@@ -393,10 +393,24 @@ export default function AgentHero({ onNavigate }) {
                 [data-theme="minimalista"] .agentport-sun {
                     background: radial-gradient(
                         circle,
-                        rgba(47, 110, 90, 0.18) 0%,
-                        rgba(47, 110, 90, 0.07) 40%,
+                        rgba(47, 110, 90, 0.2) 0%,
+                        rgba(47, 110, 90, 0.08) 42%,
                         rgba(47, 110, 90, 0) 72%
                     );
+                    width: 320px;
+                    height: 320px;
+                }
+                /* Minimalista "un toque" (operador 2026-06-06): que no se vea TAN
+                   blanco. Wash sutil del acento verde abajo + hint arriba; el
+                   blanco-papel sigue dominando, solo deja de ser plano. */
+                [data-theme="minimalista"] .agentport-scene::after {
+                    content: '';
+                    position: absolute;
+                    inset: 0;
+                    background:
+                        radial-gradient(125% 62% at 50% 110%, rgba(47, 110, 90, 0.08) 0%, rgba(47, 110, 90, 0) 56%),
+                        linear-gradient(180deg, rgba(47, 110, 90, 0.035) 0%, rgba(47, 110, 90, 0) 34%);
+                    pointer-events: none;
                 }
                 @keyframes agentport-sun-glow {
                     0%, 100% { opacity: 0.8; transform: translateX(-50%) scale(1); }
@@ -662,6 +676,43 @@ export default function AgentHero({ onNavigate }) {
                     50% { transform: scale(1.025); }
                 }
 
+                /* ===== Colibrí 2D del demo volando ALREDEDOR del avatar 3D =====
+                   Operador 2026-06-06: mantener el 3D y el 2D; el 2D orbita al
+                   3D. El contenedor rota+traslada (radio 112px) → órbita; el SVG
+                   contra-rota para no quedar de cabeza; el ala aletea. */
+                .agentport-hummer {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    z-index: 4;
+                    pointer-events: none;
+                    transform-origin: 0 0;
+                    animation: agentport-hummer-orbit 15s linear infinite;
+                }
+                .agentport-hummer > svg {
+                    display: block;
+                    margin: -23px 0 0 -31px;
+                    filter: drop-shadow(0 6px 6px rgba(90, 60, 20, 0.18));
+                    transform-origin: center;
+                    animation: agentport-hummer-upright 15s linear infinite;
+                }
+                .agentport-wing {
+                    transform-origin: 18px 26px;
+                    animation: agentport-hummer-flap 0.14s ease-in-out infinite alternate;
+                }
+                @keyframes agentport-hummer-orbit {
+                    from { transform: rotate(0deg) translateX(112px); }
+                    to { transform: rotate(360deg) translateX(112px); }
+                }
+                @keyframes agentport-hummer-upright {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(-360deg); }
+                }
+                @keyframes agentport-hummer-flap {
+                    from { transform: rotate(-24deg) scaleY(1); }
+                    to { transform: rotate(18deg) scaleY(0.72); }
+                }
+
                 /* Transición de envío: shimmer + lift (sin cambios de contrato —
                    los tests buscan estas clases). */
                 @keyframes chagra-send-shimmer {
@@ -697,7 +748,13 @@ export default function AgentHero({ onNavigate }) {
                     .chagra-hero-halo,
                     .chagra-hero-avatar-wrap,
                     .agentport-sun,
-                    .agentport-pollen { animation: none !important; }
+                    .agentport-pollen,
+                    .agentport-hummer,
+                    .agentport-hummer > svg,
+                    .agentport-wing { animation: none !important; }
+                    /* parqueado arriba-derecha, derecho, sin volar */
+                    .agentport-hummer { transform: rotate(-32deg) translateX(112px); }
+                    .agentport-hummer > svg { transform: rotate(32deg); }
                     .agentport-pollen { opacity: 0.5; }
                     .agentport-greet { animation: none !important; }
                     .chagra-composer-shimmer::after,
@@ -740,6 +797,23 @@ export default function AgentHero({ onNavigate }) {
 
             {/* ===== Zona-respiro: avatar GRANDE y centrado (abre el agente) ===== */}
             <div className="agentport-stage">
+                {/* Colibrí 2D del demo (.hummer) volando ALREDEDOR del avatar 3D.
+                    Operador 2026-06-06: "no quites el 3d ni el 2d; que el 2d
+                    vuele alrededor del 3d es lo ideal". SVG exacto del demo. */}
+                <span className="agentport-hummer" aria-hidden="true">
+                    <svg width="62" height="46" viewBox="0 0 62 46">
+                        <ellipse cx="34" cy="28" rx="11" ry="6.5" fill="#2f7d6b" />
+                        <ellipse cx="34" cy="27" rx="9" ry="4.2" fill="#3fa489" />
+                        <circle cx="46" cy="24" r="6" fill="#2a6f60" />
+                        <circle cx="48.5" cy="22.5" r="1.4" fill="#11332c" />
+                        <path d="M44 28 q5 2 8 0 q-3 4 -8 3 z" fill="#d05038" />
+                        <path d="M52 24 L62 19" stroke="#3a2a18" strokeWidth="2" strokeLinecap="round" />
+                        <path d="M23 28 L8 22 M23 30 L8 32" stroke="#256155" strokeWidth="3" strokeLinecap="round" />
+                        <g className="agentport-wing">
+                            <path d="M30 24 C18 6 6 8 2 16 C12 18 22 24 30 30 Z" fill="#4fb89a" opacity="0.9" />
+                        </g>
+                    </svg>
+                </span>
                 <button
                     type="button"
                     onClick={launchToAgent}
