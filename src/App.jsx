@@ -25,7 +25,6 @@ import { alertEngine } from './services/alertEngine';
 // comentario abajo donde se removió el render).
 // import FieldFeedback from './components/FieldFeedback';
 import AgentFab from './components/AgentFab';
-import QuickActionsPanel from './components/QuickActionsPanel';
 import { ScreenShell } from './components/common/ScreenShell';
 import ChagraGrowLoader from './components/ChagraGrowLoader';
 import Confetti from './components/common/Confetti';
@@ -743,7 +742,6 @@ export default function App() {
           ya es el botón de ENVIAR del compositor, así que el FAB flotante ahí
           duplicaría el ave. Sigue en el resto para anunciar "respuesta lista". */}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && <AgentFab onNavigate={navigate} />}
-      {currentView === 'dashboard' && <QuickActionsPanel onNavigate={navigate} />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <SyncProgressIndicator />}
       {toast && (

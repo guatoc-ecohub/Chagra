@@ -294,14 +294,13 @@ export default function AgentHero({ onNavigate }) {
     const night = isNightNow();
 
     // ── Ubicación real del perfil (arriba-der de la escena) ───────────────────
-    // 📍 Vereda, Municipio · altitud — SIN latitud. Sale del perfil de finca.
+    // 📍 Municipio · altitud — SIN vereda (operador 2026-06-06).
     // Si falta municipio, no se muestra (no inventamos ubicación).
     const profile = getProfile();
     const municipio = getProfileMunicipio();
-    const vereda = profile?.vereda || null;
     const altitud = profile?.finca_altitud || profile?.altitud || null;
     const locationLabel = municipio
-        ? [vereda ? `${vereda}, ${municipio.split(',')[0]}` : municipio.split(',')[0],
+        ? [municipio.split(',')[0],
             altitud ? `${altitud} msnm` : null]
             .filter(Boolean)
             .join(' · ')
@@ -782,7 +781,7 @@ export default function AgentHero({ onNavigate }) {
                 /* ===================== MARCA + TOGGLE ===================== */
                 .agentport-topbar {
                     position: relative;
-                    z-index: 2;
+                    z-index: 10;
                     display: flex;
                     align-items: flex-start;
                     justify-content: space-between;
@@ -846,11 +845,12 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-headtools { display: flex; align-items: center; gap: 8px; flex: none; }
 
                 /* chip de UBICACIÓN — arriba-derecha de la escena (donde vuela el
-                   colibrí). 📍 Vereda, Municipio · altitud. Delicado, acento suave. */
+                   colibrí). 📍 Municipio · altitud, SIN vereda. Reposicionado
+                   para NO tapar el sol/luna (operador 2026-06-06). */
                 .agentport-loc {
                     position: absolute; z-index: 2;
-                    top: calc(90px + env(safe-area-inset-top)); right: 14px;
-                    display: inline-flex; align-items: center; gap: 5px; max-width: 64%;
+                    top: calc(110px + env(safe-area-inset-top)); right: 18px;
+                    display: inline-flex; align-items: center; gap: 5px; max-width: 56%;
                     padding: 5px 10px; border-radius: 14px;
                     background: rgb(var(--c-surface-card) / 0.55);
                     border: 1px solid rgb(var(--t-accent-rgb) / 0.22);
@@ -1293,7 +1293,7 @@ export default function AgentHero({ onNavigate }) {
             </header>
 
             {/* UBICACIÓN — arriba-derecha de la escena (donde vuela el colibrí).
-                📍 Vereda, Municipio · altitud, SIN latitud, del perfil real. Si
+                📍 Municipio · altitud, SIN vereda (operador 2026-06-06), del perfil real. Si
                 falta el municipio no se muestra (no inventamos ubicación). */}
             {locationLabel && (
                 <div className="agentport-loc" aria-label={`Ubicación: ${locationLabel}`}>
