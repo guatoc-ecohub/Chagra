@@ -27,7 +27,11 @@ test.describe('Themes — Perfil de usuario y persistencia', () => {
         await page.getByRole('button', { name: /ingresar/i }).click();
 
         // Entrar a Perfil > Apariencia
-        await page.getByRole('button', { name: /perfil del operador/i }).click();
+        // Post-rediseño home #1339: el botón "perfil del operador" ya no existe.
+        // Ahora hay un menú de usuario (aria-label="Menú de usuario") que abre
+        // un dropdown con "Ajustes" (role="menuitem", texto "Ajustes").
+        await page.getByLabel('Menú de usuario').click();
+        await page.getByRole('menuitem', { name: 'Ajustes' }).click();
         await page.getByRole('tab', { name: /apariencia/i }).click();
         // El switcher muestra los 3 temas curados.
         await expect(page.getByRole('button', { name: /^Nature/i })).toBeVisible();
@@ -43,7 +47,9 @@ test.describe('Themes — Perfil de usuario y persistencia', () => {
         await expect(page.locator('html')).toHaveAttribute('data-theme', 'nature');
 
         // Volver a Bio-Punk (default = sin data-theme)
-        await page.getByRole('button', { name: /perfil del operador/i }).click();
+        // Post-rediseño home #1339: usar menú de usuario → Ajustes
+        await page.getByLabel('Menú de usuario').click();
+        await page.getByRole('menuitem', { name: 'Ajustes' }).click();
         await page.getByRole('tab', { name: /apariencia/i }).click();
         await page.getByRole('button', { name: /^Bio-Punk/i }).click();
         await expect(page.locator('html')).not.toHaveAttribute('data-theme');
@@ -55,7 +61,11 @@ test.describe('Themes — Perfil de usuario y persistencia', () => {
         await page.getByLabel(/contraseña/i).fill('e2e-pass');
         await page.getByRole('button', { name: /ingresar/i }).click();
 
-        await page.getByRole('button', { name: /perfil del operador/i }).click();
+        // Post-rediseño home #1339: el botón "perfil del operador" ya no existe.
+        // Ahora hay un menú de usuario (aria-label="Menú de usuario") que abre
+        // un dropdown con "Ajustes" (role="menuitem", texto "Ajustes").
+        await page.getByLabel('Menú de usuario').click();
+        await page.getByRole('menuitem', { name: 'Ajustes' }).click();
         await page.getByRole('tab', { name: /apariencia/i }).click();
         await page.getByRole('button', { name: /^Minimalista/i }).click();
 
