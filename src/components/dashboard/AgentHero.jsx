@@ -364,7 +364,7 @@ export default function AgentHero({ onNavigate }) {
                 </div>
 
                 <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-none mb-1.5">
-                    Pregúntale a <span className="bg-gradient-to-r from-emerald-300 to-lime-300 bg-clip-text text-transparent">Chagra</span>
+                    Pregúntale a <span className="chagra-wordmark">Chagra</span>
                 </h2>
                 <p
                     key={tipIndex}
@@ -494,7 +494,7 @@ export default function AgentHero({ onNavigate }) {
                             className={[
                                 'w-10 h-10 rounded-full flex items-center justify-center transition-all active:scale-95',
                                 canSend
-                                    ? 'bg-gradient-to-br from-lime-400 to-emerald-500 hover:from-lime-300 hover:to-emerald-400 text-slate-900 shadow-lg shadow-emerald-500/30'
+                                    ? 'agent-send-accent shadow-lg'
                                     : 'bg-white/8 text-slate-500 cursor-not-allowed',
                             ].join(' ')}
                         >

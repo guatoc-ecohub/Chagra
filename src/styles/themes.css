@@ -35,14 +35,48 @@
  *    acento principal de cada tema claro, para tintar el halo del agente.
  * =========================================================================== */
 
+/* Acento POR TEMA = el color de marca del demo (botón enviar redondo, wordmark
+ * "Chagra", halo). Antes biopunk no lo tenía y nature usaba oliva → el acento
+ * salía verde-lavado en vez del color del demo. Valores = demos 2026-06-05:
+ *   biopunk → teal #19c79a · nature → ocre #d98a4f · minimalista → verde #2f6e5a */
+:root {
+  --t-accent-rgb: 25, 201, 154;  /* teal neón biopunk (demo #19c79a) */
+}
+
 [data-theme="minimalista"] {
-  --t-accent-rgb: 47, 110, 90;   /* salvia */
+  --t-accent-rgb: 47, 110, 90;   /* verde profundo (demo #2f6e5a) */
   --t-bg-rgb: 246, 243, 236;     /* papel (para el agujero del halo) */
 }
 
 [data-theme="nature"] {
-  --t-accent-rgb: 122, 143, 74;  /* salvia cálida */
+  --t-accent-rgb: 217, 138, 79;  /* ocre cálido (demo #d98a4f) */
   --t-bg-rgb: 251, 245, 234;     /* crema */
+}
+
+/* ===========================================================================
+ * 0b. ELEMENTOS DE MARCA con el acento del tema (botón enviar + wordmark).
+ *    Antes usaban un degradé lime/emerald fijo (no theme-aware en `lime`) → se
+ *    veía verde-lavado e idéntico en los 3 temas. Ahora toman --t-accent-rgb:
+ *    teal (biopunk) / ocre (nature) / verde (minimalista) = el color del demo.
+ * =========================================================================== */
+
+/* Botón enviar: círculo SÓLIDO del acento (el punto focal de acción del demo) */
+.agent-send-accent {
+  background-image: none !important;
+  background-color: rgb(var(--t-accent-rgb)) !important;
+  color: #04231b !important;  /* tinta oscura — AA sobre teal/ocre claros */
+}
+/* Sobre acentos oscuros (verde minimalista) la tinta oscura no contrasta → blanco */
+[data-theme="minimalista"] .agent-send-accent {
+  color: #fff !important;
+}
+
+/* Wordmark "Chagra": del degradé al acento sólido del tema */
+.chagra-wordmark {
+  background-image: none !important;
+  -webkit-text-fill-color: rgb(var(--t-accent-rgb)) !important;
+  color: rgb(var(--t-accent-rgb)) !important;
+  font-weight: 900;
 }
 
 /* ===========================================================================
@@ -162,6 +196,46 @@
 [data-theme="nature"] .text-yellow-300 {
   color: rgb(var(--c-emerald-700)) !important;  /* verde profundo cálido (AA) */
   text-shadow: none !important;
+}
+
+/* ===========================================================================
+ * 3b. PANELES "INFO" sky/indigo (ClimaStrip "Clima en tu zona", y similares)
+ *    PEOR OFFENDER de los temas claros (reporte visual 2026-06-05): el card usa
+ *    `bg-gradient-to-br from-sky-950/70 to-indigo-950/60 border-sky-800/40
+ *    text-sky-200/300` — la familia sky/indigo NO está en la indirección
+ *    (solo slate/emerald/amber), así que el GRADIENTE oscuro sobrevivía sobre
+ *    la crema → bloque azul-oscuro con texto casi ilegible. Lo colapsamos al
+ *    surface del tema SOLO en claros (el gradiente se neutraliza a color sólido).
+ * =========================================================================== */
+
+/* Superficie: matar el gradiente sky/indigo → tarjeta del tema */
+[data-theme="nature"] .from-sky-950\/70,
+[data-theme="minimalista"] .from-sky-950\/70 {
+  background-image: none !important;
+  background-color: rgb(var(--c-surface-card)) !important;
+}
+
+/* Bordes sky del panel y del botón */
+[data-theme="nature"] .border-sky-800\/40,
+[data-theme="nature"] .border-sky-500\/40,
+[data-theme="minimalista"] .border-sky-800\/40,
+[data-theme="minimalista"] .border-sky-500\/40 {
+  border-color: rgb(var(--c-surface-border)) !important;
+}
+
+/* Texto sky claro → tinta del tema (AA sobre crema/papel) */
+[data-theme="nature"] .text-sky-200,
+[data-theme="minimalista"] .text-sky-200 {
+  color: rgb(var(--c-slate-100)) !important;
+}
+
+/* Botón de acción "Configurar ubicación" (bg-sky-700/30 → acento del tema) */
+[data-theme="nature"] .bg-sky-700\/30,
+[data-theme="nature"] .bg-sky-600\/40,
+[data-theme="minimalista"] .bg-sky-700\/30,
+[data-theme="minimalista"] .bg-sky-600\/40 {
+  background-color: rgb(var(--t-accent-rgb)) !important;
+  color: #fff !important;
 }
 
 [data-theme="minimalista"] .bg-cyan-500,
