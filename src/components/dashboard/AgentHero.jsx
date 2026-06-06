@@ -16,6 +16,8 @@ import {
     getNotificationStyle,
 } from '../../services/userProfileService';
 import { buildCropSuggestions } from '../../data/cropSuggestions';
+import { iconForTheme } from './themeIcon';
+import ChagraAgentAvatarColibri3D from '../ChagraAgentAvatarColibri3D';
 
 /**
  * AgentHero — la PORTADA INMERSIVA del agente Chagra, PRIMERA PANTALLA COMPLETA
@@ -81,49 +83,10 @@ import { buildCropSuggestions } from '../../data/cropSuggestions';
  */
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ÍCONOS DEL TEMA — los 3 SVG (versión marca) de los demos. El ícono Ⓐ del botón
-// y de la marca cambian con el tema. Tomados 1:1 de THEMES[tema].icon (demo
-// nature) / ICON_BIOPUNK (demo biopunk) / ICON.mark (demo minimalista). `auto`
-// reusa el ícono de su estética base (biopunk).
-const THEME_ICON = {
-    // Nature — manos + frailejón (Espeletia), acento tierra.
-    nature: (
-        <svg viewBox="0 0 120 120" fill="none" width="100%" height="100%" aria-hidden="true">
-            <path d="M18 100 Q38 78 60 88 Q82 78 102 100" stroke="#a8612f" strokeWidth="9" fill="none" strokeLinecap="round" />
-            <line x1="60" y1="88" x2="60" y2="56" stroke="#7a8f4a" strokeWidth="8" strokeLinecap="round" />
-            <path d="M60 64 q-16 -3 -20 -13 q15 -2 20 7 z" fill="#9cb06a" />
-            <path d="M60 64 q16 -3 20 -13 q-15 -2 -20 7 z" fill="#9cb06a" />
-            <g fill="#f5b733">
-                <circle cx="60" cy="36" r="8" /><circle cx="72" cy="36" r="8" /><circle cx="48" cy="36" r="8" />
-                <circle cx="60" cy="25" r="8" /><circle cx="60" cy="47" r="8" />
-            </g>
-            <circle cx="60" cy="36" r="6.5" fill="#d9742a" />
-        </svg>
-    ),
-    // Bio-punk — anillo eléctrico + A (azadón + rama) + travesaño zigzag.
-    biopunk: (
-        <svg viewBox="0 0 120 120" fill="none" width="100%" height="100%" aria-hidden="true">
-            <circle cx="60" cy="60" r="50" stroke="#19c79a" strokeWidth="7" />
-            <line x1="60" y1="24" x2="34" y2="96" stroke="#f0a060" strokeWidth="9" strokeLinecap="round" />
-            <line x1="60" y1="24" x2="86" y2="96" stroke="#3be8a6" strokeWidth="9" strokeLinecap="round" />
-            <path d="M44 66 L52 60 L60 66 L68 60 L76 67" stroke="#19c79a" strokeWidth="7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-    ),
-    // Minimalista — círculo + brote-horqueta monoline, acento verde sobrio.
-    minimalista: (
-        <svg viewBox="0 0 120 120" fill="none" width="100%" height="100%" aria-hidden="true">
-            <circle cx="60" cy="60" r="46" fill="none" stroke="#2b2b2b" strokeWidth="7" />
-            <path d="M60 90 V58 M60 58 L44 40 M60 58 L76 40" fill="none" stroke="#2b2b2b" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
-            <circle cx="44" cy="40" r="7" fill="#19a585" /><circle cx="76" cy="40" r="7" fill="#19a585" />
-        </svg>
-    ),
-};
-
-// Resuelve el ícono efectivo del tema (con fallback para `auto`/desconocidos).
-// `auto` cae al ícono biopunk (su estética base / default de la app).
-function iconForTheme(theme) {
-    return THEME_ICON[theme] || THEME_ICON.biopunk;
-}
+// ÍCONOS DEL TEMA — importados desde themeIcon.jsx (compartido con TopBar)
+// ─────────────────────────────────────────────────────────────────────────────
+// THEME_ICON e iconForTheme ahora viven en ./themeIcon.jsx
+// para evitar import circular y duplicación.
 
 // ¿Es de noche? (operador 2026-06-06: sol de día, luna de noche en la escena).
 // Noche = antes de las 6am o desde las 7pm. Puro, fácil de testear vía hora.
@@ -549,6 +512,8 @@ export default function AgentHero({ onNavigate }) {
                 .agentport {
                     font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, 'Segoe UI', sans-serif;
                     --ap-r-grande: 26px;
+                    /* CRÍTICO: transparente para dejar ver el fondo biopunk */
+                    background: transparent;
                 }
                 [data-theme="minimalista"] .agentport { --ap-r-grande: 22px; }
 
@@ -556,6 +521,8 @@ export default function AgentHero({ onNavigate }) {
                     min-height: 100dvh;
                     padding: 0 16px 14px;
                     overflow: hidden; /* la escena ambiente no desborda el screenful */
+                    /* CRÍTICO: transparente para dejar ver el fondo biopunk */
+                    background: transparent;
                 }
 
                 /* ===================== ESCENA AMBIENTE ===================== */
@@ -570,10 +537,11 @@ export default function AgentHero({ onNavigate }) {
                 /* — SOL (nature) — radial cálido en la zona-respiro, respira.
                    Solo nature. Posicionado bajo la marca, en el aire abierto
                    de la escena (como el amanecer del demo), no tapado por el
-                   chrome del TopBar/marca. */
+                   chrome del TopBar/marca. Ajustado top 8% para evitar que
+                   el toggle Campesino/Experto lo tape. */
                 .agentport-sun {
                     position: absolute;
-                    top: 15%;
+                    top: 8%;
                     left: 50%;
                     transform: translateX(-50%);
                     width: 240px;
@@ -1470,20 +1438,16 @@ export default function AgentHero({ onNavigate }) {
                             {isRecording ? <Square size={16} strokeWidth={2.5} aria-hidden="true" /> : <Mic size={18} strokeWidth={2.5} aria-hidden="true" />}
                         </button>
 
-                        {/* ENVIAR = el colibrí (operador 2026-06-06). Botón redondo
-                            de acento con el colibrí 2D del demo dentro. Toda la
-                            lógica de envío intacta (handleSendText → outbox →
-                            navegar, SEND_TRANSITION_MS, disabled/sending). */}
+                        {/* Enviar — botón redondo de acento con colibrí 3D (el .send del demo) */}
                         <button
                             type="button"
                             onClick={handleSendText}
                             disabled={!canSend}
                             aria-label="Enviar"
                             className={['agentport-send', canSend ? 'agent-send-accent' : ''].join(' ')}
+                            style={{ width: '44px', height: '44px', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         >
-                            <span className="send-hummer" aria-hidden="true">
-                                <HummerSvg flap={false} />
-                            </span>
+                            <ChagraAgentAvatarColibri3D size={36} state={canSend ? 'idle' : 'listening'} />
                         </button>
                     </div>
 

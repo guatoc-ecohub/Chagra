@@ -538,7 +538,16 @@ export default function App() {
     // demo (themes.css §16) en lugar de la foto. Si elige otra foto curada,
     // marcamos data-custom-bg y la foto vuelve a ganar. El gate solo importa en
     // bio-punk (sin data-theme); en nature/minimalista el fondo es crema (§2).
-    if (selectedBackground && selectedBackground !== DEFAULT_BACKGROUND_ID) {
+    //
+    // FIX 2026-06-06: El lienzo biopunk (gradiente + glow) debe verse SIEMPRE
+    // que estemos en biopunk sin foto custom explícita. data-custom-bg solo debe
+    // escribirse cuando el usuario seleccionó una foto FOTO CURADA diferente al
+    // default biopunk-4, no para cualquier cambio de default.
+    const isBiopunkDefault = selectedBackground === DEFAULT_BACKGROUND_ID;
+    const isBiopunkOne = selectedBackground === 'biopunk-1';
+    const isDefaultOrBiopunkOne = isBiopunkDefault || isBiopunkOne;
+
+    if (!isDefaultOrBiopunkOne) {
       document.body.setAttribute('data-custom-bg', '1');
     } else {
       document.body.removeAttribute('data-custom-bg');

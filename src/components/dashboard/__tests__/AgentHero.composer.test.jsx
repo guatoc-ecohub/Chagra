@@ -58,6 +58,15 @@ vi.mock('../../ChagraAgentAvatar', () => ({
   default: ({ state }) => <div data-testid="avatar" data-state={state} />,
 }));
 
+// ── Mock del avatar 3D (evita Three.js en tests) ────────────────────────────
+vi.mock('../../ChagraAgentAvatarColibri3D', () => ({
+  default: ({ size, state }) => (
+    <div data-testid="colibri-3d" data-size={size} data-state={state}>
+      🐦
+    </div>
+  ),
+}));
+
 import AgentHero, { SEND_TRANSITION_MS } from '../AgentHero';
 
 beforeEach(() => {

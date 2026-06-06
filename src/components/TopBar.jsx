@@ -5,6 +5,14 @@ import OfflineChip from './OfflineChip';
 import NotificationsBell from './NotificationsBell';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
 import useAssetStore from '../store/useAssetStore';
+<<<<<<< HEAD
+=======
+import { FARM_CONFIG } from '../config/defaults';
+import { getProfile, getProfileMunicipio } from '../services/userProfileService';
+import { findMunicipio } from '../utils/colombiaLocations';
+import { useTheme } from '../hooks/useTheme';
+import { iconForTheme } from './dashboard/themeIcon';
+>>>>>>> b2605a6 (fix(home): 4 correcciones visuales portada inmersiva v2)
 
 /**
  * TopBar, header persistente con identidad del operador (DR-030 QW2).
@@ -39,7 +47,55 @@ import useAssetStore from '../store/useAssetStore';
  * para destrabar PWA install Safari iOS).
  */
 export default function TopBar({ onNavigate, onLogout }) {
+<<<<<<< HEAD
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
+=======
+  const [envOpen, setEnvOpen] = useState(false);
+  const [operatorName, setOperatorName] = useState(() =>
+    typeof window !== 'undefined'
+      ? localStorage.getItem('chagra:operator:name') || 'Mi finca'
+      : 'Mi finca'
+  );
+  const { theme } = useTheme();
+  const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
+  const fincas = useFincaActiveStore((s) => s.fincas);
+  const activeFinca = fincas.find((f) => f.slug === activeFincaSlug);
+  // `tick` fuerza re-lectura del perfil cuando el usuario confirma su ubicación
+  // en LocationDetectedScreen (evento 'chagra:location-updated'), que la guarda
+  // en el PERFIL (userProfileService), no en fincaActiveStore. Sin esto la
+  // línea de ubicación bajo el nombre se quedaría vacía para el piloto que
+  // solo pasó por esa pantalla.
+  const [profileTick, setProfileTick] = useState(0);
+  const profile = (() => { void profileTick; return getProfile(); })();
+  // Ubicación bajo el nombre: finca activa (multi-finca) → perfil (onboarding/
+  // ubicación detectada) → FARM_CONFIG (demo).
+  //
+  // BUG FIX 2026-05-30 (operador "no veo Choachí"): antes leía
+  // `profile?.municipio` crudo. Pero el ONBOARDING guarda la ubicación en el
+  // campo `region` (texto libre, ej. "Choachí"), NO en `municipio` —
+  // `municipio` solo lo escribe LocationDetectedScreen al confirmar por el
+  // mapa. Así, el piloto que solo hizo el onboarding tenía `municipio`
+  // undefined → la línea caía a FARM_CONFIG (null en prod) y NO mostraba
+  // Choachí. `getProfileMunicipio()` retrocompatibiliza: prefiere `municipio`
+  // y, si falta, resuelve `region` contra el dataset DANE local (offline).
+  const profileMunicipio = getProfileMunicipio();
+  const municipio = activeFinca?.municipio || profileMunicipio || FARM_CONFIG?.MUNICIPIO || null;
+  // Vereda: el dataset DANE no la trae; solo aparece si el perfil/finca la tiene
+  // de onboarding manual. Si no, se omite sin romper (municipio + altitud bastan).
+  const vereda = activeFinca?.vereda || profile?.vereda || null;
+  // Altitud: prioriza la real de la finca (perfil/finca activa); si el perfil no
+  // la trae (onboarding sin altitud), cae a la altitud curada del municipio en
+  // el dataset DANE — así el chip siempre muestra municipio + altitud aunque la
+  // captura fina de la altitud real la complete el otro flujo (coarse-location).
+  const daneAltitud = municipio ? findMunicipio(String(municipio).split(',')[0])?.altitud : null;
+  const altitud =
+    activeFinca?.altitud ||
+    profile?.finca_altitud ||
+    profile?.altitud ||
+    FARM_CONFIG?.ALTITUD_MSNM ||
+    daneAltitud ||
+    null;
+>>>>>>> b2605a6 (fix(home): 4 correcciones visuales portada inmersiva v2)
 
   // "Respira" animación del logo Chagra cuando hay actividad de fondo
   // (warm-up del agente IA o sync con FarmOS). Sensación de "agente vivo
@@ -93,11 +149,16 @@ export default function TopBar({ onNavigate, onLogout }) {
               del AgentHero justo debajo. El colibrí sigue VIVO en la escena del
               home y ES el botón de enviar. */}
           <span
-            className={['text-base font-bold', isBreathing ? 'chagra-topbar-breathe' : ''].join(' ')}
-            style={{ display: 'inline-flex' }}
+            className={isBreathing ? 'chagra-topbar-breathe' : ''}
+            style={{ display: 'inline-flex', width: '32px', height: '32px' }}
+            aria-hidden="true"
           >
-            Chagra
+            {iconForTheme(theme)}
           </span>
+          <div className="hidden sm:flex flex-col">
+            <span className="text-base font-bold leading-tight">Chagra</span>
+            <small className="text-[10px] text-slate-400 font-normal">su mano en el campo</small>
+          </div>
           <span className="hidden md:inline text-[10px] text-slate-500 font-mono font-normal">v{APP_VERSION}</span>
         </button>
         <style>{`
