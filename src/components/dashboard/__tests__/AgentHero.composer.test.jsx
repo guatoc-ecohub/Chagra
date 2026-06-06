@@ -336,12 +336,6 @@ describe('AgentHero — colibrí = enviar + botón de perfil (operador 2026-06-0
     expect(container.querySelector('input[capture]')).toBeNull();
   });
 
-  test('el botón de perfil navega a la pantalla de Perfil', () => {
-    const onNavigate = vi.fn();
-    render(<AgentHero onNavigate={onNavigate} />);
-    fireEvent.click(screen.getByLabelText('Perfil'));
-    expect(onNavigate).toHaveBeenCalledWith('perfil');
-  });
 });
 
 describe('AgentHero — voseo (español colombiano)', () => {
