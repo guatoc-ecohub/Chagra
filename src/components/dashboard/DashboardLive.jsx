@@ -148,7 +148,7 @@ function SortableSection({ id, onNavigate, sensors }) {
     );
 }
 
-export default function DashboardLive({ onNavigate }) {
+export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
     const [order, setOrder] = useState(readOrder);
     const iotAlerts = useAssetStore((s) => s.iotAlerts) || [];
 
@@ -182,8 +182,15 @@ export default function DashboardLive({ onNavigate }) {
             className="flex flex-col w-full h-full overflow-y-auto pb-24"
             data-scroll-key="dashboard-live"
         >
-            {/* Agente: fijo arriba, no draggable. Protagonista. */}
+            {/* Agente: PORTADA INMERSIVA a pantalla completa (≈100dvh).
+                Protagonista absoluto, primera pantalla. El resto del dashboard
+                (saludo regional + secciones) queda DEBAJO del fold y se llega
+                scrolleando. */}
             <AgentHero onNavigate={onNavigate} />
+
+            {/* Saludo regional dismissible — bajo el fold, ya no sobre el hero
+                (que tiene su propio saludo "Soy Chagra"). */}
+            {regionalGreeting}
 
             {/* Secciones drag-reorder */}
             <div className="px-4 pt-3 pb-4">

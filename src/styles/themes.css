@@ -80,6 +80,46 @@
 }
 
 /* ===========================================================================
+ * 0bis. TOPBAR FLOTANTE de la PORTADA INMERSIVA del agente (2026-06-06).
+ *    En el home, el AgentHero ocupa la primera pantalla completa (≈100dvh). El
+ *    TopBar pasó a ser un overlay flotante (.agent-immersive-topbar) por encima
+ *    de la escena, para no comerle alto vertical a la inmersión. Aquí lo hacemos
+ *    DISCRETO: el header interno pierde su barra sólida y su borde inferior, y
+ *    queda translúcido con blur — flota sobre la escena sin romperla. El blur
+ *    mantiene legible la identidad operador encima del resplandor/colibrí.
+ * =========================================================================== */
+.agent-immersive-topbar > header {
+  background: transparent !important;
+  border-bottom: 0 !important;
+  position: relative !important; /* el sticky del header no aplica dentro del overlay */
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+/* La barra colapsable "Ambiente · altitud · efemérides" (hermana del header,
+   hija directa del overlay) también pierde su fondo/borde sólidos para no
+   cortar la escena con una franja dura justo encima de las pills de tema. */
+.agent-immersive-topbar > button {
+  background: transparent !important;
+  border-bottom: 0 !important;
+}
+/* Las "pastillas" internas (operador, acciones) conservan su fondo, pero la
+   barra global ya no tapa la escena. Un degradé sutil de arriba asegura
+   contraste del texto del operador sobre el resplandor sin barra dura. */
+.agent-immersive-topbar::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 120px;
+  background: linear-gradient(180deg, rgb(var(--c-surface) / 0.6) 0%, rgb(var(--c-surface) / 0.25) 55%, rgb(var(--c-surface) / 0) 100%);
+  pointer-events: none;
+  z-index: -1;
+}
+[data-theme="nature"] .agent-immersive-topbar::before,
+[data-theme="minimalista"] .agent-immersive-topbar::before {
+  background: linear-gradient(180deg, rgb(var(--c-surface-raised) / 0.7) 0%, rgb(var(--c-surface-raised) / 0) 100%);
+}
+
+/* ===========================================================================
  * 1. FOTO DE LOGIN Y PATRÓN BIOPUNK
  *    La capa de foto oscura del login (.login-bg-photo) trae su propio overlay
  *    slate-950: en temas claros oscurecería la UI. El patrón PCB biopunk
