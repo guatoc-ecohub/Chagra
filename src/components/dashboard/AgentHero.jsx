@@ -849,7 +849,7 @@ export default function AgentHero({ onNavigate }) {
                    para NO tapar el sol/luna (operador 2026-06-06). */
                 .agentport-loc {
                     position: absolute; z-index: 2;
-                    top: calc(110px + env(safe-area-inset-top)); right: 18px;
+                    top: calc(148px + env(safe-area-inset-top)); right: 18px;
                     display: inline-flex; align-items: center; gap: 5px; max-width: 56%;
                     padding: 5px 10px; border-radius: 14px;
                     background: rgb(var(--c-surface-card) / 0.55);
@@ -1253,7 +1253,7 @@ export default function AgentHero({ onNavigate }) {
                 <div className="agentport-brand">
                     <span className="agentport-mark">{iconForTheme(theme)}</span>
                     <div className="agentport-name">
-                        Chagra<small>tu mano en el campo</small>
+                        Chagra<small>su mano en el campo</small>
                     </div>
                 </div>
 

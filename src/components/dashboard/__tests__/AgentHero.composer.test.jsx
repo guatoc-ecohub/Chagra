@@ -358,4 +358,18 @@ describe('AgentHero — voseo (español colombiano)', () => {
     expect(text).not.toMatch(/\btenés\b/);
     expect(text).not.toMatch(/\bquerés\b/);
   });
+
+  test('el wordmark usa "su mano en el campo" (usted colombiano, NO "tu") — HOME-FIX', () => {
+    const { container } = render(<AgentHero onNavigate={vi.fn()} />);
+    // Buscar específicamente el elemento .agentport-name
+    const wordmark = container.querySelector('.agentport-name');
+    expect(wordmark).toBeTruthy();
+    const text = wordmark.textContent || '';
+    // Debe decir "su mano en el campo" (usted colombiano).
+    // Nota: textContent puede concatenar "Chagra" con el <small>, así que
+    // buscamos la frase sin word boundary estricto al inicio.
+    expect(text).toMatch(/su mano en el campo/i);
+    // NO debe decir "tu mano en el campo" (tú incorrecto).
+    expect(text).not.toMatch(/tu mano en el campo/i);
+  });
 });
