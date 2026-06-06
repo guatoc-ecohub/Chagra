@@ -1,12 +1,1 @@
-{
-  "allowedOrganizations": ["guatoc-ecohub"],
-  "contributors": [
-    {
-      "login": "kortux",
-      "name": "Miguel (operador Guatoc)",
-      "email": "operator@guatoc.co",
-      "signedAt": "2026-06-06",
-      "version": "1.0"
-    }
-  ]
-}
+{"allowedOrganizations":["guatoc-ecohub"],"contributors":[{"login":"kortux","name":"Miguel (operador Guatoc)","email":"operator@guatoc.co","signedAt":"2026-06-06T23:00:00Z","version":"1.0"}]}
