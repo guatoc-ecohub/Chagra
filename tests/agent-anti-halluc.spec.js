@@ -221,8 +221,34 @@ async function mockSidecar(page, opts = {}) {
   });
 }
 
+// Texto neutro de la pregunta de ENTRADA al AgentScreen (ver gotoAgentScreen).
+// No es "tomate"/"maíz"/etc. para no chocar visualmente con las preguntas de
+// los casos que cuentan burbujas/cola por contenido.
+const ENTRY_QUESTION = 'hola chagra';
+
 /**
  * Login + navegación al AgentScreen. Reutilizable en todos los tests.
+ *
+ * CAMINO NUEVO (PR #1336, "pulido del agente"): el AgentFab (colibrí flotante
+ * "Asistente Chagra IA") ya NO se renderiza en el home/dashboard — el operador
+ * pidió que en la portada el colibrí sea el botón de ENVIAR del compositor, no
+ * un FAB duplicado. La única entrada determinística al AgentScreen desde el
+ * home es ahora el COMPOSITOR de la portada (AgentHero):
+ *   - textarea  → aria-label "Escribe tu pregunta al agente"
+ *                 (placeholder "Pregúntale a Chagra…")
+ *   - enviar    → botón colibrí, aria-label "Enviar" (habilitado solo con texto)
+ * Al enviar, AgentHero PERSISTE la consulta en la outbox durable y navega a
+ * 'agente'; al montar, AgentScreen DRENA la outbox y procesa esa consulta por
+ * el mismo pipeline (enqueue → runAgentPipeline → completeProcessing).
+ *
+ * CONSECUENCIA para la cola (task #121, QUEUE_MAX=2): entrar al chat ahora
+ * SIEMBRA 1 mensaje en la cola. Los casos que cuentan la cola (A enquola
+ * exactamente 2; C espera "1 en cola") asumen una cola VACÍA al empezar. Por
+ * eso este helper, tras entrar, ESPERA a que el mensaje de entrada drene por
+ * completo: el placeholder del input vuelve a 'Escribe tu pregunta...' solo
+ * cuando queueProcessing===null y queuePending===[] (cola ociosa). Recién ahí
+ * los casos pueden encolar sus 2 preguntas sobre una cola limpia, sin acoplar
+ * el helper al delay del mock LLM de cada test.
  */
 async function gotoAgentScreen(page) {
   await page.goto('/');
@@ -230,15 +256,30 @@ async function gotoAgentScreen(page) {
   await page.getByLabel(/contraseña/i).fill('e2e-pwd');
   await page.getByRole('button', { name: /ingresar/i }).click();
 
-  // El AgentFab es global pero solo aparece fuera de login/loading/voz/agente.
-  // aria-label exacto: "Asistente Chagra IA" (o "Chagra IA tiene respuesta
-  // nueva" si responseReady=true — no debería al primer login).
-  const fab = page.getByRole('button', { name: /Asistente Chagra IA/i });
-  await expect(fab).toBeVisible({ timeout: 15_000 });
-  await fab.click();
+  // Compositor de la portada (AgentHero): escribir + enviar (colibrí) navega al
+  // AgentScreen. El textarea aparece fuera de login/loading; le damos margen al
+  // primer paint del dashboard.
+  const composer = page.getByLabel('Escribe tu pregunta al agente');
+  await expect(composer).toBeVisible({ timeout: 15_000 });
+  await composer.fill(ENTRY_QUESTION);
+  // El botón de enviar (colibrí) se habilita al haber texto.
+  const sendBtn = page.getByRole('button', { name: /^Enviar$/ });
+  await expect(sendBtn).toBeEnabled({ timeout: 5_000 });
+  await sendBtn.click();
 
   // Confirmar que el AgentScreen ya renderizó el input.
   await expect(page.getByTestId('agent-input')).toBeVisible({ timeout: 10_000 });
+
+  // Esperar a que el mensaje de ENTRADA drene la cola por completo: el
+  // placeholder vuelve al default solo con la cola ociosa (sin processing ni
+  // pending). Sin esto, las preguntas del caso encolarían sobre una cola que
+  // todavía tiene el mensaje de entrada → conteo roto. Timeout holgado: cubre
+  // los mocks con delayMs (p.ej. Caso A/C usan delayMs 3000 en el LLM).
+  await expect(page.getByTestId('agent-input')).toHaveAttribute(
+    'placeholder',
+    'Escribe tu pregunta...',
+    { timeout: 15_000 }
+  );
 }
 
 /**
@@ -646,6 +687,13 @@ test.describe('AgentScreen — sidecar pipeline (flag-dependent)', () => {
     });
 
     await gotoAgentScreen(page);
+    // gotoAgentScreen entra al chat SEMBRANDO 1 mensaje de texto (camino nuevo
+    // del compositor de la portada, PR #1336). Ese mensaje de entrada SÍ pasa
+    // por el NLU normal (no es un chip) → dispararía el counter. Lo reseteamos
+    // ahora que la entrada ya drenó: el contrato que medimos es que el CHIP
+    // (la acción de abajo) NO toque el /nlu, no la pregunta de entrada.
+    nluCalled = false;
+    pestToolCalled = false;
     // Activar el chip Plaga y enviar.
     await page.getByRole('button', { name: /Plaga/i }).click();
     await askAgent(page, 'broca del café');
@@ -684,6 +732,9 @@ test.describe('AgentScreen — sidecar pipeline (flag-dependent)', () => {
     });
 
     await gotoAgentScreen(page);
+    // Reset tras la entrada sembrada (ver Caso L): medimos solo el chip.
+    nluCalled = false;
+    speciesToolCalled = false;
     await page.getByRole('button', { name: /Qué siembro/i }).click();
     await askAgent(page, 'aguacate');
 
@@ -710,6 +761,11 @@ test.describe('AgentScreen — sidecar pipeline (flag-dependent)', () => {
     await mockSidecar(page);
 
     await gotoAgentScreen(page);
+    // Reset tras la entrada sembrada (ver Caso L): la pregunta de entrada SÍ
+    // pasa por NLU+LLM; el contrato que medimos es que el chip Precio resuelva
+    // su STUB honesto sin tocar NI /nlu NI el LLM.
+    nluCalled = false;
+    llmCalled = false;
     await page.getByRole('button', { name: /Precio/i }).click();
     await askAgent(page, 'papa');
 
