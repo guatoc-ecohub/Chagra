@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { Mic, Square, Camera, Settings, X } from 'lucide-react';
+import { Mic, Square, Camera, X } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { captureAndCompress } from '../../services/photoService';
 import { isAnalyzableImageAttachment } from '../../services/agentOutboxAttachment';
@@ -299,8 +299,13 @@ export default function AgentHero({ onNavigate }) {
     const profile = getProfile();
     const municipio = getProfileMunicipio();
     const altitud = profile?.finca_altitud || profile?.altitud || null;
+    // Vereda CONDICIONAL (operador 2026-06-06): si el perfil la tiene
+    // (la escribió en onboarding; NO se auto-detecta), va delante →
+    // "Vereda · Municipio · msnm". Si no, "Municipio · msnm".
+    const vereda = profile?.vereda || profile?.finca_vereda || null;
     const locationLabel = municipio
-        ? [municipio.split(',')[0],
+        ? [vereda,
+            municipio.split(',')[0],
             altitud ? `${altitud} msnm` : null]
             .filter(Boolean)
             .join(' · ')
@@ -1279,16 +1284,9 @@ export default function AgentHero({ onNavigate }) {
                         </button>
                     </div>
 
-                    {/* Botón de perfil (engranaje) → pantalla de Perfil (prefs). */}
-                    <button
-                        type="button"
-                        className="agentport-profile"
-                        aria-label="Perfil"
-                        title="Perfil y preferencias"
-                        onClick={() => onNavigate?.('perfil')}
-                    >
-                        <Settings size={18} aria-hidden="true" />
-                    </button>
+                    {/* Engranaje de perfil REMOVIDO (operador 2026-06-06): era
+                        redundante — el ícono de usuario del TopBar ya abre el menú
+                        con Ajustes/Salir. */}
                 </div>
             </header>
 

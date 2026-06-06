@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { CircleUser, HelpCircle, LogOut } from 'lucide-react';
 import { version as APP_VERSION } from '../../package.json';
 import OfflineChip from './OfflineChip';
-import ChagraAgentAvatar from './ChagraAgentAvatar';
 import NotificationsBell from './NotificationsBell';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
 import useAssetStore from '../store/useAssetStore';
@@ -88,14 +87,17 @@ export default function TopBar({ onNavigate, onLogout }) {
           title={isBreathing ? 'Chagra está pensando…' : 'Volver al inicio'}
           className="font-bold flex items-center gap-2 shrink-0 rounded-lg px-1 py-1 hover:bg-slate-800/60 active:bg-slate-700 transition-colors min-h-[44px]"
         >
+          {/* Colibrí (ChagraAgentAvatar) REMOVIDO del TopBar 2026-06-06 (operador:
+              "sacar el colibrí de arriba-izquierda"). La identidad del tema
+              (ícono del tema + "Chagra · su mano en el campo") la da el brand
+              del AgentHero justo debajo. El colibrí sigue VIVO en la escena del
+              home y ES el botón de enviar. */}
           <span
-            className={isBreathing ? 'chagra-topbar-breathe' : ''}
+            className={['text-base font-bold', isBreathing ? 'chagra-topbar-breathe' : ''].join(' ')}
             style={{ display: 'inline-flex' }}
-            aria-hidden="true"
           >
-            <ChagraAgentAvatar size={32} state={isBreathing ? 'thinking' : 'idle'} />
+            Chagra
           </span>
-          <span className="hidden sm:inline text-base">Chagra</span>
           <span className="hidden md:inline text-[10px] text-slate-500 font-mono font-normal">v{APP_VERSION}</span>
         </button>
         <style>{`
