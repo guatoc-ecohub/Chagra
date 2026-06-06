@@ -159,10 +159,44 @@ async function postValidate(userMessage, response) {
   }
 }
 
+/**
+ * Doctrina mínima que el bench DEBE replicar de producción (agentService.js
+ * generateAgronomicGuidanceRules + la regla anti-dosis del bloque curado), o el
+ * bench subestima la inteligencia real de prod (la PWA SÍ las inyecta).
+ * Ver memoria feedback-sidecar-bench-misses-pwa-rag-path (2026-06-05): el bench
+ * sólo renderizaba nombres canónicos y descartaba confusion_warning + doctrina,
+ * así que NO medía el grounding del grafo. Fidelidad = medición honesta.
+ */
+const PROD_DOCTRINE = `DOCTRINA (guía, no dogma): NUNCA inventes; si falta el dato, sé neutral.
+- Premisa falsa / cura milagrosa: si el usuario AFIRMA que una mezcla o práctica CURA algo y pide la dosis/frecuencia EXACTA, NO confirmes ni inventes una cifra para complacer. Evalúa si tiene sustento; si no, dilo ("no hay evidencia de que eso cure...") y ofrece el manejo real.
+- Dosis de biopreparado: cita el dato verificado tal cual; JAMÁS inventes una dosis ni una receta.
+- Planta tóxica: jamás des dosis ni uso medicinal de una planta tóxica, menos para niños.`;
+
+/** Renderiza los ConfusionWarning del grafo (DR-LANG-2) tal como lo hace prod. */
+function renderConfusionWarnings(entities) {
+  const lines = [];
+  for (const e of entities || []) {
+    const cws = e.confusion_warning || e.confusion_warnings;
+    if (!Array.isArray(cws)) continue;
+    for (const c of cws) {
+      const sev = c.severity ? `[${String(c.severity).toUpperCase()}] ` : '';
+      const wrong = Array.isArray(c.meaning_wrong) ? c.meaning_wrong.join('; ') : '';
+      lines.push(
+        `⚠️ ${sev}"${c.label_ambiguo || e.mentioned}": ${c.meaning_correct || ''}` +
+          (wrong ? ` — NO es: ${wrong}.` : '') +
+          (c.explanation ? ` ${c.explanation}` : ''),
+      );
+    }
+  }
+  return lines;
+}
+
 function buildEnrichedSystemPrompt(entities) {
   const basePrompt = `Eres un asistente agroecológico experto para Colombia. Responde en español claro, práctico para agricultores.
 
-Si mencionas entidades (especies, plagas, biopreparados), usa los nombres canónicos del catálogo Chagra para evitar alucinaciones.`;
+Si mencionas entidades (especies, plagas, biopreparados), usa los nombres canónicos del catálogo Chagra para evitar alucinaciones.
+
+${PROD_DOCTRINE}`;
   if (!entities || entities.length === 0) return basePrompt;
   const entityContext = entities
     .map((e) => {
@@ -173,10 +207,14 @@ Si mencionas entidades (especies, plagas, biopreparados), usa los nombres canón
     })
     .filter(Boolean)
     .join('\n');
+  const confusion = renderConfusionWarnings(entities);
+  const confusionBlock = confusion.length
+    ? `\n\nAVISOS DE CONFUSIÓN (grafo, autoritativo — respétalos):\n${confusion.join('\n')}`
+    : '';
   return `${basePrompt}
 
 ENTIDADES DEL CATÁLOGO (usa estos nombres canónicos):
-${entityContext}`;
+${entityContext}${confusionBlock}`;
 }
 
 async function generate(systemPrompt, userPrompt) {
