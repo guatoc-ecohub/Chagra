@@ -14,13 +14,36 @@ describe('Catalog Count - Task #189', () => {
   it('should have at least 200 species in OSS subset v3.2', () => {
     const catalogPath = path.join(__dirname, '../../catalog/chagra-catalog-oss-subset-v3.2.json');
     const catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf-8'));
-    
+
     expect(catalog.species).toBeDefined();
     expect(catalog.species.length).toBeGreaterThanOrEqual(200);
     // El subset v3.2 quedó con 205 species (el archivo y schema_version ya son
     // v3.2). El test seguía clavado en el conteo de v3.1 (204) y fallaba en main
     // — actualizado al dato real para no nacer rojo el gate de vitest.
     expect(catalog.species.length).toBe(205);
+  });
+
+  it('should include Carludovica palmata (palma de iraca) - Task #iraca-seed', () => {
+    const catalogPath = path.join(__dirname, '../../catalog/chagra-catalog-seed-v3.1.json');
+    const catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf-8'));
+
+    const speciesIds = catalog.species.map(s => s.id);
+    expect(speciesIds).toContain('carludovica_palmata');
+
+    const iraca = catalog.species.find(s => s.id === 'carludovica_palmata');
+    expect(iraca).toBeDefined();
+    expect(iraca.nombre_comun).toBe('Palma de iraca (paja toquilla)');
+    expect(iraca.nombre_cientifico).toBe('Carludovica palmata Ruiz & Pav.');
+    expect(iraca.familia_botanica).toBe('Cyclanthaceae');
+    expect(iraca.category).toBe('fibras_no_maderables');
+    expect(iraca.cultivable).toBe(true);
+    expect(iraca.conservation_status).toBe('nativo_silvestre');
+    expect(iraca.altitud_msnm.min_absoluto).toBe(0);
+    expect(iraca.altitud_msnm.max_absoluto).toBe(1800);
+    expect(iraca.source_ids).toContain('gbif-taxonomic-backbone');
+    expect(iraca.source_ids).toContain('powo-kew');
+    expect(iraca.valor_pedagogico).toContain('Sandoná');
+    expect(iraca.valor_pedagogico).toContain('Nariño');
   });
 
   it('should have proper schema version', () => {
