@@ -6059,6 +6059,205 @@ export function guardInventedBotanicalExtract(responseText, resolvedEntities = n
   };
 }
 
+// ── GUARD: binomio de ORGANISMO BENÉFICO FABRICADO (caveat suave · 2026-06-06) ─
+
+/**
+ * Allowlist de GÉNEROS de organismos BENÉFICOS (depredadores / parasitoides /
+ * polinizadores / entomopatógenos) REALES y bien documentados que se citan en
+ * agroecología neotropical/colombiana. Sirve para NO marcar como dudoso un
+ * binomio cuyo género es de control biológico conocido (Aphidius colemani,
+ * Chrysoperla carnea, Coccinella septempunctata…). Normalizado (minúsculas, sin
+ * tildes). Lista deliberadamente AMPLIA y conservadora hacia el NO-disparo: ante
+ * la duda preferimos NO poner caveat (un FP en un benéfico real molesta más que
+ * dejar pasar un benéfico raro sin confirmar).
+ *
+ * NO confundir con el catálogo Chagra (Species de CULTIVOS): estos son enemigos
+ * naturales / insectos benéficos, que en su mayoría NO están en el grafo de
+ * especies vegetales. Por eso el filtro de fabricación NO puede apoyarse en el
+ * catálogo (un benéfico real tampoco está ahí) — se apoya en esta allowlist
+ * curada de géneros.
+ */
+const BENEFICIAL_GENERA_ALLOWLIST = new Set(
+  [
+    // Parasitoides (Hymenoptera) — avispitas
+    'aphidius', 'lysiphlebus', 'diaeretiella', 'praon', 'aphelinus',
+    'encarsia', 'eretmocerus', 'trichogramma', 'telenomus', 'cotesia',
+    'apanteles', 'diadegma', 'diachasmimorpha', 'fopius', 'doryctobracon',
+    'tamarixia', 'anagyrus', 'leptomastix', 'metaphycus', 'cales',
+    'amitus', 'cephalonomia', 'prorops', 'phymastichus', 'spalangia',
+    'muscidifurax', 'pteromalus', 'bracon', 'habrobracon', 'opius',
+    // Depredadores: coccinélidos (mariquitas / catarinas)
+    'coccinella', 'hippodamia', 'harmonia', 'cycloneda', 'eriopis',
+    'olla', 'cryptolaemus', 'stethorus', 'scymnus', 'chilocorus',
+    'rodolia', 'novius', 'azya', 'delphastus',
+    // Depredadores: crisopas / hemeróbidos
+    'chrysoperla', 'chrysopa', 'ceraeochrysa', 'hemerobius', 'mallada',
+    // Depredadores: sírfidos, cecidómidos, antocóridos, míridos
+    'syrphus', 'allograpta', 'eupeodes', 'episyrphus', 'toxomerus',
+    'aphidoletes', 'orius', 'anthocoris', 'macrolophus', 'nesidiocoris',
+    'geocoris', 'nabis', 'podisus', 'zelus', 'sinea',
+    // Ácaros depredadores (fitoseidos)
+    'phytoseiulus', 'neoseiulus', 'amblyseius', 'galendromus', 'typhlodromus',
+    'iphiseiodes',
+    // Nematodos entomopatógenos
+    'steinernema', 'heterorhabditis',
+    // Hongos / bacterias / virus entomopatógenos (refuerzo de REAL_BIOCONTROL_TERMS)
+    'beauveria', 'metarhizium', 'cordyceps', 'isaria', 'lecanicillium',
+    'verticillium', 'purpureocillium', 'paecilomyces', 'pochonia', 'nomuraea',
+    'bacillus', 'baculovirus',
+    // Antagonistas de hongos (biocontrol fitopatógeno)
+    'trichoderma', 'gliocladium', 'ampelomyces',
+    // Polinizadores (abejas / abejorros / meliponas)
+    'apis', 'bombus', 'tetragonisca', 'melipona', 'scaptotrigona',
+    'nannotrigona', 'osmia', 'xylocopa', 'centris', 'eulaema', 'euglossa',
+  ].map(_stripDiacritics),
+);
+
+/**
+ * Términos que establecen CONTEXTO de ENEMIGO NATURAL / CONTROL BIOLÓGICO.
+ * El guard SOLO actúa sobre binomios que aparezcan en una oración (o su vecina)
+ * con uno de estos términos: así un binomio de CULTIVO/planta nativa (que NO es
+ * un organismo benéfico) jamás recibe caveat. Normalizado (minúsculas, sin
+ * tildes). Conservador: sin contexto de biocontrol → no se toca nada.
+ */
+const BENEFICIAL_CONTEXT_RE =
+  /\b(enemig\w*\s+natural\w*|control\w*\s+biolog\w*|biocontrol\w*|depredador\w*|parasitoid\w*|parasit\w*\s+(de\s+)?(la\s+|el\s+)?plaga|polinizador\w*|insecto\w*\s+benefic\w*|fauna\s+benefic\w*|avispit\w*\s+parasit\w*|liber[aeá]\w*\s+\w*\s*(para|contra)\b|se\s+(come|comen|alimenta\w*|aliment[ae]\w*)\s+(de\s+)?(los\s+|las\s+)?(pulgon\w*|afid\w*|larva\w*|huevo\w*|plaga\w*|cochinilla\w*|mosca\w*|trip\w*|acaro\w*))/;
+
+/** Prefijo/marca estable del caveat suave (idempotencia + asserts de test). */
+const FABRICATED_BENEFICIAL_MARKER = 'Verifica este nombre con tu técnico';
+
+/**
+ * guardFabricatedBeneficialBinomial — CAVEAT SUAVE sobre binomios de organismos
+ * BENÉFICOS (depredador / parasitoide / polinizador / entomopatógeno) que NO se
+ * pueden confirmar contra la allowlist curada de géneros de biocontrol reales.
+ *
+ * BUG REAL (2026-06-06): respondiendo "control del pulgón", el agente recomendó
+ * enemigos naturales e INVENTÓ "hormigas cazadoras (Oligamus pectoralis)" — un
+ * binomio que no existe (el género Oligamus no es un organismo descrito).
+ * Aphidius colemani, al lado, SÍ es real. El campesino recibe un nombre falso de
+ * organismo benéfico → desinformación que puede mandarlo a buscar/comprar algo
+ * que no existe.
+ *
+ * DISEÑO CONSERVADOR (anti-falso-positivo — restricción crítica):
+ *  - Colombia tiene MUCHÍSIMAS especies nativas reales fuera del catálogo. Por
+ *    eso "no está en el catálogo" ≠ "inventado": NUNCA suprimimos un binomio. El
+ *    daño aquí es AFIRMAR un nombre como cierto sin poder confirmarlo, no
+ *    nombrarlo — así que el remedio es un CAVEAT ANEXO, no un borrado (a
+ *    diferencia del guard de agroquímico/tóxico donde nombrar el insumo ES el
+ *    daño).
+ *  - El guard SOLO mira binomios en CONTEXTO de enemigo natural / control
+ *    biológico (`BENEFICIAL_CONTEXT_RE` en la oración o su vecina). Un binomio de
+ *    CULTIVO o planta nativa mencionada como árbol/sombra/comida NO entra → cero
+ *    riesgo de tachar nativas legítimas.
+ *  - Un binomio cuyo GÉNERO está en `BENEFICIAL_GENERA_ALLOWLIST` (o es un agro-
+ *    input real conocido) NO recibe caveat (Aphidius/Chrysoperla/Coccinella…).
+ *  - Un binomio que YA viene en el grounding curado (`resolvedEntities`, incl.
+ *    pest_controllers/companions) está respaldado por fuente → no recibe caveat.
+ *  - Pares de prosa española capitalizada ("Sin embargo", "Estos enemigos") se
+ *    descartan con `_looksLikeLatinBinomial` (igual que guards 5/5b).
+ *  - ADITIVO e IDEMPOTENTE: el cuerpo del LLM queda intacto; segunda pasada no
+ *    re-anexa. Determinístico y barato (regex + lookup), sin llamar al LLM.
+ *
+ * Alcance honesto: detecta binomios de organismos benéficos cuyo GÉNERO no es de
+ * biocontrol conocido. Generaliza más allá del caso `Oligamus pectoralis` (cubre
+ * cualquier género no-allowlisted en contexto benéfico), PERO la cobertura
+ * depende de la completitud de la allowlist y del detector de contexto: un
+ * binomio fabricado cuyo GÉNERO coincida casualmente con uno real de biocontrol
+ * (epíteto inventado, p.ej. "Aphidius fantasticus") NO se marca — eso requeriría
+ * un resolver externo (GBIF/POWO) que hoy el sidecar no expone. El caveat es
+ * suave a propósito: ante la duda no afirma "es falso", solo pide verificar.
+ *
+ * Firma propia (necesita las entidades resueltas crudas para el grounding) → se
+ * invoca aparte en applyOutputGuards, fuera de GUARD_CHAIN.
+ *
+ * @param {string} responseText
+ * @param {Array<object>|null} resolvedEntities  grounding del turno (opcional).
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardFabricatedBeneficialBinomial(responseText, resolvedEntities = null) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Idempotencia: nuestro caveat ya está → no re-anexar.
+  if (responseText.includes(FABRICATED_BENEFICIAL_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Gate barato: si el texto no toca control biológico / enemigos naturales en
+  // ningún lado, no hay nada que mirar (cero costo en respuestas de siembra/precio).
+  const fullNorm = _stripDiacritics(responseText);
+  if (!BENEFICIAL_CONTEXT_RE.test(fullNorm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Binomios ya respaldados por el grounding curado (entidad + sub-arrays) → no
+  // se cuestionan, aunque su género no esté en la allowlist estática.
+  const grounded = _groundedBinomials(Array.isArray(resolvedEntities) ? resolvedEntities : []);
+
+  // Recorremos oración por oración: un binomio solo es "benéfico" si su oración
+  // (o una vecina inmediata) está en contexto de enemigo natural/biocontrol.
+  const sentences = _splitSentences(responseText);
+  const sentNorms = sentences.map((s) => _stripDiacritics(s));
+
+  /** binomios canónicos dudosos, en orden de aparición, dedup. */
+  const dudosos = [];
+  const seen = new Set();
+  /** display crudo (Género epíteto) por binomio canónico, para el caveat. */
+  const displayOf = new Map();
+
+  for (let i = 0; i < sentences.length; i += 1) {
+    // ¿Esta oración o una vecina inmediata establece contexto benéfico?
+    const ctxHere =
+      BENEFICIAL_CONTEXT_RE.test(sentNorms[i]) ||
+      (i > 0 && BENEFICIAL_CONTEXT_RE.test(sentNorms[i - 1])) ||
+      (i + 1 < sentNorms.length && BENEFICIAL_CONTEXT_RE.test(sentNorms[i + 1]));
+    if (!ctxHere) continue;
+
+    SCI_BINOMIAL_RE.lastIndex = 0;
+    let m;
+    while ((m = SCI_BINOMIAL_RE.exec(sentences[i])) !== null) {
+      const genusRaw = m[1];
+      const epithetRaw = m[2];
+      if (!_looksLikeLatinBinomial(genusRaw, epithetRaw)) continue;
+      const genusNorm = _stripDiacritics(genusRaw).toLowerCase();
+      // Género de biocontrol REAL conocido (allowlist o agro-input) → legítimo.
+      if (BENEFICIAL_GENERA_ALLOWLIST.has(genusNorm)) continue;
+      if (_isRealAgroInput(genusNorm)) continue;
+      const bin = _binomial(`${genusRaw} ${epithetRaw}`);
+      if (!bin) continue;
+      // Respaldado por el grounding curado → no se cuestiona.
+      if (grounded.has(bin)) continue;
+      if (seen.has(bin)) continue;
+      seen.add(bin);
+      dudosos.push(bin);
+      displayOf.set(bin, `${genusRaw} ${epithetRaw}`);
+    }
+  }
+
+  if (dudosos.length === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('fabricated_beneficial_binomial');
+
+  const nombres = dudosos.map((b) => displayOf.get(b) || _displayBinomial(b));
+  const lista = nombres.length === 1 ? `"${nombres[0]}"` : nombres.map((n) => `"${n}"`).join(', ');
+  const plural = nombres.length > 1;
+  const caveat =
+    `${FABRICATED_BENEFICIAL_MARKER}: no pude confirmar ${plural ? 'los nombres científicos' : 'el nombre científico'} ${lista} ` +
+    `como ${plural ? 'organismos benéficos reales' : 'un organismo benéfico real'} en mis fuentes. ` +
+    `${plural ? 'Pueden estar' : 'Puede estar'} mal escrito${plural ? 's' : ''} o ser un nombre equivocado. ` +
+    `Antes de buscar${plural ? 'los' : 'lo'} o comprar${plural ? 'los' : 'lo'}, valida con tu técnico, el ICA o Agrosavia ` +
+    `qué enemigo natural sirve para tu plaga.`;
+
+  const text = `${responseText.trim()}\n\n${caveat}`;
+  return {
+    text,
+    modified: true,
+    reason: `binomio_benefico_no_confirmado: ${dudosos.join(', ')}`,
+  };
+}
+
 /**
  * Set de guards que SOLO tienen sentido cuando la consulta es de SIEMBRA
  * (A12). Si la pregunta del usuario es de PRECIO/MERCADO (o info general sin
@@ -6429,6 +6628,22 @@ export function applyOutputGuards(
     text = extractRes.text;
     modified = true;
     if (extractRes.reason) reasons.push(extractRes.reason);
+  }
+  // Guard CAVEAT de BINOMIO de ORGANISMO BENÉFICO FABRICADO (2026-06-06): firma
+  // propia (usa el grounding crudo para no cuestionar binomios respaldados por
+  // fuente). Corre SIEMPRE (no es de siembra). ADITIVO y conservador: si la
+  // respuesta nombra un enemigo natural / depredador / parasitoide / polinizador
+  // con un binomio cuyo GÉNERO no es de biocontrol conocido (Oligamus
+  // pectoralis…), ANEXA un caveat suave ("verifica este nombre con tu técnico; no
+  // pude confirmarlo") SIN borrar el cuerpo — el daño es afirmar un nombre como
+  // cierto, no nombrarlo. NUNCA suprime, para no tachar nativas reales fuera de
+  // catálogo. Va tras los aditivos y antes de la superficie de ConfusionWarning,
+  // para que el prefijo tóxico de esta última (si dispara) siga liderando.
+  const benefRes = guardFabricatedBeneficialBinomial(text, resolvedEntities);
+  if (benefRes && benefRes.modified) {
+    text = benefRes.text;
+    modified = true;
+    if (benefRes.reason) reasons.push(benefRes.reason);
   }
   // Guard SAFETY-CRITICAL de superficie de ConfusionWarning (BORDE-001 ·
   // cianuro/escopolamina/ricina/rotenona): firma propia (necesita las entidades
