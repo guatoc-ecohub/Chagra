@@ -6663,157 +6663,27 @@ export function applyOutputGuards(
   return { text, modified, reasons };
 }
 
-// ── GUARD ASYNC: auto-validación taxonómica (A24) ───────────────────────────
-
-/**
- * _groundedBinomialsFromAll — universo COMPLETO de binomios canónicos ya
- * conocidos del grounding: el de cada entidad resuelta, MÁS los anidados en
- * companions / antagonists / alternativas / pest_controllers. Cualquier
- * binomio presente en este set NO necesita validación externa (ya fue resuelto
- * por la capa 1 / guards 5 y 5b).
- *
- * Reutiliza `_binomial` y `_groundedBinomials` que ya existen en el módulo.
- * Se define aquí para el guard A24 (separado para legibilidad).
- *
- * @param {Array<object>|null} entities
- * @returns {Set<string>}
- */
-function _groundedBinomialsForTaxonomy(entities) {
-  if (!Array.isArray(entities) || entities.length === 0) return new Set();
-  return _groundedBinomials(entities);
-}
-
-/**
- * _extractUngroundedBinomials — extrae los binomios Linneanos del texto que
- * NO están ya en el conjunto de binomios grounded del turno. Estos son los
- * candidatos a validar con `validate_taxonomy`.
- *
- * Aplica el mismo filtro anti-prosa que los guards 5/5b: usa
- * `_looksLikeLatinBinomial` para descartar pares del español ("Sin embargo",
- * "Estos cultivos"). Devuelve un array de binomios canónicos únicos
- * (normalizado en minúsculas, "genus epiteto").
- *
- * @param {string} text
- * @param {Set<string>} groundedSet
- * @returns {Array<{raw:string, canonical:string}>}
- */
-function _extractUngroundedBinomials(text, groundedSet) {
-  const seen = new Set();
-  const out = [];
-  let m;
-  SCI_BINOMIAL_RE.lastIndex = 0;
-  while ((m = SCI_BINOMIAL_RE.exec(text)) !== null) {
-    if (!_looksLikeLatinBinomial(m[1], m[2])) continue;
-    const raw = `${m[1]} ${m[2]}`;
-    const canonical = _binomial(raw);
-    if (!canonical) continue;
-    if (groundedSet.has(canonical)) continue; // ya grounded → saltar
-    if (seen.has(canonical)) continue; // dedup
-    seen.add(canonical);
-    out.push({ raw, canonical });
-  }
-  return out;
-}
-
-/**
- * applyTaxonomyGuard — capa post-proceso ASYNC anti-alucinación taxonómica
- * (A24). Extrae los binomios Linneanos que el LLM incluyó en su respuesta y
- * que NO están cubiertos por el grounding del turno (resolvedEntities ya
- * resueltos por la capa 1 / guards 5/5b). Para cada uno llama al tool
- * `validate_taxonomy` del sidecar (vía la función `callTool` inyectada) y, si
- * el tool confirma que el binomio NO existe en el catálogo Chagra, ANEXA una
- * nota honesta al final de la respuesta.
- *
- * Diseño conservador (anti-falsos-positivos):
- *  - Solo corrige binomios que el tool confirme EXPLÍCITAMENTE como inválidos
- *    (`valid: false`). Si el tool devuelve null (caído/timeout/offline) → no-op.
- *  - Los binomios ya en el grounding (resolvedEntities + companions/alternativas)
- *    no se validan (ya cubiertos por guards 5/5b — sin duplicar correcciones).
- *  - Idempotente: si la corrección ya está en el texto, no re-dispara.
- *  - Pares de prosa española capitalizada ("Sin embargo", "Estos cultivos") se
- *    descartan con el mismo filtro de los guards 5/5b.
- *
- * Firma:
- * @param {string} responseText  respuesta post-`applyOutputGuards` del LLM.
- * @param {object} [opts]
- * @param {Function|null} [opts.callTool]  función `callTool` del sidecarClient
- *   inyectada por el caller (AgentScreen). Si falta → no-op graceful.
- * @param {Array<object>|null} [opts.resolvedEntities]  grounding del turno.
- * @returns {Promise<{text:string, modified:boolean, reason:string|null}>}
- */
-export async function applyTaxonomyGuard(
-  responseText,
-  { callTool: _callTool = null, resolvedEntities = null } = {},
-) {
-  // Entrada inválida → no-op graceful.
-  if (typeof responseText !== 'string' || responseText.length === 0) {
-    return { text: responseText ?? '', modified: false, reason: null };
-  }
-  // Sin callTool inyectado (flag off, no wired, etc.) → no-op.
-  if (typeof _callTool !== 'function') {
-    return { text: responseText, modified: false, reason: null };
-  }
-
-  // Universo de binomios ya grounded → no los re-validamos.
-  const grounded = _groundedBinomialsForTaxonomy(resolvedEntities);
-
-  // Extrae binomios no-grounded del texto.
-  const candidates = _extractUngroundedBinomials(responseText, grounded);
-  if (candidates.length === 0) {
-    return { text: responseText, modified: false, reason: null };
-  }
-
-  // Para cada candidato, llama validate_taxonomy. Ejecuta en paralelo para
-  // minimizar latencia (cada llamada tiene timeout de 5s en sidecarClient).
-  const results = await Promise.all(
-    candidates.map(async ({ raw, canonical }) => {
-      try {
-        const res = await _callTool('validate_taxonomy', {
-          species_scientific: raw,
-        });
-        return { raw, canonical, res };
-      } catch (_) {
-        return { raw, canonical, res: null };
-      }
-    }),
-  );
-
-  // Filtra los que el tool confirmó como INVÁLIDOS (valid: false).
-  const invalid = results.filter(
-    ({ res }) => res && typeof res === 'object' && res.valid === false,
-  );
-
-  if (invalid.length === 0) {
-    return { text: responseText, modified: false, reason: null };
-  }
-
-  // Idempotencia: construye la nota de corrección solo para los inválidos que
-  // aún no tienen una nota en el texto. Marca textual: "no se encontró en el
-  // catálogo Chagra" + el binomio.
-  const nuevas = invalid.filter(
-    ({ raw }) =>
-      !responseText.includes(
-        `"${raw}" no se encontró en el catálogo Chagra`,
-      ),
-  );
-
-  if (nuevas.length === 0) {
-    return { text: responseText, modified: false, reason: null };
-  }
-
-  bumpGuardTelemetry('auto_taxonomy');
-
-  const notas = nuevas.map(
-    ({ raw }) =>
-      `Nota taxonómica: el binomio "${raw}" no se encontró en el catálogo Chagra — puede ser un nombre ` +
-      `incorrecto o una especie no catalogada. Verifica el nombre científico con una fuente confiable ` +
-      `(ICA, Agrosavia, Tropicos) antes de usarlo como referencia.`,
-  );
-
-  const text = `${responseText.trim()}\n\n${notas.join('\n\n')}`;
-  return {
-    text,
-    modified: true,
-    reason: `taxonomía_no_catálogo: ${nuevas.map(({ raw }) => raw).join(', ')}`,
-  };
-}
+// ── GUARD ASYNC taxonómico (A24) — REMOVIDO 2026-06-06 ──────────────────────
+//
+// `applyTaxonomyGuard` se eliminó por estar MUERTO en producción. Llamaba al
+// tool `validate_taxonomy` del sidecar y filtraba por `res.valid === false`,
+// pero el tool REAL (chagra-pro/modules/agro-mcp/src/tools/age-tools.ts →
+// `validateTaxonomy`) NUNCA devuelve `valid`. Su contrato es
+//   { available, source:'catalog'|'age'|'none', found, canonical_id,
+//     canonical_common, canonical_scientific, scientific_input_matched?,
+//     alternatives, age_enriched?, ... }
+// El campo `valid` sólo existe en OTRO tool, `validate_visual_match` (visión),
+// que devuelve un array de `{species_id, valid, ...}`. El servidor MCP
+// serializa el resultado del handler verbatim y `sidecarClient.callTool` lo
+// entrega sin transformar, así que la rama de corrección JAMÁS disparaba en
+// prod (solo los mocks del test, que devolvían `{valid}`, la enmascaraban).
+//
+// No se re-wireó a la señal real (`found === false`) porque eso reintroduce el
+// falso-positivo que el guard #1332 (`guardFabricatedBeneficialBinomial`)
+// prohíbe: `found:false` = 'no está en el catálogo (~496 especies)', y Colombia
+// tiene muchísimas nativas reales fuera del catálogo — 'no en catálogo' ≠
+// 'inventado'. La única versión acotada (solo contexto de organismo benéfico)
+// ya la cubre #1332, determinístico y sin round-trip de red. La cobertura
+// taxonómica viva hoy: guardFabricatedBeneficialBinomial (#1332) +
+// guardSpeciesSubstitution / guardCompanionBinomial (5/5b) + el grounding de
+// resolve-entities. Ver fix/taxonomy-guard-a24-dead-2026-06-06.
