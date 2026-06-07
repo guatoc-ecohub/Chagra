@@ -5,14 +5,11 @@ import OfflineChip from './OfflineChip';
 import NotificationsBell from './NotificationsBell';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
 import useAssetStore from '../store/useAssetStore';
-<<<<<<< HEAD
-=======
 import { FARM_CONFIG } from '../config/defaults';
 import { getProfile, getProfileMunicipio } from '../services/userProfileService';
 import { findMunicipio } from '../utils/colombiaLocations';
 import { useTheme } from '../hooks/useTheme';
 import { iconForTheme } from './dashboard/themeIcon';
->>>>>>> b2605a6 (fix(home): 4 correcciones visuales portada inmersiva v2)
 
 /**
  * TopBar, header persistente con identidad del operador (DR-030 QW2).
