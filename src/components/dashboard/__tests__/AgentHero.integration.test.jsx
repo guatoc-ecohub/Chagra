@@ -3,7 +3,7 @@
  * post-pulido (portada fiel del operador 2026-06-06).
  *
  * Cubre los 5 puntos del task #TEST-int:
- *   1. enviar=colibrí navega (el botón de enviar tiene el colibrí 2D y navega)
+ *   1. enviar=colibrí navega (el botón de enviar tiene el colibrí 3D y navega)
  *   2. sin clip (no hay botón de adjuntar/clip, solo cámara)
  *   3. ubicación bajo/arriba render (ubicación arriba-derecha de la escena)
  *   4. sugerencia contextual presente (crop suggestions rotativas)
@@ -92,6 +92,15 @@ vi.mock('../../../data/exampleQuestions', () => ({
   ],
 }));
 
+// ── Mock del avatar 3D (evita Three.js en tests) ────────────────────────────
+vi.mock('../../../ChagraAgentAvatarColibri3D', () => ({
+  default: ({ size, state }) => (
+    <div data-testid="colibri-3d" data-size={size} data-state={state}>
+      🐦
+    </div>
+  ),
+}));
+
 import AgentHero from '../AgentHero';
 import { getProfile, saveProfile, getProfileMunicipio } from '../../../services/userProfileService';
 
@@ -128,17 +137,17 @@ beforeEach(() => {
 
 describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
   describe('1. enviar=colibrí navega', () => {
-    test('el botón de enviar tiene el colibrí 2D dentro', () => {
+    test('el botón de enviar tiene el colibrí 3D dentro', () => {
       render(<AgentHero onNavigate={vi.fn()} />);
-      const sendBtn = screen.getByLabelText('Enviar');
-      
-      // El colibrí va dentro del botón (.send-hummer con su SVG)
-      const hummerSvg = sendBtn.querySelector('.send-hummer svg');
-      expect(hummerSvg).toBeTruthy();
-      
-      // Verifica que tiene los elementos del colibrí (cuerpo, cabeza, pico, etc.)
-      expect(hummerSvg.querySelector('ellipse')).toBeTruthy(); // cuerpo
-      expect(hummerSvg.querySelector('circle[fill="#11332c"]')).toBeTruthy(); // ojo
+      const sendBtn = screen.getByLabelText('Enviar al agente');
+
+      // El colibrí 3D va dentro del botón (mock devuelve div con data-testid="colibri-3d")
+      const colibri3d = sendBtn.querySelector('[data-testid="colibri-3d"]');
+      expect(colibri3d).toBeTruthy();
+
+      // Verifica que tiene los atributos correctos
+      expect(colibri3d).toHaveAttribute('data-size', '36');
+      expect(colibri3d).toHaveAttribute('data-state', 'idle');
     });
 
     test('al enviar texto, el colibrí (botón enviar) navega a agente', async () => {
@@ -146,7 +155,7 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
       render(<AgentHero onNavigate={onNavigate} />);
       
       const ta = screen.getByLabelText('Escribe tu pregunta al agente');
-      const sendBtn = screen.getByLabelText('Enviar');
+      const sendBtn = screen.getByLabelText('Enviar al agente');
       
       // Escribir texto
       fireEvent.change(ta, { target: { value: '¿qué siembro?' } });
@@ -172,11 +181,11 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
 
     test('el colibrí NO se usa en otro lugar del compositor (solo en enviar)', () => {
       const { container } = render(<AgentHero onNavigate={vi.fn()} />);
-      
-      // Solo debe haber un .send-hummer (en el botón de enviar)
-      const sendHummer = container.querySelectorAll('.send-hummer');
-      expect(sendHummer.length).toBe(1);
-      
+
+      // Solo debe haber un colibrí 3D con data-testid="colibri-3d" (en el botón de enviar)
+      const colibri3dElements = container.querySelectorAll('[data-testid="colibri-3d"]');
+      expect(colibri3dElements.length).toBe(1);
+
       // El colibrí de la escena (.agentport-hummer) es separado
       const sceneHummer = container.querySelector('.agentport-hummer');
       expect(sceneHummer).toBeTruthy();
@@ -549,7 +558,7 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
       fireEvent.change(ta, { target: { value: '¿Cómo abono mis cafés?' } });
       
       // 5. Envía (tocando el colibrí)
-      const sendBtn = screen.getByLabelText('Enviar');
+      const sendBtn = screen.getByLabelText('Enviar al agente');
       expect(sendBtn.querySelector('.send-hummer svg')).toBeTruthy();
       
       await act(async () => {

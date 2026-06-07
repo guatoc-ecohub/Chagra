@@ -122,7 +122,7 @@ describe('AgentHero — compositor real (no teaser)', () => {
 
   test('botón enviar deshabilitado sin texto ni adjunto', () => {
     render(<AgentHero onNavigate={vi.fn()} />);
-    expect(screen.getByLabelText('Enviar')).toBeDisabled();
+    expect(screen.getByLabelText('Enviar al agente')).toBeDisabled();
   });
 
   test('chip de sugerencia envía su prompt como texto', async () => {
@@ -168,7 +168,7 @@ describe('AgentHero — compositor real (no teaser)', () => {
     await screen.findByText('Foto lista para enviar');
     // Enviar (ya habilitado por el adjunto).
     await act(async () => {
-      fireEvent.click(screen.getByLabelText('Enviar'));
+      fireEvent.click(screen.getByLabelText('Enviar al agente'));
     });
     await waitFor(() => {
       expect(sendMock).toHaveBeenCalledWith(
@@ -184,7 +184,7 @@ describe('AgentHero — compositor real (no teaser)', () => {
     const ta = screen.getByLabelText('Escribe tu pregunta al agente');
     fireEvent.change(ta, { target: { value: 'no me pierdas' } });
     await act(async () => {
-      fireEvent.click(screen.getByLabelText('Enviar'));
+      fireEvent.click(screen.getByLabelText('Enviar al agente'));
     });
     await waitFor(() => expect(sendMock).toHaveBeenCalled());
     expect(onNavigate).not.toHaveBeenCalled();
@@ -308,7 +308,7 @@ describe('AgentHero — foto: cámara O galería, solo imágenes (B2, 2026-06-06
     const alert = await screen.findByRole('alert');
     expect(alert.textContent).toMatch(/solo puedo ver fotos|solo.*fotos/i);
     // El botón enviar sigue deshabilitado (no hay adjunto válido ni texto).
-    expect(screen.getByLabelText('Enviar')).toBeDisabled();
+    expect(screen.getByLabelText('Enviar al agente')).toBeDisabled();
   });
 
   test('el aviso de no-imagen no usa voseo argentino', async () => {
@@ -336,11 +336,11 @@ describe('AgentHero — foto: cámara O galería, solo imágenes (B2, 2026-06-06
 });
 
 describe('AgentHero — colibrí = enviar + botón de perfil (operador 2026-06-06)', () => {
-  test('el botón de enviar lleva el colibrí 2D dentro (no la flecha)', () => {
+  test('el botón de enviar lleva el colibrí 3D (no el 2D ni flecha)', () => {
     const { container } = render(<AgentHero onNavigate={vi.fn()} />);
-    const sendBtn = screen.getByLabelText('Enviar');
-    // El colibrí va dentro del botón (.send-hummer con su SVG).
-    expect(sendBtn.querySelector('.send-hummer svg')).toBeTruthy();
+    const sendBtn = screen.getByLabelText('Enviar al agente');
+    // El colibrí 3D va dentro del botón (mock devuelve div con data-testid="colibri-3d").
+    expect(sendBtn.querySelector('[data-testid="colibri-3d"]')).toBeTruthy();
     // Ya no hay un input que fuerce cámara.
     expect(container.querySelector('input[capture]')).toBeNull();
   });
