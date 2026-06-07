@@ -134,13 +134,9 @@ export default function TopBar({ onNavigate, onLogout }) {
           onClick={() => onNavigate('dashboard')}
           aria-label={isBreathing ? 'Chagra está procesando' : 'Volver al inicio'}
           title={isBreathing ? 'Chagra está pensando…' : 'Volver al inicio'}
-          className="font-bold flex items-center gap-2 shrink-0 rounded-lg px-1 py-1 hover:bg-slate-800/60 active:bg-slate-700 transition-colors min-h-[44px]"
+          className="font-bold flex items-center gap-2 shrink-0 rounded-lg px-2 py-1 hover:bg-slate-800/60 active:bg-slate-700 transition-colors min-h-[44px]"
         >
-          {/* Colibrí (ChagraAgentAvatar) REMOVIDO del TopBar 2026-06-06 (operador:
-              "sacar el colibrí de arriba-izquierda"). La identidad del tema
-              (ícono del tema + "Chagra · su mano en el campo") la da el brand
-              del AgentHero justo debajo. El colibrí sigue VIVO en la escena del
-              home y ES el botón de enviar. */}
+          {/* Ícono del tema (A de anarquía o similar según tema) */}
           <span
             className={isBreathing ? 'chagra-topbar-breathe' : ''}
             style={{ display: 'inline-flex', width: '32px', height: '32px' }}
@@ -148,11 +144,11 @@ export default function TopBar({ onNavigate, onLogout }) {
           >
             {iconForTheme(theme)}
           </span>
-          <div className="hidden sm:flex flex-col">
+          {/* Wordmark completo: "Chagra su mano en el campo" */}
+          <div className="hidden sm:flex items-center gap-1">
             <span className="text-base font-bold leading-tight">Chagra</span>
-            <small className="text-[10px] text-slate-400 font-normal">su mano en el campo</small>
+            <span className="text-[10px] text-slate-400 font-normal">su mano en el campo</span>
           </div>
-          <span className="hidden md:inline text-[10px] text-slate-500 font-mono font-normal">v{APP_VERSION}</span>
         </button>
         <style>{`
           @keyframes chagra-topbar-breathe {
@@ -263,6 +259,11 @@ export default function TopBar({ onNavigate, onLogout }) {
             </div>
           )}
         </div>
+
+        {/* Versión de la app al final del header */}
+        <span className="hidden md:inline text-[10px] text-slate-500 font-mono font-normal ml-2">
+          v{APP_VERSION}
+        </span>
       </header>
 
       {/* Letrero "🌙 Ambiente · altitud · efemérides" + EnvironmentalCard

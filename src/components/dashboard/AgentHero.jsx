@@ -1438,16 +1438,26 @@ export default function AgentHero({ onNavigate }) {
                             {isRecording ? <Square size={16} strokeWidth={2.5} aria-hidden="true" /> : <Mic size={18} strokeWidth={2.5} aria-hidden="true" />}
                         </button>
 
-                        {/* Enviar — botón redondo de acento con colibrí 3D (el .send del demo) */}
+                        {/* Enviar — botón redondo de acento con colibrí 3D animado (el .send del demo) */}
                         <button
                             type="button"
                             onClick={handleSendText}
                             disabled={!canSend}
-                            aria-label="Enviar"
+                            aria-label="Enviar al agente"
                             className={['agentport-send', canSend ? 'agent-send-accent' : ''].join(' ')}
-                            style={{ width: '44px', height: '44px', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                            style={{
+                              width: '44px',
+                              height: '44px',
+                              padding: '0',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              position: 'relative'
+                            }}
                         >
-                            <ChagraAgentAvatarColibri3D size={36} state={canSend ? 'idle' : 'listening'} />
+                            <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+                              <ChagraAgentAvatarColibri3D size={36} state={canSend ? 'idle' : 'listening'} />
+                            </div>
                         </button>
                     </div>
 
