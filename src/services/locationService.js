@@ -163,20 +163,26 @@ function getNominatimBase() {
 }
 
 /**
- * Reverse-geocoding: de (lat, lng) a { municipio, departamento, pais,
+ * Reverse-geocoding: de (lat, lng) a { vereda, municipio, departamento, pais,
  * display }. Usa OSM Nominatim. Degrada a null sin lanzar si offline o
  * timeout.
  *
+ * En Colombia (OSM Nominatim):
+ *   - city = vereda o cabecera municipal
+ *   - county = municipio
+ *   - state = departamento
+ *
  * @param {number} lat
  * @param {number} lng
- * @returns {Promise<{municipio: string|null, departamento: string|null, pais: string|null, display: string|null}|null>}
+ * @returns {Promise<{vereda: string|null, municipio: string|null, departamento: string|null, pais: string|null, display: string|null}|null>}
  */
 export async function reverseGeocode(lat, lng) {
   if (typeof lat !== 'number' || typeof lng !== 'number') return null;
   if (typeof navigator !== 'undefined' && navigator.onLine === false) return null;
 
   const base = getNominatimBase();
-  const url = `${base}/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=12&accept-language=es`;
+  // zoom=14 para capturar veredas (city/town/village)
+  const url = `${base}/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=14&accept-language=es`;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), NOMINATIM_TIMEOUT_MS);
@@ -185,10 +191,14 @@ export async function reverseGeocode(lat, lng) {
     if (!res.ok) return null;
     const data = await res.json();
     const a = data?.address || {};
-    const municipio =
-      a.city || a.town || a.village || a.municipality || a.county || a.hamlet || null;
+
+    // En Colombia: city=vereda, county=municipio, state=departamento
+    // city puede ser vereda O cabecera municipal, así que la extraemos
+    const vereda = a.city || a.town || a.village || a.hamlet || null;
+    const municipio = a.county || a.municipality || null;
     const departamento = a.state || a.region || null;
     return {
+      vereda,
       municipio,
       departamento,
       pais: a.country || null,
@@ -290,6 +300,7 @@ export async function resolveUbicacion({ lat, lng, altitud = null }) {
   const result = {
     lat,
     lng,
+    vereda: null,
     municipio: null,
     departamento: null,
     altitud: altitudDada,
@@ -302,6 +313,7 @@ export async function resolveUbicacion({ lat, lng, altitud = null }) {
   // Reverse-geocoding (online, graceful degrade).
   const geo = await reverseGeocode(lat, lng);
   if (geo) {
+    result.vereda = geo.vereda;
     result.municipio = geo.municipio;
     result.departamento = geo.departamento;
   }

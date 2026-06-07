@@ -1,0 +1,38 @@
+{
+  "_meta": {
+    "source": "crowdsourced",
+    "generatedAt": "2026-06-07T13:11:52.928Z",
+    "total_veredas": 3,
+    "municipio_codigos": [
+      "25899",
+      "25377",
+      "25126"
+    ]
+  },
+  "por_codigo": {
+    "25126": {
+      "el hato": {
+        "conteo": 3,
+        "lat_promedio": 4.92,
+        "lng_promedio": -74.02,
+        "ejemplo_display_name": "el hato, Cajicá"
+      }
+    },
+    "25377": {
+      "mundo nuevo": {
+        "conteo": 2,
+        "lat_promedio": 4.675,
+        "lng_promedio": -73.845,
+        "ejemplo_display_name": "mundo nuevo, La Calera"
+      }
+    },
+    "25899": {
+      "la esperanza": {
+        "conteo": 2,
+        "lat_promedio": 5.025,
+        "lng_promedio": -74.14500000000001,
+        "ejemplo_display_name": "la esperanza, Zipaquirá"
+      }
+    }
+  }
+}

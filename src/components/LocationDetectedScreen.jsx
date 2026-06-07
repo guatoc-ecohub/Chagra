@@ -510,10 +510,11 @@ export default function LocationDetectedScreen({
     saveProfile({
       ubicacion_lat: loc.lat,
       ubicacion_lng: loc.lng,
+      vereda: loc.vereda || undefined,
       municipio: loc.municipio || undefined,
       departamento: loc.departamento || undefined,
       region: loc.municipio
-        ? [loc.municipio, loc.departamento].filter(Boolean).join(', ')
+        ? [loc.vereda, loc.municipio, loc.departamento].filter(Boolean).join(', ')
         : undefined,
       // #coarse-location / #1213-fix: guardamos la altitud EFECTIVA con coalesce.
       // `altitud_source: 'manual'` señala que el usuario la fijó a mano.
@@ -778,7 +779,9 @@ export default function LocationDetectedScreen({
               <MapPin size={18} className="text-emerald-400 mt-0.5 shrink-0" />
               <div>
                 <p className="text-sm font-bold text-white">
-                  {loc.municipio || 'Ubicación detectada'}
+                  {loc.vereda
+                    ? `${loc.vereda}, ${loc.municipio || 'Municipio'}`
+                    : loc.municipio || 'Ubicación detectada'}
                 </p>
                 {loc.departamento && (
                   <p className="text-xs text-slate-400">{loc.departamento}, Colombia</p>
