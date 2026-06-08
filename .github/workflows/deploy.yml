@@ -89,7 +89,7 @@ jobs:
               echo "</details>"
             } >> "$GITHUB_STEP_SUMMARY"
             # Annotations inline por cada error de eslint (aparecen en commit + email).
-            grep -E "^\s+[0-9]+:[0-9]+\s+error" /tmp/lint.log | head -20 | while read -r line; do
+            grep -m 20 -E "^\s+[0-9]+:[0-9]+\s+error" /tmp/lint.log | while read -r line; do
               echo "::warning::deploy lint: $line"
             done
             echo "::warning::Lint had errors but deploy continues (soft-fail desde 2026-05-28). Fix en rama fix/lint-deploy-<fecha>."
