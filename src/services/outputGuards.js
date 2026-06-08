@@ -6102,11 +6102,15 @@ export function guardInventedProductRecipe(responseText) {
 // ── Bench V2: autoridad/regulador equivocado para Colombia ──────────────────
 
 const WRONG_CO_AUTHORITY_MARKER = 'en Colombia no corresponde citar ANVISA para esto';
+const FALSE_GOMOSIS_REMEDY_MARKER = 'la ceniza con gaseosa no es una cura verificada para la gomosis';
 
-function _wrongColombiaAuthorityReplacement() {
+function _wrongColombiaAuthorityReplacement({ mentionsAnvisa = false } = {}) {
+  const authorityWarning = mentionsAnvisa
+    ? `${WRONG_CO_AUTHORITY_MARKER}. `
+    : '';
   return (
-    `${WRONG_CO_AUTHORITY_MARKER}. Para gomosis o problemas sanitarios de cítricos no te confirmo una receta ` +
-    'de ceniza con gaseosa ni gramos por litro: no hay evidencia de que eso cure la gomosis.\n\n' +
+    `${authorityWarning}${FALSE_GOMOSIS_REMEDY_MARKER}. Para gomosis o problemas sanitarios de cítricos no te ` +
+    'confirmo una receta de ceniza con gaseosa ni gramos por litro.\n\n' +
     'Manejo real: retirar tejido afectado, evitar heridas y exceso de humedad en el cuello, mejorar drenaje, ' +
     'desinfectar herramientas y consultar con un técnico local, ICA o Agrosavia si necesitas un manejo específico. ' +
     'No uses una dosis casera como cura total.'
@@ -6117,19 +6121,26 @@ export function guardWrongColombiaAuthority(responseText, { userMessage = null }
   if (typeof responseText !== 'string' || responseText.length === 0) {
     return { text: responseText ?? '', modified: false, reason: null };
   }
-  if (responseText.includes(WRONG_CO_AUTHORITY_MARKER)) {
+  if (responseText.includes(WRONG_CO_AUTHORITY_MARKER) || responseText.includes(FALSE_GOMOSIS_REMEDY_MARKER)) {
     return { text: responseText, modified: false, reason: null };
   }
   const haystack = `${userMessage || ''}\n${responseText}`;
   const norm = _stripDiacritics(haystack);
-  if (!/\bcolombia\b|\bcitricos?\b|\bgomosis\b|\bgota\b/.test(norm)) {
-    return { text: responseText, modified: false, reason: null };
-  }
-  if (!/\banvisa\b/.test(norm)) {
+  const isFalseGomosisRemedy =
+    /\b(gomosis|gota)\b/.test(norm) &&
+    /\bcitricos?\b/.test(norm) &&
+    /\bceniza\b/.test(norm) &&
+    /\bgaseosa\b/.test(norm);
+  const mentionsAnvisa = /\banvisa\b/.test(norm);
+  if (!isFalseGomosisRemedy && !mentionsAnvisa) {
     return { text: responseText, modified: false, reason: null };
   }
   bumpGuardTelemetry('wrong_colombia_authority');
-  return { text: _wrongColombiaAuthorityReplacement(), modified: true, reason: 'autoridad_colombia_incorrecta: anvisa' };
+  return {
+    text: _wrongColombiaAuthorityReplacement({ mentionsAnvisa }),
+    modified: true,
+    reason: mentionsAnvisa ? 'autoridad_colombia_incorrecta: anvisa' : 'premisa_falsa_gomosis_ceniza_gaseosa',
+  };
 }
 
 // ── C1 (BORDE-017): EXTRACTO/PREPARADO botánico INVENTADO "milagroso" ─────────
