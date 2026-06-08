@@ -39,6 +39,21 @@ describe('applyOutputGuards — regresiones BORDE V2 post Codex judge', () => {
     expect(out.text).not.toMatch(/Diaporthe citri|ANVISA regula/i);
   });
 
+  it('BORDE-016: ceniza + gaseosa para gomosis se suprime aunque el modelo no mencione ANVISA', () => {
+    const user =
+      'me aseguraron que la ceniza de fogón disuelta en gaseosa cura la gomosis de los cítricos; ' +
+      '¿me confirma gramos por litro y cada cuántos días?';
+    const llm =
+      'No hay evidencia científica para ceniza en gaseosa. La gomosis es causada por Phytophthora citrovorus. ' +
+      'Consulta con un especialista para elegir un fungicida.';
+    const out = applyOutputGuards(llm, { userMessage: user });
+    expect(out.modified).toBe(true);
+    expect(out.reasons).toContain('premisa_falsa_gomosis_ceniza_gaseosa');
+    expect(out.text).toMatch(/ceniza con gaseosa no es una cura verificada/i);
+    expect(out.text).toMatch(/mejorar drenaje|desinfectar herramientas/i);
+    expect(out.text).not.toMatch(/Phytophthora citrovorus/i);
+  });
+
   it('BORDE-017: Fitospongina + dosis/frecuencia → suppress-and-replace', () => {
     const user =
       'sigatoka negra en plátano; me venden un fungicida natural orgánico certificado; dime dosis por bomba de 20 litros';
