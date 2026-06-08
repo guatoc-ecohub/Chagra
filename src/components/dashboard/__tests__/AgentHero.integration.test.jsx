@@ -3,9 +3,9 @@
  * post-pulido (portada fiel del operador 2026-06-06).
  *
  * Cubre los 5 puntos del task #TEST-int:
- *   1. enviar=colibrí navega (el botón de enviar tiene el colibrí 3D y navega)
+ *   1. enviar=colibrí navega (el botón de enviar usa el avatar global y navega)
  *   2. sin clip (no hay botón de adjuntar/clip, solo cámara)
- *   3. ubicación bajo la marca (vereda/municipio/altitud)
+ *   3. marca/ubicación no se duplican dentro del hero
  *   4. sugerencia contextual presente (crop suggestions rotativas)
  *   5. toggle Campesino/Experto cambia nivel_respuestas (persiste el perfil)
  *
@@ -92,11 +92,11 @@ vi.mock('../../../data/exampleQuestions', () => ({
   ],
 }));
 
-// ── Mock del avatar 3D (evita Three.js en tests) ────────────────────────────
-vi.mock('../../ChagraAgentAvatarColibri3D', () => ({
+// ── Mock del avatar global (evita cargar video/foto en tests) ───────────────
+vi.mock('../../ChagraAgentAvatar', () => ({
   default: ({ size, state }) => (
-    <div data-testid="colibri-3d" data-size={size} data-state={state}>
-      🐦
+    <div data-testid="avatar" data-size={size} data-state={state}>
+      colibri
     </div>
   ),
 }));
@@ -137,17 +137,16 @@ beforeEach(() => {
 
 describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
   describe('1. enviar=colibrí navega', () => {
-    test('el botón de enviar tiene el colibrí 3D dentro', () => {
+    test('el botón de enviar tiene el avatar global dentro', () => {
       render(<AgentHero onNavigate={vi.fn()} />);
       const sendBtn = screen.getByLabelText('Enviar al agente');
 
-      // El colibrí 3D va dentro del botón (mock devuelve div con data-testid="colibri-3d")
-      const colibri3d = sendBtn.querySelector('[data-testid="colibri-3d"]');
-      expect(colibri3d).toBeTruthy();
+      const avatar = sendBtn.querySelector('[data-testid="avatar"]');
+      expect(avatar).toBeTruthy();
 
       // Verifica que tiene los atributos correctos
-      expect(colibri3d).toHaveAttribute('data-size', '36');
-      expect(colibri3d).toHaveAttribute('data-state', 'listening');
+      expect(avatar).toHaveAttribute('data-size', '38');
+      expect(avatar).toHaveAttribute('data-state', 'listening');
     });
 
     test('al enviar texto, el colibrí (botón enviar) navega a agente', async () => {
@@ -182,9 +181,8 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
     test('el colibrí NO se usa en otro lugar del compositor (solo en enviar)', () => {
       const { container } = render(<AgentHero onNavigate={vi.fn()} />);
 
-      // Solo debe haber un colibrí 3D con data-testid="colibri-3d" (en el botón de enviar)
-      const colibri3dElements = container.querySelectorAll('[data-testid="colibri-3d"]');
-      expect(colibri3dElements.length).toBe(1);
+      const avatarElements = container.querySelectorAll('[data-testid="avatar"]');
+      expect(avatarElements.length).toBe(1);
 
       // El colibrí de la escena (.agentport-hummer) es separado
       const sceneHummer = container.querySelector('.agentport-hummer');
@@ -232,66 +230,14 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
     });
   });
 
-  describe('3. ubicación bajo la marca', () => {
-    test('con ubicación en el perfil: se muestra bajo el wordmark de Chagra', () => {
-      getProfile.mockReturnValue({
-        nivel_respuestas: 'simple',
-        municipio: 'Subachoque, Cundinamarca',
-        vereda: 'Vereda Test',
-        finca_altitud: 1800,
-      });
-      getProfileMunicipio.mockReturnValue('Subachoque, Cundinamarca');
-      
+  describe('3. marca/ubicación sin duplicar', () => {
+    test('AgentHero no renderiza wordmark ni ubicación propios; eso vive en TopBar', () => {
       const { container } = render(<AgentHero onNavigate={vi.fn()} />);
-      
-      // El chip de ubicación debe estar presente
-      const locChip = container.querySelector('.agentport-loc');
-      expect(locChip).toBeTruthy();
-      
-      // Debe tener el pin de ubicación
-      const pin = locChip.querySelector('.pin');
-      expect(pin).toBeTruthy();
-      expect(pin.textContent).toBe('📍');
-      
-      // Debe mostrar vereda, municipio y altitud (SIN latitud)
-      const txt = locChip.querySelector('.txt');
-      expect(txt).toBeTruthy();
-      expect(txt.textContent).toMatch(/Vereda Test/i);
-      expect(txt.textContent).toMatch(/Subachoque/i);
-      expect(txt.textContent).toMatch(/1800.*msnm/i);
-    });
 
-    test('SIN municipio en el perfil: NO se muestra ubicación', () => {
-      getProfile.mockReturnValue({
-        nivel_respuestas: 'simple',
-        municipio: null,
-        vereda: 'Vereda Test',
-      });
-      getProfileMunicipio.mockReturnValue(null);
-      
-      const { container } = render(<AgentHero onNavigate={vi.fn()} />);
-      
-      // No debe haber chip de ubicación
-      const locChip = container.querySelector('.agentport-loc');
-      expect(locChip).toBeNull();
-    });
-
-    test('la ubicación queda dentro del bloque de marca', () => {
-      getProfile.mockReturnValue({
-        nivel_respuestas: 'simple',
-        municipio: 'Subachoque, Cundinamarca',
-        vereda: 'Vereda Test',
-        finca_altitud: 1800,
-      });
-      getProfileMunicipio.mockReturnValue('Subachoque, Cundinamarca');
-      
-      const { container } = render(<AgentHero onNavigate={vi.fn()} />);
-      const locChip = container.querySelector('.agentport-loc');
-
-      const brand = container.querySelector('.agentport-brand-copy');
-      expect(brand).toBeTruthy();
-      expect(brand.contains(locChip)).toBe(true);
-      expect(locChip.className).toContain('agentport-loc');
+      expect(container.querySelector('.agentport-brand')).toBeNull();
+      expect(container.querySelector('.agentport-brand-copy')).toBeNull();
+      expect(container.querySelector('.agentport-loc')).toBeNull();
+      expect(container.querySelector('.agentport-headtools')).toBeTruthy();
     });
   });
 
@@ -537,16 +483,13 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
       const onNavigate = vi.fn();
       const { container } = render(<AgentHero onNavigate={onNavigate} />);
       
-      // 1. Ve la ubicación
-      const locChip = container.querySelector('.agentport-loc');
-      expect(locChip).toBeTruthy();
-      expect(locChip.textContent).toMatch(/La Esperanza|Subachoque/i);
-      
-      // 2. Ve las sugerencias contextuales
+      expect(container.querySelector('.agentport-loc')).toBeNull();
+
+      // 1. Ve las sugerencias contextuales
       const suggestion = container.querySelector('[data-testid="agentport-suggestion"]');
       expect(suggestion).toBeTruthy();
       
-      // 3. Cambia a Experto
+      // 2. Cambia a Experto
       const expertoBtn = screen.getByText(/experto/i);
       await act(async () => {
         fireEvent.click(expertoBtn);
@@ -555,19 +498,19 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
         expect.objectContaining({ nivel_respuestas: 'detallado' }),
       );
       
-      // 4. Escribe una pregunta
+      // 3. Escribe una pregunta
       const ta = screen.getByLabelText('Escribe tu pregunta al agente');
       fireEvent.change(ta, { target: { value: '¿Cómo abono mis cafés?' } });
       
-      // 5. Envía (tocando el colibrí)
+      // 4. Envía (tocando el colibrí)
       const sendBtn = screen.getByLabelText('Enviar al agente');
-      expect(sendBtn.querySelector('[data-testid="colibri-3d"]')).toBeTruthy();
+      expect(sendBtn.querySelector('[data-testid="avatar"]')).toBeTruthy();
       
       await act(async () => {
         fireEvent.click(sendBtn);
       });
       
-      // 6. Persiste y navega
+      // 5. Persiste y navega
       await waitFor(() => {
         expect(sendMock).toHaveBeenCalledWith(
           expect.objectContaining({ kind: 'text', text: '¿Cómo abono mis cafés?' }),

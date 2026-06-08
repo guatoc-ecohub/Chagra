@@ -12,12 +12,11 @@ import { useTheme } from '../../hooks/useTheme';
 import {
     getProfile,
     saveProfile,
-    getProfileMunicipio,
     getNotificationStyle,
 } from '../../services/userProfileService';
 import { buildCropSuggestions } from '../../data/cropSuggestions';
 import { iconForTheme } from './themeIcon';
-import ChagraAgentAvatarColibri3D from '../ChagraAgentAvatarColibri3D';
+import ChagraAgentAvatar from '../ChagraAgentAvatar';
 
 /**
  * AgentHero — la PORTADA INMERSIVA del agente Chagra, PRIMERA PANTALLA COMPLETA
@@ -256,24 +255,9 @@ export default function AgentHero({ onNavigate }) {
     // ── Escena: sol de día / luna de noche (operador 2026-06-06) ──────────────
     const night = isNightNow();
 
-    // ── Ubicación real del perfil, bajo la marca ──────────────────────────────
-    // 📍 Vereda · Municipio · altitud. Si falta municipio, no se muestra (no
-    // inventamos ubicación).
-    // Si falta municipio, no se muestra (no inventamos ubicación).
+    // ── Perfil real para sugerencias contextuales ─────────────────────────────
     const profile = getProfile();
-    const municipio = getProfileMunicipio();
     const altitud = profile?.finca_altitud || profile?.altitud || null;
-    // Vereda CONDICIONAL (operador 2026-06-06): si el perfil la tiene
-    // (la escribió en onboarding; NO se auto-detecta), va delante →
-    // "Vereda · Municipio · msnm". Si no, "Municipio · msnm".
-    const vereda = profile?.vereda || profile?.finca_vereda || null;
-    const locationLabel = municipio
-        ? [vereda,
-            municipio.split(',')[0],
-            altitud ? `${altitud} msnm` : null]
-            .filter(Boolean)
-            .join(' · ')
-        : null;
 
     // ── Sugerencias contextuales ROTATIVAS basadas en los cultivos reales ─────
     // Deterministas (cropSuggestions: cultivos del store × mes × piso térmico).
@@ -752,13 +736,13 @@ export default function AgentHero({ onNavigate }) {
                     100% { transform: translate(0,0) rotate(0deg); }
                 }
 
-                /* ===================== MARCA + TOGGLE ===================== */
+                /* ===================== TOGGLE SUPERIOR ===================== */
                 .agentport-topbar {
                     position: relative;
                     z-index: 10;
                     display: flex;
                     align-items: flex-start;
-                    justify-content: space-between;
+                    justify-content: flex-end;
                     gap: 8px;
                     padding: calc(86px + env(safe-area-inset-top)) 0 6px;
                     flex: none;
@@ -1218,26 +1202,8 @@ export default function AgentHero({ onNavigate }) {
                 </div>
             </div>
 
-            {/* ===================== MARCA + TOGGLE Campesino/Experto ===================== */}
-            {/* Operador 2026-06-06: arriba-izq = MARCA (ícono del tema + wordmark
-                "Chagra · tu mano en el campo"), NO el colibrí-video. El colibrí
-                sigue volando en la escena de fondo, y ES el botón de enviar. */}
+            {/* ===================== TOGGLE Campesino/Experto ===================== */}
             <header className="agentport-topbar">
-                <div className="agentport-brand">
-                    <span className="agentport-mark">{iconForTheme(theme)}</span>
-                    <div className="agentport-brand-copy">
-                        <div className="agentport-name">
-                            Chagra<small>su mano en el campo</small>
-                        </div>
-                        {locationLabel && (
-                            <div className="agentport-loc" aria-label={`Ubicación: ${locationLabel}`}>
-                                <span className="pin" aria-hidden="true">📍</span>
-                                <span className="txt">{locationLabel}</span>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
                 <div className="agentport-headtools">
                     <div className="agentport-mode" role="tablist" aria-label="Nivel de respuestas">
                         <button
@@ -1436,7 +1402,7 @@ export default function AgentHero({ onNavigate }) {
                             {isRecording ? <Square size={16} strokeWidth={2.5} aria-hidden="true" /> : <Mic size={18} strokeWidth={2.5} aria-hidden="true" />}
                         </button>
 
-                        {/* Enviar — botón redondo de acento con colibrí 3D animado (el .send del demo) */}
+                        {/* Enviar — usa el mismo colibrí foto/video del FAB global. */}
                         <button
                             type="button"
                             onClick={handleSendText}
@@ -1454,7 +1420,7 @@ export default function AgentHero({ onNavigate }) {
                             }}
                         >
                             <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-                              <ChagraAgentAvatarColibri3D size={36} state={canSend ? 'idle' : 'listening'} />
+                              <ChagraAgentAvatar size={38} state={canSend ? 'idle' : 'listening'} ariaLabel="Enviar al agente" />
                             </div>
                         </button>
                     </div>

@@ -58,15 +58,6 @@ vi.mock('../../ChagraAgentAvatar', () => ({
   default: ({ state }) => <div data-testid="avatar" data-state={state} />,
 }));
 
-// ── Mock del avatar 3D (evita Three.js en tests) ────────────────────────────
-vi.mock('../../ChagraAgentAvatarColibri3D', () => ({
-  default: ({ size, state }) => (
-    <div data-testid="colibri-3d" data-size={size} data-state={state}>
-      🐦
-    </div>
-  ),
-}));
-
 import AgentHero, { SEND_TRANSITION_MS } from '../AgentHero';
 
 beforeEach(() => {
@@ -336,11 +327,10 @@ describe('AgentHero — foto: cámara O galería, solo imágenes (B2, 2026-06-06
 });
 
 describe('AgentHero — colibrí = enviar + botón de perfil (operador 2026-06-06)', () => {
-  test('el botón de enviar lleva el colibrí 3D (no el 2D ni flecha)', () => {
+  test('el botón de enviar lleva el mismo avatar colibrí del FAB global', () => {
     const { container } = render(<AgentHero onNavigate={vi.fn()} />);
     const sendBtn = screen.getByLabelText('Enviar al agente');
-    // El colibrí 3D va dentro del botón (mock devuelve div con data-testid="colibri-3d").
-    expect(sendBtn.querySelector('[data-testid="colibri-3d"]')).toBeTruthy();
+    expect(sendBtn.querySelector('[data-testid="avatar"]')).toBeTruthy();
     // Ya no hay un input que fuerce cámara.
     expect(container.querySelector('input[capture]')).toBeNull();
   });
@@ -362,17 +352,11 @@ describe('AgentHero — voseo (español colombiano)', () => {
     expect(text).not.toMatch(/\bquerés\b/);
   });
 
-  test('el wordmark usa "su mano en el campo" (usted colombiano, NO "tu") — HOME-FIX', () => {
+  test('no duplica el wordmark del TopBar dentro del hero — HOME-FIX', () => {
     const { container } = render(<AgentHero onNavigate={vi.fn()} />);
-    // Buscar específicamente el elemento .agentport-name
-    const wordmark = container.querySelector('.agentport-name');
-    expect(wordmark).toBeTruthy();
-    const text = wordmark.textContent || '';
-    // Debe decir "su mano en el campo" (usted colombiano).
-    // Nota: textContent puede concatenar "Chagra" con el <small>, así que
-    // buscamos la frase sin word boundary estricto al inicio.
-    expect(text).toMatch(/su mano en el campo/i);
-    // NO debe decir "tu mano en el campo" (tú incorrecto).
+    expect(container.querySelector('.agentport-name')).toBeNull();
+    expect(container.querySelector('.agentport-brand')).toBeNull();
+    const text = container.textContent || '';
     expect(text).not.toMatch(/tu mano en el campo/i);
   });
 });
