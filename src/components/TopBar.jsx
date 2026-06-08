@@ -154,11 +154,11 @@ export default function TopBar({ onNavigate, onLogout }) {
           {/* Wordmark completo: visible también en móvil para no dejar el logo vacío. */}
           <div className="flex min-w-0 max-w-[42vw] sm:max-w-none flex-col items-start">
             <span className="text-base font-bold leading-tight text-white">Chagra</span>
-            <span className="text-[10px] leading-tight text-slate-400 font-normal truncate max-w-full">
+            <span className="text-[10px] leading-tight text-emerald-300/90 font-semibold truncate max-w-full">
               su mano en el campo
             </span>
             {locationLabel && (
-              <span className="text-[10px] leading-tight text-emerald-300/90 font-medium truncate max-w-full">
+              <span className="mt-0.5 max-w-full truncate rounded-full border border-emerald-400/20 bg-emerald-950/25 px-1.5 py-0.5 text-[10px] leading-tight text-emerald-200/95 font-medium">
                 {locationLabel}
               </span>
             )}
