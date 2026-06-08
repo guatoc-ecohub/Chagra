@@ -47,7 +47,7 @@ jobs:
           path-to-signatures: 'signatures/cla.json'
           path-to-document: 'https://github.com/guatoc-ecohub/Chagra/blob/main/CLA.md'
           branch: 'cla-signatures'
-          allowlist: dependabot[bot],renovate[bot],github-actions[bot]
+          allowlist: dependabot[bot],renovate[bot],github-actions[bot],guatoc-ecohub
           custom-notsigned-prcomment: |
             Hola, gracias por tu PR a Chagra.
 
