@@ -235,6 +235,7 @@ export default function TopBar({ onNavigate, onLogout }) {
             onClick={() => setAvatarMenuOpen((v) => !v)}
             aria-label="Menú de usuario"
             aria-expanded={avatarMenuOpen}
+            data-testid="topbar-user-menu"
             className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-slate-800 border-2 border-slate-700 hover:border-teal-500/50 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
           >
             <CircleUser size={20} aria-hidden="true" />
@@ -249,6 +250,7 @@ export default function TopBar({ onNavigate, onLogout }) {
               <button
                 type="button"
                 role="menuitem"
+                data-testid="topbar-user-settings"
                 onClick={() => {
                   setAvatarMenuOpen(false);
                   onNavigate('perfil');

@@ -2954,6 +2954,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
 
           <button
             type="submit"
+            aria-label="Enviar"
             disabled={
               !inputText.trim() ||
               state === STATE_RECORDING ||
