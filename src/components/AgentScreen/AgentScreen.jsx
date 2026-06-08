@@ -87,6 +87,7 @@ import { getCachedClimaSnapshot, fetchClimaSnapshot, resolveClimaLocation } from
 import { FARM_CONFIG } from '../../config/defaults';
 import { speak, speakSentences, stop, init as initTTS, isSupported, isKokoroAvailable, replayLast, isSpeaking } from '../../services/ttsService';
 import { executeAction, setActionGateCallback } from '../../services/actionExecutor';
+import { getToolsForLLM } from '../../services/llmTools';
 import { useRotatingTip } from '../../services/tipsService';
 import ChatHistory from './ChatHistory';
 import SuggestedActions from './SuggestedActions';
@@ -1319,6 +1320,13 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       const chatRoute = selectChatRoute(query);
       const { url, body } = buildLLMRequest(chatRoute, messages);
 
+      // 057.4 — tools de function calling. Si hay herramientas registradas,
+      // las inyectamos en el body para que el LLM pueda emitir tool_calls.
+      const toolsList = getToolsForLLM();
+      if (toolsList.length > 0) {
+        body.tools = toolsList;
+      }
+
       // SPEED-1: streaming end-to-end PWA→sidecar→Ollama. Solo si flag
       // VITE_AGENT_STREAMING=true Y sidecar habilitado Y online. Sin esto,
       // mantenemos el path directo `streamOpenAI` → /api/ollama/v1/chat/completions
@@ -1334,11 +1342,6 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
           route: chatRoute,
           model: body.model,
         });
-        // Cualquier fallo del sidecar (502 ollama down, network) cae al
-        // catch externo del runner. NO hacemos fallback automático al path
-        // directo: mezclar paths en el mismo turn complica diagnóstico y
-        // telemetría. El operador apaga la flag VITE_AGENT_STREAMING si
-        // quiere bajar al baseline.
         const { fullText, stats } = await streamChatViaSidecar({
           model: body.model,
           messages,
@@ -1359,15 +1362,63 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         return fullText;
       }
 
-      console.warn('[Agent] LLM call start', { url, queryLen: query.length, route: chatRoute, model: body.model });
-      const result = await streamOpenAI(
-        url,
-        body,
-        (_chunk, fullText) => markToken(fullText),
-        { signal: controller.signal },
-      );
-      console.warn('[Agent] LLM call complete', { responseLen: result?.length || 0 });
-      return result;
+      const callLLMOnce = async (msgs, extraBody) => {
+        const mergedBody = { ...body, messages: msgs, ...extraBody };
+        console.warn('[Agent] LLM call start', { url, queryLen: query.length, route: chatRoute, model: body.model, hasTools: !!mergedBody.tools });
+        const res = await streamOpenAI(
+          url,
+          mergedBody,
+          (_chunk, fullText) => markToken(fullText),
+          { signal: controller.signal },
+        );
+        console.warn('[Agent] LLM call complete', { responseLen: res.fullText?.length || 0, toolCalls: res.toolCalls?.length || 0 });
+        return res;
+      };
+
+      let result = await callLLMOnce(messages, {});
+
+      // 057.4 — si el LLM respondió con tool_calls, ejecutamos el action loop.
+      if (result.toolCalls && result.toolCalls.length > 0) {
+        const toolResults = [];
+        for (const tc of result.toolCalls) {
+          const actionResult = await executeAction({
+            tool_name: tc.function.name,
+            parameters: tc.function.arguments,
+            intent: query,
+            llm_response: result.fullText,
+            timestamp: new Date().toISOString(),
+          }, operatorId);
+          toolResults.push({ toolCallId: tc.id, result: actionResult });
+        }
+
+        const assistantMsg = {
+          role: 'assistant',
+          content: null,
+          tool_calls: result.toolCalls.map((tc) => ({
+            id: tc.id,
+            type: 'function',
+            function: { name: tc.function.name, arguments: typeof tc.function.arguments === 'object' ? JSON.stringify(tc.function.arguments) : tc.function.arguments },
+          })),
+        };
+
+        const toolMessages = toolResults.map((tr) => ({
+          role: 'tool',
+          tool_call_id: tr.toolCallId,
+          content: JSON.stringify(tr.result),
+        }));
+
+        // Segunda llamada: pasar resultado del tool al LLM para respuesta NL
+        deadline.onToken();
+        streamingContentRef.current = '';
+        setStreamingContent('');
+        const secondResult = await callLLMOnce(
+          [...messages, assistantMsg, ...toolMessages],
+          { tools: undefined },
+        );
+        return secondResult.fullText || '';
+      }
+
+      return result.fullText;
     } catch (e) {
       if (e.name === 'AbortError') {
         // Bug UX 2026-05-30: NO aplastamos el parcial acá. Propagamos un error
