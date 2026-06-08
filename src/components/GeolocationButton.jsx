@@ -22,7 +22,7 @@ const GeolocationButton = ({ onCoords, label = "Capturar ubicación", icon: _Ico
             message = "Permiso denegado";
             const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent);
             subMessage = isIos
-                ? "iOS Safari → Ajustes → Privacidad → Localización → Permitir para chagra.guatoc.co"
+                ? "iOS Safari → Ajustes → Privacidad → Localización → Permitir para este sitio"
                 : "Habilita el permiso de ubicación en los ajustes de tu navegador.";
         } else if (error === 'timeout') {
             message = "Tiempo agotado";

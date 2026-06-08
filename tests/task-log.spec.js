@@ -59,16 +59,9 @@ test.describe('ADR-019 Fase 5: log--task & Inmutabilidad', () => {
     });
 
     test('crea tarea con ULID y verifica inmutabilidad al completar', async ({ page }) => {
-        // 1. Navegar a nueva tarea — usar aria-label exacto del tile (no regex /tareas/i
-        // que matchea 3 botones: refresh, Campo, Cola). Tile dashboard "Tareas: Cola
-        // de pendientes" es el que abre TaskLogScreen donde vive el botón "+".
-        // El botón "+" ahora tiene aria-label="Nueva tarea" (el span '+' es
-        // aria-hidden) — accessible name calculation con sólo `+` era frágil.
-        // Post-rediseño DashboardLive (#310): los NAV_TILES ya no están en el
-        // dashboard. La pantalla de Tareas se alcanza vía el FAB de acciones
-        // rápidas (QuickActionsPanel) → "Cola de tareas".
-        await page.getByLabel('Abrir acciones rápidas').click();
-        await page.getByRole('menuitem', { name: /cola de tareas/i }).click();
+        // 1. Navegar a nueva tarea. El dashboard live ya no expone el panel de
+        // acciones rápidas; la ruta hash es el contrato estable para este smoke.
+        await page.goto('/#/tareas');
         await page.getByRole('button', { name: 'Nueva tarea' }).click();
 
         // 2. Llenar formulario — TaskScreen.jsx:83 usa placeholder

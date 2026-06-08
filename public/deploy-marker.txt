@@ -1,1 +1,1 @@
-deploy 2026-06-02T16:34:32Z — version unstick tras colisión auto-bump paralelo
+deploy 2026-06-08T03:20:00Z — veredas/topbar/agent-context prod refresh

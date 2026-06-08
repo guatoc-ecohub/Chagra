@@ -117,6 +117,20 @@ const ACCENT_CLASSES = {
   amber: { border: 'border-l-amber-500', text: 'text-amber-400' },
 };
 
+const HASH_VIEW_ROUTES = {
+  agente: 'agente',
+  inventario: 'activos',
+  activos: 'activos',
+  biodiversidad: 'biodiversidad',
+  ayuda: 'ayuda',
+  perfil: 'perfil',
+  informes: 'informes',
+  'case-studies': 'casos',
+  casos: 'casos',
+  tareas: 'task_log',
+  task_log: 'task_log',
+};
+
 // T2: Dashboard como componente propio con suscripción reactiva al store.
 // useAssetStore() (hook) dispara re-render cuando hydrate()/syncFromServer() actualizan
 // el estado, a diferencia de useAssetStore.getState() que es una lectura snapshot.
@@ -439,8 +453,26 @@ export default function App() {
       return;
     }
     isAuthenticated().then((isAuth) => {
-      navigate(isAuth ? 'dashboard' : 'login');
+      if (!isAuth) {
+        navigate('login');
+        return;
+      }
+      navigate(HASH_VIEW_ROUTES[hash] || 'dashboard');
     });
+  }, [navigate]);
+
+  useEffect(() => {
+    const handleHashRoute = () => {
+      const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
+      const routeView = HASH_VIEW_ROUTES[hash];
+      if (!routeView) return;
+      isAuthenticated().then((isAuth) => {
+        if (isAuth) navigate(routeView);
+      });
+    };
+
+    window.addEventListener('hashchange', handleHashRoute);
+    return () => window.removeEventListener('hashchange', handleHashRoute);
   }, [navigate]);
 
   // Preload del catálogo SQLite WASM en background (v0.8.2). Inicializa la
@@ -538,7 +570,16 @@ export default function App() {
     // demo (themes.css §16) en lugar de la foto. Si elige otra foto curada,
     // marcamos data-custom-bg y la foto vuelve a ganar. El gate solo importa en
     // bio-punk (sin data-theme); en nature/minimalista el fondo es crema (§2).
-    if (selectedBackground && selectedBackground !== DEFAULT_BACKGROUND_ID) {
+    //
+    // FIX 2026-06-06: El lienzo biopunk (gradiente + glow) debe verse SIEMPRE
+    // que estemos en biopunk sin foto custom explícita. data-custom-bg solo debe
+    // escribirse cuando el usuario seleccionó una foto FOTO CURADA diferente al
+    // default biopunk-4, no para cualquier cambio de default.
+    const isBiopunkDefault = selectedBackground === DEFAULT_BACKGROUND_ID;
+    const isBiopunkOne = selectedBackground === 'biopunk-1';
+    const isDefaultOrBiopunkOne = isBiopunkDefault || isBiopunkOne;
+
+    if (!isDefaultOrBiopunkOne) {
       document.body.setAttribute('data-custom-bg', '1');
     } else {
       document.body.removeAttribute('data-custom-bg');

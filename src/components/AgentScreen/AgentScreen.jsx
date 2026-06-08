@@ -78,6 +78,7 @@ import DeepResearchCard from '../DeepResearchCard';
 import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildSuggestedEntitiesContext, isLowConfidenceEntity } from '../../services/agentService';
 import { applyOutputGuards, classifyQueryIntent } from '../../services/outputGuards';
 import { getProfile } from '../../services/userProfileService';
+import { captureExchange } from '../../services/conversationCaptureService';
 import { regionFromProfile, getEnsoOutlook } from '../../services/ensoContext';
 // SALUDO PROACTIVO (#162 alertas + #298 tareas + #331 análisis): el agente, de
 // entrada, lidera con lo MÁS importante (1-2 pendientes) si los hay, o da una
@@ -92,7 +93,7 @@ import useLogStore from '../../store/useLogStore';
 import { mergePartialOnInterruption } from '../../services/agentPartialMerge';
 // PoC alertas meteorológicas tiempo real (#316) — el bell + el agente
 // comparten el mismo snapshot via `climaService` (cache 30 min).
-import { getCachedClimaSnapshot, fetchClimaSnapshot } from '../../services/climaService';
+import { getCachedClimaSnapshot, fetchClimaSnapshot, resolveClimaLocation } from '../../services/climaService';
 import { FARM_CONFIG } from '../../config/defaults';
 import { speak, speakSentences, stop, init as initTTS, isSupported, isKokoroAvailable, replayLast, isSpeaking } from '../../services/ttsService';
 import { executeAction, setActionGateCallback } from '../../services/actionExecutor';
@@ -1405,6 +1406,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
   // No toca el queue store — eso lo hace handleSubmit antes/después.
   // Tampoco hace re-entry guard porque el queue ya garantiza serialización.
   const runAgentPipeline = async (text, { suppressUserBubble = false, visionContext = null, forcedIntent = null } = {}) => {
+    const pipelineStartedAt = performance.now();
     // Bug 2026-05-31: cuando el item viene de la outbox multimodal (foto /
     // adjunto), el caller YA pintó la burbuja de usuario REAL (con su imagen).
     // Si además pintáramos aquí una burbuja con el prompt sintético ("Analicé
@@ -1460,6 +1462,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       // delimitado en el system prompt para grounding citable.
       let toolEvidence = null;
       let resolvedEntities = null;
+      let nluRoute = forcedIntent ? `chip:${forcedIntent}` : null;
       // P4 (juez claude-cli 2026-06-02): las entidades de BAJA confianza (<0.7,
       // p.ej. "culupa"→Gulupa fuzzy a 0.5) NO se descartan más — se separan en
       // este bucket para presentarlas como SUGERENCIA (CASO B) en vez de
@@ -1559,6 +1562,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
                   tool: forcedPlan.tool,
                   reason: forcedPlan.stubResult.reason,
                 });
+                nluRoute = `chip:${forcedIntent}:${forcedPlan.tool}`;
               } else {
                 const tTool0 = performance.now();
                 const result = await callTool(forcedPlan.tool, forcedPlan.args);
@@ -1570,6 +1574,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
                     tool: forcedPlan.tool,
                     latencyTool: Math.round(tTool1 - tTool0),
                   });
+                  nluRoute = `chip:${forcedIntent}:${forcedPlan.tool}`;
                 } else {
                   console.debug('[sidecar] chip forzado tool null', {
                     intent: forcedIntent,
@@ -1582,6 +1587,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
           // PASO 2b — NLU planner + tool call (flow original, sin chip).
           const tNlu0 = performance.now();
           const plan = await planNlu(textForLLM, contextMemory);
+          if (plan?.tool) nluRoute = `nlu:${plan.tool}`;
           const tNlu1 = performance.now();
           // D2 (#246) — modo cadena: si el sidecar devolvió `tool_chain`
           // (array no vacío), ejecutamos cada paso en orden y usamos el
@@ -1594,6 +1600,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
             const useful = chainEvidences.filter((ev) => ev && ev.result != null);
             if (useful.length > 0) {
               toolEvidence = useful;
+              nluRoute = `nlu:chain:${useful.map((e) => e.tool).join('>')}`;
               const evidenceBytes = (() => {
                 try { return JSON.stringify(useful.map((e) => e.result)).length; } catch (_) { return 0; }
               })();
@@ -1615,6 +1622,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
             const tTool1 = performance.now();
             if (result) {
               toolEvidence = { tool: plan.tool, args: plan.args, result };
+              nluRoute = `nlu:${plan.tool}`;
               const evidenceBytes = (() => {
                 try { return JSON.stringify(result).length; } catch (_) { return 0; }
               })();
@@ -1653,6 +1661,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
               const tFb1 = performance.now();
               if (fbResult) {
                 toolEvidence = { tool: fbPlan.tool, args: fbPlan.args, result: fbResult };
+                nluRoute = `fallback:${fbPlan.tool}`;
                 console.debug('[sidecar] NLU muerto — grounding best-effort (#349)', {
                   tool: fbPlan.tool,
                   source: fbPlan.source,
@@ -1687,7 +1696,13 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
             // activa, 2) FARM_CONFIG demo, 3) null + tool con flag
             // no_municipio para que el LLM PIDA el municipio al usuario.
             const activeFinca = fincas.find((f) => f.slug === activeFincaSlug);
-            const municipio = activeFinca?.municipio || FARM_CONFIG?.MUNICIPIO || null;
+            const climaLocation = resolveClimaLocation({ municipio: activeFinca?.municipio });
+            const profileForClima = getProfile();
+            const municipio = activeFinca?.municipio
+              || climaLocation?.municipio
+              || profileForClima?.municipio
+              || FARM_CONFIG?.MUNICIPIO
+              || null;
             if (climaKeywords.test(text) && !municipio) {
               // Inyectar evidencia explícita "no_municipio" — el LLM
               // debe pedirle al user su municipio, NO redirigirlo a IDEAM
@@ -1701,6 +1716,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
                   hint: 'pedirle al usuario su municipio para consultar IDEAM',
                 },
               };
+              nluRoute = 'heuristic:get_clima_ideam:no_municipio';
               console.debug('[sidecar] clima sin municipio — evidence no_municipio inyectada');
             }
             if (climaKeywords.test(text) && municipio) {
@@ -1713,14 +1729,30 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
                   municipio,
                   metric: 'precipitation',
                   desde: desdeDate,
+                  lat: climaLocation?.lat,
+                  lng: climaLocation?.lng,
+                  elevation: climaLocation?.elevation,
+                  vereda: climaLocation?.vereda,
+                  location_source: climaLocation?.source,
                 });
                 const tClima1 = performance.now();
                 if (climaResult) {
                   toolEvidence = {
                     tool: 'get_clima_ideam',
-                    args: { action: 'monthly_avg', municipio, metric: 'precipitation', desde: desdeDate },
+                    args: {
+                      action: 'monthly_avg',
+                      municipio,
+                      metric: 'precipitation',
+                      desde: desdeDate,
+                      lat: climaLocation?.lat,
+                      lng: climaLocation?.lng,
+                      elevation: climaLocation?.elevation,
+                      vereda: climaLocation?.vereda,
+                      location_source: climaLocation?.source,
+                    },
                     result: climaResult,
                   };
+                  nluRoute = 'heuristic:get_clima_ideam';
                   console.debug('[sidecar] clima_ideam heuristic hit', {
                     municipio,
                     latencyMs: Math.round(tClima1 - tClima0),
@@ -1912,6 +1944,30 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         role: 'assistant',
         content: response,
         metadata: sourceMetadata,
+      });
+      const profileForCapture = (() => {
+        try { return getProfile(); } catch (_) { return {}; }
+      })();
+      captureExchange({
+        userText: text.trim(),
+        agentText: response,
+        identity: {
+          user_id: operatorId,
+          user_name: profileForCapture?.nombre || null,
+          finca_slug: activeFincaSlug || null,
+          finca_nombre: fincaActiva?.nombre || fincaActiva?.name || null,
+        },
+        meta: {
+          session_id: `${operatorId}:${activeFincaSlug || 'sin-finca'}`,
+          nlu_route: nluRoute,
+          entities_grounded: Array.isArray(resolvedEntities)
+            ? resolvedEntities.map((e) => e?.canonical_id || e?.id || e?.mentioned).filter(Boolean)
+            : [],
+          guards_fired: guarded.modified ? guarded.reasons || [] : [],
+          grounded_status: sourceMetadata?.source || sourceMetadata?.grounded_status || null,
+          latency_ms: Math.round(performance.now() - pipelineStartedAt),
+          model: selectChatRoute(textForLLM),
+        },
       });
       setMessages((prev) => [...prev, assistantMessage]);
 
@@ -2898,6 +2954,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
 
           <button
             type="submit"
+            aria-label="Enviar"
             disabled={
               !inputText.trim() ||
               state === STATE_RECORDING ||

@@ -134,6 +134,62 @@ describe('climaService — cache + fetch', () => {
     });
   });
 
+  it('uses saved profile/vereda coordinates when caller omits coords', async () => {
+    vi.resetModules();
+    localStorage.setItem('chagra:profile:v1', JSON.stringify({
+      municipio: 'Choachí',
+      departamento: 'Cundinamarca',
+      vereda: 'Maza',
+      vereda_source: 'osm',
+      ubicacion_lat: '4.531234',
+      ubicacion_lng: '-73.924321',
+      finca_altitud: '2580',
+    }));
+    const mockGetClima = vi.fn().mockResolvedValue({
+      fetched_at: new Date().toISOString(),
+      enso_status: { phase: 'neutral', severity: 'neutral', sources: [] },
+      alertas_locales: [],
+    });
+    vi.doMock('../sidecarClient.js', () => ({ getClimaSnapshot: mockGetClima }));
+    const mod = await import('../climaService.js');
+    const result = await mod.fetchClimaSnapshot();
+    expect(mockGetClima).toHaveBeenCalledWith({
+      lat: 4.531234,
+      lng: -73.924321,
+      elevation: 2580,
+    });
+    expect(result.location_context).toMatchObject({
+      municipio: 'Choachí',
+      departamento: 'Cundinamarca',
+      vereda: 'Maza',
+      source: 'osm',
+      precision: 'exact',
+    });
+  });
+
+  it('does not collide cache for nearby but distinct coordinates', async () => {
+    vi.resetModules();
+    const mockGetClima = vi
+      .fn()
+      .mockResolvedValueOnce({
+        fetched_at: new Date().toISOString(),
+        enso_status: { phase: 'neutral', severity: 'neutral', sources: [] },
+        alertas_locales: [],
+        openmeteo: { available: true, forecast_7d: [{ temp_max_c: 17 }] },
+      })
+      .mockResolvedValueOnce({
+        fetched_at: new Date().toISOString(),
+        enso_status: { phase: 'neutral', severity: 'neutral', sources: [] },
+        alertas_locales: [],
+        openmeteo: { available: true, forecast_7d: [{ temp_max_c: 19 }] },
+      });
+    vi.doMock('../sidecarClient.js', () => ({ getClimaSnapshot: mockGetClima }));
+    const mod = await import('../climaService.js');
+    await mod.fetchClimaSnapshot({ lat: 4.53123, lng: -73.92432, elevation: 2580 });
+    await mod.fetchClimaSnapshot({ lat: 4.53499, lng: -73.92432, elevation: 2580 });
+    expect(mockGetClima).toHaveBeenCalledTimes(2);
+  });
+
   it('keys the cache by elevation — distinta altitud no comparte snapshot', async () => {
     vi.resetModules();
     const mockGetClima = vi

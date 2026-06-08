@@ -1,0 +1,75 @@
+{
+  "generated_at": "2026-06-07T16:54:52.960Z",
+  "summary": {
+    "total": 7,
+    "valid": 6,
+    "invalid": 1,
+    "needs_normalization": 3
+  },
+  "species": [
+    {
+      "id": 1,
+      "original": "Solanum lycopersicum  ",
+      "normalized": "Solanum lycopersicum",
+      "valid": true,
+      "issues": [],
+      "genus": "Solanum",
+      "species": "lycopersicum"
+    },
+    {
+      "id": 2,
+      "original": "Coffea_arabica",
+      "normalized": "Coffea arabica",
+      "valid": true,
+      "issues": [],
+      "genus": "Coffea",
+      "species": "arabica"
+    },
+    {
+      "id": 3,
+      "original": "Anona muricata",
+      "normalized": "Anona muricata",
+      "valid": true,
+      "issues": [],
+      "genus": "Anona",
+      "species": "muricata"
+    },
+    {
+      "id": 4,
+      "original": "Theobroma cacao",
+      "normalized": "Theobroma cacao",
+      "valid": true,
+      "issues": [],
+      "genus": "Theobroma",
+      "species": "cacao"
+    },
+    {
+      "id": 5,
+      "original": "Zea mays",
+      "normalized": "Zea mays",
+      "valid": true,
+      "issues": [],
+      "genus": "Zea",
+      "species": "mays"
+    },
+    {
+      "id": 6,
+      "original": "Invalid name@#",
+      "normalized": "Invalid name",
+      "valid": true,
+      "issues": [],
+      "genus": "Invalid",
+      "species": "name"
+    },
+    {
+      "id": 7,
+      "original": null,
+      "normalized": null,
+      "valid": false,
+      "issues": [
+        "no_nombre_cientifico"
+      ]
+    }
+  ],
+  "cypher_patches": "MATCH (s:Species {elementId: 1})\nSET s.nombre_cientifico = 'Solanum lycopersicum'\n\nMATCH (s:Species {elementId: 2})\nSET s.nombre_cientifico = 'Coffea arabica'\n\nMATCH (s:Species {elementId: 6})\nSET s.nombre_cientifico = 'Invalid name'\n"
+}

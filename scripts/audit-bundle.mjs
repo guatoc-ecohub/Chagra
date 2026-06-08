@@ -90,6 +90,22 @@ const forbiddenRegexes = regexList
   })
   .filter(Boolean);
 
+function isAllowedVendorFalsePositive(regex, match, content) {
+  const value = String(match[0]);
+
+  // Three.js embeds a hexadecimal lookup table for UUID generation:
+  // "00.01.02...10.11.12.13...fe.ff". The 10/8 private-IP regex sees
+  // "10.11.12.13" inside that table, but it is not a network address.
+  if (regex.source === String.raw`\b10\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\b` && value === '10.11.12.13') {
+    const start = Math.max(0, match.index - 80);
+    const end = Math.min(content.length, match.index + value.length + 900);
+    const context = content.slice(start, end);
+    return context.includes('00.01.02.03.04.05') && context.includes('fa.fb.fc.fd.fe.ff');
+  }
+
+  return false;
+}
+
 // Recorrer dist/ recursivo, leer archivos de texto
 function walk(dir) {
   const out = [];
@@ -120,8 +136,12 @@ for (const f of files) {
 
   // Regex
   for (const r of forbiddenRegexes) {
-    const m = content.match(r);
-    if (m) hits.push(`[${f.slice(ROOT.length + 1)}] regex ${r.source} → "${String(m[0]).slice(0, 60)}"`);
+    const globalRegex = new RegExp(r.source, r.flags.includes('g') ? r.flags : `${r.flags}g`);
+    for (const m of content.matchAll(globalRegex)) {
+      if (isAllowedVendorFalsePositive(r, m, content)) continue;
+      hits.push(`[${f.slice(ROOT.length + 1)}] regex ${r.source} → "${String(m[0]).slice(0, 60)}"`);
+      break;
+    }
   }
 }
 

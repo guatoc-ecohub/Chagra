@@ -40,14 +40,18 @@ jobs:
         uses: contributor-assistant/github-action@v2.6.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Para firmas en este mismo repo, GITHUB_TOKEN basta. No configurar
-          # remote-* abajo: el action interpreta eso como repo remoto y exige
-          # PERSONAL_ACCESS_TOKEN con scopes extra.
+          # PERSONAL_ACCESS_TOKEN es OPCIONAL: solo necesario si el repo
+          # de firmas (`path-to-signatures`) vive en otro repo (org-wide
+          # signatures vault). Mientras `path-to-signatures` apunte al
+          # mismo repo, GITHUB_TOKEN basta.
+          # PERSONAL_ACCESS_TOKEN: ${{ secrets.CLA_BOT_PAT }}
         with:
           path-to-signatures: 'signatures/cla.json'
           path-to-document: 'https://github.com/guatoc-ecohub/Chagra/blob/main/CLA.md'
           branch: 'cla-signatures'
           allowlist: dependabot[bot],renovate[bot],github-actions[bot]
+          remote-organization-name: guatoc-ecohub
+          remote-repository-name: Chagra
           custom-notsigned-prcomment: |
             Hola, gracias por tu PR a Chagra.
 

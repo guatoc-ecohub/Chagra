@@ -48,6 +48,13 @@
 | 11 | **Agregador global de estadísticas** — endpoint público opt-in, anonimización, hosting. Fase B de stats. | 0.8.0 | XL | Requiere hosting público y políticas de privacidad |
 | 12 | **Instalador Chagra** — onboarding con GPS + API de elevación + catálogo de especies por piso térmico + seed de zonas/insumos base + consentimiento de telemetría global | 0.9.0 | XL | Catálogo curado propio (~50 cultivos colombianos por altitud). |
 
+### Deseable futuro — red climática multi-finca
+
+- Evaluar red LoRa/LoRaWAN por veredas/fincas para sensores climáticos locales,
+  usando distancia entre coordenadas de fincas, altitud y ubicación de gateways
+  candidatos. Por ahora NO es prioridad: la prioridad inmediata es inteligencia
+  del agente, benches anti-alucinación y calidad de grounding.
+
 ---
 
 ## Preguntas abiertas (a resolver en el momento de cada tarea)

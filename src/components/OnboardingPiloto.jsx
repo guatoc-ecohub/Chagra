@@ -143,6 +143,7 @@ function FormPiloto() {
     operador_nombre: '',
     operador_email: '',
     maps_url: '',
+    vereda: '',
     altitud_msnm: '',
     area_m2: '',
     vocacion: '',
@@ -217,6 +218,9 @@ function FormPiloto() {
     const mapsLine = data.maps_url.trim()
       ? `maps_url: "${data.maps_url}"`
       : `maps_url: null  # TODO Miguel: pedir en llamada de seguimiento (vino via skip)`;
+    const veredaLine = data.vereda.trim()
+      ? `vereda_osm: "${data.vereda.trim().replace(/"/g, "'")}"`
+      : `vereda_osm: null`;
     const vocacionLine = data.vocacion
       ? `vocacion: ${data.vocacion}`
       : `vocacion: "TODO_vocacion"  # TODO Miguel: pedir en llamada de seguimiento (vino via skip)`;
@@ -230,6 +234,7 @@ function FormPiloto() {
     operador_nombre: "${data.operador_nombre}"
     operador_email: "${data.operador_email}"
     ${mapsLine}
+    ${veredaLine}
     coords: [TODO_lat, TODO_lon]  # Miguel: extraer del maps_url
     altitud_msnm: ${data.altitud_msnm ? Number(data.altitud_msnm) : 'null  # TODO operador o GPS'}
     biocultural_zone: "TODO_zona"  # Miguel: andino_alto_páramo | andino_alto | andino_medio | andino_medio_invernadero | valle_caucano
@@ -257,6 +262,7 @@ function FormPiloto() {
     return `Hola Miguel, te paso mis datos para el piloto Chagra:${skipNote}
 
 ${yamlOutput}${mapsLine}
+${data.vereda ? `\nVereda o sector: ${data.vereda}\n` : ''}
 ${data.notas ? `\nNotas: ${data.notas}\n` : ''}
 Saludos,
 ${data.operador_nombre}`;
@@ -427,6 +433,22 @@ ${data.operador_nombre}`;
                 <AlertCircle size={12} /> {errors.maps_url}
               </p>
             )}
+          </div>
+
+          <div>
+            <label htmlFor="vereda" className={labelClass}>Vereda o sector (opcional)</label>
+            <input
+              id="vereda"
+              type="text"
+              value={data.vereda}
+              onChange={(e) => setField('vereda', e.target.value)}
+              placeholder="Ej: Mundo Nuevo, La Calera"
+              className={inputClass(false)}
+            />
+            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              Si no tienes link exacto, escribe la vereda y el municipio. Chagra
+              la cruza con OSM al configurar la ubicación.
+            </p>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">

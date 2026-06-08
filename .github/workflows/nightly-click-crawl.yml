@@ -1,19 +1,19 @@
-name: Playwright E2E
+name: Nightly Click Crawl
 
 on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
+  schedule:
+    # 02:30 America/Bogota = 07:30 UTC.
+    - cron: '30 7 * * *'
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  e2e:
-    name: Offline-first E2E
+  click-crawl:
+    name: App-wide click crawl
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,13 +27,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Playwright browsers
+      - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
 
-      - name: Run Playwright tests
-        run: npm run test:e2e
+      - name: Run nightly click crawl
+        run: npm run test:e2e -- tests/nightly-click-crawl.spec.js
         env:
           CI: '1'
+          RUN_NIGHTLY_CLICK_CRAWL: '1'
           VITE_FARMOS_URL: ''
           VITE_FARMOS_CLIENT_ID: farm
 
@@ -41,6 +42,6 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          name: nightly-click-crawl-report
           path: playwright-report/
           retention-days: 14

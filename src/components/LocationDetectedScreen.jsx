@@ -27,6 +27,7 @@ import {
 import { useFincaActiveStore } from '../services/fincaActiveStore';
 import { getProfile, saveProfile, resolveAltitudToSave } from '../services/userProfileService';
 import { getDepartamentos, getMunicipios, findMunicipio } from '../utils/colombiaLocations';
+import { searchVeredasEnMunicipio } from '../services/veredaService';
 
 // Fix del marcador por defecto de Leaflet (bundlers no resuelven las URLs
 // relativas del CSS). Mismo patrón que MultiFincaGlobe.
@@ -252,6 +253,7 @@ export default function LocationDetectedScreen({
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState(initialMunicipio);
   const [searchError, setSearchError] = useState(null);
+  const [veredaSuggestions, setVeredaSuggestions] = useState([]);
   // PR4 (#187) — cascade dropdown offline para cuando Nominatim falla o el
   // usuario no tiene buena ortografía. 33 deptos × 1.122 municipios (DANE #338).
   const [cascadeOpen, setCascadeOpen] = useState(false);
@@ -371,7 +373,43 @@ export default function LocationDetectedScreen({
     if (!q) return;
     setLoading(true);
     setSearchError(null);
+    setVeredaSuggestions([]);
     try {
+      // Esquema OSM veredal: aceptar "Vereda, Municipio" como entrada directa.
+      // El municipio se resuelve offline con DANE; la vereda se valida contra
+      // Overpass y el dataset crowdsourced local. Si no hay lat/lng veredal,
+      // usamos el centroide municipal y guardamos la vereda como contexto.
+      const [rawVereda, ...rest] = q.split(',').map((p) => p.trim()).filter(Boolean);
+      const municipioHint = rest.join(', ');
+      if (rawVereda && municipioHint) {
+        const municipioLocal = findMunicipio(municipioHint);
+        if (municipioLocal) {
+          const veredas = await searchVeredasEnMunicipio(municipioLocal.name, rawVereda);
+          const exact = veredas.find(
+            (v) => v.name.toLowerCase().trim() === rawVereda.toLowerCase().trim(),
+          ) || veredas[0];
+          const lat = typeof exact?.lat === 'number' ? exact.lat : municipioLocal.lat;
+          const lng = typeof exact?.lng === 'number' ? exact.lng : municipioLocal.lng;
+          const enriched = await resolveUbicacion({
+            lat,
+            lng,
+            altitud: municipioLocal.altitud ?? null,
+          });
+          setLoc({
+            ...enriched,
+            lat,
+            lng,
+            vereda: exact?.name || rawVereda,
+            vereda_source: exact?.source || 'typed',
+            vereda_display_name: exact?.display_name || null,
+            municipio: municipioLocal.name,
+            departamento: municipioLocal.departamento,
+          });
+          setVeredaSuggestions(veredas.slice(0, 5));
+          return;
+        }
+      }
+
       // 1) OFFLINE-FIRST: resolver contra el dataset DANE embebido (1.122
       //    municipios). Funciona sin red y trae municipio + departamento +
       //    altitud curada directamente. Solo si no hay match local caemos a
@@ -405,9 +443,44 @@ export default function LocationDetectedScreen({
         municipio: hit.municipio || enriched.municipio,
         departamento: hit.departamento || enriched.departamento,
       });
+      const municipioNombre = hit.municipio || enriched.municipio;
+      if (municipioNombre) {
+        const veredas = await searchVeredasEnMunicipio(municipioNombre, q);
+        setVeredaSuggestions(veredas.slice(0, 5));
+      }
     } catch (e) {
       console.warn('[LocationDetected] búsqueda falló:', e);
       setSearchError('Hubo un problema buscando ese lugar. Intenta de nuevo.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVeredaSelect = async (vereda) => {
+    if (!vereda) return;
+    const baseMunicipio = vereda.municipio || loc?.municipio;
+    const municipioInfo = baseMunicipio ? findMunicipio(baseMunicipio) : null;
+    const lat = typeof vereda.lat === 'number' ? vereda.lat : (loc?.lat ?? municipioInfo?.lat);
+    const lng = typeof vereda.lng === 'number' ? vereda.lng : (loc?.lng ?? municipioInfo?.lng);
+    if (typeof lat !== 'number' || typeof lng !== 'number') return;
+    setLoading(true);
+    try {
+      const enriched = await resolveUbicacion({
+        lat,
+        lng,
+        altitud: municipioInfo?.altitud ?? loc?.altitud ?? null,
+      });
+      setLoc({
+        ...enriched,
+        lat,
+        lng,
+        vereda: vereda.name,
+        vereda_source: vereda.source || 'selected',
+        vereda_display_name: vereda.display_name || null,
+        municipio: municipioInfo?.name || baseMunicipio || enriched.municipio,
+        departamento: municipioInfo?.departamento || vereda.departamento || enriched.departamento,
+      });
+      setQuery([vereda.name, municipioInfo?.name || baseMunicipio].filter(Boolean).join(', '));
     } finally {
       setLoading(false);
     }
@@ -510,10 +583,13 @@ export default function LocationDetectedScreen({
     saveProfile({
       ubicacion_lat: loc.lat,
       ubicacion_lng: loc.lng,
+      vereda: loc.vereda || undefined,
+      vereda_source: loc.vereda_source || undefined,
+      vereda_display_name: loc.vereda_display_name || undefined,
       municipio: loc.municipio || undefined,
       departamento: loc.departamento || undefined,
       region: loc.municipio
-        ? [loc.municipio, loc.departamento].filter(Boolean).join(', ')
+        ? [loc.vereda, loc.municipio, loc.departamento].filter(Boolean).join(', ')
         : undefined,
       // #coarse-location / #1213-fix: guardamos la altitud EFECTIVA con coalesce.
       // `altitud_source: 'manual'` señala que el usuario la fijó a mano.
@@ -533,7 +609,11 @@ export default function LocationDetectedScreen({
     try {
       window.dispatchEvent(
         new CustomEvent('chagra:location-updated', {
-          detail: { municipio: loc.municipio || null },
+          detail: {
+            vereda: loc.vereda || null,
+            municipio: loc.municipio || null,
+            departamento: loc.departamento || null,
+          },
         }),
       );
     } catch (_) {
@@ -615,6 +695,29 @@ export default function LocationDetectedScreen({
             <p className="text-xs text-amber-400 mt-2 flex items-center gap-1">
               <AlertCircle size={12} /> {searchError}
             </p>
+          )}
+          {veredaSuggestions.length > 0 && (
+            <div
+              data-testid="vereda-suggestions"
+              className="mt-2 rounded-xl border border-slate-800 bg-slate-900/70 overflow-hidden"
+            >
+              <p className="px-3 pt-2 text-2xs uppercase tracking-wide text-slate-500">
+                Veredas encontradas
+              </p>
+              {veredaSuggestions.map((v) => (
+                <button
+                  key={`${v.name}-${v.source}`}
+                  type="button"
+                  onClick={() => handleVeredaSelect(v)}
+                  className="w-full text-left px-3 py-2 text-sm text-slate-200 hover:bg-slate-800 flex items-center justify-between gap-3"
+                >
+                  <span>{v.name}</span>
+                  <span className="text-2xs text-slate-500">
+                    {v.source === 'local-crowdsourced' ? 'local' : 'OSM'}
+                  </span>
+                </button>
+              ))}
+            </div>
           )}
         </div>
 
@@ -778,7 +881,9 @@ export default function LocationDetectedScreen({
               <MapPin size={18} className="text-emerald-400 mt-0.5 shrink-0" />
               <div>
                 <p className="text-sm font-bold text-white">
-                  {loc.municipio || 'Ubicación detectada'}
+                  {loc.vereda
+                    ? `${loc.vereda}, ${loc.municipio || 'Municipio'}`
+                    : loc.municipio || 'Ubicación detectada'}
                 </p>
                 {loc.departamento && (
                   <p className="text-xs text-slate-400">{loc.departamento}, Colombia</p>

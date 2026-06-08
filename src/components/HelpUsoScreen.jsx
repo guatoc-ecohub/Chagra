@@ -152,7 +152,7 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
           </ol>
           <p>Después al crear plantas, selecciona esa zona como contenedor.</p>
             <p className="text-xs text-slate-500 italic mt-2">
-              <strong>Brave + GPS</strong>: si el mapa muestra tu ubicación incorrectamente, el navegador podría estar bloqueando el acceso preciso a tu ubicación. Para solucionarlo, toca el icono del escudo en la barra de direcciones del navegador y desactiva la opción de bloqueo de huellas digitales para chagra.guatoc.co.
+              <strong>Brave + GPS</strong>: si el mapa muestra tu ubicación incorrectamente, el navegador podría estar bloqueando el acceso preciso a tu ubicación. Para solucionarlo, toca el icono del escudo en la barra de direcciones del navegador y desactiva la opción de bloqueo de huellas digitales para este sitio.
             </p>
         </Section>
 
@@ -249,7 +249,7 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
                     En Chrome: barra de URL → ícono del candado o tres
                     puntos → &ldquo;Configuración del sitio&rdquo; o
                     &ldquo;Permisos&rdquo; → &ldquo;Ubicación&rdquo; → permitir
-                    para chagra.guatoc.co.
+                    para este sitio.
                   </li>
                   <li>
                     En Brave: lo mismo + revisar que la opción de
@@ -266,7 +266,7 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
             </div>
             <div>
               <p className="font-bold text-amber-300">🎤 Voz no transcribe</p>
-              <p className="text-xs text-slate-400 leading-relaxed">Verifica permiso de micrófono (iOS: Ajustes → Safari → Micrófono → chagra.guatoc.co → Permitir). Necesita conexión activa al servidor de transcripción.</p>
+              <p className="text-xs text-slate-400 leading-relaxed">Verifica permiso de micrófono (iOS: Ajustes → Safari → Micrófono → este sitio → Permitir). Necesita conexión activa al servidor de transcripción.</p>
             </div>
             <div>
               <p className="font-bold text-amber-300">📷 La foto no aparece tras adjuntarla</p>
