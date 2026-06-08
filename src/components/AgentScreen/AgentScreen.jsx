@@ -14,7 +14,8 @@ import { blobToDataUrl } from '../../utils/imageProcessor';
 import { processPhotoItem, buildPhotoUserMessage } from '../../services/agentOutboxPhoto';
 import { isAnalyzableImageAttachment, buildAttachmentRejection } from '../../services/agentOutboxAttachment';
 import { buildPhotoAnalysisMessage } from './photoAnalysis';
-import { AGENT_ENTRANCE_CSS, AGENT_COMPOSITOR_CSS, agentEntranceClass } from './agentEntrance';import {
+import { AGENT_ENTRANCE_CSS, AGENT_COMPOSITOR_CSS, agentEntranceClass } from './agentEntrance';
+import {
   addTurn,
   getFullHistory,
   getContextString,
@@ -95,7 +96,6 @@ import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import ChagraAgentAvatarColibriPhoto from '../ChagraAgentAvatarColibriPhoto';
 import QuickChipsBar from '../QuickChipsBar';
 import ChipsToolbar from '../ChipsToolbar';
-import { captureAndCompress } from '../../services/photoService';
 import { agentSounds } from '../../services/agentSoundService';
 import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
