@@ -461,6 +461,20 @@ export default function App() {
     });
   }, [navigate]);
 
+  useEffect(() => {
+    const handleHashRoute = () => {
+      const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
+      const routeView = HASH_VIEW_ROUTES[hash];
+      if (!routeView) return;
+      isAuthenticated().then((isAuth) => {
+        if (isAuth) navigate(routeView);
+      });
+    };
+
+    window.addEventListener('hashchange', handleHashRoute);
+    return () => window.removeEventListener('hashchange', handleHashRoute);
+  }, [navigate]);
+
   // Preload del catálogo SQLite WASM en background (v0.8.2). Inicializa la
   // DB cuando la app arranca para que la primera apertura de los flows que
   // consultan el catálogo (InvasiveObservationLog, NativeSubstituteSuggestion,

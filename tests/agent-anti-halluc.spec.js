@@ -452,13 +452,13 @@ test.describe('AgentScreen — pipeline anti-halluc + queue UX (task #171)', () 
     // visible en la burbuja del assistant. Esto prueba que el contenido NO
     // queda vacío (regresión #339) y que el render no crashea con voseo.
     await expect(
-      page.getByText(/aplicar el biopreparado en la tarde/)
+      page.getByText(/aplicar el biopreparado en la tarde/).first()
     ).toBeVisible({ timeout: 30_000 });
 
     // El filtro anti-voseo corrigió el voseo argentino: NO debe quedar
     // "Mirá" ni "vos tenés" visibles en la UI (DR-LANG-1 / español
     // colombiano). Verificamos la sustitución a usted colombiano.
-    await expect(page.getByText(/Mire, usted tiene/)).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText(/Mire, usted tiene/).first()).toBeVisible({ timeout: 30_000 });
     await expect(page.getByText(/vos tenés/)).toHaveCount(0);
   });
 });
