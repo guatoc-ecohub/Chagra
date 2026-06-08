@@ -527,7 +527,7 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-sun {
                     position: absolute;
                     top: 8%;
-                    left: 50%;
+                    left: 25%;
                     transform: translateX(-50%);
                     width: 240px;
                     height: 240px;
