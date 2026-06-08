@@ -58,7 +58,7 @@ describe('agentOutboxPhoto.buildVisionPrompt', () => {
 
   it('sin diagnóstico + con caption: prompt conversacional con caption', () => {
     const prompt = buildVisionPrompt(null, 'esta mata de tomate está rara');
-    expect(prompt).toBe('Te envié una foto de mi planta. esta mata de tomate está rara');
+    expect(prompt).toBe('Te envié una foto. esta mata de tomate está rara');
   });
 
   it('sin diagnóstico + sin caption: pide guía por descripción', () => {
