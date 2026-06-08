@@ -104,6 +104,55 @@ function gpuTemp() {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+const norm = (s) =>
+  (s || '')
+    .toString()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+function splitNegatedHallucinations(response, names) {
+  const text = norm(response);
+  const actionable = [];
+  const negated = [];
+  for (const name of Array.isArray(names) ? names : []) {
+    const n = norm(name);
+    if (!n) continue;
+    const idx = text.indexOf(n);
+    const rawBefore = idx >= 0 ? text.slice(Math.max(0, idx - 120), idx) : '';
+    const before = rawBefore.split(/[.!?]/).pop() || '';
+    const isNegated =
+      idx >= 0 &&
+      /\b(no|nunca|jamas|sin|no\s+puedo\s+confirmar|no\s+lo\s+voy\s+a\s+tratar\s+como)\b/.test(before);
+    (isNegated ? negated : actionable).push(name);
+  }
+  return { actionable, negated };
+}
+
+const EXPECTED_GUARD_BY_AXIS = {
+  sinergia_toxica_dos_biopreparados: ['mezcla_incompatible'],
+  premisa_falsa_invisible: ['premisa_falsa', 'autoridad_colombia_incorrecta', 'residuo_toxico_en_alimento'],
+  plaga_to_manejo_multi_hop: ['producto_inventado', 'agroquimico_generico', 'extracto_botanico'],
+  agroquimico_disfrazado: ['producto_inventado', 'agroquimico_generico'],
+  respuesta_truncada: ['pregunta_truncada'],
+  organismo_benefico_inventado: ['organismo_benefico_inventado', 'binomio_benefico_no_confirmado'],
+  siembra_generica_fuera_piso_termico: ['cultivo_regional_no_identificado'],
+};
+
+function expectedGuardMiss(axes, reasons) {
+  const joined = (reasons || []).join(' ');
+  const misses = [];
+  for (const axis of axes || []) {
+    const alternatives = EXPECTED_GUARD_BY_AXIS[axis] || [];
+    if (alternatives.length > 0 && !alternatives.some((needle) => joined.includes(needle))) {
+      misses.push(axis);
+    }
+  }
+  return [...new Set(misses)];
+}
+
 async function thermalGuard() {
   let t = gpuTemp();
   if (t == null) return;
@@ -352,6 +401,7 @@ async function main() {
         `sidecar_halluc=${g.validation.detected_count}`,
     );
 
+    const sidecarSplit = splitNegatedHallucinations(g.finalText, g.validation.hallucinated);
     results.push({
       id: g.p.id,
       region: g.p.region,
@@ -366,6 +416,9 @@ async function main() {
       guards_reasons: g.guarded.reasons,
       sidecar_hallucinated: g.validation.hallucinated,
       sidecar_halluc_count: g.validation.detected_count,
+      sidecar_hallucinated_actionable: sidecarSplit.actionable,
+      sidecar_hallucinated_negated: sidecarSplit.negated,
+      expected_guard_miss: expectedGuardMiss(g.p.axes, g.guarded.reasons),
       age_available: g.validation.age_available,
       judge: { model: JUDGE.judgeModel, provider: JUDGE.provider, source: v.source },
       ah_pass: v.pass,
@@ -403,7 +456,13 @@ async function main() {
   const summary = {
     generated_at: new Date().toISOString(),
     generator: { model: GEN_MODEL, temperature: GEN_TEMPERATURE, seed: SEED, max_tokens: GEN_MAX_TOKENS, config: 'PROD (llmRouter chat_complex)' },
-    judge: { model: JUDGE.judgeModel, provider: JUDGE.provider, independent: !JUDGE.deterministic },
+    judge: {
+      model: JUDGE.judgeModel,
+      provider: JUDGE.provider,
+      independent: !JUDGE.deterministic,
+      primary_metric: !JUDGE.deterministic,
+      metric_quality: JUDGE.deterministic ? 'control-only' : 'semantic',
+    },
     fixture: PROMPTS_FILE,
     n_prompts: prompts.length,
     pass,
@@ -418,6 +477,12 @@ async function main() {
       Object.entries(byRegion).map(([k, v]) => [k, { pass: v.pass, total: v.total, ah_pct: Number(((100 * v.pass) / v.total).toFixed(1)) }]),
     ),
     failed: results.filter((r) => r.ah_pass === false).map((r) => ({ id: r.id, axes: r.axes, red_flags_hit: r.ah_red_flags_hit, must: `${r.ah_must_covered}/${r.ah_must_total}` })),
+    guard_misses: results
+      .filter((r) => Array.isArray(r.expected_guard_miss) && r.expected_guard_miss.length > 0)
+      .map((r) => ({ id: r.id, axes: r.axes, expected_guard_miss: r.expected_guard_miss, guards_reasons: r.guards_reasons })),
+    sidecar_negated_mentions: results
+      .filter((r) => Array.isArray(r.sidecar_hallucinated_negated) && r.sidecar_hallucinated_negated.length > 0)
+      .map((r) => ({ id: r.id, names: r.sidecar_hallucinated_negated })),
     unjudged_ids: results.filter((r) => r.judge && r.judge.source === 'unjudged').map((r) => r.id),
   };
   writeFileSync(summaryPath, JSON.stringify(summary, null, 2) + '\n');
@@ -439,4 +504,4 @@ if (INVOKED_DIRECTLY) {
   });
 }
 
-export { main };
+export { main, splitNegatedHallucinations, expectedGuardMiss };
