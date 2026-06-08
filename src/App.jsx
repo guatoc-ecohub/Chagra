@@ -117,6 +117,20 @@ const ACCENT_CLASSES = {
   amber: { border: 'border-l-amber-500', text: 'text-amber-400' },
 };
 
+const HASH_VIEW_ROUTES = {
+  agente: 'agente',
+  inventario: 'activos',
+  activos: 'activos',
+  biodiversidad: 'biodiversidad',
+  ayuda: 'ayuda',
+  perfil: 'perfil',
+  informes: 'informes',
+  'case-studies': 'casos',
+  casos: 'casos',
+  tareas: 'task_log',
+  task_log: 'task_log',
+};
+
 // T2: Dashboard como componente propio con suscripción reactiva al store.
 // useAssetStore() (hook) dispara re-render cuando hydrate()/syncFromServer() actualizan
 // el estado, a diferencia de useAssetStore.getState() que es una lectura snapshot.
@@ -439,7 +453,11 @@ export default function App() {
       return;
     }
     isAuthenticated().then((isAuth) => {
-      navigate(isAuth ? 'dashboard' : 'login');
+      if (!isAuth) {
+        navigate('login');
+        return;
+      }
+      navigate(HASH_VIEW_ROUTES[hash] || 'dashboard');
     });
   }, [navigate]);
 

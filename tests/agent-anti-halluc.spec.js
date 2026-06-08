@@ -263,7 +263,7 @@ async function gotoAgentScreen(page) {
   await expect(composer).toBeVisible({ timeout: 15_000 });
   await composer.fill(ENTRY_QUESTION);
   // El botón de enviar (colibrí) se habilita al haber texto.
-  const sendBtn = page.getByRole('button', { name: /^Enviar$/ });
+  const sendBtn = page.getByRole('button', { name: /^Enviar al agente$/ });
   await expect(sendBtn).toBeEnabled({ timeout: 5_000 });
   await sendBtn.click();
 
