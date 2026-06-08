@@ -1,0 +1,84 @@
+name: Deploy Chagra PWA (QA)
+
+on:
+  push:
+    branches: [qa]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+
+concurrency:
+  group: deploy-chagra-qa
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: [self-hosted, alpha]
+    timeout-minutes: 30
+    steps:
+      - name: Detect runner identity
+        run: |
+          if echo "$HOME" | grep -q claude-runner; then
+            echo "SKIP_DEPLOY=1" >> "$GITHUB_ENV"
+          fi
+
+      - if: env.SKIP_DEPLOY != '1'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Install dependencies
+        run: npm ci
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Lint
+        run: |
+          set -o pipefail
+          if ! npm run lint -- --max-warnings 9999 2>&1 | tee /tmp/lint.log; then
+            grep -E "^\s+[0-9]+:[0-9]+\s+error" /tmp/lint.log | head -20 | while read -r line; do
+              echo "::error::qa-deploy lint: $line"
+            done
+            exit 1
+          fi
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Build
+        run: npm run build
+        env:
+          VITE_FARMOS_URL: ""
+          VITE_FARMOS_CLIENT_ID: farm
+          VITE_HA_ACCESS_TOKEN: ${{ secrets.VITE_HA_ACCESS_TOKEN }}
+          VITE_USE_SIDECAR_AGRO_MCP: "true"
+          VITE_CHAGRA_MCP_TOKEN: ${{ secrets.VITE_CHAGRA_MCP_TOKEN }}
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Deploy to qa
+        run: |
+          set -e
+          TARGET=/mnt/fast/appdata/farmos-pwa-qa
+          if [ ! -d "$TARGET" ]; then
+            echo "Target $TARGET does not exist — run nixos-rebuild or mkdir first"
+            exit 1
+          fi
+          umask 022
+          rsync -avzO --no-perms --delete --no-group --chmod=F644 dist/ "$TARGET/"
+          find "$TARGET" -type f -user runner ! -perm 644 -exec chmod 644 {} + || true
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Verify deployment
+        run: |
+          TARGET=/mnt/fast/appdata/farmos-pwa-qa
+          test -f "$TARGET/index.html" || exit 1
+          HASH=$(sha256sum "$TARGET/index.html" | cut -d' ' -f1)
+          echo "QA Deploy OK: $(date -Iseconds) | index.html sha256: ${HASH:0:12}"
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Bump SW cache version (qa)
+        run: |
+          SW_FILE=/mnt/fast/appdata/farmos-pwa-qa/sw.js
+          if [ -f "$SW_FILE" ]; then
+            COMMIT_SHORT=$(git rev-parse --short HEAD)
+            sed -i -E "s/chagra-[0-9a-z]+/chagra-qa-${COMMIT_SHORT}/" "$SW_FILE"
+            echo "SW cache bumped to chagra-qa-${COMMIT_SHORT}"
+          fi

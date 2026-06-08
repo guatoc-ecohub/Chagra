@@ -1,0 +1,73 @@
+name: Deploy Chagra PWA (DEV)
+
+on:
+  push:
+    branches: ['dev/*', 'feat/*', 'fix/*']
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+
+concurrency:
+  group: deploy-chagra-dev-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: [self-hosted, alpha]
+    timeout-minutes: 30
+    steps:
+      - name: Detect runner identity
+        run: |
+          if echo "$HOME" | grep -q claude-runner; then
+            echo "SKIP_DEPLOY=1" >> "$GITHUB_ENV"
+          fi
+
+      - if: env.SKIP_DEPLOY != '1'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Install dependencies
+        run: npm ci
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Build
+        run: npm run build
+        env:
+          VITE_FARMOS_URL: ""
+          VITE_FARMOS_CLIENT_ID: farm
+          VITE_HA_ACCESS_TOKEN: ${{ secrets.VITE_HA_ACCESS_TOKEN }}
+          VITE_USE_SIDECAR_AGRO_MCP: "true"
+          VITE_CHAGRA_MCP_TOKEN: ${{ secrets.VITE_CHAGRA_MCP_TOKEN }}
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Deploy to dev
+        run: |
+          set -e
+          TARGET=/mnt/fast/appdata/farmos-pwa-dev
+          if [ ! -d "$TARGET" ]; then
+            echo "Target $TARGET does not exist — run nixos-rebuild or mkdir first"
+            exit 1
+          fi
+          umask 022
+          rsync -avzO --no-perms --delete --no-group --chmod=F644 dist/ "$TARGET/"
+          find "$TARGET" -type f -user runner ! -perm 644 -exec chmod 644 {} + || true
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Verify deployment
+        run: |
+          TARGET=/mnt/fast/appdata/farmos-pwa-dev
+          test -f "$TARGET/index.html" || exit 1
+          HASH=$(sha256sum "$TARGET/index.html" | cut -d' ' -f1)
+          echo "DEV Deploy OK: $(date -Iseconds) | index.html sha256: ${HASH:0:12}"
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Bump SW cache version (dev)
+        run: |
+          SW_FILE=/mnt/fast/appdata/farmos-pwa-dev/sw.js
+          if [ -f "$SW_FILE" ]; then
+            COMMIT_SHORT=$(git rev-parse --short HEAD)
+            sed -i -E "s/chagra-[0-9a-z]+/chagra-dev-${COMMIT_SHORT}/" "$SW_FILE"
+            echo "SW cache bumped to chagra-dev-${COMMIT_SHORT}"
+          fi
