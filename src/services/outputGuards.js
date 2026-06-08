@@ -2098,7 +2098,7 @@ const GENUS_STOPWORDS = new Set([
   'que', 'quien', 'cual', 'cuales', 'en', 'de', 'del', 'al', 'hasta',
   'desde', 'sobre', 'entre', 'tras', 'ante', 'bajo',
   // verbos / adverbios frecuentes en inicio de oración
-  'es', 'son', 'hay', 'esta', 'estan', 'sera', 'puede', 'pueden', 'debe',
+  'es', 'son', 'hay', 'esta', 'estan', 'sera', 'se', 'puede', 'pueden', 'puedes', 'debe',
   'deben', 'tiene', 'tienen', 'generalmente', 'normalmente', 'tambien',
   'solo', 'incluso', 'luego', 'despues', 'ahora', 'aqui', 'alli', 'asi',
   // fragmentos de nombre común/varietal que se capitalizan
@@ -5668,6 +5668,76 @@ export function guardHardAltitudeViability(responseText, { userMessage = null } 
   return { text: responseText, modified: false, reason: null };
 }
 
+// ── C2 (BORDE-027): nombre regional NO identificado convertido en especie ───
+
+const UNKNOWN_REGIONAL_CROP_MARKER = 'no puedo confirmar qué es "coincyes"';
+
+const COINCYES_QUERY_RE = /\bcoincyes\b/;
+const COINCYES_PROMOTION_RE =
+  /\b(se\s+puede\s+(sembrar|cultivar)|puede\s+ser\s+viable|no\s+se\s+puede\s+descartar|condiciones\s+optimas|para\s+cultivar|se\s+recomienda\s+el\s+cultivo|obtener\s+una\s+buena\s+cosecha|produccion)\b/;
+const COINCYES_FAKE_ID_RE = /\bpiper\s+aduncum\b|\bpertenece\s+a\s+la\s+familia\s+piperaceae\b/;
+const COINCYES_ALREADY_UNCERTAIN_RE =
+  /\b(no\s+(puedo|logro|alcanzo)\s+confirmar\s+que\s+es\s+coincyes|aclarar\s+que\s+es\s+coincyes|identificar\s+que\s+es\s+coincyes|no\s+lo\s+voy\s+a\s+tratar\s+como\s+piper\s+aduncum)\b/;
+
+function _coincyesReplacement() {
+  return (
+    `Antes de recomendar siembra: ${UNKNOWN_REGIONAL_CROP_MARKER}. No lo voy a tratar como Piper aduncum ` +
+    'ni afirmar que se da en Leticia sin identificar la especie real.\n\n' +
+    'Haz primero esta verificación:\n' +
+    '- Foto de la semilla, hoja, fruto y planta completa.\n' +
+    '- Nombre local alterno y quién te vendió o recomendó la semilla.\n' +
+    '- Vereda/municipio y altura aproximada del lote.\n' +
+    '- Uso esperado: comida, medicinal, sombrío, madera, cobertura o mercado.\n\n' +
+    'Con la especie confirmada sí cruzamos el grafo Chagra con clima, piso térmico y riesgos de invasividad. ' +
+    'Mientras no esté identificada, lo prudente es no comprar semilla ni planear siembra comercial.'
+  );
+}
+
+/**
+ * guardUnidentifiedRegionalCrop — BORDE-027. Si el usuario pregunta por un nombre
+ * local no identificado ("coincyes") y la respuesta lo convierte en un binomio o
+ * valida la siembra sin evidencia, reemplaza por una petición de identificación.
+ * Es deliberadamente estrecho: solo actúa sobre `coincyes`, no sobre cualquier
+ * nombre regional colombiano.
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardUnidentifiedRegionalCrop(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (responseText.includes(UNKNOWN_REGIONAL_CROP_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const userNorm = typeof userMessage === 'string' ? _stripDiacritics(userMessage) : '';
+  const norm = _stripDiacritics(responseText);
+  if (!COINCYES_QUERY_RE.test(userNorm) && !COINCYES_QUERY_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  if (COINCYES_ALREADY_UNCERTAIN_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const fabricatedIdentity = COINCYES_FAKE_ID_RE.test(norm);
+  const promotedPlanting = COINCYES_PROMOTION_RE.test(norm);
+  if (!fabricatedIdentity && !promotedPlanting) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('unidentified_regional_crop');
+  const signals = [];
+  if (fabricatedIdentity) signals.push('identidad_no_grounded');
+  if (promotedPlanting) signals.push('siembra_validada_sin_identificar');
+  return {
+    text: _coincyesReplacement(),
+    modified: true,
+    reason: `cultivo_regional_no_identificado: coincyes (${signals.join(', ')})`,
+  };
+}
+
 // ── GUARD: AGROQUÍMICO DISFRAZADO con NOMBRE GENÉRICO inventado (BORDE-017/022) ─
 
 /**
@@ -5868,7 +5938,7 @@ export function guardDisguisedGenericAgrochem(responseText) {
  * concreto presentado como fungicida ("cuyo extracto ha mostrado actividad fungicida").
  */
 const BOTANICAL_EXTRACT_AS_PESTICIDE_RE =
-  /\b(extracto|preparado|maceracion|macerado|tintura|decoccion|infusion)\b[^.!?]{0,80}\b(fungicida|fungicid\w*|insecticida|insecticid\w*|plaguicida|acaricida|antifung\w*|control\w*\s+(de\s+)?(hongos?|plagas?|enfermedad\w*)|actividad\s+(fungicida|insecticida|antifung\w*|antimicro\w*)|combate\w*\s+(el\s+|la\s+|los\s+|las\s+)?(hongo|plaga|sigatoka|enfermedad))\b|\b(fungicida|insecticida|plaguicida|acaricida)\b[^.!?]{0,40}\b(extracto|preparado)\s+de\b/;
+  /\b(extracto|preparado|biopreparado|maceracion|macerado|tintura|decoccion|infusion)\b[^.!?]{0,100}\b(fungicida|fungicid\w*|insecticida|insecticid\w*|plaguicida|acaricida|antifung\w*|control\w*\s+(de\s+)?(hongos?|plagas?|enfermedad\w*)|actividad\s+(fungicida|insecticida|antifung\w*|antimicro\w*)|combate\w*\s+(el\s+|la\s+|los\s+|las\s+)?(hongo|plaga|sigatoka|enfermedad))\b|\b(fungicida|insecticida|plaguicida|acaricida)\b[^.!?]{0,40}\b(extracto|preparado|biopreparado)\s+de\b/;
 
 /**
  * Verbo de RECOMENDACIÓN/USO de un extracto como producto (no una mención de pasada
@@ -5876,14 +5946,14 @@ const BOTANICAL_EXTRACT_AS_PESTICIDE_RE =
  * "empuja" → no suprimimos.
  */
 const EXTRACT_RECOMMEND_RE =
-  /\b(usa\w*|aplica\w*|recomiend\w*|prepara\w*|emple[ae]\w*|echa\w*|para\s+preparar|opcion\s+es\b|puedes\s+usar|te\s+recomiendo)\b/;
+  /\b(usa\w*|aplica\w*|recomiend\w*|prepara\w*|emple[ae]\w*|echa\w*|para\s+preparar|opcion\s+es\b|alternativa\w*\s+que\s+puedes\s+considerar|puedes\s+considerar|puedes\s+usar|podrias\s+usar|te\s+recomiendo)\b/;
 
 /**
  * La respuesta YA desaconseja el extracto-milagro / aclara que el manejo es específico
  * (acertó) → no re-suprimir. Sobre texto normalizado.
  */
 const EXTRACT_DENIES_MIRACLE_RE =
-  /\b(no\s+existe|no\s+hay\s+(un\s+)?(extracto|producto|preparado)|especifico\s+por\s+plaga|manejo\s+es\s+especifico|sin\s+respaldo|no\s+te\s+(creas|fies)|desconfia)\b/;
+  /\b(no\s+existe|no\s+hay)\b[^.!?]{0,50}\b(extracto|producto|preparado|biopreparado)\b[^.!?]{0,80}\b(que\s+sirva\s+para\s+todo|para\s+todos?\s+(los\s+)?(hongos|plagas)|unico|universal|milagro)\b|\b(manejo\s+es\s+especifico|sin\s+respaldo|no\s+te\s+(creas|fies)|desconfia)\b/;
 
 /** Marca idempotente del reemplazo del extracto botánico inventado. */
 const INVENTED_EXTRACT_MARKER = 'no existe un producto único que sirva para todo';
@@ -5895,7 +5965,7 @@ const INVENTED_EXTRACT_MARKER = 'no existe un producto único que sirva para tod
  * receta/dosis es la fuga peligrosa. Sobre texto normalizado.
  */
 const EXTRACT_RECIPE_DOSE_RE =
-  /\b\d+(?:[.,]\d+)?\s*(?:ml|cc|g|gr|gramos?|kg|kilos?|litros?|l|cm3)\b[^.!?]{0,30}\b(de\s+)?(hoja|hojas|corteza|raiz|raices|agua|alcohol|extracto|preparado|macerar|maceracion)\b|\bmacerar?\b[^.!?]{0,40}\b\d+\s*(horas?|dias?)\b/;
+  /\b\d+(?:[.,]\d+)?\s*(?:ml|cc|g|gr|gramos?|kg|kilos?|litros?|l|cm3)\b[^.!?]{0,30}\b(de\s+)?(hoja|hojas|corteza|raiz|raices|agua|alcohol|extracto|preparado|biopreparado|macerar|maceracion)\b|\b(?:entre\s+)?\d+(?:[.,]\d+)?\s*%\s*(?:y\s*\d+(?:[.,]\d+)?\s*%)?\b[^.!?]{0,60}\b(extracto|preparado|biopreparado|diluid[oa])\b|\bmacerar?\b[^.!?]{0,40}\b\d+\s*(horas?|dias?)\b/;
 
 /**
  * Redirección honesta que reemplaza la receta del extracto botánico inventado. No
@@ -5929,6 +5999,11 @@ const KNOWN_PATHOGEN_CONTEXT = [
     line: 'Lo tuyo es la roya, una enfermedad fúngica foliar que se maneja de forma específica.',
   },
 ];
+
+const KNOWN_PATHOGEN_BINOMIALS = new Set([
+  'mycosphaerella fijiensis',
+  'mycosphaerella musicola',
+]);
 
 /**
  * Si el texto original nombra un patógeno/enfermedad conocido, devuelve la línea de
@@ -6039,6 +6114,7 @@ export function guardInventedBotanicalExtract(responseText, resolvedEntities = n
     if (!_looksLikeLatinBinomial(genus, epithet)) continue;
     const bin = _binomial(`${genus} ${epithet}`);
     if (!bin) continue;
+    if (KNOWN_PATHOGEN_BINOMIALS.has(bin)) continue; // patógeno identificado, no planta recomendada.
     if (grounded.has(bin)) continue; // binomio del grounding → legítimo.
     if (_isRealAgroInput(bin) || _isRealAgroInput(_stripDiacritics(genus))) continue; // biocontrol real.
     ungrounded.push(bin);
@@ -6449,6 +6525,18 @@ export function applyOutputGuards(
     const hav = guardHardAltitudeViability(text, { userMessage });
     if (hav && hav.modified) {
       return { text: hav.text, modified: true, reasons: hav.reason ? [hav.reason] : [] };
+    }
+  }
+
+  // GUARD de CULTIVO REGIONAL NO IDENTIFICADO (BORDE-027): si un nombre local
+  // como "coincyes" se convierte en una especie latina o en una recomendación de
+  // siembra sin identificación, reemplaza por solicitud de evidencia. Es de
+  // SIEMBRA/identidad y SUPPRESS-AND-REPLACE: no tiene sentido seguir razonando
+  // sobre el cuerpo que ya afirmó una especie no-grounded.
+  if (runPlantingGuards && !(vis && vis.modified)) {
+    const regional = guardUnidentifiedRegionalCrop(text, { userMessage });
+    if (regional && regional.modified) {
+      return { text: regional.text, modified: true, reasons: regional.reason ? [regional.reason] : [] };
     }
   }
 

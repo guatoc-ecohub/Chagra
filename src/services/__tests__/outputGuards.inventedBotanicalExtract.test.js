@@ -55,6 +55,22 @@ describe('guardInventedBotanicalExtract — TRIGGER (suprime la receta del extra
     expect(getOutputGuardTelemetry().invented_botanical_extract).toBe(1);
   });
 
+  it('BORDE-017 post-bench: biopreparado de Serroa pentaphylla con dosis porcentual → suprime', () => {
+    const resp =
+      'Para la sigatoka negra (Mycosphaerella fijiensis) del plátano hay alternativas que puedes considerar. ' +
+      '1. Biopreparado de Serroa (Serroa pentaphylla): este biopreparado natural puede ayudar a controlar ' +
+      'enfermedades fúngicas. La dosificación varía, pero generalmente se aplica entre 10% y 20%. En tu caso, ' +
+      'podrías usar una bomba de 20 litros con 15-20 litros del biopreparado diluido en agua.';
+    const r = guardInventedBotanicalExtract(resp, [
+      { nombre_comun: 'plátano', nombre_cientifico: 'Musa × paradisiaca' },
+    ]);
+    expect(r.modified).toBe(true);
+    expect(r.reason).toMatch(/serroa pentaphylla/);
+    expect(r.text).not.toMatch(/Serroa pentaphylla|15-20 litros|10%|20%/i);
+    expect(r.text).toMatch(/sigatoka negra|Mycosphaerella fijiensis/i);
+    expect(r.text.toLowerCase()).toMatch(/no existe un producto único|manejo es específico/);
+  });
+
   it('extracto de una planta inventada (binomio no-grounded) como insecticida con dosis → suprime', () => {
     const resp =
       'Te recomiendo el extracto de Brunfelsia chocoana, que actúa como insecticida natural para todas las ' +
