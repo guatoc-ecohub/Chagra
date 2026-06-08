@@ -258,7 +258,7 @@ export function HoyCard({ onNavigate, variant }) {
             title="Hoy en finca"
             subtitle="Lo que toca hacer cerca tuyo"
             tooltip="Tareas pendientes ordenadas por cercanía a tu ubicación actual."
-            onClick={() => onNavigate('javier')}
+            onClick={() => onNavigate('task_log')}
         />
     );
 }
