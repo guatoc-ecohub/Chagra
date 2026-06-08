@@ -41,6 +41,14 @@ chagra-anthropic-judge-key
 /blob-report/
 /playwright/.cache/
 
+# Benchmark outputs generated locally. Keep fixtures/scripts tracked; keep
+# selected summaries only when they are intentionally promoted into a PR.
+/data/bench-runs/
+!/data/bench-runs/.gitkeep
+/data/bench-runs-test/
+/data/species-cleanup/
+/data/intelligence-history.jsonl
+
 # Catálogo SQLite tracked desde 2026-04-25:
 # se genera con scripts/build-catalog-sqlite.mjs desde seeds en
 # Chagra-strategy (privado). El binario derivado se commitea aquí porque

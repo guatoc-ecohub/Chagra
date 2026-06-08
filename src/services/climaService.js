@@ -38,16 +38,95 @@
  */
 
 import { getClimaSnapshot } from './sidecarClient.js';
+import { getProfile, getProfileMunicipio } from './userProfileService.js';
+import { findMunicipio } from '../utils/colombiaLocations.js';
 
 const CACHE_TTL_MS = 30 * 60 * 1000;
 const LS_KEY = 'chagra:clima:snapshot-v1';
 
 let memCache = null; // { ts, key, payload }
-let inFlight = null; // Promise<payload>
+let inFlight = null; // { key, promise }
+
+function plausibleMsnm(value) {
+    const n = Number(value);
+    return Number.isFinite(n) && n >= -100 && n <= 6000 ? Math.round(n) : null;
+}
+
+function numericCoord(value) {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : null;
+}
+
+function profileElevation(profile) {
+    return plausibleMsnm(profile?.finca_altitud) ?? plausibleMsnm(profile?.altitud);
+}
+
+/**
+ * Resuelve la ubicación climática más precisa disponible.
+ *
+ * Prioridad:
+ *   1. Coordenadas confirmadas en el perfil (`ubicacion_lat/lng`), incluidas
+ *      las que vienen de una vereda OSM/crowdsourced.
+ *   2. Centroide DANE del municipio como fallback explícitamente marcado como
+ *      baja precisión.
+ *
+ * @param {object} [opts]
+ * @returns {{ lat:number, lng:number, elevation?:number, municipio?:string, departamento?:string, vereda?:string, source:string, precision:'exact'|'centroid' } | null}
+ */
+export function resolveClimaLocation(opts = {}) {
+    const profile = opts.profile && typeof opts.profile === 'object' ? opts.profile : getProfile();
+    const explicitLat = numericCoord(opts.lat);
+    const explicitLng = numericCoord(opts.lng);
+    const explicitElevation = plausibleMsnm(opts.elevation);
+
+    if (explicitLat != null && explicitLng != null) {
+        return {
+            lat: explicitLat,
+            lng: explicitLng,
+            elevation: explicitElevation ?? profileElevation(profile) ?? undefined,
+            municipio: opts.municipio || profile?.municipio || getProfileMunicipio() || undefined,
+            departamento: opts.departamento || profile?.departamento || undefined,
+            vereda: opts.vereda || profile?.vereda || undefined,
+            source: opts.source || profile?.vereda_source || profile?.ubicacion_source || 'explicit',
+            precision: 'exact',
+        };
+    }
+
+    const profileLat = numericCoord(profile?.ubicacion_lat);
+    const profileLng = numericCoord(profile?.ubicacion_lng);
+    if (profileLat != null && profileLng != null) {
+        return {
+            lat: profileLat,
+            lng: profileLng,
+            elevation: explicitElevation ?? profileElevation(profile) ?? undefined,
+            municipio: profile?.municipio || getProfileMunicipio() || undefined,
+            departamento: profile?.departamento || undefined,
+            vereda: profile?.vereda || undefined,
+            source: profile?.vereda_source || profile?.ubicacion_source || 'profile',
+            precision: 'exact',
+        };
+    }
+
+    const municipio = opts.municipio || profile?.municipio || getProfileMunicipio();
+    if (!municipio) return null;
+    const hit = findMunicipio(String(municipio).split(',')[0]);
+    if (!hit || !Number.isFinite(hit.lat) || !Number.isFinite(hit.lng)) return null;
+
+    return {
+        lat: hit.lat,
+        lng: hit.lng,
+        elevation: explicitElevation ?? profileElevation(profile) ?? plausibleMsnm(hit.altitud) ?? undefined,
+        municipio: hit.name || municipio,
+        departamento: hit.departamento || profile?.departamento || undefined,
+        vereda: profile?.vereda || undefined,
+        source: 'municipio-centroid',
+        precision: 'centroid',
+    };
+}
 
 function coordKey(lat, lng, elevation) {
     if (typeof lat !== 'number' || typeof lng !== 'number') return 'global';
-    const base = `${lat.toFixed(2)},${lng.toFixed(2)}`;
+    const base = `${lat.toFixed(5)},${lng.toFixed(5)}`;
     // La elevación entra en la clave: dos puntos con las mismas coords pero
     // distinta altitud (perfil corrige la grilla de Open-Meteo) son snapshots
     // distintos y no deben compartir cache.
@@ -87,7 +166,10 @@ function writeLocalStorage(entry) {
  * @returns {object | null}
  */
 export function getCachedClimaSnapshot(lat, lng, elevation) {
-    const key = coordKey(lat, lng, elevation);
+    const location = lat == null && lng == null
+        ? resolveClimaLocation()
+        : { lat, lng, elevation };
+    const key = coordKey(location?.lat, location?.lng, location?.elevation);
     const now = Date.now();
     if (memCache && memCache.key === key && now - memCache.ts < CACHE_TTL_MS) {
         return memCache.payload;
@@ -113,32 +195,41 @@ export function getCachedClimaSnapshot(lat, lng, elevation) {
  * @param {boolean} [opts.forceRefresh]
  * @returns {Promise<object | null>}
  */
-export async function fetchClimaSnapshot({ lat, lng, elevation, forceRefresh = false } = {}) {
-    const key = coordKey(lat, lng, elevation);
+export async function fetchClimaSnapshot({ lat, lng, elevation, forceRefresh = false, ...rest } = {}) {
+    const location = resolveClimaLocation({ lat, lng, elevation, ...rest });
+    const key = coordKey(location?.lat, location?.lng, location?.elevation);
     const now = Date.now();
 
     if (!forceRefresh && memCache && memCache.key === key && now - memCache.ts < CACHE_TTL_MS) {
         return memCache.payload;
     }
-    if (inFlight) return inFlight;
+    if (inFlight && inFlight.key === key) return inFlight.promise;
 
-    inFlight = (async () => {
-        const payload = await getClimaSnapshot({ lat, lng, elevation });
+    const promise = (async () => {
+        const payload = await getClimaSnapshot({
+            lat: location?.lat,
+            lng: location?.lng,
+            elevation: location?.elevation,
+        });
         if (payload) {
-            const entry = { ts: Date.now(), key, payload };
+            const enrichedPayload = location
+                ? { ...payload, location_context: location }
+                : payload;
+            const entry = { ts: Date.now(), key, payload: enrichedPayload };
             memCache = entry;
             writeLocalStorage(entry);
             try {
-                window.dispatchEvent(new CustomEvent('chagra:clima:updated', { detail: payload }));
+                window.dispatchEvent(new CustomEvent('chagra:clima:updated', { detail: enrichedPayload }));
             } catch (_) { /* noop */ }
         }
-        return payload;
+        return payload ? memCache?.payload || payload : payload;
     })();
+    inFlight = { key, promise };
 
     try {
-        return await inFlight;
+        return await promise;
     } finally {
-        inFlight = null;
+        if (inFlight?.promise === promise) inFlight = null;
     }
 }
 

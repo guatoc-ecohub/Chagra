@@ -2,46 +2,50 @@
 
 ## Instrucciones para el operador
 
-El CLA Assistant está temporalmente deshabilitado (cla.yml.disabled). Para re-habilitarlo correctamente, necesita un Personal Access Token (PAT).
+El CLA Assistant vuelve a estar activo en `.github/workflows/cla.yml`.
+El workflow espera el secret de GitHub Actions `CLAUDE_CODE_BOT_PAT`, restaurado
+operativamente desde la key SOPS `claude-code-bot-pat` en `guatoc-nixos`.
 
-## Paso 1: Crear Personal Access Token
+No imprimir el valor del PAT en logs, issues, PRs ni documentación.
 
-1. Ir a GitHub: https://github.com/settings/tokens
-2. Click "Generate new token" → "Generate new token (classic)"
-3. Configurar:
-   - **Note**: "CLA Bot Chagra"
-   - **Expiration**: 90 días o más
-   - **Scopes**: ✅ `repo` (full control of private repositories)
-4. Click "Generate token"
-5. **COPIAR EL TOKEN** (solo se muestra una vez)
+## Paso 1: Restaurar el secret desde SOPS
 
-## Paso 2: Agregar secret al repo
+El PAT ya debe existir cifrado como `claude-code-bot-pat`. El operador con
+acceso SOPS debe extraerlo localmente y cargarlo como secret de GitHub:
 
 ```bash
-# Reemplazar TOKEN_GENERADO con el token del paso 1
-gh secret set CLA_BOT_PAT --body "TOKEN_GENERADO"
+gh secret set CLAUDE_CODE_BOT_PAT --repo guatoc-ecohub/Chagra --body "$TOKEN_DESDE_SOPS"
 ```
 
 O vía GitHub UI:
+
 1. Ir a: https://github.com/guatoc-ecohub/Chagra/settings/secrets/actions
 2. Click "New repository secret"
-3. Name: `CLA_BOT_PAT`
-4. Secret: pegar el token
+3. Name: `CLAUDE_CODE_BOT_PAT`
+4. Secret: pegar el token restaurado desde SOPS
 5. Click "Add secret"
 
-## Paso 3: Re-habilitar CLA Assistant
+## Rotación si el PAT no existe o expiró
+
+1. Ir a GitHub: https://github.com/settings/tokens
+2. Click "Generate new token" -> "Generate new token (classic)"
+3. Configurar:
+   - **Note**: "CLA Bot Chagra"
+   - **Expiration**: 90 días o más
+   - **Scopes**: `repo` (full control of private repositories)
+4. Guardar el valor nuevo en SOPS como `claude-code-bot-pat`
+5. Publicarlo al repo como `CLAUDE_CODE_BOT_PAT`
 
 ```bash
-# 1. Descomentar línea 47
-sed -i 's/# PERSONAL_ACCESS_TOKEN:/PERSONAL_ACCESS_TOKEN:/' .github/workflows/cla.yml.disabled
+gh secret set CLAUDE_CODE_BOT_PAT --repo guatoc-ecohub/Chagra --body "$TOKEN_NUEVO"
+```
 
-# 2. Renombrar archivo
-mv .github/workflows/cla.yml.disabled .github/workflows/cla.yml
+## Workflow activo
 
-# 3. Commitear
-git add .github/workflows/cla.yml
-git commit -m "chore(cla): re-habilitar CLA Assistant con PAT configurado"
-git push origin main
+`.github/workflows/cla.yml` referencia:
+
+```yaml
+PERSONAL_ACCESS_TOKEN: ${{ secrets.CLAUDE_CODE_BOT_PAT }}
 ```
 
 ## Verificación

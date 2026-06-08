@@ -40,11 +40,9 @@ jobs:
         uses: contributor-assistant/github-action@v2.6.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # PERSONAL_ACCESS_TOKEN es OPCIONAL: solo necesario si el repo
-          # de firmas (`path-to-signatures`) vive en otro repo (org-wide
-          # signatures vault). Mientras `path-to-signatures` apunte al
-          # mismo repo, GITHUB_TOKEN basta.
-          # PERSONAL_ACCESS_TOKEN: ${{ secrets.CLA_BOT_PAT }}
+          # PAT restaurado desde SOPS como secreto de GitHub Actions.
+          # Fuente operativa: guatoc-nixos key `claude-code-bot-pat`.
+          PERSONAL_ACCESS_TOKEN: ${{ secrets.CLAUDE_CODE_BOT_PAT }}
         with:
           path-to-signatures: 'signatures/cla.json'
           path-to-document: 'https://github.com/guatoc-ecohub/Chagra/blob/main/CLA.md'

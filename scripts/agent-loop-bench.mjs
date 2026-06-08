@@ -174,6 +174,11 @@ async function queryAgent(prompt, maxIterations = 3) {
 async function runBench(mockMode = false) {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
   const outputFile = join(BENCH_RUNS_DIR, `agent-loop-bench-${timestamp}.jsonl`);
+  const summaryFile = outputFile.replace(/\.jsonl$/, '.summary.json');
+
+  if (!existsSync(BENCH_RUNS_DIR)) {
+    mkdirSync(BENCH_RUNS_DIR, { recursive: true });
+  }
 
   console.log(`🔄 Agent Loop Bench E1`);
   console.log(`📁 Output: ${outputFile}`);
@@ -209,18 +214,54 @@ async function runBench(mockMode = false) {
   }
 
   const jsonlOutput = allResults.map(r => JSON.stringify(r)).join('\n');
-  writeFileSync(outputFile, jsonlOutput);
+  writeFileSync(outputFile, jsonlOutput + '\n');
 
   const totalTests = allResults.length;
   const correctedTests = allResults.filter(r => r.corrected).length;
+  const expectedCorrections = allResults.filter(r => r.expected_correction).length;
+  const expectedNonCorrections = allResults.filter(r => !r.expected_correction).length;
+  const truePositive = allResults.filter(r => r.expected_correction && r.corrected).length;
+  const trueNegative = allResults.filter(r => !r.expected_correction && !r.corrected).length;
+  const falsePositive = allResults.filter(r => !r.expected_correction && r.corrected).length;
+  const falseNegative = allResults.filter(r => r.expected_correction && !r.corrected).length;
+  const accuracyPct = totalTests > 0 ? Number(((100 * (truePositive + trueNegative)) / totalTests).toFixed(1)) : 0;
   const avgIterations = allResults.reduce((sum, r) => sum + r.iterations, 0) / totalTests;
   const avgLatency = allResults.reduce((sum, r) => sum + r.avg_latency_per_iteration, 0) / totalTests;
+  const summary = {
+    generated_at: new Date().toISOString(),
+    mode: mockMode ? 'mock' : 'real',
+    sidecar_url: mockMode ? null : SIDECAR_URL,
+    output_jsonl: outputFile,
+    total_tests: totalTests,
+    expected_corrections: expectedCorrections,
+    expected_non_corrections: expectedNonCorrections,
+    corrected_tests: correctedTests,
+    true_positive: truePositive,
+    true_negative: trueNegative,
+    false_positive: falsePositive,
+    false_negative: falseNegative,
+    accuracy_pct: accuracyPct,
+    correction_rate_pct: totalTests > 0 ? Number(((100 * correctedTests) / totalTests).toFixed(1)) : 0,
+    avg_iterations: Number(avgIterations.toFixed(2)),
+    avg_latency_per_iteration_ms: Math.round(avgLatency),
+    failed_cases: allResults
+      .filter(r => r.expected_correction !== r.corrected)
+      .map(r => ({
+        id: r.test_id,
+        expected_correction: r.expected_correction,
+        corrected: r.corrected,
+        iterations: r.iterations,
+      })),
+  };
+  writeFileSync(summaryFile, JSON.stringify(summary, null, 2) + '\n');
 
   console.log(`\n📊 ESTADÍSTICAS:`);
   console.log(`   Tests totales: ${totalTests}`);
   console.log(`   Tests autocorregidos: ${correctedTests}/${totalTests} (${(correctedTests/totalTests*100).toFixed(1)}%)`);
+  console.log(`   Accuracy vs esperado: ${accuracyPct}%`);
   console.log(`   Promedio iteraciones: ${avgIterations.toFixed(2)}`);
   console.log(`   Promedio latencia/iteración: ${avgLatency.toFixed(0)}ms`);
+  console.log(`   Summary: ${summaryFile}`);
   console.log(`\n✅ Benchmark completo`);
 }
 

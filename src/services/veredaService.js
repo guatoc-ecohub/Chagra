@@ -19,6 +19,7 @@
 
 import { reverseGeocode } from './locationService.js';
 import { findMunicipio } from '../utils/colombiaLocations.js';
+import veredasCrowdsourced from '../data/veredas-crowdsourced.json';
 
 const NOMINATIM_TIMEOUT_MS = 8000;
 
@@ -41,17 +42,15 @@ export async function getVeredaFromGPS(lat, lng) {
       return { vereda: null, municipio: null, departamento: null, source: 'nominatim-fail' };
     }
 
-    // En Colombia: city=vereda, county=municipio, state=departamento
-    // BUT: city puede ser cabecera municipal también, así que validamos
-    const city = result.city || result.town || result.village || null;
-    const county = result.county || result.municipality || null;
-    const state = result.state || result.department || null;
+    const vereda = result.vereda || null;
+    const county = result.municipio || null;
+    const state = result.departamento || null;
 
     // Validar que county es un municipio DANE conocido
     const municipioValidado = county ? findMunicipio(county) : null;
 
     return {
-      vereda: city || null,
+      vereda,
       municipio: municipioValidado?.name || county || null,
       departamento: state || null,
       source: 'nominatim',
@@ -68,13 +67,57 @@ export async function getVeredaFromGPS(lat, lng) {
  * @param {string} name
  * @returns {string}
  */
-function normalizeVeredaName(name) {
+export function normalizeVeredaName(name) {
   return String(name ?? '')
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim()
     .replace(/\s+/g, ' ');
+}
+
+function getMunicipioCode(municipio) {
+  const hit = findMunicipio(municipio);
+  return hit?.codigo || hit?.cod_mpio || hit?.id || null;
+}
+
+function dedupeVeredas(items) {
+  const seen = new Set();
+  return items.filter((item) => {
+    const key = normalizeVeredaName(`${item.name}|${item.municipio || ''}|${item.departamento || ''}`);
+    if (!item.name || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+/**
+ * Busca veredas en el dataset local crowdsourced. Offline-first.
+ *
+ * @param {string} municipio
+ * @param {string} query
+ * @returns {Array<{name:string, lat:number|null, lng:number|null, source:string, municipio:string|null, departamento:string|null}>}
+ */
+export function searchVeredasLocales(municipio, query = '') {
+  const code = getMunicipioCode(municipio);
+  if (!code) return [];
+  const bucket = veredasCrowdsourced?.por_codigo?.[String(code)];
+  if (!bucket || typeof bucket !== 'object') return [];
+
+  const municipioInfo = findMunicipio(municipio);
+  const normalizedQuery = normalizeVeredaName(query);
+  return Object.entries(bucket)
+    .filter(([name]) => !normalizedQuery || normalizeVeredaName(name).includes(normalizedQuery))
+    .map(([name, meta]) => ({
+      name: meta?.nombre || name,
+      lat: typeof meta?.lat_promedio === 'number' ? meta.lat_promedio : null,
+      lng: typeof meta?.lng_promedio === 'number' ? meta.lng_promedio : null,
+      source: 'local-crowdsourced',
+      municipio: municipioInfo?.name || municipio || null,
+      departamento: municipioInfo?.departamento || null,
+      display_name: meta?.ejemplo_display_name || null,
+      conteo: meta?.conteo || 0,
+    }));
 }
 
 /**
@@ -104,6 +147,7 @@ export async function searchVeredasEnMunicipio(municipio, query) {
   };
 
   const normalizedQuery = normalizeVeredaName(query);
+  const localResults = searchVeredasLocales(municipio, query);
 
   try {
     // Overpass query: busca veredas (admin_level=8) en el bbox
@@ -131,13 +175,13 @@ export async function searchVeredasEnMunicipio(municipio, query) {
 
     clearTimeout(timer);
 
-    if (!res.ok) return [];
+    if (!res.ok) return localResults;
 
     const data = await res.json();
     const elements = data?.elements || [];
 
     // Filtrar por nombre y mapear a formato simple
-    return elements
+    const osmResults = elements
       .filter(el => {
         const name = el.tags?.name || '';
         const normalized = normalizeVeredaName(name);
@@ -147,10 +191,14 @@ export async function searchVeredasEnMunicipio(municipio, query) {
         name: el.tags?.name || '',
         lat: el.center?.lat || el.lat || el.nodes?.[0] || null,
         lng: el.center?.lon || el.lon || el.nodes?.[0] || null,
+        source: 'overpass',
+        municipio: municipioInfo.name,
+        departamento: municipioInfo.departamento || null,
       }));
+    return dedupeVeredas([...localResults, ...osmResults]);
   } catch (e) {
     console.debug('[veredaService] searchVeredasEnMunicipio fail:', e?.message || e);
-    return [];
+    return localResults;
   }
 }
 

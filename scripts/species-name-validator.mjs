@@ -16,7 +16,7 @@
  *   --apply: Aplica parches a AGE (requiere NEO4J_URI)
  */
 
-import { writeFileSync, readFileSync, existsSync } from 'node:fs';
+import { writeFileSync, readFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -27,8 +27,9 @@ const REPORTS_DIR = join(DATA_DIR, 'species-cleanup');
 
 // Crear directorio de reportes si no existe
 if (!existsSync(REPORTS_DIR)) {
-  // Silenciar error si no se puede crear
-  try { writeFileSync(REPORTS_DIR, ''); } catch {}
+  // Silenciar error si no se puede crear: el caller de CLI reportará el fallo
+  // real al intentar escribir el reporte.
+  try { mkdirSync(REPORTS_DIR, { recursive: true }); } catch {}
 }
 
 // Patrones de limpieza

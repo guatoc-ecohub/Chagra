@@ -5,6 +5,7 @@ import OfflineChip from './OfflineChip';
 import NotificationsBell from './NotificationsBell';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
 import useAssetStore from '../store/useAssetStore';
+import useFincaActiveStore from '../services/fincaActiveStore';
 import { FARM_CONFIG } from '../config/defaults';
 import { getProfile, getProfileMunicipio } from '../services/userProfileService';
 import { findMunicipio } from '../utils/colombiaLocations';
@@ -44,12 +45,7 @@ import { iconForTheme } from './dashboard/themeIcon';
  * para destrabar PWA install Safari iOS).
  */
 export default function TopBar({ onNavigate, onLogout }) {
-  const [envOpen, setEnvOpen] = useState(false);
-  const [operatorName, setOperatorName] = useState(() =>
-    typeof window !== 'undefined'
-      ? localStorage.getItem('chagra:operator:name') || 'Mi finca'
-      : 'Mi finca'
-  );
+  const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
   const { theme } = useTheme();
   const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
   const fincas = useFincaActiveStore((s) => s.fincas);
@@ -89,6 +85,17 @@ export default function TopBar({ onNavigate, onLogout }) {
     FARM_CONFIG?.ALTITUD_MSNM ||
     daneAltitud ||
     null;
+  const locationLabel = [
+    vereda,
+    municipio ? String(municipio).split(',')[0] : null,
+    altitud ? `${altitud} msnm` : null,
+  ].filter(Boolean).join(' · ');
+
+  useEffect(() => {
+    const onLocUpdated = () => setProfileTick((t) => t + 1);
+    window.addEventListener('chagra:location-updated', onLocUpdated);
+    return () => window.removeEventListener('chagra:location-updated', onLocUpdated);
+  }, []);
 
   // "Respira" animación del logo Chagra cuando hay actividad de fondo
   // (warm-up del agente IA o sync con FarmOS). Sensación de "agente vivo
@@ -144,10 +151,17 @@ export default function TopBar({ onNavigate, onLogout }) {
           >
             {iconForTheme(theme)}
           </span>
-          {/* Wordmark completo: "Chagra su mano en el campo" */}
-          <div className="hidden sm:flex items-center gap-1">
-            <span className="text-base font-bold leading-tight">Chagra</span>
-            <span className="text-[10px] text-slate-400 font-normal">su mano en el campo</span>
+          {/* Wordmark completo: visible también en móvil para no dejar el logo vacío. */}
+          <div className="flex min-w-0 max-w-[42vw] sm:max-w-none flex-col items-start">
+            <span className="text-base font-bold leading-tight text-white">Chagra</span>
+            <span className="text-[10px] leading-tight text-slate-400 font-normal truncate max-w-full">
+              su mano en el campo
+            </span>
+            {locationLabel && (
+              <span className="text-[10px] leading-tight text-emerald-300/90 font-medium truncate max-w-full">
+                {locationLabel}
+              </span>
+            )}
           </div>
         </button>
         <style>{`

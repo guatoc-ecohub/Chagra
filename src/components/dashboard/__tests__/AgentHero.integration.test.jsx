@@ -5,7 +5,7 @@
  * Cubre los 5 puntos del task #TEST-int:
  *   1. enviar=colibrí navega (el botón de enviar tiene el colibrí 3D y navega)
  *   2. sin clip (no hay botón de adjuntar/clip, solo cámara)
- *   3. ubicación bajo/arriba render (ubicación arriba-derecha de la escena)
+ *   3. ubicación bajo la marca (vereda/municipio/altitud)
  *   4. sugerencia contextual presente (crop suggestions rotativas)
  *   5. toggle Campesino/Experto cambia nivel_respuestas (persiste el perfil)
  *
@@ -93,7 +93,7 @@ vi.mock('../../../data/exampleQuestions', () => ({
 }));
 
 // ── Mock del avatar 3D (evita Three.js en tests) ────────────────────────────
-vi.mock('../../../ChagraAgentAvatarColibri3D', () => ({
+vi.mock('../../ChagraAgentAvatarColibri3D', () => ({
   default: ({ size, state }) => (
     <div data-testid="colibri-3d" data-size={size} data-state={state}>
       🐦
@@ -147,7 +147,7 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
 
       // Verifica que tiene los atributos correctos
       expect(colibri3d).toHaveAttribute('data-size', '36');
-      expect(colibri3d).toHaveAttribute('data-state', 'idle');
+      expect(colibri3d).toHaveAttribute('data-state', 'listening');
     });
 
     test('al enviar texto, el colibrí (botón enviar) navega a agente', async () => {
@@ -232,8 +232,8 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
     });
   });
 
-  describe('3. ubicación bajo/arriba render', () => {
-    test('con ubicación en el perfil: se muestra arriba-derecha de la escena', () => {
+  describe('3. ubicación bajo la marca', () => {
+    test('con ubicación en el perfil: se muestra bajo el wordmark de Chagra', () => {
       getProfile.mockReturnValue({
         nivel_respuestas: 'simple',
         municipio: 'Subachoque, Cundinamarca',
@@ -276,7 +276,7 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
       expect(locChip).toBeNull();
     });
 
-    test('la ubicación está arriba-derecha (positioning CSS correcto)', () => {
+    test('la ubicación queda dentro del bloque de marca', () => {
       getProfile.mockReturnValue({
         nivel_respuestas: 'simple',
         municipio: 'Subachoque, Cundinamarca',
@@ -288,7 +288,9 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
       const { container } = render(<AgentHero onNavigate={vi.fn()} />);
       const locChip = container.querySelector('.agentport-loc');
 
-      // Debe tener estilos de posicionamiento absoluto arriba-derecha
+      const brand = container.querySelector('.agentport-brand-copy');
+      expect(brand).toBeTruthy();
+      expect(brand.contains(locChip)).toBe(true);
       expect(locChip.className).toContain('agentport-loc');
     });
   });
@@ -559,7 +561,7 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
       
       // 5. Envía (tocando el colibrí)
       const sendBtn = screen.getByLabelText('Enviar al agente');
-      expect(sendBtn.querySelector('.send-hummer svg')).toBeTruthy();
+      expect(sendBtn.querySelector('[data-testid="colibri-3d"]')).toBeTruthy();
       
       await act(async () => {
         fireEvent.click(sendBtn);

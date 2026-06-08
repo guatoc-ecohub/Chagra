@@ -492,9 +492,23 @@ export function buildProfileContext(finca) {
     console.warn('[agentService] buildUserProfileBlock falló:', e);
   }
   const profileSuffix = userProfileBlock ? `\n\n${userProfileBlock}` : '';
+  const veredaContext = (() => {
+    try {
+      const p = getProfile();
+      if (!p || typeof p !== 'object' || !p.vereda) return '';
+      const location = [p.vereda, p.municipio, p.departamento].filter(Boolean).join(', ');
+      const source = p.vereda_source ? ` Fuente: ${p.vereda_source}.` : '';
+      return `\n\nCONTEXTO DE VEREDA OSM:
+- Ubicación veredal confirmada: ${location}.${source}
+- Usa la vereda para adaptar clima local, pendiente, acceso y recomendaciones de campo cuando sea relevante.
+- Si la consulta requiere precisión predial, pide confirmación de coordenadas o altitud antes de afirmar.`;
+    } catch (_) {
+      return '';
+    }
+  })();
 
   if (!finca) {
-    return generateSourceCitationRules() + '\n\n' + generateUserDataRules() + profileSuffix;
+    return generateSourceCitationRules() + '\n\n' + generateUserDataRules() + profileSuffix + veredaContext;
   }
 
   const bioculturalZone = finca.biocultural_zone;
@@ -510,7 +524,7 @@ ${climateContext}
 
 ${citationRules}
 
-${userDataRules}${profileSuffix}`;
+${userDataRules}${profileSuffix}${veredaContext}`;
 }
 
 /**

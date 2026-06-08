@@ -256,8 +256,9 @@ export default function AgentHero({ onNavigate }) {
     // ── Escena: sol de día / luna de noche (operador 2026-06-06) ──────────────
     const night = isNightNow();
 
-    // ── Ubicación real del perfil (arriba-der de la escena) ───────────────────
-    // 📍 Municipio · altitud — SIN vereda (operador 2026-06-06).
+    // ── Ubicación real del perfil, bajo la marca ──────────────────────────────
+    // 📍 Vereda · Municipio · altitud. Si falta municipio, no se muestra (no
+    // inventamos ubicación).
     // Si falta municipio, no se muestra (no inventamos ubicación).
     const profile = getProfile();
     const municipio = getProfileMunicipio();
@@ -762,12 +763,13 @@ export default function AgentHero({ onNavigate }) {
                     padding: calc(86px + env(safe-area-inset-top)) 0 6px;
                     flex: none;
                 }
-                .agentport-brand { display: flex; align-items: center; gap: 9px; min-width: 0; }
+                .agentport-brand { display: flex; align-items: flex-start; gap: 9px; min-width: 0; }
                 .agentport-mark {
                     width: 34px; height: 34px; flex: none; display: inline-flex;
                     filter: drop-shadow(0 2px 3px rgba(0,0,0,.25));
                 }
                 .agentport-mark svg { width: 100%; height: 100%; display: block; }
+                .agentport-brand-copy { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; }
                 .agentport-name {
                     font-weight: 800; font-size: 1.1rem; letter-spacing: -.01em;
                     color: rgb(var(--c-slate-100)); line-height: 1.05;
@@ -817,17 +819,15 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-profile:active { transform: scale(.92); }
                 .agentport-headtools { display: flex; align-items: center; gap: 8px; flex: none; }
 
-                /* chip de UBICACIÓN — arriba-derecha de la escena (donde vuela el
-                   colibrí). 📍 Municipio · altitud, SIN vereda. Reposicionado
-                   para NO tapar el sol/luna (operador 2026-06-06). */
+                /* chip de UBICACIÓN — debajo de la marca, conectado al logo.
+                   📍 Vereda · Municipio · altitud. */
                 .agentport-loc {
-                    position: absolute; z-index: 2;
-                    top: calc(148px + env(safe-area-inset-top)); right: 18px;
-                    display: inline-flex; align-items: center; gap: 5px; max-width: 56%;
-                    padding: 5px 10px; border-radius: 14px;
+                    margin-top: 4px;
+                    display: inline-flex; align-items: center; gap: 5px; max-width: min(72vw, 360px);
+                    padding: 4px 8px; border-radius: 12px;
                     background: rgb(var(--c-surface-card) / 0.55);
                     border: 1px solid rgb(var(--t-accent-rgb) / 0.22);
-                    color: rgb(var(--c-slate-300)); font-size: .72rem; font-weight: 600;
+                    color: rgb(var(--c-slate-300)); font-size: .68rem; font-weight: 650;
                     line-height: 1.1; backdrop-filter: blur(6px);
                     box-shadow: 0 2px 8px -5px rgba(0,0,0,.35);
                 }
@@ -1225,8 +1225,16 @@ export default function AgentHero({ onNavigate }) {
             <header className="agentport-topbar">
                 <div className="agentport-brand">
                     <span className="agentport-mark">{iconForTheme(theme)}</span>
-                    <div className="agentport-name">
-                        Chagra<small>su mano en el campo</small>
+                    <div className="agentport-brand-copy">
+                        <div className="agentport-name">
+                            Chagra<small>su mano en el campo</small>
+                        </div>
+                        {locationLabel && (
+                            <div className="agentport-loc" aria-label={`Ubicación: ${locationLabel}`}>
+                                <span className="pin" aria-hidden="true">📍</span>
+                                <span className="txt">{locationLabel}</span>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -1257,16 +1265,6 @@ export default function AgentHero({ onNavigate }) {
                         con Ajustes/Salir. */}
                 </div>
             </header>
-
-            {/* UBICACIÓN — arriba-derecha de la escena (donde vuela el colibrí).
-                📍 Municipio · altitud, SIN vereda (operador 2026-06-06), del perfil real. Si
-                falta el municipio no se muestra (no inventamos ubicación). */}
-            {locationLabel && (
-                <div className="agentport-loc" aria-label={`Ubicación: ${locationLabel}`}>
-                    <span className="pin" aria-hidden="true">📍</span>
-                    <span className="txt">{locationLabel}</span>
-                </div>
-            )}
 
             {/* ===================== ZONA-RESPIRO (escena vive detrás) ===================== */}
             <div className="agentport-stage" aria-hidden="true" />

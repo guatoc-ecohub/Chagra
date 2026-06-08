@@ -489,6 +489,9 @@ export function buildUserProfileBlock(profile) {
 
   if (p.nombre) push('Nombre', p.nombre);
   if (p.region) push('Región', p.region);
+  if (p.vereda) push('Vereda', p.vereda);
+  if (p.municipio) push('Municipio', p.municipio);
+  if (p.departamento) push('Departamento', p.departamento);
 
   const vocacionLabels = {
     campesino: 'campesino/a (vive del campo)',
@@ -502,6 +505,7 @@ export function buildUserProfileBlock(profile) {
   push('Tipo de cultivo', humanizeAnswer(byId('finca_tipo') || {}, p.finca_tipo));
   push('Tamaño', humanizeAnswer(byId('finca_hectareas') || {}, p.finca_hectareas));
   if (p.finca_altitud) push('Altitud', `${p.finca_altitud} msnm`);
+  if (p.piso_termico) push('Piso térmico', p.piso_termico);
   push('Cultivos actuales', p.cultivos_actuales);
   push('Experiencia', humanizeAnswer(byId('anios_cultivando') || {}, p.anios_cultivando));
   push('Manejo', humanizeAnswer(byId('manejo') || {}, p.manejo));
