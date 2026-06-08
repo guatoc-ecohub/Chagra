@@ -163,7 +163,7 @@ async function main() {
   console.log(`[rejudge] SUMMARY actualizado: ${summaryPath}`);
 
   console.log('\n══════════════════════════════════════════════════');
-  console.log(`AH% (12 prompts, juez claude-cli) = ${ahPct}%   PASS=${pass} FAIL=${failCt} UNJUDGED=${unjudgedCt}`);
+  console.log(`AH% (${rows.length} prompts, juez claude-cli) = ${ahPct}%   PASS=${pass} FAIL=${failCt} UNJUDGED=${unjudgedCt}`);
   console.log('══════════════════════════════════════════════════');
 }
 

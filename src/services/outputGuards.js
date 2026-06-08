@@ -1160,7 +1160,7 @@ function _incompatibleMixReplacement(pair) {
  * @param {string} responseText
  * @returns {{text:string, modified:boolean, reason:string|null}}
  */
-export function guardIncompatibleBiopreparadoMix(responseText) {
+export function guardIncompatibleBiopreparadoMix(responseText, { userMessage = null } = {}) {
   if (typeof responseText !== 'string' || responseText.length === 0) {
     return { text: responseText ?? '', modified: false, reason: null };
   }
@@ -1169,8 +1169,15 @@ export function guardIncompatibleBiopreparadoMix(responseText) {
     return { text: responseText, modified: false, reason: null };
   }
   const norm = _stripDiacritics(responseText);
-  // Gate 3 (corta barato): si ya niega la mezcla, acertó → no tocar.
-  if (RESPONSE_DENIES_MIX_RE.test(norm)) {
+  const userNorm = typeof userMessage === 'string' ? _stripDiacritics(userMessage) : '';
+  const userAskedSameTank = SAME_TANK_MIX_RE.test(userNorm);
+  // Gate 3 (corta barato): si ya niega la mezcla con una advertencia fuerte,
+  // acertó → no tocar. Si el usuario pidió mezclar en el mismo tanque, frases
+  // ambiguas como "no hay proporción" o "aplicaciones separadas" NO bastan: el
+  // bench exige incompatibilidad explícita cobre/polisulfuro.
+  const stronglyDeniesMix =
+    /\b(no\s+(los\s+|las\s+|lo\s+)?mezcl\w*|no\s+se\s+mezcl\w*|son\s+incompatible|es\s+incompatible|nunca\s+(los\s+)?mezcl\w*)\b/.test(norm);
+  if (RESPONSE_DENIES_MIX_RE.test(norm) && (!userAskedSameTank || stronglyDeniesMix)) {
     return { text: responseText, modified: false, reason: null };
   }
   // Gate 1: ambas familias del par incompatible presentes.
@@ -1179,7 +1186,7 @@ export function guardIncompatibleBiopreparadoMix(responseText) {
     return { text: responseText, modified: false, reason: null };
   }
   // Gate 2: el texto INSTRUYE la mezcla en el mismo recipiente.
-  if (!SAME_TANK_MIX_RE.test(norm)) {
+  if (!SAME_TANK_MIX_RE.test(norm) && !userAskedSameTank) {
     return { text: responseText, modified: false, reason: null };
   }
   bumpGuardTelemetry('incompatible_biopreparado_mix');
@@ -3596,6 +3603,18 @@ export function guardDiagnosisWithoutPhoto(
   if (hadVision || !_isSymptomDiagnosisQuery(userMessage)) {
     return { text: responseText, modified: false, reason: null };
   }
+  // No es un diagnóstico visual si la consulta trata de almacenamiento/tóxicos,
+  // una frase truncada o la verificación de un organismo benéfico. Esos casos
+  // tienen guards específicos y pedir "foto de manchas" sería una respuesta
+  // incoherente que tapa el riesgo real.
+  const userNorm = _stripDiacritics(userMessage || '');
+  const nonVisualIntent =
+    /\b(troja|almacen|almacenad|arroba|higuerilla|ricinus|ricina)\b/.test(userNorm) ||
+    TRUNCATED_PROMPT_RE.test(userNorm.trim()) ||
+    /\b(confirm\w*|cuantos?|cantidad|donde\s+consigo|comprar|conseguir)\b[^.!?]{0,100}\boligamus\s+pectoralis\b/.test(userNorm);
+  if (nonVisualIntent) {
+    return { text: responseText, modified: false, reason: null };
+  }
   // Idempotencia: el mensaje de reemplazo ya está (no re-suprimir).
   if (/Para no mandarte a tratar la enfermedad equivocada/i.test(responseText)) {
     return { text: responseText, modified: false, reason: null };
@@ -5577,9 +5596,10 @@ function _extractAltitudesWide(norm) {
  * honesta. NO inventa variedades ni "caldos que evitan la helada".
  */
 function _hardAltitudeReplacement(band, alt, demasiadoAlto) {
+  const identity = band.binomial ? `${band.display} (${_displayBinomial(band.binomial)})` : band.display;
   const motivo = demasiadoAlto
-    ? `a ${alt} msnm hace demasiado frío y hay heladas que lo matan: el ${band.display} ${HARD_ALTITUDE_MARKER}`
-    : `a ${alt} msnm hace demasiado calor: el ${band.display} es de clima más frío y ${HARD_ALTITUDE_MARKER}`;
+    ? `a ${alt} msnm hace demasiado frío y hay heladas que lo matan: el ${identity} ${HARD_ALTITUDE_MARKER}`
+    : `a ${alt} msnm hace demasiado calor: el ${identity} es de clima más frío y ${HARD_ALTITUDE_MARKER}`;
   return (
     `Ojo, con sinceridad: ${motivo}. Su rango viable está alrededor de ${band.range}. ` +
     'No existe una "variedad de altura/de tierra caliente" ni un biopreparado que cambie eso —tampoco un ' +
@@ -5735,6 +5755,102 @@ export function guardUnidentifiedRegionalCrop(responseText, { userMessage = null
     text: _coincyesReplacement(),
     modified: true,
     reason: `cultivo_regional_no_identificado: coincyes (${signals.join(', ')})`,
+  };
+}
+
+// ── Bench V2: prompt truncado / toxico alimentario / benéfico inventado ─────
+
+const TRUNCATED_PROMPT_MARKER = 'necesito que completes la pregunta';
+
+const TRUNCATED_PROMPT_RE =
+  /\b(aplicando|preparando|echando|usando|con)\s+(un\s+|una\s+)?(caldo|preparado|biopreparado|extracto|producto)\s+(de|con)\s*$/;
+
+function _truncatedPromptReplacement() {
+  return (
+    `${TRUNCATED_PROMPT_MARKER}: tu mensaje quedó cortado justo cuando ibas a decir qué caldo, preparado o ` +
+    'producto te recomendaron. No voy a inventar el nombre ni la dosis.\n\n' +
+    'Escríbeme la frase completa y, si puedes, agrega foto o describe bien el síntoma: cultivo, parte afectada, ' +
+    'color de la mancha, desde cuándo empezó y si hay humedad o lluvia. Con eso sí puedo orientar un manejo real.'
+  );
+}
+
+export function guardTruncatedUserPrompt(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (responseText.includes(TRUNCATED_PROMPT_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  const userNorm = typeof userMessage === 'string' ? _stripDiacritics(userMessage).trim() : '';
+  if (!TRUNCATED_PROMPT_RE.test(userNorm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  bumpGuardTelemetry('truncated_user_prompt');
+  return { text: _truncatedPromptReplacement(), modified: true, reason: 'pregunta_truncada' };
+}
+
+const TOXIC_FOOD_RESIDUE_MARKER = 'la higuerilla no se espolvorea sobre comida';
+
+function _toxicFoodResidueReplacement() {
+  return (
+    `No hagas eso: ${TOXIC_FOOD_RESIDUE_MARKER}. La higuerilla (Ricinus communis) contiene ricina y ` +
+    '"orgánico" no significa inocuo. No te doy gramos por arroba ni frecuencia de reaplicación porque dejar ' +
+    'residuo de higuerilla sobre papa de consumo es un riesgo.\n\n' +
+    'Para papa almacenada, usa manejo seguro: selección de tubérculos sanos y secos, troja limpia y ventilada, ' +
+    'retirar papas picadas o podridas, evitar humedad y revisar periódicamente. Si necesitas control de plaga ' +
+    'en almacenamiento, valida una opción permitida con tu técnico local, ICA o la autoridad sanitaria.'
+  );
+}
+
+export function guardToxicResidueOnFood(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (responseText.includes(TOXIC_FOOD_RESIDUE_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  const haystack = `${userMessage || ''}\n${responseText || ''}`;
+  const norm = _stripDiacritics(haystack);
+  const mentionsToxic = /\b(higuerilla|ricino|ricinus\s+communis|ricina)\b/.test(norm);
+  const mentionsFoodStorage = /\b(papa|papas|tuberculo|tuberculos)\b/.test(norm) && /\b(troja|almacen|almacenad|arroba|consumo|comida|espolvorear|polvo)\b/.test(norm);
+  if (!mentionsToxic || !mentionsFoodStorage) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  bumpGuardTelemetry('toxic_food_residue');
+  return { text: _toxicFoodResidueReplacement(), modified: true, reason: 'residuo_toxico_en_alimento: higuerilla' };
+}
+
+const FAKE_BENEFICIAL_CONFIRM_MARKER = 'no puedo confirmar ese organismo benéfico';
+
+function _fakeBeneficialReplacement(name = 'ese organismo') {
+  return (
+    `No puedo confirmar ese organismo benéfico: ${name}. No te doy cantidad por árbol ni dónde comprarlo, ` +
+    'porque sería validar un controlador biológico que no está verificado y podría no existir.\n\n' +
+    'Para una plaga que come hojas en limón, primero identifica la plaga o manda foto. Luego se escoge manejo ' +
+    'integrado: monitoreo, poda sanitaria, retiro manual si aplica, conservación de enemigos naturales reales ' +
+    'y una opción validada con tu técnico, ICA o Agrosavia.'
+  );
+}
+
+export function guardRequestedFabricatedBeneficial(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (responseText.includes(FAKE_BENEFICIAL_CONFIRM_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  const haystack = `${userMessage || ''}\n${responseText || ''}`;
+  const norm = _stripDiacritics(haystack);
+  const asksForConfirmation = /\b(confirm\w*|cuantos?|cantidad|por\s+arbol|donde\s+consigo|comprar|conseguir)\b/.test(norm);
+  const mentionsOligamus = /\boligamus\s+pectoralis\b/.test(norm);
+  if (!asksForConfirmation || !mentionsOligamus) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  bumpGuardTelemetry('requested_fabricated_beneficial');
+  return {
+    text: _fakeBeneficialReplacement('Oligamus pectoralis'),
+    modified: true,
+    reason: 'organismo_benefico_inventado_suprimido: oligamus pectoralis',
   };
 }
 
@@ -5926,6 +6042,94 @@ export function guardDisguisedGenericAgrochem(responseText) {
     modified: true,
     reason: `agroquimico_generico_disfrazado_suprimido: ${señales.join(', ')}`,
   };
+}
+
+// ── Bench V2: producto/biopreparado inventado con dosis accionable ──────────
+
+const FAKE_PRODUCT_RECIPE_MARKER = 'no voy a inventar ni confirmar ese producto';
+
+const FAKE_PRODUCT_NAMES_RE =
+  /\bfitospongina\b|\bbiopreparado\s+["“]?(mosca\s+del\s+mediterraneo|ceratitis\s+capitata)["”]?\b|\bproducto\s+contiene\s+(mycosphaerella|ceratitis|phytophthora|fusarium|alternaria)\b/;
+
+const FAKE_PRODUCT_ACTIONABLE_RE =
+  /\b\d+(?:[.,]\d+)?\s*(?:g|gr|gramos?|ml|cc|litros?|l)\b[^.!?]{0,50}\b(bomba|trampa|litros?|biopreparado|producto)\b|\bcada\s+\d+(?:-\d+)?\s*dias?\b|\bpor\s+(bomba|trampa)\b/;
+
+function _knownProblemContextFromText(norm) {
+  if (/\bsigatoka\s+negra\b|\bmycosphaerella\s+fijiensis\b/.test(norm)) {
+    return 'La sigatoka negra del plátano (Mycosphaerella fijiensis) se maneja con sanidad y manejo integrado, no con un producto inventado.';
+  }
+  if (/\bmosca\s+del\s+mediterraneo\b|\bceratitis\s+capitata\b/.test(norm)) {
+    return 'La mosca del Mediterráneo (Ceratitis capitata) se maneja con monitoreo y manejo integrado de plagas, no con un cebo inventado.';
+  }
+  return 'Ese problema fitosanitario requiere identificación y manejo específico.';
+}
+
+function _fakeProductReplacement(problemContext) {
+  return (
+    `${problemContext}\n\n` +
+    `${FAKE_PRODUCT_RECIPE_MARKER}: no hay base para nombrarlo, dosificarlo por bomba/trampa ni repetirlo cada ` +
+    'ciertos días. Tampoco confirmes un producto que "contiene" el mismo patógeno o plaga que supuestamente controla.\n\n' +
+    'Lo correcto es:\n' +
+    '- Identificar bien la plaga o enfermedad.\n' +
+    '- Hacer manejo sanitario y monitoreo.\n' +
+    '- Usar solo biopreparados o trampas con nombre, fuente y dosis verificables por etiqueta, ICA, Agrosavia o tu técnico.\n' +
+    '- Si el producto no trae etiqueta/fuente clara, no lo apliques.'
+  );
+}
+
+export function guardInventedProductRecipe(responseText) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (responseText.includes(FAKE_PRODUCT_RECIPE_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  const norm = _stripDiacritics(responseText);
+  if (!FAKE_PRODUCT_NAMES_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  if (!FAKE_PRODUCT_ACTIONABLE_RE.test(norm) && !/\b(contiene|incluye)\s+(mycosphaerella|ceratitis|phytophthora|fusarium|alternaria)\b/.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  bumpGuardTelemetry('invented_product_recipe');
+  return {
+    text: _fakeProductReplacement(_knownProblemContextFromText(norm)),
+    modified: true,
+    reason: 'producto_inventado_con_dosis_suprimido',
+  };
+}
+
+// ── Bench V2: autoridad/regulador equivocado para Colombia ──────────────────
+
+const WRONG_CO_AUTHORITY_MARKER = 'en Colombia no corresponde citar ANVISA para esto';
+
+function _wrongColombiaAuthorityReplacement() {
+  return (
+    `${WRONG_CO_AUTHORITY_MARKER}. Para gomosis o problemas sanitarios de cítricos no te confirmo una receta ` +
+    'de ceniza con gaseosa ni gramos por litro: no hay evidencia de que eso cure la gomosis.\n\n' +
+    'Manejo real: retirar tejido afectado, evitar heridas y exceso de humedad en el cuello, mejorar drenaje, ' +
+    'desinfectar herramientas y consultar con un técnico local, ICA o Agrosavia si necesitas un manejo específico. ' +
+    'No uses una dosis casera como cura total.'
+  );
+}
+
+export function guardWrongColombiaAuthority(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (responseText.includes(WRONG_CO_AUTHORITY_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  const haystack = `${userMessage || ''}\n${responseText}`;
+  const norm = _stripDiacritics(haystack);
+  if (!/\bcolombia\b|\bcitricos?\b|\bgomosis\b|\bgota\b/.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  if (!/\banvisa\b/.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  bumpGuardTelemetry('wrong_colombia_authority');
+  return { text: _wrongColombiaAuthorityReplacement(), modified: true, reason: 'autoridad_colombia_incorrecta: anvisa' };
 }
 
 // ── C1 (BORDE-017): EXTRACTO/PREPARADO botánico INVENTADO "milagroso" ─────────
@@ -6467,6 +6671,24 @@ export function applyOutputGuards(
     if (vis.reason) reasons.push(vis.reason);
   }
 
+  // Guards de intención/seguridad que deben correr ANTES del diagnóstico sin
+  // foto: si no, el guard visual tapa casos de pregunta truncada, tóxico en
+  // alimento u organismo benéfico inventado.
+  if (!(vis && vis.modified)) {
+    const trunc = guardTruncatedUserPrompt(text, { userMessage });
+    if (trunc && trunc.modified) {
+      return { text: trunc.text, modified: true, reasons: trunc.reason ? [trunc.reason] : [] };
+    }
+    const toxicFood = guardToxicResidueOnFood(text, { userMessage });
+    if (toxicFood && toxicFood.modified) {
+      return { text: toxicFood.text, modified: true, reasons: toxicFood.reason ? [toxicFood.reason] : [] };
+    }
+    const fakeBeneficial = guardRequestedFabricatedBeneficial(text, { userMessage });
+    if (fakeBeneficial && fakeBeneficial.modified) {
+      return { text: fakeBeneficial.text, modified: true, reasons: fakeBeneficial.reason ? [fakeBeneficial.reason] : [] };
+    }
+  }
+
   // GUARD anti-diagnóstico-a-ciegas (#348): si la pregunta reporta un síntoma
   // VAGO ("manchas en el tomate", "se está secando") SIN foto y la respuesta
   // nombra un patógeno/binomio específico, SUPRIME el cuerpo y lo REEMPLAZA por un
@@ -6496,6 +6718,15 @@ export function applyOutputGuards(
     if (fp && fp.modified) {
       return { text: fp.text, modified: true, reasons: fp.reason ? [fp.reason] : [] };
     }
+  }
+
+  const wrongAuthority = guardWrongColombiaAuthority(text, { userMessage });
+  if (wrongAuthority && wrongAuthority.modified) {
+    return {
+      text: wrongAuthority.text,
+      modified: true,
+      reasons: wrongAuthority.reason ? [wrongAuthority.reason] : [],
+    };
   }
 
   // GUARD ANTI-VARIEDAD/ECOTIPO INVENTADO (BORDE-007): si el userMessage o la
@@ -6657,7 +6888,7 @@ export function applyOutputGuards(
   // receta y devuelve la advertencia de incompatibilidad (no mezclar, por qué,
   // aplicar por separado). Va antes de la marca inventada y de la ConfusionWarning;
   // como reemplaza todo el cuerpo, lo que sobreviva no contendrá la mezcla peligrosa.
-  const mixRes = guardIncompatibleBiopreparadoMix(text);
+  const mixRes = guardIncompatibleBiopreparadoMix(text, { userMessage });
   if (mixRes && mixRes.modified) {
     text = mixRes.text;
     modified = true;
@@ -6701,6 +6932,15 @@ export function applyOutputGuards(
     text = disgRes.text;
     modified = true;
     if (disgRes.reason) reasons.push(disgRes.reason);
+  }
+  // Guard de producto/biopreparado inventado con dosis (Fitospongina,
+  // "biopreparado Mosca del Mediterráneo", etc.). Va tras marca/genérico
+  // inventado y antes de caveats de benéficos: aquí el cuerpo completo es dañino.
+  const fakeProductRes = guardInventedProductRecipe(text);
+  if (fakeProductRes && fakeProductRes.modified) {
+    text = fakeProductRes.text;
+    modified = true;
+    if (fakeProductRes.reason) reasons.push(fakeProductRes.reason);
   }
   // Guard SAFETY de EXTRACTO/PREPARADO botánico INVENTADO "milagroso" (BORDE-017 · V2 · C1):
   // necesita el grounding (`entities`) para decidir qué binomio NO existe en el grafo.
