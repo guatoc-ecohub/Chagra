@@ -24,7 +24,7 @@ import { isAnalyzableImageAttachment, buildAttachmentRejection } from '../../ser
 // B1 (2026-06-02): animación de ENTRADA al agente. El home anima el envío, pero
 // el cambio de pantalla era un corte seco ("casi no se nota"). El contenedor
 // raíz entra con un fade+rise deliberado (~460ms), respetando reduced-motion.
-import { AGENT_ENTRANCE_CSS, agentEntranceClass } from './agentEntrance';
+import { AGENT_ENTRANCE_CSS, AGENT_COMPOSITOR_CSS, agentEntranceClass } from './agentEntrance';
 import {
   addTurn,
   getFullHistory,
@@ -103,11 +103,9 @@ import SuggestedActions from './SuggestedActions';
 import ActionConfirmModal from '../ActionConfirmModal';
 import FeedbackConsentModal from '../FeedbackConsentModal';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
-import ChagraAgentAvatarColibri3D from '../ChagraAgentAvatarColibri3D';
 import ChagraAgentAvatarColibriPhoto from '../ChagraAgentAvatarColibriPhoto';
 import QuickChipsBar from '../QuickChipsBar';
 import ChipsToolbar from '../ChipsToolbar';
-import AgentDemoExample from '../AgentDemoExample';
 import { captureAndCompress } from '../../services/photoService';
 import { agentSounds } from '../../services/agentSoundService';
 import usePrefsStore from '../../store/usePrefsStore';
@@ -204,11 +202,6 @@ export default function AgentScreen({ onBack, initialContext }) {
   // Toast de rechazo de la 3ra pregunta. Auto-dismiss a 4s para no
   // bloquear el input visualmente.
   const [queueRejectedToast, setQueueRejectedToast] = useState('');
-  // UX-4 (#285): demo predefinida del agente para operadores que abren la
-  // pantalla por primera vez (sin historial). Toggle local — NO se persiste
-  // ni se inyecta al messages real. Aparece junto a QuickChipsBar cuando
-  // chat está vacío e idle.
-  const [showAgentDemo, setShowAgentDemo] = useState(false);
   // 2026-05-28 UX: cuando el operador llega al agente desde una notificación
   // climática (NotificationsBell), recibimos `initialContext` con prompt
   // pre-cargado + cita de la entidad emisora (IDEAM/NOAA/CIIFEN/Open-Meteo).
@@ -227,6 +220,10 @@ export default function AgentScreen({ onBack, initialContext }) {
   // input también cambia para guiar al campesino sobre qué escribir. Es un
   // toggle: tocar el mismo chip lo desactiva (vuelve al routing NLU normal).
   const [activeIntent, setActiveIntent] = useState(null);
+  // Hoja de capacidades (paridad AgentHero Ⓐ).
+  const [sheetOpen, setSheetOpen] = useState(false);
+  // Fase del compositor para la animación shimmer/lift al enviar.
+  const [composerPhase, setComposerPhase] = useState('idle'); // 'idle' | 'sending'
   // Deep Research (A6/A7): refs para los AbortControllers de los jobs en vuelo.
   // Guardamos en un Map (msgId → AbortController) para poder cancelar jobs
   // individuales. Al desmontar el componente cancelamos todos.
@@ -2515,6 +2512,9 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
 
   const handleAgentSend = async () => {
     if (state === STATE_RECORDING) return;
+    // Shimmer/lift animation al enviar (paridad AgentHero).
+    setComposerPhase('sending');
+    setTimeout(() => setComposerPhase('idle'), 560);
     if (agentAttachment) {
       // Foto inline: armar burbuja + correr visión + handleSubmit
       const item = {
@@ -2765,9 +2765,11 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     : 'Escribe tu pregunta...';
 
   return (
-    <div className={`h-[100dvh] flex flex-col bg-slate-950/95 overflow-hidden ${entranceClassRef.current}`}>
+    <div className={`h-[100dvh] flex flex-col overflow-hidden relative text-white ${entranceClassRef.current}`}>
+      {/* Scrim semitransparente: deja ver --app-bg-image del body */}
+      <div className="absolute inset-0 bg-slate-950/82 backdrop-blur-sm pointer-events-none" aria-hidden="true" />
       {/* B1: animación de entrada (fade+rise). Respeta prefers-reduced-motion. */}
-      <style>{AGENT_ENTRANCE_CSS}</style>
+      <style>{AGENT_ENTRANCE_CSS}{AGENT_COMPOSITOR_CSS}</style>
 
       {/* ── Header estilo ScreenShell (2026-06-08): scrim + blur + acciones globales ── */}
       <header className="px-4 py-3 flex items-center gap-2 border-b border-slate-800 bg-slate-900/50 backdrop-blur-md shrink-0">
@@ -2818,7 +2820,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
           type="button"
           onClick={handleNewConversation}
           disabled={state !== STATE_IDLE || messages.length === 0}
-          className={`p-2 rounded-full transition-all ${
+          className={`p-2.5 rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center transition-all ${
             state !== STATE_IDLE || messages.length === 0
               ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
               : 'bg-slate-800 text-slate-300 hover:bg-slate-700 active:scale-95'
@@ -2833,7 +2835,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
           type="button"
           disabled={!ttsSupported}
           onClick={() => { if (ttsEnabled) stop(); setTtsEnabled(!ttsEnabled); }}
-          className={`p-2 rounded-full transition-all ${
+          className={`p-2.5 rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center transition-all ${
             !ttsSupported ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
               : ttsEnabled ? 'bg-violet-900/40 text-violet-400'
               : 'bg-slate-800 text-slate-500'
@@ -2918,26 +2920,6 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         <QuickChipsBar onSelect={handleSuggestion} />
       )}
 
-      {/* UX-4 (#285): botón "Ver ejemplo" para operadores nuevos sin
-          historial. Monta una demo simulada (mensaje user + respuesta
-          predefinida con delay 1s) sin llamar al LLM — cero costo, cero
-          alucinación. Solo en pantalla nueva e idle, alineado con la
-          ventana donde QuickChipsBar también vive. */}
-      {state === STATE_IDLE && messages.length === 0 && !showAgentDemo && (
-        <div className="px-4 pb-2 pt-1 bg-slate-900/40">
-          <button
-            type="button"
-            onClick={() => setShowAgentDemo(true)}
-            data-testid="agent-demo-trigger"
-            className="w-full px-3 py-2 rounded-lg bg-slate-800/60 hover:bg-slate-700/70 active:scale-[0.99] border border-slate-700/50 text-xs text-slate-300 transition-all"
-          >
-            Ver ejemplo (sin foto)
-          </button>
-        </div>
-      )}
-      {state === STATE_IDLE && messages.length === 0 && showAgentDemo && (
-        <AgentDemoExample onClose={() => setShowAgentDemo(false)} />
-      )}
 
       {/* 2026-05-28 UX: banner de contexto de alerta climática. Aparece
           cuando el operador llega desde una notificación con prompt
@@ -2991,21 +2973,21 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         </div>
       )}
 
-      {/* CHIPS DE MODO (A4/B4): "caja de herramientas" estilo Gemini, fila
-          scrollable JUSTO sobre el input. Persistente durante toda la
-          conversación. Tocar un chip fuerza la intención del próximo submit y
-          rutea directo al tool (saltando el NLU, A3). El chip 📷 foto solo
-          aparece si hay imagen adjunta. */}
-      <ChipsToolbar
-        onSelectIntent={handleChipSelect}
-        activeIntent={activeIntent}
-        hasAttachment={false}
-        disabled={state === STATE_RECORDING}
-        isPro={getCurrentTier() === 'pro'}
-      />
+      {/* ── Chips (modo) — fila scrollable unificada.
+          Oculta en pantalla vacía donde QuickChipsBar ya muestra ejemplos
+          (issue #5 duplicación resuelta 2026-06-08). ── */}
+      {(state !== STATE_IDLE || messages.length > 0) && (
+        <ChipsToolbar
+          onSelectIntent={handleChipSelect}
+          activeIntent={activeIntent}
+          hasAttachment={false}
+          disabled={state === STATE_RECORDING}
+          isPro={getCurrentTier() === 'pro'}
+        />
+      )}
 
-      {/* ── Compositor pill — paridad visual con AgentHero (2026-06-08) ── */}
-      <div className="px-3 pb-3 pt-2 border-t border-slate-800 bg-slate-900/70 backdrop-blur-md shrink-0">
+      {/* ── Compositor pill — paridad completa AgentHero (2026-06-08) ── */}
+      <div className="relative z-10 px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] pt-2 border-t border-slate-800/60 bg-slate-900/70 backdrop-blur-md shrink-0">
 
         {/* Preview de foto adjunta inline */}
         {agentAttachment && (
@@ -3032,75 +3014,98 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
           <p className="text-xs text-red-400 mb-2 px-1">{agentPickError}</p>
         )}
 
-        {/* Pill */}
+        {/* Pill — unified with AgentHero (as-bar CSS tokens) */}
         <div
-          className="rounded-2xl border bg-slate-800/80 overflow-hidden"
-          style={{ borderColor: 'rgba(100,116,139,0.4)' }}
+          className={[
+            'as-bar',
+            state === STATE_RECORDING ? 'is-recording' : '',
+            composerPhase === 'sending' ? 'as-shimmer as-sending' : '',
+          ].join(' ')}
         >
-          {/* Fila 1: textarea */}
-          <textarea
-            rows={1}
-            value={inputText}
-            onChange={(e) => {
-              setInputText(e.target.value);
-              // auto-grow hasta ~5 líneas
-              e.target.style.height = 'auto';
-              e.target.style.height = `${Math.min(e.target.scrollHeight, 140)}px`;
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleAgentSend();
+          {/* Fila 1: textarea o waveform de grabación */}
+          {state === STATE_RECORDING ? (
+            <div className="flex items-center gap-3 px-3 py-3 min-h-[52px]">
+              <span className="relative flex h-3 w-3 shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500" />
+              </span>
+              <span className="flex-1 text-sm text-rose-400 font-medium tabular-nums">
+                Grabando… {Math.floor(durationMs / 1000)}s
+              </span>
+            </div>
+          ) : (
+            <textarea
+              rows={1}
+              value={inputText}
+              onChange={(e) => {
+                setInputText(e.target.value);
+                e.target.style.height = 'auto';
+                e.target.style.height = `${Math.min(e.target.scrollHeight, 140)}px`;
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleAgentSend();
+                }
+              }}
+              placeholder={
+                queuePending.length >= 1
+                  ? 'Espera — ya hay una en cola…'
+                  : queueProcessing
+                    ? 'Adelanta otra pregunta (máx 1 en cola)'
+                    : agentAttachment
+                      ? 'Añade una nota a tu foto (opcional)…'
+                      : activePlaceholder
               }
-            }}
-            placeholder={
-              queuePending.length >= 1
-                ? 'Espera — ya hay una en cola…'
-                : queueProcessing
-                  ? 'Adelanta otra pregunta (máx 1 en cola)'
-                  : agentAttachment
-                    ? 'Añade una nota a tu foto (opcional)…'
-                    : activePlaceholder
-            }
-            disabled={state === STATE_RECORDING || queuePending.length >= 1}
-            data-testid="agent-input"
-            className="w-full bg-transparent resize-none px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none leading-snug disabled:opacity-50"
-            style={{ minHeight: '44px', maxHeight: '140px' }}
-          />
+              disabled={queuePending.length >= 1}
+              data-testid="agent-input"
+              className="w-full bg-transparent resize-none px-3 py-3 text-sm text-white placeholder-slate-500 focus:outline-none leading-snug"
+              style={{ minHeight: '44px', maxHeight: '140px' }}
+            />
+          )}
 
-          {/* Fila 2: botones */}
-          <div className="flex items-center gap-1.5 px-2 pb-2">
-            {/* Micrófono */}
+          {/* Fila 2: Ⓐ | 📷 | spacer | 🎤 | Enviar */}
+          <div className="flex items-center gap-2 px-1 pb-1 pt-0.5">
+            {/* Botón Ⓐ — abre hoja de capacidades */}
+            <button
+              type="button"
+              onClick={() => setSheetOpen((o) => !o)}
+              disabled={state === STATE_RECORDING}
+              aria-label="Ver todo lo que puede hacer Chagra"
+              aria-expanded={sheetOpen}
+              className={['as-iconbtn as-tool', sheetOpen ? 'is-open' : ''].join(' ')}
+            >
+              <Sparkles size={18} strokeWidth={2} aria-hidden="true" />
+            </button>
+
+            {/* Cámara — sin `capture`, abre galería+cámara igual que AgentHero */}
+            <button
+              type="button"
+              onClick={() => cameraInputAgentRef.current?.click()}
+              disabled={state === STATE_RECORDING || queuePending.length >= 1}
+              aria-label="Tomar o elegir foto"
+              className="as-iconbtn"
+            >
+              <Camera size={19} strokeWidth={2} aria-hidden="true" />
+            </button>
+
+            <div className="flex-1" />
+
+            {/* Micrófono (toggle) */}
             <button
               type="button"
               onClick={handleVoiceRecord}
               disabled={queuePending.length >= 1}
               aria-label={state === STATE_RECORDING ? 'Detener y enviar audio' : 'Grabar audio'}
-              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                state === STATE_RECORDING
-                  ? 'bg-red-600 text-white animate-pulse'
-                  : 'bg-slate-700 text-slate-300 hover:bg-violet-700/60 hover:text-violet-200'
-              }`}
+              aria-pressed={state === STATE_RECORDING}
+              className={['as-iconbtn', state === STATE_RECORDING ? 'as-mic-on' : ''].join(' ')}
             >
               {state === STATE_RECORDING
                 ? <Square size={15} strokeWidth={2.5} />
                 : <Mic size={17} strokeWidth={2} />}
             </button>
 
-            {/* Cámara / foto (igual que AgentHero: sin `capture`, abre galería+cámara) */}
-            <button
-              type="button"
-              onClick={() => cameraInputAgentRef.current?.click()}
-              disabled={state === STATE_RECORDING || queuePending.length >= 1}
-              aria-label="Tomar o elegir foto"
-              className="w-10 h-10 rounded-full flex items-center justify-center bg-slate-700 text-slate-300 hover:bg-emerald-700/50 hover:text-emerald-200 transition-all disabled:opacity-40"
-            >
-              <Camera size={17} strokeWidth={2} />
-            </button>
-
-            <div className="flex-1" />
-
-            {/* Enviar — botón Colibrí 3D (misma lógica que AgentHero) */}
+            {/* Enviar — ChagraAgentAvatar idéntico al Home */}
             <button
               type="button"
               onClick={handleAgentSend}
@@ -3111,25 +3116,33 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
               }
               data-testid="agent-submit"
               aria-label="Enviar al agente"
-              className="w-11 h-11 rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              className="as-send"
               style={{
                 background:
                   (!inputText.trim() && !agentAttachment) || state === STATE_RECORDING || queuePending.length >= 1
                     ? 'rgba(51,65,85,0.8)'
-                    : 'linear-gradient(135deg, #10b981 0%, #0891b2 100%)',
+                    : 'linear-gradient(135deg,#10b981 0%,#0891b2 100%)',
                 boxShadow:
                   (!inputText.trim() && !agentAttachment) || state === STATE_RECORDING || queuePending.length >= 1
                     ? 'none'
-                    : '0 0 16px rgba(16,185,129,0.45)',
+                    : '0 0 18px rgba(16,185,129,0.5)',
               }}
             >
-              <ChagraAgentAvatarColibri3D
-                size={34}
+              <ChagraAgentAvatar
+                size={38}
                 state={state === STATE_THINKING ? 'thinking' : 'idle'}
+                ariaLabel="Enviar al agente"
               />
             </button>
           </div>
         </div>
+
+        {/* Hint educativo bajo el pill */}
+        {state !== STATE_RECORDING && !agentAttachment && (
+          <p className="mt-1 text-center text-[11px] text-slate-500 leading-tight">
+            Toca <b className="text-emerald-400">✦</b> para ver todo lo que sé hacer
+          </p>
+        )}
 
         {/* Input oculto de foto */}
         <input
@@ -3141,11 +3154,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
           tabIndex={-1}
           onChange={handleAgentPhotoPick}
         />
-        {state === STATE_RECORDING && (
-          <p className="text-center text-xs text-red-400 mt-2 animate-pulse">
-            Grabando... {Math.floor(durationMs / 1000)}s
-          </p>
-        )}
+
 
         {state === STATE_THINKING && (
           <div className="flex flex-col items-center gap-2 mt-2">
@@ -3253,6 +3262,48 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       </div>
 
       <div ref={chatEndRef} />
+
+      {/* Hoja de capacidades (Ⓐ) — misma UX que AgentHero */}
+      {sheetOpen && (
+        <>
+          <div className="as-sheet-scrim" onClick={() => setSheetOpen(false)} aria-hidden="true" />
+          <section
+            className="as-sheet"
+            role="dialog"
+            aria-modal
+            aria-label="Capacidades de Chagra"
+          >
+            <div className="as-sheet-grab" aria-hidden="true" />
+            <div className="px-5 pb-2 pt-1 text-center">
+              <p className="text-lg font-bold text-white">¿En qué te ayudo?</p>
+              <p className="text-sm text-slate-400 mt-1">Toca una opción para empezar. Toda respuesta viene con su fuente.</p>
+            </div>
+            <div className="px-4 pb-4 overflow-y-auto flex flex-col gap-3">
+              {CHIP_DEFS.map((chip) => (
+                <button
+                  key={chip.intent}
+                  type="button"
+                  className="as-cap"
+                  onClick={() => {
+                    handleChipSelect(chip.intent);
+                    setSheetOpen(false);
+                  }}
+                >
+                  <span className="as-cap-ico" aria-hidden="true">{chip.emoji}</span>
+                  <span className="flex-1 min-w-0 text-left">
+                    <span className="font-bold text-white block">{chip.label}</span>
+                    <span className="text-sm text-slate-400 block mt-0.5">{chip.placeholder}</span>
+                  </span>
+                  <span className="text-emerald-400 text-lg self-center" aria-hidden="true">›</span>
+                </button>
+              ))}
+            </div>
+            <p className="px-5 pb-5 text-center text-xs text-slate-500">
+              Chagra responde con información de <b className="text-emerald-400">AGROSAVIA</b>, <b className="text-emerald-400">ICA</b> e <b className="text-emerald-400">IDEAM</b>.
+            </p>
+          </section>
+        </>
+      )}
 
       {/* Action Confirmation Modal — alimentado por actionExecutor gate callback (057.4) */}
       <ActionConfirmModal
