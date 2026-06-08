@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw, X } from 'lucide-react';
+import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw, X, Home, Camera, Square } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { transcribe } from '../../services/voiceService';
 // Outbox DURABLE (compositor multimodal del home). El AgentScreen es el
@@ -103,9 +103,12 @@ import SuggestedActions from './SuggestedActions';
 import ActionConfirmModal from '../ActionConfirmModal';
 import FeedbackConsentModal from '../FeedbackConsentModal';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
+import ChagraAgentAvatarColibri3D from '../ChagraAgentAvatarColibri3D';
+import ChagraAgentAvatarColibriPhoto from '../ChagraAgentAvatarColibriPhoto';
 import QuickChipsBar from '../QuickChipsBar';
 import ChipsToolbar from '../ChipsToolbar';
 import AgentDemoExample from '../AgentDemoExample';
+import { captureAndCompress } from '../../services/photoService';
 import { agentSounds } from '../../services/agentSoundService';
 import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
@@ -164,6 +167,11 @@ export default function AgentScreen({ onBack, initialContext }) {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [state, setState] = useState(STATE_IDLE);
+  // Compositor inline (foto adjuntada directamente en AgentScreen, sin outbox).
+  // Independiente de la outbox — el operador ya está en la pantalla del agente.
+  const cameraInputAgentRef = useRef(null);
+  const [agentAttachment, setAgentAttachment] = useState(null); // {blob,mime,previewUrl,fileName}
+  const [agentPickError, setAgentPickError] = useState('');
   const [streamingContent, setStreamingContent] = useState('');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [error, setError] = useState('');
@@ -2472,6 +2480,84 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     setActiveIntent((prev) => (prev === intent ? null : intent));
   };
 
+  // ── Foto inline desde el compositor del AgentScreen ───────────────────────
+  // Independiente del outbox: el operador ya está en la pantalla del agente,
+  // así que la foto se procesa directamente (captureAndCompress → preview).
+  // Al enviar: processPhotoItem inline → handleSubmit(prompt, suppressUserBubble).
+  const handleAgentPhotoPick = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    const looksLikeImage =
+      (file.type && file.type.startsWith('image/')) ||
+      isAnalyzableImageAttachment({ mime: file.type, fileName: file.name });
+    if (!looksLikeImage) {
+      setAgentPickError('Por ahora solo puedo ver fotos. Mándame una foto de tu planta o cultivo.');
+      return;
+    }
+    setAgentPickError('');
+    try {
+      const { blob, mime } = await captureAndCompress(file);
+      const previewUrl = URL.createObjectURL(blob);
+      photoObjectUrlsRef.current.push(previewUrl);
+      setAgentAttachment({ blob, mime, previewUrl, fileName: file.name || 'foto.jpg', kind: 'photo' });
+    } catch (err) {
+      console.error('[AgentScreen] no se pudo procesar la foto:', err);
+      setAgentPickError('No pude procesar esa foto. Inténtalo de nuevo.');
+    }
+  };
+
+  const clearAgentAttachment = () => {
+    if (agentAttachment?.previewUrl) URL.revokeObjectURL(agentAttachment.previewUrl);
+    setAgentAttachment(null);
+    setAgentPickError('');
+  };
+
+  const handleAgentSend = async () => {
+    if (state === STATE_RECORDING) return;
+    if (agentAttachment) {
+      // Foto inline: armar burbuja + correr visión + handleSubmit
+      const item = {
+        kind: 'photo',
+        blob: agentAttachment.blob,
+        mime: agentAttachment.mime,
+        text: inputText.trim(),
+      };
+      // Pintar burbuja con la imagen DE INMEDIATO
+      const createUrl = (blob) => {
+        if (typeof URL === 'undefined' || !URL.createObjectURL) return null;
+        const url = URL.createObjectURL(blob);
+        photoObjectUrlsRef.current.push(url);
+        return url;
+      };
+      const { message } = buildPhotoUserMessage(item, createUrl);
+      setMessages((prev) => [...prev, message]);
+      // Correr visión y armar prompt
+      const { prompt, finding } = await processPhotoItem(item, {
+        analyze: analyzeFoliage,
+        createUrl: null,
+      });
+      setInputText('');
+      clearAgentAttachment();
+      setActiveIntent(null);
+      setAlertContextBanner(null);
+      await handleSubmit(prompt, {
+        suppressUserBubble: true,
+        visionContext: {
+          hadVision: true,
+          visionConfidence:
+            finding && typeof finding.confidence === 'number' ? finding.confidence : null,
+        },
+      });
+      return;
+    }
+    if (!inputText.trim()) return;
+    handleSubmit(inputText, { forcedIntent: activeIntent });
+    setInputText('');
+    setActiveIntent(null);
+    setAlertContextBanner(null);
+  };
+
   // ── Consumo de la OUTBOX DURABLE del compositor del home ───────────────────
   // El usuario disparó una consulta multimodal desde AgentHero; el item ya
   // está persistido en IndexedDB. Aquí la procesamos como "ya enviada":
@@ -2551,6 +2637,13 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       }
 
       if (item.kind === 'photo') {
+        // Bug fix 2026-06-08: IDB puede serializar el Blob perdiendo su MIME type.
+        // Si item.blob.type está vacío pero item.mime existe, reconstruimos el Blob.
+        if (item.blob && !item.blob.type && item.mime) {
+          try {
+            item = { ...item, blob: new Blob([item.blob], { type: item.mime }) };
+          } catch (_) { /* noop: degradamos a prompt sin imagen */ }
+        }
         // Bug 2026-05-31: la foto NO llegaba al chat (solo el texto). Causa
         // raíz doble: (1) la burbuja se pintaba SIN la imagen — el blob se
         // pasaba a analyzeFoliage y se descartaba, y ChatBubble no sabía pintar
@@ -2672,96 +2765,90 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     : 'Escribe tu pregunta...';
 
   return (
-    <div className={`h-[100dvh] flex flex-col bg-slate-950 overflow-hidden ${entranceClassRef.current}`}>
-      {/* B1: animación de entrada (fade+rise) para que se perciba el cruce al
-          agente. Respeta prefers-reduced-motion vía @media en el CSS. */}
+    <div className={`h-[100dvh] flex flex-col bg-slate-950/95 overflow-hidden ${entranceClassRef.current}`}>
+      {/* B1: animación de entrada (fade+rise). Respeta prefers-reduced-motion. */}
       <style>{AGENT_ENTRANCE_CSS}</style>
-      {/* Header con avatar colibrí Chagra IA (operator bug #920 no aplicó el avatar al header) */}
-      <div className="px-4 py-3 flex items-center gap-3 border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm shrink-0">
+
+      {/* ── Header estilo ScreenShell (2026-06-08): scrim + blur + acciones globales ── */}
+      <header className="px-4 py-3 flex items-center gap-2 border-b border-slate-800 bg-slate-900/50 backdrop-blur-md shrink-0">
+        {/* Back */}
         <button
           type="button"
           onClick={onBack}
-          className="p-2 -ml-2 rounded-lg active:bg-slate-800"
+          className="p-2.5 rounded-full bg-slate-800 hover:bg-slate-700 active:scale-95 transition-all"
           aria-label="Volver"
         >
-          <ArrowLeft size={20} className="text-amber-400" />
+          <ArrowLeft size={18} className="text-slate-300" />
         </button>
-        <ChagraAgentAvatar
+        {/* Home */}
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new CustomEvent('chagra:nav', { detail: 'dashboard' }))}
+          className="p-2.5 rounded-full bg-slate-800 hover:bg-emerald-700/40 hover:text-emerald-200 active:scale-95 transition-all text-emerald-400"
+          aria-label="Volver al inicio"
+          title="Inicio"
+        >
+          <Home size={18} />
+        </button>
+        {/* Avatar + título */}
+        <ChagraAgentAvatarColibriPhoto
           state={state === STATE_RECORDING ? 'listening' : state === STATE_THINKING ? 'thinking' : 'idle'}
-          size={40}
+          size={36}
           onDoubleClick={async () => {
-            // Task #122: doble-click avatar header silencia/reactiva audio.
-            // Espejo del comportamiento del AgentFab global, pero acá ya
-            // estamos en AgentScreen así que solo tocamos TTS.
             if (isSpeaking() || ttsEnabled) {
-              stop();
-              setTtsEnabled(false);
-              agentSounds.cancel();
-              return;
+              stop(); setTtsEnabled(false); agentSounds.cancel(); return;
             }
-            // Reactivar + replay último mensaje
             setTtsEnabled(true);
             const ok = await replayLast({ useKokoro: kokoroReady });
             if (ok) agentSounds.chime();
           }}
-          ariaLabel="Avatar Chagra IA, doble click para silenciar o reactivar la voz"
+          ariaLabel="Chagra IA — doble click silencia/reactiva voz"
         />
         <div className="flex-1 min-w-0">
-          <h1 className="text-base font-bold text-white leading-tight">Chagra IA</h1>
-          <p className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+          <h1 className="text-sm font-bold text-white leading-tight truncate">Chagra IA</h1>
+          <p className="text-[10px] font-semibold uppercase tracking-wider leading-tight"
+             style={{ color: state === STATE_THINKING ? '#f59e0b' : state === STATE_RECORDING ? '#a78bfa' : '#6ee7b7' }}>
             {state === STATE_THINKING && 'pensando…'}
             {state === STATE_RECORDING && 'escuchando…'}
             {state === STATE_IDLE && 'agente agroecológico'}
           </p>
         </div>
-        {/* Bug N3 fix (PR fix/n3-cross-conv-contamination 2026-05-23):
-            botón explícito "Nueva conversación". Llama clearMemory(operatorId)
-            + reset state + marca sesión fresca. Cubre el caso N3 exacto donde
-            el operador hace Volver + reabre rápido (<30min) con tópico distinto
-            y el gap temporal automático NO se dispararía. Sólo habilitado en
-            STATE_IDLE para no interrumpir streaming en curso. */}
+        {/* Acciones: nueva conversación + TTS + online badge */}
         <button
           type="button"
           onClick={handleNewConversation}
           disabled={state !== STATE_IDLE || messages.length === 0}
-          className={`p-2 rounded-full transition-colors ${
+          className={`p-2 rounded-full transition-all ${
             state !== STATE_IDLE || messages.length === 0
               ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
               : 'bg-slate-800 text-slate-300 hover:bg-slate-700 active:scale-95'
           }`}
-          title="Nueva conversación (borra historial)"
+          title="Nueva conversación"
           aria-label="Iniciar nueva conversación"
           data-testid="new-conversation-btn"
         >
-          <RotateCcw size={16} />
+          <RotateCcw size={15} />
         </button>
         <button
           type="button"
           disabled={!ttsSupported}
-          onClick={() => {
-            if (ttsEnabled) {
-              stop();
-            }
-            setTtsEnabled(!ttsEnabled);
-          }}
-          className={`p-2 rounded-full transition-colors ${
-            !ttsSupported
-              ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
-              : ttsEnabled
-                ? 'bg-violet-900/40 text-violet-400'
-                : 'bg-slate-800 text-slate-500'
+          onClick={() => { if (ttsEnabled) stop(); setTtsEnabled(!ttsEnabled); }}
+          className={`p-2 rounded-full transition-all ${
+            !ttsSupported ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
+              : ttsEnabled ? 'bg-violet-900/40 text-violet-400'
+              : 'bg-slate-800 text-slate-500'
           }`}
-          title={!ttsSupported ? 'Tu navegador no soporta sintesis de voz' : ttsEnabled ? 'Silenciar voz' : 'Activar voz'}
+          title={ttsEnabled ? 'Silenciar voz' : 'Activar voz'}
         >
-          {ttsEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+          {ttsEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
         </button>
-        <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] ${
+        <div className={`hidden sm:flex items-center gap-1 px-2 py-1 rounded-full text-[10px] ${
           isOnline ? 'bg-emerald-900/40 text-emerald-400' : 'bg-red-900/40 text-red-400'
         }`}>
-          {isOnline ? <Wifi size={12} /> : <WifiOff size={12} />}
+          {isOnline ? <Wifi size={11} /> : <WifiOff size={11} />}
           {isOnline ? 'Online' : 'Offline'}
         </div>
-      </div>
+      </header>
 
       {/* Bug N3 fix: badge "nueva sesión" cuando reseteamos por gap temporal
           o por botón explícito. Sin esto el operador no entendería por qué su
@@ -2917,56 +3004,143 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         isPro={getCurrentTier() === 'pro'}
       />
 
-      {/* Input */}
-      <div className="p-4 border-t border-slate-800 bg-slate-900/80 shrink-0">
-        <form onSubmit={handleTextSubmit} className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={handleVoiceRecord}
-            className={`shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
-              state === STATE_RECORDING
-                ? 'bg-red-600 animate-pulse'
-                : 'bg-violet-700 hover:bg-violet-600'
-            }`}
-          >
-            {state === STATE_RECORDING ? (
-              <MicOff size={20} className="text-white" />
-            ) : (
-              <Mic size={20} className="text-white" />
-            )}
-          </button>
+      {/* ── Compositor pill — paridad visual con AgentHero (2026-06-08) ── */}
+      <div className="px-3 pb-3 pt-2 border-t border-slate-800 bg-slate-900/70 backdrop-blur-md shrink-0">
 
-          <input
-            type="text"
+        {/* Preview de foto adjunta inline */}
+        {agentAttachment && (
+          <div className="flex items-center gap-2 mb-2 px-1">
+            <img
+              src={agentAttachment.previewUrl}
+              alt="Foto adjunta"
+              className="w-14 h-14 rounded-lg object-cover border border-slate-700"
+            />
+            <p className="text-xs text-slate-400 flex-1 leading-snug">
+              📷 Foto lista — añade una nota opcional
+            </p>
+            <button
+              type="button"
+              onClick={clearAgentAttachment}
+              className="p-1.5 rounded-full bg-slate-700 hover:bg-slate-600 text-slate-300"
+              aria-label="Quitar foto"
+            >
+              <X size={13} />
+            </button>
+          </div>
+        )}
+        {agentPickError && (
+          <p className="text-xs text-red-400 mb-2 px-1">{agentPickError}</p>
+        )}
+
+        {/* Pill */}
+        <div
+          className="rounded-2xl border bg-slate-800/80 overflow-hidden"
+          style={{ borderColor: 'rgba(100,116,139,0.4)' }}
+        >
+          {/* Fila 1: textarea */}
+          <textarea
+            rows={1}
             value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
+            onChange={(e) => {
+              setInputText(e.target.value);
+              // auto-grow hasta ~5 líneas
+              e.target.style.height = 'auto';
+              e.target.style.height = `${Math.min(e.target.scrollHeight, 140)}px`;
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleAgentSend();
+              }
+            }}
             placeholder={
               queuePending.length >= 1
-                ? 'Espera — ya hay una en cola'
+                ? 'Espera — ya hay una en cola…'
                 : queueProcessing
-                  ? 'Adelanta otra pregunta (cola: 1 más)'
-                  : activePlaceholder
+                  ? 'Adelanta otra pregunta (máx 1 en cola)'
+                  : agentAttachment
+                    ? 'Añade una nota a tu foto (opcional)…'
+                    : activePlaceholder
             }
             disabled={state === STATE_RECORDING || queuePending.length >= 1}
             data-testid="agent-input"
-            className="flex-1 px-4 py-3 rounded-full bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-violet-500/50 disabled:opacity-50"
+            className="w-full bg-transparent resize-none px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none leading-snug disabled:opacity-50"
+            style={{ minHeight: '44px', maxHeight: '140px' }}
           />
 
-          <button
-            type="submit"
-            aria-label="Enviar"
-            disabled={
-              !inputText.trim() ||
-              state === STATE_RECORDING ||
-              queuePending.length >= 1
-            }
-            data-testid="agent-submit"
-            className="shrink-0 w-12 h-12 rounded-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
-          >
-            <Send size={18} className="text-white" />
-          </button>
-        </form>
+          {/* Fila 2: botones */}
+          <div className="flex items-center gap-1.5 px-2 pb-2">
+            {/* Micrófono */}
+            <button
+              type="button"
+              onClick={handleVoiceRecord}
+              disabled={queuePending.length >= 1}
+              aria-label={state === STATE_RECORDING ? 'Detener y enviar audio' : 'Grabar audio'}
+              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                state === STATE_RECORDING
+                  ? 'bg-red-600 text-white animate-pulse'
+                  : 'bg-slate-700 text-slate-300 hover:bg-violet-700/60 hover:text-violet-200'
+              }`}
+            >
+              {state === STATE_RECORDING
+                ? <Square size={15} strokeWidth={2.5} />
+                : <Mic size={17} strokeWidth={2} />}
+            </button>
 
+            {/* Cámara / foto (igual que AgentHero: sin `capture`, abre galería+cámara) */}
+            <button
+              type="button"
+              onClick={() => cameraInputAgentRef.current?.click()}
+              disabled={state === STATE_RECORDING || queuePending.length >= 1}
+              aria-label="Tomar o elegir foto"
+              className="w-10 h-10 rounded-full flex items-center justify-center bg-slate-700 text-slate-300 hover:bg-emerald-700/50 hover:text-emerald-200 transition-all disabled:opacity-40"
+            >
+              <Camera size={17} strokeWidth={2} />
+            </button>
+
+            <div className="flex-1" />
+
+            {/* Enviar — botón Colibrí 3D (misma lógica que AgentHero) */}
+            <button
+              type="button"
+              onClick={handleAgentSend}
+              disabled={
+                (!inputText.trim() && !agentAttachment) ||
+                state === STATE_RECORDING ||
+                queuePending.length >= 1
+              }
+              data-testid="agent-submit"
+              aria-label="Enviar al agente"
+              className="w-11 h-11 rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              style={{
+                background:
+                  (!inputText.trim() && !agentAttachment) || state === STATE_RECORDING || queuePending.length >= 1
+                    ? 'rgba(51,65,85,0.8)'
+                    : 'linear-gradient(135deg, #10b981 0%, #0891b2 100%)',
+                boxShadow:
+                  (!inputText.trim() && !agentAttachment) || state === STATE_RECORDING || queuePending.length >= 1
+                    ? 'none'
+                    : '0 0 16px rgba(16,185,129,0.45)',
+              }}
+            >
+              <ChagraAgentAvatarColibri3D
+                size={34}
+                state={state === STATE_THINKING ? 'thinking' : 'idle'}
+              />
+            </button>
+          </div>
+        </div>
+
+        {/* Input oculto de foto */}
+        <input
+          ref={cameraInputAgentRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          aria-hidden="true"
+          tabIndex={-1}
+          onChange={handleAgentPhotoPick}
+        />
         {state === STATE_RECORDING && (
           <p className="text-center text-xs text-red-400 mt-2 animate-pulse">
             Grabando... {Math.floor(durationMs / 1000)}s
