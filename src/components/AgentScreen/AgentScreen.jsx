@@ -2775,20 +2775,20 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         <button
           type="button"
           onClick={onBack}
-          className="p-2.5 rounded-full bg-slate-800 hover:bg-slate-700 active:scale-95 transition-all"
+          className="p-3 rounded-full bg-slate-800 hover:bg-slate-700 active:scale-95 transition-all min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
           aria-label="Volver"
         >
-          <ArrowLeft size={18} className="text-slate-300" />
+          <ArrowLeft size={20} className="text-slate-300" />
         </button>
         {/* Home */}
         <button
           type="button"
           onClick={() => window.dispatchEvent(new CustomEvent('chagra:nav', { detail: 'dashboard' }))}
-          className="p-2.5 rounded-full bg-slate-800 hover:bg-emerald-700/40 hover:text-emerald-200 active:scale-95 transition-all text-emerald-400"
+          className="p-3 rounded-full bg-slate-800 hover:bg-emerald-700/40 hover:text-emerald-200 active:bg-emerald-700/60 transition-all text-emerald-400 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
           aria-label="Volver al inicio"
           title="Inicio"
         >
-          <Home size={18} />
+          <Home size={20} />
         </button>
         {/* Avatar + título */}
         <ChagraAgentAvatarColibriPhoto

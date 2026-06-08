@@ -610,7 +610,8 @@ export default function AgentHero({ onNavigate }) {
                    sin data-theme) — la ocultamos en nature/minimalista. */
                 .agentport-bp { display: block; }
                 [data-theme] .agentport-bp { display: none; }
-                [data-theme="biopunk"] .agentport-bp { display: block; }
+                body:not([data-custom-bg]) [data-theme="biopunk"] .agentport-bp { display: block; }
+                :global(body[data-custom-bg]) .agentport-bp, body[data-custom-bg] .agentport-bp { display: none !important; }
 
                 /* base oscura con glow teal central + glow inferior (HYTA) */
                 .agentport-void {
