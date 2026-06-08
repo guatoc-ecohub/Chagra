@@ -1,0 +1,45 @@
+name: Bug Report
+description: Reporta un bug o problema técnico (para contribuidores externos)
+title: "[Bug] <descripción corta>"
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por reportar. Antes de crear, busca si ya existe un issue similar.
+        Si es un problema de seguridad, usa el canal privado (Security Advisories).
+
+  - type: textarea
+    id: descripcion
+    attributes:
+      label: Descripción del bug
+      description: Qué ocurre, qué debería ocurrir.
+      placeholder: "Ej. Al hacer clic en 'Guardar', la pantalla se queda cargando y nunca confirma."
+    validations:
+      required: true
+
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Pasos para reproducir
+      placeholder: |
+        1. Ir a '...'
+        2. Hacer clic en '...'
+        3. Ver error
+    validations:
+      required: true
+
+  - type: input
+    id: entorno
+    attributes:
+      label: Entorno
+      description: Navegador, dispositivo, versión de la app (visible en footer)
+      placeholder: "Ej. Chrome 125, Android 14, Pixel 7, Chagra v0.6.15"
+    validations:
+      required: true
+
+  - type: textarea
+    id: contexto
+    attributes:
+      label: Contexto adicional
+      description: Screenshots, video, console logs. Opcional.
