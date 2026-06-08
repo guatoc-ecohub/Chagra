@@ -152,13 +152,13 @@ export default function TopBar({ onNavigate, onLogout }) {
             {iconForTheme(theme)}
           </span>
           {/* Wordmark completo: visible también en móvil para no dejar el logo vacío. */}
-          <div className="flex min-w-0 max-w-[42vw] sm:max-w-none flex-col items-start">
+          <div className="flex flex-col items-start min-w-0 text-left ml-1">
             <span className="text-base font-bold leading-tight text-white">Chagra</span>
-            <span className="text-[10px] leading-tight text-emerald-300/90 font-semibold truncate max-w-full">
+            <span className="text-[10px] leading-tight text-emerald-300/90 font-semibold">
               su mano en el campo
             </span>
             {locationLabel && (
-              <span className="mt-0.5 max-w-full truncate rounded-full border border-emerald-400/20 bg-emerald-950/25 px-1.5 py-0.5 text-[10px] leading-tight text-emerald-200/95 font-medium">
+              <span className="mt-1 inline-block whitespace-normal break-words rounded-lg border border-emerald-400/20 bg-emerald-950/25 px-2 py-1 text-[10px] leading-snug text-emerald-200/95 font-medium max-w-[50vw]">
                 {locationLabel}
               </span>
             )}
