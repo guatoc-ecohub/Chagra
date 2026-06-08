@@ -121,7 +121,7 @@ describe('aiService — buildDiagnosisPrompt (helper)', () => {
     expect(prompt).toContain('<CONTEXTO_CIENTÍFICO>');
     expect(prompt).toContain('agroecológico');
     expect(prompt).toMatch(/cit.*fuente/i);
-    expect(prompt).toContain('{"score": 0-100');
+    expect(prompt).toContain('{"isPlant": true/false, "score": 0-100');
   });
 });
 

@@ -39,7 +39,7 @@ const VISION_SPECIES_FALLBACK_2_MODEL = 'qwen2.5vl:7b';
 
 // Prompt base sin contexto RAG. Fallback usado cuando el corpus no cargó
 // o el retrieve no devolvió passages relevantes.
-const DIAGNOSIS_BASE_PROMPT = 'detect disease, nutrient deficiency, and overall plant health. Output JSON: {"score": 0-100, "issues": [], "treatment": ""}';
+const DIAGNOSIS_BASE_PROMPT = 'First, decide if this image contains a living plant. Output JSON: {"isPlant": true/false, "score": 0-100, "issues": [], "treatment": ""}. If isPlant is false, set score to 0, issues to [], and treatment to "".';
 
 // Query genérica para fallback cuando no conocemos la especie. Apunta a
 // passages del corpus que hablen de manejo agroecológico colombiano —
@@ -104,7 +104,7 @@ const buildDiagnosisPrompt = (ragContext) => {
     'arriba + lo que observas en la imagen para diagnosticar. Cita la fuente ' +
     'numérica (ej. "Fuente 1") cuando aplique. Si el contexto no aplica a lo ' +
     'que ves, ignóralo y diagnostica solo por la imagen. ' +
-    'Output JSON: {"score": 0-100, "issues": [], "treatment": ""}'
+    'Output JSON: {"isPlant": true/false, "score": 0-100, "issues": [], "treatment": ""}. If isPlant is false, set score to 0, issues to [], and treatment to "".'
   );
 };
 
@@ -226,6 +226,12 @@ const analyzeFoliageUncached = async (imageBlob, { onToken, signal, speciesSlug,
     if (!Array.isArray(parsed.issues)) parsed.issues = [];
     // Normalizar: PaliGemma usa "treatment", legacy usa "treatment_suggestion"
     parsed.treatment_suggestion = parsed.treatment_suggestion || parsed.treatment || '';
+
+    // Bug P0 (2026-06-08): para imágenes sin planta (toy, paisaje, etc.) el
+    // modelo alucina un diagnóstico completo. Si isPlant es false, devolvemos
+    // null para que el caller use el fallback "guíame por descripción".
+    // Legacy cache (isPlant undefined) se asume plant para no romper.
+    if (parsed.isPlant === false) return null;
 
     return parsed;
   } catch (err) {

@@ -55,13 +55,13 @@ export function buildVisionPrompt(finding, caption = '') {
     const treat = finding.treatment_suggestion
       ? ` Sugerencia preliminar: ${finding.treatment_suggestion}.`
       : '';
-    return `Analicé una foto de mi planta. Hallazgos del diagnóstico visual: ${issues} (estado ${
+    return `Analicé una foto que enviaste. Hallazgos del diagnóstico visual: ${issues} (estado ${
       finding.score ?? 'n/d'
     }/100).${treat} ${cap || '¿Qué me recomiendas hacer?'}`.trim();
   }
   return cap
-    ? `Te envié una foto de mi planta. ${cap}`
-    : 'Te envié una foto de mi planta para que me ayudes a identificar qué tiene. No pude obtener un diagnóstico visual automático; guíame por descripción.';
+    ? `Te envié una foto. ${cap}`
+    : 'Te envié una foto para que me ayudes a identificar qué tiene. No pude obtener un diagnóstico visual automático; guíame por descripción.';
 }
 
 /**
