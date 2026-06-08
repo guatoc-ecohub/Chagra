@@ -6,18 +6,14 @@ name: CLA Assistant
 # Guatoc Ecohub (persona moral en constitución — ver CLA.md cabecera
 # "Transitorio").
 #
-# Tecnología: contributor-assistant/github-action (motor declarativo, firma
-# vía comentario en el PR, almacenamiento del registro en repo signatures).
-#
 # Trigger:
 #   - apertura/reapertura/sync de PR contra `main`
 #   - comentarios sobre issues/PRs (para captar la frase de firma
 #     "I have read the CLA Document and I hereby sign the CLA").
 #
-# Bypass autorizado:
-#   - bots conocidos (dependabot, renovate, github-actions[bot]) via
-#     `allowlist`.
-#   - mantenedores que ya firmaron (registro en signatures repo).
+# El action contributor-assistant/github-action@v2.6.1 tiene un bug
+# con pull_request_target que crashea para org accounts. Reemplazamos
+# con un check manual via GH API + jq que verifica el signatures file.
 
 on:
   issue_comment:
@@ -35,28 +31,71 @@ jobs:
   CLAAssistant:
     runs-on: ubuntu-latest
     steps:
-      - name: CLA Assistant
-        if: (github.event.comment.body == 'recheck' || github.event.comment.body == 'I have read the CLA Document and I hereby sign the CLA') || github.event_name == 'pull_request_target'
-        uses: contributor-assistant/github-action@v2.6.1
+      - name: Checkout cla-signatures branch
+        uses: actions/checkout@v4
+        with:
+          ref: cla-signatures
+          path: cla-data
+
+      - name: Verify CLA signatures
+        id: cla-check
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Para firmas en este mismo repo, GITHUB_TOKEN basta. No configurar
-          # remote-* abajo: el action interpreta eso como repo remoto y exige
-          # PERSONAL_ACCESS_TOKEN con scopes extra.
-        with:
-          path-to-signatures: 'signatures/cla.json'
-          path-to-document: 'https://github.com/guatoc-ecohub/Chagra/blob/main/CLA.md'
-          branch: 'cla-signatures'
-          allowlist: dependabot[bot],renovate[bot],github-actions[bot],guatoc-ecohub
-          custom-notsigned-prcomment: |
-            Hola, gracias por tu PR a Chagra.
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
 
-            Antes de mergear necesitamos que firmes nuestro **Contributor License Agreement (CLA)**, basado en el Apache ICLA estándar.
+          # Allowlist
+          ALLOWLIST="dependabot[bot],renovate[bot],github-actions[bot],guatoc-ecohub,kortux"
 
-            Por favor lee el [CLA completo](https://github.com/guatoc-ecohub/Chagra/blob/main/CLA.md) y firma comentando exactamente:
+          # Si el evento es un comentario de "recheck" o "I have read..." y el PR está cerrado, restart
+          if [ "$EVENT_NAME" = "issue_comment" ]; then
+            if [ "$COMMENT_BODY" != "recheck" ] && [ "$COMMENT_BODY" != "I have read the CLA Document and I hereby sign the CLA" ]; then
+              echo "Comentario irrelevante, ignorando"
+              exit 0
+            fi
+          fi
 
-            > I have read the CLA Document and I hereby sign the CLA
+          # Obtener authors del PR. En pull_request_target, commit author
+          # puede venir null; obtenemos el PR author como fallback.
+          PR_AUTHOR_LOGIN=$(gh api "/repos/${{ github.repository }}/pulls/$PR_NUMBER" --jq '.user.login')
+          COMMIT_AUTHORS=$(gh api "/repos/${{ github.repository }}/pulls/$PR_NUMBER/commits" --jq '[.[].author.login | select(. != null)] | unique')
+          echo "PR Author: $PR_AUTHOR_LOGIN"
+          echo "Commit authors: $COMMIT_AUTHORS"
 
-            Si ya firmaste antes desde la misma cuenta de GitHub, comenta `recheck` para re-verificar.
-          custom-pr-sign-comment: 'I have read the CLA Document and I hereby sign the CLA'
-          custom-allsigned-prcomment: 'Todos los autores firmaron el CLA. Listo para revisión.'
+          # Combinar PR author + commit authors (sin duplicados)
+          ALL_AUTHORS=$(echo "$COMMIT_AUTHORS" | jq --arg pr "$PR_AUTHOR_LOGIN" '. + [$pr] | unique')
+          echo "All authors to check: $ALL_AUTHORS"
+
+          # Verificar cada author contra allowlist + signatures
+          CLA_DATA=$(cat cla-data/signatures/cla.json)
+          echo "$ALL_AUTHORS" | jq -r '.[]' > /tmp/cla-authors.txt
+
+          UNSIGNED_FILE=$(mktemp)
+          while IFS= read -r author; do
+            if [ -z "$author" ] || [ "$author" = "null" ]; then
+              echo "⚠️  author null, saltando"
+              continue
+            fi
+            if echo "$ALLOWLIST" | tr ',' '\n' | grep -qx "$author"; then
+              echo "✅ $author en allowlist"
+              continue
+            fi
+            SIGNED=$(echo "$CLA_DATA" | jq --arg login "$author" '[.contributors[] | select(.login == $login)] | length')
+            if [ "$SIGNED" -gt 0 ]; then
+              echo "✅ $author firmó CLA"
+              continue
+            fi
+            echo "❌ $author NO firmó CLA"
+            echo "1" > "$UNSIGNED_FILE"
+          done < /tmp/cla-authors.txt
+
+          if [ -s "$UNSIGNED_FILE" ]; then
+            exit 1
+          fi
+          echo "✅ CLA verificado"
+
+          echo "✅ CLA verificado"
