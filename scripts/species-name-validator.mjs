@@ -224,6 +224,7 @@ function processSpeciesBatch(species, catalog = null) {
  */
 function generateCypherPatches(results) {
   const patches = [];
+  const cypherString = (value) => String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 
   for (const result of results) {
     if (!result.normalized || result.issues.length > 0) {
@@ -235,8 +236,8 @@ function generateCypherPatches(results) {
     }
 
     // Patch: MATCH (s:Species {id: '...'}) SET s.nombre_cientifico = '...'
-    const escapedOriginal = result.original.replace(/'/g, "\\'");
-    const escapedNormalized = result.normalized.replace(/'/g, "\\'");
+    const escapedOriginal = cypherString(result.original);
+    const escapedNormalized = cypherString(result.normalized);
 
     patches.push(`MATCH (s:Species {elementId: ${result.id}})`);
     patches.push(`SET s.nombre_cientifico = '${escapedNormalized}'`);

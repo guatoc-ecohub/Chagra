@@ -24,6 +24,15 @@ function argVal(flag, def) {
 const JSONL_FILE = argVal('--jsonl', '');
 const FIXTURE_FILE = argVal('--fixture', '');
 
+function readJsonFileIfPresent(path, fallback = {}) {
+  try {
+    return JSON.parse(readFileSync(path, 'utf-8'));
+  } catch (err) {
+    if (err && err.code === 'ENOENT') return fallback;
+    throw err;
+  }
+}
+
 function fail(msg) {
   console.error(`FATAL: ${msg}`);
   process.exit(1);
@@ -128,10 +137,10 @@ async function main() {
       axes: r.axes,
       red_flags_hit: r.ah_red_flags_hit,
       must: `${r.ah_must_covered}/${r.ah_must_total}`,
-    }));
+  }));
 
   const summaryPath = JSONL_FILE.replace(/\.jsonl$/, '.summary.json');
-  const prev = existsSync(summaryPath) ? JSON.parse(readFileSync(summaryPath, 'utf-8')) : {};
+  const prev = readJsonFileIfPresent(summaryPath, {});
 
   const summary = {
     ...prev,
