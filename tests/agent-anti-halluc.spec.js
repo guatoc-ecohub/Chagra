@@ -352,7 +352,7 @@ test.describe('AgentScreen — pipeline anti-halluc + queue UX (task #171)', () 
     await submit.click();
     await expect(input).toHaveAttribute(
       'placeholder',
-      'Espera — ya hay una en cola',
+      'Espera — ya hay una en cola…',
       { timeout: 5_000 }
     );
   });
