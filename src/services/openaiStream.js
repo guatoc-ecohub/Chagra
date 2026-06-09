@@ -72,15 +72,35 @@ const extractDeltaContent = (parsed) => {
   if (!parsed || !Array.isArray(parsed.choices)) return '';
   const choice = parsed.choices[0];
   if (!choice) return '';
-  // streaming: delta.content (token incremental)
   if (choice.delta && typeof choice.delta.content === 'string') {
     return choice.delta.content;
   }
-  // non-stream fallback: message.content (respuesta completa de una)
   if (choice.message && typeof choice.message.content === 'string') {
     return choice.message.content;
   }
   return '';
+};
+
+const extractDeltaToolCalls = (parsed) => {
+  if (!parsed || !Array.isArray(parsed.choices)) return null;
+  const choice = parsed.choices[0];
+  if (!choice || !choice.delta || !Array.isArray(choice.delta.tool_calls)) return null;
+  return choice.delta.tool_calls;
+};
+
+const mergeToolCallDeltas = (acc, deltas) => {
+  for (const tc of deltas) {
+    const idx = tc.index;
+    if (!acc[idx]) {
+      acc[idx] = { index: idx, id: tc.id || null, function: { name: null, arguments: '' } };
+    }
+    if (tc.id) acc[idx].id = tc.id;
+    if (tc.function) {
+      if (tc.function.name) acc[idx].function.name = tc.function.name;
+      if (tc.function.arguments) acc[idx].function.arguments += tc.function.arguments;
+    }
+  }
+  return acc;
 };
 
 const isDoneChunk = (parsed) =>
@@ -98,7 +118,8 @@ const isDoneChunk = (parsed) =>
  * @param {AbortSignal} [options.signal] señal de aborto.
  * @param {Function}    [options.onDone] callback con el último chunk parseado
  *        (incluye `usage` y `finish_reason` si el backend lo emite).
- * @returns {Promise<string>} texto completo concatenado.
+ * @returns {Promise<{fullText: string, toolCalls: Array|null}>}
+ *     Objeto con el texto completo y las tool_calls acumuladas (null si no hubo).
  * @throws {Error} si fetch falla, no-2xx, o body no streameable.
  */
 export async function streamOpenAI(url, body, onToken, { signal, onDone } = {}) {
@@ -162,6 +183,7 @@ export async function streamOpenAI(url, body, onToken, { signal, onDone } = {}) 
   let fullText = '';
   let lastParsed = null;
   let done = false;
+  const accumulatedToolCalls = [];
 
   try {
     while (!done) {
@@ -169,9 +191,6 @@ export async function streamOpenAI(url, body, onToken, { signal, onDone } = {}) 
       if (streamDone) break;
       buffer += decoder.decode(value, { stream: true });
 
-      // SSE separa eventos por doble newline. Cada evento puede tener
-      // múltiples líneas pero para chat completions siempre es una sola
-      // línea `data: {...}`.
       let sep;
       while ((sep = buffer.indexOf('\n\n')) !== -1) {
         const eventBlock = buffer.slice(0, sep);
@@ -192,9 +211,11 @@ export async function streamOpenAI(url, body, onToken, { signal, onDone } = {}) 
             fullText += chunk;
             if (onToken) onToken(chunk, fullText);
           }
+          const tc = extractDeltaToolCalls(parsed);
+          if (tc) {
+            mergeToolCallDeltas(accumulatedToolCalls, tc);
+          }
           if (isDoneChunk(parsed)) {
-            // Algunos backends emiten finish_reason ANTES del [DONE]
-            // literal; usage/eval_count viene en este último chunk.
           }
         }
         if (done) break;
@@ -218,12 +239,10 @@ export async function streamOpenAI(url, body, onToken, { signal, onDone } = {}) 
     try { onDone(lastParsed); } catch (_) { /* noop */ }
   }
 
-  // Telemetría privacy-safe.
   const total_ms = Date.now() - t0;
   const usage = lastParsed?.usage || null;
   const eval_count = usage?.completion_tokens ?? null;
   const prompt_eval_count = usage?.prompt_tokens ?? null;
-  // OpenAI-compatible no expone eval_duration. Estimación tokens/s sobre wall-clock.
   const eval_rate = (eval_count && total_ms)
     ? Math.round((eval_count / (total_ms / 1000)) * 100) / 100
     : null;
@@ -242,7 +261,19 @@ export async function streamOpenAI(url, body, onToken, { signal, onDone } = {}) 
     });
   });
 
-  return fullText;
+  let toolCalls = null;
+  if (accumulatedToolCalls.length > 0) {
+    toolCalls = accumulatedToolCalls.map((tc) => {
+      try {
+        tc.function.arguments = JSON.parse(tc.function.arguments);
+      } catch {
+        tc.function.arguments = null;
+      }
+      return tc;
+    });
+  }
+
+  return { fullText, toolCalls };
 }
 
 export default streamOpenAI;
