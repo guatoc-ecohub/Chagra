@@ -14,6 +14,7 @@
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
     "audit:bundle": "node scripts/audit-bundle.mjs",
+    "grafo:snapshot": "node scripts/snapshot-grafo-crecimiento.mjs",
     "hooks:install": "lefthook install",
     "tsc:check": "tsc --noEmit -p jsconfig.json"
   },
