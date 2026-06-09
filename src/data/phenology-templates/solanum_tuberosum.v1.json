@@ -1,0 +1,76 @@
+{
+  "template_id": "solanum_tuberosum.v1",
+  "species_slug": "solanum_tuberosum",
+  "species_label": "Papa común (Solanum tuberosum)",
+  "version": 1,
+  "sources": [
+    {
+      "name": "CORPOICA — Fenología de la papa en Colombia",
+      "reference": "Corpoica (2012). Manual de producción de papa para Colombia",
+      "url": "https://repository.agrosavia.co/handle/20.500.12324/12745"
+    },
+    {
+      "name": "ICA — Criterios para el manejo integrado del cultivo de papa",
+      "reference": "ICA, Boletín técnico 2018",
+      "url": "https://www.ica.gov.co/"
+    }
+  ],
+  "stages": [
+    {
+      "code": "sowing",
+      "label": "Siembra",
+      "description": "Siembra de tubérculo-semilla en surco o lomo",
+      "minDays": 0,
+      "maxDays": 0,
+      "sourceIndex": 0
+    },
+    {
+      "code": "emergence",
+      "label": "Emergencia",
+      "description": "Aparición de brotes sobre la superficie del suelo",
+      "minDays": 15,
+      "maxDays": 30,
+      "sourceIndex": 0
+    },
+    {
+      "code": "vegetative",
+      "label": "Crecimiento vegetativo",
+      "description": "Desarrollo de tallos, hojas y sistema radicular. Inicio de estolonización",
+      "minDays": 31,
+      "maxDays": 60,
+      "sourceIndex": 0
+    },
+    {
+      "code": "flowering",
+      "label": "Floración e inicio de tuberización",
+      "description": "Aparición de flores y comienzo de formación de tubérculos",
+      "minDays": 55,
+      "maxDays": 75,
+      "sourceIndex": 0
+    },
+    {
+      "code": "fruiting",
+      "label": "Llenado de tubérculo",
+      "description": "Acumulación de almidón y crecimiento del tubérculo",
+      "minDays": 76,
+      "maxDays": 110,
+      "sourceIndex": 0
+    },
+    {
+      "code": "harvest_window",
+      "label": "Senescencia y cosecha",
+      "description": "Amarillamiento del follaje, piel del tubérculo firme. Cosecha entre 100-130 días según altitud",
+      "minDays": 100,
+      "maxDays": 130,
+      "sourceIndex": 1
+    },
+    {
+      "code": "closed",
+      "label": "Ciclo cerrado",
+      "description": "Post-cosecha, rotación o descanso del lote",
+      "minDays": 131,
+      "maxDays": null,
+      "sourceIndex": 0
+    }
+  ]
+}

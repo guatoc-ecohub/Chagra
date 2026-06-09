@@ -1,0 +1,68 @@
+{
+  "template_id": "solanum_lycopersicum.v1",
+  "species_slug": "solanum_lycopersicum",
+  "species_label": "Tomate (Solanum lycopersicum)",
+  "version": 1,
+  "sources": [
+    {
+      "name": "Agrosavia — Manual de producción de tomate bajo condiciones controladas",
+      "reference": "Agrosavia (2020). Manual técnico para el cultivo de tomate",
+      "url": "https://repository.agrosavia.co/handle/20.500.12324/36763"
+    },
+    {
+      "name": "FAO — Tomato crop management",
+      "reference": "FAO, Good Agricultural Practices for tomato, 2019",
+      "url": "https://www.fao.org/"
+    }
+  ],
+  "stages": [
+    {
+      "code": "sowing",
+      "label": "Siembra / Trasplante",
+      "description": "Trasplante de plántula de almácigo a sitio definitivo (30-35 días post-germinación)",
+      "minDays": 0,
+      "maxDays": 0,
+      "sourceIndex": 0
+    },
+    {
+      "code": "vegetative",
+      "label": "Crecimiento vegetativo",
+      "description": "Desarrollo de tallo principal, hojas verdaderas y sistema radicular. Tutorado temprano",
+      "minDays": 1,
+      "maxDays": 25,
+      "sourceIndex": 0
+    },
+    {
+      "code": "flowering",
+      "label": "Floración",
+      "description": "Aparición de primeros racimos florales (entre 25-45 días post-trasplante según variedad)",
+      "minDays": 25,
+      "maxDays": 45,
+      "sourceIndex": 0
+    },
+    {
+      "code": "fruiting",
+      "label": "Cuajado y llenado de fruto",
+      "description": "Polinización, cuajado y desarrollo del fruto hasta madurez fisiológica",
+      "minDays": 45,
+      "maxDays": 80,
+      "sourceIndex": 0
+    },
+    {
+      "code": "harvest_window",
+      "label": "Cosecha",
+      "description": "Maduración comercial del fruto. Cosecha continua por 4-8 semanas según manejo",
+      "minDays": 75,
+      "maxDays": 120,
+      "sourceIndex": 0
+    },
+    {
+      "code": "closed",
+      "label": "Ciclo cerrado",
+      "description": "Fin de cosecha, erradicación del cultivo y preparación del lote para rotación",
+      "minDays": 121,
+      "maxDays": null,
+      "sourceIndex": 0
+    }
+  ]
+}

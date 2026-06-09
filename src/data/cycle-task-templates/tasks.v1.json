@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "stage_tasks": {
+    "sowing": [
+      {"task": "Preparar el suelo", "description": "Adecuar el terreno, eliminar arvenses y nivelar", "priority": "alta"},
+      {"task": "Trazar surcos o hoyos", "description": "Definir distancia de siembra según la especie", "priority": "alta"},
+      {"task": "Aplicar enmienda orgánica", "description": "Incorporar compost o bocashi antes de sembrar", "priority": "media"}
+    ],
+    "emergence": [
+      {"task": "Monitorear emergencia", "description": "Revisar aparición de plántulas diariamente", "priority": "alta"},
+      {"task": "Riego ligero", "description": "Mantener humedad superficial sin encharcar", "priority": "alta"},
+      {"task": "Control de aves y hormigas", "description": "Proteger semillas y plántulas emergentes", "priority": "media"}
+    ],
+    "vegetative": [
+      {"task": "Riego", "description": "Mantener programa de riego según necesidad del cultivo", "priority": "alta"},
+      {"task": "Fertilización nitrogenada", "description": "Aplicar abono rico en N para fomentar follaje", "priority": "alta"},
+      {"task": "Control de arvenses", "description": "Deshierbe manual o mulching entre calles", "priority": "media"},
+      {"task": "Monitoreo de plagas", "description": "Inspeccionar hojas y tallos en busca de signos tempranos", "priority": "media"}
+    ],
+    "flowering": [
+      {"task": "Monitoreo de floración", "description": "Revisar apertura de flores y presencia de polinizadores", "priority": "alta"},
+      {"task": "Fertilización rica en K y P", "description": "Aplicar fósforo y potasio para inducir floración", "priority": "alta"},
+      {"task": "Riego moderado", "description": "Evitar estrés hídrico durante antesis", "priority": "alta"},
+      {"task": "Control de hongos preventivo", "description": "Aplicar caldo bordelés o microorganismos benéficos", "priority": "media"}
+    ],
+    "fruiting": [
+      {"task": "Monitorear desarrollo de fruto", "description": "Revisar tamaño, color y presencia de deformaciones", "priority": "alta"},
+      {"task": "Fertilización de llenado", "description": "Aplicar potasio y calcio para calidad del fruto", "priority": "alta"},
+      {"task": "Riego constante", "description": "No dejar secar — el estrés hídrico afecta llenado", "priority": "alta"},
+      {"task": "Tutorado o soporte", "description": "Asegurar ramas cargadas de fruto", "priority": "media"}
+    ],
+    "harvest_window": [
+      {"task": "Cosechar frutos maduros", "description": "Recoger en hora fresca, seleccionar por madurez", "priority": "alta"},
+      {"task": "Clasificar producto", "description": "Separar por calidad, tamaño y sanidad", "priority": "alta"},
+      {"task": "Llevar registro de cosecha", "description": "Anotar kilos, calidad y destino", "priority": "media"},
+      {"task": "Podar ramas gastadas", "description": "Eliminar ramas que ya produjeron (cultivos perennes)", "priority": "baja"}
+    ],
+    "closed": [
+      {"task": "Evaluar ciclo", "description": "Hacer balance de producción e incidencias", "priority": "media"},
+      {"task": "Incorporar residuos al suelo", "description": "Picar y enterrar rastrojos para abonar", "priority": "alta"},
+      {"task": "Planificar rotación", "description": "Decidir próximo cultivo y preparar terreno", "priority": "media"}
+    ]
+  }
+}

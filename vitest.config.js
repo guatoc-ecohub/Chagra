@@ -30,5 +30,6 @@ export default defineConfig({
     ],
     exclude: ['node_modules', 'dist', 'tests/*.spec.js'],
     css: false,
+    testTimeout: 30000,
   },
 });

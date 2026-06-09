@@ -559,10 +559,17 @@ export default function AgentScreen({ onBack, initialContext }) {
       acc[base] = (acc[base] || 0) + 1;
       return acc;
     }, {});
-    const plantNames = Object.entries(groupedCounts)
+    const MAX_SPECIES_CONTEXT = 50;
+    const plantNamesSlice = Object.entries(groupedCounts)
       .sort((a, b) => b[1] - a[1])
+      .slice(0, MAX_SPECIES_CONTEXT);
+    const totalSpecies = Object.keys(groupedCounts).length;
+    const plantNames = plantNamesSlice
       .map(([name, n]) => (n > 1 ? `${name} ×${n}` : name))
-      .join(', ') || 'ninguna';
+      .join(', ');
+    const plantContext = totalSpecies > MAX_SPECIES_CONTEXT
+      ? `${plantNames} y ${totalSpecies - MAX_SPECIES_CONTEXT} especies más`
+      : (plantNames || 'ninguna');
     // 062.6: inyectar contexto finca activa (slug, nombre, biocultural_zone, altitud)
     // + indoor override si aplica. El LLM responde con criterio agronómico ajustado
     // a la zona ecológica donde el operador está físicamente.
@@ -582,7 +589,7 @@ export default function AgentScreen({ onBack, initialContext }) {
     // agresivo con respuesta literal exigida + ejemplo + bajar temperature
     // a 0.3. Bench 2026-05-17 con esta versión devolvió la respuesta
     // EXACTA esperada (no reconozco el término) en 27 tokens / 8s.
-    return `Eres Chagra IA, un asistente agroecológico colombiano. ${fincaContext}${indoorContext}El usuario tiene estas plantas agrupadas por especie con su conteo: ${plantNames}.
+    return `Eres Chagra IA, un asistente agroecológico colombiano. ${fincaContext}${indoorContext}El usuario tiene estas plantas agrupadas por especie con su conteo: ${plantContext}.
 
 REGLA DE FORMATO: cuando hables de las plantas del usuario, agrupa por especie y di cuántas tiene (ej. "tienes 15 fresas, 4 caléndulas, 1 tomate cherry"). NUNCA listes los números individuales de cada planta (#01, #02, etc.) — son identificadores internos, no info útil para el operador. Habla como agrónomo experimentado, no como sistema.
 

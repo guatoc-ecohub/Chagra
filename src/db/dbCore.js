@@ -38,7 +38,7 @@
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 17;
+export const DB_VERSION = 18;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -58,6 +58,8 @@ export const STORES = {
   RAG_TELEMETRY: 'rag_telemetry',
   FAILED_TX: 'failed_transactions',
   VISION_QUEUE: 'vision_queue',
+  FARM_PROCESSES: 'farm_processes', // v18: ADR-047 agregado de ciclo de cultivo
+  FARM_PROCESS_EVENTS: 'farm_process_events', // v18: eventos del ciclo de cultivo
   // v17 (compositor multimodal del home): outbox DURABLE de consultas al
   // agente disparadas desde el dashboard. El item (texto / blob de audio /
   // foto / adjunto + metadata) se persiste ANTES de navegar al AgentScreen,
@@ -277,6 +279,26 @@ export const openDB = async () => {
           store.createIndex('status', 'status', { unique: false });
           store.createIndex('createdAt', 'createdAt', { unique: false });
           store.createIndex('kind', 'kind', { unique: false });
+        }
+      }
+
+      // v18: ADR-047 farm_process aggregate — ciclos de cultivo + eventos
+      if (event.oldVersion < 18) {
+        if (!db.objectStoreNames.contains(STORES.FARM_PROCESSES)) {
+          const fpStore = db.createObjectStore(STORES.FARM_PROCESSES, { keyPath: 'process_id' });
+          fpStore.createIndex('status', 'attributes.status', { unique: false });
+          fpStore.createIndex('process_type', 'attributes.process_type', { unique: false });
+          fpStore.createIndex('subject_kind', 'attributes.subject_kind', { unique: false });
+          fpStore.createIndex('location_land_asset_id', 'attributes.location_land_asset_id', { unique: false });
+          fpStore.createIndex('updated_at', 'attributes.updated_at', { unique: false });
+        }
+        if (!db.objectStoreNames.contains(STORES.FARM_PROCESS_EVENTS)) {
+          const fpeStore = db.createObjectStore(STORES.FARM_PROCESS_EVENTS, { keyPath: 'event_id' });
+          fpeStore.createIndex('process_id', 'process_id', { unique: false });
+          fpeStore.createIndex('event_type', 'event_type', { unique: false });
+          fpeStore.createIndex('occurred_at', 'occurred_at', { unique: false });
+          fpeStore.createIndex('idempotency_key', 'idempotency_key', { unique: false });
+          fpeStore.createIndex('asset_id', 'asset_id', { unique: false });
         }
       }
     };

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "templates": [
+    {
+      "template_id": "coffea_arabica.v1",
+      "species_slug": "coffea_arabica",
+      "species_label": "Café arábica",
+      "version": 1
+    },
+    {
+      "template_id": "solanum_tuberosum.v1",
+      "species_slug": "solanum_tuberosum",
+      "species_label": "Papa común",
+      "version": 1
+    },
+    {
+      "template_id": "solanum_lycopersicum.v1",
+      "species_slug": "solanum_lycopersicum",
+      "species_label": "Tomate",
+      "version": 1
+    }
+  ]
+}
