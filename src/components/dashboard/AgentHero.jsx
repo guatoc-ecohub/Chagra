@@ -7,6 +7,7 @@ import useAgentOutboxStore from '../../store/useAgentOutboxStore';
 import useAssetStore from '../../store/useAssetStore';
 import useAlertStore from '../../store/useAlertStore';
 import { agentSounds } from '../../services/agentSoundService';
+import { CAPABILITY_MANIFEST } from '../../services/agentCapabilities';
 import { AGENT_HERO_CHIPS } from '../../data/exampleQuestions';
 import { useTheme } from '../../hooks/useTheme';
 import {
@@ -144,75 +145,19 @@ const QUICK_CHIPS = AGENT_HERO_CHIPS;
 /**
  * CAPACIDADES de Chagra para el menú Ⓐ (bottom-sheet .sheet del demo).
  *
- * Son las capacidades REALES de la app — derivadas de los chips del home
- * (AGENT_HERO_CHIPS), de lo que el agente SÍ sabe hacer (HelpAgentSection) y de
- * las tools del catálogo. Cada una declara su `route`:
- *   - kind 'ask'   → envía un prompt por la outbox real → AgentScreen (mismo
- *                    camino que escribir/enviar). Es lo que el demo simula.
- *   - kind 'nav'   → navega a una pantalla dedicada existente (voz, activos…).
- *   - kind 'photo' → abre el selector de foto del compositor (visión del agente).
- *
- * El operador pidió incluir explícitamente "agregar planta por voz o foto".
- * `tool` es la etiqueta técnica (visible en modo experto), igual que el demo.
+ * CAPABILITIES derivadas del manifiesto único (agentCapabilities.js).
+ * NO editar labels, tools o rutas acá — hacerlo en el manifiesto.
  */
-const CAPABILITIES = [
-    {
-        id: 'siembra', icon: '🌱',
-        title: '¿Qué siembro?',
-        desc: 'Qué sembrar según tu clima y tu altura.',
-        tool: 'get_species',
-        route: { kind: 'ask', prompt: '¿Qué puedo sembrar este mes en mi zona?' },
-    },
-    {
-        id: 'plaga', icon: '🐛',
-        title: 'Plaga',
-        desc: 'Controlar una plaga sin veneno.',
-        tool: 'get_pest_controllers',
-        route: { kind: 'ask', prompt: '¿Cómo controlo plagas sin químicos?' },
-    },
-    {
-        id: 'bio', icon: '🧪',
-        title: 'Biopreparado',
-        desc: 'Receta casera para fortalecer tu cultivo.',
-        tool: 'get_biopreparados',
-        route: { kind: 'ask', prompt: '¿Cómo hago un biopreparado para fortalecer mis matas?' },
-    },
-    {
-        id: 'foto', icon: '📷',
-        title: 'Agregar planta por foto',
-        desc: 'Tómale una foto y la identifico y registro.',
-        tool: 'vision_identify',
-        route: { kind: 'photo' },
-    },
-    {
-        id: 'voz', icon: '🎤',
-        title: 'Agregar planta por voz',
-        desc: 'Dime qué sembraste y lo registro en tu finca.',
-        tool: 'voice_capture',
-        route: { kind: 'nav', view: 'voz' },
-    },
-    {
-        id: 'clima', icon: '🌦️',
-        title: 'Clima',
-        desc: 'El clima de tu finca esta semana.',
-        tool: 'get_clima',
-        route: { kind: 'ask', prompt: 'Dame el reporte del clima de mi zona esta semana.' },
-    },
-    {
-        id: 'cal', icon: '📅',
-        title: 'Calendario',
-        desc: 'Cuándo sembrar y cuándo cosechar.',
-        tool: 'get_calendario',
-        route: { kind: 'ask', prompt: '¿Cuándo siembro y cuándo cosecho en mi zona?' },
-    },
-    {
-        id: 'plantas', icon: '🌿',
-        title: 'Mis plantas',
-        desc: 'Ver y manejar lo que tienes en la finca.',
-        tool: 'assets',
-        route: { kind: 'nav', view: 'activos' },
-    },
-];
+const CAPABILITIES = CAPABILITY_MANIFEST
+    .filter((e) => e.hero)
+    .map((e) => ({
+        id: e.id,
+        icon: e.icon,
+        title: e.label,
+        desc: e.desc,
+        tool: e.tool,
+        route: e.heroRoute,
+    }));
 
 function prefersReducedMotion() {
     return typeof window !== 'undefined' && window.matchMedia
