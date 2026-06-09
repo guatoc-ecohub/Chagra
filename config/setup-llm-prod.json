@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "status": "pending_benchmark_and_human_review",
+  "updatedAt": "2026-06-08",
+  "objective": "Select the most stable local model for Chagra while maximizing useful intelligence and speed within current RAM and VRAM limits.",
+  "hardwareProfile": {
+    "gpu": "NVIDIA Quadro M6000",
+    "vramGiB": 12,
+    "systemRamGiB": 15,
+    "architectureConstraint": "Maxwell sm_52"
+  },
+  "runtimeStatus": {
+    "checkedAt": "2026-06-08",
+    "candidateModelsInstalled": false,
+    "activation": "Declared in guatoc-nixos/modules/ai/ollama.nix; requires deployment or completed pulls before benchmark."
+  },
+  "currentBaseline": {
+    "chatModel": "granite3.1-dense:8b",
+    "visionModel": "gemma3:4b",
+    "promotionStatus": "keep_until_candidate_passes_all_gates"
+  },
+  "candidates": [
+    {
+      "model": "gemma4:e4b",
+      "role": "multimodal_agent_candidate",
+      "registrySizeGiB": 9.6,
+      "risk": "Leaves little VRAM headroom; verify Maxwell compatibility, latency, and tool calling."
+    },
+    {
+      "model": "granite3.3:8b",
+      "role": "stable_text_agent_candidate",
+      "registrySizeGiB": 4.9,
+      "risk": "Text only; verify agricultural Spanish quality and grounding."
+    },
+    {
+      "model": "qwen3.5:9b",
+      "role": "multimodal_tool_use_candidate",
+      "registrySizeGiB": 11,
+      "risk": "Near VRAM ceiling; verify it does not spill enough to make agent latency unacceptable."
+    }
+  ],
+  "benchmark": {
+    "command": "BENCH_MODELS=gemma4_e4b,granite3_3_8b,qwen3_5_9b node scripts/bench-agente-completo.mjs",
+    "requiredRunsPerModel": 3,
+    "measure": [
+      "semantic_quality",
+      "grounded_answer_rate",
+      "tool_call_accuracy",
+      "hallucination_rate",
+      "time_to_first_token",
+      "tokens_per_second",
+      "peak_vram",
+      "peak_system_ram",
+      "oom_or_crash_rate"
+    ],
+    "promotionGates": {
+      "humanReviewRequired": true,
+      "allRunsComplete": true,
+      "toolCallAccuracyMinimum": 0.95,
+      "groundedAnswerRateMinimum": 0.95,
+      "hallucinationRegressionAllowed": false,
+      "oomOrCrashAllowed": false,
+      "latencyRegressionAllowedPercent": 20
+    }
+  },
+  "resourcePolicyToValidate": {
+    "principle": "Maximize resident model intelligence and context for Chagra, but avoid swap, OOM, model eviction, or enough CPU spill to damage response time.",
+    "knownContention": "The MCP NLU model currently keeps gemma3:4b resident for 24h; benchmark it together with each candidate before promotion.",
+    "utilizationTargets": {
+      "minimumPeakVramPercent": 85,
+      "minimumFreeSystemRamGiB": 2,
+      "swapDuringSteadyStateAllowed": false
+    },
+    "bench": {
+      "OLLAMA_MAX_LOADED_MODELS": 1,
+      "OLLAMA_NUM_PARALLEL": 1,
+      "OLLAMA_KEEP_ALIVE": "0"
+    },
+    "productionCandidate": {
+      "OLLAMA_MAX_LOADED_MODELS": 1,
+      "OLLAMA_NUM_PARALLEL": 2,
+      "OLLAMA_KEEP_ALIVE": "24h",
+      "OLLAMA_FLASH_ATTENTION": "true",
+      "OLLAMA_KV_CACHE_TYPE": "q8_0"
+    }
+  },
+  "selectedProductionSetup": null
+}

@@ -9,6 +9,8 @@ import {
   photoBubbleText,
   buildPhotoUserMessage,
   processPhotoItem,
+  isVisionDomainRejection,
+  VISION_OUT_OF_SCOPE_MESSAGE,
 } from '../agentOutboxPhoto';
 
 describe('agentOutboxPhoto.hasVisionFinding', () => {
@@ -30,6 +32,14 @@ describe('agentOutboxPhoto.hasVisionFinding', () => {
   it('objeto sin issues ni tratamiento → false', () => {
     expect(hasVisionFinding({ score: 80 })).toBe(false);
     expect(hasVisionFinding({ treatment_suggestion: '   ' })).toBe(false);
+  });
+});
+
+describe('agentOutboxPhoto.isVisionDomainRejection', () => {
+  it('reconoce únicamente el rechazo tipado fuera de dominio', () => {
+    expect(isVisionDomainRejection({ _visionRejected: true, reason: 'out_of_domain' })).toBe(true);
+    expect(isVisionDomainRejection({ _visionRejected: true, reason: 'model_error' })).toBe(false);
+    expect(isVisionDomainRejection(null)).toBe(false);
   });
 });
 
@@ -162,6 +172,22 @@ describe('agentOutboxPhoto.processPhotoItem (drain → visión + foto)', () => {
     expect(prompt).toContain('No pude obtener un diagnóstico visual automático');
     // Aun sin diagnóstico, la imagen llega al chat.
     expect(message.imageUrl).toBe('blob:still-here');
+  });
+
+  it('imagen fuera de dominio devuelve rechazo y no debe pasar al chat general', async () => {
+    const analyze = vi.fn(async () => ({
+      _visionRejected: true,
+      reason: 'out_of_domain',
+      domain: 'other',
+    }));
+    const result = await processPhotoItem(
+      { kind: 'photo', text: 'hola', blob },
+      { analyze, createUrl: () => 'blob:mapa' },
+    );
+
+    expect(result.rejectionMessage).toBe(VISION_OUT_OF_SCOPE_MESSAGE);
+    expect(result.rejectionMessage).toMatch(/planta|hoja|biopreparado/i);
+    expect(result.finding._visionRejected).toBe(true);
   });
 
   it('sin blob no llama a la visión y pide guía por descripción', async () => {

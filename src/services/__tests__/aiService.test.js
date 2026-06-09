@@ -121,7 +121,8 @@ describe('aiService — buildDiagnosisPrompt (helper)', () => {
     expect(prompt).toContain('<CONTEXTO_CIENTÍFICO>');
     expect(prompt).toContain('agroecológico');
     expect(prompt).toMatch(/cit.*fuente/i);
-    expect(prompt).toContain('{"isPlant": true/false, "score": 0-100');
+    expect(prompt).toContain('{"domain_relevant": true/false');
+    expect(prompt).toContain('"isPlant": true/false, "score": 0-100');
   });
 });
 
@@ -227,6 +228,41 @@ describe('aiService — analyzeFoliage integración RAG', () => {
 
     const result = await analyzeFoliage(makeBlob(), {});
     expect(result).toBeNull();
+  });
+
+  it('mapa fuera de dominio retorna rechazo tipado en vez de diagnóstico', async () => {
+    retrieveMock.mockResolvedValueOnce([]);
+    streamOllamaMock.mockResolvedValueOnce(JSON.stringify({
+      domain_relevant: false,
+      domain: 'other',
+      isPlant: false,
+      score: 0,
+      issues: [],
+      treatment: '',
+    }));
+
+    const result = await analyzeFoliage(makeBlob(), {});
+    expect(result).toEqual({
+      _visionRejected: true,
+      reason: 'out_of_domain',
+      domain: 'other',
+    });
+  });
+
+  it('biopreparado relevante no se rechaza aunque no sea una planta viva', async () => {
+    retrieveMock.mockResolvedValueOnce([]);
+    streamOllamaMock.mockResolvedValueOnce(JSON.stringify({
+      domain_relevant: true,
+      domain: 'biopreparation',
+      isPlant: false,
+      score: 0,
+      issues: [],
+      treatment: 'revisar color y fermentación',
+    }));
+
+    const result = await analyzeFoliage(makeBlob(), {});
+    expect(result._visionRejected).toBeUndefined();
+    expect(result.treatment_suggestion).toBe('revisar color y fermentación');
   });
 
   it('response con markdown fences → JSON.parse robusto', async () => {

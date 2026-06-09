@@ -6,7 +6,7 @@
  * Ollama inference → post-validate hallucination check.
  *
  * 50 prompts mix: species(20) + biopreparados(12) + plagas(10) + normativa(4) + agroforestería(4)
- * 7 modelos: gemma3:4b, granite3.1-dense:8b, ministral-3:latest, aya:8b, mistral-nemo:12b, ministral-3:14b, qwen3:30b
+ * Modelos baseline + candidatos opt-in mediante BENCH_MODELS.
  *
  * Output: data/bench-runs/agente-completo-YYYY-MM-DD.jsonl + summary.md
  * Luego invoca bench-llm-judge.mjs para evaluar calidad.
@@ -28,6 +28,8 @@
  *   node scripts/bench-agente-completo.mjs --judge                 # + LLM-judge (qwen2.5:14b)
  *   node scripts/bench-agente-completo.mjs --judge qwen2.5:14b     # juez explícito
  *   JUDGE_MODEL=qwen2.5:14b node scripts/... --judge               # equivalente por env
+ *   BENCH_MODELS=granite3_1_8b,gemma4_e4b node scripts/...         # A/B Gemma 4
+ *   BENCH_MODELS=gemma4_e4b,granite3_3_8b,qwen3_5_9b node scripts/... # candidatos prod
  */
 import { writeFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -81,12 +83,49 @@ const JUDGE_TIMEOUT_MS = 60_000;
 const MODELS = {
   gemma3_4b: 'gemma3:4b',
   granite3_1_8b: 'granite3.1-dense:8b',
+  granite3_3_8b: 'granite3.3:8b',
+  gemma4_e4b: 'gemma4:e4b',
+  gemma4_12b_qat: 'gemma4:12b-it-qat',
   ministral_3b: 'ministral-3:latest',
   aya_8b: 'aya:8b',
   mistral_nemo_12b: 'mistral-nemo:12b',
   ministral_14b: 'ministral-3:14b',
   qwen3_30b: 'qwen3:30b',
+  qwen3_5_9b: 'qwen3.5:9b',
 };
+
+const DEFAULT_MODEL_KEYS = [
+  'gemma3_4b',
+  'granite3_1_8b',
+  'ministral_3b',
+  'aya_8b',
+  'mistral_nemo_12b',
+  'ministral_14b',
+  'qwen3_30b',
+];
+
+function selectModelKeys(raw = process.env.BENCH_MODELS) {
+  if (!raw) return DEFAULT_MODEL_KEYS;
+  const keys = raw.split(',').map((key) => key.trim()).filter(Boolean);
+  const unknown = keys.filter((key) => !MODELS[key]);
+  if (unknown.length > 0) {
+    throw new Error(
+      `BENCH_MODELS contiene claves desconocidas: ${unknown.join(', ')}. ` +
+      `Disponibles: ${Object.keys(MODELS).join(', ')}`,
+    );
+  }
+  if (keys.length === 0) throw new Error('BENCH_MODELS no puede estar vacío');
+  return [...new Set(keys)];
+}
+
+const MODEL_KEYS = selectModelKeys();
+
+function inferenceOptionsFor(model) {
+  if (/(^|\/)gemma4(?::|-|$)/i.test(model)) {
+    return { temperature: 1.0, top_p: 0.95, top_k: 64, num_predict: 512 };
+  }
+  return { temperature: 0.7, num_predict: 512 };
+}
 
 const MAXWELL_ERROR_PATTERNS = [
   'sm_5.2',
@@ -492,10 +531,8 @@ async function callOllama(model, systemPrompt, userPrompt, signal) {
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
         ],
-        options: {
-          temperature: 0.7,
-          num_predict: 512,
-        },
+        options: inferenceOptionsFor(model),
+        ...(model.startsWith('gemma4:') ? { think: false } : {}),
         keep_alive: '30m',
       }),
       signal,
@@ -740,8 +777,7 @@ async function benchmarkPrompt(promptData, index, total) {
     timestamp: new Date().toISOString(),
   };
 
-  // Benchmark all 7 models
-  const modelKeys = ['gemma3_4b', 'granite3_1_8b', 'ministral_3b', 'aya_8b', 'mistral_nemo_12b', 'ministral_14b', 'qwen3_30b'];
+  const modelKeys = MODEL_KEYS;
   
   for (const modelKey of modelKeys) {
     const modelName = MODELS[modelKey];
@@ -881,7 +917,7 @@ async function main() {
   await checkOllamaModels();
 
   console.log('[bench] Agente Chagra completo — Benchmark LARGO');
-  console.log(`[bench] Modelos: ${Object.values(MODELS).join(', ')}`);
+  console.log(`[bench] Modelos: ${MODEL_KEYS.map((key) => MODELS[key]).join(', ')}`);
   console.log(`[bench] Prompts: ${PROMPTS.length}`);
   console.log(`[bench] Categorías: species(20), biopreparados(12), plagas(10), normativa(4), agroforestería(4)`);
   console.log(`[bench] Directorio output: ${BENCH_RUNS_DIR}`);
@@ -910,7 +946,7 @@ async function main() {
 
   // Calcular estadísticas por modelo
   const stats = {};
-  const modelKeys = ['gemma3_4b', 'granite3_1_8b', 'ministral_3b', 'aya_8b', 'mistral_nemo_12b', 'ministral_14b', 'qwen3_30b'];
+  const modelKeys = MODEL_KEYS;
   
   for (const modelKey of modelKeys) {
     const modelName = MODELS[modelKey];
@@ -996,7 +1032,7 @@ async function main() {
 
 ## Metadata
 - **Timestamp**: ${new Date().toISOString()}
-- **Modelos**: ${Object.values(MODELS).join(', ')}
+- **Modelos**: ${MODEL_KEYS.map((key) => MODELS[key]).join(', ')}
 - **Prompts**: ${PROMPTS.length}
 - **Categorías**: 
   - Species: 20

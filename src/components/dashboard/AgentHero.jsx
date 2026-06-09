@@ -15,6 +15,7 @@ import {
     getNotificationStyle,
 } from '../../services/userProfileService';
 import { buildCropSuggestions } from '../../data/cropSuggestions';
+import { HOME_CAPABILITIES, getCapability } from '../../services/agentCapabilities';
 import { iconForTheme } from './themeIcon';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 
@@ -135,84 +136,11 @@ function greetingForNow(nivel) {
 // Subtítulo bajo el saludo — campesino vs experto, copy del demo
 // (COPY.campesino.greetSub / COPY.experto.greetSub), castellanizado.
 const SUB_CAMPESINO = 'Pregúntame sobre tu cultivo, las plagas, el clima o los precios. Hablo claro, como en el campo.';
-const SUB_EXPERTO = 'Asistente agroecológico con grounding. Cada respuesta cita su fuente; puedes pedirle "cómo lo sé" para ver la herramienta y los parámetros.';
+const SUB_EXPERTO = 'Asistente agroecológico con grounding. Muestra la fuente cuando hay datos verificados; puedes pedirle "cómo lo sé" para ver la herramienta y los parámetros.';
 
 // Fuente única de los chips del home (compartida con el test del punto de
 // acceso #1, regla react-refresh/only-export-components).
 const QUICK_CHIPS = AGENT_HERO_CHIPS;
-
-/**
- * CAPACIDADES de Chagra para el menú Ⓐ (bottom-sheet .sheet del demo).
- *
- * Son las capacidades REALES de la app — derivadas de los chips del home
- * (AGENT_HERO_CHIPS), de lo que el agente SÍ sabe hacer (HelpAgentSection) y de
- * las tools del catálogo. Cada una declara su `route`:
- *   - kind 'ask'   → envía un prompt por la outbox real → AgentScreen (mismo
- *                    camino que escribir/enviar). Es lo que el demo simula.
- *   - kind 'nav'   → navega a una pantalla dedicada existente (voz, activos…).
- *   - kind 'photo' → abre el selector de foto del compositor (visión del agente).
- *
- * El operador pidió incluir explícitamente "agregar planta por voz o foto".
- * `tool` es la etiqueta técnica (visible en modo experto), igual que el demo.
- */
-const CAPABILITIES = [
-    {
-        id: 'siembra', icon: '🌱',
-        title: '¿Qué siembro?',
-        desc: 'Qué sembrar según tu clima y tu altura.',
-        tool: 'get_species',
-        route: { kind: 'ask', prompt: '¿Qué puedo sembrar este mes en mi zona?' },
-    },
-    {
-        id: 'plaga', icon: '🐛',
-        title: 'Plaga',
-        desc: 'Controlar una plaga sin veneno.',
-        tool: 'get_pest_controllers',
-        route: { kind: 'ask', prompt: '¿Cómo controlo plagas sin químicos?' },
-    },
-    {
-        id: 'bio', icon: '🧪',
-        title: 'Biopreparado',
-        desc: 'Receta casera para fortalecer tu cultivo.',
-        tool: 'get_biopreparados',
-        route: { kind: 'ask', prompt: '¿Cómo hago un biopreparado para fortalecer mis matas?' },
-    },
-    {
-        id: 'foto', icon: '📷',
-        title: 'Agregar planta por foto',
-        desc: 'Tómale una foto y la identifico y registro.',
-        tool: 'vision_identify',
-        route: { kind: 'photo' },
-    },
-    {
-        id: 'voz', icon: '🎤',
-        title: 'Agregar planta por voz',
-        desc: 'Dime qué sembraste y lo registro en tu finca.',
-        tool: 'voice_capture',
-        route: { kind: 'nav', view: 'voz' },
-    },
-    {
-        id: 'clima', icon: '🌦️',
-        title: 'Clima',
-        desc: 'El clima de tu finca esta semana.',
-        tool: 'get_clima',
-        route: { kind: 'ask', prompt: 'Dame el reporte del clima de mi zona esta semana.' },
-    },
-    {
-        id: 'cal', icon: '📅',
-        title: 'Calendario',
-        desc: 'Cuándo sembrar y cuándo cosechar.',
-        tool: 'get_calendario',
-        route: { kind: 'ask', prompt: '¿Cuándo siembro y cuándo cosecho en mi zona?' },
-    },
-    {
-        id: 'plantas', icon: '🌿',
-        title: 'Mis plantas',
-        desc: 'Ver y manejar lo que tienes en la finca.',
-        tool: 'assets',
-        route: { kind: 'nav', view: 'activos' },
-    },
-];
 
 function prefersReducedMotion() {
     return typeof window !== 'undefined' && window.matchMedia
@@ -237,6 +165,7 @@ export default function AgentHero({ onNavigate }) {
     const [phase, setPhase] = useState('idle');
     // Menú Ⓐ (bottom-sheet de capacidades). false=cerrado | true=abierto.
     const [sheetOpen, setSheetOpen] = useState(false);
+    const [activeIntent, setActiveIntent] = useState(null);
     // Nivel de respuestas del perfil (campesino=simple / experto=detallado).
     // Lo leemos del perfil real al montar; el toggle lo persiste de verdad.
     const [nivel, setNivel] = useState(() => {
@@ -347,6 +276,7 @@ export default function AgentHero({ onNavigate }) {
         try {
             await sendToOutbox(payload);
             setText('');
+            setActiveIntent(null);
             if (attachment?.previewUrl) URL.revokeObjectURL(attachment.previewUrl);
             setAttachment(null);
             launchToAgent();
@@ -369,7 +299,11 @@ export default function AgentHero({ onNavigate }) {
             return;
         }
         if (!trimmed) return;
-        send({ kind: 'text', text: trimmed });
+        send({
+            kind: 'text',
+            text: trimmed,
+            ...(activeIntent ? { meta: { capabilityIntent: activeIntent } } : {}),
+        });
     };
 
     const handleChipSend = (prompt) => {
@@ -397,16 +331,17 @@ export default function AgentHero({ onNavigate }) {
     const toggleSheet = () => setSheetOpen((o) => !o);
     const closeSheet = () => setSheetOpen(false);
 
-    // Despacha una capacidad del sheet a su routing real.
+    // Las capacidades agrícolas activan un modo visible para el próximo envío.
+    // Foto y navegación siguen siendo acciones directas.
     const pickCapability = (cap) => {
         closeSheet();
-        const r = cap.route;
-        if (r.kind === 'ask') {
-            handleChipSend(r.prompt);
-        } else if (r.kind === 'nav') {
+        if (cap.kind === 'mode') {
+            setActiveIntent(cap.intent);
+            window.setTimeout(() => textareaRef.current?.focus(), 0);
+        } else if (cap.kind === 'nav') {
             try { agentSounds.start(); } catch { /* opcional */ }
-            onNavigate?.(r.view);
-        } else if (r.kind === 'photo') {
+            onNavigate?.(cap.view);
+        } else if (cap.kind === 'photo') {
             // Abre el selector de foto del compositor (visión del agente). El
             // usuario elige/toma la foto y la envía como item 'photo'.
             cameraInputRef.current?.click();
@@ -1354,7 +1289,13 @@ export default function AgentHero({ onNavigate }) {
                             onChange={(e) => { setText(e.target.value); autoGrow(e.target); }}
                             onKeyDown={handleKeyDown}
                             rows={1}
-                            placeholder={attachment ? 'Añade una nota a tu foto (opcional)…' : 'Pregúntale a Chagra…'}
+                            placeholder={
+                                attachment
+                                    ? 'Añade una nota a tu foto (opcional)…'
+                                    : activeIntent
+                                        ? getCapability(activeIntent)?.placeholder
+                                        : 'Pregúntale a Chagra…'
+                            }
                             aria-label="Escribe tu pregunta al agente"
                             className="w-full bg-transparent resize-none px-3 py-3 text-base text-[rgb(var(--c-slate-100))] placeholder:text-[rgb(var(--c-slate-500))] focus:outline-none leading-snug"
                             disabled={busy}
@@ -1440,9 +1381,17 @@ export default function AgentHero({ onNavigate }) {
 
                 {/* Hint bajo la pill (réplica de .hintbar del demo). */}
                 {!isRecording && !attachment && (
-                    <p className="agentport-hint">
-                        Toca <b>Ⓐ</b> para ver todo lo que sé hacer, o escríbeme aquí
-                    </p>
+                    activeIntent ? (
+                        <div className="agentport-hint" role="status" data-testid="home-capability-active">
+                            <b>{getCapability(activeIntent)?.label} activo.</b>{' '}
+                            {getCapability(activeIntent)?.prompt}{' '}
+                            <button type="button" onClick={() => setActiveIntent(null)}>Cancelar</button>
+                        </div>
+                    ) : (
+                        <p className="agentport-hint">
+                            Toca <b>Ⓐ</b> para elegir una ayuda, o escríbeme aquí
+                        </p>
+                    )
                 )}
 
                 {recorderError && (
@@ -1477,11 +1426,11 @@ export default function AgentHero({ onNavigate }) {
                     <div className="s">
                         {expertoActive
                             ? 'Capacidades enrutadas a herramientas. Toca una para empezar.'
-                            : 'Toca una opción y te ayudo. Toda respuesta viene con su fuente.'}
+                            : 'Elige una ayuda. Después te diré qué dato necesito.'}
                     </div>
                 </div>
                 <div className="agentport-caps">
-                    {CAPABILITIES.map((cap) => (
+                    {HOME_CAPABILITIES.map((cap) => (
                         <button
                             key={cap.id}
                             type="button"
@@ -1489,10 +1438,10 @@ export default function AgentHero({ onNavigate }) {
                             onClick={() => pickCapability(cap)}
                             disabled={busy}
                         >
-                            <span className="ico" aria-hidden="true">{cap.icon}</span>
+                            <span className="ico" aria-hidden="true">{cap.emoji}</span>
                             <span className="txt">
-                                <span className="ct">{cap.title}</span>
-                                <span className="cd">{cap.desc}</span>
+                                <span className="ct">{cap.label}</span>
+                                <span className="cd">{cap.description}</span>
                                 <span className="tool-id">{cap.tool}()</span>
                             </span>
                             <span className="arrow" aria-hidden="true">›</span>
@@ -1500,7 +1449,7 @@ export default function AgentHero({ onNavigate }) {
                     ))}
                 </div>
                 <div className="agentport-sheet-foot">
-                    Chagra responde con información de <b>AGROSAVIA</b>, <b>ICA</b> e <b>IDEAM</b>.
+                    Chagra mostrará la fuente cuando la consulta tenga datos verificados.
                 </div>
             </section>
         </section>

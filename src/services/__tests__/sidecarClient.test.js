@@ -302,6 +302,7 @@ describe('sidecarClient — feature flag on', () => {
       expect(__TEST__.ALLOWED_TOOLS.has('get_normativa_ica')).toBe(true);
       expect(__TEST__.ALLOWED_TOOLS.has('get_clima_ideam')).toBe(true);
       expect(__TEST__.ALLOWED_TOOLS.has('get_precio_sipsa')).toBe(true);
+      expect(__TEST__.ALLOWED_TOOLS.has('get_calendario_siembra')).toBe(true);
     });
 
     it('5xx → null sin throw', async () => {

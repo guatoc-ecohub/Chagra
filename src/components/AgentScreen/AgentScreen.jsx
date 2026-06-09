@@ -8,12 +8,10 @@ import {
   markError as outboxMarkError,
   recoverStaleProcessing as outboxRecoverStale,
 } from '../../services/agentOutboxService';
-import { recognizeSpeciesGrounded, analyzeFoliage } from '../../services/aiService';
+import { analyzeFoliage } from '../../services/aiService';
 import { captureAndCompress } from '../../services/photoService';
-import { blobToDataUrl } from '../../utils/imageProcessor';
 import { processPhotoItem, buildPhotoUserMessage } from '../../services/agentOutboxPhoto';
 import { isAnalyzableImageAttachment, buildAttachmentRejection } from '../../services/agentOutboxAttachment';
-import { buildPhotoAnalysisMessage } from './photoAnalysis';
 import { AGENT_ENTRANCE_CSS, AGENT_COMPOSITOR_CSS, agentEntranceClass } from './agentEntrance';
 import {
   addTurn,
@@ -48,9 +46,14 @@ import { createStreamDeadline } from '../../services/streamDeadline';
 import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, postValidate, getClimaIdeam } from '../../services/sidecarClient';
 // CHIPS DE MODO (A3/A4, decisión operador 2026-06-02): el router PURO mapea
 // la intención forzada del chip → tool determinístico, SALTANDO el NLU
-// (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
-// los chips cuyo backend aún no existe (precio/deep).
+// (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` conserva
+// compatibilidad con modos temporalmente no disponibles.
 import { planForcedIntent, isStubIntent, isDeepResearchIntent, CHIP_DEFS } from '../../services/chipIntentRouter';
+import {
+  capabilityFailureMessage,
+  getCapability,
+  getVisibleModeCapabilities,
+} from '../../services/agentCapabilities';
 // #349 — router heurístico de GROUNDING para el path de FALLO del NLU. Cuando
 // `planNlu` devuelve null (timeout/fail del sidecar bajo contención de GPU), el
 // turno NO debe saltarse el grounding: este router PURO deriva el tool obvio
@@ -65,7 +68,7 @@ import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../
 // sidecarClient/deepResearchClient vía buildSidecarHeaders (defense-in-depth).
 import { getCurrentTier } from '../../services/tierService';
 import DeepResearchCard from '../DeepResearchCard';
-import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildSuggestedEntitiesContext, isLowConfidenceEntity } from '../../services/agentService';
+import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildSuggestedEntitiesContext, isLowConfidenceEntity, pisoTermicoFromAltitud } from '../../services/agentService';
 import { applyOutputGuards, classifyQueryIntent } from '../../services/outputGuards';
 import { getProfile } from '../../services/userProfileService';
 import { captureExchange } from '../../services/conversationCaptureService';
@@ -217,14 +220,6 @@ export default function AgentScreen({ onBack, initialContext }) {
   // Guardamos en un Map (msgId → AbortController) para poder cancelar jobs
   // individuales. Al desmontar el componente cancelamos todos.
   const deepResearchControllersRef = useRef(new Map());
-  // FEAT-2 (#291): foto adjunta al chat pendiente de envío. `{ blob, dataUrl }`
-  // o null. El blob ya viene comprimido por captureAndCompress; el dataUrl es
-  // el preview thumbnail. `analyzingPhoto` bloquea el input mientras corre la
-  // pipeline de visión (ID + diagnóstico).
-  const [attachedPhoto, setAttachedPhoto] = useState(null);
-  const [analyzingPhoto, setAnalyzingPhoto] = useState(false);
-  const photoInputRef = useRef(null);
-
   const { durationMs, start: startRecord, stop: stopRecord, reset: resetRecord } = useVoiceRecorder();
   const chatEndRef = useRef(null);
   // Bug 2026-05-18: ref al AbortController activo para que botón Cancelar
@@ -1548,6 +1543,9 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
               activeFincaClima?.municipio || FARM_CONFIG?.MUNICIPIO || null;
             const forcedPlan = planForcedIntent(forcedIntent, textForLLM, {
               municipio: municipioClima,
+              pisoTermico: pisoTermicoFromAltitud(
+                activeFincaClima?.altitud || getProfile()?.finca_altitud,
+              ),
             });
             if (forcedPlan && forcedPlan.tool) {
               if (forcedPlan.stub && forcedPlan.stubResult) {
@@ -1771,6 +1769,30 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
           // pero si algo raro pasa NO bloqueamos el chat.
           console.debug('[sidecar] inesperado, sigo con RAG-only:', sidecarErr?.message);
         }
+      }
+
+      // Una capacidad elegida explícitamente es un contrato con la persona:
+      // si no produjo evidencia, NO seguimos al LLM como si la consulta hubiera
+      // funcionado. Mostramos un fallo claro y dejamos la respuesta sin badge
+      // de fuente/grounding.
+      if (forcedIntent && !toolEvidence) {
+        const failure = capabilityFailureMessage(forcedIntent, {
+          online: isOnline,
+          sidecarEnabled: isSidecarEnabled(),
+        });
+        const assistantMessage = {
+          role: 'assistant',
+          content: failure,
+          timestamp: Date.now(),
+          metadata: { grounded: false, source: 'capability_failed' },
+        };
+        await addTurn(operatorId, {
+          role: 'assistant',
+          content: failure,
+          metadata: assistantMessage.metadata,
+        });
+        setMessages((prev) => [...prev, assistantMessage]);
+        return;
       }
 
       const rawResponse = await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock);
@@ -2445,129 +2467,6 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     }
   };
 
-  // FEAT-2 (#291): el operador eligió una foto (cámara o galería). La
-  // comprimimos con captureAndCompress (mismo pipeline que EvidenceCapture)
-  // y guardamos blob + dataUrl para el preview. NO disparamos la inferencia
-  // todavía — eso pasa al darle Enviar, junto con el texto opcional.
-  const handlePhotoPick = async (e) => {
-    const file = e.target.files?.[0];
-    // Limpiamos el input para que volver a elegir la misma foto dispare change.
-    if (photoInputRef.current) photoInputRef.current.value = '';
-    if (!file) return;
-    try {
-      const { blob } = await captureAndCompress(file);
-      const dataUrl = await blobToDataUrl(blob);
-      setAttachedPhoto({ blob, dataUrl });
-    } catch (err) {
-      console.warn('[Agent] No se pudo procesar la foto:', err?.message);
-      setError('No se pudo procesar la foto. Intenta con otra imagen.');
-    }
-  };
-
-  const handleRemovePhoto = () => {
-    setAttachedPhoto(null);
-  };
-
-  // FEAT-2 (#291): corre la pipeline de visión sobre la foto adjunta y agrega
-  // el turno del usuario (con la foto) + el turno del asistente (ID especie +
-  // diagnóstico). Reusa recognizeSpeciesGrounded + analyzeFoliage en paralelo.
-  // Si la visión falla entera, igual responde con un mensaje amable en vez de
-  // crashear. Persiste ambos turnos con addTurn.
-  const handlePhotoAnalysis = async (photo, caption) => {
-    const userText = (caption || '').trim();
-    const userMessage = {
-      role: 'user',
-      content: userText || '📷 Foto',
-      photo: photo.dataUrl,
-      timestamp: Date.now(),
-    };
-    setMessages((prev) => [...prev, userMessage]);
-    await addTurn(operatorId, { role: 'user', content: userMessage.content });
-
-    setAnalyzingPhoto(true);
-    setState(STATE_THINKING);
-    setError('');
-    agentSounds.start();
-
-    let assistantMessage;
-    try {
-      // En paralelo: identificación grounded (AGE) + diagnóstico del follaje.
-      // Cada llamada ya degrada con gracia (devuelve null si el modelo falla),
-      // así que un Promise.all no rompe aunque una de las dos no resuelva.
-      const [species, diagnosis] = await Promise.all([
-        recognizeSpeciesGrounded(photo.blob),
-        analyzeFoliage(photo.blob),
-      ]);
-
-      if (!species && !diagnosis) {
-        // Pipeline entera caída (ollama abajo / timeout). Mensaje amable.
-        assistantMessage = {
-          role: 'assistant',
-          content: 'No pude analizar la foto ahora. Intenta de nuevo en un momento, o toma otra con mejor luz.',
-          timestamp: Date.now(),
-        };
-      } else {
-        const { content, metadata } = buildPhotoAnalysisMessage({ species, diagnosis });
-        assistantMessage = {
-          role: 'assistant',
-          content,
-          metadata,
-          timestamp: Date.now(),
-        };
-      }
-    } catch (err) {
-      console.warn('[Agent] Fallo análisis de foto:', err?.message);
-      assistantMessage = {
-        role: 'assistant',
-        content: 'No pude analizar la foto ahora. Intenta de nuevo en un momento.',
-        timestamp: Date.now(),
-      };
-    } finally {
-      setAnalyzingPhoto(false);
-      setState(STATE_IDLE);
-    }
-
-    agentSounds.chime();
-    setMessages((prev) => [...prev, assistantMessage]);
-    await addTurn(operatorId, {
-      role: 'assistant',
-      content: assistantMessage.content,
-      ...(assistantMessage.metadata ? { metadata: assistantMessage.metadata } : {}),
-    });
-
-    if (ttsEnabled && assistantMessage.content) {
-      setLastNotificationMessage(assistantMessage.content);
-      setResponseReady(true);
-    }
-  };
-
-  const handleTextSubmit = (e) => {
-    e.preventDefault();
-    // FEAT-2 (#291): si hay foto adjunta, el envío dispara el análisis de
-    // visión (ID + diagnóstico) en vez del pipeline de chat de texto. El
-    // texto del input se usa como caption opcional del mensaje del usuario.
-    if (attachedPhoto && !analyzingPhoto) {
-      const photo = attachedPhoto;
-      const caption = inputText;
-      setAttachedPhoto(null);
-      setInputText('');
-      setAlertContextBanner(null);
-      handlePhotoAnalysis(photo, caption);
-      return;
-    }
-    // CHIPS DE MODO (A3): si hay un modo activo, el submit lleva la intención
-    // forzada → runAgentPipeline salta el NLU y rutea directo al tool.
-    handleSubmit(inputText, { forcedIntent: activeIntent });
-    setInputText('');
-    // El modo es de un solo uso por pregunta: tras enviar volvemos al routing
-    // NLU normal para el siguiente turno (igual que Gemini desactiva el chip).
-    setActiveIntent(null);
-    // El banner de contexto de alerta es de un solo uso — al primer submit
-    // el operador ya está conversando con el agente y el banner queda
-    // redundante. Se reabre solo si vuelve a entrar desde la notificación.
-    setAlertContextBanner(null);
-  };
-
   const handleSuggestion = (text) => {
     handleSubmit(text);
   };
@@ -2637,7 +2536,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       const { message } = buildPhotoUserMessage(item, createUrl);
       setMessages((prev) => [...prev, message]);
       // Correr visión y armar prompt
-      const { prompt, finding } = await processPhotoItem(item, {
+      const { prompt, finding, rejectionMessage } = await processPhotoItem(item, {
         analyze: analyzeFoliage,
         createUrl: null,
       });
@@ -2645,6 +2544,13 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       clearAgentAttachment();
       setActiveIntent(null);
       setAlertContextBanner(null);
+      if (rejectionMessage) {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: rejectionMessage, timestamp: Date.now() },
+        ]);
+        return;
+      }
       await handleSubmit(prompt, {
         suppressUserBubble: true,
         visionContext: {
@@ -2714,7 +2620,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     try {
       if (item.kind === 'text') {
         if (!caption) { await outboxMarkError(item.id, 'item de texto vacío'); return false; }
-        await handleSubmit(caption);
+        await handleSubmit(caption, { forcedIntent: item.meta?.capabilityIntent || null });
         await outboxMarkAnswered(item.id);
         return true;
       }
@@ -2770,10 +2676,18 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         // 2) Correr la visión y armar el prompt (degrada a "por descripción"
         //    si analyzeFoliage falla). Reusa processPhotoItem para la parte
         //    pura del prompt (sin re-pintar burbuja: createUrl ya consumido).
-        const { prompt, finding } = await processPhotoItem(item, {
+        const { prompt, finding, rejectionMessage } = await processPhotoItem(item, {
           analyze: analyzeFoliage,
           createUrl: null,
         });
+        if (rejectionMessage) {
+          setMessages((prev) => [
+            ...prev,
+            { role: 'assistant', content: rejectionMessage, timestamp: Date.now() },
+          ]);
+          await outboxMarkAnswered(item.id);
+          return true;
+        }
         // 3) Despachar al pipeline con la burbuja ya pintada (no duplicar).
         //    visionContext marca que ESTE turno SÍ trajo una foto real: el guard
         //    de visión NO corrige un diagnóstico visual legítimo. La confianza
@@ -2867,6 +2781,11 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
   const activePlaceholder = activeIntent
     ? (CHIP_DEFS.find((c) => c.intent === activeIntent)?.placeholder || 'Escribe tu pregunta...')
     : 'Escribe tu pregunta...';
+  const activeCapability = activeIntent ? getCapability(activeIntent) : null;
+  const visibleModeCapabilities = getVisibleModeCapabilities({
+    deepEnabled: isDeepResearchEnabled(),
+    isPro: getCurrentTier() === 'pro',
+  });
 
   return (
     <div className={`h-[100dvh] flex flex-col overflow-hidden relative text-white ${entranceClassRef.current}`}>
@@ -3077,6 +2996,29 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         </div>
       )}
 
+      {activeCapability && (
+        <div
+          className="mx-4 mb-2 p-3 rounded-lg bg-emerald-950/45 border border-emerald-700/60 flex items-start gap-3"
+          role="status"
+          data-testid="active-capability-banner"
+        >
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-bold text-emerald-200">
+              {activeCapability.emoji} {activeCapability.label} activo para tu próximo mensaje
+            </p>
+            <p className="text-[11px] text-emerald-100/75 mt-0.5">{activeCapability.prompt}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setActiveIntent(null)}
+            className="text-xs text-emerald-300 underline"
+            aria-label="Cancelar ayuda seleccionada"
+          >
+            Cancelar
+          </button>
+        </div>
+      )}
+
       {/* ── Chips (modo) — fila scrollable unificada.
           Oculta en pantalla vacía donde QuickChipsBar ya muestra ejemplos
           (issue #5 duplicación resuelta 2026-06-08). ── */}
@@ -3092,30 +3034,6 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
 
       {/* ── Compositor pill — paridad completa AgentHero (2026-06-08) ── */}
       <div className="relative z-10 px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] pt-2 border-t border-slate-800/60 bg-slate-900/70 backdrop-blur-md shrink-0">
-
-        {/* FEAT-2 (#291): preview de la foto adjunta (inline) antes de enviar. */}
-        {attachedPhoto && (
-          <div className="mb-3 flex items-center gap-3 px-1">
-            <div className="relative shrink-0 w-16 h-16 rounded-lg overflow-hidden border border-slate-700">
-              <img src={attachedPhoto.dataUrl} alt="Foto adjunta" className="w-full h-full object-cover" />
-              {!analyzingPhoto && (
-                <button
-                  type="button"
-                  onClick={handleRemovePhoto}
-                  className="absolute top-0.5 right-0.5 p-1 bg-red-600 rounded-full text-white"
-                  aria-label="Quitar foto"
-                >
-                  <X size={10} />
-                </button>
-              )}
-            </div>
-            <p className="text-xs text-slate-400">
-              {analyzingPhoto
-                ? 'Analizando la foto (identificación + diagnóstico)…'
-                : 'Foto lista. Agrega una nota si quieres y presiona Enviar.'}
-            </p>
-          </div>
-        )}
 
         {/* Preview de foto adjunta (outbox) */}
         {agentAttachment && (
@@ -3141,17 +3059,6 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         {agentPickError && (
           <p className="text-xs text-red-400 mb-2 px-1">{agentPickError}</p>
         )}
-
-        {/* FEAT-2 (#291): botón cámara + input oculto para inline photo analysis */}
-        <input
-          ref={photoInputRef}
-          type="file"
-          accept="image/*"
-          capture="environment"
-          className="hidden"
-          onChange={handlePhotoPick}
-          data-testid="agent-photo-input"
-        />
 
         {/* Pill — unified with AgentHero (as-bar CSS tokens) */}
         <div
@@ -3415,30 +3322,30 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
             <div className="as-sheet-grab" aria-hidden="true" />
             <div className="px-5 pb-2 pt-1 text-center">
               <p className="text-lg font-bold text-white">¿En qué te ayudo?</p>
-              <p className="text-sm text-slate-400 mt-1">Toca una opción para empezar. Toda respuesta viene con su fuente.</p>
+              <p className="text-sm text-slate-400 mt-1">Elige una ayuda. Después escribe el dato que te pedimos.</p>
             </div>
             <div className="px-4 pb-4 overflow-y-auto flex flex-col gap-3">
-              {CHIP_DEFS.map((chip) => (
+              {visibleModeCapabilities.map((chip) => (
                 <button
                   key={chip.intent}
                   type="button"
                   className="as-cap"
                   onClick={() => {
-                    handleChipSelect(chip.intent);
+                    setActiveIntent(chip.intent);
                     setSheetOpen(false);
                   }}
                 >
                   <span className="as-cap-ico" aria-hidden="true">{chip.emoji}</span>
                   <span className="flex-1 min-w-0 text-left">
                     <span className="font-bold text-white block">{chip.label}</span>
-                    <span className="text-sm text-slate-400 block mt-0.5">{chip.placeholder}</span>
+                    <span className="text-sm text-slate-400 block mt-0.5">{chip.description}</span>
                   </span>
                   <span className="text-emerald-400 text-lg self-center" aria-hidden="true">›</span>
                 </button>
               ))}
             </div>
             <p className="px-5 pb-5 text-center text-xs text-slate-500">
-              Chagra responde con información de <b className="text-emerald-400">AGROSAVIA</b>, <b className="text-emerald-400">ICA</b> e <b className="text-emerald-400">IDEAM</b>.
+              Chagra mostrará la fuente cuando la consulta tenga datos verificados.
             </p>
           </section>
         </>

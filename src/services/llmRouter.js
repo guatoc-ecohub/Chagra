@@ -137,10 +137,11 @@ export const ROUTES = {
       'Bench 2026-05-23 anti-alucinación: granite3.1-dense:8b 37 t/s, ' +
       '~6 GB VRAM, ~37s avg con context completo. Más lento que gemma3:4b ' +
       'pero clavó "Monalonion velezangeli" sin pifia donde 4b derivaba a ' +
-      'Fusarium genéricos. keep_alive_min=5 (no 30): el chat hot sigue ' +
-      'siendo gemma3:4b → no mantener dos modelos calientes simultáneos ' +
-      'para no presionar VRAM contra vision (qwen2.5vl 11.8 GB). ' +
-      'max_tokens 768 (vs 512 del chat simple) porque queries complejas ' +
+      'Fusarium genéricos. chat y chat_complex usan hoy el mismo modelo, ' +
+      'así que escalar de ruta no fuerza un segundo cold-start. ' +
+      'keep_alive_min=5 limita presión de VRAM contra vision ' +
+      '(qwen2.5vl 11.8 GB) después de consultas complejas. ' +
+      'max_tokens 1024 (vs 768 del chat simple) porque queries complejas ' +
       'tienden a respuestas más estructuradas (planes, asocios, ' +
       'enumeraciones). temperature mantenida en 0.3 — la regla ' +
       'intelligence-first aplica igual: temperature baja + prompt ' +
@@ -202,6 +203,34 @@ export function getModelFor(task) {
 }
 
 /**
+ * Ajustes de inferencia específicos por familia.
+ *
+ * Gemma 4 recomienda temperature=1.0 y top_p=0.95. El agente no consume
+ * trazas de razonamiento, así que las desactiva en chat para evitar latencia
+ * y posibles fugas de pensamiento al historial. NLU conserva temperature=0
+ * porque la estabilidad del JSON prima sobre el perfil generativo.
+ *
+ * Esta función hace que los overrides VITE_LLM_* sean experimentos válidos:
+ * cambiar a Gemma 4 no reutiliza accidentalmente el sampling calibrado para
+ * Granite. No cambia el comportamiento de los modelos actuales.
+ *
+ * @param {string} model
+ * @param {LLMTask} task
+ * @returns {{temperature?: number, top_p?: number, reasoning_effort?: string}}
+ */
+export function getModelInferenceProfile(model, task) {
+  if (typeof model !== 'string' || !/(^|\/)gemma4(?::|-|$)/i.test(model)) {
+    return {};
+  }
+
+  return {
+    ...(task === 'nlu' ? {} : { temperature: 1.0 }),
+    top_p: 0.95,
+    reasoning_effort: task === 'reasoning' ? 'medium' : 'none',
+  };
+}
+
+/**
  * Helper para invocar Ollama OpenAI-compat con la config de la tarea.
  *
  * Sólo crea el body base del request — el caller decide si usa fetch
@@ -222,15 +251,24 @@ export function getModelFor(task) {
  */
 export function buildLLMRequest(task, messages, overrides = {}) {
   const route = getModelFor(task);
+  const profile = getModelInferenceProfile(route.model, task);
   const body = {
     model: route.model,
     messages,
-    temperature: overrides.temperature ?? route.temperature,
+    temperature: overrides.temperature ?? profile.temperature ?? route.temperature,
     max_tokens: overrides.max_tokens ?? route.max_tokens,
     // keep_alive controla cuánto Ollama mantiene el modelo en RAM tras
     // esta request. Formato Ollama: número en segundos o sufijo "m"/"h".
     keep_alive: `${route.keep_alive_min}m`,
   };
+  const topP = overrides.top_p ?? profile.top_p;
+  if (typeof topP === 'number') {
+    body.top_p = topP;
+  }
+  const reasoningEffort = overrides.reasoning_effort ?? profile.reasoning_effort;
+  if (typeof reasoningEffort === 'string') {
+    body.reasoning_effort = reasoningEffort;
+  }
   // BUG A fix (2026-05-30): forward stop sequences (de la ruta o del
   // override). Ollama OpenAI-compat respeta `stop` (string[]). Solo se
   // setea cuando hay algo que cortar, para no enviar `stop: undefined`.

@@ -39,7 +39,7 @@ const VISION_SPECIES_FALLBACK_2_MODEL = 'qwen2.5vl:7b';
 
 // Prompt base sin contexto RAG. Fallback usado cuando el corpus no cargó
 // o el retrieve no devolvió passages relevantes.
-const DIAGNOSIS_BASE_PROMPT = 'First, decide if this image contains a living plant. Output JSON: {"isPlant": true/false, "score": 0-100, "issues": [], "treatment": ""}. If isPlant is false, set score to 0, issues to [], and treatment to "".';
+const DIAGNOSIS_BASE_PROMPT = 'First classify whether the image is relevant to agricultural plant assistance. Allowed: a living plant, leaf, crop, seed, fruit, pest on a plant, soil sample, compost, biopreparation, agricultural input, or a close-up useful for plant care. Reject maps, screenshots, documents, people, vehicles, buildings, unrelated objects, and landscapes without an agricultural subject. Output JSON: {"domain_relevant": true/false, "domain": "plant|leaf|crop|pest|soil|biopreparation|agricultural_input|other", "isPlant": true/false, "score": 0-100, "issues": [], "treatment": ""}. If domain_relevant is false, set domain to "other", isPlant to false, score to 0, issues to [], and treatment to "".';
 
 // Query genérica para fallback cuando no conocemos la especie. Apunta a
 // passages del corpus que hablen de manejo agroecológico colombiano —
@@ -104,7 +104,9 @@ const buildDiagnosisPrompt = (ragContext) => {
     'arriba + lo que observas en la imagen para diagnosticar. Cita la fuente ' +
     'numérica (ej. "Fuente 1") cuando aplique. Si el contexto no aplica a lo ' +
     'que ves, ignóralo y diagnostica solo por la imagen. ' +
-    'Output JSON: {"isPlant": true/false, "score": 0-100, "issues": [], "treatment": ""}. If isPlant is false, set score to 0, issues to [], and treatment to "".'
+    'First reject maps, screenshots, documents, people, vehicles, buildings, unrelated objects, and landscapes without an agricultural subject. ' +
+    'Allow plants, leaves, crops, seeds, fruits, pests on plants, soil samples, compost, biopreparations and agricultural inputs. ' +
+    'Output JSON: {"domain_relevant": true/false, "domain": "plant|leaf|crop|pest|soil|biopreparation|agricultural_input|other", "isPlant": true/false, "score": 0-100, "issues": [], "treatment": ""}. If domain_relevant is false, set domain to "other", isPlant to false, score to 0, issues to [], and treatment to "".'
   );
 };
 
@@ -227,11 +229,20 @@ const analyzeFoliageUncached = async (imageBlob, { onToken, signal, speciesSlug,
     // Normalizar: PaliGemma usa "treatment", legacy usa "treatment_suggestion"
     parsed.treatment_suggestion = parsed.treatment_suggestion || parsed.treatment || '';
 
-    // Bug P0 (2026-06-08): para imágenes sin planta (toy, paisaje, etc.) el
-    // modelo alucina un diagnóstico completo. Si isPlant es false, devolvemos
-    // null para que el caller use el fallback "guíame por descripción".
-    // Legacy cache (isPlant undefined) se asume plant para no romper.
-    if (parsed.isPlant === false) return null;
+    // Fuera de dominio se propaga como rechazo tipado. El caller debe cortar
+    // antes del chat general para que un caption como "hola" no genere una
+    // interpretación agronómica inventada. Respuestas legacy sin
+    // `domain_relevant` conservan el guard anterior basado en `isPlant`.
+    const outOfDomain =
+      parsed.domain_relevant === false ||
+      (parsed.domain_relevant === undefined && parsed.isPlant === false);
+    if (outOfDomain) {
+      return {
+        _visionRejected: true,
+        reason: 'out_of_domain',
+        domain: parsed.domain || 'other',
+      };
+    }
 
     return parsed;
   } catch (err) {

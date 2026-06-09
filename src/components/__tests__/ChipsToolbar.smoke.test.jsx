@@ -44,8 +44,8 @@ describe('ChipsToolbar — flag Deep Research OFF (chip 🔬 oculto)', () => {
     render(<ChipsToolbar onSelectIntent={() => {}} isPro={false} />);
     const chips = screen.getAllByTestId('mode-chip');
     expect(chips).toHaveLength(NON_DEEP_CHIP_COUNT);
-    expect(screen.getByText('¿Qué siembro?')).toBeInTheDocument();
-    expect(screen.getByText('Plaga')).toBeInTheDocument();
+    expect(screen.getByText('Consultar un cultivo')).toBeInTheDocument();
+    expect(screen.getByText('Tengo una plaga')).toBeInTheDocument();
   });
 
   test('el chip 🔬 tampoco aparece para usuario pro con la flag OFF', () => {
@@ -56,7 +56,7 @@ describe('ChipsToolbar — flag Deep Research OFF (chip 🔬 oculto)', () => {
   test('clickear un chip llama onSelectIntent con el intent enum', () => {
     const onSelectIntent = vi.fn();
     render(<ChipsToolbar onSelectIntent={onSelectIntent} />);
-    fireEvent.click(screen.getByText('Plaga'));
+    fireEvent.click(screen.getByText('Tengo una plaga'));
     expect(onSelectIntent).toHaveBeenCalledTimes(1);
     expect(onSelectIntent).toHaveBeenCalledWith('plaga');
   });
@@ -65,7 +65,7 @@ describe('ChipsToolbar — flag Deep Research OFF (chip 🔬 oculto)', () => {
     render(<ChipsToolbar onSelectIntent={() => {}} activeIntent="clima" />);
     const climaChip = screen.getByRole('button', { name: /clima/i });
     expect(climaChip).toHaveAttribute('aria-pressed', 'true');
-    const siembroChip = screen.getByRole('button', { name: /siembro/i });
+    const siembroChip = screen.getByRole('button', { name: /consultar un cultivo/i });
     expect(siembroChip).toHaveAttribute('aria-pressed', 'false');
   });
 
@@ -107,10 +107,10 @@ describe('ChipsToolbar — flag Deep Research OFF (chip 🔬 oculto)', () => {
   test('chips no-Pro (siembro, plaga, etc.) siguen activos para usuario free', () => {
     const onSelectIntent = vi.fn();
     render(<ChipsToolbar onSelectIntent={onSelectIntent} isPro={false} />);
-    fireEvent.click(screen.getByText('¿Qué siembro?'));
+    fireEvent.click(screen.getByText('Consultar un cultivo'));
     expect(onSelectIntent).toHaveBeenCalledWith('siembro');
     onSelectIntent.mockClear();
-    fireEvent.click(screen.getByText('Plaga'));
+    fireEvent.click(screen.getByText('Tengo una plaga'));
     expect(onSelectIntent).toHaveBeenCalledWith('plaga');
   });
 });
@@ -134,7 +134,7 @@ describe('ChipsToolbar — chip precio stub no engaña', () => {
   test('chip precio es clickable (funciona, solo que el backend es stub)', () => {
     const onSelectIntent = vi.fn();
     render(<ChipsToolbar onSelectIntent={onSelectIntent} />);
-    fireEvent.click(screen.getByText('Precio'));
+    fireEvent.click(screen.getByText('Consultar un precio'));
     expect(onSelectIntent).toHaveBeenCalledWith('precio');
   });
 
@@ -168,7 +168,7 @@ describe('ChipsToolbar — estado disabled global (durante grabación, etc.)', (
   test('no se puede clickear un chip cuando disabled=true', () => {
     const onSelectIntent = vi.fn();
     render(<ChipsToolbar onSelectIntent={onSelectIntent} disabled />);
-    fireEvent.click(screen.getByText('¿Qué siembro?'));
+    fireEvent.click(screen.getByText('Consultar un cultivo'));
     expect(onSelectIntent).not.toHaveBeenCalled();
   });
 

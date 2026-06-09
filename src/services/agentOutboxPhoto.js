@@ -33,6 +33,18 @@ export function hasVisionFinding(finding) {
   return hasIssues || hasTreatment;
 }
 
+export const VISION_OUT_OF_SCOPE_MESSAGE =
+  'No puedo analizar esa imagen porque no parece mostrar una planta, hoja, cultivo, plaga, suelo, biopreparado o insumo agrícola. Envíame una foto relacionada y con gusto la reviso.';
+
+export function isVisionDomainRejection(finding) {
+  return Boolean(
+    finding &&
+    typeof finding === 'object' &&
+    finding._visionRejected === true &&
+    finding.reason === 'out_of_domain',
+  );
+}
+
 /**
  * Construye el prompt que se despacha al pipeline del agente para una foto.
  *
@@ -130,6 +142,9 @@ export async function processPhotoItem(item, { analyze, createUrl } = {}) {
       finding = null;
     }
   }
+  const rejectionMessage = isVisionDomainRejection(finding)
+    ? VISION_OUT_OF_SCOPE_MESSAGE
+    : null;
   const prompt = buildVisionPrompt(finding, caption);
-  return { message, prompt, finding, imageUrl };
+  return { message, prompt, finding, imageUrl, rejectionMessage };
 }

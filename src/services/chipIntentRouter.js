@@ -20,21 +20,15 @@
  *
  * Tools determinísticos (ya existen en el sidecar, ver sidecarClient.ALLOWED_TOOLS):
  *   - siembro      → get_species          (ficha + viabilidad de la especie)
- *   - calendario   → get_species          (época de siembra se deriva de la ficha;
- *                                           NO existe get_calendario_siembra dedicado)
+ *   - calendario   → get_calendario_siembra
  *   - plaga        → get_pest_controllers  (controladores agroecológicos de la plaga)
  *   - biopreparado → get_biopreparados     (recetas de biopreparados)
  *   - clima        → get_clima_ideam       (IDEAM nacional; requiere municipio)
  *
- * Intents STUB (el backend aún NO existe — NO inventamos endpoints):
- *   - precio → SIPSA/DANE consulta directa no disponible (dataset ZIP federado).
- *   - deep   → investigación profunda multi-fuente sin pipeline implementado.
- *   Ambos devuelven un mensaje honesto "aún no disponible" en vez de routear
- *   a un tool fantasma.
- *
  * IMPORTANTE — español colombiano (tú/usted), NUNCA voseo argentino. Todos los
  * strings visibles al campesino se redactan en neutro colombiano.
  */
+import { MODE_CAPABILITIES } from './agentCapabilities.js';
 
 /** Enum de intención de los chips. Las claves == valores (string union). */
 export const CHIP_INTENTS = Object.freeze({
@@ -53,64 +47,10 @@ export const CHIP_INTENTS = Object.freeze({
  * cuando el modo está activo, para guiar al campesino sobre qué escribir.
  *
  * `kind`:
- *   - 'tool' → rutea a un tool determinístico (planForcedIntent.tool).
- *   - 'stub' → backend no implementado; planForcedIntent.stubMessage explica.
+ *   - 'mode' → rutea a un tool determinístico (planForcedIntent.tool).
+ *   - 'deep' → flujo dedicado de investigación profunda.
  */
-export const CHIP_DEFS = Object.freeze([
-  {
-    intent: CHIP_INTENTS.siembro,
-    emoji: '🌱',
-    label: '¿Qué siembro?',
-    kind: 'tool',
-    placeholder: 'Escribe la planta o di qué quieres sembrar',
-  },
-  {
-    intent: CHIP_INTENTS.plaga,
-    emoji: '🐛',
-    label: 'Plaga',
-    kind: 'tool',
-    placeholder: 'Escribe la plaga o describe el daño que ves',
-  },
-  {
-    intent: CHIP_INTENTS.biopreparado,
-    emoji: '🧪',
-    label: 'Biopreparado',
-    kind: 'tool',
-    placeholder: 'Escribe para qué plaga o planta quieres el biopreparado',
-  },
-  {
-    intent: CHIP_INTENTS.clima,
-    emoji: '🌦️',
-    label: 'Clima',
-    kind: 'tool',
-    placeholder: 'Pregunta por la lluvia o el clima de tu zona',
-  },
-  {
-    intent: CHIP_INTENTS.precio,
-    emoji: '💰',
-    label: 'Precio',
-    kind: 'stub',
-    placeholder: 'Escribe el producto del que quieres saber el precio',
-    stubMessage:
-      'La consulta de precios todavía no está disponible en Chagra. ' +
-      'Por ahora el precio mayorista lo publica el DANE (SIPSA) como archivo descargable, ' +
-      'sin consulta directa. Si quieres, te oriento a la fuente o a Corabastos.',
-  },
-  {
-    intent: CHIP_INTENTS.calendario,
-    emoji: '📅',
-    label: 'Calendario',
-    kind: 'tool',
-    placeholder: 'Escribe la planta para ver su época de siembra',
-  },
-  {
-    intent: CHIP_INTENTS.deep,
-    emoji: '🔬',
-    label: 'Investigación profunda',
-    kind: 'deep',
-    placeholder: 'Escribe el tema que quieres investigar a fondo',
-  },
-]);
+export const CHIP_DEFS = MODE_CAPABILITIES;
 
 const DEF_BY_INTENT = Object.freeze(
   CHIP_DEFS.reduce((acc, def) => {
@@ -150,6 +90,7 @@ export function isDeepResearchIntent(intent) {
  * @param {string} text — texto crudo del usuario (lo que escribió en el input).
  * @param {object} [opts]
  * @param {string|null} [opts.municipio] — municipio de la finca activa (para clima).
+ * @param {string|null} [opts.pisoTermico] — frio|templado|calido (para calendario).
  * @returns {null | {
  *   intent: string,
  *   tool: string | null,        // tool determinístico, o null si stub
@@ -181,19 +122,15 @@ export function planForcedIntent(intent, text, opts = {}) {
 
   switch (intent) {
     case CHIP_INTENTS.siembro:
-    case CHIP_INTENTS.calendario:
-      // Ficha de especie. El calendario/época de siembra se deriva de la ficha
-      // (no hay get_calendario_siembra dedicado en el sidecar). El grounding
-      // trae piso térmico / ciclo y el LLM lo expone como época de siembra.
-      return { ...base, tool: 'get_species', args: { query: prompt } };
+      return { ...base, tool: 'get_species', args: { id_or_name: prompt } };
 
     case CHIP_INTENTS.plaga:
       // Controladores agroecológicos de la plaga (AGE Cypher).
-      return { ...base, tool: 'get_pest_controllers', args: { pest: prompt } };
+      return { ...base, tool: 'get_pest_controllers', args: { pest_id_or_name: prompt } };
 
     case CHIP_INTENTS.biopreparado:
       // Recetas de biopreparados del catálogo.
-      return { ...base, tool: 'get_biopreparados', args: { query: prompt } };
+      return { ...base, tool: 'get_biopreparados', args: { species_id_or_pest: prompt } };
 
     case CHIP_INTENTS.clima: {
       const municipio =
@@ -225,8 +162,33 @@ export function planForcedIntent(intent, text, opts = {}) {
     }
 
     case CHIP_INTENTS.precio:
-      // STUB: backend no implementado. NO inventamos endpoint.
-      return { ...base, stub: true, stubMessage: def.stubMessage };
+      return {
+        ...base,
+        tool: 'get_precio_sipsa',
+        args: { action: 'latest_price', producto: prompt },
+      };
+
+    case CHIP_INTENTS.calendario: {
+      const piso = normalizePisoTermico(opts.pisoTermico);
+      if (!piso) {
+        return {
+          ...base,
+          tool: 'get_calendario_siembra',
+          args: {},
+          stub: true,
+          stubResult: {
+            available: false,
+            reason: 'no_piso_termico',
+            hint: 'pedir la altitud de la finca para calcular el piso térmico',
+          },
+        };
+      }
+      return {
+        ...base,
+        tool: 'get_calendario_siembra',
+        args: { piso_termico: piso },
+      };
+    }
 
     case CHIP_INTENTS.deep:
       // Deep Research: el backend está live (POST /deep-research → GET /deep-research/:id).
@@ -250,4 +212,15 @@ function isoDaysAgo(days) {
   return new Date(Date.now() - days * 24 * 60 * 60 * 1000)
     .toISOString()
     .slice(0, 10);
+}
+
+function normalizePisoTermico(value) {
+  if (typeof value !== 'string') return null;
+  const normalized = value.trim().toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+  if (normalized === 'frio' || normalized === 'paramo') return 'frio';
+  if (normalized === 'templado') return 'templado';
+  if (normalized === 'calido') return 'calido';
+  return null;
 }
