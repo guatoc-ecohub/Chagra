@@ -15,8 +15,8 @@
  * "plan forzado" que el AgentScreen ejecuta sin pasar por `planNlu()`. Toda la
  * lógica de routing vive acá para poder testearla en aislamiento (TDD).
  *
- * Enum de intención: { siembro, plaga, biopreparado, clima, precio,
- *                      calendario, deep }.
+ * CHIP_INTENTS y CHIP_DEFS se importan de agentCapabilities.js (fuente única
+ * de verdad). Este módulo NO redefine esas constantes.
  *
  * Tools determinísticos (ya existen en el sidecar, ver sidecarClient.ALLOWED_TOOLS):
  *   - siembro      → get_species          (ficha + viabilidad de la especie)
@@ -36,81 +36,8 @@
  * strings visibles al campesino se redactan en neutro colombiano.
  */
 
-/** Enum de intención de los chips. Las claves == valores (string union). */
-export const CHIP_INTENTS = Object.freeze({
-  siembro: 'siembro',
-  plaga: 'plaga',
-  biopreparado: 'biopreparado',
-  clima: 'clima',
-  precio: 'precio',
-  calendario: 'calendario',
-  deep: 'deep',
-});
-
-/**
- * Definiciones declarativas de los 7 chips. El orden de este array es el orden
- * de render en la barra. `placeholder` reemplaza el placeholder del input
- * cuando el modo está activo, para guiar al campesino sobre qué escribir.
- *
- * `kind`:
- *   - 'tool' → rutea a un tool determinístico (planForcedIntent.tool).
- *   - 'stub' → backend no implementado; planForcedIntent.stubMessage explica.
- */
-export const CHIP_DEFS = Object.freeze([
-  {
-    intent: CHIP_INTENTS.siembro,
-    emoji: '🌱',
-    label: '¿Qué siembro?',
-    kind: 'tool',
-    placeholder: 'Escribe la planta o di qué quieres sembrar',
-  },
-  {
-    intent: CHIP_INTENTS.plaga,
-    emoji: '🐛',
-    label: 'Plaga',
-    kind: 'tool',
-    placeholder: 'Escribe la plaga o describe el daño que ves',
-  },
-  {
-    intent: CHIP_INTENTS.biopreparado,
-    emoji: '🧪',
-    label: 'Biopreparado',
-    kind: 'tool',
-    placeholder: 'Escribe para qué plaga o planta quieres el biopreparado',
-  },
-  {
-    intent: CHIP_INTENTS.clima,
-    emoji: '🌦️',
-    label: 'Clima',
-    kind: 'tool',
-    placeholder: 'Pregunta por la lluvia o el clima de tu zona',
-  },
-  {
-    intent: CHIP_INTENTS.precio,
-    emoji: '💰',
-    label: 'Precio',
-    kind: 'stub',
-    placeholder: 'Escribe el producto del que quieres saber el precio',
-    stubMessage:
-      'La consulta de precios todavía no está disponible en Chagra. ' +
-      'Por ahora el precio mayorista lo publica el DANE (SIPSA) como archivo descargable, ' +
-      'sin consulta directa. Si quieres, te oriento a la fuente o a Corabastos.',
-  },
-  {
-    intent: CHIP_INTENTS.calendario,
-    emoji: '📅',
-    label: 'Calendario',
-    kind: 'tool',
-    placeholder: 'Escribe la planta para ver su época de siembra',
-  },
-  {
-    intent: CHIP_INTENTS.deep,
-    emoji: '🔬',
-    label: 'Investigación profunda',
-    kind: 'deep',
-    placeholder: 'Escribe el tema que quieres investigar a fondo',
-  },
-]);
+import { CHIP_INTENTS, CHIP_DEFS } from './agentCapabilities.js';
+export { CHIP_INTENTS, CHIP_DEFS };
 
 const DEF_BY_INTENT = Object.freeze(
   CHIP_DEFS.reduce((acc, def) => {
