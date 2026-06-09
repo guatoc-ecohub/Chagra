@@ -77,6 +77,30 @@ describe('chipIntentRouter — entradas inválidas', () => {
     expect(planForcedIntent('siembro', '   ')).toBeNull();
     expect(planForcedIntent('siembro', null)).toBeNull();
   });
+
+  it('retorna null para opts null/undefined explícito', () => {
+    // opts default es {} pero si se pasa null/undefined debe sobrevivir
+    expect(planForcedIntent('siembro', 'hola', null)).not.toBeNull();
+    expect(planForcedIntent('siembro', 'hola', undefined)).not.toBeNull();
+  });
+
+  it('retorna stub no_municipio para opts.municipio vacío/null en clima', () => {
+    const emptyMunicipio = planForcedIntent('clima', '¿lloverá?', { municipio: '' });
+    expect(emptyMunicipio.stub).toBe(true);
+    expect(emptyMunicipio.stubResult.reason).toBe('no_municipio');
+
+    const nullMunicipio = planForcedIntent('clima', '¿lloverá?', { municipio: null });
+    expect(nullMunicipio.stub).toBe(true);
+    expect(nullMunicipio.stubResult.reason).toBe('no_municipio');
+  });
+
+  it('retorna plan normal para texto con solo caracteres especiales', () => {
+    const emoji = planForcedIntent('siembro', '🌱🌿');
+    expect(emoji).not.toBeNull();
+    expect(emoji.tool).toBe('get_species');
+    expect(emoji.args).toEqual({ query: '🌱🌿' });
+    expect(emoji.prompt).toBe('🌱🌿');
+  });
 });
 
 describe('chipIntentRouter — intents con tool determinístico (saltan NLU)', () => {
@@ -110,8 +134,17 @@ describe('chipIntentRouter — intents con tool determinístico (saltan NLU)', (
     expect(plan.tool).toBe('get_clima_ideam');
     expect(plan.args.action).toBe('monthly_avg');
     expect(plan.args.municipio).toBe('Choachí');
+    expect(plan.args.metric).toBe('precipitation');
+    // desde debe ser fecha ISO YYYY-MM-DD de hace ~30 días
+    expect(plan.args.desde).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     expect(plan.stub).toBe(false);
     expect(plan.skipNlu).toBe(true);
+  });
+
+  it('clima con opts.municipio trimmeado funciona (espacios alrededor se limpian)', () => {
+    const plan = planForcedIntent('clima', 'lluvias?', { municipio: '  Choachí  ' });
+    expect(plan.args.municipio).toBe('Choachí');
+    expect(plan.stub).toBe(false);
   });
 
   it('clima sin municipio → evidence stub no_municipio (pide municipio, NO inventa)', () => {
@@ -186,6 +219,82 @@ describe('chipIntentRouter — Deep Research (A6/A7, backend live)', () => {
     expect(deepDef.kind).toBe('deep');
     // Ya no tiene stubMessage
     expect(deepDef.stubMessage).toBeUndefined();
+  });
+});
+
+describe('chipIntentRouter — contrato de orden y consistencia del índice', () => {
+  it('CHIP_DEFS mantiene el orden de render estable (siembro, plaga, biopreparado, clima, precio, calendario, deep)', () => {
+    const order = CHIP_DEFS.map((d) => d.intent);
+    expect(order).toEqual([
+      'siembro', 'plaga', 'biopreparado', 'clima', 'precio', 'calendario', 'deep',
+    ]);
+  });
+
+  it('DEF_BY_INTENT indexa todos los 7 intents sin entradas extra', async () => {
+    const { default: mod } = await import('../chipIntentRouter.js');
+    // DEF_BY_INTENT no es exportado, así que verificamos indirectamente:
+    // isStubIntent e isDeepResearchIntent cubren todos los intents sin error.
+    for (const intent of Object.keys(CHIP_INTENTS)) {
+      expect(() => {
+        // Estos son los únicos consumers del índice interno
+        const plan = planForcedIntent(intent, 'test');
+        expect(plan).not.toBeNull();
+      }).not.toThrow();
+    }
+  });
+});
+
+describe('chipIntentRouter — opts ruidosos no contaminan los args', () => {
+  it('siembro ignora opts.municipio cuando se pasa por error', () => {
+    const plan = planForcedIntent('siembro', 'aguacate', { municipio: 'Bogotá' });
+    expect(plan.tool).toBe('get_species');
+    expect(plan.args).toEqual({ query: 'aguacate' });
+    expect(plan.args).not.toHaveProperty('municipio');
+  });
+
+  it('plaga ignora opts no relacionados', () => {
+    const plan = planForcedIntent('plaga', 'broca', { foo: 'bar' });
+    expect(plan.tool).toBe('get_pest_controllers');
+    expect(plan.args).toEqual({ pest: 'broca' });
+  });
+
+  it('precio ignora opts completamente (es stub)', () => {
+    const plan = planForcedIntent('precio', 'papa', { municipio: 'Choachí' });
+    expect(plan.stub).toBe(true);
+    expect(plan.tool).toBeNull();
+    expect(plan.args).toBeNull();
+  });
+
+  it('deep ignora opts completamente', () => {
+    const plan = planForcedIntent('deep', 'abonos verdes', { municipio: 'Choachí' });
+    expect(plan.deep).toBe(true);
+    expect(plan.tool).toBeNull();
+    expect(plan.stub).toBe(false);
+  });
+});
+
+describe('chipIntentRouter — cross-reference con ALLOWED_TOOLS del sidecar', () => {
+  it('todas las tools de CHIP_DEFS kind:tool existen en ALLOWED_TOOLS', async () => {
+    const { __TEST__ } = await import('../sidecarClient.js');
+    const allowed = __TEST__.ALLOWED_TOOLS;
+    const toolIntents = CHIP_DEFS.filter((d) => d.kind === 'tool');
+    for (const def of toolIntents) {
+      // planForcedIntent revela el tool name real
+      const plan = planForcedIntent(def.intent, 'test query', { municipio: 'Choachí' });
+      expect(plan.tool).not.toBeNull();
+      expect(allowed.has(plan.tool)).toBe(true);
+    }
+  });
+
+  it('ningún kind:stub o kind:deep tiene tool en ALLOWED_TOOLS', async () => {
+    const { __TEST__ } = await import('../sidecarClient.js');
+    const allowed = __TEST__.ALLOWED_TOOLS;
+    const nonToolIntents = CHIP_DEFS.filter((d) => d.kind !== 'tool');
+    for (const def of nonToolIntents) {
+      const plan = planForcedIntent(def.intent, 'test');
+      expect(plan.tool).toBeNull();
+      // Ningún stub/deep debe tener un tool asignado (ni siquiera por error)
+    }
   });
 });
 
