@@ -5,6 +5,7 @@ import Database from 'better-sqlite3';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = path.join(__dirname, '../public/catalog.sqlite');
+const TEMP_DB_PATH = `${DB_PATH}.tmp-${process.pid}`;
 // REVERT 2026-05-23: el subset 50 species (PR #1011) cortó species críticas
 // (aguacate, tomate, lechuga, acelga, tomate árbol) y rompió casos de uso
 // reales del agente en producción. Vuelve al corpus full 496 mientras
@@ -24,11 +25,13 @@ const SEED_FILE = process.env.CHAGRA_SEED
   ? path.basename(process.env.CHAGRA_SEED)
   : DEFAULT_SEED;
 
-if (fs.existsSync(DB_PATH)) {
-  fs.unlinkSync(DB_PATH);
+if (fs.existsSync(TEMP_DB_PATH)) {
+  fs.unlinkSync(TEMP_DB_PATH);
 }
 
-const db = new Database(DB_PATH);
+// Construir fuera de la ruta pública. Un ABI roto, seed inválido o mismatch no
+// debe borrar el último catálogo válido que ya usa la aplicación.
+const db = new Database(TEMP_DB_PATH);
 
 db.exec(`
   CREATE TABLE species (
@@ -165,7 +168,10 @@ db.close();
 
 if (countSpecies !== speciesData.length || countBio !== biopreparadosData.length || countSources !== sourcesData.length) {
   console.error(`[Build Catalog] Mismatch in expected counts! Failed. Species: ${countSpecies}!=${speciesData.length}`);
+  if (fs.existsSync(TEMP_DB_PATH)) fs.unlinkSync(TEMP_DB_PATH);
   process.exit(1);
 }
+
+fs.renameSync(TEMP_DB_PATH, DB_PATH);
 
 process.exit(0);
