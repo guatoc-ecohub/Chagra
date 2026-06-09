@@ -20,6 +20,7 @@ import {
   guardCompanionBinomial,
   guardVisionWithoutPhoto,
   guardThermalViability,
+  guardConciseResponse,
   applyOutputGuards,
   filterNoiseEntities,
   getOutputGuardTelemetry,
@@ -1446,5 +1447,63 @@ describe('applyOutputGuards (cadena)', () => {
     const out = applyOutputGuards(ok, { hadVision: true, visionConfidence: 0.8 });
     expect(out.modified).toBe(false);
     expect(out.text).toBe(ok);
+  });
+
+  // ── guardConciseResponse ─────────────────────────────────────────────────
+  describe('guardConciseResponse', () => {
+    it('NO toca respuestas cortas (<250 palabras)', () => {
+      const ok = 'Para la roya del café recomiendo podar las ramas afectadas y aplicar caldo bordelés.';
+      const out = guardConciseResponse(ok);
+      expect(out.modified).toBe(false);
+      expect(out.text).toBe(ok);
+    });
+
+    it('recorta respuestas >250 palabras a primeras 3 oraciones + oferta', () => {
+      const long = Array.from({ length: 55 }, (_, i) =>
+        `Recomendación ${i + 1} para tu cultivo de tomate en clima frío.`
+      ).join(' ');
+      expect(long.split(/\s+/).filter(Boolean).length).toBeGreaterThan(250);
+      const out = guardConciseResponse(long);
+      expect(out.modified).toBe(true);
+      expect(out.reason).toMatch(/verbose|concise/i);
+      expect(out.text).toMatch(/¿Quieres que profundice/i);
+    });
+
+    it('fuerza recorte duro si >400 palabras', () => {
+      const veryLong = Array.from({ length: 80 }, (_, i) =>
+        `Este es el párrafo extenso número ${i + 1} con detalles sobre la fresa en cultivo de clima frío.`
+      ).join('. ');
+      expect(veryLong.split(/\s+/).filter(Boolean).length).toBeGreaterThan(400);
+      const out = guardConciseResponse(veryLong);
+      expect(out.modified).toBe(true);
+      expect(out.reason).toMatch(/hard_limit/i);
+    });
+
+    it('deduplica si misma recomendación aparece 3+ veces', () => {
+      const redundant = 'Recomiendo regar cada 3 días. '.repeat(60) +
+        'También recomiendo podar en seco una vez al mes.';
+      const out = guardConciseResponse(redundant);
+      expect(out.modified).toBe(true);
+      expect(out.reason).toMatch(/redundant/i);
+    });
+
+    it('no-op para string vacío', () => {
+      expect(guardConciseResponse('').modified).toBe(false);
+    });
+
+    it('no-op para no-string', () => {
+      expect(guardConciseResponse(null).modified).toBe(false);
+      expect(guardConciseResponse(undefined).modified).toBe(false);
+    });
+
+    it('se integra en la cadena applyOutputGuards: recorta respuesta larga', () => {
+      const veryLong = Array.from({ length: 35 }, (_, i) =>
+        `Paso importante número ${i + 1} que debes seguir en tu cultivo de tomate.`
+      ).join(' ');
+      const out = applyOutputGuards(veryLong, {});
+      expect(out.modified).toBe(true);
+      const hasConcise = out.reasons.some(r => /concise/i.test(r));
+      expect(hasConcise).toBe(true);
+    });
   });
 });

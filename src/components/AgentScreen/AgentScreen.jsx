@@ -65,7 +65,7 @@ import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../
 // sidecarClient/deepResearchClient vía buildSidecarHeaders (defense-in-depth).
 import { getCurrentTier } from '../../services/tierService';
 import DeepResearchCard from '../DeepResearchCard';
-import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildSuggestedEntitiesContext, isLowConfidenceEntity } from '../../services/agentService';
+import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildSuggestedEntitiesContext, isLowConfidenceEntity, buildFallbackResponse } from '../../services/agentService';
 import { applyOutputGuards, classifyQueryIntent } from '../../services/outputGuards';
 import { getProfile } from '../../services/userProfileService';
 import { captureExchange } from '../../services/conversationCaptureService';
@@ -239,6 +239,7 @@ export default function AgentScreen({ onBack, initialContext }) {
   // LLM / watchdog sin tokens), 'cancel' (operador tocó Cancelar) o 'abort'
   // (genérico, ej. red caída). Se setea antes de disparar controller.abort().
   const cancelReasonRef = useRef(null);
+  const llmStatsRef = useRef(null);
   // Holder del deadline stream-aware activo (createStreamDeadline). FIX prod
   // P0 (2026-06-02): combina idle-timeout (reinicia por token → no aborta
   // streams vivos) + techo absoluto. Reemplaza al watchdog/timer total previo.
@@ -1350,6 +1351,12 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
           onToken: (_chunk, full) => markToken(full),
           signal: controller.signal,
         });
+        llmStatsRef.current = {
+          first_token_ms: stats?.first_token_ms || null,
+          sidecar_first_token_ms: stats?.sidecar_first_token_ms || null,
+          eval_rate: stats?.eval_rate || null,
+          response_len: fullText?.length || 0,
+        };
         console.warn('[Agent] LLM call complete (sidecar stream)', {
           responseLen: fullText?.length || 0,
           first_token_ms: stats?.first_token_ms,
@@ -1774,6 +1781,10 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       }
 
       const rawResponse = await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock);
+      // Fallback estructurado (Item 9): si el LLM retornó vacío (timeout, OOM,
+      // modelo caído), construimos una respuesta útil con lo que sabemos
+      // (toolEvidence, entidades) en vez de un silencio o banner rojo.
+      const fallbackContent = buildFallbackResponse(rawResponse, toolEvidence, resolvedEntities);
       // DR-LANG-1: filtro post-process anti-voseo argentino. Es la última
       // línea de defensa estructural — garantiza que el léxico rioplatense
       // (che, laburar, etc.) NUNCA llegue al usuario campesino colombiano,
@@ -1789,7 +1800,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       // sequences de llmRouter, así que el filtro estructural por sí solo no
       // cubre el 100% de los casos). Va ANTES del voseo para no analizar
       // basura, y el resultado se persiste/renderea/habla ya saneado.
-      const deLeaked = stripRoleLeak(rawResponse);
+      const deLeaked = stripRoleLeak(fallbackContent);
       const voseoSafe = applyVoseoFilter(deLeaked, { formality: 'usted', region: resolveUserRegion() });
       // GUARDAS DETERMINISTAS sobre la SALIDA (bench 10 prompts 2026-05-30: el
       // modelo TIENE los hechos en el grounding pero razona mal —invierte
@@ -1949,6 +1960,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       const profileForCapture = (() => {
         try { return getProfile(); } catch (_) { return {}; }
       })();
+      const currentLlmStats = llmStatsRef.current;
       captureExchange({
         userText: text.trim(),
         agentText: response,
@@ -1968,6 +1980,9 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
           grounded_status: sourceMetadata?.source || sourceMetadata?.grounded_status || null,
           latency_ms: Math.round(performance.now() - pipelineStartedAt),
           model: selectChatRoute(textForLLM),
+          eval_rate: currentLlmStats?.eval_rate ?? null,
+          first_token_ms: currentLlmStats?.first_token_ms ?? null,
+          response_len: currentLlmStats?.response_len ?? null,
         },
       });
       setMessages((prev) => [...prev, assistantMessage]);

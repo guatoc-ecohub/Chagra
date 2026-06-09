@@ -880,13 +880,50 @@ async function main() {
   // Preflight: todos los modelos existen antes de empezar.
   await checkOllamaModels();
 
-  console.log('[bench] Agente Chagra completo — Benchmark LARGO');
-  console.log(`[bench] Modelos: ${Object.values(MODELS).join(', ')}`);
-  console.log(`[bench] Prompts: ${PROMPTS.length}`);
-  console.log(`[bench] Categorías: species(20), biopreparados(12), plagas(10), normativa(4), agroforestería(4)`);
-  console.log(`[bench] Directorio output: ${BENCH_RUNS_DIR}`);
-  console.log(`[bench] Sidecar URL: ${SIDECAR_URL}`);
-  console.log(`[bench] Ollama URL: ${OLLAMA_URL}`);
+  console.log('');
+  console.log('================================================================================');
+  console.log('  BENCHMARK COMPLETO DEL AGENTE CHAGRA');
+  console.log('================================================================================');
+  console.log('');
+  console.log('  ¿Qué mide?');
+  console.log('  El pipeline completo: resolve-entities → enriched prompt → LLM → post-validate.');
+  console.log('  Evalúa cada modelo en 50 consultas reales de agricultores colombianos,');
+  console.log('  midiendo qué tan bien usa el grounding del catálogo Chagra sin alucinar.');
+  console.log('');
+  console.log(`  Modelos evaluados (${Object.keys(MODELS).length}):`);
+  for (const [k, v] of Object.entries(MODELS)) {
+    console.log(`    • ${v}`);
+  }
+  console.log('');
+  console.log('  ¿Por qué estos modelos?');
+  console.log('  Van desde 3B hasta 30B parámetros, cubriendo perfiles:');
+  console.log('    • 3B-4B:     Ejecución local en laptop/edge (gemma3:4b, ministral-3:latest)');
+  console.log('    • 8B:        Balance calidad/recursos (granite3.1-dense:8b, aya:8b)');
+  console.log('    • 12B-14B:   Rendimiento medio-alto (mistral-nemo:12b, ministral-3:14b)');
+  console.log('    • 30B:       Máxima calidad (qwen3:30b, require GPU dedicada)');
+  console.log('');
+  console.log(`  Categorías de consulta (${PROMPTS.length} totales):`);
+  console.log('    • species (20)       — Siembra, cuidados, riego, suelo, cosecha, almacenamiento');
+  console.log('    • biopreparados (12) — Recetas orgánicas, fermentos, caldos, purines');
+  console.log('    • plagas (10)        — Identificación, control, prevención');
+  console.log('    • normativa (4)      — Legislación, registro ICA, etiquetado');
+  console.log('    • agroforestería (4) — Sistemas silvopastoriles, gremios, barreras');
+  console.log('');
+  console.log('  Métricas clave:');
+  console.log('    • Latencia total:     Tiempo real que espera el usuario (resolve + inferencia + validación)');
+  console.log('    • Tokens/s:           Velocidad de generación del LLM');
+  console.log('    • Keywords matched:   % de términos esperados que aparecen en la respuesta');
+  console.log('    • Entities grounded:  Cuántas entidades del catálogo usa correctamente');
+  console.log('    • Hallucinations:     Afirmaciones sin respaldo en el grounding');
+  console.log('    • VRAM / RAM:         Consumo de memoria (clave para decidir hardware)');
+  console.log('    • Prompt eval:        Tiempo de procesar la consulta (primera latencia)');
+  console.log('    • Eval count:         Cantidad de tokens generados');
+  console.log('    • Load duration:      Tiempo de carga del modelo en GPU');
+  console.log('');
+  console.log(`  Output: ${BENCH_RUNS_DIR}`);
+  console.log(`  Sidecar: ${SIDECAR_URL}`);
+  console.log(`  Ollama:  ${OLLAMA_URL}`);
+  console.log('');
 
   // Crear directorio output
   if (!existsSync(BENCH_RUNS_DIR)) {
@@ -1238,28 +1275,47 @@ La revisión humana es obligatoria antes de promover un modelo.
   const summaryPath = join(BENCH_RUNS_DIR, `agente-completo-${dateStr}-summary.md`);
   writeFileSync(summaryPath, summaryContent);
 
-  console.log('\n[bench] ===== RESULTADOS =====');
-  console.log(`[bench] Tiempo total: ${(totalTime / 1000 / 60).toFixed(2)}min`);
-  console.log(`[bench]`);
+  console.log('');
+  console.log('================================================================================');
+  console.log('  RESULTADOS');
+  console.log('================================================================================');
+  console.log('');
+  console.log(`  Tiempo total del benchmark: ${(totalTime / 1000 / 60).toFixed(2)} minutos`);
+  console.log(`  Promedio por consulta:      ${(totalTime / PROMPTS.length / 1000).toFixed(2)} segundos`);
+  console.log('');
   for (const modelKey of modelKeys) {
     const s = stats[modelKey];
-    console.log(`[bench] ${s.modelName}:`);
-    console.log(`[bench]   Exitosos: ${s.successful}/${PROMPTS.length}`);
-    console.log(`[bench]   Latencia avg: ${s.avgLatencyTotal.toFixed(0)}ms (R:${s.avgLatencyResolve.toFixed(0)} I:${s.avgLatencyInference.toFixed(0)} V:${s.avgLatencyValidate.toFixed(0)})`);
-    console.log(`[bench]   Keywords avg: ${(s.avgKeywords * 100).toFixed(1)}%`);
-    console.log(`[bench]   Entities avg: ${s.avgEntities.toFixed(1)}`);
-    console.log(`[bench]   Hallucinations avg: ${s.avgHalluc.toFixed(1)}`);
-    console.log(`[bench]`);
+    const okRate = s.successful > 0 ? ((s.successful / PROMPTS.length) * 100).toFixed(0) : '0';
+    const tokensPerSec = s.avgTokensPerSec !== null ? `${s.avgTokensPerSec} tok/s` : 'N/A';
+    const vram = s.avgVram !== 'N/A' ? `${s.avgVram} MiB` : 'N/A';
+    const ram = s.avgRam !== 'N/A' ? `${s.avgRam} MB` : 'N/A';
+    const promptEval = s.avgPromptEvalDurationMs !== null ? `${(s.avgPromptEvalDurationMs / 1000).toFixed(1)}s` : 'N/A';
+    const evalCount = s.avgEvalCount !== null ? `${s.avgEvalCount}` : 'N/A';
+
+    console.log(`  ── ${s.modelName} ──`);
+    console.log(`  Consultas exitosas: ${s.successful}/${PROMPTS.length} (${okRate}%) — modelos caídos = 0 significa ejecutable`);
+    console.log(`  Velocidad:         ${s.avgLatencyTotal.toFixed(0)}ms por consulta (resolver ${s.avgLatencyResolve.toFixed(0)}ms, inferir ${s.avgLatencyInference.toFixed(0)}ms, validar ${s.avgLatencyValidate.toFixed(0)}ms)`);
+    console.log(`  Tokens:            ${tokensPerSec}, ${evalCount} tokens generados, evalúo del prompt ${promptEval}`);
+    console.log(`  Precisión:         ${(s.avgKeywords * 100).toFixed(1)}% keywords acertados, ${s.avgEntities.toFixed(1)} entidades del catálogo usadas`);
+    console.log(`  Alucinaciones:     ${s.avgHalluc.toFixed(1)} por respuesta`);
+    console.log(`  Recursos:          VRAM ${vram}, RAM ${ram}`);
+    console.log('');
   }
-  console.log(`[bench] Ganadores:`);
-  for (const modelKey of modelKeys) {
-    console.log(`[bench]   ${MODELS[modelKey]}: ${winners[modelKey]} (${(winners[modelKey] / PROMPTS.length * 100).toFixed(1)}%)`);
+  console.log('  ── Ranking por victorias ──');
+  const sortedModels = [...modelKeys].sort((a, b) => (winners[a] || 0) - (winners[b] || 0)).reverse();
+  for (let rank = 0; rank < sortedModels.length; rank++) {
+    const mk = sortedModels[rank];
+    const pct = ((winners[mk] / PROMPTS.length) * 100).toFixed(1);
+    console.log(`  #${rank + 1}  ${MODELS[mk]}  —  ${winners[mk]} victorias (${pct}%)`);
   }
-  console.log(`[bench]   Todos fallaron: ${winners.none} (${(winners.none / PROMPTS.length * 100).toFixed(1)}%)`);
-  console.log(`[bench]`);
-  console.log(`[bench] Output:`);
-  console.log(`[bench]   JSONL: ${jsonlPath}`);
-  console.log(`[bench]   Summary: ${summaryPath}`);
+  if (winners.none > 0) {
+    console.log(`  —   Todos fallaron: ${winners.none} consultas`);
+  }
+  console.log('');
+  console.log('  Archivos generados:');
+  console.log(`    Datos:    ${jsonlPath}`);
+  console.log(`    Reporte:  ${summaryPath}`);
+  console.log('');
   
   console.log(`\n[bench] Invocando LLM-judge para evaluar calidad...`);
   try {
