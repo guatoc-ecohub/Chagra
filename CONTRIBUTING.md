@@ -72,6 +72,20 @@ Ver:
 - `src/core/bootstrap-oss.js` — registra módulos OSS en bootstrap.
 - `src/core/loadProModules.js` — carga dinámica de módulos opcionales vía env var.
 
+## Para revisores externos: cómo participar
+
+Valoramos contribuciones de la comunidad. Si eres nuevo en Chagra, este flujo guía tu primer aporte:
+
+1. **Encuentra un issue**: explora los issues abiertos con label `good-first-issue` o `help-wanted`. También puedes reportar bugs o sugerir features abriendo un issue nuevo usando la plantilla `claude-code-request.yml`.
+2. **Comenta que lo tomas**: así evitamos duplicación de trabajo. Un mantenedor asignará el issue y responderá dudas.
+3. **Lee el CLA**: toda contribución requiere firmar el CLA (`CLA.md`). Un comentario "I have read the CLA Document and I hereby sign the CLA" en tu primer PR basta.
+4. **Crea tu rama desde `origin/main`**: asegúrate de que tu fork esté actualizado antes de branchear.
+5. **Sigue el estilo del proyecto**: conventional commits, sin em dashes en texto UI, respeta las reglas anti-leak de infraestructura privada ($6).
+6. **Abre un Pull Request draft**: titúlalo con el prefijo del tipo de cambio (`feat:`, `fix:`, `refactor:`, `chore:`, `docs:`). Los checks de CI (CodeQL + Playwright E2E) correrán automáticamente.
+7. **Espera review**: un mantenedor revisará en máximo 5 días hábiles. Si pasa más tiempo sin respuesta, ping en el PR.
+
+**Criterios de merge**: ambos checks CI verdes, sin secretos leakados, CLA firmado, y aprobación de al menos un mantenedor.
+
 ## Reporte responsable de vulnerabilidades
 
 Si detectas un problema de seguridad, por favor no abras un issue público. Usa el canal privado de GitHub Security Advisories sobre este repositorio, o contacta al mantenedor directamente.
