@@ -33,7 +33,7 @@ import { writeFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
-import { execSync } from 'node:child_process';
+import { execSync, spawnSync } from 'node:child_process';
 import {
   scoreKeywordsFlexible,
   scoreWithJudge,
@@ -52,6 +52,7 @@ const BENCH_RUNS_DIR = process.env.BENCH_OUTPUT_DIR || join(DATA_DIR, 'bench-run
 const SIDECAR_URL = process.env.SIDECAR_URL || 'http://localhost:7880';
 const OLLAMA_URL = 'http://localhost:11434/api/chat';
 const OLLAMA_GEN_URL = process.env.OLLAMA_GEN_URL || 'http://localhost:11434/api/generate';
+const OLLAMA_LIST_URL = 'http://localhost:11434/api/tags';
 const TIMEOUT_MS = 180_000; // 3 min timeout por modelo
 
 // R4 — juez INDEPENDIENTE (COBERTURA de keywords, no anti-alucinación). `--judge
@@ -506,10 +507,25 @@ async function callOllama(model, systemPrompt, userPrompt, signal) {
     }
     
     const data = await res.json();
+    const totalLatencyMs = performance.now() - start;
+    const promptEvalCount = data.prompt_eval_count || 0;
+    const evalCount = data.eval_count || 0;
+    const evalDuration = data.eval_duration || 0;
+    const loadDuration = data.load_duration || 0;
+    const promptEvalDuration = data.prompt_eval_duration || 0;
+    const tokensPerSec = evalDuration > 0
+      ? Math.round((evalCount / evalDuration) * 1e9)
+      : 0;
     return {
       response: data.message?.content || '',
-      latency_ms: performance.now() - start,
+      latency_ms: totalLatencyMs,
       tokens_estimated: data.message?.content?.length || 0,
+      load_duration: loadDuration,
+      prompt_eval_count: promptEvalCount,
+      prompt_eval_duration: promptEvalDuration,
+      eval_count: evalCount,
+      eval_duration: evalDuration,
+      tokens_per_sec: tokensPerSec,
     };
   } catch (err) {
     if (err.name === 'AbortError') {
@@ -647,6 +663,7 @@ async function benchmarkModel(modelKey, modelName, promptData) {
       );
     }
 
+    const resources = sampleResources();
     return {
       model: modelName,
       latency_resolve_ms: entitiesResult.latency_ms,
@@ -655,6 +672,15 @@ async function benchmarkModel(modelKey, modelName, promptData) {
       latency_total_ms: entitiesResult.latency_ms + ollamaResult.latency_ms + validationResult.latency_ms,
       response: ollamaResult.response,
       tokens_estimated: ollamaResult.tokens_estimated,
+      load_duration_ns: ollamaResult.load_duration,
+      prompt_eval_count: ollamaResult.prompt_eval_count,
+      prompt_eval_duration_ns: ollamaResult.prompt_eval_duration,
+      eval_count: ollamaResult.eval_count,
+      eval_duration_ns: ollamaResult.eval_duration,
+      tokens_per_sec: ollamaResult.tokens_per_sec,
+      vram_peak_mib: resources.vram_peak_mib,
+      ram_peak_mb: resources.ram_peak_mb,
+      swap_peak_mb: resources.swap_peak_mb,
       keywords_matched: countKeywords(ollamaResult.response, promptData.expected_keywords),
       keywords_total: promptData.expected_keywords.length,
       judge_cumple: judge ? judge.cumple : null,
@@ -683,6 +709,15 @@ async function benchmarkModel(modelKey, modelName, promptData) {
       latency_validate_ms: null,
       latency_total_ms: null,
       response: null,
+      load_duration_ns: null,
+      prompt_eval_count: null,
+      prompt_eval_duration_ns: null,
+      eval_count: null,
+      eval_duration_ns: null,
+      tokens_per_sec: null,
+      vram_peak_mib: 'N/A',
+      ram_peak_mb: 'N/A',
+      swap_peak_mb: 'N/A',
       keywords_matched: 0,
       keywords_total: promptData.expected_keywords.length,
       entities_grounded: 0,
@@ -749,6 +784,90 @@ async function benchmarkPrompt(promptData, index, total) {
   return results;
 }
 
+/**
+ * Preflight: verifica que TODOS los modelos de BENCH_MODELS existen en Ollama
+ * antes de gastar tiempo en inferencias. Si falta alguno, lista los comandos
+ * `ollama pull` necesarios y sale con código ≠ 0.
+ * También chequea que Ollama responda (el daemon está vivo).
+ */
+async function checkOllamaModels() {
+  const modelNames = Object.values(MODELS);
+  console.log('[preflight] Verificando modelos en Ollama...');
+
+  let ollamaUp = false;
+  try {
+    const res = await fetch(OLLAMA_LIST_URL, { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    ollamaUp = true;
+
+    const installed = new Set((data.models || []).map(m => m.name));
+    const missing = modelNames.filter(m => !installed.has(m));
+
+    if (missing.length === 0) {
+      console.log(`[preflight] Los ${modelNames.length} modelos están presentes.`);
+      return;
+    }
+
+    console.error(`[preflight] FALTAN ${missing.length} modelo(s) — abortando.`);
+    for (const m of missing) {
+      console.error(`  - ${m}`);
+    }
+    console.error('');
+    console.error('Comandos para instalar los faltantes:');
+    for (const m of missing) {
+      console.error(`  ollama pull ${m}`);
+    }
+    process.exit(1);
+  } catch (err) {
+    if (!ollamaUp) {
+      console.error('[preflight] No se pudo conectar con Ollama en', OLLAMA_LIST_URL);
+      console.error('[preflight] Asegúrate de que el daemon esté corriendo: ollama serve');
+      process.exit(1);
+    }
+    console.error('[preflight] Error inesperado al listar modelos:', err.message);
+    process.exit(1);
+  }
+}
+
+/**
+ * Muestrea VRAM, RAM y swap de forma segura sin requerir privilegios.
+ * En GPU Maxwell usa `nvidia-smi --query --format=csv` si está disponible;
+ * si no, reporta 'N/A'. RAM y swap se leen de /proc/meminfo.
+ * @returns {object} { vram_peak_mib, ram_peak_mb, swap_peak_mb }
+ */
+function sampleResources() {
+  const result = { vram_peak_mib: 'N/A', ram_peak_mb: 'N/A', swap_peak_mb: 'N/A' };
+  try {
+    const meminfo = readFileSync('/proc/meminfo', 'utf-8');
+    const totalMatch = meminfo.match(/MemTotal:\s+(\d+)/);
+    const availMatch = meminfo.match(/MemAvailable:\s+(\d+)/);
+    const swapTotalMatch = meminfo.match(/SwapTotal:\s+(\d+)/);
+    const swapFreeMatch = meminfo.match(/SwapFree:\s+(\d+)/);
+    if (totalMatch && availMatch) {
+      const usedKb = parseInt(totalMatch[1], 10) - parseInt(availMatch[1], 10);
+      result.ram_peak_mb = Math.round(usedKb / 1024);
+    }
+    if (swapTotalMatch && swapFreeMatch) {
+      const usedSwapKb = parseInt(swapTotalMatch[1], 10) - parseInt(swapFreeMatch[1], 10);
+      result.swap_peak_mb = Math.round(usedSwapKb / 1024);
+    }
+  } catch (_) { /* best-effort */ }
+
+  try {
+    const smi = spawnSync('nvidia-smi', [
+      '--query-gpu=memory.used',
+      '--format=csv,noheader,nounits',
+    ], { timeout: 5000, encoding: 'utf-8' });
+    if (smi.status === 0 && smi.stdout) {
+      const val = parseInt(smi.stdout.trim(), 10);
+      if (!isNaN(val)) result.vram_peak_mib = val;
+    }
+  } catch (_) { /* best-effort */ }
+
+  return result;
+}
+
 async function main() {
   // Guarda ANTI-STALE: aborta si el checkout está atrás de origin/main, para que
   // el bench nunca mida código viejo (pasó 3 veces y contaminó el AH%).
@@ -757,6 +876,9 @@ async function main() {
     autoPull: process.env.BENCH_AUTO_PULL === '1',
     skip: process.env.BENCH_SKIP_STALE_GUARD === '1',
   });
+
+  // Preflight: todos los modelos existen antes de empezar.
+  await checkOllamaModels();
 
   console.log('[bench] Agente Chagra completo — Benchmark LARGO');
   console.log(`[bench] Modelos: ${Object.values(MODELS).join(', ')}`);
@@ -794,6 +916,16 @@ async function main() {
     const modelName = MODELS[modelKey];
     const successful = results.filter(r => !r[modelKey].error);
     
+    const loadDurations = successful.map(r => r[modelKey].load_duration_ns).filter(Boolean);
+    const promptEvalCounts = successful.map(r => r[modelKey].prompt_eval_count).filter(Boolean);
+    const promptEvalDurations = successful.map(r => r[modelKey].prompt_eval_duration_ns).filter(Boolean);
+    const evalCounts = successful.map(r => r[modelKey].eval_count).filter(Boolean);
+    const evalDurations = successful.map(r => r[modelKey].eval_duration_ns).filter(Boolean);
+    const tokensPerSec = successful.map(r => r[modelKey].tokens_per_sec).filter(v => v !== null && v !== 0);
+
+    const vramValues = successful.map(r => r[modelKey].vram_peak_mib).filter(v => v !== 'N/A' && v !== null);
+    const ramValues = successful.map(r => r[modelKey].ram_peak_mb).filter(v => v !== 'N/A' && v !== null);
+
     stats[modelKey] = {
       modelName,
       successful: successful.length,
@@ -819,6 +951,30 @@ async function main() {
       avgHalluc: successful.length > 0
         ? successful.reduce((s, r) => s + r[modelKey].halluc_count, 0) / successful.length
         : 0,
+      avgLoadDurationMs: loadDurations.length > 0
+        ? Math.round(loadDurations.reduce((s, v) => s + v, 0) / loadDurations.length / 1e6)
+        : null,
+      avgPromptEvalCount: promptEvalCounts.length > 0
+        ? Math.round(promptEvalCounts.reduce((s, v) => s + v, 0) / promptEvalCounts.length)
+        : null,
+      avgPromptEvalDurationMs: promptEvalDurations.length > 0
+        ? Math.round(promptEvalDurations.reduce((s, v) => s + v, 0) / promptEvalDurations.length / 1e6)
+        : null,
+      avgEvalCount: evalCounts.length > 0
+        ? Math.round(evalCounts.reduce((s, v) => s + v, 0) / evalCounts.length)
+        : null,
+      avgEvalDurationMs: evalDurations.length > 0
+        ? Math.round(evalDurations.reduce((s, v) => s + v, 0) / evalDurations.length / 1e6)
+        : null,
+      avgTokensPerSec: tokensPerSec.length > 0
+        ? Math.round(tokensPerSec.reduce((s, v) => s + v, 0) / tokensPerSec.length)
+        : null,
+      avgVram: vramValues.length > 0
+        ? Math.round(vramValues.reduce((s, v) => s + v, 0) / vramValues.length)
+        : 'N/A',
+      avgRam: ramValues.length > 0
+        ? Math.round(ramValues.reduce((s, v) => s + v, 0) / ramValues.length)
+        : 'N/A',
     };
   }
 
@@ -856,11 +1012,16 @@ async function main() {
 
 ## Resultados Globales
 
-| Modelo | Exitosos | Latencia Total (ms) | Resolve | Inference | Validate | Keywords (%) | Entities | Halluc |
-|--------|----------|---------------------|---------|-----------|----------|-------------|----------|--------|
+| Modelo | Exitosos | Latencia Total (ms) | Tokens/s | Prompt Eval | Eval Count | VRAM (MiB) | RAM (MB) | Keywords (%) | Entities | Halluc |
+|--------|----------|---------------------|----------|-------------|------------|------------|----------|-------------|----------|--------|
 ${modelKeys.map(k => {
   const s = stats[k];
-  return `| **${s.modelName}** | ${s.successful}/${PROMPTS.length} | ${s.avgLatencyTotal.toFixed(0)} | ${s.avgLatencyResolve.toFixed(0)} | ${s.avgLatencyInference.toFixed(0)} | ${s.avgLatencyValidate.toFixed(0)} | ${(s.avgKeywords * 100).toFixed(1)}% | ${s.avgEntities.toFixed(1)} | ${s.avgHalluc.toFixed(1)} |`;
+  const tokensPerSec = s.avgTokensPerSec !== null ? s.avgTokensPerSec : 'N/A';
+  const promptEval = s.avgPromptEvalDurationMs !== null ? `${s.avgPromptEvalDurationMs}ms` : 'N/A';
+  const evalCount = s.avgEvalCount !== null ? s.avgEvalCount : 'N/A';
+  const vram = s.avgVram !== undefined ? s.avgVram : 'N/A';
+  const ram = s.avgRam !== undefined ? s.avgRam : 'N/A';
+  return `| **${s.modelName}** | ${s.successful}/${PROMPTS.length} | ${s.avgLatencyTotal.toFixed(0)} | ${tokensPerSec} | ${promptEval} | ${evalCount} | ${vram} | ${ram} | ${(s.avgKeywords * 100).toFixed(1)}% | ${s.avgEntities.toFixed(1)} | ${s.avgHalluc.toFixed(1)} |`;
 }).join('\n')}
 
 ## Ganadores por Prompt
@@ -995,12 +1156,69 @@ ${(() => {
   return `**Velocidad**: Todos los modelos fallaron.`;
 })()}
 
-${maxwellErrorDetected ? `
+${(() => {
+  // Detectar OOM / swap spill: si un modelo tuvo éxito pero swap > 0, señal de spill
+  const swapWarnings = [];
+  const oomErrors = [];
+  for (const modelKey of modelKeys) {
+    for (const r of results) {
+      const m = r[modelKey];
+      if (m.error) {
+        const e = (m.error || '').toLowerCase();
+        if (e.includes('oom') || e.includes('out of memory') || e.includes('cuda error')) {
+          oomErrors.push({ model: m.model, error: m.error });
+        }
+        continue;
+      }
+      if (m.swap_peak_mb !== 'N/A' && m.swap_peak_mb > 500) {
+        swapWarnings.push({ model: m.model, swapMb: m.swap_peak_mb });
+      }
+    }
+  }
+  const dedupedSwap = [...new Map(swapWarnings.map(s => [s.model, s])).values()];
+  const dedupedOom = [...new Map(oomErrors.map(s => [s.model, s])).values()];
+  let output = '';
+
+  if (maxwellErrorDetected) {
+    output += `
 ## ⚠️ Advertencia Maxwell sm_5.2
 
 Se detectaron errores relacionados con arquitectura Maxwell sm_5.2 durante el benchmark.
 Esto indica incompatibilidad con GPU Maxwell (Compute Capability 5.2).
-` : ''}
+`;
+  }
+
+  if (dedupedOom.length > 0) {
+    output += `
+## 🔴 OOM / CUDA Error detectados
+
+Los siguientes modelos fallaron por falta de memoria:
+`;
+    for (const o of dedupedOom) {
+      output += `- **${o.model}**: ${o.error}\n`;
+    }
+    output += '\n';
+  }
+
+  if (dedupedSwap.length > 0) {
+    output += `
+## ⚠️ Spill a swap detectado
+
+Los siguientes modelos usaron >500MB de swap, indicando presión de memoria:
+`;
+    for (const s of dedupedSwap) {
+      output += `- **${s.model}**: ${s.swapMb} MB swap\n`;
+    }
+    output += '\n';
+  }
+
+  return output;
+})()}
+
+## Gates vs configuración de producción
+
+No se encontró \`config/setup-llm-prod.json\` — no se puede comparar contra gates automáticos.
+**Ningún modelo se selecciona automáticamente para producción: se requiere revisión humana obligatoria.**
 
 ## Siguiente Paso
 
@@ -1013,6 +1231,8 @@ node scripts/bench-llm-judge.mjs --from ${jsonlPath}
 ---
 
 **Benchmark LARGO agente completo** — Generado por \`bench-agente-completo.mjs\`
+⚠️ Ningún modelo en este reporte ha sido seleccionado automáticamente para producción.
+La revisión humana es obligatoria antes de promover un modelo.
 `;
 
   const summaryPath = join(BENCH_RUNS_DIR, `agente-completo-${dateStr}-summary.md`);
