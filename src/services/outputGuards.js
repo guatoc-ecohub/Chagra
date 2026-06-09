@@ -6632,6 +6632,80 @@ const GUARD_CHAIN = [
  *   guards de siembra corren (conservador, no rompe la protección).
  * @returns {{text:string, modified:boolean, reasons:string[]}}
  */
+
+const MAX_CONCISE_WORDS = 250;
+const MAX_CONCISE_WORDS_HARD = 400;
+
+/**
+ * guardConciseResponse — guard de CONCISIÓN (Item 7).
+ *
+ * Si la respuesta del LLM excede 250 palabras, la acorta conservando las
+ * primeras 2 oraciones como resumen accionable y ofreciendo profundizar.
+ * Si excede 400 palabras (hard limit), fuerza el recorte.
+ * Además detecta si una misma recomendación aparece 3+ veces y la deduplica.
+ *
+ * Conservador: no toca respuestas <200 palabras (detalle legítimo).
+ * No-op si el texto es corto o no es string.
+ *
+ * @param {string} responseText - Texto completo de la respuesta del LLM.
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardConciseResponse(responseText) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+
+  const words = responseText.split(/\s+/).filter(Boolean);
+  if (words.length < MAX_CONCISE_WORDS) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Detectar repetición de misma recomendación 3+ veces
+  const sentences = responseText.match(/[^.!?]*[.!?]/g) || [];
+  const recommendationCounts = {};
+  for (const s of sentences) {
+    const trimmed = s.trim().toLowerCase();
+    for (const keyword of ['recomiendo', 'puedes', 'aplicar', 'usar', 'sembrar', 'regar', 'podar']) {
+      if (trimmed.includes(keyword)) {
+        recommendationCounts[keyword] = (recommendationCounts[keyword] || 0) + 1;
+        break;
+      }
+    }
+  }
+  const hasRedundancy = Object.values(recommendationCounts).some(c => c >= 3);
+
+  // Construir versión concisa
+  let conciseText = '';
+  let reason = '';
+
+  if (words.length >= MAX_CONCISE_WORDS_HARD) {
+    // Hard limit: extraer primeras 2 oraciones como resumen
+    const firstTwo = sentences.slice(0, 2).join(' ').trim();
+    conciseText = `${firstTwo}\n\n¿Quieres que profundice en algo específico?`;
+    reason = `guardConciseResponse:hard_limit (${words.length} palabras, max ${MAX_CONCISE_WORDS_HARD})`;
+  } else if (hasRedundancy) {
+    // Deduplicar: mantener primera mención de cada recomendación
+    const seen = new Set();
+    const deduped = sentences.filter(s => {
+      const key = s.trim().toLowerCase().slice(0, 60);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    conciseText = deduped.join(' ').trim();
+    if (conciseText.length < 30) conciseText = responseText.slice(0, 500) + '...';
+    reason = `guardConciseResponse:redundant_recommendation (${sentences.length} -> ${deduped.length} oraciones)`;
+  } else {
+    // Soft limit: recortar a primeras 3 oraciones + oferta profundizar
+    const firstThree = sentences.slice(0, 3).join(' ').trim();
+    conciseText = `${firstThree}\n\n¿Quieres que profundice en algo específico?`;
+    reason = `guardConciseResponse:verbose (${words.length} palabras, recomendado <${MAX_CONCISE_WORDS})`;
+  }
+
+  bumpGuardTelemetry('concise');
+  return { text: conciseText, modified: true, reason };
+}
+
 export function applyOutputGuards(
   responseText,
   {
@@ -6998,6 +7072,20 @@ export function applyOutputGuards(
     text = cwRes.text;
     modified = true;
     if (cwRes.reason) reasons.push(cwRes.reason);
+  }
+  // Guard de CONCISIÓN (Item 7): si la respuesta es demasiado larga para
+  // experiencia rural/TTS (>200 palabras), recorta a lo esencial y ofrece
+  // profundizar. Conservador: 200-300 palabras permite detalle útil; sobre
+  // 300 es verborrea que rompe la UX de voz. Hace dos cosas:
+  //   1. Si > 300 palabras: extrae primeras 2 oraciones como resumen y
+  //      acorta el resto.
+  //   2. Si > 200 palabras y detecta repetición del mismo consejo,
+  //      deduplica (deja la primera mención).
+  const conciseRes = guardConciseResponse(text);
+  if (conciseRes && conciseRes.modified) {
+    text = conciseRes.text;
+    modified = true;
+    if (conciseRes.reason) reasons.push(conciseRes.reason);
   }
   return { text, modified, reasons };
 }

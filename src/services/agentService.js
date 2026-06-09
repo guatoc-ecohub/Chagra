@@ -1668,3 +1668,99 @@ REGLA DE MÁXIMA PRIORIDAD (CASO B obligatorio):
 4. ES PREFERIBLE PREGUNTAR QUE AFIRMAR LA EQUIVOCADA.
 === FIN POSIBLES COINCIDENCIAS ===`;
 }
+
+/**
+ * buildFallbackResponse — salida estructurada cuando el LLM falla (#349, Item 9).
+ *
+ * Cuando callLLM retorna vacío (timeout/OOM/modelo caído), la experiencia NO debe
+ * ser un banner rojo ni un silencio. Esta función construye una respuesta útil
+ * con lo que SÍ se sabe (toolEvidence) y deja claro qué falta.
+ *
+ * Flujo de decisión:
+ *   1. Si rawResponse NO es vacío → passthrough (el LLM respondió bien).
+ *   2. Si hay toolEvidence → construye un resumen estructurado: "Esto sabemos,
+ *      esto no se pudo consultar, el siguiente paso es X".
+ *   3. Si no hay nada → mensaje honesto: "No pude conectarme al asistente.
+ *      ¿Quieres preguntar otra cosa o intentar de nuevo?"
+ *
+ * @param {string} rawResponse - Texto crudo del LLM (puede ser '').
+ * @param {object|Array|null} toolEvidence - Lo que callTool retornó (routing/grounding).
+ * @param {Array|null} resolvedEntities - Entidades resueltas por el sidecar.
+ * @returns {string} - rawResponse si es válida, o fallback estructurado.
+ */
+export function buildFallbackResponse(rawResponse, toolEvidence = null, resolvedEntities = null) {
+  if (rawResponse && typeof rawResponse === 'string' && rawResponse.trim().length > 0) {
+    return rawResponse;
+  }
+
+  const entities = Array.isArray(resolvedEntities) ? resolvedEntities : [];
+
+  // Extraer lo que sabemos de toolEvidence
+  const knownFacts = [];
+  const unknownQuestions = [];
+
+  if (toolEvidence) {
+    const evidences = Array.isArray(toolEvidence) ? toolEvidence : [toolEvidence];
+    for (const ev of evidences) {
+      if (!ev || !ev.tool) continue;
+      const toolName = ev.tool;
+      const result = ev.result;
+      if (!result || result.available === false) {
+        unknownQuestions.push(`No pude obtener datos de "${toolName}".`);
+        continue;
+      }
+
+      // Extraer info relevante del resultado (según el tool)
+      if (toolName === 'get_species' && result.species_name) {
+        knownFacts.push(`La especie que mencionaste es ${result.species_name}.`);
+        if (result.viabilidad) {
+          knownFacts.push(`En tu zona es ${result.viabilidad === 'viable' ? 'viable' : result.viabilidad === 'marginal' ? 'marginal' : 'no viable'} para sembrar.`);
+        }
+      } else if (toolName === 'get_pest_controllers' && result.controls) {
+        const controls = Array.isArray(result.controls) ? result.controls : [];
+        if (controls.length > 0) {
+          knownFacts.push(`Encontré ${controls.length} control(es) para esa plaga.`);
+        }
+      } else if (toolName === 'get_biopreparados' && result.recipes) {
+        const recipes = Array.isArray(result.recipes) ? result.recipes : [];
+        if (recipes.length > 0) {
+          knownFacts.push(`Encontré ${recipes.length} receta(s) de biopreparados.`);
+        }
+      } else {
+        knownFacts.push(`Consulté "${toolName}" y obtuve información útil.`);
+      }
+    }
+  }
+
+  // Si hay entidades pero no toolEvidence, al menos sabemos qué mencionó
+  if (entities.length > 0 && knownFacts.length === 0) {
+    const names = entities.map(e => e.nombre_comun || e.mentioned).filter(Boolean);
+    if (names.length > 0) {
+      knownFacts.push(`Mencionaste: ${names.join(', ')}.`);
+    }
+  }
+
+  // Construir respuesta estructurada
+  const parts = [];
+
+  if (knownFacts.length > 0) {
+    parts.push('Esto es lo que sé hasta ahora:');
+    parts.push(knownFacts.map(f => `  • ${f}`).join('\n'));
+  }
+
+  parts.push('No pude completar la consulta con el asistente principal.');
+  parts.push('Puedes intentar de nuevo o preguntar de otra forma.');
+  parts.push('');
+
+  if (unknownQuestions.length > 0) {
+    parts.push('Fallo:');
+    parts.push(unknownQuestions.map(u => `  • ${u}`).join('\n'));
+    parts.push('');
+  }
+
+  parts.push('¿Quieres preguntar otra cosa?');
+
+  const result = parts.join('\n');
+  console.warn('[agentService] FallbackResponse activado (LLM vacío) - facts:', knownFacts.length, 'missing:', unknownQuestions.length);
+  return result;
+}

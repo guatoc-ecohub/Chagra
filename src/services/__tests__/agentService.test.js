@@ -23,6 +23,7 @@ import {
   generateAgronomicGuidanceRules,
   pisoTermicoFromAltitud,
   temporadaColombiana,
+  buildFallbackResponse,
 } from '../agentService.js';
 
 describe('agentService — Task #202 Profile Context', () => {
@@ -1296,6 +1297,82 @@ describe('agentService — Task #202 Profile Context', () => {
       expect(rules).not.toMatch(/\bmirá\b/);
       expect(rules).not.toMatch(/\bacá\b/);
       expect(rules).not.toMatch(/\bsembrá\b/);
+    });
+  });
+
+  // ─── buildFallbackResponse (Item 9) ──────────────────────────────────────
+  describe('buildFallbackResponse', () => {
+    it('passthrough si rawResponse es válida (no vacía)', () => {
+      const r = buildFallbackResponse('La fresa se siembra en clima frío.', null, null);
+      expect(r).toBe('La fresa se siembra en clima frío.');
+    });
+
+    it('con toolEvidence get_species: construye respuesta con datos conocidos', () => {
+      const toolEvidence = {
+        tool: 'get_species',
+        result: { available: true, species_name: 'Fresa', viabilidad: 'viable' },
+      };
+      const r = buildFallbackResponse('', toolEvidence, []);
+      expect(r).toMatch(/Fresa/);
+      expect(r).toMatch(/viable/);
+      expect(r).toMatch(/¿Quieres preguntar otra cosa/);
+    });
+
+    it('con toolEvidence get_pest_controllers: muestra controles disponibles', () => {
+      const toolEvidence = {
+        tool: 'get_pest_controllers',
+        result: { available: true, controls: ['control1', 'control2'] },
+      };
+      const r = buildFallbackResponse('', toolEvidence, []);
+      expect(r).toMatch(/2 control/);
+    });
+
+    it('con toolEvidence get_biopreparados: muestra recetas disponibles', () => {
+      const toolEvidence = {
+        tool: 'get_biopreparados',
+        result: { available: true, recipes: ['rec1'] },
+      };
+      const r = buildFallbackResponse('', toolEvidence, []);
+      expect(r).toMatch(/1 receta/);
+    });
+
+    it('con toolEvidence no disponible: lo reporta como fallo', () => {
+      const toolEvidence = {
+        tool: 'get_precio_sipsa',
+        result: { available: false },
+      };
+      const r = buildFallbackResponse('', toolEvidence, []);
+      expect(r).toMatch(/No pude obtener/);
+      expect(r).toMatch(/get_precio_sipsa/);
+    });
+
+    it('con entidades pero sin toolEvidence: al menos menciona las especies', () => {
+      const entities = [{ nombre_comun: 'Tomate' }];
+      const r = buildFallbackResponse('', null, entities);
+      expect(r).toMatch(/Tomate/);
+      expect(r).toMatch(/No pude completar/);
+    });
+
+    it('sin toolEvidence ni entidades: mensaje honesto', () => {
+      const r = buildFallbackResponse('', null, null);
+      expect(r).toMatch(/No pude completar/);
+      expect(r).toMatch(/intentar de nuevo/);
+      expect(r).toMatch(/¿Quieres preguntar otra cosa/);
+    });
+
+    it('con rawResponse whitespace-only: trata como vacío y construye fallback', () => {
+      const r = buildFallbackResponse('   ', null, null);
+      expect(r).toMatch(/No pude completar/);
+    });
+
+    it('acepta toolEvidence como array (NLU tool_chain)', () => {
+      const toolEvidence = [
+        { tool: 'get_species', result: { available: true, species_name: 'Café' } },
+        { tool: 'get_pest_controllers', result: { available: false } },
+      ];
+      const r = buildFallbackResponse('', toolEvidence, []);
+      expect(r).toMatch(/Café/);
+      expect(r).toMatch(/No pude obtener/);
     });
   });
 });

@@ -143,9 +143,12 @@ export function captureExchange({ userText, agentText, identity = {}, meta = {} 
     entities_grounded: Array.isArray(meta.entities_grounded) ? meta.entities_grounded.slice(0, 50) : [],
     guards_fired: Array.isArray(meta.guards_fired) ? meta.guards_fired.slice(0, 20) : [],
     grounded_status: meta.grounded_status ?? null,
-    latency_ms: typeof meta.latency_ms === 'number' ? meta.latency_ms : null,
-    model: meta.model ?? null,
-  };
+      latency_ms: typeof meta.latency_ms === 'number' ? meta.latency_ms : null,
+      model: meta.model ?? null,
+      eval_rate: typeof meta.eval_rate === 'number' ? meta.eval_rate : null,
+      first_token_ms: typeof meta.first_token_ms === 'number' ? meta.first_token_ms : null,
+      response_len: typeof meta.response_len === 'number' ? meta.response_len : null,
+    };
 
   const base = getBaseUrl();
   const token = getToken();
