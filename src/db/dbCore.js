@@ -58,6 +58,8 @@ export const STORES = {
   RAG_TELEMETRY: 'rag_telemetry',
   FAILED_TX: 'failed_transactions',
   VISION_QUEUE: 'vision_queue',
+  FARM_PROCESSES: 'farm_processes', // v18: ADR-047 agregado de ciclo de cultivo
+  FARM_PROCESS_EVENTS: 'farm_process_events', // v18: eventos del ciclo de cultivo
   // v17 (compositor multimodal del home): outbox DURABLE de consultas al
   // agente disparadas desde el dashboard. El item (texto / blob de audio /
   // foto / adjunto + metadata) se persiste ANTES de navegar al AgentScreen,
@@ -65,10 +67,6 @@ export const STORES = {
   // procesa exactamente UNA vez (claim atómico anti-duplicado). NUNCA se
   // pierde el dato del usuario — ese es el contrato.
   AGENT_OUTBOX: 'agent_outbox',
-  // v18 (ciclos productivos): stores para procesos de finca y sus eventos
-  // append-only. Ninguno toca syncManager ni se expone al LLM.
-  FARM_PROCESSES: 'farm_processes',
-  FARM_PROCESS_EVENTS: 'farm_process_events',
 };
 
 let dbInstance = null;
@@ -284,23 +282,23 @@ export const openDB = async () => {
         }
       }
 
-      // v18: farm_processes + farm_process_events — ciclos productivos locales.
-      // Append-only por eventos. No tocar syncManager.
+      // v18: ADR-047 farm_process aggregate — ciclos de cultivo + eventos
       if (event.oldVersion < 18) {
         if (!db.objectStoreNames.contains(STORES.FARM_PROCESSES)) {
-          const store = db.createObjectStore(STORES.FARM_PROCESSES, { keyPath: 'process_id' });
-          store.createIndex('status', 'attributes.status', { unique: false });
-          store.createIndex('process_type', 'attributes.process_type', { unique: false });
-          store.createIndex('subject_kind', 'attributes.subject_kind', { unique: false });
-          store.createIndex('location_land_asset_id', 'attributes.location_land_asset_id', { unique: false });
-          store.createIndex('updated_at', 'attributes.updated_at', { unique: false });
+          const fpStore = db.createObjectStore(STORES.FARM_PROCESSES, { keyPath: 'process_id' });
+          fpStore.createIndex('status', 'attributes.status', { unique: false });
+          fpStore.createIndex('process_type', 'attributes.process_type', { unique: false });
+          fpStore.createIndex('subject_kind', 'attributes.subject_kind', { unique: false });
+          fpStore.createIndex('location_land_asset_id', 'attributes.location_land_asset_id', { unique: false });
+          fpStore.createIndex('updated_at', 'attributes.updated_at', { unique: false });
         }
         if (!db.objectStoreNames.contains(STORES.FARM_PROCESS_EVENTS)) {
-          const store = db.createObjectStore(STORES.FARM_PROCESS_EVENTS, { keyPath: 'event_id' });
-          store.createIndex('process_id', 'attributes.process_id', { unique: false });
-          store.createIndex('event_type', 'attributes.event_type', { unique: false });
-          store.createIndex('occurred_at', 'attributes.occurred_at', { unique: false });
-          store.createIndex('idempotency_key', 'attributes.idempotency_key', { unique: true });
+          const fpeStore = db.createObjectStore(STORES.FARM_PROCESS_EVENTS, { keyPath: 'event_id' });
+          fpeStore.createIndex('process_id', 'process_id', { unique: false });
+          fpeStore.createIndex('event_type', 'event_type', { unique: false });
+          fpeStore.createIndex('occurred_at', 'occurred_at', { unique: false });
+          fpeStore.createIndex('idempotency_key', 'idempotency_key', { unique: false });
+          fpeStore.createIndex('asset_id', 'asset_id', { unique: false });
         }
       }
     };

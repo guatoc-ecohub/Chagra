@@ -8,12 +8,10 @@ import {
   markError as outboxMarkError,
   recoverStaleProcessing as outboxRecoverStale,
 } from '../../services/agentOutboxService';
-import { recognizeSpeciesGrounded, analyzeFoliage } from '../../services/aiService';
+import { analyzeFoliage } from '../../services/aiService';
 import { captureAndCompress } from '../../services/photoService';
-import { blobToDataUrl } from '../../utils/imageProcessor';
 import { processPhotoItem, buildPhotoUserMessage } from '../../services/agentOutboxPhoto';
 import { isAnalyzableImageAttachment, buildAttachmentRejection } from '../../services/agentOutboxAttachment';
-import { buildPhotoAnalysisMessage } from './photoAnalysis';
 import { AGENT_ENTRANCE_CSS, AGENT_COMPOSITOR_CSS, agentEntranceClass } from './agentEntrance';
 import {
   addTurn,
@@ -218,14 +216,6 @@ export default function AgentScreen({ onBack, initialContext }) {
   // Guardamos en un Map (msgId → AbortController) para poder cancelar jobs
   // individuales. Al desmontar el componente cancelamos todos.
   const deepResearchControllersRef = useRef(new Map());
-  // FEAT-2 (#291): foto adjunta al chat pendiente de envío. `{ blob, dataUrl }`
-  // o null. El blob ya viene comprimido por captureAndCompress; el dataUrl es
-  // el preview thumbnail. `analyzingPhoto` bloquea el input mientras corre la
-  // pipeline de visión (ID + diagnóstico).
-  const [attachedPhoto, setAttachedPhoto] = useState(null);
-  const [analyzingPhoto, setAnalyzingPhoto] = useState(false);
-  const photoInputRef = useRef(null);
-
   const { durationMs, start: startRecord, stop: stopRecord, reset: resetRecord } = useVoiceRecorder();
   const chatEndRef = useRef(null);
   // Bug 2026-05-18: ref al AbortController activo para que botón Cancelar
@@ -569,10 +559,17 @@ export default function AgentScreen({ onBack, initialContext }) {
       acc[base] = (acc[base] || 0) + 1;
       return acc;
     }, {});
-    const plantNames = Object.entries(groupedCounts)
+    const MAX_SPECIES_CONTEXT = 50;
+    const plantNamesSlice = Object.entries(groupedCounts)
       .sort((a, b) => b[1] - a[1])
+      .slice(0, MAX_SPECIES_CONTEXT);
+    const totalSpecies = Object.keys(groupedCounts).length;
+    const plantNames = plantNamesSlice
       .map(([name, n]) => (n > 1 ? `${name} ×${n}` : name))
-      .join(', ') || 'ninguna';
+      .join(', ');
+    const plantContext = totalSpecies > MAX_SPECIES_CONTEXT
+      ? `${plantNames} y ${totalSpecies - MAX_SPECIES_CONTEXT} especies más`
+      : (plantNames || 'ninguna');
     // 062.6: inyectar contexto finca activa (slug, nombre, biocultural_zone, altitud)
     // + indoor override si aplica. El LLM responde con criterio agronómico ajustado
     // a la zona ecológica donde el operador está físicamente.
@@ -592,7 +589,7 @@ export default function AgentScreen({ onBack, initialContext }) {
     // agresivo con respuesta literal exigida + ejemplo + bajar temperature
     // a 0.3. Bench 2026-05-17 con esta versión devolvió la respuesta
     // EXACTA esperada (no reconozco el término) en 27 tokens / 8s.
-    return `Eres Chagra IA, un asistente agroecológico colombiano. ${fincaContext}${indoorContext}El usuario tiene estas plantas agrupadas por especie con su conteo: ${plantNames}.
+    return `Eres Chagra IA, un asistente agroecológico colombiano. ${fincaContext}${indoorContext}El usuario tiene estas plantas agrupadas por especie con su conteo: ${plantContext}.
 
 REGLA DE FORMATO: cuando hables de las plantas del usuario, agrupa por especie y di cuántas tiene (ej. "tienes 15 fresas, 4 caléndulas, 1 tomate cherry"). NUNCA listes los números individuales de cada planta (#01, #02, etc.) — son identificadores internos, no info útil para el operador. Habla como agrónomo experimentado, no como sistema.
 
@@ -2530,116 +2527,8 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     }
   };
 
-  // FEAT-2 (#291): el operador eligió una foto (cámara o galería). La
-  // comprimimos con captureAndCompress (mismo pipeline que EvidenceCapture)
-  // y guardamos blob + dataUrl para el preview. NO disparamos la inferencia
-  // todavía — eso pasa al darle Enviar, junto con el texto opcional.
-  const handlePhotoPick = async (e) => {
-    const file = e.target.files?.[0];
-    // Limpiamos el input para que volver a elegir la misma foto dispare change.
-    if (photoInputRef.current) photoInputRef.current.value = '';
-    if (!file) return;
-    try {
-      const { blob } = await captureAndCompress(file);
-      const dataUrl = await blobToDataUrl(blob);
-      setAttachedPhoto({ blob, dataUrl });
-    } catch (err) {
-      console.warn('[Agent] No se pudo procesar la foto:', err?.message);
-      setError('No se pudo procesar la foto. Intenta con otra imagen.');
-    }
-  };
-
-  const handleRemovePhoto = () => {
-    setAttachedPhoto(null);
-  };
-
-  // FEAT-2 (#291): corre la pipeline de visión sobre la foto adjunta y agrega
-  // el turno del usuario (con la foto) + el turno del asistente (ID especie +
-  // diagnóstico). Reusa recognizeSpeciesGrounded + analyzeFoliage en paralelo.
-  // Si la visión falla entera, igual responde con un mensaje amable en vez de
-  // crashear. Persiste ambos turnos con addTurn.
-  const handlePhotoAnalysis = async (photo, caption) => {
-    const userText = (caption || '').trim();
-    const userMessage = {
-      role: 'user',
-      content: userText || '📷 Foto',
-      photo: photo.dataUrl,
-      timestamp: Date.now(),
-    };
-    setMessages((prev) => [...prev, userMessage]);
-    await addTurn(operatorId, { role: 'user', content: userMessage.content });
-
-    setAnalyzingPhoto(true);
-    setState(STATE_THINKING);
-    setError('');
-    agentSounds.start();
-
-    let assistantMessage;
-    try {
-      // En paralelo: identificación grounded (AGE) + diagnóstico del follaje.
-      // Cada llamada ya degrada con gracia (devuelve null si el modelo falla),
-      // así que un Promise.all no rompe aunque una de las dos no resuelva.
-      const [species, diagnosis] = await Promise.all([
-        recognizeSpeciesGrounded(photo.blob),
-        analyzeFoliage(photo.blob),
-      ]);
-
-      if (!species && !diagnosis) {
-        // Pipeline entera caída (ollama abajo / timeout). Mensaje amable.
-        assistantMessage = {
-          role: 'assistant',
-          content: 'No pude analizar la foto ahora. Intenta de nuevo en un momento, o toma otra con mejor luz.',
-          timestamp: Date.now(),
-        };
-      } else {
-        const { content, metadata } = buildPhotoAnalysisMessage({ species, diagnosis });
-        assistantMessage = {
-          role: 'assistant',
-          content,
-          metadata,
-          timestamp: Date.now(),
-        };
-      }
-    } catch (err) {
-      console.warn('[Agent] Fallo análisis de foto:', err?.message);
-      assistantMessage = {
-        role: 'assistant',
-        content: 'No pude analizar la foto ahora. Intenta de nuevo en un momento.',
-        timestamp: Date.now(),
-      };
-    } finally {
-      setAnalyzingPhoto(false);
-      setState(STATE_IDLE);
-    }
-
-    agentSounds.chime();
-    setMessages((prev) => [...prev, assistantMessage]);
-    await addTurn(operatorId, {
-      role: 'assistant',
-      content: assistantMessage.content,
-      ...(assistantMessage.metadata ? { metadata: assistantMessage.metadata } : {}),
-    });
-
-    if (ttsEnabled && assistantMessage.content) {
-      setLastNotificationMessage(assistantMessage.content);
-      setResponseReady(true);
-    }
-  };
-
   const handleTextSubmit = (e) => {
     e.preventDefault();
-    // FEAT-2 (#291): si hay foto adjunta, el envío dispara el análisis de
-    // visión (ID + diagnóstico) en vez del pipeline de chat de texto. El
-    // texto del input se usa como caption opcional del mensaje del usuario.
-    if (attachedPhoto && !analyzingPhoto) {
-      const photo = attachedPhoto;
-      const caption = inputText;
-      setAttachedPhoto(null);
-      setInputText('');
-      setAlertContextBanner(null);
-      handlePhotoAnalysis(photo, caption);
-      return;
-    }
     // CHIPS DE MODO (A3): si hay un modo activo, el submit lleva la intención
     // forzada → runAgentPipeline salta el NLU y rutea directo al tool.
     handleSubmit(inputText, { forcedIntent: activeIntent });
@@ -3178,30 +3067,6 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       {/* ── Compositor pill — paridad completa AgentHero (2026-06-08) ── */}
       <div className="relative z-10 px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] pt-2 border-t border-slate-800/60 bg-slate-900/70 backdrop-blur-md shrink-0">
 
-        {/* FEAT-2 (#291): preview de la foto adjunta (inline) antes de enviar. */}
-        {attachedPhoto && (
-          <div className="mb-3 flex items-center gap-3 px-1">
-            <div className="relative shrink-0 w-16 h-16 rounded-lg overflow-hidden border border-slate-700">
-              <img src={attachedPhoto.dataUrl} alt="Foto adjunta" className="w-full h-full object-cover" />
-              {!analyzingPhoto && (
-                <button
-                  type="button"
-                  onClick={handleRemovePhoto}
-                  className="absolute top-0.5 right-0.5 p-1 bg-red-600 rounded-full text-white"
-                  aria-label="Quitar foto"
-                >
-                  <X size={10} />
-                </button>
-              )}
-            </div>
-            <p className="text-xs text-slate-400">
-              {analyzingPhoto
-                ? 'Analizando la foto (identificación + diagnóstico)…'
-                : 'Foto lista. Agrega una nota si quieres y presiona Enviar.'}
-            </p>
-          </div>
-        )}
-
         {/* Preview de foto adjunta (outbox) */}
         {agentAttachment && (
           <div className="flex items-center gap-2 mb-2 px-1">
@@ -3226,17 +3091,6 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         {agentPickError && (
           <p className="text-xs text-red-400 mb-2 px-1">{agentPickError}</p>
         )}
-
-        {/* FEAT-2 (#291): botón cámara + input oculto para inline photo analysis */}
-        <input
-          ref={photoInputRef}
-          type="file"
-          accept="image/*"
-          capture="environment"
-          className="hidden"
-          onChange={handlePhotoPick}
-          data-testid="agent-photo-input"
-        />
 
         {/* Pill — unified with AgentHero (as-bar CSS tokens) */}
         <div
