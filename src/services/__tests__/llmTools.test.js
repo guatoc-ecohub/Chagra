@@ -186,21 +186,21 @@ describe('llmTools — funciones de registry', () => {
 
     it('incluye type y properties de parameters en formato OpenAI', () => {
       const tools = getToolsForLLM();
-      const crearLogTool = tools.find((t) => t.function.name === 'crear_log');
+      const corpusTool = tools.find((t) => t.function.name === 'query_corpus_dr034');
       
-      expect(crearLogTool).toBeDefined();
-      expect(crearLogTool.function.parameters.type).toBe('object');
-      expect(crearLogTool.function.parameters.properties).toBeDefined();
-      expect(crearLogTool.function.parameters.required).toBeDefined();
+      expect(corpusTool).toBeDefined();
+      expect(corpusTool.function.parameters.type).toBe('object');
+      expect(corpusTool.function.parameters.properties).toBeDefined();
+      expect(corpusTool.function.parameters.required).toBeDefined();
     });
 
-    it('incluye las herramientas pre-registradas del módulo', () => {
+    it('expone solo herramientas con persistencia conectada', () => {
       const tools = getToolsForLLM();
       const names = tools.map((t) => t.function.name);
       
-      expect(names).toContain('crear_log');
-      expect(names).toContain('actualizar_planta');
-      expect(names).toContain('agendar_riego');
+      expect(names).not.toContain('crear_log');
+      expect(names).not.toContain('actualizar_planta');
+      expect(names).not.toContain('agendar_riego');
       expect(names).toContain('query_corpus_dr034');
     });
 

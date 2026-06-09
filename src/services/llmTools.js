@@ -17,6 +17,7 @@ import useAssetStore from '../store/useAssetStore';
  * @property {Object} parameters - JSON Schema de inputs
  * @property {Function} handler - función async que ejecuta la tool
  * @property {boolean} requiresGate - true para acciones write, false para read-only
+ * @property {boolean} [enabledForLLM=true] - false hasta que la persistencia esté conectada
  */
 
 /**
@@ -61,7 +62,9 @@ export function listTools() {
  * @returns {Array}
  */
 export function getToolsForLLM() {
-  return Object.values(tools).map((t) => ({
+  return Object.values(tools)
+    .filter((t) => t.enabledForLLM !== false)
+    .map((t) => ({
     type: 'function',
     function: {
       name: t.name,
@@ -72,7 +75,7 @@ export function getToolsForLLM() {
         required: t.parameters?.required || [],
       },
     },
-  }));
+    }));
 }
 
 // =============================================================================
@@ -145,6 +148,9 @@ registerTool({
     }
   },
   requiresGate: true,
+  // useAssetStore no expone addLog. No ofrecer esta acción al LLM hasta
+  // conectarla a useLogStore/FarmOS y probar persistencia real.
+  enabledForLLM: false,
 });
 
 /**
@@ -197,6 +203,9 @@ registerTool({
     }
   },
   requiresGate: true,
+  // El handler actual no satisface la firma updateAsset(assetType, asset,
+  // pendingTxs). Mantener fuera del function calling evita un falso éxito.
+  enabledForLLM: false,
 });
 
 /**
@@ -264,6 +273,8 @@ registerTool({
     }
   },
   requiresGate: true,
+  // Igual que crear_log: todavía no existe addLog en useAssetStore.
+  enabledForLLM: false,
 });
 
 /**

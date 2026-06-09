@@ -1,11 +1,10 @@
 name: Deploy Chagra PWA (DEV)
 
+# DEV deploy uses alpha's shared self-hosted runner and must not start on every
+# feature push. Keep it manual so coding agents on stg cannot interrupt model
+# benches or production workloads running on alpha.
 on:
-  push:
-    branches: ['dev/*', 'feat/*', 'fix/*']
-    paths-ignore:
-      - '**.md'
-      - 'LICENSE'
+  workflow_dispatch:
 
 concurrency:
   group: deploy-chagra-dev-${{ github.ref_name }}
