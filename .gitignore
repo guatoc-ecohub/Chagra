@@ -55,3 +55,11 @@ chagra-anthropic-judge-key
 # CI no tiene acceso al repo privado para regenerarlo durante el build.
 # Cuando se actualicen los seeds, regenerar local + commit del .sqlite.
 # public/catalog.sqlite
+
+# Salida de benchmarks: EFÍMERA por defecto. El número que importa va a un doc
+# (BORDE_*_RESULTS) o a la página HYTA, NO al repo. Antes ensuciaba los worktrees
+# de los agentes → bloqueaba el auto-clean del worktree → se acumulaban (66 en una
+# semana) y al borrarlos se perdían artefactos untracked. Para persistir una
+# corrida puntual: `git add -f <ruta>`. (root 2026-06-04 retro worktrees sucios)
+/data/bench-runs/
+/data/bench-runs-test/
