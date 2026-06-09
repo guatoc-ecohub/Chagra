@@ -115,6 +115,77 @@ describe('ChipsToolbar — flag Deep Research OFF (chip 🔬 oculto)', () => {
   });
 });
 
+// ──── Chip precio (stub) — no promete capacidades que no existen ────────────
+describe('ChipsToolbar — chip precio stub no engaña', () => {
+  beforeEach(() => {
+    vi.spyOn(deepResearchClient, 'isDeepResearchEnabled').mockReturnValue(false);
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test('chip precio tiene placeholder honesto (sin prometer precio)', () => {
+    render(<ChipsToolbar onSelectIntent={() => {}} />);
+    const precioDef = CHIP_DEFS.find((d) => d.intent === 'precio');
+    expect(precioDef.placeholder.toLowerCase()).toMatch(/producto|precio/i);
+    expect(precioDef.placeholder.toLowerCase()).not.toMatch(/consulta\s+exitosa|resultado|dato/i);
+  });
+
+  test('chip precio es clickable (funciona, solo que el backend es stub)', () => {
+    const onSelectIntent = vi.fn();
+    render(<ChipsToolbar onSelectIntent={onSelectIntent} />);
+    fireEvent.click(screen.getByText('Precio'));
+    expect(onSelectIntent).toHaveBeenCalledWith('precio');
+  });
+
+  test('todos los labels de chip omiten promesas de datos no verificables', () => {
+    render(<ChipsToolbar onSelectIntent={() => {}} />);
+    const phantomPromises = /\b(resultado exacto|dato garantizado|100% preciso|siempre disponible)\b/i;
+    for (const def of CHIP_DEFS) {
+      expect(def.label).not.toMatch(phantomPromises);
+      expect(def.placeholder).not.toMatch(phantomPromises);
+    }
+  });
+});
+
+// ──── Deshabilitado global (disabled prop) ──────────────────────────────────
+describe('ChipsToolbar — estado disabled global (durante grabación, etc.)', () => {
+  beforeEach(() => {
+    vi.spyOn(deepResearchClient, 'isDeepResearchEnabled').mockReturnValue(false);
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test('todos los chips normales están visualmente deshabilitados con disabled=true', () => {
+    render(<ChipsToolbar onSelectIntent={() => {}} disabled />);
+    const chips = screen.getAllByTestId('mode-chip');
+    for (const chip of chips) {
+      expect(chip).toBeDisabled();
+    }
+  });
+
+  test('no se puede clickear un chip cuando disabled=true', () => {
+    const onSelectIntent = vi.fn();
+    render(<ChipsToolbar onSelectIntent={onSelectIntent} disabled />);
+    fireEvent.click(screen.getByText('¿Qué siembro?'));
+    expect(onSelectIntent).not.toHaveBeenCalled();
+  });
+
+  test('chip foto también se deshabilita con disabled=true', () => {
+    render(<ChipsToolbar onSelectIntent={() => {}} disabled hasAttachment />);
+    expect(screen.getByTestId('mode-chip-foto')).toBeDisabled();
+    expect(screen.getByTestId('mode-chip-foto')).toHaveAttribute('disabled');
+  });
+
+  test('aria-pressed se preserva aunque todos estén disabled', () => {
+    render(<ChipsToolbar onSelectIntent={() => {}} disabled activeIntent="clima" />);
+    const climaChip = screen.getByRole('button', { name: /clima/i });
+    expect(climaChip).toHaveAttribute('aria-pressed', 'true');
+    expect(climaChip).toBeDisabled();
+  });
+});
+
 // ──── Flag Deep Research ON → chip 🔬 visible + tier gate A1 ─────────────────
 describe('ChipsToolbar — flag Deep Research ON (chip 🔬 visible, pro-gated)', () => {
   beforeEach(() => {
