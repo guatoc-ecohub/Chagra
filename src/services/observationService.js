@@ -7,7 +7,7 @@ import { recordFarmEvent } from './farmEventService';
  * Soporta selección cuando hay múltiples ciclos activos (el caller
  * debe resolver la ambigüedad antes de llamar).
  */
-export async function registerObservation({ processId, text, actor, source, evidence }) {
+export async function registerObservation({ processId, text, actor, source, evidence, extraPayload }) {
   if (!processId) throw new Error('registerObservation: process_id required');
   if (!text || typeof text !== 'string' || !text.trim()) {
     throw new Error('registerObservation: text required');
@@ -19,7 +19,7 @@ export async function registerObservation({ processId, text, actor, source, evid
     occurred_at: Date.now(),
     actor: actor || 'operator',
     source: source || 'operator',
-    payload: { text: text.trim() },
+    payload: { text: text.trim(), ...(extraPayload || {}) },
     confidence: 1.0,
     evidence: evidence || null,
   });

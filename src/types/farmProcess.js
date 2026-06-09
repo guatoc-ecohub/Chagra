@@ -106,8 +106,35 @@ export const isPopulation = (p) => p?.type === 'population';
 const VALID_PROCESS_TYPES = ['sowing', 'restoration', 'silvopasture', 'pest_management', 'harvest', 'post_harvest'];
 const VALID_SUBJECT_KINDS = ['individual', 'aggregate'];
 const VALID_STATUSES = ['active', 'completed', 'cancelled'];
-const VALID_STAGES = ['sowing_confirmed', 'germination', 'growth', 'flowering', 'fruiting', 'harvest', 'fallow'];
-const VALID_EVENT_TYPES = ['sowing_confirmed', 'observation', 'stage_transition', 'task_completed', 'photo_attached', 'weather_snapshot', 'note'];
+// Transitional vocabulary: OpenCode's phenology/tasks use the newer
+// emergence/vegetative/harvest_window/closed names, while the earlier
+// draft types used germination/growth/harvest/fallow. Accept both until
+// the ADR closes and the repo converges on one canonical set.
+const VALID_STAGES = [
+  'sowing',
+  'sowing_confirmed',
+  'emergence',
+  'germination',
+  'vegetative',
+  'growth',
+  'flowering',
+  'fruiting',
+  'harvest_window',
+  'harvest',
+  'closed',
+  'fallow',
+];
+const VALID_EVENT_TYPES = [
+  'sowing_confirmed',
+  'observation',
+  'stage_transition',
+  'stage_confirmed',
+  'stage_corrected',
+  'task_completed',
+  'photo_attached',
+  'weather_snapshot',
+  'note',
+];
 
 /**
  * Valida un objeto FarmProcess.
