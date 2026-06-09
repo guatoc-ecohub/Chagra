@@ -1,0 +1,68 @@
+{
+  "template_id": "coffea_arabica.v1",
+  "species_slug": "coffea_arabica",
+  "species_label": "Café arábica",
+  "version": 1,
+  "sources": [
+    {
+      "name": "Cenicafé — Fenología del cafeto",
+      "reference": "Arcila-Pulgarín et al. (2002). Avances Técnicos Cenicafé 305",
+      "url": "https://www.cenicafe.org/es/publications/avt0305.pdf"
+    },
+    {
+      "name": "FNC — Guía de variedades",
+      "reference": "Federación Nacional de Cafeteros, 2023",
+      "url": "https://federaciondecafeteros.org/"
+    }
+  ],
+  "stages": [
+    {
+      "code": "sowing",
+      "label": "Siembra",
+      "description": "Trasplante al sitio definitivo (post-almácigo 6-8 meses)",
+      "minDays": 0,
+      "maxDays": 0,
+      "sourceIndex": 0
+    },
+    {
+      "code": "vegetative",
+      "label": "Crecimiento vegetativo",
+      "description": "Formación de estructuras vegetativas: hojas, ramas y sistema radicular",
+      "minDays": 1,
+      "maxDays": 540,
+      "sourceIndex": 0
+    },
+    {
+      "code": "flowering",
+      "label": "Floración",
+      "description": "Aparición de botones florales y antesis. Depende de lluvias (floración por golpes)",
+      "minDays": 541,
+      "maxDays": 730,
+      "sourceIndex": 0
+    },
+    {
+      "code": "fruiting",
+      "label": "Llenado de fruto",
+      "description": "Formación y maduración del grano (cereza verde → madura). 6-8 meses post-floración",
+      "minDays": 600,
+      "maxDays": 900,
+      "sourceIndex": 0
+    },
+    {
+      "code": "harvest_window",
+      "label": "Cosecha",
+      "description": "Ventana de recolección de grano maduro. Hasta 3 pases por lote según variedad",
+      "minDays": 850,
+      "maxDays": 1000,
+      "sourceIndex": 1
+    },
+    {
+      "code": "closed",
+      "label": "Ciclo cerrado",
+      "description": "Fin del ciclo productivo o renovación del cafetal",
+      "minDays": 1001,
+      "maxDays": null,
+      "sourceIndex": 1
+    }
+  ]
+}
