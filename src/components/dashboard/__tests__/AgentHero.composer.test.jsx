@@ -126,6 +126,26 @@ describe('AgentHero — compositor real (no teaser)', () => {
     });
   });
 
+  test('la araña activa una ayuda visible y conserva el intent en la outbox', async () => {
+    render(<AgentHero onNavigate={vi.fn()} />);
+    fireEvent.click(screen.getByLabelText('Ver todo lo que puede hacer Chagra'));
+    fireEvent.click(screen.getByText('Tengo una plaga'));
+
+    expect(screen.getByTestId('home-capability-active')).toHaveTextContent('Tengo una plaga activo');
+    const ta = screen.getByLabelText('Escribe tu pregunta al agente');
+    expect(ta).toHaveAttribute('placeholder', 'Escribe la plaga o enfermedad');
+    fireEvent.change(ta, { target: { value: 'broca del café' } });
+    fireEvent.keyDown(ta, { key: 'Enter', shiftKey: false });
+
+    await waitFor(() => {
+      expect(sendMock).toHaveBeenCalledWith({
+        kind: 'text',
+        text: 'broca del café',
+        meta: { capabilityIntent: 'plaga' },
+      });
+    });
+  });
+
   test('micrófono: grabar y detener envía item de voz con el blob', async () => {
     const onNavigate = vi.fn();
     render(<AgentHero onNavigate={onNavigate} />);

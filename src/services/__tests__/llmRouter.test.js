@@ -3,6 +3,7 @@ import {
   ROUTES,
   getModelFor,
   buildLLMRequest,
+  getModelInferenceProfile,
   selectChatRoute,
   DEFAULT_MODEL,
 } from '../llmRouter.js';
@@ -71,9 +72,16 @@ describe('buildLLMRequest', () => {
   });
 
   it('los overrides ganan sobre la config de la ruta', () => {
-    const { body } = buildLLMRequest('chat', messages, { temperature: 0.9, max_tokens: 42 });
+    const { body } = buildLLMRequest('chat', messages, {
+      temperature: 0.9,
+      max_tokens: 42,
+      top_p: 0.8,
+      reasoning_effort: 'low',
+    });
     expect(body.temperature).toBe(0.9);
     expect(body.max_tokens).toBe(42);
+    expect(body.top_p).toBe(0.8);
+    expect(body.reasoning_effort).toBe('low');
   });
 
   it('lanza para tarea desconocida (vía getModelFor)', () => {
@@ -117,6 +125,33 @@ describe('buildLLMRequest', () => {
       const { body } = buildLLMRequest('nlu', messages);
       // nlu puede no traer stop; si lo trae, debe ser array.
       if (body.stop !== undefined) expect(Array.isArray(body.stop)).toBe(true);
+    });
+  });
+});
+
+describe('getModelInferenceProfile', () => {
+  it('no cambia el sampling de familias ya calibradas', () => {
+    expect(getModelInferenceProfile('granite3.1-dense:8b', 'chat')).toEqual({});
+    expect(getModelInferenceProfile('gemma3:4b', 'chat')).toEqual({});
+  });
+
+  it('aplica el sampling recomendado y desactiva thinking en Gemma 4 chat', () => {
+    expect(getModelInferenceProfile('gemma4:e4b', 'chat')).toEqual({
+      temperature: 1,
+      top_p: 0.95,
+      reasoning_effort: 'none',
+    });
+  });
+
+  it('mantiene NLU determinista y habilita thinking solo en reasoning', () => {
+    expect(getModelInferenceProfile('gemma4:e4b', 'nlu')).toEqual({
+      top_p: 0.95,
+      reasoning_effort: 'none',
+    });
+    expect(getModelInferenceProfile('registry/gemma4:12b-it-qat', 'reasoning')).toEqual({
+      temperature: 1,
+      top_p: 0.95,
+      reasoning_effort: 'medium',
     });
   });
 });

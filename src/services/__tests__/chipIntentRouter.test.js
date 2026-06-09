@@ -33,7 +33,7 @@ describe('chipIntentRouter — enum y definiciones', () => {
     });
   });
 
-  it('CHIP_DEFS tiene los 7 chips con label en español colombiano (sin voseo)', () => {
+  it('CHIP_DEFS deriva los 7 modos del manifiesto con label claro', () => {
     const ids = CHIP_DEFS.map((c) => c.intent);
     expect(ids).toEqual([
       'siembro',
@@ -98,33 +98,33 @@ describe('chipIntentRouter — entradas inválidas', () => {
     const emoji = planForcedIntent('siembro', '🌱🌿');
     expect(emoji).not.toBeNull();
     expect(emoji.tool).toBe('get_species');
-    expect(emoji.args).toEqual({ query: '🌱🌿' });
+    expect(emoji.args).toEqual({ id_or_name: '🌱🌿' });
     expect(emoji.prompt).toBe('🌱🌿');
   });
 });
 
 describe('chipIntentRouter — intents con tool determinístico (saltan NLU)', () => {
-  it('siembro → get_species con query del texto + skipNlu', () => {
+  it('siembro → get_species con id_or_name + skipNlu', () => {
     const plan = planForcedIntent('siembro', '¿qué tal el aguacate?');
     expect(plan.intent).toBe('siembro');
     expect(plan.tool).toBe('get_species');
-    expect(plan.args).toEqual({ query: '¿qué tal el aguacate?' });
+    expect(plan.args).toEqual({ id_or_name: '¿qué tal el aguacate?' });
     expect(plan.stub).toBe(false);
     expect(plan.skipNlu).toBe(true);
   });
 
-  it('plaga → get_pest_controllers con pest del texto + skipNlu', () => {
+  it('plaga → get_pest_controllers con pest_id_or_name + skipNlu', () => {
     const plan = planForcedIntent('plaga', 'broca del café');
     expect(plan.tool).toBe('get_pest_controllers');
-    expect(plan.args).toEqual({ pest: 'broca del café' });
+    expect(plan.args).toEqual({ pest_id_or_name: 'broca del café' });
     expect(plan.stub).toBe(false);
     expect(plan.skipNlu).toBe(true);
   });
 
-  it('biopreparado → get_biopreparados con query del texto + skipNlu', () => {
+  it('biopreparado → get_biopreparados con species_id_or_pest + skipNlu', () => {
     const plan = planForcedIntent('biopreparado', 'algo para hongos en tomate');
     expect(plan.tool).toBe('get_biopreparados');
-    expect(plan.args).toEqual({ query: 'algo para hongos en tomate' });
+    expect(plan.args).toEqual({ species_id_or_pest: 'algo para hongos en tomate' });
     expect(plan.stub).toBe(false);
     expect(plan.skipNlu).toBe(true);
   });
@@ -156,32 +156,32 @@ describe('chipIntentRouter — intents con tool determinístico (saltan NLU)', (
     expect(plan.skipNlu).toBe(true);
   });
 
-  it('calendario → get_species con query del texto + skipNlu (no existe tool calendario dedicado)', () => {
-    // No hay get_calendario_siembra en el sidecar; el calendario se deriva de
-    // la ficha de especie (época de siembra / piso térmico). Routeamos a
-    // get_species y dejamos que el grounding traiga la info de ciclo.
-    const plan = planForcedIntent('calendario', 'maíz');
-    expect(plan.tool).toBe('get_species');
-    expect(plan.args).toEqual({ query: 'maíz' });
+  it('calendario → get_calendario_siembra con piso térmico real', () => {
+    const plan = planForcedIntent('calendario', '¿qué siembro?', { pisoTermico: 'frío' });
+    expect(plan.tool).toBe('get_calendario_siembra');
+    expect(plan.args).toEqual({ piso_termico: 'frio' });
     expect(plan.stub).toBe(false);
     expect(plan.skipNlu).toBe(true);
   });
-});
 
-describe('chipIntentRouter — intents STUB (backend no existe aún)', () => {
-  it('precio → stub claro "aún no disponible" (NO inventa backend de precio)', () => {
+  it('calendario sin piso térmico pide altitud sin inventar fechas', () => {
+    const plan = planForcedIntent('calendario', '¿qué siembro?');
+    expect(plan.tool).toBe('get_calendario_siembra');
+    expect(plan.stub).toBe(true);
+    expect(plan.stubResult).toMatchObject({ available: false, reason: 'no_piso_termico' });
+  });
+
+  it('precio → get_precio_sipsa real con latest_price', () => {
     const plan = planForcedIntent('precio', 'papa');
     expect(plan.intent).toBe('precio');
-    expect(plan.stub).toBe(true);
-    expect(plan.tool).toBeNull();
-    expect(typeof plan.stubMessage).toBe('string');
-    expect(plan.stubMessage.toLowerCase()).toContain('no');
+    expect(plan.stub).toBe(false);
+    expect(plan.tool).toBe('get_precio_sipsa');
+    expect(plan.args).toEqual({ action: 'latest_price', producto: 'papa' });
     expect(plan.skipNlu).toBe(true);
   });
 
-  it('isStubIntent reconoce precio como stub y deep como NO stub (backend live)', () => {
-    expect(isStubIntent('precio')).toBe(true);
-    // Deep Research ya tiene backend live — ya NO es stub
+  it('no quedan modos stub: los tools visibles existen o tienen flujo propio', () => {
+    expect(isStubIntent('precio')).toBe(false);
     expect(isStubIntent('deep')).toBe(false);
     expect(isStubIntent('siembro')).toBe(false);
     expect(isStubIntent('plaga')).toBe(false);
@@ -248,21 +248,21 @@ describe('chipIntentRouter — opts ruidosos no contaminan los args', () => {
   it('siembro ignora opts.municipio cuando se pasa por error', () => {
     const plan = planForcedIntent('siembro', 'aguacate', { municipio: 'Bogotá' });
     expect(plan.tool).toBe('get_species');
-    expect(plan.args).toEqual({ query: 'aguacate' });
+    expect(plan.args).toEqual({ id_or_name: 'aguacate' });
     expect(plan.args).not.toHaveProperty('municipio');
   });
 
   it('plaga ignora opts no relacionados', () => {
     const plan = planForcedIntent('plaga', 'broca', { foo: 'bar' });
     expect(plan.tool).toBe('get_pest_controllers');
-    expect(plan.args).toEqual({ pest: 'broca' });
+    expect(plan.args).toEqual({ pest_id_or_name: 'broca' });
   });
 
-  it('precio ignora opts completamente (es stub)', () => {
+  it('precio ignora opts completamente (pero sigue siendo tool real)', () => {
     const plan = planForcedIntent('precio', 'papa', { municipio: 'Choachí' });
-    expect(plan.stub).toBe(true);
-    expect(plan.tool).toBeNull();
-    expect(plan.args).toBeNull();
+    expect(plan.stub).toBe(false);
+    expect(plan.tool).toBe('get_precio_sipsa');
+    expect(plan.args).toEqual({ action: 'latest_price', producto: 'papa' });
   });
 
   it('deep ignora opts completamente', () => {
@@ -289,7 +289,7 @@ describe('chipIntentRouter — cross-reference con ALLOWED_TOOLS del sidecar', (
   it('ningún kind:stub o kind:deep tiene tool en ALLOWED_TOOLS', async () => {
     const { __TEST__ } = await import('../sidecarClient.js');
     const allowed = __TEST__.ALLOWED_TOOLS;
-    const nonToolIntents = CHIP_DEFS.filter((d) => d.kind !== 'tool');
+    const nonToolIntents = CHIP_DEFS.filter((d) => d.kind === 'deep');
     for (const def of nonToolIntents) {
       const plan = planForcedIntent(def.intent, 'test');
       expect(plan.tool).toBeNull();

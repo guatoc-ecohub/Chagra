@@ -301,6 +301,7 @@ const ALLOWED_TOOLS = new Set([
   'get_normativa_ica',
   'get_clima_ideam',
   'get_precio_sipsa',
+  'get_calendario_siembra',
   // PoC alertas meteorológicas (#316) — resueltas por el sidecar (NO MCP child).
   // Cache compartida con `/clima/snapshot` y refrescada por systemd timer.
   'get_enso_status',
