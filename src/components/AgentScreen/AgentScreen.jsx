@@ -940,6 +940,26 @@ ${buildProfileContext(finca)}`;
     }
     if (!toolEvidence || !toolEvidence.tool || !toolEvidence.result) return '';
 
+    const result = toolEvidence.result;
+    // ToolError: el tool fue intentado pero falló (timeout, HTTP error,
+    // not allowed). El LLM debe saber que NO hay datos, en vez de asumir
+    // que el tool no se invocó y tratar de responder con su memoria.
+    if (result && typeof result === 'object' && result._error === true) {
+      const errorReason = result.reason || 'unknown';
+      const toolName = toolEvidence.tool;
+      return `
+=== ERROR DE CONSULTA: ${toolName} NO DISPONIBLE ===
+El tool '${toolName}' falló: ${errorReason}.
+
+INSTRUCCIÓN OBLIGATORIA — anti-alucinación por fallo de tool:
+1. NO inventes datos de catálogo ni del sidecar (no hay datos disponibles).
+2. NO uses tu memoria para suplir la información que el tool debía traer.
+3. Responde de forma honesta: "No pude consultar la información técnica necesaria.".
+4. Si puedes responder desde conocimiento general sin inventar datos concretos, hazlo, pero sé explícito: "Esto lo sé por conocimiento general, no por el catálogo Chagra."
+=== FIN ERROR ===
+`;
+    }
+
     // 2026-05-23 incidente test #4: usuario preguntó por "mareñongoño del
     // Tolima" (especie NO en catálogo). El tool devolvió {found:false,
     // hint:"..."} pero el modelo IGNORÓ el flag found:false y mapeó
@@ -949,7 +969,6 @@ ${buildProfileContext(finca)}`;
     //
     // Fix: detectar found:false en el frontend ANTES del LLM call y
     // formatear un bloque hyper-explícito que prohíbe el mapeo creativo.
-    const result = toolEvidence.result;
     const isNotFound =
       result &&
       typeof result === 'object' &&

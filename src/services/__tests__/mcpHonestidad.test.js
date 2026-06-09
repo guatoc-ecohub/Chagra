@@ -16,16 +16,22 @@ import { describe, it, expect, vi } from 'vitest';
 // 1. callTool nunca fabrica datos en fallo
 // ---------------------------------------------------------------------------
 describe('mcp honestidad — callTool nunca fabrica datos en fallo', () => {
-  it('callTool con tool no permitido retorna null, no objeto vacío ni string', async () => {
+  it('callTool con tool no permitido retorna objeto _error honesto, no null', async () => {
     const { callTool } = await import('../sidecarClient.js');
     const result = await callTool('execute_sql', { query: 'DROP TABLE' });
-    expect(result).toBeNull();
+    expect(result).not.toBeNull();
+    expect(result._error).toBe(true);
+    expect(result.reason).toBe('not_allowed');
+    expect(result.tool).toBe('execute_sql');
   });
 
-  it('callTool con tool vacío retorna null', async () => {
+  it('callTool con tool vacío retorna null (no intentado)', async () => {
     const { callTool } = await import('../sidecarClient.js');
+    // '' falla !toolName → null. '   ' no está en whitelist → error honesto.
     expect(await callTool('', {})).toBeNull();
-    expect(await callTool('   ', {})).toBeNull();
+    const ws = await callTool('   ', {});
+    expect(ws._error).toBe(true);
+    expect(ws.reason).toBe('not_allowed');
   });
 
   it('callTool con args no-object no crash — retorna null', async () => {

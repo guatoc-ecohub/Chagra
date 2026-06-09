@@ -451,20 +451,42 @@ export async function postValidate(text, expected) {
 }
 
 /**
+ * Resultado de error de tool MCP.
+ * @typedef {object} ToolError
+ * @property {true}       _error   — discrimina de resultados exitosos
+ * @property {string}     reason   — 'not_allowed' | 'fetch_failed'
+ * @property {string}     tool     — nombre del tool que falló
+ */
+
+/**
  * Llama `POST ${BASE}/tools/<toolName>` con los args dados.
+ *
+ * El contrato de retorno es tri-estado:
+ *   - object (sin _error) → datos reales del sidecar.
+ *   - ToolError → tool fue intentado pero falló (timeout, HTTP error, not allowed).
+ *   - null → tool NO fue intentado (flag off, offline).
  *
  * @param {string} toolName — uno de ALLOWED_TOOLS
  * @param {object} args — body raw (forma específica por tool)
- * @returns {Promise<null | object>} respuesta del sidecar tal cual, o null
- *   si flag off / offline / tool no permitido / fetch falla.
+ * @returns {Promise<null | object | ToolError>}
  */
 export async function callTool(toolName, args) {
   if (!toolName || typeof toolName !== 'string') return null;
   if (!ALLOWED_TOOLS.has(toolName)) {
     console.debug('[sidecar] tool no permitido', toolName);
-    return null;
+    return { _error: true, reason: 'not_allowed', tool: toolName };
   }
-  return postJson(`/tools/${toolName}`, args || {}, TOOL_TIMEOUT_MS);
+  const result = await postJson(`/tools/${toolName}`, args || {}, TOOL_TIMEOUT_MS);
+  if (result !== null) return result;
+  // postJson retornó null. Distinguir: tool fue intentado pero falló
+  // (timeout / HTTP error / network) vs. ni siquiera se intentó (flag off / offline).
+  const attempted =
+    isSidecarEnabled() &&
+    !(typeof navigator !== 'undefined' && navigator.onLine === false);
+  if (attempted) {
+    return { _error: true, reason: 'fetch_failed', tool: toolName };
+  }
+  return null;
 }
 
 /**

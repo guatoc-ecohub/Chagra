@@ -193,10 +193,17 @@ describe('agentCapabilities — fallo explícito corta antes del LLM', () => {
     expect(plan.stubMessage).toBeNull();
   });
 
-  it('callTool con tool no permitido retorna null (no fabrica)', async () => {
+  it('callTool con tool no permitido retorna _error honesto (no fabrica datos)', async () => {
     const { callTool } = await import('../sidecarClient.js');
     const result = await callTool('sell', {});
-    expect(result).toBeNull();
+    expect(result).not.toBeNull();
+    expect(result._error).toBe(true);
+    expect(result.reason).toBe('not_allowed');
+    expect(result.tool).toBe('sell');
+    // No fabrica datos reales: el result no tiene species/data simulados.
+    expect(result).not.toHaveProperty('species');
+    expect(result).not.toHaveProperty('found');
+    expect(result).not.toHaveProperty('data');
   });
 
   it('callTool sin toolName retorna null', async () => {
