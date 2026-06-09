@@ -42,5 +42,9 @@
 /** @typedef {import('./syncEvent.js').SyncEvent} SyncEvent */
 /** @typedef {import('./asset.js').Asset} ChagraAsset */
 /** @typedef {import('./log.js').Log} ChagraLog */
+/** @typedef {import('./farmProcess.js').FarmProcess} FarmProcess */
+/** @typedef {import('./farmProcess.js').FarmProcessEvent} FarmProcessEvent */
+/** @typedef {import('./farmProcess.js').CultivationProfile} CultivationProfile */
+/** @typedef {import('./farmProcess.js').Population} Population */
 
 export {};
