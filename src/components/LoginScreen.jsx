@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sprout } from 'lucide-react';
+import { applyTheme, normalizeTheme, STORAGE_KEY, DEFAULT_THEME } from '../hooks/useTheme';
 import { authenticateUser } from '../services/authService';
 import { setCurrentOperator } from '../services/operatorIdentityService';
 import { setActiveTenantId } from '../services/tenantContext';
@@ -21,6 +22,20 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
   // el login nunca muestra el patrón viejo.
   const selectedBackground = useThemeBackgroundStore((s) => s.selected);
   const loginBgSrc = getBackgroundSrc(selectedBackground);
+
+  // FIX prod 2026-06-10: la login está diseñada en estilo BIOPUNK (dark) —
+  // `bg-slate-950` + `bg-biopunk-pattern` + texto claro. Con el tema 'auto'
+  // resolviendo a NATURE de día, los colores (vía CSS-vars de tema) se
+  // invertían a oscuros → texto/formulario oscuro sobre fondo oscuro = login
+  // INVISIBLE (pantalla negra en Android/Chrome de día). Forzamos biopunk
+  // mientras se muestra el login y restauramos el tema del usuario al salir.
+  useEffect(() => {
+    applyTheme('biopunk');
+    return () => {
+      try { applyTheme(normalizeTheme(localStorage.getItem(STORAGE_KEY))); }
+      catch { applyTheme(DEFAULT_THEME); }
+    };
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
