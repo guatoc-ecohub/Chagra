@@ -17,10 +17,9 @@ describe('Catalog Count - Task #189', () => {
 
     expect(catalog.species).toBeDefined();
     expect(catalog.species.length).toBeGreaterThanOrEqual(200);
-    // El subset v3.2 quedó con 205 species (el archivo y schema_version ya son
-    // v3.2). El test seguía clavado en el conteo de v3.1 (204) y fallaba en main
-    // — actualizado al dato real para no nacer rojo el gate de vitest.
-    expect(catalog.species.length).toBe(205);
+    // 2026-06-10: subset v3.2 enriquecido con 58 especies de páramo (Cruz Verde,
+    // demo MinAmbiente) → 205 → 263. Ver PR #1386 + enrich-oss-paramo-cruz-verde.mjs.
+    expect(catalog.species.length).toBe(263);
   });
 
   it('should include Carludovica palmata (palma de iraca) - Task #iraca-seed', () => {
