@@ -1,0 +1,26 @@
+{
+  "_comment": "Setup LLM de PRODUCCIÓN fijo (2026-06-10). Fuente de verdad del modelo + parámetros del agente Chagra. El bench (scripts/bench-agente-completo.mjs) compara contra estos gates. Cambios aquí = decisión humana deliberada.",
+  "chat_model": "granite3.1-dense:8b",
+  "chat_model_rationale": "Baseline verificado en prod (anti-alucinación + grounding). El bench 5-modelos 2026-06-10 sugiere granite3.3:8b como posible upgrade (menos halluc heurística, más wins) pero la decisión final espera re-bench CON num_ctx fijado (GR-10) + juez Claude (MD-2). No se promueve sobre un bench confundido por truncación.",
+  "num_ctx": 6144,
+  "num_ctx_note": "GR-10: 4096 truncaba el grounding; 8192 rompe co-residencia con el NLU (thrash). 6144 es el óptimo PROBADO 2026-06-10: granite@6144=8.3GB + gemma3:4b NLU@2048=4.5GB → VRAM real 11.7/12.3GB, COEXISTEN sin thrash, +50% contexto. Fijado en OLLAMA_CONTEXT_LENGTH=6144 (modules/ai/ollama.nix). Margen fino (~570MB) → fix completo pendiente: reducir prompt (Fable #2) + NLU más liviano (tarea optimización VRAM).",
+  "temperature": 0.3,
+  "kv_cache_type": "q8_0",
+  "flash_attention": true,
+  "max_tokens_by_route": {
+    "chat": 768,
+    "chat_complex": 1024,
+    "nlu": 150
+  },
+  "judge_model_trusted": "claude (cloud) — los jueces locales están rotos en Maxwell; ver bench-scorer",
+  "candidates_verified_maxwell": {
+    "ok": ["granite3.1-dense:8b", "granite3.3:8b", "gemma4:e4b", "ministral-3:latest", "ministral-3:14b"],
+    "crash": ["qwen2.5:14b", "qwen3:30b", "mistral-nemo:12b"]
+  },
+  "gates_min": {
+    "anti_hallucination_pct": 75,
+    "keywords_pct": 40
+  },
+  "updated": "2026-06-10",
+  "updated_by": "GR-10 fix + bench 5-modelos singleslot"
+}
