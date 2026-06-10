@@ -18,8 +18,10 @@ import { CAPABILITY_MANIFEST } from '../../services/agentCapabilities';
  *   - El tema se LEE de <html data-theme> (lo escribe useTheme/applyTheme;
  *     biopunk = sin atributo). MutationObserver re-evalúa cambios en vivo.
  *     Sin barra selectora propia (eso vive en Perfil).
- *   - Sin FAB Ⓐ ni sheet propios: se renderiza DENTRO del bottom-sheet del
- *     AgentHero. El nodo Ⓐ abajo-centro es la raíz del árbol (y "volver").
+ *   - Sin FAB Ⓐ, sin sheet y SIN MARCO propio: se renderiza INTEGRADO en el
+ *     lienzo del AgentHero (la zona-respiro), full-bleed y transparente — la
+ *     escena del hero por tema es el fondo. El contenedor padre decide el
+ *     alto (height:100%). El nodo Ⓐ abajo-centro es la raíz (y "volver").
  *   - `prefers-reduced-motion` → sin loop rAF: un solo paint al estado final.
  *   - Cleanup completo: rAF, timers, ResizeObserver, MutationObserver, paths.
  *
@@ -190,21 +192,18 @@ function bounce(el) {
 /* ══════════════ estilos (CSS del demo, scoped arm-) ══════════════ */
 
 const CSS = `
+/* SIN MARCO (operador 2026-06-09): nada de caja con borde/radius/fondo —
+   la red respira full-bleed sobre el lienzo del AgentHero; el padre da el
+   alto. Solo overflow:hidden para que esporas/ramas no se salgan. */
 .arm-root{
-  position:relative;width:100%;height:560px;max-height:calc(100dvh - 170px);min-height:420px;
-  overflow:hidden;border-radius:24px;
-  background:var(--sheetBg);border:1px solid var(--sheetEdge);
+  position:relative;width:100%;height:100%;min-height:380px;
+  overflow:hidden;background:transparent;
   -webkit-tap-highlight-color:transparent;
   /* ---- tema biopunk (base) ---- */
   --fam:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;
   --lblSize:13px; --lblSp:.01em; --lblW:800;
   --lblC:#ffffff; --lblBg:rgba(3,12,9,.9); --lblEdge:rgba(25,199,154,.55);
   --lblShadow:0 2px 8px rgba(0,0,0,.6);
-  --sheetBg:
-    radial-gradient(135% 95% at 50% 103%,rgba(25,199,154,.20),rgba(25,199,154,.05) 42%,transparent 64%),
-    radial-gradient(90% 55% at 86% -6%,rgba(38,110,160,.16),transparent 60%),
-    linear-gradient(180deg,#0d1422,#0a0e14 85%);
-  --sheetEdge:rgba(25,199,154,.35);
   --branch:#19c79a; --coreW:2.2px;
   --glowC:rgba(25,199,154,.30); --glowW:8px; --glowO:1; --glowBlur:3px;
   --twigC:rgba(25,199,154,.55);
@@ -213,7 +212,7 @@ const CSS = `
   --orbShadow:0 0 22px rgba(25,199,154,.32),0 0 6px rgba(25,199,154,.5),inset 0 0 16px rgba(25,199,154,.10);
   --orbRadA:50%; --orbRadB:50%;
   --pulse:rgba(25,199,154,.55);
-  --spore:#19c79a; --spO:.7; --noiseO:.05;
+  --spore:#19c79a; --spO:.7;
   --rootBg:radial-gradient(circle at 35% 28%,#34efbe,#129b78 75%);
   --rootGlyph:#06231b; --rootShadow:0 0 26px rgba(25,199,154,.55),0 4px 14px rgba(0,0,0,.5);
   --crumbBg:rgba(25,199,154,.16); --crumbC:#c8f3e2; --crumbEdge:rgba(25,199,154,.45);
@@ -227,11 +226,6 @@ const CSS = `
   --lblSize:13.5px; --lblSp:0; --lblW:700;
   --lblC:#2e2414; --lblBg:rgba(255,250,238,.95); --lblEdge:rgba(121,87,53,.5);
   --lblShadow:0 2px 6px rgba(90,60,30,.22);
-  --sheetBg:
-    radial-gradient(85% 45% at 80% -8%,rgba(241,199,118,.42),transparent 58%),
-    linear-gradient(to top,rgba(108,139,77,.30),rgba(108,139,77,.08) 130px,transparent 210px),
-    linear-gradient(180deg,#f3ead4,#faf3e2 40%,#f5edd9);
-  --sheetEdge:rgba(121,87,53,.35);
   --branch:#6e4f2e; --coreW:4px;
   --glowC:rgba(121,87,53,.22); --glowW:9px; --glowO:1; --glowBlur:1.5px;
   --twigC:rgba(110,79,46,.6);
@@ -241,7 +235,7 @@ const CSS = `
   --orbRadA:58% 42% 55% 45% / 45% 58% 42% 55%;
   --orbRadB:44% 56% 48% 52% / 56% 44% 58% 42%;
   --pulse:rgba(95,124,66,.5);
-  --spore:#7c9a4e; --spO:.6; --noiseO:.08;
+  --spore:#7c9a4e; --spO:.6;
   --rootBg:radial-gradient(circle at 35% 28%,#8fae62,#5f7c42 78%);
   --rootGlyph:#fdf8e9; --rootShadow:0 5px 16px rgba(80,60,30,.4);
   --crumbBg:rgba(255,250,238,.9); --crumbC:#4a3a1f; --crumbEdge:rgba(121,87,53,.45);
@@ -255,8 +249,6 @@ const CSS = `
   --lblSize:12.5px; --lblSp:.02em; --lblW:700;
   --lblC:#143d31; --lblBg:rgba(255,255,255,.96); --lblEdge:rgba(47,110,90,.35);
   --lblShadow:0 1px 4px rgba(30,40,35,.12);
-  --sheetBg:linear-gradient(180deg,#f9f6ee,#f6f3ec);
-  --sheetEdge:rgba(47,110,90,.28);
   --branch:#2f6e5a; --coreW:1.6px;
   --glowC:transparent; --glowW:0px; --glowO:0; --glowBlur:0px;
   --twigC:rgba(47,110,90,.45);
@@ -265,7 +257,7 @@ const CSS = `
   --orbShadow:0 2px 6px rgba(30,40,35,.1);
   --orbRadA:50%; --orbRadB:50%;
   --pulse:transparent;
-  --spore:transparent; --spO:0; --noiseO:.03;
+  --spore:transparent; --spO:0;
   --rootBg:#2f6e5a;
   --rootGlyph:#f6f3ec; --rootShadow:0 3px 10px rgba(30,50,42,.25);
   --crumbBg:#ffffff; --crumbC:#1f5847; --crumbEdge:rgba(47,110,90,.35);
@@ -274,10 +266,9 @@ const CSS = `
   --trunkC:#2f6e5a; --trunkHi:#5ea58d;
 }
 .arm-root.arm-disabled{pointer-events:none;opacity:.55}
-.arm-root::after{content:"";position:absolute;inset:0;z-index:6;pointer-events:none;
-  opacity:var(--noiseO);mix-blend-mode:overlay;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='0.65'/></svg>");
-}
+/* La textura de ruido del demo se quitó en la integración: sobre el lienzo
+   transparente del hero dibujaba un rectángulo "sucio" (el marco que el
+   operador rechazó). El grano ambiente lo pone la escena del hero. */
 .arm-web{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
 .arm-gtrunk path{fill:none;stroke-linecap:round;transition:stroke .5s}
 .arm-gtrunk .tkB{stroke:var(--trunkC);stroke-width:17px}
