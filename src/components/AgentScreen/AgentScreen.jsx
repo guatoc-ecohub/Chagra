@@ -67,6 +67,7 @@ import { normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buil
 import { buildBasePrompt, analyzeQuery, buildQueryAnalysisBlock, buildCorpusVariants, buildResolvedEntitiesBlock, formatToolEvidence } from '../../services/agentPromptBase';
 import { assembleSystemContent } from '../../services/promptAssembler';
 import { applyOutputGuards, classifyQueryIntent } from '../../services/outputGuards';
+import { createStreamGuard } from '../../services/streamGuards';
 import { getProfile } from '../../services/userProfileService';
 import { captureExchange } from '../../services/conversationCaptureService';
 import { regionFromProfile, getEnsoOutlook } from '../../services/ensoContext';
@@ -894,13 +895,27 @@ export default function AgentScreen({ onBack, initialContext }) {
     // antes detenían el watchdog.
     stallTimerRef.current = deadline;
 
+    // SEC-001 (DR-CHAGRA-AUDIT-IA-001): guard del canal de STREAMING. El guard
+    // final (applyOutputGuards sobre el texto completo) NO cambia — esto es una
+    // capa ADICIONAL sobre el display EN VIVO: el sniff local (mismos guards de
+    // peligro de outputGuards, cero latencia, throttle incremental + latch)
+    // retiene el parcial con un placeholder si un patrón peligroso dispara
+    // (sintético+dosis, mezcla incompatible, tóxico en comida…). Las respuestas
+    // seguras y las dosis orgánicas legítimas fluyen token a token sin cambio.
+    const streamGuard = createStreamGuard({ userMessage: query });
+
     const markToken = (fullText) => {
       // Llegó un token: el stream está vivo → reinicia el idle-timer. El techo
       // absoluto sigue corriendo intacto.
       deadline.onToken();
+      // SEC-001: lo que se pinta (y lo que el catch preserva ante una
+      // interrupción) es SIEMPRE la versión segura del parcial — si el sniff
+      // latcheó peligro, es el placeholder; el final guardado reemplaza limpio.
+      // En streams seguros safeDisplay === fullText (passthrough idéntico).
+      const safeDisplay = streamGuard.check(fullText);
       // Espejo del parcial en ref para que el catch lo preserve sin closure stale.
-      streamingContentRef.current = fullText;
-      setStreamingContent(fullText);
+      streamingContentRef.current = safeDisplay;
+      setStreamingContent(safeDisplay);
     };
     deadline.start();
 
