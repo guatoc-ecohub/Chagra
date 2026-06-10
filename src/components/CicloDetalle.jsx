@@ -3,6 +3,7 @@ import { Sprout, FlaskConical, AlertTriangle } from 'lucide-react';
 import FarmProcessSummary from './FarmProcessSummary';
 import PhenologyTimeline from './PhenologyTimeline';
 import CicloObservacion from './CicloObservacion';
+import CicloFotos from './CicloFotos';
 import { getTasksForCycle, getUrgentTasks } from '../services/cycleTaskService';
 import { getPestRisksByStage, getBiopreparadosForStage, getEnsemblePreventiveTasks } from '../services/climateCycleService';
 import { confirmStage } from '../services/stageConfirmationService';
@@ -98,6 +99,8 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
         <h2 className="text-2xs uppercase font-bold text-slate-500 mb-2">Línea de tiempo</h2>
         <PhenologyTimeline speciesSlug={a.subject_slug} sowingDate={a.created_at} altitudeM={altitudeM} />
       </section>
+
+      <CicloFotos processId={processId} />
 
       {bios.length > 0 && (
         <section>
