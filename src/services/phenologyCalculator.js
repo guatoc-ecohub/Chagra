@@ -110,6 +110,55 @@ export function calculateWindows({ speciesSlug, sowingDate, altitudeM }) {
 }
 
 /**
+ * @typedef {Object} CurrentStageResult
+ * @property {PhenologyWindow} stage — la ventana que contiene `now`
+ * @property {number} stageIndex — índice en el array de etapas del template
+ * @property {number} daysElapsed — días transcurridos desde la siembra
+ */
+
+/**
+ * Determina la etapa fenológica estimada actual según `now`.
+ * Usa `calculateWindows` internamente y busca la ventana cuyo
+ * [windowStart, windowEnd] contiene el timestamp `now`.
+ *
+ * - `now` anterior a la primera ventana → etapa sowing.
+ * - `now` posterior a la última ventana → etapa closed.
+ * - Sin plantilla o sin sowingDate → null (degradación limpia).
+ *
+ * @param {Object} input
+ * @param {string} input.speciesSlug
+ * @param {number} input.sowingDate — timestamp ms del evento de siembra
+ * @param {number} [input.altitudeM]
+ * @param {number} [input.now=Date.now()] — timestamp ms para el cual calcular la etapa
+ * @returns {CurrentStageResult|null}
+ */
+export function getCurrentStage({ speciesSlug, sowingDate, altitudeM, now }) {
+  const windows = calculateWindows({ speciesSlug, sowingDate, altitudeM });
+
+  if (!windows.length || (windows.length === 1 && windows[0].status !== 'computed')) {
+    return null;
+  }
+
+  const today = now && now > 0 ? now : Date.now();
+  const daysElapsed = Math.floor((today - windows[0].windowStart) / 86400000);
+
+  // Recorrer de la última etapa hacia atrás: en caso de solapamiento,
+  // retorna la etapa más avanzada que aún aplica.
+  for (let i = windows.length - 1; i >= 0; i--) {
+    const w = windows[i];
+    if (w.status !== 'computed' || w.windowStart === null) continue;
+    const afterStart = today >= w.windowStart;
+    const beforeEnd = w.windowEnd === null || today <= w.windowEnd;
+    if (afterStart && beforeEnd) {
+      return { stage: w, stageIndex: i, daysElapsed };
+    }
+  }
+
+  // today anterior a la primera ventana
+  return { stage: windows[0], stageIndex: 0, daysElapsed: Math.max(0, daysElapsed) };
+}
+
+/**
  * Ventana legible para el campesino.
  * @param {PhenologyWindow} w
  * @returns {string}
