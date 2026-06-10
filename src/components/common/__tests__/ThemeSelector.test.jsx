@@ -39,9 +39,9 @@ describe('ThemeSelector — switcher de tema', () => {
     expect(autoBtn()).toBeTruthy();
   });
 
-  it('marca bio-punk como activo por defecto (aria-pressed)', () => {
+  it('marca automático como activo por defecto (aria-pressed)', () => {
     render(<ThemeSelector />);
-    expect(bioBtn().getAttribute('aria-pressed')).toBe('true');
+    expect(autoBtn().getAttribute('aria-pressed')).toBe('true');
   });
 
   it('al elegir Nature persiste en localStorage y aplica data-theme', () => {

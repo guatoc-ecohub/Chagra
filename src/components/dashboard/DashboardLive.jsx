@@ -20,6 +20,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import AgentHero from './AgentHero';
 import AgentAraña from '../AgentAraña';
+import SelectedBackgroundReveal from './SelectedBackgroundReveal';
 import ClimaStrip from './ClimaStrip';
 import AIStatusFooter from './AIStatusFooter';
 import AnalisisProactivoIA from './AnalisisProactivoIA';
@@ -189,13 +190,16 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
                 scrolleando. */}
             <AgentHero onNavigate={onNavigate} />
 
-            {/* ── Araña visual de capacidades del agente ──
-                Nature: árbol orgánico. Biopunk: red micorrizal. Minimalista: lista.
-                Muestra todas las funciones con estado real (conectada/pendiente/Pro).
-                Campesino-friendly: metáforas naturales, colores tierra, etiquetas claras.
-                Deploy verification: v2-2026-06-10 */}
+            {/* Paisaje elegido — la foto de biodiversidad seleccionada, JUSTO
+                bajo el hero, visible en todos los temas (operador 2026-06-09). */}
+            <SelectedBackgroundReveal />
+
+            {/* ── La mano de Chagra (panel inline) ──
+                Misma mano del bottom-sheet Ⓐ: nature = rama+hojas, biopunk =
+                micorriza+esporas, minimalista = silueta sobria. Muestra TODAS las
+                capacidades con su estado real (conectada / por lanzarse). */}
             <div className="px-4 py-2">
-                <AgentAraña onSelect={(id) => onNavigate('agente', { intent: id })} />
+                <AgentAraña onNavigate={onNavigate} />
             </div>
 
             {/* Saludo regional dismissible — bajo el fold, ya no sobre el hero
