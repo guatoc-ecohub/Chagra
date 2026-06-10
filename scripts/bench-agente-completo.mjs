@@ -6,7 +6,9 @@
  * Ollama inference → post-validate hallucination check.
  *
  * 50 prompts mix: species(20) + biopreparados(12) + plagas(10) + normativa(4) + agroforestería(4)
- * 7 modelos: gemma3:4b, granite3.1-dense:8b, ministral-3:latest, aya:8b, mistral-nemo:12b, ministral-3:14b, qwen3:30b
+ * Modelos: ver const MODELS (candidatos que CABEN en la M6000 12GB). En GPU de
+ * slot único se descarga cada modelo (unloadModel, keep_alive:0) antes de cargar
+ * el siguiente — dos modelos de 8B no co-residen en 12GB.
  *
  * Output: data/bench-runs/agente-completo-YYYY-MM-DD.jsonl + summary.md
  * Luego invoca bench-llm-judge.mjs para evaluar calidad.
@@ -55,6 +57,25 @@ const OLLAMA_GEN_URL = process.env.OLLAMA_GEN_URL || 'http://localhost:11434/api
 const OLLAMA_LIST_URL = 'http://localhost:11434/api/tags';
 const TIMEOUT_MS = 180_000; // 3 min timeout por modelo
 
+/**
+ * Descarga un modelo de la VRAM (keep_alive:0). Necesario en GPU de slot
+ * único: tras la tanda de un modelo, liberamos memoria para que el siguiente
+ * pueda cargar. Best-effort: si falla, solo se loguea (no aborta el bench).
+ */
+async function unloadModel(modelName) {
+  try {
+    await fetch(OLLAMA_GEN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: modelName, keep_alive: 0 }),
+      signal: AbortSignal.timeout(15_000),
+    });
+    console.log(`    [unload] ${modelName} descargado de VRAM`);
+  } catch (err) {
+    console.log(`    [unload] no se pudo descargar ${modelName}: ${err.message}`);
+  }
+}
+
 // R4 — juez INDEPENDIENTE (COBERTURA de keywords, no anti-alucinación). `--judge
 // [modelo]` activa el LLM-judge LOCAL contra ollama. OJO: los jueces locales
 // están rotos en Maxwell (devuelven vacío / rubber-stamp); el juez confiable es
@@ -79,13 +100,9 @@ const JUDGE_MODEL = parseJudgeArg() || process.env.JUDGE_MODEL || RECOMMENDED_OL
 const JUDGE_TIMEOUT_MS = 60_000;
 
 const MODELS = {
-  gemma3_4b: 'gemma3:4b',
+  granite3_3_8b: 'granite3.3:8b',
+  gemma4_e4b: 'gemma4:e4b',
   granite3_1_8b: 'granite3.1-dense:8b',
-  ministral_3b: 'ministral-3:latest',
-  aya_8b: 'aya:8b',
-  mistral_nemo_12b: 'mistral-nemo:12b',
-  ministral_14b: 'ministral-3:14b',
-  qwen3_30b: 'qwen3:30b',
 };
 
 const MAXWELL_ERROR_PATTERNS = [
@@ -741,7 +758,7 @@ async function benchmarkPrompt(promptData, index, total) {
   };
 
   // Benchmark all 7 models
-  const modelKeys = ['gemma3_4b', 'granite3_1_8b', 'ministral_3b', 'aya_8b', 'mistral_nemo_12b', 'ministral_14b', 'qwen3_30b'];
+  const modelKeys = Object.keys(MODELS);
   
   for (const modelKey of modelKeys) {
     const modelName = MODELS[modelKey];
@@ -754,8 +771,14 @@ async function benchmarkPrompt(promptData, index, total) {
       console.log(`    OK: ${result.latency_total_ms.toFixed(0)}ms total, ${result.keywords_matched}/${result.keywords_total} keywords, ${result.entities_grounded} entities, ${result.halluc_count} halluc`);
     }
     
+    // Descargar el modelo recién evaluado ANTES de cargar el siguiente.
+    // En GPU de slot único (M6000, 12 GB) dos modelos de 8B no co-residen;
+    // sin este unload el segundo modelo falla con "memory layout cannot be
+    // allocated". keep_alive:0 libera la VRAM al terminar su tanda de prompts.
+    await unloadModel(modelName);
+
     // Pausa pequeña entre modelos
-    await new Promise(r => setTimeout(r, 1000));
+    await new Promise(r => setTimeout(r, 1500));
   }
 
   // Determinar ganador (solo entre modelos que completaron exitosamente)
@@ -947,7 +970,7 @@ async function main() {
 
   // Calcular estadísticas por modelo
   const stats = {};
-  const modelKeys = ['gemma3_4b', 'granite3_1_8b', 'ministral_3b', 'aya_8b', 'mistral_nemo_12b', 'ministral_14b', 'qwen3_30b'];
+  const modelKeys = Object.keys(MODELS);
   
   for (const modelKey of modelKeys) {
     const modelName = MODELS[modelKey];
