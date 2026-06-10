@@ -44,10 +44,11 @@ import { resolveSpeciesDefaults } from '../config/speciesDefaults';
  */
 /**
  * Detecta el TIPO de proceso productivo desde la transcripción (heurística por
- * palabras clave). Soporta reforestación/restauración y silvopastoreo además de
- * la siembra normal. process_type válido en types/farmProcess.
+ * palabras clave). Soporta reforestación/restauración, silvopastoreo, cosecha,
+ * post-cosecha y manejo de plagas además de la siembra normal. process_type
+ * válido en types/farmProcess.
  * @param {string} text
- * @returns {'sowing'|'restoration'|'silvopasture'}
+ * @returns {'sowing'|'restoration'|'silvopasture'|'harvest'|'post_harvest'|'pest_management'}
  */
 export function detectProcessType(text) {
   const t = (text || '').toLowerCase();
@@ -56,6 +57,15 @@ export function detectProcessType(text) {
   }
   if (/reforest|restaur|reforesté|árboles? (nativ|para|en el bosque)|\bbosque\b|revegetar?|enriquec\w* el bosque|roble|quercus|nogal|cativo/.test(t)) {
     return 'restoration';
+  }
+  if (/secad|almacen|poscosech|beneficiad/.test(t)) {
+    return 'post_harvest';
+  }
+  if (/fumig|control de (broca|plaga)|aplic/.test(t)) {
+    return 'pest_management';
+  }
+  if (/cosech|recolect/.test(t)) {
+    return 'harvest';
   }
   return 'sowing';
 }
@@ -78,6 +88,13 @@ export const buildDraftsFromVoice = ({
     const trackingMode = defaults?.tracking_mode || 'individual';
     const insights = e._ragInsights || null;
 
+    const unit = (() => {
+      if (ptype === 'restoration' || ptype === 'silvopasture') return 'árboles';
+      if (ptype === 'harvest' || ptype === 'post_harvest') return 'kg';
+      if (ptype === 'pest_management') return 'litros';
+      return trackingMode === 'individual' ? 'plantas' : 'semillas';
+    })();
+
     return {
       draft_id: newUlid(),
       transcription,
@@ -86,9 +103,7 @@ export const buildDraftsFromVoice = ({
       subject_label: cropInfo.label || e.crop,
       variety: cropInfo.variety || undefined,
       quantity: e.quantity || 1,
-      unit: (ptype === 'restoration' || ptype === 'silvopasture')
-        ? 'árboles'
-        : (trackingMode === 'individual' ? 'plantas' : 'semillas'),
+      unit,
       subject_kind: trackingMode,
       location_land_asset_id: locInfo?.id || '',
       location_land_label: locInfo?.label || undefined,

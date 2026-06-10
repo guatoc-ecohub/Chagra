@@ -26,12 +26,23 @@ export function useFarmProcessConfirm() {
       const now = Date.now();
       const processId = newUlid();
 
+      // Determina status y current_stage según el tipo de proceso
+      const processType = draft.process_type || 'sowing';
+      const isHarvest = processType === 'harvest';
+      const status = isHarvest ? 'completed' : 'active';
+      const currentStage = (() => {
+        if (isHarvest) return 'closed';
+        if (processType === 'post_harvest') return 'post_harvest';
+        if (processType === 'pest_management') return 'pest_management';
+        return 'sowing_confirmed';
+      })();
+
       // Build FarmProcess from edited draft
       const process = {
         process_id: processId,
         type: 'farm_process',
         attributes: {
-          process_type: draft.process_type || 'sowing',
+          process_type: processType,
           subject_kind: draft.subject_kind || 'individual',
           subject_slug: draft.subject_slug || '',
           subject_label: draft.subject_label,
@@ -39,8 +50,8 @@ export function useFarmProcessConfirm() {
           quantity: draft.quantity,
           unit: draft.unit || 'plantas',
           location_land_asset_id: draft.location_land_asset_id,
-          status: 'active',
-          current_stage: 'sowing_confirmed',
+          status,
+          current_stage: currentStage,
           created_at: draft.suggested_date || now,
           updated_at: now,
         },

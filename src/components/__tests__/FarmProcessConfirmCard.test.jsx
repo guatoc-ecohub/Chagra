@@ -158,4 +158,56 @@ describe('FarmProcessConfirmCard', () => {
       expect(input.disabled).toBe(true);
     });
   });
+
+  it('renderiza encabezado de cosecha (harvest)', () => {
+    const harvestDraft = { ...baseDraft, process_type: 'harvest', unit: 'kg' };
+    render(
+      <FarmProcessConfirmCard
+        draft={harvestDraft}
+        locationOptions={locationOptions}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
+      />
+    );
+    expect(screen.getByText(/Ciclo de cosecha/)).toBeDefined();
+  });
+
+  it('renderiza encabezado de post-cosecha (post_harvest)', () => {
+    const postDraft = { ...baseDraft, process_type: 'post_harvest', unit: 'kg' };
+    render(
+      <FarmProcessConfirmCard
+        draft={postDraft}
+        locationOptions={locationOptions}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
+      />
+    );
+    expect(screen.getByText(/Post-cosecha/)).toBeDefined();
+  });
+
+  it('renderiza encabezado de manejo de plagas (pest_management)', () => {
+    const pestDraft = { ...baseDraft, process_type: 'pest_management', unit: 'litros' };
+    render(
+      <FarmProcessConfirmCard
+        draft={pestDraft}
+        locationOptions={locationOptions}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
+      />
+    );
+    expect(screen.getByText(/Manejo de plagas/)).toBeDefined();
+  });
+
+  it('muestra unidad kg y unidades de cosecha en harvest', () => {
+    const harvestDraft = { ...baseDraft, process_type: 'harvest', unit: 'kg' };
+    render(
+      <FarmProcessConfirmCard
+        draft={harvestDraft}
+        locationOptions={locationOptions}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
+      />
+    );
+    expect(screen.getByDisplayValue('kg')).toBeDefined();
+  });
 });

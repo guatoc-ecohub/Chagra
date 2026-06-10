@@ -97,4 +97,52 @@ describe('useFarmProcessConfirm', () => {
     const call = createFarmProcess.mock.lastCall[0];
     expect(call.attributes.created_at).toBe(172800000000);
   });
+
+  it('cosecha: crea proceso con status completed y current_stage closed', async () => {
+    createFarmProcess.mockResolvedValue({ process: {}, event: {} });
+    const harvestDraft = { ...validDraft, process_type: 'harvest', unit: 'kg' };
+    const { result } = renderHook(() => useFarmProcessConfirm());
+
+    await act(async () => {
+      await result.current.confirm(harvestDraft);
+    });
+
+    const call = createFarmProcess.mock.lastCall[0];
+    expect(call.attributes.process_type).toBe('harvest');
+    expect(call.attributes.status).toBe('completed');
+    expect(call.attributes.current_stage).toBe('closed');
+    expect(call.attributes.unit).toBe('kg');
+  });
+
+  it('post-cosecha: crea proceso con status active y current_stage post_harvest', async () => {
+    createFarmProcess.mockResolvedValue({ process: {}, event: {} });
+    const postDraft = { ...validDraft, process_type: 'post_harvest', unit: 'kg' };
+    const { result } = renderHook(() => useFarmProcessConfirm());
+
+    await act(async () => {
+      await result.current.confirm(postDraft);
+    });
+
+    const call = createFarmProcess.mock.lastCall[0];
+    expect(call.attributes.process_type).toBe('post_harvest');
+    expect(call.attributes.status).toBe('active');
+    expect(call.attributes.current_stage).toBe('post_harvest');
+    expect(call.attributes.unit).toBe('kg');
+  });
+
+  it('manejo de plagas: crea proceso con status active y current_stage pest_management', async () => {
+    createFarmProcess.mockResolvedValue({ process: {}, event: {} });
+    const pestDraft = { ...validDraft, process_type: 'pest_management', unit: 'litros' };
+    const { result } = renderHook(() => useFarmProcessConfirm());
+
+    await act(async () => {
+      await result.current.confirm(pestDraft);
+    });
+
+    const call = createFarmProcess.mock.lastCall[0];
+    expect(call.attributes.process_type).toBe('pest_management');
+    expect(call.attributes.status).toBe('active');
+    expect(call.attributes.current_stage).toBe('pest_management');
+    expect(call.attributes.unit).toBe('litros');
+  });
 });
