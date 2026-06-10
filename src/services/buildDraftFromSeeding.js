@@ -7,6 +7,7 @@
  * Si falla, el seeding NO falla.
  */
 import { getAllSpecies } from '../db/catalogDB';
+import { FARM_CONFIG } from '../config/defaults';
 
 /**
  * Crea un draft de FarmProcess desde un payload de log--seeding.
@@ -50,7 +51,7 @@ export async function buildDraftFromSeeding(payload) {
     quantity,
     unit,
     subject_kind: subjectKind,
-    location_land_asset_id: '',
+    location_land_asset_id: FARM_CONFIG.LOCATION_ID || '',
     suggested_date: suggestedDate,
     companions: [],
     antagonists: [],
