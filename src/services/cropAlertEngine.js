@@ -14,6 +14,7 @@
  */
 import { listFarmProcesses } from '../db/farmProcessCache';
 import { getPestRisksByStage } from './climateCycleService';
+import { getEnsoServicePhase, getEnsoLabel } from './ensoService';
 
 const SEVERITY_BY_RISK = { 'crítico': 'danger', critico: 'danger', alto: 'warning' };
 
@@ -71,6 +72,25 @@ export async function runCropAlerts() {
       cleared++;
     }
   }
+
+  // Alerta de TEMPORADA ENSO (El Niño/La Niña) — una sola, no por ciclo. Solo
+  // tiene sentido si hay ciclos activos; se limpia si la fase vuelve a neutral.
+  if (cycles.length > 0) {
+    const ensoPhase = getEnsoServicePhase();
+    if (ensoPhase) {
+      emit('alertTriggered', {
+        type: 'enso_season',
+        severity: 'warning',
+        title: `Temporada ${getEnsoLabel()}`,
+        message: 'Revisa las labores preventivas de la temporada en cada ciclo (riego, drenajes, hongos).',
+        source: 'enso',
+      });
+      emitted++;
+    } else {
+      emit('alertCleared', { type: 'enso_season' });
+    }
+  }
+
   return { emitted, cleared };
 }
 

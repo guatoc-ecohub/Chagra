@@ -42,13 +42,34 @@ import { resolveSpeciesDefaults } from '../config/speciesDefaults';
  * @param {function} [input.resolveCrop] — (cropName) => {slug, label, variety, tracking_mode}
  * @returns {FarmProcessDraft[]} — un draft por entidad
  */
+/**
+ * Detecta el TIPO de proceso productivo desde la transcripción (heurística por
+ * palabras clave). Soporta reforestación/restauración y silvopastoreo además de
+ * la siembra normal. process_type válido en types/farmProcess.
+ * @param {string} text
+ * @returns {'sowing'|'restoration'|'silvopasture'}
+ */
+export function detectProcessType(text) {
+  const t = (text || '').toLowerCase();
+  if (/silvopast|silvo-?past|\bganad\w* con (árbol|arbol|sombr)|leucaena|sombr\w* para (el )?ganado|árboles? con (pasto|ganado)/.test(t)) {
+    return 'silvopasture';
+  }
+  if (/reforest|restaur|reforesté|árboles? (nativ|para|en el bosque)|\bbosque\b|revegetar?|enriquec\w* el bosque|roble|quercus|nogal|cativo/.test(t)) {
+    return 'restoration';
+  }
+  return 'sowing';
+}
+
 export const buildDraftsFromVoice = ({
   transcription,
   entities,
+  processType,
   resolveLocation = defaultResolveLocation,
   resolveCrop = defaultResolveCrop,
 }) => {
   if (!Array.isArray(entities) || entities.length === 0) return [];
+
+  const ptype = processType || detectProcessType(transcription);
 
   return entities.map((e) => {
     const cropInfo = resolveCrop(e.crop);
@@ -60,12 +81,14 @@ export const buildDraftsFromVoice = ({
     return {
       draft_id: newUlid(),
       transcription,
-      process_type: 'sowing',
+      process_type: ptype,
       subject_slug: cropInfo.slug || '',
       subject_label: cropInfo.label || e.crop,
       variety: cropInfo.variety || undefined,
       quantity: e.quantity || 1,
-      unit: trackingMode === 'individual' ? 'plantas' : 'semillas',
+      unit: (ptype === 'restoration' || ptype === 'silvopasture')
+        ? 'árboles'
+        : (trackingMode === 'individual' ? 'plantas' : 'semillas'),
       subject_kind: trackingMode,
       location_land_asset_id: locInfo?.id || '',
       location_land_label: locInfo?.label || undefined,
