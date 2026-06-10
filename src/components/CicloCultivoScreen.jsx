@@ -2,12 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, Sprout, Mic, RotateCcw, AlertTriangle } from 'lucide-react';
 import { listFarmProcesses } from '../db/farmProcessCache';
 import { getProfile } from '../services/userProfileService';
-import { getTasksForCycle, getUrgentTasks } from '../services/cycleTaskService';
-import { getPestRisksByStage } from '../services/climateCycleService';
-import FarmProcessSummary from './FarmProcessSummary';
-import PhenologyTimeline from './PhenologyTimeline';
 import DailyTasksView from './DailyTasksView';
-import CicloObservacion from './CicloObservacion';
+import CicloDetalle from './CicloDetalle';
 import ChagraGrowLoader from './ChagraGrowLoader';
 
 /**
@@ -94,46 +90,10 @@ export default function CicloCultivoScreen({ onBack, onNavigate }) {
 
   // Detalle de un ciclo
   if (selected) {
-    const a = selected.attributes || {};
-    const pestRisks = (() => {
-      try { return getPestRisksByStage(a.current_stage, a.subject_slug) || []; } catch { return []; }
-    })();
-    const tasks = (() => {
-      try { return getTasksForCycle(selected) || []; } catch { return []; }
-    })();
-    const urgent = (() => {
-      try { return getUrgentTasks(tasks) || []; } catch { return []; }
-    })();
     return (
       <div className="min-h-[100dvh] text-white">
         {Header}
-        <div className="px-4 pb-10 flex flex-col gap-4">
-          <FarmProcessSummary process={selected} pestRisks={pestRisks} />
-          <CicloObservacion processId={selectedId} onSaved={load} />
-          <section>
-            <h2 className="text-2xs uppercase font-bold text-slate-500 mb-2">Línea de tiempo</h2>
-            <PhenologyTimeline
-              speciesSlug={a.subject_slug}
-              sowingDate={a.created_at}
-              altitudeM={altitudeM}
-            />
-          </section>
-          {tasks.length > 0 && (
-            <section>
-              <h2 className="text-2xs uppercase font-bold text-slate-500 mb-2">
-                Labores de esta etapa {urgent.length > 0 && <span className="text-amber-400">· {urgent.length} urgente(s)</span>}
-              </h2>
-              <ul className="flex flex-col gap-1.5">
-                {tasks.map((t, i) => (
-                  <li key={t.id || t.code || i} className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 flex items-center gap-2">
-                    <Sprout size={14} className="text-lime-400 shrink-0" />
-                    <span>{t.label || t.name || t.title || String(t)}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-        </div>
+        <CicloDetalle cycle={selected} altitudeM={altitudeM} onReload={load} />
       </div>
     );
   }
