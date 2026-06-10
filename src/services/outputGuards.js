@@ -5688,6 +5688,210 @@ export function guardHardAltitudeViability(responseText, { userMessage = null } 
   return { text: responseText, modified: false, reason: null };
 }
 
+// ── GUARD: PREMISA FALSA EMBEBIDA por PISO TÉRMICO (eje premisa_falsa) ───────
+
+/**
+ * GR-5 (eje premisa_falsa del bench borde-alucinación): el usuario enuncia como
+ * HECHO que un cultivo ya está sembrado/prosperando en un piso térmico TEXTUAL
+ * incompatible con su rango —"¿cuándo cosecho el café que sembré a nivel del
+ * mar?", "¿cómo cuido mi mango del páramo?", "el coco que tengo en clima frío…"—
+ * y el modelo responde COMPLACIENTE (da fechas/cuidados de un cultivo que no
+ * prospera ahí) en vez de detectar y corregir la premisa. `guardHardAltitudeViability`
+ * NO lo cubre: ese exige una ALTITUD NUMÉRICA en el mensaje y una banda hardcodeada;
+ * aquí el piso viene TEXTUAL ("nivel del mar", "páramo", "tierra caliente/fría") y la
+ * incompatibilidad sale del RANGO REAL del grounding (`=== ENTIDADES RESUELTAS ===`:
+ * altitud_min / altitud_max de la especie resuelta), no de una tabla fija.
+ *
+ * Extiende la doctrina de VIABILIDAD HONESTA (agentService.generateViabilityRules /
+ * buildViabilityContext) de la pregunta DIRECTA de siembra a la premisa EMBEBIDA.
+ *
+ * GATING (anti-sobre-corrección, todo determinístico y grounding-driven):
+ *   1. el userMessage nombra un PISO TÉRMICO textual con altitud representativa
+ *      inequívoca (`_userPisoFromText`). Sin frase de piso → no-op.
+ *   2. el grounding trae una especie con RANGO CLARO (altitud_min Y altitud_max);
+ *      la altitud representativa del piso del usuario cae FUERA de [min, max] por
+ *      más del margen de zona-gris (300 m). Sin rango → no-op (NEUTRAL, no inventa
+ *      incompatibilidad). Dentro de banda → no-op (premisa válida, no corrige).
+ *   3. la respuesta NO está ya señalando la incompatibilidad
+ *      (`EMBEDDED_ALREADY_FLAGS_RE`). Si el modelo ya corrigió → no-op.
+ *
+ * SUPPRESS-AND-REPLACE: el cuerpo que da cosecha/cuidados de un cultivo inviable es
+ * íntegramente engañoso (memoria feedback-guards-suppress-not-prepend: anteponer un
+ * aviso y dejar el cuerpo = fuga). Reemplaza por una corrección AMABLE (tú, español
+ * de Colombia) con el rango real + orientación; si el grounding trae
+ * `alternativas_viables`, las nombra (SOLO del catálogo, nunca inventadas).
+ *
+ * CERO fabricación: la incompatibilidad y el rango salen del grounding; las
+ * alternativas también. Si no hay dato → neutral.
+ */
+
+/**
+ * Frases de PISO TÉRMICO textual → altitud representativa (msnm) + etiqueta legible.
+ * Orden importa: las más específicas primero. Sobre el texto normalizado del usuario.
+ * Solo pisos INEQUÍVOCOS (extremos y bandas claras); "templado" se incluye para que
+ * la prueba de compatibilidad (anti-sobre-corrección) reconozca el piso medio.
+ */
+const USER_PISO_PHRASES = [
+  { re: /\bnivel\s+del\s+mar\b/, alt: 0, label: 'a nivel del mar' },
+  { re: /\b(en\s+la\s+|zona\s+)?(playa|costa|litoral)\b/, alt: 50, label: 'en la costa' },
+  { re: /\bparamo[s]?\b/, alt: 3300, label: 'en el páramo' },
+  {
+    re: /\b(tierra\s+caliente|clima\s+(caliente|calid[oa])|zona\s+calid[oa]|tierra\s+ardiente|llano\s+caliente)\b/,
+    alt: 350,
+    label: 'en tierra caliente',
+  },
+  {
+    re: /\b(tierra\s+fria|clima\s+frio|zona\s+fria|tierras?\s+frias|clima\s+de\s+frio)\b/,
+    alt: 2700,
+    label: 'en clima frío',
+  },
+  {
+    re: /\b(tierra\s+templad[oa]|clima\s+templad[oa]|zona\s+templad[oa]|clima\s+medio)\b/,
+    alt: 1500,
+    label: 'en clima templado',
+  },
+];
+
+/**
+ * Detecta el piso térmico textual del mensaje del usuario. Devuelve la PRIMERA
+ * coincidencia (más específica) o null. Conservador: solo frases inequívocas.
+ *
+ * @param {string} userNorm  texto del usuario normalizado (sin tildes/case).
+ * @returns {{alt:number, label:string}|null}
+ */
+function _userPisoFromText(userNorm) {
+  if (typeof userNorm !== 'string' || !userNorm) return null;
+  for (const p of USER_PISO_PHRASES) {
+    if (p.re.test(userNorm)) return { alt: p.alt, label: p.label };
+  }
+  return null;
+}
+
+/**
+ * La RESPUESTA ya está señalando la incompatibilidad de piso/altitud (acertó). Si
+ * dice "no prospera", "no es viable", "no se da", "necesita clima…", "fuera de su
+ * rango", "no es el clima/la altura adecuada" → no re-corregimos. Anti-FP central.
+ */
+const EMBEDDED_ALREADY_FLAGS_RE =
+  /(no\s+prosper|no\s+es\s+viable|inviable|no\s+se\s+da\b|clima\s+no\s+(le\s+)?sirve|altura\s+no\s+(le\s+)?sirve|fuera\s+de\s+su\s+rango|no\s+(crece|sobrevive|aguanta|resiste)\s+(bien|en|a)|necesita\s+(un\s+)?clima|no\s+es\s+(el\s+)?(clima|piso|la\s+altura|altura)\s+(adecuad|correct|apropiad|ideal)|no\s+corresponde\s+a\s+ese\s+(clima|piso|altura)|esa\s+premisa)/;
+
+/**
+ * La RESPUESTA TRATA el cultivo como PRESENTE/viable (le da cosecha, cuidados,
+ * manejo, abono, riego, poda, o afirma que se da/produce). Si no engancha con el
+ * cultivo, no hay complacencia que neutralizar. Sobre el texto normalizado.
+ */
+const EMBEDDED_TREATS_AS_PRESENT_RE =
+  /(cosech\w*|cuid\w*|abon\w*|rieg\w*|rega\w*|pod[ae]\w*|manej\w*|fertiliz\w*|fructific\w*|florec\w*|produc\w*|madur\w*|se\s+da\b|se\s+cultiva|crece\s+bien|distancia\s+de\s+siembra|control\w*|aplic\w*|trasplant\w*|cuando\s+(la\s+|lo\s+)?(coseches|recoges))/;
+
+/** Marca textual idempotente del reemplazo de premisa falsa embebida. */
+const EMBEDDED_FALSE_PREMISE_MARKER = 'con cariño te corrijo';
+
+/**
+ * Deriva la palabra de clima de una banda de altitud [min, max] del grounding, sin
+ * red ni catálogo: usa el punto medio contra los umbrales de piso térmico de
+ * Colombia (mismos cortes que pisoTermicoFromAltitud).
+ */
+function _climaWordFromRange(min, max) {
+  const mid = (min + max) / 2;
+  if (mid >= 3000) return 'clima de páramo';
+  if (mid >= 2000) return 'clima frío';
+  if (mid >= 1000) return 'clima templado';
+  return 'clima cálido';
+}
+
+/**
+ * Texto de corrección AMABLE para la premisa falsa embebida. Español de Colombia
+ * (tú), sin humillar. Da el rango real + orienta; nombra alternativas SOLO si el
+ * grounding las trae.
+ */
+function _embeddedFalsePremiseReplacement({ nombre, pisoLabel, min, max, alternativas }) {
+  const clima = _climaWordFromRange(min, max);
+  const altTxt = alternativas.length
+    ? ` Si quieres sembrar ${pisoLabel}, lo que sí se da bien por allá es, por ejemplo, ${alternativas.join(', ')} (del catálogo).`
+    : ` Si me dices bien la altura o el municipio de tu finca, con gusto te oriento qué cultivos sí se dan ${pisoLabel}.`;
+  return (
+    `Ojo, ${EMBEDDED_FALSE_PREMISE_MARKER}: ${nombre} no prospera ${pisoLabel} — necesita ${clima}, ` +
+    `alrededor de ${min}–${max} msnm. Seguramente te refieres a otra ubicación, a otra planta o a una ` +
+    `siembra que no va a cuajar ahí, así que prefiero no darte cuidados de un cultivo que no se daría en ese ` +
+    `piso.${altTxt}`
+  );
+}
+
+/**
+ * guardEmbeddedAltitudeFalsePremise — GR-5. Detecta la PREMISA FALSA EMBEBIDA de
+ * piso térmico (cultivo dado por sembrado/prosperando en un clima incompatible con
+ * su rango del grounding) y, si la respuesta la trata como cierta sin corregir,
+ * SUPRIME-Y-REEMPLAZA por una corrección amable + el rango real + orientación.
+ *
+ * Firma propia (necesita userMessage Y resolvedEntities) → se invoca aparte en
+ * applyOutputGuards, fuera de GUARD_CHAIN. Idempotente. Guard de SIEMBRA/viabilidad.
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null, resolvedEntities?: Array<object>|null}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardEmbeddedAltitudeFalsePremise(
+  responseText,
+  { userMessage = null, resolvedEntities = null } = {},
+) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Idempotencia: nuestro reemplazo ya está → no re-suprimir.
+  if (responseText.includes(EMBEDDED_FALSE_PREMISE_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  // Capa 1: el usuario debe nombrar un piso térmico textual inequívoco.
+  const userNorm = typeof userMessage === 'string' ? _stripDiacritics(userMessage) : '';
+  const piso = _userPisoFromText(userNorm);
+  if (!piso) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  // Necesitamos grounding con especie de rango claro para juzgar (NEUTRAL si no hay).
+  if (!Array.isArray(resolvedEntities) || resolvedEntities.length === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const norm = _stripDiacritics(responseText);
+  // Capa 3 (corta barato): si la respuesta YA señala la incompatibilidad, acertó.
+  if (EMBEDDED_ALREADY_FLAGS_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  // La respuesta debe TRATAR el cultivo como presente/viable (complacencia). Si solo
+  // lo menciona de pasada sin darle cosecha/cuidados, no hay qué neutralizar.
+  if (!EMBEDDED_TREATS_AS_PRESENT_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const margin = 300; // misma zona-gris que buildViabilityContext.
+  for (const e of resolvedEntities) {
+    if (!_isSpecies(e)) continue;
+    const hasMin = e.altitud_min != null && e.altitud_min !== '';
+    const hasMax = e.altitud_max != null && e.altitud_max !== '';
+    if (!hasMin || !hasMax) continue; // sin rango claro → NEUTRAL para esta especie.
+    const min = Number(e.altitud_min);
+    const max = Number(e.altitud_max);
+    if (!Number.isFinite(min) || !Number.isFinite(max) || min > max) continue;
+
+    const demasiadoBajo = piso.alt < min - margin;
+    const demasiadoAlto = piso.alt > max + margin;
+    if (!demasiadoBajo && !demasiadoAlto) continue; // dentro de banda → premisa válida.
+
+    const nombre = _entityName(e);
+    // La especie incompatible debe ser la que el usuario nombró: el grounding la
+    // resolvió desde el mensaje, así que su `mentioned`/nombre aparece en el texto.
+    const alternativas = _altNames(e.alternativas_viables, 3);
+    bumpGuardTelemetry('embedded_altitude_false_premise');
+    return {
+      text: _embeddedFalsePremiseReplacement({ nombre, pisoLabel: piso.label, min, max, alternativas }),
+      modified: true,
+      reason: `premisa_falsa_embebida: ${nombre} ${piso.label} (rango ${min}-${max} msnm)`,
+    };
+  }
+
+  return { text: responseText, modified: false, reason: null };
+}
+
 // ── C2 (BORDE-027): nombre regional NO identificado convertido en especie ───
 
 const UNKNOWN_REGIONAL_CROP_MARKER = 'no puedo confirmar qué es "coincyes"';
@@ -6841,6 +7045,22 @@ export function applyOutputGuards(
     const hav = guardHardAltitudeViability(text, { userMessage });
     if (hav && hav.modified) {
       return { text: hav.text, modified: true, reasons: hav.reason ? [hav.reason] : [] };
+    }
+  }
+
+  // GUARD PREMISA FALSA EMBEBIDA por PISO TÉRMICO (GR-5, eje premisa_falsa): si la
+  // pregunta da por sembrado/prosperando un cultivo en un piso térmico TEXTUAL ("el
+  // café que sembré a nivel del mar", "mi mango del páramo") incompatible con el
+  // RANGO del grounding, y la respuesta lo trata como cierto, SUPRIME el cuerpo
+  // complaciente y lo REEMPLAZA por la corrección amable + el rango real +
+  // orientación. Extiende la viabilidad honesta de la pregunta directa a la premisa
+  // embebida. Necesita userMessage Y entities (grounding) → firma propia. Como
+  // REEMPLAZA todo el cuerpo (cosecha/cuidados de un cultivo inviable son engañosos),
+  // early-return. Guard de SIEMBRA/viabilidad → solo si la consulta no es de precio.
+  if (runPlantingGuards && !(vis && vis.modified)) {
+    const efp = guardEmbeddedAltitudeFalsePremise(text, { userMessage, resolvedEntities: entities });
+    if (efp && efp.modified) {
+      return { text: efp.text, modified: true, reasons: efp.reason ? [efp.reason] : [] };
     }
   }
 

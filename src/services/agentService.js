@@ -619,11 +619,12 @@ export function buildClimaContext(snapshot, opts = {}) {
  * @returns {string}
  */
 export function generateViabilityRules() {
-  return `REGLA DE VIABILIDAD HONESTA DE CULTIVO: las preguntas son POR DEFECTO sobre SU finca (ubicación, altitud, piso térmico, clima, cultivos) aunque no lo diga — ya lo tienes en "=== CONTEXTO AMBIENTAL DE LA FINCA ===". Si quiere sembrar una especie y el grounding trae su rango (altitud_min / altitud_max) Y conoces la altitud de la finca:
-- Si la finca está FUERA de [altitud_min, altitud_max], dilo con honestidad amable: la probabilidad de éxito es muy baja y POR QUÉ (ej: coco necesita 0–1000 m cálido, tu finca a 2580 m frío), que no vale la pena, y SUGIERE 2–3 alternativas viables para SU altitud.
-- Las alternativas salen SOLO del catálogo/grounding o del tool get_cultivos_viables. NUNCA inventes especies ni que algo es viable.
-- Si NO tienes el rango (no vino o es null), NO afirmes NADA sobre viabilidad: sé neutral, pide el dato antes de prometer éxito.
-PRESENTACIÓN DE DATOS LOCALES (fraseo): que se note que los datos de finca son SUYOS y locales ("En tu finca tienes…", "Para tu altura (2580 m)…"); el usuario puede ser campesino o un niño de 11 años. Respuestas concisas, sin preámbulo de todo el contexto.`;
+  return `REGLA DE VIABILIDAD HONESTA: las preguntas son POR DEFECTO sobre SU finca (altitud, piso, clima) aunque no lo diga — ya está en "=== CONTEXTO AMBIENTAL DE LA FINCA ===". Si el grounding trae el rango de la especie (altitud_min/altitud_max):
+- Finca FUERA de [altitud_min, altitud_max]: dilo con honestidad amable — probabilidad de éxito muy baja y POR QUÉ (ej: coco 0–1000 m cálido, tu finca 2580 m frío) y sugiere 2–3 alternativas viables para SU altitud.
+- PREMISA FALSA EMBEBIDA: si da por hecho un cultivo ya sembrado/prosperando en un piso incompatible con su rango ("el café que sembré a nivel del mar", "mi mango del páramo"), NO des cosecha/cuidados como si fuera cierto: corrige con amabilidad ("ojo: el café no prospera a nivel del mar") y orienta con alternativas o pide aclaración.
+- Alternativas SOLO del catálogo/grounding o get_cultivos_viables. NUNCA inventes especies, viabilidad ni incompatibilidad.
+- Sin rango (null): NO afirmes NADA; sé neutral y pide el dato.
+PRESENTACIÓN LOCAL: que los datos de finca se noten SUYOS ("En tu finca…", "Para tu altura (2580 m)…"); usuario campesino o niño. Conciso.`;
 }
 
 /**
