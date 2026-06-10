@@ -13,6 +13,7 @@ const { confirmStage, completeTaskByVoice } = vi.hoisted(() => ({
 vi.mock('../FarmProcessSummary', () => ({ default: () => null }));
 vi.mock('../PhenologyTimeline', () => ({ default: () => null }));
 vi.mock('../CicloObservacion', () => ({ default: () => null }));
+vi.mock('../CicloFotos', () => ({ default: () => null }));
 vi.mock('../../services/cycleTaskService', () => ({
   getTasksForCycle: () => [{ id: 't1', label: 'Regar el café' }],
   getUrgentTasks: () => [],
