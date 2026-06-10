@@ -6,6 +6,8 @@ import { getTasksForCycle, getUrgentTasks } from '../services/cycleTaskService';
 import { getPestRisksByStage } from '../services/climateCycleService';
 import FarmProcessSummary from './FarmProcessSummary';
 import PhenologyTimeline from './PhenologyTimeline';
+import DailyTasksView from './DailyTasksView';
+import CicloObservacion from './CicloObservacion';
 import ChagraGrowLoader from './ChagraGrowLoader';
 
 /**
@@ -107,6 +109,7 @@ export default function CicloCultivoScreen({ onBack, onNavigate }) {
         {Header}
         <div className="px-4 pb-10 flex flex-col gap-4">
           <FarmProcessSummary process={selected} pestRisks={pestRisks} />
+          <CicloObservacion processId={selectedId} onSaved={load} />
           <section>
             <h2 className="text-2xs uppercase font-bold text-slate-500 mb-2">Línea de tiempo</h2>
             <PhenologyTimeline
@@ -151,7 +154,10 @@ export default function CicloCultivoScreen({ onBack, onNavigate }) {
           </button>
         </div>
       ) : (
-        <ul className="px-4 pb-10 flex flex-col gap-2">
+        <div className="px-4 pb-10 flex flex-col gap-3">
+          {/* Digest "para hoy": labores urgentes agregadas de todos los ciclos. */}
+          <DailyTasksView processes={cycles} />
+          <ul className="flex flex-col gap-2">
           {cycles.map((c) => {
             const a = c.attributes || {};
             const id = c.process_id || c.id;
@@ -174,7 +180,8 @@ export default function CicloCultivoScreen({ onBack, onNavigate }) {
               </li>
             );
           })}
-        </ul>
+          </ul>
+        </div>
       )}
     </div>
   );

@@ -18,6 +18,8 @@ vi.mock('../../services/cycleTaskService', () => ({
   getUrgentTasks: () => [],
 }));
 vi.mock('../../services/climateCycleService', () => ({ getPestRisksByStage: () => [] }));
+// El widget de observación tiene su propio test; acá se stubea para aislar.
+vi.mock('../CicloObservacion', () => ({ default: () => null }));
 
 import CicloCultivoScreen from '../CicloCultivoScreen';
 
@@ -51,8 +53,9 @@ describe('CicloCultivoScreen — ciclo del cultivo (fenología wired)', () => {
   it('lista los ciclos y abre el detalle con la línea de tiempo', async () => {
     listFarmProcesses.mockResolvedValue([CYCLE]);
     render(<CicloCultivoScreen onBack={() => {}} onNavigate={() => {}} />);
-    // La lista muestra el cultivo.
-    const card = await screen.findByText('Fresa');
+    // La tarjeta de la lista es un botón con el cultivo (hay otros "Fresa" en el
+    // digest DailyTasksView, por eso se apunta al botón, no al texto suelto).
+    const card = await screen.findByRole('button', { name: /Fresa/ });
     fireEvent.click(card);
     // El detalle muestra la sección de línea de tiempo y las labores cableadas.
     await waitFor(() => expect(screen.getByText(/Línea de tiempo/i)).toBeTruthy());
