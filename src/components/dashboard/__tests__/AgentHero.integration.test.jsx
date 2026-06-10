@@ -101,6 +101,12 @@ vi.mock('../../ChagraAgentAvatar', () => ({
   ),
 }));
 
+// jsdom no trae ResizeObserver (lo usa el motor de AgentRedMenu, que ahora
+// se monta INTEGRADO en el hero al abrir el menú Ⓐ).
+globalThis.ResizeObserver = globalThis.ResizeObserver || class {
+  observe() {} unobserve() {} disconnect() {}
+};
+
 import AgentHero from '../AgentHero';
 import { getProfile, saveProfile, getProfileMunicipio } from '../../../services/userProfileService';
 
@@ -466,6 +472,79 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
       
       // NO debe persistir (ya está en ese nivel)
       expect(saveProfile).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('6. menú Ⓐ integrado al hero (sin bottom-sheet)', () => {
+    test('tocar Ⓐ brota la red EN la zona-respiro y pliega saludo/chips', async () => {
+      const { container } = render(<AgentHero onNavigate={vi.fn()} />);
+
+      // Cerrado: nada de red ni de sheet/scrim (el modal aparte murió).
+      expect(container.querySelector('.agentport-redpanel')).toBeNull();
+      expect(container.querySelector('.agentport-sheet')).toBeNull();
+      expect(container.querySelector('.agentport-scrim')).toBeNull();
+
+      const aBtn = screen.getByLabelText('Ver todo lo que puede hacer Chagra');
+      await act(async () => { fireEvent.click(aBtn); });
+
+      // Abierto: la red vive DENTRO de la zona-respiro del hero.
+      const stage = container.querySelector('.agentport-stage');
+      const panel = stage.querySelector('.agentport-redpanel');
+      expect(panel).toBeTruthy();
+      expect(panel.querySelector('.arm-root')).toBeTruthy();
+      expect(container.querySelector('.agentport-sheet')).toBeNull();
+      expect(aBtn).toHaveAttribute('aria-expanded', 'true');
+
+      // El saludo/chips quedan plegados (misma pantalla, no scrim encima).
+      expect(container.querySelector('.agentport-foldaway')).toHaveClass('is-folded');
+      // La escena ambiente baja el volumen pero sigue siendo el mismo lienzo.
+      expect(container.querySelector('.agentport-scene')).toHaveClass('is-quiet');
+    });
+
+    test('tocar Ⓐ de nuevo cierra y devuelve el saludo (reduced-motion: inmediato)', async () => {
+      const { container } = render(<AgentHero onNavigate={vi.fn()} />);
+      const aBtn = screen.getByLabelText('Ver todo lo que puede hacer Chagra');
+
+      await act(async () => { fireEvent.click(aBtn); });
+      expect(container.querySelector('.agentport-redpanel')).toBeTruthy();
+
+      await act(async () => { fireEvent.click(aBtn); });
+      expect(container.querySelector('.agentport-redpanel')).toBeNull();
+      expect(container.querySelector('.agentport-foldaway')).not.toHaveClass('is-folded');
+      expect(aBtn).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    test('tocar una hoja viva rutea de verdad (heroRoute → outbox → chat)', async () => {
+      const onNavigate = vi.fn();
+      render(<AgentHero onNavigate={onNavigate} />);
+      const aBtn = screen.getByLabelText('Ver todo lo que puede hacer Chagra');
+      await act(async () => { fireEvent.click(aBtn); });
+
+      // 'Plaga' es una capacidad live del manifiesto real con
+      // heroRoute {kind:'ask'} — el bug de main leía cap.route (undefined)
+      // y mataba el pick en silencio. Este test lo clava.
+      const leaf = screen.getByLabelText('Plaga');
+      await act(async () => { fireEvent.click(leaf); });
+
+      await waitFor(() => {
+        expect(sendMock).toHaveBeenCalledWith(
+          expect.objectContaining({ kind: 'text', text: expect.stringMatching(/plagas/i) }),
+        );
+      });
+      await waitFor(() => expect(onNavigate).toHaveBeenCalledWith('agente'));
+    });
+
+    test('Escape cierra el menú (a11y teclado)', async () => {
+      const { container } = render(<AgentHero onNavigate={vi.fn()} />);
+      const aBtn = screen.getByLabelText('Ver todo lo que puede hacer Chagra');
+
+      await act(async () => { fireEvent.click(aBtn); });
+      expect(container.querySelector('.agentport-redpanel')).toBeTruthy();
+
+      await act(async () => {
+        fireEvent.keyDown(window, { key: 'Escape' });
+      });
+      expect(container.querySelector('.agentport-redpanel')).toBeNull();
     });
   });
 
