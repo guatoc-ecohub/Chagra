@@ -1315,6 +1315,7 @@ export function buildFincaContext({
   groupedCultivos = [],
   resolvedEntities = null,
   activeAlerts = [],
+  activeCycles = [],
   catalogNames = null,
   month,
 } = {}) {
@@ -1467,6 +1468,23 @@ export function buildFincaContext({
       .map((a) => a.title || a.message || a.type)
       .filter(Boolean);
     if (top.length) lines.push(`Alertas activas: ${top.join('; ')}.`);
+  }
+
+  // ── Ciclo(s) productivo(s) activo(s) (FarmProcess) ──────────────────────
+  // Aterriza la respuesta en lo que el usuario tiene sembrado AHORA: etapa
+  // fenológica, días desde la siembra y riesgo de plaga dominante. Son datos
+  // FACTUALES del ciclo (registrados por el usuario), no inventados. Degrada
+  // limpio si no hay ciclos. El caller (AgentScreen) ya les dio forma.
+  if (Array.isArray(activeCycles) && activeCycles.length > 0) {
+    const cycleLines = activeCycles.slice(0, 5).map((c) => {
+      let l = `${c.label || 'cultivo'} en etapa ${c.stage || '—'}`;
+      if (c.days != null) l += ` (hace ${c.days} días)`;
+      if (c.topRisk) l += `, riesgo de plaga: ${c.topRisk}`;
+      return l;
+    }).filter(Boolean);
+    if (cycleLines.length) {
+      lines.push(`Ciclos activos del usuario (aterriza la respuesta en estos): ${cycleLines.join(' · ')}.`);
+    }
   }
 
   // ── Finca / inventario (resumen compacto, NO el detalle) ────────────────

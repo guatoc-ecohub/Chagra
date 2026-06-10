@@ -1208,6 +1208,25 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     const fincaProfile = (() => { try { return getProfile(); } catch (_) { return null; } })();
     // GATE de precio: en una consulta de mercado NO inyectamos el perfil/altitud
     // de finca (evita la fuga "Tu finca a 0 msnm…").
+    // Ciclo(s) productivo(s) activo(s) (FarmProcess) → aterriza la respuesta en
+    // lo sembrado AHORA (etapa fenológica, días, riesgo de plaga dominante).
+    // Datos factuales del usuario; degrada limpio si no hay ciclos o falla.
+    const activeCycles = isPriceQuery ? [] : await (async () => {
+      try {
+        const { listFarmProcesses } = await import('../../db/farmProcessCache');
+        const { getPestRisksByStage } = await import('../../services/climateCycleService');
+        const STAGE_LBL = { sowing: 'Siembra', emergence: 'Brotó', vegetative: 'Creciendo', flowering: 'Floración', fruiting: 'Frutos', harvest_window: 'Cosecha', closed: 'Terminado' };
+        const cycles = (await listFarmProcesses({ status: 'active' })) || [];
+        return cycles.slice(0, 5).map((c) => {
+          const at = c.attributes || {};
+          const base = String(at.current_stage || '').replace(/_confirmed$/, '');
+          const days = at.created_at ? Math.max(0, Math.round((Date.now() - at.created_at) / 86400000)) : null;
+          const risks = (() => { try { return getPestRisksByStage(at.current_stage, at.subject_slug) || []; } catch { return []; } })();
+          const top = risks.find((r) => r.risk === 'crítico' || r.risk === 'alto');
+          return { label: at.subject_label, stage: STAGE_LBL[base] || base, days, topRisk: top ? `${top.pest} (${top.risk})` : null };
+        });
+      } catch { return []; }
+    })();
     const fincaContext = isPriceQuery
       ? ''
       : `\n\n${buildFincaContext({
@@ -1217,6 +1236,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
           groupedCultivos,
           resolvedEntities,
           activeAlerts,
+          activeCycles,
         })}`;
 
     // VIABILIDAD POR ALTITUD (determinístico, sin red). Cruza la altitud de la
@@ -2527,7 +2547,8 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     }
   };
 
-  const handleTextSubmit = (e) => {
+  // Handler legado conservado (sin uso actual). El prefijo _ lo exime del linter.
+  const _handleTextSubmit = (e) => {
     e.preventDefault();
     // CHIPS DE MODO (A3): si hay un modo activo, el submit lleva la intención
     // forzada → runAgentPipeline salta el NLU y rutea directo al tool.
