@@ -238,13 +238,13 @@ export const CAPABILITY_MANIFEST = Object.freeze([
   {
     id: 'alertas-cultivo',
     group: 'cuidar',
-    status: 'soon',
+    status: 'live',
     icon: '🔔',
     label: 'Alertas del cultivo',
     desc: 'Avisos anticipados de riesgo por clima, plagas y etapa.',
     tool: 'crop_alerts',
     hero: true,
-    heroRoute: { kind: 'unavailable' },
+    heroRoute: { kind: 'nav', view: 'ciclo' },
   },
 ]);
 
