@@ -181,6 +181,10 @@ export default function AgentHero({ onNavigate }) {
 
     const textareaRef = useRef(null);
     const cameraInputRef = useRef(null);
+    // Ancla de la red Ⓐ: el botón del agente en el compositor ES la raíz
+    // geométrica del menú (operador 2026-06-10: una sola Ⓐ — la red nace
+    // del botón real, no de un nodo duplicado dentro del menú).
+    const aButtonRef = useRef(null);
 
     // Sistema de temas REAL de la app (data-theme en <html>, persiste en
     // localStorage). Aquí solo LEEMOS el tema para pintar el ícono de la marca
@@ -904,9 +908,16 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-tool:not(.is-open) {
                     animation: agentport-pulse-ring 3.6s cubic-bezier(.22,.61,.36,1) infinite;
                 }
+                /* Abierto = la Ⓐ ES la raíz viva de la red: se rellena con el
+                   acento y respira (glow suave) — la misma savia de las ramas
+                   que brotan de ella en la zona-respiro (un solo organismo). */
                 .agentport-tool.is-open {
                     background: rgb(var(--t-accent-rgb)); border-color: rgb(var(--t-accent-rgb));
-                    animation: none;
+                    animation: agentport-root-breathe 3.4s ease-in-out infinite;
+                }
+                @keyframes agentport-root-breathe {
+                    0%, 100% { box-shadow: 0 0 12px -2px rgb(var(--t-accent-rgb) / 0.55); }
+                    50% { box-shadow: 0 0 24px 2px rgb(var(--t-accent-rgb) / 0.85); }
                 }
                 /* al abrir, el ícono se vuelve blanco para contrastar con el acento */
                 .agentport-tool.is-open .agentport-tool-ico path,
@@ -1039,6 +1050,7 @@ export default function AgentHero({ onNavigate }) {
                     .agentport-net .spark { display: none !important; }
                     .agentport-sprig path { stroke-dashoffset: 0 !important; animation: none !important; }
                     .agentport-tool:not(.is-open) { animation: none !important; }
+                    .agentport-tool.is-open { animation: none !important; }
                     .agentport-greet { animation: none !important; }
                     .agentport-foldaway, .agentport-redpanel { transition: none !important; animation: none !important; }
                     .chagra-composer-shimmer::after, .chagra-composer-sending { animation: none !important; }
@@ -1231,7 +1243,7 @@ export default function AgentHero({ onNavigate }) {
                             </span>
                         </div>
                         <div className="agentport-red-body">
-                            <AgentRedMenu onPick={pickCapability} disabled={busy} />
+                            <AgentRedMenu onPick={pickCapability} disabled={busy} anchorRef={aButtonRef} />
                         </div>
                     </div>
                 )}
@@ -1369,9 +1381,12 @@ export default function AgentHero({ onNavigate }) {
 
                     {/* Fila 2: Ⓐ a la izquierda · cámara/adjuntar · mic/enviar a la derecha */}
                     <div className="flex items-center gap-2 px-1 pb-1 pt-0.5">
-                        {/* Botón Ⓐ — despliega/pliega la red de capacidades EN el hero */}
+                        {/* Botón Ⓐ — despliega/pliega la red de capacidades EN el
+                            hero. Es LA raíz de la red (única Ⓐ): el menú lee su
+                            posición vía aButtonRef y las ramas brotan de aquí. */}
                         <button
                             type="button"
+                            ref={aButtonRef}
                             onClick={toggleMenu}
                             disabled={isRecording}
                             aria-label="Ver todo lo que puede hacer Chagra"

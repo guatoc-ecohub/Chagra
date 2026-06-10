@@ -20,4 +20,19 @@ describe('AgentRedMenu — smoke', () => {
     const { container } = render(<AgentRedMenu onPick={vi.fn()} />);
     expect(container.querySelector('.arm-root')).toBeTruthy();
   });
+
+  it('NO duplica la Ⓐ: el menú no trae nodo raíz propio (la raíz es el botón Ⓐ del hero)', () => {
+    const { container } = render(<AgentRedMenu onPick={vi.fn()} />);
+    // Operador 2026-06-10: una SOLA Ⓐ — la del botón del agente (AgentHero).
+    // El menú no renderiza su propio nodo Ⓐ; la red nace del ancla del padre.
+    expect(container.querySelector('.arm-rootn')).toBeNull();
+    // ningún nodo interactivo del menú pinta el glifo Ⓐ (el <style> no cuenta)
+    expect(container.querySelector('.arm-nodes').textContent).not.toContain('Ⓐ');
+  });
+
+  it('acepta el ancla del botón Ⓐ del hero (anchorRef) sin crashear', () => {
+    const anchorRef = { current: null };
+    const { container } = render(<AgentRedMenu onPick={vi.fn()} anchorRef={anchorRef} />);
+    expect(container.querySelector('.arm-root')).toBeTruthy();
+  });
 });
