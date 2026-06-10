@@ -165,17 +165,18 @@ export const ROUTES = {
       'mejor capability) o deepseek-r1:8b (46 t/s, chain-of-thought).',
   },
   vision: {
-    model: 'llava:13b',
+    model: 'llama3.2-vision:11b',
     keep_alive_min: 0,
     temperature: 0.2,
     max_tokens: 512,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Bench 2026-06-09: qwen2.5vl:7b falló (OOM), llava:13b pasó ' +
-      'validación (25.8% voice, 42.4% farm, 66.7% reforestation). ' +
-      '~9 GB VRAM, multimodal nativo. Habilita pest diagnostic ' +
-      '(DR-040 F2) y plant ID. unload tras request porque compite ' +
-      'con chat hot (qwen3.5:9b ~9.6 GB) por VRAM.'
+      'Vision bench 2026-06-09: llama3.2-vision:11b es el ÚNICO ' +
+      'modelo que funciona en 12GB VRAM. gemma4:e4b (OOM) y llava:13b ' +
+      '(OOM) fallan al cargar contexto visual. llama3.2-vision:11b ' +
+      'pasa 3/3 tests (48-88 chars, 13-26 tokens). ~7.8 GB VRAM. ' +
+      'Habilita pest diagnostic (DR-040 F2) y plant ID. ' +
+      'unload tras request porque compite con chat hot (qwen3.5:9b ~9.6 GB).'
   },
 };
 
