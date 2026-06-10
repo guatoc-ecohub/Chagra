@@ -14,10 +14,10 @@ import { useTheme, THEMES } from '../../hooks/useTheme';
 // Trío de colores representativo de cada tema (fondo / acento / detalle).
 // Solo presentación del swatch; la paleta real vive en themes.css.
 const SWATCHES = {
+  auto: ['#0a0e14', '#d98a4f', '#f6efe0'],
   biopunk: ['#0a0e14', '#19c79a', '#3be8a6'],
   nature: ['#f6efe0', '#d98a4f', '#7a8f4a'],
   minimalista: ['#f6f3ec', '#2f6e5a', '#878d86'],
-  auto: ['#0a0e14', '#2f6e5a', '#f6f3ec'],
 };
 
 export default function ThemeSelector() {
