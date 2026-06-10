@@ -1,0 +1,60 @@
+{
+  "template_id": "coriandrum_sativum.v1",
+  "species_slug": "coriandrum_sativum",
+  "species_label": "Cilantro (Coriandrum sativum)",
+  "version": 1,
+  "sources": [
+    {
+      "name": "Agrosavia — Manual de producción de plantas aromáticas",
+      "reference": "Agrosavia (2017). Manual técnico para el cultivo de plantas aromáticas y condimentarias",
+      "url": "https://repository.agrosavia.co/handle/20.500.12324/aromaticas"
+    },
+    {
+      "name": "ICA — Guía de manejo de cilantro",
+      "reference": "ICA, Boletín técnico, 2019",
+      "url": "https://www.ica.gov.co/"
+    }
+  ],
+  "stages": [
+    {
+      "code": "sowing",
+      "label": "Siembra",
+      "description": "Siembra directa de semilla al voleo o en surco superficial (1 cm). Germinación en 7-10 días",
+      "minDays": 0,
+      "maxDays": 0,
+      "sourceIndex": 0
+    },
+    {
+      "code": "emergence",
+      "label": "Emergencia",
+      "description": "Aparición de cotiledones y primeras hojas lobuladas (con olor característico)",
+      "minDays": 5,
+      "maxDays": 12,
+      "sourceIndex": 0
+    },
+    {
+      "code": "vegetative",
+      "label": "Crecimiento vegetativo",
+      "description": "Desarrollo de hojas compuestas y tallo. Cosechable como hierba fresca desde los 20 días",
+      "minDays": 13,
+      "maxDays": 28,
+      "sourceIndex": 0
+    },
+    {
+      "code": "harvest_window",
+      "label": "Cosecha",
+      "description": "Cosecha de hoja fresca entre 20-45 días. Para semilla: esperar floración y formación de esquizocarpos (umbelas secas)",
+      "minDays": 20,
+      "maxDays": 45,
+      "sourceIndex": 1
+    },
+    {
+      "code": "closed",
+      "label": "Ciclo cerrado",
+      "description": "Fin de la cosecha de hoja. La planta elonga tallo floral (bolting) y el sabor cambia. Renovar siembra cada 4-6 semanas",
+      "minDays": 46,
+      "maxDays": null,
+      "sourceIndex": 0
+    }
+  ]
+}

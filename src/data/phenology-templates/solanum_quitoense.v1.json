@@ -1,0 +1,68 @@
+{
+  "template_id": "solanum_quitoense.v1",
+  "species_slug": "solanum_quitoense",
+  "species_label": "Lulo (Solanum quitoense)",
+  "version": 1,
+  "sources": [
+    {
+      "name": "Agrosavia — Manual de producción de lulo",
+      "reference": "Agrosavia (2015). Manual técnico para el cultivo de lulo en Colombia",
+      "url": "https://repository.agrosavia.co/handle/20.500.12324/lulo"
+    },
+    {
+      "name": "FAO — Lulo/naranjilla crop management",
+      "reference": "FAO, Andean fruit crop guidelines, 2019",
+      "url": "https://www.fao.org/"
+    }
+  ],
+  "stages": [
+    {
+      "code": "sowing",
+      "label": "Trasplante",
+      "description": "Trasplante de plántula de almácigo a sitio definitivo (40-50 días post-germinación)",
+      "minDays": 0,
+      "maxDays": 0,
+      "sourceIndex": 0
+    },
+    {
+      "code": "vegetative",
+      "label": "Crecimiento vegetativo",
+      "description": "Desarrollo de hojas grandes, tallo y espinas. Formación de copa antes de floración",
+      "minDays": 1,
+      "maxDays": 150,
+      "sourceIndex": 0
+    },
+    {
+      "code": "flowering",
+      "label": "Floración",
+      "description": "Aparición de flores blancas en racimos. Inicio de producción entre 5-7 meses",
+      "minDays": 120,
+      "maxDays": 180,
+      "sourceIndex": 0
+    },
+    {
+      "code": "fruiting",
+      "label": "Cuajado y llenado de fruto",
+      "description": "Desarrollo del fruto desde floración hasta madurez (90-100 días). El fruto pasa de verde a anaranjado",
+      "minDays": 180,
+      "maxDays": 280,
+      "sourceIndex": 0
+    },
+    {
+      "code": "harvest_window",
+      "label": "Cosecha",
+      "description": "Cosecha escalonada cada 15 días cuando el fruto alcanza color naranja. Producción por 8-12 meses",
+      "minDays": 210,
+      "maxDays": 330,
+      "sourceIndex": 1
+    },
+    {
+      "code": "closed",
+      "label": "Ciclo cerrado",
+      "description": "Fin del ciclo productivo. Poda de renovación o erradicación por problemas de nemátodos",
+      "minDays": 331,
+      "maxDays": null,
+      "sourceIndex": 0
+    }
+  ]
+}

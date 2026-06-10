@@ -1,0 +1,68 @@
+{
+  "template_id": "fragaria_ananassa.v1",
+  "species_slug": "fragaria_ananassa",
+  "species_label": "Fresa (Fragaria x ananassa)",
+  "version": 1,
+  "sources": [
+    {
+      "name": "Agrosavia — Manual de producción de fresa",
+      "reference": "Agrosavia (2019). Manual técnico para el cultivo de fresa en Colombia",
+      "url": "https://repository.agrosavia.co/handle/20.500.12324/fresa"
+    },
+    {
+      "name": "FAO — Strawberry production guide",
+      "reference": "FAO, Good Agricultural Practices for strawberry, 2020",
+      "url": "https://www.fao.org/"
+    }
+  ],
+  "stages": [
+    {
+      "code": "sowing",
+      "label": "Trasplante",
+      "description": "Trasplante de plántula con cepellón a cama elevada o bolsa. Marco 30x30 cm",
+      "minDays": 0,
+      "maxDays": 0,
+      "sourceIndex": 0
+    },
+    {
+      "code": "vegetative",
+      "label": "Crecimiento vegetativo",
+      "description": "Emisión de hojas en roseta desde la corona, desarrollo de estolones y raíces adventicias. Formación de yemas florales",
+      "minDays": 1,
+      "maxDays": 45,
+      "sourceIndex": 0
+    },
+    {
+      "code": "flowering",
+      "label": "Floración",
+      "description": "Aparición de flores blancas en inflorescencias desde la corona. Polinización por insectos o viento",
+      "minDays": 35,
+      "maxDays": 60,
+      "sourceIndex": 0
+    },
+    {
+      "code": "fruiting",
+      "label": "Cuajado y llenado de fruto",
+      "description": "Desarrollo del receptáculo floral (fruto) desde floración hasta madurez (20-30 días). Cambio de verde a rojo",
+      "minDays": 50,
+      "maxDays": 90,
+      "sourceIndex": 0
+    },
+    {
+      "code": "harvest_window",
+      "label": "Cosecha",
+      "description": "Cosecha escalonada cada 2-3 días cuando el fruto está 75% rojo. Producción continua por 6-8 meses por ciclo de planta",
+      "minDays": 65,
+      "maxDays": 120,
+      "sourceIndex": 1
+    },
+    {
+      "code": "closed",
+      "label": "Ciclo cerrado",
+      "description": "Fin del ciclo productivo. Renovación de camas y manejo fitosanitario",
+      "minDays": 121,
+      "maxDays": null,
+      "sourceIndex": 0
+    }
+  ]
+}

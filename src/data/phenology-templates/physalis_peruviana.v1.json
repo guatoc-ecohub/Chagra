@@ -1,0 +1,68 @@
+{
+  "template_id": "physalis_peruviana.v1",
+  "species_slug": "physalis_peruviana",
+  "species_label": "Uchuva (Physalis peruviana)",
+  "version": 1,
+  "sources": [
+    {
+      "name": "Agrosavia — Manual de producción de uchuva",
+      "reference": "Agrosavia (2017). Manual técnico para el cultivo de uchuva en Colombia",
+      "url": "https://repository.agrosavia.co/handle/20.500.12324/uchuva"
+    },
+    {
+      "name": "ICA — Guía de manejo de uchuva para exportación",
+      "reference": "ICA, Boletín técnico, 2020",
+      "url": "https://www.ica.gov.co/"
+    }
+  ],
+  "stages": [
+    {
+      "code": "sowing",
+      "label": "Trasplante",
+      "description": "Trasplante de plántula de almácigo a sitio definitivo (45-60 días post-germinación)",
+      "minDays": 0,
+      "maxDays": 0,
+      "sourceIndex": 0
+    },
+    {
+      "code": "vegetative",
+      "label": "Crecimiento vegetativo",
+      "description": "Formación de tallo principal, ramas laterales basales. Crecimiento arbustivo hasta 1-1.5 m",
+      "minDays": 1,
+      "maxDays": 60,
+      "sourceIndex": 0
+    },
+    {
+      "code": "flowering",
+      "label": "Floración",
+      "description": "Aparición de flores amarillas solitarias en axilas. Inicio de producción entre 3-4 meses",
+      "minDays": 60,
+      "maxDays": 90,
+      "sourceIndex": 0
+    },
+    {
+      "code": "fruiting",
+      "label": "Cuajado y desarrollo del fruto",
+      "description": "Desarrollo del fruto dentro del cáliz (capacho). Llenado de baya entre 50-70 días desde floración",
+      "minDays": 90,
+      "maxDays": 150,
+      "sourceIndex": 0
+    },
+    {
+      "code": "harvest_window",
+      "label": "Cosecha",
+      "description": "Cosecha escalonada cada 8-15 días cuando el capacho cambia de verde a amarillo. Producción por 6-8 meses",
+      "minDays": 110,
+      "maxDays": 180,
+      "sourceIndex": 1
+    },
+    {
+      "code": "closed",
+      "label": "Ciclo cerrado",
+      "description": "Fin del ciclo productivo. Poda de renovación y manejo sanitario del lote",
+      "minDays": 181,
+      "maxDays": null,
+      "sourceIndex": 0
+    }
+  ]
+}

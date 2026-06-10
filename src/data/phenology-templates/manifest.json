@@ -1,10 +1,100 @@
 {
-  "version": 1,
+  "version": 2,
   "templates": [
+    {
+      "template_id": "allium_cepa.v1",
+      "species_slug": "allium_cepa",
+      "species_label": "Cebolla de bulbo",
+      "version": 1
+    },
     {
       "template_id": "coffea_arabica.v1",
       "species_slug": "coffea_arabica",
       "species_label": "Café arábica",
+      "version": 1
+    },
+    {
+      "template_id": "coriandrum_sativum.v1",
+      "species_slug": "coriandrum_sativum",
+      "species_label": "Cilantro",
+      "version": 1
+    },
+    {
+      "template_id": "daucus_carota.v1",
+      "species_slug": "daucus_carota",
+      "species_label": "Zanahoria",
+      "version": 1
+    },
+    {
+      "template_id": "fragaria_ananassa.v1",
+      "species_slug": "fragaria_ananassa",
+      "species_label": "Fresa",
+      "version": 1
+    },
+    {
+      "template_id": "lactuca_sativa.v1",
+      "species_slug": "lactuca_sativa",
+      "species_label": "Lechuga",
+      "version": 1
+    },
+    {
+      "template_id": "manihot_esculenta.v1",
+      "species_slug": "manihot_esculenta",
+      "species_label": "Yuca",
+      "version": 1
+    },
+    {
+      "template_id": "musa_paradisiaca.v1",
+      "species_slug": "musa_paradisiaca",
+      "species_label": "Plátano",
+      "version": 1
+    },
+    {
+      "template_id": "persea_americana.v1",
+      "species_slug": "persea_americana",
+      "species_label": "Aguacate",
+      "version": 1
+    },
+    {
+      "template_id": "phaseolus_vulgaris.v1",
+      "species_slug": "phaseolus_vulgaris",
+      "species_label": "Fríjol común",
+      "version": 1
+    },
+    {
+      "template_id": "physalis_peruviana.v1",
+      "species_slug": "physalis_peruviana",
+      "species_label": "Uchuva",
+      "version": 1
+    },
+    {
+      "template_id": "pisum_sativum.v1",
+      "species_slug": "pisum_sativum",
+      "species_label": "Arveja",
+      "version": 1
+    },
+    {
+      "template_id": "rubus_glaucus.v1",
+      "species_slug": "rubus_glaucus",
+      "species_label": "Mora de Castilla",
+      "version": 1
+    },
+    {
+      "template_id": "solanum_betaceum.v1",
+      "species_slug": "solanum_betaceum",
+      "species_label": "Tomate de árbol",
+      "version": 1
+    },
+    {
+      "template_id": "solanum_lycopersicum.v1",
+      "species_slug": "solanum_lycopersicum",
+      "species_label": "Tomate",
+      "version": 1
+    },
+    {
+      "template_id": "solanum_quitoense.v1",
+      "species_slug": "solanum_quitoense",
+      "species_label": "Lulo",
       "version": 1
     },
     {
@@ -14,9 +104,9 @@
       "version": 1
     },
     {
-      "template_id": "solanum_lycopersicum.v1",
-      "species_slug": "solanum_lycopersicum",
-      "species_label": "Tomate",
+      "template_id": "zea_mays.v1",
+      "species_slug": "zea_mays",
+      "species_label": "Maíz",
       "version": 1
     }
   ]

@@ -11,6 +11,21 @@
 import coffeaArabica from './phenology-templates/coffea_arabica.v1.json';
 import solanumTuberosum from './phenology-templates/solanum_tuberosum.v1.json';
 import solanumLycopersicum from './phenology-templates/solanum_lycopersicum.v1.json';
+import zeaMays from './phenology-templates/zea_mays.v1.json';
+import phaseolusVulgaris from './phenology-templates/phaseolus_vulgaris.v1.json';
+import manihotEsculenta from './phenology-templates/manihot_esculenta.v1.json';
+import musaParadisiaca from './phenology-templates/musa_paradisiaca.v1.json';
+import perseaAmericana from './phenology-templates/persea_americana.v1.json';
+import solanumBetaceum from './phenology-templates/solanum_betaceum.v1.json';
+import solanumQuitoense from './phenology-templates/solanum_quitoense.v1.json';
+import rubusGlaucus from './phenology-templates/rubus_glaucus.v1.json';
+import physalisPeruviana from './phenology-templates/physalis_peruviana.v1.json';
+import fragariaAnanassa from './phenology-templates/fragaria_ananassa.v1.json';
+import lactucaSativa from './phenology-templates/lactuca_sativa.v1.json';
+import alliumCepa from './phenology-templates/allium_cepa.v1.json';
+import coriandrumSativum from './phenology-templates/coriandrum_sativum.v1.json';
+import daucusCarota from './phenology-templates/daucus_carota.v1.json';
+import pisumSativum from './phenology-templates/pisum_sativum.v1.json';
 
 /**
  * @typedef {Object} PhenologyStage
@@ -35,7 +50,28 @@ import solanumLycopersicum from './phenology-templates/solanum_lycopersicum.v1.j
 /** @type {Map<string, PhenologyTemplate>} */
 const registry = new Map();
 
-for (const t of [coffeaArabica, solanumTuberosum, solanumLycopersicum]) {
+const templates = [
+  coffeaArabica,
+  solanumTuberosum,
+  solanumLycopersicum,
+  zeaMays,
+  phaseolusVulgaris,
+  manihotEsculenta,
+  musaParadisiaca,
+  perseaAmericana,
+  solanumBetaceum,
+  solanumQuitoense,
+  rubusGlaucus,
+  physalisPeruviana,
+  fragariaAnanassa,
+  lactucaSativa,
+  alliumCepa,
+  coriandrumSativum,
+  daucusCarota,
+  pisumSativum,
+];
+
+for (const t of templates) {
   registry.set(t.species_slug, t);
 }
 

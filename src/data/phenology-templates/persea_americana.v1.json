@@ -1,0 +1,68 @@
+{
+  "template_id": "persea_americana.v1",
+  "species_slug": "persea_americana",
+  "species_label": "Aguacate (Persea americana)",
+  "version": 1,
+  "sources": [
+    {
+      "name": "Agrosavia — Manual de producción de aguacate",
+      "reference": "Agrosavia (2018). Manual técnico para el cultivo de aguacate Hass en Colombia",
+      "url": "https://repository.agrosavia.co/handle/20.500.12324/aguacate"
+    },
+    {
+      "name": "ICA — Guía de manejo agronómico del aguacate",
+      "reference": "ICA, Boletín técnico, 2020",
+      "url": "https://www.ica.gov.co/"
+    }
+  ],
+  "stages": [
+    {
+      "code": "sowing",
+      "label": "Siembra / Trasplante",
+      "description": "Trasplante de árbol injertado a sitio definitivo (hoyo 60x60x60 cm). Marco 7x7 m",
+      "minDays": 0,
+      "maxDays": 0,
+      "sourceIndex": 0
+    },
+    {
+      "code": "vegetative",
+      "label": "Crecimiento vegetativo",
+      "description": "Formación de copa, desarrollo de ramas y hojas. Período juvenil de 2-4 años antes de producción comercial",
+      "minDays": 1,
+      "maxDays": 720,
+      "sourceIndex": 0
+    },
+    {
+      "code": "flowering",
+      "label": "Floración",
+      "description": "Aparición de panículas florales. Floración masiva sincronizada con lluvias. Comportamiento floral diurno/nocturno tipo A o B",
+      "minDays": 540,
+      "maxDays": 800,
+      "sourceIndex": 0
+    },
+    {
+      "code": "fruiting",
+      "label": "Cuajado y llenado de fruto",
+      "description": "Cuajado del fruto, crecimiento celular y acumulación de aceite (mes 6-10 post-floración)",
+      "minDays": 600,
+      "maxDays": 1000,
+      "sourceIndex": 0
+    },
+    {
+      "code": "harvest_window",
+      "label": "Cosecha",
+      "description": "Cosecha cuando el fruto alcanza materia seca >21%. Recolección manual con tijera y gancho. Período de cosecha de 3-5 meses",
+      "minDays": 850,
+      "maxDays": 1100,
+      "sourceIndex": 1
+    },
+    {
+      "code": "closed",
+      "label": "Ciclo cerrado",
+      "description": "Fin de la cosecha anual. El árbol queda en descanso hasta la siguiente floración (perenne)",
+      "minDays": 1101,
+      "maxDays": null,
+      "sourceIndex": 0
+    }
+  ]
+}

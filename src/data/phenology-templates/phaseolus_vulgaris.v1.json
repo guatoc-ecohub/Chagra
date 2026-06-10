@@ -1,0 +1,76 @@
+{
+  "template_id": "phaseolus_vulgaris.v1",
+  "species_slug": "phaseolus_vulgaris",
+  "species_label": "Fríjol común (Phaseolus vulgaris)",
+  "version": 1,
+  "sources": [
+    {
+      "name": "Agrosavia — Manual de producción de fríjol para Colombia",
+      "reference": "Agrosavia (2020). Manual técnico para el cultivo de fríjol",
+      "url": "https://repository.agrosavia.co/handle/20.500.12324/frijol"
+    },
+    {
+      "name": "FAO — Bean production guidelines",
+      "reference": "FAO, Good Agricultural Practices for beans, 2019",
+      "url": "https://www.fao.org/"
+    }
+  ],
+  "stages": [
+    {
+      "code": "sowing",
+      "label": "Siembra",
+      "description": "Siembra directa de semilla (2-3 cm profundidad, 3-4 semillas/sitio)",
+      "minDays": 0,
+      "maxDays": 0,
+      "sourceIndex": 0
+    },
+    {
+      "code": "emergence",
+      "label": "Emergencia",
+      "description": "Aparición de cotiledones y primeras hojas verdaderas (V1)",
+      "minDays": 4,
+      "maxDays": 8,
+      "sourceIndex": 0
+    },
+    {
+      "code": "vegetative",
+      "label": "Crecimiento vegetativo",
+      "description": "Desarrollo de hojas compuestas y guía. Inicio de formación de nódulos fijadores de N",
+      "minDays": 9,
+      "maxDays": 30,
+      "sourceIndex": 0
+    },
+    {
+      "code": "flowering",
+      "label": "Floración",
+      "description": "Aparición de flores blancas o lilas en racimos axilares (R6). Autopolinización",
+      "minDays": 30,
+      "maxDays": 45,
+      "sourceIndex": 0
+    },
+    {
+      "code": "fruiting",
+      "label": "Llenado de vaina",
+      "description": "Formación de vainas (R7) y llenado del grano (R8). 3-4 semanas hasta madurez de cosecha",
+      "minDays": 45,
+      "maxDays": 75,
+      "sourceIndex": 0
+    },
+    {
+      "code": "harvest_window",
+      "label": "Cosecha",
+      "description": "Vaina seca y quebradiza. Cosecha en verde (45-50 días) o en seco (80-90 días) según variedad",
+      "minDays": 75,
+      "maxDays": 95,
+      "sourceIndex": 1
+    },
+    {
+      "code": "closed",
+      "label": "Ciclo cerrado",
+      "description": "Fin de cosecha, arranque de plantas y preparación del lote",
+      "minDays": 96,
+      "maxDays": null,
+      "sourceIndex": 0
+    }
+  ]
+}
