@@ -227,13 +227,13 @@ export const CAPABILITY_MANIFEST = Object.freeze([
   {
     id: 'procesos',
     group: 'registrar',
-    status: 'soon',
+    status: 'live',
     icon: '🔄',
     label: 'Procesos por voz',
-    desc: 'Registrar labores completas hablando con Chagra.',
+    desc: 'Registra el ciclo de un cultivo hablando con Chagra.',
     tool: 'farm_process',
     hero: true,
-    heroRoute: { kind: 'unavailable' },
+    heroRoute: { kind: 'nav', view: 'procesos' },
   },
   {
     id: 'alertas-cultivo',
