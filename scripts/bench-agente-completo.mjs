@@ -99,10 +99,18 @@ function parseJudgeArg() {
 const JUDGE_MODEL = parseJudgeArg() || process.env.JUDGE_MODEL || RECOMMENDED_OLLAMA_JUDGE_MODEL;
 const JUDGE_TIMEOUT_MS = 60_000;
 
+// Candidatos que CABEN y FUNCIONAN en la M6000 (Maxwell sm_52, 12GB).
+// Verificados empíricamente 2026-06-10 (carga + inferencia sin crash):
+//   granite3.3:8b ✓ · gemma4:e4b ✓ · granite3.1-dense:8b ✓ (prod actual)
+//   ministral-3:latest ✓ (6GB) · ministral-3:14b ✓ (13.9B mistral3, NO crashea)
+// DESCARTADOS por crash Maxwell: qwen2.5:14b, qwen3:30b, mistral-nemo:12b
+// ("signal during cgo execution" / arquitectura no soportada en sm_52).
 const MODELS = {
   granite3_3_8b: 'granite3.3:8b',
   gemma4_e4b: 'gemma4:e4b',
   granite3_1_8b: 'granite3.1-dense:8b',
+  ministral_latest: 'ministral-3:latest',
+  ministral_14b: 'ministral-3:14b',
 };
 
 const MAXWELL_ERROR_PATTERNS = [
@@ -746,67 +754,6 @@ async function benchmarkModel(modelKey, modelName, promptData) {
   }
 }
 
-async function benchmarkPrompt(promptData, index, total) {
-  console.log(`[bench] Prompt ${index + 1}/${total} [${promptData.category}]: ${promptData.query.slice(0, 50)}...`);
-  
-  const results = {
-    prompt_id: promptData.id,
-    category: promptData.category,
-    query: promptData.query,
-    expected_keywords: promptData.expected_keywords,
-    timestamp: new Date().toISOString(),
-  };
-
-  // Benchmark all 7 models
-  const modelKeys = Object.keys(MODELS);
-  
-  for (const modelKey of modelKeys) {
-    const modelName = MODELS[modelKey];
-    const result = await benchmarkModel(modelKey, modelName, promptData);
-    results[modelKey] = result;
-    
-    if (result.error) {
-      console.log(`    ERROR: ${result.error.slice(0, 80)}...`);
-    } else {
-      console.log(`    OK: ${result.latency_total_ms.toFixed(0)}ms total, ${result.keywords_matched}/${result.keywords_total} keywords, ${result.entities_grounded} entities, ${result.halluc_count} halluc`);
-    }
-    
-    // Descargar el modelo recién evaluado ANTES de cargar el siguiente.
-    // En GPU de slot único (M6000, 12 GB) dos modelos de 8B no co-residen;
-    // sin este unload el segundo modelo falla con "memory layout cannot be
-    // allocated". keep_alive:0 libera la VRAM al terminar su tanda de prompts.
-    await unloadModel(modelName);
-
-    // Pausa pequeña entre modelos
-    await new Promise(r => setTimeout(r, 1500));
-  }
-
-  // Determinar ganador (solo entre modelos que completaron exitosamente)
-  const successfulModels = modelKeys.filter(k => !results[k].error);
-  
-  if (successfulModels.length > 0) {
-    // Encontrar el modelo con mejor score de keywords
-    let bestModel = successfulModels[0];
-    let bestScore = results[bestModel].keywords_matched / results[bestModel].keywords_total;
-    
-    for (const modelKey of successfulModels) {
-      const score = results[modelKey].keywords_matched / results[modelKey].keywords_total;
-      if (score > bestScore) {
-        bestScore = score;
-        bestModel = modelKey;
-      }
-    }
-    
-    results.winner = bestModel;
-    results.reason = `${bestModel} matched ${results[bestModel].keywords_matched}/${results[bestModel].keywords_total} keywords`;
-  } else {
-    results.winner = 'none';
-    results.reason = 'Todos fallaron';
-  }
-
-  return results;
-}
-
 /**
  * Preflight: verifica que TODOS los modelos de BENCH_MODELS existen en Ollama
  * antes de gastar tiempo en inferencias. Si falta alguno, lista los comandos
@@ -953,16 +900,55 @@ async function main() {
     mkdirSync(BENCH_RUNS_DIR, { recursive: true });
   }
 
-  const results = [];
+  // Una entrada por prompt; cada modelo rellena r[modelKey] en su tanda.
+  const results = PROMPTS.map((p) => ({
+    prompt_id: p.id,
+    category: p.category,
+    query: p.query,
+    expected_keywords: p.expected_keywords,
+    timestamp: new Date().toISOString(),
+  }));
   const startTime = performance.now();
 
-  for (let i = 0; i < PROMPTS.length; i++) {
-    const result = await benchmarkPrompt(PROMPTS[i], i, PROMPTS.length);
-    results.push(result);
-    
-    // Pausa entre prompts
-    if (i < PROMPTS.length - 1) {
-      await new Promise(r => setTimeout(r, 3000));
+  // Loop EXTERNO = modelos: carga cada modelo UNA vez, corre los 50 prompts,
+  // y lo descarga antes del siguiente. En GPU de slot único (M6000 12GB) esto
+  // evita ~N×50 recargas (dos modelos no co-residen); baja la ventana de ~2.6h
+  // a ~1.4h y mantiene la VRAM limpia entre modelos.
+  const runModelKeys = Object.keys(MODELS);
+  for (let m = 0; m < runModelKeys.length; m++) {
+    const modelKey = runModelKeys[m];
+    const modelName = MODELS[modelKey];
+    console.log(`\n[bench] ===== Modelo ${m + 1}/${runModelKeys.length}: ${modelName} =====`);
+    for (let i = 0; i < PROMPTS.length; i++) {
+      const r = await benchmarkModel(modelKey, modelName, PROMPTS[i]);
+      results[i][modelKey] = r;
+      if (r.error) {
+        console.log(`  [${i + 1}/${PROMPTS.length}] ${PROMPTS[i].category} ERROR: ${r.error.slice(0, 70)}`);
+      } else {
+        console.log(`  [${i + 1}/${PROMPTS.length}] ${PROMPTS[i].category} OK: ${r.latency_total_ms.toFixed(0)}ms, ${r.keywords_matched}/${r.keywords_total} kw, ${r.entities_grounded} ent, ${r.halluc_count} halluc`);
+      }
+      await new Promise(rs => setTimeout(rs, 400));
+    }
+    // Descargar el modelo recién evaluado → libera VRAM para el siguiente.
+    await unloadModel(modelName);
+    await new Promise(rs => setTimeout(rs, 1500));
+  }
+
+  // Ganador por prompt (mejor cobertura de keywords entre los que no fallaron).
+  for (const r of results) {
+    const successfulModels = runModelKeys.filter(k => r[k] && !r[k].error);
+    if (successfulModels.length > 0) {
+      let bestModel = successfulModels[0];
+      let bestScore = r[bestModel].keywords_matched / r[bestModel].keywords_total;
+      for (const modelKey of successfulModels) {
+        const score = r[modelKey].keywords_matched / r[modelKey].keywords_total;
+        if (score > bestScore) { bestScore = score; bestModel = modelKey; }
+      }
+      r.winner = bestModel;
+      r.reason = `${bestModel} matched ${r[bestModel].keywords_matched}/${r[bestModel].keywords_total} keywords`;
+    } else {
+      r.winner = 'none';
+      r.reason = 'Todos fallaron';
     }
   }
 
