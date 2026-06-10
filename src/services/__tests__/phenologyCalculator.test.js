@@ -67,6 +67,123 @@ describe('calculateWindows', () => {
   });
 });
 
+/**
+ * Helper de test: determina la etapa actual y días transcurridos
+ * a partir de las ventanas retornadas por calculateWindows. NO es
+ * una función de producción — solo para verificar el cálculo de etapa.
+ *
+ * @param {ReturnType<calculateWindows>} windows
+ * @param {number} today — timestamp ms actual
+ * @returns {{ stageCode: string, daysElapsed: number, window: object|null }}
+ */
+function deriveCurrentStage(windows, today) {
+  const daysElapsed = Math.floor((today - windows[0]?.windowStart) / 86400000);
+  // Recorrer ventanas en orden inverso para encontrar la última que aplica
+  for (let i = windows.length - 1; i >= 0; i--) {
+    const w = windows[i];
+    if (w.status !== 'computed' || w.windowStart === null) continue;
+    const afterStart = today >= w.windowStart;
+    const beforeEnd = w.windowEnd === null || today <= w.windowEnd;
+    if (afterStart && beforeEnd) {
+      return { stageCode: w.code, daysElapsed, window: w };
+    }
+  }
+  // Si today es anterior a la siembra, devolver sowing
+  return { stageCode: 'sowing', daysElapsed: Math.max(0, daysElapsed), window: null };
+}
+
+describe('cálculo de etapa actual (derivado de calculateWindows)', () => {
+  const SOWING_DAY = 1700000000000;
+  const DAY_MS = 86400000;
+
+  it('día 0 → sowing con días transcurridos = 0', () => {
+    const windows = calculateWindows({ speciesSlug: 'solanum_lycopersicum', sowingDate: SOWING_DAY });
+    const { stageCode, daysElapsed } = deriveCurrentStage(windows, SOWING_DAY);
+    expect(stageCode).toBe('sowing');
+    expect(daysElapsed).toBe(0);
+  });
+
+  it('día 10 en tomate → vegetative (minDays=1, maxDays=25)', () => {
+    const windows = calculateWindows({ speciesSlug: 'solanum_lycopersicum', sowingDate: SOWING_DAY });
+    const today = SOWING_DAY + 10 * DAY_MS;
+    const { stageCode, daysElapsed } = deriveCurrentStage(windows, today);
+    expect(stageCode).toBe('vegetative');
+    expect(daysElapsed).toBe(10);
+  });
+
+  it('día 30 en tomate → flowering (minDays=25, maxDays=45)', () => {
+    const windows = calculateWindows({ speciesSlug: 'solanum_lycopersicum', sowingDate: SOWING_DAY });
+    const today = SOWING_DAY + 30 * DAY_MS;
+    const { stageCode } = deriveCurrentStage(windows, today);
+    expect(stageCode).toBe('flowering');
+  });
+
+  it('día 60 en tomate → fruiting (minDays=45, maxDays=80)', () => {
+    const windows = calculateWindows({ speciesSlug: 'solanum_lycopersicum', sowingDate: SOWING_DAY });
+    const today = SOWING_DAY + 60 * DAY_MS;
+    const { stageCode } = deriveCurrentStage(windows, today);
+    expect(stageCode).toBe('fruiting');
+  });
+
+  it('día 90 en tomate → harvest_window (minDays=75, maxDays=120)', () => {
+    const windows = calculateWindows({ speciesSlug: 'solanum_lycopersicum', sowingDate: SOWING_DAY });
+    const today = SOWING_DAY + 90 * DAY_MS;
+    const { stageCode } = deriveCurrentStage(windows, today);
+    expect(stageCode).toBe('harvest_window');
+  });
+
+  it('día 150 en tomate → closed (más allá de harvest_window maxDays=120)', () => {
+    const windows = calculateWindows({ speciesSlug: 'solanum_lycopersicum', sowingDate: SOWING_DAY });
+    const today = SOWING_DAY + 150 * DAY_MS;
+    const { stageCode } = deriveCurrentStage(windows, today);
+    expect(stageCode).toBe('closed');
+  });
+
+  it('días transcurridos se calculan correctamente con altitud', () => {
+    const windows = calculateWindows({ speciesSlug: 'coffea_arabica', sowingDate: SOWING_DAY, altitudeM: 2600 });
+    const today = SOWING_DAY + 60 * DAY_MS;
+    const { daysElapsed } = deriveCurrentStage(windows, today);
+    expect(daysElapsed).toBe(60);
+  });
+
+  it('maíz en día 7 → emergence (minDays=4, maxDays=10)', () => {
+    const windows = calculateWindows({ speciesSlug: 'zea_mays', sowingDate: SOWING_DAY });
+    const today = SOWING_DAY + 7 * DAY_MS;
+    const { stageCode } = deriveCurrentStage(windows, today);
+    expect(stageCode).toBe('emergence');
+  });
+
+  it('maíz en día 120 → harvest_window (minDays=100, maxDays=130)', () => {
+    const windows = calculateWindows({ speciesSlug: 'zea_mays', sowingDate: SOWING_DAY });
+    const today = SOWING_DAY + 120 * DAY_MS;
+    const { stageCode } = deriveCurrentStage(windows, today);
+    expect(stageCode).toBe('harvest_window');
+  });
+
+  it('maíz en día 200 → closed (más allá de maxDays=130)', () => {
+    const windows = calculateWindows({ speciesSlug: 'zea_mays', sowingDate: SOWING_DAY });
+    const today = SOWING_DAY + 200 * DAY_MS;
+    const { stageCode } = deriveCurrentStage(windows, today);
+    expect(stageCode).toBe('closed');
+  });
+
+  it('lechuga en día 50 → harvest_window a pesar de solapamiento con cogollo', () => {
+    // lactuca: fruiting(cogollo) minDays=25 maxDays=50, harvest minDays=45 maxDays=65
+    // día 50 cae en ambas ventanas; deriveCurrentStage itera al revés
+    // y retorna harvest_window (la más avanzada entre las que aplican)
+    const windows = calculateWindows({ speciesSlug: 'lactuca_sativa', sowingDate: SOWING_DAY });
+    const today = SOWING_DAY + 50 * DAY_MS;
+    const { stageCode } = deriveCurrentStage(windows, today);
+    expect(stageCode).toBe('harvest_window');
+  });
+
+  it('especie sin plantilla retorna stageCode sowing por defecto', () => {
+    const windows = calculateWindows({ speciesSlug: 'no_existe', sowingDate: SOWING_DAY });
+    const { stageCode } = deriveCurrentStage(windows, SOWING_DAY);
+    expect(stageCode).toBe('sowing');
+  });
+});
+
 describe('formatWindow', () => {
   it('formatea ventana computada', () => {
     const w = {
