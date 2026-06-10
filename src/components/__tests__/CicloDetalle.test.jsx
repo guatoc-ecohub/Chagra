@@ -20,7 +20,9 @@ vi.mock('../../services/cycleTaskService', () => ({
 vi.mock('../../services/climateCycleService', () => ({
   getPestRisksByStage: () => [],
   getBiopreparadosForStage: () => [{ nombre: 'Caldo bordelés', uso: 'Preventivo fungoso' }],
+  getEnsemblePreventiveTasks: () => [],
 }));
+vi.mock('../../services/ensoService', () => ({ getEnsoServicePhase: () => null, getEnsoLabel: () => 'Neutral' }));
 vi.mock('../../services/stageConfirmationService', () => ({ confirmStage }));
 vi.mock('../../services/voiceTaskService', () => ({ completeTaskByVoice }));
 

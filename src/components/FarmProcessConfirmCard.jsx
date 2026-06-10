@@ -82,7 +82,11 @@ export default function FarmProcessConfirmCard({
           <p className="text-sm text-slate-200 italic mb-3">"{draft.transcription}"</p>
         )}
         <p className="text-xs text-slate-400">
-          {draft.process_type === 'restoration' ? '🌱 Ciclo de restauración' : '🌿 Nuevo ciclo de siembra'}
+          {draft.process_type === 'restoration'
+            ? '🌳 Ciclo de reforestación / restauración'
+            : draft.process_type === 'silvopasture'
+              ? '🐄 Ciclo silvopastoril'
+              : '🌿 Nuevo ciclo de siembra'}
         </p>
       </section>
 

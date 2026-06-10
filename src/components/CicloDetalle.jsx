@@ -1,12 +1,13 @@
 import { useCallback, useMemo, useState } from 'react';
-import { Sprout, FlaskConical } from 'lucide-react';
+import { Sprout, FlaskConical, AlertTriangle } from 'lucide-react';
 import FarmProcessSummary from './FarmProcessSummary';
 import PhenologyTimeline from './PhenologyTimeline';
 import CicloObservacion from './CicloObservacion';
 import { getTasksForCycle, getUrgentTasks } from '../services/cycleTaskService';
-import { getPestRisksByStage, getBiopreparadosForStage } from '../services/climateCycleService';
+import { getPestRisksByStage, getBiopreparadosForStage, getEnsemblePreventiveTasks } from '../services/climateCycleService';
 import { confirmStage } from '../services/stageConfirmationService';
 import { completeTaskByVoice } from '../services/voiceTaskService';
+import { getEnsoServicePhase, getEnsoLabel } from '../services/ensoService';
 
 /**
  * CicloDetalle — detalle de un ciclo (FarmProcess) con el enriquecimiento del
@@ -33,6 +34,8 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
 
   const pestRisks = useMemo(() => { try { return getPestRisksByStage(a.current_stage, a.subject_slug) || []; } catch { return []; } }, [a.current_stage, a.subject_slug]);
   const bios = useMemo(() => { try { return getBiopreparadosForStage(baseStage(a.current_stage)) || []; } catch { return []; } }, [a.current_stage]);
+  const ensoLabel = getEnsoLabel();
+  const ensoTasks = useMemo(() => { try { return getEnsemblePreventiveTasks(getEnsoServicePhase(), baseStage(a.current_stage)) || []; } catch { return []; } }, [a.current_stage]);
   const tasks = useMemo(() => { try { return getTasksForCycle(cycle) || []; } catch { return []; } }, [cycle]);
   const urgent = useMemo(() => { try { return getUrgentTasks(tasks) || []; } catch { return []; } }, [tasks]);
 
@@ -104,6 +107,20 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
               <li key={b.nombre || i} className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 flex items-start gap-2">
                 <FlaskConical size={14} className="text-emerald-400 shrink-0 mt-0.5" />
                 <span className="text-sm text-slate-200"><strong>{b.nombre}</strong> — <span className="text-slate-400">{b.uso}</span></span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {ensoTasks.length > 0 && (
+        <section>
+          <h2 className="text-2xs uppercase font-bold text-slate-500 mb-2">Por la temporada · {ensoLabel}</h2>
+          <ul className="flex flex-col gap-1.5">
+            {ensoTasks.map((t, i) => (
+              <li key={t.task || i} className="bg-amber-900/10 border border-amber-800/40 rounded-xl px-3 py-2 flex items-start gap-2">
+                <AlertTriangle size={14} className="text-amber-400 shrink-0 mt-0.5" />
+                <span className="text-sm text-slate-200"><strong>{t.task}</strong>{t.description ? <span className="text-slate-400"> — {t.description}</span> : null}</span>
               </li>
             ))}
           </ul>
