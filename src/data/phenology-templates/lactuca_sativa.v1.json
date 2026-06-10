@@ -1,0 +1,60 @@
+{
+  "template_id": "lactuca_sativa.v1",
+  "species_slug": "lactuca_sativa",
+  "species_label": "Lechuga (Lactuca sativa)",
+  "version": 1,
+  "sources": [
+    {
+      "name": "Agrosavia — Manual de producción de hortalizas de hoja",
+      "reference": "Agrosavia (2018). Manual técnico para producción de hortalizas bajo cubierta",
+      "nota": "Referencia agronómica general — URL no verificada"
+    },
+    {
+      "name": "FAO — Lettuce production guide",
+      "reference": "FAO, Good Agricultural Practices for leafy vegetables, 2020",
+      "nota": "Referencia agronómica general — URL no verificada"
+    }
+  ],
+  "stages": [
+    {
+      "code": "sowing",
+      "label": "Siembra / Trasplante",
+      "description": "Siembra directa en cama o trasplante de plántula de almácigo (25-30 días post-siembra)",
+      "minDays": 0,
+      "maxDays": 0,
+      "sourceIndex": 0
+    },
+    {
+      "code": "vegetative",
+      "label": "Crecimiento vegetativo",
+      "description": "Formación de hojas en roseta desde la corona. Desarrollo rápido con temperaturas frescas (15-20°C)",
+      "minDays": 1,
+      "maxDays": 30,
+      "sourceIndex": 0
+    },
+    {
+      "code": "fruiting",
+      "label": "Formación de cogollo",
+      "description": "Compactación de hojas centrales formando el cogollo/cabeza comercial. Máximo desarrollo foliar",
+      "minDays": 25,
+      "maxDays": 50,
+      "sourceIndex": 0
+    },
+    {
+      "code": "harvest_window",
+      "label": "Cosecha",
+      "description": "Cosecha de cabeza compacta con raíz (corte a ras de suelo). Período de cosecha corto (5-7 días de ventana óptima)",
+      "minDays": 45,
+      "maxDays": 65,
+      "sourceIndex": 1
+    },
+    {
+      "code": "closed",
+      "label": "Ciclo cerrado",
+      "description": "Post-cosecha. Si no se cosecha a tiempo, elongación del tallo floral (bolting) y fin del ciclo comercial",
+      "minDays": 66,
+      "maxDays": null,
+      "sourceIndex": 0
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "template_id": "manihot_esculenta.v1",
+  "species_slug": "manihot_esculenta",
+  "species_label": "Yuca (Manihot esculenta)",
+  "version": 1,
+  "sources": [
+    {
+      "name": "Agrosavia — Manual de producción de yuca en Colombia",
+      "reference": "Agrosavia (2018). Manual técnico para el cultivo de yuca",
+      "nota": "Referencia agronómica general — URL no verificada"
+    },
+    {
+      "name": "FAO — Cassava production guide",
+      "reference": "FAO, Cassava production guidelines, 2020",
+      "nota": "Referencia agronómica general — URL no verificada"
+    }
+  ],
+  "stages": [
+    {
+      "code": "sowing",
+      "label": "Siembra",
+      "description": "Siembra de estacas (cangres) de 20-25 cm en posición inclinada",
+      "minDays": 0,
+      "maxDays": 0,
+      "sourceIndex": 0
+    },
+    {
+      "code": "emergence",
+      "label": "Brotación",
+      "description": "Brotación de yemas y aparición de primeras hojas",
+      "minDays": 7,
+      "maxDays": 21,
+      "sourceIndex": 0
+    },
+    {
+      "code": "vegetative",
+      "label": "Crecimiento vegetativo",
+      "description": "Desarrollo de copa, formación de hojas y ramificación. Cierre de calle entre 60-90 días",
+      "minDays": 22,
+      "maxDays": 120,
+      "sourceIndex": 0
+    },
+    {
+      "code": "fruiting",
+      "label": "Llenado de raíz",
+      "description": "Acumulación de almidón en raíces tuberosas. Máxima tasa de llenado entre 120-210 días",
+      "minDays": 90,
+      "maxDays": 240,
+      "sourceIndex": 0
+    },
+    {
+      "code": "harvest_window",
+      "label": "Cosecha",
+      "description": "Cosecha de raíces a partir de los 7-10 meses. La hoja amarillea y cae como indicador",
+      "minDays": 210,
+      "maxDays": 300,
+      "sourceIndex": 1
+    },
+    {
+      "code": "closed",
+      "label": "Ciclo cerrado",
+      "description": "Fin de cosecha, retiro de raíces y preparación del lote para rotación",
+      "minDays": 301,
+      "maxDays": null,
+      "sourceIndex": 0
+    }
+  ]
+}

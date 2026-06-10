@@ -1,0 +1,68 @@
+{
+  "template_id": "rubus_glaucus.v1",
+  "species_slug": "rubus_glaucus",
+  "species_label": "Mora de Castilla (Rubus glaucus)",
+  "version": 1,
+  "sources": [
+    {
+      "name": "Agrosavia — Manual de producción de mora",
+      "reference": "Agrosavia (2016). Manual técnico para el cultivo de mora en Colombia",
+      "nota": "Referencia agronómica general — URL no verificada"
+    },
+    {
+      "name": "ICA — Guía de manejo de mora",
+      "reference": "ICA, Boletín técnico, 2018",
+      "nota": "Referencia agronómica general — URL no verificada"
+    }
+  ],
+  "stages": [
+    {
+      "code": "sowing",
+      "label": "Trasplante",
+      "description": "Trasplante de plántula enraizada a sitio definitivo con tutorado. Marco 2.5x2.5 m",
+      "minDays": 0,
+      "maxDays": 0,
+      "sourceIndex": 0
+    },
+    {
+      "code": "vegetative",
+      "label": "Crecimiento vegetativo",
+      "description": "Emisión de tallos primarios, formación de ramas productivas y tutorado en V o espaldera",
+      "minDays": 1,
+      "maxDays": 180,
+      "sourceIndex": 0
+    },
+    {
+      "code": "flowering",
+      "label": "Floración",
+      "description": "Aparición de flores blancas en racimos terminales y laterales. Inicio de producción 6-8 meses post-trasplante",
+      "minDays": 150,
+      "maxDays": 210,
+      "sourceIndex": 0
+    },
+    {
+      "code": "fruiting",
+      "label": "Cuajado y llenado de fruto",
+      "description": "Desarrollo de la drupa desde floración hasta madurez (45-60 días). Cambio de color verde a morado oscuro",
+      "minDays": 180,
+      "maxDays": 270,
+      "sourceIndex": 0
+    },
+    {
+      "code": "harvest_window",
+      "label": "Cosecha",
+      "description": "Cosecha escalonada cada 7-10 días cuando el fruto está completamente morado. Producción continua por 18-24 meses por ciclo de poda",
+      "minDays": 195,
+      "maxDays": 300,
+      "sourceIndex": 1
+    },
+    {
+      "code": "closed",
+      "label": "Ciclo cerrado",
+      "description": "Fin del ciclo productivo del tallo. Poda de ramas viejas para estimular renovación",
+      "minDays": 301,
+      "maxDays": null,
+      "sourceIndex": 0
+    }
+  ]
+}

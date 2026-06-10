@@ -1,0 +1,68 @@
+{
+  "template_id": "daucus_carota.v1",
+  "species_slug": "daucus_carota",
+  "species_label": "Zanahoria (Daucus carota)",
+  "version": 1,
+  "sources": [
+    {
+      "name": "Agrosavia — Manual de producción de zanahoria",
+      "reference": "Agrosavia (2016). Manual técnico para el cultivo de zanahoria en Colombia",
+      "nota": "Referencia agronómica general — URL no verificada"
+    },
+    {
+      "name": "FAO — Carrot production guide",
+      "reference": "FAO, Root crop production guidelines, 2019",
+      "nota": "Referencia agronómica general — URL no verificada"
+    }
+  ],
+  "stages": [
+    {
+      "code": "sowing",
+      "label": "Siembra",
+      "description": "Siembra directa de semilla en surco (0.5-1 cm profundidad). Germinación lenta (10-21 días)",
+      "minDays": 0,
+      "maxDays": 0,
+      "sourceIndex": 0
+    },
+    {
+      "code": "emergence",
+      "label": "Emergencia",
+      "description": "Aparición de cotiledones y primeras hojas verdaderas pinnadas. Fase lenta y crítica para el cultivo",
+      "minDays": 8,
+      "maxDays": 21,
+      "sourceIndex": 0
+    },
+    {
+      "code": "vegetative",
+      "label": "Crecimiento vegetativo",
+      "description": "Desarrollo de roseta foliar y crecimiento en diámetro de la raíz pivotante. Raleo a 10-15 cm entre plantas",
+      "minDays": 22,
+      "maxDays": 60,
+      "sourceIndex": 0
+    },
+    {
+      "code": "fruiting",
+      "label": "Engrosamiento de la raíz",
+      "description": "Acumulación de azúcares y carotenos en la raíz. Máximo engrosamiento entre 60-90 días",
+      "minDays": 55,
+      "maxDays": 85,
+      "sourceIndex": 0
+    },
+    {
+      "code": "harvest_window",
+      "label": "Cosecha",
+      "description": "Cosecha cuando la raíz alcanza diámetro comercial (>2 cm). Arranque manual o con herramienta. 75-100 días según variedad y altitud",
+      "minDays": 75,
+      "maxDays": 105,
+      "sourceIndex": 1
+    },
+    {
+      "code": "closed",
+      "label": "Ciclo cerrado",
+      "description": "Post-cosecha, lavado y clasificación. Preparación del lote para rotación",
+      "minDays": 106,
+      "maxDays": null,
+      "sourceIndex": 0
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "template_id": "pisum_sativum.v1",
+  "species_slug": "pisum_sativum",
+  "species_label": "Arveja (Pisum sativum)",
+  "version": 1,
+  "sources": [
+    {
+      "name": "Agrosavia — Manual de producción de arveja",
+      "reference": "Agrosavia (2017). Manual técnico para el cultivo de arveja en Colombia",
+      "nota": "Referencia agronómica general — URL no verificada"
+    },
+    {
+      "name": "FAO — Pea production guide",
+      "reference": "FAO, Legume crop production guidelines, 2020",
+      "nota": "Referencia agronómica general — URL no verificada"
+    }
+  ],
+  "stages": [
+    {
+      "code": "sowing",
+      "label": "Siembra",
+      "description": "Siembra directa de semilla en surco o a golpe (2-3 semillas por sitio, 3-4 cm profundidad). Requiere tutorado",
+      "minDays": 0,
+      "maxDays": 0,
+      "sourceIndex": 0
+    },
+    {
+      "code": "emergence",
+      "label": "Emergencia",
+      "description": "Aparición de plántula con cotiledones bajo tierra (germinación hipogea). Emergencia aérea con primeras hojas compuestas",
+      "minDays": 5,
+      "maxDays": 12,
+      "sourceIndex": 0
+    },
+    {
+      "code": "vegetative",
+      "label": "Crecimiento vegetativo",
+      "description": "Desarrollo de hojas compuestas con zarcillos. Formación de nódulos fijadores de N. Tutorado a los 15-20 días",
+      "minDays": 13,
+      "maxDays": 40,
+      "sourceIndex": 0
+    },
+    {
+      "code": "flowering",
+      "label": "Floración",
+      "description": "Aparición de flores blancas en racimos axilares. Autopolinización antes de apertura floral",
+      "minDays": 38,
+      "maxDays": 55,
+      "sourceIndex": 0
+    },
+    {
+      "code": "fruiting",
+      "label": "Llenado de vaina",
+      "description": "Formación de vainas y llenado de granos (15-20 días desde floración). Cosechable en verde o seco según mercado",
+      "minDays": 50,
+      "maxDays": 80,
+      "sourceIndex": 0
+    },
+    {
+      "code": "harvest_window",
+      "label": "Cosecha",
+      "description": "Cosecha en verde (50-65 días) para consumo fresco o en seco (80-95 días) para grano seco. Recolección manual escalonada",
+      "minDays": 50,
+      "maxDays": 95,
+      "sourceIndex": 1
+    },
+    {
+      "code": "closed",
+      "label": "Ciclo cerrado",
+      "description": "Fin de cosecha, incorporación de rastrojo como abono verde (rico en N). Rotación de cultivo",
+      "minDays": 96,
+      "maxDays": null,
+      "sourceIndex": 0
+    }
+  ]
+}

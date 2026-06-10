@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { ArrowLeft, AlertCircle, MapPin, CheckCircle } from 'lucide-react';
 import { savePayload } from '../services/payloadService';
 import { savePhoto } from '../services/photoService';
+import { createFarmProcess } from '../services/farmEventService';
+import { buildDraftFromSeeding } from '../services/buildDraftFromSeeding';
+import { newUlid } from '../utils/id';
 import DateField from './DateField';
 import PhotoCaptureField from './PhotoCaptureField';
 import { getAllSpecies } from '../db/catalogDB';
@@ -205,6 +208,38 @@ export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw
       if (notes) payload.data.attributes.notes = { value: notes, format: 'plain_text' };
 
       const result = await savePayload('seeding', payload);
+
+      // Auto-ciclo: crear FarmProcess enlazado para que la planta
+      // aparezca como ciclo activo en el agente y en alertas.
+      // Tolerante a error: si falla, el seeding NO falla.
+      try {
+        const draft = await buildDraftFromSeeding(payload);
+        if (draft) {
+          const now = Date.now();
+          const processId = newUlid();
+          const process = {
+            process_id: processId,
+            type: 'farm_process',
+            attributes: {
+              process_type: 'sowing',
+              subject_kind: draft.subject_kind,
+              subject_slug: draft.subject_slug,
+              subject_label: draft.subject_label,
+              quantity: draft.quantity,
+              unit: draft.unit,
+              location_land_asset_id: draft.location_land_asset_id,
+              status: 'active',
+              current_stage: 'sowing_confirmed',
+              created_at: draft.suggested_date || now,
+              updated_at: now,
+            },
+          };
+          await createFarmProcess(process);
+        }
+      } catch {
+        // silencio: ciclo no se creó pero seeding sí
+      }
+
       onSave(result.message || 'Registro guardado localmente (Pendiente de sincronización)', !result.success);
 
       setFormData({ date: new Date().toISOString().split('T')[0], crop: '', variety: '', quantity: '' });

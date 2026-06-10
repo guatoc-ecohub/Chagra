@@ -1,0 +1,68 @@
+{
+  "template_id": "allium_cepa.v1",
+  "species_slug": "allium_cepa",
+  "species_label": "Cebolla de bulbo (Allium cepa)",
+  "version": 1,
+  "sources": [
+    {
+      "name": "Agrosavia — Manual de producción de cebolla",
+      "reference": "Agrosavia (2016). Manual técnico para el cultivo de cebolla en Colombia",
+      "nota": "Referencia agronómica general — URL no verificada"
+    },
+    {
+      "name": "ICA — Guía técnica de cebolla",
+      "reference": "ICA, Boletín técnico, 2019",
+      "nota": "Referencia agronómica general — URL no verificada"
+    }
+  ],
+  "stages": [
+    {
+      "code": "sowing",
+      "label": "Siembra",
+      "description": "Siembra directa de semilla en surco (1-2 cm profundidad) o trasplante de plántula",
+      "minDays": 0,
+      "maxDays": 0,
+      "sourceIndex": 0
+    },
+    {
+      "code": "emergence",
+      "label": "Emergencia",
+      "description": "Aparición del gancho cotiledonar sobre el suelo (7-14 días según temperatura)",
+      "minDays": 7,
+      "maxDays": 15,
+      "sourceIndex": 0
+    },
+    {
+      "code": "vegetative",
+      "label": "Crecimiento vegetativo",
+      "description": "Desarrollo de hojas tubulares desde la base. Formación de catáfilas que constituirán el bulbo",
+      "minDays": 16,
+      "maxDays": 70,
+      "sourceIndex": 0
+    },
+    {
+      "code": "fruiting",
+      "label": "Bulbificación",
+      "description": "Inicio de formación de bulbo estimulado por fotoperíodo (>12h luz). Engrosamiento de catáfilas y acumulación de reservas",
+      "minDays": 60,
+      "maxDays": 100,
+      "sourceIndex": 0
+    },
+    {
+      "code": "harvest_window",
+      "label": "Cosecha",
+      "description": "Cosecha cuando el follaje se dobla y amarillea (>50% de las plantas). Curado al sol por 3-5 días",
+      "minDays": 100,
+      "maxDays": 130,
+      "sourceIndex": 1
+    },
+    {
+      "code": "closed",
+      "label": "Ciclo cerrado",
+      "description": "Post-cosecha y curado final. Almacenamiento del bulbo seco",
+      "minDays": 131,
+      "maxDays": null,
+      "sourceIndex": 0
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "template_id": "musa_paradisiaca.v1",
+  "species_slug": "musa_paradisiaca",
+  "species_label": "Plátano (Musa paradisiaca)",
+  "version": 1,
+  "sources": [
+    {
+      "name": "Agrosavia — Manual de producción de plátano",
+      "reference": "Agrosavia (2017). Manual técnico para el cultivo de plátano en Colombia",
+      "nota": "Referencia agronómica general — URL no verificada"
+    },
+    {
+      "name": "ICA — Guía técnica de plátano",
+      "reference": "ICA, Boletín técnico de plátano, 2019",
+      "nota": "Referencia agronómica general — URL no verificada"
+    }
+  ],
+  "stages": [
+    {
+      "code": "sowing",
+      "label": "Siembra",
+      "description": "Siembra de colino (cormo) en hoyo de 40x40x40 cm con materia orgánica",
+      "minDays": 0,
+      "maxDays": 0,
+      "sourceIndex": 0
+    },
+    {
+      "code": "vegetative",
+      "label": "Crecimiento vegetativo",
+      "description": "Emisión de hojas en espiral desde el pseudotallo. Desarrollo de hijos (colinos) para sucesión",
+      "minDays": 1,
+      "maxDays": 240,
+      "sourceIndex": 0
+    },
+    {
+      "code": "flowering",
+      "label": "Emisión de inflorescencia",
+      "description": "Diferenciación floral y emisión del bellote (inflorescencia) desde el centro de la planta",
+      "minDays": 150,
+      "maxDays": 270,
+      "sourceIndex": 0
+    },
+    {
+      "code": "fruiting",
+      "label": "Llenado del racimo",
+      "description": "Desarrollo de manos y dedos (frutos) desde la floración hasta madurez fisiológica",
+      "minDays": 240,
+      "maxDays": 330,
+      "sourceIndex": 0
+    },
+    {
+      "code": "harvest_window",
+      "label": "Cosecha",
+      "description": "Cosecha del racimo cuando los dedos están llenos y angulosos (80-100 días post-floración). Una cosecha por planta",
+      "minDays": 300,
+      "maxDays": 380,
+      "sourceIndex": 1
+    },
+    {
+      "code": "closed",
+      "label": "Ciclo cerrado",
+      "description": "Post-cosecha de la planta madre. El hijo de sucesión continúa el ciclo en el mismo sitio",
+      "minDays": 381,
+      "maxDays": null,
+      "sourceIndex": 0
+    }
+  ]
+}

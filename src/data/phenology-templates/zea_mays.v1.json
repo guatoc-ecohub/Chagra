@@ -1,0 +1,76 @@
+{
+  "template_id": "zea_mays.v1",
+  "species_slug": "zea_mays",
+  "species_label": "Maíz (Zea mays)",
+  "version": 1,
+  "sources": [
+    {
+      "name": "Agrosavia — Manual de producción de maíz para Colombia",
+      "reference": "Agrosavia (2019). Manual técnico para el cultivo de maíz en Colombia",
+      "nota": "Referencia agronómica general — URL no verificada"
+    },
+    {
+      "name": "FAO — Maize production guidelines",
+      "reference": "FAO, Good Agricultural Practices for maize, 2020",
+      "nota": "Referencia agronómica general — URL no verificada"
+    }
+  ],
+  "stages": [
+    {
+      "code": "sowing",
+      "label": "Siembra",
+      "description": "Siembra directa de semilla en surco (3-5 cm profundidad)",
+      "minDays": 0,
+      "maxDays": 0,
+      "sourceIndex": 0
+    },
+    {
+      "code": "emergence",
+      "label": "Emergencia",
+      "description": "Aparición del coleóptilo sobre el suelo (V1-V2)",
+      "minDays": 4,
+      "maxDays": 10,
+      "sourceIndex": 0
+    },
+    {
+      "code": "vegetative",
+      "label": "Crecimiento vegetativo",
+      "description": "Desarrollo de hojas, tallo y nudos. Máxima altura alcanzada en V12-V18",
+      "minDays": 11,
+      "maxDays": 45,
+      "sourceIndex": 0
+    },
+    {
+      "code": "flowering",
+      "label": "Floración y polinización",
+      "description": "Emisión de espiga (VT) y estigmas (R1). Período crítico para el rendimiento",
+      "minDays": 46,
+      "maxDays": 60,
+      "sourceIndex": 0
+    },
+    {
+      "code": "fruiting",
+      "label": "Llenado de grano",
+      "description": "Formación de grano desde estado lechoso (R3) hasta madurez fisiológica (R6)",
+      "minDays": 61,
+      "maxDays": 100,
+      "sourceIndex": 0
+    },
+    {
+      "code": "harvest_window",
+      "label": "Cosecha",
+      "description": "Madurez de cosecha con grano entre 18-23% humedad. 110-130 días según variedad y altitud",
+      "minDays": 100,
+      "maxDays": 130,
+      "sourceIndex": 1
+    },
+    {
+      "code": "closed",
+      "label": "Ciclo cerrado",
+      "description": "Fin de cosecha, retiro de rastrojo y preparación para rotación",
+      "minDays": 131,
+      "maxDays": null,
+      "sourceIndex": 0
+    }
+  ]
+}
