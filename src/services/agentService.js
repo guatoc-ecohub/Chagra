@@ -434,23 +434,8 @@ ${baseClimateRule}`;
  * @returns {string} Reglas de citación para inyectar en prompt
  */
 export function generateSourceCitationRules() {
-  return `REGLA CRÍTICA DE CITACIÓN DE FUENTES:
-Toda información técnica (altitud, siembra, cosecha, manejo, plagas, clima, etc.) DEBE citar su origen. Formatos válitos:
-
-- "según Restrepo & Rivera (1994)" → para conocimiento agronómico clásico
-- "ICA Resolución [número]" → para normativa fitosanitaria
-- "Agrosavia [año]" → para investigación científica
-- "IDEAM [año]" → para datos climáticos
-- "SENA [curso/título]" → para formación técnica
-- "Papel técnico [título]" → para estudios específicos
-- "El catálogo Chagra indica..." → para datos del sistema
-
-Si NO tienes una fuente verificable para un dato, di explícitamente:
-"No tengo una fuente confiable para este dato específico. Te recomiendo consultar con [técnico local/agrónomo/IDEAM]."
-
-NUNCA inventes datos ni fuentes. Es preferible decir "no tengo el dato" que fabricar una cita.
-
-REGLA CRÍTICA DE NOMBRES CIENTÍFICOS (BINOMIO): solo puedes citar un nombre científico (binomio Linneano, p. ej. "Solanum betaceum") si proviene del grounding/catálogo provisto en este mensaje — bloques "=== ENTIDADES RESUELTAS ===" o "=== EVIDENCIA AUTORITATIVA ===". Si la planta/plaga NO aparece en esos bloques, NO inventes el binomio: usa SOLO el nombre común tal cual lo dijo el usuario, sin paréntesis con nombre científico. Inventar un binomio por similitud fonética o "porque suena parecido" es alucinación grave (incidente prod 2026-05-30: "tomate de árbol" respondido como "Solanum lycopersicum var. cerasiforme" —cherry— cuando lo correcto es Solanum betaceum). Ante la duda: nombre común, sin binomio.`;
+  return `REGLA CRÍTICA DE CITACIÓN DE FUENTES: toda información técnica (altitud, siembra, manejo, plagas, clima) DEBE citar su origen — "según Restrepo & Rivera (1994)", "ICA Resolución [número]", "Agrosavia [año]", "IDEAM [año]", "SENA [curso]", "Papel técnico [título]" o "El catálogo Chagra indica…". Si NO tienes fuente verificable, dilo: "No tengo una fuente confiable para este dato específico. Te recomiendo consultar con [técnico local/agrónomo/IDEAM]." NUNCA inventes datos ni fuentes.
+REGLA CRÍTICA DE NOMBRES CIENTÍFICOS (BINOMIO): solo puedes citar un nombre científico (binomio Linneano, p. ej. "Solanum betaceum") si proviene del grounding/catálogo provisto en este mensaje — bloques "=== ENTIDADES RESUELTAS ===" o "=== EVIDENCIA AUTORITATIVA ===". Si la planta/plaga NO aparece ahí, NO inventes el binomio: usa SOLO el nombre común tal cual lo dijo el usuario, sin paréntesis con nombre científico. Inventarlo por similitud fonética es alucinación grave (incidente prod 2026-05-30: "tomate de árbol" respondido como "Solanum lycopersicum var. cerasiforme" —cherry— cuando lo correcto es Solanum betaceum). Ante la duda: nombre común, sin binomio.`;
 }
 
 /**
@@ -459,29 +444,19 @@ REGLA CRÍTICA DE NOMBRES CIENTÍFICOS (BINOMIO): solo puedes citar un nombre ci
  * @returns {string} Reglas de privacidad de datos para inyectar en prompt
  */
 export function generateUserDataRules() {
-  return `REGLA DE PRIVACIDAD DE DATOS DE FINCA:
-Los datos de plantas, cultivos y finca del usuario SOLO deben mencionarse cuando:
-1. El usuario pregunte explícitamente: "¿qué tengo?", "mis plantas", "mi finca", "mi cultivo", "cuántas plantas tengo", "qué plantas hay"
-2. La consulta SEA sobre inventario: "¿qué especies cultivo?", "¿cuántos [cultivo] tengo?"
-
-NO preambules respuestas con "Tienes X plantas..." si la pregunta es sobre otra cosa.
-NO listes inventario en preguntas generales de manejo, plagas, clima, etc.
-
-Ejemplo CORRECTO:
-Usuario: "cómo podo el café"
-✓ "Para la poda del café (Coffea arabica), según Restrepo & Rivera (1994)..." (NO menciona inventario)
-
-Usuario: "qué tengo plantado"
-✓ "Tienes 15 fresas, 4 caléndulas, 1 tomate cherry..." (SÍ menciona inventario)`;
+  return `REGLA DE PRIVACIDAD DE DATOS DE FINCA: los datos de plantas/cultivos/finca del usuario SOLO se mencionan cuando él pregunta explícitamente por su inventario ("¿qué tengo?", "mis plantas", "mi finca", "mi cultivo", "cuántas plantas tengo", "qué plantas hay", "¿cuántos [cultivo] tengo?"). NO preambules respuestas con "Tienes X plantas..." si la pregunta es sobre otra cosa (manejo, plagas, clima). Ejemplo: a "cómo podo el café" → "Para la poda del café (Coffea arabica), según Restrepo & Rivera (1994)…" (NO menciona inventario); a "qué tengo plantado" → "Tienes 15 fresas, 4 caléndulas, 1 tomate cherry…" (SÍ menciona inventario).`;
 }
 
 /**
  * Construye el contexto de perfil completo para inyectar en el system prompt.
  *
  * @param {Object} finca - Objeto finca activa
+ * @param {object} [opts]
+ * @param {boolean} [opts.climaQuery=true] - si false, omite el bloque de
+ *   alertas climáticas regionales (solo aporta en consultas de clima).
  * @returns {string} Contexto de perfil para system prompt
  */
-export function buildProfileContext(finca) {
+export function buildProfileContext(finca, opts = {}) {
   // #200: bloque de perfil enriquecido del onboarding (localStorage
   // chagra:profile:*). Vacío si el usuario no completó el onboarding —
   // sin breaking change, el agente sigue como antes.
@@ -507,6 +482,13 @@ export function buildProfileContext(finca) {
     }
   })();
 
+  // Re-arquitectura GR-10: el bloque de ALERTAS CLIMÁTICAS regionales (riesgos
+  // por zona + regla CLIMA-DIRECTO) solo aporta cuando la consulta toca clima;
+  // en una pregunta de plaga/manejo es peso muerto que empuja a la truncación
+  // del grounding. `climaQuery` por defecto true → callers existentes y tests
+  // ven el bloque completo; buildBasePrompt lo pasa false para queries no-clima.
+  const { climaQuery = true } = opts || {};
+
   if (!finca) {
     return generateSourceCitationRules() + '\n\n' + generateUserDataRules() + profileSuffix + veredaContext;
   }
@@ -514,17 +496,13 @@ export function buildProfileContext(finca) {
   const bioculturalZone = finca.biocultural_zone;
   const region = detectRegionFromBioculturalZone(bioculturalZone);
   const toneContext = generateRegionalToneContext(region);
-  const climateContext = generateClimateAlertsContext(bioculturalZone);
+  const climateContext = climaQuery ? generateClimateAlertsContext(bioculturalZone) : '';
   const citationRules = generateSourceCitationRules();
   const userDataRules = generateUserDataRules();
 
-  return `${toneContext}
-
-${climateContext}
-
-${citationRules}
-
-${userDataRules}${profileSuffix}${veredaContext}`;
+  return [toneContext, climateContext, citationRules, `${userDataRules}${profileSuffix}${veredaContext}`]
+    .filter((s) => s && s.trim())
+    .join('\n\n');
 }
 
 /**
@@ -641,18 +619,11 @@ export function buildClimaContext(snapshot, opts = {}) {
  * @returns {string}
  */
 export function generateViabilityRules() {
-  return `REGLA DE VIABILIDAD HONESTA DE CULTIVO:
-Las preguntas del usuario son POR DEFECTO sobre SU finca (su ubicación, altitud, piso térmico, clima y cultivos), aunque no lo diga explícitamente. Asume ese contexto: ya lo tienes en el bloque "=== CONTEXTO AMBIENTAL DE LA FINCA ===".
-
-Si el usuario quiere sembrar una especie y el grounding ("=== ENTIDADES RESUELTAS ===") trae para esa especie su rango de altitud (altitud_min / altitud_max) Y conoces la altitud de la finca, compara:
-- Si la altitud de la finca está FUERA del rango [altitud_min, altitud_max] de la especie, dilo con HONESTIDAD directa pero amable: la probabilidad de éxito es muy baja y POR QUÉ (ej: el coco necesita 0–1000 m / clima cálido, y tu finca está a 2580 m / piso frío). Dile que no vale la pena el esfuerzo y SUGIERE 2–3 alternativas viables para SU altitud / piso térmico.
-- Las alternativas salen SOLO del catálogo / grounding provisto en este mensaje o del tool get_cultivos_viables. NUNCA inventes especies ni inventes que algo es viable.
-- Si NO tienes el rango de altitud de la especie (no vino en el grounding o viene null), NO afirmes NADA sobre viabilidad: sé neutral, no digas que sí ni que no. Mejor pide o consulta el dato antes de prometer éxito.
-
-Tono: honesto sin ser frío. Ejemplo: "Sembrar coco en tu Guatoc (2580 m, piso frío) tiene una probabilidad de éxito muy baja: el coco es de clima cálido (0–1000 m). No vale la pena el esfuerzo. Para tu altura te irían mejor [2–3 alternativas del catálogo]."
-
-REGLA DE PRESENTACIÓN DE DATOS LOCALES (solo fraseo, sin tablas ni formato pesado):
-Cuando cites datos de la finca del usuario, deja claro que son SUYOS y LOCALES, no generalidades: "En tu finca tienes…", "El clima hoy en tu finca…", "Según lo que registraste…", "Para tu altura (2580 m)…". El usuario puede ser campesino o un niño de 11 años: que entienda al instante que hablas de SUS datos reales. Mantén las respuestas concisas, sin enumerar todo el contexto como preámbulo.`;
+  return `REGLA DE VIABILIDAD HONESTA DE CULTIVO: las preguntas son POR DEFECTO sobre SU finca (ubicación, altitud, piso térmico, clima, cultivos) aunque no lo diga — ya lo tienes en "=== CONTEXTO AMBIENTAL DE LA FINCA ===". Si quiere sembrar una especie y el grounding trae su rango (altitud_min / altitud_max) Y conoces la altitud de la finca:
+- Si la finca está FUERA de [altitud_min, altitud_max], dilo con honestidad amable: la probabilidad de éxito es muy baja y POR QUÉ (ej: coco necesita 0–1000 m cálido, tu finca a 2580 m frío), que no vale la pena, y SUGIERE 2–3 alternativas viables para SU altitud.
+- Las alternativas salen SOLO del catálogo/grounding o del tool get_cultivos_viables. NUNCA inventes especies ni que algo es viable.
+- Si NO tienes el rango (no vino o es null), NO afirmes NADA sobre viabilidad: sé neutral, pide el dato antes de prometer éxito.
+PRESENTACIÓN DE DATOS LOCALES (fraseo): que se note que los datos de finca son SUYOS y locales ("En tu finca tienes…", "Para tu altura (2580 m)…"); el usuario puede ser campesino o un niño de 11 años. Respuestas concisas, sin preámbulo de todo el contexto.`;
 }
 
 /**
@@ -1086,12 +1057,11 @@ REGLA: si el usuario pregunta por la dosis, preparación o uso de un biopreparad
  * @returns {string}
  */
 export function generateAgronomicGuidanceRules() {
-  return `DOCTRINA AGRONÓMICA (guía, no dogma):
-Toda regla agronómica es una GUÍA con zona gris. Navégala con los datos del grafo + el clima en vivo + RESPETO a la experiencia del campesino. NUNCA inventes; si falta el dato, sé neutral (no afirmes ni niegues).
+  return `DOCTRINA AGRONÓMICA (guía, no dogma): toda regla agronómica es una GUÍA con zona gris; navégala con los datos del grafo + clima en vivo + RESPETO a la experiencia del campesino. NUNCA inventes; si falta el dato, sé neutral.
 - Viabilidad marginal: nunca "no se puede" — está al límite, posible con cuidados; el campesino que ya lo logró tiene la razón sobre la base de datos.
-- Diseño de finca: si el usuario pregunta cómo mejorar su finca, por qué su cultivo no carga, o qué sembrar alrededor, puedes usar el tool get_diseno_finca(altitud) para sugerir polinizadores (para que cargue la fruta), abonos verdes (suelo), sombra y cercas vivas — del catálogo, viables a su altitud. Úsalo SOLO cuando sea pertinente (no en cada pregunta).
-- Invasoras / conservación: jamás recomiendes sembrar una especie invasora o de conservación sensible; sé honesto y ofrece alternativa nativa.
-- Premisa falsa / cura milagrosa: si el usuario afirma que una mezcla o práctica cura algo y pide dosis o frecuencia exacta, no confirmes ni inventes una cifra para complacer. Primero evalúa si la práctica tiene sustento; si no lo tiene, dilo con respeto y ofrece el manejo real.`;
+- Diseño de finca: si pregunta cómo mejorar su finca, por qué su cultivo no carga o qué sembrar alrededor, usa get_diseno_finca(altitud) para sugerir polinizadores, abonos verdes, sombra y cercas vivas del catálogo viables a su altitud — SOLO cuando sea pertinente.
+- Invasoras / conservación: jamás recomiendes sembrar especie invasora o de conservación sensible; sé honesto y ofrece alternativa nativa.
+- Premisa falsa / cura milagrosa: si afirma que una mezcla cura algo y pide dosis/frecuencia exacta, no confirmes ni inventes una cifra; evalúa si tiene sustento, si no, dilo con respeto y ofrece el manejo real.`;
 }
 
 /**

@@ -64,7 +64,8 @@ import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../
 import { getCurrentTier } from '../../services/tierService';
 import DeepResearchCard from '../DeepResearchCard';
 import { normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildSuggestedEntitiesContext, isLowConfidenceEntity, buildFallbackResponse } from '../../services/agentService';
-import { buildBasePrompt, analyzeQuery, buildQueryAnalysisBlock, buildCorpusContext, buildResolvedEntitiesBlock, formatToolEvidence } from '../../services/agentPromptBase';
+import { buildBasePrompt, analyzeQuery, buildQueryAnalysisBlock, buildCorpusVariants, buildResolvedEntitiesBlock, formatToolEvidence } from '../../services/agentPromptBase';
+import { assembleSystemContent } from '../../services/promptAssembler';
 import { applyOutputGuards, classifyQueryIntent } from '../../services/outputGuards';
 import { getProfile } from '../../services/userProfileService';
 import { captureExchange } from '../../services/conversationCaptureService';
@@ -548,7 +549,7 @@ export default function AgentScreen({ onBack, initialContext }) {
     };
   }, [loadHistory, markRead]);
 
-  const getSystemPrompt = useCallback(() => {
+  const getSystemPrompt = useCallback(({ query = '', contextMemory = '', isEnum = false } = {}) => {
     // Operator bug 2026-05-18: agente listaba "Fresa #02, Fresa #08, Fresa #02..."
     // (cada planta individual con su número), molesto al escuchar por TTS.
     // Fix: agrupar por species y dar conteo total. Plant name suele ser
@@ -581,10 +582,12 @@ export default function AgentScreen({ onBack, initialContext }) {
     const indoorContext = indoorZone
       ? `El operador está bajo techo en: ${indoorZone}. Considera condiciones de invernadero al recomendar. `
       : '';
-    // El texto base (reglas + glosarios + CASO A/B/C) vive en
+    // El texto base (reglas + glosarios condicionales + CASO A/B/C) vive en
     // agentPromptBase.buildBasePrompt — extraído para que sea medible y
-    // testeable fuera de React (re-arquitectura del prompt 2026-06-10).
-    return buildBasePrompt({ plantContext, fincaContext, indoorContext, finca });
+    // testeable fuera de React (re-arquitectura GR-10 2026-06-10). Recibe la
+    // query / historial / isEnum para inyectar SOLO los glosarios y reglas que
+    // la conversación menciona (el resto se omite → cabe el grounding).
+    return buildBasePrompt({ plantContext, fincaContext, indoorContext, finca, query, contextMemory, isEnum });
   }, [plants, fincas, activeFincaSlug, indoorZone]);
 
   // 057.4 integration: los handlers ya NO ejecutan addLog directo. Solo
@@ -669,14 +672,16 @@ export default function AgentScreen({ onBack, initialContext }) {
   // puras, testeables y medibles fuera de React).
 
   const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null, fermentoBlock = '', subgrafoBloque = '') => {
-    const systemPrompt = getSystemPrompt();
     const analysis = analyzeQuery(query);
+    // El base recibe query/historial/isEnum para inyectar SOLO los glosarios
+    // y reglas condicionales que la conversación toca (re-arquitectura GR-10).
+    const systemPrompt = getSystemPrompt({ query, contextMemory, isEnum: analysis.isEnum });
 
     // ENTIDADES RESUELTAS (DR taxonómico Tier 1 B) + análisis NN2/NN3 +
     // corpus RAG delimitado — builders puros en agentPromptBase.
     const resolvedEntitiesBlock = buildResolvedEntitiesBlock(resolvedEntities);
     const queryAnalysisBlock = buildQueryAnalysisBlock(analysis);
-    const corpusContext = buildCorpusContext(contextCorpus);
+    const corpusVariants = buildCorpusVariants(contextCorpus);
 
     const evidenceContext = formatToolEvidence(toolEvidence);
 
@@ -831,8 +836,37 @@ export default function AgentScreen({ onBack, initialContext }) {
       ? `\n\n${fermentoBlock}`
       : '';
 
+    // Re-arquitectura GR-10: ensamblado con PRESUPUESTO de tokens y prioridad
+    // por relevancia (promptAssembler). El grounding (evidencia / entidades /
+    // hechos curados / cadena) va al FINAL del system — donde la truncación de
+    // ollama no lo alcanza y la recency lo hace dominar. Si el total supera el
+    // presupuesto, se degradan SOLO corpus RAG (por chunks) y contexto
+    // ambiental; base, guardas y grounding son intocables.
+    const assembled = assembleSystemContent({
+      base: systemPrompt,
+      // Contexto AMBIENTAL sacrificable: si el prompt se pasa de presupuesto,
+      // ENSO/alertas, asociaciones, riesgo térmico y el marco de finca ceden
+      // ANTES que el grounding duro (variant a ''). La altitud de la finca la
+      // cita igual el bloque de viabilidad, así que no se pierde la guarda.
+      clima: { variants: [climaContext, ''] },
+      finca: { variants: [fincaContext, ''] },
+      asociacion: { variants: [asociacionContext, ''] },
+      corpus: { variants: corpusVariants },
+      frostHeat: { variants: [frostHeatContext, ''] },
+      viabilidad: viabilidadContext,
+      seguridad: seguridadContext,
+      evidence: evidenceContext,
+      resolvedEntities: resolvedEntitiesBlock,
+      curatedFacts: curatedFactsContext,
+      relacional: relacionalContext,
+      queryAnalysis: queryAnalysisBlock,
+      suggested: suggestedBlock,
+      priceDecline: priceDeclineBlock,
+      fermento: fermentoSafetyBlock,
+    });
+
     const messages = [
-      { role: 'system', content: systemPrompt + corpusContext + evidenceContext + resolvedEntitiesBlock + curatedFactsContext + relacionalContext + seguridadContext + viabilidadContext + frostHeatContext + asociacionContext + climaContext + fincaContext + queryAnalysisBlock + suggestedBlock + priceDeclineBlock + fermentoSafetyBlock },
+      { role: 'system', content: assembled.content },
       ...(contextMemory ? [{ role: 'user', content: contextMemory }] : []),
       { role: 'user', content: query },
     ];
