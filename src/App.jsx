@@ -20,6 +20,7 @@ import { prewarmCorpus } from './services/ragRetriever';
 import useThemeBackgroundStore, { getBackgroundSrc } from './store/useThemeBackgroundStore';
 import useAlertStore from './store/useAlertStore';
 import { alertEngine } from './services/alertEngine';
+import { cropAlertEngine } from './services/cropAlertEngine';
 // FieldFeedback ya no se monta globalmente en App; vive embebido en
 // HelpUsoScreen como sección de Ayuda (decisión 2026-05-21, ver
 // comentario abajo donde se removió el render).
@@ -502,6 +503,11 @@ export default function App() {
       useAlertStore.getState().initializeListeners();
       alertEngine.start().catch((err) => {
         console.warn('[App] alertEngine no pudo arrancar:', err?.message);
+      });
+      // Alertas del cultivo (plaga/etapa) desde los ciclos activos (FarmProcess)
+      // hacia el mismo chip de alertas. Degrada limpio si no hay ciclos.
+      cropAlertEngine.start().catch((err) => {
+        console.warn('[App] cropAlertEngine no pudo arrancar:', err?.message);
       });
     } catch (err) {
       console.warn('[App] Error inicializando motor de alertas:', err?.message);

@@ -120,7 +120,16 @@ export const createFarmProcess = async (process) => {
 
     evStore.add(event);
 
-    tx.oncomplete = () => resolve({ process, event });
+    tx.oncomplete = () => {
+      // Avisa a quien escuche (cropAlertEngine) que cambió un ciclo, para
+      // re-evaluar alertas de plaga/etapa. Guard SSR/test.
+      try {
+        if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+          window.dispatchEvent(new CustomEvent('farmProcessChanged', { detail: { process_id: process.process_id } }));
+        }
+      } catch { /* noop */ }
+      resolve({ process, event });
+    };
     tx.onerror = () => reject(tx.error);
   });
 };
