@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { Clock, Eye, HelpCircle, AlertTriangle, CheckCircle, Sprout } from 'lucide-react';
-import { calculateWindows, formatWindow } from '../services/phenologyCalculator';
+import { Clock, Eye, HelpCircle, AlertTriangle, CheckCircle, Sprout, Timer } from 'lucide-react';
+import { calculateWindows, formatWindow, getCurrentStage } from '../services/phenologyCalculator';
 
 const confidenceColor = (c) => {
   if (c >= 0.9) return 'text-emerald-400';
@@ -44,6 +44,11 @@ export default function PhenologyTimeline({
     return calculateWindows({ speciesSlug, sowingDate, altitudeM });
   }, [speciesSlug, sowingDate, altitudeM]);
 
+  const estimatedCurrent = useMemo(() => {
+    if (!speciesSlug || !sowingDate) return null;
+    return getCurrentStage({ speciesSlug, sowingDate, altitudeM });
+  }, [speciesSlug, sowingDate, altitudeM]);
+
   const observedMap = useMemo(() => {
     const m = {};
     observedStages.forEach((os) => { m[os.code] = os; });
@@ -79,26 +84,32 @@ export default function PhenologyTimeline({
       <div className="flex flex-col gap-2">
         {windows.map((win, i) => {
           const obs = observedMap[win.code];
-          const isCurrent = obs && obs.code === win.code;
+          const isObservedCurrent = obs && obs.code === win.code;
+          const isEstimatedCurrent = estimatedCurrent && estimatedCurrent.stage.code === win.code && !isObservedCurrent;
           const isPast = obs && windows.findIndex((w) => w.code === obs.code) > i;
 
           return (
             <div key={win.code} className={`flex gap-2 ${compact ? 'items-center' : ''}`}>
               {/* Indicador de etapa */}
               <div className="flex flex-col items-center gap-0.5 shrink-0">
-                <div className={`w-3 h-3 rounded-full border ${stageColor(win.code)} ${isCurrent ? 'ring-2 ring-lime-400/50' : ''} ${isPast ? 'opacity-50' : ''}`} />
+                <div className={`w-3 h-3 rounded-full border ${stageColor(win.code)} ${isObservedCurrent ? 'ring-2 ring-lime-400/50' : ''} ${isEstimatedCurrent ? 'ring-2 ring-sky-400/40 border-dashed' : ''} ${isPast ? 'opacity-50' : ''}`} />
                 {i < windows.length - 1 && <div className="w-px h-4 bg-slate-700" />}
               </div>
 
               {/* Contenido */}
               <div className={`flex-1 min-w-0 ${compact ? 'flex items-center gap-2' : ''}`}>
                 <div className={`flex items-center gap-1.5 ${isPast ? 'opacity-50' : ''}`}>
-                  <span className={`text-sm font-medium ${isCurrent ? 'text-lime-300' : 'text-slate-200'}`}>
+                  <span className={`text-sm font-medium ${isObservedCurrent ? 'text-lime-300' : 'text-slate-200'}`}>
                     {win.label}
                   </span>
                   {obs && (
                     <span className="inline-flex items-center gap-0.5 text-2xs text-emerald-400" title="Observado">
                       <Eye size={10} />
+                    </span>
+                  )}
+                  {isEstimatedCurrent && (
+                    <span className="inline-flex items-center gap-0.5 text-2xs text-sky-400" title={`Estimado: ${estimatedCurrent.daysElapsed} días desde siembra`}>
+                      <Timer size={10} />
                     </span>
                   )}
                 </div>
