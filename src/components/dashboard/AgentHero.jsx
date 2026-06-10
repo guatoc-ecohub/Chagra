@@ -7,7 +7,7 @@ import useAgentOutboxStore from '../../store/useAgentOutboxStore';
 import useAssetStore from '../../store/useAssetStore';
 import useAlertStore from '../../store/useAlertStore';
 import { agentSounds } from '../../services/agentSoundService';
-import { CAPABILITY_MANIFEST } from '../../services/agentCapabilities';
+import AgentMano from './AgentMano';
 import { AGENT_HERO_CHIPS } from '../../data/exampleQuestions';
 import { useTheme } from '../../hooks/useTheme';
 import {
@@ -141,23 +141,6 @@ const SUB_EXPERTO = 'Asistente agroecológico con grounding. Cada respuesta cita
 // Fuente única de los chips del home (compartida con el test del punto de
 // acceso #1, regla react-refresh/only-export-components).
 const QUICK_CHIPS = AGENT_HERO_CHIPS;
-
-/**
- * CAPACIDADES de Chagra para el menú Ⓐ (bottom-sheet .sheet del demo).
- *
- * CAPABILITIES derivadas del manifiesto único (agentCapabilities.js).
- * NO editar labels, tools o rutas acá — hacerlo en el manifiesto.
- */
-const CAPABILITIES = CAPABILITY_MANIFEST
-    .filter((e) => e.hero)
-    .map((e) => ({
-        id: e.id,
-        icon: e.icon,
-        title: e.label,
-        desc: e.desc,
-        tool: e.tool,
-        route: e.heroRoute,
-    }));
 
 function prefersReducedMotion() {
     return typeof window !== 'undefined' && window.matchMedia
@@ -344,6 +327,7 @@ export default function AgentHero({ onNavigate }) {
 
     // Despacha una capacidad del sheet a su routing real.
     const pickCapability = (cap) => {
+        if (cap.status === 'soon' || !cap.route || cap.route.kind === 'unavailable') return;
         closeSheet();
         const r = cap.route;
         if (r.kind === 'ask') {
@@ -940,7 +924,7 @@ export default function AgentHero({ onNavigate }) {
                     box-shadow: 0 -16px 40px -16px rgba(0, 0, 0, 0.55);
                     border-top: 1px solid rgb(var(--c-surface-border));
                     transform: translateY(110%); transition: transform 0.5s cubic-bezier(.32,.72,0,1);
-                    max-height: 84dvh; display: flex; flex-direction: column; will-change: transform;
+                    max-height: 92dvh; display: flex; flex-direction: column; will-change: transform;
                 }
                 .agentport-sheet.is-open { transform: translateY(0); }
                 .agentport-grab { width: 42px; height: 5px; background: rgb(var(--c-surface-border)); border-radius: 5px; margin: 10px auto 4px; flex: none; }
@@ -948,37 +932,6 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-sheet-h .t { font-size: 1.18rem; font-weight: 800; color: rgb(var(--c-slate-100)); letter-spacing: -.01em; }
                 .agentport-sheet-h .s { font-size: .86rem; color: rgb(var(--c-slate-300)); margin-top: 4px; line-height: 1.45; }
                 [data-nivel="detallado"] .agentport-sheet-h .s { font-size: .8rem; }
-                .agentport-caps {
-                    padding: 12px 16px 8px; overflow-y: auto; -webkit-overflow-scrolling: touch;
-                    display: flex; flex-direction: column; gap: 9px; overscroll-behavior: contain;
-                }
-                .agentport-cap {
-                    display: flex; align-items: flex-start; gap: 13px; width: 100%; font: inherit; text-align: left;
-                    background: rgb(var(--c-surface-card)); border: 1px solid rgb(var(--c-surface-border));
-                    border-radius: 18px; padding: 13px 14px; cursor: pointer;
-                    transition: transform .16s cubic-bezier(.22,.61,.36,1), background .18s ease, box-shadow .2s ease, border-color .2s ease;
-                    box-shadow: 0 3px 10px -7px rgba(0,0,0,.5);
-                }
-                [data-theme="minimalista"] .agentport-cap { border-radius: 14px; }
-                .agentport-cap:active { transform: scale(.98); }
-                .agentport-cap:hover { border-color: rgb(var(--t-accent-rgb) / 0.45); box-shadow: 0 0 18px -7px rgb(var(--t-accent-rgb) / 0.5); }
-                .agentport-cap:disabled { opacity: .55; cursor: not-allowed; }
-                .agentport-cap .ico {
-                    width: 46px; height: 46px; flex: none; border-radius: 13px;
-                    display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
-                    background: rgb(var(--t-accent-rgb) / 0.12); border: 1px solid rgb(var(--t-accent-rgb) / 0.22);
-                }
-                .agentport-cap .txt { flex: 1; min-width: 0; }
-                .agentport-cap .ct { font-weight: 800; font-size: .98rem; color: rgb(var(--c-slate-100)); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-                .agentport-cap .cd { font-size: .86rem; color: rgb(var(--c-slate-300)); line-height: 1.4; margin-top: 2px; }
-                /* etiqueta técnica de la tool: solo experto (nivel detallado) */
-                .agentport-cap .tool-id { display: none; font-size: .66rem; font-weight: 700; color: rgb(var(--t-accent-rgb)); margin-top: 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-                [data-nivel="detallado"] .agentport-cap .tool-id {
-                    display: inline-block; background: rgb(var(--t-accent-rgb) / 0.08);
-                    border: 1px solid rgb(var(--t-accent-rgb) / 0.2); padding: 2px 7px; border-radius: 7px;
-                }
-                .agentport-cap .arrow { align-self: center; color: rgb(var(--t-accent-rgb)); font-size: 1.1rem; flex: none; transition: transform .16s ease; }
-                .agentport-cap:active .arrow { transform: translateX(2px); }
                 .agentport-sheet-foot { padding: 6px 22px calc(18px + env(safe-area-inset-bottom)); text-align: center; font-size: .72rem; color: rgb(var(--c-slate-500)); flex: none; }
                 .agentport-sheet-foot b { color: rgb(var(--t-accent-rgb)); }
 
@@ -1418,32 +1371,17 @@ export default function AgentHero({ onNavigate }) {
             >
                 <div className="agentport-grab" aria-hidden="true" />
                 <div className="agentport-sheet-h">
-                    <div className="t">¿En qué te ayudo?</div>
+                    <div className="t">La mano de Chagra</div>
                     <div className="s">
                         {expertoActive
-                            ? 'Capacidades enrutadas a herramientas. Toca una para empezar.'
-                            : 'Toca una opción y te ayudo. Toda respuesta viene con su fuente.'}
+                            ? 'Cada rama, una capacidad conectada. Las opacas están por llegar.'
+                            : 'Mi mano en tu campo: cada rama es una ayuda. Las opacas llegan pronto.'}
                     </div>
                 </div>
-                <div className="agentport-caps">
-                    {CAPABILITIES.map((cap) => (
-                        <button
-                            key={cap.id}
-                            type="button"
-                            className="agentport-cap"
-                            onClick={() => pickCapability(cap)}
-                            disabled={busy}
-                        >
-                            <span className="ico" aria-hidden="true">{cap.icon}</span>
-                            <span className="txt">
-                                <span className="ct">{cap.title}</span>
-                                <span className="cd">{cap.desc}</span>
-                                <span className="tool-id">{cap.tool}()</span>
-                            </span>
-                            <span className="arrow" aria-hidden="true">›</span>
-                        </button>
-                    ))}
-                </div>
+                {/* La mano de Chagra (emblema + capacidades) — componente único
+                    compartido con el panel inline. Solo se monta cuando el sheet
+                    está abierto, para que el dibujado se reproduzca al desplegar. */}
+                {sheetOpen && <AgentMano onPick={pickCapability} disabled={busy} />}
                 <div className="agentport-sheet-foot">
                     Chagra responde con información de <b>AGROSAVIA</b>, <b>ICA</b> e <b>IDEAM</b>.
                 </div>

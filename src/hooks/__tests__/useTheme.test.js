@@ -35,10 +35,10 @@ describe('useTheme — sistema de temas', () => {
     document.documentElement.removeAttribute('data-theme');
   });
 
-  it('default es bio-punk cuando no hay nada en localStorage', () => {
+  it('default es automático cuando no hay nada en localStorage', () => {
     const { result } = renderHook(() => useTheme());
-    expect(result.current.theme).toBe('biopunk');
-    expect(DEFAULT_THEME).toBe('biopunk');
+    expect(result.current.theme).toBe('auto');
+    expect(DEFAULT_THEME).toBe('auto');
   });
 
   it('THEME_IDS expone los 3 temas curados + auto', () => {
@@ -48,10 +48,10 @@ describe('useTheme — sistema de temas', () => {
     expect(THEME_IDS).toContain('auto');
     // El catálogo visible al usuario contiene los 3 temas explícitos + auto.
     expect(THEMES.map((t) => t.id)).toEqual([
+      'auto',
       'biopunk',
       'nature',
       'minimalista',
-      'auto',
     ]);
   });
 
@@ -76,14 +76,12 @@ describe('useTheme — sistema de temas', () => {
     );
   });
 
-  it('applyTheme(auto) de día resuelve a minimalista (data-theme escrito)', () => {
+  it('applyTheme(auto) de día resuelve a nature (data-theme escrito)', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-06-03T12:00:00'));
     const resolved = applyTheme('auto');
-    expect(resolved).toBe('minimalista');
-    expect(document.documentElement.getAttribute('data-theme')).toBe(
-      'minimalista'
-    );
+    expect(resolved).toBe('nature');
+    expect(document.documentElement.getAttribute('data-theme')).toBe('nature');
   });
 
   it('applyTheme(auto) de noche resuelve a biopunk (sin data-theme)', () => {
@@ -119,10 +117,10 @@ describe('useTheme — sistema de temas', () => {
     );
   });
 
-  it('migra ids legados (dark-sober/light) al default bio-punk en el getter', () => {
-    // dark-sober y light fueron reemplazados por los 3 temas curados.
+  it('migra ids legados (dark-sober/light) al default automático en el getter', () => {
+    // dark-sober y light fueron reemplazados por los 3 temas curados + auto.
     localStorage.setItem(STORAGE_KEY, 'dark-sober');
     const { result } = renderHook(() => useTheme());
-    expect(result.current.theme).toBe('biopunk');
+    expect(result.current.theme).toBe('auto');
   });
 });

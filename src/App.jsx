@@ -17,7 +17,7 @@ import PendingTasksWidget from './components/PendingTasksWidget';
 import SyncProgressIndicator from './components/common/SyncProgressIndicator';
 import useOllamaWarmStore from './store/useOllamaWarmStore';
 import { prewarmCorpus } from './services/ragRetriever';
-import useThemeBackgroundStore, { getBackgroundSrc, DEFAULT_BACKGROUND_ID } from './store/useThemeBackgroundStore';
+import useThemeBackgroundStore, { getBackgroundSrc } from './store/useThemeBackgroundStore';
 import useAlertStore from './store/useAlertStore';
 import { alertEngine } from './services/alertEngine';
 // FieldFeedback ya no se monta globalmente en App; vive embebido en
@@ -566,25 +566,13 @@ export default function App() {
     const img = new Image();
     img.src = src;
     document.body.style.setProperty('--app-bg-image', `url('${src}')`);
-    // Bio-punk "cosecha mística" (2026-06-03): cuando el operador NO eligió una
-    // foto propia (sigue en el default), bajamos a un lienzo digital CSS fiel al
-    // demo (themes.css §16) en lugar de la foto. Si elige otra foto curada,
-    // marcamos data-custom-bg y la foto vuelve a ganar. El gate solo importa en
-    // bio-punk (sin data-theme); en nature/minimalista el fondo es crema (§2).
-    //
-    // FIX 2026-06-06: El lienzo biopunk (gradiente + glow) debe verse SIEMPRE
-    // que estemos en biopunk sin foto custom explícita. data-custom-bg solo debe
-    // escribirse cuando el usuario seleccionó una foto FOTO CURADA diferente al
-    // default biopunk-4, no para cualquier cambio de default.
-    const isBiopunkDefault = selectedBackground === DEFAULT_BACKGROUND_ID;
-    const isBiopunkOne = selectedBackground === 'biopunk-1';
-    const isDefaultOrBiopunkOne = isBiopunkDefault || isBiopunkOne;
-
-    if (!isDefaultOrBiopunkOne) {
-      document.body.setAttribute('data-custom-bg', '1');
-    } else {
-      document.body.removeAttribute('data-custom-bg');
-    }
+    // La foto de biodiversidad elegida debe VERSE en bio-punk en todas las
+    // pantallas, incluso cuando coincide con el default (operador 2026-06-09:
+    // "no se ve la imagen de fondo en biopunk que es donde se debe ver").
+    // data-custom-bg neutraliza el lienzo CSS biopunk de themes.css y deja ganar
+    // la foto. Nature y Minimalista conservan sus lienzos claros tipo papel vía
+    // los selectores de tema (index.css fuerza background-image:none ahí).
+    document.body.setAttribute('data-custom-bg', '1');
   }, [selectedBackground]);
 
   const showToast = useCallback((message, isError = false) => {
