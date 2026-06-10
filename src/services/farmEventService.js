@@ -105,12 +105,20 @@ export const createFarmProcess = async (process) => {
 
     procStore.put(process);
 
+    const eventType = (() => {
+      const ptype = process.attributes?.process_type || 'sowing';
+      if (ptype === 'harvest') return 'harvest_confirmed';
+      if (ptype === 'post_harvest') return 'post_harvest_confirmed';
+      if (ptype === 'pest_management') return 'pest_management_confirmed';
+      return 'sowing_confirmed';
+    })();
+
     const event = {
       event_id: newUlid(),
       type: 'farm_process_event',
       attributes: {
         process_id: process.process_id,
-        event_type: 'sowing_confirmed',
+        event_type: eventType,
         occurred_at: process.attributes.created_at,
         actor: 'operator',
         source: 'operator',

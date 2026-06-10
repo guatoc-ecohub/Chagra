@@ -121,11 +121,16 @@ const VALID_STAGES = [
   'fruiting',
   'harvest_window',
   'harvest',
+  'post_harvest',
+  'pest_management',
   'closed',
   'fallow',
 ];
 const VALID_EVENT_TYPES = [
   'sowing_confirmed',
+  'harvest_confirmed',
+  'post_harvest_confirmed',
+  'pest_management_confirmed',
   'observation',
   'stage_transition',
   'stage_confirmed',
