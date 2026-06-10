@@ -86,7 +86,13 @@ export default function FarmProcessConfirmCard({
             ? '🌳 Ciclo de reforestación / restauración'
             : draft.process_type === 'silvopasture'
               ? '🐄 Ciclo silvopastoril'
-              : '🌿 Nuevo ciclo de siembra'}
+              : draft.process_type === 'harvest'
+                ? '🌾 Ciclo de cosecha'
+                : draft.process_type === 'post_harvest'
+                  ? '📦 Post-cosecha'
+                  : draft.process_type === 'pest_management'
+                    ? '🐛 Manejo de plagas'
+                    : '🌿 Nuevo ciclo de siembra'}
         </p>
       </section>
 
@@ -170,6 +176,10 @@ export default function FarmProcessConfirmCard({
             <option value="árboles">árboles</option>
             <option value="esquejes">esquejes</option>
             <option value="bulbos">bulbos</option>
+            <option value="kg">kg</option>
+            <option value="arrobas">arrobas</option>
+            <option value="bultos">bultos</option>
+            <option value="litros">litros</option>
             <option value="kilos">kilos</option>
             <option value="libras">libras</option>
             <option value="gramos">gramos</option>
@@ -266,7 +276,17 @@ export default function FarmProcessConfirmCard({
           disabled={!allValid || isSaving}
           className="flex-1 px-4 py-3 min-h-[44px] bg-lime-700 hover:bg-lime-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50 disabled:bg-slate-700"
         >
-          <Check size={18} /> {isSaving ? 'Guardando…' : `Confirmar siembra (${quantity} ${unit})`}
+          <Check size={18} /> {isSaving ? 'Guardando…' : (() => {
+            const label = (() => {
+              if (draft.process_type === 'harvest') return 'Confirmar cosecha';
+              if (draft.process_type === 'post_harvest') return 'Confirmar post-cosecha';
+              if (draft.process_type === 'pest_management') return 'Confirmar manejo de plagas';
+              if (draft.process_type === 'restoration') return 'Confirmar reforestación';
+              if (draft.process_type === 'silvopasture') return 'Confirmar silvopastoreo';
+              return 'Confirmar siembra';
+            })();
+            return `${label} (${quantity} ${unit})`;
+          })()}
         </button>
       </div>
     </div>
