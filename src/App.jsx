@@ -60,6 +60,7 @@ const OnboardingPiloto = lazy(() => import('./components/OnboardingPiloto'));
 const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
 const LocationDetectedScreen = lazy(() => import('./components/LocationDetectedScreen'));
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
+const ProcesosPorVozScreen = lazy(() => import('./components/ProcesosPorVozScreen'));
 const ProfileScreen = lazy(() => import('./components/ProfileScreen'));
 const CaseStudyScreen = lazy(() => import('./components/CaseStudyScreen'));
 const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
@@ -696,6 +697,8 @@ export default function App() {
             <VoiceCapture onSave={showToast} />
           </ScreenShell>
         );
+      case 'procesos':
+        return <ProcesosPorVozScreen onBack={() => navigate('dashboard')} onSave={showToast} />;
       case 'perfil':
         return <ProfileScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />;
       case 'casos':
