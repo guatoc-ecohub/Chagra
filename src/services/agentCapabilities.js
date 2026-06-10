@@ -216,13 +216,13 @@ export const CAPABILITY_MANIFEST = Object.freeze([
   {
     id: 'ciclo',
     group: 'cultivo',
-    status: 'soon',
+    status: 'live',
     icon: '🌾',
     label: 'Ciclo del cultivo',
     desc: 'Etapas, labores y alertas según el desarrollo.',
     tool: 'phenology_cycle',
     hero: true,
-    heroRoute: { kind: 'unavailable' },
+    heroRoute: { kind: 'nav', view: 'ciclo' },
   },
   {
     id: 'procesos',
