@@ -7,7 +7,7 @@ import useAgentOutboxStore from '../../store/useAgentOutboxStore';
 import useAssetStore from '../../store/useAssetStore';
 import useAlertStore from '../../store/useAlertStore';
 import { agentSounds } from '../../services/agentSoundService';
-import AgentMano from './AgentMano';
+import AgentRedMenu from './AgentRedMenu';
 import { AGENT_HERO_CHIPS } from '../../data/exampleQuestions';
 import { useTheme } from '../../hooks/useTheme';
 import {
@@ -1381,7 +1381,7 @@ export default function AgentHero({ onNavigate }) {
                 {/* La mano de Chagra (emblema + capacidades) — componente único
                     compartido con el panel inline. Solo se monta cuando el sheet
                     está abierto, para que el dibujado se reproduzca al desplegar. */}
-                {sheetOpen && <AgentMano onPick={pickCapability} disabled={busy} />}
+                {sheetOpen && <AgentRedMenu onPick={pickCapability} disabled={busy} />}
                 <div className="agentport-sheet-foot">
                     Chagra responde con información de <b>AGROSAVIA</b>, <b>ICA</b> e <b>IDEAM</b>.
                 </div>

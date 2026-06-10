@@ -19,7 +19,6 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import AgentHero from './AgentHero';
-import AgentAraña from '../AgentAraña';
 import SelectedBackgroundReveal from './SelectedBackgroundReveal';
 import ClimaStrip from './ClimaStrip';
 import AIStatusFooter from './AIStatusFooter';
@@ -194,13 +193,9 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
                 bajo el hero, visible en todos los temas (operador 2026-06-09). */}
             <SelectedBackgroundReveal />
 
-            {/* ── La mano de Chagra (panel inline) ──
-                Misma mano del bottom-sheet Ⓐ: nature = rama+hojas, biopunk =
-                micorriza+esporas, minimalista = silueta sobria. Muestra TODAS las
-                capacidades con su estado real (conectada / por lanzarse). */}
-            <div className="px-4 py-2">
-                <AgentAraña onNavigate={onNavigate} />
-            </div>
+            {/* Panel inline de capacidades RETIRADO (operador 2026-06-10): el
+                menú vive solo en el despliegue de la Ⓐ del AgentHero (la red
+                nueva AgentRedMenu). El home queda limpio. */}
 
             {/* Saludo regional dismissible — bajo el fold, ya no sobre el hero
                 (que tiene su propio saludo "Soy Chagra"). */}
