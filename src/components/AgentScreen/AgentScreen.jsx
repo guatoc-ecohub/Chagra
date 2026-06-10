@@ -1109,7 +1109,7 @@ RESPONDE SOLO a lo que el usuario preguntó usando ÚNICAMENTE los datos verific
     return { isEnum, pestsMentioned, topic };
   };
 
-  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null, fermentoBlock = '') => {
+  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null, fermentoBlock = '', subgrafoBloque = '') => {
     const systemPrompt = getSystemPrompt();
     const analysis = analyzeQuery(query);
 
@@ -1282,6 +1282,12 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     const curatedFactsBlock = buildCuratedFactsContext({ resolvedEntities });
     const curatedFactsContext = curatedFactsBlock ? `\n\n${curatedFactsBlock}` : '';
 
+    // GraphRAG: bloque "=== CADENA DE RELACIONES (grafo) ===" (multi-hop AGE)
+    // para queries relacionales. Ya viene formateado del sidecar; '' = no-op.
+    const relacionalContext = (typeof subgrafoBloque === 'string' && subgrafoBloque.trim())
+      ? `\n\n${subgrafoBloque}`
+      : '';
+
     // P4b — POSIBLES COINCIDENCIAS (baja confianza). Va al FINAL del prompt para
     // que la regla CASO B (pedir confirmación, no afirmar) domine por recency
     // sobre cualquier dato de altitud/viabilidad que el modelo quiera afirmar.
@@ -1308,7 +1314,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       : '';
 
     const messages = [
-      { role: 'system', content: systemPrompt + corpusContext + evidenceContext + resolvedEntitiesBlock + curatedFactsContext + seguridadContext + viabilidadContext + frostHeatContext + asociacionContext + climaContext + fincaContext + queryAnalysisBlock + suggestedBlock + priceDeclineBlock + fermentoSafetyBlock },
+      { role: 'system', content: systemPrompt + corpusContext + evidenceContext + resolvedEntitiesBlock + curatedFactsContext + relacionalContext + seguridadContext + viabilidadContext + frostHeatContext + asociacionContext + climaContext + fincaContext + queryAnalysisBlock + suggestedBlock + priceDeclineBlock + fermentoSafetyBlock },
       ...(contextMemory ? [{ role: 'user', content: contextMemory }] : []),
       { role: 'user', content: query },
     ];
@@ -1568,6 +1574,9 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       // por default → no-op en el system prompt si no hubo intención-fermento o
       // el sidecar no respondió (degradación graceful).
       let fermentoBlock = '';
+      // GraphRAG multi-hop (#1 intelligence-first): bloque "CADENA DE RELACIONES"
+      // del grafo AGE para queries relacionales (plaga+cultivo). '' = no-op.
+      let subgrafoBloque = '';
       if (isOnline && isSidecarEnabled()) {
         try {
           // PASO 1 — pre-validation AGE (DR taxonómico Tier 1 B, PR #59).
@@ -1627,6 +1636,27 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
               suggestedEntities: suggested.map((e) => `${e.mentioned}→${e.canonical_id}@${e.confidence}`),
             });
           }
+
+          // GraphRAG multi-hop: si hay plaga y/o cultivo resueltos, traemos del
+          // grafo AGE la CADENA de relaciones (cultivo→plaga→controladores/
+          // biopreparados + asocios) e inyectamos el bloque al grounding. La
+          // tool es sub-segundo y no-throw; si no hay cadena, queda '' (no-op).
+          try {
+            const pestEnt = (resolvedEntities || []).find((e) => e.kind === 'pest' || e.kind === 'plaga');
+            const cropEnt = (resolvedEntities || []).find((e) => ['cultivo', 'especie', 'species', 'planta'].includes(e.kind));
+            const subArgs = {};
+            if (pestEnt) subArgs.pest = pestEnt.canonical_id || pestEnt.mentioned;
+            if (cropEnt) subArgs.cultivo = cropEnt.canonical_id || cropEnt.mentioned;
+            if (subArgs.pest || subArgs.cultivo) {
+              const sub = await callTool('get_subgrafo_relacional', subArgs);
+              if (sub && sub.found && typeof sub.bloque === 'string' && sub.bloque.trim()) {
+                subgrafoBloque = sub.bloque;
+                console.debug('[sidecar] subgrafo-relacional', {
+                  nodes: sub.nodes?.length, rels: sub.relaciones?.length,
+                });
+              }
+            }
+          } catch (_) { /* graceful: subgrafoBloque queda '' */ }
 
           // PASO 2 — routing del tool.
           //
@@ -1867,7 +1897,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         }
       }
 
-      const rawResponse = await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock);
+      const rawResponse = await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, subgrafoBloque);
       // Fallback estructurado (Item 9): si el LLM retornó vacío (timeout, OOM,
       // modelo caído), construimos una respuesta útil con lo que sabemos
       // (toolEvidence, entidades) en vez de un silencio o banner rojo.

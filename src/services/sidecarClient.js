@@ -296,6 +296,9 @@ const ALLOWED_TOOLS = new Set([
   'get_biopreparados',
   'get_pest_controllers',
   'get_multihop_companions',
+  // GraphRAG multi-hop + restauración (sidecar feat/graphrag-multihop, 2026-06-10).
+  'get_subgrafo_relacional',
+  'get_diseno_restauracion',
   'validate_visual_match',
   'validate_taxonomy',
   'get_normativa_ica',
