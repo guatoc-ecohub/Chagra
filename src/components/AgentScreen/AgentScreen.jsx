@@ -55,6 +55,7 @@ import { planForcedIntent, isStubIntent, isDeepResearchIntent, CHIP_DEFS } from 
 // (entidad resuelta o keyword → get_species/get_pest_controllers/get_biopreparados)
 // para intentar AL MENOS una consulta al grafo en vez de caer a generativo puro.
 import { planNluFallback } from '../../services/agentNluFallback';
+import { planKnowledgeIntent } from '../../services/knowledgeIntentRouter';
 // Deep Research (A6/A7): cliente HTTP del endpoint async de investigación
 // profunda del sidecar. Feature flag VITE_DEEP_RESEARCH_ENABLED (default false).
 import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../../services/deepResearchClient';
@@ -1225,6 +1226,39 @@ export default function AgentScreen({ onBack, initialContext }) {
             }
           } catch (_) { /* graceful: subgrafoBloque queda '' */ }
 
+          // PASO 2-pre — routing determinístico de CONOCIMIENTO del grafo
+          // (usos tradicionales / toxicidad / variedades / suelo). Igual que el
+          // chip forzado, salta el planner NLU cuando la intención es inequívoca
+          // y hay una especie ya resuelta: "¿la yuca brava es tóxica?",
+          // "¿para qué sirve la ruda?", "¿qué variedades de café hay?",
+          // "¿qué pH necesita la papa?". El resultado entra como toolEvidence →
+          // bloque de grounding del system prompt (promptAssembler, intocable).
+          // found:false TAMBIÉN es evidencia útil: trae la nota anti-invención
+          // y el agente responde neutral en vez de fabricar. No corre bajo chip
+          // forzado (el chip ya decidió el tool determinístico).
+          if (!forcedIntent) {
+            try {
+              const kPlan = planKnowledgeIntent(textForLLM, resolvedEntities);
+              if (kPlan && kPlan.tool) {
+                const tK0 = performance.now();
+                const kResult = await callTool(kPlan.tool, kPlan.args);
+                const tK1 = performance.now();
+                // available:false = grafo caído → NO inyectamos (dejamos que el
+                // planner NLU / fallback decidan); null = error de red, ídem.
+                if (kResult && kResult.available !== false) {
+                  toolEvidence = { tool: kPlan.tool, args: kPlan.args, result: kResult };
+                  nluRoute = `conocimiento:${kPlan.tool}`;
+                  console.debug('[sidecar] conocimiento del grafo (NLU saltado)', {
+                    tool: kPlan.tool,
+                    source: kPlan.source,
+                    found: kResult.found,
+                    latencyTool: Math.round(tK1 - tK0),
+                  });
+                }
+              }
+            } catch (_) { /* graceful: sigue el flujo NLU normal */ }
+          }
+
           // PASO 2 — routing del tool.
           //
           // CHIPS DE MODO (A3): si el usuario forzó la intención tocando un
@@ -1275,8 +1309,9 @@ export default function AgentScreen({ onBack, initialContext }) {
                 }
               }
             }
-          } else {
-          // PASO 2b — NLU planner + tool call (flow original, sin chip).
+          } else if (!toolEvidence) {
+          // PASO 2b — NLU planner + tool call (flow original, sin chip y sin
+          // evidencia ya resuelta por el routing de conocimiento del PASO 2-pre).
           const tNlu0 = performance.now();
           const plan = await planNlu(textForLLM, contextMemory);
           if (plan?.tool) nluRoute = `nlu:${plan.tool}`;

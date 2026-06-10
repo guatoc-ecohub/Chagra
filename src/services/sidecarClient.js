@@ -308,6 +308,15 @@ const ALLOWED_TOOLS = new Set([
   // Cache compartida con `/clima/snapshot` y refrescada por systemd timer.
   'get_enso_status',
   'get_alertas_clima_zona',
+  // Grounding de conocimiento del grafo (2026-06-10): usos tradicionales
+  // documentados (siempre con descargo educativo), perfil de toxicidad,
+  // variedades/cultivares registrados y requerimientos de suelo/nutrición.
+  // Si el grafo no tiene el dato, la tool devuelve found:false y el agente
+  // responde neutral — NUNCA inventa.
+  'get_saberes',
+  'get_toxicidad',
+  'get_variedades',
+  'get_suelo',
 ]);
 
 const NORMATIVA_ICA_ACTIONS = new Set([
