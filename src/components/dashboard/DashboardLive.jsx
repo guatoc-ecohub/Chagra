@@ -192,7 +192,8 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
             {/* ── Araña visual de capacidades del agente ──
                 Nature: árbol orgánico. Biopunk: red micorrizal. Minimalista: lista.
                 Muestra todas las funciones con estado real (conectada/pendiente/Pro).
-                Campesino-friendly: metáforas naturales, colores tierra, etiquetas claras. */}
+                Campesino-friendly: metáforas naturales, colores tierra, etiquetas claras.
+                Deploy verification: v2-2026-06-10 */}
             <div className="px-4 py-2">
                 <AgentAraña onSelect={(id) => onNavigate('agente', { intent: id })} />
             </div>
