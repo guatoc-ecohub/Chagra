@@ -43,8 +43,8 @@ import ChagraAgentAvatar from '../ChagraAgentAvatar';
  *   │  [¿Qué siembro?] [Plagas] [Clima]            │ ← chips
  *   │  ╭───────────────────────────────────────╮  │
  *   │  │ Pregúntale a Chagra…                  │  │ ← compositor pill anclado
- *   │  │ Ⓐ            📷 📎      🎤  ⬆          │  │   Ⓐ (izq) abre el menú de
- *   │  ╰───────────────────────────────────────╯  │   capacidades (bottom-sheet)
+ *   │  │ Ⓐ            📷 📎      🎤  ⬆          │  │   Ⓐ (izq) despliega la red
+ *   │  ╰───────────────────────────────────────╯  │   de capacidades EN el hero
  *   └─────────────────────────────────────────────┘
  *
  * QUÉ ES FIEL AL DEMO:
@@ -60,8 +60,10 @@ import ChagraAgentAvatar from '../ChagraAgentAvatar';
  *   - Toggle Campesino/Experto cableado al motor REAL `nivel_respuestas`
  *     (simple/detallado en userProfileService) — mueve el perfil de verdad y
  *     cambia el saludo, como el demo (COPY.campesino/experto).
- *   - Botón Ⓐ a la izquierda del compositor abre un bottom-sheet (.sheet del
- *     demo) con TODAS las capacidades reales de Chagra, cada una con su routing.
+ *   - Botón Ⓐ a la izquierda del compositor despliega la red de capacidades
+ *     (AgentRedMenu) INTEGRADA al hero: el saludo/chips se pliegan y la red
+ *     brota en la zona-respiro, sobre el mismo lienzo del tema (operador
+ *     2026-06-09: nada de bottom-sheet/modal aparte). Cada rama rutea real.
  *
  * QUÉ NO SE PORTÓ (y por qué, honesto):
  *   - El avatar 3D (ChagraAgentAvatar) + halo conic: ELIMINADOS por orden del
@@ -163,8 +165,13 @@ export default function AgentHero({ onNavigate }) {
     const [busy, setBusy] = useState(false);
     // Fase de la transición de envío: 'idle' | 'sending'.
     const [phase, setPhase] = useState('idle');
-    // Menú Ⓐ (bottom-sheet de capacidades). false=cerrado | true=abierto.
-    const [sheetOpen, setSheetOpen] = useState(false);
+    // Menú Ⓐ (la red de capacidades). Integrado AL hero (operador 2026-06-09:
+    // nada de bottom-sheet aparte): al abrir, el saludo/chips se PLIEGAN y la
+    // red brota en la zona-respiro, sobre el mismo lienzo del tema.
+    // menuOpen=montado · menuClosing=animando el cierre antes de desmontar.
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [menuClosing, setMenuClosing] = useState(false);
+    const menuCloseTimerRef = useRef(null);
     // Nivel de respuestas del perfil (campesino=simple / experto=detallado).
     // Lo leemos del perfil real al montar; el toggle lo persiste de verdad.
     const [nivel, setNivel] = useState(() => {
@@ -174,6 +181,10 @@ export default function AgentHero({ onNavigate }) {
 
     const textareaRef = useRef(null);
     const cameraInputRef = useRef(null);
+    // Ancla de la red Ⓐ: el botón del agente en el compositor ES la raíz
+    // geométrica del menú (operador 2026-06-10: una sola Ⓐ — la red nace
+    // del botón real, no de un nodo duplicado dentro del menú).
+    const aButtonRef = useRef(null);
 
     // Sistema de temas REAL de la app (data-theme en <html>, persiste en
     // localStorage). Aquí solo LEEMOS el tema para pintar el ícono de la marca
@@ -321,15 +332,50 @@ export default function AgentHero({ onNavigate }) {
         try { saveProfile({ nivel_respuestas: next }); } catch { /* perfil opcional */ }
     };
 
-    // ── Menú Ⓐ (bottom-sheet de capacidades) ─────────────────────────────────
-    const toggleSheet = () => setSheetOpen((o) => !o);
-    const closeSheet = () => setSheetOpen(false);
+    // ── Menú Ⓐ (red de capacidades INTEGRADA al hero) ────────────────────────
+    // Abrir = plegar saludo/chips y brotar la red en la zona-respiro.
+    // Cerrar = breve fade de salida (MENU_CLOSE_MS) y desmontar; con
+    // prefers-reduced-motion el cierre es inmediato.
+    const MENU_CLOSE_MS = 300;
+    const openMenu = () => {
+        window.clearTimeout(menuCloseTimerRef.current);
+        setMenuClosing(false);
+        setMenuOpen(true);
+    };
+    const closeMenu = () => {
+        if (prefersReducedMotion()) {
+            setMenuOpen(false);
+            setMenuClosing(false);
+            return;
+        }
+        setMenuClosing(true);
+        menuCloseTimerRef.current = window.setTimeout(() => {
+            setMenuOpen(false);
+            setMenuClosing(false);
+        }, MENU_CLOSE_MS);
+    };
+    const toggleMenu = () => {
+        if (menuOpen && !menuClosing) closeMenu();
+        else openMenu();
+    };
 
-    // Despacha una capacidad del sheet a su routing real.
+    // Limpia el timer de cierre al desmontar y cierra con Escape (a11y).
+    useEffect(() => () => window.clearTimeout(menuCloseTimerRef.current), []);
+    useEffect(() => {
+        if (!menuOpen) return undefined;
+        const onKey = (e) => { if (e.key === 'Escape') closeMenu(); };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [menuOpen]);
+
+    // Despacha una capacidad de la red a su routing real. El manifiesto
+    // unificado (agentCapabilities.js) llama `heroRoute` al routing del hero;
+    // leer `cap.route` dejaba TODOS los picks muertos en silencio (bug
+    // pre-existente de main, detectado en la validación visual 2026-06-09).
     const pickCapability = (cap) => {
-        if (cap.status === 'soon' || !cap.route || cap.route.kind === 'unavailable') return;
-        closeSheet();
-        const r = cap.route;
+        const r = cap.heroRoute || cap.route;
+        if (cap.status === 'soon' || !r || r.kind === 'unavailable') return;
+        closeMenu();
         if (r.kind === 'ask') {
             handleChipSend(r.prompt);
         } else if (r.kind === 'nav') {
@@ -862,9 +908,16 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-tool:not(.is-open) {
                     animation: agentport-pulse-ring 3.6s cubic-bezier(.22,.61,.36,1) infinite;
                 }
+                /* Abierto = la Ⓐ ES la raíz viva de la red: se rellena con el
+                   acento y respira (glow suave) — la misma savia de las ramas
+                   que brotan de ella en la zona-respiro (un solo organismo). */
                 .agentport-tool.is-open {
                     background: rgb(var(--t-accent-rgb)); border-color: rgb(var(--t-accent-rgb));
-                    animation: none;
+                    animation: agentport-root-breathe 3.4s ease-in-out infinite;
+                }
+                @keyframes agentport-root-breathe {
+                    0%, 100% { box-shadow: 0 0 12px -2px rgb(var(--t-accent-rgb) / 0.55); }
+                    50% { box-shadow: 0 0 24px 2px rgb(var(--t-accent-rgb) / 0.85); }
                 }
                 /* al abrir, el ícono se vuelve blanco para contrastar con el acento */
                 .agentport-tool.is-open .agentport-tool-ico path,
@@ -909,31 +962,65 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-hint { text-align: center; font-size: 0.72rem; margin-top: 9px; color: rgb(var(--c-slate-500)); }
                 .agentport-hint b { color: rgb(var(--t-accent-rgb)); font-weight: 700; }
 
-                /* ===================== BOTTOM SHEET (menú Ⓐ) ===================== */
-                .agentport-scrim {
-                    position: fixed; inset: 0; background: rgba(10, 8, 4, 0.5);
-                    backdrop-filter: blur(2px); opacity: 0; pointer-events: none;
-                    transition: opacity 0.42s cubic-bezier(.32,.72,0,1); z-index: 60;
+                /* ============== MENÚ Ⓐ INTEGRADO (la red en el hero) ==============
+                   Nada de bottom-sheet/scrim/modal (operador 2026-06-09: "que se
+                   abra APARTE del agente lo vuelve feo"). Mecánica: al tocar Ⓐ,
+                   el saludo+chips se PLIEGAN (grid 1fr→0fr) y la zona-respiro
+                   (flex:1) absorbe el espacio; allí BROTA la red, full-bleed y
+                   transparente, sobre la misma escena del tema. El compositor no
+                   se mueve: el árbol crece desde el mismo lienzo donde está Ⓐ. */
+
+                /* plegado fluido del saludo/alerta/chips al abrir el menú */
+                .agentport-foldaway {
+                    display: grid; grid-template-rows: 1fr;
+                    transition: grid-template-rows .5s cubic-bezier(.32,.72,0,1),
+                                opacity .32s ease;
                 }
-                .agentport-scrim.is-open { opacity: 1; pointer-events: auto; }
-                .agentport-sheet {
-                    position: fixed; left: 0; right: 0; bottom: 0; z-index: 61;
-                    max-width: 640px; margin: 0 auto;
-                    background: rgb(var(--c-surface-raised));
-                    border-radius: 26px 26px 0 0;
-                    box-shadow: 0 -16px 40px -16px rgba(0, 0, 0, 0.55);
-                    border-top: 1px solid rgb(var(--c-surface-border));
-                    transform: translateY(110%); transition: transform 0.5s cubic-bezier(.32,.72,0,1);
-                    max-height: 92dvh; display: flex; flex-direction: column; will-change: transform;
+                .agentport-foldaway.is-folded {
+                    grid-template-rows: 0fr; opacity: 0; pointer-events: none;
                 }
-                .agentport-sheet.is-open { transform: translateY(0); }
-                .agentport-grab { width: 42px; height: 5px; background: rgb(var(--c-surface-border)); border-radius: 5px; margin: 10px auto 4px; flex: none; }
-                .agentport-sheet-h { padding: 6px 22px 4px; text-align: center; flex: none; }
-                .agentport-sheet-h .t { font-size: 1.18rem; font-weight: 800; color: rgb(var(--c-slate-100)); letter-spacing: -.01em; }
-                .agentport-sheet-h .s { font-size: .86rem; color: rgb(var(--c-slate-300)); margin-top: 4px; line-height: 1.45; }
-                [data-nivel="detallado"] .agentport-sheet-h .s { font-size: .8rem; }
-                .agentport-sheet-foot { padding: 6px 22px calc(18px + env(safe-area-inset-bottom)); text-align: center; font-size: .72rem; color: rgb(var(--c-slate-500)); flex: none; }
-                .agentport-sheet-foot b { color: rgb(var(--t-accent-rgb)); }
+                .agentport-foldaway-in { min-height: 0; overflow: hidden; }
+
+                /* panel de la red: vive DENTRO de la zona-respiro, sin caja */
+                .agentport-redpanel {
+                    position: absolute; inset: 0;
+                    display: flex; flex-direction: column;
+                    animation: agentport-red-in .5s cubic-bezier(.32,.72,0,1) both;
+                }
+                .agentport-redpanel.is-closing {
+                    transition: opacity .28s ease, transform .28s ease;
+                    opacity: 0; transform: translateY(10px) scale(.985);
+                    pointer-events: none;
+                }
+                @keyframes agentport-red-in {
+                    from { opacity: 0; transform: translateY(16px) scale(.985); }
+                    to { opacity: 1; transform: none; }
+                }
+                .agentport-red-h { flex: none; text-align: center; padding: 0 14px 2px; }
+                .agentport-red-h .t {
+                    font-size: 1.02rem; font-weight: 800; letter-spacing: -.01em;
+                    color: rgb(var(--c-slate-100));
+                }
+                .agentport-red-h .s {
+                    display: block; font-size: .78rem; line-height: 1.4; margin-top: 2px;
+                    color: rgb(var(--c-slate-300));
+                }
+                .agentport-red-body { flex: 1 1 auto; min-height: 0; position: relative; overflow: hidden; }
+
+                /* con la red abierta, la escena ambiente baja el volumen (misma
+                   pantalla, foco en la red — no un modal encima) */
+                .agentport-sun, .agentport-astro, .agentport-mtn, .agentport-pollen,
+                .agentport-hummer, .agentport-net, .agentport-spore,
+                .agentport-roots, .agentport-sprig { transition: opacity .5s ease; }
+                .agentport-scene.is-quiet .agentport-sun,
+                .agentport-scene.is-quiet .agentport-astro,
+                .agentport-scene.is-quiet .agentport-mtn,
+                .agentport-scene.is-quiet .agentport-pollen,
+                .agentport-scene.is-quiet .agentport-hummer,
+                .agentport-scene.is-quiet .agentport-net,
+                .agentport-scene.is-quiet .agentport-spore,
+                .agentport-scene.is-quiet .agentport-roots,
+                .agentport-scene.is-quiet .agentport-sprig { opacity: .22; }
 
                 /* Transición de envío: shimmer + lift (contrato de tests). */
                 @keyframes chagra-send-shimmer {
@@ -963,14 +1050,20 @@ export default function AgentHero({ onNavigate }) {
                     .agentport-net .spark { display: none !important; }
                     .agentport-sprig path { stroke-dashoffset: 0 !important; animation: none !important; }
                     .agentport-tool:not(.is-open) { animation: none !important; }
+                    .agentport-tool.is-open { animation: none !important; }
                     .agentport-greet { animation: none !important; }
+                    .agentport-foldaway, .agentport-redpanel { transition: none !important; animation: none !important; }
                     .chagra-composer-shimmer::after, .chagra-composer-sending { animation: none !important; }
                 }
             `}</style>
 
             {/* ===================== ESCENA AMBIENTE (por tema) ===================== */}
             <div
-                className={['agentport-scene', night ? 'is-night' : 'is-day'].join(' ')}
+                className={[
+                    'agentport-scene',
+                    night ? 'is-night' : 'is-day',
+                    menuOpen && !menuClosing ? 'is-quiet' : '',
+                ].join(' ')}
                 aria-hidden="true"
             >
                 {/* — SOL/LUNA delicado, universal, según hora (operador 2026-06-06) — */}
@@ -1131,9 +1224,34 @@ export default function AgentHero({ onNavigate }) {
                 </div>
             </header>
 
-            {/* ===================== ZONA-RESPIRO (escena vive detrás) ===================== */}
-            <div className="agentport-stage" aria-hidden="true" />
+            {/* ============ ZONA-RESPIRO (escena detrás · red Ⓐ al abrir) ============
+                Con el menú abierto, la red de capacidades BROTA aquí mismo —
+                integrada al lienzo del hero, sin sheet ni scrim. */}
+            <div className="agentport-stage" aria-hidden={menuOpen ? undefined : 'true'}>
+                {menuOpen && (
+                    <div
+                        className={['agentport-redpanel', menuClosing ? 'is-closing' : ''].join(' ')}
+                        role="group"
+                        aria-label="Capacidades de Chagra"
+                    >
+                        <div className="agentport-red-h">
+                            <span className="t">La mano de Chagra</span>
+                            <span className="s">
+                                {expertoActive
+                                    ? 'Cada rama, una capacidad conectada. Las opacas están por llegar.'
+                                    : 'Mi mano en tu campo: cada rama es una ayuda. Las opacas llegan pronto.'}
+                            </span>
+                        </div>
+                        <div className="agentport-red-body">
+                            <AgentRedMenu onPick={pickCapability} disabled={busy} anchorRef={aButtonRef} />
+                        </div>
+                    </div>
+                )}
+            </div>
 
+            {/* ======= SALUDO + ALERTA + CHIPS (se pliegan al abrir el menú Ⓐ) ======= */}
+            <div className={['agentport-foldaway', menuOpen && !menuClosing ? 'is-folded' : ''].join(' ')}>
+            <div className="agentport-foldaway-in">
             {/* ===================== SALUDO ===================== */}
             <div className="agentport-greet">
                 <h2 className="agentport-hi">
@@ -1190,6 +1308,8 @@ export default function AgentHero({ onNavigate }) {
                         {chip.label}
                     </button>
                 ))}
+            </div>
+            </div>
             </div>
 
             {/* ===================== COMPOSITOR MULTIMODAL ===================== */}
@@ -1261,14 +1381,17 @@ export default function AgentHero({ onNavigate }) {
 
                     {/* Fila 2: Ⓐ a la izquierda · cámara/adjuntar · mic/enviar a la derecha */}
                     <div className="flex items-center gap-2 px-1 pb-1 pt-0.5">
-                        {/* Botón Ⓐ — abre el menú de capacidades (bottom-sheet) */}
+                        {/* Botón Ⓐ — despliega/pliega la red de capacidades EN el
+                            hero. Es LA raíz de la red (única Ⓐ): el menú lee su
+                            posición vía aButtonRef y las ramas brotan de aquí. */}
                         <button
                             type="button"
-                            onClick={toggleSheet}
+                            ref={aButtonRef}
+                            onClick={toggleMenu}
                             disabled={isRecording}
                             aria-label="Ver todo lo que puede hacer Chagra"
-                            aria-expanded={sheetOpen}
-                            className={['agentport-iconbtn agentport-tool !w-11 !h-11', sheetOpen ? 'is-open' : ''].join(' ')}
+                            aria-expanded={menuOpen && !menuClosing}
+                            className={['agentport-iconbtn agentport-tool !w-11 !h-11', menuOpen && !menuClosing ? 'is-open' : ''].join(' ')}
                         >
                             <span className="agentport-tool-ico" aria-hidden="true">{iconForTheme(theme)}</span>
                         </button>
@@ -1336,10 +1459,15 @@ export default function AgentHero({ onNavigate }) {
                     />
                 </div>
 
-                {/* Hint bajo la pill (réplica de .hintbar del demo). */}
+                {/* Hint bajo la pill (réplica de .hintbar del demo). Con la red
+                    abierta muta a la línea de fuentes (antes pie del sheet). */}
                 {!isRecording && !attachment && (
                     <p className="agentport-hint">
-                        Toca <b>Ⓐ</b> para ver todo lo que sé hacer, o escríbeme aquí
+                        {menuOpen && !menuClosing ? (
+                            <>Chagra responde con información de <b>AGROSAVIA</b>, <b>ICA</b> e <b>IDEAM</b>.</>
+                        ) : (
+                            <>Toca <b>Ⓐ</b> para ver todo lo que sé hacer, o escríbeme aquí</>
+                        )}
                     </p>
                 )}
 
@@ -1356,36 +1484,6 @@ export default function AgentHero({ onNavigate }) {
                 )}
             </div>
 
-            {/* ===================== SCRIM + BOTTOM SHEET (menú Ⓐ) ===================== */}
-            <div
-                className={['agentport-scrim', sheetOpen ? 'is-open' : ''].join(' ')}
-                onClick={closeSheet}
-                aria-hidden="true"
-            />
-            <section
-                className={['agentport-sheet', sheetOpen ? 'is-open' : ''].join(' ')}
-                role="dialog"
-                aria-modal={sheetOpen}
-                aria-label="Capacidades de Chagra"
-                aria-hidden={!sheetOpen}
-            >
-                <div className="agentport-grab" aria-hidden="true" />
-                <div className="agentport-sheet-h">
-                    <div className="t">La mano de Chagra</div>
-                    <div className="s">
-                        {expertoActive
-                            ? 'Cada rama, una capacidad conectada. Las opacas están por llegar.'
-                            : 'Mi mano en tu campo: cada rama es una ayuda. Las opacas llegan pronto.'}
-                    </div>
-                </div>
-                {/* La mano de Chagra (emblema + capacidades) — componente único
-                    compartido con el panel inline. Solo se monta cuando el sheet
-                    está abierto, para que el dibujado se reproduzca al desplegar. */}
-                {sheetOpen && <AgentRedMenu onPick={pickCapability} disabled={busy} />}
-                <div className="agentport-sheet-foot">
-                    Chagra responde con información de <b>AGROSAVIA</b>, <b>ICA</b> e <b>IDEAM</b>.
-                </div>
-            </section>
         </section>
     );
 }

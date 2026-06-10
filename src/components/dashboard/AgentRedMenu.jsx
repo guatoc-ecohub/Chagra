@@ -18,16 +18,26 @@ import { CAPABILITY_MANIFEST } from '../../services/agentCapabilities';
  *   - El tema se LEE de <html data-theme> (lo escribe useTheme/applyTheme;
  *     biopunk = sin atributo). MutationObserver re-evalúa cambios en vivo.
  *     Sin barra selectora propia (eso vive en Perfil).
- *   - Sin FAB Ⓐ ni sheet propios: se renderiza DENTRO del bottom-sheet del
- *     AgentHero. El nodo Ⓐ abajo-centro es la raíz del árbol (y "volver").
+ *   - Sin FAB Ⓐ, sin sheet y SIN MARCO propio: se renderiza INTEGRADO en el
+ *     lienzo del AgentHero (la zona-respiro), full-bleed y transparente — la
+ *     escena del hero por tema es el fondo. El contenedor padre decide el
+ *     alto (height:100%).
+ *   - UNA SOLA Ⓐ (operador 2026-06-10): el menú NO renderiza nodo raíz propio.
+ *     La raíz geométrica de la red ES el botón Ⓐ real del compositor (vive en
+ *     AgentHero, abajo-izquierda); el padre lo comparte vía `anchorRef` y acá
+ *     se mide su centro en coordenadas del lienzo (queda bajo el borde
+ *     inferior — las ramas brotan del borde apuntando exactamente al botón).
  *   - `prefers-reduced-motion` → sin loop rAF: un solo paint al estado final.
  *   - Cleanup completo: rAF, timers, ResizeObserver, MutationObserver, paths.
  *
- * Mecánicas por tema (idénticas al demo):
- *   - biopunk / minimalista → "micorriza": ramas radiales desde la raíz Ⓐ;
- *     al enfocar, el grupo VIAJA al hub y los demás se vuelven yemas.
- *   - nature → "árbol": tronco vertical que brota + ramas alternadas; al
- *     enfocar, el follaje brota EN SITIO y las demás ramas se atenúan.
+ * Mecánicas por tema (refinamiento 2026-06-10):
+ *   - biopunk / minimalista → "micorriza": la red brota del botón Ⓐ
+ *     (abajo-izquierda) y se despliega en diagonal hacia ARRIBA-DERECHA,
+ *     al espacio libre del hero. Al enfocar, el grupo VIAJA al hub (sobre la
+ *     diagonal) y los demás se vuelven yemas recogidas junto al origen.
+ *   - nature → "árbol": tronco vertical CENTRADO que brota + ramas alternadas;
+ *     una vena/raíz orgánica conecta el botón Ⓐ con la base del tronco (un
+ *     solo organismo). Al enfocar, el follaje brota EN SITIO.
  */
 
 /* ══════════════ datos: grupos derivados del manifiesto ══════════════ */
@@ -190,21 +200,18 @@ function bounce(el) {
 /* ══════════════ estilos (CSS del demo, scoped arm-) ══════════════ */
 
 const CSS = `
+/* SIN MARCO (operador 2026-06-09): nada de caja con borde/radius/fondo —
+   la red respira full-bleed sobre el lienzo del AgentHero; el padre da el
+   alto. Solo overflow:hidden para que esporas/ramas no se salgan. */
 .arm-root{
-  position:relative;width:100%;height:560px;max-height:calc(100dvh - 170px);min-height:420px;
-  overflow:hidden;border-radius:24px;
-  background:var(--sheetBg);border:1px solid var(--sheetEdge);
+  position:relative;width:100%;height:100%;min-height:380px;
+  overflow:hidden;background:transparent;
   -webkit-tap-highlight-color:transparent;
   /* ---- tema biopunk (base) ---- */
   --fam:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;
   --lblSize:13px; --lblSp:.01em; --lblW:800;
   --lblC:#ffffff; --lblBg:rgba(3,12,9,.9); --lblEdge:rgba(25,199,154,.55);
   --lblShadow:0 2px 8px rgba(0,0,0,.6);
-  --sheetBg:
-    radial-gradient(135% 95% at 50% 103%,rgba(25,199,154,.20),rgba(25,199,154,.05) 42%,transparent 64%),
-    radial-gradient(90% 55% at 86% -6%,rgba(38,110,160,.16),transparent 60%),
-    linear-gradient(180deg,#0d1422,#0a0e14 85%);
-  --sheetEdge:rgba(25,199,154,.35);
   --branch:#19c79a; --coreW:2.2px;
   --glowC:rgba(25,199,154,.30); --glowW:8px; --glowO:1; --glowBlur:3px;
   --twigC:rgba(25,199,154,.55);
@@ -213,9 +220,7 @@ const CSS = `
   --orbShadow:0 0 22px rgba(25,199,154,.32),0 0 6px rgba(25,199,154,.5),inset 0 0 16px rgba(25,199,154,.10);
   --orbRadA:50%; --orbRadB:50%;
   --pulse:rgba(25,199,154,.55);
-  --spore:#19c79a; --spO:.7; --noiseO:.05;
-  --rootBg:radial-gradient(circle at 35% 28%,#34efbe,#129b78 75%);
-  --rootGlyph:#06231b; --rootShadow:0 0 26px rgba(25,199,154,.55),0 4px 14px rgba(0,0,0,.5);
+  --spore:#19c79a; --spO:.7;
   --crumbBg:rgba(25,199,154,.16); --crumbC:#c8f3e2; --crumbEdge:rgba(25,199,154,.45);
   --toastBg:#0e1a18; --toastC:#d8f7e9; --toastEdge:rgba(25,199,154,.45);
   --hintC:rgba(190,240,220,.85);
@@ -227,11 +232,6 @@ const CSS = `
   --lblSize:13.5px; --lblSp:0; --lblW:700;
   --lblC:#2e2414; --lblBg:rgba(255,250,238,.95); --lblEdge:rgba(121,87,53,.5);
   --lblShadow:0 2px 6px rgba(90,60,30,.22);
-  --sheetBg:
-    radial-gradient(85% 45% at 80% -8%,rgba(241,199,118,.42),transparent 58%),
-    linear-gradient(to top,rgba(108,139,77,.30),rgba(108,139,77,.08) 130px,transparent 210px),
-    linear-gradient(180deg,#f3ead4,#faf3e2 40%,#f5edd9);
-  --sheetEdge:rgba(121,87,53,.35);
   --branch:#6e4f2e; --coreW:4px;
   --glowC:rgba(121,87,53,.22); --glowW:9px; --glowO:1; --glowBlur:1.5px;
   --twigC:rgba(110,79,46,.6);
@@ -241,9 +241,7 @@ const CSS = `
   --orbRadA:58% 42% 55% 45% / 45% 58% 42% 55%;
   --orbRadB:44% 56% 48% 52% / 56% 44% 58% 42%;
   --pulse:rgba(95,124,66,.5);
-  --spore:#7c9a4e; --spO:.6; --noiseO:.08;
-  --rootBg:radial-gradient(circle at 35% 28%,#8fae62,#5f7c42 78%);
-  --rootGlyph:#fdf8e9; --rootShadow:0 5px 16px rgba(80,60,30,.4);
+  --spore:#7c9a4e; --spO:.6;
   --crumbBg:rgba(255,250,238,.9); --crumbC:#4a3a1f; --crumbEdge:rgba(121,87,53,.45);
   --toastBg:#fffaf0; --toastC:#3c2f18; --toastEdge:rgba(121,87,53,.4);
   --hintC:rgba(74,58,31,.8);
@@ -255,8 +253,6 @@ const CSS = `
   --lblSize:12.5px; --lblSp:.02em; --lblW:700;
   --lblC:#143d31; --lblBg:rgba(255,255,255,.96); --lblEdge:rgba(47,110,90,.35);
   --lblShadow:0 1px 4px rgba(30,40,35,.12);
-  --sheetBg:linear-gradient(180deg,#f9f6ee,#f6f3ec);
-  --sheetEdge:rgba(47,110,90,.28);
   --branch:#2f6e5a; --coreW:1.6px;
   --glowC:transparent; --glowW:0px; --glowO:0; --glowBlur:0px;
   --twigC:rgba(47,110,90,.45);
@@ -265,30 +261,31 @@ const CSS = `
   --orbShadow:0 2px 6px rgba(30,40,35,.1);
   --orbRadA:50%; --orbRadB:50%;
   --pulse:transparent;
-  --spore:transparent; --spO:0; --noiseO:.03;
-  --rootBg:#2f6e5a;
-  --rootGlyph:#f6f3ec; --rootShadow:0 3px 10px rgba(30,50,42,.25);
+  --spore:transparent; --spO:0;
   --crumbBg:#ffffff; --crumbC:#1f5847; --crumbEdge:rgba(47,110,90,.35);
   --toastBg:#ffffff; --toastC:#1f5847; --toastEdge:rgba(47,110,90,.3);
   --hintC:rgba(31,88,71,.7);
   --trunkC:#2f6e5a; --trunkHi:#5ea58d;
 }
 .arm-root.arm-disabled{pointer-events:none;opacity:.55}
-.arm-root::after{content:"";position:absolute;inset:0;z-index:6;pointer-events:none;
-  opacity:var(--noiseO);mix-blend-mode:overlay;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='0.65'/></svg>");
-}
+/* La textura de ruido del demo se quitó en la integración: sobre el lienzo
+   transparente del hero dibujaba un rectángulo "sucio" (el marco que el
+   operador rechazó). El grano ambiente lo pone la escena del hero. */
 .arm-web{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
 .arm-gtrunk path{fill:none;stroke-linecap:round;transition:stroke .5s}
 .arm-gtrunk .tkB{stroke:var(--trunkC);stroke-width:17px}
 .arm-gtrunk .tkO{stroke:var(--trunkC);stroke-width:10px}
 .arm-gtrunk .tkI{stroke:var(--trunkHi);stroke-width:3.5px;opacity:.8}
+/* vena Ⓐ→tronco (nature): raíz superficial que conecta el botón del agente
+   con la base del tronco centrado — un solo organismo, no dos piezas. */
+.arm-gtrunk .vnO{stroke:var(--trunkC);stroke-width:8px;opacity:.95}
+.arm-gtrunk .vnI{stroke:var(--trunkHi);stroke-width:2.6px;opacity:.75}
 .arm-gglow{opacity:var(--glowO);filter:blur(var(--glowBlur));animation:armBreathe 4.5s ease-in-out infinite}
 .arm-gglow path{stroke:var(--glowC);stroke-width:var(--glowW);fill:none;stroke-linecap:round;transition:stroke .5s}
 .arm-gcore path{stroke:var(--branch);stroke-width:var(--coreW);fill:none;stroke-linecap:round;transition:stroke .5s}
 .arm-gcore path.lf{stroke-width:calc(var(--coreW)*.78)}
 .arm-gtwig path{stroke:var(--twigC);stroke-width:1.1px;fill:none;stroke-linecap:round;transition:stroke .5s}
-.arm-gtwig path.rt{opacity:.5;stroke-width:1.3px}
+.arm-gtwig path.rt{opacity:.62;stroke-width:1.4px}
 .arm-gtwig path.gd{opacity:.65;stroke-width:2.2px}
 @keyframes armBreathe{0%,100%{opacity:var(--glowO)}50%{opacity:calc(var(--glowO)*.55)}}
 .arm-spores{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
@@ -320,6 +317,8 @@ const CSS = `
 }
 .arm-node::before{content:"";position:absolute;inset:-10px} /* target de toque >= 92px */
 .arm-node.arm-leaf{width:66px;height:66px;margin:-33px 0 0 -33px;z-index:5}
+/* (el nodo raíz Ⓐ propio del menú se ELIMINÓ — operador 2026-06-10: una sola
+   Ⓐ, la del botón del agente en el compositor; la red nace de ese ancla) */
 .arm-orb{
   position:absolute;inset:0;display:grid;place-items:center;
   background:var(--orbBg);border:var(--ringW) solid var(--ringGroup);
@@ -329,17 +328,12 @@ const CSS = `
 }
 .arm-node:nth-child(even) .arm-orb{border-radius:var(--orbRadB)}
 .arm-node.arm-leaf .arm-orb{border-color:var(--ringLeaf)}
-.arm-node.arm-rootn{z-index:4;width:78px;height:78px;margin:-39px 0 0 -39px}
-.arm-node.arm-rootn .arm-orb{background:var(--rootBg);border:none;box-shadow:var(--rootShadow);border-radius:50%;
-  animation:armSprout .6s cubic-bezier(.34,1.55,.5,1) both .12s}
-.arm-node.arm-rootn .arm-ic{font-family:Georgia,serif;font-size:38px;color:var(--rootGlyph);font-style:normal}
-.arm-node.arm-group .arm-orb::after,.arm-node.arm-rootn .arm-orb::after{
+.arm-node.arm-group .arm-orb::after{
   content:"";position:absolute;inset:-5px;border-radius:inherit;
   border:1px solid var(--pulse);animation:armPing 3.4s ease-out infinite;
   animation-delay:var(--pd,0s);
 }
 @keyframes armPing{0%{transform:scale(.88);opacity:.8}70%,100%{transform:scale(1.4);opacity:0}}
-@keyframes armSprout{from{transform:scale(0)}to{transform:scale(1)}}
 .arm-ic{display:block;font-size:35px;font-style:normal;
   animation:armSway var(--swD,5s) ease-in-out var(--swDel,0s) infinite alternate}
 .arm-node.arm-leaf .arm-ic{font-size:31px}
@@ -360,7 +354,9 @@ const CSS = `
   padding:2px 7px;opacity:.9}
 .arm-node.arm-soon{cursor:default}
 .arm-node.arm-soon .arm-orb{border-style:dashed}
-.arm-hint{position:absolute;left:50%;bottom:120px;transform:translateX(-50%);z-index:4;
+/* pista de uso — abajo-derecha: la esquina libre con la red brotando del
+   botón Ⓐ (abajo-izquierda) hacia arriba-derecha. */
+.arm-hint{position:absolute;right:14px;bottom:10px;z-index:4;
   font-family:var(--fam);font-size:13.5px;font-weight:700;letter-spacing:.04em;color:var(--hintC);
   pointer-events:none;transition:opacity .6s;white-space:nowrap}
 .arm-hint.off{opacity:0}
@@ -386,7 +382,7 @@ const CSS = `
 
 /* ══════════════ componente ══════════════ */
 
-export default function AgentRedMenu({ onPick, disabled = false }) {
+export default function AgentRedMenu({ onPick, disabled = false, anchorRef = null }) {
   const rootRef = useRef(null);
   const engineRef = useRef(null);
   const toastTimerRef = useRef(null);
@@ -422,10 +418,11 @@ export default function AgentRedMenu({ onPick, disabled = false }) {
     const tkB = root.querySelector('[data-arm="tkB"]');
     const tkO = root.querySelector('[data-arm="tkO"]');
     const tkI = root.querySelector('[data-arm="tkI"]');
+    const vnO = root.querySelector('[data-arm="vnO"]');
+    const vnI = root.querySelector('[data-arm="vnI"]');
     const rootlets = root.querySelector('[data-arm="rootlets"]');
     const ground = root.querySelector('[data-arm="ground"]');
     const hintEl = root.querySelector('[data-arm="hint"]');
-    const rootNodeEl = root.querySelector('[data-arm="rootnode"]');
 
     /* estado de simulación por grupo/hoja (paths SVG creados acá). */
     const sim = GROUPS.map((g, i) => {
@@ -461,7 +458,7 @@ export default function AgentRedMenu({ onPick, disabled = false }) {
     const denom = Math.max(1, N - 1);
     let W = 0, H = 0, cx = 0, rootPt = { x: 0, y: 0 }, hub = { x: 0, y: 0 };
     let posOver = [], posBud = [];
-    let trunkBez = null, trunkLen = 1, attachPts = [], treePos = [], treeFocus = [];
+    let trunkBez = null, trunkLen = 1, venaLen = 1, attachPts = [], treePos = [], treeFocus = [];
     let trunkV = 0, trunkVT = 0;
     let focused = null;
     let rafId = null, last = 0, animUntil = 0;
@@ -473,43 +470,73 @@ export default function AgentRedMenu({ onPick, disabled = false }) {
       H = root.clientHeight;
       if (!W || !H) return;
       cx = W / 2;
-      rootPt = { x: cx, y: H - 76 };
+
+      /* LA RAÍZ ES EL BOTÓN Ⓐ REAL del compositor (vive en AgentHero, abajo-
+         izquierda). Medimos su centro en coordenadas de este lienzo: queda
+         BAJO el borde inferior (el compositor está debajo de la zona-respiro),
+         así las ramas brotan del borde apuntando exactamente al botón — una
+         sola Ⓐ, un solo organismo. Sin ancla (tests/jsdom): fallback
+         abajo-izquierda equivalente. */
+      const aEl = anchorRef && anchorRef.current;
+      const rb = root.getBoundingClientRect();
+      if (aEl && rb.width > 0) {
+        const ab = aEl.getBoundingClientRect();
+        rootPt = {
+          x: clampN(ab.left + ab.width / 2 - rb.left, 24, W - 24),
+          y: Math.max(H - 8, ab.top + ab.height / 2 - rb.top),
+        };
+      } else {
+        rootPt = { x: 46, y: H + 58 };
+      }
       svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
 
-      /* radial (biopunk/min): micorriza que explota desde la raíz */
-      const Rx = cx - 64, Ry = rootPt.y - 110;
-      const a0 = -Math.PI + 0.30, a1 = -0.30;
+      /* micorriza (biopunk/min): abanico diagonal hacia ARRIBA-DERECHA desde
+         la Ⓐ (operador 2026-06-10) — del origen abajo-izquierda al espacio
+         libre del hero. */
+      const a0 = -1.45, a1 = -0.30; /* casi vertical → casi horizontal der. */
+      const Rx = Math.max(120, W - rootPt.x - 84);
+      const Ry = Math.max(140, rootPt.y - 96);
       posOver = sim.map((s, i) => {
         const a = a0 + (a1 - a0) * i / denom;
         const k = KS[i % KS.length];
         return {
-          x: cx + Math.cos(a) * Rx * k + (rand(i + 31) - 0.5) * 18,
+          x: rootPt.x + Math.cos(a) * Rx * k + (rand(i + 31) - 0.5) * 18,
           y: rootPt.y + Math.sin(a) * Ry * k + (rand(i + 47) - 0.5) * 18,
         };
       });
-      relax(posOver, 106, { x0: 62, x1: W - 62, y0: 78, y1: rootPt.y - 84 });
+      /* y1 deja libre la franja inferior (pista "toque una rama" + labels) */
+      relax(posOver, 106, { x0: 62, x1: W - 62, y0: 82, y1: H - 118 });
 
+      /* yemas: recogidas junto al origen (abajo-izquierda, sobre la Ⓐ) */
       posBud = sim.map((s, i) => {
-        const a = a0 + (a1 - a0) * i / denom, r = i % 2 ? 100 : 66;
-        return { x: cx + Math.cos(a) * r, y: rootPt.y + Math.sin(a) * r * 0.82 };
+        const a = a0 + (a1 - a0) * i / denom, r = i % 2 ? 152 : 110;
+        return { x: rootPt.x + Math.cos(a) * r, y: rootPt.y + Math.sin(a) * r * 0.9 };
       });
-      relax(posBud, 46, { x0: 44, x1: W - 44, y0: rootPt.y - 128, y1: rootPt.y - 16 });
+      relax(posBud, 46, { x0: 40, x1: W - 44, y0: H - 158, y1: H - 26 });
 
-      hub = { x: cx, y: rootPt.y - Math.min(180, H * 0.31) };
-      const Lrx = Math.min(158, cx - 68), Lry = Math.min(188, hub.y - 114);
+      /* hub del foco: sobre la diagonal, dejando aire arriba-derecha para
+         que el follaje del grupo enfocado respire */
+      hub = {
+        x: clampN(rootPt.x + Math.min(132, W * 0.30), 96, Math.max(98, W - 150)),
+        y: Math.max(132, H * 0.46),
+      };
+      const Lrx = Math.max(96, Math.min(152, W - hub.x - 62));
+      const Lry = Math.max(72, Math.min(176, hub.y - 100, H - hub.y - 96));
       sim.forEach((s) => {
         const n = s.leaves.length;
         const sp = n > 1 ? Math.min(2.6, 0.9 * (n - 1)) : 0;
+        const center = -0.55; /* abanico sesgado hacia arriba-derecha */
         s.leafAbsR = s.leaves.map((lf, j) => {
-          const a = -Math.PI / 2 + (n > 1 ? -sp / 2 + sp * j / (n - 1) : 0);
+          const a = center + (n > 1 ? -sp / 2 + sp * j / (n - 1) : 0);
           return { x: hub.x + Math.cos(a) * Lrx, y: hub.y + Math.sin(a) * Lry };
         });
-        relax(s.leafAbsR, 96, { x0: 60, x1: W - 60, y0: 78, y1: hub.y + 8 });
+        relax(s.leafAbsR, 96, { x0: 60, x1: W - 60, y0: 84, y1: H - 70 });
         s.leafOffR = s.leafAbsR.map((p) => ({ x: p.x - hub.x, y: p.y - hub.y }));
       });
 
-      /* árbol (nature): tronco vertical + ramas alternadas */
-      const baseT = { x: cx, y: rootPt.y - 4 };
+      /* árbol (nature): tronco vertical CENTRADO (correcto funcional y
+         visualmente — operador 2026-06-10) + ramas alternadas */
+      const baseT = { x: cx, y: H - 56 };
       const topT = { x: cx + 10, y: Math.max(92, H * 0.14) };
       const Lh = baseT.y - topT.y;
       trunkBez = bezObj(
@@ -522,6 +549,21 @@ export default function AgentRedMenu({ onPick, disabled = false }) {
       tkB.setAttribute('d', trunkBez.d);
       tkO.setAttribute('d', trunkBez.d);
       tkI.setAttribute('d', trunkBez.d);
+
+      /* la VENA Ⓐ→tronco: raíz superficial que nace en el botón del agente
+         y repta por el suelo hasta la base del tronco — la conexión elegante
+         (un solo organismo, no dos piezas pegadas). */
+      const venaBez = bezObj(
+        rootPt,
+        /* sube casi vertical sobre la Ⓐ (asoma temprano en el lienzo)… */
+        { x: rootPt.x + 6, y: rootPt.y - Math.max(40, (rootPt.y - baseT.y - 26) * 0.55) },
+        /* …y repta por el suelo hasta la base del tronco */
+        { x: rootPt.x + (baseT.x - rootPt.x) * 0.45, y: baseT.y + 18 },
+        { x: baseT.x - 2, y: baseT.y + 6 },
+      );
+      venaLen = Math.hypot(baseT.x - rootPt.x, baseT.y - rootPt.y) * 1.3 + 1;
+      vnO.setAttribute('d', venaBez.d);
+      vnI.setAttribute('d', venaBez.d);
 
       attachPts = []; treePos = []; treeFocus = [];
       sim.forEach((s, i) => {
@@ -547,25 +589,39 @@ export default function AgentRedMenu({ onPick, disabled = false }) {
           const a = center + (n > 1 ? -spread / 2 + spread * j / (n - 1) : 0) * (side < 0 ? 1 : -1);
           return { x: fp.x + Math.cos(a) * r, y: fp.y + Math.sin(a) * r };
         });
-        relax(s.leafAbsT, 96, { x0: 64, x1: W - 64, y0: 78, y1: rootPt.y - 46 });
+        relax(s.leafAbsT, 96, { x0: 64, x1: W - 64, y0: 78, y1: baseT.y - 54 });
         s.leafOffT = s.leafAbsT.map((p) => ({ x: p.x - fp.x, y: p.y - fp.y }));
       });
 
-      rootNodeEl.style.transform = `translate(${r1(rootPt.x)}px,${r1(rootPt.y)}px)`;
-
-      /* raicillas decorativas bajo el nodo raíz */
+      /* decoración del arraigo:
+         - nature: raicillas bajo la base del tronco + arco de suelo.
+         - micorriza: boca de raicillas que brota de la Ⓐ hacia arriba-derecha
+           (largos calculados para asomar SIEMPRE sobre el borde inferior). */
       let d = '';
-      for (let k = 0; k < 5; k++) {
-        const a = Math.PI * (0.15 + 0.7 * k / 4);
-        const ex = rootPt.x + Math.cos(a) * (24 + rand(k + 40) * 34);
-        const ey = rootPt.y + 10 + Math.sin(a) * (16 + rand(k + 50) * 30);
-        const mx = rootPt.x + (ex - rootPt.x) * 0.35 + (rand(k + 60) - 0.5) * 10;
-        const my = rootPt.y + 12;
-        d += `M${r1(rootPt.x)} ${r1(rootPt.y + 8)} Q${r1(mx)} ${r1(my)} ${r1(ex)} ${r1(ey)} `;
+      if (treeMode) {
+        for (let k = 0; k < 5; k++) {
+          const a = Math.PI * (0.15 + 0.7 * k / 4);
+          const ex = baseT.x + Math.cos(a) * (24 + rand(k + 40) * 34);
+          const ey = baseT.y + 10 + Math.sin(a) * (16 + rand(k + 50) * 30);
+          const mx = baseT.x + (ex - baseT.x) * 0.35 + (rand(k + 60) - 0.5) * 10;
+          const my = baseT.y + 12;
+          d += `M${r1(baseT.x)} ${r1(baseT.y + 8)} Q${r1(mx)} ${r1(my)} ${r1(ex)} ${r1(ey)} `;
+        }
+      } else {
+        const depth = Math.max(0, rootPt.y - H);
+        for (let k = 0; k < 5; k++) {
+          const a = -1.32 + 1.0 * k / 4; /* -76°..-18°: hacia arriba-derecha */
+          const len = (depth + 26 + rand(k + 40) * 46) / Math.max(0.3, -Math.sin(a));
+          const ex = clampN(rootPt.x + Math.cos(a) * len, 16, W - 28);
+          const ey = rootPt.y + Math.sin(a) * len;
+          const mx = rootPt.x + (ex - rootPt.x) * 0.45 + (rand(k + 60) - 0.5) * 14;
+          const my = rootPt.y + Math.sin(a) * len * 0.45;
+          d += `M${r1(rootPt.x)} ${r1(rootPt.y)} Q${r1(mx)} ${r1(my)} ${r1(ex)} ${r1(ey)} `;
+        }
       }
       rootlets.setAttribute('d', d.trim());
       ground.setAttribute('d',
-        `M${r1(cx - 108)} ${r1(rootPt.y + 12)} Q${r1(cx)} ${r1(rootPt.y + 26)} ${r1(cx + 108)} ${r1(rootPt.y + 12)}`);
+        `M${r1(cx - 108)} ${r1(baseT.y + 12)} Q${r1(cx)} ${r1(baseT.y + 26)} ${r1(cx + 108)} ${r1(baseT.y + 12)}`);
     }
 
     /* ── bucle rAF (con reduced-motion: un solo paint al estado final) ── */
@@ -587,10 +643,16 @@ export default function AgentRedMenu({ onPick, disabled = false }) {
         md = Math.max(md, 200 * Math.abs(trunkVT - trunkV));
         const te = ease3(trunkV);
         if (trunkV < 0.995) {
+          /* la vena brota PRIMERO desde la Ⓐ; el tronco la sigue */
+          setDash(vnO, venaLen, Math.min(1, te * 2.6));
+          setDash(vnI, venaLen, Math.min(1, te * 2.6));
           setDash(tkB, trunkLen, Math.min(1, te * 4));
           setDash(tkO, trunkLen, te);
           setDash(tkI, trunkLen, te);
-        } else { clearDash(tkB); clearDash(tkO); clearDash(tkI); }
+        } else {
+          clearDash(tkB); clearDash(tkO); clearDash(tkI);
+          clearDash(vnO); clearDash(vnI);
+        }
         gTrunk.style.opacity = f == null ? 1 : 0.55;
       }
 
@@ -744,7 +806,7 @@ export default function AgentRedMenu({ onPick, disabled = false }) {
       });
       engineRef.current = null;
     };
-  }, [treeMode]);
+  }, [treeMode, anchorRef]);
 
   function showToast(msg) {
     setToastMsg(msg);
@@ -783,6 +845,9 @@ export default function AgentRedMenu({ onPick, disabled = false }) {
 
       <svg className="arm-web" data-arm="web" preserveAspectRatio="none" aria-hidden="true">
         <g className="arm-gtrunk" data-arm="gTrunk">
+          {/* vena Ⓐ→tronco primero: la base del tronco tapa la unión */}
+          <path className="vnO" data-arm="vnO" />
+          <path className="vnI" data-arm="vnI" />
           <path className="tkB" data-arm="tkB" />
           <path className="tkO" data-arm="tkO" />
           <path className="tkI" data-arm="tkI" />
@@ -875,17 +940,9 @@ export default function AgentRedMenu({ onPick, disabled = false }) {
           }),
         )}
 
-        <div
-          className="arm-node arm-rootn"
-          role="button"
-          tabIndex={0}
-          aria-label="Volver al inicio del menú"
-          data-arm="rootnode"
-          onClick={handleRootTap}
-          onKeyDown={(ev) => pressKey(ev, handleRootTap)}
-        >
-          <div className="arm-orb"><i className="arm-ic">Ⓐ</i></div>
-        </div>
+        {/* SIN nodo raíz Ⓐ propio (operador 2026-06-10): la única Ⓐ es el
+            botón del agente en el compositor — la red nace de él. "Volver"
+            vive en la miga (crumb) cuando hay un grupo enfocado. */}
       </div>
 
       <div className="arm-hint" data-arm="hint">⸙ toque una rama</div>
