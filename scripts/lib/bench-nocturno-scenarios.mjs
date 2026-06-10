@@ -1,21 +1,51 @@
 export const PRIMARY_MODELS = [
   'gemma4:e4b',
-  'ministral-3:latest',
-  'ministral-3:14b',
-  'granite3.3:8b',
   'gemma3:12b',
-  'qwen3.5:9b',
   'gemma3:4b',
+  'granite3.3:8b',
   'granite3.1-dense:8b',
+  'mistral-nemo:12b',
+  'qwen3:14b',
+  'qwen3.5:9b',
 ];
 
+export const PHASE_2_MODELS = [
+  'qwen3:8b',
+  'qwen3:4b',
+  'ministral-3:14b',
+  'ministral-3:latest',
+  'deepseek-r1:8b',
+  'deepseek-r1:7b',
+  'llama3.2:3b',
+  'llama3.2-vision:11b',
+];
+
+export const PHASE_3_MODELS = [
+  'qwen2.5:7b',
+  'qwen2.5:3b',
+  'qwen2.5-coder:7b',
+  'mistral:7b',
+  'aya:8b',
+  'llava:13b',
+  'phi4-mini:latest',
+];
+
+export const ALL_VALIDATED_MODELS = [
+  ...PRIMARY_MODELS,
+  ...PHASE_2_MODELS,
+  ...PHASE_3_MODELS,
+];
+
+// Deprecated: old smoke-only models that failed validation
 export const SMOKE_ONLY_MODELS = [
   'qwen3.5:4b',
-  'mistral-nemo:12b',
   'phi4:14b',
-  'qwen3:14b',
-  'deepseek-r1:14b',
   'qwen3:30b',
+  'deepseek-r1:14b',
+  'phi4-mini-reasoning:latest',
+  'qwen2.5:14b',
+  'qwen2.5vl:7b',
+  'gemma2:9b',
 ];
 
 export const BENCH_SCENARIOS = [

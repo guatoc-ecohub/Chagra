@@ -112,13 +112,14 @@ async function callModel(model, scenario) {
             role: 'system',
             content:
               'Eres un evaluado del bench de Chagra. Sigue exactamente el formato pedido. ' +
-              'No afirmes persistencia remota inexistente. Distingue estimación y observación.',
+              'No afirmes persistencia remota inexistente. Distingue estimación y observación. ' +
+              'No uses reasoning. Responde directamente sin razonamiento interno.',
           },
           { role: 'user', content: scenario.prompt },
         ],
         options: {
           temperature: 0.2,
-          num_predict: 400,
+          num_predict: 2000,
         },
         keep_alive: '15m',
       }),
