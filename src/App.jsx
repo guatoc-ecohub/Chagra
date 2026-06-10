@@ -158,7 +158,8 @@ const DashboardLiveView = React.memo(function DashboardLiveView({ onNavigate, on
     // ahora sale de --scrim-bg/--scrim-opacity → navy en bio-punk, crema sutil en
     // temas claros (no lava la imagen). BiopunkBackground (capa animada) +
     // contenido z-10 mantienen legibilidad.
-    <div className="relative h-[100dvh] w-full app-scrim text-white flex flex-col overflow-hidden">
+    <div className="relative h-[100dvh] w-full text-white flex flex-col overflow-hidden">
+      {/* Fondo visible: body tiene la imagen/gradiente, este div es transparente */}
       {/* Capa biopunk viva — sutil siempre, salvaje en idle */}
       <BiopunkBackground intense={idle} />
       {/* Contenido del dashboard, fade-out cuando idle para resaltar fondo.

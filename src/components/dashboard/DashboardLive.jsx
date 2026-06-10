@@ -19,6 +19,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import AgentHero from './AgentHero';
+import AgentAraña from '../AgentAraña';
 import ClimaStrip from './ClimaStrip';
 import AIStatusFooter from './AIStatusFooter';
 import AnalisisProactivoIA from './AnalisisProactivoIA';
@@ -187,6 +188,14 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
                 (saludo regional + secciones) queda DEBAJO del fold y se llega
                 scrolleando. */}
             <AgentHero onNavigate={onNavigate} />
+
+            {/* ── Araña visual de capacidades del agente ──
+                Nature: árbol orgánico. Biopunk: red micorrizal. Minimalista: lista.
+                Muestra todas las funciones con estado real (conectada/pendiente/Pro).
+                Campesino-friendly: metáforas naturales, colores tierra, etiquetas claras. */}
+            <div className="px-4 py-2">
+                <AgentAraña onSelect={(id) => onNavigate('agente', { intent: id })} />
+            </div>
 
             {/* Saludo regional dismissible — bajo el fold, ya no sobre el hero
                 (que tiene su propio saludo "Soy Chagra"). */}

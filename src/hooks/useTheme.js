@@ -20,17 +20,22 @@ import { useEffect, useState, useCallback } from 'react';
  */
 
 export const STORAGE_KEY = 'chagra:theme';
-export const DEFAULT_THEME = 'biopunk';
+export const DEFAULT_THEME = 'auto';
 
 /**
  * Catálogo visible en el switcher (ThemeSelector). El orden define el orden
- * en la UI: el default bio-punk va primero. `auto` cierra la lista.
+ * en la UI: el default auto va primero. `auto` cierra la lista.
  */
 export const THEMES = Object.freeze([
   Object.freeze({
+    id: 'auto',
+    label: 'Automático',
+    desc: 'Nature de día, Bio-Punk de noche.',
+  }),
+  Object.freeze({
     id: 'biopunk',
     label: 'Bio-Punk',
-    desc: 'Oscuro, neón teal — cosecha mística. El tema por defecto.',
+    desc: 'Oscuro, neón teal — cosecha mística.',
   }),
   Object.freeze({
     id: 'nature',
@@ -40,12 +45,7 @@ export const THEMES = Object.freeze([
   Object.freeze({
     id: 'minimalista',
     label: 'Minimalista',
-    desc: 'Limpio y claro, crema con verde monoline.',
-  }),
-  Object.freeze({
-    id: 'auto',
-    label: 'Automático',
-    desc: 'Minimalista de día, Bio-Punk de noche.',
+    desc: 'El tema perfecto para la gente aburrida.',
   }),
 ]);
 
@@ -71,7 +71,7 @@ export function applyTheme(theme) {
   let resolved = theme;
   if (theme === 'auto') {
     const hour = new Date().getHours();
-    resolved = hour >= 18 || hour < 6 ? 'biopunk' : 'minimalista';
+    resolved = hour >= 18 || hour < 6 ? 'biopunk' : 'nature';
   }
 
   if (resolved === 'biopunk') {
