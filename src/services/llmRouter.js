@@ -89,7 +89,7 @@ export const ROUTES = {
     // Override via env VITE_LLM_CHAT_MODEL para experimentos.
     model:
       (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_LLM_CHAT_MODEL) ||
-      'granite3.1-dense:8b',
+      'qwen3.5:9b',
     keep_alive_min: 30,
     temperature: 0.3,
     // 2026-06-06: 512→768. Fuga real (interacción operador): respuesta de
@@ -101,20 +101,15 @@ export const ROUTES = {
     stop: CHAT_STOP_SEQUENCES,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Swap 2026-05-24 post-bug producción: granite3.1-dense:8b promovido a ' +
-      'baseline chat. Bench nocturno Phase C (100 prompts con tools+AGE): ' +
-      'granite3.1-dense:8b #1 (56% AH, 0 halluc flags, 24.7s lat) vs ' +
-      'llama3.1:8b #2 (44% AH, 12.9s) y gemma3:4b #4 (40% AH, 11.7s). ' +
-      '12 puntos AH de mejora justifican +11.8s latencia bajo intelligence-first ' +
-      'principle (memoria feedback-intelligence-first-never-shrink-models). ' +
-      'Mismo modelo chat + chat_complex evita cold-start en escalado complex. ' +
-      'VRAM: ~5 GB (más chico que llama 6.2 GB) → libera ~1.2 GB para Kokoro ' +
-      'CUDA cuando se re-active (PR #112 rollback temporal hasta este swap). ' +
+      'Swap 2026-06-09 post-bench evolution: qwen3.5:9b promovido a ' +
+      'baseline chat. Bench nocturno 2026-06-09 (3 fases, 23 modelos): ' +
+      'qwen3.5:9b #1 (85% AH, farm_process 91.4%, silvopasture 100%) vs ' +
+      'granite3.1-dense:8b #2 (80% AH, reforestation 91.7%). ' +
+      '5 puntos AH de mejora justifican +latencia bajo intelligence-first ' +
+      'principle. Fix aplicado: num_predict=2000 + anti-thinking prompt. ' +
+      'VRAM: ~9.6 GB (más grande que granite 5 GB) → tradeoff aceptable. ' +
       'keep_alive=30m. Override env: VITE_LLM_CHAT_MODEL para experimentos. ' +
-      'Bugs que mitiga: Choachí confundido con "Shoeachi" + Sibundoy, café ' +
-      'supremo asumido como variedad, mango como sombra a 2400 msnm, ' +
-      'Tabebuia rosea como "roble", Inga edulis como "guayabo". Todos ' +
-      'derivados de llama ignorando evidence de tools.',
+      'Bugs que mitiga: mejor manejo de voz, extracción, fenología, ENSO.',
   },
   chat_complex: {
     // Override por env para que el operador pueda probar otros modelos
@@ -123,7 +118,7 @@ export const ROUTES = {
     // evita confusiones taxonómicas con cupo de GPU razonable).
     model:
       (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_LLM_COMPLEX_MODEL) ||
-      'granite3.1-dense:8b',
+      'qwen3.5:9b',
     keep_alive_min: 5,
     temperature: 0.3,
     // 2026-06-06: 768→1024. Las queries complejas (planes multi-cultivo,
@@ -134,16 +129,14 @@ export const ROUTES = {
     stop: CHAT_STOP_SEQUENCES,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Bench 2026-05-23 anti-alucinación: granite3.1-dense:8b 37 t/s, ' +
-      '~6 GB VRAM, ~37s avg con context completo. Más lento que gemma3:4b ' +
-      'pero clavó "Monalonion velezangeli" sin pifia donde 4b derivaba a ' +
-      'Fusarium genéricos. keep_alive_min=5 (no 30): el chat hot sigue ' +
-      'siendo gemma3:4b → no mantener dos modelos calientes simultáneos ' +
-      'para no presionar VRAM contra vision (qwen2.5vl 11.8 GB). ' +
-      'max_tokens 768 (vs 512 del chat simple) porque queries complejas ' +
-      'tienden a respuestas más estructuradas (planes, asocios, ' +
-      'enumeraciones). temperature mantenida en 0.3 — la regla ' +
-      'intelligence-first aplica igual: temperature baja + prompt ' +
+      'Bench 2026-06-09: qwen3.5:9b 85% AH, farm_process 91.4%, ' +
+      'silvopasture 100%. Más lento que granite pero mejor manejo de ' +
+      'queries complejas (voz, extracción, fenología, ENSO). ' +
+      'keep_alive_min=5 (no 30): el chat hot es qwen3.5:9b → no mantener ' +
+      'dos modelos calientes simultáneos para no presionar VRAM contra ' +
+      'vision (llava 13b ~9 GB). ' +
+      'max_tokens 1024 para queries complejas con respuestas estructuradas. ' +
+      'temperature 0.3 — intelligence-first: temperature baja + prompt ' +
       'agresivo > modelo más grande con temperature alta.',
   },
   nlu: {
@@ -172,17 +165,17 @@ export const ROUTES = {
       'mejor capability) o deepseek-r1:8b (46 t/s, chain-of-thought).',
   },
   vision: {
-    model: 'qwen2.5vl:7b',
+    model: 'llava:13b',
     keep_alive_min: 0,
     temperature: 0.2,
     max_tokens: 512,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Bench GPU: 78 t/s, 11.8 GB VRAM (apretado pero cabe en M6000 12 GB). ' +
-      'Multimodal nativo, antes inviable por OOM CPU. Habilita pest ' +
-      'diagnostic (DR-040 F2) y plant ID. Alternativa: llava:13b (22.94 t/s) ' +
-      'si Qwen falla con flora silvestre. unload tras request porque ' +
-      'compite con chat hot por VRAM.',
+      'Bench 2026-06-09: qwen2.5vl:7b falló (OOM), llava:13b pasó ' +
+      'validación (25.8% voice, 42.4% farm, 66.7% reforestation). ' +
+      '~9 GB VRAM, multimodal nativo. Habilita pest diagnostic ' +
+      '(DR-040 F2) y plant ID. unload tras request porque compite ' +
+      'con chat hot (qwen3.5:9b ~9.6 GB) por VRAM.'
   },
 };
 
