@@ -75,6 +75,7 @@ export const BLOCK_ORDER = [
   'clima', // contexto ambiental — sacrificable en emergencia
   'finca', // contexto ambiental — sacrificable en emergencia
   'asociacion', // policultivo — sacrificable en emergencia
+  'memoria', // MEMORIA EPISÓDICA de la finca (TIER 2 #6) — prioridad media, sacrificable
   'corpus', // RAG — PRIMER sacrificio (por variantes con menos chunks)
   'frostHeat', // riesgo térmico por cultivo
   'viabilidad', // GUARDA viabilidad/altitud (protegido)
@@ -95,11 +96,13 @@ export const BLOCK_ORDER = [
  * resto (base, guardas, grounding, análisis) es intocable.
  */
 // Orden de sacrificio bajo presión de presupuesto: primero el corpus RAG (por
-// chunks), luego el contexto AMBIENTAL (asociaciones, fase ENSO, riesgo
-// térmico y por último el marco de finca — su altitud también la cita el
-// bloque de viabilidad). El grounding duro (evidencia, entidades, dosis
-// curadas, cadena del grafo) y las guardas NUNCA están aquí: jamás se recortan.
-const SACRIFICE_ORDER = ['corpus', 'asociacion', 'clima', 'frostHeat', 'finca'];
+// chunks), luego la MEMORIA EPISÓDICA (personalización: valiosa pero nunca por
+// encima de las guardas ni la evidencia — TIER 2 #6), luego el contexto
+// AMBIENTAL (asociaciones, fase ENSO, riesgo térmico y por último el marco de
+// finca — su altitud también la cita el bloque de viabilidad). El grounding
+// duro (evidencia, entidades, dosis curadas, cadena del grafo) y las guardas
+// NUNCA están aquí: jamás se recortan.
+const SACRIFICE_ORDER = ['corpus', 'memoria', 'asociacion', 'clima', 'frostHeat', 'finca'];
 
 const _normalize = (t) => (typeof t === 'string' ? t.replace(/^\n+|\n+$/g, '') : '');
 

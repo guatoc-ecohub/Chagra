@@ -804,6 +804,28 @@ export default function AgentScreen({ onBack, initialContext }) {
     const asociacionBlock = buildAssociationContext({ resolvedEntities, groupedCultivos });
     const asociacionContext = asociacionBlock ? `\n\n${asociacionBlock}` : '';
 
+    // MEMORIA EPISÓDICA de la finca (TIER 2 #6): lo que la finca YA VIVIÓ con
+    // lo que el usuario pregunta este turno (siembras/etapas/manejos de plaga
+    // del event store FarmProcess en IndexedDB) + máx. 2 señales de
+    // anticipación (transición de etapa inminente por fenología desde la fecha
+    // de siembra REAL, recurrencia estacional de manejo de plagas). CERO
+    // invención: solo eventos registrados; sin historial relevante o con IDB
+    // caído → '' (no-op silencioso). GATE de precio: igual que finca/viabilidad,
+    // no aplica a consultas de mercado. Entra al promptAssembler como
+    // 'memoria' (prioridad media, sacrificable — nunca desplaza guardas ni
+    // evidencia).
+    const memoriaBlock = isPriceQuery
+      ? ''
+      : await (async () => {
+          try {
+            const { buildEpisodicMemoryContext } = await import('../../services/episodicMemoryService');
+            return await buildEpisodicMemoryContext({ query, resolvedEntities, fincaAltitud });
+          } catch {
+            return '';
+          }
+        })();
+    const memoriaContext = memoriaBlock ? `\n\n${memoriaBlock}` : '';
+
     // SEGURIDAD: invasoras / conservación sensible. Bloqueo determinístico de
     // recomendación de siembra. Cero red.
     const seguridadBlock = buildInvasiveSafetyContext({ resolvedEntities });
@@ -863,6 +885,7 @@ export default function AgentScreen({ onBack, initialContext }) {
       clima: { variants: [climaContext, ''] },
       finca: { variants: [fincaContext, ''] },
       asociacion: { variants: [asociacionContext, ''] },
+      memoria: { variants: [memoriaContext, ''] },
       corpus: { variants: corpusVariants },
       frostHeat: { variants: [frostHeatContext, ''] },
       viabilidad: viabilidadContext,
