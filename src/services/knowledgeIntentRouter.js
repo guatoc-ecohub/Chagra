@@ -132,3 +132,21 @@ export const __TEST__ = {
   PLAGA_GUARD_RE,
   _norm,
 };
+
+/** Señal de DIAGNÓSTICO de suelo — descripción del terreno del campesino. */
+const SUELO_DIAG_RE =
+  /\b(tierra|suelo|terreno|lote|parcela)\b.*\b(amarilla|colorada|pegajosa|greda|chiclosa|empoza|encharca|barro|dura|piedra|pal[ií]n|rebota|cansad[ao]|flojita|negr[ao]|sueltica|se\s+lava|helecho|cortadera|coquito|lombriz|vinagre|bicarbonato|cal|encalar)\b|^\s*(m[ií]\s+tierra|la\s+tierra|el\s+suelo|el\s+lote)/i;
+
+/**
+ * Detecta si el mensaje del campesino describe su suelo (diagnóstico).
+ * A diferencia de SUELO_RE (que busca requerimientos de suelo por especie),
+ * esta detecta descripciones del terreno para activar diagnosticarSuelo().
+ *
+ * @param {string} userMessage
+ * @returns {boolean}
+ */
+export function hasSoilDiagnosticIntent(userMessage) {
+  if (typeof userMessage !== 'string' || userMessage.trim().length < 5) return false;
+  const norm = _norm(userMessage);
+  return SUELO_DIAG_RE.test(norm);
+}

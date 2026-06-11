@@ -1,6 +1,7 @@
 {
   "name": "Chagra",
   "short_name": "Chagra",
+  "id": "/",
   "description": "Sistema de gestión agrícola inteligente con IA",
   "start_url": "/",
   "display": "standalone",

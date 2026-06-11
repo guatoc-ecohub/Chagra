@@ -1,13 +1,31 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { describe, test, expect } from 'vitest';
 import BiopreparadoDiagrama from '../BiopreparadoDiagrama';
 import {
+  DIAGRAMAS_BIOPREPARADO,
   getDiagramaBiopreparado,
   tieneDiagrama,
   iconoIngrediente,
 } from '../../data/biopreparado-diagramas';
+// El catálogo real es la ÚNICA fuente de cantidades (cero fabricación de recetas).
+import seedRaw from '../../../catalog/biopreparados-seed.json';
+
+/** Mapa id → entrada del seed del catálogo de biopreparados. */
+const SEED = new Map(seedRaw.biopreparados.map((b) => [b.id, b]));
+
+/**
+ * Normaliza texto para comparación robusta de provenance: minúsculas, sin
+ * tildes, sin espacios. Así "45-60 min" ≡ "45-60 min" del seed, "1 kg" ≡ "1kg",
+ * "2% al 7%" ≡ "2% al 7%", etc., sin depender de mayúsculas/acentos/espaciado.
+ */
+const ACENTOS = { á: 'a', é: 'e', í: 'i', ó: 'o', ú: 'u', ü: 'u', ñ: 'n' };
+const norm = (s) =>
+  String(s)
+    .toLowerCase()
+    .replace(/[áéíóúüñ]/g, (c) => ACENTOS[c])
+    .replace(/\s+/g, '');
 
 /**
  * Smoke tests — BiopreparadoDiagrama (TIER 2 #4: diagramas de biopreparados).
@@ -48,11 +66,13 @@ const BOCASHI = {
   fuente: 'Restrepo Rivera, J. — ABC de la agricultura organica.',
 };
 
+// Receta incompleta para diagrama (extracto industrial sin cantidades de
+// preparación campesina en el seed) → debe caer al texto, sin diagrama.
 const SIN_DIAGRAMA = {
-  id: 'roca_fosforica',
-  nombre: 'Roca fosfórica',
-  ingredientes: ['roca fosfórica molida'],
-  proceso_resumen: 'Aplicación directa al suelo.',
+  id: 'biofertilizante_algas',
+  nombre: 'Biofertilizante de algas marinas',
+  ingredientes: ['algas marinas secas (Ascophyllum/Sargassum/Ecklonia)'],
+  proceso_resumen: 'Extracto hidrolizado alcalino o ácido. Aplicación foliar 1:500.',
 };
 
 describe('BiopreparadoDiagrama — render del diagrama paso a paso', () => {
@@ -146,20 +166,26 @@ describe('BiopreparadoDiagrama — defensa y degradación elegante', () => {
 });
 
 describe('overlay de datos biopreparado-diagramas', () => {
-  test('tieneDiagrama es true para los 3 biopreparados de prueba', () => {
+  test('tieneDiagrama es true para los biopreparados curados', () => {
     expect(tieneDiagrama('caldo_bordeles')).toBe(true);
     expect(tieneDiagrama('bocashi')).toBe(true);
     expect(tieneDiagrama('biol')).toBe(true);
+    expect(tieneDiagrama('caldo_sulfocalcico')).toBe(true);
+    expect(tieneDiagrama('supermagro')).toBe(true);
+    expect(tieneDiagrama('ceniza_madera')).toBe(true);
   });
 
-  test('tieneDiagrama es false para ids sin receta curada o vacíos', () => {
-    expect(tieneDiagrama('roca_fosforica')).toBe(false);
+  test('tieneDiagrama es false para ids vacíos', () => {
     expect(tieneDiagrama('')).toBe(false);
     expect(tieneDiagrama(undefined)).toBe(false);
   });
 
+  test('hay 15 diagramas curados (de 3 a 15)', () => {
+    expect(Object.keys(DIAGRAMAS_BIOPREPARADO)).toHaveLength(15);
+  });
+
   test('cada diagrama tiene pasos numerados de 1..N en orden', () => {
-    for (const id of ['caldo_bordeles', 'bocashi', 'biol']) {
+    for (const id of Object.keys(DIAGRAMAS_BIOPREPARADO)) {
       const { pasos } = getDiagramaBiopreparado(id);
       expect(pasos.length).toBeGreaterThanOrEqual(3);
       pasos.forEach((p, i) => {
@@ -169,6 +195,69 @@ describe('overlay de datos biopreparado-diagramas', () => {
         expect(p.icon).toBeTruthy();
       });
     }
+  });
+});
+
+describe('BiopreparadoDiagrama — provenance del seed (cero fabricación)', () => {
+  test('toda clave de diagrama corresponde a un id real del catálogo', () => {
+    for (const id of Object.keys(DIAGRAMAS_BIOPREPARADO)) {
+      expect(SEED.has(id)).toBe(true);
+    }
+  });
+
+  test('cada diagrama renderiza sin crash con la entrada REAL del seed', () => {
+    for (const id of Object.keys(DIAGRAMAS_BIOPREPARADO)) {
+      const entrada = SEED.get(id);
+      const { container, unmount } = render(
+        <BiopreparadoDiagrama biopreparado={entrada} />,
+      );
+      const seccion = within(container).getByTestId('biopreparado-diagrama');
+      expect(seccion).toBeInTheDocument();
+      // Cada paso del overlay sale con su badge numerado y su título.
+      for (const paso of getDiagramaBiopreparado(id).pasos) {
+        expect(within(container).getByLabelText(`Paso ${paso.n}`)).toBeInTheDocument();
+        expect(within(container).getAllByText(paso.titulo).length).toBeGreaterThanOrEqual(1);
+      }
+      unmount();
+    }
+  });
+
+  test('TODA cantidad destacada del diagrama existe TEXTUALMENTE en el seed', () => {
+    // Anti-fabricación: cada `cantidad` (la cifra resaltada que ve el campesino)
+    // debe ser substring del objeto del catálogo. Si una dosis fuese inventada,
+    // este test la atrapa.
+    for (const id of Object.keys(DIAGRAMAS_BIOPREPARADO)) {
+      const seedBlob = norm(JSON.stringify(SEED.get(id)));
+      for (const paso of getDiagramaBiopreparado(id).pasos) {
+        if (!paso.cantidad) continue;
+        expect(
+          seedBlob.includes(norm(paso.cantidad)),
+          `[${id}] cantidad "${paso.cantidad}" no aparece en el seed`,
+        ).toBe(true);
+      }
+    }
+  });
+
+  test('ningún diagrama usa voseo argentino (español de Colombia)', () => {
+    const VOSEO = /\b(escrib[íi]|ten[ée]s|quer[ée]s|eleg[íi]|pod[ée]s|sab[ée]s|aplicá|prepará|verté|cocé|herví|dilu[íi]|asperjá|mezclá|esparcí)\b/i;
+    for (const id of Object.keys(DIAGRAMAS_BIOPREPARADO)) {
+      const { container, unmount } = render(
+        <BiopreparadoDiagrama biopreparado={SEED.get(id)} />,
+      );
+      expect(container.textContent, `voseo en ${id}`).not.toMatch(VOSEO);
+      unmount();
+    }
+  });
+
+  test('el biopreparado con receta incompleta NO tiene diagrama (cae al texto)', () => {
+    // biofertilizante_algas: extracto hidrolizado industrial, el seed no trae
+    // cantidades de preparación campesina → reproducirlo exigiría inventar.
+    expect(SEED.has('biofertilizante_algas')).toBe(true);
+    expect(tieneDiagrama('biofertilizante_algas')).toBe(false);
+    const { container } = render(
+      <BiopreparadoDiagrama biopreparado={SEED.get('biofertilizante_algas')} />,
+    );
+    expect(container.firstChild).toBeNull();
   });
 
   test('iconoIngrediente mapea claves conocidas y cae a 🌿 por defecto', () => {

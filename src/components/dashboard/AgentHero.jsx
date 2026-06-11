@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Mic, Square, Camera, X } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { captureAndCompress } from '../../services/photoService';
@@ -16,8 +16,17 @@ import {
     getNotificationStyle,
 } from '../../services/userProfileService';
 import { buildCropSuggestions } from '../../data/cropSuggestions';
+import { syncManager } from '../../services/syncManager';
 import { iconForTheme } from './themeIcon';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
+import { lunarPhase, solarTimes, moonPathD } from '../../utils/skyEphemeris';
+import { resolveClimaLocation, getCachedClimaSnapshot } from '../../services/climaService';
+import {
+    fetchSkyConditions,
+    getCachedSkyConditions,
+    classifySkyCondition,
+    applySensorCalibration,
+} from '../../services/skyConditionService';
 
 /**
  * AgentHero — la PORTADA INMERSIVA del agente Chagra, PRIMERA PANTALLA COMPLETA
@@ -91,12 +100,137 @@ import ChagraAgentAvatar from '../ChagraAgentAvatar';
 // para evitar import circular y duplicación.
 
 // ¿Es de noche? (operador 2026-06-06: sol de día, luna de noche en la escena).
-// Noche = antes de las 6am o desde las 7pm. Puro, fácil de testear vía hora.
+// Fallback puro por hora (6am-7pm) cuando NO hay coordenadas de la finca; con
+// coordenadas el hero usa solarTimes() (salida/puesta de sol reales ±2 min).
 function isNightNow(hour) {
     const h = Number.isInteger(hour)
         ? hour
         : (typeof Date !== 'undefined' ? new Date().getHours() : 9);
     return h < 6 || h >= 19;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ARTEFACTO SOL/LUNA REALISTA (caso Choachí 2026-06).
+//
+// Antes: sol radiante SIEMPRE de día y luna creciente FIJA de noche — pura
+// hora del reloj, cero clima real. En Choachí (altoandino, nubosidad orográfica
+// crónica) el artefacto prometía sol en días muy nublados.
+//
+// Ahora: la condición viene de skyConditionService (nubosidad real Open-Meteo
+// + corrección orográfica por piso térmico + modulación ENSO, sesgo de
+// honestidad: solo degrada hacia más nube) y la luna dibuja su FASE REAL
+// (skyEphemeris.moonPathD — astronomía válida; mostrar la fase ≠ recomendar
+// labores por ella, eso es folclore vetado por ADR-033).
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Nube puffy compartida por las variantes (parcial/nublado/niebla/lluvia).
+const CLOUD_D = 'M16 42 q-9 0 -9 -8 q0 -8 8 -8 q3 -9 13 -9 q9 0 12 8 q9 1 9 9 q0 8 -9 8 z';
+
+function SkyAstro({ night, condition, moonFraction }) {
+    const cloudy = condition === 'nublado' || condition === 'niebla' || condition === 'lluvia';
+
+    if (night) {
+        const moon = moonPathD(moonFraction, 32, 30, 12);
+        return (
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+                <defs>
+                    <radialGradient id="ap-moon" cx="42%" cy="38%" r="65%">
+                        <stop offset="0%" stopColor="#fdfbf2" />
+                        <stop offset="100%" stopColor="#d9e2f2" />
+                    </radialGradient>
+                </defs>
+                {/* lado oscuro del disco, apenas insinuado */}
+                <circle cx="32" cy="30" r="12" fill="#2b3650" opacity=".5" />
+                {moon.kind === 'full' && <circle cx="32" cy="30" r="12" fill="url(#ap-moon)" />}
+                {moon.kind === 'partial' && <path d={moon.d} fill="url(#ap-moon)" />}
+                {moon.kind === 'new' && (
+                    <circle cx="32" cy="30" r="12" fill="none" stroke="#94a3c4" strokeWidth="0.9" opacity=".55" />
+                )}
+                {/* cráteres tenues sobre la zona iluminada */}
+                {moon.kind !== 'new' && (
+                    <>
+                        <circle cx="29" cy="25" r="1.9" fill="#c3cde2" opacity=".4" />
+                        <circle cx="35" cy="33" r="1.3" fill="#c3cde2" opacity=".35" />
+                    </>
+                )}
+                {/* nubes nocturnas reales delante de la luna */}
+                {cloudy && (
+                    <path d={CLOUD_D} fill="#39435e" opacity=".88" transform="translate(8 16) scale(.78)" />
+                )}
+                {condition === 'lluvia' && (
+                    <g stroke="#7fa6d9" strokeWidth="2" strokeLinecap="round" opacity=".8">
+                        <line x1="24" y1="52" x2="22" y2="58" />
+                        <line x1="33" y1="52" x2="31" y2="58" />
+                        <line x1="42" y1="52" x2="40" y2="58" />
+                    </g>
+                )}
+            </svg>
+        );
+    }
+
+    // ── Día: el sol que se ve es el que el cielo real permite ──
+    return (
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+            <defs>
+                <radialGradient id="ap-sun" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stopColor="#fff3cf" />
+                    <stop offset="100%" stopColor="#f5b733" />
+                </radialGradient>
+            </defs>
+            {condition === 'despejado' && (
+                <>
+                    <g stroke="#f5b733" strokeWidth="2.4" strokeLinecap="round" opacity=".85">
+                        <line x1="32" y1="4" x2="32" y2="13" />
+                        <line x1="32" y1="51" x2="32" y2="60" />
+                        <line x1="4" y1="32" x2="13" y2="32" />
+                        <line x1="51" y1="32" x2="60" y2="32" />
+                        <line x1="12" y1="12" x2="18" y2="18" />
+                        <line x1="46" y1="46" x2="52" y2="52" />
+                        <line x1="52" y1="12" x2="46" y2="18" />
+                        <line x1="18" y1="46" x2="12" y2="52" />
+                    </g>
+                    <circle cx="32" cy="32" r="13" fill="url(#ap-sun)" />
+                </>
+            )}
+            {condition === 'parcial' && (
+                <>
+                    {/* sol asomado arriba-izquierda, rayos cortos */}
+                    <g stroke="#f5b733" strokeWidth="2" strokeLinecap="round" opacity=".7">
+                        <line x1="24" y1="4" x2="24" y2="10" />
+                        <line x1="6" y1="22" x2="12" y2="22" />
+                        <line x1="9" y1="8" x2="14" y2="13" />
+                        <line x1="39" y1="8" x2="34" y2="13" />
+                    </g>
+                    <circle cx="24" cy="22" r="10" fill="url(#ap-sun)" />
+                    <path d={CLOUD_D} fill="#e6ecf5" stroke="#9aa7ba" strokeWidth="1" opacity=".95" transform="translate(8 14) scale(.82)" />
+                </>
+            )}
+            {(condition === 'nublado' || condition === 'niebla') && (
+                <>
+                    {/* resplandor apagado detrás de la nube — honesto, sin rayos */}
+                    <circle cx="26" cy="20" r="9" fill="url(#ap-sun)" opacity=".35" />
+                    <path d={CLOUD_D} fill="#dfe5ee" stroke="#94a1b5" strokeWidth="1.1" opacity=".95" transform="translate(4 10) scale(.92)" />
+                    <path d={CLOUD_D} fill="#c7cfdc" stroke="#8d99ad" strokeWidth="1.1" opacity=".9" transform="translate(16 22) scale(.62)" />
+                    {condition === 'niebla' && (
+                        <g stroke="#a9b3c4" strokeWidth="2.2" strokeLinecap="round" opacity=".85">
+                            <line x1="12" y1="52" x2="40" y2="52" />
+                            <line x1="20" y1="58" x2="50" y2="58" />
+                        </g>
+                    )}
+                </>
+            )}
+            {condition === 'lluvia' && (
+                <>
+                    <path d={CLOUD_D} fill="#cdd5e2" stroke="#8d99ad" strokeWidth="1.1" opacity=".95" transform="translate(6 10) scale(.9)" />
+                    <g stroke="#5d96d8" strokeWidth="2" strokeLinecap="round" opacity=".85">
+                        <line x1="22" y1="48" x2="20" y2="56" />
+                        <line x1="32" y1="48" x2="30" y2="56" />
+                        <line x1="42" y1="48" x2="40" y2="56" />
+                    </g>
+                </>
+            )}
+        </svg>
+    );
 }
 
 // Colibrí 2D del demo (SVG .hummer). Se usa tanto en la escena ambiente (vuela)
@@ -172,6 +306,12 @@ export default function AgentHero({ onNavigate }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [menuClosing, setMenuClosing] = useState(false);
     const menuCloseTimerRef = useRef(null);
+    // Campana de alertas/tareas (importada del demo biopunk 2026-06-11):
+    // panel con "Alertas ambientales" (useAlertStore) + "Tareas de campo"
+    // (pendientes farmOS, offline-first vía syncManager). Mutuamente
+    // excluyente con el menú Ⓐ, como en el demo.
+    const [notifOpen, setNotifOpen] = useState(false);
+    const [pendingTasks, setPendingTasks] = useState([]);
     // Nivel de respuestas del perfil (campesino=simple / experto=detallado).
     // Lo leemos del perfil real al montar; el toggle lo persiste de verdad.
     const [nivel, setNivel] = useState(() => {
@@ -191,12 +331,70 @@ export default function AgentHero({ onNavigate }) {
     // y del botón Ⓐ; el switcher completo vive en Perfil → Apariencia.
     const { theme } = useTheme();
 
-    // ── Escena: sol de día / luna de noche (operador 2026-06-06) ──────────────
-    const night = isNightNow();
-
+    // ── markSwap del demo: al cambiar de tema, el ícono Ⓐ hace la
+    // micro-animación de intercambio (scale+rotate). Solo en CAMBIO de tema,
+    // no en el primer paint (el demo guarda `first = name !== THEME`).
+    const prevThemeRef = useRef(theme);
+    const themeSwapped = prevThemeRef.current !== theme;
+    useEffect(() => { prevThemeRef.current = theme; }, [theme]);
     // ── Perfil real para sugerencias contextuales ─────────────────────────────
     const profile = getProfile();
     const altitud = profile?.finca_altitud || profile?.altitud || null;
+
+    // ── Escena: sol/luna REALISTA (nubosidad real + fase lunar real) ──────────
+    // Ubicación GUARDADA del perfil (misma fuente que el clima — NO geo en vivo).
+    const climaLoc = useMemo(() => {
+        try { return resolveClimaLocation(); } catch (_) { return null; }
+    }, []);
+
+    // Día/noche por salida/puesta de sol REALES de la finca; fallback por hora.
+    const night = useMemo(() => {
+        try {
+            if (climaLoc && Number.isFinite(climaLoc.lat) && Number.isFinite(climaLoc.lng)) {
+                const st = solarTimes(new Date(), climaLoc.lat, climaLoc.lng);
+                if (st.sunrise && st.sunset) return !st.isDaylight;
+            }
+        } catch (_) { /* fallback hora local */ }
+        return isNightNow();
+    }, [climaLoc]);
+
+    // Nubosidad real (Open-Meteo directo, cache 30 min). Pinta el cache al
+    // primer paint y refresca en background. Offline → null y el clasificador
+    // cae al prior climatológico por piso térmico (honesto, no sol por defecto).
+    const [skySnap, setSkySnap] = useState(() => (
+        climaLoc ? getCachedSkyConditions(climaLoc.lat, climaLoc.lng, climaLoc.elevation) : null
+    ));
+    useEffect(() => {
+        if (!climaLoc) return undefined;
+        let alive = true;
+        fetchSkyConditions({ lat: climaLoc.lat, lng: climaLoc.lng, elevation: climaLoc.elevation })
+            .then((s) => { if (alive && s) setSkySnap(s); })
+            .catch(() => { /* nunca rompe el hero */ });
+        return () => { alive = false; };
+    }, [climaLoc]);
+
+    // Condición honesta del cielo: nubosidad + piso térmico + ENSO (solo
+    // degrada hacia más nube). applySensorCalibration es el hook para los
+    // sensores de campo futuros (hoy identidad — sin sensores desplegados).
+    const sky = useMemo(() => {
+        let ensoPhase = 'neutral';
+        try { ensoPhase = getCachedClimaSnapshot()?.enso_status?.phase || 'neutral'; } catch (_) { /* neutral */ }
+        const elevationM = Number.isFinite(Number(altitud))
+            ? Number(altitud)
+            : (Number.isFinite(Number(climaLoc?.elevation)) ? Number(climaLoc.elevation) : null);
+        return applySensorCalibration(classifySkyCondition({
+            cloudCoverPct: skySnap?.current?.cloud_cover_pct ?? null,
+            weatherCode: skySnap?.current?.weather_code ?? null,
+            precipMm: skySnap?.current?.precip_mm ?? null,
+            elevationM,
+            ensoPhase,
+        }), null);
+    }, [skySnap, altitud, climaLoc]);
+
+    // Fase lunar REAL (astronomía — skyEphemeris). Solo para DIBUJARLA.
+    const moonFraction = useMemo(() => {
+        try { return lunarPhase(new Date(), { latitude: climaLoc?.lat ?? 4 }).fraction; } catch (_) { return 0.25; }
+    }, [climaLoc]);
 
     // ── Sugerencias contextuales ROTATIVAS basadas en los cultivos reales ─────
     // Deterministas (cropSuggestions: cultivos del store × mes × piso térmico).
@@ -279,6 +477,20 @@ export default function AgentHero({ onNavigate }) {
      * Persiste la consulta en la outbox DURABLE y navega. Orden estricto:
      * (1) persistir → (2) navegar. Si la persistencia falla NO navegamos en
      * silencio: dejamos el texto/adjunto para reintentar (cero pérdida).
+     *
+     * BUG mano-bloqueada (operador 2026-06-10, repro tests/mano-bloqueo): el
+     * `busy=true` SOLO se reseteaba en el catch (fallo de persistencia). En el
+     * camino feliz quedaba `true` para SIEMPRE, confiando en que `launchToAgent`
+     * desmontara el hero. Pero la transición es diferida (SEND_TRANSITION_MS) y
+     * si la navegación NO desmonta el hero (la vista 'agente' no monta, navegar
+     * es no-op, o el operador sigue viendo la mano), `busy` quedaba pegado →
+     * `AgentRedMenu` recibe `disabled=true` → `.arm-root.arm-disabled`
+     * (pointer-events:none) → la MANO MUERTA hasta recargar (los nodos
+     * páramo/silvopastoreo/restauración "no hacían nada y bloqueaban la mano").
+     *
+     * Fix: `busy` se libera SIEMPRE en `finally`. La mano nunca queda muerta;
+     * si la navegación desmonta el hero, el setState post-unmount es no-op
+     * inofensivo; si NO desmonta, la mano vuelve a estar viva de inmediato.
      */
     const send = async (payload) => {
         if (busy) return;
@@ -291,6 +503,10 @@ export default function AgentHero({ onNavigate }) {
             launchToAgent();
         } catch (err) {
             console.error('[AgentHero] no se pudo guardar la consulta, no navego:', err);
+        } finally {
+            // Reset incondicional: la mano NUNCA debe quedar bloqueada. En éxito,
+            // la navegación desmonta el hero poco después (setState no-op); en
+            // fallo, el operador puede reintentar con la mano viva.
             setBusy(false);
         }
     };
@@ -307,7 +523,13 @@ export default function AgentHero({ onNavigate }) {
             });
             return;
         }
-        if (!trimmed) return;
+        if (!trimmed) {
+            // Comportamiento del demo (`sendField()` vacío → `openSheet()`):
+            // enviar sin nada escrito abre el menú didáctico de capacidades
+            // en vez de morir en silencio.
+            openMenu();
+            return;
+        }
         send({ kind: 'text', text: trimmed });
     };
 
@@ -340,6 +562,7 @@ export default function AgentHero({ onNavigate }) {
     const openMenu = () => {
         window.clearTimeout(menuCloseTimerRef.current);
         setMenuClosing(false);
+        setNotifOpen(false); // campana y red Ⓐ son mutuamente excluyentes (demo)
         setMenuOpen(true);
     };
     const closeMenu = () => {
@@ -359,14 +582,38 @@ export default function AgentHero({ onNavigate }) {
         else openMenu();
     };
 
+    // ── Campana 🔔 (alertas + tareas) — import del demo biopunk ─────────────
+    // Las tareas pendientes vienen del MISMO camino offline-first que el
+    // PendingTasksWidget (syncManager cachea farmOS); sin red, falla suave y
+    // el badge cuenta solo las alertas locales.
+    useEffect(() => {
+        let alive = true;
+        Promise.resolve()
+            .then(() => syncManager.fetchPendingTasksFromFarmOS())
+            .then((tasks) => { if (alive && Array.isArray(tasks)) setPendingTasks(tasks); })
+            .catch(() => { /* offline: el badge usa solo las alertas */ });
+        return () => { alive = false; };
+    }, []);
+    const notifCount = activeAlerts.length + pendingTasks.length;
+    const toggleNotif = () => {
+        setNotifOpen((open) => {
+            if (!open && menuOpen) closeMenu(); // excluyentes, como el demo
+            return !open;
+        });
+    };
+
     // Limpia el timer de cierre al desmontar y cierra con Escape (a11y).
     useEffect(() => () => window.clearTimeout(menuCloseTimerRef.current), []);
     useEffect(() => {
-        if (!menuOpen) return undefined;
-        const onKey = (e) => { if (e.key === 'Escape') closeMenu(); };
+        if (!menuOpen && !notifOpen) return undefined;
+        const onKey = (e) => {
+            if (e.key !== 'Escape') return;
+            if (notifOpen) setNotifOpen(false);
+            else closeMenu();
+        };
         window.addEventListener('keydown', onKey);
         return () => window.removeEventListener('keydown', onKey);
-    }, [menuOpen]);
+    }, [menuOpen, notifOpen]);
 
     // Despacha una capacidad de la red a su routing real. El manifiesto
     // unificado (agentCapabilities.js) llama `heroRoute` al routing del hero;
@@ -518,6 +765,16 @@ export default function AgentHero({ onNavigate }) {
                     display: none;
                 }
                 [data-theme="nature"] .agentport-scene.is-day .agentport-sun { display: block; }
+                /* Honestidad climática: el sol radial grande de nature se apaga
+                   cuando el cielo REAL está cubierto (caso Choachí) y se
+                   atenúa con cielo parcial. La nube manda, no el reloj. */
+                [data-theme="nature"] .agentport-scene.is-day.sky-parcial .agentport-sun { opacity: .55; animation: none; }
+                [data-theme="nature"] .agentport-scene.is-day.sky-nublado .agentport-sun,
+                [data-theme="nature"] .agentport-scene.is-day.sky-niebla .agentport-sun,
+                [data-theme="nature"] .agentport-scene.is-day.sky-lluvia .agentport-sun {
+                    opacity: .22;
+                    animation: none;
+                }
                 @keyframes agentport-sun-glow {
                     0%, 100% { opacity: 0.85; transform: translateX(-50%) scale(1); }
                     50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
@@ -530,17 +787,23 @@ export default function AgentHero({ onNavigate }) {
                    de día; este astro pequeño es universal y delicado. */
                 .agentport-astro {
                     position: absolute;
-                    top: 11%;
-                    right: 14%;
-                    width: 46px;
-                    height: 46px;
+                    /* top 11% lo dejaba DETRÁS del toggle Campesino/Experto en
+                       viewport de teléfono (390px): el astro quedaba invisible.
+                       Baja al aire abierto entre el toggle y el saludo. */
+                    top: 19%;
+                    right: 10%;
+                    width: 54px;
+                    height: 54px;
                     z-index: 1;
                     opacity: .9;
                     filter: drop-shadow(0 0 10px rgba(255, 236, 180, .35));
                     animation: agentport-astro-breathe 8s ease-in-out infinite;
                 }
                 .agentport-astro.is-moon { filter: drop-shadow(0 0 10px rgba(200, 220, 255, .35)); }
-                [data-theme="nature"] .agentport-astro.is-day { display: none; } /* nature ya tiene el sol radial grande de día */
+                /* nature ya tiene el sol radial grande de día — el astro chico
+                   solo se oculta cuando el cielo REAL está despejado; con
+                   nube/niebla/lluvia el astro ES el que cuenta la verdad. */
+                [data-theme="nature"] .agentport-scene.is-day.sky-despejado .agentport-astro { display: none; }
                 .agentport-astro svg { width: 100%; height: 100%; display: block; }
                 @keyframes agentport-astro-breathe {
                     0%, 100% { opacity: .85; transform: scale(1); }
@@ -736,7 +999,10 @@ export default function AgentHero({ onNavigate }) {
                 }
                 .agentport-name small {
                     display: block; font-weight: 600; font-size: .6rem; letter-spacing: .16em;
-                    text-transform: uppercase; color: rgb(var(--t-accent-rgb)); margin-top: -1px;
+                    text-transform: uppercase; margin-top: -1px;
+                    /* matiz profundo del acento (.brand small del demo:
+                       #a8612f nature · #19c79a biopunk · #1d4639 minimal) */
+                    color: rgb(var(--t-accent-deep-rgb, var(--t-accent-rgb)));
                 }
                 /* toggle Campesino | Experto (.modeToggle del demo) */
                 .agentport-mode {
@@ -750,7 +1016,8 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-mode button {
                     border: none; background: transparent; font: inherit; cursor: pointer;
                     font-size: .72rem; font-weight: 700; padding: 6px 10px; border-radius: 18px;
-                    color: rgb(var(--c-slate-400));
+                    /* slate-500 = inactivo del demo (nature --cafe-3 #8a7350 MEDIDO) */
+                    color: rgb(var(--c-slate-500));
                     display: flex; align-items: center; gap: 4px; white-space: nowrap;
                     transition: background .3s cubic-bezier(.22,.61,.36,1), color .3s ease, transform .15s ease;
                 }
@@ -778,6 +1045,124 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-profile:hover { color: rgb(var(--c-slate-100)); border-color: rgb(var(--t-accent-rgb) / 0.5); }
                 .agentport-profile:active { transform: scale(.92); }
                 .agentport-headtools { display: flex; align-items: center; gap: 8px; flex: none; }
+
+                /* ============ CAMPANA DE ALERTAS/TAREAS (demo biopunk) ============
+                   Import 1:1 del .bellbtn + .notifPanel del demo-agente-biopunk:
+                   campana redonda con anillo que respira + badge ámbar; panel que
+                   baja desde el header con "Alertas ambientales" y "Tareas de
+                   campo". Colores via tokens → theme-aware en los 3 temas. */
+                .agentport-bell {
+                    position: relative; width: 38px; height: 38px; flex: none;
+                    border-radius: 50%; display: inline-flex; align-items: center;
+                    justify-content: center; cursor: pointer; font-size: 1.05rem;
+                    background: rgb(var(--c-surface-card) / 0.65);
+                    border: 1px solid rgb(var(--c-surface-border));
+                    backdrop-filter: blur(6px);
+                    box-shadow: 0 2px 8px -4px rgba(0,0,0,.35);
+                    transition: transform .16s cubic-bezier(.22,.61,.36,1),
+                                background .25s ease, border-color .25s ease, box-shadow .25s ease;
+                }
+                /* el anillo solo respira cuando HAY pendientes (badge > 0) */
+                .agentport-bell.has-items:not(.is-open) {
+                    animation: agentport-pulse-ring 3.6s cubic-bezier(.22,.61,.36,1) infinite;
+                }
+                .agentport-bell:active { transform: scale(.9); }
+                .agentport-bell.is-open {
+                    background: rgb(var(--t-accent-rgb)); border-color: rgb(var(--t-accent-rgb));
+                    animation: none;
+                    box-shadow: 0 0 20px -3px rgb(var(--t-accent-rgb) / 0.85);
+                }
+                .agentport-bell .bicon { transition: transform .3s cubic-bezier(.22,.61,.36,1); }
+                .agentport-bell.is-open .bicon { transform: rotate(8deg); }
+                .agentport-bell .badge {
+                    position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px;
+                    padding: 0 4px; border-radius: 9px; font-size: .62rem; font-weight: 800;
+                    display: flex; align-items: center; justify-content: center; line-height: 1;
+                    background: rgb(var(--c-amber-400)); color: #3a2208;
+                    border: 1.5px solid rgb(var(--c-surface));
+                    box-shadow: 0 0 10px -1px rgb(var(--c-amber-400) / 0.85);
+                }
+                .agentport-notif {
+                    position: absolute; left: 12px; right: 12px;
+                    top: calc(150px + env(safe-area-inset-top));
+                    z-index: 30; display: flex; flex-direction: column; overflow: hidden;
+                    max-height: 56dvh;
+                    background: rgb(var(--c-surface-card) / 0.97);
+                    border: 1px solid rgb(var(--t-accent-rgb) / 0.4);
+                    border-radius: 20px;
+                    box-shadow: 0 22px 48px -18px rgba(0,0,0,.55),
+                                0 0 36px -10px rgb(var(--t-accent-rgb) / 0.3);
+                    transform-origin: top right;
+                    animation: agentport-notif-in .42s cubic-bezier(.32,.72,0,1) both;
+                }
+                @keyframes agentport-notif-in {
+                    from { opacity: 0; transform: translateY(-14px) scale(.97); }
+                    to { opacity: 1; transform: none; }
+                }
+                .agentport-notif .nph {
+                    display: flex; align-items: center; justify-content: space-between;
+                    padding: 13px 16px 9px; flex: none;
+                    border-bottom: 1px solid rgb(var(--c-surface-border));
+                }
+                .agentport-notif .nph .nt {
+                    font-weight: 800; font-size: .96rem; color: rgb(var(--c-slate-100));
+                    display: flex; align-items: center; gap: 7px;
+                }
+                .agentport-notif .nph .nclose {
+                    border: none; cursor: pointer; width: 28px; height: 28px;
+                    border-radius: 50%; font-size: 1rem;
+                    display: flex; align-items: center; justify-content: center;
+                    background: rgb(var(--t-accent-rgb) / 0.12);
+                    color: rgb(var(--t-accent-deep-rgb, var(--t-accent-rgb)));
+                    transition: background .2s ease, transform .15s ease;
+                }
+                .agentport-notif .nph .nclose:active { transform: scale(.9); }
+                .agentport-notif-body {
+                    overflow-y: auto; -webkit-overflow-scrolling: touch;
+                    padding: 8px 12px 12px; overscroll-behavior: contain;
+                }
+                .agentport-notif .nsec {
+                    font-size: .62rem; font-weight: 800; letter-spacing: .16em;
+                    text-transform: uppercase; color: rgb(var(--c-slate-500));
+                    margin: 9px 6px 6px;
+                }
+                .agentport-notif .nitem {
+                    display: flex; align-items: flex-start; gap: 11px;
+                    background: rgb(var(--c-surface-raised));
+                    border: 1px solid rgb(var(--c-surface-border));
+                    border-radius: 14px; padding: 10px 12px; margin-bottom: 7px;
+                }
+                .agentport-notif .nitem .nico {
+                    width: 34px; height: 34px; flex: none; border-radius: 10px;
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: 1.15rem;
+                    background: rgb(var(--t-accent-rgb) / 0.12);
+                    border: 1px solid rgb(var(--t-accent-rgb) / 0.25);
+                }
+                .agentport-notif .nitem.is-danger .nico {
+                    background: rgb(244 63 94 / 0.12); border-color: rgb(244 63 94 / 0.4);
+                }
+                .agentport-notif .nitem .ntxt { flex: 1; min-width: 0; }
+                .agentport-notif .nitem .ntit {
+                    display: block; font-weight: 700; font-size: .88rem;
+                    color: rgb(var(--c-slate-100)); line-height: 1.3;
+                }
+                .agentport-notif .nitem .nmeta {
+                    display: block; font-size: .74rem; margin-top: 3px;
+                    color: rgb(var(--c-slate-300)); line-height: 1.35;
+                }
+                .agentport-notif .nitem .due { font-weight: 800; color: rgb(var(--c-amber-500)); }
+                .agentport-notif .nitem.is-danger .due { color: rgb(244 63 94); }
+                .agentport-notif .nempty {
+                    text-align: center; font-size: .8rem; color: rgb(var(--c-slate-400));
+                    padding: 10px 6px;
+                }
+                .agentport-notif-foot {
+                    padding: 7px 16px 12px; text-align: center; flex: none;
+                    font-size: .68rem; color: rgb(var(--c-slate-500));
+                    border-top: 1px solid rgb(var(--c-surface-border));
+                }
+                .agentport-notif-foot b { color: rgb(var(--t-accent-deep-rgb, var(--t-accent-rgb))); }
 
                 /* chip de UBICACIÓN — debajo de la marca, conectado al logo.
                    📍 Vereda · Municipio · altitud. */
@@ -849,7 +1234,9 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-hi .chagra-wordmark { color: rgb(var(--t-accent-rgb)); }
                 .agentport-sub {
                     margin-top: 8px; font-size: 1rem; line-height: 1.5;
-                    color: rgb(var(--c-slate-300)); max-width: 34ch;
+                    /* slate-400 = .greet .sub del demo (nature --cafe-2 #6b5638
+                       MEDIDO; en biopunk acerca al teal-grisáceo del demo) */
+                    color: rgb(var(--c-slate-400)); max-width: 34ch;
                     transition: opacity 0.4s ease;
                 }
                 [data-nivel="detallado"] .agentport-sub { font-size: 0.92rem; }
@@ -924,14 +1311,30 @@ export default function AgentHero({ onNavigate }) {
                     0%, 100% { box-shadow: 0 0 12px -2px rgb(var(--t-accent-rgb) / 0.55); }
                     50% { box-shadow: 0 0 24px 2px rgb(var(--t-accent-rgb) / 0.85); }
                 }
-                /* al abrir, el ícono se vuelve blanco para contrastar con el acento */
+                /* al abrir, el ícono se vuelve blanco para contrastar con el acento
+                   (cubre también los rellenos de la Ⓐ de herramientas: cabeza del
+                   azadón, hoja y punta del machete) */
                 .agentport-tool.is-open .agentport-tool-ico path,
-                .agentport-tool.is-open .agentport-tool-ico line { stroke: #fff; }
-                .agentport-tool.is-open .agentport-tool-ico circle[fill] { fill: #fff; }
+                .agentport-tool.is-open .agentport-tool-ico line,
+                .agentport-tool.is-open .agentport-tool-ico circle[stroke] { stroke: #fff; }
+                .agentport-tool.is-open .agentport-tool-ico circle[fill],
+                .agentport-tool.is-open .agentport-tool-ico polygon[fill],
+                .agentport-tool.is-open .agentport-tool-ico path[fill]:not([fill="none"]) { fill: #fff; }
                 @keyframes agentport-pulse-ring {
                     0% { box-shadow: 0 0 0 0 rgb(var(--t-accent-rgb) / 0.45); }
                     70% { box-shadow: 0 0 0 12px rgb(var(--t-accent-rgb) / 0); }
                     100% { box-shadow: 0 0 0 0 rgb(var(--t-accent-rgb) / 0); }
+                }
+                /* markSwap del demo: micro-animación al INTERCAMBIAR el ícono
+                   del tema (scale .6 + rotate -12° → overshoot → reposo). */
+                .agentport-tool-ico.agentport-swap,
+                .agentport-mark.agentport-swap {
+                    animation: agentport-mark-swap .5s cubic-bezier(.16,.84,.3,1);
+                }
+                @keyframes agentport-mark-swap {
+                    0% { transform: scale(.6) rotate(-12deg); opacity: .2; }
+                    60% { transform: scale(1.08) rotate(3deg); }
+                    100% { transform: scale(1) rotate(0); opacity: 1; }
                 }
 
                 .agentport-mic-on {
@@ -951,6 +1354,12 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-send:not(:disabled) { box-shadow: 0 4px 14px -4px rgb(var(--t-accent-rgb) / 0.7); }
                 .agentport-send:not(:disabled):active { transform: scale(0.86); }
                 .agentport-send:disabled { background: rgb(var(--c-slate-700)); cursor: not-allowed; }
+                /* sin texto/adjunto el botón sigue VIVO (demo: vacío → abre el
+                   menú Ⓐ) pero baja el volumen para no competir con el acento */
+                .agentport-send:not(.agent-send-accent):not(:disabled) {
+                    background: rgb(var(--c-slate-700));
+                    box-shadow: none;
+                }
                 .agentport-send .send-hummer { width: 30px; height: 22px; display: block; }
                 .agentport-send .send-hummer svg { width: 100%; height: 100%; display: block; }
                 /* En el botón de enviar el colibrí va en CREMA/blanco para
@@ -965,7 +1374,8 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-send:disabled .send-hummer { opacity: .55; }
 
                 .agentport-hint { text-align: center; font-size: 0.72rem; margin-top: 9px; color: rgb(var(--c-slate-500)); }
-                .agentport-hint b { color: rgb(var(--t-accent-rgb)); font-weight: 700; }
+                /* el Ⓐ del hint usa el matiz profundo (.hintbar b del demo) */
+                .agentport-hint b { color: rgb(var(--t-accent-deep-rgb, var(--t-accent-rgb))); font-weight: 700; }
 
                 /* ============== MENÚ Ⓐ INTEGRADO (la red en el hero) ==============
                    Nada de bottom-sheet/scrim/modal (operador 2026-06-09: "que se
@@ -1058,6 +1468,8 @@ export default function AgentHero({ onNavigate }) {
                     .agentport-sprig path { stroke-dashoffset: 0 !important; animation: none !important; }
                     .agentport-tool:not(.is-open) { animation: none !important; }
                     .agentport-tool.is-open { animation: none !important; }
+                    .agentport-bell, .agentport-notif,
+                    .agentport-tool-ico.agentport-swap { animation: none !important; }
                     .agentport-greet { animation: none !important; }
                     .agentport-foldaway, .agentport-redpanel { transition: none !important; animation: none !important; }
                     .chagra-composer-shimmer::after, .chagra-composer-sending { animation: none !important; }
@@ -1069,51 +1481,22 @@ export default function AgentHero({ onNavigate }) {
                 className={[
                     'agentport-scene',
                     night ? 'is-night' : 'is-day',
+                    `sky-${sky.condition}`,
                     menuOpen && !menuClosing ? 'is-quiet' : '',
                 ].join(' ')}
+                data-sky={sky.condition}
+                data-sky-degraded={sky.degraded ? 'true' : 'false'}
                 aria-hidden="true"
             >
-                {/* — SOL/LUNA delicado, universal, según hora (operador 2026-06-06) — */}
-                <div className={['agentport-astro', night ? 'is-moon' : 'is-day'].join(' ')}>
-                    {night ? (
-                        <svg viewBox="0 0 64 64" aria-hidden="true">
-                            {/* luna creciente delicada */}
-                            <defs>
-                                <radialGradient id="ap-moon" cx="42%" cy="38%" r="65%">
-                                    <stop offset="0%" stopColor="#fdfbf2" />
-                                    <stop offset="100%" stopColor="#d9e2f2" />
-                                </radialGradient>
-                            </defs>
-                            <path
-                                d="M44 8 a26 26 0 1 0 12 40 a20 20 0 1 1 -12 -40 z"
-                                fill="url(#ap-moon)"
-                            />
-                            <circle cx="28" cy="24" r="2.2" fill="#cfd8ea" opacity=".7" />
-                            <circle cx="22" cy="38" r="1.6" fill="#cfd8ea" opacity=".55" />
-                            <circle cx="33" cy="42" r="1.3" fill="#cfd8ea" opacity=".5" />
-                        </svg>
-                    ) : (
-                        <svg viewBox="0 0 64 64" aria-hidden="true">
-                            {/* sol delicado con rayos finos */}
-                            <defs>
-                                <radialGradient id="ap-sun" cx="50%" cy="50%" r="50%">
-                                    <stop offset="0%" stopColor="#fff3cf" />
-                                    <stop offset="100%" stopColor="#f5b733" />
-                                </radialGradient>
-                            </defs>
-                            <g stroke="#f5b733" strokeWidth="2.4" strokeLinecap="round" opacity=".85">
-                                <line x1="32" y1="4" x2="32" y2="13" />
-                                <line x1="32" y1="51" x2="32" y2="60" />
-                                <line x1="4" y1="32" x2="13" y2="32" />
-                                <line x1="51" y1="32" x2="60" y2="32" />
-                                <line x1="12" y1="12" x2="18" y2="18" />
-                                <line x1="46" y1="46" x2="52" y2="52" />
-                                <line x1="52" y1="12" x2="46" y2="18" />
-                                <line x1="18" y1="46" x2="12" y2="52" />
-                            </g>
-                            <circle cx="32" cy="32" r="13" fill="url(#ap-sun)" />
-                        </svg>
-                    )}
+                {/* — SOL/LUNA realista: nubosidad real Open-Meteo + corrección
+                     orográfica andina + ENSO de día; FASE LUNAR real de noche
+                     (mostrarla es astronomía; recomendar labores por ella sería
+                     folclore — ADR-033). data-sky habilita la validación E2E. — */}
+                <div
+                    className={['agentport-astro', night ? 'is-moon' : 'is-day'].join(' ')}
+                    title={sky.label}
+                >
+                    <SkyAstro night={night} condition={sky.condition} moonFraction={moonFraction} />
                 </div>
 
                 {/* — NATURE: sol + montañas 3 capas + polen — */}
@@ -1228,8 +1611,84 @@ export default function AgentHero({ onNavigate }) {
                     {/* Engranaje de perfil REMOVIDO (operador 2026-06-06): era
                         redundante — el ícono de usuario del TopBar ya abre el menú
                         con Ajustes/Salir. */}
+
+                    {/* Campana de alertas/tareas — import del demo biopunk.
+                        Badge = alertas activas + tareas de campo pendientes. */}
+                    <button
+                        type="button"
+                        onClick={toggleNotif}
+                        aria-label="Alertas y tareas pendientes"
+                        aria-expanded={notifOpen}
+                        className={[
+                            'agentport-bell',
+                            notifOpen ? 'is-open' : '',
+                            notifCount > 0 ? 'has-items' : '',
+                        ].join(' ')}
+                    >
+                        <span className="bicon" aria-hidden="true">🔔</span>
+                        {notifCount > 0 && <span className="badge">{notifCount}</span>}
+                    </button>
                 </div>
             </header>
+
+            {/* ============ PANEL DE ALERTAS / TAREAS (demo biopunk) ============ */}
+            {notifOpen && (
+                <section className="agentport-notif" aria-label="Alertas y tareas de campo">
+                    <div className="nph">
+                        <div className="nt">🔔 Alertas y tareas</div>
+                        <button
+                            type="button"
+                            className="nclose"
+                            aria-label="Cerrar alertas"
+                            onClick={() => setNotifOpen(false)}
+                        >
+                            ✕
+                        </button>
+                    </div>
+                    <div className="agentport-notif-body">
+                        <div className="nsec">Alertas ambientales</div>
+                        {activeAlerts.length === 0 && (
+                            <p className="nempty">Sin alertas ambientales por ahora.</p>
+                        )}
+                        {activeAlerts.map((a) => (
+                            <div
+                                key={a.type || a.title}
+                                className={['nitem', a.severity === 'danger' ? 'is-danger' : ''].join(' ')}
+                            >
+                                <span className="nico" aria-hidden="true">{a.icon || '⚠️'}</span>
+                                <span className="ntxt">
+                                    <span className="ntit">{a.title}</span>
+                                    {a.message && <span className="nmeta">{a.message}</span>}
+                                </span>
+                            </div>
+                        ))}
+                        <div className="nsec">Tareas de campo</div>
+                        {pendingTasks.length === 0 && (
+                            <p className="nempty">No tienes tareas de campo pendientes.</p>
+                        )}
+                        {pendingTasks.map((t) => (
+                            <div
+                                key={t.id || t.title}
+                                className={[
+                                    'nitem',
+                                    t.severity === 'critical' || t.severity === 'high' ? 'is-danger' : '',
+                                ].join(' ')}
+                            >
+                                <span className="nico" aria-hidden="true">🧑‍🌾</span>
+                                <span className="ntxt">
+                                    <span className="ntit">{t.title}</span>
+                                    {t.deadline && (
+                                        <span className="nmeta"><span className="due">{t.deadline}</span></span>
+                                    )}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="agentport-notif-foot">
+                        Lo clave te lo digo en el saludo. Aquí guardo <b>el resto</b>.
+                    </div>
+                </section>
+            )}
 
             {/* ============ ZONA-RESPIRO (escena detrás · red Ⓐ al abrir) ============
                 Con el menú abierto, la red de capacidades BROTA aquí mismo —
@@ -1400,7 +1859,16 @@ export default function AgentHero({ onNavigate }) {
                             aria-expanded={menuOpen && !menuClosing}
                             className={['agentport-iconbtn agentport-tool !w-11 !h-11', menuOpen && !menuClosing ? 'is-open' : ''].join(' ')}
                         >
-                            <span className="agentport-tool-ico" aria-hidden="true">{iconForTheme(theme)}</span>
+                            {/* key={theme}: al cambiar el tema el ícono se REMONTA →
+                                corre el markSwap del demo (y la "forja" de la Ⓐ de
+                                herramientas vuelve a dibujarse trazo a trazo). */}
+                            <span
+                                key={theme}
+                                className={['agentport-tool-ico', themeSwapped ? 'agentport-swap' : ''].join(' ')}
+                                aria-hidden="true"
+                            >
+                                {iconForTheme(theme)}
+                            </span>
                         </button>
 
                         {/* Cámara / foto — toma una foto O elige de la galería.
@@ -1431,11 +1899,13 @@ export default function AgentHero({ onNavigate }) {
                             {isRecording ? <Square size={16} strokeWidth={2.5} aria-hidden="true" /> : <Mic size={18} strokeWidth={2.5} aria-hidden="true" />}
                         </button>
 
-                        {/* Enviar — usa el mismo colibrí foto/video del FAB global. */}
+                        {/* Enviar — usa el mismo colibrí foto/video del FAB global.
+                            Comportamiento del demo: con el campo VACÍO no se apaga;
+                            tocarlo abre el menú didáctico de capacidades. */}
                         <button
                             type="button"
                             onClick={handleSendText}
-                            disabled={!canSend}
+                            disabled={busy || isRecording}
                             aria-label="Enviar al agente"
                             className={['agentport-send', canSend ? 'agent-send-accent' : ''].join(' ')}
                             style={{

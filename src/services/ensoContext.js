@@ -110,6 +110,13 @@ const PISO_TO_REGION = Object.freeze({
     templado: 'andina',
     templado_andino: 'andina',
     calido: 'andina',
+    // Auditoría clima 2026-06-11: LocationDetectedScreen guarda piso_termico
+    // CON tilde ('frío', 'páramo', 'cálido' — deriveThermalZoneFromAltitud);
+    // sin estas variantes regionFromProfile fallaba silencioso por el piso.
+    'páramo': 'andina',
+    'frío': 'andina',
+    'cálido': 'andina',
+    glacial: 'andina',
 });
 
 /**

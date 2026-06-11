@@ -129,6 +129,46 @@ export function solarTimes(date, latitude, longitude) {
 }
 
 /**
+ * Geometría SVG de la fase lunar REAL para el artefacto sol/luna del agente.
+ *
+ * Dibuja la porción ILUMINADA del disco como un path de dos arcos:
+ *   - arco exterior sobre el limbo iluminado (semicírculo del lado lit),
+ *   - arco interior sobre el terminador (semielipse rx = r·|cos(2πf)|).
+ * Convención hemisferio norte (Colombia ~4°N): creciente ilumina la derecha.
+ *
+ * La FASE es astronomía real (±12h con el ciclo sinódico medio) — mostrarla es
+ * válido. Lo que NO hace este módulo (ni debe hacer la UI) es recomendar
+ * labores agrícolas por fase lunar: eso es folclore sin base física
+ * (ADR-033 / DR-AGUA 2026 — fuerza de marea ~10⁻⁷ de g).
+ *
+ * @param {number} fraction  posición en el ciclo 0..1 (0 = luna nueva, 0.5 = llena)
+ * @param {number} cx @param {number} cy @param {number} r
+ * @returns {{ kind: 'new'|'full'|'partial', d: string|null }}
+ *   kind 'new'  → no dibujar disco iluminado (solo contorno tenue)
+ *   kind 'full' → dibujar círculo completo
+ *   kind 'partial' → usar `d` como path de la zona iluminada
+ */
+export function moonPathD(fraction, cx = 32, cy = 32, r = 13) {
+  const f = ((Number(fraction) % 1) + 1) % 1;
+  const illum = (1 - Math.cos(2 * Math.PI * f)) / 2;
+  if (illum < 0.03) return { kind: 'new', d: null };
+  if (illum > 0.97) return { kind: 'full', d: null };
+
+  const waxing = f < 0.5;
+  const rx = Math.abs(Math.cos(2 * Math.PI * f)) * r;
+  const outerSweep = waxing ? 1 : 0; // creciente: limbo derecho; menguante: izquierdo
+  const gibbous = illum > 0.5; // gibosa: el terminador se curva hacia el lado oscuro
+  const innerSweep = gibbous ? outerSweep : 1 - outerSweep;
+  const d = [
+    `M ${cx} ${cy - r}`,
+    `A ${r} ${r} 0 1 ${outerSweep} ${cx} ${cy + r}`,
+    `A ${rx.toFixed(2)} ${r} 0 1 ${innerSweep} ${cx} ${cy - r}`,
+    'Z',
+  ].join(' ');
+  return { kind: 'partial', d };
+}
+
+/**
  * Formatea una fecha como HH:MM en hora local (24h).
  */
 export function formatLocalHM(date) {

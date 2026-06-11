@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Bell, X, AlertTriangle, Info, AlertCircle, Sprout, Cloud, Wifi, Droplets, ListChecks, Sparkles, Snowflake, CloudRain, Sun, CloudSun, Thermometer, Wind, Activity, RefreshCw } from 'lucide-react';
+import { Bell, X, AlertTriangle, Info, AlertCircle, Sprout, Cloud, CloudFog, Wifi, Droplets, ListChecks, Sparkles, Snowflake, CloudRain, Sun, CloudSun, Thermometer, Wind, Activity, RefreshCw } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import useAlertStore from '../store/useAlertStore';
 import useFincaActiveStore from '../services/fincaActiveStore';
@@ -13,6 +13,8 @@ import {
     phaseBadgeColor,
     describePhase,
 } from '../services/climaService';
+// Condición real del cielo (nubosidad) — fix Choachí 2026-06.
+import { skyForDay, getCachedSkyConditions } from '../services/skyConditionService';
 
 const TYPE_ICONS = {
     climate_critical: Snowflake,
@@ -502,11 +504,34 @@ const PHASE_COLOR_CLASSES = {
     emerald: 'bg-emerald-900/30 border-emerald-700/60 text-emerald-200',
 };
 
-function pickWeatherIcon(precipMm, tempMax) {
-    if (precipMm != null && precipMm >= 10) return CloudRain;
-    if (precipMm != null && precipMm >= 2) return Cloud;
-    if (tempMax != null && tempMax >= 30) return Sun;
-    return CloudSun;
+/**
+ * Ícono por condición REAL del cielo (fix Choachí 2026-06, mismo criterio que
+ * ClimaStrip). Antes <2 mm → "solecito" ámbar: en pueblos altoandinos con
+ * nubosidad orográfica sin lluvia medible eso prometía sol falso. La condición
+ * sale de skyConditionService (nubosidad Open-Meteo si está cacheada + piso
+ * térmico + ENSO; sin dato cae a prior conservador, no a sol).
+ */
+const WEATHER_CONDITION_ICONS = {
+    despejado: { Icon: Sun, cls: 'text-amber-300' },
+    parcial: { Icon: CloudSun, cls: 'text-slate-200' },
+    nublado: { Icon: Cloud, cls: 'text-slate-400' },
+    niebla: { Icon: CloudFog, cls: 'text-slate-300' },
+    lluvia: { Icon: CloudRain, cls: 'text-sky-400' },
+};
+
+function pickWeatherCondition(day, snapshot, skyByDate) {
+    const skyDay = (day?.date && skyByDate?.get(day.date)) || {};
+    return skyForDay(
+        {
+            precip_mm: typeof day?.precip_mm === 'number' ? day.precip_mm : skyDay.precip_mm,
+            cloud_cover_mean_pct: day?.cloud_cover_mean_pct ?? skyDay.cloud_cover_mean_pct,
+            weather_code: day?.weather_code ?? skyDay.weather_code,
+        },
+        {
+            elevationM: snapshot?.location_context?.elevation ?? null,
+            ensoPhase: snapshot?.enso_status?.phase || 'neutral',
+        },
+    );
 }
 
 function formatDayLabel(isoDate, i) {
@@ -560,6 +585,13 @@ function ClimaPanel({ snapshot, loading, onRefresh, climaInfo, onAlertAction, on
 
     const alertas = Array.isArray(snapshot.alertas_locales) ? snapshot.alertas_locales : [];
     const forecast = snapshot.openmeteo?.available ? snapshot.openmeteo.forecast_7d : [];
+    // Nubosidad real cacheada (la llenan AgentHero/ClimaStrip en el home) —
+    // sin red extra aquí; si no está, skyForDay cae al prior conservador.
+    const loc = snapshot.location_context;
+    const skyCache = loc ? getCachedSkyConditions(loc.lat, loc.lng, loc.elevation) : null;
+    const skyByDate = new Map(
+        (Array.isArray(skyCache?.daily) ? skyCache.daily : []).map((d) => [d.date, d]),
+    );
     const sources = Array.isArray(enso.sources) ? enso.sources : [];
     const probs = enso.ideam_probabilities || enso.ideam_probabilidades || null;
 
@@ -570,7 +602,7 @@ function ClimaPanel({ snapshot, loading, onRefresh, climaInfo, onAlertAction, on
 
     return (
         <div className="divide-y divide-slate-800">
-            {/* ENSO badge */}
+            {/* ENSO badge — lenguaje campesino, sin jerga tecnica */}
             <section className={`p-4 border-l-4 ${colorClass}`}>
                 <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
@@ -578,15 +610,9 @@ function ClimaPanel({ snapshot, loading, onRefresh, climaInfo, onAlertAction, on
                             <Activity size={18} aria-hidden="true" />
                             <h4 className="text-sm font-bold">{describePhase(phase)}</h4>
                         </div>
-                        {typeof enso.oni_value === 'number' && (
-                            <p className="text-xs mt-1 opacity-85">
-                                ONI NOAA: <span className="tabular-nums font-bold">{enso.oni_value.toFixed(2)}°C</span>
-                                {enso.trend ? <> · tendencia {enso.trend === 'rising' ? '↑ subiendo' : enso.trend === 'falling' ? '↓ bajando' : '→ estable'}</> : null}
-                            </p>
-                        )}
                         {probs && (
                             <p className="text-xs mt-1 opacity-85">
-                                IDEAM: <span className="font-bold">{probs.nino_pct}%</span> Niño · <span className="font-bold">{probs.neutral_pct}%</span> Neutro · <span className="font-bold">{probs.nina_pct}%</span> Niña
+                                Probabilidad IDEAM: <span className="font-bold">{probs.nino_pct}%</span> seco · <span className="font-bold">{probs.neutral_pct}%</span> normal · <span className="font-bold">{probs.nina_pct}%</span> lluvioso
                             </p>
                         )}
                     </div>
@@ -657,11 +683,12 @@ function ClimaPanel({ snapshot, loading, onRefresh, climaInfo, onAlertAction, on
                     <h5 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Pronóstico 7 días (Open-Meteo)</h5>
                     <div className="grid grid-cols-7 gap-1.5">
                         {forecast.slice(0, 7).map((d, i) => {
-                            const Icon = pickWeatherIcon(d.precip_mm, d.temp_max_c);
+                            const cond = pickWeatherCondition(d, snapshot, skyByDate);
+                            const { Icon, cls } = WEATHER_CONDITION_ICONS[cond.condition] || WEATHER_CONDITION_ICONS.parcial;
                             return (
-                                <div key={d.date || i} className="flex flex-col items-center gap-1 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+                                <div key={d.date || i} title={cond.label} data-condition={cond.condition} className="flex flex-col items-center gap-1 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06]">
                                     <span className="text-[9px] font-bold text-slate-400 uppercase">{formatDayLabel(d.date, i)}</span>
-                                    <Icon size={20} className={(d.precip_mm ?? 0) >= 10 ? 'text-sky-400' : (d.precip_mm ?? 0) >= 2 ? 'text-slate-300' : 'text-amber-300'} aria-hidden="true" />
+                                    <Icon size={20} className={cls} aria-hidden="true" />
                                     {d.temp_max_c != null && (
                                         <span className="text-[11px] font-bold tabular-nums text-white">{Math.round(d.temp_max_c)}°</span>
                                     )}

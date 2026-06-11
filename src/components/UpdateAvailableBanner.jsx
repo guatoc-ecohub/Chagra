@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { RefreshCw, Sparkles } from 'lucide-react';
 import { writeAckedVersion } from '../services/swUpdateAck';
+import { reloadPage } from '../services/pageReload';
 
 export default function UpdateAvailableBanner() {
   const [updateAvailable, setUpdateAvailable] = useState(false);
@@ -28,7 +29,7 @@ export default function UpdateAvailableBanner() {
   }, [updateAvailable]);
 
   const handleUpdate = async () => {
-    // Persistimos el ack ANTES del reload: si el reload falla o el usuario
+    // Persistimos el ack ANTES de activar: si la recarga falla o el usuario
     // cierra la pestaña, no queremos repetir el toast en la proxima sesion
     // para una version que ya acepto.
     if (announcedVersionRef.current) {
@@ -36,11 +37,23 @@ export default function UpdateAvailableBanner() {
     }
     try {
       const reg = await navigator.serviceWorker.ready;
+      // Bug operador 2026-06-10 ("dar Actualizar N veces"): si hubo varios
+      // deploys con la pestaña abierta, update() trae el SW MAS NUEVO y el
+      // browser reemplaza el waiting → un click lleva a la ultima version.
+      try {
+        await reg.update();
+      } catch (_) { /* offline — activamos el waiting que ya tengamos */ }
       if (reg.waiting) {
+        // NO recargamos aca. El SW activa → controllerchange → main.jsx
+        // recarga UNA sola vez (patron Workbox). El reload inmediato creaba
+        // la carrera "recarga antes de que el SW nuevo tome control" que
+        // re-mostraba el banner.
         reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        return;
       }
-    } catch (_) { /* SW not ready — recargar igual abajo */ }
-    window.location.reload();
+    } catch (_) { /* SW no disponible — recargar directo abajo */ }
+    // Sin SW en waiting (banner stale o SW no soportado) → recarga directa.
+    reloadPage();
   };
 
   if (!updateAvailable) return null;

@@ -2,6 +2,7 @@ import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback } from
 import { Sprout, MapPin, Eye, Package, Clock, NotebookPen, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette, FileText } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
+import { useClimaAtmosphere } from './hooks/useClimaAtmosphere';
 import { useScrollRestoration } from './hooks/useScrollRestoration';
 import useIdleDetection from './hooks/useIdleDetection';
 import useGlobalKeyboardShortcuts from './hooks/useGlobalKeyboardShortcuts';
@@ -30,6 +31,7 @@ import { ScreenShell } from './components/common/ScreenShell';
 import ChagraGrowLoader from './components/ChagraGrowLoader';
 import Confetti from './components/common/Confetti';
 import IosInstallBanner from './components/IosInstallBanner';
+import AndroidInstallBanner from './components/AndroidInstallBanner';
 import UpdateAvailableBanner from './components/UpdateAvailableBanner';
 import GpsFincaBanner from './components/GpsFincaBanner';
 import DataLossBanner from './components/DataLossBanner';
@@ -63,6 +65,7 @@ const LocationDetectedScreen = lazy(() => import('./components/LocationDetectedS
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
 const ProcesosPorVozScreen = lazy(() => import('./components/ProcesosPorVozScreen'));
 const CicloCultivoScreen = lazy(() => import('./components/CicloCultivoScreen'));
+const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
 const ProfileScreen = lazy(() => import('./components/ProfileScreen'));
 const CaseStudyScreen = lazy(() => import('./components/CaseStudyScreen'));
 const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
@@ -347,6 +350,9 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
 
 export default function App() {
   useTheme();
+  // Atmósfera climática: el clima real (climaService) matiza el tema activo
+  // vía data-clima/data-luz/data-enso en <html> (clima-atmosfera.css).
+  useClimaAtmosphere();
   // Atajos teclado globales (?, g+h). Quick-win UX 2026-05-28 demo Diana.
   // Solo activos post-login (no en loading ni login para no atrapar shift+?
   // accidental al escribir password).
@@ -708,6 +714,8 @@ export default function App() {
         return <ProcesosPorVozScreen onBack={() => navigate('dashboard')} onSave={showToast} />;
       case 'ciclo':
         return <CicloCultivoScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />;
+      case 'suelo':
+        return <SoilDiagnosticScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />;
       case 'perfil':
         return <ProfileScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />;
       case 'casos':
@@ -753,6 +761,7 @@ export default function App() {
     <>
       <NetworkStatusBar />
       <IosInstallBanner />
+      <AndroidInstallBanner />
       <UpdateAvailableBanner />
       <Confetti />
       <GpsFincaBanner />

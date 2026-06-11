@@ -103,21 +103,22 @@ function scoreBM25(doc, queryTerms, idf, avgLen) {
   return score;
 }
 
-function flattenDoc(doc, prefix = '') {
+function flattenDoc(doc, prefix = '', speciesSlug = null) {
+  const slug = speciesSlug || doc.species_slug || '';
   const passages = [];
   const addPassage = (key, val) => {
     if (typeof val === 'string' && val.length > 20) {
-      passages.push({ key: `${prefix}${key}`, text: val, species: doc.species_slug });
+      passages.push({ key: `${prefix}${key}`, text: val, species: slug });
     } else if (Array.isArray(val)) {
       val.forEach((item, i) => {
         if (typeof item === 'string' && item.length > 20) {
-          passages.push({ key: `${prefix}${key}[${i}]`, text: item, species: doc.species_slug });
+          passages.push({ key: `${prefix}${key}[${i}]`, text: item, species: slug });
         } else if (typeof item === 'object' && item !== null) {
-          flattenDoc(item, `${prefix}${key}[${i}].`).forEach((p) => passages.push(p));
+          flattenDoc(item, `${prefix}${key}[${i}].`, slug).forEach((p) => passages.push(p));
         }
       });
     } else if (typeof val === 'object' && val !== null) {
-      flattenDoc(val, `${prefix}${key}.`).forEach((p) => passages.push(p));
+      flattenDoc(val, `${prefix}${key}.`, slug).forEach((p) => passages.push(p));
     }
   };
 

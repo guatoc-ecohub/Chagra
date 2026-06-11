@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Cloud, CloudRain, Sun, CloudSun, Droplets, Wind, Thermometer, MapPin, AlertCircle, Pencil } from 'lucide-react';
+import { Cloud, CloudRain, CloudFog, Sun, CloudSun, Droplets, Wind, Thermometer, MapPin, AlertCircle, Pencil } from 'lucide-react';
 import { fetchClimaSnapshot, getCachedClimaSnapshot } from '../../services/climaService';
+import { fetchSkyConditions, getCachedSkyConditions, skyForDay } from '../../services/skyConditionService';
 import { findMunicipio } from '../../utils/colombiaLocations';
 import { isSavedLocationCoarse } from '../../services/locationService';
 import { FARM_CONFIG } from '../../config/defaults';
@@ -36,12 +37,23 @@ import { getProfile, getProfileMunicipio } from '../../services/userProfileServi
 
 const DAY_LABELS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
-function pickIcon(precipMm, tempC) {
-    if (precipMm != null && precipMm >= 10) return CloudRain;
-    if (precipMm != null && precipMm >= 2) return Cloud;
-    if (tempC != null && tempC >= 28) return Sun;
-    return CloudSun;
-}
+/**
+ * Ícono + color por CONDICIÓN REAL del cielo (fix Choachí 2026-06).
+ *
+ * Antes: <2 mm de precipitación → "solecito" ámbar. En los pueblos altoandinos
+ * (nubosidad orográfica + niebla SIN lluvia medible) eso prometía ~4 días de
+ * sol cuando hubo 2. Ahora la condición sale de skyConditionService:
+ * nubosidad real de Open-Meteo + corrección por piso térmico + ENSO; sin dato
+ * de nube cae a un prior conservador (piso frío → variable, no sol).
+ * El ámbar de "sol" queda RESERVADO para despejado de verdad.
+ */
+const CONDITION_ICONS = {
+    despejado: { Icon: Sun, cls: 'text-amber-300' },
+    parcial: { Icon: CloudSun, cls: 'text-slate-200' },
+    nublado: { Icon: Cloud, cls: 'text-slate-400' },
+    niebla: { Icon: CloudFog, cls: 'text-slate-300' },
+    lluvia: { Icon: CloudRain, cls: 'text-sky-400' },
+};
 
 function dayLabel(isoDate, i) {
     if (i === 0) return 'Hoy';
@@ -125,6 +137,8 @@ export default function ClimaStrip({ onNavigate }) {
     const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
     const fincas = useFincaActiveStore((s) => s.fincas);
     const [snapshot, setSnapshot] = useState(() => getCachedClimaSnapshot());
+    // Nubosidad real por día (Open-Meteo directo — el sidecar aún no la trae).
+    const [sky, setSky] = useState(null);
     const [loading, setLoading] = useState(true);
     // Bug fix 2026-05-30: el municipio que el usuario confirma en
     // LocationDetectedScreen se guarda en el perfil (userProfileService), NO en
@@ -206,6 +220,15 @@ export default function ClimaStrip({ onNavigate }) {
             .then((res) => { if (alive && res) setSnapshot(res); })
             .catch(() => { /* degrade limpio — nunca rompe el dashboard */ })
             .finally(() => { if (alive) setLoading(false); });
+        // Nubosidad real 7 días (fix Choachí): el snapshot del sidecar aún no
+        // trae cloud_cover, así que se pide directo a Open-Meteo (gratis, CORS
+        // ok, cache 30 min compartido con AgentHero). Si falla, el ícono cae
+        // al prior conservador por piso térmico — nunca a "sol" por defecto.
+        const cachedSky = getCachedSkyConditions(geo.lat, geo.lng, geo.elevation);
+        if (cachedSky && alive) setSky(cachedSky);
+        fetchSkyConditions(climaArgs)
+            .then((s) => { if (alive && s) setSky(s); })
+            .catch(() => { /* degrade limpio */ });
         return () => { alive = false; };
     }, [geo]);
 
@@ -262,14 +285,33 @@ export default function ClimaStrip({ onNavigate }) {
         : [];
 
     const today = new Date();
+    // Nubosidad por fecha (fetch directo) — se cruza con el forecast del
+    // sidecar por ISO date. El día también acepta cloud_cover_mean_pct /
+    // weather_code DEL PROPIO forecast_7d (forward-compat: cuando el sidecar
+    // los agregue, skyForDay los toma de ahí sin tocar este componente).
+    const skyByDate = new Map(
+        (Array.isArray(sky?.daily) ? sky.daily : []).map((d) => [d.date, d]),
+    );
+    const ensoPhase = snapshot?.enso_status?.phase || 'neutral';
     const filled = Array.from({ length: 7 }, (_, i) => {
         const d = forecast[i] || {};
         const fallbackDate = new Date(today.getTime() + i * 24 * 60 * 60 * 1000);
+        const skyDay = (d.date && skyByDate.get(d.date)) || sky?.daily?.[i] || {};
+        const condition = skyForDay(
+            {
+                precip_mm: typeof d.precip_mm === 'number' ? d.precip_mm : skyDay.precip_mm,
+                cloud_cover_mean_pct: d.cloud_cover_mean_pct ?? skyDay.cloud_cover_mean_pct,
+                weather_code: d.weather_code ?? skyDay.weather_code,
+            },
+            { elevationM: geo?.elevation ?? null, ensoPhase },
+        );
         return {
             label: dayLabel(d.date || fallbackDate, i),
             tempMaxC: typeof d.temp_max_c === 'number' ? d.temp_max_c : null,
             tempMinC: typeof d.temp_min_c === 'number' ? d.temp_min_c : null,
             precipMm: typeof d.precip_mm === 'number' ? d.precip_mm : null,
+            condition: condition.condition,
+            conditionLabel: condition.label,
         };
     });
 
@@ -346,14 +388,16 @@ export default function ClimaStrip({ onNavigate }) {
 
             <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
                 {filled.map((d, i) => {
-                    const Icon = pickIcon(d.precipMm, d.tempMaxC);
+                    const { Icon, cls } = CONDITION_ICONS[d.condition] || CONDITION_ICONS.parcial;
                     return (
                         <div
                             key={i}
+                            data-condition={d.condition}
+                            title={d.conditionLabel}
                             className="flex flex-col items-center gap-1 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06]"
                         >
                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{d.label}</span>
-                            <Icon size={22} className={(d.precipMm ?? 0) >= 10 ? 'text-sky-400' : (d.precipMm ?? 0) >= 2 ? 'text-slate-300' : 'text-amber-300'} />
+                            <Icon size={22} className={cls} />
                             {d.tempMaxC != null && (
                                 <span className="text-sm font-bold text-white tabular-nums">{Math.round(d.tempMaxC)}°</span>
                             )}

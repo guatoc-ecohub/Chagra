@@ -1,0 +1,222 @@
+/* src/styles/clima-atmosfera.css
+ * ============================================================================
+ * MODULACIÓN CLIMÁTICA DE LOS TEMAS — la atmósfera visual sigue al clima real.
+ *
+ * Entrada: atributos que escribe atmosphereService/useClimaAtmosphere en <html>:
+ *   data-clima = despejado | nublado | lluvia | niebla   (snapshot climaService)
+ *   data-luz   = amanecer | dia | atardecer | noche      (reloj + efemérides, offline)
+ *   data-enso  = nina | nino                             (sesgo macro; neutral = sin attr)
+ *
+ * Mecánica (misma filosofía de la indirección por CSS-var del theming P0):
+ * los atributos solo mueven VARIABLES `--w-*`; un único velo translúcido
+ * `body::after` (fixed, pointer-events:none) las compone en 3 capas:
+ *
+ *   1. GLOW    radial cálido desde arriba  → luz directa (sol/amanecer/atardecer)
+ *   2. TINTE   gradiente vertical          → color del cielo (gris/azul-frío/niebla)
+ *   3. NOCHE   veladura plana              → variante nocturna de los temas claros
+ *
+ * REGLAS DE ORO:
+ *  - LA IDENTIDAD DEL TEMA MANDA. No se toca ningún token --c-* del tema: el
+ *    clima es un velo encima, con alphas de diseño ≤0.24 y TOPE DURO min()
+ *    (0.20 glow / 0.26 tinte / 0.25 noche) que ni la calibración ni el ENSO
+ *    pueden superar. Peor caso CALCULADO (niebla nature al tope 0.26): tinta
+ *    café sobre crema velada ≈ 4.9:1 → sigue AA. A 0.32 caía a 4.1 → por eso
+ *    el tope es 0.26.
+ *  - Sin atributos → sin velo (ni siquiera se genera el ::after).
+ *  - `prefers-contrast: more` apaga TODA la capa (campo, sol directo).
+ *  - Calibración sensores: `--w-cal` (atmosphereService, 0..1.5) escala todo.
+ *
+ * MATRIZ DE DISEÑO (resumen):
+ *            │ despejado          │ nublado          │ lluvia            │ niebla
+ *   biopunk  │ glow+baño cálido   │ velo gris 10%    │ tinte azul 16%    │ velo claro 18%
+ *   (oscuro) │ canvas glow ↑      │ canvas glow ↓    │ canvas glow ↓↓    │ (la niebla ACLARA lo oscuro)
+ *   nature   │ glow ámbar+baño 7% │ gris piedra 16%  │ azul-frío 20%     │ velo crema-gris 24%
+ *   minimal  │ glow suave 10%     │ gris neutro 16%  │ azul-frío 20%     │ velo blanco-gris 22%
+ *   + luz: amanecer glow rosado / atardecer glow naranja / noche veladura navy
+ *     (solo temas claros — biopunk YA es nocturno, su "idle" oscuro se respeta).
+ *   + ENSO: Niña ×1.25 tinte ×0.8 glow (más húmedo/gris); Niño al revés.
+ * ============================================================================ */
+
+:root {
+  /* Calibración global (hook sensores en campo — atmosphereService). */
+  --w-cal: 1;
+  /* Sesgo ENSO (multiplicadores; neutral = 1). */
+  --w-enso-tint: 1;
+  --w-enso-glow: 1;
+  /* Capa 1: glow de luz directa (radial desde el cielo). */
+  --w-glow-rgb: 255 200 120;
+  --w-glow-a: 0;
+  /* Capa 2: tinte del cielo (gradiente, más denso arriba). */
+  --w-tint-rgb: 100 116 139;
+  --w-tint-a: 0;
+  /* Capa 3: veladura nocturna (solo temas claros). */
+  --w-night-rgb: 24 32 48;
+  --w-night-a: 0;
+  /* Lienzo biopunk (themes.css §4): alpha del glow ambiental teal. El clima lo
+   * "respira": sol pleno lo aviva, lluvia/niebla lo amortiguan. */
+  --bp-glow-a: 0.10;
+}
+
+/* ---------------------------------------------------------------------------
+ * LUZ DEL DÍA (offline: reloj + efemérides — funciona aun sin snapshot).
+ * ------------------------------------------------------------------------- */
+html[data-luz="amanecer"] {
+  --w-glow-rgb: 255 176 132;  /* rosado-durazno de madrugada andina */
+  --w-glow-a: 0.14;
+}
+html[data-luz="atardecer"] {
+  --w-glow-rgb: 255 146 88;   /* naranja de tarde */
+  --w-glow-a: 0.16;
+}
+html[data-luz="noche"] {
+  --w-night-a: 0.25;          /* variante nocturna de los temas claros */
+  /* la noche también ENFRÍA: tinte azul que baja desde el cielo */
+  --w-tint-rgb: 51 65 96;
+  --w-tint-a: 0.10;
+}
+/* Biopunk es el tema NOCTURNO por diseño ("cosecha mística"): de noche no se
+ * vela nada — se respeta su modo oscuro tal cual (patrón del modo auto:
+ * noche→biopunk). */
+html:not([data-theme])[data-luz="noche"] {
+  --w-night-a: 0;
+}
+
+/* ---------------------------------------------------------------------------
+ * CONDICIÓN DEL CIELO (snapshot climaService). Declarado DESPUÉS de la luz:
+ * a igual especificidad, el clima gana el glow (las nubes tapan el sol).
+ * ------------------------------------------------------------------------- */
+
+/* DESPEJADO — sol pleno: saturación plena del tema + luz cálida directa. */
+html[data-clima="despejado"][data-luz="dia"] {
+  --w-glow-rgb: 255 200 120;
+  --w-glow-a: 0.15;
+  /* baño cálido general: el "día de sol" se siente en toda la superficie */
+  --w-tint-rgb: 255 214 140;
+  --w-tint-a: 0.07;
+}
+html[data-clima="despejado"] {
+  --bp-glow-a: 0.14;          /* el lienzo biopunk brilla más con sol */
+}
+
+/* NUBLADO — luz difusa: velo gris que apaga/desatura perceptualmente. */
+html[data-clima="nublado"] {
+  --w-glow-a: 0.03;           /* el sol apenas se insinúa tras las nubes */
+  --w-tint-rgb: 148 163 184;  /* gris slate de cielo cubierto */
+  --w-tint-a: 0.16;
+  --bp-glow-a: 0.07;
+}
+
+/* LLUVIA — tinte frío/húmedo, más denso hacia el cielo. */
+html[data-clima="lluvia"] {
+  --w-glow-a: 0;
+  --w-tint-rgb: 73 102 141;   /* azul-gris de aguacero */
+  --w-tint-a: 0.20;
+  --bp-glow-a: 0.05;
+}
+
+/* NIEBLA (piso térmico frío / páramo) — velo claro, contraste atmosférico bajo
+ * pero texto SIEMPRE sobre el tope min() de legibilidad. */
+html[data-clima="niebla"] {
+  --w-glow-a: 0;
+  --w-tint-rgb: 226 232 240;  /* blanco-gris de nube de suelo */
+  --w-tint-a: 0.22;
+  --bp-glow-a: 0.04;
+}
+
+/* De noche no hay glow solar, llueva o no (gana por orden de declaración). */
+html[data-luz="noche"][data-clima] {
+  --w-glow-a: 0;
+}
+
+/* ---------------------------------------------------------------------------
+ * AFINADO POR TEMA — el mismo clima, en el lenguaje de cada tema.
+ * ------------------------------------------------------------------------- */
+
+/* NATURE (crema cálida): los grises fríos la ensucian → gris PIEDRA cálido
+ * para nublado y niebla color bruma-de-cafetal; la lluvia sí enfría (es el
+ * punto), apenas un paso menos azul. */
+html[data-theme="nature"][data-clima="nublado"] {
+  --w-tint-rgb: 124 116 105;
+}
+html[data-theme="nature"][data-clima="lluvia"] {
+  --w-tint-rgb: 87 105 130;
+}
+html[data-theme="nature"][data-clima="niebla"] {
+  --w-tint-rgb: 233 230 222;
+  --w-tint-a: 0.24;
+}
+
+/* MINIMALISTA (papel): mantiene su sobriedad — glow solar más tímido. */
+html[data-theme="minimalista"][data-clima="despejado"][data-luz="dia"] {
+  --w-glow-a: 0.10;
+  --w-tint-a: 0.05;
+}
+
+/* BIOPUNK (oscuro): los velos claros sobre oscuro pesan el doble percibido →
+ * alphas menores; la lluvia tiñe azul profundo; la niebla ACLARA (nube sobre
+ * neón) sin lavar el teal. */
+html:not([data-theme])[data-clima="nublado"] {
+  --w-tint-a: 0.10;
+}
+html:not([data-theme])[data-clima="lluvia"] {
+  --w-tint-rgb: 56 96 154;
+  --w-tint-a: 0.16;
+}
+html:not([data-theme])[data-clima="niebla"] {
+  --w-tint-rgb: 203 213 225;
+  --w-tint-a: 0.18;
+}
+html:not([data-theme])[data-clima="despejado"][data-luz="dia"] {
+  --w-glow-a: 0.10;
+  --w-tint-rgb: 255 214 140;
+  --w-tint-a: 0.04;
+}
+
+/* ---------------------------------------------------------------------------
+ * ENSO — sesgo macro de estación. La Niña: más húmedo/gris (tinte ↑, sol ↓).
+ * El Niño: más seco/brillante (tinte ↓, sol ↑). Nunca cambia la CATEGORÍA del
+ * cielo (eso es del snapshot): solo la intensidad con que se siente.
+ * ------------------------------------------------------------------------- */
+html[data-enso="nina"] {
+  --w-enso-tint: 1.25;
+  --w-enso-glow: 0.8;
+}
+html[data-enso="nino"] {
+  --w-enso-tint: 0.8;
+  --w-enso-glow: 1.2;
+}
+
+/* ---------------------------------------------------------------------------
+ * EL VELO — una sola capa fija componiendo glow + tinte + noche.
+ * Solo existe si hay atributos de atmósfera; pointer-events:none (jamás
+ * intercepta toques); z-index 60 (sobre modales z-50/51, alphas mínimas).
+ * Tope duro min(): la suma enso×cal nunca supera lo legible.
+ * ------------------------------------------------------------------------- */
+html[data-luz] body::after,
+html[data-clima] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  background:
+    radial-gradient(
+      130% 85% at 50% -12%,
+      rgb(var(--w-glow-rgb) / min(0.20, calc(var(--w-glow-a) * var(--w-enso-glow) * var(--w-cal)))) 0%,
+      transparent 62%
+    ),
+    linear-gradient(
+      180deg,
+      rgb(var(--w-tint-rgb) / min(0.26, calc(var(--w-tint-a) * var(--w-enso-tint) * var(--w-cal)))) 0%,
+      rgb(var(--w-tint-rgb) / min(0.20, calc(var(--w-tint-a) * 0.55 * var(--w-enso-tint) * var(--w-cal)))) 100%
+    ),
+    rgb(var(--w-night-rgb) / min(0.25, calc(var(--w-night-a) * var(--w-cal))));
+}
+
+/* Accesibilidad de campo: contraste alto pedido por el sistema → capa OFF. */
+@media (prefers-contrast: more) {
+  html[data-luz] body::after,
+  html[data-clima] body::after {
+    display: none;
+  }
+}

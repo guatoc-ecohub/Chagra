@@ -56,7 +56,7 @@ import { planForcedIntent, isStubIntent, isDeepResearchIntent, CHIP_DEFS } from 
 // (entidad resuelta o keyword → get_species/get_pest_controllers/get_biopreparados)
 // para intentar AL MENOS una consulta al grafo en vez de caer a generativo puro.
 import { planNluFallback } from '../../services/agentNluFallback';
-import { planKnowledgeIntent } from '../../services/knowledgeIntentRouter';
+import { planKnowledgeIntent, hasSoilDiagnosticIntent } from '../../services/knowledgeIntentRouter';
 // Deep Research (A6/A7): cliente HTTP del endpoint async de investigación
 // profunda del sidecar. Feature flag VITE_DEEP_RESEARCH_ENABLED (default false).
 import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../../services/deepResearchClient';
@@ -67,6 +67,8 @@ import { getCurrentTier } from '../../services/tierService';
 import DeepResearchCard from '../DeepResearchCard';
 import { normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildSuggestedEntitiesContext, isLowConfidenceEntity, buildFallbackResponse, pisoTermicoFromAltitud } from '../../services/agentService';
 import { buildBasePrompt, analyzeQuery, buildQueryAnalysisBlock, buildCorpusVariants, buildResolvedEntitiesBlock, formatToolEvidence } from '../../services/agentPromptBase';
+// Nubosidad real para el grounding (fix Choachí 2026-06) — solo lee caches.
+import { summarizeSkyForGrounding } from '../../services/skyConditionService';
 import { assembleSystemContent } from '../../services/promptAssembler';
 import { applyOutputGuards, classifyQueryIntent } from '../../services/outputGuards';
 import { createStreamGuard } from '../../services/streamGuards';
@@ -707,7 +709,11 @@ export default function AgentScreen({ onBack, initialContext }) {
     const ensoRegion = (() => {
       try { return regionFromProfile(getProfile()); } catch (_) { return null; }
     })();
-    const climaContext = climaSnapshot ? `\n\n${buildClimaContext(climaSnapshot, { region: ensoRegion })}` : '';
+    // Nubosidad real de HOY (cache que llenan AgentHero/ClimaStrip en el home):
+    // el agente cita la condición honesta del cielo (corrección orográfica
+    // andina incluida) o no menciona nubosidad — nunca la inventa.
+    const skyToday = climaSnapshot ? summarizeSkyForGrounding(climaSnapshot) : null;
+    const climaContext = climaSnapshot ? `\n\n${buildClimaContext(climaSnapshot, { region: ensoRegion, sky: skyToday })}` : '';
 
     // FALLO 2 (E2E prod 2026-06-03): GATE de PRECIO para el contexto de finca.
     // `classifyQueryIntent` ya clasifica "a cómo está el bulto de papa" como
@@ -1307,6 +1313,28 @@ export default function AgentScreen({ onBack, initialContext }) {
                 }
               }
             } catch (_) { /* graceful: sigue el flujo NLU normal */ }
+
+            // Suelo-diagnostico: si el campesino describe su terreno, injectamos
+            // diagnosticarSuelo() al grounding. Es cliente-side (sin sidecar),
+            // usa los datos del DR-SUELOS-1. Las guardas anti-mito (vinagre/bicarbonato,
+            // no sobre-encalar) afloran en la respuesta del agente.
+            if (!toolEvidence && hasSoilDiagnosticIntent(textForLLM)) {
+              try {
+                const { diagnosticarSuelo, formatearGroundingSuelo } = await import('../../services/soilDiagnostic');
+                const diag = diagnosticarSuelo(textForLLM);
+                if (diag && !diag.sin_datos) {
+                  const bloque = formatearGroundingSuelo(diag);
+                  if (bloque) {
+                    toolEvidence = {
+                      tool: 'soil_diagnostic',
+                      args: { query: textForLLM },
+                      result: { found: true, bloque },
+                    };
+                    nluRoute = 'suelo:diagnostico';
+                  }
+                }
+              } catch (_) { /* graceful: sin diagnosticar no rompe */ }
+            }
           }
 
           // PASO 2 — routing del tool.
