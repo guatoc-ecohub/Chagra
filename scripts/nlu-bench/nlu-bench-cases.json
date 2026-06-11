@@ -1,0 +1,165 @@
+{
+  "_meta": {
+    "title": "NLU BENCH SÓLIDO — 20 casos complejos de ruteo (grado decisión)",
+    "fecha": "2026-06-10",
+    "autor": "bench NLU sidecar agro-mcp",
+    "nota_labels": "expected_tool / expected_chain / 'chat'. SOLO rutas CONECTADAS (verificadas en chagra/src/services/sidecarClient.js ALLOWED_TOOLS + chagra-pro allowed-tools.ts). NO se etiqueta contra tools de diseño no conectadas (silvopastoril/finca/viables/calendario/grado_dia/finca_overview/add_planta).",
+    "rutas_conectadas": [
+      "get_species",
+      "get_companions",
+      "get_multihop_companions",
+      "get_biopreparados",
+      "get_pest_controllers",
+      "get_precio_sipsa",
+      "get_normativa_ica",
+      "get_subgrafo_relacional",
+      "get_diseno_restauracion",
+      "get_clima_ideam",
+      "get_enso_status",
+      "get_alertas_clima_zona"
+    ],
+    "criterio_acierto": "Un caso simple acierta si use_tool coincide con el esperado Y (si es tool) el tool es el esperado. Un caso 'chat' acierta si use_tool=false. Un caso de cadena acierta si la respuesta trae tool_chain con el conjunto esperado (orden no estricto). Los args NO se evalúan (el tool los resuelve contra el grafo)."
+  },
+  "cases": [
+    {
+      "id": "C01",
+      "query": "Tengo café y maíz juntos en el mismo lote, ¿con qué más los puedo asociar y qué biopreparado les sirve?",
+      "intent": "COMPANION+BIOPREP (multi-intent)",
+      "expected_chain": ["get_companions", "get_biopreparados"],
+      "why": "Multi-intent: pide asociación (companions) Y un biopreparado en la misma frase. El corrector R4 (hasCompanion && hasBioprep) sintetiza tool_chain[get_companions, get_biopreparados]. Ambas rutas conectadas."
+    },
+    {
+      "id": "C02",
+      "query": "se me llenó el cultivo de mosca blanca, ¿qué hago pa controlarla?",
+      "intent": "CONTROL (plaga nombrada + verbo control)",
+      "expected_tool": "get_pest_controllers",
+      "why": "Plaga concreta del catálogo ('mosca blanca') + intención de CONTROL ('qué hago', 'controlar') SIN pedir receta. R0b → get_pest_controllers (controladores/enemigos naturales), no biopreparados."
+    },
+    {
+      "id": "C03",
+      "query": "cómo preparo un caldo o purín pa la roya del café, deme la receta",
+      "intent": "RECETA (preparación explícita)",
+      "expected_tool": "get_biopreparados",
+      "why": "Pide explícitamente RECETA/preparación ('cómo preparo', 'caldo', 'purín', 'receta'). hasRecetaIntent domina sobre control → get_biopreparados con la plaga/especie. R0b NO aplica porque hay receta."
+    },
+    {
+      "id": "C04",
+      "query": "ome y a cómo está el bulto de papa en corabastos esta semana?",
+      "intent": "PRICE (giro colombiano sin verbo)",
+      "expected_tool": "get_precio_sipsa",
+      "why": "Intención de precio inequívoca ('a cómo está', 'el bulto de', 'corabastos'). R0 PRICE FORCE enruta SIEMPRE a get_precio_sipsa, incluso si el modelo alucina. Sin plaga → no se roba a control."
+    },
+    {
+      "id": "C05",
+      "query": "vecino me dijo que use glifosato en la finca, ¿eso está permitido por el ICA?",
+      "intent": "NORMATIVA (legalidad insumo)",
+      "expected_tool": "get_normativa_ica",
+      "why": "Consulta de LEGALIDAD/registro de un insumo ('glifosato', 'está permitido', 'ICA'). NO es una plaga. R0c → get_normativa_ica. NO pide receta ni precio."
+    },
+    {
+      "id": "C06",
+      "query": "se me quemó un pedazo de monte el verano pasado, ¿qué nativas siembro para recuperar ese bosque después del incendio?",
+      "intent": "RESTAURACION (post-incendio)",
+      "expected_tool": "get_diseno_restauracion",
+      "why": "Recuperar/restaurar terreno con NATIVAS tras incendio ('recuperar ese bosque', 'después del incendio', 'nativas'). R0d2 → get_diseno_restauracion (objetivo post_incendio). Conectada en sidecarClient."
+    },
+    {
+      "id": "C07",
+      "query": "para la broca en el café de clima frío, ¿qué controladores hay y con qué cultivos lo asocio en esa tierra?",
+      "intent": "RELACIONAL (plaga + cultivo + clima multi-hop)",
+      "expected_tool": "get_subgrafo_relacional",
+      "why": "Combina PLAGA ('broca') + CULTIVO ('café') + contexto de CLIMA ('clima frío') pidiendo la relación (controladores + asocios filtrados por piso). La regla R0e (hasPestName && hasCultivoMention && hasClimaContext → get_subgrafo_relacional) EXISTE en src/nlu.ts pero NO está en el dist/ que prod corre hoy (build_sha 3b70167, dist mtime 10:32 < commit f3eb01f). Verificado en vivo: prod hoy enruta este caso a chain[get_companions,get_biopreparados] vía R4. Mantenemos el label semánticamente correcto (subgrafo_relacional, ruta conectada) → este caso fallará en TODOS los modelos porque el gap está en el corrector desplegado, NO en el modelo. Hallazgo auditable: el dist de prod va atrás de src en la regla relacional."
+    },
+    {
+      "id": "C08",
+      "query": "¿este año viene Niño o Niña? quiero saber cómo va a estar el clima los próximos meses para programar la siembra",
+      "intent": "CLIMA/ENSO (fase estacional)",
+      "expected_tool": "get_enso_status",
+      "why": "Pregunta por la fase ENSO ('Niño/Niña') y la perspectiva climática de varios meses ('próximos meses'). Es estado ENSO, no pronóstico de 7 días ni histórico → get_enso_status. Keywords 'el niño'/'la niña'/'como va a estar' pasan heurística."
+    },
+    {
+      "id": "C09",
+      "query": "¿va a caer helada esta semana en mi finca? necesito saber el pronóstico de los próximos días",
+      "intent": "CLIMA/ALERTAS (pronóstico inmediato local)",
+      "expected_tool": "get_alertas_clima_zona",
+      "why": "Pronóstico INMEDIATO local + riesgo de evento ('helada esta semana', 'próximos días', 'mi finca'). Es alerta/forecast 7 días por coordenada → get_alertas_clima_zona, NO ENSO (estacional) ni IDEAM histórico."
+    },
+    {
+      "id": "C10",
+      "query": "¿cuánto llovió en mayo en Pasto los últimos años? quiero el promedio histórico de lluvia de la estación más cercana",
+      "intent": "CLIMA/IDEAM (histórico/estaciones)",
+      "expected_tool": "get_clima_ideam",
+      "why": "Clima HISTÓRICO + estaciones ('cuánto llovió en mayo', 'promedio histórico', 'estación más cercana', municipio 'Pasto'). Es la capacidad IDEAM (climate_series/monthly_avg/stations_near), NO pronóstico inmediato ni ENSO."
+    },
+    {
+      "id": "C11",
+      "query": "qué le siembro al lado al tomate pa que se ayuden, buenos vecinos pues",
+      "intent": "COMPANION (asociación 1-hop)",
+      "expected_tool": "get_companions",
+      "why": "Asociación benéfica de un cultivo ('al lado', 'buenos vecinos', 'se ayuden') SIN plaga ni receta. get_companions. R3 reencauza si el modelo cae en plagas/bioprep."
+    },
+    {
+      "id": "C12",
+      "query": "ya sé las compañeras del café, ahora dime qué se asocia con esas compañeras, dos saltos",
+      "intent": "COMPANION 2-hop (multihop)",
+      "expected_tool": "get_multihop_companions",
+      "why": "Pide asociación de SEGUNDO grado ('compañeras de las compañeras', 'dos saltos') — recorrido 2-hop del grafo AGE. get_multihop_companions, no el companions de 1 salto."
+    },
+    {
+      "id": "C13",
+      "query": "al aguacate se le está cayendo toda la flor y no cuaja el fruto, ¿qué será?",
+      "intent": "MANEJO/FISIOLOGÍA (no plaga) → chat",
+      "expected_tool": "chat",
+      "why": "Fisiología/manejo PURO ('se cae la flor', 'no cuaja el fruto') SIN plaga, precio o companions. R2 MANEJO OVERRIDE → use_tool=false (el LLM responde con conocimiento, reason manejo_no_documentado)."
+    },
+    {
+      "id": "C14",
+      "query": "buenos días, ¿cómo amaneció hoy? todo bien por allá?",
+      "intent": "CHAT PURO (saludo)",
+      "expected_tool": "chat",
+      "why": "Saludo sin ninguna keyword agro. La heurística passesHeuristic falla → use_tool=false, reason no_agro_keyword, sin tocar el LLM. (Nota: 'día como estas' NO matchea 'a como esta el' por exigir artículo)."
+    },
+    {
+      "id": "C15",
+      "query": "tengo el cultivo lleno de chzia, digo, chiza o gallina ciega comiéndome la raíz, ¿cómo la combato?",
+      "intent": "CONTROL con TYPO (plaga mal escrita)",
+      "expected_tool": "get_pest_controllers",
+      "why": "Plaga del catálogo escrita con typo ('chzia/chiza' → 'gallina ciega' sí está en PEST_NAME_KEYWORDS) + intención de control ('combato'). R0b → get_pest_controllers. El typo se pasa tal cual; el tool resuelve o devuelve found:false."
+    },
+    {
+      "id": "C16",
+      "query": "a qué altura y a qué temperatura crece bien la arracacha? ¿aguanta clima frío?",
+      "intent": "ESTADO/ATRIBUTO especie",
+      "expected_tool": "get_species",
+      "why": "Pregunta por ATRIBUTOS de una especie concreta ('altura', 'temperatura', 'aguanta clima frío' de 'arracacha'). Es la ficha de especie → get_species. No es relacional (una sola entidad, sin plaga)."
+    },
+    {
+      "id": "C17",
+      "query": "con qué reemplazo el retamo espinoso que invadió la ladera, quiero sembrar nativas en su lugar",
+      "intent": "RESTAURACION (invasora → nativas)",
+      "expected_tool": "get_diseno_restauracion",
+      "why": "Invasora combustible mencionada ('retamo') + intención de reemplazo con NATIVAS ('sembrar nativas en su lugar'). R0d2 → get_diseno_restauracion con invasora_mencionada=retamo (devuelve nota de reemplazo nativa)."
+    },
+    {
+      "id": "C18",
+      "query": "¿qué le echo a la broca del café? cómo la controlo de una vez",
+      "intent": "CONTROL (plaga sola, sin clima)",
+      "expected_tool": "get_pest_controllers",
+      "why": "Plaga SOLA ('broca' en café) + control ('qué le echo', 'cómo la controlo') SIN contexto de clima ni pedir receta. R0e NO la roba (falta clima); R0b → get_pest_controllers. Contraste deliberado con C07."
+    },
+    {
+      "id": "C19",
+      "query": "necesito un repelente casero de neem para los pulgones que tengo en la huerta, ¿cómo lo hago?",
+      "intent": "RECETA (repelente casero) — vs control",
+      "expected_tool": "get_biopreparados",
+      "why": "Aunque nombra plaga ('pulgones'), PIDE una receta/preparación ('repelente casero', 'neem', 'cómo lo hago'). hasRecetaIntent → get_biopreparados (no pest_controllers). Distingue receta vs control con plaga presente."
+    },
+    {
+      "id": "C20",
+      "query": "y a cómo van los tomates en la plaza esta semana, los voy a sacar a vender",
+      "intent": "PRICE (intención de venta, sin plaga)",
+      "expected_tool": "get_precio_sipsa",
+      "why": "Intención de precio/venta inequívoca ('a cómo van', 'en la plaza', 'sacar a vender') SIN plaga ni receta ni clima. R0 PRICE FORCE (hasPrice && !hasPlaga && !hasPestName) → get_precio_sipsa de forma determinista. Segunda forma colombiana de precio distinta a C04 (sin 'bulto', con verbo 'van')."
+    }
+  ]
+}
