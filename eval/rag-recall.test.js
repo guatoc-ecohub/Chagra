@@ -1,12 +1,23 @@
 /**
- * rag-recall.test.js — medición de recall@5 ANTES (BM25 solo) y DESPUÉS
- * (híbrido BM25 + semántico con sinónimos campesinos).
+ * rag-recall.test.js — recall@5 sobre un corpus SINTÉTICO controlado (14 fichas
+ * escritas a mano con vocabulario técnico) para probar el GAP léxico campesino.
  *
- * AIA-004: la auditoría pide MEDIR, no asumir. Este test usa un golden set
- * de 20 consultas campesinas con slugs esperados derivables del catálogo.
+ * ⚠️ ESTO NO ES EL RECALL DE PRODUCCIÓN. El corpus de abajo es SINTÉTICO y
+ * pequeño; sirve solo para un experimento controlado del gap "broca" vs "gusano
+ * del café". La medición REAL contra las 492 fichas del catálogo de producción
+ * vive en `eval/rag-recall-real-corpus.test.js` (recall@5 real ≈ 35%, BM25-only,
+ * porque en prod NO existe `public/rag-embeddings.json`).
+ *
+ * AUDITORÍA 2026-06-11: este archivo (a) declaraba un "90%" HARDCODEADO que no
+ * salía de ninguna medición, y (b) en su rama "híbrida" mockeaba el embedding de
+ * la query con un vector CONSTANTE (independiente del texto), así que NO medía
+ * recall semántico — solo probaba que el pipeline RRF no crashea. Ambas cosas
+ * quedaron corregidas: el 90% se eliminó y la rama híbrida se renombró a lo que
+ * realmente es (un smoke test de infraestructura, no un número de recall).
+ *
+ * AIA-004: la auditoría pide MEDIR, no asumir.
  *
  * Se ejecuta con vitest: `npx vitest run eval/rag-recall.test.js`
- * Incluye en vitest.config.js la ruta eval/ si no está ya.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
@@ -204,59 +215,43 @@ describe('RAG recall@5 — AIA-004 golden set', () => {
     expect(passed).toBeGreaterThanOrEqual(1);
   });
 
-  it('HIBRIDO (BM25 + semantico con RRF): recall@5 NO baja vs BM25-only', async () => {
+  // SMOKE TEST de INFRAESTRUCTURA — NO es una medición de recall.
+  //
+  // El embedding de la query se mockea con un vector CONSTANTE
+  // (slugHash('generic_query')), idéntico para todas las consultas. Por eso el
+  // ranking semántico es el MISMO para cualquier query → NO mide relación
+  // semántica real. Solo verifica que el pipeline híbrido (BM25 + coseno + RRF)
+  // corre sin crashear y que se consulta el endpoint de embeddings.
+  //
+  // El recall semántico REAL requiere nomic-embed-text de verdad: hay que correr
+  // `node scripts/build-rag-embeddings.mjs` (genera public/rag-embeddings.json,
+  // hoy AUSENTE en prod) y medir. Ver la lista de "pruebas duras" en el reporte
+  // de auditoría. Mientras tanto, prod corre BM25-only.
+  it('SMOKE infra: el pipeline híbrido (BM25+semántico+RRF) corre sin crashear', async () => {
     vi.doMock('../../db/catalogDB', () => ({
       getAllSpecies: vi.fn().mockResolvedValue(
         Object.keys(CORPUS_DOCS).map((id) => ({ id })),
       ),
     }));
 
-    // Embeddings mock + ollama mock → modo hibrido completo.
-    // Los vectores mock SIMULAN lo que nomic-embed-text haria en produccion:
-    // el vector de cada slug tiene alta similitud consigo mismo (las
-    // posiciones 0..N codifican el nombre del slug). Esto permite que
-    // semanticRetrieve funcione direccionalmente — no es ruido aleatorio.
-    //
-    // En produccion, nomic-embed-text capturaria la relacion semantica real:
-    // "tierra fria" ≈ "paramo" → solanum_tuberosum, etc.
     const tracker = setupFetchMock({ embedOk: true, mockEmbeddings: true });
     const { retrieve } = await import('../src/services/ragRetriever.js');
 
-    let passed = 0;
     let hits_total = 0;
-    const details = [];
-
     for (const item of GOLDEN_SET) {
       const hits = await retrieve(item.query, 5);
       hits_total += hits.length;
-      const { found, topSlugs } = computeRecallAt5(hits, item.expected);
-      if (found) passed += 1;
-      details.push({
-        id: item.id,
-        query: item.query,
-        expected: item.expected,
-        found,
-        topSlugs,
-      });
     }
 
-    const recall = passed / GOLDEN_SET.length;
-    console.log(`\n[AIA-004] HIBRIDO recall@5: ${passed}/${GOLDEN_SET.length} = ${(recall * 100).toFixed(0)}%\n`);
-    for (const d of details) {
-      console.log(`  ${d.id} ${d.found ? '✅' : '❌'} "${d.query}" → ${d.topSlugs.slice(0, 3).join(', ') || '(ninguno)'}${d.found ? '' : ` [esperado: ${d.expected}]`}`);
-    }
-
-    // El test hibrido con vectores MOCK verifica que:
-    // 1. La pipeline hibrida corre sin crash (BM25 + semantico + RRF)
-    // 2. El endpoint de embeddings se consulto por cada query
-    // 3. El resultado es no-vacio (el recall depende de la calidad del
-    //    modelo nomic-embed-text real, no de mocks direccionales simples)
+    // Lo único que este test puede afirmar HONESTAMENTE:
+    // 1. La pipeline híbrida corre sin crash (BM25 + semántico + RRF).
+    // 2. El endpoint de embeddings se consultó por cada query.
+    // 3. El resultado es no-vacío.
+    // NO afirma ningún recall: el vector de query mock es constante.
     expect(tracker.embedCalls).toBeGreaterThanOrEqual(GOLDEN_SET.length);
     expect(hits_total).toBeGreaterThan(0);
-    expect(recall).toBeGreaterThan(0);
 
-    console.log(`\n  recall@5 BM25+sinonimos: 90%  |  hibrido (mock): ${(recall * 100).toFixed(0)}%  |  embedCalls: ${tracker.embedCalls}`);
-    console.log('  NOTA: recall hibrido real requiere nomic-embed-text (no mock).');
-    console.log('  La infraestructura hibrida (BM25+coseno+RRF) funciona correctamente.');
+    console.log('\n[infra] híbrido OK (sin crash). NO es recall — query embedding mock es constante.');
+    console.log('[infra] recall REAL: ver eval/rag-recall-real-corpus.test.js (35% BM25) y build-rag-embeddings.mjs para el semántico.');
   });
 });
