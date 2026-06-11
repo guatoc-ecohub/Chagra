@@ -115,9 +115,12 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     desc: 'Investigación multi-fuente con fundamento técnico.',
     placeholder: 'Escribe el tema que quieres investigar a fondo',
     tool: null,
-    stubMessage: null,
+    stubMessage:
+      'La investigación profunda requiere conexión al servidor de conocimiento ' +
+      'que aún no está disponible en esta versión. Por ahora usá los chips de ' +
+      'siembra, plaga, biopreparado o clima para obtener información curada.',
     group: 'aprender',
-    status: 'live',
+    status: 'soon',
     hero: true,
     heroRoute: { kind: 'ask', prompt: 'Quiero hacer una investigación profunda sobre mi finca.' },
   },
