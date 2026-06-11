@@ -19,7 +19,7 @@ export default function UpdateAvailableBanner() {
   // Click "Actualizar" en curso: feedback inmediato + evita doble click.
   const [updating, setUpdating] = useState(false);
   // Capturamos la version reportada por el SW (via event.detail) para
-  // persistir el ack en click "Actualizar". Fix Antigravity QA #18.
+  // persistir el ack en click "Actualizar". Fix QA #18.
   const announcedVersionRef = useRef(null);
 
   useEffect(() => {

@@ -19,7 +19,7 @@ import { Sprout, Copy, MessageCircle, Mail, Check, AlertCircle, ChevronRight, Lo
  *
  * Cómo rotar la pass:
  *   1. Cambiar PASSWORD_PILOTO abajo a otro valor.
- *   2. npm run build && deploy a chagra.guatoc.co.
+ *   2. npm run build && deploy a app.example.co.
  *   3. Avisar por WhatsApp/email a los pilotos pending con el nuevo valor.
  */
 

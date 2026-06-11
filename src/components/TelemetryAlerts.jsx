@@ -89,7 +89,7 @@ export default function TelemetryAlerts() {
 
   // Authorization header se inyecta server-side en Nginx desde SOPS
   // (audit #2). VITE_HA_ACCESS_TOKEN ya no se lee — el token vivía en el
-  // bundle JS y era leak Ley 1581. Ahora /api/ha/ proxy de chagra.guatoc.co
+  // bundle JS y era leak Ley 1581. Ahora /api/ha/ proxy de app.example.co
   // agrega `proxy_set_header Authorization "Bearer ..."` con el secret.
 
   // Helper de observabilidad (v0.7.2)

@@ -428,7 +428,7 @@ export default function App() {
 
   useEffect(() => {
     // Rutas públicas (sin auth check): onboarding-piloto. Soporta pathname
-    // (chagra.guatoc.co/onboarding-piloto) gracias al SPA fallback de Nginx
+    // (app.example.co/onboarding-piloto) gracias al SPA fallback de Nginx
     // que sirve index.html, hash (#onboarding-piloto), o query
     // (?onboarding=piloto). Esto permite que pilotos invitados lleguen al
     // form sin tener cuenta previa en FarmOS.
