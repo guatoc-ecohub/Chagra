@@ -87,15 +87,16 @@ export default function HelpAgentSection({ onBackToHome, onNavigate }) {
             <p>
               No es un humano. Se llama &ldquo;agente&rdquo; porque puede usar
               herramientas (consultar el catálogo de plantas, mirar un grafo
-              de relaciones entre especies) para responder con datos reales,
-              no solo con lo que recuerda el modelo de IA.
+              de relaciones entre especies, revisar toxicidad, variedades, suelo
+              y saberes) para responder con datos reales, no solo con lo que
+              recuerda el modelo de IA.
             </p>
             <p>
-              Por dentro usa un modelo de inteligencia artificial llamado{' '}
-              <strong className="text-sky-300">gemma3:4b</strong> que corre en
-              nuestros servidores en Colombia. Es un modelo abierto publicado
-              por Google DeepMind. Lo escogimos pequeño a propósito: responde
-              rápido y no necesita una supercomputadora.
+              Para conversar usa un modelo de inteligencia artificial abierto
+              llamado <strong className="text-sky-300">Granite 3.1</strong> (de
+              IBM) que corre en nuestros servidores en Colombia. Lo anclamos al
+              catálogo: si un dato no está en las fichas, el agente lo dice en
+              vez de inventarlo.
             </p>
           </div>
         </section>
@@ -126,12 +127,8 @@ export default function HelpAgentSection({ onBackToHome, onNavigate }) {
                 </p>
                 <p className="text-xs text-slate-400 mt-1">
                   Ejemplo: pregúntale &ldquo;qué plantas van con el
-                  café&rdquo; y te responde con datos del catálogo Chagra (495
-                  especies curadas a la fecha, ver{' '}
-                  <code className="text-emerald-300">
-                    catalog/chagra-catalog-seed-v3.1.json
-                  </code>
-                  ).
+                  café&rdquo; y te responde con datos del catálogo Chagra (263
+                  especies curadas a la fecha, incluidas 60 de páramo).
                 </p>
               </div>
             </li>
@@ -191,6 +188,26 @@ export default function HelpAgentSection({ onBackToHome, onNavigate }) {
                 <p>
                   <strong>Te lee las respuestas en voz alta</strong> si tienes
                   las manos sucias o no puedes leer la pantalla.
+                </p>
+              </div>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle2
+                size={16}
+                className="text-emerald-400 mt-1 shrink-0"
+                aria-hidden="true"
+              />
+              <div>
+                <p>
+                  <strong>Te muestra todo lo que sabe hacer</strong> en un menú
+                  que se abre desde el agente.
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
+                  Del agente brota una red de opciones, como las ramas de un
+                  árbol. Toca una rama y se abren sus capacidades (plantas
+                  compañeras, biopreparados, toxicidad, variedades, suelo,
+                  saberes). Lo que aún no está listo aparece marcado como &ldquo;por
+                  lanzarse&rdquo;.
                 </p>
               </div>
             </li>
@@ -357,9 +374,9 @@ export default function HelpAgentSection({ onBackToHome, onNavigate }) {
           </h3>
           <ul className="space-y-3 text-sm text-slate-200 leading-relaxed">
             <li>
-              <strong>El catálogo tiene 495 especies hoy</strong> (revisado
-              2026-05-23). Si tu planta no está, el agente te lo dirá. Crece
-              con aportes de la comunidad.
+              <strong>El catálogo abierto tiene 263 especies hoy</strong>{' '}
+              (incluidas 60 de páramo). Si tu planta no está, el agente te lo
+              dirá. Crece con aportes de la comunidad.
             </li>
             <li>
               <strong>El modelo se equivoca</strong> en cierto porcentaje de

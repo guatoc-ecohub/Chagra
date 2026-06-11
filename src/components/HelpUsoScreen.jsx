@@ -185,7 +185,7 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
         </Section>
 
         {/* 5. Reportar problema / sugerir mejora — embed del FieldFeedback
-            form. Antes vivía como FAB flotante 💬 global; movido acá
+            form. Antes vivía como FAB flotante 💬 global; movido aquí
             2026-05-21 por feedback usuario (más discoverable + no tapa
             contenido). isNew=true para resaltar la nueva ubicación. */}
         <Section
