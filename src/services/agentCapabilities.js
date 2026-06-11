@@ -192,13 +192,17 @@ export const CAPABILITY_MANIFEST = Object.freeze([
   {
     id: 'foto',
     group: 'observar',
-    status: 'live',
+    status: 'soon',
     icon: '📷',
     label: 'Agregar planta por foto',
     desc: 'Tómale una foto y la identifico y registro.',
     tool: 'vision_identify',
     hero: true,
     heroRoute: { kind: 'photo' },
+    stubMessage:
+      'La identificación por foto necesita mejor hardware (GPU con ≥8GB VRAM). ' +
+      'Por ahora usá la voz o el formulario manual para registrar tus plantas. ' +
+      'Próximamente estará disponible por la nube.',
   },
   {
     id: 'voz',
