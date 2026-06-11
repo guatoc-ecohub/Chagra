@@ -279,6 +279,20 @@ export default function AgentHero({ onNavigate }) {
      * Persiste la consulta en la outbox DURABLE y navega. Orden estricto:
      * (1) persistir → (2) navegar. Si la persistencia falla NO navegamos en
      * silencio: dejamos el texto/adjunto para reintentar (cero pérdida).
+     *
+     * BUG mano-bloqueada (operador 2026-06-10, repro tests/mano-bloqueo): el
+     * `busy=true` SOLO se reseteaba en el catch (fallo de persistencia). En el
+     * camino feliz quedaba `true` para SIEMPRE, confiando en que `launchToAgent`
+     * desmontara el hero. Pero la transición es diferida (SEND_TRANSITION_MS) y
+     * si la navegación NO desmonta el hero (la vista 'agente' no monta, navegar
+     * es no-op, o el operador sigue viendo la mano), `busy` quedaba pegado →
+     * `AgentRedMenu` recibe `disabled=true` → `.arm-root.arm-disabled`
+     * (pointer-events:none) → la MANO MUERTA hasta recargar (los nodos
+     * páramo/silvopastoreo/restauración "no hacían nada y bloqueaban la mano").
+     *
+     * Fix: `busy` se libera SIEMPRE en `finally`. La mano nunca queda muerta;
+     * si la navegación desmonta el hero, el setState post-unmount es no-op
+     * inofensivo; si NO desmonta, la mano vuelve a estar viva de inmediato.
      */
     const send = async (payload) => {
         if (busy) return;
@@ -291,6 +305,10 @@ export default function AgentHero({ onNavigate }) {
             launchToAgent();
         } catch (err) {
             console.error('[AgentHero] no se pudo guardar la consulta, no navego:', err);
+        } finally {
+            // Reset incondicional: la mano NUNCA debe quedar bloqueada. En éxito,
+            // la navegación desmonta el hero poco después (setState no-op); en
+            // fallo, el operador puede reintentar con la mano viva.
             setBusy(false);
         }
     };
