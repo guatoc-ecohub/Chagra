@@ -157,6 +157,22 @@ const PRICE_INTENT_PATTERNS = [
   /\b(el|la|los|las|una?|cuantas?)\s+(arroba|bulto|carga)[s]?\b/,
 ];
 
+// ── R0b: intencion CARBONO/BONOS (Task 3, audit ministerio) ──────────
+const CARBON_INTENT_PATTERNS = [
+  /\b(bonos?\s+(de\s+)?carbono|carbono\s+neutral|creditos?\s+(de\s+)?carbono)\b/,
+  /\b(me\s+quieren\s+pagar\s+por\s+sembrar|pagar\s+por\s+sembrar\s+arboles|pago\s+por\s+carbono)\b/,
+  /\b(PSA|pago\s+por\s+servicios?\s+ambientales?|Decreto\s+1007)\b/,
+];
+
+// ── R0: intencion RESTAURACION (Task 2, audit ministerio) ────────────
+const RESTORATION_INTENT_PATTERNS = [
+  /\b(restaura[cç]|reforesta[cç]|recuperar\s+(el\s+)?(monte|bosque|terreno|suelo|lote))\b/,
+  /\b(arbol(es)?\s+nativ[oa]s?|especies?\s+nativ[oa]s?|nativ[oa]s?\s+(de|para|a))\b/,
+  /\b(p[aá]ramo|frailej[oó]n|sucesi[oó]n\s+(ecol[oó]gica|natural)|corredor\s+ripario|cerca\s+viva)\b/,
+  /\b(sembrar|plantar)\s+(pino|eucalipto|cedro|roble|aliso|nacedero|guadua)\b/,
+  /\b(proteger\s+(el\s+)?nacimiento|controlar\s+(la\s+)?erosion|barrera[s]?\s+viva[s]?)\b/,
+];
+
 /**
  * Verbos / fraseo de SIEMBRA. Si la consulta del usuario los trae, es de
  * siembra y los guards de siembra SÍ deben correr aunque también mencione
@@ -199,9 +215,9 @@ export function classifyQueryIntent(userMessage) {
   if (typeof userMessage !== 'string') return 'unknown';
   const norm = _stripDiacritics(userMessage);
   if (!norm) return 'unknown';
-  // La siembra manda: si la pregunta menciona sembrar/cultivar/viabilidad, es de
-  // siembra aunque también hable de precio (conservador).
   if (PLANTING_INTENT_PATTERNS.some((re) => re.test(norm))) return 'siembra';
+  if (CARBON_INTENT_PATTERNS.some((re) => re.test(norm))) return 'carbono_bonos';
+  if (RESTORATION_INTENT_PATTERNS.some((re) => re.test(norm))) return 'restauracion';
   if (PRICE_INTENT_PATTERNS.some((re) => re.test(norm))) return 'precio';
   return 'unknown';
 }
