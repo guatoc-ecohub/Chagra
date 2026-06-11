@@ -6,7 +6,14 @@
  *
  * Los 3 SVG son versiones marca de los demos:
  *   - nature: manos + frailejón (Espeletia), acento tierra
- *   - biopunk: anillo eléctrico + A (azadón + rama) + travesaño zigzag
+ *   - biopunk: la Ⓐ DE HERRAMIENTAS DE CAMPO — iteración RECUPERADA
+ *     (Chagra-strategy/ops/icon-explorations/animada-refinada-grunge2.html,
+ *     "ANIM-2 Refinada · Forja", 2026-06-06): círculo anarquía + pata
+ *     izquierda = AZADÓN (cabeza perpendicular al mango, filo rojo) + pata
+ *     derecha = RASTRILLO (travesaño + 5 dientes) + travesaño = MACHETE
+ *     (hoja curva + punta). Versión 28px engrosada (legible en cabecera).
+ *     Las clases `aforge`/`aforge-fill` activan la animación de forja
+ *     one-shot (stroke-dashoffset) definida en index.css.
  *   - minimalista: círculo + brote-horqueta monoline, acento verde sobrio
  */
 
@@ -30,13 +37,68 @@ export const THEME_ICON = {
             <circle cx="60" cy="36" r="6.5" fill="#d9742a" />
         </svg>
     ),
-    // Bio-punk — anillo eléctrico + A (azadón + rama) + travesaño zigzag.
+    // Bio-punk — la Ⓐ de HERRAMIENTAS DE CAMPO (iteración recuperada,
+    // "ANIM-2 Refinada": azadón + rastrillo + machete + círculo anarquía,
+    // rojinegro punk). Geometría 1:1 de la exploración del operador; trazos
+    // de la versión 28px (engrosados) para que lea a tamaño de marca/botón.
     biopunk: (
-        <svg viewBox="0 0 120 120" fill="none" width="100%" height="100%" aria-hidden="true">
-            <circle cx="60" cy="60" r="50" stroke="#19c79a" strokeWidth="7" />
-            <line x1="60" y1="24" x2="34" y2="96" stroke="#f0a060" strokeWidth="9" strokeLinecap="round" />
-            <line x1="60" y1="24" x2="86" y2="96" stroke="#3be8a6" strokeWidth="9" strokeLinecap="round" />
-            <path d="M44 66 L52 60 L60 66 L68 60 L76 67" stroke="#19c79a" strokeWidth="7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        <svg viewBox="0 0 100 108" fill="none" width="100%" height="100%" aria-hidden="true">
+            {/* Círculo anarquía */}
+            <circle
+                className="aforge" cx="50" cy="55" r="41" stroke="#c0392b" strokeWidth="5.5"
+                style={{ '--sd': 290 }}
+            />
+            {/* AZADÓN — pata izquierda: mango + cabeza PERPENDICULAR + filo */}
+            <g data-tool="azadon">
+                <line
+                    className="aforge" x1="28" y1="100" x2="46" y2="22"
+                    stroke="#c0392b" strokeWidth="6" strokeLinecap="round"
+                    style={{ '--sd': 96, '--fd': '.18s' }}
+                />
+                <polygon className="aforge-fill" points="34,18 58,24 60,29 36,23" fill="#5a0000" style={{ '--fd': '.26s' }} />
+                <path
+                    className="aforge" d="M34 18 L58 24 L60 29 L36 23 Z"
+                    stroke="#e74c3c" strokeWidth="3" strokeLinejoin="round"
+                    style={{ '--sd': 55, '--fd': '.28s' }}
+                />
+                <line
+                    className="aforge" x1="36" y1="23" x2="60" y2="29"
+                    stroke="#ff6060" strokeWidth="4" strokeLinecap="round"
+                    style={{ '--sd': 32, '--fd': '.34s' }}
+                />
+            </g>
+            {/* RASTRILLO — pata derecha: mango + travesaño + 5 dientes */}
+            <g data-tool="rastrillo">
+                <line
+                    className="aforge" x1="73" y1="100" x2="54" y2="18"
+                    stroke="#c0392b" strokeWidth="5.5" strokeLinecap="round"
+                    style={{ '--sd': 90, '--fd': '.4s' }}
+                />
+                <path
+                    className="aforge" d="M44 20 C51 17 58 15 65 14"
+                    stroke="#e74c3c" strokeWidth="4.5" strokeLinecap="round"
+                    style={{ '--sd': 26, '--fd': '.48s' }}
+                />
+                <line className="aforge" x1="45" y1="20" x2="44" y2="9" stroke="#e74c3c" strokeWidth="3.5" strokeLinecap="round" style={{ '--sd': 14, '--fd': '.52s' }} />
+                <line className="aforge" x1="49" y1="19" x2="48.5" y2="8" stroke="#ff6060" strokeWidth="3" strokeLinecap="round" style={{ '--sd': 14, '--fd': '.55s' }} />
+                <line className="aforge" x1="53" y1="18" x2="53" y2="7.5" stroke="#e74c3c" strokeWidth="3.5" strokeLinecap="round" style={{ '--sd': 14, '--fd': '.58s' }} />
+                <line className="aforge" x1="57" y1="17" x2="57.5" y2="7" stroke="#ff6060" strokeWidth="3" strokeLinecap="round" style={{ '--sd': 14, '--fd': '.61s' }} />
+                <line className="aforge" x1="61" y1="16" x2="62" y2="7.5" stroke="#e74c3c" strokeWidth="3.5" strokeLinecap="round" style={{ '--sd': 14, '--fd': '.64s' }} />
+            </g>
+            {/* MACHETE — travesaño: hoja curva + filo rojo sangre + punta */}
+            <g data-tool="machete">
+                <path
+                    className="aforge-fill"
+                    d="M21 62 C36 57 56 58 70 61 C76 62 80 65 83 67 C78 69 64 68 50 66 C36 64 21 68 21 69Z"
+                    fill="#4a0a00" style={{ '--fd': '.7s' }}
+                />
+                <path
+                    className="aforge" d="M21 62 C36 57 58 58 70 61 C76 62 81 65 84 67"
+                    stroke="#e74c3c" strokeWidth="4" strokeLinecap="round"
+                    style={{ '--sd': 85, '--fd': '.74s' }}
+                />
+                <path className="aforge-fill" d="M81 65 L93 62 L90 69 L80 70Z" fill="#c0392b" style={{ '--fd': '.78s' }} />
+            </g>
         </svg>
     ),
     // Minimalista — círculo + brote-horqueta monoline, acento verde sobrio.

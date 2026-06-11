@@ -39,17 +39,33 @@
  * "Chagra", halo). Antes biopunk no lo tenía y nature usaba oliva → el acento
  * salía verde-lavado en vez del color del demo. Valores = demos 2026-06-05:
  *   biopunk → teal #19c79a · nature → ocre #d98a4f · minimalista → verde #2f6e5a */
+/* Además del acento base, cada demo usa DOS matices del acento que antes no
+ * existían como token (paridad medida 2026-06-11 contra demo-agente*.html):
+ *   --t-accent-strong-rgb → el matiz del wordmark "Soy Chagra" (.greet .hi span):
+ *       biopunk = --teal-br #3be8a6 · nature = --acento-d #b86a32 ·
+ *       minimalista = --acento #2f6e5a.
+ *   --t-accent-deep-rgb   → el matiz del subtítulo de marca y del hint
+ *       (.brand small / .hintbar b): biopunk = --teal #19c79a · nature =
+ *       --acento-deep #a8612f · minimalista = --acento-deep #1d4639.
+ * Sin esto, nature pintaba wordmark/hint con el acento claro #d98a4f (medido)
+ * en vez de los tostados #b86a32/#a8612f del demo. */
 :root {
   --t-accent-rgb: 25, 201, 154;  /* teal neón biopunk (demo #19c79a) */
+  --t-accent-strong-rgb: 59, 232, 166;  /* teal brillante (demo #3be8a6) */
+  --t-accent-deep-rgb: 25, 201, 154;    /* = acento (demo --teal) */
 }
 
 [data-theme="minimalista"] {
   --t-accent-rgb: 47, 110, 90;   /* verde profundo (demo #2f6e5a) */
+  --t-accent-strong-rgb: 47, 110, 90;   /* demo: .hi span usa --acento */
+  --t-accent-deep-rgb: 29, 70, 57;      /* --acento-deep #1d4639 */
   --t-bg-rgb: 246, 243, 236;     /* papel (para el agujero del halo) */
 }
 
 [data-theme="nature"] {
   --t-accent-rgb: 217, 138, 79;  /* ocre cálido (demo #d98a4f) */
+  --t-accent-strong-rgb: 184, 106, 50;  /* --acento-d #b86a32 (wordmark) */
+  --t-accent-deep-rgb: 168, 97, 47;     /* --acento-deep #a8612f (hint/marca) */
   --t-bg-rgb: 251, 245, 234;     /* crema */
 }
 
@@ -71,11 +87,12 @@
   color: #fff !important;
 }
 
-/* Wordmark "Chagra": del degradé al acento sólido del tema */
+/* Wordmark "Chagra": del degradé al matiz FUERTE del acento del tema
+ * (= .greet .hi span del demo: #3be8a6 bp · #b86a32 nature · #2f6e5a min) */
 .chagra-wordmark {
   background-image: none !important;
-  -webkit-text-fill-color: rgb(var(--t-accent-rgb)) !important;
-  color: rgb(var(--t-accent-rgb)) !important;
+  -webkit-text-fill-color: rgb(var(--t-accent-strong-rgb, var(--t-accent-rgb))) !important;
+  color: rgb(var(--t-accent-strong-rgb, var(--t-accent-rgb))) !important;
   font-weight: 900;
 }
 
