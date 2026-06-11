@@ -1,0 +1,38 @@
+{
+  "fuente": "DR-RESTAURACION-1 (Gemini+Meta, 2026-06-11)",
+  "referencias": ["UICN", "IAvH", "CIPAV"],
+  "indicadores": [
+    {
+      "id": "conteo_aves",
+      "nombre": "Conteo de aves",
+      "que_mide": "Recuperacion de biodiversidad, salud del ecosistema",
+      "como_se_hace": "Elegir un punto fijo en el predio. Contar especies de aves diferentes vistas/oidas en 15 minutos al amanecer. Repetir cada 6 meses.",
+      "umbral": "Pasar de 5 a 15 especies en 2 anos indica recuperacion del ecosistema.",
+      "confiabilidad": "media"
+    },
+    {
+      "id": "macroinvertebrados",
+      "nombre": "Macroinvertebrados acuaticos (BMWP)",
+      "que_mide": "Calidad del agua de quebradas y rios",
+      "como_se_hace": "Levantar piedras en el fondo de la quebrada y contar los 'bichos' pegados (larvas de libelula, friganea, efemeropteros). Cada tipo tiene un puntaje de tolerancia a contaminacion.",
+      "umbral": "Presencia de friganea y efemeropteros = agua limpia. Solo caracoles y sanguijuelas = agua contaminada.",
+      "confiabilidad": "alta"
+    },
+    {
+      "id": "estratos",
+      "nombre": "Estratos verticales de vegetacion",
+      "que_mide": "Complejidad estructural del bosque en recuperacion",
+      "como_se_hace": "Observar si hay: suelo cubierto (hojarasca/musgo) + sotobosque (arbustos <2m) + dosel medio (arboles 5-15m) + dosel alto (>15m) + epifitas (bromelias/orquideas en ramas). Cada estrato suma 1 punto.",
+      "umbral": "Potrero = 1 estrato. Bosque maduro = 4-5 estratos. La restauracion ANDINA debe sumar al menos 3 estratos en 5-8 anos.",
+      "confiabilidad": "alta"
+    },
+    {
+      "id": "plantulas_nativas",
+      "nombre": "Plantulas nativas por metro cuadrado",
+      "que_mide": "Regeneracion natural del bosque",
+      "como_se_hace": "Marcar 3 cuadrados de 1x1m en el area en restauracion. Contar plantulas de arboles nativos (NO pasto, NO retamo).",
+      "umbral": "0 plantulas/m2 = no hay regeneracion. >3 plantulas/m2 de al menos 2 especies diferentes = buena regeneracion.",
+      "confiabilidad": "media"
+    }
+  ]
+}
