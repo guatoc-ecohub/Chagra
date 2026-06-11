@@ -56,7 +56,7 @@ import { planForcedIntent, isStubIntent, isDeepResearchIntent, CHIP_DEFS } from 
 // (entidad resuelta o keyword → get_species/get_pest_controllers/get_biopreparados)
 // para intentar AL MENOS una consulta al grafo en vez de caer a generativo puro.
 import { planNluFallback } from '../../services/agentNluFallback';
-import { planKnowledgeIntent } from '../../services/knowledgeIntentRouter';
+import { planKnowledgeIntent, hasSoilDiagnosticIntent } from '../../services/knowledgeIntentRouter';
 // Deep Research (A6/A7): cliente HTTP del endpoint async de investigación
 // profunda del sidecar. Feature flag VITE_DEEP_RESEARCH_ENABLED (default false).
 import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../../services/deepResearchClient';
@@ -1307,6 +1307,28 @@ export default function AgentScreen({ onBack, initialContext }) {
                 }
               }
             } catch (_) { /* graceful: sigue el flujo NLU normal */ }
+
+            // Suelo-diagnostico: si el campesino describe su terreno, injectamos
+            // diagnosticarSuelo() al grounding. Es cliente-side (sin sidecar),
+            // usa los datos del DR-SUELOS-1. Las guardas anti-mito (vinagre/bicarbonato,
+            // no sobre-encalar) afloran en la respuesta del agente.
+            if (!toolEvidence && hasSoilDiagnosticIntent(textForLLM)) {
+              try {
+                const { diagnosticarSuelo, formatearGroundingSuelo } = await import('../../services/soilDiagnostic');
+                const diag = diagnosticarSuelo(textForLLM);
+                if (diag && !diag.sin_datos) {
+                  const bloque = formatearGroundingSuelo(diag);
+                  if (bloque) {
+                    toolEvidence = {
+                      tool: 'soil_diagnostic',
+                      args: { query: textForLLM },
+                      result: { found: true, bloque },
+                    };
+                    nluRoute = 'suelo:diagnostico';
+                  }
+                }
+              } catch (_) { /* graceful: sin diagnosticar no rompe */ }
+            }
           }
 
           // PASO 2 — routing del tool.
