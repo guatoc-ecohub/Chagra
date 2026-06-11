@@ -195,9 +195,11 @@ describe('ChipsToolbar — flag Deep Research ON (chip 🔬 visible, pro-gated)'
     vi.restoreAllMocks();
   });
 
-  test('renderiza los 7 chips (incluido 🔬) con la flag ON', () => {
+  test('renderiza todos los chips (incluido 🔬) con la flag ON', () => {
     render(<ChipsToolbar onSelectIntent={() => {}} isPro={false} />);
-    expect(screen.getAllByTestId('mode-chip')).toHaveLength(7);
+    // Con la flag ON se ven los 10 chips del manifiesto (deep incluido, aunque
+    // quede pro-locked para free).
+    expect(screen.getAllByTestId('mode-chip')).toHaveLength(CHIP_DEFS.length);
   });
 
   test('usuario free ve el chip 🔬 con sufijo "(Pro)" y deshabilitado', () => {

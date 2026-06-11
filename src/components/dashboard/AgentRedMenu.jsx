@@ -58,6 +58,7 @@ const GROUP_META = Object.freeze({
   cultivo: { icon: '🌱', label: 'Mis cultivos' },
   cuidar: { icon: '🐛', label: 'Cuidar y prevenir' },
   observar: { icon: '👁️', label: 'Mirar la finca' },
+  restaurar: { icon: '🌳', label: 'Restaurar y conservar' },
   registrar: { icon: '📝', label: 'Guardar lo que hago' },
   planear: { icon: '📅', label: 'Planear' },
   aprender: { icon: '📚', label: 'Aprender' },
@@ -65,7 +66,7 @@ const GROUP_META = Object.freeze({
 });
 
 const GROUP_ORDER = Object.freeze([
-  'cultivo', 'cuidar', 'observar', 'registrar', 'planear', 'aprender', 'vender',
+  'cultivo', 'cuidar', 'observar', 'restaurar', 'registrar', 'planear', 'aprender', 'vender',
 ]);
 
 const GROUPS = GROUP_ORDER

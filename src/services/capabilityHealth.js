@@ -19,6 +19,7 @@ export const SIDECAR_TOOL_NAMES = new Set([
   'get_multihop_companions',
   'get_subgrafo_relacional',
   'get_diseno_restauracion',
+  'get_diseno_silvopastoril',
   'validate_visual_match',
   'validate_taxonomy',
   'get_normativa_ica',

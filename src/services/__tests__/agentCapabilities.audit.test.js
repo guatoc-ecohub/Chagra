@@ -15,7 +15,7 @@
  *   - MCP sin datos: available:false / found:false → mensaje honesto
  *   - función no disponible por plan → stubMessage claro (ej. precio)
  */
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { CHIP_INTENTS, CHIP_DEFS, planForcedIntent } from '../chipIntentRouter.js';
 
 // ---------------------------------------------------------------------------
@@ -85,6 +85,33 @@ const CHIP_REGISTRY = [
     tool: null,
     stub: false,
     deep: true,
+  },
+  {
+    intent: 'restauracion',
+    label: 'Restauración',
+    emoji: '🌳',
+    kind: 'tool',
+    tool: 'get_diseno_restauracion',
+    stub: false,
+    deep: false,
+  },
+  {
+    intent: 'silvopastoreo',
+    label: 'Silvopastoreo',
+    emoji: '🐄',
+    kind: 'tool',
+    tool: 'get_diseno_silvopastoril',
+    stub: false,
+    deep: false,
+  },
+  {
+    intent: 'paramo',
+    label: 'Páramo',
+    emoji: '⛰️',
+    kind: 'tool',
+    tool: 'get_diseno_restauracion',
+    stub: false,
+    deep: false,
   },
 ];
 
@@ -164,6 +191,8 @@ describe('agentCapabilities — cada tool del chip está en ALLOWED_TOOLS', () =
     const knownTools = new Set([
       'get_species', 'get_companions', 'get_biopreparados',
       'get_pest_controllers', 'get_multihop_companions',
+      'get_subgrafo_relacional', 'get_diseno_restauracion',
+      'get_diseno_silvopastoril',
       'validate_visual_match', 'validate_taxonomy',
       'get_normativa_ica', 'get_clima_ideam', 'get_precio_sipsa',
       'get_enso_status', 'get_alertas_clima_zona',
@@ -293,13 +322,16 @@ describe('agentCapabilities — Deep Research (backend live)', () => {
 // 7. Contrato anti-regresión — si alguien cambia labels o tools sin aviso
 // ---------------------------------------------------------------------------
 describe('agentCapabilities — contrato anti-regresión', () => {
-  it('el número total de chips visibles es 7', () => {
-    expect(CHIP_DEFS).toHaveLength(7);
-    expect(CHIP_REGISTRY).toHaveLength(7);
+  it('el número total de chips visibles es 10', () => {
+    expect(CHIP_DEFS).toHaveLength(10);
+    expect(CHIP_REGISTRY).toHaveLength(10);
   });
 
-  it('los intents visibles son exactamente los 7 contratados', () => {
-    const expected = ['siembro', 'plaga', 'biopreparado', 'clima', 'precio', 'calendario', 'deep'];
+  it('los intents visibles son exactamente los 10 contratados', () => {
+    const expected = [
+      'siembro', 'plaga', 'biopreparado', 'clima', 'precio', 'calendario', 'deep',
+      'restauracion', 'silvopastoreo', 'paramo',
+    ];
     const actual = CHIP_DEFS.map((d) => d.intent);
     expect(actual).toEqual(expected);
   });
