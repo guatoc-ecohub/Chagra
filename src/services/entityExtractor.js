@@ -26,8 +26,15 @@ import { registry } from '../core/moduleRegistry';
 import { parseJsonTolerant as parseJsonTolerantUtil } from '../utils/parseJsonTolerant';
 
 const OLLAMA_CHAT_URL = '/api/ollama/api/chat';
-const MODEL = 'gemma3:4b';
-// El modelo configurado responde en pocos segundos para extracción JSON con format:json.
+// 2026-06-11: gemma3:4b NO co-reside con granite3.3:8b pinned "Forever" (8.3GB
+// → solo ~3.7GB libres; gemma3:4b 3.3GB + contexto NO carga limpio) → la
+// extracción de voz fallaba (0 plantas: "Sembré 10 fresas y 4 lechugas…" no
+// resolvía nada porque el call a gemma3:4b se quedaba sin respuesta/timeout).
+// Fix: usar granite3.3 (YA cargado, hot) — extrae el JSON bien sin esperar
+// carga ni evictar el chat. Verificado en vivo: granite3.3 devuelve
+// {crop,quantity,location} correcto donde gemma3:4b daba vacío.
+const MODEL = 'granite3.3:8b';
+// El modelo responde en pocos segundos para extracción JSON con format:json.
 // Nginx permite hasta 120s en /api/ollama/; 60s cliente es el punto medio seguro.
 const TIMEOUT_MS = 60000;
 
