@@ -23,6 +23,7 @@ export default defineConfig({
     include: [
       'src/**/*.test.{js,jsx}',
       'tests/unit/**/*.test.{js,jsx}',
+      'eval/**/*.test.{js,mjs}',
       // POC Apache AGE (feat/apache-age-poc-2026-05-20): tests del importer
       // viven junto al script para mantener cohesión local. Incluye .mjs
       // porque el importer es ESM nativo.
