@@ -56,7 +56,7 @@ import { planForcedIntent, isStubIntent, isDeepResearchIntent, CHIP_DEFS } from 
 // (entidad resuelta o keyword → get_species/get_pest_controllers/get_biopreparados)
 // para intentar AL MENOS una consulta al grafo en vez de caer a generativo puro.
 import { planNluFallback } from '../../services/agentNluFallback';
-import { planKnowledgeIntent } from '../../services/knowledgeIntentRouter';
+import { planKnowledgeIntent, hasSoilDiagnosticIntent, hasWaterDiagnosticIntent, hasAnimalDiagnosticIntent, hasRestauracionDiagnosticIntent } from '../../services/knowledgeIntentRouter';
 // Deep Research (A6/A7): cliente HTTP del endpoint async de investigación
 // profunda del sidecar. Feature flag VITE_DEEP_RESEARCH_ENABLED (default false).
 import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../../services/deepResearchClient';
@@ -1307,6 +1307,34 @@ export default function AgentScreen({ onBack, initialContext }) {
                 }
               }
             } catch (_) { /* graceful: sigue el flujo NLU normal */ }
+
+            // Modulos DR: inyectar diagnosticos de suelo/agua/animal/restauracion al grounding.
+            // Cada uno es cliente-side (sin sidecar), usa datos del DR-consolidado.
+            // Las guardas anti-mito y de seguridad afloran en la respuesta del agente.
+            if (!toolEvidence) {
+              const intents = [
+                [hasSoilDiagnosticIntent, () => import('../../services/soilDiagnostic').then(m => [m.diagnosticarSuelo, m.formatearGroundingSuelo]), 'suelo'],
+                [hasWaterDiagnosticIntent, () => import('../../services/waterDiagnostic').then(m => [m.diagnosticarAgua, m.formatearGroundingAgua]), 'agua'],
+                [hasAnimalDiagnosticIntent, () => import('../../services/animalDiagnostic').then(m => [m.diagnosticarAnimal, m.formatearGroundingAnimal]), 'animal'],
+                [hasRestauracionDiagnosticIntent, () => import('../../services/restauracionDiagnostic').then(m => [m.diagnosticarRestauracion, m.formatearGroundingRestauracion]), 'restauracion'],
+              ];
+              for (const [hasIntent, loadMod, label] of intents) {
+                if (hasIntent(textForLLM)) {
+                  try {
+                    const [diagnosticar, formatear] = await loadMod();
+                    const diag = diagnosticar(textForLLM);
+                    if (diag && !diag.sin_datos) {
+                      const bloque = formatear(diag);
+                      if (bloque) {
+                        toolEvidence = { tool: `${label}_diagnostic`, args: { query: textForLLM }, result: { found: true, bloque } };
+                        nluRoute = `${label}:diagnostico`;
+                      }
+                    }
+                  } catch (_) { /* graceful */ }
+                  break;
+                }
+              }
+            }
           }
 
           // PASO 2 — routing del tool.

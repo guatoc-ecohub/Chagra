@@ -132,3 +132,15 @@ export const __TEST__ = {
   PLAGA_GUARD_RE,
   _norm,
 };
+
+// ── Intenciones de diagnóstico (módulos DR) ──
+
+const SUELO_DIAG_RE = /\b(tierra|suelo|terreno|lote|parcela)\b.*\b(amarilla|colorada|pegajosa|greda|empoza|encharca|dura|piedra|pal[ií]n|rebota|cansad[ao]|flojita|negr[ao]|sueltica|se\s+lava|helecho|cortadera|coquito|lombriz|vinagre|bicarbonato|cal|encalar)\b|^\s*(m[ií]\s+tierra|la\s+tierra|el\s+suelo|el\s+lote)/i;
+const AGUA_DIAG_RE = /\b(lluvia|llueve|sequ[ií]a|quebrada|riego|regar|tanque|agua|capta[cç].?o|pozo|aljibe|nacimiento|reservorio|goteo|mulch.*agua|se\s+sec[oó])\b|no\s+llueve|falta\s+agua|agua\s+no\s+(me\s+)?alcanza|se\s+sec[oó]\s+la\s+quebrada|se\s+me\s+ahog[oó]/i;
+const ANIMAL_DIAG_RE = /\b(vacas?|novillas?|toro|gallinas?|ponedoras?|pollos?|cabras?|chivos?|ovejas?|corderos?|marranos?|cochina|lech[oó]n|conejos?|abejas?|angelitas?|colmenas?|meliponas?|caballo|mula|bestia|yunta|forraje|banco\s+de\s+prote[ií]na|leucaena|bot[oó]n\s+de\s+oro|matarrat[oó]n)\b|qu[eé]\s+les?\s+doy\s+de\s+comer/i;
+const RESTAURACION_DIAG_RE = /\b(restaura[cç].?o|recuperar\s+(el\s+)?monte|proteger\s+(el\s+)?nacimiento|p[aá]ramo|reforesta[cç].?o|corredor\s+(biol[oó]gico|ripario)|retamo|invasor|potrero\s+degradado|quebrada\s+a\s+restaurar)\b|me\s+quieren\s+pagar\s+por\s+sembrar|sembrar\s+pino|sembrar\s+eucalipto/i;
+
+export function hasSoilDiagnosticIntent(msg) { return typeof msg === 'string' && msg.trim().length >= 5 && SUELO_DIAG_RE.test(_norm(msg)); }
+export function hasWaterDiagnosticIntent(msg) { return typeof msg === 'string' && msg.trim().length >= 5 && AGUA_DIAG_RE.test(_norm(msg)); }
+export function hasAnimalDiagnosticIntent(msg) { return typeof msg === 'string' && msg.trim().length >= 5 && ANIMAL_DIAG_RE.test(_norm(msg)); }
+export function hasRestauracionDiagnosticIntent(msg) { return typeof msg === 'string' && msg.trim().length >= 5 && RESTAURACION_DIAG_RE.test(_norm(msg)); }
