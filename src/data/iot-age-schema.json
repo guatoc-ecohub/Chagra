@@ -1,0 +1,17 @@
+{
+  "fuente": "DR-IOT-1",
+  "nodos": [
+    { "label": "Sensor", "propiedades": ["id", "tipo", "ubicacion", "unidad", "modelo"] },
+    { "label": "Lectura", "propiedades": ["valor", "timestamp", "bateria"] },
+    { "label": "Camara", "propiedades": ["id", "modelo", "resolucion"] },
+    { "label": "DiagnosticoImagen", "propiedades": ["foto_hash", "veredicto_salud", "plaga_detectada", "confianza", "fuente_VLM", "validado"] },
+    { "label": "Alerta", "propiedades": ["tipo", "mensaje", "severidad", "timestamp"] }
+  ],
+  "edges": [
+    { "from": "Lectura", "to": "Sensor", "rel": "GENERADA_POR" },
+    { "from": "Sensor", "to": "Zona", "rel": "MIDE_EN" },
+    { "from": "Lectura", "to": "Alerta", "rel": "DISPARA" },
+    { "from": "DiagnosticoImagen", "to": "Species", "rel": "SOBRE" },
+    { "from": "Camara", "to": "DiagnosticoImagen", "rel": "CAPTURO" }
+  ]
+}
