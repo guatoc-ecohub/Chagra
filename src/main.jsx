@@ -89,9 +89,12 @@ if ('serviceWorker' in navigator) {
     }
   });
 
-  // Banner "nueva version disponible" cuando SW cambia (controllerchange) o
-  // cuando un nuevo SW esta en waiting (updatefound). Reemplaza auto-reload:
-  // el operador decide cuando actualizar via UpdateAvailableBanner.
+  // Banner "nueva version disponible" SOLO cuando hay un SW nuevo en waiting
+  // (registration.waiting / updatefound). NUNCA por controllerchange: ese
+  // evento significa que la actualizacion YA se aplico — dispararlo ahi
+  // re-mostraba el banner despues de actualizar (bug operador 2026-06-10
+  // "debo dar Actualizar N veces"). El operador decide cuando actualizar
+  // via UpdateAvailableBanner.
   //
   // Fix Antigravity QA #18: persistimos el ack en localStorage
   // (`sw:last-acked-version`) para no repetir el toast cada reload. Antes
@@ -122,17 +125,32 @@ if ('serviceWorker' in navigator) {
     }
   };
 
+  // Patron Workbox estandar: click "Actualizar" → SKIP_WAITING → el SW nuevo
+  // toma control → controllerchange → recargar la pagina UNA sola vez.
+  // Guard `reloading` evita bucles de recarga; `hadController` evita recargar
+  // en el primer install (clients.claim() tambien dispara controllerchange
+  // cuando antes no habia controlador — ahi NO hay que recargar).
+  let reloading = false;
+  let hadController = Boolean(navigator.serviceWorker.controller);
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    maybeDispatchUpdateAvailable(navigator.serviceWorker.controller);
+    if (!hadController) {
+      hadController = true; // primer claim en first install — sin recarga
+      return;
+    }
+    if (reloading) return;
+    reloading = true;
+    window.location.reload();
   });
 
-  // Tambien detectar SW en waiting por si el controllerchange no se dispara
-  // (ej. si el SW no hace skipWaiting automaticamente en el futuro).
+  // Deteccion de SW nuevo en waiting: unica fuente del banner.
   navigator.serviceWorker.ready.then((registration) => {
-    // Estado inicial: si ya hay un SW controlador, sembrar ack para suprimir
-    // toast en cargas siguientes.
-    if (navigator.serviceWorker.controller) {
-      maybeDispatchUpdateAvailable(navigator.serviceWorker.controller);
+    // First install: sembrar el ack con la version del SW activo SIN disparar
+    // banner (la actualizacion ya esta aplicada; anunciar aqui era el bug).
+    const activeSw = navigator.serviceWorker.controller || registration.active;
+    if (activeSw && readAckedVersion() === null) {
+      getSwVersion(activeSw)
+        .then((version) => { if (version) seedFirstInstallAck(version); })
+        .catch(() => { });
     }
     if (registration.waiting) {
       maybeDispatchUpdateAvailable(registration.waiting);
