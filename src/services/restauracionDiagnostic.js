@@ -1,3 +1,12 @@
+/**
+ * restauracionDiagnostic — diagnostico de restauracion ecologica (DR-RESTAURACION-1).
+ *
+ * Fuente: DR-RESTAURACION-1 (2/3 Gemini+Meta, 2026-06-11).
+ * Datos: src/data/restauracion.json
+ *
+ * Guardas: pino/eucalipto NO restauracion, alerta bonos carbono,
+ * paramo→pasiva+Ley 1930, retamo NO quemar, densidad excesiva MITO.
+ */
 import REST_DATA from '../data/restauracion.json';
 
 export function diagnosticarRestauracion(descripcion) {

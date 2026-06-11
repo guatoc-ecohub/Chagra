@@ -1,5 +1,15 @@
+/**
+ * animalDiagnostic — diagnostico pecuario agroecologico (DR-ANIMAL-1).
+ *
+ * Fuente: DR-ANIMAL-1-consolidado (3/3 DeepSeek+Gemini+Meta, 2026-06-11).
+ * Datos: src/data/animal-diagnostics.json
+ *
+ * Guardas criticas: Leucaena PROHIBIDA a monogastricos+equinos,
+ * Apis vs meliponas (pillaje), estres termico mortal aves/cerdos.
+ */
 import ANIMAL_DATA from '../data/animal-diagnostics.json';
 
+/** @param {string} descripcion @returns {Object|null} */
 export function detectarEspecie(descripcion) {
   if (!descripcion) return null;
   const texto = descripcion.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
