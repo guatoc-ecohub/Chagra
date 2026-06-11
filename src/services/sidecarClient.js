@@ -299,6 +299,10 @@ const ALLOWED_TOOLS = new Set([
   // GraphRAG multi-hop + restauración (sidecar feat/graphrag-multihop, 2026-06-10).
   'get_subgrafo_relacional',
   'get_diseno_restauracion',
+  // Silvopastoril (chip Silvopastoreo, 2026-06-10): forrajeras multipropósito
+  // CIPAV/Agrosavia del grafo AGE. La tool existía en el sidecar pero no estaba
+  // en esta allow-list — el chip la expone.
+  'get_diseno_silvopastoril',
   'validate_visual_match',
   'validate_taxonomy',
   'get_normativa_ica',

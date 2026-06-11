@@ -21,7 +21,7 @@ import {
  */
 
 describe('chipIntentRouter — enum y definiciones', () => {
-  it('expone los 7 intents del enum', () => {
+  it('expone los 10 intents del enum (incluye restauración, silvopastoreo, páramo)', () => {
     expect(CHIP_INTENTS).toEqual({
       siembro: 'siembro',
       plaga: 'plaga',
@@ -30,10 +30,13 @@ describe('chipIntentRouter — enum y definiciones', () => {
       precio: 'precio',
       calendario: 'calendario',
       deep: 'deep',
+      restauracion: 'restauracion',
+      silvopastoreo: 'silvopastoreo',
+      paramo: 'paramo',
     });
   });
 
-  it('CHIP_DEFS tiene los 7 chips con label en español colombiano (sin voseo)', () => {
+  it('CHIP_DEFS tiene los 10 chips con label en español colombiano (sin voseo)', () => {
     const ids = CHIP_DEFS.map((c) => c.intent);
     expect(ids).toEqual([
       'siembro',
@@ -43,6 +46,9 @@ describe('chipIntentRouter — enum y definiciones', () => {
       'precio',
       'calendario',
       'deep',
+      'restauracion',
+      'silvopastoreo',
+      'paramo',
     ]);
     // Labels presentes y emoji declarado
     for (const def of CHIP_DEFS) {
@@ -168,6 +174,80 @@ describe('chipIntentRouter — intents con tool determinístico (saltan NLU)', (
   });
 });
 
+describe('chipIntentRouter — chips de diseño (capacidades antes dark)', () => {
+  it('restauración → get_diseno_restauracion objetivo=bosque por defecto + altitud del perfil', () => {
+    const plan = planForcedIntent('restauracion', 'quiero recuperar este lote', { altitud: 2600 });
+    expect(plan.tool).toBe('get_diseno_restauracion');
+    expect(plan.args.objetivo).toBe('bosque');
+    expect(plan.args.altitud_msnm).toBe(2600);
+    expect(plan.stub).toBe(false);
+    expect(plan.skipNlu).toBe(true);
+  });
+
+  it('restauración infiere objetivo del texto (ribera / quemado / cortafuegos / páramo)', () => {
+    expect(planForcedIntent('restauracion', 'la orilla de la quebrada').args.objetivo).toBe('ribera');
+    expect(planForcedIntent('restauracion', 'un sitio que se quemó').args.objetivo).toBe('post_incendio');
+    expect(planForcedIntent('restauracion', 'quiero un cortafuego vivo').args.objetivo).toBe('cortafuegos');
+    expect(planForcedIntent('restauracion', 'restaurar el páramo').args.objetivo).toBe('paramo');
+  });
+
+  it('restauración pasa invasora_mencionada cuando el usuario la nombra (retamo/eucalipto)', () => {
+    const plan = planForcedIntent('restauracion', 'tengo retamo espinoso, ¿qué hago?');
+    expect(plan.args.invasora_mencionada).toBe('retamo');
+  });
+
+  it('restauración sin altitud NO incluye altitud_msnm (la tool la trata como opcional)', () => {
+    const plan = planForcedIntent('restauracion', 'recuperar bosque');
+    expect(plan.tool).toBe('get_diseno_restauracion');
+    expect(plan.args).not.toHaveProperty('altitud_msnm');
+  });
+
+  it('páramo → get_diseno_restauracion objetivo=paramo SIN pasar la altura de la finca', () => {
+    // La altura de la finca puede estar por debajo del páramo; el objetivo
+    // 'paramo' ya fuerza ≥3000 msnm en la tool. No la pasamos para no vaciar.
+    const plan = planForcedIntent('paramo', 'especies de páramo', { altitud: 2600 });
+    expect(plan.tool).toBe('get_diseno_restauracion');
+    expect(plan.args).toEqual({ objetivo: 'paramo' });
+    expect(plan.skipNlu).toBe(true);
+  });
+
+  it('silvopastoreo → get_diseno_silvopastoril con altura + piso del perfil', () => {
+    const plan = planForcedIntent('silvopastoreo', 'forraje para mis vacas', {
+      altitud: 1800,
+      pisoTermico: 'templado',
+    });
+    expect(plan.tool).toBe('get_diseno_silvopastoril');
+    expect(plan.args.altitud).toBe(1800);
+    expect(plan.args.piso_termico).toBe('templado');
+    expect(plan.args.animal).toBe('bovino');
+    expect(plan.stub).toBe(false);
+    expect(plan.skipNlu).toBe(true);
+  });
+
+  it('silvopastoreo normaliza el piso con tilde del perfil (frío→frio, páramo→paramo)', () => {
+    expect(planForcedIntent('silvopastoreo', 'forraje', { altitud: 2500, pisoTermico: 'frío' }).args.piso_termico).toBe('frio');
+    expect(planForcedIntent('silvopastoreo', 'forraje', { altitud: 3100, pisoTermico: 'páramo' }).args.piso_termico).toBe('paramo');
+  });
+
+  it('silvopastoreo detecta el animal del texto (oveja→ovino, cabra→caprino)', () => {
+    expect(planForcedIntent('silvopastoreo', 'forraje para ovejas', { altitud: 2500 }).args.animal).toBe('ovino');
+    expect(planForcedIntent('silvopastoreo', 'sombra para mis cabras', { altitud: 1500 }).args.animal).toBe('caprino');
+  });
+
+  it('silvopastoreo SIN altura → stub no_altitud (pide la altura, NO inventa)', () => {
+    const plan = planForcedIntent('silvopastoreo', 'forraje para el ganado');
+    expect(plan.tool).toBe('get_diseno_silvopastoril');
+    expect(plan.stub).toBe(true);
+    expect(plan.stubResult).toMatchObject({ available: false, reason: 'no_altitud' });
+    expect(plan.skipNlu).toBe(true);
+  });
+
+  it('silvopastoreo acepta altitud como string del perfil (coerción a número)', () => {
+    const plan = planForcedIntent('silvopastoreo', 'forraje', { altitud: '2100' });
+    expect(plan.args.altitud).toBe(2100);
+  });
+});
+
 describe('chipIntentRouter — intents STUB (backend no existe aún)', () => {
   it('precio → stub claro "aún no disponible" (NO inventa backend de precio)', () => {
     const plan = planForcedIntent('precio', 'papa');
@@ -223,15 +303,15 @@ describe('chipIntentRouter — Deep Research (A6/A7, backend live)', () => {
 });
 
 describe('chipIntentRouter — contrato de orden y consistencia del índice', () => {
-  it('CHIP_DEFS mantiene el orden de render estable (siembro, plaga, biopreparado, clima, precio, calendario, deep)', () => {
+  it('CHIP_DEFS mantiene el orden de render estable (chips base + restauración/silvopastoreo/páramo al final)', () => {
     const order = CHIP_DEFS.map((d) => d.intent);
     expect(order).toEqual([
       'siembro', 'plaga', 'biopreparado', 'clima', 'precio', 'calendario', 'deep',
+      'restauracion', 'silvopastoreo', 'paramo',
     ]);
   });
 
-  it('DEF_BY_INTENT indexa todos los 7 intents sin entradas extra', async () => {
-    const { default: mod } = await import('../chipIntentRouter.js');
+  it('DEF_BY_INTENT indexa todos los intents sin entradas extra', () => {
     // DEF_BY_INTENT no es exportado, así que verificamos indirectamente:
     // isStubIntent e isDeepResearchIntent cubren todos los intents sin error.
     for (const intent of Object.keys(CHIP_INTENTS)) {
@@ -286,14 +366,12 @@ describe('chipIntentRouter — cross-reference con ALLOWED_TOOLS del sidecar', (
     }
   });
 
-  it('ningún kind:stub o kind:deep tiene tool en ALLOWED_TOOLS', async () => {
-    const { __TEST__ } = await import('../sidecarClient.js');
-    const allowed = __TEST__.ALLOWED_TOOLS;
+  it('ningún kind:stub o kind:deep tiene tool en ALLOWED_TOOLS', () => {
     const nonToolIntents = CHIP_DEFS.filter((d) => d.kind !== 'tool');
     for (const def of nonToolIntents) {
       const plan = planForcedIntent(def.intent, 'test');
-      expect(plan.tool).toBeNull();
       // Ningún stub/deep debe tener un tool asignado (ni siquiera por error)
+      expect(plan.tool).toBeNull();
     }
   });
 });

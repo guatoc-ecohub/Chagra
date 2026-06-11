@@ -121,6 +121,70 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     hero: true,
     heroRoute: { kind: 'ask', prompt: 'Quiero hacer una investigación profunda sobre mi finca.' },
   },
+  {
+    // Capacidad ya viva en el backend (get_diseno_restauracion: sucesión
+    // ecológica con nativas del grafo AGE) pero SIN chip — la auditoría IA la
+    // marcó "dark". El chip la fuerza saltando el NLU y le pasa la altura del
+    // perfil. El `objetivo` (bosque/ribera/cortafuegos/post_incendio) lo infiere
+    // el router del texto del usuario; por defecto 'bosque'.
+    id: 'restauracion',
+    group: 'restaurar',
+    status: 'live',
+    intent: 'restauracion',
+    kind: 'tool',
+    icon: '🌳',
+    label: 'Restauración',
+    desc: 'Recuperar un terreno con nativas, de pioneras a bosque maduro.',
+    placeholder: 'Cuéntame qué quieres recuperar: bosque, orilla de quebrada o sitio quemado',
+    tool: 'get_diseno_restauracion',
+    stubMessage: null,
+    hero: true,
+    heroRoute: {
+      kind: 'ask',
+      prompt: 'Quiero restaurar un terreno con árboles nativos. ¿Qué especies siembro y en qué orden?',
+    },
+  },
+  {
+    // get_diseno_silvopastoril estaba viva en el sidecar pero NI en el
+    // allow-list del cliente NI con chip. El chip la fuerza con la altura del
+    // perfil (requerida por la tool) y, opcional, el animal inferido del texto.
+    id: 'silvopastoreo',
+    group: 'restaurar',
+    status: 'live',
+    intent: 'silvopastoreo',
+    kind: 'tool',
+    icon: '🐄',
+    label: 'Silvopastoreo',
+    desc: 'Forraje y árboles para tu ganado según tu altura.',
+    placeholder: 'Escribe tu animal o el forraje que buscas: banco de proteína, cerca viva, sombra',
+    tool: 'get_diseno_silvopastoril',
+    stubMessage: null,
+    hero: true,
+    heroRoute: {
+      kind: 'ask',
+      prompt: 'Quiero un arreglo silvopastoril con forraje y árboles para mi ganado.',
+    },
+  },
+  {
+    // Páramo: reutiliza get_diseno_restauracion con objetivo='paramo' (la tool
+    // filtra a especies que alcanzan ≥3000 msnm). NO inventamos tool nuevo.
+    id: 'paramo',
+    group: 'restaurar',
+    status: 'live',
+    intent: 'paramo',
+    kind: 'tool',
+    icon: '⛰️',
+    label: 'Páramo',
+    desc: 'Especies nativas para restaurar el páramo, por encima de 3000 metros.',
+    placeholder: 'Pregunta por especies nativas para restaurar el páramo',
+    tool: 'get_diseno_restauracion',
+    stubMessage: null,
+    hero: true,
+    heroRoute: {
+      kind: 'ask',
+      prompt: 'Quiero restaurar el páramo. ¿Qué especies nativas siembro?',
+    },
+  },
 
   // ═══════════════════════════════════════════════════════════════════════
   // AGENTHERO ACTIONS — aparecen solo en menú Ⓐ del AgentHero

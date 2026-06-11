@@ -64,7 +64,7 @@ import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../
 // sidecarClient/deepResearchClient vía buildSidecarHeaders (defense-in-depth).
 import { getCurrentTier } from '../../services/tierService';
 import DeepResearchCard from '../DeepResearchCard';
-import { normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildSuggestedEntitiesContext, isLowConfidenceEntity, buildFallbackResponse } from '../../services/agentService';
+import { normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildSuggestedEntitiesContext, isLowConfidenceEntity, buildFallbackResponse, pisoTermicoFromAltitud } from '../../services/agentService';
 import { buildBasePrompt, analyzeQuery, buildQueryAnalysisBlock, buildCorpusVariants, buildResolvedEntitiesBlock, formatToolEvidence } from '../../services/agentPromptBase';
 import { assembleSystemContent } from '../../services/promptAssembler';
 import { applyOutputGuards, classifyQueryIntent } from '../../services/outputGuards';
@@ -1271,8 +1271,28 @@ export default function AgentScreen({ onBack, initialContext }) {
             const activeFincaClima = fincas.find((f) => f.slug === activeFincaSlug);
             const municipioClima =
               activeFincaClima?.municipio || FARM_CONFIG?.MUNICIPIO || null;
+            // Altura + piso térmico para los chips de diseño (restauración,
+            // silvopastoreo, páramo). El chip salta el NLU, así que el contexto
+            // de altura lo aporta el perfil/finca aquí. Silvopastoreo EXIGE
+            // altura: sin ella el router devuelve un stub que pide la altura.
+            const fincaAltitudChip = (() => {
+              try {
+                const p = getProfile();
+                if (p && p.finca_altitud != null && p.finca_altitud !== '') return p.finca_altitud;
+              } catch (_) { /* noop */ }
+              return activeFincaClima?.altitud ?? null;
+            })();
+            const pisoTermicoChip = (() => {
+              try {
+                const p = getProfile();
+                if (p && p.piso_termico) return p.piso_termico;
+              } catch (_) { /* noop */ }
+              return pisoTermicoFromAltitud(fincaAltitudChip);
+            })();
             const forcedPlan = planForcedIntent(forcedIntent, textForLLM, {
               municipio: municipioClima,
+              altitud: fincaAltitudChip,
+              pisoTermico: pisoTermicoChip,
             });
             if (forcedPlan && forcedPlan.tool) {
               if (forcedPlan.stub && forcedPlan.stubResult) {
@@ -1302,7 +1322,21 @@ export default function AgentScreen({ onBack, initialContext }) {
                   });
                   nluRoute = `chip:${forcedIntent}:${forcedPlan.tool}`;
                 } else {
-                  console.debug('[sidecar] chip forzado tool null', {
+                  // DEGRADACIÓN AMABLE: el tool no respondió (sin red / sidecar
+                  // caído / timeout). En vez de un error mudo, inyectamos
+                  // evidence sintética available:false para que el agente
+                  // responda con un mensaje amable y NO invente datos.
+                  toolEvidence = {
+                    tool: forcedPlan.tool,
+                    args: forcedPlan.args,
+                    result: {
+                      available: false,
+                      reason: 'sin_respuesta',
+                      hint: 'la herramienta no respondió — pedirle al usuario revisar su conexión e intentar de nuevo, sin inventar datos',
+                    },
+                  };
+                  nluRoute = `chip:${forcedIntent}:${forcedPlan.tool}:sin_respuesta`;
+                  console.debug('[sidecar] chip forzado tool null — degradación amable', {
                     intent: forcedIntent,
                     tool: forcedPlan.tool,
                   });
