@@ -476,6 +476,28 @@ function _docKey(doc) {
 }
 
 /**
+ * Colapsa variedades -> especie base + boost a especie sobre variedad.
+ * "lactuca_sativa_longifolia_morada" → "lactuca_sativa".
+ * Variedades (>2 partes en slug) reciben penalizacion 0.85x.
+ * Agrupa por genus_especie conservando el score mas alto.
+ */
+function collapseVarieties(results) {
+  if (!results?.length) return results;
+  const bySpecies = new Map();
+  for (const r of results) {
+    const parts = (r.species || '').split('_');
+    const base = parts.length >= 2 ? parts.slice(0, 2).join('_') : r.species;
+    const isVariety = parts.length > 2;
+    const s = isVariety ? r.score * 0.85 : r.score;
+    const existing = bySpecies.get(base);
+    if (!existing || s > existing.score) {
+      bySpecies.set(base, { ...r, species: base, score: s });
+    }
+  }
+  return Array.from(bySpecies.values()).sort((a, b) => b.score - a.score);
+}
+
+/**
  * Recupera los top-K passages más relevantes al query usando BM25.
  *
  * @param {string} query - texto a buscar (se tokeniza con normalización NFD).
@@ -495,7 +517,8 @@ export async function retrieve(query, topK = 5, surface = 'unknown') {
   let results = [];
   let errorKind = null;
   try {
-    results = await retrieveInternal(query, topK);
+    results = await retrieveInternal(query, Math.max(topK * 3, 15));
+    results = collapseVarieties(results).slice(0, topK);
     return results;
   } catch (err) {
     errorKind = 'unknown';
