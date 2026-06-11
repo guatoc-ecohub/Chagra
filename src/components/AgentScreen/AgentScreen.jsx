@@ -1240,24 +1240,41 @@ export default function AgentScreen({ onBack, initialContext }) {
 
           // GraphRAG multi-hop: si hay plaga y/o cultivo resueltos, traemos del
           // grafo AGE la CADENA de relaciones (cultivo→plaga→controladores/
-          // biopreparados + asocios) e inyectamos el bloque al grounding. La
-          // tool es sub-segundo y no-throw; si no hay cadena, queda '' (no-op).
-          try {
-            const pestEnt = (resolvedEntities || []).find((e) => e.kind === 'pest' || e.kind === 'plaga');
-            const cropEnt = (resolvedEntities || []).find((e) => ['cultivo', 'especie', 'species', 'planta'].includes(e.kind));
-            const subArgs = {};
-            if (pestEnt) subArgs.pest = pestEnt.canonical_id || pestEnt.mentioned;
-            if (cropEnt) subArgs.cultivo = cropEnt.canonical_id || cropEnt.mentioned;
-            if (subArgs.pest || subArgs.cultivo) {
-              const sub = await callTool('get_subgrafo_relacional', subArgs);
+          // biopreparados + asocios) e inyectamos el bloque al grounding.
+          // Tambien invocamos get_multihop_companions (AIA-008): cadenas de N
+          // saltos de asociacion ecologica (companeras que controlan plagas).
+          // Ambas tools son sub-segundo y no-throw; si no hay dato, no-op.
+          const pestEnt = (resolvedEntities || []).find((e) => e.kind === 'pest' || e.kind === 'plaga');
+          const cropEnt = (resolvedEntities || []).find((e) => ['cultivo', 'especie', 'species', 'planta'].includes(e.kind));
+          const relArgs = {};
+          if (pestEnt) relArgs.pest = pestEnt.canonical_id || pestEnt.mentioned;
+          if (cropEnt) relArgs.cultivo = cropEnt.canonical_id || cropEnt.mentioned;
+
+          if (relArgs.pest || relArgs.cultivo) {
+            // Capa 1: subgrafo estructural (todas las relaciones del grafo)
+            try {
+              const sub = await callTool('get_subgrafo_relacional', relArgs);
               if (sub && sub.found && typeof sub.bloque === 'string' && sub.bloque.trim()) {
                 subgrafoBloque = sub.bloque;
                 console.debug('[sidecar] subgrafo-relacional', {
                   nodes: sub.nodes?.length, rels: sub.relaciones?.length,
                 });
               }
-            }
-          } catch (_) { /* graceful: subgrafoBloque queda '' */ }
+            } catch (_) { /* graceful */ }
+
+            // Capa 2 (AIA-008): multihop funcional (cadenas de control biologico
+            // a N saltos — NO redundante con el subgrafo: el subgrafo da
+            // adyacencia estructural, multihop da cadenas ecologicas funcionales)
+            try {
+              const mh = await callTool('get_multihop_companions', relArgs);
+              if (mh && mh.found && typeof mh.bloque === 'string' && mh.bloque.trim()) {
+                subgrafoBloque = [subgrafoBloque, mh.bloque].filter(Boolean).join('\n\n');
+                console.debug('[sidecar] multihop-companions', {
+                  hops: mh.hops, chains: mh.cadenas?.length,
+                });
+              }
+            } catch (_) { /* graceful: sin multihop sigue funcionando */ }
+          }
 
           // PASO 2-pre — routing determinístico de CONOCIMIENTO del grafo
           // (usos tradicionales / toxicidad / variedades / suelo). Igual que el
