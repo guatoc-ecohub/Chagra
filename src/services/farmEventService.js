@@ -83,7 +83,14 @@ export const recordFarmEvent = async (input) => {
     };
     dedupReq.onerror = () => reject(dedupReq.error);
 
-    tx.oncomplete = () => resolve(event);
+    tx.oncomplete = () => {
+      resolve(event);
+      // Fire-and-forget: encolar para sync a FarmOS (NO bloquea el registro local).
+      // Si falla, el evento ya está seguro en IDB. Cap #9 — antes dormido.
+      import('./farmProcessSync').then(({ enqueueFarmProcessEvent }) =>
+        enqueueFarmProcessEvent(event, null).catch(() => {}),
+      );
+    };
     tx.onerror = () => reject(tx.error);
   });
 };
@@ -137,6 +144,10 @@ export const createFarmProcess = async (process) => {
         }
       } catch { /* noop */ }
       resolve({ process, event });
+      // Fire-and-forget: encolar para sync a FarmOS (NO bloquea).
+      import('./farmProcessSync').then(({ enqueueFarmProcessEvent }) =>
+        enqueueFarmProcessEvent(event, process).catch(() => {}),
+      );
     };
     tx.onerror = () => reject(tx.error);
   });
