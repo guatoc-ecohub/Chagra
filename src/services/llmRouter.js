@@ -89,7 +89,7 @@ export const ROUTES = {
     // Override via env VITE_LLM_CHAT_MODEL para experimentos.
     model:
       (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_LLM_CHAT_MODEL) ||
-      'granite3.1-dense:8b',
+      'granite3.3:8b',
     keep_alive_min: 30,
     temperature: 0.3,
     // 2026-06-06: 512→768. Fuga real (interacción operador): respuesta de
@@ -123,7 +123,7 @@ export const ROUTES = {
     // evita confusiones taxonómicas con cupo de GPU razonable).
     model:
       (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_LLM_COMPLEX_MODEL) ||
-      'granite3.1-dense:8b',
+      'granite3.3:8b',
     keep_alive_min: 5,
     temperature: 0.3,
     // 2026-06-06: 768→1024. Las queries complejas (planes multi-cultivo,
