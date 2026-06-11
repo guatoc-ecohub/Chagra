@@ -16,6 +16,7 @@ import {
     getNotificationStyle,
 } from '../../services/userProfileService';
 import { buildCropSuggestions } from '../../data/cropSuggestions';
+import { syncManager } from '../../services/syncManager';
 import { iconForTheme } from './themeIcon';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 
@@ -172,6 +173,12 @@ export default function AgentHero({ onNavigate }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [menuClosing, setMenuClosing] = useState(false);
     const menuCloseTimerRef = useRef(null);
+    // Campana de alertas/tareas (importada del demo biopunk 2026-06-11):
+    // panel con "Alertas ambientales" (useAlertStore) + "Tareas de campo"
+    // (pendientes farmOS, offline-first vía syncManager). Mutuamente
+    // excluyente con el menú Ⓐ, como en el demo.
+    const [notifOpen, setNotifOpen] = useState(false);
+    const [pendingTasks, setPendingTasks] = useState([]);
     // Nivel de respuestas del perfil (campesino=simple / experto=detallado).
     // Lo leemos del perfil real al montar; el toggle lo persiste de verdad.
     const [nivel, setNivel] = useState(() => {
@@ -190,6 +197,13 @@ export default function AgentHero({ onNavigate }) {
     // localStorage). Aquí solo LEEMOS el tema para pintar el ícono de la marca
     // y del botón Ⓐ; el switcher completo vive en Perfil → Apariencia.
     const { theme } = useTheme();
+
+    // ── markSwap del demo: al cambiar de tema, el ícono Ⓐ hace la
+    // micro-animación de intercambio (scale+rotate). Solo en CAMBIO de tema,
+    // no en el primer paint (el demo guarda `first = name !== THEME`).
+    const prevThemeRef = useRef(theme);
+    const themeSwapped = prevThemeRef.current !== theme;
+    useEffect(() => { prevThemeRef.current = theme; }, [theme]);
 
     // ── Escena: sol de día / luna de noche (operador 2026-06-06) ──────────────
     const night = isNightNow();
@@ -307,7 +321,13 @@ export default function AgentHero({ onNavigate }) {
             });
             return;
         }
-        if (!trimmed) return;
+        if (!trimmed) {
+            // Comportamiento del demo (`sendField()` vacío → `openSheet()`):
+            // enviar sin nada escrito abre el menú didáctico de capacidades
+            // en vez de morir en silencio.
+            openMenu();
+            return;
+        }
         send({ kind: 'text', text: trimmed });
     };
 
@@ -340,6 +360,7 @@ export default function AgentHero({ onNavigate }) {
     const openMenu = () => {
         window.clearTimeout(menuCloseTimerRef.current);
         setMenuClosing(false);
+        setNotifOpen(false); // campana y red Ⓐ son mutuamente excluyentes (demo)
         setMenuOpen(true);
     };
     const closeMenu = () => {
@@ -359,14 +380,38 @@ export default function AgentHero({ onNavigate }) {
         else openMenu();
     };
 
+    // ── Campana 🔔 (alertas + tareas) — import del demo biopunk ─────────────
+    // Las tareas pendientes vienen del MISMO camino offline-first que el
+    // PendingTasksWidget (syncManager cachea farmOS); sin red, falla suave y
+    // el badge cuenta solo las alertas locales.
+    useEffect(() => {
+        let alive = true;
+        Promise.resolve()
+            .then(() => syncManager.fetchPendingTasksFromFarmOS())
+            .then((tasks) => { if (alive && Array.isArray(tasks)) setPendingTasks(tasks); })
+            .catch(() => { /* offline: el badge usa solo las alertas */ });
+        return () => { alive = false; };
+    }, []);
+    const notifCount = activeAlerts.length + pendingTasks.length;
+    const toggleNotif = () => {
+        setNotifOpen((open) => {
+            if (!open && menuOpen) closeMenu(); // excluyentes, como el demo
+            return !open;
+        });
+    };
+
     // Limpia el timer de cierre al desmontar y cierra con Escape (a11y).
     useEffect(() => () => window.clearTimeout(menuCloseTimerRef.current), []);
     useEffect(() => {
-        if (!menuOpen) return undefined;
-        const onKey = (e) => { if (e.key === 'Escape') closeMenu(); };
+        if (!menuOpen && !notifOpen) return undefined;
+        const onKey = (e) => {
+            if (e.key !== 'Escape') return;
+            if (notifOpen) setNotifOpen(false);
+            else closeMenu();
+        };
         window.addEventListener('keydown', onKey);
         return () => window.removeEventListener('keydown', onKey);
-    }, [menuOpen]);
+    }, [menuOpen, notifOpen]);
 
     // Despacha una capacidad de la red a su routing real. El manifiesto
     // unificado (agentCapabilities.js) llama `heroRoute` al routing del hero;
@@ -736,7 +781,10 @@ export default function AgentHero({ onNavigate }) {
                 }
                 .agentport-name small {
                     display: block; font-weight: 600; font-size: .6rem; letter-spacing: .16em;
-                    text-transform: uppercase; color: rgb(var(--t-accent-rgb)); margin-top: -1px;
+                    text-transform: uppercase; margin-top: -1px;
+                    /* matiz profundo del acento (.brand small del demo:
+                       #a8612f nature · #19c79a biopunk · #1d4639 minimal) */
+                    color: rgb(var(--t-accent-deep-rgb, var(--t-accent-rgb)));
                 }
                 /* toggle Campesino | Experto (.modeToggle del demo) */
                 .agentport-mode {
@@ -750,7 +798,8 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-mode button {
                     border: none; background: transparent; font: inherit; cursor: pointer;
                     font-size: .72rem; font-weight: 700; padding: 6px 10px; border-radius: 18px;
-                    color: rgb(var(--c-slate-400));
+                    /* slate-500 = inactivo del demo (nature --cafe-3 #8a7350 MEDIDO) */
+                    color: rgb(var(--c-slate-500));
                     display: flex; align-items: center; gap: 4px; white-space: nowrap;
                     transition: background .3s cubic-bezier(.22,.61,.36,1), color .3s ease, transform .15s ease;
                 }
@@ -778,6 +827,124 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-profile:hover { color: rgb(var(--c-slate-100)); border-color: rgb(var(--t-accent-rgb) / 0.5); }
                 .agentport-profile:active { transform: scale(.92); }
                 .agentport-headtools { display: flex; align-items: center; gap: 8px; flex: none; }
+
+                /* ============ CAMPANA DE ALERTAS/TAREAS (demo biopunk) ============
+                   Import 1:1 del .bellbtn + .notifPanel del demo-agente-biopunk:
+                   campana redonda con anillo que respira + badge ámbar; panel que
+                   baja desde el header con "Alertas ambientales" y "Tareas de
+                   campo". Colores via tokens → theme-aware en los 3 temas. */
+                .agentport-bell {
+                    position: relative; width: 38px; height: 38px; flex: none;
+                    border-radius: 50%; display: inline-flex; align-items: center;
+                    justify-content: center; cursor: pointer; font-size: 1.05rem;
+                    background: rgb(var(--c-surface-card) / 0.65);
+                    border: 1px solid rgb(var(--c-surface-border));
+                    backdrop-filter: blur(6px);
+                    box-shadow: 0 2px 8px -4px rgba(0,0,0,.35);
+                    transition: transform .16s cubic-bezier(.22,.61,.36,1),
+                                background .25s ease, border-color .25s ease, box-shadow .25s ease;
+                }
+                /* el anillo solo respira cuando HAY pendientes (badge > 0) */
+                .agentport-bell.has-items:not(.is-open) {
+                    animation: agentport-pulse-ring 3.6s cubic-bezier(.22,.61,.36,1) infinite;
+                }
+                .agentport-bell:active { transform: scale(.9); }
+                .agentport-bell.is-open {
+                    background: rgb(var(--t-accent-rgb)); border-color: rgb(var(--t-accent-rgb));
+                    animation: none;
+                    box-shadow: 0 0 20px -3px rgb(var(--t-accent-rgb) / 0.85);
+                }
+                .agentport-bell .bicon { transition: transform .3s cubic-bezier(.22,.61,.36,1); }
+                .agentport-bell.is-open .bicon { transform: rotate(8deg); }
+                .agentport-bell .badge {
+                    position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px;
+                    padding: 0 4px; border-radius: 9px; font-size: .62rem; font-weight: 800;
+                    display: flex; align-items: center; justify-content: center; line-height: 1;
+                    background: rgb(var(--c-amber-400)); color: #3a2208;
+                    border: 1.5px solid rgb(var(--c-surface));
+                    box-shadow: 0 0 10px -1px rgb(var(--c-amber-400) / 0.85);
+                }
+                .agentport-notif {
+                    position: absolute; left: 12px; right: 12px;
+                    top: calc(150px + env(safe-area-inset-top));
+                    z-index: 30; display: flex; flex-direction: column; overflow: hidden;
+                    max-height: 56dvh;
+                    background: rgb(var(--c-surface-card) / 0.97);
+                    border: 1px solid rgb(var(--t-accent-rgb) / 0.4);
+                    border-radius: 20px;
+                    box-shadow: 0 22px 48px -18px rgba(0,0,0,.55),
+                                0 0 36px -10px rgb(var(--t-accent-rgb) / 0.3);
+                    transform-origin: top right;
+                    animation: agentport-notif-in .42s cubic-bezier(.32,.72,0,1) both;
+                }
+                @keyframes agentport-notif-in {
+                    from { opacity: 0; transform: translateY(-14px) scale(.97); }
+                    to { opacity: 1; transform: none; }
+                }
+                .agentport-notif .nph {
+                    display: flex; align-items: center; justify-content: space-between;
+                    padding: 13px 16px 9px; flex: none;
+                    border-bottom: 1px solid rgb(var(--c-surface-border));
+                }
+                .agentport-notif .nph .nt {
+                    font-weight: 800; font-size: .96rem; color: rgb(var(--c-slate-100));
+                    display: flex; align-items: center; gap: 7px;
+                }
+                .agentport-notif .nph .nclose {
+                    border: none; cursor: pointer; width: 28px; height: 28px;
+                    border-radius: 50%; font-size: 1rem;
+                    display: flex; align-items: center; justify-content: center;
+                    background: rgb(var(--t-accent-rgb) / 0.12);
+                    color: rgb(var(--t-accent-deep-rgb, var(--t-accent-rgb)));
+                    transition: background .2s ease, transform .15s ease;
+                }
+                .agentport-notif .nph .nclose:active { transform: scale(.9); }
+                .agentport-notif-body {
+                    overflow-y: auto; -webkit-overflow-scrolling: touch;
+                    padding: 8px 12px 12px; overscroll-behavior: contain;
+                }
+                .agentport-notif .nsec {
+                    font-size: .62rem; font-weight: 800; letter-spacing: .16em;
+                    text-transform: uppercase; color: rgb(var(--c-slate-500));
+                    margin: 9px 6px 6px;
+                }
+                .agentport-notif .nitem {
+                    display: flex; align-items: flex-start; gap: 11px;
+                    background: rgb(var(--c-surface-raised));
+                    border: 1px solid rgb(var(--c-surface-border));
+                    border-radius: 14px; padding: 10px 12px; margin-bottom: 7px;
+                }
+                .agentport-notif .nitem .nico {
+                    width: 34px; height: 34px; flex: none; border-radius: 10px;
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: 1.15rem;
+                    background: rgb(var(--t-accent-rgb) / 0.12);
+                    border: 1px solid rgb(var(--t-accent-rgb) / 0.25);
+                }
+                .agentport-notif .nitem.is-danger .nico {
+                    background: rgb(244 63 94 / 0.12); border-color: rgb(244 63 94 / 0.4);
+                }
+                .agentport-notif .nitem .ntxt { flex: 1; min-width: 0; }
+                .agentport-notif .nitem .ntit {
+                    display: block; font-weight: 700; font-size: .88rem;
+                    color: rgb(var(--c-slate-100)); line-height: 1.3;
+                }
+                .agentport-notif .nitem .nmeta {
+                    display: block; font-size: .74rem; margin-top: 3px;
+                    color: rgb(var(--c-slate-300)); line-height: 1.35;
+                }
+                .agentport-notif .nitem .due { font-weight: 800; color: rgb(var(--c-amber-500)); }
+                .agentport-notif .nitem.is-danger .due { color: rgb(244 63 94); }
+                .agentport-notif .nempty {
+                    text-align: center; font-size: .8rem; color: rgb(var(--c-slate-400));
+                    padding: 10px 6px;
+                }
+                .agentport-notif-foot {
+                    padding: 7px 16px 12px; text-align: center; flex: none;
+                    font-size: .68rem; color: rgb(var(--c-slate-500));
+                    border-top: 1px solid rgb(var(--c-surface-border));
+                }
+                .agentport-notif-foot b { color: rgb(var(--t-accent-deep-rgb, var(--t-accent-rgb))); }
 
                 /* chip de UBICACIÓN — debajo de la marca, conectado al logo.
                    📍 Vereda · Municipio · altitud. */
@@ -849,7 +1016,9 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-hi .chagra-wordmark { color: rgb(var(--t-accent-rgb)); }
                 .agentport-sub {
                     margin-top: 8px; font-size: 1rem; line-height: 1.5;
-                    color: rgb(var(--c-slate-300)); max-width: 34ch;
+                    /* slate-400 = .greet .sub del demo (nature --cafe-2 #6b5638
+                       MEDIDO; en biopunk acerca al teal-grisáceo del demo) */
+                    color: rgb(var(--c-slate-400)); max-width: 34ch;
                     transition: opacity 0.4s ease;
                 }
                 [data-nivel="detallado"] .agentport-sub { font-size: 0.92rem; }
@@ -924,14 +1093,30 @@ export default function AgentHero({ onNavigate }) {
                     0%, 100% { box-shadow: 0 0 12px -2px rgb(var(--t-accent-rgb) / 0.55); }
                     50% { box-shadow: 0 0 24px 2px rgb(var(--t-accent-rgb) / 0.85); }
                 }
-                /* al abrir, el ícono se vuelve blanco para contrastar con el acento */
+                /* al abrir, el ícono se vuelve blanco para contrastar con el acento
+                   (cubre también los rellenos de la Ⓐ de herramientas: cabeza del
+                   azadón, hoja y punta del machete) */
                 .agentport-tool.is-open .agentport-tool-ico path,
-                .agentport-tool.is-open .agentport-tool-ico line { stroke: #fff; }
-                .agentport-tool.is-open .agentport-tool-ico circle[fill] { fill: #fff; }
+                .agentport-tool.is-open .agentport-tool-ico line,
+                .agentport-tool.is-open .agentport-tool-ico circle[stroke] { stroke: #fff; }
+                .agentport-tool.is-open .agentport-tool-ico circle[fill],
+                .agentport-tool.is-open .agentport-tool-ico polygon[fill],
+                .agentport-tool.is-open .agentport-tool-ico path[fill]:not([fill="none"]) { fill: #fff; }
                 @keyframes agentport-pulse-ring {
                     0% { box-shadow: 0 0 0 0 rgb(var(--t-accent-rgb) / 0.45); }
                     70% { box-shadow: 0 0 0 12px rgb(var(--t-accent-rgb) / 0); }
                     100% { box-shadow: 0 0 0 0 rgb(var(--t-accent-rgb) / 0); }
+                }
+                /* markSwap del demo: micro-animación al INTERCAMBIAR el ícono
+                   del tema (scale .6 + rotate -12° → overshoot → reposo). */
+                .agentport-tool-ico.agentport-swap,
+                .agentport-mark.agentport-swap {
+                    animation: agentport-mark-swap .5s cubic-bezier(.16,.84,.3,1);
+                }
+                @keyframes agentport-mark-swap {
+                    0% { transform: scale(.6) rotate(-12deg); opacity: .2; }
+                    60% { transform: scale(1.08) rotate(3deg); }
+                    100% { transform: scale(1) rotate(0); opacity: 1; }
                 }
 
                 .agentport-mic-on {
@@ -951,6 +1136,12 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-send:not(:disabled) { box-shadow: 0 4px 14px -4px rgb(var(--t-accent-rgb) / 0.7); }
                 .agentport-send:not(:disabled):active { transform: scale(0.86); }
                 .agentport-send:disabled { background: rgb(var(--c-slate-700)); cursor: not-allowed; }
+                /* sin texto/adjunto el botón sigue VIVO (demo: vacío → abre el
+                   menú Ⓐ) pero baja el volumen para no competir con el acento */
+                .agentport-send:not(.agent-send-accent):not(:disabled) {
+                    background: rgb(var(--c-slate-700));
+                    box-shadow: none;
+                }
                 .agentport-send .send-hummer { width: 30px; height: 22px; display: block; }
                 .agentport-send .send-hummer svg { width: 100%; height: 100%; display: block; }
                 /* En el botón de enviar el colibrí va en CREMA/blanco para
@@ -965,7 +1156,8 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-send:disabled .send-hummer { opacity: .55; }
 
                 .agentport-hint { text-align: center; font-size: 0.72rem; margin-top: 9px; color: rgb(var(--c-slate-500)); }
-                .agentport-hint b { color: rgb(var(--t-accent-rgb)); font-weight: 700; }
+                /* el Ⓐ del hint usa el matiz profundo (.hintbar b del demo) */
+                .agentport-hint b { color: rgb(var(--t-accent-deep-rgb, var(--t-accent-rgb))); font-weight: 700; }
 
                 /* ============== MENÚ Ⓐ INTEGRADO (la red en el hero) ==============
                    Nada de bottom-sheet/scrim/modal (operador 2026-06-09: "que se
@@ -1058,6 +1250,8 @@ export default function AgentHero({ onNavigate }) {
                     .agentport-sprig path { stroke-dashoffset: 0 !important; animation: none !important; }
                     .agentport-tool:not(.is-open) { animation: none !important; }
                     .agentport-tool.is-open { animation: none !important; }
+                    .agentport-bell, .agentport-notif,
+                    .agentport-tool-ico.agentport-swap { animation: none !important; }
                     .agentport-greet { animation: none !important; }
                     .agentport-foldaway, .agentport-redpanel { transition: none !important; animation: none !important; }
                     .chagra-composer-shimmer::after, .chagra-composer-sending { animation: none !important; }
@@ -1228,8 +1422,84 @@ export default function AgentHero({ onNavigate }) {
                     {/* Engranaje de perfil REMOVIDO (operador 2026-06-06): era
                         redundante — el ícono de usuario del TopBar ya abre el menú
                         con Ajustes/Salir. */}
+
+                    {/* Campana de alertas/tareas — import del demo biopunk.
+                        Badge = alertas activas + tareas de campo pendientes. */}
+                    <button
+                        type="button"
+                        onClick={toggleNotif}
+                        aria-label="Alertas y tareas pendientes"
+                        aria-expanded={notifOpen}
+                        className={[
+                            'agentport-bell',
+                            notifOpen ? 'is-open' : '',
+                            notifCount > 0 ? 'has-items' : '',
+                        ].join(' ')}
+                    >
+                        <span className="bicon" aria-hidden="true">🔔</span>
+                        {notifCount > 0 && <span className="badge">{notifCount}</span>}
+                    </button>
                 </div>
             </header>
+
+            {/* ============ PANEL DE ALERTAS / TAREAS (demo biopunk) ============ */}
+            {notifOpen && (
+                <section className="agentport-notif" aria-label="Alertas y tareas de campo">
+                    <div className="nph">
+                        <div className="nt">🔔 Alertas y tareas</div>
+                        <button
+                            type="button"
+                            className="nclose"
+                            aria-label="Cerrar alertas"
+                            onClick={() => setNotifOpen(false)}
+                        >
+                            ✕
+                        </button>
+                    </div>
+                    <div className="agentport-notif-body">
+                        <div className="nsec">Alertas ambientales</div>
+                        {activeAlerts.length === 0 && (
+                            <p className="nempty">Sin alertas ambientales por ahora.</p>
+                        )}
+                        {activeAlerts.map((a) => (
+                            <div
+                                key={a.type || a.title}
+                                className={['nitem', a.severity === 'danger' ? 'is-danger' : ''].join(' ')}
+                            >
+                                <span className="nico" aria-hidden="true">{a.icon || '⚠️'}</span>
+                                <span className="ntxt">
+                                    <span className="ntit">{a.title}</span>
+                                    {a.message && <span className="nmeta">{a.message}</span>}
+                                </span>
+                            </div>
+                        ))}
+                        <div className="nsec">Tareas de campo</div>
+                        {pendingTasks.length === 0 && (
+                            <p className="nempty">No tienes tareas de campo pendientes.</p>
+                        )}
+                        {pendingTasks.map((t) => (
+                            <div
+                                key={t.id || t.title}
+                                className={[
+                                    'nitem',
+                                    t.severity === 'critical' || t.severity === 'high' ? 'is-danger' : '',
+                                ].join(' ')}
+                            >
+                                <span className="nico" aria-hidden="true">🧑‍🌾</span>
+                                <span className="ntxt">
+                                    <span className="ntit">{t.title}</span>
+                                    {t.deadline && (
+                                        <span className="nmeta"><span className="due">{t.deadline}</span></span>
+                                    )}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="agentport-notif-foot">
+                        Lo clave te lo digo en el saludo. Aquí guardo <b>el resto</b>.
+                    </div>
+                </section>
+            )}
 
             {/* ============ ZONA-RESPIRO (escena detrás · red Ⓐ al abrir) ============
                 Con el menú abierto, la red de capacidades BROTA aquí mismo —
@@ -1400,7 +1670,16 @@ export default function AgentHero({ onNavigate }) {
                             aria-expanded={menuOpen && !menuClosing}
                             className={['agentport-iconbtn agentport-tool !w-11 !h-11', menuOpen && !menuClosing ? 'is-open' : ''].join(' ')}
                         >
-                            <span className="agentport-tool-ico" aria-hidden="true">{iconForTheme(theme)}</span>
+                            {/* key={theme}: al cambiar el tema el ícono se REMONTA →
+                                corre el markSwap del demo (y la "forja" de la Ⓐ de
+                                herramientas vuelve a dibujarse trazo a trazo). */}
+                            <span
+                                key={theme}
+                                className={['agentport-tool-ico', themeSwapped ? 'agentport-swap' : ''].join(' ')}
+                                aria-hidden="true"
+                            >
+                                {iconForTheme(theme)}
+                            </span>
                         </button>
 
                         {/* Cámara / foto — toma una foto O elige de la galería.
@@ -1431,11 +1710,13 @@ export default function AgentHero({ onNavigate }) {
                             {isRecording ? <Square size={16} strokeWidth={2.5} aria-hidden="true" /> : <Mic size={18} strokeWidth={2.5} aria-hidden="true" />}
                         </button>
 
-                        {/* Enviar — usa el mismo colibrí foto/video del FAB global. */}
+                        {/* Enviar — usa el mismo colibrí foto/video del FAB global.
+                            Comportamiento del demo: con el campo VACÍO no se apaga;
+                            tocarlo abre el menú didáctico de capacidades. */}
                         <button
                             type="button"
                             onClick={handleSendText}
-                            disabled={!canSend}
+                            disabled={busy || isRecording}
                             aria-label="Enviar al agente"
                             className={['agentport-send', canSend ? 'agent-send-accent' : ''].join(' ')}
                             style={{
