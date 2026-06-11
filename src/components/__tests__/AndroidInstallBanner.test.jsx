@@ -17,7 +17,7 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
-import AndroidInstallBanner, { DISMISS_KEY } from '../AndroidInstallBanner';
+import AndroidInstallBanner, { DISMISS_KEY, DISMISS_TTL_MS } from '../AndroidInstallBanner';
 
 function makeBipEvent(outcome = 'accepted') {
   const event = new Event('beforeinstallprompt');
@@ -85,18 +85,37 @@ describe('AndroidInstallBanner', () => {
     expect(screen.queryByRole('button', { name: /instalar chagra/i })).not.toBeInTheDocument();
   });
 
-  it('NO aparece si fue descartado antes (localStorage)', () => {
-    localStorage.setItem(DISMISS_KEY, 'true');
+  it('NO aparece si hay un descarte VIGENTE (timestamp reciente)', () => {
+    localStorage.setItem(DISMISS_KEY, String(Date.now()));
     render(<AndroidInstallBanner />);
     act(() => { window.dispatchEvent(makeBipEvent()); });
     expect(screen.queryByRole('button', { name: /instalar chagra/i })).not.toBeInTheDocument();
   });
 
-  it('botón cerrar persiste el descarte y oculta', () => {
+  // Bug operador 2026-06-11: el descarte era PERMANENTE → Chrome (donde lo
+  // descartó una vez) nunca volvía a ofrecer instalar, mientras Brave sí.
+  it('SÍ re-aparece si el descarte ya expiró (más de DISMISS_TTL_MS)', () => {
+    localStorage.setItem(DISMISS_KEY, String(Date.now() - DISMISS_TTL_MS - 1000));
+    render(<AndroidInstallBanner />);
+    act(() => { window.dispatchEvent(makeBipEvent()); });
+    expect(screen.getByRole('button', { name: /instalar chagra/i })).toBeInTheDocument();
+  });
+
+  it('el descarte legado ("true", sin fecha) se trata como expirado: re-ofrece', () => {
+    localStorage.setItem(DISMISS_KEY, 'true');
+    render(<AndroidInstallBanner />);
+    act(() => { window.dispatchEvent(makeBipEvent()); });
+    expect(screen.getByRole('button', { name: /instalar chagra/i })).toBeInTheDocument();
+  });
+
+  it('botón cerrar persiste el descarte CON timestamp y oculta', () => {
+    const before = Date.now();
     render(<AndroidInstallBanner />);
     act(() => { window.dispatchEvent(makeBipEvent()); });
     fireEvent.click(screen.getByRole('button', { name: /cerrar/i }));
-    expect(localStorage.getItem(DISMISS_KEY)).toBe('true');
+    const stored = Number(localStorage.getItem(DISMISS_KEY));
+    expect(Number.isFinite(stored)).toBe(true);
+    expect(stored).toBeGreaterThanOrEqual(before);
     expect(screen.queryByRole('button', { name: /instalar chagra/i })).not.toBeInTheDocument();
   });
 
