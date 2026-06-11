@@ -1,6 +1,13 @@
 /**
  * streamChatViaSidecar.js — SSE chat streaming client (SPEED-1).
  *
+ * ⚠️ IN-5 (auditoria 2026-06-10): el endpoint `POST /chat/stream` NO existe
+ * en el sidecar de produccion. Este modulo esta GATEADO detras del flag
+ * `VITE_AGENT_STREAMING` (default OFF en .env). Si se activa, el cliente
+ * intentara conectar a una ruta fantasma → 404. NO activar hasta que el
+ * sidecar implemente el endpoint. Mientras tanto, la PWA usa streamOpenAI
+ * (comportamiento por defecto, estable).
+ *
  * Companion to the sidecar `POST /chat/stream` endpoint. Speaks the
  * sidecar's custom SSE shape (NOT raw Ollama, NOT OpenAI):
  *
