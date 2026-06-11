@@ -364,3 +364,133 @@ describe('ragRetriever — loadCorpus paralelo-acotado (hotfix prod-down 2026-06
     await expect(prewarmCorpus()).resolves.toBeUndefined();
   });
 });
+
+describe('ragRetriever — tier-gate del catalogo (SEC-002 / UXC-004)', () => {
+  const MANIFEST_GATED = {
+    generated_at: '2026-06-10T00:00:00Z',
+    slugs: ['fragaria_test', 'coffea_test', 'lechuga_test', 'pro_only_1', 'pro_only_2'],
+  };
+
+  const OSS_SPECIES = [
+    { id: 'fragaria_test', nombre_comun: 'Fresa' },
+    { id: 'coffea_test', nombre_comun: 'Café' },
+    { id: 'lechuga_test', nombre_comun: 'Lechuga' },
+    // pro_only_1 y pro_only_2 NO estan en el catalogo OSS
+  ];
+
+  function setupGatedFetchMock() {
+    const tracker = { docFetches: new Set() };
+    globalThis.fetch = vi.fn((url) => {
+      const u = String(url);
+      if (u.endsWith('/cycle-content/manifest.json')) {
+        return Promise.resolve({
+          ok: true, status: 200,
+          headers: { get: (h) => (h.toLowerCase() === 'content-type' ? 'application/json' : '') },
+          json: () => Promise.resolve(MANIFEST_GATED),
+        });
+      }
+      const match = u.match(/\/cycle-content\/([^.]+)\.json/);
+      if (match) {
+        tracker.docFetches.add(match[1]);
+        return Promise.resolve({
+          ok: true, status: 200,
+          headers: { get: (h) => (h.toLowerCase() === 'content-type' ? 'application/json' : '') },
+          json: () => Promise.resolve({
+            species_slug: match[1],
+            valor_pedagogico: `Ficha pedagógica de ${match[1]} con suficiente texto para indexar y recuperar por BM25 en el corpus del retriever.`,
+          }),
+        });
+      }
+      return Promise.resolve({ ok: false, status: 404, headers: { get: () => '' } });
+    });
+    return tracker;
+  }
+
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  afterEach(() => {
+    delete globalThis.fetch;
+    vi.clearAllMocks();
+  });
+
+  it('SEC-002 — slugs fuera del catalogo OSS NO se fetchean ni entran al corpus', async () => {
+    vi.doMock('../../db/catalogDB', () => ({
+      getAllSpecies: vi.fn().mockResolvedValue(OSS_SPECIES),
+    }));
+
+    const tracker = setupGatedFetchMock();
+    const { retrieve } = await import('../ragRetriever.js');
+
+    await retrieve('ficha pedagógica', 5);
+
+    // Solo los 3 slugs del catalogo se fetchearon
+    expect(tracker.docFetches.has('fragaria_test')).toBe(true);
+    expect(tracker.docFetches.has('coffea_test')).toBe(true);
+    expect(tracker.docFetches.has('lechuga_test')).toBe(true);
+    expect(tracker.docFetches.has('pro_only_1')).toBe(false);
+    expect(tracker.docFetches.has('pro_only_2')).toBe(false);
+    expect(tracker.docFetches.size).toBe(3);
+  });
+
+  it('SEC-002 — corpusStats refleja solo los docs dentro del catalogo', async () => {
+    vi.doMock('../../db/catalogDB', () => ({
+      getAllSpecies: vi.fn().mockResolvedValue(OSS_SPECIES),
+    }));
+
+    setupGatedFetchMock();
+    const { retrieve, getCorpusStats } = await import('../ragRetriever.js');
+
+    await retrieve('ficha pedagógica', 5);
+
+    const stats = await getCorpusStats();
+    // 3 en catalogo, 2 fuera → total debe ser 3
+    expect(stats.totalDocs).toBe(3);
+  });
+
+  it('SEC-002 — si el catalogo falla, carga todos los slugs (degradacion segura)', async () => {
+    vi.doMock('../../db/catalogDB', () => ({
+      getAllSpecies: vi.fn().mockRejectedValue(new Error('SQLite no disponible')),
+    }));
+
+    const tracker = setupGatedFetchMock();
+    const { retrieve, getCorpusStats } = await import('../ragRetriever.js');
+
+    await retrieve('ficha pedagógica', 5);
+
+    const stats = await getCorpusStats();
+    // Degradacion: sin catalogo, carga los 5 slugs completos
+    expect(stats.totalDocs).toBe(5);
+    expect(tracker.docFetches.size).toBe(5);
+  });
+
+  it('SEC-002 — catalogo vacio (sin especies) carga todos los slugs', async () => {
+    vi.doMock('../../db/catalogDB', () => ({
+      getAllSpecies: vi.fn().mockResolvedValue([]),
+    }));
+
+    const tracker = setupGatedFetchMock();
+    const { retrieve } = await import('../ragRetriever.js');
+
+    await retrieve('ficha pedagógica', 5);
+
+    expect(tracker.docFetches.size).toBe(5);
+  });
+
+  it('SEC-002 — retrieve solo devuelve docs dentro del tier', async () => {
+    vi.doMock('../../db/catalogDB', () => ({
+      getAllSpecies: vi.fn().mockResolvedValue(OSS_SPECIES),
+    }));
+
+    setupGatedFetchMock();
+    const { retrieve } = await import('../ragRetriever.js');
+
+    const hits = await retrieve('ficha pedagógica', 10);
+    // Todos los hits deben ser de especies en el catalogo
+    const catalogSlugs = new Set(OSS_SPECIES.map((s) => s.id));
+    for (const hit of hits) {
+      expect(catalogSlugs.has(hit.species)).toBe(true);
+    }
+  });
+});
