@@ -131,10 +131,22 @@ if ('serviceWorker' in navigator) {
   // Guard `reloading` evita bucles de recarga; `hadController` evita recargar
   // en el primer install (clients.claim() tambien dispara controllerchange
   // cuando antes no habia controlador — ahi NO hay que recargar).
+  //
+  // `userUpdateRequested` (bug operador 2026-06-11, Android — boton pegado):
+  // si la pagina arranco SIN controller (hard reload / carga no controlada)
+  // pero hay un SW en waiting, el click "Actualizar" disparaba SKIP_WAITING
+  // → claim → controllerchange, y el guard de first-install se TRAGABA el
+  // evento: ni recarga ni banner fuera. Cuando la actualizacion la pidio el
+  // usuario (evento chagra:sw-update-requested del banner), controllerchange
+  // SIEMPRE recarga.
   let reloading = false;
   let hadController = Boolean(navigator.serviceWorker.controller);
+  let userUpdateRequested = false;
+  window.addEventListener('chagra:sw-update-requested', () => {
+    userUpdateRequested = true;
+  });
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!hadController) {
+    if (!hadController && !userUpdateRequested) {
       hadController = true; // primer claim en first install — sin recarga
       return;
     }

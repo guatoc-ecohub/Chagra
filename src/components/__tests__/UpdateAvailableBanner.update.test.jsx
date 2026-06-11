@@ -16,7 +16,10 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
-import UpdateAvailableBanner from '../UpdateAvailableBanner';
+import UpdateAvailableBanner, {
+  UPDATE_TIMEOUT_MS,
+  RELOAD_FALLBACK_MS,
+} from '../UpdateAvailableBanner';
 import { ACK_STORAGE_KEY } from '../../services/swUpdateAck';
 import { reloadPage } from '../../services/pageReload';
 
@@ -100,5 +103,81 @@ describe('UpdateAvailableBanner — flujo Actualizar', () => {
       expect(waiting.postMessage).toHaveBeenCalledWith({ type: 'SKIP_WAITING' });
     });
     expect(reloadPage).not.toHaveBeenCalled();
+  });
+
+  // ── Bug operador 2026-06-11 (Android): botón "Actualizar" pegado ──────────
+
+  it('click muestra "Actualizando…" y deshabilita el botón (feedback inmediato)', async () => {
+    const waiting = { postMessage: vi.fn() };
+    mockServiceWorker({ update: vi.fn().mockResolvedValue(undefined), waiting });
+
+    render(<UpdateAvailableBanner />);
+    showBanner();
+    const btn = screen.getByRole('button', { name: /actualizar/i });
+    fireEvent.click(btn);
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /actualizando/i })).toBeDisabled();
+    });
+  });
+
+  it('anuncia chagra:sw-update-requested para que main.jsx recargue SIEMPRE en controllerchange', async () => {
+    const waiting = { postMessage: vi.fn() };
+    mockServiceWorker({ update: vi.fn().mockResolvedValue(undefined), waiting });
+    const requested = vi.fn();
+    window.addEventListener('chagra:sw-update-requested', requested);
+
+    render(<UpdateAvailableBanner />);
+    showBanner();
+    fireEvent.click(screen.getByRole('button', { name: /actualizar/i }));
+
+    await waitFor(() => expect(waiting.postMessage).toHaveBeenCalled());
+    expect(requested).toHaveBeenCalledTimes(1);
+    window.removeEventListener('chagra:sw-update-requested', requested);
+  });
+
+  it('update() COLGADO (red flaky) no bloquea: SKIP_WAITING sale tras el timeout', async () => {
+    vi.useFakeTimers();
+    try {
+      const waiting = { postMessage: vi.fn() };
+      // update() nunca resuelve — simula fetch de sw.js colgado en red rural.
+      mockServiceWorker({ update: vi.fn(() => new Promise(() => {})), waiting });
+
+      render(<UpdateAvailableBanner />);
+      showBanner();
+      fireEvent.click(screen.getByRole('button', { name: /actualizar/i }));
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(UPDATE_TIMEOUT_MS + 50);
+      });
+      expect(waiting.postMessage).toHaveBeenCalledWith({ type: 'SKIP_WAITING' });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('fallback: si controllerchange nunca recarga, recarga directa tras RELOAD_FALLBACK_MS', async () => {
+    vi.useFakeTimers();
+    try {
+      const waiting = { postMessage: vi.fn() };
+      mockServiceWorker({ update: vi.fn().mockResolvedValue(undefined), waiting });
+
+      render(<UpdateAvailableBanner />);
+      showBanner();
+      fireEvent.click(screen.getByRole('button', { name: /actualizar/i }));
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(10);
+      });
+      expect(waiting.postMessage).toHaveBeenCalledWith({ type: 'SKIP_WAITING' });
+      expect(reloadPage).not.toHaveBeenCalled();
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(RELOAD_FALLBACK_MS + 50);
+      });
+      expect(reloadPage).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
