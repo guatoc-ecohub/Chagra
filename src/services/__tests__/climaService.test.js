@@ -239,6 +239,56 @@ describe('climaService — cache + fetch', () => {
     });
   });
 
+  it('GR-9: el fetch alimenta el caché vivo de ensoService (offline = chat)', async () => {
+    vi.resetModules();
+    vi.doMock('../sidecarClient.js', () => ({
+      getClimaSnapshot: vi.fn().mockResolvedValue({
+        fetched_at: new Date().toISOString(),
+        enso_status: { phase: 'nina_moderada', label: 'La Niña moderada', severity: 'warning', sources: [] },
+        alertas_locales: [],
+      }),
+    }));
+    const mod = await import('../climaService.js');
+    const enso = await import('../ensoService.js');
+    await mod.fetchClimaSnapshot();
+    // El motor offline (fenología/tareas/alertas) ahora ve la MISMA fase viva.
+    expect(enso.getEnsoPhase()).toBe('la_nina');
+    expect(enso.getEnsoPhaseSource()).toBe('live');
+    expect(enso.getEnsoServicePhase()).toBe('la_nina');
+  });
+
+  it('GR-9: override manual gana también en el path del chat (snapshot efectivo)', async () => {
+    vi.resetModules();
+    vi.doMock('../sidecarClient.js', () => ({
+      getClimaSnapshot: vi.fn().mockResolvedValue({
+        fetched_at: new Date().toISOString(),
+        enso_status: { phase: 'nina_fuerte', label: 'La Niña fuerte', severity: 'critical', oni_value: -1.5, sources: ['NOAA CPC'] },
+        alertas_locales: [],
+      }),
+    }));
+    const enso = await import('../ensoService.js');
+    enso.setEnsoPhase('el_nino');
+    const mod = await import('../climaService.js');
+    const snap = await mod.fetchClimaSnapshot();
+    // Chat y offline reportan la MISMA familia de fase: la manual.
+    expect(snap.enso_status.phase).toBe('nino');
+    expect(snap.enso_status.phase_source).toBe('manual');
+    expect(enso.getEnsoPhase()).toBe('el_nino');
+    // El caché persistido guarda el snapshot CRUDO (quitar el override restaura el vivo).
+    const raw = JSON.parse(localStorage.getItem('chagra:clima:snapshot-v1'));
+    expect(raw.payload.enso_status.phase).toBe('nina_fuerte');
+    // Y el cached read también aplica el override.
+    expect(mod.getCachedClimaSnapshot()?.enso_status?.phase).toBe('nino');
+    enso.clearEnsoPhase();
+    expect(mod.getCachedClimaSnapshot()?.enso_status?.phase).toBe('nina_fuerte');
+  });
+
+  it('GR-9: describePhase entiende las fases manuales genéricas', async () => {
+    const mod = await importFresh();
+    expect(mod.describePhase('nino')).toBe('El Niño');
+    expect(mod.describePhase('nina')).toBe('La Niña');
+  });
+
   it('two simultaneous fetches share the in-flight promise', async () => {
     vi.resetModules();
     let resolveFn;
