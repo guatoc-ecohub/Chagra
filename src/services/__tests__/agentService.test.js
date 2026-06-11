@@ -470,6 +470,19 @@ describe('agentService — Task #202 Profile Context', () => {
       expect(ctx).toContain('CITANDO las fuentes');
     });
 
+    it('inyecta el cielo de HOY (nubosidad real) cuando opts.sky viene (fix Choachí)', () => {
+      const snap = { enso_status: { phase: 'neutral', label: 'Neutral ENSO', severity: 'neutral' } };
+      const ctx = buildClimaContext(snap, {
+        sky: { condition: 'nublado', label: 'Mayormente nublado', cloudCoverPct: 82, degraded: true },
+      });
+      expect(ctx).toContain('Cielo de hoy en la finca: Mayormente nublado');
+      expect(ctx).toContain('~82%');
+      expect(ctx).toContain('NO prometas sol');
+      // Sin sky NO menciona nubosidad (no inventa cielo).
+      const sinSky = buildClimaContext(snap);
+      expect(sinSky).not.toContain('Cielo de hoy');
+    });
+
     it('omite ONI/IDEAM cuando no hay valor numérico', () => {
       const snap = {
         enso_status: {

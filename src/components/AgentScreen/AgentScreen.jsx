@@ -67,6 +67,8 @@ import { getCurrentTier } from '../../services/tierService';
 import DeepResearchCard from '../DeepResearchCard';
 import { normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildSuggestedEntitiesContext, isLowConfidenceEntity, buildFallbackResponse, pisoTermicoFromAltitud } from '../../services/agentService';
 import { buildBasePrompt, analyzeQuery, buildQueryAnalysisBlock, buildCorpusVariants, buildResolvedEntitiesBlock, formatToolEvidence } from '../../services/agentPromptBase';
+// Nubosidad real para el grounding (fix Choachí 2026-06) — solo lee caches.
+import { summarizeSkyForGrounding } from '../../services/skyConditionService';
 import { assembleSystemContent } from '../../services/promptAssembler';
 import { applyOutputGuards, classifyQueryIntent } from '../../services/outputGuards';
 import { createStreamGuard } from '../../services/streamGuards';
@@ -707,7 +709,11 @@ export default function AgentScreen({ onBack, initialContext }) {
     const ensoRegion = (() => {
       try { return regionFromProfile(getProfile()); } catch (_) { return null; }
     })();
-    const climaContext = climaSnapshot ? `\n\n${buildClimaContext(climaSnapshot, { region: ensoRegion })}` : '';
+    // Nubosidad real de HOY (cache que llenan AgentHero/ClimaStrip en el home):
+    // el agente cita la condición honesta del cielo (corrección orográfica
+    // andina incluida) o no menciona nubosidad — nunca la inventa.
+    const skyToday = climaSnapshot ? summarizeSkyForGrounding(climaSnapshot) : null;
+    const climaContext = climaSnapshot ? `\n\n${buildClimaContext(climaSnapshot, { region: ensoRegion, sky: skyToday })}` : '';
 
     // FALLO 2 (E2E prod 2026-06-03): GATE de PRECIO para el contexto de finca.
     // `classifyQueryIntent` ya clasifica "a cómo está el bulto de papa" como
