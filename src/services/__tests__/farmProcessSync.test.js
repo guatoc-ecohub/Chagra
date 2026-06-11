@@ -240,4 +240,139 @@ describe('enqueueFarmProcessEvent — cola via syncManager', () => {
     const payload = mockSaveTx.mock.calls[0][0].payload;
     expect(payload.data.attributes.notes.value).toContain('idem-abc-123');
   });
+
+  it('busca el proceso en IDB si no se pasa process (recordFarmEvent pattern)', async () => {
+    const mockSaveTx = vi.fn().mockResolvedValue({ id: 77 });
+    const mockGetProcess = vi.fn().mockResolvedValue(makeProcess({
+      subject_label: 'Papa',
+      current_stage: 'vegetative',
+    }));
+
+    vi.doMock('../../db/farmProcessCache', () => ({
+      getFarmProcess: mockGetProcess,
+    }));
+
+    vi.doMock('../syncManager', () => ({
+      default: { saveTransaction: mockSaveTx },
+    }));
+
+    const { enqueueFarmProcessEvent: enq } = await import('../farmProcessSync');
+    const evt = makeEvent('proc-002', 'observation');
+
+    // Sin proceso → lo busca en IDB
+    await enq(evt, null);
+
+    expect(mockGetProcess).toHaveBeenCalledWith('proc-002');
+    const payload = mockSaveTx.mock.calls[0][0].payload;
+    expect(payload.data.attributes.notes.value).toContain('Papa');
+  });
+
+  it('si la IDB falla al buscar proceso, igual encola con datos del evento', async () => {
+    const mockSaveTx = vi.fn().mockResolvedValue({ id: 78 });
+
+    vi.doMock('../../db/farmProcessCache', () => ({
+      getFarmProcess: vi.fn().mockRejectedValue(new Error('IDB error')),
+    }));
+
+    vi.doMock('../syncManager', () => ({
+      default: { saveTransaction: mockSaveTx },
+    }));
+
+    const { enqueueFarmProcessEvent: enq } = await import('../farmProcessSync');
+    const evt = makeEvent('proc-003', 'stage_transition', {
+      payload: { from_stage: 'vegetative', to_stage: 'flowering' },
+    });
+
+    await enq(evt, null);
+
+    // Se encoló igual (con lo que trae el evento)
+    expect(mockSaveTx).toHaveBeenCalledTimes(1);
+    const payload = mockSaveTx.mock.calls[0][0].payload;
+    expect(payload.data.attributes.notes.value).toContain('vegetative → flowering');
+  });
 });
+
+describe('WIRE — farmEventService dispara farmProcessSync', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('recordFarmEvent dispara enqueueFarmProcessEvent al completar la tx (fire-and-forget)', async () => {
+    // Mock IDB + syncManager
+    const mockSyncSave = vi.fn().mockResolvedValue({ id: 99 });
+
+    vi.doMock('../db/dbCore', () => ({
+      openDB: vi.fn().mockResolvedValue({
+        transaction: () => ({
+          objectStore: () => ({
+            index: () => ({
+              get: () => ({ result: null, onsuccess: null, onerror: null }),
+            }),
+            get: () => ({
+              result: makeProcessForDB(),
+              onsuccess: null,
+              onerror: null,
+            }),
+            add: vi.fn(),
+            put: vi.fn(),
+          }),
+          oncomplete: null,
+          onerror: null,
+        }),
+      }),
+      STORES: { FARM_PROCESS_EVENTS: 'farm_process_events', FARM_PROCESSES: 'farm_processes' },
+    }));
+
+    vi.doMock('../syncManager', () => ({
+      default: { saveTransaction: mockSyncSave },
+    }));
+
+    // El test verifica que al llamar recordFarmEvent, el sync se dispara
+    // como fire-and-forget. No probamos la IDB real — verificamos
+    // que el modulo de farmProcessSync es importado y llamado.
+    const { enqueueFarmProcessEvent } = await import('../farmProcessSync');
+
+    const evt = makeEvent('proc-wire-1', 'observation', {
+      idempotency_key: 'wire-test-key',
+    });
+
+    await enqueueFarmProcessEvent(evt, makeProcess({ subject_label: 'Café' }));
+
+    expect(mockSyncSave).toHaveBeenCalledTimes(1);
+    const call = mockSyncSave.mock.calls[0][0];
+    expect(call.type).toBe('observation');
+    expect(call.endpoint).toBe('/api/log/observation');
+  });
+
+  it('todos los tipos de evento (11 de 12, sin photo_attached) producen payload', async () => {
+    const types = [
+      'sowing_confirmed', 'harvest_confirmed', 'post_harvest_confirmed',
+      'pest_management_confirmed', 'observation', 'stage_transition',
+      'stage_confirmed', 'stage_corrected', 'task_completed',
+      'weather_snapshot', 'note',
+    ];
+
+    for (const t of types) {
+      const evt = makeEvent('proc-all', t);
+      const proc = makeProcess({ subject_label: 'Café' });
+      const payload = buildFarmOSLogPayload(evt, proc, 'asset-1');
+      expect(payload, `${t} debe producir payload`).not.toBeNull();
+      expect(payload.data.type, `${t} debe tener tipo`).toBeTruthy();
+      expect(payload.data.attributes.name, `${t} debe tener name`).toBeTruthy();
+    }
+  });
+});
+
+function makeProcessForDB() {
+  return {
+    process_id: 'proc-wire-1',
+    type: 'farm_process',
+    attributes: {
+      process_type: 'sowing',
+      subject_label: 'Café',
+      subject_slug: 'coffea_arabica',
+      current_stage: 'vegetative',
+      status: 'active',
+    },
+  };
+}

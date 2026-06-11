@@ -208,13 +208,18 @@ function buildNotes(event, process) {
  * NO llama a FarmOS directamente — solo construye el payload y lo
  * mete en la cola de `syncManager` que ya maneja online/offline/backoff.
  *
- * El caller (ej. `farmEventService.recordFarmEvent`) llama esta función
- * después de persistir el evento localmente.
+ * Si `process` es null/undefined, lo busca de IndexedDB por
+ * `event.attributes.process_id`. Esto permite llamarla desde
+ * `recordFarmEvent` (que solo tiene el process_id, no el objeto).
+ *
+ * Fire-and-forget seguro: NUNCA lanza. Si el syncManager falla o la
+ * IDB no responde, loguea warning y sigue. El registro local del
+ * evento NO se ve afectado.
  *
  * @param {Object} event — farm_process_event ya persistido
- * @param {Object} [process] — FarmProcess padre
+ * @param {Object} [process] — FarmProcess padre (si no, se busca en IDB)
  * @param {string} [assetId] — ID del asset--plant en FarmOS
- * @returns {Promise<Object>} el registro de transacción pendiente, o null si no aplica
+ * @returns {Promise<Object|null>} el registro de transacción pendiente, o null si no aplica
  */
 export async function enqueueFarmProcessEvent(event, process, assetId) {
   if (!event?.attributes) return null;
@@ -225,12 +230,22 @@ export async function enqueueFarmProcessEvent(event, process, assetId) {
   const mapping = EVENT_TO_FARMOS_LOG[eventType];
   if (!mapping?.endpoint) return null;
 
-  const payload = buildFarmOSLogPayload(event, process, assetId);
+  // Si no nos pasan el proceso, lo buscamos en IDB
+  let proc = process || null;
+  if (!proc && event.attributes.process_id) {
+    try {
+      const { getFarmProcess } = await import('../db/farmProcessCache');
+      proc = await getFarmProcess(event.attributes.process_id);
+    } catch (_) {
+      // Sin proceso no bloqueamos — el payload se construye igual con
+      // la info que trae el evento.
+    }
+  }
+
+  const payload = buildFarmOSLogPayload(event, proc, assetId);
   if (!payload) return null;
 
   try {
-    // Import dinámico para evitar dependencia circular
-    // syncManager usa el mismo patrón que usan SeedingLog/payloadService
     const { default: syncManager } = await import('./syncManager');
 
     const tx = await syncManager.saveTransaction({
