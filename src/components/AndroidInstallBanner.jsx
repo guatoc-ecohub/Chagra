@@ -2,6 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { Download, X } from 'lucide-react';
 
 export const DISMISS_KEY = 'chagra-android-install-dismissed';
+// El descarte EXPIRA (operador 2026-06-11: "Chrome no me ofrece instalar" —
+// los criterios de instalabilidad PASAN en Chrome; la causa era el descarte
+// PERMANENTE de este banner en localStorage, mientras Brave —perfil sin
+// descarte previo— sí lo mostraba). Tras la ventana, re-ofrecemos.
+export const DISMISS_TTL_MS = 14 * 24 * 60 * 60 * 1000; // 14 días
+
+/**
+ * ¿Hay un descarte vigente? Se guarda el timestamp del descarte; el valor
+ * legado 'true' (descarte sin fecha, pre-2026-06-11) se trata como expirado
+ * para volver a ofrecer la instalación una vez.
+ */
+function isDismissalActive() {
+  try {
+    const raw = localStorage.getItem(DISMISS_KEY);
+    if (!raw) return false;
+    const ts = Number(raw);
+    if (!Number.isFinite(ts)) return false; // legado 'true' → expirado
+    return Date.now() - ts < DISMISS_TTL_MS;
+  } catch (_) {
+    return false; // modo privado — tratamos como no descartado
+  }
+}
 
 /**
  * AndroidInstallBanner — botón claro "Instalar Chagra" para Android Chrome.
@@ -32,11 +54,7 @@ const AndroidInstallBanner = () => {
       window.matchMedia('(display-mode: standalone)').matches ||
       window.navigator.standalone === true;
     if (isStandalone) return undefined;
-    let dismissed = null;
-    try {
-      dismissed = localStorage.getItem(DISMISS_KEY);
-    } catch (_) { /* modo privado — tratamos como no descartado */ }
-    if (dismissed) return undefined;
+    if (isDismissalActive()) return undefined;
 
     const onBeforeInstallPrompt = (event) => {
       // Cancela el mini-infobar de Chrome y guarda el prompt para dispararlo
@@ -71,7 +89,10 @@ const AndroidInstallBanner = () => {
 
   const handleDismiss = () => {
     try {
-      localStorage.setItem(DISMISS_KEY, 'true');
+      // Timestamp, no 'true': el descarte expira (DISMISS_TTL_MS) y el
+      // banner vuelve a ofrecerse — un "ahora no" de hace meses no debe
+      // esconder la instalación para siempre.
+      localStorage.setItem(DISMISS_KEY, String(Date.now()));
     } catch (_) { /* modo privado — solo oculta esta sesión */ }
     setDeferredPrompt(null);
   };

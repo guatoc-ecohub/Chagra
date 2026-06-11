@@ -38,6 +38,10 @@ self.addEventListener('activate', (event) => {
           return undefined;
         })
       ))
+      // La limpieza de caches viejos NUNCA debe bloquear el claim: si falla
+      // (cuota/storage en Android), sin claim() no hay controllerchange y el
+      // boton "Actualizar" del banner queda pegado (bug operador 2026-06-11).
+      .catch(() => undefined)
       .then(() => self.clients.claim())
       .then(() => self.clients.matchAll({ type: 'window' }))
       .then(clients => {
@@ -47,6 +51,7 @@ self.addEventListener('activate', (event) => {
           client.postMessage({ type: 'SW_UPDATED', version: CACHE_NAME });
         });
       })
+      .catch(() => undefined)
   );
 });
 
