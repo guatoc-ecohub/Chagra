@@ -1,0 +1,122 @@
+[
+  {
+    "id": "G01",
+    "query": "gusano del cafe",
+    "expected": "coffea_arabica",
+    "rationale": "broca es la plaga principal del cafe; ficha de cafe cubre manejo de broca"
+  },
+  {
+    "id": "G02",
+    "query": "matamalezas natural",
+    "expected": "allium_cepa",
+    "rationale": "cebolla tiene rol alelopatico documentado — control natural de malezas"
+  },
+  {
+    "id": "G03",
+    "query": "que siembro en tierra fria",
+    "expected": "solanum_tuberosum",
+    "rationale": "papa es cultivo emblematico de clima frio (~2500-3500 msnm)"
+  },
+  {
+    "id": "G04",
+    "query": "bichos en la lechuga",
+    "expected": "lactuca_sativa",
+    "rationale": "ficha de lechuga cubre plagas de afidos y gusanos comedores de hoja"
+  },
+  {
+    "id": "G05",
+    "query": "remedio para la roya",
+    "expected": "coffea_arabica",
+    "rationale": "roya es enfermedad principal del cafe; caldo bordeles preventivo en ficha"
+  },
+  {
+    "id": "G06",
+    "query": "como abonar el maiz",
+    "expected": "zea_mays",
+    "rationale": "ficha de maiz incluye plan de alimentacion y fertilizacion"
+  },
+  {
+    "id": "G07",
+    "query": "plaga del tomate",
+    "expected": "solanum_lycopersicum",
+    "rationale": "ficha de tomate cubre plagas principales (afidos, trips, mosca blanca)"
+  },
+  {
+    "id": "G08",
+    "query": "que cultivar en paramo",
+    "expected": "solanum_tuberosum",
+    "rationale": "papa nativa es cultivo clave de paramo; ficha describe adaptacion a altura"
+  },
+  {
+    "id": "G09",
+    "query": "controlar hormigas en frijol",
+    "expected": "phaseolus_vulgaris",
+    "rationale": "frijol es leguminosa con plagas de suelo; ficha cubre manejo"
+  },
+  {
+    "id": "G10",
+    "query": "hongo blanco en la fresa",
+    "expected": "fragaria_ananassa",
+    "rationale": "fresa susceptible a botrytis y oidio; ficha cubre manejo fungoso"
+  },
+  {
+    "id": "G11",
+    "query": "cosechar aguacate maduro",
+    "expected": "persea_americana",
+    "rationale": "ficha de aguacate describe madurez de cosecha y punto optimo"
+  },
+  {
+    "id": "G12",
+    "query": "maleza que ahoga el cultivo",
+    "expected": "allium_cepa",
+    "rationale": "cebolla tiene propiedad alelopatica que suprime malezas; ficha lo explica"
+  },
+  {
+    "id": "G13",
+    "query": "sembrar yuca en loma",
+    "expected": "manihot_esculenta",
+    "rationale": "yuca se siembra en laderas y lomas; ficha cubre preparacion de terreno"
+  },
+  {
+    "id": "G14",
+    "query": "porque se seca la mora",
+    "expected": "rubus_glaucus",
+    "rationale": "mora de Castilla tiene modos de falla documentados en su ficha"
+  },
+  {
+    "id": "G15",
+    "query": "a los cuantos dias cosecho zanahoria",
+    "expected": "daucus_carota",
+    "rationale": "zanahoria tiene tiempo a cosecha definido en su ficha fenologica"
+  },
+  {
+    "id": "G16",
+    "query": "como proteger el platano del viento",
+    "expected": "musa_paradisiaca",
+    "rationale": "platano es susceptible a vuelco por viento; ficha cubre manejo"
+  },
+  {
+    "id": "G17",
+    "query": "con que junto la papa",
+    "expected": "solanum_tuberosum",
+    "rationale": "papa tiene companions y antagonistas documentados en su ficha"
+  },
+  {
+    "id": "G18",
+    "query": "gusano cogollero remedio",
+    "expected": "zea_mays",
+    "rationale": "cogollero es plaga principal del maiz; ficha cubre control biologico"
+  },
+  {
+    "id": "G19",
+    "query": "podar tomate de arbol",
+    "expected": "solanum_betaceum",
+    "rationale": "tomate de arbol requiere poda de formacion; ficha lo documenta"
+  },
+  {
+    "id": "G20",
+    "query": "sombrio para cafe organico",
+    "expected": "coffea_arabica",
+    "rationale": "cafe bajo sombra es practica agroecologica; ficha de cafe cubre sombrio"
+  }
+]
