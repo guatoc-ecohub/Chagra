@@ -1,0 +1,51 @@
+{
+  "fuente": "Decreto 1007/2018, Decreto 870/2017, DR-RESTAURACION-1",
+  "que_es": "El Pago por Servicios Ambientales (PSA) es un incentivo economico del gobierno colombiano para que campesinos y propietarios conserven o restauren ecosistemas estrategicos en sus predios. NO vende la tierra. El campesino recibe un pago anual por hectarea a cambio de mantener el bosque/paramo/cuenca.",
+  "monto_orientativo": "$300.000 - $700.000 por hectarea al ano",
+  "autoridad": "Corporaciones Autonomas Regionales (CAR) ejecutan el PSA en cada region",
+  "modalidades": [
+    {
+      "id": "hidrico",
+      "nombre": "Servicio hidrico",
+      "que_cubre": "Conservacion o restauracion de cuencas abastecedoras de agua (nacimientos, quebradas, rios).",
+      "quien_prioriza": "Quien capta agua para consumo humano o riego → inversion forzosa del 1% (Decreto 2099/2016) financia restauracion aguas arriba.",
+      "ejemplo": "Proteger el nacimiento de la quebrada que abastece al acueducto veredal."
+    },
+    {
+      "id": "biodiversidad",
+      "nombre": "Conservacion de biodiversidad",
+      "que_cubre": "Areas con alta biodiversidad, corredores biologicos, habitat de especies amenazadas.",
+      "ejemplo": "Conservar un fragmento de bosque andino con oso de anteojos o palma de cera."
+    },
+    {
+      "id": "gei",
+      "nombre": "Reduccion de GEI / Carbono",
+      "que_cubre": "Captura de carbono en bosques y paramos (evitar deforestacion, restaurar areas degradadas).",
+      "alerta": "NO confundir con bonos de carbono privados. El PSA-carbono es del Estado colombiano, no de intermediarios."
+    },
+    {
+      "id": "cultural",
+      "nombre": "Servicio cultural / espiritual",
+      "que_cubre": "Sitios sagrados, territorios indigenas/afro, valores paisajisticos y de identidad cultural.",
+      "ejemplo": "Conservar un paramo que es sitio sagrado para la comunidad indigena local."
+    }
+  ],
+  "requisitos_campesino": [
+    "Ser propietario, poseedor o tenedor legitimo del predio",
+    "Predio en area de importancia estrategica (cuenca abastecedora, paramo, bosque, corredor)",
+    "Comprometerse a NO talar, NO quemar y NO cambiar el uso del suelo durante la vigencia del acuerdo",
+    "Presentar un plan de conservacion/restauracion (la CAR puede ayudar a formularlo)"
+  ],
+  "que_exige": [
+    "Acuerdo de conservacion firmado con la CAR (NO vende la tierra, solo acuerda cuidarla)",
+    "Mantener cobertura vegetal y no degradar el ecosistema",
+    "Permitir visitas de verificacion de la CAR",
+    "El pago se suspende si incumple"
+  ],
+  "que_habilita": [
+    "Ingreso anual estable por conservar (no depredar)",
+    "Acceso a asistencia tecnica de la CAR y entidades aliadas",
+    "Prioridad en otros programas de desarrollo rural sostenible",
+    "La tierra SIGUE siendo del campesino"
+  ]
+}
