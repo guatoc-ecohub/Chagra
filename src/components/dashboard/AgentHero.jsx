@@ -826,7 +826,12 @@ export default function AgentHero({ onNavigate }) {
                    colibrí). Sin avatar 3D: el protagonista es el colibrí 2D. */
                 .agentport-stage {
                     position: relative;
-                    z-index: 1;
+                    /* z-index 2 > compositor (1): los trazos de la red que
+                       DESBORDAN el lienzo hacia abajo pintan sobre el borde del
+                       compositor y se sueldan al botón Ⓐ — continuidad raíz↔red
+                       sin corte (operador 2026-06-10). El SVG es pointer-events
+                       none y la caja del stage no tapa el compositor. */
+                    z-index: 2;
                     flex: 1 1 auto;
                     min-height: 180px;
                 }
@@ -1005,7 +1010,9 @@ export default function AgentHero({ onNavigate }) {
                     display: block; font-size: .78rem; line-height: 1.4; margin-top: 2px;
                     color: rgb(var(--c-slate-300));
                 }
-                .agentport-red-body { flex: 1 1 auto; min-height: 0; position: relative; overflow: hidden; }
+                /* overflow VISIBLE: las raicillas/vena bajan del lienzo al
+                   botón Ⓐ real (un solo trazo, sin clip en el borde). */
+                .agentport-red-body { flex: 1 1 auto; min-height: 0; position: relative; overflow: visible; }
 
                 /* con la red abierta, la escena ambiente baja el volumen (misma
                    pantalla, foco en la red — no un modal encima) */
@@ -1020,7 +1027,7 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-scene.is-quiet .agentport-net,
                 .agentport-scene.is-quiet .agentport-spore,
                 .agentport-scene.is-quiet .agentport-roots,
-                .agentport-scene.is-quiet .agentport-sprig { opacity: .22; }
+                .agentport-scene.is-quiet .agentport-sprig { opacity: .14; }
 
                 /* Transición de envío: shimmer + lift (contrato de tests). */
                 @keyframes chagra-send-shimmer {
