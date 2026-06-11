@@ -1,5 +1,6 @@
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { recordRagEvent } from './ragTelemetry';
+import { getAllSpecies } from '../db/catalogDB';
 
 const CORPUS_PATH = '/cycle-content/';
 
@@ -177,9 +178,29 @@ async function buildCorpus() {
   // Manifest first: si existe, itera solo los slugs presentes.
   // Fallback: iterar CROP_TAXONOMY (legacy, con N-3 fetches fallidos).
   const manifestSlugs = await loadManifest();
-  const species = manifestSlugs ?? Object.values(CROP_TAXONOMY).flatMap((group) =>
+  let species = manifestSlugs ?? Object.values(CROP_TAXONOMY).flatMap((group) =>
     group.species.map((sp) => sp.id)
   );
+
+  // Tier gate (SEC-002 / UXC-004): filtrar slugs contra el catalogo activo.
+  // En OSS el catalogo tiene ~263 especies; el manifest ~491. Los ~296 slugs
+  // sin entrada en el catalogo NO deben groundearse para evitar leak de
+  // contenido Pro a usuarios OSS. Degradacion: si el catalogo falla, se
+  // cargan todos los slugs (mejor grounding completo que ninguno).
+  try {
+    const catalogSpecies = await getAllSpecies();
+    if (catalogSpecies && catalogSpecies.length > 0) {
+      const allowedIds = new Set(catalogSpecies.map((s) => s.id));
+      const before = species.length;
+      species = species.filter((slug) => allowedIds.has(slug));
+      if (before !== species.length) {
+        console.info(`[RAG] Tier gate: ${before} slugs en manifest, ${species.length} dentro del catalogo (${before - species.length} excluidos).`);
+      }
+    }
+  } catch (err) {
+    console.warn('[RAG] No se pudo cargar el catalogo para tier-gate — cargando todos los slugs:', err?.message);
+  }
+
   const docs = [];
 
   // Prefetch PARALELO-ACOTADO: en vez del loop serial que bloqueaba ~3min la
