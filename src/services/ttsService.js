@@ -286,6 +286,53 @@ let lastSpoken = null;
 let lastSpokenOptions = null;
 
 // ──────────────────────────────────────────────────────────────────────────
+// Estado observable de reproducción (TIER 2 #5 — voz punta-a-punta)
+// ──────────────────────────────────────────────────────────────────────────
+// El campesino que casi no lee necesita VER cuándo Chagra está hablando
+// (estado "hablando" con ícono+animación en AgentScreen). El problema:
+// la reproducción Kokoro vive en elementos Audio internos de este módulo
+// y Web Speech en utterances — nada de eso es observable desde React.
+//
+// Solución mínima: pub/sub de un booleano. notifySpeaking(bool) se llama
+// en los puntos de arranque/fin de audio (Kokoro single, cadena de
+// speakSentences, Web Speech onstart/onend, stop()). Solo notifica en
+// CAMBIOS de estado — sin flicker entre frases de la cadena (la cadena
+// notifica true al primer audio y false al terminar TODA la cadena).
+let audioPlaying = false;
+const speakingListeners = new Set();
+
+function notifySpeaking(value) {
+  if (audioPlaying === value) return;
+  audioPlaying = value;
+  for (const cb of speakingListeners) {
+    try { cb(value); } catch (_) { /* listener roto no tumba el TTS */ }
+  }
+}
+
+/**
+ * Suscripción a cambios del estado "está sonando audio del agente".
+ *
+ * @param {(speaking: boolean) => void} cb
+ * @returns {() => void} unsubscribe
+ */
+export function onSpeakingChange(cb) {
+  if (typeof cb !== 'function') return () => {};
+  speakingListeners.add(cb);
+  return () => speakingListeners.delete(cb);
+}
+
+/**
+ * Estado actual de reproducción (Kokoro Audio o Web Speech). A diferencia
+ * de isSpeaking() (que solo mira window.speechSynthesis), esto también
+ * cubre los Audio elements de Kokoro/XTTS y la cadena de speakSentences.
+ *
+ * @returns {boolean}
+ */
+export function isAudioPlaying() {
+  return audioPlaying;
+}
+
+// ──────────────────────────────────────────────────────────────────────────
 // Streaming sentence-by-sentence (Free 7→10 fix-pack)
 // ──────────────────────────────────────────────────────────────────────────
 // Bug observado: Kokoro TTS CPU es lineal con el largo del texto. Una
@@ -397,6 +444,10 @@ function playSentenceBlob(url) {
     };
     audio.onended = () => { cleanup(); resolve(); };
     audio.onerror = (e) => { cleanup(); reject(e); };
+    // Estado "hablando": true al arrancar la frase. El false lo emite el
+    // FIN DE LA CADENA en speakSentences (no acá) — así no hay flicker
+    // true→false→true entre frase y frase.
+    notifySpeaking(true);
     audio.play().catch((e) => { cleanup(); reject(e); });
   });
 }
@@ -486,26 +537,37 @@ export async function speakSentences(text, options = {}) {
     return r !== null;
   }
 
-  for (let i = 0; i < sentences.length; i++) {
-    if (sentenceQueueCancelled) break;
-    // Disparar prefetch de la siguiente mientras suena la actual
-    const next = i + 1 < sentences.length ? prefetch(i + 1) : null;
-    if (prefetched) {
-      try {
-        await playSentenceBlob(prefetched);
-        firstFrameSucceeded = true;
-      } catch (e) {
-        console.warn('[TTS streaming] playback error frase', i, ':', e?.message || e);
-        // Para frases tardías que fallan, fallback Web Speech por frase.
-        if (i > 0 && !sentenceQueueCancelled) {
-          try { speak(sentences[i], options); } catch (_) { /* ignore */ }
+  // Capturamos NUESTRO controller: si otro speakSentences/stop() arranca
+  // mientras esta cadena sigue viva, el notifySpeaking(false) del final solo
+  // debe emitirse si seguimos siendo la cadena activa (evita clobber del
+  // estado "hablando" de la cadena nueva).
+  const myController = sentenceQueueController;
+
+  try {
+    for (let i = 0; i < sentences.length; i++) {
+      if (sentenceQueueCancelled) break;
+      // Disparar prefetch de la siguiente mientras suena la actual
+      const next = i + 1 < sentences.length ? prefetch(i + 1) : null;
+      if (prefetched) {
+        try {
+          await playSentenceBlob(prefetched);
+          firstFrameSucceeded = true;
+        } catch (e) {
+          console.warn('[TTS streaming] playback error frase', i, ':', e?.message || e);
+          // Para frases tardías que fallan, fallback Web Speech por frase.
+          if (i > 0 && !sentenceQueueCancelled) {
+            try { speak(sentences[i], options); } catch (_) { /* ignore */ }
+          }
         }
       }
+      prefetched = next ? await next : null;
     }
-    prefetched = next ? await next : null;
+  } finally {
+    if (sentenceQueueController === myController) {
+      sentenceQueueController = null;
+      notifySpeaking(false);
+    }
   }
-
-  sentenceQueueController = null;
   return firstFrameSucceeded;
 }
 
@@ -612,6 +674,12 @@ export function speak(text, options = {}) {
 
   utterance.lang = 'es-CO';
 
+  // Estado "hablando" observable (TIER 2 #5): Web Speech expone onstart/
+  // onend/onerror en el utterance — los usamos para notificar a la UI.
+  utterance.onstart = () => notifySpeaking(true);
+  utterance.onend = () => notifySpeaking(false);
+  utterance.onerror = () => notifySpeaking(false);
+
   // Task #122: guardar para replayLast(). Texto vacío no se cachea para
   // evitar replayLast() repitiendo nada cuando el operador hizo speak('').
   if (typeof text === 'string' && text.trim().length > 0) {
@@ -638,6 +706,7 @@ export function stop() {
     URL.revokeObjectURL(currentKokoroUrl);
     currentKokoroUrl = null;
   }
+  notifySpeaking(false);
 }
 
 export function pause() {
@@ -725,12 +794,18 @@ export async function speakKokoro(text, options = {}) {
         currentKokoroAudio = null;
         currentKokoroUrl = null;
       }
+      notifySpeaking(false);
     };
+    audio.onerror = () => notifySpeaking(false);
 
     await audio.play();
+    notifySpeaking(true);
     return audio;
   } catch (e) {
     console.warn('[TTS] Kokoro failed, fallback to Web Speech:', e.message);
+    // Si el play() falló después de notificar, limpiar antes del fallback —
+    // speak() gestionará su propio onstart/onend.
+    notifySpeaking(false);
     speak(text, options);
     return null;
   }
@@ -803,13 +878,17 @@ export async function speakXTTS(text, options = {}) {
         currentKokoroAudio = null;
         currentKokoroUrl = null;
       }
+      notifySpeaking(false);
     };
+    audio.onerror = () => notifySpeaking(false);
 
     await audio.play();
+    notifySpeaking(true);
     return audio;
   } catch (e) {
     // Fallback a Kokoro si XTTS falla (timeout, error HTTP, XTTS not available)
     console.warn('[TTS] XTTS failed, fallback to Kokoro:', e.message);
+    notifySpeaking(false);
     return await speakKokoro(text, options);
   }
 }
@@ -878,6 +957,9 @@ export default {
   isPaused,
   isSupported,
   isKokoroAvailable,
+  // TIER 2 #5: estado observable de reproducción para la UI "hablando".
+  onSpeakingChange,
+  isAudioPlaying,
   getVoices,
   getSpanishVoice,
   replayLast,
