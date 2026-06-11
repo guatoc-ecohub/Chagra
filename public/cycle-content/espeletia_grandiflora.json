@@ -24,7 +24,7 @@
     "best_method": "semilla",
     "protocol_resumen": "Recoleccion de aquenios de inflorescencias maduras (temporada seca, diciembre-febrero en cordillera oriental). Siembra en sustrato de turba de paramo: tierra de subparamo 50% + arena 30% + materia organica 20%. Germinacion lenta: 30-90 dias. Trasplante a bolsa a los 4-6 meses. Plantacion definitiva >12 meses a 15-20cm.",
     "tiempo_a_establecimiento_dias": 180,
-    "notas": "Tasa de germinacion natural baja (5-20%). Crecimiento ~1cm/ano: individuos de 2m tardan ~200 anos. Protegida por Ley 1930/2018 y Resolucion 383/2010 MADS."
+    "notas": "Tasa de germinacion natural baja (5-20%). Crecimiento ~1cm/año: individuos de 2m tardan ~200 años. Protegida por Ley 1930/2018 y Resolucion 383/2010 MADS."
   },
   "requirements": {
     "agua": "alto",
