@@ -132,6 +132,41 @@ describe('assembleSystemContent — presupuesto y degradación', () => {
     }
   });
 
+  it('MEMORIA EPISÓDICA (TIER 2 #6): va ANTES del grounding y se sacrifica tras el corpus, sin tocar la evidencia', () => {
+    // Orden: memoria entre el contexto ambiental y el corpus — nunca después
+    // del grounding (la evidencia debe dominar por recency).
+    const ordered = assembleSystemContent({
+      base: 'BASE',
+      asociacion: 'BLOQUE_ASOCIACION',
+      memoria: 'BLOQUE_MEMORIA',
+      corpus: { variants: ['BLOQUE_CORPUS', ''] },
+      evidence: 'BLOQUE_EVIDENCIA',
+    });
+    const idx = (s) => ordered.content.indexOf(s);
+    expect(idx('BLOQUE_MEMORIA')).toBeGreaterThan(idx('BLOQUE_ASOCIACION'));
+    expect(idx('BLOQUE_MEMORIA')).toBeLessThan(idx('BLOQUE_CORPUS'));
+    expect(idx('BLOQUE_MEMORIA')).toBeLessThan(idx('BLOQUE_EVIDENCIA'));
+
+    // Sacrificio bajo presión: corpus cede primero, luego memoria; el
+    // grounding (evidence) queda intacto.
+    const big = 'm'.repeat(3200); // ~1208 tokens
+    const small = 'y'.repeat(265); // ~100 tokens
+    const r = assembleSystemContent(
+      {
+        base: small,
+        memoria: { variants: [big, ''] },
+        corpus: { variants: [big, ''] },
+        evidence: small,
+      },
+      { budget: 300 },
+    );
+    expect(r.breakdown.find((b) => b.name === 'corpus').degraded).toBe(true);
+    expect(r.breakdown.find((b) => b.name === 'memoria').degraded).toBe(true);
+    expect(r.breakdown.find((b) => b.name === 'evidence').degraded).toBe(false);
+    expect(r.content).toContain(small);
+    expect(r.content).not.toContain(big);
+  });
+
   it('exporta presupuestos coherentes con num_ctx 6144 → headroom 8192 (GR-10)', () => {
     expect(SYSTEM_PROMPT_TOKEN_BUDGET).toBe(6144);
     expect(PROMPT_TOKEN_BUDGET).toBe(8192);
