@@ -25,9 +25,9 @@
       "semilla"
     ],
     "best_method": "semilla",
-    "protocol_resumen": "Siembra en surcos o al voleo, 0.5-1cm profundidad. Densidad 20-25 kg/ha. Requiere inoculacion con Rhizobium meliloti para optimizar fijacion de N. Ciclo de 3-5 anos de produccion. Corte cada 35-45 dias.",
+    "protocol_resumen": "Siembra en surcos o al voleo, 0.5-1cm profundidad. Densidad 20-25 kg/ha. Requiere inoculacion con Rhizobium meliloti para optimizar fijacion de N. Ciclo de 3-5 años de produccion. Corte cada 35-45 dias.",
     "tiempo_a_establecimiento_dias": 90,
-    "notas": "La reina de las forrajeras: alto contenido proteico (18-22%). Raiz pivotante que alcanza 3-4m de profundidad. Fija 150-250 kg N/ha/ano. Requiere suelos neutros a ligeramente alcalinos y buen drenaje.",
+    "notas": "La reina de las forrajeras: alto contenido proteico (18-22%). Raiz pivotante que alcanza 3-4m de profundidad. Fija 150-250 kg N/ha/año. Requiere suelos neutros a ligeramente alcalinos y buen drenaje.",
     "fuente": "AGROSAVIA 2022. Gramineas forrajeras en sistemas ganaderos andinos"
   },
   "requirements": {
