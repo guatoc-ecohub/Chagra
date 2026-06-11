@@ -1,7 +1,9 @@
-import React from 'react';
-import { Camera, Mic, Pencil } from 'lucide-react';
+import React, { useState } from 'react';
+import { Camera, Mic, Pencil, MapPin, Check } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import { FARM_CONFIG } from '../config/defaults';
+import { getProfile, saveProfile } from '../services/userProfileService';
+import { getPisoTermicoInfo } from '../services/locationService';
 
 /**
  * OnboardingHero, empty-state cold-start del dashboard (DR-030 QW5).
@@ -21,12 +23,34 @@ import { FARM_CONFIG } from '../config/defaults';
  *   - Con zonas pero sin plantas → "ya tienes zonas listas, falta la primera planta"
  *   - Sin zonas pero con FARM_CONFIG → "tu finca está configurada"
  *
+ * Piso térmico primero (feat/onboarding-ayuda): la altitud es el FILTRO
+ * MAESTRO de todos los módulos (suelo/agua/animal/restauración/clima).
+ * Si el perfil no la tiene, el hero antepone el "Paso 1: ubicar la finca"
+ * (→ LocationDetectedScreen, que ya resuelve GPS + municipio + montaña de
+ * pisos térmicos). Si ya hay altitud pero no está confirmada, muestra la
+ * confirmación visual llana ("clima Frío, ~2200 m — ¿correcto?").
+ *
  * Refs: deepresearch/chagra-ux/decisions/ux-clarity-2026-05.md
  */
 export default function OnboardingHero({ onNavigate }) {
   const lands = useAssetStore((s) => s.lands);
   const hasZones = lands.length > 0;
   const hasFarmContext = !!(FARM_CONFIG.ALTITUD_MSNM || (FARM_CONFIG.THERMAL_ZONES || []).length > 0);
+
+  // Perfil leído una vez al montar (localStorage, sin red). El strip de
+  // confirmación muta `pisoConfirmado` localmente al tocar "Sí".
+  const [profile] = useState(() => getProfile());
+  const [pisoConfirmado, setPisoConfirmado] = useState(() => profile.piso_confirmado === '1');
+  const altitud = Number(profile.finca_altitud);
+  const pisoInfo = Number.isFinite(altitud) && profile.finca_altitud !== '' && profile.finca_altitud != null
+    ? getPisoTermicoInfo(altitud)
+    : null;
+  const needsLocation = !pisoInfo;
+
+  const confirmPiso = () => {
+    saveProfile({ piso_confirmado: '1', ...(pisoInfo ? { piso_termico: pisoInfo.slug } : {}) });
+    setPisoConfirmado(true);
+  };
 
   // Copy adaptive según señales detectadas del operador.
   // Tono "usted" cordial colombiano (memoria feedback_colombian_tone).
@@ -83,6 +107,78 @@ export default function OnboardingHero({ onNavigate }) {
           {subtitle}
         </p>
       </div>
+
+      {/* ── Paso 1: piso térmico (filtro maestro de TODOS los módulos) ── */}
+      {needsLocation && (
+        <div
+          data-testid="onboarding-piso-cta"
+          className="rounded-xl bg-emerald-950/50 border-2 border-emerald-600/60 p-4 flex flex-col gap-3"
+        >
+          <div className="flex items-start gap-3">
+            <span className="text-4xl shrink-0" aria-hidden="true">📍</span>
+            <div className="min-w-0 flex-1">
+              <p className="text-lg font-black text-emerald-100 leading-tight">
+                Primero: ¿dónde está su finca?
+              </p>
+              <p className="text-sm text-slate-300 leading-relaxed mt-1">
+                Con la altura de su tierra sabemos si su clima es
+                {' '}<span aria-hidden="true">🌴</span> caliente,
+                {' '}<span aria-hidden="true">🌤️</span> templado o
+                {' '}<span aria-hidden="true">⛅</span> frío — y todos los
+                consejos le salen acertados.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => onNavigate('ubicacion-detectada')}
+            className="w-full min-h-[56px] rounded-xl bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white text-lg font-black flex items-center justify-center gap-2 transition-colors"
+          >
+            <MapPin size={22} aria-hidden="true" /> Ubicar mi finca
+          </button>
+          <button
+            type="button"
+            onClick={() => onNavigate('onboarding-perfil')}
+            className="text-sm text-emerald-300 hover:text-emerald-200 underline underline-offset-2 self-center"
+          >
+            Prefiero contarle de mi finca con preguntas
+          </button>
+        </div>
+      )}
+
+      {/* Confirmación visual del piso detectado — un solo toque. */}
+      {!needsLocation && !pisoConfirmado && (
+        <div
+          data-testid="onboarding-piso-confirm"
+          className="rounded-xl bg-slate-950 border-2 border-emerald-600/60 p-4 flex flex-col gap-3"
+        >
+          <div className="flex items-start gap-3">
+            <span className="text-4xl shrink-0" aria-hidden="true">{pisoInfo.emoji}</span>
+            <div className="min-w-0 flex-1">
+              <p className="text-lg font-black text-white leading-tight">
+                Su finca está en clima {pisoInfo.label.toLowerCase()}, a unos {Math.round(altitud)} m de altura.
+              </p>
+              <p className="text-sm text-slate-400 mt-1">¿Es correcto?</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={confirmPiso}
+              className="min-h-[52px] rounded-xl bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white font-black flex items-center justify-center gap-2 transition-colors"
+            >
+              <Check size={20} aria-hidden="true" /> Sí, es correcto
+            </button>
+            <button
+              type="button"
+              onClick={() => onNavigate('ubicacion-detectada')}
+              className="min-h-[52px] rounded-xl bg-slate-900 border border-slate-600 hover:border-slate-500 text-slate-200 font-bold flex items-center justify-center gap-2 transition-colors"
+            >
+              <Pencil size={18} aria-hidden="true" /> Corregir
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {ctas.map((cta) => (

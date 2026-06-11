@@ -7,6 +7,7 @@ import SOIL_DATA from '../data/soil-diagnostics.json';
 import { diagnosticarSuelo } from '../services/soilDiagnostic';
 import useVoiceRecorder from '../hooks/useVoiceRecorder';
 import { transcribe } from '../services/voiceService';
+import ContextTip from './ContextTip';
 
 /**
  * SoilDiagnosticScreen — diagnóstico de suelo GUIADO sin laboratorio
@@ -421,6 +422,18 @@ export default function SoilDiagnosticScreen({ onBack, onNavigate }) {
 
               {diag.pruebas.length > 0 ? (
                 <section>
+                  {/* Tip de primera vez: cómo leer la confiabilidad (reusa la
+                      semántica de CONFIABILIDAD_META, presentada en el momento
+                      de uso — feat/onboarding-ayuda). */}
+                  <ContextTip
+                    id="diagnostico-confianza"
+                    emoji="🟢"
+                    title="Mire los puntos de confianza"
+                    className="mb-3"
+                  >
+                    Tres puntos verdes = prueba confiable. Un punto = solo da una
+                    pista. Si dice MITO, esa prueba no sirve para decidir.
+                  </ContextTip>
                   <h2 className="text-sm font-bold text-slate-200 mb-2">
                     <span aria-hidden="true">🧰 </span>Confírmalo con esta prueba casera
                   </h2>

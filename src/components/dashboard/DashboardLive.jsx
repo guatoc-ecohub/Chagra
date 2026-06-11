@@ -19,6 +19,8 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import AgentHero from './AgentHero';
+import OnboardingHero from '../OnboardingHero';
+import { getProfile } from '../../services/userProfileService';
 import SelectedBackgroundReveal from './SelectedBackgroundReveal';
 import ClimaStrip from './ClimaStrip';
 import AIStatusFooter from './AIStatusFooter';
@@ -152,6 +154,20 @@ function SortableSection({ id, onNavigate, sensors }) {
 export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
     const [order, setOrder] = useState(readOrder);
     const iotAlerts = useAssetStore((s) => s.iotAlerts) || [];
+    // Primer uso (feat/onboarding-ayuda): sin plantas registradas se re-monta
+    // el OnboardingHero existente (quedó huérfano del DashboardView legacy al
+    // pasar a DashboardLive 2026-05-28). Trae el Paso 1 "piso térmico" —
+    // filtro maestro de todos los módulos — + las 3 rutas de registro.
+    // Si falta capturar/confirmar el piso, va ARRIBA del AgentHero (above
+    // the fold — el hero mide ~100dvh y el paso crítico no puede quedar
+    // escondido tras un scroll); ya confirmado, baja al flujo normal.
+    const plantsCount = useAssetStore((s) => s.plants.length);
+    const [needsPisoCapture] = useState(() => {
+        const p = getProfile();
+        const alt = Number(p.finca_altitud);
+        const hasAltitud = p.finca_altitud !== '' && p.finca_altitud != null && Number.isFinite(alt);
+        return !hasAltitud || p.piso_confirmado !== '1';
+    });
 
     // Persist scroll position al volver de detalle (mismo bug que App.jsx
     // resolvió para Dashboard clásico). Quick-win UX 2026-05-28 demo Diana.
@@ -187,6 +203,12 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
                 Protagonista absoluto, primera pantalla. El resto del dashboard
                 (saludo regional + secciones) queda DEBAJO del fold y se llega
                 scrolleando. */}
+            {plantsCount === 0 && needsPisoCapture && (
+                <div className="px-4 pt-3" data-testid="dashboard-onboarding-top">
+                    <OnboardingHero onNavigate={onNavigate} />
+                </div>
+            )}
+
             <AgentHero onNavigate={onNavigate} />
 
             {/* Paisaje elegido — la foto de biodiversidad seleccionada, JUSTO
@@ -200,6 +222,14 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
             {/* Saludo regional dismissible — bajo el fold, ya no sobre el hero
                 (que tiene su propio saludo "Soy Chagra"). */}
             {regionalGreeting}
+
+            {/* Primer uso con piso ya confirmado: las 3 rutas de registro
+                bajo el fold. Desaparece al registrar la primera planta. */}
+            {plantsCount === 0 && !needsPisoCapture && (
+                <div className="px-4 pt-3">
+                    <OnboardingHero onNavigate={onNavigate} />
+                </div>
+            )}
 
             {/* Secciones drag-reorder */}
             <div className="px-4 pt-3 pb-4">

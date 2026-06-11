@@ -14,6 +14,7 @@ import {
   markProfileDone,
   markProfileSkipped,
 } from '../services/userProfileService';
+import { PISO_TERMICO_INFO } from '../services/locationService';
 
 /**
  * OnboardingProfile — flujo de onboarding extendido (#200).
@@ -143,6 +144,8 @@ export default function OnboardingProfile({ onComplete, onClose }) {
           question={current}
           value={answers[current.id]}
           onChange={(v) => setAnswer(current.id, v)}
+          onChangeOther={setAnswer}
+          extraAnswers={answers}
           onAdvanceSingle={goNext}
         />
       </div>
@@ -190,9 +193,56 @@ export default function OnboardingProfile({ onComplete, onClose }) {
 }
 
 /**
- * Renderiza una pregunta según su `type`.
+ * Quick-pick visual de piso térmico para la pregunta de altitud (baja
+ * alfabetización): si el campesino no sabe los msnm, escoge el clima de su
+ * tierra con un botón grande (emoji + nombre + rango). Cero fabricación:
+ * guarda SOLO `piso_termico` declarado — la altitud numérica real la
+ * resuelve y confirma LocationDetectedScreen (GPS/Open-Elevation) después.
  */
-function QuestionView({ question, value, onChange, onAdvanceSingle }) {
+function PisoTermicoQuickPick({ selected, onPick }) {
+  const pisos = Object.values(PISO_TERMICO_INFO);
+  return (
+    <div className="mt-4">
+      <p className="text-sm text-slate-300 font-medium">
+        ¿No sabe los metros? Escoja el clima de su tierra:
+      </p>
+      <div className="grid grid-cols-2 gap-2.5 mt-2.5">
+        {pisos.map((p) => {
+          const isSel = selected === p.slug;
+          return (
+            <button
+              key={p.slug}
+              type="button"
+              onClick={() => onPick(p.slug)}
+              aria-pressed={isSel}
+              className={`flex flex-col items-center justify-center gap-1 p-3 min-h-[88px] rounded-xl border transition-colors ${
+                isSel
+                  ? 'bg-emerald-900/30 border-emerald-600 text-white'
+                  : 'bg-slate-900 border-slate-700 text-slate-200 hover:border-slate-600'
+              }`}
+            >
+              <span className="text-3xl" aria-hidden="true">{p.emoji}</span>
+              <span className="text-sm font-bold capitalize">{p.label}</span>
+              <span className="text-[11px] text-slate-500">{p.rango}</span>
+            </button>
+          );
+        })}
+      </div>
+      <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+        Después afinamos la altura exacta con la ubicación de su finca.
+      </p>
+    </div>
+  );
+}
+
+/**
+ * Renderiza una pregunta según su `type`.
+ *
+ * `onChangeOther(id, value)` permite que una pregunta guarde una clave
+ * adicional del perfil (ej: la pregunta de altitud guarda `piso_termico`
+ * cuando el usuario escoge el clima en vez de escribir msnm).
+ */
+function QuestionView({ question, value, onChange, onChangeOther, extraAnswers, onAdvanceSingle }) {
   const { type, title, help, options, placeholder, unit } = question;
 
   return (
@@ -229,6 +279,14 @@ function QuestionView({ question, value, onChange, onAdvanceSingle }) {
               </span>
             )}
           </div>
+        )}
+
+        {/* Piso térmico visual — solo en la pregunta de altitud. */}
+        {question.id === 'finca_altitud' && typeof onChangeOther === 'function' && (
+          <PisoTermicoQuickPick
+            selected={extraAnswers?.piso_termico}
+            onPick={(slug) => onChangeOther('piso_termico', slug)}
+          />
         )}
 
         {type === 'single' &&

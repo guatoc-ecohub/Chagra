@@ -3,6 +3,7 @@ import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { transcribe, queueForRetry } from '../../services/voiceService';
 import VoiceStatusStrip from './VoiceStatusStrip';
+import ContextTip from '../ContextTip';
 import {
   claimNext as outboxClaimNext,
   markAnswered as outboxMarkAnswered,
@@ -2901,6 +2902,21 @@ export default function AgentScreen({ onBack, initialContext }) {
         )}
         {agentPickError && (
           <p className="text-xs text-red-400 mb-2 px-1">{agentPickError}</p>
+        )}
+
+        {/* Tip de primera vez (feat/onboarding-ayuda): cómo pedir diagnóstico
+            con foto. Apunta al botón 📷 real del compositor de abajo;
+            descartable y no se repite (contextTips). */}
+        {state !== STATE_RECORDING && !agentAttachment && (
+          <ContextTip
+            id="foto-diagnostico"
+            emoji="📷"
+            title="¿Una mata enferma? Mándeme una foto"
+            className="mb-2"
+          >
+            Toque la cámara aquí abajo y tome la foto cerquita de la hoja, con
+            buena luz de día. Yo le digo qué veo.
+          </ContextTip>
         )}
 
         {/* TIER 2 #5 — estado de VOZ evidente para baja alfabetización:
