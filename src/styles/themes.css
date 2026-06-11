@@ -415,8 +415,10 @@ html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
     /* rejilla de circuito tenue (líneas teal al 5%) */
     linear-gradient(rgba(var(--bp-teal-rgb), 0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(var(--bp-teal-rgb), 0.05) 1px, transparent 1px),
-    /* glow ambiental inferior-derecho */
-    radial-gradient(80% 50% at 80% 92%, rgba(var(--bp-teal-rgb), 0.10) 0%, transparent 60%),
+    /* glow ambiental inferior-derecho — el alpha respira con el clima real
+     * (clima-atmosfera.css mueve --bp-glow-a: sol pleno .14 · nublado .07 ·
+     * lluvia .05 · niebla .04). Default 0.10 = paridad exacta con el demo. */
+    radial-gradient(80% 50% at 80% 92%, rgba(var(--bp-teal-rgb), var(--bp-glow-a, 0.10)) 0%, transparent 60%),
     /* base teal profunda que sube hacia el verde-teal del demo */
     radial-gradient(120% 80% at 50% 8%, #0e2a2e 0%, #0b1a20 34%, #0a1118 56%, #0a0e14 100%) !important;
   background-size: 34px 34px, 34px 34px, 100% 100%, 100% 100% !important;
