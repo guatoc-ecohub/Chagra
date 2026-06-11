@@ -75,6 +75,7 @@ const OnboardingHero = lazy(() => import('./components/OnboardingHero'));
 const WelcomeStatsHero = lazy(() => import('./components/WelcomeStatsHero'));
 const TopBar = lazy(() => import('./components/TopBar'));
 const DashboardLive = lazy(() => import('./components/dashboard/DashboardLive'));
+const HoyEnFincaScreen = lazy(() => import('./components/hoy/HoyEnFincaScreen'));
 import HomeRegionalGreeting from './components/HomeRegionalGreeting';
 
 localforage.config({
@@ -135,6 +136,8 @@ const HASH_VIEW_ROUTES = {
   casos: 'casos',
   tareas: 'task_log',
   task_log: 'task_log',
+  hoy: 'hoy_finca',
+  'hoy-en-finca': 'hoy_finca',
 };
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
@@ -643,6 +646,19 @@ export default function App() {
         );
       case 'dashboard':
         return <DashboardLiveView onNavigate={navigate} onLogout={handleLogout} lastLogMessage={lastLogMessage} />;
+      case 'hoy_finca':
+        // Dashboard proactivo "Hoy en finca": clima honesto de hoy + alertas
+        // + tareas del ciclo de la semana + agenda campesina. Todo accionable
+        // (los toques rutean a agente/ciclo/procesos/etc.).
+        return (
+          <ErrorBoundary>
+            <HoyEnFincaScreen
+              onBack={() => navigate('dashboard')}
+              onHome={() => navigate('dashboard')}
+              onNavigate={navigate}
+            />
+          </ErrorBoundary>
+        );
       case 'sembrar':
         return <SeedingLog onBack={() => navigate('dashboard')} onSave={showToast} initialData={currentViewData} />;
       case 'cosechar':

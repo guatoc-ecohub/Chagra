@@ -251,14 +251,17 @@ export function BitacoraCard({ onNavigate, variant }) {
 }
 
 export function HoyCard({ onNavigate, variant }) {
+    // 2026-06-11: la card "Hoy en finca" deja de ir a la cola de tareas y
+    // abre el dashboard proactivo del día (clima honesto + alertas + tareas
+    // del ciclo + agenda campesina) — vista 'hoy_finca'.
     return (
         <Card
             variant={variant}
             section="hoy"
             title="Hoy en finca"
-            subtitle="Lo que toca hacer cerca tuyo"
-            tooltip="Tareas pendientes ordenadas por cercanía a tu ubicación actual."
-            onClick={() => onNavigate('task_log')}
+            subtitle="El día, las alertas y lo que toca"
+            tooltip="Clima de hoy, alertas, tareas de la semana y agenda de tu finca."
+            onClick={() => onNavigate('hoy_finca')}
         />
     );
 }
