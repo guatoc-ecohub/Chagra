@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { X, Beaker, Clock, ChevronDown, ChevronRight, BookOpen } from 'lucide-react';
+import BiopreparadoDiagrama from './BiopreparadoDiagrama';
+import { tieneDiagrama } from '../data/biopreparado-diagramas';
 
 /**
  * BiopreparadoSuggestionModal, Modal sugerencia de biopreparados para un
@@ -78,39 +80,47 @@ export default function BiopreparadoSuggestionModal({ ingredientName, bioprepara
                 </button>
 
                 {isOpen && (
-                  <div className="px-4 pb-4 pt-1 text-xs text-slate-300 space-y-3 border-t border-slate-800">
-                    {bp.ingredientes && bp.ingredientes.length > 0 && (
-                      <div>
-                        <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">Ingredientes</p>
-                        <div className="flex flex-wrap gap-1">
-                          {bp.ingredientes.map((ing, i) => {
-                            const isMatch = ing.toLowerCase().includes(ingredientName.toLowerCase());
-                            return (
-                              <span
-                                key={i}
-                                className={`text-[11px] px-2 py-0.5 rounded ${
-                                  isMatch
-                                    ? 'bg-emerald-900/40 text-emerald-300 border border-emerald-800'
-                                    : 'bg-slate-800 text-slate-400'
-                                }`}
-                              >
-                                {ing}
-                              </span>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                    {bp.proceso_resumen && (
-                      <div>
-                        <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1 flex items-center gap-1">
-                          <BookOpen size={10} /> Proceso
-                        </p>
-                        <p className="text-xs text-slate-300 leading-relaxed">{bp.proceso_resumen}</p>
-                      </div>
+                  <div className="px-4 pb-4 pt-3 text-xs text-slate-300 space-y-3 border-t border-slate-800">
+                    {/* Diagrama visual paso a paso (baja alfabetización) cuando
+                        existe receta curada; si no, cae al texto del proceso. */}
+                    {tieneDiagrama(bp.id) ? (
+                      <BiopreparadoDiagrama biopreparado={bp} highlightIngredient={ingredientName} compact />
+                    ) : (
+                      <>
+                        {bp.ingredientes && bp.ingredientes.length > 0 && (
+                          <div>
+                            <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">Ingredientes</p>
+                            <div className="flex flex-wrap gap-1">
+                              {bp.ingredientes.map((ing, i) => {
+                                const isMatch = ing.toLowerCase().includes(ingredientName.toLowerCase());
+                                return (
+                                  <span
+                                    key={i}
+                                    className={`text-[11px] px-2 py-0.5 rounded ${
+                                      isMatch
+                                        ? 'bg-emerald-900/40 text-emerald-300 border border-emerald-800'
+                                        : 'bg-slate-800 text-slate-400'
+                                    }`}
+                                  >
+                                    {ing}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                        {bp.proceso_resumen && (
+                          <div>
+                            <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1 flex items-center gap-1">
+                              <BookOpen size={10} /> Proceso
+                            </p>
+                            <p className="text-xs text-slate-300 leading-relaxed">{bp.proceso_resumen}</p>
+                          </div>
+                        )}
+                      </>
                     )}
                     <div className="flex flex-wrap gap-3 text-[10px] text-slate-500">
-                      {bp.tiempo_elaboracion_dias && (
+                      {!tieneDiagrama(bp.id) && bp.tiempo_elaboracion_dias && (
                         <span className="inline-flex items-center gap-1">
                           <Clock size={10} /> Elaboración: {bp.tiempo_elaboracion_dias} días
                         </span>
