@@ -76,6 +76,10 @@ const ONLY = argVal("--only", null);
 
 const CANDIDATES = [
   "granite3.1-dense:8b", // BASELINE (NLU real de prod)
+  "granite3.3:8b",       // posible upgrade chat — ¿mejor routing?
+  "gemma4:e4b",          // Maxwell-safe
+  "ministral-3:latest",  // Maxwell-safe
+  "ministral-3:14b",     // Maxwell-safe (más grande)
   "granite3.1-moe:1b",
   "qwen2.5:1.5b",
 ].filter((m) => !ONLY || m === ONLY);

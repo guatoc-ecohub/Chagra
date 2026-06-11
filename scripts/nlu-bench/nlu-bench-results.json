@@ -4,10 +4,10 @@
       "model": "granite3.1-dense:8b",
       "soloAcc": 0.75,
       "corrAcc": 0.85,
-      "p50": 2293,
-      "p95": 5899,
-      "minLat": 980,
-      "maxLat": 6881,
+      "p50": 2243,
+      "p95": 4146,
+      "minLat": 877,
+      "maxLat": 4904,
       "crashes": 0,
       "totalCalls": 60,
       "perCase": [
@@ -131,7 +131,7 @@
           "corr": "get_enso_status",
           "corrHit": true,
           "crashes": 0,
-          "rawContent": "{\"use_tool\":true,\"tool\":\"get_enso_status\"}",
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_enso_status\",\"args\":{}}",
           "soloDecision": {
             "use_tool": true,
             "tool": "get_enso_status",
@@ -163,7 +163,7 @@
           "corr": "get_clima_ideam",
           "corrHit": true,
           "crashes": 0,
-          "rawContent": "{\"use_tool\": true, \"tool\": \"get_clima_ideam\", \"args\": {\"action\": \"climate_series\", \"args\": {\"municipio\": \"Pasto\", \"departamento\": \"Nariño\", \"variable\": \"precipitacion_acumulada_dia\", \"frequency\": \"monthly\", \"start_date\": \"2016-05-01\", \"end_date\": \"2021-05-31\"}}}",
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_clima_ideam\",\"args\":{\"action\":\"climate_series\",\"args\":{\"municipio\":\"Pasto\",\"departamento\":\"Nariño\",\"station_id\":null}}}",
           "soloDecision": {
             "use_tool": true,
             "tool": "get_clima_ideam",
@@ -230,7 +230,7 @@
           "corr": "chat/none",
           "corrHit": true,
           "crashes": 0,
-          "rawContent": "{\n  \"use_tool\": false,\n  \"tool\": null,\n  \"args\": {\n    \"text\": \"¡Buenos días! El clima en la región es favorable para el cultivo de café. Actualmente, no hay alertas climáticas locales.\"\n  }\n}",
+          "rawContent": "{\n  \"use_tool\": false,\n  \"tool\": null,\n  \"args\": {\n    \"text\": \"El clima de hoy es soleado y agradable. La temperatura oscila entre 15°C y 25°C. No hay alertas climáticas en la zona.\"\n  }\n}",
           "soloDecision": {
             "use_tool": false,
             "tool": null,
@@ -262,7 +262,7 @@
           "corr": "chat/none",
           "corrHit": false,
           "crashes": 0,
-          "rawContent": "{\"use_tool\":true,\"tool\":\"get_cultivos_viables\",\"args\":{\"altitud*\":[1500,2000],\"piso_termico\":\"frio\"}}",
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_cultivos_viables\",\"args\":{\"altitud\":[1800,2500],\"piso_termico\":\"frio\"}}",
           "soloDecision": {
             "use_tool": false,
             "tool": null,
@@ -278,7 +278,7 @@
           "corr": "get_diseno_restauracion",
           "corrHit": true,
           "crashes": 0,
-          "rawContent": "{\"use_tool\":true,\"tool\":\"get_diseno_restauracion\",\"args\":{\"objetivo\":\"bosque\",\"altitud_msnm\":\"1500\",\"region\":\"Antioquia\",\"invasora_mencionada\":\"retamo espinoso\"}}",
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_diseno_restauracion\",\"args\":{\"objetivo\":\"bosque\",\"altitud_msnm\":\"1500\",\"region\":\"Antioquia\",\"invasora_mencionada\":\"Retama espinosa\"}}",
           "soloDecision": {
             "use_tool": true,
             "tool": "get_diseno_restauracion",
@@ -336,14 +336,1407 @@
         }
       ]
     },
+    "granite3.3:8b": {
+      "model": "granite3.3:8b",
+      "soloAcc": 0.85,
+      "corrAcc": 0.85,
+      "p50": 4209,
+      "p95": 5864,
+      "minLat": 2484,
+      "maxLat": 6218,
+      "crashes": 0,
+      "totalCalls": 60,
+      "perCase": [
+        {
+          "id": "C01",
+          "expected": "chain[get_companions+get_biopreparados]",
+          "solo": "chain[get_multihop_companions+get_biopreparados]",
+          "soloHit": false,
+          "corr": "chain[get_multihop_companions+get_biopreparados]",
+          "corrHit": false,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\": true, \"tool_chain\": [{\"tool\": \"get_multihop_companions\", \"args\": {\"species_id_or_pest\": [\"coffea_arabica\", \"zea_mays\"], \"hops\": 2}}, {\"tool\": \"get_biopreparados\", \"args\": {\"species_id_or_pest\": \"coffea_arabica\"}}]}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_multihop_companions",
+            "chain": [
+              "get_multihop_companions",
+              "get_biopreparados"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C02",
+          "expected": "get_pest_controllers",
+          "solo": "chain[get_pest_controllers]",
+          "soloHit": true,
+          "corr": "chain[get_pest_controllers]",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\": true, \"tool_chain\": [{\"tool\": \"get_pest_controllers\", \"args\": {\"pest_id_or_name\": \"mosca blanca\"}}]}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_pest_controllers",
+            "chain": [
+              "get_pest_controllers"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C03",
+          "expected": "get_biopreparados",
+          "solo": "chain[get_biopreparados]",
+          "soloHit": true,
+          "corr": "chain[get_biopreparados]",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\": true, \"tool_chain\": [{\"tool\": \"get_biopreparados\", \"args\": {\"species_id_or_pest\": \"roya\"}}]}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_biopreparados",
+            "chain": [
+              "get_biopreparados"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C04",
+          "expected": "get_precio_sipsa",
+          "solo": "get_precio_sipsa",
+          "soloHit": true,
+          "corr": "get_precio_sipsa",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\": true, \"tool\": \"get_precio_sipsa\", \"args\": {\"action\": \"latest_price\", \"producto\": \"papa\", \"plaza\": \"corabastos\"}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_precio_sipsa",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C05",
+          "expected": "get_normativa_ica",
+          "solo": "chain[get_normativa_ica]",
+          "soloHit": true,
+          "corr": "chain[get_normativa_ica]",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\": true, \"tool_chain\": [{\"tool\": \"get_normativa_ica\", \"args\": {\"action\": \"latest_active_ingredients\", \"text\": \"glifosato\"}}]}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_normativa_ica",
+            "chain": [
+              "get_normativa_ica"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C06",
+          "expected": "get_diseno_restauracion",
+          "solo": "get_diseno_restauracion",
+          "soloHit": true,
+          "corr": "get_diseno_restauracion",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\": true, \"tool\": \"get_diseno_restauracion\", \"args\": {\"objetivo\": \"bosque\", \"altitud_msnm\": \"<altitud_del_sitio>\", \"region\": \"<región_geográfica>\", \"invasora_mencionada\": \"\"}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_diseno_restauracion",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C07",
+          "expected": "get_subgrafo_relacional",
+          "solo": "chain[get_pest_controllers]",
+          "soloHit": false,
+          "corr": "chain[get_pest_controllers]",
+          "corrHit": false,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\": true, \"tool_chain\": [{\"tool\": \"get_pest_controllers\", \"args\": {\"pest_id_or_name\": \"broca\"}}, {\"tool\": \"get_cultivos_viables\", \"args\": {\"altitud\": \"clima frío\", \"piso_termico\": \"frio\"}}]}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_pest_controllers",
+            "chain": [
+              "get_pest_controllers"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C08",
+          "expected": "get_enso_status",
+          "solo": "chain[get_enso_status+get_clima_ideam]",
+          "soloHit": true,
+          "corr": "chain[get_enso_status+get_clima_ideam]",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\": true, \"tool_chain\": [{\"tool\": \"get_enso_status\", \"args\": {}}, {\"tool\": \"get_clima_ideam\", \"args\": {\"action\": \"climate_series\", \"args\": {\"municipio\": \"<insert_municipality>\", \"departamento\": \"<insert_department>\", \"station_id\": \"<insert_station_id>\"}}}]}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_enso_status",
+            "chain": [
+              "get_enso_status",
+              "get_clima_ideam"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C09",
+          "expected": "get_alertas_clima_zona",
+          "solo": "chain[get_alertas_clima_zona+get_clima_ideam]",
+          "soloHit": true,
+          "corr": "chain[get_alertas_clima_zona+get_clima_ideam]",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\": true, \"tool_chain\": [{\"tool\": \"get_alertas_clima_zona\", \"args\": {\"lat\": \"<latitud_finca>\", \"lng\": \"<longitud_finca>\"}}, {\"tool\": \"get_clima_ideam\", \"args\": {\"action\": \"monthly_avg\", \"municipio\": \"<municipio>\", \"departamento\": \"<departamento>\"}}]}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_alertas_clima_zona",
+            "chain": [
+              "get_alertas_clima_zona",
+              "get_clima_ideam"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C10",
+          "expected": "get_clima_ideam",
+          "solo": "chain[get_clima_ideam]",
+          "soloHit": true,
+          "corr": "chain[get_clima_ideam]",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\": true, \"tool_chain\": [{\"tool\": \"get_clima_ideam\", \"args\": {\"action\": \"climate_series\", \"args\": {\"municipio\": \"Pasto\", \"action\": \"monthly_avg\", \"period\": \"5y\"}}}]}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_clima_ideam",
+            "chain": [
+              "get_clima_ideam"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C11",
+          "expected": "get_companions",
+          "solo": "chain[get_companions+get_biopreparados]",
+          "soloHit": true,
+          "corr": "chain[get_companions+get_biopreparados]",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\": true, \"tool_chain\": [{\"tool\": \"get_companions\", \"args\": {\"species_id\": \"solanum_lycopersicum_san_marzano\"}}, {\"tool\": \"get_biopreparados\", \"args\": {\"species_id_or_pest\": \"solanum_lycopersicum_san_marzano\"}}]}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_companions",
+            "chain": [
+              "get_companions",
+              "get_biopreparados"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C12",
+          "expected": "get_multihop_companions",
+          "solo": "chain[get_multihop_companions+get_biopreparados]",
+          "soloHit": true,
+          "corr": "chain[get_multihop_companions+get_biopreparados]",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\": true, \"tool_chain\": [{\"tool\": \"get_multihop_companions\", \"args\": {\"species_id\": \"<id_del_café>\", \"hops\": 2}}, {\"tool\": \"get_biopreparados\", \"args\": {\"species_id_or_pest\": \"<id_del_café>\"}}]}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_multihop_companions",
+            "chain": [
+              "get_multihop_companions",
+              "get_biopreparados"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C13",
+          "expected": "chat",
+          "solo": "chat/none",
+          "soloHit": true,
+          "corr": "chat/none",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\": false, \"tool\": null, \"args\": {\"floral_drop\": \"al aguacate se le está cayendo toda la flor y no cuaja el fruto\"}}",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_tool"
+          }
+        },
+        {
+          "id": "C14",
+          "expected": "chat",
+          "solo": "chat/none",
+          "soloHit": true,
+          "corr": "chat/none",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\": false, \"tool\": null, \"args\": {\"text\": \"Buenos días, no puedo proporcionar información sobre el clima actual ya que mi función se centra en agroecológicas. Para obtener la información climática, por favor utiliza la herramienta 'get_clima_ideam'.\"}}",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_tool"
+          }
+        },
+        {
+          "id": "C15",
+          "expected": "get_pest_controllers",
+          "solo": "chain[get_pest_controllers]",
+          "soloHit": true,
+          "corr": "chain[get_pest_controllers]",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\": true, \"tool_chain\": [{\"tool\": \"get_pest_controllers\", \"args\": {\"pest_id_or_name\": \"chiza\"}}]}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_pest_controllers",
+            "chain": [
+              "get_pest_controllers"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C16",
+          "expected": "get_species",
+          "solo": "chat/none",
+          "soloHit": false,
+          "corr": "chat/none",
+          "corrHit": false,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\": true, \"tool_chain\": [{\"tool\": \"get_cultivos_viables\", \"args\": {\"altitud\": \"<insert_altitude>\", \"piso_termico\": \"frio\", \"limit\": 1}}, {\"tool\": \"get_diseno_finca\", \"args\": {\"altitud\": \"<insert_altitude>\", \"roles\": \"frio\"}}]}",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": [],
+            "reason": "chain_invalid"
+          }
+        },
+        {
+          "id": "C17",
+          "expected": "get_diseno_restauracion",
+          "solo": "chain[get_diseno_restauracion]",
+          "soloHit": true,
+          "corr": "chain[get_diseno_restauracion]",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\": true, \"tool_chain\": [{\"tool\": \"get_diseno_restauracion\", \"args\": {\"objetivo\": \"ribera\", \"altitud_msnm\": \"<altitud>\", \"region\": \"<región>\", \"invasora_mencionada\": \"retama espinosa\"}}]}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_diseno_restauracion",
+            "chain": [
+              "get_diseno_restauracion"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C18",
+          "expected": "get_pest_controllers",
+          "solo": "chain[get_pest_controllers]",
+          "soloHit": true,
+          "corr": "chain[get_pest_controllers]",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\": true, \"tool_chain\": [{\"tool\": \"get_pest_controllers\", \"args\": {\"pest_id_or_name\": \"broca\"}}]}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_pest_controllers",
+            "chain": [
+              "get_pest_controllers"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C19",
+          "expected": "get_biopreparados",
+          "solo": "chain[get_biopreparados]",
+          "soloHit": true,
+          "corr": "chain[get_biopreparados]",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\": true, \"tool_chain\": [{\"tool\": \"get_biopreparados\", \"args\": {\"species_id_or_pest\": \"pulgon\"}}]}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_biopreparados",
+            "chain": [
+              "get_biopreparados"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C20",
+          "expected": "get_precio_sipsa",
+          "solo": "get_precio_sipsa",
+          "soloHit": true,
+          "corr": "get_precio_sipsa",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\n  \"use_tool\": true,\n  \"tool\": \"get_precio_sipsa\",\n  \"args\": {\n    \"action\": \"latest_price\",\n    \"producto\": \"tomate\"\n  }\n}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_precio_sipsa",
+            "chain": null,
+            "reason": "tool"
+          }
+        }
+      ]
+    },
+    "gemma4:e4b": {
+      "model": "gemma4:e4b",
+      "soloAcc": 0.2,
+      "corrAcc": 0.45,
+      "p50": 6665,
+      "p95": 7884,
+      "minLat": 4970,
+      "maxLat": 8221,
+      "crashes": 0,
+      "totalCalls": 60,
+      "perCase": [
+        {
+          "id": "C01",
+          "expected": "chain[get_companions+get_biopreparados]",
+          "solo": "chat/none",
+          "soloHit": false,
+          "corr": "chat/none",
+          "corrHit": false,
+          "crashes": 0,
+          "rawContent": "",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_json"
+          }
+        },
+        {
+          "id": "C02",
+          "expected": "get_pest_controllers",
+          "solo": "chat/none",
+          "soloHit": false,
+          "corr": "chat/none",
+          "corrHit": false,
+          "crashes": 0,
+          "rawContent": "",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_json"
+          }
+        },
+        {
+          "id": "C03",
+          "expected": "get_biopreparados",
+          "solo": "get_biopreparados",
+          "soloHit": true,
+          "corr": "get_biopreparados",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_biopreparados\",\"args\":{\"species_id_or_pest\":\"roya\"}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_biopreparados",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C04",
+          "expected": "get_precio_sipsa",
+          "solo": "chat/none",
+          "soloHit": false,
+          "corr": "get_precio_sipsa",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_json"
+          }
+        },
+        {
+          "id": "C05",
+          "expected": "get_normativa_ica",
+          "solo": "chat/none",
+          "soloHit": false,
+          "corr": "get_normativa_ica",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_json"
+          }
+        },
+        {
+          "id": "C06",
+          "expected": "get_diseno_restauracion",
+          "solo": "chat/none",
+          "soloHit": false,
+          "corr": "get_diseno_restauracion",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_json"
+          }
+        },
+        {
+          "id": "C07",
+          "expected": "get_subgrafo_relacional",
+          "solo": "chat/none",
+          "soloHit": false,
+          "corr": "chat/none",
+          "corrHit": false,
+          "crashes": 0,
+          "rawContent": "",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_json"
+          }
+        },
+        {
+          "id": "C08",
+          "expected": "get_enso_status",
+          "solo": "chat/none",
+          "soloHit": false,
+          "corr": "chat/none",
+          "corrHit": false,
+          "crashes": 0,
+          "rawContent": "",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_json"
+          }
+        },
+        {
+          "id": "C09",
+          "expected": "get_alertas_clima_zona",
+          "solo": "chat/none",
+          "soloHit": false,
+          "corr": "chat/none",
+          "corrHit": false,
+          "crashes": 0,
+          "rawContent": "",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_json"
+          }
+        },
+        {
+          "id": "C10",
+          "expected": "get_clima_ideam",
+          "solo": "chat/none",
+          "soloHit": false,
+          "corr": "chat/none",
+          "corrHit": false,
+          "crashes": 0,
+          "rawContent": "",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_json"
+          }
+        },
+        {
+          "id": "C11",
+          "expected": "get_companions",
+          "solo": "chat/none",
+          "soloHit": false,
+          "corr": "chat/none",
+          "corrHit": false,
+          "crashes": 0,
+          "rawContent": "",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_json"
+          }
+        },
+        {
+          "id": "C12",
+          "expected": "get_multihop_companions",
+          "solo": "get_multihop_companions",
+          "soloHit": true,
+          "corr": "get_multihop_companions",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_multihop_companions\",\"args\":{\"species_id\":\"coffea_arabica\",\"hops\":2}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_multihop_companions",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C13",
+          "expected": "chat",
+          "solo": "chat/none",
+          "soloHit": true,
+          "corr": "chat/none",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_json"
+          }
+        },
+        {
+          "id": "C14",
+          "expected": "chat",
+          "solo": "chat/none",
+          "soloHit": true,
+          "corr": "chat/none",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":false,\"tool\":null,\"args\":null}",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_tool"
+          }
+        },
+        {
+          "id": "C15",
+          "expected": "get_pest_controllers",
+          "solo": "chat/none",
+          "soloHit": false,
+          "corr": "chat/none",
+          "corrHit": false,
+          "crashes": 0,
+          "rawContent": "",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_json"
+          }
+        },
+        {
+          "id": "C16",
+          "expected": "get_species",
+          "solo": "chat/none",
+          "soloHit": false,
+          "corr": "chat/none",
+          "corrHit": false,
+          "crashes": 0,
+          "rawContent": "",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_json"
+          }
+        },
+        {
+          "id": "C17",
+          "expected": "get_diseno_restauracion",
+          "solo": "chat/none",
+          "soloHit": false,
+          "corr": "get_diseno_restauracion",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_json"
+          }
+        },
+        {
+          "id": "C18",
+          "expected": "get_pest_controllers",
+          "solo": "chat/none",
+          "soloHit": false,
+          "corr": "chat/none",
+          "corrHit": false,
+          "crashes": 0,
+          "rawContent": "",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_json"
+          }
+        },
+        {
+          "id": "C19",
+          "expected": "get_biopreparados",
+          "solo": "chat/none",
+          "soloHit": false,
+          "corr": "chat/none",
+          "corrHit": false,
+          "crashes": 0,
+          "rawContent": "",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_json"
+          }
+        },
+        {
+          "id": "C20",
+          "expected": "get_precio_sipsa",
+          "solo": "chat/none",
+          "soloHit": false,
+          "corr": "get_precio_sipsa",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_json"
+          }
+        }
+      ]
+    },
+    "ministral-3:latest": {
+      "model": "ministral-3:latest",
+      "soloAcc": 0.85,
+      "corrAcc": 0.9,
+      "p50": 2463,
+      "p95": 7488,
+      "minLat": 1098,
+      "maxLat": 7958,
+      "crashes": 0,
+      "totalCalls": 60,
+      "perCase": [
+        {
+          "id": "C01",
+          "expected": "chain[get_companions+get_biopreparados]",
+          "solo": "chain[get_companions+get_companions+get_biopreparados+get_biopreparados]",
+          "soloHit": true,
+          "corr": "chain[get_companions+get_companions+get_biopreparados+get_biopreparados]",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool_chain\":[\n    {\"tool\":\"get_companions\",\"args\":{\"species_id\":\"coffea_arabica\"}},\n    {\"tool\":\"get_companions\",\"args\":{\"species_id\":\"zea_mays\"}},\n    {\"tool\":\"get_biopreparados\",\"args\":{\"species_id_or_pest\":\"coffea_arabica\"}},\n    {\"tool\":\"get_biopreparados\",\"args\":{\"species_id_or_pest\":\"zea_mays\"}}\n]}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_companions",
+            "chain": [
+              "get_companions",
+              "get_companions",
+              "get_biopreparados",
+              "get_biopreparados"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C02",
+          "expected": "get_pest_controllers",
+          "solo": "get_pest_controllers",
+          "soloHit": true,
+          "corr": "get_pest_controllers",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_pest_controllers\",\"args\":{\"pest_id_or_name\":\"mosca blanca\",\"limit\":3}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_pest_controllers",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C03",
+          "expected": "get_biopreparados",
+          "solo": "get_biopreparados",
+          "soloHit": true,
+          "corr": "get_biopreparados",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_biopreparados\",\"args\":{\"species_id_or_pest\":\"roya\"}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_biopreparados",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C04",
+          "expected": "get_precio_sipsa",
+          "solo": "get_precio_sipsa",
+          "soloHit": true,
+          "corr": "get_precio_sipsa",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_precio_sipsa\",\"args\":{\"action\":\"latest_price\",\"producto\":\"papa\",\"plaza\":\"corabastos\"}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_precio_sipsa",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C05",
+          "expected": "get_normativa_ica",
+          "solo": "get_normativa_ica",
+          "soloHit": true,
+          "corr": "get_normativa_ica",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_normativa_ica\",\"args\":{\"action\":\"latest_active_ingredients\",\"text\":\"glifosato\",\"limit\":1}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_normativa_ica",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C06",
+          "expected": "get_diseno_restauracion",
+          "solo": "get_diseno_restauracion",
+          "soloHit": true,
+          "corr": "get_diseno_restauracion",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_diseno_restauracion\",\"args\":{\"objetivo\":\"bosque\",\"altitud_msnm\":null,\"region\":null,\"invasora_mencionada\":null}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_diseno_restauracion",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C07",
+          "expected": "get_subgrafo_relacional",
+          "solo": "chain[get_pest_controllers+get_companions+get_multihop_companions]",
+          "soloHit": false,
+          "corr": "chain[get_pest_controllers+get_companions+get_multihop_companions]",
+          "corrHit": false,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool_chain\":[\n    {\"tool\":\"get_pest_controllers\",\"args\":{\"pest_id_or_name\":\"broca\",\"limit\":5}},\n    {\"tool\":\"get_companions\",\"args\":{\"species_id\":\"coffea_arabica\"}},\n    {\"tool\":\"get_multihop_companions\",\"args\":{\"species_id\":\"coffea_arabica\",\"hops\":2,\"limit\":5}}\n]}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_pest_controllers",
+            "chain": [
+              "get_pest_controllers",
+              "get_companions",
+              "get_multihop_companions"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C08",
+          "expected": "get_enso_status",
+          "solo": "chain[get_enso_status+get_clima_ideam]",
+          "soloHit": true,
+          "corr": "chain[get_enso_status+get_clima_ideam]",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool_chain\":[\n    {\"tool\":\"get_enso_status\",\"args\":{}},\n    {\"tool\":\"get_clima_ideam\",\"args\":{\"action\":\"monthly_avg\",\"municipio\":\"[MUNICIPIO]\", \"departamento\":\"[DEPARTAMENTO]\",\"station_id\":\"[ID_ESTACIÓN_CERCANA]\"}  }\n]}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_enso_status",
+            "chain": [
+              "get_enso_status",
+              "get_clima_ideam"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C09",
+          "expected": "get_alertas_clima_zona",
+          "solo": "get_alertas_clima_zona",
+          "soloHit": true,
+          "corr": "get_alertas_clima_zona",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_alertas_clima_zona\",\"args\":{\"lat\":null,\"lng\":null}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_alertas_clima_zona",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C10",
+          "expected": "get_clima_ideam",
+          "solo": "chain[get_clima_ideam+get_clima_ideam]",
+          "soloHit": true,
+          "corr": "chain[get_clima_ideam+get_clima_ideam]",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool_chain\":[\n    {\"tool\":\"get_clima_ideam\",\"args\":{\"action\":\"stations_near\",\"lat\":1.25,\"lng\":-77.36,\"municipio\":\"Pasto\",\"departamento\":\"Nariño\"}},\n    {\"tool\":\"get_clima_ideam\",\"args\":{\"action\":\"climate_series\",\"station_id\":\"<ID_ESTACION_CERCANA>\",\"mes\":\"mayo\",\"anios\":[\"2015\",\"2016\",\"2017\",\"2018\",\"2019\",\"2020\",\"2021\",\"2022\",\"202",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_clima_ideam",
+            "chain": [
+              "get_clima_ideam",
+              "get_clima_ideam"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C11",
+          "expected": "get_companions",
+          "solo": "get_companions",
+          "soloHit": true,
+          "corr": "get_companions",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_companions\",\"args\":{\"species_id\":\"solanum_lycopersicum_san_marzano\"}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_companions",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C12",
+          "expected": "get_multihop_companions",
+          "solo": "chain[get_companions+get_multihop_companions]",
+          "soloHit": false,
+          "corr": "chain[get_companions+get_multihop_companions]",
+          "corrHit": false,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool_chain\":[\n    {\"tool\":\"get_companions\",\"args\":{\"species_id\":\"coffea_arabica\"}},\n    {\"tool\":\"get_multihop_companions\",\"args\":{\"species_id\":\"<ID_DE_ESPECIE_COMPAÑERA>\",\"hops\":2,\"limit\":10}}\n]}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_companions",
+            "chain": [
+              "get_companions",
+              "get_multihop_companions"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C13",
+          "expected": "chat",
+          "solo": "get_pest_controllers",
+          "soloHit": false,
+          "corr": "chat/none",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_pest_controllers\",\"args\":{\"pest_id_or_name\":\"caída_de_flor_aguacate\"}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_pest_controllers",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C14",
+          "expected": "chat",
+          "solo": "chat/none",
+          "soloHit": true,
+          "corr": "chat/none",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":false,\"tool\":null,\"args\":null}",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_tool"
+          }
+        },
+        {
+          "id": "C15",
+          "expected": "get_pest_controllers",
+          "solo": "get_pest_controllers",
+          "soloHit": true,
+          "corr": "get_pest_controllers",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_pest_controllers\",\"args\":{\"pest_id_or_name\":\"gallina_ciega\",\"limit\":5}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_pest_controllers",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C16",
+          "expected": "get_species",
+          "solo": "chain[get_species]",
+          "soloHit": true,
+          "corr": "chain[get_species]",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool_chain\":[\n    {\"tool\":\"get_species\",\"args\":{\"id_or_name\":\"arracacha\"}},\n    {\"tool\":\"get_cultivos_viables\",\"args\":{\"altitud\":null,\"piso_termico\":\"frio\"}}\n]}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_species",
+            "chain": [
+              "get_species"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C17",
+          "expected": "get_diseno_restauracion",
+          "solo": "get_diseno_restauracion",
+          "soloHit": true,
+          "corr": "get_diseno_restauracion",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_diseno_restauracion\",\"args\":{\"objetivo\":\"bosque\",\"altitud_msnm\":null,\"region\":null,\"invasora_mencionada\":\"retamo espinoso\"}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_diseno_restauracion",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C18",
+          "expected": "get_pest_controllers",
+          "solo": "get_pest_controllers",
+          "soloHit": true,
+          "corr": "get_pest_controllers",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_pest_controllers\",\"args\":{\"pest_id_or_name\":\"broca\",\"limit\":5}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_pest_controllers",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C19",
+          "expected": "get_biopreparados",
+          "solo": "get_biopreparados",
+          "soloHit": true,
+          "corr": "get_biopreparados",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_biopreparados\",\"args\":{\"species_id_or_pest\":\"pulgón\"}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_biopreparados",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C20",
+          "expected": "get_precio_sipsa",
+          "solo": "get_precio_sipsa",
+          "soloHit": true,
+          "corr": "get_precio_sipsa",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_precio_sipsa\",\"args\":{\"action\":\"latest_price\",\"producto\":\"tomate\",\"plaza\":\"corabastos\"}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_precio_sipsa",
+            "chain": null,
+            "reason": "tool"
+          }
+        }
+      ]
+    },
+    "ministral-3:14b": {
+      "model": "ministral-3:14b",
+      "soloAcc": 0.95,
+      "corrAcc": 0.95,
+      "p50": 3095,
+      "p95": 10889,
+      "minLat": 1416,
+      "maxLat": 11781,
+      "crashes": 0,
+      "totalCalls": 60,
+      "perCase": [
+        {
+          "id": "C01",
+          "expected": "chain[get_companions+get_biopreparados]",
+          "solo": "chain[get_companions+get_companions+get_biopreparados+get_biopreparados]",
+          "soloHit": true,
+          "corr": "chain[get_companions+get_companions+get_biopreparados+get_biopreparados]",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\n  \"use_tool\": true,\n  \"tool_chain\": [\n    {\n      \"tool\": \"get_companions\",\n      \"args\": {\n        \"species_id\": \"coffea_arabica\"\n      }\n    },\n    {\n      \"tool\": \"get_companions\",\n      \"args\": {\n        \"species_id\": \"zea_mays\"\n      }\n    },\n    {\n      \"tool\": \"get_biopreparados\",\n      \"args\": {\n        \"species_id_or_pest\": \"coffea_arabica\"\n      }\n    },\n    {\n      \"tool\": \"get_biopreparados\",\n      \"args\": {\n        \"species_id_or_pest\": \"zea_m",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_companions",
+            "chain": [
+              "get_companions",
+              "get_companions",
+              "get_biopreparados",
+              "get_biopreparados"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C02",
+          "expected": "get_pest_controllers",
+          "solo": "get_pest_controllers",
+          "soloHit": true,
+          "corr": "get_pest_controllers",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_pest_controllers\",\"args\":{\"pest_id_or_name\":\"mosca blanca\"}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_pest_controllers",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C03",
+          "expected": "get_biopreparados",
+          "solo": "get_biopreparados",
+          "soloHit": true,
+          "corr": "get_biopreparados",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\n  \"use_tool\": true,\n  \"tool\": \"get_biopreparados\",\n  \"args\": {\n    \"species_id_or_pest\": \"hemileia_vastatrix_roya\"\n  }\n}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_biopreparados",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C04",
+          "expected": "get_precio_sipsa",
+          "solo": "get_precio_sipsa",
+          "soloHit": true,
+          "corr": "get_precio_sipsa",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\n  \"use_tool\": true,\n  \"tool\": \"get_precio_sipsa\",\n  \"args\": {\n    \"action\": \"latest_price\",\n    \"producto\": \"papa\",\n    \"plaza\": \"corabastos\"\n  }\n}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_precio_sipsa",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C05",
+          "expected": "get_normativa_ica",
+          "solo": "get_normativa_ica",
+          "soloHit": true,
+          "corr": "get_normativa_ica",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_normativa_ica\",\"args\":{\"action\":\"latest_active_ingredients\",\"text\":\"glifosato\"}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_normativa_ica",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C06",
+          "expected": "get_diseno_restauracion",
+          "solo": "get_diseno_restauracion",
+          "soloHit": true,
+          "corr": "get_diseno_restauracion",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_diseno_restauracion\",\"args\":{\"objetivo\":\"post_incendio\",\"altitud_msnm\":null,\"region\":\"\",\"invasora_mencionada\":null}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_diseno_restauracion",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C07",
+          "expected": "get_subgrafo_relacional",
+          "solo": "chain[get_pest_controllers+get_companions]",
+          "soloHit": false,
+          "corr": "chain[get_pest_controllers+get_companions]",
+          "corrHit": false,
+          "crashes": 0,
+          "rawContent": "{\n  \"use_tool\": true,\n  \"tool_chain\": [\n    {\n      \"tool\": \"get_pest_controllers\",\n      \"args\": {\n        \"pest_id_or_name\": \"hypothenemus_hampei_broca\",\n        \"limit\": 10\n      }\n    },\n    {\n      \"tool\": \"get_companions\",\n      \"args\": {\n        \"species_id\": \"coffea_arabica\"\n      }\n    },\n    {\n      \"tool\": \"get_cultivos_viables\",\n      \"args\": {\n        \"altitud\": 1500,\n        \"piso_termico\": \"frio\",\n        \"limit\": 5",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_pest_controllers",
+            "chain": [
+              "get_pest_controllers",
+              "get_companions"
+            ],
+            "reason": "chain"
+          }
+        },
+        {
+          "id": "C08",
+          "expected": "get_enso_status",
+          "solo": "get_enso_status",
+          "soloHit": true,
+          "corr": "get_enso_status",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_enso_status\",\"args\":null}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_enso_status",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C09",
+          "expected": "get_alertas_clima_zona",
+          "solo": "get_alertas_clima_zona",
+          "soloHit": true,
+          "corr": "get_alertas_clima_zona",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_alertas_clima_zona\",\"args\":{\"lat\":\"\",\"lng\":\"\"}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_alertas_clima_zona",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C10",
+          "expected": "get_clima_ideam",
+          "solo": "get_clima_ideam",
+          "soloHit": true,
+          "corr": "get_clima_ideam",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_clima_ideam\",\"args\":{\"action\":\"climate_series\",\"municipio\":\"Pasto\",\"departamento\":\"Nariño\",\"station_id\":null}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_clima_ideam",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C11",
+          "expected": "get_companions",
+          "solo": "get_companions",
+          "soloHit": true,
+          "corr": "get_companions",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_companions\",\"args\":{\"species_id\":\"solanum_lycopersicum\"}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_companions",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C12",
+          "expected": "get_multihop_companions",
+          "solo": "get_multihop_companions",
+          "soloHit": true,
+          "corr": "get_multihop_companions",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_multihop_companions\",\"args\":{\"species_id\":\"coffea_arabica\",\"hops\":2,\"limit\":20}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_multihop_companions",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C13",
+          "expected": "chat",
+          "solo": "chat/none",
+          "soloHit": true,
+          "corr": "chat/none",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":false,\"tool\":null,\"args\":null}",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_tool"
+          }
+        },
+        {
+          "id": "C14",
+          "expected": "chat",
+          "solo": "chat/none",
+          "soloHit": true,
+          "corr": "chat/none",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":false,\"tool\":null,\"args\":null}",
+          "soloDecision": {
+            "use_tool": false,
+            "tool": null,
+            "chain": null,
+            "reason": "no_tool"
+          }
+        },
+        {
+          "id": "C15",
+          "expected": "get_pest_controllers",
+          "solo": "get_pest_controllers",
+          "soloHit": true,
+          "corr": "get_pest_controllers",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_pest_controllers\",\"args\":{\"pest_id_or_name\":\"nematodo_gallina_ciega\",\"limit\":5}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_pest_controllers",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C16",
+          "expected": "get_species",
+          "solo": "get_species",
+          "soloHit": true,
+          "corr": "get_species",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_species\",\"args\":{\"id_or_name\":\"arracacia_xanthorrhiza\"}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_species",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C17",
+          "expected": "get_diseno_restauracion",
+          "solo": "get_diseno_restauracion",
+          "soloHit": true,
+          "corr": "get_diseno_restauracion",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_diseno_restauracion\",\"args\":{\"objetivo\":\"ribera\",\"altitud_msnm\":null,\"region\":\"ladera\",\"invasora_mencionada\":\"retamo_espinoso\"}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_diseno_restauracion",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C18",
+          "expected": "get_pest_controllers",
+          "solo": "get_pest_controllers",
+          "soloHit": true,
+          "corr": "get_pest_controllers",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_pest_controllers\",\"args\":{\"pest_id_or_name\":\"broca\",\"limit\":5}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_pest_controllers",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C19",
+          "expected": "get_biopreparados",
+          "solo": "get_biopreparados",
+          "soloHit": true,
+          "corr": "get_biopreparados",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_biopreparados\",\"args\":{\"species_id_or_pest\":\"pulgón\"}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_biopreparados",
+            "chain": null,
+            "reason": "tool"
+          }
+        },
+        {
+          "id": "C20",
+          "expected": "get_precio_sipsa",
+          "solo": "get_precio_sipsa",
+          "soloHit": true,
+          "corr": "get_precio_sipsa",
+          "corrHit": true,
+          "crashes": 0,
+          "rawContent": "{\"use_tool\":true,\"tool\":\"get_precio_sipsa\",\"args\":{\"action\":\"latest_price\",\"producto\":\"tomate\",\"plaza\":\"corabastos\"}}",
+          "soloDecision": {
+            "use_tool": true,
+            "tool": "get_precio_sipsa",
+            "chain": null,
+            "reason": "tool"
+          }
+        }
+      ]
+    },
     "granite3.1-moe:1b": {
       "model": "granite3.1-moe:1b",
       "soloAcc": 0.3,
       "corrAcc": 0.55,
-      "p50": 959,
-      "p95": 7092,
-      "minLat": 379,
-      "maxLat": 7534,
+      "p50": 946,
+      "p95": 2590,
+      "minLat": 391,
+      "maxLat": 2901,
       "crashes": 0,
       "totalCalls": 60,
       "perCase": [
@@ -675,10 +2068,10 @@
       "model": "qwen2.5:1.5b",
       "soloAcc": 0.55,
       "corrAcc": 0.7,
-      "p50": 1241,
-      "p95": 1794,
-      "minLat": 740,
-      "maxLat": 1896,
+      "p50": 1225,
+      "p95": 1577,
+      "minLat": 763,
+      "maxLat": 1794,
       "crashes": 0,
       "totalCalls": 60,
       "perCase": [
@@ -1007,11 +2400,11 @@
   },
   "cascade": {
     "name": "cascade(moe1b → [qwen1.5b] → granite8b conjuez)",
-    "acc": 0.65,
-    "escalatedPct": 0.8,
-    "p50": 13034,
-    "p95": 40692,
-    "meanEff": 17569,
+    "acc": 0.7,
+    "escalatedPct": 0.75,
+    "p50": 6327,
+    "p95": 37878,
+    "meanEff": 12037,
     "perCase": [
       {
         "id": "C01",
@@ -1020,7 +2413,7 @@
         "hit": false,
         "escalated": true,
         "trigger": "c:small-vs-small",
-        "effLat": 13034
+        "effLat": 10152
       },
       {
         "id": "C02",
@@ -1029,16 +2422,16 @@
         "hit": true,
         "escalated": false,
         "trigger": "none",
-        "effLat": 8559
+        "effLat": 6728
       },
       {
         "id": "C03",
         "expected": "get_biopreparados",
-        "got": "chat/none",
-        "hit": false,
+        "got": "get_biopreparados",
+        "hit": true,
         "escalated": true,
         "trigger": "c:small-vs-small",
-        "effLat": 2045
+        "effLat": 31753
       },
       {
         "id": "C04",
@@ -1047,7 +2440,7 @@
         "hit": true,
         "escalated": true,
         "trigger": "b:small-vs-corrector",
-        "effLat": 15451
+        "effLat": 3187
       },
       {
         "id": "C05",
@@ -1056,7 +2449,7 @@
         "hit": true,
         "escalated": false,
         "trigger": "none",
-        "effLat": 9506
+        "effLat": 6951
       },
       {
         "id": "C06",
@@ -1065,7 +2458,7 @@
         "hit": true,
         "escalated": true,
         "trigger": "a:invalid",
-        "effLat": 37594
+        "effLat": 29750
       },
       {
         "id": "C07",
@@ -1074,16 +2467,16 @@
         "hit": false,
         "escalated": true,
         "trigger": "c:small-vs-small",
-        "effLat": 40692
+        "effLat": 37878
       },
       {
         "id": "C08",
         "expected": "get_enso_status",
-        "got": "chat/none",
-        "hit": false,
+        "got": "get_enso_status",
+        "hit": true,
         "escalated": true,
         "trigger": "a:invalid",
-        "effLat": 25831
+        "effLat": 4406
       },
       {
         "id": "C09",
@@ -1091,8 +2484,8 @@
         "got": "get_alertas_clima_zona",
         "hit": true,
         "escalated": true,
-        "trigger": "c:small-vs-small",
-        "effLat": 37844
+        "trigger": "a:invalid",
+        "effLat": 3921
       },
       {
         "id": "C10",
@@ -1101,16 +2494,16 @@
         "hit": true,
         "escalated": true,
         "trigger": "c:small-vs-small",
-        "effLat": 30058
+        "effLat": 6327
       },
       {
         "id": "C11",
         "expected": "get_companions",
-        "got": "get_companions",
-        "hit": true,
-        "escalated": true,
-        "trigger": "a:invalid",
-        "effLat": 36144
+        "got": "chat/none",
+        "hit": false,
+        "escalated": false,
+        "trigger": "none",
+        "effLat": 5897
       },
       {
         "id": "C12",
@@ -1119,7 +2512,7 @@
         "hit": false,
         "escalated": true,
         "trigger": "c:small-vs-small",
-        "effLat": 6898
+        "effLat": 3131
       },
       {
         "id": "C13",
@@ -1128,7 +2521,7 @@
         "hit": true,
         "escalated": true,
         "trigger": "b:small-vs-corrector",
-        "effLat": 2720
+        "effLat": 2592
       },
       {
         "id": "C14",
@@ -1137,7 +2530,7 @@
         "hit": true,
         "escalated": true,
         "trigger": "a:invalid",
-        "effLat": 6380
+        "effLat": 6367
       },
       {
         "id": "C15",
@@ -1146,7 +2539,7 @@
         "hit": true,
         "escalated": false,
         "trigger": "none",
-        "effLat": 6013
+        "effLat": 6275
       },
       {
         "id": "C16",
@@ -1155,7 +2548,7 @@
         "hit": false,
         "escalated": true,
         "trigger": "a:invalid",
-        "effLat": 29739
+        "effLat": 31282
       },
       {
         "id": "C17",
@@ -1163,8 +2556,8 @@
         "got": "get_diseno_restauracion",
         "hit": true,
         "escalated": true,
-        "trigger": "b:small-vs-corrector",
-        "effLat": 5264
+        "trigger": "a:invalid",
+        "effLat": 5408
       },
       {
         "id": "C18",
@@ -1173,7 +2566,7 @@
         "hit": true,
         "escalated": false,
         "trigger": "none",
-        "effLat": 5953
+        "effLat": 5992
       },
       {
         "id": "C19",
@@ -1182,7 +2575,7 @@
         "hit": false,
         "escalated": true,
         "trigger": "c:small-vs-small",
-        "effLat": 28258
+        "effLat": 29313
       },
       {
         "id": "C20",
@@ -1191,7 +2584,7 @@
         "hit": true,
         "escalated": true,
         "trigger": "a:invalid",
-        "effLat": 3406
+        "effLat": 3430
       }
     ]
   },
