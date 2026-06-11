@@ -38,7 +38,7 @@
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 18;
+export const DB_VERSION = 19;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -299,6 +299,23 @@ export const openDB = async () => {
           fpeStore.createIndex('occurred_at', 'occurred_at', { unique: false });
           fpeStore.createIndex('idempotency_key', 'idempotency_key', { unique: false });
           fpeStore.createIndex('asset_id', 'asset_id', { unique: false });
+        }
+      }
+
+      // v19: BUGFIX — el índice process_id de farm_process_events apuntaba a
+      // nivel raíz ('process_id'), pero los eventos guardan el id dentro de
+      // attributes.process_id (ver farmEventService.js). Resultado:
+      // index('process_id').getAll(id) devolvía 0. Corrección: eliminar el
+      // índice viejo y recrearlo con keyPath 'attributes.process_id'.
+      // La migración es segura e idempotente: los datos existentes ya tienen
+      // attributes.process_id, el nuevo índice los indexa automáticamente.
+      if (event.oldVersion < 19) {
+        const fpeStore = event.target.transaction.objectStore(STORES.FARM_PROCESS_EVENTS);
+        if (fpeStore && fpeStore.indexNames.contains('process_id')) {
+          fpeStore.deleteIndex('process_id');
+        }
+        if (fpeStore && !fpeStore.indexNames.contains('process_id')) {
+          fpeStore.createIndex('process_id', 'attributes.process_id', { unique: false });
         }
       }
     };

@@ -236,8 +236,9 @@ export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw
           };
           await createFarmProcess(process);
         }
-      } catch {
-        // silencio: ciclo no se creó pero seeding sí
+      } catch (err) {
+        console.warn('[SeedingLog] No se pudo crear el ciclo automático:', err.message);
+        // El seeding sí se guardó. El ciclo se puede crear después manualmente.
       }
 
       onSave(result.message || 'Registro guardado localmente (Pendiente de sincronización)', !result.success);
