@@ -366,11 +366,16 @@ async function loadEmbeddings() {
       if (!ct.includes('json')) return null;
       const raw = await res.json();
       if (!raw || typeof raw !== 'object') return null;
-      // Convertir arrays planos a Float32Array para similitud rápida
+      // Convertir a Float32Array. Soporta int8 quantizado (q:'int8',s:scale,v:Int8Array)
       const converted = {};
-      for (const [slug, vec] of Object.entries(raw)) {
-        if (Array.isArray(vec) && vec.length > 0) {
-          converted[slug] = new Float32Array(vec);
+      for (const [slug, entry] of Object.entries(raw)) {
+        if (entry && typeof entry === 'object' && entry.q === 'int8' && Array.isArray(entry.v) && entry.s) {
+          // Dequantizar: int8 → float32
+          const f32 = new Float32Array(entry.v.length);
+          for (let i = 0; i < entry.v.length; i++) f32[i] = entry.v[i] * entry.s;
+          converted[slug] = f32;
+        } else if (Array.isArray(entry) && entry.length > 0) {
+          converted[slug] = new Float32Array(entry);
         }
       }
       embeddingsCache = converted;
