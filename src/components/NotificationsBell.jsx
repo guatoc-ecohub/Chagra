@@ -602,7 +602,7 @@ function ClimaPanel({ snapshot, loading, onRefresh, climaInfo, onAlertAction, on
 
     return (
         <div className="divide-y divide-slate-800">
-            {/* ENSO badge */}
+            {/* ENSO badge — lenguaje campesino, sin jerga tecnica */}
             <section className={`p-4 border-l-4 ${colorClass}`}>
                 <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
@@ -610,15 +610,9 @@ function ClimaPanel({ snapshot, loading, onRefresh, climaInfo, onAlertAction, on
                             <Activity size={18} aria-hidden="true" />
                             <h4 className="text-sm font-bold">{describePhase(phase)}</h4>
                         </div>
-                        {typeof enso.oni_value === 'number' && (
-                            <p className="text-xs mt-1 opacity-85">
-                                ONI NOAA: <span className="tabular-nums font-bold">{enso.oni_value.toFixed(2)}°C</span>
-                                {enso.trend ? <> · tendencia {enso.trend === 'rising' ? '↑ subiendo' : enso.trend === 'falling' ? '↓ bajando' : '→ estable'}</> : null}
-                            </p>
-                        )}
                         {probs && (
                             <p className="text-xs mt-1 opacity-85">
-                                IDEAM: <span className="font-bold">{probs.nino_pct}%</span> Niño · <span className="font-bold">{probs.neutral_pct}%</span> Neutro · <span className="font-bold">{probs.nina_pct}%</span> Niña
+                                Probabilidad IDEAM: <span className="font-bold">{probs.nino_pct}%</span> seco · <span className="font-bold">{probs.neutral_pct}%</span> normal · <span className="font-bold">{probs.nina_pct}%</span> lluvioso
                             </p>
                         )}
                     </div>

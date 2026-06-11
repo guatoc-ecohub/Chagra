@@ -1,0 +1,20 @@
+{
+  "fuente": "DR-IOT-1 (3/3 DeepSeek+Gemini+Meta, 2026-06-11)",
+  "precios_COP_junio_2026": "orientativos MercadoLibre/Electronilab",
+  "principio": "El IoT no es el cerebro, es un OJO BARATO. Solo alertar, NUNCA automatizar.",
+  "camara": [
+    { "modelo": "ESP32-CAM OV2640", "precio_COP": "50.000-110.000", "resolucion": "2MP", "ventajas": "microSD, <200mA, captura programada, WiFi", "desventajas": "alcance WiFi limitado, necesita fuente estable", "nota": "Workhorse barato. 2MP bastan para clorosis/necrosis a <=50cm con buena luz." },
+    { "modelo": "Tapo C210", "precio_COP": "~133.000", "resolucion": "3MP", "ventajas": "plug-and-play, app movil, buena resolucion", "desventajas": "requiere toma electrica, sin microSD local en algunos modelos" }
+  ],
+  "sensores_que_si_sirven": [
+    { "sensor": "Humedad suelo CAPACITIVO v1.2", "precio_COP": "12.000-18.000", "ventajas": "NO se corroe, respuesta rapida", "desventajas": "clones necesitan soldar R4 de 1MΩ", "evitar": "RESISTIVO de 2 puntas (se oxida en semanas)" },
+    { "sensor": "SHT30 I2C", "precio_COP": "~100.000", "ventajas": "filtro sinterizado, preciso en alta humedad/condensacion", "desventajas": "mas caro que DHT22", "evitar": "DHT11 (juguete, imprecision)" },
+    { "sensor": "BH1750 (luz)", "precio_COP": "8.000-22.000", "ventajas": "digital I2C, preciso", "desventajas": "ninguna", "evitar": "fotorresistencia LDR (imprecisa)" },
+    { "sensor": "JSN-SR04T (nivel tanque)", "precio_COP": "17.000-50.000", "ventajas": "ultrasonico, sellado IP67", "desventajas": "solo si hay tanque" }
+  ],
+  "energia": [
+    { "tipo": "Panel policristalino 5-50W", "precio_COP": "30.000-150.000", "ventajas": "aprovecha luz difusa bajo dosel mejor que monocristalino" },
+    { "tipo": "Bateria LiFePO4 12V 7Ah", "precio_COP": "140.000-194.000", "ventajas": "2000-4000 ciclos, seguro termico, BMS incluido", "desventajas": "mas cara" },
+    { "tipo": "18650 + TP4056", "precio_COP": "~25.000", "ventajas": "barato", "desventajas": "cambiar cada 2 anos, menos seguro" }
+  ]
+}

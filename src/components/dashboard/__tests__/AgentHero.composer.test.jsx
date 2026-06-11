@@ -111,9 +111,15 @@ describe('AgentHero — compositor real (no teaser)', () => {
     expect(sendMock).not.toHaveBeenCalled();
   });
 
-  test('botón enviar deshabilitado sin texto ni adjunto', () => {
+  test('enviar sin texto ni adjunto NO envía: abre el menú didáctico (demo)', () => {
+    // Port fiel del demo (2026-06-11): `sendField()` con el campo vacío abre
+    // el menú de capacidades en vez de quedar muerto/deshabilitado.
     render(<AgentHero onNavigate={vi.fn()} />);
-    expect(screen.getByLabelText('Enviar al agente')).toBeDisabled();
+    const sendBtn = screen.getByLabelText('Enviar al agente');
+    expect(sendBtn).toBeEnabled();
+    fireEvent.click(sendBtn);
+    expect(sendMock).not.toHaveBeenCalled();
+    expect(screen.getByText('La mano de Chagra')).toBeInTheDocument();
   });
 
   test('chip de sugerencia envía su prompt como texto', async () => {
@@ -298,8 +304,10 @@ describe('AgentHero — foto: cámara O galería, solo imágenes (B2, 2026-06-06
     // Mensaje claro en castellano colombiano.
     const alert = await screen.findByRole('alert');
     expect(alert.textContent).toMatch(/solo puedo ver fotos|solo.*fotos/i);
-    // El botón enviar sigue deshabilitado (no hay adjunto válido ni texto).
-    expect(screen.getByLabelText('Enviar al agente')).toBeDisabled();
+    // Sin adjunto válido ni texto, tocar enviar NO manda nada a la outbox
+    // (abre el menú didáctico — comportamiento del demo).
+    fireEvent.click(screen.getByLabelText('Enviar al agente'));
+    expect(sendMock).not.toHaveBeenCalled();
   });
 
   test('el aviso de no-imagen no usa voseo argentino', async () => {
