@@ -10,12 +10,18 @@ const ASSETS_TO_CACHE = [
   '/icon-512.png'
 ];
 
-// Instalación del Service Worker
+// Instalación del Service Worker.
+// SIN self.skipWaiting() automático: el SW nuevo queda en `waiting` para que
+// el cliente muestre el banner "nueva versión disponible" y el operador
+// decida cuándo actualizar. El skipWaiting solo ocurre vía mensaje
+// SKIP_WAITING (click "Actualizar" en UpdateAvailableBanner). Con el
+// auto-skip el SW activaba solo, controllerchange disparaba el banner
+// DESPUÉS de aplicada la actualización y el operador debía dar "Actualizar"
+// N veces (bug 2026-06-10).
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(ASSETS_TO_CACHE))
-      .then(() => self.skipWaiting())
   );
 });
 

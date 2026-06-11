@@ -30,6 +30,7 @@ import { ScreenShell } from './components/common/ScreenShell';
 import ChagraGrowLoader from './components/ChagraGrowLoader';
 import Confetti from './components/common/Confetti';
 import IosInstallBanner from './components/IosInstallBanner';
+import AndroidInstallBanner from './components/AndroidInstallBanner';
 import UpdateAvailableBanner from './components/UpdateAvailableBanner';
 import GpsFincaBanner from './components/GpsFincaBanner';
 import DataLossBanner from './components/DataLossBanner';
@@ -753,6 +754,7 @@ export default function App() {
     <>
       <NetworkStatusBar />
       <IosInstallBanner />
+      <AndroidInstallBanner />
       <UpdateAvailableBanner />
       <Confetti />
       <GpsFincaBanner />
