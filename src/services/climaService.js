@@ -40,6 +40,7 @@
 import { getClimaSnapshot } from './sidecarClient.js';
 import { getProfile, getProfileMunicipio } from './userProfileService.js';
 import { findMunicipio } from '../utils/colombiaLocations.js';
+import { recordLiveEnsoStatus, applyEnsoOverride } from './ensoService.js';
 
 const CACHE_TTL_MS = 30 * 60 * 1000;
 const LS_KEY = 'chagra:clima:snapshot-v1';
@@ -135,6 +136,19 @@ function coordKey(lat, lng, elevation) {
         : base;
 }
 
+/**
+ * GR-9: aplica el override manual ENSO (ensoService) al snapshot ANTES de
+ * entregarlo a cualquier consumidor (chat, bell, strip, alertEngine). El caché
+ * guarda siempre el snapshot CRUDO del sidecar; el override se aplica en
+ * LECTURA, así quitar el override restaura el dato vivo. Sin override el
+ * payload sale intacto (misma referencia).
+ */
+function withEffectiveEnso(payload) {
+    if (!payload || typeof payload !== 'object' || !payload.enso_status) return payload;
+    const effective = applyEnsoOverride(payload.enso_status);
+    return effective === payload.enso_status ? payload : { ...payload, enso_status: effective };
+}
+
 function readLocalStorage() {
     try {
         const raw = localStorage.getItem(LS_KEY);
@@ -172,12 +186,12 @@ export function getCachedClimaSnapshot(lat, lng, elevation) {
     const key = coordKey(location?.lat, location?.lng, location?.elevation);
     const now = Date.now();
     if (memCache && memCache.key === key && now - memCache.ts < CACHE_TTL_MS) {
-        return memCache.payload;
+        return withEffectiveEnso(memCache.payload);
     }
     const ls = readLocalStorage();
     if (ls && ls.key === key) {
         memCache = ls;
-        return ls.payload;
+        return withEffectiveEnso(ls.payload);
     }
     return null;
 }
@@ -201,7 +215,7 @@ export async function fetchClimaSnapshot({ lat, lng, elevation, forceRefresh = f
     const now = Date.now();
 
     if (!forceRefresh && memCache && memCache.key === key && now - memCache.ts < CACHE_TTL_MS) {
-        return memCache.payload;
+        return withEffectiveEnso(memCache.payload);
     }
     if (inFlight && inFlight.key === key) return inFlight.promise;
 
@@ -212,6 +226,9 @@ export async function fetchClimaSnapshot({ lat, lng, elevation, forceRefresh = f
             elevation: location?.elevation,
         });
         if (payload) {
+            // GR-9: alimenta el caché vivo ENSO (fuente única para el motor
+            // offline: fenología, tareas preventivas, alertas de temporada).
+            recordLiveEnsoStatus(payload.enso_status);
             const enrichedPayload = location
                 ? { ...payload, location_context: location }
                 : payload;
@@ -219,10 +236,10 @@ export async function fetchClimaSnapshot({ lat, lng, elevation, forceRefresh = f
             memCache = entry;
             writeLocalStorage(entry);
             try {
-                window.dispatchEvent(new CustomEvent('chagra:clima:updated', { detail: enrichedPayload }));
+                window.dispatchEvent(new CustomEvent('chagra:clima:updated', { detail: withEffectiveEnso(enrichedPayload) }));
             } catch (_) { /* noop */ }
         }
-        return payload ? memCache?.payload || payload : payload;
+        return payload ? withEffectiveEnso(memCache?.payload || payload) : payload;
     })();
     inFlight = { key, promise };
 
@@ -288,6 +305,9 @@ export function phaseBadgeColor(phase) {
 
 export function describePhase(phase) {
     const m = {
+        // Fases genéricas que produce el override manual (GR-9, ensoService).
+        nino: 'El Niño',
+        nina: 'La Niña',
         nina_fuerte: 'La Niña fuerte',
         nina_moderada: 'La Niña moderada',
         nina_debil: 'La Niña débil',
