@@ -476,6 +476,25 @@ function _docKey(doc) {
 }
 
 /**
+ * Colapsa variedades a especie base. "lactuca_sativa_longifolia_morada"
+ * → "lactuca_sativa". Agrupa por genus_especie (2 partes), conserva el
+ * score mas alto por grupo, re-ordena. El mayor lever del deep-test RAG.
+ */
+function collapseVarieties(results) {
+  if (!results?.length) return results;
+  const bySpecies = new Map();
+  for (const r of results) {
+    const parts = (r.species || '').split('_');
+    const base = parts.length >= 2 ? parts.slice(0, 2).join('_') : r.species;
+    const existing = bySpecies.get(base);
+    if (!existing || r.score > existing.score) {
+      bySpecies.set(base, { ...r, species: base });
+    }
+  }
+  return Array.from(bySpecies.values()).sort((a, b) => b.score - a.score);
+}
+
+/**
  * Recupera los top-K passages más relevantes al query usando BM25.
  *
  * @param {string} query - texto a buscar (se tokeniza con normalización NFD).
@@ -495,7 +514,9 @@ export async function retrieve(query, topK = 5, surface = 'unknown') {
   let results = [];
   let errorKind = null;
   try {
-    results = await retrieveInternal(query, topK);
+    results = await retrieveInternal(query, Math.max(topK * 3, 15));
+    // Colapsar variedades a especie base (A1: el mayor lever del deep-test)
+    results = collapseVarieties(results).slice(0, topK);
     return results;
   } catch (err) {
     errorKind = 'unknown';
