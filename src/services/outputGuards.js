@@ -157,6 +157,13 @@ const PRICE_INTENT_PATTERNS = [
   /\b(el|la|los|las|una?|cuantas?)\s+(arroba|bulto|carga)[s]?\b/,
 ];
 
+// ── CARBONO/BONOS (Task 3, audit ministerio) ──────────────────────────
+const CARBON_INTENT_PATTERNS = [
+  /\b(bonos?\s+(de\s+)?carbono|carbono\s+neutral|creditos?\s+(de\s+)?carbono)\b/,
+  /\b(me\s+quieren\s+pagar\s+por\s+sembrar|pagar\s+por\s+sembrar\s+arboles|pago\s+por\s+carbono)\b/,
+  /\b(PSA|pago\s+por\s+servicios?\s+ambientales?|Decreto\s+1007)\b/,
+];
+
 // ── R0: intencion de RESTAURACION ─────────────────────────────────────
 // Task 2 (auditoria ministerio): "arboles nativos a 3200m" y "recuperar
 // el monte" caian a no_agro_keyword. Estas keywords los rutean.
@@ -204,14 +211,15 @@ const PLANTING_INTENT_PATTERNS = [
  * que `shouldRunPlantingGuards` colapsa la decisión.
  *
  * @param {string|null|undefined} userMessage
- * @returns {'siembra'|'precio'|'unknown'}
+ * @returns {'restauracion'|'carbono'|'siembra'|'precio'|'unknown'}
  */
 export function classifyQueryIntent(userMessage) {
   if (typeof userMessage !== 'string') return 'unknown';
   const norm = _stripDiacritics(userMessage);
   if (!norm) return 'unknown';
-  if (PLANTING_INTENT_PATTERNS.some((re) => re.test(norm))) return 'siembra';
   if (RESTORATION_INTENT_PATTERNS.some((re) => re.test(norm))) return 'restauracion';
+  if (CARBON_INTENT_PATTERNS.some((re) => re.test(norm))) return 'carbono';
+  if (PLANTING_INTENT_PATTERNS.some((re) => re.test(norm))) return 'siembra';
   if (PRICE_INTENT_PATTERNS.some((re) => re.test(norm))) return 'precio';
   return 'unknown';
 }
