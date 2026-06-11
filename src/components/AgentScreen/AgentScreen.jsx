@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw, X, Home, Camera, Square } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
-import { transcribe } from '../../services/voiceService';
+import { transcribe, queueForRetry } from '../../services/voiceService';
+import VoiceStatusStrip from './VoiceStatusStrip';
 import {
   claimNext as outboxClaimNext,
   markAnswered as outboxMarkAnswered,
@@ -87,7 +88,7 @@ import { mergePartialOnInterruption } from '../../services/agentPartialMerge';
 // comparten el mismo snapshot via `climaService` (cache 30 min).
 import { getCachedClimaSnapshot, fetchClimaSnapshot, resolveClimaLocation } from '../../services/climaService';
 import { FARM_CONFIG } from '../../config/defaults';
-import { speak, speakSentences, stop, init as initTTS, isSupported, isKokoroAvailable, replayLast, isSpeaking } from '../../services/ttsService';
+import { speak, speakSentences, stop, init as initTTS, isSupported, isKokoroAvailable, replayLast, isSpeaking, onSpeakingChange, isAudioPlaying, getLastSpoken } from '../../services/ttsService';
 import { executeAction, setActionGateCallback } from '../../services/actionExecutor';
 import { getToolsForLLM } from '../../services/llmTools';
 import { useRotatingTip } from '../../services/tipsService';
@@ -170,6 +171,15 @@ export default function AgentScreen({ onBack, initialContext }) {
   const [feedbackConsentModal, setFeedbackConsentModal] = useState({ isOpen: false, pendingAction: null });
   const ttsSupported = isSupported();
   const [kokoroReady, setKokoroReady] = useState(false);
+  // TIER 2 #5 (voz punta-a-punta): estado "hablando" observable. ttsService
+  // notifica true/false cuando arranca/termina audio (Kokoro single, cadena
+  // frase-por-frase, Web Speech). Alimenta el VoiceStatusStrip y el sub-
+  // título del header — el campesino VE cuándo Chagra habla, no lo adivina.
+  const [isVoicePlaying, setIsVoicePlaying] = useState(false);
+  // Aviso amable de degradación de voz (STT/TTS caído): NUNCA error mudo y
+  // NUNCA banner rojo de error — el flujo cae a texto sin romper.
+  const [voiceNotice, setVoiceNotice] = useState('');
+  useEffect(() => onSpeakingChange(setIsVoicePlaying), []);
   // Bug 2026-05-18 (Karen reportó stuck-pensando): tras 20s sin token visible,
   // mostrar mensaje "Aún pensando, toca cancelar si quieres reintentar" y
   // habilitar botón cancelar que dispara AbortController. Si pasan 30s sin
@@ -1720,14 +1730,28 @@ export default function AgentScreen({ onBack, initialContext }) {
 
       if (ttsEnabled && response) {
         stop();
+        // TIER 2 #5: degradación amable. Si TODO el stack de voz falla
+        // (Kokoro caído + Web Speech ausente), avisamos en el strip — la
+        // respuesta YA está escrita arriba, nada se rompe ni queda mudo.
+        // Damos 1.2s de gracia porque Web Speech puede demorar el onstart.
+        const warnIfMute = () => {
+          setTimeout(() => {
+            if (!isAudioPlaying() && !isSpeaking()) {
+              setVoiceNotice('Ahora no puedo hablarte — te dejé la respuesta escrita aquí arriba.');
+            }
+          }, 1200);
+        };
         if (kokoroReady) {
           // Free 7→10 fix-pack #4: streaming frase-por-frase reduce la
           // latencia hasta-primer-audio de "esperar respuesta entera"
           // (3-23s) a "esperar primera frase" (<2s). Internamente fallback
           // a speakKokoro/speak en caso de error en la primera frase.
-          speakSentences(response, { rate: 0.9, pitch: 1.0 });
+          speakSentences(response, { rate: 0.9, pitch: 1.0 })
+            .then((ok) => { if (!ok) warnIfMute(); })
+            .catch(() => warnIfMute());
         } else {
-          speak(response, { rate: 0.9, pitch: 1.0 });
+          const utterance = speak(response, { rate: 0.9, pitch: 1.0 });
+          if (!utterance) warnIfMute();
         }
       }
 
@@ -2164,17 +2188,32 @@ export default function AgentScreen({ onBack, initialContext }) {
           await handleSubmit(text, { fromVoice: true });
         } else {
           setState(STATE_IDLE);
-          setError('No entendí el audio. Prueba de nuevo.');
+          setVoiceNotice('No te entendí bien. Intenta de nuevo, o escribe tu pregunta aquí abajo.');
         }
-        } catch (err) {
-          setState(STATE_IDLE);
-          setError(`Error al transcribir audio: ${err.message || 'Habla más claro'}`);
+      } catch (err) {
+        // TIER 2 #5 degradación: Whisper caído NO rompe el flujo ni grita en
+        // rojo. (1) Guardamos el audio para reintento cuando vuelva el
+        // servicio (pending_voice_recordings), (2) avisamos amable y dejamos
+        // el teclado como camino. Nunca error mudo.
+        setState(STATE_IDLE);
+        queueForRetry(blob, {
+          reason: err?.message || 'whisper failed',
+          durationMs: result.durationMs || 0,
+        }).catch(() => {});
+        setVoiceNotice('No pude escucharte esta vez — guardé tu audio para reintentarlo. Mientras tanto puedes escribir tu pregunta aquí abajo.');
       }
     } else {
       resetRecord();
-      startRecord();
+      // Permiso de micrófono denegado / sin MediaRecorder → degradar a texto
+      // con aviso amable (antes: unhandled rejection silenciosa).
+      startRecord().catch((err) => {
+        console.warn('[Agent] no se pudo iniciar grabación:', err?.message);
+        setState(STATE_IDLE);
+        setVoiceNotice('No pude usar el micrófono. Revisa el permiso del navegador, o escribe tu pregunta aquí abajo.');
+      });
       setState(STATE_RECORDING);
       setError('');
+      setVoiceNotice('');
       agentSounds.listen();
     }
   };
@@ -2354,7 +2393,18 @@ export default function AgentScreen({ onBack, initialContext }) {
           { role: 'user', content: '🎤 Audio enviado…', timestamp: Date.now(), _outboxPending: true, _outboxId: item.id },
         ]);
         if (!ttsEnabled) setTtsEnabled(true);
-        const text = item.blob ? await transcribe(item.blob) : '';
+        let text = '';
+        try {
+          text = item.blob ? await transcribe(item.blob) : '';
+        } catch (sttErr) {
+          // TIER 2 #5 degradación: Whisper caído NO rompe el flujo. Guardamos
+          // el audio para reintento + aviso amable (sin banner rojo).
+          setMessages((prev) => prev.filter((m) => m._outboxId !== item.id));
+          if (item.blob) queueForRetry(item.blob, { reason: sttErr?.message || 'whisper failed' }).catch(() => {});
+          setVoiceNotice('No pude escuchar tu audio esta vez — lo guardé para reintentarlo. Mientras tanto puedes escribir tu pregunta.');
+          await outboxMarkError(item.id, sttErr?.message || 'transcripción falló');
+          return false;
+        }
         // Sustituir el placeholder por la transcripción real (sin duplicar).
         setMessages((prev) => prev.filter((m) => m._outboxId !== item.id));
         if (text && text.trim()) {
@@ -2362,7 +2412,7 @@ export default function AgentScreen({ onBack, initialContext }) {
           await outboxMarkAnswered(item.id, { answeredText: text.trim() });
           return true;
         }
-        setError('No entendí el audio. Prueba de nuevo desde el agente.');
+        setVoiceNotice('No te entendí bien. Intenta de nuevo, o escribe tu pregunta aquí abajo.');
         await outboxMarkError(item.id, 'transcripción vacía');
         return false;
       }
@@ -2525,7 +2575,7 @@ export default function AgentScreen({ onBack, initialContext }) {
         </button>
         {/* Avatar + título */}
         <ChagraAgentAvatarColibriPhoto
-          state={state === STATE_RECORDING ? 'listening' : state === STATE_THINKING ? 'thinking' : 'idle'}
+          state={state === STATE_RECORDING ? 'listening' : (state === STATE_THINKING || isVoicePlaying) ? 'thinking' : 'idle'}
           size={36}
           onDoubleClick={async () => {
             if (isSpeaking() || ttsEnabled) {
@@ -2539,11 +2589,17 @@ export default function AgentScreen({ onBack, initialContext }) {
         />
         <div className="flex-1 min-w-0">
           <h1 className="text-sm font-bold text-white leading-tight truncate">Chagra IA</h1>
-          <p className="text-[10px] font-semibold uppercase tracking-wider leading-tight"
-             style={{ color: state === STATE_THINKING ? '#f59e0b' : state === STATE_RECORDING ? '#a78bfa' : '#6ee7b7' }}>
+          {/* Theme-aware (2026-06-10): clases Tailwind (van por --c-*) en vez
+              de hex inline que ignoraba los temas. + estado "hablando". */}
+          <p className={`text-[10px] font-semibold uppercase tracking-wider leading-tight ${
+            state === STATE_THINKING ? 'text-amber-500'
+              : state === STATE_RECORDING ? 'text-violet-400'
+              : isVoicePlaying ? 'text-emerald-400'
+              : 'text-emerald-300'
+          }`}>
             {state === STATE_THINKING && 'pensando…'}
             {state === STATE_RECORDING && 'escuchando…'}
-            {state === STATE_IDLE && 'agente agroecológico'}
+            {state === STATE_IDLE && (isVoicePlaying ? 'hablando…' : 'agente agroecológico')}
           </p>
         </div>
         {/* Acciones: nueva conversación + TTS + online badge */}
@@ -2745,6 +2801,31 @@ export default function AgentScreen({ onBack, initialContext }) {
           <p className="text-xs text-red-400 mb-2 px-1">{agentPickError}</p>
         )}
 
+        {/* TIER 2 #5 — estado de VOZ evidente para baja alfabetización:
+            "Chagra te escucha / está pensando / está hablando" con ícono+
+            animación, botón Parar mientras habla, botón GRANDE "Volver a oír"
+            cuando ya hay una respuesta hablada, y aviso amable si el oído
+            (Whisper) o la voz (Kokoro/Web Speech) se degradan. */}
+        <VoiceStatusStrip
+          phase={
+            state === STATE_RECORDING ? 'listening'
+              : state === STATE_THINKING ? 'thinking'
+              : isVoicePlaying ? 'speaking'
+              : 'idle'
+          }
+          canRepeat={Boolean(getLastSpoken())}
+          notice={voiceNotice}
+          onRepeat={async () => {
+            setVoiceNotice('');
+            const ok = await replayLast({ useKokoro: kokoroReady });
+            if (!ok) {
+              setVoiceNotice('No pude repetir la respuesta — la tienes escrita aquí arriba.');
+            }
+          }}
+          onStopSpeaking={() => { stop(); agentSounds.cancel(); }}
+          onDismissNotice={() => setVoiceNotice('')}
+        />
+
         {/* Pill — unified with AgentHero (as-bar CSS tokens) */}
         <div
           className={[
@@ -2762,6 +2843,9 @@ export default function AgentScreen({ onBack, initialContext }) {
               </span>
               <span className="flex-1 text-sm text-rose-400 font-medium tabular-nums">
                 Grabando… {Math.floor(durationMs / 1000)}s
+                <span className="block text-[11px] text-rose-300/80 font-normal">
+                  Habla tranquilo. Toca el botón rojo cuando termines.
+                </span>
               </span>
             </div>
           ) : (
@@ -2822,18 +2906,22 @@ export default function AgentScreen({ onBack, initialContext }) {
 
             <div className="flex-1" />
 
-            {/* Micrófono (toggle) */}
+            {/* Micrófono (toggle) — GRANDE (TIER 2 #5): el camino principal
+                del campesino que casi no lee es HABLAR, no escribir. 54px
+                con anillo de acento; en grabación se vuelve el botón rojo
+                de "detener y enviar". */}
             <button
               type="button"
               onClick={handleVoiceRecord}
               disabled={queuePending.length >= 1}
-              aria-label={state === STATE_RECORDING ? 'Detener y enviar audio' : 'Grabar audio'}
+              aria-label={state === STATE_RECORDING ? 'Detener y enviar audio' : 'Hablar con Chagra'}
               aria-pressed={state === STATE_RECORDING}
-              className={['as-iconbtn', state === STATE_RECORDING ? 'as-mic-on' : ''].join(' ')}
+              data-testid="agent-mic-btn"
+              className={['as-iconbtn as-mic-big', state === STATE_RECORDING ? 'as-mic-on' : ''].join(' ')}
             >
               {state === STATE_RECORDING
-                ? <Square size={15} strokeWidth={2.5} />
-                : <Mic size={17} strokeWidth={2} />}
+                ? <Square size={20} strokeWidth={2.5} />
+                : <Mic size={24} strokeWidth={2} />}
             </button>
 
             {/* Enviar — ChagraAgentAvatar idéntico al Home */}

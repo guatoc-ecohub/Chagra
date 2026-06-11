@@ -91,6 +91,20 @@ export const AGENT_COMPOSITOR_CSS = `
     background: rgb(244,63,94) !important; border-color: rgb(244,63,94) !important;
     color: #fff !important; box-shadow: 0 4px 14px -4px rgba(244,63,94,0.5);
   }
+  /* TIER 2 #5 (voz punta-a-punta): mic GRANDE — el camino principal para
+     baja alfabetización es hablar. 54px + anillo de acento del TEMA
+     (--t-accent-rgb, con fallback al teal biopunk) que respira suave para
+     invitar al toque. En grabación as-mic-on lo pinta rojo (detener). */
+  .as-mic-big {
+    width: 54px; height: 54px;
+    border-color: rgba(var(--t-accent-rgb, 25, 201, 154), 0.55);
+    color: rgb(var(--t-accent-rgb, 25, 201, 154));
+    animation: as-mic-breathe 3.2s ease-in-out infinite;
+  }
+  @keyframes as-mic-breathe {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(var(--t-accent-rgb, 25, 201, 154), 0.35); }
+    50%      { box-shadow: 0 0 0 7px rgba(var(--t-accent-rgb, 25, 201, 154), 0); }
+  }
   .as-send {
     width: 46px; height: 46px; flex: none; border: none; border-radius: 50%;
     display: flex; align-items: center; justify-content: center; cursor: pointer;
@@ -151,6 +165,7 @@ export const AGENT_COMPOSITOR_CSS = `
   @media (prefers-reduced-motion: reduce) {
     .as-shimmer::after, .as-sending { animation: none !important; }
     .as-tool { animation: none !important; }
+    .as-mic-big { animation: none !important; }
   }
 `;
 
