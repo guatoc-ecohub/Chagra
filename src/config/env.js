@@ -19,5 +19,8 @@ export const ENV = {
   // Modelos de inferencia (configurables sin recompilar).
   // Cambia en .env cuando bumpees el modelo en el Nodo Alpha.
   STT_MODEL: import.meta.env.VITE_STT_MODEL || 'base',
-  NLU_MODEL: import.meta.env.VITE_NLU_MODEL || 'gemma3:4b',
+  // 2026-06-11: default gemma3:4b → granite3.3:8b. gemma3:4b NO carga junto a
+  // granite3.3 pinned (VRAM) → la extracción de voz daba 0 plantas. granite3.3
+  // (hot) extrae bien. Alinea el display + HelpVoiceQuestion con el modelo real.
+  NLU_MODEL: import.meta.env.VITE_NLU_MODEL || 'granite3.3:8b',
 };
