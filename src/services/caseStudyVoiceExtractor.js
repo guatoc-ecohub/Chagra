@@ -13,7 +13,7 @@
  * Para casos de estudio se usa el modelo configurado por su mejor razonamiento
  * con campos múltiples + reasoning sobre pest taxonomy + count parsing.
  *
- * Privacy: el prompt + transcripción NUNCA salen del host alpha. Si
+ * Privacy: el prompt + transcripción NUNCA salen del host local. Si
  * Ollama no responde (down, timeout), retorna `null` y la UI cae a modo
  * manual (offline-first compliant DR-044 restricciones).
  *

@@ -4,7 +4,7 @@
  * Toma el state_history + treatments_applied + outcome de un caso y
  * propone un borrador de `lessons_learned` (3-5 frases, español Colombia).
  *
- * Privacy: NUNCA sale del host alpha. Si Ollama down → null (UI cae a
+ * Privacy: NUNCA sale del host local. Si Ollama down → null (UI cae a
  * input manual).
  *
  * Audit trail: cada respuesta retorna `_audit` para vincular a
