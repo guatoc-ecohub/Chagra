@@ -305,18 +305,17 @@ export function phaseBadgeColor(phase) {
 
 export function describePhase(phase) {
     const m = {
-        // Fases genéricas que produce el override manual (GR-9, ensoService).
-        nino: 'El Niño',
-        nina: 'La Niña',
-        nina_fuerte: 'La Niña fuerte',
-        nina_moderada: 'La Niña moderada',
-        nina_debil: 'La Niña débil',
-        neutral: 'Neutral ENSO',
-        nino_debil: 'El Niño débil',
-        nino_moderado: 'El Niño moderado',
-        nino_fuerte: 'El Niño fuerte',
+        nino: 'El Niño — viene seco, prepare agua y sombra',
+        nina: 'La Niña — viene lluvioso, limpie drenajes',
+        nina_fuerte: 'La Niña fuerte — mucha lluvia, riesgo de inundacion',
+        nina_moderada: 'La Niña moderada — mas lluvia de lo normal',
+        nina_debil: 'Algo mas lluvioso de lo normal',
+        neutral: 'El clima viene parejo, ni muy seco ni muy lluvioso',
+        nino_debil: 'Algo mas seco de lo normal',
+        nino_moderado: 'El Nino moderado — viene seco, ahorre agua',
+        nino_fuerte: 'El Nino fuerte — sequia, prepare reservorios',
     };
-    return m[phase] || 'Estado ENSO desconocido';
+    return m[phase] || 'Estado del clima desconocido';
 }
 
 // Hook informal — el caller puede `window.addEventListener('chagra:clima:updated', cb)`
