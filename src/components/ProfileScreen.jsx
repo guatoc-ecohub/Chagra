@@ -304,21 +304,23 @@ export default function ProfileScreen({ onBack, onHome }) {
             <BackgroundSelector />
             <AgentAvatarSelector />
 
-            {/* Estilo de notificación de alertas (operador 2026-06-06).
-                'demo' = chip llamativo en la portada del agente (por defecto).
-                'actual' = campanita del encabezado. Persiste en el perfil. */}
+            {/* Estilo de notificación (operador 2026-06-06 + 2026-06-11).
+                Decide CUÁL campana única se muestra (bug "dos campanas"):
+                'demo' = campana de la portada del agente + aviso destacado
+                (por defecto). 'actual' = campanita clásica del encabezado.
+                Persiste en el perfil. */}
             <div className="space-y-3 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
               <div className="flex items-center gap-2 px-1">
                 <Bell size={18} className="text-emerald-400" />
-                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Avisos de clima</h3>
+                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Botón de avisos</h3>
               </div>
               <p className="text-[11px] text-slate-500 leading-snug px-1">
-                Cómo te muestra Chagra una alerta de clima o helada.
+                Elige cuál campana te muestra los avisos (alertas, tareas y sincronización). Solo se muestra una.
               </p>
               <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label="Estilo de avisos">
                 {[
-                  { id: 'demo', label: 'Aviso destacado', desc: 'Un cartel grande en la portada' },
-                  { id: 'actual', label: 'Campanita', desc: 'Solo el ícono de la campana' },
+                  { id: 'demo', label: 'Campana de la portada', desc: 'Vive en la portada del agente, con aviso destacado de clima' },
+                  { id: 'actual', label: 'Campana clásica', desc: 'El ícono de arriba, con notificaciones y clima' },
                 ].map((opt) => (
                   <button
                     key={opt.id}
