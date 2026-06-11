@@ -289,6 +289,17 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     heroRoute: { kind: 'nav', view: 'ciclo' },
   },
   {
+    id: 'suelo',
+    group: 'observar',
+    status: 'live',
+    icon: '🪱',
+    label: 'Mi suelo',
+    desc: 'Diagnostica tu tierra con pruebas caseras honestas.',
+    tool: 'soil_diagnostic',
+    hero: true,
+    heroRoute: { kind: 'nav', view: 'suelo' },
+  },
+  {
     id: 'procesos',
     group: 'registrar',
     status: 'live',
