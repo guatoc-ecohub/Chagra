@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Mic, Square, Camera, X } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { captureAndCompress } from '../../services/photoService';
@@ -18,6 +18,14 @@ import {
 import { buildCropSuggestions } from '../../data/cropSuggestions';
 import { iconForTheme } from './themeIcon';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
+import { lunarPhase, solarTimes, moonPathD } from '../../utils/skyEphemeris';
+import { resolveClimaLocation, getCachedClimaSnapshot } from '../../services/climaService';
+import {
+    fetchSkyConditions,
+    getCachedSkyConditions,
+    classifySkyCondition,
+    applySensorCalibration,
+} from '../../services/skyConditionService';
 
 /**
  * AgentHero — la PORTADA INMERSIVA del agente Chagra, PRIMERA PANTALLA COMPLETA
@@ -91,12 +99,137 @@ import ChagraAgentAvatar from '../ChagraAgentAvatar';
 // para evitar import circular y duplicación.
 
 // ¿Es de noche? (operador 2026-06-06: sol de día, luna de noche en la escena).
-// Noche = antes de las 6am o desde las 7pm. Puro, fácil de testear vía hora.
+// Fallback puro por hora (6am-7pm) cuando NO hay coordenadas de la finca; con
+// coordenadas el hero usa solarTimes() (salida/puesta de sol reales ±2 min).
 function isNightNow(hour) {
     const h = Number.isInteger(hour)
         ? hour
         : (typeof Date !== 'undefined' ? new Date().getHours() : 9);
     return h < 6 || h >= 19;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ARTEFACTO SOL/LUNA REALISTA (caso Choachí 2026-06).
+//
+// Antes: sol radiante SIEMPRE de día y luna creciente FIJA de noche — pura
+// hora del reloj, cero clima real. En Choachí (altoandino, nubosidad orográfica
+// crónica) el artefacto prometía sol en días muy nublados.
+//
+// Ahora: la condición viene de skyConditionService (nubosidad real Open-Meteo
+// + corrección orográfica por piso térmico + modulación ENSO, sesgo de
+// honestidad: solo degrada hacia más nube) y la luna dibuja su FASE REAL
+// (skyEphemeris.moonPathD — astronomía válida; mostrar la fase ≠ recomendar
+// labores por ella, eso es folclore vetado por ADR-033).
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Nube puffy compartida por las variantes (parcial/nublado/niebla/lluvia).
+const CLOUD_D = 'M16 42 q-9 0 -9 -8 q0 -8 8 -8 q3 -9 13 -9 q9 0 12 8 q9 1 9 9 q0 8 -9 8 z';
+
+function SkyAstro({ night, condition, moonFraction }) {
+    const cloudy = condition === 'nublado' || condition === 'niebla' || condition === 'lluvia';
+
+    if (night) {
+        const moon = moonPathD(moonFraction, 32, 30, 12);
+        return (
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+                <defs>
+                    <radialGradient id="ap-moon" cx="42%" cy="38%" r="65%">
+                        <stop offset="0%" stopColor="#fdfbf2" />
+                        <stop offset="100%" stopColor="#d9e2f2" />
+                    </radialGradient>
+                </defs>
+                {/* lado oscuro del disco, apenas insinuado */}
+                <circle cx="32" cy="30" r="12" fill="#2b3650" opacity=".5" />
+                {moon.kind === 'full' && <circle cx="32" cy="30" r="12" fill="url(#ap-moon)" />}
+                {moon.kind === 'partial' && <path d={moon.d} fill="url(#ap-moon)" />}
+                {moon.kind === 'new' && (
+                    <circle cx="32" cy="30" r="12" fill="none" stroke="#94a3c4" strokeWidth="0.9" opacity=".55" />
+                )}
+                {/* cráteres tenues sobre la zona iluminada */}
+                {moon.kind !== 'new' && (
+                    <>
+                        <circle cx="29" cy="25" r="1.9" fill="#c3cde2" opacity=".4" />
+                        <circle cx="35" cy="33" r="1.3" fill="#c3cde2" opacity=".35" />
+                    </>
+                )}
+                {/* nubes nocturnas reales delante de la luna */}
+                {cloudy && (
+                    <path d={CLOUD_D} fill="#39435e" opacity=".88" transform="translate(8 16) scale(.78)" />
+                )}
+                {condition === 'lluvia' && (
+                    <g stroke="#7fa6d9" strokeWidth="2" strokeLinecap="round" opacity=".8">
+                        <line x1="24" y1="52" x2="22" y2="58" />
+                        <line x1="33" y1="52" x2="31" y2="58" />
+                        <line x1="42" y1="52" x2="40" y2="58" />
+                    </g>
+                )}
+            </svg>
+        );
+    }
+
+    // ── Día: el sol que se ve es el que el cielo real permite ──
+    return (
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+            <defs>
+                <radialGradient id="ap-sun" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stopColor="#fff3cf" />
+                    <stop offset="100%" stopColor="#f5b733" />
+                </radialGradient>
+            </defs>
+            {condition === 'despejado' && (
+                <>
+                    <g stroke="#f5b733" strokeWidth="2.4" strokeLinecap="round" opacity=".85">
+                        <line x1="32" y1="4" x2="32" y2="13" />
+                        <line x1="32" y1="51" x2="32" y2="60" />
+                        <line x1="4" y1="32" x2="13" y2="32" />
+                        <line x1="51" y1="32" x2="60" y2="32" />
+                        <line x1="12" y1="12" x2="18" y2="18" />
+                        <line x1="46" y1="46" x2="52" y2="52" />
+                        <line x1="52" y1="12" x2="46" y2="18" />
+                        <line x1="18" y1="46" x2="12" y2="52" />
+                    </g>
+                    <circle cx="32" cy="32" r="13" fill="url(#ap-sun)" />
+                </>
+            )}
+            {condition === 'parcial' && (
+                <>
+                    {/* sol asomado arriba-izquierda, rayos cortos */}
+                    <g stroke="#f5b733" strokeWidth="2" strokeLinecap="round" opacity=".7">
+                        <line x1="24" y1="4" x2="24" y2="10" />
+                        <line x1="6" y1="22" x2="12" y2="22" />
+                        <line x1="9" y1="8" x2="14" y2="13" />
+                        <line x1="39" y1="8" x2="34" y2="13" />
+                    </g>
+                    <circle cx="24" cy="22" r="10" fill="url(#ap-sun)" />
+                    <path d={CLOUD_D} fill="#e6ecf5" stroke="#9aa7ba" strokeWidth="1" opacity=".95" transform="translate(8 14) scale(.82)" />
+                </>
+            )}
+            {(condition === 'nublado' || condition === 'niebla') && (
+                <>
+                    {/* resplandor apagado detrás de la nube — honesto, sin rayos */}
+                    <circle cx="26" cy="20" r="9" fill="url(#ap-sun)" opacity=".35" />
+                    <path d={CLOUD_D} fill="#dfe5ee" stroke="#94a1b5" strokeWidth="1.1" opacity=".95" transform="translate(4 10) scale(.92)" />
+                    <path d={CLOUD_D} fill="#c7cfdc" stroke="#8d99ad" strokeWidth="1.1" opacity=".9" transform="translate(16 22) scale(.62)" />
+                    {condition === 'niebla' && (
+                        <g stroke="#a9b3c4" strokeWidth="2.2" strokeLinecap="round" opacity=".85">
+                            <line x1="12" y1="52" x2="40" y2="52" />
+                            <line x1="20" y1="58" x2="50" y2="58" />
+                        </g>
+                    )}
+                </>
+            )}
+            {condition === 'lluvia' && (
+                <>
+                    <path d={CLOUD_D} fill="#cdd5e2" stroke="#8d99ad" strokeWidth="1.1" opacity=".95" transform="translate(6 10) scale(.9)" />
+                    <g stroke="#5d96d8" strokeWidth="2" strokeLinecap="round" opacity=".85">
+                        <line x1="22" y1="48" x2="20" y2="56" />
+                        <line x1="32" y1="48" x2="30" y2="56" />
+                        <line x1="42" y1="48" x2="40" y2="56" />
+                    </g>
+                </>
+            )}
+        </svg>
+    );
 }
 
 // Colibrí 2D del demo (SVG .hummer). Se usa tanto en la escena ambiente (vuela)
@@ -191,12 +324,64 @@ export default function AgentHero({ onNavigate }) {
     // y del botón Ⓐ; el switcher completo vive en Perfil → Apariencia.
     const { theme } = useTheme();
 
-    // ── Escena: sol de día / luna de noche (operador 2026-06-06) ──────────────
-    const night = isNightNow();
-
     // ── Perfil real para sugerencias contextuales ─────────────────────────────
     const profile = getProfile();
     const altitud = profile?.finca_altitud || profile?.altitud || null;
+
+    // ── Escena: sol/luna REALISTA (nubosidad real + fase lunar real) ──────────
+    // Ubicación GUARDADA del perfil (misma fuente que el clima — NO geo en vivo).
+    const climaLoc = useMemo(() => {
+        try { return resolveClimaLocation(); } catch (_) { return null; }
+    }, []);
+
+    // Día/noche por salida/puesta de sol REALES de la finca; fallback por hora.
+    const night = useMemo(() => {
+        try {
+            if (climaLoc && Number.isFinite(climaLoc.lat) && Number.isFinite(climaLoc.lng)) {
+                const st = solarTimes(new Date(), climaLoc.lat, climaLoc.lng);
+                if (st.sunrise && st.sunset) return !st.isDaylight;
+            }
+        } catch (_) { /* fallback hora local */ }
+        return isNightNow();
+    }, [climaLoc]);
+
+    // Nubosidad real (Open-Meteo directo, cache 30 min). Pinta el cache al
+    // primer paint y refresca en background. Offline → null y el clasificador
+    // cae al prior climatológico por piso térmico (honesto, no sol por defecto).
+    const [skySnap, setSkySnap] = useState(() => (
+        climaLoc ? getCachedSkyConditions(climaLoc.lat, climaLoc.lng, climaLoc.elevation) : null
+    ));
+    useEffect(() => {
+        if (!climaLoc) return undefined;
+        let alive = true;
+        fetchSkyConditions({ lat: climaLoc.lat, lng: climaLoc.lng, elevation: climaLoc.elevation })
+            .then((s) => { if (alive && s) setSkySnap(s); })
+            .catch(() => { /* nunca rompe el hero */ });
+        return () => { alive = false; };
+    }, [climaLoc]);
+
+    // Condición honesta del cielo: nubosidad + piso térmico + ENSO (solo
+    // degrada hacia más nube). applySensorCalibration es el hook para los
+    // sensores de campo futuros (hoy identidad — sin sensores desplegados).
+    const sky = useMemo(() => {
+        let ensoPhase = 'neutral';
+        try { ensoPhase = getCachedClimaSnapshot()?.enso_status?.phase || 'neutral'; } catch (_) { /* neutral */ }
+        const elevationM = Number.isFinite(Number(altitud))
+            ? Number(altitud)
+            : (Number.isFinite(Number(climaLoc?.elevation)) ? Number(climaLoc.elevation) : null);
+        return applySensorCalibration(classifySkyCondition({
+            cloudCoverPct: skySnap?.current?.cloud_cover_pct ?? null,
+            weatherCode: skySnap?.current?.weather_code ?? null,
+            precipMm: skySnap?.current?.precip_mm ?? null,
+            elevationM,
+            ensoPhase,
+        }), null);
+    }, [skySnap, altitud, climaLoc]);
+
+    // Fase lunar REAL (astronomía — skyEphemeris). Solo para DIBUJARLA.
+    const moonFraction = useMemo(() => {
+        try { return lunarPhase(new Date(), { latitude: climaLoc?.lat ?? 4 }).fraction; } catch (_) { return 0.25; }
+    }, [climaLoc]);
 
     // ── Sugerencias contextuales ROTATIVAS basadas en los cultivos reales ─────
     // Deterministas (cropSuggestions: cultivos del store × mes × piso térmico).
@@ -518,6 +703,16 @@ export default function AgentHero({ onNavigate }) {
                     display: none;
                 }
                 [data-theme="nature"] .agentport-scene.is-day .agentport-sun { display: block; }
+                /* Honestidad climática: el sol radial grande de nature se apaga
+                   cuando el cielo REAL está cubierto (caso Choachí) y se
+                   atenúa con cielo parcial. La nube manda, no el reloj. */
+                [data-theme="nature"] .agentport-scene.is-day.sky-parcial .agentport-sun { opacity: .55; animation: none; }
+                [data-theme="nature"] .agentport-scene.is-day.sky-nublado .agentport-sun,
+                [data-theme="nature"] .agentport-scene.is-day.sky-niebla .agentport-sun,
+                [data-theme="nature"] .agentport-scene.is-day.sky-lluvia .agentport-sun {
+                    opacity: .22;
+                    animation: none;
+                }
                 @keyframes agentport-sun-glow {
                     0%, 100% { opacity: 0.85; transform: translateX(-50%) scale(1); }
                     50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
@@ -530,17 +725,23 @@ export default function AgentHero({ onNavigate }) {
                    de día; este astro pequeño es universal y delicado. */
                 .agentport-astro {
                     position: absolute;
-                    top: 11%;
-                    right: 14%;
-                    width: 46px;
-                    height: 46px;
+                    /* top 11% lo dejaba DETRÁS del toggle Campesino/Experto en
+                       viewport de teléfono (390px): el astro quedaba invisible.
+                       Baja al aire abierto entre el toggle y el saludo. */
+                    top: 19%;
+                    right: 10%;
+                    width: 54px;
+                    height: 54px;
                     z-index: 1;
                     opacity: .9;
                     filter: drop-shadow(0 0 10px rgba(255, 236, 180, .35));
                     animation: agentport-astro-breathe 8s ease-in-out infinite;
                 }
                 .agentport-astro.is-moon { filter: drop-shadow(0 0 10px rgba(200, 220, 255, .35)); }
-                [data-theme="nature"] .agentport-astro.is-day { display: none; } /* nature ya tiene el sol radial grande de día */
+                /* nature ya tiene el sol radial grande de día — el astro chico
+                   solo se oculta cuando el cielo REAL está despejado; con
+                   nube/niebla/lluvia el astro ES el que cuenta la verdad. */
+                [data-theme="nature"] .agentport-scene.is-day.sky-despejado .agentport-astro { display: none; }
                 .agentport-astro svg { width: 100%; height: 100%; display: block; }
                 @keyframes agentport-astro-breathe {
                     0%, 100% { opacity: .85; transform: scale(1); }
@@ -1069,51 +1270,22 @@ export default function AgentHero({ onNavigate }) {
                 className={[
                     'agentport-scene',
                     night ? 'is-night' : 'is-day',
+                    `sky-${sky.condition}`,
                     menuOpen && !menuClosing ? 'is-quiet' : '',
                 ].join(' ')}
+                data-sky={sky.condition}
+                data-sky-degraded={sky.degraded ? 'true' : 'false'}
                 aria-hidden="true"
             >
-                {/* — SOL/LUNA delicado, universal, según hora (operador 2026-06-06) — */}
-                <div className={['agentport-astro', night ? 'is-moon' : 'is-day'].join(' ')}>
-                    {night ? (
-                        <svg viewBox="0 0 64 64" aria-hidden="true">
-                            {/* luna creciente delicada */}
-                            <defs>
-                                <radialGradient id="ap-moon" cx="42%" cy="38%" r="65%">
-                                    <stop offset="0%" stopColor="#fdfbf2" />
-                                    <stop offset="100%" stopColor="#d9e2f2" />
-                                </radialGradient>
-                            </defs>
-                            <path
-                                d="M44 8 a26 26 0 1 0 12 40 a20 20 0 1 1 -12 -40 z"
-                                fill="url(#ap-moon)"
-                            />
-                            <circle cx="28" cy="24" r="2.2" fill="#cfd8ea" opacity=".7" />
-                            <circle cx="22" cy="38" r="1.6" fill="#cfd8ea" opacity=".55" />
-                            <circle cx="33" cy="42" r="1.3" fill="#cfd8ea" opacity=".5" />
-                        </svg>
-                    ) : (
-                        <svg viewBox="0 0 64 64" aria-hidden="true">
-                            {/* sol delicado con rayos finos */}
-                            <defs>
-                                <radialGradient id="ap-sun" cx="50%" cy="50%" r="50%">
-                                    <stop offset="0%" stopColor="#fff3cf" />
-                                    <stop offset="100%" stopColor="#f5b733" />
-                                </radialGradient>
-                            </defs>
-                            <g stroke="#f5b733" strokeWidth="2.4" strokeLinecap="round" opacity=".85">
-                                <line x1="32" y1="4" x2="32" y2="13" />
-                                <line x1="32" y1="51" x2="32" y2="60" />
-                                <line x1="4" y1="32" x2="13" y2="32" />
-                                <line x1="51" y1="32" x2="60" y2="32" />
-                                <line x1="12" y1="12" x2="18" y2="18" />
-                                <line x1="46" y1="46" x2="52" y2="52" />
-                                <line x1="52" y1="12" x2="46" y2="18" />
-                                <line x1="18" y1="46" x2="12" y2="52" />
-                            </g>
-                            <circle cx="32" cy="32" r="13" fill="url(#ap-sun)" />
-                        </svg>
-                    )}
+                {/* — SOL/LUNA realista: nubosidad real Open-Meteo + corrección
+                     orográfica andina + ENSO de día; FASE LUNAR real de noche
+                     (mostrarla es astronomía; recomendar labores por ella sería
+                     folclore — ADR-033). data-sky habilita la validación E2E. — */}
+                <div
+                    className={['agentport-astro', night ? 'is-moon' : 'is-day'].join(' ')}
+                    title={sky.label}
+                >
+                    <SkyAstro night={night} condition={sky.condition} moonFraction={moonFraction} />
                 </div>
 
                 {/* — NATURE: sol + montañas 3 capas + polen — */}

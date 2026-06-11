@@ -579,6 +579,22 @@ export function buildClimaContext(snapshot, opts = {}) {
       lines.push(`  ${sev} ${a.tipo}: ${a.mensaje}`);
     }
   }
+
+  // Cielo de HOY (nubosidad real — fix Choachí 2026-06). El snapshot del
+  // sidecar no trae cloud_cover; el resumen viene de skyConditionService
+  // (Open-Meteo directo + corrección orográfica andina + ENSO). Solo se
+  // inyecta si el caller lo pasó — sin dato, el prompt no inventa cielo.
+  if (opts.sky && typeof opts.sky === 'object' && opts.sky.label) {
+    const pct = typeof opts.sky.cloudCoverPct === 'number'
+      ? ` (cobertura nubosa ~${Math.round(opts.sky.cloudCoverPct)}%)`
+      : '';
+    const honesty = opts.sky.degraded
+      ? ' Ajustado por nubosidad orográfica altoandina (el modelo global la subestima): NO prometas sol.'
+      : '';
+    lines.push('');
+    lines.push(`Cielo de hoy en la finca: ${opts.sky.label}${pct} — Open-Meteo.${honesty}`);
+  }
+
   // Lectura regional ENSO (DR-MISSION-2/4) si conocemos la región de la finca.
   // Complementa la fase cruda con la implicación accionable por región.
   const ensoRegional = buildEnsoAgentLines({
