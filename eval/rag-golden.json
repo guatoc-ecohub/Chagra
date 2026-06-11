@@ -1,122 +1,37 @@
 [
-  {
-    "id": "G01",
-    "query": "gusano del cafe",
-    "expected": "coffea_arabica",
-    "rationale": "broca es la plaga principal del cafe; ficha de cafe cubre manejo de broca"
-  },
-  {
-    "id": "G02",
-    "query": "matamalezas natural",
-    "expected": "allium_cepa",
-    "rationale": "cebolla tiene rol alelopatico documentado — control natural de malezas"
-  },
-  {
-    "id": "G03",
-    "query": "que siembro en tierra fria",
-    "expected": "solanum_tuberosum",
-    "rationale": "papa es cultivo emblematico de clima frio (~2500-3500 msnm)"
-  },
-  {
-    "id": "G04",
-    "query": "bichos en la lechuga",
-    "expected": "lactuca_sativa",
-    "rationale": "ficha de lechuga cubre plagas de afidos y gusanos comedores de hoja"
-  },
-  {
-    "id": "G05",
-    "query": "remedio para la roya",
-    "expected": "coffea_arabica",
-    "rationale": "roya es enfermedad principal del cafe; caldo bordeles preventivo en ficha"
-  },
-  {
-    "id": "G06",
-    "query": "como abonar el maiz",
-    "expected": "zea_mays",
-    "rationale": "ficha de maiz incluye plan de alimentacion y fertilizacion"
-  },
-  {
-    "id": "G07",
-    "query": "plaga del tomate",
-    "expected": "solanum_lycopersicum",
-    "rationale": "ficha de tomate cubre plagas principales (afidos, trips, mosca blanca)"
-  },
-  {
-    "id": "G08",
-    "query": "que cultivar en paramo",
-    "expected": "solanum_tuberosum",
-    "rationale": "papa nativa es cultivo clave de paramo; ficha describe adaptacion a altura"
-  },
-  {
-    "id": "G09",
-    "query": "controlar hormigas en frijol",
-    "expected": "phaseolus_vulgaris",
-    "rationale": "frijol es leguminosa con plagas de suelo; ficha cubre manejo"
-  },
-  {
-    "id": "G10",
-    "query": "hongo blanco en la fresa",
-    "expected": "fragaria_ananassa",
-    "rationale": "fresa susceptible a botrytis y oidio; ficha cubre manejo fungoso"
-  },
-  {
-    "id": "G11",
-    "query": "cosechar aguacate maduro",
-    "expected": "persea_americana",
-    "rationale": "ficha de aguacate describe madurez de cosecha y punto optimo"
-  },
-  {
-    "id": "G12",
-    "query": "maleza que ahoga el cultivo",
-    "expected": "allium_cepa",
-    "rationale": "cebolla tiene propiedad alelopatica que suprime malezas; ficha lo explica"
-  },
-  {
-    "id": "G13",
-    "query": "sembrar yuca en loma",
-    "expected": "manihot_esculenta",
-    "rationale": "yuca se siembra en laderas y lomas; ficha cubre preparacion de terreno"
-  },
-  {
-    "id": "G14",
-    "query": "porque se seca la mora",
-    "expected": "rubus_glaucus",
-    "rationale": "mora de Castilla tiene modos de falla documentados en su ficha"
-  },
-  {
-    "id": "G15",
-    "query": "a los cuantos dias cosecho zanahoria",
-    "expected": "daucus_carota",
-    "rationale": "zanahoria tiene tiempo a cosecha definido en su ficha fenologica"
-  },
-  {
-    "id": "G16",
-    "query": "como proteger el platano del viento",
-    "expected": "musa_paradisiaca",
-    "rationale": "platano es susceptible a vuelco por viento; ficha cubre manejo"
-  },
-  {
-    "id": "G17",
-    "query": "con que junto la papa",
-    "expected": "solanum_tuberosum",
-    "rationale": "papa tiene companions y antagonistas documentados en su ficha"
-  },
-  {
-    "id": "G18",
-    "query": "gusano cogollero remedio",
-    "expected": "zea_mays",
-    "rationale": "cogollero es plaga principal del maiz; ficha cubre control biologico"
-  },
-  {
-    "id": "G19",
-    "query": "podar tomate de arbol",
-    "expected": "solanum_betaceum",
-    "rationale": "tomate de arbol requiere poda de formacion; ficha lo documenta"
-  },
-  {
-    "id": "G20",
-    "query": "sombrio para cafe organico",
-    "expected": "coffea_arabica",
-    "rationale": "cafe bajo sombra es practica agroecologica; ficha de cafe cubre sombrio"
-  }
+  {"id":"G01","query":"gusano del cafe","expected":"coffea_arabica","rationale":"broca es la plaga principal del cafe"},
+  {"id":"G02","query":"matamalezas natural","expected":"allium_cepa","rationale":"cebolla tiene rol alelopatico"},
+  {"id":"G03","query":"que siembro en tierra fria","expected":"solanum_tuberosum","rationale":"papa cultivo de clima frio"},
+  {"id":"G04","query":"bichos en la lechuga","expected":"lactuca_sativa","rationale":"ficha de lechuga cubre plagas"},
+  {"id":"G05","query":"remedio para la roya","expected":"coffea_arabica","rationale":"roya=principal enfermedad del cafe"},
+  {"id":"G06","query":"como abonar el maiz","expected":"zea_mays","rationale":"ficha de maiz incluye fertilizacion"},
+  {"id":"G07","query":"plaga del tomate","expected":"solanum_lycopersicum","rationale":"ficha de tomate cubre plagas principales"},
+  {"id":"G08","query":"que cultivar en paramo","expected":"solanum_tuberosum","rationale":"papa nativa cultivo clave de paramo"},
+  {"id":"G09","query":"controlar hormigas en frijol","expected":"phaseolus_vulgaris","rationale":"frijol con plagas de suelo"},
+  {"id":"G10","query":"hongo blanco en la fresa","expected":"fragaria_ananassa","rationale":"fresa susceptible a botrytis"},
+  {"id":"G11","query":"cosechar aguacate maduro","expected":"persea_americana","rationale":"ficha de aguacate describe madurez"},
+  {"id":"G12","query":"maleza que ahoga el cultivo","expected":"allium_cepa","rationale":"cebolla alelopatica suprime malezas"},
+  {"id":"G13","query":"sembrar yuca en loma","expected":"manihot_esculenta","rationale":"yuca se siembra en laderas"},
+  {"id":"G14","query":"porque se seca la mora","expected":"rubus_glaucus","rationale":"mora tiene modos de falla documentados"},
+  {"id":"G15","query":"a los cuantos dias cosecho zanahoria","expected":"daucus_carota","rationale":"zanahoria tiempo a cosecha definido"},
+  {"id":"G16","query":"como proteger el platano del viento","expected":"musa_paradisiaca","rationale":"platano susceptible a vuelco por viento"},
+  {"id":"G17","query":"con que junto la papa","expected":"solanum_tuberosum","rationale":"papa tiene companions documentados"},
+  {"id":"G18","query":"gusano cogollero remedio","expected":"zea_mays","rationale":"cogollero plaga principal del maiz"},
+  {"id":"G19","query":"podar tomate de arbol","expected":"solanum_betaceum","rationale":"tomate de arbol requiere poda"},
+  {"id":"G20","query":"sombrio para cafe organico","expected":"coffea_arabica","rationale":"cafe bajo sombra practica agroecologica"},
+  {"id":"G21","query":"broca en el cafe como se controla","expected":"coffea_arabica","rationale":"broca es plaga del cafe"},
+  {"id":"G22","query":"lechuga morada como se siembra","expected":"lactuca_sativa","rationale":"variedad de lechuga"},
+  {"id":"G23","query":"mosca blanca en el tomate","expected":"solanum_lycopersicum","rationale":"plaga comun del tomate"},
+  {"id":"G24","query":"gota negra en la papa","expected":"solanum_tuberosum","rationale":"gota=tizon tardio de la papa"},
+  {"id":"G25","query":"cuanto produce una mata de cafe","expected":"coffea_arabica","rationale":"produccion de cafe por planta"},
+  {"id":"G26","query":"como hacer bocashi para el maiz","expected":"zea_mays","rationale":"maiz se beneficia de bocashi"},
+  {"id":"G27","query":"cada cuanto se riega el frijol","expected":"phaseolus_vulgaris","rationale":"frijol sensible a exceso de agua"},
+  {"id":"G28","query":"porque se pudre la raiz del aguacate","expected":"persea_americana","rationale":"phytophthora en aguacate"},
+  {"id":"G29","query":"que abono para la cebolla","expected":"allium_cepa","rationale":"cebolla requiere fertilizacion especifica"},
+  {"id":"G30","query":"sembrar cilantro en la sombra","expected":"coriandrum_sativum","rationale":"cilantro prefiere sombra parcial"},
+  {"id":"G31","query":"hormiga arriera en la yuca","expected":"manihot_esculenta","rationale":"arriera ataca yuca"},
+  {"id":"G32","query":"cuando cosechar la arveja","expected":"pisum_sativum","rationale":"arveja=cosecha en verde"},
+  {"id":"G33","query":"la mora se esta secando","expected":"rubus_glaucus","rationale":"mora=estres hidrico o acaros"},
+  {"id":"G34","query":"el lulo se da en clima frio","expected":"solanum_quitoense","rationale":"lulo=piso termico frio"},
+  {"id":"G35","query":"uchuva en matera","expected":"physalis_peruviana","rationale":"uchuva apta para maceta"}
 ]
