@@ -128,7 +128,7 @@ export default function HelpVozScreen({ onBackToHome, onNavigate }) {
 
         {/* Sin red */}
         <p className="text-xs text-slate-500 italic mt-2 leading-relaxed">
-          ¿Sin red en campo? La voz funciona offline igual. La transcripción local guarda el audio y reintenta cuando vuelves a tener señal.
+          ¿Sin red en campo? Puedes grabar igual: la app guarda tu audio y lo transcribe en cuanto vuelves a tener señal (la transcripción usa el servidor). Lo que registras nunca se pierde.
         </p>
 
         {/* CTA bottom secundaria — backup si scrolleó hasta abajo */}
