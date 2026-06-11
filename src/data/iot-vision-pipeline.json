@@ -1,0 +1,19 @@
+{
+  "fuente": "DR-IOT-1 (Gemini+DeepSeek+Meta, 2026-06-11)",
+  "nota": "M6000 Maxwell NO corre VLMs util -> vision SIEMPRE en cloud",
+  "pipeline": [
+    "ESP32-CAM captura foto (JPEG, timestamp)",
+    "Encola en microSD (buffer 7 dias si no hay red)",
+    "Hotspot del celular sincroniza (4-6 fotos/dia, pocos min bastan)",
+    "Gemini Flash procesa ($0.002-0.004/foto, 1-2s latencia)",
+    "VLM responde JSON: {salud, sintomas, plaga, estres, confianza}",
+    "Grounding contra el grafo AGE de Chagra (cruza especie+plagas)",
+    "Si no coincide -> 'no verificado, requiere revision humana'",
+    "Recomendacion + guardas -> nodo DiagnosticoImagen"
+  ],
+  "prompt_anti_alucinacion": "NO inventes nombres de especies o plagas sin evidencia visual clara. Si no estas seguro, di 'no verificado' y sugiere revision humana.",
+  "costo_api_mensual": "$0.19-1 USD (insignificante)",
+  "costo_dominante": "Plan de datos ~$15.000-21.000 COP/mes (Claro cobertura rural 94.6%)",
+  "modelo_primario": "Gemini Flash (barato, rapido)",
+  "escalar_si_confianza_baja": "GPT-4o o Claude solo si confianza <70%"
+}
