@@ -48,6 +48,7 @@ import {
   scoreAntiHallucDeterministic,
   selectJudgeProvider,
 } from './lib/bench-scorer.mjs';
+import { summarizeReps, formatRepSummary } from './lib/bench-stats.mjs';
 import { assertCheckoutCurrent } from './lib/bench-checkout-guard.mjs';
 import { applyOutputGuards } from '../src/services/outputGuards.js';
 
@@ -83,6 +84,14 @@ const PROMPTS_FILE =
 
 // Tamaño de lote para el juez claude-cli (un spawn por lote, secuencial).
 const JUDGE_BATCH_SIZE = Number(process.env.JUDGE_BATCH_SIZE || 6);
+
+// VARIANZA (auditoría 2026-06-11): granite NO es determinista ni con seed fijo,
+// y el juez es todo-o-nada → el AH% rebota entre corridas (33%/25% misma config).
+// BENCH_REPS>1 corre N repeticiones (seed distinto por rep) y reporta media ±
+// desviación + IC95 en vez de UNA cifra engañosa. Default 1 (retrocompatible),
+// pero el summary SIEMPRE incluye el bloque de varianza (con n=1 avisa que no es
+// medible). Para una medición honesta de cara a la auditoría: BENCH_REPS=5.
+const BENCH_REPS = Math.max(1, Number(process.env.BENCH_REPS || 1));
 
 const GPU_TEMP_LIMIT = 88;
 const GPU_TEMP_RESUME = 75;
@@ -272,7 +281,7 @@ ENTIDADES DEL CATÁLOGO (usa estos nombres canónicos):
 ${entityContext}${confusionBlock}`;
 }
 
-async function generate(systemPrompt, userPrompt) {
+async function generate(systemPrompt, userPrompt, seed = SEED) {
   const start = performance.now();
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), GEN_TIMEOUT_MS);
@@ -287,7 +296,7 @@ async function generate(systemPrompt, userPrompt) {
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
         ],
-        options: { temperature: GEN_TEMPERATURE, seed: SEED, num_predict: GEN_MAX_TOKENS },
+        options: { temperature: GEN_TEMPERATURE, seed, num_predict: GEN_MAX_TOKENS },
         keep_alive: '30m',
       }),
       signal: controller.signal,
@@ -300,32 +309,21 @@ async function generate(systemPrompt, userPrompt) {
   }
 }
 
-// ── main ──────────────────────────────────────────────────────────────────────
+// ── una repetición (generar + juzgar + agregar) ───────────────────────────────
 
-async function main() {
-  assertCheckoutCurrent({
-    cwd: ROOT_DIR,
-    autoPull: process.env.BENCH_AUTO_PULL === '1',
-    skip: process.env.BENCH_SKIP_STALE_GUARD === '1',
-  });
-
-  const fixture = JSON.parse(readFileSync(PROMPTS_FILE, 'utf-8'));
-  const prompts = fixture.prompts || [];
-
-  console.log('[bench-borde] BORDE de alucinación — generador config-prod + juez fuerte');
-  console.log(`[bench-borde] generador: ${GEN_MODEL} temp=${GEN_TEMPERATURE} seed=${SEED} max_tokens=${GEN_MAX_TOKENS}`);
-  console.log(`[bench-borde] juez:      ${JUDGE.judgeModel} (provider=${JUDGE.provider}, deterministic=${JUDGE.deterministic})`);
-  console.log(`[bench-borde] fixture:   ${PROMPTS_FILE.split('/').pop()} (${prompts.length} prompts)`);
-  console.log(`[bench-borde] output:    ${BENCH_RUNS_DIR}`);
-  console.log(`[bench-borde] GPU temp inicial: ${gpuTemp() ?? 'n/d'}°C`);
-
-  if (!existsSync(BENCH_RUNS_DIR)) mkdirSync(BENCH_RUNS_DIR, { recursive: true });
+/**
+ * runRep — corre UNA repetición completa del bench (generación + juicio) con un
+ * seed dado. Devuelve los resultados por prompt + métricas agregadas de la rep.
+ * Extraído de main() para poder repetirlo N veces y medir varianza.
+ */
+async function runRep(prompts, { seed, repIndex, reps }) {
+  const tag = reps > 1 ? `[rep ${repIndex + 1}/${reps} seed=${seed}] ` : '';
 
   // ── Fase 1: GENERAR todas las respuestas (granite) ──────────────────────────
   const generated = [];
   for (let i = 0; i < prompts.length; i++) {
     const p = prompts[i];
-    console.log(`\n[gen ${i + 1}/${prompts.length}] ${p.id} (${p.region}/${p.complexity}): ${p.prompt.slice(0, 56)}...`);
+    console.log(`\n${tag}[gen ${i + 1}/${prompts.length}] ${p.id} (${p.region}/${p.complexity}): ${p.prompt.slice(0, 56)}...`);
     await thermalGuard();
 
     const { entities } = await resolveEntities(p.prompt);
@@ -333,7 +331,7 @@ async function main() {
 
     let gen;
     try {
-      gen = await generate(systemPrompt, p.prompt);
+      gen = await generate(systemPrompt, p.prompt, seed);
     } catch (err) {
       console.log(`    GEN ERROR: ${err.message}`);
       generated.push({ p, entities, error: err.message });
@@ -367,13 +365,13 @@ async function main() {
 
   const verdictById = new Map();
   if (JUDGE.deterministic) {
-    console.log(`\n[bench-borde] juez DETERMINÍSTICO (sin claude-cli) — limitación: no detecta alucinación semántica fina.`);
+    console.log(`\n${tag}juez DETERMINÍSTICO (sin claude-cli) — limitación: no detecta alucinación semántica fina.`);
     for (const it of judgeItems) {
       const v = scoreAntiHallucDeterministic(it);
       verdictById.set(it.id, { ...v, source: 'deterministic' });
     }
   } else {
-    console.log(`\n[bench-borde] juzgando ${judgeItems.length} respuestas con ${JUDGE.judgeModel} en lotes de ${JUDGE_BATCH_SIZE} (secuencial)...`);
+    console.log(`\n${tag}juzgando ${judgeItems.length} respuestas con ${JUDGE.judgeModel} en lotes de ${JUDGE_BATCH_SIZE} (secuencial)...`);
     for (let i = 0; i < judgeItems.length; i += JUDGE_BATCH_SIZE) {
       const batch = judgeItems.slice(i, i + JUDGE_BATCH_SIZE);
       const t0 = performance.now();
@@ -383,7 +381,7 @@ async function main() {
     }
   }
 
-  // ── Fase 3: armar resultados + summary ──────────────────────────────────────
+  // ── Fase 3: armar resultados de la rep ──────────────────────────────────────
   const results = [];
   let pass = 0;
   let fail = 0;
@@ -410,12 +408,14 @@ async function main() {
     const sidecarSplit = splitNegatedHallucinations(g.finalText, g.validation.hallucinated);
     results.push({
       id: g.p.id,
+      rep: repIndex + 1,
+      seed,
       region: g.p.region,
       axes: g.p.axes,
       complexity: g.p.complexity,
       prompt: g.p.prompt,
       entities_grounded: g.entities.length,
-      generator: { model: GEN_MODEL, temperature: GEN_TEMPERATURE, seed: SEED, max_tokens: GEN_MAX_TOKENS },
+      generator: { model: GEN_MODEL, temperature: GEN_TEMPERATURE, seed, max_tokens: GEN_MAX_TOKENS },
       raw_response: g.gen.response,
       guarded_response: g.finalText,
       guards_modified: g.guarded.modified,
@@ -453,15 +453,57 @@ async function main() {
     if (r.ah_pass) byRegion[reg].pass++;
   }
 
+  console.log(`\n${tag}RESULTADO  PASS=${pass}  FAIL=${fail}  UNJUDGED=${unjudged}  AH%=${ahPct.toFixed(1)}`);
+  return { results, pass, fail, unjudged, judged, ahPct, byAxis, byRegion };
+}
+
+// ── main ──────────────────────────────────────────────────────────────────────
+
+async function main() {
+  assertCheckoutCurrent({
+    cwd: ROOT_DIR,
+    autoPull: process.env.BENCH_AUTO_PULL === '1',
+    skip: process.env.BENCH_SKIP_STALE_GUARD === '1',
+  });
+
+  const fixture = JSON.parse(readFileSync(PROMPTS_FILE, 'utf-8'));
+  const prompts = fixture.prompts || [];
+
+  console.log('[bench-borde] BORDE de alucinación — generador config-prod + juez fuerte');
+  console.log(`[bench-borde] generador: ${GEN_MODEL} temp=${GEN_TEMPERATURE} seed=${SEED} max_tokens=${GEN_MAX_TOKENS}`);
+  console.log(`[bench-borde] juez:      ${JUDGE.judgeModel} (provider=${JUDGE.provider}, deterministic=${JUDGE.deterministic})`);
+  console.log(`[bench-borde] fixture:   ${PROMPTS_FILE.split('/').pop()} (${prompts.length} prompts)`);
+  console.log(`[bench-borde] reps:      ${BENCH_REPS}${BENCH_REPS < 2 ? ' (UNA corrida — varianza NO medible; usá BENCH_REPS=5 para la auditoría)' : ' (varianza medida)'}`);
+  console.log(`[bench-borde] output:    ${BENCH_RUNS_DIR}`);
+  console.log(`[bench-borde] GPU temp inicial: ${gpuTemp() ?? 'n/d'}°C`);
+
+  if (!existsSync(BENCH_RUNS_DIR)) mkdirSync(BENCH_RUNS_DIR, { recursive: true });
+
   const dateStr = new Date().toISOString().split('T')[0];
-  const jsonlPath = join(BENCH_RUNS_DIR, `borde-alucinacion-${dateStr}.jsonl`);
+
+  // Corré N repeticiones con seed distinto por rep → muestrea la no-determinación
+  // real de granite. Cada rep escribe su propio JSONL.
+  const reps = [];
+  for (let k = 0; k < BENCH_REPS; k++) {
+    const seed = SEED + k;
+    const rep = await runRep(prompts, { seed, repIndex: k, reps: BENCH_REPS });
+    reps.push(rep);
+
+    const repSuffix = BENCH_REPS > 1 ? `.rep${k + 1}` : '';
+    const jsonlPath = join(BENCH_RUNS_DIR, `borde-alucinacion-${dateStr}${repSuffix}.jsonl`);
+    writeFileSync(jsonlPath, rep.results.map((r) => JSON.stringify(r)).join('\n') + '\n');
+    console.log(`  JSONL rep ${k + 1}: ${jsonlPath}`);
+  }
+
+  // ── Varianza entre reps (honestidad: media ± desviación, no UNA cifra) ───────
+  const ahValues = reps.map((r) => Number(r.ahPct.toFixed(1)));
+  const ahStats = summarizeReps(ahValues);
+  const lastRep = reps[reps.length - 1];
+
   const summaryPath = join(BENCH_RUNS_DIR, `borde-alucinacion-${dateStr}.summary.json`);
-
-  writeFileSync(jsonlPath, results.map((r) => JSON.stringify(r)).join('\n') + '\n');
-
   const summary = {
     generated_at: new Date().toISOString(),
-    generator: { model: GEN_MODEL, temperature: GEN_TEMPERATURE, seed: SEED, max_tokens: GEN_MAX_TOKENS, config: 'PROD (llmRouter chat_complex)' },
+    generator: { model: GEN_MODEL, temperature: GEN_TEMPERATURE, base_seed: SEED, max_tokens: GEN_MAX_TOKENS, config: 'PROD (llmRouter chat_complex)' },
     judge: {
       model: JUDGE.judgeModel,
       provider: JUDGE.provider,
@@ -471,33 +513,41 @@ async function main() {
     },
     fixture: PROMPTS_FILE,
     n_prompts: prompts.length,
-    pass,
-    fail,
-    unjudged,
-    judged,
-    ah_pct: Number(ahPct.toFixed(1)),
-    by_axis: Object.fromEntries(
-      Object.entries(byAxis).map(([k, v]) => [k, { pass: v.pass, total: v.total, ah_pct: Number(((100 * v.pass) / v.total).toFixed(1)) }]),
-    ),
-    by_region: Object.fromEntries(
-      Object.entries(byRegion).map(([k, v]) => [k, { pass: v.pass, total: v.total, ah_pct: Number(((100 * v.pass) / v.total).toFixed(1)) }]),
-    ),
-    failed: results.filter((r) => r.ah_pass === false).map((r) => ({ id: r.id, axes: r.axes, red_flags_hit: r.ah_red_flags_hit, must: `${r.ah_must_covered}/${r.ah_must_total}` })),
-    guard_misses: results
-      .filter((r) => Array.isArray(r.expected_guard_miss) && r.expected_guard_miss.length > 0)
-      .map((r) => ({ id: r.id, axes: r.axes, expected_guard_miss: r.expected_guard_miss, guards_reasons: r.guards_reasons })),
-    sidecar_negated_mentions: results
-      .filter((r) => Array.isArray(r.sidecar_hallucinated_negated) && r.sidecar_hallucinated_negated.length > 0)
-      .map((r) => ({ id: r.id, names: r.sidecar_hallucinated_negated })),
-    unjudged_ids: results.filter((r) => r.judge && r.judge.source === 'unjudged').map((r) => r.id),
+    // VARIANZA: la métrica honesta es la distribución, no una corrida.
+    reps: BENCH_REPS,
+    ah_pct_per_rep: ahValues,
+    ah_pct_mean: ahStats.mean,
+    ah_pct_stddev: ahStats.stddev,
+    ah_pct_min: ahStats.min,
+    ah_pct_max: ahStats.max,
+    ah_pct_ci95: BENCH_REPS > 1 ? [ahStats.ci95Lo, ahStats.ci95Hi] : null,
+    variance_measurable: BENCH_REPS > 1,
+    // Detalle de la ÚLTIMA rep (compat con herramientas previas que leían una corrida).
+    last_rep: {
+      pass: lastRep.pass,
+      fail: lastRep.fail,
+      unjudged: lastRep.unjudged,
+      judged: lastRep.judged,
+      ah_pct: Number(lastRep.ahPct.toFixed(1)),
+      by_axis: Object.fromEntries(
+        Object.entries(lastRep.byAxis).map(([k, v]) => [k, { pass: v.pass, total: v.total, ah_pct: Number(((100 * v.pass) / v.total).toFixed(1)) }]),
+      ),
+      by_region: Object.fromEntries(
+        Object.entries(lastRep.byRegion).map(([k, v]) => [k, { pass: v.pass, total: v.total, ah_pct: Number(((100 * v.pass) / v.total).toFixed(1)) }]),
+      ),
+      failed: lastRep.results.filter((r) => r.ah_pass === false).map((r) => ({ id: r.id, axes: r.axes, red_flags_hit: r.ah_red_flags_hit, must: `${r.ah_must_covered}/${r.ah_must_total}` })),
+      guard_misses: lastRep.results
+        .filter((r) => Array.isArray(r.expected_guard_miss) && r.expected_guard_miss.length > 0)
+        .map((r) => ({ id: r.id, axes: r.axes, expected_guard_miss: r.expected_guard_miss, guards_reasons: r.guards_reasons })),
+      unjudged_ids: lastRep.results.filter((r) => r.judge && r.judge.source === 'unjudged').map((r) => r.id),
+    },
   };
   writeFileSync(summaryPath, JSON.stringify(summary, null, 2) + '\n');
 
   console.log('\n══════════════════════════════════════════════════');
-  console.log(`RESULTADO  PASS=${pass}  FAIL=${fail}  UNJUDGED=${unjudged}  (juzgados=${judged})`);
-  console.log(`AH% (juez ${JUDGE.provider}, config-prod) = ${ahPct.toFixed(1)}%`);
-  console.log(`Por eje:    ${JSON.stringify(summary.by_axis)}`);
-  console.log(`JSONL:   ${jsonlPath}`);
+  console.log(formatRepSummary(`AH% (juez ${JUDGE.provider}, config-prod)`, ahStats));
+  if (BENCH_REPS > 1) console.log(`Por rep:    [${ahValues.join(', ')}]`);
+  console.log(`Por eje (última rep): ${JSON.stringify(summary.last_rep.by_axis)}`);
   console.log(`SUMMARY: ${summaryPath}`);
   console.log('══════════════════════════════════════════════════');
 }
