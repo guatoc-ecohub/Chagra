@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { CAPABILITY_MANIFEST } from '../../services/agentCapabilities';
+import { getCapabilityHealth, SIDECAR_TOOL_NAMES } from '../../services/capabilityHealth';
+import { isSidecarEnabled } from '../../services/sidecarClient';
 import {
   relax, nodeRect, rimPoint, shelfPack, treeLadder, placeLeavesNoClash,
 } from './agentRedMenuGeom';
@@ -352,6 +354,10 @@ const CSS = `
   padding:2px 7px;opacity:.9}
 .arm-node.arm-soon{cursor:default}
 .arm-node.arm-soon .arm-orb{border-style:dashed}
+.arm-node.arm-down{cursor:default}
+.arm-node.arm-down .arm-orb{border-style:dashed;opacity:.55}
+.arm-node.arm-down .arm-lbl{opacity:.6}
+.arm-badge-down{color:var(--warnC, #f59e0b);border-color:var(--warnC, #f59e0b40)}
 /* pista de uso — abajo-derecha: la esquina libre con la red brotando del
    botón Ⓐ (abajo-izquierda) hacia arriba-derecha. */
 .arm-hint{position:absolute;right:14px;bottom:10px;z-index:2;
@@ -403,6 +409,26 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
 
   const treeMode = themeKind === 'nature';
 
+  /* Estado real de cada capacidad: live (pleno), soon (por lanzar),
+     down (dependencia rota, ej. sidecar caido). Deterministico,
+     sin side-effects ocultos — las dependencias vienen de imports. */
+  const capabilityHealth = useMemo(() => {
+    try {
+      const sidecarOn = isSidecarEnabled();
+      return new Map(CAPABILITY_MANIFEST.map((cap) => [
+        cap.id,
+        getCapabilityHealth(cap.id, {
+          manifest: CAPABILITY_MANIFEST,
+          isSidecarEnabled: sidecarOn,
+          sidecarToolNames: SIDECAR_TOOL_NAMES,
+        }),
+      ]));
+    } catch {
+      // Degradacion total: todo live (el menu nunca se rompe)
+      return new Map(CAPABILITY_MANIFEST.map((cap) => [cap.id, 'live']));
+    }
+  }, []);
+
   /* Motor imperativo: layout + rAF (port del demo). Re-brota al cambiar
      entre mecánica micorriza (biopunk/min) y árbol (nature). */
   useEffect(() => {
@@ -442,11 +468,13 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
         leafAbsR: [], leafOffR: [], leafAbsT: [], leafOffT: [],
         leaves: g.leaves.map((cap, j) => {
           const lel = root.querySelector(`[data-arm-leaf="${i}-${j}"]`);
+          const health = capabilityHealth.get(cap.id) || 'live';
           return {
             el: lel,
             orb: lel.querySelector('.arm-orb'),
             lblEl: lel.querySelector('.arm-lbl'),
-            soon: cap.status === 'soon',
+            soon: health === 'soon',
+            down: health === 'down',
             pGlow: mkPath(gGlow, 'lf'),
             pCore: mkPath(gCore, 'lf'),
             grow: 0, growT: 0,
@@ -815,7 +843,7 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
             setDash(lf.pCore, L, e); setDash(lf.pGlow, L, e);
           } else { clearDash(lf.pCore); clearDash(lf.pGlow); }
           lf.el.style.transform = `translate(${r1(lx)}px,${r1(ly)}px)`;
-          lf.el.style.opacity = ((lf.soon ? 0.72 : 1) * e).toFixed(3);
+          lf.el.style.opacity = ((lf.soon || lf.down ? 0.72 : 1) * e).toFixed(3);
           lf.orb.style.transform = `scale(${(0.5 + 0.5 * e).toFixed(3)})`;
           lf.lblEl.style.opacity = e.toFixed(3);
         });
@@ -900,7 +928,7 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
       });
       engineRef.current = null;
     };
-  }, [treeMode, anchorRef]);
+  }, [treeMode, anchorRef, capabilityHealth]);
 
   function showToast(msg) {
     setToastMsg(msg);
@@ -916,8 +944,13 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
   function handleLeafTap(ev, cap) {
     if (disabled) return;
     bounce(ev.currentTarget);
-    if (cap.status === 'soon') {
+    const health = capabilityHealth.get(cap.id) || 'live';
+    if (health === 'soon') {
       showToast(`${cap.icon} ${cap.label} — por lanzar`);
+      return;
+    }
+    if (health === 'down') {
+      showToast(`${cap.icon} ${cap.label} — no disponible sin conexión al servidor`);
       return;
     }
     if (onPick) onPick(cap);
@@ -1027,15 +1060,18 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
 
         {GROUPS.map((g, i) =>
           g.leaves.map((cap, j) => {
-            const soon = cap.status === 'soon';
+            const health = capabilityHealth.get(cap.id) || 'live';
+            const isSoon = health === 'soon';
+            const isDown = health === 'down';
+            const dimmed = isSoon || isDown;
             return (
               <div
                 key={cap.id}
-                className={`arm-node arm-leaf${soon ? ' arm-soon' : ''}`}
+                className={`arm-node arm-leaf${isSoon ? ' arm-soon' : ''}${isDown ? ' arm-down' : ''}`}
                 role="button"
-                tabIndex={soon ? -1 : 0}
-                aria-label={soon ? `${cap.label} (por lanzar)` : cap.label}
-                aria-disabled={soon || disabled || undefined}
+                tabIndex={dimmed ? -1 : 0}
+                aria-label={isSoon ? `${cap.label} (por lanzar)` : isDown ? `${cap.label} (sin conexión al servidor)` : cap.label}
+                aria-disabled={dimmed || disabled || undefined}
                 data-arm-leaf={`${i}-${j}`}
                 style={{ display: 'none' }}
                 onClick={(ev) => handleLeafTap(ev, cap)}
@@ -1054,10 +1090,16 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
                 </div>
                 <div className="arm-lbl">
                   {cap.label}
-                  {soon && (
+                  {isSoon && (
                     <>
                       <br />
                       <span className="arm-badge">por lanzar</span>
+                    </>
+                  )}
+                  {isDown && (
+                    <>
+                      <br />
+                      <span className="arm-badge arm-badge-down">sin servidor</span>
                     </>
                   )}
                 </div>

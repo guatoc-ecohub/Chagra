@@ -6,6 +6,33 @@
  */
 
 /**
+ * Tools que dependen del sidecar MCP agro (ALLOWED_TOOLS en sidecarClient).
+ * Si el sidecar está caído/deshabilitado, las capacidades que usan estas
+ * tools se marcan 'down'. Las capacidades con tools NO listadas acá son
+ * offline-first y siempre están 'live'.
+ */
+export const SIDECAR_TOOL_NAMES = new Set([
+  'get_species',
+  'get_companions',
+  'get_biopreparados',
+  'get_pest_controllers',
+  'get_multihop_companions',
+  'get_subgrafo_relacional',
+  'get_diseno_restauracion',
+  'validate_visual_match',
+  'validate_taxonomy',
+  'get_normativa_ica',
+  'get_clima_ideam',
+  'get_precio_sipsa',
+  'get_enso_status',
+  'get_alertas_clima_zona',
+  'get_saberes',
+  'get_toxicidad',
+  'get_variedades',
+  'get_suelo',
+]);
+
+/**
  * @typedef {Object} CapabilityStatus
  * @property {string} name — nombre legible
  * @property {'ok'|'degraded'|'down'} status
@@ -67,4 +94,49 @@ export function hasCriticalFailure(statuses) {
  */
 export function getDegradedCapabilities(statuses) {
   return statuses.filter((s) => s.status !== 'ok');
+}
+
+/**
+ * Determina el estado real de una capacidad individual.
+ *
+ * Reglas determinísticas, sin side-effects ocultos:
+ * 1. Si el manifest marca `status: 'soon'` → 'soon' (futura).
+ * 2. Si la tool de la capacidad está en `sidecarToolNames` y el sidecar
+ *    NO está habilitado → 'down' (dependencia rota).
+ * 3. En cualquier otro caso → 'live' (offline-first o sidecar activo).
+ *
+ * Degradación segura: si el capabilityId no está en el manifest,
+ * retorna 'live' (asume offline-first, no rompe el menú).
+ *
+ * @param {string} capabilityId — id de la capacidad (ej. 'siembro')
+ * @param {Object} deps — dependencias inyectadas (testeable)
+ * @param {Array<{id:string, status:string, tool:string|null}>} [deps.manifest]
+ * @param {boolean} [deps.isSidecarEnabled=true]
+ * @param {Set<string>|Array<string>} [deps.sidecarToolNames]
+ * @returns {'live'|'soon'|'down'}
+ */
+export function getCapabilityHealth(capabilityId, deps = {}) {
+  const {
+    manifest = [],
+    isSidecarEnabled = false,
+    sidecarToolNames = SIDECAR_TOOL_NAMES,
+  } = deps;
+
+  const toolsSet = sidecarToolNames instanceof Set
+    ? sidecarToolNames
+    : new Set(sidecarToolNames);
+
+  const cap = Array.isArray(manifest)
+    ? manifest.find((c) => c.id === capabilityId)
+    : null;
+
+  if (!cap) return 'live';
+
+  if (cap.status === 'soon') return 'soon';
+
+  if (cap.tool && toolsSet.has(cap.tool) && !isSidecarEnabled) {
+    return 'down';
+  }
+
+  return 'live';
 }
