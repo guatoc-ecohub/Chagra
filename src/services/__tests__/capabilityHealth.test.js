@@ -50,10 +50,11 @@ describe('getDegradedCapabilities', () => {
 
 describe('getCapabilityHealth — estado real por capacidad', () => {
   it('SIDECAR_TOOL_NAMES contiene las tools que dependen del sidecar', () => {
-    expect(SIDECAR_TOOL_NAMES.has('get_species')).toBe(true);
-    expect(SIDECAR_TOOL_NAMES.has('get_biopreparados')).toBe(true);
-    expect(SIDECAR_TOOL_NAMES.has('get_clima_ideam')).toBe(true);
-    expect(SIDECAR_TOOL_NAMES.has('get_pest_controllers')).toBe(true);
+    expect(SIDECAR_TOOL_NAMES.has('get_multihop_companions')).toBe(true);
+    expect(SIDECAR_TOOL_NAMES.has('get_subgrafo_relacional')).toBe(true);
+    expect(SIDECAR_TOOL_NAMES.has('get_saberes')).toBe(true);
+    expect(SIDECAR_TOOL_NAMES.has('get_toxicidad')).toBe(true);
+    expect(SIDECAR_TOOL_NAMES.has('get_suelo')).toBe(true);
     // Locales/offline NO están
     expect(SIDECAR_TOOL_NAMES.has('assets')).toBe(false);
     expect(SIDECAR_TOOL_NAMES.has('voice_capture')).toBe(false);
