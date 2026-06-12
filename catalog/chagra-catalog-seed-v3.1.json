@@ -4172,7 +4172,8 @@
         "gbif-taxonomic-backbone",
         "agrosavia-manual-frutales-tropicales",
         "perez-arbelaez-1947-plantas-utiles"
-      ]
+      ],
+      "estrato": "alto"
     },
     {
       "id": "musa_paradisiaca",
@@ -4265,7 +4266,8 @@
         "phaseolus_vulgaris",
         "manihot_esculenta",
         "cajanus_cajan"
-      ]
+      ],
+      "estrato": "alto"
     },
     {
       "id": "carludovica_palmata",

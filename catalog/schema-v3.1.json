@@ -152,7 +152,8 @@
               "living_fence",
               "invasive",
               "windbreak",
-              "nurse_plant"
+              "nurse_plant",
+              "shade_lover"
             ]
           },
           "minItems": 1,
@@ -178,7 +179,10 @@
           ]
         },
         "rol_restauracion": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "enum": [
             "pionera",
             "secundaria",
@@ -189,7 +193,10 @@
           "description": "Módulo Reforestación+Incendios (Fase 1, schema v3.2 — MODULO_REFORESTACION_INCENDIOS_2026-06-02). Rol sucesional de la especie en restauración ecológica: 'pionera' (coloniza áreas degradadas/post-incendio, crecimiento rápido, facilita sucesión), 'secundaria' (etapa intermedia, se establece bajo pioneras), 'climax' (bosque maduro estable, dosel denso), 'nodriza' (nurse plant: protege/facilita el establecimiento de otras especies sin ser necesariamente sucesional). null = sin rol de restauración asignado o no respaldado por fuente. Regla anti-alucinación: solo valor no-null con respaldo de fuente Tier-A o DR citado."
         },
         "resistencia_fuego": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "enum": [
             "alta",
             "media",
@@ -199,16 +206,27 @@
           "description": "Módulo Reforestación+Incendios (Fase 1, schema v3.2). Aptitud de la especie como cortafuego vivo / baja inflamabilidad foliar: 'alta' (hoja húmeda/suculenta, baja inflamabilidad, útil como cortafuego), 'media', 'baja'. null = sin dato verificado (NO inferir). Regla anti-alucinación (doc §2.3): este campo solo recibe valor no-null con fuente Tier-A verificada. NO es lo mismo que invasora_combustible (especies pirofíticas/inflamables tienen resistencia_fuego=null, no 'baja', porque el campo mide aptitud cortafuego, no la peligrosidad)."
         },
         "apta_ribera": {
-          "type": ["boolean", "null"],
+          "type": [
+            "boolean",
+            "null"
+          ],
           "description": "Módulo Reforestación+Incendios (Fase 1, schema v3.2). true si la especie es apta para restauración riparia / estabilización de orillas y cauces; false si no lo es; null si no se ha evaluado. Respaldo requerido por fuente o DR."
         },
         "invasora_combustible": {
-          "type": ["boolean", "null"],
+          "type": [
+            "boolean",
+            "null"
+          ],
           "description": "Módulo Reforestación+Incendios (Fase 1, schema v3.2). true si la especie es invasora con alta carga combustible que amplifica incendios (pirofítica/inflamable), p.ej. Ulex europaeus, Genista monspessulana, Eucalyptus globulus, Melinis minutiflora, Pinus patula; false si no; null si no se ha evaluado. Independiente de category/conservation_status: una especie marcada naturalizada (no 'invasor') puede tener invasora_combustible=true si la fuente lo respalda."
         },
         "cites_appendix": {
           "type": "string",
-          "enum": ["I", "II", "III", "NO_APLICA"],
+          "enum": [
+            "I",
+            "II",
+            "III",
+            "NO_APLICA"
+          ],
           "description": "CITES Appendix listing if applicable. I=most restrictive, II=trade-regulated, III=country-specific, NO_APLICA=not in CITES."
         },
         "harvest_type": {
@@ -959,11 +977,18 @@
                 "discriminator": {
                   "propertyName": "tipo"
                 },
-                "required": ["tipo", "alcance"],
+                "required": [
+                  "tipo",
+                  "alcance"
+                ],
                 "properties": {
                   "tipo": {
                     "type": "string",
-                    "enum": ["regulatoria", "contexto_etnocultural", "estatus_conservacion"],
+                    "enum": [
+                      "regulatoria",
+                      "contexto_etnocultural",
+                      "estatus_conservacion"
+                    ],
                     "description": "regulatoria = norma vigente con obligación. contexto_etnocultural = patrimonio/uso ritual/saber comunidad sin norma específica. estatus_conservacion = categoría IUCN/Libro Rojo/etc."
                   },
                   "norma": {
@@ -1367,7 +1392,11 @@
         },
         "confianza": {
           "type": "string",
-          "enum": ["alta", "media", "baja"],
+          "enum": [
+            "alta",
+            "media",
+            "baja"
+          ],
           "description": "Nivel de confianza en la dosis verificada: alta = receta estandarizada con fuente institucional; media = rango campesino documentado con variacion entre fuentes; baja = gramajes variables/no estandarizados, verificar receta institucional antes de escalar."
         },
         "target": {
