@@ -35,6 +35,12 @@ export const STAGE_LABELS = Object.freeze({
   fruiting: 'Echando fruto',
   harvest_window: 'Cosecha',
   closed: 'Ciclo cerrado',
+  // Restauración/silvopastoreo (no fenología de cultivo): hitos propios.
+  establecimiento: 'Establecimiento',
+  prendimiento: 'Prendimiento',
+  mantenimiento: 'Mantenimiento',
+  monitoreo_sucesion: 'Monitoreo de sucesión',
+  cierre: 'Cierre',
 });
 
 export const STAGE_EMOJIS = Object.freeze({
@@ -45,6 +51,12 @@ export const STAGE_EMOJIS = Object.freeze({
   fruiting: '🍎',
   harvest_window: '🧺',
   closed: '🏁',
+  // Restauración/silvopastoreo.
+  establecimiento: '🌱',
+  prendimiento: '🌿',
+  mantenimiento: '🪴',
+  monitoreo_sucesion: '🌳',
+  cierre: '🏞️',
 });
 
 /**

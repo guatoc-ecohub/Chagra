@@ -27,6 +27,7 @@ import { cropAlertEngine } from './services/cropAlertEngine';
 // comentario abajo donde se removió el render).
 // import FieldFeedback from './components/FieldFeedback';
 import AgentFab from './components/AgentFab';
+import AgentOfflineGuard from './components/AgentScreen/AgentOfflineGuard';
 import { ScreenShell } from './components/common/ScreenShell';
 import ChagraGrowLoader from './components/ChagraGrowLoader';
 import Confetti from './components/common/Confetti';
@@ -360,6 +361,23 @@ export default function App() {
   // Solo activos post-login (no en loading ni login para no atrapar shift+?
   // accidental al escribir password).
   const [currentView, setCurrentView] = useState('loading');
+  // Estado online reactivo: usado para mostrar el aviso offline del agente
+  // ANTES de intentar el dynamic import de AgentScreen (ver `case 'agente'`).
+  // Sin esto, abrir el agente offline con su chunk no cacheado caía en el
+  // ErrorBoundary genérico y el guard offline real quedaba inalcanzable.
+  const [isAppOnline, setIsAppOnline] = useState(
+    typeof navigator !== 'undefined' ? navigator.onLine : true
+  );
+  useEffect(() => {
+    const goOnline = () => setIsAppOnline(true);
+    const goOffline = () => setIsAppOnline(false);
+    window.addEventListener('online', goOnline);
+    window.addEventListener('offline', goOffline);
+    return () => {
+      window.removeEventListener('online', goOnline);
+      window.removeEventListener('offline', goOffline);
+    };
+  }, []);
   useGlobalKeyboardShortcuts({ enabled: currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' });
   const [currentViewData, setCurrentViewData] = useState(null);
   const [toast, setToast] = useState(null);
@@ -861,6 +879,20 @@ export default function App() {
           </ErrorBoundary>
         );
       case 'agente':
+        // Guard offline ANTES del dynamic import (bug offline-first 2026-06-13):
+        // AgentScreen es un chunk lazy. Si se abre el agente OFFLINE con ese
+        // chunk no cacheado por el SW, el import() falla → ErrorBoundary genérico
+        // ("Algo falló") y el guard offline real (ollamaStream) queda
+        // inalcanzable porque el componente nunca monta. Chequear navigator.onLine
+        // acá deja ver el aviso claro ("el asistente necesita internet; tus datos
+        // sí funcionan sin conexión") aunque el chunk no esté disponible.
+        if (!isAppOnline) {
+          return (
+            <ErrorBoundary>
+              <AgentOfflineGuard onBack={() => navigate('dashboard')} />
+            </ErrorBoundary>
+          );
+        }
         // 2026-05-28: pasamos currentViewData como initialContext para que
         // notificaciones críticas (helada, alerta clima) lleguen al agente
         // con prompt pre-cargado + cita de la fuente (IDEAM/NOAA/CIIFEN/

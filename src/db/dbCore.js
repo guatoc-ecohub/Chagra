@@ -38,7 +38,7 @@
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 19;
+export const DB_VERSION = 20;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -67,6 +67,12 @@ export const STORES = {
   // procesa exactamente UNA vez (claim atómico anti-duplicado). NUNCA se
   // pierde el dato del usuario — ese es el contrato.
   AGENT_OUTBOX: 'agent_outbox',
+  // v20: agent_requests — cola durable de requests al agente + telemetría rica.
+  // Cada item incluye prompt, ruta, modelo, grounding (entities, tools, RAG),
+  // latencias (t_first_token_ms, t_total_ms, queue_wait_ms), response, tokens,
+  // retries y status (queued/sending/done/failed/offline). Permite debuggear
+  // inteligencia+velocidad de Chagra y garantiza que ninguna pregunta se pierda.
+  AGENT_REQUESTS: 'agent_requests',
 };
 
 let dbInstance = null;
@@ -316,6 +322,25 @@ export const openDB = async () => {
         }
         if (fpeStore && !fpeStore.indexNames.contains('process_id')) {
           fpeStore.createIndex('process_id', 'attributes.process_id', { unique: false });
+        }
+      }
+
+      // v20: agent_requests — cola durable de requests al agente + telemetría rica.
+      // Alimenta el dashboard de debug de Chagra (inteligencia + velocidad) y
+      // garantiza que ninguna pregunta se pierda. Schema:
+      //   { id, ts_submit, prompt, route, model, grounding: {entities, tools,
+      //     rag_chunks, nlu_route, grounded_status}, latency: {t_first_token_ms,
+      //     t_total_ms, queue_wait_ms}, response, tokens_in, tokens_out, retries,
+      //     status: queued/sending/done/failed/offline, ts_done }
+      // keyPath autoIncrement (como vision_queue). Índices para drainPending
+      // (status, ts_submit) y queries (model, route).
+      if (event.oldVersion < 20) {
+        if (!db.objectStoreNames.contains(STORES.AGENT_REQUESTS)) {
+          const store = db.createObjectStore(STORES.AGENT_REQUESTS, { keyPath: 'id', autoIncrement: true });
+          store.createIndex('status', 'status', { unique: false });
+          store.createIndex('ts_submit', 'ts_submit', { unique: false });
+          store.createIndex('model', 'model', { unique: false });
+          store.createIndex('route', 'route', { unique: false });
         }
       }
     };
