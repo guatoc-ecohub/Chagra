@@ -162,42 +162,42 @@ test.describe('La mano de Chagra — funcional: ruteo sin dead-ends', () => {
     expect(dead, `capacidades hero con ruta muerta: ${dead.map((c) => c.id).join(', ')}`).toEqual([]);
   });
 
-  test('un nodo VIVO "ask" rutea al CHAT real (Investigación profunda)', async ({ page }) => {
+  test('un nodo de NAVEGACIÓN "ask" sin dead-end: Investigación profunda (soon) NO atasca', async ({ page }) => {
     await bootToDashboard(page);
     await openArana(page);
 
-    // 'deep' (Investigación profunda) es el nodo 'ask' SIEMPRE vivo: tool=null
-    // (NO depende del sidecar) y status='live' en el manifiesto. Es el caso
-    // correcto para validar "ask → chat real" offline-first. (Los otros 'ask'
-    // —siembro/plaga/clima…— usan tools de sidecar y caen a 'down' sin servidor,
-    // lo que se cubre aparte en la sección live/soon/down.)
+    // B14: 'deep' (Investigación profunda) pasó de 'live' a 'soon' — la feature
+    // de deep research aún no está servible en prod (backend tras la flag
+    // VITE_DEEP_RESEARCH_ENABLED, off por defecto). El nodo NO debe ser un
+    // callejón sin salida: se pinta atenuado (arm-soon), no es tabbable, y al
+    // tocarlo avisa "por lanzar" SIN navegar — la red sigue viva. heroRoute es
+    // 'unavailable' (no 'ask'): no promete un chat que no existe.
     const deep = HERO_CAPS.find((c) => c.id === 'deep');
-    expect(deep?.heroRoute?.kind).toBe('ask');
+    expect(deep?.status).toBe('soon');
+    expect(deep?.heroRoute?.kind).toBe('unavailable');
     expect(deep?.tool).toBeFalsy();
+
+    // En el catálogo del DOM la hoja deep debe estar marcada soon y no-tabbable.
+    const cat = await readLeafCatalog(page);
+    const deepLeaf = cat.find((l) => (l.label || '').toLowerCase().includes('investigación profunda'));
+    expect(deepLeaf, 'la hoja Investigación profunda debe existir en la red').toBeTruthy();
+    expect(deepLeaf.soon, 'Investigación profunda debe estar marcada soon (atenuada)').toBe(true);
+    expect(deepLeaf.tabIndex, 'una hoja soon NO es tabbable').toBe(-1);
 
     // Enfocar su grupo (aprender) y esperar a que broten las hojas.
     await expandGroup(page, 'Aprender');
 
     const leaf = page.locator('.arm-node.arm-leaf', { hasText: 'Investigación profunda' }).first();
     await expect(leaf).toBeVisible({ timeout: 8000 });
-    // Debe estar VIVA (no down/soon) — es la precondición del ruteo a chat.
-    await expect(leaf).not.toHaveClass(/arm-down|arm-soon/);
+    // Atenuada como soon (no live, no down).
+    await expect(leaf).toHaveClass(/arm-soon/);
+    await expect(leaf).not.toHaveClass(/arm-down/);
 
-    // Activación a11y (focus + Enter) → pickCapability('ask') → handleChipSend →
-    // send() → la transición de envío arranca y onNavigate('agente') monta el
-    // chat real. (Keyboard porque las hojas se solapan/animan; el handler es el
-    // mismo onClick/onKeyDown del nodo.)
-    await leaf.focus();
-    await leaf.press('Enter');
-
-    // Aterrizaje en el chat real: el AgentScreen (textarea del agente) aparece,
-    // o como mínimo el hero deja de mostrar el panel de la red (no quedó atascado).
-    const landedChat = page
-      .locator('textarea, [role="textbox"], [data-testid="agent-screen"]')
-      .first();
-    await expect(landedChat).toBeVisible({ timeout: 15000 });
-    // El menú se cerró: no hay panel de capacidades colgando.
-    await expect(page.locator('.arm-root')).toHaveCount(0, { timeout: 8000 });
+    // Tocarla NO navega ni rompe: toast "por lanzar" y el menú sigue abierto.
+    await leaf.click({ force: true }); // soon es pointer-events default; force el tap
+    await expect(page.locator('.arm-toast')).toContainText(/por lanzar/i, { timeout: 5000 });
+    // No quedó atascado: la red sigue montada (no aterrizó en un chat fantasma).
+    await expect(page.locator('.arm-root')).toBeVisible();
   });
 
   test('un nodo de NAVEGACIÓN abre su pantalla (Mis plantas → activos)', async ({ page }) => {

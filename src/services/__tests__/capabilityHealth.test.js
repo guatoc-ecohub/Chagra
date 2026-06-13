@@ -72,7 +72,14 @@ describe('getCapabilityHealth — estado real por capacidad', () => {
     expect(getCapabilityHealth('ciclo', deps)).toBe('live');
     expect(getCapabilityHealth('procesos', deps)).toBe('live');
     expect(getCapabilityHealth('voz', deps)).toBe('live');
-    expect(getCapabilityHealth('foto', deps)).toBe('live');
+  });
+
+  it('foto retorna soon (manifest: identificacion por foto necesita GPU >=8GB)', () => {
+    // foto es status:'soon' en el manifiesto (hardware insuficiente en Maxwell);
+    // el manifest manda, sin importar el estado del sidecar.
+    const deps = makeDeps({ isSidecarEnabled: false });
+    expect(getCapabilityHealth('foto', deps)).toBe('soon');
+    expect(getCapabilityHealth('foto', makeDeps({ isSidecarEnabled: true }))).toBe('soon');
   });
 
   it('capacidades sidecar-dependent retornan live con sidecar habilitado', () => {
@@ -101,9 +108,12 @@ describe('getCapabilityHealth — estado real por capacidad', () => {
     expect(getCapabilityHealth('precio', depsOff)).toBe('soon');
   });
 
-  it('deep retorna live (sin dependencia de sidecar)', () => {
-    expect(getCapabilityHealth('deep', makeDeps({ isSidecarEnabled: false }))).toBe('live');
-    expect(getCapabilityHealth('deep', makeDeps({ isSidecarEnabled: true }))).toBe('live');
+  it('deep retorna soon (explicito en manifest, B14: backend no disponible aun)', () => {
+    // Investigacion profunda es kind:'stub' status:'soon' en el manifiesto: no
+    // depende del sidecar — el manifest manda. Aunque el sidecar este on/off,
+    // el estado es 'soon' (la feature no esta servible en prod).
+    expect(getCapabilityHealth('deep', makeDeps({ isSidecarEnabled: false }))).toBe('soon');
+    expect(getCapabilityHealth('deep', makeDeps({ isSidecarEnabled: true }))).toBe('soon');
   });
 
   it('alertas-cultivo retorna live (sin dependencia de sidecar)', () => {

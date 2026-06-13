@@ -2015,11 +2015,13 @@ export default function AgentScreen({ onBack, initialContext }) {
     if (!text || !text.trim()) return;
     const trimmed = text.trim();
 
-    // DEEP RESEARCH (A6/A7): chip 🔬 con backend live. Interceptamos ANTES del
-    // stub-check y del pipeline NLU. Lanzamos el job async y ponemos un card
-    // de progreso en el chat que se actualiza vía polling hasta status=done.
-    // Gate: VITE_DEEP_RESEARCH_ENABLED + online. Si la flag está off o no hay
-    // conexión, devuelve el mensaje honesto de no disponibilidad.
+    // DEEP RESEARCH (A6/A7): path LIVE del job async del sidecar, gateado por
+    // VITE_DEEP_RESEARCH_ENABLED + online. B14: mientras la feature no esté
+    // servible en prod, 'deep' es kind:'stub' en el manifiesto, así que
+    // isDeepResearchIntent('deep') es false y este branch NO se dispara vía chip
+    // — la pregunta cae al stub honesto de abajo (mismo handler que 'precio').
+    // El branch se conserva intacto: reactivar es volver 'deep' a kind:'deep' en
+    // agentCapabilities.js cuando el backend esté live (sin tocar este flujo).
     if (forcedIntent && isDeepResearchIntent(forcedIntent)) {
       const userMessage = { role: 'user', content: trimmed, timestamp: Date.now() };
       setMessages((prev) => [...prev, userMessage]);

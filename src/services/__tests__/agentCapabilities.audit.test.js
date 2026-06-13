@@ -81,10 +81,11 @@ const CHIP_REGISTRY = [
     intent: 'deep',
     label: 'Investigación profunda',
     emoji: '🔬',
-    kind: 'deep',
+    kind: 'stub',
     tool: null,
-    stub: false,
-    deep: true,
+    stub: true,
+    deep: false,
+    expectsStubMessage: true,
   },
   {
     intent: 'restauracion',
@@ -299,21 +300,25 @@ describe('agentCapabilities — cobertura total de intents', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 6. Deep Research — backend live, no stub, interceptado antes del NLU
+// 6. Deep Research — B14: stub honesto (backend no servible en prod)
 // ---------------------------------------------------------------------------
-describe('agentCapabilities — Deep Research (backend live)', () => {
-  it('deep chip tiene kind=deep en CHIP_DEFS', () => {
+describe('agentCapabilities — Deep Research (B14: stub honesto)', () => {
+  it('deep chip tiene kind=stub en CHIP_DEFS con stubMessage honesto', () => {
     const deepDef = CHIP_DEFS.find((d) => d.intent === 'deep');
     expect(deepDef).toBeTruthy();
-    expect(deepDef.kind).toBe('deep');
+    expect(deepDef.kind).toBe('stub');
+    expect(typeof deepDef.stubMessage).toBe('string');
+    expect(deepDef.stubMessage.length).toBeGreaterThan(0);
   });
 
-  it('planForcedIntent para deep produce plan con deep=true', () => {
+  it('planForcedIntent para deep produce stub honesto (NO path live)', () => {
     const plan = planForcedIntent('deep', 'abonos verdes');
     expect(plan.intent).toBe('deep');
-    expect(plan.deep).toBe(true);
-    expect(plan.stub).toBe(false);
+    expect(plan.stub).toBe(true);
+    expect(plan.deep).toBeUndefined();
     expect(plan.tool).toBeNull();
+    expect(typeof plan.stubMessage).toBe('string');
+    expect(plan.stubMessage.toLowerCase()).toContain('no está disponible');
     expect(plan.skipNlu).toBe(true);
   });
 });

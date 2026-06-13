@@ -51,8 +51,10 @@ const DEF_BY_INTENT = Object.freeze(
 );
 
 /**
- * ¿Este intent es un STUB (backend no implementado)?
- * Devuelve false para 'deep' — Deep Research ya tiene backend live.
+ * ¿Este intent es un STUB (backend no disponible aún)?
+ * Devuelve true para 'precio' y 'deep' (kind:'stub' en el manifiesto): ambos
+ * carecen de backend servible en esta versión y muestran un mensaje honesto
+ * "aún no disponible" en vez de routear a un tool/path fantasma.
  * @param {string} intent
  * @returns {boolean}
  */
@@ -62,9 +64,14 @@ export function isStubIntent(intent) {
 }
 
 /**
- * ¿Este intent es Deep Research?
- * Permite al AgentScreen interceptar el flujo ANTES del stub-check y del
- * pipeline NLU/tool, lanzando el job async de deep research.
+ * ¿Este intent dispara el path LIVE de Deep Research (job async del sidecar)?
+ *
+ * B14: mientras la investigación profunda NO esté servible, 'deep' es kind
+ * 'stub' en el manifiesto, así que esta función devuelve false para 'deep' y el
+ * chip cae al stub honesto (mismo handler que 'precio'). La función se conserva
+ * como punto de enganche: cuando el backend deep-research esté servido en prod
+ * (feature flag VITE_DEEP_RESEARCH_ENABLED), basta volver 'deep' a kind 'deep'
+ * en el manifiesto para reactivar el path live SIN tocar el AgentScreen.
  * @param {string} intent
  * @returns {boolean}
  */
@@ -217,11 +224,12 @@ export function planForcedIntent(intent, text, opts = {}) {
       return { ...base, stub: true, stubMessage: def.stubMessage };
 
     case CHIP_INTENTS.deep:
-      // Deep Research: el backend está live (POST /deep-research → GET /deep-research/:id).
-      // Devolvemos el plan con kind='deep' para que AgentScreen lo intercepte
-      // ANTES del flujo NLU/tool y lance el job async. El caller (AgentScreen)
-      // gestiona el polling y actualiza el card en el historial de chat.
-      return { ...base, deep: true };
+      // STUB (B14): la investigación profunda aún no tiene backend servible en
+      // prod (el job async vive detrás de VITE_DEEP_RESEARCH_ENABLED, off por
+      // defecto). Devolvemos el mismo stub honesto que 'precio' — NO routeamos
+      // a un path "live" inexistente. Coherente con el manifiesto (status 'soon')
+      // y con el menú de capacidades, que ya pinta 'deep' como por-lanzar.
+      return { ...base, stub: true, stubMessage: def.stubMessage };
 
     default:
       return null;
