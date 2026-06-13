@@ -646,6 +646,117 @@ export function validateAmb27_toxicoSinAdvertencia(catalog) {
   return warnings;
 }
 
+// AMB-28: confusión taxonómica conocida. Detecta patrones históricos de
+// confusión entre especies reportados en auditorías agroecológicas (2026-05-21
+// Pasada 3-5-7). Los casos documentados:
+//   - gulupa (Passiflora edulis) frecuentemente confundida con guayaba
+//   - aguacate (Persea americana) frecuentemente confundido con guayaba
+// El validador chequea nombre_comun y nombres_comunes_regionales contra estos
+// patrones de confusión. Match case-insensitive y substring para capturar
+// variantes ("guayaba morada", "guayaba de tierra fría", etc.).
+export const TAXONOMIC_CONFUSION_PATTERNS = new Map([
+  // key: substring sospechoso (lowercase) → value: especie correcta (lowercase)
+  ['gulupa', 'passiflora'], // Si menciona "guayaba" pero el ID sugiere Passiflora → confusión gulupa
+  ['aguacate', 'persea'],   // Si menciona "guayaba" pero el ID sugiere Persea → confusión aguacate
+]);
+export function validateAmb28_taxonomicConfusion(catalog) {
+  const errors = [];
+  for (const sp of catalog.species || []) {
+    const nombreComun = (sp.nombre_comun || '').toLowerCase().trim();
+    const nombresRegionales = (sp.nombres_comunes_regionales || [])
+      .map((n) => String(n).toLowerCase().trim());
+
+    // Detectar patrones de confusión
+    const allNames = [nombreComun, ...nombresRegionales].filter(Boolean);
+    const idLower = String(sp.id || '').toLowerCase();
+
+    // Chequear si menciona "guayaba" pero el ID sugiere otra especie
+    if (allNames.some((n) => n.includes('guayaba'))) {
+      // Si el ID sugiere Passiflora (gulupa/curuba/maracuyá) pero menciona "guayaba"
+      if (idLower.includes('passiflora') && !idLower.includes('guajava')) {
+        // Encontrar qué nombre contiene "guayaba" para reportarlo
+        const guiltyName = allNames.find((n) => n.includes('guayaba'));
+        errors.push(`AMB-28 [${sp.id}]: posible confusión gulupa→guayaba detectada en nombre "${guiltyName}". Passiflora spp. (gulupa, curuba, maracuyá) no deben confundirse con Psidium guajava (guayaba).`);
+      }
+
+      // Si el ID sugiere Persea (aguacate) pero menciona "guayaba"
+      if (idLower.includes('persea') && !idLower.includes('guajava')) {
+        const guiltyName = allNames.find((n) => n.includes('guayaba'));
+        errors.push(`AMB-28 [${sp.id}]: posible confusión aguacate→guayaba detectada en nombre "${guiltyName}". Persea americana (aguacate) no debe confundirse con Psidium guajava (guayaba).`);
+      }
+    }
+
+    // Chequear confusión inversa: menciona gulupa pero el ID sugiere guayaba
+    if (allNames.some((n) => n.includes('gulupa') || n.includes('maracuyá') || n.includes('curuba'))) {
+      if (idLower.includes('guajava')) {
+        const guiltyName = allNames.find((n) => n.includes('gulupa') || n.includes('maracuyá') || n.includes('curuba'));
+        errors.push(`AMB-28 [${sp.id}]: posible confusión guayaba→gulupa detectada en nombre "${guiltyName}". Psidium guajava (guayaba) no debe confundirse con Passiflora spp.`);
+      }
+    }
+
+    // Chequear si menciona "gulupa" pero el ID sugiere aguacate
+    if (allNames.some((n) => n.includes('gulupa'))) {
+      if (idLower.includes('persea')) {
+        const guiltyName = allNames.find((n) => n.includes('gulupa'));
+        errors.push(`AMB-28 [${sp.id}]: posible confusión gulupa→aguacate detectada en nombre "${guiltyName}". Passiflora edulis (gulupa) no debe confundirse con Persea americana (aguacate).`);
+      }
+    }
+
+    // Chequear si menciona "aguacate" pero el ID sugiere gulupa
+    if (allNames.some((n) => n.includes('aguacate'))) {
+      if (idLower.includes('passiflora')) {
+        const guiltyName = allNames.find((n) => n.includes('aguacate'));
+        errors.push(`AMB-28 [${sp.id}]: posible confusión aguacate→gulupa detectada en nombre "${guiltyName}". Persea americana (aguacate) no debe confundirse con Passiflora spp. (gulupa).`);
+      }
+    }
+  }
+  return errors;
+}
+
+// AMB-29: species insertadas en array equivocado. Detecta cuando una especie
+// (con campos propios de species como nombre_cientifico, companions, antagonists,
+// category, etc.) fue insertada incorrectamente dentro del array biopreparados[].
+// Este es un error de estructura de catálogo que rompe validadores posteriores.
+// Los campos distintivos de species que NO deben aparecer en biopreparados:
+//   - nombre_cientifico
+//   - companions / antagonists
+//   - category
+//   - familia_botanica
+//   - altitud_msnm
+//   - propagation
+//   - scale_viability
+// Si alguno de estos campos está presente en un item de biopreparados[],
+// es muy probable que sea una species mal ubicada.
+export const SPECIES_EXCLUSIVE_FIELDS = new Set([
+  'nombre_cientifico',
+  'companions',
+  'antagonists',
+  'category',
+  'familia_botanica',
+  'altitud_msnm',
+  'propagation',
+  'scale_viability',
+  'manejo_por_escala',
+  'recommended_covers',
+  'recommended_fences',
+]);
+export function validateAmb29_speciesInBiopreparados(catalog) {
+  const errors = [];
+  for (const bp of catalog.biopreparados || []) {
+    if (!bp || typeof bp !== 'object') continue;
+
+    // Detectar si tiene campos exclusivos de species
+    const speciesFields = Object.keys(bp).filter((k) => SPECIES_EXCLUSIVE_FIELDS.has(k));
+
+    if (speciesFields.length > 0) {
+      const id = bp.id || '(sin id)';
+      const fieldsList = speciesFields.join(', ');
+      errors.push(`AMB-29 [biopreparados[${id}]]: posible species mal ubicada en array biopreparados (campos de species detectados: ${fieldsList}). ${bp.nombre_comun ? `nombre_comun="${bp.nombre_comun}"` : ''} Revisa si este item debería estar en catalog.species[] en lugar de catalog.biopreparados[].`);
+    }
+  }
+  return errors;
+}
+
 // ----------------------------------------------------------------
 // Main (CLI). Gated por `import.meta.url === file://${process.argv[1]}` para
 // permitir importar las funciones validador desde tests (scripts/__tests__/
@@ -766,6 +877,20 @@ function runCli() {
     ['AMB-27 toxico_sin_advertencia (WARN)', (c) => ({
       errors: [],
       warnings: validateAmb27_toxicoSinAdvertencia(c),
+    })],
+    // AMB-28/29 introducidos 2026-06-12 (GLM-4.6 task #6133) para endurecer
+    // validación del catálogo contra patrones de confusión taxonómica conocidos
+    // (gulupa→guayaba, aguacate→guayaba) y detección de species insertadas en
+    // arrays equivocados (species dentro de biopreparados[]). AMB-28 es error
+    // duro porque rompe la integridad del catálogo; AMB-29 también es error
+    // duro porque es un error estructural que rompe validadores posteriores.
+    ['AMB-28 confusión taxonómica conocida', (c) => ({
+      errors: validateAmb28_taxonomicConfusion(c),
+      warnings: [],
+    })],
+    ['AMB-29 species en array biopreparados', (c) => ({
+      errors: validateAmb29_speciesInBiopreparados(c),
+      warnings: [],
     })],
   ];
 
