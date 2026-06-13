@@ -8,15 +8,27 @@
  * paramo→pasiva+Ley 1930, retamo NO quemar, densidad excesiva MITO.
  */
 import REST_DATA from '../data/restauracion.json';
+import ESPECIES_DATA from '../data/restauracion-especies.json';
 
-export function diagnosticarRestauracion(descripcion) {
+/** Deriva el piso térmico desde la altitud (m s.n.m.) del perfil de la finca. */
+function pisoDesdeAltitud(alt) {
+  const a = Number(alt);
+  if (alt == null || Number.isNaN(a)) return null;
+  if (a >= 3000) return 'paramo_3000';
+  if (a >= 2000) return 'frio_2000_3000';
+  if (a >= 1000) return 'templado_1000_2000';
+  return 'calido_0_1000';
+}
+
+export function diagnosticarRestauracion(descripcion, opts = {}) {
   if (!descripcion || descripcion.trim().length < 3) {
-    return { arreglo: null, roles: null, alertas: [], guardas: [REST_DATA.guardas.pino_eucalipto], sin_datos: true, fuente: REST_DATA.fuente };
+    return { arreglo: null, roles: null, especies: null, alertas: [], guardas: [REST_DATA.guardas.pino_eucalipto], sin_datos: true, fuente: REST_DATA.fuente };
   }
   const texto = descripcion.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const alertas = [];
   let arregloId = null;
-  let piso = null;
+  // Prioridad: piso/altitud del perfil de la finca; luego señales del texto.
+  let piso = opts.piso || pisoDesdeAltitud(opts.altitud);
 
   for (const [clave, senal] of Object.entries(REST_DATA.senales_voz)) {
     const palabras = clave.split('_');
@@ -31,31 +43,42 @@ export function diagnosticarRestauracion(descripcion) {
   }
 
   if (texto.includes('paramo') || texto.includes('frailejon')) {
-    piso = 'paramo_3000';
+    piso = piso || 'paramo_3000';
     alertas.push(REST_DATA.guardas.paramo_pasivo);
-  } else if (texto.includes('calido') || texto.includes('tropical')) piso = 'calido_0_1000';
-  else if (texto.includes('templado') || texto.includes('andino')) piso = 'templado_1000_2000';
-  else if (texto.includes('frio')) piso = 'frio_2000_3000';
+  }
+  // Detección por texto solo si el perfil no dio piso (cubre fría/frío, cálido/cálida…).
+  if (!piso) {
+    if (texto.includes('calid') || texto.includes('tropical')) piso = 'calido_0_1000';
+    else if (texto.includes('templad') || texto.includes('andino')) piso = 'templado_1000_2000';
+    else if (texto.includes('fri')) piso = 'frio_2000_3000';
+  }
 
   const arreglo = arregloId ? REST_DATA.arreglos.find((a) => a.id === arregloId) : null;
   const roles = piso ? REST_DATA.roles_sucesion[piso] : null;
+  const especies = piso ? (ESPECIES_DATA.especies_por_rol[piso] || null) : null;
 
   if (texto.includes('pino') || texto.includes('eucalipto')) alertas.push(REST_DATA.guardas.pino_eucalipto);
   if (texto.includes('carbono') || texto.includes('pagar') || texto.includes('bonos')) alertas.push(REST_DATA.guardas.bonos_carbono);
 
   const guardas = [REST_DATA.guardas.pino_eucalipto, REST_DATA.guardas.densidad_excesiva];
   if (!arreglo && !alertas.length && !roles) {
-    return { arreglo: null, roles: null, alertas, guardas, sin_datos: true, fuente: REST_DATA.fuente };
+    return { arreglo: null, roles: null, especies, alertas, guardas, sin_datos: true, fuente: REST_DATA.fuente };
   }
 
-  return { arreglo, roles, alertas, guardas, sin_datos: false, fuente: REST_DATA.fuente };
+  return { arreglo, roles, especies, alertas, guardas, sin_datos: false, fuente: REST_DATA.fuente };
 }
 
 export function formatearGroundingRestauracion(d) {
   if (!d || d.sin_datos) return '';
   const partes = [];
   if (d.arreglo) partes.push(`**Arreglo recomendado:** ${d.arreglo.nombre} — ${d.arreglo.detalle} (${d.arreglo.densidad}).`);
-  if (d.roles) {
+  if (d.especies) {
+    partes.push('**Sucesion ecologica — especies nativas de tu piso termico (usa SOLO estas, NO inventes otras):**');
+    const fmt = (arr) => arr.map((e) => `${e.nombre} (${e.cientifico})${e.nota ? ` — ${e.nota}` : ''}`).join('; ');
+    if (d.especies.pioneras) partes.push(`- Pioneras: ${fmt(d.especies.pioneras)}`);
+    if (d.especies.intermedias) partes.push(`- Intermedias: ${fmt(d.especies.intermedias)}`);
+    if (d.especies.climax) partes.push(`- Climax: ${fmt(d.especies.climax)}`);
+  } else if (d.roles) {
     partes.push('**Sucesion ecologica:**');
     if (d.roles.pioneras) partes.push(`- Pioneras: ${d.roles.pioneras.join(', ')}`);
     if (d.roles.intermedias) partes.push(`- Intermedias: ${d.roles.intermedias.join(', ')}`);
@@ -63,6 +86,7 @@ export function formatearGroundingRestauracion(d) {
   }
   if (d.alertas.length > 0) { partes.push('**ALERTAS:**'); d.alertas.forEach((a) => partes.push(`- ${a}`)); }
   if (d.guardas.length > 0) { partes.push('**GUARDAS:**'); d.guardas.forEach((g) => partes.push(`- ${g}`)); }
+  partes.push('IMPORTANTE: recomienda SOLO especies nativas verificadas de la lista anterior; si no hay lista para este piso, dilo y sugiere el vivero local o la CAR. NUNCA inventes nombres de especies.');
   partes.push(`Fuente: ${d.fuente}`);
   return partes.join('\n\n');
 }

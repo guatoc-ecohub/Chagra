@@ -48,3 +48,26 @@ describe('formatearGroundingRestauracion', () => {
     expect(f).toContain('GUARDAS');
   });
 });
+
+describe('especies nativas reales (anti-fabricacion — escenario Daniel)', () => {
+  it('la altitud del perfil deriva el piso y trae especies del catalogo', () => {
+    const d = diagnosticarRestauracion('quiero proteger el nacimiento de agua', { altitud: 2600 });
+    expect(d.especies).toBeTruthy();
+    expect(d.especies.pioneras.length).toBeGreaterThan(0);
+  });
+  it('Daniel (nacimiento, 2600m frio) → grounding con especies reales con nombre cientifico + NO inventes', () => {
+    const d = diagnosticarRestauracion('arboles nativos en el nacimiento de agua', { altitud: 2600 });
+    const f = formatearGroundingRestauracion(d);
+    expect(f).toContain('Alnus acuminata'); // Aliso — piso frio, cientifico real del catalogo
+    expect(f).toMatch(/NO inventes/i);
+  });
+  it('la altitud mapea al piso correcto (calido vs paramo)', () => {
+    expect(formatearGroundingRestauracion(diagnosticarRestauracion('recuperar el bosque', { altitud: 400 }))).toContain('Ochroma pyramidale'); // Balso, calido
+    expect(formatearGroundingRestauracion(diagnosticarRestauracion('recuperar el bosque', { altitud: 3200 }))).toContain('Espeletia'); // Frailejon, paramo
+  });
+  it('sin altitud ni piso en el texto → especies null (NO inventa), pero la guarda anti-fabricacion sigue', () => {
+    const d = diagnosticarRestauracion('quiero proteger el nacimiento de agua');
+    expect(d.especies).toBeNull();
+    expect(formatearGroundingRestauracion(d)).toMatch(/NUNCA inventes/i);
+  });
+});
