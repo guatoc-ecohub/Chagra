@@ -161,14 +161,16 @@ const PRICE_INTENT_PATTERNS = [
 const CARBON_INTENT_PATTERNS = [
   /\b(bonos?\s+(de\s+)?carbono|carbono\s+neutral|creditos?\s+(de\s+)?carbono)\b/,
   /\b(me\s+quieren\s+pagar\s+por\s+sembrar|pagar\s+por\s+sembrar\s+arboles|pago\s+por\s+carbono)\b/,
-  /\b(PSA|pago\s+por\s+servicios?\s+ambientales?|Decreto\s+1007)\b/,
+  // input viene de _stripDiacritics() que hace .toLowerCase() → literales en minúscula
+  /\b(psa|pago\s+por\s+servicios?\s+ambientales?|decreto\s+1007)\b/,
 ];
 
 // ── R0: intencion de RESTAURACION ─────────────────────────────────────
 // Task 2 (auditoria ministerio): "arboles nativos a 3200m" y "recuperar
 // el monte" caian a no_agro_keyword. Estas keywords los rutean.
 const RESTORATION_INTENT_PATTERNS = [
-  /\b(restaura[cç]|reforesta[cç]|recuperar\s+(el\s+)?(monte|bosque|terreno|suelo|lote)|regenera[cç])\b/,
+  // [cçr] captura también los infinitivos "restaurar"/"reforestar" (no solo -ción)
+  /\b(restaura[cçr]|reforesta[cçr]|recuperar\s+(el\s+)?(monte|bosque|terreno|suelo|lote)|regenera[cç])\b/,
   /\b(arbol(es)?\s+nativ[oa]s?|especies?\s+nativ[oa]s?|nativ[oa]s?\s+(de|para|a)\b)/,
   /\b(p[aá]ramo|frailej[oó]n|sucesi[oó]n\s+(ecol[oó]gica|natural)|corredor\s+(biol[oó]gico|ripario)|cerca\s+viva)\b/,
   /\b(sembrar|plantar)\s+(pino|eucalipto|cedro|roble|aliso|nacedero|guadua)\b/,
