@@ -41,7 +41,11 @@ describe('mergePartialOnInterruption', () => {
 
       expect(res.preservePartial).toBe(true);
       expect(res.content.startsWith(partial)).toBe(true);
-      expect(res.content).toContain('Respuesta incompleta');
+      // UX paciente: marcador tranquilizador de reintento automático, NUNCA
+      // "toca de nuevo" / "Tiempo agotado".
+      expect(res.content).toContain('reintentando');
+      expect(res.content).not.toMatch(/toca de nuevo/i);
+      expect(res.content).not.toMatch(/tiempo agotado/i);
       expect(res.error).toBeNull();
       expect(res.reason).toBe('timeout');
     });
@@ -116,5 +120,43 @@ describe('normalizeInterruptReason', () => {
     expect(normalizeInterruptReason('boom')).toBe('abort');
     expect(normalizeInterruptReason(undefined)).toBe('abort');
     expect(normalizeInterruptReason(null)).toBe('abort');
+  });
+});
+
+/**
+ * GUARDRAIL UX PACIENTE (2026-06-13): el operador pidió explícitamente eliminar
+ * "Tiempo agotado. Toca de nuevo para reintentar." de la cara del campesino. La
+ * cola durable reintenta sola; pedir "toca de nuevo" cuando el sistema YA está
+ * reintentando es alarmante y falso. Este bloque blinda el copy contra regresión.
+ */
+describe('UX paciente — nunca el copy alarmante "Tiempo agotado / toca de nuevo"', () => {
+  const forbidden = [/tiempo agotado/i, /toca de nuevo/i];
+
+  it('ningún FULL_ERROR_MESSAGES contiene el copy prohibido', () => {
+    for (const msg of Object.values(FULL_ERROR_MESSAGES)) {
+      for (const re of forbidden) {
+        expect(msg).not.toMatch(re);
+      }
+    }
+  });
+
+  it('ningún PARTIAL_MARKERS contiene el copy prohibido', () => {
+    for (const msg of Object.values(PARTIAL_MARKERS)) {
+      for (const re of forbidden) {
+        expect(msg).not.toMatch(re);
+      }
+    }
+  });
+
+  it('timeout/abort comunican reintento automático (sin pedir acción)', () => {
+    expect(FULL_ERROR_MESSAGES.timeout).toMatch(/reintentando|guardada/i);
+    expect(FULL_ERROR_MESSAGES.abort).toMatch(/reintentando|guardada/i);
+    expect(PARTIAL_MARKERS.timeout).toMatch(/reintentando/i);
+    expect(PARTIAL_MARKERS.abort).toMatch(/reintentando/i);
+  });
+
+  it('cancel (acción voluntaria) sí ofrece Reintentar explícito', () => {
+    expect(FULL_ERROR_MESSAGES.cancel).toMatch(/reintentar/i);
+    expect(PARTIAL_MARKERS.cancel).toMatch(/reintentar/i);
   });
 });

@@ -86,6 +86,8 @@ import {
   drainPending,
   clearAgentRequests,
   aggregateRequestMetrics,
+  finalizeRequest,
+  failRequest,
 } from '../agentRequestQueue.js';
 
 function setOnline(value) {
@@ -590,5 +592,69 @@ describe('agentRequestQueue — nunca pierde requests', () => {
     expect(all).toHaveLength(2);
     expect(all[0].prompt).toBe('a');
     expect(all[1].prompt).toBe('b');
+  });
+});
+
+describe('agentRequestQueue — finalizeRequest (camino VIVO del AgentScreen)', () => {
+  it('cierra el request con telemetría de un LLM YA ejecutado (sin sender)', async () => {
+    const id = await enqueueRequest({ prompt: '¿qué le pasa al café?', route: 'chat' });
+
+    const item = await finalizeRequest({
+      id,
+      result: {
+        response: 'Tu café tiene roya. Aplica caldo bordelés.',
+        latency: { t_first_token_ms: 120 },
+        grounding: {
+          entities: ['cafe'],
+          tools: ['get_pest_controllers'],
+          rag_chunks: 2,
+          grounded_status: 'verified',
+        },
+        tokens_in: 30,
+        tokens_out: 40,
+      },
+    });
+
+    expect(item.status).toBe('done');
+    expect(item.response).toBe('Tu café tiene roya. Aplica caldo bordelés.');
+    expect(item.latency.t_first_token_ms).toBe(120);
+    expect(item.latency.queue_wait_ms).toBeGreaterThanOrEqual(0);
+    expect(item.latency.t_total_ms).toBeGreaterThanOrEqual(0);
+    expect(item.grounding.grounded_status).toBe('verified');
+    expect(item.grounding.entities).toEqual(['cafe']);
+    expect(item.tokens_in).toBe(30);
+    expect(item.tokens_out).toBe(40);
+    expect(item.error).toBeNull();
+
+    // Persistió en IDB (sobrevive recarga).
+    const reread = await getRequest(id);
+    expect(reread.status).toBe('done');
+    expect(reread.response).toBe('Tu café tiene roya. Aplica caldo bordelés.');
+  });
+
+  it('finalizeRequest tolera id inexistente (devuelve null, no lanza)', async () => {
+    const out = await finalizeRequest({ id: 9999, result: { response: 'x' } });
+    expect(out).toBeNull();
+  });
+});
+
+describe('agentRequestQueue — failRequest (camino VIVO)', () => {
+  it('marca failed conservando el prompt intacto', async () => {
+    const id = await enqueueRequest({ prompt: 'cómo combato la broca', route: 'chat' });
+
+    const item = await failRequest({ id, error: new Error('LLM caído') });
+
+    expect(item.status).toBe('failed');
+    expect(item.error).toBe('LLM caído');
+    expect(item.prompt).toBe('cómo combato la broca'); // prompt NUNCA se pierde
+
+    const reread = await getRequest(id);
+    expect(reread.status).toBe('failed');
+    expect(reread.prompt).toBe('cómo combato la broca');
+  });
+
+  it('failRequest tolera id inexistente (devuelve null, no lanza)', async () => {
+    const out = await failRequest({ id: 9999, error: 'x' });
+    expect(out).toBeNull();
   });
 });

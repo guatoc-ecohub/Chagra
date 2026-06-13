@@ -213,6 +213,89 @@ async function persistItem(item) {
 }
 
 /**
+ * Vuelca la telemetría de un resultado del LLM en un item y lo marca 'done'.
+ * Helper PURO sobre el item (no toca IDB) — reutilizado por processRequest y
+ * por finalizeRequest (camino VIVO del AgentScreen, que ya corrió el LLM y solo
+ * necesita persistir el resultado, sin re-invocar un sender).
+ *
+ * @param {Object} item - registro del store (mutado in-place)
+ * @param {Object} result - { response, latency:{t_first_token_ms}, grounding, tokens_in, tokens_out }
+ * @param {number} [attempt=0] - cuántos reintentos hubo (se guarda en retries)
+ * @returns {Object} el item mutado
+ */
+function applyResultToItem(item, result, attempt = 0) {
+  item.status = 'done';
+  item.ts_done = Date.now();
+  if (item.latency.t_total_ms == null) {
+    item.latency.t_total_ms = item.ts_submit ? item.ts_done - item.ts_submit : null;
+  }
+  if (result?.latency?.t_first_token_ms != null) {
+    item.latency.t_first_token_ms = result.latency.t_first_token_ms;
+  }
+  if (result?.grounding) {
+    item.grounding = { ...item.grounding, ...result.grounding };
+  }
+  item.response = result?.response || null;
+  if (result?.tokens_in != null) item.tokens_in = result.tokens_in;
+  if (result?.tokens_out != null) item.tokens_out = result.tokens_out;
+  item.retries = attempt;
+  item.error = null;
+  return item;
+}
+
+/**
+ * Marca un request 'done' con la telemetría de un LLM YA ejecutado (camino VIVO
+ * del AgentScreen). El pipeline React corre el stream/TTS/grounding rico; al
+ * terminar solo necesita CERRAR el registro durable — NO re-llamar al modelo.
+ * Por eso `finalizeRequest` NO recibe un sender ni reintenta: persiste el
+ * resultado y listo. Tolerante a fallos (no lanza).
+ *
+ * @param {Object} args
+ * @param {number} args.id - id del request encolado por enqueueRequest
+ * @param {Object} args.result - telemetría del turno (response, latency, grounding, tokens)
+ * @returns {Promise<Object|null>} item actualizado o null si falla/no existe
+ */
+export async function finalizeRequest({ id, result } = {}) {
+  try {
+    const item = await getRequest(id);
+    if (!item) return null;
+    if (item.latency.queue_wait_ms == null && item.ts_submit) {
+      item.latency.queue_wait_ms = Date.now() - item.ts_submit;
+    }
+    applyResultToItem(item, result, item.retries || 0);
+    await persistItem(item);
+    return item;
+  } catch (e) {
+    console.debug('[agentRequestQueue] finalizeRequest error:', e);
+    return null;
+  }
+}
+
+/**
+ * Marca un request 'failed' (camino VIVO, tras agotar el manejo de error del
+ * pipeline). Conserva el prompt intacto. Tolerante a fallos (no lanza).
+ *
+ * @param {Object} args
+ * @param {number} args.id
+ * @param {string|Error} [args.error]
+ * @returns {Promise<Object|null>}
+ */
+export async function failRequest({ id, error } = {}) {
+  try {
+    const item = await getRequest(id);
+    if (!item) return null;
+    item.status = 'failed';
+    item.ts_done = Date.now();
+    item.error = error ? (error.message || String(error)) : 'fallo en el pipeline';
+    await persistItem(item);
+    return item;
+  } catch (e) {
+    console.debug('[agentRequestQueue] failRequest error:', e);
+    return null;
+  }
+}
+
+/**
  * Worker SERIALIZADO que procesa la cola uno a uno. Toma el siguiente 'queued',
  * marca 'sending', delega al sender inyectado, reintenta con backoff exponencial,
  * marca 'done'/'failed'. NO procesa si offline.
@@ -253,28 +336,13 @@ export async function processRequest({ sender, req, id }) {
       
       const tDone = Date.now();
       const tTotalMs = tDone - tStart;
-      
-      // Marcar 'done' con metadata completa
-      item.status = 'done';
-      item.ts_done = tDone;
+
+      // Marcar 'done' con metadata completa. Fijamos t_total_ms desde tStart
+      // (el helper solo lo calcularía si fuera null); el resto lo vuelca
+      // applyResultToItem (compartido con finalizeRequest, sin duplicar).
       item.latency.t_total_ms = tTotalMs;
-      // t_first_token_ms debe venir del sender si es medible
-      if (result?.latency?.t_first_token_ms != null) {
-        item.latency.t_first_token_ms = result.latency.t_first_token_ms;
-      }
-      
-      // Metadata de grounding si viene del sender
-      if (result?.grounding) {
-        item.grounding = { ...item.grounding, ...result.grounding };
-      }
-      
-      // Response y tokens
-      item.response = result?.response || null;
-      item.tokens_in = result?.tokens_in || null;
-      item.tokens_out = result?.tokens_out || null;
-      item.retries = attempt;
-      item.error = null;
-      
+      applyResultToItem(item, result, attempt);
+
       await persistItem(item);
       console.debug(`[agentRequestQueue] request #${id} completado (${tTotalMs}ms, ${attempt} retries)`);
       return item;

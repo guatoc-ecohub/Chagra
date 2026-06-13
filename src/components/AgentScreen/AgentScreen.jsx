@@ -110,6 +110,20 @@ import useOllamaWarmStore from '../../store/useOllamaWarmStore';
 import useAgentQueueStore from '../../store/useAgentQueueStore';
 import useFincaActiveStore from '../../services/fincaActiveStore';
 import useAlertStore from '../../store/useAlertStore';
+// #5 (2026-06-13) — COLA DURABLE de requests al agente. El queue Zustand
+// (useAgentQueueStore) es EFÍMERO (se pierde al recargar). Esta cola persiste
+// en IndexedDB ANTES de llamar al LLM, captura telemetría rica (latencia +
+// grounding + tokens) al cerrar el turno, y reanuda sola los requests que
+// quedaron 'queued'/'offline' de sesiones previas — para que NUNCA se pierda
+// una pregunta y NUNCA mostremos "Tiempo agotado. Toca de nuevo".
+import {
+  enqueueRequest as durableEnqueue,
+  finalizeRequest as durableFinalize,
+  failRequest as durableFail,
+  resumePending as durableResumePending,
+  drainPending as durableDrainPending,
+} from '../../services/agentRequestQueue';
+import { createAgentRequestSender } from '../../services/agentRequestSender';
 
 // 2026-05-16: migrado a llmRouter (Multi-LLM por tarea). AgentScreen usa
 // la `chat` route con el modelo de chat configurado como hot model. Bench
@@ -247,6 +261,10 @@ export default function AgentScreen({ onBack, initialContext }) {
   // (genérico, ej. red caída). Se setea antes de disparar controller.abort().
   const cancelReasonRef = useRef(null);
   const llmStatsRef = useRef(null);
+  // #5 cola durable: id del registro IndexedDB del turno EN CURSO. enqueueRequest
+  // lo crea ANTES de llamar al LLM (persistencia previa = cero pérdida); al
+  // terminar, finalizeRequest/failRequest cierran ese mismo id con telemetría.
+  const durableRequestIdRef = useRef(null);
   // Holder del deadline stream-aware activo (createStreamDeadline). FIX prod
   // P0 (2026-06-02): combina idle-timeout (reinicia por token → no aborta
   // streams vivos) + techo absoluto. Reemplaza al watchdog/timer total previo.
@@ -519,10 +537,61 @@ export default function AgentScreen({ onBack, initialContext }) {
     useAgentQueueStore.getState().reset();
   };
 
+  // #5 COLA DURABLE — recuperación de requests que sobrevivieron una recarga /
+  // sesión anterior. Reanuda los 'offline' (resumePending) y luego drena los
+  // 'queued' (drainPending) con un sender HEADLESS (corre el LLM sin React). El
+  // resultado de cada recuperado se pinta como burbuja del agente etiquetada,
+  // para que el campesino VEA la respuesta de la pregunta que creía perdida.
+  // Guard de re-entrada para que dos disparos (mount + 'online') no se pisen.
+  const durableRecoveringRef = useRef(false);
+  const recoverDurableRequests = useCallback(async () => {
+    if (durableRecoveringRef.current) return;
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+    durableRecoveringRef.current = true;
+    try {
+      await durableResumePending(); // 'offline' → 'queued'
+      const sender = createAgentRequestSender();
+      // Envolvemos el sender para CAPTURAR la respuesta recuperada y pintarla.
+      const surfacingSender = async (req) => {
+        const result = await sender(req);
+        if (result?.response) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: 'user',
+              content: req.prompt,
+              timestamp: Date.now(),
+              _recovered: true,
+            },
+            {
+              role: 'assistant',
+              content: result.response,
+              timestamp: Date.now(),
+              _recovered: true,
+            },
+          ]);
+        }
+        return result;
+      };
+      const summary = await durableDrainPending({ sender: surfacingSender });
+      if (summary && (summary.processed > 0 || summary.failed > 0)) {
+        console.debug('[Agent] cola durable recuperada', summary);
+      }
+    } catch (err) {
+      console.debug('[Agent] recoverDurableRequests error (no crítico):', err?.message);
+    } finally {
+      durableRecoveringRef.current = false;
+    }
+  }, []);
+
   useEffect(() => {
     initTTS();
     isKokoroAvailable().then(setKokoroReady);
     loadHistory();
+    // #5: al montar, recuperar preguntas pendientes de sesiones previas (no
+    // bloquea el render — corre en background y pinta las respuestas cuando
+    // lleguen). Cero pérdida tras recarga / cierre de app a mitad de inferencia.
+    recoverDurableRequests();
     // Task #122: al entrar a AgentScreen, apaga el glow del avatar global.
     // El operador ya está mirando la conversación, no necesita el "reluce"
     // de "respuesta nueva".
@@ -544,7 +613,12 @@ export default function AgentScreen({ onBack, initialContext }) {
         });
       });
     });
-    const handleOnline = () => setIsOnline(true);
+    const handleOnline = () => {
+      setIsOnline(true);
+      // #5: al volver la conexión, reanudar las preguntas que quedaron
+      // 'queued'/'offline' (las que el operador hizo sin señal en el campo).
+      recoverDurableRequests();
+    };
     const handleOffline = () => setIsOnline(false);
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
@@ -561,7 +635,7 @@ export default function AgentScreen({ onBack, initialContext }) {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [loadHistory, markRead]);
+  }, [loadHistory, markRead, recoverDurableRequests]);
 
   const getSystemPrompt = useCallback(({ query = '', contextMemory = '', isEnum = false } = {}) => {
     // Operator bug 2026-05-18: agente listaba "Fresa #02, Fresa #08, Fresa #02..."
@@ -1133,6 +1207,19 @@ export default function AgentScreen({ onBack, initialContext }) {
     setState(STATE_THINKING);
     setError('');
     agentSounds.start();
+
+    // #5 COLA DURABLE — persistir el request ANTES de tocar el LLM. Si la app se
+    // recarga / cierra a mitad de inferencia, el prompt queda 'queued' en
+    // IndexedDB y se reanuda solo al reabrir (resumePending + drainPending). El
+    // id se cierra al final del turno con finalizeRequest (telemetría) o
+    // failRequest. enqueueRequest es no-throw: si IDB falla, devuelve null y el
+    // pipeline sigue idéntico (degradación graceful, nunca bloquea la pregunta).
+    const durableRoute = selectChatRoute(text.trim());
+    durableRequestIdRef.current = await durableEnqueue({
+      prompt: text.trim(),
+      route: durableRoute,
+      model: durableRoute,
+    });
 
     // Free 7→10 fix-pack #5: normalización léxica regional Cauca.
     // Si la finca activa es del Cauca andino/pacífico, reemplazamos
@@ -1839,6 +1926,37 @@ export default function AgentScreen({ onBack, initialContext }) {
       });
       setMessages((prev) => [...prev, assistantMessage]);
 
+      // #5 COLA DURABLE — cerrar el registro de este turno con telemetría rica.
+      // Reusamos lo YA computado por el pipeline (cero coste extra): respuesta,
+      // grounding (entidades AGE resueltas + tools + RAG chunks + estado), y las
+      // latencias del llmStatsRef. Marca status='done' en IndexedDB; queda como
+      // evidencia para debuggear inteligencia+velocidad y confirma que la
+      // pregunta NO se perdió. No-throw: si falla, el chat ya respondió.
+      if (durableRequestIdRef.current != null) {
+        durableFinalize({
+          id: durableRequestIdRef.current,
+          result: {
+            response,
+            latency: { t_first_token_ms: currentLlmStats?.first_token_ms ?? null },
+            grounding: {
+              entities: Array.isArray(resolvedEntities)
+                ? resolvedEntities.map((e) => e?.canonical_id || e?.id || e?.mentioned).filter(Boolean)
+                : [],
+              tools: Array.isArray(toolEvidence)
+                ? toolEvidence.map((t) => t?.tool || t?.name).filter(Boolean)
+                : [],
+              rag_chunks: Array.isArray(contextCorpus) ? contextCorpus.length : 0,
+              nlu_route: nluRoute || durableRoute,
+              grounded_status: sourceMetadata?.source || sourceMetadata?.grounded_status || 'none',
+            },
+            tokens_out: currentLlmStats?.response_len
+              ? Math.max(1, Math.round(currentLlmStats.response_len / 4))
+              : null,
+          },
+        }).catch(() => { /* no-op: el turno ya se mostró */ });
+        durableRequestIdRef.current = null;
+      }
+
       // Task #122: cachear el último mensaje del agente en el store global
       // para que el doble-click del avatar (cualquier pantalla) pueda re-
       // reproducirlo via replayLast(). responseReady NO se setea acá porque
@@ -1944,14 +2062,40 @@ export default function AgentScreen({ onBack, initialContext }) {
         } else {
           setError(merged.error);
         }
+        // #5 COLA DURABLE en interrupción:
+        //   - timeout/abort → el sistema reintenta SOLO. Dejamos el registro en
+        //     'queued' (enqueueRequest nunca lo movió de ahí) para que
+        //     drainPending lo reanude headless al volver / al re-montar. Por eso
+        //     NO lo marcamos failed: re-queue implícito = cero pérdida.
+        //   - cancel → el operador eligió parar; NO auto-reintentamos. Cerramos
+        //     el registro como failed para que no se reanude por la espalda.
+        if (e.interruptReason === 'cancel' && durableRequestIdRef.current != null) {
+          durableFail({ id: durableRequestIdRef.current, error: 'cancelado por el operador' })
+            .catch(() => {});
+          durableRequestIdRef.current = null;
+        }
+        // (timeout/abort: dejamos durableRequestIdRef.current intacto en IDB como
+        // 'queued'; solo soltamos la ref local en el finally.)
       } else {
         setError(e.message || 'No pude conectarme al asistente. Intenta de nuevo.');
+        // Error NO-interrupción (HTTP 5xx, sesión, etc.): marcar failed. El
+        // prompt queda intacto en IDB; la cola durable NO lo reintenta (no es
+        // recuperable solo con reintentar), pero NO se pierde el dato.
+        if (durableRequestIdRef.current != null) {
+          durableFail({ id: durableRequestIdRef.current, error: e })
+            .catch(() => {});
+          durableRequestIdRef.current = null;
+        }
       }
     } finally {
       setState(STATE_IDLE);
       setStreamingContent('');
       streamingContentRef.current = '';
       cancelReasonRef.current = null;
+      // Soltar la ref local del turno (el estado durable ya quedó en IDB:
+      // 'done' si finalizó, 'queued' si timeout/abort → auto-reanuda, 'failed'
+      // si cancel/error no-interrupción).
+      durableRequestIdRef.current = null;
     }
   };
 
@@ -3105,11 +3249,15 @@ export default function AgentScreen({ onBack, initialContext }) {
               data-testid="eta-label"
             >
               {(() => {
+                // UX PACIENTE (#5): estados visibles NO alarmantes. NUNCA
+                // pedimos "toca de nuevo" — la pregunta está guardada y, si se
+                // corta, se reintenta sola. Aun el caso lento ofrece SOLO
+                // Cancelar (acción voluntaria), nunca insinúa que se perdió.
                 if (showSlowWarning) {
-                  return 'Chagra IA sigue pensando — toca Cancelar si quieres reintentar';
+                  return 'Sigo pensando — esto puede tardar en el campo. Tu pregunta está guardada.';
                 }
                 // ETA visible. Si remainingMs es null o el item recién arrancó
-                // sin haber medido aún, caemos a "Procesando tu pregunta…".
+                // sin haber medido aún, caemos a "Pensando…".
                 if (remainingMs !== null && queueProcessing) {
                   const expected = queueProcessing.expectedEtaMs;
                   const elapsed = expected - remainingMs;
@@ -3120,14 +3268,15 @@ export default function AgentScreen({ onBack, initialContext }) {
                   // texto general en violeta.
                   const secsLeft = Math.max(0, Math.ceil(remainingMs / 1000));
                   if (overshoot) {
-                    return `Tardando más de lo normal (${Math.floor(elapsed / 1000)}s ya)`;
+                    // Sin alarma: tranquiliza que la pregunta sigue en proceso.
+                    return `Tardando un poco (${Math.floor(elapsed / 1000)}s) — sigo en eso, no se perdió.`;
                   }
                   if (stretching) {
                     return `Casi listo… (${Math.floor(elapsed / 1000)}s)`;
                   }
-                  return `Procesando tu pregunta… ~${secsLeft}s`;
+                  return `Pensando tu respuesta… ~${secsLeft}s`;
                 }
-                return 'Chagra IA está pensando…';
+                return 'Pensando… (puede tardar en el campo)';
               })()}
             </p>
             {queuePending.length >= 1 && (
