@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { ScreenShell } from '../common/ScreenShell';
 import AgendaCampesina from './AgendaCampesina';
+import JourneyGuideCard from './JourneyGuideCard';
 import useAlertStore from '../../store/useAlertStore';
 import { listFarmProcesses } from '../../db/farmProcessCache';
 import { getProfile } from '../../services/userProfileService';
@@ -164,6 +165,9 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
             <div className="flex flex-col gap-3 px-4 pt-3 pb-8 max-w-2xl mx-auto">
                 {/* Fecha de hoy, grande y en cristiano */}
                 <p className="text-sm text-slate-400 capitalize px-1">{fechaLarga}</p>
+
+                {/* ── 0. GUÍA DEL VIAJE — Chagra como agroecólogo desde el inicio ── */}
+                <JourneyGuideCard processes={processes} onNavigate={onNavigate} />
 
                 {/* ── 1. CLIMA DE HOY (honesto) ─────────────────────────── */}
                 {!geo ? (
