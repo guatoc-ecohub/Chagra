@@ -85,8 +85,7 @@ export default function ChipsToolbar({
       <div
         role="toolbar"
         aria-label="Modos del asistente"
-        className="flex gap-2 overflow-x-auto pb-1 -mb-1 scrollbar-none"
-        style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
+        className="flex flex-wrap gap-2 pb-1 -mb-1"
       >
         {/* Chip 📷 foto: primero y SOLO si hay imagen adjunta. */}
         {hasAttachment && (

@@ -494,3 +494,420 @@ describe('ragRetriever — tier-gate del catalogo (SEC-002 / UXC-004)', () => {
     }
   });
 });
+
+/**
+ * Tests específicos para prevenir regresión del fetch serial de 491 slugs
+ * (PROD-DOWN RAG #1271, hotfix 2026-06-02).
+ *
+ * Estos tests verifican:
+ *   - Con 491 slugs (tamaño real del manifest prod) NO hay fetch serial.
+ *   - Edge cases: 1 slug, < CONCURRENCY_LIMIT, = CONCURRENCY_LIMIT.
+ *   - Tolerancia a fallos: slugs que dan 404 o error de red no rompen la carga.
+ *   - Orden determinístico: los docs se insertan en orden lote-a-lote.
+ */
+describe('ragRetriever — anti-regresión fetch serial 491 slugs (PROD-DOWN #1271)', () => {
+  const CONCURRENCY_LIMIT = 12;
+
+  function makeManifest(n) {
+    return { generated_at: '2026-06-12T00:00:00Z', slugs: Array.from({ length: n }, (_, i) => `sp_${i}`) };
+  }
+
+  function makeSpeciesCatalog(n) {
+    // Crear catalogo que incluya todos los slugs del manifest (para evitar tier-gate)
+    return Array.from({ length: n }, (_, i) => ({
+      id: `sp_${i}`,
+      nombre_comun: `Especie ${i}`,
+    }));
+  }
+
+  /**
+   * Mock que trackea el orden de arrival de los fetches para verificar que
+   * hay paralelismo real (no serial) y que el límite de concurrencia se respeta.
+   */
+  function setupOrderedFetchMock(manifest) {
+    const tracker = {
+      inFlight: 0,
+      peak: 0,
+      docFetches: 0,
+      // Track start times para verificar paralelismo
+      startTimes: [],
+      // Track end times para verificar que no es serial
+      endTimes: [],
+    };
+
+    globalThis.fetch = vi.fn((url) => {
+      const u = String(url);
+      if (u.endsWith('/cycle-content/manifest.json')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          headers: { get: (h) => (h.toLowerCase() === 'content-type' ? 'application/json' : '') },
+          json: () => Promise.resolve(manifest),
+        });
+      }
+      const match = u.match(/\/cycle-content\/(sp_\d+)\.json/);
+      if (match) {
+        tracker.docFetches += 1;
+        tracker.inFlight += 1;
+        tracker.peak = Math.max(tracker.peak, tracker.inFlight);
+        tracker.startTimes.push(Date.now());
+
+        const slug = match[1];
+        const doc = {
+          species_slug: slug,
+          valor_pedagogico: `Documento sintético ${slug} con texto suficiente para indexar y recuperar por BM25 en el retriever.`,
+        };
+
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            tracker.inFlight -= 1;
+            tracker.endTimes.push(Date.now());
+            resolve({
+              ok: true,
+              status: 200,
+              headers: { get: (h) => (h.toLowerCase() === 'content-type' ? 'application/json' : '') },
+              json: () => Promise.resolve(doc),
+            });
+          }, 5);
+        });
+      }
+      return Promise.resolve({ ok: false, status: 404, headers: { get: () => '' } });
+    });
+    return tracker;
+  }
+
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  afterEach(() => {
+    delete globalThis.fetch;
+    vi.clearAllMocks();
+  });
+
+  it('PROD-DOWN #1271 — con 491 slugs (tamaño real del manifest) NO hay fetch serial', async () => {
+    const N = 491; // Tamaño real del manifest en prod (2026-06-02)
+    vi.doMock('../../db/catalogDB', () => ({
+      getAllSpecies: vi.fn().mockResolvedValue(makeSpeciesCatalog(N)),
+    }));
+    const tracker = setupOrderedFetchMock(makeManifest(N));
+    const { retrieve, getCorpusStats } = await import('../ragRetriever.js');
+
+    const startTime = Date.now();
+    await retrieve('documento sintético corpus indexable', 5);
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+
+    const stats = await getCorpusStats();
+    expect(stats.totalDocs).toBe(N);
+    expect(tracker.docFetches).toBe(N);
+
+    // Prueba clave: hubo MÁS DE UN fetch en vuelo a la vez.
+    // Con serial, peak sería 1. Con batching, peak >= 2.
+    expect(tracker.peak).toBeGreaterThan(1);
+    // Y debe respetar el límite de concurrencia.
+    expect(tracker.peak).toBeLessThanOrEqual(CONCURRENCY_LIMIT);
+
+    // Con serial de 491 fetches × 5ms = ~2.5s.
+    // Con batches de 12, ceil(491/12) barreras × 5ms ≈ 205ms.
+    // Asumimos que si dura < 1s, NO es serial.
+    expect(duration).toBeLessThan(1000);
+  });
+
+  it('PROD-DOWN #1271 — con exactamente CONCURRENCY_LIMIT (12) slugs hace un solo batch', async () => {
+    const N = CONCURRENCY_LIMIT;
+    vi.doMock('../../db/catalogDB', () => ({
+      getAllSpecies: vi.fn().mockResolvedValue(makeSpeciesCatalog(N)),
+    }));
+    const tracker = setupOrderedFetchMock(makeManifest(N));
+    const { retrieve, getCorpusStats } = await import('../ragRetriever.js');
+
+    await retrieve('documento sintético corpus indexable', 5);
+
+    const stats = await getCorpusStats();
+    expect(stats.totalDocs).toBe(N);
+    expect(tracker.docFetches).toBe(N);
+
+    // Con un solo batch, peak debe ser CONCURRENCY_LIMIT.
+    expect(tracker.peak).toBe(CONCURRENCY_LIMIT);
+  });
+
+  it('PROD-DOWN #1271 — con menos de CONCURRENCY_LIMIT (8) slugs hace un solo batch', async () => {
+    const N = 8;
+    vi.doMock('../../db/catalogDB', () => ({
+      getAllSpecies: vi.fn().mockResolvedValue(makeSpeciesCatalog(N)),
+    }));
+    const tracker = setupOrderedFetchMock(makeManifest(N));
+    const { retrieve, getCorpusStats } = await import('../ragRetriever.js');
+
+    await retrieve('documento sintético corpus indexable', 5);
+
+    const stats = await getCorpusStats();
+    expect(stats.totalDocs).toBe(N);
+    expect(tracker.docFetches).toBe(N);
+
+    // Con un solo batch de 8, peak debe ser 8.
+    expect(tracker.peak).toBe(N);
+  });
+
+  it('PROD-DOWN #1271 — con un solo slug (1) hace un solo batch', async () => {
+    const N = 1;
+    vi.doMock('../../db/catalogDB', () => ({
+      getAllSpecies: vi.fn().mockResolvedValue(makeSpeciesCatalog(N)),
+    }));
+    const tracker = setupOrderedFetchMock(makeManifest(N));
+    const { retrieve, getCorpusStats } = await import('../ragRetriever.js');
+
+    await retrieve('documento sintético corpus indexable', 5);
+
+    const stats = await getCorpusStats();
+    expect(stats.totalDocs).toBe(N);
+    expect(tracker.docFetches).toBe(N);
+
+    // Con un solo slug, peak es 1.
+    expect(tracker.peak).toBe(1);
+  });
+
+  it('PROD-DOWN #1271 — tolerancia a fallos: slugs 404 no rompen la carga', async () => {
+    const N = 30;
+    vi.doMock('../../db/catalogDB', () => ({
+      getAllSpecies: vi.fn().mockResolvedValue(makeSpeciesCatalog(N)),
+    }));
+    const manifest = makeManifest(N);
+    const tracker = { docFetches: 0, successful: 0 };
+
+    globalThis.fetch = vi.fn((url) => {
+      const u = String(url);
+      if (u.endsWith('/cycle-content/manifest.json')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          headers: { get: (h) => (h.toLowerCase() === 'content-type' ? 'application/json' : '') },
+          json: () => Promise.resolve(manifest),
+        });
+      }
+      const match = u.match(/\/cycle-content\/(sp_\d+)\.json/);
+      if (match) {
+        tracker.docFetches += 1;
+        const slug = match[1];
+        // Los slugs multiplos de 5 dan 404 (degradación silenciosa)
+        if (parseInt(slug.split('_')[1]) % 5 === 0) {
+          return Promise.resolve({ ok: false, status: 404, headers: { get: () => 'text/html' } });
+        }
+        tracker.successful += 1;
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          headers: { get: (h) => (h.toLowerCase() === 'content-type' ? 'application/json' : '') },
+          json: () => Promise.resolve({
+            species_slug: slug,
+            valor_pedagogico: `Documento sintético ${slug} con texto suficiente para indexar.`,
+          }),
+        });
+      }
+      return Promise.resolve({ ok: false, status: 404, headers: { get: () => '' } });
+    });
+
+    const { retrieve, getCorpusStats } = await import('../ragRetriever.js');
+
+    // No debe lanzar aunque algunos slugs fallen
+    await expect(retrieve('documento sintético corpus indexable', 5)).resolves.toBeDefined();
+
+    const stats = await getCorpusStats();
+    // 30 slugs - 6 fallidos (multiplos de 5) = 24 exitosos
+    expect(stats.totalDocs).toBe(24);
+    expect(tracker.docFetches).toBe(N);
+    expect(tracker.successful).toBe(24);
+  });
+
+  it('PROD-DOWN #1271 — tolerancia a fallos: slugs con error de red no rompen la carga', async () => {
+    const N = 20;
+    vi.doMock('../../db/catalogDB', () => ({
+      getAllSpecies: vi.fn().mockResolvedValue(makeSpeciesCatalog(N)),
+    }));
+    const manifest = makeManifest(N);
+    const tracker = { docFetches: 0, successful: 0, failed: 0 };
+
+    globalThis.fetch = vi.fn((url) => {
+      const u = String(url);
+      if (u.endsWith('/cycle-content/manifest.json')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          headers: { get: (h) => (h.toLowerCase() === 'content-type' ? 'application/json' : '') },
+          json: () => Promise.resolve(manifest),
+        });
+      }
+      const match = u.match(/\/cycle-content\/(sp_\d+)\.json/);
+      if (match) {
+        tracker.docFetches += 1;
+        const slug = match[1];
+        // Los slugs multiplos de 7 fallan con error de red
+        if (parseInt(slug.split('_')[1]) % 7 === 0) {
+          tracker.failed += 1;
+          return Promise.reject(new Error('ECONNREFUSED'));
+        }
+        tracker.successful += 1;
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          headers: { get: (h) => (h.toLowerCase() === 'content-type' ? 'application/json' : '') },
+          json: () => Promise.resolve({
+            species_slug: slug,
+            valor_pedagogico: `Documento sintético ${slug} con texto suficiente para indexar.`,
+          }),
+        });
+      }
+      return Promise.resolve({ ok: false, status: 404, headers: { get: () => '' } });
+    });
+
+    const { retrieve, getCorpusStats } = await import('../ragRetriever.js');
+
+    // No debe lanzar aunque algunos slugs fallen
+    await expect(retrieve('documento sintético corpus indexable', 5)).resolves.toBeDefined();
+
+    const stats = await getCorpusStats();
+    // 20 slugs - 3 fallidos (0, 7, 14 múltiplos de 7) = 17 exitosos
+    expect(stats.totalDocs).toBe(17);
+    expect(tracker.docFetches).toBe(N);
+    expect(tracker.successful).toBe(17);
+    expect(tracker.failed).toBe(3);
+  });
+
+  it('PROD-DOWN #1271 — determinismo: docs se insertan en orden lote-a-lote', async () => {
+    const N = 36; // 3 lotes completos de 12
+    vi.doMock('../../db/catalogDB', () => ({
+      getAllSpecies: vi.fn().mockResolvedValue(makeSpeciesCatalog(N)),
+    }));
+    const manifest = makeManifest(N);
+    const insertionOrder = [];
+
+    globalThis.fetch = vi.fn((url) => {
+      const u = String(url);
+      if (u.endsWith('/cycle-content/manifest.json')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          headers: { get: (h) => (h.toLowerCase() === 'content-type' ? 'application/json' : '') },
+          json: () => Promise.resolve(manifest),
+        });
+      }
+      const match = u.match(/\/cycle-content\/(sp_\d+)\.json/);
+      if (match) {
+        const slug = match[1];
+        // Cada fetch resuelve en un delay variable (0-10ms) para desordenar
+        const delay = Math.random() * 10;
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            insertionOrder.push(slug);
+            resolve({
+              ok: true,
+              status: 200,
+              headers: { get: (h) => (h.toLowerCase() === 'content-type' ? 'application/json' : '') },
+              json: () => Promise.resolve({
+                species_slug: slug,
+                valor_pedagogico: `Documento sintético ${slug} con texto suficiente para indexar.`,
+              }),
+            });
+          }, delay);
+        });
+      }
+      return Promise.resolve({ ok: false, status: 404, headers: { get: () => '' } });
+    });
+
+    const { retrieve } = await import('../ragRetriever.js');
+    await retrieve('documento sintético corpus indexable', 5);
+
+    // Debemos tener 36 docs insertados
+    expect(insertionOrder.length).toBe(N);
+
+    // Verificar que los docs están ordenados por lotes:
+    // - Lote 0: sp_0 a sp_11 (en cualquier orden entre ellos)
+    // - Lote 1: sp_12 a sp_23 (en cualquier orden entre ellos)
+    // - Lote 2: sp_24 a sp_35 (en cualquier orden entre ellos)
+    const batch0 = new Set(Array.from({ length: 12 }, (_, i) => `sp_${i}`));
+    const batch1 = new Set(Array.from({ length: 12 }, (_, i) => `sp_${i + 12}`));
+    const batch2 = new Set(Array.from({ length: 12 }, (_, i) => `sp_${i + 24}`));
+
+    // Encontrar los índices donde termina cada lote
+    let batch0End = -1;
+    let batch1End = -1;
+
+    for (let i = 0; i < insertionOrder.length; i++) {
+      if (batch0End === -1 && !batch0.has(insertionOrder[i])) {
+        batch0End = i - 1;
+      }
+      if (batch1End === -1 && !batch0.has(insertionOrder[i]) && !batch1.has(insertionOrder[i])) {
+        batch1End = i - 1;
+      }
+    }
+
+    // Todos los elementos antes de batch0End deben ser del lote 0
+    for (let i = 0; i <= batch0End; i++) {
+      expect(batch0.has(insertionOrder[i])).toBe(true);
+    }
+
+    // Todos los elementos entre batch0End+1 y batch1End deben ser del lote 1
+    for (let i = batch0End + 1; i <= batch1End; i++) {
+      expect(batch1.has(insertionOrder[i])).toBe(true);
+    }
+
+    // Todos los elementos después de batch1End deben ser del lote 2
+    for (let i = batch1End + 1; i < insertionOrder.length; i++) {
+      expect(batch2.has(insertionOrder[i])).toBe(true);
+    }
+  });
+
+  it('PROD-DOWN #1271 — prewarmCorpus + retrieve concurrentes no duplican fetches', async () => {
+    const N = 30;
+    vi.doMock('../../db/catalogDB', () => ({
+      getAllSpecies: vi.fn().mockResolvedValue(makeSpeciesCatalog(N)),
+    }));
+    const tracker = setupOrderedFetchMock(makeManifest(N));
+    const { prewarmCorpus, retrieve } = await import('../ragRetriever.js');
+
+    // Disparar prewarm y retrieve concurrentemente (race condition)
+    const [prewarmResult, retrieveResult] = await Promise.all([
+      prewarmCorpus(),
+      retrieve('documento sintético corpus indexable', 5),
+    ]);
+
+    // Ambos deben completar sin error
+    expect(prewarmResult).toBeUndefined();
+    expect(retrieveResult.length).toBeGreaterThan(0);
+
+    // Solo debe haber N fetches (no 2N por duplicación)
+    expect(tracker.docFetches).toBe(N);
+
+    // Debe haber habido paralelismo (no serial)
+    expect(tracker.peak).toBeGreaterThan(1);
+  });
+
+  it('PROD-DOWN #1271 — múltiples retrieve concurrentes después de prewarm no hacen fetches extra', async () => {
+    const N = 25;
+    vi.doMock('../../db/catalogDB', () => ({
+      getAllSpecies: vi.fn().mockResolvedValue(makeSpeciesCatalog(N)),
+    }));
+    const tracker = setupOrderedFetchMock(makeManifest(N));
+    const { prewarmCorpus, retrieve } = await import('../ragRetriever.js');
+
+    // Prewarm primero
+    await prewarmCorpus();
+    const fetchesAfterPrewarm = tracker.docFetches;
+    expect(fetchesAfterPrewarm).toBe(N);
+
+    // Múltiples retrieve concurrentes con queries que sabemos que tienen matches
+    const results = await Promise.all([
+      retrieve('documento sintético', 5),
+      retrieve('sintético corpus', 5),
+      retrieve('indexar', 5),
+    ]);
+
+    // Al menos algunos deben tener resultados (no todos vacíos)
+    const totalResults = results.reduce((sum, r) => sum + r.length, 0);
+    expect(totalResults).toBeGreaterThan(0);
+
+    // No debe haber fetches nuevos (corpus ya cacheado)
+    expect(tracker.docFetches).toBe(fetchesAfterPrewarm);
+  });
+});

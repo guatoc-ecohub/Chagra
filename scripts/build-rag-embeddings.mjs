@@ -119,9 +119,24 @@ async function main() {
   const vectors = await embedTexts(texts);
 
   const output = {};
-  validSlugs.forEach((slug, i) => {
-    output[slug] = vectors[i];
-  });
+  const quantize = process.argv.includes('--quantize');
+
+  if (quantize) {
+    // int8 quantization: cada vector 768d float32 → Int8Array + escala
+    for (let i = 0; i < validSlugs.length; i++) {
+      const vec = vectors[i];
+      let maxAbs = 0;
+      for (let j = 0; j < vec.length; j++) maxAbs = Math.max(maxAbs, Math.abs(vec[j]));
+      const scale = maxAbs / 127;
+      const int8 = new Int8Array(vec.length);
+      for (let j = 0; j < vec.length; j++) int8[j] = Math.round(vec[j] / scale);
+      output[validSlugs[i]] = { q: 'int8', s: Number(scale.toFixed(8)), v: Array.from(int8) };
+    }
+  } else {
+    for (let i = 0; i < validSlugs.length; i++) {
+      output[validSlugs[i]] = vectors[i];
+    }
+  }
 
   writeFileSync(OUTPUT_PATH, JSON.stringify(output));
   const stats = { slugs: validSlugs.length, dim: vectors[0]?.length || 0, bytes: Buffer.byteLength(JSON.stringify(output), 'utf8') };

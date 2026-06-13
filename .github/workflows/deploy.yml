@@ -74,6 +74,12 @@ jobs:
         #      "Deploy failed" genérico).
         run: |
           set -o pipefail
+          # 2026-06-11: el codebase crecio (muchos PRs) y eslint OOMeaba con el
+          # heap default (~4GB) -> FATAL "heap out of memory" -> tumbaba el deploy
+          # ENTERO (no era un error de lint, era falta de memoria, y el crash se
+          # comia la logica soft-fail). Subimos el heap de node para que eslint
+          # complete. El runner (alpha) tiene RAM de sobra.
+          export NODE_OPTIONS="--max-old-space-size=8192"
           if ! npm run lint -- --max-warnings 9999 2>&1 | tee /tmp/lint.log; then
             {
               echo "## Deploy bloqueado: lint failed"

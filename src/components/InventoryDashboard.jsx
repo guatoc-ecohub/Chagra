@@ -3,6 +3,7 @@ import { Package, AlertTriangle, Plus, X, Download } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import { UNIT_OPTIONS } from '../config/materials';
 import { useConsumptionMetrics } from '../hooks/useConsumptionMetrics';
+import BiopreparadoRecetasGallery from './BiopreparadoRecetasGallery';
 import { Sparkline } from './charts/Sparkline';
 import { exportTraceabilityCsv } from '../services/exportService';
 import { getAllPlans, markStepExecuted } from '../services/planGeneratorService';
@@ -313,6 +314,13 @@ export const InventoryDashboard = () => {
           </div>
         </section>
       )}
+
+      {/* Galería de recetas de biopreparados — visible siempre (no gateada por
+          el inventario). Antes los 15 diagramas eran inalcanzables si la Bodega
+          estaba vacía (bug operador 2026-06-11). */}
+      <div className="mb-5 flex justify-center">
+        <BiopreparadoRecetasGallery />
+      </div>
 
       {materials.length === 0 ? (
         <div className="py-12 text-center text-slate-500">
