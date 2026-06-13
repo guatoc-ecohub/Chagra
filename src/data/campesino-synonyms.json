@@ -10,7 +10,8 @@
     "gota": ["tizon", "phytophthora", "hongo"],
     "palomilla": ["mariposa", "polilla", "lepidoptera"],
     "chinche": ["hemiptera", "chupador", "plaga"],
-    "mosca_blanca": ["bemisia", "homoptera"]
+    "mosca_blanca": ["bemisia", "homoptera"],
+    "nematodo": ["gusano", "microscopico", "suelo"]
   },
   "control": {
     "matamaleza": ["herbicida", "control", "maleza", "arvenses"],
