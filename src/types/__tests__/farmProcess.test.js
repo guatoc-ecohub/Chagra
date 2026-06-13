@@ -5,6 +5,7 @@ import { describe, it, expect } from 'vitest';
 import {
   isFarmProcess, isFarmProcessEvent, isPopulation,
   validateFarmProcess, validateFarmProcessEvent, validatePopulation,
+  stageSequenceForProcessType, RESTORATION_STAGE_SEQUENCE,
 } from '../farmProcess';
 
 // ─── Fixtures (Task 14) ────────────────────────────────────────
@@ -189,5 +190,31 @@ describe('Population validator', () => {
 
   it('rejects count < 1', () => {
     expect(() => validatePopulation(makePopulation({ count: 0 }))).toThrow(/count/);
+  });
+});
+
+describe('etapas propias de restauración (no fenología de cultivo)', () => {
+  it('valida un proceso de restauración en etapa propia (prendimiento)', () => {
+    expect(() => validateFarmProcess(makeProcess({ process_type: 'restoration', current_stage: 'prendimiento' }))).not.toThrow();
+  });
+
+  it('valida monitoreo_sucesion y cierre (restoration/silvopasture)', () => {
+    expect(() => validateFarmProcess(makeProcess({ process_type: 'restoration', current_stage: 'monitoreo_sucesion' }))).not.toThrow();
+    expect(() => validateFarmProcess(makeProcess({ process_type: 'silvopasture', current_stage: 'cierre' }))).not.toThrow();
+  });
+
+  it('stageSequenceForProcessType(restoration) trae hitos de restauración, no floración/cosecha', () => {
+    const seq = stageSequenceForProcessType('restoration');
+    expect(seq).toBe(RESTORATION_STAGE_SEQUENCE);
+    const codigos = seq.map((s) => s.stage);
+    expect(codigos).toContain('prendimiento');
+    expect(codigos).not.toContain('flowering');
+    expect(codigos).not.toContain('harvest');
+  });
+
+  it('stageSequenceForProcessType(sowing) sí trae fenología de cultivo', () => {
+    const codigos = stageSequenceForProcessType('sowing').map((s) => s.stage);
+    expect(codigos).toContain('germination');
+    expect(codigos).toContain('harvest');
   });
 });
