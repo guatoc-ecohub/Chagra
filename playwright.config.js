@@ -128,10 +128,19 @@ export default defineConfig({
       grep: /@cross-platform/,
     },
   ],
-  webServer: {
-    command: 'npx vite --port=5173 --strictPort',
-    url: 'http://localhost:5173',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+  // webServer: solo cuando NO se provee un servidor externo. Si
+  // PLAYWRIGHT_BASE_URL está seteado (ej. el gate offline-corpus-dist arranca su
+  // propio `vite preview` con el SW de producción), NO levantamos el dev server
+  // de Playwright — si no, chocaría con el preview por el puerto 5173 y, peor,
+  // serviría módulos de dev (sin bundle/SW real) en vez del dist.
+  ...(process.env.PLAYWRIGHT_BASE_URL
+    ? {}
+    : {
+        webServer: {
+          command: 'npx vite --port=5173 --strictPort',
+          url: 'http://localhost:5173',
+          reuseExistingServer: !process.env.CI,
+          timeout: 120_000,
+        },
+      }),
 });

@@ -44,3 +44,60 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 14
+
+  # Gate dedicado offline-first de campo: corre el spec del corpus RAG contra el
+  # BUILD de producción + `vite preview` (Service Worker REAL), NO el dev server.
+  # Motivo (memoria feedback-sidecar-bench-misses-pwa-rag-path): el gate viejo
+  # corría en dev y era ciego al SW de prod. Aquí validamos que el corpus +
+  # embeddings + bundle se sirven OFFLINE desde la cache del SW real tras una
+  # recarga en frío.
+  offline-corpus-dist:
+    name: Offline-first corpus (dist + SW real)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build (genera dist con SW de producción)
+        run: npm run build
+        env:
+          VITE_FARMOS_URL: ''
+          VITE_FARMOS_CLIENT_ID: farm
+
+      - name: Preview server + offline-corpus spec contra el SW real
+        run: |
+          npx vite preview --port 5173 --strictPort &
+          PREVIEW_PID=$!
+          # Espera a que el preview responda (hasta 60s) sin dependencias extra.
+          for i in $(seq 1 60); do
+            if curl -sf -o /dev/null http://localhost:5173/sw.js; then break; fi
+            sleep 1
+          done
+          npx playwright test offline-corpus.spec.js --project=chromium
+          STATUS=$?
+          kill $PREVIEW_PID 2>/dev/null || true
+          exit $STATUS
+        env:
+          CI: '1'
+          PLAYWRIGHT_BASE_URL: http://localhost:5173
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-offline-corpus
+          path: playwright-report/
+          retention-days: 14
