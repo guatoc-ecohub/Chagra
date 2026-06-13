@@ -335,15 +335,13 @@ test.describe('BUG conocido — "Procesos por voz" dead-end sin zona', () => {
     await mockOAuth(page);
   });
 
-  test('reproduce el ATASCO: sin zonas/lotes, "Confirmar siembra" queda DESHABILITADO (dead-end total)', async ({ page }) => {
-    // Escenario del operador: usuario nuevo SIN lotes definidos. Llega a la
-    // tarjeta de confirmación tras hablar; especie/cantidad están OK, pero el
-    // selector de Zona/Lote no tiene ninguna opción real → locationId queda ''
-    // → el botón nunca se habilita → no hay forma de avanzar ni de crear zona.
+  test('FIX — sin zonas/lotes, "Confirmar siembra" se HABILITA y permite sembrar sin ubicacion (ya no es dead-end)', async ({ page }) => {
+    // FIX del dead-end: location_land_asset_id ahora es OPCIONAL.
+    // Con 0 lotes, especie y cantidad validas → boton habilitado,
+    // la siembra se confirma con ubicacion vacia (el campesino puede
+    // asignar zona despues). La UI muestra "Sin asignar".
     await bootToDashboard(page, { seedLands: false });
 
-    // Verificamos en el modelo de la tarjeta: con 0 zonas, allValid === false
-    // aunque especie y cantidad sean válidas.
     const verdict = await page.evaluate(() => {
       const draft = {
         process_type: 'seeding',
@@ -351,24 +349,23 @@ test.describe('BUG conocido — "Procesos por voz" dead-end sin zona', () => {
         subject_slug: 'solanum_lycopersicum',
         quantity: 10,
         unit: 'plantas',
-        location_land_asset_id: '', // <- voz NO resolvió zona (caso común)
+        location_land_asset_id: '',
         transcription: 'sembré 10 tomates',
       };
       const species = (draft.subject_label || '').trim();
       const quantity = Number(draft.quantity);
-      const locationOptions = []; // <- NO hay lotes en la finca
+      const locationOptions = [];
       const locationId = draft.location_land_asset_id || '';
-      // Réplica EXACTA de allValid en FarmProcessConfirmCard.jsx (línea 73).
-      const allValid = species.length > 0 && quantity > 0 && Boolean(locationId);
+      // Replica EXACTA de allValid tras el fix (sin locationId en la condicion)
+      const allValid = species.length > 0 && quantity > 0;
       return { allValid, optionsCount: locationOptions.length, locationId };
     });
 
-    // ESTE es el bug: la siembra es válida en todo menos la zona, que NO se
-    // puede seleccionar porque no existe ninguna → botón muerto.
-    expect(verdict.optionsCount, 'sin lotes en la finca = dead-end').toBe(0);
-    expect(verdict.allValid, 'el botón Confirmar siembra NUNCA se habilita sin zona').toBe(false);
+    // FIX: con 0 zonas, allValid AHORA es true (la ubicacion es opcional)
+    expect(verdict.optionsCount, 'sin lotes en la finca').toBe(0);
+    expect(verdict.allValid, 'el boton Confirmar siembra SE habilita aunque no haya zona').toBe(true);
 
-    // Y lo confirmamos en la UI REAL renderizando la tarjeta con locationOptions=[].
+    // UI REAL: el boton esta HABILITADO sin zona
     await page.evaluate(async ([reactDep, reactDomDep]) => {
       const ReactMod = await import(reactDep);
       const ReactDOM = await import(reactDomDep);
@@ -390,7 +387,7 @@ test.describe('BUG conocido — "Procesos por voz" dead-end sin zona', () => {
       createRoot(host).render(
         React.createElement(Card, {
           draft,
-          locationOptions: [], // SIN zonas — el caso del operador
+          locationOptions: [],
           isSaving: false,
           onConfirm: () => { window.__confirmFired = true; },
           onCancel: () => {},
@@ -400,14 +397,22 @@ test.describe('BUG conocido — "Procesos por voz" dead-end sin zona', () => {
 
     const confirmBtn = page.getByRole('button', { name: /Confirmar siembra/i });
     await expect(confirmBtn).toBeVisible({ timeout: 8000 });
-    // El botón existe pero está DESHABILITADO: dead-end reproducido en la UI real.
-    await expect(confirmBtn).toBeDisabled();
+    // FIX: el boton AHORA esta HABILITADO (ya no es dead-end)
+    await expect(confirmBtn).toBeEnabled({ timeout: 5000 });
 
-    // El selector de Zona/Lote solo ofrece "Seleccionar…": no hay salida.
+    // El selector muestra "Sin lotes disponibles" en vez de "Seleccionar..."
     const zoneSelect = page.locator('#e2e-confirm-host select').last();
     const optionTexts = await zoneSelect.locator('option').allInnerTexts();
-    expect(optionTexts).toEqual(['Seleccionar…']);
-    expect(optionTexts.some((t) => /Lote|invernadero|zona/i.test(t))).toBe(false);
+    expect(optionTexts).toEqual(['Sin lotes disponibles']);
+
+    // El hint "Sin asignar" es visible
+    const hint = page.locator('#e2e-confirm-host').locator('text=Sin asignar');
+    await expect(hint).toBeVisible();
+
+    // Al confirmar SIN zona, onConfirm se dispara igual
+    await confirmBtn.click();
+    const fired = await page.evaluate(() => window.__confirmFired === true);
+    expect(fired, 'sin zona, Confirmar siembra IGUAL dispara onConfirm').toBe(true);
   });
 
   test('CON al menos una zona, el flujo SÍ se desbloquea (control positivo)', async ({ page }) => {
@@ -436,7 +441,8 @@ test.describe('BUG conocido — "Procesos por voz" dead-end sin zona', () => {
           draft,
           locationOptions: [{ id: 'e2e-land-lote-1', type: 'asset--land', name: 'Lote 1 (prueba)', label: 'Lote 1 (prueba)' }],
           isSaving: false,
-          onConfirm: () => { window.__confirmFired = true; },
+          // Capturamos el payload para verificar que la zona elegida se propaga.
+          onConfirm: (p) => { window.__confirmFired = true; window.__confirmPayload = p; },
           onCancel: () => {},
         }),
       );
@@ -444,16 +450,25 @@ test.describe('BUG conocido — "Procesos por voz" dead-end sin zona', () => {
 
     const confirmBtn = page.getByRole('button', { name: /Confirmar siembra/i });
     await expect(confirmBtn).toBeVisible({ timeout: 8000 });
-    // Sin zona seleccionada todavía está deshabilitado…
-    await expect(confirmBtn).toBeDisabled();
+    // Ubicacion OPCIONAL: con especie y cantidad validas el boton ya esta
+    // habilitado aunque todavia no se haya elegido zona (ya no es dead-end).
+    await expect(confirmBtn).toBeEnabled({ timeout: 5000 });
 
-    // …seleccionamos la zona disponible → se habilita y confirma.
+    // El control positivo de la ZONA: si hay lotes, el selector los ofrece y la
+    // eleccion se respeta. Elegimos la zona disponible…
     const zoneSelect = page.locator('#e2e-confirm-host select').last();
+    const optionTexts = await zoneSelect.locator('option').allInnerTexts();
+    expect(optionTexts, 'con lotes, el selector ofrece la zona real').toContain('Lote 1 (prueba)');
     await zoneSelect.selectOption({ label: 'Lote 1 (prueba)' });
+    // …sigue habilitado y confirma.
     await expect(confirmBtn).toBeEnabled({ timeout: 5000 });
     await confirmBtn.click();
+
     const fired = await page.evaluate(() => window.__confirmFired === true);
     expect(fired, 'con zona, Confirmar siembra SÍ dispara onConfirm').toBe(true);
+    // La zona elegida viaja en el payload confirmado (el wiring de seleccion vive).
+    const confirmedLand = await page.evaluate(() => window.__confirmPayload?.location_land_asset_id);
+    expect(confirmedLand, 'la zona elegida se propaga al ciclo confirmado').toBe('e2e-land-lote-1');
   });
 });
 

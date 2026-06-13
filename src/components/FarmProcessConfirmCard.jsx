@@ -56,7 +56,7 @@ export default function FarmProcessConfirmCard({
   }, [species, allSpecies]);
 
   const handleConfirm = () => {
-    if (!species.trim() || !(Number(quantity) > 0) || !locationId) return;
+    if (!species.trim() || !(Number(quantity) > 0)) return;
     const selected = allSpecies.find((s) => s.commonName === species || s.name === species);
     onConfirm({
       ...draft,
@@ -70,7 +70,7 @@ export default function FarmProcessConfirmCard({
     });
   };
 
-  const allValid = species.trim().length > 0 && Number(quantity) > 0 && locationId;
+  const allValid = species.trim().length > 0 && Number(quantity) > 0;
 
   return (
     <div className="p-4 flex flex-col gap-4">
@@ -187,7 +187,7 @@ export default function FarmProcessConfirmCard({
         </label>
       </div>
 
-      {/* Zona / Lote */}
+      {/* Zona / Lote — opcional; si no hay lotes el ciclo se crea sin ubicacion */}
       <label className="flex flex-col gap-1">
         <span className="text-2xs font-bold text-slate-400 uppercase">Zona / Lote</span>
         <select
@@ -196,11 +196,16 @@ export default function FarmProcessConfirmCard({
           className="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white focus:border-lime-500 focus:outline-none"
           disabled={isSaving}
         >
-          <option value="">Seleccionar…</option>
+          <option value="">
+            {locationOptions.length === 0 ? 'Sin lotes disponibles' : 'Seleccionar…'}
+          </option>
           {locationOptions.map((o) => (
             <option key={o.id} value={o.id}>{o.label || o.name}</option>
           ))}
         </select>
+        {!locationId && (
+          <span className="text-3xs text-slate-500">Sin asignar (puedes asignarlo despues)</span>
+        )}
       </label>
 
       {/* Fecha */}

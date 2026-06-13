@@ -191,7 +191,9 @@ export const validateFarmProcess = (p) => {
   if (!a.subject_slug && !a.subject_label) throw new Error('Need subject_slug or subject_label');
   if (!Number.isInteger(a.quantity) || a.quantity < 1) throw new Error('quantity must be positive integer');
   if (!a.unit) throw new Error('Missing unit');
-  if (!a.location_land_asset_id) throw new Error('Missing location_land_asset_id');
+  // location_land_asset_id es OPCIONAL (fix dead-end sin lotes).
+  // Si no hay lotes en la finca, el ciclo se crea sin ubicacion;
+  // el campesino puede asignarla despues. La UI muestra "Sin asignar".
   if (!VALID_STATUSES.includes(a.status)) throw new Error(`Invalid status: ${a.status}`);
   if (!VALID_STAGES.includes(a.current_stage)) throw new Error(`Invalid current_stage: ${a.current_stage}`);
 };
@@ -221,5 +223,5 @@ export const validatePopulation = (p) => {
   if (!p.population_id) throw new Error('Missing population_id');
   if (!p.species_slug) throw new Error('Missing species_slug');
   if (!Number.isInteger(p.count) || p.count < 1) throw new Error('count must be positive integer');
-  if (!p.location_land_asset_id) throw new Error('Missing location_land_asset_id');
+  // location_land_asset_id es OPCIONAL (mismo criterio que FarmProcess).
 };
