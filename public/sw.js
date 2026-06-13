@@ -7,7 +7,11 @@ const ASSETS_TO_CACHE = [
   '/favicon.svg',
   '/icon-180.png',
   '/icon-192.png',
-  '/icon-512.png'
+  '/icon-512.png',
+  // Catálogo de especies (sqlite-wasm). Precacheado para que el catálogo sea
+  // consultable OFFLINE aunque el usuario nunca haya abierto una vista que lo
+  // cargue estando online. ~1.2 MB; aceptable para garantizar offline-first.
+  '/catalog.sqlite'
 ];
 
 // Instalación del Service Worker.
@@ -21,7 +25,37 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(ASSETS_TO_CACHE))
+      .then(async (cache) => {
+        // 1) Shell estático (HTML/manifest/icons/catálogo). add por item (no
+        //    addAll atómico) para que un 404 transitorio de un asset opcional
+        //    (ej. /catalog.sqlite) no aborte el precache completo del shell.
+        await Promise.all(
+          ASSETS_TO_CACHE.map((u) => cache.add(u).catch(() => undefined))
+        );
+        // 2) Bundle de arranque: parseamos index.html para descubrir los chunks
+        //    de entrada hasheados (`/assets/index-*.js`, rolldown-runtime,
+        //    vendor-react/state, css) y los precacheamos. Sin esto, una recarga
+        //    OFFLINE en frío no podía bootear React (los <script> de /assets/*
+        //    daban ERR_INTERNET_DISCONNECTED). El resto de chunks lazy se cachea
+        //    on-demand vía la estrategia cache-first del handler de fetch.
+        try {
+          const res = await fetch('/index.html', { cache: 'no-store' });
+          if (res && res.ok) {
+            const html = await res.text();
+            const assetRe = /\/assets\/[A-Za-z0-9._-]+\.(?:js|css)/g;
+            const found = Array.from(new Set(html.match(assetRe) || []));
+            // addAll es atómico (falla todo si uno falla); usamos add por chunk
+            // para que un 404 transitorio de un chunk no aborte el precache del
+            // resto del bundle de arranque.
+            await Promise.all(
+              found.map((u) => cache.add(u).catch(() => undefined))
+            );
+          }
+        } catch {
+          // Sin red en el install (raro): el shell quedó cacheado igual; los
+          // chunks se llenarán cache-first en la primera carga online.
+        }
+      })
   );
 });
 
@@ -68,9 +102,44 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // PASSTHROUGH para chunks hasheados de Vite. NO interceptar.
-  if (url.pathname.startsWith('/assets/')) {
-    return; // browser maneja directamente
+  // Chunks hasheados de Vite (`/assets/index-XXXX.js`, vendors, lazy chunks,
+  // CSS): CACHE-FIRST con relleno en background.
+  //
+  // ANTES esto era PASSTHROUGH puro (return; sin cachear). Consecuencia: en una
+  // recarga OFFLINE el shell `/index.html` cargaba del cache, pero TODOS los
+  // <script>/<link> que referencia apuntan a `/assets/*` → el browser intenta
+  // bajarlos de la red → `net::ERR_INTERNET_DISCONNECTED` → React NUNCA monta →
+  // pantalla en blanco / splash colgado. La PWA NO arrancaba offline en frío.
+  // (Evidencia E2E offline-first 2026-06-13: 0/113 chunks cacheados; reload
+  // offline = blank. El guard offline del agente quedaba además inalcanzable
+  // porque su chunk lazy tampoco se cacheaba.)
+  //
+  // El motivo histórico del passthrough (servir chunks viejos tras deploy →
+  // 404 → white screen, incidente 2026-05-06) NO aplica con cache-first sobre
+  // filenames inmutables: cada deploy genera hashes nuevos, el HTML fresco
+  // (Network-First más abajo) referencia los nuevos, y el `activate` borra el
+  // cache viejo entero al bumpear CACHE_NAME (chagra-<sha> por deploy). Un chunk
+  // cacheado solo se sirve si su URL exacta (con hash) sigue referenciada.
+  if (url.pathname.startsWith('/assets/') && event.request.method === 'GET') {
+    event.respondWith(
+      caches.match(event.request).then((cached) => {
+        if (cached) return cached;
+        return fetch(event.request)
+          .then((response) => {
+            // Solo cacheamos respuestas completas y válidas (no opaque/parcial).
+            if (response && response.ok && response.status === 200) {
+              const respClone = response.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, respClone));
+            }
+            return response;
+          })
+          // Offline y sin cache: devolvemos un 504 explícito en vez de dejar
+          // que el browser tire ERR_INTERNET_DISCONNECTED silencioso. El chunk
+          // ya cacheado (caso normal tras una visita online) sí se sirve arriba.
+          .catch(() => new Response('', { status: 504, statusText: 'Offline: chunk no cacheado' }));
+      })
+    );
+    return;
   }
 
   // HTML shell (documento navegable: `/`, `/index.html`, o cualquier navegación

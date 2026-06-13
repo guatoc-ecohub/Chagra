@@ -541,8 +541,53 @@ contradice lo que el usuario dice ahora, dale prioridad a lo que dice ahora.
 === FIN PERFIL DEL USUARIO ===`;
 }
 
+/**
+ * Consentimiento de telemetría de uso del agente (#6230).
+ *
+ * Si el usuario habilita esta opción, los metadatos anónimos de las
+ * consultas al agente (route, model, latencias, tokens, etc.) se envían
+ * al backend de telemetría para mejorar el producto. El prompt COMPLETO
+ * nunca se envía (privacidad-first). Default: OFF.
+ *
+ * Se guarda en localStorage independiente del perfil para separar
+ * identidad (nombre, región) de métricas agregadas (latencias, modelos).
+ */
+const TELEMETRY_CONSENT_KEY = `${PROFILE_PREFIX}telemetry_consent:v1`;
+
+/**
+ * Lee el consentimiento de telemetría. Default: false (OFF).
+ * @returns {boolean}
+ */
+export function getTelemetryConsent() {
+  if (!hasStorage()) return false;
+  try {
+    const value = window.localStorage.getItem(TELEMETRY_CONSENT_KEY);
+    return value === 'true';
+  } catch (e) {
+    console.warn('[userProfile] No se pudo leer consentimiento telemetría:', e);
+    return false;
+  }
+}
+
+/**
+ * Persiste el consentimiento de telemetría.
+ * @param {boolean} enabled
+ * @returns {boolean} valor guardado
+ */
+export function setTelemetryConsent(enabled) {
+  if (!hasStorage()) return false;
+  try {
+    window.localStorage.setItem(TELEMETRY_CONSENT_KEY, enabled ? 'true' : 'false');
+    return enabled;
+  } catch (e) {
+    console.warn('[userProfile] No se pudo guardar consentimiento telemetría:', e);
+    return false;
+  }
+}
+
 export const __PROFILE_KEYS__ = {
   PROFILE_KEY,
   PROFILE_DONE_KEY,
   PROFILE_SKIPPED_KEY,
+  TELEMETRY_CONSENT_KEY,
 };

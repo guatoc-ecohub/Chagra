@@ -1334,14 +1334,17 @@ export default function AgentScreen({ onBack, initialContext }) {
               // Carbono/PSA (Task 3): detectarAlertaCarbono
               modules.push([
                 (text) => /\b(bonos?\s+carbono|pagar\s+por\s+sembrar|carbono\b.*\bpagar|PSA|Decreto\s+1007)\b/i.test(text),
-                async () => { const c = await import('../../services/carbonoAlerta'); const p = await import('../../data/carbono-alertas.json'); return { diagnosticar: (t) => c.detectarAlertaCarbono(t), formatear: (d) => d ? `ALERTA BONOS DE CARBONO: ${d.alerta}\n\nTrampas:\n${d.trampas.map((t) => `- ${t.nombre}: ${t.riesgo}`).join('\n')}\n\nRecomendacion: ${d.recomendacion}` : '' }; },
+                async () => { const c = await import('../../services/carbonoAlerta'); return { diagnosticar: (t) => c.detectarAlertaCarbono(t), formatear: (d) => d ? `ALERTA BONOS DE CARBONO: ${d.alerta}\n\nTrampas:\n${d.trampas.map((t) => `- ${t.nombre}: ${t.riesgo}`).join('\n')}\n\nRecomendacion: ${d.recomendacion}` : '' }; },
                 'carbono_alerta', 'carbono',
               ]);
+              // Altitud del perfil de finca activa → el grounding de restauración
+              // elige especies nativas REALES del piso térmico (anti-fabricación).
+              const restAltitud = fincas?.find((f) => f.slug === activeFincaSlug)?.altitud ?? null;
               for (const [hasIntent, loadMod, tool, label] of modules) {
                 if (hasIntent(textForLLM)) {
                   try {
                     const mod = await loadMod();
-                    const diag = mod.diagnosticar(textForLLM);
+                    const diag = mod.diagnosticar(textForLLM, { altitud: restAltitud });
                     if (diag && (diag.sin_datos === false || diag.alerta)) {
                       const bloque = mod.formatear(diag);
                       if (bloque) {

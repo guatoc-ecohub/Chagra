@@ -39,13 +39,21 @@
 export const IDLE_TIMEOUT_MS = 40000;
 
 /**
- * Techo absoluto desde el arranque (backstop extremo). NO se reinicia con
- * tokens. 120s es ampliamente suficiente para cualquier respuesta legítima del
- * agente (incluyendo planes multi-aspecto largos en el modelo complejo); su
- * único fin es evitar que la UI quede colgada indefinidamente ante un backend
- * que gotea tokens para siempre. NO es infinito a propósito.
+ * Presupuesto para el PRIMER token (distinto del idle entre tokens). Bajo carga
+ * de GPU única el time-to-first-token llega a 95-151s (test integral 2026-06-13);
+ * el idle de 40s abortaba ANTES del primer token y mostraba "Tiempo agotado". Este
+ * presupuesto separado tolera la espera inicial; cuando empieza a fluir, aplica el
+ * idle normal entre tokens.
  */
-export const HARD_CEILING_MS = 120000;
+export const FIRST_TOKEN_TIMEOUT_MS = 200000;
+
+/**
+ * Techo absoluto desde el arranque (backstop extremo). NO se reinicia con
+ * tokens. 300s tolera respuestas legítimas largas bajo contención de GPU única
+ * (antes 120s también abortaba respuestas largas bajo carga); su único fin es
+ * evitar que la UI quede colgada ante un backend que gotea tokens para siempre.
+ */
+export const HARD_CEILING_MS = 300000;
 
 /**
  * Crea un controlador de deadline stream-aware.
@@ -69,6 +77,7 @@ export const HARD_CEILING_MS = 120000;
  */
 export function createStreamDeadline({
   idleMs = IDLE_TIMEOUT_MS,
+  firstTokenMs = FIRST_TOKEN_TIMEOUT_MS,
   ceilingMs = HARD_CEILING_MS,
   onTimeout,
 } = {}) {
@@ -114,7 +123,9 @@ export function createStreamDeadline({
       // Idempotente: re-arranque limpio (no acumula timers huérfanos).
       clearTimers();
       finished = false;
-      armIdle();
+      // Antes del primer token: presupuesto GENEROSO (firstTokenMs), NO el idle
+      // corto — bajo carga el primer token tarda 95-151s. onToken() cambia al idle.
+      idleTimer = setTimeout(() => fire('first_token'), firstTokenMs);
       ceilingTimer = setTimeout(() => fire('ceiling'), ceilingMs);
     },
     onToken() {

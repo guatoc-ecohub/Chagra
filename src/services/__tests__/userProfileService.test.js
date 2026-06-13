@@ -13,6 +13,9 @@ import {
   getNotificationStyle,
   setNotificationStyle,
   DEFAULT_NOTIFICATION_STYLE,
+  getTelemetryConsent,
+  setTelemetryConsent,
+  __PROFILE_KEYS__,
 } from '../userProfileService.js';
 
 describe('userProfileService (#200)', () => {
@@ -273,5 +276,63 @@ describe('resolveAltitudToSave — coalesce no-destructivo (#1213-regresion)', (
       saveProfile({ nombre: 'Lili' });
       expect(getNotificationStyle()).toBe('demo');
     });
+  });
+});
+
+describe('consentimiento de telemetría (#6230)', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('getTelemetryConsent devuelve false por defecto (OFF)', () => {
+    expect(getTelemetryConsent()).toBe(false);
+  });
+
+  it('setTelemetryConsent(true) persiste y relee true', () => {
+    expect(setTelemetryConsent(true)).toBe(true);
+    expect(getTelemetryConsent()).toBe(true);
+  });
+
+  it('setTelemetryConsent(false) persiste y relee false', () => {
+    setTelemetryConsent(true);
+    expect(getTelemetryConsent()).toBe(true);
+
+    setTelemetryConsent(false);
+    expect(getTelemetryConsent()).toBe(false);
+  });
+
+  it('getTelemetryConsent falla silente si localStorage no disponible', () => {
+    const originalLocalStorage = window.localStorage;
+    delete window.localStorage;
+
+    expect(getTelemetryConsent()).toBe(false);
+
+    window.localStorage = originalLocalStorage;
+  });
+
+  it('setTelemetryConsent falla silente si localStorage no disponible', () => {
+    const originalLocalStorage = window.localStorage;
+    delete window.localStorage;
+
+    expect(setTelemetryConsent(true)).toBe(false);
+
+    window.localStorage = originalLocalStorage;
+  });
+
+  it('consentimiento es independiente del perfil principal', () => {
+    saveProfile({ nombre: 'Carlos' });
+    setTelemetryConsent(true);
+
+    const profile = getProfile();
+    expect(profile.nombre).toBe('Carlos');
+    expect(profile.telemetry_consent).toBeUndefined(); // No mezcla keys
+    expect(getTelemetryConsent()).toBe(true);
+
+    localStorage.clear();
+    expect(getTelemetryConsent()).toBe(false); // Se limpia por separado
+  });
+
+  it('__PROFILE_KEYS__ exporta la key de consentimiento', () => {
+    expect(__PROFILE_KEYS__.TELEMETRY_CONSENT_KEY).toContain('telemetry_consent');
   });
 });
