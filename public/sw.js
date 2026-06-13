@@ -1,4 +1,30 @@
-const CACHE_NAME = 'chagra-v308';
+const CACHE_NAME = 'chagra-v309';
+
+// Cache de GROUNDING del agente (corpus RAG + embeddings + tiles del mapa).
+// SEPARADO de CACHE_NAME a propósito: su contenido NO está hasheado por
+// filename (las fichas son `/cycle-content/<slug>.json`, los tiles
+// `/{z}/{x}/{y}.png`) y cambia con baja frecuencia. Si viviera en CACHE_NAME,
+// cada deploy (que bumpea CACHE_NAME por SHA) borraría el corpus entero y la
+// PRIMERA recarga offline post-deploy se quedaría SIN grounding hasta volver a
+// estar online. Al aislarlo, el grounding sobrevive a los deploys del bundle.
+// La invalidación del corpus se maneja por separado (versión del manifest), no
+// por SHA del bundle. Ver migración de versión en RAG_GROUNDING_PREFIX.
+const RAG_GROUNDING_PREFIX = 'chagra-rag-grounding-';
+const RAG_GROUNDING_CACHE = `${RAG_GROUNDING_PREFIX}v1`;
+
+// Tiles de mapa (Leaflet/OpenStreetMap): cache-on-use en su propio bucket.
+// No se precachean (son ilimitados); se cachean SOLO los que el usuario ya
+// vio online, para que el mapa funcione offline en zonas ya visitadas.
+const MAP_TILES_PREFIX = 'chagra-map-tiles-';
+const MAP_TILES_CACHE = `${MAP_TILES_PREFIX}v1`;
+// Tope defensivo de tiles cacheados (LRU aproximado por orden de inserción):
+// evita que el cache de tiles crezca sin límite en un teléfono rural. ~400
+// tiles ≈ varios MB, suficiente para varias zonas de finca a distintos zooms.
+const MAP_TILES_MAX = 400;
+// Dominios de tiles que cacheamos. OSM y su alias osm.org (ver FarmMap,
+// MapPicker, LocationDetectedScreen, MultiFincaGlobe).
+const MAP_TILE_HOSTS = ['tile.openstreetmap.org', 'tile.osm.org', 'tile.opentopomap.org'];
+
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -12,6 +38,20 @@ const ASSETS_TO_CACHE = [
   // consultable OFFLINE aunque el usuario nunca haya abierto una vista que lo
   // cargue estando online. ~1.2 MB; aceptable para garantizar offline-first.
   '/catalog.sqlite'
+];
+
+// Grounding del agente precacheado en install (archivos únicos, no las 491
+// fichas — esas se llenan cache-first vía prewarmCorpus al login, ver fetch
+// handler de /cycle-content/*):
+//   - rag-embeddings.json (~7 MB): el ÚNICO archivo que habilita búsqueda
+//     SEMÁNTICA offline. Sin él, una recarga offline degrada a BM25 puro.
+//     Vale el peso del install one-time: es el mayor salto de calidad de
+//     grounding sin red.
+//   - cycle-content/manifest.json (~13 KB): lista de slugs; sin él loadCorpus
+//     cae al fallback legacy (iterar CROP_TAXONOMY) con N-3 fetches fallidos.
+const RAG_GROUNDING_PRECACHE = [
+  '/rag-embeddings.json',
+  '/cycle-content/manifest.json',
 ];
 
 // Instalación del Service Worker.
@@ -56,6 +96,19 @@ self.addEventListener('install', (event) => {
           // chunks se llenarán cache-first en la primera carga online.
         }
       })
+      // 3) Grounding del agente: precache de embeddings + manifest en su bucket
+      //    separado (RAG_GROUNDING_CACHE). NO bloquea el shell — corre después y
+      //    los errores son tolerados (add por item con catch). Las 491 fichas NO
+      //    se precachean aquí (peso + 491 sockets en install); se llenan
+      //    cache-first cuando prewarmCorpus las pide al login. Ver fetch handler.
+      .then(() =>
+        caches.open(RAG_GROUNDING_CACHE).then((groundingCache) =>
+          Promise.all(
+            RAG_GROUNDING_PRECACHE.map((u) => groundingCache.add(u).catch(() => undefined))
+          )
+        )
+      )
+      .catch(() => undefined)
   );
 });
 
@@ -66,10 +119,18 @@ self.addEventListener('activate', (event) => {
     caches.keys()
       .then(cacheNames => Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-          return undefined;
+          // Conservar SIEMPRE el bucket actual de grounding (corpus/embeddings)
+          // y el de tiles del mapa: no están versionados por SHA del bundle, así
+          // que un deploy NO debe purgarlos (si no, la primera recarga offline
+          // post-deploy queda sin grounding ni mapa). Solo borramos versiones
+          // VIEJAS de esos buckets (prefijo + versión distinta) y el CACHE_NAME
+          // anterior.
+          if (cacheName === CACHE_NAME) return undefined;
+          if (cacheName === RAG_GROUNDING_CACHE) return undefined;
+          if (cacheName === MAP_TILES_CACHE) return undefined;
+          // Versiones viejas de los buckets de grounding/tiles → borrar.
+          // El resto (CACHE_NAME viejo, caches huérfanos) → borrar.
+          return caches.delete(cacheName);
         })
       ))
       // La limpieza de caches viejos NUNCA debe bloquear el claim: si falla
@@ -138,6 +199,77 @@ self.addEventListener('fetch', (event) => {
           // ya cacheado (caso normal tras una visita online) sí se sirve arriba.
           .catch(() => new Response('', { status: 504, statusText: 'Offline: chunk no cacheado' }));
       })
+    );
+    return;
+  }
+
+  // Grounding del agente (corpus RAG + embeddings): CACHE-FIRST con relleno en
+  // background, en el bucket separado RAG_GROUNDING_CACHE.
+  //   - /cycle-content/<slug>.json  (491 fichas + manifest.json)
+  //   - /rag-embeddings.json        (vectores semánticos)
+  // Cache-first porque el contenido cambia con baja frecuencia y la latencia
+  // móvil rural penaliza una revalidación de red por cada ficha. La primera
+  // visita ONLINE (prewarmCorpus al login fetchea las 491 fichas en lotes) las
+  // deja todas en cache; a partir de ahí una recarga OFFLINE en frío tiene el
+  // corpus completo y el agente conserva grounding sin señal. Esto cierra el
+  // hueco: antes corpusCache vivía solo en memoria y el SW no cacheaba estas
+  // rutas → recarga offline = agente sin grounding (degradaba a respuesta sin
+  // contexto). Un slug nuevo tras un deploy del corpus se baja la primera vez
+  // que se lo pide estando online (cache-miss → fetch → put).
+  const isGrounding =
+    url.pathname.startsWith('/cycle-content/') ||
+    url.pathname === '/rag-embeddings.json';
+  if (isGrounding && event.request.method === 'GET') {
+    event.respondWith(
+      caches.open(RAG_GROUNDING_CACHE).then((cache) =>
+        cache.match(event.request).then((cached) => {
+          if (cached) return cached;
+          return fetch(event.request)
+            .then((response) => {
+              if (response && response.ok && response.status === 200) {
+                cache.put(event.request, response.clone());
+              }
+              return response;
+            })
+            // Offline y sin cache: 504 explícito. El caller (loadSlugDocs /
+            // loadEmbeddings) ya degrada con gracia ante !ok (devuelve []/null).
+            .catch(() => new Response('', { status: 504, statusText: 'Offline: grounding no cacheado' }));
+        })
+      )
+    );
+    return;
+  }
+
+  // Tiles de mapa (OSM/OpenTopoMap): CACHE-FIRST cache-on-use en MAP_TILES_CACHE.
+  // No se precachean (son ilimitados); se guardan SOLO los tiles que el usuario
+  // ya cargó online, para que el mapa funcione offline en zonas ya visitadas.
+  // Cross-origin → respuestas opaque (no inspeccionables): las cacheamos igual
+  // (un tile opaque renderiza bien en <img>/Leaflet) pero aplicamos un tope LRU
+  // aproximado para no llenar el storage del teléfono. Si no hay red ni cache,
+  // dejamos que falle (Leaflet ya muestra su placeholder; NO rompemos el mapa).
+  if (
+    event.request.method === 'GET' &&
+    MAP_TILE_HOSTS.some((h) => url.hostname === h || url.hostname.endsWith('.' + h))
+  ) {
+    event.respondWith(
+      caches.open(MAP_TILES_CACHE).then((cache) =>
+        cache.match(event.request).then((cached) => {
+          if (cached) return cached;
+          return fetch(event.request)
+            .then((response) => {
+              // Cacheamos 200 (same-origin imposible aquí) y opaque (status 0,
+              // type 'opaque') — ambos sirven para pintar el tile offline.
+              if (response && (response.ok || response.type === 'opaque')) {
+                cache.put(event.request, response.clone());
+                trimTileCache(cache);
+              }
+              return response;
+            })
+            // Sin red ni cache: propagamos el fallo de red para que Leaflet
+            // muestre su placeholder. NUNCA un 504 sintético (rompería el tile).
+            .catch(() => cached || Response.error());
+        })
+      )
     );
     return;
   }
@@ -306,6 +438,23 @@ async function getPendingTelemetryEvents() {
 
     request.onerror = () => reject(request.error);
   });
+}
+
+// Poda LRU aproximada del cache de tiles: si supera MAP_TILES_MAX, borra los
+// más viejos (las keys de un Cache se devuelven en orden de inserción, así que
+// `keys()[0..N]` son los primeros guardados ≈ los menos recientes). No es un
+// LRU exacto (no reordena por acceso), pero acota el storage sin coste por hit.
+// Fire-and-forget: nunca bloquea ni rompe la respuesta del tile.
+async function trimTileCache(cache) {
+  try {
+    const keys = await cache.keys();
+    const excess = keys.length - MAP_TILES_MAX;
+    if (excess > 0) {
+      await Promise.all(keys.slice(0, excess).map((k) => cache.delete(k)));
+    }
+  } catch {
+    // storage/quota: ignorar — el tope es defensivo, no crítico.
+  }
 }
 
 // Escuchar mensajes del cliente (solo same-origin).

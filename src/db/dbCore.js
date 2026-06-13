@@ -38,7 +38,7 @@
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 20;
+export const DB_VERSION = 21;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -73,6 +73,13 @@ export const STORES = {
   // retries y status (queued/sending/done/failed/offline). Permite debuggear
   // inteligencia+velocidad de Chagra y garantiza que ninguna pregunta se pierda.
   AGENT_REQUESTS: 'agent_requests',
+  // v21: rag_corpus_cache — índice RAG construido (docs pre-tokenizados + IDF)
+  // persistido para que sobreviva recargas OFFLINE en frío. El SW ya cachea los
+  // bytes crudos de /cycle-content/* (capa de red), pero re-parsear+re-tokenizar
+  // las 491 fichas en cada arranque cuesta CPU en teléfonos rurales. Esto
+  // persiste el índice YA construido (capa de cómputo) → arranque offline
+  // instantáneo sin re-tokenizar. keyPath 'key' (un único registro 'corpus').
+  RAG_CORPUS_CACHE: 'rag_corpus_cache',
 };
 
 let dbInstance = null;
@@ -341,6 +348,16 @@ export const openDB = async () => {
           store.createIndex('ts_submit', 'ts_submit', { unique: false });
           store.createIndex('model', 'model', { unique: false });
           store.createIndex('route', 'route', { unique: false });
+        }
+      }
+
+      // v21: rag_corpus_cache — índice RAG construido persistido (offline-first
+      // de campo). Un único registro KV (keyPath 'key', valor 'corpus') con los
+      // docs pre-tokenizados + IDF serializados. Permite que una recarga OFFLINE
+      // en frío arranque con grounding sin re-tokenizar las 491 fichas.
+      if (event.oldVersion < 21) {
+        if (!db.objectStoreNames.contains(STORES.RAG_CORPUS_CACHE)) {
+          db.createObjectStore(STORES.RAG_CORPUS_CACHE, { keyPath: 'key' });
         }
       }
     };

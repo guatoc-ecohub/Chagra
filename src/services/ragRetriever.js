@@ -2,6 +2,7 @@ import { CROP_TAXONOMY } from '../config/taxonomy';
 import { recordRagEvent } from './ragTelemetry';
 import { getAllSpecies } from '../db/catalogDB';
 import { expandQueryTokens } from './ragSynonyms';
+import { saveCorpusIndex, loadCorpusIndex } from '../db/corpusIndexCache';
 
 const CORPUS_PATH = '/cycle-content/';
 const EMBEDDINGS_PATH = '/rag-embeddings.json';
@@ -145,7 +146,12 @@ async function loadManifest() {
     if (!ct.includes('json')) return null;
     const data = await res.json();
     if (!Array.isArray(data?.slugs)) return null;
-    return data.slugs;
+    // Devolvemos los slugs + una huella (`stamp`) para invalidar el índice
+    // persistido cuando el corpus cambia (deploy nuevo del manifest). La huella
+    // combina generated_at + cantidad de slugs: barato y suficiente para
+    // detectar un manifest distinto sin hashear todo el contenido.
+    const stamp = `${data.generated_at ?? ''}:${data.slugs.length}`;
+    return { slugs: data.slugs, stamp };
   } catch (_) {
     return null;
   }
@@ -195,8 +201,9 @@ async function loadSlugDocs(slug) {
 async function buildCorpus() {
   // Manifest first: si existe, itera solo los slugs presentes.
   // Fallback: iterar CROP_TAXONOMY (legacy, con N-3 fetches fallidos).
-  const manifestSlugs = await loadManifest();
-  let species = manifestSlugs ?? Object.values(CROP_TAXONOMY).flatMap((group) =>
+  const manifest = await loadManifest();
+  const manifestStamp = manifest?.stamp ?? null;
+  let species = manifest?.slugs ?? Object.values(CROP_TAXONOMY).flatMap((group) =>
     group.species.map((sp) => sp.id)
   );
 
@@ -205,9 +212,11 @@ async function buildCorpus() {
   // sin entrada en el catalogo NO deben groundearse para evitar leak de
   // contenido Pro a usuarios OSS. Degradacion: si el catalogo falla, se
   // cargan todos los slugs (mejor grounding completo que ninguno).
+  let tier = null;
   try {
     const catalogSpecies = await getAllSpecies();
     if (catalogSpecies && catalogSpecies.length > 0) {
+      tier = catalogSpecies.length;
       const allowedIds = new Set(catalogSpecies.map((s) => s.id));
       const before = species.length;
       species = species.filter((slug) => allowedIds.has(slug));
@@ -217,6 +226,23 @@ async function buildCorpus() {
     }
   } catch (err) {
     console.warn('[RAG] No se pudo cargar el catalogo para tier-gate — cargando todos los slugs:', err?.message);
+  }
+
+  // OFFLINE-FIRST: intentar hidratar el índice YA construido desde IndexedDB
+  // ANTES de re-fetchear+re-tokenizar las 491 fichas. Si existe y coincide la
+  // huella del manifest + el tier-gate, lo usamos tal cual → arranque (incluida
+  // recarga OFFLINE en frío) sin re-tokenizar. Si está obsoleto o no existe,
+  // loadCorpusIndex devuelve null y reconstruimos desde la red (SW cache).
+  try {
+    const persisted = await loadCorpusIndex({ manifestStamp, tier });
+    if (persisted) {
+      avgDocLen = persisted.avgDocLen;
+      corpusCache = { docs: persisted.docs, idf: persisted.idf };
+      console.info(`[RAG] Índice del corpus hidratado desde IndexedDB: ${persisted.docs.length} passages (sin re-tokenizar).`);
+      return corpusCache;
+    }
+  } catch (err) {
+    console.warn('[RAG] Hidratación del índice persistido falló — reconstruyendo:', err?.message);
   }
 
   const docs = [];
@@ -241,6 +267,17 @@ async function buildCorpus() {
   const df = buildInvertedIndex(docs);
   const idf = computeIDF(df, docs.length);
   corpusCache = { docs, idf };
+
+  // OFFLINE-FIRST: persistir el índice construido a IndexedDB (fire-and-forget,
+  // no bloqueante). Una recarga OFFLINE en frío posterior lo hidratará sin
+  // re-tokenizar las 491 fichas. Solo persistimos si hay docs reales (no un
+  // corpus vacío por fallo de red). saveCorpusIndex nunca lanza.
+  if (docs.length > 0) {
+    saveCorpusIndex({ docs, idf, avgDocLen, manifestStamp, tier }).then((ok) => {
+      if (ok) console.info(`[RAG] Índice del corpus persistido en IndexedDB (${docs.length} passages).`);
+    });
+  }
+
   return corpusCache;
 }
 
