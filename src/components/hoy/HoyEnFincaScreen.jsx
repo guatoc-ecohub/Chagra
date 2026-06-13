@@ -7,6 +7,7 @@ import {
 import { ScreenShell } from '../common/ScreenShell';
 import AgendaCampesina from './AgendaCampesina';
 import JourneyGuideCard from './JourneyGuideCard';
+import FincaEvolutionCard from './FincaEvolutionCard';
 import useAlertStore from '../../store/useAlertStore';
 import { listFarmProcesses } from '../../db/farmProcessCache';
 import { getProfile } from '../../services/userProfileService';
@@ -168,6 +169,15 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
 
                 {/* ── 0. GUÍA DEL VIAJE — Chagra como agroecólogo desde el inicio ── */}
                 <JourneyGuideCard processes={processes} onNavigate={onNavigate} />
+
+                {/* ── 0b. CÓMO EVOLUCIONA TU FINCA — resumen TAPE/MESMIS ─────
+                    El "¿Qué es esto?" rutea a la pantalla 'evolucion' (detalle
+                    de indicadores + etapa del viaje). Antes la tarjeta vivía
+                    huérfana y ese botón no llevaba a ningún lado. */}
+                <FincaEvolutionCard
+                    processes={processes}
+                    onNavigate={onNavigate}
+                />
 
                 {/* ── 1. CLIMA DE HOY (honesto) ─────────────────────────── */}
                 {!geo ? (

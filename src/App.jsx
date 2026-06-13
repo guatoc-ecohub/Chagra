@@ -77,6 +77,7 @@ const WelcomeStatsHero = lazy(() => import('./components/WelcomeStatsHero'));
 const TopBar = lazy(() => import('./components/TopBar'));
 const DashboardLive = lazy(() => import('./components/dashboard/DashboardLive'));
 const HoyEnFincaScreen = lazy(() => import('./components/hoy/HoyEnFincaScreen'));
+const MiFincaEvolucionScreen = lazy(() => import('./components/hoy/MiFincaEvolucionScreen'));
 import HomeRegionalGreeting from './components/HomeRegionalGreeting';
 
 localforage.config({
@@ -139,6 +140,7 @@ const HASH_VIEW_ROUTES = {
   task_log: 'task_log',
   hoy: 'hoy_finca',
   'hoy-en-finca': 'hoy_finca',
+  evolucion: 'evolucion',
 };
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
@@ -690,6 +692,22 @@ export default function App() {
           <ErrorBoundary>
             <HoyEnFincaScreen
               onBack={() => navigate('dashboard')}
+              onHome={() => navigate('dashboard')}
+              onNavigate={navigate}
+            />
+          </ErrorBoundary>
+        );
+      case 'evolucion':
+        // "Cómo evoluciona tu finca": le da SUPERFICIE al motor agroecológico
+        // (fincaEvolutionService + agroecologyJourney) que vivía huérfano. La
+        // FincaEvolutionCard de "Hoy en finca" llama onNavigate('evolucion');
+        // sin esta ruta el botón "¿Qué es esto?" quedaba muerto. Cero
+        // gamificación: la progresión es el avance real de indicadores
+        // TAPE/MESMIS + la etapa del viaje, no puntos ni badges.
+        return (
+          <ErrorBoundary>
+            <MiFincaEvolucionScreen
+              onBack={() => navigate('hoy_finca')}
               onHome={() => navigate('dashboard')}
               onNavigate={navigate}
             />
