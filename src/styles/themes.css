@@ -426,3 +426,13 @@ html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
   background-repeat: repeat, repeat, no-repeat, no-repeat !important;
   background-attachment: fixed !important;
 }
+/* ══════════════ FormField — patron compartido de formularios ══════════════ */
+.chagra-form-field { display:flex; flex-direction:column; gap:0.35rem; }
+.chagra-form-label { font-size:0.65rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:0.08em; color:var(--hintC,#94a3b8); }
+.chagra-form-input { background:var(--inputBg,#1e293b); border:1px solid var(--inputEdge,#334155);
+  border-radius:0.5rem; padding:0.5rem 0.75rem; color:var(--tx,#e2e8f0);
+  font-size:0.875rem; min-height:2.5rem; }
+.chagra-form-input:focus { outline:none; border-color:var(--accent,#3be8a6); box-shadow:0 0 0 2px var(--accent-rgba, rgba(59,232,166,0.15)); }
+.chagra-form-error { font-size:0.65rem; color:#f87171; margin-top:-0.15rem; }
+.chagra-form-help { font-size:0.6rem; color:var(--hintC,#64748b); }
