@@ -441,7 +441,8 @@ test.describe('BUG conocido — "Procesos por voz" dead-end sin zona', () => {
           draft,
           locationOptions: [{ id: 'e2e-land-lote-1', type: 'asset--land', name: 'Lote 1 (prueba)', label: 'Lote 1 (prueba)' }],
           isSaving: false,
-          onConfirm: () => { window.__confirmFired = true; },
+          // Capturamos el payload para verificar que la zona elegida se propaga.
+          onConfirm: (p) => { window.__confirmFired = true; window.__confirmPayload = p; },
           onCancel: () => {},
         }),
       );
@@ -449,16 +450,25 @@ test.describe('BUG conocido — "Procesos por voz" dead-end sin zona', () => {
 
     const confirmBtn = page.getByRole('button', { name: /Confirmar siembra/i });
     await expect(confirmBtn).toBeVisible({ timeout: 8000 });
-    // Sin zona seleccionada todavía está deshabilitado…
-    await expect(confirmBtn).toBeDisabled();
+    // Ubicacion OPCIONAL: con especie y cantidad validas el boton ya esta
+    // habilitado aunque todavia no se haya elegido zona (ya no es dead-end).
+    await expect(confirmBtn).toBeEnabled({ timeout: 5000 });
 
-    // …seleccionamos la zona disponible → se habilita y confirma.
+    // El control positivo de la ZONA: si hay lotes, el selector los ofrece y la
+    // eleccion se respeta. Elegimos la zona disponible…
     const zoneSelect = page.locator('#e2e-confirm-host select').last();
+    const optionTexts = await zoneSelect.locator('option').allInnerTexts();
+    expect(optionTexts, 'con lotes, el selector ofrece la zona real').toContain('Lote 1 (prueba)');
     await zoneSelect.selectOption({ label: 'Lote 1 (prueba)' });
+    // …sigue habilitado y confirma.
     await expect(confirmBtn).toBeEnabled({ timeout: 5000 });
     await confirmBtn.click();
+
     const fired = await page.evaluate(() => window.__confirmFired === true);
     expect(fired, 'con zona, Confirmar siembra SÍ dispara onConfirm').toBe(true);
+    // La zona elegida viaja en el payload confirmado (el wiring de seleccion vive).
+    const confirmedLand = await page.evaluate(() => window.__confirmPayload?.location_land_asset_id);
+    expect(confirmedLand, 'la zona elegida se propaga al ciclo confirmado').toBe('e2e-land-lote-1');
   });
 });
 
