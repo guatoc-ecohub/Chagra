@@ -58,3 +58,35 @@
 (:Experto)-[:VALIDA]->(:Caso)
 (:Caso)-[:SE_VUELVE]->(:ConocimientoComunitario)
 ```
+
+## PSA (DR-RESTAURACION-1 + Decretos)
+```
+(:MarcoNormativo {ley, que_exige, que_habilita})
+(:ModalidadPSA {id, nombre, que_cubre, monto_ha_ano})
+(:MarcoNormativo)-[:HABILITA]->(:ModalidadPSA)
+```
+
+## Carbono (DR-RESTAURACION-1)
+```
+(:AlertaCarbono {tipo, riesgo, recomendacion})
+(:AlertaCarbono)-[:DETECTA]->(:Caso)
+```
+
+## Clima (DR-AGUA-1, IDEAM)
+```
+(:PisoTermico {id, msnm, temp_media, nubosidad})
+(:EnsoFase {fase, efecto, lluvia})
+(:EnsoFase)-[:MODULA]->(:PisoTermico)
+```
+
+## Data files AGE-ready
+
+| Schema | Archivo | Ingesta |
+|---|---|---|
+| IoT | iot-age-schema.json | 5 nodos + 5 edges |
+| Social | social-age-schema.json | 4 nodos + 3 edges |
+| Clima | clima-age-schema.json | 3 nodos + 2 edges |
+| PSA | psa-age-schema.json | 3 nodos + 2 edges |
+| Restauración | restauracion-age-schema.json | 3 nodos + 3 edges |
+
+Todos los archivos `*-age-schema.json` en `src/data/` tienen formato listo para ingesta al grafo AGE.
