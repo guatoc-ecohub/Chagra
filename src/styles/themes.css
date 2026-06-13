@@ -426,3 +426,7 @@ html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
   background-repeat: repeat, repeat, no-repeat, no-repeat !important;
   background-attachment: fixed !important;
 }
+/* Error legibility: sin blur, alto contraste en cualquier tema */
+.chagra-error-toast { filter:none !important; backdrop-filter:none !important;
+  background:var(--errBg,#7f1d1d); color:#fef2f2; border:1px solid var(--errEdge,#dc2626);
+  border-radius:0.75rem; padding:0.75rem 1rem; font-size:0.875rem; font-weight:600; }
