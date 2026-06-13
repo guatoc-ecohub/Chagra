@@ -486,13 +486,35 @@ export async function postValidate(text, expected) {
  * @param {object} args — body raw (forma específica por tool)
  * @returns {Promise<null | object | ToolError>}
  */
+/**
+ * Coerción defensiva de argumentos numéricos. El sidecar (Zod) espera `number`
+ * en argumentos como `altitud_msnm`; el chat LLM a veces los genera como string
+ * → el sidecar respondía 502 (invalid_type) y Daniel recibía respuesta vacía.
+ * Coercionamos en el chokepoint para que TODO caller (chat LLM, chips, plan
+ * determinístico) sea robusto. Fix P0 — test integral Daniel 2026-06-13.
+ */
+const NUMERIC_TOOL_ARGS = new Set(['altitud_msnm', 'altitud', 'altura']);
+export function coerceNumericArgs(args) {
+  if (!args || typeof args !== 'object') return args;
+  let changed = false;
+  const out = { ...args };
+  for (const k of NUMERIC_TOOL_ARGS) {
+    if (typeof out[k] === 'string' && out[k].trim() !== '') {
+      const n = Number(out[k]);
+      if (Number.isFinite(n)) out[k] = n; else delete out[k];
+      changed = true;
+    }
+  }
+  return changed ? out : args;
+}
+
 export async function callTool(toolName, args) {
   if (!toolName || typeof toolName !== 'string') return null;
   if (!ALLOWED_TOOLS.has(toolName)) {
     console.debug('[sidecar] tool no permitido', toolName);
     return { _error: true, reason: 'not_allowed', tool: toolName };
   }
-  const result = await postJson(`/tools/${toolName}`, args || {}, TOOL_TIMEOUT_MS);
+  const result = await postJson(`/tools/${toolName}`, coerceNumericArgs(args || {}), TOOL_TIMEOUT_MS);
   if (result !== null) return result;
   // postJson retornó null. Distinguir: tool fue intentado pero falló
   // (timeout / HTTP error / network) vs. ni siquiera se intentó (flag off / offline).
