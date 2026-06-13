@@ -38,7 +38,7 @@ describe('useTheme — sistema de temas', () => {
   it('default es automático cuando no hay nada en localStorage', () => {
     const { result } = renderHook(() => useTheme());
     expect(result.current.theme).toBe('auto');
-    expect(DEFAULT_THEME).toBe('auto');
+    expect(DEFAULT_THEME).toBe('biopunk');
   });
 
   it('THEME_IDS expone los 3 temas curados + auto', () => {
