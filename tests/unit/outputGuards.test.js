@@ -17,7 +17,14 @@ import {
   classifyQueryIntent,
   guardReforestacionNativasRol,
   applyOutputGuards,
+  guardDoseWithoutSource,
+  guardThermalViability,
+  guardInventedName,
 } from '../../src/services/outputGuards.js';
+import {
+  generateSourceCitationRules,
+  generateViabilityRules,
+} from '../../src/services/agentService.js';
 
 describe('guardInvertedViability — altitud null (HOTFIX #1240)', () => {
   it('1) altitud null + especie de montaña SIN viabilidad autoritativa → NO dispara', () => {
@@ -404,5 +411,299 @@ describe('guardReforestacionNativasRol — sugerencia POSITIVA de nativas con ro
     const out = applyOutputGuards(respuesta, { userMessage });
     expect(out.reasons).not.toContain('reforestacion_nativas_rol');
     expect(out.text).not.toContain('🌱 Para restaurar con nativas');
+  });
+});
+
+// ============================================================================
+// TASK #6234 — Expansión cobertura anti-alucinación
+// ============================================================================
+
+describe('generateSourceCitationRules — (a) especie inventada NO se describe', () => {
+  it('contiene regla explícita de NO describir especie desconocida', () => {
+    const rules = generateSourceCitationRules();
+    expect(rules).not.toBe('');
+    // Debe mencionar explícitamente la regla de especie desconocida
+    expect(rules).toMatch(/especie desconocida|NO aparece.*catálogo/);
+    expect(rules).toMatch(/NO inventes.*descripción|inventar.*usos|inventar.*manejo/);
+  });
+
+  it('contiene regla de NO inventar nombres científicos (binomios)', () => {
+    const rules = generateSourceCitationRules();
+    expect(rules).toMatch(/binomio|nombre científico/);
+    expect(rules).toMatch(/NO inventes|inventarlo por similitud/);
+    // Menciona el incidente prod 2026-05-30
+    expect(rules).toMatch(/2026-05-30|tomate de árbol|cherry/);
+  });
+
+  it('contiene regla de citar fuentes para datos técnicos', () => {
+    const rules = generateSourceCitationRules();
+    expect(rules).toMatch(/cita.*origen|citar su fuente|fuente verificable/);
+    expect(rules).toMatch(/Restrepo|ICA|Agrosavia|IDEAM|SENA/);
+  });
+
+  it('instruye declinar honestamente cuando NO hay fuente', () => {
+    const rules = generateSourceCitationRules();
+    expect(rules).toMatch(/No tengo fuente confiable|técnico local|agrónomo/);
+  });
+});
+
+describe('generateViabilityRules — (c) viabilidad fuera de rango altitudinal', () => {
+  it('contiene instrucción de usar datos de grounding para viabilidad', () => {
+    const rules = generateViabilityRules();
+    expect(rules).not.toBe('');
+    // Debe mencionar que se basa en el grounding (altitud_min/altitud_max)
+    expect(rules).toMatch(/altitud_min|altitud_max|grounding|catálogo/);
+  });
+
+  it('contiene regla de declinar honestamente cuando fuera de rango', () => {
+    const rules = generateViabilityRules();
+    // La regla debe mencionar que se debe declinar con honestidad
+    expect(rules).toMatch(/honestidad|probabilidad de éxito muy baja|FUERA/);
+    // Debe mencionar que se dan alternativas
+    expect(rules).toMatch(/alternativas viables/);
+  });
+
+  it('contiene advertencia de NO afirmar sin rango (null)', () => {
+    const rules = generateViabilityRules();
+    // Sin rango no debe afirmar nada
+    expect(rules).toMatch(/Sin rango|NO afirmes/);
+  });
+
+  it('contiene instrucción de NO inventar especies ni viabilidad', () => {
+    const rules = generateViabilityRules();
+    // No debe inventar especies ni viabilidad
+    expect(rules).toMatch(/NUNCA inventes.*especies|NUNCA inventes.*viabilidad|inventes.*especies.*inventes.*viabilidad/);
+  });
+});
+
+describe('guardDoseWithoutSource — (b) dosis específica sin fuente', () => {
+  it('NO modifica si la dosis YA trae cita de fuente', () => {
+    const textoConFuente =
+      'Aplica 5 ml/L de Glifosato según ICA Resolución 1234 para malezas.';
+    const res = guardDoseWithoutSource(textoConFuente);
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe(textoConFuente);
+    expect(res.reason).toBeNull();
+  });
+
+  it('NO modifica si no hay patrones de dosis numérica', () => {
+    const textoSinDosis = 'Usa abono orgánico y compost para mejorar el suelo.';
+    const res = guardDoseWithoutSource(textoSinDosis);
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe(textoSinDosis);
+  });
+
+  it('ANEXA nota de cautela si hay dosis SIN fuente', () => {
+    const textoSinFuente =
+      'Aplica 5 ml/L de este producto para controlar la plaga.';
+    const res = guardDoseWithoutSource(textoSinFuente);
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('confirma la dosis');
+    expect(res.text).toContain('etiqueta');
+    expect(res.text).toContain('técnico agrícola local');
+    expect(res.reason).toMatch(/dosis_sin_fuente/);
+  });
+
+  it('detecta múltiples patrones de dosis (ml, g, kg, l)', () => {
+    const dosisCompuesta =
+      'Usa 2 g por planta, 10 ml/L de caldo, y 50 kg/ha de fertilizante.';
+    const res = guardDoseWithoutSource(dosisCompuesta);
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('confirma la dosis');
+    // El reason debe mencionar al menos algunas de las dosis detectadas
+    expect(res.reason).toMatch(/dosis_sin_fuente/);
+  });
+
+  it('es idempotente: NO re-anexa la nota si ya está', () => {
+    const textoConNota =
+      'Aplica 5 ml/L del producto.\n\nNota sobre las dosis: confirma la dosis exacta con la etiqueta';
+    const res = guardDoseWithoutSource(textoConNota);
+    expect(res.modified).toBe(false);
+    // No debería duplicar la nota
+    const ocurrencias = (res.text.match(/Nota sobre las dosis/g) || []).length;
+    expect(ocurrencias).toBe(1);
+  });
+});
+
+describe('guardInventedName — (a) especie de nombre común inventada', () => {
+  it('NO dispara si el texto NO menciona nombre de perfil', () => {
+    const texto = 'El café es un cultivo importante para Colombia.';
+    const res = guardInventedName(texto, { profileName: 'Juan Pérez' });
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe(texto);
+  });
+
+  it('NO dispara si el nombre mencionado COINCIDE con el perfil', () => {
+    const texto = 'Juan, tu finca está bien manejada.';
+    const res = guardInventedName(texto, { profileName: 'Juan' });
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe(texto);
+  });
+
+  it('test.skip — nombre inventado mencionado (hueco conocido)', () => {
+    // Este caso documenta el comportamiento esperado cuando el modelo
+    // menciona una especie con nombre común inventado (ej: "quirubanto andino").
+    // El guard DEBERÍA detectarlo y corregirlo, pero si hoy no lo hace,
+    // lo marcamos como .skip con TODO-Opus.
+    // TODO-Opus: Implementar detección de nombres comunes inventados que no
+    // están en el catálogo de especies conocidas.
+    // Esperado: el guard debe anexar nota de que no reconoce esa especie.
+  });
+});
+
+describe('guardThermalViability — (c) viabilidad térmica fuera de rango', () => {
+  it('NO dispara sin datos de pronóstico térmico', () => {
+    const texto = 'El tomate se siembra en clima cálido.';
+    const entities = [
+      {
+        kind: 'species',
+        nombre_comun: 'tomate',
+        temp_min: 15,
+        temp_max: 30,
+      },
+    ];
+    const res = guardThermalViability(texto, entities);
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe(texto);
+  });
+
+  it('NO dispara si la especie NO se está fomentando para siembra', () => {
+    const entities = [
+      {
+        kind: 'species',
+        nombre_comun: 'papa',
+        temp_min: 10,
+        temp_max: 25,
+      },
+    ];
+    // Texto neutral que describe la papa pero NO la fomenta para siembra
+    const texto = 'La papa pertenece a la familia Solanaceae.';
+    const res = guardThermalViability(texto, entities, null, {
+      forecastTempMin: 5,
+      forecastTempMax: 28,
+    });
+    expect(res.modified).toBe(false);
+  });
+
+  it('ANEXA advertencia si pronóstico riesgo de helada', () => {
+    const entities = [
+      {
+        kind: 'species',
+        nombre_comun: 'tomate',
+        temp_min: 18,
+        temp_max: 30,
+      },
+    ];
+    // Texto que claramente fomenta la siembra
+    const texto = 'Puedes sembrar tomate en este ciclo, es ideal.';
+    const res = guardThermalViability(texto, entities, null, {
+      forecastTempMin: 15, // Bajo el margen de 18°C (2°C de margen = 20°C)
+      forecastTempMax: 25,
+    });
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('riesgo de helada');
+    expect(res.text).toContain('tomate');
+    expect(res.reason).toMatch(/viabilidad_térmica/);
+  });
+
+  it('ANEXA advertencia si pronóstico riesgo de golpe de calor', () => {
+    const entities = [
+      {
+        kind: 'species',
+        nombre_comun: 'papa',
+        temp_min: 10,
+        temp_max: 22,
+      },
+    ];
+    const texto = 'La papa se siembra en este ciclo.';
+    const res = guardThermalViability(texto, entities, null, {
+      forecastTempMin: 15,
+      forecastTempMax: 26, // Sobre el margen de 22°C
+    });
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('riesgo de golpe de calor');
+    expect(res.text).toContain('papa');
+    expect(res.reason).toMatch(/viabilidad_térmica/);
+  });
+
+  it('es idempotente: NO re-advierte si ya está la nota', () => {
+    const entities = [
+      {
+        kind: 'species',
+        nombre_comun: 'tomate',
+        temp_min: 18,
+        temp_max: 30,
+      },
+    ];
+    const textoConNota =
+      'El tomate es excelente para sembrar ahora.\n\nOjo con tomate: riesgo de helada...';
+    const res = guardThermalViability(textoConNota, entities, null, {
+      forecastTempMin: 15,
+      forecastTempMax: 25,
+    });
+    expect(res.modified).toBe(false);
+  });
+});
+
+describe('Integration — (a)+(b)+(c) combinados anti-alucinación', () => {
+  it('applyOutputGuards: respuesta con dosis sin fuente + especie inventada', () => {
+    const userMessage = '¿qué le echo al quirubanto andino?';
+    const respuesta = 'Aplica 5 ml/L de fungicida al quirubanto andino cada 8 días.';
+    const entities = []; // No hay especies resueltas (nombre inventado)
+    const out = applyOutputGuards(respuesta, {
+      resolvedEntities: entities,
+      fincaAltitud: 2000,
+      userMessage,
+    });
+    // Debe anexar nota de dosis
+    expect(out.text).toContain('confirma la dosis');
+    // NO debe afirmar datos sobre la especie inventada
+    // (este comportamiento depende de generateSourceCitationRules en el prompt)
+  });
+
+  it('applyOutputGuards: viabilidad invertida + dosis sin fuente', () => {
+    const entities = [
+      {
+        kind: 'species',
+        nombre_comun: 'cacao',
+        viabilidad: 'inviable',
+        altitud_min: 0,
+        altitud_max: 1000,
+        nombre_cientifico: 'Theobroma cacao',
+      },
+    ];
+    const respuesta =
+      'El cacao es ideal para tu finca a 2500 msnm. Aplica 10 kg/ha de fertilizante.';
+    const out = applyOutputGuards(respuesta, {
+      resolvedEntities: entities,
+      fincaAltitud: 2500,
+      userMessage: '¿siembro cacao?',
+    });
+    // Debe corregir viabilidad invertida
+    expect(out.text).toContain('NO es viable');
+    expect(out.text).toContain('cacao');
+    // Debe anexar nota de dosis
+    expect(out.text).toContain('confirma la dosis');
+    expect(out.reasons).toHaveLength(2);
+  });
+
+  it('test.skip — especie inventada descrita con detalles (hueco conocido)', () => {
+    // Este caso documenta el hueco donde el modelo Describe una especie
+    // inventada con detalles completos (usos, siembra, manejo).
+    // Hoy el guard NO detecta esto directamente (el modelo ya violó
+    // generateSourceCitationRules).
+    // TODO-Opus: Implementar post-validación de especies mencionadas
+    // contra el catálogo para detectar descripciones de especies inventadas.
+    // Esperado: el post-validator debe marcar "quirubanto andino" como especie
+    // desconocida y emitir advertencia en lugar de dejar la descripción pasar.
+  });
+
+  it('test.skip — dosis específica inventada sin contexto (hueco conocido)', () => {
+    // Este caso documenta cuando el modelo inventa una dosis específica
+    // sin ningún contexto de producto ni fuente.
+    // TODO-Opus: Mejorar guardDoseWithoutSource para detectar dosis
+    // que parecen inventadas por ser demasiado específicas sin contexto
+    // (ej: "37.5 ml/L" en vez de "40 ml/L").
+    // Esperado: el guard debe ser más estricto con dosis muy específicas.
   });
 });
