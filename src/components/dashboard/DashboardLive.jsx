@@ -165,9 +165,9 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
     // el OnboardingHero existente (quedó huérfano del DashboardView legacy al
     // pasar a DashboardLive 2026-05-28). Trae el Paso 1 "piso térmico" —
     // filtro maestro de todos los módulos — + las 3 rutas de registro.
-    // Si falta capturar/confirmar el piso, va ARRIBA del AgentHero (above
-    // the fold — el hero mide ~100dvh y el paso crítico no puede quedar
-    // escondido tras un scroll); ya confirmado, baja al flujo normal.
+    // Si falta capturar/confirmar el piso, el Paso 1 se muestra como banner
+    // compacto flotando SOBRE el AgentHero (overlay, no empuja el hero — ver
+    // el bloque de render); ya confirmado, las 3 rutas bajan al flujo normal.
     const plantsCount = useAssetStore((s) => s.plants.length);
     const [needsPisoCapture] = useState(() => {
         const p = getProfile();
@@ -203,16 +203,31 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
 
     return (
         <div
-            className="flex flex-col w-full h-full overflow-y-auto pb-24"
+            className="relative flex flex-col w-full h-full overflow-y-auto pb-24"
             data-scroll-key="dashboard-live"
         >
             {/* Agente: PORTADA INMERSIVA a pantalla completa (≈100dvh).
                 Protagonista absoluto, primera pantalla. El resto del dashboard
                 (saludo regional + secciones) queda DEBAJO del fold y se llega
                 scrolleando. */}
+            {/* Primer uso sin piso confirmado: BANNER compacto del Paso 1
+                (piso térmico) flotando SOBRE la zona decorativa superior del
+                AgentHero, justo bajo el TopBar flotante. Es un OVERLAY (absolute)
+                a propósito (regresión 2026-06-13): montarlo en el flujo flex
+                EMPUJABA el AgentHero ≈100dvh hacia arriba y, al abrir la araña, su
+                fila superior de nodos quedaba TAPADA por el TopBar flotante (los
+                clics aterrizaban en el TopBar). Como overlay no desplaza al hero:
+                la araña conserva su geometría y sigue alcanzable. Las 3 rutas de
+                registro viven en el hero completo bajo el fold, una vez
+                confirmado el piso. */}
             {plantsCount === 0 && needsPisoCapture && (
-                <div className="px-4 pt-3" data-testid="dashboard-onboarding-top">
-                    <OnboardingHero onNavigate={onNavigate} />
+                <div
+                    className="absolute inset-x-0 top-[64px] z-20 px-4 pointer-events-none"
+                    data-testid="dashboard-onboarding-top"
+                >
+                    <div className="pointer-events-auto">
+                        <OnboardingHero onNavigate={onNavigate} compact />
+                    </div>
                 </div>
             )}
 

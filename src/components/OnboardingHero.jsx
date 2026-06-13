@@ -32,7 +32,17 @@ import { getPisoTermicoInfo } from '../services/locationService';
  *
  * Refs: deepresearch/chagra-ux/decisions/ux-clarity-2026-05.md
  */
-export default function OnboardingHero({ onNavigate }) {
+/**
+ * @param {object}   props
+ * @param {Function} props.onNavigate
+ * @param {boolean} [props.compact] - Variante banner: solo el paso "piso
+ *   térmico" (CTA o confirmación), SIN el título ni las 3 rutas de registro.
+ *   Se usa above-the-fold en DashboardLive para no empujar el AgentHero fuera
+ *   del viewport (regresión 2026-06-13): el agente debe seguir alcanzable
+ *   mientras el primer uso captura el piso. Las 3 rutas viven en el hero
+ *   completo bajo el fold.
+ */
+export default function OnboardingHero({ onNavigate, compact = false }) {
   const lands = useAssetStore((s) => s.lands);
   const hasZones = lands.length > 0;
   const hasFarmContext = !!(FARM_CONFIG.ALTITUD_MSNM || (FARM_CONFIG.THERMAL_ZONES || []).length > 0);
@@ -94,20 +104,10 @@ export default function OnboardingHero({ onNavigate }) {
     },
   ];
 
-  return (
-    <section
-      aria-label="Comenzar a registrar plantas"
-      className="w-full bg-slate-900/50 border border-slate-800 rounded-xl p-5 flex flex-col gap-4"
-    >
-      <div className="flex flex-col gap-1">
-        <h2 className="text-2xl font-black text-white">
-          {title}
-        </h2>
-        <p className="text-sm text-slate-400">
-          {subtitle}
-        </p>
-      </div>
-
+  // Bloques del "Paso 1: piso térmico". Se reúsan en el banner compacto
+  // (above-the-fold) y en el hero completo (bajo el fold).
+  const pisoStep = (
+    <>
       {/* ── Paso 1: piso térmico (filtro maestro de TODOS los módulos) ── */}
       {needsLocation && (
         <div
@@ -179,6 +179,40 @@ export default function OnboardingHero({ onNavigate }) {
           </div>
         </div>
       )}
+    </>
+  );
+
+  // Banner compacto (above-the-fold): SOLO el paso del piso, sin chrome ni las
+  // 3 rutas grandes. Mantiene el primer uso "piso primero" sin desplazar el
+  // AgentHero fuera del viewport. Si el piso ya está confirmado, no renderiza
+  // nada (DashboardLive deja de montarlo, pero por las dudas devolvemos null).
+  if (compact) {
+    if (!needsLocation && pisoConfirmado) return null;
+    return (
+      <section
+        aria-label="Primer paso: ubicar su finca"
+        className="w-full flex flex-col gap-3"
+      >
+        {pisoStep}
+      </section>
+    );
+  }
+
+  return (
+    <section
+      aria-label="Comenzar a registrar plantas"
+      className="w-full bg-slate-900/50 border border-slate-800 rounded-xl p-5 flex flex-col gap-4"
+    >
+      <div className="flex flex-col gap-1">
+        <h2 className="text-2xl font-black text-white">
+          {title}
+        </h2>
+        <p className="text-sm text-slate-400">
+          {subtitle}
+        </p>
+      </div>
+
+      {pisoStep}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {ctas.map((cta) => (
