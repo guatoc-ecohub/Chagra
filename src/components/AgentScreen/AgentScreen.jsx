@@ -1316,25 +1316,43 @@ export default function AgentScreen({ onBack, initialContext }) {
             } catch (_) { /* graceful: sigue el flujo NLU normal */ }
 
             // Suelo-diagnostico: si el campesino describe su terreno, injectamos
-            // diagnosticarSuelo() al grounding. Es cliente-side (sin sidecar),
-            // usa los datos del DR-SUELOS-1. Las guardas anti-mito (vinagre/bicarbonato,
-            // no sobre-encalar) afloran en la respuesta del agente.
-            if (!toolEvidence && hasSoilDiagnosticIntent(textForLLM)) {
+            // Modulos DR dormidos (Task 4, audit ministerio): wirear suelo,
+            // agua, animal, restauracion + carbono/PSA al grounding. Cada modulo
+            // es cliente-side, usa datos del DR consolidado, y sus guardas
+            // anti-mito afloran en la respuesta del agente.
+            if (!toolEvidence) {
+              const modules = [
+                [hasSoilDiagnosticIntent, () => import('../../services/soilDiagnostic'), 'soil_diagnostic', 'suelo'],
+              ];
+              // Agua, animal, restauracion disponibles si el intent matcher existe
               try {
-                const { diagnosticarSuelo, formatearGroundingSuelo } = await import('../../services/soilDiagnostic');
-                const diag = diagnosticarSuelo(textForLLM);
-                if (diag && !diag.sin_datos) {
-                  const bloque = formatearGroundingSuelo(diag);
-                  if (bloque) {
-                    toolEvidence = {
-                      tool: 'soil_diagnostic',
-                      args: { query: textForLLM },
-                      result: { found: true, bloque },
-                    };
-                    nluRoute = 'suelo:diagnostico';
-                  }
+                const { hasWaterDiagnosticIntent, hasAnimalDiagnosticIntent, hasRestauracionDiagnosticIntent } = await import('../../services/knowledgeIntentRouter');
+                if (hasWaterDiagnosticIntent) modules.push([hasWaterDiagnosticIntent, async () => { const m = await import('../../services/waterDiagnostic'); return { diagnosticar: m.diagnosticarAgua, formatear: m.formatearGroundingAgua }; }, 'water_diagnostic', 'agua']);
+                if (hasAnimalDiagnosticIntent) modules.push([hasAnimalDiagnosticIntent, async () => { const m = await import('../../services/animalDiagnostic'); return { diagnosticar: m.diagnosticarAnimal, formatear: m.formatearGroundingAnimal }; }, 'animal_diagnostic', 'animal']);
+                if (hasRestauracionDiagnosticIntent) modules.push([hasRestauracionDiagnosticIntent, async () => { const m = await import('../../services/restauracionDiagnostic'); return { diagnosticar: m.diagnosticarRestauracion, formatear: m.formatearGroundingRestauracion }; }, 'restauracion_diagnostic', 'restauracion']);
+              } catch (_) { /* graceful */ }
+              // Carbono/PSA (Task 3): detectarAlertaCarbono
+              modules.push([
+                (text) => /\b(bonos?\s+carbono|pagar\s+por\s+sembrar|carbono\b.*\bpagar|PSA|Decreto\s+1007)\b/i.test(text),
+                async () => { const c = await import('../../services/carbonoAlerta'); const p = await import('../../data/carbono-alertas.json'); return { diagnosticar: (t) => c.detectarAlertaCarbono(t), formatear: (d) => d ? `ALERTA BONOS DE CARBONO: ${d.alerta}\n\nTrampas:\n${d.trampas.map((t) => `- ${t.nombre}: ${t.riesgo}`).join('\n')}\n\nRecomendacion: ${d.recomendacion}` : '' }; },
+                'carbono_alerta', 'carbono',
+              ]);
+              for (const [hasIntent, loadMod, tool, label] of modules) {
+                if (hasIntent(textForLLM)) {
+                  try {
+                    const mod = await loadMod();
+                    const diag = mod.diagnosticar(textForLLM);
+                    if (diag && (diag.sin_datos === false || diag.alerta)) {
+                      const bloque = mod.formatear(diag);
+                      if (bloque) {
+                        toolEvidence = { tool, args: { query: textForLLM }, result: { found: true, bloque } };
+                        nluRoute = `${label}:diagnostico`;
+                      }
+                    }
+                  } catch (_) { /* graceful */ }
+                  break;
                 }
-              } catch (_) { /* graceful: sin diagnosticar no rompe */ }
+              }
             }
           }
 

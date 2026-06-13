@@ -816,6 +816,8 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
       };
       return urbanExamples[formData.landType] || 'Ej: Mi zona urbana...';
     }
+    // Zona rural (land no-urbana): placeholder de zona, NO de insumos.
+    if (activeTab === 'land') return 'Ej: Huerta, Lote de abajo, Potrero, Invernadero...';
     if (activeTab === 'structure') return 'Ej: ' + STRUCTURE_EXAMPLES[Math.floor(Math.random() * STRUCTURE_EXAMPLES.length)];
     if (activeTab === 'equipment') return 'Ej: ' + EQUIPMENT_EXAMPLES[Math.floor(Math.random() * EQUIPMENT_EXAMPLES.length)];
     return 'Ej: Bokashi, Biol, Purín de Ortiga...';

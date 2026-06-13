@@ -97,7 +97,7 @@ if ('serviceWorker' in navigator) {
   // "debo dar Actualizar N veces"). El operador decide cuando actualizar
   // via UpdateAvailableBanner.
   //
-  // Fix Antigravity QA #18: persistimos el ack en localStorage
+  // Fix QA #18: persistimos el ack en localStorage
   // (`sw:last-acked-version`) para no repetir el toast cada reload. Antes
   // de disparar `chagra:update-available` preguntamos al SW su CACHE_NAME
   // via MessageChannel y comparamos con el acked. Si coincide → suprimir.

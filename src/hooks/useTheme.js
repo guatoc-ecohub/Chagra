@@ -20,7 +20,7 @@ import { useEffect, useState, useCallback } from 'react';
  */
 
 export const STORAGE_KEY = 'chagra:theme';
-export const DEFAULT_THEME = 'auto';
+export const DEFAULT_THEME = 'biopunk';
 
 /**
  * Catálogo visible en el switcher (ThemeSelector). El orden define el orden

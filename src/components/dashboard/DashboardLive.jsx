@@ -23,6 +23,7 @@ import OnboardingHero from '../OnboardingHero';
 import { getProfile } from '../../services/userProfileService';
 import SelectedBackgroundReveal from './SelectedBackgroundReveal';
 import ClimaStrip from './ClimaStrip';
+import HoyEnFincaStrip from './HoyEnFincaStrip';
 import AIStatusFooter from './AIStatusFooter';
 import AnalisisProactivoIA from './AnalisisProactivoIA';
 import useAssetStore from '../../store/useAssetStore';
@@ -52,9 +53,14 @@ import {
 // sección draggable, por defecto justo debajo de 'clima'. Bump de versión
 // para que usuarios con orden v1 reciban el nuevo default en vez de que se
 // les agregue al final.
-const STORAGE_KEY = 'chagra:dashboard-order:v2';
+// v3 (2026-06-11): 'hoyfinca' (HoyEnFincaStrip) — resumen proactivo del día
+// (clima honesto + alertas + tareas + próximo evento de agenda) como PRIMERA
+// sección bajo el hero. Toque → vista completa 'hoy_finca'. Bump para que
+// usuarios con orden v2 lo reciban arriba y no apendizado al final.
+const STORAGE_KEY = 'chagra:dashboard-order:v3';
 
 const DEFAULT_ORDER = [
+    'hoyfinca',
     'clima',
     'analisis',
     'plantas',
@@ -68,6 +74,7 @@ const DEFAULT_ORDER = [
 ];
 
 const SECTION_COMPONENTS = {
+    hoyfinca: { Component: HoyEnFincaStrip, full: true },
     clima: { Component: ClimaStrip, full: true },
     analisis: { Component: AnalisisProactivoIA, full: true },
     plantas: { Component: PlantasCard },

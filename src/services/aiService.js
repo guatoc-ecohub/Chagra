@@ -1,7 +1,7 @@
 /**
  * aiService.js — Inferencia de visión via Ollama / Gemma 4 (Fase 20.2b).
  *
- * Envía imágenes codificadas en Base64 al endpoint local del Nodo Alpha
+ * Envía imágenes codificadas en Base64 al endpoint local del servidor local
  * para diagnóstico fitosanitario automatizado. Desde v0.6.0 consume la
  * respuesta en streaming NDJSON via `streamOllama`, permitiendo a la UI
  * mostrar el diagnóstico token-por-token con efecto typewriter.

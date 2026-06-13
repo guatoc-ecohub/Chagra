@@ -1,7 +1,7 @@
 /**
  * swUpdateAck.js — persistencia del "ack de versión" del Service Worker.
  *
- * Bug Antigravity QA #18: la notificación "nueva versión disponible" se
+ * Bug QA #18: la notificación "nueva versión disponible" se
  * mostraba cada reload aunque el usuario ya hubiera clickeado "Actualizar".
  * El SW dispara `controllerchange`/`updatefound` con cada activación nueva
  * y el cliente no recordaba que el usuario ya había aceptado esa versión.
@@ -18,7 +18,7 @@
  * Este módulo expone funciones puras + helpers de localStorage para que
  * `swUpdateAck.test.js` pueda cubrir los 3 casos sin mockear navigator.
  *
- * Refs: Antigravity QA #18, task #128.
+ * Refs: QA #18, task #128.
  */
 
 export const ACK_STORAGE_KEY = 'sw:last-acked-version';

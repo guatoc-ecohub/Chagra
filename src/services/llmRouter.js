@@ -96,7 +96,11 @@ export const ROUTES = {
     // siembra cortada a media frase ("…riego regular para") porque una lista
     // de 5 especies con descripción supera 512 tokens. Intelligence-first:
     // no truncar el consejo agronómico por ahorrar tokens.
-    max_tokens: 768,
+    // 2026-06-11: 768→1024. La auditoría agroecológica (marca) halló que 768
+    // AÚN mutila respuestas agronómicas: dosis + pasos + especies + precaución
+    // + fuente superan 768 → se corta a media frase ("concise-guard truncation"
+    // sistémica en todos los dominios). 1024 deja pasar el consejo completo.
+    max_tokens: 1024,
     // BUG A fix (2026-05-30): corta turnos falsos "Usuario:"/"Asistente:".
     stop: CHAT_STOP_SEQUENCES,
     url: '/api/ollama/v1/chat/completions',
