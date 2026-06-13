@@ -7,7 +7,7 @@ import useOllamaWarmStore from '../store/useOllamaWarmStore';
 import useAssetStore from '../store/useAssetStore';
 import useFincaActiveStore from '../services/fincaActiveStore';
 import { FARM_CONFIG } from '../config/defaults';
-import { getProfile, getProfileMunicipio } from '../services/userProfileService';
+import { getProfile, getProfileMunicipio, getNotificationStyle } from '../services/userProfileService';
 import { findMunicipio } from '../utils/colombiaLocations';
 import { useTheme } from '../hooks/useTheme';
 import { iconForTheme } from './dashboard/themeIcon';
@@ -95,6 +95,18 @@ export default function TopBar({ onNavigate, onLogout }) {
     const onLocUpdated = () => setProfileTick((t) => t + 1);
     window.addEventListener('chagra:location-updated', onLocUpdated);
     return () => window.removeEventListener('chagra:location-updated', onLocUpdated);
+  }, []);
+
+  // UN solo botón de notificación (operador 2026-06-11, bug "dos campanas"):
+  // la pref `estilo_notificacion` del perfil decide cuál se ve —
+  //   'demo'   → la campana viva de la portada (AgentHero) · aquí NO se pinta
+  //   'actual' → esta campanita clásica del TopBar
+  // Re-lee en vivo cuando el operador la cambia en Perfil.
+  const [notifStyle, setNotifStyle] = useState(() => getNotificationStyle());
+  useEffect(() => {
+    const onStyleChanged = () => setNotifStyle(getNotificationStyle());
+    window.addEventListener('chagra:notif-style-changed', onStyleChanged);
+    return () => window.removeEventListener('chagra:notif-style-changed', onStyleChanged);
   }, []);
 
   // "Respira" animación del logo Chagra cuando hay actividad de fondo
@@ -219,8 +231,11 @@ export default function TopBar({ onNavigate, onLogout }) {
         {/* NotificationsBell — vivo. Pulsa rojo si crítico, ámbar si warning,
             slate si info/empty. Reemplaza el mic+sprout del TopBar
             (operador 2026-05-28: el agregar-planta-por-voz lo hace ahora
-            el agente Chagra directamente). */}
-        <NotificationsBell onNavigate={onNavigate} />
+            el agente Chagra directamente).
+            Solo si el operador eligió 'actual' (campana clásica) en Perfil —
+            con 'demo' la campana visible es la de la portada del agente
+            (una sola campana, operador 2026-06-11). */}
+        {notifStyle === 'actual' && <NotificationsBell onNavigate={onNavigate} />}
         {/* Botón Settings (icono ⚙) eliminado, Feedback piloto #115: era duplicado del
             botón operator name de arriba (ambos onNavigate('perfil')). El
             operator name button es más explícito + el NAV_TILE Perfil del

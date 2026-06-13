@@ -411,9 +411,18 @@ export default function AgentHero({ onNavigate }) {
         activeAlerts.find((a) => a.severity === 'danger') ||
         activeAlerts.find((a) => a.severity === 'warning') ||
         null;
-    // Preferencia de estilo: 'demo' (chip, default) | 'actual' (campanita del
-    // TopBar). En 'actual' NO pintamos el chip aquí (la campanita ya lo cubre).
-    const notifStyle = getNotificationStyle();
+    // Preferencia de estilo: 'demo' (campana de la portada + chip, default) |
+    // 'actual' (campanita clásica del TopBar). Operador 2026-06-11 (bug "dos
+    // campanas"): la pref decide cuál ÚNICA campana se renderiza — con 'demo'
+    // la de la portada vive aquí y el TopBar no pinta la suya; con 'actual'
+    // es al revés. Re-lee en vivo cuando cambia en Perfil.
+    const [notifStyle, setNotifStyle] = useState(() => getNotificationStyle());
+    useEffect(() => {
+        const onStyleChanged = () => setNotifStyle(getNotificationStyle());
+        window.addEventListener('chagra:notif-style-changed', onStyleChanged);
+        return () => window.removeEventListener('chagra:notif-style-changed', onStyleChanged);
+    }, []);
+    const showHeroBell = notifStyle === 'demo';
     const showAlertChip = notifStyle === 'demo' && Boolean(topAlert);
 
     const sendToOutbox = useAgentOutboxStore((s) => s.send);
@@ -586,15 +595,23 @@ export default function AgentHero({ onNavigate }) {
     // Las tareas pendientes vienen del MISMO camino offline-first que el
     // PendingTasksWidget (syncManager cachea farmOS); sin red, falla suave y
     // el badge cuenta solo las alertas locales.
+    // failedTxCount: cambios en quarantine (sin sincronizar). Cuando esta
+    // campana es la ÚNICA (estilo 'demo'), los errores reales de sync de la
+    // campanita clásica NO se pierden: viven aquí (operador 2026-06-11).
+    const [failedTxCount, setFailedTxCount] = useState(0);
     useEffect(() => {
         let alive = true;
         Promise.resolve()
             .then(() => syncManager.fetchPendingTasksFromFarmOS())
             .then((tasks) => { if (alive && Array.isArray(tasks)) setPendingTasks(tasks); })
             .catch(() => { /* offline: el badge usa solo las alertas */ });
+        Promise.resolve()
+            .then(() => syncManager.getFailedTransactions())
+            .then((txs) => { if (alive) setFailedTxCount(Array.isArray(txs) ? txs.length : 0); })
+            .catch(() => { /* sin IDB: el badge usa solo alertas+tareas */ });
         return () => { alive = false; };
-    }, []);
-    const notifCount = activeAlerts.length + pendingTasks.length;
+    }, [notifOpen]);
+    const notifCount = activeAlerts.length + pendingTasks.length + (failedTxCount > 0 ? 1 : 0);
     const toggleNotif = () => {
         setNotifOpen((open) => {
             if (!open && menuOpen) closeMenu(); // excluyentes, como el demo
@@ -1613,26 +1630,30 @@ export default function AgentHero({ onNavigate }) {
                         con Ajustes/Salir. */}
 
                     {/* Campana de alertas/tareas — import del demo biopunk.
-                        Badge = alertas activas + tareas de campo pendientes. */}
-                    <button
-                        type="button"
-                        onClick={toggleNotif}
-                        aria-label="Alertas y tareas pendientes"
-                        aria-expanded={notifOpen}
-                        className={[
-                            'agentport-bell',
-                            notifOpen ? 'is-open' : '',
-                            notifCount > 0 ? 'has-items' : '',
-                        ].join(' ')}
-                    >
-                        <span className="bicon" aria-hidden="true">🔔</span>
-                        {notifCount > 0 && <span className="badge">{notifCount}</span>}
-                    </button>
+                        Badge = alertas activas + tareas de campo + sync con
+                        errores. Solo con estilo 'demo' (es LA campana única;
+                        con 'actual' la única es la del TopBar). */}
+                    {showHeroBell && (
+                        <button
+                            type="button"
+                            onClick={toggleNotif}
+                            aria-label="Alertas y tareas pendientes"
+                            aria-expanded={notifOpen}
+                            className={[
+                                'agentport-bell',
+                                notifOpen ? 'is-open' : '',
+                                notifCount > 0 ? 'has-items' : '',
+                            ].join(' ')}
+                        >
+                            <span className="bicon" aria-hidden="true">🔔</span>
+                            {notifCount > 0 && <span className="badge">{notifCount}</span>}
+                        </button>
+                    )}
                 </div>
             </header>
 
             {/* ============ PANEL DE ALERTAS / TAREAS (demo biopunk) ============ */}
-            {notifOpen && (
+            {showHeroBell && notifOpen && (
                 <section className="agentport-notif" aria-label="Alertas y tareas de campo">
                     <div className="nph">
                         <div className="nt">🔔 Alertas y tareas</div>
@@ -1683,6 +1704,25 @@ export default function AgentHero({ onNavigate }) {
                                 </span>
                             </div>
                         ))}
+                        {/* Errores reales de sincronización (quarantine) — al ser
+                            esta la campana única, el estado de sync de la
+                            campanita clásica vive aquí (operador 2026-06-11). */}
+                        {failedTxCount > 0 && (
+                            <>
+                                <div className="nsec">Sincronización</div>
+                                <div className="nitem is-danger">
+                                    <span className="nico" aria-hidden="true">📡</span>
+                                    <span className="ntxt">
+                                        <span className="ntit">
+                                            {failedTxCount === 1
+                                                ? '1 cambio no se pudo sincronizar'
+                                                : `${failedTxCount} cambios no se pudieron sincronizar`}
+                                        </span>
+                                        <span className="nmeta">Tus datos siguen guardados en el teléfono. Revisa la conexión e intenta de nuevo.</span>
+                                    </span>
+                                </div>
+                            </>
+                        )}
                     </div>
                     <div className="agentport-notif-foot">
                         Lo clave te lo digo en el saludo. Aquí guardo <b>el resto</b>.

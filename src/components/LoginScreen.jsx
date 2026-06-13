@@ -45,7 +45,7 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
     }
 
     setLoading(true);
-    // 2026-05-23 auditoría Antigravity bug #10: si `authenticateUser` throw
+    // 2026-05-23 auditoría QA bug #10: si `authenticateUser` throw
     // (network error, JSON parse fail, CORS, AbortError) sin try/catch, el
     // botón quedaba en "Procesando..." infinito sin feedback al usuario.
     // Fix: try/catch + finally garantizan que setLoading(false) corra siempre

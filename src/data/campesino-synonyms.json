@@ -54,5 +54,21 @@
     "tutorar": ["entutorar", "amarrar", "soporte"],
     "raleo": ["entresaque", "aclareo", "reducir_densidad"],
     "injetar": ["injerto", "mejorar_variedad", "patron"]
+  },
+  "plaga_hospedero": {
+    "broca_del_cafe": ["coffea_arabica", "cafe"],
+    "roya_del_cafe": ["coffea_arabica", "cafe"],
+    "gusano_del_cafe": ["coffea_arabica", "cafe", "broca"],
+    "cogollero_del_maiz": ["zea_mays", "maiz"],
+    "mosca_blanca_tomate": ["solanum_lycopersicum", "tomate"],
+    "gota_de_la_papa": ["solanum_tuberosum", "papa"],
+    "tizon_de_la_papa": ["solanum_tuberosum", "papa"],
+    "gusano_blanco_papa": ["solanum_tuberosum", "papa"],
+    "botrytis_fresa": ["fragaria_ananassa", "fresa"],
+    "hongo_blanco_fresa": ["fragaria_ananassa", "fresa"],
+    "antracnosis_tomate": ["solanum_lycopersicum", "tomate"],
+    "passalora_cafe": ["coffea_arabica", "cafe"],
+    "phytophthora_aguacate": ["persea_americana", "aguacate"],
+    "pudricion_radicular_aguacate": ["persea_americana", "aguacate"]
   }
 }

@@ -97,7 +97,7 @@ if ('serviceWorker' in navigator) {
   // "debo dar Actualizar N veces"). El operador decide cuando actualizar
   // via UpdateAvailableBanner.
   //
-  // Fix Antigravity QA #18: persistimos el ack en localStorage
+  // Fix QA #18: persistimos el ack en localStorage
   // (`sw:last-acked-version`) para no repetir el toast cada reload. Antes
   // de disparar `chagra:update-available` preguntamos al SW su CACHE_NAME
   // via MessageChannel y comparamos con el acked. Si coincide → suprimir.
@@ -131,10 +131,22 @@ if ('serviceWorker' in navigator) {
   // Guard `reloading` evita bucles de recarga; `hadController` evita recargar
   // en el primer install (clients.claim() tambien dispara controllerchange
   // cuando antes no habia controlador — ahi NO hay que recargar).
+  //
+  // `userUpdateRequested` (bug operador 2026-06-11, Android — boton pegado):
+  // si la pagina arranco SIN controller (hard reload / carga no controlada)
+  // pero hay un SW en waiting, el click "Actualizar" disparaba SKIP_WAITING
+  // → claim → controllerchange, y el guard de first-install se TRAGABA el
+  // evento: ni recarga ni banner fuera. Cuando la actualizacion la pidio el
+  // usuario (evento chagra:sw-update-requested del banner), controllerchange
+  // SIEMPRE recarga.
   let reloading = false;
   let hadController = Boolean(navigator.serviceWorker.controller);
+  let userUpdateRequested = false;
+  window.addEventListener('chagra:sw-update-requested', () => {
+    userUpdateRequested = true;
+  });
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!hadController) {
+    if (!hadController && !userUpdateRequested) {
       hadController = true; // primer claim en first install — sin recarga
       return;
     }

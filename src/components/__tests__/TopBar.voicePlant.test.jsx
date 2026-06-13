@@ -38,6 +38,7 @@ describe('TopBar — captura por voz removida (#323)', () => {
   beforeEach(() => {
     onNavigate = vi.fn();
     onLogout = vi.fn();
+    localStorage.clear();
   });
 
   it('YA NO existe el botón unificado "Agregar planta por voz"', () => {
@@ -52,8 +53,17 @@ describe('TopBar — captura por voz removida (#323)', () => {
     expect(screen.queryByLabelText(/^Captura por voz$/i)).toBeNull();
   });
 
-  it('en su lugar renderiza el NotificationsBell', () => {
+  // 2026-06-11 (bug "dos campanas"): el NotificationsBell del TopBar solo se
+  // renderiza si el operador eligió 'actual' en Perfil. Con 'demo' (default)
+  // la campana única es la de la portada del agente (AgentHero).
+  it('renderiza el NotificationsBell solo con estilo "actual"', () => {
+    localStorage.setItem('chagra:profile:v1', JSON.stringify({ estilo_notificacion: 'actual' }));
     render(<TopBar onNavigate={onNavigate} onLogout={onLogout} />);
     expect(screen.getByTestId('notifications-bell-stub')).toBeInTheDocument();
+  });
+
+  it('con estilo "demo" (default) NO renderiza el NotificationsBell (campana única en el hero)', () => {
+    render(<TopBar onNavigate={onNavigate} onLogout={onLogout} />);
+    expect(screen.queryByTestId('notifications-bell-stub')).toBeNull();
   });
 });

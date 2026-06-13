@@ -409,12 +409,20 @@ export function getNotificationStyle() {
  * Persiste el estilo de notificación en el perfil. Ignora valores inválidos
  * (cae al default) para no corromper el perfil.
  *
+ * Emite `chagra:notif-style-changed` para que los consumidores montados
+ * (TopBar, AgentHero) re-lean la preferencia en vivo — desde 2026-06-11 el
+ * estilo decide CUÁL campana se renderiza (una sola, bug "dos campanas").
+ *
  * @param {'demo'|'actual'} style
  * @returns {Object} perfil resultante
  */
 export function setNotificationStyle(style) {
   const next = NOTIFICATION_STYLES.includes(style) ? style : DEFAULT_NOTIFICATION_STYLE;
-  return saveProfile({ estilo_notificacion: next });
+  const profile = saveProfile({ estilo_notificacion: next });
+  try {
+    window.dispatchEvent(new CustomEvent('chagra:notif-style-changed', { detail: { style: next } }));
+  } catch (_) { /* SSR/tests sin window — la pref ya quedó persistida */ }
+  return profile;
 }
 
 /** Marca el onboarding de perfil como completado. */

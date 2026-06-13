@@ -150,3 +150,14 @@ export function hasSoilDiagnosticIntent(userMessage) {
   const norm = _norm(userMessage);
   return SUELO_DIAG_RE.test(norm);
 }
+
+// ── Intenciones de los otros modulos DR (Task 4, audit ministerio) ──
+
+const AGUA_DIAG_RE = /\b(lluvia|llueve|sequ[ií]a|quebrada|riego|regar|tanque|agua|capta[cç]|pozo|aljibe|nacimiento|reservorio|goteo|se\s+sec[oó])\b|no\s+llueve|falta\s+agua|agua\s+no\s+(me\s+)?alcanza|se\s+sec[oó]\s+la\s+quebrada|se\s+me\s+ahog[oó]/i;
+export function hasWaterDiagnosticIntent(msg) { return typeof msg === 'string' && msg.trim().length >= 5 && AGUA_DIAG_RE.test(_norm(msg)); }
+
+const ANIMAL_DIAG_RE = /\b(vacas?|novillas?|toro|gallinas?|ponedoras?|pollos?|cabras?|chivos?|ovejas?|corderos?|marranos?|cochina|lech[oó]n|conejos?|abejas?|angelitas?|colmenas?|caballo|mula|bestia|yunta|forraje|banco\s+de\s+prote[ií]na|leucaena)\b|qu[eé]\s+les?\s+doy\s+de\s+comer/i;
+export function hasAnimalDiagnosticIntent(msg) { return typeof msg === 'string' && msg.trim().length >= 5 && ANIMAL_DIAG_RE.test(_norm(msg)); }
+
+const RESTAURACION_DIAG_RE = /\b(restaura[cç]|reforesta[cç]|recuperar\s+(el\s+)?(monte|bosque)|p[aá]ramo|frailej[oó]n|sucesi[oó]n\s+ecol[oó]gica|corredor\s+ripario|cerca\s+viva|arbol(es)?\s+nativ[oa]s?|especies?\s+nativ[oa]s?)\b|proteger\s+(el\s+)?nacimiento|controlar\s+(la\s+)?erosion/i;
+export function hasRestauracionDiagnosticIntent(msg) { return typeof msg === 'string' && msg.trim().length >= 5 && RESTAURACION_DIAG_RE.test(_norm(msg)); }

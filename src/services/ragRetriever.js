@@ -366,11 +366,16 @@ async function loadEmbeddings() {
       if (!ct.includes('json')) return null;
       const raw = await res.json();
       if (!raw || typeof raw !== 'object') return null;
-      // Convertir arrays planos a Float32Array para similitud rápida
+      // Convertir a Float32Array. Soporta int8 quantizado (q:'int8',s:scale,v:Int8Array)
       const converted = {};
-      for (const [slug, vec] of Object.entries(raw)) {
-        if (Array.isArray(vec) && vec.length > 0) {
-          converted[slug] = new Float32Array(vec);
+      for (const [slug, entry] of Object.entries(raw)) {
+        if (entry && typeof entry === 'object' && entry.q === 'int8' && Array.isArray(entry.v) && entry.s) {
+          // Dequantizar: int8 → float32
+          const f32 = new Float32Array(entry.v.length);
+          for (let i = 0; i < entry.v.length; i++) f32[i] = entry.v[i] * entry.s;
+          converted[slug] = f32;
+        } else if (Array.isArray(entry) && entry.length > 0) {
+          converted[slug] = new Float32Array(entry);
         }
       }
       embeddingsCache = converted;
@@ -476,6 +481,25 @@ function _docKey(doc) {
 }
 
 /**
+ * Colapsa variedades a especie base. "lactuca_sativa_longifolia_morada"
+ * → "lactuca_sativa". Agrupa por genus_especie (2 partes), conserva el
+ * score mas alto por grupo, re-ordena. El mayor lever del deep-test RAG.
+ */
+function collapseVarieties(results) {
+  if (!results?.length) return results;
+  const bySpecies = new Map();
+  for (const r of results) {
+    const parts = (r.species || '').split('_');
+    const base = parts.length >= 2 ? parts.slice(0, 2).join('_') : r.species;
+    const existing = bySpecies.get(base);
+    if (!existing || r.score > existing.score) {
+      bySpecies.set(base, { ...r, species: base });
+    }
+  }
+  return Array.from(bySpecies.values()).sort((a, b) => b.score - a.score);
+}
+
+/**
  * Recupera los top-K passages más relevantes al query usando BM25.
  *
  * @param {string} query - texto a buscar (se tokeniza con normalización NFD).
@@ -495,7 +519,9 @@ export async function retrieve(query, topK = 5, surface = 'unknown') {
   let results = [];
   let errorKind = null;
   try {
-    results = await retrieveInternal(query, topK);
+    results = await retrieveInternal(query, Math.max(topK * 3, 15));
+    // Colapsar variedades a especie base (A1: el mayor lever del deep-test)
+    results = collapseVarieties(results).slice(0, topK);
     return results;
   } catch (err) {
     errorKind = 'unknown';

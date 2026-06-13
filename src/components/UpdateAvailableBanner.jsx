@@ -3,10 +3,23 @@ import { RefreshCw, Sparkles } from 'lucide-react';
 import { writeAckedVersion } from '../services/swUpdateAck';
 import { reloadPage } from '../services/pageReload';
 
+// Timeout para reg.update(): en red rural flaky el fetch de sw.js puede
+// colgarse y el click "Actualizar" quedaba pegado esperando para siempre
+// (bug operador 2026-06-11). Pasado el timeout seguimos con el waiting
+// que ya tengamos.
+export const UPDATE_TIMEOUT_MS = 3000;
+// Red de seguridad post-SKIP_WAITING: si controllerchange nunca llega
+// (claim falló en el activate, evento tragado por el guard de first-install,
+// etc.) recargamos directo. Si la página recarga antes, este timer muere
+// con ella — nunca produce doble recarga.
+export const RELOAD_FALLBACK_MS = 8000;
+
 export default function UpdateAvailableBanner() {
   const [updateAvailable, setUpdateAvailable] = useState(false);
+  // Click "Actualizar" en curso: feedback inmediato + evita doble click.
+  const [updating, setUpdating] = useState(false);
   // Capturamos la version reportada por el SW (via event.detail) para
-  // persistir el ack en click "Actualizar". Fix Antigravity QA #18.
+  // persistir el ack en click "Actualizar". Fix QA #18.
   const announcedVersionRef = useRef(null);
 
   useEffect(() => {
@@ -29,19 +42,34 @@ export default function UpdateAvailableBanner() {
   }, [updateAvailable]);
 
   const handleUpdate = async () => {
+    if (updating) return;
+    setUpdating(true);
     // Persistimos el ack ANTES de activar: si la recarga falla o el usuario
     // cierra la pestaña, no queremos repetir el toast en la proxima sesion
     // para una version que ya acepto.
     if (announcedVersionRef.current) {
       writeAckedVersion(announcedVersionRef.current);
     }
+    // Aviso a main.jsx: la PROXIMA controllerchange es una actualizacion
+    // pedida por el usuario → recargar SIEMPRE. Sin esto, una pagina que
+    // arranco SIN controller (hard reload / primera carga no controlada) se
+    // tragaba el controllerchange en el guard de first-install y el boton
+    // quedaba pegado (bug operador 2026-06-11, Android).
+    try {
+      window.dispatchEvent(new CustomEvent('chagra:sw-update-requested'));
+    } catch (_) { /* CustomEvent siempre existe en browsers soportados */ }
     try {
       const reg = await navigator.serviceWorker.ready;
       // Bug operador 2026-06-10 ("dar Actualizar N veces"): si hubo varios
       // deploys con la pestaña abierta, update() trae el SW MAS NUEVO y el
       // browser reemplaza el waiting → un click lleva a la ultima version.
+      // Promise.race: en red flaky update() puede colgarse — pasado el
+      // timeout activamos el waiting que ya tengamos.
       try {
-        await reg.update();
+        await Promise.race([
+          reg.update(),
+          new Promise((resolve) => { window.setTimeout(resolve, UPDATE_TIMEOUT_MS); }),
+        ]);
       } catch (_) { /* offline — activamos el waiting que ya tengamos */ }
       if (reg.waiting) {
         // NO recargamos aca. El SW activa → controllerchange → main.jsx
@@ -49,6 +77,10 @@ export default function UpdateAvailableBanner() {
         // la carrera "recarga antes de que el SW nuevo tome control" que
         // re-mostraba el banner.
         reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        // Red de seguridad: si controllerchange nunca dispara (claim fallido
+        // en el activate del SW), recarga directa — el SW nuevo ya esta
+        // activo y controlara la pagina recargada. El reload mata el timer.
+        window.setTimeout(() => { reloadPage(); }, RELOAD_FALLBACK_MS);
         return;
       }
     } catch (_) { /* SW no disponible — recargar directo abajo */ }
@@ -87,10 +119,12 @@ export default function UpdateAvailableBanner() {
 
         <button
           onClick={handleUpdate}
-          className="px-3 py-1.5 bg-muzo-glow/20 hover:bg-muzo-glow/30 text-muzo-glow text-xs font-bold rounded-lg transition-colors whitespace-nowrap"
+          disabled={updating}
+          className="px-3 py-1.5 bg-muzo-glow/20 hover:bg-muzo-glow/30 disabled:opacity-60 text-muzo-glow text-xs font-bold rounded-lg transition-colors whitespace-nowrap inline-flex items-center gap-1.5"
           type="button"
         >
-          Actualizar
+          {updating && <RefreshCw size={12} className="animate-spin" aria-hidden="true" />}
+          {updating ? 'Actualizando…' : 'Actualizar'}
         </button>
       </div>
     </div>

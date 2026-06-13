@@ -61,8 +61,8 @@ const useFincaActiveStore = create(
             // Resolver el endpoint de FarmOS para la finca activa.
             //
             // Bug 2026-05-18 (operator: 100+ registros stuck pendientes con WiFi):
-            // si retorna URL absoluta cross-origin (ej. 'https://farmos.guatoc.co'
-            // desde 'https://chagra.guatoc.co'), Cloudflare Access devuelve 302
+            // si retorna URL absoluta cross-origin (ej. 'https://farm.example.co'
+            // desde 'https://app.example.co'), Cloudflare Access devuelve 302
             // redirect a login → sync falla. Solución: si la URL absoluta del
             // farmos_endpoint comparte hostname o es el "farmos." pair del
             // origin actual de la PWA, usar relative '' → fetch same-origin

@@ -102,6 +102,27 @@ export async function streamOllama(url, body, onToken, { signal, onDone, meta } 
   let lastDoneObj = null;
   let response;
 
+  // Guard offline (feedback Lili/MinAmbiente 2026-06-11): sin esto, estando sin
+  // internet el fetch al sidecar/Ollama (remoto, en alpha) se queda "pensando"
+  // hasta el timeout largo y NUNCA avisa que falta conexión (los íconos ¿Qué
+  // siembro?/Plaga/Clima y la voz se quedaban pegados). navigator.onLine=false →
+  // fallamos rápido con mensaje claro. Los datos locales (siembras, zonas,
+  // catálogo) SÍ funcionan offline; solo el asistente IA necesita conexión.
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    recordLLMEvent({
+      model: modelHint,
+      endpoint: url,
+      flujo: flujoHint,
+      status: 'error',
+      total_ms: Date.now() - t0,
+      error_kind: 'offline',
+    });
+    throw new Error(
+      'Sin conexión a internet. El asistente necesita internet para responder; ' +
+        'tus datos de la finca (siembras, zonas, catálogo) sí funcionan sin conexión.'
+    );
+  }
+
   try {
     response = await fetch(url, {
       method: 'POST',

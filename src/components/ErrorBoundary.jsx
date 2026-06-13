@@ -1,4 +1,5 @@
 import React from 'react';
+import { WifiOff } from 'lucide-react';
 
 export class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -27,22 +28,23 @@ export class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div className="h-[100dvh] w-full bg-slate-950 flex items-center justify-center p-6">
-          <div className="w-full max-w-md bg-slate-900 border border-red-800 rounded-2xl p-6 space-y-4 shadow-2xl">
+          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-2xl">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-red-900/50 rounded-full flex items-center justify-center shrink-0">
-                <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
+              <div className="w-12 h-12 bg-amber-900/50 rounded-full flex items-center justify-center shrink-0">
+                <WifiOff size={24} className="text-amber-400" aria-hidden="true" />
               </div>
-              <div>
-                <h2 className="text-lg font-bold text-white">Fallo en el modulo</h2>
-                <p className="text-sm text-slate-400">Un error impidio renderizar esta vista.</p>
+              <div className="flex-1">
+                <h2 className="text-lg font-bold text-white">Algo falló</h2>
+                <p className="text-sm text-slate-400 mt-1">
+                  Tus datos de la finca están a salvo
+                </p>
               </div>
             </div>
 
-            <div className="p-3 bg-slate-800 rounded-xl border border-slate-700 overflow-auto max-h-32">
-              <p className="text-xs font-mono text-red-300 break-all">
-                {this.state.error?.message || 'Error desconocido'}
+            <div className="p-4 bg-slate-800 rounded-xl border border-slate-700">
+              <p className="text-sm text-slate-300 leading-relaxed">
+                Este módulo tuvo un error inesperado. La información de tu finca
+                (plantas, tareas, bitácora) está guardada de forma segura en tu dispositivo.
               </p>
             </div>
 
@@ -51,19 +53,28 @@ export class ErrorBoundary extends React.Component {
                 onClick={this.handleReset}
                 className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-colors text-sm"
               >
-                Reiniciar vista
+                Intentar de nuevo
               </button>
               <button
                 onClick={this.handleReload}
-                className="flex-1 py-3 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl transition-colors text-sm"
+                className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-colors text-sm"
               >
-                Recargar app
+                Recargar Chagra
               </button>
             </div>
 
-            <p className="text-2xs text-slate-600 text-center">
-              El detalle del error fue registrado en consola para depuracion.
-            </p>
+            {this.state.error?.message && (
+              <details className="text-xs text-slate-600">
+                <summary className="cursor-pointer hover:text-slate-500 text-2xs uppercase tracking-wider font-bold">
+                  Detalle técnico (para depuración)
+                </summary>
+                <div className="mt-2 p-2 bg-slate-950 rounded border border-slate-800 overflow-auto max-h-20">
+                  <p className="font-mono text-red-400 break-all text-2xs">
+                    {this.state.error.message}
+                  </p>
+                </div>
+              </details>
+            )}
           </div>
         </div>
       );
