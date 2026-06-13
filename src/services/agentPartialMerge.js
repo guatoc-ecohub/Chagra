@@ -12,6 +12,15 @@
  * muestra el mensaje de error completo (caso "primer token nunca llegó", que
  * ya era correcto).
  *
+ * UX PACIENTE (2026-06-13, wire cola durable): se ELIMINÓ el copy alarmante
+ * "Tiempo agotado. Toca de nuevo para reintentar." El campesino en el campo, con
+ * la M6000 como única GPU (first-token 95-151s bajo carga), veía ese mensaje y
+ * creía que la app estaba rota. Ahora:
+ *   - timeout/abort → la pregunta NO se pierde: la cola durable la reintenta sola
+ *     (agentRequestQueue). El copy tranquiliza y NUNCA pide "toca de nuevo".
+ *   - cancel → el operador eligió parar; ahí sí ofrecemos Reintentar explícito
+ *     (acción voluntaria, no una falla del sistema).
+ *
  * Mantener esto como función pura (sin React, sin DOM) lo hace testeable en
  * vitest sin montar el componente y deja AgentScreen delgado.
  */
@@ -25,22 +34,26 @@
  */
 export const PARTIAL_MARKERS = {
   // timeout total del LLM (LLM_TIMEOUT_MS) o stall sin tokens (watchdog).
-  timeout: '\n\n⚠️ Respuesta incompleta (se cortó). Toca Reintentar.',
+  // UX paciente: la cola durable reintenta sola; no pedimos acción al usuario.
+  timeout: '\n\n⏳ Se cortó la conexión con la IA. Lo estoy reintentando solo, no toca hacer nada.',
   // AbortError genérico (red caída mid-stream, signal externo no clasificado).
-  abort: '\n\n⚠️ Respuesta incompleta (se cortó). Toca Reintentar.',
-  // El operador tocó "Cancelar" a propósito.
-  cancel: '\n\n⚠️ Cancelado por ti. Toca Reintentar para continuar.',
+  abort: '\n\n⏳ Se cortó la respuesta. Lo estoy reintentando solo, no toca hacer nada.',
+  // El operador tocó "Cancelar" a propósito → acción voluntaria, ofrecemos retry.
+  cancel: '\n\n⏸️ Cancelado por ti. Toca Reintentar cuando quieras continuar.',
 };
 
 /**
- * Mensaje de error completo cuando NO hubo parcial (abort antes del primer
- * token). Este es el comportamiento que ya era correcto: mostrar el error en
- * el banner rojo separado, sin burbuja del assistant.
+ * Mensaje cuando NO hubo parcial (abort antes del primer token). Se muestra en
+ * el banner discreto, sin burbuja del assistant.
+ *
+ * UX PACIENTE: ya NO decimos "Tiempo agotado. Toca de nuevo para reintentar."
+ * Para timeout/abort el reintento es AUTOMÁTICO (cola durable); el mensaje
+ * tranquiliza sin pedir acción. Solo `cancel` (voluntario) ofrece Reintentar.
  */
 export const FULL_ERROR_MESSAGES = {
-  timeout: 'Tiempo agotado. Toca de nuevo para reintentar.',
-  abort: 'Tiempo agotado o cancelado. Toca de nuevo.',
-  cancel: 'Cancelado. Toca de nuevo si quieres reintentar.',
+  timeout: 'La IA está tardando (la conexión se cortó). Tu pregunta quedó guardada y la estoy reintentando sola.',
+  abort: 'Se cortó la respuesta. Tu pregunta quedó guardada y la estoy reintentando sola.',
+  cancel: 'Cancelado. Toca Reintentar si quieres que lo intente otra vez.',
 };
 
 /**
