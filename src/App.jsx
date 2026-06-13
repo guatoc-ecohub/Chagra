@@ -428,7 +428,7 @@ export default function App() {
 
   useEffect(() => {
     // Rutas públicas (sin auth check): onboarding-piloto. Soporta pathname
-    // (chagra.guatoc.co/onboarding-piloto) gracias al SPA fallback de Nginx
+    // (app.example.co/onboarding-piloto) gracias al SPA fallback de Nginx
     // que sirve index.html, hash (#onboarding-piloto), o query
     // (?onboarding=piloto). Esto permite que pilotos invitados lleguen al
     // form sin tener cuenta previa en FarmOS.
@@ -607,45 +607,63 @@ export default function App() {
       case 'loading':
         return <LoadingFallback />;
       case 'login':
-        return <LoginScreen onLoginSuccess={() => navigate('dashboard')} onSave={showToast} />;
+        return (
+          <ErrorBoundary>
+            <LoginScreen onLoginSuccess={() => navigate('dashboard')} onSave={showToast} />
+          </ErrorBoundary>
+        );
       case 'oauth-callback':
         // Puente del flujo Authorization Code + PKCE. Intercambia el code por
         // token y navega al dashboard; si falla, vuelve al login con toast.
         return (
-          <OAuthCallback
-            onSuccess={() => navigate('dashboard')}
-            onError={(msg) => {
-              showToast(msg || 'No se pudo iniciar sesión con PKCE.', true);
-              navigate('login');
-            }}
-          />
+          <ErrorBoundary>
+            <OAuthCallback
+              onSuccess={() => navigate('dashboard')}
+              onError={(msg) => {
+                showToast(msg || 'No se pudo iniciar sesión con PKCE.', true);
+                navigate('login');
+              }}
+            />
+          </ErrorBoundary>
         );
       case 'onboarding-piloto':
-        return <OnboardingPiloto />;
+        return (
+          <ErrorBoundary>
+            <OnboardingPiloto />
+          </ErrorBoundary>
+        );
       case 'onboarding-perfil':
         // #200: onboarding extendido de 18 preguntas condicionales → perfil.
         // Al terminar/saltar va al detector de ubicación; tras confirmar,
         // al dashboard. currentViewData.next permite override del destino.
         return (
-          <OnboardingProfile
-            onComplete={() => navigate('ubicacion-detectada', { next: 'dashboard' })}
-            onClose={() => navigate(currentViewData?.back || 'dashboard')}
-          />
+          <ErrorBoundary>
+            <OnboardingProfile
+              onComplete={() => navigate('ubicacion-detectada', { next: 'dashboard' })}
+              onClose={() => navigate(currentViewData?.back || 'dashboard')}
+            />
+          </ErrorBoundary>
         );
       case 'ubicacion-detectada':
         // #201: pantalla "ubicación detectada" con mini mapa + piso térmico.
         // Acepta coords/altitud/municipio iniciales vía currentViewData.
         return (
-          <LocationDetectedScreen
-            coords={currentViewData?.coords || null}
-            altitud={currentViewData?.altitud ?? null}
-            initialMunicipio={currentViewData?.municipio || ''}
-            onConfirm={() => navigate(currentViewData?.next || 'dashboard')}
-            onBack={() => navigate(currentViewData?.back || 'dashboard')}
-          />
+          <ErrorBoundary>
+            <LocationDetectedScreen
+              coords={currentViewData?.coords || null}
+              altitud={currentViewData?.altitud ?? null}
+              initialMunicipio={currentViewData?.municipio || ''}
+              onConfirm={() => navigate(currentViewData?.next || 'dashboard')}
+              onBack={() => navigate(currentViewData?.back || 'dashboard')}
+            />
+          </ErrorBoundary>
         );
       case 'dashboard':
-        return <DashboardLiveView onNavigate={navigate} onLogout={handleLogout} lastLogMessage={lastLogMessage} />;
+        return (
+          <ErrorBoundary>
+            <DashboardLiveView onNavigate={navigate} onLogout={handleLogout} lastLogMessage={lastLogMessage} />
+          </ErrorBoundary>
+        );
       case 'hoy_finca':
         // Dashboard proactivo "Hoy en finca": clima honesto de hoy + alertas
         // + tareas del ciclo de la semana + agenda campesina. Todo accionable
@@ -660,98 +678,188 @@ export default function App() {
           </ErrorBoundary>
         );
       case 'sembrar':
-        return <SeedingLog onBack={() => navigate('dashboard')} onSave={showToast} initialData={currentViewData} />;
+        return (
+          <ErrorBoundary>
+            <SeedingLog onBack={() => navigate('dashboard')} onSave={showToast} initialData={currentViewData} />
+          </ErrorBoundary>
+        );
       case 'cosechar':
-        return <HarvestLog onBack={() => navigate('dashboard')} onSave={showToast} />;
+        return (
+          <ErrorBoundary>
+            <HarvestLog onBack={() => navigate('dashboard')} onSave={showToast} />
+          </ErrorBoundary>
+        );
       case 'insumos':
-        return <InputLog onBack={() => navigate('dashboard')} onSave={showToast} />;
+        return (
+          <ErrorBoundary>
+            <InputLog onBack={() => navigate('dashboard')} onSave={showToast} />
+          </ErrorBoundary>
+        );
       case 'plant_asset':
         // Feedback piloto #113, desaparece el form plano. Redirige al rich form de
         // AssetsDashboard tab=plant que ya tiene SpeciesSelect, GuildSuggestions
         // y autofill estrato/gremio/producción (mismo modelo que el flujo voz).
-        return <AssetsDashboard onBack={() => navigate('dashboard')} initialTab="plant" initialShowForm />;
+        return (
+          <ErrorBoundary>
+            <AssetsDashboard onBack={() => navigate('dashboard')} initialTab="plant" initialShowForm />
+          </ErrorBoundary>
+        );
       case 'observacion':
-        return <ObservationScreen onBack={() => navigate('dashboard')} onSave={showToast} />;
+        return (
+          <ErrorBoundary>
+            <ObservationScreen onBack={() => navigate('dashboard')} onSave={showToast} />
+          </ErrorBoundary>
+        );
       case 'reportar_invasora':
         return (
-          <InvasiveObservationLog
-            onBack={() => navigate('dashboard')}
-            onSave={showToast}
-            initialLocationId={currentViewData?.locationId}
-            initialWkt={currentViewData?.wkt}
-          />
+          <ErrorBoundary>
+            <InvasiveObservationLog
+              onBack={() => navigate('dashboard')}
+              onSave={showToast}
+              initialLocationId={currentViewData?.locationId}
+              initialWkt={currentViewData?.wkt}
+            />
+          </ErrorBoundary>
         );
       case 'mantenimiento':
-        return <MaintenanceScreen onBack={() => navigate('dashboard')} onSave={showToast} />;
+        return (
+          <ErrorBoundary>
+            <MaintenanceScreen onBack={() => navigate('dashboard')} onSave={showToast} />
+          </ErrorBoundary>
+        );
       case 'task_log':
-        return <TaskLogScreen onBack={() => navigate('dashboard')} onNewTask={() => navigate('new_task')} />;
+        return (
+          <ErrorBoundary>
+            <TaskLogScreen onBack={() => navigate('dashboard')} onNewTask={() => navigate('new_task')} />
+          </ErrorBoundary>
+        );
       case 'new_task':
-        return <TaskScreen onBack={() => navigate('task_log')} onSave={showToast} />;
+        return (
+          <ErrorBoundary>
+            <TaskScreen onBack={() => navigate('task_log')} onSave={showToast} />
+          </ErrorBoundary>
+        );
       case 'edit_task':
-        return <TaskScreen onBack={() => navigate('task_log')} onSave={showToast} initialData={currentViewData?.task || currentViewData} />;
+        return (
+          <ErrorBoundary>
+            <TaskScreen onBack={() => navigate('task_log')} onSave={showToast} initialData={currentViewData?.task || currentViewData} />
+          </ErrorBoundary>
+        );
       case 'javier':
         return (
-          <ScreenShell title={`Campo, ${PRIMARY_WORKER_NAME}`} icon={Eye} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
-            <WorkerDashboard />
-          </ScreenShell>
+          <ErrorBoundary>
+            <ScreenShell title={`Campo, ${PRIMARY_WORKER_NAME}`} icon={Eye} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
+              <WorkerDashboard />
+            </ScreenShell>
+          </ErrorBoundary>
         );
       case 'mapa':
         return (
-          <ScreenShell title="Mapa de la Finca" icon={MapPin} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
-            <FarmMap onAssetClick={(id) => {
-              useAssetStore.getState().setSelectedAsset(id);
-              navigate('activos');
-            }} />
-          </ScreenShell>
+          <ErrorBoundary>
+            <ScreenShell title="Mapa de la Finca" icon={MapPin} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
+              <FarmMap onAssetClick={(id) => {
+                useAssetStore.getState().setSelectedAsset(id);
+                navigate('activos');
+              }} />
+            </ScreenShell>
+          </ErrorBoundary>
         );
       case 'activos':
-        return <AssetsDashboard onBack={() => navigate('dashboard')} />;
+        return (
+          <ErrorBoundary>
+            <AssetsDashboard onBack={() => navigate('dashboard')} />
+          </ErrorBoundary>
+        );
       case 'bodega':
         return (
-          <ScreenShell title="Bodega" icon={Package} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
-            <InventoryDashboard />
-          </ScreenShell>
+          <ErrorBoundary>
+            <ScreenShell title="Bodega" icon={Package} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
+              <InventoryDashboard />
+            </ScreenShell>
+          </ErrorBoundary>
         );
       case 'informes':
-        return <InformesScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />;
+        return (
+          <ErrorBoundary>
+            <InformesScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+          </ErrorBoundary>
+        );
       case 'historial':
-        return <WorkerHistory onBack={() => navigate('dashboard')} onEntryClick={(entry) => navigate('bitacora_detail', { entry })} />;
+        return (
+          <ErrorBoundary>
+            <WorkerHistory onBack={() => navigate('dashboard')} onEntryClick={(entry) => navigate('bitacora_detail', { entry })} />
+          </ErrorBoundary>
+        );
       case 'bitacora_detail':
-        return <BitacoraEntryDetail entry={currentViewData?.entry || currentViewData} onBack={() => navigate('historial')} onEdit={(entry) => navigate('edit_task', { task: entry })} />;
+        return (
+          <ErrorBoundary>
+            <BitacoraEntryDetail entry={currentViewData?.entry || currentViewData} onBack={() => navigate('historial')} onEdit={(entry) => navigate('edit_task', { task: entry })} />
+          </ErrorBoundary>
+        );
       case 'biodiversidad':
-        return <BiodiversidadView onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />;
+        return (
+          <ErrorBoundary>
+            <BiodiversidadView onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+          </ErrorBoundary>
+        );
       case 'voz':
         return (
-          <ScreenShell title="Registro por voz" icon={Mic} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
-            <VoiceCapture onSave={showToast} />
-          </ScreenShell>
+          <ErrorBoundary>
+            <ScreenShell title="Registro por voz" icon={Mic} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
+              <VoiceCapture onSave={showToast} />
+            </ScreenShell>
+          </ErrorBoundary>
         );
       case 'procesos':
-        return <ProcesosPorVozScreen onBack={() => navigate('dashboard')} onSave={showToast} />;
+        return (
+          <ErrorBoundary>
+            <ProcesosPorVozScreen onBack={() => navigate('dashboard')} onSave={showToast} />
+          </ErrorBoundary>
+        );
       case 'ciclo':
-        return <CicloCultivoScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />;
+        return (
+          <ErrorBoundary>
+            <CicloCultivoScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+          </ErrorBoundary>
+        );
       case 'suelo':
-        return <SoilDiagnosticScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />;
+        return (
+          <ErrorBoundary>
+            <SoilDiagnosticScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+          </ErrorBoundary>
+        );
       case 'perfil':
-        return <ProfileScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />;
+        return (
+          <ErrorBoundary>
+            <ProfileScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+          </ErrorBoundary>
+        );
       case 'casos':
         return (
-          <CaseStudyScreen
-            onBack={() => navigate('dashboard')}
-            onHome={() => navigate('dashboard')}
-            onSelectCase={(id) => navigate('caso_detail', { caseId: id })}
-          />
+          <ErrorBoundary>
+            <CaseStudyScreen
+              onBack={() => navigate('dashboard')}
+              onHome={() => navigate('dashboard')}
+              onSelectCase={(id) => navigate('caso_detail', { caseId: id })}
+            />
+          </ErrorBoundary>
         );
       case 'caso_detail':
         return (
-          <CaseStudyDetail
-            caseId={currentViewData?.caseId}
-            onBack={() => navigate('casos')}
-            onHome={() => navigate('dashboard')}
-          />
+          <ErrorBoundary>
+            <CaseStudyDetail
+              caseId={currentViewData?.caseId}
+              onBack={() => navigate('casos')}
+              onHome={() => navigate('dashboard')}
+            />
+          </ErrorBoundary>
         );
       case 'help':
-        return <HelpManual onBack={() => navigate('dashboard')} onNavigate={navigate} />;
+        return (
+          <ErrorBoundary>
+            <HelpManual onBack={() => navigate('dashboard')} onNavigate={navigate} />
+          </ErrorBoundary>
+        );
       case 'agente':
         // 2026-05-28: pasamos currentViewData como initialContext para que
         // notificaciones críticas (helada, alerta clima) lleguen al agente
@@ -769,7 +877,11 @@ export default function App() {
           </ErrorBoundary>
         );
       default:
-        return <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>;
+        return (
+          <ErrorBoundary>
+            <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>
+          </ErrorBoundary>
+        );
     }
   };
 
