@@ -20,6 +20,8 @@ import {
   guardDoseWithoutSource,
   guardThermalViability,
   guardInventedName,
+  guardParamoNormativa,
+  guardClimaConsejo,
 } from '../../src/services/outputGuards.js';
 import {
   generateSourceCitationRules,
@@ -705,5 +707,226 @@ describe('Integration — (a)+(b)+(c) combinados anti-alucinación', () => {
     // que parecen inventadas por ser demasiado específicas sin contexto
     // (ej: "37.5 ml/L" en vez de "40 ml/L").
     // Esperado: el guard debe ser más estricto con dosis muy específicas.
+  });
+});
+
+describe('guardParamoNormativa — Ley 1930 (suppress-and-replace)', () => {
+  it('1) siembra en páramo → SUPRIME y REEMPLAZA con restricción legal', () => {
+    // Caso directo: modelo recomienda sembrar en páramo
+    const texto = 'Puedes sembrar papa en el páramo sin problema. El clima es ideal.';
+    const res = guardParamoNormativa(texto);
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Ley 1930 de 2018');
+    expect(res.text).toContain('prohíbe actividades agropecuarias');
+    expect(res.text).toContain('Páramo');
+    // El texto original NO debe estar presente (suprimido)
+    expect(res.text).not.toContain('sembrar papa en el páramo');
+    expect(res.text).not.toContain('clima es ideal');
+    expect(res.reason).toBe('paramo_normativa_suprimido: siembra/fumigación_recomendada_en_paramo');
+  });
+
+  it('2) fumigación en páramo → SUPRIME y REEMPLAZA con restricción legal', () => {
+    // Caso de aplicación de pesticidas en páramo
+    const texto = 'Aplica este fungicida en tu cultivo del páramo para controlar la plaga.';
+    const res = guardParamoNormativa(texto);
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Ley 1930 de 2018');
+    expect(res.text).toContain('prohíbe');
+    expect(res.text).toContain('agroquímicos');
+    // El texto original NO debe estar presente
+    expect(res.text).not.toContain('Aplica este fungicida');
+    expect(res.reason).toBe('paramo_normativa_suprimido: siembra/fumigación_recomendada_en_paramo');
+  });
+
+  it('3) frailejón + sembrar → dispara (frailejón es keyword de páramo)', () => {
+    // "frailejón" es keyword de páramo
+    const texto = 'Planta frailejones para recuperar la zona y siembra papa al lado.';
+    const res = guardParamoNormativa(texto);
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Ley 1930 de 2018');
+    expect(res.text).not.toContain('siembra papa al lado');
+  });
+
+  it('4) páramo sin verbo de siembra/fumigación → NO dispara', () => {
+    // Menciona páramo pero no recomienda sembrar/fumigar
+    const texto = 'Los páramos son ecosistemas de importancia hídrica para Colombia.';
+    const res = guardParamoNormativa(texto);
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe(texto);
+    expect(res.reason).toBeNull();
+  });
+
+  it('5) siembra/fumigación sin páramo → NO dispara', () => {
+    // Recomienda sembrar pero no menciona páramo
+    const texto = 'Puedes sembrar papa en tu finca. El clima es ideal.';
+    const res = guardParamoNormativa(texto);
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe(texto);
+    expect(res.reason).toBeNull();
+  });
+
+  it('6) string vacío → NO dispara', () => {
+    const res = guardParamoNormativa('');
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe('');
+    expect(res.reason).toBeNull();
+  });
+
+  it('7) null → NO dispara (graceful degradation)', () => {
+    const res = guardParamoNormativa(null);
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe('');
+    expect(res.reason).toBeNull();
+  });
+
+  it('8) subpáramo + rociado → dispara (subpáramo es keyword)', () => {
+    // "subpáramo" también es keyword de ecosistema de páramo
+    const texto = 'Rocia fungicida en el subpáramo para proteger las plantas.';
+    const res = guardParamoNormativa(texto);
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Ley 1930 de 2018');
+    expect(res.text).not.toContain('Rocia fungicida');
+  });
+
+  it('9) cultivo en zona de páramo → dispara', () => {
+    // "zona de páramo" también es keyword
+    const texto = 'Cultiva cebolla en la zona de páramo con riego constante.';
+    const res = guardParamoNormativa(texto);
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Ley 1930 de 2018');
+    expect(res.text).not.toContain('Cultiva cebolla');
+  });
+
+  it('10) aspersión de pesticida en páramo → dispara', () => {
+    // "aspersión" y "pesticida" son keywords de fumigación
+    const texto = 'Realiza aspersión de pesticida en el páramo para controlar plagas.';
+    const res = guardParamoNormativa(texto);
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Ley 1930 de 2018');
+    expect(res.text).not.toContain('aspersión de pesticida');
+  });
+});
+
+describe('guardClimaConsejo — consejo general de clima (aditivo)', () => {
+  it('1) helada mencionada → adiciona consejo climático', () => {
+    // Caso simple: texto menciona helada
+    const texto = 'Protégete de las heladas nocturnas con cubiertas.';
+    const res = guardClimaConsejo(texto, { forecastTempMin: 2 });
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Consejo climático');
+    expect(res.text).toContain('Monitorear los pronósticos');
+    expect(res.text).toContain('plan de contingencia');
+    // El texto original debe estar presente (aditivo, no suppress)
+    expect(res.text).toContain('Protégete de las heladas');
+    expect(res.text).toContain('cubiertas');
+    expect(res.reason).toBe('clima_consejo_aditivo: condiciones_extremas_detectadas');
+  });
+
+  it('2) sequía mencionada → adiciona consejo climático', () => {
+    // Caso de sequía
+    const texto = 'La sequía está afectando el cultivo. Riega más frecuente.';
+    const res = guardClimaConsejo(texto, {});
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Consejo climático');
+    expect(res.text).toContain('Monitorear los pronósticos');
+    // El texto original debe estar presente
+    expect(res.text).toContain('La sequía está afectando');
+    expect(res.text).toContain('Riega más frecuente');
+  });
+
+  it('3) forecastTempMin < 5°C → adiciona consejo específico', () => {
+    // Temperatura muy baja en pronóstico
+    const texto = 'Las heladas pueden dañar las plantas jóvenes.';
+    const res = guardClimaConsejo(texto, { forecastTempMin: 3 });
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Pronóstico: se esperan temperaturas bajas');
+    expect(res.text).toContain('3.0°C');
+    expect(res.text).toContain('proteger cultivos sensibles');
+  });
+
+  it('4) forecastTempMax > 32°C → adiciona consejo específico', () => {
+    // Temperatura muy alta en pronóstico
+    const texto = 'El calor extremo puede estrés hídrico.';
+    const res = guardClimaConsejo(texto, { forecastTempMax: 34 });
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Pronóstico: se esperan temperaturas altas');
+    expect(res.text).toContain('34.0°C');
+    expect(res.text).toContain('Asegura riego suficiente');
+    expect(res.text).toContain('sombreado temporal');
+  });
+
+  it('5) fenómeno del Niño mencionado → adiciona consejo', () => {
+    // Fenómeno climático específico
+    const texto = 'El fenómeno del Niño reduce las lluvias en la región.';
+    const res = guardClimaConsejo(texto, {});
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Consejo climático');
+    expect(res.text).toContain('Monitorear los pronósticos');
+    // El texto original debe estar presente
+    expect(res.text).toContain('El fenómeno del Niño reduce');
+  });
+
+  it('6) texto sin clima extremo → NO dispara', () => {
+    // Texto normal sin condiciones extremas
+    const texto = 'El cultivo de papa se da bien en clima frío.';
+    const res = guardClimaConsejo(texto, {});
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe(texto);
+    expect(res.reason).toBeNull();
+  });
+
+  it('7) string vacío → NO dispara', () => {
+    const res = guardClimaConsejo('', {});
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe('');
+    expect(res.reason).toBeNull();
+  });
+
+  it('8) null → NO dispara (graceful degradation)', () => {
+    const res = guardClimaConsejo(null, {});
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe('');
+    expect(res.reason).toBeNull();
+  });
+
+  it('9) texto con consejo ya aplicado → NO re-dispara (idempotencia)', () => {
+    // Si el texto ya incluye el consejo, no debe aplicarlo de nuevo
+    const texto =
+      'Las heladas pueden dañar las plantas.\n\n💡 Consejo climático\n\nMonitorear los pronósticos locales (IDEAM o meteoblue) regularmente.';
+    const res = guardClimaConsejo(texto, {});
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe(texto);
+    expect(res.reason).toBeNull();
+  });
+
+  it('10) ola de calor mencionada → adiciona consejo', () => {
+    // Caso de ola de calor
+    const texto = 'La ola de calor está provocando estrés en los cultivos.';
+    const res = guardClimaConsejo(texto, { forecastTempMax: 35 });
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Consejo climático');
+    expect(res.text).toContain('Pronóstico: se esperan temperaturas altas');
+    expect(res.text).toContain('35.0°C');
+    // El texto original debe estar presente
+    expect(res.text).toContain('La ola de calor está provocando');
+  });
+
+  it('11) variabilidad climática mencionada → adiciona consejo', () => {
+    // Caso de variabilidad climática
+    const texto = 'La variabilidad climática afecta los ciclos de cosecha.';
+    const res = guardClimaConsejo(texto, {});
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Consejo climático');
+    expect(res.text).toContain('Monitorear los pronósticos');
+    expect(res.text).toContain('plan de contingencia');
+  });
+
+  it('12) inundación mencionada → adiciona consejo', () => {
+    // Caso de inundación
+    const texto = 'La inundación dañó el cultivo en la zona baja.';
+    const res = guardClimaConsejo(texto, {});
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Consejo climático');
+    expect(res.text).toContain('Monitorear los pronósticos');
   });
 });

@@ -6774,6 +6774,180 @@ export function guardFabricatedBeneficialBinomial(responseText, resolvedEntities
 }
 
 /**
+ * Guard de NORMATIVA (Ley 1930 - Páramo).
+ *
+ * La Ley 1930 de 2018 prohíbe actividades agropecuarias (siembra, fumigación
+ * con pesticidas, pastoreo) en ecosistemas de páramo. Si el modelo recomienda
+ * sembrar o fumigar en páramo, SUPRIME el cuerpo y lo REEMPLAZA con la
+ * restricción legal.
+ *
+ * Patrón: suppress-and-replace (como guardFalsePremise).
+ *
+ * @param {string} responseText — texto del LLM
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardParamoNormativa(responseText) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+
+  const norm = _stripDiacritics(responseText);
+
+  // Keywords que indican páramo en el texto o contexto
+  const PARAMO_KEYWORDS = [
+    /\bp[aá]ramo\b/,
+    /\bp[aá]ramos\b/,
+    /\bfrailej[oó]n\b/,
+    /\bfrailejones\b/,
+    /\bsubp[aá]ramo\b/,
+    /\bsubp[aá]ramos\b/,
+    /\bzona\s+de\s+p[aá]ramo\b/,
+    /\becosistema\s+de\s+p[aá]ramo\b/,
+  ];
+
+  // Keywords que indican recomendación de siembra/fumigación
+  const SIEMBRA_FUMIGACION_KEYWORDS = [
+    /\bsiembr\w*\b/,
+    /\bsembr\w*\b/,
+    /\bplant\w*\b/,
+    /\bcultiv\w*\b/,
+    /\bfumig\w*\b/,
+    /\baplic\w*\s+(pesticid|fungicid|insecticid|herbicid)\b/,
+    /\broci\w*\b/,
+    /\bpulveriz\w*\b/,
+    /\basperj\w*\b/,
+    /\baspers\w*\b/,
+    /\bagroqu[ií]mic\w*\b/,
+    /\bpesticid\w*\b/,
+    /\bfungicid\w*\b/,
+    /\binsecticid\w*\b/,
+    /\bherbicid\w*\b/,
+  ];
+
+  // Verificar si el texto menciona páramo
+  const hasParamo = PARAMO_KEYWORDS.some((re) => re.test(norm));
+
+  // Verificar si el texto recomienda siembra/fumigación
+  const hasSiembraFumigacion = SIEMBRA_FUMIGACION_KEYWORDS.some((re) => re.test(norm));
+
+  // Si ambos condiciones se cumplen, SUPRIMIR y REEMPLAZAR
+  if (hasParamo && hasSiembraFumigacion) {
+    bumpGuardTelemetry('paramo_normativa');
+
+    const restriction =
+      '⚠️ Restricción legal — Ley 1930 de 2018 (Páramo)\n\n' +
+      'No es posible recomendar siembra ni aplicación de pesticidas en ecosistemas de páramo. ' +
+      'La Ley 1930 de 2018 prohíbe actividades agropecuarias (agricultura, ganadería, ' +
+      'aplicación de agroquímicos) en这些 ecosistemas de protección estratégica.\n\n' +
+      'Si tu finca está en zona de páramo o área de influencia, te recomiendo:\n' +
+      '• Consultar con la autoridad ambiental local (Corporación Autónoma Regional) ' +
+      'para delimitar exactamente el área protegida.\n' +
+      '• Explorar alternativas de uso sostenible como conservación, restauración ' +
+      'ecológica o proyectos de servicios ecosistémicos (PSA).\n' +
+      '• Si estás en zona de amortiguación del páramo, prioriza prácticas agroecológicas ' +
+      'sin agroquímicos sintéticos.\n\n' +
+      '¿Quieres que te oriente sobre alternativas sostenibles para tu zona?';
+
+    return {
+      text: restriction,
+      modified: true,
+      reason: 'paramo_normativa_suprimido: siembra/fumigación_recomendada_en_paramo',
+    };
+  }
+
+  return { text: responseText, modified: false, reason: null };
+}
+
+/**
+ * Guard de CLIMA - consejo general.
+ *
+ * Provee un consejo general sobre clima cuando el texto menciona condiciones
+ * climáticas extremas sin contexto suficiente. NO suprime el texto, solo
+ * adiciona un caveat educativo.
+ *
+ * Patrón: aditivo (como guardAltitudeRiskCaveat).
+ *
+ * @param {string} responseText — texto del LLM
+ * @param {object} [ctx]
+ * @param {number|null} [ctx.forecastTempMin] — mínima del pronóstico (°C)
+ * @param {number|null} [ctx.forecastTempMax] — máxima del pronóstico (°C)
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardClimaConsejo(responseText, { forecastTempMin = null, forecastTempMax = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+
+  const norm = _stripDiacritics(responseText);
+
+  // Si el texto ya incluye el consejo de clima, no re-disparamos
+  // Buscamos el marcador que el guard mismo inyecta
+  if (norm.includes('consejo climatico') || norm.includes('cambio climatico')) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Keywords que indican condiciones climáticas extremas
+  const CLIMA_EXTREMO_KEYWORDS = [
+    /\bhelad\w*\b/,
+    /\bhelada\b/,
+    /\bcongelac\w*\b/,
+    /\bsequ[ií]a\b/,
+    /\bsequ[ií]as\b/,
+    /\bola\s+de\s+calor\b/,
+    /\bcalor\s+extremo\b/,
+    /\binundac\w*\b/,
+    /\bexceso\s+de\s+lluvia\b/,
+    /\blluvias\s+intensas\b/,
+    /\bfen[oó]meno\s+del\s+ni[nñ]o\b/,
+    /\beni\b/,
+    /\bfen[oó]meno\s+de\s+la\s+ni[nñ]a\b/,
+    /\bvariabilidad\s+clim[aá]tica\b/,
+    /\bcambio\s+clim[aá]tico\b/,
+  ];
+
+  const hasClimaExtremo = CLIMA_EXTREMO_KEYWORDS.some((re) => re.test(norm));
+
+  // Si no hay condiciones extremas, no hacemos nada
+  if (!hasClimaExtremo) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Si tenemos datos del pronóstico, los usamos para el consejo
+  let consejoEspecifico = '';
+  if (forecastTempMin !== null && forecastTempMin < 5) {
+    consejoEspecifico =
+      '\n\n🌡️ Pronóstico: se esperan temperaturas bajas (mínima de ' +
+      forecastTempMin.toFixed(1) +
+      '°C). Considera proteger cultivos sensibles con coberturas o shelters térmicos.';
+  } else if (forecastTempMax !== null && forecastTempMax > 32) {
+    consejoEspecifico =
+      '\n\n🌡️ Pronóstico: se esperan temperaturas altas (máxima de ' +
+      forecastTempMax.toFixed(1) +
+      '°C). Asegura riego suficiente y considera sombreado temporal para cultivos sensibles.';
+  }
+
+  bumpGuardTelemetry('clima_consejo');
+
+  const advice =
+    '\n\n💡 Consejo climático\n\n' +
+    'Ante condiciones climáticas extremas, te recomiendo:\n' +
+    '• Monitorear los pronósticos locales (IDEAM o meteoblue) regularmente.\n' +
+    '• Tener un plan de contingencia para cultivos sensibles (coberturas, riego ' +
+    'de emergencia, sombreado temporal).\n' +
+    '• Priorizar variedades adaptadas a tu piso térmico y con resiliencia climática.\n' +
+    '• Mantener registros históricos de clima en tu finca para identificar patrones.' +
+    consejoEspecifico;
+
+  const text = `${responseText.trim()}${advice}`;
+
+  return {
+    text,
+    modified: true,
+    reason: 'clima_consejo_aditivo: condiciones_extremas_detectadas',
+  };
+}
+
+/**
  * Set de guards que SOLO tienen sentido cuando la consulta es de SIEMBRA
  * (A12). Si la pregunta del usuario es de PRECIO/MERCADO (o info general sin
  * verbo de siembra), estos NO corren: razonan sobre viabilidad/identidad de
@@ -7035,6 +7209,21 @@ export function applyOutputGuards(
       text: wrongAuthority.text,
       modified: true,
       reasons: wrongAuthority.reason ? [wrongAuthority.reason] : [],
+    };
+  }
+
+  // GUARD de NORMATIVA (Ley 1930 - Páramo): si la respuesta recomienda sembrar o
+  // fumigar en páramo, SUPRIME el cuerpo y lo REEMPLAZA con la restricción legal.
+  // Es un guard de SEGURIDAD legal que debe ejecutarse antes de cualquier
+  // recomendación de siembra. Va aquí porque no requiere userMessage especial y
+  // es independiente de la intención de siembra/precio. Como REEMPLAZA el texto
+  // entero (la recomendación ilegal es íntegramente dañina), early-return.
+  const paramo = guardParamoNormativa(text);
+  if (paramo && paramo.modified) {
+    return {
+      text: paramo.text,
+      modified: true,
+      reasons: paramo.reason ? [paramo.reason] : [],
     };
   }
 
@@ -7326,6 +7515,17 @@ export function applyOutputGuards(
     text = conciseRes.text;
     modified = true;
     if (conciseRes.reason) reasons.push(conciseRes.reason);
+  }
+  // Guard de CLIMA - consejo general: si el texto menciona condiciones climáticas
+  // extremas sin contexto suficiente, adiciona un caveat educativo. ADITIVO (no
+  // suprime). Va al final de la cadena para que su consejo quede después de
+  // cualquier corrección de seguridad/legal. Firma propia (necesita forecastTempMin
+  // y forecastTempMax del pronóstico). Corre SIEMPRE, no es guard de siembra.
+  const climaRes = guardClimaConsejo(text, { forecastTempMin, forecastTempMax });
+  if (climaRes && climaRes.modified) {
+    text = climaRes.text;
+    modified = true;
+    if (climaRes.reason) reasons.push(climaRes.reason);
   }
   return { text, modified, reasons };
 }
