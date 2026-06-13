@@ -22,6 +22,8 @@ import {
   validateAmb25_autoridadCanonicaEstricta,
   validateAmb26_validationLevelCanonico,
   validateAmb27_toxicoSinAdvertencia,
+  validateAmb28_taxonomicConfusion,
+  validateAmb29_speciesInBiopreparados,
 } from '../validate-catalog.mjs';
 
 describe('AMB-25 — autoridad canónica estricta', () => {
@@ -194,5 +196,229 @@ describe('AMB-27 — toxico_sin_advertencia (WARN-only)', () => {
   it('ignora species sin valor_pedagogico', () => {
     const catalog = { species: [{ id: 'sin_vp' }] };
     expect(validateAmb27_toxicoSinAdvertencia(catalog)).toEqual([]);
+  });
+});
+
+describe('AMB-28 — confusión taxonómica conocida', () => {
+  it('detecta gulupa confundida con guayaba en nombre_comun', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'passiflora_edulis_morada',
+          nombre_comun: 'Guayaba', // ERROR: debería ser 'Gulupa'
+          nombre_cientifico: 'Passiflora edulis f. edulis',
+        },
+      ],
+    };
+    const errors = validateAmb28_taxonomicConfusion(catalog);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('passiflora_edulis_morada');
+    expect(errors[0]).toContain('guayaba');
+    expect(errors[0]).toContain('gulupa');
+  });
+
+  it('detecta aguacate confundido con guayaba en nombre_comun', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'persea_americana',
+          nombre_comun: 'Guayaba', // ERROR: debería ser 'Aguacate'
+          nombre_cientifico: 'Persea americana',
+        },
+      ],
+    };
+    const errors = validateAmb28_taxonomicConfusion(catalog);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('persea_americana');
+    expect(errors[0]).toContain('aguacate');
+  });
+
+  it('detecta confusión en nombres_comunes_regionales', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'passiflora_edulis_morada',
+          nombre_comun: 'Gulupa',
+          nombres_comunes_regionales: ['Guayaba de pasiflora', 'Curuba'], // ERROR: 'Guayaba' en Passiflora es confusión
+        },
+      ],
+    };
+    const errors = validateAmb28_taxonomicConfusion(catalog);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('guayaba de pasiflora');
+  });
+
+  it('acepta nombres correctos sin error', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'passiflora_edulis_morada',
+          nombre_comun: 'Gulupa',
+          nombre_cientifico: 'Passiflora edulis f. edulis',
+          nombres_comunes_regionales: ['Gulupa morada', 'Curuba de tierra fría'],
+        },
+        {
+          id: 'psidium_guajava',
+          nombre_comun: 'Guayaba',
+          nombre_cientifico: 'Psidium guajava',
+        },
+        {
+          id: 'persea_americana',
+          nombre_comun: 'Aguacate',
+          nombre_cientifico: 'Persea americana',
+        },
+      ],
+    };
+    expect(validateAmb28_taxonomicConfusion(catalog)).toEqual([]);
+  });
+
+  it('ignora species sin nombre_comun', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'sin_nombre',
+          nombre_cientifico: 'Species unknown',
+        },
+      ],
+    };
+    expect(validateAmb28_taxonomicConfusion(catalog)).toEqual([]);
+  });
+
+  it('detecta múltiples confusiones en una sola especie', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'passiflora_edulis_morada',
+          nombre_comun: 'Gulupa con confusiones',
+          nombres_comunes_regionales: [
+            'Aguacate de pasiflora', // ERROR: aguacate en Passiflora
+            'Guayaba de montaña'      // ERROR: guayaba en Passiflora
+          ],
+        },
+      ],
+    };
+    const errors = validateAmb28_taxonomicConfusion(catalog);
+    // Debería detectar al menos 2 errores (aguacate y guayaba)
+    expect(errors.length).toBeGreaterThanOrEqual(2);
+    // Verificar que ambos errores están presentes
+    const hasAguacateError = errors.some(e => e.includes('aguacate'));
+    const hasGuayabaError = errors.some(e => e.includes('guayaba'));
+    expect(hasAguacateError).toBe(true);
+    expect(hasGuayabaError).toBe(true);
+  });
+});
+
+describe('AMB-29 — species en array biopreparados', () => {
+  it('detecta species insertada dentro de biopreparados array', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'psidium_guajava',
+          nombre_comun: 'Guayaba',
+          nombre_cientifico: 'Psidium guajava',
+        },
+      ],
+      biopreparados: [
+        {
+          id: 'bocashi',
+          nombre: 'Bocashi',
+          tipo: 'fermentado',
+        },
+        {
+          // ERROR: esto es una species, no un biopreparado
+          id: 'passiflora_edulis_morada',
+          nombre_comun: 'Gulupa',
+          nombre_cientifico: 'Passiflora edulis f. edulis',
+          companions: ['psidium_guajava'],
+        },
+      ],
+    };
+    const errors = validateAmb29_speciesInBiopreparados(catalog);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('biopreparados');
+    expect(errors[0]).toContain('passiflora_edulis_morada');
+    expect(errors[0]).toContain('nombre_cientifico');
+  });
+
+  it('detecta múltiples species mal insertadas', () => {
+    const catalog = {
+      species: [],
+      biopreparados: [
+        {
+          id: 'bocashi',
+          nombre: 'Bocashi',
+          tipo: 'fermentado',
+        },
+        {
+          id: 'persea_americana',
+          nombre_comun: 'Aguacate',
+          nombre_cientifico: 'Persea americana',
+          category: 'frutales',
+        },
+        {
+          id: 'psidium_guajava',
+          nombre_comun: 'Guayaba',
+          nombre_cientifico: 'Psidium guajava',
+          companions: ['persea_americana'],
+        },
+      ],
+    };
+    const errors = validateAmb29_speciesInBiopreparados(catalog);
+    expect(errors).toHaveLength(2);
+  });
+
+  it('acepta biopreparados válidos sin error', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'psidium_guajava',
+          nombre_comun: 'Guayaba',
+        },
+      ],
+      biopreparados: [
+        {
+          id: 'bocashi',
+          nombre: 'Bocashi',
+          tipo: 'fermentado',
+          ingredientes: ['gallinaza', 'melaza'],
+        },
+        {
+          id: 'biol',
+          nombre: 'Biol',
+          tipo: 'fermentado',
+          ingredientes: ['estiércol', 'melaza'],
+        },
+      ],
+    };
+    expect(validateAmb29_speciesInBiopreparados(catalog)).toEqual([]);
+  });
+
+  it('ignora catálogos sin biopreparados', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'psidium_guajava',
+          nombre_comun: 'Guayaba',
+        },
+      ],
+    };
+    expect(validateAmb29_speciesInBiopreparados(catalog)).toEqual([]);
+  });
+
+  it('detecta species markers sutiles (companions/antagonists sin target)', () => {
+    const catalog = {
+      biopreparados: [
+        {
+          id: 'algo_raro',
+          nombre: 'Algo Raro',
+          tipo: 'fermentado',
+          // ERROR: companions es un campo de species, no de biopreparados
+          companions: ['otra_especie'],
+        },
+      ],
+    };
+    const errors = validateAmb29_speciesInBiopreparados(catalog);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('companions');
   });
 });
