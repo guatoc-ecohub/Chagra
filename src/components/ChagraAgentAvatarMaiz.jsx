@@ -347,6 +347,17 @@ export default function ChagraAgentAvatarMaiz({
                         0%, 100% { filter: drop-shadow(0 0 4px #fbbf24); }
                         50% { filter: drop-shadow(0 0 12px #fbbf24); }
                     }
+
+                    /* Reduced motion */
+                    @media (prefers-reduced-motion: reduce) {
+                        .chagra-agent-avatar.chagra-maiz * {
+                            animation: none !important;
+                        }
+                        .chagra-agent-avatar.chagra-maiz.chagra-glow .chagra-halo {
+                            animation: none !important;
+                            filter: drop-shadow(0 0 6px #fbbf24);
+                        }
+                    }
                 `}</style>
             </svg>
             {withLabel && (
