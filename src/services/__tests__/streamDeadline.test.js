@@ -20,6 +20,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   createStreamDeadline,
   IDLE_TIMEOUT_MS,
+  FIRST_TOKEN_TIMEOUT_MS,
   HARD_CEILING_MS,
 } from '../streamDeadline.js';
 
@@ -30,11 +31,11 @@ describe('streamDeadline — constantes de política', () => {
     expect(IDLE_TIMEOUT_MS).toBeGreaterThanOrEqual(35000);
   });
 
-  it('techo absoluto es generoso pero NO infinito (entre 60s y 180s)', () => {
-    // Backstop extremo: una respuesta sana termina mucho antes. NO debe cortar
-    // streams que avanzan, pero evita colgar la UI para siempre.
-    expect(HARD_CEILING_MS).toBeGreaterThanOrEqual(60000);
-    expect(HARD_CEILING_MS).toBeLessThanOrEqual(180000);
+  it('techo absoluto es generoso pero NO infinito (entre 120s y 360s)', () => {
+    // Backstop extremo subido a 300s: tolera respuestas largas bajo contención
+    // de GPU única sin colgar la UI para siempre.
+    expect(HARD_CEILING_MS).toBeGreaterThanOrEqual(120000);
+    expect(HARD_CEILING_MS).toBeLessThanOrEqual(360000);
   });
 
   it('el techo absoluto es estrictamente mayor que el idle-timeout', () => {
@@ -51,13 +52,13 @@ describe('streamDeadline — comportamiento idle (no abortar mientras streamea)'
     vi.useRealTimers();
   });
 
-  it('aborta si NUNCA llega un token y pasa el idle-timeout', () => {
+  it('aborta con "first_token" si NUNCA llega un token y pasa el presupuesto del primer token', () => {
     const onTimeout = vi.fn();
-    const dl = createStreamDeadline({ idleMs: 1000, ceilingMs: 5000, onTimeout });
+    const dl = createStreamDeadline({ firstTokenMs: 1000, idleMs: 1000, ceilingMs: 5000, onTimeout });
     dl.start();
     vi.advanceTimersByTime(1000);
     expect(onTimeout).toHaveBeenCalledTimes(1);
-    expect(onTimeout).toHaveBeenCalledWith('idle');
+    expect(onTimeout).toHaveBeenCalledWith('first_token');
     dl.stop();
   });
 
@@ -184,23 +185,23 @@ describe('streamDeadline — ciclo de vida y limpieza', () => {
     dl.stop();
   });
 
-  it('usa los defaults de política si no se pasan idleMs/ceilingMs', () => {
+  it('usa los defaults: antes del primer token el presupuesto es FIRST_TOKEN_TIMEOUT_MS (el idle de 40s ya no aborta)', () => {
     const onTimeout = vi.fn();
     const dl = createStreamDeadline({ onTimeout });
     dl.start();
-    // Antes del idle-timeout default no dispara nada.
-    vi.advanceTimersByTime(IDLE_TIMEOUT_MS - 1);
+    // El idle (40s) ya NO aborta antes del primer token; hay que pasar firstToken.
+    vi.advanceTimersByTime(FIRST_TOKEN_TIMEOUT_MS - 1);
     expect(onTimeout).not.toHaveBeenCalled();
     vi.advanceTimersByTime(1);
-    expect(onTimeout).toHaveBeenCalledWith('idle');
+    expect(onTimeout).toHaveBeenCalledWith('first_token');
     dl.stop();
   });
 
   it('start() es idempotente — doble start no deja timers huérfanos', () => {
     const onTimeout = vi.fn();
-    const dl = createStreamDeadline({ idleMs: 1000, ceilingMs: 5000, onTimeout });
+    const dl = createStreamDeadline({ firstTokenMs: 1000, idleMs: 1000, ceilingMs: 5000, onTimeout });
     dl.start();
-    dl.start(); // re-arranque: no debe acumular dos idle-timers
+    dl.start(); // re-arranque: no debe acumular dos timers
     vi.advanceTimersByTime(1000);
     expect(onTimeout).toHaveBeenCalledTimes(1);
     dl.stop();
