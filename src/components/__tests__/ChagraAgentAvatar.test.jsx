@@ -17,6 +17,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
+import ChagraAgentAvatarMaiz from '../ChagraAgentAvatarMaiz';
 
 describe('ChagraAgentAvatar — task #122 glow + double-click', () => {
   beforeEach(() => {
@@ -100,5 +101,78 @@ describe('ChagraAgentAvatar — task #122 glow + double-click', () => {
     const svg = container.querySelector('svg.chagra-agent-avatar');
     expect(svg.classList.contains('chagra-state-speaking')).toBe(true);
     expect(svg.classList.contains('chagra-glow')).toBe(true);
+  });
+});
+
+describe('ChagraAgentAvatarMaiz — prefers-reduced-motion (task #6240)', () => {
+  test('maíz tiene media query prefers-reduced-motion en CSS inline', () => {
+    const { container } = render(<ChagraAgentAvatarMaiz state="idle" />);
+    const styleTag = container.querySelector('style');
+    expect(styleTag).toBeInTheDocument();
+
+    const cssContent = styleTag.textContent;
+    expect(cssContent).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(cssContent).toContain('animation: none !important');
+  });
+
+  test('maíz respeta prefers-reduced-motion: desactiva animaciones', () => {
+    // Mock window.matchMedia para simular prefers-reduced-motion: reduce
+    const mockMatchMedia = vi.fn();
+    mockMatchMedia.mockReturnValue({
+      matches: true,
+      media: '(prefers-reduced-motion: reduce)',
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    });
+
+    // Guardar el matchMedia original
+    const originalMatchMedia = window.matchMedia;
+    window.matchMedia = mockMatchMedia;
+
+    const { container } = render(<ChagraAgentAvatarMaiz state="thinking" glow />);
+    const styleTag = container.querySelector('style');
+    const cssContent = styleTag.textContent;
+
+    // Verificar que la media query esté presente
+    expect(cssContent).toMatch(/@media \(prefers-reduced-motion: reduce\)/);
+
+    // Verificar que dentro de la media query se desactiven las animaciones
+    const reducedMotionBlock = cssContent.match(/@media \(prefers-reduced-motion: reduce\) \{([^}]+)\}/);
+    expect(reducedMotionBlock).toBeTruthy();
+
+    const reducedMotionCSS = reducedMotionBlock[1];
+    expect(reducedMotionCSS).toContain('animation: none !important');
+
+    // Restaurar el matchMedia original
+    window.matchMedia = originalMatchMedia;
+  });
+
+  test('maíz con glow + prefers-reduced-motion usa filtro estático', () => {
+    const { container } = render(<ChagraAgentAvatarMaiz state="idle" glow />);
+    const styleTag = container.querySelector('style');
+    const cssContent = styleTag.textContent;
+
+    // Verificar que la media query esté presente
+    expect(cssContent).toMatch(/@media \(prefers-reduced-motion: reduce\)/);
+
+    // El glow con reduced motion debe tener filter estático (drop-shadow)
+    // Buscar específicamente la regla de glow dentro de la media query
+    expect(cssContent).toMatch(/\.chagra-maiz\.chagra-glow.*filter:\s*drop-shadow\(.*\)/s);
+  });
+
+  test('maíz: todos los keyframes tienen nombres descriptivos', () => {
+    const { container } = render(<ChagraAgentAvatarMaiz state="idle" />);
+    const styleTag = container.querySelector('style');
+    const cssContent = styleTag.textContent;
+
+    // Verificar que los keyframes principales existan
+    expect(cssContent).toContain('@keyframes chagra-halo-pulse');
+    expect(cssContent).toContain('@keyframes chagra-hoja-sway-l');
+    expect(cssContent).toContain('@keyframes chagra-hoja-sway-r');
+    expect(cssContent).toContain('@keyframes chagra-barbas-wiggle');
+    expect(cssContent).toContain('@keyframes chagra-hoja-think');
+    expect(cssContent).toContain('@keyframes chagra-panocha-vibrate');
+    expect(cssContent).toContain('@keyframes chagra-planta-lean');
+    expect(cssContent).toContain('@keyframes chagra-glow-amber');
   });
 });
