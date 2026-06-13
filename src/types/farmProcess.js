@@ -125,6 +125,13 @@ const VALID_STAGES = [
   'pest_management',
   'closed',
   'fallow',
+  // Restauración/silvopastoreo: NO siguen fenología de cultivo (germina→florece→
+  // cosecha); usan hitos propios de establecimiento ecológico.
+  'establecimiento',
+  'prendimiento',
+  'mantenimiento',
+  'monitoreo_sucesion',
+  'cierre',
 ];
 const VALID_EVENT_TYPES = [
   'sowing_confirmed',
@@ -140,6 +147,34 @@ const VALID_EVENT_TYPES = [
   'weather_snapshot',
   'note',
 ];
+
+/**
+ * Secuencia de etapas + etiquetas por tipo de proceso. La restauración/silvopastoreo
+ * NO sigue fenología de cultivo; usa hitos de establecimiento ecológico, de modo que
+ * el ciclo de una reforestación no "florece y cosecha".
+ */
+export const RESTORATION_STAGE_SEQUENCE = [
+  { stage: 'establecimiento', label: 'Establecimiento (siembra/plantación)' },
+  { stage: 'prendimiento', label: 'Prendimiento (¿pegaron las plántulas?)' },
+  { stage: 'mantenimiento', label: 'Mantenimiento (replante y control de competencia)' },
+  { stage: 'monitoreo_sucesion', label: 'Monitoreo de sucesión (cómo avanza el bosque)' },
+  { stage: 'cierre', label: 'Cierre (rodal autosostenible)' },
+];
+
+const SOWING_STAGE_SEQUENCE = [
+  { stage: 'sowing_confirmed', label: 'Siembra confirmada' },
+  { stage: 'germination', label: 'Germinación' },
+  { stage: 'vegetative', label: 'Crecimiento vegetativo' },
+  { stage: 'flowering', label: 'Floración' },
+  { stage: 'fruiting', label: 'Fructificación' },
+  { stage: 'harvest', label: 'Cosecha' },
+];
+
+/** Secuencia de etapas (con etiqueta) apropiada para el tipo de proceso. */
+export const stageSequenceForProcessType = (processType) =>
+  processType === 'restoration' || processType === 'silvopasture'
+    ? RESTORATION_STAGE_SEQUENCE
+    : SOWING_STAGE_SEQUENCE;
 
 /**
  * Valida un objeto FarmProcess.

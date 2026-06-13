@@ -1,0 +1,81 @@
+{
+  "tape_10_elementos": [
+    {
+      "id": "diversidad",
+      "nombre": "Diversidad de especies y procesos",
+      "descripcion_corta": "Cantidad de plantas, animales y actividades diferentes que fortalecen la finca"
+    },
+    {
+      "id": "sinergias",
+      "nombre": "Sinergias entre elementos",
+      "descripcion_corta": "Cómo se ayudan los componentes del sistema para producir más juntos"
+    },
+    {
+      "id": "eficiencia",
+      "nombre": "Eficiencia en el uso de recursos",
+      "descripcion_corta": "Aprovechamiento inteligente del agua, suelo y energía sin desperdiciar"
+    },
+    {
+      "id": "resiliencia",
+      "nombre": "Resiliencia del sistema",
+      "descripcion_corta": "Capacidad de recuperarse después de sequías, plagas o cambios fuertes"
+    },
+    {
+      "id": "reciclaje",
+      "nombre": "Reciclaje de materia y energía",
+      "descripcion_corta": "Uso y reúso de biomasa, residuos y nutrientes para cerrar ciclos"
+    },
+    {
+      "id": "cocreacion_conocimiento",
+      "nombre": "Cocreación de conocimiento",
+      "descripcion_corta": "Intercambio de saberes entre campesinos, técnicos y la comunidad"
+    },
+    {
+      "id": "valores_humanos_sociales",
+      "nombre": "Valores humanos y sociales",
+      "descripcion_corta": "Prácticas que fortalecen la confianza, solidaridad y trabajo en equipo"
+    },
+    {
+      "id": "cultura_tradiciones",
+      "nombre": "Cultura y tradiciones locales",
+      "descripcion_corta": "Rescate y valoración de costumbres, semillas y prácticas campesinas ancestrales"
+    },
+    {
+      "id": "economia_circular_solidaria",
+      "nombre": "Economía circular y solidaria",
+      "descripcion_corta": "Comercio justo local donde se comparten beneficios y se reducen desechos"
+    },
+    {
+      "id": "gobernanza",
+      "nombre": "Gobernanza participativa",
+      "descripcion_corta": "Organización democrática donde todos deciden sobre el territorio"
+    }
+  ],
+  "mesmis_5_atributos": [
+    {
+      "id": "productividad",
+      "nombre": "Productividad",
+      "descripcion_corta": "Cantidad de alimento o productos que se obtienen por unidad de área"
+    },
+    {
+      "id": "estabilidad_resiliencia",
+      "nombre": "Estabilidad y resiliencia",
+      "descripcion_corta": "Mantención de producción constante ante cambios del clima o problemas"
+    },
+    {
+      "id": "adaptabilidad",
+      "nombre": "Adaptabilidad",
+      "descripcion_corta": "Capacidad de ajustar prácticas cuando cambian las condiciones del entorno"
+    },
+    {
+      "id": "equidad",
+      "nombre": "Equidad",
+      "descripcion_corta": "Distribución justa de beneficios, trabajo y oportunidades entre todos"
+    },
+    {
+      "id": "autodependencia",
+      "nombre": "Autodependencia",
+      "descripcion_corta": "Capacidad de producir semillas, abonos y alimentos sin depender de fuera"
+    }
+  ]
+}
