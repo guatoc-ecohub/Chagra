@@ -107,19 +107,28 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     heroRoute: { kind: 'ask', prompt: '¿Cuándo siembro y cuándo cosecho en mi zona?' },
   },
   {
+    // Investigación profunda (B14): aún NO disponible. El backend de deep
+    // research (POST /deep-research) está detrás de la feature flag
+    // VITE_DEEP_RESEARCH_ENABLED (default false) y no se sirve en prod. Mientras
+    // tanto la capacidad es un STUB honesto: status 'soon' + stubMessage claro.
+    // El chip router la trata como stub (NO la routea a un path "live"), igual
+    // que 'precio'. Coherente con el gate por flag de AgentScreen.
     id: 'deep',
     intent: 'deep',
-    kind: 'deep',
+    kind: 'stub',
     icon: '🔬',
     label: 'Investigación profunda',
     desc: 'Investigación multi-fuente con fundamento técnico.',
     placeholder: 'Escribe el tema que quieres investigar a fondo',
     tool: null,
-    stubMessage: null,
+    stubMessage:
+      'La investigación profunda requiere conexión al servidor de conocimiento ' +
+      'que aún no está disponible en esta versión. Por ahora puedes usar los chips ' +
+      'de siembra, plaga, biopreparado o clima para obtener información curada.',
     group: 'aprender',
-    status: 'live',
+    status: 'soon',
     hero: true,
-    heroRoute: { kind: 'ask', prompt: 'Quiero hacer una investigación profunda sobre mi finca.' },
+    heroRoute: { kind: 'unavailable' },
   },
   {
     // Capacidad ya viva en el backend (get_diseno_restauracion: sucesión
@@ -201,7 +210,7 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     heroRoute: { kind: 'photo' },
     stubMessage:
       'La identificación por foto necesita mejor hardware (GPU con ≥8GB VRAM). ' +
-      'Por ahora usá la voz o el formulario manual para registrar tus plantas. ' +
+      'Por ahora puedes usar la voz o el formulario manual para registrar tus plantas. ' +
       'Próximamente estará disponible por la nube.',
   },
   {

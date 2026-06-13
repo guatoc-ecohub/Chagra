@@ -259,10 +259,10 @@ describe('chipIntentRouter — intents STUB (backend no existe aún)', () => {
     expect(plan.skipNlu).toBe(true);
   });
 
-  it('isStubIntent reconoce precio como stub y deep como NO stub (backend live)', () => {
+  it('isStubIntent reconoce precio y deep como stub (B14: backend no disponible)', () => {
     expect(isStubIntent('precio')).toBe(true);
-    // Deep Research ya tiene backend live — ya NO es stub
-    expect(isStubIntent('deep')).toBe(false);
+    // B14: investigacion profunda aun NO esta servible — es stub honesto
+    expect(isStubIntent('deep')).toBe(true);
     expect(isStubIntent('siembro')).toBe(false);
     expect(isStubIntent('plaga')).toBe(false);
     expect(isStubIntent('clima')).toBe(false);
@@ -270,20 +270,27 @@ describe('chipIntentRouter — intents STUB (backend no existe aún)', () => {
   });
 });
 
-describe('chipIntentRouter — Deep Research (A6/A7, backend live)', () => {
-  it('deep → plan con deep=true + skipNlu + tool null (el AgentScreen lo intercepta)', () => {
+describe('chipIntentRouter — Deep Research (B14: stub honesto, backend no servible)', () => {
+  it('deep → stub claro "aún no disponible" + skipNlu + tool null (NO path live)', () => {
+    // B14: la investigacion profunda no tiene backend servible en prod (el job
+    // async vive detras de VITE_DEEP_RESEARCH_ENABLED, off por defecto). El chip
+    // NO routea a un path "live": devuelve el mismo stub honesto que 'precio'.
     const plan = planForcedIntent('deep', 'sistema agroforestal cacao');
     expect(plan.intent).toBe('deep');
-    expect(plan.deep).toBe(true);
-    expect(plan.stub).toBe(false);
+    expect(plan.stub).toBe(true);
+    expect(plan.deep).toBeUndefined();
     expect(plan.tool).toBeNull();
-    expect(plan.stubMessage).toBeNull();
+    expect(typeof plan.stubMessage).toBe('string');
+    expect(plan.stubMessage.toLowerCase()).toContain('no está disponible');
     expect(plan.skipNlu).toBe(true);
     expect(plan.prompt).toBe('sistema agroforestal cacao');
   });
 
-  it('isDeepResearchIntent reconoce solo el intent deep', () => {
-    expect(isDeepResearchIntent('deep')).toBe(true);
+  it('isDeepResearchIntent devuelve false para deep (ya no es path live) y para todo intent', () => {
+    // El path live (job async) esta detras de la flag; mientras deep sea kind
+    // 'stub' en el manifiesto, ningun chip lo dispara. La funcion se conserva
+    // como gancho para reactivar volviendo deep a kind:'deep'.
+    expect(isDeepResearchIntent('deep')).toBe(false);
     expect(isDeepResearchIntent('precio')).toBe(false);
     expect(isDeepResearchIntent('siembro')).toBe(false);
     expect(isDeepResearchIntent('plaga')).toBe(false);
@@ -293,12 +300,13 @@ describe('chipIntentRouter — Deep Research (A6/A7, backend live)', () => {
     expect(isDeepResearchIntent(undefined)).toBe(false);
   });
 
-  it('deep chip tiene kind=deep en CHIP_DEFS (no stub)', () => {
+  it('deep chip tiene kind=stub en CHIP_DEFS con stubMessage honesto', () => {
     const deepDef = CHIP_DEFS.find((d) => d.intent === 'deep');
     expect(deepDef).toBeTruthy();
-    expect(deepDef.kind).toBe('deep');
-    // Ya no tiene stubMessage
-    expect(deepDef.stubMessage).toBeUndefined();
+    expect(deepDef.kind).toBe('stub');
+    // Como stub, EXPONE stubMessage honesto (igual que 'precio').
+    expect(typeof deepDef.stubMessage).toBe('string');
+    expect(deepDef.stubMessage.length).toBeGreaterThan(0);
   });
 });
 
@@ -345,11 +353,11 @@ describe('chipIntentRouter — opts ruidosos no contaminan los args', () => {
     expect(plan.args).toBeNull();
   });
 
-  it('deep ignora opts completamente', () => {
+  it('deep ignora opts completamente (es stub)', () => {
     const plan = planForcedIntent('deep', 'abonos verdes', { municipio: 'Choachí' });
-    expect(plan.deep).toBe(true);
+    expect(plan.stub).toBe(true);
     expect(plan.tool).toBeNull();
-    expect(plan.stub).toBe(false);
+    expect(plan.deep).toBeUndefined();
   });
 });
 
