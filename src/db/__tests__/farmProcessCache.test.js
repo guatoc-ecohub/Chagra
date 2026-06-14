@@ -12,9 +12,9 @@ import { validateFarmProcessEvent } from '../../types/farmProcess';
  * Tests de regresion: verifican el schema de evento y la version.
  */
 
-describe('farmProcessCache - Bug A: schema v19', () => {
-  it('DB_VERSION es 19 tras la migracion del indice process_id', () => {
-    expect(DB_VERSION).toBe(19);
+describe('farmProcessCache - Bug A: schema process_id (DB_VERSION vigente)', () => {
+  it('DB_VERSION es 21 (esquema vigente; v19 introdujo el indice process_id)', () => {
+    expect(DB_VERSION).toBe(21);
   });
 
   it('STORES.FARM_PROCESS_EVENTS existe', () => {

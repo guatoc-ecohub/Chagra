@@ -99,6 +99,28 @@ const INSTITUTIONS = [
     kind: 'search',
     searchUrl: (c) => `https://www.invima.gov.co/buscar?q=${encodeURIComponent(c)}`,
   },
+  // Ley 1930 de 2018 — gestión integral de páramos (prohíbe actividades
+  // agropecuarias y minería en páramo). La URL ES el texto de la norma en el
+  // Gestor Normativo de Función Pública (verificada HTTP 200 + título "Ley 1930
+  // de 2018", 2026-06-13): acerca al documento citado → section.
+  {
+    keys: ['ley 1930'],
+    kind: 'section',
+    url: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=87764',
+  },
+  // Decreto 1007 de 2018 — reglamenta el incentivo de Pago por Servicios
+  // Ambientales (PSA). La URL ES el texto de la norma en el Gestor Normativo
+  // (verificada HTTP 200 + título "Decreto 1007 de 2018", 2026-06-13) → section.
+  {
+    keys: ['decreto 1007'],
+    kind: 'section',
+    url: 'https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=86901',
+  },
+  // MinAmbiente — Ministerio de Ambiente y Desarrollo Sostenible. Su portal no
+  // tiene una sección estable por dato ni un buscador parametrizable verificado
+  // que acerque a la norma/recurso citado; linkear a la home sería trazabilidad
+  // teatral. Se reconoce como institución pero su cita va en texto plano → text.
+  { keys: ['minambiente', 'ministerio de ambiente'], kind: 'text' },
 ];
 
 /** Normaliza para matchear: minúsculas, sin tildes, espacios colapsados. */
