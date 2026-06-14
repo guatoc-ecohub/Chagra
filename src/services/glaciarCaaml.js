@@ -22,12 +22,12 @@
 /**
  * Mapeo de códigos de dureza Chagra → CAAML hardnessCode.
  *
- * CAAML define: F (Fist), 1F (One Finger), P (Pencil), 1+1F (Two Fingers),
+ * CAAML define: F (Fist), 4F (Four Fingers), 1F (One Finger), P (Pencil),
  * K (Knife), I (Ice). Nuestro esquema mano→piolet se mapea así:
  */
 const DUREZA_TO_CAAML = {
   'F': 'F',      // Fist - Puño
-  '4F': '1+1F',  // Four Fingers → Two Fingers (aproximación más cercana)
+  '4F': '4F',    // Four Fingers - 4 dedos
   '1F': '1F',    // One Finger - 1 dedo
   'P': 'P',      // Pencil - Lápiz
   'K': 'K',      // Knife - Cuchillo
@@ -105,7 +105,7 @@ function parseDepthTop(profundidadChagra) {
  * Normaliza código de dureza Chagra a código CAAML.
  *
  * @param {string} durezaChagra - código Chagra (F, 4F, 1F, P, K, H1, H2)
- * @returns {string} código CAAML (F, 1+1F, 1F, P, K, I)
+ * @returns {string} código CAAML (F, 4F, 1F, P, K, I)
  */
 function normalizeHardness(durezaChagra) {
   return DUREZA_TO_CAAML[durezaChagra] || 'F'; // fallback a Fist (más blando)

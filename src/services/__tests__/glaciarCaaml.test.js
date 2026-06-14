@@ -3,7 +3,7 @@
  *
  * Verifica:
  * - toCaamlXml() genera XML válido con namespace CAAML v6
- * - Mapeo correcto de durezas Chagra → CAAML (F, 4F, 1F, P, K, H1, H2 → F/1+1F/1F/P/K/I)
+ * - Mapeo correcto de durezas Chagra → CAAML (F, 4F, 1F, P, K, H1, H2 → F/4F/1F/P/K/I)
  * - Mapeo correcto de tipos de superficie Chagra → CAAML grainType
  * - Parseo de profundidades (rangos '0–10 cm' → depthTop 0)
  * - Escape XML de caracteres especiales (guía con &, <, etc.)
@@ -118,7 +118,7 @@ describe('glaciarCaaml — exportación CAAML v6', () => {
       expect(xml).toContain('<caaml:hardnessCode>F</caaml:hardnessCode>');
     });
 
-    it('mapea dureza 4F → 1+1F (Two Fingers)', () => {
+    it('mapea dureza 4F → 4F (Four Fingers)', () => {
       const reporte = {
         guia: 'Test',
         lat: 0,
@@ -127,7 +127,7 @@ describe('glaciarCaaml — exportación CAAML v6', () => {
       };
       
       const xml = toCaamlXml(reporte);
-      expect(xml).toContain('<caaml:hardnessCode>1+1F</caaml:hardnessCode>');
+      expect(xml).toContain('<caaml:hardnessCode>4F</caaml:hardnessCode>');
     });
 
     it('mapea dureza 1F → 1F (One Finger)', () => {
@@ -458,7 +458,7 @@ describe('glaciarCaaml — exportación CAAML v6', () => {
       
       // Verificar orden: F antes que 4F antes que I
       const fIndex = xml.indexOf('<caaml:hardnessCode>F</caaml:hardnessCode>');
-      const fourFIndex = xml.indexOf('<caaml:hardnessCode>1+1F</caaml:hardnessCode>');
+      const fourFIndex = xml.indexOf('<caaml:hardnessCode>4F</caaml:hardnessCode>');
       const iceIndex = xml.indexOf('<caaml:hardnessCode>I</caaml:hardnessCode>');
       
       expect(fIndex).toBeLessThan(fourFIndex);
