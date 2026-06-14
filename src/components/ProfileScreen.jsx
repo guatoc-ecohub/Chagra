@@ -12,7 +12,7 @@ import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 import useFincaActiveStore from '../services/fincaActiveStore';
 import usePrefsStore from '../store/usePrefsStore';
 import { stop as stopTTS } from '../services/ttsService';
-import { getNotificationStyle, setNotificationStyle } from '../services/userProfileService';
+import { getNotificationStyle, setNotificationStyle, getTelemetryConsent, setTelemetryConsent } from '../services/userProfileService';
 
 const TTL_OPTIONS = [
   { id: '1d', label: '1 día' },
@@ -83,6 +83,12 @@ export default function ProfileScreen({ onBack, onHome }) {
       ? localStorage.getItem('chagra:voice:telemetry:enabled') !== '0'
       : true
   );
+  // Tarea #8 — consentimiento para ENVIAR la telemetría del agente al servidor.
+  // OFF por defecto (privacidad). Distinto de la telemetría de voz local de
+  // arriba (que solo graba en el dispositivo): este toggle autoriza el envío
+  // de metadatos anónimos (NUNCA prompt ni respuesta) al sidecar para mejorar
+  // el producto.
+  const [telemetryConsent, setTelemetryConsentState] = useState(() => getTelemetryConsent());
   const [telemetryTtl, setTelemetryTtl] = useState(() =>
     typeof window !== 'undefined'
       ? localStorage.getItem('chagra:voice:telemetry:ttl') || '7d'
@@ -464,6 +470,51 @@ export default function ProfileScreen({ onBack, onHome }) {
               <p className="text-[10px] text-slate-500 px-1 leading-relaxed">
                 La telemetría sigue grabándose en el dispositivo (privacy-safe, NUNCA prompt ni respuesta).
                 El dashboard de visualización se migró al panel privado del operador (ADR-020 anti-leak / ADR-029 Capa C).
+              </p>
+            </div>
+
+            {/* Tarea #8 — Consentimiento de envío de telemetría al servidor.
+                Default OFF (privacidad). Autoriza enviar SOLO metadatos
+                anónimos (modelo, ruta, latencias, tokens) — NUNCA el prompt ni
+                la respuesta ni datos de ubicación. */}
+            <div className="space-y-3 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+              <div className="flex items-center gap-2 px-1">
+                <Wrench size={18} className="text-morpho" />
+                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Compartir telemetría del agente</h3>
+              </div>
+
+              <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-sm font-bold text-slate-200">Enviar métricas anónimas</span>
+                  <span className="text-[10px] text-slate-500">Ayuda a mejorar el agente. Desactivado por defecto.</span>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={telemetryConsent}
+                  aria-label="Enviar métricas anónimas del agente"
+                  data-testid="telemetry-consent-toggle"
+                  onClick={() => {
+                    const next = !telemetryConsent;
+                    setTelemetryConsent(next);
+                    setTelemetryConsentState(next);
+                  }}
+                  className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+                    telemetryConsent ? 'bg-emerald-600' : 'bg-slate-700'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                      telemetryConsent ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </label>
+
+              <p className="text-[10px] text-slate-500 px-1 leading-relaxed">
+                Si lo activas, se envían al servidor métricas agregadas de tus consultas (modelo usado, tipo de
+                consulta, tiempos de respuesta y conteo de tokens). Nunca se envían el texto de tus preguntas ni
+                las respuestas, ni tu ubicación. Puedes desactivarlo cuando quieras.
               </p>
             </div>
 

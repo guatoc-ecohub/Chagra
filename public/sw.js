@@ -423,7 +423,12 @@ async function handleVoiceTelemetrySync() {
 
 async function getPendingTelemetryEvents() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('ChagraDB', 10);
+    // Tarea #8 fix: abrir SIN versión. El SW no puede importar dbCore (DB_VERSION
+    // avanza con cada migración), y pasar una versión hardcodeada (antes: 10)
+    // menor a la actual hace que indexedDB.open lance VersionError → esta función
+    // SIEMPRE fallaba. Abrir sin versión devuelve la DB en su versión vigente,
+    // sea cual sea, sin disparar un upgrade.
+    const request = indexedDB.open('ChagraDB');
 
     request.onsuccess = async (event) => {
       const db = event.target.result;

@@ -18,6 +18,7 @@ import PendingTasksWidget from './components/PendingTasksWidget';
 import SyncProgressIndicator from './components/common/SyncProgressIndicator';
 import useOllamaWarmStore from './store/useOllamaWarmStore';
 import { prewarmCorpus } from './services/ragRetriever';
+import { syncAgentTelemetry } from './services/agentTelemetrySync';
 import useThemeBackgroundStore, { getBackgroundSrc } from './store/useThemeBackgroundStore';
 import useAlertStore from './store/useAlertStore';
 import { alertEngine } from './services/alertEngine';
@@ -371,13 +372,26 @@ export default function App() {
     typeof navigator !== 'undefined' ? navigator.onLine : true
   );
   useEffect(() => {
-    const goOnline = () => setIsAppOnline(true);
+    const goOnline = () => {
+      setIsAppOnline(true);
+      // Tarea #8 — al recuperar conexión, intentar drenar la telemetría del
+      // agente al sidecar. No-bloqueante y tolerante a fallos; internamente
+      // respeta el consentimiento del usuario (default OFF) — si no lo dio,
+      // es un no-op silencioso. NUNCA envía prompts ni PII.
+      void syncAgentTelemetry();
+    };
     const goOffline = () => setIsAppOnline(false);
     window.addEventListener('online', goOnline);
     window.addEventListener('offline', goOffline);
+    // Un intento al montar (cubre el caso de requests 'done' que quedaron sin
+    // sincronizar de una sesión previa). Diferido para no competir con el boot.
+    const bootSync = setTimeout(() => {
+      void syncAgentTelemetry();
+    }, 8000);
     return () => {
       window.removeEventListener('online', goOnline);
       window.removeEventListener('offline', goOffline);
+      clearTimeout(bootSync);
     };
   }, []);
   useGlobalKeyboardShortcuts({ enabled: currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' });
