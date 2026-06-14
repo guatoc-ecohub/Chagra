@@ -62,7 +62,18 @@ jobs:
             exit 1
           fi
           umask 022
-          rsync -avzO --no-perms --delete --no-group --chmod=F644 dist/ "$TARGET/"
+          # /assets/ append-only: ver comentario extenso en deploy.yml (prod).
+          # En resumen: un solo `rsync --delete dist/ TARGET/` borra los chunks
+          # hasheados viejos que un cliente/SW instalado todavia necesita ->
+          # "failed to fetch". Fix en 3 pasos:
+          #   1) sincronizar todo MENOS /assets/ con --delete (index.html, sw.js,
+          #      manifest, etc.: nombres no hasheados, limpiar basura).
+          #   2) sincronizar /assets/ SIN --delete (agregar chunks nuevos,
+          #      conservar viejos; los hashes no colisionan).
+          #   3) GC de chunks con mtime > 30 dias para no crecer infinito.
+          rsync -avzO --no-perms --delete --no-group --chmod=F644 --exclude='/assets/' dist/ "$TARGET/"
+          rsync -avzO --no-perms --no-group --chmod=F644 dist/assets/ "$TARGET/assets/"
+          find "$TARGET/assets/" -type f -mtime +30 -delete || true
           find "$TARGET" -type f -user runner ! -perm 644 -exec chmod 644 {} + || true
 
       - if: env.SKIP_DEPLOY != '1'

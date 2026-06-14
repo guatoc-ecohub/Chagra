@@ -166,9 +166,31 @@ jobs:
         # blanca tras cada deploy. El chmod posterior es defensa en
         # profundidad: se aplica solo a archivos cuyo owner es runner (los
         # que creo este deploy), no toca dirs ajenos.
+        #
+        # /assets/ es append-only (estrategia en 3 pasos):
+        #   Bug previo: un solo `rsync --delete dist/ TARGET/` borraba los
+        #   chunks hasheados `/assets/*-<hash>.js` que ya no estaban en el build
+        #   nuevo. Una PWA instalada con un Service Worker viejo sirve un
+        #   index.html cacheado que apunta a esos chunks ya borrados -> el
+        #   cliente falla con "failed to fetch" (pantalla rota) hasta reinstalar.
+        #   El SW no hace skipWaiting (queda en waiting + prompt de update), asi
+        #   que el cliente viejo sigue activo y necesita que SUS chunks existan.
+        #   Fix:
+        #     1) rsync del dist completo CON --delete pero --exclude='/assets/':
+        #        actualiza index.html, sw.js, manifest, etc. (nombres NO
+        #        hasheados) y limpia basura no-hasheada. Estos son justo los
+        #        archivos que disparan el update del SW.
+        #     2) rsync de dist/assets/ a TARGET/assets/ SIN --delete: agrega los
+        #        chunks nuevos y conserva los viejos (los hashes nunca colisionan,
+        #        acumular es seguro) para que clientes/SW viejos sigan cargando.
+        #     3) GC de chunks viejos para no crecer infinito: borra archivos en
+        #        TARGET/assets/ con mtime > 30 dias. 30 dias cubre de sobra el
+        #        tiempo para que un cliente instalado se actualice.
         run: |
           umask 022
-          rsync -avzO --no-perms --delete --no-group --chmod=F644 dist/ /mnt/fast/appdata/farmos-pwa/
+          rsync -avzO --no-perms --delete --no-group --chmod=F644 --exclude='/assets/' dist/ /mnt/fast/appdata/farmos-pwa/
+          rsync -avzO --no-perms --no-group --chmod=F644 dist/assets/ /mnt/fast/appdata/farmos-pwa/assets/
+          find /mnt/fast/appdata/farmos-pwa/assets/ -type f -mtime +30 -delete || true
           find /mnt/fast/appdata/farmos-pwa -type f -user runner ! -perm 644 -exec chmod 644 {} + || true
 
       - if: env.SKIP_DEPLOY != '1'
