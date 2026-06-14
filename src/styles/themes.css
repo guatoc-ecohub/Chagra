@@ -432,3 +432,80 @@ html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
   border:1px solid var(--btnEdge,rgba(51,65,85,0.5)); color:var(--tx,#e2e8f0);
   min-height:44px; min-width:44px; } /* touch target >=44px */
 .chagra-back-btn:hover { background:var(--btnHover,rgba(51,65,85,0.7)); }
+
+/* ===========================================================================
+ * 4. MÓDULO GLACIAR — semáforo y escala de dureza THEME-AWARE
+ *    Alto contraste para sol directo (temas claros) sin hardcode.
+ *    Usa las variables CSS del tema actual (emerald/amber/red/sky).
+ * =========================================================================== */
+
+/* Semáforo de seguridad — fondo sutil con borde fuerte */
+.glaciar-estado-estable {
+  background-color: rgb(var(--c-emerald-900) / 0.25);
+  border-color: rgb(var(--c-emerald-600) / 0.5);
+}
+[data-theme="minimalista"] .glaciar-estado-estable,
+[data-theme="nature"] .glaciar-estado-estable {
+  background-color: rgb(var(--c-emerald-200) / 0.4);
+  border-color: rgb(var(--c-emerald-500) / 0.6);
+}
+
+.glaciar-estado-precaucion {
+  background-color: rgb(var(--c-amber-900) / 0.25);
+  border-color: rgb(var(--c-amber-600) / 0.5);
+}
+[data-theme="minimalista"] .glaciar-estado-precaucion,
+[data-theme="nature"] .glaciar-estado-precaucion {
+  background-color: rgb(var(--c-amber-200) / 0.4);
+  border-color: rgb(var(--c-amber-500) / 0.6);
+}
+
+.glaciar-estado-peligro {
+  background-color: rgb(var(--c-emerald-900) / 0.25);
+  border-color: rgb(var(--c-emerald-500) / 0.6);
+}
+[data-theme="minimalista"] .glaciar-estado-peligro,
+[data-theme="nature"] .glaciar-estado-peligro {
+  background-color: rgb(254 226 226 / 0.55);
+  border-color: rgb(239 68 68 / 0.7);
+}
+
+.glaciar-estado-observacion {
+  background-color: rgb(var(--c-slate-700) / 0.25);
+  border-color: rgb(var(--c-morpho) / 0.5);
+}
+[data-theme="minimalista"] .glaciar-estado-observacion,
+[data-theme="nature"] .glaciar-estado-observacion {
+  background-color: rgb(var(--c-morpho) / 0.15);
+  border-color: rgb(var(--c-morpho) / 0.5);
+}
+
+/* Escala de dureza — distinción clara entre mano (sky) y piolet (indigo/morpho) */
+.glaciar-dureza-mano {
+  background-color: rgb(var(--c-morpho) / 0.4);
+  border-color: rgb(var(--c-morpho-glow) / 0.7);
+}
+[data-theme="minimalista"] .glaciar-dureza-mano,
+[data-theme="nature"] .glaciar-dureza-mano {
+  background-color: rgb(var(--c-emerald-200) / 0.5);
+  border-color: rgb(var(--c-emerald-500) / 0.6);
+}
+
+.glaciar-dureza-piolet {
+  background-color: rgb(var(--c-orchid) / 0.4);
+  border-color: rgb(var(--c-orchid-glow) / 0.7);
+}
+[data-theme="minimalista"] .glaciar-dureza-piolet,
+[data-theme="nature"] .glaciar-dureza-piolet {
+  background-color: rgb(var(--c-emerald-300) / 0.5);
+  border-color: rgb(var(--c-emerald-600) / 0.6);
+}
+
+/* Texto del semáforo — asegura legibilidad en todos los temas */
+.glaciar-estado-texto {
+  color: rgb(var(--c-slate-100));
+}
+[data-theme="minimalista"] .glaciar-estado-texto,
+[data-theme="nature"] .glaciar-estado-texto {
+  color: rgb(var(--c-slate-200));
+}
