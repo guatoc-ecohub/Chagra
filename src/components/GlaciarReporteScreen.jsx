@@ -36,10 +36,10 @@ import {
  */
 
 const ESTADO_BG = {
-  estable: 'bg-emerald-900/25 border-emerald-600/50',
-  precaucion: 'bg-amber-900/25 border-amber-600/50',
-  peligro: 'bg-red-900/25 border-red-600/50',
-  observacion: 'bg-sky-900/25 border-sky-600/50',
+  estable: 'glaciar-estado-estable',
+  precaucion: 'glaciar-estado-precaucion',
+  peligro: 'glaciar-estado-peligro',
+  observacion: 'glaciar-estado-observacion',
 };
 
 const ESTADO_EMOJI = {
@@ -825,8 +825,8 @@ function DurezaGrid({ value, onChange }) {
           className={`flex flex-col items-center justify-center py-2 rounded-xl border-2 transition active:scale-95 ${
             value === d.codigo
               ? d.medio === 'piolet'
-                ? 'bg-indigo-900/40 border-indigo-400 text-indigo-100'
-                : 'bg-sky-900/40 border-sky-400 text-sky-100'
+                ? 'glaciar-dureza-piolet text-white'
+                : 'glaciar-dureza-mano text-white'
               : 'bg-slate-900 border-slate-700 text-slate-300 hover:bg-slate-800'
           }`}
         >
@@ -889,20 +889,21 @@ function CapaRow({ index, capa, esSuperficie, onChange, onRemove, removable }) {
 }
 
 function SeguridadBanner({ seguridad }) {
+  const bgClass = ESTADO_BG[seguridad.nivel] || ESTADO_BG.precaucion;
   return (
-    <div className={`rounded-2xl border-2 p-4 ${ESTADO_BG[seguridad.nivel] || ESTADO_BG.precaucion}`}>
+    <div className={`rounded-2xl border-2 p-4 ${bgClass}`}>
       <div className="flex items-center gap-3">
         <span className="text-3xl" aria-hidden="true">{seguridad.emoji}</span>
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">Estado de seguridad</p>
-          <p className="text-xl font-black leading-tight">{seguridad.label}</p>
+          <p className="text-xs uppercase tracking-wide text-slate-400 glaciar-estado-texto">Estado de seguridad</p>
+          <p className="text-xl font-black leading-tight glaciar-estado-texto">{seguridad.label}</p>
         </div>
       </div>
-      <p className="text-sm text-slate-300 mt-2">{seguridad.desc}</p>
+      <p className="text-sm text-slate-300 mt-2 glaciar-estado-texto">{seguridad.desc}</p>
       {seguridad.razones?.length > 0 && (
         <ul className="mt-2 space-y-1">
           {seguridad.razones.map((r, i) => (
-            <li key={i} className="text-xs text-slate-400 flex gap-1.5">
+            <li key={i} className="text-xs text-slate-400 glaciar-estado-texto flex gap-1.5">
               <span className="text-slate-500">•</span>{r}
             </li>
           ))}
@@ -978,9 +979,10 @@ function ReporteCard({ reporte, onEliminar }) {
   const montana = MONTANA_BY_KEY[reporte.montana];
   const fecha = reporte.fechaISO ? new Date(reporte.fechaISO) : new Date(reporte.createdAt || 0);
   const emoji = ESTADO_EMOJI[estado] || '🟡';
+  const bgClass = ESTADO_BG[estado] || ESTADO_BG.precaucion;
 
   return (
-    <div className={`rounded-2xl border ${ESTADO_BG[estado] || ESTADO_BG.precaucion} overflow-hidden`}>
+    <div className={`rounded-2xl border ${bgClass} overflow-hidden`}>
       <div className="flex gap-3 p-3">
         {/* Miniatura */}
         <div className="shrink-0 w-20 h-20 rounded-xl bg-slate-800 overflow-hidden grid place-items-center">
@@ -992,7 +994,7 @@ function ReporteCard({ reporte, onEliminar }) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-lg font-black flex items-center gap-1.5">
+            <span className="text-lg font-black flex items-center gap-1.5 glaciar-estado-texto">
               {emoji} <span className="text-sm">{ESTADOS_SEGURIDAD[estado]?.label || 'Precaución'}</span>
             </span>
             <button
@@ -1004,7 +1006,7 @@ function ReporteCard({ reporte, onEliminar }) {
               <Trash2 size={16} />
             </button>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-400 mt-0.5 glaciar-estado-texto">
             {fecha.toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' })}
           </p>
           <div className="flex flex-wrap gap-1.5 mt-1.5">
@@ -1022,7 +1024,7 @@ function ReporteCard({ reporte, onEliminar }) {
               {reporte.precision != null ? ` (±${reporte.precision}m)` : ''}
             </p>
           )}
-          {reporte.guia && <p className="text-[11px] text-slate-400 mt-0.5">Guía: {reporte.guia}</p>}
+          {reporte.guia && <p className="text-[11px] text-slate-400 mt-0.5 glaciar-estado-texto">Guía: {reporte.guia}</p>}
         </div>
       </div>
       {Array.isArray(reporte.peligros) && reporte.peligros.filter((p) => p !== 'ninguno_evidente').length > 0 && (
@@ -1040,7 +1042,7 @@ function ReporteCard({ reporte, onEliminar }) {
         </p>
       )}
       {reporte.notas && (
-        <p className="px-3 pb-3 text-xs text-slate-400 italic">“{reporte.notas}”</p>
+        <p className="px-3 pb-3 text-xs text-slate-400 italic glaciar-estado-texto">"{reporte.notas}"</p>
       )}
     </div>
   );
