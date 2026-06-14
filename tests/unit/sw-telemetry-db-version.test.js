@@ -3,7 +3,7 @@
  * en el Service Worker (Tarea #8).
  *
  * Bug: `getPendingTelemetryEvents` abría `indexedDB.open('ChagraDB', 10)` con
- * una versión HARDCODEADA (10) menor a la actual de `dbCore` (DB_VERSION ≥ 20).
+ * una versión HARDCODEADA (10) menor a la actual de `dbCore` (DB_VERSION = 23).
  * `indexedDB.open(name, N)` con N < versión-vigente lanza `VersionError`, así
  * que la función SIEMPRE fallaba y el background-sync de voice-telemetry nunca
  * podía drenar eventos.
