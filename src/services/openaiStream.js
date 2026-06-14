@@ -216,6 +216,7 @@ export async function streamOpenAI(url, body, onToken, { signal, onDone } = {}) 
             mergeToolCallDeltas(accumulatedToolCalls, tc);
           }
           if (isDoneChunk(parsed)) {
+            // Empty block - finish_reason detected but we continue processing
           }
         }
         if (done) break;
