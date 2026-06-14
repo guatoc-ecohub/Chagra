@@ -6,10 +6,26 @@ Documento canónico del estado de cobertura testing en Chagra. Auditado 2026-05-
 
 ## Stack testing
 
-- **Unit:** Vitest + @testing-library/react
+- **Unit:** Vitest + @testing-library/react + @vitest/coverage-v8
 - **E2E:** Playwright Chromium (1 worker, retries=2)
 - **CI gates:** CodeQL SAST + Playwright Offline-first E2E (bloqueante merge)
 - **Pre-commit:** lefthook 5 hooks (secret-scan + infra-refs + Pro-import + ESLint + strategic-content)
+
+### Reporte de cobertura unitaria
+
+Para generar el reporte de cobertura de tests unitarios:
+
+```bash
+npm run coverage
+```
+
+Esto genera:
+- **Reporte terminal:** Resumen de cobertura en consola (líneas, ramas, funciones, statements)
+- **Reporte HTML:** `coverage/index.html` — visualización interactiva detallada por archivo
+- **Reporte LCOV:** `coverage/lcov.info` — compatible con CI tools (Codecov, Coveralls, GitHub Actions)
+- **Reporte JSON:** `coverage/coverage-final.json` — para análisis automatizados
+
+**Estado actual:** Ejecutar `npm run coverage` para obtener métricas actualizadas. El reporte HTML permite navegar cobertura por archivo y línea.
 
 ## Cobertura Vitest unit
 
