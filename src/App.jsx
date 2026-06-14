@@ -604,6 +604,21 @@ export default function App() {
     // re-login). prewarmCorpus es idempotente: si el corpus ya está cacheado o
     // cargándose, no dispara trabajo extra. Fire-and-forget, no bloqueante.
     prewarmCorpus();
+
+    // U-2 (crítico glaciar): PREFETCH del chunk lazy del módulo glaciar para
+    // los usuarios de La Cordada, mientras hay señal en el dashboard. Sin esto,
+    // si un guía instala la app y sube al glaciar SIN haber abierto el módulo
+    // online, el chunk `/assets/GlaciarReporteScreen-*.js` nunca se cachea → el
+    // SW responde 504 y el módulo NO abre en campo. Disparar el import() acá
+    // baja el chunk estando online; el handler cache-first de /assets/* del SW
+    // lo guarda y sobrevive offline. Idempotente (el bundler cachea el módulo),
+    // fire-and-forget, y solo para la whitelist (no malgasta datos del resto).
+    if (tieneAccesoGlaciarActual()) {
+      import('./components/GlaciarReporteScreen').catch(() => {
+        // Sin señal / chunk no disponible aún: se reintentará en el próximo
+        // arranque online. No rompemos el dashboard por un prefetch fallido.
+      });
+    }
   }, [currentView]);
 
   // 2026-05-18 (operator request): la imagen de fondo agroecológica de
