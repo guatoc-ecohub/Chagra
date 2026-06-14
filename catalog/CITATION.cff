@@ -34,7 +34,7 @@ identifiers:
     value: "https://chagra.guatoc.co"
 preferred-citation:
   type: dataset
-  title: "Chagra Catálogo Agroecológico Colombiano v3.1 — 175 especies + 54 fuentes"
+  title: "Chagra Catálogo Agroecológico Colombiano — 263 especies + 68 fuentes (subset OSS v3.2)"
   authors:
     - family-names: Guerrero
       given-names: Miguel

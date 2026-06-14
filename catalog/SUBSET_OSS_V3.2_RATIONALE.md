@@ -1,10 +1,19 @@
-# Subset OSS v3.2 — 105 species top-uso curadas
+# Subset OSS v3.2 — subset top-uso curado
+
+> **Actualización 2026-06-14 (estado real shipped):** este documento describe la
+> **curación inicial de 105 species** (2026-05-24). El archivo que hoy ships en
+> `chagra-catalog-oss-subset-v3.2.json` → `public/catalog.sqlite` tiene **263
+> species**: la curación de aquí más enriquecimientos posteriores (notablemente
+> +58 species de páramo Cruz Verde el 2026-06-10, ver `_paramo_enrichment` en el
+> JSON). Las tablas de inventario más abajo reflejan la composición original de
+> las 105, no el total actual. Conteo autoritativo = `species[]` del JSON +
+> `_subset_meta` reconciliado.
 
 **Fecha**: 2026-05-24  
 **Reemplaza**: chagra-catalog-oss-subset-v3.1.json (50 species, deprecado tras revert PR #1012)  
-**Fuente**: chagra-catalog-seed-v3.1.json (495 species full, ahora reservado para chagra-pro)  
+**Fuente**: chagra-catalog-seed-v3.1.json (corpus full reservado para chagra-pro)  
 **Licencia**: CC-BY-NC-SA 4.0  
-**Generador**: scripts/extract-oss-subset-v32.mjs (determinístico)
+**Generador**: scripts/extract-oss-subset-v32.mjs (determinístico) + enrich-oss-paramo-cruz-verde.mjs (páramo)
 
 ## Contexto
 
@@ -38,7 +47,7 @@ El subset v3.1 (50 species, PR #1011) cortó species críticas — aguacate, tom
 | ornamentales_nativas | 2 | Páramo emblemático — frailejón mayor. Identificación + valor cultural. |
 | abonos_verdes_coberturas | 1 | Cobertura/abono verde — aliso andino (N-fixer). |
 
-**Total**: 105 species, 36 biopreparados, 68 sources.
+**Total (curación inicial)**: 105 species, 36 biopreparados, 68 sources. **Total shipped actual** (tras enriquecimiento páramo 2026-06-10): **263 species**, 36 biopreparados, 68 sources.
 
 ## Lista completa
 
