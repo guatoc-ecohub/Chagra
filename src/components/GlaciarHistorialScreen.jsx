@@ -15,9 +15,10 @@
  * Español Colombia (usted/tú, SIN voseo).
  */
 import { useState, useEffect, useCallback } from 'react';
-import { List, Snowflake, MapPin, Calendar, Loader2, ChevronLeft, Home, AlertCircle, Trash2, ArrowLeft } from 'lucide-react';
+import { List, Snowflake, MapPin, Calendar, Loader2, ChevronLeft, Home, AlertCircle, Trash2, ArrowLeft, Download, CheckCircle2 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { glaciarReportes } from '../db/glaciarReportes';
+import { downloadGeoJSON, downloadReporteGeoJSON } from '../services/glaciarExport';
 import {
   MONTANA_BY_KEY,
   ESTADOS_SEGURIDAD,
@@ -48,6 +49,9 @@ export default function GlaciarHistorialScreen({ onBack, onHome }) {
   const [loading, setLoading] = useState(true);
   const [selectedReporte, setSelectedReporte] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  // Exportación GeoJSON (de reportes YA guardados): estado in-flight + feedback.
+  const [exporting, setExporting] = useState(false);
+  const [exportResult, setExportResult] = useState(null);
 
   const cargarReportes = useCallback(async () => {
     setLoading(true);
@@ -62,8 +66,43 @@ export default function GlaciarHistorialScreen({ onBack, onHome }) {
   }, []);
 
   useEffect(() => {
+    // Carga inicial al montar. cargarReportes hace su propio setState de forma
+    // asíncrona (await IndexedDB); el disable es para el patrón establecido de
+    // "cargar al montar", no un setState síncrono que dispare renders en cascada.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     cargarReportes();
   }, [cargarReportes]);
+
+  const handleExportarTodos = useCallback(async () => {
+    if (exporting) return;
+    setExporting(true);
+    setExportResult(null);
+    try {
+      const result = await downloadGeoJSON();
+      setExportResult({
+        success: true,
+        message: `Exportados ${result.featureCount} reportes (${(result.sizeBytes / 1024).toFixed(1)} kB).`,
+      });
+    } catch (err) {
+      console.error('[GlaciarHistorial] error exportando GeoJSON:', err);
+      setExportResult({
+        success: false,
+        message: err.message || 'No se pudo exportar el archivo.',
+      });
+    } finally {
+      setExporting(false);
+      setTimeout(() => setExportResult(null), 4000);
+    }
+  }, [exporting]);
+
+  const handleExportarReporte = useCallback((reporte) => {
+    try {
+      downloadReporteGeoJSON(reporte);
+    } catch (err) {
+      console.error('[GlaciarHistorial] error exportando reporte:', err);
+      alert(err.message || 'No se pudo exportar el reporte.');
+    }
+  }, []);
 
   const handleEliminar = useCallback(async (id) => {
     if (deleting) return;
@@ -91,6 +130,7 @@ export default function GlaciarHistorialScreen({ onBack, onHome }) {
         reporte={selectedReporte}
         onBack={() => setSelectedReporte(null)}
         onEliminar={() => handleEliminar(selectedReporte.id)}
+        onExportar={() => handleExportarReporte(selectedReporte)}
         onHome={onHome}
         deleting={deleting}
       />
@@ -144,9 +184,31 @@ export default function GlaciarHistorialScreen({ onBack, onHome }) {
           </div>
         ) : (
           <>
-            <p className="text-xs text-slate-500 pb-2">
-              {reportes.length} {reportes.length === 1 ? 'reporte guardado' : 'reportes guardados'}
-            </p>
+            <div className="flex items-center justify-between gap-2 pb-2">
+              <p className="text-xs text-slate-500">
+                {reportes.length} {reportes.length === 1 ? 'reporte guardado' : 'reportes guardados'}
+              </p>
+              <button
+                type="button"
+                onClick={handleExportarTodos}
+                disabled={exporting}
+                className="px-3 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-600 disabled:opacity-60 text-white font-bold text-xs flex items-center gap-2 transition-colors"
+                aria-label="Exportar reportes a GeoJSON"
+              >
+                {exporting ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+                {exporting ? 'Exportando…' : 'Exportar GeoJSON'}
+              </button>
+            </div>
+            {exportResult && (
+              <div className={`rounded-xl p-3 text-xs flex items-center gap-2 ${
+                exportResult.success
+                  ? 'bg-emerald-900/30 text-emerald-300 border border-emerald-800/50'
+                  : 'bg-red-900/30 text-red-300 border border-red-800/50'
+              }`}>
+                {exportResult.success ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                <span>{exportResult.message}</span>
+              </div>
+            )}
             {reportes.map((r) => (
               <ReporteCard
                 key={r.id}
@@ -229,8 +291,10 @@ function ReporteCard({ reporte, onPress }) {
 /**
  * DetalleReporte — vista detallada read-only de un reporte.
  */
-function DetalleReporte({ reporte, onBack, onEliminar, onHome, deleting }) {
+function DetalleReporte({ reporte, onBack, onEliminar, onExportar, onHome, deleting }) {
   const estado = reporte.estado || 'precaucion';
+  // Solo se puede exportar a GeoJSON si el reporte tiene coordenadas GPS.
+  const tieneCoords = reporte.lat != null && reporte.lng != null;
   const supKey = reporte.tipoSuperficie || reporte.capas?.[0]?.tipoSuperficie;
   const durCod = reporte.dureza || reporte.capas?.[0]?.dureza;
   const sup = SUPERFICIE_BY_KEY[supKey];
@@ -253,19 +317,32 @@ function DetalleReporte({ reporte, onBack, onEliminar, onHome, deleting }) {
       onBack={onBack}
       onHome={handleHomeClick}
       actions={
-        <button
-          type="button"
-          onClick={onEliminar}
-          disabled={deleting}
-          className="p-2 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-900/20 transition disabled:opacity-50"
-          aria-label="Eliminar reporte"
-        >
-          {deleting ? (
-            <Loader2 size={18} className="animate-spin" />
-          ) : (
-            <Trash2 size={18} />
+        <>
+          {tieneCoords && (
+            <button
+              type="button"
+              onClick={onExportar}
+              className="p-2 rounded-lg text-slate-500 hover:text-emerald-300 hover:bg-emerald-900/20 transition"
+              aria-label="Exportar reporte a GeoJSON"
+              title="Exportar este reporte a GeoJSON"
+            >
+              <Download size={18} />
+            </button>
           )}
-        </button>
+          <button
+            type="button"
+            onClick={onEliminar}
+            disabled={deleting}
+            className="p-2 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-900/20 transition disabled:opacity-50"
+            aria-label="Eliminar reporte"
+          >
+            {deleting ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <Trash2 size={18} />
+            )}
+          </button>
+        </>
       }
     >
       <main className="flex-1 px-4 pt-4 space-y-4 max-w-xl mx-auto overflow-y-auto pb-[calc(env(safe-area-inset-bottom,0px)+120px)]">

@@ -16,11 +16,22 @@ const { getAll: mockGetAll, remove: mockRemove } = vi.hoisted(() => ({
   remove: vi.fn(),
 }));
 
+const { downloadGeoJSON: mockDownloadGeoJSON, downloadReporteGeoJSON: mockDownloadReporteGeoJSON } =
+  vi.hoisted(() => ({
+    downloadGeoJSON: vi.fn(),
+    downloadReporteGeoJSON: vi.fn(),
+  }));
+
 vi.mock('../../db/glaciarReportes', () => ({
   glaciarReportes: {
     getAll: mockGetAll,
     remove: mockRemove,
   },
+}));
+
+vi.mock('../../services/glaciarExport', () => ({
+  downloadGeoJSON: mockDownloadGeoJSON,
+  downloadReporteGeoJSON: mockDownloadReporteGeoJSON,
 }));
 
 import GlaciarHistorialScreen from '../GlaciarHistorialScreen';
@@ -67,6 +78,8 @@ const REPORTE_BASE = {
 beforeEach(() => {
   mockGetAll.mockReset();
   mockRemove.mockReset();
+  mockDownloadGeoJSON.mockReset();
+  mockDownloadReporteGeoJSON.mockReset();
   // Mock window.confirm
   globalThis.confirm = vi.fn(() => true);
 });
@@ -372,5 +385,90 @@ describe('GlaciarHistorialScreen — historial de reportes glaciares', () => {
 
     // Matiz de séracs
     expect(screen.getByText(/La ruta pasa por debajo de los séracs/i)).toBeVisible();
+  });
+});
+
+describe('GlaciarHistorialScreen — exportación GeoJSON', () => {
+  it('muestra el botón "Exportar GeoJSON" en la lista cuando hay reportes', async () => {
+    mockGetAll.mockResolvedValue([REPORTE_BASE]);
+    render(<GlaciarHistorialScreen onBack={() => {}} />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/Exportar reportes a GeoJSON/i)).toBeVisible();
+    });
+  });
+
+  it('NO muestra el botón de exportar lista en el estado vacío', async () => {
+    mockGetAll.mockResolvedValue([]);
+    render(<GlaciarHistorialScreen onBack={() => {}} />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Sin reportes aún/i)).toBeVisible();
+    });
+    expect(screen.queryByLabelText(/Exportar reportes a GeoJSON/i)).not.toBeInTheDocument();
+  });
+
+  it('al exportar la lista llama a downloadGeoJSON y muestra el resultado', async () => {
+    mockGetAll.mockResolvedValue([REPORTE_BASE]);
+    mockDownloadGeoJSON.mockResolvedValue({
+      filename: 'glaciares-reportes-2026-06-14.geojson',
+      sizeBytes: 2048,
+      featureCount: 1,
+    });
+    render(<GlaciarHistorialScreen onBack={() => {}} />);
+
+    const btn = await screen.findByLabelText(/Exportar reportes a GeoJSON/i);
+    fireEvent.click(btn);
+
+    await waitFor(() => {
+      expect(mockDownloadGeoJSON).toHaveBeenCalledTimes(1);
+    });
+    await waitFor(() => {
+      expect(screen.getByText(/Exportados 1 reportes/i)).toBeVisible();
+    });
+  });
+
+  it('muestra mensaje de error si la exportación de la lista falla', async () => {
+    mockGetAll.mockResolvedValue([REPORTE_BASE]);
+    mockDownloadGeoJSON.mockRejectedValue(new Error('No hay reportes guardados para exportar.'));
+    render(<GlaciarHistorialScreen onBack={() => {}} />);
+
+    const btn = await screen.findByLabelText(/Exportar reportes a GeoJSON/i);
+    fireEvent.click(btn);
+
+    await waitFor(() => {
+      expect(screen.getByText(/No hay reportes guardados para exportar/i)).toBeVisible();
+    });
+  });
+
+  it('el detalle ofrece exportar el reporte y llama a downloadReporteGeoJSON', async () => {
+    mockGetAll.mockResolvedValue([REPORTE_BASE]);
+    render(<GlaciarHistorialScreen onBack={() => {}} />);
+
+    const card = (await screen.findByText(/Cocuy/i)).closest('button');
+    fireEvent.click(card);
+
+    const exportBtn = await screen.findByLabelText(/Exportar reporte a GeoJSON/i);
+    fireEvent.click(exportBtn);
+
+    expect(mockDownloadReporteGeoJSON).toHaveBeenCalledTimes(1);
+    expect(mockDownloadReporteGeoJSON).toHaveBeenCalledWith(
+      expect.objectContaining({ id: REPORTE_BASE.id })
+    );
+  });
+
+  it('el detalle NO ofrece exportar si el reporte no tiene coordenadas', async () => {
+    const sinCoords = { ...REPORTE_BASE, lat: null, lng: null };
+    mockGetAll.mockResolvedValue([sinCoords]);
+    render(<GlaciarHistorialScreen onBack={() => {}} />);
+
+    const card = (await screen.findByText(/Cocuy/i)).closest('button');
+    fireEvent.click(card);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Detalle del reporte/i)).toBeVisible();
+    });
+    expect(screen.queryByLabelText(/Exportar reporte a GeoJSON/i)).not.toBeInTheDocument();
+    expect(mockDownloadReporteGeoJSON).not.toHaveBeenCalled();
   });
 });
