@@ -70,6 +70,7 @@ const ProcesosPorVozScreen = lazy(() => import('./components/ProcesosPorVozScree
 const CicloCultivoScreen = lazy(() => import('./components/CicloCultivoScreen'));
 const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
 const GlaciarReporteScreen = lazy(() => import('./components/GlaciarReporteScreen'));
+const GlaciarHistorialScreen = lazy(() => import('./components/GlaciarHistorialScreen'));
 const ProfileScreen = lazy(() => import('./components/ProfileScreen'));
 const CaseStudyScreen = lazy(() => import('./components/CaseStudyScreen'));
 const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
@@ -145,6 +146,7 @@ const HASH_VIEW_ROUTES = {
   'hoy-en-finca': 'hoy_finca',
   evolucion: 'evolucion',
   glaciar: 'glaciar',
+  'glaciar-historial': 'glaciar_historial',
 };
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
@@ -928,6 +930,25 @@ export default function App() {
         return (
           <ErrorBoundary>
             <GlaciarReporteScreen onBack={() => navigate('dashboard')} />
+          </ErrorBoundary>
+        );
+      case 'glaciar_historial':
+        // Historial de reportes glaciares. Ruta #glaciar-historial.
+        // ACCESO RESTRINGIDO a los beta testers de "La Cordada"
+        // (src/config/glaciarAccess.js). Guarda defensiva: si por cualquier
+        // ruta un usuario no autorizado llega a esta vista, NO montamos el
+        // módulo — devolvemos el fallback estándar. Las navegaciones a
+        // #glaciar-historial ya redirigen al dashboard antes de llegar acá.
+        if (!tieneAccesoGlaciarActual()) {
+          return (
+            <ErrorBoundary>
+              <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>
+            </ErrorBoundary>
+          );
+        }
+        return (
+          <ErrorBoundary>
+            <GlaciarHistorialScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
           </ErrorBoundary>
         );
       case 'perfil':
