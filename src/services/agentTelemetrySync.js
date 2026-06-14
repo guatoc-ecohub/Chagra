@@ -46,13 +46,51 @@ import { getTelemetryConsent } from './userProfileService.js';
 import { listRequests, getRequest } from './agentRequestQueue.js';
 
 /**
+ * Base del sidecar agro-mcp (espejo de feedbackService.getBaseUrl).
+ * @returns {string}
+ */
+function getSidecarBaseUrl() {
+  try {
+    const raw = import.meta.env?.VITE_SIDECAR_URL;
+    if (typeof raw === 'string' && raw.trim()) {
+      return raw.trim().replace(/\/+$/, '');
+    }
+  } catch (_) {
+    // ignore
+  }
+  return '/api';
+}
+
+/**
+ * Token compartido del sidecar (header X-Chagra-Token). El endpoint /ingest
+ * está auth-gated igual que /agent-feedback.
+ * @returns {string}
+ */
+function getToken() {
+  try {
+    const raw = import.meta.env?.VITE_CHAGRA_MCP_TOKEN;
+    return typeof raw === 'string' ? raw : '';
+  } catch (_) {
+    return '';
+  }
+}
+
+/**
  * Devuelve la URL de ingest de telemetría.
  * Leer en tiempo de ejecución (no en import) para facilitar testing.
+ *
+ * Prioridad:
+ *   1. VITE_TELEMETRY_INGEST_URL explícito (override).
+ *   2. Default: endpoint /ingest del sidecar (`${VITE_SIDECAR_URL||'/api'}/ingest`).
  *
  * @returns {string}
  */
 export function getTelemetryIngestUrl() {
-  return import.meta.env.VITE_TELEMETRY_INGEST_URL || '';
+  const explicit = import.meta.env?.VITE_TELEMETRY_INGEST_URL;
+  if (typeof explicit === 'string' && explicit.trim()) {
+    return explicit.trim();
+  }
+  return `${getSidecarBaseUrl()}/ingest`;
 }
 
 /**
@@ -162,10 +200,12 @@ export async function syncAgentTelemetry() {
     }
 
     // 6. POST al endpoint
+    const token = getToken();
     const response = await fetch(telemetryUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(token ? { 'X-Chagra-Token': token } : {}),
       },
       body: JSON.stringify(payload),
     });

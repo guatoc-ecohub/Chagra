@@ -251,6 +251,29 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
     expect(payload[1].model).toBe('gpt-4o');
   });
 
+  it('default al sidecar /ingest + envía X-Chagra-Token (Tarea #8)', async () => {
+    vi.unstubAllEnvs();
+    // Sin VITE_TELEMETRY_INGEST_URL: cae al sidecar. Token presente.
+    vi.stubEnv('VITE_TELEMETRY_INGEST_URL', '');
+    vi.stubEnv('VITE_SIDECAR_URL', 'https://chagra.example.co/api');
+    vi.stubEnv('VITE_CHAGRA_MCP_TOKEN', 'tok-123');
+    const { syncAgentTelemetry } = await import('../agentTelemetrySync.js');
+
+    getTelemetryConsent.mockReturnValue(true);
+    setOnline(true);
+
+    const doneRequests = [{ id: 9, route: 'chat', model: 'granite3.3:8b', status: 'done', synced: false }];
+    listRequests.mockResolvedValue(doneRequests);
+    getRequest.mockImplementation(async (_id) => doneRequests.find((r) => r.id === _id) || null);
+
+    await syncAgentTelemetry();
+
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    const [url, opts] = global.fetch.mock.calls[0];
+    expect(url).toBe('https://chagra.example.co/api/ingest');
+    expect(opts.headers['X-Chagra-Token']).toBe('tok-123');
+  });
+
   it('ignora requests que no están done', async () => {
     vi.unstubAllEnvs();
     vi.stubEnv('VITE_TELEMETRY_INGEST_URL', 'https://telemetry.example.com/ingest');
@@ -415,15 +438,18 @@ describe('agentTelemetrySync — isTelemetrySyncEnabled', () => {
     expect(isTelemetrySyncEnabled()).toBe(false);
   });
 
-  it('devuelve false si VITE_TELEMETRY_INGEST_URL vacío', async () => {
+  it('default al sidecar /ingest cuando VITE_TELEMETRY_INGEST_URL está vacío (Tarea #8)', async () => {
+    // Comportamiento nuevo: sin override explícito la URL cae al endpoint
+    // /ingest del sidecar, así que con consentimiento + online queda habilitado.
     vi.unstubAllEnvs();
     vi.stubEnv('VITE_TELEMETRY_INGEST_URL', '');
-    const { isTelemetrySyncEnabled } = await import('../agentTelemetrySync.js');
-    
+    const { isTelemetrySyncEnabled, getTelemetryIngestUrl } = await import('../agentTelemetrySync.js');
+
     getTelemetryConsent.mockReturnValue(true);
     setOnline(true);
 
-    expect(isTelemetrySyncEnabled()).toBe(false);
+    expect(getTelemetryIngestUrl()).toMatch(/\/ingest$/);
+    expect(isTelemetrySyncEnabled()).toBe(true);
   });
 
   it('devuelve true si todo está habilitado', async () => {
