@@ -71,7 +71,7 @@ export function diagnosticarSuelo(descripcion) {
     // Match más flexible: cada palabra significativa del nombre del bio
     // debe aparecer en el texto (ignoramos conectores /, (), etc.)
     const palabrasBio = nombreNorm
-      .replace(/[\/\(\)\[\],.]/g, ' ')
+      .replace(/[/()[\],.]/g, ' ')
       .split(/\s+/)
       .filter((p) => p.length > 3);
     const matchBio = palabrasBio.some((p) => texto.includes(p));
