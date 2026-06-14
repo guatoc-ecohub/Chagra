@@ -176,3 +176,63 @@ describe('SW offline-first precache (regresión 2026-06-13)', () => {
     expect(res.status).toBe(504);
   });
 });
+
+// Regresión bug prod 2026-06-14: `/catalog.sqlite` (~1.2 MB) caía en la rama
+// Stale-While-Revalidate del shell → re-descarga de 1.2 MB en CADA carga
+// (server con `cache-control: no-store`) y el fetch en vuelo se abortaba en el
+// reload del SW nuevo → console.error "Failed to fetch". Ahora se sirve
+// CACHE-FIRST (sin tocar la red si ya está cacheado).
+describe('SW catalog.sqlite cache-first (regresión 2026-06-14)', () => {
+  it('install precachea /catalog.sqlite (sigue en ASSETS_TO_CACHE)', async () => {
+    const { listeners, fakeCaches } = loadSW({ online: true, indexHtml: SAMPLE_INDEX });
+    const { waited } = fireEvent(listeners.install, {});
+    await waited;
+    const names = await fakeCaches.keys();
+    const cache = await fakeCaches.open(names[0]);
+    const keys = (await cache.keys()).map((r) => new URL(r.url).pathname);
+    expect(keys).toContain('/catalog.sqlite');
+  });
+
+  it('/catalog.sqlite se sirve CACHE-FIRST (desde cache, sin red) cuando ya está cacheado', async () => {
+    const { listeners, fetchImpl } = loadSW({ online: true, indexHtml: SAMPLE_INDEX });
+    await fireEvent(listeners.install, {}).waited;
+
+    fetchImpl.mockClear();
+    const req = { url: 'https://chagra.guatoc.co/catalog.sqlite', method: 'GET' };
+    const { responded } = fireEvent(listeners.fetch, req);
+    const res = await responded;
+    expect(res).toBeTruthy();
+    expect(res.ok).toBe(true);
+    // NO debió ir a la red: el blob estaba en cache → cero re-descarga de 1.2 MB.
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
+  it('/catalog.sqlite cache-miss → fetch + put (se cachea para la próxima vez)', async () => {
+    // SW sin install previo (cache vacío): primer hit debe ir a la red Y cachear.
+    const { listeners, fetchImpl, fakeCaches } = loadSW({ online: true, indexHtml: SAMPLE_INDEX });
+    const req = { url: 'https://chagra.guatoc.co/catalog.sqlite', method: 'GET' };
+    const { responded } = fireEvent(listeners.fetch, req);
+    const res = await responded;
+    expect(res).toBeTruthy();
+    expect(res.ok).toBe(true);
+    // Fue a la red esta vez (cache-miss).
+    expect(fetchImpl).toHaveBeenCalled();
+    // Y quedó cacheado: un segundo hit no toca la red.
+    fetchImpl.mockClear();
+    const { responded: responded2 } = fireEvent(listeners.fetch, req);
+    await responded2;
+    expect(fetchImpl).not.toHaveBeenCalled();
+    // Está en algún bucket.
+    const hit = await fakeCaches.match(req);
+    expect(hit).toBeTruthy();
+  });
+
+  it('offline + /catalog.sqlite NO cacheado → 504 explícito (no rompe el home)', async () => {
+    const { listeners } = loadSW({ online: false, indexHtml: SAMPLE_INDEX });
+    const req = { url: 'https://chagra.guatoc.co/catalog.sqlite', method: 'GET' };
+    const { responded } = fireEvent(listeners.fetch, req);
+    const res = await responded;
+    expect(res).toBeTruthy();
+    expect(res.status).toBe(504);
+  });
+});
