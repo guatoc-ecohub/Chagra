@@ -12,6 +12,7 @@ import { isAuthenticated, logoutUser } from './services/authService';
 import useAssetStore from './store/useAssetStore';
 import { fetchFromFarmOS } from './services/apiService';
 import { PRIMARY_WORKER_NAME } from './config/workerConfig';
+import { tieneAccesoGlaciarActual } from './config/glaciarAccess';
 import { initCatalog } from './db/catalogDB';
 import NetworkStatusBar from './components/NetworkStatusBar';
 import PendingTasksWidget from './components/PendingTasksWidget';
@@ -506,7 +507,15 @@ export default function App() {
         navigate('login');
         return;
       }
-      navigate(HASH_VIEW_ROUTES[hash] || 'dashboard');
+      const targetView = HASH_VIEW_ROUTES[hash] || 'dashboard';
+      // Gate de acceso: el módulo glaciar es solo para los beta testers de "La
+      // Cordada". Si un usuario fuera de la whitelist aterriza en #glaciar,
+      // mandamos al dashboard — el módulo NO se monta (ver glaciarAccess.js).
+      if (targetView === 'glaciar' && !tieneAccesoGlaciarActual()) {
+        navigate('dashboard');
+        return;
+      }
+      navigate(targetView);
     });
   }, [navigate]);
 
@@ -516,7 +525,14 @@ export default function App() {
       const routeView = HASH_VIEW_ROUTES[hash];
       if (!routeView) return;
       isAuthenticated().then((isAuth) => {
-        if (isAuth) navigate(routeView);
+        if (!isAuth) return;
+        // Gate glaciar (La Cordada): un usuario no autorizado que navega a
+        // #glaciar es redirigido al dashboard en vez de montar el módulo.
+        if (routeView === 'glaciar' && !tieneAccesoGlaciarActual()) {
+          navigate('dashboard');
+          return;
+        }
+        navigate(routeView);
       });
     };
 
@@ -881,7 +897,19 @@ export default function App() {
           </ErrorBoundary>
         );
       case 'glaciar':
-        // Módulo demo: Reporte de Punto Glaciar (guías de glaciar). Ruta #glaciar.
+        // Módulo "Reporte de Punto Glaciar" (guías de glaciar). Ruta #glaciar.
+        // ACCESO RESTRINGIDO a los beta testers de "La Cordada"
+        // (src/config/glaciarAccess.js). Guarda defensiva: si por cualquier
+        // ruta un usuario no autorizado llega a esta vista, NO montamos el
+        // módulo — devolvemos el fallback estándar. Las navegaciones a #glaciar
+        // ya redirigen al dashboard antes de llegar acá (ver effects de ruta).
+        if (!tieneAccesoGlaciarActual()) {
+          return (
+            <ErrorBoundary>
+              <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>
+            </ErrorBoundary>
+          );
+        }
         return (
           <ErrorBoundary>
             <GlaciarReporteScreen onBack={() => navigate('dashboard')} />

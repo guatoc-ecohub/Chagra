@@ -21,6 +21,7 @@ import { GripVertical, Snowflake, ChevronRight } from 'lucide-react';
 import AgentHero from './AgentHero';
 import OnboardingHero from '../OnboardingHero';
 import { getProfile } from '../../services/userProfileService';
+import { tieneAccesoGlaciarActual } from '../../config/glaciarAccess';
 import SelectedBackgroundReveal from './SelectedBackgroundReveal';
 import ClimaStrip from './ClimaStrip';
 import HoyEnFincaStrip from './HoyEnFincaStrip';
@@ -237,27 +238,32 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
                 bajo el hero, visible en todos los temas (operador 2026-06-09). */}
             <SelectedBackgroundReveal />
 
-            {/* Acceso al módulo demo "Reporte de Punto Glaciar" (guías de
-                glaciar). Ruta #glaciar. Banner visible para validación en
-                campo — offline-first. */}
-            <div className="px-4 pt-3">
-                <button
-                    type="button"
-                    onClick={() => onNavigate('glaciar')}
-                    className="w-full flex items-center gap-3 p-3.5 rounded-2xl border border-sky-700/50 bg-sky-900/25 hover:bg-sky-900/40 active:scale-[0.99] transition text-left"
-                >
-                    <span className="shrink-0 w-11 h-11 rounded-xl bg-sky-500/20 grid place-items-center">
-                        <Snowflake size={24} className="text-sky-300" />
-                    </span>
-                    <span className="flex-1 min-w-0">
-                        <span className="block font-bold text-slate-100 leading-tight">Reporte de Punto Glaciar</span>
-                        <span className="block text-xs text-slate-400 leading-tight">
-                            Dureza del hielo, GPS y foto — funciona sin internet
+            {/* Acceso al módulo "Reporte de Punto Glaciar" (guías de glaciar).
+                Ruta #glaciar. ACCESO RESTRINGIDO a los beta testers de "La
+                Cordada": el banner solo se renderiza si el usuario logueado
+                está en la whitelist (src/config/glaciarAccess.js). Para el resto
+                de usuarios el módulo es invisible. Offline-first (lee el usuario
+                ya guardado en login, sin red). */}
+            {tieneAccesoGlaciarActual() && (
+                <div className="px-4 pt-3">
+                    <button
+                        type="button"
+                        onClick={() => onNavigate('glaciar')}
+                        className="w-full flex items-center gap-3 p-3.5 rounded-2xl border border-sky-700/50 bg-sky-900/25 hover:bg-sky-900/40 active:scale-[0.99] transition text-left"
+                    >
+                        <span className="shrink-0 w-11 h-11 rounded-xl bg-sky-500/20 grid place-items-center">
+                            <Snowflake size={24} className="text-sky-300" />
                         </span>
-                    </span>
-                    <ChevronRight size={20} className="text-sky-300/70 shrink-0" />
-                </button>
-            </div>
+                        <span className="flex-1 min-w-0">
+                            <span className="block font-bold text-slate-100 leading-tight">Reporte de Punto Glaciar</span>
+                            <span className="block text-xs text-slate-400 leading-tight">
+                                Dureza del hielo, GPS y foto — funciona sin internet
+                            </span>
+                        </span>
+                        <ChevronRight size={20} className="text-sky-300/70 shrink-0" />
+                    </button>
+                </div>
+            )}
 
             {/* Panel inline de capacidades RETIRADO (operador 2026-06-10): el
                 menú vive solo en el despliegue de la Ⓐ del AgentHero (la red
