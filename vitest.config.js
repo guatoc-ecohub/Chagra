@@ -32,5 +32,18 @@ export default defineConfig({
     exclude: ['node_modules', 'dist', 'tests/*.spec.js'],
     css: false,
     testTimeout: 30000,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html', 'lcov'],
+      exclude: [
+        'node_modules/',
+        'dist/',
+        'tests/',
+        '**/*.test.{js,jsx}',
+        '**/*.spec.{js,jsx}',
+        '**/*.config.{js,ts}',
+        'scripts/',
+      ],
+    },
   },
 });
