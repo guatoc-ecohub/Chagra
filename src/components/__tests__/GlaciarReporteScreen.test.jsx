@@ -34,6 +34,20 @@ vi.mock('../../db/glaciarReportes', () => ({
   nuevoReporteId: () => 'glaciar-test',
 }));
 
+// U-3: el autosave del borrador vive en IndexedDB (store glaciar_draft), no en
+// sessionStorage (CodeQL clear-text del GPS). Mockeamos el módulo del borrador:
+// loadDraft puede sembrar un borrador (simula descarte de pestaña por iOS) y
+// saveDraft/clearDraft se espían.
+let draftToLoad = null; // lo que loadDraft() devuelve al montar
+const saveDraftMock = vi.fn(() => Promise.resolve(true));
+const loadDraftMock = vi.fn(() => Promise.resolve(draftToLoad));
+const clearDraftMock = vi.fn(() => Promise.resolve());
+vi.mock('../../db/glaciarDraft', () => ({
+  saveDraft: (...a) => saveDraftMock(...a),
+  loadDraft: (...a) => loadDraftMock(...a),
+  clearDraft: (...a) => clearDraftMock(...a),
+}));
+
 vi.mock('../../utils/imageProcessor', () => ({
   blobToDataUrl: vi.fn(() => Promise.resolve('data:image/jpeg;base64,AAA')),
 }));
@@ -47,12 +61,10 @@ vi.mock('../../utils/persistStorage', () => ({
 
 import GlaciarReporteScreen from '../GlaciarReporteScreen';
 
-const BORRADOR_KEY = 'chagra:glaciar:borrador';
-
 beforeEach(() => {
   mockPosition = null;
+  draftToLoad = null;
   vi.clearAllMocks();
-  sessionStorage.clear();
 });
 afterEach(() => cleanup());
 
@@ -201,32 +213,34 @@ describe('GlaciarReporteScreen — U-1 almacenamiento persistente', () => {
   });
 });
 
-describe('GlaciarReporteScreen — U-3 autosave del borrador', () => {
-  it('autosalva el form en sessionStorage al digitar (montaña/superficie)', async () => {
+describe('GlaciarReporteScreen — U-3 autosave del borrador (IndexedDB)', () => {
+  it('autosalva el form en IndexedDB al digitar (montaña/superficie)', async () => {
     render(<GlaciarReporteScreen onBack={() => {}} />);
     const selects = screen.getAllByRole('combobox');
     fireEvent.change(selects[0], { target: { value: 'ruiz' } });
     clickSuperficie('Hielo de glaciar (azul)');
 
+    // saveDraft está antirebotado: waitFor espera a que se dispare con el último
+    // estado del form (montaña + superficie ya aplicadas).
     await waitFor(() => {
-      const raw = sessionStorage.getItem(BORRADOR_KEY);
-      expect(raw).toBeTruthy();
-      const parsed = JSON.parse(raw);
-      expect(parsed.form.montana).toBe('ruiz');
-      expect(parsed.form.tipoSuperficie).toBe('hielo_glaciar_azul');
+      expect(saveDraftMock).toHaveBeenCalled();
+      const lastForm = saveDraftMock.mock.calls.at(-1)[0];
+      expect(lastForm.montana).toBe('ruiz');
+      expect(lastForm.tipoSuperficie).toBe('hielo_glaciar_azul');
     });
   });
 
-  it('restaura el borrador al re-montar (simula descarte de pestaña por iOS)', async () => {
-    // Sembramos un borrador como si la pestaña se hubiera descartado.
-    sessionStorage.setItem(BORRADOR_KEY, JSON.stringify({
+  it('restaura el borrador al montar (simula descarte de pestaña por iOS)', async () => {
+    // Sembramos un borrador como si la pestaña se hubiera descartado: loadDraft()
+    // lo devuelve al montar (restore async desde IndexedDB).
+    draftToLoad = {
       form: { montana: 'tolima', dureza: 'H2', puntoId: 'FRENTE-X' },
       coords: { lat: 4.81, lng: -75.33, altitud: 4850, precision: 8 },
-    }));
+    };
 
     render(<GlaciarReporteScreen onBack={() => {}} />);
 
-    // La montaña restaurada debe estar seleccionada.
+    // La montaña restaurada debe quedar seleccionada (tras el load async).
     await waitFor(() => {
       const selects = screen.getAllByRole('combobox');
       expect(selects[0].value).toBe('tolima');
@@ -237,7 +251,7 @@ describe('GlaciarReporteScreen — U-3 autosave del borrador', () => {
     expect(screen.getByText(/Ubicación capturada/i)).toBeTruthy();
   });
 
-  it('limpia el borrador al guardar el reporte con éxito', async () => {
+  it('limpia el borrador (clearDraft) al guardar el reporte con éxito', async () => {
     render(<GlaciarReporteScreen onBack={() => {}} />);
     const selects = screen.getAllByRole('combobox');
     fireEvent.change(selects[0], { target: { value: 'ruiz' } });
@@ -251,21 +265,21 @@ describe('GlaciarReporteScreen — U-3 autosave del borrador', () => {
     fireEvent.click(screen.getByRole('button', { name: /Guardar reporte/i }));
     await waitFor(() => expect(saveMock).toHaveBeenCalled());
 
-    // Tras guardar, el borrador del reporte ya guardado NO debe contener su
-    // diagnóstico (se limpió). Puede re-persistirse el form vacío con la montaña
-    // que se conserva para la jornada, pero la superficie/dureza guardadas ya no.
-    await waitFor(() => {
-      const raw = sessionStorage.getItem(BORRADOR_KEY);
-      const parsed = raw ? JSON.parse(raw) : { form: {} };
-      expect(parsed.form.tipoSuperficie || null).toBeNull();
-      expect(parsed.form.dureza || null).toBeNull();
-    });
+    // El reporte ya quedó en glaciar_reportes → el borrador en curso se borra.
+    await waitFor(() => expect(clearDraftMock).toHaveBeenCalled());
   });
 
-  it('no rompe si el borrador en sessionStorage está corrupto', () => {
-    sessionStorage.setItem(BORRADOR_KEY, '{no es json valido');
+  it('no rompe si el borrador en IndexedDB no se puede leer (loadDraft falla)', async () => {
+    // loadDraft tolera la corrupción devolviendo null; aun si rechazara, el
+    // reporte nuevo debe abrirse igual (la pantalla no depende del borrador).
+    loadDraftMock.mockRejectedValueOnce(new Error('IDB ilegible'));
     expect(() => render(<GlaciarReporteScreen onBack={() => {}} />)).not.toThrow();
     expect(screen.getByText('Punto Glaciar')).toBeTruthy();
+    // El form arranca vacío (sin montaña seleccionada).
+    await waitFor(() => {
+      const selects = screen.getAllByRole('combobox');
+      expect(selects[0].value).toBe('');
+    });
   });
 });
 

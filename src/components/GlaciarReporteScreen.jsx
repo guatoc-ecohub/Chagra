@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ChevronLeft, MapPin, Loader2, AlertCircle, Mountain, Thermometer,
   Save, ListChecks, Trash2, CheckCircle2, Snowflake, Compass, Layers,
@@ -8,6 +8,7 @@ import { useGeolocation } from '../hooks/useGeolocation';
 import PhotoCaptureField from './PhotoCaptureField';
 import { blobToDataUrl } from '../utils/imageProcessor';
 import { glaciarReportes, nuevoReporteId } from '../db/glaciarReportes';
+import { saveDraft, loadDraft, clearDraft } from '../db/glaciarDraft';
 import { evaluarSeguridadGlaciar } from '../services/glaciarSafety';
 import { requestPersistentStorage } from '../utils/persistStorage';
 import {
@@ -51,47 +52,16 @@ function nuevaCapa() {
   return { profundidad: '', tipoSuperficie: '', dureza: '' };
 }
 
-/**
- * U-3: clave de autosave del borrador en sessionStorage. Si iOS descarta la
- * pestaña al abrir la cámara, el estado capturado (montaña/GPS/dureza/peligros)
- * se restaura al volver. sessionStorage sobrevive al discard de la pestaña
- * dentro de la misma sesión y se limpia solo al cerrar el navegador.
- */
-const BORRADOR_KEY = 'chagra:glaciar:borrador';
+// U-3: el autosave del borrador vive en IndexedDB (store glaciar_draft), NO en
+// sessionStorage. Razón: el borrador incluye coordenadas GPS (lat/lng) y CodeQL
+// marcaba sessionStorage como clear-text storage de datos sensibles (HIGH). En
+// IndexedDB no dispara esa regla y además sobrevive al descarte de la pestaña
+// por iOS al abrir la cámara y al cierre del navegador → mejor recuperación.
+// El acceso al store está en db/glaciarDraft (saveDraft/loadDraft/clearDraft).
 
-/** Lee el borrador guardado (form + coords). Null si no hay o está corrupto. */
-function leerBorrador() {
-  try {
-    if (typeof sessionStorage === 'undefined') return null;
-    const raw = sessionStorage.getItem(BORRADOR_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== 'object' || !parsed.form) return null;
-    return parsed;
-  } catch {
-    return null;
-  }
-}
-
-/** Persiste el borrador (form + coords). Tolerante a fallos (cuota/Safari priv). */
-function guardarBorrador(form, coords) {
-  try {
-    if (typeof sessionStorage === 'undefined') return;
-    sessionStorage.setItem(BORRADOR_KEY, JSON.stringify({ form, coords }));
-  } catch {
-    // Cuota llena o modo privado: el autosave es best-effort, no rompemos nada.
-  }
-}
-
-/** Limpia el borrador (al guardar el reporte con éxito). */
-function limpiarBorrador() {
-  try {
-    if (typeof sessionStorage === 'undefined') return;
-    sessionStorage.removeItem(BORRADOR_KEY);
-  } catch {
-    // Ignorar: no es crítico.
-  }
-}
+// Antirebote del autosave a IndexedDB: agrupa ráfagas de tecleo en una sola
+// escritura para no abrir una transacción por pulsación.
+const DRAFT_AUTOSAVE_DEBOUNCE_MS = 400;
 
 function emptyForm() {
   return {
@@ -126,13 +96,18 @@ function emptyForm() {
 
 export default function GlaciarReporteScreen({ onBack }) {
   const [tab, setTab] = useState('nuevo'); // 'nuevo' | 'lista'
-  // U-3: restaurar el borrador autosalvado (si la pestaña fue descartada por
-  // iOS al abrir la cámara). emptyForm() de respaldo si no hay borrador.
-  const [form, setForm] = useState(() => {
-    const b = leerBorrador();
-    return b?.form ? { ...emptyForm(), ...b.form } : emptyForm();
-  });
-  const [coords, setCoords] = useState(() => leerBorrador()?.coords ?? null); // {lat,lng,altitud,precision}
+  // U-3: el borrador autosalvado se restaura desde IndexedDB en un efecto al
+  // montar (loadDraft es async). Arrancamos en vacío y, si hay borrador, lo
+  // hidratamos. El flag `hydrated` (abajo) evita que el autosave pise el
+  // borrador guardado con el form vacío del primer render (la carga async aún
+  // no llegó).
+  const [form, setForm] = useState(emptyForm);
+  const [coords, setCoords] = useState(null); // {lat,lng,altitud,precision}
+  // `hydrated` pasa a true cuando termina el restore del borrador (loadDraft).
+  // Es estado (no ref) a propósito: al volverse true re-dispara el efecto de
+  // autosave para que persista el estado vigente justo después de hidratar.
+  const [hydrated, setHydrated] = useState(false);
+  const autosaveTimerRef = useRef(null);
   const [fotoBlob, setFotoBlob] = useState(null);
   const [saving, setSaving] = useState(false);
   const [savedOk, setSavedOk] = useState(false);
@@ -150,14 +125,47 @@ export default function GlaciarReporteScreen({ onBack }) {
     requestPersistentStorage();
   }, []);
 
-  // U-3: autosave del borrador en sessionStorage en cada cambio del form o de
-  // las coords. Si iOS descarta la pestaña al abrir la cámara, lo capturado
-  // (montaña/GPS/dureza/peligros) se restaura al volver (ver initial state).
-  // La foto (Blob) NO se serializa — se re-captura; lo que el guía digitó sí
-  // sobrevive. Se limpia al guardar el reporte con éxito (limpiarBorrador()).
+  // U-3: restaurar el borrador autosalvado desde IndexedDB al montar. Si iOS
+  // descartó la pestaña al abrir la cámara (o se cerró el navegador), lo
+  // capturado (montaña/GPS/dureza/peligros) se restaura. La foto (Blob) no se
+  // guarda — se re-captura; lo digitado sí sobrevive. Marcamos `hydrated` al
+  // terminar para habilitar el autosave sin pisar el borrador con el form vacío.
   useEffect(() => {
-    guardarBorrador(form, coords);
-  }, [form, coords]);
+    let cancelled = false;
+    (async () => {
+      let draft = null;
+      try {
+        draft = await loadDraft();
+      } catch {
+        // loadDraft ya es tolerante (devuelve null), pero por si acaso: un
+        // borrador ilegible nunca debe impedir abrir un reporte nuevo.
+        draft = null;
+      }
+      if (cancelled) return;
+      if (draft?.form) {
+        setForm((prev) => ({ ...prev, ...draft.form }));
+        if (draft.coords) setCoords(draft.coords);
+      }
+      setHydrated(true);
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // U-3: autosave del borrador en IndexedDB (store glaciar_draft) en cada cambio
+  // del form o de las coords, con antirebote para agrupar el tecleo. Fire-and-
+  // forget y tolerante a fallos (saveDraft nunca lanza). No corre hasta hidratar
+  // para no sobrescribir el borrador restaurado con el form vacío inicial. Se
+  // limpia al guardar el reporte con éxito (clearDraft()).
+  useEffect(() => {
+    if (!hydrated) return undefined;
+    if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+    autosaveTimerRef.current = setTimeout(() => {
+      saveDraft(form, coords);
+    }, DRAFT_AUTOSAVE_DEBOUNCE_MS);
+    return () => {
+      if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+    };
+  }, [form, coords, hydrated]);
 
   // Capturar coords cuando llega la posición del GPS.
   useEffect(() => {
@@ -313,7 +321,7 @@ export default function GlaciarReporteScreen({ onBack }) {
       setSavedOk(true);
       // U-3: el reporte quedó persistido en IndexedDB → el borrador ya no hace
       // falta. Lo limpiamos para no restaurar datos ya guardados al volver.
-      limpiarBorrador();
+      clearDraft();
       // Conservamos guía + montaña + puntoId (suelen repetirse en la jornada y
       // el mismo punto se vuelve a medir).
       const { guia, montana, montanaLibre, puntoId } = form;
