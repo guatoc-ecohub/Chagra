@@ -82,7 +82,11 @@ const TopBar = lazy(() => import('./components/TopBar'));
 const DashboardLive = lazy(() => import('./components/dashboard/DashboardLive'));
 const HoyEnFincaScreen = lazy(() => import('./components/hoy/HoyEnFincaScreen'));
 const MiFincaEvolucionScreen = lazy(() => import('./components/hoy/MiFincaEvolucionScreen'));
+// Modo extensionista (panel supervisor multi-finca, ADR-048 MVP). Gateado por
+// feature flag VITE_FEATURE_EXTENSIONISTA + rol (ver config/extensionistaAccess).
+const ExtensionistaScreen = lazy(() => import('./components/ExtensionistaScreen'));
 import HomeRegionalGreeting from './components/HomeRegionalGreeting';
+import { esExtensionistaActual } from './config/extensionistaAccess';
 
 localforage.config({
   name: 'Chagra',
@@ -140,6 +144,7 @@ const HASH_VIEW_ROUTES = {
   informes: 'informes',
   'case-studies': 'casos',
   casos: 'casos',
+  extensionista: 'extensionista',
   tareas: 'task_log',
   task_log: 'task_log',
   hoy: 'hoy_finca',
@@ -517,6 +522,12 @@ export default function App() {
         navigate('dashboard');
         return;
       }
+      // Gate del modo extensionista (ADR-048): si un usuario sin rol aterriza
+      // en #extensionista (flag off o fuera de whitelist), va al dashboard.
+      if (targetView === 'extensionista' && !esExtensionistaActual()) {
+        navigate('dashboard');
+        return;
+      }
       navigate(targetView);
     });
   }, [navigate]);
@@ -526,6 +537,11 @@ export default function App() {
       const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
       const routeView = HASH_VIEW_ROUTES[hash];
       if (!routeView) return;
+      // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
+      if (routeView === 'extensionista' && !esExtensionistaActual()) {
+        navigate('dashboard');
+        return;
+      }
       isAuthenticated().then((isAuth) => {
         if (!isAuth) return;
         // Gate glaciar (La Cordada): un usuario no autorizado que navega a
@@ -955,6 +971,23 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ProfileScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+          </ErrorBoundary>
+        );
+      case 'extensionista':
+        // Panel SUPERVISOR del modo extensionista (ADR-048 MVP). ACCESO por
+        // feature flag VITE_FEATURE_EXTENSIONISTA + rol (config/extensionistaAccess).
+        // Las rutas a #extensionista ya redirigen al dashboard antes de llegar
+        // acá si el usuario no tiene rol; guarda defensiva por si se monta directo.
+        if (!esExtensionistaActual()) {
+          return (
+            <ErrorBoundary>
+              <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>
+            </ErrorBoundary>
+          );
+        }
+        return (
+          <ErrorBoundary>
+            <ExtensionistaScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
           </ErrorBoundary>
         );
       case 'casos':
