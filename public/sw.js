@@ -240,6 +240,46 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Catálogo de especies (`/catalog.sqlite`, ~1.2 MB): CACHE-FIRST en CACHE_NAME.
+  //
+  // ANTES caía en la rama Stale-While-Revalidate del shell estático (más abajo,
+  // `ASSETS_TO_CACHE.some(...)`): servía el blob cacheado PERO disparaba un
+  // `fetch` en background en CADA carga → re-descarga de 1.2 MB por load
+  // (el server lo sirve con `cache-control: no-store` → cf-cache-status DYNAMIC,
+  // sin HTTP cache). Ese fetch de 1.2 MB en vuelo es además el que se ABORTA
+  // (net::ERR_ABORTED → "Failed to fetch") cuando un SW nuevo hace clients.claim()
+  // y el cliente recarga vía controllerchange durante el arranque.
+  //
+  // Cache-first lo arregla de raíz: se sirve desde caché sin tocar la red (el
+  // header `no-store` del server es irrelevante para la estrategia del SW), así
+  // que se re-baja UNA sola vez por deploy (cache-miss tras el bump de
+  // CACHE_NAME) y luego es instantáneo y offline. El blob ya se precachea en
+  // install (ASSETS_TO_CACHE); si ese precache falló (404 transitorio / offline),
+  // el primer cache-miss lo rellena en background. Versionado por CACHE_NAME:
+  // un deploy bumpea el SHA y `activate` borra el bucket viejo, forzando la
+  // re-descarga del catálogo fresco una vez.
+  if (url.pathname === '/catalog.sqlite' && event.request.method === 'GET') {
+    event.respondWith(
+      caches.open(CACHE_NAME).then((cache) =>
+        cache.match(event.request).then((cached) => {
+          if (cached) return cached;
+          return fetch(event.request)
+            .then((response) => {
+              if (response && response.ok && response.status === 200) {
+                cache.put(event.request, response.clone());
+              }
+              return response;
+            })
+            // Offline y sin cache: 504 explícito. corpusLoader.loadCatalogBuffer
+            // degrada con gracia (el preload en App.jsx loguea warn y los
+            // componentes reintentan al usar el catálogo).
+            .catch(() => new Response('', { status: 504, statusText: 'Offline: catálogo no cacheado' }));
+        })
+      )
+    );
+    return;
+  }
+
   // Tiles de mapa (OSM/OpenTopoMap): CACHE-FIRST cache-on-use en MAP_TILES_CACHE.
   // No se precachean (son ilimitados); se guardan SOLO los tiles que el usuario
   // ya cargó online, para que el mapa funcione offline en zonas ya visitadas.
@@ -303,6 +343,9 @@ self.addEventListener('fetch', (event) => {
 
   // Resto del static shell NO-HTML (manifest, iconos): Stale-While-Revalidate
   // (no referencian hashes de bundle, así que un cache viejo no rompe nada).
+  // `/` e `/index.html` ya se sirvieron arriba (Network-First) y
+  // `/catalog.sqlite` arriba (Cache-First), así que aquí solo caen los assets
+  // ligeros del shell para los que revalidar en background es barato.
   if (ASSETS_TO_CACHE.some(path => url.pathname === path)) {
     event.respondWith(
       caches.match(event.request).then(cachedResponse => {

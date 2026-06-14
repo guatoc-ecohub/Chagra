@@ -1,5 +1,5 @@
 import sqlite3InitModule from '@sqlite.org/sqlite-wasm';
-import { loadCatalogBuffer, assertCatalogShape } from '../services/corpusLoader';
+import { loadCatalogBuffer, assertCatalogShape, isAbortLikeFetchError } from '../services/corpusLoader';
 
 let dbInstance = null;
 let initPromise = null;
@@ -69,7 +69,17 @@ export async function initCatalog() {
         // /catalog.sqlite 404 transitorio, OPFS bloqueado) dejaba el catálogo
         // permanentemente broken hasta refresh manual.
         initPromise = null;
-        console.error('[SQLite WASM] Failed to initialize catalog db:', error);
+        // Abort por unload/reload (bug prod 2026-06-14): el fetch del catálogo
+        // se aborta cuando un SW nuevo recarga el cliente durante el arranque.
+        // NO es bloqueante (el home usa fallback de stats y los componentes
+        // reintentan al usar el catálogo) y NO debe gritar console.error: es
+        // ruido esperado en cada deploy. Degradamos a debug; loadCatalogBuffer
+        // ya reintentó una vez antes de llegar acá.
+        if (isAbortLikeFetchError(error)) {
+            console.debug('[SQLite WASM] init del catálogo abortado (probable reload por SW nuevo); se reintentará on-demand.');
+        } else {
+            console.error('[SQLite WASM] Failed to initialize catalog db:', error);
+        }
         throw error;
     });
 
