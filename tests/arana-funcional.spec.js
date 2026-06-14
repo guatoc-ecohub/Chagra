@@ -57,8 +57,21 @@ async function mockOAuth(page) {
   );
 }
 
-/** Autentica vía authService (OAuth mockeado) y monta el dashboard real. */
-async function bootToDashboard(page, { seedLands = false } = {}) {
+/**
+ * Autentica vía authService (OAuth mockeado) y monta el dashboard real.
+ *
+ * `seedOnboarded` (default true): deja el perfil como un usuario YA ONBOARDEADO
+ * (piso térmico capturado y confirmado). IMPORTA porque estos specs prueban el
+ * RUTEO DEL MENÚ AGENTE (la araña), no el onboarding. DashboardLive monta el
+ * OnboardingHero del "piso térmico primero" cuando `plantsCount === 0` y el piso
+ * no está confirmado; ese hero compite por el espacio con el AgentHero/araña y
+ * ensuciaría las pruebas del menú con estado que no les corresponde. Sembrando
+ * `finca_altitud` + `piso_confirmado === '1'`, `needsPisoCapture` queda en false
+ * y el menú se prueba en su estado real de uso (sin el banner de onboarding).
+ * La feature de onboarding para usuarios nuevos sigue intacta y se cubre en sus
+ * propios specs (OnboardingHero.piso.test.jsx, OnboardingProfile.piso.test.jsx).
+ */
+async function bootToDashboard(page, { seedLands = false, seedOnboarded = true } = {}) {
   await page.goto('/');
   await page.waitForLoadState('domcontentloaded');
 
@@ -67,6 +80,18 @@ async function bootToDashboard(page, { seedLands = false } = {}) {
     const r = await auth.authenticateUser('e2e-arana', 'e2e-pwd');
     if (!r.success) throw new Error('OAuth mock no respondió OK: ' + r.error);
   });
+
+  // Perfil onboardeado: piso térmico capturado + confirmado → DashboardLive NO
+  // monta el OnboardingHero, así el menú araña se prueba sin interferencias.
+  await page.evaluate(async (withOnboarding) => {
+    if (!withOnboarding) return;
+    const profileMod = await import('/src/services/userProfileService.js');
+    profileMod.saveProfile({
+      finca_altitud: '1730',
+      altitud_source: 'manual',
+      piso_confirmado: '1',
+    });
+  }, seedOnboarded);
 
   // Sembrar (o NO) zonas/lotes en el cache de assets ANTES de hidratar el store.
   await page.evaluate(async (withLand) => {

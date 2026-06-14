@@ -15,6 +15,7 @@ import Sparkline from './common/Sparkline';
 import AIStreamPanel from './common/AIStreamPanel';
 import VoiceConfirmation from './VoiceConfirmation';
 import ChagraGrowLoader from './ChagraGrowLoader';
+import ContextTip from './ContextTip';
 import { logVoiceEvent } from '../services/voiceTelemetry';
 import { recordEvent } from '../services/voiceTelemetryService';
 
@@ -526,6 +527,17 @@ export default function VoiceCapture({ onSave }) {
 
       {view === STATE_IDLE && (
         <div className="flex flex-col items-center gap-4 py-8">
+          {/* Tip de primera vez (feat/onboarding-ayuda): reusa el paso 2-3
+              del Manual (HelpVozScreen) pero en el momento de uso. */}
+          <ContextTip
+            id="voz-hablar-natural"
+            emoji="🎤"
+            title="Hable natural, como a un amigo"
+            className="w-full max-w-md"
+          >
+            No tiene que hablar como robot. Chagra entiende y le muestra lo
+            que oyó para que confirme o corrija antes de guardar.
+          </ContextTip>
           <p className="text-sm text-slate-400 text-center max-w-xs">
             Describe en voz alta lo que registraste, por ejemplo:
             <br />

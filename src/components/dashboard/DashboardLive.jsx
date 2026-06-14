@@ -19,6 +19,8 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import AgentHero from './AgentHero';
+import OnboardingHero from '../OnboardingHero';
+import { getProfile } from '../../services/userProfileService';
 import SelectedBackgroundReveal from './SelectedBackgroundReveal';
 import ClimaStrip from './ClimaStrip';
 import HoyEnFincaStrip from './HoyEnFincaStrip';
@@ -159,6 +161,20 @@ function SortableSection({ id, onNavigate, sensors }) {
 export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
     const [order, setOrder] = useState(readOrder);
     const iotAlerts = useAssetStore((s) => s.iotAlerts) || [];
+    // Primer uso (feat/onboarding-ayuda): sin plantas registradas se re-monta
+    // el OnboardingHero existente (quedó huérfano del DashboardView legacy al
+    // pasar a DashboardLive 2026-05-28). Trae el Paso 1 "piso térmico" —
+    // filtro maestro de todos los módulos — + las 3 rutas de registro.
+    // Si falta capturar/confirmar el piso, el Paso 1 se muestra como banner
+    // compacto flotando SOBRE el AgentHero (overlay, no empuja el hero — ver
+    // el bloque de render); ya confirmado, las 3 rutas bajan al flujo normal.
+    const plantsCount = useAssetStore((s) => s.plants.length);
+    const [needsPisoCapture] = useState(() => {
+        const p = getProfile();
+        const alt = Number(p.finca_altitud);
+        const hasAltitud = p.finca_altitud !== '' && p.finca_altitud != null && Number.isFinite(alt);
+        return !hasAltitud || p.piso_confirmado !== '1';
+    });
 
     // Persist scroll position al volver de detalle (mismo bug que App.jsx
     // resolvió para Dashboard clásico). Quick-win UX 2026-05-28 demo Diana.
@@ -187,13 +203,34 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
 
     return (
         <div
-            className="flex flex-col w-full h-full overflow-y-auto pb-24"
+            className="relative flex flex-col w-full h-full overflow-y-auto pb-24"
             data-scroll-key="dashboard-live"
         >
             {/* Agente: PORTADA INMERSIVA a pantalla completa (≈100dvh).
                 Protagonista absoluto, primera pantalla. El resto del dashboard
                 (saludo regional + secciones) queda DEBAJO del fold y se llega
                 scrolleando. */}
+            {/* Primer uso sin piso confirmado: BANNER compacto del Paso 1
+                (piso térmico) flotando SOBRE la zona decorativa superior del
+                AgentHero, justo bajo el TopBar flotante. Es un OVERLAY (absolute)
+                a propósito (regresión 2026-06-13): montarlo en el flujo flex
+                EMPUJABA el AgentHero ≈100dvh hacia arriba y, al abrir la araña, su
+                fila superior de nodos quedaba TAPADA por el TopBar flotante (los
+                clics aterrizaban en el TopBar). Como overlay no desplaza al hero:
+                la araña conserva su geometría y sigue alcanzable. Las 3 rutas de
+                registro viven en el hero completo bajo el fold, una vez
+                confirmado el piso. */}
+            {plantsCount === 0 && needsPisoCapture && (
+                <div
+                    className="absolute inset-x-0 top-[64px] z-20 px-4 pointer-events-none"
+                    data-testid="dashboard-onboarding-top"
+                >
+                    <div className="pointer-events-auto">
+                        <OnboardingHero onNavigate={onNavigate} compact />
+                    </div>
+                </div>
+            )}
+
             <AgentHero onNavigate={onNavigate} />
 
             {/* Paisaje elegido — la foto de biodiversidad seleccionada, JUSTO
@@ -207,6 +244,14 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
             {/* Saludo regional dismissible — bajo el fold, ya no sobre el hero
                 (que tiene su propio saludo "Soy Chagra"). */}
             {regionalGreeting}
+
+            {/* Primer uso con piso ya confirmado: las 3 rutas de registro
+                bajo el fold. Desaparece al registrar la primera planta. */}
+            {plantsCount === 0 && !needsPisoCapture && (
+                <div className="px-4 pt-3">
+                    <OnboardingHero onNavigate={onNavigate} />
+                </div>
+            )}
 
             {/* Secciones drag-reorder */}
             <div className="px-4 pt-3 pb-4">
