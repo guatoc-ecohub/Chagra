@@ -38,7 +38,7 @@
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 21;
+export const DB_VERSION = 22;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -80,6 +80,15 @@ export const STORES = {
   // persiste el índice YA construido (capa de cómputo) → arranque offline
   // instantáneo sin re-tokenizar. keyPath 'key' (un único registro 'corpus').
   RAG_CORPUS_CACHE: 'rag_corpus_cache',
+  // v22: glaciar_reportes — reportes OFFLINE de puntos glaciares capturados
+  // por guías de glaciar (módulo demo). Cada reporte guarda GPS (lat/lng/
+  // altitud/precisión), foto (dataURL para sobrevivir recargas), el formulario
+  // de diagnóstico de dureza del hielo + peligros y el estado de seguridad
+  // derivado. La idea es repetir el MISMO punto GPS en el tiempo →
+  // trazabilidad del cambio climático (repeat photography). keyPath 'id'
+  // (string ULID-like generado en cliente). Índices: createdAt (timeline),
+  // estado (filtrar por 🟢/🟡/🔴), guia (por persona).
+  GLACIAR_REPORTES: 'glaciar_reportes',
 };
 
 let dbInstance = null;
@@ -358,6 +367,19 @@ export const openDB = async () => {
       if (event.oldVersion < 21) {
         if (!db.objectStoreNames.contains(STORES.RAG_CORPUS_CACHE)) {
           db.createObjectStore(STORES.RAG_CORPUS_CACHE, { keyPath: 'key' });
+        }
+      }
+
+      // v22: glaciar_reportes — reportes offline de puntos glaciares (módulo
+      // demo para guías de glaciar). Offline-first: el reporte completo (GPS +
+      // foto dataURL + diagnóstico + estado de seguridad) se persiste local y
+      // sobrevive recargas sin red. keyPath 'id' (string generado en cliente).
+      if (event.oldVersion < 22) {
+        if (!db.objectStoreNames.contains(STORES.GLACIAR_REPORTES)) {
+          const store = db.createObjectStore(STORES.GLACIAR_REPORTES, { keyPath: 'id' });
+          store.createIndex('createdAt', 'createdAt', { unique: false });
+          store.createIndex('estado', 'estado', { unique: false });
+          store.createIndex('guia', 'guia', { unique: false });
         }
       }
     };

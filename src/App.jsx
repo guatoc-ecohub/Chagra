@@ -68,6 +68,7 @@ const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
 const ProcesosPorVozScreen = lazy(() => import('./components/ProcesosPorVozScreen'));
 const CicloCultivoScreen = lazy(() => import('./components/CicloCultivoScreen'));
 const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
+const GlaciarReporteScreen = lazy(() => import('./components/GlaciarReporteScreen'));
 const ProfileScreen = lazy(() => import('./components/ProfileScreen'));
 const CaseStudyScreen = lazy(() => import('./components/CaseStudyScreen'));
 const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
@@ -142,6 +143,7 @@ const HASH_VIEW_ROUTES = {
   hoy: 'hoy_finca',
   'hoy-en-finca': 'hoy_finca',
   evolucion: 'evolucion',
+  glaciar: 'glaciar',
 };
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
@@ -876,6 +878,13 @@ export default function App() {
         return (
           <ErrorBoundary>
             <SoilDiagnosticScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+          </ErrorBoundary>
+        );
+      case 'glaciar':
+        // Módulo demo: Reporte de Punto Glaciar (guías de glaciar). Ruta #glaciar.
+        return (
+          <ErrorBoundary>
+            <GlaciarReporteScreen onBack={() => navigate('dashboard')} />
           </ErrorBoundary>
         );
       case 'perfil':
