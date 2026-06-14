@@ -8,7 +8,7 @@
  * Más un modo `auto` (alterna minimalista/biopunk según la hora).
  *
  * Cubre:
- *   - default = bio-punk (sin localStorage previo)
+ *   - default = bio-punk (sin localStorage previo, desde PR #1501)
  *   - applyTheme escribe / limpia data-theme en <html> (biopunk = sin attr)
  *   - setTheme persiste en localStorage (chagra:theme) y rechaza ids inválidos
  *   - THEME_IDS expone exactamente los 3 temas + auto
@@ -35,9 +35,9 @@ describe('useTheme — sistema de temas', () => {
     document.documentElement.removeAttribute('data-theme');
   });
 
-  it('default es automático cuando no hay nada en localStorage', () => {
+  it('default es biopunk cuando no hay nada en localStorage', () => {
     const { result } = renderHook(() => useTheme());
-    expect(result.current.theme).toBe('auto');
+    expect(result.current.theme).toBe('biopunk');
     expect(DEFAULT_THEME).toBe('biopunk');
   });
 
@@ -117,10 +117,10 @@ describe('useTheme — sistema de temas', () => {
     );
   });
 
-  it('migra ids legados (dark-sober/light) al default automático en el getter', () => {
+  it('migra ids legados (dark-sober/light) al default biopunk en el getter', () => {
     // dark-sober y light fueron reemplazados por los 3 temas curados + auto.
     localStorage.setItem(STORAGE_KEY, 'dark-sober');
     const { result } = renderHook(() => useTheme());
-    expect(result.current.theme).toBe('auto');
+    expect(result.current.theme).toBe('biopunk');
   });
 });

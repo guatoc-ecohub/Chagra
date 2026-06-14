@@ -5,7 +5,7 @@
  *   - renderiza los 3 temas curados (bio-punk, Nature, Minimalista) + auto
  *   - el tema activo aparece marcado (aria-pressed)
  *   - al elegir un tema se persiste en localStorage y se aplica a <html>
- *   - default = bio-punk
+ *   - default = bio-punk (sin localStorage previo)
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
@@ -39,9 +39,9 @@ describe('ThemeSelector — switcher de tema', () => {
     expect(autoBtn()).toBeTruthy();
   });
 
-  it('marca automático como activo por defecto (aria-pressed)', () => {
+  it('marca biopunk como activo por defecto (aria-pressed)', () => {
     render(<ThemeSelector />);
-    expect(autoBtn().getAttribute('aria-pressed')).toBe('true');
+    expect(bioBtn().getAttribute('aria-pressed')).toBe('true');
   });
 
   it('al elegir Nature persiste en localStorage y aplica data-theme', () => {
