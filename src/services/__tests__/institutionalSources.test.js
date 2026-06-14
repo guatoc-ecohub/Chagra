@@ -189,6 +189,26 @@ describe('resolveSourceLink — de una cita a {fuente, fuente_url|fuente_texto}'
     expect(resolveSourceLink([])).toEqual({});
   });
 
+  // ── Normativa ambiental (#357): Ley 1930 / Decreto 1007 / MinAmbiente ──
+  test('Ley 1930 de 2018 (páramos) → link a la norma en gestornormativo', () => {
+    const out = resolveSourceLink('Ley 1930 de 2018');
+    expect(out.fuente).toBe('Ley 1930 de 2018');
+    expect(out.fuente_url).toContain('gestornormativo/norma.php?i=87764');
+  });
+
+  test('Decreto 1007 de 2018 (PSA) → link a la norma en gestornormativo', () => {
+    const out = resolveSourceLink('Decreto 1007 de 2018');
+    expect(out.fuente).toBe('Decreto 1007 de 2018');
+    expect(out.fuente_url).toContain('gestornormativo/norma.php?i=86901');
+  });
+
+  test('MinAmbiente → reconocida pero texto plano (no homepage genérica)', () => {
+    const out = resolveSourceLink('MinAmbiente');
+    expect(out.fuente).toBe('MinAmbiente');
+    expect(out.fuente_texto).toBe(true);
+    expect(out.fuente_url).toBeUndefined();
+  });
+
   // ── La regla central del operador, como aserción explícita ──
   test('NINGÚN destino emitido es una homepage/landing genérica', () => {
     const isHomepage = (u) => /^https?:\/\/[^/]+\/?$/.test(u); // host + opcional "/"
