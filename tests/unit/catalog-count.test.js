@@ -51,11 +51,12 @@ describe('Catalog Count - Task #189', () => {
 
     expect(catalog.schema_version).toBe('3.2');
     expect(catalog._subset_meta).toBeDefined();
-    // NOTA: _subset_meta.species_count quedó en 204 mientras species.length es
-    // 205 (off-by-one en la metadata del subset, NO en este test). Se asserta el
-    // valor real para no enmascarar la inconsistencia; corregir la metadata es
-    // tarea aparte del owner del catálogo.
-    expect(catalog._subset_meta.species_count).toBe(204);
+    // 2026-06-14 (chore higiene catálogo público): _subset_meta.species_count
+    // reconciliado a 263 para que coincida con species.length real (205 curación
+    // inicial + 58 páramo Cruz Verde). Antes declaraba 204 (off-by-one heredado).
+    // El conteo declarado DEBE coincidir con el array real.
+    expect(catalog._subset_meta.species_count).toBe(263);
+    expect(catalog._subset_meta.species_count).toBe(catalog.species.length);
   });
   
   it('should include new species from batches 4-9', () => {

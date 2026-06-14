@@ -40,7 +40,7 @@ Chagra is an offline-first Progressive Web App (PWA) built for field operations 
 | Captura de datos agroecológica respetando policultivos, estratos y biodiversidad.                    | Agroecological data capture that respects polyculture, strata, and biodiversity.                       |
 | Idioma colombiano (sumercé, mijo, mi llave, panita) en lugar de español neutro de Madrid.            | Colombian Spanish vocabulary (regional greetings) instead of neutral peninsular Spanish.               |
 | IA local con vocabulario rural — agente offline-friendly que no asume cobertura.                     | Local AI with rural vocabulary — offline-friendly agent that does not assume connectivity.             |
-| Catálogo agroecológico Colombia validado (600 especies, 30 plagas, 20 biopreparados ICA/Agrosavia).  | Validated Colombian agroecological catalog (600 species, 30 pests, 20 ICA/Agrosavia bio-preparations). |
+| Catálogo agroecológico Colombia validado (263 especies, 36 biopreparados, 68 fuentes ICA/Agrosavia).  | Validated Colombian agroecological catalog (263 species, 36 bio-preparations, 68 ICA/Agrosavia sources). |
 
 ---
 

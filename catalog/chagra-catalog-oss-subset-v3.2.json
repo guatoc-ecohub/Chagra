@@ -25,14 +25,14 @@
   "generated_at": "2026-05-25T23:11:20.222Z",
   "generated_by": "scripts/extract-oss-subset-v32.mjs",
   "_subset_meta": {
-    "subset_name": "oss-subset-105",
+    "subset_name": "oss-subset-263",
     "subset_version": "v3.2",
     "source_file": "chagra-catalog-seed-v3.1.json",
-    "species_count": 204,
+    "species_count": 263,
     "sources_count": 68,
     "biopreparados_count": 36,
     "license": "CC-BY-NC-SA 4.0",
-    "rationale": "Subset top-uso 105 species curadas según criterio intelligence-first + valor público familias agricultoras Colombia. Cobertura: frutales mayor + pasifloras (anti-confusión taxonómica) + hortalizas comunes + tubérculos andinos + cereales/leguminosas + especias/medicinales base familiar + asocios funcionales + forestales/sombrío café + páramo + amazónicos estratégicos. Re-curado tras revert del subset v3.1 (50 species, PR #1012) que cortó species críticas (aguacate, tomate, lechuga, acelga). Ver catalog/SUBSET_OSS_V3.2_RATIONALE.md."
+    "rationale": "Subset top-uso curado según criterio intelligence-first + valor público familias agricultoras Colombia. Cobertura: frutales mayor + pasifloras (anti-confusión taxonómica) + hortalizas comunes + tubérculos andinos + cereales/leguminosas + especias/medicinales base familiar + asocios funcionales + forestales/sombrío café + páramo + amazónicos estratégicos. Re-curado tras revert del subset v3.1 (50 species, PR #1012) que cortó species críticas (aguacate, tomate, lechuga, acelga). Curación inicial 205 species (extract-oss-subset-v32.mjs) + 58 species de páramo (enrich-oss-paramo-cruz-verde.mjs, 2026-06-10, ver _paramo_enrichment) = 263 species reales en species[]. Ver catalog/SUBSET_OSS_V3.2_RATIONALE.md."
   },
   "species": [
     {
