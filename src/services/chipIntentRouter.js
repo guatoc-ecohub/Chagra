@@ -211,7 +211,7 @@ export function planForcedIntent(intent, text, opts = {}) {
           },
         };
       }
-      const args = { altitud: altSilvo };
+      const args = { altitud_msnm: altSilvo };
       const piso = normalizePiso(opts.pisoTermico);
       if (piso) args.piso_termico = piso;
       const animal = detectAnimalSilvo(prompt);

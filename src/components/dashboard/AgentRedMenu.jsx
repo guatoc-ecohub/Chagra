@@ -346,6 +346,9 @@ const CSS = `
   max-width:128px;min-width:58px;width:max-content;text-align:center;pointer-events:none;
   font-family:var(--fam);font-size:var(--lblSize);font-weight:var(--lblW);line-height:1.22;
   letter-spacing:var(--lblSp);
+  /* la etiqueta SIEMPRE envuelve (no se corta contra el borde): palabras
+     largas rompen y el texto fluye a varias líneas dentro de max-width. */
+  white-space:normal;overflow-wrap:break-word;word-break:break-word;hyphens:auto;
   color:var(--lblC);background:var(--lblBg);border:1px solid var(--lblEdge);
   border-radius:10px;padding:4px 8px;box-shadow:var(--lblShadow);
   transition:color .5s,background .5s;
@@ -560,12 +563,15 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
         { pad: 9, jitter: 8, rand },
       );
 
-      /* yemas: recogidas junto al origen (abajo-izquierda, sobre la Ⓐ) */
+      /* yemas: recogidas junto al origen (abajo-izquierda, sobre la Ⓐ). Banda
+         ALTA (operador 2026-06-10: las yemas se amontonaban/encimaban abajo al
+         enfocar): repartir las 7-8 yemas en una franja generosa con separación
+         anisotrópica (más aire vertical) → columna limpia, cero encime. */
       posBud = sim.map((s, i) => {
         const a = a0 + (a1 - a0) * i / denom, r = i % 2 ? 152 : 110;
         return { x: rootPt.x + Math.cos(a) * r, y: rootPt.y + Math.sin(a) * r * 0.9 };
       });
-      relax(posBud, 46, { x0: 40, x1: W - 44, y0: H - 150, y1: H - 30 });
+      relax(posBud, 54, { x0: 38, x1: W - 44, y0: Math.max(96, H - 290), y1: H - 28 }, { ky: 0.82 });
 
       /* hub del foco: sobre la diagonal, dejando aire arriba-derecha para
          que el follaje del grupo enfocado respire */
@@ -595,11 +601,15 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
         };
         const maxHw = Math.max(...lBoxes.map((b) => b.hw));
         const maxHh = Math.max(...lBoxes.map((b) => b.hh));
+        /* inset X = semiancho de la etiqueta más ancha → la caja completa
+           (orbe+etiqueta) cabe en pantalla; sin esto el rótulo se cortaba
+           contra el borde (operador 2026-06-10). */
+        const insetX = Math.max(56, maxHw + 4);
         s.leafAbsR = placeLeavesNoClash(hub, lBoxes, {
           a0: -2.35, a1: 0.85, /* arriba-izq → derecha → abajo-der */
           rx: Math.max(Lrx, hubBox.hw + maxHw * 0.7),
           ry: Math.max(Lry, hubBox.hh + maxHh * 0.7),
-          bd: { x0: 56, x1: W - 56, y0: 84, y1: H - 76 },
+          bd: { x0: insetX, x1: W - insetX, y0: 84, y1: H - 76 },
           pad: 6,
           hard: [hubBox, crumbBox],
           soft: budBoxes,
@@ -692,11 +702,12 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
            ARRIBA (no hay piso debajo), grupos altos hacia abajo */
         const tilt = clampN((fp.y - H * 0.45) / H, -0.35, 0.45) * 2.0;
         const centerA = side < 0 ? -tilt : Math.PI + tilt; /* hacia adentro */
+        const insetXT = Math.max(58, maxHwT + 4);
         s.leafAbsT = placeLeavesNoClash(fp, lBoxesT, {
           a0: centerA - 1.85, a1: centerA + 1.85,
           rx: fpBox.hw + maxHwT * 0.7,
           ry: fpBox.hh + maxHhT * 0.7,
-          bd: { x0: 58, x1: W - 58, y0: 78, y1: baseT.y - 54 },
+          bd: { x0: insetXT, x1: W - insetXT, y0: 78, y1: baseT.y - 54 },
           pad: 6,
           hard: [fpBox],
           /* atenuados: sin etiqueta visible — solo el orbe (esc .84) */
@@ -786,8 +797,8 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
         } else {
           /* micorriza: la rama enfocada viaja al hub, las demás son yemas */
           tp = f == null ? posOver[i] : (f === i ? hub : posBud[i]);
-          ts = f == null ? 1 : (f === i ? 1.1 : 0.55);
-          ta = (f == null || f === i ? 1 : 0.45) * Math.min(1, g.vis * 1.5);
+          ts = f == null ? 1 : (f === i ? 1.1 : 0.5);
+          ta = (f == null || f === i ? 1 : 0.28) * Math.min(1, g.vis * 1.5);
           tl = (f == null || f === i ? 1 : 0) * (g.vis > 0.75 ? 1 : 0);
         }
 

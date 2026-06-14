@@ -217,7 +217,8 @@ describe('chipIntentRouter — chips de diseño (capacidades antes dark)', () =>
       pisoTermico: 'templado',
     });
     expect(plan.tool).toBe('get_diseno_silvopastoril');
-    expect(plan.args.altitud).toBe(1800);
+    expect(plan.args.altitud_msnm).toBe(1800);
+    expect(plan.args).not.toHaveProperty('altitud'); // #193: el schema renombró altitud→altitud_msnm
     expect(plan.args.piso_termico).toBe('templado');
     expect(plan.args.animal).toBe('bovino');
     expect(plan.stub).toBe(false);
@@ -244,7 +245,7 @@ describe('chipIntentRouter — chips de diseño (capacidades antes dark)', () =>
 
   it('silvopastoreo acepta altitud como string del perfil (coerción a número)', () => {
     const plan = planForcedIntent('silvopastoreo', 'forraje', { altitud: '2100' });
-    expect(plan.args.altitud).toBe(2100);
+    expect(plan.args.altitud_msnm).toBe(2100);
   });
 });
 

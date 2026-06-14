@@ -56,9 +56,16 @@ vi.mock('../dbCore', () => {
     openDB: vi.fn(async () => {
       if (failMode === 'open') throw new Error('IDB no disponible');
       return {
+        // El objeto transaction DEBE ser el MISMO que el mock usa para disparar
+        // oncomplete/onerror: producción setea `tx.oncomplete = ...` sobre el
+        // objeto retornado, así que ese objeto y el que el mock dispara tienen
+        // que ser idénticos (un spread {...tx} crearía una COPIA → producción
+        // setea el callback en la copia, el mock lo dispara en el original →
+        // la promesa nunca resuelve y el test cuelga 30s).
         transaction: () => {
           const { tx, objectStore } = makeTx();
-          return { ...tx, objectStore: () => objectStore() };
+          tx.objectStore = () => objectStore();
+          return tx;
         },
       };
     }),
