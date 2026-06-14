@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ChevronLeft, MapPin, Loader2, AlertCircle, Mountain, Thermometer,
   Save, ListChecks, Trash2, CheckCircle2, Snowflake, Compass, Layers,
@@ -8,7 +8,9 @@ import { useGeolocation } from '../hooks/useGeolocation';
 import PhotoCaptureField from './PhotoCaptureField';
 import { blobToDataUrl } from '../utils/imageProcessor';
 import { glaciarReportes, nuevoReporteId } from '../db/glaciarReportes';
+import { saveDraft, loadDraft, clearDraft } from '../db/glaciarDraft';
 import { evaluarSeguridadGlaciar } from '../services/glaciarSafety';
+import { requestPersistentStorage } from '../utils/persistStorage';
 import {
   TIPOS_SUPERFICIE, ESCALA_DUREZA, PELIGROS, CIELO, VIENTO, VISIBILIDAD,
   MONTANAS, SUPERFICIE_BY_KEY, PELIGRO_BY_KEY, DUREZA_BY_CODIGO, MONTANA_BY_KEY,
@@ -50,6 +52,17 @@ function nuevaCapa() {
   return { profundidad: '', tipoSuperficie: '', dureza: '' };
 }
 
+// U-3: el autosave del borrador vive en IndexedDB (store glaciar_draft), NO en
+// sessionStorage. Razón: el borrador incluye coordenadas GPS (lat/lng) y CodeQL
+// marcaba sessionStorage como clear-text storage de datos sensibles (HIGH). En
+// IndexedDB no dispara esa regla y además sobrevive al descarte de la pestaña
+// por iOS al abrir la cámara y al cierre del navegador → mejor recuperación.
+// El acceso al store está en db/glaciarDraft (saveDraft/loadDraft/clearDraft).
+
+// Antirebote del autosave a IndexedDB: agrupa ráfagas de tecleo en una sola
+// escritura para no abrir una transacción por pulsación.
+const DRAFT_AUTOSAVE_DEBOUNCE_MS = 400;
+
 function emptyForm() {
   return {
     guia: '',
@@ -83,8 +96,18 @@ function emptyForm() {
 
 export default function GlaciarReporteScreen({ onBack }) {
   const [tab, setTab] = useState('nuevo'); // 'nuevo' | 'lista'
+  // U-3: el borrador autosalvado se restaura desde IndexedDB en un efecto al
+  // montar (loadDraft es async). Arrancamos en vacío y, si hay borrador, lo
+  // hidratamos. El flag `hydrated` (abajo) evita que el autosave pise el
+  // borrador guardado con el form vacío del primer render (la carga async aún
+  // no llegó).
   const [form, setForm] = useState(emptyForm);
   const [coords, setCoords] = useState(null); // {lat,lng,altitud,precision}
+  // `hydrated` pasa a true cuando termina el restore del borrador (loadDraft).
+  // Es estado (no ref) a propósito: al volverse true re-dispara el efecto de
+  // autosave para que persista el estado vigente justo después de hidratar.
+  const [hydrated, setHydrated] = useState(false);
+  const autosaveTimerRef = useRef(null);
   const [fotoBlob, setFotoBlob] = useState(null);
   const [saving, setSaving] = useState(false);
   const [savedOk, setSavedOk] = useState(false);
@@ -92,6 +115,57 @@ export default function GlaciarReporteScreen({ onBack }) {
   const [loadingList, setLoadingList] = useState(false);
 
   const { position, error: geoError, loading: geoLoading, request } = useGeolocation();
+
+  // U-1 (crítico): pedir almacenamiento PERSISTENTE al montar el módulo. iOS
+  // Safari purga IndexedDB de sitios no instalados tras ~7 días sin uso → el
+  // guía perdería todos sus reportes glaciar. requestPersistentStorage() es
+  // idempotente, tolerante a fallos (try/catch interno) y no requiere red, así
+  // que se mantiene offline-first. Fire-and-forget: no bloquea el render.
+  useEffect(() => {
+    requestPersistentStorage();
+  }, []);
+
+  // U-3: restaurar el borrador autosalvado desde IndexedDB al montar. Si iOS
+  // descartó la pestaña al abrir la cámara (o se cerró el navegador), lo
+  // capturado (montaña/GPS/dureza/peligros) se restaura. La foto (Blob) no se
+  // guarda — se re-captura; lo digitado sí sobrevive. Marcamos `hydrated` al
+  // terminar para habilitar el autosave sin pisar el borrador con el form vacío.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      let draft = null;
+      try {
+        draft = await loadDraft();
+      } catch {
+        // loadDraft ya es tolerante (devuelve null), pero por si acaso: un
+        // borrador ilegible nunca debe impedir abrir un reporte nuevo.
+        draft = null;
+      }
+      if (cancelled) return;
+      if (draft?.form) {
+        setForm((prev) => ({ ...prev, ...draft.form }));
+        if (draft.coords) setCoords(draft.coords);
+      }
+      setHydrated(true);
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // U-3: autosave del borrador en IndexedDB (store glaciar_draft) en cada cambio
+  // del form o de las coords, con antirebote para agrupar el tecleo. Fire-and-
+  // forget y tolerante a fallos (saveDraft nunca lanza). No corre hasta hidratar
+  // para no sobrescribir el borrador restaurado con el form vacío inicial. Se
+  // limpia al guardar el reporte con éxito (clearDraft()).
+  useEffect(() => {
+    if (!hydrated) return undefined;
+    if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+    autosaveTimerRef.current = setTimeout(() => {
+      saveDraft(form, coords);
+    }, DRAFT_AUTOSAVE_DEBOUNCE_MS);
+    return () => {
+      if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+    };
+  }, [form, coords, hydrated]);
 
   // Capturar coords cuando llega la posición del GPS.
   useEffect(() => {
@@ -150,7 +224,14 @@ export default function GlaciarReporteScreen({ onBack }) {
   const togglePeligro = (key) => {
     setForm((f) => {
       const has = f.peligros.includes(key);
-      return { ...f, peligros: has ? f.peligros.filter((p) => p !== key) : [...f.peligros, key] };
+      const peligros = has ? f.peligros.filter((p) => p !== key) : [...f.peligros, key];
+      // U-5: si se DESMARCA séracs/penitentes, limpiamos su matiz dependiente
+      // (rutaBajoSeracs / penitentesDensos) para no dejar un flag huérfano que
+      // ya no se ve en pantalla. Al re-marcar el peligro el matiz vuelve en off.
+      const next = { ...f, peligros };
+      if (has && key === 'seracs') next.rutaBajoSeracs = false;
+      if (has && key === 'penitentes') next.penitentesDensos = false;
+      return next;
     });
   };
 
@@ -175,10 +256,23 @@ export default function GlaciarReporteScreen({ onBack }) {
   const puedeGuardar =
     !!coords && !!form.montana && tieneSuperficie && (esBorde || tieneDureza) && !saving;
 
+  // U-6: lista CLARA de lo que falta para poder guardar (en vez de un gris
+  // ilegible). Cada faltante lleva el número de la sección donde se completa.
+  const faltantes = [];
+  if (!form.montana) faltantes.push({ seccion: '1', texto: 'Elija la montaña' });
+  if (!coords) faltantes.push({ seccion: '2', texto: 'Capture la ubicación (GPS)' });
+  if (!tieneSuperficie) faltantes.push({ seccion: '4', texto: 'Marque el tipo de superficie' });
+  if (!esBorde && !tieneDureza) faltantes.push({ seccion: '4', texto: 'Marque la dureza del hielo' });
+
   const handleGuardar = async () => {
     if (!puedeGuardar) return;
     setSaving(true);
     setSavedOk(false);
+    // U-1: reforzar el pedido de almacenamiento persistente al guardar el
+    // primer reporte. Guardar es la señal de engagement más fuerte: algunos
+    // navegadores conceden la persistencia recién entonces. No bloqueamos el
+    // guardado por esto (se dispara en paralelo y se tolera el fallo).
+    requestPersistentStorage();
     try {
       let fotoDataUrl = null;
       if (fotoBlob) {
@@ -225,6 +319,9 @@ export default function GlaciarReporteScreen({ onBack }) {
       };
       await glaciarReportes.save(reporte);
       setSavedOk(true);
+      // U-3: el reporte quedó persistido en IndexedDB → el borrador ya no hace
+      // falta. Lo limpiamos para no restaurar datos ya guardados al volver.
+      clearDraft();
       // Conservamos guía + montaña + puntoId (suelen repetirse en la jornada y
       // el mismo punto se vuelve a medir).
       const { guia, montana, montanaLibre, puntoId } = form;
@@ -286,7 +383,7 @@ export default function GlaciarReporteScreen({ onBack }) {
           <SeguridadBanner seguridad={seguridad} />
 
           {/* 1. MONTAÑA + PUNTO */}
-          <Section num="1" title="Montaña y punto del frente" icon={<Mountain size={18} />}>
+          <Section num="1" title="Montaña y punto del frente" icon={<Mountain size={18} />} incompleta={!form.montana}>
             <Label>Montaña</Label>
             <select
               value={form.montana}
@@ -369,7 +466,7 @@ export default function GlaciarReporteScreen({ onBack }) {
           </Section>
 
           {/* 2. UBICACIÓN + ENCUADRE */}
-          <Section num="2" title="Ubicación y encuadre" icon={<MapPin size={18} />}>
+          <Section num="2" title="Ubicación y encuadre" icon={<MapPin size={18} />} incompleta={!coords}>
             <button
               type="button"
               onClick={() => request()}
@@ -455,7 +552,12 @@ export default function GlaciarReporteScreen({ onBack }) {
           </Section>
 
           {/* 4. DUREZA — escala mano→piolet + perfil por capas */}
-          <Section num="4" title="Dureza del hielo (mano → piolet)" icon={<Snowflake size={18} />}>
+          <Section
+            num="4"
+            title="Dureza del hielo (mano → piolet)"
+            icon={<Snowflake size={18} />}
+            incompleta={!tieneSuperficie || (!esBorde && !tieneDureza)}
+          >
             <EscalaDurezaAyuda />
 
             <div className="mt-4 flex items-center gap-2 mb-2">
@@ -524,24 +626,30 @@ export default function GlaciarReporteScreen({ onBack }) {
               ))}
             </div>
 
-            {/* Matices que afinan la lógica de seguridad */}
+            {/* U-5: Detalles que AFINAN un peligro ya marcado. Antes había dos
+                checkboxes ("Pendiente pronunciada", "Penitentes densos") que
+                duplicaban su chip de peligro de arriba y confundían. Ahora:
+                - "Pendiente pronunciada" vive SOLO como chip (se quitó el
+                  checkbox redundante; la lógica de seguridad ya lee el chip).
+                - El detalle de séracs/penitentes solo aparece cuando su peligro
+                  está marcado, y deja claro que es un MATIZ del mismo peligro,
+                  no otra casilla aparte. */}
             <div className="mt-4 space-y-2">
-              <CheckRow
-                label="La ruta pasa por debajo de los séracs"
-                checked={form.rutaBajoSeracs}
-                onClick={() => toggleField('rutaBajoSeracs')}
-                icon={<ShieldAlert size={16} />}
-              />
-              <CheckRow
-                label="Penitentes densos / altos"
-                checked={form.penitentesDensos}
-                onClick={() => toggleField('penitentesDensos')}
-              />
-              <CheckRow
-                label="Pendiente pronunciada"
-                checked={form.pendientePronunciada}
-                onClick={() => toggleField('pendientePronunciada')}
-              />
+              {form.peligros.includes('seracs') && (
+                <CheckRow
+                  label="…y la ruta pasa por debajo de esos séracs"
+                  checked={form.rutaBajoSeracs}
+                  onClick={() => toggleField('rutaBajoSeracs')}
+                  icon={<ShieldAlert size={16} />}
+                />
+              )}
+              {form.peligros.includes('penitentes') && (
+                <CheckRow
+                  label="…y esos penitentes son densos / altos"
+                  checked={form.penitentesDensos}
+                  onClick={() => toggleField('penitentesDensos')}
+                />
+              )}
               <CheckRow
                 label="Nieve fresca en las últimas 24 h"
                 checked={form.nieveReciente24h}
@@ -605,12 +713,30 @@ export default function GlaciarReporteScreen({ onBack }) {
             {saving ? <Loader2 size={22} className="animate-spin" /> : savedOk ? <CheckCircle2 size={22} /> : <Save size={22} />}
             {savedOk ? 'Reporte guardado' : saving ? 'Guardando…' : 'Guardar reporte'}
           </button>
-          {!puedeGuardar && !saving && !savedOk && (
-            <p className="text-[11px] text-slate-500 text-center -mt-2">
-              {esBorde
-                ? 'Capture ubicación, montaña y la superficie del frente para guardar.'
-                : 'Capture ubicación, montaña, superficie y dureza para guardar.'}
-            </p>
+          {/* U-6: en vez de un gris ilegible, una tarjeta de buen contraste que
+              dice EXACTAMENTE qué falta y en qué sección, con guantes y a pleno
+              sol. Solo aparece si hay faltantes (no mientras se guarda/ya
+              guardó). */}
+          {faltantes.length > 0 && !saving && !savedOk && (
+            <div
+              className="-mt-2 rounded-xl bg-amber-950/40 border-2 border-amber-500/70 p-3"
+              role="status"
+            >
+              <p className="flex items-center gap-2 text-sm font-bold text-amber-200">
+                <AlertCircle size={18} className="shrink-0 text-amber-300" />
+                Falta para guardar:
+              </p>
+              <ul className="mt-1.5 space-y-1">
+                {faltantes.map((f) => (
+                  <li key={`${f.seccion}-${f.texto}`} className="flex items-center gap-2 text-sm text-amber-100">
+                    <span className="shrink-0 w-5 h-5 rounded-full bg-amber-500 text-slate-950 grid place-items-center text-xs font-black">
+                      {f.seccion}
+                    </span>
+                    {f.texto}
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
 
           {/* Disclaimer + propósito */}
@@ -645,11 +771,21 @@ function TabBtn({ active, onClick, icon, children }) {
   );
 }
 
-function Section({ num, title, icon, children }) {
+function Section({ num, title, icon, children, incompleta = false }) {
+  // U-6: si la sección es obligatoria y está incompleta, la marcamos con un
+  // borde rojo de buen contraste para que se vea cuál falta (a pleno sol).
   return (
-    <section className="bg-slate-900/40 border border-slate-800 rounded-2xl p-4">
+    <section
+      className={`rounded-2xl p-4 ${
+        incompleta
+          ? 'bg-slate-900/40 border-2 border-red-500/70'
+          : 'bg-slate-900/40 border border-slate-800'
+      }`}
+    >
       <h2 className="flex items-center gap-2 text-base font-bold text-slate-200 mb-3">
-        <span className="w-6 h-6 rounded-full bg-sky-500/20 text-sky-300 grid place-items-center text-sm font-black shrink-0">
+        <span className={`w-6 h-6 rounded-full grid place-items-center text-sm font-black shrink-0 ${
+          incompleta ? 'bg-red-500/30 text-red-200' : 'bg-sky-500/20 text-sky-300'
+        }`}>
           {num}
         </span>
         {icon}

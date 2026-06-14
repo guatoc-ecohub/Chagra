@@ -38,7 +38,7 @@
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 23;
+export const DB_VERSION = 24;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -89,6 +89,14 @@ export const STORES = {
   // (string ULID-like generado en cliente). Índices: createdAt (timeline),
   // estado (filtrar por 🟢/🟡/🔴), guia (por persona).
   GLACIAR_REPORTES: 'glaciar_reportes',
+  // v24: glaciar_draft — autosave del BORRADOR en curso del reporte glaciar
+  // (un único registro KV, keyPath 'key'). Antes vivía en sessionStorage, pero
+  // CodeQL lo marcaba como clear-text storage de datos sensibles (lat/lng GPS).
+  // En IndexedDB no dispara esa regla y además sobrevive al cierre/descarte de
+  // la pestaña por iOS (sessionStorage NO), así que recupera mejor ante crash.
+  // No es el reporte final (eso vive en glaciar_reportes): es el work-in-progress
+  // que se restaura al volver y se borra al guardar el reporte con éxito.
+  GLACIAR_DRAFT: 'glaciar_draft',
 };
 
 let dbInstance = null;
@@ -393,6 +401,18 @@ export const openDB = async () => {
           if (!store.indexNames.contains('puntoId')) {
             store.createIndex('puntoId', 'puntoId', { unique: false });
           }
+        }
+      }
+
+      // v24: glaciar_draft — autosave del borrador en curso del reporte glaciar.
+      // Un único registro KV (keyPath 'key', valor 'borrador') con el form +
+      // coords del reporte que se está digitando. Reemplaza el autosave previo
+      // en sessionStorage (CodeQL js/clear-text-storage-of-sensitive-data por el
+      // GPS lat/lng). IndexedDB no dispara esa regla y sobrevive al descarte de
+      // la pestaña por iOS al abrir la cámara → mejor recuperación ante crash.
+      if (event.oldVersion < 24) {
+        if (!db.objectStoreNames.contains(STORES.GLACIAR_DRAFT)) {
+          db.createObjectStore(STORES.GLACIAR_DRAFT, { keyPath: 'key' });
         }
       }
     };
