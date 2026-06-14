@@ -13,8 +13,8 @@ import { validateFarmProcessEvent } from '../../types/farmProcess';
  */
 
 describe('farmProcessCache - Bug A: schema process_id (DB_VERSION vigente)', () => {
-  it('DB_VERSION es 21 (esquema vigente; v19 introdujo el indice process_id)', () => {
-    expect(DB_VERSION).toBe(21);
+  it('DB_VERSION es 23 (esquema vigente; v19 introdujo el indice process_id)', () => {
+    expect(DB_VERSION).toBe(23);
   });
 
   it('STORES.FARM_PROCESS_EVENTS existe', () => {

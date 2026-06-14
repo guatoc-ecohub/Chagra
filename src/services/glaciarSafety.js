@@ -1,114 +1,297 @@
 /**
  * glaciarSafety.js — lógica PURA y testeable del estado de seguridad de un
- * punto glaciar a partir de un reporte de campo.
+ * punto glaciar a partir de un reporte de campo (v2 "escala creíble").
  *
- * Reglas PROVISIONALES (refinables con investigación glaciológica):
- *   🔴 PELIGRO   — hielo podrido (derretido) O agua de deshielo O grietas
- *                  abiertas O puente de nieve O séracs O riesgo de avalancha.
- *   🟡 PRECAUCIÓN — firn/nieve blando (dureza ≤ 2) con algún peligro, O
- *                  cualquier peligro presente que no sea de la lista crítica.
- *   🟢 ESTABLE   — hielo compacto/duro (dureza ≥ 3) sin peligros observados.
+ * Reglas de OVERRIDE JERÁRQUICO: el peor disparador gana. El orden de
+ * evaluación es: modo observación → 🔴 peligro → 🟡 precaución → 🟢 estable.
  *
- * La función es pura: mismo reporte → mismo estado. Sin efectos secundarios,
- * sin red, sin fecha/hora. Apta para tests deterministas y para correr
+ *   🔵 OBSERVACIÓN — si `pisoGlaciar === false` (modo borde, no se pisó el
+ *      hielo): se registra estado y retroceso, NO se emite juicio de tránsito.
+ *
+ *   🔴 PELIGRO:
+ *      - hielo podrido (tipo de superficie de cualquier capa O peligro) SIEMPRE.
+ *      - séracs SI la ruta pasa por debajo (rutaBajoSeracs).
+ *      - grietas con puente de nieve Y (dureza superficie ≤ 4F  O  hora > mediodía
+ *        O  nieve reciente en 24h).
+ *      - riesgo de avalancha con nieve fresca en pendiente.
+ *      - penitentes densos.
+ *
+ *   🟡 PRECAUCIÓN:
+ *      - hielo de glaciar azul con dureza H2.
+ *      - grietas con puente de nieve en mañana fría (hora < 10:00) y
+ *        superficie ≥ 1F (puente más firme, pero ojo).
+ *      - hielo cubierto de detritos.
+ *      - agua de deshielo superficial.
+ *      - dureza F/4F sobre glaciar (superficie muy blanda).
+ *      - cualquier otro peligro observado no crítico.
+ *
+ *   🟢 ESTABLE:
+ *      - firn/névé con dureza 1F–P sin peligros, mañana fría.
+ *      - hielo de glaciar azul con dureza H1 sin grietas/séracs/agua.
+ *
+ * La función es pura: mismo reporte → mismo estado. Sin red, sin Date.now()
+ * (la hora se pasa explícita). Apta para tests deterministas y para correr
  * offline en campo.
+ *
+ * Sobre la dureza por CAPAS: la capa SUPERIOR (la más somera) manda el
+ * tránsito. Si el reporte trae `capas`, usamos la dureza/superficie de la
+ * primera capa como "superficie". Una `lecturaPuntual` (superficie + dureza
+ * sueltas) sirve de respaldo si no hay capas.
  *
  * @module services/glaciarSafety
  */
 
-import { ESTADOS_SEGURIDAD } from '../data/glaciar-schema.js';
+import {
+  ESTADOS_SEGURIDAD,
+  DUREZAS_BLANDAS,
+  ordenDureza,
+} from '../data/glaciar-schema.js';
 
-/** Peligros que, por sí solos, fuerzan estado 🔴 peligro. */
-export const PELIGROS_CRITICOS = Object.freeze([
-  'grietas_abiertas',
-  'puente_nieve',
-  'seracs',
-  'agua_deshielo',
-  'riesgo_avalancha',
-]);
-
-/** Tipos de superficie que, por sí solos, fuerzan estado 🔴 peligro. */
+/** Tipos de superficie que, por sí solos (en cualquier capa), fuerzan 🔴. */
 export const SUPERFICIES_CRITICAS = Object.freeze(['hielo_podrido']);
 
-/** Dureza por debajo o igual a este umbral se considera "blanda". */
-export const DUREZA_BLANDA_MAX = 2;
+/** Peligros que fuerzan 🔴 de forma incondicional. */
+export const PELIGROS_CRITICOS_SIEMPRE = Object.freeze(['hielo_podrido']);
+
+/** Orden de la dureza "4F" — umbral de superficie blanda para puentes. */
+const ORDEN_4F = ordenDureza('4F'); // 2
+/** Orden de la dureza "1F" — superficie ya firme para puente en mañana fría. */
+const ORDEN_1F = ordenDureza('1F'); // 3
+
+/** Mediodía y "mañana fría" como horas locales (0–23.999). */
+const HORA_MEDIODIA = 12;
+const HORA_MANANA_FRIA = 10;
+
+/**
+ * Normaliza la "superficie de tránsito" del reporte: capa superior si hay
+ * perfil por capas, si no la lectura puntual / campos sueltos.
+ *
+ * @param {Object} reporte
+ * @returns {{tipoSuperficie: string|null, dureza: string|null,
+ *   tiposTodos: string[]}} superficie de tránsito + todos los tipos vistos.
+ */
+function superficieDeTransito(reporte) {
+  const capas = Array.isArray(reporte.capas) ? reporte.capas.filter(Boolean) : [];
+  const tiposTodos = [];
+
+  let tipoSuperficie = null;
+  let dureza = null;
+
+  if (capas.length > 0) {
+    // La primera capa es la más somera (superficie) → manda el tránsito.
+    tipoSuperficie = capas[0].tipoSuperficie || null;
+    dureza = capas[0].dureza || null;
+    for (const c of capas) if (c.tipoSuperficie) tiposTodos.push(c.tipoSuperficie);
+  }
+
+  // Lectura puntual / campos sueltos como respaldo o complemento.
+  if (!tipoSuperficie && reporte.tipoSuperficie) tipoSuperficie = reporte.tipoSuperficie;
+  if (!dureza && reporte.dureza) dureza = reporte.dureza;
+  if (reporte.tipoSuperficie) tiposTodos.push(reporte.tipoSuperficie);
+
+  return { tipoSuperficie, dureza, tiposTodos };
+}
+
+/**
+ * Extrae la hora local (0–23.999) del reporte. Acepta `horaLocal` numérica
+ * (horas), o `fechaISO` (de la que se toma la hora local del Date). Null si no
+ * se puede determinar.
+ *
+ * @param {Object} reporte
+ * @returns {number|null}
+ */
+function horaDelReporte(reporte) {
+  if (typeof reporte.horaLocal === 'number' && Number.isFinite(reporte.horaLocal)) {
+    return reporte.horaLocal;
+  }
+  if (typeof reporte.fechaISO === 'string') {
+    const d = new Date(reporte.fechaISO);
+    if (!Number.isNaN(d.getTime())) return d.getHours() + d.getMinutes() / 60;
+  }
+  return null;
+}
 
 /**
  * Evalúa el estado de seguridad de un punto glaciar.
  *
  * @param {Object} reporte
- * @param {string} [reporte.tipoSuperficie] - key de TIPOS_SUPERFICIE.
- * @param {number} [reporte.dureza] - 1..5 (escala de penetración).
+ * @param {Array<{tipoSuperficie?:string, dureza?:string}>} [reporte.capas]
+ *   Perfil por capas (la [0] es la superficie). Manda el tránsito.
+ * @param {string} [reporte.tipoSuperficie] - lectura puntual de superficie.
+ * @param {string} [reporte.dureza] - código de dureza (F..H2) puntual.
  * @param {string[]} [reporte.peligros] - keys de PELIGROS.
- * @param {string} [reporte.aguaDeshielo] - compat: si viene 'agua_deshielo'
- *   suelto, también cuenta (defensivo). Normalmente va dentro de `peligros`.
- * @returns {{nivel: 'estable'|'precaucion'|'peligro', emoji: string,
- *   label: string, desc: string, color: string, razones: string[]}}
+ * @param {boolean} [reporte.pisoGlaciar] - false → modo observación (borde).
+ * @param {boolean} [reporte.rutaBajoSeracs] - la ruta pasa bajo séracs.
+ * @param {boolean} [reporte.penitentesDensos] - penitentes densos/altos.
+ * @param {boolean} [reporte.pendientePronunciada] - pendiente pronunciada.
+ * @param {boolean} [reporte.nieveReciente24h] - nieve fresca en 24h.
+ * @param {number} [reporte.horaLocal] - hora local (0–23.999) del reporte.
+ * @param {string} [reporte.fechaISO] - alternativa para derivar la hora.
+ * @returns {{nivel: 'estable'|'precaucion'|'peligro'|'observacion',
+ *   emoji: string, label: string, desc: string, color: string,
+ *   razones: string[]}}
  */
 export function evaluarSeguridadGlaciar(reporte = {}) {
   const peligros = Array.isArray(reporte.peligros) ? reporte.peligros : [];
-  const tipoSuperficie = reporte.tipoSuperficie || null;
-  const durezaNum = Number(reporte.dureza);
-  const dureza = Number.isFinite(durezaNum) ? durezaNum : null;
+  const has = (k) => peligros.includes(k);
+  const { tipoSuperficie, dureza, tiposTodos } = superficieDeTransito(reporte);
+  const hora = horaDelReporte(reporte);
+  const nieveReciente = reporte.nieveReciente24h === true;
+  const ordenSup = dureza ? ordenDureza(dureza) : null;
 
-  const razones = [];
-
-  // ── 🔴 PELIGRO: superficie crítica ──
-  if (tipoSuperficie && SUPERFICIES_CRITICAS.includes(tipoSuperficie)) {
-    razones.push('Hielo podrido (derretido)');
-  }
-
-  // ── 🔴 PELIGRO: peligros críticos ──
-  const criticosPresentes = peligros.filter((p) => PELIGROS_CRITICOS.includes(p));
-  for (const p of criticosPresentes) razones.push(peligroLabel(p));
-
-  if (razones.length > 0) {
-    return { ...ESTADOS_SEGURIDAD.peligro, razones };
-  }
-
-  // A partir de acá NO hay peligros críticos ni superficie crítica.
-  const otrosPeligros = peligros.filter((p) => !PELIGROS_CRITICOS.includes(p));
-  const esBlando = dureza != null && dureza <= DUREZA_BLANDA_MAX;
-
-  // ── 🟡 PRECAUCIÓN: firn blando + algún peligro, o cualquier peligro ──
-  if (otrosPeligros.length > 0) {
-    const motivos = otrosPeligros.map(peligroLabel);
-    if (esBlando) motivos.unshift('Superficie blanda (firn/nieve)');
-    return { ...ESTADOS_SEGURIDAD.precaucion, razones: motivos };
-  }
-
-  // Sin peligros pero superficie blanda → precaución suave.
-  if (esBlando) {
+  // ── 🔵 OBSERVACIÓN: no se pisó el hielo (modo borde) ──
+  if (reporte.pisoGlaciar === false) {
     return {
-      ...ESTADOS_SEGURIDAD.precaucion,
-      razones: ['Superficie blanda (firn/nieve), sin peligros visibles'],
+      ...ESTADOS_SEGURIDAD.observacion,
+      razones: ['No se pisó el hielo: registro de borde para trazabilidad, sin juicio de tránsito.'],
     };
   }
 
-  // ── 🟢 ESTABLE: hielo compacto/duro (≥3) sin peligros ──
-  if (dureza != null && dureza >= 3) {
+  const razonesPeligro = [];
+
+  // ── 🔴 hielo podrido SIEMPRE (en cualquier capa o como peligro) ──
+  const hayPodrido =
+    tiposTodos.some((t) => SUPERFICIES_CRITICAS.includes(t)) ||
+    peligros.some((p) => PELIGROS_CRITICOS_SIEMPRE.includes(p));
+  if (hayPodrido) razonesPeligro.push('Hielo podrido: no sostiene peso, puede colapsar.');
+
+  // ── 🔴 séracs SI la ruta pasa por debajo ──
+  if (has('seracs') && reporte.rutaBajoSeracs === true) {
+    razonesPeligro.push('Séracs sobre la ruta: riesgo de colapso por encima.');
+  }
+
+  // ── 🔴 grietas con puente de nieve Y (sup ≤ 4F  O  hora > mediodía  O  nieve 24h) ──
+  if (has('grietas_con_puente_nieve')) {
+    const supBlanda = ordenSup != null && ordenSup <= ORDEN_4F;
+    const tarde = hora != null && hora > HORA_MEDIODIA;
+    if (supBlanda || tarde || nieveReciente) {
+      const causa = supBlanda
+        ? 'superficie blanda'
+        : tarde
+          ? 'pasado el mediodía (puentes se ablandan)'
+          : 'nieve reciente (24h)';
+      razonesPeligro.push(`Puente de nieve sobre grieta con ${causa}.`);
+    }
+  }
+
+  // ── 🔴 riesgo de avalancha con nieve fresca en pendiente ──
+  if (has('riesgo_avalancha')) {
+    const hayNieveFresca = nieveReciente || tiposTodos.includes('nieve_fresca');
+    const enPendiente = reporte.pendientePronunciada === true || has('pendiente_pronunciada');
+    if (hayNieveFresca && enPendiente) {
+      razonesPeligro.push('Riesgo de avalancha: nieve fresca sobre pendiente pronunciada.');
+    }
+  }
+
+  // ── 🔴 penitentes densos ──
+  if (reporte.penitentesDensos === true && (has('penitentes') || tiposTodos.includes('penitentes'))) {
+    razonesPeligro.push('Penitentes densos: tránsito inseguro y agotador.');
+  }
+
+  if (razonesPeligro.length > 0) {
+    return { ...ESTADOS_SEGURIDAD.peligro, razones: razonesPeligro };
+  }
+
+  // A partir de acá NO hay disparadores 🔴.
+  const razonesPrecaucion = [];
+
+  // ── 🟡 hielo azul con dureza H2 ──
+  if (tipoSuperficie === 'hielo_glaciar_azul' && dureza === 'H2') {
+    razonesPrecaucion.push('Hielo azul muy duro (H2): cuesta clavar, resbala.');
+  }
+
+  // ── 🟡 grietas con puente de nieve en mañana fría (<10:00) y sup ≥ 1F ──
+  if (has('grietas_con_puente_nieve')) {
+    const mananaFria = hora != null && hora < HORA_MANANA_FRIA;
+    const supFirme = ordenSup != null && ordenSup >= ORDEN_1F;
+    if (mananaFria && supFirme) {
+      razonesPrecaucion.push('Puente de nieve sobre grieta en mañana fría: firme, pero vigile.');
+    }
+  }
+
+  // ── 🟡 hielo cubierto de detritos ──
+  if (tiposTodos.includes('hielo_cubierto_detritos')) {
+    razonesPrecaucion.push('Hielo cubierto de detritos: huecos y roca suelta ocultos.');
+  }
+
+  // ── 🟡 agua de deshielo superficial ──
+  if (has('agua_deshielo_superficial')) {
+    razonesPrecaucion.push('Agua de deshielo en superficie: hielo debilitándose.');
+  }
+
+  // ── 🟡 dureza F/4F sobre glaciar (superficie muy blanda) ──
+  if (dureza && DUREZAS_BLANDAS.includes(dureza)) {
+    razonesPrecaucion.push('Superficie muy blanda (la mano entra): cuidado con puentes y carga.');
+  }
+
+  // ── 🟡 otros peligros observados no contemplados arriba ──
+  for (const p of peligros) {
+    if (p === 'ninguno_evidente') continue;
+    if (
+      p === 'grietas_con_puente_nieve' || // ya manejado
+      p === 'hielo_podrido' || // ya 🔴
+      p === 'agua_deshielo_superficial' // ya manejado
+    ) continue;
+    razonesPrecaucion.push(peligroLabel(p));
+  }
+
+  if (razonesPrecaucion.length > 0) {
+    // De-duplicar conservando orden.
+    const razones = [...new Set(razonesPrecaucion)];
+    return { ...ESTADOS_SEGURIDAD.precaucion, razones };
+  }
+
+  // ── 🟢 ESTABLE: condiciones limpias ──
+  const mananaFria = hora == null || hora < HORA_MANANA_FRIA;
+
+  // firn/névé con dureza 1F–P sin peligros, mañana fría.
+  const firnFirme =
+    tipoSuperficie === 'firn_neve' &&
+    ordenSup != null &&
+    ordenSup >= ORDEN_1F &&
+    ordenSup <= ordenDureza('P');
+  if (firnFirme && mananaFria) {
     return {
       ...ESTADOS_SEGURIDAD.estable,
-      razones: ['Hielo compacto y duro, sin peligros observados'],
+      razones: ['Firn firme en mañana fría, sin peligros: buen agarre.'],
     };
   }
 
-  // Sin dureza registrada y sin peligros: precaución por falta de datos
-  // (no podemos afirmar que es estable sin medir el hielo).
+  // hielo de glaciar azul con H1 sin grietas/séracs/agua.
+  if (tipoSuperficie === 'hielo_glaciar_azul' && dureza === 'H1') {
+    return {
+      ...ESTADOS_SEGURIDAD.estable,
+      razones: ['Hielo trabajable (H1) sin peligros: clava bien el crampón.'],
+    };
+  }
+
+  // Sin dureza registrada → no podemos afirmar estabilidad.
+  if (!dureza) {
+    return {
+      ...ESTADOS_SEGURIDAD.precaucion,
+      razones: ['Falta medir la dureza del hielo para confirmar el estado.'],
+    };
+  }
+
+  // Caso limpio genérico (con dureza, sin peligros ni disparadores).
   return {
-    ...ESTADOS_SEGURIDAD.precaucion,
-    razones: ['Falta medir la dureza del hielo para confirmar el estado'],
+    ...ESTADOS_SEGURIDAD.estable,
+    razones: ['Superficie medida y sin peligros observados.'],
   };
 }
 
 const PELIGRO_LABELS = {
-  grietas_cerradas: 'Grietas cerradas',
-  grietas_abiertas: 'Grietas abiertas',
-  puente_nieve: 'Puente de nieve',
-  seracs: 'Séracs',
-  agua_deshielo: 'Agua de deshielo',
-  riesgo_avalancha: 'Riesgo de avalancha',
-  penitentes: 'Penitentes',
+  grietas_abiertas: 'Grietas abiertas.',
+  grietas_con_puente_nieve: 'Grietas con puente de nieve.',
+  seracs: 'Séracs cerca.',
+  rimaya_bergschrund: 'Rimaya (bergschrund).',
+  puente_nieve_debil: 'Puente de nieve débil.',
+  agua_deshielo_superficial: 'Agua de deshielo superficial.',
+  hielo_podrido: 'Hielo podrido.',
+  penitentes: 'Penitentes.',
+  riesgo_avalancha: 'Riesgo de avalancha.',
+  roca_suelta_sobre_hielo: 'Roca suelta sobre el hielo.',
+  pendiente_pronunciada: 'Pendiente pronunciada.',
 };
 
 function peligroLabel(key) {

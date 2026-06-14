@@ -38,7 +38,7 @@
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 22;
+export const DB_VERSION = 23;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -380,6 +380,19 @@ export const openDB = async () => {
           store.createIndex('createdAt', 'createdAt', { unique: false });
           store.createIndex('estado', 'estado', { unique: false });
           store.createIndex('guia', 'guia', { unique: false });
+        }
+      }
+
+      // v23: índice `puntoId` en glaciar_reportes — trazabilidad del FRENTE del
+      // hielo. Un punto fijo (punto_id estable) repetido en el tiempo cuenta el
+      // retroceso del glaciar: agrupar todos los reportes del mismo punto.
+      // Migración aditiva (no toca registros existentes): solo agrega el índice.
+      if (event.oldVersion < 23) {
+        if (db.objectStoreNames.contains(STORES.GLACIAR_REPORTES)) {
+          const store = event.target.transaction.objectStore(STORES.GLACIAR_REPORTES);
+          if (!store.indexNames.contains('puntoId')) {
+            store.createIndex('puntoId', 'puntoId', { unique: false });
+          }
         }
       }
     };

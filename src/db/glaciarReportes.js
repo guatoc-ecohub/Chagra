@@ -1,28 +1,44 @@
 /**
  * glaciarReportes.js — CRUD offline-first de reportes de puntos glaciares.
  *
- * Store: glaciar_reportes (ChagraDB v22)
- * Schema del registro:
+ * Store: glaciar_reportes (ChagraDB v23) — el reporte representa el FRENTE/BORDE
+ * del hielo (el punto que retrocede). Repetir el mismo `puntoId` en el tiempo
+ * = serie temporal del retroceso.
+ *
+ * Schema del registro (v2 "escala creíble"):
  *   {
  *     id,            // string único generado en cliente
+ *     puntoId,       // string ESTABLE del punto (repetible en el tiempo) | null
  *     createdAt,     // epoch ms
  *     fechaISO,      // ISO string (auto, hora local del reporte)
+ *     horaLocal,     // número 0–23.999 (hora local; afecta puentes de nieve)
  *     guia,          // nombre del guía (string)
- *     // Ubicación (GPS offline)
+ *     montana,       // key de MONTANAS | null
+ *     montanaLibre,  // texto si montana === 'otra'
+ *     pisoGlaciar,   // boolean — false => modo observación (borde)
+ *     // Ubicación (GPS offline) + trazabilidad climática
  *     lat, lng, altitud, precision,   // números | null
- *     // Diagnóstico
- *     tipoSuperficie,   // key de TIPOS_SUPERFICIE
- *     dureza,           // 1..5
+ *     distanciaBordeHieloM,           // número | null (desde hito fijo)
+ *     azimutBrujula,                  // grados 0–359 (dirección del disparo)
+ *     referenciaEncuadre,             // texto (repeat photography)
+ *     // Diagnóstico — perfil por CAPAS + lectura puntual rápida
+ *     capas,            // [{ profundidad, tipoSuperficie, dureza }] (la [0] = superficie)
+ *     tipoSuperficie,   // lectura puntual: key de TIPOS_SUPERFICIE
+ *     dureza,           // lectura puntual: código F..H2 (escala mano→piolet)
  *     tempSuperficie,   // °C | null
  *     peligros,         // string[] keys de PELIGROS
+ *     rutaBajoSeracs,   // boolean (séracs sobre la ruta)
+ *     penitentesDensos, // boolean
+ *     pendientePronunciada, // boolean
+ *     nieveReciente24h, // boolean
  *     // Condiciones
  *     tempAmbiente,     // °C | null
- *     nubosidad, viento, visibilidad,  // keys | null
+ *     cielo, viento, visibilidad,  // keys | null
  *     notas,            // texto libre
  *     // Foto (dataURL para sobrevivir recargas offline — NO blob URL)
  *     fotoDataUrl,      // string | null
  *     // Estado de seguridad derivado (cache de evaluarSeguridadGlaciar)
- *     estado,           // 'estable'|'precaucion'|'peligro'
+ *     estado,           // 'estable'|'precaucion'|'peligro'|'observacion'
  *     estadoRazones,    // string[]
  *   }
  *
@@ -78,6 +94,18 @@ export const glaciarReportes = {
       };
       req.onerror = () => reject(req.error);
     });
+  },
+
+  /**
+   * Devuelve todos los reportes de un mismo punto fijo (puntoId), del más
+   * reciente al más antiguo. Es la serie temporal del retroceso de ese punto.
+   * @param {string} puntoId
+   * @returns {Promise<object[]>}
+   */
+  async getByPunto(puntoId) {
+    if (!puntoId) return [];
+    const all = await this.getAll();
+    return all.filter((r) => r.puntoId === puntoId);
   },
 
   /**
