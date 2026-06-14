@@ -125,4 +125,42 @@ describe('glaciarReportes store', () => {
     const got = await glaciarReportes.get('foto-1');
     expect(got.fotoDataUrl).toBe(dataUrl);
   });
+
+  it('persiste el perfil por capas y campos de trazabilidad del frente', async () => {
+    const { glaciarReportes } = await import('../glaciarReportes');
+    await glaciarReportes.save({
+      id: 'capas-1',
+      puntoId: 'RITACUBA-FRENTE-01',
+      capas: [
+        { profundidad: '0–10 cm', tipoSuperficie: 'hielo_glaciar_azul', dureza: 'H1' },
+        { profundidad: '10–40 cm', tipoSuperficie: 'firn_neve', dureza: 'P' },
+      ],
+      azimutBrujula: 135,
+      distanciaBordeHieloM: 12,
+      pisoGlaciar: true,
+      estado: 'estable',
+    });
+    const got = await glaciarReportes.get('capas-1');
+    expect(got.capas).toHaveLength(2);
+    expect(got.capas[0].dureza).toBe('H1');
+    expect(got.azimutBrujula).toBe(135);
+    expect(got.puntoId).toBe('RITACUBA-FRENTE-01');
+  });
+
+  it('getByPunto() agrupa la serie temporal del mismo punto fijo', async () => {
+    const { glaciarReportes } = await import('../glaciarReportes');
+    await glaciarReportes.save({ id: 'p1-a', puntoId: 'FRENTE-A', createdAt: 1000, estado: 'estable' });
+    await glaciarReportes.save({ id: 'p1-b', puntoId: 'FRENTE-A', createdAt: 3000, estado: 'precaucion' });
+    await glaciarReportes.save({ id: 'p2-a', puntoId: 'FRENTE-B', createdAt: 2000, estado: 'estable' });
+    const serie = await glaciarReportes.getByPunto('FRENTE-A');
+    // Ordenado del más reciente al más antiguo (hereda el orden de getAll).
+    expect(serie.map((r) => r.id)).toEqual(['p1-b', 'p1-a']);
+  });
+
+  it('getByPunto() sin id devuelve lista vacía', async () => {
+    const { glaciarReportes } = await import('../glaciarReportes');
+    await glaciarReportes.save({ id: 'x', puntoId: 'Z', estado: 'estable' });
+    expect(await glaciarReportes.getByPunto('')).toEqual([]);
+    expect(await glaciarReportes.getByPunto(null)).toEqual([]);
+  });
 });
