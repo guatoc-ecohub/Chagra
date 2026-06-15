@@ -36,6 +36,7 @@ const PhotoCaptureField = ({ onPhoto, onRemove, label = "Capturar Foto", value =
             url = URL.createObjectURL(value);
             const safeUrl = sanitizeBlobUrl(url);
             if (active && safeUrl) {
+                // eslint-disable-next-line react-hooks/set-state-in-effect
                 setPreviewUrl(safeUrl);
             } else {
                 URL.revokeObjectURL(url);
@@ -128,6 +129,7 @@ const PhotoCaptureField = ({ onPhoto, onRemove, label = "Capturar Foto", value =
                 onChange={handleFileChange}
                 ref={cameraInputRef}
                 className="hidden"
+                aria-label="Tomar foto con camara"
             />
             <input
                 type="file"
@@ -135,6 +137,7 @@ const PhotoCaptureField = ({ onPhoto, onRemove, label = "Capturar Foto", value =
                 onChange={handleFileChange}
                 ref={galleryInputRef}
                 className="hidden"
+                aria-label="Seleccionar foto de galeria"
             />
 
             {!previewUrl && !isProcessing && (

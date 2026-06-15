@@ -66,7 +66,7 @@ export default function SyncProgressIndicator() {
             <span className="text-sm font-medium">
               Sincronización completa
             </span>
-            <button onClick={handleDismiss} className="ml-auto text-slate-400 hover:text-slate-200">
+            <button onClick={handleDismiss} aria-label="Cerrar" className="ml-auto text-slate-400 hover:text-slate-200">
               <X size={16} />
             </button>
           </div>
@@ -76,7 +76,7 @@ export default function SyncProgressIndicator() {
             <span className="text-sm font-medium">
               Sincronización pausada en {syncProgress.current} / {syncProgress.total}
             </span>
-            <button onClick={handleDismiss} className="ml-auto text-slate-400 hover:text-slate-200">
+            <button onClick={handleDismiss} aria-label="Cerrar" className="ml-auto text-slate-400 hover:text-slate-200">
               <X size={16} />
             </button>
           </div>
@@ -86,7 +86,7 @@ export default function SyncProgressIndicator() {
             <span className="text-sm font-medium">
               Error: {syncProgress.error}
             </span>
-            <button onClick={handleDismiss} className="ml-auto text-slate-400 hover:text-slate-200">
+            <button onClick={handleDismiss} aria-label="Cerrar" className="ml-auto text-slate-400 hover:text-slate-200">
               <X size={16} />
             </button>
           </div>

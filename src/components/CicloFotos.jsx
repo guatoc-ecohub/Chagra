@@ -39,6 +39,7 @@ export default function CicloFotos({ processId }) {
   }, [processId]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     load();
     return () => setPhotos((prev) => { prev.forEach((p) => p.revoke?.()); return []; });
   }, [load]);
@@ -90,7 +91,7 @@ export default function CicloFotos({ processId }) {
       )}
       {err && <p className="text-xs text-amber-400 mt-1">{err}</p>}
       {viewing && (
-        <div className="fixed inset-0 z-[80] bg-black/90 flex items-center justify-center" onClick={() => setViewing(null)}>
+        <div className="fixed inset-0 z-[80] bg-black/90 flex items-center justify-center" role="dialog" aria-modal="true" aria-label="Visor de foto" onClick={() => setViewing(null)}>
           <button type="button" className="absolute top-4 right-4 text-white z-10" onClick={() => setViewing(null)} aria-label="Cerrar foto"><X size={24} /></button>
           <PhotoViewer src={viewing} alt="Foto del ciclo" />
         </div>

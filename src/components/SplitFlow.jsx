@@ -50,7 +50,7 @@ export const SplitFlow = ({ asset, onClose }) => {
                     <Layers className="text-emerald-400" />
                     {trackingMode === 'individual' ? 'Juntar en grupo' : 'Dividir en plantas individuales'}
                 </h2>
-                <button onClick={onClose} className="p-2 text-slate-400 hover:text-white transition-colors">
+                <button onClick={onClose} aria-label="Cerrar" className="p-2 text-slate-400 hover:text-white transition-colors">
                     <X size={24} />
                 </button>
             </div>
