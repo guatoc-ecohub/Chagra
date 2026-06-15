@@ -140,6 +140,9 @@ jobs:
           VITE_FARMOS_URL: ""
           VITE_FARMOS_CLIENT_ID: farm
           VITE_HA_ACCESS_TOKEN: ${{ secrets.VITE_HA_ACCESS_TOKEN }}
+          # Operador: username inyectado en build desde secret (anti-leak: NUNCA
+          # hardcodeado en el source publico). Habilita esOperador -> vision total.
+          VITE_OPERATOR_USERNAME: ${{ secrets.OPERATOR_USERNAME }}
           # Sidecar agro-mcp (ADR-045 fase 2) activado en produccion 2026-05-23.
           # Con flag true, AgentScreen rutea cada turno por NLU del sidecar y,
           # si el planner detecta agro-query, llama al tool MCP antes del chat.

@@ -97,16 +97,22 @@ describe('glaciarAccess — tieneAccesoGlaciarActual (usuario logueado, offline)
 
 describe('glaciarAccess — esOperador (bypass de visión total, función pura)', () => {
   beforeEach(async () => {
+    // El operador se inyecta por env (anti-leak: no se hardcodea el username real).
+    vi.stubEnv('VITE_OPERATOR_USERNAME', 'op-test');
     glaciarAccess = await importFresh();
   });
 
-  it('devuelve true para el operador (kortux)', () => {
-    expect(glaciarAccess.esOperador('kortux')).toBe(true);
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('devuelve true para el operador (segun VITE_OPERATOR_USERNAME)', () => {
+    expect(glaciarAccess.esOperador('op-test')).toBe(true);
   });
 
   it('hace match case-insensitive y tolerante a espacios (trim)', () => {
-    expect(glaciarAccess.esOperador('KORTUX')).toBe(true);
-    expect(glaciarAccess.esOperador('  Kortux  ')).toBe(true);
+    expect(glaciarAccess.esOperador('OP-TEST')).toBe(true);
+    expect(glaciarAccess.esOperador('  Op-Test  ')).toBe(true);
   });
 
   it('INVARIANTE: un guía glaciar REAL de la Cordada NO es operador', () => {
@@ -125,13 +131,14 @@ describe('glaciarAccess — esOperador (bypass de visión total, función pura)'
     expect(glaciarAccess.esOperador('   ')).toBe(false);
   });
 
-  it('OPERADOR_WHITELIST es un Set no vacío e independiente de CORDADA', () => {
-    expect(glaciarAccess.OPERADOR_WHITELIST).toBeInstanceOf(Set);
-    expect(glaciarAccess.OPERADOR_WHITELIST.size).toBeGreaterThan(0);
+  it('getOperadorWhitelist() es un Set no vacío e independiente de CORDADA', () => {
+    const operadores = glaciarAccess.getOperadorWhitelist();
+    expect(operadores).toBeInstanceOf(Set);
+    expect(operadores.size).toBeGreaterThan(0);
     // Son conceptos distintos: la Cordada (acceso al tile) NO es la whitelist
     // de operador (visión total). alex está en Cordada pero NO es operador.
     expect(glaciarAccess.CORDADA_WHITELIST.has('alex')).toBe(true);
-    expect(glaciarAccess.OPERADOR_WHITELIST.has('alex')).toBe(false);
+    expect(operadores.has('alex')).toBe(false);
   });
 });
 
@@ -140,6 +147,7 @@ describe('glaciarAccess — esOperadorActual (usuario logueado, offline)', () =>
 
   beforeEach(async () => {
     store = {};
+    vi.stubEnv('VITE_OPERATOR_USERNAME', 'op-test');
     vi.stubGlobal('localStorage', {
       getItem: (k) => store[k] ?? null,
       setItem: (k, v) => { store[k] = v; },
@@ -150,10 +158,11 @@ describe('glaciarAccess — esOperadorActual (usuario logueado, offline)', () =>
 
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
   });
 
   it('devuelve true cuando el usuario logueado es el operador', () => {
-    store['chagra:active_tenant_id'] = 'kortux';
+    store['chagra:active_tenant_id'] = 'op-test';
     expect(glaciarAccess.esOperadorActual()).toBe(true);
   });
 

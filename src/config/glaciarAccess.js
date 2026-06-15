@@ -53,7 +53,8 @@ export const CORDADA_WHITELIST = new Set([
   'alex',    // La Cordada — beta tester glaciar.
   'mario',   // La Cordada — beta tester glaciar.
   'camilo',  // La Cordada — beta tester glaciar.
-  'kortux',  // Operador — debe VER el tile glaciar (acceso), NO rol de guía.
+  // NOTA: el operador NO se hardcodea aquí (anti-leak, repo público). Ve el tile
+  // glaciar vía `tieneAccesoGlaciar` (que incluye a esOperador). Ver abajo.
 ]);
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -67,8 +68,9 @@ export const CORDADA_WHITELIST = new Set([
 //
 // Por eso el operador tiene su PROPIA whitelist: estar acá NO deriva un rol de
 // producto; es un BYPASS del gating del home/chips para que el operador
-// (admin/demo/debug) vea SIEMPRE TODO. El operador puede seguir estando también
-// en CORDADA_WHITELIST (para ver el tile glaciar) sin que eso le estreche nada.
+// (admin/demo/debug) vea SIEMPRE TODO. El operador ve el tile glaciar vía
+// `tieneAccesoGlaciar` (que incluye a esOperador), SIN hardcodear su username
+// (anti-leak: repo público, ver tests/unit/boundaryAudit.test.js).
 //
 // NO reutilizar CORDADA_WHITELIST para esto: son dos conceptos distintos
 // (acceso a un módulo beta vs. visión total del operador).
@@ -84,9 +86,26 @@ export const CORDADA_WHITELIST = new Set([
  *
  * @constant {Set<string>}
  */
-export const OPERADOR_WHITELIST = new Set([
-  'kortux',  // Operador — visión total para demos/debug (NO estrecha por rol).
-]);
+// ANTI-LEAK (repo PÚBLICO): el/los username(s) del operador se INYECTAN en build
+// vía la env `VITE_OPERATOR_USERNAME` (uno o varios separados por coma) y NUNCA se
+// hardcodean aquí. El deploy la setea desde el secret OPERATOR_USERNAME. En dev sin
+// la env, el Set queda vacío → esOperador=false (fallback seguro). Ver
+// tests/unit/boundaryAudit.test.js (Task 40).
+function operadorUsernames() {
+  return String(import.meta.env?.VITE_OPERATOR_USERNAME ?? '')
+    .split(',')
+    .map((u) => u.trim().toLowerCase())
+    .filter((u) => u.length > 0);
+}
+
+/**
+ * Set de usernames del operador, leído de la env en CALL-TIME (testeable con
+ * vi.stubEnv). NUNCA hardcodea el username (anti-leak, repo público).
+ * @returns {Set<string>}
+ */
+export function getOperadorWhitelist() {
+  return new Set(operadorUsernames());
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // API pública
@@ -108,7 +127,9 @@ export function tieneAccesoGlaciar(username) {
   if (!username || typeof username !== 'string') return false;
   const normalized = username.trim().toLowerCase();
   if (normalized.length === 0) return false;
-  return CORDADA_WHITELIST.has(normalized);
+  // El operador (visión total) también ve el tile glaciar, aunque ya NO esté
+  // hardcodeado en CORDADA_WHITELIST (anti-leak).
+  return CORDADA_WHITELIST.has(normalized) || esOperador(normalized);
 }
 
 /**
@@ -137,7 +158,7 @@ export function esOperador(username) {
   if (!username || typeof username !== 'string') return false;
   const normalized = username.trim().toLowerCase();
   if (normalized.length === 0) return false;
-  return OPERADOR_WHITELIST.has(normalized);
+  return operadorUsernames().includes(normalized);
 }
 
 /**
