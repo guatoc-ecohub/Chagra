@@ -19,6 +19,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Snowflake, ChevronRight } from 'lucide-react';
 import AgentHero from './AgentHero';
+import { CHIP_DEFS } from '../../services/agentCapabilities';
 import OnboardingHero from '../OnboardingHero';
 import { getProfile, isModuleVisible } from '../../services/userProfileService';
 import { tieneAccesoGlaciarActual } from '../../config/glaciarAccess';
@@ -294,9 +295,28 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
                 </div>
             )}
 
-            {/* Panel inline de capacidades RETIRADO (operador 2026-06-10): el
-                menú vive solo en el despliegue de la Ⓐ del AgentHero (la red
-                nueva AgentRedMenu). El home queda limpio. */}
+            {/* Capacidades VISIBLES en el home (re-add 2026-06-15): revierte el
+                retiro del 06-10. El operador busca silvopastoreo/restauración/etc.
+                AQUÍ (no escondidas tras la Ⓐ). Tocar un chip abre el agente. */}
+            <div className="px-4 pt-3">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                    Pregúntale a Chagra
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {CHIP_DEFS.filter((c) => c.kind !== 'stub').map((c) => (
+                        <button
+                            key={c.intent}
+                            type="button"
+                            onClick={() => onNavigate('agente')}
+                            className="flex items-center gap-2 p-2.5 rounded-xl border border-slate-700/50 bg-slate-800/70 hover:bg-slate-700/70 active:scale-[0.98] transition text-left"
+                            aria-label={c.label}
+                        >
+                            <span className="text-lg shrink-0" aria-hidden="true">{c.icon}</span>
+                            <span className="text-sm font-semibold text-slate-100 leading-tight truncate">{c.label}</span>
+                        </button>
+                    ))}
+                </div>
+            </div>
 
             {/* Saludo regional dismissible — bajo el fold, ya no sobre el hero
                 (que tiene su propio saludo "Soy Chagra"). */}
