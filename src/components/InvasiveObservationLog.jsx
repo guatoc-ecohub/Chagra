@@ -229,7 +229,7 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
     return (
         <div className="h-[100dvh] w-full bg-slate-950 text-slate-100 flex flex-col overflow-y-auto">
             <header className="p-4 sticky top-0 bg-slate-950 border-b border-slate-800 flex items-center gap-4 z-10 shrink-0 shadow-md">
-                <button onClick={onBack} className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[56px] min-w-[56px] flex justify-center items-center shrink-0">
+                <button onClick={onBack} aria-label="Volver" className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[56px] min-w-[56px] flex justify-center items-center shrink-0">
                     <ArrowLeft size={32} />
                 </button>
                 <h2 className="text-3xl font-bold truncate">Reportar Invasora</h2>

@@ -98,8 +98,8 @@ function PhotoHeroSection({ assetId, speciesSlug, assetType }) {
 
   return (
     <section className="rounded-2xl overflow-hidden border border-slate-700/50 bg-slate-900" data-testid="photo-hero-section">
-      <input ref={cameraRef} type="file" accept="image/*" capture="environment" onChange={handleFile} className="hidden" />
-      <input ref={galleryRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
+      <input ref={cameraRef} type="file" accept="image/*" capture="environment" onChange={handleFile} className="hidden" aria-label="Tomar foto con camara" />
+      <input ref={galleryRef} type="file" accept="image/*" onChange={handleFile} className="hidden" aria-label="Seleccionar foto de galeria" />
 
       {hasPhoto ? (
         // Hero con foto: imagen 4:3 + overlay gradient + botones flotantes.

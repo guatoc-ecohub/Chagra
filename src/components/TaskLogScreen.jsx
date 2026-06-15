@@ -50,6 +50,7 @@ function TaskLogScreen({ onBack, onNewTask }) {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchPendingTasks();
   }, []);
 
@@ -83,7 +84,7 @@ function TaskLogScreen({ onBack, onNewTask }) {
     <div className="h-[100dvh] w-full bg-slate-950 text-slate-100 flex flex-col overflow-y-auto">
       <header className="p-4 sticky top-0 bg-slate-950 border-b border-slate-800 flex items-center justify-between z-10 shrink-0 shadow-md">
         <div className="flex items-center gap-4">
-          <button onClick={onBack} className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[56px] min-w-[56px] flex justify-center items-center shrink-0">
+          <button onClick={onBack} aria-label="Volver" className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[56px] min-w-[56px] flex justify-center items-center shrink-0">
             <ArrowLeft size={32} />
           </button>
           <h2 className="text-3xl font-bold">Log de Tareas</h2>
@@ -107,7 +108,7 @@ function TaskLogScreen({ onBack, onNewTask }) {
           >
             <span className="text-3xl font-black text-slate-950" aria-hidden="true">+</span>
           </button>
-          <button onClick={syncTasks} disabled={isSyncing} className="p-2 bg-slate-800 rounded-full active:bg-slate-700 min-h-[40px] min-w-[40px] flex justify-center items-center shrink-0 border border-slate-600">
+          <button onClick={syncTasks} disabled={isSyncing} aria-label="Sincronizar tareas" className="p-2 bg-slate-800 rounded-full active:bg-slate-700 min-h-[40px] min-w-[40px] flex justify-center items-center shrink-0 border border-slate-600">
             <RefreshCw size={16} className={isSyncing ? 'animate-spin' : ''} />
           </button>
         </div>

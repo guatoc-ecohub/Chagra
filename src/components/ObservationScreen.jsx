@@ -107,6 +107,7 @@ function ObservationScreen({ onBack, onSave }) {
     // Reset si no se cumplen condiciones (mantiene UI limpia entre cambios
     // de severity o descripción vaciada).
     if (!triggers || desc.length < MIN_DESCRIPTION_LEN) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRagSuggestions([]);
       setRagLoading(false);
       return undefined;
@@ -296,7 +297,7 @@ function ObservationScreen({ onBack, onSave }) {
   return (
     <div className="h-[100dvh] w-full bg-slate-950 text-slate-100 flex flex-col overflow-y-auto">
       <header className="p-4 sticky top-0 bg-slate-950 border-b border-slate-800 flex items-center gap-4 z-10 shrink-0 shadow-md">
-        <button onClick={onBack} className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[56px] min-w-[56px] flex justify-center items-center shrink-0">
+        <button onClick={onBack} aria-label="Volver" className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[56px] min-w-[56px] flex justify-center items-center shrink-0">
           <ArrowLeft size={32} />
         </button>
         <h2 className="text-3xl font-bold">Observacion</h2>
@@ -452,8 +453,8 @@ function ObservationScreen({ onBack, onSave }) {
 
         <div className="flex flex-col gap-2">
           <span className="text-xl font-bold">Foto</span>
-          <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handlePhotoCapture} className="hidden" />
-          <input ref={galleryInputRef} type="file" accept="image/*" onChange={handlePhotoCapture} className="hidden" />
+          <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handlePhotoCapture} className="hidden" aria-label="Tomar foto con camara" />
+          <input ref={galleryInputRef} type="file" accept="image/*" onChange={handlePhotoCapture} className="hidden" aria-label="Seleccionar foto de galeria" />
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"

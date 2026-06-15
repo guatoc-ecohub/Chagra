@@ -162,7 +162,7 @@ export default function WorkerHistory({ onBack, onEntryClick }) {
     <div className="h-[100dvh] w-full bg-slate-950 text-slate-100 flex flex-col overflow-hidden">
       {/* Header */}
       <header className="p-4 bg-slate-950 border-b border-slate-800 flex items-center gap-4 shrink-0 shadow-md">
-        <button onClick={onBack} className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[48px] min-w-[48px] flex justify-center items-center shrink-0">
+        <button onClick={onBack} aria-label="Volver" className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[48px] min-w-[48px] flex justify-center items-center shrink-0">
           <ArrowLeft size={24} />
         </button>
         <h2 className="text-2xl font-black flex-1">Historial</h2>
@@ -172,7 +172,7 @@ export default function WorkerHistory({ onBack, onEntryClick }) {
           ) : (
             <WifiOff size={14} className="text-red-400" />
           )}
-          <button onClick={loadData} disabled={isLoading} className="p-2 bg-slate-800 rounded-lg active:bg-slate-700 disabled:opacity-50 min-h-[40px] min-w-[40px] flex items-center justify-center">
+          <button onClick={loadData} disabled={isLoading} aria-label="Recargar datos" className="p-2 bg-slate-800 rounded-lg active:bg-slate-700 disabled:opacity-50 min-h-[40px] min-w-[40px] flex items-center justify-center">
             <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
           </button>
         </div>
