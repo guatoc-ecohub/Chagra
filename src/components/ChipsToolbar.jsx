@@ -68,9 +68,9 @@ export default function ChipsToolbar({
     'focus:outline-none focus:ring-2 focus:ring-emerald-400/60 ' +
     'disabled:opacity-40 disabled:cursor-not-allowed';
   // Alto contraste: activo = verde sólido sobre texto blanco; inactivo =
-  // slate-700 con borde claro (legible al sol). Toque ≥44px efectivo por padding.
-  const inactiveChip =
-    'bg-slate-700 border-slate-500 text-slate-100 hover:bg-slate-600 hover:border-slate-400';
+  // superficie OPACA por token (.agent-chip — paridad con el home, legible sobre
+  // la foto de fondo). Toque ≥44px efectivo por padding.
+  const inactiveChip = 'agent-chip';
   const activeChip =
     'bg-emerald-600 border-emerald-300 text-white shadow-md';
   // Chip Pro bloqueado: apariencia visualmente diferenciada para free users.
@@ -80,7 +80,7 @@ export default function ChipsToolbar({
   return (
     <div
       data-testid="chips-toolbar"
-      className="px-3 py-2 border-t border-slate-800/70 bg-slate-900/70"
+      className="agent-chip-tray px-3 py-2"
     >
       <div
         role="toolbar"
