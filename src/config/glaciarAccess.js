@@ -53,7 +53,39 @@ export const CORDADA_WHITELIST = new Set([
   'alex',    // La Cordada — beta tester glaciar.
   'mario',   // La Cordada — beta tester glaciar.
   'camilo',  // La Cordada — beta tester glaciar.
-  'kortux',  // Operador — acceso total (admin/testing); debe ver todo.
+  'kortux',  // Operador — debe VER el tile glaciar (acceso), NO rol de guía.
+]);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WHITELIST DE OPERADOR — separada de la Cordada A PROPÓSITO.
+//
+// PROBLEMA QUE RESUELVE (regresión 2026-06-15): meter al operador en
+// CORDADA_WHITELIST le da acceso al tile glaciar (correcto), pero como efecto
+// colateral `deriveRole` lo clasifica como `guia_glaciar` y `homeModuleSelector`
+// le entrega el set ESTRECHO de guía (clima/páramo/reforestación) — lo contrario
+// de "acceso total". Pertenecer a la Cordada NO debe estrechar el home.
+//
+// Por eso el operador tiene su PROPIA whitelist: estar acá NO deriva un rol de
+// producto; es un BYPASS del gating del home/chips para que el operador
+// (admin/demo/debug) vea SIEMPRE TODO. El operador puede seguir estando también
+// en CORDADA_WHITELIST (para ver el tile glaciar) sin que eso le estreche nada.
+//
+// NO reutilizar CORDADA_WHITELIST para esto: son dos conceptos distintos
+// (acceso a un módulo beta vs. visión total del operador).
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Set de usernames farmOS del/los OPERADOR(es) del producto (admin/testing).
+ * Estar acá da VISIÓN TOTAL del home (todos los módulos + las 4 tarjetas de
+ * seguimiento + el catálogo completo de chips vivos), saltándose el gating por
+ * perfil.
+ *
+ * Para dar visión total a alguien: añadir su username (lowercase) a este Set.
+ *
+ * @constant {Set<string>}
+ */
+export const OPERADOR_WHITELIST = new Set([
+  'kortux',  // Operador — visión total para demos/debug (NO estrecha por rol).
 ]);
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -89,4 +121,33 @@ export function tieneAccesoGlaciar(username) {
  */
 export function tieneAccesoGlaciarActual() {
   return tieneAccesoGlaciar(getActiveTenantId());
+}
+
+/**
+ * Función pura: ¿este username es OPERADOR del producto (visión total)?
+ *
+ * Normaliza igual que `tieneAccesoGlaciar` (trim + toLowerCase) para que el
+ * match sea robusto ante capitalización/espacios. Es independiente de la
+ * Cordada: un guía de glaciar REAL (alex/mario/camilo) NO es operador.
+ *
+ * @param {string|null|undefined} username — username farmOS del usuario.
+ * @returns {boolean} true solo si está en OPERADOR_WHITELIST.
+ */
+export function esOperador(username) {
+  if (!username || typeof username !== 'string') return false;
+  const normalized = username.trim().toLowerCase();
+  if (normalized.length === 0) return false;
+  return OPERADOR_WHITELIST.has(normalized);
+}
+
+/**
+ * ¿El usuario actualmente logueado es OPERADOR (visión total)?
+ *
+ * Companion offline de `tieneAccesoGlaciarActual`: lee el mismo username
+ * persistido por `tenantContext`. No requiere red.
+ *
+ * @returns {boolean}
+ */
+export function esOperadorActual() {
+  return esOperador(getActiveTenantId());
 }

@@ -113,6 +113,17 @@ const STUB_INTENTS = new Set(
 );
 
 /**
+ * Catálogo COMPLETO de chips VIVOS (todos los `CHIP_DEFS` con `kind !== 'stub'`),
+ * en el orden del manifiesto. Es lo que ve el OPERADOR (bypass del gating por
+ * perfil): la caja de herramientas entera, sin estrechar. Los stubs (precio/deep,
+ * sin backend) quedan fuera, igual que para cualquier otro perfil.
+ * @type {readonly string[]}
+ */
+const ALL_LIVE_CHIP_INTENTS = Object.freeze(
+  CHIP_DEFS.filter((d) => d.kind !== 'stub').map((d) => d.intent),
+);
+
+/**
  * Normaliza un string a minúsculas sin tildes ni espacios sobrantes. Tolerante
  * a `null`/no-string (devuelve '').
  * @param {unknown} v
@@ -258,11 +269,20 @@ export function selectChipIntentsForRole({
  *
  * @param {Object} profile — perfil (chagra:profile).
  * @param {Object} [opts]
+ * @param {boolean} [opts.esOperador=false] — el usuario es OPERADOR (admin/demo/
+ *   debug). BYPASS del gating por perfil: devuelve el catálogo COMPLETO de chips
+ *   vivos. Tiene PRECEDENCIA sobre el rol y sobre #7003.
  * @param {boolean} [opts.esGuiaGlaciar=false] — username en whitelist Cordada.
  * @param {Object} [opts.moduleVisibility] — { moduleId: boolean } de #7003.
  * @returns {string[]} intents de chip ordenados para este usuario.
  */
 export function selectChipIntents(profile, opts = {}) {
+  // BYPASS OPERADOR (primer check): la caja de herramientas completa, sin
+  // estrechar por rol/visibilidad. Solo se omiten los stubs (sin backend),
+  // igual que para todos. Va antes de deriveRole para que la whitelist Cordada
+  // del operador no recorte el set por el rol guia_glaciar.
+  if (opts.esOperador) return [...ALL_LIVE_CHIP_INTENTS];
+
   const p = profile && typeof profile === 'object' ? profile : {};
   const role = deriveRole(p, opts);
 

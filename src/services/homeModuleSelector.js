@@ -277,6 +277,9 @@ function dedupeValid(ids, valid) {
  *
  * @param {Object} profile — perfil del usuario (chagra:profile:v1).
  * @param {Object} [opts]
+ * @param {boolean} [opts.esOperador=false] — el usuario es OPERADOR (admin/demo/
+ *   debug, whitelist en glaciarAccess). BYPASS del gating: ve TODO. Tiene
+ *   PRECEDENCIA sobre el override urbano y sobre los mapas por rol.
  * @param {boolean} [opts.esGuiaGlaciar=false] — username en whitelist Cordada
  *   (lo resuelve el call-site con glaciarAccess, fuera de este módulo puro).
  * @returns {{ visibles: string[], seguimiento: string[] }} ids de módulos del
@@ -285,6 +288,20 @@ function dedupeValid(ids, valid) {
  */
 export function selectHomeModules(profile, opts = {}) {
   const p = profile && typeof profile === 'object' ? profile : {};
+
+  // ── BYPASS OPERADOR (PRIMER check, gana sobre TODO) ──────────────────────
+  // El operador (admin/demo/debug) ve SIEMPRE el home completo: todos los
+  // módulos + las 4 tarjetas de seguimiento (incluida Cerdos). Va ANTES del
+  // override urbano y de los mapas por rol, porque su criterio de éxito es
+  // "ver todo para demos y debug", no una vista por perfil. (Que el operador
+  // esté en la Cordada — para ver el tile glaciar — NO debe estrecharle el
+  // home: ese era el bug que esto corrige.)
+  if (opts.esOperador) {
+    return {
+      visibles: dedupeValid(ALL_HOME_MODULES, VALID_MODULES),
+      seguimiento: dedupeValid(Object.values(SEGUIMIENTO_KEYS), VALID_SEGUIMIENTO),
+    };
+  }
 
   // ── OVERRIDE DURO: urbano ───────────────────────────────────────────────
   // Gana sobre cualquier rol derivado. Set mínimo, SIN seguimiento (un balcón

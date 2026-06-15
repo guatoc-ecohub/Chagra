@@ -260,3 +260,45 @@ describe('profileChipSelector — selectChipDefs (objetos para el componente)', 
     }
   });
 });
+
+// ── BYPASS OPERADOR (regresión 2026-06-15 — catálogo COMPLETO de chips) ─────
+describe('profileChipSelector — opts.esOperador (catálogo completo de chips)', () => {
+  // Catálogo COMPLETO de chips vivos (kind !== 'stub') = lo que ve el operador.
+  const LIVE_INTENTS = CHIP_DEFS.filter((d) => d.kind !== 'stub').map((d) => d.intent);
+  const STUB_INTENTS = CHIP_DEFS.filter((d) => d.kind === 'stub').map((d) => d.intent);
+
+  it('OPERADOR: selectChipIntents devuelve TODOS los chips vivos del manifiesto', () => {
+    const intents = selectChipIntents({}, { esOperador: true });
+    for (const i of LIVE_INTENTS) expect(intents).toContain(i);
+    expect(intents.length).toBe(LIVE_INTENTS.length);
+    // Los stubs (sin backend) NO aparecen, igual que para cualquier perfil.
+    for (const s of STUB_INTENTS) expect(intents).not.toContain(s);
+  });
+
+  it('OPERADOR: incluye chips que un guía glaciar NO vería (biopreparado, siembro)', () => {
+    const intents = selectChipIntents({}, { esOperador: true });
+    expect(intents).toContain(CHIP_INTENTS.biopreparado);
+    expect(intents).toContain(CHIP_INTENTS.siembro);
+    expect(intents).toContain(CHIP_INTENTS.silvopastoreo);
+  });
+
+  it('OPERADOR gana sobre el rol guía glaciar (Cordada NO recorta sus chips)', () => {
+    // esGuiaGlaciar también true, pero esOperador tiene precedencia → catálogo full.
+    const intents = selectChipIntents({}, { esOperador: true, esGuiaGlaciar: true });
+    for (const i of LIVE_INTENTS) expect(intents).toContain(i);
+    expect(intents).toContain(CHIP_INTENTS.biopreparado); // guía NO lo vería
+  });
+
+  it('OPERADOR: selectChipDefs entrega los objetos completos de TODOS los chips vivos', () => {
+    const defs = selectChipDefs({}, { esOperador: true });
+    expect(defs.length).toBe(LIVE_INTENTS.length);
+    for (const d of defs) expect(d).toHaveProperty('label');
+  });
+
+  it('NO-OPERADOR: guía glaciar REAL (esGuiaGlaciar sin esOperador) SIGUE sin biopreparado', () => {
+    // No-regresión: alex/mario/camilo conservan su set estrecho de chips.
+    const intents = selectChipIntents({ vocacion: 'campesino' }, { esGuiaGlaciar: true });
+    expect(intents).not.toContain(CHIP_INTENTS.biopreparado);
+    expect(intents).toContain(CHIP_INTENTS.clima);
+  });
+});

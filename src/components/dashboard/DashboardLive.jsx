@@ -29,7 +29,7 @@ import {
     selectHomeModuleVisibilityMap,
     selectHomeModules,
 } from '../../services/homeModuleSelector';
-import { tieneAccesoGlaciarActual } from '../../config/glaciarAccess';
+import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciarAccess';
 import SelectedBackgroundReveal from './SelectedBackgroundReveal';
 import ClimaStrip from './ClimaStrip';
 import HoyEnFincaStrip from './HoyEnFincaStrip';
@@ -185,7 +185,10 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
                 return getModuleVisibility();
             }
             // Primer load sin elección manual: default por perfil.
+            // El operador (esOperadorActual) hace BYPASS → ve TODOS los módulos
+            // (selectHomeModules ignora el rol/urbano cuando esOperador=true).
             return selectHomeModuleVisibilityMap(getProfile(), {
+                esOperador: esOperadorActual(),
                 esGuiaGlaciar: tieneAccesoGlaciarActual(),
             });
         } catch (_) {
@@ -209,7 +212,9 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
     const [seguimientoKeys] = useState(() => {
         try {
             if (hasManualModuleVisibility()) return null;
+            // El operador ve las 4 tarjetas (incluida Cerdos) por el bypass.
             return selectHomeModules(getProfile(), {
+                esOperador: esOperadorActual(),
                 esGuiaGlaciar: tieneAccesoGlaciarActual(),
             }).seguimiento;
         } catch (_) {
