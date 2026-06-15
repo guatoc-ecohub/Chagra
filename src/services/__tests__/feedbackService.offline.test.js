@@ -13,9 +13,7 @@ import {
  * flushFeedbackQueue() lo reenvía cuando vuelve la conexión.
  */
 
-function setOnline(value) {
-  Object.defineProperty(navigator, 'onLine', { value, configurable: true });
-}
+import { setOnline } from '../../test-utils/index.js';
 
 beforeEach(() => {
   localStorage.clear();

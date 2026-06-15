@@ -14,62 +14,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
  * (analyzeFoliage / recognizeSpeciesGrounded) para no pegar al modelo.
  */
 
-// ─── Mock de dbCore: IndexedDB en memoria mínimo para el store vision_queue ──
-// Imita la superficie de IDBDatabase que visionQueueService usa: transaction →
-// objectStore → {add, getAll, put, delete, get}. autoIncrement simulado.
-function makeFakeDB() {
-  const data = new Map();
-  let seq = 0;
-  const makeReq = (resultFn) => {
-    const req = {};
-    queueMicrotask(() => {
-      try {
-        req.result = resultFn();
-        req.onsuccess?.({ target: req });
-      } catch (e) {
-        req.error = e;
-        req.onerror?.({ target: req });
-      }
-    });
-    return req;
-  };
-  return {
-    transaction() {
-      return {
-        objectStore() {
-          return {
-            add(record) {
-              return makeReq(() => {
-                const id = record.id != null ? record.id : ++seq;
-                data.set(id, { ...record, id });
-                return id;
-              });
-            },
-            put(record) {
-              return makeReq(() => {
-                data.set(record.id, { ...record });
-                return record.id;
-              });
-            },
-            get(id) {
-              return makeReq(() => data.get(id) || undefined);
-            },
-            delete(id) {
-              return makeReq(() => {
-                data.delete(id);
-                return undefined;
-              });
-            },
-            getAll() {
-              return makeReq(() => Array.from(data.values()));
-            },
-          };
-        },
-      };
-    },
-    __data: data,
-  };
-}
+import { makeFakeDB } from '../../test-utils/index.js';
 
 let fakeDB;
 
@@ -93,9 +38,7 @@ import {
   clearVisionQueue,
 } from '../visionQueueService.js';
 
-function setOnline(value) {
-  Object.defineProperty(navigator, 'onLine', { value, configurable: true });
-}
+import { setOnline } from '../../test-utils/index.js';
 
 const fakeBlob = () => new Blob(['x'], { type: 'image/jpeg' });
 

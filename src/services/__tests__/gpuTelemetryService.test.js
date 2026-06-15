@@ -10,12 +10,7 @@ import { getGpuSnapshot, listAvailableModels, clearGpuCache } from '../gpuTeleme
 
 const GB = 1024 * 1024 * 1024;
 
-function okResponse(json) {
-  return { ok: true, status: 200, statusText: 'OK', json: async () => json };
-}
-function errResponse(status, statusText) {
-  return { ok: false, status, statusText, json: async () => ({}) };
-}
+import { okResponse, errResponse } from '../../test-utils/index.js';
 
 beforeEach(() => {
   clearGpuCache();

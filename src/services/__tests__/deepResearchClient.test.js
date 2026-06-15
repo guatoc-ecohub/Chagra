@@ -34,12 +34,7 @@ function mockEnv(value) {
   vi.stubEnv('VITE_DEEP_RESEARCH_ENABLED', value);
 }
 
-function setOnline(online) {
-  Object.defineProperty(navigator, 'onLine', {
-    configurable: true,
-    value: online,
-  });
-}
+import { setOnline } from '../../test-utils/index.js';
 
 function mockFetchOnce(body, { status = 200, ok = true } = {}) {
   const jsonFn = vi.fn().mockResolvedValueOnce(body);

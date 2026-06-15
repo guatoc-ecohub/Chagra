@@ -1,5 +1,6 @@
-/* eslint-disable no-undef -- global object is used in tests */
+/* eslint-disable no-undef */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { makeFakeDB, setOnline } from '../../test-utils/index.js';
 
 /**
  * Tests de sincronización de telemetría del agente (#6230).
@@ -13,61 +14,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
  * - POST al endpoint con payload correcto
  * - Falla silente (no lanza)
  */
-
-// ─── Mock de dbCore: IndexedDB en memoria ───
-function makeFakeDB() {
-  const data = new Map();
-  let seq = 0;
-  const makeReq = (resultFn) => {
-    const req = {};
-    queueMicrotask(() => {
-      try {
-        req.result = resultFn();
-        req.onsuccess?.({ target: req });
-      } catch (e) {
-        req.error = e;
-        req.onerror?.({ target: req });
-      }
-    });
-    return req;
-  };
-  return {
-    transaction() {
-      return {
-        objectStore() {
-          return {
-            add(record) {
-              return makeReq(() => {
-                const id = record.id != null ? record.id : ++seq;
-                data.set(id, { ...record, id });
-                return id;
-              });
-            },
-            put(record) {
-              return makeReq(() => {
-                data.set(record.id, { ...record });
-                return record.id;
-              });
-            },
-            get(id) {
-              return makeReq(() => data.get(id) || undefined);
-            },
-            delete(id) {
-              return makeReq(() => {
-                data.delete(id);
-                return undefined;
-              });
-            },
-            getAll() {
-              return makeReq(() => Array.from(data.values()));
-            },
-          };
-        },
-      };
-    },
-    __data: data,
-  };
-}
 
 let fakeDB;
 
@@ -88,12 +34,7 @@ vi.mock('../agentRequestQueue.js', () => ({
   getRequest: vi.fn(async (_id) => null),
 }));
 
-// ─── Mock de fetch ───
 global.fetch = vi.fn();
-
-function setOnline(value) {
-  Object.defineProperty(navigator, 'onLine', { value, configurable: true });
-}
 
 beforeEach(() => {
   fakeDB = makeFakeDB();

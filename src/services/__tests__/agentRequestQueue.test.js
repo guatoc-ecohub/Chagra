@@ -14,60 +14,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
  * - offline mantiene 'queued' (o los marca 'offline')
  */
 
-// ─── Mock de dbCore: IndexedDB en memoria para el store agent_requests ───
-function makeFakeDB() {
-  const data = new Map();
-  let seq = 0;
-  const makeReq = (resultFn) => {
-    const req = {};
-    queueMicrotask(() => {
-      try {
-        req.result = resultFn();
-        req.onsuccess?.({ target: req });
-      } catch (e) {
-        req.error = e;
-        req.onerror?.({ target: req });
-      }
-    });
-    return req;
-  };
-  return {
-    transaction() {
-      return {
-        objectStore() {
-          return {
-            add(record) {
-              return makeReq(() => {
-                const id = record.id != null ? record.id : ++seq;
-                data.set(id, { ...record, id });
-                return id;
-              });
-            },
-            put(record) {
-              return makeReq(() => {
-                data.set(record.id, { ...record });
-                return record.id;
-              });
-            },
-            get(id) {
-              return makeReq(() => data.get(id) || undefined);
-            },
-            delete(id) {
-              return makeReq(() => {
-                data.delete(id);
-                return undefined;
-              });
-            },
-            getAll() {
-              return makeReq(() => Array.from(data.values()));
-            },
-          };
-        },
-      };
-    },
-    __data: data,
-  };
-}
+import { makeFakeDB } from '../../test-utils/index.js';
 
 let fakeDB;
 
@@ -90,9 +37,7 @@ import {
   failRequest,
 } from '../agentRequestQueue.js';
 
-function setOnline(value) {
-  Object.defineProperty(navigator, 'onLine', { value, configurable: true });
-}
+import { setOnline } from '../../test-utils/index.js';
 
 beforeEach(() => {
   fakeDB = makeFakeDB();
