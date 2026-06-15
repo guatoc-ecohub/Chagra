@@ -1,0 +1,10 @@
+{
+  "fuente": "DR-IOT-1",
+  "umbrales": [
+    { "sensor": "temperatura", "umbral": ">30°C", "accion": "VENTILAR. Abrir cortinas/puertas del invernadero. Riesgo: estres termico, aborto floral, muerte de aves/cerdos si hay." },
+    { "sensor": "humedad_relativa", "umbral": ">85%", "accion": "VENTILAR. Alta humedad = hongos (botrytis, mildiu). En clima frio, abrir en las horas mas calidas del dia." },
+    { "sensor": "humedad_suelo", "umbral": "<30%", "accion": "REGAR. Suelo seco a 15cm. Verificar con prueba del punado antes de regar." },
+    { "sensor": "temperatura_min", "umbral": "<2°C", "accion": "PROTEGER. Riesgo de helada. Cubrir con plastico/agril. Regar al amanecer (el agua libera calor al congelarse)." },
+    { "sensor": "nivel_tanque", "umbral": "<20%", "accion": "REVISAR fuente de agua. Puede haber fuga, obstruccion o sequia en la fuente." }
+  ]
+}

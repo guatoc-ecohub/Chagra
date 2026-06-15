@@ -270,12 +270,15 @@
     background-color: rgb(var(--c-slate-950)) !important;
   }
 
-  /* Nature (N33 2026-06-04): degradado cálido crema→ocre con "sol" tenue arriba,
-   * paridad con el demo demo-agente.html. Minimalista se queda liso tipo papel. */
+  /* Nature: cielo AMANECER 1:1 del demo demo-agente.html (.sky, medido
+   * 2026-06-11 — antes era una aproximación N33 más ocre/oscura abajo):
+   *   radial #ffe8c2 → #f8d9a6 (26%) → #f3c98e (46%) + linear #fbe9c8 →
+   *   #f6ddb6 (30%) → #f1e3cb (56%) → #eef0db (100%).
+   * Minimalista se queda liso tipo papel. */
   [data-theme="nature"] body.app-bg-biodiversidad {
     background-image:
-      radial-gradient(125% 85% at 50% -12%, rgb(245 200 110 / 0.5) 0%, rgb(245 210 140 / 0.18) 38%, transparent 62%),
-      linear-gradient(178deg, rgb(var(--c-slate-950)) 0%, rgb(248 235 205) 62%, rgb(243 224 178) 100%) !important;
+      radial-gradient(120% 70% at 50% -10%, #ffe8c2 0%, #f8d9a6 26%, #f3c98e 46%, transparent 70%),
+      linear-gradient(180deg, #fbe9c8 0%, #f6ddb6 30%, #f1e3cb 56%, #eef0db 100%) !important;
     background-color: rgb(var(--c-slate-950)) !important;
     background-attachment: fixed !important;
   }
@@ -344,4 +347,33 @@
   .app-scrim-strong {
     background-color: rgb(var(--scrim-bg) / calc(var(--scrim-opacity) * 1.49));
   }
+}
+
+/* ===========================================================================
+ * Ⓐ DE HERRAMIENTAS DE CAMPO — animación "FORJA" one-shot (iteración
+ * recuperada: Chagra-strategy/ops/icon-explorations/animada-refinada-grunge2
+ * .html, "ANIM-2 Refinada"). Cada trazo del ícono biopunk (azadón → rastrillo
+ * → machete) se dibuja con stroke-dashoffset al montar, una sola vez (en el
+ * exploratorio era loop infinito; en la app sería ruido permanente).
+ * Los elementos llevan clase `aforge` (trazos) / `aforge-fill` (rellenos) con
+ * `--sd` (largo del trazo) y `--fd` (delay) inline desde themeIcon.jsx.
+ * =========================================================================== */
+.aforge {
+  stroke-dasharray: var(--sd, 100);
+  stroke-dashoffset: var(--sd, 100);
+  animation: aforge-draw 0.9s cubic-bezier(0.4, 0, 0.2, 1) var(--fd, 0s) forwards;
+}
+.aforge-fill {
+  opacity: 0;
+  animation: aforge-fill 0.6s ease var(--fd, 0s) forwards;
+}
+@keyframes aforge-draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes aforge-fill {
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aforge { stroke-dashoffset: 0; animation: none; }
+  .aforge-fill { opacity: 1; animation: none; }
 }

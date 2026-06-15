@@ -1,0 +1,18 @@
+{
+  "fuente": "DR-IOT-1",
+  "vale_la_pena_si": [
+    "Invernadero alejado de la vivienda (no lo visita a diario)",
+    "Cultivo de alto valor (tomate, fresa, aromaticas bajo cubierta)",
+    "Solo 1 camara + 2-3 sensores (no mas)",
+    "SOLO alertar, NUNCA automatizar riego/ventilacion",
+    "Asume conectividad intermitente como normal (hotspot del celular)"
+  ],
+  "no_vale_la_pena_si": [
+    "Visita el cultivo a diario (su ojo + pluviometro manual ganan)",
+    "A cielo abierto (la variabilidad climatica hace que el sensor mida solo un punto)",
+    "Presupuesto menor a $300.000 COP (inversion minima para algo util)",
+    "Quiere 'automatizar todo' (valvula pegada = encharcado = mas riesgo que beneficio)",
+    "No tiene cobertura celular en el predio"
+  ],
+  "costo_total_orientativo": "Hardware unico $200.000-560.000 COP + plan datos ~$15.000-21.000/mes"
+}

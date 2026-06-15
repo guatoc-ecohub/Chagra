@@ -1,0 +1,9 @@
+{
+  "fuente": "DR-IOT-1 (3/3 DeepSeek+Gemini+Meta, 2026-06-11)",
+  "juguetes": [
+    { "sensor": "Humedad RESISTIVO 2 puntas", "razon": "Se oxida y se corroe en SEMANAS. Las lecturas se vuelven erraticas. El capacitivo v1.2 cuesta lo mismo y NO se oxida." },
+    { "sensor": "DHT11", "razon": "Imprecision de fabrica (±2°C, ±5%HR). El DHT22 ya es mejor; el SHT30 es el estandar. Para invernadero: solo SHT30." },
+    { "sensor": "Modulo de lluvia YL-83", "razon": "Corrosion instantanea. Las pistas expuestas se sulfatan. Un pluviometro manual de botella es mas confiable y cuesta cero." },
+    { "sensor": "Todo-en-uno sin marca", "razon": "Suelen combinar sensores incompatibles en una sola placa de calidad dudosa. Compre sensores por separado de marcas conocidas." }
+  ]
+}
