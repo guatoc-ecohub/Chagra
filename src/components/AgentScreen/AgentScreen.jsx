@@ -3090,7 +3090,7 @@ export default function AgentScreen({ onBack, initialContext }) {
         hasAttachment={false}
         disabled={state === STATE_RECORDING}
         isPro={getCurrentTier() === 'pro'}
-        chipDefs={profileChipDefs}
+        chipDefs={messages.length === 0 ? null : profileChipDefs}
       />
 
       {/* ── Compositor pill — paridad completa AgentHero (2026-06-08).
