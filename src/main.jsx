@@ -12,11 +12,7 @@ import { fetchFromFarmOS } from './services/apiService'
 import { PRIMARY_WORKER_NAME } from './config/workerConfig'
 import { renameWorker } from './services/assetService'
 import { getAccessToken } from './services/authService'
-import {
-  shouldShowUpdateBanner,
-  readAckedVersion,
-  seedFirstInstallAck,
-} from './services/swUpdateAck'
+import { registerServiceWorker } from './services/swRegistration'
 
 import { loadDemoSeedData } from '../scripts/seed-demo';
 import { bootstrapOssModules } from './core/bootstrap-oss';
@@ -61,154 +57,20 @@ syncManager.initDB().then(async () => {
   console.error('Error inicializando Sync Manager:', error);
 });
 
-// Registrar Service Worker con espera a .ready para background sync robusto.
+// Service Worker: registro + AUTO-UPDATE seguro (ver swRegistration.js).
+// Al detectar un SW nuevo en `waiting`, aplica skipWaiting automáticamente y
+// recarga UNA sola vez (respetando el guard anti-loop). El UpdateAvailableBanner
+// queda como fallback visible. La lógica vive en su propio módulo para poder
+// testearla en vitest sin montar el árbol React.
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then((registration) => {
-        console.log('Service Worker registrado:', registration.scope);
-      })
-      .catch((error) => {
-        console.error('Error registrando Service Worker:', error);
-      });
-
-    // Esperar a que el SW esté activo antes de registrar background sync.
-    navigator.serviceWorker.ready.then((registration) => {
-      if (registration.sync) {
-        registration.sync.register('sync-pending-transactions').catch((e) => {
-          console.warn('Background Sync no disponible:', e.message);
-        });
-      }
-      console.info('[SW] Service Worker activo y listo.');
-    });
-  });
-
-  // Escuchar solicitudes de sync del SW
+  // Escuchar solicitudes de sync del SW (syncManager ya importado aquí).
   navigator.serviceWorker.addEventListener('message', (event) => {
     if (event.data?.type === 'SYNC_REQUESTED') {
       syncManager.syncAll();
     }
   });
 
-  // Banner "nueva version disponible" SOLO cuando hay un SW nuevo en waiting
-  // (registration.waiting / updatefound). NUNCA por controllerchange: ese
-  // evento significa que la actualizacion YA se aplico — dispararlo ahi
-  // re-mostraba el banner despues de actualizar (bug operador 2026-06-10
-  // "debo dar Actualizar N veces"). El operador decide cuando actualizar
-  // via UpdateAvailableBanner.
-  //
-  // Fix QA #18: persistimos el ack en localStorage
-  // (`sw:last-acked-version`) para no repetir el toast cada reload. Antes
-  // de disparar `chagra:update-available` preguntamos al SW su CACHE_NAME
-  // via MessageChannel y comparamos con el acked. Si coincide → suprimir.
-  // First install (no ack previo) → suprimir tambien y sembrar el ack para
-  // que la primera notif real (al actualizar) si dispare.
-  const maybeDispatchUpdateAvailable = async (sw) => {
-    if (!sw) return;
-    try {
-      const version = await getSwVersion(sw);
-      if (!version) return;
-      const lastAcked = readAckedVersion();
-      // Seed first-install: nunca hubo ack previo → guardamos current y
-      // suprimimos el toast. Asi en la proxima version real (CACHE_NAME
-      // distinto) el banner si dispara.
-      if (lastAcked === null) {
-        seedFirstInstallAck(version);
-        return;
-      }
-      if (shouldShowUpdateBanner(version, lastAcked)) {
-        window.dispatchEvent(
-          new CustomEvent('chagra:update-available', { detail: { version } })
-        );
-      }
-    } catch (_) {
-      // SW no responde / MessageChannel timeout → no spammear toast.
-    }
-  };
-
-  // Patron Workbox estandar: click "Actualizar" → SKIP_WAITING → el SW nuevo
-  // toma control → controllerchange → recargar la pagina UNA sola vez.
-  // Guard `reloading` evita bucles de recarga; `hadController` evita recargar
-  // en el primer install (clients.claim() tambien dispara controllerchange
-  // cuando antes no habia controlador — ahi NO hay que recargar).
-  //
-  // `userUpdateRequested` (bug operador 2026-06-11, Android — boton pegado):
-  // si la pagina arranco SIN controller (hard reload / carga no controlada)
-  // pero hay un SW en waiting, el click "Actualizar" disparaba SKIP_WAITING
-  // → claim → controllerchange, y el guard de first-install se TRAGABA el
-  // evento: ni recarga ni banner fuera. Cuando la actualizacion la pidio el
-  // usuario (evento chagra:sw-update-requested del banner), controllerchange
-  // SIEMPRE recarga.
-  let reloading = false;
-  let hadController = Boolean(navigator.serviceWorker.controller);
-  let userUpdateRequested = false;
-  window.addEventListener('chagra:sw-update-requested', () => {
-    userUpdateRequested = true;
-  });
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!hadController && !userUpdateRequested) {
-      hadController = true; // primer claim en first install — sin recarga
-      return;
-    }
-    if (reloading) return;
-    reloading = true;
-    window.location.reload();
-  });
-
-  // Deteccion de SW nuevo en waiting: unica fuente del banner.
-  navigator.serviceWorker.ready.then((registration) => {
-    // First install: sembrar el ack con la version del SW activo SIN disparar
-    // banner (la actualizacion ya esta aplicada; anunciar aqui era el bug).
-    const activeSw = navigator.serviceWorker.controller || registration.active;
-    if (activeSw && readAckedVersion() === null) {
-      getSwVersion(activeSw)
-        .then((version) => { if (version) seedFirstInstallAck(version); })
-        .catch(() => { });
-    }
-    if (registration.waiting) {
-      maybeDispatchUpdateAvailable(registration.waiting);
-    }
-    registration.addEventListener('updatefound', () => {
-      const installing = registration.installing;
-      if (installing) {
-        installing.addEventListener('statechange', () => {
-          if (installing.state === 'installed' && registration.waiting) {
-            maybeDispatchUpdateAvailable(registration.waiting);
-          }
-        });
-      } else if (registration.waiting) {
-        maybeDispatchUpdateAvailable(registration.waiting);
-      }
-    });
-  });
-}
-
-// Pregunta CACHE_NAME al SW via MessageChannel con timeout corto. Devuelve
-// null si no responde (no bloquear UI ni spammear toast).
-function getSwVersion(sw, timeoutMs = 1500) {
-  return new Promise((resolve) => {
-    if (!sw || typeof MessageChannel === 'undefined') {
-      resolve(null);
-      return;
-    }
-    const channel = new MessageChannel();
-    const timer = setTimeout(() => {
-      channel.port1.close();
-      resolve(null);
-    }, timeoutMs);
-    channel.port1.onmessage = (event) => {
-      clearTimeout(timer);
-      channel.port1.close();
-      resolve(event.data?.version ?? null);
-    };
-    try {
-      sw.postMessage({ type: 'GET_VERSION' }, [channel.port2]);
-    } catch (_) {
-      clearTimeout(timer);
-      channel.port1.close();
-      resolve(null);
-    }
-  });
+  registerServiceWorker();
 }
 
 createRoot(document.getElementById('root')).render(
