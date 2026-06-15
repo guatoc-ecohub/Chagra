@@ -93,8 +93,9 @@ export default function ActionConfirmModal({
               <div className="space-y-2">
                 {Object.entries(editedParams).map(([key, value]) => (
                   <div key={key} className="flex flex-col">
-                    <label className="text-xs text-slate-500 mb-1">{key}</label>
+                    <label htmlFor={`action-param-${key}`} className="text-xs text-slate-500 mb-1">{key}</label>
                     <input
+                      id={`action-param-${key}`}
                       type={typeof value === 'number' ? 'number' : 'text'}
                       value={value || ''}
                       onChange={(e) =>

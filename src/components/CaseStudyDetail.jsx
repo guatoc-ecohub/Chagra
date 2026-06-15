@@ -134,6 +134,7 @@ const TimelineEventForm = ({ onSubmit, onCancel }) => {
         </select>
         <input
           type="datetime-local"
+          aria-label="Fecha del evento"
           value={date}
           onChange={(e) => setDate(e.target.value)}
           className="px-3 py-2 rounded bg-slate-800 border border-slate-700 text-white text-sm"

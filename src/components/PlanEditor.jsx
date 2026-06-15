@@ -155,9 +155,10 @@ export default function PlanEditor({ assetId, speciesSlug, plantingDate, climate
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-700 mt-1">
                                 <div className="flex items-center">
-                                    <span className="font-medium w-24">Insumo:</span>
+                                    <label htmlFor="plan-insumo" className="font-medium w-24">Insumo:</label>
                                     {isAdvisor && !isCompleted ? (
                                         <input
+                                            id="plan-insumo"
                                             type="text"
                                             className="ml-2 border rounded px-2 py-1 w-full max-w-[150px] shadow-inner"
                                             defaultValue={step.biofertilizer_slug}
@@ -171,9 +172,10 @@ export default function PlanEditor({ assetId, speciesSlug, plantingDate, climate
                                     )}
                                 </div>
                                 <div className="flex items-center">
-                                    <span className="font-medium w-24">Dosis (ml):</span>
+                                    <label htmlFor="plan-dosis" className="font-medium w-24">Dosis (ml):</label>
                                     {isAdvisor && !isCompleted ? (
                                         <input
+                                            id="plan-dosis"
                                             type="number"
                                             className="ml-2 border rounded px-2 py-1 flex-grow max-w-[100px] shadow-inner"
                                             defaultValue={step.dose_ml}
