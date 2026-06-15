@@ -2,9 +2,9 @@
  * ProfileScreen.tabs.test.jsx — refactor a PESTAÑAS (2026-05-28).
  *
  * El operador reportó "está difícil de navegar, muchas opciones": el Perfil
- * se reorganizó en 4 pestañas (Perfil / Apariencia / Voz y finca / Avanzado).
+ * se reorganizó en 5 pestañas (Perfil / Apariencia / Voz y finca / Módulos / Avanzado).
  * Estos smoke tests verifican que:
- *   - la tab bar renderiza las 4 pestañas,
+ *   - la tab bar renderiza las 5 pestañas,
  *   - la pestaña Perfil es la activa por defecto (aria-selected),
  *   - cambiar de pestaña muestra el contenido correspondiente y oculta el
  *     anterior (sin breaking change funcional: cada opción sigue accesible).
@@ -20,14 +20,15 @@ import { describe, test, expect } from 'vitest';
 import ProfileScreen from '../ProfileScreen';
 
 describe('ProfileScreen — pestañas', () => {
-  test('renderiza las 4 pestañas en la tab bar', () => {
+  test('renderiza las 5 pestañas en la tab bar', () => {
     render(<ProfileScreen onBack={() => {}} onHome={() => {}} />);
     const tablist = screen.getByRole('tablist', { name: /secciones del perfil/i });
     const tabs = within(tablist).getAllByRole('tab');
-    expect(tabs).toHaveLength(4);
+    expect(tabs).toHaveLength(5);
     expect(within(tablist).getByRole('tab', { name: /perfil/i })).toBeInTheDocument();
     expect(within(tablist).getByRole('tab', { name: /apariencia/i })).toBeInTheDocument();
     expect(within(tablist).getByRole('tab', { name: /voz y finca/i })).toBeInTheDocument();
+    expect(within(tablist).getByRole('tab', { name: /módulos/i })).toBeInTheDocument();
     expect(within(tablist).getByRole('tab', { name: /avanzado/i })).toBeInTheDocument();
   });
 

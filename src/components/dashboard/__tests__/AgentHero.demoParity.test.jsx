@@ -50,6 +50,7 @@ vi.mock('../../../services/userProfileService', () => ({
   saveProfile: vi.fn(),
   getProfileMunicipio: vi.fn(() => null),
   getNotificationStyle: vi.fn(() => 'demo'),
+  isModuleVisible: vi.fn(() => true),
 }));
 
 vi.mock('../../../hooks/useTheme', () => ({
