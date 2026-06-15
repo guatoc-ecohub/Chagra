@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench, Sprout, ChevronRight, Bell, Users } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench, Sprout, ChevronRight, Bell, Users, Camera, Trash2 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { esExtensionistaActual } from '../config/extensionistaAccess';
 import ThemeSelector from './common/ThemeSelector';
@@ -14,6 +14,7 @@ import useFincaActiveStore from '../services/fincaActiveStore';
 import usePrefsStore from '../store/usePrefsStore';
 import { stop as stopTTS } from '../services/ttsService';
 import { getNotificationStyle, setNotificationStyle, getTelemetryConsent, setTelemetryConsent, HOME_MODULES, getModuleVisibility, setModuleVisibility } from '../services/userProfileService';
+import { getOperatorPhoto, setOperatorPhotoFromFile, removeOperatorPhotoLocal } from '../services/operatorPhotoService';
 
 const TTL_OPTIONS = [
   { id: '1d', label: '1 día' },
@@ -79,6 +80,44 @@ export default function ProfileScreen({ onBack, onHome }) {
       ? localStorage.getItem('chagra:operator:role') || 'operador_campo'
       : 'operador_campo'
   );
+
+  // Foto de perfil del operador (feature recuperada 2026-06-15). Persiste
+  // local (localStorage) + sincroniza a FarmOS cuando hay sesión, vía
+  // operatorPhotoService. Render inmediato desde localStorage (offline-first).
+  const [photoData, setPhotoData] = useState(() => getOperatorPhoto());
+  const [photoError, setPhotoError] = useState(null);
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const photoInputRef = useRef(null);
+
+  const handlePhotoSelected = async (e) => {
+    setPhotoError(null);
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setPhotoError('El archivo no parece una imagen.');
+      return;
+    }
+    setPhotoBusy(true);
+    try {
+      // Redimensiona + persiste local + dispara sync a FarmOS en segundo plano.
+      const dataUrl = await setOperatorPhotoFromFile(file);
+      setPhotoData(dataUrl);
+    } catch (err) {
+      console.warn('[ProfileScreen] photo upload falló:', err);
+      setPhotoError('No pudimos procesar la imagen. Intenta otra.');
+    } finally {
+      setPhotoBusy(false);
+      // Reset para permitir re-elegir el mismo archivo si quiere.
+      if (photoInputRef.current) photoInputRef.current.value = '';
+    }
+  };
+
+  const handlePhotoRemove = () => {
+    removeOperatorPhotoLocal();
+    setPhotoData('');
+    setPhotoError(null);
+  };
+
   const [savedFlash, setSavedFlash] = useState(false);
   const [telemetryEnabled, setTelemetryEnabled] = useState(() =>
     typeof window !== 'undefined'
@@ -211,11 +250,60 @@ export default function ProfileScreen({ onBack, onHome }) {
             aria-labelledby="profile-tab-perfil"
             className="flex flex-col gap-6"
           >
-            {/* ID Card / User Info, header con datos sintetizados */}
+            {/* ID Card / User Info, header con datos sintetizados.
+                Avatar editable: el operador sube su foto (cámara/galería). La
+                imagen se guarda local (offline) y se sincroniza a FarmOS para
+                verla en otros dispositivos (operatorPhotoService). */}
             <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col items-center">
-              <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mb-4 border-2 border-emerald-500/30">
-                <User size={40} className="text-emerald-400" />
+              <div className="relative mb-4">
+                <div
+                  className="w-24 h-24 bg-slate-800 rounded-full overflow-hidden flex items-center justify-center border-2 border-emerald-500/30"
+                >
+                  {photoData ? (
+                    <img
+                      src={photoData}
+                      alt={`Foto de ${name}`}
+                      className="w-full h-full object-cover"
+                      data-testid="profile-photo-img"
+                    />
+                  ) : (
+                    <User size={44} className="text-emerald-400" aria-hidden="true" />
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => photoInputRef.current?.click()}
+                  disabled={photoBusy}
+                  data-testid="profile-photo-button"
+                  className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 disabled:opacity-60 text-white flex items-center justify-center shadow-lg border-2 border-slate-900"
+                  aria-label={photoData ? 'Cambiar foto de perfil' : 'Agregar foto de perfil'}
+                  title={photoData ? 'Cambiar foto' : 'Agregar foto'}
+                >
+                  <Camera size={16} aria-hidden="true" />
+                </button>
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="user"
+                  onChange={handlePhotoSelected}
+                  className="hidden"
+                  aria-hidden="true"
+                  data-testid="profile-photo-input"
+                />
               </div>
+              {photoError && (
+                <p className="text-xs text-amber-400 mb-2" role="alert">{photoError}</p>
+              )}
+              {photoData && (
+                <button
+                  type="button"
+                  onClick={handlePhotoRemove}
+                  className="text-[10px] text-slate-500 hover:text-slate-300 inline-flex items-center gap-1 mb-2"
+                >
+                  <Trash2 size={11} aria-hidden="true" /> Quitar foto
+                </button>
+              )}
               <h2 className="text-2xl font-black text-white">{name}</h2>
               <p className="text-xs text-slate-500 uppercase tracking-widest font-bold mt-1">{currentRoleLabel}</p>
             </div>
@@ -305,7 +393,8 @@ export default function ProfileScreen({ onBack, onHome }) {
                 {savedFlash ? <><Check size={18} /> Guardado</> : <><Save size={18} /> Guardar cambios</>}
               </button>
               <p className="text-[10px] text-slate-500 text-center leading-relaxed">
-                Los cambios se guardan en tu dispositivo. Subida al servidor pendiente (planeado v1.x).
+                El nombre y el rol se guardan en tu dispositivo. Tu foto de perfil
+                se sincroniza con el servidor para verla en otros dispositivos.
               </p>
             </div>
           </div>

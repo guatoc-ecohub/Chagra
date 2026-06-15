@@ -8,6 +8,7 @@ import useAssetStore from '../store/useAssetStore';
 import useFincaActiveStore from '../services/fincaActiveStore';
 import { FARM_CONFIG } from '../config/defaults';
 import { getProfile, getProfileMunicipio, getNotificationStyle } from '../services/userProfileService';
+import { getOperatorPhoto } from '../services/operatorPhotoService';
 import { findMunicipio } from '../utils/colombiaLocations';
 import { useTheme } from '../hooks/useTheme';
 import { iconForTheme } from './dashboard/themeIcon';
@@ -107,6 +108,21 @@ export default function TopBar({ onNavigate, onLogout }) {
     const onStyleChanged = () => setNotifStyle(getNotificationStyle());
     window.addEventListener('chagra:notif-style-changed', onStyleChanged);
     return () => window.removeEventListener('chagra:notif-style-changed', onStyleChanged);
+  }, []);
+
+  // Foto de perfil del operador en el ícono de usuario (feature 2026-06-15).
+  // Cae al ícono CircleUser si no hay foto. Re-lee en vivo cuando el operador
+  // la sube/cambia/quita en Perfil ('chagra:operator-update', same-tab) o desde
+  // otra pestaña ('storage', cross-tab nativo).
+  const [operatorPhoto, setOperatorPhoto] = useState(() => getOperatorPhoto());
+  useEffect(() => {
+    const refresh = () => setOperatorPhoto(getOperatorPhoto());
+    window.addEventListener('chagra:operator-update', refresh);
+    window.addEventListener('storage', refresh);
+    return () => {
+      window.removeEventListener('chagra:operator-update', refresh);
+      window.removeEventListener('storage', refresh);
+    };
   }, []);
 
   // "Respira" animación del logo Chagra cuando hay actividad de fondo
@@ -251,9 +267,18 @@ export default function TopBar({ onNavigate, onLogout }) {
             aria-label="Menú de usuario"
             aria-expanded={avatarMenuOpen}
             data-testid="topbar-user-menu"
-            className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-slate-800 border-2 border-slate-700 hover:border-teal-500/50 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+            className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-slate-800 border-2 border-slate-700 hover:border-teal-500/50 flex items-center justify-center text-slate-400 hover:text-white transition-colors overflow-hidden"
           >
-            <CircleUser size={20} aria-hidden="true" />
+            {operatorPhoto ? (
+              <img
+                src={operatorPhoto}
+                alt="Foto de perfil"
+                className="w-full h-full object-cover"
+                data-testid="topbar-user-photo"
+              />
+            ) : (
+              <CircleUser size={20} aria-hidden="true" />
+            )}
           </button>
 
           {avatarMenuOpen && (
