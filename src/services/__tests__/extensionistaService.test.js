@@ -27,7 +27,7 @@ import {
 
 describe('extensionistaService — getFincasDelegadas', () => {
   it('devuelve las fincas delegadas al extensionista del seed', () => {
-    const fincas = getFincasDelegadas('kortux');
+    const fincas = getFincasDelegadas('demo-extensionista');
     expect(Array.isArray(fincas)).toBe(true);
     expect(fincas.length).toBeGreaterThan(0);
     // Cada finca trae los campos mínimos que el tablero consume.
@@ -40,8 +40,8 @@ describe('extensionistaService — getFincasDelegadas', () => {
   });
 
   it('normaliza el username (trim + case-insensitive)', () => {
-    expect(getFincasDelegadas('  KORTUX  ').length).toBe(
-      getFincasDelegadas('kortux').length
+    expect(getFincasDelegadas('  DEMO-EXTENSIONISTA  ').length).toBe(
+      getFincasDelegadas('demo-extensionista').length
     );
   });
 
@@ -57,9 +57,9 @@ describe('extensionistaService — getFincasDelegadas', () => {
   });
 
   it('devuelve copias, no referencias al mock (no se puede mutar el seed)', () => {
-    const a = getFincasDelegadas('kortux');
+    const a = getFincasDelegadas('demo-extensionista');
     a[0].nombre = 'MUTADO';
-    const b = getFincasDelegadas('kortux');
+    const b = getFincasDelegadas('demo-extensionista');
     expect(b[0].nombre).not.toBe('MUTADO');
   });
 });
@@ -97,14 +97,14 @@ describe('extensionistaService — clasificarEstadoFinca', () => {
 
 describe('extensionistaService — construirTableroExtensionista', () => {
   it('ordena las fincas por severidad descendente (lo urgente arriba)', () => {
-    const tablero = construirTableroExtensionista('kortux');
+    const tablero = construirTableroExtensionista('demo-extensionista');
     const sevs = tablero.fincas.map((f) => f._clasificacion.severidad);
     const ordenado = [...sevs].sort((a, b) => b - a);
     expect(sevs).toEqual(ordenado);
   });
 
   it('agrega contadores: total, con_alertas, con_pendientes', () => {
-    const tablero = construirTableroExtensionista('kortux');
+    const tablero = construirTableroExtensionista('demo-extensionista');
     expect(tablero.resumen.total).toBe(tablero.fincas.length);
     expect(tablero.resumen.con_alertas).toBe(
       tablero.fincas.filter((f) => (f.alertas || 0) > 0).length
@@ -123,7 +123,7 @@ describe('extensionistaService — construirTableroExtensionista', () => {
   });
 
   it('cada finca del tablero trae su clasificación adjunta', () => {
-    const tablero = construirTableroExtensionista('kortux');
+    const tablero = construirTableroExtensionista('demo-extensionista');
     for (const f of tablero.fincas) {
       expect(f._clasificacion).toBeTruthy();
       expect(typeof f._clasificacion.label).toBe('string');

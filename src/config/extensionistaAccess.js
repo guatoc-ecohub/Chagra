@@ -62,7 +62,9 @@ import { getActiveTenantId } from '../services/tenantContext.js';
  * @constant {Set<string>}
  */
 export const EXTENSIONISTA_WHITELIST = new Set([
-  'kortux', // Operador (Miguel) — perfil de extensión/coordinación piloto.
+  'demo-extensionista', // Placeholder de piloto. Reemplazar por el username
+  // farmOS real del asesor/técnico al activar el modo (mismo patrón que
+  // CORDADA_WHITELIST en glaciarAccess.js).
 ]);
 
 const FLAG_KEY = 'VITE_FEATURE_EXTENSIONISTA';
