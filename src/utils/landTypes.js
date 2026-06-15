@@ -33,4 +33,11 @@ export const URBAN_LAND_TYPES = new Set(
   LAND_TYPES.filter((lt) => lt.urban).map((lt) => lt.value)
 );
 
+/**
+ * Determina si el valor de tipo de terreno pertenece al subset urbano
+ * (balcón, terraza, ventana, matera interior, jardín urbano).
+ *
+ * @param {string} landType - Valor de tipo de terreno (ej. 'balcony').
+ * @returns {boolean} true si es un tipo urbano.
+ */
 export const isUrbanLandType = (landType) => URBAN_LAND_TYPES.has(landType);

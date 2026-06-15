@@ -1,5 +1,10 @@
 import CARBONO from '../data/carbono-alertas.json';
 
+/**
+ * Detecta si un texto menciona bonos/créditos de carbono y retorna alerta educativa.
+ * @param {string|null} texto
+ * @returns {object|null}
+ */
 export function detectarAlertaCarbono(texto) {
   if (!texto) return null;
   const t = texto.toLowerCase();

@@ -27,6 +27,11 @@ export function detectarEspecie(descripcion) {
   return null;
 }
 
+/**
+ * Recomienda forrajeras segun la especie animal.
+ * @param {string} especieId
+ * @returns {Array<object>}
+ */
 export function recomendarForraje(especieId) {
   const forrajes = ANIMAL_DATA.forrajeras.filter((f) => {
     if (especieId === 'porcino' || especieId === 'cunicola' || especieId === 'avicola') {
@@ -38,6 +43,11 @@ export function recomendarForraje(especieId) {
   return forrajes;
 }
 
+/**
+ * Retorna guardas de seguridad especificas para una especie animal.
+ * @param {string} especieId
+ * @returns {Array<string>}
+ */
 export function getGuardas(especieId) {
   const guardas = [];
   if (['porcino', 'cunicola', 'avicola', 'equino'].includes(especieId)) {
@@ -49,6 +59,12 @@ export function getGuardas(especieId) {
   return guardas;
 }
 
+/**
+ * Diagnostica una especie animal a partir de la descripcion del usuario
+ * y retorna forrajes y guardas.
+ * @param {string} descripcion
+ * @returns {{especie: object|null, forrajes: Array, guardas: Array, sin_datos: boolean, fuente: string}}
+ */
 export function diagnosticarAnimal(descripcion) {
   if (!descripcion || descripcion.trim().length < 3) {
     return { especie: null, forrajes: [], guardas: [], sin_datos: true, fuente: ANIMAL_DATA.fuente };
@@ -69,6 +85,11 @@ export function diagnosticarAnimal(descripcion) {
   return { especie, forrajes, guardas, sin_datos: false, fuente: ANIMAL_DATA.fuente };
 }
 
+/**
+ * Formatea el resultado del diagnostico pecuario en texto legible.
+ * @param {object|null} d
+ * @returns {string}
+ */
 export function formatearGroundingAnimal(d) {
   if (!d || d.sin_datos || !d.especie) return '';
   const partes = [];

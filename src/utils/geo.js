@@ -22,6 +22,13 @@ const coordToWkt = ([lon, lat]) => `${fmt(lon)} ${fmt(lat)}`;
 
 const ringToWkt = (ring) => `(${ring.map(coordToWkt).join(', ')})`;
 
+/**
+ * Convierte una geometría GeoJSON a string WKT (Well-Known Text) para
+ * serialización hacia FarmOS. Soporta Point, Polygon y MultiPolygon.
+ *
+ * @param {object} geometry - Geometría GeoJSON con type y coordinates.
+ * @returns {string} Representación WKT, o string vacío si el tipo no está soportado.
+ */
 export const geoJsonToWkt = (geometry) => {
   if (!geometry || !geometry.type) return '';
 
@@ -49,7 +56,13 @@ export const geoJsonToWkt = (geometry) => {
   }
 };
 
-// Cierra un ring abierto (añade el primer punto al final si falta).
+/**
+ * Cierra un ring abierto añadiendo el primer punto al final si el anillo
+ * no está ya cerrado (primer y último punto distintos).
+ *
+ * @param {Array<[number, number]>} ring - Array de coordenadas [lon, lat].
+ * @returns {Array<[number, number]>} Ring cerrado (copia si fue necesario cerrar).
+ */
 export const closeRing = (ring) => {
   if (ring.length < 3) return ring;
   const [first] = ring;
@@ -58,13 +71,25 @@ export const closeRing = (ring) => {
   return [...ring, first];
 };
 
-// Construye una Feature GeoJSON desde coordenadas de Leaflet.
-// Leaflet entrega LatLng: { lat, lng }. GeoJSON espera [lon, lat].
+/**
+ * Construye un GeoJSON Point Feature desde coordenadas de Leaflet.
+ * Leaflet entrega LatLng: { lat, lng }. GeoJSON espera [lon, lat].
+ *
+ * @param {{ lat: number, lng: number }} latlng - Coordenada Leaflet.
+ * @returns {{ type: 'Point', coordinates: [number, number] }} GeoJSON Point.
+ */
 export const latLngToPoint = (latlng) => ({
   type: 'Point',
   coordinates: [latlng.lng, latlng.lat],
 });
 
+/**
+ * Construye un GeoJSON Polygon desde un array de coordenadas Leaflet.
+ * Cierra el anillo automáticamente vía closeRing.
+ *
+ * @param {Array<{ lat: number, lng: number }>} latlngs - Array de coordenadas Leaflet.
+ * @returns {{ type: 'Polygon', coordinates: [[number, number]] }} GeoJSON Polygon.
+ */
 export const latLngsToPolygon = (latlngs) => {
   const ring = latlngs.map((ll) => [ll.lng, ll.lat]);
   return {
@@ -73,8 +98,13 @@ export const latLngsToPolygon = (latlngs) => {
   };
 };
 
-// Parsea un WKT simple (POINT o POLYGON) de vuelta a GeoJSON para renderizar
-// geometrías existentes que llegan del servidor.
+/**
+ * Parsea un WKT simple (POINT o POLYGON) de vuelta a GeoJSON para renderizar
+ * geometrías existentes que llegan del servidor.
+ *
+ * @param {string} wkt - String WKT a parsear.
+ * @returns {object|null} Geometría GeoJSON con type y coordinates, o null si no se pudo parsear.
+ */
 export const wktToGeoJson = (wkt) => {
   if (!wkt || typeof wkt !== 'string') return null;
   const trimmed = wkt.trim().toUpperCase();

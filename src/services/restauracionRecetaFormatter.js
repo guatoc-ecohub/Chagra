@@ -1,3 +1,8 @@
+/**
+ * Formatea un diagnostico de restauracion en texto legible.
+ * @param {object|null} diagnostico
+ * @returns {string}
+ */
 export function formatearRecetaAgroecologica(diagnostico) {
   if (!diagnostico || diagnostico.sin_datos) return '';
   const p = [];

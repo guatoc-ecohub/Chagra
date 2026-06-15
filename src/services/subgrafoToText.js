@@ -1,3 +1,8 @@
+/**
+ * Convierte un subgrafo (nodos + relaciones) a texto llano para el campesino.
+ * @param {object|null} subgrafo
+ * @returns {string}
+ */
 export function subgrafoATextoCampesino(subgrafo) {
   if (!subgrafo?.nodes?.length) return '';
   const partes = [];

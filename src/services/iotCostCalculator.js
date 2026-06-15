@@ -1,5 +1,13 @@
 import HARDWARE from '../data/iot-hardware.json';
 
+/**
+ * Estima el costo de hardware IoT para una finca.
+ * @param {object} [opciones]
+ * @param {boolean} [opciones.incluirCamara=true]
+ * @param {boolean} [opciones.incluirSHT30=true]
+ * @param {string} [opciones.bateria='18650']
+ * @returns {object}
+ */
 export function estimarCostoIoT({ incluirCamara = true, incluirSHT30 = true, bateria = '18650' } = {}) {
   const costos = { hardware: 0, recurrente_mensual: 21000 };
   if (incluirCamara) costos.hardware += 80000;

@@ -11,7 +11,12 @@ const EARTH_RADIUS_M = 6_371_000;
 const toRad = (deg) => (deg * Math.PI) / 180;
 
 /**
- * Distancia Haversine entre dos puntos [lon, lat] en metros.
+ * Distancia Haversine entre dos puntos [lon, lat] en metros usando el
+ * radio medio terrestre (6,371 km).
+ *
+ * @param {[number, number]} param0 - Primer punto [lon, lat].
+ * @param {[number, number]} param1 - Segundo punto [lon, lat].
+ * @returns {number} Distancia en metros.
  */
 export const haversineDistance = ([lon1, lat1], [lon2, lat2]) => {
   const dLat = toRad(lat2 - lat1);
@@ -25,6 +30,9 @@ export const haversineDistance = ([lon1, lat1], [lon2, lat2]) => {
 /**
  * Extrae coordenadas [lon, lat] de un GeoJSON Point o del centroide de un Polygon.
  * Retorna null si no se puede resolver.
+ *
+ * @param {object} geometry - Geometría GeoJSON (Point o Polygon).
+ * @returns {[number, number]|null} Coordenadas [lon, lat] o null.
  */
 export const getCoords = (geometry) => {
   if (!geometry) return null;
@@ -40,11 +48,11 @@ export const getCoords = (geometry) => {
 
 /**
  * Verifica la distancia entre la posición GPS del dispositivo y una geometría.
- * Retorna { distance: number (metros), isClose: boolean }.
  *
- * @param {GeolocationPosition} gpsPosition — navigator.geolocation result
- * @param {object} geometry — GeoJSON
- * @param {number} threshold — umbral en metros (default 50)
+ * @param {GeolocationPosition} gpsPosition - Resultado de navigator.geolocation.
+ * @param {object} geometry - Geometría GeoJSON.
+ * @param {number} [threshold=50] - Umbral en metros.
+ * @returns {{ distance: number, isClose: boolean }} Distancia redondeada en metros y si está dentro del umbral.
  */
 export const proximityCheck = (gpsPosition, geometry, threshold = 50) => {
   /** @type {[number, number]} */

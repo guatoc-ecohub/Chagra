@@ -10,6 +10,13 @@
  *   - Devuelve score 0..1 normalizado, no ranking interno.
  */
 
+/**
+ * Normaliza un string para matching fuzzy: lowercase, sin tildes,
+ * colapsa whitespace múltiple y recorta bordes.
+ *
+ * @param {string} s - String a normalizar.
+ * @returns {string} String normalizado (vacío si la entrada es falsy).
+ */
 export const normalize = (s) =>
   (s || '')
     .toLowerCase()
@@ -42,6 +49,10 @@ const levenshtein = (a, b) => {
  * - 1.0 si son iguales tras normalizar.
  * - 0.7..1.0 si uno contiene al otro (bonus por substring).
  * - sino, 1 - levenshtein / max(len).
+ *
+ * @param {string} a - Primer string a comparar.
+ * @param {string} b - Segundo string a comparar.
+ * @returns {number} Score de similaridad entre 0 y 1.
  */
 export const similarity = (a, b) => {
   const na = normalize(a);

@@ -273,10 +273,12 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
   return sections.join('\n\n');
 }
 
-// NN2+NN3 (2026-05-23): análisis de query en frontend para inyectar
-// señales específicas al system prompt. El LLM configurado ignora reglas
-// generales bajo presión — necesita instrucción concreta sobre ESTA
-// query.
+/**
+ * Analiza una consulta para detectar si es enumerativa, que plagas menciona
+ * y el tema principal. Señales NN2+NN3 para inyectar al system prompt.
+ * @param {string} q
+ * @returns {{isEnum: boolean, pestsMentioned: Array<{name: string, canonical: string}>, topic: string}}
+ */
 export const analyzeQuery = (q) => {
   const lower = (q || '').toLowerCase();
   // NN2: detección estricta de query enumerativa. Solo SI contiene

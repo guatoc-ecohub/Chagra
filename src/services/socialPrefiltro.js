@@ -1,8 +1,11 @@
-import { expandQueryTokens } from './ragSynonyms';
-
 const PALABRAS_PELIGROSAS = ['glifosato', 'paraquat', 'clorpirifos', 'urea_pura', 'cal_viva', 'formalina', 'arsenico'];
 const MITOS_BLOQUEABLES = ['vinagre.*ph', 'bicarbonato.*ph', 'luna.*sembrar', 'luna.*regar', 'varilla.*agua', 'pendulo.*agua'];
 
+/**
+ * Prefiltro de seguridad que bloquea palabras peligrosas y mitos.
+ * @param {string|null} texto
+ * @returns {{pasar: boolean, razon?: string, severidad?: string}}
+ */
 export function preFiltroSocial(texto) {
   if (!texto) return { pasar: false, razon: 'vacio' };
   const t = texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
