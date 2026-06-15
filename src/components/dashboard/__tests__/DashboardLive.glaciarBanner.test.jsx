@@ -42,6 +42,19 @@ vi.mock('../FincaCards', () => ({
 vi.mock('../../../services/userProfileService', () => ({
   getProfile: vi.fn(() => ({})),
   isModuleVisible: vi.fn(() => true),
+  getModuleVisibility: vi.fn(() => ({})),
+  hasManualModuleVisibility: vi.fn(() => false),
+  // Orden de módulos del home (reorder por drag, 2026-06-15). Para este test el
+  // orden por defecto basta; setModuleOrder es no-op.
+  HOME_MODULE_DEFAULT_ORDER: [
+    'hoyfinca', 'clima', 'analisis', 'plantas', 'hoy', 'zonas',
+    'insumos', 'plagas', 'bitacora', 'biodiversidad', 'informes',
+  ],
+  getModuleOrder: vi.fn(() => [
+    'hoyfinca', 'clima', 'analisis', 'plantas', 'hoy', 'zonas',
+    'insumos', 'plagas', 'bitacora', 'biodiversidad', 'informes',
+  ]),
+  setModuleOrder: vi.fn(),
 }));
 
 // Store de assets: plantsCount > 0 para que NO se monte el OnboardingHero de

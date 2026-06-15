@@ -18,9 +18,13 @@ import { render, screen, cleanup, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// Gate glaciar: irrelevante a este test → sin acceso.
+// Gate glaciar: irrelevante a este test → sin acceso. esOperadorActual: estos
+// casos prueban el gating POR PERFIL (urbano/ganadero/restaurador), NO el
+// bypass del operador (#1581) — sin este mock, DashboardLive llamaba a un
+// esOperadorActual indefinido y el catch fail-open mostraba TODAS las tarjetas.
 vi.mock('../../../config/glaciarAccess', () => ({
   tieneAccesoGlaciarActual: () => false,
+  esOperadorActual: () => false,
 }));
 
 // Hijos pesados → stubs livianos. NO mockeamos FincaCards (queremos las

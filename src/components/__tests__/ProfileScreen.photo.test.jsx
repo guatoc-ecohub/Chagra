@@ -43,6 +43,17 @@ describe('ProfileScreen — foto de perfil', () => {
     expect(screen.queryByTestId('profile-photo-img')).toBeNull();
   });
 
+  // BUG 3 (operador 2026-06-15): el input NO debe forzar la cámara. Sin el
+  // atributo `capture`, el SO ofrece cámara + galería/archivos. `accept` sigue
+  // restringido a imágenes.
+  test('el input de foto NO tiene `capture` (ofrece cámara + galería)', () => {
+    render(<ProfileScreen onBack={() => {}} onHome={() => {}} />);
+    const input = screen.getByTestId('profile-photo-input');
+    expect(input).not.toHaveAttribute('capture');
+    expect(input).toHaveAttribute('accept', 'image/*');
+    expect(input).toHaveAttribute('type', 'file');
+  });
+
   test('al elegir un archivo de imagen llama al servicio y renderiza la foto', async () => {
     const dataUrl = 'data:image/jpeg;base64,ZZZ';
     setOperatorPhotoFromFile.mockResolvedValue(dataUrl);

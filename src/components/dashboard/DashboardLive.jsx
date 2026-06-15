@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useScrollRestoration } from '../../hooks/useScrollRestoration';
 import {
     DndContext,
@@ -24,6 +24,9 @@ import {
     getProfile,
     getModuleVisibility,
     hasManualModuleVisibility,
+    getModuleOrder,
+    setModuleOrder,
+    HOME_MODULE_DEFAULT_ORDER,
 } from '../../services/userProfileService';
 import {
     selectHomeModuleVisibilityMap,
@@ -56,32 +59,16 @@ import {
  *   - Secciones (draggables): clima, plantas, zonas, insumos, bitácora,
  *     hoy, plagas, biodiversidad, informes.
  *
- * Persiste orden en localStorage `chagra:dashboard-order:v1`.
+ * Persiste el orden en el perfil del usuario (userProfileService:
+ * getModuleOrder/setModuleOrder, campo `modulos_orden`). Migrado desde la
+ * clave localStorage legada `chagra:dashboard-order:v3` (2026-06-15) para
+ * unificar la persistencia del home junto a la visibilidad de módulos.
  */
 
-// v2 (2026-05-30): 'analisis' (AnalisisProactivoIA) pasó de fijo-abajo a
-// sección draggable, por defecto justo debajo de 'clima'. Bump de versión
-// para que usuarios con orden v1 reciban el nuevo default en vez de que se
-// les agregue al final.
-// v3 (2026-06-11): 'hoyfinca' (HoyEnFincaStrip) — resumen proactivo del día
-// (clima honesto + alertas + tareas + próximo evento de agenda) como PRIMERA
-// sección bajo el hero. Toque → vista completa 'hoy_finca'. Bump para que
-// usuarios con orden v2 lo reciban arriba y no apendizado al final.
-const STORAGE_KEY = 'chagra:dashboard-order:v3';
-
-const DEFAULT_ORDER = [
-    'hoyfinca',
-    'clima',
-    'analisis',
-    'plantas',
-    'hoy',
-    'zonas',
-    'insumos',
-    'plagas',
-    'bitacora',
-    'biodiversidad',
-    'informes',
-];
+// Orden por defecto + fuente del orden persistido: viven en userProfileService
+// (HOME_MODULE_DEFAULT_ORDER / getModuleOrder / setModuleOrder). DEFAULT_ORDER
+// se mantiene acá como alias para el fail-open de la visibilidad por perfil.
+const DEFAULT_ORDER = HOME_MODULE_DEFAULT_ORDER;
 
 const SECTION_COMPONENTS = {
     hoyfinca: { Component: HoyEnFincaStrip, full: true },
@@ -96,25 +83,6 @@ const SECTION_COMPONENTS = {
     biodiversidad: { Component: BiodiversidadCard },
     informes: { Component: InformesCard },
 };
-
-function readOrder() {
-    try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return DEFAULT_ORDER;
-        const parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed)) return DEFAULT_ORDER;
-        // Filter to known sections + append any missing (new sections added post-deploy)
-        const valid = parsed.filter((id) => SECTION_COMPONENTS[id]);
-        const missing = DEFAULT_ORDER.filter((id) => !valid.includes(id));
-        return [...valid, ...missing];
-    } catch {
-        return DEFAULT_ORDER;
-    }
-}
-
-function writeOrder(order) {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(order)); } catch { /* ignore */ }
-}
 
 function SortableSection({ id, onNavigate, sensors }) {
     const {
@@ -169,7 +137,7 @@ function SortableSection({ id, onNavigate, sensors }) {
 }
 
 export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
-    const [order, setOrder] = useState(readOrder);
+    const [order, setOrder] = useState(getModuleOrder);
     const [moduleVisibility, setModuleVisibility] = useState(() => {
         // GATING DEL HOME POR PERFIL (2026-06-15): el perfil del onboarding
         // (rol/vocacion/finca_tipo/animales/objetivo) fija QUÉ módulos se ven
@@ -258,12 +226,24 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
         }
     }, []);
 
-    // Persist scroll position al volver de detalle (mismo bug que App.jsx
-    // resolvió para Dashboard clásico). Quick-win UX 2026-05-28 demo Diana.
-    useScrollRestoration('dashboard-live', '[data-scroll-key="dashboard-live"]');
+    // Restaurar scroll SOLO al volver de un detalle/sub-ruta (operador
+    // 2026-06-15): en una entrada NUEVA (mount inicial / post-login) el home
+    // debe quedar ARRIBA (scroll 0), no en la posición baja que dejó la sesión
+    // anterior. `restoreOnReturnOnly` distingue ambos casos: la primera vez que
+    // se monta en este page-load NO restaura (entrada fresca → top); al volver
+    // de un detalle (mount posterior) SÍ restaura. Conserva el fix #103 (no
+    // perder la posición al ir a un detalle y regresar).
+    useScrollRestoration('dashboard-live', '[data-scroll-key="dashboard-live"]', {
+        restoreOnReturnOnly: true,
+    });
 
+    // Persistir el orden en el perfil SOLO tras una reorganización real del
+    // usuario (no en el mount inicial): evita reescribir el perfil en cada
+    // entrada al home. `orderDirtyRef` se marca en handleDragEnd.
+    const orderDirtyRef = useRef(false);
     useEffect(() => {
-        writeOrder(order);
+        if (!orderDirtyRef.current) return;
+        setModuleOrder(order);
     }, [order]);
 
     const sensors = useSensors(
@@ -279,6 +259,8 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
             const oldIndex = items.indexOf(active.id);
             const newIndex = items.indexOf(over.id);
             if (oldIndex === -1 || newIndex === -1) return items;
+            // Reorganización real del usuario → habilitar la persistencia.
+            orderDirtyRef.current = true;
             return arrayMove(items, oldIndex, newIndex);
         });
     }, []);
@@ -415,8 +397,8 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
                     análisis de IA quede justo debajo del clima y que también
                     pueda moverse". Pasó de render fijo acá-abajo a sección
                     DRAGGABLE en SECTION_COMPONENTS, default order = bajo 'clima'
-                    (ver DEFAULT_ORDER + STORAGE_KEY v2). Recibe `sensors` vía
-                    SortableSection. */}
+                    (ver HOME_MODULE_DEFAULT_ORDER en userProfileService). Recibe
+                    `sensors` vía SortableSection. */}
             </div>
         </div>
     );

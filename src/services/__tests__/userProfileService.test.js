@@ -19,6 +19,10 @@ import {
   getModuleVisibility,
   setModuleVisibility,
   isModuleVisible,
+  HOME_MODULE_DEFAULT_ORDER,
+  getModuleOrder,
+  setModuleOrder,
+  hasManualModuleOrder,
   __PROFILE_KEYS__,
 } from '../userProfileService.js';
 
@@ -492,6 +496,104 @@ describe('visibilidad de módulos del Home (#7003)', () => {
       expect(isModuleVisible('clima')).toBe(false);
       setModuleVisibility({ clima: true });
       expect(isModuleVisible('clima')).toBe(true);
+    });
+  });
+});
+
+describe('orden de módulos del Home (reorder por drag, 2026-06-15)', () => {
+  const LEGACY_KEY = 'chagra:dashboard-order:v3';
+
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  describe('HOME_MODULE_DEFAULT_ORDER', () => {
+    it('contiene exactamente los ids de HOME_MODULES (cada uno una vez)', () => {
+      const known = HOME_MODULES.map((m) => m.id).sort();
+      expect([...HOME_MODULE_DEFAULT_ORDER].sort()).toEqual(known);
+      expect(new Set(HOME_MODULE_DEFAULT_ORDER).size).toBe(HOME_MODULE_DEFAULT_ORDER.length);
+    });
+
+    it('el agente (AgentHero) NO está en el orden (vive fijo fuera del grid)', () => {
+      expect(HOME_MODULE_DEFAULT_ORDER).not.toContain('agente');
+      expect(HOME_MODULE_DEFAULT_ORDER).not.toContain('agent');
+      expect(HOME_MODULE_DEFAULT_ORDER).not.toContain('hero');
+    });
+  });
+
+  describe('getModuleOrder', () => {
+    it('sin perfil devuelve el orden por defecto', () => {
+      expect(getModuleOrder()).toEqual([...HOME_MODULE_DEFAULT_ORDER]);
+    });
+
+    it('lee el orden manual guardado en el perfil', () => {
+      const custom = ['plantas', 'clima', 'hoyfinca'];
+      saveProfile({ modulos_orden: custom });
+      const order = getModuleOrder();
+      // Respeta el orden elegido al frente...
+      expect(order.slice(0, 3)).toEqual(custom);
+      // ...y completa los faltantes al final (sin perder ninguno).
+      expect([...order].sort()).toEqual(HOME_MODULES.map((m) => m.id).sort());
+    });
+
+    it('descarta ids desconocidos y duplicados del orden guardado', () => {
+      saveProfile({ modulos_orden: ['clima', 'inventado', 'clima', 'plantas'] });
+      const order = getModuleOrder();
+      expect(order.slice(0, 2)).toEqual(['clima', 'plantas']);
+      expect(order).not.toContain('inventado');
+      expect(new Set(order).size).toBe(order.length);
+      expect([...order].sort()).toEqual(HOME_MODULES.map((m) => m.id).sort());
+    });
+  });
+
+  describe('migración del orden legado de localStorage → perfil', () => {
+    it('migra chagra:dashboard-order:v3 al perfil y limpia la clave legada', () => {
+      const legacy = ['informes', 'clima', 'plantas'];
+      localStorage.setItem(LEGACY_KEY, JSON.stringify(legacy));
+      // Sin modulos_orden en el perfil todavía.
+      expect(hasManualModuleOrder()).toBe(false);
+
+      const order = getModuleOrder();
+      // Orden migrado respeta el legado al frente.
+      expect(order.slice(0, 3)).toEqual(legacy);
+      // Persistido en el perfil.
+      expect(getProfile().modulos_orden).toBeDefined();
+      expect(hasManualModuleOrder()).toBe(true);
+      // Clave legada eliminada tras migrar.
+      expect(localStorage.getItem(LEGACY_KEY)).toBeNull();
+    });
+
+    it('el perfil tiene prioridad sobre la clave legada', () => {
+      localStorage.setItem(LEGACY_KEY, JSON.stringify(['informes', 'clima']));
+      saveProfile({ modulos_orden: ['plantas', 'zonas'] });
+      const order = getModuleOrder();
+      // Gana el perfil, no el legado.
+      expect(order.slice(0, 2)).toEqual(['plantas', 'zonas']);
+      // No se toca la clave legada cuando el perfil ya manda.
+      expect(localStorage.getItem(LEGACY_KEY)).not.toBeNull();
+    });
+  });
+
+  describe('setModuleOrder', () => {
+    it('persiste el orden normalizado en el perfil', () => {
+      setModuleOrder(['plantas', 'clima']);
+      const saved = getProfile().modulos_orden;
+      expect(saved.slice(0, 2)).toEqual(['plantas', 'clima']);
+      // Normalizado: todos los módulos presentes una vez.
+      expect([...saved].sort()).toEqual(HOME_MODULES.map((m) => m.id).sort());
+    });
+
+    it('ignora argumentos inválidos sin corromper el perfil', () => {
+      saveProfile({ modulos_orden: ['clima', 'plantas'] });
+      setModuleOrder(null);
+      const order = getModuleOrder();
+      expect(order.slice(0, 2)).toEqual(['clima', 'plantas']);
+    });
+
+    it('round-trip: lo que se guarda con setModuleOrder se lee con getModuleOrder', () => {
+      const desired = ['biodiversidad', 'plagas', 'hoy', 'clima'];
+      setModuleOrder(desired);
+      expect(getModuleOrder().slice(0, 4)).toEqual(desired);
     });
   });
 });
