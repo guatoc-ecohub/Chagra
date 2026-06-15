@@ -81,6 +81,26 @@ export const PROFILE_QUESTIONS = [
       { value: 'curioso', label: 'Curioso/a — apenas estoy aprendiendo' },
     ],
   },
+  {
+    // ROL de producto (onboarding por perfil). Afina qué herramientas
+    // (chips de modo) se despliegan primero. NO es rol de seguridad — es un
+    // perfil de USO. Los valores coinciden con PROFILE_ROLES de
+    // profileChipSelector.js (fuente de la selección de chips). Skippable:
+    // si lo saltan, el rol se infiere de vocación/objetivo/animales.
+    id: 'rol',
+    category: 'identidad',
+    title: '¿Qué es lo tuyo en el campo?',
+    help: 'Define qué herramientas te mostramos primero. Puedes saltarlo.',
+    type: 'single',
+    options: [
+      { value: 'campesino', label: '🌱 Cultivo comida — siembro y cosecho' },
+      { value: 'ganadero', label: '🐄 Tengo animales — gallinas, cerdos o ganado' },
+      { value: 'restaurador', label: '🌳 Restauro la tierra — nativas, bosque, páramo' },
+      { value: 'guia_glaciar', label: '⛰️ Guío en la montaña — páramo y glaciar' },
+      { value: 'tecnico', label: '🔬 Acompaño técnicamente — agrónomo/a o asesor/a' },
+      { value: 'socio', label: '🤝 Soy aliado/a o apenas miro' },
+    ],
+  },
 
   // ── Finca ────────────────────────────────────────────────────────────
   {
@@ -128,6 +148,65 @@ export const PROFILE_QUESTIONS = [
     help: 'Escribe los cultivos que tienes. Ej: café, mora, tomate, plátano.',
     type: 'text',
     placeholder: 'Café, mora, tomate...',
+  },
+  {
+    // ANIMALES (onboarding por perfil). Pregunta pertinente para campesinos y
+    // ganaderos. Alimenta la selección de chips: si tiene animales, se le
+    // despliega el chip de silvopastoreo (forraje/ganado — el chip REAL que
+    // cubre el ángulo pecuario; no existe chip "gallinas" ni "cerdos" en el
+    // manifiesto, no se inventan). Multi + skippable. No aplica a cultivo
+    // urbano de balcón (sin espacio para animales).
+    id: 'animales',
+    category: 'finca',
+    title: '¿Qué animales tienes?',
+    help: 'Marca todos los que apliquen, o sáltala si no tienes.',
+    type: 'multi',
+    options: [
+      { value: 'gallinas', label: '🐔 Gallinas o pollos' },
+      { value: 'cerdos', label: '🐖 Cerdos o marranos' },
+      { value: 'ganado', label: '🐄 Ganado (vacas)' },
+      { value: 'ovejas_cabras', label: '🐑 Ovejas o cabras' },
+      { value: 'otros', label: '🐝 Otros (abejas, peces, conejos...)' },
+      { value: 'ninguno', label: 'Ninguno por ahora' },
+    ],
+    // No aplica al cultivo urbano de balcón/terraza (sin espacio pecuario).
+    when: (a) => a.vocacion !== 'urbano' && !['balcon', 'terraza'].includes(a.finca_tipo),
+  },
+  {
+    // Para gallinas: aclara el manejo (libres / galpón / corral). Ejemplo
+    // explícito del brief (carlos.rivera). Solo si marcó gallinas. Refina el
+    // contexto del agente; no cambia la selección de chips por sí sola.
+    id: 'gallinas_manejo',
+    category: 'finca',
+    title: '¿Cómo tienes las gallinas?',
+    help: 'Ayuda a dar mejor consejo de sanidad y postura.',
+    type: 'single',
+    options: [
+      { value: 'libres', label: 'Sueltas / libres (pastoreo)' },
+      { value: 'galpon', label: 'En galpón' },
+      { value: 'corral', label: 'En corral cercado' },
+      { value: 'mixto', label: 'Mixto — entran y salen' },
+    ],
+    when: (a) => Array.isArray(a.animales) && a.animales.includes('gallinas'),
+  },
+  {
+    // OBJETIVO de restauración (onboarding por perfil). Pertinente para
+    // restauradores y guías de páramo/glaciar. Refina el contexto y refuerza
+    // la selección de chips de restauración. Skippable.
+    id: 'restauracion_objetivo',
+    category: 'finca',
+    title: '¿Qué te gustaría recuperar?',
+    help: 'Marca lo que quieres restaurar con nativas. Opcional.',
+    type: 'multi',
+    options: [
+      { value: 'bosque', label: '🌳 Bosque nativo' },
+      { value: 'ribera', label: '💧 Orilla de quebrada o nacimiento' },
+      { value: 'paramo', label: '⛰️ Páramo (sobre 3000 m)' },
+      { value: 'cortafuegos', label: '🔥 Barrera contra incendios' },
+      { value: 'silvopastoreo', label: '🐄 Árboles + forraje para ganado' },
+    ],
+    // Solo si el rol es restaurador / guía de glaciar (perfiles ecológicos).
+    when: (a) => ['restaurador', 'guia_glaciar'].includes(a.rol),
   },
 
   // ── Experiencia ──────────────────────────────────────────────────────
@@ -509,12 +588,25 @@ export function buildUserProfileBlock(profile) {
   };
   if (p.vocacion) push('Perfil', vocacionLabels[p.vocacion] || p.vocacion);
 
+  const rolLabels = {
+    campesino: 'productor agrícola (cultiva comida)',
+    ganadero: 'productor pecuario (tiene animales)',
+    restaurador: 'restaurador ecológico (nativas, bosque, páramo)',
+    guia_glaciar: 'guía de alta montaña (páramo y glaciar)',
+    tecnico: 'técnico/a o asesor/a de extensión',
+    socio: 'aliado/a u observador/a',
+  };
+  if (p.rol) push('Rol', rolLabels[p.rol] || p.rol);
+
   const byId = (id) => PROFILE_QUESTIONS.find((q) => q.id === id);
   push('Tipo de cultivo', humanizeAnswer(byId('finca_tipo') || {}, p.finca_tipo));
   push('Tamaño', humanizeAnswer(byId('finca_hectareas') || {}, p.finca_hectareas));
   if (p.finca_altitud) push('Altitud', `${p.finca_altitud} msnm`);
   if (p.piso_termico) push('Piso térmico', p.piso_termico);
   push('Cultivos actuales', p.cultivos_actuales);
+  push('Animales', humanizeAnswer(byId('animales') || {}, p.animales));
+  push('Manejo de gallinas', humanizeAnswer(byId('gallinas_manejo') || {}, p.gallinas_manejo));
+  push('Quiere restaurar', humanizeAnswer(byId('restauracion_objetivo') || {}, p.restauracion_objetivo));
   push('Experiencia', humanizeAnswer(byId('anios_cultivando') || {}, p.anios_cultivando));
   push('Manejo', humanizeAnswer(byId('manejo') || {}, p.manejo));
   push('Problemas frecuentes', humanizeAnswer(byId('problemas') || {}, p.problemas));

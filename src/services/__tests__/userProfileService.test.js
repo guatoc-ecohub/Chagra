@@ -28,8 +28,12 @@ describe('userProfileService (#200)', () => {
   });
 
   describe('catálogo de preguntas', () => {
-    it('define hasta 18 preguntas', () => {
-      expect(PROFILE_QUESTIONS.length).toBeLessThanOrEqual(18);
+    it('define un catálogo razonable de preguntas condicionales', () => {
+      // El catálogo creció con el onboarding por perfil (rol, animales,
+      // gallinas_manejo, restauracion_objetivo). Las condicionales hacen que el
+      // número EFECTIVO por usuario sea bastante menor (ver test de conteo por
+      // perfil). El piso/techo aquí solo evita crecimiento descontrolado.
+      expect(PROFILE_QUESTIONS.length).toBeLessThanOrEqual(24);
       expect(PROFILE_QUESTIONS.length).toBeGreaterThanOrEqual(15);
     });
 
