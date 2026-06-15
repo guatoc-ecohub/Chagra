@@ -40,8 +40,6 @@ const HERO_ROTATION_MS = 9000;
 const HERO_PAUSE_AFTER_INTERACTION_MS = 5000;
 const MONITOR_DAYS_PER_PLANT = 90;
 const DRIP_SAVING_L_PER_DAY = 5;
-const CO2_KG_PER_TREE_YEAR = 22;
-const TREE_FRACTION = 0.3;
 
 // Fallback inicial: el catálogo seed tiene exactamente estos números.
 // Renderizar valores reales desde el primer paint evita el destello "0".
@@ -67,7 +65,6 @@ function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesT
   const isPreLogin = mode === 'pre-login';
   const displayPlants = isPreLogin ? GLOBAL_FEDERATION_FALLBACK.plantasRegistradas : plantsCount;
   const aguaAhorradaL = Math.max(0, displayPlants) * DRIP_SAVING_L_PER_DAY * MONITOR_DAYS_PER_PLANT;
-  const co2KgAnio = Math.max(0, displayPlants) * TREE_FRACTION * CO2_KG_PER_TREE_YEAR;
   const plantsLabel = displayPlants === 1 ? 'planta' : 'plantas';
   const scopeNote = isPreLogin ? 'en la red Chagra' : 'en tu finca';
 
@@ -84,14 +81,14 @@ function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesT
       navTarget: 'biodiversidad',
     },
     {
-      key: 'co2',
-      icon: Cloud,
-      headline: 'Chagra cuida el aire',
-      value: Math.round(co2KgAnio).toLocaleString('es-CO'),
-      unit: 'kg de CO₂ secuestrados al año',
+      key: 'biodiversidad',
+      icon: Leaf,
+      headline: 'Chagra registra biodiversidad',
+      value: `${species} + ${displayPlants.toLocaleString('es-CO')}`,
+      unit: 'especies + plantas registradas',
       tone: 'lime',
-      story: `Monitoreando árboles nativos andinos sembrados ${scopeNote} con Chagra.`,
-      caption: 'Factor IDEAM-MADS · 22 kg CO₂/año por árbol joven',
+      story: `Documentando diversidad biológica ${scopeNote} con fichas científicas y seguimiento.`,
+      caption: 'Datos medibles · Catálogo científico · Sin alucinaciones',
       navTarget: 'biodiversidad',
     },
     {
