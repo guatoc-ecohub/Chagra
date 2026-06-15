@@ -40,6 +40,7 @@ vi.mock('../FincaCards', () => ({
 
 vi.mock('../../../services/userProfileService', () => ({
   getProfile: vi.fn(() => ({})),
+  isModuleVisible: vi.fn(() => true),
 }));
 
 // Store de assets: plantsCount > 0 para que NO se monte el OnboardingHero de
