@@ -22,26 +22,12 @@ import {
   resetOutputGuardTelemetry,
   getOutputGuardTelemetry,
 } from '../outputGuards.js';
+import { SPECIES } from './fixtures';
 
-// Grounding fixtures (como vienen del sidecar resolve-entities / AGE).
-const CAFE = {
-  kind: 'species',
-  mentioned: 'café',
-  nombre_comun: 'café',
-  nombre_cientifico: 'Coffea arabica',
-  altitud_min: 1000,
-  altitud_max: 2000,
-  alternativas_viables: ['coco', 'cacao', 'plátano'],
-};
-const MANGO = {
-  kind: 'species',
-  mentioned: 'mango',
-  nombre_comun: 'mango',
-  nombre_cientifico: 'Mangifera indica',
-  altitud_min: 0,
-  altitud_max: 1000,
-  alternativas_viables: ['mora de Castilla', 'curuba'],
-};
+// Grounding fixtures importados desde el módulo centralizado.
+// Esto elimina redundancia: CAFE y MANGO ahora viven en fixtures/index.js
+const CAFE = SPECIES.CAFE;
+const MANGO = SPECIES.MANGO;
 
 beforeEach(() => resetOutputGuardTelemetry());
 
