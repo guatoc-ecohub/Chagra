@@ -333,17 +333,20 @@ describe('userProfileService.questions — getApplicableQuestions y saveProfile'
   });
 
   describe('cobertura exhaustiva de condiciones', () => {
-    it('urbano muestra 12-14 preguntas (menos que rural)', () => {
+    it('urbano muestra menos preguntas que rural (sin hectáreas/altitud/riego/animales)', () => {
       const urbano = getApplicableQuestions({ vocacion: 'urbano' });
-      const rural = getApplicableQuestions({ 
+      const rural = getApplicableQuestions({
         vocacion: 'campesino',
         finca_tipo: 'rural'
       });
-      
-      // Urbano tiene menos preguntas (sin hectáreas, altitud, riego)
+
+      // Urbano tiene menos preguntas (sin hectáreas, altitud, riego, animales).
+      // El número exacto evoluciona al agregar preguntas por perfil; lo que
+      // importa es la RELACIÓN urbano < rural y un piso razonable.
       expect(urbano.length).toBeLessThan(rural.length);
       expect(urbano.length).toBeGreaterThanOrEqual(12);
-      expect(urbano.length).toBeLessThanOrEqual(14);
+      // Urbano NO recibe la pregunta de animales (balcón sin espacio pecuario).
+      expect(urbano.map((q) => q.id)).not.toContain('animales');
     });
 
     it('rural muestra 15-17 preguntas (más que urbano)', () => {

@@ -1,0 +1,23 @@
+<!doctype html>
+<!--
+  onboarding-harness.html — Harness AISLADO para el test VISUAL del onboarding
+  por perfil. Monta el componente REAL OnboardingProfile con un perfil semilla
+  inyectado por query (?seed=...), SIN pasar por el router/auth de la app. Sirve
+  para capturar el onboarding con la pregunta de ROL y las preguntas
+  dependientes del perfil en un Chromium real (NixOS nix-store), sin depender
+  del flujo OAuth completo.
+
+  Uso: vite sirve este HTML; el .mjs de Playwright navega a
+       /tests/visual/onboarding-harness.html?seed=<base64-json-del-perfil>&start=<id-pregunta>
+-->
+<html lang="es-CO">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Onboarding por perfil — harness visual</title>
+  </head>
+  <body class="bg-slate-950">
+    <div id="onb-root"></div>
+    <script type="module" src="./onboarding-harness.jsx"></script>
+  </body>
+</html>

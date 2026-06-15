@@ -186,6 +186,51 @@ describe('ChipsToolbar — estado disabled global (durante grabación, etc.)', (
   });
 });
 
+// ──── chipDefs (selección POR PERFIL) — la barra pinta lo que recibe ────────
+describe('ChipsToolbar — prop chipDefs (chips adaptativos por perfil)', () => {
+  beforeEach(() => {
+    vi.spyOn(deepResearchClient, 'isDeepResearchEnabled').mockReturnValue(false);
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test('con chipDefs pinta SOLO los chips de esa lista (filtrado por perfil)', () => {
+    // Perfil "guía de glaciar": clima + páramo + restauración (sin biopreparado).
+    const guiaGlaciarDefs = CHIP_DEFS.filter((d) =>
+      ['clima', 'paramo', 'restauracion'].includes(d.intent),
+    );
+    render(<ChipsToolbar onSelectIntent={() => {}} chipDefs={guiaGlaciarDefs} />);
+    const chips = screen.getAllByTestId('mode-chip');
+    expect(chips).toHaveLength(guiaGlaciarDefs.length);
+    // No debe aparecer un chip ausente del perfil (biopreparado).
+    expect(screen.queryByText(/biopreparado/i)).not.toBeInTheDocument();
+    // Sí los del perfil.
+    expect(screen.getByText(/clima/i)).toBeInTheDocument();
+  });
+
+  test('chipDefs respeta el ORDEN recibido (el perfil decide la prioridad)', () => {
+    const ordered = CHIP_DEFS.filter((d) =>
+      ['clima', 'siembro', 'plaga'].includes(d.intent),
+    ).sort((a, b) => ['clima', 'siembro', 'plaga'].indexOf(a.intent) - ['clima', 'siembro', 'plaga'].indexOf(b.intent));
+    render(<ChipsToolbar onSelectIntent={() => {}} chipDefs={ordered} />);
+    const rendered = screen.getAllByTestId('mode-chip').map((el) => el.getAttribute('data-intent'));
+    expect(rendered).toEqual(['clima', 'siembro', 'plaga']);
+  });
+
+  test('sin chipDefs (null) cae al catálogo completo — sin breaking change', () => {
+    render(<ChipsToolbar onSelectIntent={() => {}} chipDefs={null} />);
+    const chips = screen.getAllByTestId('mode-chip');
+    expect(chips).toHaveLength(NON_DEEP_CHIP_COUNT);
+  });
+
+  test('chipDefs vacío [] cae al catálogo completo (defensa, nunca barra vacía)', () => {
+    render(<ChipsToolbar onSelectIntent={() => {}} chipDefs={[]} />);
+    const chips = screen.getAllByTestId('mode-chip');
+    expect(chips).toHaveLength(NON_DEEP_CHIP_COUNT);
+  });
+});
+
 // ──── Flag Deep Research ON → chip 🔬 visible + tier gate A1 ─────────────────
 describe('ChipsToolbar — flag Deep Research ON (chip 🔬 visible, pro-gated)', () => {
   beforeEach(() => {

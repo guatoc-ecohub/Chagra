@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw, X, Home, Camera, Square } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { transcribe, queueForRetry } from '../../services/voiceService';
@@ -73,7 +73,9 @@ import { summarizeSkyForGrounding } from '../../services/skyConditionService';
 import { assembleSystemContent } from '../../services/promptAssembler';
 import { applyOutputGuards, classifyQueryIntent } from '../../services/outputGuards';
 import { createStreamGuard } from '../../services/streamGuards';
-import { getProfile } from '../../services/userProfileService';
+import { getProfile, getModuleVisibility } from '../../services/userProfileService';
+import { selectChipDefs } from '../../services/profileChipSelector';
+import { tieneAccesoGlaciarActual } from '../../config/glaciarAccess';
 import { captureExchange } from '../../services/conversationCaptureService';
 import { regionFromProfile, getEnsoOutlook } from '../../services/ensoContext';
 // SALUDO PROACTIVO (#162 alertas + #298 tareas + #331 análisis): el agente, de
@@ -101,7 +103,6 @@ import ActionConfirmModal from '../ActionConfirmModal';
 import FeedbackConsentModal from '../FeedbackConsentModal';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import ChagraAgentAvatarColibriPhoto from '../ChagraAgentAvatarColibriPhoto';
-import QuickChipsBar from '../QuickChipsBar';
 import ChipsToolbar from '../ChipsToolbar';
 import { agentSounds } from '../../services/agentSoundService';
 import usePrefsStore from '../../store/usePrefsStore';
@@ -239,6 +240,26 @@ export default function AgentScreen({ onBack, initialContext }) {
   // input también cambia para guiar al campesino sobre qué escribir. Es un
   // toggle: tocar el mismo chip lo desactiva (vuelve al routing NLU normal).
   const [activeIntent, setActiveIntent] = useState(null);
+  // CHIPS ADAPTATIVOS POR PERFIL: la "caja de herramientas" despliega los chips
+  // MÁS APROPIADOS para esta persona (campesino→cultivo, restaurador→páramo/
+  // silvopastoreo, guía glaciar→clima/páramo, ganadero→silvopastoreo...). La
+  // SELECCIÓN/lógica vive en profileChipSelector (puro, testeado); aquí solo
+  // leemos el perfil + módulos visibles + acceso glaciar y le pasamos la lista
+  // ya filtrada a la ChipsToolbar. NO tocamos su CSS (otro stream lleva estilo).
+  // Memoizado al montar: el perfil rara vez cambia dentro de la sesión del chat
+  // (mismo criterio que los otros getProfile() de este componente).
+  const profileChipDefs = useMemo(() => {
+    try {
+      const profile = getProfile();
+      return selectChipDefs(profile, {
+        esGuiaGlaciar: tieneAccesoGlaciarActual(),
+        moduleVisibility: getModuleVisibility(),
+      });
+    } catch (_) {
+      // Si algo falla, null → ChipsToolbar cae a su catálogo completo (default).
+      return null;
+    }
+  }, []);
   // Hoja de capacidades (paridad AgentHero Ⓐ).
   const [sheetOpen, setSheetOpen] = useState(false);
   // Fase del compositor para la animación shimmer/lift al enviar.
@@ -2991,13 +3012,13 @@ export default function AgentScreen({ onBack, initialContext }) {
         <SuggestedActions onSelect={handleSuggestion} />
       )}
 
-      {/* UX-5 (#286): chips de preguntas rápidas. Solo en pantalla nueva
-          (chat vacío) e idle — al primer turn desaparecen para no llenar la
-          UI con sugerencias mientras hay conversación visible. */}
-      {state === STATE_IDLE && messages.length === 0 && (
-        <QuickChipsBar onSelect={handleSuggestion} />
-      )}
-
+      {/* UX-5 (#286) — QuickChipsBar RETIRADA de la pantalla vacía (fire #1,
+          2026-06-15): sus 3 preguntas-ejemplo genéricas se reemplazaron por la
+          ChipsToolbar de capacidades filtrada por perfil (renderizada más
+          abajo, ahora SIEMPRE visible). Así el operador ve, apenas abre el
+          agente, las herramientas reales adaptadas a su persona —en vez de 3
+          ejemplos sueltos— sin duplicar filas de chips. El componente
+          QuickChipsBar se conserva para otros usos/tests. */}
 
       {/* 2026-05-28 UX: banner de contexto de alerta climática. Aparece
           cuando el operador llega desde una notificación con prompt
@@ -3051,18 +3072,25 @@ export default function AgentScreen({ onBack, initialContext }) {
         </div>
       )}
 
-      {/* ── Chips (modo/capacidades) — fila scrollable unificada.
-          Fix 2026-06-15 (fire operador): SIEMPRE visible, incluida la pantalla
-          vacía/idle. Antes el gate `state !== STATE_IDLE || messages.length > 0`
-          los ocultaba justo cuando el usuario los busca (issue #5), y el operador
-          creía que no existían. Ahora VE los chips de capacidad apenas abre el
-          agente, sin tener que enviar un mensaje. ── */}
+      {/* ── Chips de capacidad (modo) — fila scrollable unificada, SIEMPRE
+          visible (incluida la pantalla vacía/idle).
+
+          Fire #1 (2026-06-15): el operador debe VER las herramientas del
+          agente apenas abre la pantalla, sin tener que mandar un mensaje
+          primero. Antes el gate `state !== STATE_IDLE || messages.length > 0`
+          escondía la barra en pantalla vacía (regresión del dedup del issue
+          #5, 2026-06-08), dejando solo 3 ejemplos genéricos. Ahora la barra
+          de modos —ya FILTRADA POR PERFIL (profileChipDefs)— se muestra
+          siempre y REEMPLAZA a QuickChipsBar en la pantalla nueva: una sola
+          fila de chips (sin duplicación), pero ahora son las capacidades
+          reales del agente, adaptadas a la persona. ── */}
       <ChipsToolbar
         onSelectIntent={handleChipSelect}
         activeIntent={activeIntent}
         hasAttachment={false}
         disabled={state === STATE_RECORDING}
         isPro={getCurrentTier() === 'pro'}
+        chipDefs={profileChipDefs}
       />
 
       {/* ── Compositor pill — paridad completa AgentHero (2026-06-08).
@@ -3412,7 +3440,7 @@ export default function AgentScreen({ onBack, initialContext }) {
               <p className="text-sm text-slate-400 mt-1">Toca una opción para empezar. Toda respuesta viene con su fuente.</p>
             </div>
             <div className="px-4 pb-4 overflow-y-auto flex flex-col gap-3">
-              {CHIP_DEFS.map((chip) => (
+              {(profileChipDefs || CHIP_DEFS).map((chip) => (
                 <button
                   key={chip.intent}
                   type="button"
