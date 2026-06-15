@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useMemo } from 'react';
 import { CAPABILITY_MANIFEST } from '../../services/agentCapabilities';
 import { getCapabilityHealth, SIDECAR_TOOL_NAMES } from '../../services/capabilityHealth';
 import { isSidecarEnabled } from '../../services/sidecarClient';
+import useCapabilityHealthStore from '../../store/useCapabilityHealthStore';
 import {
   relax, nodeRect, rimPoint, shelfPack, treeLadder, placeLeavesNoClash,
 } from './agentRedMenuGeom';
@@ -415,15 +416,24 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
 
   /* Estado real de cada capacidad: live (pleno), soon (por lanzar),
      down (dependencia rota, ej. sidecar caido). Deterministico,
-     sin side-effects ocultos — las dependencias vienen de imports. */
+     sin side-effects ocultos — las dependencias vienen de imports.
+
+     Task 6331: ahora usa health dinámico del sidecar (real-time polling)
+     en lugar de solo la flag estática VITE_USE_SIDECAR_AGRO_MCP. */
+  const { sidecarHealthy } = useCapabilityHealthStore();
+
   const capabilityHealth = useMemo(() => {
     try {
       const sidecarOn = isSidecarEnabled();
+      // Usar sidecarHealthy si está disponible (dinámico), si no degradar a flag estática
+      const sidecarAvailable = sidecarHealthy !== null ? sidecarHealthy : sidecarOn;
+
       return new Map(CAPABILITY_MANIFEST.map((cap) => [
         cap.id,
         getCapabilityHealth(cap.id, {
           manifest: CAPABILITY_MANIFEST,
           isSidecarEnabled: sidecarOn,
+          sidecarHealthy: sidecarAvailable,
           sidecarToolNames: SIDECAR_TOOL_NAMES,
         }),
       ]));
@@ -431,6 +441,22 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
       // Degradacion total: todo live (el menu nunca se rompe)
       return new Map(CAPABILITY_MANIFEST.map((cap) => [cap.id, 'live']));
     }
+  }, [sidecarHealthy]);
+
+  /* Health check polling: iniciar verificación periódica del sidecar.
+   * Solo si el sidecar está habilitado por flag - si no, no hay necesidad.
+   * Polling cada 60 segundos para detectar caídas del servicio en tiempo real. */
+  useEffect(() => {
+    const { startPolling, stopPolling } = useCapabilityHealthStore.getState();
+
+    // Solo iniciar polling si sidecar está habilitado
+    if (isSidecarEnabled()) {
+      startPolling(60000); // 60 segundos
+    }
+
+    return () => {
+      stopPolling();
+    };
   }, []);
 
   /* Motor imperativo: layout + rAF (port del demo). Re-brota al cambiar

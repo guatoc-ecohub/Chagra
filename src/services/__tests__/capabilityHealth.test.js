@@ -8,12 +8,18 @@ import {
   getDegradedCapabilities,
   getCapabilityHealth,
   SIDECAR_TOOL_NAMES,
+  checkSidecarHealth,
+  checkOllamaHealth,
+  checkAllServicesHealth,
+  clearHealthCache,
+  __TEST__,
 } from '../capabilityHealth';
 import { CAPABILITY_MANIFEST } from '../agentCapabilities';
 
 const makeDeps = (overrides = {}) => ({
   manifest: overrides.manifest ?? CAPABILITY_MANIFEST,
   isSidecarEnabled: overrides.isSidecarEnabled ?? true,
+  sidecarHealthy: overrides.sidecarHealthy,
   sidecarToolNames: overrides.sidecarToolNames ?? SIDECAR_TOOL_NAMES,
 });
 
@@ -140,5 +146,278 @@ describe('getCapabilityHealth — estado real por capacidad', () => {
 
     const arrDeps = makeDeps({ isSidecarEnabled: false, sidecarToolNames: ['get_species'] });
     expect(getCapabilityHealth('siembro', arrDeps)).toBe('down');
+  });
+
+  // Task 6331: tests para health dinámico
+  describe('Task 6331: health dinámico del sidecar', () => {
+    beforeEach(() => {
+      clearHealthCache();
+    });
+
+    it('usa sidecarHealthy si está disponible (dinámico), sino degrada a flag estática', () => {
+      // sidecarHealthy = true → live
+      const depsTrue = makeDeps({
+        isSidecarEnabled: false,
+        sidecarHealthy: true,
+      });
+      expect(getCapabilityHealth('siembro', depsTrue)).toBe('live');
+
+      // sidecarHealthy = false → down
+      const depsFalse = makeDeps({
+        isSidecarEnabled: true, // flag dice sí, pero health real dice no
+        sidecarHealthy: false,
+      });
+      expect(getCapabilityHealth('siembro', depsFalse)).toBe('down');
+
+      // sidecarHealthy = null → usa flag estática (comportamiento anterior)
+      const depsNull = makeDeps({
+        isSidecarEnabled: false,
+        sidecarHealthy: null,
+      });
+      expect(getCapabilityHealth('siembro', depsNull)).toBe('down');
+    });
+
+    it('sidecarHealthy no afecta capacidades offline-first', () => {
+      const deps = makeDeps({
+        isSidecarEnabled: false,
+        sidecarHealthy: false,
+      });
+      expect(getCapabilityHealth('plantas', deps)).toBe('live');
+      expect(getCapabilityHealth('tareas', deps)).toBe('live');
+    });
+
+    it('status soon del manifest siempre manda, sin importar sidecarHealthy', () => {
+      const deps = makeDeps({
+        isSidecarEnabled: true,
+        sidecarHealthy: true,
+      });
+      expect(getCapabilityHealth('foto', deps)).toBe('soon');
+      expect(getCapabilityHealth('precio', deps)).toBe('soon');
+      expect(getCapabilityHealth('deep', deps)).toBe('soon');
+    });
+  });
+});
+
+describe('Task 6331: health checks dinámicos', () => {
+  beforeEach(() => {
+    clearHealthCache();
+    vi.clearAllMocks();
+  });
+
+  describe('checkSidecarHealth', () => {
+    it('retorna false si sidecar no está habilitado por flag', async () => {
+      const deps = {
+        isSidecarEnabled: () => false,
+        fetch: vi.fn(),
+      };
+      const result = await checkSidecarHealth(deps);
+      expect(result).toBe(false);
+      expect(deps.fetch).not.toHaveBeenCalled();
+    });
+
+    it('retorna true si sidecar responde OK', async () => {
+      const mockFetch = vi.fn(() =>
+        Promise.resolve({
+          ok: true,
+          status: 200,
+        })
+      );
+      const deps = {
+        isSidecarEnabled: () => true,
+        sidecarUrl: '/api/mcp/agro',
+        fetch: mockFetch,
+      };
+      const result = await checkSidecarHealth(deps);
+      expect(result).toBe(true);
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/mcp/agro/nlu',
+        expect.objectContaining({
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: expect.stringContaining('user_message'),
+        })
+      );
+    });
+
+    it('retorna false si sidecar responde error', async () => {
+      const mockFetch = vi.fn(() =>
+        Promise.resolve({
+          ok: false,
+          status: 503,
+        })
+      );
+      const deps = {
+        isSidecarEnabled: () => true,
+        fetch: mockFetch,
+      };
+      const result = await checkSidecarHealth(deps);
+      expect(result).toBe(false);
+    });
+
+    it('retorna false si sidecar timeout', async () => {
+      const mockFetch = vi.fn(() =>
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('AbortError')), 100)
+        )
+      );
+      const deps = {
+        isSidecarEnabled: () => true,
+        fetch: mockFetch,
+      };
+      const result = await checkSidecarHealth(deps);
+      expect(result).toBe(false);
+    });
+
+    it('cachea resultado con TTL', async () => {
+      let callCount = 0;
+      const mockFetch = vi.fn(() => {
+        callCount++;
+        return Promise.resolve({ ok: true, status: 200 });
+      });
+      const deps = {
+        isSidecarEnabled: () => true,
+        fetch: mockFetch,
+        cache: { result: null, timestamp: 0, ttl: 30000 },
+      };
+
+      // Primera llamada → fetch
+      await checkSidecarHealth(deps);
+      expect(callCount).toBe(1);
+
+      // Segunda llamada inmediata → cache (no fetch)
+      await checkSidecarHealth(deps);
+      expect(callCount).toBe(1);
+    });
+  });
+
+  describe('checkOllamaHealth', () => {
+    it('retorna true si ollama responde OK', async () => {
+      const mockFetch = vi.fn(() =>
+        Promise.resolve({
+          ok: true,
+          status: 200,
+        })
+      );
+      const deps = { fetch: mockFetch };
+      const result = await checkOllamaHealth(deps);
+      expect(result).toBe(true);
+      expect(mockFetch).toHaveBeenCalledWith('/api/ollama/api/tags', expect.any(Object));
+    });
+
+    it('retorna false si ollama responde error', async () => {
+      const mockFetch = vi.fn(() =>
+        Promise.resolve({
+          ok: false,
+          status: 503,
+        })
+      );
+      const deps = { fetch: mockFetch };
+      const result = await checkOllamaHealth(deps);
+      expect(result).toBe(false);
+    });
+
+    it('retorna false si ollama timeout', async () => {
+      const mockFetch = vi.fn(() =>
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('AbortError')), 100)
+        )
+      );
+      const deps = { fetch: mockFetch };
+      const result = await checkOllamaHealth(deps);
+      expect(result).toBe(false);
+    });
+
+    it('cachea resultado con TTL', async () => {
+      let callCount = 0;
+      const mockFetch = vi.fn(() => {
+        callCount++;
+        return Promise.resolve({ ok: true, status: 200 });
+      });
+      const deps = {
+        fetch: mockFetch,
+        cache: { result: null, timestamp: 0, ttl: 60000 },
+      };
+
+      // Primera llamada → fetch
+      await checkOllamaHealth(deps);
+      expect(callCount).toBe(1);
+
+      // Segunda llamada inmediata → cache (no fetch)
+      await checkOllamaHealth(deps);
+      expect(callCount).toBe(1);
+    });
+  });
+
+  describe('checkAllServicesHealth', () => {
+    it('verifica ambos servicios en paralelo', async () => {
+      const mockFetch = vi.fn(() =>
+        Promise.resolve({
+          ok: true,
+          status: 200,
+        })
+      );
+      const deps = {
+        isSidecarEnabled: () => true,
+        fetch: mockFetch,
+      };
+
+      const result = await checkAllServicesHealth(deps);
+
+      expect(result).toHaveProperty('sidecar');
+      expect(result).toHaveProperty('ollama');
+      expect(typeof result.sidecar).toBe('boolean');
+      expect(typeof result.ollama).toBe('boolean');
+    });
+
+    it('degrada a false si alguno falla', async () => {
+      const mockFetch = vi.fn(() =>
+        Promise.resolve({
+          ok: false,
+          status: 503,
+        })
+      );
+      const deps = {
+        isSidecarEnabled: () => true,
+        fetch: mockFetch,
+      };
+
+      const result = await checkAllServicesHealth(deps);
+
+      expect(result.sidecar).toBe(false);
+      expect(result.ollama).toBe(false);
+    });
+  });
+
+  describe('clearHealthCache', () => {
+    beforeEach(() => {
+      // Poblar el cache antes de cada test
+      __TEST__.healthCache.sidecar.result = true;
+      __TEST__.healthCache.sidecar.timestamp = Date.now();
+      __TEST__.healthCache.ollama.result = true;
+      __TEST__.healthCache.ollama.timestamp = Date.now();
+    });
+
+    it('limpia cache de sidecar', () => {
+      clearHealthCache('sidecar');
+      expect(__TEST__.healthCache.sidecar.result).toBeNull();
+      expect(__TEST__.healthCache.sidecar.timestamp).toBe(0);
+      // ollama debe quedar intacto
+      expect(__TEST__.healthCache.ollama.result).toBe(true);
+    });
+
+    it('limpia cache de ollama', () => {
+      clearHealthCache('ollama');
+      expect(__TEST__.healthCache.ollama.result).toBeNull();
+      expect(__TEST__.healthCache.ollama.timestamp).toBe(0);
+      // sidecar debe quedar intacto
+      expect(__TEST__.healthCache.sidecar.result).toBe(true);
+    });
+
+    it('limpia ambos caches si no se especifica servicio', () => {
+      clearHealthCache();
+      // verificar que ambos caches están limpios
+      expect(__TEST__.healthCache.sidecar.result).toBeNull();
+      expect(__TEST__.healthCache.ollama.result).toBeNull();
+    });
   });
 });
