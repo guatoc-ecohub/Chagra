@@ -20,7 +20,15 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Snowflake, ChevronRight } from 'lucide-react';
 import AgentHero from './AgentHero';
 import OnboardingHero from '../OnboardingHero';
-import { getProfile, isModuleVisible } from '../../services/userProfileService';
+import {
+    getProfile,
+    getModuleVisibility,
+    hasManualModuleVisibility,
+} from '../../services/userProfileService';
+import {
+    selectHomeModuleVisibilityMap,
+    selectHomeModules,
+} from '../../services/homeModuleSelector';
 import { tieneAccesoGlaciarActual } from '../../config/glaciarAccess';
 import SelectedBackgroundReveal from './SelectedBackgroundReveal';
 import ClimaStrip from './ClimaStrip';
@@ -163,12 +171,50 @@ function SortableSection({ id, onNavigate, sensors }) {
 export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
     const [order, setOrder] = useState(readOrder);
     const [moduleVisibility, setModuleVisibility] = useState(() => {
-        // Leer visibilidad inicial: filtra el order para solo incluir módulos visibles
-        const visibility = {};
-        for (const id of DEFAULT_ORDER) {
-            visibility[id] = isModuleVisible(id);
+        // GATING DEL HOME POR PERFIL (2026-06-15): el perfil del onboarding
+        // (rol/vocacion/finca_tipo/animales/objetivo) fija QUÉ módulos se ven
+        // por DEFECTO — "el usuario solo ve lo que necesita".
+        //
+        // RESPETO A #1560: si el usuario ya guardó una preferencia MANUAL en
+        // ProfileScreen, esa GANA — el perfil solo decide el default. Si no hay
+        // preferencia manual, derivamos la visibilidad por perfil con
+        // homeModuleSelector (reusa deriveRole de profileChipSelector).
+        try {
+            if (hasManualModuleVisibility()) {
+                // El usuario eligió a mano: respetar su configuración tal cual.
+                return getModuleVisibility();
+            }
+            // Primer load sin elección manual: default por perfil.
+            return selectHomeModuleVisibilityMap(getProfile(), {
+                esGuiaGlaciar: tieneAccesoGlaciarActual(),
+            });
+        } catch (_) {
+            // Fail-open: ante cualquier problema, todo visible (no romper el home).
+            const visibility = {};
+            for (const id of DEFAULT_ORDER) visibility[id] = true;
+            return visibility;
         }
-        return visibility;
+    });
+    // Tarjetas de SEGUIMIENTO permitidas por perfil (Reforestación · Silvopastoreo
+    // · Páramo · Cerdos). Mismo gating "el usuario solo ve lo que necesita": un
+    // urbano (sin preferencia manual) NUNCA ve Cerdos. Se calcula una vez al
+    // montar; el perfil no cambia dentro de la sesión del home.
+    //
+    // RESPETO A #1560: si el usuario ya tomó control MANUAL de su home
+    // (hasManualModuleVisibility), NO le ocultamos tarjetas por perfil — el
+    // perfil solo fija el DEFAULT. Devolvemos null (= mostrar las 4), igual que
+    // el comportamiento histórico. Un urbano FRESCO (sin manual) sí queda
+    // gateado: no ve ninguna (criterio de éxito #1).
+    // null = mostrar todas; [] = ocultar el bloque; [k…] = filtrar.
+    const [seguimientoKeys] = useState(() => {
+        try {
+            if (hasManualModuleVisibility()) return null;
+            return selectHomeModules(getProfile(), {
+                esGuiaGlaciar: tieneAccesoGlaciarActual(),
+            }).seguimiento;
+        } catch (_) {
+            return null; // Fail-open: el componente muestra las 4 por defecto.
+        }
     });
     const iotAlerts = useAssetStore((s) => s.iotAlerts) || [];
     // Primer uso (feat/onboarding-ayuda): sin plantas registradas se re-monta
@@ -300,16 +346,23 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
                 de "Mis plantas". Cada una abre su VISTA de seguimiento (iniciar
                 el proceso, ver etapas con fechas, agregar registros/fotos y ver
                 el avance). El operador las pidió visibles en el home (no escondidas
-                tras la Ⓐ ni iniciables solo por voz). Bloque propio, siempre
-                presente, fuera del grid draggable de módulos. */}
-            <div className="px-4 pt-3">
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                    Seguimiento de procesos
-                </p>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3" data-testid="seguimiento-cards">
-                    <SeguimientoCards onNavigate={onNavigate} variant="grid" />
+                tras la Ⓐ ni iniciables solo por voz). Bloque propio, fuera del
+                grid draggable de módulos.
+
+                GATING POR PERFIL: `seguimientoKeys` filtra qué tarjetas se ven
+                ("el usuario solo ve lo que necesita" — un urbano NUNCA ve Cerdos
+                ni Silvopastoreo). Si el perfil no permite ninguna (ej. urbano de
+                balcón), el bloque entero se oculta. null = fail-open (las 4). */}
+            {(seguimientoKeys === null || seguimientoKeys.length > 0) && (
+                <div className="px-4 pt-3">
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                        Seguimiento de procesos
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3" data-testid="seguimiento-cards">
+                        <SeguimientoCards onNavigate={onNavigate} variant="grid" keys={seguimientoKeys} />
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Saludo regional dismissible — bajo el fold, ya no sobre el hero
                 (que tiene su propio saludo "Soy Chagra"). */}

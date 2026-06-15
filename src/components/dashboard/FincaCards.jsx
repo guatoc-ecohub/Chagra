@@ -405,15 +405,32 @@ export function SeguimientoCard({ def, count, onNavigate, variant }) {
 }
 
 /**
- * SeguimientoCards — las 4 tarjetas de seguimiento de procesos de finca
- * para el home (Reforestación · Silvopastoreo · Páramo · Cerdos). Se renderiza
- * como bloque propio en DashboardLive, fuera del grid draggable.
+ * SeguimientoCards — las tarjetas de seguimiento de procesos de finca para el
+ * home (Reforestación · Silvopastoreo · Páramo · Cerdos). Se renderiza como
+ * bloque propio en DashboardLive, fuera del grid draggable.
+ *
+ * GATING POR PERFIL (2026-06-15): `keys` filtra qué tarjetas se muestran según
+ * el perfil del usuario ("el usuario solo ve lo que necesita" — un urbano
+ * NUNCA ve Cerdos). Lo decide el call-site (DashboardLive) vía
+ * homeModuleSelector. Si `keys` se omite (null/undefined), se muestran las 4 —
+ * comportamiento histórico, sin breaking change. La selección NO se decide acá;
+ * este componente solo pinta las tarjetas permitidas.
+ *
+ * @param {Object} props
+ * @param {(view: string) => void} props.onNavigate
+ * @param {'grid'|'list'} [props.variant='grid']
+ * @param {string[]|null} [props.keys=null] — keys de seguimiento permitidas
+ *   (subconjunto de SEGUIMIENTO_PROCESOS[].key). null = todas.
  */
-export function SeguimientoCards({ onNavigate, variant = 'grid' }) {
+export function SeguimientoCards({ onNavigate, variant = 'grid', keys = null }) {
     const counts = useSeguimientoCounts();
+    const allowed = Array.isArray(keys) ? new Set(keys) : null;
+    const defs = allowed
+        ? SEGUIMIENTO_PROCESOS.filter((def) => allowed.has(def.key))
+        : SEGUIMIENTO_PROCESOS;
     return (
         <>
-            {SEGUIMIENTO_PROCESOS.map((def) => (
+            {defs.map((def) => (
                 <SeguimientoCard
                     key={def.key}
                     def={def}
