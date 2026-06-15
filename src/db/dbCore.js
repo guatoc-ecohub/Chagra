@@ -38,7 +38,7 @@
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 24;
+export const DB_VERSION = 25;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -97,6 +97,13 @@ export const STORES = {
   // No es el reporte final (eso vive en glaciar_reportes): es el work-in-progress
   // que se restaura al volver y se borra al guardar el reporte con éxito.
   GLACIAR_DRAFT: 'glaciar_draft',
+  // v25: pilot_telemetry — telemetría por piloto (#7005) para monitoreo e2e.
+  // Captura por usuario piloto (con consentimiento explícito) los metadatos
+  // de uso: queries, errores, minutos de audio, módulos usados. Privacy-first:
+  // NO prompt completo, NO PII, NO coords precisas. Solo metadata agregada para
+  // mejorar el producto en tiempo real. keyPath: id; indexes: created_at,
+  // synced, module, event_type.
+  PILOT_TELEMETRY: 'pilot_telemetry',
 };
 
 let dbInstance = null;
@@ -413,6 +420,21 @@ export const openDB = async () => {
       if (event.oldVersion < 24) {
         if (!db.objectStoreNames.contains(STORES.GLACIAR_DRAFT)) {
           db.createObjectStore(STORES.GLACIAR_DRAFT, { keyPath: 'key' });
+        }
+      }
+
+      // v25: pilot_telemetry — telemetría por piloto (#7005) para monitoreo e2e.
+      // Captura por usuario piloto (con consentimiento explícito) los metadatos
+      // de uso: queries, errores, minutos de audio, módulos usados. Privacy-first:
+      // NO prompt completo, NO PII, NO coords precisas. Solo metadata agregada para
+      // mejorar el producto en tiempo real.
+      if (event.oldVersion < 25) {
+        if (!db.objectStoreNames.contains(STORES.PILOT_TELEMETRY)) {
+          const store = db.createObjectStore(STORES.PILOT_TELEMETRY, { keyPath: 'id' });
+          store.createIndex('created_at', 'created_at', { unique: false });
+          store.createIndex('synced', 'synced', { unique: false });
+          store.createIndex('module', 'module', { unique: false });
+          store.createIndex('event_type', 'event_type', { unique: false });
         }
       }
     };
