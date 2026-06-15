@@ -3051,18 +3051,19 @@ export default function AgentScreen({ onBack, initialContext }) {
         </div>
       )}
 
-      {/* ── Chips (modo) — fila scrollable unificada.
-          Oculta en pantalla vacía donde QuickChipsBar ya muestra ejemplos
-          (issue #5 duplicación resuelta 2026-06-08). ── */}
-      {(state !== STATE_IDLE || messages.length > 0) && (
-        <ChipsToolbar
-          onSelectIntent={handleChipSelect}
-          activeIntent={activeIntent}
-          hasAttachment={false}
-          disabled={state === STATE_RECORDING}
-          isPro={getCurrentTier() === 'pro'}
-        />
-      )}
+      {/* ── Chips (modo/capacidades) — fila scrollable unificada.
+          Fix 2026-06-15 (fire operador): SIEMPRE visible, incluida la pantalla
+          vacía/idle. Antes el gate `state !== STATE_IDLE || messages.length > 0`
+          los ocultaba justo cuando el usuario los busca (issue #5), y el operador
+          creía que no existían. Ahora VE los chips de capacidad apenas abre el
+          agente, sin tener que enviar un mensaje. ── */}
+      <ChipsToolbar
+        onSelectIntent={handleChipSelect}
+        activeIntent={activeIntent}
+        hasAttachment={false}
+        disabled={state === STATE_RECORDING}
+        isPro={getCurrentTier() === 'pro'}
+      />
 
       {/* ── Compositor pill — paridad completa AgentHero (2026-06-08).
           Superficie OPACA por token (.agent-bar-surface) para legibilidad sobre
