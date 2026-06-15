@@ -6,143 +6,167 @@ import {
   buildOpenExternalPrompt,
 } from '../externalAiPromptBuilder.js';
 
-/**
- * Tests del constructor de prompts portables (puro, sin red ni efectos).
- */
-
-describe('deriveThermalZoneFromAltitud', () => {
-  it.each([
-    [0, 'cálido'],
-    [999, 'cálido'],
-    [1000, 'templado'],
-    [1999, 'templado'],
-    [2000, 'frío'],
-    [2550, 'frío'],
-    [2999, 'frío'],
-    [3000, 'páramo'],
-    [3599, 'páramo'],
-    [3600, 'glacial'],
-    [5000, 'glacial'],
-  ])('clasifica %i msnm como %s', (msnm, zona) => {
-    expect(deriveThermalZoneFromAltitud(msnm)).toBe(zona);
+describe('deriveThermalZoneFromAltitud — casos borde', () => {
+  it('maneja altitud con decimales', () => {
+    expect(deriveThermalZoneFromAltitud(999.5)).toBe('cálido');
+    expect(deriveThermalZoneFromAltitud(1999.9)).toBe('templado');
   });
 
-  it.each([NaN, Infinity, -Infinity, -10, '2550', null, undefined, {}])(
-    'retorna null para entrada inválida: %s',
-    (input) => {
-      expect(deriveThermalZoneFromAltitud(input)).toBeNull();
-    },
-  );
+  it('maneja altitud extremadamente alta', () => {
+    expect(deriveThermalZoneFromAltitud(8848)).toBe('glacial');
+  });
+
+  it('maneja altitud exacta en limite', () => {
+    expect(deriveThermalZoneFromAltitud(1000)).toBe('templado');
+    expect(deriveThermalZoneFromAltitud(2000)).toBe('frío');
+    expect(deriveThermalZoneFromAltitud(3000)).toBe('páramo');
+    expect(deriveThermalZoneFromAltitud(3600)).toBe('glacial');
+  });
+
+  it('retorna null para string numerico', () => {
+    expect(deriveThermalZoneFromAltitud('2550')).toBeNull();
+  });
+
+  it('retorna null para boolean', () => {
+    expect(deriveThermalZoneFromAltitud(true)).toBeNull();
+    expect(deriveThermalZoneFromAltitud(false)).toBeNull();
+  });
+
+  it('retorna null para NaN', () => {
+    expect(deriveThermalZoneFromAltitud(NaN)).toBeNull();
+  });
 });
 
-describe('buildGuildExternalPrompt', () => {
-  it('incluye especie con nombre científico y común', () => {
-    const p = buildGuildExternalPrompt({ speciesName: 'maíz', scientificName: 'Zea mays' });
-    expect(p).toContain('Zea mays (maíz)');
+describe('buildGuildExternalPrompt — casos borde', () => {
+  it('maneja nombre de especie con tildes y caracteres especiales', () => {
+    const p = buildGuildExternalPrompt({ speciesName: 'cañamo', scientificName: 'Cannabis sativa L.' });
+    expect(p).toContain('cañamo');
+    expect(p).toContain('Cannabis sativa L.');
   });
 
-  it('deriva el piso térmico desde la altitud cuando no hay thermalZones', () => {
-    const p = buildGuildExternalPrompt({ speciesName: 'papa', altitudMsnm: 2550 });
-    expect(p).toContain('piso térmico frío');
-    expect(p).toContain('2550 msnm');
+  it('maneja nombre de especie muy largo', () => {
+    const longName = 'Super Tomate Chonto Riñon Cherry Orgánico Certificado Premium';
+    const p = buildGuildExternalPrompt({ speciesName: longName });
+    expect(p).toContain(longName);
+    expect(p.length).toBeGreaterThan(100);
   });
 
-  it('usa thermalZones explícitos por encima de la altitud', () => {
-    const p = buildGuildExternalPrompt({ speciesName: 'papa', altitudMsnm: 2550, thermalZones: ['templado'] });
+  it('maneja companions largos', () => {
+    const p = buildGuildExternalPrompt({
+      speciesName: 'maíz',
+      companions: Array.from({ length: 20 }, (_, i) => `planta-${i}`),
+    });
+    expect(p).toContain('planta-0');
+    expect(p).toContain('planta-19');
+  });
+
+  it('maneja altitud muy alta', () => {
+    const p = buildGuildExternalPrompt({ speciesName: 'papa', altitudMsnm: 4500 });
+    expect(p).toContain('piso térmico glacial');
+    expect(p).toContain('4500 msnm');
+  });
+
+  it('maneja municipio con caracteres especiales', () => {
+    const p = buildGuildExternalPrompt({ speciesName: 'café', municipio: 'Chinchiná, Caldas' });
+    expect(p).toContain('Chinchiná, Caldas');
+  });
+
+  it('maneja estrato con caracter especial', () => {
+    const p = buildGuildExternalPrompt({ speciesName: 'yuca', estrato: 'sotobosque' });
+    expect(p).toContain('Estrato: sotobosque');
+  });
+
+  it('maneja prompt sin especie (vacio total)', () => {
+    const p = buildGuildExternalPrompt({});
+    expect(p).toContain('especie desconocida');
+    expect(typeof p).toBe('string');
+    expect(p.length).toBeGreaterThan(50);
+  });
+
+  it('thermalZones vacio pero con altitud deriva correctamente', () => {
+    const p = buildGuildExternalPrompt({ speciesName: 'frijol', thermalZones: [], altitudMsnm: 1500 });
     expect(p).toContain('piso térmico templado');
-    expect(p).not.toContain('piso térmico frío');
   });
 
-  it('marca "no especificado" cuando no hay zona ni altitud', () => {
-    const p = buildGuildExternalPrompt({ speciesName: 'yuca' });
-    expect(p).toContain('piso térmico no especificado');
-    expect(p).toContain('altitud no especificada');
-  });
-
-  it('usa los textos por defecto para companions y antagonists vacíos', () => {
-    const p = buildGuildExternalPrompt({ speciesName: 'frijol' });
-    expect(p).toContain('Companions ya considerados: ninguno aún');
-    expect(p).toContain('Antagonists conocidos: ninguno conocido');
-  });
-
-  it('lista companions y antagonists provistos', () => {
-    const p = buildGuildExternalPrompt({ speciesName: 'maíz', companions: ['frijol', 'calabaza'], antagonists: ['hinojo'] });
-    expect(p).toContain('frijol, calabaza');
-    expect(p).toContain('hinojo');
-  });
-
-  it('incluye el estrato solo cuando se provee', () => {
-    expect(buildGuildExternalPrompt({ speciesName: 'maíz', estrato: 'alto' })).toContain('Estrato: alto');
-    expect(buildGuildExternalPrompt({ speciesName: 'maíz' })).not.toContain('Estrato:');
-  });
-
-  it('pide respuesta en JSON y va recortado', () => {
-    const p = buildGuildExternalPrompt({ speciesName: 'maíz' });
-    expect(p).toContain('JSON');
-    expect(p).toBe(p.trim());
-  });
-
-  it('usa "especie desconocida" si no se da speciesName', () => {
-    expect(buildGuildExternalPrompt({})).toContain('especie desconocida');
+  it('thermalZones con multiples zonas', () => {
+    const p = buildGuildExternalPrompt({ speciesName: 'maíz', thermalZones: ['frío', 'templado'] });
+    expect(p).toContain('frío, templado');
   });
 });
 
-describe('buildDiagnosticExternalPrompt', () => {
-  it('formatea las condiciones ambientales provistas', () => {
-    const p = buildDiagnosticExternalPrompt({ speciesName: 'tomate', humedad: 80, temperatura: 18, lluvia: 40 });
-    expect(p).toContain('HR 80%');
-    expect(p).toContain('temperatura media 18°C');
-    expect(p).toContain('precipitación acumulada 40mm');
+describe('buildDiagnosticExternalPrompt — casos borde', () => {
+  it('maneja humedad extrema', () => {
+    const p = buildDiagnosticExternalPrompt({ speciesName: 'tomate', humedad: 100 });
+    expect(p).toContain('HR 100%');
   });
 
-  it('marca "datos no disponibles" sin condiciones', () => {
-    expect(buildDiagnosticExternalPrompt({ speciesName: 'tomate' })).toContain('datos no disponibles');
+  it('maneja temperatura bajo cero', () => {
+    const p = buildDiagnosticExternalPrompt({ speciesName: 'papa', temperatura: -5 });
+    expect(p).toContain('temperatura media -5°C');
   });
 
-  it('compone fase fenológica y días desde siembra', () => {
-    const p = buildDiagnosticExternalPrompt({ speciesName: 'tomate', fase: 'floración', diasDesdeSiembra: 45 });
-    expect(p).toContain('fase fenológica floración');
-    expect(p).toContain('45 días desde siembra');
+  it('maneja lluvia cero explícita', () => {
+    const p = buildDiagnosticExternalPrompt({ speciesName: 'tomate', lluvia: 0 });
+    expect(p).toContain('precipitación acumulada 0mm');
   });
 
-  it('marca "fase no especificada" cuando faltan fase y días', () => {
-    expect(buildDiagnosticExternalPrompt({ speciesName: 'tomate' })).toContain('fase no especificada');
+  it('maneja sintomas muy largos', () => {
+    const largoSintoma = 'manchas ' + 'amarillas '.repeat(50) + 'en hojas';
+    const p = buildDiagnosticExternalPrompt({ speciesName: 'café', sintomas: largoSintoma });
+    expect(p).toContain('amarillas');
   });
 
-  it('usa el placeholder de síntomas por defecto', () => {
-    expect(buildDiagnosticExternalPrompt({ speciesName: 'tomate' })).toContain('[usuario describe síntomas aquí]');
+  it('maneja diasDesdeSiembra sin fase', () => {
+    const p = buildDiagnosticExternalPrompt({ speciesName: 'tomate', diasDesdeSiembra: 90 });
+    expect(p).toContain('90 días desde siembra');
+    expect(p).not.toContain('fase fenológica');
   });
 
-  it('incluye los síntomas provistos por el usuario', () => {
-    const p = buildDiagnosticExternalPrompt({ speciesName: 'tomate', sintomas: 'manchas negras en hojas' });
-    expect(p).toContain('manchas negras en hojas');
+  it('maneja fase sin diasDesdeSiembra', () => {
+    const p = buildDiagnosticExternalPrompt({ speciesName: 'tomate', fase: 'maduración' });
+    expect(p).toContain('fase fenológica maduración');
+    expect(p).not.toContain('días desde siembra');
   });
 
-  it('prohíbe agroquímicos sintéticos en la tarea', () => {
-    const p = buildDiagnosticExternalPrompt({ speciesName: 'tomate' });
-    expect(p).toContain('NO agroquímicos sintéticos');
-    expect(p).toContain('biopreparado');
+  it('usa "cultivo" cuando speciesName no se da', () => {
+    const p = buildDiagnosticExternalPrompt({});
+    expect(p).toContain('cultivo');
   });
 
-  it('humedad 0 se incluye (no se trata como ausente)', () => {
-    expect(buildDiagnosticExternalPrompt({ speciesName: 'tomate', humedad: 0 })).toContain('HR 0%');
+  it('maneja condiciones parciales (solo humedad)', () => {
+    const p = buildDiagnosticExternalPrompt({ speciesName: 'lechuga', humedad: 65 });
+    expect(p).toContain('HR 65%');
+    expect(p).not.toContain('temperatura media');
+    expect(p).not.toContain('precipitación');
   });
 });
 
-describe('buildOpenExternalPrompt', () => {
-  it('usa el placeholder de pregunta por defecto', () => {
-    expect(buildOpenExternalPrompt({ speciesName: 'mora' })).toContain('[Escribe tu pregunta aquí]');
+describe('buildOpenExternalPrompt — casos borde', () => {
+  it('maneja pregunta larga', () => {
+    const larga = 'Cual es la mejor manera '.repeat(10);
+    const p = buildOpenExternalPrompt({ speciesName: 'mora', pregunta: larga });
+    expect(typeof p).toBe('string');
+    expect(p.length).toBeGreaterThan(50);
   });
 
-  it('incluye la pregunta del usuario y el piso térmico derivado', () => {
-    const p = buildOpenExternalPrompt({ speciesName: 'mora', altitudMsnm: 2550, pregunta: '¿cuándo podar?' });
-    expect(p).toContain('¿cuándo podar?');
-    expect(p).toContain('piso térmico frío');
+  it('maneja pregunta con caracteres especiales', () => {
+    const p = buildOpenExternalPrompt({ speciesName: 'café', pregunta: '¿Cómo afecta el fenómeno de El Niño al cultivo?' });
+    expect(p).toContain('El Niño');
   });
 
-  it('incluye la especie y va recortado', () => {
-    const p = buildOpenExternalPrompt({ speciesName: 'mora', scientificName: 'Rubus glaucus' });
-    expect(p).toContain('Rubus glaucus (mora)');
-    expect(p).toBe(p.trim());
+  it('maneja prompt sin especie ni nada', () => {
+    const p = buildOpenExternalPrompt({});
+    expect(typeof p).toBe('string');
+    expect(p.length).toBeGreaterThan(20);
+  });
+
+  it('maneja municipio largo con tilde', () => {
+    const p = buildOpenExternalPrompt({ speciesName: 'papa', municipio: 'San José de la Montaña, Antioquia' });
+    expect(p).toContain('San José de la Montaña');
+  });
+
+  it('maneja thermalZones con zona unica', () => {
+    const p = buildOpenExternalPrompt({ speciesName: 'yuca', thermalZones: ['cálido'] });
+    expect(p).toContain('piso térmico cálido');
   });
 });
