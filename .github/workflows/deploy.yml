@@ -79,7 +79,7 @@ jobs:
           # ENTERO (no era un error de lint, era falta de memoria, y el crash se
           # comia la logica soft-fail). Subimos el heap de node para que eslint
           # complete. El runner (alpha) tiene RAM de sobra.
-          export NODE_OPTIONS="--max-old-space-size=8192"
+          export NODE_OPTIONS="--max-old-space-size=16384"
           if ! npm run lint -- --max-warnings 9999 2>&1 | tee /tmp/lint.log; then
             {
               echo "## Deploy bloqueado: lint failed"
