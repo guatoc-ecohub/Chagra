@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench, Sprout, ChevronRight, Bell } from 'lucide-react';
+import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench, Sprout, ChevronRight, Bell, Users } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
+import { esExtensionistaActual } from '../config/extensionistaAccess';
 import ThemeSelector from './common/ThemeSelector';
 import AgentAvatarSelector from './Settings/AgentAvatarSelector';
 import BackgroundSelector from './Settings/BackgroundSelector';
@@ -424,6 +425,36 @@ export default function ProfileScreen({ onBack, onHome }) {
                 </div>
               )}
             </div>
+
+            {/* Modo extensionista (ADR-048 MVP): entrada al panel supervisor
+                multi-finca. Solo se RENDERIZA si el usuario tiene el rol
+                (feature flag VITE_FEATURE_EXTENSIONISTA + whitelist). Para el
+                resto de usuarios esta sección no existe. Navega vía 'chagra:nav'
+                (patrón CSP-safe, sin onClick inline-string). */}
+            {esExtensionistaActual() && (
+              <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+                <div className="flex items-center gap-2 px-1">
+                  <Users size={18} className="text-emerald-400" />
+                  <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Acompañamiento</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('chagra:nav', { detail: { view: 'extensionista' } }));
+                  }}
+                  className="w-full flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 hover:bg-slate-700/60 transition-colors min-h-[48px] text-left cursor-pointer"
+                >
+                  <div className="flex flex-col gap-0.5 flex-1">
+                    <span className="text-sm font-bold text-slate-200">Fincas que acompaño</span>
+                    <span className="text-[10px] text-slate-500 leading-snug">
+                      Panel del extensionista: revisa el estado de las fincas que
+                      supervisas. Vista previa con datos de ejemplo.
+                    </span>
+                  </div>
+                  <ChevronRight size={18} className="text-slate-400 shrink-0" aria-hidden="true" />
+                </button>
+              </div>
+            )}
 
             {/* Telemetry Section */}
             <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">

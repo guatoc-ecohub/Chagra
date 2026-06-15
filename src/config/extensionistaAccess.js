@@ -1,0 +1,128 @@
+/**
+ * extensionistaAccess.js — Gate del ROL "extensionista" (modo supervisor
+ * multi-finca). MVP de ADR-048.
+ *
+ * QUÉ ES UN EXTENSIONISTA
+ *   Un usuario que SUPERVISA fincas de OTROS agricultores: el asesor de
+ *   extensión rural (EPSEA/SENA), el técnico Agrosavia/IPPTA, el líder de una
+ *   asociación campesina que acompaña a sus asociados. Ve un panel con las
+ *   fincas que le delegaron, NO opera la suya propia.
+ *
+ * DIFERENCIA CON ADR-036 (multi-finca de 1 usuario)
+ *   - `tenantContext` (ADR-036 MVP) resuelve "quién soy yo" (un agricultor con
+ *     una o más fincas PROPIAS) para scopear sus assets en farmOS.
+ *   - `extensionistaAccess` (este módulo, ADR-048) resuelve "¿soy un supervisor
+ *     que puede VER fincas ajenas?". Es una capa de ROL por encima del tenant.
+ *
+ * POR QUÉ ES SOLO MVP (lo duro queda como follow-up backend)
+ *   La delegación real "el agricultor X autoriza al extensionista Y a ver su
+ *   finca" requiere UCAN delegations + el módulo Drupal `farm_did_auth`
+ *   (ADR-036 sub-i / sub-iv). HOY no existe ese backend. Por eso este MVP:
+ *     (1) detecta el rol con una whitelist client-side (igual patrón que
+ *         glaciarAccess.js / La Cordada), y
+ *     (2) lee la lista de fincas delegadas de un MOCK/config estático
+ *         (src/data/extensionista-fincas.json), NO de una autorización
+ *         verificada server-side.
+ *   Es DEFENSE-IN-DEPTH de UX + scaffold de producto, NO autorización dura. El
+ *   día que ADR-036 active UCAN, `esExtensionista` se sustituye por la
+ *   verificación de una capability `supervise` firmada por el dueño de la finca.
+ *
+ * DOBLE CANDADO
+ *   1. Feature flag global `VITE_FEATURE_EXTENSIONISTA` (kill-switch). Con la
+ *      flag apagada (default), el modo NO existe para NADIE — ni la ruta, ni el
+ *      tile, ni el panel. Permite shippear el código a producción dark hasta
+ *      que el backend esté listo.
+ *   2. Whitelist de usernames `EXTENSIONISTA_WHITELIST`. Aun con la flag ON,
+ *      solo estos usuarios entran al modo supervisor.
+ *
+ * OFFLINE-FIRST
+ *   La verificación NO requiere red. Usa el username del login ya guardado por
+ *   tenantContext en localStorage. Funciona idéntico online u offline.
+ *
+ * Español colombiano (tú/usted). NUNCA voseo argentino.
+ *
+ * @module extensionistaAccess
+ */
+
+import { getActiveTenantId } from '../services/tenantContext.js';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WHITELIST — editar SOLO este Set para dar/quitar el rol extensionista.
+// Son los usuarios con perfil de asesor de extensión / técnico / líder de
+// asociación. Los usernames se normalizan (trim + lowercase) en el match, así
+// que el formato exacto acá no es crítico.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Set de usernames farmOS con ROL extensionista (acceso al panel supervisor).
+ *
+ * Para dar el rol: añadir su username (lowercase) a este Set.
+ * Para revocar: eliminar la línea.
+ *
+ * @constant {Set<string>}
+ */
+export const EXTENSIONISTA_WHITELIST = new Set([
+  'demo-extensionista', // Placeholder de piloto. Reemplazar por el username
+  // farmOS real del asesor/técnico al activar el modo (mismo patrón que
+  // CORDADA_WHITELIST en glaciarAccess.js).
+]);
+
+const FLAG_KEY = 'VITE_FEATURE_EXTENSIONISTA';
+
+/**
+ * Lee el feature flag global del modo extensionista. Acepta los strings
+ * 'true' / '1' (case-insensitive, con espacios) como habilitado; cualquier
+ * otro valor — incluido undefined o '' — deja el modo APAGADO (default off).
+ *
+ * Mismo criterio de parseo que `isSidecarEnabled()` en sidecarClient.js para
+ * mantener la convención del repo.
+ *
+ * @returns {boolean}
+ */
+export function featureExtensionistaActivo() {
+  try {
+    const raw = import.meta.env?.[FLAG_KEY];
+    if (raw === true) return true;
+    if (typeof raw === 'string') {
+      const v = raw.trim().toLowerCase();
+      return v === 'true' || v === '1';
+    }
+    return false;
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
+ * Función pura: ¿este username tiene el rol extensionista?
+ *
+ * Doble candado:
+ *   - si el feature flag global está apagado → false para todos (kill-switch);
+ *   - si está encendido → true solo si el username está en la whitelist.
+ *
+ * Normaliza con trim() + toLowerCase() antes de comparar (tolerante a
+ * capitalización accidental o espacios alrededor).
+ *
+ * @param {string|null|undefined} username — username farmOS del usuario.
+ * @returns {boolean} true si tiene el rol; false en todos los demás casos
+ *   (flag off, null, undefined, vacío, solo espacios, fuera de la whitelist).
+ */
+export function esExtensionista(username) {
+  if (!featureExtensionistaActivo()) return false;
+  if (!username || typeof username !== 'string') return false;
+  const normalized = username.trim().toLowerCase();
+  if (normalized.length === 0) return false;
+  return EXTENSIONISTA_WHITELIST.has(normalized);
+}
+
+/**
+ * ¿El usuario actualmente logueado tiene el rol extensionista?
+ *
+ * Lee el username persistido por `tenantContext` (se setea en el login OAuth).
+ * No requiere red — funciona offline con el usuario ya guardado localmente.
+ *
+ * @returns {boolean}
+ */
+export function esExtensionistaActual() {
+  return esExtensionista(getActiveTenantId());
+}

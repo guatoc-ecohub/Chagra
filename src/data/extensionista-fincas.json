@@ -1,0 +1,47 @@
+{
+  "fuente": "MOCK/scaffold ADR-048 modo extensionista — datos de ejemplo, NO autorización verificada. La delegación real (UCAN/farm_did_auth, ADR-036) es follow-up backend. No usar para inferencias agronómicas.",
+  "esquema": "src/services/extensionistaService.js",
+  "delegaciones": [
+    {
+      "extensionista": "demo-extensionista",
+      "fincas": [
+        {
+          "slug": "finca-la-esperanza",
+          "nombre": "Finca La Esperanza",
+          "operador": "campesino_juan",
+          "vereda": "El Triunfo",
+          "municipio": "Silvania",
+          "biocultural_zone": "andino_medio",
+          "estado": "al_dia",
+          "ultima_sync_iso": "2026-06-12T14:30:00Z",
+          "pendientes": 0,
+          "alertas": 0
+        },
+        {
+          "slug": "finca-buenos-aires",
+          "nombre": "Finca Buenos Aires",
+          "operador": "maria_t",
+          "vereda": "Aguabonita",
+          "municipio": "Fusagasugá",
+          "biocultural_zone": "andino_medio",
+          "estado": "con_pendientes",
+          "ultima_sync_iso": "2026-06-09T09:10:00Z",
+          "pendientes": 3,
+          "alertas": 1
+        },
+        {
+          "slug": "finca-el-paramo",
+          "nombre": "Finca El Páramo",
+          "operador": "pedro_g",
+          "vereda": "Cruz Verde",
+          "municipio": "Choachí",
+          "biocultural_zone": "andino_alto_páramo",
+          "estado": "sin_sync_reciente",
+          "ultima_sync_iso": "2026-05-28T18:45:00Z",
+          "pendientes": 0,
+          "alertas": 2
+        }
+      ]
+    }
+  ]
+}
