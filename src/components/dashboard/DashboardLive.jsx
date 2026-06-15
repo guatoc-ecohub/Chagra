@@ -19,7 +19,6 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Snowflake, ChevronRight } from 'lucide-react';
 import AgentHero from './AgentHero';
-import { CHIP_DEFS } from '../../services/agentCapabilities';
 import OnboardingHero from '../OnboardingHero';
 import { getProfile, isModuleVisible } from '../../services/userProfileService';
 import { tieneAccesoGlaciarActual } from '../../config/glaciarAccess';
@@ -38,6 +37,7 @@ import {
     PlagasCard,
     BiodiversidadCard,
     InformesCard,
+    SeguimientoCards,
 } from './FincaCards';
 
 /**
@@ -295,26 +295,19 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
                 </div>
             )}
 
-            {/* Capacidades VISIBLES en el home (re-add 2026-06-15): revierte el
-                retiro del 06-10. El operador busca silvopastoreo/restauración/etc.
-                AQUÍ (no escondidas tras la Ⓐ). Tocar un chip abre el agente. */}
+            {/* Seguimiento de procesos de finca (2026-06-15): TARJETAS en el
+                home — Reforestación · Silvopastoreo · Páramo · Cerdos — al estilo
+                de "Mis plantas". Cada una abre su VISTA de seguimiento (iniciar
+                el proceso, ver etapas con fechas, agregar registros/fotos y ver
+                el avance). El operador las pidió visibles en el home (no escondidas
+                tras la Ⓐ ni iniciables solo por voz). Bloque propio, siempre
+                presente, fuera del grid draggable de módulos. */}
             <div className="px-4 pt-3">
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                    Pregúntale a Chagra
+                    Seguimiento de procesos
                 </p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {CHIP_DEFS.filter((c) => c.kind !== 'stub').map((c) => (
-                        <button
-                            key={c.intent}
-                            type="button"
-                            onClick={() => onNavigate('agente')}
-                            className="flex items-center gap-2 p-2.5 rounded-xl border border-slate-700/50 bg-slate-800/70 hover:bg-slate-700/70 active:scale-[0.98] transition text-left"
-                            aria-label={c.label}
-                        >
-                            <span className="text-lg shrink-0" aria-hidden="true">{c.icon}</span>
-                            <span className="text-sm font-semibold text-slate-100 leading-tight truncate">{c.label}</span>
-                        </button>
-                    ))}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3" data-testid="seguimiento-cards">
+                    <SeguimientoCards onNavigate={onNavigate} variant="grid" />
                 </div>
             </div>
 

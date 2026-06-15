@@ -36,6 +36,7 @@ vi.mock('../FincaCards', () => ({
   PlantasCard: () => <div />, ZonasCard: () => <div />, InsumosCard: () => <div />,
   BitacoraCard: () => <div />, HoyCard: () => <div />, PlagasCard: () => <div />,
   BiodiversidadCard: () => <div />, InformesCard: () => <div />,
+  SeguimientoCards: () => <div data-testid="seguimiento-cards" />,
 }));
 
 vi.mock('../../../services/userProfileService', () => ({

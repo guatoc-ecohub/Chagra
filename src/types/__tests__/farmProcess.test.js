@@ -6,6 +6,7 @@ import {
   isFarmProcess, isFarmProcessEvent, isPopulation,
   validateFarmProcess, validateFarmProcessEvent, validatePopulation,
   stageSequenceForProcessType, RESTORATION_STAGE_SEQUENCE,
+  PARAMO_STAGE_SEQUENCE, PIGS_STAGE_SEQUENCE,
 } from '../farmProcess';
 
 // ─── Fixtures (Task 14) ────────────────────────────────────────
@@ -216,5 +217,55 @@ describe('etapas propias de restauración (no fenología de cultivo)', () => {
     const codigos = stageSequenceForProcessType('sowing').map((s) => s.stage);
     expect(codigos).toContain('germination');
     expect(codigos).toContain('harvest');
+  });
+});
+
+describe('process_types nuevos de seguimiento (paramo, pigs)', () => {
+  it('valida un proceso de páramo en sus etapas propias', () => {
+    expect(() => validateFarmProcess(makeProcess({
+      process_type: 'paramo', subject_slug: '', subject_label: 'Nacimiento El Roble',
+      unit: 'hectáreas', current_stage: 'delimitacion',
+    }))).not.toThrow();
+    expect(() => validateFarmProcess(makeProcess({
+      process_type: 'paramo', subject_slug: '', subject_label: 'Frailejonal',
+      unit: 'hectáreas', current_stage: 'monitoreo_hidrico',
+    }))).not.toThrow();
+  });
+
+  it('valida un ciclo de cerdos en sus etapas de manejo', () => {
+    expect(() => validateFarmProcess(makeProcess({
+      process_type: 'pigs', subject_slug: '', subject_label: 'Lote de engorde',
+      unit: 'animales', current_stage: 'instalacion',
+    }))).not.toThrow();
+    expect(() => validateFarmProcess(makeProcess({
+      process_type: 'pigs', subject_slug: '', subject_label: 'Marranas de cría',
+      unit: 'animales', current_stage: 'reproduccion',
+    }))).not.toThrow();
+  });
+
+  it('stageSequenceForProcessType(paramo) trae hitos de conservación, no fenología', () => {
+    const seq = stageSequenceForProcessType('paramo');
+    expect(seq).toBe(PARAMO_STAGE_SEQUENCE);
+    const codigos = seq.map((s) => s.stage);
+    expect(codigos).toContain('aislamiento');
+    expect(codigos).toContain('monitoreo_hidrico');
+    expect(codigos).not.toContain('flowering');
+    expect(codigos).not.toContain('harvest');
+  });
+
+  it('stageSequenceForProcessType(pigs) trae hitos de manejo porcino, no fenología', () => {
+    const seq = stageSequenceForProcessType('pigs');
+    expect(seq).toBe(PIGS_STAGE_SEQUENCE);
+    const codigos = seq.map((s) => s.stage);
+    expect(codigos).toContain('alimentacion');
+    expect(codigos).toContain('sanidad');
+    expect(codigos).not.toContain('germination');
+    expect(codigos).not.toContain('harvest');
+  });
+
+  it('rechaza una etapa que no pertenece a ningún proceso', () => {
+    expect(() => validateFarmProcess(makeProcess({
+      process_type: 'pigs', subject_slug: '', subject_label: 'x', current_stage: 'etapa_inexistente',
+    }))).toThrow(/current_stage/);
   });
 });
