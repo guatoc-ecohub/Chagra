@@ -21,7 +21,7 @@ import {
  */
 
 describe('chipIntentRouter — enum y definiciones', () => {
-  it('expone los 10 intents del enum (incluye restauración, silvopastoreo, páramo)', () => {
+  it('expone los 11 intents del enum (incluye restauración, silvopastoreo, páramo, incendio)', () => {
     expect(CHIP_INTENTS).toEqual({
       siembro: 'siembro',
       plaga: 'plaga',
@@ -33,10 +33,11 @@ describe('chipIntentRouter — enum y definiciones', () => {
       restauracion: 'restauracion',
       silvopastoreo: 'silvopastoreo',
       paramo: 'paramo',
+      incendio: 'incendio',
     });
   });
 
-  it('CHIP_DEFS tiene los 10 chips con label en español colombiano (sin voseo)', () => {
+  it('CHIP_DEFS tiene los 11 chips con label en español colombiano (sin voseo)', () => {
     const ids = CHIP_DEFS.map((c) => c.intent);
     expect(ids).toEqual([
       'siembro',
@@ -49,6 +50,7 @@ describe('chipIntentRouter — enum y definiciones', () => {
       'restauracion',
       'silvopastoreo',
       'paramo',
+      'incendio',
     ]);
     // Labels presentes y emoji declarado
     for (const def of CHIP_DEFS) {
@@ -211,6 +213,22 @@ describe('chipIntentRouter — chips de diseño (capacidades antes dark)', () =>
     expect(plan.skipNlu).toBe(true);
   });
 
+  it('incendio → localGrounding client-side (sin tool sidecar) + altura del perfil', () => {
+    // Riesgo de incendio se calcula en el cliente (incendioRiskService); NO hay
+    // tool de alerta en tiempo real. El plan lleva localGrounding:'incendio'.
+    const plan = planForcedIntent('incendio', '¿estoy en riesgo de incendio?', { altitud: 2400 });
+    expect(plan.tool).toBeNull();
+    expect(plan.localGrounding).toBe('incendio');
+    expect(plan.args).toEqual({ altitud: 2400 });
+    expect(plan.skipNlu).toBe(true);
+  });
+
+  it('incendio sin altura → localGrounding con args vacíos (el servicio deriva del perfil)', () => {
+    const plan = planForcedIntent('incendio', 'riesgo de incendio');
+    expect(plan.localGrounding).toBe('incendio');
+    expect(plan.args).toEqual({});
+  });
+
   it('silvopastoreo → get_diseno_silvopastoril con altura + piso del perfil', () => {
     const plan = planForcedIntent('silvopastoreo', 'forraje para mis vacas', {
       altitud: 1800,
@@ -312,11 +330,11 @@ describe('chipIntentRouter — Deep Research (B14: stub honesto, backend no serv
 });
 
 describe('chipIntentRouter — contrato de orden y consistencia del índice', () => {
-  it('CHIP_DEFS mantiene el orden de render estable (chips base + restauración/silvopastoreo/páramo al final)', () => {
+  it('CHIP_DEFS mantiene el orden de render estable (chips base + restauración/silvopastoreo/páramo/incendio al final)', () => {
     const order = CHIP_DEFS.map((d) => d.intent);
     expect(order).toEqual([
       'siembro', 'plaga', 'biopreparado', 'clima', 'precio', 'calendario', 'deep',
-      'restauracion', 'silvopastoreo', 'paramo',
+      'restauracion', 'silvopastoreo', 'paramo', 'incendio',
     ]);
   });
 
