@@ -1,0 +1,236 @@
+{
+  "id": "qwen3-vs-granite",
+  "title": "Comparativo qwen2.5:14b vs granite3.1-dense:8b (20 prompts)",
+  "models": [
+    "qwen2.5:14b",
+    "granite3.1-dense:8b"
+  ],
+  "defaultModel": "granite3.1-dense:8b",
+  "categories": {
+    "species": 8,
+    "biopreparados": 6,
+    "plagas": 6
+  },
+  "prompts": [
+    {
+      "id": 1,
+      "category": "species",
+      "query": "¿Qué cuidados requiere la fresa en clima frío?",
+      "expected_keywords": [
+        "drenaje",
+        "riego",
+        "heladas",
+        "poda"
+      ]
+    },
+    {
+      "id": 2,
+      "category": "species",
+      "query": "¿Cómo se maneja la roya del café de forma orgánica?",
+      "expected_keywords": [
+        "variedades resistentes",
+        "poda",
+        "sombra",
+        "caldo bordelés"
+      ]
+    },
+    {
+      "id": 3,
+      "category": "species",
+      "query": "¿Por qué la lechuga hace bolting y cómo evitarlo?",
+      "expected_keywords": [
+        "calor",
+        "floración",
+        "temperatura",
+        "sombra"
+      ]
+    },
+    {
+      "id": 4,
+      "category": "species",
+      "query": "¿Qué plantas companion ayudan al maíz y por qué?",
+      "expected_keywords": [
+        "frijol",
+        "calabaza",
+        "nitrógeno",
+        "sombra"
+      ]
+    },
+    {
+      "id": 5,
+      "category": "species",
+      "query": "¿Qué poda y fertilización necesita el aguacate en clima cálido?",
+      "expected_keywords": [
+        "poda de formación",
+        "zinc",
+        "boro",
+        "raíz"
+      ]
+    },
+    {
+      "id": 6,
+      "category": "species",
+      "query": "¿Cómo manejar la sigatoka en banano?",
+      "expected_keywords": [
+        "sombra",
+        "drenaje",
+        "variedades resistentes",
+        "des hoje"
+      ]
+    },
+    {
+      "id": 7,
+      "category": "species",
+      "query": "¿Cuándo cosechar el plátano hartón?",
+      "expected_keywords": [
+        "calibre",
+        "dedos",
+        "madurez",
+        "color"
+      ]
+    },
+    {
+      "id": 8,
+      "category": "species",
+      "query": "¿Qué control biológico funciona contra la mosca blanca en tomate?",
+      "expected_keywords": [
+        "encarsia",
+        "eretmocerus",
+        "avispa",
+        "parasitoide"
+      ]
+    },
+    {
+      "id": 9,
+      "category": "biopreparados",
+      "query": "¿Cómo preparar caldo bordelés y cuándo aplicarlo?",
+      "expected_keywords": [
+        "cal",
+        "sulfato de cobre",
+        "disolver",
+        "preventivo"
+      ]
+    },
+    {
+      "id": 10,
+      "category": "biopreparados",
+      "query": "¿Para qué sirve el biol y cómo se prepara?",
+      "expected_keywords": [
+        "estiércol",
+        "fermentación",
+        "nutrientes",
+        "microorganismos"
+      ]
+    },
+    {
+      "id": 11,
+      "category": "biopreparados",
+      "query": "¿Cómo preparar purín de ortigas como abono?",
+      "expected_keywords": [
+        "ortiga",
+        "agua",
+        "fermentar",
+        "nitrógeno"
+      ]
+    },
+    {
+      "id": 12,
+      "category": "biopreparados",
+      "query": "¿Cómo hacer extracto de ajo para insecticida?",
+      "expected_keywords": [
+        "ajo",
+        "agua",
+        "jabón",
+        "pulverizar"
+      ]
+    },
+    {
+      "id": 13,
+      "category": "biopreparados",
+      "query": "¿Cómo preparar jabón potásico contra áfidos?",
+      "expected_keywords": [
+        "jabón",
+        "alcohol",
+        "agua",
+        "directo"
+      ]
+    },
+    {
+      "id": 14,
+      "category": "biopreparados",
+      "query": "¿Cómo preparar un trapiche de compost con lombrices?",
+      "expected_keywords": [
+        "lombriz roja",
+        "deshielo",
+        "humus",
+        "material orgánico"
+      ]
+    },
+    {
+      "id": 15,
+      "category": "plagas",
+      "query": "¿Qué control biológico existe para la mosca blanca?",
+      "expected_keywords": [
+        "encarsia",
+        "eretmocerus",
+        "beauveria",
+        "parsitoide"
+      ]
+    },
+    {
+      "id": 16,
+      "category": "plagas",
+      "query": "¿Cómo controlar áfidos sin agroquímicos?",
+      "expected_keywords": [
+        "mariquita",
+        "neem",
+        "jabón",
+        "depredador"
+      ]
+    },
+    {
+      "id": 17,
+      "category": "plagas",
+      "query": "¿Cómo manejar la roya del café orgánicamente?",
+      "expected_keywords": [
+        "resistentes",
+        "poda",
+        "sombra",
+        "fungicida orgánico"
+      ]
+    },
+    {
+      "id": 18,
+      "category": "plagas",
+      "query": "¿Qué tratamiento hay para la sigatoka negra del banano?",
+      "expected_keywords": [
+        "des hoje",
+        "drenaje",
+        "variedades resistentes",
+        "fungicida"
+      ]
+    },
+    {
+      "id": 19,
+      "category": "plagas",
+      "query": "¿Cómo controlar el gusano cogollero del maíz?",
+      "expected_keywords": [
+        "bacillus thuringiensis",
+        "trichogramma",
+        "manual",
+        "centeno"
+      ]
+    },
+    {
+      "id": 20,
+      "category": "plagas",
+      "query": "¿Cómo identificar y manejar el pulgón del tomate?",
+      "expected_keywords": [
+        "colonias",
+        "moscas",
+        "transmisión",
+        "aceite"
+      ]
+    }
+  ]
+}

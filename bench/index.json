@@ -1,0 +1,426 @@
+{
+  "version": 1,
+  "generatedNote": "Fuente de verdad del indice de benches y suites de test. Editar AQUI; bench/INDEX.md se regenera con `node bench/run.mjs --regen-index`. Solo caracteres latinos.",
+  "clusters": {
+    "model-comparison": "Comparan calidad de modelos sobre prompts del dominio (species/biopreparados/plagas) por keyword-matching flexible + latencia + recursos.",
+    "anti-hallucination": "Miden alucinacion real (AH% = FAIL/total) con must_include + red_flags y juez independiente.",
+    "vision": "Reconocimiento de especies desde fotos + grounding del sidecar (validate_visual_match).",
+    "rag": "Latencia del retrieve BM25 sobre el corpus real.",
+    "judge": "Smoke + ranking del LLM-judge.",
+    "nocturno": "Bench largo de FarmProcess con escenarios + eliminacion temprana.",
+    "meta": "Herramientas sobre resultados de benches (no corren modelo).",
+    "tests": "Suites de pruebas unitarias / E2E del repo."
+  },
+  "entries": [
+    {
+      "id": "model-compare",
+      "title": "Comparacion parametrizable de modelos (species/biopreparados/plagas)",
+      "type": "bench-llm",
+      "cluster": "model-comparison",
+      "status": "active",
+      "script": "scripts/bench-model-compare.mjs",
+      "cmd": [
+        "node",
+        "{{script}}",
+        "--suite",
+        "qwen3-vs-granite"
+      ],
+      "infra": [
+        "gpu",
+        "ollama"
+      ],
+      "metrics": [
+        "keywords_pct",
+        "latency_avg_ms"
+      ],
+      "what": "Corre una suite de prompts (definida en data/bench-suites/*.json) contra una lista de modelos via Ollama /api/generate y puntua por keyword-matching flexible. Reemplaza a bench-nuevos-vs-baseline y bench-qwen3-vs-granite (mismo motor, distinta suite).",
+      "suites": [
+        "nuevos-vs-baseline",
+        "qwen3-vs-granite"
+      ],
+      "replaces": [
+        "bench-nuevos-vs-baseline.mjs",
+        "bench-qwen3-vs-granite.mjs"
+      ],
+      "output": "data/bench-runs/model-compare-<suite>-YYYY-MM-DD.jsonl + summary.md",
+      "history": true
+    },
+    {
+      "id": "agente-completo",
+      "title": "Pipeline completo del agente (resolve-entities -> enriched -> LLM -> post-validate)",
+      "type": "bench-llm",
+      "cluster": "model-comparison",
+      "status": "active",
+      "script": "scripts/bench-agente-completo.mjs",
+      "cmd": [
+        "node",
+        "{{script}}"
+      ],
+      "infra": [
+        "gpu",
+        "ollama",
+        "sidecar"
+      ],
+      "metrics": [
+        "keywords_pct",
+        "latency_avg_ms",
+        "hallucination_rate"
+      ],
+      "what": "Bench LARGO (50 prompts) del pipeline de prod completo, con sidecar para grounding + post-validate. --judge activa juez qwen2.5:14b. Dispara bench-llm-judge al terminar.",
+      "output": "data/bench-runs/agente-completo-YYYY-MM-DD.jsonl + summary.md",
+      "history": true
+    },
+    {
+      "id": "borde-alucinacion",
+      "title": "Borde de alucinacion (trampas adversariales, juez claude-cli) - NO ROMPER",
+      "type": "bench-llm",
+      "cluster": "anti-hallucination",
+      "status": "active",
+      "protected": true,
+      "script": "scripts/bench-borde-alucinacion.mjs",
+      "cmd": [
+        "node",
+        "{{script}}"
+      ],
+      "infra": [
+        "gpu",
+        "ollama",
+        "sidecar",
+        "claude-cli",
+        "fixtures-privadas"
+      ],
+      "metrics": [
+        "ah_pct",
+        "pass_pct"
+      ],
+      "what": "Busca el BORDE de alucinacion de granite3.3:8b a CONFIG-PROD con juez FUERTE INDEPENDIENTE (claude-cli). 27 trampas (12 V1 + 15 V2). BENCH_REPS>1 da media +- stddev. Contrato publico sellado: exports + env vars + paths de salida estables.",
+      "envVars": [
+        "BENCH_REPS",
+        "BENCH_APPLY_GUARDS",
+        "PROMPTS_FILE",
+        "PROMPTS_FILES",
+        "BENCH_OUTPUT_DIR",
+        "JUDGE_PROVIDER",
+        "GEN_MODEL",
+        "SEED"
+      ],
+      "output": "data/bench-runs/borde-alucinacion-YYYY-MM-DD[.repN].jsonl + .summary.json",
+      "history": true
+    },
+    {
+      "id": "complejos-juez-independiente",
+      "title": "Prompts complejos rotativos con juez independiente",
+      "type": "bench-llm",
+      "cluster": "anti-hallucination",
+      "status": "active",
+      "script": "scripts/bench-complejos-juez-independiente.mjs",
+      "cmd": [
+        "node",
+        "{{script}}"
+      ],
+      "infra": [
+        "gpu",
+        "ollama",
+        "sidecar",
+        "fixtures-privadas"
+      ],
+      "metrics": [
+        "ah_pct",
+        "pass_pct"
+      ],
+      "what": "Re-bench HONESTO de 10 prompts complejos rotativos a CONFIG-PROD. Juez Anthropic (Haiku) si hay API key, si no determinstico. Comparte helpers de sidecar/GPU con capabilities via lib/bench-sidecar.mjs.",
+      "output": "data/bench-runs/complejos-juez-independiente-YYYY-MM-DD.jsonl + .summary.json",
+      "history": true
+    },
+    {
+      "id": "capabilities-A-vs-C",
+      "title": "Capacidades A (granite crudo) vs C (pipeline completo)",
+      "type": "bench-llm",
+      "cluster": "anti-hallucination",
+      "status": "active",
+      "script": "scripts/bench-capabilities-A-vs-C.mjs",
+      "cmd": null,
+      "infra": [
+        "gpu",
+        "ollama",
+        "sidecar",
+        "anthropic-key"
+      ],
+      "metrics": [
+        "ah_pct",
+        "pass_pct",
+        "lift_pp"
+      ],
+      "what": "Bench HONESTO de capacidades: CONFIG A (granite CRUDO) vs CONFIG C (pipeline de prod). Reporta LIFT C-A por capability. Pool generado por gen-bench-capabilities-pool.mjs. Requiere generar primero el pool (gen-bench-capabilities-pool.mjs), por eso es de invocacion manual.",
+      "output": "data/bench-runs/capabilities-A-vs-C-<ts>.jsonl + .summary.json",
+      "history": true,
+      "manualCmd": "node scripts/gen-bench-capabilities-pool.mjs > pool.json && node scripts/bench-capabilities-A-vs-C.mjs --pool pool.json"
+    },
+    {
+      "id": "rescore-claude-cli",
+      "title": "Re-puntuar JSONL de capabilities con juez claude-cli",
+      "type": "meta",
+      "cluster": "anti-hallucination",
+      "status": "active",
+      "script": "scripts/bench-rescore-claude-cli.mjs",
+      "cmd": null,
+      "infra": [
+        "claude-cli"
+      ],
+      "metrics": [
+        "ah_pct",
+        "lift_pp"
+      ],
+      "what": "Re-juzga un JSONL existente de capabilities-A-vs-C con claude-cli (suscripcion del operador). NO genera respuestas nuevas. Requiere --jsonl y --pool, por eso no tiene cmd por defecto.",
+      "manualCmd": "JUDGE_PROVIDER=claude-cli node scripts/bench-rescore-claude-cli.mjs --jsonl <file> --pool <pool>",
+      "output": "<base>.rescore-cli.<ts>.jsonl + .summary.json",
+      "history": false
+    },
+    {
+      "id": "vision-pipeline",
+      "title": "Vision: pipeline completo (vision -> resolveSpeciesId -> validate_visual_match)",
+      "type": "bench-vision",
+      "cluster": "vision",
+      "status": "active",
+      "script": "scripts/bench-vision-pipeline.mjs",
+      "cmd": [
+        "node",
+        "{{script}}"
+      ],
+      "infra": [
+        "gpu",
+        "ollama",
+        "sidecar",
+        "fixtures-privadas"
+      ],
+      "metrics": [
+        "name_accuracy",
+        "sci_accuracy",
+        "verified_rate",
+        "rejection_rate",
+        "latency_p50_ms",
+        "latency_p95_ms"
+      ],
+      "what": "Bench V-02: pipeline de grounding de vision. Mide validation_rate y rejection_rate (anti-halluc). NO inyecta RAG al prompt.",
+      "output": "data/bench-runs/vision-pipeline-<ts>/raw.jsonl + summary.md",
+      "history": true
+    },
+    {
+      "id": "vision-ab-rag",
+      "title": "Vision: A/B RAG-by-prompt vs vanilla",
+      "type": "bench-vision",
+      "cluster": "vision",
+      "status": "active",
+      "script": "scripts/bench-vision-ab-rag.mjs",
+      "cmd": [
+        "node",
+        "{{script}}"
+      ],
+      "infra": [
+        "gpu",
+        "ollama",
+        "sidecar",
+        "fixtures-privadas"
+      ],
+      "metrics": [
+        "parse_rate",
+        "name_accuracy",
+        "sci_accuracy",
+        "verified_rate",
+        "hallucination_rate",
+        "latency_p50_ms",
+        "latency_p95_ms"
+      ],
+      "what": "Bench V-03: A/B test inyectando el catalogo (binomials) al prompt (variante A) vs SPECIES_PROMPT vanilla (variante B). Mide la reduccion de alucinacion del RAG-by-prompt.",
+      "output": "data/bench-runs/vision-ab-rag-<ts>/raw.jsonl + summary.md",
+      "history": true
+    },
+    {
+      "id": "rag-retrieve",
+      "title": "Latencia del retrieve BM25 (cold load + warm)",
+      "type": "bench-latencia",
+      "cluster": "rag",
+      "status": "active",
+      "script": "scripts/bench-rag-retrieve.mjs",
+      "cmd": [
+        "node",
+        "{{script}}"
+      ],
+      "infra": [
+        "corpus"
+      ],
+      "metrics": [
+        "cold_load_ms",
+        "latency_p50_ms",
+        "latency_p95_ms",
+        "latency_avg_ms"
+      ],
+      "what": "Mide retrieve(query, topK) sobre el corpus real (491+ species). Cold load + warm p50/p95. Consolidado de 3 archivos a 1 (loader hook ahora inline via data: URL). NOTA: ejecucion completa bajo Node puro necesita shim import.meta.env (gap pre-existente en main).",
+      "consolidatedFrom": [
+        "bench-rag-retrieve.mjs",
+        "bench-rag-retrieve.loader.mjs",
+        "bench-rag-retrieve.register.mjs"
+      ],
+      "output": "consola + bench/history (via --history-out)",
+      "history": true,
+      "runnable": "parcial"
+    },
+    {
+      "id": "llm-judge",
+      "title": "Smoke + ranking del LLM-judge",
+      "type": "bench-llm",
+      "cluster": "judge",
+      "status": "active",
+      "script": "scripts/bench-llm-judge.mjs",
+      "cmd": [
+        "node",
+        "{{script}}"
+      ],
+      "infra": [
+        "gpu",
+        "ollama"
+      ],
+      "metrics": [
+        "factualidad",
+        "promedio"
+      ],
+      "what": "Smoke test del LLM-judge + ranking. Se ejecuta automaticamente tras agente-completo. Acepta --from <jsonl> para juzgar una corrida real.",
+      "output": "data/bench-judge-scores/YYYY-MM-DD.jsonl + summary.md",
+      "history": true
+    },
+    {
+      "id": "nocturno-farm-process",
+      "title": "Bench nocturno FarmProcess (escenarios smoke/full + eliminacion temprana)",
+      "type": "bench-llm",
+      "cluster": "nocturno",
+      "status": "active",
+      "script": "scripts/bench-nocturno-farm-process.mjs",
+      "cmd": [
+        "node",
+        "{{script}}",
+        "--smoke-only"
+      ],
+      "infra": [
+        "gpu",
+        "ollama"
+      ],
+      "metrics": [
+        "normalized_score"
+      ],
+      "what": "Bench nocturno de FarmProcess con escenarios smoke (2) o full (20+), checkpointing y eliminacion temprana de modelos fallidos. Delega en lib/bench-nocturno-runner.mjs.",
+      "output": "data/bench-runs/farm-process-<runid>/manifest.json + state.json + results.jsonl + summary.md",
+      "history": true
+    },
+    {
+      "id": "summary-diff",
+      "title": "Gate GREEN/YELLOW/RED comparando dos summary.md",
+      "type": "meta",
+      "cluster": "meta",
+      "status": "active",
+      "script": "scripts/bench-summary-diff.mjs",
+      "cmd": null,
+      "infra": [
+        "ninguna"
+      ],
+      "metrics": [],
+      "what": "Herramienta META: compara dos summary.md y emite gate GREEN/YELLOW/RED (exit 0/1/2/3). NO corre modelos. Requiere --baseline y --current.",
+      "manualCmd": "node scripts/bench-summary-diff.mjs --baseline=<a/summary.md> --current=<b/summary.md>",
+      "output": "consola + exit code",
+      "history": false
+    },
+    {
+      "id": "suite-unit-ci",
+      "title": "Suite unitaria del gate de CI (entrypoint del agente)",
+      "type": "test-suite",
+      "cluster": "tests",
+      "status": "active",
+      "script": null,
+      "cmd": [
+        "npm",
+        "run",
+        "test:unit",
+        "--",
+        "tests/unit/exampleQuestions.entrypoint.test.jsx",
+        "tests/unit/outputGuards.test.js",
+        "tests/unit/catalog-count.test.js",
+        "src/components/__tests__/QuickChipsBar.smoke.test.jsx",
+        "src/components/__tests__/ChipsToolbar.smoke.test.jsx"
+      ],
+      "infra": [
+        "ninguna"
+      ],
+      "metrics": [],
+      "what": "El subconjunto EXACTO que corre .github/workflows/unit-tests.yml en cada PR a main. Determinista (sin GPU/red/crypto). Es el gate vitest del repo.",
+      "ci": ".github/workflows/unit-tests.yml",
+      "history": false
+    },
+    {
+      "id": "suite-unit-full",
+      "title": "Suite unitaria completa (vitest)",
+      "type": "test-suite",
+      "cluster": "tests",
+      "status": "active",
+      "script": null,
+      "cmd": [
+        "npm",
+        "run",
+        "test:unit"
+      ],
+      "infra": [
+        "ninguna"
+      ],
+      "metrics": [],
+      "what": "Toda la suite vitest (src/**, tests/unit/**, eval/**, scripts/__tests__/**, bench/__tests__/**). ~380 tests. 2 tests de vision son CI-flaky por SubtleCrypto, por eso CI corre solo el subconjunto de suite-unit-ci.",
+      "history": false
+    },
+    {
+      "id": "suite-bench-framework",
+      "title": "Tests del propio framework de benches (lib + index + history + run)",
+      "type": "test-suite",
+      "cluster": "tests",
+      "status": "active",
+      "script": null,
+      "cmd": [
+        "npm",
+        "run",
+        "test:unit",
+        "--",
+        "bench/__tests__/",
+        "scripts/__tests__/bench-runner.test.mjs",
+        "scripts/__tests__/bench-ollama.test.mjs",
+        "scripts/__tests__/bench-summary.test.mjs",
+        "scripts/__tests__/bench-scorer.test.mjs",
+        "scripts/__tests__/bench-stats.test.mjs",
+        "scripts/__tests__/bench-checkout-guard.test.mjs",
+        "scripts/__tests__/bench-sidecar.test.mjs",
+        "scripts/__tests__/bench-model-compare.test.mjs"
+      ],
+      "infra": [
+        "ninguna"
+      ],
+      "metrics": [],
+      "what": "Tests del runner/indice/historial (bench/__tests__) + libs de bench (scripts/__tests__/bench-*). Deterministas, sin GPU/red. Garantizan indice consistente + lectura de historial. (Excluye el test de fixtures privadas que depende del repo Chagra-strategy.)",
+      "history": false
+    },
+    {
+      "id": "suite-e2e-offline",
+      "title": "Playwright E2E offline-first (gate de merge)",
+      "type": "test-suite",
+      "cluster": "tests",
+      "status": "active",
+      "script": null,
+      "cmd": [
+        "npm",
+        "run",
+        "test:e2e"
+      ],
+      "infra": [
+        "ninguna"
+      ],
+      "metrics": [],
+      "what": "Suite Playwright (35 specs). El gate canonico es tests/offline.spec.js (contrato offline-first: IndexedDB pending_transactions + transicion Online). Corre en .github/workflows/playwright.yml.",
+      "ci": ".github/workflows/playwright.yml",
+      "history": false
+    }
+  ]
+}

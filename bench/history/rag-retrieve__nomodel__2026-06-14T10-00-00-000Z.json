@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "bench": "rag-retrieve",
+  "date": "2026-06-14T10:00:00.000Z",
+  "model": null,
+  "config": "bm25",
+  "commit": "fe9ea44",
+  "metrics": {
+    "cold_load_ms": 1600,
+    "latency_p50_ms": 1.5,
+    "latency_p95_ms": 2.9,
+    "latency_avg_ms": 1.7
+  },
+  "passCount": null,
+  "failCount": null,
+  "passPct": null,
+  "notes": "registro semilla de ejemplo (reingenieria 2026-06-15) — reemplazar con corridas reales",
+  "seed": true
+}

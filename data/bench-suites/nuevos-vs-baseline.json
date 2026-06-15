@@ -1,0 +1,129 @@
+{
+  "id": "nuevos-vs-baseline",
+  "title": "Modelos nuevos vs baseline granite3.1 (10 prompts smoke)",
+  "models": [
+    "ministral-3:latest",
+    "ministral-3:14b",
+    "deepseek-r1:14b",
+    "qwen2.5:30b",
+    "granite3.1-dense:8b"
+  ],
+  "defaultModel": "granite3.1-dense:8b",
+  "categories": {
+    "species": 4,
+    "biopreparados": 3,
+    "plagas": 3
+  },
+  "prompts": [
+    {
+      "id": 1,
+      "category": "species",
+      "query": "¿Qué cuidados requiere la fresa en clima frío?",
+      "expected_keywords": [
+        "drenaje",
+        "riego",
+        "heladas",
+        "poda"
+      ]
+    },
+    {
+      "id": 2,
+      "category": "species",
+      "query": "¿Cómo se maneja la roya del café de forma orgánica?",
+      "expected_keywords": [
+        "variedades resistentes",
+        "poda",
+        "sombra",
+        "caldo bordelés"
+      ]
+    },
+    {
+      "id": 3,
+      "category": "species",
+      "query": "¿Por qué la lechuga hace bolting y cómo evitarlo?",
+      "expected_keywords": [
+        "calor",
+        "floración",
+        "temperatura",
+        "sombra"
+      ]
+    },
+    {
+      "id": 4,
+      "category": "species",
+      "query": "¿Qué plantas companion ayudan al maíz y por qué?",
+      "expected_keywords": [
+        "frijol",
+        "calabaza",
+        "nitrógeno",
+        "sombra"
+      ]
+    },
+    {
+      "id": 5,
+      "category": "biopreparados",
+      "query": "¿Cómo preparar caldo bordelés y cuándo aplicarlo?",
+      "expected_keywords": [
+        "cal",
+        "sulfato de cobre",
+        "disolver",
+        "preventivo"
+      ]
+    },
+    {
+      "id": 6,
+      "category": "biopreparados",
+      "query": "¿Para qué sirve el biol y cómo se prepara?",
+      "expected_keywords": [
+        "estiércol",
+        "fermentación",
+        "nutrientes",
+        "microorganismos"
+      ]
+    },
+    {
+      "id": 7,
+      "category": "biopreparados",
+      "query": "¿Cómo preparar purín de ortigas como abono?",
+      "expected_keywords": [
+        "ortiga",
+        "agua",
+        "fermentar",
+        "nitrógeno"
+      ]
+    },
+    {
+      "id": 8,
+      "category": "plagas",
+      "query": "¿Qué control biológico existe para la mosca blanca?",
+      "expected_keywords": [
+        "encarsia",
+        "eretmocerus",
+        "beauveria",
+        "parasitoide"
+      ]
+    },
+    {
+      "id": 9,
+      "category": "plagas",
+      "query": "¿Cómo controlar áfidos sin agroquímicos?",
+      "expected_keywords": [
+        "mariquita",
+        "neem",
+        "jabón",
+        "depredador"
+      ]
+    },
+    {
+      "id": 10,
+      "category": "plagas",
+      "query": "¿Cómo controlar el gusano cogollero del maíz?",
+      "expected_keywords": [
+        "bacillus thuringiensis",
+        "trichogramma",
+        "manual",
+        "centeno"
+      ]
+    }
+  ]
+}

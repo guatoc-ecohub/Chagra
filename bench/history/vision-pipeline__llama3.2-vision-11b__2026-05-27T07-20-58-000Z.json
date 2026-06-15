@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "bench": "vision-pipeline",
+  "date": "2026-05-27T07:20:58.000Z",
+  "model": "llama3.2-vision:11b",
+  "config": "PROD",
+  "commit": "fe9ea44",
+  "metrics": {
+    "name_accuracy": 62,
+    "verified_rate": 55,
+    "rejection_rate": 12,
+    "latency_p50_ms": 3100
+  },
+  "passCount": null,
+  "failCount": null,
+  "passPct": null,
+  "notes": "registro semilla de ejemplo (reingenieria 2026-06-15) — reemplazar con corridas reales",
+  "seed": true
+}

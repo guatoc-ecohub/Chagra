@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "bench": "model-compare",
+  "date": "2026-06-14T09:00:00.000Z",
+  "model": "granite3.1-dense:8b",
+  "config": "qwen3-vs-granite",
+  "commit": "fe9ea44",
+  "metrics": {
+    "keywords_pct": 74,
+    "latency_avg_ms": 2250
+  },
+  "passCount": null,
+  "failCount": null,
+  "passPct": null,
+  "notes": "registro semilla de ejemplo (reingenieria 2026-06-15) — reemplazar con corridas reales",
+  "seed": true
+}
