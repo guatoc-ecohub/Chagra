@@ -32,11 +32,33 @@
  *   <dir>/borde-alucinacion-YYYY-MM-DD.jsonl
  *   <dir>/borde-alucinacion-YYYY-MM-DD.summary.json
  *
+ * MÉTRICA HONESTA (2026-06-14): el log y el summary emiten DOS cifras claras:
+ *   - PASS% = aciertos/juzgadas (lo que el modelo+guards resuelve bien).
+ *   - AH%   = FAIL/juzgadas = 100 − PASS% = la TASA DE ALUCINACIÓN REAL.
+ *   Históricamente el campo "AH%" era en realidad el % de ACIERTO y se leía como
+ *   alucinación (memoria feedback-bench-borde-ah-field-is-passrate, mordió 3 veces).
+ *   Ahora el AH es inequívoco y es la métrica primaria de cara a la auditoría.
+ *
+ * ANTES vs DESPUÉS (de cabo a rabo): el bench corre el pipeline real
+ * modelo→guards→respuesta y juzga ESO (lo que ve el campesino). Con
+ * BENCH_APPLY_GUARDS=0 se mide el CRUDO (sin guards) para cuantificar el DELTA que
+ * prueban los guards. Default 1 (con guards = realidad de prod).
+ *
+ * DESGLOSE POR CATEGORÍA: además del eje crudo, agrupa cada trampa en una de
+ * {receta-exacta, toxicidad, falsa-cura, altitud, otras} (categoryForAxes) para ver
+ * qué familia de guards funcionó y cuál sigue fallando.
+ *
+ * MÁS COBERTURA: PROMPTS_FILES (coma-separado) concatena V1 (12) + V2 (15) = 27
+ * trampas en una sola corrida, deduplicando por id.
+ *
  * Uso:
- *   node scripts/bench-borde-alucinacion.mjs                         # juez claude-cli (default)
+ *   node scripts/bench-borde-alucinacion.mjs                         # juez claude-cli (default), guards ON
  *   JUDGE_PROVIDER=deterministic node scripts/bench-borde-alucinacion.mjs   # sin GPU del juez
+ *   BENCH_APPLY_GUARDS=0 node scripts/bench-borde-alucinacion.mjs    # CRUDO (sin guards) para el DELTA
+ *   BENCH_REPS=3 node scripts/bench-borde-alucinacion.mjs            # 3 reps → varianza min-max
  *   BENCH_OUTPUT_DIR=/repo/data/bench-runs node scripts/bench-borde-alucinacion.mjs
  *   PROMPTS_FILE=/ruta/otra.json node scripts/bench-borde-alucinacion.mjs
+ *   PROMPTS_FILES=/v1.json,/v2.json node scripts/bench-borde-alucinacion.mjs   # 27 trampas combinadas
  */
 import { writeFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -64,10 +86,18 @@ const BENCH_RUNS_DIR =
   (existsSync(dirname(BENCH_EXTERNAL_DIR)) ? BENCH_EXTERNAL_DIR : join(ROOT_DIR, 'data', 'bench-runs'));
 
 // ── generador config-PROD (= ROUTES.chat_complex de llmRouter.js) ─────────────
-const GEN_MODEL = process.env.GEN_MODEL || 'granite3.1-dense:8b';
+// granite3.3:8b es el modelo de chat/NLU en prod desde 2026-06-11 (memoria
+// reference-nlu-real-es-granite-no-gemma). Overridable con GEN_MODEL.
+const GEN_MODEL = process.env.GEN_MODEL || 'granite3.3:8b';
 const GEN_TEMPERATURE = 0.3; // PROD. NO 0.7.
 const GEN_MAX_TOKENS = 768; // chat_complex
 const SEED = Number(process.env.SEED || 42);
+
+// ── toggle de guards: realidad de prod (ON) vs crudo del modelo (OFF) ─────────
+// El bench de cabo a rabo mide modelo→guards→respuesta (lo que ve el campesino).
+// BENCH_APPLY_GUARDS=0 salta los guards para cuantificar el DELTA que prueban los
+// guards (AH crudo vs AH con guards). Default ON = fidelidad a prod.
+const APPLY_GUARDS = process.env.BENCH_APPLY_GUARDS !== '0';
 
 // ── juez fuerte: claude-cli por defecto; degrada a determinístico ─────────────
 const JUDGE = selectJudgeProvider({
@@ -81,6 +111,13 @@ const GEN_TIMEOUT_MS = 180_000;
 const PROMPTS_FILE =
   process.env.PROMPTS_FILE ||
   '/home/kortux/Workspace/Chagra-strategy/deepresearch/TEST_PROMPTS_BORDE_ALUCINACION_2026-06-03.json';
+
+// PROMPTS_FILES (coma-separado) concatena varias fixtures (V1 12 + V2 15 = 27),
+// deduplicando por id. Si no se da, usa PROMPTS_FILE (retrocompatible).
+const PROMPTS_FILES = (process.env.PROMPTS_FILES || PROMPTS_FILE)
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
 
 // Tamaño de lote para el juez claude-cli (un spawn por lote, secuencial).
 const JUDGE_BATCH_SIZE = Number(process.env.JUDGE_BATCH_SIZE || 6);
@@ -166,6 +203,45 @@ function expectedGuardMiss(axes, reasons) {
     }
   }
   return [...new Set(misses)];
+}
+
+// ── DESGLOSE POR CATEGORÍA ─────────────────────────────────────────────────────
+// Agrupa cada trampa (multi-eje) en UNA categoría de cara al reporte, para ver qué
+// FAMILIA de guards funcionó y cuál sigue fallando. Orden = prioridad de riesgo:
+// la categoría más peligrosa que toque la trampa gana (toxicidad > receta-exacta >
+// altitud > falsa-cura > otras). La toxicidad va primero porque un FAIL ahí
+// (cianuro/rotenona en alimento) es letal; "otras" es el cajón de las que no caen
+// en las 4 familias con guard dedicado de #1558.
+const CATEGORY_RULES = [
+  ['toxicidad', ['confusion_toxica', 'toxicidad_mas_uso_alimentario', 'homonimia_confusion_letal', 'procesado_seguridad', 'fitotoxicidad']],
+  ['receta-exacta', ['dosis_biopreparado_especifica', 'dosis_biopreparado_inventada', 'dosis_biopreparado', 'sinergia_toxica_dos_biopreparados', 'acaricida', 'agroquimico_disfrazado']],
+  ['altitud', ['viabilidad_altitud', 'viabilidad_altitud_caso_limite', 'viabilidad_altitud_con_riesgo_letal', 'siembra_generica_fuera_piso_termico', 'heladas']],
+  ['falsa-cura', ['premisa_falsa', 'premisa_falsa_invisible']],
+];
+
+/** Mapea los ejes de una trampa a UNA categoría de reporte (prioridad de riesgo). */
+function categoryForAxes(axes) {
+  const set = new Set(axes || []);
+  for (const [cat, axisList] of CATEGORY_RULES) {
+    if (axisList.some((a) => set.has(a))) return cat;
+  }
+  return 'otras';
+}
+
+/**
+ * loadPrompts — carga y CONCATENA una o más fixtures, deduplicando por id (gana la
+ * primera aparición). Anota la categoría de reporte en cada prompt (`_category`).
+ */
+function loadPrompts(files) {
+  const byId = new Map();
+  for (const file of files) {
+    const fx = JSON.parse(readFileSync(file, 'utf-8'));
+    for (const p of fx.prompts || []) {
+      if (byId.has(p.id)) continue; // dedup: primera fixture gana
+      byId.set(p.id, { ...p, _category: categoryForAxes(p.axes) });
+    }
+  }
+  return [...byId.values()];
 }
 
 async function thermalGuard() {
@@ -338,13 +414,18 @@ async function runRep(prompts, { seed, repIndex, reps }) {
       continue;
     }
 
-    const guarded = applyOutputGuards(gen.response, { resolvedEntities: entities, profileName: null, userMessage: p.prompt });
+    // De cabo a rabo: pasa el crudo del modelo por los guards de PROD (modelo →
+    // guards → respuesta final) y juzga ESO — lo que ve el campesino. Con
+    // APPLY_GUARDS=0 se mide el crudo para cuantificar el DELTA de los guards.
+    const guarded = APPLY_GUARDS
+      ? applyOutputGuards(gen.response, { resolvedEntities: entities, profileName: null, userMessage: p.prompt })
+      : { text: gen.response, modified: false, reasons: [] };
     const finalText = guarded.text;
     const validation = await postValidate(p.prompt, finalText);
 
     console.log(
       `    gen ${(gen.latency_ms / 1000).toFixed(1)}s  entities=${entities.length}  ` +
-        `guards=${guarded.modified ? guarded.reasons.join(',') : 'none'}  sidecar_halluc=${validation.detected_count}`,
+        `guards=${APPLY_GUARDS ? (guarded.modified ? guarded.reasons.join(',') : 'none') : 'OFF'}  sidecar_halluc=${validation.detected_count}`,
     );
 
     generated.push({ p, entities, gen, finalText, guarded, validation });
@@ -412,6 +493,7 @@ async function runRep(prompts, { seed, repIndex, reps }) {
       seed,
       region: g.p.region,
       axes: g.p.axes,
+      category: g.p._category || categoryForAxes(g.p.axes),
       complexity: g.p.complexity,
       prompt: g.p.prompt,
       entities_grounded: g.entities.length,
