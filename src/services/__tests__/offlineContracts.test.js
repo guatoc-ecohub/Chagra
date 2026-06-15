@@ -11,13 +11,7 @@
  * navigator.onLine y verifican el comportamiento de degradación, sin red real.
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-
-function setOnline(value) {
-  Object.defineProperty(globalThis.navigator, 'onLine', {
-    configurable: true,
-    get: () => value,
-  });
-}
+import { setOnline } from '../../test-utils/index.js';
 
 describe('offline contracts — servicios degradan a null/mensaje sin throw', () => {
   beforeEach(() => {
