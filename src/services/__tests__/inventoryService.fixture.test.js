@@ -14,21 +14,10 @@
 import { describe, it, expect } from 'vitest';
 import { projectStock, compareEventOrder } from '../inventoryService.js';
 import { EVENT_TYPES } from '../inventoryEvents.js';
+import { makeInventoryEvent } from '../../../tests/fixtures/index.js';
 
-// Helper — construye un event con defaults sanos
-function evt(eventType, payload, opts = {}) {
-  return {
-    id: opts.id || crypto.randomUUID().replace(/-/g, '').slice(0, 26).toUpperCase(),
-    event_type: eventType,
-    timestamp: opts.timestamp || new Date().toISOString(),
-    device_id_lex_hash: opts.device || 'AAAA0000',
-    sequence_number: opts.seq ?? 1,
-    operator_id_hash: 'a'.repeat(64),
-    idempotency_key: opts.idempotency_key || `${eventType}:${payload.item_id || 'x'}:${Math.random()}`,
-    payload,
-    schema_version: '1',
-  };
-}
+// Helper local — alias por compatibilidad con tests existentes
+const evt = makeInventoryEvent;
 
 describe('projectStock — determinismo', () => {
   it('un solo received → stock igual al delta', () => {

@@ -14,6 +14,7 @@ import {
   _resetForTests,
 } from '../../services/tenantContext';
 import { useCaseStudyStore } from '../useCaseStudyStore';
+import { makeCase as makeCaseData } from '../../../tests/fixtures/index.js';
 
 const resetStore = () => {
   useCaseStudyStore.setState({ cases: [] });
@@ -21,13 +22,11 @@ const resetStore = () => {
   _resetForTests();
 };
 
-const makeCase = (title, opts = {}) =>
-  useCaseStudyStore.getState().createCase({
-    title,
-    finca_slug: opts.finca_slug || 'guatoc',
-    problem: { name_freetext: opts.problem || 'Trozador', severity: opts.severity || 'medium' },
-    subject: opts.subject,
-  });
+// Helper local — crea caso y retorna ID usando factory compartido
+const makeCase = (title, opts = {}) => {
+  const caseData = makeCaseData(title, opts);
+  return useCaseStudyStore.getState().createCase(caseData);
+};
 
 describe('useCaseStudyStore tenant scoping (ADR-036 MVP)', () => {
   beforeEach(resetStore);
