@@ -47,11 +47,8 @@ import {
   ordenDureza,
 } from '../data/glaciar-schema.js';
 
-/** Tipos de superficie que, por sí solos (en cualquier capa), fuerzan 🔴. */
-export const SUPERFICIES_CRITICAS = Object.freeze(['hielo_podrido']);
-
-/** Peligros que fuerzan 🔴 de forma incondicional. */
-export const PELIGROS_CRITICOS_SIEMPRE = Object.freeze(['hielo_podrido']);
+/** Peligros que fuerzan 🔴 de forma incondicional (superficies + peligros observados). */
+export const PELIGROS_CRITICOS = Object.freeze(['hielo_podrido']);
 
 /** Orden de la dureza "4F" — umbral de superficie blanda para puentes. */
 const ORDEN_4F = ordenDureza('4F'); // 2
@@ -90,6 +87,19 @@ function superficieDeTransito(reporte) {
   if (reporte.tipoSuperficie) tiposTodos.push(reporte.tipoSuperficie);
 
   return { tipoSuperficie, dureza, tiposTodos };
+}
+
+/**
+ * Extrae todos los keys de peligros del reporte (superficies + observados).
+ * Unifica lógica que antes chequeaba arrays separados.
+ *
+ * @param {Object} reporte
+ * @returns {string[]} todos los keys de peligros presentes
+ */
+function peligrosDelReporte(reporte) {
+  const peligros = Array.isArray(reporte.peligros) ? reporte.peligros : [];
+  const { tiposTodos } = superficieDeTransito(reporte);
+  return [...new Set([...tiposTodos, ...peligros])];
 }
 
 /**
@@ -134,7 +144,8 @@ function horaDelReporte(reporte) {
 export function evaluarSeguridadGlaciar(reporte = {}) {
   const peligros = Array.isArray(reporte.peligros) ? reporte.peligros : [];
   const has = (k) => peligros.includes(k);
-  const { tipoSuperficie, dureza, tiposTodos } = superficieDeTransito(reporte);
+  const { tipoSuperficie, dureza } = superficieDeTransito(reporte);
+  const peligrosTodos = peligrosDelReporte(reporte);
   const hora = horaDelReporte(reporte);
   const nieveReciente = reporte.nieveReciente24h === true;
   const ordenSup = dureza ? ordenDureza(dureza) : null;
@@ -149,10 +160,8 @@ export function evaluarSeguridadGlaciar(reporte = {}) {
 
   const razonesPeligro = [];
 
-  // ── 🔴 hielo podrido SIEMPRE (en cualquier capa o como peligro) ──
-  const hayPodrido =
-    tiposTodos.some((t) => SUPERFICIES_CRITICAS.includes(t)) ||
-    peligros.some((p) => PELIGROS_CRITICOS_SIEMPRE.includes(p));
+  // ── 🔴 hielo podrido SIEMPRE (como superficie o como peligro observado) ──
+  const hayPodrido = peligrosTodos.includes('hielo_podrido');
   if (hayPodrido) razonesPeligro.push('Hielo podrido: no sostiene peso, puede colapsar.');
 
   // ── 🔴 séracs SI la ruta pasa por debajo ──
@@ -176,7 +185,7 @@ export function evaluarSeguridadGlaciar(reporte = {}) {
 
   // ── 🔴 riesgo de avalancha con nieve fresca en pendiente ──
   if (has('riesgo_avalancha')) {
-    const hayNieveFresca = nieveReciente || tiposTodos.includes('nieve_fresca');
+    const hayNieveFresca = nieveReciente || peligrosTodos.includes('nieve_fresca');
     const enPendiente = reporte.pendientePronunciada === true || has('pendiente_pronunciada');
     if (hayNieveFresca && enPendiente) {
       razonesPeligro.push('Riesgo de avalancha: nieve fresca sobre pendiente pronunciada.');
@@ -184,7 +193,7 @@ export function evaluarSeguridadGlaciar(reporte = {}) {
   }
 
   // ── 🔴 penitentes densos ──
-  if (reporte.penitentesDensos === true && (has('penitentes') || tiposTodos.includes('penitentes'))) {
+  if (reporte.penitentesDensos === true && peligrosTodos.includes('penitentes')) {
     razonesPeligro.push('Penitentes densos: tránsito inseguro y agotador.');
   }
 
@@ -210,7 +219,7 @@ export function evaluarSeguridadGlaciar(reporte = {}) {
   }
 
   // ── 🟡 hielo cubierto de detritos ──
-  if (tiposTodos.includes('hielo_cubierto_detritos')) {
+  if (peligrosTodos.includes('hielo_cubierto_detritos')) {
     razonesPrecaucion.push('Hielo cubierto de detritos: huecos y roca suelta ocultos.');
   }
 

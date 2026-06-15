@@ -198,4 +198,38 @@ describe('evaluarSeguridadGlaciar — robustez', () => {
     const r = evaluarSeguridadGlaciar({ tipoSuperficie: 'hielo_glaciar_azul', dureza: 'H1', peligros: ['ninguno_evidente'] });
     expect(r.nivel).toBe('estable');
   });
+
+  it('hielo podrido como tipoSuperficie dispara peligro (backward compat)', () => {
+    const r = evaluarSeguridadGlaciar({ tipoSuperficie: 'hielo_podrido', dureza: 'F', peligros: [] });
+    expect(r.nivel).toBe('peligro');
+    expect(r.razones.some((x) => /podrido/i.test(x))).toBe(true);
+  });
+
+  it('hielo podrido como peligro observado dispara peligro (backward compat)', () => {
+    const r = evaluarSeguridadGlaciar({ tipoSuperficie: 'hielo_glaciar_azul', dureza: 'H1', peligros: ['hielo_podrido'] });
+    expect(r.nivel).toBe('peligro');
+    expect(r.razones.some((x) => /podrido/i.test(x))).toBe(true);
+  });
+
+  it('penitentes como tipoSuperficie + penitentesDensos dispara peligro (backward compat)', () => {
+    const r = evaluarSeguridadGlaciar({
+      tipoSuperficie: 'penitentes',
+      dureza: 'P',
+      peligros: [],
+      penitentesDensos: true,
+    });
+    expect(r.nivel).toBe('peligro');
+    expect(r.razones.some((x) => /penitentes/i.test(x))).toBe(true);
+  });
+
+  it('penitentes como peligro observado + penitentesDensos dispara peligro (backward compat)', () => {
+    const r = evaluarSeguridadGlaciar({
+      tipoSuperficie: 'hielo_glaciar_azul',
+      dureza: 'H1',
+      peligros: ['penitentes'],
+      penitentesDensos: true,
+    });
+    expect(r.nivel).toBe('peligro');
+    expect(r.razones.some((x) => /penitentes/i.test(x))).toBe(true);
+  });
 });

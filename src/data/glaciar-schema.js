@@ -161,6 +161,9 @@ export const TIPOS_SUPERFICIE = [
  * Cada peligro trae un campo `critico` (dispara 🔴 por sí solo o bajo
  * condición) usado por la documentación; la lógica fina vive en
  * services/glaciarSafety.js.
+ *
+ * NOTA: hielo_podrido y penitentes están definidos tanto en TIPOS_SUPERFICIE
+ * como aquí por compatibilidad UI. Son los únicos duplicados intencionales.
  */
 export const PELIGROS = [
   { key: 'grietas_abiertas', icon: '⚠️', label: 'Grietas abiertas' },
@@ -176,6 +179,11 @@ export const PELIGROS = [
   { key: 'pendiente_pronunciada', icon: '⛰️', label: 'Pendiente pronunciada' },
   { key: 'ninguno_evidente', icon: '✅', label: 'Ninguno evidente' },
 ];
+
+/* ── Keys de peligros que están duplicados entre TIPOS_SUPERFICIE y PELIGROS ─────
+ * Lista explícita para validar que no agregamos más duplicados por error.
+ */
+export const PELIGROS_DUPLICADOS = Object.freeze(['hielo_podrido', 'penitentes']);
 
 /* ── Condiciones del entorno (selects cortos) ───────────────────────────── */
 export const CIELO = [
@@ -264,7 +272,9 @@ export const PROPOSITO =
 
 /* Mapas key→meta para mostrar etiquetas en la lista/trazabilidad. */
 export const SUPERFICIE_BY_KEY = Object.fromEntries(TIPOS_SUPERFICIE.map((t) => [t.key, t]));
-export const PELIGRO_BY_KEY = Object.fromEntries(PELIGROS.map((p) => [p.key, p]));
+export const PELIGRO_BY_KEY = Object.fromEntries(
+  [...TIPOS_SUPERFICIE, ...PELIGROS].map((p) => [p.key, p]),
+);
 export const DUREZA_BY_CODIGO = Object.fromEntries(ESCALA_DUREZA.map((d) => [d.codigo, d]));
 export const MONTANA_BY_KEY = Object.fromEntries(MONTANAS.map((m) => [m.key, m]));
 
