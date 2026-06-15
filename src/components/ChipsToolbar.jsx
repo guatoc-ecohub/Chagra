@@ -43,6 +43,14 @@ import { isDeepResearchEnabled } from '../services/deepResearchClient';
  *   - disabled:       boolean — deshabilita todos los chips (ej. mientras graba).
  *   - isPro:          boolean — si el usuario actual tiene tier Pro. Los chips
  *                     Pro-only (🔬) se muestran deshabilitados para free.
+ *   - chipDefs:       Array<CHIP_DEFS-shape> | null — lista ADAPTATIVA de chips
+ *                     a mostrar, YA ordenada y filtrada POR PERFIL por el
+ *                     call-site (profileChipSelector.selectChipDefs). Si se
+ *                     omite (null/undefined), se muestran TODOS los chips
+ *                     (CHIP_DEFS) — comportamiento histórico, sin breaking
+ *                     change. Este componente NO decide la selección: solo
+ *                     pinta lo que recibe con su CSS actual (la legibilidad/
+ *                     estilo la lleva otro stream).
  */
 export default function ChipsToolbar({
   onSelectIntent,
@@ -50,17 +58,23 @@ export default function ChipsToolbar({
   hasAttachment = false,
   disabled = false,
   isPro = false,
+  chipDefs = null,
 }) {
   if (typeof onSelectIntent !== 'function') return null;
+
+  // Selección por perfil (si el call-site la pasa) o catálogo completo (default
+  // histórico). El componente NO infiere nada — solo respeta la lista recibida.
+  const sourceDefs = Array.isArray(chipDefs) && chipDefs.length > 0 ? chipDefs : CHIP_DEFS;
 
   // Deep Research dead-end fix: si la flag VITE_DEEP_RESEARCH_ENABLED está
   // OFF la feature no existe para ningún plan, así que ocultamos el chip 🔬
   // por completo (no solo lo pro-bloqueamos). Con la flag ON el chip vuelve
-  // y queda pro-gated como el resto de la lógica de abajo.
+  // y queda pro-gated como el resto de la lógica de abajo. Se aplica sobre la
+  // lista efectiva (sea la del perfil o el catálogo completo).
   const deepEnabled = isDeepResearchEnabled();
   const visibleChipDefs = deepEnabled
-    ? CHIP_DEFS
-    : CHIP_DEFS.filter((def) => def.intent !== CHIP_INTENTS.deep);
+    ? sourceDefs
+    : sourceDefs.filter((def) => def.intent !== CHIP_INTENTS.deep);
 
   const baseChip =
     'shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border ' +
