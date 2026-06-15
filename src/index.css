@@ -347,6 +347,64 @@
   .app-scrim-strong {
     background-color: rgb(var(--scrim-bg) / calc(var(--scrim-opacity) * 1.49));
   }
+
+  /* ---------------------------------------------------------------------------
+   * AGENTE — superficies LEGIBLES sobre foto de fondo (fix 2026-06-15).
+   * Bug: accediendo al AGENTE directo (#agente, sin pasar por el home) los chips
+   * de capacidades/sugerencias, el header y el botón "Volver" quedaban como
+   * fantasmas translúcidos (bg-slate-900/40-50 + bg-slate-800/80) ILEGIBLES
+   * sobre la foto de biodiversidad (SelectedBackgroundReveal / --app-bg-image).
+   * Solución: superficies OPACAS por TOKEN de tema (igual que .agentport-chip
+   * del home) + blur de respaldo + texto fuerte → contraste WCAG AA en bio-punk
+   * y en los temas claros (papel/crema) sin eliminar el fondo. Unifica el
+   * tratamiento del AgentScreen con el del home.
+   * ------------------------------------------------------------------------- */
+
+  /* Velo extra SOLO del AgentScreen: refuerza el scrim base de la vista (la foto
+   * estaba lavando el contenido al entrar directo). Token-aware: navy denso en
+   * bio-punk, crema sutil en claros. Va como capa absoluta detrás del contenido. */
+  .agent-scrim {
+    background-color: rgb(var(--scrim-bg) / calc(var(--scrim-opacity) * 1.62));
+  }
+
+  /* Bandeja opaca para filas de chips/sugerencias (QuickChipsBar, SuggestedActions,
+   * ChipsToolbar). Reemplaza los wrappers translúcidos: superficie raised del
+   * tema + blur de respaldo + borde superior. */
+  .agent-chip-tray {
+    background-color: rgb(var(--c-surface-raised) / 0.96);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgb(var(--c-surface-border) / 0.9);
+  }
+
+  /* Etiqueta de sección ("Sugerencias", "Preguntas rápidas") — legible, no el
+   * slate-500 que se perdía sobre la foto. */
+  .agent-chip-tray-label {
+    color: rgb(var(--c-slate-400));
+  }
+
+  /* Pill de chip OPACO (paridad con .agentport-chip del home): superficie card
+   * del tema + borde + texto fuerte (--c-slate-100) + sombra sutil. Legible al
+   * sol y sobre cualquier foto. El estado activo/disabled lo siguen poniendo las
+   * clases utilitarias del componente; esto fija la BASE legible. */
+  .agent-chip {
+    background-color: rgb(var(--c-surface-card));
+    border: 1px solid rgb(var(--c-surface-border));
+    color: rgb(var(--c-slate-100));
+    box-shadow: 0 2px 8px -5px rgba(0, 0, 0, 0.45);
+  }
+  .agent-chip:hover {
+    background-color: rgb(var(--c-surface-raised));
+    border-color: rgb(var(--t-accent-rgb) / 0.5);
+  }
+
+  /* Header + compositor del AGENTE — superficies opacas (antes /50-/70 dejaban
+   * pasar la foto detrás de los íconos y el botón Volver). */
+  .agent-bar-surface {
+    background-color: rgb(var(--c-surface-card) / 0.97);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
 }
 
 /* ===========================================================================

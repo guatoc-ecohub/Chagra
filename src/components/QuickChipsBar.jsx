@@ -28,9 +28,9 @@ export default function QuickChipsBar({ onSelect, questions = DEFAULT_QUICK_QUES
   return (
     <div
       data-testid="quick-chips-bar"
-      className="px-4 py-2 border-t border-slate-800/60 bg-slate-900/40"
+      className="agent-chip-tray px-4 py-2"
     >
-      <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-2">
+      <p className="agent-chip-tray-label text-[10px] uppercase tracking-wider font-bold mb-2">
         Preguntas rápidas
       </p>
       <div className="flex flex-wrap gap-2">
@@ -40,7 +40,7 @@ export default function QuickChipsBar({ onSelect, questions = DEFAULT_QUICK_QUES
             type="button"
             onClick={() => onSelect(q)}
             data-testid="quick-chip"
-            className="px-3 py-1.5 rounded-full bg-slate-800/80 hover:bg-slate-700/80 active:scale-95 border border-slate-700/60 text-xs text-slate-200 transition-all"
+            className="agent-chip px-3 py-1.5 rounded-full border active:scale-95 text-xs font-medium transition-all"
           >
             {q}
           </button>
