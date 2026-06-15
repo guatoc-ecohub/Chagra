@@ -240,7 +240,7 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
             <div className="text-5xl mb-2" aria-hidden="true">🌱</div>
             <h3 className="text-xl font-black text-white">¡Empezá tu finca!</h3>
             <p className="text-sm text-amber-50 mt-2 leading-relaxed">
-              Tu finca está esperando. Sembrá tu primera planta y mirá cómo cobra
+              Tu finca está esperando. Siembra tu primera planta y mira cómo cobra
               vida: llegarán mariposas, abejas y muchas criaturas más.
             </p>
             <button
@@ -315,7 +315,7 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
           <Sparkles size={14} className="text-emerald-500 shrink-0 mt-0.5" aria-hidden="true" />
           <p className="text-xs text-slate-400 leading-relaxed">
             Este juego no inventa premios: tu finca crece de verdad con el trabajo
-            real. Cada planta que sembrás, cada cosecha y cada cuidado sin venenos
+            real. Cada planta que siembras, cada cosecha y cada cuidado sin venenos
             hace que tu mundo florezca. 🌿
           </p>
         </div>

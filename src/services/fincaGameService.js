@@ -45,7 +45,7 @@ export const WORLD_STAGES = Object.freeze([
     nombreNino: 'La tierra que despierta',
     nombreReal: 'Convencional',
     emoji: '🌱',
-    mensaje: 'Tu finca está empezando. ¡Sembrá tu primera planta para darle vida!',
+    mensaje: 'Tu finca está empezando. ¡Siembra tu primera planta para darle vida!',
     cielo: ['#bcd9e8', '#e8f3ee'],
     tierra: ['#c9a878', '#a98a5e'],
     arboles: 1,
@@ -161,7 +161,7 @@ export const CREATURES = Object.freeze([
     id: 'mariquita',
     nombre: 'Mariquita',
     emoji: '🐞',
-    pista: 'Aparece cuando cuidás la finca sin químicos.',
+    pista: 'Aparece cuando cuidas la finca sin químicos.',
     logro: '¡Las mariquitas te ayudan! Se comen las plagas.',
     check: (ev) => num(ev.mesmis.autodependencia) >= 2,
   }),
@@ -196,14 +196,14 @@ export const BADGES = Object.freeze([
     id: 'jardin_diverso',
     nombre: 'Jardín diverso',
     emoji: '🌼',
-    descripcion: 'Tenés varias plantas distintas.',
+    descripcion: 'Tienes varias plantas distintas.',
     check: (ev) => num(ev.tape.diversidad) >= 2,
   }),
   Object.freeze({
     id: 'amiga_del_suelo',
     nombre: 'Amiga del suelo',
     emoji: '🪱',
-    descripcion: 'Cuidás la tierra con cariño, sin venenos.',
+    descripcion: 'Cuidas la tierra con cariño, sin venenos.',
     check: (ev) => num(ev.mesmis.autodependencia) >= 2,
   }),
   Object.freeze({
@@ -238,9 +238,9 @@ export const BADGES = Object.freeze([
 export const MISSIONS = Object.freeze([
   Object.freeze({
     id: 'sembrar_planta',
-    titulo: 'Sembrá una planta',
+    titulo: 'Siembra una planta',
     emoji: '🌱',
-    descripcion: 'Poné una planta nueva en tu finca y registrala.',
+    descripcion: 'Pon una planta nueva en tu finca y regístrala.',
     cta: 'Ir a sembrar',
     nav: 'sembrar',
     tipo: 'accion',
@@ -248,7 +248,7 @@ export const MISSIONS = Object.freeze([
   }),
   Object.freeze({
     id: 'aprender_ficha',
-    titulo: 'Aprendé sobre una planta',
+    titulo: 'Aprende sobre una planta',
     emoji: '📖',
     descripcion: 'Descubrí una planta nueva en la biblioteca de Chagra.',
     cta: 'Ir a aprender',
@@ -258,7 +258,7 @@ export const MISSIONS = Object.freeze([
   }),
   Object.freeze({
     id: 'plantar_variado',
-    titulo: 'Sembrá plantas amigas',
+    titulo: 'Siembra plantas amigas',
     emoji: '🌻',
     descripcion: 'Tené al menos 3 plantas distintas: así llegan las mariposas.',
     cta: 'Sembrar otra',
@@ -270,7 +270,7 @@ export const MISSIONS = Object.freeze([
     id: 'hacer_biopreparado',
     titulo: 'Preparale comida natural',
     emoji: '🧪',
-    descripcion: 'Hacé un biopreparado para cuidar tu finca sin venenos.',
+    descripcion: 'Haz un biopreparado para cuidar tu finca sin venenos.',
     cta: 'Ver biopreparados',
     nav: 'insumos',
     tipo: 'accion',
@@ -280,7 +280,7 @@ export const MISSIONS = Object.freeze([
     id: 'registrar_cosecha',
     titulo: 'Recogé tu cosecha',
     emoji: '🧺',
-    descripcion: 'Cuando tu planta dé frutos, registrá la cosecha.',
+    descripcion: 'Cuando tu planta dé frutos, registra la cosecha.',
     cta: 'Ir a cosechar',
     nav: 'cosechar',
     tipo: 'accion',
@@ -288,7 +288,7 @@ export const MISSIONS = Object.freeze([
   }),
   Object.freeze({
     id: 'observar_finca',
-    titulo: 'Mirá tu finca',
+    titulo: 'Mira tu finca',
     emoji: '🔎',
     descripcion: 'Anotá algo que viste hoy: un bicho, una flor, una hoja.',
     cta: 'Anotar observación',
@@ -529,14 +529,14 @@ export function narrarFinca(state, { levelUp = false } = {}) {
     return `¡Tu finca subió de nivel! Ahora es ${state.mundo.nombreNino}. ${state.mundo.mensaje}`;
   }
   if (state.vacia) {
-    return 'Tu finca está esperando. ¡Sembrá tu primera planta para que cobre vida!';
+    return 'Tu finca está esperando. ¡Siembra tu primera planta para que cobre vida!';
   }
   const mundo = state.mundo;
   const criaturas = state.criaturasVivas === 1
-    ? 'Tenés una criatura viviendo en tu finca.'
+    ? 'Tienes una criatura viviendo en tu finca.'
     : state.criaturasVivas > 1
-      ? `Tenés ${state.criaturasVivas} criaturas viviendo en tu finca.`
-      : 'Todavía no llegan criaturas. ¡Sembrá más para invitarlas!';
+      ? `Tienes ${state.criaturasVivas} criaturas viviendo en tu finca.`
+      : 'Todavía no llegan criaturas. ¡Siembra más para invitarlas!';
   return `Tu finca es ${mundo.nombreNino}. ${mundo.mensaje} ${criaturas}`;
 }
 

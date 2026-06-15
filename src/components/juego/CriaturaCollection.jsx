@@ -29,7 +29,7 @@ export default function CriaturaCollection({ criaturas = [], vivas = 0, total = 
         </h3>
         <span
           className="text-sm font-black text-emerald-200 bg-emerald-800/50 rounded-full px-3 py-1"
-          aria-label={`Tenés ${vivas} de ${total} criaturas`}
+          aria-label={`Tienes ${vivas} de ${total} criaturas`}
         >
           {vivas} / {total}
         </span>
@@ -83,7 +83,7 @@ export default function CriaturaCollection({ criaturas = [], vivas = 0, total = 
 
       <p className="text-xs text-emerald-200/70 mt-3 leading-relaxed">
         Tocá una criatura para oír su secreto. Las criaturas llegan solitas cuando
-        cuidás tu finca: más plantas, suelo sano y nada de venenos. 🌱
+        cuidas tu finca: más plantas, suelo sano y nada de venenos. 🌱
       </p>
     </section>
   );

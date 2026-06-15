@@ -193,7 +193,7 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
                     <span className="flex-1 min-w-0">
                         <span className="block text-base font-black text-white">Mi Finca Viva</span>
                         <span className="block text-sm text-emerald-100/90 leading-snug">
-                            Mirá crecer tu finca como un mundo: criaturas, misiones y aventuras. ¡Para jugar en familia!
+                            Mira crecer tu finca como un mundo: criaturas, misiones y aventuras. ¡Para jugar en familia!
                         </span>
                     </span>
                     <ChevronRight size={22} className="text-emerald-200 shrink-0" aria-hidden="true" />
