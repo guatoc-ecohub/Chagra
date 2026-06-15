@@ -13,7 +13,9 @@ import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 import useFincaActiveStore from '../services/fincaActiveStore';
 import usePrefsStore from '../store/usePrefsStore';
 import { stop as stopTTS } from '../services/ttsService';
-import { getNotificationStyle, setNotificationStyle, getTelemetryConsent, setTelemetryConsent, HOME_MODULES, getModuleVisibility, setModuleVisibility } from '../services/userProfileService';
+import { getNotificationStyle, setNotificationStyle, getTelemetryConsent, setTelemetryConsent, HOME_MODULES, getModuleVisibility, setModuleVisibility, hasManualModuleVisibility, getProfile } from '../services/userProfileService';
+import { selectHomeModuleVisibilityMap } from '../services/homeModuleSelector';
+import { tieneAccesoGlaciarActual } from '../config/glaciarAccess';
 import { getOperatorPhoto, setOperatorPhotoFromFile, removeOperatorPhotoLocal } from '../services/operatorPhotoService';
 
 const TTL_OPTIONS = [
@@ -136,9 +138,23 @@ export default function ProfileScreen({ onBack, onHome }) {
       : '7d'
   );
 
-  // Visibilidad de módulos del Home (#7003). Lee la configuración del perfil
-  // y permite activar/desactivar cada módulo individualmente.
-  const [moduleVisibility, setModuleVisibilityState] = useState(() => getModuleVisibility());
+  // Visibilidad de módulos del Home (#7003 + gating por perfil 2026-06-15).
+  // Permite activar/desactivar cada módulo individualmente. Estado inicial =
+  // visibilidad EFECTIVA del home: si el usuario ya guardó una preferencia
+  // MANUAL, esa gana (#1560); si no, partimos del DEFAULT derivado del perfil
+  // (homeModuleSelector) para que los toggles coincidan con lo que el home
+  // realmente muestra. Así un urbano ve aquí 'zonas/insumos' ya en OFF (no un
+  // todo-ON que contradiga su home).
+  const [moduleVisibility, setModuleVisibilityState] = useState(() => {
+    try {
+      if (hasManualModuleVisibility()) return getModuleVisibility();
+      return selectHomeModuleVisibilityMap(getProfile(), {
+        esGuiaGlaciar: tieneAccesoGlaciarActual(),
+      });
+    } catch (_) {
+      return getModuleVisibility();
+    }
+  });
 
   // Free 7→10 fix-pack: HYTA (info GPU/Ollama) detrás de un toggle "Modo
   // técnico". Default OFF para que el campesino-target no vea jerga técnica

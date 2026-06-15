@@ -1,0 +1,43 @@
+{
+  "fuente": "DR-RESTAURACION-1 (Gemini+Meta, 2026-06-11) — Phillips/RAINFOR, IAvH, MinAmbiente",
+  "_nota_anti_alucinacion": "Estos son RANGOS de referencia a nivel de rodal (por hectarea), NO un factor por arbol para multiplicar. El carbono real de un predio SOLO se conoce midiendo en campo (DAP/alometria). Chagra NO calcula un numero exacto para la finca: muestra el rango orientativo con su fuente y marca [VALIDAR]. La medicion formal (MRV) es costosa e inviable para un campesino solo.",
+  "requiere_medicion_campo": true,
+  "conversion": {
+    "carbono_a_co2": 3.67,
+    "explicacion": "1 tonelada de carbono (tC) equivale a ~3.67 toneladas de CO2 (tCO2). La biomasa aerea se estima como biomasa x 0.5 = carbono."
+  },
+  "rangos_referencia": [
+    {
+      "ecosistema": "Bosque andino maduro (aereo)",
+      "rango_tC_ha": [100, 200],
+      "fuente": "Phillips/RAINFOR (via DR-RESTAURACION-1)"
+    },
+    {
+      "ecosistema": "Potrero degradado (punto de partida tipico)",
+      "rango_tC_ha": [0, 5],
+      "fuente": "DR-RESTAURACION-1"
+    },
+    {
+      "ecosistema": "Paramo — biomasa aerea",
+      "rango_tC_ha": [13, 183],
+      "fuente": "Gemini-profundo (via DR-RESTAURACION-1)"
+    },
+    {
+      "ecosistema": "Paramo — carbono del suelo (SOC, 0-40 cm)",
+      "rango_tC_ha": [119, 397],
+      "fuente": "Gemini-profundo (via DR-RESTAURACION-1)",
+      "nota": "El grueso del carbono del paramo esta BAJO tierra, no en la madera. Arar o drenar lo libera catastroficamente."
+    }
+  ],
+  "metodo_estimacion": {
+    "titulo": "Que se necesita para estimar la captura de CO2 de tu predio",
+    "pasos": [
+      "Numero de arboles y su especie (cada especie acumula biomasa distinto)",
+      "Edad o tiempo desde la siembra (un arbol joven captura mucho menos que uno maduro)",
+      "Area restaurada en hectareas",
+      "Medicion de campo del DAP (diametro a la altura del pecho) y ecuaciones alometricas por especie",
+      "Para un bono o pago formal: verificacion MRV por una entidad acreditada (costosa)"
+    ],
+    "advertencia": "Sin medicion de campo, cualquier numero exacto de CO2 es una invencion. El rango de referencia sirve solo para dimensionar el orden de magnitud, NO para prometer ingresos."
+  }
+}

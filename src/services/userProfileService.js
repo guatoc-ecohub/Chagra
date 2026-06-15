@@ -793,6 +793,30 @@ export function getModuleVisibility() {
 }
 
 /**
+ * ¿El usuario guardó una preferencia MANUAL de visibilidad de módulos?
+ *
+ * Devuelve true solo si existe el campo `modulos_visibles` en el perfil (lo
+ * escribe `setModuleVisibility` desde ProfileScreen, #1560). Cuando es false,
+ * el Home puede derivar la visibilidad por DEFECTO desde el perfil
+ * (homeModuleSelector) sin pisar ninguna elección del usuario.
+ *
+ * Nota: un objeto vacío `{}` (caso de "todo visible" que setModuleVisibility
+ * guarda cuando el usuario no ocultó nada) TAMBIÉN cuenta como preferencia
+ * manual — el usuario pasó por la pantalla y dejó todo visible a propósito.
+ *
+ * @returns {boolean}
+ */
+export function hasManualModuleVisibility() {
+  const profile = getProfile();
+  return !!(
+    profile &&
+    typeof profile === 'object' &&
+    profile.modulos_visibles &&
+    typeof profile.modulos_visibles === 'object'
+  );
+}
+
+/**
  * Persiste la configuración de visibilidad de módulos.
  *
  * @param {Object} visibility - { moduleId: boolean }

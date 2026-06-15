@@ -103,7 +103,12 @@ export const isPopulation = (p) => p?.type === 'population';
 
 // ─── Validators ────────────────────────────────────────────────
 
-const VALID_PROCESS_TYPES = ['sowing', 'restoration', 'silvopasture', 'pest_management', 'harvest', 'post_harvest'];
+// 'paramo' y 'pigs' agregados 2026-06-15 (seguimiento de procesos de finca):
+//   - paramo: conservación/restauración de páramo (NO es cultivo ni cosecha;
+//     hitos de protección de fuentes hídricas y de frailejones).
+//   - pigs: ciclo de manejo porcino (alimentación/reproducción/sanidad). Reusa
+//     animal-diagnostics.json + guardas leucaena/mimosina.
+const VALID_PROCESS_TYPES = ['sowing', 'restoration', 'silvopasture', 'pest_management', 'harvest', 'post_harvest', 'paramo', 'pigs'];
 const VALID_SUBJECT_KINDS = ['individual', 'aggregate'];
 const VALID_STATUSES = ['active', 'completed', 'cancelled'];
 // Transitional vocabulary: OpenCode's phenology/tasks use the newer
@@ -132,6 +137,17 @@ const VALID_STAGES = [
   'mantenimiento',
   'monitoreo_sucesion',
   'cierre',
+  // Páramo (conservación): hitos de protección de fuentes hídricas + frailejones.
+  'delimitacion',
+  'aislamiento',
+  'revegetacion_nativa',
+  'monitoreo_hidrico',
+  // Cerdos (ciclo de manejo porcino). Hitos de manejo, NO fenología.
+  'instalacion',
+  'alimentacion',
+  'reproduccion',
+  'sanidad',
+  'engorde',
 ];
 const VALID_EVENT_TYPES = [
   'sowing_confirmed',
@@ -170,11 +186,41 @@ const SOWING_STAGE_SEQUENCE = [
   { stage: 'harvest', label: 'Cosecha' },
 ];
 
+/**
+ * Páramo (conservación). NO sigue fenología de cultivo: son hitos de protección
+ * del ecosistema de páramo (delimitación de la zona, aislamiento del ganado,
+ * revegetación con nativas, monitoreo de fuentes hídricas). El detalle técnico
+ * de cada hito está marcado [VALIDAR] en la UI hasta tener fuente cerrada.
+ */
+export const PARAMO_STAGE_SEQUENCE = [
+  { stage: 'delimitacion', label: 'Delimitación de la zona a proteger' },
+  { stage: 'aislamiento', label: 'Aislamiento (cercas, sacar ganado)' },
+  { stage: 'revegetacion_nativa', label: 'Revegetación con nativas (frailejón, etc.)' },
+  { stage: 'monitoreo_hidrico', label: 'Monitoreo de fuentes hídricas y sucesión' },
+  { stage: 'cierre', label: 'Cierre (zona protegida y estable)' },
+];
+
+/**
+ * Cerdos (ciclo de manejo porcino). Hitos de MANEJO, no fenología. Las cifras
+ * técnicas (gestación 114 días para porcino) salen de animal-diagnostics.json
+ * (DR-ANIMAL-1, fuentes ICA/AGROSAVIA). Cualquier recomendación de dieta/sanidad
+ * concreta NO va aquí sin fuente: se marca [VALIDAR] en la UI.
+ */
+export const PIGS_STAGE_SEQUENCE = [
+  { stage: 'instalacion', label: 'Instalación (corral / cama profunda)' },
+  { stage: 'alimentacion', label: 'Alimentación y engorde' },
+  { stage: 'reproduccion', label: 'Reproducción (monta y gestación)' },
+  { stage: 'sanidad', label: 'Sanidad y bioseguridad' },
+  { stage: 'cierre', label: 'Cierre del ciclo' },
+];
+
 /** Secuencia de etapas (con etiqueta) apropiada para el tipo de proceso. */
-export const stageSequenceForProcessType = (processType) =>
-  processType === 'restoration' || processType === 'silvopasture'
-    ? RESTORATION_STAGE_SEQUENCE
-    : SOWING_STAGE_SEQUENCE;
+export const stageSequenceForProcessType = (processType) => {
+  if (processType === 'restoration' || processType === 'silvopasture') return RESTORATION_STAGE_SEQUENCE;
+  if (processType === 'paramo') return PARAMO_STAGE_SEQUENCE;
+  if (processType === 'pigs') return PIGS_STAGE_SEQUENCE;
+  return SOWING_STAGE_SEQUENCE;
+};
 
 /**
  * Valida un objeto FarmProcess.

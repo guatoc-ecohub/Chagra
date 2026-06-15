@@ -13,6 +13,7 @@ import useAssetStore from './store/useAssetStore';
 import { fetchFromFarmOS } from './services/apiService';
 import { PRIMARY_WORKER_NAME } from './config/workerConfig';
 import { tieneAccesoGlaciarActual } from './config/glaciarAccess';
+import { parseSeguimientoView } from './config/seguimientoProcesos';
 import { initCatalog } from './db/catalogDB';
 import NetworkStatusBar from './components/NetworkStatusBar';
 import PendingTasksWidget from './components/PendingTasksWidget';
@@ -69,6 +70,7 @@ const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
 const PlantaPorVozScreen = lazy(() => import('./components/PlantaPorVozScreen'));
 const ProcesosPorVozScreen = lazy(() => import('./components/ProcesosPorVozScreen'));
 const CicloCultivoScreen = lazy(() => import('./components/CicloCultivoScreen'));
+const SeguimientoProcesoScreen = lazy(() => import('./components/SeguimientoProcesoScreen'));
 const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
 const GlaciarReporteScreen = lazy(() => import('./components/GlaciarReporteScreen'));
 const GlaciarHistorialScreen = lazy(() => import('./components/GlaciarHistorialScreen'));
@@ -690,6 +692,23 @@ export default function App() {
   }, [navigate]);
 
   const renderView = () => {
+    // Seguimiento de procesos de finca (ruta dinámica 'seguimiento_<key>':
+    // reforestacion/silvopastoreo/paramo/cerdos). Tarjetas del home →
+    // SeguimientoProcesoScreen. Se resuelve antes del switch porque es una
+    // ruta paramétrica, no un literal.
+    const seguimientoKey = parseSeguimientoView(currentView);
+    if (seguimientoKey) {
+      return (
+        <ErrorBoundary>
+          <SeguimientoProcesoScreen
+            procesoKey={seguimientoKey}
+            onBack={() => navigate('dashboard')}
+            onSave={showToast}
+          />
+        </ErrorBoundary>
+      );
+    }
+
     switch (currentView) {
       case 'loading':
         return <LoadingFallback />;

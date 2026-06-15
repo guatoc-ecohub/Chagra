@@ -1,6 +1,9 @@
+import { useEffect, useState } from 'react';
 import { Sprout, MapPin, Package, NotebookPen, Eye, AlertCircle, FileText, ChevronRight, Leaf } from 'lucide-react';
 import useAssetStore from '../../store/useAssetStore';
 import Skeleton from '../common/Skeleton';
+import { listFarmProcesses } from '../../db/farmProcessCache';
+import { SEGUIMIENTO_PROCESOS, seguimientoRoute } from '../../config/seguimientoProcesos';
 
 /**
  * FincaCards — secciones del dashboard re-organizadas con sensibilidad
@@ -74,6 +77,39 @@ const SECTION_STYLES = {
         border: 'border-indigo-700/30',
         ring: 'ring-indigo-500/0 group-hover:ring-indigo-500/40',
         iconColor: 'text-indigo-300',
+    },
+    // Seguimiento de procesos de finca (2026-06-15). Misma estética tonal.
+    reforestacion: {
+        Icon: Leaf,
+        emoji: '🌳',
+        accent: 'from-green-600/20 to-emerald-500/10',
+        border: 'border-green-700/30',
+        ring: 'ring-green-500/0 group-hover:ring-green-500/40',
+        iconColor: 'text-green-300',
+    },
+    silvopastoreo: {
+        Icon: Sprout,
+        emoji: '🐄',
+        accent: 'from-amber-600/20 to-yellow-500/10',
+        border: 'border-amber-700/30',
+        ring: 'ring-amber-500/0 group-hover:ring-amber-500/40',
+        iconColor: 'text-amber-300',
+    },
+    paramo: {
+        Icon: MapPin,
+        emoji: '🏔️',
+        accent: 'from-sky-600/20 to-cyan-500/10',
+        border: 'border-sky-700/30',
+        ring: 'ring-sky-500/0 group-hover:ring-sky-500/40',
+        iconColor: 'text-sky-300',
+    },
+    cerdos: {
+        Icon: AlertCircle,
+        emoji: '🐖',
+        accent: 'from-pink-600/20 to-rose-500/10',
+        border: 'border-pink-700/30',
+        ring: 'ring-pink-500/0 group-hover:ring-pink-500/40',
+        iconColor: 'text-pink-300',
     },
 };
 
@@ -302,5 +338,107 @@ export function InformesCard({ onNavigate, variant }) {
             tooltip="Exporta cuaderno de campo, inventario, registros de cosecha y aplicaciones a CSV/PDF."
             onClick={() => onNavigate('informes')}
         />
+    );
+}
+
+/**
+ * useSeguimientoCounts — cuenta los procesos ACTIVOS por process_type para los
+ * contadores de las tarjetas de seguimiento. Offline-first (lee IndexedDB).
+ * Se re-cuenta al volver al home y al evento 'farmProcessChanged'.
+ */
+function useSeguimientoCounts() {
+    const [counts, setCounts] = useState(null); // null = cargando
+
+    useEffect(() => {
+        let alive = true;
+        const recount = async () => {
+            try {
+                const all = await listFarmProcesses({ status: 'active' });
+                if (!alive) return;
+                const byType = {};
+                for (const p of all || []) {
+                    const t = p?.attributes?.process_type;
+                    if (t) byType[t] = (byType[t] || 0) + 1;
+                }
+                setCounts(byType);
+            } catch {
+                if (alive) setCounts({});
+            }
+        };
+        recount();
+        const onChange = () => recount();
+        try { window.addEventListener('farmProcessChanged', onChange); } catch { /* SSR/test */ }
+        return () => {
+            alive = false;
+            try { window.removeEventListener('farmProcessChanged', onChange); } catch { /* noop */ }
+        };
+    }, []);
+
+    return counts;
+}
+
+/**
+ * SeguimientoCard — tarjeta de seguimiento de un proceso de finca
+ * (Reforestación/Silvopastoreo/Páramo/Cerdos). Mismo componente base que
+ * "Mis plantas": navega a la vista de seguimiento del proceso.
+ */
+export function SeguimientoCard({ def, count, onNavigate, variant }) {
+    const loaded = count !== null && count !== undefined;
+    const n = loaded ? (count || 0) : null;
+    const subtitle = !loaded
+        ? 'Cargando…'
+        : n > 0
+            ? (n === 1 ? '1 en seguimiento' : `${n} en seguimiento`)
+            : def.subtitle;
+    return (
+        <Card
+            variant={variant}
+            section={def.section}
+            title={def.title}
+            subtitle={subtitle}
+            value={loaded ? n : null}
+            loading={!loaded}
+            tooltip={`${def.title} — ${def.subtitle}. Tócalo para iniciar y hacer seguimiento (etapas, fotos y avance).`}
+            onClick={() => onNavigate(seguimientoRoute(def.key))}
+        />
+    );
+}
+
+/**
+ * SeguimientoCards — las tarjetas de seguimiento de procesos de finca para el
+ * home (Reforestación · Silvopastoreo · Páramo · Cerdos). Se renderiza como
+ * bloque propio en DashboardLive, fuera del grid draggable.
+ *
+ * GATING POR PERFIL (2026-06-15): `keys` filtra qué tarjetas se muestran según
+ * el perfil del usuario ("el usuario solo ve lo que necesita" — un urbano
+ * NUNCA ve Cerdos). Lo decide el call-site (DashboardLive) vía
+ * homeModuleSelector. Si `keys` se omite (null/undefined), se muestran las 4 —
+ * comportamiento histórico, sin breaking change. La selección NO se decide acá;
+ * este componente solo pinta las tarjetas permitidas.
+ *
+ * @param {Object} props
+ * @param {(view: string) => void} props.onNavigate
+ * @param {'grid'|'list'} [props.variant='grid']
+ * @param {string[]|null} [props.keys=null] — keys de seguimiento permitidas
+ *   (subconjunto de SEGUIMIENTO_PROCESOS[].key). null = todas.
+ */
+export function SeguimientoCards({ onNavigate, variant = 'grid', keys = null }) {
+    const counts = useSeguimientoCounts();
+    const allowed = Array.isArray(keys) ? new Set(keys) : null;
+    const defs = allowed
+        ? SEGUIMIENTO_PROCESOS.filter((def) => allowed.has(def.key))
+        : SEGUIMIENTO_PROCESOS;
+    return (
+        <>
+            {defs.map((def) => (
+                <SeguimientoCard
+                    key={def.key}
+                    def={def}
+                    count={counts ? (counts[def.processType] || 0) : null}
+                    onNavigate={onNavigate}
+                    variant={variant}
+                />
+            ))}
+        </>
     );
 }
