@@ -236,15 +236,22 @@ export const CAPABILITY_MANIFEST = Object.freeze([
       'Próximamente estará disponible por la nube.',
   },
   {
+    // MÓDULO UNIFICADO de voz (2026-06-15): único punto de entrada desde la mano
+    // para agregar una planta por voz Y ver, sobre la misma planta, su ciclo
+    // genealógico + bioinsumos + ciclos asociados + companions/antagonistas.
+    // Reusa el pipeline de VoiceCapture (captura/transcripción/entidades/
+    // sugerencias) y lo extiende con el dossier (PlantaPorVozScreen). La vista
+    // 'voz' (captura simple) sigue existiendo para el micrófono genérico del
+    // TopBar; la mano apunta al módulo unificado 'voz_planta'.
     id: 'voz',
     group: 'registrar',
     status: 'live',
     icon: '🎤',
     label: 'Agregar planta por voz',
-    desc: 'Dime qué sembraste y lo registro en tu finca.',
+    desc: 'Dime qué sembraste: lo registro y te muestro su ciclo, bioinsumos y compañeros.',
     tool: 'voice_capture',
     hero: true,
-    heroRoute: { kind: 'nav', view: 'voz' },
+    heroRoute: { kind: 'nav', view: 'voz_planta' },
   },
   {
     id: 'plantas',

@@ -66,6 +66,7 @@ const OnboardingPiloto = lazy(() => import('./components/OnboardingPiloto'));
 const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
 const LocationDetectedScreen = lazy(() => import('./components/LocationDetectedScreen'));
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
+const PlantaPorVozScreen = lazy(() => import('./components/PlantaPorVozScreen'));
 const ProcesosPorVozScreen = lazy(() => import('./components/ProcesosPorVozScreen'));
 const CicloCultivoScreen = lazy(() => import('./components/CicloCultivoScreen'));
 const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
@@ -925,6 +926,15 @@ export default function App() {
             <ScreenShell title="Registro por voz" icon={Mic} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
               <VoiceCapture onSave={showToast} />
             </ScreenShell>
+          </ErrorBoundary>
+        );
+      case 'voz_planta':
+        // Módulo UNIFICADO de voz (entrada desde la mano Ⓐ): agrega una planta
+        // por voz y muestra su ciclo genealógico + bioinsumos + ciclos
+        // asociados + companions/antagonistas en una sola pantalla.
+        return (
+          <ErrorBoundary>
+            <PlantaPorVozScreen onBack={() => navigate('dashboard')} onSave={showToast} />
           </ErrorBoundary>
         );
       case 'procesos':
