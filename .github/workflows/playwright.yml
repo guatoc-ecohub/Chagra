@@ -36,6 +36,11 @@ jobs:
           CI: '1'
           VITE_FARMOS_URL: ''
           VITE_FARMOS_CLIENT_ID: farm
+          # El operador ya NO está hardcodeado (anti-leak): esOperador lee
+          # VITE_OPERATOR_USERNAME. El spec home-operador-ve-todo siembra el
+          # tenant 'op-test', así que el E2E debe inyectar ese mismo valor para
+          # que el dev server reconozca al operador y renderice el home completo.
+          VITE_OPERATOR_USERNAME: op-test
 
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
