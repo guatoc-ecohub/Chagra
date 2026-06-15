@@ -13,9 +13,12 @@ describe('guardas — todas vivas (ninguna muerta)', () => {
     const d = diagnosticarSuelo('hice la prueba del bicarbonato');
     expect(d.advertencias.some((a) => a.includes('MITO') && a.includes('bicarbonato'))).toBe(true);
   });
-  it('suelo: aguacate+mal drenaje -> ALERTA CRITICA', () => {
+  it('suelo: aguacate+mal drenaje -> ALERTA CRÍTICA', () => {
     const d = diagnosticarSuelo('quiero sembrar aguacate y el terreno se empoza');
-    expect(d.advertencias.some((a) => a.includes('ALERTA CRITICA') && a.includes('Phytophthora'))).toBe(true);
+    // El guard de prod emite "ALERTA CRÍTICA" (con tilde) + Phytophthora; la
+    // aserción tenía "CRITICA" sin tilde y nunca matcheaba. Corregido para
+    // reflejar el string real de prod sin debilitar la guarda.
+    expect(d.advertencias.some((a) => a.includes('ALERTA CRÍTICA') && a.includes('Phytophthora'))).toBe(true);
   });
   it('agua: lunar -> MITO', () => {
     const d = diagnosticarAgua('debo regar en luna menguante');
