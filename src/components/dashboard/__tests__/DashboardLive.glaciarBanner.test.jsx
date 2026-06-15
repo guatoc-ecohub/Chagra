@@ -22,6 +22,10 @@ import { describe, test, expect, vi, beforeEach } from 'vitest';
 const accesoMock = vi.fn(() => false);
 vi.mock('../../../config/glaciarAccess', () => ({
   tieneAccesoGlaciarActual: (...args) => accesoMock(...args),
+  // DashboardLive importa esOperadorActual (bypass del operador + switch de
+  // demo). Sin este export el mock lo dejaría undefined y el cálculo de
+  // visibilidad caería al fail-open. Este test no ejercita al operador → false.
+  esOperadorActual: () => false,
 }));
 
 // Hijos pesados → stubs livianos.

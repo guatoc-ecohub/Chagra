@@ -76,6 +76,7 @@ import { createStreamGuard } from '../../services/streamGuards';
 import { getProfile, getModuleVisibility } from '../../services/userProfileService';
 import { selectChipDefs } from '../../services/profileChipSelector';
 import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciarAccess';
+import { applyDemoToSelector, DEMO_CHANGED_EVENT } from '../../services/demoProfile';
 import { captureExchange } from '../../services/conversationCaptureService';
 import { regionFromProfile, getEnsoOutlook } from '../../services/ensoContext';
 // SALUDO PROACTIVO (#162 alertas + #298 tareas + #331 análisis): el agente, de
@@ -248,20 +249,41 @@ export default function AgentScreen({ onBack, initialContext }) {
   // ya filtrada a la ChipsToolbar. NO tocamos su CSS (otro stream lleva estilo).
   // Memoizado al montar: el perfil rara vez cambia dentro de la sesión del chat
   // (mismo criterio que los otros getProfile() de este componente).
+  // Versión del modo demo: se incrementa en cada activación/cambio/salida del
+  // SWITCH DE DEMO (solo operador) para re-derivar los chips en caliente. Para
+  // usuarios reales el evento nunca trae un override válido, así que esto es
+  // inocuo (applyDemoToSelector sigue siendo passthrough).
+  const [demoVersion, setDemoVersion] = useState(0);
+  useEffect(() => {
+    const bump = () => setDemoVersion((v) => v + 1);
+    try {
+      window.addEventListener(DEMO_CHANGED_EVENT, bump);
+      return () => {
+        try { window.removeEventListener(DEMO_CHANGED_EVENT, bump); } catch (_) { /* noop */ }
+      };
+    } catch (_) {
+      return () => {};
+    }
+  }, []);
   const profileChipDefs = useMemo(() => {
     try {
-      const profile = getProfile();
-      return selectChipDefs(profile, {
-        // El operador ve el catálogo COMPLETO de chips vivos (bypass del gating).
+      // SWITCH DE DEMO (solo operador): si el operador simula un perfil,
+      // applyDemoToSelector entrega el perfil sintético del rol + opts con el
+      // bypass APAGADO, de modo que los chips se filtran como los vería esa
+      // persona (un urbano no ve biopreparados, etc.). Sin demo, passthrough.
+      const { profile, opts } = applyDemoToSelector(getProfile(), {
+        // El operador (sin demo) ve el catálogo COMPLETO de chips (bypass).
         esOperador: esOperadorActual(),
         esGuiaGlaciar: tieneAccesoGlaciarActual(),
         moduleVisibility: getModuleVisibility(),
       });
+      return selectChipDefs(profile, opts);
     } catch (_) {
       // Si algo falla, null → ChipsToolbar cae a su catálogo completo (default).
       return null;
     }
-  }, []);
+    // demoVersion re-deriva los chips cuando el operador cambia/sale del demo.
+  }, [demoVersion]);
   // Hoja de capacidades (paridad AgentHero Ⓐ).
   const [sheetOpen, setSheetOpen] = useState(false);
   // Fase del compositor para la animación shimmer/lift al enviar.

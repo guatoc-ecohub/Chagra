@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench, Sprout, ChevronRight, Bell, Users, Camera, Trash2 } from 'lucide-react';
+import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench, Sprout, ChevronRight, Bell, Users, Camera, Trash2, FlaskConical } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { esExtensionistaActual } from '../config/extensionistaAccess';
 import ThemeSelector from './common/ThemeSelector';
@@ -15,7 +15,8 @@ import usePrefsStore from '../store/usePrefsStore';
 import { stop as stopTTS } from '../services/ttsService';
 import { getNotificationStyle, setNotificationStyle, getTelemetryConsent, setTelemetryConsent, HOME_MODULES, getModuleVisibility, setModuleVisibility, hasManualModuleVisibility, getProfile } from '../services/userProfileService';
 import { selectHomeModuleVisibilityMap } from '../services/homeModuleSelector';
-import { tieneAccesoGlaciarActual } from '../config/glaciarAccess';
+import { tieneAccesoGlaciarActual, esOperadorActual } from '../config/glaciarAccess';
+import { DEMO_ROLES, getDemoOverride, setDemoRole, clearDemo, DEMO_CHANGED_EVENT } from '../services/demoProfile';
 import { getOperatorPhoto, setOperatorPhotoFromFile, removeOperatorPhotoLocal } from '../services/operatorPhotoService';
 
 const TTL_OPTIONS = [
@@ -169,6 +170,35 @@ export default function ProfileScreen({ onBack, onHome }) {
   useEffect(() => {
     localStorage.setItem('chagra:profile:modo-tecnico:v1', modoTecnico ? '1' : '0');
   }, [modoTecnico]);
+
+  // SWITCH DE DEMO POR PERFIL (solo OPERADOR). Simula cómo ve la app cada
+  // perfil (campesino/urbano/ganadero/restaurador/guía/socio/técnico) sin
+  // cambiar el perfil real ni re-loguear. El gate duro vive en demoProfile
+  // (getDemoOverride/setDemoRole están gated por esOperadorActual); aquí solo
+  // mostramos el control si el usuario es operador. Para usuarios reales esta
+  // sección no se renderiza.
+  const esOperador = (() => { try { return esOperadorActual(); } catch (_) { return false; } })();
+  const [demoRole, setDemoRoleState] = useState(() => {
+    try { return getDemoOverride(); } catch (_) { return null; }
+  });
+  useEffect(() => {
+    const refresh = () => { try { setDemoRoleState(getDemoOverride()); } catch (_) { setDemoRoleState(null); } };
+    try {
+      window.addEventListener(DEMO_CHANGED_EVENT, refresh);
+      return () => { try { window.removeEventListener(DEMO_CHANGED_EVENT, refresh); } catch (_) { /* noop */ } };
+    } catch (_) { return () => {}; }
+  }, []);
+  const handleDemoRole = (roleId) => {
+    // Toque sobre el rol ya activo = salir del demo (toggle). Si no, activarlo.
+    if (demoRole === roleId) {
+      clearDemo();
+      setDemoRoleState(null);
+    } else {
+      const ok = setDemoRole(roleId);
+      // setDemoRole es no-op si no es operador; reflejamos el estado real.
+      setDemoRoleState(ok ? roleId : getDemoOverride());
+    }
+  };
 
   // Estilo de notificación de alertas (operador 2026-06-06): 'demo' (chip
   // llamativo estilo demo en la portada del agente, POR DEFECTO) o 'actual'
@@ -632,6 +662,62 @@ export default function ProfileScreen({ onBack, onHome }) {
                 </div>
               )}
             </div>
+
+            {/* SWITCH DE DEMO POR PERFIL (solo OPERADOR). Simula la vista de
+                cada perfil para demos a instituciones + debug de "cómo ve cada
+                usuario". Self-gated: solo se renderiza si esOperador. El gate
+                duro real vive en demoProfile (setDemoRole/getDemoOverride están
+                gated por esOperadorActual), así que aunque esto se renderizara
+                por error, no afectaría a un usuario real. */}
+            {esOperador && (
+              <div className="space-y-4 bg-slate-900/40 border border-amber-800/40 rounded-2xl p-5" data-testid="demo-switch-section">
+                <div className="flex items-center gap-2 px-1">
+                  <FlaskConical size={18} className="text-amber-400" />
+                  <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Modo demo (ver como…)</h3>
+                </div>
+                <p className="text-[11px] text-slate-500 leading-snug px-1">
+                  Simula cómo ve la app cada perfil de usuario para demostraciones
+                  y pruebas. No cambia tu perfil real ni te saca de la sesión. Toca
+                  un perfil para verlo; tócalo de nuevo (o usa el banner de arriba)
+                  para salir.
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {DEMO_ROLES.map((r) => {
+                    const activo = demoRole === r.id;
+                    return (
+                      <button
+                        key={r.id}
+                        type="button"
+                        aria-pressed={activo}
+                        data-testid={`demo-role-${r.id}`}
+                        onClick={() => handleDemoRole(r.id)}
+                        className={`flex items-start gap-2 p-3 rounded-xl text-left transition-colors min-h-[56px] border ${
+                          activo
+                            ? 'bg-amber-600/20 border-amber-500/70 ring-1 ring-amber-500/50'
+                            : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-700/60'
+                        }`}
+                      >
+                        <span className="text-lg leading-none shrink-0" aria-hidden="true">{r.emoji}</span>
+                        <span className="flex flex-col gap-0.5 min-w-0">
+                          <span className={`text-sm font-bold ${activo ? 'text-amber-200' : 'text-slate-200'}`}>{r.label}</span>
+                          <span className="text-[10px] text-slate-500 leading-snug">{r.descripcion}</span>
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                {demoRole && (
+                  <button
+                    type="button"
+                    onClick={() => handleDemoRole(demoRole)}
+                    data-testid="demo-exit-button"
+                    className="w-full p-3 rounded-xl bg-amber-700/30 hover:bg-amber-700/45 border border-amber-600/50 transition-colors text-center"
+                  >
+                    <span className="text-sm font-bold text-amber-200">Salir del modo demo</span>
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* Modo extensionista (ADR-048 MVP): entrada al panel supervisor
                 multi-finca. Solo se RENDERIZA si el usuario tiene el rol

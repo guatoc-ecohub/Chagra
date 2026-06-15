@@ -30,6 +30,7 @@ import {
     selectHomeModules,
 } from '../../services/homeModuleSelector';
 import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciarAccess';
+import { applyDemoToSelector, DEMO_CHANGED_EVENT } from '../../services/demoProfile';
 import SelectedBackgroundReveal from './SelectedBackgroundReveal';
 import ClimaStrip from './ClimaStrip';
 import HoyEnFincaStrip from './HoyEnFincaStrip';
@@ -187,10 +188,15 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
             // Primer load sin elección manual: default por perfil.
             // El operador (esOperadorActual) hace BYPASS → ve TODOS los módulos
             // (selectHomeModules ignora el rol/urbano cuando esOperador=true).
-            return selectHomeModuleVisibilityMap(getProfile(), {
-                esOperador: esOperadorActual(),
-                esGuiaGlaciar: tieneAccesoGlaciarActual(),
-            });
+            // SWITCH DE DEMO (solo operador): si el operador está simulando un
+            // perfil, applyDemoToSelector sustituye el par (perfil, opts) por el
+            // del rol simulado (vista ESTRECHA de esa persona, sin bypass). Para
+            // usuarios reales y sin demo activo es un passthrough exacto.
+            const { profile: demoProfile, opts: demoOpts } = applyDemoToSelector(
+                getProfile(),
+                { esOperador: esOperadorActual(), esGuiaGlaciar: tieneAccesoGlaciarActual() },
+            );
+            return selectHomeModuleVisibilityMap(demoProfile, demoOpts);
         } catch (_) {
             // Fail-open: ante cualquier problema, todo visible (no romper el home).
             const visibility = {};
@@ -209,14 +215,15 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
     // el comportamiento histórico. Un urbano FRESCO (sin manual) sí queda
     // gateado: no ve ninguna (criterio de éxito #1).
     // null = mostrar todas; [] = ocultar el bloque; [k…] = filtrar.
-    const [seguimientoKeys] = useState(() => {
+    const [seguimientoKeys, setSeguimientoKeys] = useState(() => {
         try {
             if (hasManualModuleVisibility()) return null;
             // El operador ve las 4 tarjetas (incluida Cerdos) por el bypass.
-            return selectHomeModules(getProfile(), {
-                esOperador: esOperadorActual(),
-                esGuiaGlaciar: tieneAccesoGlaciarActual(),
-            }).seguimiento;
+            const { profile: demoProfile, opts: demoOpts } = applyDemoToSelector(
+                getProfile(),
+                { esOperador: esOperadorActual(), esGuiaGlaciar: tieneAccesoGlaciarActual() },
+            );
+            return selectHomeModules(demoProfile, demoOpts).seguimiento;
         } catch (_) {
             return null; // Fail-open: el componente muestra las 4 por defecto.
         }
@@ -254,6 +261,41 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
             };
         } catch (_) {
             // Tests sin window
+            return () => {};
+        }
+    }, []);
+
+    // SWITCH DE DEMO (solo operador): al activar/cambiar/salir del modo demo,
+    // re-derivar EN CALIENTE los módulos visibles + las tarjetas de seguimiento
+    // como el perfil simulado (o, al salir, como el operador real = ve todo).
+    // Respeta #1560: si el usuario tomó control manual de su home, no pisamos su
+    // elección (igual que el cálculo inicial). Sin demo activo, vuelve al default
+    // del perfil real. Solo afecta al operador (applyDemoToSelector es no-op para
+    // usuarios reales).
+    useEffect(() => {
+        const reDerive = () => {
+            try {
+                if (hasManualModuleVisibility()) {
+                    setModuleVisibility(getModuleVisibility());
+                    setSeguimientoKeys(null);
+                    return;
+                }
+                const { profile: demoProfile, opts: demoOpts } = applyDemoToSelector(
+                    getProfile(),
+                    { esOperador: esOperadorActual(), esGuiaGlaciar: tieneAccesoGlaciarActual() },
+                );
+                setModuleVisibility(selectHomeModuleVisibilityMap(demoProfile, demoOpts));
+                setSeguimientoKeys(selectHomeModules(demoProfile, demoOpts).seguimiento);
+            } catch (_) {
+                /* noop — fail-open ya cubierto por el estado inicial */
+            }
+        };
+        try {
+            window.addEventListener(DEMO_CHANGED_EVENT, reDerive);
+            return () => {
+                try { window.removeEventListener(DEMO_CHANGED_EVENT, reDerive); } catch (_) { /* noop */ }
+            };
+        } catch (_) {
             return () => {};
         }
     }, []);

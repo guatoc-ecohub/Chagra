@@ -40,6 +40,7 @@ import UpdateAvailableBanner from './components/UpdateAvailableBanner';
 import GpsFincaBanner from './components/GpsFincaBanner';
 import DataLossBanner from './components/DataLossBanner';
 import CriticalAlertBanner from './components/CriticalAlertBanner';
+import DemoModeBanner from './components/DemoModeBanner';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Lazy-loaded route components
@@ -1118,6 +1119,11 @@ export default function App() {
       {/* #315 — banner crítico global: surfacea alertas graves (helada, sensor
           crítico) sin abrir la campana. Imposible de ignorar. */}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <CriticalAlertBanner onNavigate={navigate} />}
+      {/* SWITCH DE DEMO POR PERFIL (solo OPERADOR): banner global "MODO DEMO —
+          viendo como <perfil>" cuando el operador simula un perfil para demos
+          a instituciones / debug. Self-gated: para usuarios reales no renderiza
+          nada (getActiveDemoRoleMeta está gated por esOperadorActual). */}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <DemoModeBanner />}
       <Suspense fallback={<LoadingFallback />}>
         {renderView()}
       </Suspense>
