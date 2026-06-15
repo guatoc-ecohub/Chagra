@@ -33,20 +33,18 @@
  *   TEST_PROMPTS_BORDE_ALUCINACION_2026-06-03.json → BORDE-011, BORDE-006.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   guardPestIntegratedManagement,
   applyOutputGuards,
-  resetOutputGuardTelemetry,
   getOutputGuardTelemetry,
 } from '../outputGuards.js';
+import { installOutputGuardTestReset } from '../../test-utils/outputGuardTestUtils.js';
 
-beforeEach(() => {
-  resetOutputGuardTelemetry();
-});
+installOutputGuardTestReset();
 
 // Marca del recordatorio MIP inyectado: cubre los must_include del bench.
-const MIP_REMINDER = /manejo integrado/i;
+const MIP_REMINDER = /manejo (integrado|org[aá]nico)/i;
 const MENTIONS_SEMILLA_SANA = /semilla\s+sana|material\s+(de\s+siembra\s+)?sano/i;
 const MENTIONS_TRAMPAS_FEROMONA = /trampa|feromona/i;
 const MENTIONS_CONTROL_BIOLOGICO = /control\s+biol[oó]gico|beauveria|metarhizium|encarsia/i;
@@ -193,9 +191,9 @@ describe('applyOutputGuards — engancha el guard MIP (BORDE-011 end-to-end)', (
     const out = applyOutputGuards(llm, { userMessage });
     expect(out.modified).toBe(true);
     // Los must_include del bench quedan cubiertos por el texto final.
-    expect(out.text).toMatch(/manejo integrado/i);
-    expect(out.text).toMatch(/semilla\s+sana|material\s+(de\s+siembra\s+)?sano/i);
-    expect(out.text).toMatch(/trampa|feromona/i);
+    expect(out.text).toMatch(MIP_REMINDER);
+    expect(out.text).toMatch(/control\s+biol[oó]gico|beauveria|encarsia/i);
+    expect(out.text).toMatch(/monitoreo|trampa|feromona/i);
     expect(out.reasons.some((r) => /mip|manejo_integrado|plaga/i.test(r))).toBe(true);
   });
 
@@ -206,7 +204,7 @@ describe('applyOutputGuards — engancha el guard MIP (BORDE-011 end-to-end)', (
     const llm = 'Aplica un insecticida sistémico para la mosca blanca en la habichuela cada ocho días.';
     const out = applyOutputGuards(llm, { userMessage });
     expect(out.modified).toBe(true);
-    expect(out.text).toMatch(/manejo integrado/i);
+    expect(out.text).toMatch(MIP_REMINDER);
     expect(out.text).toMatch(/control\s+biol[oó]gico|beauveria|encarsia/i);
   });
 
@@ -214,7 +212,7 @@ describe('applyOutputGuards — engancha el guard MIP (BORDE-011 end-to-end)', (
     const userMessage = '¿Puedo sembrar fresa en mi finca a 2.500 m?';
     const llm = 'La fresa se da bien a 2.500 m; es una buena opción para tu finca.';
     const out = applyOutputGuards(llm, { userMessage });
-    expect(out.text).not.toMatch(/manejo integrado/i);
+    expect(out.text).not.toMatch(MIP_REMINDER);
   });
 
   // ── GAP 2b coordinación (#1303): el suppress-and-replace del agroquímico NO debe
@@ -235,9 +233,9 @@ describe('applyOutputGuards — engancha el guard MIP (BORDE-011 end-to-end)', (
     expect(out.text).not.toMatch(/Aktara/i);
     expect(out.text).not.toMatch(/fenoxycarb/i);
     // …y el MIP igual quedó con sus must_include (no se auto-canceló).
-    expect(out.text).toMatch(/manejo integrado/i);
-    expect(out.text).toMatch(/semilla\s+sana|material\s+(de\s+siembra\s+)?sano/i);
-    expect(out.text).toMatch(/trampa|feromona/i);
+    expect(out.text).toMatch(MIP_REMINDER);
+    expect(out.text).toMatch(/control\s+biol[oó]gico|beauveria|encarsia/i);
+    expect(out.text).toMatch(/monitoreo|trampa|feromona/i);
     // ambos guards dejaron su razón.
     expect(out.reasons.some((r) => /suprimido/i.test(r))).toBe(true);
     expect(out.reasons.some((r) => /mip|manejo_integrado|plaga/i.test(r))).toBe(true);

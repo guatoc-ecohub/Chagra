@@ -4,10 +4,11 @@
  * Cubre fallos vivos detectados en el JSONL:
  * BORDE-014, 016, 017, 022, 024, 025 y 026.
  */
-import { describe, it, expect, beforeEach } from 'vitest';
-import { applyOutputGuards, resetOutputGuardTelemetry } from '../outputGuards.js';
+import { describe, it, expect } from 'vitest';
+import { applyOutputGuards } from '../outputGuards.js';
+import { installOutputGuardTestReset } from '../../test-utils/outputGuardTestUtils.js';
 
-beforeEach(() => resetOutputGuardTelemetry());
+installOutputGuardTestReset();
 
 describe('applyOutputGuards — regresiones BORDE V2 post Codex judge', () => {
   it('BORDE-014: mezcla bordelés + sulfocálcico ambigua → exige incompatibilidad explícita', () => {

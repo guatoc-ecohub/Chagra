@@ -4,15 +4,15 @@
  * Evita que un nombre local no identificado ("coincyes") se convierta en una
  * especie latina y en una recomendación de siembra sin evidencia.
  */
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   guardUnidentifiedRegionalCrop,
   applyOutputGuards,
-  resetOutputGuardTelemetry,
   getOutputGuardTelemetry,
 } from '../outputGuards.js';
+import { installOutputGuardTestReset } from '../../test-utils/outputGuardTestUtils.js';
 
-beforeEach(() => resetOutputGuardTelemetry());
+installOutputGuardTestReset();
 
 const USER_BORDE_027 =
   'Hermano, en Leticia (Amazonia, ~100 metros sobre el nivel del mar) me ofrecen semilla de coincyes ' +
