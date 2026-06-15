@@ -194,4 +194,4 @@ export const computeBiodiversityStats = (plants, speciesIndex) => {
   };
 };
 
-export const __STRATA_KEYS__ = STRATA_KEYS;
+// (__STRATA_KEYS__ — no exportado: sin referencias externas)
