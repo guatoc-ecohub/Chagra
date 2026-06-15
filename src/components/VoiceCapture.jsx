@@ -60,8 +60,16 @@ const STATE_DONE = 'done';
  *
  * Si transcripción o extracción fallan con error de red, ofrece encolar el
  * Blob en pending_voice_recordings para reintento posterior.
+ *
+ * `onPlantsSaved(entities)` (opcional): callback invocado tras un guardado
+ * exitoso con las entidades confirmadas (cada una con cropSlug/canonical). Lo
+ * usa el módulo unificado de voz (PlantaPorVozScreen) para mostrar, sobre la
+ * misma planta, su ciclo genealógico + bioinsumos + ciclos asociados +
+ * antagonistas. Sin esta prop el comportamiento es idéntico al anterior.
+ * `hideDoneScreen` (opcional): omite el estado DONE interno cuando el padre
+ * toma el control de la pantalla post-guardado (el dossier).
  */
-export default function VoiceCapture({ onSave }) {
+export default function VoiceCapture({ onSave, onPlantsSaved, hideDoneScreen = false }) {
   const { audioLevel, amplitudeHistory, durationMs, error: recorderError, start, stop, reset, hardLimitMs } = useVoiceRecorder();
 
   // Ejemplo adaptativo: lee zonas + plantas del store y arma la frase
@@ -473,13 +481,17 @@ export default function VoiceCapture({ onSave }) {
       const finalAnswer = applyRegionalismOverlay(msg, region, intensity);
 
       onSave?.(finalAnswer);
-      setView(STATE_DONE);
+      // Módulo unificado: entrega las entidades confirmadas al padre para que
+      // arme el dossier de la planta (ciclo + bioinsumos + ciclos + antagonistas).
+      // Sólo las que tienen cultivo resuelto sirven para consultar el catálogo.
+      try { onPlantsSaved?.(confirmedEntities); } catch (_) { /* no romper el flujo de guardado */ }
+      if (!hideDoneScreen) setView(STATE_DONE);
     } else {
       logVoiceEvent('voice:save_failed', { errors }, 'warn');
       setErrorMsg(`No se pudo guardar: ${errors.join('; ')}`);
       setView(STATE_ERROR);
     }
-  }, [buildSeedingPayload, onSave, reprocessingId, refreshPendingCount]);
+  }, [buildSeedingPayload, onSave, onPlantsSaved, hideDoneScreen, reprocessingId, refreshPendingCount]);
 
   const recorderErr = recorderError;
   const remainingMs = Math.max(0, hardLimitMs - durationMs);
