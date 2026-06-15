@@ -10,7 +10,11 @@
  * El sidecar hace el trabajo pesado (NOAA ONI + IDEAM ENSO + CIIFEN + Open-Meteo).
  * Este módulo es solo cache + pub/sub para que la app no haga N pedidos en
  * paralelo cuando varios componentes lo necesiten.
- *
+ */
+
+export const CLIMA_UPDATED_EVENT = 'chagra:clima:updated';
+
+/**
  * Contract de la respuesta del sidecar:
  *   {
  *     fetched_at: ISO8601,
@@ -236,7 +240,7 @@ export async function fetchClimaSnapshot({ lat, lng, elevation, forceRefresh = f
             memCache = entry;
             writeLocalStorage(entry);
             try {
-                window.dispatchEvent(new CustomEvent('chagra:clima:updated', { detail: withEffectiveEnso(enrichedPayload) }));
+                window.dispatchEvent(new CustomEvent(CLIMA_UPDATED_EVENT, { detail: withEffectiveEnso(enrichedPayload) }));
             } catch (_) { /* noop */ }
         }
         return payload ? withEffectiveEnso(memCache?.payload || payload) : payload;

@@ -11,6 +11,8 @@
  * case.event_log_ids.
  */
 
+const CASE_STUDY_CTX_SIZE = 4096;
+
 import { streamOllama } from './ollamaStream';
 import { retrieve } from './ragRetriever';
 
@@ -158,7 +160,7 @@ export async function summarizeLessons(caseObj, opts = {}) {
     model: MODEL,
     stream: true,
     keep_alive: '5m',
-    options: { temperature: 0.3, num_ctx: 4096 },
+    options: { temperature: 0.3, num_ctx: CASE_STUDY_CTX_SIZE },
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user', content: userContent },

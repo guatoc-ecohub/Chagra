@@ -21,6 +21,8 @@
  * equivalente para extracción JSON frente a alternativas que colgaban.
  */
 
+const EXTRACTION_TEMPERATURE = 0.1;
+
 import { streamOllama } from './ollamaStream';
 import { registry } from '../core/moduleRegistry';
 import { parseJsonTolerant as parseJsonTolerantUtil } from '../utils/parseJsonTolerant';
@@ -181,7 +183,7 @@ export async function extractEntities(text, { onToken } = {}) {
           { role: 'system', content: systemPrompt },
           { role: 'user', content: text },
         ],
-        options: { temperature: 0.1, num_predict: 2048 },
+        options: { temperature: EXTRACTION_TEMPERATURE, num_predict: 2048 },
       },
       onToken,
       { signal: controller.signal },
