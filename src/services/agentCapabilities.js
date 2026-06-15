@@ -194,6 +194,28 @@ export const CAPABILITY_MANIFEST = Object.freeze([
       prompt: 'Quiero restaurar el páramo. ¿Qué especies nativas siembro?',
     },
   },
+  {
+    // Riesgo de incendio: ESTIMACIÓN estacional (temporada seca + fase ENSO),
+    // NO alerta oficial. kind:'local' → se calcula en el cliente
+    // (incendioRiskService) sin tool del sidecar; el chip router devuelve un
+    // plan con localGrounding:'incendio' y el AgentScreen inyecta el bloque.
+    id: 'incendio',
+    group: 'restaurar',
+    status: 'live',
+    intent: 'incendio',
+    kind: 'local',
+    icon: '🔥',
+    label: 'Riesgo de incendio',
+    desc: 'Estimación de riesgo de incendio según la temporada seca y El Niño. No es alerta oficial.',
+    placeholder: 'Pregunta si tu zona está en temporada de riesgo de incendio',
+    tool: null,
+    stubMessage: null,
+    hero: true,
+    heroRoute: {
+      kind: 'ask',
+      prompt: '¿Mi zona está en riesgo de incendio esta temporada?',
+    },
+  },
 
   // ═══════════════════════════════════════════════════════════════════════
   // AGENTHERO ACTIONS — aparecen solo en menú Ⓐ del AgentHero

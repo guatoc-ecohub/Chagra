@@ -161,3 +161,27 @@ export function hasAnimalDiagnosticIntent(msg) { return typeof msg === 'string' 
 
 const RESTAURACION_DIAG_RE = /\b(restaura[cç]|reforesta[cç]|recuperar\s+(el\s+)?(monte|bosque)|p[aá]ramo|frailej[oó]n|sucesi[oó]n\s+ecol[oó]gica|corredor\s+ripario|cerca\s+viva|arbol(es)?\s+nativ[oa]s?|especies?\s+nativ[oa]s?)\b|proteger\s+(el\s+)?nacimiento|controlar\s+(la\s+)?erosion/i;
 export function hasRestauracionDiagnosticIntent(msg) { return typeof msg === 'string' && msg.trim().length >= 5 && RESTAURACION_DIAG_RE.test(_norm(msg)); }
+
+/**
+ * Señal de RIESGO DE INCENDIO (estacional). Distinta de la restauración
+ * post-incendio: aquí el campesino pregunta si su zona ESTÁ en riesgo /
+ * temporada de incendios, no cómo recuperar un sitio ya quemado.
+ *   - matchea: "riesgo de incendio", "temporada de incendios", "alerta de
+ *     incendio", "se va a quemar", "época de quemas", "peligro de fuego".
+ *   - NO matchea: "restaurar después del incendio" / "sitio quemado" (eso es
+ *     restauración → su propio matcher arriba). La co-ocurrencia de un término
+ *     de riesgo/temporada con uno de fuego/quema desambigua.
+ */
+const INCENDIO_RIESGO_RE =
+  /\b(riesgo|peligro|temporada|epoca|alerta|amenaza)\b[^.?!]*\b(incendio|incendios|quema[rs]?|fuego|conato)\b|\b(incendio|incendios|quema[rs]?|fuego)\b[^.?!]*\b(riesgo|peligro|temporada|epoca|alerta|amenaza)\b|se\s+(va|puede|pueden)\s+(a\s+)?quemar|epoca\s+de\s+quemas|estamos\s+en\s+(epoca|temporada)\s+seca/i;
+/**
+ * Detecta si el mensaje pregunta por riesgo/temporada de incendio (para
+ * activar incendioRiskService). Conservador: requiere co-ocurrencia de un
+ * término de riesgo/temporada con uno de fuego/quema.
+ *
+ * @param {string} msg
+ * @returns {boolean}
+ */
+export function hasIncendioRiskIntent(msg) {
+  return typeof msg === 'string' && msg.trim().length >= 5 && INCENDIO_RIESGO_RE.test(_norm(msg));
+}
