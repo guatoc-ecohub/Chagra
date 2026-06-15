@@ -260,6 +260,21 @@ function ConfianzaBadge({ metadata }) {
   );
 }
 
+/**
+ * Burbuja individual de chat para un mensaje del usuario o del agente.
+ * Soporta renderizado de imágenes, badges de fuente verificable, confianza,
+ * auto-corrección, nombres científicos sospechosos/alucinados, feedback,
+ * reproducción TTS con doble click y botón de reintento para mensajes huérfanos.
+ *
+ * @param {Object} props - Propiedades del componente.
+ * @param {Object} props.message - Objeto mensaje con `role` ('user'|'assistant'), `content`, `timestamp`,
+ *   `metadata` (fuente, confianza, tool_used, grounded), `imageUrl`, `photo`, `_orphan_recovery`,
+ *   `_orphan_prompt`, `_deepResearch`, `_edges`.
+ * @param {boolean} [props.isStreaming=false] - Indica si este mensaje está en streaming.
+ * @param {string} [props.promptText] - Texto del prompt del usuario asociado a esta respuesta (para feedback).
+ * @param {Function} props.onConsentNeeded - Callback cuando se requiere consentimiento para enviar feedback.
+ * @param {Function} props.onRetryOrphan - Callback para reintentar un mensaje huérfano sin respuesta.
+ */
 export default function ChatBubble({ message, isStreaming = false, promptText, onConsentNeeded, onRetryOrphan }) {
   const isUser = message.role === 'user';
   const showSourceBadges = usePrefsStore((s) => s.showSourceBadges);

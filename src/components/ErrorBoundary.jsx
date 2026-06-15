@@ -1,6 +1,12 @@
 import React from 'react';
 import { WifiOff } from 'lucide-react';
 
+/**
+ * ErrorBoundary de clase que captura errores en el árbol de componentes hijos.
+ * Renderiza una UI de recuperación con opciones de reintentar o recargar la app.
+ * Los datos de la finca (plantas, tareas, bitácora) permanecen seguros en el
+ * dispositivo local.
+ */
 export class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);

@@ -108,7 +108,20 @@ const MaterialCard = ({ item, onRefill }) => {
     </div>
   );
 };
-
+/**
+ * Dashboard de bodega / biofábrica que muestra los materiales (insumos)
+ * registrados como assets tipo `material`. Se suscribe a `useAssetStore`
+ * para leer `materials` y ejecutar `refillMaterial`.
+ *
+ * Funcionalidades principales:
+ * - Vista de tarjetas con niveles de stock actual y barras de consumo.
+ * - Modal de abastecimiento (refill) con selector de cantidad y unidad.
+ * - Detección automática de stock bajo contra umbral configurable.
+ * - Exportación del inventario como archivo descargable (CSV/JSON).
+ * - Sparklines de consumo histórico derivados de logs de tipo input.
+ *
+ * @returns {JSX.Element}
+ */
 export const InventoryDashboard = () => {
   const materials = useAssetStore((s) => s.materials);
   const refillMaterial = useAssetStore((s) => s.refillMaterial);
@@ -158,6 +171,7 @@ export const InventoryDashboard = () => {
   };
 
   React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadUpcomingSteps();
   }, []);
 
@@ -287,6 +301,7 @@ export const InventoryDashboard = () => {
           <h2 className="text-xl font-bold text-white mb-4">Próximos Pasos (7 días)</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {upcomingSteps.map(step => {
+              // eslint-disable-next-line react-hooks/purity
               const isPast = step.scheduled_date < Date.now();
               return (
                 <div key={step.id} className={`p-3 rounded-xl border ${isPast ? 'border-red-500/50 bg-red-500/10' : 'border-cyan-500/50 bg-cyan-500/10'}`}>

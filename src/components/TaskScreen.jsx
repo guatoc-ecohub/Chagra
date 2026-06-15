@@ -23,6 +23,17 @@ function readLastUsed() {
     }
 }
 
+/**
+ * Formulario de creación y edición de tareas agendadas. Soporta modo edición
+ * cuando `initialData` contiene un `id`. Aplica autocompletado de prioridad y
+ * ubicación usando la última tarea creada (con validez de 30 días).
+ * Guarda mediante el store de tareas con soporte offline-first.
+ *
+ * @param {Object} props - Propiedades del componente.
+ * @param {Function} props.onBack - Callback para volver a la pantalla anterior.
+ * @param {Function} props.onSave - Callback invocado tras guardar: onSave(mensaje, esError).
+ * @param {Object} [props.initialData] - Datos iniciales para modo edición. Si incluye `.id`, se activa el modo edición.
+ */
 function TaskScreen({ onBack, onSave, initialData }) {
     const plants = useAssetStore((s) => s.plants);
     const structures = useAssetStore((s) => s.structures);

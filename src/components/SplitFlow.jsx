@@ -3,6 +3,21 @@ import { X, ArrowRight, CheckCircle2, AlertTriangle, Layers, User, Info, Loader2
 import { previewSplit, executeSplit } from '../services/splitService';
 import useAssetStore from '../store/useAssetStore';
 
+/**
+ * Asistente multi-paso para dividir o juntar activos (split/merge).
+ * Soporta dos flujos: individual a agregado (juntar en grupo) y
+ * agregado a individual (dividir en plantas individuales).
+ *
+ * Pasos del flujo:
+ * 1. Selección de modo y cantidad
+ * 2. Vista previa del resultado
+ * 3. Confirmación humana (gate de seguridad)
+ * 4. Resultado final
+ *
+ * @param {Object} props - Propiedades del componente.
+ * @param {Object} props.asset - El activo a dividir o juntar.
+ * @param {Function} props.onClose - Callback para cerrar el flujo.
+ */
 export const SplitFlow = ({ asset, onClose }) => {
     const [step, setStep] = useState(1);
     const [qty, setQty] = useState(2);

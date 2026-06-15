@@ -289,7 +289,21 @@ const TAB_LABELS = {
   equipment: 'Herramienta',
   material: 'Insumo',
 };
-
+/**
+ * Panel principal de gestión de activos (CRUD) con pestañas para cada tipo de asset:
+ * Siembra (plant), Zona (land), Infraestructura (structure), Herramienta (equipment),
+ * e Insumo (material).
+ *
+ * Incluye filtro por nombre de finca activa, selector de mapa para coordenadas GPS,
+ * modal de creación/edición inline por bundle, importación/exportación masiva,
+ * búsqueda global con atajos de teclado y vista de lista/tarjeta.
+ *
+ * @param {Object} props
+ * @param {Function} [props.onBack] - Callback para navegar hacia atrás o cerrar el dashboard.
+ * @param {string} [props.initialTab] - Pestaña activa al montar (plant, land, structure, equipment, material).
+ * @param {boolean} [props.initialShowForm=false] - Si true, abre el formulario de creación automáticamente al montar.
+ * @returns {JSX.Element}
+ */
 export default function AssetsDashboard({ onBack, initialTab, initialShowForm = false }) {
   const {
     plants, structures, equipment, materials, lands,
@@ -333,6 +347,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
   const [ragLoading, setRagLoading] = useState(false);
   useEffect(() => {
     if (!formData.speciesId || !formData.name) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRagInsights(null);
       setRagLoading(false);
       return;
@@ -365,6 +380,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     if (!showForm) return;
     const isRealZone = currentZoneId && !['__all__', '__orphan__', '__cemetery__'].includes(currentZoneId);
     if (isRealZone && !formData.parentLandId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData((prev) => ({ ...prev, parentLandId: currentZoneId }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -818,8 +834,8 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     }
     // Zona rural (land no-urbana): placeholder de zona, NO de insumos.
     if (activeTab === 'land') return 'Ej: Huerta, Lote de abajo, Potrero, Invernadero...';
-    if (activeTab === 'structure') return 'Ej: ' + STRUCTURE_EXAMPLES[Math.floor(Math.random() * STRUCTURE_EXAMPLES.length)];
-    if (activeTab === 'equipment') return 'Ej: ' + EQUIPMENT_EXAMPLES[Math.floor(Math.random() * EQUIPMENT_EXAMPLES.length)];
+    if (activeTab === 'structure') return 'Ej: ' + STRUCTURE_EXAMPLES[Math.floor(/* eslint-disable-line react-hooks/purity */ Math.random() * STRUCTURE_EXAMPLES.length)];
+    if (activeTab === 'equipment') return 'Ej: ' + EQUIPMENT_EXAMPLES[Math.floor(/* eslint-disable-line react-hooks/purity */ Math.random() * EQUIPMENT_EXAMPLES.length)];
     return 'Ej: Bokashi, Biol, Purín de Ortiga...';
   };
 

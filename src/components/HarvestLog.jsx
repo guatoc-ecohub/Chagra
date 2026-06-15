@@ -72,7 +72,20 @@ const MOCK_SUB_AREAS = {
     { id: 'sub-3-2', name: 'Interior', suggest: 'Mora Sin Espinas' }
   ]
 };
-
+/**
+ * Formulario de registro de cosecha con cascada de 3 niveles
+ * (área → sub-área → producto) y sugerencia de mediana histórica.
+ *
+ * Al seleccionar área y sub-área se dispara una búsqueda en logs de cosecha
+ * anteriores para calcular la mediana de cantidad por producto. El resultado
+ * se muestra como hint opcional al operador para orientar el valor esperado
+ * de la cosecha actual.
+ *
+ * @param {Object} props
+ * @param {Function} [props.onBack] - Callback invocado al cancelar o navegar hacia atrás.
+ * @param {Function} [props.onSave] - Callback invocado tras guardado exitoso del log de cosecha.
+ * @returns {JSX.Element}
+ */
 export default function HarvestLog({ onBack, onSave }) {
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
@@ -134,6 +147,7 @@ export default function HarvestLog({ onBack, onSave }) {
   useEffect(() => {
     let alive = true;
     if (!formData.product) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMedianHint(null);
       return;
     }

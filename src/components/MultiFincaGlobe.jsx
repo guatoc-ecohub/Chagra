@@ -56,6 +56,14 @@ function MapEntryFlyTo({ phase }) {
     return null;
 }
 
+/**
+ * Mapa Leaflet multi-finca que muestra un globo con las fincas registradas.
+ * Incluye una secuencia de entrada animada (Colombia, zoom a Choachí) y
+ * marcadores interactivos con popups que permiten seleccionar una finca activa.
+ *
+ * @param {Object} props - Propiedades del componente.
+ * @param {Function} props.onSelect - Callback invocado al seleccionar una finca desde el popup.
+ */
 export const MultiFincaGlobe = ({ onSelect }) => {
     const { activeFincaSlug, setActiveFinca, setFincas, fincas } = useFincaActiveStore();
     const [loading, setLoading] = useState(fincas.length === 0);
