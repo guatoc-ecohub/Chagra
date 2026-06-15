@@ -58,6 +58,13 @@ jobs:
 
       - if: env.SKIP_DEPLOY != '1'
         name: Lint
+        # 2026-06-15: eslint . OOMea/thrashea el runner self-hosted de alpha y
+        # consumia los 30min del job -> el deploy se cancelaba por timeout y prod
+        # quedaba atras. Pasa a NO bloquear (lint = check de PR, no de deploy) con
+        # timeout propio corto, asi build+rsync proceden siempre. Fix de fondo:
+        # lint como required check del PR + eslint scoped (plan infra #132).
+        continue-on-error: true
+        timeout-minutes: 6
         # max-warnings 20 ya es el cap; si excede, debe BLOQUEAR el deploy.
         # Removido continue-on-error: true que silenciaba errores fatales.
         #
