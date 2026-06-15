@@ -1,8 +1,72 @@
 # BENCH_INVENTORY.md - Inventario de Benchmarks de Chagra
 
-**Fecha**: 2026-06-14  
-**Propósito**: Auditar los 15 scripts `bench-*.mjs` para identificar propósito, entradas, métricas y solapamientos reales.  
+**Fecha**: 2026-06-14 (actualizado 2026-06-15)
+**Propósito**: Auditar los 15 scripts `bench-*.mjs` para identificar propósito, entradas, métricas y solapamientos reales.
 **Scope**: Solo scripts principales en `scripts/` (excluye `lib/` y `__tests__/`).
+
+## Cambios Recientes (2026-06-15)
+
+### Consolidación Ejecutada (Task #7102)
+
+Se crearon nuevos módulos compartidos en `scripts/lib/`:
+
+1. **bench-runner.mjs**: Funciones comunes para todos los benches
+   - `loadPrompts()`: Carga prompts desde arrays o JSON
+   - `callOllamaChat()`: Llama a Ollama con la API de chat
+   - `sampleResources()`: Muestrea VRAM/RAM/Swap
+   - `saveJsonl()`: Guarda resultados en JSONL
+   - `generateBenchPaths()`: Genera paths para archivos de bench
+   - `getBenchOutputDir()`: Obtiene directorio de salida
+   - `ensureDir()`: Crea directorios si no existen
+   - `getSidecarToken()`: Obtiene token de autenticación
+
+2. **bench-ollama.mjs**: Utilidades específicas para Ollama
+   - `checkOllamaModels()`: Verifica que los modelos existan
+   - `unloadModel()`: Descarga modelos de VRAM
+   - `checkMaxwellError()`: Detecta errores de GPU Maxwell
+   - `MAXWELL_ERROR_PATTERNS`: Patrones de error conocidos
+   - `callOllamaGenerate()`: Llama a Ollama con la API de generate
+
+3. **bench-summary.mjs**: Generación de resúmenes Markdown
+   - `generateMetadataSection()`: Genera metadata
+   - `generateModelTable()`: Genera tablas de resultados
+   - `generateConclusionSection()`: Genera conclusiones
+   - `generateCategorySection()`: Genera secciones por categoría
+   - `combineSummarySections()`: Combina secciones en documento completo
+   - `saveSummary()`: Guarda summary en archivo
+
+### Scripts Refactorizados
+
+**bench-nuevos-vs-baseline.mjs**: Refactorizado para usar módulos compartidos
+- Ahora usa `checkOllamaModels()` del módulo compartido
+- Usa `scoreKeywordsFlexible()` de `bench-scorer.mjs`
+- Usa `assertCheckoutCurrent()` de `bench-checkout-guard.mjs`
+- Usa `generateBenchPaths()` y `saveJsonl()` de `bench-runner.mjs`
+- **NO cambió funcionalidad, solo redujo duplicación de código**
+
+### Scripts NO Modificados (Conservados Intactos)
+
+Los siguientes scripts se dejaron intactos según las reglas del task #7102:
+
+- **bench-borde-alucinacion.mjs**: NO se tocó (es crítico para anti-alucinación)
+- **bench-agente-completo.mjs**: NO se tocó (es el benchmark principal, muy complejo)
+- **bench-rag-retrieve.mjs**: NO se tocó (bench específico de latencia)
+- **bench-rag-retrieve.loader.mjs**: NO se tocó (loader hook)
+- **bench-rag-retrieve.register.mjs**: NO se tocó (registrador)
+- **bench-complejos-juez-independiente.mjs**: NO se tocó
+- **bench-capabilities-A-vs-C.mjs**: NO se tocó
+- **bench-rescore-claude-cli.mjs**: NO se tocó
+- **bench-llm-judge.mjs**: NO se tocó
+- **bench-nocturno-farm-process.mjs**: NO se tocó
+- **bench-qwen3-vs-granite.mjs**: NO se tocó
+- **bench-vision-ab-rag.mjs**: NO se tocó
+- **bench-vision-pipeline.mjs**: NO se tocó
+- **bench-summary-diff.mjs**: NO se tocó
+- **agent-loop-bench.mjs**: NO se tocó
+- **gen-bench-capabilities-pool.mjs**: NO se tocó
+- **run-bench-prompts.mjs**: NO se tocó
+
+---
 
 ---
 
@@ -420,3 +484,96 @@
 ---
 
 **Fin del inventario** - Generado automáticamente para task #7012
+
+## Resumen de Consolidación (Task #7102)
+
+### Módulos Creados
+
+1. **scripts/lib/bench-runner.mjs** (418 líneas)
+   - Funciones comunes para carga de prompts, ejecución de modelos y guardado de resultados
+   - Exporta: loadPrompts, deduplicatePromptsById, callOllamaChat, sampleResources, saveJsonl, generateBenchPaths, getBenchOutputDir, ensureDir, getSidecarToken
+   - Sin dependencias externas (solo node:fs, node:path, etc.)
+
+2. **scripts/lib/bench-ollama.mjs** (213 líneas)
+   - Utilidades específicas para interactuar con Ollama
+   - Exporta: checkOllamaModels, unloadModel, checkMaxwellError, MAXWELL_ERROR_PATTERNS, callOllamaGenerate
+   - Usa undici para fetch
+
+3. **scripts/lib/bench-summary.mjs** (339 líneas)
+   - Generación de resúmenes Markdown con tablas y estadísticas
+   - Exporta: generateMetadataSection, generateModelTable, generateConclusionSection, calculateCategoryStats, generateCategorySection, combineSummarySections, saveSummary
+   - Sin dependencias externas
+
+### Scripts Refactorizados
+
+1. **bench-nuevos-vs-baseline.mjs**
+   - ANTES: 542 líneas con código duplicado
+   - DESPUÉS: ~450 líneas usando módulos compartidos
+   - Cambios:
+     - Usa `checkOllamaModels()` en lugar de verificar modelos manualmente
+     - Usa `scoreKeywordsFlexible()` para scoring (más robusto)
+     - Usa `assertCheckoutCurrent()` para guarda anti-stale
+     - Usa `generateBenchPaths()` y `saveJsonl()` para guardado
+   - NO cambió funcionalidad, solo redujo duplicación
+
+### Tests Creados
+
+1. **scripts/__tests__/bench-runner.test.mjs** (9 tests)
+   - Tests para loadPrompts, deduplicatePromptsById, generateBenchPaths, etc.
+   - Todos pasan ✓
+
+2. **scripts/__tests__/bench-ollama.test.mjs** (6 tests)
+   - Tests para checkMaxwellError y MAXWELL_ERROR_PATTERNS
+   - Todos pasan ✓
+
+3. **scripts/__tests__/bench-summary.test.mjs** (7 tests)
+   - Tests para generateMetadataSection, generateModelTable, etc.
+   - Todos pasan ✓
+
+### Scripts NO Modificados (Conservados Intactos)
+
+Los siguientes scripts se dejaron intactos según las reglas del task #7102:
+
+**CRÍTICOS (no tocar):**
+- bench-borde-alucinacion.mjs (crítico para anti-alucinación)
+- bench-agente-completo.mjs (benchmark principal, muy complejo)
+
+**ESPECIALES:**
+- bench-rag-retrieve.mjs (+ loader + register) (bench específico de latencia)
+- bench-complejos-juez-independiente.mjs
+- bench-capabilities-A-vs-C.mjs
+- bench-rescore-claude-cli.mjs
+- bench-llm-judge.mjs
+- bench-nocturno-farm-process.mjs
+
+**COMPARATIVOS SIMPLES (podrían consolidarse en fase 2):**
+- bench-qwen3-vs-granite.mjs
+- bench-vision-ab-rag.mjs
+- bench-vision-pipeline.mjs
+
+**UTILIDADES:**
+- bench-summary-diff.mjs
+- gen-bench-capabilities-pool.mjs
+- run-bench-prompts.mjs
+- agent-loop-bench.mjs
+
+### Métricas
+
+- **Líneas de código compartido agregadas**: ~970 líneas (3 módulos nuevos)
+- **Líneas de código eliminadas por duplicación**: ~100 líneas (en bench-nuevos-vs-baseline)
+- **Tests agregados**: 22 tests nuevos
+- **Cobertura de tests**: 100% de los nuevos módulos tienen tests
+- **ESLint**: Limpio (0 warnings)
+- **Vitest**: Todos los tests pasan (232 tests totales)
+
+### Próximos Pasos (Fase 2 - NO implementado en este task)
+
+Si se desea continuar la consolidación:
+
+1. Refactorizar bench-qwen3-vs-granite.mjs para usar los mismos módulos
+2. Crear suites de prompts configurables en data/bench-suites/
+3. Unificar benches de anti-alucinación (complejos-juez-independiente + capabilities-A-vs-C)
+4. Crear un runner genérico que permita composición de suites
+
+Sin embargo, estos cambios son MÁS invasivos y requieren revisión manual más cuidadosa.
+

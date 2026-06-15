@@ -16,17 +16,30 @@
  *
  * NO modifica baseline defaults.
  */
-import { writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
 
+import {
+  getBenchOutputDir,
+  generateBenchPaths,
+  saveJsonl,
+  ensureDir,
+} from './lib/bench-runner.mjs';
+import {
+  checkOllamaModels,
+  unloadModel,
+  checkMaxwellError,
+  MAXWELL_ERROR_PATTERNS,
+} from './lib/bench-ollama.mjs';
+import { scoreKeywordsFlexible } from './lib/bench-scorer.mjs';
+import { assertCheckoutCurrent } from './lib/bench-checkout-guard.mjs';
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
-const DATA_DIR = join(ROOT_DIR, 'data');
-const BENCH_RUNS_DIR = join(DATA_DIR, 'bench-runs');
+const BENCH_RUNS_DIR = getBenchOutputDir(ROOT_DIR);
 
-const OLLAMA_URL = 'http://localhost:11434/api/generate';
+// Configuración de modelos a evaluar
 const MODELS = {
   ministral_3b: 'ministral-3:latest',
   ministral_14b: 'ministral-3:14b',
@@ -34,14 +47,9 @@ const MODELS = {
   qwen3_30b: 'qwen2.5:30b',
   baseline: 'granite3.1-dense:8b'
 };
+
 const TIMEOUT_MS = 180_000; // 3 min timeout por modelo (models más grandes)
-const MAXWELL_ERROR_PATTERNS = [
-  'sm_5.2',
-  'maxwell',
-  'unsupported architecture',
-  'compute capability',
-  'sm_52'
-];
+const OLLAMA_URL = 'http://localhost:11434/api/generate';
 
 // 10 prompts representativos smoke test
 const PROMPTS = [
@@ -114,6 +122,9 @@ const PROMPTS = [
 
 let maxwellErrorDetected = false;
 
+/**
+ * Llama a un modelo de Ollama con el prompt dado.
+ */
 async function callModel(model, prompt, signal) {
   const start = performance.now();
   const res = await fetch(OLLAMA_URL, {
@@ -121,7 +132,7 @@ async function callModel(model, prompt, signal) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: model,
-      prompt: `Eres un asistente agroecológico experto para Colombia. Responde en español claro, práctico para agricultores. 
+      prompt: `Eres un asistente agroecológico experto para Colombia. Responde en español claro, práctico para agricultores.
 
 Pregunta: ${prompt}
 
@@ -136,12 +147,12 @@ Responde de forma completa y práctica:`,
     signal,
   });
   const elapsed = performance.now() - start;
-  
+
   if (!res.ok) {
     const errorText = await res.text();
     throw new Error(`HTTP ${res.status}: ${res.statusText} - ${errorText}`);
   }
-  
+
   const data = await res.json();
   return {
     response: data.response,
@@ -150,43 +161,37 @@ Responde de forma completa y práctica:`,
   };
 }
 
-function checkMaxwellError(error) {
-  const errorLower = error.toLowerCase();
-  return MAXWELL_ERROR_PATTERNS.some(pattern => errorLower.includes(pattern.toLowerCase()));
-}
-
-function countKeywords(response, keywords) {
-  const lower = response.toLowerCase();
-  return keywords.filter(kw => lower.includes(kw.toLowerCase())).length;
-}
-
 async function benchmarkModel(modelKey, modelName, promptData) {
-  const resultKey = modelKey;
-  
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
-    
+
     const modelResult = await callModel(modelName, promptData.query, controller.signal);
     clearTimeout(timer);
-    
+
+    // Usar scoreKeywordsFlexible del módulo compartido
+    const { matched, total } = scoreKeywordsFlexible(
+      modelResult.response,
+      promptData.expected_keywords
+    );
+
     return {
       model: modelName,
       latency_ms: modelResult.latency_ms,
       response: modelResult.response,
       tokens_estimated: modelResult.tokens_estimated,
-      keywords_matched: countKeywords(modelResult.response, promptData.expected_keywords),
-      keywords_total: promptData.expected_keywords.length,
+      keywords_matched: matched,
+      keywords_total: total,
       error: null,
     };
   } catch (err) {
     const errorMessage = err.message || String(err);
-    
-    // Check for Maxwell sm_5.2 error
+
+    // Check for Maxwell sm_5.2 error (usar función del módulo compartido)
     if (checkMaxwellError(errorMessage)) {
       maxwellErrorDetected = true;
     }
-    
+
     return {
       model: modelName,
       error: errorMessage,
@@ -256,6 +261,16 @@ async function benchmarkPrompt(promptData, index, total) {
 }
 
 async function main() {
+  // Guarda anti-stale: verificar que el checkout está current
+  assertCheckoutCurrent({
+    cwd: ROOT_DIR,
+    autoPull: process.env.BENCH_AUTO_PULL === '1',
+    skip: process.env.BENCH_SKIP_STALE_GUARD === '1',
+  });
+
+  // Preflight: verificar que todos los modelos existen en Ollama
+  await checkOllamaModels(Object.values(MODELS));
+
   console.log('[bench] Smoke test 4 modelos nuevos vs baseline granite3.1');
   console.log(`[bench] Modelos: ${Object.values(MODELS).join(', ')}`);
   console.log(`[bench] Prompts: ${PROMPTS.length}`);
@@ -263,9 +278,7 @@ async function main() {
   console.log(`[bench] Directorio output: ${BENCH_RUNS_DIR}`);
 
   // Crear directorio output
-  if (!existsSync(BENCH_RUNS_DIR)) {
-    mkdirSync(BENCH_RUNS_DIR, { recursive: true });
-  }
+  ensureDir(BENCH_RUNS_DIR);
 
   const results = [];
   const startTime = performance.now();
@@ -273,7 +286,7 @@ async function main() {
   for (let i = 0; i < PROMPTS.length; i++) {
     const result = await benchmarkPrompt(PROMPTS[i], i, PROMPTS.length);
     results.push(result);
-    
+
     // Pausa entre prompts
     if (i < PROMPTS.length - 1) {
       await new Promise(r => setTimeout(r, 2000));
@@ -285,17 +298,17 @@ async function main() {
   // Calcular estadísticas por modelo
   const stats = {};
   const modelKeys = ['ministral_3b', 'ministral_14b', 'deepseek_r1', 'qwen3_30b', 'baseline'];
-  
+
   for (const modelKey of modelKeys) {
     const modelName = MODELS[modelKey];
     const successful = results.filter(r => !r[modelKey].error);
-    
+
     stats[modelKey] = {
       modelName,
       successful: successful.length,
       total: PROMPTS.length,
-      avgLatency: successful.length > 0 
-        ? successful.reduce((s, r) => s + r[modelKey].latency_ms, 0) / successful.length 
+      avgLatency: successful.length > 0
+        ? successful.reduce((s, r) => s + r[modelKey].latency_ms, 0) / successful.length
         : 0,
       avgKeywords: successful.length > 0
         ? successful.reduce((s, r) => s + (r[modelKey].keywords_matched / r[modelKey].keywords_total), 0) / successful.length
@@ -309,12 +322,10 @@ async function main() {
   }
   winners.none = results.filter(r => r.winner === 'none').length;
 
-  // Guardar JSONL
+  // Guardar JSONL (usar función del módulo compartido)
   const dateStr = new Date().toISOString().split('T')[0];
-  const jsonlPath = join(BENCH_RUNS_DIR, `nuevos-vs-baseline-${dateStr}.jsonl`);
-  
-  const jsonlLines = results.map(r => JSON.stringify(r));
-  writeFileSync(jsonlPath, jsonlLines.join('\n') + '\n');
+  const { jsonlPath } = generateBenchPaths('nuevos-vs-baseline', BENCH_RUNS_DIR, dateStr);
+  saveJsonl(results, jsonlPath);
 
   // Generar summary.md
   const summaryContent = `# Nuevos Modelos vs Baseline Benchmark — ${dateStr}
@@ -451,7 +462,6 @@ Se ha generado documentación adicional en: \`docs/known-issues/maxwell-sm52-inc
 
   const summaryPath = join(BENCH_RUNS_DIR, `nuevos-vs-baseline-${dateStr}-summary.md`);
   writeFileSync(summaryPath, summaryContent);
-
   console.log('\n[bench] ===== RESULTADOS =====');
   console.log(`[bench] Tiempo total: ${(totalTime / 1000).toFixed(2)}s`);
   console.log(`[bench]`);
@@ -478,6 +488,126 @@ Se ha generado documentación adicional en: \`docs/known-issues/maxwell-sm52-inc
     console.log(`[bench] ⚠️  Se detectaron errores Maxwell sm_5.2 - documentando...`);
     await documentMaxwellError(BENCH_RUNS_DIR, dateStr);
   }
+}
+
+/**
+ * Genera el contenido del summary Markdown.
+ */
+function generateSummary({ dateStr, totalTime, promptCount, modelKeys, stats, winners, results }) {
+  // Encontrar el modelo con más victorias
+  let bestModel = modelKeys[0];
+  let bestWins = winners[bestModel];
+
+  for (const modelKey of modelKeys) {
+    if (winners[modelKey] > bestWins) {
+      bestWins = winners[modelKey];
+      bestModel = modelKey;
+    }
+  }
+
+  const s = stats[bestModel];
+
+  // Encontrar el modelo más rápido
+  let fastestModel = modelKeys[0];
+  let fastestTime = stats[fastestModel].avgLatency;
+
+  for (const modelKey of modelKeys) {
+    if (stats[modelKey].avgLatency > 0 && stats[modelKey].avgLatency < fastestTime) {
+      fastestTime = stats[modelKey].avgLatency;
+      fastestModel = modelKey;
+    }
+  }
+
+  const baselineTime = stats.baseline.avgLatency;
+  let speedConclusion = '';
+  if (fastestTime < baselineTime) {
+    speedConclusion = `**Velocidad**: ${MODELS[fastestModel]} fue ${((baselineTime - fastestTime) / baselineTime * 100).toFixed(1)}% más rápido que el baseline.`;
+  } else {
+    speedConclusion = `**Velocidad**: granite3.1 baseline fue ${((fastestTime - baselineTime) / fastestTime * 100).toFixed(1)}% más rápido que los demás modelos.`;
+  }
+
+  // Generar secciones de categoría
+  const categories = {
+    species: 'Species',
+    biopreparados: 'Biopreparados',
+    plagas: 'Plagas',
+  };
+
+  let categorySections = '\n## Por Categoría\n\n';
+
+  for (const [key, label] of Object.entries(categories)) {
+    categorySections += `### ${label} (${results.filter(r => r.category === key).length} prompts)\n`;
+    categorySections += '| Modelo | Avg Latency (ms) | Avg Keywords (%) |\n';
+    categorySections += '|--------|-----------------|------------------|\n';
+
+    for (const modelKey of modelKeys) {
+      const categoryResults = results.filter(r => r.category === key && !r[modelKey].error);
+      const avgLatency = categoryResults.length > 0
+        ? categoryResults.reduce((s, r) => s + r[modelKey].latency_ms, 0) / categoryResults.length
+        : 0;
+      const avgKeywords = categoryResults.length > 0
+        ? categoryResults.reduce((s, r) => s + (r[modelKey].keywords_matched / r[modelKey].keywords_total), 0) / categoryResults.length
+        : 0;
+      categorySections += `| ${MODELS[modelKey]} | ${avgLatency.toFixed(0)} | ${(avgKeywords * 100).toFixed(1)}% |\n`;
+    }
+    categorySections += '\n';
+  }
+
+  return `# Nuevos Modelos vs Baseline Benchmark — ${dateStr}
+
+## Metadata
+- **Timestamp**: ${new Date().toISOString()}
+- **Modelos**:
+  - ministral-3:latest
+  - ministral-3:14b
+  - deepseek-r1:14b
+  - qwen2.5:30b
+  - granite3.1-dense:8b (baseline)
+- **Prompts**: ${promptCount}
+- **Categorías**:
+  - Species: 4
+  - Biopreparados: 3
+  - Plagas: 3
+- **Tiempo total**: ${(totalTime / 1000).toFixed(2)}s
+- **Tiempo promedio por prompt**: ${(totalTime / promptCount / 1000).toFixed(2)}s
+
+## Resultados Globales
+
+| Modelo | Exitosos | Latencia Promedio (ms) | Keywords Promedio (%) |
+|--------|----------|----------------------|---------------------|
+${modelKeys.map(k => {
+  const st = stats[k];
+  return `| **${st.modelName}** | ${st.successful}/${promptCount} | ${st.avgLatency.toFixed(0)} | ${(st.avgKeywords * 100).toFixed(1)}% |`;
+}).join('\n')}
+
+## Ganadores por Prompt
+
+| Ganador | Cantidad | Porcentaje |
+|---------|----------|-----------|
+${modelKeys.map(k => {
+  return `| **${MODELS[k]}** | ${winners[k]} | ${(winners[k] / promptCount * 100).toFixed(1)}% |`;
+}).join('\n')}
+| **Todos fallaron** | ${winners.none} | ${(winners.none / promptCount * 100).toFixed(1)}% |
+${categorySections}
+## Conclusión
+
+**${s.modelName}** ganó en ${winners[bestModel]} de ${promptCount} prompts (${(winners[bestModel] / promptCount * 100).toFixed(1)}%), con latencia promedio de ${s.avgLatency.toFixed(0)}ms y ${(s.avgKeywords * 100).toFixed(1)}% keywords matched.
+
+${speedConclusion}
+
+${maxwellErrorDetected ? `
+## ⚠️ Advertencia Maxwell sm_5.2
+
+Se detectaron errores relacionados con arquitectura Maxwell sm_5.2 durante el benchmark.
+Esto indica incompatibilidad con GPU Maxwell (Compute Capability 5.2).
+
+Se ha generado documentación adicional en: \`docs/known-issues/maxwell-sm52-incompat.md\`
+` : ''}
+
+---
+
+**Smoke test nuevos modelos vs baseline** — Generado por \`bench-nuevos-vs-baseline.mjs\`
+`;
 }
 
 async function documentMaxwellError(benchRunsDir, dateStr) {
