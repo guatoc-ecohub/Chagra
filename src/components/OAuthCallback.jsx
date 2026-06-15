@@ -65,6 +65,15 @@ export default function OAuthCallback({ onSuccess, onError }) {
         } catch (err) {
           console.warn('[OAuthCallback] setActiveTenantId failed:', err);
         }
+        // Foto de perfil cross-device (2026-06-15): igual que LoginScreen,
+        // traer del servidor la última foto del operador. Fire-and-forget.
+        try {
+          import('../services/operatorPhotoService.js')
+            .then((m) => m.loadFromFarmOS())
+            .catch(() => {});
+        } catch (err) {
+          console.warn('[OAuthCallback] operator photo load dispatch failed:', err);
+        }
         try {
           useOllamaWarmStore.getState().startWarmup();
         } catch (err) {
