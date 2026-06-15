@@ -32,11 +32,33 @@
  *   <dir>/borde-alucinacion-YYYY-MM-DD.jsonl
  *   <dir>/borde-alucinacion-YYYY-MM-DD.summary.json
  *
+ * MÉTRICA HONESTA (2026-06-14): el log y el summary emiten DOS cifras claras:
+ *   - PASS% = aciertos/juzgadas (lo que el modelo+guards resuelve bien).
+ *   - AH%   = FAIL/juzgadas = 100 − PASS% = la TASA DE ALUCINACIÓN REAL.
+ *   Históricamente el campo "AH%" era en realidad el % de ACIERTO y se leía como
+ *   alucinación (memoria feedback-bench-borde-ah-field-is-passrate, mordió 3 veces).
+ *   Ahora el AH es inequívoco y es la métrica primaria de cara a la auditoría.
+ *
+ * ANTES vs DESPUÉS (de cabo a rabo): el bench corre el pipeline real
+ * modelo→guards→respuesta y juzga ESO (lo que ve el campesino). Con
+ * BENCH_APPLY_GUARDS=0 se mide el CRUDO (sin guards) para cuantificar el DELTA que
+ * prueban los guards. Default 1 (con guards = realidad de prod).
+ *
+ * DESGLOSE POR CATEGORÍA: además del eje crudo, agrupa cada trampa en una de
+ * {receta-exacta, toxicidad, falsa-cura, altitud, otras} (categoryForAxes) para ver
+ * qué familia de guards funcionó y cuál sigue fallando.
+ *
+ * MÁS COBERTURA: PROMPTS_FILES (coma-separado) concatena V1 (12) + V2 (15) = 27
+ * trampas en una sola corrida, deduplicando por id.
+ *
  * Uso:
- *   node scripts/bench-borde-alucinacion.mjs                         # juez claude-cli (default)
+ *   node scripts/bench-borde-alucinacion.mjs                         # juez claude-cli (default), guards ON
  *   JUDGE_PROVIDER=deterministic node scripts/bench-borde-alucinacion.mjs   # sin GPU del juez
+ *   BENCH_APPLY_GUARDS=0 node scripts/bench-borde-alucinacion.mjs    # CRUDO (sin guards) para el DELTA
+ *   BENCH_REPS=3 node scripts/bench-borde-alucinacion.mjs            # 3 reps → varianza min-max
  *   BENCH_OUTPUT_DIR=/repo/data/bench-runs node scripts/bench-borde-alucinacion.mjs
  *   PROMPTS_FILE=/ruta/otra.json node scripts/bench-borde-alucinacion.mjs
+ *   PROMPTS_FILES=/v1.json,/v2.json node scripts/bench-borde-alucinacion.mjs   # 27 trampas combinadas
  */
 import { writeFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -64,10 +86,18 @@ const BENCH_RUNS_DIR =
   (existsSync(dirname(BENCH_EXTERNAL_DIR)) ? BENCH_EXTERNAL_DIR : join(ROOT_DIR, 'data', 'bench-runs'));
 
 // ── generador config-PROD (= ROUTES.chat_complex de llmRouter.js) ─────────────
-const GEN_MODEL = process.env.GEN_MODEL || 'granite3.1-dense:8b';
+// granite3.3:8b es el modelo de chat/NLU en prod desde 2026-06-11 (memoria
+// reference-nlu-real-es-granite-no-gemma). Overridable con GEN_MODEL.
+const GEN_MODEL = process.env.GEN_MODEL || 'granite3.3:8b';
 const GEN_TEMPERATURE = 0.3; // PROD. NO 0.7.
 const GEN_MAX_TOKENS = 768; // chat_complex
 const SEED = Number(process.env.SEED || 42);
+
+// ── toggle de guards: realidad de prod (ON) vs crudo del modelo (OFF) ─────────
+// El bench de cabo a rabo mide modelo→guards→respuesta (lo que ve el campesino).
+// BENCH_APPLY_GUARDS=0 salta los guards para cuantificar el DELTA que prueban los
+// guards (AH crudo vs AH con guards). Default ON = fidelidad a prod.
+const APPLY_GUARDS = process.env.BENCH_APPLY_GUARDS !== '0';
 
 // ── juez fuerte: claude-cli por defecto; degrada a determinístico ─────────────
 const JUDGE = selectJudgeProvider({
@@ -81,6 +111,13 @@ const GEN_TIMEOUT_MS = 180_000;
 const PROMPTS_FILE =
   process.env.PROMPTS_FILE ||
   '/home/kortux/Workspace/Chagra-strategy/deepresearch/TEST_PROMPTS_BORDE_ALUCINACION_2026-06-03.json';
+
+// PROMPTS_FILES (coma-separado) concatena varias fixtures (V1 12 + V2 15 = 27),
+// deduplicando por id. Si no se da, usa PROMPTS_FILE (retrocompatible).
+const PROMPTS_FILES = (process.env.PROMPTS_FILES || PROMPTS_FILE)
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
 
 // Tamaño de lote para el juez claude-cli (un spawn por lote, secuencial).
 const JUDGE_BATCH_SIZE = Number(process.env.JUDGE_BATCH_SIZE || 6);
@@ -166,6 +203,45 @@ function expectedGuardMiss(axes, reasons) {
     }
   }
   return [...new Set(misses)];
+}
+
+// ── DESGLOSE POR CATEGORÍA ─────────────────────────────────────────────────────
+// Agrupa cada trampa (multi-eje) en UNA categoría de cara al reporte, para ver qué
+// FAMILIA de guards funcionó y cuál sigue fallando. Orden = prioridad de riesgo:
+// la categoría más peligrosa que toque la trampa gana (toxicidad > receta-exacta >
+// altitud > falsa-cura > otras). La toxicidad va primero porque un FAIL ahí
+// (cianuro/rotenona en alimento) es letal; "otras" es el cajón de las que no caen
+// en las 4 familias con guard dedicado de #1558.
+const CATEGORY_RULES = [
+  ['toxicidad', ['confusion_toxica', 'toxicidad_mas_uso_alimentario', 'homonimia_confusion_letal', 'procesado_seguridad', 'fitotoxicidad']],
+  ['receta-exacta', ['dosis_biopreparado_especifica', 'dosis_biopreparado_inventada', 'dosis_biopreparado', 'sinergia_toxica_dos_biopreparados', 'acaricida', 'agroquimico_disfrazado']],
+  ['altitud', ['viabilidad_altitud', 'viabilidad_altitud_caso_limite', 'viabilidad_altitud_con_riesgo_letal', 'siembra_generica_fuera_piso_termico', 'heladas']],
+  ['falsa-cura', ['premisa_falsa', 'premisa_falsa_invisible']],
+];
+
+/** Mapea los ejes de una trampa a UNA categoría de reporte (prioridad de riesgo). */
+function categoryForAxes(axes) {
+  const set = new Set(axes || []);
+  for (const [cat, axisList] of CATEGORY_RULES) {
+    if (axisList.some((a) => set.has(a))) return cat;
+  }
+  return 'otras';
+}
+
+/**
+ * loadPrompts — carga y CONCATENA una o más fixtures, deduplicando por id (gana la
+ * primera aparición). Anota la categoría de reporte en cada prompt (`_category`).
+ */
+function loadPrompts(files) {
+  const byId = new Map();
+  for (const file of files) {
+    const fx = JSON.parse(readFileSync(file, 'utf-8'));
+    for (const p of fx.prompts || []) {
+      if (byId.has(p.id)) continue; // dedup: primera fixture gana
+      byId.set(p.id, { ...p, _category: categoryForAxes(p.axes) });
+    }
+  }
+  return [...byId.values()];
 }
 
 async function thermalGuard() {
@@ -338,13 +414,18 @@ async function runRep(prompts, { seed, repIndex, reps }) {
       continue;
     }
 
-    const guarded = applyOutputGuards(gen.response, { resolvedEntities: entities, profileName: null, userMessage: p.prompt });
+    // De cabo a rabo: pasa el crudo del modelo por los guards de PROD (modelo →
+    // guards → respuesta final) y juzga ESO — lo que ve el campesino. Con
+    // APPLY_GUARDS=0 se mide el crudo para cuantificar el DELTA de los guards.
+    const guarded = APPLY_GUARDS
+      ? applyOutputGuards(gen.response, { resolvedEntities: entities, profileName: null, userMessage: p.prompt })
+      : { text: gen.response, modified: false, reasons: [] };
     const finalText = guarded.text;
     const validation = await postValidate(p.prompt, finalText);
 
     console.log(
       `    gen ${(gen.latency_ms / 1000).toFixed(1)}s  entities=${entities.length}  ` +
-        `guards=${guarded.modified ? guarded.reasons.join(',') : 'none'}  sidecar_halluc=${validation.detected_count}`,
+        `guards=${APPLY_GUARDS ? (guarded.modified ? guarded.reasons.join(',') : 'none') : 'OFF'}  sidecar_halluc=${validation.detected_count}`,
     );
 
     generated.push({ p, entities, gen, finalText, guarded, validation });
@@ -412,6 +493,7 @@ async function runRep(prompts, { seed, repIndex, reps }) {
       seed,
       region: g.p.region,
       axes: g.p.axes,
+      category: g.p._category || categoryForAxes(g.p.axes),
       complexity: g.p.complexity,
       prompt: g.p.prompt,
       entities_grounded: g.entities.length,
@@ -438,9 +520,12 @@ async function runRep(prompts, { seed, repIndex, reps }) {
   const judged = pass + fail;
   const ahPct = judged > 0 ? (100 * pass) / judged : 0;
 
-  // AH% por eje (primer axis) y por región, para localizar el borde.
+  // Desglose por eje (primer axis), por región y por CATEGORÍA de reporte
+  // (receta-exacta/toxicidad/falsa-cura/altitud/otras), para localizar el borde y
+  // ver qué familia de guards funcionó.
   const byAxis = {};
   const byRegion = {};
+  const byCategory = {};
   for (const r of results) {
     if (r.ah_pass == null) continue;
     const axis = (r.axes && r.axes[0]) || 'sin_eje';
@@ -451,10 +536,21 @@ async function runRep(prompts, { seed, repIndex, reps }) {
     byRegion[reg] = byRegion[reg] || { pass: 0, total: 0 };
     byRegion[reg].total++;
     if (r.ah_pass) byRegion[reg].pass++;
+    const cat = r.category || 'otras';
+    byCategory[cat] = byCategory[cat] || { pass: 0, total: 0 };
+    byCategory[cat].total++;
+    if (r.ah_pass) byCategory[cat].pass++;
   }
 
-  console.log(`\n${tag}RESULTADO  PASS=${pass}  FAIL=${fail}  UNJUDGED=${unjudged}  AH%=${ahPct.toFixed(1)}`);
-  return { results, pass, fail, unjudged, judged, ahPct, byAxis, byRegion };
+  // Métrica HONESTA: PASS% = aciertos; AH% = FAIL/juzgadas = 100 − PASS% (la tasa de
+  // alucinación REAL). El log emite las dos sin ambigüedad (memoria
+  // feedback-bench-borde-ah-field-is-passrate: el viejo "AH%" era el % de acierto).
+  const ahReal = judged > 0 ? (100 * fail) / judged : 0;
+  console.log(
+    `\n${tag}RESULTADO  PASS=${pass}  FAIL=${fail}  UNJUDGED=${unjudged}  ` +
+      `PASS%=${ahPct.toFixed(1)}  AH%(alucinación real=FAIL/juzgadas)=${ahReal.toFixed(1)}`,
+  );
+  return { results, pass, fail, unjudged, judged, ahPct, ahReal, byAxis, byRegion, byCategory };
 }
 
 // ── main ──────────────────────────────────────────────────────────────────────
@@ -466,14 +562,19 @@ async function main() {
     skip: process.env.BENCH_SKIP_STALE_GUARD === '1',
   });
 
-  const fixture = JSON.parse(readFileSync(PROMPTS_FILE, 'utf-8'));
-  const prompts = fixture.prompts || [];
+  const prompts = loadPrompts(PROMPTS_FILES);
+
+  // Conteo por categoría de la fixture cargada (para el encabezado del log).
+  const catCounts = {};
+  for (const p of prompts) catCounts[p._category] = (catCounts[p._category] || 0) + 1;
 
   console.log('[bench-borde] BORDE de alucinación — generador config-prod + juez fuerte');
   console.log(`[bench-borde] generador: ${GEN_MODEL} temp=${GEN_TEMPERATURE} seed=${SEED} max_tokens=${GEN_MAX_TOKENS}`);
   console.log(`[bench-borde] juez:      ${JUDGE.judgeModel} (provider=${JUDGE.provider}, deterministic=${JUDGE.deterministic})`);
-  console.log(`[bench-borde] fixture:   ${PROMPTS_FILE.split('/').pop()} (${prompts.length} prompts)`);
-  console.log(`[bench-borde] reps:      ${BENCH_REPS}${BENCH_REPS < 2 ? ' (UNA corrida — varianza NO medible; usá BENCH_REPS=5 para la auditoría)' : ' (varianza medida)'}`);
+  console.log(`[bench-borde] guards:    ${APPLY_GUARDS ? 'ON (modelo→guards→respuesta = realidad prod)' : 'OFF (CRUDO del modelo — para medir el DELTA)'}`);
+  console.log(`[bench-borde] fixtures:  ${PROMPTS_FILES.map((f) => f.split('/').pop()).join(' + ')} (${prompts.length} trampas)`);
+  console.log(`[bench-borde] categorías: ${JSON.stringify(catCounts)}`);
+  console.log(`[bench-borde] reps:      ${BENCH_REPS}${BENCH_REPS < 2 ? ' (UNA corrida — varianza NO medible; usá BENCH_REPS=3 para la auditoría)' : ' (varianza medida)'}`);
   console.log(`[bench-borde] output:    ${BENCH_RUNS_DIR}`);
   console.log(`[bench-borde] GPU temp inicial: ${gpuTemp() ?? 'n/d'}°C`);
 
@@ -495,15 +596,41 @@ async function main() {
     console.log(`  JSONL rep ${k + 1}: ${jsonlPath}`);
   }
 
-  // ── Varianza entre reps (honestidad: media ± desviación, no UNA cifra) ───────
-  const ahValues = reps.map((r) => Number(r.ahPct.toFixed(1)));
-  const ahStats = summarizeReps(ahValues);
+  // ── Varianza entre reps (honestidad: distribución, no UNA cifra) ─────────────
+  // OJO con la nomenclatura (memoria feedback-bench-borde-ah-field-is-passrate):
+  //   passValues = % de ACIERTO por rep (lo que históricamente se llamó "ah_pct").
+  //   ahRealValues = TASA DE ALUCINACIÓN por rep = 100 − pass = FAIL/juzgadas.
+  // El summary emite AMBAS y marca cuál es cuál; la primaria de cara a la auditoría
+  // es la alucinación real (ah_real_pct_*).
+  const passValues = reps.map((r) => Number(r.ahPct.toFixed(1)));
+  const ahRealValues = reps.map((r) => Number(r.ahReal.toFixed(1)));
+  const passStats = summarizeReps(passValues);
+  const ahRealStats = summarizeReps(ahRealValues);
   const lastRep = reps[reps.length - 1];
+
+  // Helper: desglose pass+AH por dimensión (eje/región/categoría) para la última rep.
+  const breakdown = (by) =>
+    Object.fromEntries(
+      Object.entries(by).map(([k, v]) => [
+        k,
+        {
+          pass: v.pass,
+          total: v.total,
+          pass_pct: Number(((100 * v.pass) / v.total).toFixed(1)),
+          ah_pct: Number(((100 * (v.total - v.pass)) / v.total).toFixed(1)),
+        },
+      ]),
+    );
 
   const summaryPath = join(BENCH_RUNS_DIR, `borde-alucinacion-${dateStr}.summary.json`);
   const summary = {
     generated_at: new Date().toISOString(),
+    metric_legend:
+      'PASS% = aciertos/juzgadas. AH% (alucinación REAL) = FAIL/juzgadas = 100 − PASS%. ' +
+      'Los campos ah_pct_* son el % de ACIERTO (nombre histórico, NO la alucinación) — usá ah_real_pct_* para la alucinación.',
     generator: { model: GEN_MODEL, temperature: GEN_TEMPERATURE, base_seed: SEED, max_tokens: GEN_MAX_TOKENS, config: 'PROD (llmRouter chat_complex)' },
+    guards_applied: APPLY_GUARDS,
+    pipeline: APPLY_GUARDS ? 'modelo → applyOutputGuards → juez (realidad prod)' : 'modelo → juez (CRUDO, sin guards)',
     judge: {
       model: JUDGE.judgeModel,
       provider: JUDGE.provider,
@@ -511,16 +638,31 @@ async function main() {
       primary_metric: !JUDGE.deterministic,
       metric_quality: JUDGE.deterministic ? 'control-only' : 'semantic',
     },
-    fixture: PROMPTS_FILE,
+    fixtures: PROMPTS_FILES,
+    fixture: PROMPTS_FILES[0], // compat: primera fixture
     n_prompts: prompts.length,
+    category_counts: catCounts,
     // VARIANZA: la métrica honesta es la distribución, no una corrida.
     reps: BENCH_REPS,
-    ah_pct_per_rep: ahValues,
-    ah_pct_mean: ahStats.mean,
-    ah_pct_stddev: ahStats.stddev,
-    ah_pct_min: ahStats.min,
-    ah_pct_max: ahStats.max,
-    ah_pct_ci95: BENCH_REPS > 1 ? [ahStats.ci95Lo, ahStats.ci95Hi] : null,
+    // ── ALUCINACIÓN REAL (métrica primaria) = FAIL/juzgadas = 100 − pass ────────
+    ah_real_pct_per_rep: ahRealValues,
+    ah_real_pct_mean: ahRealStats.mean,
+    ah_real_pct_stddev: ahRealStats.stddev,
+    ah_real_pct_min: ahRealStats.min,
+    ah_real_pct_max: ahRealStats.max,
+    ah_real_pct_ci95: BENCH_REPS > 1 ? [ahRealStats.ci95Lo, ahRealStats.ci95Hi] : null,
+    // ── ACIERTO (lo que el viejo "ah_pct" medía en realidad) ────────────────────
+    pass_pct_per_rep: passValues,
+    pass_pct_mean: passStats.mean,
+    pass_pct_min: passStats.min,
+    pass_pct_max: passStats.max,
+    // ── COMPAT: ah_pct_* = % de ACIERTO (nombre histórico engañoso, NO alucinar) ─
+    ah_pct_per_rep: passValues,
+    ah_pct_mean: passStats.mean,
+    ah_pct_stddev: passStats.stddev,
+    ah_pct_min: passStats.min,
+    ah_pct_max: passStats.max,
+    ah_pct_ci95: BENCH_REPS > 1 ? [passStats.ci95Lo, passStats.ci95Hi] : null,
     variance_measurable: BENCH_REPS > 1,
     // Detalle de la ÚLTIMA rep (compat con herramientas previas que leían una corrida).
     last_rep: {
@@ -528,26 +670,33 @@ async function main() {
       fail: lastRep.fail,
       unjudged: lastRep.unjudged,
       judged: lastRep.judged,
-      ah_pct: Number(lastRep.ahPct.toFixed(1)),
-      by_axis: Object.fromEntries(
-        Object.entries(lastRep.byAxis).map(([k, v]) => [k, { pass: v.pass, total: v.total, ah_pct: Number(((100 * v.pass) / v.total).toFixed(1)) }]),
-      ),
-      by_region: Object.fromEntries(
-        Object.entries(lastRep.byRegion).map(([k, v]) => [k, { pass: v.pass, total: v.total, ah_pct: Number(((100 * v.pass) / v.total).toFixed(1)) }]),
-      ),
-      failed: lastRep.results.filter((r) => r.ah_pass === false).map((r) => ({ id: r.id, axes: r.axes, red_flags_hit: r.ah_red_flags_hit, must: `${r.ah_must_covered}/${r.ah_must_total}` })),
+      pass_pct: Number(lastRep.ahPct.toFixed(1)),
+      ah_real_pct: Number(lastRep.ahReal.toFixed(1)),
+      ah_pct: Number(lastRep.ahPct.toFixed(1)), // compat (= acierto)
+      by_category: breakdown(lastRep.byCategory),
+      by_axis: breakdown(lastRep.byAxis),
+      by_region: breakdown(lastRep.byRegion),
+      failed: lastRep.results.filter((r) => r.ah_pass === false).map((r) => ({ id: r.id, category: r.category, axes: r.axes, red_flags_hit: r.ah_red_flags_hit, must: `${r.ah_must_covered}/${r.ah_must_total}` })),
       guard_misses: lastRep.results
         .filter((r) => Array.isArray(r.expected_guard_miss) && r.expected_guard_miss.length > 0)
-        .map((r) => ({ id: r.id, axes: r.axes, expected_guard_miss: r.expected_guard_miss, guards_reasons: r.guards_reasons })),
+        .map((r) => ({ id: r.id, category: r.category, axes: r.axes, expected_guard_miss: r.expected_guard_miss, guards_reasons: r.guards_reasons })),
       unjudged_ids: lastRep.results.filter((r) => r.judge && r.judge.source === 'unjudged').map((r) => r.id),
     },
   };
   writeFileSync(summaryPath, JSON.stringify(summary, null, 2) + '\n');
 
   console.log('\n══════════════════════════════════════════════════');
-  console.log(formatRepSummary(`AH% (juez ${JUDGE.provider}, config-prod)`, ahStats));
-  if (BENCH_REPS > 1) console.log(`Por rep:    [${ahValues.join(', ')}]`);
-  console.log(`Por eje (última rep): ${JSON.stringify(summary.last_rep.by_axis)}`);
+  console.log(`guards: ${APPLY_GUARDS ? 'ON (realidad prod)' : 'OFF (crudo)'}  | trampas: ${prompts.length}  | reps: ${BENCH_REPS}`);
+  console.log(formatRepSummary(`AH% ALUCINACIÓN REAL (FAIL/juzgadas, juez ${JUDGE.provider})`, ahRealStats));
+  console.log(formatRepSummary('PASS% acierto', passStats));
+  if (BENCH_REPS > 1) {
+    console.log(`AH% por rep:   [${ahRealValues.join(', ')}]  (rango ${ahRealStats.min}–${ahRealStats.max})`);
+    console.log(`PASS% por rep: [${passValues.join(', ')}]`);
+  }
+  console.log('AH% por categoría (última rep):');
+  for (const [cat, v] of Object.entries(summary.last_rep.by_category).sort((a, b) => b[1].ah_pct - a[1].ah_pct)) {
+    console.log(`  ${cat.padEnd(14)} AH%=${String(v.ah_pct).padStart(5)}  (FAIL ${v.total - v.pass}/${v.total})`);
+  }
   console.log(`SUMMARY: ${summaryPath}`);
   console.log('══════════════════════════════════════════════════');
 }
@@ -560,4 +709,4 @@ if (INVOKED_DIRECTLY) {
   });
 }
 
-export { main, splitNegatedHallucinations, expectedGuardMiss };
+export { main, splitNegatedHallucinations, expectedGuardMiss, categoryForAxes, loadPrompts };
