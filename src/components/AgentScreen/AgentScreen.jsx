@@ -1411,12 +1411,16 @@ export default function AgentScreen({ onBack, initialContext }) {
               const modules = [
                 [hasSoilDiagnosticIntent, () => import('../../services/soilDiagnostic'), 'soil_diagnostic', 'suelo'],
               ];
-              // Agua, animal, restauracion disponibles si el intent matcher existe
+              // Agua, animal, restauracion, riesgo-incendio si el intent matcher existe
               try {
-                const { hasWaterDiagnosticIntent, hasAnimalDiagnosticIntent, hasRestauracionDiagnosticIntent } = await import('../../services/knowledgeIntentRouter');
+                const { hasWaterDiagnosticIntent, hasAnimalDiagnosticIntent, hasRestauracionDiagnosticIntent, hasIncendioRiskIntent } = await import('../../services/knowledgeIntentRouter');
                 if (hasWaterDiagnosticIntent) modules.push([hasWaterDiagnosticIntent, async () => { const m = await import('../../services/waterDiagnostic'); return { diagnosticar: m.diagnosticarAgua, formatear: m.formatearGroundingAgua }; }, 'water_diagnostic', 'agua']);
                 if (hasAnimalDiagnosticIntent) modules.push([hasAnimalDiagnosticIntent, async () => { const m = await import('../../services/animalDiagnostic'); return { diagnosticar: m.diagnosticarAnimal, formatear: m.formatearGroundingAnimal }; }, 'animal_diagnostic', 'animal']);
                 if (hasRestauracionDiagnosticIntent) modules.push([hasRestauracionDiagnosticIntent, async () => { const m = await import('../../services/restauracionDiagnostic'); return { diagnosticar: m.diagnosticarRestauracion, formatear: m.formatearGroundingRestauracion }; }, 'restauracion_diagnostic', 'restauracion']);
+                // Riesgo de incendio (estimación ENSO + temporada seca; cero
+                // fabricación, NO alerta oficial). El servicio deriva la región
+                // del perfil y usa la altitud para corregir piso (Galeras/Nariño).
+                if (hasIncendioRiskIntent) modules.push([hasIncendioRiskIntent, async () => { const m = await import('../../services/incendioRiskService'); return { diagnosticar: (_t, o) => ({ ...m.evaluarRiesgoIncendio({ altitud: o?.altitud ?? null }), sin_datos: false }), formatear: (d) => m.formatIncendioContext(d) }; }, 'incendio_riesgo', 'incendio']);
               } catch (_) { /* graceful */ }
               // Carbono/PSA (Task 3): detectarAlertaCarbono
               modules.push([
@@ -1481,7 +1485,18 @@ export default function AgentScreen({ onBack, initialContext }) {
               altitud: fincaAltitudChip,
               pisoTermico: pisoTermicoChip,
             });
-            if (forcedPlan && forcedPlan.tool) {
+            if (forcedPlan && forcedPlan.localGrounding === 'incendio') {
+              // Riesgo de incendio: estimación client-side (NO tool sidecar, NO
+              // API de alerta en tiempo real). Calculamos el bloque honesto y lo
+              // inyectamos como evidence; el LLM lo presenta como estimación.
+              try {
+                const m = await import('../../services/incendioRiskService');
+                const r = m.evaluarRiesgoIncendio({ altitud: forcedPlan.args?.altitud ?? fincaAltitudChip ?? null });
+                const bloque = m.formatIncendioContext(r);
+                toolEvidence = { tool: 'riesgo_incendio', args: forcedPlan.args || {}, result: { found: true, bloque, nivel: r.nivel, es_estimacion: true } };
+                nluRoute = `chip:${forcedIntent}:riesgo_incendio`;
+              } catch (_) { /* graceful: cae al flujo generativo con RAG */ }
+            } else if (forcedPlan && forcedPlan.tool) {
               if (forcedPlan.stub && forcedPlan.stubResult) {
                 // Modo clima sin municipio: inyectamos evidence sintética que
                 // obliga al LLM a PEDIR el municipio (NO inventar datos IDEAM).

@@ -3,6 +3,7 @@ import { FileText, Download, Loader2, CheckCircle2, AlertCircle } from 'lucide-r
 import { ScreenShell } from './common/ScreenShell';
 import { exportTraceabilityCsv } from '../services/exportService';
 import CuadernoPDFButton from './CuadernoPDFButton';
+import RestauracionPlanPDFButton from './RestauracionPlanPDFButton';
 
 /**
  * InformesScreen, sección dedicada para descargar reportes de la finca
@@ -116,6 +117,12 @@ export default function InformesScreen({ onBack, onHome }) {
             orgánica (ICA, ECOCERT, FLO-CERT). Renderiza su propio panel
             con resumen pre-generación + estado de descarga. */}
         <CuadernoPDFButton />
+
+        {/* Plan de restauración ecológica PDF (caso Ana, UNGRD Pasto/Galeras).
+            Diferenciador Pro para gestión de riesgo / restauración: sucesión
+            con nativas por piso térmico + estimación opcional de riesgo de
+            incendio (NO alerta oficial). Reutiliza el patrón cuadernoPDF. */}
+        <RestauracionPlanPDFButton />
 
         {/* Placeholders próximos reportes, comentado hasta tener implementación */}
         <div className="rounded-2xl border border-dashed border-slate-700/60 p-5 bg-slate-900/30">

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chagra-v309';
+const CACHE_NAME = 'chagra-v310';
 
 // Cache de GROUNDING del agente (corpus RAG + embeddings + tiles del mapa).
 // SEPARADO de CACHE_NAME a propósito: su contenido NO está hasheado por
