@@ -103,7 +103,6 @@ import ActionConfirmModal from '../ActionConfirmModal';
 import FeedbackConsentModal from '../FeedbackConsentModal';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import ChagraAgentAvatarColibriPhoto from '../ChagraAgentAvatarColibriPhoto';
-import QuickChipsBar from '../QuickChipsBar';
 import ChipsToolbar from '../ChipsToolbar';
 import { agentSounds } from '../../services/agentSoundService';
 import usePrefsStore from '../../store/usePrefsStore';
@@ -3013,13 +3012,13 @@ export default function AgentScreen({ onBack, initialContext }) {
         <SuggestedActions onSelect={handleSuggestion} />
       )}
 
-      {/* UX-5 (#286): chips de preguntas rápidas. Solo en pantalla nueva
-          (chat vacío) e idle — al primer turn desaparecen para no llenar la
-          UI con sugerencias mientras hay conversación visible. */}
-      {state === STATE_IDLE && messages.length === 0 && (
-        <QuickChipsBar onSelect={handleSuggestion} />
-      )}
-
+      {/* UX-5 (#286) — QuickChipsBar RETIRADA de la pantalla vacía (fire #1,
+          2026-06-15): sus 3 preguntas-ejemplo genéricas se reemplazaron por la
+          ChipsToolbar de capacidades filtrada por perfil (renderizada más
+          abajo, ahora SIEMPRE visible). Así el operador ve, apenas abre el
+          agente, las herramientas reales adaptadas a su persona —en vez de 3
+          ejemplos sueltos— sin duplicar filas de chips. El componente
+          QuickChipsBar se conserva para otros usos/tests. */}
 
       {/* 2026-05-28 UX: banner de contexto de alerta climática. Aparece
           cuando el operador llega desde una notificación con prompt
@@ -3073,19 +3072,26 @@ export default function AgentScreen({ onBack, initialContext }) {
         </div>
       )}
 
-      {/* ── Chips (modo) — fila scrollable unificada.
-          Oculta en pantalla vacía donde QuickChipsBar ya muestra ejemplos
-          (issue #5 duplicación resuelta 2026-06-08). ── */}
-      {(state !== STATE_IDLE || messages.length > 0) && (
-        <ChipsToolbar
-          onSelectIntent={handleChipSelect}
-          activeIntent={activeIntent}
-          hasAttachment={false}
-          disabled={state === STATE_RECORDING}
-          isPro={getCurrentTier() === 'pro'}
-          chipDefs={profileChipDefs}
-        />
-      )}
+      {/* ── Chips de capacidad (modo) — fila scrollable unificada, SIEMPRE
+          visible (incluida la pantalla vacía/idle).
+
+          Fire #1 (2026-06-15): el operador debe VER las herramientas del
+          agente apenas abre la pantalla, sin tener que mandar un mensaje
+          primero. Antes el gate `state !== STATE_IDLE || messages.length > 0`
+          escondía la barra en pantalla vacía (regresión del dedup del issue
+          #5, 2026-06-08), dejando solo 3 ejemplos genéricos. Ahora la barra
+          de modos —ya FILTRADA POR PERFIL (profileChipDefs)— se muestra
+          siempre y REEMPLAZA a QuickChipsBar en la pantalla nueva: una sola
+          fila de chips (sin duplicación), pero ahora son las capacidades
+          reales del agente, adaptadas a la persona. ── */}
+      <ChipsToolbar
+        onSelectIntent={handleChipSelect}
+        activeIntent={activeIntent}
+        hasAttachment={false}
+        disabled={state === STATE_RECORDING}
+        isPro={getCurrentTier() === 'pro'}
+        chipDefs={profileChipDefs}
+      />
 
       {/* ── Compositor pill — paridad completa AgentHero (2026-06-08).
           Superficie OPACA por token (.agent-bar-surface) para legibilidad sobre
