@@ -3,7 +3,7 @@ import { Bell, X, AlertTriangle, Info, AlertCircle, Sprout, Cloud, CloudFog, Wif
 import useAssetStore from '../store/useAssetStore';
 import useAlertStore from '../store/useAlertStore';
 import useFincaActiveStore from '../services/fincaActiveStore';
-import { aggregateNotifications, dismissNotification } from '../services/notificationsService';
+import { aggregateNotifications, dismissNotification, resolveCalendarMonth } from '../services/notificationsService';
 import { syncManager } from '../services/syncManager';
 import { useLogStore } from '../store/useLogStore';
 // PoC alertas meteorológicas (#316) — fuente de verdad ENSO + alertas locales.
@@ -176,7 +176,7 @@ export default function NotificationsBell({ onNavigate }) {
             hasUpdate: readUpdateAvailable(),
             onboardingComplete: readOnboardingComplete(),
             bioculturalZone: finca?.biocultural_zone || null,
-            calendarMonth: null,
+            calendarMonth: resolveCalendarMonth(finca?.biocultural_zone || null),
             iotAlerts: mapSensorAlertsToIot(sensorAlerts),
         });
         // tick force re-run on dismiss event
