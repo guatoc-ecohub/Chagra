@@ -29,9 +29,13 @@ afterEach(() => {
 describe('climaService — phase helpers', () => {
   it('describePhase maps known phases', async () => {
     const mod = await importFresh();
-    expect(mod.describePhase('nino_fuerte')).toBe('El Niño fuerte');
-    expect(mod.describePhase('nina_debil')).toBe('La Niña débil');
-    expect(mod.describePhase('neutral')).toBe('Neutral ENSO');
+    // describePhase devuelve GUÍA accionable para el campesino, no la etiqueta
+    // técnica de la fase. Asertamos el ancla semántica con toContain para que
+    // un retoque de copy no re-rompa el test pero sí verifique que describe la
+    // fase correcta (seco para El Niño, parejo para neutral, etc.).
+    expect(mod.describePhase('nino_fuerte')).toContain('sequia');
+    expect(mod.describePhase('nina_debil')).toContain('lluvioso');
+    expect(mod.describePhase('neutral')).toContain('parejo');
   });
 
   it('phaseBadgeColor maps to expected accent', async () => {
@@ -285,8 +289,10 @@ describe('climaService — cache + fetch', () => {
 
   it('GR-9: describePhase entiende las fases manuales genéricas', async () => {
     const mod = await importFresh();
-    expect(mod.describePhase('nino')).toBe('El Niño');
-    expect(mod.describePhase('nina')).toBe('La Niña');
+    // Fases genéricas (sin intensidad): la guía debe nombrar el fenómeno y dar
+    // el consejo base. toContain por la misma razón que el test de arriba.
+    expect(mod.describePhase('nino')).toContain('El Niño');
+    expect(mod.describePhase('nina')).toContain('La Niña');
   });
 
   it('two simultaneous fetches share the in-flight promise', async () => {

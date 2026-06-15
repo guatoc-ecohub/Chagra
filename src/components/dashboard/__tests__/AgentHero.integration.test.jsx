@@ -14,7 +14,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { describe, test, expect, vi, beforeEach } from 'vitest';
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // ── Mock del store outbox (send durable) ─────────────────────────────────────
 const sendMock = vi.fn(async () => 1);
@@ -112,12 +112,20 @@ import AgentHero from '../AgentHero';
 import { getProfile, saveProfile, getProfileMunicipio } from '../../../services/userProfileService';
 
 beforeEach(() => {
+  // El menú Ⓐ marca cada capacidad con getCapabilityHealth(): una capacidad
+  // cuya tool vive en el sidecar (ej. 'Plaga' → get_pest_controllers) sale
+  // 'down' ("… sin conexión al servidor") cuando VITE_USE_SIDECAR_AGRO_MCP no
+  // está set, cambiando su aria-label y rompiendo getByLabelText('Plaga'). En
+  // un browser real con sidecar activo la capacidad está viva; acá habilitamos
+  // la flag para reproducir ese estado (entorno, no lógica de prod).
+  vi.stubEnv('VITE_USE_SIDECAR_AGRO_MCP', 'true');
+
   sendMock.mockClear();
   recorderState.isRecording = false;
   recorderState.start.mockClear();
   recorderState.stop.mockClear();
   recorderState.reset.mockClear();
-  
+
   // Reset profile mocks to default values
   getProfile.mockReturnValue({
     nivel_respuestas: 'simple',
@@ -140,6 +148,11 @@ beforeEach(() => {
   }));
   window.URL.createObjectURL = vi.fn(() => 'blob:preview');
   window.URL.revokeObjectURL = vi.fn();
+});
+
+afterEach(() => {
+  // No filtrar VITE_USE_SIDECAR_AGRO_MCP a otros archivos de test.
+  vi.unstubAllEnvs();
 });
 
 describe('AgentHero — integración post-pulido (task #TEST-int)', () => {

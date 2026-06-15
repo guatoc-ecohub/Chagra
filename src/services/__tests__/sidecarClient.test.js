@@ -271,10 +271,14 @@ describe('sidecarClient — feature flag on', () => {
       expect(res).toEqual({ found: false });
     });
 
-    it('tool name no permitido → null sin fetch (whitelist defense)', async () => {
+    it('tool name no permitido → ToolError not_allowed sin fetch (whitelist defense)', async () => {
       const { callTool } = await importFresh();
       const res = await callTool('delete_everything', {});
-      expect(res).toBeNull();
+      // Contrato tri-estado documentado de callTool (JSDoc): un tool intentado
+      // pero rechazado por la whitelist devuelve ToolError {_error,reason,tool},
+      // NO null (null se reserva para "ni se intentó": flag off / offline). Esto
+      // permite al caller distinguir "bloqueado" de "no aplica".
+      expect(res).toEqual({ _error: true, reason: 'not_allowed', tool: 'delete_everything' });
       expect(fetchMock).not.toHaveBeenCalled();
     });
 
@@ -304,11 +308,14 @@ describe('sidecarClient — feature flag on', () => {
       expect(__TEST__.ALLOWED_TOOLS.has('get_precio_sipsa')).toBe(true);
     });
 
-    it('5xx → null sin throw', async () => {
+    it('5xx → ToolError fetch_failed sin throw', async () => {
       fetchMock.mockResolvedValueOnce(jsonResponse(500, { error: 'kg down' }));
       const { callTool } = await importFresh();
       const res = await callTool('get_companions', { species_id: 'maiz' });
-      expect(res).toBeNull();
+      // Tool permitido + intentado pero el sidecar respondió 5xx → ToolError
+      // fetch_failed (contrato tri-estado), no null. El turno no se rompe (no
+      // throw) y el formatter puede señalar el gap al LLM.
+      expect(res).toEqual({ _error: true, reason: 'fetch_failed', tool: 'get_companions' });
     });
   });
 
