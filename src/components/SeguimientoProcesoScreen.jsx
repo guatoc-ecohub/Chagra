@@ -10,6 +10,9 @@ import useAssetStore from '../store/useAssetStore';
 import CicloObservacion from './CicloObservacion';
 import CicloFotos from './CicloFotos';
 import ChagraGrowLoader from './ChagraGrowLoader';
+import CarbonoPsaSubvista from './CarbonoPsaSubvista';
+import useFincaActiveStore from '../services/fincaActiveStore';
+import { getProfile } from '../services/userProfileService';
 import animalDiagnostics from '../data/animal-diagnostics.json';
 
 /**
@@ -442,6 +445,16 @@ function ProcesoDetalle({ def, proceso, stageSeq, locationOptions = [], onReload
     return locationOptions.find((o) => o.id === a.location_land_asset_id)?.label || null;
   }, [a.location_land_asset_id, locationOptions]);
 
+  // Perfil de la finca para la sub-vista de Carbono/PSA (solo reforestación).
+  // Misma fuente que RestauracionPlanPDFButton: finca activa + perfil de usuario.
+  // Si no hay altitud conocida, queda undefined — NO se inventa.
+  const activeFinca = useFincaActiveStore((s) => s.getActiveFinca());
+  const perfilFinca = useMemo(() => {
+    const profile = (() => { try { return getProfile(); } catch { return null; } })();
+    const altitud = activeFinca?.altitud ?? profile?.finca_altitud ?? profile?.altitud ?? undefined;
+    return { altitud: altitud == null ? undefined : Number(altitud), enParamo: Number(altitud) >= 3000 || undefined };
+  }, [activeFinca]);
+
   const loadEvents = useCallback(async () => {
     try { setEvents((await getFarmEvents(processId)) || []); }
     catch { setEvents([]); }
@@ -542,6 +555,12 @@ function ProcesoDetalle({ def, proceso, stageSeq, locationOptions = [], onReload
         </ol>
         <p className="text-3xs text-slate-600 mt-1.5">Toca una etapa para marcar el avance. Los detalles técnicos de cada hito están por validar [VALIDAR].</p>
       </section>
+
+      {/* Carbono y PSA — solo en Reforestación (restoration). Hereda el gate por
+          perfil de Reforestación (el perfil urbano nunca llega a esta vista). */}
+      {def.processType === 'restoration' && (
+        <CarbonoPsaSubvista proceso={proceso} perfilFinca={perfilFinca} />
+      )}
 
       {/* Observaciones (reusa el motor del ciclo) */}
       <CicloObservacion processId={processId} currentStage={a.current_stage} onSaved={() => { loadEvents(); onReload?.(); }} />
