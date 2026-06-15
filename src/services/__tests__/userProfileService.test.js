@@ -15,6 +15,10 @@ import {
   DEFAULT_NOTIFICATION_STYLE,
   getTelemetryConsent,
   setTelemetryConsent,
+  HOME_MODULES,
+  getModuleVisibility,
+  setModuleVisibility,
+  isModuleVisible,
   __PROFILE_KEYS__,
 } from '../userProfileService.js';
 
@@ -334,5 +338,156 @@ describe('consentimiento de telemetría (#6230)', () => {
 
   it('__PROFILE_KEYS__ exporta la key de consentimiento', () => {
     expect(__PROFILE_KEYS__.TELEMETRY_CONSENT_KEY).toContain('telemetry_consent');
+  });
+});
+
+describe('visibilidad de módulos del Home (#7003)', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  describe('catálogo HOME_MODULES', () => {
+    it('define todos los módulos del dashboard', () => {
+      const ids = HOME_MODULES.map((m) => m.id);
+      const expectedIds = [
+        'hoyfinca',
+        'clima',
+        'analisis',
+        'plantas',
+        'zonas',
+        'insumos',
+        'bitacora',
+        'hoy',
+        'plagas',
+        'biodiversidad',
+        'informes',
+      ];
+      expect(ids).toEqual(expectedIds);
+    });
+
+    it('cada módulo tiene id, label, description y category', () => {
+      for (const module of HOME_MODULES) {
+        expect(module.id).toBeTruthy();
+        expect(module.label).toBeTruthy();
+        expect(module.description).toBeTruthy();
+        expect(module.category).toBeTruthy();
+      }
+    });
+
+    it('los ids son únicos', () => {
+      const ids = HOME_MODULES.map((m) => m.id);
+      expect(new Set(ids).size).toBe(ids.length);
+    });
+  });
+
+  describe('getModuleVisibility', () => {
+    it('sin perfil devuelve todos los módulos visibles (true)', () => {
+      const visibility = getModuleVisibility();
+      for (const module of HOME_MODULES) {
+        expect(visibility[module.id]).toBe(true);
+      }
+    });
+
+    it('con perfil vacío devuelve todos los módulos visibles', () => {
+      saveProfile({});
+      const visibility = getModuleVisibility();
+      for (const module of HOME_MODULES) {
+        expect(visibility[module.id]).toBe(true);
+      }
+    });
+
+    it('lee configuración guardada correctamente', () => {
+      saveProfile({
+        modulos_visibles: {
+          clima: false,
+          plantas: false,
+        },
+      });
+      const visibility = getModuleVisibility();
+      expect(visibility.clima).toBe(false);
+      expect(visibility.plantas).toBe(false);
+      expect(visibility.zonas).toBe(true); // No guardado → true por defecto
+    });
+
+    it('nuevos módulos (no guardados) son visibles por defecto', () => {
+      saveProfile({
+        modulos_visibles: {
+          clima: false,
+        },
+      });
+      const visibility = getModuleVisibility();
+      expect(visibility.clima).toBe(false);
+      expect(visibility.analisis).toBe(true); // Nuevo módulo → true
+    });
+  });
+
+  describe('setModuleVisibility', () => {
+    it('guarda configuración de visibilidad en el perfil', () => {
+      setModuleVisibility({
+        clima: false,
+        plantas: false,
+        zonas: true,
+      });
+      const profile = getProfile();
+      expect(profile.modulos_visibles).toBeDefined();
+      expect(profile.modulos_visibles.clima).toBe(false);
+      expect(profile.modulos_visibles.plantas).toBe(false);
+      // true no se guarda (implícito)
+      expect(profile.modulos_visibles.zonas).toBeUndefined();
+    });
+
+    it('solo guarda módulos conocidos', () => {
+      setModuleVisibility({
+        clima: false,
+        modulo_inventado: true,
+      });
+      const profile = getProfile();
+      expect(profile.modulos_visibles.clima).toBe(false);
+      expect(profile.modulos_visibles.modulo_inventado).toBeUndefined();
+    });
+
+    it('reemplaza configuración anterior', () => {
+      setModuleVisibility({ clima: false, plantas: false });
+      setModuleVisibility({ clima: true });
+      const visibility = getModuleVisibility();
+      expect(visibility.clima).toBe(true);
+      expect(visibility.plantas).toBe(true); // Reset a implícito true
+    });
+
+    it('ignora argumentos inválidos', () => {
+      saveProfile({ modulos_visibles: { clima: false } });
+      setModuleVisibility(null);
+      const profile = getProfile();
+      expect(profile.modulos_visibles.clima).toBe(false); // Sin cambios
+    });
+  });
+
+  describe('isModuleVisible', () => {
+    it('devuelve true para módulos sin configuración (default)', () => {
+      expect(isModuleVisible('clima')).toBe(true);
+      expect(isModuleVisible('plantas')).toBe(true);
+    });
+
+    it('devuelve false para módulos explícitamente ocultos', () => {
+      saveProfile({ modulos_visibles: { clima: false } });
+      expect(isModuleVisible('clima')).toBe(false);
+    });
+
+    it('devuelve true para módulos explícitamente visibles', () => {
+      saveProfile({ modulos_visibles: { clima: true } });
+      expect(isModuleVisible('clima')).toBe(true);
+    });
+
+    it('módulos desconocidos son visibles (fail-open)', () => {
+      expect(isModuleVisible('modulo_inventado')).toBe(true);
+    });
+
+    it('responde a cambios en tiempo de ejecución', () => {
+      expect(isModuleVisible('clima')).toBe(true);
+      setModuleVisibility({ clima: false });
+      expect(isModuleVisible('clima')).toBe(false);
+      setModuleVisibility({ clima: true });
+      expect(isModuleVisible('clima')).toBe(true);
+    });
   });
 });

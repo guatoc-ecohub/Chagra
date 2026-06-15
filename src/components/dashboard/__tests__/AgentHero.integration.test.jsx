@@ -62,6 +62,7 @@ vi.mock('../../../services/userProfileService', () => ({
   saveProfile: vi.fn(),
   getProfileMunicipio: vi.fn(() => 'Subachoque, Cundinamarca'),
   getNotificationStyle: vi.fn(() => 'demo'),
+  isModuleVisible: vi.fn(() => true),
 }));
 
 // ── Mock de useTheme ───────────────────────────────────────────────────────

@@ -585,6 +585,158 @@ export function setTelemetryConsent(enabled) {
   }
 }
 
+/**
+ * Visibilidad de módulos del Home (#7003).
+ *
+ * El usuario puede elegir qué módulos del Home se muestran. Por defecto
+ * todos los módulos están visibles. La configuración se guarda en el perfil
+ * bajo el campo 'modulos_visibles' como un objeto { moduleId: boolean }.
+ */
+
+/**
+ * Catálogo de módulos disponibles en el Home.
+ *
+ * Cada módulo tiene:
+ *   - id: identificador único (coincide con SECTION_COMPONENTS en DashboardLive)
+ *   - label: nombre legible para el usuario
+ *   - description: descripción corta
+ *   - category: categoría agrupadora (para organización en ProfileScreen)
+ */
+export const HOME_MODULES = Object.freeze([
+  {
+    id: 'hoyfinca',
+    label: 'Hoy en la finca',
+    description: 'Resumen del día con clima honesto, alertas y tareas pendientes',
+    category: 'principal',
+  },
+  {
+    id: 'clima',
+    label: 'Clima',
+    description: 'Pronóstico del clima para tu zona (7 días)',
+    category: 'principal',
+  },
+  {
+    id: 'analisis',
+    label: 'Análisis IA',
+    description: 'Análisis proactivo de IA sobre sensores, clima y cultivos',
+    category: 'ia',
+  },
+  {
+    id: 'plantas',
+    label: 'Plantas',
+    description: 'Inventario de plantas registradas',
+    category: 'inventario',
+  },
+  {
+    id: 'zonas',
+    label: 'Zonas',
+    description: 'Mapa de zonas y cuadros de la finca',
+    category: 'inventario',
+  },
+  {
+    id: 'insumos',
+    label: 'Insumos',
+    description: 'Registro de insumos y materiales',
+    category: 'inventario',
+  },
+  {
+    id: 'bitacora',
+    label: 'Bitácora',
+    description: 'Registro de actividades y observaciones',
+    category: 'registro',
+  },
+  {
+    id: 'hoy',
+    label: 'Historial hoy',
+    description: 'Actividades registradas en el día de hoy',
+    category: 'registro',
+  },
+  {
+    id: 'plagas',
+    label: 'Plagas',
+    description: 'Registro de plagas y problemas detectados',
+    category: 'sanidad',
+  },
+  {
+    id: 'biodiversidad',
+    label: 'Biodiversidad',
+    description: 'Diversidad de especies y polinizadores',
+    category: 'ecosistema',
+  },
+  {
+    id: 'informes',
+    label: 'Informes',
+    description: 'Reportes y análisis de la finca',
+    category: 'reportes',
+  },
+]);
+
+/**
+ * Lee la configuración de visibilidad de módulos.
+ *
+ * @returns {Object} { moduleId: boolean } con true para visibles, false para ocultos.
+ *                   Si no hay configuración, devuelve un objeto con todos los módulos en true.
+ */
+export function getModuleVisibility() {
+  const profile = getProfile();
+  if (!profile || typeof profile !== 'object') {
+    // Sin perfil → todos visibles
+    return Object.fromEntries(HOME_MODULES.map(m => [m.id, true]));
+  }
+
+  const saved = profile.modulos_visibles;
+  if (!saved || typeof saved !== 'object') {
+    // Sin configuración guardada → todos visibles
+    return Object.fromEntries(HOME_MODULES.map(m => [m.id, true]));
+  }
+
+  // Merge: módulos nuevos (no guardados) → true por defecto
+  const result = {};
+  for (const module of HOME_MODULES) {
+    const value = saved[module.id];
+    // Solo true explícito o undefined (new modules). false explícito se respeta.
+    result[module.id] = value !== false;
+  }
+  return result;
+}
+
+/**
+ * Persiste la configuración de visibilidad de módulos.
+ *
+ * @param {Object} visibility - { moduleId: boolean }
+ * @returns {Object} perfil resultante
+ */
+export function setModuleVisibility(visibility) {
+  if (!visibility || typeof visibility !== 'object') {
+    console.warn('[userProfile] setModuleVisibility: argumento inválido', visibility);
+    return getProfile();
+  }
+
+  // Solo guardar módulos conocidos (evitar contaminación con keys extra)
+  const clean = {};
+  for (const module of HOME_MODULES) {
+    if (visibility[module.id] === false) {
+      clean[module.id] = false;
+    }
+    // true es implícito (no guardamos para ahorrar espacio)
+  }
+
+  return saveProfile({ modulos_visibles: clean });
+}
+
+/**
+ * Devuelve true si un módulo está visible según la configuración del usuario.
+ *
+ * @param {string} moduleId - ID del módulo (ej: 'clima', 'plantas')
+ * @returns {boolean}
+ */
+export function isModuleVisible(moduleId) {
+  const visibility = getModuleVisibility();
+  // Módulo desconocido → visible (fail-open para evitar romper con módulos nuevos)
+  if (visibility[moduleId] === undefined) return true;
+  return visibility[moduleId] !== false;
+}
+
 export const __PROFILE_KEYS__ = {
   PROFILE_KEY,
   PROFILE_DONE_KEY,
