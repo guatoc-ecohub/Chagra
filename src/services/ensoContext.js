@@ -144,6 +144,11 @@ const DEPTO_TO_REGION = Object.freeze({
  * Normaliza una fase ENSO a una de tres familias: 'nino' | 'nina' | 'neutral'.
  * Acepta los slugs del sidecar (nino_fuerte, nina_debil, neutral, etc.).
  */
+/**
+ * Normaliza una fase ENSO a una de tres familias: 'nino', 'nina' o 'neutral'.
+ * @param {string} phase
+ * @returns {'nino'|'nina'|'neutral'}
+ */
 export function ensoFamily(phase) {
     if (typeof phase !== 'string') return 'neutral';
     if (phase.startsWith('nino')) return 'nino';

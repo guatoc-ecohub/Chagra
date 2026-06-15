@@ -5,6 +5,11 @@
  * o redefinir en vitest. Esta indirección permite a los tests mockear la
  * recarga (vi.mock) sin tocar el comportamiento en producción.
  */
+/**
+ * Recarga la pagina actual. Existe como indireccion para que los tests
+ * puedan mockearla sin tocar el comportamiento en produccion.
+ * @returns {void}
+ */
 export function reloadPage() {
   window.location.reload();
 }

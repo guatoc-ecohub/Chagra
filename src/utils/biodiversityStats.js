@@ -31,6 +31,9 @@ const FIELD_RE = (key) => new RegExp(`${key}:\\s*([^|]+?)\\s*(?:\\||$)`, 'i');
  * Normaliza un string para matching: lowercase + sin tildes + trim.
  * Quita además sufijos del tipo "#001" usados en siembras bulk-individual,
  * porque el catálogo nunca los lleva ("Gulupa #003" → "gulupa").
+ *
+ * @param {string} s - String a normalizar.
+ * @returns {string} String normalizado (vacío si la entrada no es string válido).
  */
 export const normalizeForMatch = (s) => {
   if (!s || typeof s !== 'string') return '';
@@ -54,8 +57,11 @@ export const normalizeForMatch = (s) => {
  *     SpeciesSelect deja en attributes.name al elegir desde el fuzzy search.
  *   - nombre_cientifico normalizado
  *
- * Múltiples plants pueden share el mismo display name, pero el índice resuelve
+ * Múltiples plants pueden sharear el mismo display name, pero el índice resuelve
  * uno a uno gracias a estas variantes redundantes.
+ *
+ * @param {Array} allSpecies - Array de especies del catálogo (formato getAllSpecies()).
+ * @returns {Map<string, object>} Mapa de nombre normalizado a objeto especie.
  */
 export const buildSpeciesIndex = (allSpecies) => {
   const index = new Map();
@@ -111,6 +117,10 @@ const lookupSpecies = (plant, speciesIndex) => {
  *
  * Devuelve `{ estrato, gremio }` con strings normalizados (lowercase) o
  * `null` por campo si no se pudo resolver.
+ *
+ * @param {object} plant - Asset planta con attributes.name y attributes.notes.
+ * @param {Map} speciesIndex - Índice de especies construido por buildSpeciesIndex().
+ * @returns {{ estrato: string|null, gremio: string|null }} Rasgos resueltos desde catálogo o notes.
  */
 export const resolvePlantTraits = (plant, speciesIndex) => {
   const sp = lookupSpecies(plant, speciesIndex);

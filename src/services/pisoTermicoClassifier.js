@@ -1,5 +1,10 @@
 import PISOS from '../data/piso-termico.json';
 
+/**
+ * Clasifica el piso termico colombiano segun altitud.
+ * @param {number} altitudMsnm
+ * @returns {object|null}
+ */
 export function clasificarPisoTermico(altitudMsnm) {
   if (typeof altitudMsnm !== 'number' || altitudMsnm < 0) return null;
   const piso = PISOS.pisos.find((p) => {

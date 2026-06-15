@@ -169,7 +169,10 @@ export function moonPathD(fraction, cx = 32, cy = 32, r = 13) {
 }
 
 /**
- * Formatea una fecha como HH:MM en hora local (24h).
+ * Formatea una fecha como HH:MM en hora local (24h) usando locale es-CO.
+ *
+ * @param {Date|null} date - Fecha a formatear.
+ * @returns {string} Hora formateada "HH:MM" o "—" si date es nulo.
  */
 export function formatLocalHM(date) {
   if (!date) return '—';
@@ -181,7 +184,10 @@ export function formatLocalHM(date) {
 }
 
 /**
- * Formatea minutos como "Xh Ym".
+ * Formatea minutos como "Xh YYm" (ej. "12h 30m").
+ *
+ * @param {number} minutes - Duración en minutos.
+ * @returns {string} Duración formateada o "—" si el valor no es finito/positivo.
  */
 export function formatDayLength(minutes) {
   if (!Number.isFinite(minutes) || minutes <= 0) return '—';
