@@ -39,8 +39,8 @@ describe('extensionistaAccess — esExtensionista (función pura)', () => {
   });
 
   it('devuelve true para usernames extensionistas de la whitelist', () => {
-    // El operador (Miguel) es extensionista en el seed por defecto.
-    expect(mod.esExtensionista('kortux')).toBe(true);
+    // El username de demo está en la whitelist seed por defecto.
+    expect(mod.esExtensionista('demo-extensionista')).toBe(true);
   });
 
   it('devuelve false para usernames fuera de la whitelist', () => {
@@ -57,8 +57,8 @@ describe('extensionistaAccess — esExtensionista (función pura)', () => {
   });
 
   it('hace match case-insensitive y tolerante a espacios (trim)', () => {
-    expect(mod.esExtensionista('  KORTUX  ')).toBe(true);
-    expect(mod.esExtensionista('Kortux')).toBe(true);
+    expect(mod.esExtensionista('  DEMO-EXTENSIONISTA  ')).toBe(true);
+    expect(mod.esExtensionista('Demo-Extensionista')).toBe(true);
   });
 
   it('EXTENSIONISTA_WHITELIST es un Set no vacío y editable', () => {
@@ -76,21 +76,21 @@ describe('extensionistaAccess — feature flag VITE_FEATURE_EXTENSIONISTA (kill-
     vi.stubEnv('VITE_FEATURE_EXTENSIONISTA', 'false');
     const mod = await importFresh();
     expect(mod.featureExtensionistaActivo()).toBe(false);
-    expect(mod.esExtensionista('kortux')).toBe(false);
+    expect(mod.esExtensionista('demo-extensionista')).toBe(false);
   });
 
   it('con la flag indefinida (default) el modo está apagado', async () => {
     vi.stubEnv('VITE_FEATURE_EXTENSIONISTA', '');
     const mod = await importFresh();
     expect(mod.featureExtensionistaActivo()).toBe(false);
-    expect(mod.esExtensionista('kortux')).toBe(false);
+    expect(mod.esExtensionista('demo-extensionista')).toBe(false);
   });
 
   it('acepta "1" como string-verdadero para la flag', async () => {
     vi.stubEnv('VITE_FEATURE_EXTENSIONISTA', '1');
     const mod = await importFresh();
     expect(mod.featureExtensionistaActivo()).toBe(true);
-    expect(mod.esExtensionista('kortux')).toBe(true);
+    expect(mod.esExtensionista('demo-extensionista')).toBe(true);
   });
 });
 
@@ -108,7 +108,7 @@ describe('extensionistaAccess — esExtensionistaActual (lee tenant activo, offl
   it('true cuando el tenant activo está en la whitelist', async () => {
     const mod = await importFresh();
     // tenantContext persiste en esta misma key.
-    localStorage.setItem('chagra:active_tenant_id', 'kortux');
+    localStorage.setItem('chagra:active_tenant_id', 'demo-extensionista');
     expect(mod.esExtensionistaActual()).toBe(true);
   });
 

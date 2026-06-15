@@ -63,7 +63,7 @@ beforeEach(() => {
   esExtensionistaActual.mockReset();
   construirTableroExtensionista.mockReset();
   getActiveTenantId.mockReset();
-  getActiveTenantId.mockReturnValue('kortux');
+  getActiveTenantId.mockReturnValue('demo-extensionista');
 });
 afterEach(() => cleanup());
 

@@ -3,7 +3,7 @@
   "esquema": "src/services/extensionistaService.js",
   "delegaciones": [
     {
-      "extensionista": "kortux",
+      "extensionista": "demo-extensionista",
       "fincas": [
         {
           "slug": "finca-la-esperanza",
