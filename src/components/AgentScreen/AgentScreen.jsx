@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw, X, Home, Camera, Square } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { transcribe, queueForRetry } from '../../services/voiceService';
@@ -73,7 +73,9 @@ import { summarizeSkyForGrounding } from '../../services/skyConditionService';
 import { assembleSystemContent } from '../../services/promptAssembler';
 import { applyOutputGuards, classifyQueryIntent } from '../../services/outputGuards';
 import { createStreamGuard } from '../../services/streamGuards';
-import { getProfile } from '../../services/userProfileService';
+import { getProfile, getModuleVisibility } from '../../services/userProfileService';
+import { selectChipDefs } from '../../services/profileChipSelector';
+import { tieneAccesoGlaciarActual } from '../../config/glaciarAccess';
 import { captureExchange } from '../../services/conversationCaptureService';
 import { regionFromProfile, getEnsoOutlook } from '../../services/ensoContext';
 // SALUDO PROACTIVO (#162 alertas + #298 tareas + #331 análisis): el agente, de
@@ -239,6 +241,26 @@ export default function AgentScreen({ onBack, initialContext }) {
   // input también cambia para guiar al campesino sobre qué escribir. Es un
   // toggle: tocar el mismo chip lo desactiva (vuelve al routing NLU normal).
   const [activeIntent, setActiveIntent] = useState(null);
+  // CHIPS ADAPTATIVOS POR PERFIL: la "caja de herramientas" despliega los chips
+  // MÁS APROPIADOS para esta persona (campesino→cultivo, restaurador→páramo/
+  // silvopastoreo, guía glaciar→clima/páramo, ganadero→silvopastoreo...). La
+  // SELECCIÓN/lógica vive en profileChipSelector (puro, testeado); aquí solo
+  // leemos el perfil + módulos visibles + acceso glaciar y le pasamos la lista
+  // ya filtrada a la ChipsToolbar. NO tocamos su CSS (otro stream lleva estilo).
+  // Memoizado al montar: el perfil rara vez cambia dentro de la sesión del chat
+  // (mismo criterio que los otros getProfile() de este componente).
+  const profileChipDefs = useMemo(() => {
+    try {
+      const profile = getProfile();
+      return selectChipDefs(profile, {
+        esGuiaGlaciar: tieneAccesoGlaciarActual(),
+        moduleVisibility: getModuleVisibility(),
+      });
+    } catch (_) {
+      // Si algo falla, null → ChipsToolbar cae a su catálogo completo (default).
+      return null;
+    }
+  }, []);
   // Hoja de capacidades (paridad AgentHero Ⓐ).
   const [sheetOpen, setSheetOpen] = useState(false);
   // Fase del compositor para la animación shimmer/lift al enviar.
@@ -3040,6 +3062,7 @@ export default function AgentScreen({ onBack, initialContext }) {
           hasAttachment={false}
           disabled={state === STATE_RECORDING}
           isPro={getCurrentTier() === 'pro'}
+          chipDefs={profileChipDefs}
         />
       )}
 
@@ -3388,7 +3411,7 @@ export default function AgentScreen({ onBack, initialContext }) {
               <p className="text-sm text-slate-400 mt-1">Toca una opción para empezar. Toda respuesta viene con su fuente.</p>
             </div>
             <div className="px-4 pb-4 overflow-y-auto flex flex-col gap-3">
-              {CHIP_DEFS.map((chip) => (
+              {(profileChipDefs || CHIP_DEFS).map((chip) => (
                 <button
                   key={chip.intent}
                   type="button"
