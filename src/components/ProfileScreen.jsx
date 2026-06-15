@@ -297,11 +297,14 @@ export default function ProfileScreen({ onBack, onHome }) {
                 >
                   <Camera size={16} aria-hidden="true" />
                 </button>
+                {/* SIN `capture` (operador 2026-06-15): el atributo `capture`
+                    forzaba la cámara y ocultaba la galería en móvil. Quitándolo,
+                    el SO ofrece AMBOS — cámara y galería/archivos — que es lo que
+                    el operador espera para elegir una foto ya existente. */}
                 <input
                   ref={photoInputRef}
                   type="file"
                   accept="image/*"
-                  capture="user"
                   onChange={handlePhotoSelected}
                   className="hidden"
                   aria-hidden="true"

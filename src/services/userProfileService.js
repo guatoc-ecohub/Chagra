@@ -853,6 +853,145 @@ export function isModuleVisible(moduleId) {
   return visibility[moduleId] !== false;
 }
 
+/**
+ * Orden de los módulos del Home (reordenable por drag, 2026-06-15).
+ *
+ * El usuario puede MOVER a su antojo las tarjetas de módulo del home
+ * (DashboardLive), excepto la portada del agente (AgentHero), que queda fija
+ * arriba. El orden elegido se persiste en el perfil bajo `modulos_orden`
+ * (junto a `modulos_visibles`) — client-side, soberanía ADR-007.
+ *
+ * El orden por DEFECTO replica el layout histórico del home. El AgentHero NO
+ * aparece en esta lista a propósito: vive fijo fuera del grid draggable.
+ *
+ * v3 (2026-06-11): 'hoyfinca' (HoyEnFincaStrip) como primera sección.
+ */
+export const HOME_MODULE_DEFAULT_ORDER = Object.freeze([
+  'hoyfinca',
+  'clima',
+  'analisis',
+  'plantas',
+  'hoy',
+  'zonas',
+  'insumos',
+  'plagas',
+  'bitacora',
+  'biodiversidad',
+  'informes',
+]);
+
+// Clave localStorage LEGADO donde DashboardLive guardaba el orden antes de
+// migrarlo al perfil (2026-06-15). La conservamos solo para MIGRAR el orden de
+// usuarios existentes a `modulos_orden` la primera vez; luego el perfil manda.
+const LEGACY_MODULE_ORDER_KEY = 'chagra:dashboard-order:v3';
+
+/** IDs de módulo conocidos (las claves de orden válidas). */
+const KNOWN_MODULE_IDS = new Set(HOME_MODULES.map((m) => m.id));
+
+/**
+ * Normaliza una lista de orden: descarta ids desconocidos y duplicados, y
+ * agrega al final los módulos faltantes (nuevos módulos post-deploy) en el
+ * orden por defecto. Garantiza que SIEMPRE se devuelven todos los módulos
+ * conocidos exactamente una vez.
+ *
+ * @param {string[]} raw
+ * @returns {string[]}
+ */
+function normalizeModuleOrder(raw) {
+  const seen = new Set();
+  const valid = [];
+  if (Array.isArray(raw)) {
+    for (const id of raw) {
+      if (KNOWN_MODULE_IDS.has(id) && !seen.has(id)) {
+        seen.add(id);
+        valid.push(id);
+      }
+    }
+  }
+  for (const id of HOME_MODULE_DEFAULT_ORDER) {
+    if (!seen.has(id)) {
+      seen.add(id);
+      valid.push(id);
+    }
+  }
+  return valid;
+}
+
+/**
+ * ¿El usuario guardó un orden MANUAL de módulos en el perfil?
+ *
+ * Devuelve true solo si existe el array `modulos_orden` en el perfil. Sirve
+ * para decidir si hay que migrar el orden legado de localStorage.
+ *
+ * @returns {boolean}
+ */
+export function hasManualModuleOrder() {
+  const profile = getProfile();
+  return !!(
+    profile &&
+    typeof profile === 'object' &&
+    Array.isArray(profile.modulos_orden)
+  );
+}
+
+/**
+ * Lee el orden de módulos del Home.
+ *
+ * Precedencia:
+ *   1. `modulos_orden` del perfil (elección manual del usuario).
+ *   2. Orden LEGADO en localStorage (`chagra:dashboard-order:v3`) — se MIGRA
+ *      al perfil en el primer acceso para no perder la preferencia previa.
+ *   3. Orden por defecto.
+ *
+ * Siempre devuelve la lista completa de módulos conocidos (normalizada).
+ *
+ * @returns {string[]}
+ */
+export function getModuleOrder() {
+  const profile = getProfile();
+  if (profile && typeof profile === 'object' && Array.isArray(profile.modulos_orden)) {
+    return normalizeModuleOrder(profile.modulos_orden);
+  }
+
+  // Migración del orden legado de localStorage → perfil (una sola vez).
+  if (hasStorage()) {
+    try {
+      const raw = window.localStorage.getItem(LEGACY_MODULE_ORDER_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          const normalized = normalizeModuleOrder(parsed);
+          // Persistir en el perfil y limpiar la clave legada.
+          saveProfile({ modulos_orden: normalized });
+          try { window.localStorage.removeItem(LEGACY_MODULE_ORDER_KEY); } catch (_) { /* noop */ }
+          return normalized;
+        }
+      }
+    } catch (e) {
+      console.warn('[userProfile] No se pudo migrar el orden de módulos legado:', e);
+    }
+  }
+
+  return [...HOME_MODULE_DEFAULT_ORDER];
+}
+
+/**
+ * Persiste el orden de módulos del Home en el perfil.
+ *
+ * Normaliza antes de guardar (descarta ids desconocidos, completa faltantes)
+ * para que el perfil nunca quede con un orden corrupto.
+ *
+ * @param {string[]} order - lista de ids de módulo en el orden deseado
+ * @returns {Object} perfil resultante
+ */
+export function setModuleOrder(order) {
+  if (!Array.isArray(order)) {
+    console.warn('[userProfile] setModuleOrder: argumento inválido', order);
+    return getProfile();
+  }
+  return saveProfile({ modulos_orden: normalizeModuleOrder(order) });
+}
+
 export const __PROFILE_KEYS__ = {
   PROFILE_KEY,
   PROFILE_DONE_KEY,
