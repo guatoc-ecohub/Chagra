@@ -149,7 +149,7 @@ export default function MiFincaEvolucionScreen({ onBack, onHome, onNavigate }) {
           </div>
           <p className="text-sm text-slate-300 leading-relaxed">
             Acá no hay puntos ni medallas: tu finca evoluciona con el trabajo real.
-            Cada cosecha, biopreparado, siembra y observación que registrás mueve
+            Cada cosecha, biopreparado, siembra y observación que registras mueve
             estos indicadores. Así medimos cómo va tu transición hacia la agroecología.
           </p>
           <div className="mt-3 pt-3 border-t border-emerald-800/40">
@@ -256,7 +256,7 @@ export default function MiFincaEvolucionScreen({ onBack, onHome, onNavigate }) {
         <div className="flex items-start gap-2 pt-1">
           <Info size={14} className="text-slate-500 shrink-0 mt-0.5" aria-hidden="true" />
           <p className="text-xs text-slate-500 leading-relaxed">
-            Los indicadores sin datos se irán llenando a medida que registrás el
+            Los indicadores sin datos se irán llenando a medida que registras el
             trabajo de tu finca. No inventamos cifras: lo que no se puede medir aún,
             se dice tal cual.
           </p>
