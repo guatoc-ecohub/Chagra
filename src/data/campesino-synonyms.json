@@ -1,0 +1,58 @@
+{
+  "fuente": "Glosario taxonomico del catalogo + fichas cycle-content + campo Guatoc/Choachi",
+  "plagas": {
+    "gusano": ["plaga", "larva", "oruga"],
+    "gusano_del_cafe": ["broca", "hypothenemus", "gorgojo"],
+    "bicho": ["plaga", "insecto", "afido"],
+    "cogollero": ["gusano", "spodoptera", "plaga"],
+    "broca": ["gorgojo", "barrenador", "hypothenemus"],
+    "roya": ["hongo", "hemileia"],
+    "gota": ["tizon", "phytophthora", "hongo"],
+    "palomilla": ["mariposa", "polilla", "lepidoptera"],
+    "chinche": ["hemiptera", "chupador", "plaga"],
+    "mosca_blanca": ["bemisia", "homoptera"]
+  },
+  "control": {
+    "matamaleza": ["herbicida", "control", "maleza", "arvenses"],
+    "fumigar": ["aplicar", "asperjar", "control", "tratamiento"],
+    "remedio": ["control", "tratamiento", "manejo", "biopreparado"],
+    "caldo": ["bordeles", "fungicida", "preventivo", "cobre"],
+    "ceniza": ["potasio", "mineral", "fertilizante"]
+  },
+  "cultivo": {
+    "sembrar": ["cultivar", "establecer", "siembra", "plantar"],
+    "cosechar": ["recoger", "recoleccion", "cosecha", "produccion"],
+    "abonar": ["fertilizar", "nutrir", "abono", "compost"],
+    "podar": ["cortar", "poda", "formacion", "mantenimiento"],
+    "aporcar": ["arrimar", "tierra", "tuberculo", "cubrir"]
+  },
+  "clima": {
+    "secar": ["marchitar", "estres", "hidrico", "sequia"],
+    "inundar": ["encharcar", "exceso", "agua", "drenaje"],
+    "helada": ["escarcha", "frio", "congelacion", "temperatura"],
+    "verano": ["sequia", "seco", "estiaje", "calor"],
+    "invierno": ["lluvia", "humedo", "temporal", "precipitacion"]
+  },
+  "suelo_vocab": {
+    "tierra": ["suelo", "sustrato", "terreno"],
+    "loma": ["ladera", "pendiente", "colina", "inclinado"],
+    "barrial": ["arcilloso", "pesado", "compacto", "greda"],
+    "cascajo": ["pedregoso", "gravilla", "drenaje", "suelto"]
+  },
+  "partes_planta": {
+    "mata": ["planta", "arbusto", "cultivo"],
+    "rama": ["tallo", "brote", "vastago"],
+    "hoja": ["follaje", "lamina", "foliar"],
+    "raiz": ["sistema_radicular", "tuberculo_subterraneo"],
+    "flor": ["inflorescencia", "floracion", "boton"],
+    "fruto": ["cosecha", "baya", "vaina", "mazorca"],
+    "semilla": ["grano", "simiente", "pepa"]
+  },
+  "labores": {
+    "desyerbar": ["control_maleza", "limpiar", "arvenses"],
+    "aporcar": ["arrimar_tierra", "cubrir_tuberculo", "monticular"],
+    "tutorar": ["entutorar", "amarrar", "soporte"],
+    "raleo": ["entresaque", "aclareo", "reducir_densidad"],
+    "injetar": ["injerto", "mejorar_variedad", "patron"]
+  }
+}
