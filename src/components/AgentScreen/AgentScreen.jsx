@@ -75,7 +75,7 @@ import { applyOutputGuards, classifyQueryIntent } from '../../services/outputGua
 import { createStreamGuard } from '../../services/streamGuards';
 import { getProfile, getModuleVisibility } from '../../services/userProfileService';
 import { selectChipDefs } from '../../services/profileChipSelector';
-import { tieneAccesoGlaciarActual } from '../../config/glaciarAccess';
+import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciarAccess';
 import { captureExchange } from '../../services/conversationCaptureService';
 import { regionFromProfile, getEnsoOutlook } from '../../services/ensoContext';
 // SALUDO PROACTIVO (#162 alertas + #298 tareas + #331 análisis): el agente, de
@@ -252,6 +252,8 @@ export default function AgentScreen({ onBack, initialContext }) {
     try {
       const profile = getProfile();
       return selectChipDefs(profile, {
+        // El operador ve el catálogo COMPLETO de chips vivos (bypass del gating).
+        esOperador: esOperadorActual(),
         esGuiaGlaciar: tieneAccesoGlaciarActual(),
         moduleVisibility: getModuleVisibility(),
       });

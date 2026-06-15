@@ -213,6 +213,70 @@ describe('homeModuleSelector — selectHomeModules por PERSONA', () => {
   });
 });
 
+// ── BYPASS OPERADOR (regresión 2026-06-15 — el operador debe VER TODO) ──────
+describe('homeModuleSelector — opts.esOperador (bypass: ve TODO)', () => {
+  it('OPERADOR: TODOS los módulos + las 4 tarjetas de seguimiento (incluida Cerdos)', () => {
+    const { visibles, seguimiento } = selectHomeModules({}, { esOperador: true });
+    // Criterio de éxito: el home completo, sin estrechar.
+    for (const id of ALL_HOME_MODULES) expect(visibles).toContain(id);
+    expect(seguimiento).toEqual(
+      expect.arrayContaining([
+        SEGUIMIENTO_KEYS.reforestacion,
+        SEGUIMIENTO_KEYS.silvopastoreo,
+        SEGUIMIENTO_KEYS.paramo,
+        SEGUIMIENTO_KEYS.cerdos,
+      ]),
+    );
+    expect(visibles).toContain(HOME_MODULE_IDS.insumos);
+    expect(visibles).toContain(HOME_MODULE_IDS.zonas);
+    expect(seguimiento).toContain(SEGUIMIENTO_KEYS.cerdos);
+  });
+
+  it('OPERADOR gana sobre el override URBANO (ve TODO aunque sea urbano)', () => {
+    // El bypass del operador es el PRIMER check: precede al override urbano.
+    const { visibles, seguimiento } = selectHomeModules(
+      { vocacion: 'urbano', finca_tipo: 'balcon' },
+      { esOperador: true },
+    );
+    for (const id of ALL_HOME_MODULES) expect(visibles).toContain(id);
+    expect(seguimiento).toContain(SEGUIMIENTO_KEYS.cerdos);
+    expect(seguimiento).toContain(SEGUIMIENTO_KEYS.silvopastoreo);
+  });
+
+  it('OPERADOR gana sobre el rol guía glaciar (Cordada NO estrecha al operador)', () => {
+    // El bug original: operador en CORDADA → rol guia_glaciar → home estrecho.
+    // Con esOperador=true el set NO se estrecha aunque esGuiaGlaciar también lo sea.
+    const { visibles, seguimiento } = selectHomeModules(
+      {},
+      { esOperador: true, esGuiaGlaciar: true },
+    );
+    for (const id of ALL_HOME_MODULES) expect(visibles).toContain(id);
+    expect(visibles).toContain(HOME_MODULE_IDS.insumos); // guía NO lo vería
+    expect(seguimiento).toContain(SEGUIMIENTO_KEYS.cerdos); // guía NO lo vería
+  });
+
+  it('NO-OPERADOR: guía glaciar REAL (esGuiaGlaciar sin esOperador) SIGUE estrecho', () => {
+    // Invariante de no-regresión: alex/mario/camilo (Cordada, NO operador)
+    // conservan su set estrecho. esOperador ausente = false.
+    const { visibles, seguimiento } = selectHomeModules(
+      { vocacion: 'campesino' },
+      { esGuiaGlaciar: true },
+    );
+    expect(visibles).toContain(HOME_MODULE_IDS.clima);
+    expect(visibles).toContain(HOME_MODULE_IDS.biodiversidad);
+    // El set ESTRECHO: sin insumos, sin zonas, sin cerdos.
+    expect(visibles).not.toContain(HOME_MODULE_IDS.insumos);
+    expect(visibles).not.toContain(HOME_MODULE_IDS.zonas);
+    expect(seguimiento).not.toContain(SEGUIMIENTO_KEYS.cerdos);
+  });
+
+  it('NO-OPERADOR: urbano SIGUE sin cerdos (esOperador ausente = false)', () => {
+    const { visibles, seguimiento } = selectHomeModules({ vocacion: 'urbano' });
+    expect(seguimiento).not.toContain(SEGUIMIENTO_KEYS.cerdos);
+    expect(visibles).not.toContain(HOME_MODULE_IDS.insumos);
+  });
+});
+
 describe('homeModuleSelector — invariantes', () => {
   it('SIEMPRE devuelve solo ids/keys válidos y sin duplicados', () => {
     const perfiles = [

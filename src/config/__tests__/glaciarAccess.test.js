@@ -94,3 +94,75 @@ describe('glaciarAccess — tieneAccesoGlaciarActual (usuario logueado, offline)
     expect(glaciarAccess.tieneAccesoGlaciarActual()).toBe(true);
   });
 });
+
+describe('glaciarAccess — esOperador (bypass de visión total, función pura)', () => {
+  beforeEach(async () => {
+    glaciarAccess = await importFresh();
+  });
+
+  it('devuelve true para el operador (kortux)', () => {
+    expect(glaciarAccess.esOperador('kortux')).toBe(true);
+  });
+
+  it('hace match case-insensitive y tolerante a espacios (trim)', () => {
+    expect(glaciarAccess.esOperador('KORTUX')).toBe(true);
+    expect(glaciarAccess.esOperador('  Kortux  ')).toBe(true);
+  });
+
+  it('INVARIANTE: un guía glaciar REAL de la Cordada NO es operador', () => {
+    // alex/mario/camilo ven el tile glaciar (Cordada) pero NO tienen visión
+    // total: su home sigue estrecho. esOperador debe ser false para ellos.
+    expect(glaciarAccess.esOperador('alex')).toBe(false);
+    expect(glaciarAccess.esOperador('mario')).toBe(false);
+    expect(glaciarAccess.esOperador('camilo')).toBe(false);
+  });
+
+  it('devuelve false para usuarios random y para null/undefined/vacío', () => {
+    expect(glaciarAccess.esOperador('usuario_normal')).toBe(false);
+    expect(glaciarAccess.esOperador(null)).toBe(false);
+    expect(glaciarAccess.esOperador(undefined)).toBe(false);
+    expect(glaciarAccess.esOperador('')).toBe(false);
+    expect(glaciarAccess.esOperador('   ')).toBe(false);
+  });
+
+  it('OPERADOR_WHITELIST es un Set no vacío e independiente de CORDADA', () => {
+    expect(glaciarAccess.OPERADOR_WHITELIST).toBeInstanceOf(Set);
+    expect(glaciarAccess.OPERADOR_WHITELIST.size).toBeGreaterThan(0);
+    // Son conceptos distintos: la Cordada (acceso al tile) NO es la whitelist
+    // de operador (visión total). alex está en Cordada pero NO es operador.
+    expect(glaciarAccess.CORDADA_WHITELIST.has('alex')).toBe(true);
+    expect(glaciarAccess.OPERADOR_WHITELIST.has('alex')).toBe(false);
+  });
+});
+
+describe('glaciarAccess — esOperadorActual (usuario logueado, offline)', () => {
+  let store;
+
+  beforeEach(async () => {
+    store = {};
+    vi.stubGlobal('localStorage', {
+      getItem: (k) => store[k] ?? null,
+      setItem: (k, v) => { store[k] = v; },
+      removeItem: (k) => { delete store[k]; },
+    });
+    glaciarAccess = await importFresh();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('devuelve true cuando el usuario logueado es el operador', () => {
+    store['chagra:active_tenant_id'] = 'kortux';
+    expect(glaciarAccess.esOperadorActual()).toBe(true);
+  });
+
+  it('devuelve false para un guía glaciar real logueado (NO operador)', () => {
+    store['chagra:active_tenant_id'] = 'mario';
+    expect(glaciarAccess.esOperadorActual()).toBe(false);
+  });
+
+  it('devuelve false cuando no hay sesión activa', () => {
+    expect(glaciarAccess.esOperadorActual()).toBe(false);
+  });
+});
