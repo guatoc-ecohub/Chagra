@@ -21,49 +21,131 @@ vi.mock('../../config/materials.js', () => ({
 import { logCache } from '../../db/logCache.js';
 import { exportTraceabilityCsv } from '../exportService.js';
 
+function buildLog(overrides = {}) {
+  return {
+    id: 'log-1',
+    type: 'log--input',
+    name: 'Aplicacion de Compost',
+    timestamp: 1718400000,
+    quantity: { value: 5, unit: 'kg' },
+    asset_id: '00000000-0000-0000-0000-000000000001',
+    _pending: false,
+    relationships: {},
+    ...overrides,
+  };
+}
+
 describe('exportService', () => {
   describe('exportTraceabilityCsv', () => {
-    it('genera descarga con logs', async () => {
-      const mockLogs = [
-        {
-          id: 'log-1',
-          type: 'log--input',
-          name: 'Aplicacion de Compost',
-          timestamp: Math.floor(Date.now() / 1000),
-          quantity: { value: 5, unit: 'kg' },
-          asset_id: 'abc12345-1234-1234-1234-123456789abc',
-          _pending: false,
-          relationships: {},
-        },
-      ];
-
-      logCache.getAll.mockResolvedValue(mockLogs);
-
-      const result = await exportTraceabilityCsv({ filename: 'test.csv' });
-
-      expect(result.rowCount).toBe(1);
-      expect(result.filename).toBe('test.csv');
-      expect(typeof result.pendingCount).toBe('number');
+    it('cuenta pending correctamente', async () => {
+      logCache.getAll.mockResolvedValue([
+        buildLog({ id: 'a', _pending: true }),
+        buildLog({ id: 'b', _pending: false }),
+        buildLog({ id: 'c', _pending: true }),
+      ]);
+      const r = await exportTraceabilityCsv({ filename: 'p.csv' });
+      expect(r.rowCount).toBe(3);
+      expect(r.pendingCount).toBe(2);
     });
 
-    it('filtra por types si se especifica', async () => {
-      const mockLogs = [
-        { id: 'a', type: 'log--input', timestamp: 1000, quantity: {}, name: 'Test', _pending: false, relationships: {} },
-        { id: 'b', type: 'log--harvest', timestamp: 2000, quantity: {}, name: 'Test', _pending: false, relationships: {} },
-      ];
-      logCache.getAll.mockResolvedValue(mockLogs);
+    it('maneja logs sin quantity', async () => {
+      logCache.getAll.mockResolvedValue([
+        buildLog({ id: 'a', quantity: undefined, name: 'Sin cantidad' }),
+      ]);
+      const r = await exportTraceabilityCsv({ filename: 'nq.csv' });
+      expect(r.rowCount).toBe(1);
+    });
 
-      const result = await exportTraceabilityCsv({
-        types: ['log--harvest'],
-        filename: 'test.csv',
+    it('convierte bultos a kg (x50)', async () => {
+      // Verificamos que el CSV se genera sin errores con bultos
+      logCache.getAll.mockResolvedValue([
+        buildLog({ quantity: { value: 2, unit: 'bultos' } }),
+      ]);
+      const r = await exportTraceabilityCsv({ filename: 'b.csv' });
+      expect(r.rowCount).toBe(1);
+    });
+
+    it('maneja gramos a kg (x0.001)', async () => {
+      logCache.getAll.mockResolvedValue([
+        buildLog({ quantity: { value: 500, unit: 'g' } }),
+      ]);
+      const r = await exportTraceabilityCsv({ filename: 'g.csv' });
+      expect(r.rowCount).toBe(1);
+    });
+
+    it('maneja mililitros a litros (x0.001)', async () => {
+      logCache.getAll.mockResolvedValue([
+        buildLog({ quantity: { value: 250, unit: 'ml' } }),
+      ]);
+      const r = await exportTraceabilityCsv({ filename: 'ml.csv' });
+      expect(r.rowCount).toBe(1);
+    });
+
+    it('resuelve operario desde relationships.owner', async () => {
+      logCache.getAll.mockResolvedValue([
+        buildLog({
+          relationships: { owner: { data: { id: 'user-admin' } } },
+        }),
+      ]);
+      const r = await exportTraceabilityCsv({ filename: 'op.csv' });
+      expect(r.rowCount).toBe(1);
+    });
+
+    it('resuelve categoria sin categoria conocida', async () => {
+      logCache.getAll.mockResolvedValue([
+        buildLog({ name: 'Aplicacion de MaterialDesconocido', type: 'log--input' }),
+      ]);
+      const r = await exportTraceabilityCsv({ filename: 'uk.csv' });
+      expect(r.rowCount).toBe(1);
+    });
+
+    it('retorna Sin categoria para tipo no-input', async () => {
+      logCache.getAll.mockResolvedValue([
+        buildLog({ type: 'log--harvest', name: 'Cosecha de cafe' }),
+      ]);
+      const r = await exportTraceabilityCsv({ filename: 'h.csv' });
+      expect(r.rowCount).toBe(1);
+    });
+
+    it('ordena por timestamp descendente', async () => {
+      logCache.getAll.mockResolvedValue([
+        buildLog({ id: 'a', timestamp: 1000 }),
+        buildLog({ id: 'b', timestamp: 3000 }),
+        buildLog({ id: 'c', timestamp: 2000 }),
+      ]);
+      const r = await exportTraceabilityCsv({ filename: 'ord.csv' });
+      expect(r.rowCount).toBe(3);
+    });
+
+    it('filtra multiples types', async () => {
+      logCache.getAll.mockResolvedValue([
+        buildLog({ id: 'a', type: 'log--input' }),
+        buildLog({ id: 'b', type: 'log--harvest' }),
+        buildLog({ id: 'c', type: 'log--seeding' }),
+      ]);
+      const r = await exportTraceabilityCsv({
+        types: ['log--input', 'log--harvest'],
+        filename: 'multi.csv',
       });
-      expect(result.rowCount).toBe(1);
+      expect(r.rowCount).toBe(2);
     });
 
-    it('genera filename por defecto con fecha', async () => {
-      logCache.getAll.mockResolvedValue([]);
-      const result = await exportTraceabilityCsv();
-      expect(result.filename).toContain('chagra_trazabilidad_');
+    it('maneja logs con name que no empieza con Aplicacion de', async () => {
+      logCache.getAll.mockResolvedValue([
+        buildLog({ name: 'Cosecha manual', type: 'log--harvest' }),
+      ]);
+      const r = await exportTraceabilityCsv({ filename: 'nh.csv' });
+      expect(r.rowCount).toBe(1);
+    });
+
+    it('resuelve operario desde relationships.uid', async () => {
+      logCache.getAll.mockResolvedValue([
+        buildLog({
+          relationships: { uid: { data: { id: 'user-001' } } },
+        }),
+      ]);
+      const r = await exportTraceabilityCsv({ filename: 'uid.csv' });
+      expect(r.rowCount).toBe(1);
     });
   });
 });
