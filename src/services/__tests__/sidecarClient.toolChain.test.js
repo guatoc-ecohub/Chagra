@@ -449,7 +449,7 @@ describe('executeToolChain — ejecución secuencial con MAX_STEPS=3', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('herramientas con result null (timeout/error) → devuelve result: null', async () => {
+  it('herramientas que fallan (timeout/error) → result lleva ToolError fetch_failed', async () => {
     // Mock fetch: primero ok, segundo error
     fetchMock
       .mockResolvedValueOnce(jsonResponse(200, { species_id: 'passiflora_edulis' }))
@@ -466,7 +466,10 @@ describe('executeToolChain — ejecución secuencial con MAX_STEPS=3', () => {
 
     expect(result).toHaveLength(2);
     expect(result[0].result).toEqual({ species_id: 'passiflora_edulis' });
-    expect(result[1].result).toBeNull();
+    // callTool ahora propaga el ToolError tri-estado (no null) cuando el tool
+    // fue intentado pero falló; executeToolChain lo conserva como evidence del
+    // paso para que el formatter señale el gap al LLM.
+    expect(result[1].result).toEqual({ _error: true, reason: 'fetch_failed', tool: 'get_companions' });
   });
 
   it('SPEED-5 (#257): ejecuta los pasos en PARALELO (no secuencial)', async () => {
@@ -530,18 +533,20 @@ describe('executeToolChain — ejecución secuencial con MAX_STEPS=3', () => {
 });
 
 describe('ALLOWED_TOOLS whitelist — callTool rechaza no permitidos', () => {
-  it('callTool rechaza tool no permitido con null sin fetch', async () => {
+  it('callTool rechaza tool no permitido con ToolError not_allowed sin fetch', async () => {
     const { callTool } = await importFresh();
-    
+
     const result = await callTool('delete_everything', {});
-    
-    expect(result).toBeNull();
+
+    // Contrato tri-estado: rechazo de whitelist → ToolError not_allowed (no
+    // null). El tool NUNCA llega a la red (defensa en profundidad).
+    expect(result).toEqual({ _error: true, reason: 'not_allowed', tool: 'delete_everything' });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('callTool rechaza tools peligrosos: drop/delete/truncate/exec/eval', async () => {
     const { callTool } = await importFresh();
-    
+
     const dangerousTools = [
       'drop_table',
       'delete_database',
@@ -554,7 +559,9 @@ describe('ALLOWED_TOOLS whitelist — callTool rechaza no permitidos', () => {
 
     for (const tool of dangerousTools) {
       const result = await callTool(tool, {});
-      expect(result).toBeNull();
+      // Cada peligroso → ToolError not_allowed con el nombre del tool, jamás
+      // se intenta el fetch.
+      expect(result).toEqual({ _error: true, reason: 'not_allowed', tool });
     }
 
     expect(fetchMock).not.toHaveBeenCalled();
@@ -602,12 +609,13 @@ describe('ALLOWED_TOOLS whitelist — callTool rechaza no permitidos', () => {
     expect(__TEST__.ALLOWED_TOOLS.has('inject_sql')).toBe(false);
     expect(__TEST__.ALLOWED_TOOLS.has('xss_attack')).toBe(false);
     expect(__TEST__.ALLOWED_TOOLS.has('path_traversal')).toBe(false);
-    
-    // Verifica que callTool rechaza
-    expect(await callTool('inject_sql', {})).toBeNull();
-    expect(await callTool('xss_attack', {})).toBeNull();
-    expect(await callTool('path_traversal', {})).toBeNull();
-    
+
+    // Verifica que callTool rechaza con ToolError not_allowed (tri-estado) y
+    // sin tocar la red.
+    expect(await callTool('inject_sql', {})).toEqual({ _error: true, reason: 'not_allowed', tool: 'inject_sql' });
+    expect(await callTool('xss_attack', {})).toEqual({ _error: true, reason: 'not_allowed', tool: 'xss_attack' });
+    expect(await callTool('path_traversal', {})).toEqual({ _error: true, reason: 'not_allowed', tool: 'path_traversal' });
+
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
