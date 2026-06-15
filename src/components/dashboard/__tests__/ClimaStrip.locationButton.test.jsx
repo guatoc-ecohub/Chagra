@@ -61,7 +61,7 @@ vi.mock('../../../services/userProfileService', () => {
     // tests que quieran probar el fallback de región pueden sobrescribirlo con
     // mockReturnValue/Once.
     const getProfileMunicipio = vi.fn(() => getProfile()?.municipio ?? null);
-    return { getProfile, getProfileMunicipio };
+    return { getProfile, getProfileMunicipio, isModuleVisible: vi.fn(() => true) };
 });
 import { getProfile, getProfileMunicipio } from '../../../services/userProfileService';
 

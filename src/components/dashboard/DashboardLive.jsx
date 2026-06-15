@@ -20,7 +20,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Snowflake, ChevronRight } from 'lucide-react';
 import AgentHero from './AgentHero';
 import OnboardingHero from '../OnboardingHero';
-import { getProfile } from '../../services/userProfileService';
+import { getProfile, isModuleVisible } from '../../services/userProfileService';
 import { tieneAccesoGlaciarActual } from '../../config/glaciarAccess';
 import SelectedBackgroundReveal from './SelectedBackgroundReveal';
 import ClimaStrip from './ClimaStrip';
@@ -161,6 +161,14 @@ function SortableSection({ id, onNavigate, sensors }) {
 
 export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
     const [order, setOrder] = useState(readOrder);
+    const [moduleVisibility, setModuleVisibility] = useState(() => {
+        // Leer visibilidad inicial: filtra el order para solo incluir módulos visibles
+        const visibility = {};
+        for (const id of DEFAULT_ORDER) {
+            visibility[id] = isModuleVisible(id);
+        }
+        return visibility;
+    });
     const iotAlerts = useAssetStore((s) => s.iotAlerts) || [];
     // Primer uso (feat/onboarding-ayuda): sin plantas registradas se re-monta
     // el OnboardingHero existente (quedó huérfano del DashboardView legacy al
@@ -176,6 +184,27 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
         const hasAltitud = p.finca_altitud !== '' && p.finca_altitud != null && Number.isFinite(alt);
         return !hasAltitud || p.piso_confirmado !== '1';
     });
+
+    // Escuchar cambios en visibilidad de módulos desde ProfileScreen (#7003)
+    useEffect(() => {
+        const handler = (e) => {
+            const { visibility } = e.detail;
+            if (visibility && typeof visibility === 'object') {
+                setModuleVisibility(visibility);
+            }
+        };
+        try {
+            window.addEventListener('chagra:module-visibility-changed', handler);
+            return () => {
+                try {
+                    window.removeEventListener('chagra:module-visibility-changed', handler);
+                } catch (_) { /* noop */ }
+            };
+        } catch (_) {
+            // Tests sin window
+            return () => {};
+        }
+    }, []);
 
     // Persist scroll position al volver de detalle (mismo bug que App.jsx
     // resolvió para Dashboard clásico). Quick-win UX 2026-05-28 demo Diana.
@@ -290,9 +319,11 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
                 >
                     <SortableContext items={order} strategy={rectSortingStrategy}>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                            {order.map((id) => (
-                                <SortableSection key={id} id={id} onNavigate={onNavigate} sensors={iotAlerts} />
-                            ))}
+                            {order
+                                .filter((id) => moduleVisibility[id] !== false)
+                                .map((id) => (
+                                    <SortableSection key={id} id={id} onNavigate={onNavigate} sensors={iotAlerts} />
+                                ))}
                         </div>
                     </SortableContext>
                 </DndContext>

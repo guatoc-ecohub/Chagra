@@ -45,7 +45,7 @@ vi.mock('../../../config/defaults', () => ({
 vi.mock('../../../services/userProfileService', () => {
     const getProfile = vi.fn(() => ({}));
     const getProfileMunicipio = vi.fn(() => getProfile()?.municipio ?? null);
-    return { getProfile, getProfileMunicipio };
+    return { getProfile, getProfileMunicipio, isModuleVisible: vi.fn(() => true) };
 });
 import { getProfile, getProfileMunicipio } from '../../../services/userProfileService';
 

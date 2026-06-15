@@ -13,7 +13,7 @@ import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 import useFincaActiveStore from '../services/fincaActiveStore';
 import usePrefsStore from '../store/usePrefsStore';
 import { stop as stopTTS } from '../services/ttsService';
-import { getNotificationStyle, setNotificationStyle, getTelemetryConsent, setTelemetryConsent } from '../services/userProfileService';
+import { getNotificationStyle, setNotificationStyle, getTelemetryConsent, setTelemetryConsent, HOME_MODULES, getModuleVisibility, setModuleVisibility } from '../services/userProfileService';
 
 const TTL_OPTIONS = [
   { id: '1d', label: '1 día' },
@@ -62,6 +62,7 @@ const TABS = [
   { id: 'perfil', emoji: '👤', label: 'Perfil' },
   { id: 'apariencia', emoji: '🎨', label: 'Apariencia' },
   { id: 'voz', emoji: '🔊', label: 'Voz y finca' },
+  { id: 'modulos', emoji: '📦', label: 'Módulos' },
   { id: 'avanzado', emoji: '⚙️', label: 'Avanzado' },
 ];
 
@@ -95,6 +96,10 @@ export default function ProfileScreen({ onBack, onHome }) {
       ? localStorage.getItem('chagra:voice:telemetry:ttl') || '7d'
       : '7d'
   );
+
+  // Visibilidad de módulos del Home (#7003). Lee la configuración del perfil
+  // y permite activar/desactivar cada módulo individualmente.
+  const [moduleVisibility, setModuleVisibilityState] = useState(() => getModuleVisibility());
 
   // Free 7→10 fix-pack: HYTA (info GPU/Ollama) detrás de un toggle "Modo
   // técnico". Default OFF para que el campesino-target no vea jerga técnica
@@ -144,6 +149,17 @@ export default function ProfileScreen({ onBack, onHome }) {
       detail: { key: 'chagra:operator:role', value: role },
     }));
   }, [role]);
+
+  // Sincronizar visibilidad de módulos con el perfil y notificar al Home
+  // para actualización en tiempo real.
+  useEffect(() => {
+    setModuleVisibility(moduleVisibility);
+    try {
+      window.dispatchEvent(new CustomEvent('chagra:module-visibility-changed', {
+        detail: { visibility: moduleVisibility },
+      }));
+    } catch (_) { /* noop */ }
+  }, [moduleVisibility]);
 
   const handleSave = () => {
     setSavedFlash(true);
@@ -372,6 +388,92 @@ export default function ProfileScreen({ onBack, onHome }) {
 
             {/* Multifinca + GPS Section (062.7 indoor override + 062.8 privacy) */}
             <MultifincaGpsSection />
+          </div>
+        )}
+
+        {/* ── PESTAÑA: MÓDULOS (#7003) ───────────────────────────────── */}
+        {activeTab === 'modulos' && (
+          <div
+            role="tabpanel"
+            id="profile-panel-modulos"
+            aria-labelledby="profile-tab-modulos"
+            className="flex flex-col gap-6"
+          >
+            <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+              <div className="flex items-center gap-2 px-1">
+                <Sprout size={18} className="text-emerald-400" />
+                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Módulos del Home</h3>
+              </div>
+
+              <p className="text-[11px] text-slate-500 leading-snug px-1">
+                Elige qué módulos quieres ver en tu pantalla de inicio. Puedes ocultar
+                los que no usas para tener una vista más limpia. Todos los módulos están
+                activados por defecto.
+              </p>
+
+              {/* Agrupar módulos por categoría */}
+              {(() => {
+                const grouped = {};
+                for (const module of HOME_MODULES) {
+                  if (!grouped[module.category]) {
+                    grouped[module.category] = [];
+                  }
+                  grouped[module.category].push(module);
+                }
+                return Object.entries(grouped).map(([category, modules]) => (
+                  <div key={category} className="mt-4">
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2 px-1">
+                      {category}
+                    </p>
+                    <div className="space-y-2">
+                      {modules.map((module) => (
+                        <label
+                          key={module.id}
+                          className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px] hover:bg-slate-800/70 transition-colors"
+                        >
+                          <div className="flex flex-col gap-0.5 flex-1">
+                            <span className="text-sm font-bold text-slate-200">{module.label}</span>
+                            <span className="text-[10px] text-slate-500 leading-snug">{module.description}</span>
+                          </div>
+                          <button
+                            type="button"
+                            role="switch"
+                            aria-checked={moduleVisibility[module.id] !== false}
+                            aria-label={`Mostrar u ocultar ${module.label}`}
+                            onClick={() => setModuleVisibilityState((prev) => ({
+                              ...prev,
+                              [module.id]: prev[module.id] === false ? true : false,
+                            }))}
+                            className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+                              moduleVisibility[module.id] !== false ? 'bg-emerald-600' : 'bg-slate-700'
+                            }`}
+                          >
+                            <span
+                              className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                                moduleVisibility[module.id] !== false ? 'translate-x-5' : 'translate-x-0'
+                              }`}
+                            />
+                          </button>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                ));
+              })()}
+
+              <div className="mt-4 pt-4 border-t border-slate-800/50">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const allVisible = Object.fromEntries(HOME_MODULES.map(m => [m.id, true]));
+                    setModuleVisibilityState(allVisible);
+                  }}
+                  className="w-full p-3 rounded-xl bg-slate-800/50 hover:bg-slate-700/60 transition-colors text-center"
+                >
+                  <span className="text-sm font-bold text-slate-300">Restaurar todos los módulos</span>
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
