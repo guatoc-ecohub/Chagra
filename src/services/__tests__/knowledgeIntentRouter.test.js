@@ -10,7 +10,11 @@
  *   - Sin intención clara → null (el planner NLU decide).
  */
 import { describe, it, expect } from 'vitest';
-import { planKnowledgeIntent } from '../knowledgeIntentRouter.js';
+import {
+  planKnowledgeIntent,
+  hasIncendioRiskIntent,
+  hasRestauracionDiagnosticIntent,
+} from '../knowledgeIntentRouter.js';
 
 const sp = (id, mentioned = null) => ({
   kind: 'species',
@@ -120,5 +124,30 @@ describe('planKnowledgeIntent — prioridades y guardas cruzadas', () => {
       { kind: 'species', canonical_id: null, mentioned: 'adelfa' },
     ]);
     expect(plan?.args).toEqual({ species_id_or_name: 'adelfa' });
+  });
+});
+
+describe('hasIncendioRiskIntent — riesgo de incendio (≠ restauración post-incendio)', () => {
+  it('detecta preguntas de riesgo/temporada de incendio', () => {
+    expect(hasIncendioRiskIntent('¿estoy en riesgo de incendio esta temporada?')).toBe(true);
+    expect(hasIncendioRiskIntent('hay temporada de incendios ahora?')).toBe(true);
+    expect(hasIncendioRiskIntent('¿hay alerta de incendio en mi zona?')).toBe(true);
+    expect(hasIncendioRiskIntent('peligro de incendio en la finca')).toBe(true);
+    expect(hasIncendioRiskIntent('¿se va a quemar el pasto con esta sequía?')).toBe(true);
+    expect(hasIncendioRiskIntent('estamos en época de quemas')).toBe(true);
+  });
+
+  it('NO confunde con restauración post-incendio (eso es otro módulo)', () => {
+    // Estas frases las maneja hasRestauracionDiagnosticIntent, no la de riesgo.
+    expect(hasIncendioRiskIntent('quiero restaurar después del incendio')).toBe(false);
+    expect(hasIncendioRiskIntent('qué siembro en el sitio quemado')).toBe(false);
+    // La restauración la captura su propio matcher (con árboles/especies nativas).
+    expect(hasRestauracionDiagnosticIntent('quiero restaurar un terreno con árboles nativos')).toBe(true);
+  });
+
+  it('no dispara con texto irrelevante ni vacío', () => {
+    expect(hasIncendioRiskIntent('¿qué siembro en abril?')).toBe(false);
+    expect(hasIncendioRiskIntent('')).toBe(false);
+    expect(hasIncendioRiskIntent(null)).toBe(false);
   });
 });

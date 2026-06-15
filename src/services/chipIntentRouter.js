@@ -117,6 +117,7 @@ export function planForcedIntent(intent, text, opts = {}) {
     stub: false,
     stubResult: null,
     stubMessage: null,
+    localGrounding: null, // módulo client-side a inyectar (ej. 'incendio'), sin tool del sidecar
     prompt,
     skipNlu: true,
   };
@@ -191,6 +192,21 @@ export function planForcedIntent(intent, text, opts = {}) {
         tool: 'get_diseno_restauracion',
         args: { objetivo: 'paramo' },
       };
+
+    case CHIP_INTENTS.incendio: {
+      // Riesgo de incendio: ESTIMACIÓN client-side (incendioRiskService), NO un
+      // tool del sidecar (no existe API de alerta de incendio en tiempo real).
+      // Devolvemos localGrounding:'incendio' + la altura del perfil para corregir
+      // el piso térmico (caso Galeras/Nariño). El AgentScreen calcula el bloque
+      // con evaluarRiesgoIncendio y lo inyecta como evidence. CERO fabricación.
+      const altInc = toAltitud(opts.altitud);
+      return {
+        ...base,
+        tool: null,
+        localGrounding: 'incendio',
+        args: altInc != null ? { altitud: altInc } : {},
+      };
+    }
 
     case CHIP_INTENTS.silvopastoreo: {
       // Arreglo silvopastoril (get_diseno_silvopastoril). La tool EXIGE altura.
