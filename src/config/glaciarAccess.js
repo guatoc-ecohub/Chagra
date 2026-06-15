@@ -53,6 +53,7 @@ export const CORDADA_WHITELIST = new Set([
   'alex',    // La Cordada — beta tester glaciar.
   'mario',   // La Cordada — beta tester glaciar.
   'camilo',  // La Cordada — beta tester glaciar.
+  'kortux',  // Operador — acceso total (admin/testing); debe ver todo.
 ]);
 
 // ─────────────────────────────────────────────────────────────────────────────
