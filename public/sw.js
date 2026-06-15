@@ -55,13 +55,19 @@ const RAG_GROUNDING_PRECACHE = [
 ];
 
 // Instalación del Service Worker.
-// SIN self.skipWaiting() automático: el SW nuevo queda en `waiting` para que
-// el cliente muestre el banner "nueva versión disponible" y el operador
-// decida cuándo actualizar. El skipWaiting solo ocurre vía mensaje
-// SKIP_WAITING (click "Actualizar" en UpdateAvailableBanner). Con el
-// auto-skip el SW activaba solo, controllerchange disparaba el banner
-// DESPUÉS de aplicada la actualización y el operador debía dar "Actualizar"
-// N veces (bug 2026-06-10).
+// SIN self.skipWaiting() automático EN EL SW: el SW nuevo queda en `waiting` y
+// el skipWaiting lo decide el CLIENTE vía mensaje SKIP_WAITING. Quién manda ese
+// mensaje:
+//   1. AUTO-UPDATE (swRegistration.js, desde 2026-06-15): al detectar el
+//      waiting, el cliente dispara SKIP_WAITING automáticamente y recarga UNA
+//      vez (guard anti-loop por controllerchange). Así el deploy se VE sin que
+//      el usuario limpie caché.
+//   2. UpdateAvailableBanner ("Actualizar"): fallback visible si el auto-update
+//      no llegó a recargar.
+// El skipWaiting NO se hace aquí en el SW a propósito: el cliente necesita
+// orquestar la recarga ÚNICA (controllerchange) — si el SW activara solo, el
+// banner aparecía DESPUÉS de aplicada la actualización y el operador debía dar
+// "Actualizar" N veces (bug 2026-06-10). Por eso el SW espera el mensaje.
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
