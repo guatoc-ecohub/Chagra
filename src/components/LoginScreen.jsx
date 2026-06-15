@@ -84,6 +84,16 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
       } catch (err) {
         console.warn('[LoginScreen] setActiveTenantId failed:', err);
       }
+      // Foto de perfil cross-device (2026-06-15): traer del servidor la última
+      // foto del operador para este dispositivo. Fire-and-forget — no bloquea
+      // el login y es no-throw (degrada al ícono por defecto si falla/offline).
+      try {
+        import('../services/operatorPhotoService.js')
+          .then((m) => m.loadFromFarmOS())
+          .catch(() => {});
+      } catch (err) {
+        console.warn('[LoginScreen] operator photo load dispatch failed:', err);
+      }
       // NN4 fix 2026-05-23: disparar pre-warm del modelo Ollama configurado ANTES de
       // navegar al dashboard. Esto da ~15-30s de margen humano (el operador
       // mira el dashboard, escoge una tile, abre el agente) durante los
