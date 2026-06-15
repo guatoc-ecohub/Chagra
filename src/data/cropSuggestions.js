@@ -283,4 +283,4 @@ export function buildCropSuggestions(plants, opts = {}) {
   return suggestions;
 }
 
-export const __CROP_RULES__ = CROP_RULES;
+// (__CROP_RULES__ — no exportado: sin referencias externas)

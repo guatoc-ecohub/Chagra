@@ -26,13 +26,4 @@ export function getCompletedTaskIds(logs) {
     return completedIds;
 }
 
-/**
- * Parsea el veredicto de un log de completado.
- * @param {string} notes - Notas del log.
- * @returns {string|null} 'completed', 'cancelled', 'rescheduled' o null.
- */
-export function parseVerdict(notes) {
-    if (!notes.includes('[TASK_COMPLETION]')) return null;
-    const match = notes.match(/verdict:\s*([a-z]+)/);
-    return match ? match[1] : null;
-}
+// parseVerdict removido — sin referencias internas ni externas.

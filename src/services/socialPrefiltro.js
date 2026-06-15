@@ -1,5 +1,3 @@
-import { expandQueryTokens } from './ragSynonyms';
-
 const PALABRAS_PELIGROSAS = ['glifosato', 'paraquat', 'clorpirifos', 'urea_pura', 'cal_viva', 'formalina', 'arsenico'];
 const MITOS_BLOQUEABLES = ['vinagre.*ph', 'bicarbonato.*ph', 'luna.*sembrar', 'luna.*regar', 'varilla.*agua', 'pendulo.*agua'];
 
