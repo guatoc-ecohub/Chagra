@@ -12,6 +12,22 @@ import DeepResearchCard from '../DeepResearchCard';
 // no estamos viendo el header.
 const FLOATING_BACK_THRESHOLD_PX = 160;
 
+/**
+ * Área de historial de mensajes del chat con el agente. Renderiza burbujas de
+ * chat, tarjetas de Deep Research, saludo proactivo dinámico y estados vacíos.
+ * Incluye un botón "Volver" flotante que aparece al hacer scroll lejos del header.
+ *
+ * @param {Object} props - Propiedades del componente.
+ * @param {Array} [props.messages=[]] - Lista de mensajes del chat.
+ * @param {string} [props.streamingContent=''] - Texto parcial del streaming actual.
+ * @param {boolean} [props.isStreaming=false] - Indica si hay un streaming en curso.
+ * @param {Function} props.onConsentNeeded - Callback cuando se requiere consentimiento del usuario.
+ * @param {Function} props.onRetryOrphan - Callback para reintentar un mensaje huérfano (sin respuesta).
+ * @param {Function} props.onCancelDeepResearch - Callback para cancelar una investigación profunda en curso.
+ * @param {Object|null} [props.proactiveGreeting=null] - Datos del saludo proactivo dinámico.
+ * @param {Function} props.onGreetingPrompt - Callback al seleccionar un prompt sugerido del saludo.
+ * @param {Function} props.onBack - Callback para volver a la pantalla anterior.
+ */
 export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, onConsentNeeded, onRetryOrphan, onCancelDeepResearch, proactiveGreeting = null, onGreetingPrompt, onBack }) {
   const bottomRef = useRef(null);
   const scrollRef = useRef(null);

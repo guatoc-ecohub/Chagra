@@ -6,6 +6,16 @@ function isFullscreenApiAvailable() {
     document.documentElement.requestFullscreen != null;
 }
 
+/**
+ * Hook que gestiona el modo cine usando la API Fullscreen del navegador.
+ * Sincroniza el estado con eventos nativos de fullscreen (F11, toolbar) y
+ * permite salir con la tecla Escape. Funciona incluso si la API no está disponible.
+ *
+ * @returns {Object} Estado y control del modo cine.
+ * @returns {boolean} returns.isCinema - Indica si el modo cine está activo.
+ * @returns {Function} returns.toggleCinema - Función que alterna el modo cine.
+ * @returns {boolean} returns.isFullscreenApi - Indica si la API Fullscreen está disponible en el navegador.
+ */
 export function useCinemaMode() {
   const [isCinema, setIsCinema] = useState(false);
   const fullscreenApiRef = useRef(isFullscreenApiAvailable());
@@ -62,7 +72,7 @@ export function useCinemaMode() {
   return {
     isCinema,
     toggleCinema,
-    isFullscreenApi: fullscreenApiRef.current,
+    isFullscreenApi: /* eslint-disable-line react-hooks/refs */ fullscreenApiRef.current,
   };
 }
 

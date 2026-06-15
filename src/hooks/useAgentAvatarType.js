@@ -25,6 +25,15 @@ function readPref() {
     return DEFAULT_AVATAR_TYPE;
 }
 
+/**
+ * Hook que gestiona el tipo de avatar del agente. Lee la preferencia desde
+ * localStorage y permite actualizarla con sincronización entre pestañas
+ * mediante eventos 'storage' y 'chagra:agent-avatar-changed'.
+ *
+ * @returns {[string, Function]} Tupla con el tipo de avatar actual y la función para actualizarlo.
+ * @returns {'colibri'|'colibri_svg'|'maiz'} returns.0 - Tipo de avatar actual.
+ * @returns {Function} returns.1 - Función updateType(next) que persiste y propaga el nuevo tipo.
+ */
 export default function useAgentAvatarType() {
     const [type, setType] = useState(readPref);
 

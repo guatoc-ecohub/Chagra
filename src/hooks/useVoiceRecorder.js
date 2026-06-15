@@ -18,6 +18,22 @@ const pickMimeType = () => {
   return '';
 };
 
+/**
+ * Hook que gestiona el ciclo de vida de MediaRecorder para grabación de voz.
+ * Negocia el tipo MIME soportado, analiza la amplitud en tiempo real mediante
+ * AnalyserNode y detiene automáticamente la grabación a los 30 segundos.
+ *
+ * @returns {Object} Estado y controles de la grabadora de voz.
+ * @returns {boolean} returns.isRecording - Indica si la grabación está activa.
+ * @returns {number} returns.audioLevel - Nivel de amplitud RMS normalizado (0-1).
+ * @returns {number[]} returns.amplitudeHistory - Historial de los últimos 60 niveles de amplitud.
+ * @returns {number} returns.durationMs - Duración transcurrida de la grabación en milisegundos.
+ * @returns {string|null} returns.error - Mensaje de error o null si no hay error.
+ * @returns {Function} returns.start - Función asíncrona que inicia la grabación. Lanza error si falla.
+ * @returns {Function} returns.stop - Detiene la grabación y retorna una promesa con { blob, durationMs, mimeType }.
+ * @returns {Function} returns.reset - Reinicia todo el estado interno y libera recursos.
+ * @returns {number} returns.hardLimitMs - Límite máximo de grabación en milisegundos (30000).
+ */
 export default function useVoiceRecorder() {
   const [isRecording, setIsRecording] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);

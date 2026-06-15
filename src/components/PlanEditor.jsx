@@ -11,6 +11,19 @@ export const useUserStore = create((set) => ({
     setRole: (role) => set((state) => ({ user: { ...state.user, role } }))
 }));
 
+/**
+ * Editor de planes de alimentación para plantas. Carga un plan existente o
+ * permite generar uno nuevo basado en los parámetros de la planta. El asesor
+ * puede editar insumos y dosis; cualquier usuario puede marcar pasos como
+ * ejecutados.
+ *
+ * @param {Object} props - Propiedades del componente.
+ * @param {string} props.assetId - ID del activo (planta) al que pertenece el plan.
+ * @param {string} props.speciesSlug - Slug de la especie de la planta.
+ * @param {number|string} props.plantingDate - Fecha de siembra (timestamp o string ISO).
+ * @param {string} [props.climateZone='frio'] - Zona climática (ej: 'frio', 'templado', 'calido').
+ * @param {string} [props.lunarPhase='creciente'] - Fase lunar al momento de la siembra.
+ */
 export default function PlanEditor({ assetId, speciesSlug, plantingDate, climateZone = 'frio', lunarPhase = 'creciente' }) {
     const [plan, setPlan] = useState(null);
     const [loading, setLoading] = useState(true);

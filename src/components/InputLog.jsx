@@ -22,6 +22,16 @@ const APPLICATION_METHODS = [
   "Foliar", "Drench/Al suelo", "Inoculación de semillas", "Incorporación"
 ];
 
+/**
+ * Formulario legacy para registrar aplicaciones de insumos agrícolas.
+ * Permite seleccionar ubicación, tipo de insumo, método de aplicación,
+ * cantidad y notas. Guarda mediante el servicio de payloads con soporte
+ * offline-first.
+ *
+ * @param {Object} props - Propiedades del componente.
+ * @param {Function} props.onBack - Callback para volver a la pantalla anterior.
+ * @param {Function} props.onSave - Callback invocado tras guardar: onSave(mensaje, esError).
+ */
 export default function InputLog({ onBack, onSave }) {
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],

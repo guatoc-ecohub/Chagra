@@ -434,7 +434,17 @@ const CategoryBreakdown = ({ byCategory }) => {
     </div>
   );
 };
-
+/**
+ * Panel de detalle para un asset individual. Obtiene `selectedAssetId` desde
+ * `useAssetStore` y, según el bundle detectado, renderiza foto del asset,
+ * tablas de atributos, editor de geometría (latitud/longitud) y flujos de
+ * split (dividir planta) y merge (fusionar assets del mismo bundle).
+ *
+ * Expone el modal de "cementerio" para marcar assets como inactivos y un
+ * botón de cierre que limpia la selección activa vía `clearSelectedAsset`.
+ *
+ * @returns {JSX.Element|null} Retorna null si no hay `selectedAssetId` en el store.
+ */
 export const AssetDetailView = () => {
   const selectedAssetId = useAssetStore((s) => s.selectedAssetId);
   const plants = useAssetStore((s) => s.plants);
