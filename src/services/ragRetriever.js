@@ -1,5 +1,6 @@
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { recordRagEvent } from './ragTelemetry';
+import { TOOL_TIMEOUT_MS } from './sidecarClient.js';
 import { getAllSpecies } from '../db/catalogDB';
 import { expandQueryTokens } from './ragSynonyms';
 import { saveCorpusIndex, loadCorpusIndex } from '../db/corpusIndexCache';
@@ -437,7 +438,7 @@ async function embedQuery(queryText) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: 'nomic-embed-text', prompt: queryText }),
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(TOOL_TIMEOUT_MS),
     });
     if (!res.ok) return null;
     const data = await res.json();

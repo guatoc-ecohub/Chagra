@@ -247,12 +247,13 @@ export const aggregateLLMMetrics = (events) => {
   return { totals, byModel, byFlujo };
 };
 
+const P95_RATIO = 0.95;
 const isNum = (n) => typeof n === 'number' && Number.isFinite(n);
 const avg = (arr) => arr.length ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) : 0;
 const p95 = (arr) => {
   if (!arr.length) return 0;
   const sorted = [...arr].sort((a, b) => a - b);
-  const idx = Math.floor(sorted.length * 0.95);
+  const idx = Math.floor(sorted.length * P95_RATIO);
   return Math.round(sorted[Math.min(idx, sorted.length - 1)]);
 };
 const groupReduce = (arr, keyFn, reduceFn) => {

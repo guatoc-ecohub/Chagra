@@ -5,7 +5,7 @@ import {
   initAtmosphereCalibration,
   isAtmosphereEnabled,
 } from '../services/atmosphereService.js';
-import { getCachedClimaSnapshot, resolveClimaLocation } from '../services/climaService.js';
+import { getCachedClimaSnapshot, resolveClimaLocation, CLIMA_UPDATED_EVENT } from '../services/climaService.js';
 
 /**
  * useClimaAtmosphere — conecta el clima real con la atmósfera visual del tema.
@@ -40,11 +40,11 @@ export function useClimaAtmosphere() {
     update(null);
 
     const onClima = (e) => update(e?.detail || null);
-    window.addEventListener('chagra:clima:updated', onClima);
+    window.addEventListener(CLIMA_UPDATED_EVENT, onClima);
     const id = setInterval(() => update(null), REEVAL_MS);
 
     return () => {
-      window.removeEventListener('chagra:clima:updated', onClima);
+      window.removeEventListener(CLIMA_UPDATED_EVENT, onClima);
       clearInterval(id);
     };
   }, []);

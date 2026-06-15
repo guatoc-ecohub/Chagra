@@ -13,11 +13,9 @@
  *
  * Response shape Ollama `/api/ps`:
  *   { models: [{ name, model, size, size_vram, expires_at, details: {...} }] }
- *
- * `size_vram > 0` con `size_vram == size` => 100% GPU offload.
- * `size_vram == 0` => CPU only.
- * `0 < size_vram < size` => parcial (warning para nuestra GPU local).
  */
+
+const BYTES_PER_MB = 1024 * 1024;
 
 const OLLAMA_PS_URL = '/api/ollama/api/ps';
 const CACHE_TTL_MS = 5000;
@@ -49,8 +47,8 @@ const normalizeModel = (m) => {
   }
   return {
     name: m?.name || m?.model || 'unknown',
-    sizeMB: Math.round(size / (1024 * 1024)),
-    vramMB: Math.round(sizeVram / (1024 * 1024)),
+    sizeMB: Math.round(size / BYTES_PER_MB),
+    vramMB: Math.round(sizeVram / BYTES_PER_MB),
     processor,
     gpuShare: Math.round(gpuShare * 100) / 100,
     expiresAt: m?.expires_at || null,
@@ -124,7 +122,7 @@ export const listAvailableModels = async () => {
     const data = await response.json();
     const models = Array.isArray(data?.models) ? data.models.map((m) => ({
       name: m?.name,
-      sizeMB: Math.round((m?.size || 0) / (1024 * 1024)),
+      sizeMB: Math.round((m?.size || 0) / BYTES_PER_MB),
       family: m?.details?.family || null,
       parameterSize: m?.details?.parameter_size || null,
       quantization: m?.details?.quantization_level || null,

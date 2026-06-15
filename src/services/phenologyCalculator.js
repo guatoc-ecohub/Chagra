@@ -8,6 +8,7 @@
  * el proceso. Solo computa estimated_stage.
  */
 import { getTemplate } from '../data/phenologyTemplates';
+import { LOW_CONFIDENCE_THRESHOLD } from '../services/agentService.js';
 
 /**
  * @typedef {Object} PhenologyWindow
@@ -83,7 +84,7 @@ export function calculateWindows({ speciesSlug, sowingDate, altitudeM }) {
     const windowEnd = maxDays !== null ? sowingDate + maxDays * 86400000 : null;
 
     // Confianza base: template versionado + datos completos = 0.7
-    let confidence = 0.7;
+    let confidence = LOW_CONFIDENCE_THRESHOLD;
 
     // Penalización si no hay altitud (el rango es más amplio)
     if (!altitudeM || altitudeM <= 0) {

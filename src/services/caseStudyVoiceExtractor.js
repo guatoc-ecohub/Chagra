@@ -21,6 +21,9 @@
  * para que CaseStudy log en event_log_ids referenciado.
  */
 
+const EXTRACTION_TEMPERATURE = 0.1;
+const CASE_STUDY_CTX_SIZE = 4096;
+
 import { streamOllama } from './ollamaStream';
 
 const OLLAMA_CHAT_URL = '/api/ollama/api/chat';
@@ -117,7 +120,7 @@ export async function extractCaseFromText(transcript, opts = {}) {
     stream: true,
     format: 'json',
     keep_alive: '5m',
-    options: { temperature: 0.1, num_ctx: 4096 },
+    options: { temperature: EXTRACTION_TEMPERATURE, num_ctx: CASE_STUDY_CTX_SIZE },
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user', content: userMsg },

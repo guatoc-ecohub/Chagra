@@ -12,6 +12,8 @@ import { useState, useCallback } from 'react';
  * 4. Retry automático con enableHighAccuracy=false si el primer intento
  *    timeoutea — algunos iPhones viejos no entregan high-accuracy ever.
  */
+const GEO_TIMEOUT_MS = 30000;
+
 export function useGeolocation() {
     const [position, setPosition] = useState(null);
     const [error, setError] = useState(null);
@@ -32,12 +34,12 @@ export function useGeolocation() {
             // enableHighAccuracy/timeout explícitos, respetamos su valor.
             const cfg = {
                 enableHighAccuracy: highAccuracy,
-                timeout: 30000,
-                maximumAge: 30000,
+                timeout: GEO_TIMEOUT_MS,
+                maximumAge: GEO_TIMEOUT_MS,
                 ...options,
             };
             if (options.enableHighAccuracy == null) cfg.enableHighAccuracy = highAccuracy;
-            if (options.timeout == null) cfg.timeout = 30000;
+            if (options.timeout == null) cfg.timeout = GEO_TIMEOUT_MS;
             return cfg;
         };
 

@@ -38,7 +38,7 @@
 import { buildSidecarHeaders } from './tierService.js';
 
 const NLU_TIMEOUT_MS = 18000;
-const TOOL_TIMEOUT_MS = 5000;
+export const TOOL_TIMEOUT_MS = 5000;
 
 /**
  * Lee la flag `VITE_USE_SIDECAR_AGRO_MCP`. Acepta los strings 'true'/'1'
