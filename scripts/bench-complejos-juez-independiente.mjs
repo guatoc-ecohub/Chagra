@@ -47,6 +47,16 @@ import {
   selectJudgeProvider,
 } from './lib/bench-scorer.mjs';
 import { assertCheckoutCurrent } from './lib/bench-checkout-guard.mjs';
+import {
+  getSidecarToken as sidecarToken,
+  gpuTemp as gpuTempLib,
+  thermalGuard as thermalGuardLib,
+  resolveEntities as resolveEntitiesLib,
+  postValidate as postValidateLib,
+  buildEnrichedSystemPrompt as buildEnrichedSystemPromptLib,
+  generateChat,
+  makeJudgeOllamaCall,
+} from './lib/bench-sidecar.mjs';
 import { applyOutputGuards } from '../src/services/outputGuards.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -98,161 +108,61 @@ const GPU_TEMP_RESUME = 75;
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
+// ── helpers (delegan al lib compartido scripts/lib/bench-sidecar.mjs) ─────────
+// Antes estos helpers estaban COPIADOS byte-a-byte aca, en bench-borde y en
+// bench-capabilities. Ahora viven una sola vez en el lib; estos wrappers
+// conservan la firma local (y los globals de config del bench) sin duplicar
+// la implementacion. (bench-borde NO se reconecta: contrato sellado.)
+
 function getSidecarToken() {
-  const tokenPath = `${process.env.HOME}/.config/chagra-sidecar-token.txt`;
-  if (existsSync(tokenPath)) return readFileSync(tokenPath, 'utf-8').trim();
-  return process.env.SIDECAR_TOKEN || '';
+  return sidecarToken();
 }
 
-/** Lee la temperatura de la GPU vía nvidia-smi; null si no disponible. */
 function gpuTemp() {
-  try {
-    const out = execSync('nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits', {
-      encoding: 'utf-8',
-      timeout: 8000,
-    });
-    const t = parseInt(out.trim().split('\n')[0], 10);
-    return Number.isFinite(t) ? t : null;
-  } catch {
-    return null;
-  }
+  return gpuTempLib();
 }
 
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-/** Si la GPU está caliente, espera (vigilancia térmica). */
 async function thermalGuard() {
-  let t = gpuTemp();
-  if (t == null) return; // sin telemetría → no bloquea.
-  while (t >= GPU_TEMP_LIMIT) {
-    console.log(`  [thermal] GPU ${t}°C ≥ ${GPU_TEMP_LIMIT}°C — pausando 30s hasta ≤${GPU_TEMP_RESUME}°C`);
-    await sleep(30_000);
-    t = gpuTemp();
-    if (t == null) return;
-    if (t <= GPU_TEMP_RESUME) break;
-  }
+  return thermalGuardLib({ limit: GPU_TEMP_LIMIT, resume: GPU_TEMP_RESUME });
 }
 
 async function resolveEntities(userMessage) {
-  const token = getSidecarToken();
-  const headers = { 'Content-Type': 'application/json' };
-  if (token) headers['X-Chagra-Token'] = token;
-  try {
-    const res = await fetch(`${SIDECAR_URL}/resolve-entities`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ user_message: userMessage }),
-      signal: AbortSignal.timeout(15_000),
-    });
-    if (!res.ok) return { entities: [] };
-    const data = await res.json();
-    return { entities: data.entities || [] };
-  } catch (err) {
-    console.log(`    [resolve-entities] ${err.message.slice(0, 60)}`);
-    return { entities: [] };
-  }
+  return resolveEntitiesLib(userMessage, { sidecarUrl: SIDECAR_URL });
 }
 
 async function postValidate(userMessage, response) {
-  const token = getSidecarToken();
-  const headers = { 'Content-Type': 'application/json' };
-  if (token) headers['X-Chagra-Token'] = token;
-  try {
-    const res = await fetch(`${SIDECAR_URL}/post-validate`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ user_message: userMessage, response }),
-      signal: AbortSignal.timeout(15_000),
-    });
-    if (!res.ok) return { hallucinated: [], detected_count: 0, age_available: false };
-    const data = await res.json();
-    return {
-      hallucinated: data.hallucinated || [],
-      detected_count: data.detected_count || 0,
-      age_available: Boolean(data.age_available),
-    };
-  } catch {
-    return { hallucinated: [], detected_count: 0, age_available: false };
-  }
+  return postValidateLib(userMessage, response, { sidecarUrl: SIDECAR_URL });
 }
 
-// Mismo system prompt enriquecido que usa el bench del agente / la PWA en prod.
 function buildEnrichedSystemPrompt(entities) {
-  const basePrompt = `Eres un asistente agroecológico experto para Colombia. Responde en español claro, práctico para agricultores.
-
-Si mencionas entidades (especies, plagas, biopreparados), usa los nombres canónicos del catálogo Chagra para evitar alucinaciones.`;
-  if (!entities || entities.length === 0) return basePrompt;
-  const entityContext = entities
-    .map((e) => {
-      if (e.kind === 'species') return `- ${e.mentioned} = especie: ${e.nombre_cientifico} (${e.nombre_comun})`;
-      if (e.kind === 'pest') return `- ${e.mentioned} = plaga: ${e.nombre_cientifico || e.nombre_comun}`;
-      if (e.kind === 'biopreparado') return `- ${e.mentioned} = biopreparado: ${e.nombre_comun}`;
-      return null;
-    })
-    .filter(Boolean)
-    .join('\n');
-  return `${basePrompt}
-
-ENTIDADES DEL CATÁLOGO (usa estos nombres canónicos):
-${entityContext}`;
+  return buildEnrichedSystemPromptLib(entities);
 }
 
-/** Generador a CONFIG-PROD: temp 0.3 + seed fijo. */
 async function generate(systemPrompt, userPrompt) {
-  const start = performance.now();
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), GEN_TIMEOUT_MS);
-  try {
-    const res = await fetch(OLLAMA_CHAT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: GEN_MODEL,
-        stream: false,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
-        options: {
-          temperature: GEN_TEMPERATURE,
-          seed: SEED,
-          num_predict: GEN_MAX_TOKENS,
-        },
-        keep_alive: '30m',
-      }),
-      signal: controller.signal,
-    });
-    if (!res.ok) throw new Error(`gen HTTP ${res.status}`);
-    const data = await res.json();
-    return { response: data.message?.content || '', latency_ms: performance.now() - start };
-  } finally {
-    clearTimeout(timer);
-  }
+  return generateChat({
+    model: GEN_MODEL,
+    systemPrompt,
+    userPrompt,
+    temperature: GEN_TEMPERATURE,
+    seed: SEED,
+    maxTokens: GEN_MAX_TOKENS,
+    ollamaUrl: OLLAMA_CHAT_URL,
+    timeoutMs: GEN_TIMEOUT_MS,
+  });
 }
 
-/** Caller del juez independiente contra ollama. */
-async function judgeOllamaCall(prompt) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), JUDGE_TIMEOUT_MS);
-  try {
-    const res = await fetch(OLLAMA_GEN_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: JUDGE_MODEL,
-        prompt,
-        stream: false,
-        options: { temperature: JUDGE_TEMPERATURE, seed: SEED, num_predict: 160 },
-        keep_alive: '30m',
-      }),
-      signal: controller.signal,
-    });
-    if (!res.ok) throw new Error(`judge HTTP ${res.status}`);
-    const data = await res.json();
-    return data.response || '';
-  } finally {
-    clearTimeout(timer);
-  }
+function judgeOllamaCall(prompt) {
+  // Hoisted: selectJudgeProvider() lo referencia en carga de modulo (antes de
+  // que JUDGE_MODEL exista). Construimos el caller del lib en cada invocacion
+  // (lectura perezosa de los globals de config); el costo es despreciable.
+  return makeJudgeOllamaCall({
+    model: JUDGE_MODEL,
+    temperature: JUDGE_TEMPERATURE,
+    seed: SEED,
+    maxTokens: 160,
+    timeoutMs: JUDGE_TIMEOUT_MS,
+    ollamaUrl: OLLAMA_GEN_URL,
+  })(prompt);
 }
 
 // ── main ──────────────────────────────────────────────────────────────────────

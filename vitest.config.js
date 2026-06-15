@@ -28,6 +28,9 @@ export default defineConfig({
       // viven junto al script para mantener cohesión local. Incluye .mjs
       // porque el importer es ESM nativo.
       'scripts/__tests__/**/*.test.{js,mjs}',
+      // Reingenieria bench 2026-06-15: tests del framework de benches
+      // (runner + indice + historial). Deterministas, sin GPU/red.
+      'bench/__tests__/**/*.test.{js,mjs}',
     ],
     exclude: ['node_modules', 'dist', 'tests/*.spec.js'],
     css: false,

@@ -45,6 +45,15 @@ import {
   selectJudgeProvider,
 } from './lib/bench-scorer.mjs';
 import { assertCheckoutCurrent } from './lib/bench-checkout-guard.mjs';
+import {
+  getSidecarToken as sidecarToken,
+  gpuTemp as gpuTempLib,
+  thermalGuard as thermalGuardLib,
+  resolveEntities as resolveEntitiesLib,
+  postValidate as postValidateLib,
+  generateChat,
+  makeJudgeOllamaCall,
+} from './lib/bench-sidecar.mjs';
 import { applyOutputGuards } from '../src/services/outputGuards.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -83,86 +92,34 @@ const CONFIGS = argVal('--configs', 'A,C')
   .filter((c) => c === 'A' || c === 'C');
 
 // ── helpers ───────────────────────────────────────────────────────────────────
+// ── helpers de sidecar/GPU (delegan al lib scripts/lib/bench-sidecar.mjs) ─────
+// Antes COPIADOS byte-a-byte aca, en bench-borde y en bench-complejos. Ahora una
+// sola vez en el lib. buildEnrichedSystemPrompt NO se reconecta: capabilities usa
+// una version mas rica (hechos curados del grafo para CONFIG C). bench-borde
+// tampoco se reconecta (contrato sellado).
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 function getSidecarToken() {
-  const tokenPath = `${process.env.HOME}/.config/chagra-sidecar-token.txt`;
-  if (existsSync(tokenPath)) return readFileSync(tokenPath, 'utf-8').trim();
-  return process.env.SIDECAR_TOKEN || '';
+  return sidecarToken();
 }
 
 function gpuTemp() {
-  try {
-    const out = execSync('nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits', {
-      encoding: 'utf-8',
-      timeout: 8000,
-    });
-    const t = parseInt(out.trim().split('\n')[0], 10);
-    return Number.isFinite(t) ? t : null;
-  } catch {
-    return null;
-  }
+  return gpuTempLib();
 }
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function thermalGuard() {
-  let t = gpuTemp();
-  if (t == null) return;
-  while (t >= GPU_TEMP_LIMIT) {
-    console.log(`  [thermal] GPU ${t}°C ≥ ${GPU_TEMP_LIMIT}°C — pausando 30s hasta ≤${GPU_TEMP_RESUME}°C`);
-    await sleep(30_000);
-    t = gpuTemp();
-    if (t == null) return;
-    if (t <= GPU_TEMP_RESUME) break;
-  }
+  return thermalGuardLib({ limit: GPU_TEMP_LIMIT, resume: GPU_TEMP_RESUME });
 }
 
 async function resolveEntities(userMessage) {
-  const token = getSidecarToken();
-  const headers = { 'Content-Type': 'application/json' };
-  if (token) headers['X-Chagra-Token'] = token;
-  try {
-    const res = await fetch(`${SIDECAR_URL}/resolve-entities`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ user_message: userMessage }),
-      signal: AbortSignal.timeout(15_000),
-    });
-    if (!res.ok) return { entities: [] };
-    const data = await res.json();
-    return { entities: data.entities || [] };
-  } catch (err) {
-    console.log(`    [resolve-entities] ${err.message.slice(0, 60)}`);
-    return { entities: [] };
-  }
+  return resolveEntitiesLib(userMessage, { sidecarUrl: SIDECAR_URL });
 }
 
 async function postValidate(userMessage, response) {
-  const token = getSidecarToken();
-  const headers = { 'Content-Type': 'application/json' };
-  if (token) headers['X-Chagra-Token'] = token;
-  try {
-    const res = await fetch(`${SIDECAR_URL}/post-validate`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ user_message: userMessage, response }),
-      signal: AbortSignal.timeout(15_000),
-    });
-    if (!res.ok) return { hallucinated: [], detected_count: 0, age_available: false };
-    const data = await res.json();
-    return {
-      hallucinated: data.hallucinated || [],
-      detected_count: data.detected_count || 0,
-      age_available: Boolean(data.age_available),
-    };
-  } catch {
-    return { hallucinated: [], detected_count: 0, age_available: false };
-  }
+  return postValidateLib(userMessage, response, { sidecarUrl: SIDECAR_URL });
 }
 
-const BASE_PROMPT = `Eres un asistente agroecológico experto para Colombia. Responde en español claro, práctico para agricultores.
-
-Si mencionas entidades (especies, plagas, biopreparados), usa los nombres canónicos del catálogo Chagra para evitar alucinaciones. Si NO tienes un dato verificado (por ejemplo una dosis numérica), dilo explícitamente en vez de inventarlo.`;
-
-/** Lista hasta `max` nombres de un array (strings u objetos {nombre_comun}). */
 function _liftNames(arr, max = 5) {
   if (!Array.isArray(arr)) return [];
   const out = [];
@@ -228,68 +185,31 @@ ${entityContext}`;
 }
 
 async function generate(systemPrompt, userPrompt) {
-  const start = performance.now();
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), GEN_TIMEOUT_MS);
-  try {
-    const res = await fetch(OLLAMA_CHAT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: GEN_MODEL,
-        stream: false,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
-        options: { temperature: GEN_TEMPERATURE, seed: SEED, num_predict: GEN_MAX_TOKENS },
-        keep_alive: '30m',
-      }),
-      signal: controller.signal,
-    });
-    if (!res.ok) throw new Error(`gen HTTP ${res.status}`);
-    const data = await res.json();
-    return { response: data.message?.content || '', latency_ms: performance.now() - start };
-  } finally {
-    clearTimeout(timer);
-  }
+  return generateChat({
+    model: GEN_MODEL,
+    systemPrompt,
+    userPrompt,
+    temperature: GEN_TEMPERATURE,
+    seed: SEED,
+    maxTokens: GEN_MAX_TOKENS,
+    ollamaUrl: OLLAMA_CHAT_URL,
+    timeoutMs: GEN_TIMEOUT_MS,
+  });
 }
 
-async function judgeOllamaCall(prompt) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), JUDGE_TIMEOUT_MS);
-  try {
-    const res = await fetch(OLLAMA_GEN_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: JUDGE_MODEL,
-        prompt,
-        stream: false,
-        options: { temperature: JUDGE_TEMPERATURE, seed: SEED, num_predict: 160 },
-        keep_alive: '30m',
-      }),
-      signal: controller.signal,
-    });
-    if (!res.ok) throw new Error(`judge HTTP ${res.status}`);
-    const data = await res.json();
-    return data.response || '';
-  } finally {
-    clearTimeout(timer);
-  }
+function judgeOllamaCall(prompt) {
+  // Hoisted (selectJudgeProvider lo referencia en carga de modulo). Build perezoso.
+  return makeJudgeOllamaCall({
+    model: JUDGE_MODEL,
+    temperature: JUDGE_TEMPERATURE,
+    seed: SEED,
+    maxTokens: 160,
+    timeoutMs: JUDGE_TIMEOUT_MS,
+    ollamaUrl: OLLAMA_GEN_URL,
+  })(prompt);
 }
 
-/**
- * Ejecuta un prompt en una config dada y devuelve el registro evaluado.
- * CONFIG A: granite crudo (sin grounding/guards/validate).
- * CONFIG C: pipeline completo de prod.
- */
-/**
- * FASE 1 — genera la respuesta (granite) + guards/post-validate (config C). NO
- * juzga: así granite queda cargado todo el run y el juez (qwen) se carga UNA vez
- * en la fase 2. En Maxwell (12GB) granite+qwen no caben juntos → evitar el swap
- * por-prompt baja el run de ~10h a ~2-3h.
- */
+
 async function generatePhase(p, config) {
   let entities = [];
   let systemPrompt = BASE_PROMPT;

@@ -1,6 +1,36 @@
 # BENCH_INVENTORY.md - Inventario de Benchmarks de Chagra
 
-**Fecha**: 2026-06-14  
+> ACTUALIZADO 2026-06-15 (reingenieria). El inventario original (auditoria de
+> solapamientos, abajo) sigue valido como ANALISIS. La CONSOLIDACION ya se
+> ejecuto: ver `bench/INDEX.md` (catalogo vivo), `bench/run.mjs` (ejecucion +
+> historial) y `bench/README.md` (como funciona el framework). Cambios hechos:
+>
+> - Framework componible: libs compartidas en `scripts/lib/` (bench-runner,
+>   bench-ollama, bench-summary, bench-scorer, bench-stats, bench-sidecar) +
+>   benches delgados que las reusan. CERO duplicacion nueva.
+> - `bench-model-compare.mjs` (NUEVO, parametrizable por suite) reemplaza a
+>   `bench-nuevos-vs-baseline.mjs` y `bench-qwen3-vs-granite.mjs` (ELIMINADOS).
+>   Las suites viven en `data/bench-suites/*.json`. Scoring: keyword flexible
+>   (no literal).
+> - `bench-rag-retrieve.mjs`: 3 archivos -> 1 (loader hook inline via data: URL).
+>   Se eliminaron `.loader.mjs` y `.register.mjs`. Tambien arregla el import JSON.
+> - `bench-complejos-juez-independiente.mjs` y `bench-capabilities-A-vs-C.mjs`
+>   ahora usan `scripts/lib/bench-sidecar.mjs` (helpers de sidecar/GPU/generador
+>   que estaban COPIADOS x3). `bench-borde-alucinacion.mjs` NO se toco (contrato
+>   sellado, "NO ROMPER").
+> - Salida estandarizada: cada corrida puede emitir un JSON con esquema fijo v1
+>   a `bench/history/`. La tendencia (mejora/empeora) por bench y modelo se
+>   consulta con `node bench/run.mjs --history`.
+>
+> PENDIENTE honesto: `bench-agente-completo.mjs` aun tiene su pipeline inline
+> (unloadModel/sampleResources/callOllama propios); no se rewireo a los libs por
+> riesgo (1345 lineas, pipeline de sidecar especifico) - candidato a fase 2.
+> `bench-rag-retrieve.mjs` corre la consolidacion pero la ejecucion completa bajo
+> Node puro necesita un shim de `import.meta.env` (gap PRE-EXISTENTE en main).
+
+---
+
+**Fecha (analisis original)**: 2026-06-14  
 **Propósito**: Auditar los 15 scripts `bench-*.mjs` para identificar propósito, entradas, métricas y solapamientos reales.  
 **Scope**: Solo scripts principales en `scripts/` (excluye `lib/` y `__tests__/`).
 
