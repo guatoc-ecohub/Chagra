@@ -3,10 +3,10 @@ import { test, expect } from '@playwright/test';
 /**
  * home-operador-ve-todo.spec.js — REGRESIÓN 2026-06-15.
  *
- * El operador (kortux) debe ver el HOME COMPLETO para demos y debug: TODOS los
+ * El operador (op-test) debe ver el HOME COMPLETO para demos y debug: TODOS los
  * módulos + las 4 tarjetas de seguimiento (Reforestación · Silvopastoreo ·
  * Páramo · CERDOS) + el catálogo completo de chips. La causa del bug fue que
- * `kortux` está en CORDADA_WHITELIST → `deriveRole` lo clasificaba como
+ * `op-test` está en CORDADA_WHITELIST → `deriveRole` lo clasificaba como
  * `guia_glaciar` → el home quedaba ESTRECHO (clima/páramo/reforestación).
  *
  * El fix es un BYPASS: `esOperador(username)` (whitelist propia, separada de la
@@ -26,10 +26,10 @@ import { test, expect } from '@playwright/test';
  */
 
 const ORIGIN = 'http://localhost:5173';
-const OPERADOR_USERNAME = 'kortux';
+const OPERADOR_USERNAME = 'op-test';
 
 /**
- * Siembra, ANTES de cualquier script de la app, el tenant activo (kortux) y un
+ * Siembra, ANTES de cualquier script de la app, el tenant activo (op-test) y un
  * perfil URBANO en localStorage. El perfil urbano es a propósito: demuestra
  * que el bypass del operador gana sobre el override urbano (que escondería
  * Cerdos/Insumos/Zonas). Sin preferencia manual de visibilidad → el default
@@ -114,7 +114,7 @@ test.describe('Home del OPERADOR — ve TODO (bypass del gating)', () => {
     await mockBackend(page);
 
     await page.goto(ORIGIN);
-    // Login programático (token en localforage + tenant kortux).
+    // Login programático (token en localforage + tenant op-test).
     await loginComoOperador(page);
     // Recargar para que App monte autenticado y aterrice en el dashboard.
     // El addInitScript vuelve a sembrar tenant+perfil urbano antes del boot.
