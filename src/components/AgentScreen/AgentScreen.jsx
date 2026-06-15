@@ -2817,13 +2817,19 @@ export default function AgentScreen({ onBack, initialContext }) {
 
   return (
     <div className={`h-[100dvh] flex flex-col overflow-hidden relative text-white ${entranceClassRef.current}`}>
-      {/* Scrim semitransparente: deja ver --app-bg-image del body */}
-      <div className="absolute inset-0 bg-slate-950/82 backdrop-blur-sm pointer-events-none" aria-hidden="true" />
+      {/* Velo de legibilidad: deja ver --app-bg-image del body PERO garantiza
+          contraste. Token-aware (.agent-scrim → navy denso en bio-punk, crema
+          sutil en claros). Antes era bg-slate-950/82 fijo y, accediendo al
+          agente directo (#agente), la foto lavaba chips/sugerencias/Volver
+          (fix legibilidad 2026-06-15). */}
+      <div className="absolute inset-0 agent-scrim backdrop-blur-[2px] pointer-events-none" aria-hidden="true" />
       {/* B1: animación de entrada (fade+rise). Respeta prefers-reduced-motion. */}
       <style>{AGENT_ENTRANCE_CSS}{AGENT_COMPOSITOR_CSS}</style>
 
-      {/* ── Header estilo ScreenShell (2026-06-08): scrim + blur + acciones globales ── */}
-      <header className="px-4 py-3 flex items-center gap-2 border-b border-slate-800 bg-slate-900/50 backdrop-blur-md shrink-0">
+      {/* ── Header estilo ScreenShell (2026-06-08): superficie OPACA por token
+          (.agent-bar-surface) + acciones globales. Antes bg-slate-900/50 dejaba
+          pasar la foto detrás del título y los íconos (fix legibilidad 2026-06-15). ── */}
+      <header className="px-4 py-3 flex items-center gap-2 border-b border-slate-800 agent-bar-surface shrink-0">
         {/* Back */}
         <button
           type="button"
@@ -3043,8 +3049,10 @@ export default function AgentScreen({ onBack, initialContext }) {
         />
       )}
 
-      {/* ── Compositor pill — paridad completa AgentHero (2026-06-08) ── */}
-      <div className="relative z-10 px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] pt-2 border-t border-slate-800/60 bg-slate-900/70 backdrop-blur-md shrink-0">
+      {/* ── Compositor pill — paridad completa AgentHero (2026-06-08).
+          Superficie OPACA por token (.agent-bar-surface) para legibilidad sobre
+          la foto de fondo (fix 2026-06-15). ── */}
+      <div className="relative z-10 px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] pt-2 border-t border-slate-800/60 agent-bar-surface shrink-0">
 
         {/* Preview de foto adjunta (outbox) */}
         {agentAttachment && (
