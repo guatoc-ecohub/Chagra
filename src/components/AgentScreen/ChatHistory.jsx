@@ -96,6 +96,8 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
       <div
         ref={scrollRef}
         onScroll={handleScroll}
+        role="log"
+        aria-live="polite"
         data-testid="chat-scroll"
         className="h-full overflow-y-auto p-4 pb-28"
       >

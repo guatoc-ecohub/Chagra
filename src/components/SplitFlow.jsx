@@ -44,7 +44,7 @@ export const SplitFlow = ({ asset, onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-[60] bg-slate-950/90 backdrop-blur-md flex flex-col p-6 animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[60] bg-slate-950/90 backdrop-blur-md flex flex-col p-6 animate-in fade-in duration-300" role="dialog" aria-modal="true" aria-label="Dividir activo">
             <div className="flex justify-between items-center mb-8">
                 <h2 className="text-xl font-bold text-white flex items-center gap-2">
                     <Layers className="text-emerald-400" />

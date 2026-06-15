@@ -114,6 +114,7 @@ function TaskScreen({ onBack, onSave, initialData }) {
             <header className="p-4 sticky top-0 bg-slate-950/80 backdrop-blur-md border-b border-slate-800 flex items-center gap-4 z-10 shrink-0 shadow-lg">
                 <button
                     onClick={onBack}
+                    aria-label="Volver"
                     className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[56px] min-w-[56px] flex justify-center items-center shrink-0 border border-slate-700"
                 >
                     <ArrowLeft size={32} />
