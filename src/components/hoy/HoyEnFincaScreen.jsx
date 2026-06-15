@@ -179,6 +179,26 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
                     onNavigate={onNavigate}
                 />
 
+                {/* ── 0c. MI FINCA VIVA — el modo juego kid-friendly ─────────
+                    Misma evolución real (fincaEvolutionService), presentada como
+                    un mundo que crece para que una niña juegue: criaturas,
+                    misiones, audio. Rutea a la pantalla 'juego'. */}
+                <button
+                    type="button"
+                    data-testid="entrada-juego-finca"
+                    onClick={() => onNavigate?.('juego')}
+                    className="w-full text-left rounded-2xl p-4 bg-gradient-to-br from-emerald-600/40 to-teal-700/40 border-2 border-emerald-400/40 hover:border-emerald-300/60 active:scale-[0.99] transition flex items-center gap-3"
+                >
+                    <span className="text-4xl shrink-0" aria-hidden="true">🌱</span>
+                    <span className="flex-1 min-w-0">
+                        <span className="block text-base font-black text-white">Mi Finca Viva</span>
+                        <span className="block text-sm text-emerald-100/90 leading-snug">
+                            Mirá crecer tu finca como un mundo: criaturas, misiones y aventuras. ¡Para jugar en familia!
+                        </span>
+                    </span>
+                    <ChevronRight size={22} className="text-emerald-200 shrink-0" aria-hidden="true" />
+                </button>
+
                 {/* ── 1. CLIMA DE HOY (honesto) ─────────────────────────── */}
                 {!geo ? (
                     <section className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl p-4">

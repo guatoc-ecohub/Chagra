@@ -82,6 +82,7 @@ const TopBar = lazy(() => import('./components/TopBar'));
 const DashboardLive = lazy(() => import('./components/dashboard/DashboardLive'));
 const HoyEnFincaScreen = lazy(() => import('./components/hoy/HoyEnFincaScreen'));
 const MiFincaEvolucionScreen = lazy(() => import('./components/hoy/MiFincaEvolucionScreen'));
+const MiFincaVivaScreen = lazy(() => import('./components/juego/MiFincaVivaScreen'));
 // Modo extensionista (panel supervisor multi-finca, ADR-048 MVP). Gateado por
 // feature flag VITE_FEATURE_EXTENSIONISTA + rol (ver config/extensionistaAccess).
 const ExtensionistaScreen = lazy(() => import('./components/ExtensionistaScreen'));
@@ -772,6 +773,21 @@ export default function App() {
         return (
           <ErrorBoundary>
             <MiFincaEvolucionScreen
+              onBack={() => navigate('hoy_finca')}
+              onHome={() => navigate('dashboard')}
+              onNavigate={navigate}
+            />
+          </ErrorBoundary>
+        );
+      case 'juego':
+        // "Mi Finca Viva": capa LÚDICA kid-friendly sobre el motor de evolución
+        // (fincaEvolutionService → fincaGameService). Mundo que crece + criaturas
+        // + misiones ligadas a acciones reales + GUATOC. Pensado para que una
+        // niña juegue (audio TTS, botones grandes). Cero fabricación: todo se
+        // deriva de los indicadores reales; sin datos, invita a sembrar.
+        return (
+          <ErrorBoundary>
+            <MiFincaVivaScreen
               onBack={() => navigate('hoy_finca')}
               onHome={() => navigate('dashboard')}
               onNavigate={navigate}
