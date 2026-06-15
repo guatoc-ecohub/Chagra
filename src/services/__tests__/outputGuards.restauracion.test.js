@@ -11,8 +11,13 @@ describe('classifyQueryIntent — restauracion (Task 2, audit ministerio)', () =
   it('"restaurar la quebrada" → restauracion', () => {
     expect(classifyQueryIntent('restaurar la quebrada')).toBe('restauracion');
   });
-  it('"sembrar pino para reforestar" → siembra (siembra gana en prioridad)', () => {
-    expect(classifyQueryIntent('sembrar pino para reforestar')).toBe('siembra');
+  it('"sembrar pino para reforestar" → restauracion (restauración gana: pino/exóticas para "reforestar" deben disparar el guard de restauración, NO el de siembra)', () => {
+    // RESTORATION_INTENT_PATTERNS captura "(sembrar|plantar) pino/eucalipto/…"
+    // y "reforestar" y se evalúa ANTES que siembra en classifyQueryIntent. Es
+    // intencional (DR-RESTAURACION-INCENDIOS): plantar exóticas "para
+    // reforestar" es el anti-patrón que el guard de restauración debe advertir;
+    // tratarlo como siembra normal se saltaría esa advertencia.
+    expect(classifyQueryIntent('sembrar pino para reforestar')).toBe('restauracion');
   });
   it('"especies nativas para paramo" → restauracion', () => {
     expect(classifyQueryIntent('especies nativas para paramo')).toBe('restauracion');

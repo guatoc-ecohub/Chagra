@@ -11,10 +11,16 @@
  *   - resetWarmup vuelve al estado inicial limpio
  *
  * Fix cold-start (R2, 2026-06-03): el pre-warm DEBE calentar el modelo que
- * el chat realmente usa (`DEFAULT_MODEL` de llmRouter = ROUTES.chat.model =
- * granite3.1-dense:8b), NO el NLU (gemma3:4b). Antes calentaba gemma → el
- * primer chat con granite caía al cold-start de ~46s. Además se pinnea con
- * keep_alive=-1 (sin expiración por timer) en vez de '30m'.
+ * el chat realmente usa (`DEFAULT_MODEL` de llmRouter = ROUTES.chat.model), NO
+ * el NLU (gemma3:4b). Antes calentaba gemma → el primer chat con el modelo de
+ * chat caía al cold-start de ~46s. Además se pinnea con keep_alive=-1 (sin
+ * expiración por timer) en vez de '30m'.
+ *
+ * El nombre exacto del modelo de chat evoluciona (granite3.1-dense:8b →
+ * granite3.3:8b, 2026-06-11). Por eso aserta contra `DEFAULT_MODEL`
+ * (importado de llmRouter), NUNCA contra un string hardcoded: la invariante
+ * que protege este test es "pre-warm == modelo de chat ≠ NLU", no qué granite
+ * específico está promovido hoy.
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import useOllamaWarmStore from '../useOllamaWarmStore';
@@ -66,10 +72,12 @@ describe('useOllamaWarmStore — NN4 pre-warm Ollama al login', () => {
     const [, opts] = fetch.mock.calls[0];
     const body = JSON.parse(opts.body);
     // El modelo pre-calentado debe ser exactamente el del chat configurado
-    // en llmRouter (ROUTES.chat.model). Si fueran distintos, granite queda
-    // frío y el primer chat sufre el cold-start de ~46s.
+    // en llmRouter (ROUTES.chat.model). Si fueran distintos, el modelo de chat
+    // queda frío y el primer chat sufre el cold-start de ~46s. Aserta contra
+    // DEFAULT_MODEL (no un string fijo) para sobrevivir promociones de modelo.
     expect(body.model).toBe(DEFAULT_MODEL);
-    expect(body.model).toBe('granite3.1-dense:8b');
+    // Invariante anti-regresión del bug NN4: NUNCA debe calentar el modelo de
+    // NLU (gemma3:4b) en vez del de chat.
     expect(body.model).not.toBe('gemma3:4b');
   });
 
