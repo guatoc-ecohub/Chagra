@@ -401,3 +401,68 @@ describe('profileChipSelector — invariantes', () => {
     expect(a).toEqual(b);
   });
 });
+
+describe('profileChipSelector — cobertura de PROFILE_ROLES', () => {
+  it('cada rol de PROFILE_ROLES tiene al menos 1 chip en selectChipIntentsForRole', () => {
+    for (const role of Object.values(PROFILE_ROLES)) {
+      const intents = selectChipIntentsForRole({
+        role,
+        tieneAnimales: true,
+        quiereRestauracion: true,
+      });
+      expect(intents.length).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it('cada rol de PROFILE_ROLES tiene test de perfil completo en selectChipIntents', () => {
+    // Verificar que cada PROFILE_ROLES se puede mapear directamente via selectChipIntents.
+    const roleProfiles = Object.values(PROFILE_ROLES).map((role) => ({
+      rol: role,
+      ...(role === PROFILE_ROLES.ganadero ? { animales: ['ganado'] } : {}),
+      ...(role === PROFILE_ROLES.restaurador ? { objetivo: ['biodiversidad'] } : {}),
+    }));
+    for (const p of roleProfiles) {
+      const intents = selectChipIntents(p);
+      expect(intents.length).toBeGreaterThanOrEqual(1);
+      for (const i of intents) expect(ALL_INTENTS.has(i)).toBe(true);
+    }
+  });
+
+  it('cada rol tiene chips en orden determinista (no aleatorio)', () => {
+    const roleProfiles = Object.values(PROFILE_ROLES).map((role) => ({
+      rol: role,
+      ...(role === PROFILE_ROLES.ganadero ? { animales: ['ganado'] } : {}),
+      ...(role === PROFILE_ROLES.restaurador ? { objetivo: ['biodiversidad'] } : {}),
+    }));
+    for (const p of roleProfiles) {
+      const a = selectChipIntents(p);
+      const b = selectChipIntents(p);
+      expect(a).toEqual(b);
+    }
+  });
+
+  it('chips adicionales (restauracion) no duplican los del rol base', () => {
+    // Restaurador ya tiene restauracion/paramo/silvopastoreo en su base.
+    // Agregar quiereRestauracion=true NO debe duplicarlos.
+    const base = selectChipIntentsForRole({ role: PROFILE_ROLES.restaurador });
+    const conExtra = selectChipIntentsForRole({
+      role: PROFILE_ROLES.restaurador,
+      quiereRestauracion: true,
+    });
+    expect(conExtra.length).toBe(base.length);
+    for (const intent of base) {
+      expect(conExtra.filter((i) => i === intent).length).toBe(1);
+    }
+  });
+
+  it('chips adicionales de silvopastoreo no duplican en rol que ya lo tiene', () => {
+    // Ganadero base ya incluye silvopastoreo. tieneAnimales=true no debe duplicar.
+    const base = selectChipIntentsForRole({ role: PROFILE_ROLES.ganadero });
+    const conExtra = selectChipIntentsForRole({
+      role: PROFILE_ROLES.ganadero,
+      tieneAnimales: true,
+    });
+    expect(conExtra.length).toBe(base.length);
+    expect(conExtra.filter((i) => i === CHIP_INTENTS.silvopastoreo).length).toBe(1);
+  });
+});

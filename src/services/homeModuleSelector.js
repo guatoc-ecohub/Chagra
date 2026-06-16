@@ -129,7 +129,7 @@ const CAMPESINO_CORE = Object.freeze([
  * extras por animales/objetivo, que se aplican en `selectHomeModules`).
  * @type {Record<string, readonly string[]>}
  */
-const ROLE_MODULES = Object.freeze({
+export const ROLE_MODULES = Object.freeze({
   [PROFILE_ROLES.campesino]: CAMPESINO_MODULES,
   // Ganadero = campesino + (silvopastoreo/cerdos van por SEGUIMIENTO, no módulo).
   [PROFILE_ROLES.ganadero]: CAMPESINO_MODULES,
@@ -161,7 +161,7 @@ const ROLE_MODULES = Object.freeze({
  * ganadero, que se aplica en `selectHomeModules`).
  * @type {Record<string, readonly string[]>}
  */
-const ROLE_SEGUIMIENTO = Object.freeze({
+export const ROLE_SEGUIMIENTO = Object.freeze({
   [PROFILE_ROLES.campesino]: Object.freeze([]),
   // Ganadero: silvopastoreo SIEMPRE; cerdos SOLO si el perfil tiene cerdos
   // (se resuelve en selectHomeModules). Acá dejamos silvopastoreo de base.

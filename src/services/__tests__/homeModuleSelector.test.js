@@ -3,12 +3,15 @@ import {
   HOME_MODULE_IDS,
   ALL_HOME_MODULES,
   SEGUIMIENTO_KEYS,
+  ROLE_MODULES,
+  ROLE_SEGUIMIENTO,
   esPerfilUrbano,
   profileTieneCerdos,
   selectHomeModules,
   selectHomeModuleVisibilityMap,
   isSeguimientoVisible,
 } from '../homeModuleSelector.js';
+import { PROFILE_ROLES } from '../profileChipSelector.js';
 
 /**
  * Tests del SELECTOR DE MÓDULOS DEL HOME POR PERFIL (gating del home —
@@ -467,5 +470,54 @@ describe('homeModuleSelector — isSeguimientoVisible (gating de tarjetas)', () 
     expect(
       isSeguimientoVisible(SEGUIMIENTO_KEYS.reforestacion, { rol: 'restaurador' }),
     ).toBe(true);
+  });
+});
+
+describe('homeModuleSelector — cobertura de PROFILE_ROLES', () => {
+  it('cada valor de PROFILE_ROLES tiene entrada en ROLE_MODULES', () => {
+    for (const role of Object.values(PROFILE_ROLES)) {
+      expect(ROLE_MODULES).toHaveProperty(role);
+    }
+  });
+
+  it('cada valor de PROFILE_ROLES tiene entrada en ROLE_SEGUIMIENTO', () => {
+    for (const role of Object.values(PROFILE_ROLES)) {
+      expect(ROLE_SEGUIMIENTO).toHaveProperty(role);
+    }
+  });
+
+  it('cada rol tiene al menos 1 modulo visible en selectHomeModules', () => {
+    const roleProfiles = Object.values(PROFILE_ROLES).map((role) => ({
+      rol: role,
+      // Añadir animales para que ganadero no colapse a campesino sin cerdos
+      ...(role === PROFILE_ROLES.ganadero ? { animales: ['cerdos', 'gallinas'], vocacion: 'campesino' } : {}),
+    }));
+    for (const p of roleProfiles) {
+      const { visibles } = selectHomeModules(p);
+      expect(visibles.length).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it('cada rol no tiene modulos visibles duplicados', () => {
+    const roleProfiles = Object.values(PROFILE_ROLES).map((role) => ({
+      rol: role,
+      ...(role === PROFILE_ROLES.ganadero ? { animales: ['cerdos', 'gallinas'], vocacion: 'campesino' } : {}),
+    }));
+    for (const p of roleProfiles) {
+      const { visibles, seguimiento } = selectHomeModules(p);
+      expect(new Set(visibles).size).toBe(visibles.length);
+      expect(new Set(seguimiento).size).toBe(seguimiento.length);
+    }
+  });
+
+  it('cada rol no tiene seguimiento duplicado', () => {
+    const roleProfiles = Object.values(PROFILE_ROLES).map((role) => ({
+      rol: role,
+      ...(role === PROFILE_ROLES.ganadero ? { animales: ['cerdos', 'gallinas'], vocacion: 'campesino' } : {}),
+    }));
+    for (const p of roleProfiles) {
+      const { seguimiento } = selectHomeModules(p);
+      expect(new Set(seguimiento).size).toBe(seguimiento.length);
+    }
   });
 });

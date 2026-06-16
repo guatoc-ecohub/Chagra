@@ -3,11 +3,13 @@
 
 /**
  * SeguimientoProcesoScreen.test.jsx — vista de SEGUIMIENTO de un proceso de
- * finca (operador 2026-06-15). Verifica el flujo central:
- *   - vacío → botón "Iniciar"
- *   - el formulario crea un FarmProcess vía createFarmProcess con el
- *     process_type y la etapa inicial correctos
- *   - la guarda de leucaena/mimosina aparece SOLO en cerdos
+ * finca (operador 2026-06-15). Verifica el flujo central de los 4 procesos:
+ *   - Reforestacion: formulario create, etapa establecimiento, especie nativa.
+ *   - Silvopastoreo: formulario create, etapa establecimiento (comparte seq).
+ *   - Paramo: formulario create, etapa delimitacion (high-altitude).
+ *   - Cerdos: formulario create, etapa instalacion, cochera/lote/evento.
+ *   - Edge: switching entre procesos no crashea.
+ *   - Guarda de leucaena/mimosina aparece SOLO en cerdos.
  */
 import React from 'react';
 import { render, screen, cleanup, waitFor, fireEvent } from '@testing-library/react';
@@ -34,10 +36,17 @@ vi.mock('../../db/farmProcessCache', () => ({
 vi.mock('../../store/useAssetStore', () => ({
   default: (selector) => selector({ lands: [] }),
 }));
-// Sub-componentes pesados (voz/cámara) fuera del foco de este test.
+// Sub-componentes pesados (voz/cámara/carbono) fuera del foco de este test.
 vi.mock('../CicloObservacion', () => ({ default: () => <div data-testid="obs" /> }));
 vi.mock('../CicloFotos', () => ({ default: () => <div data-testid="fotos" /> }));
 vi.mock('../ChagraGrowLoader', () => ({ default: () => <div /> }));
+vi.mock('../CarbonoPsaSubvista', () => ({ default: () => <div data-testid="carbono" /> }));
+vi.mock('../../services/fincaActiveStore', () => ({
+  default: (selector) => selector({ getActiveFinca: () => ({}) }),
+}));
+vi.mock('../../services/userProfileService', () => ({
+  getProfile: vi.fn(() => ({})),
+}));
 
 import SeguimientoProcesoScreen from '../SeguimientoProcesoScreen';
 
@@ -142,6 +151,126 @@ describe('SeguimientoProcesoScreen', () => {
 
     await waitFor(() => expect(recordFarmEvent).toHaveBeenCalledTimes(2));
     expect(screen.getByText(/Cochera guardada|Lote registrado|Evento guardado/)).toBeInTheDocument();
+  });
+
+  test('iniciar silvopastoreo crea un FarmProcess silvopasture en etapa establecimiento', async () => {
+    render(<SeguimientoProcesoScreen procesoKey="silvopastoreo" onBack={vi.fn()} onSave={vi.fn()} />);
+    await waitFor(() => screen.getByText('Iniciar silvopastoreo'));
+    fireEvent.click(screen.getByText('Iniciar silvopastoreo'));
+    const input = await screen.findByPlaceholderText(/Leucaena/);
+    fireEvent.change(input, { target: { value: 'Leucaena y botón de oro' } });
+    const botones = screen.getAllByText('Iniciar silvopastoreo');
+    fireEvent.click(botones[botones.length - 1]);
+    await waitFor(() => expect(createFarmProcess).toHaveBeenCalledTimes(1));
+    const arg = createFarmProcess.mock.calls[0][0];
+    expect(arg.attributes.process_type).toBe('silvopasture');
+    expect(arg.attributes.current_stage).toBe('establecimiento');
+    expect(arg.attributes.subject_label).toBe('Leucaena y botón de oro');
+  });
+
+  test('iniciar páramo crea un FarmProcess paramo en etapa delimitacion (high-altitude)', async () => {
+    render(<SeguimientoProcesoScreen procesoKey="paramo" onBack={vi.fn()} onSave={vi.fn()} />);
+    await waitFor(() => screen.getByText('Iniciar conservación'));
+    fireEvent.click(screen.getByText('Iniciar conservación'));
+    const input = await screen.findByPlaceholderText(/frailejonal/);
+    fireEvent.change(input, { target: { value: 'Nacimiento Quebrada Honda' } });
+    const botones = screen.getAllByText('Iniciar conservación');
+    fireEvent.click(botones[botones.length - 1]);
+    await waitFor(() => expect(createFarmProcess).toHaveBeenCalledTimes(1));
+    const arg = createFarmProcess.mock.calls[0][0];
+    expect(arg.attributes.process_type).toBe('paramo');
+    expect(arg.attributes.current_stage).toBe('delimitacion');
+    expect(arg.attributes.subject_label).toBe('Nacimiento Quebrada Honda');
+  });
+
+  test('reforestación tiene placeholder de especie nativa y crea restoration', async () => {
+    render(<SeguimientoProcesoScreen procesoKey="reforestacion" onBack={vi.fn()} onSave={vi.fn()} />);
+    await waitFor(() => screen.getByText('Iniciar reforestación'));
+    fireEvent.click(screen.getByText('Iniciar reforestación'));
+
+    // Verifica que el placeholder menciona especies nativas (Roble, Aliso, Cativo).
+    const input = await screen.findByPlaceholderText(/Roble|Aliso|Cativo/);
+    expect(input).toBeInTheDocument();
+  });
+
+  test('silvopastoreo tiene placeholder de forrajeras y árboles', async () => {
+    render(<SeguimientoProcesoScreen procesoKey="silvopastoreo" onBack={vi.fn()} />);
+    await waitFor(() => screen.getByText('Iniciar silvopastoreo'));
+    fireEvent.click(screen.getByText('Iniciar silvopastoreo'));
+    const input = await screen.findByPlaceholderText(/Leucaena|Botón|Nacedero/);
+    expect(input).toBeInTheDocument();
+  });
+
+  test('páramo tiene placeholder de conservación hídrica y frailejón', async () => {
+    render(<SeguimientoProcesoScreen procesoKey="paramo" onBack={vi.fn()} />);
+    await waitFor(() => screen.getByText('Iniciar conservación'));
+    fireEvent.click(screen.getByText('Iniciar conservación'));
+    const input = await screen.findByPlaceholderText(/agua|frailejonal/i);
+    expect(input).toBeInTheDocument();
+  });
+
+  test('switching entre procesos no crashea: reforestación → cerdos → páramo', async () => {
+    const { rerender } = render(<SeguimientoProcesoScreen procesoKey="reforestacion" onBack={vi.fn()} />);
+    await waitFor(() => screen.getByText('Iniciar reforestación'));
+
+    // Switch a cerdos.
+    rerender(<SeguimientoProcesoScreen procesoKey="cerdos" onBack={vi.fn()} />);
+    await waitFor(() => screen.getByText('Iniciar ciclo'));
+
+    // Switch a páramo.
+    rerender(<SeguimientoProcesoScreen procesoKey="paramo" onBack={vi.fn()} />);
+    await waitFor(() => screen.getByText('Iniciar conservación'));
+
+    // Switch a silvopastoreo.
+    rerender(<SeguimientoProcesoScreen procesoKey="silvopastoreo" onBack={vi.fn()} />);
+    await waitFor(() => screen.getByText('Iniciar silvopastoreo'));
+
+    // No crasheó: llegamos acá.
+    expect(screen.getByText('Iniciar silvopastoreo')).toBeInTheDocument();
+  });
+
+  test('switching entre procesos mantiene el estado correcto (no mezcla labels)', async () => {
+    const { rerender } = render(<SeguimientoProcesoScreen procesoKey="cerdos" onBack={vi.fn()} />);
+    await waitFor(() => screen.getByText('Cerdos'));
+
+    rerender(<SeguimientoProcesoScreen procesoKey="reforestacion" onBack={vi.fn()} />);
+    await waitFor(() => screen.getByText('Reforestación'));
+
+    // El título de cerdos NO debe persistir tras el switch.
+    expect(screen.getByText('Reforestación')).toBeInTheDocument();
+    // Cerdos (el header) ya no debe estar.
+    expect(screen.queryByRole('heading', { name: 'Cerdos' })).not.toBeInTheDocument();
+  });
+
+  test('switching desde vista detalle a otro proceso no crashea', async () => {
+    processes = [{
+      process_id: 'proc-rest-1',
+      type: 'farm_process',
+      attributes: {
+        process_type: 'restoration',
+        subject_kind: 'aggregate',
+        subject_label: 'Bosque nativo',
+        quantity: 80,
+        unit: 'árboles',
+        status: 'active',
+        current_stage: 'establecimiento',
+        created_at: Date.now(),
+        updated_at: Date.now(),
+      },
+    }];
+
+    const { rerender } = render(<SeguimientoProcesoScreen procesoKey="reforestacion" onBack={vi.fn()} />);
+    await waitFor(() => screen.getByText('Bosque nativo'));
+    fireEvent.click(screen.getByText('Bosque nativo'));
+
+    // Ahora en detalle de reforestacion (muestra CarbonoPsaSubvista mock).
+    await waitFor(() => screen.getByTestId('carbono'));
+
+    // Switch a cerdos sin volver atrás.
+    rerender(<SeguimientoProcesoScreen procesoKey="cerdos" onBack={vi.fn()} />);
+    await waitFor(() => screen.getByText('Cerdos'));
+
+    expect(screen.getByText('Cerdos')).toBeInTheDocument();
   });
 
   test('la guarda de leucaena/mimosina aparece en cerdos pero NO en reforestación', async () => {

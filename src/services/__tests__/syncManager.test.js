@@ -252,3 +252,178 @@ describe('syncManager — plan generation hook (audit finding #2)', () => {
 // src/services/__tests__/planGeneratorService.test.js — separados para que
 // vi.mock('../planGeneratorService') que necesita este archivo (para aislar
 // syncManager.syncAll) no contamine los tests del helper.
+
+describe('syncManager — persistencia de cola (offline resilience)', () => {
+  let syncManager;
+
+  beforeEach(async () => {
+    vi.resetModules();
+    vi.clearAllMocks();
+    Object.defineProperty(navigator, 'onLine', {
+      configurable: true,
+      writable: true,
+      value: true,
+    });
+    ({ syncManager } = await import('../syncManager'));
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('saveTransaction + getPendingTransactions: la transaccion persiste y se lee de vuelta', async () => {
+    const fakeStore = new Map();
+    const mockDb = {
+      transaction: vi.fn().mockReturnValue({
+        objectStore: vi.fn().mockReturnValue({
+          add: vi.fn(() => {
+            const req = {};
+            fakeStore.set('tx-1', { id: 'tx-1', type: 'seeding', synced: false });
+            queueMicrotask(() => { req.result = 'tx-1'; req.onsuccess?.({ target: req }); });
+            return req;
+          }),
+          get: vi.fn(() => {
+            const req = {};
+            queueMicrotask(() => { req.result = fakeStore.get('tx-1'); req.onsuccess?.({ target: req }); });
+            return req;
+          }),
+          getAll: vi.fn(() => {
+            const req = {};
+            queueMicrotask(() => { req.result = Array.from(fakeStore.values()); req.onsuccess?.({ target: req }); });
+            return req;
+          }),
+          put: vi.fn(() => {
+            const req = {};
+            queueMicrotask(() => { req.onsuccess?.({ target: req }); });
+            return req;
+          }),
+          delete: vi.fn(() => {
+            const req = {};
+            queueMicrotask(() => { req.onsuccess?.({ target: req }); });
+            return req;
+          }),
+        }),
+      }),
+    };
+    syncManager.db = mockDb;
+
+    await syncManager.saveTransaction({ id: 'tx-1', type: 'seeding', payload: { data: {} } });
+    const pending = await syncManager.getPendingTransactions();
+    expect(pending.length).toBe(1);
+    expect(pending[0].id).toBe('tx-1');
+    expect(pending[0].synced).toBe(false);
+  });
+
+  it('sync exitoso borra la transaccion de la cola (clears queue)', async () => {
+    const tx = makeSeedingTransaction({ includeSpeciesSlug: true });
+    patchSyncManager(syncManager, [tx]);
+    const { sendToFarmOS } = await import('../apiService');
+    sendToFarmOS.mockResolvedValue(makeFarmOSResponse());
+
+    await syncManager.syncAll();
+
+    expect(syncManager.deleteTransaction).toHaveBeenCalledWith('tx-1');
+  });
+
+  it('sync retries con backoff: markRetry incrementa el contador de reintentos', async () => {
+    const fakeStore = new Map();
+    fakeStore.set('tx-retry', { id: 'tx-retry', type: 'seeding', synced: false, retries: 0 });
+    const mockDb = {
+      transaction: vi.fn(() => {
+        const tx = {
+          oncomplete: null,
+          onerror: null,
+          objectStore: vi.fn(() => ({
+            get: vi.fn(() => {
+              const req = {};
+              queueMicrotask(() => {
+                req.result = { ...fakeStore.get('tx-retry') };
+                req.onsuccess?.({ target: req });
+              });
+              return req;
+            }),
+            put: vi.fn((record) => {
+              fakeStore.set(record.id || 'tx-retry', record);
+              const req = {};
+              queueMicrotask(() => {
+                req.onsuccess?.({ target: req });
+                tx.oncomplete?.();
+              });
+              return req;
+            }),
+            getAll: vi.fn(() => {
+              const req = {};
+              queueMicrotask(() => { req.result = Array.from(fakeStore.values()); req.onsuccess?.({ target: req }); });
+              return req;
+            }),
+            delete: vi.fn(() => {
+              const req = {};
+              queueMicrotask(() => { req.onsuccess?.({ target: req }); });
+              return req;
+            }),
+          })),
+        };
+        return tx;
+      }),
+    };
+    syncManager.db = mockDb;
+
+    const retries1 = await syncManager.markRetry('tx-retry', 'network error');
+    expect(retries1).toBe(1);
+    const retries2 = await syncManager.markRetry('tx-retry', 'network error');
+    expect(retries2).toBe(2);
+  });
+
+  it('MAX_RETRIES excedido → la transaccion no se procesa y se marca como fallida', async () => {
+    const tx = {
+      id: 'tx-fail',
+      type: 'seeding',
+      payload: { data: { type: 'log--seeding', attributes: { timestamp: 1700000000 }, relationships: {} } },
+      synced: false,
+      retries: 3, // ya en max retries
+    };
+    patchSyncManager(syncManager, [tx]);
+
+    await syncManager.syncAll();
+
+    expect(syncManager.deleteTransaction).not.toHaveBeenCalled();
+  });
+
+  it('guardado sin conexion: saveTransaction funciona aunque navigator.onLine sea false', async () => {
+    Object.defineProperty(navigator, 'onLine', {
+      configurable: true,
+      writable: true,
+      value: false,
+    });
+    const fakeStore = new Map();
+    const mockDb = {
+      transaction: vi.fn().mockReturnValue({
+        objectStore: vi.fn().mockReturnValue({
+          add: vi.fn(() => {
+            const req = {};
+            fakeStore.set('tx-offline', { id: 'tx-offline', type: 'observation', synced: false });
+            queueMicrotask(() => { req.result = 'tx-offline'; req.onsuccess?.({ target: req }); });
+            return req;
+          }),
+          get: vi.fn(() => {
+            const req = {};
+            queueMicrotask(() => { req.result = fakeStore.get('tx-offline'); req.onsuccess?.({ target: req }); });
+            return req;
+          }),
+          getAll: vi.fn(() => {
+            const req = {};
+            queueMicrotask(() => { req.result = Array.from(fakeStore.values()); req.onsuccess?.({ target: req }); });
+            return req;
+          }),
+        }),
+      }),
+    };
+    syncManager.db = mockDb;
+
+    // Incluso offline, saveTransaction debe persistir.
+    await syncManager.saveTransaction({ id: 'tx-offline', type: 'observation', payload: { data: {} } });
+    const pending = await syncManager.getPendingTransactions();
+    expect(pending.length).toBe(1);
+    expect(pending[0].id).toBe('tx-offline');
+  });
+});

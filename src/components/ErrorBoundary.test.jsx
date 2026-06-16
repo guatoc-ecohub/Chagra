@@ -15,6 +15,7 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
+import React from 'react';
 import { ErrorBoundary } from './ErrorBoundary';
 
 // Componente mock que lanza error
@@ -207,5 +208,159 @@ describe('ErrorBoundary', () => {
 
     // No debería mostrar detalles
     expect(screen.queryByText('Detalle técnico (para depuración)')).not.toBeInTheDocument();
+  });
+});
+
+// ── TAREA 53: Screen components wrapped in ErrorBoundary ─────────────────────
+
+describe('ErrorBoundary — screen components wrapped render fallback on error', () => {
+  it('service mock that throws triggers "Algo falló" fallback (no white screen)', async () => {
+    // Simula un componente pantalla que llama un service que lanza
+    const mockService = vi.fn(() => {
+      throw new Error('Servicio caido: no se pudo cargar la finca');
+    });
+
+    const FincaScreen = () => {
+      mockService();
+      return <div>Pantalla de finca cargada</div>;
+    };
+
+    render(
+      <ErrorBoundary>
+        <FincaScreen />
+      </ErrorBoundary>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Algo falló')).toBeInTheDocument();
+    });
+
+    // Verificar que NO es pantalla blanca (debe tener contenido significativo)
+    expect(screen.getByText('Tus datos de la finca están a salvo')).toBeInTheDocument();
+    expect(console.error).toHaveBeenCalledWith(
+      '[ErrorBoundary] Error capturado:',
+      expect.any(Error)
+    );
+
+    // El contenido original NO debe mostrarse
+    expect(screen.queryByText('Pantalla de finca cargada')).not.toBeInTheDocument();
+  });
+
+  it('"Intentar de nuevo" button resets boundary and allows re-render', async () => {
+    let shouldThrow = true;
+    const mockService = vi.fn(() => {
+      if (shouldThrow) {
+        throw new Error('Error transitorio');
+      }
+      return 'ok';
+    });
+
+    const ScreenWithError = () => {
+      mockService();
+      return <div>Pantalla recuperada</div>;
+    };
+
+    const { rerender } = render(
+      <ErrorBoundary>
+        <ScreenWithError />
+      </ErrorBoundary>
+    );
+
+    // Debe mostrar fallback
+    await waitFor(() => {
+      expect(screen.getByText('Algo falló')).toBeInTheDocument();
+    });
+
+    // Click en "Intentar de nuevo"
+    const retryButton = screen.getByText('Intentar de nuevo');
+    expect(retryButton).toBeInTheDocument();
+    retryButton.click();
+
+    // Rerender sin error
+    shouldThrow = false;
+    rerender(
+      <ErrorBoundary key="retry">
+        <ScreenWithError />
+      </ErrorBoundary>
+    );
+
+    // Ahora debe mostrar contenido normal, sin fallback
+    await waitFor(() => {
+      expect(screen.getByText('Pantalla recuperada')).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText('Algo falló')).not.toBeInTheDocument();
+  });
+
+  it('multiple wrapped screens each show their own fallback independently', async () => {
+    const ThrowInChild = ({ id }) => {
+      if (id === 'broken') {
+        throw new Error('Pantalla rota: ' + id);
+      }
+      return <div>Pantalla OK: {id}</div>;
+    };
+
+    render(
+      <div>
+        <ErrorBoundary>
+          <ThrowInChild id="broken" />
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <ThrowInChild id="working" />
+        </ErrorBoundary>
+      </div>
+    );
+
+    await waitFor(() => {
+      // La pantalla rota muestra fallback
+      expect(screen.getByText('Algo falló')).toBeInTheDocument();
+      // La pantalla OK sigue renderizando normalmente
+      expect(screen.getByText('Pantalla OK: working')).toBeInTheDocument();
+    });
+  });
+
+  it('async error in render throws is caught by ErrorBoundary', async () => {
+    // Simula un componente que sincronicamente lanza en render
+    // (los errores en async effects no son capturados por ErrorBoundaries de React)
+    let shouldCrash = true;
+
+    const AsyncRenderer = () => {
+      if (shouldCrash) {
+        throw new Error('Fallo sincrono en render (simula fallo tras carga de datos)');
+      }
+      return <div>datos cargados</div>;
+    };
+
+    render(
+      <ErrorBoundary>
+        <AsyncRenderer />
+      </ErrorBoundary>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Algo falló')).toBeInTheDocument();
+    });
+
+    // Verificar que NO es pantalla blanca
+    expect(screen.getByText('Tus datos de la finca están a salvo')).toBeInTheDocument();
+  });
+
+  it('"Recargar Chagra" button is always present alongside "Intentar de nuevo"', async () => {
+    const ThrowError = () => { throw new Error('error'); };
+
+    render(
+      <ErrorBoundary>
+        <ThrowError />
+      </ErrorBoundary>
+    );
+
+    await waitFor(() => {
+      const retryBtn = screen.getByText('Intentar de nuevo');
+      const reloadBtn = screen.getByText('Recargar Chagra');
+      expect(retryBtn).toBeInTheDocument();
+      expect(reloadBtn).toBeInTheDocument();
+      expect(retryBtn.tagName).toBe('BUTTON');
+      expect(reloadBtn.tagName).toBe('BUTTON');
+    });
   });
 });

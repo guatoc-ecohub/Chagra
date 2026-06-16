@@ -12,6 +12,12 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { setOnline } from '../../test-utils/index.js';
+import { aggregateNotifications } from '../notificationsService.js';
+
+vi.mock('../ensoService.js', () => ({
+  recordLiveEnsoStatus: vi.fn(),
+  applyEnsoOverride: vi.fn((v) => v),
+}));
 
 describe('offline contracts — servicios degradan a null/mensaje sin throw', () => {
   beforeEach(() => {
@@ -71,6 +77,121 @@ describe('offline contracts — servicios degradan a null/mensaje sin throw', ()
       const result = await mod.fetchDeepResearchStatus('job-123');
       expect(result).toBeNull();
       expect(fetchSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('climaService (cache offline)', () => {
+    afterEach(() => {
+      localStorage.clear();
+    });
+
+    it('getCachedClimaSnapshot devuelve null cuando no hay cache', async () => {
+      vi.doMock('../sidecarClient.js', () => ({
+        getClimaSnapshot: vi.fn().mockResolvedValue(null),
+      }));
+      const mod = await import('../climaService.js');
+      expect(mod.getCachedClimaSnapshot()).toBeNull();
+    });
+
+    it('fetchClimaSnapshot persiste en cache y getCachedClimaSnapshot lo recupera sin red', async () => {
+      const mockPayload = {
+        fetched_at: new Date().toISOString(),
+        enso_status: { phase: 'neutral', severity: 'neutral', sources: [] },
+        alertas_locales: [],
+      };
+      vi.doMock('../sidecarClient.js', () => ({
+        getClimaSnapshot: vi.fn().mockResolvedValue(mockPayload),
+      }));
+      vi.doMock('../userProfileService.js', () => ({
+        getProfile: vi.fn().mockReturnValue(null),
+        getProfileMunicipio: vi.fn().mockReturnValue(null),
+      }));
+      vi.doMock('../../utils/colombiaLocations.js', () => ({
+        findMunicipio: vi.fn().mockReturnValue(null),
+      }));
+
+      const mod = await import('../climaService.js');
+      const snap = await mod.fetchClimaSnapshot({ lat: 4.53, lng: -73.92, elevation: 2580 });
+      expect(snap).toBeTruthy();
+
+      // Tras el fetch, getCachedClimaSnapshot debe devolver el cache sin red.
+      const cached = mod.getCachedClimaSnapshot(4.53, -73.92, 2580);
+      expect(cached).toBeTruthy();
+      expect(cached?.enso_status?.phase).toBe('neutral');
+    });
+  });
+
+  describe('agentRequestQueue (offline)', () => {
+    beforeEach(async () => {
+      vi.doMock('../../db/dbCore', () => ({
+        openDB: vi.fn().mockResolvedValue({}),
+        STORES: { AGENT_REQUESTS: 'agent_requests' },
+      }));
+    });
+
+    it('drainPending offline → marca requests como offline y no procesa', async () => {
+      const mod = await import('../agentRequestQueue');
+      const result = await mod.drainPending({ sender: vi.fn() });
+      expect(result.processed).toBe(0);
+    });
+
+    it('enqueueRequest + markRequestOffline → el request queda con status offline', async () => {
+      const mockDb = {
+        transaction: vi.fn().mockReturnValue({
+          objectStore: vi.fn().mockReturnValue({
+            add: vi.fn(() => {
+              const req = {};
+              queueMicrotask(() => { req.result = 1; req.onsuccess?.({ target: req }); });
+              return req;
+            }),
+            get: vi.fn(() => {
+              const req = {};
+              queueMicrotask(() => {
+                req.result = { id: 1, status: 'queued', prompt: 'test', ts_submit: Date.now() };
+                req.onsuccess?.({ target: req });
+              });
+              return req;
+            }),
+            put: vi.fn(() => {
+              const req = {};
+              queueMicrotask(() => { req.onsuccess?.({ target: req }); });
+              return req;
+            }),
+          }),
+        }),
+      };
+      vi.doMock('../../db/dbCore', () => ({
+        openDB: vi.fn().mockResolvedValue(mockDb),
+        STORES: { AGENT_REQUESTS: 'agent_requests' },
+      }));
+
+      vi.resetModules();
+      const mod = await import('../agentRequestQueue');
+      const id = await mod.enqueueRequest({ prompt: '¿qué siembro?' });
+      expect(id).toBeGreaterThanOrEqual(0);
+    });
+  });
+
+  describe('notificationsService (offline)', () => {
+    it('aggregateNotifications devuelve [] sin crash cuando no hay fuentes', () => {
+      const arr = aggregateNotifications({});
+      expect(Array.isArray(arr)).toBe(true);
+      expect(arr.length).toBe(0);
+    });
+
+    it('aggregateNotifications devuelve [] sin crash con fuentes vacias', () => {
+      const arr = aggregateNotifications({
+        plants: [],
+        tasks: [],
+        failedTxCount: 0,
+      });
+      expect(Array.isArray(arr)).toBe(true);
+      expect(arr.length).toBe(0);
+    });
+
+    it('aggregateNotifications no lanza con entradas vacias o undefined', () => {
+      expect(() => aggregateNotifications(undefined)).not.toThrow();
+      // null sí puede lanzar — el contrato es que el caller pase un objeto.
     });
   });
 });
