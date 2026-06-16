@@ -17,7 +17,7 @@ const TYPE_LABELS = {
   land: 'Zonas',
 };
 
-export default function SyncProgressIndicator() {
+const SyncProgressIndicator = React.memo(function SyncProgressIndicator() {
   const { syncProgress, isLoading } = useAssetStore();
   const [fadingOut, setFadingOut] = useState(false);
 
@@ -114,4 +114,6 @@ export default function SyncProgressIndicator() {
       </div>
     </div>
   );
-}
+});
+
+export default SyncProgressIndicator;

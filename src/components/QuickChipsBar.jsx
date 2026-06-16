@@ -23,7 +23,7 @@ import { QUICK_CHIPS_BAR_QUESTIONS as DEFAULT_QUICK_QUESTIONS } from '../data/ex
  *               Típicamente AgentScreen llama directo a handleSubmit(query).
  */
 
-export default function QuickChipsBar({ onSelect, questions = DEFAULT_QUICK_QUESTIONS }) {
+const QuickChipsBar = React.memo(function QuickChipsBar({ onSelect, questions = DEFAULT_QUICK_QUESTIONS }) {
   if (typeof onSelect !== 'function') return null;
   return (
     <div
@@ -48,4 +48,6 @@ export default function QuickChipsBar({ onSelect, questions = DEFAULT_QUICK_QUES
       </div>
     </div>
   );
-}
+});
+
+export default QuickChipsBar;
