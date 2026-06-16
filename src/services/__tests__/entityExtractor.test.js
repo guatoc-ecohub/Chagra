@@ -1,4 +1,9 @@
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, vi } from 'vitest';
+
+vi.mock('../ollamaStream', () => ({
+  streamOllama: vi.fn().mockResolvedValue('[]'),
+}));
+
 import { resolveSystemPrompt, _resetSystemPromptCache, extractEntities, SYSTEM_PROMPT, MODEL } from '../entityExtractor';
 
 describe('entityExtractor', () => {

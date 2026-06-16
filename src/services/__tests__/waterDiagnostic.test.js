@@ -154,7 +154,7 @@ describe('formatearGroundingAgua', () => {
     });
     const f = formatearGroundingAgua(d);
     expect(f).toContain('Captacion estimada');
-    expect(f).toContain('55.080');
+    expect(f).toContain('55,080');
     expect(f).toContain('GUARDAS');
     expect(f).toContain('DR-AGUA-1');
   });

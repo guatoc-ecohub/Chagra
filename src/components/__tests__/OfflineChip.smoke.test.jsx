@@ -42,7 +42,7 @@ describe('OfflineChip', () => {
     const chip = screen.getByTestId('offline-chip');
     expect(chip).toBeInTheDocument();
     expect(chip).toHaveAttribute('role', 'status');
-    expect(chip).toHaveTextContent(/sin conexión/i);
+    expect(chip).toHaveAttribute('aria-label', 'Sin conexión a internet');
   });
 
   it('aparece cuando se dispara el evento offline', () => {

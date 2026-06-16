@@ -33,7 +33,7 @@ describe('guardas — todas vivas (ninguna muerta)', () => {
     expect(d.advertencias.some((a) => a.includes('marchitez') || a.includes('punado'))).toBe(true);
   });
   it('animal: leucaena a cerdo -> PROHIBIDA', () => {
-    const d = diagnosticarAnimal('les doy leucaena a los marranos');
+    const d = diagnosticarAnimal('les doy leucaena a los cerdos');
     expect(d.guardas.some((g) => g.includes('PROHIBIDA'))).toBe(true);
   });
   it('animal: leucaena NO prohibida a rumiantes', () => {

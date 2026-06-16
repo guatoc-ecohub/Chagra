@@ -77,7 +77,7 @@ describe('PlanEditor — validación de dosis positiva', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('50')).toBeTruthy();
+      expect(screen.getByDisplayValue('50')).toBeTruthy();
     });
   });
 
@@ -108,10 +108,7 @@ describe('PlanEditor — validación de dosis positiva', () => {
     );
 
     await waitFor(() => {
-      // El componente muestra el valor 0 tal cual; la validación de > 0
-      // debe implementarse en el handler onBlur. Este test verifica que
-      // el valor se renderiza para que el usuario pueda corregirlo.
-      expect(screen.getByText('0')).toBeTruthy();
+      expect(screen.getByDisplayValue('0')).toBeTruthy();
     });
   });
 

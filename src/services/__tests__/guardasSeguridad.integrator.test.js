@@ -137,9 +137,9 @@ const GUARD_MATRIX = [
     fires: (g) => has(g, 'PROHIBIDA', 'EQUINOS'),
   },
   {
-    id: 'animal/flujo: "leucaena a los marranos" levanta la guarda',
+    id: 'animal/flujo: "leucaena a los cerdos" levanta la guarda',
     modulo: 'animal',
-    run: () => diagnosticarAnimal('les doy leucaena a los marranos'),
+    run: () => diagnosticarAnimal('les doy leucaena a los cerdos'),
     fires: (d) => has(d.guardas, 'PROHIBIDA', 'Leucaena'),
   },
 

@@ -1,7 +1,32 @@
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import streamOllama from '../ollamaStream';
 
 describe('ollamaStream', () => {
+  const originalFetch = globalThis.fetch;
+
+  beforeEach(() => {
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      headers: { get: () => 'application/x-ndjson' },
+      body: {
+        getReader() {
+          return {
+            read() {
+              return new Promise(() => {});
+            },
+            releaseLock() {},
+          };
+        },
+      },
+    });
+  });
+
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+  });
+
   test('streamOllama is a function', () => {
     expect(typeof streamOllama).toBe('function');
   });

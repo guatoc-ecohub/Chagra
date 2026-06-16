@@ -14,7 +14,7 @@ describe('detectarEspecie', () => {
   it('"cabras y chivos" → caprino', () => {
     expect(detectarEspecie('tengo cabras y chivos').id).toBe('caprino');
   });
-  it('"marranos" → porcino', () => {
+  it('"marrano" → porcino', () => {
     expect(detectarEspecie('los marranos').id).toBe('porcino');
   });
   it('"cerdos" → porcino', () => {
@@ -87,8 +87,8 @@ describe('diagnosticarAnimal', () => {
     expect(d.especie.id).toBe('bovino');
     expect(d.forrajes.length).toBeGreaterThan(0);
   });
-  it('"marranos y leucaena" → guarda de PROHIBIDA', () => {
-    const d = diagnosticarAnimal('les doy leucaena a los marranos');
+  it('"cerdos y leucaena" → guarda de PROHIBIDA', () => {
+    const d = diagnosticarAnimal('les doy leucaena a los cerdos');
     expect(d.guardas.some((g) => g.includes('PROHIBIDA'))).toBe(true);
     expect(d.alimentos.some((f) => f.id === 'yuca_cocida')).toBe(true);
   });

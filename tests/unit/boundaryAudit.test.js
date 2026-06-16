@@ -39,6 +39,8 @@ const PROHIBITED_PATTERNS = [
 
 const SKIP_DIRS = new Set([
   'node_modules', 'dist', '.git',
+  'bench',          // runtime bench artifacts live here and intentionally carry local paths
+  'data',           // public repo benchmark snapshots are audited elsewhere
   'test-results',    // Playwright artifacts (CI paths)
   '.claude',          // private agent config (not in repo)
 ]);

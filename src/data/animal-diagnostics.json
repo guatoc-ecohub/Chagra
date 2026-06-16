@@ -63,6 +63,8 @@
     "corderos": { "especie": "ovino", "confianza": "alta" },
     "cerdo": { "especie": "porcino", "confianza": "alta" },
     "cerda": { "especie": "porcino", "confianza": "alta" },
+    "cerdos": { "especie": "porcino", "confianza": "alta" },
+    "marrano": { "especie": "porcino", "confianza": "alta" },
     "marranos": { "especie": "porcino", "confianza": "alta" },
     "lechones": { "especie": "porcino", "confianza": "alta" },
     "cochino": { "especie": "porcino", "confianza": "alta" },

@@ -45,6 +45,7 @@ describe('homeModuleSelector — helpers', () => {
     expect(profileTieneCerdos({ animales: ['ninguno'] })).toBe(false);
     // Respaldo por texto libre.
     expect(profileTieneCerdos({ cultivos_interes: 'quiero criar marranos' })).toBe(true);
+    expect(profileTieneCerdos({ cultivos_interes: 'quiero criar cerdos' })).toBe(true);
     expect(profileTieneCerdos({})).toBe(false);
   });
 });

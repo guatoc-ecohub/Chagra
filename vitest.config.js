@@ -32,7 +32,13 @@ export default defineConfig({
       // (runner + indice + historial). Deterministas, sin GPU/red.
       'bench/__tests__/**/*.test.{js,mjs}',
     ],
-    exclude: ['node_modules', 'dist', 'tests/*.spec.js'],
+    exclude: [
+      'node_modules',
+      '**/node_modules/**',
+      'dist',
+      'eval/**/dist/**',
+      'tests/*.spec.js',
+    ],
     css: false,
     testTimeout: 30000,
     coverage: {

@@ -52,6 +52,7 @@ describe('networkRetry.fetchWithRetry', () => {
     globalThis.fetch.mockRejectedValue(new TypeError('Failed to fetch'));
 
     const promise = fetchWithRetry('/api/test');
+    promise.catch(() => {});
 
     // Avanzar timers: 1s + 2s + 4s
     await vi.advanceTimersByTimeAsync(1000);
@@ -110,6 +111,7 @@ describe('networkRetry.fetchWithRetry', () => {
     globalThis.fetch.mockRejectedValue(new TypeError('Failed to fetch'));
 
     const promise = fetchWithRetry('/api/test', { retries: 1 });
+    promise.catch(() => {});
 
     await vi.advanceTimersByTimeAsync(1000);
 

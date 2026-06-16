@@ -33,12 +33,12 @@ describe('InputLog — validacion de cantidad positiva', () => {
     const materialSelect = screen.getByRole('combobox', { name: /tipo de insumo/i });
     fireEvent.change(materialSelect, { target: { value: 'mat-bio' } });
 
-    const saveBtn = screen.getByRole('button', { name: /registrar aplicacion/i });
+    const saveBtn = screen.getByRole('button', { name: /registrar aplicaci[oó]n/i });
     fireEvent.click(saveBtn);
 
     await waitFor(() => {
       expect(onSave).toHaveBeenCalledWith(
-        'Completa Ubicacion, Tipo de Insumo y Cantidad',
+        'Completa Ubicación, Tipo de Insumo y Cantidad',
         true
       );
     });
@@ -56,7 +56,7 @@ describe('InputLog — validacion de cantidad positiva', () => {
     const qtyInput = screen.getByPlaceholderText('0.00');
     fireEvent.change(qtyInput, { target: { value: '5' } });
 
-    const saveBtn = screen.getByRole('button', { name: /registrar aplicacion/i });
+    const saveBtn = screen.getByRole('button', { name: /registrar aplicaci[oó]n/i });
     fireEvent.click(saveBtn);
 
     await waitFor(() => {
@@ -73,12 +73,12 @@ describe('InputLog — validacion de cantidad positiva', () => {
     const qtyInput = screen.getByPlaceholderText('0.00');
     fireEvent.change(qtyInput, { target: { value: '3' } });
 
-    const saveBtn = screen.getByRole('button', { name: /registrar aplicacion/i });
+    const saveBtn = screen.getByRole('button', { name: /registrar aplicaci[oó]n/i });
     fireEvent.click(saveBtn);
 
     await waitFor(() => {
       expect(onSave).toHaveBeenCalledWith(
-        'Completa Ubicacion, Tipo de Insumo y Cantidad',
+        'Completa Ubicación, Tipo de Insumo y Cantidad',
         true
       );
     });

@@ -228,7 +228,7 @@ export function profileTieneCerdos(profile) {
   const p = profile && typeof profile === 'object' ? profile : {};
   const arr = p.animales;
   if (Array.isArray(arr) && arr.map(norm).includes('cerdos')) return true;
-  // Respaldo: el usuario escribió cerdos/marranos en texto libre.
+  // Respaldo: el usuario escribió cerdos en texto libre.
   const libre = norm(p.cultivos_actuales) + ' ' + norm(p.cultivos_interes);
   return /\b(cerdo|cerdos|marrano|marranos|porcino|porcinos|porcicultura)\b/.test(libre);
 }
