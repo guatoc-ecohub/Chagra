@@ -11,6 +11,7 @@ vi.mock('../../services/atmosphereService.js', () => ({
 vi.mock('../../services/climaService.js', () => ({
   getCachedClimaSnapshot: vi.fn(() => null),
   resolveClimaLocation: vi.fn(() => null),
+  CLIMA_UPDATED_EVENT: 'chagra:clima:updated',
 }));
 
 import useClimaAtmosphere from '../useClimaAtmosphere.js';
