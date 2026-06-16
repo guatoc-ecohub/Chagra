@@ -41,6 +41,7 @@ import GpsFincaBanner from './components/GpsFincaBanner';
 import DataLossBanner from './components/DataLossBanner';
 import CriticalAlertBanner from './components/CriticalAlertBanner';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { ErrorFallback } from './components/common/ErrorFallback';
 
 // Lazy-loaded route components
 const TelemetryAlerts = lazy(() => import('./components/TelemetryAlerts'));
@@ -700,11 +701,13 @@ export default function App() {
     if (seguimientoKey) {
       return (
         <ErrorBoundary>
-          <SeguimientoProcesoScreen
-            procesoKey={seguimientoKey}
-            onBack={() => navigate('dashboard')}
-            onSave={showToast}
-          />
+          <ErrorFallback moduleName="Seguimiento">
+            <SeguimientoProcesoScreen
+              procesoKey={seguimientoKey}
+              onBack={() => navigate('dashboard')}
+              onSave={showToast}
+            />
+          </ErrorFallback>
         </ErrorBoundary>
       );
     }
@@ -771,47 +774,39 @@ export default function App() {
           </ErrorBoundary>
         );
       case 'hoy_finca':
-        // Dashboard proactivo "Hoy en finca": clima honesto de hoy + alertas
-        // + tareas del ciclo de la semana + agenda campesina. Todo accionable
-        // (los toques rutean a agente/ciclo/procesos/etc.).
         return (
           <ErrorBoundary>
-            <HoyEnFincaScreen
-              onBack={() => navigate('dashboard')}
-              onHome={() => navigate('dashboard')}
-              onNavigate={navigate}
-            />
+            <ErrorFallback moduleName="Hoy en Finca">
+              <HoyEnFincaScreen
+                onBack={() => navigate('dashboard')}
+                onHome={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'evolucion':
-        // "Cómo evoluciona tu finca": le da SUPERFICIE al motor agroecológico
-        // (fincaEvolutionService + agroecologyJourney) que vivía huérfano. La
-        // FincaEvolutionCard de "Hoy en finca" llama onNavigate('evolucion');
-        // sin esta ruta el botón "¿Qué es esto?" quedaba muerto. Cero
-        // gamificación: la progresión es el avance real de indicadores
-        // TAPE/MESMIS + la etapa del viaje, no puntos ni badges.
         return (
           <ErrorBoundary>
-            <MiFincaEvolucionScreen
-              onBack={() => navigate('hoy_finca')}
-              onHome={() => navigate('dashboard')}
-              onNavigate={navigate}
-            />
+            <ErrorFallback moduleName="Evolucion">
+              <MiFincaEvolucionScreen
+                onBack={() => navigate('hoy_finca')}
+                onHome={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'juego':
-        // "Mi Finca Viva": capa LÚDICA kid-friendly sobre el motor de evolución
-        // (fincaEvolutionService → fincaGameService). Mundo que crece + criaturas
-        // + misiones ligadas a acciones reales + GUATOC. Pensado para que una
-        // niña juegue (audio TTS, botones grandes). Cero fabricación: todo se
-        // deriva de los indicadores reales; sin datos, invita a sembrar.
         return (
           <ErrorBoundary>
-            <MiFincaVivaScreen
-              onBack={() => navigate('hoy_finca')}
-              onHome={() => navigate('dashboard')}
-              onNavigate={navigate}
-            />
+            <ErrorFallback moduleName="Juego">
+              <MiFincaVivaScreen
+                onBack={() => navigate('hoy_finca')}
+                onHome={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'sembrar':
@@ -844,7 +839,9 @@ export default function App() {
       case 'observacion':
         return (
           <ErrorBoundary>
-            <ObservationScreen onBack={() => navigate('dashboard')} onSave={showToast} />
+            <ErrorFallback moduleName="Observacion">
+              <ObservationScreen onBack={() => navigate('dashboard')} onSave={showToast} />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'reportar_invasora':
@@ -861,7 +858,9 @@ export default function App() {
       case 'mantenimiento':
         return (
           <ErrorBoundary>
-            <MaintenanceScreen onBack={() => navigate('dashboard')} onSave={showToast} />
+            <ErrorFallback moduleName="Mantenimiento">
+              <MaintenanceScreen onBack={() => navigate('dashboard')} onSave={showToast} />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'task_log':
@@ -904,21 +903,27 @@ export default function App() {
       case 'activos':
         return (
           <ErrorBoundary>
-            <AssetsDashboard onBack={() => navigate('dashboard')} />
+            <ErrorFallback moduleName="Mi Finca">
+              <AssetsDashboard onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'bodega':
         return (
           <ErrorBoundary>
-            <ScreenShell title="Bodega" icon={Package} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
-              <InventoryDashboard />
-            </ScreenShell>
+            <ErrorFallback moduleName="Insumos">
+              <ScreenShell title="Bodega" icon={Package} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
+                <InventoryDashboard />
+              </ScreenShell>
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'informes':
         return (
           <ErrorBoundary>
-            <InformesScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+            <ErrorFallback moduleName="Informes">
+              <InformesScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'historial':
@@ -965,13 +970,17 @@ export default function App() {
       case 'ciclo':
         return (
           <ErrorBoundary>
-            <CicloCultivoScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            <ErrorFallback moduleName="Ciclo de Cultivo">
+              <CicloCultivoScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'suelo':
         return (
           <ErrorBoundary>
-            <SoilDiagnosticScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            <ErrorFallback moduleName="Diagnostico de Suelo">
+              <SoilDiagnosticScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'glaciar':
@@ -984,13 +993,17 @@ export default function App() {
         if (!tieneAccesoGlaciarActual()) {
           return (
             <ErrorBoundary>
-              <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>
+              <ErrorFallback moduleName="Glaciar">
+                <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>
+              </ErrorFallback>
             </ErrorBoundary>
           );
         }
         return (
           <ErrorBoundary>
-            <GlaciarReporteScreen onBack={() => navigate('dashboard')} />
+            <ErrorFallback moduleName="Glaciar">
+              <GlaciarReporteScreen onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'glaciar_historial':
@@ -1015,7 +1028,9 @@ export default function App() {
       case 'perfil':
         return (
           <ErrorBoundary>
-            <ProfileScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+            <ErrorFallback moduleName="Perfil">
+              <ProfileScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'extensionista':
@@ -1026,23 +1041,29 @@ export default function App() {
         if (!esExtensionistaActual()) {
           return (
             <ErrorBoundary>
-              <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>
+              <ErrorFallback moduleName="Extensionista">
+                <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>
+              </ErrorFallback>
             </ErrorBoundary>
           );
         }
         return (
           <ErrorBoundary>
-            <ExtensionistaScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+            <ErrorFallback moduleName="Extensionista">
+              <ExtensionistaScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'casos':
         return (
           <ErrorBoundary>
-            <CaseStudyScreen
-              onBack={() => navigate('dashboard')}
-              onHome={() => navigate('dashboard')}
-              onSelectCase={(id) => navigate('caso_detail', { caseId: id })}
-            />
+            <ErrorFallback moduleName="Casos de Estudio">
+              <CaseStudyScreen
+                onBack={() => navigate('dashboard')}
+                onHome={() => navigate('dashboard')}
+                onSelectCase={(id) => navigate('caso_detail', { caseId: id })}
+              />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'caso_detail':
@@ -1085,10 +1106,12 @@ export default function App() {
         // se preserva sin cambios.
         return (
           <ErrorBoundary>
-            <AgentScreen
-              onBack={() => navigate('dashboard')}
-              initialContext={currentViewData}
-            />
+            <ErrorFallback moduleName="Agente">
+              <AgentScreen
+                onBack={() => navigate('dashboard')}
+                initialContext={currentViewData}
+              />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       default:
