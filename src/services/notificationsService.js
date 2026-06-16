@@ -16,6 +16,118 @@ import { REGIONAL_CLIMATE_ALERTS } from './agentService';
 const STORAGE_DISMISSED = 'chagra:notifications:dismissed:v1';
 const STORAGE_DEMO_SEED = 'chagra:demo:seed-helada';
 
+// Mapa de siembra por mes segun zona biocultural.
+// Cultivos sugeridos por piso termico y temporada, basados en calendarios
+// agricolas colombianos (IDEAM, ICA, CIPAV). Fallback: array vacio.
+const CALENDARIO_SIEMBRA = {
+  andino_alto_paramo: {
+    1: ['papa criolla', 'haba', 'oca'],
+    2: ['papa criolla', 'quinua', 'arveja'],
+    3: ['arveja', 'haba', 'cubio'],
+    4: ['papa', 'mashua', 'ulluco'],
+    5: ['papa', 'oca', 'quinua'],
+    6: ['zanahoria', 'arveja', 'cebolla larga'],
+    7: ['zanahoria', 'repollo', 'acelga'],
+    8: ['papa', 'arveja', 'cebolla larga'],
+    9: ['papa', 'haba', 'ajo'],
+    10: ['papa criolla', 'cebolla larga', 'arveja'],
+    11: ['papa', 'ajo', 'cebolla larga'],
+    12: ['ajo', 'cebolla larga', 'zanahoria'],
+  },
+  andino_medio: {
+    1: ['maiz', 'frijol', 'arveja'],
+    2: ['maiz', 'frijol', 'tomate'],
+    3: ['tomate', 'pimenton', 'frijol'],
+    4: ['cafe', 'platano', 'yuca'],
+    5: ['cafe', 'maiz', 'frijol'],
+    6: ['yuca', 'platano', 'name'],
+    7: ['aguacate', 'citricos', 'cafe'],
+    8: ['cafe', 'maiz', 'frijol'],
+    9: ['frijol', 'arveja', 'hortalizas'],
+    10: ['fresa', 'mora', 'tomate de arbol'],
+    11: ['lulo', 'granadilla', 'curuba'],
+    12: ['mora', 'uchuva', 'tomate de arbol'],
+  },
+  andino_bajo: {
+    1: ['maiz', 'frijol', 'yuca'],
+    2: ['maiz', 'frijol', 'ahuyama'],
+    3: ['yuca', 'platano', 'name'],
+    4: ['arroz secano', 'maiz', 'frijol'],
+    5: ['cacao', 'platano', 'yuca'],
+    6: ['cacao', 'citricos', 'mango'],
+    7: ['mango', 'maracuya', 'papaya'],
+    8: ['cacao', 'platano', 'aguacate'],
+    9: ['aguacate', 'citricos', 'cacao'],
+    10: ['maracuya', 'gulupa', 'papaya'],
+    11: ['platano', 'yuca', 'name'],
+    12: ['maiz', 'frijol', 'ahuyama'],
+  },
+  caribe_seco: {
+    1: ['yuca', 'name', 'batata'],
+    2: ['maiz', 'frijol caupi', 'ahuyama'],
+    3: ['maiz', 'frijol', 'patilla'],
+    4: ['yuca', 'name', 'batata'],
+    5: ['maiz', 'frijol', 'ajonjoli'],
+    6: ['yuca', 'name', 'frijol'],
+    7: ['yuca', 'maiz', 'batata'],
+    8: ['yuca', 'name', 'frijol caupi'],
+    9: ['maiz', 'frijol', 'ahuyama'],
+    10: ['yuca', 'batata', 'name'],
+    11: ['maiz', 'frijol', 'patilla'],
+    12: ['yuca', 'name', 'ahuyama'],
+  },
+  pacifico_humedo: {
+    1: ['arroz', 'platano', 'yuca'],
+    2: ['arroz', 'maiz', 'yuca'],
+    3: ['platano', 'chontaduro', 'borojo'],
+    4: ['arroz', 'maiz', 'coco'],
+    5: ['platano', 'yuca', 'name'],
+    6: ['borojo', 'chontaduro', 'araza'],
+    7: ['platano', 'arroz', 'maiz'],
+    8: ['coco', 'platano', 'yuca'],
+    9: ['arroz', 'maiz', 'platano'],
+    10: ['chontaduro', 'borojo', 'copoazu'],
+    11: ['platano', 'yuca', 'coco'],
+    12: ['arroz', 'platano', 'maiz'],
+  },
+  amazonia: {
+    1: ['yuca brava', 'platano', 'chontaduro'],
+    2: ['yuca', 'maiz', 'frijol'],
+    3: ['platano', 'yuca', 'name'],
+    4: ['yuca', 'arroz secano', 'maiz'],
+    5: ['copoazu', 'araza', 'camu camu'],
+    6: ['yuca', 'platano', 'chontaduro'],
+    7: ['platano', 'yuca', 'name'],
+    8: ['yuca', 'maiz', 'copoazu'],
+    9: ['platano', 'yuca', 'araza'],
+    10: ['yuca', 'camu camu', 'chontaduro'],
+    11: ['platano', 'yuca', 'name'],
+    12: ['yuca', 'maiz', 'platano'],
+  },
+};
+
+/**
+ * Resuelve el calendario de siembra para la zona biocultural y mes actual.
+ * Retorna objeto { month: string, cultivos: string[] } o null si no hay datos.
+ *
+ * @param {string|null} bioculturalZone - slug de zona biocultural
+ * @returns {object|null}
+ */
+export function resolveCalendarMonth(bioculturalZone) {
+  if (!bioculturalZone) return null;
+  const zoneKey = bioculturalZone.toLowerCase().replace(/-/g, '_').replace(/\s+/g, '_');
+  const cultivos = CALENDARIO_SIEMBRA[zoneKey];
+  if (!cultivos) return null;
+  const mes = new Date().getMonth() + 1;
+  const cultivosMes = cultivos[mes];
+  if (!Array.isArray(cultivosMes) || cultivosMes.length === 0) return null;
+  const meses = [
+    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+  ];
+  return { month: meses[mes - 1], cultivos: cultivosMes };
+}
+
 function readDismissedIds() {
     try {
         const raw = localStorage.getItem(STORAGE_DISMISSED);
