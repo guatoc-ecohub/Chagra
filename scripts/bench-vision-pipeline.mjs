@@ -24,22 +24,28 @@ import fs from "node:fs";
 import path from "node:path";
 import { performance } from "node:perf_hooks";
 
-const FIXTURES_DIR = "/home/kortux/Workspace/Chagra-strategy/ops/antigravity/fixtures-fotos";
-const GROUND_TRUTH = JSON.parse(
-  fs.readFileSync("/home/kortux/Workspace/chagra/data/bench-vision-fixtures-ground-truth.json", "utf-8"),
-);
+const DEFAULT_FIXTURES_DIR = "/home/kortux/Workspace/Chagra-strategy/ops/antigravity/fixtures-fotos";
+const DEFAULT_GROUND_TRUTH_PATH = "/home/kortux/Workspace/chagra/data/bench-vision-fixtures-ground-truth.json";
+const FIXTURES_DIR = process.env.VISION_FIXTURES_DIR || DEFAULT_FIXTURES_DIR;
+const GROUND_TRUTH_PATH = process.env.VISION_GROUND_TRUTH_PATH || DEFAULT_GROUND_TRUTH_PATH;
 const OLLAMA = process.env.OLLAMA_URL || "http://127.0.0.1:11434";
 const SIDECAR = process.env.SIDECAR_URL || "http://127.0.0.1:7880";
 const TOKEN = process.env.CHAGRA_MCP_TOKEN || "";
 const PRIMARY_MODEL = process.env.VISION_MODEL || "llama3.2-vision:11b";
 
-if (!TOKEN) {
-  console.error("CHAGRA_MCP_TOKEN env var required (read from /run/secrets/chagra-agro-mcp-env)");
-  process.exit(2);
+function skip(reason) {
+  console.log(`[bench-vision-pipeline] SKIP: ${reason}`);
+  process.exit(0);
 }
 
+if (!TOKEN) skip("falta CHAGRA_MCP_TOKEN");
+if (!fs.existsSync(GROUND_TRUTH_PATH)) skip(`no existe ground truth: ${GROUND_TRUTH_PATH}`);
+if (!fs.existsSync(FIXTURES_DIR)) skip(`no existe directorio de fixtures: ${FIXTURES_DIR}`);
+
+const GROUND_TRUTH = JSON.parse(fs.readFileSync(GROUND_TRUTH_PATH, "utf-8"));
+
 const RUN_ID = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-const OUT_DIR = path.join("/home/kortux/Workspace/chagra/data/bench-runs", `vision-pipeline-${RUN_ID}`);
+const OUT_DIR = path.join(process.env.BENCH_OUTPUT_DIR || "/home/kortux/Workspace/chagra/data/bench-runs", `vision-pipeline-${RUN_ID}`);
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
 const SPECIES_PROMPT =

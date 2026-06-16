@@ -133,6 +133,11 @@ const BENCH_REPS = Math.max(1, Number(process.env.BENCH_REPS || 1));
 const GPU_TEMP_LIMIT = 88;
 const GPU_TEMP_RESUME = 75;
 
+function skip(reason) {
+  console.log(`[bench-borde] SKIP: ${reason}`);
+  process.exit(0);
+}
+
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 function getSidecarToken() {
@@ -556,6 +561,12 @@ async function runRep(prompts, { seed, repIndex, reps }) {
 // ── main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
+  if (!PROMPTS_FILES.every((file) => existsSync(file))) {
+    skip(`falta fixture de prompts: ${PROMPTS_FILES.filter((file) => !existsSync(file)).join(', ')}`);
+  }
+  if (!process.env.SIDECAR_TOKEN && !existsSync(`${process.env.HOME}/.config/chagra-sidecar-token.txt`)) {
+    skip('falta token del sidecar');
+  }
   assertCheckoutCurrent({
     cwd: ROOT_DIR,
     autoPull: process.env.BENCH_AUTO_PULL === '1',
