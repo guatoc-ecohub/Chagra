@@ -40,6 +40,7 @@
  */
 
 import { recordLLMEvent } from './llmTelemetryService';
+import { classifyQueryIntent } from './outputGuards';
 
 const NLU_DEFAULT_URL = '/api/mcp/agro';
 const SSE_DATA_PREFIX = 'data: ';
@@ -319,6 +320,24 @@ export async function streamChatViaSidecar({
     processor: 'unknown',
     first_token_ms: firstTokenWallMs,
   });
+
+  try {
+    const lastMsg = Array.isArray(messages) && messages.length > 0
+      ? messages[messages.length - 1]
+      : null;
+    const userText = lastMsg && lastMsg.role === 'user' ? String(lastMsg.content || '') : '';
+    import('./pilotTelemetryService.js').then(({ recordPilotEvent }) => {
+      recordPilotEvent({
+        event_type: 'pregunta_al_agente',
+        metadata: {
+          intent_detectado: userText ? classifyQueryIntent(userText) : 'unknown',
+          source: 'text',
+          grounded: typeof stats.prompt_eval_count === 'number' && stats.prompt_eval_count > 0,
+          tiempo_respuesta_ms: totalMs,
+        },
+      }).catch(() => {});
+    }).catch(() => {});
+  } catch (_) { /* telemetría nunca rompe el flujo */ }
 
   return { fullText, stats };
 }

@@ -158,6 +158,17 @@ const HASH_VIEW_ROUTES = {
   'glaciar-historial': 'glaciar_historial',
 };
 
+// Vistas que cuentan como "módulo" para telemetría de piloto.
+const MODULE_VIEWS = new Set([
+  'activos', 'mapa', 'javier', 'bodega', 'task_log', 'historial',
+  'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
+  'hoy_finca', 'evolucion', 'juego', 'sembrar', 'cosechar', 'insumos',
+  'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
+  'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'suelo',
+  'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
+  'casos', 'caso_detail', 'bitacora_detail', 'edit_task',
+]);
+
 // T2: Dashboard como componente propio con suscripción reactiva al store.
 // useAssetStore() (hook) dispara re-render cuando hydrate()/syncFromServer() actualizan
 // el estado, a diferencia de useAssetStore.getState() que es una lectura snapshot.
@@ -420,7 +431,17 @@ export default function App() {
   const navigate = useCallback((view, initialData = null) => {
     setCurrentView(view);
     setCurrentViewData(initialData);
-  }, []);
+    try {
+      if (MODULE_VIEWS.has(view)) {
+        import('./services/pilotTelemetryService.js').then(({ recordPilotEvent }) => {
+          recordPilotEvent({
+            event_type: 'modulo_abierto',
+            metadata: { modulo_id: view, desde_home: currentView === 'dashboard' },
+          }).catch(() => {});
+        }).catch(() => {});
+      }
+    } catch (_) { /* telemetría nunca rompe el flujo */ }
+  }, [currentView]);
 
   useEffect(() => {
     const handleNavigate = (e) => navigate(e.detail.view, e.detail.initialData || null);
