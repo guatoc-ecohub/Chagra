@@ -17,6 +17,7 @@ import { describe, test, expect, afterEach, vi, beforeEach } from 'vitest';
 let processes = [];
 const createFarmProcess = vi.fn(async () => ({}));
 const recordFarmEvent = vi.fn(async () => ({}));
+const putFarmProcess = vi.fn(async () => ({}));
 
 vi.mock('../../services/farmEventService', () => ({
   createFarmProcess: (...a) => createFarmProcess(...a),
@@ -28,6 +29,7 @@ vi.mock('../../services/stageConfirmationService', () => ({
 vi.mock('../../db/farmProcessCache', () => ({
   listFarmProcesses: vi.fn(async () => processes),
   getFarmEvents: vi.fn(async () => []),
+  putFarmProcess: (...a) => putFarmProcess(...a),
 }));
 vi.mock('../../store/useAssetStore', () => ({
   default: (selector) => selector({ lands: [] }),
@@ -44,6 +46,7 @@ afterEach(() => {
   processes = [];
   createFarmProcess.mockClear();
   recordFarmEvent.mockClear();
+  putFarmProcess.mockClear();
 });
 beforeEach(() => { processes = []; });
 
@@ -91,6 +94,54 @@ describe('SeguimientoProcesoScreen', () => {
     const arg = createFarmProcess.mock.calls[0][0];
     expect(arg.attributes.process_type).toBe('pigs');
     expect(arg.attributes.current_stage).toBe('instalacion');
+  });
+
+  test('cerdos permite guardar cochera, registrar lote y evento sanitario', async () => {
+    processes = [{
+      process_id: 'proc-cerdos-1',
+      type: 'farm_process',
+      attributes: {
+        process_type: 'pigs',
+        subject_kind: 'aggregate',
+        subject_label: 'Lote de engorde',
+        quantity: 8,
+        unit: 'animales',
+        status: 'active',
+        current_stage: 'instalacion',
+        created_at: Date.now(),
+        updated_at: Date.now(),
+        pig_cochera: { nombre: '', ubicacion: '', capacidad: '', cama_profunda: 'cascarilla_de_arroz' },
+        pig_lotes: [],
+      },
+    }];
+
+    render(<SeguimientoProcesoScreen procesoKey="cerdos" onBack={vi.fn()} onSave={vi.fn()} />);
+    await waitFor(() => screen.getByText('Lote de engorde'));
+    fireEvent.click(screen.getByText('Lote de engorde'));
+
+    fireEvent.change(screen.getByPlaceholderText('Ej: Cochera El Mango'), { target: { value: 'Cochera La Palma' } });
+    fireEvent.change(screen.getByPlaceholderText('Ej: Junto al corral de servicio'), { target: { value: 'Bajo la sombra del patio' } });
+    fireEvent.change(screen.getAllByRole('spinbutton')[0], { target: { value: '14' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar cochera' }));
+
+    await waitFor(() => expect(putFarmProcess).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByPlaceholderText('Raza'), { target: { value: 'Zungo' } });
+    fireEvent.change(screen.getByPlaceholderText('Cantidad'), { target: { value: '6' } });
+    fireEvent.change(screen.getByPlaceholderText('Peso inicial kg'), { target: { value: '18' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Registrar lote' }));
+
+    await waitFor(() => expect(recordFarmEvent).toHaveBeenCalled());
+
+    fireEvent.change(screen.getAllByRole('combobox')[1], { target: { value: 'sanidad' } });
+    const sanitario = await screen.findByPlaceholderText('Ej: vacuna, desparasitación, observación sanitaria');
+    fireEvent.change(sanitario, {
+      target: { value: 'Vacuna y desparasitación' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Registrar evento' }));
+
+    await waitFor(() => expect(recordFarmEvent).toHaveBeenCalledTimes(2));
+    expect(screen.getByText(/Cochera guardada|Lote registrado|Evento guardado/)).toBeInTheDocument();
   });
 
   test('la guarda de leucaena/mimosina aparece en cerdos pero NO en reforestación', async () => {
