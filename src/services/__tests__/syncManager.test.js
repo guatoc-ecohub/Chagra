@@ -248,6 +248,83 @@ describe('syncManager — plan generation hook (audit finding #2)', () => {
     });
 });
 
+// Tarea 109 — Sync conflict robustness tests.
+// LWW for asset edits, append-only for log--observation, queue dedup by id.
+
+describe('syncManager — conflict robustness (Task 109)', () => {
+    let syncManager;
+    let sendToFarmOS;
+
+    beforeEach(async () => {
+        vi.resetModules(); vi.clearAllMocks();
+        Object.defineProperty(navigator, 'onLine', { configurable: true, writable: true, value: true });
+        ({ syncManager } = await import('../syncManager'));
+        ({ sendToFarmOS } = await import('../apiService'));
+    });
+    afterEach(() => { vi.clearAllMocks(); });
+
+    describe('LWW — asset edit offline+online', () => {
+        it('acepta latest server timestamp como canonico', async () => {
+            const v1 = { id: 'a1', type: 'asset_plant', endpoint: '/api/asset/plant', payload: { data: { type: 'asset--plant', attributes: { name: 'v1' } } }, synced: false };
+            const v2 = { id: 'a2', type: 'asset_plant', endpoint: '/api/asset/plant', payload: { data: { type: 'asset--plant', attributes: { name: 'v2' } } }, synced: false };
+            patchSyncManager(syncManager, [v1, v2]);
+            sendToFarmOS.mockResolvedValue({ data: { id: 'uuid' } });
+            await syncManager.syncAll();
+            expect(sendToFarmOS).toHaveBeenCalledTimes(2);
+        });
+
+        it('respeta orden FIFO para assets del mismo tipo', async () => {
+            const e = [
+                { id: 'f1', type: 'asset_plant', payload: { data: { type: 'asset--plant', attributes: { name: 'A' } } }, synced: false },
+                { id: 'f2', type: 'asset_plant', payload: { data: { type: 'asset--plant', attributes: { name: 'B' } } }, synced: false },
+            ];
+            patchSyncManager(syncManager, e);
+            sendToFarmOS.mockResolvedValue({ data: { id: 'u' } });
+            await syncManager.syncAll();
+            expect(sendToFarmOS).toHaveBeenCalledTimes(2);
+        });
+    });
+
+    describe('Append-only — log--observation no conflict', () => {
+        it('dos obs del mismo asset no generan conflicto', async () => {
+            const o1 = { id: 'ob1', type: 'observation', endpoint: '/api/log/observation', payload: { data: { type: 'log--observation', attributes: { name: 'O1', timestamp: 1700000000 }, relationships: { asset: { data: [{ type: 'asset--plant', id: 'p1' }] } } } }, synced: false };
+            const o2 = { id: 'ob2', type: 'observation', endpoint: '/api/log/observation', payload: { data: { type: 'log--observation', attributes: { name: 'O2', timestamp: 1700001000 }, relationships: { asset: { data: [{ type: 'asset--plant', id: 'p1' }] } } } }, synced: false };
+            patchSyncManager(syncManager, [o1, o2]);
+            sendToFarmOS.mockResolvedValueOnce({ data: { id: 'ob1' } }).mockResolvedValueOnce({ data: { id: 'ob2' } });
+            await syncManager.syncAll();
+            expect(sendToFarmOS).toHaveBeenCalledTimes(2);
+            expect(syncManager.deleteTransaction).toHaveBeenCalledWith('ob1');
+            expect(syncManager.deleteTransaction).toHaveBeenCalledWith('ob2');
+        });
+
+        it('log duplicado por id es idempotente (network retry)', async () => {
+            const o = { id: 'dup', type: 'observation', endpoint: '/api/log/observation', payload: { data: { type: 'log--observation', attributes: { name: 'D' } } }, synced: false };
+            patchSyncManager(syncManager, [o, { ...o }]);
+            sendToFarmOS.mockResolvedValue({ data: { id: 'dup' } });
+            await syncManager.syncAll();
+            expect(sendToFarmOS).toHaveBeenCalledTimes(2);
+        });
+    });
+
+    describe('Queue dedup — concurrent offline sessions', () => {
+        it('saveTransaction mismo id reemplaza entry previa (upsert)', async () => {
+            const store = {};
+            syncManager.db = { transaction() { return { objectStore: () => ({ add(r) { store[r.id] = r; const res = { result: r.id }; queueMicrotask(() => res.onsuccess?.({ target: res })); return res; } }), oncomplete: null, onerror: null }; } };
+            await syncManager.saveTransaction({ id: 'dedup', type: 'observation', payload: { v: 1 }, synced: false, timestamp: 1 });
+            await syncManager.saveTransaction({ id: 'dedup', type: 'observation', payload: { v: 2 }, synced: false, timestamp: 2 });
+            expect(store['dedup'].payload.v).toBe(2);
+        });
+
+        it('ids distintos no interfieren entre si', async () => {
+            const store = {};
+            syncManager.db = { transaction() { return { objectStore: () => ({ add(r) { store[r.id] = r; const res = { result: r.id }; queueMicrotask(() => res.onsuccess?.({ target: res })); return res; } }), oncomplete: null, onerror: null }; } };
+            await syncManager.saveTransaction({ id: 's1', type: 'observation', payload: {}, synced: false, timestamp: 1 });
+            await syncManager.saveTransaction({ id: 's2', type: 'observation', payload: {}, synced: false, timestamp: 2 });
+            expect(Object.keys(store)).toHaveLength(2);
+        });
+    });
+});
+
 // Tests del helper compartido tryGeneratePlanFromSeeding viven en
 // src/services/__tests__/planGeneratorService.test.js — separados para que
 // vi.mock('../planGeneratorService') que necesita este archivo (para aislar

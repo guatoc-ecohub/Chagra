@@ -17,7 +17,8 @@
     "audit:bundle": "node scripts/audit-bundle.mjs",
     "grafo:snapshot": "node scripts/snapshot-grafo-crecimiento.mjs",
     "hooks:install": "lefthook install",
-    "tsc:check": "tsc --noEmit -p jsconfig.json"
+    "tsc:check": "tsc --noEmit -p jsconfig.json",
+    "perf-budget": "node scripts/check-perf-budget.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
