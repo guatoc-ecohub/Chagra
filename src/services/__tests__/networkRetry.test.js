@@ -49,7 +49,7 @@ describe('networkRetry.fetchWithRetry', () => {
   });
 
   it('GET: lanza tras agotar los 3 reintentos (4 intentos totales)', async () => {
-    globalThis.fetch.mockRejectedValue(new TypeError('Failed to fetch'));
+    globalThis.fetch.mockImplementation(async () => { throw new TypeError('Failed to fetch'); });
 
     const promise = fetchWithRetry('/api/test');
 
@@ -107,7 +107,7 @@ describe('networkRetry.fetchWithRetry', () => {
   });
 
   it('respeta el parametro retries del caller', async () => {
-    globalThis.fetch.mockRejectedValue(new TypeError('Failed to fetch'));
+    globalThis.fetch.mockImplementation(async () => { throw new TypeError('Failed to fetch'); });
 
     const promise = fetchWithRetry('/api/test', { retries: 1 });
 
