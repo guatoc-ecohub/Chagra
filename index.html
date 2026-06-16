@@ -22,6 +22,21 @@
     <meta name="apple-mobile-web-app-title" content="Chagra" />
 
     <title>Chagra</title>
+    <!-- Content-Security-Policy (Task 112). Defense-in-depth anti-XSS. -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' https:;
+      style-src 'self' 'unsafe-inline' https:;
+      img-src 'self' data: blob: https:;
+      connect-src 'self' https: wss:;
+      font-src 'self' data:;
+      media-src 'self' blob:;
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self';
+      frame-ancestors 'none';
+    " />
+
 
     <!-- Pre-React loader inline (issue #121): evita flash blanco al
          arrancar PWA fría antes de que React + Suspense pinten el
