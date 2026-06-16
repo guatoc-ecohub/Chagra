@@ -87,7 +87,6 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
   // Misiones de "aprender" marcadas a mano (persistidas por finca).
   const [misionesHechas, setMisionesHechas] = useState(() => getMisionesHechasSet(fincaSlug));
 
-  // Estado de juego completo — TODO derivado de datos reales.
   const game = useMemo(
     () => buildFincaGameState({ processes, observations: [], misionesHechas }),
     [processes, misionesHechas],

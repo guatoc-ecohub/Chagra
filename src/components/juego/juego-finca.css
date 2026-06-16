@@ -126,21 +126,6 @@
   100% { transform: translateY(110vh) rotate(360deg); opacity: 0.9; }
 }
 
-/* ── Tarjetas de criatura recién desbloqueada ────────────────────────── */
-
-.fv-new-badge {
-  animation: fv-shine 1.6s ease-in-out infinite;
-}
-@keyframes fv-shine {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.12); }
-}
-
-/* Criatura nueva (toast). */
-.fv-creature-pop {
-  animation: fv-pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-}
-
 /* ── Accesibilidad: respetar reducción de movimiento ─────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
@@ -153,8 +138,6 @@
   .fv-float,
   .fv-celebration-emoji,
   .fv-confetti,
-  .fv-new-badge,
-  .fv-creature-pop,
   .fv-celebration-card {
     animation: none !important;
   }
