@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import OfflineChip from '../OfflineChip';
+import { MSG } from '../../config/messages.js';
 
 /**
  * Smoke tests para OfflineChip (UX-2 / #286).
@@ -36,13 +37,14 @@ describe('OfflineChip', () => {
     expect(screen.queryByTestId('offline-chip')).toBeNull();
   });
 
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
   it('renderiza el chip "Sin conexión" cuando está offline', () => {
     setOnline(false);
     render(<OfflineChip />);
     const chip = screen.getByTestId('offline-chip');
     expect(chip).toBeInTheDocument();
     expect(chip).toHaveAttribute('role', 'status');
-    expect(chip).toHaveTextContent(/sin conexión/i);
+    expect(chip).toHaveTextContent(/sin conexi[oó]n/i);
   });
 
   it('aparece cuando se dispara el evento offline', () => {

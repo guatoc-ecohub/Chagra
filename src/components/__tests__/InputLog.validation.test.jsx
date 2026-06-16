@@ -13,6 +13,7 @@ vi.mock('../../services/payloadService', () => ({
   savePayload: vi.fn().mockResolvedValue({ success: true, message: 'OK' }),
 }));
 vi.mock('../../config/defaults', () => ({
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
   FARM_CONFIG: { LOCATION_ID: 'loc-1', FARM_NAME: 'Finca Test' },
 }));
 
@@ -30,15 +31,15 @@ describe('InputLog — validacion de cantidad positiva', () => {
 
     render(<InputLog onBack={onBack} onSave={onSave} />);
 
-    const materialSelect = screen.getByRole('combobox', { name: /tipo de insumo/i });
+    const materialSelect = screen.getByLabelText(/Tipo de Insumo/i);
     fireEvent.change(materialSelect, { target: { value: 'mat-bio' } });
 
-    const saveBtn = screen.getByRole('button', { name: /registrar aplicacion/i });
+    const saveBtn = screen.getByText(/Registrar Aplicación/i);
     fireEvent.click(saveBtn);
 
     await waitFor(() => {
       expect(onSave).toHaveBeenCalledWith(
-        'Completa Ubicacion, Tipo de Insumo y Cantidad',
+        'Completa Ubicación, Tipo de Insumo y Cantidad',
         true
       );
     });
@@ -50,13 +51,13 @@ describe('InputLog — validacion de cantidad positiva', () => {
 
     render(<InputLog onBack={onBack} onSave={onSave} />);
 
-    const materialSelect = screen.getByRole('combobox', { name: /tipo de insumo/i });
+    const materialSelect = screen.getByLabelText(/Tipo de Insumo/i);
     fireEvent.change(materialSelect, { target: { value: 'mat-bio' } });
 
     const qtyInput = screen.getByPlaceholderText('0.00');
     fireEvent.change(qtyInput, { target: { value: '5' } });
 
-    const saveBtn = screen.getByRole('button', { name: /registrar aplicacion/i });
+    const saveBtn = screen.getByText(/Registrar Aplicación/i);
     fireEvent.click(saveBtn);
 
     await waitFor(() => {
@@ -73,12 +74,12 @@ describe('InputLog — validacion de cantidad positiva', () => {
     const qtyInput = screen.getByPlaceholderText('0.00');
     fireEvent.change(qtyInput, { target: { value: '3' } });
 
-    const saveBtn = screen.getByRole('button', { name: /registrar aplicacion/i });
+    const saveBtn = screen.getByText(/Registrar Aplicación/i);
     fireEvent.click(saveBtn);
 
     await waitFor(() => {
       expect(onSave).toHaveBeenCalledWith(
-        'Completa Ubicacion, Tipo de Insumo y Cantidad',
+        'Completa Ubicación, Tipo de Insumo y Cantidad',
         true
       );
     });

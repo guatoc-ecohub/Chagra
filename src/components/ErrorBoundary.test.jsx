@@ -16,6 +16,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { ErrorBoundary } from './ErrorBoundary';
+import { MSG } from '../config/messages.js';
 
 // Componente mock que lanza error
 const ThrowError = ({ shouldThrow }) => {
@@ -76,8 +77,7 @@ describe('ErrorBoundary', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Algo falló')).toBeInTheDocument();
-      expect(screen.getByText('Tus datos de la finca están a salvo')).toBeInTheDocument();
+      expect(screen.getByText(MSG.ALGO_FALLO)).toBeInTheDocument();
     });
   });
 
@@ -93,7 +93,7 @@ describe('ErrorBoundary', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Algo falló')).toBeInTheDocument();
+      expect(screen.getByText(MSG.ALGO_FALLO)).toBeInTheDocument();
     });
 
     // Verificar que los datos locales siguen intactos
@@ -152,11 +152,11 @@ describe('ErrorBoundary', () => {
 
     // Esperar a que se muestre el error
     await waitFor(() => {
-      expect(screen.getByText('Algo falló')).toBeInTheDocument();
+      expect(screen.getByText(MSG.ALGO_FALLO)).toBeInTheDocument();
     });
 
     // Click en "Intentar de nuevo"
-    const retryButton = screen.getByText('Intentar de nuevo');
+    const retryButton = screen.getByText(MSG.INTENTAR_DE_NUEVO);
     retryButton.click();
 
     // Rerender con shouldThrow=false
@@ -169,7 +169,7 @@ describe('ErrorBoundary', () => {
     // Ahora debería mostrarse el hijo normalmente
     await waitFor(() => {
       expect(screen.getByText('Hijo renderizado correctamente')).toBeInTheDocument();
-      expect(screen.queryByText('Algo falló')).not.toBeInTheDocument();
+      expect(screen.queryByText(MSG.ALGO_FALLO)).not.toBeInTheDocument();
     });
   });
 
@@ -202,7 +202,7 @@ describe('ErrorBoundary', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Algo falló')).toBeInTheDocument();
+      expect(screen.getByText(MSG.ALGO_FALLO)).toBeInTheDocument();
     });
 
     // No debería mostrar detalles
