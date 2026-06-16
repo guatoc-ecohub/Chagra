@@ -106,6 +106,11 @@ const PROMPTS_FILE =
 const GPU_TEMP_LIMIT = 88;
 const GPU_TEMP_RESUME = 75;
 
+function skip(reason) {
+  console.log(`[bench-complejos] SKIP: ${reason}`);
+  process.exit(0);
+}
+
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 // ── helpers (delegan al lib compartido scripts/lib/bench-sidecar.mjs) ─────────
@@ -168,6 +173,7 @@ function judgeOllamaCall(prompt) {
 // ── main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
+  if (!existsSync(PROMPTS_FILE)) skip(`no existe fixture de prompts: ${PROMPTS_FILE}`);
   // Guarda ANTI-STALE (PASO 0): aborta si el checkout está atrás de origin/main.
   // El "10% AH" previo fue artefacto de correr código viejo (sin #1240). Ningún
   // bench debe volver a medir código que el usuario ya no ve.

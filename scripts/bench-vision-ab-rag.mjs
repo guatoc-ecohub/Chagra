@@ -44,11 +44,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { performance } from "node:perf_hooks";
 
-const FIXTURES_DIR = "/home/kortux/Workspace/Chagra-strategy/ops/antigravity/fixtures-fotos";
-const EXTENDED_DIR = "/home/kortux/Workspace/chagra/data/bench-vision-fixtures-extended";
-const GROUND_TRUTH_PATH = "/home/kortux/Workspace/chagra/data/bench-vision-fixtures-ground-truth.json";
+const FIXTURES_DIR = process.env.VISION_FIXTURES_DIR || "/home/kortux/Workspace/Chagra-strategy/ops/antigravity/fixtures-fotos";
+const EXTENDED_DIR = process.env.VISION_EXTENDED_DIR || "/home/kortux/Workspace/chagra/data/bench-vision-fixtures-extended";
+const GROUND_TRUTH_PATH = process.env.VISION_GROUND_TRUTH_PATH || "/home/kortux/Workspace/chagra/data/bench-vision-fixtures-ground-truth.json";
 const EXTENDED_MANIFEST_PATH = path.join(EXTENDED_DIR, "manifest.json");
-const CATALOG_PATH = "/home/kortux/Workspace/chagra/catalog/chagra-catalog-oss-subset-v3.2.json";
+const CATALOG_PATH = process.env.VISION_CATALOG_PATH || "/home/kortux/Workspace/chagra/catalog/chagra-catalog-oss-subset-v3.2.json";
 
 const OLLAMA = process.env.OLLAMA_URL || "http://127.0.0.1:11434";
 const SIDECAR = process.env.SIDECAR_URL || "http://127.0.0.1:7880";
@@ -76,16 +76,24 @@ const args = new Set(process.argv.slice(2));
 const GROUND_TRUTH_ONLY = args.has("--ground-truth-only") || args.has("--no-extended");
 
 if (!TOKEN) {
-  console.error("CHAGRA_MCP_TOKEN env var required (read from /run/secrets/chagra-agro-mcp-env)");
-  process.exit(2);
+  console.log("[bench-vision-ab-rag] SKIP: falta CHAGRA_MCP_TOKEN");
+  process.exit(0);
 }
 if (!fs.existsSync(GROUND_TRUTH_PATH)) {
-  console.error(`Ground truth file not found: ${GROUND_TRUTH_PATH}`);
-  process.exit(2);
+  console.log(`[bench-vision-ab-rag] SKIP: no existe ground truth: ${GROUND_TRUTH_PATH}`);
+  process.exit(0);
+}
+if (!fs.existsSync(FIXTURES_DIR)) {
+  console.log(`[bench-vision-ab-rag] SKIP: no existe directorio de fixtures: ${FIXTURES_DIR}`);
+  process.exit(0);
+}
+if (!fs.existsSync(CATALOG_PATH)) {
+  console.log(`[bench-vision-ab-rag] SKIP: no existe catalogo: ${CATALOG_PATH}`);
+  process.exit(0);
 }
 
 const RUN_ID = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-const OUT_DIR = path.join("/home/kortux/Workspace/chagra/data/bench-runs", `vision-ab-rag-${RUN_ID}`);
+const OUT_DIR = path.join(process.env.BENCH_OUTPUT_DIR || "/home/kortux/Workspace/chagra/data/bench-runs", `vision-ab-rag-${RUN_ID}`);
 fs.mkdirSync(OUT_DIR, { recursive: true });
 const RAW_PATH = path.join(OUT_DIR, "raw.jsonl");
 
