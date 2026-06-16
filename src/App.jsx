@@ -39,6 +39,7 @@ import AndroidInstallBanner from './components/AndroidInstallBanner';
 import UpdateAvailableBanner from './components/UpdateAvailableBanner';
 import GpsFincaBanner from './components/GpsFincaBanner';
 import DataLossBanner from './components/DataLossBanner';
+import DemoModeBanner from './components/DemoModeBanner';
 import CriticalAlertBanner from './components/CriticalAlertBanner';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
@@ -1161,6 +1162,7 @@ export default function App() {
           )}
         </div>
       )}
+      <DemoModeBanner />
     </>
   );
 }
