@@ -1,0 +1,99 @@
+name: Visual Regression
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      update-baselines:
+        description: 'Update visual baselines (first run or after intentional UI changes)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  visual-regression:
+    name: Visual regression (screenshot diff)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run visual regression tests
+        id: visual
+        run: |
+          if [ "${{ github.event.inputs.update-baselines }}" = "true" ]; then
+            echo "Updating visual baselines..."
+            npx playwright test tests/e2e-visual-baseline.spec.js --update-snapshots --project=chromium
+          else
+            echo "Running visual regression against existing baselines..."
+            npx playwright test tests/e2e-visual-baseline.spec.js --project=chromium
+          fi
+        env:
+          CI: '1'
+          VITE_FARMOS_URL: ''
+          VITE_FARMOS_CLIENT_ID: farm
+        continue-on-error: true
+
+      - name: Upload screenshots on failure
+        if: ${{ steps.visual.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-regression-screenshots
+          path: |
+            test-results/
+          retention-days: 30
+
+      - name: Upload updated baselines
+        if: ${{ github.event.inputs.update-baselines == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-baselines-updated
+          path: |
+            tests/e2e-visual-baseline.spec.js-snapshots/
+          retention-days: 30
+
+      - name: Fail if visual regression failed on PR
+        if: ${{ steps.visual.outcome == 'failure' && github.event_name == 'pull_request' }}
+        run: |
+          echo "Visual regression failed. Review screenshots in the artifacts tab."
+          exit 1
+
+# ── How to update baselines ───────────────────────────────────────────
+#
+# Baselines are Playwright screenshot snapshots stored alongside the spec
+# file. When the UI changes intentionally (redesign, component refactor,
+# new features), the baselines must be updated.
+#
+# Option A — CI (recommended for reviewable changes):
+#   1. Go to Actions > Visual Regression > Run workflow
+#   2. Set "Update visual baselines" to true
+#   3. Run the workflow
+#   4. Download the `visual-baselines-updated` artifact
+#   5. Replace `tests/e2e-visual-baseline.spec.js-snapshots/` locally
+#   6. Commit and push the updated snapshots in a PR
+#
+# Option B — Local:
+#   npx playwright test tests/e2e-visual-baseline.spec.js --update-snapshots
+#   git add tests/e2e-visual-baseline.spec.js-snapshots/
+#   git commit -m "chore(visual): update visual baselines"
+#
+# IMPORTANT: Never update baselines to hide a regression. Always review
+# the diff in the PR before merging updated snapshots.
