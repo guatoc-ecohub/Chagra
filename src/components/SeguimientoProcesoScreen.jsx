@@ -14,6 +14,7 @@ import CarbonoPsaSubvista from './CarbonoPsaSubvista';
 import useFincaActiveStore from '../services/fincaActiveStore';
 import { getProfile } from '../services/userProfileService';
 import animalDiagnostics from '../data/animal-diagnostics.json';
+import { diagnosticarAnimal, formatearGroundingAnimal } from '../services/animalDiagnostic';
 
 /**
  * SeguimientoProcesoScreen — vista de SEGUIMIENTO de un proceso de finca
@@ -37,6 +38,10 @@ import animalDiagnostics from '../data/animal-diagnostics.json';
  */
 
 const PIG_GUARD = animalDiagnostics?.guardas?.leucaena_toxica || null;
+const PIG_SANITY_GUARDS = [
+  animalDiagnostics?.guardas?.porquinaza_bioseguridad,
+  animalDiagnostics?.guardas?.reproduccion_porcina,
+].filter(Boolean);
 const PIG_STAGE_LABELS = {
   instalacion: 'Instalación',
   alimentacion: 'Alimentación',
@@ -60,6 +65,22 @@ function getPigProfile(attributes) {
       cama_profunda: 'cascarilla_de_arroz',
     },
     lotes: Array.isArray(attributes?.pig_lotes) ? attributes.pig_lotes : [],
+  };
+}
+
+function getPigClimateContext(label = '') {
+  const text = String(label).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  if (/(frio|templado|andino|alt[oa]|sierra|montana|montana)/.test(text)) {
+    return {
+      title: 'Clima frio o templado',
+      foods: ['Maiz', 'Papa en poca cantidad', 'Balu o chachafruto', 'Suero de leche'],
+      caution: 'La papa amarilla va solo en pequenas cantidades. La papa en exceso los revienta.',
+    };
+  }
+  return {
+    title: 'Clima caliente',
+    foods: ['Soya', 'Maiz', 'Yuca cocida', 'Platano de rechazo', 'Suero de leche'],
+    caution: 'Asegura sombra, agua limpia y revolcadero. El cerdo no suda y se estresa con el calor.',
   };
 }
 
@@ -489,6 +510,8 @@ function ProcesoDetalle({ def, proceso, stageSeq, locationOptions = [], onReload
   });
   const [pigBusy, setPigBusy] = useState(false);
   const [pigMessage, setPigMessage] = useState('');
+  const pigClimate = useMemo(() => getPigClimateContext(a.subject_label || def.title), [a.subject_label, def.title]);
+  const pigDiagnosis = useMemo(() => diagnosticarAnimal(a.subject_label || 'cerdos'), [a.subject_label]);
 
   // Nombre del lote resuelto desde el store (NO inventamos el nombre).
   const locName = useMemo(() => {
@@ -662,6 +685,44 @@ function ProcesoDetalle({ def, proceso, stageSeq, locationOptions = [], onReload
       )}
 
       {def.processType === 'pigs' && (
+        <section className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col gap-3">
+          <div>
+            <h2 className="text-sm font-bold text-slate-100">Grounding porcino</h2>
+            <p className="text-2xs text-slate-500">Resumen curado para manejo, alimentacion y sanidad.</p>
+          </div>
+          {pigClimate && (
+            <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-3">
+              <p className="text-xs font-bold text-lime-200">{pigClimate.title}</p>
+              <p className="text-2xs text-slate-400 mt-1">{pigClimate.caution}</p>
+              <p className="text-2xs text-slate-500 mt-2">Alimentos sugeridos: {pigClimate.foods.join(', ')}</p>
+            </div>
+          )}
+          <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-3">
+            <p className="text-xs font-bold text-slate-200">Alertas sanitarias</p>
+            <ul className="mt-2 space-y-1 text-2xs text-slate-400">
+              <li>Vacunas y desparasitacion dependen del municipio y de la resolucion ICA vigente.</li>
+              <li>Aborto, mortalidad súbita o sangrados exigen veterinario y posible aviso al ICA.</li>
+              <li>No dar lavaza cruda ni sobras con carne sin manejo termico.</li>
+            </ul>
+          </div>
+          {Array.isArray(PIG_SANITY_GUARDS) && PIG_SANITY_GUARDS.length > 0 && (
+            <div className="rounded-lg border border-red-800/60 bg-red-950/20 p-3">
+              <p className="text-xs font-bold text-red-200">Guardas activas</p>
+              <ul className="mt-2 space-y-1 text-2xs text-red-100/90">
+                {PIG_SANITY_GUARDS.map((g) => <li key={g}>- {g}</li>)}
+              </ul>
+            </div>
+          )}
+          {pigDiagnosis?.especie && (
+            <details className="rounded-lg border border-slate-800 bg-slate-950/60 p-3">
+              <summary className="cursor-pointer text-xs font-bold text-slate-200">Grounding detallado</summary>
+              <pre className="mt-2 whitespace-pre-wrap text-2xs text-slate-400 leading-relaxed">{formatearGroundingAnimal(pigDiagnosis)}</pre>
+            </details>
+          )}
+        </section>
+      )}
+
+      {def.processType === 'pigs' && (
         <section className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col gap-4">
           <div className="flex items-center justify-between gap-2">
             <div>
@@ -720,6 +781,10 @@ function ProcesoDetalle({ def, proceso, stageSeq, locationOptions = [], onReload
                 </select>
               </label>
             </div>
+            <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-3 text-2xs text-slate-400">
+              <p className="font-bold text-slate-200">{pigClimate.title}</p>
+              <p className="mt-1">{pigClimate.caution}</p>
+            </div>
             <button
               type="button"
               onClick={savePigProfile}
@@ -750,12 +815,13 @@ function ProcesoDetalle({ def, proceso, stageSeq, locationOptions = [], onReload
                 <option value="peso">Peso</option>
                 <option value="alimentacion">Alimentación</option>
                 <option value="sanidad">Sanidad / vacunas</option>
+                <option value="reproduccion">Reproducción</option>
               </select>
               <input type="date" value={eventoDraft.fecha} onChange={(e) => setEventoDraft((p) => ({ ...p, fecha: e.target.value }))} className="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white" disabled={pigBusy} />
               {eventoDraft.tipo === 'peso' ? (
                 <input type="number" min="0" step="0.1" value={eventoDraft.valor} onChange={(e) => setEventoDraft((p) => ({ ...p, valor: e.target.value }))} className="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white" placeholder="Peso en kg" disabled={pigBusy} />
               ) : (
-                <textarea value={eventoDraft.detalle} onChange={(e) => setEventoDraft((p) => ({ ...p, detalle: e.target.value }))} rows={3} className="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white resize-none" placeholder={eventoDraft.tipo === 'alimentacion' ? 'Ej: maíz, yuca cocida, suero' : 'Ej: vacuna, desparasitación, observación sanitaria'} disabled={pigBusy} />
+                <textarea value={eventoDraft.detalle} onChange={(e) => setEventoDraft((p) => ({ ...p, detalle: e.target.value }))} rows={3} className="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white resize-none" placeholder={eventoDraft.tipo === 'alimentacion' ? 'Ej: maíz, yuca cocida, suero' : (eventoDraft.tipo === 'reproduccion' ? 'Ej: celo, monta, preñez confirmada, parto, destete' : 'Ej: vacuna, desparasitación, observación sanitaria')} disabled={pigBusy} />
               )}
               <button type="button" onClick={addPigEvent} disabled={pigBusy} className="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold disabled:opacity-50">
                 Registrar evento

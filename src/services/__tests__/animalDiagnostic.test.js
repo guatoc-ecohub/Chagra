@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { detectarEspecie, recomendarForraje, getGuardas, diagnosticarAnimal, formatearGroundingAnimal } from '../animalDiagnostic';
+import { detectarEspecie, recomendarForraje, recomendarAlimentosPecuarios, getGuardas, diagnosticarAnimal, formatearGroundingAnimal } from '../animalDiagnostic';
 
 describe('detectarEspecie', () => {
   it('"tengo 5 vacas lecheras" → bovino leche', () => {
@@ -17,6 +17,9 @@ describe('detectarEspecie', () => {
   it('"marranos" → porcino', () => {
     expect(detectarEspecie('los marranos').id).toBe('porcino');
   });
+  it('"cerdos" → porcino', () => {
+    expect(detectarEspecie('tengo cerdos en la finca').id).toBe('porcino');
+  });
   it('"angelitas y colmenas" → apicola', () => {
     expect(detectarEspecie('tengo angelitas en el colmenar').id).toBe('apicola');
   });
@@ -30,6 +33,7 @@ describe('getGuardas', () => {
     const g = getGuardas('porcino');
     expect(g.some((g) => g.includes('PROHIBIDA') && g.includes('Leucaena'))).toBe(true);
     expect(g.some((g) => g.includes('estres_termico') || g.includes('calor'))).toBe(true);
+    expect(g.some((g) => g.includes('veterinario') || g.includes('ICA'))).toBe(true);
   });
   it('avicola → leucaena PROHIBIDA + estres termico', () => {
     const g = getGuardas('avicola');
@@ -65,6 +69,14 @@ describe('recomendarForraje', () => {
   });
 });
 
+describe('recomendarAlimentosPecuarios', () => {
+  it('porcino → incluye alimentos locales curados', () => {
+    const alimentos = recomendarAlimentosPecuarios('porcino');
+    expect(alimentos.some((f) => f.id === 'yuca_cocida')).toBe(true);
+    expect(alimentos.some((f) => f.id === 'suero_leche')).toBe(true);
+  });
+});
+
 describe('diagnosticarAnimal', () => {
   it('sin datos → sin_datos true', () => {
     expect(diagnosticarAnimal('').sin_datos).toBe(true);
@@ -78,6 +90,7 @@ describe('diagnosticarAnimal', () => {
   it('"marranos y leucaena" → guarda de PROHIBIDA', () => {
     const d = diagnosticarAnimal('les doy leucaena a los marranos');
     expect(d.guardas.some((g) => g.includes('PROHIBIDA'))).toBe(true);
+    expect(d.alimentos.some((f) => f.id === 'yuca_cocida')).toBe(true);
   });
 });
 

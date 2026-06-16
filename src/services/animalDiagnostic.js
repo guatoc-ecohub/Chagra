@@ -43,6 +43,12 @@ export function recomendarForraje(especieId) {
   return forrajes;
 }
 
+export function recomendarAlimentosPecuarios(especieId) {
+  if (especieId !== 'porcino') return [];
+  const ids = ['platano_rechazo', 'yuca_cocida', 'suero_leche', 'azolla', 'bsf', 'morera', 'nacedero', 'boton_oro'];
+  return ANIMAL_DATA.forrajeras.filter((f) => ids.includes(f.id));
+}
+
 /**
  * Retorna guardas de seguridad especificas para una especie animal.
  * @param {string} especieId
@@ -55,6 +61,10 @@ export function getGuardas(especieId) {
   }
   if (especieId === 'apicola') guardas.push(ANIMAL_DATA.guardas.apis_vs_meliponas);
   if (['avicola', 'porcino'].includes(especieId)) guardas.push(ANIMAL_DATA.guardas.estres_termico);
+  if (especieId === 'porcino') {
+    guardas.push(ANIMAL_DATA.guardas.porquinaza_bioseguridad);
+    guardas.push(ANIMAL_DATA.guardas.reproduccion_porcina);
+  }
   guardas.push(ANIMAL_DATA.guardas.normativa_ica);
   return guardas;
 }
@@ -75,6 +85,7 @@ export function diagnosticarAnimal(descripcion) {
     return { especie: null, forrajes: [], guardas: [ANIMAL_DATA.guardas.normativa_ica], sin_datos: true, fuente: ANIMAL_DATA.fuente };
   }
   const forrajes = recomendarForraje(especie.id);
+  const alimentos = recomendarAlimentosPecuarios(especie.id);
   const guardas = getGuardas(especie.id);
 
   // Detect Leucaena specifically mentioned
@@ -82,7 +93,7 @@ export function diagnosticarAnimal(descripcion) {
     guardas.unshift(ANIMAL_DATA.guardas.leucaena_toxica);
   }
 
-  return { especie, forrajes, guardas, sin_datos: false, fuente: ANIMAL_DATA.fuente };
+  return { especie, forrajes, alimentos, guardas, sin_datos: false, fuente: ANIMAL_DATA.fuente };
 }
 
 /**
@@ -97,6 +108,16 @@ export function formatearGroundingAnimal(d) {
   if (d.forrajes.length > 0) {
     partes.push('**Forrajeras recomendadas:**');
     d.forrajes.forEach((f) => partes.push(`- ${f.nombre}: max ${d.especie.id === 'porcino' || d.especie.id === 'cunicola' ? f.monogastricos_max_pct : f.rumiantes_max_pct}% inclusion. ${f.guarda}`));
+  }
+  if (Array.isArray(d.alimentos) && d.alimentos.length > 0) {
+    partes.push('**Alimentos y complementos para porcinos:**');
+    d.alimentos.forEach((f) => {
+      if (f.id === 'nacedero' || f.id === 'boton_oro' || f.id === 'morera') {
+        partes.push(`- ${f.nombre}: usar como complemento, no como dieta unica. ${f.guarda}`);
+      } else {
+        partes.push(`- ${f.nombre}: ${f.guarda}`);
+      }
+    });
   }
   if (d.guardas.length > 0) {
     partes.push('**GUARDAS DE SEGURIDAD:**');
