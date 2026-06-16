@@ -276,6 +276,7 @@ function IniciarProcesoForm({ def, locationOptions, onCancel, onCreated }) {
   const [subject, setSubject] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [unit, setUnit] = useState(def.defaultUnit);
+  const [areaHa, setAreaHa] = useState('');
   const [locationId, setLocationId] = useState('');
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState('');
@@ -305,6 +306,7 @@ function IniciarProcesoForm({ def, locationOptions, onCancel, onCreated }) {
           variety: null,
           quantity: Number(quantity),
           unit: unit || def.defaultUnit,
+          area_ha: areaHa === '' ? undefined : Number(areaHa),
           location_land_asset_id: locationId,
           status: 'active',
           current_stage: initialStageFor(def.processType),
@@ -329,7 +331,7 @@ function IniciarProcesoForm({ def, locationOptions, onCancel, onCreated }) {
       setErr(`No se pudo iniciar el seguimiento: ${e.message}`);
       setSaving(false);
     }
-  }, [valid, saving, date, def, subject, quantity, unit, locationId, notes, onCreated]);
+  }, [valid, saving, date, def, subject, quantity, unit, areaHa, locationId, notes, onCreated]);
 
   return (
     <div className="p-4 flex flex-col gap-4">
@@ -381,6 +383,20 @@ function IniciarProcesoForm({ def, locationOptions, onCancel, onCreated }) {
           />
         </label>
       </div>
+
+      <label className="flex flex-col gap-1">
+        <span className="text-2xs font-bold text-slate-400 uppercase">Área plantada (ha) <span className="text-slate-600 font-normal">(opcional)</span></span>
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          value={areaHa}
+          onChange={(e) => setAreaHa(e.target.value)}
+          className="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white focus:border-lime-500 focus:outline-none"
+          disabled={saving}
+          placeholder="Ej: 1.5"
+        />
+      </label>
 
       <label className="flex flex-col gap-1">
         <span className="text-2xs font-bold text-slate-400 uppercase">Zona / Lote</span>
