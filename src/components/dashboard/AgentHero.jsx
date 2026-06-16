@@ -713,7 +713,7 @@ export default function AgentHero({ onNavigate }) {
     return (
         <section
             aria-label="Agente Chagra"
-            className="agentport agentport-immersive relative w-full flex flex-col"
+            className={['agentport agentport-immersive relative w-full flex flex-col', phase !== 'sending' ? 'agentport-idle' : ''].join(' ')}
             data-nivel={nivel}
         >
             <style>{`
@@ -747,6 +747,33 @@ export default function AgentHero({ onNavigate }) {
                     overflow: hidden; /* la escena ambiente no desborda el screenful */
                     /* CRÍTICO: transparente para dejar ver el fondo biopunk */
                     background: transparent;
+                }
+                /* Estado idle (sin conversacion activa): el hero NO ocupa toda
+                   la pantalla — el operador y los pilotos pueden ver los modulos
+                   del home sin hacer scroll infinito. Bug reportado 3 veces. */
+                .agentport-immersive.agentport-idle {
+                    min-height: auto;
+                    padding-bottom: 8px;
+                }
+                /* Indicador visual: flecha hacia abajo para mostrar que hay
+                   mas contenido (modulos del home). Solo visible en idle. */
+                .agentport-idle::after {
+                    content: '';
+                    display: block;
+                    width: 32px;
+                    height: 32px;
+                    margin: 8px auto 0;
+                    background: currentColor;
+                    opacity: 0.3;
+                    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+                    mask-size: contain;
+                    mask-repeat: no-repeat;
+                    mask-position: center;
+                    animation: agentport-bounce 2s infinite;
+                }
+                @keyframes agentport-bounce {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(6px); }
                 }
 
                 /* ===================== ESCENA AMBIENTE ===================== */
@@ -2000,6 +2027,29 @@ export default function AgentHero({ onNavigate }) {
                     </p>
                 )}
             </div>
+
+            {/* Scroll-down indicator: muestra al operador que hay modulos debajo.
+                Solo visible cuando el agente esta idle (sin conversacion activa).
+                Fix para bug reportado 3 veces: el operador no veia los botones
+                de modulos porque AgentHero ocupaba 100dvh. */}
+            {phase === 'idle' && (
+                <button
+                    type="button"
+                    onClick={() => {
+                        const target = document.querySelector('[data-testid="seguimiento-cards"]');
+                        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                    className="w-full text-center py-3 text-[rgb(var(--c-slate-400))] text-xs font-medium hover:text-[rgb(var(--c-slate-200))] transition-colors"
+                    aria-label="Ver modulos del home"
+                >
+                    <div className="flex flex-col items-center gap-1">
+                        <span>Mis modulos</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-bounce">
+                            <path d="m6 9 6 6 6-6"/>
+                        </svg>
+                    </div>
+                </button>
+            )}
 
         </section>
     );
