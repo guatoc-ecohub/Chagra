@@ -24,6 +24,9 @@ import {
   validateAmb27_toxicoSinAdvertencia,
   validateAmb28_taxonomicConfusion,
   validateAmb29_speciesInBiopreparados,
+  validateAmb30_duplicateSpecies,
+  validateAmb31_binomialFormat,
+  validateAmb32_requiredFields,
 } from '../validate-catalog.mjs';
 
 describe('AMB-25 — autoridad canónica estricta', () => {
@@ -420,5 +423,49 @@ describe('AMB-29 — species en array biopreparados', () => {
     const errors = validateAmb29_speciesInBiopreparados(catalog);
     expect(errors).toHaveLength(1);
     expect(errors[0]).toContain('companions');
+  });
+});
+
+describe('AMB-30 -- duplicate species', function () {
+  it('detecta nombre_comun duplicado', function () {
+    var catalog = { species: [{ id: 'a', nombre_comun: 'Maiz', nombre_cientifico: 'Zea mays' }, { id: 'b', nombre_comun: 'maiz', nombre_cientifico: 'Zea mays subsp. x' }] };
+    expect(validateAmb30_duplicateSpecies(catalog).length).toBeGreaterThanOrEqual(1);
+  });
+  it('detecta nombre_cientifico duplicado', function () {
+    var catalog = { species: [{ id: 'a', nombre_comun: 'A', nombre_cientifico: 'Zea mays' }, { id: 'b', nombre_comun: 'B', nombre_cientifico: 'Zea  mays' }] };
+    expect(validateAmb30_duplicateSpecies(catalog).length).toBeGreaterThanOrEqual(1);
+  });
+  it('acepta sin duplicados', function () {
+    expect(validateAmb30_duplicateSpecies({ species: [{ id: 'a', nombre_comun: 'A', nombre_cientifico: 'X y' }, { id: 'b', nombre_comun: 'B', nombre_cientifico: 'Z w' }] })).toEqual([]);
+  });
+});
+
+describe('AMB-31 -- binomial format', function () {
+  it('acepta Genus species', function () {
+    expect(validateAmb31_binomialFormat({ species: [{ id: 'a', nombre_cientifico: 'Zea mays' }] })).toEqual([]);
+  });
+  it('rechaza minuscula inicial', function () {
+    expect(validateAmb31_binomialFormat({ species: [{ id: 'a', nombre_cientifico: 'zea mays' }] }).length).toBeGreaterThanOrEqual(1);
+  });
+  it('rechaza una palabra', function () {
+    expect(validateAmb31_binomialFormat({ species: [{ id: 'a', nombre_cientifico: 'Solanum' }] }).length).toBeGreaterThanOrEqual(1);
+  });
+  it('ignora sin nombre_cientifico', function () {
+    expect(validateAmb31_binomialFormat({ species: [{ id: 'a' }] })).toEqual([]);
+  });
+});
+
+describe('AMB-32 -- required fields', function () {
+  it('detecta falta nombre_comun', function () {
+    expect(validateAmb32_requiredFields({ species: [{ id: 'a', nombre_cientifico: 'X y', familia_botanica: 'F' }] })).toHaveLength(1);
+  });
+  it('detecta falta nombre_cientifico', function () {
+    expect(validateAmb32_requiredFields({ species: [{ id: 'b', nombre_comun: 'B', familia_botanica: 'F' }] })).toHaveLength(1);
+  });
+  it('detecta falta familia_botanica', function () {
+    expect(validateAmb32_requiredFields({ species: [{ id: 'c', nombre_comun: 'C', nombre_cientifico: 'X y' }] })).toHaveLength(1);
+  });
+  it('acepta fields completos', function () {
+    expect(validateAmb32_requiredFields({ species: [{ id: 'a', nombre_comun: 'A', nombre_cientifico: 'X y', familia_botanica: 'F' }] })).toEqual([]);
   });
 });
