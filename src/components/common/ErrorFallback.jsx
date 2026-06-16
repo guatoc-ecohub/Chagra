@@ -1,5 +1,6 @@
 import React from 'react';
 import { WifiOff } from 'lucide-react';
+import { MSG } from '../../config/messages.js';
 
 /**
  * ErrorFallback — error boundary liviano por módulo.
@@ -61,7 +62,7 @@ export class ErrorFallback extends React.Component {
                 onClick={this.handleReset}
                 className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-colors text-sm"
               >
-                Intentar de nuevo
+                {MSG.INTENTAR_DE_NUEVO}
               </button>
               <button
                 onClick={this.handleReload}
