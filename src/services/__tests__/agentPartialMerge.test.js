@@ -35,17 +35,24 @@ describe('agentPartialMerge', () => {
 
   test('mergePartialOnInterruption handles null partialContent', () => {
     const result = mergePartialOnInterruption({ partialContent: null, reason: 'timeout' });
-    expect(typeof result).toBe('string');
+    expect(typeof result).toBe('object');
+    expect(result).toHaveProperty('preservePartial');
+    expect(result).toHaveProperty('error');
+    expect(result.reason).toBe('timeout');
   });
 
   test('mergePartialOnInterruption handles undefined inputs', () => {
     const result = mergePartialOnInterruption({});
-    expect(typeof result).toBe('string');
+    expect(typeof result).toBe('object');
+    expect(result).toHaveProperty('preservePartial');
+    expect(result).toHaveProperty('reason');
   });
 
   test('mergePartialOnInterruption with content merges properly', () => {
     const result = mergePartialOnInterruption({ partialContent: 'Hola mundo', reason: 'abort' });
-    expect(typeof result).toBe('string');
-    expect(result.length).toBeGreaterThan(0);
+    expect(typeof result).toBe('object');
+    expect(result.preservePartial).toBe(true);
+    expect(typeof result.content).toBe('string');
+    expect(result.content.length).toBeGreaterThan(0);
   });
 });
