@@ -53,7 +53,6 @@ export default function AIStreamPanel({
       // Set inicial sincrónico está acotado: sólo se ejecuta cuando active
       // pasa de true→false con texto presente, y la condición prevActive
       // garantiza que no se re-dispare en el siguiente render.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setClosingPhase('closing');
       const closingTimer = setTimeout(() => {
         setClosingPhase('finished');
