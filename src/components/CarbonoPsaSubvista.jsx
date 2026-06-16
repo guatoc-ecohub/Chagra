@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
-import { AlertTriangle, ShieldCheck, Scale, Ruler, Leaf } from 'lucide-react';
+import { AlertTriangle, ShieldCheck, Scale, Ruler, Leaf, ArrowUpRight, Sprout, Activity } from 'lucide-react';
 import { evaluarPSA } from '../services/psaElegibilidad';
 import { detectarAlertaCarbono } from '../services/carbonoAlerta';
 import RESTAURACION from '../data/restauracion.json';
 import CARBONO_CAPTURA from '../data/carbono-captura.json';
 import PSA_DATA from '../data/psa.json';
+import { calcularCarbonoSeguimiento } from '../services/carbonoSeguimiento';
 
 /**
  * Lista cruda de modalidades PSA, para el caso "el perfil de la finca no
@@ -39,6 +40,7 @@ const PSA_MODALIDADES = Array.isArray(PSA_DATA?.modalidades) ? PSA_DATA.modalida
  */
 export default function CarbonoPsaSubvista({ proceso, perfilFinca }) {
   const a = proceso?.attributes || {};
+  const carbono = useMemo(() => calcularCarbonoSeguimiento(proceso), [proceso]);
 
   // 1) Alerta anti-trampa. La guarda cerrada SIEMPRE se muestra (es defensiva,
   //    no depende de que el campesino mencione "bonos"). Las trampas/recomendacion
@@ -186,16 +188,41 @@ export default function CarbonoPsaSubvista({ proceso, perfilFinca }) {
           <h3 className="text-sm font-bold text-sky-200">Captura de CO₂</h3>
         </div>
 
-        {contexto.length > 0 && (
-          <p className="text-2xs text-slate-500 leading-snug">
-            Tu registro: {contexto.join(' · ')}.
+        {contexto.length > 0 && <p className="text-2xs text-slate-500 leading-snug">Tu registro: {contexto.join(' · ')}.</p>}
+
+        <div className="grid grid-cols-2 gap-2">
+          <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-3">
+            <p className="text-3xs uppercase tracking-wide text-slate-500">Especie</p>
+            <p className="text-sm font-bold text-slate-100 leading-tight">{carbono.speciesName}</p>
+            <p className="text-2xs text-slate-500">{carbono.speciesScientific || 'Sin especie reconocida'}</p>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-3">
+            <p className="text-3xs uppercase tracking-wide text-slate-500">Área plantada</p>
+            <p className="text-sm font-bold text-slate-100 leading-tight">{carbono.areaHa ? `${carbono.areaHa} ha` : 'Pendiente'}</p>
+            <p className="text-2xs text-slate-500">{carbono.confidence === 'media' ? 'Estimación con especie reconocida' : 'Estimación conservadora'}</p>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-emerald-800/50 bg-emerald-950/20 p-3 flex flex-col gap-1.5">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Sprout size={14} className="text-emerald-300" />
+              <span className="text-xs font-bold text-emerald-200">Captura estimada</span>
+            </div>
+            <span className="text-xs font-black text-white">{carbono.yearlyTCO2Text}</span>
+          </div>
+          <p className="text-2xs text-emerald-100/80 leading-snug">
+            {carbono.source}. {carbono.sourceNote}
           </p>
-        )}
+          <p className="text-3xs text-slate-400 leading-snug">
+            {carbono.ageLabel}{carbono.ageYears != null ? ` · ${carbono.ageYears.toFixed(1)} años aprox.` : ''}{carbono.stockText ? ` · Stock de referencia ${carbono.stockText}` : ''}
+          </p>
+        </div>
 
         {/* MENSAJE DE VALIDACION SIEMPRE PRESENTE: nunca un numero exacto como hecho. */}
         <p className="text-xs text-amber-200 leading-snug font-medium" data-testid="co2-validacion">
-          El cálculo de captura de CO₂ de tu predio requiere medición de campo.
-          {' '}Cualquier cifra exacta sin medir es una estimación preliminar
+          El cálculo de captura de CO₂ de tu predio sigue siendo una estimación.
+          {' '}Cualquier cifra exacta sin medir es una aproximación preliminar
           <span className="font-bold"> [VALIDAR]</span>, no un hecho.
         </p>
 
@@ -231,6 +258,28 @@ export default function CarbonoPsaSubvista({ proceso, perfilFinca }) {
           </p>
         )}
 
+        <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-3" data-testid="co2-timeline">
+          <div className="flex items-center gap-2 mb-2">
+            <Activity size={14} className="text-cyan-300" />
+            <p className="text-2xs font-bold uppercase tracking-wide text-cyan-200">Línea de tiempo de captura acumulada</p>
+          </div>
+          <div className="flex items-end gap-2 h-28">
+            {carbono.timeline.map((p) => (
+              <div key={p.year} className="flex-1 flex flex-col items-center gap-1">
+                <div className="w-full flex-1 flex items-end">
+                  <div
+                    className="w-full rounded-t-lg bg-gradient-to-t from-emerald-700 to-cyan-400"
+                    style={{ height: `${Math.max(12, Math.min(100, (p.tco2 / Math.max(carbono.timeline.at(-1)?.tco2 || 1, 1)) * 100))}%` }}
+                    aria-label={`${p.label} ${p.tco2.toFixed(2)} tCO2e acumuladas`}
+                  />
+                </div>
+                <span className="text-3xs text-slate-500">{p.label}</span>
+                <span className="text-3xs text-slate-300 font-bold">{p.tco2.toFixed(1)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {requiereMedicion && metodo && (
           <details className="mt-1">
             <summary className="text-2xs font-bold text-sky-300 cursor-pointer">
@@ -246,6 +295,7 @@ export default function CarbonoPsaSubvista({ proceso, perfilFinca }) {
                 {metodo.advertencia}
               </p>
             )}
+            <p className="text-3xs text-slate-500 leading-snug mt-1">Fuente: {metodo.citation}.</p>
           </details>
         )}
       </section>
