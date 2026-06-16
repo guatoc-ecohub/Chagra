@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { WifiOff } from 'lucide-react';
+import { MSG } from '../config/messages.js';
 
 /**
  * OfflineChip — indicador ambient persistente del estado offline (UX-2).
@@ -52,7 +53,7 @@ export default function OfflineChip() {
       title="Sin conexión a internet. Tus registros se guardan localmente y se sincronizan al volver."
     >
       <WifiOff size={11} aria-hidden="true" />
-      <span className="hidden sm:inline">Sin conexión</span>
+      <span className="hidden sm:inline">{MSG.SIN_CONEXION}</span>
     </span>
   );
 }

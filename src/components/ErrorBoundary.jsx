@@ -1,5 +1,6 @@
 import React from 'react';
 import { WifiOff } from 'lucide-react';
+import { MSG } from '../config/messages.js';
 
 /**
  * ErrorBoundary de clase que captura errores en el árbol de componentes hijos.
@@ -40,7 +41,7 @@ export class ErrorBoundary extends React.Component {
                 <WifiOff size={24} className="text-amber-400" aria-hidden="true" />
               </div>
               <div className="flex-1">
-                <h2 className="text-lg font-bold text-white">Algo falló</h2>
+                <h2 className="text-lg font-bold text-white">{MSG.ALGO_FALLO}</h2>
                 <p className="text-sm text-slate-400 mt-1">
                   Tus datos de la finca están a salvo
                 </p>
@@ -59,7 +60,7 @@ export class ErrorBoundary extends React.Component {
                 onClick={this.handleReset}
                 className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-colors text-sm"
               >
-                Intentar de nuevo
+                {MSG.INTENTAR_DE_NUEVO}
               </button>
               <button
                 onClick={this.handleReload}

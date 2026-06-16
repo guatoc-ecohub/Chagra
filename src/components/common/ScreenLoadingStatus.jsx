@@ -1,5 +1,6 @@
 import React from 'react';
 import { Loader2, AlertTriangle, PackageOpen } from 'lucide-react';
+import { MSG } from '../../config/messages.js';
 
 /**
  * ScreenLoadingStatus — estado de carga / vacio / error reutilizable.
@@ -27,7 +28,7 @@ export default function ScreenLoadingStatus({
       <div className="h-[100dvh] w-full flex items-center justify-center bg-slate-950">
         <div className="flex flex-col items-center gap-4">
           <Loader2 size={40} className="text-emerald-400 animate-spin" aria-hidden="true" />
-          <p className="text-slate-400 text-sm font-medium">Cargando...</p>
+          <p className="text-slate-400 text-sm font-medium">{MSG.CARGANDO}</p>
         </div>
       </div>
     );
@@ -71,7 +72,7 @@ export default function ScreenLoadingStatus({
               onClick={onRetry}
               className="mt-2 py-3 px-6 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-colors text-sm"
             >
-              Intentar de nuevo
+              {MSG.INTENTAR_DE_NUEVO}
             </button>
           )}
         </div>

@@ -5,37 +5,9 @@
  * Si Kokoro no está disponible, fallback transparente a window.speechSynthesis.
  */
 
-import { filterVoseo } from './voseoFilter.js';
-import { resolveUserRegion } from './agentService.js';
+import { applyVoseoGuard, sanitizeForTTS, splitIntoSentences } from './ttsHelpers.js';
+export { applyVoseoGuard, sanitizeForTTS, splitIntoSentences };
 
-/**
- * DR-LANG-1: guarda defensiva anti-voseo aplicada a la entrada de los
- * speakers. AgentScreen ya filtra antes de pasar el texto, pero el TTS
- * también es invocado desde ChatBubble (re-speak), AgentFab (replayLast)
- * y posibles surfaces futuras. filterVoseo es idempotente — un doble
- * pase es no-op y mantiene la garantía de que el campesino NUNCA escuche
- * el léxico rioplatense (che, laburar) en voz alta.
- *
- * C1/C2 (2026-06-02): region-aware. La voz también debe respetar el
- * dialecto del usuario: en regiones voseantes (paisa/pacífico/pastuso) el
- * voseo es el registro AUTÉNTICO y se PRESERVA en el audio; en el resto se
- * aplana (tú en caribe, usted por defecto). La región se resuelve del
- * perfil; sin región conocida → default seguro (comportamiento histórico).
- * resolveUserRegion es defensivo (no lanza); aun así envolvemos en try.
- *
- * @param {string} text
- * @returns {string}
- */
-function applyVoseoGuard(text) {
-  if (typeof text !== 'string' || text.length === 0) return text;
-  try {
-    let region = null;
-    try { region = resolveUserRegion(); } catch (_) { region = null; }
-    return filterVoseo(text, { formality: 'usted', telemetry: false, region });
-  } catch (_) {
-    return text;
-  }
-}
 
 /**
  * Task #124 (2026-05-24): voces Kokoro curadas para español.
@@ -219,58 +191,6 @@ export function setXTTSEnabled(enabled) {
   }
 }
 
-/**
- * Limpia markdown del texto antes de mandarlo al TTS. Sin esto, kokoro y
- * SpeechSynthesis leen literal los caracteres de formato:
- *   "asterisco asterisco bold asterisco asterisco" en lugar de "bold",
- *   "guion espacio item" en lugar de "item".
- *
- * Bug reportado por operador 2026-05-23 (task #125): el agente Chagra
- * emite respuestas en markdown con listas (`*`), negrita (`**`),
- * encabezados (`#`), inline code (`` ` ``), y links `[txt](url)`. El TTS
- * los leía literal, generando UX muy fea ("peye" según operador).
- *
- * Mantenemos las transformaciones simples + idempotentes. Si el texto NO
- * tiene markdown, devuelve el texto sin cambios.
- */
-export function sanitizeForTTS(text) {
-  if (typeof text !== 'string' || text.length === 0) return text;
-  return text
-    // Negrita ** o __ (procesar antes que cursiva para evitar romper la pareja)
-    .replace(/\*\*([^*]+)\*\*/g, '$1')
-    .replace(/__([^_]+)__/g, '$1')
-    // Cursiva * o _
-    .replace(/\*([^*\n]+)\*/g, '$1')
-    .replace(/(?<![A-Za-z0-9])_([^_\n]+)_(?![A-Za-z0-9])/g, '$1')
-    // Inline code `texto`
-    .replace(/`([^`\n]+)`/g, '$1')
-    // Code fences ```lang\n...\n```
-    .replace(/```[a-z]*\n?([\s\S]*?)```/gi, '$1')
-    // Encabezados markdown # ## ### al inicio de línea
-    .replace(/^#{1,6}\s+/gm, '')
-    // Viñetas - * + al inicio de línea
-    .replace(/^[\s]*[-*+]\s+/gm, '')
-    // Numeración 1. 2. etc al inicio de línea
-    .replace(/^[\s]*\d+[.)]\s+/gm, '')
-    // Links [texto](url) → solo el texto visible
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-    // Citas blockquote > al inicio de línea
-    .replace(/^[\s]*>\s+/gm, '')
-    // Separadores horizontales ---, ===, ***
-    .replace(/^[\s]*[-=*]{3,}[\s]*$/gm, '')
-    // Tablas (filas con |) — borrar carácter pipe
-    .replace(/\|/g, ' ')
-    // Caracteres residuales * y ` (NO _ — esos forman parte de snake_case ids
-    // como coffea_arabica que el agente cita literalmente). Si el LLM emite
-    // __ o * sueltos, los limpio; pero un _ entre dos letras de un id NO.
-    .replace(/[*`]/g, '')
-    // Espacios múltiples consecutivos → 1
-    .replace(/[ \t]+/g, ' ')
-    // Líneas en blanco múltiples → 1
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
-}
-
 let voices = [];
 let voicesLoaded = false;
 let kokoroAvailable = null;
@@ -353,55 +273,7 @@ export function isAudioPlaying() {
 let sentenceQueueCancelled = false;
 let sentenceQueueController = null;
 
-const MIN_SENTENCE_CHARS = 40;  // bufferamos chunks <40 chars hasta cerrar
-const SENTENCE_END_RE = /([.!?…])([\s\n]+|$)/;
-
-/**
- * Corta un texto en frases para streaming TTS.
- *
- * Heurística simple — busca boundaries [.!?…] seguidos de whitespace o EOL.
- * Frases muy cortas (<MIN_SENTENCE_CHARS) se concatenan con la siguiente
- * para evitar audios pico-cortos que cortan la entonación natural.
- *
- * No es un parser perfecto (no maneja "Sr. González" perfectamente), pero
- * para respuestas del LLM en español funciona suficiente. El fallback en
- * caso de texto sin boundaries es tratar todo como UNA frase.
- *
- * Idempotente: splitIntoSentences("a. b.") = ["a.", "b."], y juntando
- * vuelve a quedar equivalente con el separador whitespace original.
- *
- * @param {string} text
- * @returns {string[]} array de frases (sin separadores extra), nunca vacío
- *   si text es non-empty.
- */
-export function splitIntoSentences(text) {
-  if (typeof text !== 'string' || text.length === 0) return [];
-  const sentences = [];
-  let buffer = '';
-  let remaining = text;
-  while (remaining.length > 0) {
-    const match = SENTENCE_END_RE.exec(remaining);
-    if (!match) {
-      // No más boundaries — el resto va como una frase final.
-      // Acumulamos y dejamos el push final fuera del loop.
-      buffer += remaining;
-      break;
-    }
-    const idx = match.index + match[1].length;  // incluye el puntuador
-    buffer += remaining.slice(0, idx);
-    remaining = remaining.slice(idx + (match[2] === '' ? 0 : match[2].length));
-    // Si el buffer es muy corto (ej. "Sí." 3 chars), acumular con la
-    // siguiente frase para evitar audios picados.
-    if (buffer.trim().length >= MIN_SENTENCE_CHARS) {
-      sentences.push(buffer.trim());
-      buffer = '';
-    } else {
-      buffer += ' ';
-    }
-  }
-  if (buffer.trim().length > 0) sentences.push(buffer.trim());
-  return sentences.filter((s) => s.length > 0);
-}
+const MIN_SENTENCE_CHARS = 40;
 
 /**
  * Sintetiza una sola frase con Kokoro y devuelve un blob URL listo para Audio.
