@@ -144,6 +144,35 @@ describe('SeguimientoProcesoScreen', () => {
     expect(screen.getByText(/Cochera guardada|Lote registrado|Evento guardado/)).toBeInTheDocument();
   });
 
+  test('cerdos muestra grounding porcino, clima y alertas sanitarias', async () => {
+    processes = [{
+      process_id: 'proc-cerdos-2',
+      type: 'farm_process',
+      attributes: {
+        process_type: 'pigs',
+        subject_kind: 'aggregate',
+        subject_label: 'Lote de cerdos en clima frio',
+        quantity: 4,
+        unit: 'animales',
+        status: 'active',
+        current_stage: 'instalacion',
+        created_at: Date.now(),
+        updated_at: Date.now(),
+        pig_cochera: { nombre: '', ubicacion: '', capacidad: '', cama_profunda: 'cascarilla_de_arroz' },
+        pig_lotes: [],
+      },
+    }];
+
+    render(<SeguimientoProcesoScreen procesoKey="cerdos" onBack={vi.fn()} onSave={vi.fn()} />);
+    await waitFor(() => screen.getByText('Lote de cerdos en clima frio'));
+    fireEvent.click(screen.getByText('Lote de cerdos en clima frio'));
+
+    expect(screen.getByText('Grounding porcino')).toBeInTheDocument();
+    expect(screen.getByText('Alertas sanitarias')).toBeInTheDocument();
+    expect(screen.getAllByText('Clima frio o templado').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText(/yuca cocida/i)).toBeInTheDocument();
+  });
+
   test('la guarda de leucaena/mimosina aparece en cerdos pero NO en reforestación', async () => {
     const { unmount } = render(<SeguimientoProcesoScreen procesoKey="cerdos" onBack={vi.fn()} />);
     await waitFor(() => screen.getByText('Iniciar ciclo'));
