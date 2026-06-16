@@ -1,3 +1,5 @@
+// Sync conflict strategy (Task 109): Logs append-only idempotent by id.
+// Assets LWW at field level. Queue dedup by transaction id (upsert).
 import { sendToFarmOS, fetchFromFarmOS } from './apiService';
 import { openDB, STORES } from '../db/dbCore';
 import { logCache } from '../db/logCache';
