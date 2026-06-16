@@ -12,7 +12,7 @@ import { isAuthenticated, logoutUser } from './services/authService';
 import useAssetStore from './store/useAssetStore';
 import { fetchFromFarmOS } from './services/apiService';
 import { PRIMARY_WORKER_NAME } from './config/workerConfig';
-import { tieneAccesoGlaciarActual } from './config/glaciarAccess';
+import { tieneAccesoGlaciarActual, esOperadorActual } from './config/glaciarAccess';
 import { parseSeguimientoView } from './config/seguimientoProcesos';
 import { initCatalog } from './db/catalogDB';
 import NetworkStatusBar from './components/NetworkStatusBar';
@@ -91,6 +91,7 @@ const MiFincaVivaScreen = lazy(() => import('./components/juego/MiFincaVivaScree
 // Modo extensionista (panel supervisor multi-finca, ADR-048 MVP). Gateado por
 // feature flag VITE_FEATURE_EXTENSIONISTA + rol (ver config/extensionistaAccess).
 const ExtensionistaScreen = lazy(() => import('./components/ExtensionistaScreen'));
+const PilotTelemetryPanel = lazy(() => import('./components/PilotTelemetryPanel'));
 import HomeRegionalGreeting from './components/HomeRegionalGreeting';
 import { esExtensionistaActual } from './config/extensionistaAccess';
 
@@ -158,6 +159,7 @@ const HASH_VIEW_ROUTES = {
   evolucion: 'evolucion',
   glaciar: 'glaciar',
   'glaciar-historial': 'glaciar_historial',
+  telemetria: 'telemetria',
 };
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
@@ -534,6 +536,10 @@ export default function App() {
         navigate('dashboard');
         return;
       }
+      if (targetView === 'telemetria' && !esOperadorActual()) {
+        navigate('dashboard');
+        return;
+      }
       navigate(targetView);
     });
   }, [navigate]);
@@ -545,6 +551,10 @@ export default function App() {
       if (!routeView) return;
       // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
       if (routeView === 'extensionista' && !esExtensionistaActual()) {
+        navigate('dashboard');
+        return;
+      }
+      if (routeView === 'telemetria' && !esOperadorActual()) {
         navigate('dashboard');
         return;
       }
@@ -1075,6 +1085,23 @@ export default function App() {
               onBack={() => navigate('casos')}
               onHome={() => navigate('dashboard')}
             />
+          </ErrorBoundary>
+        );
+      case 'telemetria':
+        if (!esOperadorActual()) {
+          return (
+            <ErrorBoundary>
+              <ErrorFallback moduleName="Telemetria">
+                <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>
+              </ErrorFallback>
+            </ErrorBoundary>
+          );
+        }
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Telemetria">
+              <PilotTelemetryPanel />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'help':

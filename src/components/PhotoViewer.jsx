@@ -81,6 +81,7 @@ export default function PhotoViewer({
       <img
         src={src}
         alt={alt}
+        loading="lazy"
         className="w-full h-full object-cover rounded-lg"
       />
       <button

@@ -4,6 +4,7 @@ import useAssetStore from '../store/useAssetStore';
 import { FARM_CONFIG } from '../config/defaults';
 import { getProfile, saveProfile } from '../services/userProfileService';
 import { getPisoTermicoInfo } from '../services/locationService';
+import { useAutosave } from '../hooks/useAutosave';
 
 /**
  * OnboardingHero, empty-state cold-start del dashboard (DR-030 QW5).
@@ -47,10 +48,9 @@ export default function OnboardingHero({ onNavigate, compact = false }) {
   const hasZones = lands.length > 0;
   const hasFarmContext = !!(FARM_CONFIG.ALTITUD_MSNM || (FARM_CONFIG.THERMAL_ZONES || []).length > 0);
 
-  // Perfil leído una vez al montar (localStorage, sin red). El strip de
-  // confirmación muta `pisoConfirmado` localmente al tocar "Sí".
+  const { savedState: obState, save: obSave } = useAutosave('onboarding-hero', { lastCta: null, pisoConfirmed: false });
   const [profile] = useState(() => getProfile());
-  const [pisoConfirmado, setPisoConfirmado] = useState(() => profile.piso_confirmado === '1');
+  const [pisoConfirmado, setPisoConfirmado] = useState(() => obState.pisoConfirmed || profile.piso_confirmado === '1');
   const altitud = Number(profile.finca_altitud);
   const pisoInfo = Number.isFinite(altitud) && profile.finca_altitud !== '' && profile.finca_altitud != null
     ? getPisoTermicoInfo(altitud)
@@ -60,7 +60,9 @@ export default function OnboardingHero({ onNavigate, compact = false }) {
   const confirmPiso = () => {
     saveProfile({ piso_confirmado: '1', ...(pisoInfo ? { piso_termico: pisoInfo.slug } : {}) });
     setPisoConfirmado(true);
+    obSave({ pisoConfirmed: true });
   };
+  const navAuto = (route) => { obSave({ lastCta: route }); onNavigate(route); };
 
   // Copy adaptive según señales detectadas del operador.
   // Tono "usted" cordial colombiano (memoria feedback_colombian_tone).
@@ -219,7 +221,7 @@ export default function OnboardingHero({ onNavigate, compact = false }) {
           <button
             key={cta.id}
             type="button"
-            onClick={() => onNavigate(cta.id)}
+            onClick={() => navAuto(cta.id)}
             aria-label={`${cta.label}: ${cta.desc}`}
             className={`flex flex-col items-center justify-center gap-2 p-6 rounded-xl bg-slate-950 border-2 ${cta.accent} min-h-[140px] transition-colors`}
           >

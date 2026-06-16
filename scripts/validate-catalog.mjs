@@ -757,6 +757,61 @@ export function validateAmb29_speciesInBiopreparados(catalog) {
   return errors;
 }
 
+// AMB-30: duplicate species by nombre_comun or nombre_cientifico.
+export function validateAmb30_duplicateSpecies(catalog) {
+  const errors = [];
+  const seenComun = new Map();
+  const seenCientifico = new Map();
+  for (const sp of catalog.species || []) {
+    const nc = (sp.nombre_comun || '').toLowerCase().trim();
+    if (nc) {
+      if (seenComun.has(nc)) {
+        errors.push('AMB-30 [' + sp.id + ']: nombre_comun "' + sp.nombre_comun + '" duplicado (ya existe en ' + seenComun.get(nc) + ')');
+      } else {
+        seenComun.set(nc, sp.id);
+      }
+    }
+    const nci = (sp.nombre_cientifico || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    if (nci) {
+      if (seenCientifico.has(nci)) {
+        errors.push('AMB-30 [' + sp.id + ']: nombre_cientifico "' + sp.nombre_cientifico + '" duplicado (ya existe en ' + seenCientifico.get(nci) + ')');
+      } else {
+        seenCientifico.set(nci, sp.id);
+      }
+    }
+  }
+  return errors;
+}
+
+// AMB-31: all scientific names follow binomial format (Genus species).
+const BINOMIAL_REGEX = /^[A-Z][a-z]+(?:\s+(?:x\s+)?[a-z]+(?:\s+(?:var\.|subsp\.|f\.|spp\.)\s+[a-z]+)?(?:\s+[A-Z][a-z]+)?)$/;
+export function validateAmb31_binomialFormat(catalog) {
+  const errors = [];
+  for (const sp of catalog.species || []) {
+    const name = sp.nombre_cientifico;
+    if (!name || typeof name !== 'string') continue;
+    const trimmed = name.trim();
+    if (!BINOMIAL_REGEX.test(trimmed)) {
+      errors.push('AMB-31 [' + sp.id + ']: nombre_cientifico "' + name + '" no sigue formato binomial (Genus species)');
+    }
+  }
+  return errors;
+}
+
+// AMB-32: required fields presence (nombre_comun, nombre_cientifico, familia_botanica).
+export function validateAmb32_requiredFields(catalog) {
+  const errors = [];
+  const REQUIRED = ['nombre_comun', 'nombre_cientifico', 'familia_botanica'];
+  for (const sp of catalog.species || []) {
+    for (const field of REQUIRED) {
+      if (!sp[field] || (typeof sp[field] === 'string' && !sp[field].trim())) {
+        errors.push('AMB-32 [' + sp.id + ']: falta campo requerido "' + field + '"');
+      }
+    }
+  }
+  return errors;
+}
+
 // ----------------------------------------------------------------
 // Main (CLI). Gated por `import.meta.url === file://${process.argv[1]}` para
 // permitir importar las funciones validador desde tests (scripts/__tests__/
@@ -890,6 +945,18 @@ function runCli() {
     })],
     ['AMB-29 species en array biopreparados', (c) => ({
       errors: validateAmb29_speciesInBiopreparados(c),
+      warnings: [],
+    })],
+    ['AMB-30 duplicate species (nombre_comun/cientifico)', (c) => {
+      const arr = validateAmb30_duplicateSpecies(c);
+      return SEED_MODE ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
+    }],
+    ['AMB-31 binomial format (Genus species)', (c) => {
+      const arr = validateAmb31_binomialFormat(c);
+      return SEED_MODE ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
+    }],
+    ['AMB-32 required fields (nombre_comun, cientifico, familia)', (c) => ({
+      errors: validateAmb32_requiredFields(c),
       warnings: [],
     })],
   ];
