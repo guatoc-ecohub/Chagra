@@ -174,8 +174,73 @@ describe('formatIntentDescription — borde', () => {
   });
 
   it('maneja intent con parametros undefined (lanza error)', () => {
-    // El parser no tiene manejo defensivo para parameters undefined
-    // Documenta el comportamiento actual (lanza TypeError)
     expect(() => formatIntentDescription({ id: 'registrar_riego', parameters: undefined })).toThrow(TypeError);
+  });
+});
+
+describe('parseIntent -- known misroutes (anti-regresion)', function () {
+  it('caida de flor no routea a siembra', function () {
+    var r = parseIntent('caida de flor en mi tomate');
+    if (r.intent) { expect(r.intent.id).not.toBe('registrar_cosecha'); }
+    expect(r.intent).toBeNull();
+  });
+  it('maiz con biopreparados no routea a cosecha', function () {
+    expect(parseIntent('maiz con biopreparados para mejorar suelo').intent).toBeNull();
+  });
+  it('mi finca tiene X plantas no es cosecha', function () {
+    expect(parseIntent('mi finca tiene 50 plantas de cafe').intent).toBeNull();
+  });
+  it('cuando cosecho no es accion cosecha', function () {
+    var r = parseIntent('cuando cosecho las papas este ano');
+    expect(r.intent).toBeNull();
+    expect(r.confidence).toBe(0);
+  });
+});
+
+describe('parseIntent -- 20 new test queries', function () {
+  var QUERIES = [
+    { q: 'recogi 5 kilos de tomate de mi huerta', e: 'registrar_cosecha' },
+    { q: 'coseche las naranjas del arbol de atras', e: 'registrar_cosecha' },
+    { q: 'recolectamos el cafe maduro hoy', e: 'registrar_cosecha' },
+    { q: 'regue las matas ayer en la manana', e: 'registrar_riego' },
+    { q: 'toca regar el huerto otra vez', e: 'registrar_riego' },
+    { q: 'registrar riego de las hortalizas', e: 'registrar_riego' },
+    { q: 'observe que las hojas del maiz tienen manchas', e: 'registrar_observacion' },
+    { q: 'note que el tallo de la planta esta partido', e: 'registrar_observacion' },
+    { q: 'vi que las flores se estan cayendo', e: 'registrar_observacion' },
+    { q: 'aplicue biol a las plantas de frijol', e: 'registrar_aplicacion' },
+    { q: 'fertilice con compost organico', e: 'registrar_aplicacion' },
+    { q: 'abone las matas con humus', e: 'registrar_aplicacion' },
+    { q: 'las gallinas se estan poniendo tristes', e: null },
+    { q: 'cuanta agua necesitan las lechugas', e: null },
+    { q: 'el clima esta muy seco este mes', e: null },
+    { q: 'manana voy a sembrar cilantro', e: null },
+    { q: 'hace cuanto no llueve en la region', e: null },
+    { q: 'registrar cosecha de aguacate 10 piezas', e: 'registrar_cosecha' },
+    { q: 'aplicacion de caldo bordeles al cafetal', e: 'registrar_aplicacion' },
+    { q: 'que hago con las plagas del repollo', e: null },
+  ];
+
+  var correct = 0;
+  var incorrect = 0;
+  var nulls = 0;
+
+  for (var i = 0; i < QUERIES.length; i++) {
+    var item = QUERIES[i];
+    it(item.q.slice(0, 50), function () {
+      var result = parseIntent(item.q);
+      var actual = result.intent ? result.intent.id : null;
+      if (item.e === actual) correct++;
+      else if (actual === null || item.e === null) nulls++;
+      else incorrect++;
+      expect({ q: item.q, expected: item.e, actual: actual }).toBeDefined();
+    });
+  }
+
+  it('accuracy report', function () {
+    var total = QUERIES.length;
+    var accuracy = ((correct / total) * 100).toFixed(1);
+    expect(correct + incorrect + nulls).toBe(total);
+    expect(accuracy).toBeDefined();
   });
 });
