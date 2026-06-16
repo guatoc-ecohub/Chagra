@@ -8,7 +8,6 @@ export default function PhotoViewer({
   className = '',
   children,
   calloutOverlay,
-  onClose,
 }) {
   const { isCinema, toggleCinema } = useCinemaMode();
   const [showCallouts, setShowCallouts] = useState(true);
