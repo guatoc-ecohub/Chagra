@@ -426,12 +426,6 @@ html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
   background-repeat: repeat, repeat, no-repeat, no-repeat !important;
   background-attachment: fixed !important;
 }
-/* Back navigation — affordance consistente en todas las sub-pantallas */
-.chagra-back-btn { display:inline-flex; align-items:center; justify-content:center;
-  width:2.5rem; height:2.5rem; border-radius:9999px; background:var(--btnBg,rgba(30,41,59,0.8));
-  border:1px solid var(--btnEdge,rgba(51,65,85,0.5)); color:var(--tx,#e2e8f0);
-  min-height:44px; min-width:44px; } /* touch target >=44px */
-.chagra-back-btn:hover { background:var(--btnHover,rgba(51,65,85,0.7)); }
 
 /* ===========================================================================
  * 4. MÓDULO GLACIAR — semáforo y escala de dureza THEME-AWARE
