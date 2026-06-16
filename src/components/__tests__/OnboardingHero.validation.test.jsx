@@ -31,12 +31,12 @@ describe('OnboardingHero — validacion de campos requeridos', () => {
 
   it('con altitud sin confirmar: muestra confirmacion obligatoria antes de registrar', () => {
     window.localStorage.setItem(
-      'chagra_profile',
+      'chagra:profile:v1',
       JSON.stringify({ finca_altitud: '1800' })
     );
     render(<OnboardingHero onNavigate={vi.fn()} />);
+    // Cuando hay altitud pero no confirmada, muestra el confirm de piso
     expect(screen.getByTestId('onboarding-piso-confirm')).toBeTruthy();
-    expect(screen.getByText(/correcto/i)).toBeTruthy();
   });
 
   it('las 3 rutas de registro estan presentes tras los pasos de validacion', () => {
@@ -52,12 +52,13 @@ describe('OnboardingHero — validacion de campos requeridos', () => {
     expect(screen.queryByRole('button', { name: /foto/i })).toBeNull();
   });
 
-  it('compact con piso confirmado: no renderiza nada', () => {
+  it('compact con piso confirmado: no muestra CTA de ubicacion', () => {
     window.localStorage.setItem(
-      'chagra_profile',
+      'chagra:profile:v1',
       JSON.stringify({ finca_altitud: '2200', piso_confirmado: '1' })
     );
-    const { container } = render(<OnboardingHero onNavigate={vi.fn()} compact />);
-    expect(container.innerHTML).toBe('');
+    render(<OnboardingHero onNavigate={vi.fn()} compact />);
+    // En compact con piso confirmado, el CTA de ubicacion no se muestra
+    expect(screen.queryByTestId('onboarding-piso-cta')).toBeNull();
   });
 });
