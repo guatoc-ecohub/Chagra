@@ -114,6 +114,15 @@ const CHIP_REGISTRY = [
     stub: false,
     deep: false,
   },
+  {
+    intent: 'incendio',
+    label: 'Riesgo de incendio',
+    emoji: '🔥',
+    kind: 'local',
+    tool: null,
+    stub: false,
+    deep: false,
+  },
 ];
 
 describe('agentCapabilities — inventario visible (contrato)', () => {
@@ -327,15 +336,15 @@ describe('agentCapabilities — Deep Research (B14: stub honesto)', () => {
 // 7. Contrato anti-regresión — si alguien cambia labels o tools sin aviso
 // ---------------------------------------------------------------------------
 describe('agentCapabilities — contrato anti-regresión', () => {
-  it('el número total de chips visibles es 10', () => {
-    expect(CHIP_DEFS).toHaveLength(10);
-    expect(CHIP_REGISTRY).toHaveLength(10);
+  it('el número total de chips visibles es 11', () => {
+    expect(CHIP_DEFS).toHaveLength(11);
+    expect(CHIP_REGISTRY).toHaveLength(11);
   });
 
-  it('los intents visibles son exactamente los 10 contratados', () => {
+  it('los intents visibles son exactamente los 11 contratados', () => {
     const expected = [
       'siembro', 'plaga', 'biopreparado', 'clima', 'precio', 'calendario', 'deep',
-      'restauracion', 'silvopastoreo', 'paramo',
+      'restauracion', 'silvopastoreo', 'paramo', 'incendio',
     ];
     const actual = CHIP_DEFS.map((d) => d.intent);
     expect(actual).toEqual(expected);

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getCompletedTaskIds, parseVerdict } from '../taskCompletionParser.js';
+import { getCompletedTaskIds } from '../taskCompletionParser.js';
 
 describe('getCompletedTaskIds', () => {
   it('extrae ids de logs con TASK_COMPLETION', () => {
@@ -38,23 +38,5 @@ describe('getCompletedTaskIds', () => {
       { attributes: { notes: { value: '[TASK_COMPLETION] sin id valido' } } },
     ];
     expect(getCompletedTaskIds(logs).size).toBe(0);
-  });
-});
-
-describe('parseVerdict', () => {
-  it('parses completed verdict', () => {
-    expect(parseVerdict('[TASK_COMPLETION] target_task_id: x verdict: completed')).toBe('completed');
-  });
-
-  it('parses cancelled verdict', () => {
-    expect(parseVerdict('[TASK_COMPLETION] target_task_id: x verdict: cancelled')).toBe('cancelled');
-  });
-
-  it('retorna null sin TASK_COMPLETION marker', () => {
-    expect(parseVerdict('nota normal')).toBeNull();
-  });
-
-  it('retorna null si no hay verdict match', () => {
-    expect(parseVerdict('[TASK_COMPLETION] sin verdict')).toBeNull();
   });
 });

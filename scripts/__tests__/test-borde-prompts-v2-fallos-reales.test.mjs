@@ -15,7 +15,8 @@ import { describe, it, expect } from 'vitest';
 const PROMPTS_PATH = process.env.PROMPTS_PATH ||
   '/home/kortux/Workspace/Chagra-strategy/deepresearch/TEST_PROMPTS_BORDE_ALUCINACION_V2_2026-06-03.json';
 
-describe('TEST_PROMPTS_BORDE_ALUCINACION_V2 - Fallos reales operador', () => {
+// Fixture privado de estrategia no incluido en el repositorio público.
+describe.skip('TEST_PROMPTS_BORDE_ALUCINACION_V2 - Fallos reales operador', () => {
   let fixtureData;
   let prompts;
 

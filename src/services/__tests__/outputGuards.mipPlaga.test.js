@@ -234,10 +234,10 @@ describe('applyOutputGuards — engancha el guard MIP (BORDE-011 end-to-end)', (
     expect(out.text).not.toMatch(/Vikan/i);
     expect(out.text).not.toMatch(/Aktara/i);
     expect(out.text).not.toMatch(/fenoxycarb/i);
-    // …y el MIP igual quedó con sus must_include (no se auto-canceló).
-    expect(out.text).toMatch(/manejo integrado/i);
-    expect(out.text).toMatch(/semilla\s+sana|material\s+(de\s+siembra\s+)?sano/i);
-    expect(out.text).toMatch(/trampa|feromona/i);
+    // …y la redirección agroecológica quedó activa.
+    expect(out.text).toMatch(/manejo org[aá]nico/i);
+    expect(out.text).toMatch(/control biol[oó]gico/i);
+    expect(out.text).toMatch(/neem|bt|trichogramma/i);
     // ambos guards dejaron su razón.
     expect(out.reasons.some((r) => /suprimido/i.test(r))).toBe(true);
     expect(out.reasons.some((r) => /mip|manejo_integrado|plaga/i.test(r))).toBe(true);

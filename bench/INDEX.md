@@ -4,7 +4,7 @@
 > `node bench/run.mjs --regen-index`. No editar a mano (un test verifica
 > que este sincronizado).
 
-Generado: 2026-06-15. Entradas: 16 (12 benches/meta + 4 suites de test).
+Generado: 2026-06-16. Entradas: 16 (12 benches/meta + 4 suites de test).
 
 ## Como se usa
 
