@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "bench": "model-compare",
+  "date": "2026-06-15T23:35:58.791Z",
+  "model": "qwen2.5:14b",
+  "config": "qwen3-vs-granite",
+  "commit": "006993a",
+  "metrics": {
+    "keywords_pct": 0,
+    "latency_avg_ms": 0
+  },
+  "passCount": null,
+  "failCount": null,
+  "passPct": null,
+  "notes": "",
+  "seed": false
+}
