@@ -33,22 +33,31 @@
 
 import { jsPDF } from 'jspdf';
 
-// Tamaño de página A4 en mm (jsPDF default unit).
-const PAGE_W = 210;
-const PAGE_H = 297;
-const MARGIN = 18;
-const CONTENT_W = PAGE_W - MARGIN * 2;
+import {
+  PAGE_W,
+  PAGE_H,
+  MARGIN,
+  CONTENT_W,
+  COLOR_EMERALD,
+  COLOR_SLATE,
+  COLOR_MUTED,
+  COLOR_DARK,
+  CUADERNO_VERSION,
+  LOG_TYPE_LABELS,
+} from './cuadernoPDFTemplates.js';
 
-// Paleta — verde Chagra para títulos, gris para secundario.
-const COLOR_EMERALD = [16, 122, 87];
-const COLOR_SLATE = [71, 85, 105];
-const COLOR_MUTED = [148, 163, 184];
-const COLOR_DARK = [15, 23, 42];
-
-// Versión del schema del cuaderno (bump si cambiamos columnas / orden).
-export const CUADERNO_VERSION = '1';
-
-// ─── Helpers de fecha / formato ───────────────────────────────────────────
+export {
+  PAGE_W,
+  PAGE_H,
+  MARGIN,
+  CONTENT_W,
+  COLOR_EMERALD,
+  COLOR_SLATE,
+  COLOR_MUTED,
+  COLOR_DARK,
+  CUADERNO_VERSION,
+  LOG_TYPE_LABELS,
+} from './cuadernoPDFTemplates.js';
 
 const pad = (n) => String(n).padStart(2, '0');
 
@@ -85,15 +94,6 @@ const truncate = (str, max) => {
 };
 
 // ─── Type tags humanizados para la bitácora ───────────────────────────────
-
-const LOG_TYPE_LABELS = {
-  'log--seeding': 'Siembra',
-  'log--planting': 'Trasplante',
-  'log--harvest': 'Cosecha',
-  'log--input': 'Aplicación',
-  'log--task': 'Tarea',
-  'log--observation': 'Observación',
-};
 
 const labelLogType = (type) => LOG_TYPE_LABELS[type] || safeStr(type, 'Evento');
 
