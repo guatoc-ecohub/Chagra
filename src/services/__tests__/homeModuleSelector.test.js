@@ -308,6 +308,126 @@ describe('homeModuleSelector — invariantes', () => {
   });
 });
 
+describe('homeModuleSelector — invariantes DURAS', () => {
+  it('INVARIANTE: urbano NUNCA ve cerdos (ni como tarjeta ni como modulo)', () => {
+    const urbanos = [
+      { vocacion: 'urbano' },
+      { finca_tipo: 'balcon' },
+      { finca_tipo: 'terraza' },
+      { vocacion: 'urbano', animales: ['cerdos'] },
+      { vocacion: 'urbano', rol: 'ganadero', animales: ['cerdos', 'gallinas'] },
+      { finca_tipo: 'balcon', rol: 'porcicultor', animales: ['cerdos'] },
+    ];
+    for (const p of urbanos) {
+      const { visibles, seguimiento } = selectHomeModules(p);
+      expect(seguimiento).not.toContain(SEGUIMIENTO_KEYS.cerdos);
+      expect(visibles).not.toContain(SEGUIMIENTO_KEYS.cerdos);
+      expect(isSeguimientoVisible(SEGUIMIENTO_KEYS.cerdos, p)).toBe(false);
+    }
+  });
+
+  it('INVARIANTE: urbano NUNCA ve insumos, zonas, biodiversidad, reforestacion, paramo', () => {
+    const urbanos = [
+      { vocacion: 'urbano' },
+      { finca_tipo: 'balcon' },
+      { finca_tipo: 'terraza', animales: ['gallinas'] },
+    ];
+    for (const p of urbanos) {
+      const { visibles, seguimiento } = selectHomeModules(p);
+      expect(visibles).not.toContain(HOME_MODULE_IDS.insumos);
+      expect(visibles).not.toContain(HOME_MODULE_IDS.zonas);
+      expect(visibles).not.toContain(HOME_MODULE_IDS.biodiversidad);
+      expect(seguimiento).not.toContain(SEGUIMIENTO_KEYS.silvopastoreo);
+      expect(seguimiento).not.toContain(SEGUIMIENTO_KEYS.reforestacion);
+      expect(seguimiento).not.toContain(SEGUIMIENTO_KEYS.paramo);
+    }
+  });
+
+  it('INVARIANTE: operador ve TODO (todos los modulos + las 4 tarjetas)', () => {
+    // Verificamos que el operador ve absolutamente todo,
+    // sin importar el perfil que se le pase.
+    const operadorPerfiles = [{}, { vocacion: 'urbano' }, { rol: 'guia_glaciar' }, null];
+    for (const p of operadorPerfiles) {
+      const { visibles, seguimiento } = selectHomeModules(p, { esOperador: true });
+      for (const id of ALL_HOME_MODULES) expect(visibles).toContain(id);
+      for (const k of Object.values(SEGUIMIENTO_KEYS)) expect(seguimiento).toContain(k);
+    }
+  });
+
+  it('INVARIANTE: guia_glaciar NUNCA ve insumos ni cerdos', () => {
+    const guias = [
+      { vocacion: 'campesino' },
+      { rol: 'guia_glaciar' },
+    ];
+    for (const p of guias) {
+      const { visibles, seguimiento } = selectHomeModules(p, { esGuiaGlaciar: true });
+      expect(visibles).not.toContain(HOME_MODULE_IDS.insumos);
+      expect(visibles).not.toContain(HOME_MODULE_IDS.zonas);
+      expect(seguimiento).not.toContain(SEGUIMIENTO_KEYS.cerdos);
+    }
+  });
+});
+
+describe('homeModuleSelector — perfiles POR TIPO DE USUARIO', () => {
+  it('porcicultor (solo cerdos, sin rol explicito): silvopastoreo + cerdos', () => {
+    const { visibles, seguimiento } = selectHomeModules({
+      vocacion: 'campesino',
+      animales: ['cerdos'],
+    });
+    expect(visibles).toContain(HOME_MODULE_IDS.plantas);
+    expect(visibles).toContain(HOME_MODULE_IDS.insumos);
+    expect(seguimiento).toContain(SEGUIMIENTO_KEYS.silvopastoreo);
+    expect(seguimiento).toContain(SEGUIMIENTO_KEYS.cerdos);
+  });
+
+  it('campesino con objetivo reforestacion → biodiversidad + reforestacion/paramo', () => {
+    const { visibles, seguimiento } = selectHomeModules({
+      rol: 'campesino',
+      objetivo: ['biodiversidad'],
+      restauracion_objetivo: ['bosque', 'paramo'],
+    });
+    expect(visibles).toContain(HOME_MODULE_IDS.biodiversidad);
+    expect(seguimiento).toContain(SEGUIMIENTO_KEYS.reforestacion);
+    expect(seguimiento).toContain(SEGUIMIENTO_KEYS.paramo);
+    // El nucleo de cultivo sigue presente.
+    expect(visibles).toContain(HOME_MODULE_IDS.plantas);
+    expect(visibles).toContain(HOME_MODULE_IDS.insumos);
+  });
+
+  it('campesino con gallinas y bosque: ve cultivo + animal + restauracion', () => {
+    const { visibles, seguimiento } = selectHomeModules({
+      rol: 'campesino',
+      animales: ['gallinas'],
+      objetivo: ['biodiversidad'],
+    });
+    // Animal: silvopastoreo presente (no cerdos).
+    expect(seguimiento).toContain(SEGUIMIENTO_KEYS.silvopastoreo);
+    expect(seguimiento).not.toContain(SEGUIMIENTO_KEYS.cerdos);
+    // Restauracion: reforestacion + paramo.
+    expect(seguimiento).toContain(SEGUIMIENTO_KEYS.reforestacion);
+    expect(seguimiento).toContain(SEGUIMIENTO_KEYS.paramo);
+    expect(visibles).toContain(HOME_MODULE_IDS.biodiversidad);
+  });
+
+  it('silvopastoreo puro (ganadero sin cerdos): silvopastoreo SI, cerdos NO', () => {
+    const { seguimiento } = selectHomeModules({
+      rol: 'ganadero',
+      animales: ['ganado', 'ovejas'],
+    });
+    expect(seguimiento).toContain(SEGUIMIENTO_KEYS.silvopastoreo);
+    expect(seguimiento).not.toContain(SEGUIMIENTO_KEYS.cerdos);
+  });
+
+  it('cerdos puros (solo cerdos, nada mas): silvopastoreo + cerdos', () => {
+    const { seguimiento } = selectHomeModules({
+      rol: 'campesino',
+      animales: ['cerdos'],
+    });
+    expect(seguimiento).toContain(SEGUIMIENTO_KEYS.silvopastoreo);
+    expect(seguimiento).toContain(SEGUIMIENTO_KEYS.cerdos);
+  });
+});
+
 describe('homeModuleSelector — selectHomeModuleVisibilityMap', () => {
   it('devuelve un mapa { moduleId: boolean } con TODOS los ids del home', () => {
     const map = selectHomeModuleVisibilityMap({ rol: 'campesino' });
