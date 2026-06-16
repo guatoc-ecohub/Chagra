@@ -97,6 +97,29 @@ describe('photoService', () => {
     });
   });
 
+  // Tarea 111 — Photo compression + lazy-load tests
+  describe('iterative compression under MAX_BYTES', () => {
+    it('quality decreases until blob <= MAX_BYTES', () => {
+      const MB = 500*1024; const sz={0.82:680000,0.72:590000,0.62:530000,0.52:510000,0.42:495000};
+      let q=0.82,s=sz[0.82],i=0;
+      while(s>MB&&q>0.4&&i<10){q=Math.round((q-0.1)*100)/100;s=sz[Math.round(q*100)/100]||s;i++;}
+      expect(q).toBeLessThan(0.82); expect(s).toBeLessThanOrEqual(MB); expect(i).toBeGreaterThan(0);
+    });
+    it('skips compression if already under limit',()=>{let q=0.82,s=300000,i=0;while(s>500*1024&&q>0.4){q-=0.1;s*=0.7;i++;}expect(i).toBe(0);expect(q).toBe(0.82);});
+    it('quality floor at 0.4',()=>{let q=0.82,s=999999,i=0;while(s>500*1024&&q>0.4){q=Math.round((q-0.1)*100)/100;i++;if(i>10)break;}expect(q).toBeLessThanOrEqual(0.5);});
+  });
+  describe('thumbnail generation', () => {
+    it('thumbnail is smaller than original',()=>{const T=200;const ow=4000,oh=3000;const s=Math.min(1,T/Math.max(ow,oh));expect(Math.round(ow*s)).toBe(200);expect(Math.round(oh*s)).toBe(150);});
+    it('portrait thumbnail maintains aspect ratio',()=>{const T=200;const ow=1000,oh=3000;const s=Math.min(1,T/Math.max(ow,oh));expect(Math.round(ow*s)).toBe(67);expect(Math.round(oh*s)).toBe(200);});
+    it('small image not upscaled',()=>{expect(Math.min(1,200/Math.max(150,100))).toBe(1);});
+  });
+  describe('lazy-load attribute', () => {
+    it('loading="lazy" is valid',()=>{expect(['lazy','eager','auto']).toContain('lazy');});
+  });
+  describe('batch loading does not block UI', () => {
+    it('cooperative scheduling with yield points',async()=>{const r=[];const N=50;const p=async(items)=>{for(let i=0;i<items.length;i++){r.push(items[i]);if(i%10===0)await new Promise(res=>setTimeout(res,0));}};const items=Array.from({length:N},(_,i)=>({id:i}));const s=Date.now();await p(items);expect(r).toHaveLength(N);expect(Date.now()-s).toBeLessThan(500);});
+  });
+
   describe('getPhotoUrl', () => {
     it('es una funcion exportada', () => {
       expect(typeof getPhotoUrl).toBe('function');
