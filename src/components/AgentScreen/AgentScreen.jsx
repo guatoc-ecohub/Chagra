@@ -1945,8 +1945,7 @@ export default function AgentScreen({ onBack, initialContext }) {
         identity: {
           user_id: operatorId,
           user_name: profileForCapture?.nombre || null,
-          finca_slug: activeFincaSlug || null,
-          finca_nombre: fincaActiva?.nombre || fincaActiva?.name || null,
+          finca_id: fincaActiva?.id || activeFincaSlug || null,
         },
         meta: {
           session_id: `${operatorId}:${activeFincaSlug || 'sin-finca'}`,
@@ -1954,13 +1953,10 @@ export default function AgentScreen({ onBack, initialContext }) {
           entities_grounded: Array.isArray(resolvedEntities)
             ? resolvedEntities.map((e) => e?.canonical_id || e?.id || e?.mentioned).filter(Boolean)
             : [],
+          grounding_used: Boolean(resolvedEntities && resolvedEntities.length > 0),
           guards_fired: guarded.modified ? guarded.reasons || [] : [],
-          grounded_status: sourceMetadata?.source || sourceMetadata?.grounded_status || null,
           latency_ms: Math.round(performance.now() - pipelineStartedAt),
           model: selectChatRoute(textForLLM),
-          eval_rate: currentLlmStats?.eval_rate ?? null,
-          first_token_ms: currentLlmStats?.first_token_ms ?? null,
-          response_len: currentLlmStats?.response_len ?? null,
         },
       });
       setMessages((prev) => [...prev, assistantMessage]);
