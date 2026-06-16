@@ -185,4 +185,33 @@ test.describe('multifinca client-side scoping (ADR-036 MVP)', () => {
     expect(byIdUrl).toBeDefined();
     expect(byIdUrl).not.toContain('filter[uid');
   });
+
+  test('extensionista cambia la finca activa dentro de sus delegadas', async ({ page }) => {
+    await page.evaluate(async () => {
+      const tenantMod = await import('/src/services/tenantContext.js');
+      const fincaMod = await import('/src/services/fincaActiveStore.js');
+      const extMod = await import('/src/services/extensionistaService.js');
+      tenantMod.setActiveTenantId('demo-extensionista');
+      const tablero = extMod.construirTableroExtensionista('demo-extensionista');
+      const first = tablero.fincas[0];
+      const second = tablero.fincas[1];
+      if (!first || !second) {
+        throw new Error('seed extensionista incompleto');
+      }
+      fincaMod.useFincaActiveStore.setState({
+        activeFincaSlug: first.slug,
+        fincas: tablero.fincas.map((f) => ({
+          slug: f.slug,
+          nombre: f.nombre,
+          municipio: f.municipio,
+          farmos_endpoint: null,
+        })),
+      });
+      fincaMod.useFincaActiveStore.getState().setActiveFinca(second.slug);
+      window.__fincaActiveSlug = fincaMod.useFincaActiveStore.getState().activeFincaSlug;
+    });
+
+    const activeSlug = await page.evaluate(() => window.__fincaActiveSlug);
+    expect(activeSlug).toBe('finca-buenos-aires');
+  });
 });
