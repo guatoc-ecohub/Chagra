@@ -25,6 +25,7 @@
  * @module userProfileService
  */
 
+
 import { findMunicipio } from '../utils/colombiaLocations.js';
 import { PROFILE_QUESTIONS } from './profileQuestions.js';
 

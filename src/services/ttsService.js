@@ -190,7 +190,6 @@ export function setXTTSEnabled(enabled) {
     return false;
   }
 }
-
 let voices = [];
 let voicesLoaded = false;
 let kokoroAvailable = null;

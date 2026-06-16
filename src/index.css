@@ -21,6 +21,18 @@
  *
  * Con esto las ~726 clases de color del PWA (incluidas las de opacidad) se
  * vuelven theme-aware DE UNA, sin overrides clase-por-clase en themes.css.
+ *
+ * CATALOGO DE VARIABLES CSS:
+ *   --c-slate-50..950     Escala neutra (chrome), invertida en claros.
+ *   --c-emerald-200..900  Acento verde primario (salvia en claros).
+ *   --c-amber-200..900    Acento cálido (ocre en claros).
+ *   --c-surface*          Superficies (card/raised/border), derivadas de slate.
+ *   --c-muzo/morpho/orchid/frog[-glow]  Acentos bio-punk neon; apagados en claros.
+ *   --fx-*                Efectos visuales (particles/glow/pattern), 0 en claros.
+ *   --scrim-bg/opacity    Velo de fondo (navy denso en bp, sutil en claros).
+ *   --t-accent-rgb        themes.css: acento del tema para marca/halo.
+ *   --bp-glow-a/bg-*      themes.css: lienzo bio-punk "cosecha mística".
+ *   --w-*                 clima-atmosfera.css: modulación climática del velo.
  * =========================================================================== */
 :root {
   /* slate — escala neutra (chrome oscuro biopunk). Tailwind default exacto. */
