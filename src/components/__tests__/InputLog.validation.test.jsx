@@ -13,6 +13,7 @@ vi.mock('../../services/payloadService', () => ({
   savePayload: vi.fn().mockResolvedValue({ success: true, message: 'OK' }),
 }));
 vi.mock('../../config/defaults', () => ({
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
   FARM_CONFIG: { LOCATION_ID: 'loc-1', FARM_NAME: 'Finca Test' },
 }));
 
@@ -30,7 +31,7 @@ describe('InputLog — validacion de cantidad positiva', () => {
 
     render(<InputLog onBack={onBack} onSave={onSave} />);
 
-    const materialSelect = screen.getByRole('combobox', { name: /tipo de insumo/i });
+    const materialSelect = screen.getByLabelText(/Tipo de Insumo/i);
     fireEvent.change(materialSelect, { target: { value: 'mat-bio' } });
 
     const saveBtn = screen.getByRole('button', { name: /registrar aplicaci[oó]n/i });
@@ -50,7 +51,7 @@ describe('InputLog — validacion de cantidad positiva', () => {
 
     render(<InputLog onBack={onBack} onSave={onSave} />);
 
-    const materialSelect = screen.getByRole('combobox', { name: /tipo de insumo/i });
+    const materialSelect = screen.getByLabelText(/Tipo de Insumo/i);
     fireEvent.change(materialSelect, { target: { value: 'mat-bio' } });
 
     const qtyInput = screen.getByPlaceholderText('0.00');

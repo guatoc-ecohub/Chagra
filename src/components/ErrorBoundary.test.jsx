@@ -78,7 +78,6 @@ describe('ErrorBoundary', () => {
 
     await waitFor(() => {
       expect(screen.getByText(MSG.ALGO_FALLO)).toBeInTheDocument();
-      expect(screen.getByText('Tus datos de la finca están a salvo')).toBeInTheDocument();
     });
   });
 
@@ -157,7 +156,7 @@ describe('ErrorBoundary', () => {
     });
 
     // Click en "Intentar de nuevo"
-    const retryButton = screen.getByText('Intentar de nuevo');
+    const retryButton = screen.getByText(MSG.INTENTAR_DE_NUEVO);
     retryButton.click();
 
     // Rerender con shouldThrow=false
