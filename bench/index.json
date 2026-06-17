@@ -6,6 +6,7 @@
     "anti-hallucination": "Miden alucinacion real (AH% = FAIL/total) con must_include + red_flags y juez independiente.",
     "vision": "Reconocimiento de especies desde fotos + grounding del sidecar (validate_visual_match).",
     "rag": "Latencia del retrieve BM25 sobre el corpus real.",
+    "grafo": "Cobertura de la capa de conocimiento (Apache AGE chagra_kg): que tanto del catalogo canonico esta como arista en el grafo (capa Co).",
     "judge": "Smoke + ranking del LLM-judge.",
     "nocturno": "Bench largo de FarmProcess con escenarios + eliminacion temprana.",
     "meta": "Herramientas sobre resultados de benches (no corren modelo).",
@@ -131,6 +132,45 @@
       "what": "Re-bench HONESTO de 10 prompts complejos rotativos a CONFIG-PROD. Juez Anthropic (Haiku) si hay API key, si no determinstico. Comparte helpers de sidecar/GPU con capabilities via lib/bench-sidecar.mjs.",
       "output": "data/bench-runs/complejos-juez-independiente-YYYY-MM-DD.jsonl + .summary.json",
       "history": true
+    },
+    {
+      "id": "agro-rotatorio",
+      "title": "Bench agroecologico rotatorio de grafo y grounding",
+      "type": "bench-llm",
+      "cluster": "anti-hallucination",
+      "status": "active",
+      "script": "scripts/bench-agro-rotatorio.mjs",
+      "cmd": [
+        "node",
+        "{{script}}"
+      ],
+      "infra": [
+        "corpus"
+      ],
+      "metrics": [
+        "graph_consistency_pct",
+        "grounded_pct",
+        "hallucinations",
+        "subspecies_disconnections",
+        "score_global"
+      ],
+      "what": "Bench diario rotativo para detectar huecos base-variedad en el grafo agroecologico y alucinaciones del agente. Capa A audita paridad TARGETS_PEST/USED_AS_BIOPREPARADO/SUSCEPTIBLE_TO por base, variedad y genero. Capa B genera 50 preguntas por semilla de fecha y puntua grounding con reglas deterministicas; usa sidecar si hay token y fallback Ollama con grounding del grafo.",
+      "envVars": [
+        "SEED",
+        "AGRO_ROTATORIO_MODEL",
+        "AGRO_ROTATORIO_QUESTIONS",
+        "SIDECAR_TOKEN",
+        "SIDECAR_URL",
+        "CHAGRA_KG_PSQL_CMD",
+        "CHAGRA_KG_HOST",
+        "CHAGRA_KG_PORT",
+        "CHAGRA_KG_USER",
+        "CHAGRA_KG_DB",
+        "CHAGRA_KG_PASSWORD"
+      ],
+      "output": "bench/history/agro-rotatorio__<model|nomodel>__<timestamp>.json",
+      "history": true,
+      "dailyNote": "Para cron diario: SEED=$(date +%F) node bench/run.mjs agro-rotatorio. Para fidelidad total configure token del sidecar y AGE via CHAGRA_KG_* o CHAGRA_KG_PSQL_CMD."
     },
     {
       "id": "capabilities-A-vs-C",
@@ -264,6 +304,34 @@
       "output": "consola + bench/history (via --history-out)",
       "history": true,
       "runnable": "parcial"
+    },
+    {
+      "id": "grafo-cobertura",
+      "title": "Cobertura del grafo de conocimiento (catalogo -> aristas AGE, capa Co)",
+      "type": "bench-grafo",
+      "cluster": "grafo",
+      "status": "active",
+      "script": "scripts/bench-grafo-cobertura.mjs",
+      "cmd": [
+        "node",
+        "{{script}}"
+      ],
+      "infra": [
+        "age"
+      ],
+      "metrics": [
+        "cobertura_pct",
+        "targets_pest_cov_pct",
+        "compatible_cov_pct",
+        "antagonist_cov_pct",
+        "biop_cov_pct",
+        "holes",
+        "sin_nodo",
+        "relaciones_co"
+      ],
+      "what": "READ-ONLY. Mide que fraccion de las relaciones del catalogo canonico (especie->plaga, companeras, antagonistas, especie->biopreparado) estan como arista en Apache AGE (chagra_kg, capa Co). Cuantifica los holes (relacion conocida por el catalogo pero sin arista en el grafo, que el agente no puede aterrizar) y los vuelve tendencia. Origen: subagente de medicion de holes (2026-06-17). NO escribe en el grafo, NO inventa.",
+      "output": "bench/history/grafo-cobertura__co-chagra_kg__<ts>.json + consola",
+      "history": true
     },
     {
       "id": "llm-judge",

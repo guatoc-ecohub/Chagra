@@ -122,6 +122,14 @@ export function detectInfra({ probe } = {}) {
     existsSync('/home/kortux/Workspace/Chagra-strategy/deepresearch'),
   );
   check('farmos', () => result.sidecar === true);
+  check('age', () => {
+    const r = spawnSync(
+      'bash',
+      ['-lc', 'sudo -n podman exec -i postgres-farm psql -U farmos -d chagra_kg -tAc "SELECT 1" >/dev/null 2>&1'],
+      { stdio: 'ignore' },
+    );
+    return r.status === 0;
+  });
   return result;
 }
 
