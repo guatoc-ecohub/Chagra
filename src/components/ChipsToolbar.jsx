@@ -52,7 +52,7 @@ import { isDeepResearchEnabled } from '../services/deepResearchClient';
  *                     pinta lo que recibe con su CSS actual (la legibilidad/
  *                     estilo la lleva otro stream).
  */
-export default function ChipsToolbar({
+const ChipsToolbar = React.memo(function ChipsToolbar({
   onSelectIntent,
   activeIntent = null,
   hasAttachment = false,
@@ -155,4 +155,6 @@ export default function ChipsToolbar({
       </div>
     </div>
   );
-}
+});
+
+export default ChipsToolbar;

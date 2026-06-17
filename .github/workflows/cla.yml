@@ -1,9 +1,12 @@
 name: CLA Assistant
 
 # Requiere firma del Contributor License Agreement (CLA) en cada PR externo.
+# Verifica que todos los autores del PR hayan firmado el CLA (via archivo
+# cla.json en branch cla-signatures) o esten en la allowlist (bots, org).
 #
-# Modelo: Apache ICLA estándar (Apache Software Foundation), adaptado a
-# Guatoc Ecohub (persona moral en constitución — ver CLA.md cabecera
+# Gate de compliance legal: sin CLA firmado, el PR no puede mergearse.
+# Modelo: Apache ICLA estandar (Apache Software Foundation), adaptado a
+# Guatoc Ecohub (persona moral en constitucion -- ver CLA.md cabecera
 # "Transitorio").
 #
 # Trigger:

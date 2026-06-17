@@ -1,0 +1,26 @@
+<!doctype html>
+<!--
+  component-harness.html — Harness AISLADO para el test VISUAL de componentes
+  gallery. Monta los componentes REALES ChagraAgentAvatar, StatusBadge,
+  OfflineChip, SyncIndicator, CriticalAlertBanner y AIBetaBadge con todas sus
+  variantes, SIN pasar por el router/auth de la app. Sirve para capturar
+  cada componente en un Chromium real y verificar que todas las variantes
+  renderizan correctamente antes de mergear a main.
+
+  Uso: npx vite tests/visual/component-harness.html
+
+  Query params:
+    - ?type=colibri|colibri_svg|maiz  → fuerza tipo de ChagraAgentAvatar
+                                       (default: colibri)
+-->
+<html lang="es-CO">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Component Gallery — harness visual</title>
+  </head>
+  <body class="bg-slate-950 text-white">
+    <div id="gallery-root"></div>
+    <script type="module" src="./component-harness.jsx"></script>
+  </body>
+</html>

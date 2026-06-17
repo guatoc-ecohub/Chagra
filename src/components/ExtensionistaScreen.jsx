@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
   Users, MapPin, AlertTriangle, Clock, CheckCircle2, FlaskConical,
   Sprout, Info, UserCircle2,
@@ -7,6 +7,7 @@ import { ScreenShell } from './common/ScreenShell';
 import { esExtensionistaActual } from '../config/extensionistaAccess';
 import { construirTableroExtensionista } from '../services/extensionistaService';
 import { getActiveTenantId } from '../services/tenantContext';
+import useFincaActiveStore from '../services/fincaActiveStore';
 
 /**
  * ExtensionistaScreen — Panel SUPERVISOR del modo extensionista (ADR-048 MVP).
@@ -131,11 +132,23 @@ export default function ExtensionistaScreen({ onBack, onHome }) {
   // pantalla se monta por una ruta directa). Si no hay rol → no construimos el
   // tablero ni mostramos fincas.
   const tieneRol = esExtensionistaActual();
+  const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
+  const setActiveFinca = useFincaActiveStore((s) => s.setActiveFinca);
 
   const tablero = useMemo(
     () => (tieneRol ? construirTableroExtensionista(getActiveTenantId()) : null),
     [tieneRol]
   );
+
+  const fincasDelegadas = useMemo(() => tablero?.fincas || [], [tablero]);
+
+  useEffect(() => {
+    if (!tieneRol || fincasDelegadas.length === 0) return;
+    const activeExists = fincasDelegadas.some((f) => f.slug === activeFincaSlug);
+    if (!activeExists) {
+      setActiveFinca(fincasDelegadas[0].slug);
+    }
+  }, [activeFincaSlug, fincasDelegadas, setActiveFinca, tieneRol]);
 
   if (!tieneRol) {
     return (
@@ -163,6 +176,32 @@ export default function ExtensionistaScreen({ onBack, onHome }) {
           vistazo. Lo urgente aparece arriba. Toca una finca para ver su detalle
           (próximamente).
         </p>
+
+        {fincasDelegadas.length > 0 && (
+          <div className="rounded-2xl border border-emerald-700/30 bg-emerald-950/20 p-4 space-y-3">
+            <div>
+              <p className="text-sm font-semibold text-emerald-200">Finca activa</p>
+              <p className="text-xs text-emerald-300/80">
+                Elige cuál de las fincas delegadas quieres gestionar ahora.
+              </p>
+            </div>
+            <label className="block">
+              <span className="sr-only">Selector de finca activa</span>
+              <select
+                data-testid="finca-selector"
+                value={activeFincaSlug}
+                onChange={(e) => setActiveFinca(e.target.value)}
+                className="w-full rounded-xl border border-emerald-700/40 bg-slate-950/60 px-3 py-2 text-sm text-white outline-none focus:border-emerald-400"
+              >
+                {fincasDelegadas.map((finca) => (
+                  <option key={finca.slug} value={finca.slug}>
+                    {finca.nombre} ({finca.municipio || 'sin municipio'})
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        )}
 
         {/* Aviso de frontera MVP — para no confundir vista previa con permiso real. */}
         <div className="rounded-xl border border-sky-700/40 bg-sky-900/20 p-3 text-xs text-sky-200 flex items-start gap-2">
@@ -197,7 +236,18 @@ export default function ExtensionistaScreen({ onBack, onHome }) {
         ) : (
           <div className="flex flex-col gap-3">
             {fincas.map((finca) => (
-              <FincaCard key={finca.slug} finca={finca} />
+              <button
+                key={finca.slug}
+                type="button"
+                onClick={() => setActiveFinca(finca.slug)}
+                className={`text-left rounded-2xl border transition-colors ${
+                  finca.slug === activeFincaSlug
+                    ? 'border-emerald-500/70 ring-1 ring-emerald-500/40'
+                    : 'border-slate-700/60 hover:border-slate-500/80'
+                }`}
+              >
+                <FincaCard finca={finca} />
+              </button>
             ))}
           </div>
         )}

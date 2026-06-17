@@ -12,6 +12,7 @@ export function getCompletedTaskIds(logs) {
     const completedIds = new Set();
 
     for (const log of logs) {
+        if (!log || typeof log !== 'object') continue;
         const notes = log.attributes?.notes?.value || '';
         if (notes.includes('[TASK_COMPLETION]')) {
             const match = notes.match(/target_task_id:\s*([a-zA-Z0-9_-]+)/);
