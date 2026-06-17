@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "bench": "prueba-tomate",
+  "date": "2026-06-17T23:30:43.096Z",
+  "model": null,
+  "config": "age-chagra_kg/co",
+  "commit": "fab8701",
+  "metrics": {
+    "prueba_tomate_pct": 100,
+    "basicos_pass": 6,
+    "basicos_total": 6,
+    "cultivos_con_plaga": 21,
+    "cultivos_cadena_completa": 21,
+    "plagas_con_manejo": 234,
+    "relaciones_susceptible_to": 69
+  },
+  "passCount": 6,
+  "failCount": 0,
+  "passPct": 100,
+  "notes": "basicos que fallan: ninguno",
+  "seed": false
+}
