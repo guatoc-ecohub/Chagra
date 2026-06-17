@@ -7,7 +7,7 @@
 - **Duración**: 62.82 min
 - **Script**: `scripts/bench-agente-completo.mjs`
 - **50 prompts** | Categorías: species(20), biopreparados(12), plagas(10), normativa(4), agroforestería(4)
-- **Output persistente**: `/home/kortux/Workspace/bench-results/llm-candidates-2026-06-08/`
+- **Output persistente**: `~/Workspace/bench-results/llm-candidates-2026-06-08/`
 
 ## Modelos evaluados
 

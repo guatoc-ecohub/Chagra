@@ -29,7 +29,7 @@
 
 - [ ] Si se modifico configuracion de nginx o systemd services, ejecutar:
   ```bash
-  cd /home/kortux/Workspace/guatoc-nixos
+  cd ~/Workspace/guatoc-nixos
   sudo nixos-rebuild switch --flake .#alpha
   ```
 
