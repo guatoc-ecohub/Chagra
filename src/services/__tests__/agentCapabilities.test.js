@@ -15,7 +15,7 @@ describe('agentCapabilities', () => {
     }
   });
 
-  test('CHIP_INTENTS is a non-empty frozen array', () => {
+  test('CHIP_INTENTS is a non-empty frozen object', () => {
     expect(typeof CHIP_INTENTS).toBe('object');
     expect(CHIP_INTENTS).not.toBeNull();
     expect(Object.keys(CHIP_INTENTS).length).toBeGreaterThan(0);
