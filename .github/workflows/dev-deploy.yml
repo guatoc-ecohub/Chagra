@@ -1,5 +1,11 @@
 name: Deploy Chagra PWA (DEV)
 
+# Deploy automatico a entorno DEV en alpha para ramas dev/*, feat/*, fix/*.
+# Target: /mnt/fast/appdata/farmos-pwa-dev. Concurrency por branch
+# (cancel-in-progress: true) para que pushes rapidos a la misma rama solo
+# deplieguen el ultimo build. Sin lint step (a diferencia de prod/QA), para
+# iteracion rapida.
+
 on:
   push:
     branches: ['dev/*', 'feat/*', 'fix/*']
