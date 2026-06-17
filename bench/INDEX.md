@@ -4,7 +4,7 @@
 > `node bench/run.mjs --regen-index`. No editar a mano (un test verifica
 > que este sincronizado).
 
-Generado: 2026-06-17. Entradas: 17 (13 benches/meta + 4 suites de test).
+Generado: 2026-06-17. Entradas: 18 (14 benches/meta + 4 suites de test).
 
 ## Como se usa
 
@@ -59,6 +59,13 @@ _Latencia del retrieve BM25 sobre el corpus real._
 | id | que hace | tipo | infra | ejecutar |
 |---|---|---|---|---|
 | `rag-retrieve` | Mide retrieve(query, topK) sobre el corpus real (491+ species). Cold load + warm p50/p95. Consolidado de 3 archivos a 1 (loader hook ahora inline via data: URL). NOTA: ejecucion completa bajo Node puro necesita shim import.meta.env (gap... | Bench latencia | corpus | `node bench/run.mjs rag-retrieve` |
+
+### Cluster: grafo
+_Cobertura de la capa de conocimiento (Apache AGE chagra_kg): que tanto del catalogo canonico esta como arista en el grafo (capa Co)._
+
+| id | que hace | tipo | infra | ejecutar |
+|---|---|---|---|---|
+| `grafo-cobertura` | READ-ONLY. Mide que fraccion de las relaciones del catalogo canonico (especie->plaga, companeras, antagonistas, especie->biopreparado) estan como arista en Apache AGE (chagra_kg, capa Co). Cuantifica los holes (relacion conocida por el... | bench-grafo | age | `node bench/run.mjs grafo-cobertura` |
 
 ### Cluster: judge
 _Smoke + ranking del LLM-judge._
