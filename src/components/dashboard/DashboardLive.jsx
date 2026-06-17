@@ -84,6 +84,17 @@ const SECTION_COMPONENTS = {
     informes: { Component: InformesCard },
 };
 
+function allModulesVisible() {
+    return Object.fromEntries(DEFAULT_ORDER.map((id) => [id, true]));
+}
+
+function homeAccessOpts() {
+    return {
+        esOperador: esOperadorActual(),
+        esGuiaGlaciar: tieneAccesoGlaciarActual(),
+    };
+}
+
 function SortableSection({ id, onNavigate, sensors }) {
     const {
         attributes,
@@ -155,15 +166,10 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
             // Primer load sin elección manual: default por perfil.
             // El operador (esOperadorActual) hace BYPASS → ve TODOS los módulos
             // (selectHomeModules ignora el rol/urbano cuando esOperador=true).
-            return selectHomeModuleVisibilityMap(getProfile(), {
-                esOperador: esOperadorActual(),
-                esGuiaGlaciar: tieneAccesoGlaciarActual(),
-            });
+            return selectHomeModuleVisibilityMap(getProfile(), homeAccessOpts());
         } catch (_) {
             // Fail-open: ante cualquier problema, todo visible (no romper el home).
-            const visibility = {};
-            for (const id of DEFAULT_ORDER) visibility[id] = true;
-            return visibility;
+            return allModulesVisible();
         }
     });
     // Tarjetas de SEGUIMIENTO permitidas por perfil (Reforestación · Silvopastoreo
@@ -171,20 +177,20 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
     // urbano (sin preferencia manual) NUNCA ve Cerdos. Se calcula una vez al
     // montar; el perfil no cambia dentro de la sesión del home.
     //
-    // RESPETO A #1560: si el usuario ya tomó control MANUAL de su home
-    // (hasManualModuleVisibility), NO le ocultamos tarjetas por perfil — el
-    // perfil solo fija el DEFAULT. Devolvemos null (= mostrar las 4), igual que
-    // el comportamiento histórico. Un urbano FRESCO (sin manual) sí queda
+    // RESPETO A #1560: si el usuario no es operador y ya tomó control MANUAL de
+    // su home (hasManualModuleVisibility), NO le ocultamos tarjetas por perfil —
+    // el perfil solo fija el DEFAULT. Devolvemos null (= mostrar las 4), igual
+    // que el comportamiento histórico. Un urbano FRESCO (sin manual) sí queda
     // gateado: no ve ninguna (criterio de éxito #1).
     // null = mostrar todas; [] = ocultar el bloque; [k…] = filtrar.
     const [seguimientoKeys] = useState(() => {
         try {
+            if (esOperadorActual()) {
+                return selectHomeModules(getProfile(), homeAccessOpts()).seguimiento;
+            }
             if (hasManualModuleVisibility()) return null;
             // El operador ve las 4 tarjetas (incluida Cerdos) por el bypass.
-            return selectHomeModules(getProfile(), {
-                esOperador: esOperadorActual(),
-                esGuiaGlaciar: tieneAccesoGlaciarActual(),
-            }).seguimiento;
+            return selectHomeModules(getProfile(), homeAccessOpts()).seguimiento;
         } catch (_) {
             return null; // Fail-open: el componente muestra las 4 por defecto.
         }

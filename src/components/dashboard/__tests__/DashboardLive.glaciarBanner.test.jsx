@@ -22,6 +22,7 @@ import { describe, test, expect, vi, beforeEach } from 'vitest';
 const accesoMock = vi.fn(() => false);
 vi.mock('../../../config/glaciarAccess', () => ({
   tieneAccesoGlaciarActual: (...args) => accesoMock(...args),
+  esOperadorActual: () => false,
 }));
 
 // Hijos pesados → stubs livianos.

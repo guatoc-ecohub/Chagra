@@ -15,7 +15,7 @@ import usePrefsStore from '../store/usePrefsStore';
 import { stop as stopTTS } from '../services/ttsService';
 import { getNotificationStyle, setNotificationStyle, getTelemetryConsent, setTelemetryConsent, HOME_MODULES, getModuleVisibility, setModuleVisibility, hasManualModuleVisibility, getProfile } from '../services/userProfileService';
 import { selectHomeModuleVisibilityMap } from '../services/homeModuleSelector';
-import { tieneAccesoGlaciarActual } from '../config/glaciarAccess';
+import { tieneAccesoGlaciarActual, esOperadorActual } from '../config/glaciarAccess';
 import { getOperatorPhoto, setOperatorPhotoFromFile, removeOperatorPhotoLocal } from '../services/operatorPhotoService';
 
 const TTL_OPTIONS = [
@@ -149,12 +149,14 @@ export default function ProfileScreen({ onBack, onHome }) {
     try {
       if (hasManualModuleVisibility()) return getModuleVisibility();
       return selectHomeModuleVisibilityMap(getProfile(), {
+        esOperador: esOperadorActual(),
         esGuiaGlaciar: tieneAccesoGlaciarActual(),
       });
     } catch (_) {
       return getModuleVisibility();
     }
   });
+  const moduleVisibilityDirtyRef = useRef(false);
 
   // Free 7→10 fix-pack: HYTA (info GPU/Ollama) detrás de un toggle "Modo
   // técnico". Default OFF para que el campesino-target no vea jerga técnica
@@ -208,6 +210,7 @@ export default function ProfileScreen({ onBack, onHome }) {
   // Sincronizar visibilidad de módulos con el perfil y notificar al Home
   // para actualización en tiempo real.
   useEffect(() => {
+    if (!moduleVisibilityDirtyRef.current) return;
     setModuleVisibility(moduleVisibility);
     try {
       window.dispatchEvent(new CustomEvent('chagra:module-visibility-changed', {
@@ -548,10 +551,13 @@ export default function ProfileScreen({ onBack, onHome }) {
                             role="switch"
                             aria-checked={moduleVisibility[module.id] !== false}
                             aria-label={`Mostrar u ocultar ${module.label}`}
-                            onClick={() => setModuleVisibilityState((prev) => ({
-                              ...prev,
-                              [module.id]: prev[module.id] === false ? true : false,
-                            }))}
+                            onClick={() => {
+                              moduleVisibilityDirtyRef.current = true;
+                              setModuleVisibilityState((prev) => ({
+                                ...prev,
+                                [module.id]: prev[module.id] === false ? true : false,
+                              }));
+                            }}
                             className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
                               moduleVisibility[module.id] !== false ? 'bg-emerald-600' : 'bg-slate-700'
                             }`}
@@ -573,6 +579,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                 <button
                   type="button"
                   onClick={() => {
+                    moduleVisibilityDirtyRef.current = true;
                     const allVisible = Object.fromEntries(HOME_MODULES.map(m => [m.id, true]));
                     setModuleVisibilityState(allVisible);
                   }}

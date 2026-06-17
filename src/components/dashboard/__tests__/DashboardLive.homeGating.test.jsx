@@ -14,17 +14,20 @@
  * de procesos se mockea vacío (contadores en 0).
  */
 import React from 'react';
-import { render, screen, cleanup, waitFor } from '@testing-library/react';
+import { render, screen, cleanup, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// Gate glaciar: irrelevante a este test → sin acceso. esOperadorActual: estos
-// casos prueban el gating POR PERFIL (urbano/ganadero/restaurador), NO el
-// bypass del operador (#1581) — sin este mock, DashboardLive llamaba a un
-// esOperadorActual indefinido y el catch fail-open mostraba TODAS las tarjetas.
+const glaciarAccessMock = vi.hoisted(() => ({
+  tieneAccesoGlaciarActual: vi.fn(() => false),
+  esOperadorActual: vi.fn(() => false),
+}));
+
+// Gate glaciar: controlado por test. Por defecto estos casos prueban el gating
+// POR PERFIL (urbano/ganadero/restaurador), NO el bypass del operador (#1581).
 vi.mock('../../../config/glaciarAccess', () => ({
-  tieneAccesoGlaciarActual: () => false,
-  esOperadorActual: () => false,
+  tieneAccesoGlaciarActual: (...args) => glaciarAccessMock.tieneAccesoGlaciarActual(...args),
+  esOperadorActual: (...args) => glaciarAccessMock.esOperadorActual(...args),
 }));
 
 // Hijos pesados → stubs livianos. NO mockeamos FincaCards (queremos las
@@ -71,6 +74,8 @@ import DashboardLive from '../DashboardLive';
 
 beforeEach(() => {
   vi.clearAllMocks();
+  glaciarAccessMock.tieneAccesoGlaciarActual.mockReturnValue(false);
+  glaciarAccessMock.esOperadorActual.mockReturnValue(false);
   localStorage.clear();
   mockProfile = {};
   mockManual = false;
@@ -129,5 +134,65 @@ describe('DashboardLive — gating del home por perfil', () => {
     mockManualMap = {}; // {} = nada oculto = todo visible (preferencia explícita).
     render(<DashboardLive onNavigate={vi.fn()} />);
     await waitFor(() => expect(screen.getByText('Cerdos')).toBeInTheDocument());
+  });
+
+  test('OPERADOR sin preferencia manual: ubicación/perfil reducido no oculta módulos ni seguimiento', async () => {
+    glaciarAccessMock.esOperadorActual.mockReturnValue(true);
+    mockProfile = { rol: 'restaurador', objetivo: ['biodiversidad'] };
+
+    render(<DashboardLive onNavigate={vi.fn()} />);
+
+    await waitFor(() => expect(screen.getByText('Cerdos')).toBeInTheDocument());
+    expect(screen.getByText(/Insumos/i)).toBeInTheDocument();
+    expect(screen.getByText('Mis zonas')).toBeInTheDocument();
+    expect(screen.getByText(/Informes/i)).toBeInTheDocument();
+    expect(screen.getByText('Reforestación')).toBeInTheDocument();
+    expect(screen.getByText('Silvopastoreo')).toBeInTheDocument();
+    expect(screen.getByText('Páramo')).toBeInTheDocument();
+  });
+
+  test('OPERADOR con preferencia manual explícita: puede ocultar módulos del Home', async () => {
+    glaciarAccessMock.esOperadorActual.mockReturnValue(true);
+    mockProfile = { rol: 'restaurador', objetivo: ['biodiversidad'] };
+    mockManual = true;
+    mockManualMap = {
+      insumos: false,
+      zonas: false,
+      informes: false,
+      analisis: false,
+    };
+
+    render(<DashboardLive onNavigate={vi.fn()} />);
+
+    await waitFor(() => expect(screen.getByText('Cerdos')).toBeInTheDocument());
+    expect(screen.queryByText(/Insumos/i)).toBeNull();
+    expect(screen.queryByText('Mis zonas')).toBeNull();
+    expect(screen.queryByText(/Informes/i)).toBeNull();
+  });
+
+  test('OPERADOR: un evento de visibilidad manual actualiza el Home sin perder seguimiento', async () => {
+    glaciarAccessMock.esOperadorActual.mockReturnValue(true);
+    mockProfile = { vocacion: 'urbano', finca_tipo: 'terraza' };
+
+    render(<DashboardLive onNavigate={vi.fn()} />);
+    await waitFor(() => expect(screen.getByText(/Insumos/i)).toBeInTheDocument());
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent('chagra:module-visibility-changed', {
+        detail: {
+          visibility: {
+            insumos: false,
+            zonas: false,
+            informes: false,
+            analisis: false,
+          },
+        },
+      }));
+    });
+
+    expect(screen.queryByText(/Insumos/i)).toBeNull();
+    expect(screen.queryByText('Mis zonas')).toBeNull();
+    expect(screen.queryByText(/Informes/i)).toBeNull();
+    expect(screen.getByText('Cerdos')).toBeInTheDocument();
   });
 });
