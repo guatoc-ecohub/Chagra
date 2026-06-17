@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "bench": "grafo-cobertura",
+  "date": "2026-06-17T20:53:33.146Z",
+  "model": null,
+  "config": "age-chagra_kg/co",
+  "commit": "4496074",
+  "metrics": {
+    "cobertura_pct": 99,
+    "targets_pest_cov_pct": 82.4,
+    "compatible_cov_pct": 100,
+    "antagonist_cov_pct": 100,
+    "biop_cov_pct": 100,
+    "holes": 9,
+    "sin_nodo": 8,
+    "relaciones_co": 1039
+  },
+  "passCount": 865,
+  "failCount": 9,
+  "passPct": 99,
+  "notes": "catalogo=chagra-catalog-full-v3.1.json declaradas=882 mapeables=874 cubiertas=865",
+  "seed": false
+}
