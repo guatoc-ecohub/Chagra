@@ -334,6 +334,32 @@
       "history": true
     },
     {
+      "id": "prueba-tomate",
+      "title": "Prueba del tomate (cadena cultivo->plaga->control/biopreparado en AGE)",
+      "type": "bench-grafo",
+      "cluster": "grafo",
+      "status": "active",
+      "protected": true,
+      "script": "scripts/bench-prueba-tomate.mjs",
+      "cmd": [
+        "node",
+        "{{script}}"
+      ],
+      "infra": [
+        "age"
+      ],
+      "metrics": [
+        "prueba_tomate_pct",
+        "basicos_pass",
+        "cultivos_cadena_completa",
+        "plagas_con_manejo",
+        "relaciones_susceptible_to"
+      ],
+      "what": "CANDADO de la auditoria 2026-06-17. READ-ONLY: para cada cultivo con plaga ligada verifica que el grafo conecte la cadena agronomica (cultivo -SUSCEPTIBLE_TO-> plaga <-CONTROLS|TREATS- control/biopreparado), con la semantica CORRECTA (no TARGETS_PEST). SALE !=0 si un cultivo basico (tomate/papa/cafe/frijol/maiz/platano) no responde la consulta basica. Mide el efecto de la ingesta DR cross-AI.",
+      "output": "bench/history/prueba-tomate__co-chagra_kg__<ts>.json + consola (exit!=0 si falla un basico)",
+      "history": true
+    },
+    {
       "id": "llm-judge",
       "title": "Smoke + ranking del LLM-judge",
       "type": "bench-llm",

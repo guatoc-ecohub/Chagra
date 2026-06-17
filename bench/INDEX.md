@@ -4,7 +4,7 @@
 > `node bench/run.mjs --regen-index`. No editar a mano (un test verifica
 > que este sincronizado).
 
-Generado: 2026-06-17. Entradas: 18 (14 benches/meta + 4 suites de test).
+Generado: 2026-06-17. Entradas: 19 (15 benches/meta + 4 suites de test).
 
 ## Como se usa
 
@@ -66,6 +66,7 @@ _Cobertura de la capa de conocimiento (Apache AGE chagra_kg): que tanto del cata
 | id | que hace | tipo | infra | ejecutar |
 |---|---|---|---|---|
 | `grafo-cobertura` | READ-ONLY. Mide que fraccion de las relaciones del catalogo canonico (especie->plaga, companeras, antagonistas, especie->biopreparado) estan como arista en Apache AGE (chagra_kg, capa Co). Cuantifica los holes (relacion conocida por el... | bench-grafo | age | `node bench/run.mjs grafo-cobertura` |
+| `prueba-tomate` **[NO ROMPER]** | CANDADO de la auditoria 2026-06-17. READ-ONLY: para cada cultivo con plaga ligada verifica que el grafo conecte la cadena agronomica (cultivo -SUSCEPTIBLE_TO-> plaga <-CONTROLS/TREATS- control/biopreparado), con la semantica CORRECTA (no... | bench-grafo | age | `node bench/run.mjs prueba-tomate` |
 
 ### Cluster: judge
 _Smoke + ranking del LLM-judge._
