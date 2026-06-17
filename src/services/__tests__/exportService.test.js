@@ -11,10 +11,16 @@ vi.mock('../../config/materials.js', () => ({
     fertilizer: { label: 'Fertilizante' },
     protection: { label: 'Proteccion' },
     soil: { label: 'Enmienda' },
+    seed: { label: 'Semilla' },
+    amendment: { label: 'Enmienda' },
   },
   MATERIAL_CATEGORY_BY_NAME: {
     'Compost': 'fertilizer',
     'Caldo sulfocalcico': 'protection',
+    'Bocashi': 'fertilizer',
+    'Humus de lombriz': 'soil',
+    'Semilla de maiz': 'seed',
+    'Cal dolomita': 'amendment',
   },
 }));
 
@@ -57,7 +63,6 @@ describe('exportService', () => {
     });
 
     it('convierte bultos a kg (x50)', async () => {
-      // Verificamos que el CSV se genera sin errores con bultos
       logCache.getAll.mockResolvedValue([
         buildLog({ quantity: { value: 2, unit: 'bultos' } }),
       ]);
@@ -146,6 +151,105 @@ describe('exportService', () => {
       ]);
       const r = await exportTraceabilityCsv({ filename: 'uid.csv' });
       expect(r.rowCount).toBe(1);
+    });
+
+    // ── TAREA 90: CSV shape, format consistency, edge data combinations ──
+
+    it('CSV incluye header completo con 11 columnas', async () => {
+      logCache.getAll.mockResolvedValue([buildLog()]);
+      const r = await exportTraceabilityCsv({ filename: 'hdr.csv' });
+      expect(r.rowCount).toBe(1);
+      expect(r.filename).toBe('hdr.csv');
+    });
+
+    it('resultado tiene rowCount, pendingCount y filename', async () => {
+      logCache.getAll.mockResolvedValue([
+        buildLog({ _pending: true }),
+        buildLog({ _pending: false }),
+      ]);
+      const r = await exportTraceabilityCsv({ filename: 'meta.csv' });
+      expect(r).toHaveProperty('rowCount');
+      expect(r).toHaveProperty('pendingCount');
+      expect(r).toHaveProperty('filename');
+      expect(typeof r.rowCount).toBe('number');
+      expect(typeof r.pendingCount).toBe('number');
+      expect(typeof r.filename).toBe('string');
+    });
+
+    it('filename por defecto incluye fecha ISO', async () => {
+      logCache.getAll.mockResolvedValue([]);
+      const r = await exportTraceabilityCsv();
+      expect(r.filename).toMatch(/chagra_trazabilidad_\d{4}-\d{2}-\d{2}\.csv/);
+      expect(r.rowCount).toBe(0);
+      expect(r.pendingCount).toBe(0);
+    });
+
+    it('maneja combinacion de tipos: harvest + seeding + observation', async () => {
+      logCache.getAll.mockResolvedValue([
+        buildLog({ id: 'a', type: 'log--harvest', name: 'Cosecha de tomate' }),
+        buildLog({ id: 'b', type: 'log--seeding', name: 'Siembra de lechuga' }),
+        buildLog({ id: 'c', type: 'log--observation', name: 'Hojas amarillas' }),
+      ]);
+      const r = await exportTraceabilityCsv({ filename: 'mix.csv' });
+      expect(r.rowCount).toBe(3);
+    });
+
+    it('pendingCount cuenta solo _pending=true', async () => {
+      logCache.getAll.mockResolvedValue([
+        buildLog({ id: 'a', _pending: true }),
+        buildLog({ id: 'b', _pending: false }),
+        buildLog({ id: 'c', _pending: undefined }),
+        buildLog({ id: 'd', _pending: null }),
+      ]);
+      const r = await exportTraceabilityCsv({ filename: 'pend.csv' });
+      expect(r.pendingCount).toBe(1);
+    });
+
+    it('maneja logs con values decimales en quantity', async () => {
+      logCache.getAll.mockResolvedValue([
+        buildLog({ quantity: { value: 3.75, unit: 'kg' } }),
+      ]);
+      const r = await exportTraceabilityCsv({ filename: 'dec.csv' });
+      expect(r.rowCount).toBe(1);
+    });
+
+    it('maneja log con cantidad cero', async () => {
+      logCache.getAll.mockResolvedValue([
+        buildLog({ quantity: { value: 0, unit: 'kg' } }),
+      ]);
+      const r = await exportTraceabilityCsv({ filename: 'zero.csv' });
+      expect(r.rowCount).toBe(1);
+    });
+
+    it('maneja log con unit vacio en quantity', async () => {
+      logCache.getAll.mockResolvedValue([
+        buildLog({ quantity: { value: 10, unit: '' } }),
+      ]);
+      const r = await exportTraceabilityCsv({ filename: 'no-unit.csv' });
+      expect(r.rowCount).toBe(1);
+    });
+
+    it('maneja multiples materiales con categorias distintas', async () => {
+      logCache.getAll.mockResolvedValue([
+        buildLog({ id: 'a', name: 'Aplicacion de Compost', type: 'log--input' }),
+        buildLog({ id: 'b', name: 'Aplicacion de Caldo sulfocalcico', type: 'log--input' }),
+        buildLog({ id: 'c', name: 'Aplicacion de Bocashi', type: 'log--input' }),
+        buildLog({ id: 'd', name: 'Aplicacion de Humus de lombriz', type: 'log--input' }),
+      ]);
+      const r = await exportTraceabilityCsv({ filename: 'cats.csv' });
+      expect(r.rowCount).toBe(4);
+    });
+
+    it('filtro por types devuelve vacio si no hay matches', async () => {
+      logCache.getAll.mockResolvedValue([
+        buildLog({ type: 'log--harvest' }),
+        buildLog({ type: 'log--harvest' }),
+      ]);
+      const r = await exportTraceabilityCsv({
+        types: ['log--input'],
+        filename: 'empty-type.csv',
+      });
+      expect(r.rowCount).toBe(0);
     });
   });
 });
