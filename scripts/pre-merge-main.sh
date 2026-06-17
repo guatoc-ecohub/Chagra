@@ -15,7 +15,7 @@ NODE_OPTIONS=--max-old-space-size=2048 npx vitest run \
   tests/unit/smoke-final-142.test.js \
   --reporter=verbose 2>&1 | tail -3
 
-# Contratos de alias animales (134, 139, 148, 149)  
+# Contratos de alias animales (134, 139, 148, 149)
 echo "[2/3] Contratos alias..."
 NODE_OPTIONS=--max-old-space-size=2048 npx vitest run \
   tests/unit/animalAlias.test.js \
