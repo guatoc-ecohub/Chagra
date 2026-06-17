@@ -435,3 +435,20 @@
   .aforge { stroke-dashoffset: 0; animation: none; }
   .aforge-fill { opacity: 1; animation: none; }
 }
+
+/* ===========================================================================
+ * LOADING SKELETON DARK — fondo oscuro unificado para estados de carga.
+ *
+ * Tarea 81: .loading-skeleton-dark evita flash blanco en dark theme
+ * (bg-slate-950). Respeta prefers-reduced-motion.
+ * =========================================================================== */
+.loading-skeleton-dark {
+  @apply bg-slate-800 animate-pulse rounded-md;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-skeleton-dark {
+    animation: none;
+    opacity: 0.6;
+  }
+}
