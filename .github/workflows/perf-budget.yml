@@ -1,5 +1,11 @@
 name: Performance Budget
 
+# Gate de presupuesto de rendimiento: verifica que el bundle de produccion
+# no exceda los limites de tamanio definidos en scripts/check-perf-budget.mjs.
+# Corre en PR y push a main + ramas feat/fix/chore.
+# No se solapa con visual-regression.yml (screenshots UI) ni con playwright.yml
+# (E2E offline-first): este job solo mide tamanios de chunks JS/CSS.
+
 on:
   pull_request:
     branches: [main]
