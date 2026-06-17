@@ -6,6 +6,7 @@
     "anti-hallucination": "Miden alucinacion real (AH% = FAIL/total) con must_include + red_flags y juez independiente.",
     "vision": "Reconocimiento de especies desde fotos + grounding del sidecar (validate_visual_match).",
     "rag": "Latencia del retrieve BM25 sobre el corpus real.",
+    "grafo": "Cobertura de la capa de conocimiento (Apache AGE chagra_kg): que tanto del catalogo canonico esta como arista en el grafo (capa Co).",
     "judge": "Smoke + ranking del LLM-judge.",
     "nocturno": "Bench largo de FarmProcess con escenarios + eliminacion temprana.",
     "meta": "Herramientas sobre resultados de benches (no corren modelo).",
@@ -303,6 +304,34 @@
       "output": "consola + bench/history (via --history-out)",
       "history": true,
       "runnable": "parcial"
+    },
+    {
+      "id": "grafo-cobertura",
+      "title": "Cobertura del grafo de conocimiento (catalogo -> aristas AGE, capa Co)",
+      "type": "bench-grafo",
+      "cluster": "grafo",
+      "status": "active",
+      "script": "scripts/bench-grafo-cobertura.mjs",
+      "cmd": [
+        "node",
+        "{{script}}"
+      ],
+      "infra": [
+        "age"
+      ],
+      "metrics": [
+        "cobertura_pct",
+        "targets_pest_cov_pct",
+        "compatible_cov_pct",
+        "antagonist_cov_pct",
+        "biop_cov_pct",
+        "holes",
+        "sin_nodo",
+        "relaciones_co"
+      ],
+      "what": "READ-ONLY. Mide que fraccion de las relaciones del catalogo canonico (especie->plaga, companeras, antagonistas, especie->biopreparado) estan como arista en Apache AGE (chagra_kg, capa Co). Cuantifica los holes (relacion conocida por el catalogo pero sin arista en el grafo, que el agente no puede aterrizar) y los vuelve tendencia. Origen: subagente de medicion de holes (2026-06-17). NO escribe en el grafo, NO inventa.",
+      "output": "bench/history/grafo-cobertura__co-chagra_kg__<ts>.json + consola",
+      "history": true
     },
     {
       "id": "llm-judge",
