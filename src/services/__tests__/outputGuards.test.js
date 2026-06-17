@@ -25,6 +25,11 @@ import {
   filterNoiseEntities,
   getOutputGuardTelemetry,
   resetOutputGuardTelemetry,
+  classifyQueryIntent,
+  guardInventedName,
+  guardReforestacionNativasRol,
+  guardParamoNormativa,
+  guardClimaConsejo,
 } from '../outputGuards.js';
 
 beforeEach(() => {
@@ -1505,5 +1510,454 @@ describe('applyOutputGuards (cadena)', () => {
       const hasConcise = out.reasons.some(r => /concise/i.test(r));
       expect(hasConcise).toBe(true);
     });
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────
+// TESTS MERGED from tests/unit/outputGuards.test.js (dedup TAREA 121)
+// Funciones unicas no cubiertas por la version de servicios.
+// ──────────────────────────────────────────────────────────────────────────
+
+describe('classifyQueryIntent — A12: detección de intención del usuario', () => {
+  it('precio: "¿a cómo está la papa?" → precio', () => {
+    expect(classifyQueryIntent('¿a cómo está la papa?')).toBe('precio');
+  });
+  it('precio: "cuánto vale el lulo en el mercado" → precio', () => {
+    expect(classifyQueryIntent('cuánto vale el lulo en el mercado')).toBe('precio');
+  });
+  it('precio: "dónde puedo vender mi cosecha de papa" → precio', () => {
+    expect(classifyQueryIntent('dónde puedo vender mi cosecha de papa')).toBe('precio');
+  });
+  it('siembra: "¿siembro papa a 1923 msnm?" → siembra', () => {
+    expect(classifyQueryIntent('¿siembro papa a 1923 msnm?')).toBe('siembra');
+  });
+  it('siembra: "qué cultivo para mi finca" con verbo de siembra → siembra', () => {
+    expect(classifyQueryIntent('quiero cultivar tomate en mi finca')).toBe('siembra');
+  });
+  it('info general sin verbo de siembra → no es siembra', () => {
+    expect(classifyQueryIntent('qué es la papa criolla')).not.toBe('siembra');
+  });
+  it('vacío/null → unknown (conservador)', () => {
+    expect(classifyQueryIntent('')).toBe('unknown');
+    expect(classifyQueryIntent(null)).toBe('unknown');
+  });
+});
+
+describe('applyOutputGuards — A12: gating por intención (cierra el bug prod 2026-06-02)', () => {
+  const variedadesPapa = [
+    { kind: 'species', nombre_comun: 'Papa criolla', viabilidad: 'inviable', nombre_cientifico: 'Solanum phureja' },
+    { kind: 'species', nombre_comun: 'Papa Sabanera', viabilidad: 'inviable', nombre_cientifico: 'Solanum tuberosum' },
+  ];
+  const respuestaModelo =
+    'La papa criolla es buena para sembrar y la papa sabanera también puedes cultivarla. ' +
+    'Ambas se dan bien en tu zona.';
+
+  it('query de PRECIO → NO dispara viabilidad aunque el modelo mencione variedades', () => {
+    const res = applyOutputGuards(respuestaModelo, {
+      resolvedEntities: variedadesPapa,
+      fincaAltitud: 1923,
+      userMessage: '¿a cómo está la papa?',
+    });
+    expect(res.text).not.toContain('NO es viable');
+    expect(res.reasons.join(' ')).not.toMatch(/viabilidad/);
+  });
+
+  it('query de SIEMBRA → SÍ dispara viabilidad (no-regresión protección)', () => {
+    const res = applyOutputGuards(respuestaModelo, {
+      resolvedEntities: variedadesPapa,
+      fincaAltitud: 1923,
+      userMessage: '¿siembro papa a 1923 msnm?',
+    });
+    expect(res.modified).toBe(true);
+    expect(res.text).toMatch(/NO (es|son) viable/);
+    expect(res.text).toContain('Corrección importante');
+    expect(res.reasons.join(' ')).toMatch(/viabilidad/);
+  });
+
+  it('sin userMessage → corre los guards (conservador, no rompe protección)', () => {
+    const res = applyOutputGuards(respuestaModelo, {
+      resolvedEntities: variedadesPapa,
+      fincaAltitud: 1923,
+    });
+    expect(res.modified).toBe(true);
+    expect(res.text).toMatch(/NO (es|son) viable/);
+    expect(res.text).toContain('Corrección importante');
+  });
+
+  it('query de PRECIO → SÍ deja correr guard de agroquímico (inofensivo/safety)', () => {
+    const respConGlifosato =
+      'Para la papa puedes aplicar glifosato en las malezas antes de la siembra.';
+    const res = applyOutputGuards(respConGlifosato, {
+      resolvedEntities: variedadesPapa,
+      fincaAltitud: 1923,
+      userMessage: '¿a cómo está la papa?',
+    });
+    expect(res.modified).toBe(true);
+    expect(res.reasons.join(' ')).toMatch(/agroqu[ií]mico/);
+  });
+});
+
+describe('guardInvertedViability — A11: de-dup de variedades de la misma base', () => {
+  it('4 variedades de papa inviables → UN solo bloque de corrección', () => {
+    const entities = [
+      { kind: 'species', nombre_comun: 'Papa criolla', viabilidad: 'inviable', nombre_cientifico: 'Solanum phureja', alternativas_viables: ['arveja'] },
+      { kind: 'species', nombre_comun: 'Papa Sabanera', viabilidad: 'inviable', nombre_cientifico: 'Solanum tuberosum' },
+      { kind: 'species', nombre_comun: 'Papa Pastusa', viabilidad: 'inviable', nombre_cientifico: 'Solanum tuberosum' },
+      { kind: 'species', nombre_comun: 'Papa Argentina', viabilidad: 'inviable', nombre_cientifico: 'Solanum tuberosum' },
+    ];
+    const texto =
+      'La papa criolla es buena para sembrar, la papa sabanera también puedes cultivarla, ' +
+      'la papa pastusa se da bien y la papa argentina es recomendable para tu finca.';
+    const res = guardInvertedViability(texto, entities, 1923);
+    expect(res.modified).toBe(true);
+    const ocurrencias = (res.text.match(/Corrección importante/g) || []).length;
+    expect(ocurrencias).toBe(1);
+    expect(res.text.toLowerCase()).toContain('papa');
+    expect(res.text).toContain('NO');
+  });
+
+  it('especies de bases distintas → un bloque por base', () => {
+    const entities = [
+      { kind: 'species', nombre_comun: 'Papa criolla', viabilidad: 'inviable', nombre_cientifico: 'Solanum phureja' },
+      { kind: 'species', nombre_comun: 'cacao', viabilidad: 'inviable', nombre_cientifico: 'Theobroma cacao' },
+    ];
+    const texto =
+      'La papa criolla es buena para sembrar y el cacao es ideal para tu finca, siémbralo ya.';
+    const res = guardInvertedViability(texto, entities, 2580);
+    expect(res.modified).toBe(true);
+    const ocurrencias = (res.text.match(/Corrección importante/g) || []).length;
+    expect(ocurrencias).toBe(2);
+  });
+});
+
+describe('guardReforestacionNativasRol — sugerencia POSITIVA de nativas con rol', () => {
+  it('query genérica de reforestación → anexa nativas con rol', () => {
+    const userMessage = '¿Qué siembro para reforestar mi finca quemada?';
+    const respuesta = 'Buena idea recuperar el bosque. Prepara el terreno y siembra al inicio de lluvias.';
+    const res = guardReforestacionNativasRol(respuesta, { userMessage });
+    expect(res.modified).toBe(true);
+    expect(res.reason).toBe('reforestacion_nativas_rol');
+    const lower = res.text.toLowerCase();
+    expect(lower).toContain('pioner');
+    expect(lower).toContain('fijador');
+    expect(lower).toContain('cortafuego');
+    expect(lower).toContain('rebrote');
+    expect(res.text).toContain('Alnus acuminata');
+    expect(res.text).toContain('Quercus humboldtii');
+    expect(res.text).toContain('Clusia multiflora');
+    expect(res.text).toContain('280');
+    expect(res.text).toContain('recuperar el bosque');
+  });
+
+  it('query genérica con vocablo campesino ("recuperar el monte") → dispara', () => {
+    const userMessage = 'quiero volver a recuperar el monte que se quemó, qué hago';
+    const res = guardReforestacionNativasRol('Vamos a ayudarte con eso.', { userMessage });
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Trichanthera gigantea');
+  });
+
+  it('query AGRÍCOLA normal (no restauración) → NO toca el texto', () => {
+    const userMessage = '¿qué le echo a la papa para el gusano?';
+    const respuesta = 'Para el gusano de la papa usa Bacillus thuringiensis y monitoreo del foco.';
+    const res = guardReforestacionNativasRol(respuesta, { userMessage });
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe(respuesta);
+  });
+
+  it('sin userMessage → no-op (fail-closed)', () => {
+    const res = guardReforestacionNativasRol('Texto cualquiera sobre árboles.', {});
+    expect(res.modified).toBe(false);
+  });
+
+  it('idempotente: no re-dispara si la nota ya está', () => {
+    const userMessage = 'reforestar nacimiento de agua';
+    const res1 = guardReforestacionNativasRol('Recupera el nacimiento.', { userMessage });
+    expect(res1.modified).toBe(true);
+    const res2 = guardReforestacionNativasRol(res1.text, { userMessage });
+    expect(res2.modified).toBe(false);
+    expect(res2.text).toBe(res1.text);
+  });
+
+  it('anti-redundancia: respuesta que YA da nativas con rol → no anexa', () => {
+    const userMessage = '¿cómo restauro el bosque nativo?';
+    const respuesta =
+      'Usa especies pioneras como Alnus acuminata (aliso) que fija nitrógeno, ' +
+      'y de cortafuego Clusia multiflora; el roble (Quercus humboldtii) rebrota tras el fuego.';
+    const res = guardReforestacionNativasRol(respuesta, { userMessage });
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe(respuesta);
+  });
+
+  it('applyOutputGuards: query reforestación genérica → incluye la sugerencia y reason', () => {
+    const userMessage = 'necesito reforestar una ladera erosionada, qué especies nativas uso';
+    const respuesta = 'Empieza por estabilizar el suelo de la ladera.';
+    const out = applyOutputGuards(respuesta, { userMessage });
+    expect(out.modified).toBe(true);
+    expect(out.reasons).toContain('reforestacion_nativas_rol');
+    expect(out.text).toContain('Alnus acuminata');
+  });
+
+  it('applyOutputGuards: query agrícola normal → la sugerencia NO aparece', () => {
+    const userMessage = '¿a cómo está la papa en la plaza?';
+    const respuesta = 'La papa está por el orden de los 80 mil el bulto esta semana.';
+    const out = applyOutputGuards(respuesta, { userMessage });
+    expect(out.reasons).not.toContain('reforestacion_nativas_rol');
+    expect(out.text).not.toContain('🌱 Para restaurar con nativas');
+  });
+});
+
+describe('guardInventedName — (a) especie de nombre común inventada', () => {
+  it('NO dispara si el texto NO menciona nombre de perfil', () => {
+    const texto = 'El café es un cultivo importante para Colombia.';
+    const res = guardInventedName(texto, { profileName: 'Juan Pérez' });
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe(texto);
+  });
+
+  it('NO dispara si el nombre mencionado COINCIDE con el perfil', () => {
+    const texto = 'Juan, tu finca está bien manejada.';
+    const res = guardInventedName(texto, { profileName: 'Juan' });
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe(texto);
+  });
+
+  it.skip('nombre inventado mencionado (hueco conocido)', () => {
+    // TODO-Opus: Implementar detección de nombres comunes inventados que no
+    // están en el catálogo de especies conocidas.
+  });
+});
+
+describe('guardParamoNormativa — Ley 1930 (suppress-and-replace)', () => {
+  it('siembra en páramo → SUPRIME y REEMPLAZA con restricción legal', () => {
+    const texto = 'Puedes sembrar papa en el páramo sin problema. El clima es ideal.';
+    const res = guardParamoNormativa(texto);
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Ley 1930 de 2018');
+    expect(res.text).toContain('prohíbe actividades agropecuarias');
+    expect(res.text).toContain('Páramo');
+    expect(res.text).not.toContain('sembrar papa en el páramo');
+    expect(res.text).not.toContain('clima es ideal');
+    expect(res.reason).toBe('paramo_normativa_suprimido: siembra/fumigación_recomendada_en_paramo');
+  });
+
+  it('fumigación en páramo → SUPRIME y REEMPLAZA con restricción legal', () => {
+    const texto = 'Aplica este fungicida en tu cultivo del páramo para controlar la plaga.';
+    const res = guardParamoNormativa(texto);
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Ley 1930 de 2018');
+    expect(res.text).toContain('prohíbe');
+    expect(res.text).toContain('agroquímicos');
+    expect(res.text).not.toContain('Aplica este fungicida');
+    expect(res.reason).toBe('paramo_normativa_suprimido: siembra/fumigación_recomendada_en_paramo');
+  });
+
+  it('frailejón + sembrar → dispara (frailejón es keyword de páramo)', () => {
+    const texto = 'Planta frailejones para recuperar la zona y siembra papa al lado.';
+    const res = guardParamoNormativa(texto);
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Ley 1930 de 2018');
+    expect(res.text).not.toContain('siembra papa al lado');
+  });
+
+  it('páramo sin verbo de siembra/fumigación → NO dispara', () => {
+    const texto = 'Los páramos son ecosistemas de importancia hídrica para Colombia.';
+    const res = guardParamoNormativa(texto);
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe(texto);
+    expect(res.reason).toBeNull();
+  });
+
+  it('siembra/fumigación sin páramo → NO dispara', () => {
+    const texto = 'Puedes sembrar papa en tu finca. El clima es ideal.';
+    const res = guardParamoNormativa(texto);
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe(texto);
+    expect(res.reason).toBeNull();
+  });
+
+  it('string vacío → NO dispara', () => {
+    const res = guardParamoNormativa('');
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe('');
+    expect(res.reason).toBeNull();
+  });
+
+  it('null → NO dispara (graceful degradation)', () => {
+    const res = guardParamoNormativa(null);
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe('');
+    expect(res.reason).toBeNull();
+  });
+
+  it('subpáramo + rociado → dispara (subpáramo es keyword)', () => {
+    const texto = 'Rocia fungicida en el subpáramo para proteger las plantas.';
+    const res = guardParamoNormativa(texto);
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Ley 1930 de 2018');
+    expect(res.text).not.toContain('Rocia fungicida');
+  });
+
+  it('cultivo en zona de páramo → dispara', () => {
+    const texto = 'Cultiva cebolla en la zona de páramo con riego constante.';
+    const res = guardParamoNormativa(texto);
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Ley 1930 de 2018');
+    expect(res.text).not.toContain('Cultiva cebolla');
+  });
+
+  it('aspersión de pesticida en páramo → dispara', () => {
+    const texto = 'Realiza aspersión de pesticida en el páramo para controlar plagas.';
+    const res = guardParamoNormativa(texto);
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Ley 1930 de 2018');
+    expect(res.text).not.toContain('aspersión de pesticida');
+  });
+});
+
+describe('guardClimaConsejo — consejo general de clima (aditivo)', () => {
+  it('helada mencionada → adiciona consejo climático', () => {
+    const texto = 'Protégete de las heladas nocturnas con cubiertas.';
+    const res = guardClimaConsejo(texto, { forecastTempMin: 2 });
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Consejo climático');
+    expect(res.text).toContain('Monitorear los pronósticos');
+    expect(res.text).toContain('plan de contingencia');
+    expect(res.text).toContain('Protégete de las heladas');
+    expect(res.text).toContain('cubiertas');
+    expect(res.reason).toBe('clima_consejo_aditivo: condiciones_extremas_detectadas');
+  });
+
+  it('sequía mencionada → adiciona consejo climático', () => {
+    const texto = 'La sequía está afectando el cultivo. Riega más frecuente.';
+    const res = guardClimaConsejo(texto, {});
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Consejo climático');
+    expect(res.text).toContain('Monitorear los pronósticos');
+    expect(res.text).toContain('La sequía está afectando');
+    expect(res.text).toContain('Riega más frecuente');
+  });
+
+  it('forecastTempMin < 5°C → adiciona consejo específico', () => {
+    const texto = 'Las heladas pueden dañar las plantas jóvenes.';
+    const res = guardClimaConsejo(texto, { forecastTempMin: 3 });
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Pronóstico: se esperan temperaturas bajas');
+    expect(res.text).toContain('3.0°C');
+    expect(res.text).toContain('proteger cultivos sensibles');
+  });
+
+  it('forecastTempMax > 32°C → adiciona consejo específico', () => {
+    const texto = 'El calor extremo puede estrés hídrico.';
+    const res = guardClimaConsejo(texto, { forecastTempMax: 34 });
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Pronóstico: se esperan temperaturas altas');
+    expect(res.text).toContain('34.0°C');
+    expect(res.text).toContain('Asegura riego suficiente');
+    expect(res.text).toContain('sombreado temporal');
+  });
+
+  it('fenómeno del Niño mencionado → adiciona consejo', () => {
+    const texto = 'El fenómeno del Niño reduce las lluvias en la región.';
+    const res = guardClimaConsejo(texto, {});
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Consejo climático');
+    expect(res.text).toContain('Monitorear los pronósticos');
+    expect(res.text).toContain('El fenómeno del Niño reduce');
+  });
+
+  it('texto sin clima extremo → NO dispara', () => {
+    const texto = 'El cultivo de papa se da bien en clima frío.';
+    const res = guardClimaConsejo(texto, {});
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe(texto);
+    expect(res.reason).toBeNull();
+  });
+
+  it('string vacío → NO dispara', () => {
+    const res = guardClimaConsejo('', {});
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe('');
+    expect(res.reason).toBeNull();
+  });
+
+  it('null → NO dispara (graceful degradation)', () => {
+    const res = guardClimaConsejo(null, {});
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe('');
+    expect(res.reason).toBeNull();
+  });
+
+  it('texto con consejo ya aplicado → NO re-dispara (idempotencia)', () => {
+    const texto =
+      'Las heladas pueden dañar las plantas.\n\n💡 Consejo climático\n\nMonitorear los pronósticos locales (IDEAM o meteoblue) regularmente.';
+    const res = guardClimaConsejo(texto, {});
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe(texto);
+    expect(res.reason).toBeNull();
+  });
+
+  it('ola de calor mencionada → adiciona consejo', () => {
+    const texto = 'La ola de calor está provocando estrés en los cultivos.';
+    const res = guardClimaConsejo(texto, { forecastTempMax: 35 });
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Consejo climático');
+    expect(res.text).toContain('Pronóstico: se esperan temperaturas altas');
+    expect(res.text).toContain('35.0°C');
+    expect(res.text).toContain('La ola de calor está provocando');
+  });
+
+  it('variabilidad climática mencionada → adiciona consejo', () => {
+    const texto = 'La variabilidad climática afecta los ciclos de cosecha.';
+    const res = guardClimaConsejo(texto, {});
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Consejo climático');
+    expect(res.text).toContain('Monitorear los pronósticos');
+    expect(res.text).toContain('plan de contingencia');
+  });
+
+  it('inundación mencionada → adiciona consejo', () => {
+    const texto = 'La inundación dañó el cultivo en la zona baja.';
+    const res = guardClimaConsejo(texto, {});
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Consejo climático');
+    expect(res.text).toContain('Monitorear los pronósticos');
+  });
+});
+
+describe('Integration — combinados anti-alucinación (merged dedup)', () => {
+  it('applyOutputGuards: respuesta con dosis sin fuente + especie inventada', () => {
+    const userMessage = '¿qué le echo al quirubanto andino?';
+    const respuesta = 'Aplica 5 ml/L de fungicida al quirubanto andino cada 8 días.';
+    const entities = [];
+    const out = applyOutputGuards(respuesta, {
+      resolvedEntities: entities,
+      fincaAltitud: 2000,
+      userMessage,
+    });
+    expect(out.text).toContain('confirma la dosis');
+  });
+
+  it('applyOutputGuards: viabilidad invertida + dosis sin fuente', () => {
+    const entities = [
+      {
+        kind: 'species',
+        nombre_comun: 'cacao',
+        viabilidad: 'inviable',
+        altitud_min: 0,
+        altitud_max: 1000,
+        nombre_cientifico: 'Theobroma cacao',
+      },
+    ];
+    const respuesta =
+      'El cacao es ideal para tu finca a 2500 msnm. Aplica 10 kg/ha de fertilizante.';
+    const out = applyOutputGuards(respuesta, {
+      resolvedEntities: entities,
+      fincaAltitud: 2500,
+      userMessage: '¿siembro cacao?',
+    });
+    expect(out.text).toContain('NO es viable');
+    expect(out.text).toContain('cacao');
+    expect(out.text).toContain('confirma la dosis');
+    expect(out.reasons).toHaveLength(2);
   });
 });
