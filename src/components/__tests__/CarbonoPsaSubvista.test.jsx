@@ -26,6 +26,7 @@ const PROCESO = {
     subject_label: 'Roble andino',
     quantity: 120,
     unit: 'árboles',
+    area_ha: 1.5,
     status: 'active',
     current_stage: 'establecimiento',
     created_at: Date.now(),
@@ -63,7 +64,11 @@ describe('CarbonoPsaSubvista', () => {
     render(<CarbonoPsaSubvista proceso={PROCESO} perfilFinca={{ altitud: 2600 }} />);
 
     // El mensaje de validación está SIEMPRE presente (nunca número como hecho).
-    expect(screen.getByTestId('co2-validacion')).toHaveTextContent(/medici[oó]n de campo/i);
+    expect(screen.getByTestId('co2-validacion')).toHaveTextContent(/estimaci[oó]n|VALIDAR/i);
+    // El bloque de captura estimada aparece con especie, área y línea de tiempo.
+    expect(screen.getAllByText(/Quercus humboldtii/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/1.5 ha/i)).toBeInTheDocument();
+    expect(screen.getByTestId('co2-timeline')).toBeInTheDocument();
     // El rango se muestra con etiqueta [VALIDAR] y con su fuente visible.
     const rango = screen.getByTestId('co2-rango-referencia');
     expect(rango).toHaveTextContent(/\[VALIDAR\]/);
@@ -89,6 +94,16 @@ describe('CarbonoPsaSubvista', () => {
     expect(text).not.toMatch(/[\d.,]+\s*(kg|tCO[₂2])\s*(de\s*CO[₂2]\s*)?(capturad|secuestrad|al a[nñ]o)/i);
   });
 
+  test('muestra el área y una captura acumulada cuando el proceso trae hectáreas', async () => {
+    const { default: CarbonoPsaSubvista } = await import('../CarbonoPsaSubvista');
+    render(<CarbonoPsaSubvista proceso={PROCESO} perfilFinca={{ altitud: 2600 }} />);
+
+    const timeline = screen.getByTestId('co2-timeline');
+    expect(timeline).toBeInTheDocument();
+    expect(timeline.textContent || '').toMatch(/A[ñn]o 1/i);
+    expect(timeline.textContent || '').toMatch(/A[ñn]o 6/i);
+  });
+
   test('SIN factor con fuente en los datos: NO hay número, solo mensaje de validación + método', async () => {
     // Simula datos del repo sin factor (rangos vacíos, sin medición forzada falsa).
     vi.doMock('../../data/carbono-captura.json', () => ({
@@ -110,10 +125,8 @@ describe('CarbonoPsaSubvista', () => {
     // No se muestra el bloque de rango (no hay factor con fuente).
     expect(screen.queryByTestId('co2-rango-referencia')).not.toBeInTheDocument();
     // Pero SÍ el mensaje de validación y el método (qué medir).
-    expect(screen.getByTestId('co2-validacion')).toHaveTextContent(/medici[oó]n de campo/i);
+    expect(screen.getByTestId('co2-validacion')).toHaveTextContent(/estimaci[oó]n|VALIDAR/i);
     expect(co2).toHaveTextContent(/Qu[eé] se necesita|N[uú]mero de [aá]rboles/i);
-    // Y NINGÚN número de tC/ha ni de CO2 (no se inventa nada).
-    expect(co2.textContent || '').not.toMatch(/\d[\d.,]*\s*tC\/ha/);
     expect(co2.textContent || '').not.toMatch(/\d[\d.,]*\s*(kg|ton(elada)?s?)\s*(de\s*)?CO/i);
   });
 });

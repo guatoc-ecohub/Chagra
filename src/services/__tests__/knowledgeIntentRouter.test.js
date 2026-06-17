@@ -49,6 +49,14 @@ describe('planKnowledgeIntent — guardas', () => {
   });
 });
 
+describe('hasAnimalDiagnosticIntent — porcinos', () => {
+  it('detecta cerdo y cerdos', async () => {
+    const { hasAnimalDiagnosticIntent } = await import('../knowledgeIntentRouter.js');
+    expect(hasAnimalDiagnosticIntent('tengo cerdos en la finca')).toBe(true);
+    expect(hasAnimalDiagnosticIntent('quiero manejar el cerdo de engorde')).toBe(true);
+  });
+});
+
 describe('planKnowledgeIntent — las 4 intenciones', () => {
   it('toxicidad: "¿la yuca brava es tóxica?" → get_toxicidad con la entidad', () => {
     const plan = planKnowledgeIntent('¿la yuca brava es tóxica?', [sp('manihot_esculenta', 'yuca brava')]);

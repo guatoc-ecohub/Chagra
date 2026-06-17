@@ -302,3 +302,102 @@ describe('profileChipSelector — opts.esOperador (catálogo completo de chips)'
     expect(intents).toContain(CHIP_INTENTS.clima);
   });
 });
+
+describe('profileChipSelector — chips POR TIPO DE USUARIO', () => {
+  it('urbano: chips de cultivo basico (siembro, plaga, clima) sin silvopastoreo ni paramo', () => {
+    // El urbano deriva a campesino (porque vocacion=urbano → campesino en deriveRole).
+    // Los chips son los de CULTIVO base. SIN silvopastoreo (no tiene animales).
+    const intents = selectChipIntents({ vocacion: 'urbano' });
+    expect(intents).toContain(CHIP_INTENTS.siembro);
+    expect(intents).toContain(CHIP_INTENTS.clima);
+    expect(intents).not.toContain(CHIP_INTENTS.silvopastoreo);
+    expect(intents).not.toContain(CHIP_INTENTS.paramo);
+    expect(intents).not.toContain(CHIP_INTENTS.restauracion);
+  });
+
+  it('campesino (full agro): cultivo completo, sin restauracion ni silvopastoreo', () => {
+    const intents = selectChipIntents({ rol: 'campesino' });
+    expect(intents).toContain(CHIP_INTENTS.siembro);
+    expect(intents).toContain(CHIP_INTENTS.calendario);
+    expect(intents).toContain(CHIP_INTENTS.plaga);
+    expect(intents).toContain(CHIP_INTENTS.biopreparado);
+    expect(intents).toContain(CHIP_INTENTS.clima);
+    expect(intents).not.toContain(CHIP_INTENTS.silvopastoreo);
+    expect(intents).not.toContain(CHIP_INTENTS.paramo);
+  });
+
+  it('guia_glaciar: solo clima/paramo/restauracion, sin cultivo', () => {
+    const intents = selectChipIntents({}, { esGuiaGlaciar: true });
+    expect(intents).toContain(CHIP_INTENTS.clima);
+    expect(intents).toContain(CHIP_INTENTS.paramo);
+    expect(intents).toContain(CHIP_INTENTS.restauracion);
+    expect(intents).not.toContain(CHIP_INTENTS.siembro);
+    expect(intents).not.toContain(CHIP_INTENTS.biopreparado);
+    expect(intents).not.toContain(CHIP_INTENTS.calendario);
+  });
+
+  it('operador: catalogo COMPLETO de chips vivos (incluye biopreparado, siembro, todo)', () => {
+    const intents = selectChipIntents({}, { esOperador: true });
+    expect(intents).toContain(CHIP_INTENTS.biopreparado);
+    expect(intents).toContain(CHIP_INTENTS.siembro);
+    expect(intents).toContain(CHIP_INTENTS.clima);
+    expect(intents).toContain(CHIP_INTENTS.paramo);
+    expect(intents).toContain(CHIP_INTENTS.silvopastoreo);
+    expect(intents).toContain(CHIP_INTENTS.restauracion);
+    // Los stubs NO aparecen
+    expect(intents).not.toContain(CHIP_INTENTS.precio);
+  });
+
+  it('porcicultor (campesino con cerdos): ve cultivo + silvopastoreo', () => {
+    const intents = selectChipIntents({ rol: 'campesino', animales: ['cerdos'] });
+    expect(intents).toContain(CHIP_INTENTS.siembro);
+    expect(intents).toContain(CHIP_INTENTS.silvopastoreo);
+    // SIN paramo (no es restaurador)
+    expect(intents).not.toContain(CHIP_INTENTS.paramo);
+    expect(intents).not.toContain(CHIP_INTENTS.restauracion);
+  });
+
+  it('restaurador + silvopastoreo (con animales): restauracion primero, silvopastoreo incluido', () => {
+    const intents = selectChipIntents({
+      rol: 'restaurador',
+      animales: ['ganado'],
+      objetivo: ['biodiversidad'],
+    });
+    expect(intents[0]).toBe(CHIP_INTENTS.restauracion);
+    expect(intents).toContain(CHIP_INTENTS.paramo);
+    expect(intents).toContain(CHIP_INTENTS.silvopastoreo);
+    expect(intents).toContain(CHIP_INTENTS.clima);
+  });
+
+  it('ganadero puro (solo vacas): silvopastoreo + clima + plaga + siembro', () => {
+    const intents = selectChipIntents({ rol: 'ganadero', animales: ['vacas'] });
+    expect(intents[0]).toBe(CHIP_INTENTS.silvopastoreo);
+    expect(intents).toContain(CHIP_INTENTS.clima);
+    expect(intents).toContain(CHIP_INTENTS.plaga);
+    expect(intents).toContain(CHIP_INTENTS.siembro);
+  });
+});
+
+describe('profileChipSelector — invariantes', () => {
+  it('NUNCA devuelve chips stubs (precio/deep) para ningun perfil no-operador', () => {
+    const perfiles = [
+      { rol: 'campesino' },
+      { rol: 'restaurador' },
+      { vocacion: 'urbano' },
+      { rol: 'tecnico' },
+      { rol: 'socio' },
+    ];
+    for (const p of perfiles) {
+      const intents = selectChipIntents(p);
+      expect(intents).not.toContain(CHIP_INTENTS.precio);
+      expect(intents).not.toContain(CHIP_INTENTS.deep);
+    }
+  });
+
+  it('SIEMPRE respeta el orden de prioridad del rol (no aleatorio)', () => {
+    // Dos llamadas identicas deben dar el mismo orden.
+    const a = selectChipIntents({ rol: 'campesino', animales: ['gallinas'] });
+    const b = selectChipIntents({ rol: 'campesino', animales: ['gallinas'] });
+    expect(a).toEqual(b);
+  });
+});

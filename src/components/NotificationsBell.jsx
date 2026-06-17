@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Bell, X, AlertTriangle, Info, AlertCircle, Sprout, Cloud, CloudFog, Wifi, Droplets, ListChecks, Sparkles, Snowflake, CloudRain, Sun, CloudSun, Thermometer, Wind, Activity, RefreshCw } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import useAlertStore from '../store/useAlertStore';
@@ -95,7 +95,7 @@ function mapSensorAlertsToIot(alerts) {
   });
 }
 
-export default function NotificationsBell({ onNavigate }) {
+const NotificationsBell = React.memo(function NotificationsBell({ onNavigate }) {
     const [open, setOpen] = useState(false);
     const [tick, setTick] = useState(0);
     // PoC #316 — tabs Notificaciones / Clima. Default "notif" para no romper
@@ -464,7 +464,9 @@ export default function NotificationsBell({ onNavigate }) {
             )}
         </>
     );
-}
+});
+
+export default NotificationsBell;
 
 /**
  * Tab button — controla activeTab. Muestra un dot pequeño si hay items en
