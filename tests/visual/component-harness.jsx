@@ -1,3 +1,5 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish --
+ * Harness visual de test: strings fijas intencionales para baselines. */
 /* eslint-disable react-refresh/only-export-components --
  * Este archivo es el entry point del harness visual. No exporta componentes
  * porque createRoot monta directamente en el DOM. Fast-refresh es irrelevante
