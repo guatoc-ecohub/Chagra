@@ -59,7 +59,7 @@ import { join } from 'node:path';
 
 const HYTA_DIR =
   process.env.HYTA_TIMELINE_DIR ||
-  '/home/kortux/Workspace/Chagra-strategy/ops/hyta-timeline';
+  join(process.cwd(), '..', 'Chagra-strategy', 'ops', 'hyta-timeline');
 const JSON_PATH = join(HYTA_DIR, 'data-crecimiento.json');
 const HTML_PUBLICO = join(HYTA_DIR, 'hyta-publico-pisos.html');
 const HTML_SOCIOS = join(HYTA_DIR, 'hyta-socios-explainer.html');

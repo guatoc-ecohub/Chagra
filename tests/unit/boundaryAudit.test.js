@@ -55,6 +55,7 @@ const ALLOWED_FILES = new Set([
   'docs/bench-candidates-gemma4-granite-2026-06-08.md',  // benchmark doc with absolute paths
   'skills-lock.json',
   'AGENTS.md',
+  'scripts/audit-bundle.mjs', // auditor intentionally references the internal prohibited-list env/path
   'src/services/__tests__/outputGuards.fermento.test.js',  // tests that names DON'T leak
 ]);
 

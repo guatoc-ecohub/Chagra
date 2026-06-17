@@ -22,14 +22,17 @@
 import fs from "node:fs";
 import path from "node:path";
 
+const ROOT_DIR = process.cwd();
+const STRATEGY_DIR = process.env.CHAGRA_STRATEGY_DIR || path.join(ROOT_DIR, "..", "Chagra-strategy");
+
 const CATALOG = JSON.parse(
-  fs.readFileSync("/home/kortux/Workspace/Chagra-strategy/catalog/chagra-catalog-seed-v3.2.json", "utf-8"),
+  fs.readFileSync(path.join(STRATEGY_DIR, "catalog", "chagra-catalog-seed-v3.2.json"), "utf-8"),
 );
 const GT_FIXTURES = JSON.parse(
-  fs.readFileSync("/home/kortux/Workspace/chagra/data/bench-vision-fixtures-ground-truth.json", "utf-8"),
+  fs.readFileSync(path.join(ROOT_DIR, "data", "bench-vision-fixtures-ground-truth.json"), "utf-8"),
 );
 
-const OUT_DIR = "/home/kortux/Workspace/chagra/data/bench-vision-fixtures-extended";
+const OUT_DIR = process.env.VISION_EXTENDED_DIR || path.join(ROOT_DIR, "data", "bench-vision-fixtures-extended");
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
 const UA = "ChagraAgroecologyBench/1.0 (https://chagra.bio; bench@chagra.bio)";

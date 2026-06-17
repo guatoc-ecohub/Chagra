@@ -100,7 +100,7 @@ const GEN_TIMEOUT_MS = 180_000;
 
 const PROMPTS_FILE =
   process.env.PROMPTS_FILE ||
-  '/home/kortux/Workspace/Chagra-strategy/deepresearch/TEST_PROMPTS_COMPLEJOS_ROTATIVOS_2026-05-30.json';
+  join(process.cwd(), '..', 'Chagra-strategy', 'deepresearch', 'TEST_PROMPTS_COMPLEJOS_ROTATIVOS_2026-05-30.json');
 
 // Umbral térmico: si la GPU supera esto, pausa hasta enfriar.
 const GPU_TEMP_LIMIT = 88;

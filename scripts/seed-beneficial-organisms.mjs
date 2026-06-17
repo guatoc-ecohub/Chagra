@@ -28,8 +28,7 @@
  *   La lista curada de organismos (fuente institucional ICA / AGROSAVIA /
  *   CENICAFÉ) es DATA y vive en el repo privado `chagra-pro`:
  *     data/age/seed-beneficial-organisms-2026-06-03.sql
- *   Este runner público NO embebe esa data (repo público — ver
- *   PROHIBITED_INTERNAL.md / AI_PIPELINE_SOP §2). Se le pasa la ruta al .sql.
+ *   Este runner público NO embebe esa data; se le pasa la ruta al .sql.
  *
  * SEGURIDAD (repo público):
  *   - Cero hosts/credenciales internos hardcodeados. Todo por env, con defaults

@@ -80,7 +80,7 @@ const ROOT_DIR = join(__dirname, '..');
 // bench en su worktree efímero NO pierde el artefacto al borrarse el worktree, y no
 // ensucia el árbol git. Override con BENCH_OUTPUT_DIR. Fallback a data/bench-runs
 // (gitignored) solo si el dir externo no es escribible. (retro worktrees 2026-06-04)
-const BENCH_EXTERNAL_DIR = '/home/kortux/Workspace/_bench-results';
+const BENCH_EXTERNAL_DIR = join(ROOT_DIR, '..', '_bench-results');
 const BENCH_RUNS_DIR =
   process.env.BENCH_OUTPUT_DIR ||
   (existsSync(dirname(BENCH_EXTERNAL_DIR)) ? BENCH_EXTERNAL_DIR : join(ROOT_DIR, 'data', 'bench-runs'));
@@ -110,7 +110,7 @@ const GEN_TIMEOUT_MS = 180_000;
 
 const PROMPTS_FILE =
   process.env.PROMPTS_FILE ||
-  '/home/kortux/Workspace/Chagra-strategy/deepresearch/TEST_PROMPTS_BORDE_ALUCINACION_2026-06-03.json';
+  join(ROOT_DIR, '..', 'Chagra-strategy', 'deepresearch', 'TEST_PROMPTS_BORDE_ALUCINACION_2026-06-03.json');
 
 // PROMPTS_FILES (coma-separado) concatena varias fixtures (V1 12 + V2 15 = 27),
 // deduplicando por id. Si no se da, usa PROMPTS_FILE (retrocompatible).
