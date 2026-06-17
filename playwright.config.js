@@ -71,6 +71,12 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.01,
+      animations: 'disabled',
+    },
+  },
   use: {
     baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173',
     trace: 'on-first-retry',
@@ -127,6 +133,23 @@ export default defineConfig({
       },
       grep: /@cross-platform/,
     },
+    {
+      name: 'visual',
+      testDir: './tests/visual',
+      testMatch: ['*.spec.js'],
+      retries: process.env.CI ? 1 : 0,
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 800 },
+        deviceScaleFactor: 1,
+        locale: 'es-CO',
+        timezoneId: 'America/Bogota',
+        launchOptions: CHROMIUM_LAUNCH,
+        reducedMotion: 'reduce',
+        screenshot: 'off',
+        trace: 'retain-on-failure',
+      },
+    },
   ],
   // webServer: solo cuando NO se provee un servidor externo. Si
   // PLAYWRIGHT_BASE_URL está seteado (ej. el gate offline-corpus-dist arranca su
@@ -141,6 +164,11 @@ export default defineConfig({
           url: 'http://localhost:5173',
           reuseExistingServer: !process.env.CI,
           timeout: 120_000,
+          env: {
+            VITE_FARMOS_URL: process.env.VITE_FARMOS_URL || '',
+            VITE_FARMOS_CLIENT_ID: process.env.VITE_FARMOS_CLIENT_ID || 'farm',
+            VITE_OPERATOR_USERNAME: process.env.VITE_OPERATOR_USERNAME || 'op-test',
+          },
         },
       }),
 });
