@@ -2037,9 +2037,9 @@ export default function AgentHero({ onNavigate }) {
                     type="button"
                     onClick={() => {
                         const target = document.querySelector('[data-testid="seguimiento-cards"]');
-                        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }}
-                    className="w-full text-center py-3 text-[rgb(var(--c-slate-400))] text-xs font-medium hover:text-[rgb(var(--c-slate-200))] transition-colors"
+                    className="relative z-40 scroll-mt-28 w-full text-center py-3 text-[rgb(var(--c-slate-400))] text-xs font-medium hover:text-[rgb(var(--c-slate-200))] transition-colors"
                     aria-label="Ver modulos del home"
                 >
                     <div className="flex flex-col items-center gap-1">

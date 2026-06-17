@@ -18,11 +18,12 @@ import { test, expect } from '@playwright/test';
  */
 
 const ORIGIN = 'http://localhost:5173';
+const OPERADOR_USERNAME = 'op-test';
 
 async function seedOperador(page) {
-  await page.addInitScript(() => {
+  await page.addInitScript((username) => {
     try {
-      window.localStorage.setItem('chagra:active_tenant_id', 'op-test');
+      window.localStorage.setItem('chagra:active_tenant_id', username);
       window.localStorage.setItem(
         'chagra:profile:v1',
         JSON.stringify({
@@ -37,21 +38,61 @@ async function seedOperador(page) {
         })
       );
     } catch (_) { /* noop */ }
-  });
+  }, OPERADOR_USERNAME);
+}
+
+async function mockBackend(page) {
+  await page.context().route('**/oauth/token', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        access_token: 'e2e-operador-token',
+        refresh_token: 'e2e-operador-refresh',
+        token_type: 'Bearer',
+        expires_in: 3600,
+      }),
+    }));
+
+  for (const pattern of ['**/api/asset/**', '**/api/log/**', '**/api/taxonomy_term/**', '**/api/user/**']) {
+    await page.context().route(pattern, (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/vnd.api+json',
+        body: JSON.stringify({ data: [], jsonapi: { version: '1.0' } }),
+      }));
+  }
+
+  for (const pattern of ['**/nlu', '**/resolve-entities', '**/post-validate']) {
+    await page.context().route(pattern, (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) }));
+  }
+}
+
+async function loginComoOperador(page) {
+  await page.evaluate(async (username) => {
+    const authMod = await import('/src/services/authService.js');
+    const result = await authMod.authenticateUser(username, 'e2e-operador-pwd');
+    if (!result.success) {
+      throw new Error('OAuth mock no respondio OK: ' + (result.error || 'desconocido'));
+    }
+    const tenantMod = await import('/src/services/tenantContext.js');
+    tenantMod.setActiveTenantId(username);
+  }, OPERADOR_USERNAME);
+}
+
+async function openHomeComoOperador(page) {
+  await seedOperador(page);
+  await mockBackend(page);
+  await page.goto(ORIGIN);
+  await loginComoOperador(page);
+  await page.goto(ORIGIN);
+  await page.waitForLoadState('networkidle').catch(() => {});
 }
 
 test.describe('Operador — modulos del home visibles (REGRESION)', () => {
   test('el home muestra el indicador "Mis modulos" (fix idle)', async ({ page }) => {
-    await seedOperador(page);
-
-    // Mock OAuth + API farmOS
-    await page.context().route('**/oauth/**', (route) =>
-      route.fulfill({ status: 200, body: JSON.stringify({ access_token: 'fake' }) }));
-    await page.context().route('**/api/**', (route) =>
-      route.fulfill({ status: 200, body: JSON.stringify({ data: [], jsonapi: { version: '1.0' } }) }));
-
-    await page.goto(ORIGIN);
-    await page.waitForLoadState('networkidle');
+    await openHomeComoOperador(page);
     await page.waitForTimeout(2000); // tiempo para que el agente pinte
 
     // El indicador "Mis modulos" debe ser visible (fase idle)
@@ -71,15 +112,7 @@ test.describe('Operador — modulos del home visibles (REGRESION)', () => {
   });
 
   test('AgentHero NO ocupa 100dvh cuando esta idle', async ({ page }) => {
-    await seedOperador(page);
-
-    await page.context().route('**/oauth/**', (route) =>
-      route.fulfill({ status: 200, body: JSON.stringify({ access_token: 'fake' }) }));
-    await page.context().route('**/api/**', (route) =>
-      route.fulfill({ status: 200, body: JSON.stringify({ data: [], jsonapi: { version: '1.0' } }) }));
-
-    await page.goto(ORIGIN);
-    await page.waitForLoadState('networkidle');
+    await openHomeComoOperador(page);
     await page.waitForTimeout(2000);
 
     // El agente debe tener la clase agentport-idle (min-height: auto)
@@ -101,15 +134,7 @@ test.describe('Operador — modulos del home visibles (REGRESION)', () => {
   });
 
   test('las tarjetas de seguimiento son alcanzables tras hacer scroll', async ({ page }) => {
-    await seedOperador(page);
-
-    await page.context().route('**/oauth/**', (route) =>
-      route.fulfill({ status: 200, body: JSON.stringify({ access_token: 'fake' }) }));
-    await page.context().route('**/api/**', (route) =>
-      route.fulfill({ status: 200, body: JSON.stringify({ data: [], jsonapi: { version: '1.0' } }) }));
-
-    await page.goto(ORIGIN);
-    await page.waitForLoadState('networkidle');
+    await openHomeComoOperador(page);
     await page.waitForTimeout(2000);
 
     // Scroll down via el indicador
@@ -132,15 +157,7 @@ test.describe('Operador — modulos del home visibles (REGRESION)', () => {
     const errors = [];
     page.on('pageerror', (err) => errors.push(err.message));
 
-    await seedOperador(page);
-
-    await page.context().route('**/oauth/**', (route) =>
-      route.fulfill({ status: 200, body: JSON.stringify({ access_token: 'fake' }) }));
-    await page.context().route('**/api/**', (route) =>
-      route.fulfill({ status: 200, body: JSON.stringify({ data: [], jsonapi: { version: '1.0' } }) }));
-
-    await page.goto(ORIGIN);
-    await page.waitForLoadState('networkidle');
+    await openHomeComoOperador(page);
     await page.waitForTimeout(3000);
 
     // Scroll down
