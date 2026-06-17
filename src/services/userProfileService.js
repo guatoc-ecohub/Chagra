@@ -512,6 +512,20 @@ export function markProfileDone() {
   } catch (e) {
     console.warn('[userProfile] markProfileDone:', e);
   }
+  try {
+    const p = getProfile();
+    import('./pilotTelemetryService.js').then(({ recordPilotEvent }) => {
+      recordPilotEvent({
+        event_type: 'onboarding_completado',
+        metadata: {
+          vocacion: p.vocacion,
+          finca_tipo: p.finca_tipo,
+          tiene_animales: Array.isArray(p.animales) && p.animales.length > 0 && !p.animales.includes('ninguno'),
+          tiempo_segundos: p.onboarding_tiempo_segundos,
+        },
+      }).catch(() => {});
+    }).catch(() => {});
+  } catch (_) { /* telemetría nunca rompe el flujo */ }
 }
 
 /** Marca que el usuario saltó el onboarding (respeta #283). */

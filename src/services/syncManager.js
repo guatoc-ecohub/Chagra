@@ -6,6 +6,7 @@ import { logCache } from '../db/logCache';
 import { newId } from '../utils/id';
 import { getCompletedTaskIds } from '../utils/taskCompletionParser';
 import { recordEvent } from './voiceTelemetryService';
+import { recordPilotEvent } from './pilotTelemetryService';
 import { tryGeneratePlanFromSeeding } from './planGeneratorService';
 import { friendlyMessage } from '../utils/friendlyErrors';
 import { flushVisionQueue } from './visionQueueService';
@@ -263,6 +264,7 @@ export class SyncManager {
     this.isSyncing = true;
     let synced = 0;
     let failed = 0;
+    const t0 = performance.now();
 
     try {
       const pendingTransactions = await this.getPendingTransactions();
@@ -397,6 +399,19 @@ export class SyncManager {
           console.warn('[SyncManager] No se pudo cargar useLogStore:', e);
         }
       }
+
+      try {
+        const duracionMs = Math.round(performance.now() - t0);
+        recordPilotEvent({
+          event_type: 'sync_resultado',
+          metadata: {
+            exitoso: failed === 0,
+            pendientes: pendingTransactions.length,
+            total: synced + failed,
+            duracion_ms: duracionMs,
+          },
+        }).catch(() => {});
+      } catch (_) { /* telemetría nunca rompe el flujo */ }
     } catch (error) {
       console.error('Error en proceso de sincronización:', error);
     } finally {

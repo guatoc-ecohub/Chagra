@@ -38,7 +38,7 @@
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 24;
+export const DB_VERSION = 25;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -97,6 +97,10 @@ export const STORES = {
   // No es el reporte final (eso vive en glaciar_reportes): es el work-in-progress
   // que se restaura al volver y se borra al guardar el reporte con éxito.
   GLACIAR_DRAFT: 'glaciar_draft',
+  // v25: pilot_telemetry — telemetría anónima de pilotos. Registra eventos de
+  // uso (onboarding, módulos, preguntas al agente, feedback, sync) sin PII.
+  // keyPath: id; indexes: event_type, created_at, synced.
+  PILOT_TELEMETRY: 'pilot_telemetry',
 };
 
 let dbInstance = null;
@@ -413,6 +417,18 @@ export const openDB = async () => {
       if (event.oldVersion < 24) {
         if (!db.objectStoreNames.contains(STORES.GLACIAR_DRAFT)) {
           db.createObjectStore(STORES.GLACIAR_DRAFT, { keyPath: 'key' });
+        }
+      }
+
+      // v25: pilot_telemetry — eventos anónimos de uso piloto. Schema:
+      // { id, event_type, metadata, created_at, synced }. Sin PII: NO
+      // user_id, NO nombres, NO coords GPS, NO texto de conversación.
+      if (event.oldVersion < 25) {
+        if (!db.objectStoreNames.contains(STORES.PILOT_TELEMETRY)) {
+          const store = db.createObjectStore(STORES.PILOT_TELEMETRY, { keyPath: 'id' });
+          store.createIndex('event_type', 'event_type', { unique: false });
+          store.createIndex('created_at', 'created_at', { unique: false });
+          store.createIndex('synced', 'synced', { unique: false });
         }
       }
     };

@@ -16,7 +16,9 @@ export default function FeedbackButtons({
   response,
   edges = [],
   onConsentNeeded,
-  onFeedbackSent
+  onFeedbackSent,
+  modulo = null,
+  enAsistente = false,
 }) {
   const [selectedThumb, setSelectedThumb] = useState(null);
   const [isSending, setIsSending] = useState(false);
@@ -61,6 +63,18 @@ export default function FeedbackButtons({
         if (onFeedbackSent) {
           onFeedbackSent(thumb);
         }
+        try {
+          import('../services/pilotTelemetryService.js').then(({ recordPilotEvent }) => {
+            recordPilotEvent({
+              event_type: 'feedback_dado',
+              metadata: {
+                tipo: thumb === 'down' ? 'thumb_down' : 'thumb_up',
+                modulo: modulo || undefined,
+                en_asistente: !!enAsistente,
+              },
+            }).catch(() => {});
+          }).catch(() => {});
+        } catch (_) { /* telemetría nunca rompe el flujo */ }
       }
     } finally {
       setIsSending(false);
