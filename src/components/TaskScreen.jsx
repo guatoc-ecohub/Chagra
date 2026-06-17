@@ -4,6 +4,7 @@ import useAssetStore from '../store/useAssetStore';
 import DateField from './DateField';
 import StatusBadge from './StatusBadge';
 import { TASK_STATUSES } from '../constants/assetStatuses';
+import { useAutosave } from '../hooks/useAutosave';
 
 // Autopilot A (2026-05-03): pre-fill priority + location desde último uso.
 // Reduce friction al crear tareas repetitivas (riego matinal, monitoreo,
@@ -51,11 +52,8 @@ function TaskScreen({ onBack, onSave, initialData }) {
     // existente. Si no, crear nueva. Feedback piloto #106.
     const isEdit = !!initialData?.id;
 
-    const [formData, setFormData] = useState(() => {
-        // En edit mode no aplicamos last-used (ya hay datos canónicos del log).
+    const buildInitial = () => {
         const lastUsed = isEdit ? null : readLastUsed();
-        // Solo aplicamos last-used location si la zona aún existe (evita
-        // referencias zombi a lands borradas).
         const lastLocationStillExists = lastUsed?.locationId
             && lands.some((l) => l.id === lastUsed.locationId);
         return {
@@ -69,16 +67,20 @@ function TaskScreen({ onBack, onSave, initialData }) {
             severity: initialData?.severity || lastUsed?.severity || 'medium',
             status: initialData?.attributes?.status || initialData?.status || 'pending'
         };
-    });
+    };
+    const [formData, setFormData] = useState(buildInitial);
+    const autosaveKey = isEdit ? `taskscreen-edit-${initialData.id}` : 'taskscreen-create';
+    const { savedState: autoForm, save: autoSave, markSubmitted } = useAutosave(autosaveKey, buildInitial());
+    const formValues = autoForm || formData;
 
     const [isSaving, setIsSaving] = useState(false);
 
     const handleInput = (e) => {
-        setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+        autoSave({ [e.target.name]: e.target.value });
     };
 
     const handleSave = async () => {
-        if (!formData.name) {
+        if (!formValues.name) {
             onSave('El nombre de la tarea es obligatorio', true);
             return;
         }
@@ -86,17 +88,18 @@ function TaskScreen({ onBack, onSave, initialData }) {
         setIsSaving(true);
         try {
             const taskData = {
-                name: formData.name,
-                notes: formData.notes,
-                assetIds: formData.assetId ? [formData.assetId] : [],
-                locationId: formData.locationId || null,
-                due: new Date(formData.due).toISOString().split('.')[0] + '+00:00',
-                severity: formData.severity,
-                status: formData.status
+                name: formValues.name,
+                notes: formValues.notes,
+                assetIds: formValues.assetId ? [formData.assetId] : [],
+                locationId: formValues.locationId || null,
+                due: new Date(formValues.due).toISOString().split('.')[0] + '+00:00',
+                severity: formValues.severity,
+                status: formValues.status
             };
 
             if (isEdit) {
                 await updateTaskLog(initialData.id, taskData);
+                markSubmitted();
                 onSave('Tarea actualizada (Offline-First)', false);
             } else {
                 await addTaskLog(taskData);
@@ -104,11 +107,12 @@ function TaskScreen({ onBack, onSave, initialData }) {
                 // la próxima tarea nueva pre-fillee con prioridad + zona usadas.
                 try {
                     localStorage.setItem(LAST_USED_KEY, JSON.stringify({
-                        severity: formData.severity,
-                        locationId: formData.locationId || null,
+                        severity: formValues.severity,
+                        locationId: formValues.locationId || null,
                         ts: Date.now(),
                     }));
                 } catch { /* localStorage no disponible / quota, silent */ }
+                markSubmitted();
                 onSave('Tarea agendada exitosamente (Offline-First)', false);
             }
             setTimeout(() => onBack(), 500);
@@ -142,7 +146,7 @@ function TaskScreen({ onBack, onSave, initialData }) {
                         <input
                             type="text"
                             name="name"
-                            value={formData.name}
+                            value={formValues.name}
                             onChange={handleInput}
                             placeholder="Ej: Riego fertiorgánico"
                             className="p-4 rounded-xl bg-slate-900 border-2 border-slate-800 focus:border-muzo outline-none text-2xl text-white transition-all shadow-inner"
@@ -156,7 +160,7 @@ function TaskScreen({ onBack, onSave, initialData }) {
                             </span>
                             <select
                                 name="severity"
-                                value={formData.severity}
+                                value={formValues.severity}
                                 onChange={handleInput}
                                 className="p-4 rounded-xl bg-slate-900 border-2 border-slate-800 text-xl text-white appearance-none"
                             >
@@ -176,8 +180,8 @@ function TaskScreen({ onBack, onSave, initialData }) {
                                     <button
                                         key={s.id}
                                         type="button"
-                                        onClick={() => setFormData(p => ({ ...p, status: s.id }))}
-                                        className={`transition-all ${formData.status === s.id ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-slate-950 scale-105' : 'opacity-60 hover:opacity-100'}`}
+                                        onClick={() => autoSave({ status: s.id })}
+                                        className={`transition-all ${formValues.status === s.id ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-slate-950 scale-105' : 'opacity-60 hover:opacity-100'}`}
                                     >
                                         <StatusBadge status={s.id} type="task" />
                                     </button>
@@ -187,8 +191,8 @@ function TaskScreen({ onBack, onSave, initialData }) {
 
                         <DateField
                             label="Fecha Programada"
-                            value={formData.due}
-                            onChange={(val) => setFormData(p => ({ ...p, due: val }))}
+                            value={formValues.due}
+                            onChange={(val) => autoSave({ due: val })}
                             required
                             className="w-full"
                         />
@@ -202,7 +206,7 @@ function TaskScreen({ onBack, onSave, initialData }) {
                         </span>
                         <select
                             name="assetId"
-                            value={formData.assetId}
+                            value={formValues.assetId}
                             onChange={handleInput}
                             className="p-4 rounded-xl bg-slate-800 border border-slate-700 text-lg text-white appearance-none"
                         >
@@ -219,7 +223,7 @@ function TaskScreen({ onBack, onSave, initialData }) {
                         </span>
                         <select
                             name="locationId"
-                            value={formData.locationId}
+                            value={formValues.locationId}
                             onChange={handleInput}
                             className="p-4 rounded-xl bg-slate-800 border border-slate-700 text-lg text-white appearance-none"
                         >
@@ -235,7 +239,7 @@ function TaskScreen({ onBack, onSave, initialData }) {
                     <span className="text-sm font-bold uppercase tracking-wider text-slate-500">Notas Adicionales</span>
                     <textarea
                         name="notes"
-                        value={formData.notes}
+                        value={formValues.notes}
                         onChange={handleInput}
                         rows="3"
                         placeholder="Instrucciones específicas para el operario..."
