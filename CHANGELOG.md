@@ -254,6 +254,70 @@ Stack: Claude Opus 4.7, GLM-4.6, opencode/deepseek-v4-flash; React 19; Vite 8; Z
 
 ---
 
+---
+
+## [1.0.52] · 2026-06-16 · Maraton opencode — suites, hardening, pilot readiness
+
+> **Resumen:** Sesion intensiva de opencode (lotes 1-191). 40+ PRs mergeados en ~18h cubriendo cobertura de tests (de 0 a 5957 pass), hardening offline-first, error boundaries, React.memo en listas, switch de perfil in-app, grounding porcino ampliado, carbono follow-up, limpieza de dead code, y cierre documental completo (merge readiness, cross-repo audit, vetados checklist).
+
+### Features
+
+- **Error boundaries por ruta** (#1614): Cada ruta tiene estados loading/empty/error con fallback visual. `ErrorBoundary`, `InputLog`, `OfflineChip` con contratos verificados.
+- **Active finca selector** (#1617): Extensionista puede alternar entre fincas asignadas desde un selector en TopBar. Multifinca funcional en UI.
+- **Amplia grounding porcino** (#1619): Seguimiento de cerdos con flujo completo (registro, alimentacion, peso, ciclo reproductivo).
+- **Porcine seguimiento flow** (#1609): `SeguimientoProcesoScreen` incluye card de cerdos con navegacion a detalle.
+- **Carbon follow-up subview** (#1611): Modulo de restauracion con subvista de seguimiento de carbono (captura acumulada, proyeccion).
+- **Switch de perfil in-app** (#1623): Operador puede cambiar entre perfiles de piloto (javier, carlos, ana, hollman, david) desde un menu en la app sin re-login.
+- **Calendario de siembra desde zona biocultural** (#1598): `NotificationsBell` cablea recomendaciones de siembra basadas en piso termico + mes del `get_calendario_siembra` MCP tool.
+
+### Fixes
+
+- **Skip infra faltante en benches** (#1615): Bench de infra no bloquea cuando falta entorno local (AGE, Ollama, etc.). Solo corre checks disponibles.
+- **Revert unintended syncManager contamination** (#1629): Tests de syncManager volvieron al estado canonico tras contaminacion cross-lote (T99).
+
+### Tests
+
+- **Offline-first hardening** (#1616): 26 tests de degradacion offline — IndexedDB, SW cache, sync queue backoff, conflictos LWW campo-a-campo. Suite E2E `tests/offline.spec.js` ampliada.
+- **Suite unit 100% verde** (#1610): 5957 tests pass, 0 fail, 15 skip. Vitest corriendose en CI contra el entrypoint + contratos canonicos.
+- **Gating home por perfiles** (#1603): Tests de gating para cada tipo de usuario (campesino, extensionista, academico, operador).
+- **Onboarding flujo end-to-end** (#1604): Test del flujo completo de onboarding: respuestas → perfil → modulos habilitados.
+- **Smoke tests RTL para componentes** (#1605): Tests de renderizado minimo para componentes sin test previo.
+- **A11y teclado en ThemeSelector** (#1606): Navegacion por teclado verificada en selector de tema (Tab, Enter, Escape).
+- **Border parsers tests** (#1597): Casos borde de `agentIntentParser` y `externalAiPromptBuilder` — inputs vacios, truncados, codificaciones raras.
+- **Cobertura services p3** (#1596): Tests para `exportService`, `photoService`, `apiService`.
+- **Alertengine guards** (#1599): Verifica degradacion graceful con sidecar caido — timeout → null → comportamiento identico a pre-wiring.
+- **Screen-reader a11y tests** (#1635): Tests de accesibilidad para lectores de pantalla en componentes clave (tarea 83).
+- **Routing deep-link smoke tests** (#1637): Tests E2E de navegacion por hash routes (deep-links desde notificaciones, FAB, etc.).
+- **Loading skeleton dark** (#1634): Clase CSS `loading-skeleton-dark` + auditoria de estados de carga en tema oscuro.
+
+### Performance
+
+- **React.memo en listas** (#1618): `React.memo` en componentes de listas (AssetsDashboard, CatalogueScreen, LogList) para celulares baratos. Reduce re-renders en listas de 100+ items.
+
+### Chore
+
+- **Elimina dead code remanente** (#1600): Componentes, imports y exports sin uso eliminados en barrido completo.
+- **Barrido final de higiene** (#1607): `src/` auditado — sin imports muertos, sin variables no usadas, sin magic numbers sin nombre.
+- **Constantes magicas** (#1595): Extrae numeros magicos repetidos en servicios y hooks a constantes nombradas.
+
+### Docs
+
+- **Cierre transversal 172-191** (#1649): Documento de estado final post-integracion de todos los lotes, cross-repo audit.
+- **Cierre integracion 117-171** (#1648): Reporte final de integracion, script `pre-merge-main.sh` para validacion pre-merge.
+- **Auditoria vetados** (#1647): Checklist de archivos vetados (`DashboardLive.jsx`, `ProfileScreen.jsx`, `AgentScreen.jsx`) — sin conflictos con integrate.
+- **Merge readiness** (#1646): Reporte de readiness para merge de integrate → main, smoke tests, bench policy.
+- **Limpieza copy + contrato selector** (#1645): Normalizacion de labels en `userProfileService.js`, contrato canonico de `animalSelector`.
+
+### Pendiente para v1.0.53+
+
+- Merge de PRs draft abiertos (1638-1643, 1627, 1628, 1630-1633, 1636) a main.
+- `ENTREGA_PILOTOS.md` — status por piloto (javier, carlos.rivera, ana.maria, hollman, david).
+- `PENDIENTE-OPERADOR.md` — deploy steps, visual baseline approval, merge steps.
+- Sidecar restart para #212/#213.
+- Visual regression baseline (workflow `visual-regression.yml` pendiente de crear).
+
+---
+
 Para historia previa a 1.0.0 ver `git log --oneline` o el changelog interno en `Chagra-strategy/ops/`.
 
 🐦 Chagra ya no es una app. Es un agente vivo con el que se habla en colombiano.
