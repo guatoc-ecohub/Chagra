@@ -33,6 +33,7 @@ export const ENTRY_TYPES = new Set([
   'bench-llm',
   'bench-latencia',
   'bench-vision',
+  'bench-grafo',
   'meta',
   'test-suite',
 ]);
@@ -47,6 +48,7 @@ export const KNOWN_INFRA = new Set([
   'fixtures-privadas',
   'corpus',
   'farmos',
+  'age',
   'ninguna',
 ]);
 

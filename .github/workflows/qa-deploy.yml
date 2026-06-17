@@ -1,5 +1,10 @@
 name: Deploy Chagra PWA (QA)
 
+# Deploy automatico a entorno QA en alpha cuando se pushea a la rama `qa`.
+# Target: /mnt/fast/appdata/farmos-pwa-qa (nginx virtual host qa.chagra.guatoc.co).
+# Misma estrategia de rsync + assets append-only que deploy.yml (prod).
+# Concurrency por grupo deploy-chagra-qa serializa deploys para no corromper destino.
+
 on:
   push:
     branches: [qa]

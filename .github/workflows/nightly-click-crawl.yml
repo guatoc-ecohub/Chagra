@@ -1,5 +1,11 @@
 name: Nightly Click Crawl
 
+# Crawl nocturno de la app completa: recorre todas las rutas y secciones
+# clickeables para detectar regresiones silenciosas (pantallas rotas, 404,
+# errores JS no catched). Corre en schedule diario 02:30 Colombia + on-demand.
+# Complementa a playwright.yml (E2E offline-first) y no depende de
+# visual-regression.yml (screenshots comparativos).
+
 on:
   schedule:
     # 02:30 America/Bogota = 07:30 UTC.

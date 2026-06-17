@@ -41,6 +41,9 @@ const SKIP_DIRS = new Set([
   'node_modules', 'dist', '.git',
   'test-results',    // Playwright artifacts (CI paths)
   '.claude',          // private agent config (not in repo)
+  'bench',            // benchmark data/history (contains model names, paths)
+  'data',             // fixture data (may contain reference paths)
+  'catalog',          // catalog data (external references)
 ]);
 
 // Archivos permitidos conocidos que contienen patrones intencionalmente
@@ -52,6 +55,9 @@ const ALLOWED_FILES = new Set([
   'AGENTS.md',
   'src/services/__tests__/outputGuards.fermento.test.js',  // tests that names DON'T leak
 ]);
+
+// Extensiones de archivo a auditar (ampliado con .mjs para scripts/bench)
+const AUDIT_EXTENSIONS = ['.js', '.jsx', '.ts', '.tsx', '.json', '.md', '.css', '.html', '.mjs'];
 
 async function* walk(dir) {
   const entries = await readdir(dir, { withFileTypes: true });
@@ -79,7 +85,7 @@ describe('Task 40: Auditoría de leaks en el repositorio público', () => {
     const violations = [];
     for await (const file of walk(REPO_DIR)) {
       const ext = extname(file);
-      if (!['.js', '.jsx', '.ts', '.tsx', '.json', '.md', '.css', '.html'].includes(ext)) continue;
+      if (!AUDIT_EXTENSIONS.includes(ext)) continue;
 
       const content = await readFile(file, 'utf-8');
       for (const pattern of PROHIBITED_PATTERNS) {

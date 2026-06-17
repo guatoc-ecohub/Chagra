@@ -1,0 +1,40 @@
+name: Performance Budget
+
+# Gate de presupuesto de rendimiento: verifica que el bundle de produccion
+# no exceda los limites de tamanio definidos en scripts/check-perf-budget.mjs.
+# Corre en PR y push a main + ramas feat/fix/chore.
+# No se solapa con visual-regression.yml (screenshots UI) ni con playwright.yml
+# (E2E offline-first): este job solo mide tamanios de chunks JS/CSS.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, feat/**, fix/**, chore/**]
+
+permissions:
+  contents: read
+
+jobs:
+  perf-budget:
+    name: Check bundle sizes
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Check performance budget
+        run: node scripts/check-perf-budget.mjs

@@ -163,7 +163,7 @@ export const PROFILE_QUESTIONS = [
     type: 'multi',
     options: [
       { value: 'gallinas', label: '🐔 Gallinas o pollos' },
-      { value: 'cerdos', label: '🐖 Cerdos o marranos' },
+      { value: 'cerdos', label: '🐖 Cerdos' },
       { value: 'ganado', label: '🐄 Ganado (vacas)' },
       { value: 'ovejas_cabras', label: '🐑 Ovejas o cabras' },
       { value: 'otros', label: '🐝 Otros (abejas, peces, conejos...)' },

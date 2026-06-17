@@ -24,12 +24,39 @@ const { construirTableroExtensionista } = vi.hoisted(() => ({
   construirTableroExtensionista: vi.fn(),
 }));
 const { getActiveTenantId } = vi.hoisted(() => ({ getActiveTenantId: vi.fn() }));
+const { useFincaActiveStoreMock } = vi.hoisted(() => ({
+  useFincaActiveStoreMock: Object.assign(
+    vi.fn((selector) =>
+      selector({
+        activeFincaSlug: 'finca-el-paramo',
+        setActiveFinca: vi.fn(),
+      })
+    ),
+    {
+      getState: vi.fn(() => ({
+        activeFincaSlug: 'finca-el-paramo',
+        setActiveFinca: vi.fn(),
+      })),
+    }
+  ),
+}));
 
 vi.mock('../../config/extensionistaAccess', () => ({ esExtensionistaActual }));
 vi.mock('../../services/extensionistaService', () => ({
   construirTableroExtensionista,
 }));
 vi.mock('../../services/tenantContext', () => ({ getActiveTenantId }));
+vi.mock('../../services/fincaActiveStore', () => ({ default: useFincaActiveStoreMock }));
+vi.mock('../../components/common/ScreenShell', () => ({
+  ScreenShell: ({ children, onBack }) => (
+    <div>
+      <button type="button" aria-label="Volver" onClick={onBack}>
+        Volver
+      </button>
+      {children}
+    </div>
+  ),
+}));
 
 import ExtensionistaScreen from '../ExtensionistaScreen';
 
@@ -101,6 +128,26 @@ describe('ExtensionistaScreen — con rol extensionista', () => {
     expect(screen.getByText(/pedro_g/)).toBeInTheDocument();
     expect(screen.getByText(/Sin sincronizar hace días/)).toBeInTheDocument();
     expect(screen.getByText(/Al día/)).toBeInTheDocument();
+  });
+
+  it('muestra selector de finca activa y permite cambiar la delegada activa', () => {
+    const setActiveFinca = vi.fn();
+    useFincaActiveStoreMock.mockImplementation((selector) =>
+      selector({ activeFincaSlug: 'finca-la-esperanza', setActiveFinca })
+    );
+    useFincaActiveStoreMock.getState.mockReturnValue({
+      activeFincaSlug: 'finca-la-esperanza',
+      setActiveFinca,
+    });
+    construirTableroExtensionista.mockReturnValue(TABLERO);
+    render(<ExtensionistaScreen onBack={() => {}} />);
+
+    const selector = screen.getByTestId('finca-selector');
+    expect(selector).toBeInTheDocument();
+    expect(selector.value).toBe('finca-la-esperanza');
+
+    fireEvent.change(selector, { target: { value: 'finca-el-paramo' } });
+    expect(setActiveFinca).toHaveBeenCalledWith('finca-el-paramo');
   });
 
   it('muestra el aviso de frontera MVP (datos de ejemplo, no autorización real)', () => {

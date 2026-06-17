@@ -29,6 +29,7 @@
  * public/cycle-content/, simulando el flujo de carga del PWA.
  */
 import { readFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { performance } from 'node:perf_hooks';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -121,8 +122,20 @@ function percentile(sorted, p) {
 
 async function main() {
   const emitHistory = process.argv.includes('--history');
-  // Import dinamico para que el stub de fetch ya este en su lugar.
-  const { retrieve, getCorpusStats } = await import('../src/services/ragRetriever.js');
+  if (!existsSync(CORPUS_ROOT)) {
+    console.log(`[bench] SKIP: no existe corpus en ${CORPUS_ROOT}`);
+    return;
+  }
+
+  let retrieve;
+  let getCorpusStats;
+  try {
+    // Import dinamico para que el stub de fetch ya este en su lugar.
+    ({ retrieve, getCorpusStats } = await import('../src/services/ragRetriever.js'));
+  } catch (err) {
+    console.log(`[bench] SKIP: no se pudo importar ragRetriever.js (${String(err.message).slice(0, 120)})`);
+    return;
+  }
 
   console.log('[bench] Cold load: cargando corpus completo + primera query...');
   const coldStart = performance.now();

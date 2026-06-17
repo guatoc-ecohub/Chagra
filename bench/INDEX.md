@@ -4,7 +4,7 @@
 > `node bench/run.mjs --regen-index`. No editar a mano (un test verifica
 > que este sincronizado).
 
-Generado: 2026-06-15. Entradas: 16 (12 benches/meta + 4 suites de test).
+Generado: 2026-06-17. Entradas: 18 (14 benches/meta + 4 suites de test).
 
 ## Como se usa
 
@@ -41,6 +41,7 @@ _Miden alucinacion real (AH% = FAIL/total) con must_include + red_flags y juez i
 |---|---|---|---|---|
 | `borde-alucinacion` **[NO ROMPER]** | Busca el BORDE de alucinacion de granite3.3:8b a CONFIG-PROD con juez FUERTE INDEPENDIENTE (claude-cli). 27 trampas (12 V1 + 15 V2). BENCH_REPS>1 da media +- stddev. Contrato publico sellado: exports + env vars + paths de salida estables. | Bench LLM | gpu, ollama, sidecar, claude-cli, fixtures-privadas | `node bench/run.mjs borde-alucinacion` |
 | `complejos-juez-independiente` | Re-bench HONESTO de 10 prompts complejos rotativos a CONFIG-PROD. Juez Anthropic (Haiku) si hay API key, si no determinstico. Comparte helpers de sidecar/GPU con capabilities via lib/bench-sidecar.mjs. | Bench LLM | gpu, ollama, sidecar, fixtures-privadas | `node bench/run.mjs complejos-juez-independiente` |
+| `agro-rotatorio` | Bench diario rotativo para detectar huecos base-variedad en el grafo agroecologico y alucinaciones del agente. Capa A audita paridad TARGETS_PEST/USED_AS_BIOPREPARADO/SUSCEPTIBLE_TO por base, variedad y genero. Capa B genera 50 preguntas... | Bench LLM | corpus | `node bench/run.mjs agro-rotatorio` |
 | `capabilities-A-vs-C` | Bench HONESTO de capacidades: CONFIG A (granite CRUDO) vs CONFIG C (pipeline de prod). Reporta LIFT C-A por capability. Pool generado por gen-bench-capabilities-pool.mjs. Requiere generar primero el pool (gen-bench-capabilities-pool.mjs),... | Bench LLM | gpu, ollama, sidecar, anthropic-key | `node scripts/gen-bench-capabilities-pool.mjs > pool.json && node scripts/bench-capabilities-A-vs-C.mjs --pool pool.json` |
 | `rescore-claude-cli` | Re-juzga un JSONL existente de capabilities-A-vs-C con claude-cli (suscripcion del operador). NO genera respuestas nuevas. Requiere --jsonl y --pool, por eso no tiene cmd por defecto. | Meta | claude-cli | `JUDGE_PROVIDER=claude-cli node scripts/bench-rescore-claude-cli.mjs --jsonl <file> --pool <pool>` |
 
@@ -58,6 +59,13 @@ _Latencia del retrieve BM25 sobre el corpus real._
 | id | que hace | tipo | infra | ejecutar |
 |---|---|---|---|---|
 | `rag-retrieve` | Mide retrieve(query, topK) sobre el corpus real (491+ species). Cold load + warm p50/p95. Consolidado de 3 archivos a 1 (loader hook ahora inline via data: URL). NOTA: ejecucion completa bajo Node puro necesita shim import.meta.env (gap... | Bench latencia | corpus | `node bench/run.mjs rag-retrieve` |
+
+### Cluster: grafo
+_Cobertura de la capa de conocimiento (Apache AGE chagra_kg): que tanto del catalogo canonico esta como arista en el grafo (capa Co)._
+
+| id | que hace | tipo | infra | ejecutar |
+|---|---|---|---|---|
+| `grafo-cobertura` | READ-ONLY. Mide que fraccion de las relaciones del catalogo canonico (especie->plaga, companeras, antagonistas, especie->biopreparado) estan como arista en Apache AGE (chagra_kg, capa Co). Cuantifica los holes (relacion conocida por el... | bench-grafo | age | `node bench/run.mjs grafo-cobertura` |
 
 ### Cluster: judge
 _Smoke + ranking del LLM-judge._
