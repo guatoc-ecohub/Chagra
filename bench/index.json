@@ -133,6 +133,45 @@
       "history": true
     },
     {
+      "id": "agro-rotatorio",
+      "title": "Bench agroecologico rotatorio de grafo y grounding",
+      "type": "bench-llm",
+      "cluster": "anti-hallucination",
+      "status": "active",
+      "script": "scripts/bench-agro-rotatorio.mjs",
+      "cmd": [
+        "node",
+        "{{script}}"
+      ],
+      "infra": [
+        "corpus"
+      ],
+      "metrics": [
+        "graph_consistency_pct",
+        "grounded_pct",
+        "hallucinations",
+        "subspecies_disconnections",
+        "score_global"
+      ],
+      "what": "Bench diario rotativo para detectar huecos base-variedad en el grafo agroecologico y alucinaciones del agente. Capa A audita paridad TARGETS_PEST/USED_AS_BIOPREPARADO/SUSCEPTIBLE_TO por base, variedad y genero. Capa B genera 50 preguntas por semilla de fecha y puntua grounding con reglas deterministicas; usa sidecar si hay token y fallback Ollama con grounding del grafo.",
+      "envVars": [
+        "SEED",
+        "AGRO_ROTATORIO_MODEL",
+        "AGRO_ROTATORIO_QUESTIONS",
+        "SIDECAR_TOKEN",
+        "SIDECAR_URL",
+        "CHAGRA_KG_PSQL_CMD",
+        "CHAGRA_KG_HOST",
+        "CHAGRA_KG_PORT",
+        "CHAGRA_KG_USER",
+        "CHAGRA_KG_DB",
+        "CHAGRA_KG_PASSWORD"
+      ],
+      "output": "bench/history/agro-rotatorio__<model|nomodel>__<timestamp>.json",
+      "history": true,
+      "dailyNote": "Para cron diario: SEED=$(date +%F) node bench/run.mjs agro-rotatorio. Para fidelidad total configure token del sidecar y AGE via CHAGRA_KG_* o CHAGRA_KG_PSQL_CMD."
+    },
+    {
       "id": "capabilities-A-vs-C",
       "title": "Capacidades A (granite crudo) vs C (pipeline completo)",
       "type": "bench-llm",
