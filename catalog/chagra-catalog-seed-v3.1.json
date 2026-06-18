@@ -90,6 +90,9 @@
         "agrosavia-sol-andina"
       ],
       "valor_pedagogico": "Allium fistulosum, conocida como cebolla larga o cebollín, es una aliácea hortícola perenne ampliamente cultivada en el cinturón agrícola de Cundinamarca, particularmente en las zonas de Aquitania y Sumapaz, donde abastece los mercados de Bogotá entre 1800 y 2800 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación mediante división de bulbillos (hijuelos) cada 4 meses para cosecha permanente, asociaciones beneficiosas con zanahoria y lechuga que mejora la salud del huerto, y requiere manejo de plagas como trips y manchas foliares mediante monitoreo frecuente y biopreparados andinos. En el contexto campesino andino, esta cebolla ha sido tradicionalmente utilizada en sofritos y guisos como base aromática esencial, preservando sabores prehispánicos en las cocinas rurales de Cundinamarca y Boyacá. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Allium fistulosum L.",
+      "companions": [
+        "fragaria_ananassa"
+      ],
       "antagonists": [
         "phaseolus_vulgaris"
       ],
@@ -298,7 +301,9 @@
         "notas": "Se resiembra sola con facilidad; sus raíces secretan sustancias que controlan nematodos en el suelo."
       },
       "companions": [
-        "solanum_lycopersicum_san_marzano"
+        "solanum_lycopersicum_san_marzano",
+        "solanum_tuberosum",
+        "fragaria_ananassa"
       ],
       "antagonists": [],
       "valor_pedagogico": "La Caléndula (Calendula officinalis L.) es una especie ornamental-medicinal originaria del Mediterráneo, ampliamente cultivada en jardines campesinos de Cundinamarca entre 0-2800 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con ciclo de floración de 75-90 días, asociándose beneficiosamente con cultivos como el tomate (Solanum lycopersicum) mientras actúa como repelente natural de trips y nemátodos mediante secreciones radiculares. En el contexto cultural andino-campesino, sus flores se utilizan tradicionalmente en preparaciones de crema cicatrizante por sus propiedades flavonoides, saponinas y aceites esenciales. Según GBIF Backbone Taxonomy y Plants of the World Online (POWO), esta especie destaca por su valor ecológico en atracción de polinizadores y manejo integrado de plagas en sistemas agroecológicos de montaña.",
@@ -602,12 +607,18 @@
         ]
       },
       "plagas_criticas": [
-        "Hypothenemus hampei (broca)",
-        "Hemileia vastatrix (roya)",
-        "Mycena citricolor"
+        "Hypothenemus hampei (broca del café — plaga #1, perfora el grano; su estadio larval se llama chapola)",
+        "Leucoptera coffeella (minador de la hoja)",
+        "Planococcus spp. (cochinilla harinosa de la raíz y el fruto)",
+        "Monalonion velezangeli (chinche de la chamusquina, también afecta café en algunas zonas)"
       ],
       "enfermedades_criticas": [
-        "Cercospora coffeicola"
+        "Hemileia vastatrix (roya del café) — enfermedad #1, defolia y reduce producción",
+        "Mycena citricolor (ojo de gallo / gotera, en zonas húmedas y sombrías)",
+        "Cercospora coffeicola (mancha de hierro / cercosporiosis)",
+        "Colletotrichum spp. (antracnosis del fruto)",
+        "Ceratocystis fimbriata (llaga macana del tronco)",
+        "Rosellinia spp. (llaga negra de la raíz)"
       ],
       "source_ids": [
         "cenicafe-manual-cafetero-2013",
@@ -865,6 +876,146 @@
       "tracking_mode": null
     },
     {
+      "_curation_status": "BORRADOR_IA",
+      "id": "fragaria_ananassa",
+      "nombre_comun": "Fresa",
+      "nombre_comunes_regionales": [
+        "fresa",
+        "frutilla",
+        "fresón"
+      ],
+      "nombre_cientifico": "Fragaria × ananassa (Duchesne ex Weston) Duchesne ex Rozier",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": null,
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2000,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "ph_suelo": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 6.5,
+        "max": 7
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "heladas_tolerancia": {
+        "umbral_c": -2,
+        "horas_acumuladas_max": 4,
+        "notas": "La planta perenne tolera heladas leves, pero la flor abierta y el fruto cuajado son muy sensibles: una helada en floración aborta la cosecha. Mulch plástico/orgánico y túneles bajos mitigan."
+      },
+      "companions": [
+        "lactuca_sativa_capitata",
+        "allium_fistulosum",
+        "calendula_officinalis"
+      ],
+      "antagonists": [],
+      "_nota_antagonists": "No asociar con solanáceas (papa, tomate, lulo) ni con Rubus (mora) por compartir hospedaje de Botrytis, Verticillium y ácaros. Rotar el lote cada 2-3 años para reducir Verticillium y nematodos.",
+      "propagation": {
+        "methods": [
+          "estolon",
+          "division_mata"
+        ],
+        "best_method": "estolon",
+        "protocol_resumen": "Propagación clonal por estolones (guías): se enraízan las plántulas hijas que emite la planta madre y se trasplantan con corona sana y raíz desnuda o en cepellón. Densidad 4-6 plantas/m² en camas elevadas con acolchado (mulch) plástico o de cascarilla. La semilla solo se usa en mejoramiento (híbrido segrega).",
+        "tiempo_a_establecimiento_dias": 30,
+        "notas": "Fenología por etapas: (1) Establecimiento/enraizamiento de corona 0-30 días; (2) Desarrollo vegetativo y emisión de hojas/estolones 30-75 días; (3) Inducción floral y floración 75-110 días (favorecida por días cortos y frío); (4) Cuajado y desarrollo de fruto 110-150 días; (5) Cosecha escalonada continua a partir de ~120 días, con picos cada 7-10 días durante varios meses; (6) Renovación de plantación cada 12-18 meses por caída de vigor y acumulación de patógenos. Eliminar estolones excesivos para concentrar energía en fruto.",
+        "fuente": "AGROSAVIA Manual de fresa (2013); AGROSAVIA Manual de biopreparados (2015)."
+      },
+      "plagas_criticas": [
+        "Tetranychus urticae (ácaro rojo / arañita de dos puntos)",
+        "Frankliniella spp. (trips, deforman flor y fruto)",
+        "Aphis gossypii / Chaetosiphon fragaefolii (áfidos, vectores de virus)",
+        "Otiorhynchus / picudo de la raíz",
+        "Babosas y caracoles (dañan fruto a ras de suelo)"
+      ],
+      "enfermedades_criticas": [
+        "Botrytis cinerea (moho gris / podredumbre del fruto) — enfermedad #1 en clima frío húmedo",
+        "Colletotrichum spp. (antracnosis de corona y fruto)",
+        "Verticillium dahliae (marchitez vascular, persistente en suelo)",
+        "Phytophthora cactorum (pudrición de corona y raíz)",
+        "Sphaerotheca / Podosphaera aphanis (oídio / cenicilla)",
+        "Xanthomonas fragariae (mancha angular bacteriana)"
+      ],
+      "feeding_plan_template": {
+        "source": "AGROSAVIA Manual de fresa (2013) + Manual de biopreparados (2015) — manejo agroecológico de transición en cama elevada con acolchado, clima frío 2000-2800 msnm.",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Aplicar bocashi a la cama a la siembra",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 200,
+            "notes": "Cama elevada con drenaje excelente (la fresa muere por encharcamiento/Phytophthora). Trasplantar coronas sanas a nivel del suelo: corona enterrada pudre, corona alta seca."
+          },
+          {
+            "offset_days": 20,
+            "action": "Inocular Trichoderma harzianum al sustrato",
+            "biofertilizer_slug": "trichoderma_harzianum_suelo",
+            "dose_g": 12,
+            "notes": "Preventivo Phytophthora cactorum, Verticillium y Colletotrichum de corona durante el enraizamiento."
+          },
+          {
+            "offset_days": 45,
+            "action": "Drench con humus líquido en desarrollo vegetativo",
+            "biofertilizer_slug": "humus_liquido",
+            "dose_ml": 150,
+            "notes": "Dilución 1:5. Aporte de N orgánico para foliaje sano antes de la inducción floral."
+          },
+          {
+            "offset_days": 75,
+            "action": "Foliar preventivo con Bacillus subtilis al inicio de floración",
+            "biofertilizer_slug": "bacillus_subtilis_foliar",
+            "dose_ml": 80,
+            "notes": "Antagonista de Botrytis cinerea — el moho gris ataca flor y fruto. Aplicar al atardecer; mejorar ventilación de la cama y NO mojar el follaje en la tarde."
+          },
+          {
+            "offset_days": 90,
+            "action": "Foliar con supermagro en cuajado de fruto",
+            "biofertilizer_slug": "supermagro",
+            "dose_ml": 50,
+            "notes": "Dilución 1:15. K y micronutrientes para llenado, color y dulzor del fruto."
+          },
+          {
+            "offset_days": 110,
+            "action": "Aplicar caldo sulfocálcico preventivo de ácaro/oídio",
+            "biofertilizer_slug": "caldo_sulfocalcico",
+            "dose_ml": 40,
+            "notes": "Dilución baja (0.5-1° Bé) — el azufre concentrado fitotóxica el follaje tierno y el fruto. Preventivo Tetranychus y oídio. NO aplicar en floración plena ni con sol fuerte."
+          }
+        ]
+      },
+      "source_ids": [
+        "agrosavia-manual-fresa-2013",
+        "agrosavia-manual-biopreparados-2015",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "La fresa (Fragaria × ananassa, familia Rosaceae) es un híbrido hortofrutícola perenne de clima frío, originado en el siglo XVIII en Europa por el cruzamiento accidental de dos especies americanas: Fragaria chiloensis (de Chile) y Fragaria virginiana (de Norteamérica) — de ahí el nombre 'ananassa' por su aroma a piña. En Colombia es un cultivo de alto valor en zonas frías de Cundinamarca (Sabana de Bogotá, Sibaté, Facatativá, Subachoque, Chocontá, Guasca), Antioquia (La Ceja, Marinilla, El Carmen de Viboral, oriente antioqueño) y Boyacá entre 2.000 y 2.800 msnm, sembrado en camas elevadas con acolchado (mulch) plástico que conserva humedad, controla maleza y mantiene el fruto limpio. La planta produce por estolones (guías) que enraízan plántulas hijas clonales, y fructifica de forma escalonada y continua durante varios meses. Su mayor reto fitosanitario es el moho gris (Botrytis cinerea), que pudre flores y frutos en el ambiente frío y húmedo de la Sabana, seguido por el ácaro de dos puntos (Tetranychus urticae), los trips (Frankliniella) que deforman el fruto, y la antracnosis (Colletotrichum) y Verticillium que se acumulan en el suelo. Manejo agroecológico: drenaje excelente y camas elevadas (la fresa muere por encharcamiento y Phytophthora cactorum de corona); trasplante de la corona a nivel exacto del suelo (enterrada pudre, alta seca); Trichoderma al sustrato; Bacillus subtilis preventivo contra Botrytis al inicio de floración; ventilación de la cama y riego por goteo para no mojar el follaje; caldo sulfocálcico diluido contra ácaro y oídio; asociación con lechuga, cebolla larga (que repele ácaros y áfidos) y caléndula; y rotación del lote cada 2-3 años para no acumular Verticillium y nematodos. La fresa enseña el manejo del microclima del cultivo — humedad, ventilación y sanidad de la corona — como base de la prevención frente a la dependencia de fungicidas. Fuentes Tier A: AGROSAVIA Manual de fresa 2013, AGROSAVIA Manual de biopreparados 2015, GBIF Backbone, POWO Kew.",
+      "validation_level": "claude_draft",
+      "tracking_mode": "aggregate"
+    },
+    {
       "id": "ipomoea_batatas",
       "nombre_comun": "Batata / Camote",
       "nombre_cientifico": "Ipomoea batatas (L.) Lam.",
@@ -1004,7 +1155,8 @@
       "valor_pedagogico": "La lechuga cogollo morada (Lactuca sativa var. capitata) es una hortaliza de hoja ampliamente cultivada en Colombia, especialmente en departamentos como Cundinamarca (cinturón productivo Choachí-Fómeque), Boyacá, Nariño y Santander, entre 800-3200 msnm en zonas térmicas fría y templada. Su manejo agronómico incluye propagación por semilla en semillero con sustrato fino, riego por nebulización en etapas tempranas, trasplante a los 25-30 días, ciclo de 60-90 días hasta cosecha, y asociaciones beneficiosas con Brassicaceae y Allium para repelencia de pulguilla. Plagas principales: pulgones (Myzus persicae), babosas (Deroceras reticulatum) y minadores (Liriomyza spp.). Culturalmente, aunque no es originaria del contexto muisca, se ha integrado en la agricultura andina contemporánea como cultivo de ciclo corto para seguridad alimentaria. Los cogollos morados deben su pigmentación a las antocianinas, pigmentos que actúan como protección natural contra radiación UV y estrés térmico. Fuente: nrc-1989-cultivos-andinos.",
       "companions": [
         "phaseolus_vulgaris",
-        "solanum_lycopersicum_san_marzano"
+        "solanum_lycopersicum_san_marzano",
+        "fragaria_ananassa"
       ],
       "tracking_mode": "aggregate"
     },
@@ -1052,7 +1204,8 @@
       "valor_pedagogico": "El tarwi o chocho andino (Lupinus mutabilis Sweet) es una leguminosa nativa de los Andes con alto contenido proteico en grano (35-50%), tradicionalmente cultivada en sistemas campesinos altoandinos colombianos para autoconsumo (cosecha desamargada). Se cultiva en Boyacá (Tunja, Soatá, Ventaquemada), Cundinamarca (Sumapaz, Choachí), Nariño y Cauca entre 2.500 y 3.500 msnm en zona térmica fría a páramo bajo. Ciclo 6-8 meses, fijación N biológica ~100-160 kg N/ha. Granos con alcaloides amargos (quinolizidínicos) requieren desamargado tradicional (remojo + enjuagues). Manejo agroecológico: siembra al voleo en pre-cultivo (8-12 kg/ha), incorporación como abono verde o cosecha grano + restos al suelo, rotación con tubérculos andinos. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, NRC 1989 Cultivos Andinos, POWO Kew, GBIF Backbone Taxonomy.",
       "companions": [
         "alnus_acuminata",
-        "zea_mays"
+        "zea_mays",
+        "solanum_tuberosum"
       ],
       "tracking_mode": "aggregate"
     },
@@ -1250,7 +1403,8 @@
         "lactuca_sativa_capitata",
         "zea_mays",
         "musa_paradisiaca",
-        "manihot_esculenta"
+        "manihot_esculenta",
+        "solanum_tuberosum"
       ],
       "antagonists": [
         "allium_fistulosum"
@@ -1604,12 +1758,20 @@
         ]
       },
       "plagas_criticas": [
-        "Trps",
-        "Heliothis"
+        "Frankliniella spp. / Thrips spp. (trips, vectores de virus del bronceado TSWV)",
+        "Tuta absoluta (polilla/cogollero del tomate, minador devastador)",
+        "Bemisia tabaci / Trialeurodes vaporariorum (mosca blanca, vector de geminivirus)",
+        "Helicoverpa zea / Heliothis (gusano del fruto)",
+        "Tetranychus urticae / Aculops lycopersici (ácaro del tomate)",
+        "Agrotis ipsilon (trozador, corta plántulas a ras de suelo)"
       ],
       "enfermedades_criticas": [
-        "Podredumbre apical (Blossom end rot)",
-        "Trozador (Agrotis ipsilon)"
+        "Phytophthora infestans (gota / tizón tardío) — devastador en clima frío húmedo, comparte patógeno con la papa",
+        "Alternaria solani (tizón temprano)",
+        "Fusarium oxysporum f. sp. lycopersici (marchitez vascular)",
+        "Ralstonia solanacearum (marchitez bacteriana)",
+        "Phytophthora infestans y Septoria lycopersici (manchas foliares)",
+        "Podredumbre apical / Blossom end rot (fisiopatía por déficit de Ca y riego irregular, NO patógeno)"
       ],
       "source_ids": [
         "gbif-taxonomic-backbone",
@@ -1630,8 +1792,7 @@
         "calido"
       ],
       "roles_in_guild": [
-        "crop",
-        "shade_lover"
+        "crop"
       ],
       "cultivable": true,
       "conservation_status": "naturalizada",
@@ -2152,7 +2313,7 @@
           "semilla"
         ],
         "best_method": "semilla sexual",
-        "notas": "Siembra directa en sitio definitivo."
+        "notas": "Siembra directa en sitio definitivo, 2-3 semillas por sitio a 3-5 cm de profundidad, distancia 30-40 cm entre plantas × 80-90 cm entre surcos. Fenología por etapas: (1) Germinación y emergencia 0-10 días; (2) Desarrollo vegetativo (V3-V8, formación de hojas) 10-45 días; (3) Crecimiento rápido y diferenciación de la mazorca (V8-VT) 45-70 días; (4) Espigamiento/floración masculina (VT, emisión de polen de la espiga) y femenina (R1, emisión de estigmas/barbas de la mazorca) 70-90 días — etapa crítica de agua, una sequía aquí cuaja menos granos; (5) Llenado de grano (lechoso → pastoso → dentado) 90-130 días; (6) Madurez fisiológica (capa negra en la base del grano) y cosecha 130-180 días en variedades andinas de ciclo largo. En sistema Milpa el frijol trepa sobre el tallo del maíz y la calabaza cubre el suelo."
       },
       "notas_taxonomicas": "Las razas locales colombianas como 'Capio' (blanco harinoso), 'Cusco' (morado) y 'Pira' son fundamentales para la soberanía alimentaria de la zona altoandina. El sistema Milpa integra maíz con frijol y calabaza.",
       "valor_pedagogico": "Lección de Milpa: el maíz criollo andino (Zea mays L.) se cultiva en el altiplano cundiboyacense y Nariño entre 1800-2800 msnm en zonas frío-templadas. Las variedades 'Capio', 'Pira' y 'Cusco' son patrimonios genéticos muiscas. Ciclo de 6 meses, propagación por semilla directa. En asociación tradicional milpa (frijol+calabaza) se emplea manejo integrado de Spodoptera frugiperda y Puccinia sorghi. Fuente: NRC (1989) Cultivos Andinos, AGROSAVIA, ICA Res. 3168/2015.",
@@ -2162,9 +2323,51 @@
         "Diabrotica balteata"
       ],
       "enfermedades_criticas": [
-        "Puccinia sorghi (roya)",
-        "Fusarium spp."
+        "Puccinia sorghi (roya común del maíz)",
+        "Fusarium spp. (pudrición de mazorca y tallo, produce micotoxinas)",
+        "Cercospora zeae-maydis (mancha gris de la hoja)",
+        "Helminthosporium / Exserohilum turcicum (tizón foliar norteño)"
       ],
+      "feeding_plan_template": {
+        "source": "AGROSAVIA Manual de biopreparados (2015) + NRC (1989) Cultivos Andinos — plan agroecológico tipo Milpa para maíz criollo de clima frío 1800-2800 msnm.",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Aplicar bocashi al sitio de siembra",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 150,
+            "notes": "Mezclar con el suelo del hoyo antes de depositar la semilla. En sistema Milpa, sembrar el frijol 2-3 semanas después para que el maíz le sirva de tutor."
+          },
+          {
+            "offset_days": 30,
+            "action": "Drench con biol en desarrollo vegetativo",
+            "biofertilizer_slug": "biol",
+            "dose_ml": 150,
+            "notes": "Dilución 1:7. Aporte de N en la fase V3-V8 de máximo crecimiento foliar. Coincide con el primer aporque."
+          },
+          {
+            "offset_days": 55,
+            "action": "Foliar con supermagro previo a floración",
+            "biofertilizer_slug": "supermagro",
+            "dose_ml": 60,
+            "notes": "Dilución 1:15. Refuerzo de K y micronutrientes antes del espigamiento (VT/R1), la etapa que define el número de granos por mazorca."
+          },
+          {
+            "offset_days": 70,
+            "action": "Aplicar Bacillus thuringiensis al cogollo si hay cogollero",
+            "biofertilizer_slug": "bacillus_thuringiensis",
+            "dose_g": 10,
+            "notes": "Control biológico de Spodoptera frugiperda (cogollero) dirigido al verticilo. Aplicar al atardecer cuando la larva está activa. Monitorear daño foliar antes de aplicar."
+          },
+          {
+            "offset_days": 95,
+            "action": "Foliar con lixiviado de frutas en llenado de grano",
+            "biofertilizer_slug": "lixiviado_frutas",
+            "dose_ml": 80,
+            "notes": "Aporte de azúcares y K para el llenado (fase lechoso-pastoso). Mantener humedad de suelo en esta etapa."
+          }
+        ]
+      },
       "source_ids": [
         "agrosavia-manual-biopreparados-2015",
         "gbif-taxonomic-backbone",
@@ -2719,6 +2922,157 @@
       "tracking_mode": "individual"
     },
     {
+      "_curation_status": "BORRADOR_IA",
+      "_anti_confusion": "Solanum tuberosum (papa común). NO confundir con Solanum betaceum (tomate de árbol), Solanum lycopersicum (tomate), Solanum quitoense (lulo) ni Solanum phureja/Solanum tuberosum Grupo Phureja (papa criolla, subgrupo distinto de menor latencia y tubérculo amarillo).",
+      "id": "solanum_tuberosum",
+      "nombre_comun": "Papa",
+      "nombre_comunes_regionales": [
+        "papa común",
+        "papa de año",
+        "papa pastusa",
+        "papa sabanera",
+        "papa única",
+        "papa diacol capiro (R-12)"
+      ],
+      "nombre_cientifico": "Solanum tuberosum L.",
+      "familia_botanica": "Solanaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "tuberculo",
+      "cycleMonths": 6,
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2500,
+        "optimo_max": 3200,
+        "max_absoluto": 3500
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 10,
+        "optimo_max": 18,
+        "max_tolerable": 24
+      },
+      "ph_suelo": {
+        "min": 4.5,
+        "optimo_min": 5.2,
+        "optimo_max": 6.5,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -1.5,
+        "horas_acumuladas_max": 2,
+        "notas": "Follaje muere a -2 °C. La helada negra de madrugada en el altiplano (Cundiboyacense, Nariño) es la causa abiótica más frecuente de pérdida total. El aporque alto y el riego nocturno por aspersión mitigan parcialmente."
+      },
+      "companions": [
+        "calendula_officinalis",
+        "lupinus_mutabilis",
+        "phaseolus_vulgaris"
+      ],
+      "antagonists": [],
+      "_nota_antagonists": "Evitar monocultivo y rotación papa-papa: concentra Phytophthora infestans (gota), Tecia solanivora (polilla guatemalteca) y nematodo quiste (Globodera pallida). No asociar con otras solanáceas (tomate, lulo, tomate de árbol) por compartir gota y mosca blanca. Rotar con leguminosas (haba, arveja, lupino) y cereales.",
+      "propagation": {
+        "methods": [
+          "tuberculo",
+          "semilla"
+        ],
+        "best_method": "tuberculo",
+        "protocol_resumen": "Tubérculo-semilla certificado pre-brotado (yemas de 1-2 cm, verdeado a luz difusa). Siembra a 10-15 cm de profundidad, distancia 30 cm entre plantas × 90-100 cm entre surcos. Densidad ~33.000-40.000 plantas/ha. La semilla sexual (botánica) solo se usa en programas de mejoramiento, no en producción comercial.",
+        "tiempo_a_establecimiento_dias": 21,
+        "notas": "Renovar semilla certificada cada 2-3 ciclos por degeneración viral (PVY, PLRV) y bacteriana (Ralstonia, Pectobacterium). Fenología por etapas: (1) Brotación/emergencia 0-25 días; (2) Desarrollo vegetativo y crecimiento de follaje 25-45 días; (3) Inicio de tuberización (estolones) 45-60 días — etapa que define el número de tubérculos; (4) Llenado/engrose de tubérculo 60-110 días — máxima demanda de K y agua; (5) Maduración de piel y senescencia del follaje 110-150 días; (6) Cosecha 150-180 días según variedad.",
+        "fuente": "AGROSAVIA Manual tubérculos andinos 2017; Pérez-Rodríguez-Gómez 2008; Núñez-Rodríguez 2024 UNAL."
+      },
+      "plagas_criticas": [
+        "Tecia solanivora (polilla guatemalteca de la papa)",
+        "Premnotrypes vorax (gusano blanco / chiza de la papa)",
+        "Phyllophaga spp. y Ancognatha spp. (chiza, larva rizófaga)",
+        "Globodera pallida / Globodera rostochiensis (nematodo del quiste de la papa)",
+        "Liriomyza huidobrensis (minador de la hoja)",
+        "Epitrix spp. (pulguilla de la papa)"
+      ],
+      "enfermedades_criticas": [
+        "Phytophthora infestans (gota o tizón tardío) — enfermedad #1, devastadora en clima frío húmedo",
+        "Alternaria solani (tizón temprano)",
+        "Rhizoctonia solani (costra negra / cancro del tallo)",
+        "Spongospora subterranea (sarna polvosa, vector del Potato mop-top virus)",
+        "Ralstonia solanacearum (marchitez bacteriana / dormidera)",
+        "Pectobacterium / Dickeya (pudrición blanda y pierna negra)"
+      ],
+      "feeding_plan_template": {
+        "source": "AGROSAVIA Manual tubérculos andinos (2017) + Pérez-Rodríguez-Gómez (2008) — plan agroecológico de transición para papa de año clima frío 2500-3200 msnm. Énfasis preventivo contra gota (Phytophthora infestans).",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Aplicar bocashi al surco a la siembra",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 300,
+            "notes": "Surco preparado 0-20 cm. Tubérculo-semilla certificado pre-brotado. Suelo bien drenado; evitar encharcamiento (favorece Phytophthora y Ralstonia)."
+          },
+          {
+            "offset_days": 25,
+            "action": "Inocular Trichoderma harzianum al suelo",
+            "biofertilizer_slug": "trichoderma_harzianum_suelo",
+            "dose_g": 15,
+            "notes": "Preventivo Rhizoctonia solani y Spongospora subterranea. Coincide con emergencia/inicio vegetativo."
+          },
+          {
+            "offset_days": 45,
+            "action": "Primer aporque + drench con humus líquido",
+            "biofertilizer_slug": "humus_liquido",
+            "dose_ml": 200,
+            "notes": "Dilución 1:5. Aporque alto fundamental: cubre estolones, protege tubérculos de la luz (evita verdeo/solanina) y de la polilla Tecia, y mejora drenaje. Inicio de tuberización."
+          },
+          {
+            "offset_days": 60,
+            "action": "Foliar preventivo de gota con caldo bordelés",
+            "biofertilizer_slug": "caldo_bordeles",
+            "dose_ml": 100,
+            "notes": "Concentración 1%. PREVENTIVO de Phytophthora infestans — NUNCA curativo. Iniciar antes de la primera lluvia persistente y repetir cada 10-14 días en condición de niebla/lluvia. El Cu deja residuo: alternar con Bacillus subtilis foliar y reducir frecuencia en seco."
+          },
+          {
+            "offset_days": 75,
+            "action": "Foliar con Bacillus subtilis (alternar con bordelés)",
+            "biofertilizer_slug": "bacillus_subtilis_foliar",
+            "dose_ml": 80,
+            "notes": "Antagonista preventivo de Phytophthora y Alternaria; reduce dependencia del cobre. Aplicar al atardecer."
+          },
+          {
+            "offset_days": 90,
+            "action": "Foliar con supermagro durante llenado de tubérculo",
+            "biofertilizer_slug": "supermagro",
+            "dose_ml": 60,
+            "notes": "Dilución 1:15. K crítico para engrose de tubérculo y materia seca. Etapa de máxima demanda hídrica y de potasio."
+          },
+          {
+            "offset_days": 130,
+            "action": "Suspender riego para madurar la piel",
+            "notes": "Reducir riego 80% las últimas 3 semanas. Piel madura = mejor conservación y menor pudrición post-cosecha. Cosecha 150-180 días. Curar tubérculos a la sombra 1-2 semanas antes de almacenar."
+          }
+        ]
+      },
+      "source_ids": [
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "nustez-rodriguez-2024-unal",
+        "perez-rodriguez-gomez-2008",
+        "ica-resolucion-3168-2015",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "La papa (Solanum tuberosum L., familia Solanaceae) es el cultivo de tubérculo más importante del clima frío colombiano y el segundo alimento de consumo nacional después del arroz. Domesticada hace más de 7.000 años en los Andes (cuenca del lago Titicaca, Perú-Bolivia), llegó al altiplano colombiano y hoy se cultiva intensivamente entre 2.500 y 3.200 msnm en Cundinamarca (Sabana de Bogotá, Subachoque, Zipaquirá, Une, Carmen de Carupa), Boyacá (Ventaquemada, Toca, Soracá, Tunja), Nariño (Túquerres, Pupiales, Guachucal, Ipiales — principal departamento productor) y norte de Antioquia (La Unión, Sonsón). Las variedades comerciales dominantes en Colombia son Diacol Capiro (R-12, industrial para fritura), Pastusa Suprema, Superior, Única, Esmeralda y la papa criolla amarilla (Grupo Phureja). El enemigo número uno es la gota o tizón tardío (Phytophthora infestans), un oomiceto que en clima frío húmedo y con neblina puede destruir un lote entero en menos de una semana; fue el patógeno responsable de la Gran Hambruna Irlandesa (1845-1849) y sigue siendo el factor que más encarece y contamina el cultivo, pues ata al productor a 8-14 aplicaciones de fungicida por ciclo. Manejo agroecológico de transición: rotación obligatoria con leguminosas (haba, arveja, lupino/chocho) que fijan nitrógeno y rompen el ciclo de plagas de suelo; semilla certificada renovada cada 2-3 ciclos contra la degeneración viral (PVY, PLRV); aporque alto para proteger tubérculos de la polilla guatemalteca (Tecia solanivora) y del verdeo; manejo PREVENTIVO de la gota con caldo bordelés al 1% y Bacillus subtilis alternados antes de las lluvias (nunca como cura una vez establecida); Trichoderma harzianum al suelo contra Rhizoctonia y sarna polvosa; y asociación con caléndula y tagetes para repeler insectos y nematodos. La papa enseña la lección central de la soberanía alimentaria andina: la inmensa diversidad de variedades nativas (más de 4.000 en los Andes) es el seguro biológico frente a plagas y cambio climático, y su erosión por el monocultivo de pocas variedades comerciales es un riesgo real. Fuentes Tier A: AGROSAVIA Manual Tubérculos Andinos 2017, Núñez-Rodríguez 2024 UNAL, Pérez-Rodríguez-Gómez 2008, ICA Resolución 3168/2015, GBIF Backbone, POWO Kew.",
+      "validation_level": "claude_draft",
+      "tracking_mode": "aggregate"
+    },
+    {
       "id": "solanum_tuberosum_pastusa_suprema",
       "nombre_comun": "Papa Pastusa Suprema",
       "nombre_comunes_regionales": [
@@ -3015,6 +3369,20 @@
         "phaseolus_vulgaris",
         "cajanus_cajan",
         "musa_paradisiaca"
+      ],
+      "plagas_criticas": [
+        "Phenacoccus manihoti (cochinilla harinosa de la yuca, controlada biológicamente con Anagyrus lopezi)",
+        "Mononychellus tanajoa (ácaro verde de la yuca)",
+        "Bemisia tuberculata / Aleurotrachelus socialis (mosca blanca, vector de virus)",
+        "Erinnyis ello (gusano cachón / cornudo de la yuca, defoliador)",
+        "Chilomima clarkei (barrenador del tallo)"
+      ],
+      "enfermedades_criticas": [
+        "Xanthomonas axonopodis pv. manihotis (bacteriosis / añublo bacterial de la yuca)",
+        "Phytophthora spp. (pudrición radical en suelos encharcados)",
+        "Sphaceloma manihoticola (superalargamiento)",
+        "Colletotrichum gloeosporioides f. sp. manihotis (antracnosis del tallo)",
+        "Mosaico/virosis de la yuca (complejo de geminivirus transmitido por mosca blanca y material de siembra)"
       ],
       "tracking_mode": "aggregate"
     },
@@ -4094,6 +4462,7 @@
       "nombre_cientifico": "Persea americana Mill.",
       "familia_botanica": "Lauraceae",
       "category": "frutales_perennes",
+      "estrato": "alto",
       "thermal_zones": [
         "calido",
         "templado"
@@ -4180,6 +4549,7 @@
       "nombre_cientifico": "Musa × paradisiaca L.",
       "familia_botanica": "Musaceae",
       "category": "frutales_perennes",
+      "estrato": "alto",
       "thermal_zones": [
         "calido",
         "templado"
@@ -4265,6 +4635,19 @@
         "phaseolus_vulgaris",
         "manihot_esculenta",
         "cajanus_cajan"
+      ],
+      "plagas_criticas": [
+        "Cosmopolites sordidus (picudo negro del plátano, barrena el cormo)",
+        "Metamasius hemipterus (picudo rayado)",
+        "Opogona / barrenadores del pseudotallo",
+        "Nematodos (Radopholus similis, Pratylenchus, Helicotylenchus — daño radical y volcamiento)"
+      ],
+      "enfermedades_criticas": [
+        "Mycosphaerella fijiensis (Sigatoka negra) — enfermedad foliar #1, defolia y adelanta maduración",
+        "Fusarium oxysporum f. sp. cubense raza 4 tropical (Foc R4T / Mal de Panamá) — amenaza cuarentenaria devastadora",
+        "Ralstonia solanacearum raza 2 (moko del plátano, bacteriosis vascular)",
+        "Erwinia / Pectobacterium (pudrición acuosa del pseudotallo)",
+        "Virus del rayado del banano (BSV) y virus del mosaico"
       ]
     },
     {
@@ -4313,6 +4696,297 @@
       "antagonists": [],
       "tracking_mode": "aggregate",
       "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "BORRADOR_IA",
+      "id": "vaccinium_corymbosum",
+      "nombre_comun": "Arándano",
+      "nombre_comunes_regionales": [
+        "arándano azul",
+        "blueberry",
+        "arándano highbush"
+      ],
+      "nombre_cientifico": "Vaccinium corymbosum L.",
+      "familia_botanica": "Ericaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": null,
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 12,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "ph_suelo": {
+        "min": 4,
+        "optimo_min": 4.5,
+        "optimo_max": 5.5,
+        "max": 6
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "heladas_tolerancia": {
+        "umbral_c": -4,
+        "horas_acumuladas_max": 6,
+        "notas": "El arbusto en reposo tolera heladas fuertes, pero la flor abierta se daña por debajo de -1 °C. En el trópico de altura no hay reposo invernal verdadero, por lo que florece y fructifica de forma escalonada casi todo el año."
+      },
+      "companions": [],
+      "antagonists": [],
+      "_nota_antagonists": "Requisito agronómico crítico: pH del suelo muy ácido (4.5-5.5). No asociar en cama con cultivos de pH neutro (hortalizas comunes), porque las enmiendas de cal que esos cultivos requieren matan al arándano por clorosis férrica. Manejar en cama o contenedor aislado con sustrato acidificado (turba, corteza/aserrín de pino, azufre elemental).",
+      "propagation": {
+        "methods": [
+          "esqueje",
+          "acodo",
+          "micropropagacion"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Propagación clonal por estaca semileñosa o leñosa enraizada en sustrato ácido y aireado, o por micropropagación (planta certificada). En Colombia se cultiva con variedades de bajo requerimiento de frío (low-chill) tipo 'Biloxi', 'Misty', 'Sharpblue' adaptadas al trópico de altura. Distancia 0.6-1 m entre plantas × 2.5-3 m entre hileras.",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "Fenología por etapas en trópico de altura (sin reposo invernal marcado): (1) Establecimiento de raíz superficial fibrosa 0-12 meses — la raíz es somera, sin pelos radiculares, depende de micorrizas ericoides y de mulch ácido; (2) Brotación vegetativa y formación de madera frutal año 1-2; (3) Floración escalonada y cuajado desde el segundo año; (4) Desarrollo y maduración de baya ~60-90 días desde flor; (5) Cosecha escalonada casi continua con podas de renovación anuales; (6) Plena producción a partir del año 3-4, vida productiva 10-15 años. Acidificar y mantener pH 4.5-5.5 de por vida (monitoreo de pH del agua de riego).",
+        "fuente": "AGROSAVIA Manual de arándano (2018); ICA Resolución 3168/2015."
+      },
+      "plagas_criticas": [
+        "Frankliniella spp. (trips en floración)",
+        "Tetranychus urticae (ácaro)",
+        "Drosophila suzukii (mosca de alas manchadas, perfora la baya — cuarentenaria emergente)",
+        "Aphis spp. (áfidos, vectores de virus)",
+        "Aves frugívoras (pérdida directa de cosecha)"
+      ],
+      "enfermedades_criticas": [
+        "Botrytis cinerea (moho gris en flor y fruto)",
+        "Colletotrichum spp. (antracnosis / pudrición madura de la baya)",
+        "Phytophthora cinnamomi (pudrición de raíz por mal drenaje)",
+        "Clorosis férrica fisiológica por pH alto (NO patógeno — déficit de Fe asimilable si el suelo no es ácido)"
+      ],
+      "feeding_plan_template": {
+        "source": "AGROSAVIA Manual de arándano (2018) — establecimiento en sustrato acidificado, clima frío 2200-2800 msnm.",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Plantar en hoyo con sustrato ácido + compost",
+            "biofertilizer_slug": "compost_maduro",
+            "dose_g": 1500,
+            "notes": "Mezclar suelo con corteza/aserrín de pino, turba y compost maduro. NUNCA aplicar cal. Acidificar a pH 4.5-5.5 con azufre elemental si es necesario. Drenaje excelente obligatorio."
+          },
+          {
+            "offset_days": 30,
+            "action": "Acolchar la base con corteza/aserrín de pino",
+            "notes": "Mulch ácido de pino mantiene humedad, baja pH gradualmente y protege la raíz superficial. Reponer cada 6 meses."
+          },
+          {
+            "offset_days": 60,
+            "action": "Drench con humus líquido acidificado",
+            "biofertilizer_slug": "humus_liquido",
+            "dose_ml": 200,
+            "notes": "Dilución 1:5. Aporte de N orgánico; preferir fuentes de N amoniacal/orgánico (no nitrato) que el arándano asimila mejor en suelo ácido."
+          },
+          {
+            "offset_days": 120,
+            "action": "Foliar preventivo con Bacillus subtilis en floración",
+            "biofertilizer_slug": "bacillus_subtilis_foliar",
+            "dose_ml": 80,
+            "notes": "Antagonista de Botrytis cinerea y antracnosis en flor/fruto. Aplicar al atardecer."
+          },
+          {
+            "offset_days": 180,
+            "action": "Foliar con biofertilizante de algas (micronutrientes)",
+            "biofertilizer_slug": "biofertilizante_algas",
+            "dose_ml": 60,
+            "notes": "Aporte de micronutrientes (Fe, Mn, B) quelatados; previene clorosis férrica si el pH se mantiene ácido. Vigilar amarillamiento internerval = señal de pH alto."
+          }
+        ]
+      },
+      "source_ids": [
+        "agrosavia-manual-arandano-2018",
+        "ica-resolucion-3168-2015",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "El arándano azul (Vaccinium corymbosum L., familia Ericaceae), conocido en inglés como blueberry o highbush blueberry, es un arbusto frutal de origen norteamericano que se ha convertido en un cultivo de exportación de alto valor en el trópico de altura colombiano, sembrado en Cundinamarca (Sabana de Bogotá, oriente, Sumapaz), Antioquia (oriente antioqueño) y Boyacá entre 2.200 y 2.800 msnm con variedades de bajo requerimiento de frío (low-chill) como 'Biloxi', 'Misty' y 'Sharpblue', que florecen y fructifican de forma casi continua porque en el trópico no existe el reposo invernal de las zonas templadas. La particularidad agronómica que lo define —y que hay que entender antes de sembrarlo— es su exigencia de un suelo MUY ácido (pH 4.5-5.5) y de raíz superficial fibrosa sin pelos radiculares que depende de micorrizas ericoides y de un acolchado (mulch) ácido de corteza o aserrín de pino. En suelo de pH neutro o alcalino la planta sufre clorosis férrica (amarillamiento internerval por falta de hierro asimilable) y muere; por eso NO se debe asociar con cultivos que requieran encalado, y se maneja en cama o contenedor con sustrato acidificado. Sus retos fitosanitarios principales son el moho gris (Botrytis cinerea) y la antracnosis (Colletotrichum) en flor y fruto, los trips en floración, y la mosca de alas manchadas (Drosophila suzukii), plaga cuarentenaria emergente que perfora la baya madura. Manejo agroecológico: sustrato y mulch ácidos de pino, drenaje excelente (Phytophthora cinnamomi pudre la raíz con exceso de agua), Bacillus subtilis preventivo contra Botrytis, biofertilizante de algas para micronutrientes, riego con agua de pH controlado y malla anti-pájaros. El arándano enseña la lección de que el éxito de un frutal depende primero de ajustar el suelo a su fisiología —en este caso la acidez— antes que de cualquier fertilización. Fuentes Tier A: AGROSAVIA Manual de arándano 2018, ICA Resolución 3168/2015, GBIF Backbone, POWO Kew.",
+      "validation_level": "claude_draft",
+      "tracking_mode": "individual"
+    },
+    {
+      "_curation_status": "BORRADOR_IA",
+      "_anti_confusion": "Vaccinium meridionale (agraz/mortiño, arándano andino NATIVO). NO confundir con Vaccinium corymbosum (arándano azul comercial introducido norteamericano) ni con Vaccinium floribundum (mortiño de páramo, otra especie nativa).",
+      "id": "vaccinium_meridionale",
+      "nombre_comun": "Agraz / Mortiño",
+      "nombre_comunes_regionales": [
+        "agraz",
+        "mortiño",
+        "arándano andino",
+        "arándano nativo",
+        "joyapa"
+      ],
+      "nombre_cientifico": "Vaccinium meridionale Sw.",
+      "familia_botanica": "Ericaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "harvest_type": "fruto",
+      "cycleMonths": null,
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2300,
+        "optimo_max": 3200,
+        "max_absoluto": 3800
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 8,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "ph_suelo": {
+        "min": 4,
+        "optimo_min": 4.5,
+        "optimo_max": 5.5,
+        "max": 6
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "companions": [],
+      "antagonists": [],
+      "_nota_antagonists": "Como toda ericácea, requiere suelo ácido (4.5-5.5) y micorriza ericoide nativa; no encalar. Se asocia naturalmente en bordes de bosque altoandino y subpáramo.",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje",
+          "acodo"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Propagación por semilla (germinación lenta y errática, requiere sustrato ácido y luz) o clonal por estaca/acodo de material seleccionado de poblaciones silvestres. La domesticación está en curso (AGROSAVIA, UNAL): la mayor parte de la cosecha aún proviene de recolección silvestre en relictos de bosque altoandino.",
+        "tiempo_a_establecimiento_dias": 120,
+        "notas": "Fenología: arbusto perenne de bosque altoandino; floración y fructificación marcadas por la estacionalidad de lluvias, con cosecha silvestre tradicional en julio-agosto y noviembre-enero en la región andina. Fruto pequeño azul-negro de alto contenido de antocianinas y antioxidantes (mayor que el arándano comercial). Crecimiento lento; entra en producción al año 3-4."
+      },
+      "plagas_criticas": [
+        "Frankliniella spp. (trips en floración)",
+        "Aves frugívoras (dispersan pero compiten por la cosecha)",
+        "Larvas de lepidópteros defoliadores (en relictos silvestres)"
+      ],
+      "enfermedades_criticas": [
+        "Botrytis cinerea (moho gris en fruto en poscosecha)",
+        "Colletotrichum spp. (antracnosis del fruto)"
+      ],
+      "source_ids": [
+        "agrosavia-manual-frutales-tropicales",
+        "humboldt-flora-alto-andina",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "El agraz o mortiño (Vaccinium meridionale Sw., familia Ericaceae) es el arándano andino NATIVO de Colombia, un arbusto silvestre de los bosques altoandinos y subpáramos que crece de forma natural entre 2.300 y 3.200 msnm en Cundinamarca, Boyacá (provincias de Norte y Gutiérrez, Arcabuco, Villa de Leyva), Santander, Antioquia, Nariño y la cordillera Oriental, y que también se distribuye en Venezuela y los Andes del norte (no es endémico de Colombia). Su fruto pequeño, azul-negro y de sabor ácido-dulce, ha sido recolectado tradicionalmente por las comunidades campesinas para preparar el 'sabajón de agraz', vinos, mermeladas, coladas y postres, y tiene un contenido de antocianinas y capacidad antioxidante superior al del arándano comercial importado (Vaccinium corymbosum), lo que lo posiciona como un superalimento nativo de altísimo potencial. A diferencia del arándano azul de cultivo, gran parte de la cosecha aún proviene de recolección silvestre en relictos de bosque altoandino, lo que lo vincula directamente a la conservación de esos ecosistemas: el agraz es a la vez alimento, ingreso campesino y especie clave para fauna frugívora y polinizadores. La domesticación y propagación clonal están en curso (AGROSAVIA, Universidad Nacional) para reducir la presión sobre las poblaciones silvestres. Como toda ericácea requiere suelo ácido (pH 4.5-5.5), micorriza ericoide nativa y NO tolera el encalado. Su manejo agroecológico privilegia el aprovechamiento sostenible de rodales silvestres (no cosechar más del fruto disponible, dejar semilla para regeneración) y el establecimiento de cultivos con material seleccionado en sustrato ácido. El agraz enseña el valor de los frutales nativos como alternativa de soberanía alimentaria frente a la dependencia de especies importadas, y la importancia de conservar el bosque altoandino que lo alberga. Fuentes Tier A: AGROSAVIA Manual de frutales tropicales, Humboldt Flora Alto-Andina, GBIF Backbone, POWO Kew.",
+      "validation_level": "claude_draft",
+      "tracking_mode": "individual",
+      "rol_restauracion": "secundaria",
+      "apta_ribera": null
+    },
+    {
+      "_curation_status": "BORRADOR_IA",
+      "id": "oryza_sativa",
+      "nombre_comun": "Arroz",
+      "nombre_comunes_regionales": [
+        "arroz de riego",
+        "arroz secano",
+        "arroz paddy"
+      ],
+      "nombre_cientifico": "Oryza sativa L.",
+      "familia_botanica": "Poaceae",
+      "category": "cereales",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "grano",
+      "cycleMonths": 5,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1000,
+        "max_absoluto": 1300
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 38
+      },
+      "ph_suelo": {
+        "min": 4.5,
+        "optimo_min": 5.5,
+        "optimo_max": 6.5,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bajo",
+      "companions": [],
+      "antagonists": [],
+      "_nota_antagonists": "Monocultivo dominante en Colombia (riego en Tolima/Huila/Meta/Casanare; secano en llanos y costa). Buena práctica agroecológica: rotación con leguminosa de cobertura (Crotalaria, soya, fríjol caupí) entre ciclos para fijar N y romper el ciclo de Tagosodes y nematodos; integración con peces/patos en arroz inundado (sistema rice-fish) para control biológico.",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra directa al voleo o en hileras con semilla certificada (riego), o por trasplante de plántulas desde semillero (más común en pequeña escala/SRI). Densidad de siembra 150-200 kg/ha en voleo. Lámina de agua manejada por etapas en sistema de riego.",
+        "tiempo_a_establecimiento_dias": 15,
+        "notas": "Fenología por etapas (BBCH simplificado): (1) Germinación y plántula 0-15 días; (2) Macollamiento (ahijamiento) 15-45 días — definición del número de tallos productivos; (3) Inicio de primordio / fase reproductiva (encañe) 45-65 días; (4) Embuchamiento y emergencia de la panícula (floración/antesis) 65-90 días — etapa crítica de agua y la más sensible a daño por Tagosodes y vaneamiento; (5) Llenado de grano (lechoso → pastoso) 90-115 días; (6) Maduración y cosecha 115-150 días. El arroz de riego mantiene lámina de agua; el secano depende de lluvia.",
+        "fuente": "FEDEARROZ Manual técnico del cultivo de arroz (2018)."
+      },
+      "plagas_criticas": [
+        "Tagosodes orizicolus (sogata, vector del Virus de la Hoja Blanca — plaga #1 en Colombia)",
+        "Spodoptera frugiperda (cogollero/gusano ejército)",
+        "Hydrellia spp. (mosca minadora de la hoja)",
+        "Oebalus spp. (chinche del grano, causa vaneamiento y manchado)",
+        "Diatraea saccharalis (barrenador del tallo)"
+      ],
+      "enfermedades_criticas": [
+        "Pyricularia oryzae (añublo / quema del arroz / blast) — enfermedad fúngica #1",
+        "Virus de la Hoja Blanca (VHB) transmitido por Tagosodes orizicolus",
+        "Rhizoctonia solani (añublo de la vaina)",
+        "Burkholderia glumae (añublo bacterial de la panícula, agravado por calor)",
+        "Helminthosporium / Bipolaris oryzae (mancha parda)"
+      ],
+      "source_ids": [
+        "fedearroz-manual-arroz-2018",
+        "fao-ecocrop",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "El arroz (Oryza sativa L., familia Poaceae) es el cereal de mayor consumo per cápita en Colombia y el alimento básico de la dieta nacional, cultivado en tierra caliente entre 0 y 1.000 msnm bajo dos grandes sistemas: arroz de riego (con lámina de agua controlada) en el Tolima, Huila, Meta y Casanare, y arroz secano (de temporal, dependiente de lluvia) en los Llanos Orientales, el Bajo Cauca y la Costa Caribe. Domesticado hace más de 8.000 años en Asia, es una gramínea semiacuática cuya particularidad fisiológica es la tolerancia a la inundación gracias a tejidos aerénquima que llevan oxígeno a la raíz sumergida. Su fenología pasa por germinación, macollamiento (cuando define el número de tallos productivos), fase reproductiva con la emergencia de la panícula y antesis —la etapa más sensible a la falta de agua y al daño de plagas—, llenado de grano y maduración, en un ciclo de 4-5 meses. El mayor problema fitosanitario del arroz colombiano es el complejo sogata-Virus de la Hoja Blanca: el insecto Tagosodes orizicolus transmite un virus devastador, por lo que el manejo se centra en variedades resistentes y en evitar siembras escalonadas que mantengan poblaciones del vector. Le siguen el añublo o quema (Pyricularia oryzae), hongo que ataca hoja, cuello y panícula, el añublo bacterial (Burkholderia glumae) agravado por el calor nocturno, y plagas como el cogollero y los chinches que vanean el grano. Manejo agroecológico de transición: rotación con leguminosas de cobertura entre ciclos para fijar nitrógeno y cortar el ciclo de plagas; manejo eficiente del agua para reducir emisiones de metano del arroz inundado; integración rice-fish o con patos para control biológico de insectos y malezas; uso de Trichoderma y Bacillus contra hongos; y semilla certificada de variedades resistentes a sogata. El arroz enseña la gestión del agua como eje del cultivo y el reto ambiental de un sistema que, mal manejado, es gran emisor de metano y gran consumidor de agroquímicos. NOTA DE VERIFICACIÓN: las variedades comerciales y umbrales económicos de plaga deben consultarse en la ficha oficial vigente de FEDEARROZ/AGROSAVIA antes de decisiones de campo. Fuentes: FEDEARROZ Manual técnico del arroz 2018, FAO Ecocrop, GBIF Backbone, POWO Kew.",
+      "validation_level": "claude_draft",
+      "tracking_mode": "aggregate"
     }
   ],
   "sources": [
@@ -4348,6 +5022,36 @@
       "observaciones": "Compilación de fichas técnicas de AGROSAVIA para leguminosas de clima frío. Año y volumen pendientes de consolidación. _audit_note: cita aglutinadora; buscar fichas individuales en repository.agrosavia.co o agrosavia.co/productos-y-servicios/oferta-tecnologica.",
       "tier": "A",
       "_url_pendiente": true
+    },
+    {
+      "id": "agrosavia-manual-arandano-2018",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": 2018,
+      "titulo": "Manual técnico para el cultivo de arándano (Vaccinium corymbosum) en Colombia",
+      "institucion": "AGROSAVIA",
+      "observaciones": "_audit_note: buscar handle en repository.agrosavia.co por 'arándano Vaccinium 2018'. Respalda requerimiento de pH ácido (4.5-5.5), manejo de sustrato y mulch de pino.",
+      "tier": "A"
+    },
+    {
+      "id": "agrosavia-manual-fresa-2013",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": 2013,
+      "titulo": "Manual técnico para el cultivo de fresa (Fragaria × ananassa) en clima frío de Colombia",
+      "institucion": "AGROSAVIA",
+      "observaciones": "_audit_note: buscar handle en repository.agrosavia.co por 'fresa Fragaria ananassa'. Respalda manejo de Botrytis cinerea, ácaro Tetranychus y propagación por estolón/corona.",
+      "tier": "A"
+    },
+    {
+      "id": "fedearroz-manual-arroz-2018",
+      "tipo": "manual_tecnico",
+      "autores": "Federación Nacional de Arroceros (FEDEARROZ) — Fondo Nacional del Arroz",
+      "año": 2018,
+      "titulo": "Manual técnico del cultivo de arroz (Oryza sativa) bajo riego y secano en Colombia",
+      "institucion": "FEDEARROZ",
+      "observaciones": "_audit_note: FEDEARROZ es la autoridad gremial-técnica del arroz en Colombia. Respalda fenología, manejo de Tagosodes orizicolus (sogata/virus de la hoja blanca) y Pyricularia oryzae (añublo/quema).",
+      "tier": "B"
     },
     {
       "id": "agrosavia-manual-biopreparados-2015",
