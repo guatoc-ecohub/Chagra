@@ -25,6 +25,8 @@
  * @property {string} defaultUnit — unidad por defecto al iniciar
  * @property {string} subjectLabelPlaceholder — placeholder del campo "qué"
  * @property {string} startVerb — etiqueta del botón "iniciar"
+ * @property {string} emptyHint — invitación amable en la tarjeta cuando el
+ *   contador está en cero (en vez de un "0" triste). Español Colombia.
  */
 
 /** @type {SeguimientoProcesoDef[]} */
@@ -40,6 +42,7 @@ export const SEGUIMIENTO_PROCESOS = [
     defaultUnit: 'árboles',
     subjectLabelPlaceholder: 'Ej: Roble, Aliso, Cativo…',
     startVerb: 'Iniciar reforestación',
+    emptyHint: 'Siembra tus primeros árboles',
   },
   {
     key: 'silvopastoreo',
@@ -52,6 +55,7 @@ export const SEGUIMIENTO_PROCESOS = [
     defaultUnit: 'árboles',
     subjectLabelPlaceholder: 'Ej: Leucaena, Botón de oro, Nacedero…',
     startVerb: 'Iniciar silvopastoreo',
+    emptyHint: 'Une árboles, pasto y ganado',
   },
   {
     key: 'paramo',
@@ -64,6 +68,7 @@ export const SEGUIMIENTO_PROCESOS = [
     defaultUnit: 'hectáreas',
     subjectLabelPlaceholder: 'Ej: Nacimiento de agua, frailejonal…',
     startVerb: 'Iniciar conservación',
+    emptyHint: 'Cuida tu páramo y el agua',
   },
   {
     key: 'cerdos',
@@ -76,6 +81,7 @@ export const SEGUIMIENTO_PROCESOS = [
     defaultUnit: 'animales',
     subjectLabelPlaceholder: 'Ej: Lote de engorde, marranas de cría…',
     startVerb: 'Iniciar ciclo',
+    emptyHint: 'Arranca tu primer lote',
   },
 ];
 

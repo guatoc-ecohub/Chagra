@@ -52,16 +52,32 @@ describe('SeguimientoCards — tarjetas de seguimiento en el home', () => {
       { attributes: { process_type: 'pigs', status: 'active' } },
     ];
     render(<SeguimientoCards onNavigate={vi.fn()} />);
-    // Las cards muestran el conteo en el badge data-testid="finca-card-count".
+    // Las cards CON procesos muestran el conteo en la pastilla
+    // data-testid="finca-card-count" (refinamiento visual 2026-06-18).
     await waitFor(() => {
       const counts = screen.getAllByTestId('finca-card-count');
-      // 4 cards → 4 badges (incluye los 0).
-      expect(counts.length).toBe(4);
+      // Reforestación (2) y Cerdos (1) → 2 pastillas de conteo.
+      expect(counts.length).toBe(2);
     });
     const counts = screen.getAllByTestId('finca-card-count').map((n) => n.textContent);
-    // Reforestación = 2, cerdos = 1, silvopastoreo/páramo = 0.
+    // Reforestación = 2, cerdos = 1.
     expect(counts).toContain('2');
     expect(counts).toContain('1');
+  });
+
+  test('una tarjeta en cero muestra invitación amable, no un "0" pelado', async () => {
+    // Estado vacío amable (refinamiento 2026-06-18): en vez de un "0" triste,
+    // la pastilla "Empieza" + la invitación cálida del proceso.
+    activeProcesses = []; // las 4 en cero
+    render(<SeguimientoCards onNavigate={vi.fn()} />);
+    await waitFor(() => {
+      expect(screen.getAllByTestId('finca-card-empty').length).toBe(4);
+    });
+    // No debe quedar ninguna pastilla con el conteo "0".
+    expect(screen.queryAllByTestId('finca-card-count').length).toBe(0);
+    // La invitación por proceso aparece (copy de seguimientoProcesos.emptyHint).
+    expect(screen.getByText('Siembra tus primeros árboles')).toBeInTheDocument();
+    expect(screen.getByText('Arranca tu primer lote')).toBeInTheDocument();
   });
 
   test('tocar Reforestación navega a su vista de seguimiento', async () => {
