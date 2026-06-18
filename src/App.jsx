@@ -31,6 +31,9 @@ import { cropAlertEngine } from './services/cropAlertEngine';
 // import FieldFeedback from './components/FieldFeedback';
 import AgentFab from './components/AgentFab';
 import AgentOfflineGuard from './components/AgentScreen/AgentOfflineGuard';
+// Transición home→conversación: el colibrí en video (~2s). Eager (debe
+// aparecer al instante al enviar desde el hero).
+import ColibriTransition from './components/agent/ColibriTransition';
 import { ScreenShell } from './components/common/ScreenShell';
 import ChagraGrowLoader from './components/ChagraGrowLoader';
 import Confetti from './components/common/Confetti';
@@ -425,12 +428,22 @@ export default function App() {
   const [currentViewData, setCurrentViewData] = useState(null);
   const [toast, setToast] = useState(null);
   const [lastLogMessage, setLastLogMessage] = useState('');
+  // Transición colibrí (home→conversación): se activa al pasar de la portada
+  // (dashboard, donde vive el AgentHero) al agente. El overlay va ENCIMA y la
+  // conversación monta detrás; al terminar, queda la conversación limpia.
+  const [colibriTransition, setColibriTransition] = useState(false);
 
   // navigate(view, data), único entry point para cambiar vista. Limpia
   // currentViewData salvo cuando se pasa explícitamente. Sin esto, navegar
   // dashboard → vista_con_initialData → dashboard → misma_vista_otra_vez
   // reusaba el initialData stale (bug latente de UX).
   const navigate = useCallback((view, initialData = null) => {
+    // Transición colibrí solo en home→conversación (la portada con el hero del
+    // agente → el agente). Otras entradas al agente (FAB, tile, notificación)
+    // conservan la entrada suave estándar del AgentScreen, sin video.
+    if (view === 'agente' && currentView === 'dashboard') {
+      setColibriTransition(true);
+    }
     setCurrentView(view);
     setCurrentViewData(initialData);
     try {
@@ -1145,6 +1158,7 @@ export default function App() {
             <ErrorFallback moduleName="Agente">
               <AgentScreen
                 onBack={() => navigate('dashboard')}
+                onNavigate={navigate}
                 initialContext={currentViewData}
               />
             </ErrorFallback>
@@ -1161,6 +1175,9 @@ export default function App() {
 
   return (
     <>
+      {/* Transición colibrí home→conversación (~2s). Encima de todo (z alto);
+          la conversación monta detrás y queda limpia al terminar. */}
+      <ColibriTransition active={colibriTransition} onDone={() => setColibriTransition(false)} />
       <NetworkStatusBar />
       <IosInstallBanner />
       <AndroidInstallBanner />
