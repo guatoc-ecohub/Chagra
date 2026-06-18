@@ -59,6 +59,7 @@ const GROUP_META = Object.freeze({
   cuidar: { icon: '🐛', label: 'Cuidar y prevenir' },
   observar: { icon: '👁️', label: 'Mirar la finca' },
   restaurar: { icon: '🌳', label: 'Restaurar y conservar' },
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- rótulo legacy, migración i18n diferida a ADR-050 (preexistente)
   registrar: { icon: '📝', label: 'Guardar lo que hago' },
   planear: { icon: '📅', label: 'Planear' },
   aprender: { icon: '📚', label: 'Aprender' },
@@ -126,23 +127,6 @@ function cubicPt(b, t) {
     x: u * u * u * b.p0.x + 3 * u * u * t * b.c1.x + 3 * u * t * t * b.c2.x + t * t * t * b.p1.x,
     y: u * u * u * b.p0.y + 3 * u * u * t * b.c1.y + 3 * u * t * t * b.c2.y + t * t * t * b.p1.y,
   };
-}
-
-function cubicTan(b, t) {
-  const u = 1 - t;
-  return {
-    x: 3 * u * u * (b.c1.x - b.p0.x) + 6 * u * t * (b.c2.x - b.c1.x) + 3 * t * t * (b.p1.x - b.c2.x),
-    y: 3 * u * u * (b.c1.y - b.p0.y) + 6 * u * t * (b.c2.y - b.c1.y) + 3 * t * t * (b.p1.y - b.c2.y),
-  };
-}
-
-/** Ramita decorativa que sale de la rama madre en t, hacia el lado dir. */
-function twigD(b, t, dir) {
-  const p = cubicPt(b, t), tn = cubicTan(b, t), l = Math.hypot(tn.x, tn.y) || 1;
-  const nx = -tn.y / l, ny = tn.x / l, tx = tn.x / l, ty = tn.y / l;
-  const m = { x: p.x + nx * 7 * dir + tx * 6, y: p.y + ny * 7 * dir + ty * 6 };
-  const e = { x: p.x + nx * 16 * dir + tx * 10, y: p.y + ny * 16 * dir + ty * 10 - 4 };
-  return `M${r1(p.x)} ${r1(p.y)} Q${r1(m.x)} ${r1(m.y)} ${r1(e.x)} ${r1(e.y)}`;
 }
 
 function setDash(p, L, e) {
@@ -445,7 +429,6 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
     const gTrunk = root.querySelector('[data-arm="gTrunk"]');
     const gGlow = root.querySelector('[data-arm="gGlow"]');
     const gCore = root.querySelector('[data-arm="gCore"]');
-    const gTwig = root.querySelector('[data-arm="gTwig"]');
     const tkB = root.querySelector('[data-arm="tkB"]');
     const tkO = root.querySelector('[data-arm="tkO"]');
     const tkI = root.querySelector('[data-arm="tkI"]');
@@ -465,8 +448,6 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
         lblEl: el.querySelector('.arm-lbl'),
         pGlow: mkPath(gGlow, ''),
         pCore: mkPath(gCore, ''),
-        tw1: mkPath(gTwig, ''),
-        tw2: mkPath(gTwig, ''),
         x: 0, y: 0, scl: 0, alp: 0, vis: 0, visT: 0, lbl: 0,
         leafTimers: [], growTimer: null,
         leafAbsR: [], leafOffR: [], leafAbsT: [], leafOffT: [],
@@ -735,16 +716,25 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
       } else {
         /* boca de raíz: 7 raicillas que nacen DENTRO del disco de la Ⓐ
            (soldadas, sin gap) y asoman bien adentro del lienzo — presencia
-           subida (operador 2026-06-10). */
+           subida (operador 2026-06-10). Forman un RACIMO compacto pegado al
+           botón (la raíz del organismo), NO trazos largos al vacío: el largo
+           se acota para que el grupo se lea como boca de raíz y no como líneas
+           sueltas (limpieza 2026-06-18). */
         const depth = Math.max(0, rootPt.y - H);
         for (let k = 0; k < 7; k++) {
           const a = -1.38 + 1.14 * k / 6; /* -79°..-14°: hacia arriba-derecha */
           const sx = rootPt.x + Math.cos(a) * Math.max(0, btnR - 5);
           const sy = rootPt.y + Math.sin(a) * Math.max(0, btnR - 5);
-          const len = (depth + 38 + rand(k + 40) * 58) / Math.max(0.3, -Math.sin(a));
+          /* el largo justo para asomar sobre el borde + un acento corto, con
+             tope: las raicillas casi horizontales (−sin(a) chico) no se
+             disparan a lo ancho del lienzo. */
+          const len = Math.min(
+            depth + 56,
+            (depth + 30 + rand(k + 40) * 30) / Math.max(0.45, -Math.sin(a)),
+          );
           const ex = clampN(rootPt.x + Math.cos(a) * len, 16, W - 28);
           const ey = rootPt.y + Math.sin(a) * len;
-          const mx = rootPt.x + (ex - rootPt.x) * 0.45 + (rand(k + 60) - 0.5) * 14;
+          const mx = rootPt.x + (ex - rootPt.x) * 0.45 + (rand(k + 60) - 0.5) * 12;
           const my = rootPt.y + Math.sin(a) * len * 0.45;
           d += `M${r1(sx)} ${r1(sy)} Q${r1(mx)} ${r1(my)} ${r1(ex)} ${r1(ey)} `;
         }
@@ -822,12 +812,12 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
         const bo = (f == null || f === i) ? 1 : 0.3;
         g.pCore.style.opacity = bo; g.pGlow.style.opacity = bo;
 
-        const tw = (f == null ? 0.55 : 0.1) * Math.max(0, (ve - 0.6) * 2.5);
-        g.tw1.style.opacity = tw; g.tw2.style.opacity = tw;
-        if (tw > 0.01) {
-          g.tw1.setAttribute('d', twigD(b, 0.48, i % 2 ? 1 : -1));
-          g.tw2.setAttribute('d', twigD(b, 0.72, i % 2 ? -1 : 1));
-        }
+        /* Ramitas decorativas (twigD) ELIMINADAS (operador 2026-06-18): brotaban
+           de la rama madre y MORIAN en el vacio, sin nodo al final — se leian
+           como lineas sueltas/colgantes (un defecto), no como micorriza. Ahora
+           cada trazo de la red muere SIEMPRE en un nodo (grupo/hoja); la riqueza
+           organica la dan la curva sembrada, el glow que respira, las esporas y
+           la boca de raiz soldada a la Ⓐ. */
 
         g.el.style.transform = `translate(${r1(g.x)}px,${r1(g.y)}px)`;
         g.el.style.opacity = g.alp.toFixed(3);
@@ -935,7 +925,7 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
       sim.forEach((s) => {
         clearTimeout(s.growTimer);
         s.leafTimers.forEach(clearTimeout);
-        [s.pGlow, s.pCore, s.tw1, s.tw2].forEach((p) => p.remove());
+        [s.pGlow, s.pCore].forEach((p) => p.remove());
         s.leaves.forEach((lf) => { lf.pGlow.remove(); lf.pCore.remove(); });
       });
       engineRef.current = null;
