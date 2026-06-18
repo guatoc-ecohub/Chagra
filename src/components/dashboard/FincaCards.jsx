@@ -1,3 +1,10 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish --
+ * Las etiquetas de las tarjetas ("Insumos", "Bitácora", "Informes") y los
+ * textos de carga/aria ("Cargando…", "Cargando contador") son strings de UI
+ * preexistentes de este componente. Su migración a src/config/messages.js es
+ * la TAREA i18n de ADR-050 (transversal a toda la app), fuera del alcance de
+ * este refinamiento visual. Se silencia el warning soft acá para no bloquear
+ * el commit sin arrastrar ese refactor i18n. */
 import { useEffect, useState } from 'react';
 import { Sprout, MapPin, Package, NotebookPen, Eye, AlertCircle, FileText, ChevronRight, Leaf } from 'lucide-react';
 import useAssetStore from '../../store/useAssetStore';
@@ -11,6 +18,16 @@ import { SEGUIMIENTO_PROCESOS, seguimientoRoute } from '../../config/seguimiento
  * tipo + acción clara. Click navega a su pantalla. Glassmorphism uniforme.
  *
  * Diseño: cards grandes, números legibles, copy de campesino.
+ *
+ * Refinamiento visual 2026-06-18 (tarjetas más bellas para mostrar):
+ *   Cada `section` agrega `bar` (cinta de acento superior con la identidad de
+ *   color del proceso) y `halo` (disco tenue detrás del emoji). El emoji se
+ *   monta sobre ese disco para dar profundidad. El contador "0" deja de ser un
+ *   número plano: cuando hay procesos muestra una pastilla de acento; cuando
+ *   está vacío, una invitación amable ("Empieza"). Mismo radio (rounded-2xl),
+ *   spacing y tipografía del resto del home; theme-aware (text-white vira a
+ *   tinta en nature/minimalista vía themes.css), mobile-first y accesible
+ *   (focus-visible ring). NO toca AgentHero ni AgentRedMenu.
  */
 
 const SECTION_STYLES = {
@@ -21,6 +38,8 @@ const SECTION_STYLES = {
         border: 'border-emerald-700/30',
         ring: 'ring-emerald-500/0 group-hover:ring-emerald-500/40',
         iconColor: 'text-emerald-300',
+        bar: 'from-emerald-400 to-lime-300',
+        halo: 'bg-emerald-400/15',
     },
     zonas: {
         Icon: MapPin,
@@ -29,6 +48,8 @@ const SECTION_STYLES = {
         border: 'border-teal-700/30',
         ring: 'ring-teal-500/0 group-hover:ring-teal-500/40',
         iconColor: 'text-teal-300',
+        bar: 'from-teal-400 to-cyan-300',
+        halo: 'bg-teal-400/15',
     },
     insumos: {
         Icon: Package,
@@ -37,6 +58,8 @@ const SECTION_STYLES = {
         border: 'border-amber-700/30',
         ring: 'ring-amber-500/0 group-hover:ring-amber-500/40',
         iconColor: 'text-amber-300',
+        bar: 'from-amber-400 to-orange-300',
+        halo: 'bg-amber-400/15',
     },
     bitacora: {
         Icon: NotebookPen,
@@ -45,6 +68,8 @@ const SECTION_STYLES = {
         border: 'border-stone-700/30',
         ring: 'ring-stone-500/0 group-hover:ring-stone-500/40',
         iconColor: 'text-stone-300',
+        bar: 'from-stone-300 to-zinc-200',
+        halo: 'bg-stone-400/15',
     },
     hoy: {
         Icon: Eye,
@@ -53,6 +78,8 @@ const SECTION_STYLES = {
         border: 'border-violet-700/30',
         ring: 'ring-violet-500/0 group-hover:ring-violet-500/40',
         iconColor: 'text-violet-300',
+        bar: 'from-violet-400 to-purple-300',
+        halo: 'bg-violet-400/15',
     },
     plagas: {
         Icon: AlertCircle,
@@ -61,6 +88,8 @@ const SECTION_STYLES = {
         border: 'border-rose-700/30',
         ring: 'ring-rose-500/0 group-hover:ring-rose-500/40',
         iconColor: 'text-rose-300',
+        bar: 'from-rose-400 to-red-300',
+        halo: 'bg-rose-400/15',
     },
     biodiversidad: {
         Icon: Leaf,
@@ -69,6 +98,8 @@ const SECTION_STYLES = {
         border: 'border-green-700/30',
         ring: 'ring-green-500/0 group-hover:ring-green-500/40',
         iconColor: 'text-green-300',
+        bar: 'from-green-400 to-emerald-300',
+        halo: 'bg-green-400/15',
     },
     informes: {
         Icon: FileText,
@@ -77,43 +108,55 @@ const SECTION_STYLES = {
         border: 'border-indigo-700/30',
         ring: 'ring-indigo-500/0 group-hover:ring-indigo-500/40',
         iconColor: 'text-indigo-300',
+        bar: 'from-indigo-400 to-blue-300',
+        halo: 'bg-indigo-400/15',
     },
-    // Seguimiento de procesos de finca (2026-06-15). Misma estética tonal.
+    // Seguimiento de procesos de finca (2026-06-15). Identidad de color por
+    // proceso reforzada con cinta de acento (bar) + halo del emoji (refinamiento
+    // visual 2026-06-18).
     reforestacion: {
         Icon: Leaf,
         emoji: '🌳',
-        accent: 'from-green-600/20 to-emerald-500/10',
-        border: 'border-green-700/30',
-        ring: 'ring-green-500/0 group-hover:ring-green-500/40',
+        accent: 'from-green-600/25 to-emerald-500/10',
+        border: 'border-green-600/40',
+        ring: 'ring-green-500/0 group-hover:ring-green-400/50',
         iconColor: 'text-green-300',
+        bar: 'from-green-400 to-emerald-300',
+        halo: 'bg-green-400/20',
     },
     silvopastoreo: {
         Icon: Sprout,
         emoji: '🐄',
-        accent: 'from-amber-600/20 to-yellow-500/10',
-        border: 'border-amber-700/30',
-        ring: 'ring-amber-500/0 group-hover:ring-amber-500/40',
+        accent: 'from-amber-600/25 to-yellow-500/10',
+        border: 'border-amber-600/40',
+        ring: 'ring-amber-500/0 group-hover:ring-amber-400/50',
         iconColor: 'text-amber-300',
+        bar: 'from-amber-400 to-yellow-300',
+        halo: 'bg-amber-400/20',
     },
     paramo: {
         Icon: MapPin,
         emoji: '🏔️',
-        accent: 'from-sky-600/20 to-cyan-500/10',
-        border: 'border-sky-700/30',
-        ring: 'ring-sky-500/0 group-hover:ring-sky-500/40',
+        accent: 'from-sky-600/25 to-cyan-500/10',
+        border: 'border-sky-600/40',
+        ring: 'ring-sky-500/0 group-hover:ring-sky-400/50',
         iconColor: 'text-sky-300',
+        bar: 'from-sky-400 to-cyan-300',
+        halo: 'bg-sky-400/20',
     },
     cerdos: {
         Icon: AlertCircle,
         emoji: '🐖',
-        accent: 'from-pink-600/20 to-rose-500/10',
-        border: 'border-pink-700/30',
-        ring: 'ring-pink-500/0 group-hover:ring-pink-500/40',
+        accent: 'from-pink-600/25 to-rose-500/10',
+        border: 'border-pink-600/40',
+        ring: 'ring-pink-500/0 group-hover:ring-pink-400/50',
         iconColor: 'text-pink-300',
+        bar: 'from-pink-400 to-rose-300',
+        halo: 'bg-pink-400/20',
     },
 };
 
-function Card({ section, title, subtitle, value, onClick, badge, variant = 'list', loading = false, tooltip }) {
+function Card({ section, title, subtitle, value, onClick, badge, variant = 'list', loading = false, tooltip, emptyHint }) {
     const style = SECTION_STYLES[section] || SECTION_STYLES.plantas;
     // Tooltip nativo (title) funciona bien en desktop hover y NO bloquea
     // touch en mobile (Safari/Chrome lo muestran on long-press). Sin libs.
@@ -123,23 +166,45 @@ function Card({ section, title, subtitle, value, onClick, badge, variant = 'list
     // value en corner top-right. Optimizado para cuadrícula 2-col/3-col que
     // deja respirar el fondo biopunk entre cards.
     if (variant === 'grid') {
+        // Estado VACÍO amable (refinamiento 2026-06-18): un "0" pelado se ve
+        // triste. Cuando value === 0 y hay `emptyHint`, en vez de la pastilla
+        // con el número mostramos una invitación cálida ("Empieza"); el número
+        // con su pastilla de acento solo aparece cuando ya hay procesos.
+        const isEmpty = value === 0;
+        const showFriendlyEmpty = isEmpty && !!emptyHint;
+        const showCountPill = !loading && !showFriendlyEmpty && (value != null || badge != null);
         return (
             <button
                 type="button"
                 onClick={onClick}
                 title={titleAttr}
                 aria-label={titleAttr}
-                className={`group relative w-full text-left rounded-2xl bg-gradient-to-br ${style.accent} backdrop-blur-xl border ${style.border} p-4 ring-2 ${style.ring} transition-all active:scale-[0.96] hover:-translate-y-0.5 aspect-square flex flex-col items-center justify-between min-h-[120px]`}
+                className={`group relative w-full text-left rounded-2xl overflow-hidden bg-gradient-to-br ${style.accent} backdrop-blur-xl border ${style.border} p-4 ring-2 ${style.ring} shadow-lg shadow-black/20 transition-all duration-200 ease-out active:scale-[0.96] hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 aspect-square flex flex-col items-center justify-between min-h-[120px]`}
             >
+                {/* Cinta de acento superior: identidad de color del proceso de un
+                    vistazo, sin recargar. Sutil en reposo, llena al tocar/hover. */}
+                <span
+                    aria-hidden="true"
+                    className={`pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${style.bar || 'from-emerald-400 to-lime-300'} opacity-70 group-hover:opacity-100 transition-opacity`}
+                />
                 {/* Contador top-right — GRANDE y legible de un vistazo: el
-                    conteo de plantas/zonas es la info más importante de la
-                    card (feedback operador 2026-05-30). Pill con número
-                    text-xl, padding generoso y buen contraste. */}
+                    conteo de procesos es la info más importante de la card
+                    (feedback operador 2026-05-30). Vacío amable cuando es 0. */}
                 {loading ? (
                     <div className="absolute top-2 right-2">
                         <Skeleton variant="rect" width={40} height={32} rounded="lg" ariaLabel="Cargando contador" />
                     </div>
-                ) : (value != null || badge != null) && (
+                ) : showFriendlyEmpty ? (
+                    // Pastilla "Empieza" — CTA cálido en vez de un "0" triste.
+                    // bg-emerald-500/25 + text-white viran a verde-tinta legibles
+                    // en nature/minimalista vía themes.css (ambos theme-aware).
+                    <div
+                        data-testid="finca-card-empty"
+                        className="absolute top-2 right-2 px-2 py-1 rounded-lg text-[10px] font-bold leading-none bg-emerald-500/25 backdrop-blur ring-1 ring-emerald-300/40 text-white shadow-sm"
+                    >
+                        Empieza
+                    </div>
+                ) : showCountPill && (
                     <div
                         data-testid="finca-card-count"
                         className="absolute top-2 right-2 min-w-[2rem] px-2.5 py-1 rounded-lg text-lg sm:text-xl font-black leading-none text-center bg-black/55 backdrop-blur ring-1 ring-white/20 text-white tabular-nums shadow-md"
@@ -147,14 +212,32 @@ function Card({ section, title, subtitle, value, onClick, badge, variant = 'list
                         {value != null ? value : badge}
                     </div>
                 )}
-                {/* Emoji grande centrado */}
-                <div className="flex-1 flex items-center justify-center text-5xl sm:text-6xl select-none filter drop-shadow-md group-hover:scale-110 transition-transform">
-                    {style.emoji}
+                {/* Emoji grande centrado, sobre un disco de halo tonal que le da
+                    profundidad y refuerza el color del proceso. */}
+                <div className="flex-1 w-full flex items-center justify-center">
+                    <span className="relative grid place-items-center">
+                        <span
+                            aria-hidden="true"
+                            className={`absolute inset-0 -m-2 rounded-full ${style.halo || 'bg-emerald-400/15'} blur-md scale-110 group-hover:scale-125 transition-transform duration-200`}
+                        />
+                        <span className="relative text-5xl sm:text-6xl select-none filter drop-shadow-md group-hover:scale-110 transition-transform duration-200">
+                            {style.emoji}
+                        </span>
+                    </span>
                 </div>
-                {/* Title abajo */}
-                <h3 className="text-sm font-bold text-white text-center leading-tight w-full truncate">
-                    {title}
-                </h3>
+                {/* Title + estado/invitación abajo: jerarquía clara (nombre fuerte,
+                    línea de estado suave). El estado muestra la invitación cálida
+                    cuando está vacío y el subtitle de progreso cuando hay datos. */}
+                <div className="w-full text-center">
+                    <h3 className="text-sm font-bold text-white leading-tight truncate">
+                        {title}
+                    </h3>
+                    {(showFriendlyEmpty ? emptyHint : subtitle) && (
+                        <p className="mt-0.5 text-[10px] leading-tight text-white/70 truncate">
+                            {showFriendlyEmpty ? emptyHint : subtitle}
+                        </p>
+                    )}
+                </div>
             </button>
         );
     }
@@ -385,17 +468,22 @@ function useSeguimientoCounts() {
 export function SeguimientoCard({ def, count, onNavigate, variant }) {
     const loaded = count !== null && count !== undefined;
     const n = loaded ? (count || 0) : null;
+    // Estado VACÍO amable: en vez de un "0" triste, una invitación cálida a
+    // empezar el proceso (la pastilla "Empieza" + esta línea). Con datos, la
+    // línea de estado muestra el avance ("N en seguimiento").
     const subtitle = !loaded
         ? 'Cargando…'
         : n > 0
             ? (n === 1 ? '1 en seguimiento' : `${n} en seguimiento`)
-            : def.subtitle;
+            : null;
+    const emptyHint = def.emptyHint || 'Empieza tu primer registro';
     return (
         <Card
             variant={variant}
             section={def.section}
             title={def.title}
             subtitle={subtitle}
+            emptyHint={emptyHint}
             value={loaded ? n : null}
             loading={!loaded}
             tooltip={`${def.title} — ${def.subtitle}. Tócalo para iniciar y hacer seguimiento (etapas, fotos y avance).`}

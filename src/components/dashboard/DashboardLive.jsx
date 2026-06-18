@@ -342,7 +342,11 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
                 balcón), el bloque entero se oculta. null = fail-open (las 4). */}
             {(seguimientoKeys === null || seguimientoKeys.length > 0) && (
                 <div className="px-4 pt-3">
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                    <p className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2.5">
+                        <span
+                            aria-hidden="true"
+                            className="h-3.5 w-1 rounded-full bg-gradient-to-b from-emerald-400 to-teal-400"
+                        />
                         Seguimiento de procesos
                     </p>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3" data-testid="seguimiento-cards">
