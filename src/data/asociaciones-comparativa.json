@@ -1,0 +1,118 @@
+[
+  {
+    "id": "milpa-maiz-frijol-ahuyama",
+    "asociacion": "Milpa maiz-frijol-ahuyama",
+    "cultivos": ["maiz", "frijol", "ahuyama"],
+    "monocultivo": {
+      "rendimiento_rel": null,
+      "insumos": "Monocultivos separados usados como linea base para comparar uso de tierra."
+    },
+    "policultivo": {
+      "LER": {
+        "valor_aprox": 2,
+        "min": 1.08,
+        "max": 2.89
+      },
+      "N_fijado_kg_ha": null,
+      "N_fijado_pct": {
+        "min": 12,
+        "max": 60
+      },
+      "ahorro_insumos": {
+        "arvenses_reduccion_pct_min": 24,
+        "arvenses_reduccion_pct_max": 55
+      },
+      "control_plaga_pct": 23
+    },
+    "diferencia_resumen": "La milpa usa mejor la tierra que sembrar cada cultivo solo, ayuda a cubrir el suelo y puede bajar el cogollero, pero el frijol no reemplaza todo el abono.",
+    "fuente": "DR-ASOCIACIONES-CULTIVO-COLOMBIA-2026-06-18; DR-AGRO-Norteamerica-2026-06-17; DOI 10.1093/aob/mcu191; DOI 10.3389/fagro.2023.1115490",
+    "confianza": "alta"
+  },
+  {
+    "id": "cafe-sombrio-guamo",
+    "asociacion": "Cafe con sombrio de guamo",
+    "cultivos": ["cafe", "guamo"],
+    "monocultivo": {
+      "rendimiento_rel": null,
+      "insumos": "Cafe a sol pleno como comparacion para carbono y microclima."
+    },
+    "policultivo": {
+      "LER": null,
+      "N_fijado_kg_ha": 168,
+      "ahorro_insumos": null,
+      "control_plaga_pct": null,
+      "otros_indicadores": {
+        "carbono_biomasa_mg_C_ha": 118,
+        "carbono_sol_pleno_mg_C_ha": 31,
+        "buffer_temperatura_min_hoja_c_min": 2,
+        "buffer_temperatura_min_hoja_c_max": 4,
+        "sombra_manejada_pct_min": 30,
+        "sombra_manejada_pct_max": 50
+      }
+    },
+    "diferencia_resumen": "El guamo aporta sombra manejada, carbono y mantillo con nitrogeno, pero no conviene cerrar demasiado la sombra porque puede bajar el rendimiento o subir enfermedades.",
+    "fuente": "DR-ASOCIACIONES-CULTIVO-COLOMBIA-2026-06-18; microclima cafe-sombra Peru/Colombia; Inga alley-cropping green mulch Costa Rica; DOI 10.1016/j.agee.2008.06.001",
+    "confianza": "media"
+  },
+  {
+    "id": "maiz-leguminosa",
+    "asociacion": "Maiz con leguminosa",
+    "cultivos": ["maiz", "leguminosa"],
+    "monocultivo": {
+      "rendimiento_rel": null,
+      "insumos": "Maiz y leguminosa en monocultivo como base de comparacion para LER y nitrogeno."
+    },
+    "policultivo": {
+      "LER": {
+        "valor": 1.32,
+        "error": 0.02
+      },
+      "N_fijado_kg_ha": null,
+      "N_fijado_pct": 76,
+      "ahorro_insumos": {
+        "N_sintesis_reduccion_pct_min": 5,
+        "N_sintesis_reduccion_pct_max": 15
+      },
+      "control_plaga_pct": {
+        "infestacion_reduccion_pct_min": 30,
+        "infestacion_reduccion_pct_max": 40
+      },
+      "otros_indicadores": {
+        "ganancia_t_ha": 1.45,
+        "rendimiento_cereal_aumento_pct_min": 16,
+        "rendimiento_cereal_aumento_pct_max": 30
+      }
+    },
+    "diferencia_resumen": "Sembrar maiz con una leguminosa mejora el uso de tierra y permite bajar una parte del nitrogeno de sintesis, sin prometer cero fertilizante.",
+    "fuente": "DR-ASOCIACIONES-CULTIVO-COLOMBIA-2026-06-18; DOI 10.1016/j.fcr.2019.107661; DOI 10.1007/s13593-022-00816-1; DOI 10.1016/j.eja.2020.126048; DOI 10.1002/ps.6261",
+    "confianza": "alta"
+  },
+  {
+    "id": "cacao-saf",
+    "asociacion": "Cacao en sistema agroforestal",
+    "cultivos": ["cacao", "platano", "maderables", "leguminosas"],
+    "monocultivo": {
+      "rendimiento_rel": 1,
+      "insumos": "Cacao a pleno sol como linea base de rendimiento de cacao."
+    },
+    "policultivo": {
+      "LER": null,
+      "N_fijado_kg_ha": null,
+      "ahorro_insumos": {
+        "fertilizacion_N_sustituible_kg_ha_min": 0,
+        "fertilizacion_N_sustituible_kg_ha_max": 200
+      },
+      "control_plaga_pct": null,
+      "otros_indicadores": {
+        "rendimiento_cacao_rel": 0.75,
+        "productividad_total_sistema_factor": 10,
+        "productividad_total_saf_mg_ha": 9.8,
+        "productividad_total_monocultivo_mg_ha": 0.6,
+        "carbono_factor": 2.5
+      }
+    },
+    "diferencia_resumen": "El cacao en SAF puede dar menos cacao por arbol, pero el sistema completo produce mucho mas por hectarea y guarda mas carbono si se maneja la sombra y la humedad.",
+    "fuente": "DR-ASOCIACIONES-CULTIVO-COLOMBIA-2026-06-18; DOI 10.1088/1748-9326/abb053; Gliricidia + cacao N-fixation; CIPAV El Hatico",
+    "confianza": "alta"
+  }
+]
