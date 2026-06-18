@@ -1792,8 +1792,7 @@
         "calido"
       ],
       "roles_in_guild": [
-        "crop",
-        "shade_lover"
+        "crop"
       ],
       "cultivable": true,
       "conservation_status": "naturalizada",
@@ -4463,6 +4462,7 @@
       "nombre_cientifico": "Persea americana Mill.",
       "familia_botanica": "Lauraceae",
       "category": "frutales_perennes",
+      "estrato": "alto",
       "thermal_zones": [
         "calido",
         "templado"
@@ -4549,6 +4549,7 @@
       "nombre_cientifico": "Musa × paradisiaca L.",
       "familia_botanica": "Musaceae",
       "category": "frutales_perennes",
+      "estrato": "alto",
       "thermal_zones": [
         "calido",
         "templado"
@@ -4634,6 +4635,19 @@
         "phaseolus_vulgaris",
         "manihot_esculenta",
         "cajanus_cajan"
+      ],
+      "plagas_criticas": [
+        "Cosmopolites sordidus (picudo negro del plátano, barrena el cormo)",
+        "Metamasius hemipterus (picudo rayado)",
+        "Opogona / barrenadores del pseudotallo",
+        "Nematodos (Radopholus similis, Pratylenchus, Helicotylenchus — daño radical y volcamiento)"
+      ],
+      "enfermedades_criticas": [
+        "Mycosphaerella fijiensis (Sigatoka negra) — enfermedad foliar #1, defolia y adelanta maduración",
+        "Fusarium oxysporum f. sp. cubense raza 4 tropical (Foc R4T / Mal de Panamá) — amenaza cuarentenaria devastadora",
+        "Ralstonia solanacearum raza 2 (moko del plátano, bacteriosis vascular)",
+        "Erwinia / Pectobacterium (pudrición acuosa del pseudotallo)",
+        "Virus del rayado del banano (BSV) y virus del mosaico"
       ]
     },
     {
