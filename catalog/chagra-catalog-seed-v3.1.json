@@ -607,12 +607,18 @@
         ]
       },
       "plagas_criticas": [
-        "Hypothenemus hampei (broca)",
-        "Hemileia vastatrix (roya)",
-        "Mycena citricolor"
+        "Hypothenemus hampei (broca del café — plaga #1, perfora el grano; su estadio larval se llama chapola)",
+        "Leucoptera coffeella (minador de la hoja)",
+        "Planococcus spp. (cochinilla harinosa de la raíz y el fruto)",
+        "Monalonion velezangeli (chinche de la chamusquina, también afecta café en algunas zonas)"
       ],
       "enfermedades_criticas": [
-        "Cercospora coffeicola"
+        "Hemileia vastatrix (roya del café) — enfermedad #1, defolia y reduce producción",
+        "Mycena citricolor (ojo de gallo / gotera, en zonas húmedas y sombrías)",
+        "Cercospora coffeicola (mancha de hierro / cercosporiosis)",
+        "Colletotrichum spp. (antracnosis del fruto)",
+        "Ceratocystis fimbriata (llaga macana del tronco)",
+        "Rosellinia spp. (llaga negra de la raíz)"
       ],
       "source_ids": [
         "cenicafe-manual-cafetero-2013",
@@ -1752,12 +1758,20 @@
         ]
       },
       "plagas_criticas": [
-        "Trps",
-        "Heliothis"
+        "Frankliniella spp. / Thrips spp. (trips, vectores de virus del bronceado TSWV)",
+        "Tuta absoluta (polilla/cogollero del tomate, minador devastador)",
+        "Bemisia tabaci / Trialeurodes vaporariorum (mosca blanca, vector de geminivirus)",
+        "Helicoverpa zea / Heliothis (gusano del fruto)",
+        "Tetranychus urticae / Aculops lycopersici (ácaro del tomate)",
+        "Agrotis ipsilon (trozador, corta plántulas a ras de suelo)"
       ],
       "enfermedades_criticas": [
-        "Podredumbre apical (Blossom end rot)",
-        "Trozador (Agrotis ipsilon)"
+        "Phytophthora infestans (gota / tizón tardío) — devastador en clima frío húmedo, comparte patógeno con la papa",
+        "Alternaria solani (tizón temprano)",
+        "Fusarium oxysporum f. sp. lycopersici (marchitez vascular)",
+        "Ralstonia solanacearum (marchitez bacteriana)",
+        "Phytophthora infestans y Septoria lycopersici (manchas foliares)",
+        "Podredumbre apical / Blossom end rot (fisiopatía por déficit de Ca y riego irregular, NO patógeno)"
       ],
       "source_ids": [
         "gbif-taxonomic-backbone",
@@ -2300,7 +2314,7 @@
           "semilla"
         ],
         "best_method": "semilla sexual",
-        "notas": "Siembra directa en sitio definitivo."
+        "notas": "Siembra directa en sitio definitivo, 2-3 semillas por sitio a 3-5 cm de profundidad, distancia 30-40 cm entre plantas × 80-90 cm entre surcos. Fenología por etapas: (1) Germinación y emergencia 0-10 días; (2) Desarrollo vegetativo (V3-V8, formación de hojas) 10-45 días; (3) Crecimiento rápido y diferenciación de la mazorca (V8-VT) 45-70 días; (4) Espigamiento/floración masculina (VT, emisión de polen de la espiga) y femenina (R1, emisión de estigmas/barbas de la mazorca) 70-90 días — etapa crítica de agua, una sequía aquí cuaja menos granos; (5) Llenado de grano (lechoso → pastoso → dentado) 90-130 días; (6) Madurez fisiológica (capa negra en la base del grano) y cosecha 130-180 días en variedades andinas de ciclo largo. En sistema Milpa el frijol trepa sobre el tallo del maíz y la calabaza cubre el suelo."
       },
       "notas_taxonomicas": "Las razas locales colombianas como 'Capio' (blanco harinoso), 'Cusco' (morado) y 'Pira' son fundamentales para la soberanía alimentaria de la zona altoandina. El sistema Milpa integra maíz con frijol y calabaza.",
       "valor_pedagogico": "Lección de Milpa: el maíz criollo andino (Zea mays L.) se cultiva en el altiplano cundiboyacense y Nariño entre 1800-2800 msnm en zonas frío-templadas. Las variedades 'Capio', 'Pira' y 'Cusco' son patrimonios genéticos muiscas. Ciclo de 6 meses, propagación por semilla directa. En asociación tradicional milpa (frijol+calabaza) se emplea manejo integrado de Spodoptera frugiperda y Puccinia sorghi. Fuente: NRC (1989) Cultivos Andinos, AGROSAVIA, ICA Res. 3168/2015.",
@@ -2310,9 +2324,51 @@
         "Diabrotica balteata"
       ],
       "enfermedades_criticas": [
-        "Puccinia sorghi (roya)",
-        "Fusarium spp."
+        "Puccinia sorghi (roya común del maíz)",
+        "Fusarium spp. (pudrición de mazorca y tallo, produce micotoxinas)",
+        "Cercospora zeae-maydis (mancha gris de la hoja)",
+        "Helminthosporium / Exserohilum turcicum (tizón foliar norteño)"
       ],
+      "feeding_plan_template": {
+        "source": "AGROSAVIA Manual de biopreparados (2015) + NRC (1989) Cultivos Andinos — plan agroecológico tipo Milpa para maíz criollo de clima frío 1800-2800 msnm.",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Aplicar bocashi al sitio de siembra",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 150,
+            "notes": "Mezclar con el suelo del hoyo antes de depositar la semilla. En sistema Milpa, sembrar el frijol 2-3 semanas después para que el maíz le sirva de tutor."
+          },
+          {
+            "offset_days": 30,
+            "action": "Drench con biol en desarrollo vegetativo",
+            "biofertilizer_slug": "biol",
+            "dose_ml": 150,
+            "notes": "Dilución 1:7. Aporte de N en la fase V3-V8 de máximo crecimiento foliar. Coincide con el primer aporque."
+          },
+          {
+            "offset_days": 55,
+            "action": "Foliar con supermagro previo a floración",
+            "biofertilizer_slug": "supermagro",
+            "dose_ml": 60,
+            "notes": "Dilución 1:15. Refuerzo de K y micronutrientes antes del espigamiento (VT/R1), la etapa que define el número de granos por mazorca."
+          },
+          {
+            "offset_days": 70,
+            "action": "Aplicar Bacillus thuringiensis al cogollo si hay cogollero",
+            "biofertilizer_slug": "bacillus_thuringiensis",
+            "dose_g": 10,
+            "notes": "Control biológico de Spodoptera frugiperda (cogollero) dirigido al verticilo. Aplicar al atardecer cuando la larva está activa. Monitorear daño foliar antes de aplicar."
+          },
+          {
+            "offset_days": 95,
+            "action": "Foliar con lixiviado de frutas en llenado de grano",
+            "biofertilizer_slug": "lixiviado_frutas",
+            "dose_ml": 80,
+            "notes": "Aporte de azúcares y K para el llenado (fase lechoso-pastoso). Mantener humedad de suelo en esta etapa."
+          }
+        ]
+      },
       "source_ids": [
         "agrosavia-manual-biopreparados-2015",
         "gbif-taxonomic-backbone",
@@ -3314,6 +3370,20 @@
         "phaseolus_vulgaris",
         "cajanus_cajan",
         "musa_paradisiaca"
+      ],
+      "plagas_criticas": [
+        "Phenacoccus manihoti (cochinilla harinosa de la yuca, controlada biológicamente con Anagyrus lopezi)",
+        "Mononychellus tanajoa (ácaro verde de la yuca)",
+        "Bemisia tuberculata / Aleurotrachelus socialis (mosca blanca, vector de virus)",
+        "Erinnyis ello (gusano cachón / cornudo de la yuca, defoliador)",
+        "Chilomima clarkei (barrenador del tallo)"
+      ],
+      "enfermedades_criticas": [
+        "Xanthomonas axonopodis pv. manihotis (bacteriosis / añublo bacterial de la yuca)",
+        "Phytophthora spp. (pudrición radical en suelos encharcados)",
+        "Sphaceloma manihoticola (superalargamiento)",
+        "Colletotrichum gloeosporioides f. sp. manihotis (antracnosis del tallo)",
+        "Mosaico/virosis de la yuca (complejo de geminivirus transmitido por mosca blanca y material de siembra)"
       ],
       "tracking_mode": "aggregate"
     },
