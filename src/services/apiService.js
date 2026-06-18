@@ -6,7 +6,7 @@
  * @requires authService
  */
 
-import { getAccessToken } from './authService';
+import { getAccessToken, refreshAccessToken } from './authService';
 import { getActiveTenantId } from './tenantContext';
 
 /**
@@ -153,7 +153,7 @@ const FARMOS_BUNDLE_GONE = [
 const isGoneBundle = (endpoint) =>
   FARMOS_BUNDLE_GONE.some((prefix) => endpoint.startsWith(prefix));
 
-export const fetchFromFarmOS = async (endpoint, options = {}) => {
+export const fetchFromFarmOS = async (endpoint, options = {}, _retried = false) => {
   if (import.meta.env.VITE_DEMO_MODE === 'true') {
     console.log(`[DEMO] blocked FarmOS call to ${endpoint}`);
     return {};
@@ -216,7 +216,19 @@ export const fetchFromFarmOS = async (endpoint, options = {}) => {
     });
 
     if (!response.ok) {
-      // Interceptor: redirigir a login en 401/403 (token expirado o revocado)
+      // Interceptor de auth (401/403): el access token fue rechazado por el
+      // servidor (vencido server-side o revocado) aunque el cliente lo creía
+      // vigente. ANTES de mandar al operador a #login (la "sesión zombi": home
+      // sin datos + "Tu sesión expiró"), intentar UNA renovación silenciosa con
+      // el refresh_token y reintentar la misma petición. Solo si la renovación
+      // no da token nuevo redirigimos a login. `_retried` evita bucles.
+      if ((response.status === 401 || response.status === 403) && !_retried) {
+        const refreshed = await refreshAccessToken();
+        if (refreshed) {
+          console.info(`[API] ${response.status} → token renovado, reintentando ${endpoint}.`);
+          return fetchFromFarmOS(endpoint, options, true);
+        }
+      }
       if (response.status === 401 || response.status === 403) {
         console.error(`[API] Auth error ${response.status}. Redirigiendo a login.`);
         if (typeof window !== 'undefined') window.location.hash = '#login';

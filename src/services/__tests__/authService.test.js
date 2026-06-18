@@ -9,6 +9,8 @@ import {
     authenticateUser,
     generateOAuthState,
     handleOAuthCallback,
+    getAccessToken,
+    refreshAccessToken,
 } from '../authService';
 
 // Mock localforage
@@ -380,6 +382,122 @@ describe('authService — OAuth PKCE flow', () => {
             expect(result.success).toBe(true);
             expect(result.error).toBeUndefined();
             expect(global.fetch).toHaveBeenCalled();
+        });
+    });
+
+    // ──────────────────────────────────────────────────────────────────────
+    // Cura del bug "sesión zombi" (operador 2026-06-18): el access token dura
+    // 1h; antes, al vencer, getAccessToken hacía logout y devolvía null sin
+    // usar NUNCA el refresh_token. Ahora renueva en silencio.
+    // ──────────────────────────────────────────────────────────────────────
+    describe('refreshAccessToken (renovación silenciosa)', () => {
+        beforeEach(() => {
+            global.fetch = vi.fn();
+            // navigator.onLine = true por defecto en jsdom; lo dejamos así.
+        });
+
+        it('devuelve null si no hay refresh_token guardado (no llama al backend)', async () => {
+            localforage.getItem.mockResolvedValue(null); // sin refresh_token
+            const result = await refreshAccessToken();
+            expect(result).toBeNull();
+            expect(global.fetch).not.toHaveBeenCalled();
+        });
+
+        it('usa grant_type=refresh_token y persiste el access + refresh nuevos', async () => {
+            localforage.getItem.mockResolvedValue('refresh-viejo');
+            global.fetch.mockResolvedValue({
+                ok: true,
+                status: 200,
+                headers: { get: (n) => (n === 'content-type' ? 'application/json' : null) },
+                json: async () => ({ access_token: 'access-nuevo', refresh_token: 'refresh-nuevo', expires_in: 3600 }),
+            });
+
+            const result = await refreshAccessToken();
+            expect(result).toBe('access-nuevo');
+
+            // El body del fetch debe ser un refresh_token grant.
+            const body = global.fetch.mock.calls[0][1].body;
+            expect(body).toContain('grant_type=refresh_token');
+            expect(body).toContain('refresh_token=refresh-viejo');
+
+            // Persiste el access nuevo y rota el refresh.
+            expect(localforage.setItem).toHaveBeenCalledWith('farmos_access_token', 'access-nuevo');
+            expect(localforage.setItem).toHaveBeenCalledWith('farmos_refresh_token', 'refresh-nuevo');
+        });
+
+        it('devuelve null si el backend rechaza el refresh (400/401)', async () => {
+            localforage.getItem.mockResolvedValue('refresh-vencido');
+            global.fetch.mockResolvedValue({
+                ok: false,
+                status: 400,
+                headers: { get: () => null },
+                text: async () => 'invalid_grant',
+            });
+            const result = await refreshAccessToken();
+            expect(result).toBeNull();
+        });
+
+        it('devuelve null (sin lanzar) si la red falla', async () => {
+            localforage.getItem.mockResolvedValue('refresh-x');
+            global.fetch.mockRejectedValue(new Error('Network error'));
+            await expect(refreshAccessToken()).resolves.toBeNull();
+        });
+    });
+
+    describe('getAccessToken — renueva en vez de quedar zombi', () => {
+        beforeEach(() => {
+            global.fetch = vi.fn();
+        });
+
+        it('si el token está vigente lo devuelve sin renovar', async () => {
+            localforage.getItem.mockImplementation((k) => {
+                if (k === 'farmos_access_token') return Promise.resolve('vigente');
+                if (k === 'farmos_token_expiry') return Promise.resolve(Date.now() + 60_000);
+                return Promise.resolve(null);
+            });
+            const t = await getAccessToken();
+            expect(t).toBe('vigente');
+            expect(global.fetch).not.toHaveBeenCalled();
+        });
+
+        it('si el token venció PERO el refresh funciona, devuelve el token renovado (NO logout)', async () => {
+            localforage.getItem.mockImplementation((k) => {
+                if (k === 'farmos_access_token') return Promise.resolve('vencido');
+                if (k === 'farmos_token_expiry') return Promise.resolve(Date.now() - 1000);
+                if (k === 'farmos_refresh_token') return Promise.resolve('refresh-ok');
+                return Promise.resolve(null);
+            });
+            global.fetch.mockResolvedValue({
+                ok: true,
+                status: 200,
+                headers: { get: (n) => (n === 'content-type' ? 'application/json' : null) },
+                json: async () => ({ access_token: 'renovado', refresh_token: 'r2', expires_in: 3600 }),
+            });
+
+            const t = await getAccessToken();
+            expect(t).toBe('renovado'); // el operador NO ve "sesión expiró"
+            // No debe haber borrado tokens (no logout).
+            expect(localforage.removeItem).not.toHaveBeenCalledWith('farmos_access_token');
+        });
+
+        it('si venció y el refresh está muerto (online), hace logout limpio y devuelve null', async () => {
+            localforage.getItem.mockImplementation((k) => {
+                if (k === 'farmos_access_token') return Promise.resolve('vencido');
+                if (k === 'farmos_token_expiry') return Promise.resolve(Date.now() - 1000);
+                if (k === 'farmos_refresh_token') return Promise.resolve('refresh-muerto');
+                return Promise.resolve(null);
+            });
+            global.fetch.mockResolvedValue({
+                ok: false,
+                status: 400,
+                headers: { get: () => null },
+                text: async () => 'invalid_grant',
+            });
+
+            const t = await getAccessToken();
+            expect(t).toBeNull();
+            // Logout limpio: borra el access token (no deja estado zombi).
+            expect(localforage.removeItem).toHaveBeenCalledWith('farmos_access_token');
         });
     });
 });
