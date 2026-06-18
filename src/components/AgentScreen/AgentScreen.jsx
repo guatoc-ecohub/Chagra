@@ -104,6 +104,11 @@ import FeedbackConsentModal from '../FeedbackConsentModal';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import ChagraAgentAvatarColibriPhoto from '../ChagraAgentAvatarColibriPhoto';
 import ChipsToolbar from '../ChipsToolbar';
+// FUENTE ÚNICA de la MANO (operador: en el agente "no se ve la mano, se ven
+// los menús en texto"). AgentManoOverlay monta el MISMO AgentRedMenu que el
+// home; mapCapabilityPick es el routing único de un pick de capacidad.
+import { AgentManoOverlay } from '../agent/AgentShell';
+import { mapCapabilityPick } from '../agent/capabilityRouting';
 import { agentSounds } from '../../services/agentSoundService';
 import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
@@ -136,7 +141,7 @@ const STATE_IDLE = 'idle';
 const STATE_RECORDING = 'recording';
 const STATE_THINKING = 'thinking';
 
-export default function AgentScreen({ onBack, initialContext }) {
+export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // B1: clase de animación de entrada, resuelta UNA vez al montar (no en cada
   // re-render — si no, la animación se reiniciaría con cada mensaje). Vacía bajo
   // prefers-reduced-motion.
@@ -179,6 +184,9 @@ export default function AgentScreen({ onBack, initialContext }) {
   // Compositor inline (foto adjuntada directamente en AgentScreen, sin outbox).
   // Independiente de la outbox — el operador ya está en la pantalla del agente.
   const cameraInputAgentRef = useRef(null);
+  // Ancla de la MANO: el botón Ⓐ del compositor ES la raíz geométrica de la red
+  // (paridad con el home — una sola Ⓐ, la red nace de ese botón real).
+  const aButtonRef = useRef(null);
   const [agentAttachment, setAgentAttachment] = useState(null); // {blob,mime,previewUrl,fileName}
   const [agentPickError, setAgentPickError] = useState('');
   const [streamingContent, setStreamingContent] = useState('');
@@ -262,7 +270,8 @@ export default function AgentScreen({ onBack, initialContext }) {
       return null;
     }
   }, []);
-  // Hoja de capacidades (paridad AgentHero Ⓐ).
+  // La MANO de Chagra (AgentRedMenu) — MISMA red que el home, no menús de texto.
+  // sheetOpen monta/desmonta el overlay de la mano (AgentManoOverlay).
   const [sheetOpen, setSheetOpen] = useState(false);
   // Fase del compositor para la animación shimmer/lift al enviar.
   const [composerPhase, setComposerPhase] = useState('idle'); // 'idle' | 'sending'
@@ -2555,6 +2564,29 @@ export default function AgentScreen({ onBack, initialContext }) {
     setActiveIntent((prev) => (prev === intent ? null : intent));
   };
 
+  // Pick de una rama de la MANO (AgentRedMenu) en la conversación. Routing
+  // ÚNICO compartido con el home (mapCapabilityPick): `ask` → pregunta directa,
+  // `nav` → navegar a otra vista, `photo` → abrir la cámara. soon/down/
+  // unavailable ya los bloquea AgentRedMenu antes de llegar acá.
+  const handleManoPick = (cap) => {
+    const acted = mapCapabilityPick(cap, {
+      onAsk: (prompt) => {
+        if (!prompt) return;
+        setActiveIntent(null);
+        setAlertContextBanner(null);
+        handleSubmit(prompt);
+      },
+      onNav: (view) => {
+        if (!view) return;
+        try { agentSounds.start(); } catch { /* sonido opcional */ }
+        if (onNavigate) onNavigate(view);
+      },
+      onPhoto: () => cameraInputAgentRef.current?.click(),
+    });
+    // Tras cualquier acción (o no-op de capacidad por lanzar) cerramos la mano.
+    if (acted) setSheetOpen(false);
+  };
+
   // ── Foto inline desde el compositor del AgentScreen ───────────────────────
   // Independiente del outbox: el operador ya está en la pantalla del agente,
   // así que la foto se procesa directamente (captureAndCompress → preview).
@@ -3220,12 +3252,15 @@ export default function AgentScreen({ onBack, initialContext }) {
 
           {/* Fila 2: Ⓐ | 📷 | spacer | 🎤 | Enviar */}
           <div className="flex items-center gap-2 px-1 pb-1 pt-0.5">
-            {/* Botón Ⓐ — abre hoja de capacidades */}
+            {/* Botón Ⓐ — abre la MANO de Chagra (AgentRedMenu). Este botón ES la
+                raíz geométrica de la red (anchorRef): la mano brota de él, igual
+                que en el home. */}
             <button
+              ref={aButtonRef}
               type="button"
               onClick={() => setSheetOpen((o) => !o)}
               disabled={state === STATE_RECORDING}
-              aria-label="Ver todo lo que puede hacer Chagra"
+              aria-label="Abrir la mano de Chagra"
               aria-expanded={sheetOpen}
               className={['as-iconbtn as-tool', sheetOpen ? 'is-open' : ''].join(' ')}
             >
@@ -3426,47 +3461,17 @@ export default function AgentScreen({ onBack, initialContext }) {
 
       <div ref={chatEndRef} />
 
-      {/* Hoja de capacidades (Ⓐ) — misma UX que AgentHero */}
-      {sheetOpen && (
-        <>
-          <div className="as-sheet-scrim" onClick={() => setSheetOpen(false)} aria-hidden="true" />
-          <section
-            className="as-sheet"
-            role="dialog"
-            aria-modal
-            aria-label="Capacidades de Chagra"
-          >
-            <div className="as-sheet-grab" aria-hidden="true" />
-            <div className="px-5 pb-2 pt-1 text-center">
-              <p className="text-lg font-bold text-white">¿En qué te ayudo?</p>
-              <p className="text-sm text-slate-400 mt-1">Toca una opción para empezar. Toda respuesta viene con su fuente.</p>
-            </div>
-            <div className="px-4 pb-4 overflow-y-auto flex flex-col gap-3">
-              {(profileChipDefs || CHIP_DEFS).map((chip) => (
-                <button
-                  key={chip.intent}
-                  type="button"
-                  className="as-cap"
-                  onClick={() => {
-                    handleChipSelect(chip.intent);
-                    setSheetOpen(false);
-                  }}
-                >
-                  <span className="as-cap-ico" aria-hidden="true">{chip.emoji}</span>
-                  <span className="flex-1 min-w-0 text-left">
-                    <span className="font-bold text-white block">{chip.label}</span>
-                    <span className="text-sm text-slate-400 block mt-0.5">{chip.placeholder}</span>
-                  </span>
-                  <span className="text-emerald-400 text-lg self-center" aria-hidden="true">›</span>
-                </button>
-              ))}
-            </div>
-            <p className="px-5 pb-5 text-center text-xs text-slate-500">
-              Chagra responde con información de <b className="text-emerald-400">AGROSAVIA</b>, <b className="text-emerald-400">ICA</b> e <b className="text-emerald-400">IDEAM</b>.
-            </p>
-          </section>
-        </>
-      )}
+      {/* La MANO de Chagra (Ⓐ) — MISMA red orgánica que el home (AgentRedMenu),
+          NO menús de texto (operador: "en el agente no se ve la mano, se ven
+          los menús en texto"). Una sola fuente: AgentManoOverlay + el mismo
+          CAPABILITY_MANIFEST. */}
+      <AgentManoOverlay
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        onPick={handleManoPick}
+        anchorRef={aButtonRef}
+        disabled={state === STATE_RECORDING}
+      />
 
       {/* Action Confirmation Modal — alimentado por actionExecutor gate callback (057.4) */}
       <ActionConfirmModal

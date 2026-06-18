@@ -8,6 +8,8 @@ import useAssetStore from '../../store/useAssetStore';
 import useAlertStore from '../../store/useAlertStore';
 import { agentSounds } from '../../services/agentSoundService';
 import AgentRedMenu from './AgentRedMenu';
+// Routing ÚNICO de un pick de la MANO, compartido con la conversación.
+import { mapCapabilityPick } from '../agent/capabilityRouting';
 import { AGENT_HERO_CHIPS } from '../../data/exampleQuestions';
 import { useTheme } from '../../hooks/useTheme';
 import {
@@ -632,24 +634,22 @@ export default function AgentHero({ onNavigate }) {
         return () => window.removeEventListener('keydown', onKey);
     }, [menuOpen, notifOpen]);
 
-    // Despacha una capacidad de la red a su routing real. El manifiesto
-    // unificado (agentCapabilities.js) llama `heroRoute` al routing del hero;
-    // leer `cap.route` dejaba TODOS los picks muertos en silencio (bug
-    // pre-existente de main, detectado en la validación visual 2026-06-09).
+    // Despacha una capacidad de la red a su routing real. Usa el routing ÚNICO
+    // compartido con la conversación (mapCapabilityPick en agent/AgentShell):
+    // una sola definición de cómo se enruta un pick — `ask` → pregunta, `nav` →
+    // navegar, `photo` → cámara. soon/unavailable son no-op (los gatea la red).
     const pickCapability = (cap) => {
-        const r = cap.heroRoute || cap.route;
-        if (cap.status === 'soon' || !r || r.kind === 'unavailable') return;
-        closeMenu();
-        if (r.kind === 'ask') {
-            handleChipSend(r.prompt);
-        } else if (r.kind === 'nav') {
-            try { agentSounds.start(); } catch { /* opcional */ }
-            onNavigate?.(r.view);
-        } else if (r.kind === 'photo') {
+        const acted = mapCapabilityPick(cap, {
+            onAsk: (prompt) => handleChipSend(prompt),
+            onNav: (view) => {
+                try { agentSounds.start(); } catch { /* opcional */ }
+                onNavigate?.(view);
+            },
             // Abre el selector de foto del compositor (visión del agente). El
             // usuario elige/toma la foto y la envía como item 'photo'.
-            cameraInputRef.current?.click();
-        }
+            onPhoto: () => cameraInputRef.current?.click(),
+        });
+        if (acted) closeMenu();
     };
 
     // ── Micrófono ─────────────────────────────────────────────────────────────

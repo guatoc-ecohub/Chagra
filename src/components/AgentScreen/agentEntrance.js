@@ -130,38 +130,10 @@ export const AGENT_COMPOSITOR_CSS = `
     pointer-events: none;
   }
   .as-sending { animation: as-send-lift 0.52s cubic-bezier(0.22,0.61,0.36,1) forwards; }
-  /* Hoja de capacidades */
-  .as-sheet-scrim {
-    position: fixed; inset: 0; z-index: 50;
-    background: rgba(10,8,4,0.5);
-    transition: opacity 0.3s ease;
-  }
-  .as-sheet {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 51;
-    max-width: 640px; margin: 0 auto;
-    background: rgb(15,23,42);
-    border-radius: 26px 26px 0 0;
-    box-shadow: 0 -16px 40px -16px rgba(0,0,0,0.55);
-    border-top: 1px solid rgba(100,116,139,0.3);
-    transform: translateY(0); max-height: 84dvh;
-    display: flex; flex-direction: column;
-  }
-  .as-sheet-grab { width: 42px; height: 5px; background: rgba(100,116,139,0.4); border-radius: 5px; margin: 10px auto 4px; flex: none; }
-  .as-cap {
-    display: flex; align-items: flex-start; gap: 13px; width: 100%;
-    font: inherit; text-align: left;
-    background: rgba(30,41,59,0.6); border: 1px solid rgba(100,116,139,0.3);
-    border-radius: 18px; padding: 13px 14px; cursor: pointer;
-    transition: transform 0.16s cubic-bezier(0.22,0.61,0.36,1), background 0.18s ease;
-    box-shadow: 0 3px 10px -7px rgba(0,0,0,0.5);
-  }
-  .as-cap:active { transform: scale(0.98); }
-  .as-cap:hover { border-color: rgba(16,185,129,0.45); box-shadow: 0 0 18px -7px rgba(16,185,129,0.5); }
-  .as-cap-ico {
-    width: 46px; height: 46px; flex: none; border-radius: 13px;
-    display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
-    background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.22);
-  }
+  /* La antigua "hoja de capacidades" en texto (.as-sheet/.as-cap) se ELIMINÓ:
+     la conversación ahora muestra la MANO (AgentRedMenu) vía AgentManoOverlay,
+     misma red que el home (operador: "no se ve la mano, se ven los menús en
+     texto"). El overlay trae su propio estilo en agent/AgentShell.jsx. */
   @media (prefers-reduced-motion: reduce) {
     .as-shimmer::after, .as-sending { animation: none !important; }
     .as-tool { animation: none !important; }
