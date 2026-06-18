@@ -752,7 +752,19 @@ export default function AgentHero({ onNavigate }) {
                    la pantalla — el operador y los pilotos pueden ver los modulos
                    del home sin hacer scroll infinito. Bug reportado 3 veces. */
                 .agentport-immersive.agentport-idle {
-                    min-height: auto;
+                    /* AGENTE MUERTO (overlay) — fix: el hero es un flex-item de
+                       una columna flex de alto fijo (h-full). Con overflow:hidden,
+                       la regla de flexbox vuelve el min-height AUTOMÁTICO = 0, así
+                       que flexbox lo ENCOGÍA a ~8px (solo el padding) para meter
+                       los módulos del home; el compositor/chips/Ⓐ quedaban
+                       DEBAJO del recorte → tap real aterrizaba en lo de abajo
+                       (onboarding/tiles), no en el agente. Fijamos un piso de alto
+                       igual al contenido y vetamos el encogimiento: el hero toma
+                       su alto natural (< 100dvh), los controles quedan alcanzables
+                       y los módulos siguen accesibles bajando (sin scroll infinito,
+                       intención de #1624). */
+                    min-height: min-content;
+                    flex-shrink: 0;
                     padding-bottom: 8px;
                 }
                 /* Indicador visual: flecha hacia abajo para mostrar que hay

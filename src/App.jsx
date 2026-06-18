@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback } from 'react';
+import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Sprout, MapPin, Eye, Package, Clock, NotebookPen, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette, FileText } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
@@ -497,7 +497,21 @@ export default function App() {
     return () => window.removeEventListener('syncSuccess', handler);
   }, []);
 
+  // Ruteo INICIAL por URL: corre UNA sola vez al montar. Sin este guardia el
+  // efecto se re-disparaba en CADA navegación —su dep `[navigate]` cambia de
+  // identidad porque `navigate` es useCallback([currentView])— y volvía a
+  // resolver `HASH_VIEW_ROUTES[hash] || 'dashboard'`. Como las navegaciones
+  // in-app (FAB/tile/“enviar al agente”) NO escriben el hash, el hash quedaba
+  // vacío → `navigate('dashboard')` pisaba la vista recién abierta ~40ms
+  // después. Síntoma: al enviar desde el hero, `currentView` pasaba a 'agente'
+  // y al instante volvía a 'dashboard' (AgentScreen nunca terminaba de montar).
+  // El ruteo por URL solo tiene sentido en la carga inicial, así que lo fijamos
+  // a una corrida única; las rutas vía hash siguen cubiertas por el listener
+  // `hashchange` (handleHashRoute) más abajo.
+  const bootRoutedRef = useRef(false);
   useEffect(() => {
+    if (bootRoutedRef.current) return;
+    bootRoutedRef.current = true;
     // Rutas públicas (sin auth check): onboarding-piloto. Soporta pathname
     // (app.example.co/onboarding-piloto) gracias al SPA fallback de Nginx
     // que sirve index.html, hash (#onboarding-piloto), o query
