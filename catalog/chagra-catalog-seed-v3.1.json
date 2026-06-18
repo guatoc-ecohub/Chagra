@@ -90,6 +90,9 @@
         "agrosavia-sol-andina"
       ],
       "valor_pedagogico": "Allium fistulosum, conocida como cebolla larga o cebollín, es una aliácea hortícola perenne ampliamente cultivada en el cinturón agrícola de Cundinamarca, particularmente en las zonas de Aquitania y Sumapaz, donde abastece los mercados de Bogotá entre 1800 y 2800 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación mediante división de bulbillos (hijuelos) cada 4 meses para cosecha permanente, asociaciones beneficiosas con zanahoria y lechuga que mejora la salud del huerto, y requiere manejo de plagas como trips y manchas foliares mediante monitoreo frecuente y biopreparados andinos. En el contexto campesino andino, esta cebolla ha sido tradicionalmente utilizada en sofritos y guisos como base aromática esencial, preservando sabores prehispánicos en las cocinas rurales de Cundinamarca y Boyacá. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Allium fistulosum L.",
+      "companions": [
+        "fragaria_ananassa"
+      ],
       "antagonists": [
         "phaseolus_vulgaris"
       ],
@@ -299,7 +302,8 @@
       },
       "companions": [
         "solanum_lycopersicum_san_marzano",
-        "solanum_tuberosum"
+        "solanum_tuberosum",
+        "fragaria_ananassa"
       ],
       "antagonists": [],
       "valor_pedagogico": "La Caléndula (Calendula officinalis L.) es una especie ornamental-medicinal originaria del Mediterráneo, ampliamente cultivada en jardines campesinos de Cundinamarca entre 0-2800 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con ciclo de floración de 75-90 días, asociándose beneficiosamente con cultivos como el tomate (Solanum lycopersicum) mientras actúa como repelente natural de trips y nemátodos mediante secreciones radiculares. En el contexto cultural andino-campesino, sus flores se utilizan tradicionalmente en preparaciones de crema cicatrizante por sus propiedades flavonoides, saponinas y aceites esenciales. Según GBIF Backbone Taxonomy y Plants of the World Online (POWO), esta especie destaca por su valor ecológico en atracción de polinizadores y manejo integrado de plagas en sistemas agroecológicos de montaña.",
@@ -866,6 +870,146 @@
       "tracking_mode": null
     },
     {
+      "_curation_status": "BORRADOR_IA",
+      "id": "fragaria_ananassa",
+      "nombre_comun": "Fresa",
+      "nombre_comunes_regionales": [
+        "fresa",
+        "frutilla",
+        "fresón"
+      ],
+      "nombre_cientifico": "Fragaria × ananassa (Duchesne ex Weston) Duchesne ex Rozier",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": null,
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2000,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "ph_suelo": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 6.5,
+        "max": 7
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "heladas_tolerancia": {
+        "umbral_c": -2,
+        "horas_acumuladas_max": 4,
+        "notas": "La planta perenne tolera heladas leves, pero la flor abierta y el fruto cuajado son muy sensibles: una helada en floración aborta la cosecha. Mulch plástico/orgánico y túneles bajos mitigan."
+      },
+      "companions": [
+        "lactuca_sativa_capitata",
+        "allium_fistulosum",
+        "calendula_officinalis"
+      ],
+      "antagonists": [],
+      "_nota_antagonists": "No asociar con solanáceas (papa, tomate, lulo) ni con Rubus (mora) por compartir hospedaje de Botrytis, Verticillium y ácaros. Rotar el lote cada 2-3 años para reducir Verticillium y nematodos.",
+      "propagation": {
+        "methods": [
+          "estolon",
+          "division_mata"
+        ],
+        "best_method": "estolon",
+        "protocol_resumen": "Propagación clonal por estolones (guías): se enraízan las plántulas hijas que emite la planta madre y se trasplantan con corona sana y raíz desnuda o en cepellón. Densidad 4-6 plantas/m² en camas elevadas con acolchado (mulch) plástico o de cascarilla. La semilla solo se usa en mejoramiento (híbrido segrega).",
+        "tiempo_a_establecimiento_dias": 30,
+        "notas": "Fenología por etapas: (1) Establecimiento/enraizamiento de corona 0-30 días; (2) Desarrollo vegetativo y emisión de hojas/estolones 30-75 días; (3) Inducción floral y floración 75-110 días (favorecida por días cortos y frío); (4) Cuajado y desarrollo de fruto 110-150 días; (5) Cosecha escalonada continua a partir de ~120 días, con picos cada 7-10 días durante varios meses; (6) Renovación de plantación cada 12-18 meses por caída de vigor y acumulación de patógenos. Eliminar estolones excesivos para concentrar energía en fruto.",
+        "fuente": "AGROSAVIA Manual de fresa (2013); AGROSAVIA Manual de biopreparados (2015)."
+      },
+      "plagas_criticas": [
+        "Tetranychus urticae (ácaro rojo / arañita de dos puntos)",
+        "Frankliniella spp. (trips, deforman flor y fruto)",
+        "Aphis gossypii / Chaetosiphon fragaefolii (áfidos, vectores de virus)",
+        "Otiorhynchus / picudo de la raíz",
+        "Babosas y caracoles (dañan fruto a ras de suelo)"
+      ],
+      "enfermedades_criticas": [
+        "Botrytis cinerea (moho gris / podredumbre del fruto) — enfermedad #1 en clima frío húmedo",
+        "Colletotrichum spp. (antracnosis de corona y fruto)",
+        "Verticillium dahliae (marchitez vascular, persistente en suelo)",
+        "Phytophthora cactorum (pudrición de corona y raíz)",
+        "Sphaerotheca / Podosphaera aphanis (oídio / cenicilla)",
+        "Xanthomonas fragariae (mancha angular bacteriana)"
+      ],
+      "feeding_plan_template": {
+        "source": "AGROSAVIA Manual de fresa (2013) + Manual de biopreparados (2015) — manejo agroecológico de transición en cama elevada con acolchado, clima frío 2000-2800 msnm.",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Aplicar bocashi a la cama a la siembra",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 200,
+            "notes": "Cama elevada con drenaje excelente (la fresa muere por encharcamiento/Phytophthora). Trasplantar coronas sanas a nivel del suelo: corona enterrada pudre, corona alta seca."
+          },
+          {
+            "offset_days": 20,
+            "action": "Inocular Trichoderma harzianum al sustrato",
+            "biofertilizer_slug": "trichoderma_harzianum_suelo",
+            "dose_g": 12,
+            "notes": "Preventivo Phytophthora cactorum, Verticillium y Colletotrichum de corona durante el enraizamiento."
+          },
+          {
+            "offset_days": 45,
+            "action": "Drench con humus líquido en desarrollo vegetativo",
+            "biofertilizer_slug": "humus_liquido",
+            "dose_ml": 150,
+            "notes": "Dilución 1:5. Aporte de N orgánico para foliaje sano antes de la inducción floral."
+          },
+          {
+            "offset_days": 75,
+            "action": "Foliar preventivo con Bacillus subtilis al inicio de floración",
+            "biofertilizer_slug": "bacillus_subtilis_foliar",
+            "dose_ml": 80,
+            "notes": "Antagonista de Botrytis cinerea — el moho gris ataca flor y fruto. Aplicar al atardecer; mejorar ventilación de la cama y NO mojar el follaje en la tarde."
+          },
+          {
+            "offset_days": 90,
+            "action": "Foliar con supermagro en cuajado de fruto",
+            "biofertilizer_slug": "supermagro",
+            "dose_ml": 50,
+            "notes": "Dilución 1:15. K y micronutrientes para llenado, color y dulzor del fruto."
+          },
+          {
+            "offset_days": 110,
+            "action": "Aplicar caldo sulfocálcico preventivo de ácaro/oídio",
+            "biofertilizer_slug": "caldo_sulfocalcico",
+            "dose_ml": 40,
+            "notes": "Dilución baja (0.5-1° Bé) — el azufre concentrado fitotóxica el follaje tierno y el fruto. Preventivo Tetranychus y oídio. NO aplicar en floración plena ni con sol fuerte."
+          }
+        ]
+      },
+      "source_ids": [
+        "agrosavia-manual-fresa-2013",
+        "agrosavia-manual-biopreparados-2015",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "La fresa (Fragaria × ananassa, familia Rosaceae) es un híbrido hortofrutícola perenne de clima frío, originado en el siglo XVIII en Europa por el cruzamiento accidental de dos especies americanas: Fragaria chiloensis (de Chile) y Fragaria virginiana (de Norteamérica) — de ahí el nombre 'ananassa' por su aroma a piña. En Colombia es un cultivo de alto valor en zonas frías de Cundinamarca (Sabana de Bogotá, Sibaté, Facatativá, Subachoque, Chocontá, Guasca), Antioquia (La Ceja, Marinilla, El Carmen de Viboral, oriente antioqueño) y Boyacá entre 2.000 y 2.800 msnm, sembrado en camas elevadas con acolchado (mulch) plástico que conserva humedad, controla maleza y mantiene el fruto limpio. La planta produce por estolones (guías) que enraízan plántulas hijas clonales, y fructifica de forma escalonada y continua durante varios meses. Su mayor reto fitosanitario es el moho gris (Botrytis cinerea), que pudre flores y frutos en el ambiente frío y húmedo de la Sabana, seguido por el ácaro de dos puntos (Tetranychus urticae), los trips (Frankliniella) que deforman el fruto, y la antracnosis (Colletotrichum) y Verticillium que se acumulan en el suelo. Manejo agroecológico: drenaje excelente y camas elevadas (la fresa muere por encharcamiento y Phytophthora cactorum de corona); trasplante de la corona a nivel exacto del suelo (enterrada pudre, alta seca); Trichoderma al sustrato; Bacillus subtilis preventivo contra Botrytis al inicio de floración; ventilación de la cama y riego por goteo para no mojar el follaje; caldo sulfocálcico diluido contra ácaro y oídio; asociación con lechuga, cebolla larga (que repele ácaros y áfidos) y caléndula; y rotación del lote cada 2-3 años para no acumular Verticillium y nematodos. La fresa enseña el manejo del microclima del cultivo — humedad, ventilación y sanidad de la corona — como base de la prevención frente a la dependencia de fungicidas. Fuentes Tier A: AGROSAVIA Manual de fresa 2013, AGROSAVIA Manual de biopreparados 2015, GBIF Backbone, POWO Kew.",
+      "validation_level": "claude_draft",
+      "tracking_mode": "aggregate"
+    },
+    {
       "id": "ipomoea_batatas",
       "nombre_comun": "Batata / Camote",
       "nombre_cientifico": "Ipomoea batatas (L.) Lam.",
@@ -1005,7 +1149,8 @@
       "valor_pedagogico": "La lechuga cogollo morada (Lactuca sativa var. capitata) es una hortaliza de hoja ampliamente cultivada en Colombia, especialmente en departamentos como Cundinamarca (cinturón productivo Choachí-Fómeque), Boyacá, Nariño y Santander, entre 800-3200 msnm en zonas térmicas fría y templada. Su manejo agronómico incluye propagación por semilla en semillero con sustrato fino, riego por nebulización en etapas tempranas, trasplante a los 25-30 días, ciclo de 60-90 días hasta cosecha, y asociaciones beneficiosas con Brassicaceae y Allium para repelencia de pulguilla. Plagas principales: pulgones (Myzus persicae), babosas (Deroceras reticulatum) y minadores (Liriomyza spp.). Culturalmente, aunque no es originaria del contexto muisca, se ha integrado en la agricultura andina contemporánea como cultivo de ciclo corto para seguridad alimentaria. Los cogollos morados deben su pigmentación a las antocianinas, pigmentos que actúan como protección natural contra radiación UV y estrés térmico. Fuente: nrc-1989-cultivos-andinos.",
       "companions": [
         "phaseolus_vulgaris",
-        "solanum_lycopersicum_san_marzano"
+        "solanum_lycopersicum_san_marzano",
+        "fragaria_ananassa"
       ],
       "tracking_mode": "aggregate"
     },
