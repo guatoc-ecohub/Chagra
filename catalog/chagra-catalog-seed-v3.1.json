@@ -4612,6 +4612,216 @@
       "antagonists": [],
       "tracking_mode": "aggregate",
       "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "BORRADOR_IA",
+      "id": "vaccinium_corymbosum",
+      "nombre_comun": "Arándano",
+      "nombre_comunes_regionales": [
+        "arándano azul",
+        "blueberry",
+        "arándano highbush"
+      ],
+      "nombre_cientifico": "Vaccinium corymbosum L.",
+      "familia_botanica": "Ericaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": null,
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 12,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "ph_suelo": {
+        "min": 4,
+        "optimo_min": 4.5,
+        "optimo_max": 5.5,
+        "max": 6
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "heladas_tolerancia": {
+        "umbral_c": -4,
+        "horas_acumuladas_max": 6,
+        "notas": "El arbusto en reposo tolera heladas fuertes, pero la flor abierta se daña por debajo de -1 °C. En el trópico de altura no hay reposo invernal verdadero, por lo que florece y fructifica de forma escalonada casi todo el año."
+      },
+      "companions": [],
+      "antagonists": [],
+      "_nota_antagonists": "Requisito agronómico crítico: pH del suelo muy ácido (4.5-5.5). No asociar en cama con cultivos de pH neutro (hortalizas comunes), porque las enmiendas de cal que esos cultivos requieren matan al arándano por clorosis férrica. Manejar en cama o contenedor aislado con sustrato acidificado (turba, corteza/aserrín de pino, azufre elemental).",
+      "propagation": {
+        "methods": [
+          "esqueje",
+          "acodo",
+          "micropropagacion"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Propagación clonal por estaca semileñosa o leñosa enraizada en sustrato ácido y aireado, o por micropropagación (planta certificada). En Colombia se cultiva con variedades de bajo requerimiento de frío (low-chill) tipo 'Biloxi', 'Misty', 'Sharpblue' adaptadas al trópico de altura. Distancia 0.6-1 m entre plantas × 2.5-3 m entre hileras.",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "Fenología por etapas en trópico de altura (sin reposo invernal marcado): (1) Establecimiento de raíz superficial fibrosa 0-12 meses — la raíz es somera, sin pelos radiculares, depende de micorrizas ericoides y de mulch ácido; (2) Brotación vegetativa y formación de madera frutal año 1-2; (3) Floración escalonada y cuajado desde el segundo año; (4) Desarrollo y maduración de baya ~60-90 días desde flor; (5) Cosecha escalonada casi continua con podas de renovación anuales; (6) Plena producción a partir del año 3-4, vida productiva 10-15 años. Acidificar y mantener pH 4.5-5.5 de por vida (monitoreo de pH del agua de riego).",
+        "fuente": "AGROSAVIA Manual de arándano (2018); ICA Resolución 3168/2015."
+      },
+      "plagas_criticas": [
+        "Frankliniella spp. (trips en floración)",
+        "Tetranychus urticae (ácaro)",
+        "Drosophila suzukii (mosca de alas manchadas, perfora la baya — cuarentenaria emergente)",
+        "Aphis spp. (áfidos, vectores de virus)",
+        "Aves frugívoras (pérdida directa de cosecha)"
+      ],
+      "enfermedades_criticas": [
+        "Botrytis cinerea (moho gris en flor y fruto)",
+        "Colletotrichum spp. (antracnosis / pudrición madura de la baya)",
+        "Phytophthora cinnamomi (pudrición de raíz por mal drenaje)",
+        "Clorosis férrica fisiológica por pH alto (NO patógeno — déficit de Fe asimilable si el suelo no es ácido)"
+      ],
+      "feeding_plan_template": {
+        "source": "AGROSAVIA Manual de arándano (2018) — establecimiento en sustrato acidificado, clima frío 2200-2800 msnm.",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Plantar en hoyo con sustrato ácido + compost",
+            "biofertilizer_slug": "compost_maduro",
+            "dose_g": 1500,
+            "notes": "Mezclar suelo con corteza/aserrín de pino, turba y compost maduro. NUNCA aplicar cal. Acidificar a pH 4.5-5.5 con azufre elemental si es necesario. Drenaje excelente obligatorio."
+          },
+          {
+            "offset_days": 30,
+            "action": "Acolchar la base con corteza/aserrín de pino",
+            "notes": "Mulch ácido de pino mantiene humedad, baja pH gradualmente y protege la raíz superficial. Reponer cada 6 meses."
+          },
+          {
+            "offset_days": 60,
+            "action": "Drench con humus líquido acidificado",
+            "biofertilizer_slug": "humus_liquido",
+            "dose_ml": 200,
+            "notes": "Dilución 1:5. Aporte de N orgánico; preferir fuentes de N amoniacal/orgánico (no nitrato) que el arándano asimila mejor en suelo ácido."
+          },
+          {
+            "offset_days": 120,
+            "action": "Foliar preventivo con Bacillus subtilis en floración",
+            "biofertilizer_slug": "bacillus_subtilis_foliar",
+            "dose_ml": 80,
+            "notes": "Antagonista de Botrytis cinerea y antracnosis en flor/fruto. Aplicar al atardecer."
+          },
+          {
+            "offset_days": 180,
+            "action": "Foliar con biofertilizante de algas (micronutrientes)",
+            "biofertilizer_slug": "biofertilizante_algas",
+            "dose_ml": 60,
+            "notes": "Aporte de micronutrientes (Fe, Mn, B) quelatados; previene clorosis férrica si el pH se mantiene ácido. Vigilar amarillamiento internerval = señal de pH alto."
+          }
+        ]
+      },
+      "source_ids": [
+        "agrosavia-manual-arandano-2018",
+        "ica-resolucion-3168-2015",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "El arándano azul (Vaccinium corymbosum L., familia Ericaceae), conocido en inglés como blueberry o highbush blueberry, es un arbusto frutal de origen norteamericano que se ha convertido en un cultivo de exportación de alto valor en el trópico de altura colombiano, sembrado en Cundinamarca (Sabana de Bogotá, oriente, Sumapaz), Antioquia (oriente antioqueño) y Boyacá entre 2.200 y 2.800 msnm con variedades de bajo requerimiento de frío (low-chill) como 'Biloxi', 'Misty' y 'Sharpblue', que florecen y fructifican de forma casi continua porque en el trópico no existe el reposo invernal de las zonas templadas. La particularidad agronómica que lo define —y que hay que entender antes de sembrarlo— es su exigencia de un suelo MUY ácido (pH 4.5-5.5) y de raíz superficial fibrosa sin pelos radiculares que depende de micorrizas ericoides y de un acolchado (mulch) ácido de corteza o aserrín de pino. En suelo de pH neutro o alcalino la planta sufre clorosis férrica (amarillamiento internerval por falta de hierro asimilable) y muere; por eso NO se debe asociar con cultivos que requieran encalado, y se maneja en cama o contenedor con sustrato acidificado. Sus retos fitosanitarios principales son el moho gris (Botrytis cinerea) y la antracnosis (Colletotrichum) en flor y fruto, los trips en floración, y la mosca de alas manchadas (Drosophila suzukii), plaga cuarentenaria emergente que perfora la baya madura. Manejo agroecológico: sustrato y mulch ácidos de pino, drenaje excelente (Phytophthora cinnamomi pudre la raíz con exceso de agua), Bacillus subtilis preventivo contra Botrytis, biofertilizante de algas para micronutrientes, riego con agua de pH controlado y malla anti-pájaros. El arándano enseña la lección de que el éxito de un frutal depende primero de ajustar el suelo a su fisiología —en este caso la acidez— antes que de cualquier fertilización. Fuentes Tier A: AGROSAVIA Manual de arándano 2018, ICA Resolución 3168/2015, GBIF Backbone, POWO Kew.",
+      "validation_level": "claude_draft",
+      "tracking_mode": "individual"
+    },
+    {
+      "_curation_status": "BORRADOR_IA",
+      "_anti_confusion": "Vaccinium meridionale (agraz/mortiño, arándano andino NATIVO). NO confundir con Vaccinium corymbosum (arándano azul comercial introducido norteamericano) ni con Vaccinium floribundum (mortiño de páramo, otra especie nativa).",
+      "id": "vaccinium_meridionale",
+      "nombre_comun": "Agraz / Mortiño",
+      "nombre_comunes_regionales": [
+        "agraz",
+        "mortiño",
+        "arándano andino",
+        "arándano nativo",
+        "joyapa"
+      ],
+      "nombre_cientifico": "Vaccinium meridionale Sw.",
+      "familia_botanica": "Ericaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "harvest_type": "fruto",
+      "cycleMonths": null,
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2300,
+        "optimo_max": 3200,
+        "max_absoluto": 3800
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 8,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "ph_suelo": {
+        "min": 4,
+        "optimo_min": 4.5,
+        "optimo_max": 5.5,
+        "max": 6
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "companions": [],
+      "antagonists": [],
+      "_nota_antagonists": "Como toda ericácea, requiere suelo ácido (4.5-5.5) y micorriza ericoide nativa; no encalar. Se asocia naturalmente en bordes de bosque altoandino y subpáramo.",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje",
+          "acodo"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Propagación por semilla (germinación lenta y errática, requiere sustrato ácido y luz) o clonal por estaca/acodo de material seleccionado de poblaciones silvestres. La domesticación está en curso (AGROSAVIA, UNAL): la mayor parte de la cosecha aún proviene de recolección silvestre en relictos de bosque altoandino.",
+        "tiempo_a_establecimiento_dias": 120,
+        "notas": "Fenología: arbusto perenne de bosque altoandino; floración y fructificación marcadas por la estacionalidad de lluvias, con cosecha silvestre tradicional en julio-agosto y noviembre-enero en la región andina. Fruto pequeño azul-negro de alto contenido de antocianinas y antioxidantes (mayor que el arándano comercial). Crecimiento lento; entra en producción al año 3-4."
+      },
+      "plagas_criticas": [
+        "Frankliniella spp. (trips en floración)",
+        "Aves frugívoras (dispersan pero compiten por la cosecha)",
+        "Larvas de lepidópteros defoliadores (en relictos silvestres)"
+      ],
+      "enfermedades_criticas": [
+        "Botrytis cinerea (moho gris en fruto en poscosecha)",
+        "Colletotrichum spp. (antracnosis del fruto)"
+      ],
+      "source_ids": [
+        "agrosavia-manual-frutales-tropicales",
+        "humboldt-flora-alto-andina",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "El agraz o mortiño (Vaccinium meridionale Sw., familia Ericaceae) es el arándano andino NATIVO de Colombia, un arbusto silvestre de los bosques altoandinos y subpáramos que crece de forma natural entre 2.300 y 3.200 msnm en Cundinamarca, Boyacá (provincias de Norte y Gutiérrez, Arcabuco, Villa de Leyva), Santander, Antioquia, Nariño y la cordillera Oriental, y que también se distribuye en Venezuela y los Andes del norte (no es endémico de Colombia). Su fruto pequeño, azul-negro y de sabor ácido-dulce, ha sido recolectado tradicionalmente por las comunidades campesinas para preparar el 'sabajón de agraz', vinos, mermeladas, coladas y postres, y tiene un contenido de antocianinas y capacidad antioxidante superior al del arándano comercial importado (Vaccinium corymbosum), lo que lo posiciona como un superalimento nativo de altísimo potencial. A diferencia del arándano azul de cultivo, gran parte de la cosecha aún proviene de recolección silvestre en relictos de bosque altoandino, lo que lo vincula directamente a la conservación de esos ecosistemas: el agraz es a la vez alimento, ingreso campesino y especie clave para fauna frugívora y polinizadores. La domesticación y propagación clonal están en curso (AGROSAVIA, Universidad Nacional) para reducir la presión sobre las poblaciones silvestres. Como toda ericácea requiere suelo ácido (pH 4.5-5.5), micorriza ericoide nativa y NO tolera el encalado. Su manejo agroecológico privilegia el aprovechamiento sostenible de rodales silvestres (no cosechar más del fruto disponible, dejar semilla para regeneración) y el establecimiento de cultivos con material seleccionado en sustrato ácido. El agraz enseña el valor de los frutales nativos como alternativa de soberanía alimentaria frente a la dependencia de especies importadas, y la importancia de conservar el bosque altoandino que lo alberga. Fuentes Tier A: AGROSAVIA Manual de frutales tropicales, Humboldt Flora Alto-Andina, GBIF Backbone, POWO Kew.",
+      "validation_level": "claude_draft",
+      "tracking_mode": "individual",
+      "rol_restauracion": "secundaria",
+      "apta_ribera": null
     }
   ],
   "sources": [
