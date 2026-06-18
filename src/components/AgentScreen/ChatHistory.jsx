@@ -56,7 +56,7 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
   // aquí. Si el saludo aún no resolvió, caemos al copy estático de siempre.
   if (messages.length === 0 && !isStreaming) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-6">
+      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center justify-center p-6">
         <div className="text-center max-w-md">
           <ChagraAgentAvatar state="idle" size={200} className="mx-auto mb-4" />
           {proactiveGreeting ? (
