@@ -268,3 +268,44 @@ test.describe('Offline-first — siembra pendiente y reconexión', () => {
       .toBeGreaterThanOrEqual(1);
   });
 });
+
+test.describe('Smoke capa de datos — el CSP no debe bloquear WASM/sqlite (regresión prod #1631)', () => {
+  // Por qué existe: el 2026-06-17 un meta CSP sin 'wasm-unsafe-eval' bloqueó
+  // WebAssembly -> sqlite-wasm no cargó -> "Failed to fetch", todo en 0, prod caída.
+  // Los tests offline existentes usan IndexedDB directo (no wasm) y NO lo cazaron.
+  // Este check es determinista: WebAssembly.compile falla si el CSP activo no
+  // permite wasm. Corre dentro del gate requerido (offline.spec.js).
+  test('WebAssembly compila bajo el CSP activo y la app arranca sin violaciones wasm', async ({ page }) => {
+    const wasmCsp = [];
+    const capture = (t) => {
+      if (/webassembly|wasm-unsafe-eval|wasm/i.test(String(t))) wasmCsp.push(String(t));
+    };
+    page.on('console', (msg) => capture(msg.text()));
+    page.on('pageerror', (e) => capture(e));
+
+    await page.goto('/');
+
+    // La UI de login pinta aunque el wasm falle (no depende de wasm).
+    await expect(page.getByRole('button', { name: /ingresar/i })).toBeVisible({ timeout: 15_000 });
+
+    // CHECK CLAVE: WebAssembly.compile debe funcionar bajo el CSP de index.html.
+    // Módulo wasm mínimo válido (header "\0asm" + versión 1). Si el CSP no trae
+    // 'wasm-unsafe-eval', esto lanza CompileError -> sqlite-wasm no cargaría.
+    const wasmResult = await page.evaluate(async () => {
+      try {
+        const bytes = new Uint8Array([0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00]);
+        await WebAssembly.compile(bytes);
+        return 'ok';
+      } catch (e) {
+        return String(e && e.message ? e.message : e);
+      }
+    });
+    expect(
+      wasmResult,
+      `WebAssembly.compile falló bajo el CSP activo (¿falta 'wasm-unsafe-eval' en script-src?): ${wasmResult}`
+    ).toBe('ok');
+
+    // Ninguna violación CSP relacionada con wasm en el arranque.
+    expect(wasmCsp, `Violaciones CSP/WASM en el arranque: ${wasmCsp.join(' | ')}`).toEqual([]);
+  });
+});

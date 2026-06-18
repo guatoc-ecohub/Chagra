@@ -23,6 +23,25 @@
 
     <title>Chagra</title>
 
+    <!-- Content-Security-Policy (Task 112, corregido tras incidente prod #1631).
+         CRITICO: script-src DEBE incluir 'wasm-unsafe-eval'; sin eso el navegador
+         bloquea WebAssembly -> sqlite-wasm (capa de datos) no carga -> app muerta
+         (Failed to fetch, todo en 0). worker-src para el service worker de la PWA.
+         Regresion cubierta por el smoke en tests/offline.spec.js (WebAssembly.compile). -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https:;
+      style-src 'self' 'unsafe-inline' https:;
+      img-src 'self' data: blob: https:;
+      connect-src 'self' https: wss:;
+      font-src 'self' data:;
+      media-src 'self' blob:;
+      worker-src 'self' blob:;
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self';
+      frame-ancestors 'none';
+    " />
 
     <!-- Pre-React loader inline (issue #121): evita flash blanco al
          arrancar PWA fría antes de que React + Suspense pinten el
