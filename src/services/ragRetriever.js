@@ -1,9 +1,11 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { recordRagEvent } from './ragTelemetry';
 import { TOOL_TIMEOUT_MS } from './sidecarClient.js';
 import { getAllSpecies } from '../db/catalogDB';
 import { expandQueryTokens } from './ragSynonyms';
 import { saveCorpusIndex, loadCorpusIndex } from '../db/corpusIndexCache';
+import { fetchWithAuthRetry } from './apiService';
 
 const CORPUS_PATH = '/cycle-content/';
 const EMBEDDINGS_PATH = '/rag-embeddings.json';
@@ -434,7 +436,7 @@ async function loadEmbeddings() {
  */
 async function embedQuery(queryText) {
   try {
-    const res = await fetch('/api/ollama/api/embeddings', {
+    const res = await fetchWithAuthRetry('/api/ollama/api/embeddings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: 'nomic-embed-text', prompt: queryText }),

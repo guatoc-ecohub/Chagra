@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { fetchWithAuthRetry } from '../services/apiService';
 import { DEFAULT_MODEL } from '../services/llmRouter';
 
 /**
@@ -81,7 +82,7 @@ const useOllamaWarmStore = create((set, get) => ({
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), WARMUP_TIMEOUT_MS);
 
-    fetch('/api/ollama/api/generate', {
+    fetchWithAuthRetry('/api/ollama/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

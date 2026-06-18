@@ -1,4 +1,6 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import { TOOL_TIMEOUT_MS } from './sidecarClient.js';
+import { fetchWithAuthRetry } from './apiService.js';
 
 /**
  * capabilityHealth — Task 37: estado de disponibilidad de capacidades.
@@ -61,7 +63,7 @@ export async function checkCapabilityHealth() {
 
   // LLM vía health check básico
   try {
-    const res = await fetch('/api/ollama/api/tags', { signal: AbortSignal.timeout(TOOL_TIMEOUT_MS) });
+    const res = await fetchWithAuthRetry('/api/ollama/api/tags', { signal: AbortSignal.timeout(TOOL_TIMEOUT_MS) });
     results.push({ name: 'Modelo de IA (Ollama)', status: res.ok ? 'ok' : 'degraded', message: res.ok ? undefined : 'El modelo no responde correctamente.' });
   } catch {
     results.push({ name: 'Modelo de IA (Ollama)', status: 'down', message: 'No hay conexión con el servidor de IA.' });

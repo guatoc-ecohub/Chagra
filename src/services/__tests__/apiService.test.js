@@ -19,7 +19,7 @@ vi.mock('../fincaActiveStore.js', () => ({
 
 vi.stubGlobal('fetch', vi.fn());
 
-import { fetchFromFarmOS, sendToFarmOS } from '../apiService.js';
+import { fetchFromFarmOS, fetchWithAuthRetry, sendToFarmOS } from '../apiService.js';
 
 describe('apiService', () => {
   describe('fetchFromFarmOS', () => {
@@ -226,6 +226,66 @@ describe('apiService', () => {
       await sendToFarmOS('/api/asset/plant/123', { some: 'data' }, 'DELETE');
       const [, opts] = fetchSpy.mock.calls[0];
       expect(opts.body).toBeUndefined();
+    });
+  });
+
+  describe('fetchWithAuthRetry', () => {
+    beforeEach(async () => {
+      const { getAccessToken, refreshAccessToken } = await import('../authService.js');
+      getAccessToken.mockReset().mockResolvedValue('mock-token');
+      refreshAccessToken.mockReset().mockResolvedValue(null);
+      Object.defineProperty(navigator, 'onLine', {
+        configurable: true,
+        value: true,
+      });
+    });
+
+    it('ante 401 refresca token y reintenta una vez con el Bearer nuevo', async () => {
+      const { getAccessToken, refreshAccessToken } = await import('../authService.js');
+      getAccessToken.mockResolvedValue('token-viejo');
+      refreshAccessToken.mockResolvedValueOnce('token-nuevo');
+
+      const fetchSpy = vi.fn()
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          statusText: 'Unauthorized',
+          headers: { get: vi.fn().mockReturnValue('') },
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          headers: { get: vi.fn().mockReturnValue('') },
+          json: async () => ({ ok: true }),
+        });
+      vi.stubGlobal('fetch', fetchSpy);
+
+      const response = await fetchWithAuthRetry('/api/ollama/api/tags', {
+        method: 'GET',
+        headers: { 'X-Chagra-Token': 'sidecar-token' },
+      });
+
+      expect(response.ok).toBe(true);
+      expect(refreshAccessToken).toHaveBeenCalledTimes(1);
+      expect(fetchSpy).toHaveBeenCalledTimes(2);
+      expect(fetchSpy.mock.calls[0][1].headers.Authorization).toBe('Bearer token-viejo');
+      expect(fetchSpy.mock.calls[0][1].headers['X-Chagra-Token']).toBe('sidecar-token');
+      expect(fetchSpy.mock.calls[1][1].headers.Authorization).toBe('Bearer token-nuevo');
+      expect(fetchSpy.mock.calls[1][1].headers['X-Chagra-Token']).toBe('sidecar-token');
+    });
+
+    it('offline falla rapido sin llamar fetch ni refresh', async () => {
+      const { refreshAccessToken } = await import('../authService.js');
+      Object.defineProperty(navigator, 'onLine', {
+        configurable: true,
+        value: false,
+      });
+      const fetchSpy = vi.fn();
+      vi.stubGlobal('fetch', fetchSpy);
+
+      await expect(fetchWithAuthRetry('/api/ollama/api/tags')).rejects.toThrow('Offline');
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(refreshAccessToken).not.toHaveBeenCalled();
     });
   });
 

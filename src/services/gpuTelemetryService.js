@@ -15,6 +15,8 @@
  *   { models: [{ name, model, size, size_vram, expires_at, details: {...} }] }
  */
 
+import { fetchWithAuthRetry } from './apiService.js';
+
 const BYTES_PER_MB = 1024 * 1024;
 
 const OLLAMA_PS_URL = '/api/ollama/api/ps';
@@ -27,7 +29,7 @@ const fetchWithTimeout = async (url, options = {}, timeoutMs = FETCH_TIMEOUT_MS)
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    return await fetch(url, { ...options, signal: controller.signal });
+    return await fetchWithAuthRetry(url, { ...options, signal: controller.signal });
   } finally {
     clearTimeout(timer);
   }

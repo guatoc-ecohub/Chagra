@@ -29,13 +29,72 @@ const fetchWithTimeout = async (resource, options = {}) => {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
   try {
-    const response = await fetch(resource, { ...options, signal: controller.signal });
+    const response = await globalThis.fetch(resource, { ...options, signal: controller.signal });
     clearTimeout(id);
     return response;
   } catch (error) {
     clearTimeout(id);
     throw error;
   }
+};
+
+const AUTH_RETRY_STATUSES = new Set([401, 403]);
+
+const withAuthorization = (headersInit, token) => {
+  if (headersInit instanceof Headers) {
+    const headers = new Headers(headersInit);
+    if (token) headers.set('Authorization', `Bearer ${token}`);
+    return headers;
+  }
+
+  if (Array.isArray(headersInit)) {
+    const headers = new Headers(headersInit);
+    if (token) headers.set('Authorization', `Bearer ${token}`);
+    return headers;
+  }
+
+  return {
+    ...(headersInit || {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
+
+/**
+ * Fetch autenticado reusable para proxies que aceptan el Bearer de farmOS
+ * (sidecar MCP, Ollama detras de nginx, y otros endpoints internos).
+ *
+ * Mantiene el contrato nativo de fetch: devuelve Response y no parsea body.
+ * Ante 401/403 intenta renovar el access token una sola vez y reintenta la
+ * misma request con el Bearer nuevo. Si no hay token local, preserva el fetch
+ * original sin Authorization para no romper endpoints publicos.
+ *
+ * @param {RequestInfo|URL} resource
+ * @param {RequestInit} [options]
+ * @param {boolean} [_retried]
+ * @returns {Promise<Response>}
+ */
+export const fetchWithAuthRetry = async (resource, options = {}, _retried = false) => {
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    throw new TypeError('Offline');
+  }
+
+  const token = await getAccessToken();
+  const headers = withAuthorization(options.headers, token);
+
+  const response = await globalThis.fetch(resource, { ...options, headers });
+
+  if (!AUTH_RETRY_STATUSES.has(response.status) || _retried) {
+    return response;
+  }
+
+  const refreshed = await refreshAccessToken();
+  if (!refreshed) {
+    return response;
+  }
+
+  const retryHeaders = withAuthorization(options.headers, refreshed);
+  console.info(`[API] ${response.status} -> token renovado, reintentando ${resource}.`);
+  return globalThis.fetch(resource, { ...options, headers: retryHeaders });
 };
 
 /**

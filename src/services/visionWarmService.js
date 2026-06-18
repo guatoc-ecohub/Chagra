@@ -24,6 +24,8 @@
  * cold-start clásico que verá el operador en el momento del análisis.
  */
 
+import { fetchWithAuthRetry } from './apiService.js';
+
 const OLLAMA_URL = '/api/ollama/api/generate';
 const VISION_MODEL = 'llama3.2-vision:11b';
 // keep_alive 5min: si user demora entre click cámara y submit, el modelo
@@ -54,7 +56,7 @@ export async function warmVisionModel() {
   const timer = setTimeout(() => controller.abort(), WARMUP_TIMEOUT_MS);
 
   try {
-    const res = await fetch(OLLAMA_URL, {
+    const res = await fetchWithAuthRetry(OLLAMA_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
