@@ -3118,14 +3118,34 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           siempre y REEMPLAZA a QuickChipsBar en la pantalla nueva: una sola
           fila de chips (sin duplicación), pero ahora son las capacidades
           reales del agente, adaptadas a la persona. ── */}
-      <ChipsToolbar
-        onSelectIntent={handleChipSelect}
-        activeIntent={activeIntent}
-        hasAttachment={false}
-        disabled={state === STATE_RECORDING}
-        isPro={getCurrentTier() === 'pro'}
-        chipDefs={messages.length === 0 ? null : profileChipDefs}
-      />
+      {/* Operador 2026-06-18: en la pantalla idle NO mostramos el catálogo de
+          chips de texto ("menús horribles") — en su lugar, UN trigger limpio y
+          prominente que abre la MANO de Chagra (única fuente de capacidades,
+          igual que el home). Durante una conversación (messages>0) sí se
+          muestran los chips de capacidad, ya compactos y filtrados por perfil. */}
+      {messages.length === 0 ? (
+        <div className="px-4 pb-1 pt-1 shrink-0">
+          <button
+            type="button"
+            onClick={() => setSheetOpen(true)}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border border-emerald-400/60 bg-emerald-700/45 text-emerald-50 text-sm font-semibold shadow-lg shadow-emerald-950/40 active:scale-[.98] transition-transform"
+            aria-label="Abrir la mano de Chagra"
+            data-testid="agent-mano-trigger"
+          >
+            <Sparkles size={18} className="text-emerald-300 shrink-0" aria-hidden="true" />
+            Toca la mano de Chagra para ver todo lo que puede hacer
+          </button>
+        </div>
+      ) : (
+        <ChipsToolbar
+          onSelectIntent={handleChipSelect}
+          activeIntent={activeIntent}
+          hasAttachment={false}
+          disabled={state === STATE_RECORDING}
+          isPro={getCurrentTier() === 'pro'}
+          chipDefs={profileChipDefs}
+        />
+      )}
 
       {/* ── Compositor pill — paridad completa AgentHero (2026-06-08).
           Superficie OPACA por token (.agent-bar-surface) para legibilidad sobre
