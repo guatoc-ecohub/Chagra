@@ -123,6 +123,29 @@ async function hitTestCenter(page, locator) {
   );
 }
 
+/** Como hitTestCenter, pero para controles que NO son <button>/<a> (ej. un
+ *  <div onClick> clickeable como el abridor del SpeciesSelect). Verifica vía
+ *  elementFromPoint que el punto central pertenece al subárbol del propio
+ *  locator (o ES el locator), es decir, que NO está tapado por un overlay
+ *  externo. Devuelve {ok, reason}. */
+async function hitTestWithin(page, locator) {
+  await locator.scrollIntoViewIfNeeded();
+  const box = await locator.boundingBox();
+  if (!box) return { ok: false, reason: 'sin boundingBox (no visible)' };
+  const cx = box.x + box.width / 2;
+  const cy = box.y + box.height / 2;
+  return await locator.evaluate(
+    (el, { cx, cy }) => {
+      const top = document.elementFromPoint(cx, cy);
+      if (!top) return { ok: false, reason: 'elementFromPoint=null' };
+      // ok si el punto central cae en el control o en uno de sus descendientes.
+      const ok = el === top || el.contains(top);
+      return { ok, reason: ok ? null : 'el punto central cae fuera del control (overlay encima)' };
+    },
+    { cx, cy },
+  );
+}
+
 // ──────────────────────────────────────────────────────────────────────────
 // Pre-flight: credenciales presentes.
 // ──────────────────────────────────────────────────────────────────────────
@@ -360,5 +383,261 @@ test.describe('Operador — todo visible y funcional (prueba FAITHFUL nocturna)'
     // El selector debe tener al menos una opción real (además del placeholder).
     const optionCount = await select.locator('option').count();
     expect(optionCount, 'El selector de zona no tiene opciones reales (solo el placeholder)').toBeGreaterThan(1);
+  });
+
+  // ────────────────────────────────────────────────────────────────────────
+  // 6) CICLO CRUD COMPLETO DE UNA PLANTA: AGREGAR → CONSULTAR → BORRAR
+  //    Reproduce, end-to-end y contra el farmOS real, el flujo que el operador
+  //    hace a mano: registrar una siembra, abrir su ficha y eliminarla.
+  //    Es IDEMPOTENTE: borra lo que crea (el paso 3 lo hace; el finally limpia
+  //    cualquier residuo si algún paso anterior falla), así el cron 3am no
+  //    acumula basura. Tap REAL + hit-test de cada control (no clic sintético).
+  // ────────────────────────────────────────────────────────────────────────
+
+  /** Abre el formulario de "Registrar Siembra" (modo normal) y devuelve el
+   *  <select> de zona contenedora ya visible. Misma estrategia que el test 5:
+   *  hash directo y, si no abre, navegación in-app por "Mis plantas". */
+  async function abrirFormAgregarPlanta(page) {
+    const zonaSel = () =>
+      page.locator('select').filter({ has: page.locator('option', { hasText: /Seleccione una zona/i }) }).first();
+
+    await page.goto('/#plant_asset', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2000);
+
+    if (!(await zonaSel().isVisible().catch(() => false))) {
+      await page.goto('/', { waitUntil: 'domcontentloaded' });
+      await page.locator('section[aria-label="Agente Chagra"]').waitFor({ state: 'visible', timeout: 30000 });
+      const verModulos = page.getByLabel('Ver modulos del home');
+      if (await verModulos.isVisible().catch(() => false)) {
+        await verModulos.click();
+        await page.waitForTimeout(600);
+      }
+      const plantsCard = page.locator('button[aria-label*="Cultivos registrados"]').first();
+      await plantsCard.scrollIntoViewIfNeeded();
+      await plantsCard.click();
+      await page.waitForTimeout(1500);
+      // "Registrar Siembra" abre el formulario (AssetsDashboard.jsx).
+      const addBtn = page.getByRole('button', { name: /Registrar Siembra|Agregar|Nueva planta|Sembrar/i }).first();
+      if (await addBtn.isVisible().catch(() => false)) {
+        await addBtn.click();
+        await page.waitForTimeout(1500);
+      }
+    }
+    const select = zonaSel();
+    await expect(select, 'No se pudo abrir el formulario con el selector de zona').toBeVisible({ timeout: 10000 });
+    return select;
+  }
+
+  /** Va a "Mis plantas" (vista de activos) y aplana la lista para que las
+   *  tarjetas individuales (div[role="article"]) sean visibles. La vista de
+   *  plantas arranca AGRUPADA por zona (drill-down): hay que tocar "Ver todos
+   *  (N)" (AssetsDashboard.jsx → setCurrentZoneId('__all__')) para ver cada
+   *  planta como card. */
+  async function irAMisPlantas(page) {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.locator('section[aria-label="Agente Chagra"]').waitFor({ state: 'visible', timeout: 30000 });
+    const verModulos = page.getByLabel('Ver modulos del home');
+    if (await verModulos.isVisible().catch(() => false)) {
+      await verModulos.click();
+      await page.waitForTimeout(600);
+    }
+    const plantsCard = page.locator('button[aria-label*="Cultivos registrados"]').first();
+    await plantsCard.scrollIntoViewIfNeeded();
+    await plantsCard.click();
+    await page.waitForTimeout(1800);
+    // Aplanar: "Ver todos (N)" despliega todas las plantas como cards.
+    const verTodos = page.getByRole('button', { name: /^Ver todos/i }).first();
+    if (await verTodos.isVisible().catch(() => false)) {
+      await verTodos.click();
+      await page.waitForTimeout(1200);
+    }
+  }
+
+  /** Cuenta las tarjetas de la lista de activos cuyo título (h4) contiene el
+   *  nombre dado. Sirve para verificar el delta al crear/borrar y para limpiar
+   *  residuos de corridas previas. */
+  async function contarCardsPorNombre(page, nombre) {
+    return await page
+      .locator('div[role="article"]')
+      .filter({ has: page.getByRole('heading', { level: 4, name: nombre }) })
+      .count()
+      .catch(() => 0);
+  }
+
+  /** Borra (con confirm aceptado) todas las tarjetas cuyo título contenga el
+   *  nombre dado. Idempotente: si no hay ninguna, no hace nada. */
+  async function borrarTodasPorNombre(page, nombre) {
+    page.on('dialog', (d) => d.accept().catch(() => {}));
+    for (let i = 0; i < 6; i++) {
+      const card = page
+        .locator('div[role="article"]')
+        .filter({ has: page.getByRole('heading', { level: 4, name: nombre }) })
+        .first();
+      if (!(await card.isVisible().catch(() => false))) break;
+      // Botón rojo de borrar (Trash2) dentro de la card (AssetsDashboard.jsx:
+      // <button onClick={handleDelete} className="...bg-red-900/30...">). El icono
+      // no tiene aria-label, así que se localiza por su clase distintiva.
+      await card.locator('button[class*="bg-red-900"]').first().click().catch(() => {});
+      await page.waitForTimeout(1200);
+    }
+  }
+
+  test('6) CRUD planta: AGREGAR → CONSULTAR → BORRAR (ciclo real end-to-end)', async ({ page }) => {
+    // Recorre 3 vistas con navegación in-app + 2 round-trips a farmOS (crear y
+    // borrar); necesita más que el timeout por defecto de 30s.
+    test.setTimeout(150_000);
+
+    // Confirm nativo del navegador (window.confirm en handleDelete) → aceptar.
+    page.on('dialog', (d) => d.accept().catch(() => {}));
+
+    await loginReal(page);
+    await page.waitForTimeout(2500);
+
+    // Nombre de la especie que registraremos (del catálogo). El nombre de la
+    // planta queda igual al de la especie elegida (SpeciesSelect → formData.name).
+    let plantName = '';
+
+    try {
+      // ── 1) AGREGAR ────────────────────────────────────────────────────────
+      const select = await abrirFormAgregarPlanta(page);
+
+      // (a) Seleccionar la PRIMERA zona/área real (no el placeholder). Si NO
+      //     hubiera opciones reales, sería el bug reportado ("no aparece área").
+      //     Ojo: las <option> de un <select> nativo NO son "visible" para
+      //     Playwright hasta desplegar el dropdown del SO; por eso verificamos
+      //     que el <select> es visible y que hay ≥1 opción real por conteo.
+      await expect(select, 'El selector de área/zona no aparece al agregar planta (BUG del operador)').toBeVisible({
+        timeout: 8000,
+      });
+      const realOptions = select.locator('option:not([disabled])');
+      const nRealOptions = await realOptions.count();
+      expect(nRealOptions, 'El selector de área no tiene zonas reales (BUG: no aparece área)').toBeGreaterThanOrEqual(1);
+      const zoneValue = await realOptions.first().getAttribute('value');
+      expect(zoneValue, 'La zona seleccionable no tiene value (área inválida)').toBeTruthy();
+      await select.selectOption(zoneValue);
+
+      // (b) Elegir una ESPECIE del catálogo: abrir el SpeciesSelect, buscar y
+      //     tomar la primera coincidencia real del dropdown (tap REAL + hit-test).
+      //     El abridor del SpeciesSelect es un <div role="button" onClick> (no
+      //     un <button>): localizamos ese contenedor y hacemos hit-test contra
+      //     ÉL (que el punto central caiga dentro de su subárbol, no en un
+      //     overlay), porque hitTestCenter solo reconoce button/a/[role=button].
+      const speciesOpener = page
+        .locator('div')
+        .filter({ has: page.getByText('Seleccionar especie…', { exact: false }) })
+        .last();
+      await expect(speciesOpener, 'No aparece el selector de especie del catálogo').toBeVisible({ timeout: 8000 });
+      const openHit = await hitTestWithin(page, speciesOpener);
+      expect(openHit.ok, `El abridor de especie está tapado por un overlay: ${openHit.reason}`).toBe(true);
+      await speciesOpener.click();
+
+      const searchBox = page.locator('input[placeholder*="Buscar especie"]').first();
+      await expect(searchBox, 'No aparece el buscador de especie').toBeVisible({ timeout: 6000 });
+      await searchBox.fill('tomate');
+      await page.waitForTimeout(900);
+
+      // Las opciones del dropdown son <button> con un <span> del nombre.
+      const firstOption = page.locator('button:has(span.font-medium)').first();
+      await expect(firstOption, 'El catálogo no devolvió coincidencias para "tomate"').toBeVisible({ timeout: 6000 });
+      const optHit = await hitTestCenter(page, firstOption);
+      expect(optHit.ok, `La opción del catálogo está tapada: ${optHit.reason}`).toBe(true);
+      plantName = ((await firstOption.locator('span.font-medium').first().textContent()) || '').trim();
+      expect(plantName, 'No se pudo leer el nombre de la especie del catálogo').toBeTruthy();
+      await firstOption.click();
+      await page.waitForTimeout(600);
+
+      // (c) Confirmar/guardar (tap REAL + hit-test del botón "Guardar").
+      const saveBtn = page.getByRole('button', { name: /^Guardar$|^Guardando/i }).first();
+      await expect(saveBtn, 'No aparece el botón Guardar').toBeVisible({ timeout: 6000 });
+      const saveHit = await hitTestCenter(page, saveBtn);
+      expect(saveHit.ok, `El botón Guardar está tapado: ${saveHit.reason}`).toBe(true);
+      await saveBtn.click();
+      // El form se cierra (setShowForm(false)) y la planta se persiste/sincroniza.
+      await page.waitForTimeout(3000);
+      await page.screenshot({ path: 'test-results/operador-crud-1-agregada.png', fullPage: true }).catch(() => {});
+
+      // Verificar que NO hubo error de token tras el round-trip de creación.
+      const afterAddText = await page.locator('body').innerText();
+      for (const re of TOKEN_ERROR_PATTERNS) {
+        expect(afterAddText, `Error de token al agregar planta: ${re}`).not.toMatch(re);
+      }
+
+      // La planta CREADA aparece en "Mis plantas" (señal de éxito).
+      await irAMisPlantas(page);
+      const nuevaCard = page
+        .locator('div[role="article"]')
+        .filter({ has: page.getByRole('heading', { level: 4, name: plantName }) })
+        .first();
+      await nuevaCard.scrollIntoViewIfNeeded().catch(() => {});
+      await expect(nuevaCard, `La planta creada "${plantName}" no aparece en Mis plantas`).toBeVisible({
+        timeout: 12000,
+      });
+
+      // ── 2) CONSULTAR ──────────────────────────────────────────────────────
+      // Abrir el detalle de la planta recién creada (tap REAL en la card).
+      const cardOpener = nuevaCard.locator('button').first();
+      const cardHit = await hitTestCenter(page, cardOpener);
+      expect(cardHit.ok, `La card de la planta está tapada: ${cardHit.reason}`).toBe(true);
+      await cardOpener.click();
+      await page.waitForTimeout(1500);
+
+      // El panel de detalle abre con aria-label="Detalle del activo ..." y un
+      // botón data-testid="asset-detail-close". El título (h2) debe traer el nombre.
+      const detalle = page.locator('[aria-label^="Detalle del activo"]').first();
+      await expect(detalle, 'El detalle de la planta no abrió').toBeVisible({ timeout: 10000 });
+      await expect(
+        detalle.getByRole('heading', { level: 2, name: plantName }),
+        'El detalle no muestra el nombre/especie correcta',
+      ).toBeVisible({ timeout: 8000 });
+
+      // El detalle NO debe mostrar error de token / sesión expirada.
+      const detalleText = await detalle.innerText();
+      for (const re of TOKEN_ERROR_PATTERNS) {
+        expect(detalleText, `El detalle muestra error de token: ${re}`).not.toMatch(re);
+      }
+      await page.screenshot({ path: 'test-results/operador-crud-2-detalle.png', fullPage: true }).catch(() => {});
+
+      // Cerrar el detalle (vuelve a la lista).
+      const closeBtn = page.locator('[data-testid="asset-detail-close"]').first();
+      if (await closeBtn.isVisible().catch(() => false)) {
+        await closeBtn.click();
+        await page.waitForTimeout(1000);
+      }
+
+      // ── 3) BORRAR ─────────────────────────────────────────────────────────
+      const antes = await contarCardsPorNombre(page, plantName);
+      expect(antes, `Antes de borrar debía existir ≥1 card "${plantName}"`).toBeGreaterThanOrEqual(1);
+
+      const cardABorrar = page
+        .locator('div[role="article"]')
+        .filter({ has: page.getByRole('heading', { level: 4, name: plantName }) })
+        .first();
+      await cardABorrar.scrollIntoViewIfNeeded().catch(() => {});
+      // Botón rojo de borrar (Trash2) dentro de la card. El icono no tiene
+      // aria-label → se localiza por su clase distintiva (bg-red-900).
+      const delBtn = cardABorrar.locator('button[class*="bg-red-900"]').first();
+      const delHit = await hitTestCenter(page, delBtn);
+      expect(delHit.ok, `El botón de borrar está tapado: ${delHit.reason}`).toBe(true);
+      await delBtn.click(); // dispara window.confirm → ya aceptado por el handler de dialog
+      await page.waitForTimeout(2500);
+      await page.screenshot({ path: 'test-results/operador-crud-3-borrada.png', fullPage: true }).catch(() => {});
+
+      // La planta desaparece: el conteo de cards con ese nombre baja en 1.
+      const despues = await contarCardsPorNombre(page, plantName);
+      expect(despues, `La planta "${plantName}" no desapareció tras borrar (antes=${antes}, después=${despues})`).toBe(
+        antes - 1,
+      );
+    } finally {
+      // Idempotencia: si algún paso falló dejando la planta creada, límpiala
+      // para que el cron no acumule basura. No rompe el resultado del test.
+      if (plantName) {
+        try {
+          await irAMisPlantas(page);
+          await borrarTodasPorNombre(page, plantName);
+        } catch {
+          // best-effort: el assert del test ya reportó el fallo real.
+        }
+      }
+    }
   });
 });
