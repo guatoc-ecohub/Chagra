@@ -11986,12 +11986,48 @@
       "companions": [],
       "_nota_companions": "Asocio papa-arveja (DR Gemini): la papa es tutor físico de la arveja (evita volcamiento); ~21.000 ha/año, 65% de productores del altiplano.",
       "enfermedades_criticas": [
-        "Phytophthora infestans"
+        "Phytophthora infestans",
+        "Trozador (Agrotis ipsilon)"
       ],
       "plagas_criticas": [
         "Tecia solanivora",
         "Phyllophaga spp."
       ],
+      "feeding_plan_template": {
+        "source": "Agrosavia Manual tuberculos andinos (2017) + Perez-Rodriguez-Gomez (2008). Paridad base-variedad para papa; detalle operativo vive en variedades comerciales.",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Aplicar bocashi al surco",
+            "biofertilizer_slug": "bocashi"
+          },
+          {
+            "offset_days": 25,
+            "action": "Inocular Trichoderma harzianum al sustrato",
+            "biofertilizer_slug": "trichoderma_harzianum_suelo"
+          },
+          {
+            "offset_days": 45,
+            "action": "Drench con humus liquido",
+            "biofertilizer_slug": "humus_liquido"
+          },
+          {
+            "offset_days": 60,
+            "action": "Foliar con biol en pre-tuberizacion",
+            "biofertilizer_slug": "biol"
+          },
+          {
+            "offset_days": 80,
+            "action": "Foliar con caldo bordeles preventivo",
+            "biofertilizer_slug": "caldo_bordeles"
+          },
+          {
+            "offset_days": 100,
+            "action": "Foliar con supermagro durante llenado",
+            "biofertilizer_slug": "supermagro"
+          }
+        ]
+      },
       "valor_pedagogico": "La papa parda pastusa (Solanum tuberosum subsp. andigenum) es una variedad tradicional de mesa del altiplano frío colombiano (2600-3300 msnm) que, a diferencia de la Pastusa Suprema y la Diacol Capiro, TOLERA HELADAS MODERADAS y por eso se siembra en cotas más altas (DR Gemini 2026). Entra en el asocio clásico papa-arveja, donde la mata de papa actúa como tutor físico de la arveja erecta (Gorriona/Guatecaria), un sistema que cubre ~21.000 ha/año y al que recurre el 65% de los productores. Manejo agroecológico: rotación con haba/arveja (fijación de N), bocashi al surco, caldo bordelés preventivo para gota (Phytophthora infestans), monitoreo de polilla guatemalteca (Tecia solanivora) con feromonas. Confianza media: envolvente agroclimática provisional (Agrosavia, URL por verificar).",
       "source_ids": [
         "gbif-taxonomic-backbone",
