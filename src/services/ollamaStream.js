@@ -1,3 +1,4 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 /**
  * ollamaStream.js — Cliente de streaming NDJSON para Ollama (v0.6.0).
  *
@@ -24,6 +25,7 @@
 
 import { recordLLMEvent } from './llmTelemetryService';
 import { getGpuSnapshot } from './gpuTelemetryService';
+import { fetchWithAuthRetry } from './apiService';
 
 const detectProcessorFor = async (model) => {
   try {
@@ -124,7 +126,7 @@ export async function streamOllama(url, body, onToken, { signal, onDone, meta } 
   }
 
   try {
-    response = await fetch(url, {
+    response = await fetchWithAuthRetry(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...body, stream: true }),

@@ -31,6 +31,7 @@
  * El gating duro es server-side; este header es defense-in-depth cliente.
  */
 
+import { fetchWithAuthRetry } from './apiService.js';
 import { buildSidecarHeaders } from './tierService.js';
 
 const SUBMIT_TIMEOUT_MS = 15000;
@@ -108,7 +109,7 @@ export async function submitDeepResearch(query) {
 
   const t0 = Date.now();
   try {
-    const res = await fetch(url, {
+    const res = await fetchWithAuthRetry(url, {
       method: 'POST',
       headers: makeHeaders(),
       body: JSON.stringify({ query: query.trim() }),
@@ -176,7 +177,7 @@ export async function fetchDeepResearchStatus(jobId, signal) {
   const headers = buildSidecarHeaders(getToken());
 
   try {
-    const res = await fetch(url, { method: 'GET', headers, signal: controller.signal });
+    const res = await fetchWithAuthRetry(url, { method: 'GET', headers, signal: controller.signal });
     if (!res.ok) {
       console.debug('[deep-research] poll non-2xx', { jobId, status: res.status });
       return null;

@@ -35,6 +35,7 @@
 
 import { ulid } from 'ulid';
 import { hasConsent } from './feedbackService';
+import { fetchWithAuthRetry } from './apiService';
 
 const CAPTURE_TIMEOUT_MS = 6000;
 const TEXT_MAX = 16000; // cota por campo (un turno largo del agente ~2-4k; holgado)
@@ -159,7 +160,7 @@ export function captureExchange({ userText, agentText, identity = {}, meta = {} 
   const timer = setTimeout(() => controller.abort(), CAPTURE_TIMEOUT_MS);
 
   // Fire-and-forget: no await, no throw. El chat NO depende de esto.
-  fetch(`${base}/log-conversation`, {
+  fetchWithAuthRetry(`${base}/log-conversation`, {
     method: 'POST',
     headers,
     body: JSON.stringify(payload),

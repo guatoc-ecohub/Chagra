@@ -35,6 +35,7 @@
  * telemetría aún — esto se sumará a una task futura si hace falta).
  */
 
+import { fetchWithAuthRetry } from './apiService.js';
 import { buildSidecarHeaders } from './tierService.js';
 
 const NLU_TIMEOUT_MS = 18000;
@@ -115,7 +116,7 @@ async function getJson(path, query, timeoutMs) {
 
   const t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
   try {
-    const res = await fetch(url, {
+    const res = await fetchWithAuthRetry(url, {
       method: 'GET',
       headers,
       signal: controller.signal,
@@ -160,7 +161,7 @@ async function postJson(path, body, timeoutMs) {
 
   const t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
   try {
-    const res = await fetch(url, {
+    const res = await fetchWithAuthRetry(url, {
       method: 'POST',
       headers,
       body: JSON.stringify(body || {}),

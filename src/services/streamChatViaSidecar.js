@@ -41,6 +41,7 @@
 
 import { recordLLMEvent } from './llmTelemetryService';
 import { classifyQueryIntent } from './outputGuards';
+import { fetchWithAuthRetry } from './apiService';
 
 const NLU_DEFAULT_URL = '/api/mcp/agro';
 const SSE_DATA_PREFIX = 'data: ';
@@ -173,7 +174,7 @@ export async function streamChatViaSidecar({
 
   let response;
   try {
-    response = await fetch(url, {
+    response = await fetchWithAuthRetry(url, {
       method: 'POST',
       headers,
       body: JSON.stringify(body),

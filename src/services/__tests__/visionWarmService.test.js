@@ -12,6 +12,13 @@ beforeEach(() => {
   vi.unstubAllGlobals();
 });
 
+const waitForMockCalls = async (mockFn, count) => {
+  for (let i = 0; i < 20 && mockFn.mock.calls.length < count; i++) {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  }
+  expect(mockFn).toHaveBeenCalledTimes(count);
+};
+
 describe('warmVisionModel', () => {
   it('dispara un fetch POST al endpoint de ollama y retorna true si responde ok', async () => {
     const fetchMock = vi.fn(async () => ({ ok: true }));
@@ -59,7 +66,7 @@ describe('warmVisionModel', () => {
     const p1 = warmVisionModel();        // queda in-flight
     const r2 = await warmVisionModel();  // debe cortocircuitar por el lock
     expect(r2).toBe(true);
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    await waitForMockCalls(fetchMock, 1);
     resolveFetch();
     expect(await p1).toBe(true);
   });

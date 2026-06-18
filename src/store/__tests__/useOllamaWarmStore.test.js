@@ -26,6 +26,13 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import useOllamaWarmStore from '../useOllamaWarmStore';
 import { DEFAULT_MODEL } from '../../services/llmRouter';
 
+const waitForFetchCalls = async (count) => {
+  for (let i = 0; i < 20 && fetch.mock.calls.length < count; i++) {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  }
+  expect(fetch).toHaveBeenCalledTimes(count);
+};
+
 describe('useOllamaWarmStore — NN4 pre-warm Ollama al login', () => {
   beforeEach(() => {
     // Reset siempre antes de cada test: el store es singleton entre tests.
@@ -46,11 +53,11 @@ describe('useOllamaWarmStore — NN4 pre-warm Ollama al login', () => {
     expect(s.completedAt).toBeNull();
   });
 
-  it('startWarmup dispara fetch al endpoint Ollama con payload correcto', () => {
+  it('startWarmup dispara fetch al endpoint Ollama con payload correcto', async () => {
     fetch.mockResolvedValueOnce({ ok: true, status: 200 });
     useOllamaWarmStore.getState().startWarmup();
 
-    expect(fetch).toHaveBeenCalledTimes(1);
+    await waitForFetchCalls(1);
     const [url, opts] = fetch.mock.calls[0];
     expect(url).toBe('/api/ollama/api/generate');
     expect(opts.method).toBe('POST');
@@ -65,10 +72,11 @@ describe('useOllamaWarmStore — NN4 pre-warm Ollama al login', () => {
     });
   });
 
-  it('pre-warm apunta al modelo de CHAT (granite), no al NLU (gemma)', () => {
+  it('pre-warm apunta al modelo de CHAT (granite), no al NLU (gemma)', async () => {
     fetch.mockResolvedValueOnce({ ok: true, status: 200 });
     useOllamaWarmStore.getState().startWarmup();
 
+    await waitForFetchCalls(1);
     const [, opts] = fetch.mock.calls[0];
     const body = JSON.parse(opts.body);
     // El modelo pre-calentado debe ser exactamente el del chat configurado
@@ -81,10 +89,11 @@ describe('useOllamaWarmStore — NN4 pre-warm Ollama al login', () => {
     expect(body.model).not.toBe('gemma3:4b');
   });
 
-  it('pre-warm pinnea el modelo con keep_alive=-1 (sin expiración por timer)', () => {
+  it('pre-warm pinnea el modelo con keep_alive=-1 (sin expiración por timer)', async () => {
     fetch.mockResolvedValueOnce({ ok: true, status: 200 });
     useOllamaWarmStore.getState().startWarmup();
 
+    await waitForFetchCalls(1);
     const [, opts] = fetch.mock.calls[0];
     const body = JSON.parse(opts.body);
     // keep_alive=-1 mantiene el modelo cargado indefinidamente (no expira a
@@ -108,6 +117,7 @@ describe('useOllamaWarmStore — NN4 pre-warm Ollama al login', () => {
     expect(s.startedAt).toBeTypeOf('number');
     expect(s.completedAt).toBeNull();
 
+    await waitForFetchCalls(1);
     // Resolvemos el fetch y flusheamos el microtask queue.
     resolveFetch();
     await new Promise((r) => setTimeout(r, 0));
@@ -140,10 +150,10 @@ describe('useOllamaWarmStore — NN4 pre-warm Ollama al login', () => {
     expect(useOllamaWarmStore.getState().status).toBe('failed');
   });
 
-  it('idempotencia: llamar startWarmup en estado warming NO dispara segundo fetch', () => {
+  it('idempotencia: llamar startWarmup en estado warming NO dispara segundo fetch', async () => {
     fetch.mockImplementation(() => new Promise(() => {})); // pending forever
     useOllamaWarmStore.getState().startWarmup();
-    expect(fetch).toHaveBeenCalledTimes(1);
+    await waitForFetchCalls(1);
     expect(useOllamaWarmStore.getState().status).toBe('warming');
 
     useOllamaWarmStore.getState().startWarmup();
@@ -172,7 +182,7 @@ describe('useOllamaWarmStore — NN4 pre-warm Ollama al login', () => {
     // Segundo intento desde 'failed' debe disparar un nuevo fetch.
     fetch.mockResolvedValueOnce({ ok: true, status: 200 });
     useOllamaWarmStore.getState().startWarmup();
-    expect(fetch).toHaveBeenCalledTimes(2);
+    await waitForFetchCalls(2);
     await new Promise((r) => setTimeout(r, 0));
     expect(useOllamaWarmStore.getState().status).toBe('warm');
   });

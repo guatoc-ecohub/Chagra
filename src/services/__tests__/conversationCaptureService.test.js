@@ -3,10 +3,18 @@
  */
 
 /* eslint-disable no-undef */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { captureExchange, isCaptureEnabled, shouldAnonymizePII } from '../conversationCaptureService';
 import * as feedbackService from '../feedbackService';
+
+const waitForFetchCalls = async (count) => {
+  for (let i = 0; i < 20 && global.fetch.mock.calls.length < count; i++) {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  }
+  expect(global.fetch).toHaveBeenCalledTimes(count);
+};
 
 describe('conversationCaptureService', () => {
   const originalFetch = global.fetch;
@@ -76,7 +84,7 @@ describe('conversationCaptureService', () => {
       expect(global.fetch).not.toHaveBeenCalled();
     });
 
-    it('con flag ON y consentimiento, postea a /log-conversation con token y schema', () => {
+    it('con flag ON y consentimiento, postea a /log-conversation con token y schema', async () => {
       vi.stubEnv('VITE_CAPTURE_CONVERSATIONS', 'true');
       captureExchange({
         userText: '¿compañeros del café?',
@@ -99,7 +107,7 @@ describe('conversationCaptureService', () => {
         },
       });
 
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      await waitForFetchCalls(1);
       const [url, opts] = global.fetch.mock.calls[0];
       expect(url).toBe('/api/mcp/agro/log-conversation');
       expect(opts.method).toBe('POST');
@@ -123,7 +131,7 @@ describe('conversationCaptureService', () => {
       expect(typeof body.ts).toBe('number');
     });
 
-    it('con VITE_CAPTURE_ANONYMIZE=true omite user_name y finca_nombre', () => {
+    it('con VITE_CAPTURE_ANONYMIZE=true omite user_name y finca_nombre', async () => {
       vi.stubEnv('VITE_CAPTURE_CONVERSATIONS', 'true');
       vi.stubEnv('VITE_CAPTURE_ANONYMIZE', 'true');
       captureExchange({
@@ -137,6 +145,7 @@ describe('conversationCaptureService', () => {
         },
       });
 
+      await waitForFetchCalls(1);
       const body = JSON.parse(global.fetch.mock.calls[0][1].body);
       expect(body.user_name).toBeNull();
       expect(body.finca_nombre).toBeNull();
@@ -144,9 +153,10 @@ describe('conversationCaptureService', () => {
       expect(body.finca_slug).toBe('finca-free');
     });
 
-    it('tolera identity/meta ausentes', () => {
+    it('tolera identity/meta ausentes', async () => {
       vi.stubEnv('VITE_CAPTURE_CONVERSATIONS', 'true');
       captureExchange({ userText: 'hola', agentText: 'buenas' });
+      await waitForFetchCalls(1);
       const body = JSON.parse(global.fetch.mock.calls[0][1].body);
       expect(body.user_id).toBeNull();
       expect(body.user_name).toBeNull();
@@ -155,11 +165,11 @@ describe('conversationCaptureService', () => {
       expect(body.latency_ms).toBeNull();
     });
 
-    it('falla en silencio si fetch rechaza', () => {
+    it('falla en silencio si fetch rechaza', async () => {
       vi.stubEnv('VITE_CAPTURE_CONVERSATIONS', 'true');
       global.fetch = vi.fn().mockRejectedValue(new Error('network down'));
       expect(() => captureExchange({ userText: 'x', agentText: 'y' })).not.toThrow();
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      await waitForFetchCalls(1);
     });
   });
 });

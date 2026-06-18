@@ -442,6 +442,32 @@ describe('authService — OAuth PKCE flow', () => {
             global.fetch.mockRejectedValue(new Error('Network error'));
             await expect(refreshAccessToken()).resolves.toBeNull();
         });
+
+        it('serializa refresh concurrente y comparte una sola llamada al backend', async () => {
+            localforage.getItem.mockResolvedValue('refresh-serial');
+            global.fetch.mockImplementation(() => new Promise((resolve) => {
+                setTimeout(() => resolve({
+                    ok: true,
+                    status: 200,
+                    headers: { get: (n) => (n === 'content-type' ? 'application/json' : null) },
+                    json: async () => ({
+                        access_token: 'access-serial',
+                        refresh_token: 'refresh-serial-2',
+                        expires_in: 3600,
+                    }),
+                }), 5);
+            }));
+
+            const [a, b] = await Promise.all([
+                refreshAccessToken(),
+                refreshAccessToken(),
+            ]);
+
+            expect(a).toBe('access-serial');
+            expect(b).toBe('access-serial');
+            expect(global.fetch).toHaveBeenCalledTimes(1);
+            expect(localforage.setItem).toHaveBeenCalledWith('farmos_refresh_token', 'refresh-serial-2');
+        });
     });
 
     describe('getAccessToken — renueva en vez de quedar zombi', () => {

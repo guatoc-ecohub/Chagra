@@ -21,7 +21,10 @@ vi.mock('../services/ragRetriever', () => ({
 }));
 vi.mock('../services/alertEngine', () => ({ alertEngine: { start: () => Promise.resolve() } }));
 vi.mock('../services/cropAlertEngine', () => ({ cropAlertEngine: { start: () => Promise.resolve() } }));
-vi.mock('../services/apiService', () => ({ fetchFromFarmOS: () => Promise.resolve(null) }));
+vi.mock('../services/apiService', () => ({
+  fetchFromFarmOS: () => Promise.resolve(null),
+  fetchWithAuthRetry: () => Promise.resolve({ ok: true }),
+}));
 
 // La pantalla destino: stub liviano que delata que se montó. Probamos el WIRING
 // de la ruta, no el render interno de la pantalla (ya cubierto en su propio test).

@@ -26,7 +26,10 @@ vi.mock('../services/ragRetriever', () => ({
 }));
 vi.mock('../services/alertEngine', () => ({ alertEngine: { start: () => Promise.resolve() } }));
 vi.mock('../services/cropAlertEngine', () => ({ cropAlertEngine: { start: () => Promise.resolve() } }));
-vi.mock('../services/apiService', () => ({ fetchFromFarmOS: () => Promise.resolve(null) }));
+vi.mock('../services/apiService', () => ({
+  fetchFromFarmOS: () => Promise.resolve(null),
+  fetchWithAuthRetry: () => Promise.resolve({ ok: true }),
+}));
 vi.mock('../db/farmProcessCache', () => ({ listFarmProcesses: () => Promise.resolve([]) }));
 
 // El módulo glaciar: stub liviano que delata que se montó. Si el gate funciona,

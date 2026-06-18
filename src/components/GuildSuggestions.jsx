@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect, useMemo } from 'react';
 import { Sprout, AlertTriangle, Sparkles, Loader2, Check } from 'lucide-react';
 import { getSuggestedCompanions, buildGuildPrompt } from '../services/guildService';
@@ -7,6 +8,7 @@ import { registry } from '../core/moduleRegistry';
 import useAssetStore from '../store/useAssetStore';
 import ExternalAiButton from './common/ExternalAiButton';
 import { buildGuildExternalPrompt } from '../services/externalAiPromptBuilder';
+import { fetchWithAuthRetry } from '../services/apiService';
 
 // Autopilot #8 (2026-05-03): re-rank companions putting existing plants first.
 // Reduce friction de "tengo que comprar otra especie", mostrar primero las
@@ -111,7 +113,7 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
     setAiError(null);
     try {
       const prompt = buildGuildPrompt(speciesName, defaults.estrato);
-      const res = await fetch('/api/ollama/api/chat', {
+      const res = await fetchWithAuthRetry('/api/ollama/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
