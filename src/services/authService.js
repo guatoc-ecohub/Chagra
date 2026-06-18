@@ -233,19 +233,139 @@ export const authenticateUser = async (username, password) => {
 };
 
 /**
- * Lee el access token persistido. Si está expirado, fuerza logout y retorna null.
+ * Refresca el access token usando el refresh_token persistido (OAuth2
+ * `grant_type=refresh_token`).
  *
- * @returns {Promise<string|null>} token activo, o null si no existe / expiró /
- *   localforage falló (defensive: la app debe tratar null como "no auth").
+ * RAÍZ DEL BUG "sesión zombi" (operador 2026-06-18): el access token de farmOS
+ * dura 1h (`expires_in: 3600`). Hasta ahora `getAccessToken()` SOLO comprobaba
+ * la expiración y, al vencer, hacía `logoutUser()` y devolvía null — el
+ * refresh_token se guardaba en el login pero NUNCA se usaba. Resultado: tras 1h
+ * el operador volvía a la app con un token vencido y, en vez de renovarse
+ * solo, la primera petición fallaba: el home mostraba "Tu sesión expiró"
+ * (friendlyErrors 401), los contadores quedaban en "sin plantas" y el selector
+ * de zona salía vacío. Verificado EN VIVO que el backend SÍ acepta el
+ * `refresh_token` grant (devuelve un access nuevo + refresh rotado), así que la
+ * renovación silenciosa es la cura correcta: re-loguearse a mano dejaba de ser
+ * necesario.
+ *
+ * Idempotente y serializado: si dos llamadas concurrentes detectan expiración a
+ * la vez, comparten la MISMA promesa de refresh (`refreshInFlight`) para no
+ * disparar dos grants en paralelo (que rotarían el refresh_token dos veces y
+ * uno quedaría inválido).
+ *
+ * @returns {Promise<string|null>} nuevo access token, o null si no hay
+ *   refresh_token, el grant falla, o el grant está deshabilitado. NUNCA lanza.
+ */
+let refreshInFlight = null;
+
+export const refreshAccessToken = async () => {
+    if (refreshInFlight) return refreshInFlight;
+
+    refreshInFlight = (async () => {
+        let refreshToken;
+        try {
+            refreshToken = await localforage.getItem('farmos_refresh_token');
+        } catch (err) {
+            console.error('[Auth] no se pudo leer el refresh_token:', err);
+            return null;
+        }
+        if (!refreshToken) return null;
+
+        const url = `${FARMOS_URL}/oauth/token`;
+        const payload = new URLSearchParams({
+            grant_type: 'refresh_token',
+            client_id: CLIENT_ID,
+            refresh_token: refreshToken,
+            scope: 'farm_manager',
+        });
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: payload.toString(),
+            });
+
+            if (!response.ok) {
+                // 400/401 = refresh_token vencido o revocado: no hay nada que
+                // renovar. El caller debe hacer logout limpio (no quedarse en
+                // estado zombi). NO logueamos el body (puede traer el token).
+                console.warn(`[Auth] refresh_token grant falló (${response.status}).`);
+                return null;
+            }
+
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('json')) {
+                console.warn('[Auth] respuesta de refresh sin JSON (backend caído?).');
+                return null;
+            }
+
+            const data = await response.json();
+            if (!data.access_token) return null;
+
+            await localforage.setItem('farmos_access_token', data.access_token);
+            // El refresh_token suele rotar en cada uso: persistir el nuevo si
+            // viene, conservar el anterior si el backend no lo rota.
+            if (data.refresh_token) {
+                await localforage.setItem('farmos_refresh_token', data.refresh_token);
+            }
+            const expiresIn = Number(data.expires_in) || 3600;
+            await localforage.setItem('farmos_token_expiry', Date.now() + expiresIn * 1000);
+
+            console.log('[Auth] access token renovado vía refresh_token grant.');
+            return data.access_token;
+        } catch (err) {
+            // Red caída / timeout: NO es expiración del refresh. Devolvemos null
+            // para que el caller no rompa, pero el caller NO debe hacer logout
+            // por un fallo de red (ver getAccessToken: solo logout si había
+            // refresh_token y el grant lo rechazó explícitamente).
+            console.error('[Auth] error de red al refrescar el token:', err);
+            return null;
+        }
+    })();
+
+    try {
+        return await refreshInFlight;
+    } finally {
+        refreshInFlight = null;
+    }
+};
+
+/**
+ * Lee el access token persistido. Si está expirado, intenta RENOVARLO con el
+ * refresh_token antes de rendirse; solo si la renovación falla por
+ * refresh_token vencido/revocado hace un logout limpio (evita el estado zombi).
+ *
+ * @returns {Promise<string|null>} token activo (renovado si hizo falta), o null
+ *   si no existe / no se pudo renovar / localforage falló (defensive: la app
+ *   debe tratar null como "no auth").
  */
 export const getAccessToken = async () => {
     try {
         const token = await localforage.getItem('farmos_access_token');
         const expiry = await localforage.getItem('farmos_token_expiry');
 
-        // Basic check for expiration (could trigger refresh here)
         if (token && expiry && Date.now() > expiry) {
-            await logoutUser();
+            // Token vencido: intentar renovación silenciosa con el refresh_token
+            // ANTES de cerrar la sesión (la cura del bug "sesión zombi").
+            const refreshed = await refreshAccessToken();
+            if (refreshed) return refreshed;
+
+            // La renovación no dio token. Distinguir dos casos para no cerrar la
+            // sesión por un simple fallo de red (offline-first):
+            //   - HAY refresh_token pero el grant lo rechazó → sesión realmente
+            //     muerta → logout limpio (la app lleva a #login, sin zombi).
+            //   - red caída / sin refresh_token → devolver null SIN borrar nada:
+            //     al recuperar conexión el siguiente intento renovará y el
+            //     usuario no pierde su sesión por estar offline un rato.
+            let hadRefresh = false;
+            try {
+                hadRefresh = !!(await localforage.getItem('farmos_refresh_token'));
+            } catch (_) { /* asumir que no, fail-safe */ }
+
+            if (hadRefresh && navigator.onLine !== false) {
+                await logoutUser();
+            }
             return null;
         }
 

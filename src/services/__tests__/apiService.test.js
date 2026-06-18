@@ -1,7 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('../authService.js', () => ({
   getAccessToken: vi.fn().mockResolvedValue('mock-token'),
+  refreshAccessToken: vi.fn().mockResolvedValue(null),
 }));
 
 vi.mock('../tenantContext.js', () => ({
@@ -225,6 +226,66 @@ describe('apiService', () => {
       await sendToFarmOS('/api/asset/plant/123', { some: 'data' }, 'DELETE');
       const [, opts] = fetchSpy.mock.calls[0];
       expect(opts.body).toBeUndefined();
+    });
+  });
+
+  // Cura del bug "sesión zombi" (operador 2026-06-18): ante un 401 del backend
+  // (token rechazado server-side), fetchFromFarmOS intenta UNA renovación con
+  // el refresh_token y reintenta, en vez de mandar directo a #login.
+  describe('fetchFromFarmOS — auto-refresh en 401', () => {
+    beforeEach(async () => {
+      // Aislar el conteo de llamadas de refreshAccessToken entre tests.
+      const { getAccessToken, refreshAccessToken } = await import('../authService.js');
+      getAccessToken.mockClear();
+      refreshAccessToken.mockClear();
+    });
+
+    it('en 401, si refreshAccessToken da token nuevo, reintenta y devuelve data (sin ir a login)', async () => {
+      const { getAccessToken, refreshAccessToken } = await import('../authService.js');
+      getAccessToken.mockResolvedValue('tkn-viejo');
+      refreshAccessToken.mockResolvedValueOnce('tkn-nuevo');
+
+      // 1er fetch: 401. 2do fetch (retry): 200 con data.
+      const fetchSpy = vi.fn()
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          statusText: 'Unauthorized',
+          text: async () => '{"errors":[{"status":"401"}]}',
+          headers: { get: vi.fn().mockReturnValue('application/vnd.api+json') },
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: async () => ({ data: [{ id: 'p1', type: 'asset--plant' }], jsonapi: { version: '1.0' } }),
+          headers: { get: vi.fn().mockReturnValue('') },
+        });
+      vi.stubGlobal('fetch', fetchSpy);
+
+      const r = await fetchFromFarmOS('/api/asset/plant');
+      expect(refreshAccessToken).toHaveBeenCalledTimes(1);
+      expect(fetchSpy).toHaveBeenCalledTimes(2); // 401 + retry
+      expect(r.data[0].id).toBe('p1'); // datos cargan tras renovar (no zombi)
+    });
+
+    it('en 401, si la renovación falla, NO reintenta en bucle y lanza el error', async () => {
+      const { getAccessToken, refreshAccessToken } = await import('../authService.js');
+      getAccessToken.mockResolvedValue('tkn-viejo');
+      refreshAccessToken.mockResolvedValue(null); // refresh muerto
+
+      const fetchSpy = vi.fn().mockResolvedValue({
+        ok: false,
+        status: 401,
+        statusText: 'Unauthorized',
+        text: async () => '{"errors":[{"status":"401"}]}',
+        headers: { get: vi.fn().mockReturnValue('application/vnd.api+json') },
+      });
+      vi.stubGlobal('fetch', fetchSpy);
+
+      await expect(fetchFromFarmOS('/api/asset/plant')).rejects.toThrow();
+      expect(refreshAccessToken).toHaveBeenCalledTimes(1);
+      // 1 intento original + 1 retry (que vuelve a dar 401 pero ya no refresca).
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
     });
   });
 });
