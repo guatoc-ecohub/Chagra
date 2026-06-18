@@ -298,7 +298,8 @@
         "notas": "Se resiembra sola con facilidad; sus raíces secretan sustancias que controlan nematodos en el suelo."
       },
       "companions": [
-        "solanum_lycopersicum_san_marzano"
+        "solanum_lycopersicum_san_marzano",
+        "solanum_tuberosum"
       ],
       "antagonists": [],
       "valor_pedagogico": "La Caléndula (Calendula officinalis L.) es una especie ornamental-medicinal originaria del Mediterráneo, ampliamente cultivada en jardines campesinos de Cundinamarca entre 0-2800 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con ciclo de floración de 75-90 días, asociándose beneficiosamente con cultivos como el tomate (Solanum lycopersicum) mientras actúa como repelente natural de trips y nemátodos mediante secreciones radiculares. En el contexto cultural andino-campesino, sus flores se utilizan tradicionalmente en preparaciones de crema cicatrizante por sus propiedades flavonoides, saponinas y aceites esenciales. Según GBIF Backbone Taxonomy y Plants of the World Online (POWO), esta especie destaca por su valor ecológico en atracción de polinizadores y manejo integrado de plagas en sistemas agroecológicos de montaña.",
@@ -1052,7 +1053,8 @@
       "valor_pedagogico": "El tarwi o chocho andino (Lupinus mutabilis Sweet) es una leguminosa nativa de los Andes con alto contenido proteico en grano (35-50%), tradicionalmente cultivada en sistemas campesinos altoandinos colombianos para autoconsumo (cosecha desamargada). Se cultiva en Boyacá (Tunja, Soatá, Ventaquemada), Cundinamarca (Sumapaz, Choachí), Nariño y Cauca entre 2.500 y 3.500 msnm en zona térmica fría a páramo bajo. Ciclo 6-8 meses, fijación N biológica ~100-160 kg N/ha. Granos con alcaloides amargos (quinolizidínicos) requieren desamargado tradicional (remojo + enjuagues). Manejo agroecológico: siembra al voleo en pre-cultivo (8-12 kg/ha), incorporación como abono verde o cosecha grano + restos al suelo, rotación con tubérculos andinos. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, NRC 1989 Cultivos Andinos, POWO Kew, GBIF Backbone Taxonomy.",
       "companions": [
         "alnus_acuminata",
-        "zea_mays"
+        "zea_mays",
+        "solanum_tuberosum"
       ],
       "tracking_mode": "aggregate"
     },
@@ -1250,7 +1252,8 @@
         "lactuca_sativa_capitata",
         "zea_mays",
         "musa_paradisiaca",
-        "manihot_esculenta"
+        "manihot_esculenta",
+        "solanum_tuberosum"
       ],
       "antagonists": [
         "allium_fistulosum"
@@ -2717,6 +2720,157 @@
       "valor_pedagogico": "La sábila o aloe (Aloe vera (L.) Burm.f., familia Asphodelaceae) es una asphodelácea suculenta perenne acaule originaria de la Península Arábiga, naturalizada y cultivada extensamente en huertos de tierra caliente y templada colombiana por su gel mucilaginoso translúcido contenido en el parénquima foliar central, rico en polisacáridos (acemanano, glucomanano), antraquinonas (aloína, barbaloína) en el latex amarillo periférico, vitaminas y aminoácidos. Se cultiva en Bolívar (Cartagena, El Carmen de Bolívar), Magdalena (Santa Marta), Atlántico, Sucre, La Guajira (sur de Riohacha), Cesar (Valledupar), Tolima caliente (Espinal, Flandes), Huila (Neiva, Aipe) y Valle del Cauca entre 0 y 1.500 msnm en zona térmica cálida seca a templada. Ciclo perenne con hijuelos basales propagables desde el segundo año. Lección viva: la farmacia en una hoja — enseña suculencia y la estrategia metabólica CAM (Crassulacean Acid Metabolism) de las plantas xerófilas que abren estomas de noche para fijar CO2 reduciendo pérdida de agua diurna, adaptación clave a sequía documentada en Aloe, Agave, Opuntia y piñas (Bromeliaceae). El gel del parénquima foliar interno se usa en la medicina casera colombiana como cicatrizante de quemaduras solares, hidratante cutáneo y demulcente digestivo (uso tradicional respaldado por el JBB Bogotá). Manejo agroecológico: propagación por hijuelos basales separados con 3-4 hojas (dejar secar la herida 24 h antes de plantar), siembra en sustrato arenoso con drenaje excelente, exposición sol pleno, riego escaso (cada 15-20 días en seco), tolera salinidad moderada, asocio con henequén y cactáceas en sistemas xerófilos del Caribe, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Pérez Arbeláez 1947 Plantas Útiles de Colombia, Pamplona-Roger 2006 Plantas Medicinales, JBB Plantas Medicinales Cundinamarca-Boyacá, AGROSAVIA Tibaitatá.",
       "validation_level": "claude_draft",
       "tracking_mode": "individual"
+    },
+    {
+      "_curation_status": "BORRADOR_IA",
+      "_anti_confusion": "Solanum tuberosum (papa común). NO confundir con Solanum betaceum (tomate de árbol), Solanum lycopersicum (tomate), Solanum quitoense (lulo) ni Solanum phureja/Solanum tuberosum Grupo Phureja (papa criolla, subgrupo distinto de menor latencia y tubérculo amarillo).",
+      "id": "solanum_tuberosum",
+      "nombre_comun": "Papa",
+      "nombre_comunes_regionales": [
+        "papa común",
+        "papa de año",
+        "papa pastusa",
+        "papa sabanera",
+        "papa única",
+        "papa diacol capiro (R-12)"
+      ],
+      "nombre_cientifico": "Solanum tuberosum L.",
+      "familia_botanica": "Solanaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "tuberculo",
+      "cycleMonths": 6,
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2500,
+        "optimo_max": 3200,
+        "max_absoluto": 3500
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 10,
+        "optimo_max": 18,
+        "max_tolerable": 24
+      },
+      "ph_suelo": {
+        "min": 4.5,
+        "optimo_min": 5.2,
+        "optimo_max": 6.5,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -1.5,
+        "horas_acumuladas_max": 2,
+        "notas": "Follaje muere a -2 °C. La helada negra de madrugada en el altiplano (Cundiboyacense, Nariño) es la causa abiótica más frecuente de pérdida total. El aporque alto y el riego nocturno por aspersión mitigan parcialmente."
+      },
+      "companions": [
+        "calendula_officinalis",
+        "lupinus_mutabilis",
+        "phaseolus_vulgaris"
+      ],
+      "antagonists": [],
+      "_nota_antagonists": "Evitar monocultivo y rotación papa-papa: concentra Phytophthora infestans (gota), Tecia solanivora (polilla guatemalteca) y nematodo quiste (Globodera pallida). No asociar con otras solanáceas (tomate, lulo, tomate de árbol) por compartir gota y mosca blanca. Rotar con leguminosas (haba, arveja, lupino) y cereales.",
+      "propagation": {
+        "methods": [
+          "tuberculo",
+          "semilla"
+        ],
+        "best_method": "tuberculo",
+        "protocol_resumen": "Tubérculo-semilla certificado pre-brotado (yemas de 1-2 cm, verdeado a luz difusa). Siembra a 10-15 cm de profundidad, distancia 30 cm entre plantas × 90-100 cm entre surcos. Densidad ~33.000-40.000 plantas/ha. La semilla sexual (botánica) solo se usa en programas de mejoramiento, no en producción comercial.",
+        "tiempo_a_establecimiento_dias": 21,
+        "notas": "Renovar semilla certificada cada 2-3 ciclos por degeneración viral (PVY, PLRV) y bacteriana (Ralstonia, Pectobacterium). Fenología por etapas: (1) Brotación/emergencia 0-25 días; (2) Desarrollo vegetativo y crecimiento de follaje 25-45 días; (3) Inicio de tuberización (estolones) 45-60 días — etapa que define el número de tubérculos; (4) Llenado/engrose de tubérculo 60-110 días — máxima demanda de K y agua; (5) Maduración de piel y senescencia del follaje 110-150 días; (6) Cosecha 150-180 días según variedad.",
+        "fuente": "AGROSAVIA Manual tubérculos andinos 2017; Pérez-Rodríguez-Gómez 2008; Núñez-Rodríguez 2024 UNAL."
+      },
+      "plagas_criticas": [
+        "Tecia solanivora (polilla guatemalteca de la papa)",
+        "Premnotrypes vorax (gusano blanco / chiza de la papa)",
+        "Phyllophaga spp. y Ancognatha spp. (chiza, larva rizófaga)",
+        "Globodera pallida / Globodera rostochiensis (nematodo del quiste de la papa)",
+        "Liriomyza huidobrensis (minador de la hoja)",
+        "Epitrix spp. (pulguilla de la papa)"
+      ],
+      "enfermedades_criticas": [
+        "Phytophthora infestans (gota o tizón tardío) — enfermedad #1, devastadora en clima frío húmedo",
+        "Alternaria solani (tizón temprano)",
+        "Rhizoctonia solani (costra negra / cancro del tallo)",
+        "Spongospora subterranea (sarna polvosa, vector del Potato mop-top virus)",
+        "Ralstonia solanacearum (marchitez bacteriana / dormidera)",
+        "Pectobacterium / Dickeya (pudrición blanda y pierna negra)"
+      ],
+      "feeding_plan_template": {
+        "source": "AGROSAVIA Manual tubérculos andinos (2017) + Pérez-Rodríguez-Gómez (2008) — plan agroecológico de transición para papa de año clima frío 2500-3200 msnm. Énfasis preventivo contra gota (Phytophthora infestans).",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Aplicar bocashi al surco a la siembra",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 300,
+            "notes": "Surco preparado 0-20 cm. Tubérculo-semilla certificado pre-brotado. Suelo bien drenado; evitar encharcamiento (favorece Phytophthora y Ralstonia)."
+          },
+          {
+            "offset_days": 25,
+            "action": "Inocular Trichoderma harzianum al suelo",
+            "biofertilizer_slug": "trichoderma_harzianum_suelo",
+            "dose_g": 15,
+            "notes": "Preventivo Rhizoctonia solani y Spongospora subterranea. Coincide con emergencia/inicio vegetativo."
+          },
+          {
+            "offset_days": 45,
+            "action": "Primer aporque + drench con humus líquido",
+            "biofertilizer_slug": "humus_liquido",
+            "dose_ml": 200,
+            "notes": "Dilución 1:5. Aporque alto fundamental: cubre estolones, protege tubérculos de la luz (evita verdeo/solanina) y de la polilla Tecia, y mejora drenaje. Inicio de tuberización."
+          },
+          {
+            "offset_days": 60,
+            "action": "Foliar preventivo de gota con caldo bordelés",
+            "biofertilizer_slug": "caldo_bordeles",
+            "dose_ml": 100,
+            "notes": "Concentración 1%. PREVENTIVO de Phytophthora infestans — NUNCA curativo. Iniciar antes de la primera lluvia persistente y repetir cada 10-14 días en condición de niebla/lluvia. El Cu deja residuo: alternar con Bacillus subtilis foliar y reducir frecuencia en seco."
+          },
+          {
+            "offset_days": 75,
+            "action": "Foliar con Bacillus subtilis (alternar con bordelés)",
+            "biofertilizer_slug": "bacillus_subtilis_foliar",
+            "dose_ml": 80,
+            "notes": "Antagonista preventivo de Phytophthora y Alternaria; reduce dependencia del cobre. Aplicar al atardecer."
+          },
+          {
+            "offset_days": 90,
+            "action": "Foliar con supermagro durante llenado de tubérculo",
+            "biofertilizer_slug": "supermagro",
+            "dose_ml": 60,
+            "notes": "Dilución 1:15. K crítico para engrose de tubérculo y materia seca. Etapa de máxima demanda hídrica y de potasio."
+          },
+          {
+            "offset_days": 130,
+            "action": "Suspender riego para madurar la piel",
+            "notes": "Reducir riego 80% las últimas 3 semanas. Piel madura = mejor conservación y menor pudrición post-cosecha. Cosecha 150-180 días. Curar tubérculos a la sombra 1-2 semanas antes de almacenar."
+          }
+        ]
+      },
+      "source_ids": [
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "nustez-rodriguez-2024-unal",
+        "perez-rodriguez-gomez-2008",
+        "ica-resolucion-3168-2015",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "La papa (Solanum tuberosum L., familia Solanaceae) es el cultivo de tubérculo más importante del clima frío colombiano y el segundo alimento de consumo nacional después del arroz. Domesticada hace más de 7.000 años en los Andes (cuenca del lago Titicaca, Perú-Bolivia), llegó al altiplano colombiano y hoy se cultiva intensivamente entre 2.500 y 3.200 msnm en Cundinamarca (Sabana de Bogotá, Subachoque, Zipaquirá, Une, Carmen de Carupa), Boyacá (Ventaquemada, Toca, Soracá, Tunja), Nariño (Túquerres, Pupiales, Guachucal, Ipiales — principal departamento productor) y norte de Antioquia (La Unión, Sonsón). Las variedades comerciales dominantes en Colombia son Diacol Capiro (R-12, industrial para fritura), Pastusa Suprema, Superior, Única, Esmeralda y la papa criolla amarilla (Grupo Phureja). El enemigo número uno es la gota o tizón tardío (Phytophthora infestans), un oomiceto que en clima frío húmedo y con neblina puede destruir un lote entero en menos de una semana; fue el patógeno responsable de la Gran Hambruna Irlandesa (1845-1849) y sigue siendo el factor que más encarece y contamina el cultivo, pues ata al productor a 8-14 aplicaciones de fungicida por ciclo. Manejo agroecológico de transición: rotación obligatoria con leguminosas (haba, arveja, lupino/chocho) que fijan nitrógeno y rompen el ciclo de plagas de suelo; semilla certificada renovada cada 2-3 ciclos contra la degeneración viral (PVY, PLRV); aporque alto para proteger tubérculos de la polilla guatemalteca (Tecia solanivora) y del verdeo; manejo PREVENTIVO de la gota con caldo bordelés al 1% y Bacillus subtilis alternados antes de las lluvias (nunca como cura una vez establecida); Trichoderma harzianum al suelo contra Rhizoctonia y sarna polvosa; y asociación con caléndula y tagetes para repeler insectos y nematodos. La papa enseña la lección central de la soberanía alimentaria andina: la inmensa diversidad de variedades nativas (más de 4.000 en los Andes) es el seguro biológico frente a plagas y cambio climático, y su erosión por el monocultivo de pocas variedades comerciales es un riesgo real. Fuentes Tier A: AGROSAVIA Manual Tubérculos Andinos 2017, Núñez-Rodríguez 2024 UNAL, Pérez-Rodríguez-Gómez 2008, ICA Resolución 3168/2015, GBIF Backbone, POWO Kew.",
+      "validation_level": "claude_draft",
+      "tracking_mode": "aggregate"
     },
     {
       "id": "solanum_tuberosum_pastusa_suprema",
@@ -4348,6 +4502,36 @@
       "observaciones": "Compilación de fichas técnicas de AGROSAVIA para leguminosas de clima frío. Año y volumen pendientes de consolidación. _audit_note: cita aglutinadora; buscar fichas individuales en repository.agrosavia.co o agrosavia.co/productos-y-servicios/oferta-tecnologica.",
       "tier": "A",
       "_url_pendiente": true
+    },
+    {
+      "id": "agrosavia-manual-arandano-2018",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": 2018,
+      "titulo": "Manual técnico para el cultivo de arándano (Vaccinium corymbosum) en Colombia",
+      "institucion": "AGROSAVIA",
+      "observaciones": "_audit_note: buscar handle en repository.agrosavia.co por 'arándano Vaccinium 2018'. Respalda requerimiento de pH ácido (4.5-5.5), manejo de sustrato y mulch de pino.",
+      "tier": "A"
+    },
+    {
+      "id": "agrosavia-manual-fresa-2013",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": 2013,
+      "titulo": "Manual técnico para el cultivo de fresa (Fragaria × ananassa) en clima frío de Colombia",
+      "institucion": "AGROSAVIA",
+      "observaciones": "_audit_note: buscar handle en repository.agrosavia.co por 'fresa Fragaria ananassa'. Respalda manejo de Botrytis cinerea, ácaro Tetranychus y propagación por estolón/corona.",
+      "tier": "A"
+    },
+    {
+      "id": "fedearroz-manual-arroz-2018",
+      "tipo": "manual_tecnico",
+      "autores": "Federación Nacional de Arroceros (FEDEARROZ) — Fondo Nacional del Arroz",
+      "año": 2018,
+      "titulo": "Manual técnico del cultivo de arroz (Oryza sativa) bajo riego y secano en Colombia",
+      "institucion": "FEDEARROZ",
+      "observaciones": "_audit_note: FEDEARROZ es la autoridad gremial-técnica del arroz en Colombia. Respalda fenología, manejo de Tagosodes orizicolus (sogata/virus de la hoja blanca) y Pyricularia oryzae (añublo/quema).",
+      "tier": "B"
     },
     {
       "id": "agrosavia-manual-biopreparados-2015",
