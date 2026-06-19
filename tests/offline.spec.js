@@ -278,7 +278,13 @@ test.describe('Smoke capa de datos — el CSP no debe bloquear WASM/sqlite (regr
   test('WebAssembly compila bajo el CSP activo y la app arranca sin violaciones wasm', async ({ page }) => {
     const wasmCsp = [];
     const capture = (t) => {
-      if (/webassembly|wasm-unsafe-eval|wasm/i.test(String(t))) wasmCsp.push(String(t));
+      const s = String(t);
+      // Solo VIOLACIONES reales: rechazos CSP o CompileError de wasm. NO capturar
+      // logs de ÉXITO que mencionan "wasm" (ej. "[SQLite WASM] loaded"), que antes
+      // se contaban como violación y auto-fallaban el smoke.
+      if (/refused to (compile|instantiate|evaluate|load)|content security policy|compileerror/i.test(s)) {
+        wasmCsp.push(s);
+      }
     };
     page.on('console', (msg) => capture(msg.text()));
     page.on('pageerror', (e) => capture(e));
