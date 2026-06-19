@@ -1321,7 +1321,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           // serial añadida. Ambos wrappers son no-throw (devuelven null en
           // error/timeout), así que Promise.all no puede rechazar por ellos.
           const [resolved, fermento] = await Promise.all([
-            resolveEntities(textForLLM, { fincaAltitud: reAltitud }),
+            resolveEntities(textForLLM, { fincaAltitud: reAltitud, context: contextMemory }),
             fermentoPrefilter(textForLLM),
           ]);
           const tRE1 = performance.now();
