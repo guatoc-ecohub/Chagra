@@ -49,6 +49,7 @@ import {
     BiodiversidadCard,
     AsociacionesCard,
     InformesCard,
+    FermentosCard,
     SeguimientoCards,
 } from './FincaCards';
 
@@ -83,6 +84,7 @@ const SECTION_COMPONENTS = {
     plagas: { Component: PlagasCard },
     biodiversidad: { Component: BiodiversidadCard },
     asociaciones: { Component: AsociacionesCard },
+    fermentos: { Component: FermentosCard },
     informes: { Component: InformesCard },
 };
 

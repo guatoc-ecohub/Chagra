@@ -253,6 +253,19 @@ export async function getAllBiopreparados() {
 }
 
 /**
+ * Lista todos los fermentos del catálogo (alimentarios + vetos de seguridad).
+ * @returns {Promise<Array<fermento>>}
+ */
+export async function getAllFermentos() {
+    if (!dbInstance) await initCatalog();
+    const rows = dbInstance.exec({
+        sql: 'SELECT data FROM fermentos ORDER BY tipo DESC, nombre',
+        rowMode: 'object',
+    });
+    return rows.map((r) => JSON.parse(r.data));
+}
+
+/**
  * Encuentra biopreparados que usan un ingrediente específico (Miguel UX
  * 2026-05-03: cuando user agrega melaza a bodega, sugerir Bocashi/Biol/etc).
  *
@@ -290,6 +303,7 @@ if (import.meta.env.DEV) {
             initCatalog,
             getAllSpecies,
             getAllBiopreparados,
+            getAllFermentos,
             findBiopreparadosByIngredient,
             getSpeciesByThermalZone,
             getNativeSubstitutesForInvasive
