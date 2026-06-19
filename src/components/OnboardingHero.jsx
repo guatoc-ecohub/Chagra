@@ -5,6 +5,7 @@ import { FARM_CONFIG } from '../config/defaults';
 import { getProfile, saveProfile } from '../services/userProfileService';
 import { getPisoTermicoInfo } from '../services/locationService';
 import { useAutosave } from '../hooks/useAutosave';
+import { MSG } from '../config/messages.js';
 
 /**
  * OnboardingHero, empty-state cold-start del dashboard (DR-030 QW5).
@@ -69,14 +70,14 @@ export default function OnboardingHero({ onNavigate, compact = false }) {
   let title;
   let subtitle;
   if (hasZones) {
-    title = `Tiene ${lands.length} ${lands.length === 1 ? 'zona' : 'zonas'} lista${lands.length === 1 ? '' : 's'}. Falta su primera planta.`;
-    subtitle = 'Elija cómo registrarla. Las tres rutas guardan lo mismo.';
+    title = MSG.format(MSG.onboarding.zonasListas, { count: lands.length });
+    subtitle = MSG.onboarding.elegirRegistro;
   } else if (hasFarmContext) {
-    title = 'Su finca está configurada. Sembremos la primera planta.';
-    subtitle = 'Tip: tras la primera, puede crear zonas (parcelas, camas) para organizarlas.';
+    title = MSG.onboarding.fincaConfigurada;
+    subtitle = MSG.onboarding.tipZonas;
   } else {
-    title = 'Bienvenido a Chagra. Empiece registrando su primera planta.';
-    subtitle = 'Elija cómo registrarla. Las tres rutas guardan lo mismo.';
+    title = MSG.onboarding.primeraPlanta;
+    subtitle = MSG.onboarding.elegirRegistro;
   }
 
   const ctas = [

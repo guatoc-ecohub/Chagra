@@ -8,6 +8,7 @@ import { Sparkline } from './charts/Sparkline';
 import { exportTraceabilityCsv } from '../services/exportService';
 import { getAllPlans, markStepExecuted } from '../services/planGeneratorService';
 import { getCurrentOperatorHash } from '../services/operatorIdentityService';
+import { MSG } from '../config/messages.js';
 
 // Autopilot #10 (2026-05-03): banner top + sort low-stock primero. Reduce
 // chance que el operador no se entere de stock bajo hasta que use el material.
@@ -196,7 +197,7 @@ export const InventoryDashboard = () => {
     } catch (err) {
       console.error('[Export] Error generando CSV:', err);
       window.dispatchEvent(new CustomEvent('syncError', {
-        detail: { message: 'No se pudo generar el reporte CSV.' },
+        detail: { message: MSG.ui.errorReporteCsv },
       }));
     } finally {
       setExporting(false);
@@ -228,7 +229,7 @@ export const InventoryDashboard = () => {
     } catch (err) {
       console.error('[InventoryDashboard] Error en refill:', err);
       window.dispatchEvent(new CustomEvent('syncError', {
-        detail: { message: 'No se pudo abastecer el insumo. Verifique el almacenamiento.' },
+        detail: { message: MSG.ui.errorAbastecer },
       }));
     } finally {
       setSubmitting(false);
@@ -366,7 +367,7 @@ export const InventoryDashboard = () => {
           >
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-bold text-white">Registrar Producción</h3>
+                <h3 className="text-lg font-bold text-white">{MSG.ui.registrarProduccion}</h3>
                 <p className="text-xs text-slate-400 mt-1 truncate">
                   {refillTarget.attributes?.name || refillTarget.name}
                 </p>
@@ -433,7 +434,7 @@ export const InventoryDashboard = () => {
                 disabled={submitting}
                 className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-bold transition-colors"
               >
-                Cancelar
+                {MSG.action.cancelar}
               </button>
               <button
                 type="submit"
@@ -445,7 +446,7 @@ export const InventoryDashboard = () => {
                 ) : (
                   <Plus size={16} />
                 )}
-                {submitting ? 'Registrando…' : 'Confirmar'}
+                {submitting ? MSG.ui.registrando : MSG.ui.confirmarAbastecer}
               </button>
             </div>
           </form>

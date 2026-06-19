@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { MSG } from '../config/messages.js';
 import { Microscope, ChevronDown, ChevronUp, ExternalLink, ShieldCheck, Clock, AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react';
 
 /**
@@ -217,9 +218,9 @@ export default function DeepResearchCard({
               onClick={(e) => { e.stopPropagation(); onCancel(); }}
               data-testid="deep-research-cancel"
               className="text-xs text-slate-400 hover:text-slate-200 px-2 py-0.5 rounded border border-slate-600 hover:border-slate-400 transition-colors"
-              aria-label="Cancelar investigación"
+              aria-label={MSG.ui.cancelarInvestigacion}
             >
-              Cancelar
+              {MSG.action.cancelar}
             </button>
           )}
           {expanded ? (

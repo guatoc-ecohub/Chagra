@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { MSG } from '../config/messages.js';
 import {
   ChevronLeft, MapPin, Loader2, AlertCircle, Mountain, Thermometer,
   Save, ListChecks, Trash2, CheckCircle2, Snowflake, Compass, Layers,
@@ -1069,7 +1070,7 @@ function ListaReportes({ reportes, loading, onEliminar, onNuevo }) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-slate-500">
         <Loader2 size={32} className="animate-spin mb-3" />
-        <p>Cargando reportes…</p>
+        <p>{MSG.ui.cargandoReportes}</p>
       </div>
     );
   }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { MSG } from '../config/messages.js';
 import { ArrowLeft, Plus, Trash2, RefreshCw, Building2, Leaf, Search, WifiOff, TreePine, Map as MapIcon, List, Sprout, FlaskConical, Ban, AlertTriangle, Warehouse, Square } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import { Virtuoso } from 'react-virtuoso';
@@ -1617,7 +1618,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
           {isLoading && currentAssets.length === 0 ? (
             <div className="flex items-center justify-center py-12">
               <RefreshCw size={24} className="animate-spin text-slate-500" />
-              <span className="ml-3 text-slate-500">Cargando...</span>
+              <span className="ml-3 text-slate-500">{MSG.ui.cargando}</span>
             </div>
           ) : currentAssets.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-slate-500">
