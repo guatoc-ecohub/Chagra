@@ -12,6 +12,7 @@ import { clearActiveTenantId } from './tenantContext';
 const FARMOS_URL = import.meta.env.VITE_FARMOS_URL;
 const CLIENT_ID = import.meta.env.VITE_FARMOS_CLIENT_ID;
 const REDIRECT_URI = `${window.location.origin}/callback`;
+export const SESSION_EXPIRED_EVENT = 'chagra:session-expired';
 
 /**
  * DEPRECATION NOTICE: Password grant será removido después de esta fecha.
@@ -257,19 +258,27 @@ export const authenticateUser = async (username, password) => {
  *   refresh_token, el grant falla, o el grant está deshabilitado. NUNCA lanza.
  */
 let refreshInFlight = null;
+let lastRefreshFailureReason = null;
+
+export const getLastRefreshFailureReason = () => lastRefreshFailureReason;
 
 export const refreshAccessToken = async () => {
     if (refreshInFlight) return refreshInFlight;
 
     refreshInFlight = (async () => {
+        lastRefreshFailureReason = null;
         let refreshToken;
         try {
             refreshToken = await localforage.getItem('farmos_refresh_token');
         } catch (err) {
             console.error('[Auth] no se pudo leer el refresh_token:', err);
+            lastRefreshFailureReason = 'storage';
             return null;
         }
-        if (!refreshToken) return null;
+        if (!refreshToken) {
+            lastRefreshFailureReason = 'missing';
+            return null;
+        }
 
         const url = `${FARMOS_URL}/oauth/token`;
         const payload = new URLSearchParams({
@@ -291,17 +300,22 @@ export const refreshAccessToken = async () => {
                 // renovar. El caller debe hacer logout limpio (no quedarse en
                 // estado zombi). NO logueamos el body (puede traer el token).
                 console.warn(`[Auth] refresh_token grant falló (${response.status}).`);
+                lastRefreshFailureReason = 'rejected';
                 return null;
             }
 
             const contentType = response.headers.get('content-type');
             if (!contentType || !contentType.includes('json')) {
                 console.warn('[Auth] respuesta de refresh sin JSON (backend caído?).');
+                lastRefreshFailureReason = 'invalid-response';
                 return null;
             }
 
             const data = await response.json();
-            if (!data.access_token) return null;
+            if (!data.access_token) {
+                lastRefreshFailureReason = 'invalid-response';
+                return null;
+            }
 
             await localforage.setItem('farmos_access_token', data.access_token);
             // El refresh_token suele rotar en cada uso: persistir el nuevo si
@@ -320,6 +334,7 @@ export const refreshAccessToken = async () => {
             // por un fallo de red (ver getAccessToken: solo logout si había
             // refresh_token y el grant lo rechazó explícitamente).
             console.error('[Auth] error de red al refrescar el token:', err);
+            lastRefreshFailureReason = 'network';
             return null;
         }
     })();
@@ -328,6 +343,18 @@ export const refreshAccessToken = async () => {
         return await refreshInFlight;
     } finally {
         refreshInFlight = null;
+    }
+};
+
+export const expireSession = async (detail = {}) => {
+    await logoutUser();
+    if (typeof window !== 'undefined') {
+        window.location.hash = '#login';
+        try {
+            window.dispatchEvent(
+                new CustomEvent(SESSION_EXPIRED_EVENT, { detail })
+            );
+        } catch (_) { /* CustomEvent existe en browsers soportados */ }
     }
 };
 
@@ -363,8 +390,12 @@ export const getAccessToken = async () => {
                 hadRefresh = !!(await localforage.getItem('farmos_refresh_token'));
             } catch (_) { /* asumir que no, fail-safe */ }
 
-            if (hadRefresh && navigator.onLine !== false) {
-                await logoutUser();
+            if (
+                hadRefresh &&
+                navigator.onLine !== false &&
+                lastRefreshFailureReason === 'rejected'
+            ) {
+                await expireSession({ reason: 'refresh-rejected' });
             }
             return null;
         }

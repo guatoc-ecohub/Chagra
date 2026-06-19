@@ -5,6 +5,15 @@
 /* eslint-disable no-undef */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
+const { fetchWithAuthRetry } = vi.hoisted(() => ({
+  fetchWithAuthRetry: vi.fn((...args) => global.fetch(...args)),
+}));
+
+vi.mock('../apiService.js', () => ({
+  fetchWithAuthRetry,
+}));
+
 import { sendFeedback, hasConsent, saveConsent } from '../feedbackService';
 
 describe('feedbackService', () => {
@@ -19,6 +28,8 @@ describe('feedbackService', () => {
     };
     // Mock fetch
     global.fetch = vi.fn();
+    fetchWithAuthRetry.mockClear();
+    fetchWithAuthRetry.mockImplementation((...args) => global.fetch(...args));
   });
 
   afterEach(() => {
@@ -91,6 +102,12 @@ describe('feedbackService', () => {
             'Content-Type': 'application/json',
           }),
           body: expect.stringContaining('¿Qué es el café?'),
+        })
+      );
+      expect(fetchWithAuthRetry).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          method: 'POST',
         })
       );
     });

@@ -6,7 +6,7 @@
  * @requires authService
  */
 
-import { getAccessToken, refreshAccessToken } from './authService';
+import { expireSession, getAccessToken, refreshAccessToken } from './authService';
 import { getActiveTenantId } from './tenantContext';
 
 /**
@@ -89,6 +89,9 @@ export const fetchWithAuthRetry = async (resource, options = {}, _retried = fals
 
   const refreshed = await refreshAccessToken();
   if (!refreshed) {
+    if (token) {
+      await expireSession({ status: response.status, resource: String(resource) });
+    }
     return response;
   }
 
@@ -301,14 +304,7 @@ export const fetchFromFarmOS = async (endpoint, options = {}, _retried = false) 
         // a la pantalla de login ("Sesión vencida — vuelve a entrar"), y se
         // hace logout limpio para no reintentar con el token muerto. El hash se
         // mantiene como señal secundaria por compatibilidad.
-        if (typeof window !== 'undefined') {
-          window.location.hash = '#login';
-          try {
-            window.dispatchEvent(
-              new CustomEvent('chagra:session-expired', { detail: { status: response.status } })
-            );
-          } catch (_) { /* CustomEvent existe en browsers soportados */ }
-        }
+        await expireSession({ status: response.status, endpoint });
       }
       const errorDetail = await response.text().catch(() => '');
       // Sanitize body antes de pegarlo al .message — Drupal/cloudflared a

@@ -10,6 +10,7 @@ import {
     generateOAuthState,
     handleOAuthCallback,
     getAccessToken,
+    getLastRefreshFailureReason,
     refreshAccessToken,
 } from '../authService';
 
@@ -435,12 +436,27 @@ describe('authService — OAuth PKCE flow', () => {
             });
             const result = await refreshAccessToken();
             expect(result).toBeNull();
+            expect(getLastRefreshFailureReason()).toBe('rejected');
+        });
+
+        it('devuelve null y marca rejected si el backend rechaza el refresh con 403', async () => {
+            localforage.getItem.mockResolvedValue('refresh-vencido');
+            global.fetch.mockResolvedValue({
+                ok: false,
+                status: 403,
+                headers: { get: () => null },
+                text: async () => 'forbidden',
+            });
+            const result = await refreshAccessToken();
+            expect(result).toBeNull();
+            expect(getLastRefreshFailureReason()).toBe('rejected');
         });
 
         it('devuelve null (sin lanzar) si la red falla', async () => {
             localforage.getItem.mockResolvedValue('refresh-x');
             global.fetch.mockRejectedValue(new Error('Network error'));
             await expect(refreshAccessToken()).resolves.toBeNull();
+            expect(getLastRefreshFailureReason()).toBe('network');
         });
 
         it('serializa refresh concurrente y comparte una sola llamada al backend', async () => {
@@ -524,6 +540,22 @@ describe('authService — OAuth PKCE flow', () => {
             expect(t).toBeNull();
             // Logout limpio: borra el access token (no deja estado zombi).
             expect(localforage.removeItem).toHaveBeenCalledWith('farmos_access_token');
+        });
+
+        it('si venció pero el refresh falla por red, no borra tokens', async () => {
+            localforage.getItem.mockImplementation((k) => {
+                if (k === 'farmos_access_token') return Promise.resolve('vencido');
+                if (k === 'farmos_token_expiry') return Promise.resolve(Date.now() - 1000);
+                if (k === 'farmos_refresh_token') return Promise.resolve('refresh-ok');
+                return Promise.resolve(null);
+            });
+            global.fetch.mockRejectedValue(new Error('Network error'));
+
+            const t = await getAccessToken();
+            expect(t).toBeNull();
+            expect(getLastRefreshFailureReason()).toBe('network');
+            expect(localforage.removeItem).not.toHaveBeenCalledWith('farmos_access_token');
+            expect(localforage.removeItem).not.toHaveBeenCalledWith('farmos_refresh_token');
         });
     });
 });

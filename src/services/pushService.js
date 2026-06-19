@@ -19,6 +19,8 @@
  *   - Subscription POST a `/notifications/subscribe` con X-Chagra-Token.
  */
 
+import { fetchWithAuthRetry } from './apiService.js';
+
 const STORAGE_KEY = 'chagra:push-subscribed:v1';
 const SIDECAR_BASE = '/api/sidecar';
 
@@ -69,7 +71,7 @@ export async function requestPermission() {
  * Obtiene la VAPID public key del sidecar. Necesaria para subscribe.
  */
 async function fetchVapidPublicKey() {
-    const r = await fetch(`${SIDECAR_BASE}/notifications/vapid-public`);
+    const r = await fetchWithAuthRetry(`${SIDECAR_BASE}/notifications/vapid-public`);
     if (!r.ok) throw new Error(`VAPID fetch HTTP ${r.status}`);
     const { publicKey } = await r.json();
     return publicKey;
@@ -111,7 +113,7 @@ export async function subscribePush() {
 
     // Enviar al backend para guardar
     const payload = sub.toJSON();
-    const r = await fetch(`${SIDECAR_BASE}/notifications/subscribe`, {
+    const r = await fetchWithAuthRetry(`${SIDECAR_BASE}/notifications/subscribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -138,7 +140,7 @@ export async function unsubscribePush() {
         await sub.unsubscribe();
         // Notificar al backend
         try {
-            await fetch(`${SIDECAR_BASE}/notifications/subscribe`, {
+            await fetchWithAuthRetry(`${SIDECAR_BASE}/notifications/subscribe`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ endpoint }),

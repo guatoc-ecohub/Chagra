@@ -15,6 +15,15 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
+const { fetchWithAuthRetry } = vi.hoisted(() => ({
+  fetchWithAuthRetry: vi.fn((...args) => global.fetch(...args)),
+}));
+
+vi.mock('../apiService.js', () => ({
+  fetchWithAuthRetry,
+}));
+
 import { sendFeedback } from '../feedbackService';
 
 describe('feedbackService — edges (A-15 #248)', () => {
@@ -24,6 +33,8 @@ describe('feedbackService — edges (A-15 #248)', () => {
   beforeEach(() => {
     global.localStorage = { getItem: vi.fn(), setItem: vi.fn() };
     global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) });
+    fetchWithAuthRetry.mockClear();
+    fetchWithAuthRetry.mockImplementation((...args) => global.fetch(...args));
   });
 
   afterEach(() => {

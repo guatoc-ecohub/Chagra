@@ -44,6 +44,7 @@
 
 import { getTelemetryConsent } from './userProfileService.js';
 import { listRequests, getRequest } from './agentRequestQueue.js';
+import { fetchWithAuthRetry } from './apiService.js';
 
 /**
  * Base del sidecar agro-mcp (espejo de feedbackService.getBaseUrl).
@@ -201,7 +202,7 @@ export async function syncAgentTelemetry() {
 
     // 6. POST al endpoint
     const token = getToken();
-    const response = await fetch(telemetryUrl, {
+    const response = await fetchWithAuthRetry(telemetryUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

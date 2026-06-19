@@ -8,16 +8,14 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-// Mocks de red: apiService (POST/GET FarmOS) + authService (Bearer token).
+// Mocks de red: apiService (POST/GET FarmOS + descarga con auth-retry).
 const sendToFarmOS = vi.fn();
 const fetchFromFarmOS = vi.fn();
-const getAccessToken = vi.fn();
+const fetchWithAuthRetry = vi.fn();
 vi.mock('../apiService.js', () => ({
   sendToFarmOS: (...a) => sendToFarmOS(...a),
   fetchFromFarmOS: (...a) => fetchFromFarmOS(...a),
-}));
-vi.mock('../authService.js', () => ({
-  getAccessToken: (...a) => getAccessToken(...a),
+  fetchWithAuthRetry: (...a) => fetchWithAuthRetry(...a),
 }));
 
 import {
@@ -78,7 +76,7 @@ describe('operatorPhotoService', () => {
     _resetForTests();
     sendToFarmOS.mockReset();
     fetchFromFarmOS.mockReset();
-    getAccessToken.mockReset();
+    fetchWithAuthRetry.mockReset();
     // onLine = true por defecto (jsdom navigator es read-only → defineProperty).
     Object.defineProperty(navigator, 'onLine', { value: true, configurable: true });
   });
@@ -201,9 +199,7 @@ describe('operatorPhotoService', () => {
           attributes: { filename: 'chagra-operator-photo-bob-1.jpg', uri: { url: '/sites/default/files/x.jpg' } },
         }],
       });
-      getAccessToken.mockResolvedValue('tok');
-      // fetch del blob binario:
-      globalThis.fetch = vi.fn().mockResolvedValue({
+      fetchWithAuthRetry.mockResolvedValue({
         ok: true,
         blob: async () => new Blob([new Uint8Array(20)], { type: 'image/jpeg' }),
       });
@@ -217,6 +213,7 @@ describe('operatorPhotoService', () => {
       expect(endpoint).toContain('/api/file/file');
       expect(endpoint).toContain('CONTAINS');
       expect(endpoint).toContain(encodeURIComponent('chagra-operator-photo-bob-'));
+      expect(fetchWithAuthRetry).toHaveBeenCalledWith(expect.stringContaining('/sites/default/files/x.jpg'));
       // Quedó persistida local + meta con el uuid remoto.
       expect(getOperatorPhoto()).toBe(SAMPLE_DATA_URL);
       expect(__test.readSyncMeta().fileUuid).toBe('remote-uuid-9');
@@ -238,13 +235,13 @@ describe('operatorPhotoService', () => {
       fetchFromFarmOS.mockResolvedValue({
         data: [{ id: 'same-uuid', attributes: { filename: 'x', uri: { url: '/x' } } }],
       });
-      globalThis.fetch = vi.fn();
+      fetchWithAuthRetry.mockReset();
 
       const r = await loadFromFarmOS();
 
       expect(r.updated).toBe(false);
       expect(r.reason).toBe('already-current');
-      expect(globalThis.fetch).not.toHaveBeenCalled();
+      expect(fetchWithAuthRetry).not.toHaveBeenCalled();
     });
   });
 

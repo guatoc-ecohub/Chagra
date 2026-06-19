@@ -1,4 +1,13 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
+const { fetchWithAuthRetry } = vi.hoisted(() => ({
+  fetchWithAuthRetry: vi.fn((...args) => globalThis.fetch(...args)),
+}));
+
+vi.mock('../apiService.js', () => ({
+  fetchWithAuthRetry,
+}));
+
 import {
   sendFeedback,
   queueFeedbackOffline,
@@ -19,6 +28,8 @@ beforeEach(() => {
   localStorage.clear();
   clearFeedbackQueue();
   setOnline(true);
+  fetchWithAuthRetry.mockClear();
+  fetchWithAuthRetry.mockImplementation((...args) => globalThis.fetch(...args));
 });
 
 afterEach(() => {
@@ -63,6 +74,7 @@ describe('cola offline de feedback', () => {
     const flushed = await flushFeedbackQueue();
     expect(flushed).toBe(2);
     expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchWithAuthRetry).toHaveBeenCalledTimes(2);
     expect(getQueuedFeedback()).toHaveLength(0);
   });
 
