@@ -245,8 +245,7 @@ export async function loadFromFarmOS() {
     return { ok: false, reason: 'offline' };
   }
   try {
-    const { fetchFromFarmOS } = await import('./apiService.js');
-    const { getAccessToken } = await import('./authService.js');
+    const { fetchFromFarmOS, fetchWithAuthRetry } = await import('./apiService.js');
 
     const response = await fetchFromFarmOS(latestPhotoEndpoint(tenantId));
     const items = response?.data || [];
@@ -266,8 +265,7 @@ export async function loadFromFarmOS() {
     const base = import.meta.env.VITE_FARMOS_URL || '';
     const fullUrl = uri.startsWith('http') ? uri : `${base}${uri}`;
 
-    const token = await getAccessToken();
-    const res = await fetch(fullUrl, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+    const res = await fetchWithAuthRetry(fullUrl);
     if (!res.ok) return { ok: false, reason: `http-${res.status}` };
     const blob = await res.blob();
 

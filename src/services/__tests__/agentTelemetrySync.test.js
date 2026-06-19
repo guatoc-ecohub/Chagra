@@ -17,6 +17,10 @@ import { makeFakeDB, setOnline } from '../../test-utils/index.js';
 
 let fakeDB;
 
+const { fetchWithAuthRetry } = vi.hoisted(() => ({
+  fetchWithAuthRetry: vi.fn((...args) => global.fetch(...args)),
+}));
+
 vi.mock('../../db/dbCore.js', () => ({
   openDB: vi.fn(async () => fakeDB),
   STORES: { AGENT_REQUESTS: 'agent_requests' },
@@ -34,6 +38,10 @@ vi.mock('../agentRequestQueue.js', () => ({
   getRequest: vi.fn(async (_id) => null),
 }));
 
+vi.mock('../apiService.js', () => ({
+  fetchWithAuthRetry,
+}));
+
 global.fetch = vi.fn();
 
 beforeEach(() => {
@@ -45,6 +53,7 @@ beforeEach(() => {
     ok: true,
     json: async () => ({ success: true }),
   });
+  fetchWithAuthRetry.mockImplementation((...args) => global.fetch(...args));
 });
 
 afterEach(() => {
@@ -143,8 +152,8 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
         id: 2,
         ts_submit: 1234567891,
         ts_done: 1234567910,
-        prompt: 'Ayuda con mi tomate', // PII - debe removerse
-        response: 'Para tu tomate...', // PII - debe removerse
+        prompt: 'Sensitive prompt text', // PII - debe removerse
+        response: 'Sensitive response text', // PII - debe removerse
         route: 'foliage',
         model: 'gpt-4o',
         grounding: { entities: ['tomate'], tools: [] },
@@ -166,6 +175,7 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
 
     // Verificar que se llamó a fetch
     expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(fetchWithAuthRetry).toHaveBeenCalledTimes(1);
     const fetchCall = global.fetch.mock.calls[0];
     expect(fetchCall[0]).toBe('https://telemetry.example.com/ingest');
     expect(fetchCall[1].method).toBe('POST');
@@ -210,7 +220,8 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
     await syncAgentTelemetry();
 
     expect(global.fetch).toHaveBeenCalledTimes(1);
-    const [url, opts] = global.fetch.mock.calls[0];
+    expect(fetchWithAuthRetry).toHaveBeenCalledTimes(1);
+    const [url, opts] = fetchWithAuthRetry.mock.calls[0];
     expect(url).toBe('https://chagra.example.co/api/ingest');
     expect(opts.headers['X-Chagra-Token']).toBe('tok-123');
   });

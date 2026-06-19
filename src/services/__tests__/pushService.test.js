@@ -1,6 +1,15 @@
 /* global global */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
+const { fetchWithAuthRetry } = vi.hoisted(() => ({
+    fetchWithAuthRetry: vi.fn((...args) => global.fetch(...args)),
+}));
+
+vi.mock('../apiService.js', () => ({
+    fetchWithAuthRetry,
+}));
+
 import {
     isPushSupported,
     isSubscribed,
@@ -51,6 +60,8 @@ describe('pushService — Web Push API subscription management', () => {
 
         // Mock fetch
         global.fetch = vi.fn();
+        fetchWithAuthRetry.mockClear();
+        fetchWithAuthRetry.mockImplementation((...args) => global.fetch(...args));
     });
 
     afterEach(() => {
@@ -192,6 +203,12 @@ describe('pushService — Web Push API subscription management', () => {
             expect(result).toBe(existingSub);
             expect(mockServiceWorkerRegistration.pushManager.subscribe).not.toHaveBeenCalled();
             expect(global.fetch).toHaveBeenCalledWith(
+                '/api/sidecar/notifications/subscribe',
+                expect.objectContaining({
+                    method: 'POST',
+                })
+            );
+            expect(fetchWithAuthRetry).toHaveBeenCalledWith(
                 '/api/sidecar/notifications/subscribe',
                 expect.objectContaining({
                     method: 'POST',

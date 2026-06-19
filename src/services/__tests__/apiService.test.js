@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('../authService.js', () => ({
+  expireSession: vi.fn().mockResolvedValue(undefined),
   getAccessToken: vi.fn().mockResolvedValue('mock-token'),
   refreshAccessToken: vi.fn().mockResolvedValue(null),
 }));
@@ -232,8 +233,10 @@ describe('apiService', () => {
   describe('fetchWithAuthRetry', () => {
     beforeEach(async () => {
       const { getAccessToken, refreshAccessToken } = await import('../authService.js');
+      const { expireSession } = await import('../authService.js');
       getAccessToken.mockReset().mockResolvedValue('mock-token');
       refreshAccessToken.mockReset().mockResolvedValue(null);
+      expireSession.mockReset().mockResolvedValue(undefined);
       Object.defineProperty(navigator, 'onLine', {
         configurable: true,
         value: true,
@@ -287,6 +290,33 @@ describe('apiService', () => {
       expect(fetchSpy).not.toHaveBeenCalled();
       expect(refreshAccessToken).not.toHaveBeenCalled();
     });
+
+    it('ante 403 definitivo limpia sesión y devuelve la respuesta original', async () => {
+      const { expireSession, getAccessToken, refreshAccessToken } = await import('../authService.js');
+      getAccessToken.mockResolvedValue('token-viejo');
+      refreshAccessToken.mockResolvedValue(null);
+
+      const forbidden = {
+        ok: false,
+        status: 403,
+        statusText: 'Forbidden',
+        headers: { get: vi.fn().mockReturnValue('') },
+      };
+      const fetchSpy = vi.fn().mockResolvedValue(forbidden);
+      vi.stubGlobal('fetch', fetchSpy);
+
+      const response = await fetchWithAuthRetry('/api/sidecar/notifications/subscribe', {
+        method: 'POST',
+      });
+
+      expect(response).toBe(forbidden);
+      expect(refreshAccessToken).toHaveBeenCalledTimes(1);
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      expect(expireSession).toHaveBeenCalledWith({
+        status: 403,
+        resource: '/api/sidecar/notifications/subscribe',
+      });
+    });
   });
 
   // Cura del bug "sesión zombi" (operador 2026-06-18): ante un 401 del backend
@@ -296,8 +326,10 @@ describe('apiService', () => {
     beforeEach(async () => {
       // Aislar el conteo de llamadas de refreshAccessToken entre tests.
       const { getAccessToken, refreshAccessToken } = await import('../authService.js');
+      const { expireSession } = await import('../authService.js');
       getAccessToken.mockClear();
       refreshAccessToken.mockClear();
+      expireSession.mockClear();
     });
 
     it('en 401, si refreshAccessToken da token nuevo, reintenta y devuelve data (sin ir a login)', async () => {
@@ -352,8 +384,8 @@ describe('apiService', () => {
     // se despacha 'chagra:session-expired' para que App navegue a login en vez
     // de dejar al usuario en el dashboard vacío → OnboardingHero engañoso
     // (prod-down 2026-06-18).
-    it('en 401 con renovación fallida, despacha chagra:session-expired', async () => {
-      const { getAccessToken, refreshAccessToken } = await import('../authService.js');
+    it('en 401 con renovación fallida, expira sesión de forma explícita', async () => {
+      const { expireSession, getAccessToken, refreshAccessToken } = await import('../authService.js');
       getAccessToken.mockResolvedValue('tkn-viejo');
       refreshAccessToken.mockResolvedValue(null);
 
@@ -366,15 +398,11 @@ describe('apiService', () => {
       });
       vi.stubGlobal('fetch', fetchSpy);
 
-      const sessionExpired = vi.fn();
-      window.addEventListener('chagra:session-expired', sessionExpired);
-      try {
-        await expect(fetchFromFarmOS('/api/asset/plant')).rejects.toThrow();
-        expect(sessionExpired).toHaveBeenCalledTimes(1);
-        expect(sessionExpired.mock.calls[0][0].detail.status).toBe(401);
-      } finally {
-        window.removeEventListener('chagra:session-expired', sessionExpired);
-      }
+      await expect(fetchFromFarmOS('/api/asset/plant')).rejects.toThrow();
+      expect(expireSession).toHaveBeenCalledWith({
+        status: 401,
+        endpoint: '/api/asset/plant',
+      });
     });
   });
 });

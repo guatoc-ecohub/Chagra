@@ -28,6 +28,7 @@
  */
 
 import { ulid } from 'ulid';
+import { fetchWithAuthRetry } from './apiService.js';
 
 const FEEDBACK_TIMEOUT_MS = 8000;
 const CONSENT_STORAGE_KEY = 'chagra_feedback_consent_v1';
@@ -163,7 +164,7 @@ async function postFeedback(feedback) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FEEDBACK_TIMEOUT_MS);
   try {
-    const res = await fetch(url, {
+    const res = await fetchWithAuthRetry(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...(token ? { 'X-Chagra-Token': token } : {}) },
       body: JSON.stringify(feedback),
