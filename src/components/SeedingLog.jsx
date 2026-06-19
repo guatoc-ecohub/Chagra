@@ -253,7 +253,13 @@ export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw
           await createFarmProcess(process);
         }
       } catch (err) {
-        console.warn('[SeedingLog] No se pudo crear el ciclo automático:', err.message);
+        // Auto-ciclo robusto: telemetría cuando falle para no perder plantas nuevas
+        console.error('[SeedingLog] Auto-ciclo falló:', {
+          error: err.message,
+          stack: err.stack,
+          payload: payload.data?.attributes?.name,
+          timestamp: Date.now(),
+        });
         // El seeding sí se guardó. El ciclo se puede crear después manualmente.
       }
 
