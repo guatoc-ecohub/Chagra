@@ -7666,6 +7666,36 @@ export function guardConciseResponse(responseText) {
   return { text: conciseText, modified: true, reason };
 }
 
+// ── GUARD CONFIDENCIALIDAD: fugas de internos del agente ────────────────────
+
+export const INTERNALS_LEAK_SAFE_REDIRECT =
+  'Soy el asistente de Chagra para apoyar el campo colombiano. No comparto detalles internos ni especulo sobre tecnología. Mejor cuéntame: ¿en qué cultivo te ayudo?';
+
+const INTERNALS_LEAK_RE =
+  /\b(?:cypher|neo4j|apache\s+age|ollama|granite|mistral|gemma)\b|\b(?:modelo|model|ia|ai)\s+(?:de\s+)?llama\b|\bllama\s*(?:\d|[.:_-]|model|modelo|ia|ai)\b|MATCH\s*\(|\b(?:nodo|node|label|grafo|graph)\s+(?:species|biopreparado|pest|association|companion)\b|\b(?:get_pest_controllers|get_biopreparados|get_normativa_ica|get_associations)\b|\b(?:mis\s+instrucciones|system\s+prompt|mi\s+prompt)\b/i;
+
+/**
+ * stripInternalsLeak - suppress-and-replace ante detalles internos reales o
+ * inventados sobre implementación, prompts, herramientas o grafo.
+ *
+ * @param {string} responseText
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function stripInternalsLeak(responseText) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (!INTERNALS_LEAK_RE.test(responseText)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  bumpGuardTelemetry('internals_leak');
+  return {
+    text: INTERNALS_LEAK_SAFE_REDIRECT,
+    modified: true,
+    reason: 'internals_leak',
+  };
+}
+
 // ── GUARD CROP-AGNOSTIC: trampas de seguridad anti-falsa-cura (aplican a cualquier cultivo) ─────────────────────
 
 const CROP_AGNOSTIC_SAFETY_MARKER = 'Seguridad:';
@@ -7899,6 +7929,17 @@ export function applyOutputGuards(
   let text = responseText;
   let modified = false;
   const reasons = [];
+
+  // GUARD CONFIDENCIALIDAD: si el modelo revela o inventa internos, se
+  // reemplaza toda la respuesta antes de que otros guards anexen contenido.
+  const internals = stripInternalsLeak(text);
+  if (internals && internals.modified) {
+    return {
+      text: internals.text,
+      modified: true,
+      reasons: internals.reason ? [internals.reason] : [],
+    };
+  }
 
   // GUARD CROP-AGNOSTIC SAFETY: debe liderar ANTES que cualquier guard específico.
   // Una dosis inventada, cura química o plaguicida prohibido no debe sobrevivir

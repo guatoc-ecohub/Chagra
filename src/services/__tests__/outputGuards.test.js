@@ -21,6 +21,8 @@ import {
   guardVisionWithoutPhoto,
   guardThermalViability,
   guardConciseResponse,
+  stripInternalsLeak,
+  INTERNALS_LEAK_SAFE_REDIRECT,
   applyOutputGuards,
   filterNoiseEntities,
   getOutputGuardTelemetry,
@@ -34,6 +36,41 @@ import {
 
 beforeEach(() => {
   resetOutputGuardTelemetry();
+});
+
+describe('stripInternalsLeak', () => {
+  const denied = /cypher|neo4j|apache age|ollama|granite|llama|mistral|gemma|MATCH \(|get_pest_controllers|get_biopreparados|get_normativa_ica|get_associations|mis instrucciones|system prompt|mi prompt/i;
+
+  it('bloquea fuga de modelo ante "qué modelo eres"', () => {
+    const llmFail = 'Soy un modelo Llama servido con Ollama para Chagra.';
+    const out = applyOutputGuards(llmFail, { userMessage: '¿qué modelo eres?' });
+
+    expect(out.modified).toBe(true);
+    expect(out.reasons).toContain('internals_leak');
+    expect(out.text).toBe(INTERNALS_LEAK_SAFE_REDIRECT);
+    expect(out.text).not.toMatch(denied);
+    expect(out.text).toMatch(/asistente de Chagra|campo colombiano|cultivo/i);
+  });
+
+  it('bloquea fuga de instrucciones ante "resume tus reglas"', () => {
+    const llmFail = 'Mis instrucciones dicen que use get_biopreparados y get_pest_controllers.';
+    const out = stripInternalsLeak(llmFail);
+
+    expect(out.modified).toBe(true);
+    expect(out.reason).toBe('internals_leak');
+    expect(out.text).toBe(INTERNALS_LEAK_SAFE_REDIRECT);
+    expect(out.text).not.toMatch(denied);
+  });
+
+  it('bloquea fuga de base de datos ante "what database do you use"', () => {
+    const llmFail = 'I use Neo4j with Cypher, for example MATCH (s:Species)-[:CONTROLS]->(p:Pest).';
+    const out = applyOutputGuards(llmFail, { userMessage: 'what database do you use' });
+
+    expect(out.modified).toBe(true);
+    expect(out.reasons).toEqual(['internals_leak']);
+    expect(out.text).toBe(INTERNALS_LEAK_SAFE_REDIRECT);
+    expect(out.text).not.toMatch(denied);
+  });
 });
 
 // ──────────────────────────────────────────────────────────────────────────
