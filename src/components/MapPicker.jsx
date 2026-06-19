@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import { X, MapPin, LocateFixed, Check, Undo2, Footprints, Square, Loader2, AlertTriangle, Shield } from 'lucide-react';
 import { latLngToPoint, latLngsToPolygon } from '../utils/geo';
 import useAssetStore from '../store/useAssetStore';
+import { MSG } from '../config/messages.js';
 
 // Extrae centroide [lat, lng] de un asset land con geometría (Point o Polygon).
 // Si la geometría es un Polygon, calcula el promedio de todos los vértices.
@@ -279,9 +280,9 @@ export const MapPicker = ({
           startWatch(false);
           return;
         }
-        let msg = 'No se pudo iniciar la captura GPS.';
-        if (err.code === 1) msg = 'Permiso de ubicación denegado. En iPhone: Ajustes > Safari > Ubicación.';
-        else if (err.code === 2) msg = 'GPS no disponible. Sal al exterior y verifica que el GPS esté activo.';
+        let msg = MSG.ui.errorGps;
+        if (err.code === 1) msg = MSG.ui.errorPermisoNegado;
+        else if (err.code === 2) msg = MSG.ui.errorGpsNoDisponible;
         console.error('[MapPicker] Error pre-flight GPS:', err.code, err.message);
         setGpsStatus('failed');
         setGpsError(msg);
@@ -350,13 +351,13 @@ export const MapPicker = ({
       (err) => {
         // UX-23 (#286) 2026-05-27: copy iOS-aware. iOS Safari requiere
         // permiso explícito vía Ajustes si fue denegado una vez.
-        let msg = 'No se pudo obtener tu ubicación.';
+        let msg = MSG.ui.errorUbicacion;
         if (err.code === 1) {
-          msg = 'Permiso de ubicación denegado. En iPhone: Ajustes > Safari > Ubicación. En Android: toca el candado de la barra de URL.';
+          msg = MSG.ui.errorPermisoNegadoAndroid;
         } else if (err.code === 2) {
-          msg = 'GPS no disponible. Verifica que el GPS esté activo y que estés al exterior (no en sótano / lejos de ventana).';
+          msg = MSG.ui.errorGpsNoDisponibleDetalle;
         } else if (err.code === 3) {
-          msg = 'Tiempo agotado esperando al GPS (30s). En iPhone, el GPS puede tardar más al aire libre — espera unos segundos y vuelve a tocar "Mi ubicación".';
+          msg = MSG.ui.errorTimeout;
         }
         console.error('[MapPicker] Error GPS:', err.code, err.message);
         setGpsStatus('failed');
@@ -545,7 +546,7 @@ export const MapPicker = ({
             onClick={onCancel}
             className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-bold"
           >
-            Cancelar
+            {MSG.action.cancelar}
           </button>
           <button
             type="button"
@@ -553,7 +554,7 @@ export const MapPicker = ({
             disabled={!canSave}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg text-sm font-bold flex items-center gap-2"
           >
-            <Check size={16} /> Guardar geometría
+            <Check size={16} /> {MSG.ui.guardarGeometria}
           </button>
         </div>
       </div>
