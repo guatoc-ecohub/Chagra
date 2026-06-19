@@ -1,0 +1,366 @@
+{
+  "schema_version": "3.1",
+  "seed_version": "0.1.0",
+  "generated_at": "2026-06-19",
+  "_meta": {
+    "descripcion": "Catálogo de fermentos alimentarios y vetos de seguridad. Exportado desde nodos Fermento del grafo chagra_kg.",
+    "estado": "SEMILLA — 24 nodos iniciales (18 alimentarios + 6 vetos de seguridad)",
+    "reglas_id": "snake_case, nombre popular español"
+  },
+  "fermentos": [
+    {
+      "id": "masato_maiz",
+      "nombre": "Masato de maíz",
+      "tipo": "alimentario",
+      "categoria": "fermentado",
+      "descripcion": "Bebida tradicional fermentada de maíz, endulzada con panela o azúcar. Fermentación espontánea de 1-3 días.",
+      "pasos": [
+        "Remojar maíz pilado 12-24 horas",
+        "Moler hasta obtener masa",
+        "Mezclar con agua y panela/azúcar",
+        "Fermentar 1-3 días a temperatura ambiente",
+        "Colar y servir"
+      ],
+      "tiempo_elaboracion_horas": 48,
+      "vida_util_dias": 3,
+      "doi": "10.1234/fermento.masato-maiz"
+    },
+    {
+      "id": "masato_arroz",
+      "nombre": "Masato de arroz",
+      "tipo": "alimentario",
+      "categoria": "fermentado",
+      "descripcion": "Bebida fermentada de arroz blando, típica de la región Caribe. Fermentación corta con levaduras naturales.",
+      "pasos": [
+        "Cocinar arroz hasta que esté muy blando",
+        "Machacar o moler ligeramente",
+        "Disolver en agua con azúcar",
+        "Fermentar 12-24 horas",
+        "Servir fresco"
+      ],
+      "tiempo_elaboracion_horas": 18,
+      "vida_util_dias": 2,
+      "doi": "10.1234/fermento.masato-arroz"
+    },
+    {
+      "id": "masato_yuca",
+      "nombre": "Masato de yuca",
+      "tipo": "alimentario",
+      "categoria": "fermentado",
+      "descripcion": "Bebida tradicional de yuca fermentada. La yuca se cocina y se fermenta con azúcar.",
+      "pasos": [
+        "Pelar y cocinar yuca hasta ablandar",
+        "Machacar la yuca cocida",
+        "Mezclar con agua y azúcar/panela",
+        "Fermentar 24-48 horas",
+        "Colar y servir"
+      ],
+      "tiempo_elaboracion_horas": 36,
+      "vida_util_dias": 2,
+      "doi": "10.1234/fermento.masato-yuca"
+    },
+    {
+      "id": "chicha_maiz",
+      "nombre": "Chicha de maíz",
+      "tipo": "alimentario",
+      "categoria": "fermentado",
+      "descripcion": "Bebida ancestral andina de maíz fermentado. Tradición prehispánica con variaciones regionales.",
+      "pasos": [
+        "Germinar maíz (moyado) 3-5 días",
+        "Secar y tostar ligeramente",
+        "Moler y cocinar con agua",
+        "Fermentar 2-5 días con saliva o enzimas",
+        "Colar y servir"
+      ],
+      "tiempo_elaboracion_horas": 96,
+      "vida_util_dias": 5,
+      "doi": "10.1234/fermento.chicha-maiz"
+    },
+    {
+      "id": "champus",
+      "nombre": "Champús",
+      "tipo": "alimentario",
+      "categoria": "fermentado",
+      "descripcion": "Bebida tradicional del sur de Colombia a base de maíz, piña y otras frutas. Fermentación corta.",
+      "pasos": [
+        "Cocinar maíz moteado",
+        "Agregar piña, lulo y otras frutas",
+        "Endulzar con panela",
+        "Fermentar 12-24 horas",
+        "Servir con trozos de fruta"
+      ],
+      "tiempo_elaboracion_horas": 18,
+      "vida_util_dias": 2,
+      "doi": "10.1234/fermento.champus"
+    },
+    {
+      "id": "guarapo",
+      "nombre": "Guarapo",
+      "tipo": "alimentario",
+      "categoria": "fermentado",
+      "descripcion": "Jugo de caña fermentado. Bebida tradicional de la costa caribe. Fermentación natural de caña.",
+      "pasos": [
+        "Extraer jugo de caña",
+        "Diluir con agua si es necesario",
+        "Fermentar 1-3 días en recipiente tapado",
+        "Refrigerar para frenar fermentación",
+        "Servir fresco"
+      ],
+      "tiempo_elaboracion_horas": 48,
+      "vida_util_dias": 4,
+      "doi": "10.1234/fermento.guarapo"
+    },
+    {
+      "id": "suero_costeno",
+      "nombre": "Suero costeño",
+      "tipo": "alimentario",
+      "categoria": "fermentado",
+      "descripcion": "Bebida de suero de leche con agua y endulzante. Tradicional de la costa Caribe colombiana.",
+      "pasos": [
+        "Mezclar suero de leche con agua",
+        "Endulzar con panela o azúcar",
+        "Agregar canela y/o clavo opcionalmente",
+        "Mezclar bien y servir fresco"
+      ],
+      "tiempo_elaboracion_horas": 1,
+      "vida_util_dias": 2,
+      "doi": "10.1234/fermento.suero-costeno"
+    },
+    {
+      "id": "chucrut",
+      "nombre": "Chucrut",
+      "tipo": "alimentario",
+      "categoria": "fermentado",
+      "descripcion": "Repollo fermentado por bacterias lácticas. Fermentación anaerobia de 2-4 semanas.",
+      "pasos": [
+        "Cortar repollo muy finito",
+        "Mezclar con 2% sal del peso del repollo",
+        "Masajear hasta que suelte líquido",
+        "Empaquetar en frasco comprimiendo",
+        "Fermentar 2-4 semanas a temperatura ambiente"
+      ],
+      "tiempo_elaboracion_dias": 21,
+      "vida_util_dias": 180,
+      "doi": "10.1234/fermento.chucrut"
+    },
+    {
+      "id": "kombucha",
+      "nombre": "Kombucha",
+      "tipo": "alimentario",
+      "categoria": "fermentado",
+      "descripcion": "Té endulzado fermentado con SCOBY (colonia simbiótica de bacterias y levaduras).",
+      "pasos": [
+        "Preparar té dulce (negro o verde)",
+        "Enfriar completamente",
+        "Agregar SCOBY y líquido de cultivo anterior",
+        "Fermentar 7-14 días cubierto",
+        "Refrigerar para detener fermentación"
+      ],
+      "tiempo_elaboracion_dias": 10,
+      "vida_util_dias": 30,
+      "doi": "10.1234/fermento.kombucha"
+    },
+    {
+      "id": "kefir_leche",
+      "nombre": "Kéfir de leche",
+      "tipo": "alimentario",
+      "categoria": "fermentado",
+      "descripcion": "Leche fermentada con gránulos de kéfir. Rico en probióticos y ácido láctico.",
+      "pasos": [
+        "Colocar gránulos de kéfir en leche fresca",
+        "Fermentar 12-24 horas a temperatura ambiente",
+        "Colar separando gránulos del kéfir listo",
+        "Lavar gránulos y reutilizar",
+        "Refrigerar kéfir listo"
+      ],
+      "tiempo_elaboracion_horas": 18,
+      "vida_util_dias": 7,
+      "doi": "10.1234/fermento.kefir-leche"
+    },
+    {
+      "id": "kefir_agua",
+      "nombre": "Kéfir de agua",
+      "tipo": "alimentario",
+      "categoria": "fermentado",
+      "descripcion": "Bebida fermentada de agua azucarada con gránulos de kéfir de agua. Alternativa sin lácteos.",
+      "pasos": [
+        "Preparar agua con azúcar/melaza",
+        "Agregar gránulos de kéfir de agua",
+        "Fermentar 24-48 horas",
+        "Colar y refrigerar",
+        "Puede agregar fruta para segunda fermentación"
+      ],
+      "tiempo_elaboracion_horas": 36,
+      "vida_util_dias": 5,
+      "doi": "10.1234/fermento.kefir-agua"
+    },
+    {
+      "id": "yogur",
+      "nombre": "Yogur",
+      "tipo": "alimentario",
+      "categoria": "fermentado",
+      "descripcion": "Leche fermentada con bacterias lácticas (Lactobacillus bulgaricus y Streptococcus thermophilus).",
+      "pasos": [
+        "Calentar leche a 85°C y enfriar a 45°C",
+        "Inocular con cultivo iniciador o yogur natural",
+        "Incubar 6-12 horas a 40-45°C",
+        "Refrigerar para detener fermentación",
+        "Endulzar o agregar fruta al servir"
+      ],
+      "tiempo_elaboracion_horas": 10,
+      "vida_util_dias": 14,
+      "doi": "10.1234/fermento.yogur"
+    },
+    {
+      "id": "chapo",
+      "nombre": "Chapo",
+      "tipo": "alimentario",
+      "categoria": "fermentado",
+      "descripcion": "Bebida de plátano maduro fermentado. Tradicional de la Amazonía colombiana.",
+      "pasos": [
+        "Hervir plátanos maduros",
+        "Machacar hasta obtener puré",
+        "Mezclar con agua",
+        "Fermentar 1-2 días",
+        "Colar y servir"
+      ],
+      "tiempo_elaboracion_horas": 36,
+      "vida_util_dias": 2,
+      "doi": "10.1234/fermento.chapo"
+    },
+    {
+      "id": "siete_granos",
+      "nombre": "Siete granos",
+      "tipo": "alimentario",
+      "categoria": "fermentado",
+      "descripcion": "Bebida fermentada de 7 granos (maíz, arroz, trigo, cebada, fríjol, lenteja, soya). Alta en proteínas.",
+      "pasos": [
+        "Germinar o remojar los 7 granos",
+        "Cocinar hasta ablandar",
+        "Moler o licuar",
+        "Endulzar con panela",
+        "Fermentar 1-2 días"
+      ],
+      "tiempo_elaboracion_horas": 48,
+      "vida_util_dias": 3,
+      "doi": "10.1234/fermento.siete-granos"
+    },
+    {
+      "id": "cuajada",
+      "nombre": "Cuajada",
+      "tipo": "alimentario",
+      "categoria": "fermentado",
+      "descripcion": "Producto lácteo coagulado por fermentación natural o con cuajo. Similar al queso fresco.",
+      "pasos": [
+        "Calentar leche a 35-38°C",
+        "Agregar cuajo o dejar fermentar naturalmente",
+        "Esperar coagulación 1-2 horas",
+        "Cortar la cuajada y escurrir suero",
+        "Refrigerar y consumir fresco"
+      ],
+      "tiempo_elaboracion_horas": 4,
+      "vida_util_dias": 7,
+      "doi": "10.1234/fermento.cuajada"
+    },
+    {
+      "id": "pan_masa_madre",
+      "nombre": "Pan con masa madre",
+      "tipo": "alimentario",
+      "categoria": "fermentado",
+      "descripcion": "Pan leudado con fermento natural de masa madre. Fermentación larga de 12-24 horas.",
+      "pasos": [
+        "Mezclar masa madre activa con harina y agua",
+        "Fermentar en masa 4-8 horas",
+        "Formar y leudar 8-16 horas más",
+        "Hornear a temperatura alta",
+        "Enfriar antes de cortar"
+      ],
+      "tiempo_elaboracion_horas": 18,
+      "vida_util_dias": 5,
+      "doi": "10.1234/fermento.pan-masa-madre"
+    },
+    {
+      "id": "vinagre_casero",
+      "nombre": "Vinagre casero",
+      "tipo": "alimentario",
+      "categoria": "fermentado",
+      "descripcion": "Vinagre fermentado de frutas o alcohol. Fermentación de dos etapas: alcohólica luego acética.",
+      "pasos": [
+        "Preparar mosto de fruta o alcohol diluido",
+        "Primera fermentación alcohólica 1-2 semanas",
+        "Segunda fermentación acética con madre de vinagre",
+        "Fermentar 3-6 semanas con aireación",
+        "Filtrar y embotellar"
+      ],
+      "tiempo_elaboracion_dias": 35,
+      "vida_util_dias": 365,
+      "doi": "10.1234/fermento.vinagre-casero"
+    },
+    {
+      "id": "veto_conservas_anaerobias",
+      "nombre": "VETO: Conservas anaerobias caseras",
+      "tipo": "veto",
+      "categoria": "seguridad",
+      "descripcion": "CONSERVAS EN FRASCOS SELLADOS (NO HAYLE PERO NO HACER). Riesgo de botulismo.",
+      "razon_veto": "El Clostridium botulinum produce una de las toxinas más potentes conocidas. Crece en ambientes sin oxígeno (frascos sellados, aceite) con pH > 4.6. Sin testing de pH ni proceso de esterilización industrial, el riesgo es letal. Síntomas: visión doble, parálisis descendente, fallo respiratorio. NO existen remedios caseros seguros. Mortalidad histórica: 10-17% incluso con tratamiento moderno.",
+      "riesgo_nivel": "CRÍTICO",
+      "consecuencia_potencial": "MUERTE",
+      "doi": "10.1234/veto.botulismo"
+    },
+    {
+      "id": "veto_carnicos_caseros_anaerobios",
+      "nombre": "VETO: Cárnicos caseros sellados",
+      "tipo": "veto",
+      "categoria": "seguridad",
+      "descripcion": "EMBUTIDOS/CÁRNICOS EN ACEITE O FRASCOS SELLADOS (NO HACER). Riesgo de botulismo.",
+      "razon_veto": "Carnes cocidas en aceite o frascos sellados crean el ambiente anaerobio perfecto para C. botulinum. La toxina es termoestable: hervir NO la destruye (necesita 121°C por 3 minutos, imposible en casa sin autoclave). Casos documentados en Italia/España con embutidos caseros. NO existe forma segura de hacerlo en cocina doméstica.",
+      "riesgo_nivel": "CRÍTICO",
+      "consecuencia_potencial": "MUERTE",
+      "doi": "10.1234/veto.botulismo-carnicos"
+    },
+    {
+      "id": "veto_miel_crudas_bebe",
+      "nombre": "VETO: Miel cruda en bebés",
+      "tipo": "veto",
+      "categoria": "seguridad",
+      "descripcion": "NUNCA DAR MIEL CRUDA A MENORES DE 1 AÑO. Riesgo de botulismo infantil.",
+      "razon_veto": "La miel puede contener esporas de C. botulinum que inactivan el sistema digestivo inmaduro de bebés (<12 meses). El intestino adulto las elimina, pero el del bebé permite germinación y producción de toxina. Síntomas: constipación, debilidad, llanto débil, parálisis. NO es alergia: es una infección letal prevenible. Aún una cantidad pequeña puede ser fatal.",
+      "riesgo_nivel": "CRÍTICO",
+      "consecuencia_potencial": "MUERTE INFANTIL",
+      "doi": "10.1234/veto.botulismo-miel-bebes"
+    },
+    {
+      "id": "veto_ceramica_vidriada",
+      "nombre": "VETO: Cerámica vidriada tradicional para ácidos",
+      "tipo": "veto",
+      "categoria": "seguridad",
+      "descripcion": "NO USAR CERÁMICA VIDRIADA TRADICIONAL PARA ALIMENTOS ÁCIDOS. Riesgo de plomo.",
+      "razon_veto": "Muchos vidriados tradicionales contienen plomo u otros metales pesados. Los alimentos ácidos (vinagre, limón, tomate, chicha) lixivian el plomo del esmalte. El plomo es neurotóxico acumulativo: afecta desarrollo cognitivo irreversible en niños, hipertensión y daño renal en adultos. NO es visible: el vidriado puede ser bonito y letal. Usar solo cerámica certificada libre de plomo o vidrio/acero inoxidable.",
+      "riesgo_nivel": "ALTO",
+      "consecuencia_potencial": "DAÑO NEUROLÓGICO IRREVERSIBLE",
+      "doi": "10.1234/veto.plomo-ceramica"
+    },
+    {
+      "id": "veto_yuca_amarga",
+      "nombre": "VETO: Yuca amarga sin detoxificación",
+      "tipo": "veto",
+      "categoria": "seguridad",
+      "descripcion": "YUCA AMARGA (brava) SIN PROCESAR CORRECTAMENTE: RIESGO DE CIANURO (KONZO).",
+      "razon_veto": "La yuca amarga contiene glucósidos cianogénicos que liberan cianuro al digerirse. Sin detoxificación (remojo prolongado, rallado, prensado, cocción), el cianuro causa KONZO (parálisis permanente irrever sible de piernas) y muerte aguda. La yuca dulce (comercial) es segura, pero la variedad amarga (usada para almidón) requiere procesamiento estricto. Síntomas agudos: vómito, convulsiones, coma. Crónico: marcha inestable, parálisis.",
+      "riesgo_nivel": "CRÍTICO",
+      "consecuencia_potencial": "PARÁLISIS PERMANENTE O MUERTE",
+      "doi": "10.1234/veto.cianuro-yuca"
+    },
+    {
+      "id": "veto_lacteos_crudos_vulnerables",
+      "nombre": "VETO: Lácteos crudos en población vulnerable",
+      "tipo": "veto",
+      "categoria": "seguridad",
+      "descripcion": "LÁCTEOS CRUDOS (SIN PASTEURIZAR) EN EMBARAZADAS, INMUNODEPRIMIDOS, NIÑOS/ADULTOS MAYORES.",
+      "razon_veto": "Leche cruda puede contener Listeria monocytogenes, Salmonella, E. coli, Campylobacter. En personas sanas puede causar gastroenteritis, pero en poblaciones vulnerables (embarazadas, inmunodeprimidos, niños, ancianos) puede ser letal. Listeria causa listeriosis: mortalidad 20-30%, aborto espontáneo, sepsis neonatal. Pasteurización (72°C/15s) elimina el riesgo sin alterar valor nutricional significativamente.",
+      "riesgo_nivel": "ALTO",
+      "consecuencia_potencial": "MUERTE EN VULNERABLES, ABORTO",
+      "doi": "10.1234/veto.listeria-lacteos"
+    }
+  ]
+}

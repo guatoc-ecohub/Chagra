@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Sprout, MapPin, Eye, Package, Clock, NotebookPen, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette, FileText, Network } from 'lucide-react';
+import { Sprout, MapPin, Eye, Package, Clock, NotebookPen, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette, FileText, Network, Beaker } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
 import { useClimaAtmosphere } from './hooks/useClimaAtmosphere';
@@ -69,6 +69,7 @@ const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
 const BiodiversidadView = lazy(() => import('./components/BiodiversidadView'));
 const Asociaciones = lazy(() => import('./components/Asociaciones'));
+const FermentosView = lazy(() => import('./components/FermentosView'));
 const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
 const OnboardingPiloto = lazy(() => import('./components/OnboardingPiloto'));
 const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
@@ -125,6 +126,7 @@ const NAV_TILES = [
   { id: 'task_log', label: 'Tareas', icon: Clock, accent: 'rose', desc: 'Cola de pendientes' },
   { id: 'historial', label: 'Bitácora', icon: NotebookPen, accent: 'indigo', desc: 'Historial de actividades' },
   { id: 'biodiversidad', label: 'Flora y fauna', icon: Leaf, accent: 'emerald', desc: 'Ecosistema, estratos y gremios' },
+  { id: 'fermentos', label: 'Fermentos', icon: Beaker, accent: 'orange', desc: 'Recetas tradicionales y seguridad' },
   { id: 'reportar_invasora', label: 'Plagas', icon: AlertCircle, accent: 'amber', desc: 'Reporte de plagas y malezas' },
   { id: 'casos', label: 'Casos', icon: FileText, accent: 'amber', desc: 'Seguimiento de problemas y tratamientos' },
   { id: 'informes', label: 'Informes', icon: FileText, accent: 'lime', desc: 'Descargas de reportes en CSV' },
@@ -143,6 +145,7 @@ const ACCENT_CLASSES = {
   emerald: { border: 'border-l-emerald-500', text: 'text-emerald-400' },
   lime: { border: 'border-l-lime-500', text: 'text-lime-400' },
   amber: { border: 'border-l-amber-500', text: 'text-amber-400' },
+  orange: { border: 'border-l-orange-500', text: 'text-orange-400' },
 };
 
 const HASH_VIEW_ROUTES = {
@@ -163,6 +166,7 @@ const HASH_VIEW_ROUTES = {
   evolucion: 'evolucion',
   glaciar: 'glaciar',
   'glaciar-historial': 'glaciar_historial',
+  fermentos: 'fermentos',
 };
 
 // Vistas que cuentan como "módulo" para telemetría de piloto.
@@ -1016,6 +1020,16 @@ export default function App() {
         return (
           <ErrorBoundary>
             <BiodiversidadView onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+          </ErrorBoundary>
+        );
+      case 'fermentos':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Fermentos">
+              <ScreenShell title="Fermentos" icon={Beaker} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
+                <FermentosView />
+              </ScreenShell>
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'asociaciones':

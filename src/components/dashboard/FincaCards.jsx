@@ -6,7 +6,7 @@
  * este refinamiento visual. Se silencia el warning soft acá para no bloquear
  * el commit sin arrastrar ese refactor i18n. */
 import { useEffect, useState } from 'react';
-import { Sprout, MapPin, Package, NotebookPen, Eye, AlertCircle, FileText, ChevronRight, Leaf, Network } from 'lucide-react';
+import { Sprout, MapPin, Package, NotebookPen, Eye, AlertCircle, FileText, ChevronRight, Leaf, Network, Beaker } from 'lucide-react';
 import useAssetStore from '../../store/useAssetStore';
 import Skeleton from '../common/Skeleton';
 import { listFarmProcesses } from '../../db/farmProcessCache';
@@ -110,6 +110,16 @@ const SECTION_STYLES = {
         iconColor: 'text-lime-300',
         bar: 'from-lime-300 to-emerald-300',
         halo: 'bg-lime-400/15',
+    },
+    fermentos: {
+        Icon: Beaker,
+        emoji: '🍶',
+        accent: 'from-orange-500/20 to-amber-500/10',
+        border: 'border-orange-700/30',
+        ring: 'ring-orange-500/0 group-hover:ring-orange-500/40',
+        iconColor: 'text-orange-300',
+        bar: 'from-orange-400 to-amber-300',
+        halo: 'bg-orange-400/15',
     },
     informes: {
         Icon: FileText,
@@ -551,5 +561,23 @@ export function SeguimientoCards({ onNavigate, variant = 'grid', keys = null }) 
                 />
             ))}
         </>
+    );
+}
+
+/**
+ * FermentosCard — tarjeta del módulo de fermentos alimentarios.
+ * Navega a la vista 'fermentos' con la galería de recetas tradicionales
+ * y las advertencias de seguridad críticas (botulismo, plomo, cianuro).
+ */
+export function FermentosCard({ onNavigate, variant }) {
+    return (
+        <Card
+            variant={variant}
+            section="fermentos"
+            title="Fermentos"
+            subtitle="Recetas tradicionales y seguridad"
+            tooltip="Fermentos alimentarios colombianos (masato, chicha, kéfir) + VETOS de seguridad (botulismo, plomo, cianuro)."
+            onClick={() => onNavigate('fermentos')}
+        />
     );
 }
