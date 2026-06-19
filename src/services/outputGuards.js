@@ -7666,18 +7666,121 @@ export function guardConciseResponse(responseText) {
   return { text: conciseText, modified: true, reason };
 }
 
-// ── GUARD TOMATE: trampas de seguridad anti-falsa-cura ─────────────────────
+// ── GUARD CROP-AGNOSTIC: trampas de seguridad anti-falsa-cura (aplican a cualquier cultivo) ─────────────────────
+
+const CROP_AGNOSTIC_SAFETY_MARKER = 'Seguridad:';
+const CROP_AGNOSTIC_DISEASE_NO_CURE_RE =
+  /\b(hlb|greening|liberibacter|monilia|moniliopsis|sigatoka\s+negra|moko|marchitez\s+bacteriana|ralstonia|virus|cuchara|tylcv|peste\s+negra|tswv|mosaico)\b/i;
+const PROHIBITED_PESTICIDE_RE =
+  /\b(metamidofos|parathion|paration|monocrotofos|endosulfan|lannate|metomil)\b/i;
+const PESTICIDE_DOSE_REQUEST_RE =
+  /\b(dosis|cuant[oa]s?\s+(ml|cc|gramos?|gr|g)|\d+\s*(ml|cc|g|gr|gramos?))\b/i;
+const PESTICIDE_CONTEXT_RE = /\b(plaguicida|insecticida|fungicida|herbicida|agroquimic|veneno|glifosato|sistematico)\b/i;
+const NON_SELECTIVE_HERBICIDE_RE = /\b(glifosato|paraquat|glufosinato)\b/i;
+const EXPORT_NORMATIVA_RE =
+  /\b(exportar|exportación|europa|estados\s+unidos|eea|mrl|carencia|residuos)\b/i;
+const PREHARVEST_RE = /\b(cosecha|cerca\s+de\s+cosecha|pre[-\s]?cosecha|cerca\s+de\s+cosechar)\b/i;
+const TRICHODERMA_RE = /\btrichoderma\b/i;
+const INSECT_RE = /\b(insecto|oruga|polilla|gusano|cogollero|trips|mosca|plaga)\b/i;
+
+function _cropAgnosticSafetyReplacement(kind) {
+  const intro = `${CROP_AGNOSTIC_SAFETY_MARKER} no voy a confirmar una cura, producto o dosis peligrosa.`;
+  const byKind = {
+    sin_cura:
+      `${intro} Estas enfermedades no tienen cura química comprobada en planta: HLB (cítricos), monilia (cacao), Sigatoka negra (plátano), moko/marchitez bacteriana/Ralstonia, virus (varios cultivos). Manejo: erradicar/roguing, variedades resistentes, control de vector, desinfección. NUNCA prometas cura ni producto milagroso.`,
+    prohibido:
+      `${intro} Productos altamente tóxicos sin registro ICA vigente (metamidofós, paratión, monocrotofós, endosulfán, metomil/Lannate). Consulta etiqueta actual y asistente técnico. Prefiere opciones agroecológicas.`,
+    dosis:
+      `${intro} NUNCA inventes una dosis numérica de plaguicida. La dosis sale de la etiqueta registrada ICA y del asistente técnico. Herbicidas no selectivos (glifosato, paraquat) NO se aplican sobre el cultivo.`,
+    export_mrl:
+      `${intro} Para exportación, respeta MRL del país destino y carencia del producto. NO apliques plaguicidas fuertes cerca de cosecha. Verifica registro ICA y residuos permitidos.`,
+    trichoderma_insect:
+      `${intro} Trichoderma es un hongo de suelo para patógenos como Fusarium/Rhizoctonia, NO controla insectos. Para plagas usa control biológico específico (Beauveria, Bacillus, etc.).`,
+  };
+  return byKind[kind] || byKind.dosis;
+}
+
+function _cropAgnosticSafetyKind({ userNorm, responseNorm }) {
+  const combined = `${userNorm}\n${responseNorm}`;
+
+  // Si el usuario menciona específicamente "tomate", dejamos que el guarda de tomate maneje el caso
+  // (excepto para export/MRL que es genuinamente crop-agnostic)
+  if (/\btomate\b/i.test(userNorm)) {
+    // Solo procesamos export/MRL para tomate, el resto lo deja pasar al guarda de tomate
+    if (EXPORT_NORMATIVA_RE.test(combined) && PREHARVEST_RE.test(combined)) {
+      const unsafeApply = /\b(aplica|aplique|usa|use|puedo|puede|sirve)\b/i.test(responseNorm);
+      const alreadySafe = /\b(no\s+aplic|cuidado|evita|carencia|mrl|residuos|registro\s+ica)\b/i.test(responseNorm);
+      if (unsafeApply || !alreadySafe) return 'export_mrl';
+    }
+    // Para tomate, dejamos que el guarda específico maneje el resto
+    return null;
+  }
+
+  // Enfermedades sin cura (crop-agnostic)
+  if (CROP_AGNOSTIC_DISEASE_NO_CURE_RE.test(combined)) {
+    const unsafeCure = /\b(cura|curar|elimina|control\s+total|producto|fungicida|bactericida|antibiotico|dosis|aplica|aplique)\b/i.test(responseNorm);
+    // Respuestas seguras mencionan erradicar/roguing/sacar la planta, o dicen explícitamente que no hay cura
+    const alreadySafe = /\b(no\s+(tiene|hay)\s+cura|sin\s+cura|no\s+se\s+cura|erradica|erradicar|erradiques|roguing|quemar|saca|sacar|elimina\s+plantas|elimin\s+\w+\s+plantas|retira|retirar)\b/i.test(responseNorm);
+    if (unsafeCure || !alreadySafe) return 'sin_cura';
+  }
+
+  // Plaguicidas prohibidos (crop-agnostic)
+  if (PROHIBITED_PESTICIDE_RE.test(combined)) {
+    const alreadySafe = /\b(no|nunca|evita|prohibid|restringid|registro\s+ica|etiqueta)\b/i.test(responseNorm);
+    if (!alreadySafe || /\b(aplica|aplique|usa|use|dosis|ml|cc|gramos?)\b/i.test(responseNorm)) return 'prohibido';
+  }
+
+  // Dosis inventadas (crop-agnostic)
+  if (
+    (PESTICIDE_DOSE_REQUEST_RE.test(userNorm) && PESTICIDE_CONTEXT_RE.test(combined)) ||
+    (NON_SELECTIVE_HERBICIDE_RE.test(combined) && /\b(cultivo|planta)\b/i.test(combined))
+  ) {
+    const hasNumericDose = /\b\d+(?:[.,]\d+)?\s*(ml|cc|cm3|g|gr|gramos?|kg|l|litros?)\b/i.test(responseNorm);
+    const alreadySafe = /\b(etiqueta|registro\s+ica|asistente\s+tecnico|t[eé]cnico|no\s+invent)\b/i.test(responseNorm);
+    if (hasNumericDose || !alreadySafe) return 'dosis';
+  }
+
+  // Exportación/MRL (crop-agnostic)
+  if (EXPORT_NORMATIVA_RE.test(combined) && PREHARVEST_RE.test(combined)) {
+    const unsafeApply = /\b(aplica|aplique|usa|use|puedo|puede|sirve)\b/i.test(responseNorm);
+    const alreadySafe = /\b(no\s+aplic|cuidado|evita|carencia|mrl|residuos|registro\s+ica)\b/i.test(responseNorm);
+    if (unsafeApply || !alreadySafe) return 'export_mrl';
+  }
+
+  // Trichoderma para insectos (crop-agnostic)
+  if (TRICHODERMA_RE.test(combined) && INSECT_RE.test(combined)) {
+    const alreadySafe = /\b(no\s+controla\s+insectos|no\s+corresponde|hongo\s+de\s+suelo)\b/i.test(responseNorm);
+    if (!alreadySafe) return 'trichoderma_insect';
+  }
+
+  return null;
+}
+
+export function guardCropAgnosticSafetyTraps(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (responseText.includes(CROP_AGNOSTIC_SAFETY_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  const userNorm = _stripDiacritics(userMessage || '');
+  const responseNorm = _stripDiacritics(responseText);
+  const kind = _cropAgnosticSafetyKind({ userNorm, responseNorm });
+  if (!kind) return { text: responseText, modified: false, reason: null };
+  bumpGuardTelemetry('crop_agnostic_safety_traps');
+  return {
+    text: _cropAgnosticSafetyReplacement(kind),
+    modified: true,
+    reason: `crop_agnostic_safety_${kind}`,
+  };
+}
+
+// ── GUARD TOMATE: trampas de seguridad anti-falsa-cura (específicas de tomate) ─────────────────────
 
 const TOMATE_SAFETY_MARKER = 'Seguridad tomate:';
-const TOMATE_DISEASE_NO_CURE_RE =
-  /\b(marchitez\s+bacteriana|ralstonia|moko|virus|cuchara|tylcv|peste\s+negra|tswv|mosaico)\b/;
-const TOMATE_PHYSIO_RE = /\b(pudricion\s+apical|culillo|blossom-end|raj\w*|agriet\w*)\b/;
-const PROHIBITED_PESTICIDE_RE =
-  /\b(metamidofos|parathion|paration|monocrotofos|endosulfan|lannate|metomil)\b/;
-const PESTICIDE_DOSE_REQUEST_RE =
-  /\b(dosis|cuant[oa]s?\s+(ml|cc|gramos?|gr|g)|\d+\s*(ml|cc|g|gr|gramos?))\b/;
-const PESTICIDE_CONTEXT_RE = /\b(plaguicida|insecticida|fungicida|herbicida|agroquimic|veneno|glifosato)\b/;
-const NON_SELECTIVE_HERBICIDE_RE = /\b(glifosato|paraquat|glufosinato)\b/;
+// Reutilizamos la constante crop-agnostic para enfermedades sin cura (incluye tomate)
+const TOMATE_DISEASE_NO_CURE_RE = CROP_AGNOSTIC_DISEASE_NO_CURE_RE;
+const TOMATE_PHYSIO_RE = /\b(pudricion\s+apical|culillo|blossom-end|raj\w*|agriet\w*)\b/i;
 
 function _tomateSafetyReplacement(kind) {
   const intro = `${TOMATE_SAFETY_MARKER} no voy a confirmar una cura, producto o dosis peligrosa.`;
@@ -7704,11 +7807,15 @@ function _tomateSafetyReplacement(kind) {
 
 function _tomateSafetyKind({ userNorm, responseNorm }) {
   const combined = `${userNorm}\n${responseNorm}`;
-  const hasTomateContext = /\btomate\b/.test(combined) || TOMATE_DISEASE_NO_CURE_RE.test(combined) || TOMATE_PHYSIO_RE.test(combined);
+  // El guarda de tomate solo activa cuando el user menciona específicamente "tomate"
+  // o cuando se trata de trastornos fisiológicos de tomate (pudrición apical, rajado)
+  const hasTomateContext = /\btomate\b/.test(userNorm) || TOMATE_PHYSIO_RE.test(combined);
   if (!hasTomateContext) return null;
   if (TOMATE_DISEASE_NO_CURE_RE.test(combined)) {
-    const unsafeCure = /\b(cura|curar|elimina|control\s+total|erradic\w+|producto|fungicida|bactericida|antibiotico|dosis|aplica|aplique)\b/.test(responseNorm);
-    const alreadySafe = /\b(no\s+(tiene|hay)\s+cura|sin\s+cura|no\s+se\s+cura|erradicar|roguing|quemar\s+plantas|eliminar\s+plantas)\b/.test(responseNorm);
+    // unsafeCure: promete cura/producto específico (excepto erradicar que es seguro)
+    const unsafeCure = /\b(cura|curar|elimina|control\s+total|producto|fungicida|bactericida|antibiotico|dosis|aplica|aplique)\b/.test(responseNorm);
+    // alreadySafe: menciona erradicar/roguing o dice explícitamente que no hay cura
+    const alreadySafe = /\b(no\s+(tiene|hay)\s+cura|sin\s+cura|no\s+se\s+cura|erradica|erradicar|roguing|quemar|saca|sacar|elimina.*plantas|retira|retirar)\b/.test(responseNorm);
     if (unsafeCure || !alreadySafe) return 'sin_cura';
   }
   if (TOMATE_PHYSIO_RE.test(combined)) {
@@ -7793,9 +7900,21 @@ export function applyOutputGuards(
   let modified = false;
   const reasons = [];
 
-  // GUARD TOMATE SAFETY: debe liderar antes de cualquier guard anexador o de
-  // diagnóstico. Una dosis, cura química o asociación riesgosa de tomate no debe
-  // sobrevivir debajo de caveats posteriores.
+  // GUARD CROP-AGNOSTIC SAFETY: debe liderar ANTES que cualquier guard específico.
+  // Una dosis inventada, cura química o plaguicida prohibido no debe sobrevivir
+  // debajo de caveats posteriores, independientemente del cultivo.
+  const cropAgnosticSafety = guardCropAgnosticSafetyTraps(text, { userMessage });
+  if (cropAgnosticSafety && cropAgnosticSafety.modified) {
+    return {
+      text: cropAgnosticSafety.text,
+      modified: true,
+      reasons: cropAgnosticSafety.reason ? [cropAgnosticSafety.reason] : [],
+    };
+  }
+
+  // GUARD TOMATE SAFETY: reglas específicas de tomate (se ejecutan después de crop-agnostic).
+  // Una dosis, cura química o asociación riesgosa de tomate no debe sobrevivir
+  // debajo de caveats posteriores.
   const tomatoSafety = guardTomateSafetyTraps(text, { userMessage });
   if (tomatoSafety && tomatoSafety.modified) {
     return {

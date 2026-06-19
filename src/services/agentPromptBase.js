@@ -154,38 +154,47 @@ const INVENTORY_QUERY_RE = /(^|[^a-zñ])(tengo|registrad\w*|mis plantas|que plan
 const SYMPTOM_QUERY_RE = /(mancha|amarill|seca|secando|marchit|hongo|caen|caida|cayendo|triste|enferm|podrid|pudri|debil|flojo|arrugad|enrollad|mordid|comid|huec|plaga|bicho|gusano|sintoma)/;
 const NORMATIVA_QUERY_RE = /(quimic|sintetic|prohibid|registrad|permitid|restringid|(^|[^a-zñ])ica([^a-zñ]|$)|glifosato|veneno|agrotoxic|agroquimic|plaguicida|fungicida|insecticida|herbicida|dosis de [a-z]+cida)/;
 const CLIMA_QUERY_RE = /(clima|lluvia|llover|llovi|temperatura|pronostico|tiempo|helada|granizo|sequia|verano|invierno|nino|nina|viento)/;
-const TOMATE_SAFETY_RULES = [
+// Reglas crop-agnostic de seguridad (aplican a cualquier cultivo)
+const CROP_AGNOSTIC_SAFETY_RULES = [
   [
-    [['marchitez bacteriana', 'ralstonia', 'moko', 'virus', 'cuchara', 'tylcv', 'peste negra', 'tswv', 'mosaico']],
-    'TOMATE SEGURIDAD: marchitez bacteriana/Ralstonia/moko y virus (cuchara/TYLCV, peste negra/TSWV, mosaico) NO tienen cura química en planta. No prometas cura ni producto: erradica y quema plantas enfermas, rota con no-solanáceas, usa variedades resistentes, controla vector, desinfecta suelo/herramienta.',
+    [['hlb', 'greening', 'liberibacter', 'monilia', 'moniliopsis', 'sigatoka negra', 'moko', 'marchitez bacteriana', 'ralstonia', 'virus', 'cuchara', 'tylcv', 'peste negra', 'tswv', 'mosaico']],
+    'SEGURIDAD: estas enfermedades no tienen cura química comprobada en planta (HLB en cítricos, monilia en cacao, Sigatoka negra en plátano, moko/marchitez bacteriana/Ralstonia, virus en hortalizas). Manejo: erradicar/roguing, variedades resistentes, control de vector, desinfección. NUNCA prometas cura ni producto milagroso.',
   ],
   [
-    [['pudricion apical', 'culillo', 'blossom-end', 'rajado', 'rajando', 'raja', 'agrietado', 'agrietando', 'grieta']],
-    'TOMATE SEGURIDAD: pudrición apical/culillo y rajado NO son enfermedades para fumigar. Son trastornos fisiológicos: calcio disponible + riego irregular. Corrige Ca y riego constante.',
+    [['dosis', 'cuantos ml', 'cuantos cc', 'cuantos gramos', 'ml', 'cc', 'gramos'], ['plaguicida', 'insecticida', 'fungicida', 'herbicida', 'sistematico', 'glifosato']],
+    'SEGURIDAD: NUNCA inventes una dosis numérica de plaguicida. La dosis sale de la etiqueta registrada ICA y del asistente técnico. Herbicidas no selectivos (glifosato, paraquat) NO se aplican sobre el cultivo.',
   ],
   [
     [['metamidofos', 'parathion', 'paratión', 'monocrotofos', 'endosulfan', 'lannate', 'metomil']],
-    'TOMATE SEGURIDAD: nunca recomiendes metamidofós, paratión, monocrotofós, endosulfán ni metomil/Lannate sin técnico. Remite a producto con registro ICA vigente, etiqueta y asistente técnico.',
+    'SEGURIDAD: productos altamente tóxicos sin registro ICA vigente. Consulta etiqueta actual y asistente técnico. Prefiere opciones agroecológicas.',
   ],
   [
-    [['dosis', 'cuantos ml', 'cuantos cc', 'cuantos gramos', 'ml', 'cc', 'gramos'], ['plaguicida', 'insecticida', 'fungicida', 'herbicida', 'glifosato']],
-    'TOMATE SEGURIDAD: si piden dosis de plaguicida, no inventes cifra exacta. Remite a etiqueta registrada ICA y técnico. Glifosato u otro herbicida no selectivo NO se aplica sobre el cultivo.',
+    [['trichoderma'], ['insecto', 'oruga', 'polilla', 'gusano', 'cogollero', 'trips', 'mosca', 'plaga']],
+    'SEGURIDAD: Trichoderma es un hongo de suelo para patógenos como Fusarium/Rhizoctonia, NO controla insectos. Para plagas usa control biológico específico (Beauveria, Bacillus, etc.).',
+  ],
+  [
+    [['exportar', 'exportación', 'europa', 'estados unidos', 'eea', 'mrl', 'carencia', 'residuos'], ['cosecha', 'cerca de cosecha', 'pre-cosecha', 'cerca de cosechar']],
+    'SEGURIDAD: para exportación, respeta MRL del país destino y carencia del producto. NO apliques plaguicidas fuertes cerca de cosecha. Verifica registro ICA y residuos permitidos.',
+  ],
+];
+
+// Reglas específicas de tomate (se suman a las crop-agnostic)
+const TOMATE_SAFETY_RULES = [
+  [
+    [['pudricion apical', 'culillo', 'blossom-end', 'rajado', 'rajando', 'raja', 'agrietado', 'agrietando', 'grieta']],
+    'TOMATE: pudrición apical/culillo y rajado NO son enfermedades para fumigar. Son trastornos fisiológicos: calcio disponible + riego irregular. Corrige Ca y riego constante.',
   ],
   [
     [['broca'], ['tomate']],
-    'TOMATE SEGURIDAD: si dicen broca en tomate, corrige la premisa. Broca es plaga de café; plagas clave del tomate: Tuta absoluta, mosca blanca y Helicoverpa.',
-  ],
-  [
-    [['trichoderma'], ['tuta']],
-    'TOMATE SEGURIDAD: no encadenes Trichoderma para Tuta absoluta. Trichoderma es hongo de suelo para patógenos como Fusarium/Rhizoctonia, no controla insectos.',
+    'TOMATE: broca es plaga de café, no de tomate. Plagas clave del tomate: Tuta absoluta, mosca blanca y Helicoverpa. Confirma con monitoreo o foto.',
   ],
   [
     [['tomate'], ['papa'], ['asociar', 'asociado', 'sembrar junto', 'juntos', 'asocio']],
-    'TOMATE SEGURIDAD: no recomiendes asociar tomate con papa. Comparten Phytophthora infestans (gota/tizón tardío) y Ralstonia; advierte riesgo compartido.',
+    'TOMATE: no recomiendes asociar tomate con papa. Comparten Phytophthora infestans (gota/tizón tardío) y Ralstonia; advierte riesgo compartido.',
   ],
   [
     [['triplicar', 'triplico', 'triplica', 'duplicar', 'duplico', 'duplica', 'aumentar', 'aumento', 'aumenta'], ['nitrogeno', 'nitrógeno'], ['mas fruto', 'más fruto', 'fruto']],
-    'TOMATE SEGURIDAD: corrige premisas agronómicas falsas. Triplicar nitrógeno no da más fruto: exceso de N da follaje, baja balance reproductivo y favorece plagas.',
+    'TOMATE: triplicar nitrógeno NO da más fruto. Exceso de N da follaje, baja balance reproductivo y favorece plagas. Ajusta con análisis y potasio/calcio balanceados.',
   ],
 ];
 
@@ -273,9 +282,17 @@ ANTI-INVENCIÓN-DE-SÍNTOMAS: NUNCA describas síntomas/problemas/observaciones 
     sections.push(`REGLA CRÍTICA DIAGNÓSTICO-SIN-EVIDENCIA: si el usuario reporta un síntoma VAGO ("manchas amarillas", "se está secando", "está triste") y se cumplen LAS DOS: (a) NO nombró la especie o no está clara, Y (b) NO adjuntó foto en este turno → PROHIBIDO nombrar un patógeno específico o binomio ("es Phytophthora…", "es el hongo Golovinomyces…") y PROHIBIDO inventar síntomas no escritos. Un síntoma vago tiene MUCHAS causas: responde con (1) un diferencial BREVE sin latín (2-3 causas comunes: falta de nutrientes, exceso/falta de agua, hongo, plaga, sol fuerte) y (2) preguntas para acotar: ¿qué planta es? ¿me envías una foto de la hoja? ¿la mancha está en el haz o el envés? ¿se siente seca o húmeda? ¿hace cuánto empezó? NUNCA cierres con un diagnóstico único y seguro sin esa evidencia. ES PREFERIBLE PEDIR LA FOTO QUE INVENTAR EL HONGO.`);
   }
 
+  // Reglas crop-agnostic (aplican a cualquier cultivo)
+  const cropAgnosticSafety = CROP_AGNOSTIC_SAFETY_RULES.filter(([groups]) =>
+    groups.every((keys) => _mentionsAny(mention, keys))
+  ).map(([, line]) => line);
+
+  // Reglas específicas de tomate (se suman a las crop-agnostic)
   const tomateSafety = TOMATE_SAFETY_RULES.filter(([groups]) => groups.every((keys) => _mentionsAny(mention, keys))).map(([, line]) => line);
-  if (tomateSafety.length > 0) {
-    sections.push(tomateSafety.join('\n'));
+
+  const allSafetyRules = [...cropAgnosticSafety, ...tomateSafety];
+  if (allSafetyRules.length > 0) {
+    sections.push(allSafetyRules.join('\n'));
   }
 
   // CASO C: definición SIEMPRE presente (guarda); detalle completo solo si la
