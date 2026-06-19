@@ -322,6 +322,15 @@ const SYNTHETIC_AGROCHEM_TERMS = [
   'imidacloprid',
   'malation',
   'metomil',
+  'lannate',
+  'metamidofos',
+  'metamidofós',
+  'parathion',
+  'paratión',
+  'monocrotofos',
+  'monocrotofós',
+  'endosulfan',
+  'endosulfán',
   // #1303 (BORDE-006): acaricidas/insecticidas comunes que faltaban. Su nombre NO
   // termina en un sufijo de familia clásica capturado por el detector de sufijos
   // (abamectina→-ectina, spinosad/spinetoram, ciantraniliprol, tiametoxam,
@@ -7391,7 +7400,7 @@ export function guardParamoNormativa(responseText) {
       '⚠️ Restricción legal — Ley 1930 de 2018 (Páramo)\n\n' +
       'No es posible recomendar siembra ni aplicación de pesticidas en ecosistemas de páramo. ' +
       'La Ley 1930 de 2018 prohíbe actividades agropecuarias (agricultura, ganadería, ' +
-      'aplicación de agroquímicos) en这些 ecosistemas de protección estratégica.\n\n' +
+      'aplicación de agroquímicos) en estos ecosistemas de protección estratégica.\n\n' +
       'Si tu finca está en zona de páramo o área de influencia, te recomiendo:\n' +
       '• Consultar con la autoridad ambiental local (Corporación Autónoma Regional) ' +
       'para delimitar exactamente el área protegida.\n' +
@@ -7657,6 +7666,106 @@ export function guardConciseResponse(responseText) {
   return { text: conciseText, modified: true, reason };
 }
 
+// ── GUARD TOMATE: trampas de seguridad anti-falsa-cura ─────────────────────
+
+const TOMATE_SAFETY_MARKER = 'Seguridad tomate:';
+const TOMATE_DISEASE_NO_CURE_RE =
+  /\b(marchitez\s+bacteriana|ralstonia|moko|virus|cuchara|tylcv|peste\s+negra|tswv|mosaico)\b/;
+const TOMATE_PHYSIO_RE = /\b(pudricion\s+apical|culillo|blossom-end|raj\w*|agriet\w*)\b/;
+const PROHIBITED_PESTICIDE_RE =
+  /\b(metamidofos|parathion|paration|monocrotofos|endosulfan|lannate|metomil)\b/;
+const PESTICIDE_DOSE_REQUEST_RE =
+  /\b(dosis|cuant[oa]s?\s+(ml|cc|gramos?|gr|g)|\d+\s*(ml|cc|g|gr|gramos?))\b/;
+const PESTICIDE_CONTEXT_RE = /\b(plaguicida|insecticida|fungicida|herbicida|agroquimic|veneno|glifosato)\b/;
+const NON_SELECTIVE_HERBICIDE_RE = /\b(glifosato|paraquat|glufosinato)\b/;
+
+function _tomateSafetyReplacement(kind) {
+  const intro = `${TOMATE_SAFETY_MARKER} no voy a confirmar una cura, producto o dosis peligrosa.`;
+  const byKind = {
+    sin_cura:
+      `${intro} Marchitez bacteriana/Ralstonia/moko y virus del tomate (cuchara/TYLCV, peste negra/TSWV, mosaico) no tienen cura química en la planta. Manejo: erradicar y quemar plantas enfermas, rotar con cultivos no solanáceos, usar variedades resistentes, controlar mosca blanca o trips según el virus, y desinfectar suelo, bandejas y herramientas.`,
+    fisiologico:
+      `${intro} Pudrición apical/culillo y rajado no son enfermedades para fumigar. Son trastornos fisiológicos ligados a calcio disponible y riego irregular. Corrige calcio, evita golpes de sequía/encharque y mantén riego constante.`,
+    prohibido:
+      `${intro} No uses ni recomiendes metamidofós, paratión, monocrotofós, endosulfán ni metomil/Lannate sin acompañamiento técnico. En Colombia se debe revisar registro ICA vigente, etiqueta y asistente técnico antes de cualquier plaguicida.`,
+    dosis:
+      `${intro} No inventes una dosis numérica de plaguicida. La dosis sale de la etiqueta registrada ICA y del asistente técnico. Un herbicida no selectivo como glifosato no se aplica sobre el cultivo de tomate.`,
+    broca:
+      `${intro} Esa premisa está cruzada: la broca es plaga del café, no una plaga clave del tomate. En tomate revisa Tuta absoluta, mosca blanca y Helicoverpa; confirma con monitoreo o foto antes de elegir manejo.`,
+    trichoderma:
+      `${intro} No corresponde usar Trichoderma para Tuta absoluta. Trichoderma es un hongo de suelo para patógenos como Fusarium o Rhizoctonia; no controla insectos. Para Tuta se trabaja con monitoreo, trampas, saneamiento y control biológico específico.`,
+    asociacion:
+      `${intro} No recomiendo asociar tomate con papa: comparten riesgos fuertes como Phytophthora infestans (gota/tizón tardío) y Ralstonia. Si ya están cerca, aumenta rotación, distancia sanitaria, drenaje, eliminación de focos y desinfección de herramientas.`,
+    nitrogeno:
+      `${intro} Triplicar nitrógeno no da más fruto. El exceso de N empuja follaje, desbalancea floración/fructificación y favorece plagas. Ajusta nutrición con análisis, potasio/calcio balanceados y riego estable.`,
+  };
+  return byKind[kind] || byKind.dosis;
+}
+
+function _tomateSafetyKind({ userNorm, responseNorm }) {
+  const combined = `${userNorm}\n${responseNorm}`;
+  const hasTomateContext = /\btomate\b/.test(combined) || TOMATE_DISEASE_NO_CURE_RE.test(combined) || TOMATE_PHYSIO_RE.test(combined);
+  if (!hasTomateContext) return null;
+  if (TOMATE_DISEASE_NO_CURE_RE.test(combined)) {
+    const unsafeCure = /\b(cura|curar|elimina|control\s+total|erradic\w+|producto|fungicida|bactericida|antibiotico|dosis|aplica|aplique)\b/.test(responseNorm);
+    const alreadySafe = /\b(no\s+(tiene|hay)\s+cura|sin\s+cura|no\s+se\s+cura|erradicar|roguing|quemar\s+plantas|eliminar\s+plantas)\b/.test(responseNorm);
+    if (unsafeCure || !alreadySafe) return 'sin_cura';
+  }
+  if (TOMATE_PHYSIO_RE.test(combined)) {
+    const unsafeFumigate = /\b(fumig|fungicida|insecticida|bactericida|hongo|patogeno|enfermedad)\b/.test(responseNorm);
+    const alreadySafe = /\b(no\s+es\s+(una\s+)?enfermedad|fisiologic|calcio|riego\s+(constante|regular))\b/.test(responseNorm);
+    if (unsafeFumigate || !alreadySafe) return 'fisiologico';
+  }
+  if (PROHIBITED_PESTICIDE_RE.test(combined)) {
+    const alreadySafe = /\b(no|nunca|evita|prohibid|restringid|registro\s+ica|etiqueta)\b/.test(responseNorm);
+    if (!alreadySafe || /\b(aplica|aplique|usa|use|dosis|ml|cc|gramos?)\b/.test(responseNorm)) return 'prohibido';
+  }
+  if (
+    (PESTICIDE_DOSE_REQUEST_RE.test(userNorm) && PESTICIDE_CONTEXT_RE.test(combined)) ||
+    (NON_SELECTIVE_HERBICIDE_RE.test(combined) && /\b(tomate|cultivo)\b/.test(combined))
+  ) {
+    const hasNumericDose = /\b\d+(?:[.,]\d+)?\s*(ml|cc|cm3|g|gr|gramos?|kg|l|litros?)\b/.test(responseNorm);
+    const alreadySafe = /\b(etiqueta|registro\s+ica|asistente\s+tecnico|t[eé]cnico|no\s+invent)\b/.test(responseNorm);
+    if (hasNumericDose || !alreadySafe) return 'dosis';
+  }
+  if (/\bbroca\b/.test(combined) && /\btomate\b/.test(combined)) {
+    const alreadySafe = /\b(cafe|caf[eé]|tuta|mosca\s+blanca|helicoverpa|premisa)\b/.test(responseNorm);
+    if (!alreadySafe) return 'broca';
+  }
+  if (/\btrichoderma\b/.test(combined) && /\b(tuta|insecto|polilla|oruga)\b/.test(combined)) {
+    const alreadySafe = /\b(no\s+controla\s+insectos|no\s+corresponde)\b/.test(responseNorm);
+    if (!alreadySafe) return 'trichoderma';
+  }
+  if (/\btomate\b/.test(combined) && /\bpapa\b/.test(combined) && /\b(asoci|junto|juntos|sembrar|intercal|companer)\w*\b/.test(userNorm)) {
+    const alreadySafe = /\b(no\s+(recomiendo|conviene)|riesgo|phytophthora|ralstonia|gota|tizon)\b/.test(responseNorm);
+    if (!alreadySafe) return 'asociacion';
+  }
+  if (/\b(triplic\w*|duplic\w*|aument\w*)\b/.test(userNorm) && /\bnitrogeno\b/.test(userNorm) && /\b(fruto|frutos|produccion|cuaje)\b/.test(userNorm)) {
+    const alreadySafe = /\b(exceso\s+de\s+n|exceso\s+de\s+nitrogeno|follaje|no\s+da\s+mas\s+fruto|plagas)\b/.test(responseNorm);
+    if (!alreadySafe || /\b(si|claro|correcto|triplica|aumenta)\b/.test(responseNorm)) return 'nitrogeno';
+  }
+  return null;
+}
+
+export function guardTomateSafetyTraps(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (responseText.includes(TOMATE_SAFETY_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  const userNorm = _stripDiacritics(userMessage || '');
+  const responseNorm = _stripDiacritics(responseText);
+  const kind = _tomateSafetyKind({ userNorm, responseNorm });
+  if (!kind) return { text: responseText, modified: false, reason: null };
+  bumpGuardTelemetry('tomate_safety_traps');
+  return {
+    text: _tomateSafetyReplacement(kind),
+    modified: true,
+    reason: `tomate_safety_${kind}`,
+  };
+}
+
 export function applyOutputGuards(
   responseText,
   {
@@ -7683,6 +7792,18 @@ export function applyOutputGuards(
   let text = responseText;
   let modified = false;
   const reasons = [];
+
+  // GUARD TOMATE SAFETY: debe liderar antes de cualquier guard anexador o de
+  // diagnóstico. Una dosis, cura química o asociación riesgosa de tomate no debe
+  // sobrevivir debajo de caveats posteriores.
+  const tomatoSafety = guardTomateSafetyTraps(text, { userMessage });
+  if (tomatoSafety && tomatoSafety.modified) {
+    return {
+      text: tomatoSafety.text,
+      modified: true,
+      reasons: tomatoSafety.reason ? [tomatoSafety.reason] : [],
+    };
+  }
 
   // GUARD de DOMINIO el más PRIMERO (#352): si la pregunta es off-domain
   // (física/química/matemáticas) y el modelo entró a contestarla, REEMPLAZAMOS la

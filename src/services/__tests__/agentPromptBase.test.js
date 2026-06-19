@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
+  buildBasePrompt,
   analyzeQuery,
   buildQueryAnalysisBlock,
   buildCorpusContext,
@@ -146,5 +147,58 @@ describe('formatToolEvidence', () => {
     ];
     const b = formatToolEvidence(evs);
     expect(b).toContain('DATOS VERIFICADOS');
+  });
+});
+
+describe('buildBasePrompt — guardas condicionales tomate', () => {
+  const baseArgs = {
+    plantContext: 'tomate ×10',
+    fincaContext: '',
+    indoorContext: '',
+    finca: null,
+    contextMemory: '',
+    isEnum: false,
+  };
+
+  it('inyecta guarda de enfermedad sin cura solo cuando la query dispara Ralstonia', () => {
+    const prompt = buildBasePrompt({
+      ...baseArgs,
+      query: 'Mi tomate tiene marchitez bacteriana por Ralstonia, ¿qué producto lo cura?',
+    });
+    expect(prompt).toContain('marchitez bacteriana/Ralstonia/moko');
+    expect(prompt).toContain('NO tienen cura química');
+
+    const control = buildBasePrompt({ ...baseArgs, query: '¿Cómo tutoro el tomate?' });
+    expect(control).not.toContain('marchitez bacteriana/Ralstonia/moko');
+  });
+
+  it('inyecta guardas de dosis y plaguicida prohibido con disparadores puntuales', () => {
+    const dosePrompt = buildBasePrompt({
+      ...baseArgs,
+      query: '¿Cuántos ml de insecticida le echo al tomate?',
+    });
+    expect(dosePrompt).toContain('si piden dosis de plaguicida');
+    expect(dosePrompt).toContain('etiqueta registrada ICA');
+
+    const bannedPrompt = buildBasePrompt({
+      ...baseArgs,
+      query: 'Me ofrecieron Lannate para tomate, ¿lo uso?',
+    });
+    expect(bannedPrompt).toContain('metamidofós');
+    expect(bannedPrompt).toContain('registro ICA vigente');
+  });
+
+  it('inyecta guardas de premisa cruzada solo con pares completos', () => {
+    const brocaTomate = buildBasePrompt({
+      ...baseArgs,
+      query: 'Tengo broca en tomate, ¿qué controlador uso?',
+    });
+    expect(brocaTomate).toContain('Broca es plaga de café');
+
+    const brocaCafe = buildBasePrompt({
+      ...baseArgs,
+      query: 'Tengo broca en café, ¿qué controlador uso?',
+    });
+    expect(brocaCafe).not.toContain('Broca es plaga de café');
   });
 });
