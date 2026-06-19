@@ -289,8 +289,26 @@ export const fetchFromFarmOS = async (endpoint, options = {}, _retried = false) 
         }
       }
       if (response.status === 401 || response.status === 403) {
-        console.error(`[API] Auth error ${response.status}. Redirigiendo a login.`);
-        if (typeof window !== 'undefined') window.location.hash = '#login';
+        console.error(`[API] Auth error ${response.status}. Sesión vencida → re-login.`);
+        // Estado de sesión CLARO (no zombi): el token fue rechazado y la
+        // renovación no dio uno nuevo → la sesión está realmente muerta.
+        // ANTES sólo se hacía `window.location.hash = '#login'`, pero el router
+        // de App (HASH_VIEW_ROUTES) NO tiene ruta 'login' → el hash se ignoraba
+        // y el usuario quedaba en el dashboard SIN datos: los contadores en 0
+        // disparaban el OnboardingHero "¿dónde está su finca?" — engañoso, hace
+        // creer que perdió su finca cuando sólo venció el token (prod-down
+        // 2026-06-18). Ahora despachamos un evento que App escucha para navegar
+        // a la pantalla de login ("Sesión vencida — vuelve a entrar"), y se
+        // hace logout limpio para no reintentar con el token muerto. El hash se
+        // mantiene como señal secundaria por compatibilidad.
+        if (typeof window !== 'undefined') {
+          window.location.hash = '#login';
+          try {
+            window.dispatchEvent(
+              new CustomEvent('chagra:session-expired', { detail: { status: response.status } })
+            );
+          } catch (_) { /* CustomEvent existe en browsers soportados */ }
+        }
       }
       const errorDetail = await response.text().catch(() => '');
       // Sanitize body antes de pegarlo al .message — Drupal/cloudflared a
