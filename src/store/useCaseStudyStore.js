@@ -179,7 +179,7 @@ export const useCaseStudyStore = create(
       // Selectors normalizan defaults extendidos (foro/validación/timeline)
       // para cases legacy almacenados antes de 2026-05-18.
       //
-      // ADR-036 MVP multi-finca: TODO selector aplica `belongsToActiveTenant`
+      // ADR-036 MVP multi-finca: selector aplica `belongsToActiveTenant`
       // ANTES del normalize/map para que el operador solo vea sus propios
       // cases. Los cases de otros tenants quedan en localStorage pero
       // ocultos del read-path — comparable al filtrado en read de

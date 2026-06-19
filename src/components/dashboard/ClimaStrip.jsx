@@ -158,12 +158,12 @@ export default function ClimaStrip({ onNavigate }) {
         // `region` en texto libre, lo resuelve offline contra el dataset DANE.
         const profileMunicipio = getProfileMunicipio();
         return activeFinca?.municipio || profileMunicipio || FARM_CONFIG?.MUNICIPIO || null;
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- getProfile* son funciones estables, no requieren deps
     }, [activeFincaSlug, fincas, tick]);
 
     const geo = useMemo(() => {
         return resolveGeo(getProfile(), municipio);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- getProfile y resolveGeo son funciones estables
     }, [municipio, tick]);
 
     // mitad geo de #364 (2026-06-03): ¿la ubicación GUARDADA es demasiado
@@ -174,7 +174,7 @@ export default function ClimaStrip({ onNavigate }) {
     // municipio mostrado y empuja a confirmar la ubicación real.
     const coarse = useMemo(() => {
         return isSavedLocationCoarse(getProfile());
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- getProfile e isSavedLocationCoarse son funciones estables
     }, [tick]);
 
     // Navegación a la pantalla de ubicación (mini-mapa + piso térmico). Reusada

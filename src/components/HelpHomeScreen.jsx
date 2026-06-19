@@ -118,7 +118,7 @@ export default function HelpHomeScreen({ onSelect }) {
       const haystack = normalize(`${c.title} ${c.sub} ${c.keywords || ''}`);
       return terms.every((t) => haystack.includes(t));
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- cards es constante (definido arriba), no cambia por referencia
   }, [query]);
 
   return (

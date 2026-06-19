@@ -202,4 +202,7 @@ export const HELP_TIPS = [
   }
 ];
 
-// TODO: ampliar a 30-50 con curaduría humana en queue/040 fase 2
+// Nota: ampliación pendiente según roadmap queue/040 fase 2.
+// Actualmente hay 27 tips cubriendo errores comunes, observación, riego,
+// sustrato, plagas y paciencia. Próximo objetivo: 30-50 tips con curaduría
+// humana basada en Cementerio de Plantas + lecciones de especies clave.

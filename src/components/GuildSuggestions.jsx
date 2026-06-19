@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable react-hooks/set-state-in-effect -- Resets de estado en useEffect son necesarios para limpiar estado al cambiar speciesId */
 import React, { useState, useEffect, useMemo } from 'react';
 import { Sprout, AlertTriangle, Sparkles, Loader2, Check } from 'lucide-react';
 import { getSuggestedCompanions, buildGuildPrompt } from '../services/guildService';
