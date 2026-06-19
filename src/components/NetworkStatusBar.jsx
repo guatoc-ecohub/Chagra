@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { MSG } from '../config/messages.js';
 import { Wifi, WifiOff, RefreshCw, CheckCircle, AlertTriangle, X } from 'lucide-react';
 import { syncManager } from '../services/syncManager';
 
@@ -146,7 +147,7 @@ export default function NetworkStatusBar() {
       bg: 'bg-morpho/10',
       border: 'border-morpho/50',
       icon: <RefreshCw size={16} className="animate-spin shrink-0 text-morpho" />,
-      text: `Sincronizando ${pendingCount} registro${pendingCount !== 1 ? 's' : ''}...`,
+      text: MSG.format(MSG.ui.sincronizandoRegistros, { count: pendingCount }),
     },
     [STATUS.SYNCED]: {
       bg: 'bg-muzo/10',

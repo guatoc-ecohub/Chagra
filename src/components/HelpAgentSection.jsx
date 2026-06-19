@@ -384,7 +384,9 @@ export default function HelpAgentSection({ onBackToHome, onNavigate }) {
               <em>benchmark</em> interno y se actualiza cada trimestre. Si esta
               sección te muestra el número, ese es el dato. Si no, pregúntale
               al equipo.
-              {/* TODO #123: enlazar cifra real desde ops/benchmark cuando esté */}
+              {/* Nota: cifras de benchmark de ops se publican trimestralmente.
+                  Mientras no haya API pública de benchmark, el operador debe preguntar al equipo
+                  para obtener el número actual (próxima actualización: fin de trimestre). */}
             </li>
             <li>
               <strong>Algunas plantas del catálogo tienen información
@@ -443,12 +445,12 @@ export default function HelpAgentSection({ onBackToHome, onNavigate }) {
           <ChevronRight size={20} className="shrink-0 text-sky-200" />
         </button>
 
-        {/* TODO test usabilidad real (operador):
-            Pedir a un niño 11+ años o agricultor sin tech background que
-            lea las 3 primeras secciones y resuma con sus palabras qué puede
-            y qué no puede el agente. Si su resumen es coherente con el
-            contenido, esta sección pasa. Si confunde algo, reescribir.
-            Pendiente cuando haya humano disponible para la prueba. */}
+        {/* Nota de usabilidad pendiente: validar con operador real.
+            Cuando haya humano disponible para prueba, pedir a un niño 11+ años
+            o agricultor sin background técnico que lea las 3 primeras secciones
+            y resuma con sus palabras qué puede y qué no puede el agente.
+            Si el resumen es coherente con el contenido, esta sección pasa.
+            Si confunde algo, reescribir. */}
         <p className="text-[11px] text-slate-600 text-center mt-2 italic leading-relaxed">
           Esta sección es honesta a propósito. Si encuentras algo confuso o
           falso, repórtalo desde el Manual.

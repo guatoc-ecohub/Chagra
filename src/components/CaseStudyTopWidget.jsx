@@ -52,7 +52,7 @@ export default function CaseStudyTopWidget({ onNavigate, maxItems = 3 }) {
   const cases = useCaseStudyStore((s) => s.cases);
   // `now` capturado una sola vez al mount (no afecta resultado: el sort solo
   // necesita orden relativo de edad entre casos, no tiempo absoluto).
-  // eslint-disable-next-line react-hooks/purity
+  // eslint-disable-next-line react-hooks/purity -- Date.now() debe capturarse solo al mount, no en cada render
   const mountedAt = useMemo(() => Date.now(), []);
   const topActive = useMemo(() => {
     if (!Array.isArray(cases) || cases.length === 0) return [];

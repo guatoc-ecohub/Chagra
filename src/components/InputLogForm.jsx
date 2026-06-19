@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { MSG } from '../config/messages.js';
 import { Droplets, Send, Info } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import { MATERIAL_PRESETS, UNIT_OPTIONS } from '../config/materials';
@@ -193,7 +194,7 @@ export const InputLogForm = ({ assetId, onComplete }) => {
         ) : (
           <Send size={18} />
         )}
-        {loading ? 'Sincronizando Offline…' : 'Registrar en Bitácora'}
+        {loading ? MSG.ui.sincronizarOffline : MSG.ui.ingresoBitacora}
       </button>
     </form>
   );

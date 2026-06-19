@@ -154,6 +154,40 @@ const INVENTORY_QUERY_RE = /(^|[^a-zñ])(tengo|registrad\w*|mis plantas|que plan
 const SYMPTOM_QUERY_RE = /(mancha|amarill|seca|secando|marchit|hongo|caen|caida|cayendo|triste|enferm|podrid|pudri|debil|flojo|arrugad|enrollad|mordid|comid|huec|plaga|bicho|gusano|sintoma)/;
 const NORMATIVA_QUERY_RE = /(quimic|sintetic|prohibid|registrad|permitid|restringid|(^|[^a-zñ])ica([^a-zñ]|$)|glifosato|veneno|agrotoxic|agroquimic|plaguicida|fungicida|insecticida|herbicida|dosis de [a-z]+cida)/;
 const CLIMA_QUERY_RE = /(clima|lluvia|llover|llovi|temperatura|pronostico|tiempo|helada|granizo|sequia|verano|invierno|nino|nina|viento)/;
+const TOMATE_SAFETY_RULES = [
+  [
+    [['marchitez bacteriana', 'ralstonia', 'moko', 'virus', 'cuchara', 'tylcv', 'peste negra', 'tswv', 'mosaico']],
+    'TOMATE SEGURIDAD: marchitez bacteriana/Ralstonia/moko y virus (cuchara/TYLCV, peste negra/TSWV, mosaico) NO tienen cura química en planta. No prometas cura ni producto: erradica y quema plantas enfermas, rota con no-solanáceas, usa variedades resistentes, controla vector, desinfecta suelo/herramienta.',
+  ],
+  [
+    [['pudricion apical', 'culillo', 'blossom-end', 'rajado', 'rajando', 'raja', 'agrietado', 'agrietando', 'grieta']],
+    'TOMATE SEGURIDAD: pudrición apical/culillo y rajado NO son enfermedades para fumigar. Son trastornos fisiológicos: calcio disponible + riego irregular. Corrige Ca y riego constante.',
+  ],
+  [
+    [['metamidofos', 'parathion', 'paratión', 'monocrotofos', 'endosulfan', 'lannate', 'metomil']],
+    'TOMATE SEGURIDAD: nunca recomiendes metamidofós, paratión, monocrotofós, endosulfán ni metomil/Lannate sin técnico. Remite a producto con registro ICA vigente, etiqueta y asistente técnico.',
+  ],
+  [
+    [['dosis', 'cuantos ml', 'cuantos cc', 'cuantos gramos', 'ml', 'cc', 'gramos'], ['plaguicida', 'insecticida', 'fungicida', 'herbicida', 'glifosato']],
+    'TOMATE SEGURIDAD: si piden dosis de plaguicida, no inventes cifra exacta. Remite a etiqueta registrada ICA y técnico. Glifosato u otro herbicida no selectivo NO se aplica sobre el cultivo.',
+  ],
+  [
+    [['broca'], ['tomate']],
+    'TOMATE SEGURIDAD: si dicen broca en tomate, corrige la premisa. Broca es plaga de café; plagas clave del tomate: Tuta absoluta, mosca blanca y Helicoverpa.',
+  ],
+  [
+    [['trichoderma'], ['tuta']],
+    'TOMATE SEGURIDAD: no encadenes Trichoderma para Tuta absoluta. Trichoderma es hongo de suelo para patógenos como Fusarium/Rhizoctonia, no controla insectos.',
+  ],
+  [
+    [['tomate'], ['papa'], ['asociar', 'asociado', 'sembrar junto', 'juntos', 'asocio']],
+    'TOMATE SEGURIDAD: no recomiendes asociar tomate con papa. Comparten Phytophthora infestans (gota/tizón tardío) y Ralstonia; advierte riesgo compartido.',
+  ],
+  [
+    [['triplicar', 'triplico', 'triplica', 'duplicar', 'duplico', 'duplica', 'aumentar', 'aumento', 'aumenta'], ['nitrogeno', 'nitrógeno'], ['mas fruto', 'más fruto', 'fruto']],
+    'TOMATE SEGURIDAD: corrige premisas agronómicas falsas. Triplicar nitrógeno no da más fruto: exceso de N da follaje, baja balance reproductivo y favorece plagas.',
+  ],
+];
 
 /**
  * buildBasePrompt — system prompt base del agente Chagra (instrucciones +
@@ -237,6 +271,11 @@ ANTI-INVENCIÓN-DE-SÍNTOMAS: NUNCA describas síntomas/problemas/observaciones 
 
   if (SYMPTOM_QUERY_RE.test(mention)) {
     sections.push(`REGLA CRÍTICA DIAGNÓSTICO-SIN-EVIDENCIA: si el usuario reporta un síntoma VAGO ("manchas amarillas", "se está secando", "está triste") y se cumplen LAS DOS: (a) NO nombró la especie o no está clara, Y (b) NO adjuntó foto en este turno → PROHIBIDO nombrar un patógeno específico o binomio ("es Phytophthora…", "es el hongo Golovinomyces…") y PROHIBIDO inventar síntomas no escritos. Un síntoma vago tiene MUCHAS causas: responde con (1) un diferencial BREVE sin latín (2-3 causas comunes: falta de nutrientes, exceso/falta de agua, hongo, plaga, sol fuerte) y (2) preguntas para acotar: ¿qué planta es? ¿me envías una foto de la hoja? ¿la mancha está en el haz o el envés? ¿se siente seca o húmeda? ¿hace cuánto empezó? NUNCA cierres con un diagnóstico único y seguro sin esa evidencia. ES PREFERIBLE PEDIR LA FOTO QUE INVENTAR EL HONGO.`);
+  }
+
+  const tomateSafety = TOMATE_SAFETY_RULES.filter(([groups]) => groups.every((keys) => _mentionsAny(mention, keys))).map(([, line]) => line);
+  if (tomateSafety.length > 0) {
+    sections.push(tomateSafety.join('\n'));
   }
 
   // CASO C: definición SIEMPRE presente (guarda); detalle completo solo si la

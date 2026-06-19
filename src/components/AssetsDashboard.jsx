@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { MSG } from '../config/messages.js';
 import { ArrowLeft, Plus, Trash2, RefreshCw, Building2, Leaf, Search, WifiOff, TreePine, Map as MapIcon, List, Sprout, FlaskConical, Ban, AlertTriangle, Warehouse, Square } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import { Virtuoso } from 'react-virtuoso';
@@ -347,7 +348,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
   const [ragLoading, setRagLoading] = useState(false);
   useEffect(() => {
     if (!formData.speciesId || !formData.name) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reset temprano en guard clause, no cambia durante render
       setRagInsights(null);
       setRagLoading(false);
       return;
@@ -380,10 +381,10 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     if (!showForm) return;
     const isRealZone = currentZoneId && !['__all__', '__orphan__', '__cemetery__'].includes(currentZoneId);
     if (isRealZone && !formData.parentLandId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sincronización de estado derivado, no afecta render actual
       setFormData((prev) => ({ ...prev, parentLandId: currentZoneId }));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- formData.parentLandId es state, incluirlo causaría loop
   }, [showForm, currentZoneId]);
 
   // Estado local del formulario de cosecha scoped por asset.id
@@ -567,7 +568,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
       onError: () => { /* silent: deja al operador elegir manual */ },
     });
     return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- detectZoneByGps es función utilidad estable, no cambia por referencia
   }, [showForm, activeTab, lands]);
 
   const handleSave = async () => {
@@ -834,8 +835,8 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     }
     // Zona rural (land no-urbana): placeholder de zona, NO de insumos.
     if (activeTab === 'land') return 'Ej: Huerta, Lote de abajo, Potrero, Invernadero...';
-    if (activeTab === 'structure') return 'Ej: ' + STRUCTURE_EXAMPLES[Math.floor(/* eslint-disable-line react-hooks/purity */ Math.random() * STRUCTURE_EXAMPLES.length)];
-    if (activeTab === 'equipment') return 'Ej: ' + EQUIPMENT_EXAMPLES[Math.floor(/* eslint-disable-line react-hooks/purity */ Math.random() * EQUIPMENT_EXAMPLES.length)];
+    if (activeTab === 'structure') return 'Ej: ' + STRUCTURE_EXAMPLES[Math.floor(/* eslint-disable-line react-hooks/purity -- Math.random() es intencionalmente impuro para variar placeholder */ Math.random() * STRUCTURE_EXAMPLES.length)];
+    if (activeTab === 'equipment') return 'Ej: ' + EQUIPMENT_EXAMPLES[Math.floor(/* eslint-disable-line react-hooks/purity -- Math.random() es intencionalmente impuro para variar placeholder */ Math.random() * EQUIPMENT_EXAMPLES.length)];
     return 'Ej: Bokashi, Biol, Purín de Ortiga...';
   };
 
@@ -1617,7 +1618,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
           {isLoading && currentAssets.length === 0 ? (
             <div className="flex items-center justify-center py-12">
               <RefreshCw size={24} className="animate-spin text-slate-500" />
-              <span className="ml-3 text-slate-500">Cargando...</span>
+              <span className="ml-3 text-slate-500">{MSG.ui.cargando}</span>
             </div>
           ) : currentAssets.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-slate-500">

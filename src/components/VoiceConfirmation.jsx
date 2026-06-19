@@ -6,6 +6,7 @@ import { CROP_TAXONOMY } from '../config/taxonomy';
 import { resolveSpeciesDefaults } from '../config/speciesDefaults';
 import { bestFuzzyMatch, similarity } from '../utils/entityMatcher';
 import GuildSuggestions from './GuildSuggestions';
+import { MSG } from '../config/messages.js';
 
 /**
  * VoiceConfirmation, pantalla obligatoria de revisión humana del array de
@@ -225,7 +226,7 @@ export default function VoiceConfirmation({
   return (
     <div className="p-4 flex flex-col gap-4">
       <section className="bg-slate-900 border border-slate-800 rounded-xl p-3">
-        <p className="text-2xs uppercase font-bold text-slate-500 mb-1">Transcripción</p>
+        <p className="text-2xs uppercase font-bold text-slate-500 mb-1">{MSG.voz.transcripcion}</p>
         <p className="text-sm text-slate-200 italic">"{transcription}"</p>
       </section>
 
@@ -238,11 +239,11 @@ export default function VoiceConfirmation({
               <p className="text-amber-200/80">
                 Revisa la transcripción arriba. Si Chagra escuchó bien pero el cultivo es una variedad nueva o regional (ej. una cepa específica, una variedad local), todavía no la tengo en mi catálogo.
               </p>
-              <p className="text-amber-200/80">Tienes 3 opciones:</p>
+              <p className="text-amber-200/80">{MSG.voz.opciones}</p>
               <ul className="list-disc pl-5 space-y-1 text-amber-200/80">
-                <li><strong>Agregar manual abajo</strong>: toca el botón "+" y escribe el cultivo + cantidad directamente.</li>
-                <li><strong>Re-grabar más simple</strong>: cierra esto y vuelve a grabar diciendo solo el nombre común (ej. "5 plantas de tomate") sin variedades.</li>
-                <li><strong>Cancelar</strong>: si era una prueba o no querías registrar nada.</li>
+                <li><strong>{MSG.voz.opcionManual}</strong>: {MSG.voz.opcionManualDesc}</li>
+                <li><strong>{MSG.voz.opcionRegrabar}</strong>: {MSG.voz.opcionRegrabarDesc}</li>
+                <li><strong>{MSG.action.cancelar}</strong>: {MSG.voz.opcionCancelarDesc}</li>
               </ul>
             </div>
           </div>
@@ -256,7 +257,7 @@ export default function VoiceConfirmation({
             <button
               onClick={() => removeRow(i)}
               className="text-slate-500 hover:text-red-400 p-1"
-              aria-label={`Eliminar entrada ${i + 1}`}
+              aria-label={MSG.format(MSG.voz.eliminarEntrada, { index: i + 1 })}
               disabled={isSaving}
             >
               <Trash2 size={16} />
@@ -455,14 +456,14 @@ export default function VoiceConfirmation({
           disabled={isSaving}
           className="flex-1 px-4 py-3 min-h-[44px] bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
         >
-          <X size={18} /> Cancelar
+          <X size={18} /> {MSG.action.cancelar}
         </button>
         <button
           onClick={handleConfirm}
           disabled={!allValid || isSaving}
           className="flex-1 px-4 py-3 min-h-[44px] bg-lime-700 hover:bg-lime-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50 disabled:bg-slate-700"
         >
-          <Check size={18} /> {isSaving ? 'Guardando…' : `Guardar (${totalAssetsToCreate} ${totalAssetsToCreate === 1 ? 'planta' : 'plantas'})`}
+          <Check size={18} /> {isSaving ? MSG.ui.guardando : MSG.format(MSG.ui.guardarPlantas, { count: totalAssetsToCreate })}
         </button>
       </div>
     </div>

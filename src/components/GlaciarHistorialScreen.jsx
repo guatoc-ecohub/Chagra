@@ -18,6 +18,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { List, Snowflake, MapPin, Calendar, Loader2, ChevronLeft, Home, AlertCircle, Trash2, ArrowLeft, Download, CheckCircle2 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { glaciarReportes } from '../db/glaciarReportes';
+import { MSG } from '../config/messages.js';
 import { downloadGeoJSON, downloadReporteGeoJSON } from '../services/glaciarExport';
 import {
   MONTANA_BY_KEY,
@@ -106,7 +107,7 @@ export default function GlaciarHistorialScreen({ onBack, onHome }) {
 
   const handleEliminar = useCallback(async (id) => {
     if (deleting) return;
-    if (!confirm('¿Eliminar este reporte? Esta acción no se puede deshacer.')) return;
+    if (!confirm(MSG.ui.confirmarEliminar)) return;
     
     setDeleting(true);
     try {
@@ -180,7 +181,7 @@ export default function GlaciarHistorialScreen({ onBack, onHome }) {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 text-slate-500">
             <Loader2 size={32} className="animate-spin mb-3" />
-            <p>Cargando reportes…</p>
+            <p>{MSG.ui.cargandoReportes}</p>
           </div>
         ) : (
           <>
@@ -334,7 +335,7 @@ function DetalleReporte({ reporte, onBack, onEliminar, onExportar, onHome, delet
             onClick={onEliminar}
             disabled={deleting}
             className="p-2 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-900/20 transition disabled:opacity-50"
-            aria-label="Eliminar reporte"
+            aria-label={MSG.ui.eliminarReporte}
           >
             {deleting ? (
               <Loader2 size={18} className="animate-spin" />

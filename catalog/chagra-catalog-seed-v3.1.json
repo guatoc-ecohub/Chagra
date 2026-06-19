@@ -1824,7 +1824,11 @@
       ],
       "valor_pedagogico": "El cacao (Theobroma cacao L.) es un árbol perenne de la familia Malvaceae nativo de la cuenca amazónica, cultivado en Colombia entre 0 y 1.200 msnm en zona térmica cálida húmeda. Se siembra en Santander (San Vicente de Chucurí, Rionegro, Landázuri — primer productor nacional), Antioquia (Magdalena Medio), Huila, Tolima, Arauca, Meta y la región Pacífica (Tumaco, Buenaventura) bajo sombra parcial de plátano, cítricos o maderables nativos (Cordia alliodora, Cedrela odorata, Erythrina poeppigiana). Árbol cauliflor (flores y frutos en el tronco), 4-8 m, ciclo a primera cosecha 3-5 años por injerto. Manejo agroecológico: poda sanitaria + de mantenimiento dos veces al año, recolección semanal de mazorcas enfermas (monilia, escoba de bruja, mazorca negra) y entierro o composteo lejos del cultivo, fertilización con compost + pulpa fermentada del propio cacao + ceniza. Asociar con leguminosas arbóreas (Inga edulis, Erythrina poeppigiana) para sombra + fijación de N, y plátano (Musa AAB) como sombra provisional los primeros 3 años. Fermentación post-cosecha 5-7 días en cajones de madera (no plástico) define el perfil de sabor exportable. Colombia es origen de cacaos finos de aroma reconocidos por ICCO. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, AGROSAVIA Tibaitatá, ICA Resolución 3168/2015.",
       "validation_level": "claude_draft",
-      "estrato": "alto"
+      "estrato": "alto",
+      "companions": [
+        "vanilla_planifolia",
+        "bactris_gasipaes"
+      ]
     },
     {
       "id": "trifolium_repens",
@@ -2305,7 +2309,8 @@
         "cajanus_cajan",
         "musa_paradisiaca",
         "manihot_esculenta",
-        "arracacia_xanthorrhiza"
+        "arracacia_xanthorrhiza",
+        "dioscorea_alata_rotundata"
       ],
       "antagonists": [],
       "propagation": {
@@ -2858,7 +2863,8 @@
         "fuente": "Restrepo Rivera 2005. Agroecologia colombiana"
       },
       "companions": [
-        "zea_mays"
+        "zea_mays",
+        "anacardium_occidentale"
       ],
       "antagonists": [],
       "valor_pedagogico": "El abono verde mas potente del tropico: el frijol terciopelo produce biomasa masivamente y cubre el suelo como una alfombra viva, ensenando como las leguminosas tropicales restauran suelos degradados en climas calidos.",
@@ -2977,7 +2983,9 @@
       "companions": [
         "calendula_officinalis",
         "lupinus_mutabilis",
-        "phaseolus_vulgaris"
+        "phaseolus_vulgaris",
+        "oxalis_tuberosa",
+        "ullucus_tuberosus"
       ],
       "antagonists": [],
       "_nota_antagonists": "Evitar monocultivo y rotación papa-papa: concentra Phytophthora infestans (gota), Tecia solanivora (polilla guatemalteca) y nematodo quiste (Globodera pallida). No asociar con otras solanáceas (tomate, lulo, tomate de árbol) por compartir gota y mosca blanca. Rotar con leguminosas (haba, arveja, lupino) y cereales.",
@@ -3368,7 +3376,8 @@
         "zea_mays",
         "phaseolus_vulgaris",
         "cajanus_cajan",
-        "musa_paradisiaca"
+        "musa_paradisiaca",
+        "plukenetia_volubilis"
       ],
       "plagas_criticas": [
         "Phenacoccus manihoti (cochinilla harinosa de la yuca, controlada biológicamente con Anagyrus lopezi)",
@@ -4453,7 +4462,11 @@
         "coffea_arabica",
         "zea_mays",
         "manihot_esculenta",
-        "musa_paradisiaca"
+        "musa_paradisiaca",
+        "selenicereus_megalanthus",
+        "anacardium_occidentale",
+        "annona_muricata",
+        "dioscorea_alata_rotundata"
       ]
     },
     {
@@ -4634,7 +4647,12 @@
         "zea_mays",
         "phaseolus_vulgaris",
         "manihot_esculenta",
-        "cajanus_cajan"
+        "cajanus_cajan",
+        "vanilla_planifolia",
+        "selenicereus_megalanthus",
+        "plukenetia_volubilis",
+        "bactris_gasipaes",
+        "annona_muricata"
       ],
       "plagas_criticas": [
         "Cosmopolites sordidus (picudo negro del plátano, barrena el cormo)",
@@ -4987,6 +5005,597 @@
       "valor_pedagogico": "El arroz (Oryza sativa L., familia Poaceae) es el cereal de mayor consumo per cápita en Colombia y el alimento básico de la dieta nacional, cultivado en tierra caliente entre 0 y 1.000 msnm bajo dos grandes sistemas: arroz de riego (con lámina de agua controlada) en el Tolima, Huila, Meta y Casanare, y arroz secano (de temporal, dependiente de lluvia) en los Llanos Orientales, el Bajo Cauca y la Costa Caribe. Domesticado hace más de 8.000 años en Asia, es una gramínea semiacuática cuya particularidad fisiológica es la tolerancia a la inundación gracias a tejidos aerénquima que llevan oxígeno a la raíz sumergida. Su fenología pasa por germinación, macollamiento (cuando define el número de tallos productivos), fase reproductiva con la emergencia de la panícula y antesis —la etapa más sensible a la falta de agua y al daño de plagas—, llenado de grano y maduración, en un ciclo de 4-5 meses. El mayor problema fitosanitario del arroz colombiano es el complejo sogata-Virus de la Hoja Blanca: el insecto Tagosodes orizicolus transmite un virus devastador, por lo que el manejo se centra en variedades resistentes y en evitar siembras escalonadas que mantengan poblaciones del vector. Le siguen el añublo o quema (Pyricularia oryzae), hongo que ataca hoja, cuello y panícula, el añublo bacterial (Burkholderia glumae) agravado por el calor nocturno, y plagas como el cogollero y los chinches que vanean el grano. Manejo agroecológico de transición: rotación con leguminosas de cobertura entre ciclos para fijar nitrógeno y cortar el ciclo de plagas; manejo eficiente del agua para reducir emisiones de metano del arroz inundado; integración rice-fish o con patos para control biológico de insectos y malezas; uso de Trichoderma y Bacillus contra hongos; y semilla certificada de variedades resistentes a sogata. El arroz enseña la gestión del agua como eje del cultivo y el reto ambiental de un sistema que, mal manejado, es gran emisor de metano y gran consumidor de agroquímicos. NOTA DE VERIFICACIÓN: las variedades comerciales y umbrales económicos de plaga deben consultarse en la ficha oficial vigente de FEDEARROZ/AGROSAVIA antes de decisiones de campo. Fuentes: FEDEARROZ Manual técnico del arroz 2018, FAO Ecocrop, GBIF Backbone, POWO Kew.",
       "validation_level": "claude_draft",
       "tracking_mode": "aggregate"
+    },
+    {
+      "id": "vanilla_planifolia",
+      "nombre_comun": "Vainilla",
+      "nombre_comunes_regionales": [
+        "Vainilla planifolia",
+        "Vainilla de orquidea"
+      ],
+      "nombre_cientifico": "Vanilla planifolia Jacks. ex Andrews",
+      "familia_botanica": "Orchidaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 900,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 22,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sombra_filtrada",
+      "agua": "alto",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Fenologia: establecimiento de esqueje y tutor vivo, crecimiento vegetativo trepador, induccion floral en epoca seca corta, floracion de una manana, polinizacion manual, llenado de capsula y curado poscosecha."
+      },
+      "source_ids": [
+        "sinchi-de-la-raiz-cosecha-vainilla",
+        "ica-resolucion-3168-2015",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "La vainilla (Vanilla planifolia) es una orquidea trepadora, no una leguminosa ni una planta de vaina comun. En Colombia se maneja en clima calido humedo, especialmente en sistemas agroforestales amazonicos y de bosque humedo con sombra filtrada, tutor vivo y alta materia organica. Su fenologia permite explicar etapas muy claras: establecimiento del esqueje, crecimiento vegetativo, induccion floral, floracion breve, polinizacion manual, llenado de capsula y curado aromatico. Las plagas y enfermedades clave incluyen pudriciones por Fusarium, antracnosis, babosas y hormigas cortadoras. Su valor pedagogico esta en mostrar coevolucion de orquideas, dependencia de polinizadores y beneficio cuidadoso de un producto de alto valor.",
+      "plagas_criticas": [
+        "Babosas",
+        "Hormigas cortadoras",
+        "Cochinillas"
+      ],
+      "enfermedades_criticas": [
+        "Fusarium oxysporum",
+        "Colletotrichum spp."
+      ],
+      "harvest_type": "fruto",
+      "cycleMonths": null,
+      "companions": [
+        "theobroma_cacao",
+        "musa_paradisiaca"
+      ],
+      "antagonists": [],
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "selenicereus_megalanthus",
+      "nombre_comun": "Pitahaya amarilla",
+      "nombre_comunes_regionales": [
+        "Pitaya amarilla"
+      ],
+      "nombre_cientifico": "Selenicereus megalanthus (K.Schum. ex Vaupel) Moran",
+      "familia_botanica": "Cactaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1200,
+        "optimo_max": 1800,
+        "max_absoluto": 2200
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 18,
+        "optimo_max": 26,
+        "max_tolerable": 32
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Fenologia: enraizamiento de cladodios, emision de brotes, floracion nocturna, cuajado, llenado de fruto, maduracion amarilla y poda sanitaria despues de cosecha."
+      },
+      "source_ids": [
+        "agrosavia-manual-frutales-tropicales",
+        "ica-resolucion-3168-2015",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "La pitahaya amarilla (Selenicereus megalanthus) es una cactacea trepadora cultivada en zonas calidas y templadas de Colombia, con importancia comercial en laderas bien drenadas y sistemas con tutorado. Su fenologia combina enraizamiento del esqueje, brotacion de cladodios, floracion nocturna, cuajado, llenado del fruto y maduracion amarilla para cosecha. Es util para ensenar manejo de cactus frutal con drenaje estricto, poda sanitaria y soporte fisico. Las plagas y enfermedades clave incluyen mosca del boton floral, chinches, antracnosis, pudriciones del tallo y bacteriosis, por lo que el monitoreo de flores y cladodios es central.",
+      "plagas_criticas": [
+        "Mosca del boton floral",
+        "Chinches",
+        "Cochinillas"
+      ],
+      "enfermedades_criticas": [
+        "Colletotrichum spp.",
+        "Pudricion basal",
+        "Bacteriosis"
+      ],
+      "harvest_type": "fruto",
+      "cycleMonths": null,
+      "companions": [
+        "musa_paradisiaca",
+        "cajanus_cajan"
+      ],
+      "antagonists": [],
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "plukenetia_volubilis",
+      "nombre_comun": "Sacha inchi",
+      "nombre_comunes_regionales": [
+        "Mani del Inca",
+        "Sacha inchik"
+      ],
+      "nombre_cientifico": "Plukenetia volubilis L.",
+      "familia_botanica": "Euphorbiaceae",
+      "category": "granos_legumbres",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 900,
+        "max_absoluto": 1500
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Fenologia: germinacion, fase vegetativa voluble, floracion, cuajado de capsulas estrelladas, llenado de semilla oleaginosa y cosecha escalonada de capsulas secas."
+      },
+      "source_ids": [
+        "sinchi-aprovechemos-sacha-inchi",
+        "ica-resolucion-3168-2015",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El sacha inchi (Plukenetia volubilis) es una euforbiacea trepadora amazonica cultivada por semillas oleaginosas ricas en aceites alimentarios. En Colombia encaja en clima calido humedo de Amazonia y piedemontes con tutorado, drenaje bueno y cosecha escalonada. Su fenologia incluye germinacion, crecimiento voluble, floracion, formacion de capsulas estrelladas, llenado de semillas y secado para cosecha. Es pedagogico porque conecta agroforesteria amazonica, valor agregado local y manejo de trepadoras comerciales. Plagas y enfermedades clave reportadas en sistemas tropicales incluyen hormigas cortadoras, acaros, chinches, nematodos, manchas foliares y pudriciones radiculares en suelos mal drenados.",
+      "plagas_criticas": [
+        "Hormigas cortadoras",
+        "Acaros",
+        "Chinches",
+        "Nematodos"
+      ],
+      "enfermedades_criticas": [
+        "Manchas foliares",
+        "Pudricion radicular"
+      ],
+      "harvest_type": "semilla",
+      "cycleMonths": null,
+      "companions": [
+        "musa_paradisiaca",
+        "manihot_esculenta"
+      ],
+      "antagonists": [],
+      "tracking_mode": "aggregate",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "anacardium_occidentale",
+      "nombre_comun": "Marañón",
+      "nombre_comunes_regionales": [
+        "Merey",
+        "Cajuil",
+        "Marañón"
+      ],
+      "nombre_cientifico": "Anacardium occidentale L.",
+      "familia_botanica": "Anacardiaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 800,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 24,
+        "optimo_max": 32,
+        "max_tolerable": 38
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Fenologia: vivero, establecimiento de arbol, crecimiento juvenil, floracion en paniculas, desarrollo del pseudofruto, llenado de nuez y cosecha de nuez madura."
+      },
+      "source_ids": [
+        "agrosavia-manual-frutales-tropicales",
+        "ica-resolucion-3168-2015",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El maranon (Anacardium occidentale) es un frutal perenne de clima calido, valioso en Caribe seco, Orinoquia y zonas con sequia estacional por su tolerancia relativa a baja disponibilidad de agua una vez establecido. Su fenologia permite diferenciar vivero, establecimiento, crecimiento juvenil, floracion en paniculas, desarrollo del pseudofruto carnoso, llenado de la nuez y cosecha. Es una ficha pedagogica para explicar que el fruto comercial combina pseudofruto y nuez, y que el procesamiento requiere cuidado por los compuestos irritantes de la cascara. Plagas y enfermedades clave: trips, chinches, antracnosis, oidio y muerte descendente en brotes.",
+      "plagas_criticas": [
+        "Trips",
+        "Chinches",
+        "Barrenadores de brotes"
+      ],
+      "enfermedades_criticas": [
+        "Antracnosis",
+        "Oidio",
+        "Muerte descendente"
+      ],
+      "harvest_type": "semilla",
+      "cycleMonths": null,
+      "companions": [
+        "cajanus_cajan",
+        "mucuna_pruriens"
+      ],
+      "antagonists": [],
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "bactris_gasipaes",
+      "nombre_comun": "Palmito de chontaduro",
+      "nombre_comunes_regionales": [
+        "Palmito",
+        "Chontaduro para palmito"
+      ],
+      "nombre_cientifico": "Bactris gasipaes Kunth",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 900,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Fenologia: germinacion lenta, vivero de palma, establecimiento, emision de macollas, crecimiento de tallos cosechables y corte selectivo de palmito."
+      },
+      "source_ids": [
+        "sinchi-frutas-amazonia-chontaduro",
+        "ica-resolucion-3168-2015",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El palmito de chontaduro (Bactris gasipaes) usa la misma especie del chontaduro, manejada con enfasis en tallos tiernos y macollamiento para corte de palmito. En Colombia tiene sentido en Amazonia y Pacifico calido humedo, con suelos profundos, humedad constante y drenaje bueno. Su fenologia incluye germinacion lenta, vivero, establecimiento de palma, emision de macollas, crecimiento de tallos cosechables y corte selectivo. La ficha ensena diferencia entre aprovechamiento de fruto y aprovechamiento de tallo, y por que la cosecha de palmito debe planearse para no destruir la cepa productiva. Plagas y enfermedades clave: picudos, acaros, pudricion del cogollo y manchas foliares.",
+      "plagas_criticas": [
+        "Picudo de las palmas",
+        "Acaros",
+        "Hormigas cortadoras"
+      ],
+      "enfermedades_criticas": [
+        "Pudricion del cogollo",
+        "Manchas foliares"
+      ],
+      "harvest_type": "tallo",
+      "cycleMonths": null,
+      "companions": [
+        "theobroma_cacao",
+        "musa_paradisiaca"
+      ],
+      "antagonists": [],
+      "tracking_mode": "aggregate",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "annona_muricata",
+      "nombre_comun": "Guanábana",
+      "nombre_comunes_regionales": [
+        "Guanábano"
+      ],
+      "nombre_cientifico": "Annona muricata L.",
+      "familia_botanica": "Annonaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1000,
+        "max_absoluto": 1400
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 23,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Fenologia: vivero, establecimiento, crecimiento vegetativo, floracion cauliflora o en ramas, polinizacion, cuajado, llenado de fruto y cosecha en madurez fisiologica."
+      },
+      "source_ids": [
+        "agrosavia-guanabana-fecunda-tesoro-2020",
+        "ica-resolucion-3168-2015",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "La guanabana (Annona muricata) es un frutal tropical de clima calido, relevante en huertos familiares y produccion comercial de pulpa. Su fenologia pasa por vivero, establecimiento, crecimiento vegetativo, floracion en tronco y ramas, polinizacion, cuajado, llenado de fruto y cosecha en madurez fisiologica. Es util para ensenar polinizacion de anonaceas, poda de formacion y manejo de fruta grande susceptible a golpes. Plagas y enfermedades clave incluyen perforadores de semilla y fruto, cochinillas, antracnosis, pudriciones de fruto y enfermedades de raiz en suelos encharcados. La ficha evita promesas medicinales no verificadas y se concentra en manejo agricola.",
+      "plagas_criticas": [
+        "Perforador de semilla",
+        "Perforador de fruto",
+        "Cochinillas"
+      ],
+      "enfermedades_criticas": [
+        "Antracnosis",
+        "Pudricion de fruto",
+        "Pudricion radicular"
+      ],
+      "harvest_type": "fruto",
+      "cycleMonths": null,
+      "companions": [
+        "musa_paradisiaca",
+        "cajanus_cajan"
+      ],
+      "antagonists": [],
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "dioscorea_alata_rotundata",
+      "nombre_comun": "Ñame",
+      "nombre_comunes_regionales": [
+        "Ñame criollo",
+        "Ñame espino",
+        "Ñame diamante"
+      ],
+      "nombre_cientifico": "Dioscorea alata L. / Dioscorea rotundata Poir.",
+      "familia_botanica": "Dioscoreaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 800,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "tuberculo",
+        "notas": "Fenologia: seleccion de semilla vegetativa, brotacion, emision de guia, crecimiento vegetativo trepador, tuberizacion, senescencia de follaje y cosecha."
+      },
+      "source_ids": [
+        "agrosavia-name-fitopatogenos-caribe-2024",
+        "ica-resolucion-3168-2015",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El name comercial en Colombia agrupa materiales de Dioscorea alata y Dioscorea rotundata, por eso esta entrada declara ambos binomios y requiere curacion taxonomica local cuando se registre una variedad especifica. Es cultivo clave del Caribe humedo y calido, propagado por secciones de tuberculo semilla. Su fenologia incluye seleccion sanitaria de semilla, brotacion, emision de guia, crecimiento vegetativo con tutor o espaldera, tuberizacion, senescencia del follaje y cosecha. Es pedagogico porque muestra propagacion vegetativa, riesgo de mover enfermedades con semilla y manejo de suelos sueltos. Plagas y enfermedades clave: antracnosis, nematodos, pudriciones de tuberculo y virus transmitidos por material vegetativo.",
+      "plagas_criticas": [
+        "Nematodos",
+        "Escarabajos del tuberculo",
+        "Trips"
+      ],
+      "enfermedades_criticas": [
+        "Antracnosis del name",
+        "Pudricion de tuberculo",
+        "Virus en material vegetativo"
+      ],
+      "harvest_type": "tuberculo",
+      "cycleMonths": 9,
+      "companions": [
+        "zea_mays",
+        "cajanus_cajan"
+      ],
+      "antagonists": [],
+      "tracking_mode": "aggregate",
+      "validation_level": "claude_draft",
+      "confidence_notes": "Entrada agregada como complejo Dioscorea alata / Dioscorea rotundata por solicitud explicita. Para registros varietales se debe separar por especie cuando haya fuente local."
+    },
+    {
+      "id": "oxalis_tuberosa",
+      "nombre_comun": "Oca / Hibia",
+      "nombre_comunes_regionales": [
+        "Hibia",
+        "Ibias"
+      ],
+      "nombre_cientifico": "Oxalis tuberosa Molina",
+      "familia_botanica": "Oxalidaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 2400,
+        "optimo_min": 2800,
+        "optimo_max": 3400,
+        "max_absoluto": 3800
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 8,
+        "optimo_max": 16,
+        "max_tolerable": 22
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "tuberculo",
+        "notas": "Fenologia: siembra de tuberculo semilla, emergencia, crecimiento rastrero, floracion ocasional, tuberizacion con dias cortos, maduracion y cosecha."
+      },
+      "source_ids": [
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "ica-resolucion-3168-2015",
+        "doi-2025-oca-narino-agrosavia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "La oca o hibia (Oxalis tuberosa) es un tuberculo andino de clima frio y altoandino, conservado en chagras y huertas campesinas de Nariño, Cauca, Boyaca y Cundinamarca. Su fenologia incluye siembra de tuberculo semilla, emergencia, crecimiento rastrero, floracion ocasional, tuberizacion inducida por dias cortos, maduracion y cosecha. Es pedagogica porque ayuda a comparar tuberculos andinos distintos de la papa y a explicar diversidad alimentaria, fotoperiodo y conservacion de semilla local. Plagas y enfermedades clave incluyen gusanos de suelo, babosas, pulgones como vectores, pudriciones bacterianas y pudriciones en almacenamiento si el tuberculo entra humedo.",
+      "plagas_criticas": [
+        "Gusanos de suelo",
+        "Babosas",
+        "Pulgones"
+      ],
+      "enfermedades_criticas": [
+        "Pudricion bacteriana",
+        "Pudricion en almacenamiento"
+      ],
+      "harvest_type": "tuberculo",
+      "cycleMonths": 7,
+      "companions": [
+        "solanum_tuberosum",
+        "ullucus_tuberosus"
+      ],
+      "antagonists": [],
+      "tracking_mode": "aggregate",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "ullucus_tuberosus",
+      "nombre_comun": "Ulluco / Chugua",
+      "nombre_comunes_regionales": [
+        "Chugua",
+        "Melloco"
+      ],
+      "nombre_cientifico": "Ullucus tuberosus Caldas",
+      "familia_botanica": "Basellaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 2400,
+        "optimo_min": 2800,
+        "optimo_max": 3400,
+        "max_absoluto": 3800
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 8,
+        "optimo_max": 16,
+        "max_tolerable": 22
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "tuberculo",
+        "notas": "Fenologia: siembra de tuberculo semilla, emergencia, cobertura baja, crecimiento vegetativo, tuberizacion, amarillamiento del follaje y cosecha."
+      },
+      "source_ids": [
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "ica-resolucion-3168-2015",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El ulluco o chugua (Ullucus tuberosus) es un tuberculo andino de la familia Basellaceae, cultivado en pisos frios y altoandinos de Colombia. Su fenologia se observa en siembra de tuberculo semilla, emergencia, crecimiento vegetativo bajo, tuberizacion, amarillamiento del follaje y cosecha. Es valioso para educacion agroecologica porque muestra que la seguridad alimentaria andina no depende solo de papa: tambien incluye especies con texturas, colores y ciclos propios. En manejo se debe cuidar semilla sana, rotacion y drenaje. Plagas y enfermedades clave incluyen babosas, gusanos de suelo, pulgones, virosis en material vegetativo y pudriciones de tuberculo.",
+      "plagas_criticas": [
+        "Babosas",
+        "Gusanos de suelo",
+        "Pulgones"
+      ],
+      "enfermedades_criticas": [
+        "Virosis en material vegetativo",
+        "Pudricion de tuberculo"
+      ],
+      "harvest_type": "tuberculo",
+      "cycleMonths": 7,
+      "companions": [
+        "solanum_tuberosum",
+        "oxalis_tuberosa"
+      ],
+      "antagonists": [],
+      "tracking_mode": "aggregate",
+      "validation_level": "claude_draft"
     }
   ],
   "sources": [
@@ -5740,6 +6349,74 @@
       "observaciones": "Recopilación canónica de purines de ortiga, consuelda, helecho, cola de caballo — proporciones, vidas útiles, advertencias de mezcla. _audit_note: edición latinoamericana auto-publicada sin DOI ni ISBN reconocido; verificar disponibilidad en bibliotecas de FAO/MAELA o catálogo Editora Aldeia do Futuro.",
       "_url_pendiente": true,
       "_isbn_pendiente": true
+    },
+    {
+      "id": "sinchi-de-la-raiz-cosecha-vainilla",
+      "tipo": "informe_tecnico",
+      "autores": "Instituto SINCHI",
+      "año": null,
+      "titulo": "De la raiz a la cosecha: guia de vainilla en la Amazonia colombiana",
+      "institucion": "Instituto Amazonico de Investigaciones Cientificas SINCHI",
+      "url": "https://sinchi.org.co/files/publicaciones/publicaciones/pdf/De%20la%20raiz%20a%20la%20cosecha%20web.pdf",
+      "tier": "A",
+      "observaciones": "Documento institucional consultado para morfologia floral, polinizacion manual y manejo de Vanilla planifolia."
+    },
+    {
+      "id": "sinchi-aprovechemos-sacha-inchi",
+      "tipo": "ficha_tecnica_institucional",
+      "autores": "Instituto SINCHI",
+      "año": null,
+      "titulo": "Aprovechemos el sacha inchi",
+      "institucion": "Instituto Amazonico de Investigaciones Cientificas SINCHI",
+      "url": "https://sinchi.org.co/aprovechemos-el-sacha-inchi",
+      "tier": "A",
+      "observaciones": "Ficha institucional sobre Plukenetia volubilis como fruto amazonico de interes nutricional y productivo."
+    },
+    {
+      "id": "sinchi-frutas-amazonia-chontaduro",
+      "tipo": "informe_tecnico",
+      "autores": "Instituto SINCHI",
+      "año": 2008,
+      "titulo": "Colombia: frutas de la Amazonia",
+      "institucion": "Instituto Amazonico de Investigaciones Cientificas SINCHI",
+      "url": "https://www.sinchi.org.co/files/publicaciones/publicaciones/pdf/catalogo%20de%20frutales%20web.pdf",
+      "tier": "A",
+      "observaciones": "Catalogo institucional que registra Bactris gasipaes, su fruto y el uso de la yema para palmito."
+    },
+    {
+      "id": "agrosavia-guanabana-fecunda-tesoro-2020",
+      "tipo": "ficha_tecnica_institucional",
+      "autores": "AGROSAVIA",
+      "año": 2020,
+      "titulo": "AGROSAVIA Fecunda y AGROSAVIA Tesoro: cultivares de guanabana para agricultores colombianos",
+      "institucion": "AGROSAVIA",
+      "url": "https://www.agrosavia.co/media/sjooklw5/cartilla-guanabana.pdf",
+      "tier": "A",
+      "observaciones": "Cartilla institucional sobre dos cultivares colombianos de Annona muricata y su aptitud productiva."
+    },
+    {
+      "id": "agrosavia-name-fitopatogenos-caribe-2024",
+      "tipo": "base_datos",
+      "autores": "AGROSAVIA",
+      "año": 2024,
+      "titulo": "Microorganismos relacionados a la produccion del cultivo de name espino en la region Caribe de Colombia",
+      "institucion": "AGROSAVIA / SiB Colombia",
+      "url": "https://ipt.biodiversidad.co/sib/resource?r=agrosavia_coleccion_semillas-name",
+      "tier": "A",
+      "observaciones": "Dataset institucional sobre hongos y bacterias asociados a pudricion seca de Dioscorea rotundata en el Caribe colombiano."
+    },
+    {
+      "id": "doi-2025-oca-narino-agrosavia",
+      "tipo": "articulo_revista",
+      "autores": "Rosero-Alpala, M.G.; Rosero, D.; Tapie, W.A.",
+      "año": 2025,
+      "titulo": "Conservacion in situ y variabilidad morfologica de la oca (Oxalis tuberosa Mol.) en agroecosistemas tradicionales de Narino, Colombia",
+      "revista_o_editorial": "Revista Peruana de Biologia",
+      "doi": "10.15381/rpb.v32i4.30838",
+      "url": "https://www.scielo.org.pe/scielo.php?pid=S1727-99332025000400002&script=sci_arttext",
+      "institucion": "AGROSAVIA / Universidad Nacional de Colombia / Universidad Catolica de Oriente",
+      "tier": "A",
+      "observaciones": "Articulo revisado por pares con participacion AGROSAVIA sobre conservacion de oca en Narino."
     }
   ],
   "biopreparados": [
