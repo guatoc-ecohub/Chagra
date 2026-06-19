@@ -20,16 +20,21 @@
  * Refs: audit-vision-chagra-2026-05-26.md V-09
  */
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 
-const CATALOG = JSON.parse(
-  fs.readFileSync("/home/kortux/Workspace/Chagra-strategy/catalog/chagra-catalog-seed-v3.2.json", "utf-8"),
-);
-const GT_FIXTURES = JSON.parse(
-  fs.readFileSync("/home/kortux/Workspace/chagra/data/bench-vision-fixtures-ground-truth.json", "utf-8"),
-);
+const HOME = os.homedir();
+// Rutas overridables por env; defaults fuera del repo público vía homedir.
+const CATALOG_PATH = process.env.VISION_CATALOG_PATH ||
+  path.join(HOME, "Workspace/Chagra-strategy/catalog/chagra-catalog-seed-v3.2.json");
+const GROUND_TRUTH_PATH = process.env.VISION_GROUND_TRUTH_PATH ||
+  path.join(HOME, "Workspace/chagra/data/bench-vision-fixtures-ground-truth.json");
 
-const OUT_DIR = "/home/kortux/Workspace/chagra/data/bench-vision-fixtures-extended";
+const CATALOG = JSON.parse(fs.readFileSync(CATALOG_PATH, "utf-8"));
+const GT_FIXTURES = JSON.parse(fs.readFileSync(GROUND_TRUTH_PATH, "utf-8"));
+
+const OUT_DIR = process.env.VISION_EXTENDED_DIR ||
+  path.join(HOME, "Workspace/chagra/data/bench-vision-fixtures-extended");
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
 const UA = "ChagraAgroecologyBench/1.0 (https://chagra.bio; bench@chagra.bio)";

@@ -10,7 +10,7 @@
  * USO:
  *   node scripts/rejudge-borde-unjudged.mjs \
  *     --jsonl  data/bench-runs/borde-alucinacion-2026-06-03.jsonl \
- *     --fixture /home/kortux/Workspace/Chagra-strategy/deepresearch/TEST_PROMPTS_BORDE_ALUCINACION_2026-06-03.json
+ *     --fixture "$HOME/Workspace/Chagra-strategy/deepresearch/TEST_PROMPTS_BORDE_ALUCINACION_2026-06-03.json"
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { makeClaudeCliJudgeCall, scoreAntiHallucBatch } from './lib/bench-scorer.mjs';

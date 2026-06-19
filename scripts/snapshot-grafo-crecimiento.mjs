@@ -52,6 +52,7 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { homedir } from 'node:os';
 
 // =============================================================================
 // Rutas (absolutas: el timeline vive en el repo privado Chagra-strategy)
@@ -59,7 +60,7 @@ import { join } from 'node:path';
 
 const HYTA_DIR =
   process.env.HYTA_TIMELINE_DIR ||
-  '/home/kortux/Workspace/Chagra-strategy/ops/hyta-timeline';
+  join(homedir(), 'Workspace/Chagra-strategy/ops/hyta-timeline');
 const JSON_PATH = join(HYTA_DIR, 'data-crecimiento.json');
 const HTML_PUBLICO = join(HYTA_DIR, 'hyta-publico-pisos.html');
 const HTML_SOCIOS = join(HYTA_DIR, 'hyta-socios-explainer.html');

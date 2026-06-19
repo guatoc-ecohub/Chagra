@@ -37,6 +37,7 @@
  */
 import { writeFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
+import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
 import { execSync } from 'node:child_process';
@@ -100,7 +101,7 @@ const GEN_TIMEOUT_MS = 180_000;
 
 const PROMPTS_FILE =
   process.env.PROMPTS_FILE ||
-  '/home/kortux/Workspace/Chagra-strategy/deepresearch/TEST_PROMPTS_COMPLEJOS_ROTATIVOS_2026-05-30.json';
+  join(homedir(), 'Workspace/Chagra-strategy/deepresearch/TEST_PROMPTS_COMPLEJOS_ROTATIVOS_2026-05-30.json');
 
 // Umbral térmico: si la GPU supera esto, pausa hasta enfriar.
 const GPU_TEMP_LIMIT = 88;

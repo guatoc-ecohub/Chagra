@@ -21,9 +21,11 @@
 
 import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
 import { join } from 'node:path';
-import { tmpdir } from 'node:os';
+import { tmpdir, homedir } from 'node:os';
 
-const PROMPTS_FILE = '/home/kortux/Workspace/Chagra-strategy/benchmarks/prompts-grafos-2026-05-20.md';
+const PROMPTS_FILE =
+  process.env.PROMPTS_FILE ||
+  join(homedir(), 'Workspace/Chagra-strategy/benchmarks/prompts-grafos-2026-05-20.md');
 const OLLAMA_URL = 'http://localhost:11434/api/generate';
 const MODEL = 'gemma3:4b';
 const TIMEOUT_MS = 60_000;
