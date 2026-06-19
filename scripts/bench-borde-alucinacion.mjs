@@ -362,10 +362,15 @@ ENTIDADES DEL CATÁLOGO (usa estos nombres canónicos):
 ${entityContext}${confusionBlock}`;
 }
 
-async function generate(systemPrompt, userPrompt, seed = SEED) {
+async function generate(systemPrompt, userPrompt, seed = SEED, conversation = []) {
   const start = performance.now();
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), GEN_TIMEOUT_MS);
+  // Multi-turno: `conversation` = turnos previos [{role:'user'|'assistant', content}]
+  // insertados ANTES del probe final. Vacío = single-turn (retrocompatible).
+  const priorTurns = (conversation || [])
+    .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+    .map((m) => ({ role: m.role, content: m.content }));
   try {
     const res = await fetch(OLLAMA_CHAT_URL, {
       method: 'POST',
@@ -375,6 +380,7 @@ async function generate(systemPrompt, userPrompt, seed = SEED) {
         stream: false,
         messages: [
           { role: 'system', content: systemPrompt },
+          ...priorTurns,
           { role: 'user', content: userPrompt },
         ],
         options: { temperature: GEN_TEMPERATURE, seed, num_predict: GEN_MAX_TOKENS },
@@ -404,15 +410,24 @@ async function runRep(prompts, { seed, repIndex, reps }) {
   const generated = [];
   for (let i = 0; i < prompts.length; i++) {
     const p = prompts[i];
-    console.log(`\n${tag}[gen ${i + 1}/${prompts.length}] ${p.id} (${p.region}/${p.complexity}): ${p.prompt.slice(0, 56)}...`);
+    const convo = Array.isArray(p.conversation) ? p.conversation : [];
+    const turnsTag = convo.length ? ` [chain:${convo.length + 1} msgs]` : '';
+    console.log(`\n${tag}[gen ${i + 1}/${prompts.length}] ${p.id} (${p.region}/${p.complexity})${turnsTag}: ${p.prompt.slice(0, 56)}...`);
     await thermalGuard();
 
-    const { entities } = await resolveEntities(p.prompt);
+    // Grounding sobre TODOS los turnos de usuario (las entidades mencionadas en
+    // mensajes previos de la cadena deben aterrizar, igual que en prod), no solo
+    // el probe final.
+    const userTurnsText = [
+      ...convo.filter((m) => m && m.role === 'user' && typeof m.content === 'string').map((m) => m.content),
+      p.prompt,
+    ].join('\n');
+    const { entities } = await resolveEntities(userTurnsText);
     const systemPrompt = buildEnrichedSystemPrompt(entities);
 
     let gen;
     try {
-      gen = await generate(systemPrompt, p.prompt, seed);
+      gen = await generate(systemPrompt, p.prompt, seed, convo);
     } catch (err) {
       console.log(`    GEN ERROR: ${err.message}`);
       generated.push({ p, entities, error: err.message });
@@ -440,14 +455,25 @@ async function runRep(prompts, { seed, repIndex, reps }) {
   // ── Fase 2: JUZGAR (batch claude-cli, secuencial) ───────────────────────────
   const judgeItems = generated
     .filter((g) => !g.error)
-    .map((g) => ({
-      id: g.p.id,
-      query: g.p.prompt,
-      response: g.finalText,
-      mustInclude: g.p.must_include,
-      redFlags: g.p.red_flags,
-      shouldInclude: g.p.should_include,
-    }));
+    .map((g) => {
+      const convo = Array.isArray(g.p.conversation) ? g.p.conversation : [];
+      // En multi-turno el juez necesita ver el hilo previo para evaluar coherencia
+      // y si la trampa (que se arma en la cadena) se evitó en la respuesta final.
+      const query = convo.length
+        ? `${convo
+            .filter((m) => m && typeof m.content === 'string')
+            .map((m) => `[${m.role === 'assistant' ? 'asistente' : 'usuario'}]: ${m.content}`)
+            .join('\n')}\n[usuario, PREGUNTA FINAL]: ${g.p.prompt}`
+        : g.p.prompt;
+      return {
+        id: g.p.id,
+        query,
+        response: g.finalText,
+        mustInclude: g.p.must_include,
+        redFlags: g.p.red_flags,
+        shouldInclude: g.p.should_include,
+      };
+    });
 
   const verdictById = new Map();
   if (JUDGE.deterministic) {
