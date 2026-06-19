@@ -49,7 +49,7 @@ export default function GpsFincaBanner({ autoDetectOnMount = true }) {
 
   useEffect(() => {
     if (autoDetectOnMount) runDetection();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runDetection se redefine cada render, incluirlo causaría loop infinito
   }, [autoDetectOnMount, fincas.length, gpsOverride]);
 
   if (dismissed) return null;

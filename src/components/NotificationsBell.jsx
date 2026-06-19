@@ -180,7 +180,7 @@ const NotificationsBell = React.memo(function NotificationsBell({ onNavigate }) 
             iotAlerts: mapSensorAlertsToIot(sensorAlerts),
         });
         // tick force re-run on dismiss event
-    }, [plants, sensorAlerts, activeFincaSlug, fincas, tick, failedTxCount, pendingTasks]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [plants, sensorAlerts, activeFincaSlug, fincas, tick, failedTxCount, pendingTasks]); // eslint-disable-line react-hooks/exhaustive-deps -- aggregateNotifications y read* son funciones estables, no requieren deps
 
     // PoC #316 — el clima cuenta para los badges del bell. Las alertas
     // locales de Open-Meteo (helada/calor/torrencial/etc) escalan severity;

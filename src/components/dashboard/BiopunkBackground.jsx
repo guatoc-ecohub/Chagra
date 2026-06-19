@@ -139,7 +139,7 @@ export default function BiopunkBackground({ intense = false }) {
             className="absolute inset-0 pointer-events-none overflow-hidden bp-fx-layer"
             aria-hidden="true"
             data-biopunk-intense={intense ? 'on' : 'off'}
-            // Gating de FX por tema (spec 2026-06-05): TODO el lienzo neón
+            // Gating de FX por tema (spec 2026-06-05): el lienzo neón
             // (patrón + glow conic + viñeta navy + partículas) se multiplica por
             // --fx-glow-opacity. En bio-punk = 1 (presencia plena); en nature/
             // minimalista = 0 → el lienzo desaparece por completo, sin sangrar

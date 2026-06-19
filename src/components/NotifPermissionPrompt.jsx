@@ -167,7 +167,7 @@ export default function NotifPermissionPrompt({ open, onClose }) {
     );
 }
 
-/* eslint-disable react-refresh/only-export-components */
+/* eslint-disable react-refresh/only-export-components -- shouldShowNotifPrompt es helper utilitario que debe exportarse junto al componente */
 // Export helper para que otros componentes sepan si pueden mostrar el prompt
 export function shouldShowNotifPrompt() {
     if (!isPushSupported()) return false;

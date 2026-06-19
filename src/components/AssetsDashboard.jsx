@@ -347,7 +347,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
   const [ragLoading, setRagLoading] = useState(false);
   useEffect(() => {
     if (!formData.speciesId || !formData.name) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reset temprano en guard clause, no cambia durante render
       setRagInsights(null);
       setRagLoading(false);
       return;
@@ -380,10 +380,10 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     if (!showForm) return;
     const isRealZone = currentZoneId && !['__all__', '__orphan__', '__cemetery__'].includes(currentZoneId);
     if (isRealZone && !formData.parentLandId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sincronización de estado derivado, no afecta render actual
       setFormData((prev) => ({ ...prev, parentLandId: currentZoneId }));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- formData.parentLandId es state, incluirlo causaría loop
   }, [showForm, currentZoneId]);
 
   // Estado local del formulario de cosecha scoped por asset.id
@@ -567,7 +567,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
       onError: () => { /* silent: deja al operador elegir manual */ },
     });
     return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- detectZoneByGps es función utilidad estable, no cambia por referencia
   }, [showForm, activeTab, lands]);
 
   const handleSave = async () => {
@@ -834,8 +834,8 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     }
     // Zona rural (land no-urbana): placeholder de zona, NO de insumos.
     if (activeTab === 'land') return 'Ej: Huerta, Lote de abajo, Potrero, Invernadero...';
-    if (activeTab === 'structure') return 'Ej: ' + STRUCTURE_EXAMPLES[Math.floor(/* eslint-disable-line react-hooks/purity */ Math.random() * STRUCTURE_EXAMPLES.length)];
-    if (activeTab === 'equipment') return 'Ej: ' + EQUIPMENT_EXAMPLES[Math.floor(/* eslint-disable-line react-hooks/purity */ Math.random() * EQUIPMENT_EXAMPLES.length)];
+    if (activeTab === 'structure') return 'Ej: ' + STRUCTURE_EXAMPLES[Math.floor(/* eslint-disable-line react-hooks/purity -- Math.random() es intencionalmente impuro para variar placeholder */ Math.random() * STRUCTURE_EXAMPLES.length)];
+    if (activeTab === 'equipment') return 'Ej: ' + EQUIPMENT_EXAMPLES[Math.floor(/* eslint-disable-line react-hooks/purity -- Math.random() es intencionalmente impuro para variar placeholder */ Math.random() * EQUIPMENT_EXAMPLES.length)];
     return 'Ej: Bokashi, Biol, Purín de Ortiga...';
   };
 
