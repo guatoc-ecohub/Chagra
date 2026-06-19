@@ -21,11 +21,14 @@
  * Refs: audit-vision-chagra-2026-05-26.md V-02
  */
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { performance } from "node:perf_hooks";
 
-const DEFAULT_FIXTURES_DIR = "/home/kortux/Workspace/Chagra-strategy/ops/antigravity/fixtures-fotos";
-const DEFAULT_GROUND_TRUTH_PATH = "/home/kortux/Workspace/chagra/data/bench-vision-fixtures-ground-truth.json";
+const HOME = os.homedir();
+// Defaults fuera del repo público, overridables por env. Segmento neutro.
+const DEFAULT_FIXTURES_DIR = path.join(HOME, "Workspace/Chagra-strategy/ops/vision-fixtures/fixtures-fotos");
+const DEFAULT_GROUND_TRUTH_PATH = path.join(HOME, "Workspace/chagra/data/bench-vision-fixtures-ground-truth.json");
 const FIXTURES_DIR = process.env.VISION_FIXTURES_DIR || DEFAULT_FIXTURES_DIR;
 const GROUND_TRUTH_PATH = process.env.VISION_GROUND_TRUTH_PATH || DEFAULT_GROUND_TRUTH_PATH;
 const OLLAMA = process.env.OLLAMA_URL || "http://127.0.0.1:11434";
@@ -45,7 +48,7 @@ if (!fs.existsSync(FIXTURES_DIR)) skip(`no existe directorio de fixtures: ${FIXT
 const GROUND_TRUTH = JSON.parse(fs.readFileSync(GROUND_TRUTH_PATH, "utf-8"));
 
 const RUN_ID = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-const OUT_DIR = path.join(process.env.BENCH_OUTPUT_DIR || "/home/kortux/Workspace/chagra/data/bench-runs", `vision-pipeline-${RUN_ID}`);
+const OUT_DIR = path.join(process.env.BENCH_OUTPUT_DIR || path.join(HOME, "Workspace/chagra/data/bench-runs"), `vision-pipeline-${RUN_ID}`);
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
 const SPECIES_PROMPT =

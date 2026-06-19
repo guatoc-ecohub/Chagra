@@ -38,14 +38,14 @@ if (!existsSync(PROHIBITED_LIST)) die(2, `falta ${PROHIBITED_LIST}`);
 
 // Resolución de la lista Pro-específica (opcional).
 // Orden de preferencia:
-//   1. env PROHIBITED_INTERNAL_PATH — explícito, CI Pro o Appliance.
-//   2. ../chagra-pro/PROHIBITED_INTERNAL.md — dev local path-relative.
+//   1. env INTERNAL_PRESET_PATH — explícito, CI Pro o Appliance.
+//   2. ../chagra-pro/internal-presets.md — dev local path-relative.
 // Si ninguno existe, el auditor corre solo con la lista pública — válido
 // para CI del repo público puro (ADR-002: el bundle público no puede
 // contener strings Pro porque el código Pro no está ahí).
 const INTERNAL_LIST_CANDIDATE =
-  process.env.PROHIBITED_INTERNAL_PATH ||
-  resolve(ROOT, '../chagra-pro/PROHIBITED_INTERNAL.md');
+  process.env.INTERNAL_PRESET_PATH ||
+  resolve(ROOT, '../chagra-pro/internal-presets.md');
 const INTERNAL_LIST = existsSync(INTERNAL_LIST_CANDIDATE) ? INTERNAL_LIST_CANDIDATE : null;
 
 const publicRaw = readFileSync(PROHIBITED_LIST, 'utf8');

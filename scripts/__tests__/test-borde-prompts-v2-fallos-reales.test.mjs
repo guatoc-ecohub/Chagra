@@ -10,10 +10,12 @@
  */
 
 import { readFileSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 import { describe, it, expect } from 'vitest';
 
 const PROMPTS_PATH = process.env.PROMPTS_PATH ||
-  '/home/kortux/Workspace/Chagra-strategy/deepresearch/TEST_PROMPTS_BORDE_ALUCINACION_V2_2026-06-03.json';
+  join(homedir(), 'Workspace/Chagra-strategy/deepresearch/TEST_PROMPTS_BORDE_ALUCINACION_V2_2026-06-03.json');
 
 describe('TEST_PROMPTS_BORDE_ALUCINACION_V2 - Fallos reales operador', () => {
   let fixtureData;

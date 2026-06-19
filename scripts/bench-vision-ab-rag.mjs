@@ -41,14 +41,18 @@
  *     [--ground-truth-only] [--limit N]
  */
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { performance } from "node:perf_hooks";
 
-const FIXTURES_DIR = process.env.VISION_FIXTURES_DIR || "/home/kortux/Workspace/Chagra-strategy/ops/antigravity/fixtures-fotos";
-const EXTENDED_DIR = process.env.VISION_EXTENDED_DIR || "/home/kortux/Workspace/chagra/data/bench-vision-fixtures-extended";
-const GROUND_TRUTH_PATH = process.env.VISION_GROUND_TRUTH_PATH || "/home/kortux/Workspace/chagra/data/bench-vision-fixtures-ground-truth.json";
+const HOME = os.homedir();
+// Directorio de fixtures de visión (fotos + ground truth). Overridable por env.
+// El default vive fuera del repo público; la palabra del segmento es neutra.
+const FIXTURES_DIR = process.env.VISION_FIXTURES_DIR || path.join(HOME, "Workspace/Chagra-strategy/ops/vision-fixtures/fixtures-fotos");
+const EXTENDED_DIR = process.env.VISION_EXTENDED_DIR || path.join(HOME, "Workspace/chagra/data/bench-vision-fixtures-extended");
+const GROUND_TRUTH_PATH = process.env.VISION_GROUND_TRUTH_PATH || path.join(HOME, "Workspace/chagra/data/bench-vision-fixtures-ground-truth.json");
 const EXTENDED_MANIFEST_PATH = path.join(EXTENDED_DIR, "manifest.json");
-const CATALOG_PATH = process.env.VISION_CATALOG_PATH || "/home/kortux/Workspace/chagra/catalog/chagra-catalog-oss-subset-v3.2.json";
+const CATALOG_PATH = process.env.VISION_CATALOG_PATH || path.join(HOME, "Workspace/chagra/catalog/chagra-catalog-oss-subset-v3.2.json");
 
 const OLLAMA = process.env.OLLAMA_URL || "http://127.0.0.1:11434";
 const SIDECAR = process.env.SIDECAR_URL || "http://127.0.0.1:7880";
@@ -93,7 +97,7 @@ if (!fs.existsSync(CATALOG_PATH)) {
 }
 
 const RUN_ID = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-const OUT_DIR = path.join(process.env.BENCH_OUTPUT_DIR || "/home/kortux/Workspace/chagra/data/bench-runs", `vision-ab-rag-${RUN_ID}`);
+const OUT_DIR = path.join(process.env.BENCH_OUTPUT_DIR || path.join(HOME, "Workspace/chagra/data/bench-runs"), `vision-ab-rag-${RUN_ID}`);
 fs.mkdirSync(OUT_DIR, { recursive: true });
 const RAW_PATH = path.join(OUT_DIR, "raw.jsonl");
 
