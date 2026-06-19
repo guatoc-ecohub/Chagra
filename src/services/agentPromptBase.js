@@ -1,3 +1,4 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 /**
  * agentPromptBase — texto BASE del system prompt del agente + builders puros
  * de bloques por-turno (corpus RAG, evidencia de tools, entidades resueltas,
@@ -58,6 +59,109 @@ function _mentionsAny(textStripped, keys) {
     if (re.test(textStripped)) return true;
   }
   return false;
+}
+
+const CONVERSATION_CROP_KEYS = [
+  ['café', ['cafe', 'cafeto', 'cafetal']],
+  ['tomate', ['tomate']],
+  ['papa', ['papa']],
+  ['aguacate', ['aguacate']],
+  ['plátano', ['platano']],
+  ['maíz', ['maiz']],
+  ['fresa', ['fresa']],
+  ['mora', ['mora']],
+  ['frijol', ['frijol']],
+  ['mango', ['mango']],
+];
+
+const CONVERSATION_VARIETY_KEYS = [
+  ['Castillo', ['castillo']],
+  ['Colombia', ['variedad colombia', 'cultivar colombia']],
+  ['Caturra', ['caturra']],
+  ['Tabi', ['tabi']],
+  ['Bourbon', ['bourbon']],
+  ['Geisha', ['geisha']],
+  ['Typica', ['typica', 'típica']],
+  ['Hass', ['hass']],
+  ['Monserrate', ['monserrate']],
+  ['Diacol Capiro', ['diacol capiro', 'capiro']],
+  ['Criolla', ['criolla']],
+];
+
+const CONVERSATION_PROBLEM_KEYS = [
+  ['gota', ['gota', 'tizón tardío', 'tizon tardio', 'phytophthora']],
+  ['roya', ['roya']],
+  ['broca', ['broca']],
+  ['chiza', ['chiza']],
+  ['sigatoka', ['sigatoka']],
+  ['antracnosis', ['antracnosis']],
+  ['monalonion', ['monalonion']],
+  ['marchitez bacteriana', ['marchitez bacteriana', 'ralstonia']],
+  ['moko', ['moko']],
+  ['manchas', ['mancha', 'manchas']],
+  ['amarillamiento', ['amarillamiento', 'amarilla', 'amarillas']],
+];
+
+const _firstMention = (textStripped, entries) => {
+  const found = entries.find(([, keys]) => _mentionsAny(textStripped, keys));
+  return found ? found[0] : '';
+};
+
+const _userHistoryText = (history) => {
+  if (Array.isArray(history)) {
+    return history
+      .filter((turn) => turn?.role === 'user' || turn?.author === 'user' || turn?.type === 'user')
+      .map((turn) => turn?.content || turn?.text || turn?.message || '')
+      .filter(Boolean)
+      .join('\n');
+  }
+
+  const raw = typeof history === 'string' ? history : '';
+  if (!raw.trim()) return '';
+
+  const userParts = [];
+  const re = /(?:^|\n)\s*Usuario:\s*([\s\S]*?)(?=\n\s*(?:Asistente|Usuario):|$)/gi;
+  let match;
+  while ((match = re.exec(raw)) !== null) {
+    if (match[1]?.trim()) userParts.push(match[1].trim());
+  }
+  return userParts.length > 0 ? userParts.join('\n') : raw;
+};
+
+/**
+ * buildConversationContextPin: fija datos ya establecidos por el usuario en
+ * la conversación. Heurística determinística y corta para no competir con el
+ * grounding del turno actual.
+ *
+ * @param {string|Array<object>} history
+ * @returns {string}
+ */
+export function buildConversationContextPin(history) {
+  const userText = _userHistoryText(history);
+  const mention = _strip(userText);
+  if (!mention) return '';
+
+  const lines = [];
+  const crop = _firstMention(mention, CONVERSATION_CROP_KEYS);
+  const variety = _firstMention(mention, CONVERSATION_VARIETY_KEYS);
+  const problem = _firstMention(mention, CONVERSATION_PROBLEM_KEYS);
+  const altitudeMatch = mention.match(/(^|[^0-9])(\d{3,4})\s*(msnm|m\.?s\.?n\.?m\.?|metros?|m)([^a-zñ]|$)/);
+  const locationMatch = userText.match(/\b(?:en|desde|ubicad[oa] en|finca en)\s+([A-ZÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚÜÑáéíóúüñ .'-]{2,45})(?=[,.;\n]|$)/);
+
+  if (crop) lines.push(`- Cultivo: ${crop}`);
+  if (variety) lines.push(`- Variedad: ${variety}`);
+  if (altitudeMatch || locationMatch) {
+    const parts = [];
+    if (altitudeMatch) parts.push(`${altitudeMatch[2]} msnm`);
+    if (locationMatch) parts.push(locationMatch[1].trim());
+    lines.push(`- Altitud/ubicación: ${parts.join(', ')}`);
+  }
+  if (problem) lines.push(`- Problema previo: ${problem}`);
+
+  if (lines.length === 0) return '';
+
+  return `CONTEXTO DE LA CONVERSACIÓN (datos ya establecidos por el usuario):
+${lines.slice(0, 4).join('\n')}`;
 }
 
 // ── Glosarios como DATA (se inyectan SOLO las líneas mencionadas) ───────────
@@ -230,17 +334,24 @@ export function buildBasePrompt({
 }) {
   const mention = _strip(`${query}\n${contextMemory}`);
   const sections = [];
+  const conversationContextPin = buildConversationContextPin(contextMemory);
 
   sections.push(`Eres Chagra IA, un asistente agroecológico colombiano. Habla como agrónomo experimentado, no como sistema. ${fincaContext}${indoorContext}El usuario tiene estas plantas agrupadas por especie con su conteo: ${plantContext}.`);
 
   sections.push(`REGLA DE INVENTARIO: al hablar de las plantas del usuario, agrupa por especie con su conteo (ej. "tienes 15 fresas, 4 caléndulas"); NUNCA listes los números individuales (#01, #02 — son identificadores internos).`);
+
+  sections.push(`COHERENCIA MULTITURNO: respeta cultivo, variedad, altitud y problema ya dichos. Si la nueva pregunta contradice o ignora un dato/riesgo previo, corrígelo o recuérdalo.`);
+
+  if (conversationContextPin) {
+    sections.push(conversationContextPin);
+  }
 
   if (INVENTORY_QUERY_RE.test(mention)) {
     sections.push(`REGLA INVENTARIO-DIRECTO: si el usuario pregunta por su inventario ("tengo X", "ya tengo X registrado", "cuántos X tengo", "mis plantas", "qué plantas tengo"), responde DIRECTAMENTE con el inventario de arriba — NO lo redirijas a "ingresar al sistema y revisar la lista": TÚ ya tienes el inventario en este contexto. Si no tiene lo que pregunta: "No, todavía no tienes X registrado. ¿Quieres agregarlo desde la sección Mi Finca?". Si el inventario es "ninguna": "No tienes plantas registradas aún. ¿Te ayudo a registrar la primera?".`);
   }
 
   if (typeof contextMemory === 'string' && contextMemory.trim()) {
-    sections.push(`REGLA CRÍTICA TURN-AISLAMIENTO: la "Conversación previa" trae respuestas que YA diste; NUNCA las copies, repitas ni mezcles con la actual (el usuario ya las leyó): responde ÚNICAMENTE al último mensaje, sin residuos de turnos pasados (listas, conteos, párrafos). Incidente real: a "cómo combatir plagas en hortalizas" se arrastró la lista de variedades de tomate del turno anterior — incoherente.`);
+    sections.push(`REGLA CRÍTICA TURN-AISLAMIENTO: la "Conversación previa" trae respuestas que YA diste. No las copies ni mezcles; responde solo al último mensaje, sin residuos de turnos pasados.`);
   }
 
   sections.push(`REGLAS ANTI-ALUCINACIÓN (núcleo):

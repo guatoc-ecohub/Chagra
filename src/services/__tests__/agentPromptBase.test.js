@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   buildBasePrompt,
+  buildConversationContextPin,
   analyzeQuery,
   buildQueryAnalysisBlock,
   buildCorpusContext,
@@ -100,6 +101,28 @@ describe('buildCorpusVariants', () => {
   });
 });
 
+describe('buildConversationContextPin', () => {
+  it('extrae datos establecidos por el usuario en historial relevante', () => {
+    const history = [
+      'Usuario: Tengo café variedad Castillo a 2600 msnm y ya vimos riesgo de gota en el lote.',
+      'Asistente: Recomiendo revisar drenaje y monitorear hojas.',
+      'Usuario: ¿Entonces cambio la variedad por roya?',
+    ].join('\n');
+
+    const block = buildConversationContextPin(history);
+    expect(block).toContain('CONTEXTO DE LA CONVERSACIÓN');
+    expect(block).toContain('Cultivo: café');
+    expect(block).toContain('Variedad: Castillo');
+    expect(block).toContain('2600 msnm');
+    expect(block).toContain('Problema previo: gota');
+  });
+
+  it('retorna vacio sin datos fijables', () => {
+    expect(buildConversationContextPin('')).toBe('');
+    expect(buildConversationContextPin('Usuario: Hola, ¿cómo estás?')).toBe('');
+  });
+});
+
 describe('formatToolEvidence', () => {
   it('retorna vacio para entrada nula', () => {
     expect(formatToolEvidence(null)).toBe('');
@@ -165,8 +188,8 @@ describe('buildBasePrompt — guardas condicionales tomate', () => {
       ...baseArgs,
       query: 'Mi tomate tiene marchitez bacteriana por Ralstonia, ¿qué producto lo cura?',
     });
-    expect(prompt).toContain('marchitez bacteriana/Ralstonia/moko');
-    expect(prompt).toContain('NO tienen cura química');
+    expect(prompt).toContain('moko/marchitez bacteriana/Ralstonia');
+    expect(prompt).toContain('no tienen cura química');
 
     const control = buildBasePrompt({ ...baseArgs, query: '¿Cómo tutoro el tomate?' });
     expect(control).not.toContain('marchitez bacteriana/Ralstonia/moko');
@@ -177,14 +200,14 @@ describe('buildBasePrompt — guardas condicionales tomate', () => {
       ...baseArgs,
       query: '¿Cuántos ml de insecticida le echo al tomate?',
     });
-    expect(dosePrompt).toContain('si piden dosis de plaguicida');
+    expect(dosePrompt).toContain('NUNCA inventes una dosis numérica de plaguicida');
     expect(dosePrompt).toContain('etiqueta registrada ICA');
 
     const bannedPrompt = buildBasePrompt({
       ...baseArgs,
       query: 'Me ofrecieron Lannate para tomate, ¿lo uso?',
     });
-    expect(bannedPrompt).toContain('metamidofós');
+    expect(bannedPrompt).toContain('productos altamente tóxicos');
     expect(bannedPrompt).toContain('registro ICA vigente');
   });
 
@@ -193,12 +216,44 @@ describe('buildBasePrompt — guardas condicionales tomate', () => {
       ...baseArgs,
       query: 'Tengo broca en tomate, ¿qué controlador uso?',
     });
-    expect(brocaTomate).toContain('Broca es plaga de café');
+    expect(brocaTomate).toContain('broca es plaga de café');
 
     const brocaCafe = buildBasePrompt({
       ...baseArgs,
       query: 'Tengo broca en café, ¿qué controlador uso?',
     });
     expect(brocaCafe).not.toContain('Broca es plaga de café');
+  });
+});
+
+describe('buildBasePrompt: coherencia multiturno', () => {
+  const baseArgs = {
+    plantContext: 'café x3',
+    fincaContext: '',
+    indoorContext: '',
+    finca: null,
+    query: '¿Cambio la variedad para resistir roya?',
+    isEnum: false,
+  };
+
+  it('inyecta contexto de conversación con Castillo, 2600 msnm y gota', () => {
+    const prompt = buildBasePrompt({
+      ...baseArgs,
+      contextMemory: 'Usuario: Mi cultivo es café variedad Castillo a 2600 msnm. Tengo gota en el lote.',
+    });
+
+    expect(prompt).toContain('COHERENCIA MULTITURNO');
+    expect(prompt).toContain('CONTEXTO DE LA CONVERSACIÓN');
+    expect(prompt).toContain('Cultivo: café');
+    expect(prompt).toContain('Variedad: Castillo');
+    expect(prompt).toContain('2600 msnm');
+    expect(prompt).toContain('Problema previo: gota');
+  });
+
+  it('sin historial no inyecta bloque, pero conserva regla base', () => {
+    const prompt = buildBasePrompt({ ...baseArgs, contextMemory: '' });
+
+    expect(prompt).toContain('COHERENCIA MULTITURNO');
+    expect(prompt).not.toContain('CONTEXTO DE LA CONVERSACIÓN');
   });
 });
