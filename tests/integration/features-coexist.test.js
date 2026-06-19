@@ -255,7 +255,7 @@ describe('Switch-perfil + Telemetry — no interferencia', () => {
     );
 
     // Operador ve todos los modulos
-    expect(visibles).toHaveLength(11); // ALL_HOME_MODULES
+    expect(visibles).toHaveLength(12); // ALL_HOME_MODULES
     // Y todas las tarjetas de seguimiento
     expect(seguimiento).toContain('cerdos');
     expect(seguimiento).toContain('silvopastoreo');

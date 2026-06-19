@@ -104,6 +104,7 @@ describe('homeModuleSelector — selectHomeModules por PERSONA', () => {
       expect.arrayContaining([
         HOME_MODULE_IDS.hoyfinca,
         HOME_MODULE_IDS.clima,
+        HOME_MODULE_IDS.asociaciones,
         HOME_MODULE_IDS.plantas,
         HOME_MODULE_IDS.plagas,
         HOME_MODULE_IDS.bitacora,

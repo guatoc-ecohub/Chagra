@@ -1,0 +1,47 @@
+[
+  {
+    "id": "milpa",
+    "nombre": "Milpa (Tres Hermanas)",
+    "icono": "🌽",
+    "rol": ["campesino"],
+    "especies": ["maíz", "fríjol", "ahuyama"],
+    "beneficio": "LER 1.32, el fríjol fija nitrógeno",
+    "fuente": "DR-ASOCIACIONES-2026-06-18"
+  },
+  {
+    "id": "saf_cafe",
+    "nombre": "SAF café",
+    "icono": "☕",
+    "rol": ["campesino", "cafetero"],
+    "especies": ["café", "guamo (Inga)", "plátano"],
+    "beneficio": "sombra + carbono + amortigua broca",
+    "fuente": "DR-ASOCIACIONES-2026-06-18"
+  },
+  {
+    "id": "saf_cacao",
+    "nombre": "SAF cacao",
+    "icono": "🍫",
+    "rol": ["campesino", "cacaotero"],
+    "especies": ["cacao", "matarratón (Gliricidia)", "plátano"],
+    "beneficio": "fija N + sombra",
+    "fuente": "DR-ASOCIACIONES-2026-06-18"
+  },
+  {
+    "id": "frutal_cobertura",
+    "nombre": "Frutal con cobertura",
+    "icono": "🍊",
+    "rol": ["campesino", "restaurador"],
+    "especies": ["frutal", "maní forrajero (Arachis pintoi)"],
+    "beneficio": "cobertura que fija N y tapa maleza",
+    "fuente": "DR-ASOCIACIONES-2026-06-18"
+  },
+  {
+    "id": "hortaliza_repelente",
+    "nombre": "Cebolla + zanahoria",
+    "icono": "🥕",
+    "rol": ["campesino", "urbano"],
+    "especies": ["cebolla", "zanahoria"],
+    "beneficio": "se protegen de sus moscas mutuamente",
+    "fuente": "DR-ASOCIACIONES-2026-06-18"
+  }
+]
