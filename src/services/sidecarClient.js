@@ -357,9 +357,16 @@ const PRECIO_SIPSA_ACTIONS = new Set([
  * alternativas_cercanas). Es el MISMO request — CERO latencia añadida. El
  * sidecar lo ignora si no soporta el campo (degrada con gracia).
  *
+ * MULTI-TURNO (#multiturno-grounding-2026-06-19): si se pasa `context` (historial
+ * de conversación), se concatena con `userMessage` para enriquecer la query de
+ * retrieval. Esto permite que el grounding mantenga contexto de turnos previos
+ * (cultivo, variedad, altitud, problema mencionado). Retrocompatible: sin
+ * `context`, comportamiento idéntico al anterior.
+ *
  * @param {string} userMessage
  * @param {object} [opts]
  * @param {number|string|null} [opts.fincaAltitud] — msnm de la finca activa.
+ * @param {string} [opts.context] — historial de conversación (últimos N turnos).
  * @returns {Promise<null | { entities: Array<{
  *   mentioned: string,
  *   kind: 'species' | 'pest' | 'biopreparado',
@@ -377,7 +384,18 @@ const PRECIO_SIPSA_ACTIONS = new Set([
  */
 export async function resolveEntities(userMessage, opts = {}) {
   if (!userMessage || typeof userMessage !== 'string') return null;
-  const body = { user_message: userMessage };
+
+  // Multi-turno: enriquecer la query con el contexto de la conversación
+  // si está disponible. Esto permite que el grounding mantenga contexto
+  // de turnos previos (cultivo, variedad, altitud, problema mencionado).
+  let enrichedMessage = userMessage;
+  if (opts && typeof opts.context === 'string' && opts.context.trim()) {
+    // Concatenamos el historial ANTES del mensaje actual para dar contexto
+    // El sidecar puede usar esto para mejorar la detección de entidades
+    enrichedMessage = `${opts.context.trim()}\n\nMensaje actual: ${userMessage}`;
+  }
+
+  const body = { user_message: enrichedMessage };
   const alt = opts && opts.fincaAltitud != null ? Number(opts.fincaAltitud) : NaN;
   if (Number.isFinite(alt)) body.finca_altitud = alt;
   const raw = await postJson('/resolve-entities', body, NLU_TIMEOUT_MS);
