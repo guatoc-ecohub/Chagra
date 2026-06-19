@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, Sprout, Mic, RotateCcw, AlertTriangle } from 'lucide-react';
-import { listFarmProcesses } from '../db/farmProcessCache';
+import { listFarmProcesses, hydrateCyclesFromFarmOS } from '../db/farmProcessCache';
 import { getProfile } from '../services/userProfileService';
 import DailyTasksView from './DailyTasksView';
 import CicloDetalle from './CicloDetalle';
@@ -30,19 +30,41 @@ export default function CicloCultivoScreen({ onBack, onNavigate }) {
   }, []);
 
   const load = useCallback(async () => {
+    let mounted = true;
     setLoading(true);
     setError('');
     try {
-      const list = await listFarmProcesses({ status: 'active' });
-      setCycles(Array.isArray(list) ? list : []);
+      // 1. Leer procesos locales de IndexedDB
+      let cycles = await listFarmProcesses({ status: 'active' });
+
+      // 2. Hidratar con plantas activas de farmOS que no tengan ciclo local
+      // POLÍTICA: Todas las plantas vivas deben aparecer como ciclo, no solo páramo
+      // Dedupe por nombre+lote para no duplicar plantas que ya tienen ciclo
+      try {
+        cycles = await hydrateCyclesFromFarmOS(cycles);
+      } catch (hydrateErr) {
+        // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- log técnico
+        console.warn('[CicloCultivoScreen] Error al hidratar ciclos desde farmOS:', hydrateErr.message);
+        // Continuar con procesos locales sin hidratación
+      }
+
+      if (mounted) {
+        setCycles(Array.isArray(cycles) ? cycles : []);
+      }
     } catch (err) {
-      setError(`No pude leer tus ciclos: ${err.message}`);
+      if (mounted) {
+        setError(`No pude leer tus ciclos: ${err.message}`);
+      }
     } finally {
-      setLoading(false);
+      if (mounted) {
+        setLoading(false);
+      }
     }
+
+    return () => { mounted = false; };
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { load(); }, [load]); // eslint-disable-line react-hooks/set-state-in-effect -- load es async, no hay cascading renders
 
   const selected = useMemo(
     () => cycles.find((c) => (c.process_id || c.id) === selectedId) || null,
