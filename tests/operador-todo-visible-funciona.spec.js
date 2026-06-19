@@ -247,10 +247,19 @@ test.describe('Operador — todo visible y funcional (prueba FAITHFUL nocturna)'
     }
 
     // Las 4 tarjetas de seguimiento (incl. Cerdos) — operador las ve todas.
+    // Se localiza cada tarjeta por su TÍTULO (el <h3> de la card, nivel 3) con
+    // nombre EXACTO, no por substring. Motivo: el nombre "Páramo" también
+    // aparece dentro de su propio subtítulo/empty-state ("Cuida tu páramo y el
+    // agua"), así que un `getByText('Páramo', { exact:false })` resolvía a DOS
+    // elementos y `isVisible()` lanzaba strict-mode violation → el `.catch`
+    // lo reportaba como "no se ve" pese a que la tarjeta SÍ está (falso
+    // negativo). El matcher por heading exacto apunta solo al título y es
+    // consistente con el patrón `getByRole('heading', …)` usado más abajo.
     const seguimiento = page.locator('[data-testid="seguimiento-cards"]');
     await seguimiento.scrollIntoViewIfNeeded().catch(() => {});
     for (const nombre of SEGUIMIENTO) {
-      const ok = await seguimiento.getByText(nombre, { exact: false }).isVisible().catch(() => false);
+      const tarjeta = seguimiento.getByRole('heading', { level: 3, name: nombre, exact: true });
+      const ok = await tarjeta.isVisible().catch(() => false);
       if (!ok) faltantes.push(`Seguimiento: ${nombre}`);
     }
 
