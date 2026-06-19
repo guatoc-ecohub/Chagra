@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Sprout, MapPin, Eye, Package, Clock, NotebookPen, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette, FileText } from 'lucide-react';
+import { Sprout, MapPin, Eye, Package, Clock, NotebookPen, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette, FileText, Network } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
 import { useClimaAtmosphere } from './hooks/useClimaAtmosphere';
@@ -12,7 +12,8 @@ import { isAuthenticated, logoutUser } from './services/authService';
 import useAssetStore from './store/useAssetStore';
 import { fetchFromFarmOS } from './services/apiService';
 import { PRIMARY_WORKER_NAME } from './config/workerConfig';
-import { tieneAccesoGlaciarActual } from './config/glaciarAccess';
+import { tieneAccesoGlaciarActual, esOperadorActual } from './config/glaciarAccess';
+import { getProfile } from './services/userProfileService';
 import { parseSeguimientoView } from './config/seguimientoProcesos';
 import { initCatalog } from './db/catalogDB';
 import NetworkStatusBar from './components/NetworkStatusBar';
@@ -67,6 +68,7 @@ const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
 const BiodiversidadView = lazy(() => import('./components/BiodiversidadView'));
+const Asociaciones = lazy(() => import('./components/Asociaciones'));
 const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
 const OnboardingPiloto = lazy(() => import('./components/OnboardingPiloto'));
 const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
@@ -1014,6 +1016,14 @@ export default function App() {
         return (
           <ErrorBoundary>
             <BiodiversidadView onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+          </ErrorBoundary>
+        );
+      case 'asociaciones':
+        return (
+          <ErrorBoundary>
+            <ScreenShell title="Asociaciones" icon={Network} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
+              <Asociaciones profile={getProfile()} esOperador={esOperadorActual()} />
+            </ScreenShell>
           </ErrorBoundary>
         );
       case 'voz':

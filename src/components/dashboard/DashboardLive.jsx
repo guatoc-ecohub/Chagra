@@ -47,6 +47,7 @@ import {
     HoyCard,
     PlagasCard,
     BiodiversidadCard,
+    AsociacionesCard,
     InformesCard,
     SeguimientoCards,
 } from './FincaCards';
@@ -81,6 +82,7 @@ const SECTION_COMPONENTS = {
     hoy: { Component: HoyCard },
     plagas: { Component: PlagasCard },
     biodiversidad: { Component: BiodiversidadCard },
+    asociaciones: { Component: AsociacionesCard },
     informes: { Component: InformesCard },
 };
 

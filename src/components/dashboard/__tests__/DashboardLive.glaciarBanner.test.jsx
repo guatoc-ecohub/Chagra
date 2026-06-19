@@ -22,6 +22,7 @@ import { describe, test, expect, vi, beforeEach } from 'vitest';
 const accesoMock = vi.fn(() => false);
 vi.mock('../../../config/glaciarAccess', () => ({
   tieneAccesoGlaciarActual: (...args) => accesoMock(...args),
+  esOperadorActual: () => false,
 }));
 
 // Hijos pesados → stubs livianos.
@@ -35,7 +36,7 @@ vi.mock('../AnalisisProactivoIA', () => ({ default: () => <div /> }));
 vi.mock('../FincaCards', () => ({
   PlantasCard: () => <div />, ZonasCard: () => <div />, InsumosCard: () => <div />,
   BitacoraCard: () => <div />, HoyCard: () => <div />, PlagasCard: () => <div />,
-  BiodiversidadCard: () => <div />, InformesCard: () => <div />,
+  BiodiversidadCard: () => <div />, AsociacionesCard: () => <div />, InformesCard: () => <div />,
   SeguimientoCards: () => <div data-testid="seguimiento-cards" />,
 }));
 
@@ -47,11 +48,11 @@ vi.mock('../../../services/userProfileService', () => ({
   // Orden de módulos del home (reorder por drag, 2026-06-15). Para este test el
   // orden por defecto basta; setModuleOrder es no-op.
   HOME_MODULE_DEFAULT_ORDER: [
-    'hoyfinca', 'clima', 'analisis', 'plantas', 'hoy', 'zonas',
+    'hoyfinca', 'clima', 'analisis', 'asociaciones', 'plantas', 'hoy', 'zonas',
     'insumos', 'plagas', 'bitacora', 'biodiversidad', 'informes',
   ],
   getModuleOrder: vi.fn(() => [
-    'hoyfinca', 'clima', 'analisis', 'plantas', 'hoy', 'zonas',
+    'hoyfinca', 'clima', 'analisis', 'asociaciones', 'plantas', 'hoy', 'zonas',
     'insumos', 'plagas', 'bitacora', 'biodiversidad', 'informes',
   ]),
   setModuleOrder: vi.fn(),

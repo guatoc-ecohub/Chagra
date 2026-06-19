@@ -728,6 +728,12 @@ export const HOME_MODULES = Object.freeze([
     category: 'ia',
   },
   {
+    id: 'asociaciones',
+    label: 'Asociaciones',
+    description: 'Policultivos y compañía de plantas por rol',
+    category: 'ecosistema',
+  },
+  {
     id: 'plantas',
     label: 'Plantas',
     description: 'Inventario de plantas registradas',
@@ -884,6 +890,7 @@ export const HOME_MODULE_DEFAULT_ORDER = Object.freeze([
   'hoyfinca',
   'clima',
   'analisis',
+  'asociaciones',
   'plantas',
   'hoy',
   'zonas',

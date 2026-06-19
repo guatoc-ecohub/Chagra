@@ -361,6 +361,7 @@ describe('visibilidad de módulos del Home (#7003)', () => {
         'hoyfinca',
         'clima',
         'analisis',
+        'asociaciones',
         'plantas',
         'zonas',
         'insumos',

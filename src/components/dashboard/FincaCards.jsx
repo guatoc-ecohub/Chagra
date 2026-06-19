@@ -6,7 +6,7 @@
  * este refinamiento visual. Se silencia el warning soft acá para no bloquear
  * el commit sin arrastrar ese refactor i18n. */
 import { useEffect, useState } from 'react';
-import { Sprout, MapPin, Package, NotebookPen, Eye, AlertCircle, FileText, ChevronRight, Leaf } from 'lucide-react';
+import { Sprout, MapPin, Package, NotebookPen, Eye, AlertCircle, FileText, ChevronRight, Leaf, Network } from 'lucide-react';
 import useAssetStore from '../../store/useAssetStore';
 import Skeleton from '../common/Skeleton';
 import { listFarmProcesses } from '../../db/farmProcessCache';
@@ -100,6 +100,16 @@ const SECTION_STYLES = {
         iconColor: 'text-green-300',
         bar: 'from-green-400 to-emerald-300',
         halo: 'bg-green-400/15',
+    },
+    asociaciones: {
+        Icon: Network,
+        emoji: '🌽',
+        accent: 'from-lime-500/20 to-emerald-500/10',
+        border: 'border-lime-700/30',
+        ring: 'ring-lime-500/0 group-hover:ring-lime-500/40',
+        iconColor: 'text-lime-300',
+        bar: 'from-lime-300 to-emerald-300',
+        halo: 'bg-lime-400/15',
     },
     informes: {
         Icon: FileText,
@@ -407,6 +417,19 @@ export function BiodiversidadCard({ onNavigate, variant }) {
             subtitle="Ecosistema de tu chagra"
             tooltip="Catálogo de especies nativas, endémicas y polinizadores que viven en tu finca."
             onClick={() => onNavigate('biodiversidad')}
+        />
+    );
+}
+
+export function AsociacionesCard({ onNavigate, variant }) {
+    return (
+        <Card
+            variant={variant}
+            section="asociaciones"
+            title="Asociaciones"
+            subtitle="Policultivos y compañía de plantas"
+            tooltip="Asociaciones. Policultivos y compañía de plantas por rol. Tócalo para ver combinaciones conocidas."
+            onClick={() => onNavigate('asociaciones')}
         />
     );
 }

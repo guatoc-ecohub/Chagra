@@ -47,6 +47,7 @@ export const HOME_MODULE_IDS = Object.freeze({
   hoyfinca: 'hoyfinca',
   clima: 'clima',
   analisis: 'analisis',
+  asociaciones: 'asociaciones',
   plantas: 'plantas',
   zonas: 'zonas',
   insumos: 'insumos',
@@ -88,6 +89,7 @@ export const SEGUIMIENTO_KEYS = Object.freeze({
  */
 const URBANO_MODULES = Object.freeze([
   HOME_MODULE_IDS.plantas,
+  HOME_MODULE_IDS.asociaciones,
   HOME_MODULE_IDS.plagas,
   HOME_MODULE_IDS.bitacora,
   HOME_MODULE_IDS.clima,
@@ -102,6 +104,7 @@ const URBANO_MODULES = Object.freeze([
 const CAMPESINO_MODULES = Object.freeze([
   HOME_MODULE_IDS.hoyfinca,
   HOME_MODULE_IDS.clima,
+  HOME_MODULE_IDS.asociaciones,
   HOME_MODULE_IDS.plantas,
   HOME_MODULE_IDS.plagas,
   HOME_MODULE_IDS.bitacora,
@@ -120,6 +123,7 @@ const CAMPESINO_CORE = Object.freeze([
   HOME_MODULE_IDS.hoyfinca,
   HOME_MODULE_IDS.clima,
   HOME_MODULE_IDS.plantas,
+  HOME_MODULE_IDS.asociaciones,
   HOME_MODULE_IDS.plagas,
   HOME_MODULE_IDS.bitacora,
 ]);
