@@ -347,5 +347,34 @@ describe('apiService', () => {
       // 1 intento original + 1 retry (que vuelve a dar 401 pero ya no refresca).
       expect(fetchSpy).toHaveBeenCalledTimes(1);
     });
+
+    // Estado de sesión CLARO (no zombi): si el 401 persiste tras la renovación,
+    // se despacha 'chagra:session-expired' para que App navegue a login en vez
+    // de dejar al usuario en el dashboard vacío → OnboardingHero engañoso
+    // (prod-down 2026-06-18).
+    it('en 401 con renovación fallida, despacha chagra:session-expired', async () => {
+      const { getAccessToken, refreshAccessToken } = await import('../authService.js');
+      getAccessToken.mockResolvedValue('tkn-viejo');
+      refreshAccessToken.mockResolvedValue(null);
+
+      const fetchSpy = vi.fn().mockResolvedValue({
+        ok: false,
+        status: 401,
+        statusText: 'Unauthorized',
+        text: async () => '{"errors":[{"status":"401"}]}',
+        headers: { get: vi.fn().mockReturnValue('application/vnd.api+json') },
+      });
+      vi.stubGlobal('fetch', fetchSpy);
+
+      const sessionExpired = vi.fn();
+      window.addEventListener('chagra:session-expired', sessionExpired);
+      try {
+        await expect(fetchFromFarmOS('/api/asset/plant')).rejects.toThrow();
+        expect(sessionExpired).toHaveBeenCalledTimes(1);
+        expect(sessionExpired.mock.calls[0][0].detail.status).toBe(401);
+      } finally {
+        window.removeEventListener('chagra:session-expired', sessionExpired);
+      }
+    });
   });
 });

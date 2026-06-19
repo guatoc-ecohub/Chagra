@@ -320,6 +320,22 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Manifest de versión (`/version.json`): NETWORK-ONLY, sin cachear NUNCA.
+  // Lo consume el self-heal (versionCheck.js) para detectar que el cliente
+  // corre un bundle viejo. Si lo cacheáramos, el chequeo compararía contra una
+  // copia vieja y el cliente stale NUNCA se auto-recuperaría (justo el bug que
+  // este archivo resuelve). El cliente ya pide `cache: 'no-store'`; acá lo
+  // reforzamos a nivel SW. Si la red falla, devolvemos un 504 sintético: el
+  // self-heal trata "sin respuesta" como no-op (offline-first), no rompe nada.
+  if (url.pathname === '/version.json' && event.request.method === 'GET') {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' }).catch(
+        () => new Response('', { status: 504, statusText: 'Offline: version.json' })
+      )
+    );
+    return;
+  }
+
   // HTML shell (documento navegable: `/`, `/index.html`, o cualquier navegación
   // SPA): NETWORK-FIRST. Un deploy nuevo SIEMPRE entrega el index.html fresco
   // (que referencia el bundle vivo); sólo cae al cache si el dispositivo está
@@ -332,17 +348,47 @@ self.addEventListener('fetch', (event) => {
     url.pathname === '/' ||
     url.pathname === '/index.html';
   if (isHtmlDoc && event.request.method === 'GET') {
+    // Fallback unificado al shell cacheado: el index.html exacto, y si no, el
+    // genérico. La SPA monta y rutea client-side. Si tampoco hay shell (primer
+    // arranque offline en frío, sin install previo), devolvemos un 503 con un
+    // mensaje claro en vez de dejar que el browser tire "failed to fetch" /
+    // pantalla en blanco — el documento navegable NUNCA debe quedar sin
+    // respuesta (raíz del "failed to fetch" engañoso del prod-down 2026-06-18).
+    // Shell de último recurso (solo si NI hay red NI shell cacheado). El SW es
+    // un worker standalone: NO puede importar src/config/messages.js (ADR-050
+    // i18n), así que este copy degradado va inline. La app real ya usa
+    // messages.js; este HTML solo se ve en el primer arranque sin señal.
+    /* eslint-disable chagra-i18n/no-hardcoded-spanish */
+    const OFFLINE_SHELL_HTML =
+      '<!doctype html><meta charset="utf-8"><title>Chagra</title>' +
+      '<body style="font-family:sans-serif;background:#0f172a;color:#e2e8f0;' +
+      'display:flex;min-height:100vh;align-items:center;justify-content:center;' +
+      'text-align:center;padding:2rem"><div><h1>Sin conexión</h1>' +
+      '<p>Chagra necesita una primera carga con internet. Vuelve a intentar ' +
+      'cuando tengas señal.</p></div></body>';
+    /* eslint-enable chagra-i18n/no-hardcoded-spanish */
+    const navFallback = () =>
+      caches.match(event.request)
+        .then(c => c || caches.match('/index.html'))
+        .then(c => c || new Response(
+          OFFLINE_SHELL_HTML,
+          { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+        ));
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          if (response.ok) {
+          // Solo cacheamos y servimos respuestas OK. Un 5xx del origen (502/503
+          // de cloudflared/Drupal) NO debe pintarse como "pantalla rota": caemos
+          // al shell cacheado, que arranca la SPA y deja reintentar.
+          if (response && response.ok) {
             const respClone = response.clone();
             caches.open(CACHE_NAME).then(cache => cache.put('/index.html', respClone));
+            return response;
           }
-          return response;
+          return navFallback();
         })
-        // Offline: cae al index.html cacheado (shell) para que la SPA arranque.
-        .catch(() => caches.match(event.request).then(c => c || caches.match('/index.html')))
+        // Offline / red caída: cae al index.html cacheado (shell). Nunca lanza.
+        .catch(navFallback)
     );
     return;
   }

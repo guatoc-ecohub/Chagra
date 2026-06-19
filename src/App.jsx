@@ -741,6 +741,29 @@ export default function App() {
     navigate('login');
   }, [navigate]);
 
+  // Sesión vencida (no zombi): apiService despacha 'chagra:session-expired'
+  // cuando farmOS rechaza el token (401/403) y la renovación con refresh_token
+  // tampoco da uno nuevo. ANTES esto sólo seteaba el hash '#login' (que el
+  // router ignora) y el usuario quedaba en el dashboard sin datos → el
+  // OnboardingHero "¿dónde está su finca?" se mostraba como si hubiera perdido
+  // la finca (prod-down 2026-06-18). Ahora navegamos EXPLÍCITAMENTE a login con
+  // un mensaje claro de re-login, distinguiendo "token vencido" de "sin finca
+  // real". Logout limpio + guard: no re-disparar si ya estamos en login/loading.
+  // Colocado tras showToast/handleLogout para que esas refs estén definidas
+  // (const en TDZ si el effect se declarara antes).
+  useEffect(() => {
+    const handler = () => {
+      if (currentView === 'login' || currentView === 'loading' || currentView === 'oauth-callback') {
+        return;
+      }
+      logoutUser().catch(() => { /* tokens podrían persistir; getAccessToken igual da null */ });
+      showToast('Sesión vencida. Vuelve a entrar.', true);
+      navigate('login');
+    };
+    window.addEventListener('chagra:session-expired', handler);
+    return () => window.removeEventListener('chagra:session-expired', handler);
+  }, [currentView, navigate, showToast]);
+
   const renderView = () => {
     // Seguimiento de procesos de finca (ruta dinámica 'seguimiento_<key>':
     // reforestacion/silvopastoreo/paramo/cerdos). Tarjetas del home →

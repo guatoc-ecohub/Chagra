@@ -13,6 +13,14 @@ import { PRIMARY_WORKER_NAME } from './config/workerConfig'
 import { renameWorker } from './services/assetService'
 import { getAccessToken } from './services/authService'
 import { registerServiceWorker } from './services/swRegistration'
+import { runSelfHealCheck, RUNNING_BUILD_SHA } from './services/versionCheck'
+
+// Exponer el SHA del bundle CORRIENDO para diagnóstico + el smoke post-deploy
+// (tests/e2e-real/sw-self-heal.smoke.mjs compara window.__CHAGRA_BUILD_SHA__
+// contra /version.json para cazar el desfase SW/bundle viejo). Solo lectura.
+if (typeof window !== 'undefined') {
+  window.__CHAGRA_BUILD_SHA__ = RUNNING_BUILD_SHA;
+}
 
 import { loadDemoSeedData } from '../scripts/seed-demo';
 import { bootstrapOssModules } from './core/bootstrap-oss';
@@ -71,6 +79,28 @@ if ('serviceWorker' in navigator) {
   });
 
   registerServiceWorker();
+}
+
+// Auto-recuperación por versión (self-heal) — NO depende del ciclo de vida del
+// SW. Compara el SHA del bundle corriendo (__BUILD_SHA__) contra /version.json
+// del servidor; si difieren, manda SKIP_WAITING y recarga UNA sola vez (guard
+// anti-loop por sessionStorage). Rescata al cliente que se quedó en un bundle
+// viejo porque nunca tomó el SW en waiting (raíz del prod-down "failed to
+// fetch" → onboarding engañoso, 2026-06-18). Offline-first: no-op sin red.
+// Diferido para no competir con el boot crítico; se repite al recuperar señal.
+const scheduleSelfHeal = () => {
+  // Solo con red. runSelfHealCheck es de todos modos no-op offline, pero
+  // evitamos el fetch innecesario.
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+  setTimeout(() => {
+    runSelfHealCheck().catch(() => { /* nunca rompe el boot */ });
+  }, 3000);
+};
+if (typeof window !== 'undefined') {
+  window.addEventListener('load', scheduleSelfHeal);
+  // Al recuperar conexión tras un rato offline: re-chequear (el cliente pudo
+  // haber estado horas en un bundle viejo sin poder verificar versión).
+  window.addEventListener('online', scheduleSelfHeal);
 }
 
 createRoot(document.getElementById('root')).render(
