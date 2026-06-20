@@ -89,7 +89,16 @@ function normalizeCommonsLicense(extmetadata = {}) {
 }
 
 function stripHtml(value) {
-  return String(value || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  // Saneo completo: una sola pasada de /<[^>]*>/ se puede burlar con tags
+  // anidados (ej. "<scr<script>ipt>" → "<script>"). Iteramos hasta que no
+  // queden tags (CodeQL js/incomplete-multi-character-sanitization).
+  let s = String(value || '');
+  let prev;
+  do {
+    prev = s;
+    s = s.replace(/<[^>]*>/g, '');
+  } while (s !== prev);
+  return s.replace(/\s+/g, ' ').trim();
 }
 
 export function parseWikimediaImage(payload) {
