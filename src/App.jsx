@@ -73,6 +73,7 @@ const WorkerHistory = lazy(() => import('./components/WorkerHistory'));
 const BitacoraEntryDetail = lazy(() => import('./components/BitacoraEntryDetail'));
 const InformesScreen = lazy(() => import('./components/InformesScreen'));
 const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').then(m => ({ default: m.InventoryDashboard })));
+const BiopreparadoRecetasGallery = lazy(() => import('./components/BiopreparadoRecetasGallery'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
 const BiodiversidadView = lazy(() => import('./components/BiodiversidadView'));
@@ -183,7 +184,7 @@ const HASH_VIEW_ROUTES = {
 const MODULE_VIEWS = new Set([
   'activos', 'mapa', 'javier', 'bodega', 'task_log', 'historial',
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
-  'hoy_finca', 'evolucion', 'juego', 'defensores', 'milpa', 'sembrar', 'cosechar', 'insumos',
+  'hoy_finca', 'evolucion', 'juego', 'defensores', 'milpa', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'suelo',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
@@ -935,6 +936,18 @@ export default function App() {
         return (
           <ErrorBoundary>
             <InputLog onBack={() => navigate('dashboard')} onSave={showToast} />
+          </ErrorBoundary>
+        );
+      case 'biopreparados':
+        // Galería de recetas de biopreparados PASO A PASO (no la pantalla de
+        // insumos/inventario). La misión "Prepárale comida natural" navega acá.
+        return (
+          <ErrorBoundary>
+            <ScreenShell title="Biopreparados" onBack={() => navigate('juego')} onHome={() => navigate('dashboard')}>
+              <div className="px-4 pt-3 pb-10 max-w-2xl mx-auto">
+                <BiopreparadoRecetasGallery />
+              </div>
+            </ScreenShell>
           </ErrorBoundary>
         );
       case 'plant_asset':
