@@ -17,6 +17,7 @@ const VOICE_STORE_NAME = STORES.PENDING_VOICE;
 
 const MAX_RETRIES = 3;
 const BASE_BACKOFF_MS = 1000;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export class SyncManager {
   constructor() {
@@ -429,10 +430,20 @@ export class SyncManager {
       throw new Error(`Endpoint no resuelto para transacción tipo: ${transaction.type}`);
     }
 
+    const outboundTransaction = {
+      ...transaction,
+      payload: transaction.payload
+        ? (typeof structuredClone === 'function'
+            ? structuredClone(transaction.payload)
+            : JSON.parse(JSON.stringify(transaction.payload)))
+        : transaction.payload,
+    };
+    await this.resolveInlineRelationships(outboundTransaction);
+
     // Pre-paso: si la transacción incluye quantity metadata, crear la entidad
     // quantity--standard primero y vincularla al payload del log.
-    if (transaction._quantityMeta) {
-      const qm = transaction._quantityMeta;
+    if (outboundTransaction._quantityMeta) {
+      const qm = outboundTransaction._quantityMeta;
       const qtyPayload = {
         data: {
           type: 'quantity--standard',
@@ -446,15 +457,15 @@ export class SyncManager {
       const qtyResult = await sendToFarmOS('/api/quantity/standard', qtyPayload, 'POST');
       const qtyId = qtyResult?.data?.id;
       if (qtyId) {
-        transaction.payload.data.relationships = transaction.payload.data.relationships || {};
-        transaction.payload.data.relationships.quantity = {
+        outboundTransaction.payload.data.relationships = outboundTransaction.payload.data.relationships || {};
+        outboundTransaction.payload.data.relationships.quantity = {
           data: [{ type: 'quantity--standard', id: qtyId }],
         };
       }
     }
 
     // Paso principal: enviar el payload del log/asset
-    const result = await sendToFarmOS(targetEndpoint, transaction.payload, transaction.method || 'POST');
+    const result = await sendToFarmOS(targetEndpoint, outboundTransaction.payload, transaction.method || 'POST');
 
     // Fase 20.2: si hay media asociada, subir binarios y vincular al log
     try {
@@ -516,6 +527,54 @@ export class SyncManager {
     }
 
     return result;
+  }
+
+  async resolveInlineRelationships(transaction) {
+    const relationships = transaction?.payload?.data?.relationships;
+    if (!relationships) return;
+
+    const resolveRelationshipItem = async (item) => {
+      if (!item || typeof item !== 'object') return null;
+      if (item.id && UUID_RE.test(item.id)) {
+        return { type: item.type, id: item.id };
+      }
+      if (!item.type || !item.attributes) return null;
+
+      const [entity, bundle] = item.type.split('--');
+      if (!entity || !bundle) return null;
+
+      const resolvedRelationships = item.relationships
+        ? await this.resolveInlineRelationshipObject(item.relationships)
+        : {};
+      const inlinePayload = {
+        data: {
+          type: item.type,
+          attributes: item.attributes,
+          ...(Object.keys(resolvedRelationships).length > 0 ? { relationships: resolvedRelationships } : {}),
+        },
+      };
+      const result = await sendToFarmOS(`/api/${entity}/${bundle}`, inlinePayload, 'POST');
+      const id = result?.data?.id;
+      return id ? { type: item.type, id } : null;
+    };
+
+    for (const [name, rel] of Object.entries(relationships)) {
+      if (!rel?.data) continue;
+      const isArray = Array.isArray(rel.data);
+      const items = isArray ? rel.data : [rel.data];
+      const resolved = (await Promise.all(items.map(resolveRelationshipItem))).filter(Boolean);
+      if (resolved.length === 0) {
+        delete relationships[name];
+      } else {
+        relationships[name] = { data: isArray ? resolved : resolved[0] };
+      }
+    }
+  }
+
+  async resolveInlineRelationshipObject(relationships) {
+    const cloneTx = { payload: { data: { relationships: { ...relationships } } } };
+    await this.resolveInlineRelationships(cloneTx);
+    return cloneTx.payload.data.relationships;
   }
 
   /**

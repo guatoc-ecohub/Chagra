@@ -36,18 +36,19 @@ export default function PhenologyTimeline({
   speciesSlug,
   sowingDate,
   altitudeM,
+  phenologyTemplate,
   observedStages = [],
   compact = false,
 }) {
   const windows = useMemo(() => {
     if (!speciesSlug || !sowingDate) return [];
-    return calculateWindows({ speciesSlug, sowingDate, altitudeM });
-  }, [speciesSlug, sowingDate, altitudeM]);
+    return calculateWindows({ speciesSlug, sowingDate, altitudeM, template: phenologyTemplate });
+  }, [speciesSlug, sowingDate, altitudeM, phenologyTemplate]);
 
   const estimatedCurrent = useMemo(() => {
     if (!speciesSlug || !sowingDate) return null;
-    return getCurrentStage({ speciesSlug, sowingDate, altitudeM });
-  }, [speciesSlug, sowingDate, altitudeM]);
+    return getCurrentStage({ speciesSlug, sowingDate, altitudeM, template: phenologyTemplate });
+  }, [speciesSlug, sowingDate, altitudeM, phenologyTemplate]);
 
   const observedMap = useMemo(() => {
     const m = {};

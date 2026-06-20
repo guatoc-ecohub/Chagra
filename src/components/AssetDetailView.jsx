@@ -58,7 +58,7 @@ const PHOTO_SUCCESS_LABELS = {
   default: '✓ Foto guardada.',
 };
 
-function PhotoHeroSection({ assetId, speciesSlug, assetType, scientificName }) {
+function PhotoHeroSection({ assetId, speciesSlug, assetType, scientificName, catalogImage }) {
   const [busy, setBusy] = useState(false);
   const [success, setSuccess] = useState(false);
   const cameraRef = React.useRef(null);
@@ -146,7 +146,7 @@ function PhotoHeroSection({ assetId, speciesSlug, assetType, scientificName }) {
           {/* SpeciesImage como fallback cuando hay nombre científico */}
           {scientificName ? (
             <div className="w-full">
-              <SpeciesImage scientificName={scientificName} compact={false} className="w-full" />
+              <SpeciesImage scientificName={scientificName} catalogImage={catalogImage} compact={false} className="w-full" />
             </div>
           ) : (
             <div className="w-16 h-16 rounded-full bg-emerald-900/40 border border-emerald-700/50 flex items-center justify-center">
@@ -468,12 +468,20 @@ export const AssetDetailView = () => {
   const [showCemeteryModal, setShowCemeteryModal] = useState(false);
   const [showSplitFlow, setShowSplitFlow] = useState(false);
   const [scientificName, setScientificName] = useState(null);
+  const [catalogImage, setCatalogImage] = useState(null);
+
+  const asset = useMemo(() => {
+    if (!selectedAssetId) return null;
+    return [...plants, ...structures, ...equipment, ...materials, ...lands].find((a) => a.id === selectedAssetId);
+  }, [selectedAssetId, plants, structures, equipment, materials, lands]);
+
+  const isPlantType = (asset?.asset_type || asset?.type || '').includes('plant');
 
   // Cargar nombre científico desde el catálogo para SpeciesImage fallback
   useEffect(() => {
-    if (!isPlantType) return;
+    if (!isPlantType) return undefined;
     const speciesSlug = resolveSpeciesSlug(asset);
-    if (!speciesSlug) return;
+    if (!speciesSlug) return undefined;
     let cancelled = false;
     getAllSpecies()
       .then((list) => {
@@ -481,9 +489,8 @@ export const AssetDetailView = () => {
         const match = (list || []).find(
           (s) => s?.id === speciesSlug || s?.slug === speciesSlug,
         );
-        if (match?.nombre_cientifico) {
-          setScientificName(match.nombre_cientifico);
-        }
+        setScientificName(match?.nombre_cientifico || null);
+        setCatalogImage(match?.imagen || match?.image || match?.media?.image || match?.media || null);
       })
       .catch((err) => {
         console.warn('[AssetDetailView] getAllSpecies falló:', err);
@@ -512,14 +519,10 @@ export const AssetDetailView = () => {
     return () => window.removeEventListener('keydown', handleKey);
   }, [selectedAssetId, clearSelectedAsset, showCemeteryModal, showSplitFlow, showGeoPicker]);
 
-  const asset = useMemo(() => {
-    if (!selectedAssetId) return null;
-    return [...plants, ...structures, ...equipment, ...materials, ...lands].find((a) => a.id === selectedAssetId);
-  }, [selectedAssetId, plants, structures, equipment, materials, lands]);
-
   if (!selectedAssetId || !asset) return null;
 
   const name = asset.attributes?.name || asset.name || 'Sin nombre';
+  const speciesSlug = isPlantType ? resolveSpeciesSlug(asset) : null;
   const status = asset.attributes?.status || 'active';
   // Bug 2026-06-20 operator: Invalid Date en Registro.
   // asset.attributes.created viene del server FarmOS post-sync. Para optimistic locales
@@ -535,7 +538,6 @@ export const AssetDetailView = () => {
   const isValidDate = createdTs && !isNaN(createdTs.getTime()) && createdTs.getTime() > 0;
   const formattedDate = isValidDate ? createdTs.toLocaleDateString() : 'Sin fecha';
 
-  const isPlantType = (asset.asset_type || asset.type || '').includes('plant');
   const geoRaw = asset.attributes?.intrinsic_geometry;
   const geoWkt = typeof geoRaw === 'object' ? geoRaw?.value : geoRaw;
   const currentGeo = geoWkt ? wktToGeoJson(geoWkt) : null;
@@ -584,9 +586,10 @@ export const AssetDetailView = () => {
               imagen 4:3 con botones overlay; si no, card grande con CTA. */}
           <PhotoHeroSection
             assetId={asset.id}
-            speciesSlug={isPlantType ? deriveSpeciesSlug(name) : null}
+            speciesSlug={speciesSlug}
             assetType={isPlantType ? 'plant' : asset.type?.replace('asset--', '') || 'default'}
-            scientificName={scientificName}
+            scientificName={speciesSlug ? scientificName : null}
+            catalogImage={speciesSlug ? catalogImage : null}
           />
 
           <div className="grid grid-cols-2 gap-4">
@@ -634,12 +637,12 @@ export const AssetDetailView = () => {
                 </div>
               </section>
 
-              {deriveSpeciesSlug(name) && (
+              {speciesSlug && (
                 <section>
                   <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 px-1 flex items-center gap-2">
                     <Images size={14} /> Galería de la especie
                   </h3>
-                  <SpeciesPhotoGallery speciesSlug={deriveSpeciesSlug(name)} currentAssetId={asset.id} />
+                  <SpeciesPhotoGallery speciesSlug={speciesSlug} currentAssetId={asset.id} />
                 </section>
               )}
             </>

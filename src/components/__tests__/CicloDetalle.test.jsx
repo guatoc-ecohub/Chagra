@@ -11,7 +11,15 @@ const { confirmStage, completeTaskByVoice } = vi.hoisted(() => ({
 }));
 
 vi.mock('../FarmProcessSummary', () => ({ default: () => null }));
-vi.mock('../PhenologyTimeline', () => ({ default: () => null }));
+vi.mock('../PhenologyTimeline', () => ({
+  default: ({ phenologyTemplate }) => (
+    <div>
+      {(phenologyTemplate?.stages || []).map((stage) => (
+        <span key={stage.code}>{stage.label}</span>
+      ))}
+    </div>
+  ),
+}));
 vi.mock('../CicloObservacion', () => ({ default: () => null }));
 vi.mock('../CicloFotos', () => ({ default: () => null }));
 vi.mock('../../services/cycleTaskService', () => ({
@@ -26,6 +34,20 @@ vi.mock('../../services/climateCycleService', () => ({
 vi.mock('../../services/ensoService', () => ({ getEnsoServicePhase: () => null, getEnsoLabel: () => 'Neutral' }));
 vi.mock('../../services/stageConfirmationService', () => ({ confirmStage }));
 vi.mock('../../services/voiceTaskService', () => ({ completeTaskByVoice }));
+vi.mock('../../db/catalogDB', () => ({
+  getSpeciesByIdSync: (id) => (id === 'catalogo_especifico'
+    ? {
+        id,
+        phenology_template: {
+          stages: [
+            { code: 'sowing', label: 'Siembra catálogo', minDays: 0, maxDays: 0 },
+            { code: 'brotacion_catalogo', label: 'Brotación específica del catálogo', minDays: 1, maxDays: 10 },
+          ],
+          sources: [{ name: 'Catálogo Chagra' }],
+        },
+      }
+    : null),
+}));
 
 import CicloDetalle from '../CicloDetalle';
 
@@ -56,5 +78,24 @@ describe('CicloDetalle', () => {
     fireEvent.click(screen.getByText('Marcar hecha'));
     await waitFor(() => expect(completeTaskByVoice).toHaveBeenCalledTimes(1));
     expect(completeTaskByVoice.mock.calls[0][0]).toMatchObject({ processId: 'p1', taskName: 'Regar el café' });
+  });
+
+  it('usa la fenología específica del catálogo antes que la plantilla genérica por slug', () => {
+    render(<CicloDetalle
+      cycle={{
+        process_id: 'p-cat',
+        attributes: {
+          subject_label: 'Cultivo catálogo',
+          subject_slug: 'catalogo_especifico',
+          current_stage: 'sowing_confirmed',
+          created_at: new Date('2026-06-01T00:00:00Z').getTime(),
+          status: 'active',
+        },
+      }}
+      altitudeM={1500}
+      onReload={() => {}}
+    />);
+
+    expect(screen.getByText('Brotación específica del catálogo')).toBeTruthy();
   });
 });

@@ -43,6 +43,37 @@ function altitudeCorrection(days, altitudeM) {
   return Math.round(days * factor);
 }
 
+export function normalizePhenologyTemplate(template, speciesSlug = '') {
+  if (!template || typeof template !== 'object') return null;
+  const stages = Array.isArray(template.stages)
+    ? template.stages
+    : Array.isArray(template.phenology_stages)
+      ? template.phenology_stages
+      : null;
+  if (!stages || stages.length === 0) return null;
+  return {
+    template_id: template.template_id || `${speciesSlug || 'catalog'}.catalog`,
+    species_slug: template.species_slug || speciesSlug,
+    species_label: template.species_label || template.label || speciesSlug,
+    version: template.version || 1,
+    sources: Array.isArray(template.sources) && template.sources.length > 0
+      ? template.sources
+      : [{ name: 'Catálogo Chagra' }],
+    stages: stages.map((stage, index) => ({
+      code: stage.code || stage.stage || `stage_${index}`,
+      label: stage.label || stage.name || stage.code || stage.stage || `Etapa ${index + 1}`,
+      description: stage.description || '',
+      minDays: Number.isFinite(Number(stage.minDays)) ? Number(stage.minDays) : Number(stage.calendar_range?.[0] || 0),
+      maxDays: stage.maxDays === null
+        ? null
+        : Number.isFinite(Number(stage.maxDays))
+          ? Number(stage.maxDays)
+          : (Number.isFinite(Number(stage.calendar_range?.[1])) ? Number(stage.calendar_range[1]) : null),
+      sourceIndex: Number.isInteger(stage.sourceIndex) ? stage.sourceIndex : 0,
+    })),
+  };
+}
+
 /**
  * Calcula ventanas fenológicas estimadas para un proceso.
  *
@@ -52,8 +83,8 @@ function altitudeCorrection(days, altitudeM) {
  * @param {number} [input.altitudeM] — msnm para corrección por altitud
  * @returns {PhenologyWindow[]}
  */
-export function calculateWindows({ speciesSlug, sowingDate, altitudeM }) {
-  const template = getTemplate(speciesSlug);
+export function calculateWindows({ speciesSlug, sowingDate, altitudeM, template: inputTemplate } = {}) {
+  const template = normalizePhenologyTemplate(inputTemplate, speciesSlug) || getTemplate(speciesSlug);
 
   if (!template) {
     return [{
@@ -138,8 +169,8 @@ export function calculateWindows({ speciesSlug, sowingDate, altitudeM }) {
  * @param {number} [input.now=Date.now()] — timestamp ms para el cual calcular la etapa
  * @returns {CurrentStageResult|null}
  */
-export function getCurrentStage({ speciesSlug, sowingDate, altitudeM, now }) {
-  const windows = calculateWindows({ speciesSlug, sowingDate, altitudeM });
+export function getCurrentStage({ speciesSlug, sowingDate, altitudeM, now, template } = {}) {
+  const windows = calculateWindows({ speciesSlug, sowingDate, altitudeM, template });
 
   if (!windows.length || (windows.length === 1 && windows[0].status !== 'computed')) {
     return null;
@@ -186,10 +217,10 @@ export function getCurrentStage({ speciesSlug, sowingDate, altitudeM, now }) {
  * @param {string} [input.fallback='sowing_confirmed'] — etapa si no se puede derivar
  * @returns {string} código de etapa (ej. 'vegetative', 'flowering', 'sowing_confirmed')
  */
-export function deriveCurrentStage({ speciesSlug, sowingDate, altitudeM, now, fallback = 'sowing_confirmed' }) {
+export function deriveCurrentStage({ speciesSlug, sowingDate, altitudeM, now, template, fallback = 'sowing_confirmed' } = {}) {
   let result = null;
   try {
-    result = getCurrentStage({ speciesSlug, sowingDate, altitudeM, now });
+    result = getCurrentStage({ speciesSlug, sowingDate, altitudeM, now, template });
   } catch {
     return fallback;
   }

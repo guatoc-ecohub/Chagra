@@ -12,7 +12,7 @@
  *
  * | Event Type                  | FarmOS Log       | Endpoint              | Notas |
  * |-----------------------------|------------------|-----------------------|-------|
- * | sowing_confirmed            | log--observation | /api/log/observation  | La siembra YA crea log--seeding en FarmOS via SeedingLog. Este evento agrega metadata de ciclo: etapa, fenología, companions, biopreparados. |
+ * | sowing_confirmed            | log--seeding     | /api/log/seeding      | Promueve el ciclo local a una siembra real en FarmOS. |
  * | harvest_confirmed           | log--harvest     | /api/log/harvest      | Cantidad cosechada + unidad. Link al asset--plant. |
  * | post_harvest_confirmed      | log--activity    | /api/log/activity     | Manejo post-cosecha: secado, almacenamiento. |
  * | pest_management_confirmed   | log--activity    | /api/log/activity     | Manejo de plaga: biopreparado aplicado, método. |
@@ -67,7 +67,7 @@
  * log documentados en farmos.docs.
  */
 export const EVENT_TO_FARMOS_LOG = Object.freeze({
-  sowing_confirmed: { farmosLogType: 'log--observation', endpoint: '/api/log/observation' },
+  sowing_confirmed: { farmosLogType: 'log--seeding', endpoint: '/api/log/seeding' },
   harvest_confirmed: { farmosLogType: 'log--harvest', endpoint: '/api/log/harvest' },
   post_harvest_confirmed: { farmosLogType: 'log--activity', endpoint: '/api/log/activity' },
   pest_management_confirmed: { farmosLogType: 'log--activity', endpoint: '/api/log/activity' },
@@ -132,7 +132,9 @@ export function buildFarmOSLogPayload(event, process, assetId) {
 
   const attrs = {
     name,
-    timestamp: new Date(occurredAt).toISOString(),
+    timestamp: eventType === 'sowing_confirmed'
+      ? Math.floor(occurredAt / 1000)
+      : new Date(occurredAt).toISOString(),
     status: 'done',
   };
 
@@ -155,6 +157,32 @@ export function buildFarmOSLogPayload(event, process, assetId) {
       attributes: attrs,
     },
   };
+
+  if (eventType === 'sowing_confirmed') {
+    const p = process?.attributes || {};
+    const plantRef = assetId
+      ? { type: 'asset--plant', id: assetId }
+      : {
+          type: 'asset--plant',
+          _speciesSlug: p.subject_slug || null,
+          attributes: {
+            name: p.subject_label || 'Cultivo sin nombre',
+            status: 'active',
+          },
+          ...(p.location_land_asset_id ? {
+            relationships: {
+              location: { data: { type: 'asset--land', id: p.location_land_asset_id } },
+              parent: { data: { type: 'asset--land', id: p.location_land_asset_id } },
+            },
+          } : {}),
+        };
+    payload.data.relationships = {
+      asset: {
+        data: [plantRef],
+      },
+    };
+    return payload;
+  }
 
   // Link al asset--plant si existe
   if (assetId) {
@@ -249,7 +277,7 @@ export async function enqueueFarmProcessEvent(event, process, assetId) {
     const { default: syncManager } = await import('./syncManager');
 
     const tx = await syncManager.saveTransaction({
-      type: eventType,
+      type: eventType === 'sowing_confirmed' ? 'seeding' : eventType,
       endpoint: mapping.endpoint,
       payload,
     });
