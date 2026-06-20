@@ -229,6 +229,24 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
           <Sparkles size={22} className="text-teal-200 shrink-0" aria-hidden="true" />
         </button>
 
+        {/* Subjuego de siembra: La Milpa (las tres hermanas, asociación real) */}
+        <button
+          type="button"
+          data-testid="entrada-milpa"
+          onClick={() => irAccion('milpa')}
+          className="w-full text-left rounded-2xl p-4 bg-gradient-to-br from-lime-600/40 to-amber-800/40 border-2 border-lime-400/40 hover:border-lime-300/60 active:scale-[0.99] transition flex items-center gap-3"
+        >
+          <span className="text-4xl shrink-0" aria-hidden="true">🌽</span>
+          <span className="flex-1 min-w-0">
+            <span className="block text-base font-black text-white">La Milpa</span>
+            <span className="block text-sm text-lime-100/90 leading-snug">
+              Siembra maíz, fríjol y ahuyama juntos (las tres hermanas) y mira
+              cómo se ayudan y rinden más que sembrar cada uno solo.
+            </span>
+          </span>
+          <Sparkles size={22} className="text-lime-200 shrink-0" aria-hidden="true" />
+        </button>
+
         {/* Barra de progreso del mundo (alegre, pero honesta: % real) */}
         <div>
           <div className="flex items-center justify-between mb-1.5">

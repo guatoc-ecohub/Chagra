@@ -103,6 +103,7 @@ const HoyEnFincaScreen = lazy(() => import('./components/hoy/HoyEnFincaScreen'))
 const MiFincaEvolucionScreen = lazy(() => import('./components/hoy/MiFincaEvolucionScreen'));
 const MiFincaVivaScreen = lazy(() => import('./components/juego/MiFincaVivaScreen'));
 const DefensoresFincaScreen = lazy(() => import('./components/juego/DefensoresFincaScreen'));
+const MilpaSimulator = lazy(() => import('./components/juego/MilpaSimulator'));
 // Modo extensionista (panel supervisor multi-finca, ADR-048 MVP). Gateado por
 // feature flag VITE_FEATURE_EXTENSIONISTA + rol (ver config/extensionistaAccess).
 const ExtensionistaScreen = lazy(() => import('./components/ExtensionistaScreen'));
@@ -182,7 +183,7 @@ const HASH_VIEW_ROUTES = {
 const MODULE_VIEWS = new Set([
   'activos', 'mapa', 'javier', 'bodega', 'task_log', 'historial',
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
-  'hoy_finca', 'evolucion', 'juego', 'defensores', 'sembrar', 'cosechar', 'insumos',
+  'hoy_finca', 'evolucion', 'juego', 'defensores', 'milpa', 'sembrar', 'cosechar', 'insumos',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'suelo',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
@@ -901,6 +902,17 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Defensores de la Finca">
               <DefensoresFincaScreen
+                onBack={() => navigate('juego')}
+                onHome={() => navigate('dashboard')}
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'milpa':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La Milpa">
+              <MilpaSimulator
                 onBack={() => navigate('juego')}
                 onHome={() => navigate('dashboard')}
               />
