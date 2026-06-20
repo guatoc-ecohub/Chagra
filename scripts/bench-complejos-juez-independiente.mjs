@@ -62,6 +62,7 @@ import { applyOutputGuards } from '../src/services/outputGuards.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 // BENCH_OUTPUT_DIR permite PERSISTIR los resultados FUERA del worktree efímero
 // (p. ej. al repo principal), para que sobrevivan al cleanup del worktree.
 const BENCH_RUNS_DIR = process.env.BENCH_OUTPUT_DIR || join(ROOT_DIR, 'data', 'bench-runs');
