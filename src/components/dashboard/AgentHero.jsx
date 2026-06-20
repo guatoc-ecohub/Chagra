@@ -1249,14 +1249,19 @@ export default function AgentHero({ onNavigate }) {
                     justify-content: flex-end;
                     overflow: hidden;
                 }
-                /* Con la mano abierta el cuerpo NO recorta: las ramas de la red
-                   bajan POR FUERA del borde inferior del cuerpo hasta el botón Ⓐ
-                   (que vive en el compositor, debajo). Sin esto, el layout de
-                   #1726 (cuerpo flex con overflow:hidden) recorta el tramo final
-                   de cada rama → "líneas que mueren en el vacío" (regresión del
-                   fix #1668). Al cerrar vuelve a hidden para que la escena
+                /* Con la mano abierta el cuerpo NO recorta y se ELEVA sobre el
+                   compositor (z 4): las ramas de la red bajan POR FUERA del borde
+                   inferior del cuerpo y pintan ENCIMA del compositor hasta el
+                   centro del botón Ⓐ (que vive dentro del compositor, debajo).
+                   #1726 dejó el cuerpo en z-index:1 < compositor:4 y con
+                   overflow:hidden → el tramo final de cada rama quedaba (a)
+                   recortado por el cuerpo y (b) tapado por el fondo del
+                   compositor → "líneas que mueren en el vacío" (regresión del
+                   fix #1668). El SVG de la red es pointer-events:none, así que el
+                   compositor sigue usable (solo el panel de la mano captura
+                   toques). Al cerrar vuelve a su estado base para que la escena
                    ambiente no desborde el screenful. */
-                .agentport-hero-body.is-open { overflow: visible; }
+                .agentport-hero-body.is-open { overflow: visible; z-index: 5; }
 
                 /* ===================== ZONA-RESPIRO ===================== */
                 /* Espacio "respiro" donde vive la mano/red al abrir Ⓐ. El stage
