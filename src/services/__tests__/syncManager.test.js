@@ -273,6 +273,91 @@ describe('syncManager — plan generation hook (audit finding #2)', () => {
     });
 });
 
+// Bug #64 — las siembras (farm_process sowing_confirmed) quedaban atascadas en
+// quarantine y NO llegaban a FarmOS. Causa raíz (pre-#1720): el evento se
+// enviaba como log--observation con timestamp ISO y sin promover el asset--plant
+// inline → FarmOS rechazaba (4xx) → la transacción caía en failed_transactions.
+// Estos tests fijan la regresión: una siembra debe PROMOVERSE al servidor
+// (POST asset--plant + POST log--seeding) y NUNCA terminar en quarantine.
+
+describe('syncManager — bug #64: siembra promueve a FarmOS sin caer en quarantine', () => {
+    let syncManager; let sendToFarmOS; let tryGeneratePlanFromSeeding;
+    beforeEach(async () => {
+        vi.resetModules();
+        vi.clearAllMocks();
+        Object.defineProperty(navigator, 'onLine', { configurable: true, writable: true, value: true });
+        ({ syncManager } = await import('../syncManager'));
+        ({ sendToFarmOS } = await import('../apiService'));
+        ({ tryGeneratePlanFromSeeding } = await import('../planGeneratorService'));
+    });
+    afterEach(() => { vi.clearAllMocks(); });
+
+    it('siembra con asset--plant inline (sin UUID): crea el plant, manda el log--seeding y purga la cola — NO quarantine', async () => {
+        const tx = makeSeedingTransaction({ includeSpeciesSlug: true }); // inline asset, sin id
+        patchSyncManager(syncManager, [tx]);
+        const quarantineSpy = vi.spyOn(syncManager, 'quarantineTransaction').mockResolvedValue(undefined);
+        sendToFarmOS
+            .mockResolvedValueOnce({ data: { id: PLANT_UUID, type: 'asset--plant' } }) // promoción del plant
+            .mockResolvedValueOnce(makeFarmOSResponse({ remoteAssetUUID: PLANT_UUID })); // log--seeding
+        tryGeneratePlanFromSeeding.mockResolvedValue(null);
+
+        await syncManager.syncAll();
+
+        // 1) Se promovió el asset--plant primero, luego el log--seeding con UUID resuelto.
+        expect(sendToFarmOS).toHaveBeenNthCalledWith(1, '/api/asset/plant', expect.any(Object), 'POST');
+        expect(sendToFarmOS).toHaveBeenNthCalledWith(2, '/api/log/seeding', expect.objectContaining({
+            data: expect.objectContaining({
+                type: 'log--seeding',
+                relationships: { asset: { data: [{ type: 'asset--plant', id: PLANT_UUID }] } },
+            }),
+        }), 'POST');
+        // 2) La transacción se purgó de pending (llegó al servidor).
+        expect(syncManager.deleteTransaction).toHaveBeenCalledWith('tx-1');
+        // 3) NUNCA fue a quarantine.
+        expect(quarantineSpy).not.toHaveBeenCalled();
+    });
+
+    it('NO manda el campo interno _speciesSlug a FarmOS (evita 422 → quarantine)', async () => {
+        const tx = makeSeedingTransaction({ includeSpeciesSlug: true });
+        patchSyncManager(syncManager, [tx]);
+        vi.spyOn(syncManager, 'quarantineTransaction').mockResolvedValue(undefined);
+        sendToFarmOS
+            .mockResolvedValueOnce({ data: { id: PLANT_UUID, type: 'asset--plant' } })
+            .mockResolvedValueOnce(makeFarmOSResponse({ remoteAssetUUID: PLANT_UUID }));
+        tryGeneratePlanFromSeeding.mockResolvedValue(null);
+
+        await syncManager.syncAll();
+
+        const plantPayload = sendToFarmOS.mock.calls[0][1];
+        const plantData = plantPayload.data;
+        // farmOS solo acepta type + attributes válidos; _speciesSlug es interno del cliente.
+        expect(plantData).not.toHaveProperty('_speciesSlug');
+        expect(plantData.attributes).not.toHaveProperty('_speciesSlug');
+        expect(plantData.type).toBe('asset--plant');
+        expect(plantData.attributes).toMatchObject({ status: 'active' });
+    });
+
+    it('siembra con asset--plant ya existente (UUID): un solo POST a log--seeding, sin re-crear el plant', async () => {
+        const tx = makeSeedingTransaction({ includeSpeciesSlug: false, assetUUID: PLANT_UUID });
+        patchSyncManager(syncManager, [tx]);
+        const quarantineSpy = vi.spyOn(syncManager, 'quarantineTransaction').mockResolvedValue(undefined);
+        sendToFarmOS.mockResolvedValueOnce(makeFarmOSResponse({ remoteAssetUUID: PLANT_UUID }));
+        tryGeneratePlanFromSeeding.mockResolvedValue(null);
+
+        await syncManager.syncAll();
+
+        // El UUID ya es válido → resolveInlineRelationships lo deja pasar sin POST extra.
+        expect(sendToFarmOS).toHaveBeenCalledTimes(1);
+        expect(sendToFarmOS).toHaveBeenCalledWith('/api/log/seeding', expect.objectContaining({
+            data: expect.objectContaining({
+                relationships: { asset: { data: [{ type: 'asset--plant', id: PLANT_UUID }] } },
+            }),
+        }), 'POST');
+        expect(syncManager.deleteTransaction).toHaveBeenCalledWith('tx-1');
+        expect(quarantineSpy).not.toHaveBeenCalled();
+    });
+});
+
 // Tarea 109 — Sync conflict robustness (LWW, append-only, queue dedup).
 
 describe('syncManager — conflict robustness (Task 109)', () => {
