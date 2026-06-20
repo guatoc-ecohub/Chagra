@@ -10,16 +10,20 @@ import { Sprout, RotateCcw, Volume2, VolumeX, Sparkles, Trophy, Target, Leaf } f
 import {
   CULTIVOS_INFO,
   CULTIVO_POR_ID,
+  CULTIVO_NARRATIVAS,
+  OCUPACION_CULTIVO,
   RELACIONES,
   CIFRAS_SISTEMAS,
   NUM_PARCELAS,
   NUM_TEMPORADAS,
   LOGROS,
+  SLOTS_POR_PARCELA,
 } from './milpaData';
 import {
-  crearParcela,
   crearJuego,
   sembrarEnParcela,
+  espaciosUsadosParcela,
+  cabeCultivoEnParcela,
   esAsociacionCompleta,
   diversidadParcela,
   saludParcela,
@@ -36,6 +40,7 @@ import {
   ASOCIACIONES,
   avanzarTemporada,
   verificarLogros,
+  describirAsociacionCompleta,
 } from '../../services/milpaGameEngine';
 import { agentSounds, isSoundEnabled, setSoundEnabled } from '../../services/agentSoundService';
 import { speak, stop as stopSpeak, isSupported as ttsSupported } from '../../services/ttsService';
@@ -68,6 +73,7 @@ function ParcelaCard({ parcela, salud, seleccionada, onSelect, mostrarTipo }) {
   const d = diversidadParcela(parcela);
   const tipoAsoc = identificarAsociacion(parcela);
   const asocInfo = tipoAsoc ? ASOCIACIONES[tipoAsoc.toUpperCase()] : null;
+  const espaciosUsados = espaciosUsadosParcela(parcela);
   const cultivos = parcela.cultivos
     .map((id) => CULTIVO_POR_ID[id])
     .filter(Boolean);
@@ -103,6 +109,9 @@ function ParcelaCard({ parcela, salud, seleccionada, onSelect, mostrarTipo }) {
       <span className="text-[11px] font-bold text-emerald-200">
         {d === 0 ? 'Tierra lista' : tipoAsoc ? asocInfo.nombre : `${d} cultivos`}
       </span>
+      <span className="text-[10px] font-black text-lime-200">
+        {espaciosUsados}/{SLOTS_POR_PARCELA} espacios
+      </span>
       <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-900/60">
         <div
           className={`h-full rounded-full bg-gradient-to-r ${colorSalud(salud)} transition-all duration-500`}
@@ -120,6 +129,7 @@ function ParcelaCard({ parcela, salud, seleccionada, onSelect, mostrarTipo }) {
 
 /** Botón para sembrar/quitar un cultivo en la parcela activa. */
 function CultivoButton({ cultivo, activo, onToggle, deshabilitado }) {
+  const ocupacion = OCUPACION_CULTIVO[cultivo.id] ?? 1;
   return (
     <button
       type="button"
@@ -127,6 +137,7 @@ function CultivoButton({ cultivo, activo, onToggle, deshabilitado }) {
       onClick={() => onToggle(cultivo.id)}
       aria-pressed={activo}
       disabled={deshabilitado}
+      title={deshabilitado ? `${cultivo.nombre} no cabe en esta parcela` : `${cultivo.nombre} usa ${ocupacion} espacio(s)`}
       className={[
         'flex min-h-[72px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 ring-2 transition active:scale-95',
         activo ? ACENTO[cultivo.color] : 'bg-emerald-950/50 text-emerald-200 ring-emerald-800/50 hover:bg-emerald-900/60',
@@ -135,15 +146,19 @@ function CultivoButton({ cultivo, activo, onToggle, deshabilitado }) {
     >
       <span className="text-2xl" aria-hidden="true">{cultivo.emoji}</span>
       <span className="text-[11px] font-black leading-tight">{cultivo.nombre}</span>
+      <span className="text-[9px] font-bold opacity-80">{ocupacion} espacio(s)</span>
       {activo && (
         <span className="text-[9px] font-bold text-emerald-900/60">✓</span>
+      )}
+      {deshabilitado && (
+        <span className="text-[9px] font-black text-amber-200">No cabe</span>
       )}
     </button>
   );
 }
 
 /**
- * MilpaSimulator — el subjuego JUGABLE de asociaciones agroecológicas.
+ * MilpaSimulator: el subjuego JUGABLE de asociaciones agroecológicas.
  *
  * Flujo en fases múltiples, mobile-first y táctil:
  *   1. SELECCIÓN: el jugador elige qué tipo de asociación quiere practicar.
@@ -170,6 +185,9 @@ export default function MilpaSimulator({ onBack, onHome }) {
   const [danos, setDanos] = useState(null);
   const [logros, setLogros] = useState([]);
   const [audioOn, setAudioOn] = useState(() => isSoundEnabled());
+  const [sistemaActivo, setSistemaActivo] = useState(null);
+  const [avisoSiembra, setAvisoSiembra] = useState('');
+  const [celebracion, setCelebracion] = useState('');
 
   const parcelaActiva = useMemo(
     () => parcelas.find((p) => p.id === activa) || parcelas[0],
@@ -187,6 +205,7 @@ export default function MilpaSimulator({ onBack, onHome }) {
 
   const resumen = useMemo(() => resumenFinca(parcelas), [parcelas]);
   const algunaSembrada = resumen.parcelasSembradas > 0;
+  const espaciosActivos = espaciosUsadosParcela(parcelaActiva);
 
   const hablar = useCallback(
     (texto) => {
@@ -209,16 +228,49 @@ export default function MilpaSimulator({ onBack, onHome }) {
 
   const toggleCultivo = useCallback(
     (cultivoId) => {
+      let textoParaHablar = '';
       setParcelas((prev) =>
-        prev.map((p) => (p.id === activa ? sembrarEnParcela(p, cultivoId) : p)),
+        prev.map((p) => {
+          if (p.id !== activa) return p;
+          const antesTenia = p.cultivos.includes(cultivoId);
+          const siguiente = sembrarEnParcela(p, cultivoId);
+
+          if (siguiente.motivo === 'no cabe') {
+            const info = CULTIVO_POR_ID[cultivoId];
+            setAvisoSiembra(`${info?.nombre ?? 'Ese cultivo'} no cabe. Quita algo o elige otra parcela.`);
+            setCelebracion('');
+            try { agentSounds.error(); } catch { /* noop */ }
+            return siguiente;
+          }
+
+          setAvisoSiembra('');
+
+          const tipo = identificarAsociacion(siguiente);
+          const agrego = !antesTenia && siguiente.cultivos.includes(cultivoId);
+          if (agrego && tipo) {
+            const mensaje = describirAsociacionCompleta(tipo);
+            setCelebracion(mensaje);
+            textoParaHablar = mensaje;
+          } else if (antesTenia) {
+            setCelebracion('');
+          }
+
+          return siguiente;
+        }),
       );
       try { agentSounds.listen(); } catch { /* noop */ }
+      if (textoParaHablar) {
+        try { agentSounds.chime(); } catch { /* noop */ }
+        hablar(textoParaHablar);
+      }
     },
-    [activa],
+    [activa, hablar],
   );
 
   const seleccionarParcela = useCallback((id) => {
     setActiva(id);
+    setAvisoSiembra('');
+    setCelebracion('');
     try { agentSounds.start(); } catch { /* noop */ }
   }, []);
 
@@ -259,7 +311,7 @@ export default function MilpaSimulator({ onBack, onHome }) {
         try { agentSounds.chime(); } catch { /* noop */ }
       }, 500);
     }
-  }, [resumen.ventajaPct, hablar, juego, parcelas]);
+  }, [resumen, hablar, juego, parcelas]);
 
   const avanzar = useCallback(() => {
     const { juego: juegoActualizado, continua } = avanzarTemporada(juego);
@@ -288,18 +340,19 @@ export default function MilpaSimulator({ onBack, onHome }) {
     setEvento(null);
     setDanos(null);
     setLogros([]);
+    setSistemaActivo(null);
+    setAvisoSiembra('');
+    setCelebracion('');
     try { agentSounds.listen(); } catch { /* noop */ }
   }, []);
 
   // Cultivos disponibles filtrados por fase de selección
   const cultivosDisponibles = useMemo(() => {
-    if (fase === 'seleccion') {
-      // Mostrar cultivos de todas las asociaciones
-      return CULTIVOS_INFO;
-    }
-    // En fase de siembra, mostrar todos los cultivos
-    return CULTIVOS_INFO;
-  }, [fase]);
+    if (!sistemaActivo) return CULTIVOS_INFO;
+    const asoc = Object.values(ASOCIACIONES).find((a) => a.id === sistemaActivo);
+    if (!asoc) return CULTIVOS_INFO;
+    return asoc.cultivos.map((id) => CULTIVO_POR_ID[id]).filter(Boolean);
+  }, [sistemaActivo]);
 
   return (
     <ScreenShell
@@ -365,6 +418,7 @@ export default function MilpaSimulator({ onBack, onHome }) {
                   key={asoc.id}
                   type="button"
                   onClick={() => {
+                    setSistemaActivo(asoc.id);
                     setFase('siembra');
                     hablar(asoc.nombre);
                     try { agentSounds.start(); } catch { /* noop */ }
@@ -418,6 +472,14 @@ export default function MilpaSimulator({ onBack, onHome }) {
             <p className="mb-2 text-sm font-bold text-emerald-100">
               Parcela {activa}: toca los cultivos para sembrarlos o quitarlos.
             </p>
+            <div className="mb-3 flex items-center justify-between rounded-2xl bg-emerald-900/50 px-3 py-2">
+              <span className="text-xs font-black text-lime-200">
+                {espaciosActivos}/{SLOTS_POR_PARCELA} espacios usados
+              </span>
+              <span className="text-[11px] font-bold text-emerald-300">
+                Capacidad limitada
+              </span>
+            </div>
             <div className="grid grid-cols-3 gap-2">
               {cultivosDisponibles.map((c) => (
                 <CultivoButton
@@ -425,33 +487,21 @@ export default function MilpaSimulator({ onBack, onHome }) {
                   cultivo={c}
                   activo={parcelaActiva.cultivos.includes(c.id)}
                   onToggle={toggleCultivo}
+                  deshabilitado={
+                    !parcelaActiva.cultivos.includes(c.id) &&
+                    !cabeCultivoEnParcela(parcelaActiva, c.id)
+                  }
                 />
               ))}
             </div>
 
-            {/* Sinergias activas en VIVO */}
-            <div className="mt-3 flex flex-col gap-1.5" data-testid="milpa-sinergias">
-              <SinergiaLinea
-                ok={haySoporteFisico(parcelaActiva)}
-                texto="Soporte físico entre cultivos 🌿"
-              />
-              <SinergiaLinea
-                ok={nitrogenoFijado(parcelaActiva) > 0}
-                texto={`Fijación de nitrógeno (${nitrogenoFijado(parcelaActiva)}%) 💧`}
-              />
-              <SinergiaLinea
-                ok={coberturaSuelo(parcelaActiva) > 0}
-                texto={`Cobertura del suelo (−${coberturaSuelo(parcelaActiva)}% maleza) 🌿`}
-              />
-              <SinergiaLinea
-                ok={sombraParcela(parcelaActiva) > 0}
-                texto={`Sombra (${sombraParcela(parcelaActiva)}% buffer climático) 🌳`}
-              />
-              <SinergiaLinea
-                ok={controlPlaga(parcelaActiva) > 0}
-                texto={`Control de plagas (${controlPlaga(parcelaActiva)}%) 🛡️`}
-              />
-            </div>
+            {avisoSiembra && (
+              <p className="mt-3 rounded-2xl bg-amber-400/15 p-3 text-sm font-black text-amber-100 ring-1 ring-amber-300/30">
+                {avisoSiembra}
+              </p>
+            )}
+
+            <SinergiaNarrada parcela={parcelaActiva} celebracion={celebracion} />
 
             <p className="mt-3 rounded-2xl bg-emerald-900/50 p-3 text-center text-sm font-black text-lime-200">
               Salud de la parcela: {saludParcela(parcelaActiva)} / {SALUD_MAX}
@@ -694,18 +744,66 @@ export default function MilpaSimulator({ onBack, onHome }) {
   );
 }
 
-/** Línea de sinergia con check/cruz. */
-function SinergiaLinea({ ok, texto }) {
+/** Narrativa viva de los cultivos sembrados y sus sinergias medibles. */
+function SinergiaNarrada({ parcela, celebracion }) {
+  const cultivos = parcela.cultivos
+    .map((id) => CULTIVO_POR_ID[id])
+    .filter(Boolean);
+  const nFijado = nitrogenoFijado(parcela);
+  const cobertura = coberturaSuelo(parcela);
+  const sombra = sombraParcela(parcela);
+  const plaga = controlPlaga(parcela);
+  const soporte = haySoporteFisico(parcela);
+
+  if (cultivos.length === 0) {
+    return (
+      <div
+        className="mt-3 rounded-2xl bg-emerald-900/40 p-3 text-sm font-bold text-emerald-300"
+        data-testid="milpa-sinergias"
+      >
+        Siembra una primera planta y mira qué puede aportar a sus vecinas.
+      </div>
+    );
+  }
+
   return (
-    <p
-      className={[
-        'flex items-center gap-2 text-xs font-bold',
-        ok ? 'text-lime-300' : 'text-emerald-400/40',
-      ].join(' ')}
+    <div
+      className="mt-3 flex flex-col gap-2"
+      data-testid="milpa-sinergias"
     >
-      <span aria-hidden="true">{ok ? '✅' : '⬜'}</span>
-      {texto}
-    </p>
+      {cultivos.map((cultivo) => (
+        <p
+          key={cultivo.id}
+          className="rounded-2xl bg-emerald-900/45 p-3 text-sm font-bold leading-relaxed text-emerald-100 ring-1 ring-emerald-700/40 milpa-deslizar-arriba"
+        >
+          {CULTIVO_NARRATIVAS[cultivo.id] ?? cultivo.ayuda}
+        </p>
+      ))}
+
+      <div className="grid grid-cols-2 gap-2">
+        {soporte && <SinergiaDato texto="Soporte físico" valor="activo" />}
+        {nFijado > 0 && <SinergiaDato texto="N fijado" valor={`${nFijado}%`} />}
+        {cobertura > 0 && <SinergiaDato texto="Maleza" valor={`-${cobertura}%`} />}
+        {sombra > 0 && <SinergiaDato texto="Sombra" valor={`${sombra}%`} />}
+        {plaga > 0 && <SinergiaDato texto="Plagas" valor={`-${plaga}%`} />}
+      </div>
+
+      {celebracion && (
+        <p className="rounded-3xl border border-lime-300/40 bg-lime-400/15 p-4 text-center text-base font-black leading-relaxed text-lime-100 milpa-asociacion-completa">
+          {celebracion}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** Indicador corto con cifra real o relación activada. */
+function SinergiaDato({ texto, valor }) {
+  return (
+    <div className="rounded-2xl bg-slate-900/45 p-2 text-center ring-1 ring-emerald-700/40">
+      <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-300">{texto}</p>
+      <p className="text-sm font-black text-lime-200">{valor}</p>
+    </div>
   );
 }
 

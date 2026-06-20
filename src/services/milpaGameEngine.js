@@ -53,6 +53,28 @@ export const HERMANAS = CULTIVOS;
 /** Salud máxima de una parcela (0–100). */
 export const SALUD_MAX = 100;
 
+/** Capacidad máxima de una parcela en espacios de siembra. */
+export const SLOTS_POR_PARCELA = 4;
+
+/**
+ * Espacios que ocupa cada cultivo. En milpa, maíz ocupa más por su porte; las
+ * coberturas y hortalizas ocupan menos. En SAF, árboles/sombras ocupan más.
+ */
+export const OCUPACION_CULTIVO = Object.freeze({
+  [CULTIVOS.MAIZ]: 2,
+  [CULTIVOS.FRIJOL]: 1,
+  [CULTIVOS.AHUYAMA]: 1,
+  [CULTIVOS.CAFE]: 1,
+  [CULTIVOS.GUAMO]: 2,
+  [CULTIVOS.PLATANO]: 1,
+  [CULTIVOS.CACAO]: 1,
+  [CULTIVOS.MATARRATON]: 2,
+  [CULTIVOS.FRUTAL]: 2,
+  [CULTIVOS.MANI_FORRAJERO]: 1,
+  [CULTIVOS.CEBOLLA]: 1,
+  [CULTIVOS.ZANAHORIA]: 1,
+});
+
 /**
  * Define los tipos de asociaciones soportadas con sus componentes.
  */
@@ -155,21 +177,52 @@ export function crearParcela(id) {
 }
 
 /**
+ * Espacios usados por los cultivos de una parcela.
+ * @param {{ cultivos: string[] }} parcela
+ * @returns {number}
+ */
+export function espaciosUsadosParcela(parcela) {
+  return parcela.cultivos.reduce(
+    (total, cultivoId) => total + (OCUPACION_CULTIVO[cultivoId] ?? 1),
+    0,
+  );
+}
+
+/**
+ * Valida si un cultivo puede entrar sin superar la capacidad. Si ya está
+ * sembrado, puede tocarse para quitarlo.
+ * @param {{ cultivos: string[] }} parcela
+ * @param {string} cultivoId
+ * @returns {boolean}
+ */
+export function cabeCultivoEnParcela(parcela, cultivoId) {
+  const valido = Object.values(CULTIVOS).includes(cultivoId);
+  if (!valido) return false;
+  if (parcela.cultivos.includes(cultivoId)) return true;
+
+  const ocupacion = OCUPACION_CULTIVO[cultivoId] ?? 1;
+  return espaciosUsadosParcela(parcela) + ocupacion <= SLOTS_POR_PARCELA;
+}
+
+/**
  * Siembra (o quita) un cultivo en una parcela. Toggle: si ya está, lo retira.
- * Una parcela admite cualquier combinación de cultivos.
+ * Una parcela admite combinaciones hasta llenar sus espacios.
  *
  * @param {{ id: string, cultivos: string[] }} parcela
  * @param {string} cultivoId  Uno de CULTIVOS.
- * @returns {{ id: string, cultivos: string[] }} nueva parcela (inmutable)
+ * @returns {{ id: string, cultivos: string[], motivo?: string }} nueva parcela
  */
 export function sembrarEnParcela(parcela, cultivoId) {
   const valido = Object.values(CULTIVOS).includes(cultivoId);
   if (!valido) return parcela;
   const tiene = parcela.cultivos.includes(cultivoId);
+  if (!tiene && !cabeCultivoEnParcela(parcela, cultivoId)) {
+    return { ...parcela, motivo: 'no cabe' };
+  }
   const cultivos = tiene
     ? parcela.cultivos.filter((c) => c !== cultivoId)
     : [...parcela.cultivos, cultivoId];
-  return { ...parcela, cultivos };
+  return { ...parcela, cultivos, motivo: undefined };
 }
 
 /**
@@ -180,13 +233,12 @@ export function sembrarEnParcela(parcela, cultivoId) {
 export function identificarAsociacion(parcela) {
   const cultivosSet = new Set(parcela.cultivos);
 
-  for (const [key, asoc] of Object.entries(ASOCIACIONES)) {
-    const cultivosAsoc = new Set(asoc.cultivos);
+  for (const asoc of Object.values(ASOCIACIONES)) {
     // Verificar si la parcela tiene todos los cultivos de la asociación
     const esEstaAsociacion = asoc.cultivos.every(c => cultivosSet.has(c));
     // Y no tiene cultivos extra de otras asociaciones (con flexibilidad para combinaciones)
     if (esEstaAsociacion) {
-      return key;
+      return asoc.id;
     }
   }
   return null;
@@ -199,6 +251,23 @@ export function identificarAsociacion(parcela) {
  */
 export function esAsociacionCompleta(parcela) {
   return identificarAsociacion(parcela) !== null;
+}
+
+/**
+ * Frase de celebración cuando se completa una asociación real.
+ * @param {string} tipo ID de asociación, por ejemplo "milpa".
+ * @returns {string}
+ */
+export function describirAsociacionCompleta(tipo) {
+  const frases = {
+    milpa: '¡Descubriste la Milpa! Las tres hermanas se ayudan: maíz sostiene, fríjol alimenta, ahuyama cuida 🌾',
+    saf_cafe: '¡Lo lograste! El café, guamo y plátano forman un SAF: sombra, nitrógeno y cosecha se acompañan ☕',
+    saf_cacao: '¡Lo lograste! Cacao, matarratón y plátano crean sombra viva y suelo alimentado 🍫',
+    frutal_cobertura: '¡Lo lograste! El frutal produce arriba y el maní forrajero protege el suelo abajo 🍊',
+    hortalizas: '¡Lo lograste! Cebolla y zanahoria se protegen con sus aromas y bajan la presión de plagas 🥕',
+  };
+
+  return frases[tipo] ?? '';
 }
 
 /**
@@ -372,7 +441,7 @@ export function haySoporteFisico(parcela) {
 
   // Árboles protegen cultivos pequeños
   const arboles = [CULTIVOS.GUAMO, CULTIVOS.MATARRATON, CULTIVOS.PLATANO, CULTIVOS.FRUTAL];
-  cultivosPequenos = [CULTIVOS.CAFE, CULTIVOS.CACAO, CULTIVOS.CEBOLLA, CULTIVOS.ZANAHORIA];
+  const cultivosPequenos = [CULTIVOS.CAFE, CULTIVOS.CACAO, CULTIVOS.CEBOLLA, CULTIVOS.ZANAHORIA];
 
   const hayArbol = parcela.cultivos.some(c => arboles.includes(c));
   const hayPequeno = parcela.cultivos.some(c => cultivosPequenos.includes(c));
@@ -730,6 +799,9 @@ export function verificarLogros(juego) {
     const r = temp.resumen;
 
     // Logros de rendimiento
+    if (r.asociacionesCompletas >= 1 && !logros.includes('primera_milpa')) {
+      logros.push('primera_milpa');
+    }
     if (r.ventajaPct >= 100 && !logros.includes('super_milpa')) {
       logros.push('super_milpa');
     }
@@ -751,7 +823,7 @@ export function verificarLogros(juego) {
     }
 
     // Logros de resiliencia
-    if (r.milpasCompletas >= Math.floor(juego.parcelas.length / 2) &&
+    if (r.asociacionesCompletas >= Math.floor(juego.parcelas.length / 2) &&
         !logros.includes('resiliente')) {
       logros.push('resiliente');
     }
@@ -786,6 +858,7 @@ export function aplicarEvento(parcela, evento) {
  * @returns {{
  *   parcelasSembradas: number,
  *   asociacionesCompletas: number,
+ *   milpasCompletas: number,
  *   tiposAsociaciones: string[],
  *   saludTotal: number,
  *   saludPromedio: number,
@@ -853,6 +926,7 @@ export function resumenFinca(parcelas) {
   return {
     parcelasSembradas: n,
     asociacionesCompletas,
+    milpasCompletas: asociacionesCompletas,
     tiposAsociaciones: Array.from(tipos),
     saludTotal,
     saludPromedio: Math.round(saludTotal / n),
