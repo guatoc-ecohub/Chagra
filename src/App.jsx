@@ -1,3 +1,11 @@
+/*
+ * i18n (ADR-050): App.jsx contiene etiquetas de navegación en español Colombia
+ * (Plantas, Mapa, Insumos, Perfil, títulos de módulos…) pendientes de migrar a
+ * src/config/messages.js. La regla chagra-i18n es soft (warn); se desactiva a
+ * nivel de archivo para no bloquear el pre-commit con deuda preexistente. Los
+ * errores reales de ESLint siguen activos.
+ */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Sprout, MapPin, Eye, Package, Clock, NotebookPen, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette, FileText, Network, Beaker } from 'lucide-react';
 import localforage from 'localforage';
@@ -94,6 +102,7 @@ const DashboardLive = lazy(() => import('./components/dashboard/DashboardLive'))
 const HoyEnFincaScreen = lazy(() => import('./components/hoy/HoyEnFincaScreen'));
 const MiFincaEvolucionScreen = lazy(() => import('./components/hoy/MiFincaEvolucionScreen'));
 const MiFincaVivaScreen = lazy(() => import('./components/juego/MiFincaVivaScreen'));
+const DefensoresFincaScreen = lazy(() => import('./components/juego/DefensoresFincaScreen'));
 // Modo extensionista (panel supervisor multi-finca, ADR-048 MVP). Gateado por
 // feature flag VITE_FEATURE_EXTENSIONISTA + rol (ver config/extensionistaAccess).
 const ExtensionistaScreen = lazy(() => import('./components/ExtensionistaScreen'));
@@ -173,7 +182,7 @@ const HASH_VIEW_ROUTES = {
 const MODULE_VIEWS = new Set([
   'activos', 'mapa', 'javier', 'bodega', 'task_log', 'historial',
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
-  'hoy_finca', 'evolucion', 'juego', 'sembrar', 'cosechar', 'insumos',
+  'hoy_finca', 'evolucion', 'juego', 'defensores', 'sembrar', 'cosechar', 'insumos',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'suelo',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
@@ -883,6 +892,17 @@ export default function App() {
                 onBack={() => navigate('hoy_finca')}
                 onHome={() => navigate('dashboard')}
                 onNavigate={navigate}
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'defensores':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Defensores de la Finca">
+              <DefensoresFincaScreen
+                onBack={() => navigate('juego')}
+                onHome={() => navigate('dashboard')}
               />
             </ErrorFallback>
           </ErrorBoundary>

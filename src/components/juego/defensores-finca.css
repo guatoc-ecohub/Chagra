@@ -1,0 +1,209 @@
+/*
+ * defensores-finca.css — estilos del minijuego plataformero
+ * "Defensores de la Finca".
+ *
+ * Mobile-first: controles táctiles grandes (mín 64px) para el pulgar en celular
+ * gama baja. Canvas 2D responsivo. Todo en CSS puro, offline-first. Respeta
+ * prefers-reduced-motion.
+ */
+
+.df-stage {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 18px 50px rgba(8, 30, 22, 0.35);
+  background: #bde0f5;
+  /* Bloquea el scroll-touch del navegador mientras se juega con el pulgar. */
+  touch-action: none;
+}
+
+.df-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* ── HUD (energía + puntaje) ─────────────────────────────────────────── */
+
+.df-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.25rem 0.75rem;
+}
+
+.df-hearts {
+  display: flex;
+  gap: 0.25rem;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.df-heart-empty {
+  opacity: 0.28;
+  filter: grayscale(1);
+}
+
+/* ── Controles táctiles ──────────────────────────────────────────────── */
+
+.df-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.df-dpad {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.df-btn {
+  min-width: 64px;
+  min-height: 64px;
+  border-radius: 1rem;
+  border: 2px solid rgba(16, 185, 129, 0.45);
+  background: rgba(6, 78, 59, 0.55);
+  color: #ecfdf5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: transform 0.08s ease, background 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+}
+
+.df-btn:active,
+.df-btn[data-pressed='true'] {
+  transform: scale(0.92);
+  background: rgba(16, 185, 129, 0.7);
+}
+
+.df-btn-jump {
+  min-width: 84px;
+  background: rgba(180, 83, 9, 0.6);
+  border-color: rgba(251, 191, 36, 0.55);
+}
+.df-btn-jump:active,
+.df-btn-jump[data-pressed='true'] {
+  background: rgba(217, 119, 6, 0.8);
+}
+
+.df-btn-action {
+  min-width: 84px;
+  background: rgba(13, 148, 136, 0.6);
+  border-color: rgba(45, 212, 191, 0.6);
+}
+
+/* ── Selector de benéfico (control biológico) ────────────────────────── */
+
+.df-beneficios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.df-beneficio {
+  flex: 1 1 0;
+  min-width: 92px;
+  min-height: 64px;
+  border-radius: 0.9rem;
+  border: 2px solid rgba(45, 212, 191, 0.4);
+  background: rgba(15, 23, 42, 0.55);
+  color: #ecfdf5;
+  padding: 0.4rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.08s ease, border-color 0.12s ease;
+}
+.df-beneficio:active {
+  transform: scale(0.95);
+}
+.df-beneficio[data-selected='true'] {
+  border-color: #2dd4bf;
+  background: rgba(13, 148, 136, 0.35);
+}
+.df-beneficio-emoji {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+.df-beneficio-nombre {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.1;
+}
+
+/* ── Banner de lección (al controlar una plaga) ──────────────────────── */
+
+.df-leccion {
+  margin-top: 0.75rem;
+  border-radius: 0.9rem;
+  border: 2px solid rgba(16, 185, 129, 0.45);
+  background: rgba(6, 78, 59, 0.4);
+  padding: 0.6rem 0.8rem;
+  color: #d1fae5;
+  font-weight: 700;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  animation: df-leccion-in 0.35s ease both;
+}
+@keyframes df-leccion-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Overlay de fin de nivel ─────────────────────────────────────────── */
+
+.df-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  text-align: center;
+  padding: 1.25rem;
+  background: rgba(8, 30, 22, 0.86);
+  backdrop-filter: blur(4px);
+  animation: df-fade-in 0.3s ease both;
+}
+@keyframes df-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.df-overlay-emoji {
+  font-size: 4rem;
+  line-height: 1;
+  animation: df-bounce 1s ease-in-out infinite;
+}
+@keyframes df-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .df-leccion,
+  .df-overlay,
+  .df-overlay-emoji {
+    animation: none !important;
+  }
+}
