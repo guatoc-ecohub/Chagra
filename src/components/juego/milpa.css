@@ -1,0 +1,33 @@
+/*
+ * milpa.css — micro-animaciones ligeras y alegres para el subjuego "La Milpa".
+ *
+ * Diseñado para una niña Y para el campesino: movimientos suaves (nada brusco),
+ * todo en CSS puro (offline-first, sin libs), rinde en gama baja. Respeta
+ * prefers-reduced-motion.
+ */
+
+/* La insignia "¡Milpa!" hace un pequeño rebote al aparecer. */
+.milpa-badge-pop {
+  animation: milpa-pop 360ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes milpa-pop {
+  0% { transform: scale(0.4); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* La hermana recién sembrada brota desde abajo con un crecimiento suave. */
+.milpa-brota {
+  animation: milpa-brota 420ms ease-out both;
+  transform-origin: bottom center;
+}
+@keyframes milpa-brota {
+  0% { transform: translateY(6px) scale(0.7); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .milpa-badge-pop,
+  .milpa-brota {
+    animation: none;
+  }
+}
