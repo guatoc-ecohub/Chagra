@@ -1,84 +1,223 @@
 [
-	{
-		"id": "milpa",
-		"nombre": "Milpa (Tres Hermanas)",
-		"icono": "🌽",
-		"rol": [
-			"campesino"
-		],
-		"especies": [
-			"maíz",
-			"fríjol",
-			"ahuyama"
-		],
-		"beneficio": "LER 1.32, el fríjol fija nitrógeno",
-		"fuente": "DR-ASOCIACIONES-2026-06-18",
-		"detalle": "El maíz da soporte al fríjol para que trepe; el fríjol fija nitrógeno que nutre al maíz; la ahuyama cubre el suelo, conserva humedad y frena la maleza. Juntas rinden más que por separado (LER 1.32)."
-	},
-	{
-		"id": "saf_cafe",
-		"nombre": "SAF café",
-		"icono": "☕",
-		"rol": [
-			"campesino",
-			"cafetero"
-		],
-		"especies": [
-			"café",
-			"guamo (Inga)",
-			"plátano"
-		],
-		"beneficio": "sombra + carbono + amortigua broca",
-		"fuente": "DR-ASOCIACIONES-2026-06-18",
-		"detalle": "El guamo (Inga) da sombra y aporta materia orgánica y nitrógeno; el plátano da sombra temporal e ingreso temprano. La sombra modera el calor y ayuda a amortiguar la broca del café."
-	},
-	{
-		"id": "saf_cacao",
-		"nombre": "SAF cacao",
-		"icono": "🍫",
-		"rol": [
-			"campesino",
-			"cacaotero"
-		],
-		"especies": [
-			"cacao",
-			"matarratón (Gliricidia)",
-			"plátano"
-		],
-		"beneficio": "fija N + sombra",
-		"fuente": "DR-ASOCIACIONES-2026-06-18",
-		"detalle": "El matarratón (Gliricidia) fija nitrógeno y da sombra; el plátano protege al cacao joven y genera ingreso mientras crece. Sombra más nitrógeno = cacao más sano."
-	},
-	{
-		"id": "frutal_cobertura",
-		"nombre": "Frutal con cobertura",
-		"icono": "🍊",
-		"rol": [
-			"campesino",
-			"restaurador"
-		],
-		"especies": [
-			"frutal",
-			"maní forrajero (Arachis pintoi)"
-		],
-		"beneficio": "cobertura que fija N y tapa maleza",
-		"fuente": "DR-ASOCIACIONES-2026-06-18",
-		"detalle": "El maní forrajero (Arachis pintoi) tapiza el suelo bajo el frutal: fija nitrógeno, conserva humedad, controla la maleza y reduce la erosión."
-	},
-	{
-		"id": "hortaliza_repelente",
-		"nombre": "Cebolla + zanahoria",
-		"icono": "🥕",
-		"rol": [
-			"campesino",
-			"urbano"
-		],
-		"especies": [
-			"cebolla",
-			"zanahoria"
-		],
-		"beneficio": "se protegen de sus moscas mutuamente",
-		"fuente": "DR-ASOCIACIONES-2026-06-18",
-		"detalle": "El olor de la cebolla repele la mosca de la zanahoria, y la zanahoria repele la mosca de la cebolla. Sembradas juntas se protegen mutuamente sin químicos."
-	}
+  {
+    "id": "milpa",
+    "nombre": "Milpa de maíz, fríjol y ahuyama",
+    "icono": "🌽",
+    "rol": ["campesino"],
+    "comparativa_id": "milpa-maiz-frijol-ahuyama",
+    "cultivos": [
+      { "id": "maiz", "slug": "zea_mays", "nombre": "maíz", "estrato": "alto" },
+      { "id": "frijol", "slug": "phaseolus_vulgaris", "nombre": "fríjol", "estrato": "trepador" },
+      { "id": "ahuyama", "slug": "cucurbita_moschata", "nombre": "ahuyama", "estrato": "cobertura" }
+    ],
+    "relaciones": [
+      {
+        "origen": "maiz",
+        "destino": "frijol",
+        "tipo": "ASOCIA_CON",
+        "beneficio": "tutor vivo",
+        "razon": "El maíz sirve de soporte para el fríjol trepador."
+      },
+      {
+        "origen": "frijol",
+        "destino": "maiz",
+        "tipo": "COMPATIBLE_WITH",
+        "beneficio": "nitrógeno",
+        "razon": "El fríjol es leguminosa y aporta fijación biológica de nitrógeno."
+      },
+      {
+        "origen": "ahuyama",
+        "destino": "maiz",
+        "tipo": "COMPATIBLE_WITH",
+        "beneficio": "cobertura",
+        "razon": "La ahuyama cubre el suelo, conserva humedad y reduce arvenses."
+      }
+    ],
+    "antagonistas": [
+      {
+        "cultivo": "maiz",
+        "evitar": "hinojo",
+        "slug": "foeniculum_vulgare",
+        "tipo": "ANTAGONIST_OF",
+        "razon": "El catálogo marca hinojo como antagonista de maíz."
+      },
+      {
+        "cultivo": "frijol",
+        "evitar": "cebolla larga",
+        "slug": "allium_fistulosum",
+        "tipo": "ANTAGONIST_OF",
+        "razon": "El catálogo marca Allium fistulosum como antagonista de fríjol."
+      }
+    ],
+    "accion": "Siembra el maíz primero; cuando esté firme, entra el fríjol y deja la ahuyama como cobertura entre calles.",
+    "fuente": "DR-ASOCIACIONES-2026-06-18"
+  },
+  {
+    "id": "maiz_leguminosa",
+    "nombre": "Maíz con leguminosa",
+    "icono": "🌽",
+    "rol": ["campesino"],
+    "comparativa_id": "maiz-leguminosa",
+    "cultivos": [
+      { "id": "maiz", "slug": "zea_mays", "nombre": "maíz", "estrato": "alto" },
+      { "id": "leguminosa", "slug": "phaseolus_vulgaris", "nombre": "leguminosa", "estrato": "medio" }
+    ],
+    "relaciones": [
+      {
+        "origen": "maiz",
+        "destino": "leguminosa",
+        "tipo": "COMPATIBLE_WITH",
+        "beneficio": "uso de tierra",
+        "razon": "La mezcla aprovecha estratos distintos y mejora el uso de tierra frente al monocultivo."
+      },
+      {
+        "origen": "leguminosa",
+        "destino": "maiz",
+        "tipo": "COMPATIBLE_WITH",
+        "beneficio": "nitrógeno",
+        "razon": "La leguminosa fija nitrógeno, pero no reemplaza todo el abono."
+      }
+    ],
+    "antagonistas": [
+      {
+        "cultivo": "maiz",
+        "evitar": "hinojo",
+        "slug": "foeniculum_vulgare",
+        "tipo": "ANTAGONIST_OF",
+        "razon": "El catálogo marca hinojo como antagonista de maíz."
+      }
+    ],
+    "accion": "Úsala cuando no tengas ahuyama: conserva maíz como cultivo principal y pon la leguminosa en calle o borde manejable.",
+    "fuente": "DR-ASOCIACIONES-2026-06-18"
+  },
+  {
+    "id": "saf_cafe",
+    "nombre": "Café con guamo y plátano",
+    "icono": "☕",
+    "rol": ["campesino", "cafetero"],
+    "comparativa_id": "cafe-sombrio-guamo",
+    "cultivos": [
+      { "id": "cafe", "slug": "coffea_arabica", "nombre": "café", "estrato": "medio" },
+      { "id": "guamo", "slug": "inga_edulis", "nombre": "guamo", "estrato": "alto" },
+      { "id": "platano", "slug": "musa_paradisiaca", "nombre": "plátano", "estrato": "alto temporal" }
+    ],
+    "relaciones": [
+      {
+        "origen": "cafe",
+        "destino": "guamo",
+        "tipo": "COMPATIBLE_WITH",
+        "beneficio": "sombra manejada",
+        "razon": "El guamo regula radiación, aporta mantillo y suma nitrógeno al sistema."
+      },
+      {
+        "origen": "cafe",
+        "destino": "platano",
+        "tipo": "ASOCIA_CON",
+        "beneficio": "ingreso temprano",
+        "razon": "El plátano da sombra temporal mientras el sistema de café se establece."
+      }
+    ],
+    "antagonistas": [
+      {
+        "cultivo": "cafe",
+        "evitar": "hinojo",
+        "slug": "foeniculum_vulgare",
+        "tipo": "ANTAGONIST_OF",
+        "razon": "El catálogo marca hinojo como antagonista de café."
+      }
+    ],
+    "accion": "Mantén la sombra en rango manejado; si se cierra demasiado, poda antes de que baje aireación o suban enfermedades.",
+    "fuente": "DR-ASOCIACIONES-2026-06-18"
+  },
+  {
+    "id": "saf_cacao",
+    "nombre": "Cacao con plátano y árboles de servicio",
+    "icono": "🍫",
+    "rol": ["campesino", "cacaotero"],
+    "comparativa_id": "cacao-saf",
+    "cultivos": [
+      { "id": "cacao", "slug": "theobroma_cacao", "nombre": "cacao", "estrato": "medio" },
+      { "id": "platano", "slug": "musa_paradisiaca", "nombre": "plátano", "estrato": "alto temporal" },
+      { "id": "leguminosa", "slug": "gliricidia_sepium", "nombre": "leguminosa de sombra", "estrato": "alto" },
+      { "id": "maderable", "slug": "cordia_alliodora", "nombre": "maderable", "estrato": "emergente" }
+    ],
+    "relaciones": [
+      {
+        "origen": "cacao",
+        "destino": "platano",
+        "tipo": "ASOCIA_CON",
+        "beneficio": "protección inicial",
+        "razon": "El plátano protege el cacao joven y produce antes de que el cacao cierre ciclo."
+      },
+      {
+        "origen": "cacao",
+        "destino": "leguminosa",
+        "tipo": "COMPATIBLE_WITH",
+        "beneficio": "sombra y nitrógeno",
+        "razon": "La leguminosa de sombra aporta poda, mantillo y nitrógeno al sistema."
+      },
+      {
+        "origen": "cacao",
+        "destino": "maderable",
+        "tipo": "COMPATIBLE_WITH",
+        "beneficio": "estrato alto",
+        "razon": "El maderable agrega estrato alto y productividad total del sistema."
+      }
+    ],
+    "antagonistas": [],
+    "accion": "Diseña por estratos: cacao al medio, plátano temporal, leguminosa podable y maderables espaciados para no cerrar la sombra.",
+    "fuente": "DR-ASOCIACIONES-2026-06-18"
+  },
+  {
+    "id": "frutal_cobertura",
+    "nombre": "Frutal con maní forrajero",
+    "icono": "🍊",
+    "rol": ["campesino", "restaurador"],
+    "cultivos": [
+      { "id": "frutal", "slug": "frutal", "nombre": "frutal", "estrato": "alto" },
+      { "id": "mani_forrajero", "slug": "arachis_pintoi", "nombre": "maní forrajero", "estrato": "cobertura" }
+    ],
+    "relaciones": [
+      {
+        "origen": "frutal",
+        "destino": "mani_forrajero",
+        "tipo": "COMPATIBLE_WITH",
+        "beneficio": "cobertura viva",
+        "razon": "El maní forrajero cubre suelo bajo el frutal, conserva humedad y compite contra arvenses."
+      }
+    ],
+    "antagonistas": [],
+    "accion": "Úsalo como cobertura viva bajo frutales establecidos; controla que no cubra el cuello del árbol.",
+    "fuente": "DR-ASOCIACIONES-2026-06-18"
+  },
+  {
+    "id": "hortaliza_repelente",
+    "nombre": "Zanahoria con cebolla",
+    "icono": "🥕",
+    "rol": ["campesino", "urbano"],
+    "cultivos": [
+      { "id": "zanahoria", "slug": "daucus_carota_subsp_sativus", "nombre": "zanahoria", "estrato": "raíz" },
+      { "id": "cebolla", "slug": "allium_fistulosum", "nombre": "cebolla", "estrato": "borde" }
+    ],
+    "relaciones": [
+      {
+        "origen": "zanahoria",
+        "destino": "cebolla",
+        "tipo": "COMPATIBLE_WITH",
+        "beneficio": "confusión de olor",
+        "razon": "La mezcla de olores ayuda a confundir moscas específicas en huertas pequeñas."
+      }
+    ],
+    "antagonistas": [
+      {
+        "cultivo": "cebolla",
+        "evitar": "fríjol",
+        "slug": "phaseolus_vulgaris",
+        "tipo": "ANTAGONIST_OF",
+        "razon": "El catálogo marca cebolla larga y fríjol como antagonistas."
+      }
+    ],
+    "accion": "Intercala líneas cortas en huerta o cama; deja espacio para deshierbar sin arrancar raíces.",
+    "fuente": "DR-ASOCIACIONES-2026-06-18"
+  }
 ]
