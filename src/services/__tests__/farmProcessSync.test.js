@@ -65,9 +65,9 @@ describe('EVENT_TO_FARMOS_LOG — mapeo completo', () => {
     expect(EVENT_TO_FARMOS_LOG.photo_attached.endpoint).toBeNull();
   });
 
-  it('sowing_confirmed → log--observation', () => {
-    expect(EVENT_TO_FARMOS_LOG.sowing_confirmed.farmosLogType).toBe('log--observation');
-    expect(EVENT_TO_FARMOS_LOG.sowing_confirmed.endpoint).toBe('/api/log/observation');
+  it('sowing_confirmed → log--seeding para que llegue como siembra real a FarmOS', () => {
+    expect(EVENT_TO_FARMOS_LOG.sowing_confirmed.farmosLogType).toBe('log--seeding');
+    expect(EVENT_TO_FARMOS_LOG.sowing_confirmed.endpoint).toBe('/api/log/seeding');
   });
 
   it('harvest_confirmed → log--harvest', () => {
@@ -119,19 +119,35 @@ describe('buildFarmOSLogPayload — payload JSON:API', () => {
     expect(buildFarmOSLogPayload(evt)).toBeNull();
   });
 
-  it('sowing_confirmed produce payload con tipo log--observation', () => {
+  it('sowing_confirmed produce payload log--seeding con asset--plant inline para promoción', () => {
     const evt = makeEvent('proc-001', 'sowing_confirmed');
     const proc = makeProcess();
     const payload = buildFarmOSLogPayload(evt, proc, 'asset-plant-123');
 
     expect(payload).not.toBeNull();
-    expect(payload.data.type).toBe('log--observation');
+    expect(payload.data.type).toBe('log--seeding');
     expect(payload.data.attributes.name).toContain('Café');
     expect(payload.data.attributes.status).toBe('done');
     expect(payload.data.attributes.timestamp).toBeDefined();
     expect(payload.data.attributes.notes.value).toContain('Cultivo: Café');
     expect(payload.data.attributes.notes.value).toContain('idempotency_key: key-001');
-    expect(payload.data.relationships.asset.data[0].id).toBe('asset-plant-123');
+    expect(payload.data.relationships.asset.data[0]).toMatchObject({ type: 'asset--plant', id: 'asset-plant-123' });
+  });
+
+  it('sowing_confirmed sin assetId promueve el proceso a asset--plant inline', () => {
+    const evt = makeEvent('proc-001', 'sowing_confirmed');
+    const proc = makeProcess();
+    const payload = buildFarmOSLogPayload(evt, proc);
+
+    expect(payload.data.type).toBe('log--seeding');
+    expect(payload.data.relationships.asset.data[0]).toMatchObject({
+      type: 'asset--plant',
+      _speciesSlug: 'coffea_arabica',
+      attributes: {
+        name: 'Café',
+        status: 'active',
+      },
+    });
   });
 
   it('harvest_confirmed incluye quantity en el payload', () => {
@@ -201,9 +217,9 @@ describe('enqueueFarmProcessEvent — cola via syncManager', () => {
 
     expect(mockSaveTx).toHaveBeenCalledTimes(1);
     const call = mockSaveTx.mock.calls[0][0];
-    expect(call.type).toBe('sowing_confirmed');
-    expect(call.endpoint).toBe('/api/log/observation');
-    expect(call.payload.data.type).toBe('log--observation');
+    expect(call.type).toBe('seeding');
+    expect(call.endpoint).toBe('/api/log/seeding');
+    expect(call.payload.data.type).toBe('log--seeding');
     expect(call.payload.data.attributes.name).toContain('Café');
     expect(result).toEqual({ id: 42, timestamp: expect.any(Number) });
   });

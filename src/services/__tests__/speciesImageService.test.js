@@ -69,4 +69,26 @@ describe('speciesImageService', () => {
       source: 'Wikimedia Commons',
     });
   });
+
+  it('prefiere la imagen curada del catálogo si existe', () => {
+    const result = __TEST__.parseCatalogImage({
+      nombre_cientifico: 'Solanum lycopersicum',
+      imagen: {
+        url: 'https://catalogo.test/tomate.jpg',
+        thumbUrl: 'https://catalogo.test/tomate-thumb.jpg',
+        license: 'CC BY 4.0',
+        rightsHolder: 'Catálogo Chagra',
+        sourceUrl: 'https://catalogo.test/tomate',
+      },
+    });
+
+    expect(result).toEqual({
+      url: 'https://catalogo.test/tomate.jpg',
+      thumbUrl: 'https://catalogo.test/tomate-thumb.jpg',
+      license: 'CC BY 4.0',
+      rightsHolder: 'Catálogo Chagra',
+      source: 'Catálogo Chagra',
+      sourceUrl: 'https://catalogo.test/tomate',
+    });
+  });
 });

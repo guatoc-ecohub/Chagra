@@ -4,7 +4,7 @@
  */
 import React, { useEffect, useMemo, useState } from 'react';
 import { Bug, ImageOff, Leaf, Microscope } from 'lucide-react';
-import { getSpeciesImage } from '../services/speciesImageService';
+import { getSpeciesImage, parseCatalogImage } from '../services/speciesImageService';
 
 function classifySpecies({ category, commonName, scientificName }) {
   const text = `${category || ''} ${commonName || ''} ${scientificName || ''}`.toLowerCase();
@@ -25,6 +25,7 @@ export default function SpeciesImage({
   scientificName,
   commonName,
   category,
+  catalogImage,
   className = '',
   compact = false,
 }) {
@@ -39,6 +40,12 @@ export default function SpeciesImage({
     const name = String(scientificName || '').trim();
     if (!name) {
       setState({ status: 'empty', image: null });
+      return undefined;
+    }
+
+    const curated = parseCatalogImage({ imagen: catalogImage });
+    if (curated) {
+      setState({ status: 'ready', image: curated });
       return undefined;
     }
 
@@ -57,7 +64,7 @@ export default function SpeciesImage({
     return () => {
       cancelled = true;
     };
-  }, [scientificName]);
+  }, [scientificName, catalogImage]);
 
   const label = kind === 'patogeno'
     ? 'Imagen de referencia del organismo. Puede no mostrar el síntoma en la planta.'

@@ -17,6 +17,13 @@ vi.mock('../../db/catalogDB', () => {
   const speciesFixtures = [
     {
       id: 'solanum_lycopersicum',
+      nombre_cientifico: 'Solanum lycopersicum',
+      imagen: {
+        url: 'https://catalogo.test/tomate.jpg',
+        thumbUrl: 'https://catalogo.test/tomate-thumb.jpg',
+        license: 'CC BY 4.0',
+        rightsHolder: 'Catálogo Chagra',
+      },
       feeding_plan_template: {
         primary_steps: [{ offset_days: 7, biofertilizer_slug: 'biol_basico', dose_ml: 50 }],
       },
@@ -70,6 +77,7 @@ vi.mock('../SplitFlow', () => ({ SplitFlow: () => null }));
 // photoService listUserPhotosBySpecies → resolve [].
 vi.mock('../../services/photoService', () => ({
   listUserPhotosBySpecies: vi.fn().mockResolvedValue([]),
+  getPhotoUrl: vi.fn().mockResolvedValue({ url: null, source: 'missing', loading: false }),
   captureAndCompress: vi.fn(),
   savePhoto: vi.fn(),
 }));
@@ -128,6 +136,23 @@ describe('AssetDetailView — PlanSection wiring (audit 070.7)', () => {
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /Generar Plan/i })).toBeTruthy();
     });
+  });
+
+  it('muestra la foto curada del catálogo en la ficha cuando no hay foto local del asset', async () => {
+    mockState.selectedAssetId = 'plant-tomate';
+    mockState.plants = [{
+      id: 'plant-tomate',
+      asset_type: 'plant',
+      attributes: {
+        name: 'Tomate Cherry #1',
+        _speciesSlug: 'solanum_lycopersicum',
+      },
+    }];
+
+    render(<AssetDetailView />);
+
+    const img = await screen.findByRole('img', { name: /Solanum lycopersicum/i });
+    expect(img).toHaveAttribute('src', 'https://catalogo.test/tomate-thumb.jpg');
   });
 
   it('muestra placeholder + botón "Solicitar" cuando la species no tiene template', async () => {

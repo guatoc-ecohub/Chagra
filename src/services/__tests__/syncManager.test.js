@@ -164,6 +164,31 @@ describe('syncManager — plan generation hook (audit finding #2)', () => {
     });
 
     describe('syncAll → tryGeneratePlanFromSeeding (path offline)', () => {
+        it('resuelve asset--plant inline antes de enviar log--seeding para no mandar inlines crudos a FarmOS', async () => {
+            const tx = makeSeedingTransaction({ includeSpeciesSlug: true });
+            delete tx.payload.data.relationships.asset.data[0].id;
+            patchSyncManager(syncManager, [tx]);
+            sendToFarmOS
+                .mockResolvedValueOnce({ data: { id: PLANT_UUID, type: 'asset--plant' } })
+                .mockResolvedValueOnce(makeFarmOSResponse({ remoteAssetUUID: PLANT_UUID }));
+
+            await syncManager.syncAll();
+
+            expect(sendToFarmOS).toHaveBeenNthCalledWith(1, '/api/asset/plant', {
+                data: {
+                    type: 'asset--plant',
+                    attributes: { name: 'Tomate Cherry [voz]', status: 'active' },
+                },
+            }, 'POST');
+            expect(sendToFarmOS).toHaveBeenNthCalledWith(2, '/api/log/seeding', expect.objectContaining({
+                data: expect.objectContaining({
+                    relationships: {
+                        asset: { data: [{ type: 'asset--plant', id: PLANT_UUID }] },
+                    },
+                }),
+            }), 'POST');
+        });
+
         it('llama tryGeneratePlanFromSeeding tras sync exitoso de seeding con _speciesSlug', async () => {
             const tx = makeSeedingTransaction({ includeSpeciesSlug: true });
             const farmosResult = makeFarmOSResponse({ remoteAssetUUID: PLANT_UUID });

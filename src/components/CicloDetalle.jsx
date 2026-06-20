@@ -7,9 +7,10 @@ import CicloFotos from './CicloFotos';
 import { getTasksForCycle, getUrgentTasks } from '../services/cycleTaskService';
 import { getPestRisksByStage, getBiopreparadosForStage, getEnsemblePreventiveTasks } from '../services/climateCycleService';
 import { confirmStage } from '../services/stageConfirmationService';
-import { deriveCurrentStage } from '../services/phenologyCalculator';
+import { deriveCurrentStage, normalizePhenologyTemplate } from '../services/phenologyCalculator';
 import { completeTaskByVoice } from '../services/voiceTaskService';
 import { getEnsoServicePhase, getEnsoLabel } from '../services/ensoService';
+import { getSpeciesByIdSync } from '../db/catalogDB';
 
 /**
  * CicloDetalle — detalle de un ciclo (FarmProcess) con el enriquecimiento del
@@ -33,6 +34,13 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
   const [pickStage, setPickStage] = useState(false);
   const [busy, setBusy] = useState(false);
   const [doneTasks, setDoneTasks] = useState({});
+  const catalogPhenologyTemplate = useMemo(() => {
+    const species = getSpeciesByIdSync(a.subject_slug);
+    return normalizePhenologyTemplate(
+      species?.phenology_template || species?.phenology || species?.fenologia || species?.phenology_stages,
+      a.subject_slug,
+    );
+  }, [a.subject_slug]);
 
   // Etapa MOSTRADA: si el campesino confirmó/corrigió la etapa a mano
   // (last_stage_change_reason presente) respetamos lo que él dijo. Si no,
@@ -45,9 +53,10 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
       speciesSlug: a.subject_slug,
       sowingDate: a.created_at,
       altitudeM,
+      template: catalogPhenologyTemplate,
       fallback: a.current_stage || 'sowing_confirmed',
     });
-  }, [a.last_stage_change_reason, a.current_stage, a.subject_slug, a.created_at, altitudeM]);
+  }, [a.last_stage_change_reason, a.current_stage, a.subject_slug, a.created_at, altitudeM, catalogPhenologyTemplate]);
 
   // Cycle con la etapa mostrada inyectada, para que las labores (getTasksForCycle)
   // correspondan a la etapa derivada, no a la congelada.
@@ -120,7 +129,12 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
 
       <section>
         <h2 className="text-2xs uppercase font-bold text-slate-500 mb-2">Línea de tiempo</h2>
-        <PhenologyTimeline speciesSlug={a.subject_slug} sowingDate={a.created_at} altitudeM={altitudeM} />
+        <PhenologyTimeline
+          speciesSlug={a.subject_slug}
+          sowingDate={a.created_at}
+          altitudeM={altitudeM}
+          phenologyTemplate={catalogPhenologyTemplate}
+        />
       </section>
 
       <CicloFotos processId={processId} />

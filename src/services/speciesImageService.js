@@ -51,6 +51,22 @@ function firstMediaImage(result) {
   return media.find((item) => item?.identifier && (!item.type || /stillimage|image/i.test(item.type)));
 }
 
+export function parseCatalogImage(species) {
+  const image = species?.imagen || species?.image || species?.media?.image || species?.media;
+  if (!image) return null;
+  const url = typeof image === 'string' ? image : (image.url || image.href || image.src);
+  if (!url) return null;
+  const license = typeof image === 'object' ? (image.license || image.licencia || 'Catálogo Chagra') : 'Catálogo Chagra';
+  return {
+    url,
+    thumbUrl: typeof image === 'object' ? (image.thumbUrl || image.thumbnail || image.thumb || url) : url,
+    license,
+    rightsHolder: typeof image === 'object' ? (image.rightsHolder || image.autor || image.credit || 'Catálogo Chagra') : 'Catálogo Chagra',
+    source: typeof image === 'object' ? (image.source || image.fuente || 'Catálogo Chagra') : 'Catálogo Chagra',
+    sourceUrl: typeof image === 'object' ? (image.sourceUrl || image.url_fuente || url) : url,
+  };
+}
+
 export function parseGbifImage(occurrence) {
   const media = firstMediaImage(occurrence);
   if (!media) return null;
@@ -245,6 +261,7 @@ export async function getSpeciesImage(nombreCientifico) {
 export const __TEST__ = {
   cacheKeyFor,
   normalizeName,
+  parseCatalogImage,
   parseGbifImage,
   parseGbifOccurrenceSearch,
   parseWikimediaImage,
