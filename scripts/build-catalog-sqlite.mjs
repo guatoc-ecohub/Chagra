@@ -83,6 +83,15 @@ db.exec(`
     año INTEGER,
     data TEXT NOT NULL
   );
+
+  CREATE TABLE fermentos (
+    id TEXT PRIMARY KEY,
+    nombre TEXT NOT NULL,
+    tipo TEXT NOT NULL,
+    categoria TEXT NOT NULL,
+    data TEXT NOT NULL
+  );
+  CREATE INDEX idx_fermentos_tipo ON fermentos(tipo);
 `);
 
 // Bug 069.1 fix 2026-05-18: v3.1 tiene biopreparados[] + sources[] INLINE en
@@ -93,6 +102,11 @@ const seedJson = JSON.parse(fs.readFileSync(path.join(CATALOG_DIR, SEED_FILE), '
 const speciesData = seedJson.species || [];
 const biopreparadosData = seedJson.biopreparados || [];
 const sourcesData = seedJson.sources || [];
+
+// Cargar fermentos desde archivo separado
+const fermentosSeedPath = path.join(CATALOG_DIR, 'fermentos-seed.json');
+const fermentosJson = JSON.parse(fs.readFileSync(fermentosSeedPath, 'utf8'));
+const fermentosData = fermentosJson.fermentos || [];
 
 db.transaction(() => {
   const insertSpecies = db.prepare(`
@@ -139,6 +153,17 @@ db.transaction(() => {
     insertBio.run({ id: bp.id, nombre: bp.nombre || bp.metadata?.name || bp.id, data: JSON.stringify(bp) });
   }
 
+  const insertFermento = db.prepare(`INSERT INTO fermentos (id, nombre, tipo, categoria, data) VALUES (@id, @nombre, @tipo, @categoria, @data)`);
+  for (const f of fermentosData) {
+    insertFermento.run({
+      id: f.id,
+      nombre: f.nombre || f.id,
+      tipo: f.tipo || 'alimentario',
+      categoria: f.categoria || 'fermentado',
+      data: JSON.stringify(f)
+    });
+  }
+
   const insertSource = db.prepare(`INSERT INTO sources (id, tipo, titulo, autores, año, data) VALUES (@id, @tipo, @titulo, @autores, @año, @data)`);
   for (const src of sourcesData) {
     insertSource.run({
@@ -155,16 +180,18 @@ db.transaction(() => {
 const countSpecies = db.prepare("SELECT COUNT(*) as c FROM species").get().c;
 const countBio = db.prepare("SELECT COUNT(*) as c FROM biopreparados").get().c;
 const countSources = db.prepare("SELECT COUNT(*) as c FROM sources").get().c;
+const countFermentos = db.prepare("SELECT COUNT(*) as c FROM fermentos").get().c;
 
 console.log(`[Build Catalog] Complete.`);
 console.log(`- ${countSpecies} species inserted.`);
 console.log(`- ${countBio} biopreparados inserted.`);
 console.log(`- ${countSources} sources inserted.`);
+console.log(`- ${countFermentos} fermentos inserted.`);
 
 db.close();
 
-if (countSpecies !== speciesData.length || countBio !== biopreparadosData.length || countSources !== sourcesData.length) {
-  console.error(`[Build Catalog] Mismatch in expected counts! Failed. Species: ${countSpecies}!=${speciesData.length}`);
+if (countSpecies !== speciesData.length || countBio !== biopreparadosData.length || countSources !== sourcesData.length || countFermentos !== fermentosData.length) {
+  console.error(`[Build Catalog] Mismatch in expected counts! Failed. Species: ${countSpecies}!=${speciesData.length}, Fermentos: ${countFermentos}!=${fermentosData.length}`);
   process.exit(1);
 }
 
