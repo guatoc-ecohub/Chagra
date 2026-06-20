@@ -748,26 +748,12 @@ export default function AgentHero({ onNavigate }) {
                     /* CRÍTICO: transparente para dejar ver el fondo biopunk */
                     background: transparent;
                 }
-                /* Estado idle (sin conversacion activa): el hero NO ocupa toda
-                   la pantalla — el operador y los pilotos pueden ver los modulos
-                   del home sin hacer scroll infinito. Bug reportado 3 veces. */
+                /* Estado idle (sin conversacion activa): el hero ocupa el primer
+                   screenful completo, como los demos. Los modulos del home
+                   siguen accesibles por scroll debajo del hero. */
                 .agentport-immersive.agentport-idle {
-                    /* AGENTE MUERTO (overlay) — fix: el hero es un flex-item de
-                       una columna flex de alto fijo (h-full). Con overflow:hidden,
-                       la regla de flexbox vuelve el min-height AUTOMÁTICO = 0, así
-                       que flexbox lo ENCOGÍA a ~8px (solo el padding) para meter
-                       los módulos del home; el compositor/chips/Ⓐ quedaban
-                       DEBAJO del recorte → tap real aterrizaba en lo de abajo
-                       (onboarding/tiles), no en el agente. Fijamos un piso de alto
-                       igual al contenido y vetamos el encogimiento: el hero toma
-                       su alto natural (< 100dvh), los controles quedan alcanzables
-                       y los módulos siguen accesibles bajando (sin scroll infinito,
-                       intención de #1624). Bug 2026-06-20: La mano expandida se
-                       solapaba con el compositor tras compactar espacio en #1708.
-                       Restaurar espacio suficiente para que la mano NO tape el input. */
-                    min-height: min-content;
+                    min-height: 100dvh;
                     flex-shrink: 0;
-                    padding-bottom: 120px;
                 }
                 /* El indicador de "hay más contenido abajo" es ÚNICO: el botón
                    funcional "Mis módulos" (con su flecha animada) al final del
@@ -855,13 +841,12 @@ export default function AgentHero({ onNavigate }) {
                 }
 
                 /* — MONTAÑAS 3 capas (nature) — paths exactos del demo. La
-                   banda de silueta se ancla en el tercio inferior de la
-                   zona-respiro (bottom ~30%) para que las cumbres asomen sobre
-                   el saludo, como el horizonte del demo, en vez de quedar
-                   enterradas al fondo de la pantalla detrás del compositor. */
+                   banda de silueta se ancla baja en la pantalla para que las
+                   cumbres asomen detras de chips/compositor, como el demo, sin
+                   cruzar el saludo. */
                 .agentport-mtn {
                     position: absolute;
-                    left: 0; right: 0; bottom: 30%;
+                    left: 0; right: 0; bottom: 18%;
                     height: 230px;
                     display: none;
                 }
@@ -1250,19 +1235,43 @@ export default function AgentHero({ onNavigate }) {
                     50% { box-shadow: 0 0 0 4px rgb(244 63 94 / 0.18); }
                 }
 
-                /* ===================== ZONA-RESPIRO ===================== */
-                /* Espacio "respiro" donde vive la escena (sol/montañas/grafo/
-                   colibrí). Sin avatar 3D: el protagonista es el colibrí 2D. */
-                .agentport-stage {
+                /* ===================== CUERPO DEL HERO ===================== */
+                /* Patrón del demo: un area flexible ocupa el espacio entre el
+                   header y el compositor. El contenido se justifica al fondo y
+                   el compositor queda como ultimo hijo visible del hero. */
+                .agentport-hero-body {
                     position: relative;
-                    /* z-index 2 > compositor (1): los trazos de la red que
-                       DESBORDAN el lienzo hacia abajo pintan sobre el borde del
-                       compositor y se sueldan al botón Ⓐ — continuidad raíz↔red
-                       sin corte (operador 2026-06-10). El SVG es pointer-events
-                       none y la caja del stage no tapa el compositor. */
-                    z-index: 2;
+                    z-index: 1;
                     flex: 1 1 auto;
-                    min-height: 180px;
+                    min-height: 0;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-end;
+                    overflow: hidden;
+                }
+
+                /* ===================== ZONA-RESPIRO ===================== */
+                /* Espacio "respiro" donde vive la mano/red al abrir Ⓐ. El stage
+                   no participa en el alto: queda contenido dentro del cuerpo
+                   flexible para no empujar ni romper el composer. */
+                .agentport-stage {
+                    position: absolute;
+                    inset: 0;
+                    z-index: 2;
+                    min-height: 0;
+                    overflow: hidden;
+                    pointer-events: none;
+                }
+                .agentport-stage.is-open { pointer-events: auto; }
+
+                .agentport-content {
+                    position: relative;
+                    z-index: 3;
+                    flex: 1 1 auto;
+                    min-height: 0;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-end;
                 }
 
                 /* ===================== SALUDO ===================== */
@@ -1311,7 +1320,12 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-chip-e { font-size: 1.05rem; line-height: 1; }
 
                 /* ===================== COMPOSITOR ===================== */
-                .agentport-composer { position: relative; z-index: 1; flex: none; }
+                .agentport-composer {
+                    position: relative;
+                    z-index: 4;
+                    flex: none;
+                    margin-bottom: 24px;
+                }
                 .agentport-bar {
                     display: flex; align-items: center; gap: 8px;
                     background: rgb(var(--c-surface-raised)); border: 1px solid rgb(var(--c-surface-border));
@@ -1420,6 +1434,30 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-hint { text-align: center; font-size: 0.72rem; margin-top: 9px; color: rgb(var(--c-slate-500)); }
                 /* el Ⓐ del hint usa el matiz profundo (.hintbar b del demo) */
                 .agentport-hint b { color: rgb(var(--t-accent-deep-rgb, var(--t-accent-rgb))); font-weight: 700; }
+
+                .agentport-scrollcue {
+                    position: absolute;
+                    left: 16px;
+                    right: 16px;
+                    bottom: calc(4px + env(safe-area-inset-bottom));
+                    z-index: 5;
+                    height: 28px;
+                    padding: 0;
+                    border: 0;
+                    background: transparent;
+                    color: rgb(var(--c-slate-400));
+                    font: inherit;
+                    font-size: .72rem;
+                    font-weight: 650;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: color .2s ease;
+                }
+                .agentport-scrollcue:hover { color: rgb(var(--c-slate-200)); }
+                .agentport-scrollcue span { line-height: 1; }
+                .agentport-scrollcue svg { display: block; margin-top: -1px; }
 
                 /* ============== MENÚ Ⓐ INTEGRADO (la red en el hero) ==============
                    Nada de bottom-sheet/scrim/modal (operador 2026-06-09: "que se
@@ -1757,92 +1795,99 @@ export default function AgentHero({ onNavigate }) {
                 </section>
             )}
 
-            {/* ============ ZONA-RESPIRO (escena detrás · red Ⓐ al abrir) ============
-                Con el menú abierto, la red de capacidades BROTA aquí mismo —
-                integrada al lienzo del hero, sin sheet ni scrim. */}
-            <div className="agentport-stage" aria-hidden={menuOpen ? undefined : 'true'}>
-                {menuOpen && (
-                    <div
-                        className={['agentport-redpanel', menuClosing ? 'is-closing' : ''].join(' ')}
-                        role="group"
-                        aria-label="Capacidades de Chagra"
-                    >
-                        <div className="agentport-red-h">
-                            <span className="t">La mano de Chagra</span>
-                            <span className="s">
-                                {expertoActive
-                                    ? 'Cada rama, una capacidad conectada. Las opacas están por llegar.'
-                                    : 'Mi mano en tu campo: cada rama es una ayuda. Las opacas llegan pronto.'}
+            <div className="agentport-hero-body">
+                {/* ============ ZONA-RESPIRO (escena detrás · red Ⓐ al abrir) ============
+                    Con el menú abierto, la red de capacidades BROTA aquí mismo —
+                    integrada al lienzo del hero, sin sheet ni scrim. */}
+                <div
+                    className={['agentport-stage', menuOpen && !menuClosing ? 'is-open' : ''].join(' ')}
+                    aria-hidden={menuOpen ? undefined : 'true'}
+                >
+                    {menuOpen && (
+                        <div
+                            className={['agentport-redpanel', menuClosing ? 'is-closing' : ''].join(' ')}
+                            role="group"
+                            aria-label="Capacidades de Chagra"
+                        >
+                            <div className="agentport-red-h">
+                                <span className="t">La mano de Chagra</span>
+                                <span className="s">
+                                    {expertoActive
+                                        ? 'Cada rama, una capacidad conectada. Las opacas están por llegar.'
+                                        : 'Mi mano en tu campo: cada rama es una ayuda. Las opacas llegan pronto.'}
+                                </span>
+                            </div>
+                            <div className="agentport-red-body">
+                                <AgentRedMenu onPick={pickCapability} disabled={busy} anchorRef={aButtonRef} />
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <div className="agentport-content">
+                    {/* ======= SALUDO + ALERTA + CHIPS (se pliegan al abrir el menú Ⓐ) ======= */}
+                    <div className={['agentport-foldaway', menuOpen && !menuClosing ? 'is-folded' : ''].join(' ')}>
+                    <div className="agentport-foldaway-in">
+                    {/* ===================== SALUDO ===================== */}
+                    <div className="agentport-greet">
+                        <h2 className="agentport-hi">
+                            {greetingForNow(nivel)}<br />Soy <span className="chagra-wordmark">Chagra</span>.
+                        </h2>
+                        {/* Sugerencia contextual ROTATIVA bajo "Soy Chagra": si el usuario
+                            tiene cultivos registrados, mostramos un consejo agronómico
+                            determinístico (cultivo × mes × piso térmico) que rota cada 5s.
+                            Si no tiene cultivos, cae al subtítulo genérico de siempre. */}
+                        {cropSuggestions.length > 0 ? (
+                            <p
+                                className="agentport-sub"
+                                key={suggestionIdx}
+                                aria-live="polite"
+                                data-testid="agentport-suggestion"
+                            >
+                                {cropSuggestions[suggestionIdx % cropSuggestions.length]}
+                            </p>
+                        ) : (
+                            <p className="agentport-sub">
+                                {expertoActive ? SUB_EXPERTO : SUB_CAMPESINO}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* CHIP DE ALERTA real (clima/helada). Solo si el estilo de
+                        notificación es 'demo' (default) y hay una alerta activa. En
+                        'actual' la campanita del TopBar la cubre. */}
+                    {showAlertChip && (
+                        <div
+                            className={['agentport-alert', topAlert.severity === 'danger' ? 'is-danger' : ''].join(' ')}
+                            role="status"
+                            data-testid="agentport-alert"
+                        >
+                            <span className="ico" aria-hidden="true">⚠️</span>
+                            <span className="txt">
+                                <span className="at">{topAlert.title}</span>
+                                {topAlert.message && <span className="am">{topAlert.message}</span>}
                             </span>
                         </div>
-                        <div className="agentport-red-body">
-                            <AgentRedMenu onPick={pickCapability} disabled={busy} anchorRef={aButtonRef} />
-                        </div>
+                    )}
+
+                    {/* ===================== CHIPS ===================== */}
+                    <div className="agentport-chiprow">
+                        {QUICK_CHIPS.map((chip) => (
+                            <button
+                                key={chip.label}
+                                type="button"
+                                onClick={() => handleChipSend(chip.prompt)}
+                                disabled={busy}
+                                className="agentport-chip"
+                            >
+                                <span aria-hidden="true" className="agentport-chip-e">{chip.icon}</span>
+                                {chip.label}
+                            </button>
+                        ))}
                     </div>
-                )}
-            </div>
-
-            {/* ======= SALUDO + ALERTA + CHIPS (se pliegan al abrir el menú Ⓐ) ======= */}
-            <div className={['agentport-foldaway', menuOpen && !menuClosing ? 'is-folded' : ''].join(' ')}>
-            <div className="agentport-foldaway-in">
-            {/* ===================== SALUDO ===================== */}
-            <div className="agentport-greet">
-                <h2 className="agentport-hi">
-                    {greetingForNow(nivel)}<br />Soy <span className="chagra-wordmark">Chagra</span>.
-                </h2>
-                {/* Sugerencia contextual ROTATIVA bajo "Soy Chagra": si el usuario
-                    tiene cultivos registrados, mostramos un consejo agronómico
-                    determinístico (cultivo × mes × piso térmico) que rota cada 5s.
-                    Si no tiene cultivos, cae al subtítulo genérico de siempre. */}
-                {cropSuggestions.length > 0 ? (
-                    <p
-                        className="agentport-sub"
-                        key={suggestionIdx}
-                        aria-live="polite"
-                        data-testid="agentport-suggestion"
-                    >
-                        {cropSuggestions[suggestionIdx % cropSuggestions.length]}
-                    </p>
-                ) : (
-                    <p className="agentport-sub">
-                        {expertoActive ? SUB_EXPERTO : SUB_CAMPESINO}
-                    </p>
-                )}
-            </div>
-
-            {/* CHIP DE ALERTA real (clima/helada). Solo si el estilo de
-                notificación es 'demo' (default) y hay una alerta activa. En
-                'actual' la campanita del TopBar la cubre. */}
-            {showAlertChip && (
-                <div
-                    className={['agentport-alert', topAlert.severity === 'danger' ? 'is-danger' : ''].join(' ')}
-                    role="status"
-                    data-testid="agentport-alert"
-                >
-                    <span className="ico" aria-hidden="true">⚠️</span>
-                    <span className="txt">
-                        <span className="at">{topAlert.title}</span>
-                        {topAlert.message && <span className="am">{topAlert.message}</span>}
-                    </span>
+                    </div>
+                    </div>
                 </div>
-            )}
-
-            {/* ===================== CHIPS ===================== */}
-            <div className="agentport-chiprow">
-                {QUICK_CHIPS.map((chip) => (
-                    <button
-                        key={chip.label}
-                        type="button"
-                        onClick={() => handleChipSend(chip.prompt)}
-                        disabled={busy}
-                        className="agentport-chip"
-                    >
-                        <span aria-hidden="true" className="agentport-chip-e">{chip.icon}</span>
-                        {chip.label}
-                    </button>
-                ))}
-            </div>
-            </div>
             </div>
 
             {/* ===================== COMPOSITOR MULTIMODAL ===================== */}
@@ -2039,7 +2084,7 @@ export default function AgentHero({ onNavigate }) {
                         const target = document.querySelector('[data-testid="seguimiento-cards"]');
                         if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }}
-                    className="w-full text-center py-3 text-[rgb(var(--c-slate-400))] text-xs font-medium hover:text-[rgb(var(--c-slate-200))] transition-colors"
+                    className="agentport-scrollcue"
                     aria-label="Ver modulos del home"
                 >
                     <div className="flex flex-col items-center gap-1">
