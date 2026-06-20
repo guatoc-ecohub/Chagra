@@ -331,20 +331,30 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
           </div>
         ) : (
           <div
-            className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center bg-slate-900 border overflow-hidden ${
+            className={`shrink-0 rounded-full flex items-center justify-center bg-slate-900 border overflow-hidden ${
               isStreaming ? 'border-amber-400/60 shadow-[0_0_10px_rgba(245,158,11,.4)]' : 'border-emerald-700/40'
             }`}
+            style={{ width: '24px', height: '24px' }}
           >
-            <ChagraAgentAvatar state={agentState} size={32} ariaLabel="Chagra IA" />
+            <ChagraAgentAvatar state={agentState} size={20} ariaLabel="Chagra IA" />
           </div>
         )}
 
         <div
           className={`rounded-2xl px-4 py-2.5 ${
             isUser
-              ? 'bg-emerald-700/60 text-white rounded-tr-sm'
-              : 'bg-slate-800/80 text-slate-100 rounded-tl-sm cursor-pointer'
+              ? 'bg-emerald-700/60 text-white rounded-tr-sm rounded-bl-[6px]'
+              : 'bg-slate-800/80 text-slate-100 rounded-tl-sm rounded-br-[6px] cursor-pointer'
           }`}
+          style={{
+            borderRadius: isUser ? '18px 18px 6px 18px' : '18px 18px 18px 6px',
+            padding: isUser ? '11px 15px' : '13px 15px',
+            fontSize: '0.95rem',
+            lineHeight: isUser ? '1.4' : '1.5',
+            boxShadow: isUser
+              ? '0 5px 14px -7px rgba(25, 201, 154, 0.7)'
+              : 'var(--sombra, 0 10px 30px -12px rgba(0,0,0,0.5))'
+          }}
           onDoubleClick={handleBubbleDoubleClick}
           title={!isUser && !isStreaming ? 'Doble click reproduce o silencia esta respuesta' : undefined}
         >
@@ -379,11 +389,11 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
               una respuesta "fantasma". Para el usuario sí mostramos su texto
               tal cual (puede ser vacío sólo si tipeó vacío, que el submit ya
               previene). Cero hype, español colombiano. */}
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">
+          <div className="whitespace-pre-wrap" style={{ fontSize: '0.95rem', lineHeight: '1.5' }}>
             {!isUser && (typeof message.content !== 'string' || message.content.trim().length === 0)
               ? <span className="italic text-slate-400">No recibí respuesta del asistente. Intenta de nuevo.</span>
               : message.content}
-          </p>
+          </div>
           {/* UX-1 (#284): badge "beta" permanente cerca de cualquier respuesta
               IA del agente. NO reemplaza a SourceBadge (que es la fuente
               grounded vs generativa) — convive. Suprimido para mensajes de

@@ -51,45 +51,71 @@ export const AGENT_ENTRANCE_CSS = `
 /**
  * CSS del compositor multimodal del AgentScreen. Idéntico a los tokens de
  * AgentHero para garantizar paridad visual completa (2026-06-08).
+ *
+ * ACTUALIZACIÓN 2026-06-20: Portado exacto de las demos (demo-agente.html,
+ * demo-agente-minimalista.html, demo-agente-biopunk.html):
+ *   - Compositor: colores theme-aware por CSS var (superf/linea de cada tema)
+ *   - Botón Ⓐ (tool): notificación pulseRing theme-aware
+ *   - Botón enviar: gradiente del tema (teal biopunk / ocre nature / verde minimalista)
+ *   - Mic: breathing animation con acento del tema
+ *   - Burbujas: estilos exactos de las demos (user/bot border-radius diferente)
  */
 export const AGENT_COMPOSITOR_CSS = `
   .as-bar {
     display: flex; align-items: center; gap: 8px;
-    background: rgba(30,41,59,0.85); border: 1px solid rgba(100,116,139,0.4);
-    border-radius: 20px; padding: 7px 8px;
-    box-shadow: 0 10px 30px -12px rgba(0,0,0,0.5);
+    background: rgb(var(--c-surface-raised) / 0.85);
+    border: 1px solid rgb(var(--c-surface-border) / 0.6);
+    border-radius: 26px; padding: 7px 8px;
+    box-shadow: var(--sombra, 0 10px 30px -12px rgba(0,0,0,0.5));
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
     position: relative; overflow: hidden;
     flex-direction: column; align-items: stretch;
   }
   .as-bar.is-recording { border-color: rgba(244,63,94,0.6); }
   .as-bar:focus-within {
-    border-color: rgba(16,185,129,0.55);
-    box-shadow: 0 10px 30px -12px rgba(0,0,0,0.5), 0 0 0 3px rgba(16,185,129,0.12);
+    border-color: rgb(var(--t-accent-rgb, 25, 201, 154) / 0.55);
+    box-shadow: var(--sombra, 0 10px 30px -12px rgba(0,0,0,0.5)), 0 0 0 3px rgba(var(--t-accent-rgb, 25, 201, 154), 0.12);
   }
   .as-iconbtn {
-    width: 44px; height: 44px; flex: none; border-radius: 50%;
-    background: rgba(30,41,59,0.9); border: 1px solid rgba(100,116,139,0.4);
+    width: 46px; height: 46px; flex: none; border-radius: 50%;
+    background: rgb(var(--c-surface-card));
+    border: 1px solid rgb(var(--c-surface-border) / 0.6);
     display: flex; align-items: center; justify-content: center;
-    color: rgb(148,163,184); cursor: pointer; position: relative;
+    color: rgb(var(--c-slate-400)); cursor: pointer; position: relative;
     transition: transform 0.16s cubic-bezier(0.22,0.61,0.36,1),
                 background 0.25s ease, border-color 0.25s ease, color 0.2s ease;
   }
-  .as-iconbtn:hover { color: #fff; border-color: rgba(16,185,129,0.5); }
+  .as-iconbtn:hover { color: rgb(var(--c-slate-100)); border-color: rgb(var(--t-accent-rgb, 25, 201, 154) / 0.5); }
   .as-iconbtn:active { transform: scale(0.9); }
   .as-iconbtn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .as-tool { animation: as-pulse-ring 3.6s cubic-bezier(.22,.61,.36,1) infinite; }
+  /* Botón Ⓐ (tool): notificación pulsante theme-aware */
+  .as-tool {
+    box-shadow: 0 0 0 0 rgba(var(--t-accent-rgb, 25, 201, 154), 0.5);
+    animation: as-pulse-ring 3.6s cubic-bezier(.22,.61,.36,1) infinite;
+  }
   .as-tool.is-open {
-    background: rgb(16,185,129); border-color: rgb(16,185,129); animation: none;
+    background: rgb(var(--t-accent-rgb, 25, 201, 154));
+    border-color: rgb(var(--t-accent-rgb, 25, 201, 154));
+    animation: none;
+  }
+  .as-tool.is-open svg path,
+  .as-tool.is-open svg line,
+  .as-tool.is-open svg circle[stroke] {
+    stroke: #fff;
+  }
+  .as-tool.is-open svg circle[fill] {
+    fill: #fff !important;
   }
   @keyframes as-pulse-ring {
-    0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0.45); }
-    70%  { box-shadow: 0 0 0 12px rgba(16,185,129,0); }
-    100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    0%   { box-shadow: 0 0 0 0 rgba(var(--t-accent-rgb, 25, 201, 154), 0.45); }
+    70%  { box-shadow: 0 0 0 12px rgba(var(--t-accent-rgb, 25, 201, 154), 0); }
+    100% { box-shadow: 0 0 0 0 rgba(var(--t-accent-rgb, 25, 201, 154), 0); }
   }
   .as-mic-on {
-    background: rgb(244,63,94) !important; border-color: rgb(244,63,94) !important;
-    color: #fff !important; box-shadow: 0 4px 14px -4px rgba(244,63,94,0.5);
+    background: rgb(244,63,94) !important;
+    border-color: rgb(244,63,94) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 14px -4px rgba(244,63,94,0.5);
   }
   /* TIER 2 #5 (voz punta-a-punta): mic GRANDE — el camino principal para
      baja alfabetización es hablar. 54px + anillo de acento del TEMA
@@ -106,11 +132,16 @@ export const AGENT_COMPOSITOR_CSS = `
     50%      { box-shadow: 0 0 0 7px rgba(var(--t-accent-rgb, 25, 201, 154), 0); }
   }
   .as-send {
-    width: 46px; height: 46px; flex: none; border: none; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center; cursor: pointer;
-    overflow: hidden; padding: 0;
-    transition: opacity 0.25s ease, box-shadow 0.25s ease;
+    width: 42px; height: 42px; flex: none; border: none; border-radius: 50%;
+    background: rgb(var(--t-accent-rgb, 25, 201, 154));
+    color: #04231b;
+    font-size: 1.05rem;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: transform 0.16s cubic-bezier(0.22,0.61,0.36,1), box-shadow 0.25s ease;
+    box-shadow: 0 4px 12px -4px rgba(var(--t-accent-rgb, 25, 201, 154), 0.7);
   }
+  .as-send:active { transform: scale(0.86); }
   .as-send:disabled { opacity: 0.35; cursor: not-allowed; }
   @keyframes as-send-shimmer {
     0%   { transform: translateX(-130%); opacity: 0; }
