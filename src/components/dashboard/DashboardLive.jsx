@@ -34,6 +34,7 @@ import {
 } from '../../services/homeModuleSelector';
 import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciarAccess';
 import SelectedBackgroundReveal from './SelectedBackgroundReveal';
+import MiFincaVivaHomeCard from './MiFincaVivaHomeCard';
 import ClimaStrip from './ClimaStrip';
 import HoyEnFincaStrip from './HoyEnFincaStrip';
 import AIStatusFooter from './AIStatusFooter';
@@ -329,6 +330,18 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
                         </span>
                         <ChevronRight size={20} className="text-sky-300/70 shrink-0" />
                     </button>
+                </div>
+            )}
+
+            {/* MI FINCA VIVA — la finca REAL del usuario como escena 2D viva
+                (cultivos por etapa fenológica + animales + vitalidad). Solo se
+                muestra cuando ya hay algo sembrado, para no competir con el
+                OnboardingHero del primer uso (que ya invita a sembrar). La
+                tarjeta es autocontenida: lee sus datos de farmProcessCache
+                (offline-first) y abre el juego completo al tocarla. */}
+            {plantsCount > 0 && (
+                <div className="px-4 pt-3">
+                    <MiFincaVivaHomeCard onNavigate={onNavigate} />
                 </div>
             )}
 
