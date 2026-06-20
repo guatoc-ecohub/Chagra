@@ -2,7 +2,7 @@
 import { test, expect } from '@playwright/test';
 
 const RUN_NIGHTLY = process.env.RUN_NIGHTLY_CLICK_CRAWL === '1';
-const ORIGIN = 'http://localhost:5173';
+const ORIGIN = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173';
 
 const ROUTES = [
   '/',
