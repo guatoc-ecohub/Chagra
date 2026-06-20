@@ -262,4 +262,15 @@ describe('fincaGameService — robustez (no rompe con datos basura)', () => {
     expect(uniq(BADGES)).toBe(true);
     expect(uniq(MISSIONS)).toBe(true);
   });
+
+  it('NO usa voseo (Bug 2026-06-20: Descubrí → Descubre)', () => {
+    // Verificar que ninguna descripción de misión use voseo
+    MISSIONS.forEach((m) => {
+      expect(m.descripcion).not.toMatch(/(descubrí|encontré|regalé|mandé)/i);
+      expect(m.descripcion).not.toContain('és');
+    });
+    // Verificar específicamente la misión aprender_ficha
+    const aprenderFicha = MISSIONS.find((m) => m.id === 'aprender_ficha');
+    expect(aprenderFicha.descripcion).toBe('Descubre una planta nueva en la biblioteca de Chagra.');
+  });
 });

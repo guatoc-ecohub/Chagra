@@ -762,10 +762,12 @@ export default function AgentHero({ onNavigate }) {
                        igual al contenido y vetamos el encogimiento: el hero toma
                        su alto natural (< 100dvh), los controles quedan alcanzables
                        y los módulos siguen accesibles bajando (sin scroll infinito,
-                       intención de #1624). */
+                       intención de #1624). Bug 2026-06-20: La mano expandida se
+                       solapaba con el compositor tras compactar espacio en #1708.
+                       Restaurar espacio suficiente para que la mano NO tape el input. */
                     min-height: min-content;
                     flex-shrink: 0;
-                    padding-bottom: 4px;
+                    padding-bottom: 120px;
                 }
                 /* El indicador de "hay más contenido abajo" es ÚNICO: el botón
                    funcional "Mis módulos" (con su flecha animada) al final del
