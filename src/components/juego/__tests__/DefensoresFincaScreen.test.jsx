@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import DefensoresFincaScreen from '../DefensoresFincaScreen';
-import { PARES_CONTROL, NIVEL_1, NIVEL_2, PROGRESO_KEY } from '../defensoresFincaData';
+import { PARES_CONTROL, NIVEL_1, NIVEL_2, NIVEL_3, PROGRESO_KEY } from '../defensoresFincaData';
 
 // jsdom no implementa canvas 2D: getContext devuelve null. El componente
 // guarda contra ctx null, así que el render no crashea y podemos probar el HUD,
@@ -65,16 +65,41 @@ describe('DefensoresFincaScreen', () => {
     raf.mockRestore();
   });
 
-  it('muestra el selector con ambos niveles; el 2 arranca bloqueado', () => {
+  it('muestra el selector con los tres niveles; el 2 y el 3 arrancan bloqueados', () => {
     render(<DefensoresFincaScreen />);
     expect(screen.getByTestId('defensores-niveles')).toBeInTheDocument();
     const nivel1 = screen.getByTestId('nivel-1');
     const nivel2 = screen.getByTestId('nivel-2');
+    const nivel3 = screen.getByTestId('nivel-3');
     expect(nivel1).not.toBeDisabled();
     expect(nivel1).toHaveAttribute('data-selected', 'true');
-    // Sin progreso guardado, el nivel 2 está bloqueado.
+    // Sin progreso guardado, los niveles 2 y 3 están bloqueados.
     expect(nivel2).toBeDisabled();
     expect(nivel2.textContent).toContain('Gana el nivel anterior');
+    expect(nivel3).toBeDisabled();
+    expect(nivel3.textContent).toContain('Gana el nivel anterior');
+  });
+
+  it('con los niveles 1 y 2 superados, el 3 (cafetal) queda jugable con sus aliados del café', () => {
+    localStorage.setItem(PROGRESO_KEY, JSON.stringify({ superados: [1, 2] }));
+    render(<DefensoresFincaScreen />);
+
+    const nivel3 = screen.getByTestId('nivel-3');
+    expect(nivel3).not.toBeDisabled();
+    expect(nivel3.textContent).toContain(NIVEL_3.nombre);
+
+    // Al elegir el nivel 3 cambian subtítulo y aparecen los aliados del café.
+    fireEvent.click(nivel3);
+    expect(nivel3).toHaveAttribute('data-selected', 'true');
+    expect(screen.getByTestId('defensores-subtitulo').textContent).toContain(
+      NIVEL_3.subtitulo,
+    );
+    // El nivel 3 incluye aliados que NO están en el nivel 2 (plagas del café).
+    const extra = NIVEL_3.paresIds.find((id) => !NIVEL_2.paresIds.includes(id));
+    const parExtra = PARES_CONTROL.find((p) => p.id === extra);
+    expect(screen.getByTestId(`beneficio-${parExtra.benefico.id}`)).toBeInTheDocument();
+    // El mini-jefe del nivel 3 (la broca) está anunciado.
+    expect(screen.getByTestId('defensores-jefe')).toBeInTheDocument();
   });
 
   it('si el nivel 1 ya fue superado, el 2 queda desbloqueado y seleccionable', () => {

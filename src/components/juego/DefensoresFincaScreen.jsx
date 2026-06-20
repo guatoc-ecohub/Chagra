@@ -676,7 +676,7 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
 }
 
 /**
- * DefensoresFincaScreen — minijuego PLATAFORMERO 2D lateral con dos niveles.
+ * DefensoresFincaScreen — minijuego PLATAFORMERO 2D lateral con tres niveles.
  *
  * Un campesino NEUTRO (sin nombre propio) corre y salta por la finca: recoge
  * cultivos (puntos), esquiva plagas reales (pierde energía al tocarlas) e invoca
@@ -686,8 +686,12 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
  * Nivel 1 (la huerta, mediodía): corto y plano, 4 pares.
  * Nivel 2 (la ladera al atardecer): más largo (mundo con cámara), otra paleta,
  * 7 pares, plataformas a distinta altura, huecos que hacen daño y un mini-jefe
- * (langosta) que solo cae con su controlador real (la mantis). Se desbloquea al
- * completar el nivel 1; el progreso se guarda offline en localStorage.
+ * (langosta) que solo cae con su controlador real (la mantis).
+ * Nivel 3 (el cafetal en la niebla): el más largo, paleta de amanecer, 10 pares
+ * (incluye plagas del café: broca, minador y cochinilla con sus aliados reales),
+ * más plataformas y huecos, y un mini-jefe broca que solo cae con la avispa
+ * Cephalonomia. Cada nivel se desbloquea al completar el anterior; el progreso se
+ * guarda offline en localStorage.
  *
  * Mobile-first: controles táctiles grandes + teclado en desktop. Offline-safe:
  * canvas 2D puro, datos locales, cero red. Estética Chagra.
@@ -727,7 +731,7 @@ export default function DefensoresFincaScreen({ onBack, onHome }) {
           biológico!
         </p>
 
-        {/* Selector de nivel (1 / 2). El 2 se desbloquea al ganar el 1. */}
+        {/* Selector de nivel (1 / 2 / 3). Cada uno se desbloquea al ganar el anterior. */}
         <div
           className="df-niveles"
           role="group"

@@ -22,6 +22,7 @@ import {
   PARES_CONTROL,
   NIVEL_1,
   NIVEL_2,
+  NIVEL_3,
   NIVELES,
   getNivel,
   nivelDesbloqueado,
@@ -292,8 +293,8 @@ describe('mini-jefe — solo cae con su controlador real', () => {
 });
 
 describe('niveles — configuración y desbloqueo', () => {
-  it('hay dos niveles y el 2 es más largo y exigente que el 1', () => {
-    expect(NIVELES).toHaveLength(2);
+  it('hay tres niveles y el 2 es más largo y exigente que el 1', () => {
+    expect(NIVELES).toHaveLength(3);
     expect(NIVEL_2.numero).toBe(2);
     expect(NIVEL_2.mundoAncho).toBeGreaterThan(NIVEL_1.mundoAncho);
     expect(NIVEL_2.metaCultivos).toBeGreaterThan(NIVEL_1.metaCultivos);
@@ -303,9 +304,24 @@ describe('niveles — configuración y desbloqueo', () => {
     expect(NIVEL_2.jefe).toBeTruthy();
   });
 
-  it('el nivel 2 usa una paleta de fondo distinta a la del 1', () => {
+  it('el nivel 3 es el más largo y exigente (más mundo, cultivos, pares, jefe duro)', () => {
+    expect(NIVEL_3.numero).toBe(3);
+    expect(NIVEL_3.mundoAncho).toBeGreaterThan(NIVEL_2.mundoAncho);
+    expect(NIVEL_3.metaCultivos).toBeGreaterThan(NIVEL_2.metaCultivos);
+    expect(NIVEL_3.paresIds.length).toBeGreaterThan(NIVEL_2.paresIds.length);
+    expect(NIVEL_3.plataformas.length).toBeGreaterThan(NIVEL_2.plataformas.length);
+    expect(NIVEL_3.huecos.length).toBeGreaterThan(NIVEL_2.huecos.length);
+    expect(NIVEL_3.jefe).toBeTruthy();
+    // El jefe del cafetal aguanta más golpes que la langosta del nivel 2.
+    expect(NIVEL_3.jefe.vida).toBeGreaterThan(NIVEL_2.jefe.vida);
+  });
+
+  it('cada nivel usa una paleta de fondo distinta', () => {
     expect(NIVEL_2.escena.id).not.toBe(NIVEL_1.escena.id);
     expect(NIVEL_2.escena.cieloTop).not.toBe(NIVEL_1.escena.cieloTop);
+    expect(NIVEL_3.escena.id).not.toBe(NIVEL_2.escena.id);
+    expect(NIVEL_3.escena.id).not.toBe(NIVEL_1.escena.id);
+    expect(NIVEL_3.escena.cieloTop).not.toBe(NIVEL_2.escena.cieloTop);
   });
 
   it('todos los pares de cada nivel existen en el dataset curado', () => {
@@ -324,14 +340,26 @@ describe('niveles — configuración y desbloqueo', () => {
     expect(beneficoControlaPlaga(par.benefico.id, NIVEL_2.jefe.plagaId)).toBe(true);
   });
 
+  it('el mini-jefe del nivel 3 (broca) referencia una plaga real con controlador', () => {
+    const par = PARES_CONTROL.find((p) => p.plaga.id === NIVEL_3.jefe.plagaId);
+    expect(par).toBeTruthy();
+    expect(par.benefico.id).toBe('cephalonomia');
+    // La avispa Cephalonomia es el controlador real de la broca y derriba al jefe.
+    expect(beneficoControlaPlaga(par.benefico.id, NIVEL_3.jefe.plagaId)).toBe(true);
+  });
+
   it('getNivel devuelve el nivel pedido y cae al 1 si no existe', () => {
     expect(getNivel(2)).toBe(NIVEL_2);
+    expect(getNivel(3)).toBe(NIVEL_3);
     expect(getNivel(99)).toBe(NIVEL_1);
   });
 
-  it('nivelDesbloqueado: el 1 siempre; el 2 solo tras superar el 1', () => {
+  it('nivelDesbloqueado: cada nivel solo tras superar el anterior', () => {
     expect(nivelDesbloqueado(1, [])).toBe(true);
     expect(nivelDesbloqueado(2, [])).toBe(false);
     expect(nivelDesbloqueado(2, [1])).toBe(true);
+    // El nivel 3 exige haber superado el nivel 2.
+    expect(nivelDesbloqueado(3, [1])).toBe(false);
+    expect(nivelDesbloqueado(3, [1, 2])).toBe(true);
   });
 });
