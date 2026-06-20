@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Audit 070.7 smoke tests para el wiring de PlanEditor dentro de
@@ -17,6 +17,7 @@ vi.mock('../../db/catalogDB', () => {
   const speciesFixtures = [
     {
       id: 'solanum_lycopersicum',
+      nombre_comun: 'Tomate',
       nombre_cientifico: 'Solanum lycopersicum',
       imagen: {
         url: 'https://catalogo.test/tomate.jpg',
@@ -112,6 +113,8 @@ beforeEach(() => {
   mockState.equipment = [];
   mockState.materials = [];
   mockState.lands = [];
+  mockState.clearSelectedAsset = vi.fn();
+  mockState.updateAsset = vi.fn().mockResolvedValue(undefined);
 });
 
 describe('AssetDetailView — PlanSection wiring (audit 070.7)', () => {
@@ -173,6 +176,74 @@ describe('AssetDetailView — PlanSection wiring (audit 070.7)', () => {
     });
     expect(screen.getByText(/Sin plan disponible/i)).toBeTruthy();
     expect(screen.getByRole('button', { name: /Solicitar al equipo Chagra/i })).toBeTruthy();
+  });
+
+  // Bug 2026-06-20 (operador, fresa): asset viejo SIN _speciesSlug cuyo
+  // nombre es el común ("Tomate #1"). El slug derivado ("tomate") no es el
+  // id del catálogo ("solanum_lycopersicum"), pero matchSpeciesInCatalog lo
+  // resuelve por nombre común → el plan y la foto de referencia funcionan.
+  it('resuelve plan + fallback por nombre común cuando el asset no tiene _speciesSlug (bug fresa)', async () => {
+    mockState.selectedAssetId = 'plant-tomate-viejo';
+    mockState.plants = [{
+      id: 'plant-tomate-viejo',
+      asset_type: 'plant',
+      attributes: { name: 'Tomate #1' }, // sin _speciesSlug
+    }];
+
+    render(<AssetDetailView />);
+
+    // El plan SÍ monta (template del catálogo resuelto por nombre común).
+    await waitFor(() => {
+      expect(screen.getByTestId('plan-section-editor')).toBeTruthy();
+    });
+    // Y la foto curada del catálogo aparece (resuelta vía nombre común).
+    const img = await screen.findByRole('img', { name: /Solanum lycopersicum/i });
+    expect(img).toHaveAttribute('src', 'https://catalogo.test/tomate-thumb.jpg');
+  });
+
+  it('muestra un fallback de foto claro (no un hueco) cuando la especie no tiene imagen ni match', async () => {
+    mockState.selectedAssetId = 'plant-marciana';
+    mockState.plants = [{
+      id: 'plant-marciana',
+      asset_type: 'plant',
+      attributes: { name: 'Planta Marciana #1' }, // no existe en catálogo
+    }];
+
+    render(<AssetDetailView />);
+
+    let fallback;
+    await waitFor(() => {
+      fallback = screen.getByTestId('species-image-fallback');
+      expect(fallback).toBeTruthy();
+    });
+    // El fallback muestra el nombre legible derivado, nunca vacío.
+    expect(within(fallback).getByText(/Planta Marciana/i)).toBeTruthy();
+  });
+
+  it('persiste la fecha de siembra editable vía updateAsset', async () => {
+    const { default: userEvent } = await import('@testing-library/user-event');
+    mockState.updateAsset = vi.fn().mockResolvedValue(undefined);
+    mockState.selectedAssetId = 'plant-tomate';
+    mockState.plants = [{
+      id: 'plant-tomate',
+      asset_type: 'plant',
+      attributes: { name: 'Tomate Cherry #1', _speciesSlug: 'solanum_lycopersicum' },
+    }];
+
+    render(<AssetDetailView />);
+
+    const dateInput = await screen.findByTestId('seeding-date-editor');
+    const input = dateInput.querySelector('input[type="date"]');
+    expect(input).toBeTruthy();
+    await userEvent.clear(input);
+    await userEvent.type(input, '2026-03-15');
+
+    await waitFor(() => {
+      expect(mockState.updateAsset).toHaveBeenCalled();
+    });
+    const [assetType, updatedAsset] = mockState.updateAsset.mock.calls.at(-1);
+    expect(assetType).toBe('plant');
+    expect(updatedAsset.attributes._chagra_plant_meta.fecha_germinacion).toBe('2026-03-15');
   });
 
   it('no monta PlanSection cuando el asset es land (no-plant)', async () => {

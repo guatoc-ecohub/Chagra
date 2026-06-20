@@ -606,6 +606,16 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     // no chocar con el schema oficial FarmOS. Fallback: si _chagra_plant_meta
     // termina siendo ignorado por el server, también se serializa una línea
     // legible al final de attributes.notes para no perder la información.
+    // Bug 2026-06-20 (operador, fresa): persistir el slug canónico del
+    // catálogo en el asset al sembrar. Sin esto, la ficha derivaba el slug
+    // del nombre común ("Fresa" → "fresa"), que NO coincide con el id del
+    // catálogo ("fragaria_ananassa"), y la foto + el plan de alimentación
+    // no resolvían. (matchSpeciesInCatalog cubre los assets viejos; esto
+    // evita el problema de raíz para los nuevos.)
+    if (activeTab === 'plant' && formData.speciesId) {
+      baseAttributes._speciesSlug = formData.speciesId;
+    }
+
     const plantMeta = activeTab === 'plant' ? buildPlantMeta(formData) : null;
     if (plantMeta) {
       baseAttributes._chagra_plant_meta = plantMeta;
