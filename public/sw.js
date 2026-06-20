@@ -25,6 +25,11 @@ const MAP_TILES_MAX = 400;
 // MapPicker, LocationDetectedScreen, MultiFincaGlobe).
 const MAP_TILE_HOSTS = ['tile.openstreetmap.org', 'tile.osm.org', 'tile.opentopomap.org'];
 
+// Imágenes de referencia por especie, llenadas on-demand por
+// speciesImageService desde GBIF/Wikimedia. Se conservan entre deploys para que
+// la ficha siga mostrando la foto ya vista cuando la finca queda sin señal.
+const SPECIES_IMAGE_CACHE = 'chagra-species-images-v1';
+
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -134,6 +139,7 @@ self.addEventListener('activate', (event) => {
           if (cacheName === CACHE_NAME) return undefined;
           if (cacheName === RAG_GROUNDING_CACHE) return undefined;
           if (cacheName === MAP_TILES_CACHE) return undefined;
+          if (cacheName === SPECIES_IMAGE_CACHE) return undefined;
           // Versiones viejas de los buckets de grounding/tiles → borrar.
           // El resto (CACHE_NAME viejo, caches huérfanos) → borrar.
           return caches.delete(cacheName);
@@ -314,6 +320,23 @@ self.addEventListener('fetch', (event) => {
             // Sin red ni cache: propagamos el fallo de red para que Leaflet
             // muestre su placeholder. NUNCA un 504 sintético (rompería el tile).
             .catch(() => cached || Response.error());
+        })
+      )
+    );
+    return;
+  }
+
+  // Imágenes GBIF/Wikimedia ya vistas: CACHE-FIRST desde el bucket que llena
+  // speciesImageService. Si el usuario abrió una especie online, la misma foto
+  // puede renderizar offline después. En cache-miss no guardamos aquí para no
+  // cachear cualquier imagen externa de la app; solo servimos lo que el
+  // pipeline curado ya decidió guardar con licencia abierta.
+  if (event.request.method === 'GET' && event.request.destination === 'image') {
+    event.respondWith(
+      caches.open(SPECIES_IMAGE_CACHE).then((cache) =>
+        cache.match(event.request).then((cached) => {
+          if (cached) return cached;
+          return fetch(event.request).catch(() => Response.error());
         })
       )
     );

@@ -417,7 +417,6 @@
       "manejo_biomasa_extraida": "compostaje en condiciones termófilas >60°C por >3 semanas (destruye semillas) O incineracion_controlada",
       "riesgo_rebrote": "alto — rebrote vigoroso desde estolones y rizomas residuales en el suelo; el corte simple sin extracción de propágulos vegetativos garantiza recolonización en 2-4 meses",
       "protocolo_post_remocion": "Restauración activa con macollas de Calamagrostis effusa y Festuca spp. a 5-9 macollas/m2 al inicio de la siguiente temporada lluviosa; mulching con paja de páramo o tela termodegradable por 6-12 meses para suprimir rebrote de propágulos residuales; monitoreo trimestral de rebrotes vegetativos durante 3 años; eliminación manual inmediata de cualquier rebrote antes de que produzca estolones secundarios; reporte de la intervención al SIB Colombia y a la autoridad ambiental jurisdiccional con coordenadas, área tratada y especies sustitutas establecidas.",
-      "foto_referencia_sugerida": "https://commons.wikimedia.org/wiki/Category:Cenchrus_clandestinus",
       "referencias_cientificas": [
         "Correa, Pabón & Carulla 2008. Valor nutricional del kikuyo. Livestock Research for Rural Development 20(59)",
         "Mila & Corredor 2004. Evolución composición botánica pradera kikuyo. Corpoica 5(1): 70-75",
@@ -1584,7 +1583,6 @@
       "riesgo_rebrote": "muy_alto",
       "_nota_riesgo_sanitario": "RIESGO SANITARIO ELEVADO: ptaquilósido es carcinógeno comprobado en humanos (cáncer gástrico, esofágico, vejiga) por exposición directa o vía leche de ganado pastoreado en zonas invadidas. Tiaminasa causa intoxicación aguda en bovinos (síndrome hemorrágico, hematuria enzoótica bovina). En zonas rurales con invasión consolidada: NO permitir pastoreo bovino, NO consumir leche cruda local, NO usar agua de manantiales sin tratamiento. Comunicar riesgo a comunidad antes de remoción.",
       "protocolo_post_remocion": "Restauración activa obligatoria: siembra de especies nativas competidoras de rápido crecimiento (Alnus acuminata, Weinmannia tomentosa, Miconia squamulosa) en densidad 1600 ind/ha al siguiente semestre lluvioso para forzar sombra. Cobertura del suelo con mulch grueso para suprimir esporas en banco superficial. Monitoreo trimestral de rebrotes por 5 años; corte inmediato de cualquier fronde emergente (NO permitir formación de frondes maduras). Año 2-3: revisar establecimiento de dosel arbóreo (>50% cobertura) para asegurar exclusión por sombra. Mantener exclusión de ganado por mínimo 3 años.",
-      "foto_referencia_sugerida": "https://commons.wikimedia.org/wiki/Category:Pteridium_aquilinum",
       "validation_level": "expert_reviewed",
       "source_ids": [
         "flora-colombia-pteridophyta",
@@ -1985,7 +1983,6 @@
       "_nota_manejo_biomasa": "Compostaje NO recomendado: semillas sobreviven temperaturas de compost doméstico. Incineración controlada en sitio autorizado o disposición en relleno sanitario con trituración previa. NUNCA dispersar en bosque o páramo.",
       "riesgo_rebrote": "altisimo",
       "protocolo_post_remocion": "Restauración activa obligatoria: siembra de especies nativas sustitutas en densidad 1100 ind/ha al siguiente semestre lluvioso. Monitoreo de rebrote semestral por 5 años. Corte inmediato de cualquier rebrote antes de 50cm altura.",
-      "foto_referencia_sugerida": "https://commons.wikimedia.org/wiki/Category:Ulex_europaeus",
       "prompts_ia_externa": {
         "plan_remocion": "Actúa como ecólogo de restauración colombiano.\nÁrea: {AREA_HA} ha invadida por Ulex europaeus en {MUNICIPIO} a {ALTITUD} msnm, densidad de matorral {DENSIDAD} (disperso/moderado/denso/muy_denso), pendiente {PENDIENTE}%, sin/con historia reciente de fuego.\n\nDiseña plan de 5 años: (a) método de extracción por zona, (b) disposición de biomasa, (c) especies nativas sustitutas con densidades, (d) calendario de monitoreo y control de rebrotes, (e) indicadores de éxito año 1, 3, 5."
       },
