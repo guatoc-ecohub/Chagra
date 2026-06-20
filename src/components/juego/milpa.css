@@ -136,6 +136,42 @@
   100% { transform: rotate(360deg) scale(1); }
 }
 
+/* Animación para barras de crecimiento */
+.milpa-barra-crecer {
+  animation: milpa-barra-crecer 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes milpa-barra-crecer {
+  0% { transform: scaleX(0); transform-origin: left; }
+  100% { transform: scaleX(1); transform-origin: left; }
+}
+
+/* Pulso suave para números flotantes */
+.milpa-numero-flotante {
+  animation: milpa-numero-flotante 0.8s ease-out both;
+}
+@keyframes milpa-numero-flotante {
+  0% { transform: translateY(10px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* Brillo para medallas */
+.milpa-medalla-brillo {
+  animation: milpa-medalla-brillo 2s ease-in-out infinite;
+}
+@keyframes milpa-medalla-brillo {
+  0%, 100% { box-shadow: 0 0 5px rgba(251, 191, 36, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.8), 0 0 30px rgba(251, 191, 36, 0.4); }
+}
+
+/* Slide para eventos de selección */
+.milpa-evento-slide {
+  animation: milpa-evento-slide 0.5s ease-out both;
+}
+@keyframes milpa-evento-slide {
+  0% { transform: translateX(-20px); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .milpa-badge-pop,
   .milpa-brota,
@@ -149,7 +185,11 @@
   .milpa-confeti::before,
   .milpa-confeti::after,
   .milpa-escena-entrar,
-  .milpa-girar {
+  .milpa-girar,
+  .milpa-barra-crecer,
+  .milpa-numero-flotante,
+  .milpa-medalla-brillo,
+  .milpa-evento-slide {
     animation: none;
   }
 }
