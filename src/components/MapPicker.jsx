@@ -2,7 +2,13 @@ import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { X, MapPin, LocateFixed, Check, Undo2, Footprints, Square, Loader2, AlertTriangle, Shield } from 'lucide-react';
-import { latLngToPoint, latLngsToPolygon } from '../utils/geo';
+import {
+  latLngToPoint,
+  latLngsToPolygon,
+  acceptGpsFix,
+  buildWalkPolygon,
+  GPS_WARMUP_ACCURACY_M,
+} from '../utils/geo';
 import useAssetStore from '../store/useAssetStore';
 import { MSG } from '../config/messages.js';
 
@@ -85,12 +91,19 @@ export const MapPicker = ({
   const mapRef = useRef(null);
   const layerRef = useRef(null); // capa de la geometría dibujada
   const watchIdRef = useRef(null); // id del watchPosition cuando traza caminando
+  const lastFixRef = useRef(null); // último fix GPS ACEPTADO (para filtro velocidad)
+  const warmedUpRef = useRef(false); // bug #57(c): ¿el GPS ya convergió y arrancamos a trazar?
   const [points, setPoints] = useState([]); // polígono en construcción
   const [marker, setMarker] = useState(null); // punto actual
   // Modo "trazar caminando": usa navigator.geolocation.watchPosition para
   // ir sumando vertices al polígono mientras el operario recorre el
   // perimetro del area (ej. un invernadero). Solo disponible en mode=polygon.
   const [isWalking, setIsWalking] = useState(false);
+  // Bug #57(c): warm-up del GPS. Mientras true, ignoramos los fixes (cold-start
+  // A-GPS impreciso) y mostramos "Afinando GPS…"; empezamos a trazar al primer
+  // fix por debajo de GPS_WARMUP_ACCURACY_M.
+  const [gpsWarmingUp, setGpsWarmingUp] = useState(false);
+  const [walkAccuracy, setWalkAccuracy] = useState(null); // accuracy del último fix entrante
   // Estado machine GPS: idle → locating → located | low-accuracy | failed.
   // Renderizado como banner persistente arriba del mapa para que el operador
   // sepa qué está pasando, antes "Mi ubicación" silenciaba errores y el
@@ -129,12 +142,16 @@ export const MapPicker = ({
 
     mapRef.current = map;
 
-    // Pre-cargar geometría inicial si existe
+    // Pre-cargar geometría inicial si existe. setState aquí es un sync de una
+    // sola vez al montar (espejo de la geometría externa pre-cargada hacia el
+    // estado de React, ADR-015 pattern). No genera cascada porque corre una
+    // única vez en el init effect — disable puntual justificado.
     if (initial) {
       if (initial.type === 'Point') {
         const [lng, lat] = initial.coordinates;
         const m = L.marker([lat, lng]).addTo(map);
         layerRef.current = m;
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMarker({ lat, lng });
         map.setView([lat, lng], DEFAULT_ZOOM);
       } else if (initial.type === 'Polygon') {
@@ -176,6 +193,8 @@ export const MapPicker = ({
         navigator.geolocation.clearWatch(watchIdRef.current);
         watchIdRef.current = null;
       }
+      lastFixRef.current = null;
+      warmedUpRef.current = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -209,6 +228,23 @@ export const MapPicker = ({
         watchIdRef.current = null;
       }
       setIsWalking(false);
+      setGpsWarmingUp(false);
+      // Al detener: simplificar/limpiar el recorrido para evitar el "polígono
+      // rayado" (síntoma b). Reemplazamos la polilínea por el anillo limpio.
+      setPoints((prev) => {
+        const cleaned = buildWalkPolygon(prev);
+        const map = mapRef.current;
+        if (map && layerRef.current) {
+          map.removeLayer(layerRef.current);
+          layerRef.current = null;
+        }
+        if (map && cleaned.length >= 3) {
+          layerRef.current = L.polygon(cleaned, { color: '#10b981', fillOpacity: 0.2, weight: 3 }).addTo(map);
+        } else if (map && cleaned.length >= 2) {
+          layerRef.current = L.polyline(cleaned, { color: '#10b981', weight: 4, opacity: 0.85 }).addTo(map);
+        }
+        return cleaned;
+      });
       return;
     }
     if (!navigator.geolocation) {
@@ -220,16 +256,50 @@ export const MapPicker = ({
     const startWatch = (highAccuracy) => {
       // Limpia cualquier vertice previo y arranca la captura
       setPoints([]);
+      lastFixRef.current = null;
+      warmedUpRef.current = false;
+      setWalkAccuracy(null);
       const map = mapRef.current;
       if (layerRef.current) {
         map.removeLayer(layerRef.current);
         layerRef.current = null;
       }
       setIsWalking(true);
+      // Bug #57(c): arrancamos en warm-up — no trazamos hasta que el GPS
+      // converja. El banner muestra "Afinando GPS…".
+      setGpsWarmingUp(true);
       setGpsError(null);
       watchIdRef.current = navigator.geolocation.watchPosition(
         (pos) => {
-          const latlng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          const accuracy = pos.coords.accuracy;
+          const fix = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+            accuracy,
+            timestamp: pos.timestamp,
+          };
+          setWalkAccuracy(Number.isFinite(accuracy) ? accuracy : null);
+
+          // Bug #57(c) warm-up: ignorar fixes hasta que el GPS sea aceptable.
+          // El primer fix bueno levanta el warm-up y se convierte en el ancla.
+          if (!warmedUpRef.current) {
+            if (Number.isFinite(accuracy) && accuracy > GPS_WARMUP_ACCURACY_M) {
+              map.panTo([fix.lat, fix.lng]); // sigue al usuario pero no traza
+              return;
+            }
+            warmedUpRef.current = true;
+            setGpsWarmingUp(false);
+          }
+
+          // Bug #57(a): filtrar línea loca — descartar fixes imprecisos y
+          // saltos a velocidad imposible respecto al último vértice aceptado.
+          const verdict = acceptGpsFix(fix, lastFixRef.current);
+          if (!verdict.accepted) {
+            map.panTo([fix.lat, fix.lng]);
+            return;
+          }
+          lastFixRef.current = fix;
+          const latlng = { lat: fix.lat, lng: fix.lng };
           setPoints((prev) => {
             const next = [...prev, latlng];
             if (layerRef.current) map.removeLayer(layerRef.current);
@@ -249,6 +319,7 @@ export const MapPicker = ({
           setGpsStatus('failed');
           setGpsError(msg);
           setIsWalking(false);
+          setGpsWarmingUp(false);
           if (watchIdRef.current !== null) {
             navigator.geolocation.clearWatch(watchIdRef.current);
             watchIdRef.current = null;
@@ -287,15 +358,22 @@ export const MapPicker = ({
         setGpsStatus('failed');
         setGpsError(msg);
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 },
+      // maximumAge: 0 — el pre-flight de "caminar" NO debe aceptar un fix
+      // cacheado/grueso como ancla del polígono (bug #57(c) primera corrida).
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
     );
   };
 
   const handleFinishPolygon = () => {
     if (points.length < 3) return;
     const map = mapRef.current;
+    // Bug #57(b): limpiar el recorrido antes de cerrar para evitar el
+    // "polígono rayado" (auto-intersección por jitter).
+    const cleaned = buildWalkPolygon(points);
+    if (cleaned.length >= 3) setPoints(cleaned);
+    const ring = cleaned.length >= 3 ? cleaned : points;
     if (layerRef.current) map.removeLayer(layerRef.current);
-    const poly = L.polygon(points, { color: '#3b82f6', fillOpacity: 0.2 }).addTo(map);
+    const poly = L.polygon(ring, { color: '#3b82f6', fillOpacity: 0.2 }).addTo(map);
     layerRef.current = poly;
   };
 
@@ -393,7 +471,12 @@ export const MapPicker = ({
       onSave(latLngToPoint(marker));
     } else if (mode === 'polygon') {
       if (points.length < 3) return;
-      onSave(latLngsToPolygon(points));
+      // Bug #57(b): red de seguridad final — dedup + simplify antes de
+      // serializar para no persistir un anillo auto-intersectado. Si el
+      // resultado degenera (<3 vértices), caemos a los puntos crudos.
+      const cleaned = buildWalkPolygon(points);
+      const ring = cleaned.length >= 3 ? cleaned : points;
+      onSave(latLngsToPolygon(ring));
     }
   };
 
@@ -429,6 +512,22 @@ export const MapPicker = ({
           <X size={20} />
         </button>
       </div>
+
+      {/* Bug #57(c): warm-up del GPS al trazar caminando. Mientras afina, no
+          trazamos; mostramos progreso de precisión para que el operador espere. */}
+      {isWalking && gpsWarmingUp && (
+        <div className="px-4 py-2 text-xs flex items-center gap-2 border-b border-slate-800 bg-amber-900/30 text-amber-300">
+          <Loader2 size={14} className="animate-spin shrink-0" />
+          <span className="flex-1">
+            {MSG.ui.gpsAfinando}
+            {Number.isFinite(walkAccuracy) && (
+              <span className="font-mono ml-1">
+                (±{Math.round(walkAccuracy)}m → ±{GPS_WARMUP_ACCURACY_M}m)
+              </span>
+            )}
+          </span>
+        </div>
+      )}
 
       {/* GPS status banner, siempre visible para no silenciar errores. */}
       {gpsStatus !== 'idle' && (
