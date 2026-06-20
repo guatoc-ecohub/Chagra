@@ -7,10 +7,17 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ScreenShell } from '../common/ScreenShell';
-import { Bug, Shield, RotateCcw } from 'lucide-react';
+import { Bug, Shield, RotateCcw, Lock } from 'lucide-react';
 import './defensores-finca.css';
 
-import { CULTIVOS, PARES_CONTROL, NIVEL_1 } from './defensoresFincaData';
+import {
+  CULTIVOS,
+  PARES_CONTROL,
+  NIVELES,
+  getNivel,
+  nivelDesbloqueado,
+  PROGRESO_KEY,
+} from './defensoresFincaData';
 import {
   MOVE_SPEED,
   clamp,
@@ -18,43 +25,65 @@ import {
   resolverColisionPlagas,
   recolectarCultivos,
   sumarPuntaje,
-  avanzarFisica,
+  avanzarFisicaTerreno,
+  golpearJefe,
   intentarSalto,
   evaluarFinNivel,
 } from '../../services/defensoresGameEngine';
 import { agentSounds, isSoundEnabled } from '../../services/agentSoundService';
 
+// Dimensiones lógicas del LIENZO visible (la cámara recorta el mundo a esto).
+const VIEW_W = 720;
+const VIEW_H = 405;
+const GROUND_Y = 340;
+const PLAYER_W = 38;
+const PLAYER_H = 54;
+
+/** Lee del localStorage los niveles ya superados (offline-safe, tolera fallos). */
+function leerSuperados() {
+  try {
+    const raw = localStorage.getItem(PROGRESO_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed?.superados) ? parsed.superados : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Marca un nivel como superado en localStorage y devuelve la lista resultante. */
+function guardarSuperado(numero) {
+  try {
+    const superados = leerSuperados();
+    if (!superados.includes(numero)) {
+      const next = [...superados, numero];
+      localStorage.setItem(PROGRESO_KEY, JSON.stringify({ superados: next }));
+      return next;
+    }
+    return superados;
+  } catch {
+    return leerSuperados();
+  }
+}
+
 /**
- * DefensoresFincaScreen — minijuego PLATAFORMERO 2D lateral.
- *
- * Un campesino NEUTRO (sin nombre propio) corre y salta por la finca: recoge
- * cultivos (puntos), esquiva plagas reales (pierde energía al tocarlas) e invoca
- * organismos benéficos que ELIMINAN exactamente la plaga que de verdad controlan
- * (control biológico real = relación CONTROLS del grafo de Chagra).
- *
- * Mobile-first: controles táctiles grandes + teclado en desktop. Offline-safe:
- * canvas 2D puro, datos locales, cero red. Estética Chagra (emerald/amber/lime).
- * La lógica vive en defensoresGameEngine (pura, testeable); aquí solo se dibuja
- * y se orquesta el loop.
+ * NivelJuego — un nivel jugable completo (canvas + HUD + controles). Se monta
+ * con `key={nivel.numero}` desde el contenedor, de modo que CADA cambio de
+ * nivel lo remonta limpio (sin setState dentro de efectos).
  *
  * @param {Object} props
- * @param {Function} [props.onBack]
- * @param {Function} [props.onHome]
+ * @param {import('./defensoresFincaData').Nivel} props.nivel
+ * @param {number[]} props.superados   niveles ya completados (desbloqueo).
+ * @param {Function} props.onGanar     callback(numero) al completar el nivel.
+ * @param {Function} props.onIrA       callback(numero) para saltar a otro nivel.
  */
-export default function DefensoresFincaScreen({ onBack, onHome }) {
+function NivelJuego({ nivel, superados, onGanar, onIrA }) {
   const canvasRef = useRef(null);
-
-  // Mundo en coordenadas de canvas (lógicas, escaladas al ancho real por CSS).
-  const W = 720;
-  const H = 405;
-  const GROUND_Y = 340;
-  const PLAYER_W = 38;
-  const PLAYER_H = 54;
 
   // Pares de control activos en este nivel (subconjunto curado).
   const pares = useMemo(
-    () => PARES_CONTROL.filter((p) => NIVEL_1.paresIds.includes(p.id)),
-    [],
+    () => PARES_CONTROL.filter((p) => nivel.paresIds.includes(p.id)),
+    [nivel],
   );
   const beneficos = useMemo(() => pares.map((p) => p.benefico), [pares]);
   const leccionPorBenefico = useMemo(
@@ -62,51 +91,87 @@ export default function DefensoresFincaScreen({ onBack, onHome }) {
     [pares],
   );
 
-  // Estado de juego visible en React (HUD). El estado "vivo" del loop vive en
-  // refs para no re-renderizar a 60fps.
-  const [energia, setEnergia] = useState(NIVEL_1.energiaInicial);
+  // Estado visible en React (HUD). El estado "vivo" del loop vive en refs.
+  const [energia, setEnergia] = useState(nivel.energiaInicial);
   const [puntaje, setPuntaje] = useState(0);
   const [estado, setEstado] = useState('jugando'); // 'jugando' | 'gano' | 'perdio'
   const [razon, setRazon] = useState('');
   const [leccion, setLeccion] = useState('');
   const [beneficoSel, setBeneficoSel] = useState(beneficos[0]?.id || null);
+  const [jefeVida, setJefeVida] = useState(nivel.jefe ? nivel.jefe.vida : 0);
 
   // Refs del mundo (mutables, leídos por el loop a 60fps sin re-render).
   const world = useRef(null);
   const input = useRef({ left: false, right: false, jumpQueued: false });
-  // Espejo del benéfico seleccionado para que la acción (puntero) lo lea sin
-  // recrear el callback; se sincroniza en un efecto (no durante el render).
   const beneficoSelRef = useRef(beneficoSel);
   useEffect(() => {
     beneficoSelRef.current = beneficoSel;
   }, [beneficoSel]);
 
-  /** Crea el mundo inicial: jugador, plagas espaciadas y cultivos. */
+  /** Crea el mundo inicial del nivel: jugador, plagas, cultivos, plataformas,
+   *  huecos y mini-jefe. */
   const crearMundo = useCallback(() => {
-    const plagas = pares.map((par, i) => ({
-      id: `plaga-${par.plaga.id}-${i}`,
-      plagaId: par.plaga.id,
-      emoji: par.plaga.emoji,
-      x: 220 + i * 150,
-      y: GROUND_Y - 34,
-      w: 34,
-      h: 34,
-      dir: i % 2 === 0 ? 1 : -1,
-      baseX: 220 + i * 150,
-      alive: true,
+    const mundoAncho = nivel.mundoAncho;
+    const sep = (mundoAncho - 260) / Math.max(1, pares.length);
+    const plagas = pares.map((par, i) => {
+      const baseX = 220 + i * sep;
+      return {
+        id: `plaga-${par.plaga.id}-${i}`,
+        plagaId: par.plaga.id,
+        emoji: par.plaga.emoji,
+        x: baseX,
+        y: GROUND_Y - 34,
+        w: 34,
+        h: 34,
+        dir: i % 2 === 0 ? 1 : -1,
+        baseX,
+        rango: 46 + (i % 3) * 18, // patrulla más amplia en algunas (dificultad)
+        vel: 0.9 + (i % 3) * 0.25,
+        alive: true,
+      };
+    });
+
+    const plats = nivel.plataformas.map((p) => ({
+      x: p.x,
+      y: GROUND_Y - p.y, // top absoluto de la plataforma en coords mundo
+      w: p.w,
+      h: 14,
     }));
-    const cultivos = Array.from({ length: NIVEL_1.metaCultivos }).map((_, i) => {
+    const cultivos = Array.from({ length: nivel.metaCultivos }).map((_, i) => {
       const c = CULTIVOS[i % CULTIVOS.length];
+      const enPlat = plats.length > 0 && i % 3 === 0;
+      const plat = enPlat ? plats[i % plats.length] : null;
+      const x = plat
+        ? plat.x + plat.w / 2 - 15
+        : 150 + (i * (mundoAncho - 220)) / nivel.metaCultivos;
+      const y = plat ? plat.y - 34 : (i % 2 === 0 ? GROUND_Y - 36 : GROUND_Y - 110);
       return {
         id: `cultivo-${c.id}-${i}`,
         emoji: c.emoji,
-        x: 150 + i * 110,
-        y: i % 2 === 0 ? GROUND_Y - 36 : GROUND_Y - 110,
+        x,
+        y,
         w: 30,
         h: 30,
         recogido: false,
       };
     });
+
+    const jefe = nivel.jefe
+      ? {
+          plagaId: nivel.jefe.plagaId,
+          emoji: nivel.jefe.emoji,
+          vida: nivel.jefe.vida,
+          vidaMax: nivel.jefe.vida,
+          vivo: true,
+          x: mundoAncho - 130,
+          y: GROUND_Y - 70,
+          w: 64,
+          h: 64,
+          dir: -1,
+          baseX: mundoAncho - 130,
+        }
+      : null;
+
     return {
       player: {
         x: 40,
@@ -120,15 +185,20 @@ export default function DefensoresFincaScreen({ onBack, onHome }) {
       },
       plagas,
       cultivos,
+      plataformas: plats,
+      huecos: nivel.huecos.map((h) => ({ x: h.x, w: h.w })),
+      jefe,
+      mundoAncho,
+      camX: 0,
       cultivosRecogidos: 0,
       puntaje: 0,
-      energia: NIVEL_1.energiaInicial,
+      energia: nivel.energiaInicial,
       t: 0,
     };
-  }, [pares]);
+  }, [nivel, pares]);
 
-  // Inicializa el mundo al montar (una vez). El reinicio se hace en el handler
-  // `reiniciar` (evento), no en un efecto, para no disparar renders en cascada.
+  // Inicializa el mundo al montar (una vez por nivel; el remount con key reinicia
+  // todo el estado React, así no hace falta setState en este efecto).
   useEffect(() => {
     if (!world.current) world.current = crearMundo();
   }, [crearMundo]);
@@ -165,7 +235,8 @@ export default function DefensoresFincaScreen({ onBack, onHome }) {
     } catch { /* sonido opcional: el juego sigue */ }
   }, []);
 
-  /** Invoca el benéfico seleccionado: limpia SOLO su plaga objetivo real. */
+  /** Invoca el benéfico seleccionado: limpia SOLO su plaga objetivo real y, si
+   *  es el controlador del jefe, le quita vida. */
   const invocarBenefico = useCallback(() => {
     const w = world.current;
     if (!w || estado !== 'jugando') return;
@@ -173,13 +244,21 @@ export default function DefensoresFincaScreen({ onBack, onHome }) {
     if (!id) return;
     const { plagas, eliminadas } = aplicarBenefico(w.plagas, id);
     w.plagas = plagas;
-    if (eliminadas > 0) {
-      w.puntaje = sumarPuntaje(w.puntaje, { plagas: eliminadas });
+
+    let golpeoJefe = false;
+    if (w.jefe && w.jefe.vivo) {
+      const res = golpearJefe(w.jefe, id);
+      w.jefe = res.jefe;
+      golpeoJefe = res.golpeo;
+      if (res.golpeo) setJefeVida(w.jefe.vida);
+    }
+
+    if (eliminadas > 0 || golpeoJefe) {
+      w.puntaje = sumarPuntaje(w.puntaje, { plagas: eliminadas + (golpeoJefe ? 1 : 0) });
       setPuntaje(w.puntaje);
       setLeccion(leccionPorBenefico[id] || '');
       beep('good');
     } else {
-      // Benéfico correcto pero su plaga no está aquí (o ya controlada): pista.
       setLeccion('Ese benéfico controla otra plaga. Mira cuál bicho malo hay cerca.');
     }
   }, [estado, leccionPorBenefico, beep]);
@@ -192,6 +271,7 @@ export default function DefensoresFincaScreen({ onBack, onHome }) {
     if (!ctx) return undefined;
     let raf = 0;
     let running = true;
+    const esc = nivel.escena;
 
     const drawEmoji = (emoji, x, y, size) => {
       ctx.font = `${size}px serif`;
@@ -213,9 +293,9 @@ export default function DefensoresFincaScreen({ onBack, onHome }) {
         w.player.x += MOVE_SPEED;
         w.player.face = 1;
       }
-      w.player.x = clamp(w.player.x, 0, W - w.player.w);
+      w.player.x = clamp(w.player.x, 0, w.mundoAncho - w.player.w);
 
-      // Salto + gravedad (física pura).
+      // Salto + gravedad sobre terreno con plataformas/huecos.
       if (input.current.jumpQueued) {
         const j = intentarSalto(w.player);
         w.player.vy = j.vy;
@@ -223,17 +303,37 @@ export default function DefensoresFincaScreen({ onBack, onHome }) {
         if (j.salto) beep('jump');
         input.current.jumpQueued = false;
       }
-      const fis = avanzarFisica(w.player, GROUND_Y, w.player.h);
+      const fis = avanzarFisicaTerreno(w.player, GROUND_Y, w.plataformas, w.huecos, VIEW_H + 80);
       w.player.y = fis.y;
       w.player.vy = fis.vy;
       w.player.onGround = fis.onGround;
 
-      // Plagas patrullan de lado a lado (movimiento simple, predecible).
+      // Caer por un hueco = daño + reposición sobre suelo firme.
+      if (estado === 'jugando' && fis.caido && w.t >= w.player.invulnUntil) {
+        w.energia -= 1;
+        w.player.invulnUntil = w.t + 60;
+        setEnergia(w.energia);
+        beep('hit');
+        w.player.x = clamp(w.player.x - 90, 0, w.mundoAncho - w.player.w);
+        w.player.y = GROUND_Y - w.player.h;
+        w.player.vy = 0;
+        w.player.onGround = true;
+      }
+
+      // Cámara: sigue al jugador (centro), recortada al mundo.
+      const objetivoCam = w.player.x + w.player.w / 2 - VIEW_W / 2;
+      w.camX = clamp(objetivoCam, 0, Math.max(0, w.mundoAncho - VIEW_W));
+
+      // Plagas patrullan (más rápido/amplio = más difícil).
       if (estado === 'jugando') {
         for (const p of w.plagas) {
           if (!p.alive) continue;
-          p.x += p.dir * 0.9;
-          if (Math.abs(p.x - p.baseX) > 46) p.dir *= -1;
+          p.x += p.dir * p.vel;
+          if (Math.abs(p.x - p.baseX) > p.rango) p.dir *= -1;
+        }
+        if (w.jefe && w.jefe.vivo) {
+          w.jefe.x += w.jefe.dir * 0.7;
+          if (Math.abs(w.jefe.x - w.jefe.baseX) > 70) w.jefe.dir *= -1;
         }
       }
 
@@ -247,11 +347,23 @@ export default function DefensoresFincaScreen({ onBack, onHome }) {
         beep('good');
       }
 
-      // Colisión con plagas (resta energía con invulnerabilidad breve).
+      // Colisión con plagas y con el jefe (resta energía).
       if (estado === 'jugando') {
         const invuln = w.t < w.player.invulnUntil;
         const col = resolverColisionPlagas(w.player, w.plagas, invuln);
-        if (col.golpe) {
+        let golpe = col.golpe;
+        if (!golpe && !invuln && w.jefe && w.jefe.vivo) {
+          const j = w.jefe;
+          if (
+            w.player.x < j.x + j.w &&
+            w.player.x + w.player.w > j.x &&
+            w.player.y < j.y + j.h &&
+            w.player.y + w.player.h > j.y
+          ) {
+            golpe = true;
+          }
+        }
+        if (golpe) {
           w.energia -= 1;
           w.player.invulnUntil = w.t + 60; // ~1s a 60fps
           setEnergia(w.energia);
@@ -261,48 +373,92 @@ export default function DefensoresFincaScreen({ onBack, onHome }) {
 
       // Fin de nivel.
       const plagasVivas = w.plagas.filter((p) => p.alive).length;
+      const hayJefe = !!w.jefe;
+      const jefeVivo = !!(w.jefe && w.jefe.vivo);
       const fin = evaluarFinNivel({
         energia: w.energia,
         cultivosRecogidos: w.cultivosRecogidos,
-        metaCultivos: NIVEL_1.metaCultivos,
+        metaCultivos: nivel.metaCultivos,
         plagasVivas,
+        hayJefe,
+        jefeVivo,
       });
       if (fin.estado !== 'jugando' && estado === 'jugando') {
         setEstado(fin.estado);
         setRazon(fin.razon);
-        if (fin.estado === 'gano') beep('good');
+        if (fin.estado === 'gano') {
+          beep('good');
+          onGanar(nivel.numero);
+        }
       }
 
       // ── DIBUJO ──────────────────────────────────────────────────
-      // Cielo.
-      const sky = ctx.createLinearGradient(0, 0, 0, H);
-      sky.addColorStop(0, '#9fd6f2');
-      sky.addColorStop(1, '#e8f7c8');
+      ctx.save();
+      ctx.translate(-w.camX, 0); // la cámara desplaza el mundo.
+      const M = w.mundoAncho;
+
+      // Cielo (paleta del nivel).
+      const sky = ctx.createLinearGradient(0, 0, 0, VIEW_H);
+      sky.addColorStop(0, esc.cieloTop);
+      sky.addColorStop(1, esc.cieloBottom);
       ctx.fillStyle = sky;
-      ctx.fillRect(0, 0, W, H);
-      // Sol.
-      ctx.fillStyle = '#fde68a';
+      ctx.fillRect(0, 0, M, VIEW_H);
+
+      // Estrellas tenues (atardecer).
+      if (esc.estrellas) {
+        ctx.fillStyle = 'rgba(255,255,255,0.55)';
+        for (let i = 0; i < 40; i += 1) {
+          ctx.fillRect((i * 137) % M, (i * 53) % 120, 2, 2);
+        }
+      }
+
+      // Astro (sol/luna), anclado a la vista.
+      ctx.fillStyle = esc.astro;
       ctx.beginPath();
-      ctx.arc(W - 70, 70, 34, 0, Math.PI * 2);
+      ctx.arc(w.camX + VIEW_W - 70, 70, 34, 0, Math.PI * 2);
       ctx.fill();
-      // Montañas.
-      ctx.fillStyle = '#86b96a';
+
+      // Montañas de fondo (repetidas a lo largo del mundo).
+      ctx.fillStyle = esc.montana;
       ctx.beginPath();
       ctx.moveTo(0, GROUND_Y);
-      ctx.lineTo(160, 180);
-      ctx.lineTo(330, GROUND_Y);
-      ctx.lineTo(520, 150);
-      ctx.lineTo(720, GROUND_Y);
+      for (let mx = 0; mx <= M; mx += 360) {
+        ctx.lineTo(mx + 160, 180);
+        ctx.lineTo(mx + 330, GROUND_Y);
+      }
+      ctx.lineTo(M, GROUND_Y);
       ctx.closePath();
       ctx.fill();
-      // Suelo.
-      const soil = ctx.createLinearGradient(0, GROUND_Y, 0, H);
-      soil.addColorStop(0, '#8a5a32');
-      soil.addColorStop(1, '#3f2d20');
-      ctx.fillStyle = soil;
-      ctx.fillRect(0, GROUND_Y, W, H - GROUND_Y);
-      ctx.fillStyle = '#6f8f32';
-      ctx.fillRect(0, GROUND_Y - 6, W, 10);
+
+      // Suelo por tramos (deja vacíos en los huecos).
+      const soil = ctx.createLinearGradient(0, GROUND_Y, 0, VIEW_H);
+      soil.addColorStop(0, esc.sueloTop);
+      soil.addColorStop(1, esc.sueloBottom);
+      const huecos = [...w.huecos].sort((a, b) => a.x - b.x);
+      let cursor = 0;
+      for (const h of huecos) {
+        if (h.x > cursor) {
+          ctx.fillStyle = soil;
+          ctx.fillRect(cursor, GROUND_Y, h.x - cursor, VIEW_H - GROUND_Y);
+          ctx.fillStyle = esc.pasto;
+          ctx.fillRect(cursor, GROUND_Y - 6, h.x - cursor, 10);
+        }
+        cursor = h.x + h.w;
+      }
+      if (cursor < M) {
+        ctx.fillStyle = soil;
+        ctx.fillRect(cursor, GROUND_Y, M - cursor, VIEW_H - GROUND_Y);
+        ctx.fillStyle = esc.pasto;
+        ctx.fillRect(cursor, GROUND_Y - 6, M - cursor, 10);
+      }
+
+      // Plataformas.
+      for (const p of w.plataformas) {
+        ctx.fillStyle = esc.sueloTop;
+        ctx.fillRect(p.x, p.y, p.w, p.h);
+        ctx.fillStyle = esc.pasto;
+        ctx.fillRect(p.x, p.y - 4, p.w, 6);
+      }
 
       // Cultivos (puntos).
       for (const c of w.cultivos) {
@@ -312,31 +468,37 @@ export default function DefensoresFincaScreen({ onBack, onHome }) {
       for (const p of w.plagas) {
         if (p.alive) drawEmoji(p.emoji, p.x, p.y, 32);
       }
+      // Mini-jefe + barra de vida.
+      if (w.jefe && w.jefe.vivo) {
+        drawEmoji(w.jefe.emoji, w.jefe.x, w.jefe.y, 60);
+        const bw = w.jefe.w;
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        ctx.fillRect(w.jefe.x, w.jefe.y - 12, bw, 7);
+        ctx.fillStyle = '#ef4444';
+        ctx.fillRect(w.jefe.x, w.jefe.y - 12, (bw * w.jefe.vida) / w.jefe.vidaMax, 7);
+      }
+
       // Jugador (campesino neutro dibujado a mano — sin nombre propio).
       const px = w.player.x;
       const py = w.player.y;
       const blink = w.t < w.player.invulnUntil && Math.floor(w.t / 6) % 2 === 0;
       if (!blink) {
-        // sombrero
         ctx.fillStyle = '#a16207';
         ctx.fillRect(px - 4, py, w.player.w + 8, 8);
         ctx.fillRect(px + 6, py - 8, w.player.w - 12, 10);
-        // cara
         ctx.fillStyle = '#e8b98a';
         ctx.fillRect(px + 8, py + 8, w.player.w - 16, 16);
-        // cuerpo (camisa verde Chagra)
         ctx.fillStyle = '#15803d';
         ctx.fillRect(px + 6, py + 24, w.player.w - 12, 20);
-        // pantalón
         ctx.fillStyle = '#1e3a5f';
         ctx.fillRect(px + 8, py + 42, w.player.w - 16, 12);
-        // ojos (mirando hacia donde va)
         ctx.fillStyle = '#1c1917';
         const ex = w.player.face === 1 ? px + 16 : px + 12;
         ctx.fillRect(ex, py + 14, 3, 3);
         ctx.fillRect(ex + 8, py + 14, 3, 3);
       }
 
+      ctx.restore();
       raf = requestAnimationFrame(step);
     };
 
@@ -345,20 +507,207 @@ export default function DefensoresFincaScreen({ onBack, onHome }) {
       running = false;
       cancelAnimationFrame(raf);
     };
-  }, [estado, beep]);
+  }, [estado, beep, nivel, onGanar]);
 
-  // Reinicia el nivel: reconstruye el mundo (ref) y restaura el HUD (estado).
-  // Es un event handler, así que el setState es seguro (no es render ni efecto).
+  // Reinicia el nivel actual (event handler → setState seguro).
   const reiniciar = useCallback(() => {
     world.current = crearMundo();
-    setEnergia(NIVEL_1.energiaInicial);
+    setEnergia(nivel.energiaInicial);
     setPuntaje(0);
     setRazon('');
     setLeccion('');
     setEstado('jugando');
-  }, [crearMundo]);
+    setJefeVida(nivel.jefe ? nivel.jefe.vida : 0);
+  }, [crearMundo, nivel]);
 
-  const energiaMax = NIVEL_1.energiaMax;
+  const energiaMax = nivel.energiaMax;
+  const hayJefe = !!nivel.jefe;
+  const siguienteAbierto = nivelDesbloqueado(nivel.numero + 1, superados);
+
+  return (
+    <>
+      <p className="text-2xs text-emerald-200/70 leading-snug" data-testid="defensores-subtitulo">
+        {nivel.subtitulo}
+      </p>
+
+      {/* HUD */}
+      <div className="df-hud" data-testid="defensores-hud">
+        <div className="df-hearts" aria-label={`Energía: ${energia} de ${energiaMax}`}>
+          {Array.from({ length: energiaMax }).map((_, i) => (
+            <span key={i} className={i < energia ? '' : 'df-heart-empty'} aria-hidden="true">
+              💚
+            </span>
+          ))}
+        </div>
+        <div className="text-right">
+          <span className="text-2xs font-black uppercase tracking-wide text-emerald-300/70 block">
+            Puntos
+          </span>
+          <span data-testid="defensores-puntaje" className="text-2xl font-black text-white leading-none">
+            {puntaje}
+          </span>
+        </div>
+      </div>
+
+      {/* Aviso de mini-jefe (solo niveles con jefe). */}
+      {hayJefe && estado === 'jugando' && (
+        <div className="df-jefe-aviso" data-testid="defensores-jefe">
+          <span aria-hidden="true">{nivel.jefe.emoji}</span> Mini-jefe al final.
+          Solo cae con su controlador real. Vida: {jefeVida}
+        </div>
+      )}
+
+      {/* Escenario (canvas) */}
+      <div className="df-stage">
+        <canvas
+          ref={canvasRef}
+          width={VIEW_W}
+          height={VIEW_H}
+          className="df-canvas"
+          role="img"
+          aria-label="Finca con un campesino que corre, cultivos para recoger y plagas para controlar"
+        />
+        {estado !== 'jugando' && (
+          <div className="df-overlay" data-testid={`defensores-fin-${estado}`}>
+            <span className="df-overlay-emoji" aria-hidden="true">
+              {estado === 'gano' ? '🌽🎉' : '🐛'}
+            </span>
+            <h3 className="text-2xl font-black text-white">
+              {estado === 'gano' ? '¡Ganaste!' : 'Casi lo logras'}
+            </h3>
+            <p className="text-sm text-emerald-100/90 max-w-xs">{razon}</p>
+            <div className="flex flex-wrap gap-2 justify-center mt-2">
+              <button
+                type="button"
+                onClick={reiniciar}
+                className="min-h-[56px] px-5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 transition text-emerald-950 font-black text-lg flex items-center gap-2"
+              >
+                <RotateCcw size={22} aria-hidden="true" />
+                Jugar otra vez
+              </button>
+              {estado === 'gano' && siguienteAbierto && (
+                <button
+                  type="button"
+                  data-testid="defensores-siguiente-nivel"
+                  onClick={() => onIrA(nivel.numero + 1)}
+                  className="min-h-[56px] px-5 rounded-2xl bg-amber-400 hover:bg-amber-300 active:scale-95 transition text-amber-950 font-black text-lg"
+                >
+                  Nivel {nivel.numero + 1} →
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Lección de control biológico */}
+      {leccion && (
+        <div className="df-leccion" data-testid="defensores-leccion" role="status">
+          <Bug size={16} className="inline-block mr-1 -mt-0.5" aria-hidden="true" />
+          {leccion}
+        </div>
+      )}
+
+      {/* Selector de benéficos (control biológico) */}
+      <div className="df-beneficios" role="group" aria-label="Elige el organismo benéfico">
+        {beneficos.map((b) => (
+          <button
+            key={b.id}
+            type="button"
+            data-testid={`beneficio-${b.id}`}
+            data-selected={beneficoSel === b.id}
+            onClick={() => setBeneficoSel(b.id)}
+            aria-pressed={beneficoSel === b.id}
+            className="df-beneficio"
+          >
+            <span className="df-beneficio-emoji" aria-hidden="true">{b.emoji}</span>
+            <span className="df-beneficio-nombre">{b.nombre}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Controles táctiles (mobile-first) + teclado en desktop */}
+      <div className="df-controls">
+        <div className="df-dpad">
+          <button
+            type="button"
+            aria-label="Mover a la izquierda"
+            className="df-btn"
+            onPointerDown={(e) => { e.preventDefault(); input.current.left = true; }}
+            onPointerUp={() => { input.current.left = false; }}
+            onPointerLeave={() => { input.current.left = false; }}
+            onPointerCancel={() => { input.current.left = false; }}
+          >
+            ◀
+          </button>
+          <button
+            type="button"
+            aria-label="Mover a la derecha"
+            className="df-btn"
+            onPointerDown={(e) => { e.preventDefault(); input.current.right = true; }}
+            onPointerUp={() => { input.current.right = false; }}
+            onPointerLeave={() => { input.current.right = false; }}
+            onPointerCancel={() => { input.current.right = false; }}
+          >
+            ▶
+          </button>
+        </div>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            aria-label="Soltar el bicho bueno"
+            className="df-btn df-btn-action"
+            onPointerDown={(e) => { e.preventDefault(); invocarBenefico(); }}
+          >
+            🐞
+          </button>
+          <button
+            type="button"
+            aria-label="Saltar"
+            className="df-btn df-btn-jump"
+            onPointerDown={(e) => { e.preventDefault(); input.current.jumpQueued = true; }}
+          >
+            ⤴
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/**
+ * DefensoresFincaScreen — minijuego PLATAFORMERO 2D lateral con dos niveles.
+ *
+ * Un campesino NEUTRO (sin nombre propio) corre y salta por la finca: recoge
+ * cultivos (puntos), esquiva plagas reales (pierde energía al tocarlas) e invoca
+ * organismos benéficos que ELIMINAN exactamente la plaga que de verdad controlan
+ * (control biológico real = relación CONTROLS del grafo de Chagra).
+ *
+ * Nivel 1 (la huerta, mediodía): corto y plano, 4 pares.
+ * Nivel 2 (la ladera al atardecer): más largo (mundo con cámara), otra paleta,
+ * 7 pares, plataformas a distinta altura, huecos que hacen daño y un mini-jefe
+ * (langosta) que solo cae con su controlador real (la mantis). Se desbloquea al
+ * completar el nivel 1; el progreso se guarda offline en localStorage.
+ *
+ * Mobile-first: controles táctiles grandes + teclado en desktop. Offline-safe:
+ * canvas 2D puro, datos locales, cero red. Estética Chagra.
+ *
+ * @param {Object} props
+ * @param {Function} [props.onBack]
+ * @param {Function} [props.onHome]
+ */
+export default function DefensoresFincaScreen({ onBack, onHome }) {
+  const [superados, setSuperados] = useState(() => leerSuperados());
+  const [nivelNum, setNivelNum] = useState(1);
+  const nivel = useMemo(() => getNivel(nivelNum), [nivelNum]);
+
+  const handleGanar = useCallback((numero) => {
+    setSuperados(guardarSuperado(numero));
+  }, []);
+
+  const irANivel = useCallback((numero) => {
+    setNivelNum(numero);
+  }, []);
 
   return (
     <ScreenShell title="Defensores de la Finca" icon={Shield} onBack={onBack} onHome={onHome}>
@@ -378,127 +727,51 @@ export default function DefensoresFincaScreen({ onBack, onHome }) {
           biológico!
         </p>
 
-        {/* HUD */}
-        <div className="df-hud" data-testid="defensores-hud">
-          <div className="df-hearts" aria-label={`Energía: ${energia} de ${energiaMax}`}>
-            {Array.from({ length: energiaMax }).map((_, i) => (
-              <span key={i} className={i < energia ? '' : 'df-heart-empty'} aria-hidden="true">
-                💚
-              </span>
-            ))}
-          </div>
-          <div className="text-right">
-            <span className="text-2xs font-black uppercase tracking-wide text-emerald-300/70 block">
-              Puntos
-            </span>
-            <span data-testid="defensores-puntaje" className="text-2xl font-black text-white leading-none">
-              {puntaje}
-            </span>
-          </div>
-        </div>
-
-        {/* Escenario (canvas) */}
-        <div className="df-stage">
-          <canvas
-            ref={canvasRef}
-            width={W}
-            height={H}
-            className="df-canvas"
-            role="img"
-            aria-label="Finca con un campesino que corre, cultivos para recoger y plagas para controlar"
-          />
-          {estado !== 'jugando' && (
-            <div className="df-overlay" data-testid={`defensores-fin-${estado}`}>
-              <span className="df-overlay-emoji" aria-hidden="true">
-                {estado === 'gano' ? '🌽🎉' : '🐛'}
-              </span>
-              <h3 className="text-2xl font-black text-white">
-                {estado === 'gano' ? '¡Ganaste!' : 'Casi lo logras'}
-              </h3>
-              <p className="text-sm text-emerald-100/90 max-w-xs">{razon}</p>
+        {/* Selector de nivel (1 / 2). El 2 se desbloquea al ganar el 1. */}
+        <div
+          className="df-niveles"
+          role="group"
+          aria-label="Elige el nivel"
+          data-testid="defensores-niveles"
+        >
+          {NIVELES.map((n) => {
+            const abierto = nivelDesbloqueado(n.numero, superados);
+            const activo = n.numero === nivelNum;
+            return (
               <button
+                key={n.id}
                 type="button"
-                onClick={reiniciar}
-                className="mt-2 min-h-[56px] px-6 rounded-2xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 transition text-emerald-950 font-black text-lg flex items-center gap-2"
+                data-testid={`nivel-${n.numero}`}
+                data-selected={activo}
+                disabled={!abierto}
+                aria-pressed={activo}
+                onClick={() => abierto && setNivelNum(n.numero)}
+                className="df-nivel"
               >
-                <RotateCcw size={22} aria-hidden="true" />
-                Jugar otra vez
+                <span className="df-nivel-num">
+                  {abierto ? `Nivel ${n.numero}` : (
+                    <>
+                      <Lock size={13} aria-hidden="true" className="inline-block -mt-0.5 mr-1" />
+                      Nivel {n.numero}
+                    </>
+                  )}
+                </span>
+                <span className="df-nivel-nombre">
+                  {abierto ? n.nombre : 'Gana el nivel anterior'}
+                </span>
               </button>
-            </div>
-          )}
+            );
+          })}
         </div>
 
-        {/* Lección de control biológico */}
-        {leccion && (
-          <div className="df-leccion" data-testid="defensores-leccion" role="status">
-            <Bug size={16} className="inline-block mr-1 -mt-0.5" aria-hidden="true" />
-            {leccion}
-          </div>
-        )}
-
-        {/* Selector de benéficos (control biológico) */}
-        <div className="df-beneficios" role="group" aria-label="Elige el organismo benéfico">
-          {beneficos.map((b) => (
-            <button
-              key={b.id}
-              type="button"
-              data-testid={`beneficio-${b.id}`}
-              data-selected={beneficoSel === b.id}
-              onClick={() => setBeneficoSel(b.id)}
-              aria-pressed={beneficoSel === b.id}
-              className="df-beneficio"
-            >
-              <span className="df-beneficio-emoji" aria-hidden="true">{b.emoji}</span>
-              <span className="df-beneficio-nombre">{b.nombre}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Controles táctiles (mobile-first) + teclado en desktop */}
-        <div className="df-controls">
-          <div className="df-dpad">
-            <button
-              type="button"
-              aria-label="Mover a la izquierda"
-              className="df-btn"
-              onPointerDown={(e) => { e.preventDefault(); input.current.left = true; }}
-              onPointerUp={() => { input.current.left = false; }}
-              onPointerLeave={() => { input.current.left = false; }}
-              onPointerCancel={() => { input.current.left = false; }}
-            >
-              ◀
-            </button>
-            <button
-              type="button"
-              aria-label="Mover a la derecha"
-              className="df-btn"
-              onPointerDown={(e) => { e.preventDefault(); input.current.right = true; }}
-              onPointerUp={() => { input.current.right = false; }}
-              onPointerLeave={() => { input.current.right = false; }}
-              onPointerCancel={() => { input.current.right = false; }}
-            >
-              ▶
-            </button>
-          </div>
-          <div className="flex gap-3">
-            <button
-              type="button"
-              aria-label="Soltar el bicho bueno"
-              className="df-btn df-btn-action"
-              onPointerDown={(e) => { e.preventDefault(); invocarBenefico(); }}
-            >
-              🐞
-            </button>
-            <button
-              type="button"
-              aria-label="Saltar"
-              className="df-btn df-btn-jump"
-              onPointerDown={(e) => { e.preventDefault(); input.current.jumpQueued = true; }}
-            >
-              ⤴
-            </button>
-          </div>
-        </div>
+        {/* El nivel se remonta con key → estado limpio sin setState en efecto. */}
+        <NivelJuego
+          key={nivel.numero}
+          nivel={nivel}
+          superados={superados}
+          onGanar={handleGanar}
+          onIrA={irANivel}
+        />
 
         <p className="text-2xs text-slate-400 text-center mt-2 leading-relaxed">
           En el computador: flechas ◀ ▶ para correr, ↑ o espacio para saltar.

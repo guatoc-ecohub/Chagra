@@ -1,13 +1,20 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import DefensoresFincaScreen from '../DefensoresFincaScreen';
-import { PARES_CONTROL, NIVEL_1 } from '../defensoresFincaData';
+import { PARES_CONTROL, NIVEL_1, NIVEL_2, PROGRESO_KEY } from '../defensoresFincaData';
 
 // jsdom no implementa canvas 2D: getContext devuelve null. El componente
 // guarda contra ctx null, así que el render no crashea y podemos probar el HUD,
 // los controles y la lógica de control biológico (que vive en refs).
 
 describe('DefensoresFincaScreen', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+  afterEach(() => {
+    localStorage.clear();
+  });
+
   it('renderiza el juego con HUD, controles táctiles y selector de benéficos', () => {
     render(<DefensoresFincaScreen />);
 
@@ -56,5 +63,39 @@ describe('DefensoresFincaScreen', () => {
     expect(leccion.textContent).toContain(par.leccion);
 
     raf.mockRestore();
+  });
+
+  it('muestra el selector con ambos niveles; el 2 arranca bloqueado', () => {
+    render(<DefensoresFincaScreen />);
+    expect(screen.getByTestId('defensores-niveles')).toBeInTheDocument();
+    const nivel1 = screen.getByTestId('nivel-1');
+    const nivel2 = screen.getByTestId('nivel-2');
+    expect(nivel1).not.toBeDisabled();
+    expect(nivel1).toHaveAttribute('data-selected', 'true');
+    // Sin progreso guardado, el nivel 2 está bloqueado.
+    expect(nivel2).toBeDisabled();
+    expect(nivel2.textContent).toContain('Gana el nivel anterior');
+  });
+
+  it('si el nivel 1 ya fue superado, el 2 queda desbloqueado y seleccionable', () => {
+    localStorage.setItem(PROGRESO_KEY, JSON.stringify({ superados: [1] }));
+    render(<DefensoresFincaScreen />);
+
+    const nivel2 = screen.getByTestId('nivel-2');
+    expect(nivel2).not.toBeDisabled();
+    expect(nivel2.textContent).toContain(NIVEL_2.nombre);
+
+    // Al elegir el nivel 2 cambian subtítulo y el set de benéficos del nivel.
+    fireEvent.click(nivel2);
+    expect(nivel2).toHaveAttribute('data-selected', 'true');
+    expect(screen.getByTestId('defensores-subtitulo').textContent).toContain(
+      NIVEL_2.subtitulo,
+    );
+    // El nivel 2 incluye pares que NO están en el nivel 1 (más elementos).
+    const extra = NIVEL_2.paresIds.find((id) => !NIVEL_1.paresIds.includes(id));
+    const parExtra = PARES_CONTROL.find((p) => p.id === extra);
+    expect(screen.getByTestId(`beneficio-${parExtra.benefico.id}`)).toBeInTheDocument();
+    // El aviso de mini-jefe del nivel 2 está presente.
+    expect(screen.getByTestId('defensores-jefe')).toBeInTheDocument();
   });
 });
