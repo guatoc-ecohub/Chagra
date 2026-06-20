@@ -65,8 +65,10 @@ import {
  *     "cablean", nodos que pulsan, corriente/sparks) + micelio/raíces + esporas
  *     + colibrí 2D. TODO portado del demo biopunk.
  *   - Escena minimal: trazo botánico monoline que se dibuja + horizonte fino +
- *     un toque verde tenue (sobrio, sin montañas ni grafo).
- *   - El colibrí 2D vuela en los TRES temas.
+ *     un toque verde tenue (sobrio, sin colibrí, sin sol/astro, sin montañas ni
+ *     grafo) — limpio crema/papel 1:1 con demo-agente-minimalista.html.
+ *   - El colibrí 2D vuela en bio-punk y nature; en minimalista NO aparece (la
+ *     escena limpia del demo no lo lleva).
  *   - Ícono del tema (THEMES[tema].icon del demo) en la marca y en el botón Ⓐ.
  *   - Toggle Campesino/Experto cableado al motor REAL `nivel_respuestas`
  *     (simple/detallado en userProfileService) — mueve el perfil de verdad y
@@ -778,16 +780,22 @@ export default function AgentHero({ onNavigate }) {
                    el toggle Campesino/Experto lo tape. */
                 .agentport-sun {
                     position: absolute;
-                    top: 8%;
-                    left: 25%;
+                    top: 9%;
+                    /* CENTRADO como el demo (.sun left:50%) — antes left:25% lo
+                       dejaba desplazado y desvaído a un lado (operador 2026-06-20:
+                       "sol como el demo"). */
+                    left: 50%;
                     transform: translateX(-50%);
                     width: 240px;
                     height: 240px;
                     border-radius: 50%;
+                    /* stops del demo (.sun: #fff4d6 0% → #ffe6a8 45% → transparente
+                       72%) — el mid-stop sólido (no .55) le da el cuerpo cálido
+                       del amanecer del demo, no un halo lavado. */
                     background: radial-gradient(
                         circle,
-                        rgba(255, 244, 214, 0.95) 0%,
-                        rgba(255, 230, 168, 0.55) 45%,
+                        #fff4d6 0%,
+                        #ffe6a8 45%,
                         rgba(255, 214, 140, 0) 72%
                     );
                     filter: blur(0.3px);
@@ -834,20 +842,26 @@ export default function AgentHero({ onNavigate }) {
                    solo se oculta cuando el cielo REAL está despejado; con
                    nube/niebla/lluvia el astro ES el que cuenta la verdad. */
                 [data-theme="nature"] .agentport-scene.is-day.sky-despejado .agentport-astro { display: none; }
+                /* minimalista: SIN astro (sol/luna) — el demo limpio no lleva
+                   ningún astro, solo el trazo botánico + horizonte (2026-06-20). */
+                [data-theme="minimalista"] .agentport-astro { display: none; }
                 .agentport-astro svg { width: 100%; height: 100%; display: block; }
                 @keyframes agentport-astro-breathe {
                     0%, 100% { opacity: .85; transform: scale(1); }
                     50% { opacity: 1; transform: scale(1.04); }
                 }
 
-                /* — MONTAÑAS 3 capas (nature) — paths exactos del demo. La
-                   banda de silueta se ancla baja en la pantalla para que las
-                   cumbres asomen detras de chips/compositor, como el demo, sin
-                   cruzar el saludo. */
+                /* — MONTAÑAS 3 capas (nature) — paths + fills exactos del demo
+                   (demo-agente.html .mtn). Ancladas al PIE (bottom:0) como el
+                   demo: la silueta llena el tercio inferior y las cumbres asoman
+                   detrás de chips/compositor — antes (bottom:18%) quedaban
+                   desvaídas/flotando a media pantalla (operador 2026-06-20:
+                   "reforzar montañas"). preserveAspectRatio:none deja que el SVG
+                   se estire a lo ancho real del teléfono, igual que el demo. */
                 .agentport-mtn {
                     position: absolute;
-                    left: 0; right: 0; bottom: 18%;
-                    height: 230px;
+                    left: 0; right: 0; bottom: 0;
+                    height: 320px;
                     display: none;
                 }
                 [data-theme="nature"] .agentport-mtn { display: block; }
@@ -973,9 +987,12 @@ export default function AgentHero({ onNavigate }) {
                     background: linear-gradient(90deg, transparent, #e3ddd0, transparent); opacity: .7;
                 }
 
-                /* ===== COLIBRÍ 2D — vuela en los 3 temas ===== */
+                /* ===== COLIBRÍ 2D — vuela en bio-punk y nature ===== */
                 /* El SVG base es ocre/teal (nature). En bio-punk recibe un glow
-                   neón vía drop-shadow; en minimal queda tenue/sobrio. */
+                   neón vía drop-shadow. En MINIMALISTA NO vuela: el demo
+                   (demo-agente-minimalista.html) es limpio crema/papel — solo el
+                   trazo botánico (.agentport-sprig) + horizonte, sin colibrí ni
+                   sol/montañas ("menos es más", operador 2026-06-20). */
                 .agentport-hummer {
                     position: absolute; top: 28%; left: 16%; z-index: 2;
                     animation: agentport-fly 18s cubic-bezier(.22,.61,.36,1) infinite;
@@ -985,8 +1002,8 @@ export default function AgentHero({ onNavigate }) {
                 /* bio-punk = tema base (sin data-theme): glow neón teal */
                 .agentport-hummer svg { filter: drop-shadow(0 0 8px rgba(25,201,154,.7)) drop-shadow(0 0 16px rgba(25,240,192,.35)); }
                 [data-theme="nature"] .agentport-hummer svg { filter: drop-shadow(0 6px 6px rgba(90,60,20,.18)); }
-                [data-theme="minimalista"] .agentport-hummer { opacity: .85; }
-                [data-theme="minimalista"] .agentport-hummer svg { filter: drop-shadow(0 4px 5px rgba(31,36,33,.14)); }
+                /* minimalista: SIN colibrí (escena limpia del demo). */
+                [data-theme="minimalista"] .agentport-hummer { display: none; }
                 .agentport-hummer .wing {
                     transform-origin: 18px 26px;
                     animation: agentport-flap .14s ease-in-out infinite alternate;
@@ -1684,7 +1701,9 @@ export default function AgentHero({ onNavigate }) {
                     <div className="agentport-horizon" />
                 </div>
 
-                {/* — COLIBRÍ 2D — vuela en los 3 temas (SVG del demo nature) — */}
+                {/* — COLIBRÍ 2D — vuela en bio-punk y nature (SVG del demo
+                     nature). En minimalista se oculta vía CSS: el demo limpio no
+                     lleva colibrí. — */}
                 <div className="agentport-hummer">
                     <HummerSvg />
                 </div>
