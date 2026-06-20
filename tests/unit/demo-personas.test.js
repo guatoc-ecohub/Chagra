@@ -3,9 +3,9 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { applyProfilePreset, getActivePresetId } from '../src/services/profilePresets.js';
-import { seedProfileData, PROFILE_SEEDS } from '../src/services/demoPersonaSeeds.js';
-import { setOperatorOverride, operatorOverrideActivo } from '../src/config/glaciarAccess.js';
+import { applyProfilePreset, getActivePresetId } from '../../src/services/profilePresets.js';
+import { seedProfileData, PROFILE_SEEDS } from '../../src/services/demoPersonaSeeds.js';
+import { setOperatorOverride, operatorOverrideActivo } from '../../src/config/glaciarAccess.js';
 
 describe('Demo Personas — Perfiles con datos ricos', () => {
   beforeEach(() => {
