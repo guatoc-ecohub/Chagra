@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import ChagraAgentAvatar from './ChagraAgentAvatar';
+import { MSG } from '../config/messages.js';
 
 /**
  * WelcomeStatsHero — widget de bienvenida con narrativa de impacto del agente.
@@ -187,18 +188,49 @@ const TONE_CLASSES = {
  * AgentColibriChip — colibri clickable que abre el agente desde el home.
  * Default idle (vuelo estacionario), hover thinking (libando), click navega.
  * Se anima en mouse over para invitar al click y en touch press en mobile.
+ *
+ * Bug móvil "Abrir Chagra IA no abre el overlay" (2026-06-20): el botón solo
+ * abría el agente vía `onClick`, pero el press anima un `transform: scale()`
+ * que cambia la geometría del target ENTRE touchstart y touchend. En móvil
+ * (iOS Safari + algunos Chrome Android) ese reescalado bajo el dedo hace que el
+ * navegador CANCELE el click sintético → `onNavigate('agente')` nunca corría y
+ * el overlay no abría (en desktop el click de mouse no se ve afectado, por eso
+ * "funcionaba en desktop pero no en móvil"). Fix mobile-first: disparar la
+ * navegación en `onTouchEnd` (la intención real del tap) y `preventDefault()`
+ * para suprimir el ghost-click, deduplicando con `navigatedByTouchRef` para que
+ * el click sintético —si igual llega— no navegue dos veces.
  */
 function AgentColibriChip({ onNavigate, size = 26 }) {
   const [hover, setHover] = useState(false);
   const [pressed, setPressed] = useState(false);
   const interactive = typeof onNavigate === 'function';
   const state = pressed ? 'speaking' : hover ? 'thinking' : 'idle';
+  // Marca que el tap táctil ya navegó, para ignorar el click sintético que
+  // algunos navegadores móviles emiten después del touchend.
+  const navigatedByTouchRef = useRef(false);
 
-  const handleClick = () => { if (interactive) onNavigate('agente'); };
+  const openAgent = () => { if (interactive) onNavigate('agente'); };
+  const handleClick = () => {
+    // Si el touchend ya navegó, el click sintético es un duplicado: no-op.
+    if (navigatedByTouchRef.current) {
+      navigatedByTouchRef.current = false;
+      return;
+    }
+    openAgent();
+  };
   const enter = () => setHover(true);
   const leave = () => { setHover(false); setPressed(false); };
   const down = () => setPressed(true);
   const up = () => setPressed(false);
+  const handleTouchEnd = (e) => {
+    setHover(false);
+    setPressed(false);
+    if (!interactive) return;
+    // Suprime el ghost-click (evita doble navegación) y abre en el tap real.
+    if (e?.cancelable) e.preventDefault();
+    navigatedByTouchRef.current = true;
+    openAgent();
+  };
 
   return (
     <button
@@ -212,7 +244,7 @@ function AgentColibriChip({ onNavigate, size = 26 }) {
       onMouseDown={down}
       onMouseUp={up}
       onTouchStart={() => { setHover(true); setPressed(true); }}
-      onTouchEnd={() => { setHover(false); setPressed(false); }}
+      onTouchEnd={handleTouchEnd}
       onFocus={enter}
       onBlur={leave}
       className={`shrink-0 inline-flex items-center justify-center rounded-full bg-slate-900 border ${
@@ -505,7 +537,7 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate }) {
                 {isPreLogin ? GLOBAL_FEDERATION_FALLBACK.plantasRegistradas : plantsCount}
               </div>
               <div className="text-[9px] text-slate-500 truncate">
-                {isPreLogin ? 'Plantas registradas' : (plantsCount === 1 ? 'Planta tuya' : 'Plantas tuyas')}
+                {isPreLogin ? MSG.welcomeStats.plantasRegistradas : (plantsCount === 1 ? MSG.welcomeStats.plantaTuya : MSG.welcomeStats.plantasTuyas)}
               </div>
             </div>
           </div>
