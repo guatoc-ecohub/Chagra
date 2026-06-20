@@ -172,6 +172,12 @@ const messages = {
     fincaActivaLabel: 'Finca activa:',
     guardar: 'Guardar',
   },
+  // Hero de bienvenida (WelcomeStatsHero) — etiquetas del mini-grid de stats.
+  welcomeStats: {
+    plantasRegistradas: 'Plantas registradas',
+    plantaTuya: 'Planta tuya',
+    plantasTuyas: 'Plantas tuyas',
+  },
   format,
 };
 
