@@ -1205,6 +1205,12 @@ export default function App() {
             <HelpManual onBack={() => navigate('dashboard')} onNavigate={navigate} />
           </ErrorBoundary>
         );
+      case 'ayuda':
+        return (
+          <ErrorBoundary>
+            <HelpManual onBack={() => navigate('dashboard')} onNavigate={navigate} />
+          </ErrorBoundary>
+        );
       case 'agente':
         // Guard offline ANTES del dynamic import (bug offline-first 2026-06-13):
         // AgentScreen es un chunk lazy. Si se abre el agente OFFLINE con ese
