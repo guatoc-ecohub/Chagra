@@ -9,13 +9,17 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-const { listFarmProcesses, getPestRisksByStage } = vi.hoisted(() => ({
+const { listFarmProcesses, getPestRisksByStage, getActiveDiseaseForCycle } = vi.hoisted(() => ({
   listFarmProcesses: vi.fn(),
   getPestRisksByStage: vi.fn(),
+  getActiveDiseaseForCycle: vi.fn(),
 }));
 
 vi.mock('../../db/farmProcessCache', () => ({ listFarmProcesses }));
 vi.mock('../climateCycleService', () => ({ getPestRisksByStage }));
+// Sin enfermedad en bitácora por defecto: el canal crop_disease solo agrega un
+// 'alertCleared' por ciclo. Mockeado para no tocar IDB real en este test de plaga.
+vi.mock('../diseaseObservationService', () => ({ getActiveDiseaseForCycle }));
 
 import { runCropAlerts } from '../cropAlertEngine';
 
@@ -28,6 +32,7 @@ let events;
 beforeEach(() => {
   listFarmProcesses.mockReset();
   getPestRisksByStage.mockReset();
+  getActiveDiseaseForCycle.mockReset().mockResolvedValue(null);
   events = [];
   vi.spyOn(window, 'dispatchEvent').mockImplementation((ev) => {
     events.push({ name: ev.type, detail: ev.detail });
@@ -55,8 +60,11 @@ describe('cropAlertEngine.runCropAlerts', () => {
     listFarmProcesses.mockResolvedValue([cycle('p2', 'sowing')]);
     getPestRisksByStage.mockReturnValue([]);
     const res = await runCropAlerts();
-    expect(res.cleared).toBe(1);
+    // Dos clears por ciclo sin novedad: el de plaga (crop_pest) y el de
+    // enfermedad de bitácora (crop_disease, sin enfermedad → clear).
+    expect(res.cleared).toBe(2);
     expect(events.some((e) => e.name === 'alertCleared' && e.detail.type === 'crop_pest_p2')).toBe(true);
+    expect(events.some((e) => e.name === 'alertCleared' && e.detail.type === 'crop_disease_p2')).toBe(true);
     expect(events.some((e) => e.name === 'alertTriggered')).toBe(false);
   });
 

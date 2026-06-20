@@ -61,7 +61,7 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
 
   return (
     <div className="px-4 pb-10 flex flex-col gap-4">
-      <FarmProcessSummary process={cycle} pestRisks={pestRisks} />
+      <FarmProcessSummary process={cycle} pestRisks={pestRisks} altitudeM={altitudeM} />
 
       {/* Etapa actual + confirmar cambio (stageConfirmationService) */}
       <section className="bg-slate-900 border border-slate-800 rounded-xl p-3">

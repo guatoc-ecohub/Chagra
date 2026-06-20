@@ -160,6 +160,95 @@ export function getCurrentStage({ speciesSlug, sowingDate, altitudeM, now }) {
 }
 
 /**
+ * @typedef {Object} LifecycleEnd
+ * @property {number|null} harvestStart — timestamp ms estimado de inicio de cosecha
+ * @property {number|null} harvestEnd — timestamp ms estimado de fin de la ventana de cosecha
+ * @property {number|null} naturalDeath — timestamp ms estimado de muerte natural / senescencia
+ * @property {'lifecycle_block'|'derived_from_stages'|'unavailable'} source — de dónde salió la estimación
+ * @property {number} confidence — 0-1
+ */
+
+/**
+ * Estima el FIN DEL CICLO de una siembra: ventana de cosecha y muerte natural
+ * (senescencia tras cosecha o, si no se cosecha, bolting + colapso de la planta).
+ *
+ * Precedencia:
+ *   1. Bloque `lifecycle` del template (días explícitos por especie). Es el dato
+ *      curado más confiable. Aplica corrección por altitud.
+ *   2. Derivado de las ETAPAS: usa el windowEnd de la etapa de cosecha
+ *      (`harvest_window` | `harvest`) y el windowStart de la etapa `closed`
+ *      como proxy de la muerte natural. Degrada limpio si no existen.
+ *
+ * Invariante: NO modifica el proceso ni inventa fechas — degrada a `unavailable`
+ * cuando faltan datos. Es estimación de referencia, no observación.
+ *
+ * @param {Object} input
+ * @param {string} input.speciesSlug
+ * @param {number} input.sowingDate — timestamp ms del evento de siembra
+ * @param {number} [input.altitudeM]
+ * @returns {LifecycleEnd}
+ */
+export function calculateLifecycleEnd({ speciesSlug, sowingDate, altitudeM }) {
+  const unavailable = {
+    harvestStart: null,
+    harvestEnd: null,
+    naturalDeath: null,
+    source: 'unavailable',
+    confidence: 0,
+  };
+
+  const template = getTemplate(speciesSlug);
+  if (!template || !sowingDate || sowingDate <= 0) return unavailable;
+
+  // 1) Bloque lifecycle explícito (más confiable).
+  const lc = template.lifecycle;
+  if (lc && typeof lc === 'object') {
+    const harvestMin = Number(lc.sowing_to_harvest_min_days);
+    const harvestMax = Number(lc.sowing_to_harvest_max_days);
+    const deathDays = Number(lc.natural_death_days);
+    const day = (d) =>
+      Number.isFinite(d) && d > 0
+        ? sowingDate + altitudeCorrection(d, altitudeM) * 86400000
+        : null;
+    let confidence = altitudeM && altitudeM > 0 ? 0.7 : 0.5;
+    return {
+      harvestStart: day(harvestMin),
+      harvestEnd: day(harvestMax),
+      naturalDeath: day(deathDays),
+      source: 'lifecycle_block',
+      confidence,
+    };
+  }
+
+  // 2) Derivar de las etapas (fallback genérico para especies sin bloque).
+  const windows = calculateWindows({ speciesSlug, sowingDate, altitudeM });
+  const harvest = windows.find((w) => w.code === 'harvest_window' || w.code === 'harvest');
+  const closed = windows.find((w) => w.code === 'closed' || w.code === 'fallow');
+  if (!harvest && !closed) return unavailable;
+
+  return {
+    harvestStart: harvest ? harvest.windowStart : null,
+    harvestEnd: harvest ? harvest.windowEnd : null,
+    // La etapa `closed` arranca cuando el ciclo comercial termina: su windowStart
+    // es el mejor proxy de muerte natural / senescencia disponible sin bloque.
+    naturalDeath: closed ? closed.windowStart : (harvest ? harvest.windowEnd : null),
+    source: 'derived_from_stages',
+    confidence: altitudeM && altitudeM > 0 ? 0.55 : 0.4,
+  };
+}
+
+/**
+ * Frase campesina para el fin de ciclo. Degrada a '' si no hay estimación.
+ * @param {LifecycleEnd} lc
+ * @returns {string}
+ */
+export function formatLifecycleEnd(lc) {
+  if (!lc || lc.source === 'unavailable' || lc.naturalDeath == null) return '';
+  const fecha = new Date(lc.naturalDeath).toLocaleDateString('es-CO', { month: 'short', day: 'numeric' });
+  return `Se espera fin de ciclo ~${fecha}`;
+}
+
+/**
  * Ventana legible para el campesino.
  * @param {PhenologyWindow} w
  * @returns {string}

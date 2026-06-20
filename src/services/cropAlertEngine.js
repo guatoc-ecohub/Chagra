@@ -15,6 +15,7 @@
 import { listFarmProcesses } from '../db/farmProcessCache';
 import { getPestRisksByStage } from './climateCycleService';
 import { getEnsoServicePhase, getEnsoLabel } from './ensoService';
+import { getActiveDiseaseForCycle } from './diseaseObservationService';
 
 const SEVERITY_BY_RISK = { 'crítico': 'danger', critico: 'danger', alto: 'warning' };
 
@@ -69,6 +70,37 @@ export async function runCropAlerts() {
       emitted++;
     } else {
       emit('alertCleared', { type });
+      cleared++;
+    }
+
+    // ── Enfermedad observada en la BITÁCORA del ciclo ──────────────────────
+    // El usuario anotó un síntoma de enfermedad: el agente debe saberlo
+    // PROACTIVAMENTE. Es un dato FACTUAL (el usuario lo escribió), no inferido.
+    // Canal separado (`crop_disease_<id>`) del riesgo de plaga por etapa para
+    // que coexistan y se de-dupliquen por su cuenta.
+    const diseaseType = `crop_disease_${id}`;
+    let disease = null;
+    try {
+      disease = await getActiveDiseaseForCycle(id, a.subject_slug);
+    } catch {
+      disease = null;
+    }
+    if (disease && disease.isDisease) {
+      const named = disease.pathogen
+        ? disease.pathogen
+        : 'Síntoma de enfermedad a vigilar';
+      const control = disease.control ? ` ${disease.control}` : '';
+      emit('alertTriggered', {
+        type: diseaseType,
+        severity: disease.severity === 'alto' ? 'warning' : 'info',
+        title: `Posible enfermedad en ${a.subject_label || 'tu cultivo'}`,
+        message: `${named}.${control}`.trim(),
+        source: 'crop',
+        processId: id,
+      });
+      emitted++;
+    } else {
+      emit('alertCleared', { type: diseaseType });
       cleared++;
     }
   }
