@@ -84,7 +84,7 @@ export default function SpeciesImage({
     if (compact) {
       return (
         <div
-          className={`grid h-20 place-items-center rounded-lg border border-slate-700 bg-slate-900 text-slate-400 ${className}`}
+          className={`grid h-20 place-items-center rounded-lg border species-image-fallback ${className}`}
           title={`Sin imagen con licencia abierta para ${scientificName || commonName || 'esta especie'}`}
         >
           <FallbackIcon kind={kind} />
@@ -93,13 +93,13 @@ export default function SpeciesImage({
     }
 
     return (
-      <div className={`relative flex items-center gap-3 rounded-lg border border-slate-700 bg-slate-900 p-3 text-slate-300 ${className}`}>
-        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-md bg-slate-800 text-slate-400">
+      <div className={`relative flex items-center gap-3 rounded-lg border p-3 species-image-fallback-large ${className}`}>
+        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-md species-image-icon">
           <FallbackIcon kind={kind} />
         </div>
         <div className="min-w-0">
-          <p className="text-xs font-bold text-slate-200">Sin foto confiable todavía</p>
-          <p className="text-[11px] leading-snug text-slate-500">
+          <p className="text-xs font-bold species-image-title">Sin foto confiable todavía</p>
+          <p className="text-[11px] leading-snug species-image-text">
             No se encontró una imagen con licencia abierta para {scientificName || commonName || 'esta especie'}.
           </p>
         </div>

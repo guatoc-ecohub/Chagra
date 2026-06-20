@@ -49,7 +49,7 @@ function CitationBadge({ citation, index }) {
         data-testid="deep-research-citation-badge"
         data-source-id={citation.source_id}
         title={`Fuente verificable: ${label}. Abre el documento original en una pestaña nueva.`}
-        className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 bg-sky-600/20 text-sky-300 border border-sky-700 hover:bg-sky-600/30 underline-offset-2 hover:underline"
+        className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 deep-research-citation-link border hover:underline-offset-2 hover:underline"
       >
         <ShieldCheck size={11} aria-hidden="true" />
         <span>{label}</span>
@@ -62,7 +62,7 @@ function CitationBadge({ citation, index }) {
     <span
       data-testid="deep-research-citation-badge"
       data-source-id={citation.source_id}
-      className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 bg-slate-600/20 text-slate-300 border border-slate-600"
+      className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 deep-research-citation-badge border"
     >
       <ShieldCheck size={11} aria-hidden="true" />
       <span>{label}</span>

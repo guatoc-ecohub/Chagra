@@ -1167,3 +1167,94 @@ html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
 [data-theme="nature"] .hero-accent-yellow {
   background-color: rgb(var(--c-emerald-400)) !important;
 }
+
+/* ===========================================================================
+ * 7. DEEPRESEARCHCARD THEME-AWARE — badges de citas de investigación
+ *    Reemplaza colores hardcodeados con tokens del tema.
+ * =========================================================================== */
+
+.deep-research-citation-link {
+  background-color: rgb(6 182 212 / 0.2);
+  color: rgb(125 211 252);
+  border-color: rgb(12 74 110 / 0.7);
+}
+[data-theme="minimalista"] .deep-research-citation-link,
+[data-theme="nature"] .deep-research-citation-link {
+  background-color: rgb(var(--c-surface-raised) / 0.4);
+  color: rgb(var(--c-slate-100));
+  border-color: rgb(var(--c-surface-border));
+}
+.deep-research-citation-link:hover {
+  background-color: rgb(6 182 212 / 0.3);
+}
+[data-theme="minimalista"] .deep-research-citation-link:hover,
+[data-theme="nature"] .deep-research-citation-link:hover {
+  background-color: rgb(var(--c-surface-raised) / 0.6);
+}
+
+.deep-research-citation-badge {
+  background-color: rgb(var(--c-slate-600) / 0.2);
+  color: rgb(var(--c-slate-300));
+  border-color: rgb(var(--c-slate-600));
+}
+[data-theme="minimalista"] .deep-research-citation-badge,
+[data-theme="nature"] .deep-research-citation-badge {
+  background-color: rgb(var(--c-surface-raised) / 0.3);
+  color: rgb(var(--c-slate-200));
+  border-color: rgb(var(--c-surface-border));
+}
+
+/* ===========================================================================
+ * 8. SPECIESIMAGE THEME-AWARE — fallbacks de imágenes de especies
+ *    Reemplaza colores hardcodeados con tokens del tema.
+ * =========================================================================== */
+
+.species-image-fallback {
+  background-color: rgb(var(--c-slate-900));
+  color: rgb(var(--c-slate-400));
+  border-color: rgb(var(--c-slate-700));
+}
+[data-theme="minimalista"] .species-image-fallback,
+[data-theme="nature"] .species-image-fallback {
+  background-color: rgb(var(--c-surface-card));
+  color: rgb(var(--c-slate-500));
+  border-color: rgb(var(--c-surface-border));
+}
+
+.species-image-fallback-large {
+  background-color: rgb(var(--c-slate-900));
+  color: rgb(var(--c-slate-300));
+  border-color: rgb(var(--c-slate-700));
+}
+[data-theme="minimalista"] .species-image-fallback-large,
+[data-theme="nature"] .species-image-fallback-large {
+  background-color: rgb(var(--c-surface-card));
+  color: rgb(var(--c-slate-200));
+  border-color: rgb(var(--c-surface-border));
+}
+
+.species-image-icon {
+  background-color: rgb(var(--c-slate-800));
+  color: rgb(var(--c-slate-400));
+}
+[data-theme="minimalista"] .species-image-icon,
+[data-theme="nature"] .species-image-icon {
+  background-color: rgb(var(--c-surface-raised));
+  color: rgb(var(--c-slate-500));
+}
+
+.species-image-title {
+  color: rgb(var(--c-slate-200));
+}
+[data-theme="minimalista"] .species-image-title,
+[data-theme="nature"] .species-image-title {
+  color: rgb(var(--c-slate-100));
+}
+
+.species-image-text {
+  color: rgb(var(--c-slate-500));
+}
+[data-theme="minimalista"] .species-image-text,
+[data-theme="nature"] .species-image-text {
+  color: rgb(var(--c-slate-400));
+}
