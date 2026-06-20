@@ -27,7 +27,7 @@
   image-rendering: -webkit-optimize-contrast;
 }
 
-/* ── Selector de nivel (1 / 2) ───────────────────────────────────────── */
+/* ── Selector de nivel (1 / 2 / 3) ───────────────────────────────────── */
 
 .df-niveles {
   display: flex;

@@ -27,6 +27,7 @@ export const CULTIVOS = [
   { id: 'tomate', nombre: 'Tomate', emoji: '🍅' },
   { id: 'ahuyama', nombre: 'Ahuyama', emoji: '🎃' },
   { id: 'platano', nombre: 'Plátano', emoji: '🍌' },
+  { id: 'cafe', nombre: 'Café', emoji: '☕' },
 ];
 
 /**
@@ -178,6 +179,62 @@ export const PARES_CONTROL = [
     },
     leccion: 'La mantis religiosa es una cazadora que controla saltamontes.',
   },
+  // ── Plagas y aliados del CAFETAL (nivel 3) ─────────────────────────────
+  // Control biológico documentado por Cenicafé Colombia para el café.
+  {
+    id: 'broca-cephalonomia',
+    plaga: {
+      id: 'broca',
+      nombre: 'Broca del café',
+      cientifico: 'Hypothenemus hampei',
+      emoji: '🪲',
+      dano: 'Perfora el grano de café y arruina la cosecha.',
+    },
+    benefico: {
+      id: 'cephalonomia',
+      nombre: 'Avispa Cephalonomia',
+      cientifico: 'Cephalonomia stephanoderis',
+      emoji: '🐝',
+      como: 'Esta avispita entra al grano y parasita a la broca.',
+    },
+    leccion: 'La avispa Cephalonomia controla la broca dentro del grano de café.',
+  },
+  {
+    id: 'minador-closterocerus',
+    plaga: {
+      id: 'minador',
+      nombre: 'Minador de la hoja',
+      cientifico: 'Leucoptera coffeella',
+      emoji: '🐛',
+      dano: 'Hace galerías cafés en la hoja del café y la seca.',
+    },
+    benefico: {
+      id: 'closterocerus',
+      nombre: 'Avispa Closterocerus',
+      cientifico: 'Closterocerus coffeellae',
+      emoji: '🐝',
+      como: 'Esta avispita parasita a la larva del minador en la hoja.',
+    },
+    leccion: 'La avispa Closterocerus controla el minador de la hoja del café.',
+  },
+  {
+    id: 'cochinilla-cryptolaemus',
+    plaga: {
+      id: 'cochinilla',
+      nombre: 'Cochinilla harinosa',
+      cientifico: 'Planococcus citri',
+      emoji: '🐌',
+      dano: 'Forma motas blancas y chupa la savia de las ramas.',
+    },
+    benefico: {
+      id: 'cryptolaemus',
+      nombre: 'Escarabajo come-cochinillas',
+      cientifico: 'Cryptolaemus montrouzieri',
+      emoji: '🐞',
+      como: 'Este escarabajo y sus larvas devoran las cochinillas.',
+    },
+    leccion: 'El escarabajo Cryptolaemus se come la cochinilla harinosa.',
+  },
 ];
 
 /** Mapa rápido benéfico → plaga que controla (para la lógica del juego). */
@@ -304,8 +361,78 @@ export const NIVEL_2 = Object.freeze({
   }),
 });
 
+/**
+ * Nivel 3 — el cafetal al amanecer (clima medio, montaña cafetera).
+ *
+ * El nivel más largo y exigente: un cafetal entre la niebla de la mañana. El
+ * mundo es más ancho que el del nivel 2 (cámara que recorre más finca), hay más
+ * cultivos que recoger (incluido el café), aparecen TODAS las plagas — las de la
+ * huerta y la ladera más tres plagas propias del café (broca, minador de la hoja
+ * y cochinilla harinosa) con sus aliados reales documentados por Cenicafé — y
+ * más plataformas y huecos. El cierre es un mini-jefe grande: la BROCA del café,
+ * que solo cae con su controlador real (la avispa Cephalonomia) y aguanta más
+ * golpes que la langosta del nivel 2. Dificultad creciente y cierre satisfactorio.
+ */
+export const NIVEL_3 = Object.freeze({
+  id: 'nivel-3',
+  numero: 3,
+  nombre: 'El cafetal en la niebla',
+  subtitulo: 'Amanece en el cafetal. Es largo y hay plagas del café por todas partes.',
+  energiaInicial: 5,
+  energiaMax: 5,
+  metaCultivos: 14,
+  mundoAncho: 2520,
+  paresIds: [
+    'pulgon-catarina',
+    'moscablanca-crisopa',
+    'cogollero-trichogramma',
+    'afido-sirfido',
+    'trips-amblyseius',
+    'acaro-phytoseiulus',
+    'saltamontes-mantis',
+    'broca-cephalonomia',
+    'minador-closterocerus',
+    'cochinilla-cryptolaemus',
+  ],
+  escena: Object.freeze({
+    id: 'cafetal-amanecer',
+    cieloTop: '#cdeaf0',
+    cieloBottom: '#f3efe0',
+    montana: '#4f7a52',
+    sueloTop: '#5a3a22',
+    sueloBottom: '#241510',
+    pasto: '#3f6b2a',
+    astro: '#fff6d6',
+  }),
+  // Camino que sube y baja por la ladera del cafetal (más plataformas que el 2).
+  plataformas: Object.freeze([
+    Object.freeze({ x: 340, y: 90, w: 130 }),
+    Object.freeze({ x: 560, y: 150, w: 120 }),
+    Object.freeze({ x: 820, y: 100, w: 140 }),
+    Object.freeze({ x: 1080, y: 160, w: 120 }),
+    Object.freeze({ x: 1320, y: 100, w: 140 }),
+    Object.freeze({ x: 1580, y: 150, w: 120 }),
+    Object.freeze({ x: 1840, y: 96, w: 140 }),
+    Object.freeze({ x: 2100, y: 150, w: 120 }),
+  ]),
+  // Más huecos (zanjas del cafetal) repartidos a lo largo del mundo.
+  huecos: Object.freeze([
+    Object.freeze({ x: 700, w: 70 }),
+    Object.freeze({ x: 1240, w: 75 }),
+    Object.freeze({ x: 1760, w: 75 }),
+    Object.freeze({ x: 2260, w: 70 }),
+  ]),
+  // Mini-jefe: una broca gigante al final del cafetal. Solo la avispa
+  // Cephalonomia (su controlador real) la derriba; aguanta más golpes (vida 4).
+  jefe: Object.freeze({
+    plagaId: 'broca',
+    emoji: '🪲',
+    vida: 4,
+  }),
+});
+
 /** Todos los niveles en orden de juego. */
-export const NIVELES = Object.freeze([NIVEL_1, NIVEL_2]);
+export const NIVELES = Object.freeze([NIVEL_1, NIVEL_2, NIVEL_3]);
 
 /** Busca un nivel por su número (1-indexado). Devuelve NIVEL_1 si no existe. */
 export function getNivel(numero) {
