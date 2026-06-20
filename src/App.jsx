@@ -80,7 +80,6 @@ const BiodiversidadView = lazy(() => import('./components/BiodiversidadView'));
 const Asociaciones = lazy(() => import('./components/Asociaciones'));
 const FermentosView = lazy(() => import('./components/FermentosView'));
 const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
-const OnboardingPiloto = lazy(() => import('./components/OnboardingPiloto'));
 const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
 const LocationDetectedScreen = lazy(() => import('./components/LocationDetectedScreen'));
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
@@ -569,17 +568,6 @@ export default function App() {
       return;
     }
 
-    const isOnboardingPiloto =
-      pathname === 'onboarding-piloto' ||
-      hash === 'onboarding-piloto' ||
-      search.get('onboarding') === 'piloto';
-    if (isOnboardingPiloto) {
-      // Microtask para evitar setState sincrónico en effect body
-      // (ESLint react-hooks/set-state-in-effect). Mismo patrón async-like
-      // que el isAuthenticated().then() de abajo, para que pase el lint.
-      Promise.resolve().then(() => navigate('onboarding-piloto'));
-      return;
-    }
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
         navigate('login');
@@ -822,12 +810,6 @@ export default function App() {
                 navigate('login');
               }}
             />
-          </ErrorBoundary>
-        );
-      case 'onboarding-piloto':
-        return (
-          <ErrorBoundary>
-            <OnboardingPiloto />
           </ErrorBoundary>
         );
       case 'onboarding-perfil':
