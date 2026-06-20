@@ -109,25 +109,29 @@ export default function OnboardingHero({ onNavigate, compact = false }) {
 
   // Bloques del "Paso 1: piso térmico". Se reúsan en el banner compacto
   // (above-the-fold) y en el hero completo (bajo el fold).
+  const pisoCardClass = compact
+    ? 'onboarding-piso-card onboarding-piso-card-compact'
+    : 'onboarding-piso-card';
+
   const pisoStep = (
     <>
       {/* ── Paso 1: piso térmico (filtro maestro de TODOS los módulos) ── */}
       {needsLocation && (
         <div
           data-testid="onboarding-piso-cta"
-          className="rounded-xl bg-emerald-950/50 border-2 border-emerald-600/60 p-4 flex flex-col gap-3"
+          className={pisoCardClass}
         >
           <div className="flex items-start gap-3">
-            <span className="text-4xl shrink-0" aria-hidden="true">📍</span>
+            <span className="onboarding-piso-pin" aria-hidden="true">📍</span>
             <div className="min-w-0 flex-1">
-              <p className="text-lg font-black text-emerald-100 leading-tight">
+              <p className="onboarding-piso-title">
                 Primero: ¿dónde está su finca?
               </p>
-              <p className="text-sm text-slate-300 leading-relaxed mt-1">
+              <p className="onboarding-piso-copy">
                 Con la altura de su tierra sabemos si su clima es
                 {' '}<span aria-hidden="true">🌴</span> caliente,
                 {' '}<span aria-hidden="true">🌤️</span> templado o
-                {' '}<span aria-hidden="true">⛅</span> frío — y todos los
+                {' '}<span aria-hidden="true">⛅</span> frío, y todos los
                 consejos le salen acertados.
               </p>
             </div>
@@ -135,14 +139,14 @@ export default function OnboardingHero({ onNavigate, compact = false }) {
           <button
             type="button"
             onClick={() => onNavigate('ubicacion-detectada')}
-            className="w-full min-h-[56px] rounded-xl bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white text-lg font-black flex items-center justify-center gap-2 transition-colors"
+            className="onboarding-piso-primary"
           >
             <MapPin size={22} aria-hidden="true" /> Ubicar mi finca
           </button>
           <button
             type="button"
             onClick={() => onNavigate('onboarding-perfil')}
-            className="text-sm text-emerald-300 hover:text-emerald-200 underline underline-offset-2 self-center"
+            className="onboarding-piso-secondary"
           >
             Prefiero contarle de mi finca con preguntas
           </button>
