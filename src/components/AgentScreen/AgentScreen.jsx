@@ -105,18 +105,15 @@ import { executeAction, setActionGateCallback } from '../../services/actionExecu
 import { getToolsForLLM } from '../../services/llmTools';
 import { useRotatingTip } from '../../services/tipsService';
 import ChatHistory from './ChatHistory';
-import SuggestedActions from './SuggestedActions';
 import ActionConfirmModal from '../ActionConfirmModal';
 import FeedbackConsentModal from '../FeedbackConsentModal';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import ChagraAgentAvatarColibriPhoto from '../ChagraAgentAvatarColibriPhoto';
-import ChipsToolbar from '../ChipsToolbar';
-// FUENTE ÚNICA de la MANO (operador: en el agente "no se ve la mano, se ven
-// los menús en texto"). AgentManoOverlay monta el MISMO AgentRedMenu que el
-// home; mapCapabilityPick es el routing único de un pick de capacidad.
 import { AgentManoOverlay } from '../agent/AgentShell';
 import { mapCapabilityPick } from '../agent/capabilityRouting';
 import { agentSounds } from '../../services/agentSoundService';
+import { useTheme } from '../../hooks/useTheme';
+import { iconForTheme } from '../dashboard/themeIcon';
 import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
 import useAgentNotificationStore from '../../store/useAgentNotificationStore';
@@ -153,6 +150,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // re-render — si no, la animación se reiniciaría con cada mensaje). Vacía bajo
   // prefers-reduced-motion.
   const entranceClassRef = useRef(agentEntranceClass());
+  const { theme } = useTheme();
   const operatorId = usePrefsStore((s) => s.operatorId) || 'default-operator';
   // Task #122 (2026-05-23): ttsEnabled global persistido en usePrefsStore.
   // Antes era useState local — al cambiarlo en otra pantalla (header
@@ -249,7 +247,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // alertas + tareas + clima/cultivos) y solo se muestra mientras el chat esté
   // vacío e idle. null mientras no haya resuelto (fallback al copy estático).
   const [proactiveGreeting, setProactiveGreeting] = useState(null);
-  // CHIPS DE MODO (A4): modo activo seleccionado en la ChipsToolbar. Cuando
+  // CHIPS DE MODO (A4): modo activo seleccionado en la mano de Chagra. Cuando
   // hay un modo activo, el siguiente submit fuerza esa intención y rutea
   // DIRECTO al tool determinístico (saltando el NLU, A3). El placeholder del
   // input también cambia para guiar al campesino sobre qué escribir. Es un
@@ -260,7 +258,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // silvopastoreo, guía glaciar→clima/páramo, ganadero→silvopastoreo...). La
   // SELECCIÓN/lógica vive en profileChipSelector (puro, testeado); aquí solo
   // leemos el perfil + módulos visibles + acceso glaciar y le pasamos la lista
-  // ya filtrada a la ChipsToolbar. NO tocamos su CSS (otro stream lleva estilo).
+  // ya filtrada a la mano de Chagra. NO tocamos su CSS (otro stream lleva estilo).
   // Memoizado al montar: el perfil rara vez cambia dentro de la sesión del chat
   // (mismo criterio que los otros getProfile() de este componente).
   const profileChipDefs = useMemo(() => {
@@ -273,7 +271,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         moduleVisibility: getModuleVisibility(),
       });
     } catch (_) {
-      // Si algo falla, null → ChipsToolbar cae a su catálogo completo (default).
+      // Si algo falla, null → la mano cae a su catálogo completo (default).
       return null;
     }
   }, []);
@@ -2580,19 +2578,6 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     setAlertContextBanner(null);
   };
 
-  const handleSuggestion = (text) => {
-    handleSubmit(text);
-  };
-
-  // CHIPS DE MODO (A4): toggle del chip. Tocar un chip activa su modo (el
-  // próximo submit fuerza esa intención y salta el NLU); tocar el mismo chip
-  // de nuevo lo desactiva (vuelve al routing NLU normal). El chip 'foto' no
-  // se maneja acá — el flujo de foto vive en el compositor multimodal.
-  const handleChipSelect = (intent) => {
-    if (intent === 'foto') return; // reservado al flujo de adjuntos
-    setActiveIntent((prev) => (prev === intent ? null : intent));
-  };
-
   // Pick de una rama de la MANO (AgentRedMenu) en la conversación. Routing
   // ÚNICO compartido con el home (mapCapabilityPick): `ask` → pregunta directa,
   // `nav` → navegar a otra vista, `photo` → abrir la cámara. soon/down/
@@ -3070,19 +3055,6 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         </div>
       )}
 
-      {/* Suggestions */}
-      {state === STATE_IDLE && messages.length < 3 && (
-        <SuggestedActions onSelect={handleSuggestion} />
-      )}
-
-      {/* UX-5 (#286) — QuickChipsBar RETIRADA de la pantalla vacía (fire #1,
-          2026-06-15): sus 3 preguntas-ejemplo genéricas se reemplazaron por la
-          ChipsToolbar de capacidades filtrada por perfil (renderizada más
-          abajo, ahora SIEMPRE visible). Así el operador ve, apenas abre el
-          agente, las herramientas reales adaptadas a su persona —en vez de 3
-          ejemplos sueltos— sin duplicar filas de chips. El componente
-          QuickChipsBar se conserva para otros usos/tests. */}
-
       {/* 2026-05-28 UX: banner de contexto de alerta climática. Aparece
           cuando el operador llega desde una notificación con prompt
           pre-cargado + cita de la entidad emisora (IDEAM/NOAA/CIIFEN/
@@ -3135,24 +3107,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         </div>
       )}
 
-      {/* ── Chips de capacidad (modo) — fila scrollable unificada, SIEMPRE
-          visible (incluida la pantalla vacía/idle).
-
-          Fire #1 (2026-06-15): el operador debe VER las herramientas del
-          agente apenas abre la pantalla, sin tener que mandar un mensaje
-          primero. Antes el gate `state !== STATE_IDLE || messages.length > 0`
-          escondía la barra en pantalla vacía (regresión del dedup del issue
-          #5, 2026-06-08), dejando solo 3 ejemplos genéricos. Ahora la barra
-          de modos —ya FILTRADA POR PERFIL (profileChipDefs)— se muestra
-          siempre y REEMPLAZA a QuickChipsBar en la pantalla nueva: una sola
-          fila de chips (sin duplicación), pero ahora son las capacidades
-          reales del agente, adaptadas a la persona. ── */}
-      {/* Operador 2026-06-18: en la pantalla idle NO mostramos el catálogo de
-          chips de texto ("menús horribles") — en su lugar, UN trigger limpio y
-          prominente que abre la MANO de Chagra (única fuente de capacidades,
-          igual que el home). Durante una conversación (messages>0) sí se
-          muestran los chips de capacidad, ya compactos y filtrados por perfil. */}
-      {messages.length === 0 ? (
+      {/* Mano de Chagra — trigger prominente en pantalla vacía para abrir la
+          red de capacidades (única fuente, igual que el home). Operador 2026-06-18:
+          el acceso a capacidades es SOLO por este botón o el ícono del tema en
+          el compositor, nunca por chips de texto. */}
+      {messages.length === 0 && (
         <div className="px-4 pb-1 pt-1 shrink-0">
           <button
             type="button"
@@ -3161,19 +3120,12 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             aria-label="Abrir la mano de Chagra"
             data-testid="agent-mano-trigger"
           >
-            <Sparkles size={18} className="text-emerald-300 shrink-0" aria-hidden="true" />
+            <span className="w-[18px] h-[18px] shrink-0 flex items-center" aria-hidden="true">
+              {iconForTheme(theme)}
+            </span>
             Toca la mano de Chagra para ver todo lo que puede hacer
           </button>
         </div>
-      ) : (
-        <ChipsToolbar
-          onSelectIntent={handleChipSelect}
-          activeIntent={activeIntent}
-          hasAttachment={false}
-          disabled={state === STATE_RECORDING}
-          isPro={getCurrentTier() === 'pro'}
-          chipDefs={profileChipDefs}
-        />
       )}
 
       {/* ── Compositor pill — paridad completa AgentHero (2026-06-08).
@@ -3313,7 +3265,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               aria-expanded={sheetOpen}
               className={['as-iconbtn as-tool', sheetOpen ? 'is-open' : ''].join(' ')}
             >
-              <Sparkles size={18} strokeWidth={2} aria-hidden="true" />
+              <span className="w-[18px] h-[18px] flex items-center" aria-hidden="true">
+                {iconForTheme(theme)}
+              </span>
             </button>
 
             {/* Cámara — sin `capture`, abre galería+cámara igual que AgentHero */}
@@ -3382,7 +3336,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         {/* Hint educativo bajo el pill */}
         {state !== STATE_RECORDING && !agentAttachment && (
           <p className="mt-1 text-center text-[11px] text-slate-500 leading-tight">
-            Toca <b className="text-emerald-400">✦</b> para ver todo lo que sé hacer
+            Toca <b className="text-emerald-400">Ⓐ</b> para ver todo lo que sé hacer
           </p>
         )}
 
