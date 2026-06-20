@@ -175,3 +175,54 @@ describe('glaciarAccess — esOperadorActual (usuario logueado, offline)', () =>
     expect(glaciarAccess.esOperadorActual()).toBe(false);
   });
 });
+
+describe('glaciarAccess — override local de operador (visión total sin env)', () => {
+  let store;
+
+  beforeEach(async () => {
+    store = {};
+    // SIN VITE_OPERATOR_USERNAME a propósito: simula el build de demo/dev donde
+    // la whitelist por env queda vacía (anti-leak). El override local debe ser
+    // suficiente para que el operador vea TODO.
+    vi.stubEnv('VITE_OPERATOR_USERNAME', '');
+    vi.stubGlobal('localStorage', {
+      getItem: (k) => store[k] ?? null,
+      setItem: (k, v) => { store[k] = v; },
+      removeItem: (k) => { delete store[k]; },
+    });
+    glaciarAccess = await importFresh();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
+
+  it('sin override y sin env: esOperador es false (fallback seguro)', () => {
+    expect(glaciarAccess.operatorOverrideActivo()).toBe(false);
+    expect(glaciarAccess.esOperador('cualquiera')).toBe(false);
+    expect(glaciarAccess.esOperadorActual()).toBe(false);
+  });
+
+  it('setOperatorOverride(true) hace esOperador true sin importar el username', () => {
+    glaciarAccess.setOperatorOverride(true);
+    expect(glaciarAccess.operatorOverrideActivo()).toBe(true);
+    // Visión total aunque el username NO esté en ninguna whitelist y aunque
+    // no haya sesión (tenantId null) — es justo el caso del demo.
+    expect(glaciarAccess.esOperador('usuario_normal')).toBe(true);
+    expect(glaciarAccess.esOperador(null)).toBe(true);
+    expect(glaciarAccess.esOperadorActual()).toBe(true);
+  });
+
+  it('setOperatorOverride(false) revierte a fallback seguro', () => {
+    glaciarAccess.setOperatorOverride(true);
+    glaciarAccess.setOperatorOverride(false);
+    expect(glaciarAccess.operatorOverrideActivo()).toBe(false);
+    expect(glaciarAccess.esOperador('usuario_normal')).toBe(false);
+  });
+
+  it('el override también abre el tile glaciar (tieneAccesoGlaciar)', () => {
+    glaciarAccess.setOperatorOverride(true);
+    expect(glaciarAccess.tieneAccesoGlaciar('usuario_normal')).toBe(true);
+  });
+});

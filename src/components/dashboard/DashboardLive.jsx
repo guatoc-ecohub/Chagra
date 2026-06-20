@@ -231,6 +231,35 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
         }
     }, []);
 
+    // Escuchar cambios de PERFIL en vivo (tarea #33 selector de perfil +
+    // override de visión total del operador). Al cambiar el perfil/rol o el
+    // bypass del operador, re-derivamos el gating del home SIN recargar:
+    // recalculamos la visibilidad por defecto del perfil nuevo. Respeta #1560:
+    // si el usuario tomó control MANUAL de sus módulos, NO lo pisamos.
+    useEffect(() => {
+        const handler = () => {
+            try {
+                if (hasManualModuleVisibility()) return;
+                setModuleVisibility(
+                    selectHomeModuleVisibilityMap(getProfile(), {
+                        esOperador: esOperadorActual(),
+                        esGuiaGlaciar: tieneAccesoGlaciarActual(),
+                    })
+                );
+            } catch (_) { /* fail-open: dejar el home como está */ }
+        };
+        try {
+            window.addEventListener('chagra:profile-changed', handler);
+            return () => {
+                try {
+                    window.removeEventListener('chagra:profile-changed', handler);
+                } catch (_) { /* noop */ }
+            };
+        } catch (_) {
+            return () => {};
+        }
+    }, []);
+
     // Restaurar scroll SOLO al volver de un detalle/sub-ruta (operador
     // 2026-06-15): en una entrada NUEVA (mount inicial / post-login) el home
     // debe quedar ARRIBA (scroll 0), no en la posición baja que dejó la sesión

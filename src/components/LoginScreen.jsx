@@ -11,6 +11,7 @@ import WelcomeStatsHero from './WelcomeStatsHero';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
 import { prewarmCorpus } from '../services/ragRetriever';
 import useThemeBackgroundStore, { getBackgroundSrc } from '../store/useThemeBackgroundStore';
+import { friendlyMessage } from '../utils/friendlyErrors';
 
 export default function LoginScreen({ onLoginSuccess, onSave }) {
   const [creds, setCreds] = useState({ username: '', password: '' });
@@ -55,11 +56,10 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
       result = await authenticateUser(creds.username, creds.password);
     } catch (err) {
       // Errores de red, timeout, CORS, JSON malformado, fetch abortado.
+      // NUNCA exponer el mensaje crudo (podía pegar texto técnico de token/HTTP
+      // al operador). friendlyMessage mapea a copy claro en español Colombia.
       setLoading(false);
-      const msg = err?.message
-        ? `Error de conexión: ${err.message}. Revisa tu internet y vuelve a intentar.`
-        : 'Error de conexión. Revisa tu internet y vuelve a intentar.';
-      onSave(msg, true);
+      onSave(friendlyMessage(err), true);
       return;
     }
 

@@ -15,8 +15,10 @@ import usePrefsStore from '../store/usePrefsStore';
 import { stop as stopTTS } from '../services/ttsService';
 import { getNotificationStyle, setNotificationStyle, getTelemetryConsent, setTelemetryConsent, HOME_MODULES, getModuleVisibility, setModuleVisibility, hasManualModuleVisibility, getProfile } from '../services/userProfileService';
 import { selectHomeModuleVisibilityMap } from '../services/homeModuleSelector';
-import { tieneAccesoGlaciarActual } from '../config/glaciarAccess';
+import { tieneAccesoGlaciarActual, esOperadorActual, operatorOverrideActivo, setOperatorOverride } from '../config/glaciarAccess';
 import { getOperatorPhoto, setOperatorPhotoFromFile, removeOperatorPhotoLocal } from '../services/operatorPhotoService';
+import ProfileSwitcher from './Settings/ProfileSwitcher';
+import { MSG } from '../config/messages';
 
 const TTL_OPTIONS = [
   { id: '1d', label: '1 día' },
@@ -48,7 +50,7 @@ const TTL_OPTIONS = [
  */
 
 const ROLES = [
-  { id: 'operador_campo', label: 'Operador de Campo' },
+  { id: 'operador_campo', label: MSG.perfilScreen.rolOperadorCampo },
   { id: 'asistente', label: 'Asistente' },
   { id: 'auditor', label: 'Auditor / Inspector' },
   { id: 'administrador', label: 'Administrador' },
@@ -62,7 +64,7 @@ const ROLES = [
  * espacio es escaso). El icono lucide se usa en el encabezado de la sección.
  */
 const TABS = [
-  { id: 'perfil', emoji: '👤', label: 'Perfil' },
+  { id: 'perfil', emoji: '👤', label: MSG.nav.perfil },
   { id: 'apariencia', emoji: '🎨', label: 'Apariencia' },
   { id: 'voz', emoji: '🔊', label: 'Voz y finca' },
   { id: 'modulos', emoji: '📦', label: 'Módulos' },
@@ -170,6 +172,25 @@ export default function ProfileScreen({ onBack, onHome }) {
     localStorage.setItem('chagra:profile:modo-tecnico:v1', modoTecnico ? '1' : '0');
   }, [modoTecnico]);
 
+  // Visión total del operador (bug demo 2026-06-19: "faltan varios botones en mi
+  // usuario"). La whitelist de operador se inyecta SOLO por VITE_OPERATOR_USERNAME
+  // en el build de prod (anti-leak); en un build de demo sin esa env, el bypass
+  // de gating nunca se activa y al operador le faltan módulos/botones. Este toggle
+  // enciende el override LOCAL (localStorage, sin leakear username) para que el
+  // operador vea TODO. Cambiar el flag re-deriva el home (chagra:profile-changed).
+  const [verTodo, setVerTodo] = useState(() => {
+    try { return operatorOverrideActivo() || esOperadorActual(); } catch (_) { return false; }
+  });
+  const handleVerTodo = () => {
+    const next = !verTodo;
+    setOperatorOverride(next);
+    setVerTodo(next);
+    // Re-derivar el gating del home en vivo (mismo evento que el switch de perfil).
+    try {
+      window.dispatchEvent(new CustomEvent('chagra:profile-changed', { detail: { operatorOverride: next } }));
+    } catch (_) { /* noop */ }
+  };
+
   // Estilo de notificación de alertas (operador 2026-06-06): 'demo' (chip
   // llamativo estilo demo en la portada del agente, POR DEFECTO) o 'actual'
   // (campanita del TopBar). Persiste en el perfil (userProfileService).
@@ -221,10 +242,10 @@ export default function ProfileScreen({ onBack, onHome }) {
     setTimeout(() => setSavedFlash(false), 1500);
   };
 
-  const currentRoleLabel = ROLES.find(r => r.id === role)?.label || 'Operador de Campo';
+  const currentRoleLabel = ROLES.find(r => r.id === role)?.label || MSG.perfilScreen.rolOperadorCampo;
 
   return (
-    <ScreenShell title="Perfil de Usuario" icon={User} onBack={onBack} onHome={onHome}>
+    <ScreenShell title={MSG.perfilScreen.tituloPantalla} icon={User} onBack={onBack} onHome={onHome}>
       {/* Tab bar sticky arriba. Scroll horizontal en móvil si no caben los 4
           (overflow-x-auto + whitespace-nowrap). La pestaña activa lleva ring +
           texto emerald como indicador visual. role=tablist para a11y. */}
@@ -292,8 +313,8 @@ export default function ProfileScreen({ onBack, onHome }) {
                   disabled={photoBusy}
                   data-testid="profile-photo-button"
                   className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 disabled:opacity-60 text-white flex items-center justify-center shadow-lg border-2 border-slate-900"
-                  aria-label={photoData ? 'Cambiar foto de perfil' : 'Agregar foto de perfil'}
-                  title={photoData ? 'Cambiar foto' : 'Agregar foto'}
+                  aria-label={photoData ? 'Cambiar foto de perfil' : MSG.perfilScreen.agregarFotoPerfil}
+                  title={photoData ? 'Cambiar foto' : MSG.perfilScreen.agregarFoto}
                 >
                   <Camera size={16} aria-hidden="true" />
                 </button>
@@ -326,6 +347,12 @@ export default function ProfileScreen({ onBack, onHome }) {
               <h2 className="text-2xl font-black text-white">{name}</h2>
               <p className="text-xs text-slate-500 uppercase tracking-widest font-bold mt-1">{currentRoleLabel}</p>
             </div>
+
+            {/* Selector de PERFIL activo (tarea #33). Cambia el rol activo —
+                campesino / cafetero / cacaotero / corporativo — afectando chips,
+                módulos del home y asociaciones por rol. Operador 2026-06-19:
+                "nunca he visto cómo switchear a los perfiles corporativos". */}
+            <ProfileSwitcher />
 
             {/* #200/#201: CTAs para personalizar el agente y configurar ubicación.
                 Navegan vía 'chagra:nav' (patrón CSP-safe, sin onClick inline-string).
@@ -365,7 +392,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-bold text-white">Configurar ubicación</p>
-                  <p className="text-xs text-slate-400">Mapa, piso térmico y cultivos de tu zona</p>
+                  <p className="text-xs text-slate-400">{MSG.perfilScreen.ubicacionDesc}</p>
                 </div>
                 <ChevronRight size={18} className="text-slate-500" />
               </button>
@@ -409,7 +436,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                   savedFlash ? 'bg-emerald-600 text-white' : 'bg-slate-800 hover:bg-slate-700 text-emerald-400'
                 }`}
               >
-                {savedFlash ? <><Check size={18} /> Guardado</> : <><Save size={18} /> Guardar cambios</>}
+                {savedFlash ? <><Check size={18} /> Guardado</> : <><Save size={18} /> {MSG.perfilScreen.guardarCambios}</>}
               </button>
               <p className="text-[10px] text-slate-500 text-center leading-relaxed">
                 El nombre y el rol se guardan en tu dispositivo. Tu foto de perfil
@@ -636,6 +663,46 @@ export default function ProfileScreen({ onBack, onHome }) {
               )}
             </div>
 
+            {/* Visión total del operador (tarea bug demo 2026-06-19). Bypass del
+                gating del home: enciende TODOS los módulos, las 4 tarjetas de
+                seguimiento y el catálogo completo de chips. Pensado para el
+                operador/admin del producto y para demos. NO leakea identidad: es
+                una bandera booleana local (ver glaciarAccess.setOperatorOverride). */}
+            <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+              <div className="flex items-center gap-2 px-1">
+                <Wrench size={18} className="text-amber-400" />
+                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Visión total (operador)</h3>
+              </div>
+
+              <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
+                <div className="flex flex-col gap-0.5 flex-1">
+                  <span className="text-sm font-bold text-slate-200">Mostrar todas las capacidades</span>
+                  <span className="text-[10px] text-slate-500 leading-snug">
+                    Activa todos los módulos, tarjetas de seguimiento y opciones del
+                    home, saltándose el filtrado por perfil. Útil para demos y para
+                    el administrador del producto.
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={verTodo}
+                  aria-label="Activar o desactivar la visión total del operador"
+                  data-testid="operator-override-toggle"
+                  onClick={handleVerTodo}
+                  className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+                    verTodo ? 'bg-amber-600' : 'bg-slate-700'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                      verTodo ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </label>
+            </div>
+
             {/* Modo extensionista (ADR-048 MVP): entrada al panel supervisor
                 multi-finca. Solo se RENDERIZA si el usuario tiene el rol
                 (feature flag VITE_FEATURE_EXTENSIONISTA + whitelist). Para el
@@ -676,7 +743,7 @@ export default function ProfileScreen({ onBack, onHome }) {
               <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
                 <div className="flex flex-col gap-0.5">
                   <span className="text-sm font-bold text-slate-200">Habilitar telemetría</span>
-                  <span className="text-[10px] text-slate-500">Registrar eventos del pipeline de voz</span>
+                  <span className="text-[10px] text-slate-500">{MSG.perfilScreen.telemetriaVozDesc}</span>
                 </div>
                 <button
                   type="button"
@@ -727,7 +794,7 @@ export default function ProfileScreen({ onBack, onHome }) {
               <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
                 <div className="flex flex-col gap-0.5">
                   <span className="text-sm font-bold text-slate-200">Enviar métricas anónimas</span>
-                  <span className="text-[10px] text-slate-500">Ayuda a mejorar el agente. Desactivado por defecto.</span>
+                  <span className="text-[10px] text-slate-500">{MSG.perfilScreen.telemetriaAgenteDesc}</span>
                 </div>
                 <button
                   type="button"
@@ -883,7 +950,7 @@ function MultifincaGpsSection() {
       </div>
 
       <p className="text-xs text-slate-500 leading-relaxed">
-        Finca activa: <strong className="text-slate-300">{activeFincaSlug}</strong>.
+        {MSG.perfilScreen.fincaActivaLabel} <strong className="text-slate-300">{activeFincaSlug}</strong>.
         {' '}Cámbiala en el banner GPS o el selector de fincas.
       </p>
 
@@ -928,7 +995,7 @@ function MultifincaGpsSection() {
             onClick={handleSaveIndoor}
             className="px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 text-sm font-bold border border-slate-700 min-h-[48px]"
           >
-            Guardar
+            {MSG.perfilScreen.guardar}
           </button>
         </div>
         {indoorZone && (

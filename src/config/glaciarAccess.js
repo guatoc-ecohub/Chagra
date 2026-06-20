@@ -99,6 +99,50 @@ function operadorUsernames() {
 }
 
 /**
+ * OVERRIDE LOCAL DE OPERADOR (visión total desde el dispositivo).
+ *
+ * PROBLEMA (demo en vivo 2026-06-19): la whitelist de operador se inyecta SOLO
+ * por `VITE_OPERATOR_USERNAME` en el build de producción (anti-leak: el username
+ * real NUNCA se hardcodea en este repo público, ver tests/unit/boundaryAudit).
+ * En un build de demo / dev sin esa env, `operadorUsernames()` queda vacío →
+ * `esOperador()` es false para TODOS → al operador le faltan botones/módulos
+ * porque el bypass de visión total nunca se activa.
+ *
+ * SOLUCIÓN (anti-leak): un override OPT-IN que el operador enciende DESDE la app
+ * (ProfileScreen) y se persiste en localStorage de ESE dispositivo. No mete
+ * ningún username en el bundle; es una bandera booleana local. Default off →
+ * fail-safe para usuarios normales.
+ *
+ * @constant {string}
+ */
+export const OPERATOR_OVERRIDE_KEY = 'chagra:operator_override';
+
+/**
+ * ¿El operador activó manualmente la "visión total" en ESTE dispositivo?
+ * Lee una bandera booleana de localStorage (no requiere red, no leakea username).
+ *
+ * @returns {boolean}
+ */
+export function operatorOverrideActivo() {
+  try {
+    return localStorage.getItem(OPERATOR_OVERRIDE_KEY) === '1';
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
+ * Enciende/apaga el override local de visión total del operador.
+ * @param {boolean} on
+ */
+export function setOperatorOverride(on) {
+  try {
+    if (on) localStorage.setItem(OPERATOR_OVERRIDE_KEY, '1');
+    else localStorage.removeItem(OPERATOR_OVERRIDE_KEY);
+  } catch (_) { /* localStorage no disponible: no-op */ }
+}
+
+/**
  * Set de usernames del operador, leído de la env en CALL-TIME (testeable con
  * vi.stubEnv). NUNCA hardcodea el username (anti-leak, repo público).
  * @returns {Set<string>}
@@ -155,6 +199,11 @@ export function tieneAccesoGlaciarActual() {
  * @returns {boolean} true solo si está en OPERADOR_WHITELIST.
  */
 export function esOperador(username) {
+  // Override local de dispositivo: si el operador encendió "visión total" en
+  // este equipo (ProfileScreen), es operador sin importar el username (no leakea
+  // identidad; es una bandera booleana en localStorage). Cubre el build de demo
+  // sin VITE_OPERATOR_USERNAME (ver setOperatorOverride).
+  if (operatorOverrideActivo()) return true;
   if (!username || typeof username !== 'string') return false;
   const normalized = username.trim().toLowerCase();
   if (normalized.length === 0) return false;
