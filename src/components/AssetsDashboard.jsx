@@ -840,6 +840,69 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     return 'Ej: Bokashi, Biol, Purín de Ortiga...';
   };
 
+  // Campo reutilizable de captura de geometría.
+  //
+  // Fix P0 TDZ (2026-06-20): debe declararse ANTES de renderPlantForm y
+  // renderGenericForm, que lo invocan. Antes vivía DESPUÉS de ambos: aunque
+  // en dev/jsdom el orden de inicialización tolera la referencia adelantada
+  // (los tres son arrow consts y solo se llaman en el return final), el
+  // bundle minificado de producción conservaba la referencia adelantada y
+  // disparaba `ReferenceError: Cannot access 'X' before initialization`
+  // (temporal dead zone) al abrir el formulario, tumbando todo el módulo
+  // "Mi Finca" y la ficha de especie con "Algo falló en Mi Finca".
+  const renderGeometryField = (mode) => (
+    <div className="space-y-1.5">
+      <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+        Ubicación física {mode === 'polygon' ? '(área)' : '(punto)'}
+      </label>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => setShowMapPicker(mode)}
+          className="flex-1 p-3 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 text-sm font-bold flex items-center justify-center gap-2 min-h-[48px]"
+        >
+          <MapPin size={16} className="text-blue-400" />
+          {formData.geometry ? 'Geometría definida ✓' : (mode === 'polygon' ? 'Definir área' : 'Definir ubicación')}
+        </button>
+        {mode === 'point' && (
+          <button
+            type="button"
+            onClick={() => {
+              requestGeo({
+                onSuccess: (pos) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    geometry: {
+                      type: 'Point',
+                      coordinates: [pos.coords.longitude, pos.coords.latitude],
+                    },
+                  }));
+                },
+                onError: (errorType) => {
+                  console.warn('[AssetsDashboard] GPS inline falló:', errorType);
+                },
+              });
+            }}
+            className="p-3 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 min-h-[48px] min-w-[48px] flex items-center justify-center"
+            aria-label="Usar mi ubicación"
+          >
+            <LocateFixed size={16} className="text-blue-400" />
+          </button>
+        )}
+        {formData.geometry && (
+          <button
+            type="button"
+            onClick={() => setFormData({ ...formData, geometry: null })}
+            className="p-3 rounded-xl bg-red-900/30 border border-red-800 hover:bg-red-900/50 text-red-400 min-h-[48px] min-w-[48px] flex items-center justify-center"
+            aria-label="Limpiar geometría"
+          >
+            <Trash2 size={16} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+
   // Render del formulario específico para el tab de plantas
   const renderPlantForm = () => (
     <>
@@ -1238,60 +1301,6 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
       {/* Geometría (POINT para frutales dispersos) */}
       {renderGeometryField('point')}
     </>
-  );
-
-  // Campo reutilizable de captura de geometría.
-  const renderGeometryField = (mode) => (
-    <div className="space-y-1.5">
-      <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-        Ubicación física {mode === 'polygon' ? '(área)' : '(punto)'}
-      </label>
-      <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={() => setShowMapPicker(mode)}
-          className="flex-1 p-3 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 text-sm font-bold flex items-center justify-center gap-2 min-h-[48px]"
-        >
-          <MapPin size={16} className="text-blue-400" />
-          {formData.geometry ? 'Geometría definida ✓' : (mode === 'polygon' ? 'Definir área' : 'Definir ubicación')}
-        </button>
-        {mode === 'point' && (
-          <button
-            type="button"
-            onClick={() => {
-              requestGeo({
-                onSuccess: (pos) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    geometry: {
-                      type: 'Point',
-                      coordinates: [pos.coords.longitude, pos.coords.latitude],
-                    },
-                  }));
-                },
-                onError: (errorType) => {
-                  console.warn('[AssetsDashboard] GPS inline falló:', errorType);
-                },
-              });
-            }}
-            className="p-3 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 min-h-[48px] min-w-[48px] flex items-center justify-center"
-            aria-label="Usar mi ubicación"
-          >
-            <LocateFixed size={16} className="text-blue-400" />
-          </button>
-        )}
-        {formData.geometry && (
-          <button
-            type="button"
-            onClick={() => setFormData({ ...formData, geometry: null })}
-            className="p-3 rounded-xl bg-red-900/30 border border-red-800 hover:bg-red-900/50 text-red-400 min-h-[48px] min-w-[48px] flex items-center justify-center"
-            aria-label="Limpiar geometría"
-          >
-            <Trash2 size={16} />
-          </button>
-        )}
-      </div>
-    </div>
   );
 
   // Render del formulario genérico (structure, equipment, material)
