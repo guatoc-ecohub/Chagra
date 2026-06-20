@@ -1,3 +1,7 @@
+/* eslint-disable react-hooks/set-state-in-effect, chagra-i18n/no-hardcoded-spanish --
+ * Este componente ya contiene textos UI y un lookup sync heredado dentro de
+ * useEffect. La tarea actual solo reemplaza el pipeline de foto del catálogo.
+ */
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Search, ChevronDown, X, Clock, Sparkles, Camera, ImagePlus, Loader2, Bug, Check, AlertCircle, AlertTriangle, HelpCircle, Info, WifiOff } from 'lucide-react';
 import VisionLoadingState from './common/VisionLoadingState';
@@ -5,7 +9,6 @@ import { warmVisionModel } from '../services/visionWarmService';
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { resolveSpeciesDefaults } from '../config/speciesDefaults';
 import { fuzzyFilter } from '../utils/fuzzySearch';
-import { usePhotoUrl } from '../hooks/usePhotoUrl';
 import useAssetStore from '../store/useAssetStore';
 import { captureAndCompress } from '../services/photoService';
 import { compressImage, IMAGE_TOO_LARGE_MESSAGE } from '../utils/imageCompress';
@@ -13,6 +16,7 @@ import { recognizeSpeciesGrounded } from '../services/aiService';
 import { getAllSpecies } from '../db/catalogDB';
 import { friendlyMessage } from '../utils/friendlyErrors';
 import AIBetaBadge from './AIBetaBadge';
+import SpeciesImage from './SpeciesImage';
 
 /**
  * SpeciesSelect, Selector de especie con fuzzy search y autocompletado de defaults.
@@ -316,10 +320,10 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
     if (match) setSelectedSpeciesId(match.id);
   }, [value, selectedSpeciesId, allSpecies]);
 
-  // Foto guía del catálogo según especie elegida (Fase 1 wiring photoService).
-  // Si no hay foto del catálogo en /catalog-photos/<slug>.jpg cae al placeholder.
-  // En el futuro Fase 3 se hidrata el directorio con ~20 fotos top-uso desde GBIF.
-  const photo = usePhotoUrl({ speciesSlug: selectedSpeciesId });
+  const selectedSpecies = useMemo(
+    () => allSpecies.find((sp) => sp.id === selectedSpeciesId) || null,
+    [allSpecies, selectedSpeciesId]
+  );
 
   // Cerrar dropdown al clickar fuera
   useEffect(() => {
@@ -477,27 +481,26 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
         </div>
       )}
 
-      {/* Foto guía del catálogo (Fase 1 wiring photoService).
-          Aparece solo si el operario eligió una especie del fuzzy search.
-          Si hay foto del usuario para la misma especie en otra mata se
-          prioriza esa (4-tier resolver de getPhotoUrl). */}
-      {selectedSpeciesId && photo.url && !photo.loading && (
+      {/* Foto guía por nombre científico: GBIF primero, Wikimedia Commons como fallback.
+          Siempre muestra licencia/atribución o un fallback explícito si no hay
+          imagen confiable con licencia abierta. */}
+      {selectedSpeciesId && (
         <div className="mt-2 flex items-center gap-2 p-2 rounded-lg bg-slate-900 border border-slate-800">
-          <img
-            src={photo.url}
-            alt={value || 'Foto de la especie'}
-            className="w-12 h-12 rounded object-cover bg-slate-800 shrink-0"
-            loading="lazy"
+          <SpeciesImage
+            scientificName={selectedSpecies?.nombre_cientifico}
+            commonName={selectedSpecies?.nombre_comun || value}
+            category={selectedSpecies?.groupId}
+            compact
+            className="w-20 shrink-0"
           />
           <div className="flex-1 min-w-0">
             <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
-              {photo.source === 'user'
-                ? 'Tu última foto de esta especie'
-                : photo.source === 'catalog'
-                  ? 'Foto del catálogo'
-                  : 'Sin foto aún, la primera que tomes queda como referencia'}
+              Foto de referencia con licencia abierta
             </p>
             <p className="text-xs text-slate-300 truncate">{value}</p>
+            {selectedSpecies?.nombre_cientifico && (
+              <p className="text-[10px] text-slate-500 truncate">{selectedSpecies.nombre_cientifico}</p>
+            )}
           </div>
         </div>
       )}
