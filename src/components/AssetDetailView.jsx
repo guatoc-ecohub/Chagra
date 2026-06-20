@@ -19,11 +19,20 @@ import { usePhotoUrl } from '../hooks/usePhotoUrl';
 import { ETAPA_FENOLOGICA_LABELS } from '../utils/plantMeta';
 import { getAllSpecies } from '../db/catalogDB';
 import SpeciesImage from './SpeciesImage';
+import { matchSpeciesInCatalog } from '../utils/speciesResolver';
 
 // Derive speciesSlug from asset name.
 function deriveSpeciesSlug(name) {
   if (!name || typeof name !== 'string') return null;
   return name.replace(/\s+#\d+$/, '').toLowerCase().replace(/\s+/g, '_').trim() || null;
+}
+
+// Nombre común legible derivado del nombre del asset (quita el sufijo "#N").
+// Último recurso para el fallback de SpeciesImage cuando el catálogo no
+// resuelve la especie — siempre mostramos algo con sentido al operador.
+function deriveCommonName(name) {
+  if (!name || typeof name !== 'string') return null;
+  return name.replace(/\s+#\d+\s*$/, '').trim() || null;
 }
 
 // UX-26 (#286) 2026-05-27 — bug operador: la sección de foto era una
@@ -58,7 +67,7 @@ const PHOTO_SUCCESS_LABELS = {
   default: '✓ Foto guardada.',
 };
 
-function PhotoHeroSection({ assetId, speciesSlug, assetType, scientificName, catalogImage }) {
+function PhotoHeroSection({ assetId, speciesSlug, assetType, scientificName, commonName, category, catalogImage }) {
   const [busy, setBusy] = useState(false);
   const [success, setSuccess] = useState(false);
   const cameraRef = React.useRef(null);
@@ -143,10 +152,20 @@ function PhotoHeroSection({ assetId, speciesSlug, assetType, scientificName, cat
       ) : (
         // Hero sin foto: card grande con CTA prominente + SpeciesImage como fallback.
         <div className="p-6 bg-gradient-to-br from-emerald-900/20 to-slate-800/40 flex flex-col items-center gap-3 text-center">
-          {/* SpeciesImage como fallback cuando hay nombre científico */}
-          {scientificName ? (
-            <div className="w-full">
-              <SpeciesImage scientificName={scientificName} catalogImage={catalogImage} compact={false} className="w-full" />
+          {/* Bug 2026-06-20 (operador, fresa): la sección de foto salía vacía
+              cuando la especie no tiene imagen en el catálogo. SpeciesImage
+              ahora SIEMPRE renderiza un fallback claro (emoji de categoría +
+              nombre), aunque no haya nombre científico — nunca un hueco. */}
+          {(scientificName || commonName) ? (
+            <div className="w-full" data-testid="photo-hero-species-fallback">
+              <SpeciesImage
+                scientificName={scientificName}
+                commonName={commonName}
+                category={category}
+                catalogImage={catalogImage}
+                compact={false}
+                className="w-full"
+              />
             </div>
           ) : (
             <div className="w-16 h-16 rounded-full bg-emerald-900/40 border border-emerald-700/50 flex items-center justify-center">
@@ -314,21 +333,29 @@ const resolvePlantingDate = (asset) => {
 
 const PlanSection = ({ asset }) => {
   const speciesSlug = useMemo(() => resolveSpeciesSlug(asset), [asset]);
+  const assetName = useMemo(() => asset?.attributes?.name || asset?.name || '', [asset]);
   const plantingDate = useMemo(() => resolvePlantingDate(asset), [asset]);
-  // status: 'idle' (sin slug, nada que buscar), 'loading', 'present', 'absent', 'error'.
+  // status: 'idle' (sin slug ni nombre, nada que buscar), 'loading',
+  // 'present', 'absent', 'error'.
   // Inicialización lazy (function form) garantiza que React no llame al
   // initializer en re-renders y respeta la regla react-hooks/set-state-in-effect.
-  const [status, setStatus] = useState(() => (speciesSlug ? 'loading' : 'idle'));
+  const [status, setStatus] = useState(() => ((speciesSlug || assetName) ? 'loading' : 'idle'));
+  // Slug canónico resuelto contra el catálogo — lo que se le pasa a
+  // PlanEditor para que el plan se ancle al id correcto (no a "fresa").
+  const [canonicalSlug, setCanonicalSlug] = useState(speciesSlug);
 
   useEffect(() => {
-    if (!speciesSlug) return undefined;
+    if (!speciesSlug && !assetName) return undefined;
     let cancelled = false;
     getAllSpecies()
       .then((list) => {
         if (cancelled) return;
-        const match = (list || []).find(
-          (s) => s?.id === speciesSlug || s?.slug === speciesSlug,
-        );
+        // Bug 2026-06-20 (operador, fresa): el plan decía "Sin plan
+        // disponible" porque el slug derivado ("fresa") no coincidía con el
+        // id del catálogo ("fragaria_ananassa"), que SÍ tiene template.
+        // matchSpeciesInCatalog resuelve la des-coincidencia.
+        const match = matchSpeciesInCatalog(list || [], speciesSlug, assetName);
+        if (match?.id) setCanonicalSlug(match.id);
         const tpl = match?.feeding_plan_template;
         const present = !!(tpl && tpl.primary_steps && tpl.primary_steps.length > 0);
         setStatus(present ? 'present' : 'absent');
@@ -339,9 +366,9 @@ const PlanSection = ({ asset }) => {
         setStatus('error');
       });
     return () => { cancelled = true; };
-  }, [speciesSlug]);
+  }, [speciesSlug, assetName]);
 
-  if (!speciesSlug) {
+  if (!speciesSlug && !assetName) {
     return (
       <section data-testid="plan-section-no-slug" className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50">
         <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1">
@@ -393,10 +420,90 @@ const PlanSection = ({ asset }) => {
       </h3>
       <PlanEditor
         assetId={asset.id}
-        speciesSlug={speciesSlug}
+        speciesSlug={canonicalSlug || speciesSlug}
         plantingDate={plantingDate}
       />
     </section>
+  );
+};
+
+// Normaliza una fecha de siembra persistida (puede venir como "yyyy-mm-dd"
+// del input date o como ISO completo del flujo de voz) al value que espera
+// <input type="date">: yyyy-mm-dd. Devuelve '' si no hay fecha válida.
+const toDateInputValue = (raw) => {
+  if (!raw) return '';
+  if (typeof raw === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  const t = new Date(raw).getTime();
+  if (!Number.isFinite(t)) return '';
+  return new Date(t).toISOString().slice(0, 10);
+};
+
+// Bug 2026-06-20 (operador, fresa): la fecha de "Registro" mostraba "Sin
+// fecha" y no era editable. Este componente expone un date picker EDITABLE
+// para la fecha de siembra/germinación que persiste en
+// attributes._chagra_plant_meta.fecha_germinacion vía updateAsset (mismo
+// servicio que usa AssetsDashboard), y se puede definir si está vacía.
+// El parent monta este componente con key={asset.id} para que el estado
+// inicial se re-derive de forma natural al cambiar de asset (evita un
+// useEffect de resync con setState síncrono — regla react-hooks).
+const EditableSeedingDate = ({ asset, updateAsset }) => {
+  const persisted = asset?.attributes?._chagra_plant_meta?.fecha_germinacion;
+  const [value, setValue] = useState(() => toDateInputValue(persisted));
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const persist = async (nextValue) => {
+    setSaving(true);
+    setSaved(false);
+    try {
+      const prevMeta = asset?.attributes?._chagra_plant_meta || {};
+      const nextMeta = { ...prevMeta };
+      if (nextValue) nextMeta.fecha_germinacion = nextValue;
+      else delete nextMeta.fecha_germinacion;
+      const updatedAsset = {
+        ...asset,
+        attributes: { ...asset.attributes, _chagra_plant_meta: nextMeta },
+      };
+      const assetType = resolveAssetType(asset);
+      await updateAsset(assetType, updatedAsset, []);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err) {
+      console.warn('[EditableSeedingDate] persistencia falló:', err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div
+      data-testid="seeding-date-editor"
+      className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50"
+    >
+      <label
+        htmlFor="seeding-date-input"
+        className="text-xs text-slate-500 flex items-center gap-1 italic mb-1"
+      >
+        <Sprout size={12} /> Fecha de siembra
+      </label>
+      <input
+        id="seeding-date-input"
+        type="date"
+        value={value}
+        disabled={saving}
+        max={new Date().toISOString().slice(0, 10)}
+        onChange={(e) => {
+          setValue(e.target.value);
+          persist(e.target.value);
+        }}
+        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm font-medium min-h-[44px] focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50"
+      />
+      <p className="text-[11px] mt-1 h-4 leading-4">
+        {saving && <span className="text-slate-400 italic">Guardando…</span>}
+        {!saving && saved && <span className="text-emerald-400" data-testid="seeding-date-saved">✓ Fecha guardada</span>}
+        {!saving && !saved && !value && <span className="text-slate-500 italic">Aún sin definir — tócala para registrarla</span>}
+      </p>
+    </div>
   );
 };
 
@@ -468,6 +575,8 @@ export const AssetDetailView = () => {
   const [showCemeteryModal, setShowCemeteryModal] = useState(false);
   const [showSplitFlow, setShowSplitFlow] = useState(false);
   const [scientificName, setScientificName] = useState(null);
+  const [commonName, setCommonName] = useState(null);
+  const [speciesCategory, setSpeciesCategory] = useState(null);
   const [catalogImage, setCatalogImage] = useState(null);
 
   const asset = useMemo(() => {
@@ -477,23 +586,32 @@ export const AssetDetailView = () => {
 
   const isPlantType = (asset?.asset_type || asset?.type || '').includes('plant');
 
-  // Cargar nombre científico desde el catálogo para SpeciesImage fallback
+  // Cargar nombre científico/común desde el catálogo para SpeciesImage.
+  // Bug 2026-06-20 (operador, fresa): los assets viejos guardan el nombre
+  // común ("Fresa") como slug derivado, que NO coincide con el id canónico
+  // ("fragaria_ananassa"). matchSpeciesInCatalog tolera esa des-coincidencia
+  // (id/slug exacto → nombre común → inclusión parcial), así la imagen y el
+  // plan resuelven igual para assets nuevos y viejos.
   useEffect(() => {
+    // Solo resolvemos catálogo para plantas. Para no-plantas el render ya
+    // pasa null a PhotoHeroSection (isPlantType ? ...), así que no hace
+    // falta resetear estado de forma síncrona (evita react-hooks warning).
     if (!isPlantType) return undefined;
-    const speciesSlug = resolveSpeciesSlug(asset);
-    if (!speciesSlug) return undefined;
+    const slug = resolveSpeciesSlug(asset);
+    const assetName = asset?.attributes?.name || asset?.name || '';
     let cancelled = false;
     getAllSpecies()
       .then((list) => {
         if (cancelled) return;
-        const match = (list || []).find(
-          (s) => s?.id === speciesSlug || s?.slug === speciesSlug,
-        );
+        const match = matchSpeciesInCatalog(list || [], slug, assetName);
         setScientificName(match?.nombre_cientifico || null);
+        setCommonName(match?.nombre_comun || deriveCommonName(assetName) || null);
+        setSpeciesCategory(match?.category || null);
         setCatalogImage(match?.imagen || match?.image || match?.media?.image || match?.media || null);
       })
       .catch((err) => {
         console.warn('[AssetDetailView] getAllSpecies falló:', err);
+        if (!cancelled) setCommonName(deriveCommonName(assetName) || null);
       });
     return () => { cancelled = true; };
   }, [asset, isPlantType]);
@@ -588,8 +706,10 @@ export const AssetDetailView = () => {
             assetId={asset.id}
             speciesSlug={speciesSlug}
             assetType={isPlantType ? 'plant' : asset.type?.replace('asset--', '') || 'default'}
-            scientificName={speciesSlug ? scientificName : null}
-            catalogImage={speciesSlug ? catalogImage : null}
+            scientificName={isPlantType ? scientificName : null}
+            commonName={isPlantType ? commonName : null}
+            category={isPlantType ? speciesCategory : null}
+            catalogImage={isPlantType ? catalogImage : null}
           />
 
           <div className="grid grid-cols-2 gap-4">
@@ -602,6 +722,13 @@ export const AssetDetailView = () => {
               <p className="text-white text-sm font-medium capitalize">{status}</p>
             </div>
           </div>
+
+          {/* Bug 2026-06-20 (operador, fresa): fecha de siembra editable y
+              persistente. Solo para plantas. key={asset.id} re-deriva el
+              estado al cambiar de planta sin un effect de resync. */}
+          {isPlantType && (
+            <EditableSeedingDate key={asset.id} asset={asset} updateAsset={updateAsset} />
+          )}
 
           <GeometrySection asset={asset} parentZoneName={parentZoneName} onEdit={() => setShowGeoPicker(true)} saving={geoSaving} />
 
