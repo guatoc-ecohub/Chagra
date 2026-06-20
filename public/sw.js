@@ -1,4 +1,8 @@
-const CACHE_NAME = 'chagra-v312';
+const SW_BUILD_SHA = '__CHAGRA_SW_BUILD_SHA__';
+const CACHE_NAME =
+  SW_BUILD_SHA && !SW_BUILD_SHA.startsWith('__CHAGRA_')
+    ? `chagra-${SW_BUILD_SHA}`
+    : 'chagra-dev';
 
 // Cache de GROUNDING del agente (corpus RAG + embeddings + tiles del mapa).
 // SEPARADO de CACHE_NAME a propósito: su contenido NO está hasheado por
@@ -60,20 +64,12 @@ const RAG_GROUNDING_PRECACHE = [
 ];
 
 // Instalación del Service Worker.
-// SIN self.skipWaiting() automático EN EL SW: el SW nuevo queda en `waiting` y
-// el skipWaiting lo decide el CLIENTE vía mensaje SKIP_WAITING. Quién manda ese
-// mensaje:
-//   1. AUTO-UPDATE (swRegistration.js, desde 2026-06-15): al detectar el
-//      waiting, el cliente dispara SKIP_WAITING automáticamente y recarga UNA
-//      vez (guard anti-loop por controllerchange). Así el deploy se VE sin que
-//      el usuario limpie caché.
-//   2. UpdateAvailableBanner ("Actualizar"): fallback visible si el auto-update
-//      no llegó a recargar.
-// El skipWaiting NO se hace aquí en el SW a propósito: el cliente necesita
-// orquestar la recarga ÚNICA (controllerchange) — si el SW activara solo, el
-// banner aparecía DESPUÉS de aplicada la actualización y el operador debía dar
-// "Actualizar" N veces (bug 2026-06-10). Por eso el SW espera el mensaje.
+// El SW nuevo se salta `waiting` de forma intencional: una vez descargado debe
+// activar, limpiar caches viejos y tomar control sin depender de que el usuario
+// pulse el banner. El cliente conserva el guard de recarga única en
+// `controllerchange`, así que first-install no se recarga y updates reales sí.
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(async (cache) => {

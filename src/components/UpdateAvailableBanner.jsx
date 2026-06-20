@@ -113,7 +113,7 @@ export default function UpdateAvailableBanner() {
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="text-white font-bold text-sm">Nueva versión disponible</p>
+          <p className="text-white font-bold text-sm">Actualización disponible</p>
           <p className="text-slate-400 text-xs leading-snug">Actualiza para ver las mejoras más recientes.</p>
         </div>
 

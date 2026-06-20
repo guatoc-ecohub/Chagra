@@ -162,6 +162,35 @@ describe('SW /version.json — network-only', () => {
   });
 });
 
+describe('SW lifecycle update reliability', () => {
+  it('install llama skipWaiting para activar el SW nuevo sin esperar al cierre de pestañas', async () => {
+    const { listeners, self } = loadSW({ online: true });
+    await fireEvent(listeners.install, {}).waited;
+    expect(self.skipWaiting).toHaveBeenCalledTimes(1);
+  });
+
+  it('activate purga caches de bundles viejos y conserva buckets offline durables', async () => {
+    const { listeners, fakeCaches, self } = loadSW({ online: true });
+    await (await fakeCaches.open('chagra-oldsha')).put('/old.js', { ok: true, status: 200 });
+    await (await fakeCaches.open('random-old-cache')).put('/x', { ok: true, status: 200 });
+    await (await fakeCaches.open('chagra-dev')).put('/index.html', { ok: true, status: 200 });
+    await (await fakeCaches.open('chagra-rag-grounding-v1')).put('/rag-embeddings.json', { ok: true, status: 200 });
+    await (await fakeCaches.open('chagra-map-tiles-v1')).put('/10/1/1.png', { ok: true, status: 200 });
+    await (await fakeCaches.open('chagra-species-images-v1')).put('/species.jpg', { ok: true, status: 200 });
+
+    await fireEvent(listeners.activate, {}).waited;
+
+    const names = await fakeCaches.keys();
+    expect(names).toContain('chagra-dev');
+    expect(names).toContain('chagra-rag-grounding-v1');
+    expect(names).toContain('chagra-map-tiles-v1');
+    expect(names).toContain('chagra-species-images-v1');
+    expect(names).not.toContain('chagra-oldsha');
+    expect(names).not.toContain('random-old-cache');
+    expect(self.clients.claim).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('SW navegación — never "failed to fetch"', () => {
   it('navegación online OK → sirve y cachea el shell', async () => {
     const { listeners, fakeCaches } = loadSW({ online: true, navStatus: 200 });
