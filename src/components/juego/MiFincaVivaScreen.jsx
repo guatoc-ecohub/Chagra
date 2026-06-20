@@ -278,7 +278,7 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
             className="bg-gradient-to-br from-amber-900/30 to-emerald-900/30 border-2 border-amber-400/40 rounded-3xl p-5 text-center"
           >
             <div className="text-5xl mb-2" aria-hidden="true">🌱</div>
-            <h3 className="text-xl font-black text-white">¡Empezá tu finca!</h3>
+            <h3 className="text-xl font-black text-white">¡Empieza tu finca!</h3>
             <p className="text-sm text-amber-50 mt-2 leading-relaxed">
               Tu finca está esperando. Siembra tu primera planta y mira cómo cobra
               vida: llegarán mariposas, abejas y muchas criaturas más.

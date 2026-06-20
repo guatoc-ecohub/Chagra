@@ -82,7 +82,7 @@ export default function CriaturaCollection({ criaturas = [], vivas = 0, total = 
       </div>
 
       <p className="text-xs text-emerald-200/70 mt-3 leading-relaxed">
-        Tocá una criatura para oír su secreto. Las criaturas llegan solitas cuando
+        Toca una criatura para oír su secreto. Las criaturas llegan solitas cuando
         cuidas tu finca: más plantas, suelo sano y nada de venenos. 🌱
       </p>
     </section>
