@@ -161,6 +161,7 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
   const mundo = game.mundo;
 
   return (
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- nombre del juego, ES-CO; migración i18n (ADR-050) fuera de alcance.
     <ScreenShell title="Mi Finca Viva" icon={Sprout} onBack={onBack} onHome={onHome}>
       <div
         data-testid="mi-finca-viva-screen"
@@ -208,6 +209,25 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
             </p>
           </div>
         </div>
+
+        {/* Minijuego plataformero: Defensores de la Finca (control biológico) */}
+        <button
+          type="button"
+          data-testid="entrada-defensores-finca"
+          onClick={() => irAccion('defensores')}
+          className="w-full text-left rounded-2xl p-4 bg-gradient-to-br from-teal-600/40 to-emerald-800/40 border-2 border-teal-400/40 hover:border-teal-300/60 active:scale-[0.99] transition flex items-center gap-3"
+        >
+          <span className="text-4xl shrink-0" aria-hidden="true">🛡️</span>
+          <span className="flex-1 min-w-0">
+            {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- nombre del juego, ES-CO. */}
+            <span className="block text-base font-black text-white">Defensores de la Finca</span>
+            <span className="block text-sm text-teal-100/90 leading-snug">
+              Corre y salta por la finca, recoge cultivos y suelta los bichos
+              buenos que controlan a las plagas. ¡Aprende control biológico!
+            </span>
+          </span>
+          <Sparkles size={22} className="text-teal-200 shrink-0" aria-hidden="true" />
+        </button>
 
         {/* Barra de progreso del mundo (alegre, pero honesta: % real) */}
         <div>
