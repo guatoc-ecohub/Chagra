@@ -1200,6 +1200,7 @@ export default function App() {
           </ErrorBoundary>
         );
       case 'help':
+      case 'ayuda':
         return (
           <ErrorBoundary>
             <HelpManual onBack={() => navigate('dashboard')} onNavigate={navigate} />
