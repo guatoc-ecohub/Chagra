@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Themes — Perfil de usuario y persistencia', () => {
+// eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- Test suite description
+test.describe('Themes - Perfil de usuario y persistencia', () => {
     test.beforeEach(async ({ context }) => {
         // Mock de auth para entrar directo al dashboard
         await context.route('**/oauth/token', (route) =>
@@ -64,6 +65,40 @@ test.describe('Themes — Perfil de usuario y persistencia', () => {
 
         await expect(page.locator('html')).toHaveAttribute('data-theme', 'minimalista');
     });
+
+    test('tema Minimalista oculta el colibrí (#72 regression)', async ({ page }) => {
+        await page.goto('/');
+        await page.getByLabel(/usuario/i).fill('e2e-operator');
+        await page.getByLabel(/contraseña/i).fill('e2e-pass');
+        await page.getByRole('button', { name: /ingresar/i }).click();
+
+        // Navegar al home para ver el AgentHero
+        await page.waitForURL('/');
+
+        // Aplicar tema minimalista
+        await page.evaluate(() => {
+            document.documentElement.setAttribute('data-theme', 'minimalista');
+        });
+
+        // Verificar que el colibrí esté oculto
+        const hummer = page.locator('.agentport-hummer');
+        await expect(hummer).toHaveCSS('display', 'none');
+
+        // Verificar que los elementos de nature estén ocultos
+        await expect(page.locator('.agentport-sun')).toHaveCSS('display', 'none');
+        await expect(page.locator('.agentport-mtn')).toHaveCSS('display', 'none');
+        await expect(page.locator('.agentport-pollen')).toHaveCSS('display', 'none');
+
+        // Verificar que los elementos de biopunk estén ocultos
+        await expect(page.locator('.agentport-bp')).toHaveCSS('display', 'none');
+        await expect(page.locator('.agentport-net')).toHaveCSS('display', 'none');
+        await expect(page.locator('.agentport-spore')).toHaveCSS('display', 'none');
+        await expect(page.locator('.agentport-roots')).toHaveCSS('display', 'none');
+
+        // Verificar que la escena minimalista esté visible
+        const minScene = page.locator('.agentport-min');
+        await expect(minScene).toBeVisible();
+    });
 });
 
 /**
@@ -78,6 +113,7 @@ test.describe('Themes — Perfil de usuario y persistencia', () => {
  * o ≥3.0 para botones/acentos de texto grande). Si alguien vuelve a meter
  * text-white sin theming en un tema claro, esta prueba falla.
  */
+// eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- Contrast test fixture with intentional Spanish labels
 const FIXTURE = `
   <div id="contrast-fixture" style="max-width:412px;padding:16px">
     <div class="bg-slate-900/60 border border-white/10 rounded-2xl p-4">
