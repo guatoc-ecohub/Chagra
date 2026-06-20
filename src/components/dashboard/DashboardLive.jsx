@@ -325,10 +325,10 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
                 confirmado el piso. */}
             {plantsCount === 0 && needsPisoCapture && (
                 <div
-                    className="absolute inset-x-0 top-[64px] z-20 px-4 pointer-events-none"
+                    className="absolute inset-x-0 top-[132px] z-[6] px-4 pointer-events-none"
                     data-testid="dashboard-onboarding-top"
                 >
-                    <div className="pointer-events-auto">
+                    <div className="pointer-events-auto mx-auto w-full max-w-[26rem]">
                         <OnboardingHero onNavigate={onNavigate} compact />
                     </div>
                 </div>
