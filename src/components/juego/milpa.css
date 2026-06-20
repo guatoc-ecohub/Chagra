@@ -1,7 +1,7 @@
 /*
  * milpa.css — micro-animaciones ligeras y alegres para el subjuego "La Milpa".
  *
- * Diseñado para una niña Y para el campesino: movimientos suaves (nada brusco),
+ * Diseñado para niños Y campesinos: movimientos suaves (nada brusco),
  * todo en CSS puro (offline-first, sin libs), rinde en gama baja. Respeta
  * prefers-reduced-motion.
  */
@@ -25,9 +25,108 @@
   100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
+/* Pulso suave para elementos activos/importantes */
+.milpa-pulso {
+  animation: milpa-pulso 2s ease-in-out infinite;
+}
+@keyframes milpa-pulso {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Resplandor para logros desbloqueados */
+.milpa-resplandor {
+  animation: milpa-resplandor 1.5s ease-out both;
+}
+@keyframes milpa-resplandor {
+  0% { box-shadow: 0 0 0 0 rgba(163, 230, 53, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(163, 230, 53, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(163, 230, 53, 0); }
+}
+
+/* Shake suave para eventos negativos (daño) */
+.milpa-shake {
+  animation: milpa-shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+@keyframes milpa-shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+/* Deslizar desde arriba para nuevos elementos */
+.milpa-deslizar-arriba {
+  animation: milpa-deslizar-arriba 0.6s ease-out both;
+}
+@keyframes milpa-deslizar-arriba {
+  0% { transform: translateY(-30px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* Aparecer con fade */
+.milpa-fade-in {
+  animation: milpa-fade-in 0.5s ease-out both;
+}
+@keyframes milpa-fade-in {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Rebote para botones importantes */
+.milpa-rebote {
+  animation: milpa-rebote 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes milpa-rebote {
+  0% { transform: scale(0.9); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Partículas de celebración (confeti CSS) */
+.milpa-confeti::before,
+.milpa-confeti::after {
+  content: '🎉';
+  position: absolute;
+  animation: milpa-confeti-caer 3s ease-in-out infinite;
+}
+@keyframes milpa-confeti-caer {
+  0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* Escala gradual para temporadas */
+.milpa-escena-entrar {
+  animation: milpa-escena-entrar 0.5s ease-out both;
+}
+@keyframes milpa-escena-entrar {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Giro para iconos de recompensa */
+.milpa-girar {
+  animation: milpa-girar 1s ease-in-out;
+}
+@keyframes milpa-girar {
+  0% { transform: rotate(0deg) scale(0.8); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .milpa-badge-pop,
-  .milpa-brota {
+  .milpa-brota,
+  .milpa-pulso,
+  .milpa-resplandor,
+  .milpa-shake,
+  .milpa-deslizar-arriba,
+  .milpa-fade-in,
+  .milpa-rebote,
+  .milpa-confeti::before,
+  .milpa-confeti::after,
+  .milpa-escena-entrar,
+  .milpa-girar {
     animation: none;
   }
 }
