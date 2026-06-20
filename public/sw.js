@@ -61,6 +61,13 @@ const ASSETS_TO_CACHE = [
 const RAG_GROUNDING_PRECACHE = [
   '/rag-embeddings.json',
   '/cycle-content/manifest.json',
+  // grafo-relations.json (~66 KB): relaciones del grafo de conocimiento
+  // (plaga→controlador, compatibles, antagonistas, biopreparados, vernáculos)
+  // por especie del catálogo. Cierra el "invisible offline": antes el cliente
+  // sin red sólo veía el catálogo estático y NO estas aristas. Generado en
+  // build/ops por chagra-pro/scripts/export-grafo-offline.mjs. Se cachea en
+  // RAG_GROUNDING_CACHE (sobrevive deploys; cache-first; degrada a 504).
+  '/grafo-relations.json',
 ];
 
 // Instalación del Service Worker.
@@ -226,7 +233,8 @@ self.addEventListener('fetch', (event) => {
   // que se lo pide estando online (cache-miss → fetch → put).
   const isGrounding =
     url.pathname.startsWith('/cycle-content/') ||
-    url.pathname === '/rag-embeddings.json';
+    url.pathname === '/rag-embeddings.json' ||
+    url.pathname === '/grafo-relations.json';
   if (isGrounding && event.request.method === 'GET') {
     event.respondWith(
       caches.open(RAG_GROUNDING_CACHE).then((cache) =>
