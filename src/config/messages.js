@@ -154,6 +154,8 @@ const messages = {
     errorGpsNoDisponibleDetalle: 'GPS no disponible. Verifica que el GPS esté activo y que estés al exterior (no en sótano / lejos de ventana).',
     errorUbicacion: 'No se pudo obtener tu ubicación.',
     errorTimeout: 'Tiempo agotado esperando al GPS (30s). En iPhone, el GPS puede tardar más al aire libre — espera unos segundos y vuelve a tocar "Mi ubicación".',
+    // Bug #57 — trazar caminando: warm-up del GPS antes de empezar el trazo.
+    gpsAfinando: 'Afinando GPS… espera a que la señal mejore.',
     confirmarAbastecer: 'Confirmar',
     registrando: 'Registrando…',
   },
