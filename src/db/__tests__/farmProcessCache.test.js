@@ -13,8 +13,11 @@ import { validateFarmProcessEvent } from '../../types/farmProcess';
  */
 
 describe('farmProcessCache - Bug A: schema process_id (DB_VERSION vigente)', () => {
-  it('DB_VERSION es 24 (esquema vigente; v19 introdujo el indice process_id)', () => {
-    expect(DB_VERSION).toBe(24);
+  it('DB_VERSION >= 19 (v19 introdujo el indice process_id corregido)', () => {
+    // No fijar un número exacto: cada migración nueva (v25 pilot_telemetry, etc.)
+    // dejaba este test stale. Lo que importa es que el esquema sea >= v19, cuando
+    // se corrigió el keyPath del índice process_id.
+    expect(DB_VERSION).toBeGreaterThanOrEqual(19);
   });
 
   it('STORES.FARM_PROCESS_EVENTS existe', () => {

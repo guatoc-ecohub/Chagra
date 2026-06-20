@@ -9,6 +9,42 @@ import { newUlid } from '../utils/id';
 import { validateFarmProcess, validateFarmProcessEvent } from '../types/farmProcess';
 
 /**
+ * Construye un FarmProcess mínimo y válido para el upsert de recordFarmEvent.
+ *
+ * Si llega `hint` (el ciclo seleccionado en la UI) se reutilizan sus atributos
+ * para no perder slug/etiqueta/lote/etapa. Si no, se arma un placeholder
+ * genérico válido. Garantiza que la observación del campesino se persista aunque
+ * el proceso falte en el store (desincronización post-clear-cache).
+ *
+ * @param {string} processId
+ * @param {import('../types/farmProcess').FarmProcess} [hint]
+ * @param {number} occurredAt — timestamp del evento que disparó el upsert
+ * @returns {import('../types/farmProcess').FarmProcess}
+ */
+export const buildUpsertPlaceholder = (processId, hint, occurredAt) => {
+  const ha = (hint && hint.attributes) || {};
+  const createdAt = Number.isInteger(ha.created_at) && ha.created_at > 0 ? ha.created_at : occurredAt;
+  return {
+    process_id: processId,
+    type: 'farm_process',
+    attributes: {
+      process_type: ha.process_type || 'sowing',
+      subject_kind: ha.subject_kind || 'individual',
+      ...(ha.subject_slug ? { subject_slug: ha.subject_slug } : {}),
+      subject_label: ha.subject_label || 'Cultivo sin nombre',
+      quantity: Number.isInteger(ha.quantity) && ha.quantity >= 1 ? ha.quantity : 1,
+      unit: ha.unit || 'plantas',
+      ...(ha.location_land_asset_id ? { location_land_asset_id: ha.location_land_asset_id } : {}),
+      status: ha.status || 'active',
+      current_stage: ha.current_stage || 'sowing_confirmed',
+      created_at: createdAt,
+      updated_at: occurredAt,
+      _synthetic: true,
+    },
+  };
+};
+
+/**
  * Registra un evento atómico en un ciclo productivo.
  *
  * - Genera event_id ULID
@@ -25,6 +61,9 @@ import { validateFarmProcess, validateFarmProcessEvent } from '../types/farmProc
  * @param {string} [input.idempotency_key]
  * @param {number} [input.confidence]
  * @param {string} [input.evidence]
+ * @param {import('../types/farmProcess').FarmProcess} [input.process_hint] — proceso
+ *   (ej. el ciclo seleccionado en la UI) para auto-crearlo si todavía no está en
+ *   el store. Nunca perdemos una observación del campesino por desincronización.
  * @returns {Promise<import('../types/farmProcess').FarmProcessEvent>}
  */
 export const recordFarmEvent = async (input) => {
@@ -52,6 +91,15 @@ export const recordFarmEvent = async (input) => {
 
   validateFarmProcessEvent(event);
 
+  // Placeholder de upsert: si el proceso no está en el store (típico tras un
+  // CLEAR CACHE, cuando la lista lo muestra desde un ciclo hidratado que no se
+  // alcanzó a persistir) NO fallamos. Auto-creamos el proceso para que la
+  // observación del campesino NUNCA se pierda. Si llega `process_hint` lo usamos
+  // (datos ricos del ciclo de la UI); si no, un mínimo válido.
+  const placeholderProcess = buildUpsertPlaceholder(processId, input.process_hint, occurredAt);
+  // Validar fuera de la transacción IDB (validate puede lanzar y abortaría el tx).
+  validateFarmProcess(placeholderProcess);
+
   const db = await openDB();
 
   return new Promise((resolve, reject) => {
@@ -67,17 +115,19 @@ export const recordFarmEvent = async (input) => {
         return;
       }
 
-      // Verificar que el proceso existe
+      // Verificar que el proceso existe; si no, auto-crearlo (upsert).
       const procReq = procStore.get(processId);
       procReq.onsuccess = () => {
-        if (!procReq.result) {
-          reject(new Error(`recordFarmEvent: process ${processId} not found`));
-          return;
-        }
-
         evStore.add(event);
-        procReq.result.attributes.updated_at = occurredAt;
-        procStore.put(procReq.result);
+        if (procReq.result) {
+          procReq.result.attributes.updated_at = occurredAt;
+          procStore.put(procReq.result);
+        } else {
+          // Upsert: el proceso faltaba en el store → lo persistimos ahora para
+          // que la lista, la fenología y las próximas observaciones funcionen.
+          console.warn(`[recordFarmEvent] proceso ${processId} ausente; auto-creado (upsert) para no perder la observacion`);
+          procStore.put(placeholderProcess);
+        }
       };
       procReq.onerror = () => reject(procReq.error);
     };

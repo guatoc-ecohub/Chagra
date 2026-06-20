@@ -21,7 +21,7 @@ const baseStage = (c) => String(c || '').replace(/_confirmed$/, '');
  * en IndexedDB). ADITIVO: NO reemplaza el ObservationScreen general (que sigue
  * registrando contra FarmOS); esto ata la nota al ciclo.
  */
-export default function CicloObservacion({ processId, currentStage, onSaved }) {
+export default function CicloObservacion({ processId, processHint, currentStage, onSaved }) {
   const { durationMs, start, stop, reset, error: recorderError } = useVoiceRecorder();
   const [text, setText] = useState('');
   const [saving, setSaving] = useState(false);
@@ -63,7 +63,7 @@ export default function CicloObservacion({ processId, currentStage, onSaved }) {
     setSaving(true);
     setErrorMsg('');
     try {
-      await registerObservation({ processId, text: t, actor: 'operator', source: 'text' });
+      await registerObservation({ processId, processHint, text: t, actor: 'operator', source: 'text' });
       maybeSuggestStage(t);
       flashSaved('Observación guardada.');
     } catch (err) {
@@ -71,7 +71,7 @@ export default function CicloObservacion({ processId, currentStage, onSaved }) {
     } finally {
       setSaving(false);
     }
-  }, [text, saving, processId, flashSaved, maybeSuggestStage]);
+  }, [text, saving, processId, processHint, flashSaved, maybeSuggestStage]);
 
   const toggleVoice = useCallback(async () => {
     if (saving) return;
@@ -95,7 +95,7 @@ export default function CicloObservacion({ processId, currentStage, onSaved }) {
         return;
       }
       const transcription = await transcribe(result.blob);
-      await registerVoiceObservation({ processId, transcription, actor: 'operator' });
+      await registerVoiceObservation({ processId, processHint, transcription, actor: 'operator' });
       maybeSuggestStage(transcription);
       flashSaved('Observación de voz guardada.');
     } catch (err) {
@@ -104,7 +104,7 @@ export default function CicloObservacion({ processId, currentStage, onSaved }) {
       reset();
       setSaving(false);
     }
-  }, [recording, saving, start, stop, reset, processId, flashSaved, maybeSuggestStage]);
+  }, [recording, saving, start, stop, reset, processId, processHint, flashSaved, maybeSuggestStage]);
 
   return (
     <section className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col gap-2">

@@ -9,6 +9,7 @@ import { validateFarmProcess, validateFarmProcessEvent } from '../types/farmProc
 import { assetCache } from './assetCache';
 import { getAllSpecies } from './catalogDB';
 import { newUlid } from '../utils/id';
+import { deriveCurrentStage } from '../services/phenologyCalculator';
 
 /**
  * Guarda (inserta o sobreescribe) un FarmProcess.
@@ -114,10 +115,26 @@ export const getFarmEvents = async (processId) => {
  * en farmOS (su inventario), no solo las creadas in-app. Excluir archivadas.
  * Dedupe por nombre+lote (subject_label + location_land_asset_id).
  *
+ * SINGLE SOURCE OF TRUTH: los ciclos sintéticos que esta función crea se
+ * PERSISTEN en el store `farm_processes` (no solo se devuelven en memoria). Esto
+ * arregla dos bugs ligados:
+ *   1. recordFarmEvent leía `farm_processes` y no encontraba el proceso ("process
+ *      <ULID> not found") porque la lista lo mostraba desde un objeto sintético
+ *      que nunca se escribía → ninguna observación/voz se podía guardar.
+ *   2. Tras un CLEAR CACHE el store quedaba vacío; al re-sincronizar de farmOS la
+ *      lista reaparecía pero el store seguía vacío. Persistir aquí repuebla
+ *      `farm_processes` para que observaciones y etapas vuelvan a funcionar.
+ *
  * @param {import('../types/farmProcess').FarmProcess[]} localProcesses - Procesos ya existentes en IndexedDB
+ * @param {Object} [opts]
+ * @param {number} [opts.altitudeM] - msnm de la finca para corregir la fenología
+ * @param {boolean} [opts.persist=true] - persistir los sintéticos nuevos en el store
  * @returns {Promise<import('../types/farmProcess').FarmProcess[]>} Lista mergeada con ciclos sintéticos
  */
-export const hydrateCyclesFromFarmOS = async (localProcesses) => {
+export const hydrateCyclesFromFarmOS = async (localProcesses, opts = {}) => {
+  const { altitudeM = null, persist = true } = opts;
+  // Ciclos sintéticos nuevos creados en esta corrida (para persistir al final).
+  const newSynthetic = [];
   try {
     // Obtener plantas activas del cache local (no archivadas)
     const allPlants = await assetCache.getByType('plant');
@@ -176,7 +193,18 @@ export const hydrateCyclesFromFarmOS = async (localProcesses) => {
         // Timestamp de creación: usar _createdAt o timestamp del asset
         const createdAt = plant._createdAt || plant.attributes?.timestamp || Date.now();
 
-        // Crear FarmProcess sintético (solo lectura)
+        // Derivar la etapa actual desde la fecha de siembra + fenología de la
+        // especie (en vez de congelar todo en 'sowing_confirmed'). Degrada a
+        // 'sowing_confirmed' si no hay template o fecha (deriveCurrentStage no
+        // lanza). Solo aplica a cultivos (process_type 'sowing').
+        const currentStage = deriveCurrentStage({
+          speciesSlug,
+          sowingDate: createdAt,
+          altitudeM,
+          fallback: 'sowing_confirmed',
+        });
+
+        // Crear FarmProcess sintético
         const syntheticProcess = {
           process_id: newUlid(),
           type: 'farm_process',
@@ -189,19 +217,36 @@ export const hydrateCyclesFromFarmOS = async (localProcesses) => {
             unit,
             location_land_asset_id: locationId,
             status: 'active',
-            current_stage: 'sowing_confirmed',
+            current_stage: currentStage,
             created_at: createdAt,
-            updated_at: createdAt,
-            // Flag para marcar como sintético (no sincronizar con farmOS)
+            updated_at: Date.now(),
+            // Flag de origen: hidratado desde una planta de farmOS (no creado
+            // in-app). NO bloquea sincronización: una vez persistido es un
+            // ciclo real al que se le pueden anotar observaciones.
             _synthetic: true,
           },
         };
 
         processMap.set(key, syntheticProcess);
+        newSynthetic.push(syntheticProcess);
       } catch (loopErr) {
         // Si falla una planta, continuamos con las demás
         // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- log técnico
         console.warn('[hydrateCyclesFromFarmOS] Error procesando planta:', loopErr.message);
+      }
+    }
+
+    // Persistir los ciclos sintéticos NUEVOS en el store `farm_processes` para
+    // que sean la única fuente de verdad: la lista y recordFarmEvent leen del
+    // MISMO store. Best-effort: si una escritura falla no se pierde la lista en
+    // pantalla (sigue en memoria) y el upsert de recordFarmEvent lo cubre.
+    if (persist && newSynthetic.length > 0) {
+      for (const proc of newSynthetic) {
+        try {
+          await putFarmProcess(proc);
+        } catch (persistErr) {
+          console.warn('[hydrateCyclesFromFarmOS] No pude persistir ciclo sintetico:', persistErr.message);
+        }
       }
     }
 

@@ -7,6 +7,7 @@ import CicloFotos from './CicloFotos';
 import { getTasksForCycle, getUrgentTasks } from '../services/cycleTaskService';
 import { getPestRisksByStage, getBiopreparadosForStage, getEnsemblePreventiveTasks } from '../services/climateCycleService';
 import { confirmStage } from '../services/stageConfirmationService';
+import { deriveCurrentStage } from '../services/phenologyCalculator';
 import { completeTaskByVoice } from '../services/voiceTaskService';
 import { getEnsoServicePhase, getEnsoLabel } from '../services/ensoService';
 
@@ -27,17 +28,39 @@ const baseStage = (code) => String(code || '').replace(/_confirmed$/, '');
 const stageLabel = (code) => STAGE_LABELS[baseStage(code)] || code || '—';
 
 export default function CicloDetalle({ cycle, altitudeM, onReload }) {
-  const a = cycle.attributes || {};
+  const a = useMemo(() => cycle.attributes || {}, [cycle]);
   const processId = cycle.process_id || cycle.id;
   const [pickStage, setPickStage] = useState(false);
   const [busy, setBusy] = useState(false);
   const [doneTasks, setDoneTasks] = useState({});
 
-  const pestRisks = useMemo(() => { try { return getPestRisksByStage(a.current_stage, a.subject_slug) || []; } catch { return []; } }, [a.current_stage, a.subject_slug]);
-  const bios = useMemo(() => { try { return getBiopreparadosForStage(baseStage(a.current_stage)) || []; } catch { return []; } }, [a.current_stage]);
+  // Etapa MOSTRADA: si el campesino confirmó/corrigió la etapa a mano
+  // (last_stage_change_reason presente) respetamos lo que él dijo. Si no,
+  // derivamos la etapa desde la fecha de siembra + fenología de la especie, para
+  // que NO se quede congelada en "sowing_confirmed". Degrada a la etapa guardada
+  // si no hay template/fecha (deriveCurrentStage no lanza).
+  const displayStage = useMemo(() => {
+    if (a.last_stage_change_reason) return a.current_stage;
+    return deriveCurrentStage({
+      speciesSlug: a.subject_slug,
+      sowingDate: a.created_at,
+      altitudeM,
+      fallback: a.current_stage || 'sowing_confirmed',
+    });
+  }, [a.last_stage_change_reason, a.current_stage, a.subject_slug, a.created_at, altitudeM]);
+
+  // Cycle con la etapa mostrada inyectada, para que las labores (getTasksForCycle)
+  // correspondan a la etapa derivada, no a la congelada.
+  const effectiveCycle = useMemo(
+    () => ({ ...cycle, attributes: { ...a, current_stage: displayStage } }),
+    [cycle, a, displayStage],
+  );
+
+  const pestRisks = useMemo(() => { try { return getPestRisksByStage(displayStage, a.subject_slug) || []; } catch { return []; } }, [displayStage, a.subject_slug]);
+  const bios = useMemo(() => { try { return getBiopreparadosForStage(baseStage(displayStage)) || []; } catch { return []; } }, [displayStage]);
   const ensoLabel = getEnsoLabel();
-  const ensoTasks = useMemo(() => { try { return getEnsemblePreventiveTasks(getEnsoServicePhase(), baseStage(a.current_stage)) || []; } catch { return []; } }, [a.current_stage]);
-  const tasks = useMemo(() => { try { return getTasksForCycle(cycle) || []; } catch { return []; } }, [cycle]);
+  const ensoTasks = useMemo(() => { try { return getEnsemblePreventiveTasks(getEnsoServicePhase(), baseStage(displayStage)) || []; } catch { return []; } }, [displayStage]);
+  const tasks = useMemo(() => { try { return getTasksForCycle(effectiveCycle) || []; } catch { return []; } }, [effectiveCycle]);
   const urgent = useMemo(() => { try { return getUrgentTasks(tasks) || []; } catch { return []; } }, [tasks]);
 
   const handleStage = useCallback(async (newStage) => {
@@ -61,12 +84,12 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
 
   return (
     <div className="px-4 pb-10 flex flex-col gap-4">
-      <FarmProcessSummary process={cycle} pestRisks={pestRisks} />
+      <FarmProcessSummary process={effectiveCycle} pestRisks={pestRisks} />
 
       {/* Etapa actual + confirmar cambio (stageConfirmationService) */}
       <section className="bg-slate-900 border border-slate-800 rounded-xl p-3">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-sm text-slate-300">Etapa: <strong className="text-lime-300">{stageLabel(a.current_stage)}</strong></span>
+          <span className="text-sm text-slate-300">Etapa: <strong className="text-lime-300">{stageLabel(displayStage)}</strong></span>
           <button
             type="button"
             onClick={() => setPickStage((o) => !o)}
@@ -93,7 +116,7 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
         )}
       </section>
 
-      <CicloObservacion processId={processId} currentStage={a.current_stage} onSaved={onReload} />
+      <CicloObservacion processId={processId} processHint={cycle} currentStage={displayStage} onSaved={onReload} />
 
       <section>
         <h2 className="text-2xs uppercase font-bold text-slate-500 mb-2">Línea de tiempo</h2>

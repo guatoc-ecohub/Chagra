@@ -4,6 +4,10 @@
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
+// Store en memoria que captura los ciclos sintéticos persistidos (BUG A: antes
+// no se persistían → recordFarmEvent no los encontraba). Compartido por el mock.
+let persistedStore;
+
 // Mock de dependencias
 vi.mock('../assetCache.js', () => ({
   assetCache: {
@@ -19,12 +23,27 @@ vi.mock('../utils/id.js', () => ({
   newUlid: () => 'ULID_TEST_' + Math.random().toString(36).substr(2, 9),
 }));
 
+// Mock IDB: putFarmProcess (interno) escribe acá vía openDB.
+vi.mock('../dbCore', () => {
+  const STORES = { FARM_PROCESSES: 'farm_processes', FARM_PROCESS_EVENTS: 'farm_process_events' };
+  const makeTx = () => {
+    const tx = { oncomplete: null, onerror: null };
+    tx.objectStore = () => ({
+      put(record) { persistedStore.set(record.process_id, record); },
+    });
+    Promise.resolve().then(() => tx.oncomplete?.());
+    return tx;
+  };
+  return { STORES, openDB: vi.fn(() => Promise.resolve({ transaction: () => makeTx() })) };
+});
+
 import { hydrateCyclesFromFarmOS } from '../farmProcessCache';
 import { assetCache } from '../assetCache';
 import { getAllSpecies } from '../catalogDB';
 
 describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () => {
   beforeEach(() => {
+    persistedStore = new Map();
     vi.clearAllMocks();
   });
 
@@ -299,5 +318,86 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
     const result = await hydrateCyclesFromFarmOS(localProcesses);
 
     expect(result).toEqual(localProcesses); // Fallback a locales
+  });
+
+  // BUG A: el ciclo sintético DEBE persistirse en farm_processes, no solo
+  // devolverse en memoria; si no, recordFarmEvent no lo encuentra.
+  it('PERSISTE el ciclo sintético en el store (single source of truth)', async () => {
+    const plants = [{
+      id: 'plant-1', type: 'asset--plant',
+      attributes: { name: 'Fresa', status: 'active' },
+      relationships: { location: { data: { id: 'land-1' } } },
+    }];
+    assetCache.getByType.mockResolvedValue(plants);
+    getAllSpecies.mockResolvedValue([{ id: 'fragaria_ananassa', nombre_comun: 'fresa', tracking_mode: 'individual' }]);
+
+    const result = await hydrateCyclesFromFarmOS([]);
+
+    const pid = result[0].process_id;
+    expect(persistedStore.has(pid)).toBe(true);
+    expect(persistedStore.get(pid).attributes.subject_label).toBe('Fresa');
+  });
+
+  it('NO persiste cuando persist:false (modo solo-lectura)', async () => {
+    const plants = [{
+      id: 'plant-1', type: 'asset--plant',
+      attributes: { name: 'Fresa', status: 'active' },
+      relationships: { location: { data: { id: 'land-1' } } },
+    }];
+    assetCache.getByType.mockResolvedValue(plants);
+    getAllSpecies.mockResolvedValue([{ id: 'fragaria_ananassa', nombre_comun: 'fresa', tracking_mode: 'individual' }]);
+
+    const result = await hydrateCyclesFromFarmOS([], { persist: false });
+
+    expect(result).toHaveLength(1);
+    expect(persistedStore.size).toBe(0);
+  });
+
+  // BUG B: la etapa se deriva de la fecha de siembra + fenología, no se congela
+  // en sowing_confirmed.
+  it('DERIVA la etapa desde la fecha de siembra (no congela en sowing_confirmed)', async () => {
+    const sowingDate = Date.now() - 30 * 86400000; // hace 30 días
+    const plants = [{
+      id: 'plant-1', type: 'asset--plant',
+      attributes: { name: 'Tomate', status: 'active', timestamp: sowingDate },
+      relationships: { location: { data: { id: 'land-1' } } },
+    }];
+    assetCache.getByType.mockResolvedValue(plants);
+    getAllSpecies.mockResolvedValue([{ id: 'solanum_lycopersicum', nombre_comun: 'tomate', tracking_mode: 'individual' }]);
+
+    const result = await hydrateCyclesFromFarmOS([]);
+
+    // A 30 días, el tomate ya no está en 'sowing_confirmed'.
+    expect(result[0].attributes.current_stage).not.toBe('sowing_confirmed');
+    expect(result[0].attributes.current_stage).toBe('flowering');
+  });
+
+  it('etapa recién sembrada (día 0) → sowing_confirmed', async () => {
+    const plants = [{
+      id: 'plant-1', type: 'asset--plant',
+      attributes: { name: 'Tomate', status: 'active', timestamp: Date.now() },
+      relationships: { location: { data: { id: 'land-1' } } },
+    }];
+    assetCache.getByType.mockResolvedValue(plants);
+    getAllSpecies.mockResolvedValue([{ id: 'solanum_lycopersicum', nombre_comun: 'tomate', tracking_mode: 'individual' }]);
+
+    const result = await hydrateCyclesFromFarmOS([]);
+
+    expect(result[0].attributes.current_stage).toBe('sowing_confirmed');
+  });
+
+  it('especie sin plantilla → etapa cae a sowing_confirmed (no rompe)', async () => {
+    const plants = [{
+      id: 'plant-1', type: 'asset--plant',
+      attributes: { name: 'Planta rara', status: 'active', timestamp: Date.now() - 100 * 86400000 },
+      relationships: { location: { data: { id: 'land-1' } } },
+    }];
+    assetCache.getByType.mockResolvedValue(plants);
+    getAllSpecies.mockResolvedValue([]); // sin match → sin slug → sin template
+
+    const result = await hydrateCyclesFromFarmOS([]);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].attributes.current_stage).toBe('sowing_confirmed');
   });
 });

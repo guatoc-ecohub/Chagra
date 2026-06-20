@@ -9,7 +9,7 @@ import { recordFarmEvent } from './farmEventService';
  * Task 24: no crea segundo pipeline. Usa el mismo VoiceCapture pero cambia
  * el modo a 'observation' en lugar de 'sowing'.
  */
-export async function registerVoiceObservation({ processId, transcription, actor }) {
+export async function registerVoiceObservation({ processId, transcription, actor, processHint }) {
   if (!processId) throw new Error('registerVoiceObservation: process_id required');
   if (!transcription || typeof transcription !== 'string' || !transcription.trim()) {
     throw new Error('registerVoiceObservation: transcription required');
@@ -24,5 +24,8 @@ export async function registerVoiceObservation({ processId, transcription, actor
     payload: { text: transcription.trim(), capture_mode: 'voice' },
     confidence: 0.85,
     evidence: null,
+    // Si el ciclo no está en el store (desync post-clear-cache), recordFarmEvent
+    // lo auto-crea con estos datos para no perder la observación de voz.
+    ...(processHint ? { process_hint: processHint } : {}),
   });
 }
