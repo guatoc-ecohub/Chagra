@@ -86,7 +86,7 @@ describe('MiFincaVivaScreen', () => {
   it('finca vacía: muestra la invitación a sembrar (no un mundo muerto)', async () => {
     render(<MiFincaVivaScreen />);
     expect(await screen.findByTestId('finca-vacia-invitacion')).toBeTruthy();
-    expect(screen.getByText('¡Empezá tu finca!')).toBeTruthy();
+    expect(screen.getByText('¡Empieza tu finca!')).toBeTruthy();
   });
 
   it('finca vacía: el botón de sembrar navega a la acción real', async () => {
