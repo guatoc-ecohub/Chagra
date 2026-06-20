@@ -35,6 +35,8 @@
 
 import { PROFILE_ROLES } from './profileChipSelector.js';
 import { saveProfile, getProfile } from './userProfileService.js';
+import { setOperatorOverride } from '../config/glaciarAccess.js';
+import { seedProfileData } from './demoPersonaSeeds.js';
 
 /** Evento same-tab que emite el switch al cambiar de perfil. */
 export const PROFILE_CHANGED_EVENT = 'chagra:profile-changed';
@@ -122,13 +124,34 @@ export function getActivePresetId(profile) {
  * evento `chagra:profile-changed` para que el home (y quien escuche) re-derive
  * su gating en vivo. NO toca el resto del perfil (finca, altitud, etc.).
  *
+ * CHANGE LOG (demo-personas 2026-06-20):
+ * - Desactiva "Visión total" automáticamente al elegir un perfil demo para que
+ *   las diferencias entre perfiles sean visibles (la visión total enmascara los
+ *   filtros por rol).
+ * - Carga datos semilla específicos del perfil (cultivos, animales, fincas) en
+ *   IndexedDB para que cada persona tenga su propia finca demo rica y coherente.
+ *
  * @param {string} presetId — id de PROFILE_PRESETS.
  * @returns {object|null} perfil resultante, o null si el id es inválido.
  */
-export function applyProfilePreset(presetId) {
+export async function applyProfilePreset(presetId) {
   const preset = getPresetById(presetId);
   if (!preset) return null;
+
+  // Desactivar "Visión total" para que las diferencias de perfil sean visibles
+  // (la visión total enmascara los filtros por rol mostrando todo siempre).
+  setOperatorOverride(false);
+
   const profile = saveProfile({ rol: preset.rol, perfil_demo: preset.id });
+
+  // Cargar datos semilla específicos del perfil (async, non-blocking)
+  try {
+    await seedProfileData(presetId);
+  } catch (error) {
+    console.warn('[profilePresets] Error seeding profile data:', error);
+    // No fallamos el switch si el seed falla - el perfil sigue cambiado
+  }
+
   try {
     window.dispatchEvent(
       new CustomEvent(PROFILE_CHANGED_EVENT, {
