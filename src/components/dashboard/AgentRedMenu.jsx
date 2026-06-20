@@ -266,12 +266,8 @@ const CSS = `
 .arm-gglow path{stroke:var(--glowC);stroke-width:var(--glowW);fill:none;stroke-linecap:round;transition:stroke .5s}
 .arm-gcore path{stroke:var(--branch);stroke-width:var(--coreW);fill:none;stroke-linecap:round;transition:stroke .5s}
 .arm-gcore path.lf{stroke-width:calc(var(--coreW)*.78)}
-.arm-gtwig path{stroke:var(--twigC);stroke-width:1.1px;fill:none;stroke-linecap:round;transition:stroke .5s}
-/* boca de raíz: las raicillas que asoman del botón Ⓐ — presencia subida
-   (operador 2026-06-10: "la raíz debe notarse"): color de rama pleno,
-   trazo grueso. */
-.arm-gtwig path.rt{opacity:.85;stroke-width:2.6px;stroke:var(--branch)}
-.arm-gtwig path.gd{opacity:.7;stroke-width:2.6px}
+/* (.arm-gtwig + raicillas .rt + arco de suelo .gd ELIMINADOS 2026-06-20:
+   decoración sin nodo destino que moría en el vacío). */
 @keyframes armBreathe{0%,100%{opacity:var(--glowO)}50%{opacity:calc(var(--glowO)*.55)}}
 .arm-spores{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
 .arm-sp{position:absolute;left:var(--lx);bottom:30px;width:3px;height:3px;border-radius:50%;
@@ -434,8 +430,6 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
     const tkI = root.querySelector('[data-arm="tkI"]');
     const vnO = root.querySelector('[data-arm="vnO"]');
     const vnI = root.querySelector('[data-arm="vnI"]');
-    const rootlets = root.querySelector('[data-arm="rootlets"]');
-    const ground = root.querySelector('[data-arm="ground"]');
     const hintEl = root.querySelector('[data-arm="hint"]');
 
     /* estado de simulación por grupo/hoja (paths SVG creados acá). */
@@ -699,49 +693,16 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
         s.leafOffT = s.leafAbsT.map((p) => ({ x: p.x - fp.x, y: p.y - fp.y }));
       });
 
-      /* decoración del arraigo:
-         - nature: raicillas bajo la base del tronco + arco de suelo.
-         - micorriza: boca de raicillas que brota de la Ⓐ hacia arriba-derecha
-           (largos calculados para asomar SIEMPRE sobre el borde inferior). */
-      let d = '';
-      if (treeMode) {
-        for (let k = 0; k < 5; k++) {
-          const a = Math.PI * (0.15 + 0.7 * k / 4);
-          const ex = baseT.x + Math.cos(a) * (24 + rand(k + 40) * 34);
-          const ey = baseT.y + 10 + Math.sin(a) * (16 + rand(k + 50) * 30);
-          const mx = baseT.x + (ex - baseT.x) * 0.35 + (rand(k + 60) - 0.5) * 10;
-          const my = baseT.y + 12;
-          d += `M${r1(baseT.x)} ${r1(baseT.y + 8)} Q${r1(mx)} ${r1(my)} ${r1(ex)} ${r1(ey)} `;
-        }
-      } else {
-        /* boca de raíz: 7 raicillas que nacen DENTRO del disco de la Ⓐ
-           (soldadas, sin gap) y asoman bien adentro del lienzo — presencia
-           subida (operador 2026-06-10). Forman un RACIMO compacto pegado al
-           botón (la raíz del organismo), NO trazos largos al vacío: el largo
-           se acota para que el grupo se lea como boca de raíz y no como líneas
-           sueltas (limpieza 2026-06-18). */
-        const depth = Math.max(0, rootPt.y - H);
-        for (let k = 0; k < 7; k++) {
-          const a = -1.38 + 1.14 * k / 6; /* -79°..-14°: hacia arriba-derecha */
-          const sx = rootPt.x + Math.cos(a) * Math.max(0, btnR - 5);
-          const sy = rootPt.y + Math.sin(a) * Math.max(0, btnR - 5);
-          /* el largo justo para asomar sobre el borde + un acento corto, con
-             tope: las raicillas casi horizontales (−sin(a) chico) no se
-             disparan a lo ancho del lienzo. */
-          const len = Math.min(
-            depth + 56,
-            (depth + 30 + rand(k + 40) * 30) / Math.max(0.45, -Math.sin(a)),
-          );
-          const ex = clampN(rootPt.x + Math.cos(a) * len, 16, W - 28);
-          const ey = rootPt.y + Math.sin(a) * len;
-          const mx = rootPt.x + (ex - rootPt.x) * 0.45 + (rand(k + 60) - 0.5) * 12;
-          const my = rootPt.y + Math.sin(a) * len * 0.45;
-          d += `M${r1(sx)} ${r1(sy)} Q${r1(mx)} ${r1(my)} ${r1(ex)} ${r1(ey)} `;
-        }
-      }
-      rootlets.setAttribute('d', d.trim());
-      ground.setAttribute('d',
-        `M${r1(cx - 108)} ${r1(baseT.y + 12)} Q${r1(cx)} ${r1(baseT.y + 26)} ${r1(cx + 108)} ${r1(baseT.y + 12)}`);
+      /* SIN decoración de arraigo sin destino (operador 2026-06-20): las
+         raicillas/"boca de raíz" (micorriza, abanico desde la Ⓐ) y el arco de
+         suelo (nature) MORÍAN en el vacío — ninguna terminaba en un nodo de
+         capacidad, así que se leían como líneas sueltas/colgantes y
+         contradecían el subtítulo "Cada rama, una capacidad conectada".
+         ELIMINADAS: ahora TODA línea visible de la red nace de la Ⓐ y muere
+         SIEMPRE en el centro de un nodo (grupo/hoja). En nature la vena
+         Ⓐ→tronco y el tronco SÍ tienen destino (la base / la copa), por eso se
+         conservan. La riqueza orgánica la dan la curva sembrada, el glow que
+         respira y las esporas. */
     }
 
     /* ── bucle rAF (con reduced-motion: un solo paint al estado final) ── */
@@ -757,7 +718,6 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
       const f = focused;
 
       gTrunk.style.display = treeMode ? '' : 'none';
-      ground.style.display = treeMode ? '' : 'none';
       if (treeMode) {
         trunkV += (trunkVT - trunkV) * kv;
         md = Math.max(md, 200 * Math.abs(trunkVT - trunkV));
@@ -906,21 +866,51 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
       clearFocus: () => setFocus(null),
     };
 
+    /* Re-mide la geometría sin re-brotar (las ramas ya están vivas): solo
+       recoloca raíz/nodos a las coords actuales y pinta. Lo usa el RO del
+       botón Ⓐ y el barrido de settle: si el compositor se ancla/mueve tras la
+       animación de pliegue (#1726, transición .5s), la BASE de cada rama sigue
+       al centro real de la Ⓐ en vez de quedar suelta. */
+    function relayout() {
+      layout();
+      if (!didSprout && W > 0 && H > 0) regrow();
+      else kick(800);
+    }
+
     let ro = null;
     if (typeof ResizeObserver !== 'undefined') {
-      ro = new ResizeObserver(() => {
-        layout();
-        if (!didSprout && W > 0 && H > 0) regrow();
-        else kick(800);
-      });
+      ro = new ResizeObserver(relayout);
       ro.observe(root);
+      /* OJO: también observamos el botón Ⓐ (anchorRef). Vive en el compositor,
+         FUERA del arm-root: cuando #1726 ancla el compositor al fondo y el
+         saludo/chips se pliegan, la Ⓐ se mueve sin que el arm-root cambie de
+         tamaño → el RO de root NO dispara y la raíz quedaba desfasada. */
+      const aEl = anchorRef && anchorRef.current;
+      if (aEl) ro.observe(aEl);
     }
 
     layout();
     if (W > 0 && H > 0) regrow();
 
+    /* Barrido de "settle": tras montar la mano, el layout del hero cambia
+       (pliegue .5s, overflow visible, compositor al fondo). Forzamos un
+       recálculo en el próximo frame y a lo largo de la transición para que la
+       geometría viva atrape la posición FINAL de la Ⓐ y de los nodos. */
+    let rafSettle = null;
+    const settleTimers = [];
+    if (!reduced) {
+      rafSettle = requestAnimationFrame(() => { rafSettle = null; relayout(); });
+      [120, 280, 520].forEach((ms) => {
+        settleTimers.push(setTimeout(relayout, ms));
+      });
+    } else {
+      rafSettle = requestAnimationFrame(() => { rafSettle = null; relayout(); });
+    }
+
     return () => {
       if (rafId != null) cancelAnimationFrame(rafId);
+      if (rafSettle != null) cancelAnimationFrame(rafSettle);
+      settleTimers.forEach(clearTimeout);
       if (ro) ro.disconnect();
       sim.forEach((s) => {
         clearTimeout(s.growTimer);
@@ -1014,10 +1004,9 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
           </g>
           <g className="arm-gglow" data-arm="gGlow" />
           <g className="arm-gcore" data-arm="gCore" />
-          <g className="arm-gtwig" data-arm="gTwig">
-            <path className="rt" data-arm="rootlets" />
-            <path className="gd" data-arm="ground" />
-          </g>
+          {/* grupo arm-gtwig (raicillas .rt + arco de suelo .gd) ELIMINADO
+              (operador 2026-06-20): eran decoración sin nodo destino —
+              líneas que morían en el vacío. */}
         </g>
       </svg>
 
