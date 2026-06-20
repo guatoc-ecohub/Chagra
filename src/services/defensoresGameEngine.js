@@ -147,6 +147,100 @@ export function avanzarFisica(estado, groundY, altura) {
 }
 
 /**
+ * ¿La posición x del jugador (centro) cae dentro de un hueco del suelo?
+ * Si está sobre un hueco, el "piso" deja de existir ahí. Útil para que el motor
+ * decida si el jugador puede caer (nivel 2: huecos = obstáculo).
+ *
+ * @param {number} centroX  x del centro del jugador en coords del MUNDO.
+ * @param {Array<{x:number,w:number}>} huecos  tramos vacíos del suelo.
+ * @returns {boolean}
+ */
+export function sobreHueco(centroX, huecos) {
+  if (!huecos || huecos.length === 0) return false;
+  return huecos.some((h) => centroX >= h.x && centroX <= h.x + h.w);
+}
+
+/**
+ * Física vertical sobre terreno con plataformas y huecos (nivel 2).
+ *
+ * El jugador aterriza en el suelo (groundY) salvo que esté sobre un hueco; y
+ * puede aterrizar ENCIMA de una plataforma SOLO si viene cayendo (vy > 0) y sus
+ * pies cruzan la superficie superior de la plataforma. Una vez bajo el suelo
+ * (cayó por un hueco), `caido` es true y la UI aplica el daño.
+ *
+ * @param {{x:number,y:number,w:number,h:number,vy:number}} estado
+ * @param {number} groundY
+ * @param {Array<{x:number,y:number,w:number}>} plataformas  y = top absoluto en coords mundo.
+ * @param {Array<{x:number,w:number}>} huecos
+ * @param {number} mundoAlto  alto total del mundo (umbral de caída fatal).
+ * @returns {{ x:number,y:number,vy:number,onGround:boolean,caido:boolean }}
+ */
+export function avanzarFisicaTerreno(estado, groundY, plataformas, huecos, mundoAlto) {
+  const { x, w, h } = estado;
+  let { y, vy } = estado;
+  const yAntes = y;
+  vy += GRAVITY;
+  y += vy;
+  let onGround = false;
+  let caido = false;
+
+  // 1) Plataformas: solo se aterriza encima si venía cayendo y cruza el top.
+  if (vy > 0 && plataformas && plataformas.length > 0) {
+    const piesAntes = yAntes + h;
+    const piesAhora = y + h;
+    for (const p of plataformas) {
+      const solapaX = x + w > p.x && x < p.x + p.w;
+      const cruzaTop = piesAntes <= p.y && piesAhora >= p.y;
+      if (solapaX && cruzaTop) {
+        y = p.y - h;
+        vy = 0;
+        onGround = true;
+        return { x, y, vy, onGround, caido: false };
+      }
+    }
+  }
+
+  // 2) Suelo, salvo que el centro del jugador esté sobre un hueco.
+  const centroX = x + w / 2;
+  const enHueco = sobreHueco(centroX, huecos);
+  const pisoY = groundY - h;
+  if (!enHueco && y >= pisoY) {
+    y = pisoY;
+    vy = 0;
+    onGround = true;
+  }
+
+  // 3) Caída fatal por el hueco: pasó el fondo del mundo.
+  if (y + h >= mundoAlto) {
+    caido = true;
+  }
+
+  return { x, y, vy, onGround, caido };
+}
+
+/**
+ * Aplica un golpe de benéfico al mini-jefe. Solo el controlador REAL del jefe
+ * le quita vida (control biológico: la mantis derriba la langosta, nadie más).
+ *
+ * @param {?{plagaId:string, vida:number, vivo:boolean}} jefe
+ * @param {string} beneficoId
+ * @returns {{ jefe: Object|null, golpeo: boolean, derrotado: boolean }}
+ */
+export function golpearJefe(jefe, beneficoId) {
+  if (!jefe || !jefe.vivo) return { jefe, golpeo: false, derrotado: false };
+  if (!beneficoControlaPlaga(beneficoId, jefe.plagaId)) {
+    return { jefe, golpeo: false, derrotado: false };
+  }
+  const vida = Math.max(0, jefe.vida - 1);
+  const vivo = vida > 0;
+  return {
+    jefe: { ...jefe, vida, vivo },
+    golpeo: true,
+    derrotado: !vivo,
+  };
+}
+
+/**
  * Aplica un salto si el jugador está en el suelo (no doble salto).
  * @param {{ vy:number, onGround:boolean }} estado
  * @returns {{ vy:number, onGround:boolean, salto:boolean }}
@@ -160,18 +254,34 @@ export function intentarSalto(estado) {
 
 /**
  * Evalúa el estado de fin de nivel.
+ *
+ * Gana al recoger la meta de cultivos Y controlar todas las plagas Y, si el
+ * nivel tiene mini-jefe, derrotarlo. Pierde si la energía llega a 0.
+ *
  * @param {Object} params
  * @param {number} params.energia       energía restante (<=0 = pierde).
  * @param {number} params.cultivosRecogidos
  * @param {number} params.metaCultivos  cuántos hace falta recoger.
  * @param {number} params.plagasVivas   plagas que siguen sin controlar.
+ * @param {boolean} [params.hayJefe=false]    si el nivel tiene mini-jefe.
+ * @param {boolean} [params.jefeVivo=false]   si el mini-jefe sigue vivo.
  * @returns {{ estado: 'jugando'|'gano'|'perdio', razon: string }}
  */
-export function evaluarFinNivel({ energia, cultivosRecogidos, metaCultivos, plagasVivas }) {
+export function evaluarFinNivel({
+  energia,
+  cultivosRecogidos,
+  metaCultivos,
+  plagasVivas,
+  hayJefe = false,
+  jefeVivo = false,
+}) {
   if (energia <= 0) {
     return { estado: 'perdio', razon: 'Te quedaste sin energía. ¡Inténtalo otra vez!' };
   }
-  if (cultivosRecogidos >= metaCultivos && plagasVivas === 0) {
+  const cultivosListos = cultivosRecogidos >= metaCultivos;
+  const plagasLimpias = plagasVivas === 0;
+  const jefeListo = !hayJefe || !jefeVivo;
+  if (cultivosListos && plagasLimpias && jefeListo) {
     return { estado: 'gano', razon: '¡Cosechaste la finca y la cuidaste con control biológico!' };
   }
   return { estado: 'jugando', razon: '' };

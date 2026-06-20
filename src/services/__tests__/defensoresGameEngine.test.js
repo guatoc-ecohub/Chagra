@@ -7,6 +7,9 @@ import {
   recolectarCultivos,
   sumarPuntaje,
   avanzarFisica,
+  avanzarFisicaTerreno,
+  sobreHueco,
+  golpearJefe,
   intentarSalto,
   evaluarFinNivel,
   clamp,
@@ -15,7 +18,14 @@ import {
   GRAVITY,
   JUMP_VELOCITY,
 } from '../defensoresGameEngine';
-import { PARES_CONTROL } from '../../components/juego/defensoresFincaData';
+import {
+  PARES_CONTROL,
+  NIVEL_1,
+  NIVEL_2,
+  NIVELES,
+  getNivel,
+  nivelDesbloqueado,
+} from '../../components/juego/defensoresFincaData';
 
 describe('defensoresGameEngine — utilidades', () => {
   it('clamp limita al rango', () => {
@@ -172,5 +182,156 @@ describe('fin de nivel', () => {
     expect(
       evaluarFinNivel({ energia: 2, cultivosRecogidos: 3, metaCultivos: 6, plagasVivas: 0 }).estado,
     ).toBe('jugando');
+  });
+
+  it('con mini-jefe NO gana hasta derrotarlo, aunque cumpla lo demás', () => {
+    const conJefeVivo = evaluarFinNivel({
+      energia: 3,
+      cultivosRecogidos: 10,
+      metaCultivos: 10,
+      plagasVivas: 0,
+      hayJefe: true,
+      jefeVivo: true,
+    });
+    expect(conJefeVivo.estado).toBe('jugando');
+
+    const jefeDerrotado = evaluarFinNivel({
+      energia: 3,
+      cultivosRecogidos: 10,
+      metaCultivos: 10,
+      plagasVivas: 0,
+      hayJefe: true,
+      jefeVivo: false,
+    });
+    expect(jefeDerrotado.estado).toBe('gano');
+  });
+});
+
+describe('nivel 2 — terreno con plataformas y huecos', () => {
+  it('sobreHueco detecta cuando el centro del jugador cae en un vacío', () => {
+    const huecos = [{ x: 100, w: 50 }];
+    expect(sobreHueco(120, huecos)).toBe(true);
+    expect(sobreHueco(99, huecos)).toBe(false);
+    expect(sobreHueco(160, huecos)).toBe(false);
+    expect(sobreHueco(120, [])).toBe(false);
+  });
+
+  it('avanzarFisicaTerreno aterriza en el suelo cuando NO hay hueco debajo', () => {
+    const groundY = 340;
+    const estado = { x: 20, y: 330, w: 38, h: 54, vy: 20 };
+    const res = avanzarFisicaTerreno(estado, groundY, [], [], 485);
+    expect(res.onGround).toBe(true);
+    expect(res.y).toBe(groundY - 54);
+    expect(res.vy).toBe(0);
+    expect(res.caido).toBe(false);
+  });
+
+  it('avanzarFisicaTerreno deja caer al jugador por un hueco (sin suelo)', () => {
+    const groundY = 340;
+    // Jugador justo sobre un hueco: su centro x cae dentro del vacío.
+    const estado = { x: 690, y: 330, w: 38, h: 54, vy: 20 };
+    const huecos = [{ x: 680, w: 80 }];
+    const res = avanzarFisicaTerreno(estado, groundY, [], huecos, 485);
+    expect(res.onGround).toBe(false);
+    expect(res.y).toBeGreaterThan(330); // siguió cayendo, no se ancló al suelo
+  });
+
+  it('avanzarFisicaTerreno marca caido al pasar el fondo del mundo', () => {
+    const estado = { x: 690, y: 460, w: 38, h: 54, vy: 20 };
+    const huecos = [{ x: 680, w: 80 }];
+    const res = avanzarFisicaTerreno(estado, 340, [], huecos, 485);
+    expect(res.caido).toBe(true);
+  });
+
+  it('avanzarFisicaTerreno aterriza encima de una plataforma al caer sobre ella', () => {
+    const groundY = 340;
+    // Plataforma con top en y=200. El jugador cae y sus pies la cruzan.
+    const plataformas = [{ x: 100, y: 200, w: 120 }];
+    const estado = { x: 120, y: 140, w: 38, h: 54, vy: 12 }; // pies antes=194, ahora≈206
+    const res = avanzarFisicaTerreno(estado, groundY, plataformas, [], 485);
+    expect(res.onGround).toBe(true);
+    expect(res.y).toBe(200 - 54);
+    expect(res.vy).toBe(0);
+  });
+
+  it('avanzarFisicaTerreno NO aterriza en plataforma si va subiendo', () => {
+    const plataformas = [{ x: 100, y: 200, w: 120 }];
+    const estado = { x: 120, y: 210, w: 38, h: 54, vy: -10 };
+    const res = avanzarFisicaTerreno(estado, 340, plataformas, [], 485);
+    expect(res.onGround).toBe(false);
+  });
+});
+
+describe('mini-jefe — solo cae con su controlador real', () => {
+  const jefeBase = { plagaId: 'saltamontes', vida: 3, vivo: true };
+
+  it('el controlador correcto (mantis → saltamontes) le quita vida', () => {
+    const res = golpearJefe(jefeBase, 'mantis');
+    expect(res.golpeo).toBe(true);
+    expect(res.jefe.vida).toBe(2);
+    expect(res.jefe.vivo).toBe(true);
+    expect(res.derrotado).toBe(false);
+  });
+
+  it('un benéfico equivocado NO le hace nada al jefe', () => {
+    const res = golpearJefe(jefeBase, 'catarina'); // controla pulgón, no saltamontes
+    expect(res.golpeo).toBe(false);
+    expect(res.jefe.vida).toBe(3);
+  });
+
+  it('al agotar la vida el jefe queda derrotado', () => {
+    let jefe = { plagaId: 'saltamontes', vida: 1, vivo: true };
+    const res = golpearJefe(jefe, 'mantis');
+    expect(res.derrotado).toBe(true);
+    expect(res.jefe.vivo).toBe(false);
+    expect(res.jefe.vida).toBe(0);
+    // Un golpe a un jefe ya muerto no hace nada.
+    jefe = res.jefe;
+    expect(golpearJefe(jefe, 'mantis').golpeo).toBe(false);
+  });
+});
+
+describe('niveles — configuración y desbloqueo', () => {
+  it('hay dos niveles y el 2 es más largo y exigente que el 1', () => {
+    expect(NIVELES).toHaveLength(2);
+    expect(NIVEL_2.numero).toBe(2);
+    expect(NIVEL_2.mundoAncho).toBeGreaterThan(NIVEL_1.mundoAncho);
+    expect(NIVEL_2.metaCultivos).toBeGreaterThan(NIVEL_1.metaCultivos);
+    expect(NIVEL_2.paresIds.length).toBeGreaterThan(NIVEL_1.paresIds.length);
+    expect(NIVEL_2.plataformas.length).toBeGreaterThan(0);
+    expect(NIVEL_2.huecos.length).toBeGreaterThan(0);
+    expect(NIVEL_2.jefe).toBeTruthy();
+  });
+
+  it('el nivel 2 usa una paleta de fondo distinta a la del 1', () => {
+    expect(NIVEL_2.escena.id).not.toBe(NIVEL_1.escena.id);
+    expect(NIVEL_2.escena.cieloTop).not.toBe(NIVEL_1.escena.cieloTop);
+  });
+
+  it('todos los pares de cada nivel existen en el dataset curado', () => {
+    const ids = new Set(PARES_CONTROL.map((p) => p.id));
+    for (const nivel of NIVELES) {
+      for (const pid of nivel.paresIds) {
+        expect(ids.has(pid)).toBe(true);
+      }
+    }
+  });
+
+  it('el mini-jefe del nivel 2 referencia una plaga real con controlador', () => {
+    const par = PARES_CONTROL.find((p) => p.plaga.id === NIVEL_2.jefe.plagaId);
+    expect(par).toBeTruthy();
+    // El controlador real de esa plaga derriba al jefe.
+    expect(beneficoControlaPlaga(par.benefico.id, NIVEL_2.jefe.plagaId)).toBe(true);
+  });
+
+  it('getNivel devuelve el nivel pedido y cae al 1 si no existe', () => {
+    expect(getNivel(2)).toBe(NIVEL_2);
+    expect(getNivel(99)).toBe(NIVEL_1);
+  });
+
+  it('nivelDesbloqueado: el 1 siempre; el 2 solo tras superar el 1', () => {
+    expect(nivelDesbloqueado(1, [])).toBe(true);
+    expect(nivelDesbloqueado(2, [])).toBe(false);
+    expect(nivelDesbloqueado(2, [1])).toBe(true);
   });
 });

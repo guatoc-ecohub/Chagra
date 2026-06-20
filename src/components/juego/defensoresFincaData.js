@@ -188,14 +188,142 @@ export const BENEFICO_CONTROLA = Object.freeze(
   }, {}),
 );
 
-/** Configuración base del nivel 1 (un nivel jugable y completable). */
+/**
+ * Configuración de un nivel jugable.
+ *
+ * @typedef {Object} Nivel
+ * @property {string} id
+ * @property {number} numero            Orden del nivel (1, 2, ...).
+ * @property {string} nombre
+ * @property {string} subtitulo         Una línea de contexto para el jugador.
+ * @property {number} energiaInicial
+ * @property {number} energiaMax
+ * @property {number} metaCultivos      Cuántos cultivos hay que recoger.
+ * @property {number} mundoAncho        Ancho del mundo en px lógicos (cámara).
+ * @property {string[]} paresIds        Pares de control que aparecen (curados).
+ * @property {Object} escena            Paleta/escena de fondo (control del dibujo).
+ * @property {string} escena.id
+ * @property {string} escena.cieloTop
+ * @property {string} escena.cieloBottom
+ * @property {string} escena.montana
+ * @property {string} escena.sueloTop
+ * @property {string} escena.sueloBottom
+ * @property {string} escena.pasto
+ * @property {string} escena.astro      Color del sol/luna.
+ * @property {boolean} [escena.estrellas]
+ * @property {Array<{x:number,y:number,w:number}>} plataformas Plataformas extra.
+ * @property {Array<{x:number,w:number}>} [huecos]            Vacíos del suelo (caer = daño).
+ * @property {?Object} jefe             Mini-jefe del nivel (o null).
+ * @property {string} jefe.plagaId      Plaga del jefe (debe existir en PARES_CONTROL).
+ * @property {string} jefe.emoji
+ * @property {number} jefe.vida         Golpes de benéfico correcto para vencerlo.
+ */
+
+/** Nivel 1 — la huerta a mediodía. Corto, plano, 4 pares. */
 export const NIVEL_1 = Object.freeze({
   id: 'nivel-1',
+  numero: 1,
   nombre: 'La huerta',
+  subtitulo: 'Mediodía en la huerta. Recoge y cuida con bichos buenos.',
   energiaInicial: 3,
   energiaMax: 3,
-  /** Cuántos cultivos hay que recoger para completar el nivel. */
   metaCultivos: 6,
-  /** Pares de control que aparecen en este nivel (subconjunto curado). */
+  mundoAncho: 720,
   paresIds: ['pulgon-catarina', 'moscablanca-crisopa', 'cogollero-trichogramma', 'afido-sirfido'],
+  escena: Object.freeze({
+    id: 'mediodia',
+    cieloTop: '#9fd6f2',
+    cieloBottom: '#e8f7c8',
+    montana: '#86b96a',
+    sueloTop: '#8a5a32',
+    sueloBottom: '#3f2d20',
+    pasto: '#6f8f32',
+    astro: '#fde68a',
+  }),
+  plataformas: [],
+  huecos: [],
+  jefe: null,
 });
+
+/**
+ * Nivel 2 — atardecer en la finca de ladera (otro piso térmico).
+ * Más largo (mundo con cámara que sigue al jugador), más pares (7), más
+ * plataformas a distinto nivel, huecos que hacen daño al caer, más cultivos y
+ * un mini-jefe final (langosta) que solo cae con su controlador real (la
+ * mantis). Dificultad progresiva: más plagas y terreno con altura.
+ */
+export const NIVEL_2 = Object.freeze({
+  id: 'nivel-2',
+  numero: 2,
+  nombre: 'La ladera al atardecer',
+  subtitulo: 'Cae la tarde en la ladera. El terreno sube y hay más bichos.',
+  energiaInicial: 4,
+  energiaMax: 4,
+  metaCultivos: 10,
+  mundoAncho: 1680,
+  paresIds: [
+    'pulgon-catarina',
+    'moscablanca-crisopa',
+    'cogollero-trichogramma',
+    'afido-sirfido',
+    'trips-amblyseius',
+    'acaro-phytoseiulus',
+    'saltamontes-mantis',
+  ],
+  escena: Object.freeze({
+    id: 'atardecer',
+    cieloTop: '#f5a05b',
+    cieloBottom: '#fcd9a0',
+    montana: '#6b4a7a',
+    sueloTop: '#6e4326',
+    sueloBottom: '#2a1a12',
+    pasto: '#557a2c',
+    astro: '#fff1c2',
+    estrellas: true,
+  }),
+  // Plataformas a distinta altura (x en coords del mundo; y = offset SOBRE el
+  // suelo, en px; el motor las ancla a groundY). Forman un camino que sube.
+  plataformas: Object.freeze([
+    Object.freeze({ x: 360, y: 86, w: 120 }),
+    Object.freeze({ x: 560, y: 150, w: 120 }),
+    Object.freeze({ x: 820, y: 96, w: 140 }),
+    Object.freeze({ x: 1080, y: 150, w: 120 }),
+    Object.freeze({ x: 1300, y: 92, w: 140 }),
+  ]),
+  // Huecos en el suelo: si el jugador cae dentro, recibe daño (obstáculo).
+  huecos: Object.freeze([
+    Object.freeze({ x: 700, w: 70 }),
+    Object.freeze({ x: 1220, w: 70 }),
+  ]),
+  // Mini-jefe: una langosta grande al final. Solo la mantis (su controlador
+  // real) la derriba; necesita varios golpes (vida).
+  jefe: Object.freeze({
+    plagaId: 'saltamontes',
+    emoji: '🦗',
+    vida: 3,
+  }),
+});
+
+/** Todos los niveles en orden de juego. */
+export const NIVELES = Object.freeze([NIVEL_1, NIVEL_2]);
+
+/** Busca un nivel por su número (1-indexado). Devuelve NIVEL_1 si no existe. */
+export function getNivel(numero) {
+  return NIVELES.find((n) => n.numero === numero) || NIVEL_1;
+}
+
+/** Clave de localStorage donde se guarda el progreso (niveles superados). */
+export const PROGRESO_KEY = 'chagra:defensores-finca:progreso';
+
+/**
+ * ¿Está desbloqueado el nivel `numero`? El 1 siempre; los demás solo si el
+ * nivel anterior está en la lista de superados (lógica pura, sin localStorage).
+ *
+ * @param {number} numero          número del nivel a consultar.
+ * @param {number[]} superados     números de nivel ya completados.
+ * @returns {boolean}
+ */
+export function nivelDesbloqueado(numero, superados = []) {
+  if (numero <= 1) return true;
+  return superados.includes(numero - 1);
+}

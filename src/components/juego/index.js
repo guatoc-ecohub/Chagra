@@ -4,4 +4,12 @@ export { default as MiFincaVivaScreen } from './MiFincaVivaScreen';
 export { default as MonoVsPoliSimulator } from './MonoVsPoliSimulator';
 export { default as MilpaSimulator } from './MilpaSimulator';
 export { default as DefensoresFincaScreen } from './DefensoresFincaScreen';
-export { PARES_CONTROL, CULTIVOS } from './defensoresFincaData';
+export {
+  PARES_CONTROL,
+  CULTIVOS,
+  NIVEL_1,
+  NIVEL_2,
+  NIVELES,
+  getNivel,
+  nivelDesbloqueado,
+} from './defensoresFincaData';
