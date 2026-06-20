@@ -1,47 +1,84 @@
 [
-  {
-    "id": "milpa",
-    "nombre": "Milpa (Tres Hermanas)",
-    "icono": "🌽",
-    "rol": ["campesino"],
-    "especies": ["maíz", "fríjol", "ahuyama"],
-    "beneficio": "LER 1.32, el fríjol fija nitrógeno",
-    "fuente": "DR-ASOCIACIONES-2026-06-18"
-  },
-  {
-    "id": "saf_cafe",
-    "nombre": "SAF café",
-    "icono": "☕",
-    "rol": ["campesino", "cafetero"],
-    "especies": ["café", "guamo (Inga)", "plátano"],
-    "beneficio": "sombra + carbono + amortigua broca",
-    "fuente": "DR-ASOCIACIONES-2026-06-18"
-  },
-  {
-    "id": "saf_cacao",
-    "nombre": "SAF cacao",
-    "icono": "🍫",
-    "rol": ["campesino", "cacaotero"],
-    "especies": ["cacao", "matarratón (Gliricidia)", "plátano"],
-    "beneficio": "fija N + sombra",
-    "fuente": "DR-ASOCIACIONES-2026-06-18"
-  },
-  {
-    "id": "frutal_cobertura",
-    "nombre": "Frutal con cobertura",
-    "icono": "🍊",
-    "rol": ["campesino", "restaurador"],
-    "especies": ["frutal", "maní forrajero (Arachis pintoi)"],
-    "beneficio": "cobertura que fija N y tapa maleza",
-    "fuente": "DR-ASOCIACIONES-2026-06-18"
-  },
-  {
-    "id": "hortaliza_repelente",
-    "nombre": "Cebolla + zanahoria",
-    "icono": "🥕",
-    "rol": ["campesino", "urbano"],
-    "especies": ["cebolla", "zanahoria"],
-    "beneficio": "se protegen de sus moscas mutuamente",
-    "fuente": "DR-ASOCIACIONES-2026-06-18"
-  }
+	{
+		"id": "milpa",
+		"nombre": "Milpa (Tres Hermanas)",
+		"icono": "🌽",
+		"rol": [
+			"campesino"
+		],
+		"especies": [
+			"maíz",
+			"fríjol",
+			"ahuyama"
+		],
+		"beneficio": "LER 1.32, el fríjol fija nitrógeno",
+		"fuente": "DR-ASOCIACIONES-2026-06-18",
+		"detalle": "El maíz da soporte al fríjol para que trepe; el fríjol fija nitrógeno que nutre al maíz; la ahuyama cubre el suelo, conserva humedad y frena la maleza. Juntas rinden más que por separado (LER 1.32)."
+	},
+	{
+		"id": "saf_cafe",
+		"nombre": "SAF café",
+		"icono": "☕",
+		"rol": [
+			"campesino",
+			"cafetero"
+		],
+		"especies": [
+			"café",
+			"guamo (Inga)",
+			"plátano"
+		],
+		"beneficio": "sombra + carbono + amortigua broca",
+		"fuente": "DR-ASOCIACIONES-2026-06-18",
+		"detalle": "El guamo (Inga) da sombra y aporta materia orgánica y nitrógeno; el plátano da sombra temporal e ingreso temprano. La sombra modera el calor y ayuda a amortiguar la broca del café."
+	},
+	{
+		"id": "saf_cacao",
+		"nombre": "SAF cacao",
+		"icono": "🍫",
+		"rol": [
+			"campesino",
+			"cacaotero"
+		],
+		"especies": [
+			"cacao",
+			"matarratón (Gliricidia)",
+			"plátano"
+		],
+		"beneficio": "fija N + sombra",
+		"fuente": "DR-ASOCIACIONES-2026-06-18",
+		"detalle": "El matarratón (Gliricidia) fija nitrógeno y da sombra; el plátano protege al cacao joven y genera ingreso mientras crece. Sombra más nitrógeno = cacao más sano."
+	},
+	{
+		"id": "frutal_cobertura",
+		"nombre": "Frutal con cobertura",
+		"icono": "🍊",
+		"rol": [
+			"campesino",
+			"restaurador"
+		],
+		"especies": [
+			"frutal",
+			"maní forrajero (Arachis pintoi)"
+		],
+		"beneficio": "cobertura que fija N y tapa maleza",
+		"fuente": "DR-ASOCIACIONES-2026-06-18",
+		"detalle": "El maní forrajero (Arachis pintoi) tapiza el suelo bajo el frutal: fija nitrógeno, conserva humedad, controla la maleza y reduce la erosión."
+	},
+	{
+		"id": "hortaliza_repelente",
+		"nombre": "Cebolla + zanahoria",
+		"icono": "🥕",
+		"rol": [
+			"campesino",
+			"urbano"
+		],
+		"especies": [
+			"cebolla",
+			"zanahoria"
+		],
+		"beneficio": "se protegen de sus moscas mutuamente",
+		"fuente": "DR-ASOCIACIONES-2026-06-18",
+		"detalle": "El olor de la cebolla repele la mosca de la zanahoria, y la zanahoria repele la mosca de la cebolla. Sembradas juntas se protegen mutuamente sin químicos."
+	}
 ]
