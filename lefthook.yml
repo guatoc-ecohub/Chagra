@@ -83,6 +83,31 @@ pre-commit:
           exit 1
         fi
 
+    voseo-scan:
+      # El filtro runtime (src/services/voseoFilter.js) limpia texto DINÁMICO
+      # (agente), pero NO los strings estáticos de la UI. Este guard corre
+      # ENCIMA del código y bloquea voseo argentino antes de que llegue a prod.
+      # Lista curada con tildes literales → cero falsos positivos (café, está,
+      # acá, José, ni 1ª persona del pretérito como "elegí/comí").
+      tags: i18n
+      glob: "src/**/*.{js,jsx,ts,tsx,json}"
+      run: |
+        files="{staged_files}"
+        [ -z "$files" ] && exit 0
+        # Excluye el filtro (contiene patrones), tests, y datos de nombres
+        # propios (locations DANE) que dan falsos positivos por substring.
+        filtered=$(echo "$files" | tr ' ' '\n' | grep -vE "voseoFilter|__tests__|\.test\.|scan-voseo|colombia-locations|\.dane\." || true)
+        [ -z "$filtered" ] && exit 0
+        # Límites de palabra que incluyen tildes (evita Sácama→sacá, etc.).
+        L="a-zA-ZáéíóúüñÁÉÍÓÚÜÑ"
+        hits=$(echo "$filtered" | xargs grep -lEi "(^|[^$L])(tenés|querés|podés|sabés|hacés|ponés|venís|decís|vivís|empezá|mirá|probá|sembrá|cuidá|anotá|tocá|hacé|poné|dejá|llevá|sacá|buscá|revisá|recogé|aprendé|mandá|contá|esperá|fijate|quedate|acordate|preparale)([^$L]|\$)" 2>/dev/null || true)
+        if [ -n "$hits" ]; then
+          echo "✗ Voseo argentino en strings/código (usar tú/usted Colombia):"
+          echo "$hits"
+          echo "El filtro runtime NO cubre strings estáticos — corrígelo en la fuente (ver voseoFilter.js)."
+          exit 1
+        fi
+
     eslint:
       glob: "*.{js,jsx,ts,tsx}"
       exclude: '\.d\.ts$'
