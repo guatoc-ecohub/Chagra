@@ -10,8 +10,8 @@
  *     dev → false (offline-first + anti-loop).
  *  3. fetchDeployedSha: parsea {sha}/{commit}/{build}; null en !ok / no-JSON /
  *     fetch lanzando (offline). Pide cache:'no-store'.
- *  4. runSelfHealCheck: orquesta — recarga UNA vez (marca guard + skipWaiting +
- *     reload) solo en mismatch; no-op en sync/offline/already-reloaded.
+ *  4. runSelfHealCheck: primera detección avisa + marca pending; el siguiente
+ *     arranque con el mismo SHA pendiente recarga UNA vez.
  */
 import { describe, it, expect, vi } from 'vitest';
 import {
@@ -20,6 +20,7 @@ import {
   fetchDeployedSha,
   runSelfHealCheck,
   VERSION_ENDPOINT,
+  PENDING_UPDATE_SHA_KEY,
 } from '../versionCheck';
 
 describe('shasMatch', () => {
@@ -109,6 +110,9 @@ describe('runSelfHealCheck', () => {
     const reload = vi.fn();
     const skipWaiting = vi.fn(async () => {});
     const markReloaded = vi.fn();
+    const writePending = vi.fn();
+    const clearPending = vi.fn();
+    const notifyUpdateAvailable = vi.fn();
     return {
       deps: {
         runningSha: 'a1b2c3d',
@@ -116,6 +120,10 @@ describe('runSelfHealCheck', () => {
         isOnline: () => true,
         alreadyReloaded: () => false,
         markReloaded,
+        readPending: () => null,
+        writePending,
+        clearPending,
+        notifyUpdateAvailable,
         skipWaiting,
         reload,
         ...overrides,
@@ -123,22 +131,41 @@ describe('runSelfHealCheck', () => {
       reload,
       skipWaiting,
       markReloaded,
+      writePending,
+      clearPending,
+      notifyUpdateAvailable,
     };
   }
 
-  it('mismatch → marca guard, skipWaiting y recarga UNA vez', async () => {
-    const { deps, reload, skipWaiting, markReloaded } = makeDeps();
+  it('primer mismatch → muestra banner, marca pending y manda skipWaiting sin recarga directa', async () => {
+    const { deps, reload, skipWaiting, markReloaded, writePending, notifyUpdateAvailable } = makeDeps();
+    const res = await runSelfHealCheck(deps);
+    expect(res.healed).toBe(false);
+    expect(res.reason).toBe('update-pending');
+    expect(writePending).toHaveBeenCalledWith('f9e8d7c');
+    expect(notifyUpdateAvailable).toHaveBeenCalledWith('f9e8d7c');
+    expect(skipWaiting).toHaveBeenCalledTimes(1);
+    expect(markReloaded).not.toHaveBeenCalled();
+    expect(reload).not.toHaveBeenCalled();
+  });
+
+  it('mismatch ya pendiente de un arranque anterior → recarga UNA vez', async () => {
+    const { deps, reload, skipWaiting, markReloaded } = makeDeps({
+      readPending: () => 'f9e8d7c',
+    });
     const res = await runSelfHealCheck(deps);
     expect(res.healed).toBe(true);
-    expect(markReloaded).toHaveBeenCalledTimes(1);
+    expect(res.reason).toBe('sha-mismatch');
     expect(skipWaiting).toHaveBeenCalledTimes(1);
+    expect(markReloaded).toHaveBeenCalledTimes(1);
     expect(reload).toHaveBeenCalledTimes(1);
   });
 
   it('SHAs en sync → no-op (no recarga)', async () => {
-    const { deps, reload } = makeDeps({ getDeployedSha: async () => 'a1b2c3d' });
+    const { deps, reload, clearPending } = makeDeps({ getDeployedSha: async () => 'a1b2c3d' });
     const res = await runSelfHealCheck(deps);
     expect(res.healed).toBe(false);
+    expect(clearPending).toHaveBeenCalledTimes(1);
     expect(reload).not.toHaveBeenCalled();
   });
 
@@ -166,10 +193,21 @@ describe('runSelfHealCheck', () => {
     expect(reload).not.toHaveBeenCalled();
   });
 
-  it('skipWaiting lanza → recarga igual (no bloquea la recuperación)', async () => {
+  it('skipWaiting lanza en primera detección → queda pending y no bloquea el boot', async () => {
     const { deps, reload } = makeDeps({ skipWaiting: async () => { throw new Error('no SW'); } });
     const res = await runSelfHealCheck(deps);
-    expect(res.healed).toBe(true);
-    expect(reload).toHaveBeenCalledTimes(1);
+    expect(res.healed).toBe(false);
+    expect(res.reason).toBe('update-pending');
+    expect(reload).not.toHaveBeenCalled();
+  });
+
+  it('helpers de pending usan localStorage', async () => {
+    localStorage.clear();
+    const { writePendingUpdateSha, readPendingUpdateSha, clearPendingUpdateSha } = await import('../versionCheck');
+    writePendingUpdateSha('abc1234');
+    expect(localStorage.getItem(PENDING_UPDATE_SHA_KEY)).toBe('abc1234');
+    expect(readPendingUpdateSha()).toBe('abc1234');
+    clearPendingUpdateSha();
+    expect(readPendingUpdateSha()).toBeNull();
   });
 });

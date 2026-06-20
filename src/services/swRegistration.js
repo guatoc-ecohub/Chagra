@@ -196,9 +196,12 @@ export function registerServiceWorker(opts = {}) {
   };
 
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
       .then((registration) => {
         console.log('Service Worker registrado:', registration.scope);
+        if (typeof registration.update === 'function') {
+          registration.update().catch(() => {});
+        }
       })
       .catch((error) => {
         console.error('Error registrando Service Worker:', error);

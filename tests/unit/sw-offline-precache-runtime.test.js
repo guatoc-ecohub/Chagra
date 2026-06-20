@@ -148,7 +148,7 @@ describe('SW RAG grounding precache (T108)', () => {
     await waited;
 
     const names = await fakeCaches.keys();
-    const shellBucket = names.find((n) => n.startsWith('chagra-v'));
+    const shellBucket = names.find((n) => n.startsWith('chagra-') && !n.startsWith('chagra-rag-') && !n.startsWith('chagra-map-'));
     expect(shellBucket).toBeTruthy();
 
     const shellCache = await fakeCaches.open(shellBucket);
@@ -166,7 +166,7 @@ describe('SW RAG grounding precache (T108)', () => {
     await waited;
 
     const names = await fakeCaches.keys();
-    const shellBucket = names.find((n) => n.startsWith('chagra-v'));
+    const shellBucket = names.find((n) => n.startsWith('chagra-') && !n.startsWith('chagra-rag-') && !n.startsWith('chagra-map-'));
     const cache = await fakeCaches.open(shellBucket);
     const keys = (await cache.keys()).map((r) => new URL(r.url).pathname);
     expect(keys).toContain('/catalog.sqlite');

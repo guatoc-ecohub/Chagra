@@ -53,6 +53,7 @@ export const RUNNING_BUILD_SHA =
   typeof __BUILD_SHA__ !== 'undefined' ? __BUILD_SHA__ : 'dev';
 
 export const SELF_HEAL_GUARD_KEY = 'chagra:self-heal-reloaded';
+export const PENDING_UPDATE_SHA_KEY = 'chagra:self-heal-pending-sha';
 export const VERSION_ENDPOINT = '/version.json';
 // Timeout corto: el self-heal NO debe bloquear el boot ni colgarse en red rural.
 export const VERSION_FETCH_TIMEOUT_MS = 4000;
@@ -143,6 +144,14 @@ function safeSessionStorage() {
   }
 }
 
+function safeLocalStorage() {
+  try {
+    return typeof globalThis !== 'undefined' ? globalThis.localStorage : null;
+  } catch (_) {
+    return null;
+  }
+}
+
 /** @returns {boolean} true si ya recargamos por self-heal en esta sesión. */
 export function hasSelfHealReloaded(storage = safeSessionStorage()) {
   if (!storage) return false;
@@ -165,6 +174,43 @@ export function markSelfHealReloaded(storage = safeSessionStorage()) {
   }
 }
 
+export function readPendingUpdateSha(storage = safeLocalStorage()) {
+  if (!storage) return null;
+  try {
+    return storage.getItem(PENDING_UPDATE_SHA_KEY);
+  } catch (_) {
+    return null;
+  }
+}
+
+export function writePendingUpdateSha(sha, storage = safeLocalStorage()) {
+  if (!storage || !sha) return;
+  try {
+    storage.setItem(PENDING_UPDATE_SHA_KEY, String(sha));
+  } catch (_) {
+    /* storage no disponible: el self-heal sigue funcionando en la sesión actual. */
+  }
+}
+
+export function clearPendingUpdateSha(storage = safeLocalStorage()) {
+  if (!storage) return;
+  try {
+    storage.removeItem(PENDING_UPDATE_SHA_KEY);
+  } catch (_) {
+    /* no-op */
+  }
+}
+
+function defaultNotifyUpdateAvailable(version) {
+  try {
+    window.dispatchEvent(
+      new CustomEvent('chagra:update-available', { detail: { version } }),
+    );
+  } catch (_) {
+    /* entorno sin window/CustomEvent: no-op */
+  }
+}
+
 /**
  * Orquesta el self-heal: lee /version.json, decide, y si procede manda
  * SKIP_WAITING al SW en waiting + recarga UNA sola vez (marcando el guard).
@@ -177,6 +223,10 @@ export function markSelfHealReloaded(storage = safeSessionStorage()) {
  * @param {() => boolean} [deps.isOnline]
  * @param {() => boolean} [deps.alreadyReloaded]
  * @param {() => void} [deps.markReloaded]
+ * @param {() => string|null} [deps.readPending]
+ * @param {(sha:string) => void} [deps.writePending]
+ * @param {() => void} [deps.clearPending]
+ * @param {(version:string) => void} [deps.notifyUpdateAvailable]
  * @param {() => Promise<void>} [deps.skipWaiting] — manda SKIP_WAITING al SW.
  * @param {() => void} [deps.reload] — recarga la página.
  * @returns {Promise<{healed: boolean, reason: string}>}
@@ -189,6 +239,10 @@ export async function runSelfHealCheck(deps = {}) {
       typeof navigator === 'undefined' ? true : navigator.onLine !== false,
     alreadyReloaded = () => hasSelfHealReloaded(),
     markReloaded = () => markSelfHealReloaded(),
+    readPending = () => readPendingUpdateSha(),
+    writePending = (sha) => writePendingUpdateSha(sha),
+    clearPending = () => clearPendingUpdateSha(),
+    notifyUpdateAvailable = defaultNotifyUpdateAvailable,
     skipWaiting = defaultSkipWaiting,
     reload = defaultReload,
   } = deps;
@@ -197,6 +251,9 @@ export async function runSelfHealCheck(deps = {}) {
   if (alreadyReloaded()) return { healed: false, reason: 'already-reloaded' };
 
   const deployedSha = await getDeployedSha();
+  if (deployedSha && shasMatch(runningSha, deployedSha)) {
+    clearPending();
+  }
   const decision = shouldSelfHeal({
     runningSha,
     deployedSha,
@@ -205,15 +262,23 @@ export async function runSelfHealCheck(deps = {}) {
   });
   if (!decision) return { healed: false, reason: 'in-sync-or-unknown' };
 
-  // Marcar ANTES de recargar: si la recarga es instantánea, el guard ya quedó
-  // escrito para que el próximo arranque no re-dispare en bucle.
-  markReloaded();
+  const pendingSha = readPending();
+  const wasPendingFromPreviousStart = shasMatch(pendingSha, deployedSha);
+  writePending(deployedSha);
+  notifyUpdateAvailable(deployedSha);
   try {
     await skipWaiting();
   } catch (_) {
-    /* SW no disponible — recargamos igual: el index.html fresco trae el
-       bundle nuevo aunque el SW viejo siga; el SW se actualiza al re-register. */
+    /* SW no disponible: el próximo arranque sigue protegido por pendingSha. */
   }
+
+  if (!wasPendingFromPreviousStart) {
+    return { healed: false, reason: 'update-pending' };
+  }
+
+  // Marcar ANTES de recargar: si la recarga es instantánea, el guard ya quedó
+  // escrito para que el próximo arranque no re-dispare en bucle.
+  markReloaded();
   reload();
   return { healed: true, reason: 'sha-mismatch' };
 }

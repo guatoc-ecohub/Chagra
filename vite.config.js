@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { execSync } from 'node:child_process'
-import { writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 // SHA del build para el self-heal por versión (src/services/versionCheck.js).
@@ -27,9 +27,9 @@ const BUILD_SHA = resolveBuildSha();
 // auto-recuperarse (versionCheck.runSelfHealCheck). Va a dist/ directo (no a
 // public/) para no ensuciar el repo ni el watch del dev server; en dev el
 // fetch de /version.json falla limpio (404) → self-heal no-op, sin romper nada.
-function emitVersionJson() {
+function emitBuildMetadata() {
   return {
-    name: 'chagra-emit-version-json',
+    name: 'chagra-emit-build-metadata',
     apply: 'build',
     closeBundle() {
       const payload = JSON.stringify(
@@ -43,12 +43,23 @@ function emitVersionJson() {
         // No bloquear el build por esto: el self-heal degrada a no-op si falta.
         this.warn(`could not emit version.json: ${err.message}`);
       }
+      try {
+        const swPath = resolve(process.cwd(), 'dist', 'sw.js');
+        const sw = readFileSync(swPath, 'utf8');
+        writeFileSync(
+          swPath,
+          sw.replaceAll('__CHAGRA_SW_BUILD_SHA__', BUILD_SHA),
+          'utf8',
+        );
+      } catch (err) {
+        this.warn(`could not stamp sw.js cache version: ${err.message}`);
+      }
     },
   };
 }
 
 export default defineConfig({
-  plugins: [react(), emitVersionJson()],
+  plugins: [react(), emitBuildMetadata()],
   // Inyecta el SHA del build como literal en el bundle (versionCheck.js lo lee
   // como __BUILD_SHA__). JSON.stringify para que quede como string válido.
   define: {
