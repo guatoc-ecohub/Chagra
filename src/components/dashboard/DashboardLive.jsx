@@ -306,7 +306,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
 
     return (
         <div
-            className="relative flex flex-col w-full h-full overflow-y-auto pb-24"
+            className="relative flex flex-col w-full h-full overflow-y-auto pb-6"
             data-scroll-key="dashboard-live"
         >
             {/* Agente: PORTADA INMERSIVA a pantalla completa (≈100dvh).

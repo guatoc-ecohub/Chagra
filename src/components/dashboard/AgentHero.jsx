@@ -765,28 +765,14 @@ export default function AgentHero({ onNavigate }) {
                        intención de #1624). */
                     min-height: min-content;
                     flex-shrink: 0;
-                    padding-bottom: 8px;
+                    padding-bottom: 4px;
                 }
-                /* Indicador visual: flecha hacia abajo para mostrar que hay
-                   mas contenido (modulos del home). Solo visible en idle. */
-                .agentport-idle::after {
-                    content: '';
-                    display: block;
-                    width: 32px;
-                    height: 32px;
-                    margin: 8px auto 0;
-                    background: currentColor;
-                    opacity: 0.3;
-                    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-                    mask-size: contain;
-                    mask-repeat: no-repeat;
-                    mask-position: center;
-                    animation: agentport-bounce 2s infinite;
-                }
-                @keyframes agentport-bounce {
-                    0%, 100% { transform: translateY(0); }
-                    50% { transform: translateY(6px); }
-                }
+                /* El indicador de "hay más contenido abajo" es ÚNICO: el botón
+                   funcional "Mis módulos" (con su flecha animada) al final del
+                   hero. Antes había además un ::after decorativo aquí que
+                   DUPLICABA la flecha y dejaba un hueco vertical feo entre el
+                   compositor y lo que sigue (bug espaciado 2026-06-19). Removido:
+                   una sola flecha, sin dead-space. */
 
                 /* ===================== ESCENA AMBIENTE ===================== */
                 .agentport-scene {
