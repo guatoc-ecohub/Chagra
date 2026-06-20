@@ -1128,7 +1128,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
           </button>
           <p className="text-[10px] text-slate-600 leading-snug">
             Cada planta tendrá su propia hoja de vida + foto + historial de cosechas.
-            Si vas a sembrar muchas en cama corrida, usá &ldquo;Agrupar siembra&rdquo;.
+            Si vas a sembrar muchas en cama corrida, usa &ldquo;Agrupar siembra&rdquo;.
           </p>
         </div>
       )}
