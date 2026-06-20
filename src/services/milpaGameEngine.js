@@ -849,6 +849,155 @@ export function aplicarEvento(parcela, evento) {
 }
 
 /**
+ * Genera 3 eventos posibles para que el jugador elija cuál enfrentar.
+ * Los eventos son no repetidos y adaptados a la temporada.
+ *
+ * @param {number} temporada - Número de temporada actual (1-3)
+ * @param {Array} historico - Historial de eventos ya usados
+ * @returns {{ id: string, nombre: string, emoji: string, dano: number, relacion: string, consejo: string }[]}
+ */
+export function elegirEventosPosibles(temporada, historico = []) {
+  // Dificultad creciente por temporada
+  const factoresTemporada = {
+    1: 1.0,  // Fácil
+    2: 1.2,  // Medio
+    3: 1.4,  // Duro
+  };
+
+  const factor = factoresTemporada[temporada] || 1.0;
+
+  // Eventos ya usados (para no repetir)
+  const eventosUsados = new Set(historico.map(e => e.id));
+
+  // Filtrar eventos no usados y aplicar factor de temporada
+  const eventosDisponibles = EVENTOS
+    .filter(e => !eventosUsados.has(e.id))
+    .map(e => ({
+      ...e,
+      dano: Math.round(e.dano * factor),
+    }));
+
+  // Si no hay suficientes eventos no usados, permitir repetir
+  const pool = eventosDisponibles.length >= 3
+    ? eventosDisponibles
+    : EVENTOS.map(e => ({ ...e, dano: Math.round(e.dano * factor) }));
+
+  // Seleccionar 3 eventos aleatorios
+  const seleccionados = [];
+  const poolCopy = [...pool];
+
+  for (let i = 0; i < 3 && poolCopy.length > 0; i++) {
+    const indice = Math.floor(Math.random() * poolCopy.length);
+    seleccionados.push(poolCopy.splice(indice, 1)[0]);
+  }
+
+  // Si por alguna razón no hay suficientes, completar con cualquiera
+  while (seleccionados.length < 3 && EVENTOS.length > 0) {
+    const randomEvento = EVENTOS[Math.floor(Math.random() * EVENTOS.length)];
+    if (!seleccionados.find(s => s.id === randomEvento.id)) {
+      seleccionados.push({ ...randomEvento, dano: Math.round(randomEvento.dano * factor) });
+    }
+  }
+
+  return seleccionados;
+}
+
+/**
+ * Genera un consejo para resistir un evento específico.
+ * @param {{ id: string }} evento
+ * @returns {{ cultivo: string, consejo: string }}
+ */
+export function generarConsejo(evento) {
+  const consejos = {
+    sequia: {
+      cultivo: 'Ahuyama o Maní forrajero',
+      consejo: 'La cobertura del suelo guarda humedad y amortigua la sequía.',
+    },
+    cogollero: {
+      cultivo: 'Cebolla y Zanahoria',
+      consejo: 'La diversidad de cultivos baja la presión del cogollero.',
+    },
+    aguacero: {
+      cultivo: 'Ahuyama o Maní forrajero',
+      consejo: 'El suelo cubierto y con raíces variadas erosiona menos.',
+    },
+    arvenses: {
+      cultivo: 'Ahuyama o Maní forrajero',
+      consejo: 'Los cultivos de cobertura tapan el suelo y frenan la maleza.',
+    },
+    broca: {
+      cultivo: 'Guamo y Plátano',
+      consejo: 'La sombra del guamo y la diversidad amortiguan la broca.',
+    },
+    helada: {
+      cultivo: 'Guamo o Matarratón',
+      consejo: 'La sombra de los árboles crea microclima que protege del frío.',
+    },
+    mosca: {
+      cultivo: 'Cebolla y Zanahoria juntas',
+      consejo: 'Sembrar cebolla y zanahoria juntas repele sus moscas mutuamente.',
+    },
+    calor_extremo: {
+      cultivo: 'Guamo o Matarratón',
+      consejo: 'La sombra de los árboles modera la temperatura y protege los cultivos.',
+    },
+    viento_fuerte: {
+      cultivo: 'Guamo, Matarratón o Frutal',
+      consejo: 'Los árboles actúan como rompevientos y protegen los cultivos.',
+    },
+    enfermedad_fungal: {
+      cultivo: 'Cualquier asociación diversa',
+      consejo: 'La diversidad y buena circulación de aire reducen enfermedades.',
+    },
+  };
+
+  return consejos[evento.id] || {
+    cultivo: 'Asociaciones diversas',
+    consejo: 'La diversidad de cultivos mejora la resiliencia.',
+  };
+}
+
+/**
+ * Cifras objetivo del "campesino vecino" a superar en cada temporada.
+ * Basadas en rendimientos reales de agricultores colombianos.
+ * @param {number} temporada
+ * @returns {{ lerMinimo: number, nMinimo: number, coberturaMinima: number }}
+ */
+export function objetivosCampesinoVecino(temporada) {
+  const objetivos = {
+    1: { lerMinimo: 1.3, nMinimo: 20, coberturaMinima: 15 }, // Fácil
+    2: { lerMinimo: 1.6, nMinimo: 35, coberturaMinima: 30 }, // Medio
+    3: { lerMinimo: 1.9, nMinimo: 50, coberturaMinima: 45 }, // Duro
+  };
+
+  return objetivos[temporada] || objetivos[1];
+}
+
+/**
+ * Verifica si el jugador superó al campesino vecino.
+ * @param {Object} resumen - Resumen de la finca
+ * @param {number} temporada - Temporada actual
+ * @returns {{ supero: boolean, medalla: string, detalles: Object }}
+ */
+export function verificarSuperoCampesinoVecino(resumen, temporada) {
+  const objetivos = objetivosCampesinoVecino(temporada);
+
+  const detalles = {
+    ler: { logrado: resumen.lerPromedio, objetivo: objetivos.lerMinimo, supero: resumen.lerPromedio >= objetivos.lerMinimo },
+    n: { logrado: resumen.nitrogenoPromedio, objetivo: objetivos.nMinimo, supero: resumen.nitrogenoPromedio >= objetivos.nMinimo },
+    cobertura: { logrado: resumen.coberturaPromedio, objetivo: objetivos.coberturaMinima, supero: resumen.coberturaPromedio >= objetivos.coberturaMinima },
+  };
+
+  const superoTodo = Object.values(detalles).every(d => d.supero);
+
+  return {
+    supero: superoTodo,
+    medalla: superoTodo ? '🏅 Medalla al Campesino Sobresaliente' : null,
+    detalles,
+  };
+}
+
+/**
  * Resumen de la finca completa (todas las parcelas) para el HUD y el cierre de
  * temporada. Calcula el rendimiento total y lo compara honestamente contra el
  * mismo número de parcelas sembradas en MONOCULTIVO, para que el jugador VEA el

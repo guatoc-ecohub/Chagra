@@ -41,6 +41,9 @@ import {
   avanzarTemporada,
   verificarLogros,
   describirAsociacionCompleta,
+  elegirEventosPosibles,
+  generarConsejo,
+  verificarSuperoCampesinoVecino,
 } from '../../services/milpaGameEngine';
 import { agentSounds, isSoundEnabled, setSoundEnabled } from '../../services/agentSoundService';
 import { speak, stop as stopSpeak, isSupported as ttsSupported } from '../../services/ttsService';
@@ -180,7 +183,7 @@ export default function MilpaSimulator({ onBack, onHome }) {
   const [juego, setJuego] = useState(() => crearJuego(NUM_PARCELAS, NUM_TEMPORADAS));
   const [parcelas, setParcelas] = useState(() => juego.parcelas);
   const [activa, setActiva] = useState('1');
-  const [fase, setFase] = useState('seleccion'); // 'seleccion' | 'siembra' | 'temporada' | 'resultado' | 'final'
+  const [fase, setFase] = useState('seleccion'); // 'seleccion' | 'siembra' | 'seleccion-evento' | 'temporada' | 'resultado' | 'final'
   const [evento, setEvento] = useState(null);
   const [danos, setDanos] = useState(null);
   const [logros, setLogros] = useState([]);
@@ -188,6 +191,10 @@ export default function MilpaSimulator({ onBack, onHome }) {
   const [sistemaActivo, setSistemaActivo] = useState(null);
   const [avisoSiembra, setAvisoSiembra] = useState('');
   const [celebracion, setCelebracion] = useState('');
+  const [eventosPosibles, setEventosPosibles] = useState([]);
+  const [consejoVisible, setConsejoVisible] = useState({});
+  const [resultadosTemporadas, setResultadosTemporadas] = useState([]);
+  const [medallasObtenidas, setMedallasObtenidas] = useState([]);
 
   const parcelaActiva = useMemo(
     () => parcelas.find((p) => p.id === activa) || parcelas[0],
@@ -275,34 +282,71 @@ export default function MilpaSimulator({ onBack, onHome }) {
   }, []);
 
   const iniciarTemporada = useCallback(() => {
-    const indice = resumen.parcelasSembradas % EVENTOS.length;
-    const ev = EVENTOS[indice];
+    // Generar 3 eventos posibles para que el jugador elija
+    const eventos = elegirEventosPosibles(juego.temporadaActual, []);
+    setEventosPosibles(eventos);
+    setConsejoVisible({});
+    setFase('seleccion-evento');
+    try { agentSounds.start(); } catch { /* noop */ }
+    hablar('Elige un evento para enfrentar. Cada uno presenta un desafío diferente.');
+  }, [juego.temporadaActual, hablar]);
+
+  const seleccionarEvento = useCallback((eventoSeleccionado) => {
     const nuevosDanos = {};
     parcelas.forEach((p) => {
       if (diversidadParcela(p) > 0) {
-        nuevosDanos[p.id] = aplicarEvento(p, ev);
+        nuevosDanos[p.id] = aplicarEvento(p, eventoSeleccionado);
       }
     });
-    setEvento(ev);
+    setEvento(eventoSeleccionado);
     setDanos(nuevosDanos);
     setFase('temporada');
     try { agentSounds.start(); } catch { /* noop */ }
-    hablar(`Llegó ${ev.nombre}. ${ev.relacion}`);
-  }, [parcelas, resumen.parcelasSembradas, hablar]);
+    hablar(`Llegó ${eventoSeleccionado.nombre}. ${eventoSeleccionado.relacion}`);
+  }, [parcelas, hablar]);
+
+  const mostrarConsejo = useCallback((eventoId) => {
+    const evento = eventosPosibles.find(e => e.id === eventoId);
+    if (!evento) return;
+
+    const consejo = generarConsejo(evento);
+    setConsejoVisible(prev => ({ ...prev, [eventoId]: consejo }));
+    try { agentSounds.chime(); } catch { /* noop */ }
+    hablar(`${consejo.consejo} ${consejo.cultivo} puede ayudarte.`);
+  }, [eventosPosibles, hablar]);
 
   const verResultado = useCallback(() => {
     setFase('resultado');
     try { agentSounds.chime(); } catch { /* noop */ }
+
+    // Guardar resultado de la temporada
+    const resultadoTemporada = {
+      numero: juego.temporadaActual,
+      resumen: { ...resumen },
+      evento: evento,
+    };
+
+    setResultadosTemporadas(prev => [...prev, resultadoTemporada]);
+
     const msg = resumen.ventajaPct > 0
       ? `Rendiste ${resumen.ventajaPct} por ciento más que el monocultivo.`
       : 'Asocia cultivos y verás cómo rinde mejor.';
     hablar(msg);
 
+    // Verificar si superó al campesino vecino
+    const verificacion = verificarSuperoCampesinoVecino(resumen, juego.temporadaActual);
+    if (verificacion.supero) {
+      setMedallasObtenidas(prev => [...prev, { temporada: juego.temporadaActual, medalla: verificacion.medalla }]);
+      setTimeout(() => {
+        try { agentSounds.chime(); } catch { /* noop */ }
+      }, 500);
+    }
+
     // Verificar logros nuevos
     const juegoConResumen = {
       ...juego,
       parcelas,
-      historicoTemporadas: [...juego.historicoTemporadas, { numero: juego.temporadaActual, resumen }],
+      historicoTemporadas: [...juego.historicoTemporadas, resultadoTemporada],
     };
     const nuevosLogros = verificarLogros(juegoConResumen);
     if (nuevosLogros.length > 0) {
@@ -311,7 +355,7 @@ export default function MilpaSimulator({ onBack, onHome }) {
         try { agentSounds.chime(); } catch { /* noop */ }
       }, 500);
     }
-  }, [resumen, hablar, juego, parcelas]);
+  }, [resumen, hablar, juego, parcelas, evento]);
 
   const avanzar = useCallback(() => {
     const { juego: juegoActualizado, continua } = avanzarTemporada(juego);
@@ -322,6 +366,8 @@ export default function MilpaSimulator({ onBack, onHome }) {
       setFase('siembra');
       setEvento(null);
       setDanos(null);
+      setEventosPosibles([]);
+      setConsejoVisible({});
       try { agentSounds.start(); } catch { /* noop */ }
       hablar(`Temporada ${juegoActualizado.temporadaActual}. Siembra de nuevo.`);
     } else {
@@ -343,6 +389,10 @@ export default function MilpaSimulator({ onBack, onHome }) {
     setSistemaActivo(null);
     setAvisoSiembra('');
     setCelebracion('');
+    setEventosPosibles([]);
+    setConsejoVisible({});
+    setResultadosTemporadas([]);
+    setMedallasObtenidas([]);
     try { agentSounds.listen(); } catch { /* noop */ }
   }, []);
 
@@ -519,6 +569,64 @@ export default function MilpaSimulator({ onBack, onHome }) {
           </section>
         )}
 
+        {/* FASE SELECCIÓN DE EVENTO: el jugador elige cuál enfrentar */}
+        {fase === 'seleccion-evento' && (
+          <section
+            data-testid="milpa-seleccion-evento"
+            className="rounded-3xl border-2 border-amber-400/50 bg-gradient-to-br from-amber-900/40 to-emerald-950/60 p-4 milpa-fade-in"
+          >
+            <div className="text-center">
+              <div className="text-4xl mb-2" aria-hidden="true">⚡</div>
+              <h3 className="text-xl font-black text-white">¡Elige un evento para enfrentar!</h3>
+              <p className="mt-2 text-sm font-medium text-amber-100">
+                Cada evento presenta un desafío diferente. Elige sabiamente.
+              </p>
+            </div>
+
+            <div className="mt-4 flex flex-col gap-3">
+              {eventosPosibles.map((ev) => {
+                const consejo = consejoVisible[ev.id];
+                return (
+                  <div
+                    key={ev.id}
+                    className="rounded-2xl bg-emerald-950/60 p-4 ring-1 ring-emerald-800/50"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => seleccionarEvento(ev)}
+                      className="flex w-full items-center gap-3 text-left transition hover:bg-emerald-900/30 active:scale-[0.98] rounded-xl p-2"
+                    >
+                      <span className="text-3xl" aria-hidden="true">{ev.emoji}</span>
+                      <div className="flex-1">
+                        <p className="text-sm font-black text-white">{ev.nombre}</p>
+                        <p className="text-xs text-emerald-300">Daño base: {ev.dano}</p>
+                      </div>
+                      <span className="text-lime-300">Enfrentar →</span>
+                    </button>
+
+                    <div className="mt-2 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => mostrarConsejo(ev.id)}
+                        className="flex min-h-[32px] items-center gap-1 rounded-xl bg-amber-400/20 px-3 py-1 text-xs font-black text-amber-200 ring-1 ring-amber-300/30 transition hover:bg-amber-400/30 active:scale-95"
+                      >
+                        💡 Consejo
+                      </button>
+                      {consejo && (
+                        <div className="flex-1 rounded-xl bg-lime-400/15 p-2 text-left">
+                          <p className="text-xs font-bold text-lime-200">
+                            <span className="text-lime-300">{consejo.cultivo}:</span> {consejo.consejo}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
         {/* FASE TEMPORADA: el evento golpea */}
         {fase === 'temporada' && evento && (
           <section
@@ -583,19 +691,67 @@ export default function MilpaSimulator({ onBack, onHome }) {
                   Asocia cultivos y verás cómo rinde más que el monocultivo.
                 </p>
               )}
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <ResultadoCelda etiqueta="Asociación" valor={resumen.saludTotal} acento />
-                <ResultadoCelda etiqueta="Monocultivo" valor={resumen.rendimientoMono} />
+
+              {/* Barras de comparación animadas */}
+              <div className="mt-4 rounded-2xl bg-slate-900/60 p-3">
+                <p className="text-[11px] font-bold uppercase tracking-wide text-emerald-200">
+                  Comparación de rendimiento
+                </p>
+                <div className="mt-3">
+                  <BarraComparacion
+                    asociacion={resumen.saludTotal}
+                    monocultivo={resumen.rendimientoMono}
+                  />
+                </div>
+                <div className="mt-2 flex justify-between text-xs">
+                  <span className="font-bold text-amber-200">Monocultivo: {resumen.rendimientoMono}</span>
+                  <span className="font-bold text-lime-200">Asociación: {resumen.saludTotal}</span>
+                </div>
               </div>
             </div>
 
-            {/* Indicadores reales */}
+            {/* Indicadores reales con mini-barras animadas */}
             <div className="grid grid-cols-2 gap-2" data-testid="milpa-indicadores">
-              <IndicadorMini emoji="📏" valor={resumen.lerPromedio.toFixed(2)} etiqueta="LER" />
-              <IndicadorMini emoji="💧" valor={`${resumen.nitrogenoPromedio}%`} etiqueta="N fijado" />
-              <IndicadorMini emoji="🌿" valor={`−${resumen.coberturaPromedio}%`} etiqueta="Maleza" />
-              <IndicadorMini emoji="🌳" valor={`${resumen.sombraPromedio}%`} etiqueta="Sombra" />
+              <IndicadorMini emoji="📏" valor={resumen.lerPromedio.toFixed(2)} etiqueta="LER" maxValor={3} />
+              <IndicadorMini emoji="💧" valor={`${resumen.nitrogenoPromedio}%`} etiqueta="N fijado" maxValor={100} />
+              <IndicadorMini emoji="🌿" valor={`−${resumen.coberturaPromedio}%`} etiqueta="Maleza" maxValor={100} />
+              <IndicadorMini emoji="🌳" valor={`${resumen.sombraPromedio}%`} etiqueta="Sombra" maxValor={100} />
             </div>
+
+            {/* Verificación del campesino vecino */}
+            {(() => {
+              const verificacion = verificarSuperoCampesinoVecino(resumen, juego.temporadaActual);
+              if (!verificacion.supero) return null;
+
+              return (
+                <div className="rounded-3xl border-2 border-amber-400/40 bg-gradient-to-br from-amber-900/60 to-emerald-950/60 p-4 text-center milpa-resplandor">
+                  <div className="text-4xl" aria-hidden="true">🏅</div>
+                  <h4 className="mt-2 text-lg font-black text-white">
+                    ¡Superaste al campesino vecino!
+                  </h4>
+                  <p className="mt-1 text-sm font-bold text-amber-200">
+                    Temporada {juego.temporadaActual} • {verificacion.medalla}
+                  </p>
+                  <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                    <div className="rounded-xl bg-slate-900/60 p-2">
+                      <p className="font-bold text-emerald-200">LER</p>
+                      <p className="text-base font-black text-lime-200">{verificacion.detalles.ler.logrado.toFixed(2)}</p>
+                      <p className="text-[10px] text-emerald-400">meta: {verificacion.detalles.ler.objetivo}</p>
+                    </div>
+                    <div className="rounded-xl bg-slate-900/60 p-2">
+                      <p className="font-bold text-emerald-200">N</p>
+                      <p className="text-base font-black text-lime-200">{verificacion.detalles.n.logrado}%</p>
+                      <p className="text-[10px] text-emerald-400">meta: {verificacion.detalles.n.objetivo}%</p>
+                    </div>
+                    <div className="rounded-xl bg-slate-900/60 p-2">
+                      <p className="font-bold text-emerald-200">Cobertura</p>
+                      <p className="text-base font-black text-lime-200">{verificacion.detalles.cobertura.logrado}%</p>
+                      <p className="text-[10px] text-emerald-400">meta: {verificacion.detalles.cobertura.objetivo}%</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Logros nuevos */}
             {logros.length > 0 && (
@@ -679,6 +835,60 @@ export default function MilpaSimulator({ onBack, onHome }) {
               </p>
             </div>
 
+            {/* Historial de las 3 temporadas */}
+            <div className="rounded-3xl border border-emerald-800/50 bg-emerald-950/40 p-4">
+              <h4 className="mb-3 flex items-center gap-2 text-sm font-black text-white">
+                <Target size={16} className="text-lime-300" aria-hidden="true" />
+                Tu progreso en las {NUM_TEMPORADAS} temporadas
+              </h4>
+              <div className="flex flex-col gap-2">
+                {resultadosTemporadas.map((temp) => {
+                  const verificacion = verificarSuperoCampesinoVecino(temp.resumen, temp.numero);
+                  const medalla = medallasObtenidas.find(m => m.temporada === temp.numero);
+
+                  return (
+                    <div
+                      key={temp.numero}
+                      className={`rounded-2xl p-3 ring-1 ${
+                        verificacion.supero
+                          ? 'bg-amber-900/40 ring-amber-400/30'
+                          : 'bg-emerald-900/40 ring-emerald-800/30'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">🌾</span>
+                          <p className="text-sm font-black text-white">Temporada {temp.numero}</p>
+                          {medalla && (
+                            <span className="text-lg" aria-hidden="true">🏅</span>
+                          )}
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs font-bold text-emerald-200">
+                            LER: {temp.resumen.lerPromedio.toFixed(2)}
+                          </p>
+                          <p className="text-xs font-bold text-emerald-200">
+                            Ventaja: +{temp.resumen.ventajaPct}%
+                          </p>
+                        </div>
+                      </div>
+                      <div className="mt-2 grid grid-cols-3 gap-1 text-[10px]">
+                        <div>
+                          <p className="font-bold text-emerald-300">N: {temp.resumen.nitrogenoPromedio}%</p>
+                        </div>
+                        <div>
+                          <p className="font-bold text-emerald-300">Cobertura: {temp.resumen.coberturaPromedio}%</p>
+                        </div>
+                        <div>
+                          <p className="font-bold text-emerald-300">Sombra: {temp.resumen.sombraPromedio}%</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Resumen de logros */}
             <div className="rounded-3xl border border-emerald-800/50 bg-emerald-950/40 p-4">
               <h4 className="mb-3 flex items-center gap-2 text-sm font-black text-white">
@@ -709,6 +919,29 @@ export default function MilpaSimulator({ onBack, onHome }) {
                 )}
               </div>
             </div>
+
+            {/* Medallas obtenidas */}
+            {medallasObtenidas.length > 0 && (
+              <div className="rounded-3xl border border-amber-400/30 bg-gradient-to-br from-amber-900/40 to-emerald-950/60 p-4">
+                <h4 className="mb-2 flex items-center gap-2 text-sm font-black text-white">
+                  <span className="text-lg" aria-hidden="true">🏅</span>
+                  Medallas del campesino vecino ({medallasObtenidas.length})
+                </h4>
+                <div className="flex flex-col gap-1">
+                  {medallasObtenidas.map((medalla, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-2 rounded-xl bg-amber-400/15 p-2"
+                    >
+                      <span className="text-lg" aria-hidden="true">🏅</span>
+                      <p className="text-xs font-black text-amber-200">
+                        Temporada {medalla.temporada}: {medalla.medalla}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Mensaje final */}
             <div className="rounded-3xl border border-lime-300/30 bg-gradient-to-br from-emerald-800/60 to-emerald-950/60 p-4">
@@ -807,29 +1040,94 @@ function SinergiaDato({ texto, valor }) {
   );
 }
 
-/** Celda de comparación. */
-function ResultadoCelda({ etiqueta, valor, acento }) {
+/** Celda de comparación con barras animadas. */
+function ResultadoCelda({ etiqueta, valor, maxValor, acento }) {
+  const porcentaje = Math.min(100, Math.max(0, (valor / maxValor) * 100));
+
   return (
-    <div
-      className={[
-        'rounded-2xl p-3',
-        acento ? 'bg-lime-400/20 ring-1 ring-lime-300/50' : 'bg-slate-800/60',
-      ].join(' ')}
-    >
+    <div className="rounded-2xl bg-slate-900/60 p-3">
       <p className="text-[11px] font-bold uppercase tracking-wide text-emerald-200">{etiqueta}</p>
-      <p className={`mt-0.5 text-2xl font-black ${acento ? 'text-lime-300' : 'text-slate-300'}`}>
-        {valor}
-      </p>
+      <div className="mt-2 relative">
+        {/* Barra animada */}
+        <div className="h-8 w-full overflow-hidden rounded-lg bg-slate-800">
+          <div
+            className={`h-full rounded-lg bg-gradient-to-r ${
+              acento
+                ? 'from-lime-400 via-emerald-400 to-lime-300'
+                : 'from-amber-600 via-orange-500 to-amber-400'
+            } transition-all duration-1000 ease-out milpa-brota`}
+            style={{ width: `${porcentaje}%` }}
+          />
+        </div>
+        {/* Número flotante */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <p
+            className={`text-lg font-black ${
+              acento ? 'text-lime-200' : 'text-amber-200'
+            } drop-shadow-lg`}
+          >
+            {valor}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
 
-/** Indicador compacto. */
-function IndicadorMini({ emoji, valor, etiqueta }) {
+/** Barra de comparación animada Monocultivo vs Asociación. */
+function BarraComparacion({ asociacion, monocultivo }) {
+  const maxValor = Math.max(asociacion, monocultivo, 1);
+  const porcentajeAsociacion = (asociacion / maxValor) * 100;
+  const porcentajeMonocultivo = (monocultivo / maxValor) * 100;
+  const ventajaPct = monocultivo > 0 ? Math.round(((asociacion - monocultivo) / monocultivo) * 100) : 0;
+
+  return (
+    <div className="relative">
+      {/* Barra monocultivo (fondo) */}
+      <div className="h-12 w-full overflow-hidden rounded-xl bg-slate-800">
+        <div
+          className="h-full rounded-xl bg-gradient-to-r from-amber-700 via-orange-600 to-amber-500 transition-all duration-1000 ease-out"
+          style={{ width: `${porcentajeMonocultivo}%` }}
+        />
+      </div>
+
+      {/* Barra asociación (superpuesta) */}
+      <div className="absolute top-0 left-0 h-12 w-full overflow-hidden rounded-xl">
+        <div
+          className="h-full rounded-xl bg-gradient-to-r from-lime-500 via-emerald-400 to-lime-300 transition-all duration-1000 ease-out milpa-brota"
+          style={{ width: `${porcentajeAsociacion}%` }}
+        />
+      </div>
+
+      {/* Número flotante de ventaja */}
+      {ventajaPct > 0 && (
+        <div className="absolute -top-6 right-0 rounded-xl bg-lime-400 px-2 py-1 text-sm font-black text-emerald-950 shadow-lg milpa-badge-pop">
+          +{ventajaPct}%
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Indicador compacto con mini-barras animadas. */
+function IndicadorMini({ emoji, valor, etiqueta, maxValor = 100 }) {
+  const valorNumerico = typeof valor === 'number' ? valor : parseFloat(valor.replace('%', ''));
+  const porcentaje = Math.min(100, Math.max(0, (valorNumerico / maxValor) * 100));
+
   return (
     <div className="flex flex-col items-center rounded-2xl bg-emerald-950/40 p-2 text-center ring-1 ring-emerald-800/40">
       <span className="text-xl" aria-hidden="true">{emoji}</span>
-      <span className="text-base font-black text-lime-200">{valor}</span>
+      <div className="relative mt-1 w-full">
+        {/* Mini barra animada */}
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-lime-400 to-emerald-400 transition-all duration-700 ease-out"
+            style={{ width: `${porcentaje}%` }}
+          />
+        </div>
+        {/* Valor superpuesto */}
+        <span className="text-base font-black text-lime-200">{valor}</span>
+      </div>
       <span className="text-[10px] leading-tight text-emerald-300/80">{etiqueta}</span>
     </div>
   );
