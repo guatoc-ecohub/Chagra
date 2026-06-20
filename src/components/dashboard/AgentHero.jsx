@@ -1249,6 +1249,14 @@ export default function AgentHero({ onNavigate }) {
                     justify-content: flex-end;
                     overflow: hidden;
                 }
+                /* Con la mano abierta el cuerpo NO recorta: las ramas de la red
+                   bajan POR FUERA del borde inferior del cuerpo hasta el botón Ⓐ
+                   (que vive en el compositor, debajo). Sin esto, el layout de
+                   #1726 (cuerpo flex con overflow:hidden) recorta el tramo final
+                   de cada rama → "líneas que mueren en el vacío" (regresión del
+                   fix #1668). Al cerrar vuelve a hidden para que la escena
+                   ambiente no desborde el screenful. */
+                .agentport-hero-body.is-open { overflow: visible; }
 
                 /* ===================== ZONA-RESPIRO ===================== */
                 /* Espacio "respiro" donde vive la mano/red al abrir Ⓐ. El stage
@@ -1262,7 +1270,18 @@ export default function AgentHero({ onNavigate }) {
                     overflow: hidden;
                     pointer-events: none;
                 }
-                .agentport-stage.is-open { pointer-events: auto; }
+                /* Abierto: overflow VISIBLE para que las ramas viajen hasta la Ⓐ
+                   y se suelden a su disco (rimPoint en AgentRedMenu.layout). El
+                   z-index sube por encima del compositor (z 4) para que el tramo
+                   final de cada rama pinte SOBRE el borde del compositor y llegue
+                   al centro del botón — continuidad raíz↔red sin corte. El SVG es
+                   pointer-events:none, así que el tap sigue cayendo en el
+                   compositor/botón; solo el panel de la mano captura toques. */
+                .agentport-stage.is-open {
+                    pointer-events: auto;
+                    overflow: visible;
+                    z-index: 5;
+                }
 
                 .agentport-content {
                     position: relative;
@@ -1795,7 +1814,7 @@ export default function AgentHero({ onNavigate }) {
                 </section>
             )}
 
-            <div className="agentport-hero-body">
+            <div className={['agentport-hero-body', menuOpen && !menuClosing ? 'is-open' : ''].join(' ')}>
                 {/* ============ ZONA-RESPIRO (escena detrás · red Ⓐ al abrir) ============
                     Con el menú abierto, la red de capacidades BROTA aquí mismo —
                     integrada al lienzo del hero, sin sheet ni scrim. */}

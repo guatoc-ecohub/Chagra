@@ -906,21 +906,51 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
       clearFocus: () => setFocus(null),
     };
 
+    /* Re-mide la geometría sin re-brotar (las ramas ya están vivas): solo
+       recoloca raíz/nodos a las coords actuales y pinta. Lo usa el RO del
+       botón Ⓐ y el barrido de settle: si el compositor se ancla/mueve tras la
+       animación de pliegue (#1726, transición .5s), la BASE de cada rama sigue
+       al centro real de la Ⓐ en vez de quedar suelta. */
+    function relayout() {
+      layout();
+      if (!didSprout && W > 0 && H > 0) regrow();
+      else kick(800);
+    }
+
     let ro = null;
     if (typeof ResizeObserver !== 'undefined') {
-      ro = new ResizeObserver(() => {
-        layout();
-        if (!didSprout && W > 0 && H > 0) regrow();
-        else kick(800);
-      });
+      ro = new ResizeObserver(relayout);
       ro.observe(root);
+      /* OJO: también observamos el botón Ⓐ (anchorRef). Vive en el compositor,
+         FUERA del arm-root: cuando #1726 ancla el compositor al fondo y el
+         saludo/chips se pliegan, la Ⓐ se mueve sin que el arm-root cambie de
+         tamaño → el RO de root NO dispara y la raíz quedaba desfasada. */
+      const aEl = anchorRef && anchorRef.current;
+      if (aEl) ro.observe(aEl);
     }
 
     layout();
     if (W > 0 && H > 0) regrow();
 
+    /* Barrido de "settle": tras montar la mano, el layout del hero cambia
+       (pliegue .5s, overflow visible, compositor al fondo). Forzamos un
+       recálculo en el próximo frame y a lo largo de la transición para que la
+       geometría viva atrape la posición FINAL de la Ⓐ y de los nodos. */
+    let rafSettle = null;
+    const settleTimers = [];
+    if (!reduced) {
+      rafSettle = requestAnimationFrame(() => { rafSettle = null; relayout(); });
+      [120, 280, 520].forEach((ms) => {
+        settleTimers.push(setTimeout(relayout, ms));
+      });
+    } else {
+      rafSettle = requestAnimationFrame(() => { rafSettle = null; relayout(); });
+    }
+
     return () => {
       if (rafId != null) cancelAnimationFrame(rafId);
+      if (rafSettle != null) cancelAnimationFrame(rafSettle);
+      settleTimers.forEach(clearTimeout);
       if (ro) ro.disconnect();
       sim.forEach((s) => {
         clearTimeout(s.growTimer);
