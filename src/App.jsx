@@ -709,10 +709,10 @@ export default function App() {
     }
   }, [currentView]);
 
-  // 2026-05-18 (operator request): la imagen de fondo agroecológica de
-  // /biodiversidad-bg.jpg que está en la pestaña Biodiversidad se aplica
-  // a TODA la app excepto login + loading. Body className toggled según
-  // currentView. Estilos en src/index.css clase .app-bg-biodiversidad.
+  // El fondo agroecológico de la app (catálogo biopunk, default "Páramo
+  // completo" vía --app-bg-image) se aplica a TODA la app excepto login +
+  // loading. Body className toggled según currentView. Estilos en
+  // src/index.css clase .app-bg-biodiversidad (nombre histórico).
   useEffect(() => {
     const showBg = currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback';
     if (showBg) {

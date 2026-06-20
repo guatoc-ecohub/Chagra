@@ -1,10 +1,8 @@
 /**
  * BiodiversidadView, Vista del ecosistema y diversidad biológica de la finca.
  *
- * Fondo permanente: ilustración curada "biodiversidad-bg.jpg" con fauna y
- * flora del bosque alto-andino colombiano (oso andino, quetzal, morpho,
- * frailejón, maíz, armadillo, entre otros). Aplicada con gradient overlay
- * para legibilidad de las tarjetas de estadísticas encima.
+ * Fondo: usa el fondo estándar de la app (catálogo biopunk, default
+ * "Páramo completo"). Se eliminó el viejo fondo propio "biodiversidad-bg.jpg".
  *
  * Bug operator 2026-05-18: estratos y gremios siempre mostraban 0 aunque
  * las 37 species reales del operator cubrían 4 estratos y >3 gremios. El
@@ -85,22 +83,12 @@ export default function BiodiversidadView({ onBack, onHome }) {
     [plants, speciesIndex]
   );
 
-  // Feedback piloto #119: "mejorar la imagen del background". Overlay reducido
-  // (de 0.55-0.82 a 0.45-0.78) para que la ilustración curada del bosque
-  // alto-andino sea más visible sin sacrificar legibilidad de las cards.
-  const customBgStyle = {
-    backgroundImage: 'linear-gradient(rgba(2,6,23,0.45), rgba(2,6,23,0.78)), url(/biodiversidad-bg.jpg)',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    backgroundAttachment: 'fixed',
-  };
-
+  // La vista usa el fondo estándar de la app (catálogo biopunk, default
+  // "Páramo completo"). Se eliminó el viejo fondo `biodiversidad-bg.jpg`.
   return (
     <ScreenShell title="Biodiversidad" icon={Leaf} onBack={onBack} onHome={onHome}>
       <div
         className="min-h-full p-4 flex flex-col gap-4"
-        style={customBgStyle}
       >
         {/* Feedback piloto #119: agregado intro contextual. Antes solo había stats
             sin explicación de qué significaban (Estratos? Gremios?). */}
