@@ -197,7 +197,7 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
         catalogImage={species?.imagen || species?.image || species?.media?.image || species?.media || null}
       />
 
-      <FarmProcessSummary process={effectiveCycle} pestRisks={pestRisks} />
+      <FarmProcessSummary process={effectiveCycle} pestRisks={pestRisks} altitudeM={altitudeM} />
 
       {/* Etapa actual + confirmar cambio (stageConfirmationService) */}
       <section className="bg-slate-900 border border-slate-800 rounded-xl p-3">
