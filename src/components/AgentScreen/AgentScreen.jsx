@@ -58,6 +58,13 @@ import { planForcedIntent, isStubIntent, isDeepResearchIntent, CHIP_DEFS } from 
 // para intentar AL MENOS una consulta al grafo en vez de caer a generativo puro.
 import { planNluFallback } from '../../services/agentNluFallback';
 import { planKnowledgeIntent, hasSoilDiagnosticIntent } from '../../services/knowledgeIntentRouter';
+// Grounding OFFLINE del grafo (#49): cuando NO hay red, el bloque de relaciones
+// (plaga→controlador / compatibles / antagonistas / biopreparados / vernáculos)
+// se arma desde el export precacheado del grafo AGE (grafo-relations.json), en
+// vez de quedarse sin grounding relacional. resolveSpecies mapea el query a un
+// id del catálogo SIN red (catalogDB + BM25 local).
+import { buildOfflineGroundingBlock } from '../../services/grafoRelations';
+import { resolveSpecies } from '../../services/speciesResolver';
 // Deep Research (A6/A7): cliente HTTP del endpoint async de investigación
 // profunda del sidecar. Feature flag VITE_DEEP_RESEARCH_ENABLED (default false).
 import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../../services/deepResearchClient';
@@ -1764,6 +1771,28 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           // Defensa extra: planNlu/callTool/resolveEntities ya son no-throw,
           // pero si algo raro pasa NO bloqueamos el chat.
           console.debug('[sidecar] inesperado, sigo con RAG-only:', sidecarErr?.message);
+        }
+      } else {
+        // GROUNDING OFFLINE del grafo (#49). Sin red el bloque online de arriba
+        // no corre y el agente perdía TODAS las relaciones del grafo (el "87%
+        // invisible offline"). Aquí resolvemos la especie del query SIN red
+        // (resolveSpecies = catalogDB + BM25 local) y armamos el bloque de
+        // relaciones desde el export precacheado (grafo-relations.json).
+        // Best-effort y no-throw: si no resuelve o no hay datos, '' → no-op.
+        try {
+          const off = await resolveSpecies(textForLLM);
+          if (off && off.slug) {
+            const bloque = await buildOfflineGroundingBlock(off.slug);
+            if (bloque) {
+              subgrafoBloque = [subgrafoBloque, bloque].filter(Boolean).join('\n\n');
+              nluRoute = 'offline:grafo-relations';
+              console.debug('[grafo] grounding offline inyectado', {
+                slug: off.slug, match: off.match,
+              });
+            }
+          }
+        } catch (offErr) {
+          console.debug('[grafo] grounding offline falló (sigo RAG-only):', offErr?.message);
         }
       }
 
