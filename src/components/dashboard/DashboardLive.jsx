@@ -153,7 +153,11 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
         // preferencia manual, derivamos la visibilidad por perfil con
         // homeModuleSelector (reusa deriveRole de profileChipSelector).
         try {
-            if (hasManualModuleVisibility()) {
+            // El override "Visión total" del operador GANA sobre prefs manuales:
+            // si está activo, mostramos TODO (esOperador=true). Sin esto, un
+            // operador que antes ocultó módulos a mano activaba el toggle y NO
+            // veía nada (bug demo 2026-06-19).
+            if (hasManualModuleVisibility() && !esOperadorActual()) {
                 // El usuario eligió a mano: respetar su configuración tal cual.
                 return getModuleVisibility();
             }
@@ -239,7 +243,8 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
     useEffect(() => {
         const handler = () => {
             try {
-                if (hasManualModuleVisibility()) return;
+                // El override del operador GANA sobre prefs manuales (ver arriba).
+                if (hasManualModuleVisibility() && !esOperadorActual()) return;
                 setModuleVisibility(
                     selectHomeModuleVisibilityMap(getProfile(), {
                         esOperador: esOperadorActual(),
