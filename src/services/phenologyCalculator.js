@@ -8,7 +8,12 @@
  * el proceso. Solo computa estimated_stage.
  */
 import { getTemplate } from '../data/phenologyTemplates';
-import { LOW_CONFIDENCE_THRESHOLD } from '../services/agentService.js';
+
+// Umbral de confianza alineado con agentService.LOW_CONFIDENCE_THRESHOLD (0.7).
+// Se define local para NO arrastrar el módulo pesado agentService.js al grafo de
+// imports de la capa de datos (farmProcessCache lo importa de forma transitiva
+// vía deriveCurrentStage). Mantener ambos valores en 0.7.
+const LOW_CONFIDENCE_THRESHOLD = 0.7;
 
 /**
  * @typedef {Object} PhenologyWindow
@@ -157,6 +162,44 @@ export function getCurrentStage({ speciesSlug, sowingDate, altitudeM, now }) {
 
   // today anterior a la primera ventana
   return { stage: windows[0], stageIndex: 0, daysElapsed: Math.max(0, daysElapsed) };
+}
+
+/**
+ * Deriva el código de etapa ACTUAL de un ciclo a partir de la fecha de siembra
+ * y la plantilla fenológica de la especie.
+ *
+ * Es la fuente de verdad para `current_stage` de los ciclos que NO tienen
+ * confirmación manual del campesino: en vez de quedar congelados en
+ * `sowing_confirmed`, la etapa avanza sola con el calendario.
+ *
+ * Degradación honesta:
+ *   - Sin template para la especie o sin fecha de siembra → devuelve el
+ *     `fallback` (por defecto 'sowing_confirmed'), NUNCA rompe.
+ *   - El día 0 (recién sembrado) devuelve 'sowing_confirmed' para conservar la
+ *     etiqueta que el resto de la UI espera tras una siembra.
+ *
+ * @param {Object} input
+ * @param {string} input.speciesSlug
+ * @param {number} input.sowingDate — timestamp ms de la siembra (created_at)
+ * @param {number} [input.altitudeM]
+ * @param {number} [input.now=Date.now()]
+ * @param {string} [input.fallback='sowing_confirmed'] — etapa si no se puede derivar
+ * @returns {string} código de etapa (ej. 'vegetative', 'flowering', 'sowing_confirmed')
+ */
+export function deriveCurrentStage({ speciesSlug, sowingDate, altitudeM, now, fallback = 'sowing_confirmed' }) {
+  let result = null;
+  try {
+    result = getCurrentStage({ speciesSlug, sowingDate, altitudeM, now });
+  } catch {
+    return fallback;
+  }
+  if (!result || !result.stage || result.stage.status !== 'computed') {
+    return fallback;
+  }
+  // La etapa 'sowing' del template equivale a 'sowing_confirmed' en el vocabulario
+  // de FarmProcess (la UI muestra "Siembra" para ambas).
+  if (result.stage.code === 'sowing') return 'sowing_confirmed';
+  return result.stage.code;
 }
 
 /**

@@ -41,7 +41,7 @@ export default function CicloCultivoScreen({ onBack, onNavigate }) {
       // POLÍTICA: Todas las plantas vivas deben aparecer como ciclo, no solo páramo
       // Dedupe por nombre+lote para no duplicar plantas que ya tienen ciclo
       try {
-        cycles = await hydrateCyclesFromFarmOS(cycles);
+        cycles = await hydrateCyclesFromFarmOS(cycles, { altitudeM });
       } catch (hydrateErr) {
         // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- log técnico
         console.warn('[CicloCultivoScreen] Error al hidratar ciclos desde farmOS:', hydrateErr.message);
@@ -62,7 +62,7 @@ export default function CicloCultivoScreen({ onBack, onNavigate }) {
     }
 
     return () => { mounted = false; };
-  }, []);
+  }, [altitudeM]);
 
   useEffect(() => { load(); }, [load]); // eslint-disable-line react-hooks/set-state-in-effect -- load es async, no hay cascading renders
 

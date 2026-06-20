@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculateWindows, formatWindow, getCurrentStage } from '../phenologyCalculator';
+import { calculateWindows, formatWindow, getCurrentStage, deriveCurrentStage } from '../phenologyCalculator';
 
 const SOWING = 1700000000000; // fixed timestamp
 
@@ -178,5 +178,53 @@ describe('formatWindow', () => {
 
   it('devuelve mensaje para insufficient_data', () => {
     expect(formatWindow({ status: 'insufficient_data' })).toBe('Fecha no disponible');
+  });
+});
+
+// BUG B (ciclos congelados en sowing_confirmed): la etapa debe DERIVARSE de la
+// fecha de siembra + fenología, no quedarse fija. deriveCurrentStage es la
+// fuente de verdad para current_stage de ciclos sin confirmación manual.
+describe('deriveCurrentStage — etapa por fecha (anti-congelamiento)', () => {
+  const SOWING_DAY = 1700000000000;
+  const DAY_MS = 86400000;
+
+  it('día 0 (recién sembrado) → sowing_confirmed (no se queda en código sowing)', () => {
+    const s = deriveCurrentStage({ speciesSlug: 'fragaria_ananassa', sowingDate: SOWING_DAY, now: SOWING_DAY });
+    expect(s).toBe('sowing_confirmed');
+  });
+
+  it('fresa a los 20 días → vegetative (la etapa AVANZA sola)', () => {
+    const s = deriveCurrentStage({ speciesSlug: 'fragaria_ananassa', sowingDate: SOWING_DAY, now: SOWING_DAY + 20 * DAY_MS });
+    expect(s).toBe('vegetative');
+  });
+
+  it('tomate a los 30 días → flowering', () => {
+    const s = deriveCurrentStage({ speciesSlug: 'solanum_lycopersicum', sowingDate: SOWING_DAY, now: SOWING_DAY + 30 * DAY_MS });
+    expect(s).toBe('flowering');
+  });
+
+  it('tomate a los 90 días → harvest_window', () => {
+    const s = deriveCurrentStage({ speciesSlug: 'solanum_lycopersicum', sowingDate: SOWING_DAY, now: SOWING_DAY + 90 * DAY_MS });
+    expect(s).toBe('harvest_window');
+  });
+
+  it('especie sin plantilla → fallback (sowing_confirmed por defecto)', () => {
+    const s = deriveCurrentStage({ speciesSlug: 'no_existe', sowingDate: SOWING_DAY, now: SOWING_DAY + 30 * DAY_MS });
+    expect(s).toBe('sowing_confirmed');
+  });
+
+  it('sin fecha de siembra → fallback configurable', () => {
+    const s = deriveCurrentStage({ speciesSlug: 'solanum_lycopersicum', sowingDate: 0, fallback: 'germination' });
+    expect(s).toBe('germination');
+  });
+
+  it('respeta fallback custom cuando no hay plantilla', () => {
+    const s = deriveCurrentStage({ speciesSlug: 'no_existe', sowingDate: SOWING_DAY, fallback: 'vegetative' });
+    expect(s).toBe('vegetative');
+  });
+
+  it('nunca lanza ante entrada basura', () => {
+    expect(() => deriveCurrentStage({})).not.toThrow();
+    expect(deriveCurrentStage({})).toBe('sowing_confirmed');
   });
 });
