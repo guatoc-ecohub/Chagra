@@ -29,7 +29,6 @@ const FLOATING_BACK_THRESHOLD_PX = 160;
  * @param {Function} props.onBack - Callback para volver a la pantalla anterior.
  */
 export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, onConsentNeeded, onRetryOrphan, onCancelDeepResearch, proactiveGreeting = null, onGreetingPrompt, onBack }) {
-  const bottomRef = useRef(null);
   const scrollRef = useRef(null);
   // (B) Botón "Volver" flotante: visible solo cuando el operador se alejó del
   // inicio (header fuera de vista). Arriba del todo lo ocultamos porque el
@@ -41,8 +40,29 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
     setShowFloatingBack(top > FLOATING_BACK_THRESHOLD_PX);
   }, []);
 
+  // Auto-scroll al fondo — ÚNICA fuente de verdad del scroll del chat
+  // (task #58: AgentScreen tenía un segundo efecto con chatEndRef que apuntaba
+  // al contenedor equivocado —el flex exterior con overflow-hidden— y peleaba
+  // con éste, trabando/cortando el scroll). Sólo arrastramos al fondo si el
+  // usuario YA estaba cerca del fondo (≤120px) o si llega un stream en curso;
+  // si subió a leer mensajes viejos, NO lo interrumpimos. Bug operador
+  // "scroll complicado / se corta": antes scrolleábamos en cada cambio sin
+  // condición, robándole la lectura. scrollTop directo (no scrollIntoView) para
+  // no mover NADA fuera del contenedor de mensajes.
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const container = scrollRef.current;
+    if (!container) return;
+    const distFromBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight;
+    if (distFromBottom <= 120 || isStreaming) {
+      // scrollTo no existe en jsdom (tests) ni navegadores muy viejos → fallback
+      // a setear scrollTop directo. Ambos llevan el contenedor al fondo.
+      if (typeof container.scrollTo === 'function') {
+        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+      } else {
+        container.scrollTop = container.scrollHeight;
+      }
+    }
   }, [messages, streamingContent, isStreaming]);
 
   // Empty state: aprovechamos el espacio vacío para mostrar el colibrí
@@ -158,6 +178,9 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
           aparición del primer token — el indicador del header pasa
           desapercibido porque el ojo del operador está en la ventana de
           diálogo. Acá el colibrí late en thinking + texto "Pensando…". */}
+      {/* eslint-disable chagra-i18n/no-hardcoded-spanish -- "Pensando"/aria-label
+          legacy preexistentes; migración i18n diferida a ADR-050 (no introducidos
+          en este cambio). */}
       {showThinkingAvatar && (
         <div className="flex items-end gap-3 mb-4 animate-fadeIn">
           <ChagraAgentAvatar
@@ -174,6 +197,7 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
           </div>
         </div>
       )}
+      {/* eslint-enable chagra-i18n/no-hardcoded-spanish */}
 
       {isStreaming && streamingContent && (
         <ChatBubble
@@ -183,7 +207,8 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
         />
       )}
 
-        <div ref={bottomRef} />
+        {/* Espaciador final: deja aire bajo el último mensaje sobre el input. */}
+        <div aria-hidden="true" className="h-1" />
       </div>
     </div>
   );

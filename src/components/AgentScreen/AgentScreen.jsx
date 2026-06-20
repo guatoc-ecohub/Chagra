@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw, X, Home, Camera, Square } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { transcribe, queueForRetry } from '../../services/voiceService';
@@ -64,7 +64,6 @@ import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../
 // Tier free|pro (A1): resuelve el tier del usuario logueado contra la allowlist.
 // isPro controla el gate de la UI (chip 🔬); x-chagra-tier se inyecta en el
 // sidecarClient/deepResearchClient vía buildSidecarHeaders (defense-in-depth).
-import { getCurrentTier } from '../../services/tierService';
 import DeepResearchCard from '../DeepResearchCard';
 import { normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildSuggestedEntitiesContext, isLowConfidenceEntity, buildFallbackResponse, pisoTermicoFromAltitud } from '../../services/agentService';
 import { buildBasePrompt, analyzeQuery, buildQueryAnalysisBlock, buildCorpusVariants, buildResolvedEntitiesBlock, formatToolEvidence } from '../../services/agentPromptBase';
@@ -73,9 +72,7 @@ import { summarizeSkyForGrounding } from '../../services/skyConditionService';
 import { assembleSystemContent } from '../../services/promptAssembler';
 import { applyOutputGuards, classifyQueryIntent } from '../../services/outputGuards';
 import { createStreamGuard } from '../../services/streamGuards';
-import { getProfile, getModuleVisibility } from '../../services/userProfileService';
-import { selectChipDefs } from '../../services/profileChipSelector';
-import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciarAccess';
+import { getProfile } from '../../services/userProfileService';
 import { captureExchange } from '../../services/conversationCaptureService';
 import { regionFromProfile, getEnsoOutlook } from '../../services/ensoContext';
 // SALUDO PROACTIVO (#162 alertas + #298 tareas + #331 análisis): el agente, de
@@ -98,12 +95,11 @@ import { executeAction, setActionGateCallback } from '../../services/actionExecu
 import { getToolsForLLM } from '../../services/llmTools';
 import { useRotatingTip } from '../../services/tipsService';
 import ChatHistory from './ChatHistory';
-import SuggestedActions from './SuggestedActions';
 import ActionConfirmModal from '../ActionConfirmModal';
 import FeedbackConsentModal from '../FeedbackConsentModal';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import ChagraAgentAvatarColibriPhoto from '../ChagraAgentAvatarColibriPhoto';
-import ChipsToolbar from '../ChipsToolbar';
+import ManoChagraIcon from '../agent/ManoChagraIcon';
 // FUENTE ÚNICA de la MANO (operador: en el agente "no se ve la mano, se ven
 // los menús en texto"). AgentManoOverlay monta el MISMO AgentRedMenu que el
 // home; mapCapabilityPick es el routing único de un pick de capacidad.
@@ -248,28 +244,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // input también cambia para guiar al campesino sobre qué escribir. Es un
   // toggle: tocar el mismo chip lo desactiva (vuelve al routing NLU normal).
   const [activeIntent, setActiveIntent] = useState(null);
-  // CHIPS ADAPTATIVOS POR PERFIL: la "caja de herramientas" despliega los chips
-  // MÁS APROPIADOS para esta persona (campesino→cultivo, restaurador→páramo/
-  // silvopastoreo, guía glaciar→clima/páramo, ganadero→silvopastoreo...). La
-  // SELECCIÓN/lógica vive en profileChipSelector (puro, testeado); aquí solo
-  // leemos el perfil + módulos visibles + acceso glaciar y le pasamos la lista
-  // ya filtrada a la ChipsToolbar. NO tocamos su CSS (otro stream lleva estilo).
-  // Memoizado al montar: el perfil rara vez cambia dentro de la sesión del chat
-  // (mismo criterio que los otros getProfile() de este componente).
-  const profileChipDefs = useMemo(() => {
-    try {
-      const profile = getProfile();
-      return selectChipDefs(profile, {
-        // El operador ve el catálogo COMPLETO de chips vivos (bypass del gating).
-        esOperador: esOperadorActual(),
-        esGuiaGlaciar: tieneAccesoGlaciarActual(),
-        moduleVisibility: getModuleVisibility(),
-      });
-    } catch (_) {
-      // Si algo falla, null → ChipsToolbar cae a su catálogo completo (default).
-      return null;
-    }
-  }, []);
+  // Task #58: profileChipDefs (chips adaptativos por perfil para la ChipsToolbar)
+  // se retiró junto con la barra de chips. La caja de herramientas ahora es la
+  // MANO de Chagra (AgentRedMenu), que ya filtra capacidades por perfil internamente.
   // La MANO de Chagra (AgentRedMenu) — MISMA red que el home, no menús de texto.
   // sheetOpen monta/desmonta el overlay de la mano (AgentManoOverlay).
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -280,7 +257,6 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // individuales. Al desmontar el componente cancelamos todos.
   const deepResearchControllersRef = useRef(new Map());
   const { durationMs, start: startRecord, stop: stopRecord, reset: resetRecord } = useVoiceRecorder();
-  const chatEndRef = useRef(null);
   // Bug 2026-05-18: ref al AbortController activo para que botón Cancelar
   // pueda abortar la inferencia LLM en curso desde fuera del callLLM scope.
   const activeControllerRef = useRef(null);
@@ -323,23 +299,12 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   const isFreshSessionRef = useRef(false);
   const [showFreshSessionBadge, setShowFreshSessionBadge] = useState(false);
 
-  // Scroll fix 2026-05-18 operator feedback: 'scroll complicado a veces'.
-  // Auto-scroll al fondo cuando hay mensaje nuevo o stream en curso, pero
-  // SOLO si el usuario ya estaba cerca del bottom (no interrumpir lectura
-  // de mensajes antiguos). Threshold 120px del fondo. Behavior smooth.
-  useEffect(() => {
-    const el = chatEndRef.current;
-    if (!el) return;
-    const container = el.parentElement;
-    if (!container) {
-      el.scrollIntoView({ behavior: 'smooth' });
-      return;
-    }
-    const distFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
-    if (distFromBottom < 120 || state === STATE_THINKING) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages.length, streamingContent, state]);
+  // Task #58: el auto-scroll del chat vive AHORA SÓLO dentro de ChatHistory
+  // (sobre su propio contenedor scrollable). El efecto previo apuntaba a
+  // `chatEndRef`, cuyo parentElement era el flex EXTERIOR (overflow-hidden):
+  // scrollHeight === clientHeight, así que disparaba scrollIntoView en cada
+  // cambio y peleaba con el scroll real de los mensajes → "scroll complicado /
+  // se corta" que reportó el operador. Eliminado: una sola fuente de verdad.
 
   const loadHistory = useCallback(async () => {
     try {
@@ -2551,18 +2516,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     setAlertContextBanner(null);
   };
 
-  const handleSuggestion = (text) => {
-    handleSubmit(text);
-  };
-
-  // CHIPS DE MODO (A4): toggle del chip. Tocar un chip activa su modo (el
-  // próximo submit fuerza esa intención y salta el NLU); tocar el mismo chip
-  // de nuevo lo desactiva (vuelve al routing NLU normal). El chip 'foto' no
-  // se maneja acá — el flujo de foto vive en el compositor multimodal.
-  const handleChipSelect = (intent) => {
-    if (intent === 'foto') return; // reservado al flujo de adjuntos
-    setActiveIntent((prev) => (prev === intent ? null : intent));
-  };
+  // Task #58: handleSuggestion (chips "Sugerencias") y handleChipSelect (chips
+  // de modo de la ChipsToolbar) se retiraron junto con sus componentes. La
+  // entrada a las capacidades es ahora SOLO la mano de Chagra (handleManoPick).
+  // El modo forzado por chip (`activeIntent`) sigue existiendo porque otras
+  // rutas internas (deep research, foto) lo setean/limpian.
 
   // Pick de una rama de la MANO (AgentRedMenu) en la conversación. Routing
   // ÚNICO compartido con el home (mapCapabilityPick): `ask` → pregunta directa,
@@ -3041,10 +2999,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         </div>
       )}
 
-      {/* Suggestions */}
-      {state === STATE_IDLE && messages.length < 3 && (
-        <SuggestedActions onSelect={handleSuggestion} />
-      )}
+      {/* Task #58 (operador 2026-06-19): chips de "Sugerencias" RETIRADOS del
+          overlay del agente. El operador los quiere fuera — la entrada a las
+          capacidades es la MANO de Chagra (trigger más abajo), no una bandeja de
+          chips de texto. SuggestedActions se conserva en el módulo para otros
+          usos/tests, pero ya no se monta acá. */}
 
       {/* UX-5 (#286) — QuickChipsBar RETIRADA de la pantalla vacía (fire #1,
           2026-06-15): sus 3 preguntas-ejemplo genéricas se reemplazaron por la
@@ -3106,23 +3065,15 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         </div>
       )}
 
-      {/* ── Chips de capacidad (modo) — fila scrollable unificada, SIEMPRE
-          visible (incluida la pantalla vacía/idle).
-
-          Fire #1 (2026-06-15): el operador debe VER las herramientas del
-          agente apenas abre la pantalla, sin tener que mandar un mensaje
-          primero. Antes el gate `state !== STATE_IDLE || messages.length > 0`
-          escondía la barra en pantalla vacía (regresión del dedup del issue
-          #5, 2026-06-08), dejando solo 3 ejemplos genéricos. Ahora la barra
-          de modos —ya FILTRADA POR PERFIL (profileChipDefs)— se muestra
-          siempre y REEMPLAZA a QuickChipsBar en la pantalla nueva: una sola
-          fila de chips (sin duplicación), pero ahora son las capacidades
-          reales del agente, adaptadas a la persona. ── */}
-      {/* Operador 2026-06-18: en la pantalla idle NO mostramos el catálogo de
-          chips de texto ("menús horribles") — en su lugar, UN trigger limpio y
-          prominente que abre la MANO de Chagra (única fuente de capacidades,
-          igual que el home). Durante una conversación (messages>0) sí se
-          muestran los chips de capacidad, ya compactos y filtrados por perfil. */}
+      {/* ── Entrada ÚNICA a las capacidades: la MANO de Chagra ──
+          Task #58 (operador 2026-06-19): los chips de capacidad ("menús
+          horribles") salen del overlay del agente. En su lugar, UN trigger
+          limpio y prominente que abre la MANO de Chagra (AgentRedMenu, la
+          misma red del home). Ya no alternamos a ChipsToolbar durante la
+          conversación: cuando hay mensajes, el trigger se compacta para no
+          comer alto de pantalla, pero sigue siendo la misma puerta. El ícono es
+          la mano de Chagra (antes una ESTRELLA/Sparkles, incoherente con el
+          nombre del botón). ── */}
       {messages.length === 0 ? (
         <div className="px-4 pb-1 pt-1 shrink-0">
           <button
@@ -3132,19 +3083,23 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             aria-label="Abrir la mano de Chagra"
             data-testid="agent-mano-trigger"
           >
-            <Sparkles size={18} className="text-emerald-300 shrink-0" aria-hidden="true" />
+            <ManoChagraIcon size={18} className="text-emerald-200 shrink-0" />
             Toca la mano de Chagra para ver todo lo que puede hacer
           </button>
         </div>
       ) : (
-        <ChipsToolbar
-          onSelectIntent={handleChipSelect}
-          activeIntent={activeIntent}
-          hasAttachment={false}
-          disabled={state === STATE_RECORDING}
-          isPro={getCurrentTier() === 'pro'}
-          chipDefs={profileChipDefs}
-        />
+        <div className="px-4 pb-1 pt-1 shrink-0">
+          <button
+            type="button"
+            onClick={() => setSheetOpen(true)}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl border border-emerald-500/40 bg-emerald-700/30 text-emerald-100 text-xs font-semibold active:scale-[.98] transition-transform"
+            aria-label="Abrir la mano de Chagra"
+            data-testid="agent-mano-trigger-compact"
+          >
+            <ManoChagraIcon size={15} className="text-emerald-200 shrink-0" />
+            La mano de Chagra
+          </button>
+        </div>
       )}
 
       {/* ── Compositor pill — paridad completa AgentHero (2026-06-08).
@@ -3284,7 +3239,8 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               aria-expanded={sheetOpen}
               className={['as-iconbtn as-tool', sheetOpen ? 'is-open' : ''].join(' ')}
             >
-              <Sparkles size={18} strokeWidth={2} aria-hidden="true" />
+              {/* Task #58: ícono de la mano de Chagra (antes una estrella/Sparkles). */}
+              <ManoChagraIcon size={18} />
             </button>
 
             {/* Cámara — sin `capture`, abre galería+cámara igual que AgentHero */}
@@ -3478,8 +3434,6 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           </p>
         )}
       </div>
-
-      <div ref={chatEndRef} />
 
       {/* La MANO de Chagra (Ⓐ) — MISMA red orgánica que el home (AgentRedMenu),
           NO menús de texto (operador: "en el agente no se ve la mano, se ven

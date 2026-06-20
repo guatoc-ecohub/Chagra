@@ -405,6 +405,66 @@
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
   }
+
+  /* Markdown renderizado de las respuestas del agente (task #58). Tipografía
+   * limpia para campesino/niña: negritas marcadas, viñetas reales con punto,
+   * títulos legibles — CERO asteriscos a la vista. El HTML viene sanitizado por
+   * renderAgentMarkdown (escape + DOMPurify allow-list). */
+  .agent-md > :first-child {
+    margin-top: 0;
+  }
+  .agent-md > :last-child {
+    margin-bottom: 0;
+  }
+  .agent-md p {
+    margin: 0 0 0.5rem;
+  }
+  .agent-md strong {
+    font-weight: 700;
+    color: inherit;
+  }
+  .agent-md em {
+    font-style: italic;
+  }
+  .agent-md h3 {
+    font-size: 0.95rem;
+    font-weight: 800;
+    margin: 0.6rem 0 0.3rem;
+    line-height: 1.3;
+  }
+  .agent-md h4 {
+    font-size: 0.88rem;
+    font-weight: 700;
+    margin: 0.5rem 0 0.25rem;
+    line-height: 1.3;
+  }
+  .agent-md ul,
+  .agent-md ol {
+    margin: 0.25rem 0 0.6rem;
+    padding-left: 1.25rem;
+  }
+  .agent-md ul {
+    list-style: disc;
+  }
+  .agent-md ol {
+    list-style: decimal;
+  }
+  .agent-md li {
+    margin: 0.15rem 0;
+  }
+  .agent-md code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.85em;
+    background-color: rgb(var(--c-surface-raised) / 0.6);
+    padding: 0.05em 0.3em;
+    border-radius: 0.25rem;
+  }
+  .agent-md blockquote {
+    margin: 0.4rem 0;
+    padding-left: 0.7rem;
+    border-left: 3px solid rgb(var(--t-accent-rgb) / 0.5);
+    opacity: 0.92;
+  }
 }
 
 /* ===========================================================================
