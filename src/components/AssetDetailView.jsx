@@ -18,6 +18,7 @@ import { listUserPhotosBySpecies, captureAndCompress, savePhoto } from '../servi
 import { usePhotoUrl } from '../hooks/usePhotoUrl';
 import { ETAPA_FENOLOGICA_LABELS } from '../utils/plantMeta';
 import { getAllSpecies } from '../db/catalogDB';
+import SpeciesImage from './SpeciesImage';
 
 // Derive speciesSlug from asset name.
 function deriveSpeciesSlug(name) {
@@ -57,7 +58,7 @@ const PHOTO_SUCCESS_LABELS = {
   default: '✓ Foto guardada.',
 };
 
-function PhotoHeroSection({ assetId, speciesSlug, assetType }) {
+function PhotoHeroSection({ assetId, speciesSlug, assetType, scientificName }) {
   const [busy, setBusy] = useState(false);
   const [success, setSuccess] = useState(false);
   const cameraRef = React.useRef(null);
@@ -140,11 +141,18 @@ function PhotoHeroSection({ assetId, speciesSlug, assetType }) {
           )}
         </div>
       ) : (
-        // Hero sin foto: card grande con CTA prominente.
+        // Hero sin foto: card grande con CTA prominente + SpeciesImage como fallback.
         <div className="p-6 bg-gradient-to-br from-emerald-900/20 to-slate-800/40 flex flex-col items-center gap-3 text-center">
-          <div className="w-16 h-16 rounded-full bg-emerald-900/40 border border-emerald-700/50 flex items-center justify-center">
-            <Images size={28} className="text-emerald-400" aria-hidden="true" />
-          </div>
+          {/* SpeciesImage como fallback cuando hay nombre científico */}
+          {scientificName ? (
+            <div className="w-full">
+              <SpeciesImage scientificName={scientificName} compact={false} className="w-full" />
+            </div>
+          ) : (
+            <div className="w-16 h-16 rounded-full bg-emerald-900/40 border border-emerald-700/50 flex items-center justify-center">
+              <Images size={28} className="text-emerald-400" aria-hidden="true" />
+            </div>
+          )}
           <h3 className="text-base font-bold text-white">{labels.title}</h3>
           <p className="text-xs text-slate-400 max-w-xs">
             Aún no hay foto. Tomarla ayuda a identificar y recordar este activo.
@@ -459,6 +467,29 @@ export const AssetDetailView = () => {
   const [geoSaving, setGeoSaving] = useState(false);
   const [showCemeteryModal, setShowCemeteryModal] = useState(false);
   const [showSplitFlow, setShowSplitFlow] = useState(false);
+  const [scientificName, setScientificName] = useState(null);
+
+  // Cargar nombre científico desde el catálogo para SpeciesImage fallback
+  useEffect(() => {
+    if (!isPlantType) return;
+    const speciesSlug = resolveSpeciesSlug(asset);
+    if (!speciesSlug) return;
+    let cancelled = false;
+    getAllSpecies()
+      .then((list) => {
+        if (cancelled) return;
+        const match = (list || []).find(
+          (s) => s?.id === speciesSlug || s?.slug === speciesSlug,
+        );
+        if (match?.nombre_cientifico) {
+          setScientificName(match.nombre_cientifico);
+        }
+      })
+      .catch((err) => {
+        console.warn('[AssetDetailView] getAllSpecies falló:', err);
+      });
+    return () => { cancelled = true; };
+  }, [asset, isPlantType]);
 
   // UX-19 (#286) 2026-05-27 — bug crítico operador: "después de que entro a
   // una planta es casi imposible salir de ahí el botón de cerrar no funciona".
@@ -490,15 +521,20 @@ export const AssetDetailView = () => {
 
   const name = asset.attributes?.name || asset.name || 'Sin nombre';
   const status = asset.attributes?.status || 'active';
-  // Bug 2026-05-18 operator (cubio recién creado): asset.attributes.created
-  // viene del server FarmOS post-sync. Para optimistic locales (recién creadas
-  // aún no sincronizadas), fallback a asset._createdAt (timestamp local en ms
-  // que AssetsDashboard setea con Date.now()). Si tampoco existe, usar 'hoy'.
+  // Bug 2026-06-20 operator: Invalid Date en Registro.
+  // asset.attributes.created viene del server FarmOS post-sync. Para optimistic locales
+  // (recién creadas aún no sincronizadas), fallback a asset._createdAt (timestamp local en ms).
+  // Si tampoco existe, usar null. Validamos que sea una fecha válida antes de formatear.
   const createdTs = asset.attributes?.created
     ? new Date(asset.attributes.created * 1000)
     : asset._createdAt
       ? new Date(asset._createdAt)
       : (asset._pending ? new Date() : null);
+
+  // Validar que la fecha sea válida; si no, usar null
+  const isValidDate = createdTs && !isNaN(createdTs.getTime()) && createdTs.getTime() > 0;
+  const formattedDate = isValidDate ? createdTs.toLocaleDateString() : 'Sin fecha';
+
   const isPlantType = (asset.asset_type || asset.type || '').includes('plant');
   const geoRaw = asset.attributes?.intrinsic_geometry;
   const geoWkt = typeof geoRaw === 'object' ? geoRaw?.value : geoRaw;
@@ -516,12 +552,13 @@ export const AssetDetailView = () => {
       className="fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-sm"
       onClick={clearSelectedAsset}
     >
-      <div className="w-full max-w-2xl bg-slate-900 h-full shadow-2xl flex flex-col" onClick={(e) => e.stopPropagation()}>
+      <div className="w-full max-w-2xl bg-[rgb(var(--c-surface-card))] h-full shadow-2xl flex flex-col" onClick={(e) => e.stopPropagation()}>
         {/* Header — UX-19 (#286) 2026-05-27: sticky para que el botón cerrar
             NUNCA se pierda cuando el operador scrolea contenido largo.
             Touch targets ampliados a 44x44 (iOS minimum) — eran ~32px.
-            aria-label explícito para screenreaders. */}
-        <div className="p-6 border-b border-slate-800 flex justify-between items-start bg-slate-900 sticky top-0 z-10">
+            aria-label explícito para screenreaders.
+            Bug 2026-06-20: Aplicar tema estándar de la app usando variables CSS. */}
+        <div className="p-6 border-b border-[rgb(var(--c-surface-border))] flex justify-between items-start bg-[rgb(var(--c-surface-card))] sticky top-0 z-10">
           <div className="min-w-0">
             <h2 className="text-2xl font-bold text-white truncate">{name}</h2>
             <p className="text-slate-500 text-xs font-mono">ID: {asset.id}</p>
@@ -549,12 +586,13 @@ export const AssetDetailView = () => {
             assetId={asset.id}
             speciesSlug={isPlantType ? deriveSpeciesSlug(name) : null}
             assetType={isPlantType ? 'plant' : asset.type?.replace('asset--', '') || 'default'}
+            scientificName={scientificName}
           />
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50">
               <span className="text-xs text-slate-500 flex items-center gap-1 italic mb-1"><Calendar size={12} /> Registro</span>
-              <p className="text-white text-sm font-medium">{createdTs ? createdTs.toLocaleDateString() : '—'}</p>
+              <p className="text-white text-sm font-medium">{formattedDate}</p>
             </div>
             <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50">
               <span className="text-xs text-slate-500 flex items-center gap-1 italic mb-1"><Activity size={12} /> Estado</span>

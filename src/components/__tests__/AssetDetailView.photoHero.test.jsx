@@ -117,4 +117,44 @@ describe('UX-26 — PhotoHeroSection integrada como hero', () => {
     }];
     mockState.lands = [];
   });
+
+  describe('Bug 2026-06-20 — Invalid Date en Registro', () => {
+    it('muestra "Sin fecha" cuando created es inválido', () => {
+      // Simular un asset con fecha inválida
+      mockState.plants[0].attributes = {
+        ...mockState.plants[0].attributes,
+        created: 'invalid-date',
+      };
+      render(<AssetDetailView />);
+      // Debería mostrar "Sin fecha" en lugar de "Invalid Date"
+      const registroElement = screen.getByText(/Registro/i).parentElement.querySelector('p');
+      expect(registroElement.textContent).toBe('Sin fecha');
+    });
+
+    it('muestra "Sin fecha" cuando no hay fecha disponible', () => {
+      // Simular un asset sin fecha
+      mockState.plants[0].attributes = {
+        ...mockState.plants[0].attributes,
+        created: null,
+        _createdAt: null,
+      };
+      delete mockState.plants[0]._createdAt;
+      render(<AssetDetailView />);
+      const registroElement = screen.getByText(/Registro/i).parentElement.querySelector('p');
+      expect(registroElement.textContent).toBe('Sin fecha');
+    });
+
+    it('formatea correctamente la fecha cuando es válida', () => {
+      // Simular un asset con fecha válida (timestamp Unix)
+      mockState.plants[0].attributes = {
+        ...mockState.plants[0].attributes,
+        created: 1704067200, // 2024-01-01 00:00:00 UTC
+      };
+      render(<AssetDetailView />);
+      const registroElement = screen.getByText(/Registro/i).parentElement.querySelector('p');
+      // La fecha formateada debe ser válida y no "Invalid Date"
+      expect(registroElement.textContent).not.toMatch(/Invalid/i);
+      expect(registroElement.textContent).not.toBe('Sin fecha');
+    });
+  });
 });

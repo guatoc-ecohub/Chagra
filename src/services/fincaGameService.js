@@ -250,7 +250,7 @@ export const MISSIONS = Object.freeze([
     id: 'aprender_ficha',
     titulo: 'Aprende sobre una planta',
     emoji: '📖',
-    descripcion: 'Descubrí una planta nueva en la biblioteca de Chagra.',
+    descripcion: 'Descubre una planta nueva en la biblioteca de Chagra.',
     cta: 'Ir a aprender',
     nav: 'ciclo',
     tipo: 'aprender',
