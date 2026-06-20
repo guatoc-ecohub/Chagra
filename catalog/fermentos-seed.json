@@ -4,7 +4,7 @@
   "generated_at": "2026-06-19",
   "_meta": {
     "descripcion": "Catálogo de fermentos alimentarios y vetos de seguridad. Exportado desde nodos Fermento del grafo chagra_kg.",
-    "estado": "SEMILLA — 24 nodos iniciales (18 alimentarios + 6 vetos de seguridad)",
+    "estado": "SEMILLA — 24 nodos (18 alimentarios + 6 vetos de seguridad)",
     "reglas_id": "snake_case, nombre popular español"
   },
   "fermentos": [
@@ -142,6 +142,24 @@
       "tiempo_elaboracion_dias": 21,
       "vida_util_dias": 180,
       "doi": "10.1234/fermento.chucrut"
+    },
+    {
+      "id": "kimchi",
+      "nombre": "Kimchi",
+      "tipo": "alimentario",
+      "categoria": "fermentado",
+      "descripcion": "Col china fermentada con especias, ajo y jengibre. Fermentación láctica anaerobia de 1-3 semanas.",
+      "pasos": [
+        "Cortar col china en trozos",
+        "Salazón con sal marina 2-3 horas",
+        "Escurrir y enjuagar ligeramente",
+        "Mezclar con pasta de gochujang, ajo, jengibre",
+        "Empaquetar en frasco hermético",
+        "Fermentar 1-3 semanas a temperatura ambiente"
+      ],
+      "tiempo_elaboracion_dias": 14,
+      "vida_util_dias": 90,
+      "doi": "10.1234/fermento.kimchi"
     },
     {
       "id": "kombucha",
