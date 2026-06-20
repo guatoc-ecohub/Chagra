@@ -22,6 +22,7 @@
  */
 
 import { CULTIVOS, ASOCIACIONES } from '../../services/milpaGameEngine';
+export { OCUPACION_CULTIVO, SLOTS_POR_PARCELA } from '../../services/milpaGameEngine';
 
 /**
  * Datos visuales y educativos de cada cultivo para la UI.
@@ -138,6 +139,22 @@ export const CULTIVOS_INFO = [
     ayuda: 'Protege a la cebolla de su plaga principal.',
   },
 ];
+
+/** Narrativa breve que aparece al sembrar cada cultivo. */
+export const CULTIVO_NARRATIVAS = Object.freeze({
+  [CULTIVOS.MAIZ]: 'El maíz crece alto y será la columna del fríjol 🌽',
+  [CULTIVOS.FRIJOL]: 'El fríjol trepa por el maíz y fija nitrógeno 💧',
+  [CULTIVOS.AHUYAMA]: 'La ahuyama cubre el suelo y frena la maleza 🎃',
+  [CULTIVOS.CAFE]: 'El café agradece sombra suave para producir mejor ☕',
+  [CULTIVOS.GUAMO]: 'El guamo da sombra, fija nitrógeno y deja mantillo 🌳',
+  [CULTIVOS.PLATANO]: 'El plátano protege temprano y también da cosecha 🍌',
+  [CULTIVOS.CACAO]: 'El cacao crece más sano con sombra viva alrededor 🍫',
+  [CULTIVOS.MATARRATON]: 'El matarratón alimenta el suelo y regula la sombra 🌿',
+  [CULTIVOS.FRUTAL]: 'El frutal produce arriba y deja espacio para cubrir abajo 🍊',
+  [CULTIVOS.MANI_FORRAJERO]: 'El maní forrajero tapiza el suelo y fija nitrógeno 🥜',
+  [CULTIVOS.CEBOLLA]: 'La cebolla protege con su aroma y confunde plagas 🧅',
+  [CULTIVOS.ZANAHORIA]: 'La zanahoria acompaña a la cebolla y reduce presión de moscas 🥕',
+});
 
 /** Mapa rápido id → cultivoInfo (para pintar parcelas). */
 export const CULTIVO_POR_ID = Object.freeze(

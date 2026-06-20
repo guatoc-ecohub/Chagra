@@ -5,10 +5,12 @@ import {
   crearParcela,
   crearJuego,
   sembrarEnParcela,
+  espaciosUsadosParcela,
   esAsociacionCompleta,
   esMilpaCompleta,
   diversidadParcela,
   identificarAsociacion,
+  describirAsociacionCompleta,
   nitrogenoFijado,
   coberturaSuelo,
   sombraParcela,
@@ -24,6 +26,7 @@ import {
   ASOCIACIONES,
   avanzarTemporada,
   verificarLogros,
+  SLOTS_POR_PARCELA,
 } from '../milpaGameEngine';
 
 /** Helper: parcela con los cultivos indicados. */
@@ -42,6 +45,20 @@ describe('milpaGameEngine — siembra', () => {
   it('ignora cultivos que no son válidos', () => {
     const p = sembrarEnParcela(crearParcela('1'), 'invalido');
     expect(p.cultivos).toEqual([]);
+  });
+
+  it('limita la siembra por espacios de parcela', () => {
+    let p = crearParcela('1');
+    p = sembrarEnParcela(p, CULTIVOS.MAIZ);
+    p = sembrarEnParcela(p, CULTIVOS.FRIJOL);
+    p = sembrarEnParcela(p, CULTIVOS.AHUYAMA);
+
+    expect(p.cultivos).toEqual([CULTIVOS.MAIZ, CULTIVOS.FRIJOL, CULTIVOS.AHUYAMA]);
+    expect(espaciosUsadosParcela(p)).toBe(SLOTS_POR_PARCELA);
+
+    const rechazada = sembrarEnParcela(p, CULTIVOS.CEBOLLA);
+    expect(rechazada.cultivos).toEqual([CULTIVOS.MAIZ, CULTIVOS.FRIJOL, CULTIVOS.AHUYAMA]);
+    expect(rechazada.motivo).toBe('no cabe');
   });
 
   it('cuenta la diversidad como número de cultivos distintos', () => {
@@ -69,6 +86,11 @@ describe('milpaGameEngine — siembra', () => {
     expect(
       identificarAsociacion(parcelaCon(CULTIVOS.CEBOLLA, CULTIVOS.ZANAHORIA)),
     ).toBe('hortalizas');
+  });
+
+  it('describe una asociación completa con una frase narrativa', () => {
+    expect(describirAsociacionCompleta('milpa')).toContain('Descubriste la Milpa');
+    expect(describirAsociacionCompleta('saf_cafe')).toContain('café');
   });
 
   it('reconoce asociaciones completas', () => {

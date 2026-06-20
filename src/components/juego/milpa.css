@@ -44,6 +44,28 @@
   100% { box-shadow: 0 0 0 0 rgba(163, 230, 53, 0); }
 }
 
+/* Celebración suave cuando se completa una asociación real. */
+.milpa-asociacion-completa {
+  animation: milpa-asociacion-completa 720ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes milpa-asociacion-completa {
+  0% {
+    transform: translateY(10px) scale(0.96);
+    opacity: 0;
+    box-shadow: 0 0 0 0 rgba(190, 242, 100, 0.55);
+  }
+  60% {
+    transform: translateY(0) scale(1.02);
+    opacity: 1;
+    box-shadow: 0 0 0 12px rgba(190, 242, 100, 0);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(190, 242, 100, 0);
+  }
+}
+
 /* Shake suave para eventos negativos (daño) */
 .milpa-shake {
   animation: milpa-shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
@@ -119,6 +141,7 @@
   .milpa-brota,
   .milpa-pulso,
   .milpa-resplandor,
+  .milpa-asociacion-completa,
   .milpa-shake,
   .milpa-deslizar-arriba,
   .milpa-fade-in,
