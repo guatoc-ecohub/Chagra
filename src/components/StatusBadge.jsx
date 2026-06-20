@@ -8,6 +8,9 @@ const StatusBadge = ({ status, type, editable = false, onChange, className = "" 
     const statuses = STATUS_MAP[type] || PLANT_STATUSES;
     const current = statuses.find(s => s.id === effectiveStatus) || statuses.find(s => s.id === 'unknown') || statuses[0];
 
+    // Theme-aware badges: usar tokens CSS en vez de estilos inline
+    const badgeThemeClass = `status-badge-${effectiveStatus}`;
+
     if (editable) {
         return (
             <div className={`relative inline-block ${className}`}>
@@ -22,8 +25,7 @@ const StatusBadge = ({ status, type, editable = false, onChange, className = "" 
                     ))}
                 </select>
                 <div
-                    className="px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center border border-white/10"
-                    style={{ backgroundColor: current.color, color: current.textColor }}
+                    className={`${badgeThemeClass} px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center border`}
                 >
                     {current.label}
                 </div>
@@ -33,8 +35,7 @@ const StatusBadge = ({ status, type, editable = false, onChange, className = "" 
 
     return (
         <div
-            className={`px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider inline-flex items-center justify-center border border-white/10 ${className}`}
-            style={{ backgroundColor: current.color, color: current.textColor }}
+            className={`${badgeThemeClass} px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider inline-flex items-center justify-center border ${className}`}
         >
             {current.label}
         </div>

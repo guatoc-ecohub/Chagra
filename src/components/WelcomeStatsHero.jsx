@@ -173,15 +173,15 @@ function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesT
 }
 
 const TONE_CLASSES = {
-  emerald: { text: 'text-emerald-400', bg: 'bg-emerald-950/40', border: 'border-emerald-800/60', accent: 'bg-emerald-500' },
-  cyan: { text: 'text-cyan-300', bg: 'bg-cyan-950/40', border: 'border-cyan-800/60', accent: 'bg-cyan-500' },
-  lime: { text: 'text-lime-300', bg: 'bg-lime-950/40', border: 'border-lime-800/60', accent: 'bg-lime-500' },
-  amber: { text: 'text-amber-300', bg: 'bg-amber-950/40', border: 'border-amber-800/60', accent: 'bg-amber-500' },
-  fuchsia: { text: 'text-fuchsia-300', bg: 'bg-fuchsia-950/40', border: 'border-fuchsia-800/60', accent: 'bg-fuchsia-500' },
-  sky: { text: 'text-sky-300', bg: 'bg-sky-950/40', border: 'border-sky-800/60', accent: 'bg-sky-500' },
-  orange: { text: 'text-orange-300', bg: 'bg-orange-950/40', border: 'border-orange-800/60', accent: 'bg-orange-500' },
-  violet: { text: 'text-violet-300', bg: 'bg-violet-950/40', border: 'border-violet-800/60', accent: 'bg-violet-500' },
-  yellow: { text: 'text-yellow-300', bg: 'bg-yellow-950/40', border: 'border-yellow-800/60', accent: 'bg-yellow-500' },
+  emerald: { text: 'hero-text-emerald', bg: 'hero-bg-emerald', border: 'hero-border-emerald', accent: 'hero-accent-emerald' },
+  cyan: { text: 'hero-text-cyan', bg: 'hero-bg-cyan', border: 'hero-border-cyan', accent: 'hero-accent-cyan' },
+  lime: { text: 'hero-text-lime', bg: 'hero-bg-lime', border: 'hero-border-lime', accent: 'hero-accent-lime' },
+  amber: { text: 'hero-text-amber', bg: 'hero-bg-amber', border: 'hero-border-amber', accent: 'hero-accent-amber' },
+  fuchsia: { text: 'hero-text-fuchsia', bg: 'hero-bg-fuchsia', border: 'hero-border-fuchsia', accent: 'hero-accent-fuchsia' },
+  sky: { text: 'hero-text-sky', bg: 'hero-bg-sky', border: 'hero-border-sky', accent: 'hero-accent-sky' },
+  orange: { text: 'hero-text-orange', bg: 'hero-bg-orange', border: 'hero-border-orange', accent: 'hero-accent-orange' },
+  violet: { text: 'hero-text-violet', bg: 'hero-bg-violet', border: 'hero-border-violet', accent: 'hero-accent-violet' },
+  yellow: { text: 'hero-text-yellow', bg: 'hero-bg-yellow', border: 'hero-border-yellow', accent: 'hero-accent-yellow' },
 };
 
 /**

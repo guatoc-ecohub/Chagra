@@ -42,13 +42,13 @@ function getLevel(confidence) {
 const LEVEL_CONFIG = {
     default: {
         text: 'beta',
-        classes: 'bg-slate-500/20 text-slate-400 border-slate-600/40',
+        classes: 'ai-badge-default',
         defaultTooltip: 'Respuesta generada por IA — verifica antes de actuar.',
         icon: null,
     },
     high: {
         text: 'verificado',
-        classes: 'bg-emerald-500/20 text-emerald-300 border-emerald-600/40',
+        classes: 'ai-badge-high',
         defaultTooltip: 'Alta confianza — respaldado por el catálogo Chagra.',
         // SVG inline check (sin lucide para no inflar bundle del badge)
         icon: (
@@ -59,7 +59,7 @@ const LEVEL_CONFIG = {
     },
     mid: {
         text: 'probable',
-        classes: 'bg-amber-500/20 text-amber-300 border-amber-600/40',
+        classes: 'ai-badge-mid',
         defaultTooltip: 'Confianza media — útil de referencia, contrasta con un técnico.',
         icon: (
             <svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -71,7 +71,7 @@ const LEVEL_CONFIG = {
     },
     low: {
         text: 'verifica',
-        classes: 'bg-rose-500/20 text-rose-300 border-rose-600/40',
+        classes: 'ai-badge-low',
         defaultTooltip: 'Baja confianza — respuesta generativa sin fuente clara. No actues sin verificar.',
         icon: (
             <svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">

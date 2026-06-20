@@ -640,3 +640,530 @@ html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
 [data-theme="nature"] .glaciar-estado-texto {
   color: rgb(var(--c-slate-200));
 }
+
+/* ===========================================================================
+ * 5. BADGES THEME-AWARE — StatusBadge, AltitudeBadge, AIBetaBadge
+ *    Reemplaza colores hardcodeados con tokens del tema para contraste correcto
+ *    en los 3 temas (bio-punk, minimalista, nature).
+ * =========================================================================== */
+
+/* StatusBadge: estados de plantas, tareas y plagas */
+.status-badge-seedling,
+.status-badge-growing {
+  background-color: rgb(var(--c-emerald-500) / 0.2);
+  color: rgb(var(--c-emerald-400));
+  border-color: rgb(var(--c-emerald-600) / 0.4);
+}
+[data-theme="minimalista"] .status-badge-seedling,
+[data-theme="minimalista"] .status-badge-growing,
+[data-theme="nature"] .status-badge-seedling,
+[data-theme="nature"] .status-badge-growing {
+  background-color: rgb(var(--c-emerald-500) / 0.25);
+  color: rgb(var(--c-emerald-700));
+  border-color: rgb(var(--c-emerald-600) / 0.5);
+}
+
+.status-badge-flowering {
+  background-color: rgb(249 168 212 / 0.2);
+  color: rgb(244 114 182);
+  border-color: rgb(236 72 153 / 0.4);
+}
+[data-theme="minimalista"] .status-badge-flowering,
+[data-theme="nature"] .status-badge-flowering {
+  background-color: rgb(250 210 230 / 0.3);
+  color: rgb(185 100 140);
+  border-color: rgb(220 150 190 / 0.5);
+}
+
+.status-badge-fruiting {
+  background-color: rgb(253 186 116 / 0.2);
+  color: rgb(251 146 60);
+  border-color: rgb(249 115 22 / 0.4);
+}
+[data-theme="minimalista"] .status-badge-fruiting,
+[data-theme="nature"] .status-badge-fruiting {
+  background-color: rgb(255 210 170 / 0.3);
+  color: rgb(200 120 40);
+  border-color: rgb(230 170 100 / 0.5);
+}
+
+.status-badge-harvested {
+  background-color: rgb(252 211 77 / 0.2);
+  color: rgb(250 204 21);
+  border-color: rgb(234 179 8 / 0.4);
+}
+[data-theme="minimalista"] .status-badge-harvested,
+[data-theme="nature"] .status-badge-harvested {
+  background-color: rgb(255 230 150 / 0.3);
+  color: rgb(180 130 20);
+  border-color: rgb(240 200 80 / 0.5);
+}
+
+.status-badge-dormant {
+  background-color: rgb(148 163 184 / 0.15);
+  color: rgb(148 163 184);
+  border-color: rgb(71 85 105 / 0.3);
+}
+[data-theme="minimalista"] .status-badge-dormant,
+[data-theme="nature"] .status-badge-dormant {
+  background-color: rgb(160 170 180 / 0.2);
+  color: rgb(100 110 120);
+  border-color: rgb(140 150 160 / 0.4);
+}
+
+.status-badge-dead {
+  background-color: rgb(239 68 68 / 0.2);
+  color: rgb(248 113 113);
+  border-color: rgb(220 38 38 / 0.4);
+}
+[data-theme="minimalista"] .status-badge-dead,
+[data-theme="nature"] .status-badge-dead {
+  background-color: rgb(252 180 180 / 0.4);
+  color: rgb(220 60 60);
+  border-color: rgb(240 100 100 / 0.6);
+}
+
+.status-badge-unknown {
+  background-color: rgb(100 116 139 / 0.15);
+  color: rgb(148 163 184);
+  border-color: rgb(71 85 105 / 0.3);
+}
+
+.status-badge-pending,
+.status-badge-cancelled,
+.status-badge-blocked {
+  background-color: rgb(100 116 139 / 0.15);
+  color: rgb(148 163 184);
+  border-color: rgb(71 85 105 / 0.3);
+}
+[data-theme="minimalista"] .status-badge-pending,
+[data-theme="minimalista"] .status-badge-cancelled,
+[data-theme="minimalista"] .status-badge-blocked,
+[data-theme="nature"] .status-badge-pending,
+[data-theme="nature"] .status-badge-cancelled,
+[data-theme="nature"] .status-badge-blocked {
+  background-color: rgb(140 150 160 / 0.2);
+  color: rgb(80 90 100);
+  border-color: rgb(120 130 140 / 0.4);
+}
+
+.status-badge-in_progress {
+  background-color: rgb(59 130 246 / 0.2);
+  color: rgb(96 165 250);
+  border-color: rgb(37 99 235 / 0.4);
+}
+[data-theme="minimalista"] .status-badge-in_progress,
+[data-theme="nature"] .status-badge-in_progress {
+  background-color: rgb(140 180 230 / 0.3);
+  color: rgb(60 110 180);
+  border-color: rgb(100 150 200 / 0.5);
+}
+
+.status-badge-completed {
+  background-color: rgb(var(--c-emerald-500) / 0.2);
+  color: rgb(var(--c-emerald-400));
+  border-color: rgb(var(--c-emerald-600) / 0.4);
+}
+[data-theme="minimalista"] .status-badge-completed,
+[data-theme="nature"] .status-badge-completed {
+  background-color: rgb(var(--c-emerald-500) / 0.25);
+  color: rgb(var(--c-emerald-700));
+  border-color: rgb(var(--c-emerald-600) / 0.5);
+}
+
+.status-badge-urgent {
+  background-color: rgb(239 68 68 / 0.2);
+  color: rgb(248 113 113);
+  border-color: rgb(220 38 38 / 0.4);
+}
+[data-theme="minimalista"] .status-badge-urgent,
+[data-theme="nature"] .status-badge-urgent {
+  background-color: rgb(252 180 180 / 0.4);
+  color: rgb(220 60 60);
+  border-color: rgb(240 100 100 / 0.6);
+}
+
+/* StatusBadge de plagas */
+.status-badge-reported {
+  background-color: rgb(252 211 77 / 0.2);
+  color: rgb(250 204 21);
+  border-color: rgb(234 179 8 / 0.4);
+}
+[data-theme="minimalista"] .status-badge-reported,
+[data-theme="nature"] .status-badge-reported {
+  background-color: rgb(255 230 150 / 0.3);
+  color: rgb(180 130 20);
+  border-color: rgb(240 200 80 / 0.5);
+}
+
+.status-badge-inspecting {
+  background-color: rgb(59 130 246 / 0.2);
+  color: rgb(96 165 250);
+  border-color: rgb(37 99 235 / 0.4);
+}
+[data-theme="minimalista"] .status-badge-inspecting,
+[data-theme="nature"] .status-badge-inspecting {
+  background-color: rgb(140 180 230 / 0.3);
+  color: rgb(60 110 180);
+  border-color: rgb(100 150 200 / 0.5);
+}
+
+.status-badge-treating {
+  background-color: rgb(249 115 22 / 0.2);
+  color: rgb(251 146 60);
+  border-color: rgb(234 88 12 / 0.4);
+}
+[data-theme="minimalista"] .status-badge-treating,
+[data-theme="nature"] .status-badge-treating {
+  background-color: rgb(255 200 150 / 0.3);
+  color: rgb(200 100 30);
+  border-color: rgb(230 160 100 / 0.5);
+}
+
+.status-badge-resolved {
+  background-color: rgb(var(--c-emerald-500) / 0.2);
+  color: rgb(var(--c-emerald-400));
+  border-color: rgb(var(--c-emerald-600) / 0.4);
+}
+[data-theme="minimalista"] .status-badge-resolved,
+[data-theme="nature"] .status-badge-resolved {
+  background-color: rgb(var(--c-emerald-500) / 0.25);
+  color: rgb(var(--c-emerald-700));
+  border-color: rgb(var(--c-emerald-600) / 0.5);
+}
+
+.status-badge-escalated {
+  background-color: rgb(239 68 68 / 0.2);
+  color: rgb(248 113 113);
+  border-color: rgb(220 38 38 / 0.4);
+}
+[data-theme="minimalista"] .status-badge-escalated,
+[data-theme="nature"] .status-badge-escalated {
+  background-color: rgb(252 180 180 / 0.4);
+  color: rgb(220 60 60);
+  border-color: rgb(240 100 100 / 0.6);
+}
+
+/* AltitudeBadge: pisos térmicos */
+.altitude-badge-neutral {
+  background-color: rgb(var(--c-slate-800) / 0.5);
+  color: rgb(var(--c-slate-400));
+  border-color: rgb(var(--c-slate-700));
+}
+[data-theme="minimalista"] .altitude-badge-neutral,
+[data-theme="nature"] .altitude-badge-neutral {
+  background-color: rgb(var(--c-surface-raised) / 0.6);
+  color: rgb(var(--c-slate-500));
+  border-color: rgb(var(--c-surface-border));
+}
+
+.altitude-badge-calido {
+  background-color: rgb(249 115 22 / 0.2);
+  color: rgb(251 146 60);
+  border-color: rgb(234 88 12 / 0.4);
+}
+[data-theme="minimalista"] .altitude-badge-calido,
+[data-theme="nature"] .altitude-badge-calido {
+  background-color: rgb(255 200 150 / 0.3);
+  color: rgb(200 100 30);
+  border-color: rgb(230 160 100 / 0.5);
+}
+
+.altitude-badge-templado {
+  background-color: rgb(251 191 36 / 0.2);
+  color: rgb(252 211 77);
+  border-color: rgb(245 158 11 / 0.4);
+}
+[data-theme="minimalista"] .altitude-badge-templado,
+[data-theme="nature"] .altitude-badge-templado {
+  background-color: rgb(255 230 150 / 0.3);
+  color: rgb(180 130 20);
+  border-color: rgb(240 200 80 / 0.5);
+}
+
+.altitude-badge-montano {
+  background-color: rgb(var(--c-emerald-500) / 0.2);
+  color: rgb(var(--c-emerald-400));
+  border-color: rgb(var(--c-emerald-600) / 0.4);
+}
+[data-theme="minimalista"] .altitude-badge-montano,
+[data-theme="nature"] .altitude-badge-montano {
+  background-color: rgb(var(--c-emerald-500) / 0.25);
+  color: rgb(var(--c-emerald-700));
+  border-color: rgb(var(--c-emerald-600) / 0.5);
+}
+
+.altitude-badge-paramo {
+  background-color: rgb(99 102 241 / 0.2);
+  color: rgb(129 140 248);
+  border-color: rgb(79 70 229 / 0.4);
+}
+[data-theme="minimalista"] .altitude-badge-paramo,
+[data-theme="nature"] .altitude-badge-paramo {
+  background-color: rgb(170 180 220 / 0.3);
+  color: rgb(80 90 140);
+  border-color: rgb(130 150 200 / 0.5);
+}
+
+/* AIBetaBadge: niveles de confianza */
+.ai-badge-default {
+  background-color: rgb(var(--c-slate-500) / 0.2);
+  color: rgb(var(--c-slate-400));
+  border-color: rgb(var(--c-slate-600) / 0.4);
+}
+[data-theme="minimalista"] .ai-badge-default,
+[data-theme="nature"] .ai-badge-default {
+  background-color: rgb(var(--c-surface-raised) / 0.4);
+  color: rgb(var(--c-slate-500));
+  border-color: rgb(var(--c-surface-border) / 0.6);
+}
+
+.ai-badge-high {
+  background-color: rgb(var(--c-emerald-500) / 0.2);
+  color: rgb(var(--c-emerald-400));
+  border-color: rgb(var(--c-emerald-600) / 0.4);
+}
+[data-theme="minimalista"] .ai-badge-high,
+[data-theme="nature"] .ai-badge-high {
+  background-color: rgb(var(--c-emerald-500) / 0.25);
+  color: rgb(var(--c-emerald-700));
+  border-color: rgb(var(--c-emerald-600) / 0.5);
+}
+
+.ai-badge-mid {
+  background-color: rgb(var(--c-amber-500) / 0.2);
+  color: rgb(var(--c-amber-400));
+  border-color: rgb(var(--c-amber-600) / 0.4);
+}
+[data-theme="minimalista"] .ai-badge-mid,
+[data-theme="nature"] .ai-badge-mid {
+  background-color: rgb(var(--c-amber-500) / 0.25);
+  color: rgb(var(--c-amber-700));
+  border-color: rgb(var(--c-amber-600) / 0.5);
+}
+
+.ai-badge-low {
+  background-color: rgb(244 63 94 / 0.2);
+  color: rgb(251 113 133);
+  border-color: rgb(225 29 72 / 0.4);
+}
+[data-theme="minimalista"] .ai-badge-low,
+[data-theme="nature"] .ai-badge-low {
+  background-color: rgb(255 180 190 / 0.4);
+  color: rgb(220 50 70);
+  border-color: rgb(240 100 120 / 0.6);
+}
+
+/* ===========================================================================
+ * 6. WELCOMESTATSHERO THEME-AWARE — cards de impacto "Chagra · impacto"
+ *    Reemplaza TONE_CLASSES hardcodeadas con clases theme-aware.
+ *    Ya existe infraestructura en themes.css (líneas 319-444), pero completamos
+ *    con clases adicionales para consistencia.
+ * =========================================================================== */
+
+/* Emerald: biodiversidad, plantas */
+.hero-text-emerald {
+  color: rgb(var(--c-emerald-400));
+}
+.hero-bg-emerald {
+  background-color: rgb(var(--c-emerald-950) / 0.4);
+}
+.hero-border-emerald {
+  border-color: rgb(var(--c-emerald-800) / 0.6);
+}
+.hero-accent-emerald {
+  background-color: rgb(var(--c-emerald-500));
+}
+
+/* Cyan: agua, riego */
+.hero-text-cyan {
+  color: rgb(6 182 212);
+}
+.hero-bg-cyan {
+  background-color: rgb(8 145 178 / 0.4);
+}
+.hero-border-cyan {
+  border-color: rgb(22 78 99 / 0.6);
+}
+.hero-accent-cyan {
+  background-color: rgb(6 182 212);
+}
+
+/* Lime: crecimiento */
+.hero-text-lime {
+  color: rgb(163 230 53);
+}
+.hero-bg-lime {
+  background-color: rgb(101 163 13 / 0.4);
+}
+.hero-border-lime {
+  border-color: rgb(82 82 82 / 0.6);
+}
+.hero-accent-lime {
+  background-color: rgb(163 230 53);
+}
+
+/* Amber: especies protegidas */
+.hero-text-amber {
+  color: rgb(var(--c-amber-400));
+}
+.hero-bg-amber {
+  background-color: rgb(var(--c-amber-950) / 0.4);
+}
+.hero-border-amber {
+  border-color: rgb(var(--c-amber-800) / 0.6);
+}
+.hero-accent-amber {
+  background-color: rgb(var(--c-amber-500));
+}
+
+/* Fuchsia: pueblos, cultura */
+.hero-text-fuchsia {
+  color: rgb(232 121 249);
+}
+.hero-bg-fuchsia {
+  background-color: rgb(192 38 211 / 0.4);
+}
+.hero-border-fuchsia {
+  border-color: rgb(157 23 77 / 0.6);
+}
+.hero-accent-fuchsia {
+  background-color: rgb(232 121 249);
+}
+
+/* Sky: fuentes, documentos */
+.hero-text-sky {
+  color: rgb(125 211 252);
+}
+.hero-bg-sky {
+  background-color: rgb(12 74 110 / 0.4);
+}
+.hero-border-sky {
+  border-color: rgb(30 64 175 / 0.6);
+}
+.hero-accent-sky {
+  background-color: rgb(14 165 233);
+}
+
+/* Orange: invasoras, alertas */
+.hero-text-orange {
+  color: rgb(253 186 116);
+}
+.hero-bg-orange {
+  background-color: rgb(194 65 12 / 0.4);
+}
+.hero-border-orange {
+  border-color: rimrgb(154 52 18 / 0.6);
+}
+.hero-accent-orange {
+  background-color: rgb(249 115 22);
+}
+
+/* Violet: offline, privacidad */
+.hero-text-violet {
+  color: rgb(196 181 253);
+}
+.hero-bg-violet {
+  background-color: rgb(109 40 217 / 0.4);
+}
+.hero-border-violet {
+  border-color: rgb(91 33 182 / 0.6);
+}
+.hero-accent-violet {
+  background-color: rgb(139 92 246);
+}
+
+/* Yellow: biopreparados */
+.hero-text-yellow {
+  color: rgb(254 240 138);
+}
+.hero-bg-yellow {
+  background-color: rgb(161 98 7 / 0.4);
+}
+.hero-border-yellow {
+  border-color: rgb(143 96 29 / 0.6);
+}
+.hero-accent-yellow {
+  background-color: rgb(250 204 21);
+}
+
+/* Overlays para temas claros: colapsar colores oscuros a surfaces del tema */
+[data-theme="minimalista"] .hero-bg-cyan,
+[data-theme="minimalista"] .hero-bg-lime,
+[data-theme="minimalista"] .hero-bg-fuchsia,
+[data-theme="minimalista"] .hero-bg-sky,
+[data-theme="minimalista"] .hero-bg-orange,
+[data-theme="minimalista"] .hero-bg-violet,
+[data-theme="minimalista"] .hero-bg-yellow,
+[data-theme="nature"] .hero-bg-cyan,
+[data-theme="nature"] .hero-bg-lime,
+[data-theme="nature"] .hero-bg-fuchsia,
+[data-theme="nature"] .hero-bg-sky,
+[data-theme="nature"] .hero-bg-orange,
+[data-theme="nature"] .hero-bg-violet,
+[data-theme="nature"] .hero-bg-yellow {
+  background-color: rgb(var(--c-surface-raised)) !important;
+}
+
+[data-theme="minimalista"] .hero-border-cyan,
+[data-theme="minimalista"] .hero-border-lime,
+[data-theme="minimalista"] .hero-border-fuchsia,
+[data-theme="minimalista"] .hero-border-sky,
+[data-theme="minimalista"] .hero-border-orange,
+[data-theme="minimalista"] .hero-border-violet,
+[data-theme="minimalista"] .hero-border-yellow,
+[data-theme="nature"] .hero-border-cyan,
+[data-theme="nature"] .hero-border-lime,
+[data-theme="nature"] .hero-border-fuchsia,
+[data-theme="nature"] .hero-border-sky,
+[data-theme="nature"] .hero-border-orange,
+[data-theme="nature"] .hero-border-violet,
+[data-theme="nature"] .hero-border-yellow {
+  border-color: rgb(var(--c-surface-border)) !important;
+}
+
+[data-theme="minimalista"] .hero-text-cyan,
+[data-theme="minimalista"] .hero-text-lime,
+[data-theme="minimalista"] .hero-text-fuchsia,
+[data-theme="minimalista"] .hero-text-sky,
+[data-theme="minimalista"] .hero-text-orange,
+[data-theme="minimalista"] .hero-text-violet,
+[data-theme="minimalista"] .hero-text-yellow,
+[data-theme="nature"] .hero-text-cyan,
+[data-theme="nature"] .hero-text-lime,
+[data-theme="nature"] .hero-text-fuchsia,
+[data-theme="nature"] .hero-text-sky,
+[data-theme="nature"] .hero-text-orange,
+[data-theme="nature"] .hero-text-violet,
+[data-theme="nature"] .hero-text-yellow {
+  color: rgb(var(--c-emerald-400)) !important;
+  text-shadow: none !important;
+}
+
+/* Nature: usar verde más profundo para contraste sobre crema */
+[data-theme="nature"] .hero-text-cyan,
+[data-theme="nature"] .hero-text-lime,
+[data-theme="nature"] .hero-text-fuchsia,
+[data-theme="nature"] .hero-text-sky,
+[data-theme="nature"] .hero-text-orange,
+[data-theme="nature"] .hero-text-violet,
+[data-theme="nature"] .hero-text-yellow {
+  color: rgb(var(--c-emerald-700)) !important;
+}
+
+[data-theme="minimalista"] .hero-accent-cyan,
+[data-theme="minimalista"] .hero-accent-lime,
+[data-theme="minimalista"] .hero-accent-fuchsia,
+[data-theme="minimalista"] .hero-accent-sky,
+[data-theme="minimalista"] .hero-accent-orange,
+[data-theme="minimalista"] .hero-accent-violet,
+[data-theme="minimalista"] .hero-accent-yellow,
+[data-theme="nature"] .hero-accent-cyan,
+[data-theme="nature"] .hero-accent-lime,
+[data-theme="nature"] .hero-accent-fuchsia,
+[data-theme="nature"] .hero-accent-sky,
+[data-theme="nature"] .hero-accent-orange,
+[data-theme="nature"] .hero-accent-violet,
+[data-theme="nature"] .hero-accent-yellow {
+  background-color: rgb(var(--c-emerald-400)) !important;
+}
