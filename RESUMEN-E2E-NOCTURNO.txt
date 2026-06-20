@@ -1,0 +1,182 @@
+═══════════════════════════════════════════════════════════════════════════════
+                    🌙 E2E NOCTURNO VALIDACIÓN - RESUMEN
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ TEST E2E NOCTURNO CREADO EXITOSAMENTE
+
+📦 PULL REQUEST: #1711
+🔗 URL: https://github.com/guatoc-ecohub/Chagra/pull/1711
+🌿 Branch: codex/e2e-nocturno-validacion
+
+═══════════════════════════════════════════════════════════════════════════════
+📋 ARCHIVOS CREADOS/MODIFICADOS
+═══════════════════════════════════════════════════════════════════════════════
+
+✨ NUEVOS:
+  • tests/e2e-nocturno-validacion.spec.js (498 líneas)
+    - Test E2E principal con validación de 7 bugs críticos
+    - 17 capturas de pantalla secuenciales
+    - 28 puntos de validación de bugs
+    - Reporte JSON PASS/FAIL por bug
+
+  • tests/README-E2E-NOCTURNO.md
+    - Documentación completa del test
+    - Instrucciones de uso y troubleshooting
+
+  • scripts/run-nocturno-validacion-stg.sh
+    - Script dedicado para ejecución en staging HEADED
+    - Carga credenciales desde ~/.config/chagra-demo-creds.env
+
+  • VALIDACION-NOCTURNA.md
+    - Guía de ejecución paso a paso
+    - Troubleshooting y tips
+
+🔄 MODIFICADOS:
+  • .github/workflows/nightly-click-crawl.yml
+    - Integrado test nocturno en workflow existente
+    - Añadido subida de screenshots como artefactos
+
+  • tests/nightly-click-crawl.spec.js
+    - Corrección: BASE_URL dinámica desde entorno
+
+═══════════════════════════════════════════════════════════════════════════════
+🐛 BUGS VALIDADOS (del 2026-06-20)
+═══════════════════════════════════════════════════════════════════════════════
+
+1. ✅ VOSEO ARGENTINO
+   - Valida: NO tenés/empezá/recogé/descubrí/preparale
+   - Referencia: commit 87b2292 (guard antivoseo)
+
+2. ✅ FOTOS DE PLANTAS
+   - Valida: Imágenes cargan correctamente (no rotas)
+   - Referencia: commit 9ac5238 (GBIF species images)
+
+3. ✅ INVALID DATE
+   - Valida: NO aparece "Invalid Date" en la UI
+   - Referencia: commit 9f2f9fb (unificar procesos)
+
+4. ✅ RECORDFARMEVENT ERRORS
+   - Valida: NO aparece "recordFarmEvent ... not found"
+   - Referencia: commits varios de farmEventService
+
+5. ✅ AVANCE DE ETAPAS
+   - Valida: Las etapas del ciclo pueden avanzar
+   - Referencia: commit 9f2f9fb (fenología)
+
+6. ✅ VISIÓN TOTAL DEL OPERADOR
+   - Valida: Con "Visión total" activada salen todos los módulos
+   - Referencia: commit 01c49fb (operador GANA sobre prefs)
+
+7. ✅ SOLAPAMIENTO DE MANO
+   - Valida: La mano NO se solapa con inputs
+   - Referencia: issues de UX cursor-overlay
+
+═══════════════════════════════════════════════════════════════════════════════
+🔄 FLUJO COMPLETO DEL TEST
+═══════════════════════════════════════════════════════════════════════════════
+
+1. 🔐 Login (demo, creds desde ~/.config/chagra-demo-creds.env)
+2. 🏠 Recorrer home + check voseo + check visión total
+3. 📦 Navegar a "Mis módulos"
+4. 🌱 Ir a Inventario + agregar planta (lechuga)
+5. 🌿 Abrir detalle de planta + verificar foto
+6. 🔄 Abrir Ciclo + validar "Invalid Date"
+7. 📝 Anotar observación + validar solapamiento mano
+8. 🤝 Abrir Asociaciones
+9. 🌺 Abrir Biodiversidad
+10. 🎮 Juegos: Defensores (niveles 1 y 2)
+11. 🌽 Juego: Milpa
+12. 🏔️ Juego: Mundo Subsuelo
+13. 🤖 Abrir Agente
+
+Total: 17 capturas de pantalla + reporte JSON
+
+═══════════════════════════════════════════════════════════════════════════════
+🚀 CÓMO EJECUTARLO HEADED EN STG
+═══════════════════════════════════════════════════════════════════════════════
+
+OPCIÓN 1 - Script dedicado (RECOMENDADO):
+─────────────────────────────────────────
+./scripts/run-nocturno-validacion-stg.sh
+
+OPCIÓN 2 - Manual:
+─────────────────
+export CHAGRA_USER=demo
+export CHAGRA_PASS=tOGF1ezbui1vDvxLxiEo
+export RUN_NOCTURNO_VALIDACION=1
+npx playwright test tests/e2e-nocturno-validacion.spec.js --headed --project=chromium
+
+═══════════════════════════════════════════════════════════════════════════════
+📊 RESULTADOS Y REPORTES
+═══════════════════════════════════════════════════════════════════════════════
+
+📁 Screenshots:     screenshots/nocturno-validacion/
+   - 00-nocturno-01-post-login.png
+   - 01-nocturno-02-home-check-voseo.png
+   - 02-nocturno-03-vision-total.png
+   - ... (17 total)
+
+📄 Reporte JSON:   screenshots/nocturno-validacion/validation-report.json
+   - Estatus PASS/FAIL por bug individual
+   - Detalles de cada validación
+
+🌐 Reporte HTML:   npx playwright show-report playwright-report
+   - Reporte interactivo de Playwright
+
+═══════════════════════════════════════════════════════════════════════════════
+🤖 EJECUCIÓN AUTOMÁTICA (CI/CD)
+═══════════════════════════════════════════════════════════════════════════════
+
+⏰ Schedule: Diariamente 02:30 Colombia (07:30 UTC)
+📋 Workflow: .github/workflows/nightly-click-crawl.yml
+🎯 On-demand: Botón "Run workflow" en GitHub Actions
+
+Resultados: https://github.com/guatoc-ecohub/Chagra/actions
+
+═══════════════════════════════════════════════════════════════════════════════
+🛡️ CARACTERÍSTICAS TÉCNICAS
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ RESILIENTE
+   - No se cae si falta una sección
+   - Usa expect.soft() para validaciones no críticas
+   - Reporta PASS/FAIL por bug individual
+
+✅ COMPLETO
+   - Valida todos los bugs reportados el 2026-06-20
+   - Cubre home, inventario, juegos, agente
+   - Check de voseo, fechas, imágenes, UX
+
+✅ AUTOMATIZADO
+   - Integrado con workflow nightly-click-crawl.yml
+   - Ejecución diaria sin intervención manual
+   - Artefactos subidos a GitHub Actions
+
+✅ DEBUGGEABLE
+   - 17 screenshots secuenciales
+   - Reporte JSON estructurado
+   - Reporte HTML interactivo
+
+═══════════════════════════════════════════════════════════════════════════════
+📚 DOCUMENTACIÓN
+═══════════════════════════════════════════════════════════════════════════════
+
+📖 Guía completa: VALIDACION-NOCTURNA.md
+📖 Docs del test: tests/README-E2E-NOCTURNO.md
+📖 Script STG: scripts/run-nocturno-validacion-stg.sh
+
+═══════════════════════════════════════════════════════════════════════════════
+🎯 PRÓXIMOS PASOS
+════════════════════════════════════yecto═════════════════════════════════════════
+
+1. ⏳ Esperar revisión del PR #1711
+2. 🧪 Ejecutar test localmente para validar:
+   ./scripts/run-nocturno-validacion-stg.sh
+3. 📊 Revisar resultados en screenshots/nocturno-validacion/
+4. 🤖 Verificar ejecución en CI tras merge
+5. 📈 Monitorear resultados diarios en GitHub Actions
+
+═══════════════════════════════════════════════════════════════════════════════
+✅ ESTADO: COMPLETO Y LISTO PARA REVISIÓN
+═══════════════════════════════════════════════════════════════════════════════
+

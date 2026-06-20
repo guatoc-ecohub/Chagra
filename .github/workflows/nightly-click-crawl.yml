@@ -44,10 +44,21 @@ jobs:
           VITE_FARMOS_URL: ''
           VITE_FARMOS_CLIENT_ID: farm
 
+      - name: Run E2E nocturno validación
+        run: npm run test:e2e -- tests/e2e-nocturno-validacion.spec.js
+        env:
+          CI: '1'
+          RUN_NOCTURNO_VALIDACION: '1'
+          PLAYWRIGHT_BASE_URL: 'http://localhost:5173'
+          CHAGRA_USER: ${{ secrets.CHAGRA_USER || 'demo' }}
+          CHAGRA_PASS: ${{ secrets.CHAGRA_PASS }}
+
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: nightly-click-crawl-report
-          path: playwright-report/
+          path: |
+            playwright-report/
+            screenshots/nocturno-validacion/
           retention-days: 14
