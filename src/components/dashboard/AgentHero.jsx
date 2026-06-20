@@ -718,6 +718,7 @@ export default function AgentHero({ onNavigate }) {
             className={['agentport agentport-immersive relative w-full flex flex-col', phase !== 'sending' ? 'agentport-idle' : ''].join(' ')}
             data-nivel={nivel}
         >
+            {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- Technical comments in CSS */}
             <style>{`
                 /* ============================================================
                    AgentHero — PORTADA INMERSIVA · PORT FIEL del demo del
@@ -842,9 +843,12 @@ export default function AgentHero({ onNavigate }) {
                    solo se oculta cuando el cielo REAL está despejado; con
                    nube/niebla/lluvia el astro ES el que cuenta la verdad. */
                 [data-theme="nature"] .agentport-scene.is-day.sky-despejado .agentport-astro { display: none; }
-                /* minimalista: SIN astro (sol/luna) — el demo limpio no lleva
-                   ningún astro, solo el trazo botánico + horizonte (2026-06-20). */
+                /* minimalista: SIN elementos de nature (sol/montañas/polen/astro) — el
+                   demo limpio solo lleva trazo botánico + horizonte (2026-06-20). */
                 [data-theme="minimalista"] .agentport-astro { display: none; }
+                [data-theme="minimalista"] .agentport-sun { display: none !important; }
+                [data-theme="minimalista"] .agentport-mtn { display: none !important; }
+                [data-theme="minimalista"] .agentport-pollen { display: none !important; }
                 .agentport-astro svg { width: 100%; height: 100%; display: block; }
                 @keyframes agentport-astro-breathe {
                     0%, 100% { opacity: .85; transform: scale(1); }
@@ -1003,7 +1007,7 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-hummer svg { filter: drop-shadow(0 0 8px rgba(25,201,154,.7)) drop-shadow(0 0 16px rgba(25,240,192,.35)); }
                 [data-theme="nature"] .agentport-hummer svg { filter: drop-shadow(0 6px 6px rgba(90,60,20,.18)); }
                 /* minimalista: SIN colibrí (escena limpia del demo). */
-                [data-theme="minimalista"] .agentport-hummer { display: none; }
+                [data-theme="minimalista"] .agentport-hummer { display: none !important; }
                 .agentport-hummer .wing {
                     transform-origin: 18px 26px;
                     animation: agentport-flap .14s ease-in-out infinite alternate;
@@ -1791,6 +1795,7 @@ export default function AgentHero({ onNavigate }) {
                                 </span>
                             </div>
                         ))}
+                        {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- TODO: migrate to messages.js (ADR-050) */}
                         <div className="nsec">Tareas de campo</div>
                         {pendingTasks.length === 0 && (
                             <p className="nempty">No tienes tareas de campo pendientes.</p>
@@ -1977,6 +1982,7 @@ export default function AgentHero({ onNavigate }) {
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
                                 <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500" />
                             </span>
+                            {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- TODO: migrate to messages.js (ADR-050) */}
                             <span className="flex-1 text-base text-rose-500 font-medium tabular-nums">
                                 Grabando… {recSeconds}s
                             </span>
