@@ -6,6 +6,8 @@ import { newId } from '../utils/id';
 import { savePayload, updatePayload } from '../services/payloadService';
 import { getAccessToken } from '../services/authService';
 import { markHadData } from '../services/emptyDbDetector';
+import { friendlyMessage } from '../utils/friendlyErrors';
+import { MSG } from '../config/messages';
 
 /** @typedef {import('../types').ChagraAsset} ChagraAsset */
 /** @typedef {import('../types').ChagraLog} ChagraLog */
@@ -198,8 +200,23 @@ const useAssetStore = create((set, get) => ({
       onProgress?.({ ...syncProgress, isComplete: true });
     } catch (err) {
       console.error('Error sincronizando activos:', err);
-      syncProgress.error = err.message;
-      set({ error: err.message, isLoading: false, syncProgress: { ...syncProgress } });
+      // NUNCA mostrar el mensaje crudo al operador (bug demo 2026-06-19: tras el
+      // login aparecía un banner rojo con el texto técnico "Token no disponible."
+      // cuando un sync corría en la ventana en que el access token estaba
+      // expirado / siendo refrescado, o antes de que el token quedara
+      // persistido). Casos:
+      //   - "Token no disponible." (apiService cuando getAccessToken() da null):
+      //     no es un error real para el operador — es estado de auth transitorio.
+      //     El interceptor 401/403 (apiService) ya renueva o despacha
+      //     'chagra:session-expired'. Aquí NO pintamos banner rojo: dejamos el
+      //     estado de carga limpio y los datos locales (offline-first) en pantalla.
+      //   - Cualquier otro fallo (red, 5xx, validación): mapear a copy amable
+      //     con friendlyMessage en vez de exponer el mensaje técnico crudo.
+      const raw = err?.message || '';
+      const isAuthTransient = /token no disponible/i.test(raw);
+      const friendly = isAuthTransient ? null : friendlyMessage(err);
+      syncProgress.error = friendly;
+      set({ error: friendly, isLoading: false, syncProgress: { ...syncProgress } });
     }
   },
 
@@ -520,7 +537,7 @@ const useAssetStore = create((set, get) => ({
         type: 'log--input',
         id: logId,
         attributes: {
-          name: inputData.name || 'Aplicación de insumo',
+          name: inputData.name || MSG.aplicacion.defaultNombreInsumo,
           timestamp,
           status: 'done',
           notes: inputData.notes

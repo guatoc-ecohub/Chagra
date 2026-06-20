@@ -70,6 +70,7 @@ const messages = {
   aplicacion: {
     registrar: 'Registrar aplicacion',
     conProducto: 'Aplicacion: {product}',
+    defaultNombreInsumo: 'Aplicación de insumo',
   },
   status: {
     cargando: 'Cargando...',
@@ -92,6 +93,7 @@ const messages = {
     finca: 'Finca',
     configuracion: 'Configuracion',
     cerrarSesion: 'Cerrar sesion',
+    perfilActivo: 'Perfil activo',
   },
   confirm: {
     eliminarItem: 'Esta seguro de eliminar este elemento?',
@@ -154,6 +156,21 @@ const messages = {
     errorTimeout: 'Tiempo agotado esperando al GPS (30s). En iPhone, el GPS puede tardar más al aire libre — espera unos segundos y vuelve a tocar "Mi ubicación".',
     confirmarAbastecer: 'Confirmar',
     registrando: 'Registrando…',
+  },
+  // Strings de la pantalla de Perfil (ADR-050 i18n). Extraídos al añadir el
+  // selector de perfil + override del operador (2026-06-19) para mantener el
+  // archivo libre de hardcodeos (chagra-i18n/no-hardcoded-spanish).
+  perfilScreen: {
+    rolOperadorCampo: 'Operador de Campo',
+    tituloPantalla: 'Perfil de Usuario',
+    agregarFotoPerfil: 'Agregar foto de perfil',
+    agregarFoto: 'Agregar foto',
+    ubicacionDesc: 'Mapa, piso térmico y cultivos de tu zona',
+    guardarCambios: 'Guardar cambios',
+    telemetriaVozDesc: 'Registrar eventos del pipeline de voz',
+    telemetriaAgenteDesc: 'Ayuda a mejorar el agente. Desactivado por defecto.',
+    fincaActivaLabel: 'Finca activa:',
+    guardar: 'Guardar',
   },
   format,
 };
