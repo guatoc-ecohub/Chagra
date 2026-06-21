@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ChevronLeft, Sprout, Mic, RotateCcw, AlertTriangle } from 'lucide-react';
+import { ChevronLeft, Sprout, Mic, RotateCcw, AlertTriangle, Beaker } from 'lucide-react';
 import { listFarmProcesses, hydrateCyclesFromFarmOS } from '../db/farmProcessCache';
 import { getProfile } from '../services/userProfileService';
 import DailyTasksView from './DailyTasksView';
@@ -134,9 +134,30 @@ export default function CicloCultivoScreen({ onBack, onNavigate }) {
           >
             <Mic size={18} /> Registrar por voz
           </button>
+          {/* Conexión con el módulo Germinación: invitar a probar la semilla
+              ANTES de sembrar, para no perder trabajo con semilla muerta. */}
+          <button
+            onClick={() => onNavigate?.('germinacion')}
+            className="px-5 py-2.5 min-h-[44px] bg-slate-800 hover:bg-slate-700 border border-sky-700/40 text-slate-200 rounded-xl font-bold text-sm flex items-center gap-2"
+          >
+            <Beaker size={16} className="text-sky-300" /> Haz una prueba de germinación primero
+          </button>
         </div>
       ) : (
         <div className="px-4 pb-10 flex flex-col gap-3">
+          {/* Atajo al módulo Germinación: ¿vas a sembrar otro lote? Prueba la
+              semilla primero. Disponible aunque ya tengas ciclos activos. */}
+          {onNavigate ? (
+            <button
+              type="button"
+              onClick={() => onNavigate('germinacion')}
+              className="w-full text-left bg-sky-900/20 border border-sky-700/40 hover:border-sky-600/60 rounded-xl p-3 flex items-center gap-2.5 text-sm text-sky-100"
+            >
+              <Beaker size={16} className="text-sky-300 shrink-0" />
+              <span className="flex-1">¿Vas a sembrar otro lote? Hazle primero una prueba de germinación.</span>
+              <ChevronLeft size={16} className="text-sky-400/70 rotate-180 shrink-0" />
+            </button>
+          ) : null}
           {/* Digest "para hoy": labores urgentes agregadas de todos los ciclos. */}
           <DailyTasksView processes={cycles} />
           <ul className="flex flex-col gap-2">

@@ -90,6 +90,7 @@ const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
 const PlantaPorVozScreen = lazy(() => import('./components/PlantaPorVozScreen'));
 const ProcesosPorVozScreen = lazy(() => import('./components/ProcesosPorVozScreen'));
 const CicloCultivoScreen = lazy(() => import('./components/CicloCultivoScreen'));
+const GerminacionScreen = lazy(() => import('./components/GerminacionScreen'));
 const SeguimientoProcesoScreen = lazy(() => import('./components/SeguimientoProcesoScreen'));
 const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
 const CromatografiaScreen = lazy(() => import('./components/CromatografiaScreen'));
@@ -186,6 +187,7 @@ const HASH_VIEW_ROUTES = {
   'glaciar-historial': 'glaciar_historial',
   fermentos: 'fermentos',
   cromatografia: 'cromatografia',
+  germinacion: 'germinacion',
   animales: 'animales',
   'animales-gallinas': 'animales_gallinas',
   'animales-abejas': 'animales_abejas',
@@ -202,7 +204,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas',
   'hoy_finca', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'suelo', 'toxicologia',
+  'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'germinacion', 'suelo', 'toxicologia',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia',
 ]);
@@ -1178,6 +1180,22 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Ciclo de Cultivo">
               <CicloCultivoScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'germinacion':
+        // Módulo GERMINACIÓN: guía de la prueba casera (papel/algodón húmedo) +
+        // registro con cálculo del % de germinación e historial local. Enlaza
+        // con el ciclo (sembrar tras probar la semilla). Días de referencia
+        // tomados de las plantillas fenológicas reales — nunca inventados.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Germinacion">
+              <GerminacionScreen
+                onBack={() => navigate('dashboard')}
+                onHome={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
             </ErrorFallback>
           </ErrorBoundary>
         );
