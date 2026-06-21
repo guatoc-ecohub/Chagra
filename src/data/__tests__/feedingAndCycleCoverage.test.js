@@ -88,7 +88,8 @@ describe('Cobertura plan de alimentación + ciclo por especie (catálogo real)',
 
     // Tripwire de cobertura: si cae por debajo del piso conocido, algo se rompió.
     // (Sube estos pisos cuando agregues plantillas perennes/medicinales.)
-    expect(feed.explicit + feed.generic, 'cobertura nutrición').toBeGreaterThanOrEqual(104);
+    // Tras añadir frutales_perennes + arboles_sombra la nutrición sube a ~177.
+    expect(feed.explicit + feed.generic, 'cobertura nutrición').toBeGreaterThanOrEqual(174);
     expect(cyc.specific + cyc.generic, 'cobertura ciclo').toBeGreaterThanOrEqual(101);
   });
 
