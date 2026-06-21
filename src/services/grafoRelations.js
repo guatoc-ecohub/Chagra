@@ -134,6 +134,9 @@ export async function getNombresComunesRegionales(speciesId) {
  * sidecar (`get_subgrafo_relacional`), para inyectarse en el system prompt del
  * agente cuando NO hay red. Devuelve '' si no hay datos (no-op en el prompt).
  *
+ * Filtra relaciones marcadas como disputed (campo disputed===true) para evitar
+ * inyectar información disputada al prompt del LLM.
+ *
  * @param {string} speciesId
  * @returns {Promise<string>}
  */
@@ -156,13 +159,17 @@ export async function buildOfflineGroundingBlock(speciesId) {
   }
   if (Array.isArray(rel.pest_controllers) && rel.pest_controllers.length) {
     for (const pc of rel.pest_controllers) {
-      if (pc && pc.plaga && Array.isArray(pc.controladores) && pc.controladores.length) {
+      // Filtrar relaciones disputed
+      if (pc && pc.plaga && !pc.disputed && Array.isArray(pc.controladores) && pc.controladores.length) {
         lines.push(`- Plaga "${pc.plaga}" → controladores: ${pc.controladores.join(', ')}.`);
       }
     }
   }
   if (Array.isArray(rel.biopreparados) && rel.biopreparados.length) {
-    const nombres = rel.biopreparados.map((b) => b.nombre || b.id).filter(Boolean);
+    const nombres = rel.biopreparados
+      .filter((b) => !b.disputed) // Filtrar biopreparados disputed
+      .map((b) => b.nombre || b.id)
+      .filter(Boolean);
     if (nombres.length) lines.push(`- Biopreparados: ${nombres.join(', ')}.`);
   }
 

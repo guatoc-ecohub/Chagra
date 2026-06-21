@@ -131,4 +131,50 @@ describe('grafoRelations — loader offline del grafo', () => {
     expect(a).toBe(b);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
+
+  it('filtra relaciones disputed del grounding offline', async () => {
+    const FIXTURE_WITH_DISPUTED = {
+      _meta: { schema_version: 1, species_count: 1 },
+      species: {
+        theobroma_cacao: {
+          nombre_comun: 'Cacao',
+          nombre_cientifico: 'Theobroma cacao L.',
+          conservation_status: 'cultivo_comun',
+          pest_controllers: [
+            {
+              plaga: 'moniliasis del cacao',
+              controladores: ['Bacteria antagonista (biofungicida)', 'Hongo antagonista del suelo'],
+              disputed: true, // Esta relación está en disputa
+            },
+            {
+              plaga: 'escoba de bruja cacao',
+              controladores: ['Bacteria antagonista (biofungicida)'],
+              disputed: false, // Esta relación NO está en disputa
+            },
+          ],
+          biopreparados: [
+            { id: 'emulsion_nim', nombre: 'Aceite/emulsión de nim (neem)', disputed: false },
+            { id: 'biopreparado_disputado', nombre: 'Biopreparado disputado', disputed: true },
+          ],
+        },
+      },
+    };
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(FIXTURE_WITH_DISPUTED)));
+
+    const bloque = await mod.buildOfflineGroundingBlock('theobroma_cacao');
+
+    // Verificar que el bloque NO esté vacío (hay relaciones no disputadas)
+    expect(bloque).not.toBe('');
+    expect(bloque).toContain('RELACIONES DEL GRAFO (offline) — Cacao:');
+
+    // Verificar que la relación disputada NO aparezca
+    expect(bloque).not.toContain('moniliasis del cacao');
+    expect(bloque).not.toContain('Biopreparado disputado');
+
+    // Verificar que la relación NO disputada SÍ aparezca
+    expect(bloque).toContain('escoba de bruja cacao');
+    expect(bloque).toContain('Bacteria antagonista (biofungicida)');
+    expect(bloque).toContain('Aceite/emulsión de nim (neem)');
+  });
 });
