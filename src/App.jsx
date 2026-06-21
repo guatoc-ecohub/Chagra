@@ -91,6 +91,7 @@ const ProcesosPorVozScreen = lazy(() => import('./components/ProcesosPorVozScree
 const CicloCultivoScreen = lazy(() => import('./components/CicloCultivoScreen'));
 const SeguimientoProcesoScreen = lazy(() => import('./components/SeguimientoProcesoScreen'));
 const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
+const CromatografiaScreen = lazy(() => import('./components/CromatografiaScreen'));
 const ToxicologiaScreen = lazy(() => import('./components/ToxicologiaScreen'));
 const GlaciarReporteScreen = lazy(() => import('./components/GlaciarReporteScreen'));
 const GlaciarHistorialScreen = lazy(() => import('./components/GlaciarHistorialScreen'));
@@ -183,6 +184,7 @@ const HASH_VIEW_ROUTES = {
   glaciar: 'glaciar',
   'glaciar-historial': 'glaciar_historial',
   fermentos: 'fermentos',
+  cromatografia: 'cromatografia',
   animales: 'animales',
   'animales-gallinas': 'animales_gallinas',
   'animales-abejas': 'animales_abejas',
@@ -200,7 +202,7 @@ const MODULE_VIEWS = new Set([
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'suelo', 'toxicologia',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
-  'casos', 'caso_detail', 'bitacora_detail', 'edit_task',
+  'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia',
 ]);
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
@@ -1172,6 +1174,14 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Diagnostico de Suelo">
               <SoilDiagnosticScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'cromatografia':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Cromatografia de Suelo">
+              <CromatografiaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
