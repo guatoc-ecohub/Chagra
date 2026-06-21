@@ -331,6 +331,17 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     heroRoute: { kind: 'nav', view: 'ciclo' },
   },
   {
+    id: 'germinacion',
+    group: 'cultivo',
+    status: 'live',
+    icon: '🌱',
+    label: 'Germinación',
+    desc: 'Prueba si tu semilla está viva antes de sembrar.',
+    tool: 'germination_test',
+    hero: true,
+    heroRoute: { kind: 'nav', view: 'germinacion' },
+  },
+  {
     id: 'suelo',
     group: 'observar',
     status: 'live',
