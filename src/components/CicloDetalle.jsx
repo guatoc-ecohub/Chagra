@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Sprout, FlaskConical, AlertTriangle } from 'lucide-react';
 import FarmProcessSummary from './FarmProcessSummary';
 import PhenologyTimeline from './PhenologyTimeline';
+import PerennialCycleView from './PerennialCycleView';
 import CicloObservacion from './CicloObservacion';
 import CicloFotos from './CicloFotos';
 import SpeciesImage from './SpeciesImage';
@@ -17,6 +18,7 @@ import { getAllSpecies } from '../db/catalogDB';
 import { matchSpeciesInCatalog } from '../utils/speciesResolver';
 import { getTemplate } from '../data/phenologyTemplates';
 import { getGenericTemplate } from '../data/phenologyGeneric';
+import { isPerennialSpecies } from '../data/perennialCycles';
 
 /**
  * CicloDetalle — detalle de un ciclo (FarmProcess) con el enriquecimiento del
@@ -74,6 +76,21 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
   // cuando la especie (o su especie madre, para cultivares) no tiene plantilla
   // específica. Nunca inventa días; solo da una referencia amplia marcada.
   const speciesCategory = useMemo(() => species?.category || null, [species]);
+
+  // ¿Es un perenne? El modelo anual (siembra → cosecha) no aplica a un árbol o
+  // arbusto que vive años. Se considera perenne si tiene ciclo perenne grounded
+  // (perennialCycles) o si su categoría es de perennes/árboles de sombra.
+  // PerennialCycleView se auto-degrada a null si no hay datos perennes para la
+  // especie, así que solo aporta la vista híbrida cuando hay algo honesto que
+  // mostrar; en ese caso ocultamos la línea de tiempo anual.
+  const hasPerennialData = useMemo(
+    () => isPerennialSpecies(canonicalSlug),
+    [canonicalSlug],
+  );
+  const isPerennial = useMemo(
+    () => hasPerennialData || speciesCategory === 'frutales_perennes' || speciesCategory === 'arboles_sombra',
+    [hasPerennialData, speciesCategory],
+  );
 
   // Plantilla fenológica resuelta SIN inventar datos, en orden de preferencia:
   //   1. fenología embebida en el catálogo (si la trae), normalizada;
@@ -192,16 +209,30 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
 
       <CicloObservacion processId={processId} processHint={cycle} currentStage={displayStage} onSaved={onReload} />
 
-      <section>
-        <h2 className="text-2xs uppercase font-bold text-slate-500 mb-2">Línea de tiempo</h2>
-        <PhenologyTimeline
-          speciesSlug={canonicalSlug}
-          sowingDate={a.created_at}
-          altitudeM={altitudeM}
-          phenologyTemplate={resolvedPhenologyTemplate}
-          category={speciesCategory}
+      {/* Vista híbrida del perenne (establecimiento + calendario anual). Se
+          auto-degrada a null si no hay datos perennes grounded para la especie. */}
+      {isPerennial && (
+        <PerennialCycleView
+          speciesId={canonicalSlug}
+          plantingDate={a.created_at}
+          commonName={species?.nombre_comun || a.subject_label || null}
         />
-      </section>
+      )}
+
+      {/* Línea de tiempo anual (siembra → cosecha): se conserva para NO perennes
+          y como respaldo cuando un perenne aún no tiene calendario grounded. */}
+      {!hasPerennialData && (
+        <section>
+          <h2 className="text-2xs uppercase font-bold text-slate-500 mb-2">Línea de tiempo</h2>
+          <PhenologyTimeline
+            speciesSlug={canonicalSlug}
+            sowingDate={a.created_at}
+            altitudeM={altitudeM}
+            phenologyTemplate={resolvedPhenologyTemplate}
+            category={speciesCategory}
+          />
+        </section>
+      )}
 
       <CicloFotos processId={processId} />
 
