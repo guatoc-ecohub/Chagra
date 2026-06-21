@@ -1,12 +1,32 @@
 {
-  "schema_version": "3.1",
-  "seed_version": "0.1.0",
-  "generated_at": "2026-06-19",
+  "schema_version": "3.2",
+  "seed_version": "0.2.0",
+  "generated_at": "2026-06-21",
   "_meta": {
-    "descripcion": "Catálogo de fermentos alimentarios y vetos de seguridad. Exportado desde nodos Fermento del grafo chagra_kg.",
+    "descripcion": "Catálogo de fermentos alimentarios tradicionales y vetos de seguridad. Cada fermento alimentario lleva un bloque de seguridad obligatorio (alertas, señales para descartar y población de riesgo) basado en seguridad alimentaria.",
     "estado": "SEMILLA — 24 nodos (18 alimentarios + 6 vetos de seguridad)",
-    "reglas_id": "snake_case, nombre popular español"
+    "reglas_id": "snake_case, nombre popular español",
+    "principio": "Seguridad-first. Un fermento es un alimento, no un medicamento: el catálogo NO hace afirmaciones medicinales ni curativas.",
+    "regla_seguridad": "Todo fermento de tipo 'alimentario' DEBE tener un bloque 'seguridad' con al menos una alerta y las señales para descartar."
   },
+  "fuentes_globales": [
+    {
+      "nombre": "INVIMA — Instituto Nacional de Vigilancia de Medicamentos y Alimentos (Colombia)",
+      "tema": "Inocuidad de alimentos y buenas prácticas de manufactura"
+    },
+    {
+      "nombre": "FAO/WHO — Codex Alimentarius, código de prácticas de higiene de los alimentos",
+      "tema": "Higiene, acidez y conservación segura"
+    },
+    {
+      "nombre": "FDA — Food Safety (EE. UU.), guía de fermentados y conservas caseras",
+      "tema": "Botulismo, pH < 4.6, conservas en aceite"
+    },
+    {
+      "nombre": "CDC — Centers for Disease Control and Prevention, botulismo y listeriosis",
+      "tema": "Riesgos microbiológicos en fermentados y lácteos crudos"
+    }
+  ],
   "fermentos": [
     {
       "id": "masato_maiz",
@@ -23,7 +43,24 @@
       ],
       "tiempo_elaboracion_horas": 48,
       "vida_util_dias": 3,
-      "doi": "10.1234/fermento.masato-maiz"
+      "seguridad": {
+        "nivel": "precaucion",
+        "alertas": [
+          "Use frascos, ollas y cucharas bien limpios y manos limpias: la mayoría de problemas vienen de la falta de higiene.",
+          "Fermentación corta y dulce: una vez listo, refrigere y tómelo en pocos días; el dulce sin acidez no se conserva a temperatura ambiente.",
+          "Si quiere guardarlo más, déjelo fermentar hasta que quede ácido (agrio) o consérvelo en frío."
+        ],
+        "descartar_si": [
+          "Aparece moho (manchas peludas o de colores) en la superficie.",
+          "Huele a podrido, a pega o a solvente, no a fermento agrio.",
+          "El frasco se abomba o suelta gas violento."
+        ],
+        "poblacion_riesgo": "Por ser fermentado espontáneo, prepárelo con extra higiene si es para niños pequeños, embarazadas o personas con defensas bajas."
+      },
+      "fuentes": [
+        "INVIMA — buenas prácticas de manufactura e higiene de alimentos",
+        "FAO/WHO Codex Alimentarius — higiene de los alimentos"
+      ]
     },
     {
       "id": "masato_arroz",
@@ -40,7 +77,24 @@
       ],
       "tiempo_elaboracion_horas": 18,
       "vida_util_dias": 2,
-      "doi": "10.1234/fermento.masato-arroz"
+      "seguridad": {
+        "nivel": "precaucion",
+        "alertas": [
+          "Arroz cocido guardado mal es riesgoso (puede dar bacilo): trabaje rápido, no lo deje horas tibio antes de fermentar.",
+          "Use agua y utensilios limpios; fermente tapado con tela limpia.",
+          "Bebida de vida corta: refrigere y consuma en 1-2 días."
+        ],
+        "descartar_si": [
+          "Hay moho o capas de color raro en la superficie.",
+          "Olor pútrido o a comida dañada.",
+          "Textura babosa o viscosa anormal."
+        ],
+        "poblacion_riesgo": "Preparar con higiene reforzada para niños pequeños, embarazadas o personas con defensas bajas."
+      },
+      "fuentes": [
+        "INVIMA — inocuidad de alimentos",
+        "FAO/WHO Codex Alimentarius — manejo seguro de cereales cocidos"
+      ]
     },
     {
       "id": "masato_yuca",
@@ -57,7 +111,24 @@
       ],
       "tiempo_elaboracion_horas": 36,
       "vida_util_dias": 2,
-      "doi": "10.1234/fermento.masato-yuca"
+      "seguridad": {
+        "nivel": "importante",
+        "alertas": [
+          "Use SOLO yuca dulce (comercial). La yuca amarga (brava) sin procesar bien puede tener cianuro; vea el veto de yuca amarga.",
+          "Cocine bien la yuca antes de fermentar y trabaje con utensilios limpios.",
+          "Bebida de vida corta: refrigere y tómela en 1-2 días."
+        ],
+        "descartar_si": [
+          "Moho o manchas de colores en la superficie.",
+          "Olor a podrido en vez de a fermento ácido.",
+          "El recipiente se abomba o gasea violentamente."
+        ],
+        "poblacion_riesgo": "Nunca use yuca amarga sin detoxificar, especialmente para niños. Higiene reforzada para población vulnerable."
+      },
+      "fuentes": [
+        "FAO — procesamiento y seguridad de la yuca (Manihot esculenta)",
+        "INVIMA — inocuidad de alimentos"
+      ]
     },
     {
       "id": "chicha_maiz",
@@ -69,12 +140,29 @@
         "Germinar maíz (moyado) 3-5 días",
         "Secar y tostar ligeramente",
         "Moler y cocinar con agua",
-        "Fermentar 2-5 días con saliva o enzimas",
+        "Fermentar 2-5 días con cultivo iniciador o reserva de chicha anterior",
         "Colar y servir"
       ],
       "tiempo_elaboracion_horas": 96,
       "vida_util_dias": 5,
-      "doi": "10.1234/fermento.chicha-maiz"
+      "seguridad": {
+        "nivel": "importante",
+        "alertas": [
+          "No la guarde ni la sirva en cerámica vidriada tradicional: la chicha es ácida y puede sacar plomo del esmalte (vea el veto de cerámica). Use vidrio, acero o barro sin plomo.",
+          "Fermente en recipiente limpio y tapado con tela; deje que acidifique bien antes de embotellar.",
+          "Al embotellar sigue produciendo gas: guarde en frío y abra con cuidado para evitar reventones."
+        ],
+        "descartar_si": [
+          "Moho peludo o de colores en la superficie.",
+          "Olor pútrido o a solvente.",
+          "Botella muy abombada o que dispara líquido al abrir."
+        ],
+        "poblacion_riesgo": "Es bebida fermentada con trazas de alcohol: no es para niños pequeños ni embarazadas."
+      },
+      "fuentes": [
+        "INVIMA — inocuidad de bebidas fermentadas",
+        "FAO/WHO Codex Alimentarius — higiene de los alimentos"
+      ]
     },
     {
       "id": "champus",
@@ -91,7 +179,24 @@
       ],
       "tiempo_elaboracion_horas": 18,
       "vida_util_dias": 2,
-      "doi": "10.1234/fermento.champus"
+      "seguridad": {
+        "nivel": "precaucion",
+        "alertas": [
+          "Lave bien la fruta antes de agregarla; la suciedad de la fruta es la principal fuente de contaminación.",
+          "Use ollas y frascos limpios y agua potable.",
+          "Bebida de vida corta: refrigere y consúmala en 1-2 días."
+        ],
+        "descartar_si": [
+          "Moho en la superficie o en los trozos de fruta.",
+          "Olor a podrido en lugar de a fermento dulce-ácido.",
+          "Textura babosa o gas violento."
+        ],
+        "poblacion_riesgo": "Higiene reforzada si es para niños pequeños, embarazadas o personas con defensas bajas."
+      },
+      "fuentes": [
+        "INVIMA — inocuidad de alimentos",
+        "FAO/WHO Codex Alimentarius — higiene de frutas y bebidas"
+      ]
     },
     {
       "id": "guarapo",
@@ -101,65 +206,135 @@
       "descripcion": "Jugo de caña fermentado. Bebida tradicional de la costa caribe. Fermentación natural de caña.",
       "pasos": [
         "Extraer jugo de caña",
-        "Diluir con agua si es necesario",
-        "Fermentar 1-3 días en recipiente tapado",
-        "Refrigerar para frenar fermentación",
+        "Diluir con agua potable si es necesario",
+        "Fermentar 1-3 días en recipiente tapado y limpio",
+        "Refrigerar para frenar la fermentación",
         "Servir fresco"
       ],
       "tiempo_elaboracion_horas": 48,
       "vida_util_dias": 4,
-      "doi": "10.1234/fermento.guarapo"
+      "seguridad": {
+        "nivel": "precaucion",
+        "alertas": [
+          "Limpie bien el trapiche o el extractor: la caña y el equipo sucio traen mucha carga de microbios.",
+          "Use agua potable para diluir y fermente tapado para evitar moscas y polvo.",
+          "Refrigere apenas alcance el punto: a temperatura ambiente sigue fermentando y se agria/alcoholiza."
+        ],
+        "descartar_si": [
+          "Capa de moho o nata de colores en la superficie.",
+          "Olor pútrido o a vinagre fuerte si no lo busca.",
+          "Recipiente abombado o gas violento."
+        ],
+        "poblacion_riesgo": "Puede tener trazas de alcohol al fermentar: precaución en niños pequeños y embarazadas."
+      },
+      "fuentes": [
+        "INVIMA — inocuidad de bebidas",
+        "FAO/WHO Codex Alimentarius — higiene de los alimentos"
+      ]
     },
     {
       "id": "suero_costeno",
       "nombre": "Suero costeño",
       "tipo": "alimentario",
       "categoria": "fermentado",
-      "descripcion": "Bebida de suero de leche con agua y endulzante. Tradicional de la costa Caribe colombiana.",
+      "descripcion": "Producto lácteo fermentado ácido, espeso, típico de la costa Caribe colombiana. Se obtiene fermentando leche o nata con sal.",
       "pasos": [
-        "Mezclar suero de leche con agua",
-        "Endulzar con panela o azúcar",
-        "Agregar canela y/o clavo opcionalmente",
-        "Mezclar bien y servir fresco"
+        "Partir de leche pasteurizada o nata fresca",
+        "Agregar sal y un poco de suero del lote anterior como iniciador",
+        "Fermentar tapado 1-2 días hasta que espese y acidifique",
+        "Batir, ajustar sal y refrigerar",
+        "Servir frío"
       ],
-      "tiempo_elaboracion_horas": 1,
-      "vida_util_dias": 2,
-      "doi": "10.1234/fermento.suero-costeno"
+      "tiempo_elaboracion_horas": 36,
+      "vida_util_dias": 8,
+      "seguridad": {
+        "nivel": "importante",
+        "alertas": [
+          "Use leche o nata PASTEURIZADA: la leche cruda puede traer listeria, salmonela o E. coli (vea el veto de lácteos crudos).",
+          "Mantenga frío y tapado; los lácteos se contaminan rápido a temperatura ambiente.",
+          "Trabaje con frascos y cucharas hervidos o bien lavados."
+        ],
+        "descartar_si": [
+          "Moho en la superficie o por dentro del frasco.",
+          "Olor pútrido o a amargo raro (no el ácido normal).",
+          "Color anormal (rosado, verdoso) o textura con burbujas de gas."
+        ],
+        "poblacion_riesgo": "Si parte de leche cruda, NO lo consuman embarazadas, niños pequeños, adultos mayores ni personas con defensas bajas."
+      },
+      "fuentes": [
+        "INVIMA — inocuidad de productos lácteos",
+        "CDC — listeriosis y lácteos no pasteurizados"
+      ]
     },
     {
       "id": "chucrut",
       "nombre": "Chucrut",
       "tipo": "alimentario",
       "categoria": "fermentado",
-      "descripcion": "Repollo fermentado por bacterias lácticas. Fermentación anaerobia de 2-4 semanas.",
+      "descripcion": "Repollo fermentado por bacterias lácticas. Fermentación anaerobia (sin aire) de 2-4 semanas.",
       "pasos": [
         "Cortar repollo muy finito",
-        "Mezclar con 2% sal del peso del repollo",
-        "Masajear hasta que suelte líquido",
-        "Empaquetar en frasco comprimiendo",
-        "Fermentar 2-4 semanas a temperatura ambiente"
+        "Mezclar con sal al 2% del peso del repollo (entre 2% y 3%)",
+        "Masajear hasta que suelte su líquido",
+        "Empacar en frasco comprimiendo para que la salmuera cubra todo y no quede aire",
+        "Fermentar 2-4 semanas a temperatura ambiente, manteniendo el repollo bajo el líquido"
       ],
       "tiempo_elaboracion_dias": 21,
       "vida_util_dias": 180,
-      "doi": "10.1234/fermento.chucrut"
+      "seguridad": {
+        "nivel": "importante",
+        "alertas": [
+          "La sal es clave para la seguridad: use entre 2% y 3% del peso del repollo. Poca sal deja crecer microbios dañinos; mucha sal frena la fermentación.",
+          "Todo el repollo debe quedar SUMERGIDO bajo la salmuera. Lo que queda al aire se enmohece: use un peso para mantenerlo abajo.",
+          "Una fermentación sana se vuelve ácida (pH por debajo de 4.6, idealmente bajo 4.0). Esa acidez es la que protege; si no se acidifica, no es seguro a temperatura ambiente.",
+          "Trabaje con utensilios y frasco bien limpios."
+        ],
+        "descartar_si": [
+          "Moho peludo o de colores (rosado, negro, verde) en la superficie. La capa blanca lechosa (kahm) en cambio es inofensiva pero retírela.",
+          "Olor pútrido o a podrido (el chucrut bueno huele ácido, no a dañado).",
+          "Textura muy babosa o color marrón oscuro generalizado."
+        ],
+        "poblacion_riesgo": "Si está bien acidificado es seguro; aun así, higiene reforzada para población vulnerable."
+      },
+      "fuentes": [
+        "FDA Food Safety — fermentación láctica segura y pH < 4.6",
+        "FAO/WHO Codex Alimentarius — acidez y conservación de vegetales fermentados"
+      ]
     },
     {
       "id": "kimchi",
       "nombre": "Kimchi",
       "tipo": "alimentario",
       "categoria": "fermentado",
-      "descripcion": "Col china fermentada con especias, ajo y jengibre. Fermentación láctica anaerobia de 1-3 semanas.",
+      "descripcion": "Col china fermentada con especias, ajo y jengibre. Fermentación láctica anaerobia (sin aire) de 1-3 semanas.",
       "pasos": [
-        "Cortar col china en trozos",
-        "Salazón con sal marina 2-3 horas",
-        "Escurrir y enjuagar ligeramente",
-        "Mezclar con pasta de gochujang, ajo, jengibre",
-        "Empaquetar en frasco hermético",
-        "Fermentar 1-3 semanas a temperatura ambiente"
+        "Cortar la col china en trozos",
+        "Salar la col (salmuera al 2-3%) por 2-3 horas y escurrir",
+        "Enjuagar ligeramente y mezclar con ajo, jengibre y ají",
+        "Empacar en frasco comprimiendo para sacar el aire",
+        "Fermentar 1-3 semanas; al gusto, pasar a refrigeración para frenar"
       ],
       "tiempo_elaboracion_dias": 14,
       "vida_util_dias": 90,
-      "doi": "10.1234/fermento.kimchi"
+      "seguridad": {
+        "nivel": "importante",
+        "alertas": [
+          "Use sal al 2-3% en la salazón: la sal suprime patógenos mientras las bacterias lácticas bajan el pH.",
+          "La verdura debe quedar bajo el líquido, sin aire, para que no se enmohezca.",
+          "Una fermentación sana acidifica (pH por debajo de 4.6); esa acidez es la que la hace segura.",
+          "Si incluye productos del mar (salsa de pescado, camarón), use ingredientes frescos y mantenga frío."
+        ],
+        "descartar_si": [
+          "Moho peludo o de colores en la superficie.",
+          "Olor pútrido (distinto del ácido y picante normal).",
+          "Frasco muy abombado con gas violento o textura babosa rara."
+        ],
+        "poblacion_riesgo": "Si está bien acidificado es seguro; higiene reforzada para población vulnerable."
+      },
+      "fuentes": [
+        "FDA Food Safety — fermentados de vegetales y pH < 4.6",
+        "FAO/WHO Codex Alimentarius — higiene de los alimentos"
+      ]
     },
     {
       "id": "kombucha",
@@ -170,30 +345,65 @@
       "pasos": [
         "Preparar té dulce (negro o verde)",
         "Enfriar completamente",
-        "Agregar SCOBY y líquido de cultivo anterior",
-        "Fermentar 7-14 días cubierto",
-        "Refrigerar para detener fermentación"
+        "Agregar el SCOBY y líquido de cultivo del lote anterior",
+        "Fermentar 7-14 días cubierto con tela limpia",
+        "Refrigerar para detener la fermentación"
       ],
       "tiempo_elaboracion_dias": 10,
       "vida_util_dias": 30,
-      "doi": "10.1234/fermento.kombucha"
+      "seguridad": {
+        "nivel": "importante",
+        "alertas": [
+          "Use agua SIN cloro (déjela reposar o hiérvala y enfríela): el cloro mata el SCOBY.",
+          "Frasco y manos muy limpios; cubra con tela para que respire pero no entren moscas ni polvo.",
+          "La acidez es la que protege: la kombucha sana llega a pH por debajo de 4.6 (ácida). No la fermente en recipientes de metal reactivo ni en cerámica vidriada.",
+          "Genera algo de alcohol (trazas); si lo embotella con azúcar carbonata: refrigere y abra con cuidado."
+        ],
+        "descartar_si": [
+          "Moho peludo o de colores SOBRE el SCOBY o el líquido (distinto de las hebras y la nueva capa lisa, que son normales).",
+          "Olor a podrido o a queso dañado.",
+          "Botella muy abombada que dispara líquido al abrir."
+        ],
+        "poblacion_riesgo": "Por sus trazas de alcohol y al no estar pasteurizada: precaución en embarazadas, niños pequeños y personas con defensas bajas."
+      },
+      "fuentes": [
+        "FDA Food Safety — kombucha casera, pH y alcohol",
+        "INVIMA — inocuidad de bebidas fermentadas"
+      ]
     },
     {
       "id": "kefir_leche",
       "nombre": "Kéfir de leche",
       "tipo": "alimentario",
       "categoria": "fermentado",
-      "descripcion": "Leche fermentada con gránulos de kéfir. Rico en probióticos y ácido láctico.",
+      "descripcion": "Leche fermentada con gránulos de kéfir, de sabor ácido. Rica en bacterias lácticas.",
       "pasos": [
-        "Colocar gránulos de kéfir en leche fresca",
+        "Colocar los gránulos de kéfir en leche pasteurizada fresca",
         "Fermentar 12-24 horas a temperatura ambiente",
-        "Colar separando gránulos del kéfir listo",
-        "Lavar gránulos y reutilizar",
-        "Refrigerar kéfir listo"
+        "Colar separando los gránulos del kéfir listo",
+        "Enjuagar los gránulos con leche y reutilizar",
+        "Refrigerar el kéfir listo"
       ],
       "tiempo_elaboracion_horas": 18,
       "vida_util_dias": 7,
-      "doi": "10.1234/fermento.kefir-leche"
+      "seguridad": {
+        "nivel": "importante",
+        "alertas": [
+          "Use leche PASTEURIZADA: la leche cruda puede traer listeria, salmonela o E. coli (vea el veto de lácteos crudos).",
+          "Trabaje con frasco, colador y cuchara muy limpios (no de metal reactivo si es posible).",
+          "No deje el kéfir tibio más de 24-48 horas; cuando esté ácido y espeso, refrigérelo."
+        ],
+        "descartar_si": [
+          "Moho en la superficie o en el frasco.",
+          "Olor pútrido o muy desagradable (distinto del ácido normal).",
+          "Color anormal (rosado, verdoso) o gas excesivo."
+        ],
+        "poblacion_riesgo": "Si parte de leche cruda, evítenlo embarazadas, niños pequeños, adultos mayores y personas con defensas bajas."
+      },
+      "fuentes": [
+        "INVIMA — inocuidad de productos lácteos",
+        "CDC — listeriosis y lácteos no pasteurizados"
+      ]
     },
     {
       "id": "kefir_agua",
@@ -202,15 +412,32 @@
       "categoria": "fermentado",
       "descripcion": "Bebida fermentada de agua azucarada con gránulos de kéfir de agua. Alternativa sin lácteos.",
       "pasos": [
-        "Preparar agua con azúcar/melaza",
-        "Agregar gránulos de kéfir de agua",
-        "Fermentar 24-48 horas",
+        "Preparar agua con azúcar o melaza (sin cloro)",
+        "Agregar los gránulos de kéfir de agua",
+        "Fermentar 24-48 horas tapado con tela",
         "Colar y refrigerar",
-        "Puede agregar fruta para segunda fermentación"
+        "Opcional: segunda fermentación con fruta en botella cerrada"
       ],
       "tiempo_elaboracion_horas": 36,
       "vida_util_dias": 5,
-      "doi": "10.1234/fermento.kefir-agua"
+      "seguridad": {
+        "nivel": "precaucion",
+        "alertas": [
+          "Use agua SIN cloro para no matar los gránulos.",
+          "Frasco y utensilios limpios; cubra con tela para que respire sin que entren moscas.",
+          "En la segunda fermentación en botella cerrada se acumula gas: refrigere y abra con cuidado para evitar reventones."
+        ],
+        "descartar_si": [
+          "Moho peludo o de colores en la superficie.",
+          "Olor a podrido o a solvente.",
+          "Botella muy abombada que dispara líquido al abrir."
+        ],
+        "poblacion_riesgo": "Bebida no pasteurizada: higiene reforzada para población vulnerable."
+      },
+      "fuentes": [
+        "INVIMA — inocuidad de bebidas fermentadas",
+        "FAO/WHO Codex Alimentarius — higiene de los alimentos"
+      ]
     },
     {
       "id": "yogur",
@@ -219,15 +446,32 @@
       "categoria": "fermentado",
       "descripcion": "Leche fermentada con bacterias lácticas (Lactobacillus bulgaricus y Streptococcus thermophilus).",
       "pasos": [
-        "Calentar leche a 85°C y enfriar a 45°C",
-        "Inocular con cultivo iniciador o yogur natural",
+        "Calentar la leche a 85°C y enfriar a 45°C",
+        "Inocular con cultivo iniciador o un poco de yogur natural",
         "Incubar 6-12 horas a 40-45°C",
-        "Refrigerar para detener fermentación",
+        "Refrigerar para detener la fermentación",
         "Endulzar o agregar fruta al servir"
       ],
       "tiempo_elaboracion_horas": 10,
       "vida_util_dias": 14,
-      "doi": "10.1234/fermento.yogur"
+      "seguridad": {
+        "nivel": "precaucion",
+        "alertas": [
+          "Calentar la leche a ~85°C antes de inocular mejora la textura y reduce microbios competidores; use leche pasteurizada o hervida.",
+          "Controle la temperatura de incubación (40-45°C): demasiado caliente mata el cultivo, demasiado frío deja crecer otros microbios.",
+          "Apenas cuaje, refrigere; trabaje con recipientes limpios."
+        ],
+        "descartar_si": [
+          "Moho en la superficie.",
+          "Olor pútrido o a rancio (distinto del ácido suave normal).",
+          "Líquido muy separado con color o gas anormal."
+        ],
+        "poblacion_riesgo": "Hecho con leche pasteurizada es de bajo riesgo; aun así, refrigere bien para población vulnerable."
+      },
+      "fuentes": [
+        "INVIMA — inocuidad de productos lácteos",
+        "FAO/WHO Codex Alimentarius — leches fermentadas"
+      ]
     },
     {
       "id": "chapo",
@@ -238,47 +482,98 @@
       "pasos": [
         "Hervir plátanos maduros",
         "Machacar hasta obtener puré",
-        "Mezclar con agua",
-        "Fermentar 1-2 días",
+        "Mezclar con agua potable",
+        "Fermentar 1-2 días tapado",
         "Colar y servir"
       ],
       "tiempo_elaboracion_horas": 36,
       "vida_util_dias": 2,
-      "doi": "10.1234/fermento.chapo"
+      "seguridad": {
+        "nivel": "precaucion",
+        "alertas": [
+          "Use agua potable y recipientes limpios; tape para evitar moscas y polvo.",
+          "Bebida de vida corta: refrigere y consúmala en 1-2 días.",
+          "No la guarde sellada mucho tiempo a temperatura ambiente: sigue fermentando y se alcoholiza."
+        ],
+        "descartar_si": [
+          "Moho en la superficie.",
+          "Olor pútrido en vez de dulce-ácido.",
+          "Textura babosa o gas violento."
+        ],
+        "poblacion_riesgo": "Higiene reforzada para niños pequeños, embarazadas y personas con defensas bajas."
+      },
+      "fuentes": [
+        "INVIMA — inocuidad de alimentos",
+        "FAO/WHO Codex Alimentarius — higiene de los alimentos"
+      ]
     },
     {
       "id": "siete_granos",
       "nombre": "Siete granos",
       "tipo": "alimentario",
       "categoria": "fermentado",
-      "descripcion": "Bebida fermentada de 7 granos (maíz, arroz, trigo, cebada, fríjol, lenteja, soya). Alta en proteínas.",
+      "descripcion": "Bebida fermentada de varios granos (maíz, arroz, trigo, cebada, fríjol, lenteja, soya).",
       "pasos": [
-        "Germinar o remojar los 7 granos",
-        "Cocinar hasta ablandar",
-        "Moler o licuar",
+        "Remojar o germinar los granos",
+        "Cocinar bien hasta ablandar",
+        "Moler o licuar con agua potable",
         "Endulzar con panela",
-        "Fermentar 1-2 días"
+        "Fermentar 1-2 días tapado"
       ],
       "tiempo_elaboracion_horas": 48,
       "vida_util_dias": 3,
-      "doi": "10.1234/fermento.siete-granos"
+      "seguridad": {
+        "nivel": "precaucion",
+        "alertas": [
+          "Cocine BIEN las leguminosas (fríjol, soya, lenteja): crudas o mal cocidas pueden causar malestar digestivo.",
+          "Use agua potable y utensilios limpios; no deje los granos cocidos tibios muchas horas antes de fermentar.",
+          "Bebida de vida corta: refrigere y consúmala en 1-2 días."
+        ],
+        "descartar_si": [
+          "Moho o capas de color raro en la superficie.",
+          "Olor pútrido o a comida dañada.",
+          "Textura babosa o gas excesivo."
+        ],
+        "poblacion_riesgo": "Higiene reforzada para niños pequeños, embarazadas y personas con defensas bajas."
+      },
+      "fuentes": [
+        "INVIMA — inocuidad de alimentos",
+        "FAO/WHO Codex Alimentarius — cocción segura de leguminosas y cereales"
+      ]
     },
     {
       "id": "cuajada",
       "nombre": "Cuajada",
       "tipo": "alimentario",
       "categoria": "fermentado",
-      "descripcion": "Producto lácteo coagulado por fermentación natural o con cuajo. Similar al queso fresco.",
+      "descripcion": "Producto lácteo coagulado con cuajo o por acidificación. Similar al queso fresco.",
       "pasos": [
-        "Calentar leche a 35-38°C",
-        "Agregar cuajo o dejar fermentar naturalmente",
-        "Esperar coagulación 1-2 horas",
-        "Cortar la cuajada y escurrir suero",
+        "Calentar leche pasteurizada a 35-38°C",
+        "Agregar cuajo (o cultivo acidificante)",
+        "Esperar la coagulación 1-2 horas",
+        "Cortar la cuajada y escurrir el suero",
         "Refrigerar y consumir fresco"
       ],
       "tiempo_elaboracion_horas": 4,
       "vida_util_dias": 7,
-      "doi": "10.1234/fermento.cuajada"
+      "seguridad": {
+        "nivel": "importante",
+        "alertas": [
+          "Use leche PASTEURIZADA: la cuajada de leche cruda es de los productos lácteos más riesgosos para listeria (vea el veto de lácteos crudos).",
+          "Es un fresco de poca acidez: manténgalo siempre frío y tápelo bien.",
+          "Trabaje con ollas, lienzos y moldes muy limpios."
+        ],
+        "descartar_si": [
+          "Moho en la superficie o por dentro.",
+          "Olor pútrido o amargo raro.",
+          "Color anormal (rosado, verdoso) o baba en la superficie."
+        ],
+        "poblacion_riesgo": "Si es de leche cruda, NO la consuman embarazadas, niños pequeños, adultos mayores ni personas con defensas bajas."
+      },
+      "fuentes": [
+        "INVIMA — inocuidad de quesos frescos",
+        "CDC — listeriosis y quesos de leche cruda"
+      ]
     },
     {
       "id": "pan_masa_madre",
@@ -288,97 +583,149 @@
       "descripcion": "Pan leudado con fermento natural de masa madre. Fermentación larga de 12-24 horas.",
       "pasos": [
         "Mezclar masa madre activa con harina y agua",
-        "Fermentar en masa 4-8 horas",
+        "Fermentar la masa 4-8 horas",
         "Formar y leudar 8-16 horas más",
         "Hornear a temperatura alta",
         "Enfriar antes de cortar"
       ],
       "tiempo_elaboracion_horas": 18,
       "vida_util_dias": 5,
-      "doi": "10.1234/fermento.pan-masa-madre"
+      "seguridad": {
+        "nivel": "bajo",
+        "alertas": [
+          "El horneado completo es lo que vuelve seguro el pan: hornee bien hasta que la miga esté cocida.",
+          "Mantenga la masa madre (la 'mascota') alimentada y tapada; si le aparece moho de colores, descártela y empiece de nuevo.",
+          "Guarde el pan ya frío; en clima cálido y húmedo puede enmohecer en pocos días."
+        ],
+        "descartar_si": [
+          "Moho peludo o de colores en el pan o en la masa madre.",
+          "Olor a podrido o a solvente en la masa madre (el ácido y afrutado es normal).",
+          "Capa rosada o anaranjada en la masa madre."
+        ],
+        "poblacion_riesgo": "Pan horneado es seguro en general; nunca consuma pan ni masa madre con moho (las micotoxinas no se quitan cortando el pedazo)."
+      },
+      "fuentes": [
+        "FDA Food Safety — moho en pan y micotoxinas",
+        "FAO/WHO Codex Alimentarius — higiene de los alimentos"
+      ]
     },
     {
       "id": "vinagre_casero",
       "nombre": "Vinagre casero",
       "tipo": "alimentario",
       "categoria": "fermentado",
-      "descripcion": "Vinagre fermentado de frutas o alcohol. Fermentación de dos etapas: alcohólica luego acética.",
+      "descripcion": "Vinagre fermentado de frutas o alcohol. Dos etapas: primero alcohólica, luego acética.",
       "pasos": [
         "Preparar mosto de fruta o alcohol diluido",
         "Primera fermentación alcohólica 1-2 semanas",
         "Segunda fermentación acética con madre de vinagre",
-        "Fermentar 3-6 semanas con aireación",
+        "Fermentar 3-6 semanas con aireación (necesita aire)",
         "Filtrar y embotellar"
       ],
       "tiempo_elaboracion_dias": 35,
       "vida_util_dias": 365,
-      "doi": "10.1234/fermento.vinagre-casero"
+      "seguridad": {
+        "nivel": "importante",
+        "alertas": [
+          "La fermentación acética NECESITA aire: cubra con tela (no selle hermético) para que la madre trabaje.",
+          "Un vinagre terminado es muy ácido (pH bajo) y se conserva bien; pero NO use vinagre casero de acidez desconocida para 'conservar' verduras en frascos sellados, porque si la acidez no alcanza hay riesgo de botulismo (vea el veto de conservas).",
+          "Use frascos limpios y de vidrio o acero; los ácidos sacan metales de la cerámica vidriada y de algunos metales."
+        ],
+        "descartar_si": [
+          "Moho peludo o de colores sobre la superficie (la 'madre' gelatinosa es normal).",
+          "Olor pútrido o a podrido.",
+          "Capa baba de color raro distinta de la madre."
+        ],
+        "poblacion_riesgo": "El vinagre es seguro por su acidez; el riesgo está en usarlo para conservas caseras mal acidificadas."
+      },
+      "fuentes": [
+        "FDA Food Safety — acidez (pH < 4.6) y conservas seguras",
+        "FAO/WHO Codex Alimentarius — fermentación acética e higiene"
+      ]
     },
     {
       "id": "veto_conservas_anaerobias",
       "nombre": "VETO: Conservas anaerobias caseras",
       "tipo": "veto",
       "categoria": "seguridad",
-      "descripcion": "CONSERVAS EN FRASCOS SELLADOS (NO HAYLE PERO NO HACER). Riesgo de botulismo.",
-      "razon_veto": "El Clostridium botulinum produce una de las toxinas más potentes conocidas. Crece en ambientes sin oxígeno (frascos sellados, aceite) con pH > 4.6. Sin testing de pH ni proceso de esterilización industrial, el riesgo es letal. Síntomas: visión doble, parálisis descendente, fallo respiratorio. NO existen remedios caseros seguros. Mortalidad histórica: 10-17% incluso con tratamiento moderno.",
+      "descripcion": "NO conservar alimentos de baja acidez en frascos sellados o en aceite a temperatura ambiente. Riesgo de botulismo.",
+      "razon_veto": "El Clostridium botulinum produce una de las toxinas más potentes que se conocen. Crece en ambientes sin oxígeno (frascos sellados, aceite) cuando el alimento es de baja acidez (pH por encima de 4.6). Sin medir el pH ni un proceso de esterilización industrial (autoclave a 121°C), el riesgo es mortal. Señales: visión doble, párpados caídos, parálisis que baja desde la cabeza, dificultad para respirar. No existen remedios caseros seguros: ante la sospecha, ir de inmediato al puesto de salud. La regla práctica: ajo en aceite, verduras o carnes en aceite o en frasco sellado deben ir REFRIGERADAS y consumirse pronto, o estar acidificadas a pH por debajo de 4.6.",
       "riesgo_nivel": "CRÍTICO",
-      "consecuencia_potencial": "MUERTE",
-      "doi": "10.1234/veto.botulismo"
+      "consecuencia_potencial": "Riesgo de muerte",
+      "fuentes": [
+        "FDA Food Safety — botulismo y conservas caseras (pH < 4.6)",
+        "CDC — prevención del botulismo de origen alimentario"
+      ]
     },
     {
       "id": "veto_carnicos_caseros_anaerobios",
-      "nombre": "VETO: Cárnicos caseros sellados",
+      "nombre": "VETO: Cárnicos caseros sellados o en aceite",
       "tipo": "veto",
       "categoria": "seguridad",
-      "descripcion": "EMBUTIDOS/CÁRNICOS EN ACEITE O FRASCOS SELLADOS (NO HACER). Riesgo de botulismo.",
-      "razon_veto": "Carnes cocidas en aceite o frascos sellados crean el ambiente anaerobio perfecto para C. botulinum. La toxina es termoestable: hervir NO la destruye (necesita 121°C por 3 minutos, imposible en casa sin autoclave). Casos documentados en Italia/España con embutidos caseros. NO existe forma segura de hacerlo en cocina doméstica.",
+      "descripcion": "NO preparar embutidos o cárnicos en aceite o en frascos sellados a temperatura ambiente. Riesgo de botulismo.",
+      "razon_veto": "Las carnes cocidas en aceite o en frascos sellados crean el ambiente sin oxígeno ideal para el Clostridium botulinum. La toxina aguanta el calor de la cocina: hervir NO la destruye con seguridad (se necesita 121°C por varios minutos, imposible en casa sin autoclave). Hay casos documentados de botulismo por embutidos y conservas cárnicas caseras. No hay forma segura de hacerlo en una cocina doméstica: refrigere y consuma pronto, o evítelo.",
       "riesgo_nivel": "CRÍTICO",
-      "consecuencia_potencial": "MUERTE",
-      "doi": "10.1234/veto.botulismo-carnicos"
+      "consecuencia_potencial": "Riesgo de muerte",
+      "fuentes": [
+        "FDA Food Safety — botulismo en cárnicos y conservas",
+        "CDC — botulismo de origen alimentario"
+      ]
     },
     {
       "id": "veto_miel_crudas_bebe",
-      "nombre": "VETO: Miel cruda en bebés",
+      "nombre": "VETO: Miel en bebés menores de 1 año",
       "tipo": "veto",
       "categoria": "seguridad",
-      "descripcion": "NUNCA DAR MIEL CRUDA A MENORES DE 1 AÑO. Riesgo de botulismo infantil.",
-      "razon_veto": "La miel puede contener esporas de C. botulinum que inactivan el sistema digestivo inmaduro de bebés (<12 meses). El intestino adulto las elimina, pero el del bebé permite germinación y producción de toxina. Síntomas: constipación, debilidad, llanto débil, parálisis. NO es alergia: es una infección letal prevenible. Aún una cantidad pequeña puede ser fatal.",
+      "descripcion": "NUNCA dar miel (cruda ni procesada) a menores de 1 año. Riesgo de botulismo infantil.",
+      "razon_veto": "La miel puede contener esporas de Clostridium botulinum. El intestino de un bebé menor de 12 meses todavía no tiene la flora que las controla, así que las esporas pueden germinar y producir toxina adentro. El intestino del adulto y del niño mayor las elimina sin problema. Señales en el bebé: estreñimiento, debilidad, llanto débil, dificultad para mamar, pérdida de fuerza. Aun una cantidad pequeña puede ser grave: ante la sospecha, ir de inmediato al puesto de salud. Después del primer año la miel es segura.",
       "riesgo_nivel": "CRÍTICO",
-      "consecuencia_potencial": "MUERTE INFANTIL",
-      "doi": "10.1234/veto.botulismo-miel-bebes"
+      "consecuencia_potencial": "Riesgo de muerte en bebés",
+      "fuentes": [
+        "CDC — botulismo del lactante y miel",
+        "FDA Food Safety — miel y menores de 1 año"
+      ]
     },
     {
       "id": "veto_ceramica_vidriada",
-      "nombre": "VETO: Cerámica vidriada tradicional para ácidos",
+      "nombre": "VETO: Cerámica vidriada tradicional para alimentos ácidos",
       "tipo": "veto",
       "categoria": "seguridad",
-      "descripcion": "NO USAR CERÁMICA VIDRIADA TRADICIONAL PARA ALIMENTOS ÁCIDOS. Riesgo de plomo.",
-      "razon_veto": "Muchos vidriados tradicionales contienen plomo u otros metales pesados. Los alimentos ácidos (vinagre, limón, tomate, chicha) lixivian el plomo del esmalte. El plomo es neurotóxico acumulativo: afecta desarrollo cognitivo irreversible en niños, hipertensión y daño renal en adultos. NO es visible: el vidriado puede ser bonito y letal. Usar solo cerámica certificada libre de plomo o vidrio/acero inoxidable.",
+      "descripcion": "NO usar cerámica vidriada tradicional sin certificar para alimentos o bebidas ácidas. Riesgo de plomo.",
+      "razon_veto": "Muchos esmaltes (vidriados) tradicionales contienen plomo u otros metales pesados. Los alimentos y bebidas ácidas (vinagre, limón, tomate, chicha, kombucha) van sacando ese plomo del esmalte hacia la comida. El plomo es neurotóxico y se acumula en el cuerpo: afecta el desarrollo del cerebro de los niños de forma que no se revierte, y en adultos sube la presión y daña los riñones. No se ve a simple vista: el vidriado puede ser bonito y aun así soltar plomo. Use solo cerámica certificada libre de plomo, o vidrio y acero inoxidable.",
       "riesgo_nivel": "ALTO",
-      "consecuencia_potencial": "DAÑO NEUROLÓGICO IRREVERSIBLE",
-      "doi": "10.1234/veto.plomo-ceramica"
+      "consecuencia_potencial": "Daño neurológico que no se revierte",
+      "fuentes": [
+        "FDA Food Safety — plomo en cerámica vidriada y alimentos ácidos",
+        "OMS — plomo y salud pública"
+      ]
     },
     {
       "id": "veto_yuca_amarga",
-      "nombre": "VETO: Yuca amarga sin detoxificación",
+      "nombre": "VETO: Yuca amarga sin detoxificar",
       "tipo": "veto",
       "categoria": "seguridad",
-      "descripcion": "YUCA AMARGA (brava) SIN PROCESAR CORRECTAMENTE: RIESGO DE CIANURO (KONZO).",
-      "razon_veto": "La yuca amarga contiene glucósidos cianogénicos que liberan cianuro al digerirse. Sin detoxificación (remojo prolongado, rallado, prensado, cocción), el cianuro causa KONZO (parálisis permanente irrever sible de piernas) y muerte aguda. La yuca dulce (comercial) es segura, pero la variedad amarga (usada para almidón) requiere procesamiento estricto. Síntomas agudos: vómito, convulsiones, coma. Crónico: marcha inestable, parálisis.",
+      "descripcion": "La yuca amarga (brava) sin procesar correctamente puede liberar cianuro. Riesgo de intoxicación y de konzo.",
+      "razon_veto": "La yuca amarga tiene glucósidos cianogénicos que liberan cianuro al digerirse. Sin un procesamiento adecuado (remojo o fermentación prolongada, rallado, prensado y cocción), el cianuro puede causar intoxicación aguda (vómito, dolor de cabeza, debilidad) y, por consumo repetido mal procesado, konzo, una parálisis de las piernas que no se revierte. La yuca dulce comercial es segura para el consumo normal; la variedad amarga (usada para almidón) exige procesamiento estricto. Si no sabe distinguirlas o procesarlas, use solo yuca dulce.",
       "riesgo_nivel": "CRÍTICO",
-      "consecuencia_potencial": "PARÁLISIS PERMANENTE O MUERTE",
-      "doi": "10.1234/veto.cianuro-yuca"
+      "consecuencia_potencial": "Parálisis que no se revierte o riesgo de muerte",
+      "fuentes": [
+        "FAO — procesamiento seguro de la yuca y cianuro",
+        "OMS — konzo y glucósidos cianogénicos en la yuca"
+      ]
     },
     {
       "id": "veto_lacteos_crudos_vulnerables",
       "nombre": "VETO: Lácteos crudos en población vulnerable",
       "tipo": "veto",
       "categoria": "seguridad",
-      "descripcion": "LÁCTEOS CRUDOS (SIN PASTEURIZAR) EN EMBARAZADAS, INMUNODEPRIMIDOS, NIÑOS/ADULTOS MAYORES.",
-      "razon_veto": "Leche cruda puede contener Listeria monocytogenes, Salmonella, E. coli, Campylobacter. En personas sanas puede causar gastroenteritis, pero en poblaciones vulnerables (embarazadas, inmunodeprimidos, niños, ancianos) puede ser letal. Listeria causa listeriosis: mortalidad 20-30%, aborto espontáneo, sepsis neonatal. Pasteurización (72°C/15s) elimina el riesgo sin alterar valor nutricional significativamente.",
+      "descripcion": "No consumir lácteos sin pasteurizar (leche cruda, quesos y cuajadas de leche cruda) en embarazadas, niños pequeños, adultos mayores y personas con defensas bajas.",
+      "razon_veto": "La leche cruda puede contener Listeria monocytogenes, Salmonella, E. coli o Campylobacter. En personas sanas suele dar gastroenteritis, pero en población vulnerable (embarazadas, personas con defensas bajas, niños y adultos mayores) puede ser grave o mortal. La listeriosis es especialmente peligrosa en el embarazo: puede causar aborto, parto prematuro o infección grave del recién nacido. La pasteurización (calentar a 72°C por unos segundos) elimina estos microbios sin cambiar de forma importante el valor nutricional. Para fermentos lácteos, parta siempre de leche pasteurizada.",
       "riesgo_nivel": "ALTO",
-      "consecuencia_potencial": "MUERTE EN VULNERABLES, ABORTO",
-      "doi": "10.1234/veto.listeria-lacteos"
+      "consecuencia_potencial": "Infección grave en población vulnerable; riesgo de aborto",
+      "fuentes": [
+        "CDC — listeriosis y leche cruda",
+        "INVIMA — pasteurización e inocuidad de la leche"
+      ]
     }
   ]
 }
