@@ -91,6 +91,7 @@ const PlantaPorVozScreen = lazy(() => import('./components/PlantaPorVozScreen'))
 const ProcesosPorVozScreen = lazy(() => import('./components/ProcesosPorVozScreen'));
 const CicloCultivoScreen = lazy(() => import('./components/CicloCultivoScreen'));
 const GerminacionScreen = lazy(() => import('./components/GerminacionScreen'));
+const CicloNutrientesScreen = lazy(() => import('./components/CicloNutrientesScreen'));
 const SeguimientoProcesoScreen = lazy(() => import('./components/SeguimientoProcesoScreen'));
 const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
 const CromatografiaScreen = lazy(() => import('./components/CromatografiaScreen'));
@@ -188,6 +189,7 @@ const HASH_VIEW_ROUTES = {
   fermentos: 'fermentos',
   cromatografia: 'cromatografia',
   germinacion: 'germinacion',
+  'ciclo-nutrientes': 'ciclo_nutrientes',
   animales: 'animales',
   'animales-gallinas': 'animales_gallinas',
   'animales-abejas': 'animales_abejas',
@@ -204,7 +206,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas',
   'hoy_finca', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'germinacion', 'suelo', 'toxicologia',
+  'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'suelo', 'toxicologia',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia',
 ]);
@@ -1192,6 +1194,23 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Germinacion">
               <GerminacionScreen
+                onBack={() => navigate('dashboard')}
+                onHome={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'ciclo_nutrientes':
+        // Módulo CICLO DE NUTRIENTES: hace visible el ciclo cerrado de la finca
+        // (animal → estiércol → biopreparado → plan de alimentación de las
+        // plantas). Asociaciones groundeadas en catalog/biopreparados-seed.json
+        // y feedingPlanGeneric.js. Deja claro qué SÍ reemplaza el abono propio y
+        // qué NO (cal dolomítica y roca fosfórica son minerales externos).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Ciclo de Nutrientes">
+              <CicloNutrientesScreen
                 onBack={() => navigate('dashboard')}
                 onHome={() => navigate('dashboard')}
                 onNavigate={navigate}

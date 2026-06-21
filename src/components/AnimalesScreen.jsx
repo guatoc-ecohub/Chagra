@@ -170,6 +170,14 @@ export default function AnimalesScreen({ onBack, onHome, onNavigate }) {
             <li>• <span className="font-bold text-pink-200">Cerdos</span> → la porcinaza y el estiércol entran al <span className="font-bold">biol</span>, el <span className="font-bold">supermagro</span> y el <span className="font-bold">compost</span>.</li>
             <li>• <span className="font-bold text-yellow-200">Abejas</span> → no dan abono, pero polinizan tus matas y mejoran el cuaje y la cosecha.</li>
           </ul>
+          <button
+            type="button"
+            onClick={() => go('ciclo_nutrientes')}
+            className="mt-4 w-full min-h-[48px] rounded-xl font-bold text-sm bg-emerald-700 hover:bg-emerald-600 text-white flex items-center justify-center gap-2"
+          >
+            <Recycle size={16} aria-hidden="true" /> Ver ciclo de nutrientes
+            <ChevronRight size={16} aria-hidden="true" />
+          </button>
         </section>
       </div>
     </ScreenShell>
