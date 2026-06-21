@@ -1607,7 +1607,7 @@ export default function AgentHero({ onNavigate }) {
             <div
                 className={[
                     'agentport-scene',
-                    night ? 'is-night' : 'is-day',
+                    'is-day', // Siempre claro, sin importar la hora (fix temas siempre claros)
                     `sky-${sky.condition}`,
                     menuOpen && !menuClosing ? 'is-quiet' : '',
                 ].join(' ')}
