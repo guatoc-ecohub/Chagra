@@ -6,6 +6,7 @@ import {
   NIVEL_1,
   NIVEL_2,
   NIVEL_3,
+  NIVEL_4,
   NIVELES,
   getNivel,
   nivelDesbloqueado,
@@ -159,6 +160,12 @@ describe('NIVELES — campos obligatorios sin undefined', () => {
     expect(NIVEL_3.jefe.vida).toBeGreaterThan(NIVEL_2.jefe.vida);
   });
 
+  it('NIVEL_4 tiene jefe con vida mayor que el jefe del nivel 3', () => {
+    expect(NIVEL_4.jefe).toBeTruthy();
+    expect(NIVEL_3.jefe).toBeTruthy();
+    expect(NIVEL_4.jefe.vida).toBeGreaterThan(NIVEL_3.jefe.vida);
+  });
+
   it('cada jefe referencia una plaga que existe en PARES_CONTROL', () => {
     for (const nivel of NIVELES) {
       if (!nivel.jefe) continue;
@@ -174,21 +181,25 @@ describe('progresión de niveles — coherencia de dificultad', () => {
   it('crece el mundo (mundoAncho) con cada nivel', () => {
     expect(NIVEL_2.mundoAncho).toBeGreaterThan(NIVEL_1.mundoAncho);
     expect(NIVEL_3.mundoAncho).toBeGreaterThan(NIVEL_2.mundoAncho);
+    expect(NIVEL_4.mundoAncho).toBeGreaterThan(NIVEL_3.mundoAncho);
   });
 
   it('crece la meta de cultivos con cada nivel', () => {
     expect(NIVEL_2.metaCultivos).toBeGreaterThan(NIVEL_1.metaCultivos);
     expect(NIVEL_3.metaCultivos).toBeGreaterThan(NIVEL_2.metaCultivos);
+    expect(NIVEL_4.metaCultivos).toBeGreaterThan(NIVEL_3.metaCultivos);
   });
 
   it('crece o se mantiene la energía con cada nivel', () => {
     expect(NIVEL_2.energiaInicial).toBeGreaterThanOrEqual(NIVEL_1.energiaInicial);
     expect(NIVEL_3.energiaInicial).toBeGreaterThanOrEqual(NIVEL_2.energiaInicial);
+    expect(NIVEL_4.energiaInicial).toBeGreaterThanOrEqual(NIVEL_3.energiaInicial);
   });
 
   it('crece el número de pares plaga/benéfico con cada nivel', () => {
     expect(NIVEL_2.paresIds.length).toBeGreaterThan(NIVEL_1.paresIds.length);
     expect(NIVEL_3.paresIds.length).toBeGreaterThan(NIVEL_2.paresIds.length);
+    expect(NIVEL_4.paresIds.length).toBeGreaterThan(NIVEL_3.paresIds.length);
   });
 
   it('cada nivel tiene una escena distinta (paleta)', () => {
@@ -199,8 +210,10 @@ describe('progresión de niveles — coherencia de dificultad', () => {
   it('las plataformas y los huecos aumentan con la dificultad', () => {
     expect(NIVEL_2.plataformas.length).toBeGreaterThan(NIVEL_1.plataformas.length);
     expect(NIVEL_3.plataformas.length).toBeGreaterThan(NIVEL_2.plataformas.length);
+    expect(NIVEL_4.plataformas.length).toBeGreaterThan(NIVEL_3.plataformas.length);
     expect(NIVEL_2.huecos.length).toBeGreaterThan(NIVEL_1.huecos.length);
     expect(NIVEL_3.huecos.length).toBeGreaterThan(NIVEL_2.huecos.length);
+    expect(NIVEL_4.huecos.length).toBeGreaterThan(NIVEL_3.huecos.length);
   });
 });
 
@@ -211,6 +224,7 @@ describe('getNivel y nivelDesbloqueado', () => {
     expect(getNivel(1)).toBe(NIVEL_1);
     expect(getNivel(2)).toBe(NIVEL_2);
     expect(getNivel(3)).toBe(NIVEL_3);
+    expect(getNivel(4)).toBe(NIVEL_4);
   });
 
   it('getNivel devuelve NIVEL_1 para números inexistentes', () => {
@@ -233,6 +247,8 @@ describe('getNivel y nivelDesbloqueado', () => {
     expect(nivelDesbloqueado(2, [1, 3])).toBe(true);
     expect(nivelDesbloqueado(3, [1])).toBe(false);
     expect(nivelDesbloqueado(3, [1, 2])).toBe(true);
+    expect(nivelDesbloqueado(4, [1, 2])).toBe(false);
+    expect(nivelDesbloqueado(4, [1, 2, 3])).toBe(true);
   });
 
   it('nivelDesbloqueado: superados por defecto es []', () => {
