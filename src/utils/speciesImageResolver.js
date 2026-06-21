@@ -60,6 +60,37 @@ async function loadSpeciesImages() {
   return loadPromise;
 }
 
+// Ruido taxonómico que NO forma parte del species_id (rangos infraespecíficos
+// y conectores de autoría). El epíteto de autor (L., Cav., Kunth, '(Duchesne…)')
+// se descarta por la lógica de candidatos: el species_id del JSON es
+// género_especie[_infra/cultivar], sin autor.
+const TAXON_NOISE = new Set([
+  'var', 'subsp', 'ssp', 'f', 'cv', 'cultivar', 'sp', 'spp', 'ex', 'aff', 'cf',
+]);
+
+/**
+ * Genera species_id candidatos para un nombre científico normalizado, de MÁS
+ * específico a MENOS. El JSON indexa por species_id SIN autor (p.ej.
+ * `solanum_tuberosum`), pero los nombres del catálogo traen autor
+ * ("Solanum tuberosum L." → `solanum_tuberosum_l`). Probar el binomio
+ * (género_especie) rescata esos casos; el trinomio cubre cultivares/infra.
+ */
+export function buildSpeciesIdCandidates(normalized) {
+  const tokens = String(normalized || '').split('_').filter(Boolean);
+  if (tokens.length < 2) return tokens.length === 1 ? [tokens[0]] : [];
+  const clean = tokens.filter((t) => !TAXON_NOISE.has(t));
+  const out = [];
+  const push = (arr) => {
+    const id = arr.join('_');
+    if (id && !out.includes(id)) out.push(id);
+  };
+  push(tokens); // 1) completo tal cual (cultivar exacto si no hay autor)
+  push(clean); // 2) sin rangos infra (var/subsp…)
+  if (clean.length >= 3) push(clean.slice(0, 3)); // 3) género_especie_infra
+  if (clean.length >= 2) push(clean.slice(0, 2)); // 4) binomio género_especie
+  return out;
+}
+
 /**
  * Busca una imagen por nombre científico en el JSON local.
  * Retorna null si no hay imagen disponible.
@@ -71,37 +102,20 @@ export async function findLocalImage(scientificName) {
   const index = await loadSpeciesImages();
   if (!index) return null;
 
-  // 1. Búsqueda exacta por species_id normalizado
-  if (index.has(normalized)) {
-    const entry = index.get(normalized);
-    return {
-      url: entry.image_url,
-      thumbUrl: entry.image_url,
-      license: formatLicense(entry.license),
-      rightsHolder: entry.attribution || 'Autor no informado',
-      source: 'iNaturalist',
-      sourceUrl: entry.image_url,
-    };
-  }
-
-  // 2. Si el nombre contiene espacios, intentar con guion bajo
-  if (normalized.includes('_')) {
-    // Ya lo intentamos con guion bajo, no hay más variantes
-    return null;
-  }
-
-  // 3. Si el nombre tiene espacios, reemplazar por guiones y reintentar
-  const withUnderscores = normalized.replace(/\s+/g, '_');
-  if (withUnderscores !== normalized && index.has(withUnderscores)) {
-    const entry = index.get(withUnderscores);
-    return {
-      url: entry.image_url,
-      thumbUrl: entry.image_url,
-      license: formatLicense(entry.license),
-      rightsHolder: entry.attribution || 'Autor no informado',
-      source: 'iNaturalist',
-      sourceUrl: entry.image_url,
-    };
+  // Probar species_id candidatos de más a menos específico. El binomio rescata
+  // los nombres con autor ("…_l", "…_kunth") que el match exacto no encuentra.
+  for (const candidate of buildSpeciesIdCandidates(normalized)) {
+    const entry = index.get(candidate);
+    if (entry) {
+      return {
+        url: entry.image_url,
+        thumbUrl: entry.image_url,
+        license: formatLicense(entry.license),
+        rightsHolder: entry.attribution || 'Autor no informado',
+        source: 'iNaturalist',
+        sourceUrl: entry.image_url,
+      };
+    }
   }
 
   return null;
