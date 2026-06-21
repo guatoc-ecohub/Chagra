@@ -8,7 +8,7 @@ import { ScreenShell } from '../common/ScreenShell';
 import { Sprout, Bug, Shield, RotateCcw, Crosshair } from 'lucide-react';
 import { agentSounds, isSoundEnabled } from '../../services/agentSoundService';
 import {
-  MAPA, MAPA_COLS, MAPA_FILAS, PALETA, MATERIALES, CONFIG_DOOM,
+  MAPA, MAPA_COLS, MAPA_FILAS, PALETA, MATERIALES, DECORACIONES, CONFIG_DOOM,
   PLAGAS_DOOM, BENEFICOS_DOOM,
 } from './doomFincaData';
 import {
@@ -93,6 +93,151 @@ function texturaPared(patron, tx, vy, base, sombra, luz) {
       return base;
   }
 }
+
+/** Oscurece un color [r,g,b]. */
+function darken(c, f) { return [c[0] * f, c[1] * f, c[2] * f]; }
+/** Aclara un color [r,g,b] (clamp 255). */
+function lighten(c, f) {
+  return [Math.min(255, c[0] * f), Math.min(255, c[1] * f), Math.min(255, c[2] * f)];
+}
+
+/**
+ * Pinta un pixel (u,v en 0-1) de una plaga segun su forma. Devuelve [r,g,b]
+ * o null (transparente). Sprites reconocibles: oruga segmentada, mosca con
+ * alas, colonia de afidos, escarabajo con elitros.
+ */
+function pintarPlaga(forma, u, v, base) {
+  const cx = u - 0.5;
+  switch (forma) {
+    case 'oruga': {
+      if (v < 0.30 || v > 0.80) return null;
+      if (cx * cx * 2.2 + (v - 0.55) * (v - 0.55) * 9 > 0.9) return null;
+      if (u > 0.80 && Math.abs(v - 0.48) < 0.13) return v < 0.46 ? [20, 20, 20] : darken(base, 0.6);
+      return frac(u * 6) < 0.20 ? darken(base, 0.55) : base; // segmentos
+    }
+    case 'mosca': {
+      const bodyR = cx * cx * 6 + (v - 0.55) * (v - 0.55) * 7;
+      if (v > 0.30 && v < 0.85 && bodyR < 0.5) {
+        if (v < 0.45 && Math.abs(cx) < 0.12) return [10, 10, 10]; // ojos
+        return base;
+      }
+      if (Math.abs(cx) > 0.18 && Math.abs(cx) < 0.5 && v > 0.30 && v < 0.58) return [240, 240, 245]; // alas
+      return null;
+    }
+    case 'afido': {
+      const blobs = [[0.40, 0.45], [0.60, 0.50], [0.50, 0.66], [0.46, 0.32]];
+      for (const b of blobs) {
+        const dx = u - b[0];
+        const dy = v - b[1];
+        if (dx * dx * 9 + dy * dy * 14 < 0.5) return dx > 0 ? base : darken(base, 0.7);
+      }
+      return null;
+    }
+    case 'escarabajo': {
+      if (cx * cx * 3 + (v - 0.55) * (v - 0.55) * 4 > 0.85 || v < 0.25) return null;
+      if (Math.abs(cx) < 0.04) return darken(base, 0.5);          // linea de elitros
+      if (v < 0.42 && cx < 0) return lighten(base, 1.5);          // brillo
+      return base;
+    }
+    default:
+      return (cx * cx * 2 + (v - 0.5) * (v - 0.5) * 2) < 0.8 ? base : null;
+  }
+}
+
+/**
+ * Pinta un pixel (u,v en 0-1) de una decoracion de la finca. Devuelve [r,g,b]
+ * o null. Arbol, colmena, gallina, vaca, girasol, compostera (abono).
+ */
+function pintarDeco(tipo, u, v) {
+  const cx = u - 0.5;
+  switch (tipo) {
+    case 'arbol': {
+      if (v > 0.60 && Math.abs(cx) < 0.08) return [92, 62, 36];   // tronco
+      const copas = [[0.50, 0.28, 0.30], [0.34, 0.40, 0.22], [0.66, 0.40, 0.22], [0.50, 0.50, 0.24]];
+      for (const co of copas) {
+        const dx = u - co[0];
+        const dy = v - co[1];
+        if (dx * dx + dy * dy < co[2] * co[2]) {
+          return hash2(Math.floor(u * 30), Math.floor(v * 30)) > 0.5 ? [74, 138, 63] : [54, 104, 46];
+        }
+      }
+      return null;
+    }
+    case 'colmena': {
+      if (v > 0.28 && v < 0.37 && Math.abs(cx) < 0.40) return [120, 80, 40]; // techo
+      if (v < 0.35) {
+        return (v < 0.32 && hash2(Math.floor(u * 40), Math.floor(v * 40)) > 0.93) ? [40, 30, 10] : null; // abejas
+      }
+      if (Math.abs(cx) > 0.34) return null;
+      const caja = Math.floor((v - 0.35) / 0.20);
+      if (frac((v - 0.35) / 0.20) < 0.10) return [110, 72, 36];   // junta de cajon
+      if (caja === 2 && Math.abs(cx) < 0.12) return [30, 20, 10]; // entrada
+      return (caja % 2 === 0) ? [214, 176, 110] : [196, 156, 92];
+    }
+    case 'gallina': {
+      if (v > 0.78 && v < 0.96 && Math.abs(cx) < 0.20) return [200, 150, 30]; // patas
+      const dxh = u - 0.66;
+      const dyh = v - 0.34;
+      if (dxh * dxh * 4 + dyh * dyh * 5 < 0.40) {                 // cabeza
+        if (v < 0.27) return [210, 40, 40];                       // cresta
+        if (u > 0.76 && Math.abs(dyh) < 0.05) return [240, 170, 30]; // pico
+        if (dxh > 0.02 && dyh < 0 && dxh * dxh + dyh * dyh < 0.012) return [20, 20, 20]; // ojo
+        return [236, 232, 220];
+      }
+      if (cx * cx * 2.6 + (v - 0.56) * (v - 0.56) * 3.2 < 0.55 && v > 0.34) return [232, 226, 210]; // cuerpo
+      return null;
+    }
+    case 'vaca': {
+      if (v > 0.80 && v < 0.98 && (Math.abs(cx - 0.22) < 0.06 || Math.abs(cx + 0.22) < 0.06)) return [40, 30, 28]; // patas
+      if (cx * cx * 1.6 + (v - 0.56) * (v - 0.56) * 3.4 < 0.60 && v > 0.32 && v < 0.86) {
+        return hash2(Math.floor(u * 9), Math.floor(v * 9)) > 0.55 ? [60, 44, 38] : [236, 232, 228]; // manchas
+      }
+      const dxh = u - 0.16;
+      const dyh = v - 0.52;
+      if (dxh * dxh * 5 + dyh * dyh * 6 < 0.40) return [70, 52, 46]; // cabeza
+      return null;
+    }
+    case 'girasol': {
+      if (v > 0.50 && Math.abs(cx) < 0.05) return [60, 110, 40];  // tallo
+      if (v > 0.58 && v < 0.72 && Math.abs(cx) > 0.05 && Math.abs(cx) < 0.28) return [70, 128, 52]; // hojas
+      const dx = u - 0.5;
+      const dy = v - 0.30;
+      const rd = Math.sqrt(dx * dx + dy * dy);
+      if (rd < 0.13) return [90, 56, 20];                         // centro
+      if (rd < 0.27) return frac(Math.atan2(dy, dx) / (Math.PI / 6)) < 0.6 ? [245, 200, 40] : [228, 174, 28]; // petalos
+      return null;
+    }
+    case 'abono': {
+      const top = 0.45 + 0.18 * Math.cos(cx * 3.1);
+      if (v < top || Math.abs(cx) > 0.45) {
+        if (v < top && v > top - 0.18 && hash2(Math.floor(u * 20), Math.floor(v * 20) + 1) > 0.92) return [212, 212, 206]; // vapor
+        return null;
+      }
+      const n = hash2(Math.floor(u * 16), Math.floor(v * 16));
+      if (n < 0.30) return [46, 32, 18];
+      if (n > 0.85) return [96, 70, 40];                          // restos claros
+      return [70, 50, 28];
+    }
+    default:
+      return null;
+  }
+}
+
+/** Dimensiones del billboard por tipo (alto/ancho en multiplos de size, hover sobre el piso). */
+const PLAGA_DIM = {
+  oruga: { hf: 0.55, wf: 0.75, hover: 0.18 },
+  mosca: { hf: 0.45, wf: 0.50, hover: 0.55 },
+  afido: { hf: 0.50, wf: 0.60, hover: 0.12 },
+  escarabajo: { hf: 0.45, wf: 0.55, hover: 0.10 },
+};
+const DECO_DIM = {
+  arbol: { hf: 2.40, wf: 1.60, hover: 0 },
+  colmena: { hf: 1.00, wf: 0.85, hover: 0 },
+  gallina: { hf: 0.55, wf: 0.60, hover: 0 },
+  vaca: { hf: 0.95, wf: 1.55, hover: 0 },
+  girasol: { hf: 1.55, wf: 0.70, hover: 0 },
+  abono: { hf: 0.55, wf: 1.15, hover: 0 },
+};
 
 /**
  * DoomFincaScreen - nivel Doom / Wolfenstein 3D agroecologico en primera
@@ -416,69 +561,56 @@ export default function DoomFincaScreen({ onBack, onHome }) {
         }
       }
 
-      // Sprites (plagas) - billboard, ordenar por distancia
-      const sprites = [];
+      // ── BILLBOARDS: plagas + decoracion viva de la finca ──
+      const billboards = [];
       for (const pest of w.pests) {
         if (!pest.vivo) continue;
         const proj = projectSprite(pest.x, pest.y, px, py, pa, FOV, W, H);
-        if (proj.visible) {
-          sprites.push({ ...pest, proj });
-        }
+        if (proj.visible) billboards.push({ kind: 'plaga', forma: pest.forma, color: pest.color, proj });
       }
-      // Ordenar lejos -> cerca para dibujar atras primero
-      sprites.sort((a, b) => b.proj.dist - a.proj.dist);
+      for (const deco of DECORACIONES) {
+        const proj = projectSprite(deco.x, deco.y, px, py, pa, FOV, W, H);
+        if (proj.visible) billboards.push({ kind: 'deco', tipo: deco.tipo, proj });
+      }
+      // Lejos -> cerca para que los cercanos tapen a los lejanos
+      billboards.sort((a, b) => b.proj.dist - a.proj.dist);
 
-      for (const spr of sprites) {
-        const { screenX, size, dist } = spr.proj;
-        const halfSize = Math.round(size / 2);
-        const top = Math.round(H / 2 - halfSize * 0.7);
-        const bot = Math.round(H / 2 + halfSize * 0.7);
-        const left = screenX - halfSize;
-        const right = screenX + halfSize;
+      for (const bb of billboards) {
+        const { screenX, size, dist } = bb.proj;
+        const dim = bb.kind === 'plaga'
+          ? (PLAGA_DIM[bb.forma] || PLAGA_DIM.oruga)
+          : (DECO_DIM[bb.tipo] || DECO_DIM.arbol);
+        const spriteH = size * dim.hf;
+        const spriteW = size * dim.wf;
+        // Anclar a la linea del piso: los objetos "se paran" en el suelo
+        const floorRow = halfH + halfH / Math.max(dist, 0.3);
+        const bottom = Math.round(floorRow - dim.hover * size);
+        const top = Math.round(bottom - spriteH);
+        const left = Math.round(screenX - spriteW / 2);
+        const right = Math.round(screenX + spriteW / 2);
 
         const fogF = Math.max(0, Math.min(1, (dist - NIEBLA_INI) / (NIEBLA_FIN - NIEBLA_INI)));
-        const sLight = Math.max(0.25, 1.0 - fogF);
+        const sLight = Math.max(0.40, 1.0 - dist * 0.05);
+        const baseRGB = bb.kind === 'plaga' ? hexRGB(bb.color) : null;
 
-        // Color base de la plaga
-        const sr = parseInt(spr.color.slice(1, 3), 16);
-        const sg = parseInt(spr.color.slice(3, 5), 16);
-        const sb = parseInt(spr.color.slice(5, 7), 16);
-
-        for (let row = top; row <= bot; row += 1) {
+        for (let row = top; row <= bottom; row += 1) {
           if (row < 0 || row >= H) continue;
+          const v = (row - top) / Math.max(1, spriteH);
           for (let c = left; c <= right; c += 1) {
             if (c < 0 || c >= W) continue;
             if (zBuffer[c] < dist) continue; // ocluido por pared
-
+            const u = (c - left) / Math.max(1, spriteW);
+            const pix = bb.kind === 'plaga'
+              ? pintarPlaga(bb.forma, u, v, baseRGB)
+              : pintarDeco(bb.tipo, u, v);
+            if (!pix) continue;
             const idx = (row * W + c) * 4;
-
-            // Forma mas o menos circular/ovalada de la plaga
-            const cx = (c - screenX) / halfSize;
-            const cy = (row - H / 2) / (halfSize * 0.7);
-            const shape = cx * cx + cy * cy;
-            if (shape > 0.85) continue;
-
-            // Detalles simples (ojos, patas)
-            if (shape > 0.55) {
-              // Borde del cuerpo
-              buf[idx] = Math.round(sr * sLight * 0.5);
-              buf[idx + 1] = Math.round(sg * sLight * 0.5);
-              buf[idx + 2] = Math.round(sb * sLight * 0.5);
-            } else if (shape < 0.05 && row < H / 2) {
-              // "Ojo" (punto brillante)
-              buf[idx] = 255;
-              buf[idx + 1] = 255;
-              buf[idx + 2] = 255;
-            } else if (cy > 0.15 && Math.abs(cx) < 0.3 && shape < 0.4) {
-              // "Boca" o detalle
-              buf[idx] = Math.round(sr * sLight * 0.7);
-              buf[idx + 1] = Math.round(sg * sLight * 0.3);
-              buf[idx + 2] = Math.round(sb * sLight * 0.3);
-            } else {
-              buf[idx] = Math.round(sr * sLight);
-              buf[idx + 1] = Math.round(sg * sLight);
-              buf[idx + 2] = Math.round(sb * sLight);
-            }
+            const pr = pix[0] * sLight;
+            const pg = pix[1] * sLight;
+            const pb = pix[2] * sLight;
+            buf[idx] = pr + (sky1[0] - pr) * fogF;
+            buf[idx + 1] = pg + (sky1[1] - pg) * fogF;
+            buf[idx + 2] = pb + (sky1[2] - pb) * fogF;
             buf[idx + 3] = 255;
           }
         }
