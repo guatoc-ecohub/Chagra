@@ -167,13 +167,15 @@ describe('findLocalImage', () => {
     expect(result.source).toBe('iNaturalist');
   });
 
-  it('(a) devuelve null si el normalizado no matchea species_id (sufijo autor no recortado)', async () => {
+  it('(a) recupera el binomio aunque el nombre traiga sufijo de autor', async () => {
     setupFetch();
-    // "Tamarindus indica L." → normaliza a "tamarindus_indica_l"
-    // El species_id en el mock es "tamarindus_indica" (sin _l).
-    // El resolver NO recorta sufijos de autor; devuelve null.
+    // "Tamarindus indica L." → normaliza a "tamarindus_indica_l". El species_id
+    // del mock es "tamarindus_indica" (sin _l). buildSpeciesIdCandidates añade
+    // el binomio "tamarindus_indica", así que el resolver SÍ lo encuentra: el
+    // autor (L.) no debe impedir la foto correcta.
     const result = await findLocalImage('Tamarindus indica L.');
-    expect(result).toBeNull();
+    expect(result).not.toBeNull();
+    expect(result.url).toBe('https://example.com/tamarind.jpg');
   });
 
   it('(b) maneja mayusculas y aun resuelve', async () => {
