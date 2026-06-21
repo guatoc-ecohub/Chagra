@@ -3,6 +3,8 @@ import {
   Hexagon, Flower2, HeartPulse, ShieldAlert, Recycle, Info, Droplets,
 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
+import FuentesAnimal from './common/FuentesAnimal';
+import ChecklistManejo from './common/ChecklistManejo';
 
 /**
  * AbejasScreen — vertical de abejas y apicultura del módulo Animales.
@@ -85,7 +87,7 @@ export default function AbejasScreen({ onBack, onHome }) {
             tamaño y la cantidad de frutos.</span>
           </p>
           <ul className="space-y-1">
-            <li>• Cultivos que se benefician fuerte: <span className="font-bold">curuba, mora, gulupa, lulo, café, frutales y cucurbitáceas</span> (ahuyama, pepino).</li>
+            <li>• Cultivos que se benefician fuerte: <span className="font-bold">curuba, mora, gulupa, lulo, frutales y cucurbitáceas</span> (ahuyama, pepino). El café se autopoliniza, pero con abejas cuaja y rinde más.</li>
             <li>• Ubica las colmenas <span className="font-bold">cerca de los cultivos en floración</span>.</li>
             <li>• <span className="font-bold">No fumigues</span> con las flores abiertas: matas a tus polinizadoras.</li>
           </ul>
@@ -171,10 +173,26 @@ export default function AbejasScreen({ onBack, onHome }) {
           </p>
         </SeccionCard>
 
-        <p className="text-[11px] text-slate-500 pt-1">
-          Fuentes: FEDEABEJA, ICA, FAO. Ante problemas de sanidad, consulta a un
-          apicultor con experiencia o al ICA.
-        </p>
+        {/* Checklist interactivo de manejo apícola (local, sin backend) */}
+        <ChecklistManejo
+          titulo="Chequeo de tus colmenas"
+          color={{ border: 'border-amber-700/40', bg: 'bg-amber-900/20', text: 'text-amber-200' }}
+          items={[
+            'Las colmenas tienen agua limpia cerca.',
+            'Hay floración disponible o les dejo reservas de miel.',
+            'No fumigo con las flores abiertas.',
+            'Reviso la colmena con periodicidad (reina, cría, fortaleza).',
+            'Cosecho solo el excedente de miel.',
+            'Mantengo separados los apiarios de Apis y los meliponarios.',
+            'Ante cría con mal olor o colmena débil, aíslo y consulto.',
+          ]}
+        />
+
+        {/* Fuentes / Saber más — enlaces públicos reales */}
+        <FuentesAnimal
+          claves={['fao', 'ica', 'agrosavia', 'sena']}
+          nota="Ante problemas de sanidad de la colmena, consulta a un apicultor con experiencia o al ICA. Esta guía no reemplaza la asistencia profesional."
+        />
       </div>
     </ScreenShell>
   );

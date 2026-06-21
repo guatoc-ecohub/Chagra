@@ -1,8 +1,8 @@
 /**
- * animalDiagnostic — diagnostico pecuario agroecologico (DR-ANIMAL-1).
+ * animalDiagnostic — diagnostico pecuario agroecologico.
  *
- * Fuente: DR-ANIMAL-1-consolidado (3/3 DeepSeek+Gemini+Meta, 2026-06-11).
  * Datos: src/data/animal-diagnostics.json
+ * Fuentes publicas: ICA, AGROSAVIA, CIPAV, FEDEGAN, Fenavi, FEDEABEJA, FAO.
  *
  * Guardas criticas: Leucaena PROHIBIDA a monogastricos+equinos,
  * Apis vs meliponas (pillaje), estres termico mortal aves/cerdos.

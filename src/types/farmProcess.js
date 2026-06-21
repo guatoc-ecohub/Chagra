@@ -203,7 +203,7 @@ export const PARAMO_STAGE_SEQUENCE = [
 /**
  * Cerdos (ciclo de manejo porcino). Hitos de MANEJO, no fenología. Las cifras
  * técnicas (gestación 114 días para porcino) salen de animal-diagnostics.json
- * (DR-ANIMAL-1, fuentes ICA/AGROSAVIA). Cualquier recomendación de dieta/sanidad
+ * (fuentes públicas ICA/AGROSAVIA). Cualquier recomendación de dieta/sanidad
  * concreta NO va aquí sin fuente: se marca [VALIDAR] en la UI.
  */
 export const PIGS_STAGE_SEQUENCE = [

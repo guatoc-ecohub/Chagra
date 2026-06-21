@@ -3,6 +3,8 @@ import {
   Beef, Milk, HeartPulse, ShieldAlert, Sprout, Recycle, Info, Trees,
 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
+import FuentesAnimal from './common/FuentesAnimal';
+import ChecklistManejo from './common/ChecklistManejo';
 
 /**
  * VacasScreen — vertical de ganado bovino del módulo Animales.
@@ -224,11 +226,27 @@ export default function VacasScreen({ onBack, onHome, onNavigate }) {
           </p>
         </SeccionCard>
 
-        <p className="text-[11px] text-slate-500 pt-1">
-          Fuentes: ICA, AGROSAVIA, FEDEGAN, CIPAV. La fiebre aftosa es de
-          notificación obligatoria e inmediata al ICA. Ante dudas de tratamiento o
-          dosis, consulta al técnico o al veterinario.
-        </p>
+        {/* Checklist interactivo de manejo del hato (local, sin backend) */}
+        <ChecklistManejo
+          titulo="Chequeo del hato"
+          color={{ border: 'border-emerald-700/40', bg: 'bg-emerald-900/20', text: 'text-emerald-200' }}
+          items={[
+            'Estoy al día con los ciclos de vacunación (aftosa, brucelosis) de la zona.',
+            'Roto el potrero para que el pasto descanse y rebrote.',
+            'Hay sombra (árboles) y agua limpia en el potrero.',
+            'Animales nuevos pasan por cuarentena antes de juntarlos.',
+            'Compro y vendo con guía de movilización del ICA.',
+            'Ordeño limpio: manos y pezones limpios, sellado del pezón.',
+            'Respeto el tiempo de retiro de la leche tras un tratamiento.',
+            'Maduro o composto la boñiga antes de aplicarla a las matas.',
+          ]}
+        />
+
+        {/* Fuentes / Saber más — enlaces públicos reales */}
+        <FuentesAnimal
+          claves={['ica', 'agrosavia', 'fedegan', 'cipav', 'sena']}
+          nota="La fiebre aftosa es de notificación obligatoria e inmediata al ICA. Ante dudas de tratamiento o dosis, consulta a un técnico o veterinario."
+        />
       </div>
     </ScreenShell>
   );
