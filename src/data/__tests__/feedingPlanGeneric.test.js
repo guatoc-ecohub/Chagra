@@ -6,6 +6,9 @@ import {
   FITOSANITARIOS,
 } from '../feedingPlanGeneric';
 
+// Categorías ANUALES de hortaliza/grano: comparten el patrón de validación
+// estricto (abonado de fondo con bocashi a offset 0, biol como N, supermagro
+// con tope 10%, dosis foliar corta, etc.).
 const NUTRITION_CATEGORIES = [
   'hortalizas_hoja',
   'hortalizas_fruto_flor',
@@ -14,14 +17,22 @@ const NUTRITION_CATEGORIES = [
   'cereales',
 ];
 
+// Categorías PERENNES (frutal / árbol de sombra-servicio): tienen su propio
+// patrón (esquema anual recurrente, abono en la gotera/corona, mulch, mínima
+// fertilización en árboles de servicio). Validación de estructura básica.
+const PERENNIAL_CATEGORIES = ['frutales_perennes', 'arboles_sombra'];
+
+// Todas las categorías con plantilla de nutrición (anuales + perennes).
+const ALL_FEEDING_CATEGORIES = [...NUTRITION_CATEGORIES, ...PERENNIAL_CATEGORIES];
+
 // Slugs del seed que aportan nitrógeno vía biol (rico en N).
 const N_BEARING_SLUG = 'biol';
 
 describe('feedingPlanGeneric — getGenericFeedingCategories', () => {
-  it('expone exactamente las 5 categorías de nutrición', () => {
+  it('expone exactamente las 7 categorías de nutrición (anuales + perennes)', () => {
     const cats = getGenericFeedingCategories();
-    expect(cats).toHaveLength(5);
-    for (const c of NUTRITION_CATEGORIES) {
+    expect(cats).toHaveLength(7);
+    for (const c of ALL_FEEDING_CATEGORIES) {
       expect(cats).toContain(c);
     }
   });
@@ -50,11 +61,11 @@ describe('feedingPlanGeneric — cada categoría devuelve pasos', () => {
     expect(getGenericFeedingTemplate('categoria_inexistente')).toBeNull();
   });
 
-  it('devuelve null para categorías sin plantilla de nutrición (perennes/sombra)', () => {
-    expect(getGenericFeedingTemplate('frutales_perennes')).toBeNull();
-    expect(getGenericFeedingTemplate('arboles_sombra')).toBeNull();
+  it('devuelve null para categorías sin plantilla de nutrición (medicinales/invasoras)', () => {
     expect(getGenericFeedingTemplate('medicinales_alelopaticas')).toBeNull();
     expect(getGenericFeedingTemplate('especies_invasoras')).toBeNull();
+    expect(getGenericFeedingTemplate('ornamentales_nativas')).toBeNull();
+    expect(getGenericFeedingTemplate('cercas_vivas')).toBeNull();
   });
 
   it('devuelve null para entradas no-string', () => {
@@ -62,6 +73,122 @@ describe('feedingPlanGeneric — cada categoría devuelve pasos', () => {
     expect(getGenericFeedingTemplate(undefined)).toBeNull();
     expect(getGenericFeedingTemplate('')).toBeNull();
     expect(getGenericFeedingTemplate(42)).toBeNull();
+  });
+});
+
+describe('feedingPlanGeneric — plantillas perennes (frutal / árbol de servicio)', () => {
+  for (const cat of PERENNIAL_CATEGORIES) {
+    it(`devuelve plantilla con estructura válida para ${cat}`, () => {
+      const t = getGenericFeedingTemplate(cat);
+      expect(t).toBeTruthy();
+      expect(t.isGeneric).toBe(true);
+      expect(t.confidence).toBe('baja');
+      expect(t.category).toBe(cat);
+      expect(Array.isArray(t.notes)).toBe(true);
+      expect(Array.isArray(t.primary_steps)).toBe(true);
+      expect(t.primary_steps.length).toBeGreaterThan(0);
+      // Paso 0 de suelo presente (cal/roca fosfórica), antepuesto por template().
+      const slugs = t.primary_steps.map((s) => s.biofertilizer_slug);
+      expect(slugs).toContain('cal_dolomita');
+      expect(slugs).toContain('roca_fosforica');
+      // Abono de fondo al sembrar (bocashi/compost) en el hoyo, a offset 0.
+      const fondo = t.primary_steps.find((s) => s.offset_days === 0);
+      expect(fondo).toBeTruthy();
+      expect(fondo.biofertilizer_slug).toBe('bocashi');
+      // Sin fitosanitarios (es nutrición, no sanidad).
+      for (const fito of FITOSANITARIOS) {
+        expect(slugs).not.toContain(fito);
+      }
+    });
+  }
+
+  it('el frutal perenne deja claro que es un esquema ANUAL recurrente (gotera/corona + mulch)', () => {
+    const t = getGenericFeedingTemplate('frutales_perennes');
+    const joined = [
+      ...t.notes,
+      ...t.primary_steps.flatMap((s) => [s.action, s.notes]),
+    ]
+      .filter(Boolean)
+      .join(' ');
+    // Esquema que se repite cada año, no una sola vez.
+    expect(joined).toMatch(/cada año/i);
+    expect(joined).toMatch(/se REPITE/i);
+    // Abono en la zona de goteo / corona del árbol al inicio de lluvias.
+    expect(joined).toMatch(/gotera|corona/i);
+    expect(joined).toMatch(/lluvias/i);
+    expect(joined).toMatch(/mulch/i);
+    // Honestidad: orientativo por tipo + análisis de suelo manda + fuentes.
+    expect(joined).toMatch(/orientativo por tipo/i);
+    expect(joined).toMatch(/análisis de suelo/i);
+    expect(joined).toMatch(/AGROSAVIA|ICA|FAO|Cenicafé/);
+  });
+
+  it('el árbol de sombra/servicio pide mínima fertilización y aporta más de lo que toma', () => {
+    const t = getGenericFeedingTemplate('arboles_sombra');
+    // Sobrio: pocos pasos de nutrición (suelo + fondo + un mantenimiento opcional).
+    const nutricion = t.primary_steps.filter((s) => s.offset_days >= 0);
+    expect(nutricion.length).toBeLessThanOrEqual(3);
+    const joined = [
+      ...t.notes,
+      ...t.primary_steps.flatMap((s) => [s.action, s.notes]),
+    ]
+      .filter(Boolean)
+      .join(' ');
+    expect(joined).toMatch(/aportan más de lo que piden|hojarasca/i);
+    expect(joined).toMatch(/mulch/i);
+    // Honestidad: orientativo + fuentes.
+    expect(joined).toMatch(/orientativo por tipo/i);
+    expect(joined).toMatch(/AGROSAVIA|ICA|FAO/);
+  });
+
+  it('los pasos perennes con biopreparado del seed traen dosis textual', () => {
+    for (const cat of PERENNIAL_CATEGORIES) {
+      const t = getGenericFeedingTemplate(cat);
+      for (const step of t.primary_steps) {
+        // bocashi, biol, te_compost, cal/roca: todos con texto en el seed.
+        expect(step.dose_text).toBeTruthy();
+        expect(typeof step.dose_text).toBe('string');
+      }
+    }
+  });
+
+  it('resolveGenericFeedingForSpecies resuelve un frutal perenne no fijador', () => {
+    const species = {
+      id: 'persea_americana',
+      category: 'frutales_perennes',
+      familia_botanica: 'Lauraceae',
+      roles_in_guild: ['crop'],
+    };
+    const t = resolveGenericFeedingForSpecies(species);
+    expect(t).toBeTruthy();
+    expect(t.category).toBe('frutales_perennes');
+    expect(t.isLegume).toBe(false);
+  });
+
+  it('resolveGenericFeedingForSpecies resuelve un árbol de sombra no fijador', () => {
+    const species = {
+      id: 'cedrela_odorata',
+      category: 'arboles_sombra',
+      familia_botanica: 'Meliaceae',
+      roles_in_guild: ['timber'],
+    };
+    const t = resolveGenericFeedingForSpecies(species);
+    expect(t).toBeTruthy();
+    expect(t.category).toBe('arboles_sombra');
+    expect(t.isLegume).toBe(false);
+  });
+
+  it('un árbol de sombra leguminoso (fijador) recibe el plan de legumbre (sin N externo)', () => {
+    const guamo = {
+      id: 'inga_edulis',
+      category: 'arboles_sombra',
+      familia_botanica: 'Fabaceae',
+      roles_in_guild: ['nitrogen_fixer', 'shade'],
+    };
+    const t = resolveGenericFeedingForSpecies(guamo);
+    expect(t).toBeTruthy();
+    expect(t.isLegume).toBe(true);
+    expect(t.primary_steps.map((s) => s.biofertilizer_slug)).not.toContain('biol');
   });
 });
 
@@ -194,11 +321,12 @@ describe('feedingPlanGeneric — resolveGenericFeedingForSpecies (override famil
   });
 
   it('especie sin categoría con plantilla → null (degrada limpio)', () => {
+    // Medicinal no fijadora: su categoría sigue sin plantilla de nutrición.
     const species = {
-      id: 'cedrela_odorata',
-      category: 'arboles_sombra',
-      familia_botanica: 'Meliaceae',
-      roles_in_guild: ['timber'],
+      id: 'ruta_graveolens',
+      category: 'medicinales_alelopaticas',
+      familia_botanica: 'Rutaceae',
+      roles_in_guild: ['medicinal'],
     };
     expect(resolveGenericFeedingForSpecies(species)).toBeNull();
   });

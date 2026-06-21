@@ -384,6 +384,120 @@ function buildCereals() {
   });
 }
 
+function buildPerennialFruit() {
+  // Frutal perenne (árbol): el ciclo NO es anual de una sola vez. El modelo
+  // del catálogo es por offset_days desde la SIEMBRA, así que el primer año se
+  // expresa con offsets razonables (establecimiento → brotación → corona en
+  // lluvias) y las notas dejan claro que es un ESQUEMA ANUAL que se REPITE cada
+  // año al inicio de las lluvias. Es orientativo por tipo, no dosis por especie.
+  // Grounding: fertilización orgánica de frutales = abono compostado en la zona
+  // de goteo (corona/gotera) al inicio de las lluvias; el árbol toma poco al
+  // establecerse y más cuando entra en producción; el análisis de suelo manda
+  // (AGROSAVIA, ICA, FAO; Cenicafé para café y frutales andinos).
+  return template({
+    categoryId: 'frutales_perennes',
+    label: 'Frutal perenne',
+    extraNotes: [
+      'Esquema ANUAL que se REPITE cada año: el abono de corona y el biol de ' +
+        'brotación se vuelven a aplicar al inicio de cada temporada de lluvias, ' +
+        'no una sola vez. Los días aquí son del primer año desde la siembra; ' +
+        'del segundo año en adelante, guíate por las lluvias y la floración.',
+      'El árbol joven toma poco al establecerse; pide más cuando entra en ' +
+        'producción. Sube el abono a medida que crece la copa y carga fruta. ' +
+        'Es orientativo por tipo de frutal, no una dosis exacta por especie: el ' +
+        'análisis de suelo manda (AGROSAVIA, ICA, FAO; Cenicafé para café y ' +
+        'frutales andinos).',
+    ],
+    steps: [
+      step({
+        offset_days: 0,
+        action: 'Abonar el hoyo de siembra con bocashi o compost',
+        biofertilizer_slug: 'bocashi',
+        dose_safe: '1-2 kg por árbol, mezclado con la tierra del hoyo',
+        notes:
+          'Abono de fondo al sembrar. Mézclalo bien con la tierra que devuelves ' +
+          'al hoyo; que el bocashi esté maduro y frío para no quemar la raíz ' +
+          'nueva. Si tienes compost maduro sirve igual.',
+      }),
+      step({
+        offset_days: 90,
+        action: 'Foliar o al pie con biol en la brotación y floración',
+        biofertilizer_slug: 'biol',
+        dose_safe: 'biol al 10-15% (1-1.5 L por 10 L de agua); en árbol joven 1:20',
+        notes:
+          'Cuando echa hojas nuevas y empieza a florear es cuando más responde. ' +
+          'Aplícalo temprano en la mañana o al atardecer, nunca con sol fuerte. ' +
+          'En árbol joven empieza diluido (1:20) para no quemar el follaje tierno.',
+      }),
+      step({
+        offset_days: 180,
+        action: 'Abonar la corona o gotera del árbol al inicio de las lluvias',
+        biofertilizer_slug: 'bocashi',
+        dose_safe: '1-2 kg por árbol en la gotera (no pegado al tronco) + mulch',
+        notes:
+          'Reparte el abono en la corona o gotera (donde cae el agua del borde ' +
+          'de la copa), que es donde están las raíces que comen, no pegado al ' +
+          'tronco. Tápalo con mulch (hojarasca, paja) para que no se lave ni se ' +
+          'seque. Este abonado de corona se REPITE cada año al inicio de las lluvias.',
+      }),
+      step({
+        offset_days: 270,
+        action: 'Té de compost de mantenimiento',
+        biofertilizer_slug: 'te_compost',
+        dose_safe: 'foliar 1:5 a 1:10 (té claro); al pie 1:4 a 1:5 en árbol joven',
+        notes:
+          'Aporte de microbios para sostener la vida del suelo bajo el árbol. ' +
+          'El mulch y la hojarasca que cae también alimentan: deja que se ' +
+          'descompongan al pie.',
+      }),
+    ],
+  });
+}
+
+function buildShadeServiceTrees() {
+  // Árbol de sombra / servicio (maderable, cerca, sombrío): casi no pide abono;
+  // aporta hojarasca y sombra. Mínima fertilización: compost en el hoyo + mulch.
+  // Las leguminosas fijadoras (guamo, leucaena, etc.) caen en el override de
+  // legumbre antes de llegar aquí, así que no se les añade nitrógeno.
+  // Grounding: estos árboles toman muy poco al establecerse; lo que necesitan es
+  // un buen arranque de raíz y materia orgánica; análisis de suelo si hay dudas
+  // (AGROSAVIA, ICA, FAO).
+  return template({
+    categoryId: 'arboles_sombra',
+    label: 'Árbol de sombra / servicio',
+    extraNotes: [
+      'Estos árboles aportan más de lo que piden: dan sombra, hojarasca y, si ' +
+        'son leguminosas, fijan nitrógeno para sus vecinos. Casi no necesitan ' +
+        'abono una vez prendidos.',
+      'Lo importante es un buen arranque de raíz y materia orgánica al sembrar. ' +
+        'Es orientativo por tipo de árbol, no dosis por especie; si dudas, un ' +
+        'análisis de suelo manda (AGROSAVIA, ICA, FAO).',
+    ],
+    steps: [
+      step({
+        offset_days: 0,
+        action: 'Abonar el hoyo de siembra con compost o bocashi + mulch',
+        biofertilizer_slug: 'bocashi',
+        dose_safe: '0.5-1 kg por árbol en el hoyo + mulch (hojarasca/paja) encima',
+        notes:
+          'Una sola mano de abono de fondo al sembrar, mezclado con la tierra ' +
+          'del hoyo; que esté maduro y frío. Tápalo con mulch para guardar la ' +
+          'humedad mientras prende. Si tienes compost maduro sirve igual.',
+      }),
+      step({
+        offset_days: 180,
+        action: 'Té de compost al pie si el arbolito viene flojo',
+        biofertilizer_slug: 'te_compost',
+        dose_safe: 'al pie 1:4 a 1:5 en árbol joven (opcional, solo si va lento)',
+        notes:
+          'Opcional: solo si el arbolito viene flojo de arranque. Ya prendido, ' +
+          'la propia hojarasca que cae lo alimenta; deja que se descomponga al pie ' +
+          'y no necesita más abono.',
+      }),
+    ],
+  });
+}
+
 /**
  * Registro de plantillas genéricas por `category` del catálogo.
  * Solo categorías con un ciclo anual de nutrición agronómicamente defendible.
@@ -395,6 +509,8 @@ const builders = new Map([
   ['tuberculos_raices', buildTubers],
   ['granos_legumbres', buildLegumes],
   ['cereales', buildCereals],
+  ['frutales_perennes', buildPerennialFruit],
+  ['arboles_sombra', buildShadeServiceTrees],
 ]);
 
 /**
