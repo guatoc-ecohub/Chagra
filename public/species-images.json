@@ -5,7 +5,7 @@
   "processed": 634,
   "offset": 0,
   "limit": "all",
-  "species_with_images": 623,
+  "species_with_images": 626,
   "species": [
     {
       "species_id": "abatia_parviflora",
@@ -4367,6 +4367,27 @@
       "image_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/377247517/medium.jpg",
       "license": "cc0",
       "attribution": "何の権利も保有しない, Jean-Paul Boerekamps によって投稿されました"
+    },
+    {
+      "species_id": "passiflora_edulis",
+      "scientific_name": "Passiflora edulis",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/9/91/Passiflora_edulis_forma_flavicarpa.jpg",
+      "license": "cc-by-sa (Wikimedia)",
+      "attribution": "Wikimedia Commons"
+    },
+    {
+      "species_id": "capsicum_chinense",
+      "scientific_name": "Capsicum chinense",
+      "image_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/634013106/original.jpg",
+      "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Stevia"
+    },
+    {
+      "species_id": "festuca_sp_paramo",
+      "scientific_name": "Festuca",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Lolium-pratense1web.jpg",
+      "license": "cc-by-sa (Wikimedia)",
+      "attribution": "Wikimedia Commons"
     }
   ]
 }
