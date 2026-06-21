@@ -32,6 +32,9 @@ export default defineConfig({
       // Reingenieria bench 2026-06-15: tests del framework de benches
       // (runner + indice + historial). Deterministas, sin GPU/red.
       'bench/__tests__/**/*.test.{js,mjs}',
+      // Invariantes de seguridad del catálogo (p. ej. fermentos): cada
+      // entrada alimentaria debe traer su bloque de seguridad no vacío.
+      'catalog/__tests__/**/*.test.{js,mjs}',
     ],
     exclude: ['node_modules', 'dist', 'tests/*.spec.js'],
     css: false,
