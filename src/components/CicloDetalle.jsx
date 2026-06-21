@@ -34,6 +34,14 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
   const [pickStage, setPickStage] = useState(false);
   const [busy, setBusy] = useState(false);
   const [doneTasks, setDoneTasks] = useState({});
+  // Categoría agronómica del catálogo: habilita el genérico por TIPO de cultivo
+  // cuando la especie (o su especie madre, para cultivares) no tiene plantilla
+  // específica. Nunca inventa días; solo da una referencia amplia marcada.
+  const speciesCategory = useMemo(() => {
+    const species = getSpeciesByIdSync(a.subject_slug);
+    return species?.category || null;
+  }, [a.subject_slug]);
+
   const catalogPhenologyTemplate = useMemo(() => {
     const species = getSpeciesByIdSync(a.subject_slug);
     return normalizePhenologyTemplate(
@@ -54,9 +62,10 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
       sowingDate: a.created_at,
       altitudeM,
       template: catalogPhenologyTemplate,
+      category: speciesCategory,
       fallback: a.current_stage || 'sowing_confirmed',
     });
-  }, [a.last_stage_change_reason, a.current_stage, a.subject_slug, a.created_at, altitudeM, catalogPhenologyTemplate]);
+  }, [a.last_stage_change_reason, a.current_stage, a.subject_slug, a.created_at, altitudeM, catalogPhenologyTemplate, speciesCategory]);
 
   // Cycle con la etapa mostrada inyectada, para que las labores (getTasksForCycle)
   // correspondan a la etapa derivada, no a la congelada.
@@ -134,6 +143,7 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
           sowingDate={a.created_at}
           altitudeM={altitudeM}
           phenologyTemplate={catalogPhenologyTemplate}
+          category={speciesCategory}
         />
       </section>
 

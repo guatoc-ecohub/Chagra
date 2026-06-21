@@ -76,12 +76,60 @@ for (const t of templates) {
 }
 
 /**
+ * Slugs de plantilla ordenados de más largo a más corto. Permite resolver un
+ * cultivar/subespecie (slug largo) a la plantilla de su especie madre buscando
+ * el prefijo más específico primero (ej. `solanum_tuberosum_pastusa_suprema`
+ * antes de un hipotético `solanum`).
+ * @type {string[]}
+ */
+const slugsByLength = Array.from(registry.keys()).sort((a, b) => b.length - a.length);
+
+/**
+ * Resuelve el slug de la especie MADRE cuando el slug recibido es un cultivar o
+ * subespecie con plantilla propia ausente.
+ *
+ * Regla anti-alucinación: solo se considera "madre" cuando el slug del cultivar
+ * EMPIEZA por el slug de una especie con plantilla seguido de `_` (ej.
+ * `solanum_lycopersicum_san_marzano` → `solanum_lycopersicum`). Un cultivar
+ * comparte la biología base de su especie, así que NO se inventa nada: se
+ * reutiliza la fenología real de la especie. Si no hay coincidencia, retorna
+ * null (el llamador caerá al genérico por tipo o a "no estimable").
+ *
+ * @param {string} speciesSlug
+ * @returns {string|null} slug de la especie madre con plantilla, o null
+ */
+export function resolveParentSpeciesSlug(speciesSlug) {
+  if (!speciesSlug || typeof speciesSlug !== 'string') return null;
+  if (registry.has(speciesSlug)) return speciesSlug;
+  for (const slug of slugsByLength) {
+    if (speciesSlug.startsWith(`${slug}_`)) return slug;
+  }
+  return null;
+}
+
+/**
  * Retorna la plantilla para una especie, o null.
+ *
+ * Si el slug exacto no tiene plantilla pero corresponde a un cultivar/subespecie
+ * de una especie que SÍ la tiene (ej. `solanum_lycopersicum_san_marzano`), se
+ * devuelve la plantilla de la especie madre marcada con `derived_from`. Esto NO
+ * es una estimación genérica: es la fenología real de la especie aplicada a su
+ * cultivar, que comparte el mismo ciclo biológico.
+ *
  * @param {string} speciesSlug
  * @returns {PhenologyTemplate|null}
  */
 export function getTemplate(speciesSlug) {
-  return registry.get(speciesSlug) || null;
+  const direct = registry.get(speciesSlug);
+  if (direct) return direct;
+  const parent = resolveParentSpeciesSlug(speciesSlug);
+  if (parent && parent !== speciesSlug) {
+    const parentTemplate = registry.get(parent);
+    if (parentTemplate) {
+      return { ...parentTemplate, species_slug: speciesSlug, derived_from: parent };
+    }
+  }
+  return null;
 }
 
 /**

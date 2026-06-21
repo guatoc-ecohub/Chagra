@@ -8,6 +8,7 @@
  * el proceso. Solo computa estimated_stage.
  */
 import { getTemplate } from '../data/phenologyTemplates';
+import { getGenericTemplate } from '../data/phenologyGeneric';
 
 // Umbral de confianza alineado con agentService.LOW_CONFIDENCE_THRESHOLD (0.7).
 // Se define local para NO arrastrar el módulo pesado agentService.js al grafo de
@@ -75,16 +76,55 @@ export function normalizePhenologyTemplate(template, speciesSlug = '') {
 }
 
 /**
+ * Resuelve la plantilla fenológica a usar para una especie, en orden de
+ * preferencia y SIN inventar datos:
+ *
+ *   1. `template` explícito normalizado (ej. fenología embebida en el catálogo).
+ *   2. Plantilla específica de la especie por slug (incluye resolución de
+ *      cultivar/subespecie a su especie madre, que es dato real de la especie).
+ *   3. Plantilla GENÉRICA por tipo de cultivo (`category`), marcada como
+ *      aproximada. Solo existe para categorías con ciclo anual estimable.
+ *   4. null si no hay nada honesto que mostrar.
+ *
+ * El resultado conserva `is_generic` cuando proviene del paso 3, para que la
+ * capa de cálculo baje la confianza y la UI marque la estimación como
+ * aproximada y NO específica de la especie.
+ *
+ * @param {Object} input
+ * @param {string} input.speciesSlug
+ * @param {Object} [input.template] — plantilla explícita (sin normalizar)
+ * @param {string} [input.category] — categoría del catálogo para el genérico
+ * @returns {(Object & {is_generic?: boolean})|null}
+ */
+export function resolveTemplate({ speciesSlug, template, category } = {}) {
+  const explicit = normalizePhenologyTemplate(template, speciesSlug);
+  if (explicit) return explicit;
+
+  const specific = getTemplate(speciesSlug);
+  if (specific) return specific;
+
+  if (category) {
+    const generic = getGenericTemplate(category);
+    if (generic) return { ...generic, is_generic: true };
+  }
+
+  return null;
+}
+
+/**
  * Calcula ventanas fenológicas estimadas para un proceso.
  *
  * @param {Object} input
  * @param {string} input.speciesSlug
  * @param {number} input.sowingDate — timestamp ms del evento de siembra
  * @param {number} [input.altitudeM] — msnm para corrección por altitud
+ * @param {Object} [input.template] — plantilla explícita (sin normalizar)
+ * @param {string} [input.category] — categoría del catálogo para el genérico por tipo
  * @returns {PhenologyWindow[]}
  */
-export function calculateWindows({ speciesSlug, sowingDate, altitudeM, template: inputTemplate } = {}) {
-  const template = normalizePhenologyTemplate(inputTemplate, speciesSlug) || getTemplate(speciesSlug);
+export function calculateWindows({ speciesSlug, sowingDate, altitudeM, template: inputTemplate, category } = {}) {
+  const template = resolveTemplate({ speciesSlug, template: inputTemplate, category });
+  const isGeneric = !!(template && template.is_generic);
 
   if (!template) {
     return [{
@@ -127,7 +167,15 @@ export function calculateWindows({ speciesSlug, sowingDate, altitudeM, template:
       confidence = Math.max(0.4, confidence - 0.15);
     }
 
-    // Etapa sowing (día 0) tiene confianza 1.0
+    // Plantilla genérica por tipo de cultivo: NO es dato específico de la
+    // especie, así que la confianza se reduce fuerte para que la UI lo marque
+    // como aproximado (anti-alucinación: nunca aparentar precisión que no hay).
+    if (isGeneric) {
+      confidence = Math.min(confidence, 0.3);
+    }
+
+    // Etapa sowing (día 0) tiene confianza 1.0 (la fecha de siembra es un hecho,
+    // no una estimación), incluso en plantillas genéricas.
     if (stage.code === 'sowing') {
       confidence = 1.0;
     }
@@ -141,6 +189,9 @@ export function calculateWindows({ speciesSlug, sowingDate, altitudeM, template:
       windowEnd,
       status: 'computed',
       confidence: Math.round(confidence * 100) / 100,
+      // `isGeneric`: la ventana viene de una estimación por TIPO de cultivo, no
+      // de datos específicos de la especie. La UI debe rotularla aproximada.
+      isGeneric,
       sources: source ? [source.name] : [],
     };
   });
@@ -169,8 +220,8 @@ export function calculateWindows({ speciesSlug, sowingDate, altitudeM, template:
  * @param {number} [input.now=Date.now()] — timestamp ms para el cual calcular la etapa
  * @returns {CurrentStageResult|null}
  */
-export function getCurrentStage({ speciesSlug, sowingDate, altitudeM, now, template } = {}) {
-  const windows = calculateWindows({ speciesSlug, sowingDate, altitudeM, template });
+export function getCurrentStage({ speciesSlug, sowingDate, altitudeM, now, template, category } = {}) {
+  const windows = calculateWindows({ speciesSlug, sowingDate, altitudeM, template, category });
 
   if (!windows.length || (windows.length === 1 && windows[0].status !== 'computed')) {
     return null;
@@ -217,10 +268,10 @@ export function getCurrentStage({ speciesSlug, sowingDate, altitudeM, now, templ
  * @param {string} [input.fallback='sowing_confirmed'] — etapa si no se puede derivar
  * @returns {string} código de etapa (ej. 'vegetative', 'flowering', 'sowing_confirmed')
  */
-export function deriveCurrentStage({ speciesSlug, sowingDate, altitudeM, now, template, fallback = 'sowing_confirmed' } = {}) {
+export function deriveCurrentStage({ speciesSlug, sowingDate, altitudeM, now, template, category, fallback = 'sowing_confirmed' } = {}) {
   let result = null;
   try {
-    result = getCurrentStage({ speciesSlug, sowingDate, altitudeM, now, template });
+    result = getCurrentStage({ speciesSlug, sowingDate, altitudeM, now, template, category });
   } catch {
     return fallback;
   }

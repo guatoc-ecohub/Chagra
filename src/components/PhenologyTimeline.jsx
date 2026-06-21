@@ -37,18 +37,26 @@ export default function PhenologyTimeline({
   sowingDate,
   altitudeM,
   phenologyTemplate,
+  category,
   observedStages = [],
   compact = false,
 }) {
   const windows = useMemo(() => {
     if (!speciesSlug || !sowingDate) return [];
-    return calculateWindows({ speciesSlug, sowingDate, altitudeM, template: phenologyTemplate });
-  }, [speciesSlug, sowingDate, altitudeM, phenologyTemplate]);
+    return calculateWindows({ speciesSlug, sowingDate, altitudeM, template: phenologyTemplate, category });
+  }, [speciesSlug, sowingDate, altitudeM, phenologyTemplate, category]);
 
   const estimatedCurrent = useMemo(() => {
     if (!speciesSlug || !sowingDate) return null;
-    return getCurrentStage({ speciesSlug, sowingDate, altitudeM, template: phenologyTemplate });
-  }, [speciesSlug, sowingDate, altitudeM, phenologyTemplate]);
+    return getCurrentStage({ speciesSlug, sowingDate, altitudeM, template: phenologyTemplate, category });
+  }, [speciesSlug, sowingDate, altitudeM, phenologyTemplate, category]);
+
+  // Una ventana genérica (no específica de la especie) marca todo el timeline
+  // como aproximado por tipo de cultivo.
+  const isGenericEstimate = useMemo(
+    () => windows.some((w) => w.isGeneric),
+    [windows],
+  );
 
   const observedMap = useMemo(() => {
     const m = {};
@@ -81,6 +89,16 @@ export default function PhenologyTimeline({
         Timeline fenológica
         {altitudeM && <span className="text-slate-600 font-normal normal-case"> · {altitudeM} msnm</span>}
       </h3>
+
+      {isGenericEstimate && !compact && (
+        <div className="flex items-start gap-1.5 bg-amber-900/20 border border-amber-800/40 rounded-lg px-2.5 py-2 mb-3">
+          <AlertTriangle size={12} className="text-amber-400 shrink-0 mt-0.5" />
+          <p className="text-2xs text-amber-200">
+            Aproximación por tipo de cultivo. No hay fenología específica para esta especie:
+            las fechas son una referencia amplia, no un dato firme de la especie.
+          </p>
+        </div>
+      )}
 
       <div className="flex flex-col gap-2">
         {windows.map((win, i) => {
