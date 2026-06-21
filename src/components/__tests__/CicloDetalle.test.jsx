@@ -1,3 +1,4 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- aserciones de UI ES-CO en test. */
 /**
  * CicloDetalle — enriquecimiento del detalle del ciclo (antes "oscuro"):
  * confirmar etapa (stageConfirmationService), biopreparados por etapa
@@ -22,6 +23,7 @@ vi.mock('../PhenologyTimeline', () => ({
 }));
 vi.mock('../CicloObservacion', () => ({ default: () => null }));
 vi.mock('../CicloFotos', () => ({ default: () => null }));
+vi.mock('../SpeciesImage', () => ({ default: () => null }));
 vi.mock('../../services/cycleTaskService', () => ({
   getTasksForCycle: () => [{ id: 't1', label: 'Regar el café' }],
   getUrgentTasks: () => [],
@@ -34,19 +36,26 @@ vi.mock('../../services/climateCycleService', () => ({
 vi.mock('../../services/ensoService', () => ({ getEnsoServicePhase: () => null, getEnsoLabel: () => 'Neutral' }));
 vi.mock('../../services/stageConfirmationService', () => ({ confirmStage }));
 vi.mock('../../services/voiceTaskService', () => ({ completeTaskByVoice }));
+// CicloDetalle resuelve la especie de forma tolerante con getAllSpecies +
+// matchSpeciesInCatalog (igual que la ficha de especie). El mock devuelve el
+// catálogo completo; el matcher hace el match exacto por id/slug.
 vi.mock('../../db/catalogDB', () => ({
-  getSpeciesByIdSync: (id) => (id === 'catalogo_especifico'
-    ? {
-        id,
-        phenology_template: {
-          stages: [
-            { code: 'sowing', label: 'Siembra catálogo', minDays: 0, maxDays: 0 },
-            { code: 'brotacion_catalogo', label: 'Brotación específica del catálogo', minDays: 1, maxDays: 10 },
-          ],
-          sources: [{ name: 'Catálogo Chagra' }],
-        },
-      }
-    : null),
+  getAllSpecies: async () => [
+    { id: 'coffea_arabica', slug: 'coffea_arabica', nombre_comun: 'Café', nombre_cientifico: 'Coffea arabica', category: 'cafe' },
+    { id: 'fragaria_ananassa', slug: 'fragaria_ananassa', nombre_comun: 'Fresa', nombre_cientifico: 'Fragaria ananassa', category: 'frutales' },
+    {
+      id: 'catalogo_especifico',
+      slug: 'catalogo_especifico',
+      nombre_comun: 'Cultivo catálogo',
+      phenology_template: {
+        stages: [
+          { code: 'sowing', label: 'Siembra catálogo', minDays: 0, maxDays: 0 },
+          { code: 'brotacion_catalogo', label: 'Brotación específica del catálogo', minDays: 1, maxDays: 10 },
+        ],
+        sources: [{ name: 'Catálogo Chagra' }],
+      },
+    },
+  ],
 }));
 
 import CicloDetalle from '../CicloDetalle';
@@ -80,7 +89,7 @@ describe('CicloDetalle', () => {
     expect(completeTaskByVoice.mock.calls[0][0]).toMatchObject({ processId: 'p1', taskName: 'Regar el café' });
   });
 
-  it('usa la fenología específica del catálogo antes que la plantilla genérica por slug', () => {
+  it('usa la fenología específica del catálogo antes que la plantilla genérica por slug', async () => {
     render(<CicloDetalle
       cycle={{
         process_id: 'p-cat',
@@ -96,6 +105,33 @@ describe('CicloDetalle', () => {
       onReload={() => {}}
     />);
 
-    expect(screen.getByText('Brotación específica del catálogo')).toBeTruthy();
+    // La especie se resuelve de forma asíncrona (getAllSpecies), así que la
+    // plantilla del catálogo aparece tras el match tolerante.
+    expect(await screen.findByText('Brotación específica del catálogo')).toBeTruthy();
+  });
+
+  it('resuelve la fenología por slug canónico cuando el ciclo guarda el nombre común (fresa)', async () => {
+    // Regresión 2026-06-20 (operador, fresa): subject_slug="fresa" no coincide
+    // con el id del catálogo "fragaria_ananassa"; el match tolerante por nombre
+    // común debe llevar a getTemplate('fragaria_ananassa') → timeline poblada,
+    // nunca "Datos insuficientes".
+    const { container } = render(<CicloDetalle
+      cycle={{
+        process_id: 'p-fresa',
+        attributes: {
+          subject_label: 'Fresa',
+          subject_slug: 'fresa',
+          current_stage: 'vegetative',
+          created_at: new Date('2026-05-01T00:00:00Z').getTime(),
+          status: 'active',
+        },
+      }}
+      altitudeM={1800}
+      onReload={() => {}}
+    />);
+
+    // El mock de PhenologyTimeline renderiza un <span> por etapa del template;
+    // si la resolución fallara, no habría ninguno.
+    await waitFor(() => expect(container.querySelectorAll('span').length).toBeGreaterThan(0));
   });
 });

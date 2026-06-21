@@ -2,9 +2,13 @@ import React, { useMemo } from 'react';
 import { Clock, Eye, HelpCircle, AlertTriangle, CheckCircle, Sprout, Timer } from 'lucide-react';
 import { calculateWindows, formatWindow, getCurrentStage } from '../services/phenologyCalculator';
 
+// Colores theme-aware: la rampa slate/emerald/amber y los acentos custom
+// (orchid/morpho) se remapean por tema (themes.css / tailwind.config.js), así el
+// timeline se ve claro en nature/minimalista y oscuro en biopunk. Antes usaba
+// lime/green/pink/yellow/sky fijos → se veían oscuros sobre fondo claro.
 const confidenceColor = (c) => {
   if (c >= 0.9) return 'text-emerald-400';
-  if (c >= 0.6) return 'text-lime-400';
+  if (c >= 0.6) return 'text-emerald-300';
   if (c >= 0.4) return 'text-amber-400';
   return 'text-slate-500';
 };
@@ -12,14 +16,14 @@ const confidenceColor = (c) => {
 const stageColor = (code) => {
   const map = {
     sowing: 'bg-emerald-800 border-emerald-600',
-    emergence: 'bg-lime-800 border-lime-600',
-    vegetative: 'bg-green-800 border-green-600',
-    flowering: 'bg-pink-800 border-pink-600',
-    fruiting: 'bg-amber-800 border-amber-600',
-    harvest_window: 'bg-yellow-800 border-yellow-600',
-    closed: 'bg-slate-800 border-slate-600',
+    emergence: 'bg-emerald-700 border-emerald-500',
+    vegetative: 'bg-emerald-600 border-emerald-400',
+    flowering: 'bg-orchid border-orchid',
+    fruiting: 'bg-amber-700 border-amber-500',
+    harvest_window: 'bg-amber-600 border-amber-400',
+    closed: 'bg-slate-700 border-slate-500',
   };
-  return map[code] || 'bg-slate-800 border-slate-600';
+  return map[code] || 'bg-slate-700 border-slate-500';
 };
 
 /**
@@ -85,7 +89,7 @@ export default function PhenologyTimeline({
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
       <h3 className="text-2xs font-bold text-slate-400 uppercase flex items-center gap-1.5 mb-4">
-        <Sprout size={13} className="text-lime-400" />
+        <Sprout size={13} className="text-emerald-400" />
         Timeline fenológica
         {altitudeM && <span className="text-slate-600 font-normal normal-case"> · {altitudeM} msnm</span>}
       </h3>
@@ -111,14 +115,14 @@ export default function PhenologyTimeline({
             <div key={win.code} className={`flex gap-2 ${compact ? 'items-center' : ''}`}>
               {/* Indicador de etapa */}
               <div className="flex flex-col items-center gap-0.5 shrink-0">
-                <div className={`w-3 h-3 rounded-full border ${stageColor(win.code)} ${isObservedCurrent ? 'ring-2 ring-lime-400/50' : ''} ${isEstimatedCurrent ? 'ring-2 ring-sky-400/40 border-dashed' : ''} ${isPast ? 'opacity-50' : ''}`} />
+                <div className={`w-3 h-3 rounded-full border ${stageColor(win.code)} ${isObservedCurrent ? 'ring-2 ring-emerald-400/50' : ''} ${isEstimatedCurrent ? 'ring-2 ring-morpho/40 border-dashed' : ''} ${isPast ? 'opacity-50' : ''}`} />
                 {i < windows.length - 1 && <div className="w-px h-4 bg-slate-700" />}
               </div>
 
               {/* Contenido */}
               <div className={`flex-1 min-w-0 ${compact ? 'flex items-center gap-2' : ''}`}>
                 <div className={`flex items-center gap-1.5 ${isPast ? 'opacity-50' : ''}`}>
-                  <span className={`text-sm font-medium ${isObservedCurrent ? 'text-lime-300' : 'text-slate-200'}`}>
+                  <span className={`text-sm font-medium ${isObservedCurrent ? 'text-emerald-300' : 'text-slate-200'}`}>
                     {win.label}
                   </span>
                   {obs && (
@@ -127,7 +131,7 @@ export default function PhenologyTimeline({
                     </span>
                   )}
                   {isEstimatedCurrent && (
-                    <span className="inline-flex items-center gap-0.5 text-2xs text-sky-400" title={`Estimado: ${estimatedCurrent.daysElapsed} días desde siembra`}>
+                    <span className="inline-flex items-center gap-0.5 text-2xs text-morpho" title={`Estimado: ${estimatedCurrent.daysElapsed} días desde siembra`}>
                       <Timer size={10} />
                     </span>
                   )}

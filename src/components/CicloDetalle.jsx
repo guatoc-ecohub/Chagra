@@ -1,16 +1,22 @@
-import { useCallback, useMemo, useState } from 'react';
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- UI ES-CO; migración a
+ * src/config/messages.js (ADR-050 i18n) fuera del alcance de este fix. */
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Sprout, FlaskConical, AlertTriangle } from 'lucide-react';
 import FarmProcessSummary from './FarmProcessSummary';
 import PhenologyTimeline from './PhenologyTimeline';
 import CicloObservacion from './CicloObservacion';
 import CicloFotos from './CicloFotos';
+import SpeciesImage from './SpeciesImage';
 import { getTasksForCycle, getUrgentTasks } from '../services/cycleTaskService';
 import { getPestRisksByStage, getBiopreparadosForStage, getEnsemblePreventiveTasks } from '../services/climateCycleService';
 import { confirmStage } from '../services/stageConfirmationService';
 import { deriveCurrentStage, normalizePhenologyTemplate } from '../services/phenologyCalculator';
 import { completeTaskByVoice } from '../services/voiceTaskService';
 import { getEnsoServicePhase, getEnsoLabel } from '../services/ensoService';
-import { getSpeciesByIdSync } from '../db/catalogDB';
+import { getAllSpecies } from '../db/catalogDB';
+import { matchSpeciesInCatalog } from '../utils/speciesResolver';
+import { getTemplate } from '../data/phenologyTemplates';
+import { getGenericTemplate } from '../data/phenologyGeneric';
 
 /**
  * CicloDetalle — detalle de un ciclo (FarmProcess) con el enriquecimiento del
@@ -34,21 +40,61 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
   const [pickStage, setPickStage] = useState(false);
   const [busy, setBusy] = useState(false);
   const [doneTasks, setDoneTasks] = useState({});
+  // Especie del catálogo resuelta de forma TOLERANTE.
+  //
+  // Bug 2026-06-20 (operador, fresa): el ciclo guarda `subject_slug` con el
+  // nombre común que escribió el campesino ("fresa"), que NO coincide con el id
+  // canónico del catálogo ("fragaria_ananassa"). El match exacto fallaba y con él
+  // se caían la categoría, la plantilla fenológica (timeline "Datos
+  // insuficientes") y la foto. matchSpeciesInCatalog tolera la des-coincidencia
+  // (id/slug exacto → nombre común → inclusión parcial), igual que la ficha de
+  // especie (AssetDetailView).
+  const [species, setSpecies] = useState(null);
+  useEffect(() => {
+    let cancelled = false;
+    getAllSpecies()
+      .then((list) => {
+        if (cancelled) return;
+        setSpecies(matchSpeciesInCatalog(list || [], a.subject_slug, a.subject_label));
+      })
+      .catch((err) => {
+        console.warn('[CicloDetalle] getAllSpecies falló:', err?.message || err);
+      });
+    return () => { cancelled = true; };
+  }, [a.subject_slug, a.subject_label]);
+
+  // Slug CANÓNICO de la especie (id del catálogo) cuando hay match; si no, el
+  // slug guardado en el ciclo. Es el que se pasa a la fenología/foto.
+  const canonicalSlug = useMemo(
+    () => species?.id || species?.slug || a.subject_slug,
+    [species, a.subject_slug],
+  );
+
   // Categoría agronómica del catálogo: habilita el genérico por TIPO de cultivo
   // cuando la especie (o su especie madre, para cultivares) no tiene plantilla
   // específica. Nunca inventa días; solo da una referencia amplia marcada.
-  const speciesCategory = useMemo(() => {
-    const species = getSpeciesByIdSync(a.subject_slug);
-    return species?.category || null;
-  }, [a.subject_slug]);
+  const speciesCategory = useMemo(() => species?.category || null, [species]);
 
-  const catalogPhenologyTemplate = useMemo(() => {
-    const species = getSpeciesByIdSync(a.subject_slug);
-    return normalizePhenologyTemplate(
+  // Plantilla fenológica resuelta SIN inventar datos, en orden de preferencia:
+  //   1. fenología embebida en el catálogo (si la trae), normalizada;
+  //   2. plantilla específica de la especie por slug canónico
+  //      (phenologyTemplates.js, con herencia padre→cultivar via getTemplate);
+  //   3. genérico por TIPO de cultivo (phenologyGeneric.js), marcado aproximado.
+  // Nunca "Datos insuficientes" si hay slug canónico o categoría conocida.
+  const resolvedPhenologyTemplate = useMemo(() => {
+    const catalogTemplate = normalizePhenologyTemplate(
       species?.phenology_template || species?.phenology || species?.fenologia || species?.phenology_stages,
-      a.subject_slug,
+      canonicalSlug,
     );
-  }, [a.subject_slug]);
+    if (catalogTemplate) return catalogTemplate;
+    const specific = getTemplate(canonicalSlug);
+    if (specific) return specific;
+    if (speciesCategory) {
+      const generic = getGenericTemplate(speciesCategory);
+      if (generic) return { ...generic, is_generic: true };
+    }
+    return null;
+  }, [species, canonicalSlug, speciesCategory]);
 
   // Etapa MOSTRADA: si el campesino confirmó/corrigió la etapa a mano
   // (last_stage_change_reason presente) respetamos lo que él dijo. Si no,
@@ -58,14 +104,14 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
   const displayStage = useMemo(() => {
     if (a.last_stage_change_reason) return a.current_stage;
     return deriveCurrentStage({
-      speciesSlug: a.subject_slug,
+      speciesSlug: canonicalSlug,
       sowingDate: a.created_at,
       altitudeM,
-      template: catalogPhenologyTemplate,
+      template: resolvedPhenologyTemplate,
       category: speciesCategory,
       fallback: a.current_stage || 'sowing_confirmed',
     });
-  }, [a.last_stage_change_reason, a.current_stage, a.subject_slug, a.created_at, altitudeM, catalogPhenologyTemplate, speciesCategory]);
+  }, [a.last_stage_change_reason, a.current_stage, canonicalSlug, a.created_at, altitudeM, resolvedPhenologyTemplate, speciesCategory]);
 
   // Cycle con la etapa mostrada inyectada, para que las labores (getTasksForCycle)
   // correspondan a la etapa derivada, no a la congelada.
@@ -102,16 +148,26 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
 
   return (
     <div className="px-4 pb-10 flex flex-col gap-4">
+      {/* Foto de referencia de la especie — misma resolución tolerante que la
+          ficha de especie. Si el catálogo no tiene foto, SpeciesImage muestra su
+          fallback (emoji + nombre), nunca un hueco. */}
+      <SpeciesImage
+        scientificName={species?.nombre_cientifico || null}
+        commonName={species?.nombre_comun || a.subject_label || null}
+        category={speciesCategory}
+        catalogImage={species?.imagen || species?.image || species?.media?.image || species?.media || null}
+      />
+
       <FarmProcessSummary process={effectiveCycle} pestRisks={pestRisks} />
 
       {/* Etapa actual + confirmar cambio (stageConfirmationService) */}
       <section className="bg-slate-900 border border-slate-800 rounded-xl p-3">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-sm text-slate-300">Etapa: <strong className="text-lime-300">{stageLabel(displayStage)}</strong></span>
+          <span className="text-sm text-slate-300">Etapa: <strong className="text-emerald-400">{stageLabel(displayStage)}</strong></span>
           <button
             type="button"
             onClick={() => setPickStage((o) => !o)}
-            className="text-xs font-bold text-lime-400 px-2.5 py-1.5 rounded-lg border border-lime-800/60 shrink-0"
+            className="text-xs font-bold text-emerald-400 px-2.5 py-1.5 rounded-lg border border-emerald-800/60 shrink-0"
           >
             ¿Cambió de etapa?
           </button>
@@ -139,10 +195,10 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
       <section>
         <h2 className="text-2xs uppercase font-bold text-slate-500 mb-2">Línea de tiempo</h2>
         <PhenologyTimeline
-          speciesSlug={a.subject_slug}
+          speciesSlug={canonicalSlug}
           sowingDate={a.created_at}
           altitudeM={altitudeM}
-          phenologyTemplate={catalogPhenologyTemplate}
+          phenologyTemplate={resolvedPhenologyTemplate}
           category={speciesCategory}
         />
       </section>
@@ -188,13 +244,13 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
               const done = !!doneTasks[label];
               return (
                 <li key={t.id || t.code || i} className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 flex items-center gap-2">
-                  <Sprout size={14} className="text-lime-400 shrink-0" />
+                  <Sprout size={14} className="text-emerald-400 shrink-0" />
                   <span className="flex-1 min-w-0">{label}</span>
                   <button
                     type="button"
                     onClick={() => handleDone(label)}
                     disabled={done}
-                    className={`text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 ${done ? 'text-green-400' : 'text-slate-200 bg-slate-800 hover:bg-slate-700'}`}
+                    className={`text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 ${done ? 'text-emerald-400' : 'text-slate-200 bg-slate-800 hover:bg-slate-700'}`}
                   >
                     {done ? '✓ Hecho' : 'Marcar hecha'}
                   </button>
