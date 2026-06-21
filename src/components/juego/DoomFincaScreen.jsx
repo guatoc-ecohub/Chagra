@@ -8,12 +8,12 @@ import { ScreenShell } from '../common/ScreenShell';
 import { Sprout, Bug, Shield, RotateCcw, Crosshair } from 'lucide-react';
 import { agentSounds, isSoundEnabled } from '../../services/agentSoundService';
 import {
-  MAPA, MAPA_COLS, MAPA_FILAS, PALETA, CONFIG_DOOM,
+  MAPA, MAPA_COLS, MAPA_FILAS, PALETA, MATERIALES, DECORACIONES, CONFIG_DOOM,
   PLAGAS_DOOM, BENEFICOS_DOOM,
 } from './doomFincaData';
 import {
   castRay, projectSprite, createWorld,
-  tickWorld, cambiarBenefico,
+  tickWorld, cambiarBenefico, decoracionEnMira, plagaEnMira,
 } from '../../services/doomFincaEngine';
 
 const W = CONFIG_DOOM.resX;  // 240
@@ -21,6 +21,223 @@ const H = CONFIG_DOOM.resY;  // 180
 const FOV = CONFIG_DOOM.fov;
 const NIEBLA_INI = CONFIG_DOOM.nieblaInicio;
 const NIEBLA_FIN = CONFIG_DOOM.nieblaFin;
+
+/** Parte fraccionaria. */
+function frac(n) { return n - Math.floor(n); }
+
+/** Hash 2D determinista 0..1 (ruido para texturas de campo). */
+function hash2(x, y) {
+  const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
+  return s - Math.floor(s);
+}
+
+/** Diferencia angular normalizada a [-PI, PI]. */
+function angDiff(a, b) {
+  let d = a - b;
+  while (d > Math.PI) d -= 2 * Math.PI;
+  while (d < -Math.PI) d += 2 * Math.PI;
+  return d;
+}
+
+/** Convierte '#rrggbb' a [r, g, b]. */
+function hexRGB(h) {
+  return [
+    parseInt(h.slice(1, 3), 16),
+    parseInt(h.slice(3, 5), 16),
+    parseInt(h.slice(5, 7), 16),
+  ];
+}
+
+/**
+ * Devuelve el color [r,g,b] de un pixel de pared segun el material y la
+ * coordenada de textura (tx horizontal 0-1, vy vertical 0-1). Cada material
+ * tiene su patron: tablones de madera, bloques de adobe, hojas del seto,
+ * grumos de la compostera, follaje de la cama de cultivo.
+ */
+function texturaPared(patron, tx, vy, base, sombra, luz) {
+  switch (patron) {
+    case 'madera': {
+      const plank = Math.floor(vy * 5);
+      if (frac(vy * 5) < 0.10) return sombra;            // junta entre tablones
+      return hash2(Math.floor(tx * 40), plank) > 0.7 ? luz : base; // veta
+    }
+    case 'adobe': {
+      const filas = 5;
+      const by = Math.floor(vy * filas);
+      const bx = frac(tx * 4 + (by % 2) * 0.5);
+      if (frac(vy * filas) < 0.12 || bx < 0.08 || bx > 0.92) return sombra; // junta de barro
+      return (by % 2 === 0) ? base : luz;
+    }
+    case 'seto': {
+      const v = hash2(Math.floor(tx * 18), Math.floor(vy * 18)) * 0.6
+              + hash2(Math.floor(tx * 7) + 3, Math.floor(vy * 9) + 5) * 0.4;
+      if (v < 0.30) return sombra;   // hueco entre hojas
+      if (v > 0.72) return luz;      // hoja iluminada
+      return base;
+    }
+    case 'compost': {
+      if (frac(tx * 3) < 0.06) return sombra;            // tablon del cajon
+      const n = hash2(Math.floor(tx * 14), Math.floor(vy * 14));
+      if (n < 0.33) return sombra;
+      if (n > 0.80) return luz;
+      return base;
+    }
+    case 'cultivo': {
+      if (vy < 0.42) {                                   // follaje verde arriba
+        return hash2(Math.floor(tx * 20), Math.floor(vy * 24)) > 0.45 ? luz : sombra;
+      }
+      if (vy < 0.50) return sombra;                      // linea de tierra
+      return frac(vy * 4) < 0.12 ? sombra : base;        // tablon de la cama
+    }
+    default:
+      return base;
+  }
+}
+
+/** Oscurece un color [r,g,b]. */
+function darken(c, f) { return [c[0] * f, c[1] * f, c[2] * f]; }
+/** Aclara un color [r,g,b] (clamp 255). */
+function lighten(c, f) {
+  return [Math.min(255, c[0] * f), Math.min(255, c[1] * f), Math.min(255, c[2] * f)];
+}
+
+/**
+ * Pinta un pixel (u,v en 0-1) de una plaga segun su forma. Devuelve [r,g,b]
+ * o null (transparente). Sprites reconocibles: oruga segmentada, mosca con
+ * alas, colonia de afidos, escarabajo con elitros.
+ */
+function pintarPlaga(forma, u, v, base) {
+  const cx = u - 0.5;
+  switch (forma) {
+    case 'oruga': {
+      if (v < 0.30 || v > 0.80) return null;
+      if (cx * cx * 2.2 + (v - 0.55) * (v - 0.55) * 9 > 0.9) return null;
+      if (u > 0.80 && Math.abs(v - 0.48) < 0.13) return v < 0.46 ? [20, 20, 20] : darken(base, 0.6);
+      return frac(u * 6) < 0.20 ? darken(base, 0.55) : base; // segmentos
+    }
+    case 'mosca': {
+      const bodyR = cx * cx * 6 + (v - 0.55) * (v - 0.55) * 7;
+      if (v > 0.30 && v < 0.85 && bodyR < 0.5) {
+        if (v < 0.45 && Math.abs(cx) < 0.12) return [10, 10, 10]; // ojos
+        return base;
+      }
+      if (Math.abs(cx) > 0.18 && Math.abs(cx) < 0.5 && v > 0.30 && v < 0.58) return [240, 240, 245]; // alas
+      return null;
+    }
+    case 'afido': {
+      const blobs = [[0.40, 0.45], [0.60, 0.50], [0.50, 0.66], [0.46, 0.32]];
+      for (const b of blobs) {
+        const dx = u - b[0];
+        const dy = v - b[1];
+        if (dx * dx * 9 + dy * dy * 14 < 0.5) return dx > 0 ? base : darken(base, 0.7);
+      }
+      return null;
+    }
+    case 'escarabajo': {
+      if (cx * cx * 3 + (v - 0.55) * (v - 0.55) * 4 > 0.85 || v < 0.25) return null;
+      if (Math.abs(cx) < 0.04) return darken(base, 0.5);          // linea de elitros
+      if (v < 0.42 && cx < 0) return lighten(base, 1.5);          // brillo
+      return base;
+    }
+    default:
+      return (cx * cx * 2 + (v - 0.5) * (v - 0.5) * 2) < 0.8 ? base : null;
+  }
+}
+
+/**
+ * Pinta un pixel (u,v en 0-1) de una decoracion de la finca. Devuelve [r,g,b]
+ * o null. Arbol, colmena, gallina, vaca, girasol, compostera (abono).
+ */
+function pintarDeco(tipo, u, v) {
+  const cx = u - 0.5;
+  switch (tipo) {
+    case 'arbol': {
+      if (v > 0.60 && Math.abs(cx) < 0.08) return [92, 62, 36];   // tronco
+      const copas = [[0.50, 0.28, 0.30], [0.34, 0.40, 0.22], [0.66, 0.40, 0.22], [0.50, 0.50, 0.24]];
+      for (const co of copas) {
+        const dx = u - co[0];
+        const dy = v - co[1];
+        if (dx * dx + dy * dy < co[2] * co[2]) {
+          return hash2(Math.floor(u * 30), Math.floor(v * 30)) > 0.5 ? [74, 138, 63] : [54, 104, 46];
+        }
+      }
+      return null;
+    }
+    case 'colmena': {
+      if (v > 0.28 && v < 0.37 && Math.abs(cx) < 0.40) return [120, 80, 40]; // techo
+      if (v < 0.35) {
+        return (v < 0.32 && hash2(Math.floor(u * 40), Math.floor(v * 40)) > 0.93) ? [40, 30, 10] : null; // abejas
+      }
+      if (Math.abs(cx) > 0.34) return null;
+      const caja = Math.floor((v - 0.35) / 0.20);
+      if (frac((v - 0.35) / 0.20) < 0.10) return [110, 72, 36];   // junta de cajon
+      if (caja === 2 && Math.abs(cx) < 0.12) return [30, 20, 10]; // entrada
+      return (caja % 2 === 0) ? [214, 176, 110] : [196, 156, 92];
+    }
+    case 'gallina': {
+      if (v > 0.78 && v < 0.96 && Math.abs(cx) < 0.20) return [200, 150, 30]; // patas
+      const dxh = u - 0.66;
+      const dyh = v - 0.34;
+      if (dxh * dxh * 4 + dyh * dyh * 5 < 0.40) {                 // cabeza
+        if (v < 0.27) return [210, 40, 40];                       // cresta
+        if (u > 0.76 && Math.abs(dyh) < 0.05) return [240, 170, 30]; // pico
+        if (dxh > 0.02 && dyh < 0 && dxh * dxh + dyh * dyh < 0.012) return [20, 20, 20]; // ojo
+        return [236, 232, 220];
+      }
+      if (cx * cx * 2.6 + (v - 0.56) * (v - 0.56) * 3.2 < 0.55 && v > 0.34) return [232, 226, 210]; // cuerpo
+      return null;
+    }
+    case 'vaca': {
+      if (v > 0.80 && v < 0.98 && (Math.abs(cx - 0.22) < 0.06 || Math.abs(cx + 0.22) < 0.06)) return [40, 30, 28]; // patas
+      if (cx * cx * 1.6 + (v - 0.56) * (v - 0.56) * 3.4 < 0.60 && v > 0.32 && v < 0.86) {
+        return hash2(Math.floor(u * 9), Math.floor(v * 9)) > 0.55 ? [60, 44, 38] : [236, 232, 228]; // manchas
+      }
+      const dxh = u - 0.16;
+      const dyh = v - 0.52;
+      if (dxh * dxh * 5 + dyh * dyh * 6 < 0.40) return [70, 52, 46]; // cabeza
+      return null;
+    }
+    case 'girasol': {
+      if (v > 0.50 && Math.abs(cx) < 0.05) return [60, 110, 40];  // tallo
+      if (v > 0.58 && v < 0.72 && Math.abs(cx) > 0.05 && Math.abs(cx) < 0.28) return [70, 128, 52]; // hojas
+      const dx = u - 0.5;
+      const dy = v - 0.30;
+      const rd = Math.sqrt(dx * dx + dy * dy);
+      if (rd < 0.13) return [90, 56, 20];                         // centro
+      if (rd < 0.27) return frac(Math.atan2(dy, dx) / (Math.PI / 6)) < 0.6 ? [245, 200, 40] : [228, 174, 28]; // petalos
+      return null;
+    }
+    case 'abono': {
+      const top = 0.45 + 0.18 * Math.cos(cx * 3.1);
+      if (v < top || Math.abs(cx) > 0.45) {
+        if (v < top && v > top - 0.18 && hash2(Math.floor(u * 20), Math.floor(v * 20) + 1) > 0.92) return [212, 212, 206]; // vapor
+        return null;
+      }
+      const n = hash2(Math.floor(u * 16), Math.floor(v * 16));
+      if (n < 0.30) return [46, 32, 18];
+      if (n > 0.85) return [96, 70, 40];                          // restos claros
+      return [70, 50, 28];
+    }
+    default:
+      return null;
+  }
+}
+
+/** Dimensiones del billboard por tipo (alto/ancho en multiplos de size, hover sobre el piso). */
+const PLAGA_DIM = {
+  oruga: { hf: 0.55, wf: 0.75, hover: 0.18 },
+  mosca: { hf: 0.45, wf: 0.50, hover: 0.55 },
+  afido: { hf: 0.50, wf: 0.60, hover: 0.12 },
+  escarabajo: { hf: 0.45, wf: 0.55, hover: 0.10 },
+};
+const DECO_DIM = {
+  arbol: { hf: 2.40, wf: 1.60, hover: 0 },
+  colmena: { hf: 1.00, wf: 0.85, hover: 0 },
+  gallina: { hf: 0.55, wf: 0.60, hover: 0 },
+  vaca: { hf: 0.95, wf: 1.55, hover: 0 },
+  girasol: { hf: 1.55, wf: 0.70, hover: 0 },
+  abono: { hf: 0.55, wf: 1.15, hover: 0 },
+};
 
 /**
  * DoomFincaScreen - nivel Doom / Wolfenstein 3D agroecologico en primera
@@ -51,6 +268,8 @@ export default function DoomFincaScreen({ onBack, onHome }) {
   );
   const [estado, setEstado] = useState('jugando'); // jugando | gano | perdio
   const [_frameCount, setFrameCount] = useState(0);
+  const [leccion, setLeccion] = useState(''); // leccion de la decoracion en la mira
+  const leccionRef = useRef('');
 
   const soundOn = useRef(isSoundEnabled());
   const beep = useCallback((kind) => {
@@ -211,170 +430,189 @@ export default function DoomFincaScreen({ onBack, onHome }) {
 
       // Pre-calcular rayos y guardar distancias por columna (para sprites)
       const zBuffer = new Float64Array(W);
+      const horizon = halfH;
+      const sky0 = PALETA.cieloAlto;
+      const sky1 = PALETA.cieloBajo;
+      const mtn = PALETA.montana;
+      const mtnS = PALETA.montanaSombra;
+      const sunC = PALETA.sol;
+      const sunG = PALETA.solBrillo;
+      const nube = PALETA.nube;
+      const tierra = PALETA.tierra;
+      const surco = PALETA.tierraSurco;
+      const pasto = PALETA.pasto;
+      const mulch = PALETA.mulch;
 
       for (let col = 0; col < W; col += 1) {
         const rayAngle = pa - fovHalf + (col / W) * FOV;
+        const rcos = Math.cos(rayAngle);
+        const rsin = Math.sin(rayAngle);
         const result = castRay(MAPA, px, py, rayAngle);
 
         // Fish-eye correction
         const corrDist = result.dist * Math.cos(rayAngle - pa);
         zBuffer[col] = corrDist;
 
-        // Altura de la pared en pantalla
-        const wallH = Math.round(H / corrDist);
-        const wallTop = Math.max(0, Math.round(halfH - wallH / 2));
-        const wallBot = Math.min(H - 1, Math.round(halfH + wallH / 2));
+        // Altura de la pared en pantalla (float para texturar sin saltos)
+        const wallHf = H / corrDist;
+        const trueTop = halfH - wallHf / 2;
+        const wallTop = Math.max(0, Math.round(trueTop));
+        const wallBot = Math.min(H - 1, Math.round(halfH + wallHf / 2));
 
-        // Color de la pared segun la cara y la distancia
-        let baseColor;
-        switch (result.cara) {
-          case 0: baseColor = PALETA.paredNorte; break;
-          case 1: baseColor = PALETA.paredSur; break;
-          case 2: baseColor = PALETA.paredEste; break;
-          case 3: baseColor = PALETA.paredOeste; break;
-          default: baseColor = '#999'; break;
-        }
+        // Material de la pared golpeada
+        const mat = MATERIALES[result.tipo] || MATERIALES[1];
+        const baseRGB = hexRGB(mat.base);
+        const sombraRGB = hexRGB(mat.sombra);
+        const luzRGB = hexRGB(mat.luz);
 
-        // Oscurecer por distancia (iluminacion + niebla)
-        const fogFactor = Math.max(0, Math.min(1,
-          (corrDist - NIEBLA_INI) / (NIEBLA_FIN - NIEBLA_INI)));
-        const lightFactor = Math.max(0.15, 1.0 - corrDist * 0.08);
+        // Iluminacion: cara N/S mas oscura; atenuacion suave por distancia;
+        // niebla atmosferica que mezcla hacia el color del horizonte (no a negro).
+        const fog = Math.max(0, Math.min(1, (corrDist - NIEBLA_INI) / (NIEBLA_FIN - NIEBLA_INI)));
+        const light = Math.max(0.40, 1.0 - corrDist * 0.05);
+        const faceDim = result.cara <= 1 ? 0.78 : 1.0;
+        const shade = light * faceDim;
 
-        // Convertir hex a RGB
-        const r = parseInt(baseColor.slice(1, 3), 16);
-        const g = parseInt(baseColor.slice(3, 5), 16);
-        const b = parseInt(baseColor.slice(5, 7), 16);
+        // Silueta de cordillera para esta columna (parallax al girar)
+        const ridge = (
+          (Math.sin(rayAngle * 1.3) * 0.5 + 0.5) * 0.6 +
+          (Math.sin(rayAngle * 2.7 + 1.5) * 0.5 + 0.5) * 0.3 +
+          (Math.sin(rayAngle * 5.1 + 4.0) * 0.5 + 0.5) * 0.1
+        ) * (horizon * 0.34);
+        const dSun = Math.abs(angDiff(rayAngle, PALETA.solAzimut));
 
-        const litR = Math.round(r * lightFactor * (1 - fogFactor));
-        const litG = Math.round(g * lightFactor * (1 - fogFactor));
-        const litB = Math.round(b * lightFactor * (1 - fogFactor));
-
-        // Oscurecimiento extra para caras N/S vs E/W
-        const faceDim = result.cara <= 1 ? 0.7 : 1.0;
-
-        const finalR = Math.round(litR * faceDim);
-        const finalG = Math.round(litG * faceDim);
-        const finalB = Math.round(litB * faceDim);
-
-        // Dibujar columna: cielo arriba, pared, piso abajo
         for (let row = 0; row < H; row += 1) {
           const idx = (row * W + col) * 4;
 
           if (row < wallTop) {
-            // Cielo (gradiente)
-            const t = row / halfH;
-            const skyR = Math.round(100 + t * 35);
-            const skyG = Math.round(180 + t * 15);
-            const skyB = Math.round(220 - t * 60);
-            buf[idx] = skyR;
-            buf[idx + 1] = skyG;
-            buf[idx + 2] = skyB;
-            buf[idx + 3] = 255;
+            // ── CIELO ──
+            const t = row / horizon;            // 0 cenit -> 1 horizonte
+            let cr = sky0[0] + (sky1[0] - sky0[0]) * t;
+            let cg = sky0[1] + (sky1[1] - sky0[1]) * t;
+            let cb = sky0[2] + (sky1[2] - sky0[2]) * t;
+
+            // Sol: disco + halo
+            const sunRow = horizon * 0.42;
+            const dvSun = Math.abs(row - sunRow) / horizon;
+            const sunDist = Math.sqrt(dSun * dSun * 6 + dvSun * dvSun * 9);
+            if (sunDist < 0.18) {
+              cr = sunC[0]; cg = sunC[1]; cb = sunC[2];
+            } else if (sunDist < 0.6) {
+              const gg = ((0.6 - sunDist) / 0.42) * 0.7;
+              cr += (sunG[0] - cr) * gg;
+              cg += (sunG[1] - cg) * gg;
+              cb += (sunG[2] - cb) * gg;
+            }
+
+            // Nubes en la franja alta
+            if (t < 0.7) {
+              const cloud = hash2(Math.floor(rayAngle * 26), Math.floor(row / 3)) * 0.5
+                          + hash2(Math.floor(rayAngle * 13) + 7, Math.floor(row / 5)) * 0.5;
+              if (cloud > 0.82) {
+                const cf = ((cloud - 0.82) / 0.18) * 0.8;
+                cr += (nube[0] - cr) * cf;
+                cg += (nube[1] - cg) * cf;
+                cb += (nube[2] - cb) * cf;
+              }
+            }
+
+            // Cordillera lejana cerca del horizonte
+            if (row > horizon - ridge && row < horizon) {
+              const nieve = (row - (horizon - ridge)) / (ridge + 0.001) < 0.25;
+              const mc = nieve ? [230, 236, 244]
+                : ((Math.floor(rayAngle * 8) % 2 === 0) ? mtn : mtnS);
+              cr = mc[0] * 0.7 + cr * 0.3;
+              cg = mc[1] * 0.7 + cg * 0.3;
+              cb = mc[2] * 0.7 + cb * 0.3;
+            }
+
+            buf[idx] = cr; buf[idx + 1] = cg; buf[idx + 2] = cb; buf[idx + 3] = 255;
           } else if (row <= wallBot) {
-            // Pared
-            buf[idx] = finalR;
-            buf[idx + 1] = finalG;
-            buf[idx + 2] = finalB;
+            // ── PARED (texturizada por material) ──
+            const vY = wallHf > 0.001 ? (row - trueTop) / wallHf : 0;
+            const wcol = texturaPared(mat.patron, result.texX, vY, baseRGB, sombraRGB, luzRGB);
+            const pr = wcol[0] * shade;
+            const pg = wcol[1] * shade;
+            const pb = wcol[2] * shade;
+            buf[idx] = pr + (sky1[0] - pr) * fog;
+            buf[idx + 1] = pg + (sky1[1] - pg) * fog;
+            buf[idx + 2] = pb + (sky1[2] - pb) * fog;
             buf[idx + 3] = 255;
           } else {
-            // Piso (tierra, oscurece con la distancia)
-            const floorDist = H / (2 * (row - halfH) + 0.001);
-            const floorFog = Math.max(0, Math.min(1,
-              (floorDist - NIEBLA_INI) / (NIEBLA_FIN - NIEBLA_INI)));
-            const fLight = Math.max(0.12, 1.0 - floorFog);
+            // ── PISO (tierra con surcos, pasto y mulch) ──
+            const floorDist = halfH / (row - halfH + 0.001);
+            const fx = px + rcos * floorDist;
+            const fy = py + rsin * floorDist;
+            const ffog = Math.max(0, Math.min(1, (floorDist - NIEBLA_INI) / (NIEBLA_FIN - NIEBLA_INI)));
+            const fl = Math.max(0.40, 1.0 - floorDist * 0.05);
 
-            const fr = parseInt(PALETA.piso.slice(1, 3), 16);
-            const fg = parseInt(PALETA.piso.slice(3, 5), 16);
-            const fb = parseInt(PALETA.piso.slice(5, 7), 16);
+            let fbase = tierra;
+            if (frac(fy * 2.2) < 0.16) fbase = surco;          // surcos del cultivo
+            const patch = hash2(Math.floor(fx * 1.6), Math.floor(fy * 1.6));
+            if (patch > 0.86) fbase = pasto;                   // mancha de pasto
+            else if (patch < 0.10) fbase = mulch;              // cobertura/mulch
+            const grain = 0.88 + hash2(Math.floor(fx * 8), Math.floor(fy * 8)) * 0.18;
 
-            // Patron de rejilla para dar textura al piso
-            const gridX = Math.floor((px + Math.cos(pa - fovHalf + (col / W) * FOV) * floorDist));
-            const gridY = Math.floor((py + Math.sin(pa - fovHalf + (col / W) * FOV) * floorDist));
-            const gridPattern = (gridX + gridY) % 2 === 0 ? 0.85 : 1.0;
-
-            buf[idx] = Math.round(fr * fLight * gridPattern);
-            buf[idx + 1] = Math.round(fg * fLight * gridPattern);
-            buf[idx + 2] = Math.round(fb * fLight * gridPattern);
+            const fr = fbase[0] * fl * grain;
+            const fg = fbase[1] * fl * grain;
+            const fb = fbase[2] * fl * grain;
+            buf[idx] = fr + (sky1[0] - fr) * ffog;
+            buf[idx + 1] = fg + (sky1[1] - fg) * ffog;
+            buf[idx + 2] = fb + (sky1[2] - fb) * ffog;
             buf[idx + 3] = 255;
-          }
-        }
-
-        // Borde oscuro en la parte inferior de la pared (sombra)
-        if (wallBot - wallTop > 4) {
-          for (let row = wallBot - 2; row <= wallBot; row += 1) {
-            if (row >= 0 && row < H) {
-              const idx = (row * W + col) * 4;
-              buf[idx] = Math.max(0, buf[idx] - 30);
-              buf[idx + 1] = Math.max(0, buf[idx + 1] - 30);
-              buf[idx + 2] = Math.max(0, buf[idx + 2] - 30);
-            }
           }
         }
       }
 
-      // Sprites (plagas) - billboard, ordenar por distancia
-      const sprites = [];
+      // ── BILLBOARDS: plagas + decoracion viva de la finca ──
+      const billboards = [];
       for (const pest of w.pests) {
         if (!pest.vivo) continue;
         const proj = projectSprite(pest.x, pest.y, px, py, pa, FOV, W, H);
-        if (proj.visible) {
-          sprites.push({ ...pest, proj });
-        }
+        if (proj.visible) billboards.push({ kind: 'plaga', forma: pest.forma, color: pest.color, proj });
       }
-      // Ordenar lejos -> cerca para dibujar atras primero
-      sprites.sort((a, b) => b.proj.dist - a.proj.dist);
+      for (const deco of DECORACIONES) {
+        const proj = projectSprite(deco.x, deco.y, px, py, pa, FOV, W, H);
+        if (proj.visible) billboards.push({ kind: 'deco', tipo: deco.tipo, proj });
+      }
+      // Lejos -> cerca para que los cercanos tapen a los lejanos
+      billboards.sort((a, b) => b.proj.dist - a.proj.dist);
 
-      for (const spr of sprites) {
-        const { screenX, size, dist } = spr.proj;
-        const halfSize = Math.round(size / 2);
-        const top = Math.round(H / 2 - halfSize * 0.7);
-        const bot = Math.round(H / 2 + halfSize * 0.7);
-        const left = screenX - halfSize;
-        const right = screenX + halfSize;
+      for (const bb of billboards) {
+        const { screenX, size, dist } = bb.proj;
+        const dim = bb.kind === 'plaga'
+          ? (PLAGA_DIM[bb.forma] || PLAGA_DIM.oruga)
+          : (DECO_DIM[bb.tipo] || DECO_DIM.arbol);
+        const spriteH = size * dim.hf;
+        const spriteW = size * dim.wf;
+        // Anclar a la linea del piso: los objetos "se paran" en el suelo
+        const floorRow = halfH + halfH / Math.max(dist, 0.3);
+        const bottom = Math.round(floorRow - dim.hover * size);
+        const top = Math.round(bottom - spriteH);
+        const left = Math.round(screenX - spriteW / 2);
+        const right = Math.round(screenX + spriteW / 2);
 
         const fogF = Math.max(0, Math.min(1, (dist - NIEBLA_INI) / (NIEBLA_FIN - NIEBLA_INI)));
-        const sLight = Math.max(0.25, 1.0 - fogF);
+        const sLight = Math.max(0.40, 1.0 - dist * 0.05);
+        const baseRGB = bb.kind === 'plaga' ? hexRGB(bb.color) : null;
 
-        // Color base de la plaga
-        const sr = parseInt(spr.color.slice(1, 3), 16);
-        const sg = parseInt(spr.color.slice(3, 5), 16);
-        const sb = parseInt(spr.color.slice(5, 7), 16);
-
-        for (let row = top; row <= bot; row += 1) {
+        for (let row = top; row <= bottom; row += 1) {
           if (row < 0 || row >= H) continue;
+          const v = (row - top) / Math.max(1, spriteH);
           for (let c = left; c <= right; c += 1) {
             if (c < 0 || c >= W) continue;
             if (zBuffer[c] < dist) continue; // ocluido por pared
-
+            const u = (c - left) / Math.max(1, spriteW);
+            const pix = bb.kind === 'plaga'
+              ? pintarPlaga(bb.forma, u, v, baseRGB)
+              : pintarDeco(bb.tipo, u, v);
+            if (!pix) continue;
             const idx = (row * W + c) * 4;
-
-            // Forma mas o menos circular/ovalada de la plaga
-            const cx = (c - screenX) / halfSize;
-            const cy = (row - H / 2) / (halfSize * 0.7);
-            const shape = cx * cx + cy * cy;
-            if (shape > 0.85) continue;
-
-            // Detalles simples (ojos, patas)
-            if (shape > 0.55) {
-              // Borde del cuerpo
-              buf[idx] = Math.round(sr * sLight * 0.5);
-              buf[idx + 1] = Math.round(sg * sLight * 0.5);
-              buf[idx + 2] = Math.round(sb * sLight * 0.5);
-            } else if (shape < 0.05 && row < H / 2) {
-              // "Ojo" (punto brillante)
-              buf[idx] = 255;
-              buf[idx + 1] = 255;
-              buf[idx + 2] = 255;
-            } else if (cy > 0.15 && Math.abs(cx) < 0.3 && shape < 0.4) {
-              // "Boca" o detalle
-              buf[idx] = Math.round(sr * sLight * 0.7);
-              buf[idx + 1] = Math.round(sg * sLight * 0.3);
-              buf[idx + 2] = Math.round(sb * sLight * 0.3);
-            } else {
-              buf[idx] = Math.round(sr * sLight);
-              buf[idx + 1] = Math.round(sg * sLight);
-              buf[idx + 2] = Math.round(sb * sLight);
-            }
+            const pr = pix[0] * sLight;
+            const pg = pix[1] * sLight;
+            const pb = pix[2] * sLight;
+            buf[idx] = pr + (sky1[0] - pr) * fogF;
+            buf[idx + 1] = pg + (sky1[1] - pg) * fogF;
+            buf[idx + 2] = pb + (sky1[2] - pb) * fogF;
             buf[idx + 3] = 255;
           }
         }
@@ -383,8 +621,40 @@ export default function DoomFincaScreen({ onBack, onHome }) {
       // Put pixel data
       ctx.putImageData(imageData, 0, 0);
 
-      // Mira central (crosshair)
-      ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+      // ── VIEWMODEL: manos del campesino sosteniendo el frasco del benefico ──
+      const bSel = BENEFICOS_DOOM.find((b) => b.id === beneficoSelRef.current) || BENEFICOS_DOOM[0];
+      const bob = Math.sin(w.t * 0.12) * 1.6;
+      const recoil = w.cooldown > 0 ? (w.cooldown / CONFIG_DOOM.cooldownLanzamiento) * 7 : 0;
+      const baseY = H - 2 + recoil + bob;
+      ctx.fillStyle = '#3f6d34';                 // mangas de la camisa de campo
+      ctx.beginPath();
+      ctx.moveTo(W * 0.26, H);
+      ctx.lineTo(W * 0.42, baseY - 16);
+      ctx.lineTo(W * 0.58, baseY - 16);
+      ctx.lineTo(W * 0.74, H);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#caa074';                 // manos
+      ctx.fillRect(W / 2 - 16, baseY - 18, 10, 9);
+      ctx.fillRect(W / 2 + 6, baseY - 18, 10, 9);
+      ctx.fillStyle = bSel.color;                // frasco del benefico
+      ctx.fillRect(W / 2 - 11, baseY - 28, 22, 18);
+      ctx.fillStyle = 'rgba(255,255,255,0.25)';
+      ctx.fillRect(W / 2 - 9, baseY - 26, 5, 14); // brillo del vidrio
+      ctx.fillStyle = '#5c4327';                  // tapa
+      ctx.fillRect(W / 2 - 8, baseY - 32, 16, 5);
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(bSel.emoji, W / 2, baseY - 18);
+
+      // Mira central (crosshair) — verde si apunta a la plaga correcta,
+      // ambar si es plaga pero benefico equivocado, blanco si no hay objetivo.
+      const aim = plagaEnMira(w.player, beneficoSelRef.current, w.pests, CONFIG_DOOM.alcanceLanzamiento);
+      const miraColor = aim.enMira
+        ? (aim.correcto ? 'rgba(130,255,130,0.95)' : 'rgba(255,180,70,0.95)')
+        : 'rgba(255,255,255,0.7)';
+      ctx.strokeStyle = miraColor;
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(W / 2 - 8, H / 2);
@@ -396,12 +666,18 @@ export default function DoomFincaScreen({ onBack, onHome }) {
       ctx.moveTo(W / 2, H / 2 + 3);
       ctx.lineTo(W / 2, H / 2 + 8);
       ctx.stroke();
-
-      // Punto central
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.fillStyle = miraColor;
       ctx.beginPath();
       ctx.arc(W / 2, H / 2, 2, 0, Math.PI * 2);
       ctx.fill();
+
+      // Leccion de la decoracion que el jugador esta mirando (ciclo de la finca)
+      const deco = decoracionEnMira(w.player, DECORACIONES);
+      const nuevaLeccion = deco ? deco.leccion : '';
+      if (nuevaLeccion !== leccionRef.current) {
+        leccionRef.current = nuevaLeccion;
+        setLeccion(nuevaLeccion);
+      }
 
       setFrameCount((prev) => (prev + 1) % 120);
     };
@@ -423,6 +699,8 @@ export default function DoomFincaScreen({ onBack, onHome }) {
     setMensaje('Elimina todas las plagas. Cada una solo cae con su controlador real.');
     setEstado('jugando');
     setBeneficoSel('trichogramma');
+    setLeccion('');
+    leccionRef.current = '';
   }, []);
 
   // Touch: joystick virtual izquierdo
@@ -462,13 +740,9 @@ export default function DoomFincaScreen({ onBack, onHome }) {
       const canvas = canvasRef.current;
       if (!canvas) continue;
       const rect = canvas.getBoundingClientRect();
-      const x = t.clientX - rect.left;
-      const relX = x / rect.width;
 
       if (t.identifier === tj.joystickId && tj.joystickActive) {
-        tj.joystickX = (relX - (tj.joystickX / rect.width + 0.2)) * rect.width;
-        tj.joystickY = (t.clientY - rect.top - 0.5 * rect.height);
-        // Recalcular con centro
+        // Delta desde el centro fijo del joystick (20% ancho, 50% alto)
         const cx = rect.width * 0.2;
         const cy = rect.height * 0.5;
         tj.joystickX = t.clientX - rect.left - cx;
@@ -523,8 +797,10 @@ export default function DoomFincaScreen({ onBack, onHome }) {
       <div className="flex flex-col gap-3 px-3 pt-2 pb-6 max-w-lg mx-auto">
         {/* Subtitulo */}
         <p className="text-xs text-emerald-200/80 leading-snug text-center">
-          Recorre el invernadero en primera persona. Lanza el benefico correcto
-          sobre cada plaga para controlarla. Protege la vitalidad del cultivo.
+          Recorre tu finca en primera persona. Lanza el benefico correcto sobre
+          cada plaga para controlarla y protege la vitalidad del cultivo. Mira
+          los arboles, la colmena, los animales y la compostera para aprender
+          como se cierra el ciclo.
         </p>
 
         {/* HUD retro */}
@@ -601,6 +877,17 @@ export default function DoomFincaScreen({ onBack, onHome }) {
             </div>
           </div>
         </div>
+
+        {/* Tarjeta educativa: lo que el jugador esta mirando (ciclo de la finca) */}
+        {leccion && (
+          <div
+            className="bg-amber-950/50 border border-amber-600/40 rounded-xl p-3 text-center"
+            role="status"
+          >
+            <Sprout size={14} className="inline-block mr-1 text-amber-300" aria-hidden="true" />
+            <span className="text-sm text-amber-100 font-medium">{leccion}</span>
+          </div>
+        )}
 
         {/* Mensaje (leccion) */}
         {mensaje && (

@@ -23,7 +23,7 @@ export function isWall(mapa, x, y) {
   const mx = Math.floor(x);
   const my = Math.floor(y);
   if (mx < 0 || mx >= MAPA_COLS || my < 0 || my >= MAPA_FILAS) return true;
-  return mapa[my][mx] === 1;
+  return mapa[my][mx] !== 0;
 }
 
 /**
@@ -32,6 +32,7 @@ export function isWall(mapa, x, y) {
  * @property {number} dist   Distancia perpendicular a la pared (corregida).
  * @property {number} cara   0=N, 1=S, 2=E, 3=O
  * @property {number} texX   Coordenada X de la textura (0-1) donde golpeo.
+ * @property {number} tipo   Codigo de material de la celda (1=seto, 2=madera, ...).
  */
 
 /**
@@ -76,6 +77,7 @@ export function castRay(mapa, ox, oy, angle) {
 
   // DDA loop: avanzar hasta chocar con una pared
   let side = 0; // 0 = vertical (E/W), 1 = horizontal (N/S)
+  let tipo = 1;
   const MAX_STEPS = 64;
   for (let i = 0; i < MAX_STEPS; i += 1) {
     if (sideDistX < sideDistY) {
@@ -90,7 +92,8 @@ export function castRay(mapa, ox, oy, angle) {
     if (mapX < 0 || mapX >= MAPA_COLS || mapY < 0 || mapY >= MAPA_FILAS) {
       break;
     }
-    if (mapa[mapY][mapX] === 1) {
+    if (mapa[mapY][mapX] !== 0) {
+      tipo = mapa[mapY][mapX];
       break;
     }
   }
@@ -122,7 +125,7 @@ export function castRay(mapa, ox, oy, angle) {
     cara = dirY > 0 ? 1 : 0; // Sur o Norte
   }
 
-  return { dist: perpDist, cara, texX: wallX };
+  return { dist: perpDist, cara, texX: wallX, tipo };
 }
 
 /**
@@ -337,6 +340,67 @@ export function checkPestReach(pests, player, distUmbral = 0.5) {
 }
 
 /**
+ * Devuelve la decoracion de la finca que el jugador tiene en la mira
+ * (al frente, dentro de un cono estrecho y un alcance corto), o null.
+ * Sirve para mostrar su leccion agroecologica.
+ *
+ * @param {{x:number, y:number, angulo:number}} player
+ * @param {Object[]} decoraciones  Lista con {x, y, ...}
+ * @param {number} maxDist
+ * @returns {Object|null}
+ */
+export function decoracionEnMira(player, decoraciones, maxDist = 3.5) {
+  let best = null;
+  let bestDist = maxDist;
+  for (const d of decoraciones) {
+    const dx = d.x - player.x;
+    const dy = d.y - player.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > maxDist) continue;
+    let diff = Math.atan2(dy, dx) - player.angulo;
+    while (diff > Math.PI) diff -= 2 * Math.PI;
+    while (diff < -Math.PI) diff += 2 * Math.PI;
+    if (Math.abs(diff) < 0.30 && dist < bestDist) {
+      best = d;
+      bestDist = dist;
+    }
+  }
+  return best;
+}
+
+/**
+ * Indica si el jugador apunta a una plaga viva y si el benefico equipado es
+ * el correcto para controlarla. Sirve para colorear la mira (verde=correcto,
+ * ambar=plaga pero benefico equivocado).
+ *
+ * @param {{x:number, y:number, angulo:number}} player
+ * @param {string} beneficoId
+ * @param {Object[]} pests
+ * @param {number} maxDist
+ * @returns {{ enMira: boolean, correcto: boolean }}
+ */
+export function plagaEnMira(player, beneficoId, pests, maxDist) {
+  let best = null;
+  let bestDist = maxDist;
+  for (const p of pests) {
+    if (!p.vivo) continue;
+    const dx = p.x - player.x;
+    const dy = p.y - player.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > maxDist) continue;
+    let diff = Math.atan2(dy, dx) - player.angulo;
+    while (diff > Math.PI) diff -= 2 * Math.PI;
+    while (diff < -Math.PI) diff += 2 * Math.PI;
+    if (Math.abs(diff) < 0.22 && dist < bestDist) {
+      best = p;
+      bestDist = dist;
+    }
+  }
+  if (!best) return { enMira: false, correcto: false };
+  return { enMira: true, correcto: best.controladoPor === beneficoId };
+}
+
+/**
  * Crea el estado inicial del mundo de juego.
  *
  * @returns {Object} Estado inicial del mundo
@@ -365,14 +429,14 @@ export function createWorld() {
 
   // Distribuir plagas por el mapa en posiciones validas (no paredes)
   const spawns = [
-    { x: 4.5, y: 4.5 },
-    { x: 11.5, y: 4.5 },
-    { x: 4.5, y: 10.5 },
-    { x: 11.5, y: 10.5 },
-    { x: 7.5, y: 7.5 },
-    { x: 1.5, y: 7.5 },
-    { x: 13.5, y: 7.5 },
-    { x: 7.5, y: 1.5 },
+    { x: 5.5, y: 5.5 },
+    { x: 10.5, y: 4.5 },
+    { x: 5.5, y: 9.5 },
+    { x: 10.5, y: 9.5 },
+    { x: 8.5, y: 7.5 },
+    { x: 2.5, y: 8.5 },
+    { x: 13.5, y: 8.5 },
+    { x: 8.5, y: 2.5 },
   ];
 
   for (let i = 0; i < Math.min(pests.length, spawns.length); i += 1) {
