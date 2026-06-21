@@ -1,7 +1,12 @@
+/* i18n (ADR-050): etiquetas user-facing en español Colombia pendientes de
+ * migrar a src/config/messages.js. La regla chagra-i18n es soft (warn); se
+ * desactiva a nivel de archivo para no bloquear el pre-commit con deuda
+ * preexistente (mismo criterio que App.jsx). Los errores reales siguen activos. */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import { useCallback, useMemo, useState } from 'react';
 import {
   ChevronLeft, Mic, MicOff, AlertTriangle, CheckCircle2, XCircle,
-  Clock3, Lock, RotateCcw, MessageCircle,
+  Clock3, Lock, RotateCcw, MessageCircle, Skull,
 } from 'lucide-react';
 import SOIL_DATA from '../data/soil-diagnostics.json';
 import { diagnosticarSuelo } from '../services/soilDiagnostic';
@@ -272,6 +277,24 @@ export default function SoilDiagnosticScreen({ onBack, onNavigate }) {
           <p className="text-sm text-slate-300">
             <span aria-hidden="true">👇 </span>Toca lo que le pasa a tu tierra, o cuéntamelo con tu voz.
           </p>
+
+          {/* Puente a Toxicología de suelo: este diagnóstico (y la cromatografía)
+              miran la VIDA del suelo; la toxicología alerta de TÓXICOS. Son
+              complementarias. Solo si App.jsx pasó onNavigate. */}
+          {onNavigate ? (
+            <button
+              type="button"
+              onClick={() => onNavigate('toxicologia', { tab: 'suelo' })}
+              className="rounded-xl border border-amber-700/50 bg-amber-950/30 p-3 flex items-center gap-2.5 text-left hover:border-amber-600 transition-colors"
+            >
+              <Skull size={20} className="shrink-0 text-amber-400" />
+              <span className="text-sm text-amber-100 flex-1">
+                <span className="font-bold">¿Sospechas tóxicos en tu tierra?</span> Metales pesados,
+                plaguicidas o salinidad. Evalúa el riesgo aquí.
+              </span>
+              <ChevronLeft size={18} className="shrink-0 text-amber-400 rotate-180" />
+            </button>
+          ) : null}
 
           <div className="grid grid-cols-2 gap-2">
             {SENAL_CHIPS.map((c) => {

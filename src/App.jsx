@@ -88,6 +88,7 @@ const ProcesosPorVozScreen = lazy(() => import('./components/ProcesosPorVozScree
 const CicloCultivoScreen = lazy(() => import('./components/CicloCultivoScreen'));
 const SeguimientoProcesoScreen = lazy(() => import('./components/SeguimientoProcesoScreen'));
 const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
+const ToxicologiaScreen = lazy(() => import('./components/ToxicologiaScreen'));
 const GlaciarReporteScreen = lazy(() => import('./components/GlaciarReporteScreen'));
 const GlaciarHistorialScreen = lazy(() => import('./components/GlaciarHistorialScreen'));
 const ProfileScreen = lazy(() => import('./components/ProfileScreen'));
@@ -179,6 +180,8 @@ const HASH_VIEW_ROUTES = {
   'glaciar-historial': 'glaciar_historial',
   fermentos: 'fermentos',
   'doom-finca': 'doom_finca',
+  toxicologia: 'toxicologia',
+  suelo: 'suelo',
 };
 
 // Vistas que cuentan como "módulo" para telemetría de piloto.
@@ -187,7 +190,7 @@ const MODULE_VIEWS = new Set([
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
   'hoy_finca', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'suelo',
+  'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'suelo', 'toxicologia',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task',
 ]);
@@ -939,7 +942,20 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ScreenShell title="Biopreparados" onBack={() => navigate('juego')} onHome={() => navigate('dashboard')}>
-              <div className="px-4 pt-3 pb-10 max-w-2xl mx-auto">
+              <div className="px-4 pt-3 pb-10 max-w-2xl mx-auto flex flex-col gap-4">
+                {/* Acceso a la toxicología de insumos (EPI, dosis seguras,
+                    restricción ICA). Caso crítico: caldo bordelés / sulfocálcico. */}
+                <button
+                  type="button"
+                  onClick={() => navigate('toxicologia', { tab: 'insumos' })}
+                  className="rounded-xl border border-amber-700/50 bg-amber-950/30 p-3 flex items-center gap-2.5 text-left hover:border-amber-600 transition-colors"
+                >
+                  <AlertCircle size={20} className="shrink-0 text-amber-400" />
+                  <span className="text-sm text-amber-100 flex-1">
+                    <span className="font-bold">Toxicología y seguridad.</span> Antes de preparar,
+                    revisa la protección (EPI), las dosis seguras y las restricciones legales.
+                  </span>
+                </button>
                 <BiopreparadoRecetasGallery />
               </div>
             </ScreenShell>
@@ -1116,6 +1132,21 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Diagnostico de Suelo">
               <SoilDiagnosticScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'toxicologia':
+        // Módulo TOXICOLOGÍA (seguridad): pestaña A insumos/biopreparados
+        // (toxicidad, EPI, restricción ICA, dosis seguras del catálogo) +
+        // pestaña B suelo (cuestionario de riesgo de contaminantes edáficos).
+        // initialTab vía currentViewData.tab ('insumos' | 'suelo').
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Toxicologia">
+              <ToxicologiaScreen
+                onBack={() => navigate('dashboard')}
+                initialTab={currentViewData?.tab}
+              />
             </ErrorFallback>
           </ErrorBoundary>
         );
