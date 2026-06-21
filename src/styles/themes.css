@@ -387,6 +387,51 @@
 }
 
 /* ===========================================================================
+ * 3c. BADGES POR FAMILIA NO-VAR (AltitudeBadge piso térmico + AIBetaBadge low)
+ *    Origen: PR glm/legibilidad-temas (#1738) — re-evaluado sobre main 2026-06-21.
+ *    El grueso de ese PR ya estaba cubierto por §3 (WelcomeStatsHero) y por la
+ *    indirección --c-* (slate/emerald/amber). PERO dos badges NO los cubre nadie
+ *    porque usan familias de color estáticas (orange/green/indigo/rose):
+ *
+ *      - AltitudeBadge: cálido(orange) · templado(amber) · montano(green) ·
+ *        páramo(indigo). En temas claros el texto -400 sobre el tinte -950/30
+ *        sobre crema medía contraste ~1.05–1.38 (sonda WCAG) = ilegible.
+ *      - AIBetaBadge nivel "low": text-rose-300 sobre bg-rose-500/20 sobre crema
+ *        medía ~1.29 = ilegible. (high=emerald y mid=amber YA adaptan vía la
+ *        indirección; default=slate también. Solo rose quedaba estática.)
+ *
+ *    Igual que §3: colapsamos superficie/borde al token del tema y subimos la
+ *    tinta al verde profundo del tema, SOLO en los claros (bio-punk intacto).
+ *    NO tocamos los componentes: el override va ANCLADO al data-testid de cada
+ *    badge ([data-testid="altitude-badge"] / [data-testid="ai-beta-badge"]) para
+ *    NO arrastrar otros usos legítimos de esas familias (TelemetryAlerts,
+ *    ClimaStrip, PestMonitoringWindow, etc. mantienen su estilo).
+ * =========================================================================== */
+
+/* Superficie + borde del badge → tarjeta/línea suave del tema. */
+[data-theme="minimalista"] [data-testid="altitude-badge"],
+[data-theme="nature"] [data-testid="altitude-badge"],
+[data-theme="minimalista"] [data-testid="ai-beta-badge"][data-confidence-level="low"],
+[data-theme="nature"] [data-testid="ai-beta-badge"][data-confidence-level="low"] {
+  background-color: rgb(var(--c-surface-raised)) !important;
+  border-color: rgb(var(--c-surface-border)) !important;
+}
+
+/* Tinta del badge → tinta profunda del tema (AA sobre papel/crema). Cubre los 4
+ * pisos térmicos (orange/amber/green/indigo) y el nivel low (rose) de un golpe,
+ * sin enumerar familias, porque está anclado al badge. */
+[data-theme="minimalista"] [data-testid="altitude-badge"],
+[data-theme="minimalista"] [data-testid="ai-beta-badge"][data-confidence-level="low"] {
+  color: rgb(var(--c-emerald-400)) !important;  /* salvia oscura minimalista (AA) */
+  text-shadow: none !important;
+}
+[data-theme="nature"] [data-testid="altitude-badge"],
+[data-theme="nature"] [data-testid="ai-beta-badge"][data-confidence-level="low"] {
+  color: rgb(var(--c-emerald-700)) !important;  /* verde profundo cálido (AA) */
+  text-shadow: none !important;
+}
+
+/* ===========================================================================
  * 3b. PANELES "INFO" sky/indigo (ClimaStrip "Clima en tu zona", y similares)
  *    PEOR OFFENDER de los temas claros (reporte visual 2026-06-05): el card usa
  *    `bg-gradient-to-br from-sky-950/70 to-indigo-950/60 border-sky-800/40
