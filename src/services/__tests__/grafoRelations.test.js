@@ -177,4 +177,327 @@ describe('grafoRelations — loader offline del grafo', () => {
     expect(bloque).toContain('Bacteria antagonista (biofungicida)');
     expect(bloque).toContain('Aceite/emulsión de nim (neem)');
   });
+
+  // (a) buildOfflineGroundingBlock arma bloque completo con pest_controllers,
+  // compatible_with, antagonist_of, biopreparados y nombres_comunes.
+  it('buildOfflineGroundingBlock arma bloque con todos los campos relacionales presentes', async () => {
+    const ALL_FIELDS_FIXTURE = {
+      _meta: { schema_version: 1, species_count: 1 },
+      species: {
+        test_multifield: {
+          nombre_comun: 'Especie multifield',
+          nombre_cientifico: 'Testus multifieldus',
+          nombres_comunes: ['nombre regional uno', 'nombre regional dos'],
+          establishment_means: 'nativo',
+          threat_status: 'ENDANGERED',
+          conservation_status: 'cultivo_comun',
+          compatible_with: ['compatible_a', 'compatible_b'],
+          antagonist_of: ['antagonista_x'],
+          pest_controllers: [
+            { plaga: 'plaga uno', controladores: ['ctrl_a', 'ctrl_b'] },
+            { plaga: 'plaga dos', controladores: ['ctrl_c'] },
+          ],
+          biopreparados: [
+            { id: 'bp_uno', nombre: 'Biopreparado Uno' },
+            { id: 'bp_dos', nombre: 'Biopreparado Dos' },
+          ],
+        },
+      },
+    };
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(ALL_FIELDS_FIXTURE)));
+
+    const bloque = await mod.buildOfflineGroundingBlock('test_multifield');
+
+    expect(bloque).not.toBe('');
+    expect(bloque).toContain('RELACIONES DEL GRAFO (offline) — Especie multifield:');
+    expect(bloque).toContain('Nombres regionales: nombre regional uno, nombre regional dos.');
+    expect(bloque).toContain('Compatible con (asociar): compatible_a, compatible_b.');
+    expect(bloque).toContain('Antagonista de (NO asociar): antagonista_x.');
+    expect(bloque).toContain('Plaga "plaga uno"');
+    expect(bloque).toContain('ctrl_a, ctrl_b');
+    expect(bloque).toContain('Plaga "plaga dos"');
+    expect(bloque).toContain('ctrl_c');
+    expect(bloque).toContain('Biopreparados: Biopreparado Uno, Biopreparado Dos.');
+  });
+
+  // (a) buildOfflineGroundingBlock: verifica que cada sección sólo aparece si
+  // el campo existe realmente en los datos.
+  it('buildOfflineGroundingBlock solo incluye secciones con datos presentes', async () => {
+    const PARTIAL_FIXTURE = {
+      _meta: { schema_version: 1, species_count: 1 },
+      species: {
+        solo_pest_controllers: {
+          nombre_comun: 'Solo PC',
+          pest_controllers: [
+            { plaga: 'plaga solitaria', controladores: ['ctrl_solo'] },
+          ],
+        },
+      },
+    };
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(PARTIAL_FIXTURE)));
+
+    const bloque = await mod.buildOfflineGroundingBlock('solo_pest_controllers');
+
+    expect(bloque).toContain('RELACIONES DEL GRAFO (offline) — Solo PC:');
+    expect(bloque).toContain('Plaga "plaga solitaria"');
+    // No debe incluir secciones de campos ausentes
+    expect(bloque).not.toContain('Nombres regionales');
+    expect(bloque).not.toContain('Compatible con');
+    expect(bloque).not.toContain('Antagonista de');
+    expect(bloque).not.toContain('Biopreparados');
+  });
+
+  // (b) buildOfflineGroundingBlock para especie sin relaciones devuelve '' sin lanzar.
+  it('buildOfflineGroundingBlock para especie sin relaciones devuelve cadena vacía', async () => {
+    const MINIMAL_FIXTURE = {
+      _meta: { schema_version: 1, species_count: 1 },
+      species: {
+        solo_header: {
+          nombre_comun: 'Solo header',
+          conservation_status: 'cultivo_comun',
+        },
+      },
+    };
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(MINIMAL_FIXTURE)));
+
+    const bloque = await mod.buildOfflineGroundingBlock('solo_header');
+    // La especie existe pero no tiene relaciones → el bloque es solo el encabezado → ''
+    expect(bloque).toBe('');
+
+    // Especie desconocida también devuelve ''
+    const bloqueDesconocido = await mod.buildOfflineGroundingBlock('no_existe_xyz');
+    expect(bloqueDesconocido).toBe('');
+  });
+
+  // (b) buildOfflineGroundingBlock para especie con arreglos vacíos explícitos
+  // tampoco incluye esas secciones y si todas son vacías devuelve ''.
+  it('buildOfflineGroundingBlock ignora arreglos vacíos explícitos', async () => {
+    const EMPTY_ARRAYS_FIXTURE = {
+      _meta: { schema_version: 1, species_count: 1 },
+      species: {
+        arrays_vacios: {
+          nombre_comun: 'Arrays vacíos',
+          compatible_with: [],
+          antagonist_of: [],
+          pest_controllers: [],
+          biopreparados: [],
+        },
+      },
+    };
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(EMPTY_ARRAYS_FIXTURE)));
+
+    const bloque = await mod.buildOfflineGroundingBlock('arrays_vacios');
+    expect(bloque).toBe('');
+  });
+
+  // (b) buildOfflineGroundingBlock con pest_controllers que tienen plaga vacía o null no falla.
+  it('buildOfflineGroundingBlock ignora pest_controller sin plaga o sin controladores', async () => {
+    const BROKEN_PC_FIXTURE = {
+      _meta: { schema_version: 1, species_count: 1 },
+      species: {
+        pc_roto: {
+          nombre_comun: 'PC Roto',
+          pest_controllers: [
+            { plaga: null, controladores: ['ctrl_a'] },
+            { plaga: 'plaga_ok', controladores: [] },
+            { plaga: 'plaga_bien', controladores: ['ctrl_b'] },
+          ],
+        },
+      },
+    };
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(BROKEN_PC_FIXTURE)));
+
+    const bloque = await mod.buildOfflineGroundingBlock('pc_roto');
+    expect(bloque).not.toBe('');
+    // Solo plaga_bien debe aparecer; plaga null y controladores vacíos se ignoran
+    expect(bloque).toContain('Plaga "plaga_bien"');
+    expect(bloque).not.toContain('ctrl_a');
+    expect(bloque).not.toContain('plaga_ok');
+  });
+
+  // (c) nombres_comunes se exponen correctamente via getNombresComunesRegionales.
+  it('getNombresComunesRegionales devuelve arreglo de nombres regionales', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(FIXTURE)));
+
+    const nombres = await mod.getNombresComunesRegionales('passiflora_edulis_flavicarpa');
+    expect(nombres).toEqual(['parcha']);
+
+    // Especie sin nombres_comunes devuelve []
+    const sinNombres = await mod.getNombresComunesRegionales('coffea_arabica');
+    expect(sinNombres).toEqual([]);
+
+    // Especie desconocida devuelve []
+    const desconocida = await mod.getNombresComunesRegionales('no_existe_xyz');
+    expect(desconocida).toEqual([]);
+  });
+
+  // (c) establishment_means y threat_status se exponen en el objeto retornado
+  // por getRelationsForSpecies.
+  it('getRelationsForSpecies expone establishment_means y threat_status del grafo', async () => {
+    const STATUS_FIXTURE = {
+      _meta: { schema_version: 1, species_count: 2 },
+      species: {
+        con_estatus: {
+          nombre_comun: 'Con estatus',
+          nombre_cientifico: 'Statusus completus',
+          establishment_means: 'introducido',
+          threat_status: 'VULNERABLE',
+          conservation_status: 'cultivo_comun',
+        },
+        sin_estatus: {
+          nombre_comun: 'Sin estatus',
+          nombre_cientifico: 'Statusus nullus',
+          conservation_status: 'cultivo_comun',
+        },
+      },
+    };
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(STATUS_FIXTURE)));
+
+    const conEstatus = await mod.getRelationsForSpecies('con_estatus');
+    expect(conEstatus).not.toBeNull();
+    expect(conEstatus.establishment_means).toBe('introducido');
+    expect(conEstatus.threat_status).toBe('VULNERABLE');
+
+    const sinEstatus = await mod.getRelationsForSpecies('sin_estatus');
+    expect(sinEstatus).not.toBeNull();
+    expect(sinEstatus.establishment_means).toBeUndefined();
+    expect(sinEstatus.threat_status).toBeUndefined();
+
+    const desconocida = await mod.getRelationsForSpecies('no_existe_xyz');
+    expect(desconocida).toBeNull();
+  });
+
+  // (d) __resetGrafoRelationsCache reinicia el cache y permite re-fetch.
+  it('__resetGrafoRelationsCache limpia cache en memoria y permite re-fetch', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(mockJsonResponse(FIXTURE));
+    vi.stubGlobal('fetch', fetchMock);
+
+    // Primera carga
+    const primera = await mod.loadGrafoRelations();
+    expect(primera).not.toBeNull();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    // Segunda llamada usa cache, no re-fetch
+    const segunda = await mod.loadGrafoRelations();
+    expect(segunda).toBe(primera);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    // Reiniciamos cache
+    mod.__resetGrafoRelationsCache();
+
+    // Tercera carga después de reset debe re-fetchear
+    const tercera = await mod.loadGrafoRelations();
+    expect(tercera).not.toBeNull();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  // (d) __resetGrafoRelationsCache limpia también el coalesce para permitir
+  // reintento tras fallo previo.
+  it('__resetGrafoRelationsCache permite reintentar carga tras fallo previo', async () => {
+    // Primer intento: fetch falla
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('red caida')));
+    const fallida = await mod.loadGrafoRelations();
+    expect(fallida).toBeNull();
+
+    // Reset
+    mod.__resetGrafoRelationsCache();
+
+    // Segundo intento: fetch funciona
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(FIXTURE)));
+    const exitosa = await mod.loadGrafoRelations();
+    expect(exitosa).not.toBeNull();
+    expect(Object.keys(exitosa)).toContain('passiflora_edulis_flavicarpa');
+  });
+
+  // Edge case: buildOfflineGroundingBlock con biopreparado sin nombre usa id como fallback.
+  it('buildOfflineGroundingBlock usa id de biopreparado cuando nombre está ausente', async () => {
+    const BP_SIN_NOMBRE_FIXTURE = {
+      _meta: { schema_version: 1, species_count: 1 },
+      species: {
+        bp_solo_id: {
+          nombre_comun: 'BP solo ID',
+          biopreparados: [
+            { id: 'biofungicida_xyz' },
+            { id: 'caldo_magico', nombre: 'Caldo Mágico' },
+          ],
+        },
+      },
+    };
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(BP_SIN_NOMBRE_FIXTURE)));
+
+    const bloque = await mod.buildOfflineGroundingBlock('bp_solo_id');
+    expect(bloque).toContain('biofungicida_xyz');
+    expect(bloque).toContain('Caldo Mágico');
+  });
+
+  // Edge case: buildOfflineGroundingBlock usa speciesId como fallback del nombre
+  // cuando nombre_comun está ausente.
+  it('buildOfflineGroundingBlock usa speciesId cuando nombre_comun no existe', async () => {
+    const SIN_NOMBRE_FIXTURE = {
+      _meta: { schema_version: 1, species_count: 1 },
+      species: {
+        species_sin_nombre: {
+          nombre_cientifico: 'Anonymous spp.',
+          compatible_with: ['aliado_x'],
+        },
+      },
+    };
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(SIN_NOMBRE_FIXTURE)));
+
+    const bloque = await mod.buildOfflineGroundingBlock('species_sin_nombre');
+    expect(bloque).toContain('RELACIONES DEL GRAFO (offline) — species_sin_nombre:');
+    expect(bloque).toContain('Compatible con (asociar): aliado_x.');
+  });
+
+  // Edge case: loadGrafoRelations con JSON malformado devuelve null sin lanzar.
+  it('loadGrafoRelations con JSON inválido devuelve null sin lanzar', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      headers: { get: (k) => (k.toLowerCase() === 'content-type' ? 'application/json' : null) },
+      json: () => Promise.reject(new SyntaxError('JSON malformado')),
+    }));
+
+    const result = await mod.loadGrafoRelations();
+    expect(result).toBeNull();
+  });
+
+  // Edge case: loadGrafoRelations con respuesta sin campo species devuelve null.
+  it('loadGrafoRelations con JSON sin campo species devuelve null', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse({
+      _meta: { schema_version: 1 },
+    })));
+
+    const result = await mod.loadGrafoRelations();
+    expect(result).toBeNull();
+  });
+
+  // Edge case: loadGrafoRelations con content-type no-json devuelve null.
+  it('loadGrafoRelations con content-type no json devuelve null', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      headers: { get: (k) => (k.toLowerCase() === 'content-type' ? 'text/html' : null) },
+      json: () => Promise.resolve(FIXTURE),
+    }));
+
+    const result = await mod.loadGrafoRelations();
+    expect(result).toBeNull();
+  });
+
+  // Edge case: getRelationsForSpecies con speciesId vacío o falsy devuelve null.
+  it('getRelationsForSpecies con id vacío, null o undefined devuelve null', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(FIXTURE)));
+
+    expect(await mod.getRelationsForSpecies('')).toBeNull();
+    expect(await mod.getRelationsForSpecies(null)).toBeNull();
+    expect(await mod.getRelationsForSpecies(undefined)).toBeNull();
+    expect(await mod.getRelationsForSpecies(0)).toBeNull();
+  });
 });
