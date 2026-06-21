@@ -171,6 +171,21 @@ describe('fin de nivel', () => {
     expect(res.estado).toBe('perdio');
   });
 
+  it('pierde cuando la energía es negativa', () => {
+    const res = evaluarFinNivel({ energia: -1, cultivosRecogidos: 10, metaCultivos: 10, plagasVivas: 0 });
+    expect(res.estado).toBe('perdio');
+  });
+
+  it('la razón de perder incluye mensaje sobre energía', () => {
+    const res = evaluarFinNivel({ energia: 0, cultivosRecogidos: 0, metaCultivos: 6, plagasVivas: 10 });
+    expect(res.razon).toContain('energía');
+  });
+
+  it('la razón de ganar incluye mensaje sobre control biológico', () => {
+    const res = evaluarFinNivel({ energia: 2, cultivosRecogidos: 6, metaCultivos: 6, plagasVivas: 0 });
+    expect(res.razon).toContain('control biológico');
+  });
+
   it('gana al recoger la meta de cultivos Y controlar todas las plagas', () => {
     const res = evaluarFinNivel({ energia: 2, cultivosRecogidos: 6, metaCultivos: 6, plagasVivas: 0 });
     expect(res.estado).toBe('gano');
@@ -208,7 +223,60 @@ describe('fin de nivel', () => {
   });
 });
 
+describe('aplicarBenefico — casos borde', () => {
+  it('no elimina nada con lista de plagas vacía', () => {
+    const res = aplicarBenefico([], 'catarina');
+    expect(res.eliminadas).toBe(0);
+    expect(res.plagas).toEqual([]);
+  });
+
+  it('no elimina nada si el benéfico no existe en BENEFICO_CONTROLA', () => {
+    const plagas = [{ id: 'a', plagaId: 'pulgon', alive: true }];
+    const res = aplicarBenefico(plagas, 'benefico_inexistente');
+    expect(res.eliminadas).toBe(0);
+    expect(res.plagas[0].alive).toBe(true);
+  });
+
+  it('todas las plagas que coinciden son eliminadas (múltiples instancias)', () => {
+    const plagas = [
+      { id: 'a', plagaId: 'pulgon', alive: true },
+      { id: 'b', plagaId: 'pulgon', alive: true },
+      { id: 'c', plagaId: 'pulgon', alive: true },
+    ];
+    const res = aplicarBenefico(plagas, 'catarina');
+    expect(res.eliminadas).toBe(3);
+    expect(res.plagas.every((p) => !p.alive)).toBe(true);
+  });
+});
+
+describe('golpearJefe — casos borde', () => {
+  it('no hace nada si el jefe es null', () => {
+    const res = golpearJefe(null, 'mantis');
+    expect(res.jefe).toBeNull();
+    expect(res.golpeo).toBe(false);
+    expect(res.derrotado).toBe(false);
+  });
+
+  it('no hace nada si el jefe ya está muerto', () => {
+    const jefe = { plagaId: 'saltamontes', vida: 0, vivo: false };
+    const res = golpearJefe(jefe, 'mantis');
+    expect(res.golpeo).toBe(false);
+  });
+});
+
+describe('sumarPuntaje — casos borde', () => {
+  it('no rompe si no se pasan deltas', () => {
+    expect(sumarPuntaje(50)).toBe(50);
+    expect(sumarPuntaje(0, undefined)).toBe(0);
+  });
+});
+
 describe('nivel 2 — terreno con plataformas y huecos', () => {
+  it('sobreHueco maneja null/undefined sin reventar', () => {
+    expect(sobreHueco(120, null)).toBe(false);
+    expect(sobreHueco(120, undefined)).toBe(false);
+  });
+
   it('sobreHueco detecta cuando el centro del jugador cae en un vacío', () => {
     const huecos = [{ x: 100, w: 50 }];
     expect(sobreHueco(120, huecos)).toBe(true);
@@ -259,6 +327,25 @@ describe('nivel 2 — terreno con plataformas y huecos', () => {
     const plataformas = [{ x: 100, y: 200, w: 120 }];
     const estado = { x: 120, y: 210, w: 38, h: 54, vy: -10 };
     const res = avanzarFisicaTerreno(estado, 340, plataformas, [], 485);
+    expect(res.onGround).toBe(false);
+  });
+
+  it('avanzarFisicaTerreno funciona con plataformas nulas o vacías', () => {
+    const groundY = 340;
+    const estado = { x: 20, y: 330, w: 38, h: 54, vy: 20 };
+    expect(avanzarFisicaTerreno(estado, groundY, null, [], 485).onGround).toBe(true);
+    expect(avanzarFisicaTerreno(estado, groundY, undefined, [], 485).onGround).toBe(true);
+    expect(avanzarFisicaTerreno(estado, groundY, [], [], 485).onGround).toBe(true);
+  });
+
+  it('el jugador NO cruza una plataforma si sus pies ya estaban debajo', () => {
+    const groundY = 340;
+    const plataformas = [{ x: 100, y: 200, w: 120 }];
+    // El jugador está debajo de la plataforma (pies en 314 > top 200).
+    // No debería aterrizar en ella porque no la cruza desde arriba.
+    const estado = { x: 120, y: 260, w: 38, h: 54, vy: 5 };
+    const res = avanzarFisicaTerreno(estado, groundY, plataformas, [], 485);
+    // No aterriza en la plataforma (pies ya debajo). Sigue en el aire.
     expect(res.onGround).toBe(false);
   });
 });
@@ -361,5 +448,15 @@ describe('niveles — configuración y desbloqueo', () => {
     // El nivel 3 exige haber superado el nivel 2.
     expect(nivelDesbloqueado(3, [1])).toBe(false);
     expect(nivelDesbloqueado(3, [1, 2])).toBe(true);
+  });
+
+  it('NIVELES está congelado (immutable)', () => {
+    expect(Object.isFrozen(NIVELES)).toBe(true);
+  });
+
+  it('NIVEL_1, NIVEL_2, NIVEL_3 están congelados', () => {
+    expect(Object.isFrozen(NIVEL_1)).toBe(true);
+    expect(Object.isFrozen(NIVEL_2)).toBe(true);
+    expect(Object.isFrozen(NIVEL_3)).toBe(true);
   });
 });
