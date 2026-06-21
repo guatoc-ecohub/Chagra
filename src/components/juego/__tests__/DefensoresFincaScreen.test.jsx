@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import DefensoresFincaScreen from '../DefensoresFincaScreen';
-import { PARES_CONTROL, NIVEL_1, NIVEL_2, NIVEL_3, PROGRESO_KEY } from '../defensoresFincaData';
+import { PARES_CONTROL, NIVEL_1, NIVEL_2, NIVEL_3, NIVEL_4, PROGRESO_KEY } from '../defensoresFincaData';
 
 // jsdom no implementa canvas 2D: getContext devuelve null. El componente
 // guarda contra ctx null, así que el render no crashea y podemos probar el HUD,
@@ -65,19 +65,22 @@ describe('DefensoresFincaScreen', () => {
     raf.mockRestore();
   });
 
-  it('muestra el selector con los tres niveles; el 2 y el 3 arrancan bloqueados', () => {
+  it('muestra el selector con los cuatro niveles; el 2, 3 y 4 arrancan bloqueados', () => {
     render(<DefensoresFincaScreen />);
     expect(screen.getByTestId('defensores-niveles')).toBeInTheDocument();
     const nivel1 = screen.getByTestId('nivel-1');
     const nivel2 = screen.getByTestId('nivel-2');
     const nivel3 = screen.getByTestId('nivel-3');
+    const nivel4 = screen.getByTestId('nivel-4');
     expect(nivel1).not.toBeDisabled();
     expect(nivel1).toHaveAttribute('data-selected', 'true');
-    // Sin progreso guardado, los niveles 2 y 3 están bloqueados.
+    // Sin progreso guardado, los niveles 2, 3 y 4 están bloqueados.
     expect(nivel2).toBeDisabled();
     expect(nivel2.textContent).toContain('Gana el nivel anterior');
     expect(nivel3).toBeDisabled();
     expect(nivel3.textContent).toContain('Gana el nivel anterior');
+    expect(nivel4).toBeDisabled();
+    expect(nivel4.textContent).toContain('Gana el nivel anterior');
   });
 
   it('con los niveles 1 y 2 superados, el 3 (cafetal) queda jugable con sus aliados del café', () => {
@@ -121,6 +124,28 @@ describe('DefensoresFincaScreen', () => {
     const parExtra = PARES_CONTROL.find((p) => p.id === extra);
     expect(screen.getByTestId(`beneficio-${parExtra.benefico.id}`)).toBeInTheDocument();
     // El aviso de mini-jefe del nivel 2 está presente.
+    expect(screen.getByTestId('defensores-jefe')).toBeInTheDocument();
+  });
+
+  it('con los niveles 1, 2 y 3 superados, el 4 (maizal) queda jugable con sus aliados del maíz', () => {
+    localStorage.setItem(PROGRESO_KEY, JSON.stringify({ superados: [1, 2, 3] }));
+    render(<DefensoresFincaScreen />);
+
+    const nivel4 = screen.getByTestId('nivel-4');
+    expect(nivel4).not.toBeDisabled();
+    expect(nivel4.textContent).toContain(NIVEL_4.nombre);
+
+    // Al elegir el nivel 4 cambian subtítulo y aparecen los aliados del maíz.
+    fireEvent.click(nivel4);
+    expect(nivel4).toHaveAttribute('data-selected', 'true');
+    expect(screen.getByTestId('defensores-subtitulo').textContent).toContain(
+      NIVEL_4.subtitulo,
+    );
+    // El nivel 4 incluye aliados que NO están en el nivel 3 (plagas del maíz).
+    const extra = NIVEL_4.paresIds.find((id) => !NIVEL_3.paresIds.includes(id));
+    const parExtra = PARES_CONTROL.find((p) => p.id === extra);
+    expect(screen.getByTestId(`beneficio-${parExtra.benefico.id}`)).toBeInTheDocument();
+    // El mini-jefe del nivel 4 (cogollero gigante) está anunciado.
     expect(screen.getByTestId('defensores-jefe')).toBeInTheDocument();
   });
 });

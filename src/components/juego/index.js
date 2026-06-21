@@ -9,6 +9,8 @@ export {
   CULTIVOS,
   NIVEL_1,
   NIVEL_2,
+  NIVEL_3,
+  NIVEL_4,
   NIVELES,
   getNivel,
   nivelDesbloqueado,

@@ -235,6 +235,62 @@ export const PARES_CONTROL = [
     },
     leccion: 'El escarabajo Cryptolaemus se come la cochinilla harinosa.',
   },
+  // ── Plagas y aliados del MAIZAL (nivel 4) ────────────────────────────────
+  // Control biológico documentado por CIAT, EMBRAPA e ICA Colombia para el maíz.
+  {
+    id: 'chicharrita-doru',
+    plaga: {
+      id: 'chicharrita',
+      nombre: 'Chicharrita del maíz',
+      cientifico: 'Dalbulus maidis',
+      emoji: '🦗',
+      dano: 'Chupa la savia y transmite el achaparramiento del maíz.',
+    },
+    benefico: {
+      id: 'doru',
+      nombre: 'Tijereta',
+      cientifico: 'Doru luteipes',
+      emoji: '🪲',
+      como: 'La tijereta caza de noche y devora chicharritas y huevos de plaga.',
+    },
+    leccion: 'La tijereta Doru luteipes es guardiana nocturna del maizal.',
+  },
+  {
+    id: 'elotero-telenomus',
+    plaga: {
+      id: 'elotero',
+      nombre: 'Gusano elotero',
+      cientifico: 'Helicoverpa zea',
+      emoji: '🐛',
+      dano: 'Se mete en la mazorca y devora los granos tiernos.',
+    },
+    benefico: {
+      id: 'telenomus',
+      nombre: 'Avispita Telenomus',
+      cientifico: 'Telenomus remus',
+      emoji: '🐝',
+      como: 'Parasita los huevos del elotero antes de que nazca la larva.',
+    },
+    leccion: 'La avispa Telenomus remus destruye los huevos del gusano elotero.',
+  },
+  {
+    id: 'barrenador-cotesia',
+    plaga: {
+      id: 'barrenador',
+      nombre: 'Barrenador del tallo',
+      cientifico: 'Diatraea saccharalis',
+      emoji: '🐛',
+      dano: 'Perfora el tallo del maíz por dentro y lo debilita.',
+    },
+    benefico: {
+      id: 'cotesia',
+      nombre: 'Avispita Cotesia',
+      cientifico: 'Cotesia flavipes',
+      emoji: '🐝',
+      como: 'Busca las larvas del barrenador dentro del tallo y las parasita.',
+    },
+    leccion: 'La avispa Cotesia flavipes controla el barrenador del tallo del maíz.',
+  },
 ];
 
 /** Mapa rápido benéfico → plaga que controla (para la lógica del juego). */
@@ -432,7 +488,88 @@ export const NIVEL_3 = Object.freeze({
 });
 
 /** Todos los niveles en orden de juego. */
-export const NIVELES = Object.freeze([NIVEL_1, NIVEL_2, NIVEL_3]);
+/**
+ * Nivel 4 — el maizal al atardecer (clima cálido, tierra plana y extensa).
+ *
+ * El nivel más grande de todos: una milpa (maizal con frijol y ahuyama) al
+ * atardecer, cuando las plagas del maíz salen con más hambre. El mundo es más
+ * ancho que todos los anteriores (cámara que recorre una finca maicera enorme),
+ * hay más cultivos que recoger y aparecen TODAS las plagas de los niveles
+ * anteriores más tres plagas propias del cultivo del maíz (chicharrita, gusano
+ * elotero y barrenador del tallo) con sus aliados reales documentados por CIAT,
+ * EMBRAPA e ICA Colombia. Más plataformas, más huecos y un mini-jefe imponente:
+ * el GUSANO COGOLLERO GIGANTE, que solo cae con su controlador real (la avispita
+ * Trichogramma) y aguanta todavía más golpes que la broca del cafetal.
+ * Dificultad máxima y cierre épico del viaje por la finca.
+ */
+export const NIVEL_4 = Object.freeze({
+  id: 'nivel-4',
+  numero: 4,
+  nombre: 'El maizal al atardecer',
+  subtitulo: 'Cae la tarde en la milpa. Las plagas del maíz salen con todo, pero sus enemigos naturales también.',
+  energiaInicial: 6,
+  energiaMax: 6,
+  metaCultivos: 18,
+  mundoAncho: 3360,
+  paresIds: [
+    'pulgon-catarina',
+    'moscablanca-crisopa',
+    'cogollero-trichogramma',
+    'afido-sirfido',
+    'trips-amblyseius',
+    'acaro-phytoseiulus',
+    'saltamontes-mantis',
+    'broca-cephalonomia',
+    'minador-closterocerus',
+    'cochinilla-cryptolaemus',
+    'chicharrita-doru',
+    'elotero-telenomus',
+    'barrenador-cotesia',
+  ],
+  escena: Object.freeze({
+    id: 'maizal-atardecer',
+    cieloTop: '#f7a460',
+    cieloBottom: '#fce8c4',
+    montana: '#4a7a3a',
+    sueloTop: '#6e4a28',
+    sueloBottom: '#2d1a0e',
+    pasto: '#4a7a2f',
+    astro: '#fff8e0',
+    estrellas: true,
+  }),
+  // Camino ondulante entre los surcos del maizal (más plataformas que el 3).
+  plataformas: Object.freeze([
+    Object.freeze({ x: 300, y: 90, w: 130 }),
+    Object.freeze({ x: 550, y: 160, w: 120 }),
+    Object.freeze({ x: 800, y: 100, w: 140 }),
+    Object.freeze({ x: 1050, y: 150, w: 120 }),
+    Object.freeze({ x: 1300, y: 90, w: 140 }),
+    Object.freeze({ x: 1550, y: 160, w: 120 }),
+    Object.freeze({ x: 1800, y: 100, w: 140 }),
+    Object.freeze({ x: 2050, y: 150, w: 120 }),
+    Object.freeze({ x: 2300, y: 90, w: 140 }),
+    Object.freeze({ x: 2550, y: 160, w: 120 }),
+    Object.freeze({ x: 2850, y: 100, w: 140 }),
+  ]),
+  // Zanjas y canales de riego del maizal (más huecos que el nivel 3).
+  huecos: Object.freeze([
+    Object.freeze({ x: 480, w: 70 }),
+    Object.freeze({ x: 980, w: 75 }),
+    Object.freeze({ x: 1480, w: 80 }),
+    Object.freeze({ x: 1980, w: 75 }),
+    Object.freeze({ x: 2480, w: 70 }),
+    Object.freeze({ x: 3030, w: 75 }),
+  ]),
+  // Mini-jefe: un gusano cogollero gigante al final del maizal. Solo la
+  // avispita Trichogramma (su controlador real) lo derriba; aguanta 5 golpes.
+  jefe: Object.freeze({
+    plagaId: 'cogollero',
+    emoji: '🐛',
+    vida: 5,
+  }),
+});
+
+export const NIVELES = Object.freeze([NIVEL_1, NIVEL_2, NIVEL_3, NIVEL_4]);
 
 /** Busca un nivel por su número (1-indexado). Devuelve NIVEL_1 si no existe. */
 export function getNivel(numero) {

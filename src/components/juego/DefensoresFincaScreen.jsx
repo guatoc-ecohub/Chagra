@@ -676,7 +676,7 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
 }
 
 /**
- * DefensoresFincaScreen — minijuego PLATAFORMERO 2D lateral con tres niveles.
+ * DefensoresFincaScreen — minijuego PLATAFORMERO 2D lateral con cuatro niveles.
  *
  * Un campesino NEUTRO (sin nombre propio) corre y salta por la finca: recoge
  * cultivos (puntos), esquiva plagas reales (pierde energía al tocarlas) e invoca
@@ -687,11 +687,15 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
  * Nivel 2 (la ladera al atardecer): más largo (mundo con cámara), otra paleta,
  * 7 pares, plataformas a distinta altura, huecos que hacen daño y un mini-jefe
  * (langosta) que solo cae con su controlador real (la mantis).
- * Nivel 3 (el cafetal en la niebla): el más largo, paleta de amanecer, 10 pares
- * (incluye plagas del café: broca, minador y cochinilla con sus aliados reales),
- * más plataformas y huecos, y un mini-jefe broca que solo cae con la avispa
- * Cephalonomia. Cada nivel se desbloquea al completar el anterior; el progreso se
- * guarda offline en localStorage.
+ * Nivel 3 (el cafetal en la niebla): todavía más largo, paleta de amanecer, 10
+ * pares (incluye plagas del café: broca, minador y cochinilla con sus aliados
+ * reales), más plataformas y huecos, y un mini-jefe broca que solo cae con la
+ * avispa Cephalonomia.
+ * Nivel 4 (el maizal al atardecer): el más grande, paleta de atardecer, 13 pares
+ * (incluye plagas del maíz: chicharrita, gusano elotero y barrenador con sus
+ * aliados reales), todavía más plataformas y huecos, y un mini-jefe cogollero
+ * gigante que solo cae con la avispita Trichogramma. Cada nivel se desbloquea al
+ * completar el anterior; el progreso se guarda offline en localStorage.
  *
  * Mobile-first: controles táctiles grandes + teclado en desktop. Offline-safe:
  * canvas 2D puro, datos locales, cero red. Estética Chagra.

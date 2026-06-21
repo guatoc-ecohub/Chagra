@@ -23,6 +23,7 @@ import {
   NIVEL_1,
   NIVEL_2,
   NIVEL_3,
+  NIVEL_4,
   NIVELES,
   getNivel,
   nivelDesbloqueado,
@@ -380,8 +381,8 @@ describe('mini-jefe — solo cae con su controlador real', () => {
 });
 
 describe('niveles — configuración y desbloqueo', () => {
-  it('hay tres niveles y el 2 es más largo y exigente que el 1', () => {
-    expect(NIVELES).toHaveLength(3);
+  it('hay cuatro niveles y el 2 es más largo y exigente que el 1', () => {
+    expect(NIVELES).toHaveLength(4);
     expect(NIVEL_2.numero).toBe(2);
     expect(NIVEL_2.mundoAncho).toBeGreaterThan(NIVEL_1.mundoAncho);
     expect(NIVEL_2.metaCultivos).toBeGreaterThan(NIVEL_1.metaCultivos);
@@ -403,12 +404,28 @@ describe('niveles — configuración y desbloqueo', () => {
     expect(NIVEL_3.jefe.vida).toBeGreaterThan(NIVEL_2.jefe.vida);
   });
 
+  it('el nivel 4 es el más grande y exigente de todos (más mundo, cultivos, pares, jefe)', () => {
+    expect(NIVEL_4.numero).toBe(4);
+    expect(NIVEL_4.mundoAncho).toBeGreaterThan(NIVEL_3.mundoAncho);
+    expect(NIVEL_4.metaCultivos).toBeGreaterThan(NIVEL_3.metaCultivos);
+    expect(NIVEL_4.paresIds.length).toBeGreaterThan(NIVEL_3.paresIds.length);
+    expect(NIVEL_4.plataformas.length).toBeGreaterThan(NIVEL_3.plataformas.length);
+    expect(NIVEL_4.huecos.length).toBeGreaterThan(NIVEL_3.huecos.length);
+    expect(NIVEL_4.jefe).toBeTruthy();
+    // El cogollero gigante aguanta más golpes que la broca del cafetal.
+    expect(NIVEL_4.jefe.vida).toBeGreaterThan(NIVEL_3.jefe.vida);
+  });
+
   it('cada nivel usa una paleta de fondo distinta', () => {
     expect(NIVEL_2.escena.id).not.toBe(NIVEL_1.escena.id);
     expect(NIVEL_2.escena.cieloTop).not.toBe(NIVEL_1.escena.cieloTop);
     expect(NIVEL_3.escena.id).not.toBe(NIVEL_2.escena.id);
     expect(NIVEL_3.escena.id).not.toBe(NIVEL_1.escena.id);
     expect(NIVEL_3.escena.cieloTop).not.toBe(NIVEL_2.escena.cieloTop);
+    expect(NIVEL_4.escena.id).not.toBe(NIVEL_3.escena.id);
+    expect(NIVEL_4.escena.id).not.toBe(NIVEL_2.escena.id);
+    expect(NIVEL_4.escena.id).not.toBe(NIVEL_1.escena.id);
+    expect(NIVEL_4.escena.cieloTop).not.toBe(NIVEL_3.escena.cieloTop);
   });
 
   it('todos los pares de cada nivel existen en el dataset curado', () => {
@@ -435,9 +452,18 @@ describe('niveles — configuración y desbloqueo', () => {
     expect(beneficoControlaPlaga(par.benefico.id, NIVEL_3.jefe.plagaId)).toBe(true);
   });
 
+  it('el mini-jefe del nivel 4 (cogollero) referencia una plaga real con controlador', () => {
+    const par = PARES_CONTROL.find((p) => p.plaga.id === NIVEL_4.jefe.plagaId);
+    expect(par).toBeTruthy();
+    expect(par.benefico.id).toBe('trichogramma');
+    // La avispita Trichogramma es el controlador real del cogollero y derriba al jefe.
+    expect(beneficoControlaPlaga(par.benefico.id, NIVEL_4.jefe.plagaId)).toBe(true);
+  });
+
   it('getNivel devuelve el nivel pedido y cae al 1 si no existe', () => {
     expect(getNivel(2)).toBe(NIVEL_2);
     expect(getNivel(3)).toBe(NIVEL_3);
+    expect(getNivel(4)).toBe(NIVEL_4);
     expect(getNivel(99)).toBe(NIVEL_1);
   });
 
@@ -448,15 +474,19 @@ describe('niveles — configuración y desbloqueo', () => {
     // El nivel 3 exige haber superado el nivel 2.
     expect(nivelDesbloqueado(3, [1])).toBe(false);
     expect(nivelDesbloqueado(3, [1, 2])).toBe(true);
+    // El nivel 4 exige haber superado el nivel 3.
+    expect(nivelDesbloqueado(4, [1, 2])).toBe(false);
+    expect(nivelDesbloqueado(4, [1, 2, 3])).toBe(true);
   });
 
   it('NIVELES está congelado (immutable)', () => {
     expect(Object.isFrozen(NIVELES)).toBe(true);
   });
 
-  it('NIVEL_1, NIVEL_2, NIVEL_3 están congelados', () => {
+  it('NIVEL_1, NIVEL_2, NIVEL_3 y NIVEL_4 están congelados', () => {
     expect(Object.isFrozen(NIVEL_1)).toBe(true);
     expect(Object.isFrozen(NIVEL_2)).toBe(true);
     expect(Object.isFrozen(NIVEL_3)).toBe(true);
+    expect(Object.isFrozen(NIVEL_4)).toBe(true);
   });
 });
