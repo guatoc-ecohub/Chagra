@@ -20,6 +20,7 @@ import { ETAPA_FENOLOGICA_LABELS } from '../utils/plantMeta';
 import { getAllSpecies } from '../db/catalogDB';
 import SpeciesImage from './SpeciesImage';
 import { matchSpeciesInCatalog } from '../utils/speciesResolver';
+import { resolveGenericFeedingForSpecies } from '../data/feedingPlanGeneric';
 
 // Derive speciesSlug from asset name.
 function deriveSpeciesSlug(name) {
@@ -331,18 +332,98 @@ const resolvePlantingDate = (asset) => {
   return Date.now();
 };
 
+// Plan de NUTRICIÓN genérico (orientativo por tipo de cultivo). Se muestra
+// cuando la especie está reconocida pero NO tiene `feeding_plan_template`
+// propio. Marcado de forma visible como aproximado por TIPO de cultivo
+// (anti-alucinación: nunca aparentar un dato específico que no tenemos). Solo
+// NUTRICIÓN; la sanidad es otra sección. Dosis textuales del seed.
+const GenericFeedingPlan = ({ template }) => {
+  if (!template) return null;
+  return (
+    <section
+      data-testid="plan-section-generic"
+      className="bg-slate-800/40 p-4 rounded-xl border border-amber-700/40 space-y-3"
+    >
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+          <Sprout size={12} /> Plan de alimentación
+        </h3>
+        <span
+          data-testid="plan-generic-badge"
+          className="text-[10px] font-bold uppercase tracking-wide text-amber-300 bg-amber-900/40 border border-amber-700/50 px-2 py-0.5 rounded-full"
+        >
+          General por tipo de cultivo
+        </span>
+      </div>
+
+      <p className="text-xs text-amber-200/90 italic">
+        No hay un plan propio para esta especie. Mostramos uno orientativo para{' '}
+        <span className="font-semibold">{template.label}</span>.
+      </p>
+
+      {template.notes?.map((nota) => (
+        <p key={nota} className="text-xs text-slate-300 border-l-2 border-amber-600/50 pl-2">
+          {nota}
+        </p>
+      ))}
+
+      <ol className="space-y-2">
+        {template.primary_steps.map((step) => (
+          <li
+            key={`${step.offset_days}-${step.biofertilizer_slug}`}
+            className="bg-slate-900/40 rounded-lg p-2 border border-slate-700/40"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-sm font-semibold text-slate-200">{step.action}</span>
+              <span className="text-[10px] text-slate-400 whitespace-nowrap">
+                {step.offset_days < 0
+                  ? `${Math.abs(step.offset_days)} días antes de sembrar`
+                  : `día ${step.offset_days}`}
+              </span>
+            </div>
+            <div className="text-xs text-emerald-300 mt-0.5">
+              {step.biofertilizer_slug.replace(/_/g, ' ')}
+              {Number.isFinite(step.dose_g) ? ` · ${step.dose_g} g aprox.` : ''}
+            </div>
+            {step.dose_safe && (
+              <p className="text-[11px] text-emerald-200 mt-1">
+                <span className="font-semibold">Dosis: </span>
+                {step.dose_safe}
+              </p>
+            )}
+            {step.dose_text && (
+              <details className="mt-1">
+                <summary className="text-[10px] text-slate-500 cursor-pointer">
+                  Cómo se prepara y se aplica (referencia)
+                </summary>
+                <p className="text-[11px] text-slate-400 mt-1">{step.dose_text}</p>
+              </details>
+            )}
+            {step.notes && (
+              <p className="text-[11px] text-slate-500 italic mt-1">{step.notes}</p>
+            )}
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+};
+
 const PlanSection = ({ asset }) => {
   const speciesSlug = useMemo(() => resolveSpeciesSlug(asset), [asset]);
   const assetName = useMemo(() => asset?.attributes?.name || asset?.name || '', [asset]);
   const plantingDate = useMemo(() => resolvePlantingDate(asset), [asset]);
   // status: 'idle' (sin slug ni nombre, nada que buscar), 'loading',
-  // 'present', 'absent', 'error'.
+  // 'present' (template propio → PlanEditor), 'generic' (sin template propio
+  // pero hay genérico por tipo de cultivo), 'absent', 'error'.
   // Inicialización lazy (function form) garantiza que React no llame al
   // initializer en re-renders y respeta la regla react-hooks/set-state-in-effect.
   const [status, setStatus] = useState(() => ((speciesSlug || assetName) ? 'loading' : 'idle'));
   // Slug canónico resuelto contra el catálogo — lo que se le pasa a
   // PlanEditor para que el plan se ancle al id correcto (no a "fresa").
   const [canonicalSlug, setCanonicalSlug] = useState(speciesSlug);
+  // Plantilla genérica de nutrición (orientativa) cuando no hay template propio.
+  const [genericTemplate, setGenericTemplate] = useState(null);
 
   useEffect(() => {
     if (!speciesSlug && !assetName) return undefined;
@@ -358,7 +439,19 @@ const PlanSection = ({ asset }) => {
         if (match?.id) setCanonicalSlug(match.id);
         const tpl = match?.feeding_plan_template;
         const present = !!(tpl && tpl.primary_steps && tpl.primary_steps.length > 0);
-        setStatus(present ? 'present' : 'absent');
+        if (present) {
+          setStatus('present');
+          return;
+        }
+        // Cascada: sin template propio → intentar un genérico por tipo de
+        // cultivo (+ override por familia/rol), marcado como orientativo.
+        const generic = match ? resolveGenericFeedingForSpecies(match) : null;
+        if (generic) {
+          setGenericTemplate(generic);
+          setStatus('generic');
+        } else {
+          setStatus('absent');
+        }
       })
       .catch((err) => {
         if (cancelled) return;
@@ -387,6 +480,10 @@ const PlanSection = ({ asset }) => {
         <p className="text-sm text-slate-400 italic">Buscando plan en el catálogo…</p>
       </section>
     );
+  }
+
+  if (status === 'generic') {
+    return <GenericFeedingPlan template={genericTemplate} />;
   }
 
   if (status !== 'present') {
