@@ -80,6 +80,17 @@ html[data-luz="noche"] {
 html:not([data-theme])[data-luz="noche"] {
   --w-night-a: 0;
 }
+/* TEMAS CLAROS SIEMPRE CLAROS (operador 2026-06-20: "siempre claro como los
+ * demos"). nature y minimalista NO adoptan la veladura navy ni el tinte azul
+ * de noche: conservan su atmósfera diurna a cualquier hora. !important para
+ * ganar sobre las reglas de clima nocturno (p.ej. niebla/lluvia de noche, de
+ * igual especificidad) sin depender del orden de declaración. La modulación
+ * climática DIURNA (nubes/lluvia/sol) se mantiene intacta. */
+html[data-theme="nature"][data-luz="noche"],
+html[data-theme="minimalista"][data-luz="noche"] {
+  --w-night-a: 0 !important;
+  --w-tint-a: 0 !important;
+}
 
 /* ---------------------------------------------------------------------------
  * CONDICIÓN DEL CIELO (snapshot climaService). Declarado DESPUÉS de la luz:
