@@ -340,6 +340,67 @@ export function checkPestReach(pests, player, distUmbral = 0.5) {
 }
 
 /**
+ * Devuelve la decoracion de la finca que el jugador tiene en la mira
+ * (al frente, dentro de un cono estrecho y un alcance corto), o null.
+ * Sirve para mostrar su leccion agroecologica.
+ *
+ * @param {{x:number, y:number, angulo:number}} player
+ * @param {Object[]} decoraciones  Lista con {x, y, ...}
+ * @param {number} maxDist
+ * @returns {Object|null}
+ */
+export function decoracionEnMira(player, decoraciones, maxDist = 3.5) {
+  let best = null;
+  let bestDist = maxDist;
+  for (const d of decoraciones) {
+    const dx = d.x - player.x;
+    const dy = d.y - player.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > maxDist) continue;
+    let diff = Math.atan2(dy, dx) - player.angulo;
+    while (diff > Math.PI) diff -= 2 * Math.PI;
+    while (diff < -Math.PI) diff += 2 * Math.PI;
+    if (Math.abs(diff) < 0.30 && dist < bestDist) {
+      best = d;
+      bestDist = dist;
+    }
+  }
+  return best;
+}
+
+/**
+ * Indica si el jugador apunta a una plaga viva y si el benefico equipado es
+ * el correcto para controlarla. Sirve para colorear la mira (verde=correcto,
+ * ambar=plaga pero benefico equivocado).
+ *
+ * @param {{x:number, y:number, angulo:number}} player
+ * @param {string} beneficoId
+ * @param {Object[]} pests
+ * @param {number} maxDist
+ * @returns {{ enMira: boolean, correcto: boolean }}
+ */
+export function plagaEnMira(player, beneficoId, pests, maxDist) {
+  let best = null;
+  let bestDist = maxDist;
+  for (const p of pests) {
+    if (!p.vivo) continue;
+    const dx = p.x - player.x;
+    const dy = p.y - player.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > maxDist) continue;
+    let diff = Math.atan2(dy, dx) - player.angulo;
+    while (diff > Math.PI) diff -= 2 * Math.PI;
+    while (diff < -Math.PI) diff += 2 * Math.PI;
+    if (Math.abs(diff) < 0.22 && dist < bestDist) {
+      best = p;
+      bestDist = dist;
+    }
+  }
+  if (!best) return { enMira: false, correcto: false };
+  return { enMira: true, correcto: best.controladoPor === beneficoId };
+}
+
+/**
  * Crea el estado inicial del mundo de juego.
  *
  * @returns {Object} Estado inicial del mundo

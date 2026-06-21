@@ -13,7 +13,7 @@ import {
 } from './doomFincaData';
 import {
   castRay, projectSprite, createWorld,
-  tickWorld, cambiarBenefico,
+  tickWorld, cambiarBenefico, decoracionEnMira, plagaEnMira,
 } from '../../services/doomFincaEngine';
 
 const W = CONFIG_DOOM.resX;  // 240
@@ -268,6 +268,8 @@ export default function DoomFincaScreen({ onBack, onHome }) {
   );
   const [estado, setEstado] = useState('jugando'); // jugando | gano | perdio
   const [_frameCount, setFrameCount] = useState(0);
+  const [leccion, setLeccion] = useState(''); // leccion de la decoracion en la mira
+  const leccionRef = useRef('');
 
   const soundOn = useRef(isSoundEnabled());
   const beep = useCallback((kind) => {
@@ -619,8 +621,40 @@ export default function DoomFincaScreen({ onBack, onHome }) {
       // Put pixel data
       ctx.putImageData(imageData, 0, 0);
 
-      // Mira central (crosshair)
-      ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+      // ── VIEWMODEL: manos del campesino sosteniendo el frasco del benefico ──
+      const bSel = BENEFICOS_DOOM.find((b) => b.id === beneficoSelRef.current) || BENEFICOS_DOOM[0];
+      const bob = Math.sin(w.t * 0.12) * 1.6;
+      const recoil = w.cooldown > 0 ? (w.cooldown / CONFIG_DOOM.cooldownLanzamiento) * 7 : 0;
+      const baseY = H - 2 + recoil + bob;
+      ctx.fillStyle = '#3f6d34';                 // mangas de la camisa de campo
+      ctx.beginPath();
+      ctx.moveTo(W * 0.26, H);
+      ctx.lineTo(W * 0.42, baseY - 16);
+      ctx.lineTo(W * 0.58, baseY - 16);
+      ctx.lineTo(W * 0.74, H);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#caa074';                 // manos
+      ctx.fillRect(W / 2 - 16, baseY - 18, 10, 9);
+      ctx.fillRect(W / 2 + 6, baseY - 18, 10, 9);
+      ctx.fillStyle = bSel.color;                // frasco del benefico
+      ctx.fillRect(W / 2 - 11, baseY - 28, 22, 18);
+      ctx.fillStyle = 'rgba(255,255,255,0.25)';
+      ctx.fillRect(W / 2 - 9, baseY - 26, 5, 14); // brillo del vidrio
+      ctx.fillStyle = '#5c4327';                  // tapa
+      ctx.fillRect(W / 2 - 8, baseY - 32, 16, 5);
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(bSel.emoji, W / 2, baseY - 18);
+
+      // Mira central (crosshair) — verde si apunta a la plaga correcta,
+      // ambar si es plaga pero benefico equivocado, blanco si no hay objetivo.
+      const aim = plagaEnMira(w.player, beneficoSelRef.current, w.pests, CONFIG_DOOM.alcanceLanzamiento);
+      const miraColor = aim.enMira
+        ? (aim.correcto ? 'rgba(130,255,130,0.95)' : 'rgba(255,180,70,0.95)')
+        : 'rgba(255,255,255,0.7)';
+      ctx.strokeStyle = miraColor;
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(W / 2 - 8, H / 2);
@@ -632,12 +666,18 @@ export default function DoomFincaScreen({ onBack, onHome }) {
       ctx.moveTo(W / 2, H / 2 + 3);
       ctx.lineTo(W / 2, H / 2 + 8);
       ctx.stroke();
-
-      // Punto central
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.fillStyle = miraColor;
       ctx.beginPath();
       ctx.arc(W / 2, H / 2, 2, 0, Math.PI * 2);
       ctx.fill();
+
+      // Leccion de la decoracion que el jugador esta mirando (ciclo de la finca)
+      const deco = decoracionEnMira(w.player, DECORACIONES);
+      const nuevaLeccion = deco ? deco.leccion : '';
+      if (nuevaLeccion !== leccionRef.current) {
+        leccionRef.current = nuevaLeccion;
+        setLeccion(nuevaLeccion);
+      }
 
       setFrameCount((prev) => (prev + 1) % 120);
     };
@@ -659,6 +699,8 @@ export default function DoomFincaScreen({ onBack, onHome }) {
     setMensaje('Elimina todas las plagas. Cada una solo cae con su controlador real.');
     setEstado('jugando');
     setBeneficoSel('trichogramma');
+    setLeccion('');
+    leccionRef.current = '';
   }, []);
 
   // Touch: joystick virtual izquierdo
@@ -698,13 +740,9 @@ export default function DoomFincaScreen({ onBack, onHome }) {
       const canvas = canvasRef.current;
       if (!canvas) continue;
       const rect = canvas.getBoundingClientRect();
-      const x = t.clientX - rect.left;
-      const relX = x / rect.width;
 
       if (t.identifier === tj.joystickId && tj.joystickActive) {
-        tj.joystickX = (relX - (tj.joystickX / rect.width + 0.2)) * rect.width;
-        tj.joystickY = (t.clientY - rect.top - 0.5 * rect.height);
-        // Recalcular con centro
+        // Delta desde el centro fijo del joystick (20% ancho, 50% alto)
         const cx = rect.width * 0.2;
         const cy = rect.height * 0.5;
         tj.joystickX = t.clientX - rect.left - cx;
@@ -759,8 +797,10 @@ export default function DoomFincaScreen({ onBack, onHome }) {
       <div className="flex flex-col gap-3 px-3 pt-2 pb-6 max-w-lg mx-auto">
         {/* Subtitulo */}
         <p className="text-xs text-emerald-200/80 leading-snug text-center">
-          Recorre el invernadero en primera persona. Lanza el benefico correcto
-          sobre cada plaga para controlarla. Protege la vitalidad del cultivo.
+          Recorre tu finca en primera persona. Lanza el benefico correcto sobre
+          cada plaga para controlarla y protege la vitalidad del cultivo. Mira
+          los arboles, la colmena, los animales y la compostera para aprender
+          como se cierra el ciclo.
         </p>
 
         {/* HUD retro */}
@@ -837,6 +877,17 @@ export default function DoomFincaScreen({ onBack, onHome }) {
             </div>
           </div>
         </div>
+
+        {/* Tarjeta educativa: lo que el jugador esta mirando (ciclo de la finca) */}
+        {leccion && (
+          <div
+            className="bg-amber-950/50 border border-amber-600/40 rounded-xl p-3 text-center"
+            role="status"
+          >
+            <Sprout size={14} className="inline-block mr-1 text-amber-300" aria-hidden="true" />
+            <span className="text-sm text-amber-100 font-medium">{leccion}</span>
+          </div>
+        )}
 
         {/* Mensaje (leccion) */}
         {mensaje && (
