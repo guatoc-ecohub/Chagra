@@ -198,11 +198,21 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
       await waitFor(() => expect(onNavigate).toHaveBeenCalledWith('agente'));
     });
 
-    test('el colibrí NO se usa en otro lugar del compositor (solo en enviar)', () => {
+    test('el colibrí del compositor solo se usa en enviar (no duplicado en la barra)', () => {
       const { container } = render(<AgentHero onNavigate={vi.fn()} />);
 
-      const avatarElements = container.querySelectorAll('[data-testid="avatar"]');
-      expect(avatarElements.length).toBe(1);
+      // Dentro del COMPOSITOR el colibrí (avatar) vive SOLO en el botón de
+      // enviar — no duplicado en la barra de íconos.
+      const composer = container.querySelector('.agentport-composer');
+      expect(composer).toBeTruthy();
+      const composerAvatars = composer.querySelectorAll('[data-testid="avatar"]');
+      expect(composerAvatars.length).toBe(1);
+
+      // El botón "Abrir Chagra IA" del header tiene su PROPIO avatar (entrada
+      // explícita al overlay, tarea #51) — es intencional, fuera del compositor.
+      const openBtn = container.querySelector('.agentport-open');
+      expect(openBtn).toBeTruthy();
+      expect(openBtn.querySelectorAll('[data-testid="avatar"]').length).toBe(1);
 
       // El colibrí de la escena (.agentport-hummer) es separado
       const sceneHummer = container.querySelector('.agentport-hummer');

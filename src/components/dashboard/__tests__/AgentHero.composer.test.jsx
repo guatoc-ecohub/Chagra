@@ -111,6 +111,19 @@ describe('AgentHero — compositor real (no teaser)', () => {
     expect(sendMock).not.toHaveBeenCalled();
   });
 
+  test('"Abrir Chagra IA" navega al overlay del agente sin enviar ni abrir el menú', async () => {
+    // Tarea #51: la portada del home (AgentHero) debe ofrecer una entrada
+    // EXPLÍCITA al overlay del agente. Distinta del compositor: no persiste en
+    // la outbox y no abre "La mano de Chagra" — navega directo a 'agente'.
+    const onNavigate = vi.fn();
+    render(<AgentHero onNavigate={onNavigate} />);
+    const openBtn = screen.getByLabelText('Abrir Chagra IA');
+    fireEvent.click(openBtn);
+    await waitFor(() => expect(onNavigate).toHaveBeenCalledWith('agente'));
+    expect(sendMock).not.toHaveBeenCalled();
+    expect(screen.queryByText('La mano de Chagra')).not.toBeInTheDocument();
+  });
+
   test('enviar sin texto ni adjunto NO envía: abre el menú didáctico (demo)', () => {
     // Port fiel del demo (2026-06-11): `sendField()` con el campo vacío abre
     // el menú de capacidades en vez de quedar muerto/deshabilitado.

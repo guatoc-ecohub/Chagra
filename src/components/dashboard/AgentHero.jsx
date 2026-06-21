@@ -1096,6 +1096,22 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-profile:active { transform: scale(.92); }
                 .agentport-headtools { display: flex; align-items: center; gap: 8px; flex: none; }
 
+                /* "Abrir Chagra IA" — botón redondo con el avatar del agente.
+                   Entrada explícita al overlay desde la portada (tarea #51). */
+                .agentport-open {
+                    width: 38px; height: 38px; flex: none; border-radius: 50%;
+                    display: inline-flex; align-items: center; justify-content: center;
+                    overflow: hidden; padding: 0; cursor: pointer;
+                    background: rgb(var(--c-surface-card) / 0.65);
+                    border: 1px solid rgb(var(--c-surface-border));
+                    backdrop-filter: blur(6px);
+                    box-shadow: 0 2px 8px -4px rgba(0,0,0,.35);
+                    transition: transform .16s cubic-bezier(.22,.61,.36,1),
+                                border-color .2s ease, box-shadow .25s ease;
+                }
+                .agentport-open:hover { border-color: rgb(var(--t-accent-rgb) / 0.5); }
+                .agentport-open:active { transform: scale(.92); }
+
                 /* ============ CAMPANA DE ALERTAS/TAREAS (demo biopunk) ============
                    Import 1:1 del .bellbtn + .notifPanel del demo-agente-biopunk:
                    campana redonda con anillo que respira + badge ámbar; panel que
@@ -1716,6 +1732,27 @@ export default function AgentHero({ onNavigate }) {
             {/* ===================== TOGGLE Campesino/Experto ===================== */}
             <header className="agentport-topbar">
                 <div className="agentport-headtools">
+                    {/* "Abrir Chagra IA": entrada EXPLÍCITA al overlay del agente
+                        (AgentScreen) desde la portada del home. Bug móvil tarea #51
+                        (2026-06-21): el único control rotulado "Abrir Chagra IA"
+                        vivía en WelcomeStatsHero/DashboardView — un dashboard que la
+                        app EN VIVO ya no monta (case 'dashboard' usa DashboardLive →
+                        AgentHero). Por eso el fix previo (PR #1725, touchEnd sobre
+                        ese chip) era no-op: nadie podía tocar el botón. Acá la
+                        portada SÍ ofrece la acción sobre la superficie real, sin
+                        tocar el contrato del compositor (enviar vacío → abre "La
+                        mano de Chagra", comportamiento del demo). launchToAgent
+                        navega con la transición premium ya probada. */}
+                    <button
+                        type="button"
+                        onClick={launchToAgent}
+                        aria-label="Abrir Chagra IA"
+                        title="Abrir Chagra IA"
+                        className="agentport-open"
+                    >
+                        <ChagraAgentAvatar size={26} state="idle" ariaLabel="Chagra IA" />
+                    </button>
+
                     <div className="agentport-mode" role="tablist" aria-label="Nivel de respuestas">
                         <button
                             type="button"
