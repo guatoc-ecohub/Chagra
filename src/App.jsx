@@ -82,6 +82,7 @@ const FermentosView = lazy(() => import('./components/FermentosView'));
 const AnimalesScreen = lazy(() => import('./components/AnimalesScreen'));
 const GallinasScreen = lazy(() => import('./components/GallinasScreen'));
 const AbejasScreen = lazy(() => import('./components/AbejasScreen'));
+const VacasScreen = lazy(() => import('./components/VacasScreen'));
 const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
 const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
 const LocationDetectedScreen = lazy(() => import('./components/LocationDetectedScreen'));
@@ -142,7 +143,7 @@ const NAV_TILES = [
   { id: 'task_log', label: 'Tareas', icon: Clock, accent: 'rose', desc: 'Cola de pendientes' },
   { id: 'historial', label: 'Bitácora', icon: NotebookPen, accent: 'indigo', desc: 'Historial de actividades' },
   { id: 'biodiversidad', label: 'Flora y fauna', icon: Leaf, accent: 'emerald', desc: 'Ecosistema, estratos y gremios' },
-  { id: 'animales', label: 'Animales', icon: PawPrint, accent: 'rose', desc: 'Gallinas, cerdos, abejas y ciclo cerrado' },
+  { id: 'animales', label: 'Animales', icon: PawPrint, accent: 'rose', desc: 'Gallinas, vacas, cerdos, abejas y ciclo cerrado' },
   { id: 'fermentos', label: 'Fermentos', icon: Beaker, accent: 'orange', desc: 'Recetas tradicionales y seguridad' },
   { id: 'reportar_invasora', label: 'Plagas', icon: AlertCircle, accent: 'amber', desc: 'Reporte de plagas y malezas' },
   { id: 'casos', label: 'Casos', icon: FileText, accent: 'amber', desc: 'Seguimiento de problemas y tratamientos' },
@@ -188,6 +189,7 @@ const HASH_VIEW_ROUTES = {
   animales: 'animales',
   'animales-gallinas': 'animales_gallinas',
   'animales-abejas': 'animales_abejas',
+  'animales-vacas': 'animales_vacas',
   'doom-finca': 'doom_finca',
   toxicologia: 'toxicologia',
   suelo: 'suelo',
@@ -197,7 +199,7 @@ const HASH_VIEW_ROUTES = {
 const MODULE_VIEWS = new Set([
   'activos', 'mapa', 'javier', 'bodega', 'task_log', 'historial',
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
-  'animales', 'animales_gallinas', 'animales_abejas',
+  'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas',
   'hoy_finca', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'suelo', 'toxicologia',
@@ -1127,6 +1129,16 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Abejas">
               <AbejasScreen onBack={() => navigate('animales')} onHome={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'animales_vacas':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Vacas">
+              {/* onNavigate: VacasScreen enlaza al proceso de seguimiento de
+                  silvopastoreo existente ('seguimiento_silvopastoreo'). */}
+              <VacasScreen onBack={() => navigate('animales')} onHome={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );

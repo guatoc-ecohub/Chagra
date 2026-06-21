@@ -1,5 +1,5 @@
 import React from 'react';
-import { PawPrint, Bird, Hexagon, ChevronRight, Recycle } from 'lucide-react';
+import { PawPrint, Bird, Hexagon, Beef, ChevronRight, Recycle } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 
 /**
@@ -14,6 +14,8 @@ import { ScreenShell } from './common/ScreenShell';
  *   - Cerdos     → REUTILIZA el seguimiento porcino existente (ruta
  *                  'seguimiento_cerdos', motor FarmProcess). NO se duplica.
  *   - Gallinas   → pantalla nueva (animales_gallinas).
+ *   - Vacas      → pantalla nueva (animales_vacas). Enlaza al proceso de
+ *                  seguimiento de silvopastoreo existente. NO se duplica.
  *   - Abejas     → pantalla nueva (animales_abejas).
  *
  * Datos sanitarios y de manejo verificables (ICA, AGROSAVIA, Fenavi,
@@ -52,6 +54,20 @@ const VERTICALES = [
     bar: 'from-amber-400 to-yellow-300',
     halo: 'bg-amber-400/20',
     iconColor: 'text-amber-300',
+  },
+  {
+    id: 'vacas',
+    route: 'animales_vacas',
+    Icon: Beef,
+    emoji: '🐄',
+    titulo: 'Vacas y ganado',
+    subtitulo: 'Leche, carne, sanidad y silvopastoreo',
+    aporte: 'Boñiga para el biol y el bocashi',
+    accent: 'from-orange-600/25 to-amber-500/10',
+    border: 'border-orange-600/40',
+    bar: 'from-orange-400 to-amber-300',
+    halo: 'bg-orange-400/20',
+    iconColor: 'text-orange-300',
   },
   {
     id: 'abejas',
@@ -150,6 +166,7 @@ export default function AnimalesScreen({ onBack, onHome, onNavigate }) {
           </div>
           <ul className="mt-3 space-y-1.5 text-sm text-emerald-100/90 leading-relaxed">
             <li>• <span className="font-bold text-amber-200">Gallinas</span> → la gallinaza es ingrediente del <span className="font-bold">bocashi</span> (abono base).</li>
+            <li>• <span className="font-bold text-orange-200">Vacas</span> → la boñiga (bovinaza) es el estiércol clásico del <span className="font-bold">biol</span> (el biol tradicional de Restrepo se hace con boñiga de vaca) y también entra al <span className="font-bold">bocashi</span>.</li>
             <li>• <span className="font-bold text-pink-200">Cerdos</span> → la porcinaza y el estiércol entran al <span className="font-bold">biol</span>, el <span className="font-bold">supermagro</span> y el <span className="font-bold">compost</span>.</li>
             <li>• <span className="font-bold text-yellow-200">Abejas</span> → no dan abono, pero polinizan tus matas y mejoran el cuaje y la cosecha.</li>
           </ul>
