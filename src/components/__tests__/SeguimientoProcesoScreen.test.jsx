@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileCopyrightText: 2026 Guatoc Eco Hub
 
+/* i18n (ADR-050): labels en español en aserciones de UI; regla soft (warn)
+ * desactivada a nivel de archivo (mismo criterio que la pantalla). */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
+
 /**
  * SeguimientoProcesoScreen.test.jsx — vista de SEGUIMIENTO de un proceso de
  * finca (operador 2026-06-15). Verifica el flujo central:
@@ -167,7 +171,7 @@ describe('SeguimientoProcesoScreen', () => {
     await waitFor(() => screen.getByText('Lote de cerdos en clima frio'));
     fireEvent.click(screen.getByText('Lote de cerdos en clima frio'));
 
-    expect(screen.getByText('Grounding porcino')).toBeInTheDocument();
+    expect(screen.getByText('Guía de manejo del cerdo')).toBeInTheDocument();
     expect(screen.getByText('Alertas sanitarias')).toBeInTheDocument();
     expect(screen.getAllByText('Clima frio o templado').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/yuca cocida/i)).toBeInTheDocument();

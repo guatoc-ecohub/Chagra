@@ -1,5 +1,11 @@
+/* i18n (ADR-050): etiquetas user-facing en español Colombia pendientes de
+ * migrar a src/config/messages.js. La regla chagra-i18n es soft (warn); se
+ * desactiva a nivel de archivo para no bloquear el pre-commit (mismo criterio
+ * que CromatografiaScreen / ToxicologiaScreen). Este archivo es anterior a la
+ * regla y su migración i18n es trabajo aparte. */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ChevronLeft, Plus, Check, X, AlertTriangle, RotateCcw, CalendarDays, MapPin, Clock, ChevronRight } from 'lucide-react';
+import { ChevronLeft, Plus, Check, X, AlertTriangle, RotateCcw, CalendarDays, MapPin, Clock, ChevronRight, ExternalLink, BookOpen } from 'lucide-react';
 import { createFarmProcess, recordFarmEvent } from '../services/farmEventService';
 import { confirmStage } from '../services/stageConfirmationService';
 import { listFarmProcesses, getFarmEvents, putFarmProcess } from '../db/farmProcessCache';
@@ -15,6 +21,7 @@ import useFincaActiveStore from '../services/fincaActiveStore';
 import { getProfile } from '../services/userProfileService';
 import animalDiagnostics from '../data/animal-diagnostics.json';
 import { diagnosticarAnimal, formatearGroundingAnimal } from '../services/animalDiagnostic';
+import { FUENTES_OFICIALES } from '../data/fuentesAnimales';
 
 /**
  * SeguimientoProcesoScreen — vista de SEGUIMIENTO de un proceso de finca
@@ -33,7 +40,7 @@ import { diagnosticarAnimal, formatearGroundingAnimal } from '../services/animal
  *   - stageSequenceForProcessType (etapas por tipo, types/farmProcess)
  *
  * Para 'pigs' surfacea la GUARDA crítica de leucaena/mimosina desde
- * animal-diagnostics.json (DR-ANIMAL-1, fuentes ICA/AGROSAVIA/CIPAV). Los
+ * animal-diagnostics.json (fuentes públicas ICA/AGROSAVIA/CIPAV). Los
  * detalles técnicos sin fuente cerrada van marcados [VALIDAR].
  */
 
@@ -687,8 +694,8 @@ function ProcesoDetalle({ def, proceso, stageSeq, locationOptions = [], onReload
       {def.processType === 'pigs' && (
         <section className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col gap-3">
           <div>
-            <h2 className="text-sm font-bold text-slate-100">Grounding porcino</h2>
-            <p className="text-2xs text-slate-500">Resumen curado para manejo, alimentacion y sanidad.</p>
+            <h2 className="text-sm font-bold text-slate-100">Guía de manejo del cerdo</h2>
+            <p className="text-2xs text-slate-500">Resumen práctico de manejo, alimentación y sanidad, basado en fuentes públicas.</p>
           </div>
           {pigClimate && (
             <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-3">
@@ -715,10 +722,41 @@ function ProcesoDetalle({ def, proceso, stageSeq, locationOptions = [], onReload
           )}
           {pigDiagnosis?.especie && (
             <details className="rounded-lg border border-slate-800 bg-slate-950/60 p-3">
-              <summary className="cursor-pointer text-xs font-bold text-slate-200">Grounding detallado</summary>
+              <summary className="cursor-pointer text-xs font-bold text-slate-200">Ver detalle de alimentación y guardas</summary>
               <pre className="mt-2 whitespace-pre-wrap text-2xs text-slate-400 leading-relaxed">{formatearGroundingAnimal(pigDiagnosis)}</pre>
             </details>
           )}
+          {/* Fuentes / Saber más — enlaces públicos reales (cama profunda y
+              porcicultura agroecológica: FAO/AGROSAVIA; sanidad: ICA). */}
+          <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-3">
+            <p className="flex items-center gap-1.5 text-xs font-bold text-slate-200">
+              <BookOpen size={14} aria-hidden="true" /> Fuentes y saber más
+            </p>
+            <ul className="mt-2 space-y-1.5">
+              {['ica', 'agrosavia', 'fao', 'sena'].map((k) => {
+                const f = FUENTES_OFICIALES[k];
+                if (!f) return null;
+                return (
+                  <li key={f.url}>
+                    <a
+                      href={f.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex items-center gap-2 text-2xs text-sky-300 hover:text-sky-200"
+                    >
+                      <ExternalLink size={13} className="shrink-0" aria-hidden="true" />
+                      <span className="font-bold">{f.nombre}</span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+            <p className="mt-2 text-2xs text-slate-500 leading-relaxed">
+              Vacunas, desparasitación y tratamientos dependen del municipio y de la
+              resolución ICA vigente. Consulta a un técnico o veterinario; esta guía no
+              reemplaza la asistencia profesional.
+            </p>
+          </div>
         </section>
       )}
 

@@ -3,6 +3,8 @@ import {
   Bird, Egg, HeartPulse, ShieldAlert, Sprout, Recycle, Info,
 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
+import FuentesAnimal from './common/FuentesAnimal';
+import ChecklistManejo from './common/ChecklistManejo';
 
 /**
  * GallinasScreen — vertical de gallinas y aves de corral del módulo Animales.
@@ -37,7 +39,7 @@ function SeccionCard({ Icon, color, titulo, children }) {
 
 // Razas reales colombianas / comunes, con propósito (Fenavi, AGROSAVIA).
 const RAZAS = [
-  { nombre: 'Criolla colombiana', proposito: 'Doble (huevo + carne)', nota: 'Rústica, ~175 huevos/año, resiste bien el campo' },
+  { nombre: 'Criolla colombiana', proposito: 'Doble (huevo + carne)', nota: 'Rústica y resistente; pone menos que las líneas comerciales pero aguanta mejor el campo' },
   { nombre: 'Isa Brown / Lohmann', proposito: 'Ponedora', nota: 'Línea comercial de postura, muchos huevos' },
   { nombre: 'Cobb / Ross', proposito: 'Engorde', nota: 'Pollo de engorde, crece rápido' },
   { nombre: 'Pescuezo pelado', proposito: 'Doble', nota: 'Criolla, tolera bien el calor' },
@@ -204,10 +206,27 @@ export default function GallinasScreen({ onBack, onHome }) {
           </p>
         </SeccionCard>
 
-        <p className="text-[11px] text-slate-500 pt-1">
-          Fuentes: Fenavi, AGROSAVIA, ICA, CIPAV. Newcastle es de notificación
-          obligatoria al ICA. Ante dudas de tratamiento o dosis, consulta al técnico.
-        </p>
+        {/* Checklist interactivo de manejo (local, sin backend) */}
+        <ChecklistManejo
+          titulo="Chequeo del galpón"
+          color={{ border: 'border-emerald-700/40', bg: 'bg-emerald-900/20', text: 'text-emerald-200' }}
+          items={[
+            'La cama está seca y suelta (sin charcos ni amoníaco fuerte).',
+            'Hay agua limpia y fresca disponible todo el día.',
+            'Hay sombra y ventilación para los días de calor.',
+            'Las aves nuevas pasaron por cuarentena antes de juntarlas.',
+            'No mezclo lotes de muy distinta edad.',
+            'Desinfecto botas y manos al entrar al galpón.',
+            'Recojo los huevos varias veces al día y los guardo frescos.',
+            'Maduro o composto la gallinaza antes de usarla en las matas.',
+          ]}
+        />
+
+        {/* Fuentes / Saber más — enlaces públicos reales */}
+        <FuentesAnimal
+          claves={['fenavi', 'agrosavia', 'ica', 'cipav', 'sena']}
+          nota="Newcastle es enfermedad de notificación obligatoria al ICA. Ante dudas de tratamiento o dosis, consulta a un técnico o veterinario."
+        />
       </div>
     </ScreenShell>
   );

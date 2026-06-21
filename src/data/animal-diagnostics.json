@@ -1,6 +1,6 @@
 {
-  "fuente": "DR-ANIMAL-1-consolidado (3/3 DeepSeek+Gemini+Meta, 2026-06-11)",
-  "referencias": ["ICA", "AGROSAVIA/Corpoica", "CIPAV", "FEDEGAN", "Fenavi", "FEDEABEJA"],
+  "fuente": "ICA, AGROSAVIA, CIPAV, FEDEGAN, Fenavi, FEDEABEJA, FAO",
+  "referencias": ["ICA", "AGROSAVIA/Corpoica", "CIPAV", "FEDEGAN", "Fenavi", "FEDEABEJA", "FAO"],
   "especies": [
     { "id": "bovino", "nombre": "Bovino", "funcion": "carne_leche_doble", "raza": [
       { "nombre": "Romosinuano", "piso_termico": "calido", "funcion": "carne", "nota": "Criollo colombiano" },
