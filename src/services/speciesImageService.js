@@ -1,9 +1,11 @@
 /**
  * speciesImageService, imágenes reales por nombre científico.
  *
- * Fuente primaria: GBIF occurrence media. Fallback: Wikimedia Commons.
- * No inventa URLs y solo acepta licencias abiertas compatibles.
+ * Prioridad: 1) JSON local (species-images.json), 2) GBIF occurrence media,
+ * 3) Wikimedia Commons. No inventa URLs y solo acepta licencias abiertas.
  */
+
+import { findLocalImage } from '../utils/speciesImageResolver';
 
 const GBIF_API = 'https://api.gbif.org/v1';
 const WIKIMEDIA_API = 'https://commons.wikimedia.org/w/api.php';
@@ -228,13 +230,27 @@ async function resolveSpeciesImage(nombreCientifico) {
   const cached = await readCached(nombreCientifico);
   if (cached) return cached;
 
+  // 1. Primero buscar en el JSON local (OpenCode data)
   let value = null;
   try {
-    value = await fetchFromGbif(nombreCientifico);
+    value = await findLocalImage(nombreCientifico);
+    if (value) {
+      console.debug('[speciesImageService] Found local image for:', nombreCientifico);
+    }
   } catch (err) {
-    console.warn('[speciesImageService] GBIF image lookup failed:', err?.message || err);
+    console.warn('[speciesImageService] Local image lookup failed:', err?.message || err);
   }
 
+  // 2. Si no hay imagen local, buscar en GBIF
+  if (!value) {
+    try {
+      value = await fetchFromGbif(nombreCientifico);
+    } catch (err) {
+      console.warn('[speciesImageService] GBIF image lookup failed:', err?.message || err);
+    }
+  }
+
+  // 3. Si no hay imagen en GBIF, buscar en Wikimedia
   if (!value) {
     try {
       value = await fetchFromWikimedia(nombreCientifico);
