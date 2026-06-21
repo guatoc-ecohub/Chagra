@@ -46,6 +46,12 @@ export const GPS_MAX_WALK_SPEED_MPS = 5; // ~18 km/h, holgado para trote/jitter
 // consideran el mismo punto (dedup) y solo engordan el anillo con jitter.
 export const GPS_MIN_VERTEX_DISTANCE_M = 3;
 
+// Distancia máxima razonable entre dos fixes consecutivos caminando. Se usa
+// como guarda de respaldo cuando los timestamps no están disponibles para
+// hacer el chequeo de velocidad; el comentario original decía "caemos a un
+// tope de distancia" pero nunca se implementó (bug #57 línea loca).
+export const GPS_MAX_JUMP_DISTANCE_M = 50;
+
 // Tolerancia por defecto de Douglas-Peucker para simplificar el recorrido.
 export const GPS_SIMPLIFY_TOLERANCE_M = 2;
 
@@ -84,11 +90,13 @@ export const haversineMeters = (a, b) => {
  * @param {object} [opts]
  * @param {number} [opts.accuracyThreshold=GPS_ACCURACY_THRESHOLD_M]
  * @param {number} [opts.maxSpeed=GPS_MAX_WALK_SPEED_MPS]
+ * @param {number} [opts.maxJumpDistance=GPS_MAX_JUMP_DISTANCE_M]
  * @returns {{accepted:boolean, reason:string|null, distance:number}}
  */
 export const acceptGpsFix = (fix, prev, opts = {}) => {
   const accuracyThreshold = opts.accuracyThreshold ?? GPS_ACCURACY_THRESHOLD_M;
   const maxSpeed = opts.maxSpeed ?? GPS_MAX_WALK_SPEED_MPS;
+  const maxJumpDistance = opts.maxJumpDistance ?? GPS_MAX_JUMP_DISTANCE_M;
 
   if (!fix || !Number.isFinite(fix.lat) || !Number.isFinite(fix.lng)) {
     return { accepted: false, reason: 'invalid', distance: 0 };
@@ -114,6 +122,10 @@ export const acceptGpsFix = (fix, prev, opts = {}) => {
     if (speed > maxSpeed) {
       return { accepted: false, reason: 'speed', distance };
     }
+  } else if (distance > maxJumpDistance) {
+    // Fallback: sin timestamps consistentes, no podemos calcular velocidad,
+    // pero una distancia exagerada igual es un salto GPS → línea loca.
+    return { accepted: false, reason: 'jump', distance };
   }
   return { accepted: true, reason: null, distance };
 };
