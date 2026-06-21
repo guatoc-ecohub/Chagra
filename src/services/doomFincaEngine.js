@@ -23,7 +23,7 @@ export function isWall(mapa, x, y) {
   const mx = Math.floor(x);
   const my = Math.floor(y);
   if (mx < 0 || mx >= MAPA_COLS || my < 0 || my >= MAPA_FILAS) return true;
-  return mapa[my][mx] === 1;
+  return mapa[my][mx] !== 0;
 }
 
 /**
@@ -32,6 +32,7 @@ export function isWall(mapa, x, y) {
  * @property {number} dist   Distancia perpendicular a la pared (corregida).
  * @property {number} cara   0=N, 1=S, 2=E, 3=O
  * @property {number} texX   Coordenada X de la textura (0-1) donde golpeo.
+ * @property {number} tipo   Codigo de material de la celda (1=seto, 2=madera, ...).
  */
 
 /**
@@ -76,6 +77,7 @@ export function castRay(mapa, ox, oy, angle) {
 
   // DDA loop: avanzar hasta chocar con una pared
   let side = 0; // 0 = vertical (E/W), 1 = horizontal (N/S)
+  let tipo = 1;
   const MAX_STEPS = 64;
   for (let i = 0; i < MAX_STEPS; i += 1) {
     if (sideDistX < sideDistY) {
@@ -90,7 +92,8 @@ export function castRay(mapa, ox, oy, angle) {
     if (mapX < 0 || mapX >= MAPA_COLS || mapY < 0 || mapY >= MAPA_FILAS) {
       break;
     }
-    if (mapa[mapY][mapX] === 1) {
+    if (mapa[mapY][mapX] !== 0) {
+      tipo = mapa[mapY][mapX];
       break;
     }
   }
@@ -122,7 +125,7 @@ export function castRay(mapa, ox, oy, angle) {
     cara = dirY > 0 ? 1 : 0; // Sur o Norte
   }
 
-  return { dist: perpDist, cara, texX: wallX };
+  return { dist: perpDist, cara, texX: wallX, tipo };
 }
 
 /**
@@ -365,14 +368,14 @@ export function createWorld() {
 
   // Distribuir plagas por el mapa en posiciones validas (no paredes)
   const spawns = [
-    { x: 4.5, y: 4.5 },
-    { x: 11.5, y: 4.5 },
-    { x: 4.5, y: 10.5 },
-    { x: 11.5, y: 10.5 },
-    { x: 7.5, y: 7.5 },
-    { x: 1.5, y: 7.5 },
-    { x: 13.5, y: 7.5 },
-    { x: 7.5, y: 1.5 },
+    { x: 5.5, y: 5.5 },
+    { x: 10.5, y: 4.5 },
+    { x: 5.5, y: 9.5 },
+    { x: 10.5, y: 9.5 },
+    { x: 8.5, y: 7.5 },
+    { x: 2.5, y: 8.5 },
+    { x: 13.5, y: 8.5 },
+    { x: 8.5, y: 2.5 },
   ];
 
   for (let i = 0; i < Math.min(pests.length, spawns.length); i += 1) {

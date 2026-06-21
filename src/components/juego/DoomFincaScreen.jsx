@@ -8,7 +8,7 @@ import { ScreenShell } from '../common/ScreenShell';
 import { Sprout, Bug, Shield, RotateCcw, Crosshair } from 'lucide-react';
 import { agentSounds, isSoundEnabled } from '../../services/agentSoundService';
 import {
-  MAPA, MAPA_COLS, MAPA_FILAS, PALETA, CONFIG_DOOM,
+  MAPA, MAPA_COLS, MAPA_FILAS, PALETA, MATERIALES, CONFIG_DOOM,
   PLAGAS_DOOM, BENEFICOS_DOOM,
 } from './doomFincaData';
 import {
@@ -21,6 +21,78 @@ const H = CONFIG_DOOM.resY;  // 180
 const FOV = CONFIG_DOOM.fov;
 const NIEBLA_INI = CONFIG_DOOM.nieblaInicio;
 const NIEBLA_FIN = CONFIG_DOOM.nieblaFin;
+
+/** Parte fraccionaria. */
+function frac(n) { return n - Math.floor(n); }
+
+/** Hash 2D determinista 0..1 (ruido para texturas de campo). */
+function hash2(x, y) {
+  const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
+  return s - Math.floor(s);
+}
+
+/** Diferencia angular normalizada a [-PI, PI]. */
+function angDiff(a, b) {
+  let d = a - b;
+  while (d > Math.PI) d -= 2 * Math.PI;
+  while (d < -Math.PI) d += 2 * Math.PI;
+  return d;
+}
+
+/** Convierte '#rrggbb' a [r, g, b]. */
+function hexRGB(h) {
+  return [
+    parseInt(h.slice(1, 3), 16),
+    parseInt(h.slice(3, 5), 16),
+    parseInt(h.slice(5, 7), 16),
+  ];
+}
+
+/**
+ * Devuelve el color [r,g,b] de un pixel de pared segun el material y la
+ * coordenada de textura (tx horizontal 0-1, vy vertical 0-1). Cada material
+ * tiene su patron: tablones de madera, bloques de adobe, hojas del seto,
+ * grumos de la compostera, follaje de la cama de cultivo.
+ */
+function texturaPared(patron, tx, vy, base, sombra, luz) {
+  switch (patron) {
+    case 'madera': {
+      const plank = Math.floor(vy * 5);
+      if (frac(vy * 5) < 0.10) return sombra;            // junta entre tablones
+      return hash2(Math.floor(tx * 40), plank) > 0.7 ? luz : base; // veta
+    }
+    case 'adobe': {
+      const filas = 5;
+      const by = Math.floor(vy * filas);
+      const bx = frac(tx * 4 + (by % 2) * 0.5);
+      if (frac(vy * filas) < 0.12 || bx < 0.08 || bx > 0.92) return sombra; // junta de barro
+      return (by % 2 === 0) ? base : luz;
+    }
+    case 'seto': {
+      const v = hash2(Math.floor(tx * 18), Math.floor(vy * 18)) * 0.6
+              + hash2(Math.floor(tx * 7) + 3, Math.floor(vy * 9) + 5) * 0.4;
+      if (v < 0.30) return sombra;   // hueco entre hojas
+      if (v > 0.72) return luz;      // hoja iluminada
+      return base;
+    }
+    case 'compost': {
+      if (frac(tx * 3) < 0.06) return sombra;            // tablon del cajon
+      const n = hash2(Math.floor(tx * 14), Math.floor(vy * 14));
+      if (n < 0.33) return sombra;
+      if (n > 0.80) return luz;
+      return base;
+    }
+    case 'cultivo': {
+      if (vy < 0.42) {                                   // follaje verde arriba
+        return hash2(Math.floor(tx * 20), Math.floor(vy * 24)) > 0.45 ? luz : sombra;
+      }
+      if (vy < 0.50) return sombra;                      // linea de tierra
+      return frac(vy * 4) < 0.12 ? sombra : base;        // tablon de la cama
+    }
+    default:
+      return base;
+  }
+}
 
 /**
  * DoomFincaScreen - nivel Doom / Wolfenstein 3D agroecologico en primera
@@ -211,103 +283,135 @@ export default function DoomFincaScreen({ onBack, onHome }) {
 
       // Pre-calcular rayos y guardar distancias por columna (para sprites)
       const zBuffer = new Float64Array(W);
+      const horizon = halfH;
+      const sky0 = PALETA.cieloAlto;
+      const sky1 = PALETA.cieloBajo;
+      const mtn = PALETA.montana;
+      const mtnS = PALETA.montanaSombra;
+      const sunC = PALETA.sol;
+      const sunG = PALETA.solBrillo;
+      const nube = PALETA.nube;
+      const tierra = PALETA.tierra;
+      const surco = PALETA.tierraSurco;
+      const pasto = PALETA.pasto;
+      const mulch = PALETA.mulch;
 
       for (let col = 0; col < W; col += 1) {
         const rayAngle = pa - fovHalf + (col / W) * FOV;
+        const rcos = Math.cos(rayAngle);
+        const rsin = Math.sin(rayAngle);
         const result = castRay(MAPA, px, py, rayAngle);
 
         // Fish-eye correction
         const corrDist = result.dist * Math.cos(rayAngle - pa);
         zBuffer[col] = corrDist;
 
-        // Altura de la pared en pantalla
-        const wallH = Math.round(H / corrDist);
-        const wallTop = Math.max(0, Math.round(halfH - wallH / 2));
-        const wallBot = Math.min(H - 1, Math.round(halfH + wallH / 2));
+        // Altura de la pared en pantalla (float para texturar sin saltos)
+        const wallHf = H / corrDist;
+        const trueTop = halfH - wallHf / 2;
+        const wallTop = Math.max(0, Math.round(trueTop));
+        const wallBot = Math.min(H - 1, Math.round(halfH + wallHf / 2));
 
-        // Color de la pared segun la cara y la distancia
-        let baseColor;
-        switch (result.cara) {
-          case 0: baseColor = PALETA.paredNorte; break;
-          case 1: baseColor = PALETA.paredSur; break;
-          case 2: baseColor = PALETA.paredEste; break;
-          case 3: baseColor = PALETA.paredOeste; break;
-          default: baseColor = '#999'; break;
-        }
+        // Material de la pared golpeada
+        const mat = MATERIALES[result.tipo] || MATERIALES[1];
+        const baseRGB = hexRGB(mat.base);
+        const sombraRGB = hexRGB(mat.sombra);
+        const luzRGB = hexRGB(mat.luz);
 
-        // Oscurecer por distancia (iluminacion + niebla)
-        const fogFactor = Math.max(0, Math.min(1,
-          (corrDist - NIEBLA_INI) / (NIEBLA_FIN - NIEBLA_INI)));
-        const lightFactor = Math.max(0.15, 1.0 - corrDist * 0.08);
+        // Iluminacion: cara N/S mas oscura; atenuacion suave por distancia;
+        // niebla atmosferica que mezcla hacia el color del horizonte (no a negro).
+        const fog = Math.max(0, Math.min(1, (corrDist - NIEBLA_INI) / (NIEBLA_FIN - NIEBLA_INI)));
+        const light = Math.max(0.40, 1.0 - corrDist * 0.05);
+        const faceDim = result.cara <= 1 ? 0.78 : 1.0;
+        const shade = light * faceDim;
 
-        // Convertir hex a RGB
-        const r = parseInt(baseColor.slice(1, 3), 16);
-        const g = parseInt(baseColor.slice(3, 5), 16);
-        const b = parseInt(baseColor.slice(5, 7), 16);
+        // Silueta de cordillera para esta columna (parallax al girar)
+        const ridge = (
+          (Math.sin(rayAngle * 1.3) * 0.5 + 0.5) * 0.6 +
+          (Math.sin(rayAngle * 2.7 + 1.5) * 0.5 + 0.5) * 0.3 +
+          (Math.sin(rayAngle * 5.1 + 4.0) * 0.5 + 0.5) * 0.1
+        ) * (horizon * 0.34);
+        const dSun = Math.abs(angDiff(rayAngle, PALETA.solAzimut));
 
-        const litR = Math.round(r * lightFactor * (1 - fogFactor));
-        const litG = Math.round(g * lightFactor * (1 - fogFactor));
-        const litB = Math.round(b * lightFactor * (1 - fogFactor));
-
-        // Oscurecimiento extra para caras N/S vs E/W
-        const faceDim = result.cara <= 1 ? 0.7 : 1.0;
-
-        const finalR = Math.round(litR * faceDim);
-        const finalG = Math.round(litG * faceDim);
-        const finalB = Math.round(litB * faceDim);
-
-        // Dibujar columna: cielo arriba, pared, piso abajo
         for (let row = 0; row < H; row += 1) {
           const idx = (row * W + col) * 4;
 
           if (row < wallTop) {
-            // Cielo (gradiente)
-            const t = row / halfH;
-            const skyR = Math.round(100 + t * 35);
-            const skyG = Math.round(180 + t * 15);
-            const skyB = Math.round(220 - t * 60);
-            buf[idx] = skyR;
-            buf[idx + 1] = skyG;
-            buf[idx + 2] = skyB;
-            buf[idx + 3] = 255;
+            // ── CIELO ──
+            const t = row / horizon;            // 0 cenit -> 1 horizonte
+            let cr = sky0[0] + (sky1[0] - sky0[0]) * t;
+            let cg = sky0[1] + (sky1[1] - sky0[1]) * t;
+            let cb = sky0[2] + (sky1[2] - sky0[2]) * t;
+
+            // Sol: disco + halo
+            const sunRow = horizon * 0.42;
+            const dvSun = Math.abs(row - sunRow) / horizon;
+            const sunDist = Math.sqrt(dSun * dSun * 6 + dvSun * dvSun * 9);
+            if (sunDist < 0.18) {
+              cr = sunC[0]; cg = sunC[1]; cb = sunC[2];
+            } else if (sunDist < 0.6) {
+              const gg = ((0.6 - sunDist) / 0.42) * 0.7;
+              cr += (sunG[0] - cr) * gg;
+              cg += (sunG[1] - cg) * gg;
+              cb += (sunG[2] - cb) * gg;
+            }
+
+            // Nubes en la franja alta
+            if (t < 0.7) {
+              const cloud = hash2(Math.floor(rayAngle * 26), Math.floor(row / 3)) * 0.5
+                          + hash2(Math.floor(rayAngle * 13) + 7, Math.floor(row / 5)) * 0.5;
+              if (cloud > 0.82) {
+                const cf = ((cloud - 0.82) / 0.18) * 0.8;
+                cr += (nube[0] - cr) * cf;
+                cg += (nube[1] - cg) * cf;
+                cb += (nube[2] - cb) * cf;
+              }
+            }
+
+            // Cordillera lejana cerca del horizonte
+            if (row > horizon - ridge && row < horizon) {
+              const nieve = (row - (horizon - ridge)) / (ridge + 0.001) < 0.25;
+              const mc = nieve ? [230, 236, 244]
+                : ((Math.floor(rayAngle * 8) % 2 === 0) ? mtn : mtnS);
+              cr = mc[0] * 0.7 + cr * 0.3;
+              cg = mc[1] * 0.7 + cg * 0.3;
+              cb = mc[2] * 0.7 + cb * 0.3;
+            }
+
+            buf[idx] = cr; buf[idx + 1] = cg; buf[idx + 2] = cb; buf[idx + 3] = 255;
           } else if (row <= wallBot) {
-            // Pared
-            buf[idx] = finalR;
-            buf[idx + 1] = finalG;
-            buf[idx + 2] = finalB;
+            // ── PARED (texturizada por material) ──
+            const vY = wallHf > 0.001 ? (row - trueTop) / wallHf : 0;
+            const wcol = texturaPared(mat.patron, result.texX, vY, baseRGB, sombraRGB, luzRGB);
+            const pr = wcol[0] * shade;
+            const pg = wcol[1] * shade;
+            const pb = wcol[2] * shade;
+            buf[idx] = pr + (sky1[0] - pr) * fog;
+            buf[idx + 1] = pg + (sky1[1] - pg) * fog;
+            buf[idx + 2] = pb + (sky1[2] - pb) * fog;
             buf[idx + 3] = 255;
           } else {
-            // Piso (tierra, oscurece con la distancia)
-            const floorDist = H / (2 * (row - halfH) + 0.001);
-            const floorFog = Math.max(0, Math.min(1,
-              (floorDist - NIEBLA_INI) / (NIEBLA_FIN - NIEBLA_INI)));
-            const fLight = Math.max(0.12, 1.0 - floorFog);
+            // ── PISO (tierra con surcos, pasto y mulch) ──
+            const floorDist = halfH / (row - halfH + 0.001);
+            const fx = px + rcos * floorDist;
+            const fy = py + rsin * floorDist;
+            const ffog = Math.max(0, Math.min(1, (floorDist - NIEBLA_INI) / (NIEBLA_FIN - NIEBLA_INI)));
+            const fl = Math.max(0.40, 1.0 - floorDist * 0.05);
 
-            const fr = parseInt(PALETA.piso.slice(1, 3), 16);
-            const fg = parseInt(PALETA.piso.slice(3, 5), 16);
-            const fb = parseInt(PALETA.piso.slice(5, 7), 16);
+            let fbase = tierra;
+            if (frac(fy * 2.2) < 0.16) fbase = surco;          // surcos del cultivo
+            const patch = hash2(Math.floor(fx * 1.6), Math.floor(fy * 1.6));
+            if (patch > 0.86) fbase = pasto;                   // mancha de pasto
+            else if (patch < 0.10) fbase = mulch;              // cobertura/mulch
+            const grain = 0.88 + hash2(Math.floor(fx * 8), Math.floor(fy * 8)) * 0.18;
 
-            // Patron de rejilla para dar textura al piso
-            const gridX = Math.floor((px + Math.cos(pa - fovHalf + (col / W) * FOV) * floorDist));
-            const gridY = Math.floor((py + Math.sin(pa - fovHalf + (col / W) * FOV) * floorDist));
-            const gridPattern = (gridX + gridY) % 2 === 0 ? 0.85 : 1.0;
-
-            buf[idx] = Math.round(fr * fLight * gridPattern);
-            buf[idx + 1] = Math.round(fg * fLight * gridPattern);
-            buf[idx + 2] = Math.round(fb * fLight * gridPattern);
+            const fr = fbase[0] * fl * grain;
+            const fg = fbase[1] * fl * grain;
+            const fb = fbase[2] * fl * grain;
+            buf[idx] = fr + (sky1[0] - fr) * ffog;
+            buf[idx + 1] = fg + (sky1[1] - fg) * ffog;
+            buf[idx + 2] = fb + (sky1[2] - fb) * ffog;
             buf[idx + 3] = 255;
-          }
-        }
-
-        // Borde oscuro en la parte inferior de la pared (sombra)
-        if (wallBot - wallTop > 4) {
-          for (let row = wallBot - 2; row <= wallBot; row += 1) {
-            if (row >= 0 && row < H) {
-              const idx = (row * W + col) * 4;
-              buf[idx] = Math.max(0, buf[idx] - 30);
-              buf[idx + 1] = Math.max(0, buf[idx + 1] - 30);
-              buf[idx + 2] = Math.max(0, buf[idx + 2] - 30);
-            }
           }
         }
       }
