@@ -2897,7 +2897,62 @@
         "Trozador (Agrotis ipsilon)"
       ],
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "feeding_plan_template": {
+        "source": "Restrepo-Rivera (2005) Agroecología + Agrosavia Manual biopreparados (2015). Tomate San Marzano clima templado bajo invernadero o campo abierto sin heladas.",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Aplicar bocashi + Trichoderma al hoyo",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 300,
+            "notes": "Hoyo 30x30 cm. Mezclar 10 g de Trichoderma harzianum al sustrato como preventivo Fusarium."
+          },
+          {
+            "offset_days": 15,
+            "action": "Drench con humus líquido al pie",
+            "biofertilizer_slug": "humus_liquido",
+            "dose_ml": 250,
+            "notes": "Dilución 1:5. Fase vegetativa activa post-trasplante."
+          },
+          {
+            "offset_days": 30,
+            "action": "Foliar con biol pre-floración",
+            "biofertilizer_slug": "biol",
+            "dose_ml": 150,
+            "notes": "Dilución 1:7. Promueve formación de racimos florales en tomate indeterminado."
+          },
+          {
+            "offset_days": 45,
+            "action": "Foliar con supermagro inicio cuajado",
+            "biofertilizer_slug": "supermagro",
+            "dose_ml": 60,
+            "notes": "Dilución 1:15. Aporte de Ca + B preventivo de pudrición apical (blossom end rot)."
+          },
+          {
+            "offset_days": 60,
+            "action": "Aplicar caldo bordelés preventivo",
+            "biofertilizer_slug": "caldo_bordeles",
+            "dose_ml": 100,
+            "notes": "Concentración 1%. Preventivo tizón tardío (Phytophthora infestans) en época húmeda. Suspender en floración plena."
+          },
+          {
+            "offset_days": 75,
+            "action": "Drench con lixiviado de frutas",
+            "biofertilizer_slug": "lixiviado_frutas",
+            "dose_ml": 100,
+            "notes": "Dilución 1:10. Refuerzo K + P durante llenado de frutos."
+          },
+          {
+            "offset_days": 90,
+            "action": "Foliar con Bacillus subtilis cerca de cosecha",
+            "biofertilizer_slug": "bacillus_subtilis_foliar",
+            "dose_ml": 5,
+            "notes": "Preventivo Botrytis en racimos maduros. Tolera aplicación hasta 1 día antes de cosecha."
+          }
+        ],
+        "derived_from": "solanum_lycopersicum_san_marzano"
+      }
     },
     {
       "id": "solanum_lycopersicum_san_marzano",
@@ -3088,7 +3143,62 @@
         "Trozador (Agrotis ipsilon)"
       ],
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "feeding_plan_template": {
+        "source": "Restrepo-Rivera (2005) Agroecología + Agrosavia Manual biopreparados (2015). Tomate San Marzano clima templado bajo invernadero o campo abierto sin heladas.",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Aplicar bocashi + Trichoderma al hoyo",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 300,
+            "notes": "Hoyo 30x30 cm. Mezclar 10 g de Trichoderma harzianum al sustrato como preventivo Fusarium."
+          },
+          {
+            "offset_days": 15,
+            "action": "Drench con humus líquido al pie",
+            "biofertilizer_slug": "humus_liquido",
+            "dose_ml": 250,
+            "notes": "Dilución 1:5. Fase vegetativa activa post-trasplante."
+          },
+          {
+            "offset_days": 30,
+            "action": "Foliar con biol pre-floración",
+            "biofertilizer_slug": "biol",
+            "dose_ml": 150,
+            "notes": "Dilución 1:7. Promueve formación de racimos florales en tomate indeterminado."
+          },
+          {
+            "offset_days": 45,
+            "action": "Foliar con supermagro inicio cuajado",
+            "biofertilizer_slug": "supermagro",
+            "dose_ml": 60,
+            "notes": "Dilución 1:15. Aporte de Ca + B preventivo de pudrición apical (blossom end rot)."
+          },
+          {
+            "offset_days": 60,
+            "action": "Aplicar caldo bordelés preventivo",
+            "biofertilizer_slug": "caldo_bordeles",
+            "dose_ml": 100,
+            "notes": "Concentración 1%. Preventivo tizón tardío (Phytophthora infestans) en época húmeda. Suspender en floración plena."
+          },
+          {
+            "offset_days": 75,
+            "action": "Drench con lixiviado de frutas",
+            "biofertilizer_slug": "lixiviado_frutas",
+            "dose_ml": 100,
+            "notes": "Dilución 1:10. Refuerzo K + P durante llenado de frutos."
+          },
+          {
+            "offset_days": 90,
+            "action": "Foliar con Bacillus subtilis cerca de cosecha",
+            "biofertilizer_slug": "bacillus_subtilis_foliar",
+            "dose_ml": 5,
+            "notes": "Preventivo Botrytis en racimos maduros. Tolera aplicación hasta 1 día antes de cosecha."
+          }
+        ],
+        "derived_from": "solanum_lycopersicum_san_marzano"
+      }
     },
     {
       "id": "solanum_phureja",
