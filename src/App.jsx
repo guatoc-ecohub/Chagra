@@ -7,7 +7,7 @@
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Sprout, MapPin, Eye, Package, Clock, NotebookPen, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette, FileText, Network, Beaker } from 'lucide-react';
+import { Sprout, MapPin, Eye, Package, Clock, NotebookPen, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette, FileText, Network, Beaker, PawPrint } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
 import { useClimaAtmosphere } from './hooks/useClimaAtmosphere';
@@ -79,6 +79,9 @@ const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m
 const BiodiversidadView = lazy(() => import('./components/BiodiversidadView'));
 const Asociaciones = lazy(() => import('./components/Asociaciones'));
 const FermentosView = lazy(() => import('./components/FermentosView'));
+const AnimalesScreen = lazy(() => import('./components/AnimalesScreen'));
+const GallinasScreen = lazy(() => import('./components/GallinasScreen'));
+const AbejasScreen = lazy(() => import('./components/AbejasScreen'));
 const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
 const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
 const LocationDetectedScreen = lazy(() => import('./components/LocationDetectedScreen'));
@@ -138,6 +141,7 @@ const NAV_TILES = [
   { id: 'task_log', label: 'Tareas', icon: Clock, accent: 'rose', desc: 'Cola de pendientes' },
   { id: 'historial', label: 'Bitácora', icon: NotebookPen, accent: 'indigo', desc: 'Historial de actividades' },
   { id: 'biodiversidad', label: 'Flora y fauna', icon: Leaf, accent: 'emerald', desc: 'Ecosistema, estratos y gremios' },
+  { id: 'animales', label: 'Animales', icon: PawPrint, accent: 'rose', desc: 'Gallinas, cerdos, abejas y ciclo cerrado' },
   { id: 'fermentos', label: 'Fermentos', icon: Beaker, accent: 'orange', desc: 'Recetas tradicionales y seguridad' },
   { id: 'reportar_invasora', label: 'Plagas', icon: AlertCircle, accent: 'amber', desc: 'Reporte de plagas y malezas' },
   { id: 'casos', label: 'Casos', icon: FileText, accent: 'amber', desc: 'Seguimiento de problemas y tratamientos' },
@@ -179,6 +183,9 @@ const HASH_VIEW_ROUTES = {
   glaciar: 'glaciar',
   'glaciar-historial': 'glaciar_historial',
   fermentos: 'fermentos',
+  animales: 'animales',
+  'animales-gallinas': 'animales_gallinas',
+  'animales-abejas': 'animales_abejas',
   'doom-finca': 'doom_finca',
   toxicologia: 'toxicologia',
   suelo: 'suelo',
@@ -188,6 +195,7 @@ const HASH_VIEW_ROUTES = {
 const MODULE_VIEWS = new Set([
   'activos', 'mapa', 'javier', 'bodega', 'task_log', 'historial',
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
+  'animales', 'animales_gallinas', 'animales_abejas',
   'hoy_finca', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'suelo', 'toxicologia',
@@ -1085,6 +1093,38 @@ export default function App() {
               <ScreenShell title="Fermentos" icon={Beaker} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
                 <FermentosView />
               </ScreenShell>
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'animales':
+        // Módulo ANIMALES de la finca integrada. Sub-botones: Cerdos (reutiliza
+        // el seguimiento porcino existente, ruta 'seguimiento_cerdos'), Gallinas
+        // y Abejas (pantallas nuevas). Eje central: el ciclo cerrado
+        // (animal → estiércol → biopreparado → suelo → planta) + polinización.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Animales">
+              <AnimalesScreen
+                onBack={() => navigate('dashboard')}
+                onHome={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'animales_gallinas':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Gallinas">
+              <GallinasScreen onBack={() => navigate('animales')} onHome={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'animales_abejas':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Abejas">
+              <AbejasScreen onBack={() => navigate('animales')} onHome={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
