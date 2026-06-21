@@ -9,6 +9,25 @@
     <meta name="theme-color" content="#0f172a" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
+    <!-- Content-Security-Policy (Task 112, corregido tras incidente prod #1631).
+         CRITICO: script-src DEBE incluir 'wasm-unsafe-eval'; sin eso el navegador
+         bloquea WebAssembly -> sqlite-wasm (capa de datos) no carga -> app muerta
+         (Failed to fetch, todo en 0). worker-src para el service worker de la PWA.
+         Regresion cubierta por el smoke en tests/offline.spec.js (WebAssembly.compile). -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https:;
+      style-src 'self' 'unsafe-inline' https:;
+      img-src 'self' data: blob: https:;
+      connect-src 'self' https: wss:;
+      font-src 'self' data:;
+      media-src 'self' blob:;
+      worker-src 'self' blob:;
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self';
+    " />
+
     <!-- iOS PWA install — Safari iOS NO usa manifest.json para "Añadir a
          pantalla de inicio". Requiere meta tags Apple-specific + un
          apple-touch-icon PNG (NO SVG) de 180×180 mínimo. Sin esto,
