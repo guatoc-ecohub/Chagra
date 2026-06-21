@@ -5,7 +5,7 @@
   "processed": 634,
   "offset": 0,
   "limit": "all",
-  "species_with_images": 615,
+  "species_with_images": 623,
   "species": [
     {
       "species_id": "abatia_parviflora",
@@ -4311,6 +4311,62 @@
       "image_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/605808231/original.jpg",
       "license": "http://creativecommons.org/publicdomain/zero/1.0/",
       "attribution": "Steven Smethurst"
+    },
+    {
+      "species_id": "beta_vulgaris",
+      "scientific_name": "Beta patula",
+      "image_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/263371546/medium.jpeg",
+      "license": "cc-by",
+      "attribution": "(c) \nNóbrega H, Freitas G, Zavattieri MA, Ragonezi C, Pinheiro de Carvalho MÂA (2021) Structure and floristic compositio"
+    },
+    {
+      "species_id": "brassica_oleracea",
+      "scientific_name": "Brassica oleracea",
+      "image_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/2057374/medium.jpg",
+      "license": "cc-by-nc",
+      "attribution": "(c) JJ Johnson, some rights reserved (CC BY-NC), uploaded by JJ Johnson"
+    },
+    {
+      "species_id": "cymbopogon_citratus",
+      "scientific_name": "Cymbopogon citratus",
+      "image_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/61513592/medium.jpg",
+      "license": "cc-by-nc",
+      "attribution": "(c) Yantza Farm, Zamora-Chinchipe, Ecuador, some rights reserved (CC BY-NC), uploaded by Yantza Farm, Zamora-Chinchipe, "
+    },
+    {
+      "species_id": "pisum_sativum",
+      "scientific_name": "Pisum sativum",
+      "image_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/57714057/medium.jpg",
+      "license": "cc-by-nc",
+      "attribution": "(c) Luca Boscain, some rights reserved (CC BY-NC), uploaded by Luca Boscain"
+    },
+    {
+      "species_id": "daucus_carota",
+      "scientific_name": "Daucus carota",
+      "image_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/7663971/medium.jpeg",
+      "license": "cc-by-nc",
+      "attribution": "(c) Nancy Phillips, some rights reserved (CC BY-NC), uploaded by Nancy Phillips"
+    },
+    {
+      "species_id": "cichorium_endivia",
+      "scientific_name": "Cichorium pumilum",
+      "image_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/7929094/medium.jpg",
+      "license": "cc-by-nc",
+      "attribution": "(c) Uriah Resheff, some rights reserved (CC BY-NC), uploaded by Uriah Resheff"
+    },
+    {
+      "species_id": "ocimum_tenuiflorum",
+      "scientific_name": "Ocimum tenuiflorum",
+      "image_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/129609853/medium.jpeg",
+      "license": "cc-by-nc",
+      "attribution": "(c) 小铖/Smalltown, some rights reserved (CC BY-NC), uploaded by 小铖/Smalltown"
+    },
+    {
+      "species_id": "valeriana_jatamansi",
+      "scientific_name": "Valeriana jatamansi",
+      "image_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/377247517/medium.jpg",
+      "license": "cc0",
+      "attribution": "何の権利も保有しない, Jean-Paul Boerekamps によって投稿されました"
     }
   ]
 }
