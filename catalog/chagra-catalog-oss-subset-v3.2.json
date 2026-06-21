@@ -892,7 +892,9 @@
       },
       "valor_pedagogico": "El café arábica (Coffea arabica L.) es el cultivo agroindustrial emblemático de Colombia y la principal fuente de ingresos de la economía campesina cafetera, con cerca de 850.000 hectáreas distribuidas en Caldas, Quindío, Risaralda, Antioquia, Tolima, Huila, Cundinamarca y Santander entre 1.200 y 2.000 msnm en zona térmica templada. Las variedades Caturra, Castillo y Cenicafé 1 son las más adoptadas en Colombia por su resistencia a roya (Hemileia vastatrix) y broca (Hypothenemus hampei) según Cenicafé. Requiere sombra parcial 35-50%, suelos francos con pH 5.0-5.5, y precipitación 1.800-2.800 mm anuales. Sistemas agroecológicos asocian café con plátano (Musa spp.), guandul (Cajanus cajan) y nogal cafetero (Cordia alliodora) para sombra estratificada. ⚠️ El sombrío histórico incluyó species hoy amenazadas (Aniba perutilis CR, Swietenia macrophylla EN/CITES II, Cedrela odorata CITES II). En cafetales nuevos, priorizar Inga spp + Erythrina + Cordia alliodora (rápido crecimiento, no amenazadas) sobre maderables CR. Fuentes Tier A: Cenicafé Manual del Cafetero 2013, AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone.",
       "feeding_plan_template": {
-        "source": "Cenicafé — Manual del Cafetero Colombiano (2013) + Cenicafé — Trichoderma spp. en manejo integrado (2010). Programa nutricional café tradicional Caturra/Castillo zona cafetera.",
+        "source": "Cenicafé — Manual del Cafetero Colombiano (2013). Programa NUTRICIONAL café tradicional Caturra/Castillo zona cafetera. Solo nutrición; el manejo fitosanitario (roya, broca, llaga macana) se trata aparte.",
+        "recurrence": "anual",
+        "perennial_note": "Cultivo perenne: repetir este ciclo cada año.",
         "primary_steps": [
           {
             "offset_days": 0,
@@ -902,13 +904,6 @@
             "notes": "Hoyo 40x40x40 cm. Cenicafé recomienda fertilización inicial al establecimiento. Mezclar con suelo del hoyo."
           },
           {
-            "offset_days": 30,
-            "action": "Inocular Trichoderma harzianum al sustrato",
-            "biofertilizer_slug": "trichoderma_harzianum_suelo",
-            "dose_g": 20,
-            "notes": "Preventivo contra Fusarium oxysporum f.sp. coffeae (llaga macana) y Rhizoctonia. Cenicafé 2010."
-          },
-          {
             "offset_days": 90,
             "action": "Drench con biol fase vegetativa",
             "biofertilizer_slug": "biol",
@@ -916,32 +911,18 @@
             "notes": "Dilución 1:5, 1 L por planta al pie. Refuerzo N orgánico fase de crecimiento foliar activo."
           },
           {
-            "offset_days": 180,
-            "action": "Foliar con caldo bordelés preventivo",
-            "biofertilizer_slug": "caldo_bordeles",
-            "dose_ml": 100,
-            "notes": "Concentración 1%. Preventivo roya (Hemileia vastatrix) en época de lluvias antes de iniciar floración."
-          },
-          {
-            "offset_days": 365,
-            "action": "Refuerzo anual con bocashi en banda",
-            "biofertilizer_slug": "bocashi",
-            "dose_g": 1500,
-            "notes": "Año 1 establecimiento completo. Aplicar en corona radicular antes de inicio de lluvias."
-          },
-          {
-            "offset_days": 540,
+            "offset_days": 210,
             "action": "Foliar con supermagro pre-floración",
             "biofertilizer_slug": "supermagro",
             "dose_ml": 80,
-            "notes": "Dilución 1:12. Corrige B y Zn críticos para cuajado de chereza. Aplicar 30 días antes de floración esperada."
+            "notes": "Dilución 1:12. Corrige B y Zn críticos para cuajado de chereza. Aplicar 30 días antes de la floración esperada."
           },
           {
-            "offset_days": 720,
-            "action": "Aplicar Bacillus subtilis foliar en cosecha",
-            "biofertilizer_slug": "bacillus_subtilis_foliar",
-            "dose_ml": 25,
-            "notes": "Año 2 primera cosecha. Control biológico de Cercospora coffeicola y Mycena citricolor (gotera)."
+            "offset_days": 300,
+            "action": "Refuerzo de bocashi en corona radicular",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 1500,
+            "notes": "Refuerzo del ciclo anual. Aplicar en corona radicular antes del inicio de lluvias. Cultivo perenne: repetir este ciclo cada año."
           }
         ]
       },
@@ -6860,7 +6841,9 @@
       "tracking_mode": "individual",
       "valor_pedagogico": "El aguacate (Persea americana Mill., Lauraceae) es uno de los frutales nativos americanos más importantes y emblemáticos de la agricultura colombiana, con producción concentrada en Antioquia, Tolima, Caldas, Quindío, Risaralda, Valle del Cauca y Cundinamarca. Variedades dominantes en Colombia: Hass (mayoritaria exportación), Lorena, Choquette, Booth, Trapp, criollos antillanos. Cultivo perenne 3-30 m altura con sistema radical superficial sensible a encharcamiento — requiere drenaje EXCELENTE (suelos francos a franco-arenosos, pH 5.5-6.5). Floración tipo A/B con dicogamia (mecanismo de polinización cruzada que requiere coexistencia de tipos florales A y B para fructificación máxima — lección agroecológica de biodiversidad funcional). Manejo: trasplante 6-8 meses post-vivero, distancia 7x7 m (Hass) a 9x9 m (criollos), tutorado primer año, poda de formación años 2-4, cosecha desde año 3-5 hasta año 25+. Plagas: trips (Frankliniella), ácaros, monalonion. Enfermedades graves: Phytophthora cinnamomi (muerte de la raíz), antracnosis, mancha negra. Manejo agroecológico: Trichoderma harzianum + sombrío de guamo (Inga edulis) reduce 70% Phytophthora. Asocio clásico: café-aguacate-plátano en sistema multiestrato cafetero.",
       "feeding_plan_template": {
-        "source": "Agrosavia — Manual frutales tropicales + Pérez-Arbeláez (1947) Plantas útiles de Colombia. Aguacate clima templado-cálido 1000-2200 msnm.",
+        "source": "Agrosavia — Manual frutales tropicales + Pérez-Arbeláez (1947) Plantas útiles de Colombia. Programa NUTRICIONAL aguacate clima templado-cálido 1000-2200 msnm. Solo nutrición; la sanidad (Phytophthora, antracnosis) se trata aparte.",
+        "recurrence": "anual",
+        "perennial_note": "Cultivo perenne: repetir este ciclo cada año.",
         "primary_steps": [
           {
             "offset_days": 0,
@@ -6870,46 +6853,25 @@
             "notes": "Hoyo 60x60x60 cm. Mezclar 2 kg de bocashi con suelo del hoyo. Aguacate sensible a encharcamiento — drenaje crítico."
           },
           {
-            "offset_days": 30,
-            "action": "Inocular Trichoderma harzianum al sustrato",
-            "biofertilizer_slug": "trichoderma_harzianum_suelo",
-            "dose_g": 30,
-            "notes": "Preventivo crítico contra Phytophthora cinnamomi (tristeza del aguacate) — patógeno principal de la especie."
-          },
-          {
             "offset_days": 90,
             "action": "Drench con biol fase vegetativa",
             "biofertilizer_slug": "biol",
             "dose_ml": 1500,
-            "notes": "Dilución 1:5, 1.5 L al pie. Año 1 establecimiento — crecimiento foliar activo."
+            "notes": "Dilución 1:5, 1.5 L al pie. Establecimiento — crecimiento foliar activo."
           },
           {
-            "offset_days": 180,
-            "action": "Foliar con caldo bordelés preventivo",
-            "biofertilizer_slug": "caldo_bordeles",
-            "dose_ml": 100,
-            "notes": "Concentración 1%. Preventivo antracnosis (Colletotrichum gloeosporioides) en hojas y frutos."
-          },
-          {
-            "offset_days": 365,
-            "action": "Refuerzo anual con bocashi en corona",
-            "biofertilizer_slug": "bocashi",
-            "dose_g": 3000,
-            "notes": "Año 1 completo. Aplicar bajo la corona en banda, no contra el tronco. Cubrir con mulch."
-          },
-          {
-            "offset_days": 730,
+            "offset_days": 210,
             "action": "Foliar con supermagro pre-floración",
             "biofertilizer_slug": "supermagro",
             "dose_ml": 100,
-            "notes": "Año 2 — preparar floración. Dilución 1:10. Aporte Zn y B críticos para cuajado de aguacate."
+            "notes": "Preparar floración. Dilución 1:10. Aporte de Zn y B críticos para el cuajado del aguacate."
           },
           {
-            "offset_days": 1095,
-            "action": "Aplicar Bacillus subtilis foliar fructificación",
-            "biofertilizer_slug": "bacillus_subtilis_foliar",
-            "dose_ml": 30,
-            "notes": "Año 3 primera cosecha esperada. Control biológico antracnosis post-cuajado."
+            "offset_days": 300,
+            "action": "Refuerzo de bocashi en corona",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 3000,
+            "notes": "Refuerzo del ciclo anual. Aplicar bajo la corona en banda, no contra el tronco; cubrir con mulch. Cultivo perenne: repetir este ciclo cada año."
           }
         ]
       },
