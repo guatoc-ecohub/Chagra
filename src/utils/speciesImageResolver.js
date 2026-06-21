@@ -92,6 +92,31 @@ export function buildSpeciesIdCandidates(normalized) {
 }
 
 /**
+ * Mapea una entrada del JSON al shape de imagen consumido por los componentes.
+ */
+function toImageResult(entry) {
+  return {
+    url: entry.image_url,
+    thumbUrl: entry.image_url,
+    license: formatLicense(entry.license),
+    rightsHolder: entry.attribution || 'Autor no informado',
+    source: 'iNaturalist',
+    sourceUrl: entry.image_url,
+  };
+}
+
+/**
+ * Devuelve el binomio `genero_especie` de una lista de candidatos (el más
+ * corto que tenga exactamente 2 tokens), o null si no hay.
+ */
+function binomioOf(candidates) {
+  for (const c of candidates) {
+    if (c.split('_').filter(Boolean).length === 2) return c;
+  }
+  return null;
+}
+
+/**
  * Busca una imagen por nombre científico en el JSON local.
  * Retorna null si no hay imagen disponible.
  */
@@ -102,20 +127,31 @@ export async function findLocalImage(scientificName) {
   const index = await loadSpeciesImages();
   if (!index) return null;
 
-  // Probar species_id candidatos de más a menos específico. El binomio rescata
-  // los nombres con autor ("…_l", "…_kunth") que el match exacto no encuentra.
-  for (const candidate of buildSpeciesIdCandidates(normalized)) {
+  // 1) Probar species_id candidatos de más a menos específico. El binomio
+  //    rescata los nombres con autor ("…_l", "…_kunth") que el match exacto
+  //    no encuentra.
+  const candidates = buildSpeciesIdCandidates(normalized);
+  for (const candidate of candidates) {
     const entry = index.get(candidate);
-    if (entry) {
-      return {
-        url: entry.image_url,
-        thumbUrl: entry.image_url,
-        license: formatLicense(entry.license),
-        rightsHolder: entry.attribution || 'Autor no informado',
-        source: 'iNaturalist',
-        sourceUrl: entry.image_url,
-      };
+    if (entry) return toImageResult(entry);
+  }
+
+  // 2) Fallback por PREFIJO de binomio (bug 2026-06-21, fresa): el catálogo
+  //    trae el binomio base ("Fragaria × ananassa" → `fragaria_ananassa`)
+  //    pero el JSON solo indexa el cultivar (`fragaria_ananassa_monterrey`).
+  //    Tomar la primera entrada cuyo species_id EMPIECE por `genero_especie_`.
+  //    Determinista: ordenamos por species_id para no depender del orden de
+  //    inserción del Map.
+  const binomio = binomioOf(candidates);
+  if (binomio) {
+    const prefix = `${binomio}_`;
+    let bestId = null;
+    for (const id of index.keys()) {
+      if (id.startsWith(prefix) && (bestId === null || id < bestId)) {
+        bestId = id;
+      }
     }
+    if (bestId) return toImageResult(index.get(bestId));
   }
 
   return null;
