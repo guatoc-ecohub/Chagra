@@ -4,6 +4,7 @@ export { default as MiFincaVivaScreen } from './MiFincaVivaScreen';
 export { default as MonoVsPoliSimulator } from './MonoVsPoliSimulator';
 export { default as MilpaSimulator } from './MilpaSimulator';
 export { default as DefensoresFincaScreen } from './DefensoresFincaScreen';
+export { default as DoomFincaScreen } from './DoomFincaScreen';
 export {
   PARES_CONTROL,
   CULTIVOS,
