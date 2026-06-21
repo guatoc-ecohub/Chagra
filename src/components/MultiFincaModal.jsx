@@ -9,7 +9,7 @@ export default function MultiFincaModal({ onClose }) {
     const [viewMode, setViewMode] = useState('globe');
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [selectedFinca, setSelectedFinca] = useState(null);
-    const { setFincas, fincas } = useFincaActiveStore();
+    const { setFincas, fincas, setActiveFincaManual } = useFincaActiveStore();
 
     useEffect(() => {
         const loadFincas = async () => {
@@ -33,6 +33,11 @@ export default function MultiFincaModal({ onClose }) {
             setSelectedFinca(finca);
             setShowOnboarding(true);
         } else {
+            // BUG #10 (2026-06-21): desde la vista de Cards "Entrar a la finca"
+            // solo cerraba el modal SIN cambiar la finca activa (el globo sí
+            // llamaba setActiveFinca, las cards no). Ahora ambos caminos
+            // conmutan la finca activa de forma explícita (manual = override GPS).
+            if (finca.slug) setActiveFincaManual(finca.slug);
             onClose();
         }
     };
