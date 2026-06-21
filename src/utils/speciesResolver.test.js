@@ -4,6 +4,7 @@ import { normalizeForMatch, matchSpeciesInCatalog } from './speciesResolver';
 const CATALOG = [
   {
     id: 'fragaria_ananassa',
+    slug: 'fragaria_ananassa',
     nombre_comun: 'Fresa',
     nombre_cientifico: 'Fragaria × ananassa',
     feeding_plan_template: { primary_steps: [{ offset_days: 7 }] },
@@ -17,6 +18,22 @@ const CATALOG = [
     id: 'solanum_lycopersicum_san_marzano',
     nombre_comun: 'Tomate San Marzano',
     nombre_cientifico: 'Solanum lycopersicum',
+  },
+  {
+    id: 'allium_fistulosum',
+    nombre_comun: 'Cebollín / Cebolla larga',
+    nombre_cientifico: 'Allium fistulosum L.',
+    familia_botanica: 'Amaryllidaceae',
+  },
+  {
+    id: 'theobroma_cacao',
+    nombre_comun: 'Cacao',
+    nombre_cientifico: 'Theobroma cacao L.',
+  },
+  {
+    id: 'hybridus_genericus',
+    nombre_comun: null,
+    nombre_cientifico: 'Hybridus genericus',
   },
 ];
 
@@ -65,5 +82,123 @@ describe('matchSpeciesInCatalog', () => {
   it('tolera lista vacía o inválida', () => {
     expect(matchSpeciesInCatalog([], 'fresa', 'Fresa')).toBeNull();
     expect(matchSpeciesInCatalog(null, 'fresa', 'Fresa')).toBeNull();
+  });
+});
+
+// —— Cascada extendida: cobertura completa del resolver ——
+
+describe('matchSpeciesInCatalog — paso 1: id/slug exacto', () => {
+  it('matchea por campo slug cuando el id no coincide', () => {
+    const r = matchSpeciesInCatalog(CATALOG, 'fragaria_ananassa', null);
+    expect(r?.id).toBe('fragaria_ananassa');
+    expect(r?.slug).toBe('fragaria_ananassa');
+  });
+
+  it('no produce falso positivo cuando slug es parcial (solo id/slug completo matchea paso 1)', () => {
+    const r = matchSpeciesInCatalog(CATALOG, 'fragaria', 'Algo raro');
+    expect(r).toBeNull();
+  });
+});
+
+describe('matchSpeciesInCatalog — paso 2: nombre comun y cientifico', () => {
+  it('matchea por nombre_comun exacto del catalogo (sin slug)', () => {
+    const r = matchSpeciesInCatalog(CATALOG, null, 'Cacao');
+    expect(r?.id).toBe('theobroma_cacao');
+  });
+
+  it('matchea por nombre_cientifico exacto del catalogo', () => {
+    const r = matchSpeciesInCatalog(CATALOG, 'cacao', 'Cacao #2');
+    expect(r?.id).toBe('theobroma_cacao');
+  });
+
+  it('slug no existe en paso 1, pero nombre_comun matchea en paso 2', () => {
+    const r = matchSpeciesInCatalog(CATALOG, 'algo_inexistente', 'Fresa');
+    expect(r?.id).toBe('fragaria_ananassa');
+  });
+
+  it('slug no matchea paso 1, pero nombre_cientifico matchea en paso 2', () => {
+    const r = matchSpeciesInCatalog(CATALOG, 'allium', 'Allium fistulosum L.');
+    expect(r?.id).toBe('allium_fistulosum');
+  });
+
+  it('matchea nombre_comun con barra inclinada en el catalogo', () => {
+    const r = matchSpeciesInCatalog(CATALOG, null, 'Cebollín');
+    expect(r?.id).toBe('allium_fistulosum');
+  });
+
+  it('matchea usando el slug normalizado contra nombre_comun del catalogo', () => {
+    const r = matchSpeciesInCatalog(CATALOG, 'tomate san marzano', null);
+    expect(r?.id).toBe('solanum_lycopersicum_san_marzano');
+  });
+});
+
+describe('matchSpeciesInCatalog — paso 3: inclusion parcial', () => {
+  it('matchea cuando el candidato aparece dentro del nombre_comun del catalogo', () => {
+    const r = matchSpeciesInCatalog(CATALOG, 'cebolla', 'Cebollín #1');
+    expect(r?.id).toBe('allium_fistulosum');
+  });
+
+  it('matchea cuando el nombre_comun del catalogo aparece dentro del candidato', () => {
+    const r = matchSpeciesInCatalog(CATALOG, 'café_colombiano', null);
+    expect(r?.id).toBe('coffea_arabica');
+  });
+
+  it('NO matchea candidatos de menos de 3 caracteres', () => {
+    const r = matchSpeciesInCatalog(CATALOG, 'ab', 'cd');
+    expect(r).toBeNull();
+  });
+
+  it('NO rompe cuando una especie tiene nombre_comun null', () => {
+    const r = matchSpeciesInCatalog(CATALOG, 'generic', null);
+    expect(r).toBeNull();
+    expect(() => matchSpeciesInCatalog(CATALOG, 'hybridus_genericus', null)).not.toThrow();
+  });
+});
+
+describe('matchSpeciesInCatalog — bordes', () => {
+  it('ambos slug y name son null o vacios → null', () => {
+    expect(matchSpeciesInCatalog(CATALOG, null, null)).toBeNull();
+    expect(matchSpeciesInCatalog(CATALOG, '', '')).toBeNull();
+  });
+
+  it('tolera entradas null/undefined dentro del array del catalogo', () => {
+    const mixedList = [null, undefined, ...CATALOG];
+    expect(() => matchSpeciesInCatalog(mixedList, 'fresa', 'Fresa')).not.toThrow();
+    expect(matchSpeciesInCatalog(mixedList, 'fresa', 'Fresa')?.id).toBe('fragaria_ananassa');
+  });
+
+  it('name vacio y slug solo → usa slug para paso 1 y paso 2', () => {
+    const r = matchSpeciesInCatalog(CATALOG, 'fresa', '');
+    expect(r?.id).toBe('fragaria_ananassa');
+  });
+
+  it('slug vacio y name solo → usa name para paso 2 y paso 3', () => {
+    const r = matchSpeciesInCatalog(CATALOG, '', 'Café');
+    expect(r?.id).toBe('coffea_arabica');
+  });
+
+  it('NO falla si slug no es string ni si name es un objeto', () => {
+    expect(matchSpeciesInCatalog(CATALOG, 42, {})).toBeNull();
+    expect(matchSpeciesInCatalog(CATALOG, 123, 'Fresa')?.id).toBe('fragaria_ananassa');
+  });
+});
+
+describe('normalizeForMatch — ampliado', () => {
+  it('remueve tilde de la eñe (ñ → n)', () => {
+    expect(normalizeForMatch('cañamo')).toBe('canamo');
+    expect(normalizeForMatch('Ñame')).toBe('name');
+  });
+
+  it('colapsa multiples guiones bajos y espacios consecutivos', () => {
+    expect(normalizeForMatch('  cafe___colombiano  ')).toBe('cafe colombiano');
+  });
+
+  it('devuelve string vacio para entrada vacia o solo whitespace', () => {
+    expect(normalizeForMatch('')).toBe('');
+    expect(normalizeForMatch('   ')).toBe('');
+  });
+
+  it('passthrough: string ya limpio queda igual', () => {
+    expect(normalizeForMatch('fresa organica')).toBe('fresa organica');
   });
 });
