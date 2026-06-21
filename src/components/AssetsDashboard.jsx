@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MSG } from '../config/messages.js';
-import { ArrowLeft, Plus, Trash2, RefreshCw, Building2, Leaf, Search, WifiOff, TreePine, Map as MapIcon, List, Sprout, FlaskConical, Ban, AlertTriangle, Warehouse, Square } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, RefreshCw, Building2, Leaf, Search, WifiOff, TreePine, Map as MapIcon, List, Sprout, FlaskConical, Ban, AlertTriangle, Warehouse, Square, ChevronDown } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import { Virtuoso } from 'react-virtuoso';
 import { fetchFromFarmOS } from '../services/apiService';
@@ -313,9 +313,14 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     setSelectedAsset,
   } = useAssetStore();
 
-  const { activeFincaSlug, getActiveFinca } = useFincaActiveStore();
+  const { activeFincaSlug, getActiveFinca, fincas } = useFincaActiveStore();
   const activeFinca = getActiveFinca();
   const fincaNombre = activeFinca.nombre;
+  // BUG #10 (2026-06-21, steve, multi-finca): con 2+ fincas el "cambiar de
+  // finca" no se hallaba — la píldora mostraba el nombre pero sin affordance
+  // de selector. hasMultipleFincas activa el chevron + texto "cambiar" para
+  // que sea claramente un conmutador. Con una sola finca queda como indicador.
+  const hasMultipleFincas = fincas.length > 1;
 
   const { request: requestGeo } = useGeolocation();
 
@@ -386,6 +391,25 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- formData.parentLandId es state, incluirlo causaría loop
   }, [showForm, currentZoneId]);
+
+  // BUG #7 (2026-06-21, flujo core david/campesino): al agregar una planta
+  // TODAS caían en "Sin zona asignada" porque el alta no auto-asignaba zona
+  // cuando la finca tiene una sola. Fix: si el form está abierto en tab plant,
+  // no hay zona elegida aún y la finca tiene EXACTAMENTE una zona registrada,
+  // auto-asignarla — el campesino con una sola chagra no tiene que elegir nada.
+  // Si tiene varias, el selector (renderPlantForm) sigue pidiendo cuál.
+  useEffect(() => {
+    if (!showForm || activeTab !== 'plant') return;
+    if (formData.parentLandId) return; // ya hay zona (manual, currentZone o GPS)
+    if (lands.length === 1) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sincronización de estado derivado, no afecta render actual
+      setFormData((prev) => {
+        if (prev.parentLandId) return prev; // race con otro efecto: no pisar
+        return { ...prev, parentLandId: lands[0].id };
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- formData.parentLandId es state, incluirlo causaría loop
+  }, [showForm, activeTab, lands]);
 
   // Estado local del formulario de cosecha scoped por asset.id
   const [activeHarvestId, setActiveHarvestId] = useState(null);
@@ -916,18 +940,22 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
   // Render del formulario específico para el tab de plantas
   const renderPlantForm = () => (
     <>
-      {/* Selector obligatorio de zona contenedora (Fase 17) */}
+      {/* Selector de zona contenedora (Fase 17 · BUG #7 2026-06-21).
+          Antes "Zona contenedora *" obligatoria y vacía por defecto: si el
+          campesino no elegía, la planta caía silenciosa en "Sin zona asignada".
+          Ahora: lenguaje campesino, auto-asigna si la finca tiene una sola zona
+          (ver efecto arriba) y ofrece "Sin zona por ahora" como elección
+          EXPLÍCITA (reasignable después desde la tarjeta de huérfanas). */}
       <div>
-        <label className="block text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">
-          Zona contenedora *
+        <label htmlFor="plant-zone-select" className="block text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">
+          ¿En qué lote o zona va?
         </label>
         <select
-          required
+          id="plant-zone-select"
           value={formData.parentLandId || ''}
           onChange={(e) => setFormData({ ...formData, parentLandId: e.target.value })}
           className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white min-h-[48px] focus:ring-lime-500 focus:border-lime-500"
         >
-          <option value="" disabled>Seleccione una zona...</option>
           {lands.map((land) => {
             const subType = land.attributes?.land_type || land.attributes?.sub_type || 'zona';
             const lname = land.attributes?.name || land.name || 'Sin nombre';
@@ -937,12 +965,19 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
               </option>
             );
           })}
+          {/* Elección explícita: sin zona aún. parentLandId vacío → la planta
+              entra a la tarjeta "Sin zona asignada" y se reasigna luego. */}
+          <option value="">Sin zona por ahora (la asigno después)</option>
         </select>
-        {lands.length === 0 && (
+        {lands.length === 0 ? (
           <p className="mt-1 text-xs text-amber-400">
-            No hay zonas registradas. Cree primero un activo tipo "Infraestructura" (ej. invernadero) o sincronice con FarmOS.
+            Todavía no tienes lotes ni zonas. Puedes guardar la planta sin zona y asignarla luego, o crear una zona desde la pestaña "Zonas".
           </p>
-        )}
+        ) : !formData.parentLandId ? (
+          <p className="mt-1 text-xs text-amber-400/80">
+            Quedará en "Sin zona asignada". La podrás mover a un lote cuando quieras.
+          </p>
+        ) : null}
       </div>
 
       {/* Selector de especie con fuzzy search + autocompletado (Fase 17) */}
@@ -1414,10 +1449,13 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
             type="button"
             onClick={() => setShowFincaModal(true)}
             className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-emerald-400 bg-emerald-900/30 border border-emerald-700/40 rounded-full px-3 py-1.5 shrink-0 hover:bg-emerald-900/50 transition-all active:scale-95 group"
-            aria-label={`Finca activa: ${fincaNombre}`}
+            aria-label={hasMultipleFincas ? `Cambiar de finca (actual: ${fincaNombre})` : `Finca activa: ${fincaNombre}`}
           >
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse group-hover:scale-125 transition-transform"></div>
-            {fincaNombre}
+            <span className="truncate max-w-[10ch]">{fincaNombre}</span>
+            {hasMultipleFincas && (
+              <ChevronDown size={12} aria-hidden="true" className="-mr-0.5 opacity-80 group-hover:translate-y-0.5 transition-transform" />
+            )}
           </button>
           <button onClick={handleRefresh} disabled={isLoading} aria-label="Sincronizar activos" className="p-2 bg-slate-800 rounded-lg active:bg-slate-700 disabled:opacity-50 min-h-[40px] min-w-[40px] flex items-center justify-center">
             <RefreshCw size={16} aria-hidden="true" className={isLoading ? 'motion-safe:animate-spin' : ''} />

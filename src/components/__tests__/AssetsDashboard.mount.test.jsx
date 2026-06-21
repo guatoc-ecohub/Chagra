@@ -54,6 +54,8 @@ vi.mock('../../services/fincaActiveStore', () => {
   const useFincaActiveStore = () => ({
     activeFincaSlug: 'guatoc',
     getActiveFinca: () => ({ slug: 'guatoc', nombre: 'Guatoc' }),
+    fincas: [{ slug: 'guatoc', nombre: 'Guatoc' }],
+    setActiveFincaManual: vi.fn(),
   });
   return { useFincaActiveStore, default: useFincaActiveStore };
 });
