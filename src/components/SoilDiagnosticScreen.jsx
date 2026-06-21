@@ -1,7 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import {
   ChevronLeft, Mic, MicOff, AlertTriangle, CheckCircle2, XCircle,
-  Clock3, Lock, RotateCcw, MessageCircle,
+  Clock3, Lock, RotateCcw, MessageCircle, Beaker,
 } from 'lucide-react';
 import SOIL_DATA from '../data/soil-diagnostics.json';
 import { diagnosticarSuelo } from '../services/soilDiagnostic';
@@ -362,6 +363,16 @@ export default function SoilDiagnosticScreen({ onBack, onNavigate }) {
             </div>
           ) : null}
 
+          {onNavigate ? (
+            <button
+              type="button"
+              onClick={() => onNavigate('cromatografia')}
+              className="min-h-[48px] rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-100 flex items-center justify-center gap-2"
+            >
+              <Beaker size={16} /> Cromatografia de suelo (Pfeiffer)
+            </button>
+          ) : null}
+
           <button
             type="button"
             onClick={mirarTierra}
@@ -440,7 +451,17 @@ export default function SoilDiagnosticScreen({ onBack, onNavigate }) {
                   <ul className="flex flex-col gap-2">
                     {diag.pruebas.map((p) => (
                       <li key={p.id}>
-                        <button
+          {onNavigate ? (
+            <button
+              type="button"
+              onClick={() => onNavigate('cromatografia')}
+              className="min-h-[48px] rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-100 flex items-center justify-center gap-2"
+            >
+              <Beaker size={16} /> Cromatografia de suelo (Pfeiffer)
+            </button>
+          ) : null}
+
+          <button
                           type="button"
                           onClick={() => { setPruebaId(p.id); setPaso('prueba'); }}
                           className="w-full text-left bg-slate-900 border border-slate-800 hover:border-slate-600 rounded-xl p-3 flex items-center gap-3"
