@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Sparkles, Volume2, VolumeX, Trophy, Sprout } from 'lucide-react';
+import { Sparkles, Volume2, VolumeX, Trophy, Sprout, Crosshair } from 'lucide-react';
 import { ScreenShell } from '../common/ScreenShell';
 import FincaWorldScene from './FincaWorldScene';
 import CriaturaCollection from './CriaturaCollection';
@@ -245,6 +245,24 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
             </span>
           </span>
           <Sparkles size={22} className="text-lime-200 shrink-0" aria-hidden="true" />
+        </button>
+
+        {/* Nivel Doom agroecologico: primera persona por el invernadero */}
+        <button
+          type="button"
+          data-testid="entrada-doom-finca"
+          onClick={() => irAccion('doom_finca')}
+          className="w-full text-left rounded-2xl p-4 bg-gradient-to-br from-orange-600/40 to-amber-800/40 border-2 border-orange-400/40 hover:border-orange-300/60 active:scale-[0.99] transition flex items-center gap-3"
+        >
+          <span className="text-4xl shrink-0" aria-hidden="true">🎯</span>
+          <span className="flex-1 min-w-0">
+            <span className="block text-base font-black text-white">Doom de la Finca</span>
+            <span className="block text-sm text-orange-100/90 leading-snug">
+              Recorre el invernadero en primera persona, identifica las plagas y
+              lanza el controlador biologico correcto. Protege tu cultivo.
+            </span>
+          </span>
+          <Crosshair size={22} className="text-orange-200 shrink-0" aria-hidden="true" />
         </button>
 
         {/* Barra de progreso del mundo (alegre, pero honesta: % real) */}
