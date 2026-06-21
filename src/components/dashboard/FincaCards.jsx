@@ -6,7 +6,7 @@
  * este refinamiento visual. Se silencia el warning soft acá para no bloquear
  * el commit sin arrastrar ese refactor i18n. */
 import { useEffect, useState } from 'react';
-import { Sprout, MapPin, Package, NotebookPen, Eye, AlertCircle, FileText, ChevronRight, Leaf, Network, Beaker } from 'lucide-react';
+import { Sprout, MapPin, Package, NotebookPen, Eye, AlertCircle, FileText, ChevronRight, Leaf, Network, Beaker, PawPrint } from 'lucide-react';
 import useAssetStore from '../../store/useAssetStore';
 import Skeleton from '../common/Skeleton';
 import { listFarmProcesses } from '../../db/farmProcessCache';
@@ -130,6 +130,16 @@ const SECTION_STYLES = {
         iconColor: 'text-indigo-300',
         bar: 'from-indigo-400 to-blue-300',
         halo: 'bg-indigo-400/15',
+    },
+    animales: {
+        Icon: PawPrint,
+        emoji: '🐔',
+        accent: 'from-rose-500/20 to-pink-500/10',
+        border: 'border-rose-700/30',
+        ring: 'ring-rose-500/0 group-hover:ring-rose-500/40',
+        iconColor: 'text-rose-300',
+        bar: 'from-rose-400 to-pink-300',
+        halo: 'bg-rose-400/15',
     },
     // Seguimiento de procesos de finca (2026-06-15). Identidad de color por
     // proceso reforzada con cinta de acento (bar) + halo del emoji (refinamiento
@@ -578,6 +588,25 @@ export function FermentosCard({ onNavigate, variant }) {
             subtitle="Recetas tradicionales y seguridad"
             tooltip="Fermentos alimentarios colombianos (masato, chicha, kéfir) + VETOS de seguridad (botulismo, plomo, cianuro)."
             onClick={() => onNavigate('fermentos')}
+        />
+    );
+}
+
+/**
+ * AnimalesCard — acceso al MÓDULO ANIMALES de la finca integrada (gallinas,
+ * cerdos, abejas). Navega a la vista 'animales', desde donde se entra a cada
+ * vertical y se ve el ciclo cerrado (estiércol → biopreparado → suelo → planta)
+ * y la polinización. Mismo componente base que el resto de tarjetas del home.
+ */
+export function AnimalesCard({ onNavigate, variant }) {
+    return (
+        <Card
+            variant={variant}
+            section="animales"
+            title="Animales"
+            subtitle="Gallinas, cerdos y abejas"
+            tooltip="Gallinas, cerdos y abejas de tu finca. Sanidad, manejo, producción y cómo aportan al ciclo cerrado (estiércol → abono → suelo → planta) y a la polinización."
+            onClick={() => onNavigate('animales')}
         />
     );
 }

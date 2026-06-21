@@ -31,6 +31,7 @@ import {
 import {
     selectHomeModuleVisibilityMap,
     selectHomeModules,
+    esPerfilUrbano,
 } from '../../services/homeModuleSelector';
 import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciarAccess';
 import SelectedBackgroundReveal from './SelectedBackgroundReveal';
@@ -51,6 +52,7 @@ import {
     AsociacionesCard,
     InformesCard,
     FermentosCard,
+    AnimalesCard,
     SeguimientoCards,
 } from './FincaCards';
 
@@ -196,6 +198,20 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
             }).seguimiento;
         } catch (_) {
             return null; // Fail-open: el componente muestra las 4 por defecto.
+        }
+    });
+    // Acceso al MÓDULO ANIMALES en el home. Mismo criterio "el usuario solo ve
+    // lo que necesita": un urbano de balcón/terraza NO maneja animales, así que
+    // no le mostramos la tarjeta (salvo que haya tomado control manual de su
+    // home, en cuyo caso respetamos #1560 y la mostramos). El operador la ve
+    // siempre (bypass de demos/debug). Se calcula una vez al montar.
+    const [mostrarAnimales] = useState(() => {
+        try {
+            if (esOperadorActual()) return true;
+            if (hasManualModuleVisibility()) return true;
+            return !esPerfilUrbano(getProfile());
+        } catch (_) {
+            return true; // Fail-open: no esconder el módulo por un error.
         }
     });
     const iotAlerts = useAssetStore((s) => s.iotAlerts) || [];
@@ -403,6 +419,23 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3" data-testid="seguimiento-cards">
                         <SeguimientoCards onNavigate={onNavigate} variant="grid" keys={seguimientoKeys} />
                     </div>
+                </div>
+            )}
+
+            {/* MÓDULO ANIMALES (finca integrada): gallinas, cerdos y abejas, con
+                el ciclo cerrado (estiércol → biopreparado → suelo → planta) y la
+                polinización. Bloque propio, fuera del grid draggable. Gateado por
+                perfil: un urbano de balcón no lo ve (mismo criterio del resto). */}
+            {mostrarAnimales && (
+                <div className="px-4 pt-3">
+                    <p className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2.5">
+                        <span
+                            aria-hidden="true"
+                            className="h-3.5 w-1 rounded-full bg-gradient-to-b from-rose-400 to-pink-400"
+                        />
+                        Animales de la finca
+                    </p>
+                    <AnimalesCard onNavigate={onNavigate} variant="list" />
                 </div>
             )}
 

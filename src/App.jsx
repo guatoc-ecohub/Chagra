@@ -7,7 +7,7 @@
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Sprout, MapPin, Eye, Package, Clock, NotebookPen, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette, FileText, Network, Beaker } from 'lucide-react';
+import { Sprout, MapPin, Eye, Package, Clock, NotebookPen, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette, FileText, Network, Beaker, PawPrint } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
 import { useClimaAtmosphere } from './hooks/useClimaAtmosphere';
@@ -79,6 +79,9 @@ const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m
 const BiodiversidadView = lazy(() => import('./components/BiodiversidadView'));
 const Asociaciones = lazy(() => import('./components/Asociaciones'));
 const FermentosView = lazy(() => import('./components/FermentosView'));
+const AnimalesScreen = lazy(() => import('./components/AnimalesScreen'));
+const GallinasScreen = lazy(() => import('./components/GallinasScreen'));
+const AbejasScreen = lazy(() => import('./components/AbejasScreen'));
 const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
 const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
 const LocationDetectedScreen = lazy(() => import('./components/LocationDetectedScreen'));
@@ -89,6 +92,7 @@ const CicloCultivoScreen = lazy(() => import('./components/CicloCultivoScreen'))
 const SeguimientoProcesoScreen = lazy(() => import('./components/SeguimientoProcesoScreen'));
 const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
 const CromatografiaScreen = lazy(() => import('./components/CromatografiaScreen'));
+const ToxicologiaScreen = lazy(() => import('./components/ToxicologiaScreen'));
 const GlaciarReporteScreen = lazy(() => import('./components/GlaciarReporteScreen'));
 const GlaciarHistorialScreen = lazy(() => import('./components/GlaciarHistorialScreen'));
 const ProfileScreen = lazy(() => import('./components/ProfileScreen'));
@@ -105,6 +109,7 @@ const MiFincaEvolucionScreen = lazy(() => import('./components/hoy/MiFincaEvoluc
 const MiFincaVivaScreen = lazy(() => import('./components/juego/MiFincaVivaScreen'));
 const DefensoresFincaScreen = lazy(() => import('./components/juego/DefensoresFincaScreen'));
 const MilpaSimulator = lazy(() => import('./components/juego/MilpaSimulator'));
+const DoomFincaScreen = lazy(() => import('./components/juego/DoomFincaScreen'));
 // Modo extensionista (panel supervisor multi-finca, ADR-048 MVP). Gateado por
 // feature flag VITE_FEATURE_EXTENSIONISTA + rol (ver config/extensionistaAccess).
 const ExtensionistaScreen = lazy(() => import('./components/ExtensionistaScreen'));
@@ -137,6 +142,7 @@ const NAV_TILES = [
   { id: 'task_log', label: 'Tareas', icon: Clock, accent: 'rose', desc: 'Cola de pendientes' },
   { id: 'historial', label: 'Bitácora', icon: NotebookPen, accent: 'indigo', desc: 'Historial de actividades' },
   { id: 'biodiversidad', label: 'Flora y fauna', icon: Leaf, accent: 'emerald', desc: 'Ecosistema, estratos y gremios' },
+  { id: 'animales', label: 'Animales', icon: PawPrint, accent: 'rose', desc: 'Gallinas, cerdos, abejas y ciclo cerrado' },
   { id: 'fermentos', label: 'Fermentos', icon: Beaker, accent: 'orange', desc: 'Recetas tradicionales y seguridad' },
   { id: 'reportar_invasora', label: 'Plagas', icon: AlertCircle, accent: 'amber', desc: 'Reporte de plagas y malezas' },
   { id: 'casos', label: 'Casos', icon: FileText, accent: 'amber', desc: 'Seguimiento de problemas y tratamientos' },
@@ -179,15 +185,22 @@ const HASH_VIEW_ROUTES = {
   'glaciar-historial': 'glaciar_historial',
   fermentos: 'fermentos',
   cromatografia: 'cromatografia',
+  animales: 'animales',
+  'animales-gallinas': 'animales_gallinas',
+  'animales-abejas': 'animales_abejas',
+  'doom-finca': 'doom_finca',
+  toxicologia: 'toxicologia',
+  suelo: 'suelo',
 };
 
 // Vistas que cuentan como "módulo" para telemetría de piloto.
 const MODULE_VIEWS = new Set([
   'activos', 'mapa', 'javier', 'bodega', 'task_log', 'historial',
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
-  'hoy_finca', 'evolucion', 'juego', 'defensores', 'milpa', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
+  'animales', 'animales_gallinas', 'animales_abejas',
+  'hoy_finca', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'suelo',
+  'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'suelo', 'toxicologia',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia',
 ]);
@@ -904,6 +917,17 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'doom_finca':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Doom de la Finca">
+              <DoomFincaScreen
+                onBack={() => navigate('juego')}
+                onHome={() => navigate('dashboard')}
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'sembrar':
         return (
           <ErrorBoundary>
@@ -928,7 +952,20 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ScreenShell title="Biopreparados" onBack={() => navigate('juego')} onHome={() => navigate('dashboard')}>
-              <div className="px-4 pt-3 pb-10 max-w-2xl mx-auto">
+              <div className="px-4 pt-3 pb-10 max-w-2xl mx-auto flex flex-col gap-4">
+                {/* Acceso a la toxicología de insumos (EPI, dosis seguras,
+                    restricción ICA). Caso crítico: caldo bordelés / sulfocálcico. */}
+                <button
+                  type="button"
+                  onClick={() => navigate('toxicologia', { tab: 'insumos' })}
+                  className="rounded-xl border border-amber-700/50 bg-amber-950/30 p-3 flex items-center gap-2.5 text-left hover:border-amber-600 transition-colors"
+                >
+                  <AlertCircle size={20} className="shrink-0 text-amber-400" />
+                  <span className="text-sm text-amber-100 flex-1">
+                    <span className="font-bold">Toxicología y seguridad.</span> Antes de preparar,
+                    revisa la protección (EPI), las dosis seguras y las restricciones legales.
+                  </span>
+                </button>
                 <BiopreparadoRecetasGallery />
               </div>
             </ScreenShell>
@@ -1061,6 +1098,38 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'animales':
+        // Módulo ANIMALES de la finca integrada. Sub-botones: Cerdos (reutiliza
+        // el seguimiento porcino existente, ruta 'seguimiento_cerdos'), Gallinas
+        // y Abejas (pantallas nuevas). Eje central: el ciclo cerrado
+        // (animal → estiércol → biopreparado → suelo → planta) + polinización.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Animales">
+              <AnimalesScreen
+                onBack={() => navigate('dashboard')}
+                onHome={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'animales_gallinas':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Gallinas">
+              <GallinasScreen onBack={() => navigate('animales')} onHome={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'animales_abejas':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Abejas">
+              <AbejasScreen onBack={() => navigate('animales')} onHome={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'asociaciones':
         return (
           <ErrorBoundary>
@@ -1113,6 +1182,21 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Cromatografia de Suelo">
               <CromatografiaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'toxicologia':
+        // Módulo TOXICOLOGÍA (seguridad): pestaña A insumos/biopreparados
+        // (toxicidad, EPI, restricción ICA, dosis seguras del catálogo) +
+        // pestaña B suelo (cuestionario de riesgo de contaminantes edáficos).
+        // initialTab vía currentViewData.tab ('insumos' | 'suelo').
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Toxicologia">
+              <ToxicologiaScreen
+                onBack={() => navigate('dashboard')}
+                initialTab={currentViewData?.tab}
+              />
             </ErrorFallback>
           </ErrorBoundary>
         );
