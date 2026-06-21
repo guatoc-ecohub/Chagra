@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculateWindows, formatWindow, getCurrentStage, deriveCurrentStage } from '../phenologyCalculator';
+import { calculateWindows, formatWindow, getCurrentStage, deriveCurrentStage, resolveTemplate } from '../phenologyCalculator';
 
 const SOWING = 1700000000000; // fixed timestamp
 
@@ -226,5 +226,109 @@ describe('deriveCurrentStage — etapa por fecha (anti-congelamiento)', () => {
   it('nunca lanza ante entrada basura', () => {
     expect(() => deriveCurrentStage({})).not.toThrow();
     expect(deriveCurrentStage({})).toBe('sowing_confirmed');
+  });
+});
+
+// Cascada de resolución de plantilla: orden de preferencia explícita >
+// específica > genérica > null. Cubre los 4 niveles del invariante.
+describe('resolveTemplate — cascada de preferencia', () => {
+  it('retorna plantilla especifica por slug cuando existe', () => {
+    const t = resolveTemplate({ speciesSlug: 'solanum_lycopersicum' });
+    expect(t).toBeTruthy();
+    expect(t.species_slug).toBe('solanum_lycopersicum');
+    expect(t.is_generic).toBeFalsy();
+  });
+
+  it('retorna null para especie sin plantilla y sin categoria', () => {
+    expect(resolveTemplate({ speciesSlug: 'no_existe' })).toBeNull();
+  });
+
+  it('retorna null con input vacio', () => {
+    expect(resolveTemplate({})).toBeNull();
+  });
+
+  it('retorna null con undefined', () => {
+    expect(resolveTemplate()).toBeNull();
+  });
+
+  it('la plantilla explicita gana sobre la especifica y la generica', () => {
+    const explicit = {
+      template_id: 'expl.test',
+      species_slug: 'test_explicita',
+      version: 1,
+      sources: [{ name: 'Fuente explicita' }],
+      stages: [
+        { code: 'sowing', label: 'Siembra', minDays: 0, maxDays: 0, sourceIndex: 0 },
+        { code: 'closed', label: 'Cerrado', minDays: 99, maxDays: null, sourceIndex: 0 },
+      ],
+    };
+    const t = resolveTemplate({ speciesSlug: 'solanum_lycopersicum', template: explicit, category: 'hortalizas_fruto_flor' });
+    expect(t.template_id).toBe('expl.test');
+    expect(t.stages).toHaveLength(2);
+    expect(t.stages[1].minDays).toBe(99);
+    expect(t.is_generic).toBeFalsy();
+  });
+
+  it('la plantilla especifica gana sobre la generica cuando ambas existen', () => {
+    const t = resolveTemplate({ speciesSlug: 'zea_mays', category: 'cereales' });
+    expect(t).toBeTruthy();
+    expect(t.species_slug).toBe('zea_mays');
+    expect(t.is_generic).toBeFalsy();
+  });
+
+  it('cae al generico cuando no hay plantilla especifica pero categoria es estimable', () => {
+    const t = resolveTemplate({ speciesSlug: 'desconocida_anual', category: 'hortalizas_hoja' });
+    expect(t).toBeTruthy();
+    expect(t.is_generic).toBe(true);
+  });
+
+  it('retorna null cuando no hay plantilla especifica y categoria no es estimable', () => {
+    expect(resolveTemplate({ speciesSlug: 'desconocida_perenne', category: 'frutales_perennes' })).toBeNull();
+  });
+
+  it('cultivar con especie madre con plantilla resuelve a la especifica, no al generico', () => {
+    const t = resolveTemplate({ speciesSlug: 'solanum_lycopersicum_san_marzano', category: 'hortalizas_fruto_flor' });
+    expect(t).toBeTruthy();
+    expect(t.derived_from).toBe('solanum_lycopersicum');
+    expect(t.is_generic).toBeFalsy();
+  });
+
+  it('cultivar sin especie madre con categoria estimable cae al generico', () => {
+    const t = resolveTemplate({ speciesSlug: 'capsicum_annuum_cayenne', category: 'hortalizas_fruto_flor' });
+    expect(t).toBeTruthy();
+    expect(t.is_generic).toBe(true);
+    expect(t.template_id).toBe('generic.hortalizas_fruto_flor');
+  });
+
+  it('cultivar sin especie madre y con categoria no estimable devuelve null', () => {
+    const t = resolveTemplate({ speciesSlug: 'citrus_sinensis_valencia', category: 'frutales_perennes' });
+    expect(t).toBeNull();
+  });
+
+  it('la plantilla explicita con template_id propio no hereda is_generic del generico', () => {
+    const explicit = {
+      template_id: 'manual.override',
+      species_slug: 'manual_override',
+      version: 1,
+      sources: [{ name: 'Override manual' }],
+      stages: [
+        { code: 'sowing', label: 'Siembra', minDays: 0, maxDays: 0, sourceIndex: 0 },
+        { code: 'closed', label: 'Cerrado', minDays: 50, maxDays: null, sourceIndex: 0 },
+      ],
+    };
+    const t = resolveTemplate({ speciesSlug: 'manual_override', template: explicit, category: 'hortalizas_hoja' });
+    expect(t.is_generic).toBeFalsy();
+  });
+
+  it('getCurrentStage con especie sin plantilla y sin categoria retorna null', () => {
+    const r = getCurrentStage({ speciesSlug: 'no_existe', sowingDate: SOWING });
+    expect(r).toBeNull();
+  });
+
+  it('getCurrentStage con especie generica retorna etapas marcadas isGeneric', () => {
+    const r = getCurrentStage({ speciesSlug: 'allium_fistulosum', sowingDate: SOWING, now: SOWING + 20 * 86400000, category: 'hortalizas_hoja' });
+    expect(r).not.toBeNull();
+    expect(r.stage.isGeneric).toBe(true);
+    expect(r.stage.confidence).toBeLessThanOrEqual(0.3);
   });
 });
