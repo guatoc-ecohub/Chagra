@@ -186,6 +186,12 @@ export function buildTareasSemana({
     const stageCode = estCode || a.current_stage || null;
     if (!stageCode) continue;
 
+    // Etiqueta específica de la especie cuando el template la define; cae al
+    // map genérico (STAGE_LABELS) cuando el template es genérico o no existe.
+    const stageLabel = (estCode && est?.stage?.label)
+      ? est.stage.label
+      : STAGE_LABELS[stageCode] || stageCode;
+
     const deEtapa = getTasksForStage(stageCode).map((t) => ({ ...t, origen: 'etapa' }));
     const deEnso = taskPhase
       ? getEnsemblePreventiveTasks(taskPhase, stageCode).map((t) => ({ ...t, origen: 'enso' }))
@@ -206,7 +212,7 @@ export function buildTareasSemana({
       processId: proc.process_id || proc.id,
       etiqueta: a.subject_label || 'Ciclo',
       stageCode,
-      stageLabel: STAGE_LABELS[stageCode] || stageCode,
+      stageLabel,
       emoji: STAGE_EMOJIS[stageCode] || '🌱',
       diasDesdeSiembra: est?.daysElapsed ?? null,
       confianza: est?.stage?.confidence ?? null,
@@ -260,7 +266,7 @@ export function buildAgenda({
         processId: proc.process_id || proc.id,
         etiqueta: a.subject_label || 'Ciclo',
         stageCode: w.code,
-        stageLabel: STAGE_LABELS[w.code] || w.label,
+        stageLabel: w.label || STAGE_LABELS[w.code] || w.code,
         emoji: STAGE_EMOJIS[w.code] || '🌱',
         tipo: w.code === 'harvest_window' ? 'cosecha' : 'etapa',
         confianza: w.confidence,

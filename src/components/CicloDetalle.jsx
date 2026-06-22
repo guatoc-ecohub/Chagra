@@ -34,7 +34,6 @@ const STAGE_LABELS = {
 };
 const STAGE_ORDER = ['sowing', 'emergence', 'vegetative', 'flowering', 'fruiting', 'harvest_window', 'closed'];
 const baseStage = (code) => String(code || '').replace(/_confirmed$/, '');
-const stageLabel = (code) => STAGE_LABELS[baseStage(code)] || code || '—';
 
 export default function CicloDetalle({ cycle, altitudeM, onReload }) {
   const a = useMemo(() => cycle.attributes || {}, [cycle]);
@@ -137,6 +136,29 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
     [cycle, a, displayStage],
   );
 
+  // Etiqueta de etapa específica de la especie cuando la plantilla fenológica
+  // tiene un label distinto al genérico (ej. "Brotó" en vez de "Emergencia").
+  // Cablea datos existentes del template sin inventar nada nuevo. Si no hay
+  // template o el label coincide con el genérico, cae al map fijo.
+  const speciesStageLabel = useCallback((code) => {
+    const base = baseStage(code);
+    if (resolvedPhenologyTemplate?.stages) {
+      const s = resolvedPhenologyTemplate.stages.find((st) => st.code === base);
+      if (s?.label && s.label !== STAGE_LABELS[base]) return s.label;
+    }
+    return STAGE_LABELS[base] || code || '—';
+  }, [resolvedPhenologyTemplate]);
+
+  // Orden de etapas específico de la especie cuando la plantilla lo define.
+  // Las plantillas pueden omitir etapas (ej. sin "emergence") o tener etapas
+  // propias; el picker hereda ese orden sin inventar.
+  const speciesStageOrder = useMemo(() => {
+    if (resolvedPhenologyTemplate?.stages?.length > 0) {
+      return resolvedPhenologyTemplate.stages.map((s) => s.code);
+    }
+    return STAGE_ORDER;
+  }, [resolvedPhenologyTemplate]);
+
   const pestRisks = useMemo(() => { try { return getPestRisksByStage(displayStage, a.subject_slug) || []; } catch { return []; } }, [displayStage, a.subject_slug]);
   const bios = useMemo(() => { try { return getBiopreparadosForStage(baseStage(displayStage)) || []; } catch { return []; } }, [displayStage]);
   const ensoLabel = getEnsoLabel();
@@ -180,7 +202,7 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
       {/* Etapa actual + confirmar cambio (stageConfirmationService) */}
       <section className="bg-slate-900 border border-slate-800 rounded-xl p-3">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-sm text-slate-300">Etapa: <strong className="text-emerald-400">{stageLabel(displayStage)}</strong></span>
+          <span className="text-sm text-slate-300">Etapa: <strong className="text-emerald-400">{speciesStageLabel(displayStage)}</strong></span>
           <button
             type="button"
             onClick={() => setPickStage((o) => !o)}
@@ -191,16 +213,16 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
         </div>
         {pickStage && (
           <div className="mt-2.5 flex flex-wrap gap-1.5">
-            {STAGE_ORDER.map((s) => (
+            {speciesStageOrder.map((s) => (
               <button
                 key={s}
                 type="button"
                 disabled={busy}
                 onClick={() => handleStage(s)}
-                aria-label={`Confirmar etapa ${STAGE_LABELS[s]}`}
+                aria-label={`Confirmar etapa ${speciesStageLabel(s)}`}
                 className="text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 disabled:opacity-50"
               >
-                {STAGE_LABELS[s]}
+                {speciesStageLabel(s)}
               </button>
             ))}
           </div>
