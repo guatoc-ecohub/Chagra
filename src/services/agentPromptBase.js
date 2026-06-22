@@ -1,4 +1,5 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
+import { TOP_N_EDGES } from './promptAssembler';
 /**
  * agentPromptBase — texto BASE del system prompt del agente + builders puros
  * de bloques por-turno (corpus RAG, evidencia de tools, entidades resueltas,
@@ -678,3 +679,29 @@ ${payload}${truncated ? '\n<!-- nota interna sistema: record truncado para ahorr
 
 RESPONDE SOLO a lo que el usuario preguntó usando ÚNICAMENTE los datos verificados de arriba.`;
 };
+
+/**
+ * truncateEdgesBlock — limita un bloque de aristas/relaciones del grafo a las
+ * top-N más relevantes, contando líneas que inician con `- ` (cada una es una
+ * arista individual). El sidecar y buildOfflineGroundingBlock ordenan por
+ * relevancia, así que tomar las primeras preserva las más importantes.
+ * No-op si el bloque no excede maxEdges o no es string válido.
+ *
+ * @param {string} bloque — texto del bloque relacional
+ * @param {number} [maxEdges=TOP_N_EDGES] — tope de aristas
+ * @returns {string} bloque truncado o el original si no aplica
+ */
+export function truncateEdgesBlock(bloque, maxEdges = TOP_N_EDGES) {
+  if (typeof bloque !== 'string' || !bloque.trim()) return bloque;
+  const lines = bloque.split('\n');
+  let edgeCount = 0;
+  const out = [];
+  for (const line of lines) {
+    if (/^\s*-\s/.test(line)) {
+      edgeCount += 1;
+      if (edgeCount > maxEdges) break;
+    }
+    out.push(line);
+  }
+  return out.join('\n');
+}

@@ -74,10 +74,10 @@ import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../
 import { getCurrentTier } from '../../services/tierService';
 import DeepResearchCard from '../DeepResearchCard';
 import { normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildSuggestedEntitiesContext, isLowConfidenceEntity, buildFallbackResponse, pisoTermicoFromAltitud } from '../../services/agentService';
-import { buildBasePrompt, analyzeQuery, buildQueryAnalysisBlock, buildCorpusVariants, buildResolvedEntitiesBlock, formatToolEvidence } from '../../services/agentPromptBase';
+import { buildBasePrompt, analyzeQuery, buildQueryAnalysisBlock, buildCorpusVariants, buildResolvedEntitiesBlock, formatToolEvidence, truncateEdgesBlock } from '../../services/agentPromptBase';
 // Nubosidad real para el grounding (fix Choachí 2026-06) — solo lee caches.
 import { summarizeSkyForGrounding } from '../../services/skyConditionService';
-import { assembleSystemContent } from '../../services/promptAssembler';
+import { assembleSystemContent, TOP_N_RAG } from '../../services/promptAssembler';
 import { applyOutputGuards, classifyQueryIntent } from '../../services/outputGuards';
 import { createStreamGuard } from '../../services/streamGuards';
 import { getProfile, getModuleVisibility } from '../../services/userProfileService';
@@ -1287,7 +1287,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       await addTurn(operatorId, { role: 'user', content: text.trim() });
 
       const contextMemory = wasFreshSession ? '' : await getContextString(operatorId, 10);
-      const contextCorpus = await retrieve(textForLLM, 3, 'agente');
+      const contextCorpus = await retrieve(textForLLM, TOP_N_RAG, 'agente');
 
       // ADR-045 Fase 2 Step B/C — sidecar NLU + MCP tool grounding.
       // Solo si flag VITE_USE_SIDECAR_AGRO_MCP=true Y estamos online.
@@ -1816,7 +1816,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         }
       }
 
-      const rawResponse = await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, subgrafoBloque, biopreparadoBlock);
+      // TOP_N_EDGES: truncar aristas del grafo a las 12 más relevantes
+      // (el sidecar las ordena por relevancia). No-op si el bloque no excede.
+      const edgesTruncated = truncateEdgesBlock(subgrafoBloque);
+
+      const rawResponse = await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, edgesTruncated, biopreparadoBlock);
       // Fallback estructurado (Item 9): si el LLM retornó vacío (timeout, OOM,
       // modelo caído), construimos una respuesta útil con lo que sabemos
       // (toolEvidence, entidades) en vez de un silencio o banner rojo.

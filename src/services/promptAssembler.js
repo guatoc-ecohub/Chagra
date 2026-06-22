@@ -46,6 +46,12 @@ export const SYSTEM_PROMPT_TOKEN_BUDGET = 6144;
  */
 export const PROMPT_TOKEN_BUDGET = 8192;
 
+/** Máximo de pasajes RAG a incluir en el prompt del agente. */
+export const TOP_N_RAG = 8;
+
+/** Máximo de aristas del grafo a incluir en el bloque relacional. */
+export const TOP_N_EDGES = 12;
+
 /**
  * estimateTokens — estimador heurístico de tokens para texto español técnico
  * con tokenizers BPE de la familia llama/granite.
