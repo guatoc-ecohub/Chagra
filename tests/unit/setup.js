@@ -13,6 +13,18 @@ import '@testing-library/jest-dom/vitest';
 import { afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 
+// ── Polyfill: IndexedDB global en jsdom ─────────────────────────────────────
+// jsdom NO implementa IndexedDB. Cualquier test que ejercite `dbCore.openDB`
+// (o un store/servicio que lo tira) sin mockear recibe:
+//   ReferenceError: indexedDB is not defined  (src/db/dbCore.js:114)
+// `fake-indexeddb/auto` instala en `globalThis` la familia completa:
+// `indexedDB`, `IDBFactory`, `IDBDatabase`, `IDBObjectStore`, `IDBIndex`,
+// `IDBTransaction`, `IDBCursor`, `IDBRequest` y `IDBKeyRange`. Es una
+// implementación en memoria, fiel a la spec, que NO toca código de prod:
+// solo cierra el gap jsdom↔browser. Tests que mockean dbCore siguen funcionando
+// porque el mock reemplaza `openDB` antes de tocar el global.
+import 'fake-indexeddb/auto';
+
 // ── Polyfill: crypto.subtle.digest con ArrayBuffer cross-realm ──────────────
 // jsdom expone `crypto.subtle` (webcrypto de Node), pero el ArrayBuffer que
 // devuelve `Blob.arrayBuffer()` proviene de OTRO realm de V8 que el de la
