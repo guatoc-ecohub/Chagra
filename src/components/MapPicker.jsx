@@ -7,6 +7,7 @@ import {
   latLngsToPolygon,
   acceptGpsFix,
   buildWalkPolygon,
+  warmupDecision,
   GPS_WARMUP_ACCURACY_M,
 } from '../utils/geo';
 import useAssetStore from '../store/useAssetStore';
@@ -93,6 +94,11 @@ export const MapPicker = ({
   const watchIdRef = useRef(null); // id del watchPosition cuando traza caminando
   const lastFixRef = useRef(null); // último fix GPS ACEPTADO (para filtro velocidad)
   const warmedUpRef = useRef(false); // bug #57(c): ¿el GPS ya convergió y arrancamos a trazar?
+  // bug #57(c) residual: algunos navegadores omiten `accuracy`. Sin ella no
+  // podemos verificar precisión, así que NO terminamos el warm-up con un fix
+  // sin accuracy; pero llevamos un contador para no quedarnos colgados para
+  // siempre en navegadores que jamás la reportan (fallback tras N fixes).
+  const warmupNoAccuracyRef = useRef(0);
   const [points, setPoints] = useState([]); // polígono en construcción
   const [marker, setMarker] = useState(null); // punto actual
   // Modo "trazar caminando": usa navigator.geolocation.watchPosition para
@@ -195,6 +201,7 @@ export const MapPicker = ({
       }
       lastFixRef.current = null;
       warmedUpRef.current = false;
+      warmupNoAccuracyRef.current = 0;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -258,6 +265,7 @@ export const MapPicker = ({
       setPoints([]);
       lastFixRef.current = null;
       warmedUpRef.current = false;
+      warmupNoAccuracyRef.current = 0;
       setWalkAccuracy(null);
       const map = mapRef.current;
       if (layerRef.current) {
@@ -282,12 +290,20 @@ export const MapPicker = ({
 
           // Bug #57(c) warm-up: ignorar fixes hasta que el GPS sea aceptable.
           // El primer fix bueno levanta el warm-up y se convierte en el ancla.
+          // warmupDecision encapsula la regla; en particular NO termina el
+          // warm-up con un fix sin accuracy (cold-start grueso de algunos
+          // navegadores) salvo como fallback tras varios fixes sin precisión.
           if (!warmedUpRef.current) {
-            if (Number.isFinite(accuracy) && accuracy > GPS_WARMUP_ACCURACY_M) {
+            const decision = warmupDecision(fix, {
+              noAccuracyCount: warmupNoAccuracyRef.current,
+            });
+            if (!decision.warmedUp) {
+              if (!Number.isFinite(accuracy)) warmupNoAccuracyRef.current += 1;
               map.panTo([fix.lat, fix.lng]); // sigue al usuario pero no traza
               return;
             }
             warmedUpRef.current = true;
+            warmupNoAccuracyRef.current = 0;
             setGpsWarmingUp(false);
           }
 

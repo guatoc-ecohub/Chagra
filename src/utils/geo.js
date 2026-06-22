@@ -38,6 +38,12 @@ export const GPS_ACCURACY_THRESHOLD_M = 25;
 // para que el primer vértice del polígono sea sólido (síntoma c).
 export const GPS_WARMUP_ACCURACY_M = 20;
 
+// bug #57(c) residual: cuántos fixes SIN `accuracy` reportada toleramos durante
+// el warm-up antes de rendirnos y anclar de todos modos. Algunos navegadores de
+// escritorio nunca reportan accuracy; sin este tope el warm-up nunca terminaría.
+// En un teléfono al aire libre, ~8 fixes son varios segundos de señal.
+export const GPS_WARMUP_NO_ACCURACY_LIMIT = 8;
+
 // Velocidad humana caminando ≈ 1.4 m/s. Por encima de este techo el "salto"
 // entre dos fixes consecutivos es físicamente imposible a pie → ruido GPS.
 export const GPS_MAX_WALK_SPEED_MPS = 5; // ~18 km/h, holgado para trote/jitter
@@ -128,6 +134,48 @@ export const acceptGpsFix = (fix, prev, opts = {}) => {
     return { accepted: false, reason: 'jump', distance };
   }
   return { accepted: true, reason: null, distance };
+};
+
+/**
+ * Decide si un fix entrante debe TERMINAR el warm-up del GPS y convertirse en
+ * el ancla del polígono (síntoma c "precisión 1ª corrida").
+ *
+ * El warm-up existe para no anclar el polígono en el primer fix de cold-start
+ * A-GPS, que suele ser grueso. La regla:
+ *   - accuracy finita y ≤ umbral  → el GPS convergió: terminar warm-up.
+ *   - accuracy finita y > umbral   → aún impreciso: seguir esperando.
+ *   - accuracy AUSENTE             → no podemos verificar precisión. NO anclamos
+ *     con ella salvo como fallback tras `noAccuracyCount` ≥ límite (navegadores
+ *     que jamás reportan accuracy), para no colgar el warm-up indefinidamente.
+ *
+ * Bug #57(c) residual: la versión previa terminaba el warm-up con CUALQUIER fix
+ * sin accuracy (la condición `Number.isFinite(accuracy) && accuracy > umbral`
+ * era falsa cuando accuracy era undefined), anclando en un cold-start grueso.
+ *
+ * @param {{accuracy?:number}} fix
+ * @param {object} [opts]
+ * @param {number} [opts.warmupAccuracy=GPS_WARMUP_ACCURACY_M]
+ * @param {number} [opts.noAccuracyCount=0] - fixes consecutivos sin accuracy ya vistos.
+ * @param {number} [opts.noAccuracyLimit=GPS_WARMUP_NO_ACCURACY_LIMIT]
+ * @returns {{warmedUp:boolean, reason:'converged'|'fallback'|'imprecise'|'no-accuracy'}}
+ */
+export const warmupDecision = (fix, opts = {}) => {
+  const warmupAccuracy = opts.warmupAccuracy ?? GPS_WARMUP_ACCURACY_M;
+  const noAccuracyCount = opts.noAccuracyCount ?? 0;
+  const noAccuracyLimit = opts.noAccuracyLimit ?? GPS_WARMUP_NO_ACCURACY_LIMIT;
+  const accuracy = fix?.accuracy;
+
+  if (Number.isFinite(accuracy)) {
+    return accuracy <= warmupAccuracy
+      ? { warmedUp: true, reason: 'converged' }
+      : { warmedUp: false, reason: 'imprecise' };
+  }
+  // accuracy ausente: solo rendirse (anclar) tras varios fixes sin señal de
+  // precisión; mientras tanto seguimos calentando.
+  if (noAccuracyCount + 1 >= noAccuracyLimit) {
+    return { warmedUp: true, reason: 'fallback' };
+  }
+  return { warmedUp: false, reason: 'no-accuracy' };
 };
 
 /**
