@@ -7,6 +7,7 @@ import {
   wktToGeoJson,
   haversineMeters,
   acceptGpsFix,
+  warmupDecision,
   dedupeByMinDistance,
   simplifyDouglasPeucker,
   polygonAreaSqMeters,
@@ -15,6 +16,7 @@ import {
   GPS_MIN_VERTEX_DISTANCE_M,
   GPS_MAX_JUMP_DISTANCE_M,
   GPS_WARMUP_ACCURACY_M,
+  GPS_WARMUP_NO_ACCURACY_LIMIT,
   GPS_MAX_WALK_SPEED_MPS,
 } from '../geo.js';
 
@@ -362,6 +364,91 @@ describe('acceptGpsFix — síntoma (a) línea loca', () => {
     expect(accepted[1].timestamp).toBe(1000);
     expect(accepted[2].timestamp).toBe(4000);
     expect(accepted[3].timestamp).toBe(5000);
+  });
+});
+
+describe('warmupDecision — síntoma (c) precisión 1ª corrida', () => {
+  it('termina el warm-up cuando la accuracy converge (≤ umbral)', () => {
+    const d = warmupDecision({ accuracy: GPS_WARMUP_ACCURACY_M });
+    expect(d.warmedUp).toBe(true);
+    expect(d.reason).toBe('converged');
+  });
+
+  it('termina el warm-up con accuracy buena (5m)', () => {
+    expect(warmupDecision({ accuracy: 5 }).warmedUp).toBe(true);
+  });
+
+  it('NO termina el warm-up con accuracy imprecisa (> umbral)', () => {
+    const d = warmupDecision({ accuracy: GPS_WARMUP_ACCURACY_M + 1 });
+    expect(d.warmedUp).toBe(false);
+    expect(d.reason).toBe('imprecise');
+  });
+
+  // --- El bug residual: fix SIN accuracy reportada ------------------------------
+  it('NO ancla con un fix sin accuracy en el primer intento (bug #57c residual)', () => {
+    // Antes: la condición finita era falsa → warm-up terminaba y anclaba en el
+    // cold-start grueso. Ahora seguimos esperando precisión verificable.
+    const d = warmupDecision({}, { noAccuracyCount: 0 });
+    expect(d.warmedUp).toBe(false);
+    expect(d.reason).toBe('no-accuracy');
+  });
+
+  it('NO ancla con accuracy undefined/NaN explícitos', () => {
+    expect(warmupDecision({ accuracy: undefined }).warmedUp).toBe(false);
+    expect(warmupDecision({ accuracy: NaN }).warmedUp).toBe(false);
+    expect(warmupDecision(null).warmedUp).toBe(false);
+  });
+
+  it('cae a fallback tras el límite de fixes sin accuracy (no cuelga el warm-up)', () => {
+    // En el penúltimo intento todavía espera; al alcanzar el límite, ancla.
+    const justBefore = warmupDecision({}, { noAccuracyCount: GPS_WARMUP_NO_ACCURACY_LIMIT - 2 });
+    expect(justBefore.warmedUp).toBe(false);
+    const atLimit = warmupDecision({}, { noAccuracyCount: GPS_WARMUP_NO_ACCURACY_LIMIT - 1 });
+    expect(atLimit.warmedUp).toBe(true);
+    expect(atLimit.reason).toBe('fallback');
+  });
+
+  it('una accuracy buena gana al fallback aunque ya haya muchos fixes sin accuracy', () => {
+    const d = warmupDecision({ accuracy: 8 }, { noAccuracyCount: 99 });
+    expect(d.warmedUp).toBe(true);
+    expect(d.reason).toBe('converged');
+  });
+
+  it('respeta warmupAccuracy personalizado en opts', () => {
+    expect(warmupDecision({ accuracy: 12 }, { warmupAccuracy: 10 }).warmedUp).toBe(false);
+    expect(warmupDecision({ accuracy: 9 }, { warmupAccuracy: 10 }).warmedUp).toBe(true);
+  });
+
+  it('respeta noAccuracyLimit personalizado en opts', () => {
+    expect(warmupDecision({}, { noAccuracyCount: 1, noAccuracyLimit: 3 }).warmedUp).toBe(false);
+    expect(warmupDecision({}, { noAccuracyCount: 2, noAccuracyLimit: 3 }).warmedUp).toBe(true);
+  });
+
+  it('simula warm-up con primeros fixes SIN accuracy: NO ancla en el cold-start grueso', () => {
+    // Escenario del bug: navegador que omite accuracy en los primeros fixes
+    // (cold-start), luego empieza a reportarla. El ancla debe ser el primer
+    // fix con accuracy verificablemente buena, no el primero a ciegas.
+    const session = [
+      { lat: 4.5200, lng: -73.9100 },                 // sin accuracy (cold-start lejano)
+      { lat: 4.5250, lng: -73.9150 },                 // sin accuracy
+      { lat: 4.5300, lng: -73.9200, accuracy: 40 },   // accuracy mala
+      { lat: 4.5300, lng: -73.9200, accuracy: 12 },   // ✓ converge aquí
+    ];
+    let warmedUp = false;
+    let noAccCount = 0;
+    let anchor = null;
+    for (const fix of session) {
+      if (warmedUp) break;
+      const d = warmupDecision(fix, { noAccuracyCount: noAccCount });
+      if (d.warmedUp) {
+        warmedUp = true;
+        anchor = fix;
+      } else if (!Number.isFinite(fix.accuracy)) {
+        noAccCount += 1;
+      }
+    }
+    expect(warmedUp).toBe(true);
+    expect(anchor.accuracy).toBe(12); // ancló en el fix preciso, no en el ciego
   });
 });
 
@@ -900,6 +987,10 @@ describe('constantes GPS', () => {
   it('GPS_WARMUP_ACCURACY_M es 20 (más estricto que el umbral de descarte)', () => {
     expect(GPS_WARMUP_ACCURACY_M).toBe(20);
     expect(GPS_WARMUP_ACCURACY_M).toBeLessThan(GPS_ACCURACY_THRESHOLD_M);
+  });
+  it('GPS_WARMUP_NO_ACCURACY_LIMIT es un entero positivo (fallback acotado)', () => {
+    expect(Number.isInteger(GPS_WARMUP_NO_ACCURACY_LIMIT)).toBe(true);
+    expect(GPS_WARMUP_NO_ACCURACY_LIMIT).toBeGreaterThan(0);
   });
   it('GPS_MAX_WALK_SPEED_MPS es 5', () => {
     expect(GPS_MAX_WALK_SPEED_MPS).toBe(5);
