@@ -20,6 +20,7 @@ import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 const { esExtensionistaActual } = vi.hoisted(() => ({
   esExtensionistaActual: vi.fn(),
 }));
+const { esOperadorActual } = vi.hoisted(() => ({ esOperadorActual: vi.fn() }));
 const { construirTableroExtensionista } = vi.hoisted(() => ({
   construirTableroExtensionista: vi.fn(),
 }));
@@ -42,6 +43,7 @@ const { useFincaActiveStoreMock } = vi.hoisted(() => ({
 }));
 
 vi.mock('../../config/extensionistaAccess', () => ({ esExtensionistaActual }));
+vi.mock('../../config/glaciarAccess', () => ({ esOperadorActual }));
 vi.mock('../../services/extensionistaService', () => ({
   construirTableroExtensionista,
 }));
@@ -88,6 +90,8 @@ const TABLERO = {
 
 beforeEach(() => {
   esExtensionistaActual.mockReset();
+  esOperadorActual.mockReset();
+  esOperadorActual.mockReturnValue(false);
   construirTableroExtensionista.mockReset();
   getActiveTenantId.mockReset();
   getActiveTenantId.mockReturnValue('demo-extensionista');
@@ -177,5 +181,42 @@ describe('ExtensionistaScreen — con rol extensionista', () => {
     // el botón atrás tiene el aria-label exacto "Volver".
     fireEvent.click(screen.getByLabelText('Volver'));
     expect(onBack).toHaveBeenCalled();
+  });
+});
+
+describe('ExtensionistaScreen — operador (demo visión total)', () => {
+  beforeEach(() => {
+    esExtensionistaActual.mockReturnValue(true);
+  });
+
+  it('si el tenant del operador no tiene fincas, cae al mock demo (no vacío)', () => {
+    esOperadorActual.mockReturnValue(true);
+    getActiveTenantId.mockReturnValue('admin');
+    // Primera llamada (tenant admin) → vacío; fallback (demo-extensionista) → tablero.
+    construirTableroExtensionista
+      .mockReturnValueOnce({ fincas: [], resumen: { total: 0, con_alertas: 0, con_pendientes: 0 } })
+      .mockReturnValueOnce(TABLERO);
+    render(<ExtensionistaScreen onBack={() => {}} />);
+    // Muestra las fincas de ejemplo en vez del estado vacío → NO queda en blanco.
+    expect(screen.getByText('Finca El Páramo')).toBeInTheDocument();
+    expect(
+      screen.queryByText('Todavía no tienes fincas asignadas')
+    ).not.toBeInTheDocument();
+    expect(construirTableroExtensionista).toHaveBeenLastCalledWith('demo-extensionista');
+  });
+
+  it('un no-operador con tenant sin fincas SÍ ve el estado vacío (sin inventar)', () => {
+    esOperadorActual.mockReturnValue(false);
+    getActiveTenantId.mockReturnValue('demo-extensionista');
+    construirTableroExtensionista.mockReturnValue({
+      fincas: [],
+      resumen: { total: 0, con_alertas: 0, con_pendientes: 0 },
+    });
+    render(<ExtensionistaScreen onBack={() => {}} />);
+    expect(
+      screen.getByText('Todavía no tienes fincas asignadas')
+    ).toBeInTheDocument();
+    // No debe pedir el fallback demo si no es operador.
+    expect(construirTableroExtensionista).toHaveBeenCalledTimes(1);
   });
 });

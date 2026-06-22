@@ -94,6 +94,39 @@ describe('extensionistaAccess — feature flag VITE_FEATURE_EXTENSIONISTA (kill-
   });
 });
 
+describe('extensionistaAccess — bypass del OPERADOR (visión total)', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    localStorage.clear();
+  });
+
+  it('el operador (override local) es extensionista AUNQUE la flag esté OFF', async () => {
+    vi.stubEnv('VITE_FEATURE_EXTENSIONISTA', 'false');
+    localStorage.setItem('chagra:operator_override', '1');
+    const mod = await importFresh();
+    // Con override de operador entra al panel sin importar la flag ni la whitelist.
+    expect(mod.esExtensionista('admin')).toBe(true);
+    expect(mod.esExtensionista('cualquiera')).toBe(true);
+  });
+
+  it('el operador (override local) entra aunque NO esté en la whitelist', async () => {
+    vi.stubEnv('VITE_FEATURE_EXTENSIONISTA', 'true');
+    localStorage.setItem('chagra:operator_override', '1');
+    const mod = await importFresh();
+    expect(mod.esExtensionista('no-en-whitelist')).toBe(true);
+  });
+
+  it('sin override de operador, un usuario normal sigue gateado (flag OFF)', async () => {
+    vi.stubEnv('VITE_FEATURE_EXTENSIONISTA', 'false');
+    const mod = await importFresh();
+    expect(mod.esExtensionista('admin')).toBe(false);
+    expect(mod.esExtensionista('demo-extensionista')).toBe(false);
+  });
+});
+
 describe('extensionistaAccess — esExtensionistaActual (lee tenant activo, offline)', () => {
   beforeEach(() => {
     vi.stubEnv('VITE_FEATURE_EXTENSIONISTA', 'true');

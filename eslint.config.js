@@ -134,4 +134,11 @@ export default defineConfig([
     files: ['src/config/messages.js'],
     rules: { 'chagra-i18n/no-hardcoded-spanish': 'off' },
   },
+  {
+    // Los tests aseveran sobre el texto en español RENDERIZADO (p. ej.
+    // `screen.getByText('Finca El Páramo')`), así que necesitan literales en
+    // español a propósito: no son cadenas de UI que migrar a messages.js.
+    files: ['**/*.test.{js,jsx}', '**/*.spec.{js,jsx}'],
+    rules: { 'chagra-i18n/no-hardcoded-spanish': 'off' },
+  },
 ])

@@ -45,6 +45,7 @@
  */
 
 import { getActiveTenantId } from '../services/tenantContext.js';
+import { esOperador } from './glaciarAccess.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // WHITELIST — editar SOLO este Set para dar/quitar el rol extensionista.
@@ -103,11 +104,23 @@ export function featureExtensionistaActivo() {
  * Normaliza con trim() + toLowerCase() antes de comparar (tolerante a
  * capitalización accidental o espacios alrededor).
  *
+ * BYPASS DEL OPERADOR (visión total):
+ *   El operador del producto (admin/demo/debug) ve SIEMPRE TODO, igual que con
+ *   el módulo glaciar (ver `tieneAccesoGlaciar`). Sin este bypass, el operador
+ *   y los perfiles de demostración (p. ej. el panel ministerial) aterrizaban en
+ *   `#extensionista` y veían una pantalla "Vista no disponible" — un dead-end
+ *   inaceptable en un demo. Con `esOperador()` (override local o
+ *   VITE_OPERATOR_USERNAME) el operador entra al panel sin importar la flag ni
+ *   la whitelist. NO leakea identidad (override booleano en localStorage).
+ *
  * @param {string|null|undefined} username — username farmOS del usuario.
- * @returns {boolean} true si tiene el rol; false en todos los demás casos
- *   (flag off, null, undefined, vacío, solo espacios, fuera de la whitelist).
+ * @returns {boolean} true si tiene el rol (o es operador); false en los demás
+ *   casos (flag off, null, undefined, vacío, solo espacios, fuera de whitelist).
  */
 export function esExtensionista(username) {
+  // El operador (visión total) ve el panel extensionista aunque la flag esté
+  // apagada o no esté en la whitelist — mismo criterio que glaciarAccess.
+  if (esOperador(username)) return true;
   if (!featureExtensionistaActivo()) return false;
   if (!username || typeof username !== 'string') return false;
   const normalized = username.trim().toLowerCase();
