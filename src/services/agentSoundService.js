@@ -87,4 +87,29 @@ export const agentSounds = {
   cancel() {
     tone({ freq: 360, duration: 0.15, type: 'triangle', volume: 0.05 });
   },
+  // ── Cues del minijuego Doom de la finca ──
+  /** Plaga controlada con el benefico correcto (arpegio ascendente). */
+  acierto() {
+    tone({ freq: 523, duration: 0.10, type: 'triangle', volume: 0.06 });
+    setTimeout(() => tone({ freq: 659, duration: 0.10, type: 'triangle', volume: 0.06 }), 60);
+    setTimeout(() => tone({ freq: 784, duration: 0.14, type: 'triangle', volume: 0.06 }), 120);
+  },
+  /** Benefico equivocado (buzz corto descendente, no agresivo). */
+  fallo() {
+    tone({ freq: 220, freqEnd: 160, duration: 0.18, type: 'square', volume: 0.04 });
+  },
+  /** Cambio de benefico / selector (pop suave). */
+  seleccion() {
+    tone({ freq: 600, duration: 0.06, type: 'triangle', volume: 0.04 });
+  },
+  /** Fanfarria de victoria. */
+  victoria() {
+    [523, 659, 784, 1046].forEach((f, i) => {
+      setTimeout(() => tone({ freq: f, duration: 0.18, type: 'triangle', volume: 0.06 }), i * 110);
+    });
+  },
+  /** Derrota (tono grave descendente). */
+  derrota() {
+    tone({ freq: 330, freqEnd: 160, duration: 0.5, type: 'sine', volume: 0.06 });
+  },
 };
