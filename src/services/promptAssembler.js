@@ -88,6 +88,7 @@ export const BLOCK_ORDER = [
   'suggested', // GUARDA CASO B baja confianza (protegido)
   'priceDecline', // GUARDA precio sin dato (protegido)
   'fermento', // GUARDA DR-FOOD-3 (protegido, máxima recency)
+  'biopreparado', // GROUNDING biopreparados chagra-pro #248 (protegido, máxima recency — anti-negación)
 ];
 
 /**

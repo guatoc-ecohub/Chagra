@@ -619,6 +619,101 @@ describe('sidecarClient — feature flag on', () => {
       expect(res).toBeNull();
     });
   });
+
+  describe('biopreparadoGrounding — capa 1 GROUNDING (#248)', () => {
+    const BIOPREPARADO_HIT = {
+      has_biopreparado: true,
+      biopreparado_id: 'caldo-bordeles',
+      system_prompt_block:
+        '=== BIOPREPARADO REAL DEL CATÁLOGO — caldo bordelés ===\n' +
+        'Composición: sulfato de cobre + cal. Uso: fungicida foliar.\n' +
+        'NUNCA digas que este insumo no existe.\n' +
+        '=== FIN BIOPREPARADO ===',
+      reason: 'biopreparado_resolved',
+    };
+
+    const NO_BIOPREPARADO = {
+      has_biopreparado: false,
+      biopreparado_id: null,
+      system_prompt_block: '',
+      reason: 'no_biopreparado_intent',
+    };
+
+    it('query de BIOPREPARADO → inyecta el system_prompt_block del sidecar', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, BIOPREPARADO_HIT));
+      const { biopreparadoGrounding } = await importFresh();
+      const res = await biopreparadoGrounding('cómo preparo caldo bordelés');
+      expect(res).not.toBeNull();
+      expect(res.has_biopreparado).toBe(true);
+      expect(res.biopreparado_id).toBe('caldo-bordeles');
+      expect(res.system_prompt_block).toContain('NUNCA digas que este insumo no existe');
+      // POST con user_message a /biopreparado-grounding (mismo contrato que /fermento-prefilter).
+      const [url, opts] = fetchMock.mock.calls[0];
+      expect(url).toBe('/api/mcp/agro/biopreparado-grounding');
+      expect(opts.method).toBe('POST');
+      expect(opts.headers['X-Chagra-Token']).toBe('test-token-123');
+      expect(JSON.parse(opts.body)).toEqual({ user_message: 'cómo preparo caldo bordelés' });
+    });
+
+    it('query SIN biopreparado → has_biopreparado false + bloque vacío (no se inyecta nada)', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, NO_BIOPREPARADO));
+      const { biopreparadoGrounding } = await importFresh();
+      const res = await biopreparadoGrounding('¿a cómo está la papa?');
+      expect(res).not.toBeNull();
+      expect(res.has_biopreparado).toBe(false);
+      expect(res.system_prompt_block).toBe('');
+      expect(res.biopreparado_id).toBeNull();
+    });
+
+    it('normaliza un body parcial del sidecar a la forma contractual (defensivo)', async () => {
+      // Sidecar viejo / respuesta incompleta: campos faltantes → defaults seguros.
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, { has_biopreparado: true, system_prompt_block: 'X' }));
+      const { biopreparadoGrounding } = await importFresh();
+      const res = await biopreparadoGrounding('cómo hago purín de ortiga');
+      expect(res.has_biopreparado).toBe(true);
+      expect(res.system_prompt_block).toBe('X');
+      expect(res.biopreparado_id).toBeNull();
+      expect(res.reason).toBe('');
+    });
+
+    it('devuelve null sin fetch cuando flag off (degradación graceful)', async () => {
+      disableFlag();
+      const { biopreparadoGrounding } = await importFresh();
+      const res = await biopreparadoGrounding('cómo preparo caldo bordelés');
+      expect(res).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('devuelve null sin fetch cuando offline', async () => {
+      Object.defineProperty(navigator, 'onLine', { configurable: true, value: false });
+      const { biopreparadoGrounding } = await importFresh();
+      const res = await biopreparadoGrounding('cómo preparo caldo bordelés');
+      expect(res).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('devuelve null sin fetch cuando userMessage vacío/no-string', async () => {
+      const { biopreparadoGrounding } = await importFresh();
+      expect(await biopreparadoGrounding('')).toBeNull();
+      expect(await biopreparadoGrounding(null)).toBeNull();
+      expect(await biopreparadoGrounding(undefined)).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('5xx → null sin throw (MCP caído, FAIL-SAFE: no rompe el turno ni fabrica datos)', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(503, { error: 'mcp down' }));
+      const { biopreparadoGrounding } = await importFresh();
+      const res = await biopreparadoGrounding('cómo preparo caldo bordelés');
+      expect(res).toBeNull();
+    });
+
+    it('fetch throws → null sin throw', async () => {
+      fetchMock.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+      const { biopreparadoGrounding } = await importFresh();
+      const res = await biopreparadoGrounding('cómo preparo caldo bordelés');
+      expect(res).toBeNull();
+    });
+  });
 });
 
 describe('sidecarClient — getClimaSnapshot elevation (gradiente térmico)', () => {

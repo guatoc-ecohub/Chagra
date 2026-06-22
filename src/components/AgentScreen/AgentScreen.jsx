@@ -45,7 +45,7 @@ import { createStreamDeadline } from '../../services/streamDeadline';
 // Sidecar agro-mcp (ADR-045 Fase 2 Step B/C). Detrás de feature flag
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
-import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, postValidate, getClimaIdeam } from '../../services/sidecarClient';
+import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, biopreparadoGrounding, postValidate, getClimaIdeam } from '../../services/sidecarClient';
 // CHIPS DE MODO (A3/A4, decisión operador 2026-06-02): el router PURO mapea
 // la intención forzada del chip → tool determinístico, SALTANDO el NLU
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
@@ -797,7 +797,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // formatToolEvidence y analyzeQuery viven en agentPromptBase (funciones
   // puras, testeables y medibles fuera de React).
 
-  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null, fermentoBlock = '', subgrafoBloque = '') => {
+  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null, fermentoBlock = '', subgrafoBloque = '', biopreparadoBlock = '') => {
     const analysis = analyzeQuery(query);
     // El base recibe query/historial/isEnum para inyectar SOLO los glosarios
     // y reglas condicionales que la conversación toca (re-arquitectura GR-10).
@@ -988,6 +988,19 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       ? `\n\n${fermentoBlock}`
       : '';
 
+    // BIOPREPARADOS (capa 1 GROUNDING, chagra-pro #248). El sidecar
+    // /biopreparado-grounding ya resolvió contra el catálogo MCP si la query
+    // toca un biopreparado real (caldo bordelés, etc.) y armó el bloque con su
+    // composición/uso curados + la regla anti-negación ("NUNCA digas que este
+    // insumo no existe") — FAIL-SAFE: si el MCP está caído NO fabrica datos.
+    // Llega pre-formateado (system_prompt_block) y va de ÚLTIMO (recency máxima,
+    // junto a fermento) para dominar la respuesta y evitar que el agente niegue
+    // insumos que sí existen. '' (no-op) cuando no hubo intención-biopreparado o
+    // el sidecar no respondió (degradación graceful — no rompe el turno).
+    const biopreparadoSafetyBlock = (typeof biopreparadoBlock === 'string' && biopreparadoBlock.trim())
+      ? `\n\n${biopreparadoBlock}`
+      : '';
+
     // Re-arquitectura GR-10: ensamblado con PRESUPUESTO de tokens y prioridad
     // por relevancia (promptAssembler). El grounding (evidencia / entidades /
     // hechos curados / cadena) va al FINAL del system — donde la truncación de
@@ -1016,6 +1029,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       suggested: suggestedBlock,
       priceDecline: priceDeclineBlock,
       fermento: fermentoSafetyBlock,
+      biopreparado: biopreparadoSafetyBlock,
     });
 
     const messages = [
@@ -1306,6 +1320,12 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // por default → no-op en el system prompt si no hubo intención-fermento o
       // el sidecar no respondió (degradación graceful).
       let fermentoBlock = '';
+      // BIOPREPARADOS (capa 1 GROUNDING, chagra-pro #248). Bloque de instrucción
+      // ya formateado por el sidecar (/biopreparado-grounding) con la composición/
+      // uso del catálogo + regla anti-negación. '' por default → no-op en el
+      // system prompt si no hubo intención-biopreparado o el sidecar no respondió
+      // (degradación graceful — FAIL-SAFE, no fabrica datos).
+      let biopreparadoBlock = '';
       // GraphRAG multi-hop (#1 intelligence-first): bloque "CADENA DE RELACIONES"
       // del grafo AGE para queries relacionales (plaga+cultivo). '' = no-op.
       let subgrafoBloque = '';
@@ -1321,13 +1341,15 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             return (fincaActiva && fincaActiva.altitud) || null;
           })();
           const tRE0 = performance.now();
-          // SAFETY-CRITICAL en PARALELO: /fermento-prefilter corre junto a
-          // /resolve-entities (mismo turno, antes del LLM) — CERO latencia
-          // serial añadida. Ambos wrappers son no-throw (devuelven null en
-          // error/timeout), así que Promise.all no puede rechazar por ellos.
-          const [resolved, fermento] = await Promise.all([
+          // SAFETY-CRITICAL en PARALELO: /fermento-prefilter y
+          // /biopreparado-grounding corren junto a /resolve-entities (mismo turno,
+          // antes del LLM) — CERO latencia serial añadida. Los tres wrappers son
+          // no-throw (devuelven null en error/timeout), así que Promise.all no
+          // puede rechazar por ellos.
+          const [resolved, fermento, biopreparado] = await Promise.all([
             resolveEntities(textForLLM, { fincaAltitud: reAltitud, context: contextMemory }),
             fermentoPrefilter(textForLLM),
+            biopreparadoGrounding(textForLLM),
           ]);
           const tRE1 = performance.now();
           // FERMENTOS: si el sidecar marcó intención-fermento, inyectamos su
@@ -1343,6 +1365,18 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               disclaimerFuerte: fermento.disclaimer_fuerte,
               fuenteAutoridad: fermento.fuente_autoridad,
               reason: fermento.reason,
+            });
+          }
+          // BIOPREPARADOS: si el sidecar resolvió un biopreparado real contra el
+          // catálogo MCP, inyectamos su bloque (composición/uso + anti-negación)
+          // al final del system prompt (recency máxima). Si el sidecar no
+          // respondió (null) o no hay biopreparado, biopreparadoBlock queda '' →
+          // no-op, el turno sigue sin romperse (degradación graceful, FAIL-SAFE).
+          if (biopreparado && biopreparado.has_biopreparado && typeof biopreparado.system_prompt_block === 'string' && biopreparado.system_prompt_block.trim()) {
+            biopreparadoBlock = biopreparado.system_prompt_block;
+            console.debug('[sidecar] biopreparado-grounding', {
+              biopreparadoId: biopreparado.biopreparado_id,
+              reason: biopreparado.reason,
             });
           }
           if (resolved && Array.isArray(resolved.entities) && resolved.entities.length > 0) {
@@ -1794,7 +1828,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         }
       }
 
-      const rawResponse = await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, subgrafoBloque);
+      const rawResponse = await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, subgrafoBloque, biopreparadoBlock);
       // Fallback estructurado (Item 9): si el LLM retornó vacío (timeout, OOM,
       // modelo caído), construimos una respuesta útil con lo que sabemos
       // (toolEvidence, entidades) en vez de un silencio o banner rojo.
