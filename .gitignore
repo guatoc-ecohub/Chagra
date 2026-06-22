@@ -63,3 +63,7 @@ chagra-anthropic-judge-key
 # corrida puntual: `git add -f <ruta>`. (root 2026-06-04 retro worktrees sucios)
 /data/bench-runs/
 /data/bench-runs-test/
+
+# Salida del dashboard de benches (scripts/bench-dashboard.mjs): HTML + SVG + PNG
+# son artefactos EFÍMEROS regenerables. El script SÍ se versiona; su salida no.
+/out/
