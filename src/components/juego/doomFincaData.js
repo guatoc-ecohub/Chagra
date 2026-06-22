@@ -330,10 +330,16 @@ export const CELDA = 1.0;
 
 /**
  * Posicion inicial del jugador (x, y en coordenadas del mundo).
+ *
+ * FIX (operador, telefono real): antes era (2.5, 2.5), que cae DENTRO de una
+ * cama de cultivo (celda solida [2][2]=5). El jugador nacia incrustado en una
+ * pared y la colision lo dejaba clavado: no podia avanzar en ninguna direccion
+ * (por eso "los controles no me permiten avanzar"). (4.5, 4.5) es una celda
+ * transitable con espacio libre en las cuatro direcciones, mirando al campo.
  */
 export const JUGADOR_INICIAL = {
-  x: 2.5,
-  y: 2.5,
+  x: 4.5,
+  y: 4.5,
   angulo: 0.5, // radianes, mirando hacia el centro del campo
 };
 

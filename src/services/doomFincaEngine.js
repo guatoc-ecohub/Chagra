@@ -314,7 +314,9 @@ function crearPlagasEscenario(esc) {
     const def = plagaDef(plagaId);
     const spawn = esc.spawns[i] || esc.spawns[esc.spawns.length - 1];
     let { x, y } = spawn;
-    if (isWall(MAPA, x, y)) { x = 7.5; y = 6.5; }
+    // Fallback a una celda transitable conocida (la vieja 7.5,6.5 era el muro
+    // de adobe central = pared: una plaga ahi quedaba incrustada e invisible).
+    if (isWall(MAPA, x, y)) { x = 8.5; y = 4.5; }
     return {
       tipo: def.id,
       nombre: def.nombre,

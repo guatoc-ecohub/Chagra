@@ -9,7 +9,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import {
-  PLAGAS_DOOM, BENEFICOS_DOOM, ESCENARIOS, CONFIG_DOOM, MAPA,
+  PLAGAS_DOOM, BENEFICOS_DOOM, ESCENARIOS, CONFIG_DOOM, MAPA, JUGADOR_INICIAL,
 } from '../doomFincaData';
 import {
   createWorld, tickWorld, plagaObjetivo, lanzarBenefico, cambiarBenefico,
@@ -203,6 +203,43 @@ describe('avanzarRonda — progresion', () => {
     }
     expect(w.terminado).toBe(true);
     expect(w.ganado).toBe(true);
+  });
+});
+
+describe('spawn del jugador — no nace en pared (regresion movil)', () => {
+  it('JUGADOR_INICIAL cae en celda transitable', () => {
+    // Bug reportado en telefono real: el spawn (2.5,2.5) caia DENTRO de una
+    // cama de cultivo (celda solida) y la colision dejaba al jugador clavado.
+    expect(isWall(MAPA, JUGADOR_INICIAL.x, JUGADOR_INICIAL.y)).toBe(false);
+  });
+
+  it('desde el spawn el jugador PUEDE avanzar (no queda clavado)', () => {
+    const w = createWorld();
+    expect(isWall(MAPA, w.player.x, w.player.y)).toBe(false);
+    // un avance hacia adelante debe cambiar la posicion (no bloqueado)
+    const next = movePlayer(MAPA, w.player, CONFIG_DOOM.velMovimiento, 0);
+    const movido = Math.hypot(next.x - w.player.x, next.y - w.player.y);
+    expect(movido).toBeGreaterThan(0);
+  });
+
+  it('hay holgura para moverse en las cuatro direcciones desde el spawn', () => {
+    const w = createWorld();
+    const v = CONFIG_DOOM.velMovimiento;
+    const dirs = [[v, 0], [-v, 0], [0, v], [0, -v]];
+    const algunaLibre = dirs.some(([dx, dy]) => {
+      const n = movePlayer(MAPA, w.player, dx, dy);
+      return Math.hypot(n.x - w.player.x, n.y - w.player.y) > 0;
+    });
+    expect(algunaLibre).toBe(true);
+  });
+});
+
+describe('crearPlagasEscenario — todas las plagas nacen transitables', () => {
+  it('ninguna plaga del mundo inicial cae en pared', () => {
+    const w = createWorld();
+    for (const p of w.pests) {
+      expect(isWall(MAPA, p.x, p.y)).toBe(false);
+    }
   });
 });
 
