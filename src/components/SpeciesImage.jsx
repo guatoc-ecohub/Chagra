@@ -47,6 +47,9 @@ export default function SpeciesImage({
   compact = false,
 }) {
   const [state, setState] = useState({ status: 'idle', image: null });
+  const handleImageError = React.useCallback(() => {
+    setState({ status: 'error', image: null });
+  }, []);
   const kind = useMemo(
     () => classifySpecies({ category, commonName, scientificName }),
     [category, commonName, scientificName]
@@ -154,6 +157,7 @@ export default function SpeciesImage({
         alt={`${label} ${scientificName || commonName || ''}`.trim()}
         className={`${compact ? 'h-20' : 'h-44'} w-full object-cover`}
         loading="lazy"
+        onError={handleImageError}
       />
       <figcaption className="absolute inset-x-0 bottom-0 bg-slate-950/82 px-2 py-1.5 backdrop-blur-sm">
         <p className="truncate text-[10px] font-semibold text-slate-100">{label}</p>
