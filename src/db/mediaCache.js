@@ -8,12 +8,14 @@
 
 import { openDB, STORES } from './dbCore';
 
-const DEFAULT_MAX_MB = parseInt(import.meta.env.VITE_MEDIA_CACHE_MAX_MB || '500', 10);
-const EVICT_BATCH_SIZE = 50;
+const MAX_MEDIA_ENTRIES = 300;
+const MAX_MEDIA_MB = parseInt(import.meta.env.VITE_MEDIA_CACHE_MAX_MB || '150', 10);
+const EVICT_DOWN_TO = 250;
 
 export const mediaCache = {
   /**
    * Guarda un blob de imagen asociado a un logId y opcionalmente a un assetId.
+   * Hace LRU eviction ANTES de insertar si el cache supera el limite.
    * @param {string} logId
    * @param {Blob} blob
    * @param {object} options — { mimeType, assetId, ai_diagnosis }
@@ -23,6 +25,10 @@ export const mediaCache = {
     const { mimeType = 'image/webp', assetId = null, ai_diagnosis = null, pinned = false } = typeof options === 'string' ? { mimeType: options } : options;
     const db = await openDB();
     const now = Date.now();
+
+    // LRU eviction antes de agregar — libera espacio para el nuevo registro
+    await evictOldestIfNeeded();
+
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.MEDIA_CACHE, 'readwrite');
       const request = tx.objectStore(STORES.MEDIA_CACHE).add({
@@ -35,11 +41,7 @@ export const mediaCache = {
         createdAt: now,
         lastAccessedAt: now,
       });
-      request.onsuccess = async (e) => {
-        const id = e.target.result;
-        await evictOldestIfNeeded();
-        resolve(id);
-      };
+      request.onsuccess = (e) => resolve(e.target.result);
       tx.onerror = () => reject(tx.error);
     });
   },
@@ -195,52 +197,61 @@ export const mediaCache = {
 };
 
 /**
- * LRU eviction: elimina los blobs más viejos si el cache excede el threshold.
- * NO elimina blobs con pinned: true.
- * @param {number} maxMB — threshold en MB (default 500MB desde VITE_MEDIA_CACHE_MAX_MB)
- * @param {number} batchSize — cuántos borrar por ejecución (default 50)
+ * LRU eviction por conteo de entradas en media_cache.
+ * Cuando el numero de registros supera MAX_MEDIA_ENTRIES, elimina los
+ * blobs menos-recientemente-accedidos (lastAccessedAt ascendente) hasta
+ * llegar a EVICT_DOWN_TO. NO elimina registros con pinned: true.
+ *
+ * @param {number} maxEntries — tope de entradas antes de evictar
+ * @param {number} maxMB — tope opcional de MB (no implementado; reservado)
+ * @returns {Promise<number>} — cantidad de entradas eliminadas
  */
-async function evictOldestIfNeeded(maxMB = DEFAULT_MAX_MB, batchSize = EVICT_BATCH_SIZE) {
-  const maxBytes = maxMB * 1024 * 1024;
+async function evictOldestIfNeeded(maxEntries = MAX_MEDIA_ENTRIES, _maxMB = MAX_MEDIA_MB) {
+  const db = await openDB();
 
   try {
-    const estimate = await navigator.storage.estimate();
-    const currentUsage = estimate.usage || 0;
+    // Fase 1: contar registros en media_cache
+    const countTx = db.transaction(STORES.MEDIA_CACHE, 'readonly');
+    const countStore = countTx.objectStore(STORES.MEDIA_CACHE);
+    const count = await new Promise((resolve, reject) => {
+      const req = countStore.count();
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
 
-    if (currentUsage <= maxBytes) {
+    if (count <= maxEntries) {
       return 0;
     }
 
-    const db = await openDB();
+    // Fase 2: evictar los mas viejos (por lastAccessedAt) hasta EVICT_DOWN_TO
+    const target = Math.max(EVICT_DOWN_TO, Math.floor(maxEntries * 0.8));
+    const toEvict = count - target;
     let evicted = 0;
 
-    const tx = db.transaction(STORES.MEDIA_CACHE, 'readwrite');
-    const store = tx.objectStore(STORES.MEDIA_CACHE);
-    const index = store.index('lastAccessedAt');
-    const cursorReq = index.openCursor();
+    const writeTx = db.transaction(STORES.MEDIA_CACHE, 'readwrite');
+    const writeStore = writeTx.objectStore(STORES.MEDIA_CACHE);
+    const index = writeStore.index('lastAccessedAt');
 
-    const toDelete = [];
-
-    cursorReq.onsuccess = (event) => {
-      const cursor = event.target.result;
-      if (cursor && evicted < batchSize) {
-        const record = cursor.value;
-        if (!record.pinned) {
-          toDelete.push(record.id);
+    return new Promise((resolve, reject) => {
+      const cursorReq = index.openCursor();
+      let deleted = 0;
+      cursorReq.onsuccess = (event) => {
+        const cursor = event.target.result;
+        if (!cursor || deleted >= toEvict) return;
+        if (!cursor.value.pinned) {
           cursor.delete();
+          deleted++;
           evicted++;
         }
         cursor.continue();
-      }
-    };
-
-    return new Promise((resolve) => {
-      tx.oncomplete = () => {
+      };
+      writeTx.oncomplete = () => {
         if (evicted > 0) {
-          console.info(`[MediaCache] LRU evicted ${evicted} blobs (threshold: ${maxMB}MB)`);
+          console.info(`[MediaCache] LRU evicted ${evicted} entries (${count} → ${count - evicted})`);
         }
         resolve(evicted);
       };
+      writeTx.onerror = () => reject(writeTx.error);
     });
   } catch (err) {
     console.warn('[MediaCache] LRU eviction failed:', err.message);
