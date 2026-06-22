@@ -31,6 +31,11 @@ import {
   generateAgronomicGuidanceRules,
   buildProfileContext,
 } from './agentService.js';
+import {
+  tagPassagesOrigin,
+  reconcileOrigins,
+  foreignOriginSuffix,
+} from './ragOriginReconciler.js';
 
 // Cap defensivo para inyectar evidencia del sidecar como context turn
 // sin reventar la ventana de contexto. ~1500 chars ≈ 500-580 tokens —
@@ -523,16 +528,55 @@ REGLA: este análisis es autoritativo para ESTA query. Si dice "Es enumerativa: 
  * delimitar EXPLÍCITAMENTE + instrucción literal de no citarlo como del
  * usuario.
  *
+ * #35 (reconciliación Co ↔ NON-Co): tras ingerir DRs continentales (#34), el
+ * corpus mezcla conocimiento colombiano con foráneo. Aquí se ETIQUETA cada
+ * pasaje por origen y se RECONCILIA: lo colombiano/general va primero como
+ * referencia principal; lo foráneo se separa en un bloque marcado para que el
+ * agente lo presente como complemento ("en otros países se reporta…") y NUNCA
+ * como práctica local validada en Colombia. El origen sale SOLO de señales
+ * estructuradas (ver ragOriginReconciler): si no hay señal, es desconocido —
+ * jamás se asume Colombia (anti-alucinación).
+ *
  * @param {Array<{text:string}>} contextCorpus — chunks recuperados por el RAG.
  * @returns {string} bloque delimitado, o '' si no hay corpus.
  */
 export function buildCorpusContext(contextCorpus) {
   if (!Array.isArray(contextCorpus) || contextCorpus.length === 0) return '';
-  return `
 
-=== INFORMACIÓN DE REFERENCIA AGRONÓMICA (NO viene del usuario, NO citarla como si el usuario te lo hubiera contado) ===
-${contextCorpus.map((c) => c.text).join('\n\n---\n\n')}
-=== FIN REFERENCIA ===
+  const tagged = tagPassagesOrigin(contextCorpus);
+  const { local, foreign, onlyForeign } = reconcileOrigins(tagged);
+
+  // Bloque principal: contexto colombiano + general (origen desconocido).
+  // Si solo hay foráneo, este bloque queda vacío y el foráneo lleva la marca
+  // de "sin validación local" — el agente debe aclararlo.
+  const localText = local.map((c) => c.text).join('\n\n---\n\n');
+  const principal = localText
+    ? `
+
+=== INFORMACIÓN DE REFERENCIA AGRONÓMICA (contexto colombiano / general — NO viene del usuario, NO citarla como si el usuario te lo hubiera contado) ===
+${localText}
+=== FIN REFERENCIA ===`
+    : '';
+
+  // Bloque foráneo (#35): separado y marcado SIEMPRE como complemento.
+  let foraneo = '';
+  if (foreign.length > 0) {
+    const foraneoText = foreign
+      .map((c) => `${c.text}${foreignOriginSuffix(c)}`)
+      .join('\n\n---\n\n');
+    const aviso = onlyForeign
+      ? 'ATENCIÓN: para esta consulta NO hay referencia validada en Colombia, SOLO la siguiente información de OTROS PAÍSES. Preséntala explícitamente como práctica foránea ("en otros países se reporta…") y aclara que no está validada localmente. NO la presentes como práctica colombiana.'
+      : 'La siguiente información es de OTROS PAÍSES, como complemento. Si la usas, preséntala explícitamente como foránea ("en otros países se reporta…"), NUNCA como práctica local validada en Colombia. El contexto colombiano de arriba tiene prioridad.';
+    foraneo = `
+
+=== INFORMACIÓN DE REFERENCIA FORÁNEA (origen fuera de Colombia — complemento, NO equivalente al contexto colombiano) ===
+${aviso}
+
+${foraneoText}
+=== FIN REFERENCIA FORÁNEA ===`;
+  }
+
+  return `${principal}${foraneo}
 
 Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el usuario preguntó. NO menciones síntomas ni observaciones que no estén en su mensaje.`;
 }

@@ -84,6 +84,37 @@ describe('buildCorpusContext', () => {
     expect(b).toContain('cafe arabica');
     expect(b).toContain('REFERENCIA AGRONÓMICA');
   });
+
+  it('#35: separa el pasaje foráneo en un bloque marcado como complemento', () => {
+    const chunks = [
+      { text: 'En Cundinamarca se renueva con estolones propios.', key: 'diferenciador_colombiano' },
+      { text: 'En otros climas se usa otra densidad.', continente: 'Asia' },
+    ];
+    const b = buildCorpusContext(chunks);
+    expect(b).toContain('REFERENCIA AGRONÓMICA');
+    expect(b).toContain('REFERENCIA FORÁNEA');
+    // El colombiano aparece antes que el foráneo en el prompt.
+    expect(b.indexOf('estolones propios')).toBeLessThan(b.indexOf('otra densidad'));
+    // El foráneo lleva la marca de origen estructurado real.
+    expect(b).toContain('[origen: Asia]');
+    expect(b).toContain('en otros países se reporta');
+  });
+
+  it('#35: solo foráneo → avisa que NO hay validación local', () => {
+    const chunks = [{ text: 'Práctica reportada afuera.', origin: 'foreign' }];
+    const b = buildCorpusContext(chunks);
+    expect(b).toContain('REFERENCIA FORÁNEA');
+    expect(b).not.toContain('REFERENCIA AGRONÓMICA (contexto colombiano');
+    expect(b).toContain('NO hay referencia validada en Colombia');
+    expect(b).toContain('[origen: fuera de Colombia]');
+  });
+
+  it('#35: pasajes sin señal de origen NO se marcan como foráneos (van al bloque principal)', () => {
+    const chunks = [{ text: 'Dato sin origen estructurado conocido.' }];
+    const b = buildCorpusContext(chunks);
+    expect(b).toContain('REFERENCIA AGRONÓMICA');
+    expect(b).not.toContain('REFERENCIA FORÁNEA');
+  });
 });
 
 describe('buildCorpusVariants', () => {
