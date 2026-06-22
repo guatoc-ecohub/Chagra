@@ -685,3 +685,62 @@ html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
 [data-theme="nature"] .glaciar-estado-texto {
   color: rgb(var(--c-slate-200));
 }
+
+/* ===========================================================================
+ * COMPOSITOR DEL AGENTE + ContextTip en TEMAS CLAROS (operador 2026-06-22
+ * "sigo viendo nature mal", #72).
+ *
+ * El compositor (.as-bar / .as-iconbtn, AGENT_COMPOSITOR_CSS) está hardcodeado
+ * con slate oscuro rgba(30,41,59,…) — correcto en biopunk (oscuro) pero, sobre
+ * la crema/papel del AgentScreen claro (ver index.css .agent-scrim por tema),
+ * quedaba como una pastilla NEGRA flotando — lo que el operador lee como
+ * "nature mal/sucio". El demo (demo-agente.html .bar) usa --superf cremoso con
+ * botones --blanco y texto --cafe. Aquí lo viramos a la superficie del tema en
+ * nature/minimalista (la indirección --c-* no llega porque son RGBA literales
+ * en el <style> inline del JSX). Biopunk no se toca. Español Colombia.
+ *
+ * También: la tarjeta ContextTip ("¿Una mata enferma?…") usa bg-emerald-950/50;
+ * en nature NO existe --c-emerald-950 → caía al verde-oscuro Tailwind. Sobre la
+ * crema quedaba como un bloque verde oscuro. La viramos a una tarjeta clara con
+ * borde salvia del tema. =========================================================================== */
+
+/* Pastilla del compositor → superficie clara del tema (= --superf del demo). */
+[data-theme="nature"] .as-bar,
+[data-theme="minimalista"] .as-bar {
+  background: rgb(var(--c-surface-raised) / 0.97);
+  border-color: rgb(var(--c-surface-border));
+  box-shadow: 0 10px 30px -14px rgba(0, 0, 0, 0.22);
+}
+/* Texto que escribe el productor: el textarea es text-white (invisible sobre
+ * crema). En claros = café/tinta del tema. El placeholder ya sale de --c-*. */
+[data-theme="nature"] .as-bar textarea,
+[data-theme="minimalista"] .as-bar textarea {
+  color: rgb(var(--c-slate-100));
+}
+/* Botones de ícono del compositor → blanco/papel con ícono café del tema. */
+[data-theme="nature"] .as-iconbtn,
+[data-theme="minimalista"] .as-iconbtn {
+  background: rgb(var(--c-surface-card));
+  border-color: rgb(var(--c-surface-border));
+  color: rgb(var(--c-slate-300));
+}
+[data-theme="nature"] .as-iconbtn:hover,
+[data-theme="minimalista"] .as-iconbtn:hover {
+  color: rgb(var(--c-slate-100));
+  border-color: rgb(var(--t-accent-rgb) / 0.55);
+}
+
+/* ContextTip ("¿Una mata enferma? Mándeme una foto") — tarjeta clara del tema
+ * en vez del verde-oscuro Tailwind (no hay --c-emerald-950 en claros). */
+[data-theme="nature"] .bg-emerald-950\/50,
+[data-theme="minimalista"] .bg-emerald-950\/50 {
+  background-color: rgb(var(--c-surface-raised) / 0.92) !important;
+  border-color: rgb(var(--c-emerald-400) / 0.5) !important;
+}
+/* Su título usa text-emerald-100 (sin token --c-emerald-100 → cae al verde casi
+ * blanco de Tailwind, ilegible sobre la tarjeta clara). En claros = verde
+ * profundo del tema, que sí pasa AA sobre la crema. */
+[data-theme="nature"] .bg-emerald-950\/50 .text-emerald-100,
+[data-theme="minimalista"] .bg-emerald-950\/50 .text-emerald-100 {
+  color: rgb(var(--c-emerald-700));
+}
