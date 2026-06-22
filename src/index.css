@@ -367,6 +367,22 @@
     background-color: rgb(var(--scrim-bg) / calc(var(--scrim-opacity) * 1.62));
   }
 
+  /* PARIDAD DEMO (operador 2026-06-22 "sigo viendo nature mal", #72): en los
+   * temas CLAROS el fondo del cuerpo es el cielo AMANECER ámbar/ocre del demo
+   * (radial #ffe8c2→#f8d9a6→#f3c98e). En el HOME ese cielo es la escena
+   * inmersiva correcta — pero la PANTALLA DEL AGENTE (chat) no usa el AgentHero:
+   * usa SOLO .agent-scrim sobre ese mismo cuerpo. Con el scrim crema débil
+   * (0.12·1.62≈0.20) el ocre se colaba como un fondo "sucio/marrón" detrás del
+   * chat, en vez de la SUPERFICIE clara tipo papel del demo (.sky linear
+   * #fbe9c8→#eef0db + burbujas blancas). Aquí subimos el velo del AgentScreen
+   * a un crema casi opaco SOLO en temas claros → el chat queda sobre papel
+   * limpio (= --c-surface del tema), como demo-agente.html. El HOME no se toca
+   * (no lleva .agent-scrim) y biopunk conserva su navy denso. */
+  [data-theme="nature"] .agent-scrim,
+  [data-theme="minimalista"] .agent-scrim {
+    background-color: rgb(var(--c-surface) / 0.94);
+  }
+
   /* Bandeja opaca para filas de chips/sugerencias (QuickChipsBar, SuggestedActions,
    * ChipsToolbar). Reemplaza los wrappers translúcidos: superficie raised del
    * tema + blur de respaldo + borde superior. */
