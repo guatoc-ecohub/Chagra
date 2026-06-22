@@ -1579,56 +1579,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
 
       {/* Lista de zonas (nivel raíz del drill-down, solo para plant) */}
       {viewMode === 'list' && activeTab === 'plant' && !currentZoneId && (
-        <div className="flex-1 overflow-y-auto p-3 space-y-2">
-          {/* Card de plantas huérfanas: visibiliza cultivos sin zona asignada.
-              Aparece antes de la lista de zonas cuando hay huérfanas. */}
-          {orphanPlants.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setCurrentZoneId('__orphan__')}
-              className="w-full p-4 rounded-xl bg-amber-900/20 border border-amber-700/50 hover:bg-amber-900/30 text-left transition-colors"
-            >
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="p-2.5 rounded-lg bg-amber-900/40 shrink-0">
-                    <TreePine size={20} className="text-amber-300" />
-                  </div>
-                  <div className="min-w-0">
-                    <h4 className="font-bold text-amber-100 truncate">Sin zona asignada</h4>
-                    <p className="text-xs text-amber-300/80">Reasigna estas plantas a una zona</p>
-                  </div>
-                </div>
-                <div className="text-right shrink-0">
-                  <span className="text-2xl font-black text-amber-300 tabular-nums">{orphanPlants.length}</span>
-                  <p className="text-[10px] text-amber-300/60 uppercase">cultivos</p>
-                </div>
-              </div>
-            </button>
-          )}
-          {cemeteryCount > 0 && (
-            <button
-              type="button"
-              onClick={() => setCurrentZoneId('__cemetery__')}
-              className="w-full p-4 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-800 text-left transition-colors"
-              title="Plantas perdidas, espacio para revisar lecciones aprendidas"
-            >
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="p-2.5 rounded-lg bg-slate-800 shrink-0 text-2xl leading-none">
-                    🪦
-                  </div>
-                  <div className="min-w-0">
-                    <h4 className="font-bold text-slate-200 truncate">Cementerio</h4>
-                    <p className="text-xs text-slate-500">Lo que se perdió. Sin juicio, son datos para aprender.</p>
-                  </div>
-                </div>
-                <div className="text-right shrink-0">
-                  <span className="text-2xl font-black text-slate-400 tabular-nums">{cemeteryCount}</span>
-                  <p className="text-[10px] text-slate-500 uppercase">cultivos</p>
-                </div>
-              </div>
-            </button>
-          )}
+        <div className="flex-1">
           {lands.length === 0 && orphanPlants.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-slate-500">
               <MapPin size={48} className="mb-3 opacity-30" />
@@ -1636,35 +1587,98 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
               <p className="text-sm mt-1">Crea una zona (asset--land) desde FarmOS o la tab Infraestructura</p>
             </div>
           ) : (
-            getZonesForDrillDown().map((zone) => {
-              const zname = zone.attributes?.name || zone.name || 'Sin nombre';
-              const subType = zone.attributes?.land_type || zone.attributes?.sub_type || 'zona';
-              const plantCount = plants.filter((p) => getParentLandId(p) === zone.id).length;
-              return (
-                <button
-                  key={zone.id}
-                  type="button"
-                  onClick={() => setCurrentZoneId(zone.id)}
-                  className="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-700 text-left transition-colors"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className={`p-2.5 rounded-lg ${colors.light} shrink-0`}>
-                        <MapPin size={20} className={colors.text} />
+            <Virtuoso
+              data={getZonesForDrillDown()}
+              style={{ height: '100%' }}
+              overscan={200}
+              components={{
+                Header: () => (
+                  <>
+                    {orphanPlants.length > 0 && (
+                      <div className="px-3 pt-3 pb-2">
+                        <button
+                          type="button"
+                          onClick={() => setCurrentZoneId('__orphan__')}
+                          className="w-full p-4 rounded-xl bg-amber-900/20 border border-amber-700/50 hover:bg-amber-900/30 text-left transition-colors"
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="p-2.5 rounded-lg bg-amber-900/40 shrink-0">
+                                <TreePine size={20} className="text-amber-300" />
+                              </div>
+                              <div className="min-w-0">
+                                <h4 className="font-bold text-amber-100 truncate">Sin zona asignada</h4>
+                                <p className="text-xs text-amber-300/80">Reasigna estas plantas a una zona</p>
+                              </div>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <span className="text-2xl font-black text-amber-300 tabular-nums">{orphanPlants.length}</span>
+                              <p className="text-[10px] text-amber-300/60 uppercase">cultivos</p>
+                            </div>
+                          </div>
+                        </button>
                       </div>
-                      <div className="min-w-0">
-                        <h4 className="font-bold text-slate-200 truncate">{zname}</h4>
-                        <p className="text-xs text-slate-500 uppercase">{subType}</p>
+                    )}
+                    {cemeteryCount > 0 && (
+                      <div className="px-3 pb-2">
+                        <button
+                          type="button"
+                          onClick={() => setCurrentZoneId('__cemetery__')}
+                          className="w-full p-4 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-800 text-left transition-colors"
+                          title="Plantas perdidas, espacio para revisar lecciones aprendidas"
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="p-2.5 rounded-lg bg-slate-800 shrink-0 text-2xl leading-none">
+                                🪦
+                              </div>
+                              <div className="min-w-0">
+                                <h4 className="font-bold text-slate-200 truncate">Cementerio</h4>
+                                <p className="text-xs text-slate-500">Lo que se perdió. Sin juicio, son datos para aprender.</p>
+                              </div>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <span className="text-2xl font-black text-slate-400 tabular-nums">{cemeteryCount}</span>
+                              <p className="text-[10px] text-slate-500 uppercase">cultivos</p>
+                            </div>
+                          </div>
+                        </button>
                       </div>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <span className="text-2xl font-black text-lime-400 tabular-nums">{plantCount}</span>
-                      <p className="text-[10px] text-slate-500 uppercase">cultivos</p>
-                    </div>
+                    )}
+                  </>
+                ),
+              }}
+              itemContent={(index, zone) => {
+                const zname = zone.attributes?.name || zone.name || 'Sin nombre';
+                const subType = zone.attributes?.land_type || zone.attributes?.sub_type || 'zona';
+                const plantCount = plants.filter((p) => getParentLandId(p) === zone.id).length;
+                return (
+                  <div className="px-3 pb-2">
+                    <button
+                      type="button"
+                      onClick={() => setCurrentZoneId(zone.id)}
+                      className="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-700 text-left transition-colors"
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className={`p-2.5 rounded-lg ${colors.light} shrink-0`}>
+                            <MapPin size={20} className={colors.text} />
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="font-bold text-slate-200 truncate">{zname}</h4>
+                            <p className="text-xs text-slate-500 uppercase">{subType}</p>
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span className="text-2xl font-black text-lime-400 tabular-nums">{plantCount}</span>
+                          <p className="text-[10px] text-slate-500 uppercase">cultivos</p>
+                        </div>
+                      </div>
+                    </button>
                   </div>
-                </button>
-              );
-            })
+                );
+              }}
+            />
           )}
         </div>
       )}
