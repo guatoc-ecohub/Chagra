@@ -447,6 +447,38 @@ export async function fermentoPrefilter(userMessage) {
 }
 
 /**
+ * Capa 1 GROUNDING de BIOPREPARADOS (chagra-pro #248). Espejo exacto de
+ * `fermentoPrefilter`: llama `POST ${BASE}/biopreparado-grounding` con
+ * `{ user_message }` para que el sidecar resuelva, contra el catálogo MCP, si la
+ * query toca un biopreparado real (p.ej. caldo bordelés) y devuelva un bloque de
+ * system prompt con su composición/uso curados + la regla anti-negación
+ * ("NUNCA digas que este insumo no existe"). FAIL-SAFE: ante MCP caído el sidecar
+ * NO fabrica datos; este wrapper, además, es no-throw (devuelve null en
+ * flag off / offline / timeout / 5xx / error de red), así que el caller degrada
+ * con gracia (no inyecta bloque, no rompe el turno). Cuando `has_biopreparado`
+ * es false, NO hay que inyectar nada.
+ *
+ * @param {string} userMessage — texto del operador.
+ * @returns {Promise<null | {
+ *   has_biopreparado: boolean,
+ *   biopreparado_id: string | null,
+ *   system_prompt_block: string,
+ *   reason: string,
+ * }>}
+ */
+export async function biopreparadoGrounding(userMessage) {
+  if (!userMessage || typeof userMessage !== 'string') return null;
+  const raw = await postJson('/biopreparado-grounding', { user_message: userMessage }, NLU_TIMEOUT_MS);
+  if (!raw || typeof raw !== 'object') return null;
+  return {
+    has_biopreparado: raw.has_biopreparado === true,
+    biopreparado_id: typeof raw.biopreparado_id === 'string' ? raw.biopreparado_id : null,
+    system_prompt_block: typeof raw.system_prompt_block === 'string' ? raw.system_prompt_block : '',
+    reason: typeof raw.reason === 'string' ? raw.reason : '',
+  };
+}
+
+/**
  * Capa 2 anti-alucinación (cross-check de contexto). Llama
  * `POST ${BASE}/post-validate` con el TEXTO que el LLM ya generó y, opcional,
  * los `nombre_cientifico` de las entidades que la capa 1 resolvió para el turno
