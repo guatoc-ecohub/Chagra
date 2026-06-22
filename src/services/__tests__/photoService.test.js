@@ -1,5 +1,24 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { captureAndCompress, getPhotoUrl } from '../photoService.js';
+
+// Mock de la capa IndexedDB: sin foto de usuario, así getPhotoUrl pasa de
+// tier 1/2 (overrides de usuario) al tier 3 (foto de catálogo), que es lo
+// que estos tests ejercitan. openDB devuelve un cursor vacío.
+vi.mock('../../db/dbCore', () => ({
+  STORES: { MEDIA_CACHE: 'media_cache' },
+  openDB: vi.fn(async () => ({
+    transaction: () => ({
+      objectStore: () => ({
+        openCursor: () => {
+          const req = {};
+          // Cursor vacío → resuelve null (sin foto de usuario).
+          queueMicrotask(() => req.onsuccess && req.onsuccess({ target: { result: null } }));
+          return req;
+        },
+      }),
+    }),
+  })),
+}));
 
 describe('photoService', () => {
   describe('captureAndCompress', () => {
@@ -121,8 +140,32 @@ describe('photoService', () => {
   });
 
   describe('getPhotoUrl', () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
     it('es una funcion exportada', () => {
       expect(typeof getPhotoUrl).toBe('function');
+    });
+
+    // Bug ficha de especie: el SPA fallback de Nginx sirve index.html con
+    // 200 text/html para /catalog-photos/<slug>.jpg (la imagen NO existe).
+    // El chequeo debe rechazarlo por Content-Type y caer al placeholder, NO
+    // devolverlo como foto de catálogo (eso producía un <img> roto).
+    it('NO trata el index.html del SPA fallback como foto de catálogo', async () => {
+      const headers = { get: (k) => (k.toLowerCase() === 'content-type' ? 'text/html' : null) };
+      vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, headers })));
+      const result = await getPhotoUrl({ speciesSlug: 'solanum_betaceum' });
+      expect(result.source).toBe('placeholder');
+      expect(result.url).not.toContain('/catalog-photos/');
+    });
+
+    it('SÍ usa la foto de catálogo cuando el Content-Type es image/*', async () => {
+      const headers = { get: (k) => (k.toLowerCase() === 'content-type' ? 'image/jpeg' : null) };
+      vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, headers })));
+      const result = await getPhotoUrl({ speciesSlug: 'solanum_betaceum' });
+      expect(result.source).toBe('catalog');
+      expect(result.url).toContain('/catalog-photos/solanum_betaceum.jpg');
     });
   });
 });

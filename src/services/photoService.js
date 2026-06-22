@@ -171,7 +171,7 @@ export async function getPhotoUrl({ assetId, speciesSlug } = {}) {
     // 3) catalog default
     if (speciesSlug) {
       const catalogUrl = `${CATALOG_PHOTOS_BASE}/${speciesSlug}.jpg`;
-      const exists = await checkUrlExists(catalogUrl);
+      const exists = await checkImageExists(catalogUrl);
       if (exists) {
         return { url: catalogUrl, source: 'catalog' };
       }
@@ -356,10 +356,22 @@ async function findLatestUserPhoto({ assetId, speciesSlug, logId }) {
   });
 }
 
-async function checkUrlExists(url) {
+// Verifica que `url` sea una IMAGEN real y no el index.html que el SPA
+// fallback de Nginx sirve con 200 para cualquier ruta inexistente.
+//
+// Bug (ficha de especie): `/catalog-photos/<slug>.jpg` NO existe como archivo
+// (la carpeta solo trae un README). El SPA fallback responde `200 text/html`
+// (index.html), así que un chequeo `response.ok` se engaña, cree que la foto
+// del catálogo existe, y la ficha renderiza un `<img>` que apunta a HTML →
+// imagen rota (naturalWidth=0), y además suprime la foto buena de
+// SpeciesImage (iNaturalist) porque cree que ya hay foto. Validamos
+// `Content-Type: image/*` para que solo cuente como existente una imagen real.
+async function checkImageExists(url) {
   try {
     const r = await fetch(url, { method: 'HEAD' });
-    return r.ok;
+    if (!r.ok) return false;
+    const contentType = r.headers.get('content-type') || '';
+    return /^image\//i.test(contentType.trim());
   } catch {
     return false;
   }
