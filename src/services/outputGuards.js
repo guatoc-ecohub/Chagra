@@ -7696,6 +7696,231 @@ export function stripInternalsLeak(responseText) {
   };
 }
 
+// ── GUARD REDACCIÓN DE LEAK DE TOOLING (modifica EL TEXTO mostrado) ──────────
+//
+// Espejo, en la capa que SÍ reescribe la respuesta visible, de
+// `sanitizeToolingLeak` del sidecar (modules/agro-mcp/sidecar/src/lib/
+// response-safety.ts). A diferencia de `stripInternalsLeak` —que NUKEA toda la
+// respuesta a un redirect genérico cuando detecta modelo/instrucciones— este
+// guard es QUIRÚRGICO: REDACTA in-line los identificadores internos
+// (query_corpus_*, "corpus DR-034", DR-NNN, nombres de tools get_*/query_*,
+// rutas /home·modules·*.ts) y deja intacto el contenido agronómico legítimo.
+//
+// Motivación (verificación en vivo, agente prod 2026-06-21): el agente a veces
+// responde "...puedo buscar en el corpus DR-034 / usa query_corpus_dr034..."
+// (plomería interna). El usuario campesino JAMÁS debe ver eso. El sidecar lo
+// redacta pero el PWA solo lo usaba para la badge (no reescribía); aquí sí
+// modificamos `guarded.text`.
+//
+// Anti-falso-positivo: NO toca términos legítimos (caldo bordelés, binomios
+// latinos, Ley 1930/2018, Decreto 1007). La denylist es cerrada y específica de
+// la plomería interna; no incluímos el allow-list completo de tools (eso vive en
+// el repo privado) sino el patrón genérico `get_*`/`query_*` de tool interno.
+
+/** Marcador con el que reemplazamos cualquier referencia interna filtrada. */
+export const TOOLING_LEAK_REDACTION = 'el catálogo';
+
+// Patrones de leak de tooling interno, ordenados para redactar de fuera-a-dentro
+// (la frase delatora primero, luego los identificadores sueltos). Cada uno es
+// global para redactar TODAS las apariciones.
+const TOOLING_LEAK_PATTERNS = [
+  // 1. La frase delatora completa "(voy a) usar/utilizar/invocar/llamar (a) la
+  //    herramienta/función `get_x`/`query_corpus_x`" → se reemplaza entera por algo
+  //    natural ("lo busco en el catálogo"), absorbiendo el lead-in "voy a"/"a"
+  //    para no dejar "voy a ... el catálogo" agramatical ni "la herramienta el
+  //    catálogo" colgando.
+  {
+    re: /\b(?:(?:te\s+)?voy\s+a\s+|puedo\s+|puede[sn]?\s+|podr[íi]a\s+|a\s+)?(?:usar|usa|utilizar|utiliza|invocar|invoca|llamar(?:\s+a)?|llama(?:\s+a)?)\s+(?:la\s+|el\s+|mi\s+|una\s+)?(?:herramienta|funci[óo]n|tool|comando)\s+`?(?:query_corpus[a-z0-9_]*|get_[a-z0-9_]+|query_[a-z0-9_]+)`?(?:\s*\([^)]*\))?/gi,
+    repl: 'lo busco en el catálogo',
+  },
+  // 2. "puedo/puede buscar(lo)/consultar(lo) en el corpus DR-034 / en query_corpus_x"
+  //    → "puedo buscarlo en el catálogo". Cubre el caso exacto de la verificación.
+  {
+    re: /\b(?:puedo|puede[sn]?|podr[íi]a)\s+(?:buscar(?:lo|la)?|consultar(?:lo|la)?|revisar(?:lo|la)?)\s+(?:en|con)\s+(?:el\s+|la\s+|mi\s+|nuestro\s+)?(?:corpus\s+)?(?:DR[-\s]?[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*|query_corpus[a-z0-9_]*|get_[a-z0-9_]+|query_[a-z0-9_]+)(?:\s*\([^)]*\))?/gi,
+    repl: 'puedo buscarlo en el catálogo',
+  },
+  // 3. `query_corpus...` suelto (función/tool RAG que el modelo nombra al razonar),
+  //    con o sin backticks, con sufijo `_dr034` y/o `(...)`.
+  { re: /`?\bquery_corpus[a-z0-9_]*\b(?:\s*\([^)]*\))?`?/gi, repl: TOOLING_LEAK_REDACTION },
+  // 4. Identificadores DR/corpus internos: "corpus DR-034", "DR-034", "DR-CHAGRA-…".
+  //    El prefijo "corpus" opcional se absorbe para no dejarlo huérfano.
+  { re: /`?\b(?:corpus\s+)?DR[-\s][A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*\b`?/gi, repl: TOOLING_LEAK_REDACTION },
+  // 5. "el corpus interno / citable / de DRs / corpus DR" como referencia a la
+  //    plomería RAG (no es vocabulario campesino). Solo con calificativo interno.
+  { re: /\b(?:el\s+|nuestro\s+|del\s+|mi\s+)?corpus\s+(?:interno|citable|de\s+drs?|dr)\b/gi, repl: TOOLING_LEAK_REDACTION },
+  // 6. Nombres de tools internas en prosa (get_x / query_x), con o sin backticks.
+  //    Patrón genérico — NO enumeramos el allow-list privado.
+  { re: /`?\b(?:get|query)_[a-z][a-z0-9_]+\b`?(?:\s*\([^)]*\))?/gi, repl: TOOLING_LEAK_REDACTION },
+  // 7. Rutas internas obvias (/home/..., modules/...) y archivos fuente *.ts/*.js.
+  {
+    re: /(?:\/home\/[^\s`]+|\bmodules\/[A-Za-z0-9_\-/]+(?:\.(?:ts|js|mjs|cjs))?|\b[A-Za-z0-9_\-/]+\.(?:ts|js|mjs|cjs))\b/g,
+    repl: TOOLING_LEAK_REDACTION,
+  },
+];
+
+// Detector barato (sin reemplazar) para el early-exit: ¿hay ALGÚN patrón de leak?
+const TOOLING_LEAK_DETECT_RE =
+  /\bquery_corpus[a-z0-9_]*\b|\b(?:corpus\s+)?DR[-\s][A-Za-z0-9]|\bcorpus\s+(?:interno|citable|de\s+drs?|dr)\b|\b(?:get|query)_[a-z][a-z0-9_]+\b|\/home\/|\bmodules\/[A-Za-z0-9_]|\b[A-Za-z0-9_\-/]+\.(?:ts|js|mjs|cjs)\b/i;
+
+/**
+ * guardToolingLeakRedaction — REDACTA in-line el leak de tooling interno del
+ * TEXTO mostrado al usuario, conservando el resto de la respuesta. Determinista,
+ * pura, idempotente (el marcador `el catálogo` no re-dispara). Corre SIEMPRE
+ * (no gateada por entidades ni por intención de siembra). Espejo aplicado-al-
+ * texto de `sanitizeToolingLeak` del sidecar.
+ *
+ * @param {string} responseText — texto del LLM.
+ * @returns {{text:string, modified:boolean, reason:string|null, patterns?:string[]}}
+ */
+export function guardToolingLeakRedaction(responseText) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (!TOOLING_LEAK_DETECT_RE.test(responseText)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  const patterns = [];
+  let out = responseText;
+  for (const { re, repl } of TOOLING_LEAK_PATTERNS) {
+    out = out.replace(re, (match) => {
+      const trimmed = match.trim();
+      if (trimmed && !patterns.includes(trimmed)) patterns.push(trimmed);
+      return repl;
+    });
+  }
+  // Limpieza de residuos: "la herramienta el catálogo" / "en el corpus el catálogo"
+  // → "el catálogo"; dobles marcadores contiguos → uno solo; espacios duplicados.
+  out = out
+    .replace(/\b(?:la|el|una|mi)\s+(?:herramienta|funci[óo]n|tool|comando)\s+el catálogo\b/gi, TOOLING_LEAK_REDACTION)
+    .replace(/\b(?:en|con|del?)\s+(?:el|la|nuestro|mi)?\s*corpus\s+el catálogo\b/gi, 'en el catálogo')
+    .replace(new RegExp(`(?:${TOOLING_LEAK_REDACTION})(?:[ ,]+(?:${TOOLING_LEAK_REDACTION}))+`, 'g'), TOOLING_LEAK_REDACTION)
+    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/\s+([,.;:])/g, '$1');
+
+  if (out === responseText || patterns.length === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  bumpGuardTelemetry('tooling_leak_redaction');
+  return {
+    text: out,
+    modified: true,
+    reason: `tooling_leak_redaction: ${patterns.slice(0, 5).join(', ')}`,
+    patterns,
+  };
+}
+
+// ── GUARD CORRECCIÓN DE QUEMA (antepone corrección al TEXTO mostrado) ────────
+//
+// Espejo aplicado-al-texto de `detectBurnEndorsement` + `buildBurnSafetyCorrection`
+// del sidecar. Si la respuesta presenta la quema como beneficiosa/balanceada
+// ("la quema puede tener beneficios", "la ceniza aporta potasio y calcio") y NO
+// la desaconseja, ANTEPONE una corrección que desaconseja la quema (pérdida de
+// materia orgánica/biología del suelo, contaminación del aire), cita la Ley
+// 1930/2018 (páramo) y ofrece alternativas (incorporar rastrojo, mulch, compost,
+// abonos verdes).
+//
+// Verificación en vivo (agente prod 2026-06-21): "la quema puede tener
+// beneficios... liberar nutrientes" — el agente NO la desaconseja.
+//
+// ADITIVO (no nuke): preserva el cuerpo original tras la corrección. Idempotente
+// (no re-dispara si la corrección ya está). Corre SIEMPRE.
+//
+// Anti-falso-positivo: requiere (verbo de quema + endoso) O fraseo ceniza-como-
+// nutriente. Una respuesta agroecológica normal que menciona "Ley 1930" o
+// "el compost aporta nutrientes" SIN quema NO dispara. Tampoco dispara si la
+// respuesta ya desaconseja la quema.
+
+const BURN_CORRECTION_MARKER = 'no se recomienda quemar';
+
+// Verbos/acciones de QUEMA agrícola.
+const BURN_ACTION_RE =
+  /\bquema(?:r|s|n|do|da|ndo)?\b|\bquemo\b|\bquemes?\b|\brocer[íi]a\b|\bsocola\b|\btumba\s+y\s+quema\b|\bincendi(?:o|ar|os)\b|\bprender(?:le)?\s+fuego\b|\bfuego\s+(?:al|a\s+la|controlado)\b/i;
+
+// Términos de ENDOSO (presentar la quema como buena/útil/balanceada).
+const BURN_ENDORSE_RE =
+  /\bbeneficios?[ao]?s?\b|\bbuena?\b|\brecomend(?:able|ada|ado|amos|o)\b|\bs[íi]rve\b|\bayuda(?:r)?\b|\bmejora(?:r)?\b|\bfertiliza\b|\benriquece\b|\bventaja(?:s)?\b|\bpermitid[ao]\b|\bpuede(?:n)?\s+tener\s+beneficios?\b|\bdesventajas?\b|\baporta(?:r|n)?\s+(?:nutrientes?|potasio|calcio|f[óo]sforo|minerales?|nitr[óo]geno)\b|\blibera(?:r|n)?\s+(?:nutrientes?|potasio|calcio|f[óo]sforo|minerales?)\b/i;
+
+// Fraseo "pro-quema suave" vía la CENIZA como aporte nutricional. Tan específico
+// que dispara aun SIN verbo de quema explícito (la ceniza presupone la quema).
+const BURN_ASH_FRAMING_RE =
+  /\bcenizas?\b[^.!?\n]{0,80}\b(?:aporta(?:r|n)?|proporciona(?:r|n)?|devuelve(?:n)?|libera(?:r|n)?|a[ñn]ade(?:n)?|enriquece(?:r|n)?|tiene(?:n)?|contiene(?:n)?|es\s+rica|son\s+ricas|fuente)\b|\b(?:aporta(?:r|n)?|proporciona(?:r|n)?|devuelve(?:n)?|libera(?:r|n)?|fuente\s+de)\b[^.!?\n]{0,40}\bcenizas?\b/i;
+
+// Señales de que el agente YA desaconseja la quema (respuesta correcta → no tocar).
+const BURN_DISCOURAGE_RE =
+  /\bno\s+(?:se\s+(?:debe|recomienda)\s+|deber[íi]as?\s+|hay\s+que\s+|conviene\s+)?(?:quemar|quemes|quemen|hacer\s+quemas?)\b|\bno\s+se\s+recomienda\s+(?:la\s+)?quem|\bevit[ae]\s+(?:la\s+)?quemas?\b|\b(?:est[áa]\s+)?prohibid[ao]\b|\bes\s+ilegal\b|\bdesaconsej/i;
+
+// Contexto páramo / área protegida (agravante legal Ley 1930/2018).
+const BURN_PARAMO_RE =
+  /\bp[áa]ramo(?:s)?\b|\b[áa]rea\s+protegida\b|\breserva\s+natural\b|\becosistema\s+estrat[ée]gico\b/i;
+
+/**
+ * Texto correctivo anti-quema (fundamentado en Ley 1930/2018 + alternativas
+ * agroecológicas). `paramo=true` agrega el marco legal específico de páramo.
+ * @param {boolean} paramo
+ * @returns {string}
+ */
+export function buildBurnSafetyCorrection(paramo) {
+  const legal = paramo
+    ? 'En PÁRAMO la quema es un delito grave: los páramos son Áreas Estratégicas ' +
+      'protegidas por la Ley 1930 de 2018, y la quema (incluido el rozamiento para ' +
+      'preparar tierra) puede acarrear sanciones. No existe una "quema pequeña ' +
+      'permitida". Antes de cualquier actividad consulta la CAR (Corporación Autónoma Regional).'
+    : 'Las quemas agrícolas a campo abierto están reguladas y, en general, ' +
+      'restringidas en Colombia: requieren autorización de la autoridad ambiental ' +
+      '(CAR) y pueden ser sancionadas. En áreas protegidas y páramo están prohibidas ' +
+      '(Ley 1930 de 2018).';
+  return [
+    `⚠️ Importante: ${BURN_CORRECTION_MARKER}. La quema NO es una opción equilibrada: ` +
+      'el aporte de la ceniza (potasio, calcio) es marginal y temporal frente al daño ' +
+      'permanente. Quemar destruye la materia orgánica, mata la biología del suelo, ' +
+      'deja el terreno expuesto a la erosión y contamina el aire (humo y material particulado).',
+    legal,
+    'Alternativas agroecológicas, sin quemar, para manejar la biomasa y los rastrojos:',
+    '• Incorporar el rastrojo picado al suelo para que se descomponga y aporte materia orgánica.',
+    '• Dejar cobertura muerta (mulch) sobre el suelo: conserva humedad, regula temperatura y nutre.',
+    '• Compostar los residuos vegetales (compost, bocashi) y devolverlos como abono.',
+    '• Sembrar abonos verdes para cubrir y nutrir el suelo entre ciclos.',
+    'Fuente: Ley 1930 de 2018, lineamientos CAR.',
+  ].join('\n');
+}
+
+/**
+ * guardBurnEndorsementCorrection — si la respuesta endosa/balancea la quema sin
+ * desaconsejarla, ANTEPONE `buildBurnSafetyCorrection`. ADITIVO (preserva el
+ * cuerpo), determinista, puro, idempotente. Corre SIEMPRE. Espejo aplicado-al-
+ * texto de `detectBurnEndorsement` del sidecar.
+ *
+ * @param {string} responseText — texto del LLM.
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardBurnEndorsementCorrection(responseText) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Idempotencia: ya corregido.
+  if (responseText.includes(BURN_CORRECTION_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  const hasBurn = BURN_ACTION_RE.test(responseText);
+  const hasEndorse = BURN_ENDORSE_RE.test(responseText);
+  const hasAshFraming = BURN_ASH_FRAMING_RE.test(responseText);
+  const discourages = BURN_DISCOURAGE_RE.test(responseText);
+
+  // Endosa si: (verbo de quema + endoso) O fraseo ceniza-como-nutriente, y NO
+  // está ya desaconsejando.
+  const endorses = ((hasBurn && hasEndorse) || hasAshFraming) && !discourages;
+  if (!endorses) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  const paramo = BURN_PARAMO_RE.test(responseText);
+  bumpGuardTelemetry('burn_endorsement_correction');
+  return {
+    text: `${buildBurnSafetyCorrection(paramo)}\n\n${responseText.trim()}`,
+    modified: true,
+    reason: `quema_balanceada_corregida${paramo ? '_paramo' : ''}`,
+  };
+}
+
 // ── GUARD CROP-AGNOSTIC: trampas de seguridad anti-falsa-cura (aplican a cualquier cultivo) ─────────────────────
 
 const CROP_AGNOSTIC_SAFETY_MARKER = 'Seguridad:';
@@ -7930,8 +8155,9 @@ export function applyOutputGuards(
   let modified = false;
   const reasons = [];
 
-  // GUARD CONFIDENCIALIDAD: si el modelo revela o inventa internos, se
-  // reemplaza toda la respuesta antes de que otros guards anexen contenido.
+  // GUARD CONFIDENCIALIDAD: si el modelo revela o inventa internos (modelo,
+  // instrucciones, grafo), se reemplaza toda la respuesta antes de que otros
+  // guards anexen contenido.
   const internals = stripInternalsLeak(text);
   if (internals && internals.modified) {
     return {
@@ -7939,6 +8165,21 @@ export function applyOutputGuards(
       modified: true,
       reasons: internals.reason ? [internals.reason] : [],
     };
+  }
+
+  // GUARD REDACCIÓN DE LEAK DE TOOLING: si el modelo nombra plomería interna en
+  // medio de una respuesta por lo demás útil (query_corpus_*, "corpus DR-034",
+  // get_*/query_*, rutas /home·modules·*.ts), NO nukeamos la respuesta —
+  // REDACTAMOS in-line los identificadores y conservamos el contenido agronómico.
+  // Va justo tras stripInternalsLeak (que sí nukea su set narrow de internos) y
+  // ANTES de cualquier guard que anexe texto, para que ningún anexo contamine la
+  // redacción. Corre SIEMPRE (no gateado por entidades). Espejo aplicado-al-texto
+  // de sanitizeToolingLeak del sidecar.
+  const toolingLeak = guardToolingLeakRedaction(text);
+  if (toolingLeak && toolingLeak.modified) {
+    text = toolingLeak.text;
+    modified = true;
+    if (toolingLeak.reason) reasons.push(toolingLeak.reason);
   }
 
   // GUARD CROP-AGNOSTIC SAFETY: debe liderar ANTES que cualquier guard específico.
@@ -8388,6 +8629,20 @@ export function applyOutputGuards(
     text = cwRes.text;
     modified = true;
     if (cwRes.reason) reasons.push(cwRes.reason);
+  }
+  // Guard CORRECCIÓN DE QUEMA (SAFETY/legal): si la respuesta presenta la quema
+  // como beneficiosa/balanceada ("la quema puede tener beneficios", "la ceniza
+  // aporta potasio y calcio") y NO la desaconseja, ANTEPONE una corrección que la
+  // desaconseja + cita Ley 1930/2018 (páramo) + alternativas (rastrojo/mulch/
+  // compost/abonos verdes). ADITIVO (preserva el cuerpo). Corre SIEMPRE. Va AL
+  // FINAL (tras los anexos) y ANTES de concisión, para que la corrección lidere y
+  // no quede sepultada. Espejo aplicado-al-texto de detectBurnEndorsement del
+  // sidecar (el PWA solo lo usaba para la badge; aquí sí reescribe guarded.text).
+  const burnRes = guardBurnEndorsementCorrection(text);
+  if (burnRes && burnRes.modified) {
+    text = burnRes.text;
+    modified = true;
+    if (burnRes.reason) reasons.push(burnRes.reason);
   }
   // Guard de CONCISIÓN (Item 7): si la respuesta es demasiado larga para
   // experiencia rural/TTS (>200 palabras), recorta a lo esencial y ofrece
