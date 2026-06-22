@@ -5,13 +5,13 @@
  *   - CON pendientes → lidera nombrando la alerta/tarea top + hint del resto.
  *   - SIN pendientes → idea contextual, sin pintar ítems de alarma.
  *   - Sin saludo resuelto → cae al copy estático de siempre (backward compat).
- *   - CTA siembra el prompt sugerido (no auto-submit).
+ *   - La pastilla-CTA de sugerencia YA NO se renderiza (retirada en tarea #58).
  *
  * La LÓGICA del saludo se prueba en services/__tests__/proactiveGreeting.test.js.
  * Aquí solo probamos que ChatHistory lo renderiza fiel a los datos.
  */
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { describe, it, expect, vi } from 'vitest';
 import ChatHistory from '../ChatHistory';
@@ -54,15 +54,15 @@ describe('ChatHistory — saludo proactivo (empty state)', () => {
     expect(screen.queryByTestId('proactive-greeting-rest')).toBeNull();
   });
 
-  it('CTA siembra el prompt sugerido (no auto-submit)', () => {
-    const onGreetingPrompt = vi.fn();
+  it('NO renderiza la pastilla-CTA de sugerencia (retirada en tarea #58)', () => {
     const greeting = {
       hi: 'Buenos días', state: 'idea', lead: 'Todo tranquilo por ahora.', items: [], restCount: 0,
       prompt: 'Dame un resumen del estado de mi finca hoy.',
     };
-    render(<ChatHistory messages={[]} proactiveGreeting={greeting} onGreetingPrompt={onGreetingPrompt} />);
-    fireEvent.click(screen.getByTestId('proactive-greeting-cta'));
-    expect(onGreetingPrompt).toHaveBeenCalledWith('Dame un resumen del estado de mi finca hoy.');
+    render(<ChatHistory messages={[]} proactiveGreeting={greeting} />);
+    // El saludo se muestra, pero ya no hay chip clickeable que dispare un flujo.
+    expect(screen.getByTestId('proactive-greeting')).toBeInTheDocument();
+    expect(screen.queryByTestId('proactive-greeting-cta')).toBeNull();
   });
 
   it('sin saludo resuelto → copy estático de siempre (backward compat)', () => {

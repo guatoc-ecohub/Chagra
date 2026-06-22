@@ -112,8 +112,7 @@ import ChagraAgentAvatarColibriPhoto from '../ChagraAgentAvatarColibriPhoto';
 import { AgentManoOverlay } from '../agent/AgentShell';
 import { mapCapabilityPick } from '../agent/capabilityRouting';
 import { agentSounds } from '../../services/agentSoundService';
-import { useTheme } from '../../hooks/useTheme';
-import { iconForTheme } from '../dashboard/themeIcon';
+import ManoChagraGlyph from '../dashboard/ManoChagraGlyph';
 import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
 import useAgentNotificationStore from '../../store/useAgentNotificationStore';
@@ -150,7 +149,6 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // re-render — si no, la animación se reiniciaría con cada mensaje). Vacía bajo
   // prefers-reduced-motion.
   const entranceClassRef = useRef(agentEntranceClass());
-  const { theme } = useTheme();
   const operatorId = usePrefsStore((s) => s.operatorId) || 'default-operator';
   // Task #122 (2026-05-23): ttsEnabled global persistido en usePrefsStore.
   // Antes era useState local — al cambiarlo en otra pantalla (header
@@ -285,7 +283,6 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // individuales. Al desmontar el componente cancelamos todos.
   const deepResearchControllersRef = useRef(new Map());
   const { durationMs, start: startRecord, stop: stopRecord, reset: resetRecord } = useVoiceRecorder();
-  const chatEndRef = useRef(null);
   // Bug 2026-05-18: ref al AbortController activo para que botón Cancelar
   // pueda abortar la inferencia LLM en curso desde fuera del callLLM scope.
   const activeControllerRef = useRef(null);
@@ -328,23 +325,14 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   const isFreshSessionRef = useRef(false);
   const [showFreshSessionBadge, setShowFreshSessionBadge] = useState(false);
 
-  // Scroll fix 2026-05-18 operator feedback: 'scroll complicado a veces'.
-  // Auto-scroll al fondo cuando hay mensaje nuevo o stream en curso, pero
-  // SOLO si el usuario ya estaba cerca del bottom (no interrumpir lectura
-  // de mensajes antiguos). Threshold 120px del fondo. Behavior smooth.
-  useEffect(() => {
-    const el = chatEndRef.current;
-    if (!el) return;
-    const container = el.parentElement;
-    if (!container) {
-      el.scrollIntoView({ behavior: 'smooth' });
-      return;
-    }
-    const distFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
-    if (distFromBottom < 120 || state === STATE_THINKING) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages.length, streamingContent, state]);
+  // Scroll fix tarea #58: el auto-scroll al fondo del chat lo maneja
+  // ÚNICAMENTE ChatHistory, que tiene su `bottomRef` DENTRO del contenedor
+  // scrollable real (`.h-full.overflow-y-auto`). El efecto previo de aquí
+  // operaba sobre `chatEndRef`, un <div> que vivía FUERA de ese contenedor
+  // (hermano de ChatHistory, hijo del root `overflow-hidden`): su
+  // `scrollIntoView` no movía el chat y peleaba con el de ChatHistory →
+  // "scroll trabado / que salta" reportado por el operador. Una sola fuente
+  // de verdad para el auto-scroll evita el conflicto.
 
   const loadHistory = useCallback(async () => {
     try {
@@ -3078,7 +3066,6 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         onRetryOrphan={handleRetryOrphan}
         onCancelDeepResearch={handleCancelDeepResearch}
         proactiveGreeting={proactiveGreeting}
-        onGreetingPrompt={(prompt) => prompt && setInputText(prompt)}
         onBack={onBack}
       />
 
@@ -3154,8 +3141,8 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             aria-label="Abrir la mano de Chagra"
             data-testid="agent-mano-trigger"
           >
-            <span className="w-[18px] h-[18px] shrink-0 flex items-center" aria-hidden="true">
-              {iconForTheme(theme)}
+            <span className="w-[20px] h-[20px] shrink-0 flex items-center justify-center" aria-hidden="true">
+              <ManoChagraGlyph size={20} />
             </span>
             Toca la mano de Chagra para ver todo lo que puede hacer
           </button>
@@ -3299,8 +3286,8 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               aria-expanded={sheetOpen}
               className={['as-iconbtn as-tool', sheetOpen ? 'is-open' : ''].join(' ')}
             >
-              <span className="w-[18px] h-[18px] flex items-center" aria-hidden="true">
-                {iconForTheme(theme)}
+              <span className="w-[20px] h-[20px] flex items-center justify-center" aria-hidden="true">
+                <ManoChagraGlyph size={20} />
               </span>
             </button>
 
@@ -3367,12 +3354,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           </div>
         </div>
 
-        {/* Hint educativo bajo el pill */}
-        {state !== STATE_RECORDING && !agentAttachment && (
-          <p className="mt-1 text-center text-[11px] text-slate-500 leading-tight">
-            Toca <b className="text-emerald-400">Ⓐ</b> para ver todo lo que sé hacer
-          </p>
-        )}
+        {/* Hint educativo bajo el pill — RETIRADO (tarea #58): el operador pidió
+            quitar los chips/líneas de sugerencia que ensucian la pantalla del
+            agente. El acceso a capacidades queda por la mano de Chagra (botón
+            Ⓐ del compositor + botón de la pantalla vacía). */}
 
         {/* Input oculto de foto */}
         <input
@@ -3495,8 +3480,6 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           </p>
         )}
       </div>
-
-      <div ref={chatEndRef} />
 
       {/* La MANO de Chagra (Ⓐ) — MISMA red orgánica que el home (AgentRedMenu),
           NO menús de texto (operador: "en el agente no se ve la mano, se ven
