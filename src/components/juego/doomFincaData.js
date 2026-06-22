@@ -2,11 +2,15 @@
  * doomFincaData - datos para el nivel Doom agroecologico primera persona.
  *
  * GANCHO PEDAGOGICO: el jugador recorre una finca andina real en primera
- * persona, identifica plagas reales y las controla lanzando el organismo
- * benefico o biopreparado CORRECTO. Los pares plaga->benefico son
- * agronomicamente reales (ICA, CIAT, Cenicafe, FAO). El escenario muestra
- * el "kit completo" de la finca: setos vivos de arboles, corral de animales,
- * compostera (abono), camas de cultivo, colmena, girasoles para polinizadores.
+ * persona, IDENTIFICA plagas reales (nombre comun + cientifico visibles en
+ * pantalla) y las controla soltando el organismo benefico o biopreparado
+ * CORRECTO. Los pares plaga->controlador son agronomicamente reales y salen
+ * del grafo de conocimiento de Chagra (Apache AGE, fuentes ICA / CIAT /
+ * Cenicafe / FAO; ver public/grafo-relations.json, relacion pest_controllers).
+ *
+ * El escenario muestra el "kit completo" de la finca: setos vivos, corral de
+ * animales, compostera, camas de cultivo, colmena, girasoles para
+ * polinizadores; todo se puede mirar para leer su rol en el ciclo.
  *
  * Motor raycaster propio en Canvas 2D (sin librerias 3D). Solo este repo.
  *
@@ -24,23 +28,23 @@
  *   4 = compostera (pila de abono encajonada)
  *   5 = cama de cultivo elevada (con plantas)
  *
- * Diseno: perimetro de seto vivo (arboles), camas de cultivo formando
- * pasillos, un corral de madera, una compostera y una bodega de adobe,
- * para que el recorrido se sienta una finca de verdad y no un pasillo vacio.
+ * Diseno abierto: pocos obstaculos centrales para que el jugador vea las
+ * plagas desde lejos (la queja #1 fue "no se distingue nada"). Las camas de
+ * cultivo se arriman a los bordes; el centro queda despejado para combatir.
  */
 export const MAPA = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 5, 5, 5, 0, 0, 5, 5, 5, 0, 0, 0, 1],
-  [1, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 1],
-  [1, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 1],
+  [1, 0, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 0, 1],
+  [1, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 1],
-  [1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 1],
-  [1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 1],
-  [1, 0, 0, 0, 4, 4, 4, 0, 0, 5, 5, 5, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1],
+  [1, 0, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
@@ -94,25 +98,85 @@ export const MATERIALES = {
 
 /**
  * Decoraciones del escenario: billboards NO hostiles, solo ambiente y
- * pedagogia. El jugador puede mirarlas para leer su rol en la finca
- * (abono -> biopreparado, abejas -> polinizacion, arbol -> sombra/silvopastoreo).
+ * pedagogia. El jugador puede mirarlas para leer su rol en la finca.
  * Coordenadas en celdas del mundo (transitables).
  */
 export const DECORACIONES = [
-  { tipo: 'arbol', x: 2.5, y: 11.5, leccion: 'Los arboles dan sombra, frenan el viento y sus hojas alimentan la compostera.' },
-  { tipo: 'arbol', x: 13.5, y: 2.5, leccion: 'Cerca viva: barrera natural que aloja aves y enemigos de las plagas.' },
-  { tipo: 'colmena', x: 13.5, y: 5.5, leccion: 'La colmena: las abejas polinizan los cultivos y suben la cosecha.' },
-  { tipo: 'girasol', x: 7.5, y: 9.5, leccion: 'Flores como el girasol atraen abejas y avispas beneficas.' },
-  { tipo: 'girasol', x: 8.5, y: 9.5, leccion: 'Mas flores = mas polinizadores y mas control natural de plagas.' },
-  { tipo: 'gallina', x: 2.5, y: 5.5, leccion: 'Las gallinas comen larvas y plagas; su gallinaza nutre el bocashi.' },
-  { tipo: 'vaca', x: 13.5, y: 11.5, leccion: 'La vaca aporta bonita: base del biol y del supermagro para las plantas.' },
-  { tipo: 'abono', x: 5.5, y: 10.5, leccion: 'Compostera: estiercol + hojas se vuelven abono que alimenta el cultivo.' },
+  { tipo: 'arbol', x: 2.5, y: 12.2, leccion: 'Arbol: da sombra, frena el viento y sus hojas alimentan la compostera.' },
+  { tipo: 'arbol', x: 13.5, y: 1.6, leccion: 'Cerca viva: barrera natural que aloja aves y enemigos de las plagas.' },
+  { tipo: 'colmena', x: 14.2, y: 5.5, leccion: 'Colmena: las abejas polinizan los cultivos y suben la cosecha.' },
+  { tipo: 'girasol', x: 7.5, y: 11.4, leccion: 'Las flores (girasol) atraen abejas, avispas y crisopas beneficas.' },
+  { tipo: 'girasol', x: 8.5, y: 11.4, leccion: 'Mas flores = mas polinizadores y mas control natural de plagas.' },
+  { tipo: 'gallina', x: 2.6, y: 8.5, leccion: 'Las gallinas comen larvas y plagas; su gallinaza nutre el bocashi.' },
+  { tipo: 'vaca', x: 13.5, y: 12.0, leccion: 'La vaca aporta bonita: base del biol y del supermagro para las plantas.' },
+  { tipo: 'abono', x: 13.0, y: 10.5, leccion: 'Compostera: estiercol + hojas se vuelven abono que nutre el cultivo.' },
 ];
 
 /**
- * Plagas que aparecen en el nivel Doom.
- * Cada una tiene su par benefico que la controla (agronomicamente real).
- * `forma` define el sprite procedural que dibuja el render.
+ * BENEFICOS / biopreparados que el jugador puede equipar y soltar.
+ * Cada uno tiene una "categoria" (tipo) para el render del frasco y una
+ * explicacion del mecanismo (el POR QUE del control biologico).
+ *
+ * Nombres y mecanismos tomados del grafo (pest_controllers) + literatura
+ * de control biologico aplicado en Colombia (ICA/CIAT/Cenicafe).
+ */
+export const BENEFICOS_DOOM = [
+  {
+    id: 'trichogramma',
+    nombre: 'Avispita Trichogramma',
+    cientifico: 'Trichogramma spp.',
+    emoji: '🐝',
+    color: '#f5c842',
+    tipo: 'avispa',
+    desc: 'Parasitoide de huevos.',
+    mecanismo: 'La avispita pone su huevo DENTRO del huevo de la mariposa-polilla. La larva nunca nace: no hay gusano que coma el cultivo.',
+  },
+  {
+    id: 'catarina',
+    nombre: 'Mariquita',
+    cientifico: 'Hippodamia convergens',
+    emoji: '🐞',
+    color: '#e74c3c',
+    tipo: 'mariquita',
+    desc: 'Depredador de pulgones.',
+    mecanismo: 'Adultos y larvas de mariquita devoran colonias enteras de pulgones y cochinillas: hasta 50 al dia.',
+  },
+  {
+    id: 'crisopa',
+    nombre: 'Crisopa (leon de afidos)',
+    cientifico: 'Chrysoperla externa',
+    emoji: '🦗',
+    color: '#7ed957',
+    tipo: 'crisopa',
+    desc: 'Depredador generalista.',
+    mecanismo: 'La larva de crisopa, el "leon de afidos", chupa pulgones, huevos y acaros con sus mandibulas curvas.',
+  },
+  {
+    id: 'beauveria',
+    nombre: 'Beauveria bassiana',
+    cientifico: 'Beauveria bassiana',
+    emoji: '🍄',
+    color: '#eef0e6',
+    tipo: 'hongo',
+    desc: 'Hongo entomopatogeno.',
+    mecanismo: 'El hongo germina sobre el insecto, lo penetra y lo coloniza por dentro hasta secarlo. Estandar contra broca y mosca blanca.',
+  },
+  {
+    id: 'bt',
+    nombre: 'Bt (Bacillus thuringiensis)',
+    cientifico: 'Bacillus thuringiensis',
+    emoji: '🧫',
+    color: '#9bd3ff',
+    tipo: 'bacteria',
+    desc: 'Bioinsecticida para orugas.',
+    mecanismo: 'La oruga come la hoja con Bt; el cristal de la bacteria rompe su intestino y deja de comer en horas. No afecta abejas ni gente.',
+  },
+];
+
+/**
+ * PLAGAS del nivel. Cada una declara su par benefico CORRECTO (controladoPor)
+ * y por que (`porQue`), tomado del grafo. `forma` define el sprite procedural.
+ * `cultivo` ata la plaga a un cultivo real para el contexto.
  */
 export const PLAGAS_DOOM = [
   {
@@ -121,12 +185,27 @@ export const PLAGAS_DOOM = [
     cientifico: 'Spodoptera frugiperda',
     emoji: '🐛',
     forma: 'oruga',
-    color: '#7c9e38',
-    dano: 'Devora el cogollo del maiz.',
-    /** Id del benefico que la controla */
-    controladoPor: 'trichogramma',
-    velocidad: 0.012,
-    vitalidad: 1,
+    color: '#8aa84a',
+    cultivo: 'Maiz',
+    dano: 'Devora el cogollo del maiz y deja la planta sin punto de crecimiento.',
+    controladoPor: 'bt',
+    porQue: 'Es una ORUGA que come hoja: el Bt la intoxica al primer bocado. Trichogramma tambien sirve atacando el HUEVO antes de que nazca.',
+    velocidad: 0.014,
+    vitalidad: 2,
+  },
+  {
+    id: 'gusano_mazorca',
+    nombre: 'Gusano de la mazorca',
+    cientifico: 'Helicoverpa zea',
+    emoji: '🐛',
+    forma: 'oruga',
+    color: '#c98a4a',
+    cultivo: 'Maiz',
+    dano: 'Se mete en la mazorca y se come los granos en formacion.',
+    controladoPor: 'bt',
+    porQue: 'Otra oruga masticadora: el Bt es el control biologico estandar. Tambien cae con chinche depredador (podisus) y crisopa.',
+    velocidad: 0.013,
+    vitalidad: 2,
   },
   {
     id: 'moscablanca',
@@ -134,22 +213,12 @@ export const PLAGAS_DOOM = [
     cientifico: 'Bemisia tabaci',
     emoji: '🪰',
     forma: 'mosca',
-    color: '#e8e8e8',
-    dano: 'Chupa savia y transmite virus.',
+    color: '#f2f2f2',
+    cultivo: 'Frijol / hortalizas',
+    dano: 'Chupa savia y transmite virus que enrollan y amarillan la hoja.',
     controladoPor: 'beauveria',
-    velocidad: 0.018,
-    vitalidad: 1,
-  },
-  {
-    id: 'afido',
-    nombre: 'Afido del frijol',
-    cientifico: 'Aphis fabae',
-    emoji: '🦟',
-    forma: 'afido',
-    color: '#3b5e2b',
-    dano: 'Forma colonias y debilita la planta.',
-    controladoPor: 'catarina',
-    velocidad: 0.010,
+    porQue: 'Insecto de cuerpo blando: el hongo Beauveria lo penetra y lo seca. Tambien la parasita la avispita Encarsia.',
+    velocidad: 0.020,
     vitalidad: 1,
   },
   {
@@ -158,54 +227,80 @@ export const PLAGAS_DOOM = [
     cientifico: 'Hypothenemus hampei',
     emoji: '🪲',
     forma: 'escarabajo',
-    color: '#4a2c17',
-    dano: 'Perfora el grano de cafe.',
+    color: '#3a2410',
+    cultivo: 'Cafe',
+    dano: 'Perfora el grano de cafe y arruina la calidad de la cosecha.',
     controladoPor: 'beauveria',
-    velocidad: 0.008,
-    vitalidad: 2,
+    porQue: 'El escarabajo vive DENTRO del grano: solo un hongo entomopatogeno como Beauveria lo alcanza ahi. Estandar Cenicafe.',
+    velocidad: 0.009,
+    vitalidad: 3,
+  },
+  {
+    id: 'afido',
+    nombre: 'Pulgon / afido',
+    cientifico: 'Aphis fabae',
+    emoji: '🐜',
+    forma: 'afido',
+    color: '#4a7a2e',
+    cultivo: 'Frijol',
+    dano: 'Forma colonias pegajosas que chupan savia y debilitan los brotes.',
+    controladoPor: 'catarina',
+    porQue: 'La mariquita y su larva devoran colonias de pulgones a docenas. La crisopa tambien los caza.',
+    velocidad: 0.011,
+    vitalidad: 1,
+  },
+  {
+    id: 'aranita',
+    nombre: 'Arana roja',
+    cientifico: 'Tetranychus urticae',
+    emoji: '🕷️',
+    forma: 'acaro',
+    color: '#c0392b',
+    cultivo: 'Mora / tomate',
+    dano: 'Acaro que pica el enves de la hoja, la puntea y la seca.',
+    controladoPor: 'crisopa',
+    porQue: 'Acaro chupador diminuto: lo controlan depredadores como la crisopa y acaros benefcos (neoseiulus). El hongo Beauveria ayuda.',
+    velocidad: 0.012,
+    vitalidad: 1,
   },
 ];
 
 /**
- * Beneficos / biopreparados que el jugador puede equipar y lanzar.
+ * Definicion de los TRES escenarios (rondas) del juego. Cada uno tiene su
+ * cultivo, las plagas que aparecen, una intro y los spawns. Suben en
+ * dificultad. Cierran el ciclo: maiz -> cafe -> hortalizas.
  */
-export const BENEFICOS_DOOM = [
+export const ESCENARIOS = [
   {
-    id: 'trichogramma',
-    nombre: 'Avispita Trichogramma',
-    emoji: '🐝',
-    color: '#f5c842',
-    desc: 'Parasita huevos del cogollero.',
+    id: 'maiz',
+    nombre: 'La milpa (maiz)',
+    cultivo: 'Maiz',
+    icono: '🌽',
+    intro: 'Tu maiz esta espigando. El gusano cogollero y el de la mazorca lo atacan. Sueltales el Bt (bioinsecticida para orugas).',
+    plagas: ['cogollero', 'cogollero', 'gusano_mazorca'],
+    spawns: [{ x: 8.5, y: 4.5 }, { x: 11.5, y: 7.5 }, { x: 6.5, y: 8.5 }],
+    beneficosSugeridos: ['bt', 'trichogramma', 'crisopa'],
   },
   {
-    id: 'catarina',
-    nombre: 'Mariquita',
-    emoji: '🐞',
-    color: '#e74c3c',
-    desc: 'Devora afidos y pulgones.',
+    id: 'cafe',
+    nombre: 'El cafetal',
+    cultivo: 'Cafe',
+    icono: '☕',
+    intro: 'Floracion del cafe. La broca perfora el grano y la mosca blanca chupa savia. Ambas caen con el hongo Beauveria bassiana.',
+    plagas: ['broca', 'broca', 'moscablanca'],
+    spawns: [{ x: 7.5, y: 4.5 }, { x: 10.5, y: 9.5 }, { x: 4.5, y: 9.5 }],
+    beneficosSugeridos: ['beauveria', 'crisopa', 'trichogramma'],
   },
   {
-    id: 'beauveria',
-    nombre: 'Beauveria bassiana',
-    emoji: '🍄',
-    color: '#f0f0e8',
-    desc: 'Hongo que controla mosca blanca y broca.',
+    id: 'huerta',
+    nombre: 'La huerta',
+    cultivo: 'Frijol y mora',
+    icono: '🫘',
+    intro: 'Hortalizas y frutales. Pulgones, mosca blanca y arana roja debilitan las plantas. Usa mariquita, crisopa y Beauveria.',
+    plagas: ['afido', 'aranita', 'moscablanca', 'afido'],
+    spawns: [{ x: 6.5, y: 4.5 }, { x: 11.5, y: 5.5 }, { x: 9.5, y: 9.5 }, { x: 4.5, y: 7.5 }],
+    beneficosSugeridos: ['catarina', 'crisopa', 'beauveria'],
   },
-];
-
-/**
- * Posiciones iniciales de las plagas en coordenadas del mundo
- * (cada celda del mapa = 1.0 unidad, centradas en la celda transitable).
- */
-export const SPAWNS_PLAGAS = [
-  { tipo: 'cogollero', x: 5.5, y: 5.5 },
-  { tipo: 'moscablanca', x: 10.5, y: 4.5 },
-  { tipo: 'afido', x: 5.5, y: 9.5 },
-  { tipo: 'broca', x: 10.5, y: 9.5 },
-  { tipo: 'cogollero', x: 8.5, y: 7.5 },
-  { tipo: 'moscablanca', x: 2.5, y: 8.5 },
-  { tipo: 'afido', x: 13.5, y: 8.5 },
-  { tipo: 'broca', x: 8.5, y: 2.5 },
 ];
 
 /**
@@ -230,7 +325,6 @@ export const PALETA = {
 
 /**
  * Tamano de celda del mapa (en unidades del mundo).
- * El raycaster usa este tamano para las paredes.
  */
 export const CELDA = 1.0;
 
@@ -240,7 +334,7 @@ export const CELDA = 1.0;
 export const JUGADOR_INICIAL = {
   x: 2.5,
   y: 2.5,
-  angulo: 0, // radianes, mirando al este (derecha)
+  angulo: 0.5, // radianes, mirando hacia el centro del campo
 };
 
 /**
@@ -249,16 +343,15 @@ export const JUGADOR_INICIAL = {
 export const CONFIG_DOOM = {
   vitalidadInicial: 100,
   vitalidadMax: 100,
-  danoPorPlaga: 15,          // vitalidad que quita una plaga al alcanzar
-  cooldownLanzamiento: 30,   // frames entre lanzamientos
-  alcanceLanzamiento: 4.0,   // distancia maxima del benefico
-  metaPlagas: 8,             // total de plagas a eliminar
-  fov: Math.PI / 3,         // 60 grados campo de vision
+  danoPorPlaga: 9,           // vitalidad que quita una plaga al alcanzar (por tick)
+  cooldownLanzamiento: 26,   // frames entre lanzamientos
+  alcanceLanzamiento: 5.0,   // distancia maxima del benefico
+  fov: Math.PI / 3,          // 60 grados campo de vision
   resX: 240,                 // columnas del raycaster (strips)
   resY: 180,                 // filas del canvas logico
-  nieblaInicio: 6.0,        // distancia donde empieza la neblina de campo
-  nieblaFin: 14.0,          // distancia donde la neblina es total
-  velMovimiento: 0.04,       // velocidad de movimiento
-  velRotacion: 0.04,         // velocidad de rotacion (rad/frame)
-  velRotacionTouch: 0.005,   // sensibilidad rotacion touch
+  nieblaInicio: 8.0,         // distancia donde empieza la neblina de campo
+  nieblaFin: 18.0,           // distancia donde la neblina es total
+  velMovimiento: 0.045,      // velocidad de movimiento
+  velRotacion: 0.045,        // velocidad de rotacion (rad/frame, teclado)
+  velRotacionTouch: 0.006,   // sensibilidad rotacion touch
 };
