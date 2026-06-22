@@ -126,7 +126,7 @@ const useAssetStore = create((set, get) => ({
 
         while (hasMore && !signal?.aborted) {
           const offset = page * pageLimit;
-          const url = `/api/asset/${t}?sort=-created&page[limit]=${pageLimit}&page[offset]=${offset}`;
+          const url = `/api/asset/${t}?sort=-created,id&page[limit]=${pageLimit}&page[offset]=${offset}`;
 
           const res = await fetchFn(url, { signal });
           const list = res.data || [];
