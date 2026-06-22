@@ -25,10 +25,9 @@ const FLOATING_BACK_THRESHOLD_PX = 160;
  * @param {Function} props.onRetryOrphan - Callback para reintentar un mensaje huérfano (sin respuesta).
  * @param {Function} props.onCancelDeepResearch - Callback para cancelar una investigación profunda en curso.
  * @param {Object|null} [props.proactiveGreeting=null] - Datos del saludo proactivo dinámico.
- * @param {Function} props.onGreetingPrompt - Callback al seleccionar un prompt sugerido del saludo.
  * @param {Function} props.onBack - Callback para volver a la pantalla anterior.
  */
-export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, onConsentNeeded, onRetryOrphan, onCancelDeepResearch, proactiveGreeting = null, onGreetingPrompt, onBack }) {
+export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, onConsentNeeded, onRetryOrphan, onCancelDeepResearch, proactiveGreeting = null, onBack }) {
   const bottomRef = useRef(null);
   const scrollRef = useRef(null);
   // (B) Botón "Volver" flotante: visible solo cuando el operador se alejó del
@@ -41,8 +40,35 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
     setShowFloatingBack(top > FLOATING_BACK_THRESHOLD_PX);
   }, []);
 
+  // Fuente ÚNICA del auto-scroll del chat (tarea #58). El contenedor scrollable
+  // real es `scrollRef`; `bottomRef` es el marcador del fondo DENTRO de él.
+  //
+  // Reglas:
+  //   - Primer render con contenido (abrir una conversación larga) → saltar al
+  //     fondo SIN animación, para no aterrizar a media altura ni ver un barrido.
+  //   - Mensajes/tokens nuevos → seguir al fondo SOLO si el usuario ya estaba
+  //     cerca del fondo (umbral 120px) o si está llegando una respuesta en
+  //     curso. Así no le arrebatamos el scroll cuando subió a releer historial.
+  const didInitialScrollRef = useRef(false);
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const container = scrollRef.current;
+    const anchor = bottomRef.current;
+    if (!anchor) return;
+
+    if (!didInitialScrollRef.current) {
+      // Salto instantáneo la primera vez que hay contenido para ver.
+      didInitialScrollRef.current = true;
+      anchor.scrollIntoView({ behavior: 'auto', block: 'end' });
+      return;
+    }
+
+    const distFromBottom = container
+      ? container.scrollHeight - container.scrollTop - container.clientHeight
+      : 0;
+    const nearBottom = distFromBottom < 120;
+    if (nearBottom || isStreaming) {
+      anchor.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
   }, [messages, streamingContent, isStreaming]);
 
   // Empty state: aprovechamos el espacio vacío para mostrar el colibrí
@@ -60,7 +86,7 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
         <div className="text-center max-w-md">
           <ChagraAgentAvatar state="idle" size={200} className="mx-auto mb-4" />
           {proactiveGreeting ? (
-            <ProactiveGreeting greeting={proactiveGreeting} onPrompt={onGreetingPrompt} />
+            <ProactiveGreeting greeting={proactiveGreeting} />
           ) : (
             <>
               <p className="text-slate-200 text-base mb-2 font-medium">¡Hola! Soy tu asistente agroecológico.</p>
@@ -115,7 +141,10 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
         role="log"
         aria-live="polite"
         data-testid="chat-scroll"
-        className="h-full overflow-y-auto p-4 pb-28"
+        /* pb-40 (tarea #58): el compositor fijo crece con la franja de voz y el
+           tip de foto; pb-28 (112px) dejaba el último mensaje tapado. 160px da
+           aire suficiente para que el fondo del chat quede SOBRE el compositor. */
+        className="h-full overflow-y-auto p-4 pb-40"
       >
       {messages.map((msg, idx) => {
         // Deep Research (A6/A7): si el mensaje lleva _deepResearch, renderizamos
@@ -214,9 +243,10 @@ const FLOATING_BACK_CSS = `
  * una idea contextual sin inventar alarmas. CTA siembra el prompt sugerido en
  * el input (el operador revisa y envía — no auto-submit).
  */
-function ProactiveGreeting({ greeting, onPrompt }) {
+function ProactiveGreeting({ greeting }) {
   if (!greeting) return null;
-  const { hi, state, lead, items = [], restCount = 0, prompt } = greeting;
+  // `prompt` del saludo ya no se usa: la pastilla-CTA se retiró (tarea #58).
+  const { hi, state, lead, items = [], restCount = 0 } = greeting;
   const isPending = state === 'pending';
   return (
     <div data-testid="proactive-greeting" data-greeting-state={state}>
@@ -259,16 +289,10 @@ function ProactiveGreeting({ greeting, onPrompt }) {
         </p>
       )}
 
-      {prompt && typeof onPrompt === 'function' && (
-        <button
-          type="button"
-          onClick={() => onPrompt(prompt)}
-          data-testid="proactive-greeting-cta"
-          className="text-xs px-3 py-1.5 rounded-full bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-600/30 text-cyan-100 transition-colors active:scale-95"
-        >
-          {prompt}
-        </button>
-      )}
+      {/* CTA-pastilla de sugerencia RETIRADA (tarea #58): el operador pidió
+          quitar los chips de sugerencia del agente porque ensucian y disparan
+          flujos confusos. El saludo conserva el contexto (pendientes/idea) pero
+          ya no propone una pregunta clickeable; el usuario habla o escribe. */}
     </div>
   );
 }

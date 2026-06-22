@@ -79,8 +79,10 @@ describe('ChatHistory — botón Volver flotante (alcanzable sin scroll al inici
   it('el contenedor scrollable reserva padding inferior para que el último mensaje no quede tapado por el input fijo', () => {
     const { container } = render(<ChatHistory messages={longConversation} onBack={vi.fn()} />);
     const scroller = container.querySelector('[data-testid="chat-scroll"]');
-    // pb-28 (7rem) reserva sitio bajo el último mensaje para que sus acciones
-    // (👍/👎, Reintentar) no queden bajo el footer fijo (input + chips).
-    expect(scroller.className).toMatch(/pb-28/);
+    // pb-40 (10rem, subido desde pb-28 en tarea #58) reserva sitio bajo el
+    // último mensaje para que sus acciones (👍/👎, Reintentar) no queden bajo
+    // el footer fijo (input + franja de voz + tip de foto), que crece más que
+    // los 7rem previos.
+    expect(scroller.className).toMatch(/pb-40/);
   });
 });
