@@ -442,6 +442,10 @@ export default function DoomFincaScreen({ onBack, onHome }) {
     const imageData = ctx.createImageData(W, H);
     const buf = imageData.data;
 
+    // Pose del jugador expuesta solo para pruebas (dev o ?e2e en la URL).
+    const e2eHook = (import.meta.env?.DEV)
+      || (typeof window !== 'undefined' && window.location.search.includes('e2e'));
+
     let raf = 0;
     let running = true;
     let lastTick = 0;
@@ -478,6 +482,12 @@ export default function DoomFincaScreen({ onBack, onHome }) {
 
           if (w.fichaTimer > prevFichaTimer && w.ficha) beep('acierto');
           if (w.errores > prevErrores) beep('fallo');
+
+          // Hook E2E (solo dev o ?e2e): expone la pose del jugador para que las
+          // pruebas tactiles verifiquen movimiento REAL (no animacion de plagas).
+          if (e2eHook) {
+            window.__doomPlayer = { x: w.player.x, y: w.player.y, angulo: w.player.angulo, t: w.t };
+          }
 
           setVitalidad((p) => (p !== Math.round(w.vitalidad) ? Math.round(w.vitalidad) : p));
           setPlagasRestantes((p) => (p !== w.plagasRestantes ? w.plagasRestantes : p));
@@ -814,67 +824,93 @@ export default function DoomFincaScreen({ onBack, onHome }) {
   }, []);
 
   // ── Touch: dos zonas (mover izquierda / mirar derecha) + boton lanzar ──
-  const handleTouchStart = useCallback((e) => {
-    if (faseRef.current !== 'jugando') return;
+  //
+  // FIX movil (operador, telefono real): los controles tactiles NO movian al
+  // jugador. Causa raiz: los handlers se cableaban como props JSX
+  // (onTouchStart/Move/End), que React adjunta como listeners PASIVOS. En un
+  // passive listener `preventDefault()` se ignora, asi que el navegador robaba
+  // el gesto (scroll / pull-to-refresh) y el arrastre del joystick no llegaba.
+  // Solucion: adjuntar listeners NATIVOS con { passive:false } y llamar
+  // e.preventDefault() para que el dedo controle el juego, no el scroll.
+  useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    for (let i = 0; i < e.changedTouches.length; i += 1) {
-      const t = e.changedTouches[i];
-      const relX = (t.clientX - rect.left) / rect.width;
+    if (!canvas) return undefined;
+
+    const onStart = (e) => {
+      if (faseRef.current !== 'jugando') return;
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
       const tj = touchRef.current;
-      if (relX < 0.45 && !tj.joystickActive) {
-        tj.joystickActive = true;
-        tj.joystickId = t.identifier;
-        tj.joystickOX = t.clientX;
-        tj.joystickOY = t.clientY;
-        tj.joystickX = 0;
-        tj.joystickY = 0;
-      } else if (!tj.lookActive) {
-        tj.lookActive = true;
-        tj.lookId = t.identifier;
-        tj.lastLookX = t.clientX;
-      }
-    }
-  }, []);
-
-  const handleTouchMove = useCallback((e) => {
-    const tj = touchRef.current;
-    for (let i = 0; i < e.changedTouches.length; i += 1) {
-      const t = e.changedTouches[i];
-      if (t.identifier === tj.joystickId && tj.joystickActive) {
-        tj.joystickX = t.clientX - tj.joystickOX;
-        tj.joystickY = t.clientY - tj.joystickOY;
-        const mag = Math.sqrt(tj.joystickX ** 2 + tj.joystickY ** 2);
-        const cap = 48;
-        if (mag > cap) { tj.joystickX = (tj.joystickX / mag) * cap; tj.joystickY = (tj.joystickY / mag) * cap; }
-      }
-      if (t.identifier === tj.lookId && tj.lookActive) {
-        const delta = t.clientX - tj.lastLookX;
-        const w = worldRef.current;
-        if (w && !w.terminado) {
-          w.player = { ...w.player, angulo: w.player.angulo + delta * CONFIG_DOOM.velRotacionTouch };
+      for (let i = 0; i < e.changedTouches.length; i += 1) {
+        const t = e.changedTouches[i];
+        const relX = (t.clientX - rect.left) / rect.width;
+        if (relX < 0.5 && !tj.joystickActive) {
+          tj.joystickActive = true;
+          tj.joystickId = t.identifier;
+          tj.joystickOX = t.clientX;
+          tj.joystickOY = t.clientY;
+          tj.joystickX = 0;
+          tj.joystickY = 0;
+        } else if (!tj.lookActive) {
+          tj.lookActive = true;
+          tj.lookId = t.identifier;
+          tj.lastLookX = t.clientX;
         }
-        tj.lastLookX = t.clientX;
       }
-    }
-  }, []);
+    };
 
-  const handleTouchEnd = useCallback((e) => {
-    const tj = touchRef.current;
-    for (let i = 0; i < e.changedTouches.length; i += 1) {
-      const t = e.changedTouches[i];
-      if (t.identifier === tj.joystickId) {
-        tj.joystickActive = false; tj.joystickId = null; tj.joystickX = 0; tj.joystickY = 0;
+    const onMove = (e) => {
+      const tj = touchRef.current;
+      if (!tj.joystickActive && !tj.lookActive) return;
+      e.preventDefault();
+      for (let i = 0; i < e.changedTouches.length; i += 1) {
+        const t = e.changedTouches[i];
+        if (t.identifier === tj.joystickId && tj.joystickActive) {
+          tj.joystickX = t.clientX - tj.joystickOX;
+          tj.joystickY = t.clientY - tj.joystickOY;
+          const mag = Math.sqrt(tj.joystickX ** 2 + tj.joystickY ** 2);
+          const cap = 48;
+          if (mag > cap) { tj.joystickX = (tj.joystickX / mag) * cap; tj.joystickY = (tj.joystickY / mag) * cap; }
+        }
+        if (t.identifier === tj.lookId && tj.lookActive) {
+          const delta = t.clientX - tj.lastLookX;
+          const w = worldRef.current;
+          if (w && !w.terminado) {
+            w.player = { ...w.player, angulo: w.player.angulo + delta * CONFIG_DOOM.velRotacionTouch };
+          }
+          tj.lastLookX = t.clientX;
+        }
+      }
+    };
+
+    const onEnd = (e) => {
+      const tj = touchRef.current;
+      e.preventDefault();
+      for (let i = 0; i < e.changedTouches.length; i += 1) {
+        const t = e.changedTouches[i];
+        if (t.identifier === tj.joystickId) {
+          tj.joystickActive = false; tj.joystickId = null; tj.joystickX = 0; tj.joystickY = 0;
+          inputRef.current.forward = false; inputRef.current.backward = false;
+          inputRef.current.strafeLeft = false; inputRef.current.strafeRight = false;
+        }
+        if (t.identifier === tj.lookId) { tj.lookActive = false; tj.lookId = null; }
+      }
+      if (e.touches.length === 0) {
         inputRef.current.forward = false; inputRef.current.backward = false;
         inputRef.current.strafeLeft = false; inputRef.current.strafeRight = false;
       }
-      if (t.identifier === tj.lookId) { tj.lookActive = false; tj.lookId = null; }
-    }
-    if (e.touches.length === 0) {
-      inputRef.current.forward = false; inputRef.current.backward = false;
-      inputRef.current.strafeLeft = false; inputRef.current.strafeRight = false;
-    }
+    };
+
+    canvas.addEventListener('touchstart', onStart, { passive: false });
+    canvas.addEventListener('touchmove', onMove, { passive: false });
+    canvas.addEventListener('touchend', onEnd, { passive: false });
+    canvas.addEventListener('touchcancel', onEnd, { passive: false });
+    return () => {
+      canvas.removeEventListener('touchstart', onStart);
+      canvas.removeEventListener('touchmove', onMove);
+      canvas.removeEventListener('touchend', onEnd);
+      canvas.removeEventListener('touchcancel', onEnd);
+    };
   }, []);
 
   const dispararTouch = useCallback(() => {
@@ -895,10 +931,19 @@ export default function DoomFincaScreen({ onBack, onHome }) {
 
   return (
     <ScreenShell title="Doom de la Finca" icon={Crosshair} onBack={onBack} onHome={onHome}>
-      <div className="flex flex-col gap-3 px-3 pt-2 pb-6 max-w-lg mx-auto">
+      {/*
+        FIX movil (operador, telefono real): antes el canvas tenia aspect-ratio
+        fijo 4:3 y el contenido se apilaba con `pb-6`, dejando ~40% de la
+        pantalla en negro abajo. Ahora el juego es una columna flex de altura
+        completa: HUD + vitalidad arriba (shrink-0), el lienzo crece para llenar
+        el alto disponible (flex-1, canvas absolute inset-0) y la barra inferior
+        (selector + ayuda) queda fija abajo. El -mb compensa el padding-bottom
+        que ScreenShell reserva para los FAB de otras pantallas (aqui sobra).
+      */}
+      <div className="flex flex-col gap-2 px-3 pt-2 pb-[max(env(safe-area-inset-bottom),8px)] w-full max-w-lg mx-auto h-full min-h-0 -mb-[max(env(safe-area-inset-bottom),0px)_+_120px]">
 
         {/* ── HUD superior: ronda, plagas, puntaje, combo ── */}
-        <div className="flex items-center justify-between gap-2 text-xs font-bold">
+        <div className="flex items-center justify-between gap-2 text-xs font-bold shrink-0">
           <span className="flex items-center gap-1 text-emerald-200 whitespace-nowrap">
             <span aria-hidden="true">{escenarioActual.icono}</span>
             <span>Ronda {rondaIdx + 1}/{ESCENARIOS.length}</span>
@@ -917,7 +962,7 @@ export default function DoomFincaScreen({ onBack, onHome }) {
         </div>
 
         {/* Barra de vitalidad */}
-        <div className="flex items-center gap-2 text-xs font-bold">
+        <div className="flex items-center gap-2 text-xs font-bold shrink-0">
           <Heart size={13} className="text-emerald-300" aria-hidden="true" />
           <div className="flex-1 h-3.5 bg-slate-800/60 rounded-full overflow-hidden border border-emerald-900/40">
             <div
@@ -928,19 +973,16 @@ export default function DoomFincaScreen({ onBack, onHome }) {
           <span className="text-white w-9 text-right" aria-label={`Vitalidad ${vitalidadPct}%`}>{vitalidadPct}%</span>
         </div>
 
-        {/* ── Canvas del juego ── */}
-        <div className="relative rounded-xl overflow-hidden border-2 border-emerald-700/50 bg-black shadow-lg shadow-emerald-900/30">
+        {/* ── Canvas del juego (crece para llenar el alto disponible) ── */}
+        <div className="relative flex-1 min-h-0 rounded-xl overflow-hidden border-2 border-emerald-700/50 bg-black shadow-lg shadow-emerald-900/30">
           <canvas
             ref={canvasRef}
             width={W}
             height={H}
-            className="w-full block cursor-crosshair touch-none select-none"
-            style={{ imageRendering: 'pixelated', aspectRatio: `${W}/${H}` }}
+            className="absolute inset-0 w-full h-full block cursor-crosshair touch-none select-none"
+            style={{ imageRendering: 'pixelated' }}
             role="img"
             aria-label="Vista en primera persona de la finca. Arrastra el lado izquierdo para moverte, el derecho para girar, y toca Soltar para aplicar el benefico."
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
           />
 
           {/* Etiqueta de identificacion del objetivo apuntado */}
