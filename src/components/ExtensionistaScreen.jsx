@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { esExtensionistaActual } from '../config/extensionistaAccess';
+import { esOperadorActual } from '../config/glaciarAccess';
 import { construirTableroExtensionista } from '../services/extensionistaService';
 import { getActiveTenantId } from '../services/tenantContext';
 import useFincaActiveStore from '../services/fincaActiveStore';
@@ -135,10 +136,19 @@ export default function ExtensionistaScreen({ onBack, onHome }) {
   const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
   const setActiveFinca = useFincaActiveStore((s) => s.setActiveFinca);
 
-  const tablero = useMemo(
-    () => (tieneRol ? construirTableroExtensionista(getActiveTenantId()) : null),
-    [tieneRol]
-  );
+  // El operador (visión total / demo, p. ej. el panel ministerial) suele tener
+  // un tenant propio (admin) que NO está en el mock de delegaciones, así que su
+  // tablero saldría vacío. Para que el panel DEMUESTRE valor en el demo, si no
+  // hay fincas para el tenant activo y el usuario es operador, caemos al MOCK de
+  // ejemplo (`demo-extensionista`). Son los mismos datos ya marcados como "vista
+  // previa / datos de ejemplo" en la UI — NO se inventan datos nuevos.
+  const tablero = useMemo(() => {
+    if (!tieneRol) return null;
+    const propio = construirTableroExtensionista(getActiveTenantId());
+    if (propio.fincas.length > 0) return propio;
+    if (esOperadorActual()) return construirTableroExtensionista('demo-extensionista');
+    return propio;
+  }, [tieneRol]);
 
   const fincasDelegadas = useMemo(() => tablero?.fincas || [], [tablero]);
 
@@ -180,6 +190,7 @@ export default function ExtensionistaScreen({ onBack, onHome }) {
         {fincasDelegadas.length > 0 && (
           <div className="rounded-2xl border border-emerald-700/30 bg-emerald-950/20 p-4 space-y-3">
             <div>
+              {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- i18n progresiva (ADR-050): esta pantalla aún no está migrada a messages.js; el resto de sus strings tampoco. Migración fuera del alcance de este fix. */}
               <p className="text-sm font-semibold text-emerald-200">Finca activa</p>
               <p className="text-xs text-emerald-300/80">
                 Elige cuál de las fincas delegadas quieres gestionar ahora.
