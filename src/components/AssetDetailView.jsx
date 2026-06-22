@@ -71,11 +71,20 @@ const PHOTO_SUCCESS_LABELS = {
 function PhotoHeroSection({ assetId, speciesSlug, assetType, scientificName, commonName, category, catalogImage }) {
   const [busy, setBusy] = useState(false);
   const [success, setSuccess] = useState(false);
+  // Si la foto resuelta (usuario/catálogo) falla al decodificar en runtime,
+  // caemos al fallback de SpeciesImage en vez de dejar una caja rota. Cubre
+  // URLs que pasan el HEAD pero no son una imagen válida (defensa en
+  // profundidad sobre el fix de checkImageExists en photoService).
+  // Guardamos la URL rota (no un boolean): así, cuando la foto cambia a otra
+  // URL, el flag se "resetea" solo por comparación, sin un useEffect que
+  // llame setState (evita el cascading-render que veta el linter).
+  const [brokenPhotoUrl, setBrokenPhotoUrl] = useState(null);
   const cameraRef = React.useRef(null);
   const galleryRef = React.useRef(null);
 
   // Foto actual del asset (si la hay) — se refresca via chagra:photo:saved.
   const photo = usePhotoUrl({ assetId, speciesSlug: speciesSlug || undefined });
+  const heroImgBroken = !!photo.url && brokenPhotoUrl === photo.url;
 
   const handleFile = async (e) => {
     const file = e.target.files?.[0];
@@ -105,7 +114,8 @@ function PhotoHeroSection({ assetId, speciesSlug, assetType, scientificName, com
   };
 
   const labels = PHOTO_HERO_LABELS[assetType] || PHOTO_HERO_LABELS.default;
-  const hasPhoto = photo.url && photo.source !== 'placeholder' && photo.source !== 'missing' && !photo.loading;
+  const hasPhoto = photo.url && photo.source !== 'placeholder' && photo.source !== 'missing'
+    && !photo.loading && !heroImgBroken;
 
   return (
     <section className="rounded-2xl overflow-hidden border border-slate-700/50 bg-slate-900" data-testid="photo-hero-section">
@@ -120,6 +130,7 @@ function PhotoHeroSection({ assetId, speciesSlug, assetType, scientificName, com
             alt={labels.title}
             className="absolute inset-0 w-full h-full object-cover"
             loading="lazy"
+            onError={() => setBrokenPhotoUrl(photo.url)}
           />
           {/* Gradient para legibilidad de los botones overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-transparent pointer-events-none" />
