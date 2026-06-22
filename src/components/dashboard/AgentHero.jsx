@@ -310,6 +310,10 @@ export default function AgentHero({ onNavigate }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [menuClosing, setMenuClosing] = useState(false);
     const menuCloseTimerRef = useRef(null);
+    // Bug #51 móvil: el `:active { transform: scale(.92) }` del CSS mueve el
+    // botón bajo el dedo entre touchstart/touchend → navegador cancela el
+    // click. Marcamos que el touchEnd ya navegó para ignorar el ghost-click.
+    const navigatedByTouchRef = useRef(false);
     // Campana de alertas/tareas (importada del demo biopunk 2026-06-11):
     // panel con "Alertas ambientales" (useAlertStore) + "Tareas de campo"
     // (pendientes farmOS, offline-first vía syncManager). Mutuamente
@@ -1734,18 +1738,26 @@ export default function AgentHero({ onNavigate }) {
                 <div className="agentport-headtools">
                     {/* "Abrir Chagra IA": entrada EXPLÍCITA al overlay del agente
                         (AgentScreen) desde la portada del home. Bug móvil tarea #51
-                        (2026-06-21): el único control rotulado "Abrir Chagra IA"
-                        vivía en WelcomeStatsHero/DashboardView — un dashboard que la
-                        app EN VIVO ya no monta (case 'dashboard' usa DashboardLive →
-                        AgentHero). Por eso el fix previo (PR #1725, touchEnd sobre
-                        ese chip) era no-op: nadie podía tocar el botón. Acá la
-                        portada SÍ ofrece la acción sobre la superficie real, sin
-                        tocar el contrato del compositor (enviar vacío → abre "La
-                        mano de Chagra", comportamiento del demo). launchToAgent
-                        navega con la transición premium ya probada. */}
+                        (2026-06-21): el `:active { transform: scale(.92) }` del CSS
+                        cambia la geometría del botón entre touchstart y touchend;
+                        en iOS Safari + algunos Chrome Android el navegador cancela
+                        el click sintético. Fix: interceptamos el touchend con
+                        preventDefault (suprime ghost-click) y navegamos directo.
+                        launchToAgent navega con la transición premium ya probada. */}
                     <button
                         type="button"
-                        onClick={launchToAgent}
+                        onClick={() => {
+                            if (navigatedByTouchRef.current) {
+                                navigatedByTouchRef.current = false;
+                                return;
+                            }
+                            launchToAgent();
+                        }}
+                        onTouchEnd={(e) => {
+                            if (e?.cancelable) e.preventDefault();
+                            navigatedByTouchRef.current = true;
+                            launchToAgent();
+                        }}
                         aria-label="Abrir Chagra IA"
                         title="Abrir Chagra IA"
                         className="agentport-open"
