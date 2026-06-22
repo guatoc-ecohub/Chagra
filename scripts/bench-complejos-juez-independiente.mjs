@@ -12,7 +12,7 @@
  *      representativo de lo que ve el usuario.
  *
  * Este script arregla ambas cosas:
- *   - GENERADOR a CONFIG-PROD: granite3.1-dense:8b, temp 0.3, seed fijo,
+ *   - GENERADOR a CONFIG-PROD: granite3.3:8b, temp 0.3, seed fijo,
  *     max_tokens 768 (= ROUTES.chat_complex de src/services/llmRouter.js), con
  *     el pipeline real: resolve-entities (AGE) → enriched system prompt →
  *     applyOutputGuards (guards deterministas de prod) → post-validate.
@@ -30,7 +30,7 @@
  * Uso:
  *   node scripts/bench-complejos-juez-independiente.mjs
  *   node scripts/bench-complejos-juez-independiente.mjs --judge qwen2.5:14b
- *   GEN_MODEL=granite3.1-dense:8b SEED=42 node scripts/bench-complejos-...mjs
+ *   GEN_MODEL=granite3.3:8b SEED=42 node scripts/bench-complejos-...mjs
  *
  * Output: data/bench-runs/complejos-juez-independiente-YYYY-MM-DD.jsonl
  *   + data/bench-runs/complejos-juez-independiente-YYYY-MM-DD.summary.json
@@ -68,7 +68,7 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const BENCH_RUNS_DIR = process.env.BENCH_OUTPUT_DIR || join(ROOT_DIR, 'data', 'bench-runs');
 
 // ── config-prod del generador (= ROUTES.chat_complex de llmRouter.js) ─────────
-const GEN_MODEL = process.env.GEN_MODEL || 'granite3.1-dense:8b';
+const GEN_MODEL = process.env.GEN_MODEL || 'granite3.3:8b';
 const GEN_TEMPERATURE = 0.3; // PROD. NO 0.7.
 const GEN_MAX_TOKENS = 768; // chat_complex
 const SEED = Number(process.env.SEED || 42); // seed FIJO → reproducible.
