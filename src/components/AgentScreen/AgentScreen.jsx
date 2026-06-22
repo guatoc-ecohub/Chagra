@@ -45,7 +45,7 @@ import { createStreamDeadline } from '../../services/streamDeadline';
 // Sidecar agro-mcp (ADR-045 Fase 2 Step B/C). Detrás de feature flag
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
-import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, postValidate, getClimaIdeam } from '../../services/sidecarClient';
+import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, biopreparadoGrounding, postValidate, getClimaIdeam } from '../../services/sidecarClient';
 // CHIPS DE MODO (A3/A4, decisión operador 2026-06-02): el router PURO mapea
 // la intención forzada del chip → tool determinístico, SALTANDO el NLU
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
@@ -1325,9 +1325,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           // /resolve-entities (mismo turno, antes del LLM) — CERO latencia
           // serial añadida. Ambos wrappers son no-throw (devuelven null en
           // error/timeout), así que Promise.all no puede rechazar por ellos.
-          const [resolved, fermento] = await Promise.all([
+          const [resolved, fermento, bioprep] = await Promise.all([
             resolveEntities(textForLLM, { fincaAltitud: reAltitud, context: contextMemory }),
             fermentoPrefilter(textForLLM),
+            biopreparadoGrounding(textForLLM),
           ]);
           const tRE1 = performance.now();
           // FERMENTOS: si el sidecar marcó intención-fermento, inyectamos su
@@ -1343,6 +1344,22 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               disclaimerFuerte: fermento.disclaimer_fuerte,
               fuenteAutoridad: fermento.fuente_autoridad,
               reason: fermento.reason,
+            });
+          }
+          // BIOPREPARADOS (grounding determinista, chagra-pro #248): si el
+          // sidecar resolvió un insumo del catálogo (caldo bordelés, supermagro,
+          // bocashi…), anexamos su bloque de datos VERIFICADOS + regla
+          // anti-negación al MISMO canal de bloques de seguridad/grounding (al
+          // final del system, recency máxima) para que el LLM NO pueda negar un
+          // insumo que sí existe. no-op (graceful) si no aplica o el sidecar no
+          // respondió.
+          if (bioprep && bioprep.has_biopreparado && typeof bioprep.system_prompt_block === 'string' && bioprep.system_prompt_block.trim()) {
+            fermentoBlock = fermentoBlock
+              ? `${fermentoBlock}\n\n${bioprep.system_prompt_block}`
+              : bioprep.system_prompt_block;
+            console.debug('[sidecar] biopreparado-grounding', {
+              biopreparadoId: bioprep.biopreparado_id,
+              reason: bioprep.reason,
             });
           }
           if (resolved && Array.isArray(resolved.entities) && resolved.entities.length > 0) {

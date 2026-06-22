@@ -447,6 +447,40 @@ export async function fermentoPrefilter(userMessage) {
 }
 
 /**
+ * Grounding DETERMINISTA de BIOPREPARADOS/insumos (chagra-pro #248). Llama
+ * `POST ${BASE}/biopreparado-grounding` con la query del usuario; el sidecar
+ * detecta el insumo nombrado (caldo bordelés, supermagro, bocashi, biol…),
+ * resuelve la entrada del catálogo vía get_biopreparados y devuelve un bloque
+ * con composición/uso/precauciones VERIFICADOS + regla inviolable anti-negación
+ * ("NUNCA afirmes que este insumo no existe o no está en el catálogo").
+ *
+ * Se invoca EN PARALELO con resolveEntities/fermentoPrefilter (mismo turno,
+ * antes del LLM) — espejo de fermentoPrefilter, CERO latencia serial. FAIL-SAFE:
+ * ante MCP caído NO fabrica datos (has_biopreparado=false). NUNCA throw: null si
+ * flag off / offline / timeout / non-2xx / body inválido → el caller degrada sin
+ * inyectar (no rompe el turno).
+ *
+ * @param {string} userMessage — texto del operador.
+ * @returns {Promise<null | {
+ *   has_biopreparado: boolean,
+ *   biopreparado_id: string | null,
+ *   system_prompt_block: string,
+ *   reason: string,
+ * }>}
+ */
+export async function biopreparadoGrounding(userMessage) {
+  if (!userMessage || typeof userMessage !== 'string') return null;
+  const raw = await postJson('/biopreparado-grounding', { user_message: userMessage }, NLU_TIMEOUT_MS);
+  if (!raw || typeof raw !== 'object') return null;
+  return {
+    has_biopreparado: raw.has_biopreparado === true,
+    biopreparado_id: typeof raw.biopreparado_id === 'string' ? raw.biopreparado_id : null,
+    system_prompt_block: typeof raw.system_prompt_block === 'string' ? raw.system_prompt_block : '',
+    reason: typeof raw.reason === 'string' ? raw.reason : '',
+  };
+}
+
+/**
  * Capa 2 anti-alucinación (cross-check de contexto). Llama
  * `POST ${BASE}/post-validate` con el TEXTO que el LLM ya generó y, opcional,
  * los `nombre_cientifico` de las entidades que la capa 1 resolvió para el turno
