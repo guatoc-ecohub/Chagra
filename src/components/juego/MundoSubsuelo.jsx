@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { BASE_SOIL_LIFE, mundoSubsueloDecisions } from './mundoSubsueloData';
+import { recordGameStart, recordGameComplete } from '../../services/usageTelemetryService';
 
 function clamp(value, min = 0, max = 100) {
   return Math.max(min, Math.min(max, value));
@@ -169,6 +170,17 @@ export default function MundoSubsuelo() {
   const activeDecision = mundoSubsueloDecisions.find((decision) => decision.id === activeId) || mundoSubsueloDecisions[0];
   const stage = getSoilStage(soilLife);
   const meterColor = soilLife >= 60 ? 'bg-emerald-500' : soilLife >= 35 ? 'bg-amber-500' : 'bg-rose-500';
+
+  // Telemetría de uso ANÓNIMA: inicio del juego al montar (una vez).
+  useEffect(() => { recordGameStart('mundo_subsuelo'); }, []);
+  // Completado: cuando la escena alcanza 'vivo' (soilLife >= 75), una sola vez.
+  const completadoRef = useRef(false);
+  useEffect(() => {
+    if (stage === 'vivo' && !completadoRef.current) {
+      completadoRef.current = true;
+      recordGameComplete('mundo_subsuelo');
+    }
+  }, [stage]);
 
   const guideLine = useMemo(() => {
     if (activeDecision.tone === 'bad') {

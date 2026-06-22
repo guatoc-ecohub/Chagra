@@ -31,6 +31,7 @@ import {
   evaluarFinNivel,
 } from '../../services/defensoresGameEngine';
 import { agentSounds, isSoundEnabled } from '../../services/agentSoundService';
+import { recordGameStart, recordGameComplete } from '../../services/usageTelemetryService';
 
 // Dimensiones lógicas del LIENZO visible (la cámara recorta el mundo a esto).
 const VIEW_W = 720;
@@ -389,6 +390,9 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
         if (fin.estado === 'gano') {
           beep('good');
           onGanar(nivel.numero);
+          // Telemetría de uso ANÓNIMA: completado de "defensores" (una vez por
+          // nivel; el guard `estado === 'jugando'` evita repetir).
+          recordGameComplete('defensores');
         }
       }
 
@@ -705,6 +709,8 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
  * @param {Function} [props.onHome]
  */
 export default function DefensoresFincaScreen({ onBack, onHome }) {
+  // Telemetría de uso ANÓNIMA: inicio del juego al montar (una vez).
+  useEffect(() => { recordGameStart('defensores'); }, []);
   const [superados, setSuperados] = useState(() => leerSuperados());
   const [nivelNum, setNivelNum] = useState(1);
   const nivel = useMemo(() => getNivel(nivelNum), [nivelNum]);

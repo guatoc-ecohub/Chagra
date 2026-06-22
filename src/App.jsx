@@ -30,6 +30,8 @@ import SyncProgressIndicator from './components/common/SyncProgressIndicator';
 import useOllamaWarmStore from './store/useOllamaWarmStore';
 import { prewarmCorpus } from './services/ragRetriever';
 import { syncAgentTelemetry } from './services/agentTelemetrySync';
+import { syncUsageTelemetry } from './services/usageTelemetrySync';
+import { recordScreenView } from './services/usageTelemetryService';
 import useThemeBackgroundStore, { getBackgroundSrc } from './store/useThemeBackgroundStore';
 import useAlertStore from './store/useAlertStore';
 import { alertEngine } from './services/alertEngine';
@@ -76,6 +78,7 @@ const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').
 const BiopreparadoRecetasGallery = lazy(() => import('./components/BiopreparadoRecetasGallery'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
+const UsageStatsDashboard = lazy(() => import('./components/UsageStatsDashboard'));
 const BiodiversidadView = lazy(() => import('./components/BiodiversidadView'));
 const Asociaciones = lazy(() => import('./components/Asociaciones'));
 const FermentosView = lazy(() => import('./components/FermentosView'));
@@ -197,6 +200,7 @@ const HASH_VIEW_ROUTES = {
   'doom-finca': 'doom_finca',
   toxicologia: 'toxicologia',
   suelo: 'suelo',
+  'usage-stats': 'usage_stats',
 };
 
 // Vistas que cuentan como "módulo" para telemetría de piloto.
@@ -209,6 +213,7 @@ const MODULE_VIEWS = new Set([
   'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'suelo', 'toxicologia',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia',
+  'usage_stats',
 ]);
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
@@ -446,6 +451,7 @@ export default function App() {
       // respeta el consentimiento del usuario (default OFF) — si no lo dio,
       // es un no-op silencioso. NUNCA envía prompts ni PII.
       void syncAgentTelemetry();
+      void syncUsageTelemetry();
     };
     const goOffline = () => setIsAppOnline(false);
     window.addEventListener('online', goOnline);
@@ -454,6 +460,7 @@ export default function App() {
     // sincronizar de una sesión previa). Diferido para no competir con el boot.
     const bootSync = setTimeout(() => {
       void syncAgentTelemetry();
+      void syncUsageTelemetry();
     }, 8000);
     return () => {
       window.removeEventListener('online', goOnline);
@@ -485,6 +492,10 @@ export default function App() {
     setCurrentViewData(initialData);
     try {
       if (MODULE_VIEWS.has(view)) {
+        // Evento screen_view directo para la agregación de pantallas del sidecar
+        // (el wrapper es no-throw y anónimo). Mantenemos también `modulo_abierto`
+        // por back-compat: el sidecar lo trata como alias de screen_view.
+        recordScreenView(view);
         import('./services/pilotTelemetryService.js').then(({ recordPilotEvent }) => {
           recordPilotEvent({
             event_type: 'modulo_abierto',
@@ -1037,6 +1048,12 @@ export default function App() {
             <ScreenShell title={`Campo, ${PRIMARY_WORKER_NAME}`} icon={Eye} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
               <WorkerDashboard />
             </ScreenShell>
+          </ErrorBoundary>
+        );
+      case 'usage_stats':
+        return (
+          <ErrorBoundary>
+            <UsageStatsDashboard onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
           </ErrorBoundary>
         );
       case 'mapa':
