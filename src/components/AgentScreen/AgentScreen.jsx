@@ -113,6 +113,11 @@ import { AgentManoOverlay } from '../agent/AgentShell';
 import { mapCapabilityPick } from '../agent/capabilityRouting';
 import { agentSounds } from '../../services/agentSoundService';
 import ManoChagraGlyph from '../dashboard/ManoChagraGlyph';
+// Ícono del TEMA para el botón Ⓐ del compositor (paridad con home/TopBar y
+// AgentHero): el acceso a capacidades entra por el ícono del tema, no por la
+// mano (operador 2026-06-18). Misma fuente que TopBar.jsx / AgentHero.jsx.
+import { useTheme } from '../../hooks/useTheme';
+import { iconForTheme } from '../dashboard/themeIcon';
 import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
 import useAgentNotificationStore from '../../store/useAgentNotificationStore';
@@ -149,6 +154,8 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // re-render — si no, la animación se reiniciaría con cada mensaje). Vacía bajo
   // prefers-reduced-motion.
   const entranceClassRef = useRef(agentEntranceClass());
+  // Tema activo → ícono del botón Ⓐ del compositor (igual que home/TopBar).
+  const { theme } = useTheme();
   const operatorId = usePrefsStore((s) => s.operatorId) || 'default-operator';
   // Task #122 (2026-05-23): ttsEnabled global persistido en usePrefsStore.
   // Antes era useState local — al cambiarlo en otra pantalla (header
@@ -3280,7 +3287,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           <div className="flex items-center gap-2 px-1 pb-1 pt-0.5">
             {/* Botón Ⓐ — abre la MANO de Chagra (AgentRedMenu). Este botón ES la
                 raíz geométrica de la red (anchorRef): la mano brota de él, igual
-                que en el home. */}
+                que en el home. El GLIFO del botón es el ÍCONO DEL TEMA (no la
+                mano): paridad con home/TopBar y AgentHero — el acceso a
+                capacidades entra por el ícono del tema en el compositor
+                (operador 2026-06-18). `key={theme}` remonta el SVG al cambiar de
+                tema para que la "forja" de la Ⓐ biopunk vuelva a dibujarse. */}
             <button
               ref={aButtonRef}
               type="button"
@@ -3290,8 +3301,8 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               aria-expanded={sheetOpen}
               className={['as-iconbtn as-tool', sheetOpen ? 'is-open' : ''].join(' ')}
             >
-              <span className="w-[20px] h-[20px] flex items-center justify-center" aria-hidden="true">
-                <ManoChagraGlyph size={20} />
+              <span key={theme} className="w-[20px] h-[20px] flex items-center justify-center" aria-hidden="true">
+                {iconForTheme(theme)}
               </span>
             </button>
 

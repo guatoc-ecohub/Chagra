@@ -83,6 +83,11 @@ const messages = {
   agente: {
     placeholder: 'Escribe tu consulta...',
     pensando: 'Chagra esta pensando...',
+    // Estado "pensando" del chat: el texto visible es solo la palabra (los
+    // puntos suspensivos animados van en spans aparte) y el aria describe el
+    // estado completo para lectores de pantalla.
+    pensandoTexto: 'Pensando',
+    pensandoAria: 'Chagra IA está pensando',
     confianzaAlta: 'Confianza alta',
     confianzaMedia: 'Confianza media',
     confianzaBaja: 'Confianza baja',

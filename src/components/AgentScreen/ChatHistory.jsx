@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 import ChatBubble from './ChatBubble';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import DeepResearchCard from '../DeepResearchCard';
+import { MSG } from '../../config/messages';
 
 // Bug piloto 2026-06-04 (B): "para devolverme tengo que ir hasta el inicio de
 // la conversación sin importar lo larga que sea". El único "Volver" vivía en el
@@ -82,7 +83,15 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
   // aquí. Si el saludo aún no resolvió, caemos al copy estático de siempre.
   if (messages.length === 0 && !isStreaming) {
     return (
-      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center justify-center p-6">
+      // `relative z-10`: el AgentScreen pinta un velo `.agent-scrim`
+      // `absolute inset-0` como PRIMER hijo del root. En temas claros ese velo
+      // es crema casi opaco (rgb(--c-surface)/0.94) y, al ser posicionado,
+      // pintaba ENCIMA del empty-state (contenido en flujo, sin z-index) →
+      // lavaba el saludo a crema-sobre-crema (BUG legibilidad nature/minimalista,
+      // operador 2026-06-22). El header y el compositor ya escapan con `z-10`;
+      // aquí elevamos el contenido del chat al mismo plano para que el velo
+      // quede DETRÁS del texto (su rol real: velar la foto del body, no el copy).
+      <div className="relative z-10 flex-1 min-h-0 overflow-y-auto flex flex-col items-center justify-center p-6">
         <div className="text-center max-w-md">
           <ChagraAgentAvatar state="idle" size={200} className="mx-auto mb-4" />
           {proactiveGreeting ? (
@@ -117,7 +126,10 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
   };
 
   return (
-    <div className="relative flex-1 min-h-0">
+    // `z-10`: igual que el empty-state, el chat poblado debe pintar SOBRE el
+    // velo `.agent-scrim` (absolute inset-0 en el root del AgentScreen). Sin
+    // esto, en temas claros el velo crema casi opaco lava también los mensajes.
+    <div className="relative z-10 flex-1 min-h-0">
       {/* (B) Botón "Volver" FLOTANTE: sticky-ish respecto al área de chat,
           aparece al alejarse del inicio. Resuelve "tengo que ir hasta el
           inicio para devolverme". La animación de entrada respeta
@@ -193,10 +205,10 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
             state="thinking"
             size={96}
             className="shrink-0 mb-1"
-            ariaLabel="Chagra IA está pensando"
+            ariaLabel={MSG.agente.pensandoAria}
           />
           <div className="rounded-2xl rounded-bl-sm bg-slate-800/80 border border-slate-700/60 px-4 py-3 text-slate-300 text-sm italic shadow-lg">
-            Pensando
+            {MSG.agente.pensandoTexto}
             <span className="inline-block ml-1 animate-thinkingDot">·</span>
             <span className="inline-block ml-0.5 animate-thinkingDot [animation-delay:200ms]">·</span>
             <span className="inline-block ml-0.5 animate-thinkingDot [animation-delay:400ms]">·</span>
