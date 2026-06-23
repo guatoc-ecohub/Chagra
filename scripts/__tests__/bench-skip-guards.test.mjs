@@ -30,13 +30,10 @@ describe('bench skip guards', () => {
     expect(`${r.stdout}${r.stderr}`).toContain('SKIP: no existe ground truth');
   });
 
-  it('borde y complejos saltan limpio si falta la fixture de prompts', () => {
-    const r1 = runScript('scripts/bench-borde-alucinacion.mjs', {
-      PROMPTS_FILE: '/no/such/file.json',
-    });
-    expect(r1.status).toBe(0);
-    expect(`${r1.stdout}${r1.stderr}`).toContain('SKIP: falta fixture de prompts');
-
+  // NOTA: bench-borde-alucinacion.mjs se movio al repo privado chagra-pro en
+  // #1687 (runner + fixtures adversariales). Su skip-guard se testea alla; aqui
+  // solo cubrimos los benches que SIGUEN en el repo OSS.
+  it('complejos salta limpio si falta la fixture de prompts', () => {
     const r2 = runScript('scripts/bench-complejos-juez-independiente.mjs', {
       PROMPTS_FILE: '/no/such/file.json',
     });

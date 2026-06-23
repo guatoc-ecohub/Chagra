@@ -76,6 +76,7 @@ export function loadIndex(path = INDEX_PATH) {
  * @param {object} entry
  * @param {object} [opts]
  * @param {boolean} [opts.checkScript=false]  ademas verifica que el script exista.
+ *   Se SALTA para entradas con `external: true` (runner en repo privado).
  * @param {string} [opts.repoRoot=REPO_ROOT]
  * @returns {string[]} lista de problemas (vacia = OK).
  */
@@ -96,7 +97,12 @@ export function validateEntry(entry, { checkScript = false, repoRoot = REPO_ROOT
   if (entry.type !== 'test-suite' && entry.type !== 'meta' && !entry.script) {
     problems.push(`[${entry.id}] falta script`);
   }
-  if (checkScript && entry.script) {
+  if (checkScript && entry.script && !entry.external) {
+    // `external: true` marca entradas cuyo runner vive FUERA de este repo OSS
+    // (p. ej. en el repo privado chagra-pro). El registro sigue describiendo el
+    // bench para `--list`/historial/INDEX.md, pero NO exigimos que el .mjs
+    // exista localmente — exigirlo rompería `--check` y los tests en el repo
+    // publico. La provenance se documenta en el campo `provenance` de la entrada.
     const p = join(repoRoot, entry.script);
     if (!existsSync(p)) problems.push(`[${entry.id}] script no existe: ${entry.script}`);
   }
