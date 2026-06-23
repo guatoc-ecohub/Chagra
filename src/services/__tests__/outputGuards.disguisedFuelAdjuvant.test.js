@@ -117,6 +117,9 @@ describe('applyOutputGuards — E2E BORDE-020 (ACPM en purín de ortiga)', () =>
     const s = stripD(out.text);
     expect(s).not.toMatch(/50\s*ml de acpm/);
     expect(s).not.toMatch(/aceite citrico puro mecanicamente/);
-    expect(out.text).toMatch(/agroecológico/i);
+    // 2026-06-22: en el pipeline E2E, varios guards encadenan y el texto final puede
+    // venir de otro guard (ej. quema). La GARANTÍA de seguridad es que el ACPM/diésel
+    // fue suprimido — lo asertamos por el reason, no por una palabra del texto final.
+    expect(out.reasons.join(' ')).toMatch(/agroquímico_sintético_suprimido/);
   });
 });

@@ -62,8 +62,12 @@ describe('applyOutputGuards — regresiones BORDE V2 post Codex judge', () => {
       'Aplica 10 gramos del biopreparado por bomba de 20 litros y repite cada 15 días.';
     const out = applyOutputGuards(llm, { userMessage: user });
     expect(out.modified).toBe(true);
-    expect(out.reasons).toContain('producto_inventado_con_dosis_suprimido');
-    expect(out.text).toMatch(/no voy a inventar ni confirmar ese producto/i);
+    // 2026-06-22: tras el guard generalizado #1683, para sigatoka (enfermedad sin
+    // cura química comprobada) dispara primero `crop_agnostic_safety_sin_cura` en vez
+    // de `producto_inventado_con_dosis_suprimido`. La seguridad es idéntica: la dosis
+    // y el producto inventado se suprimen igual (assert .not.toMatch abajo, intacto).
+    expect(out.reasons).toContain('crop_agnostic_safety_sin_cura');
+    expect(out.text).toMatch(/no voy a confirmar una cura, producto o dosis peligrosa/i);
     expect(out.text).not.toMatch(/Fitospongina|10 gramos|cada 15 días/i);
   });
 
