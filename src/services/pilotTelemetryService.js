@@ -29,10 +29,46 @@
 
 import { openDB, STORES } from '../db/dbCore.js';
 
+/**
+ * Genera un sufijo aleatorio opaco (base36) usando un PRNG criptográficamente
+ * seguro (`crypto.getRandomValues`). Se usa para los ids de evento (`pt_*`) y
+ * de sesión anónima (`as_*`).
+ *
+ * Aunque estos ids son anónimos y efímeros, un `session_id` es un valor
+ * sensible a la seguridad (CodeQL js/insecure-randomness): si fuera predecible,
+ * un atacante podría adivinar/falsificar sesiones en la telemetría agregada.
+ * Por eso NO usamos `Math.random()`. Caemos a `Math.random()` solo si la
+ * Web Crypto API no está disponible (entornos muy antiguos / SSR sin polyfill),
+ * para no romper la UX — la telemetría nunca debe lanzar.
+ *
+ * @param {number} len - cantidad de caracteres base36 a producir.
+ * @returns {string} sufijo aleatorio de longitud `len`.
+ */
+const secureRandomSuffix = (len = 8) => {
+  const ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyz';
+  const cryptoObj =
+    (typeof globalThis !== 'undefined' && globalThis.crypto) ||
+    (typeof self !== 'undefined' && self.crypto) ||
+    (typeof window !== 'undefined' && window.crypto) ||
+    null;
+  if (cryptoObj && typeof cryptoObj.getRandomValues === 'function') {
+    const bytes = new Uint8Array(len);
+    cryptoObj.getRandomValues(bytes);
+    // b % 36 introduce un sesgo mínimo e irrelevante para un id opaco.
+    return Array.from(bytes, (b) => ALPHABET[b % 36]).join('');
+  }
+  // Fallback no-crypto: solo si no hay Web Crypto API. No debe ocurrir en
+  // navegadores soportados; la telemetría jamás debe romper la UX.
+  let out = '';
+  while (out.length < len) {
+    out += Math.random().toString(36).substring(2);
+  }
+  return out.substring(0, len);
+};
+
 const generateId = () => {
   const timestamp = Date.now().toString(36);
-  const random = Math.random().toString(36).substring(2, 10);
-  return `pt_${timestamp}${random}`;
+  return `pt_${timestamp}${secureRandomSuffix(8)}`;
 };
 
 // Clave de sessionStorage para el id de sesión anónima de uso.
@@ -54,7 +90,7 @@ let inMemoryAnonSession = null;
  * @returns {string} id de sesión anónima.
  */
 export const getAnonSessionId = () => {
-  const mint = () => `as_${Date.now().toString(36)}${Math.random().toString(36).substring(2, 10)}`;
+  const mint = () => `as_${Date.now().toString(36)}${secureRandomSuffix(8)}`;
   try {
     if (typeof sessionStorage !== 'undefined') {
       let id = sessionStorage.getItem(ANON_SESSION_KEY);
