@@ -77,7 +77,10 @@ describe('PlanEditor — validación de dosis positiva', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('50')).toBeTruthy();
+      // Para el asesor (rol por defecto) la dosis se renderiza como <input>
+      // editable (defaultValue), no como texto suelto. Verificamos el valor
+      // del campo en vez de un nodo de texto "50".
+      expect(screen.getByLabelText(/Dosis/i)).toHaveValue(50);
     });
   });
 
@@ -108,10 +111,10 @@ describe('PlanEditor — validación de dosis positiva', () => {
     );
 
     await waitFor(() => {
-      // El componente muestra el valor 0 tal cual; la validación de > 0
-      // debe implementarse en el handler onBlur. Este test verifica que
-      // el valor se renderiza para que el usuario pueda corregirlo.
-      expect(screen.getByText('0')).toBeTruthy();
+      // El componente muestra el valor 0 tal cual en el <input> de dosis; la
+      // validación de > 0 debe implementarse en el handler onBlur. Este test
+      // verifica que el valor se renderiza para que el usuario pueda corregirlo.
+      expect(screen.getByLabelText(/Dosis/i)).toHaveValue(0);
     });
   });
 

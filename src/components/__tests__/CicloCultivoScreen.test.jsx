@@ -104,7 +104,9 @@ describe('CicloCultivoScreen — ciclo del cultivo (fenología wired)', () => {
       expect(screen.getByRole('button', { name: /Café/ })).toBeTruthy();
     });
 
-    expect(hydrateCyclesFromFarmOS).toHaveBeenCalledWith(localCycles);
+    // La firma ganó un 2º arg de opciones { altitudeM } (derivado del perfil:
+    // finca_altitud 2600). El test antiguo solo asertaba el 1er argumento.
+    expect(hydrateCyclesFromFarmOS).toHaveBeenCalledWith(localCycles, { altitudeM: 2600 });
   });
 
   it('backfill: tolera errores de hidratación y muestra solo locales', async () => {

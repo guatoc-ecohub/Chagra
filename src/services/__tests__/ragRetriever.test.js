@@ -14,6 +14,11 @@
  *     como passages indexables por BM25.
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+// IDBFactory para resetear el IndexedDB entre tests (fake-indexeddb/auto ya
+// está cargado por tests/unit/setup.js). El índice del corpus se persiste en
+// el store rag_corpus_cache y sobrevive a vi.resetModules() → hay que limpiar
+// la base para que no se filtre entre tests con el MISMO manifestStamp.
+import { IDBFactory } from 'fake-indexeddb';
 
 const MANIFEST = {
   generated_at: '2026-05-18T00:00:00Z',
@@ -408,6 +413,11 @@ describe('ragRetriever — tier-gate del catalogo (SEC-002 / UXC-004)', () => {
 
   beforeEach(() => {
     vi.resetModules();
+    // El índice del corpus persistido (store rag_corpus_cache, key 'corpus')
+    // sobrevive a resetModules. Todos los casos SEC-002 usan el MISMO
+    // manifestStamp, así que un índice de un test anterior (con otro tier de
+    // catálogo) se hidrataba en el siguiente → conteos cruzados. Base fresca.
+    globalThis.indexedDB = new IDBFactory();
   });
 
   afterEach(() => {

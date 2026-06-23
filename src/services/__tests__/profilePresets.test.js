@@ -79,12 +79,13 @@ describe('profilePresets — getActivePresetId / applyProfilePreset (con localSt
     expect(mod.getActivePresetId({ rol: 'tecnico' })).toBe('corporativo');
   });
 
-  it('applyProfilePreset: persiste rol + perfil_demo y emite el evento', () => {
+  it('applyProfilePreset: persiste rol + perfil_demo y emite el evento', async () => {
     const events = [];
     const handler = (e) => events.push(e.detail);
     window.addEventListener(mod.PROFILE_CHANGED_EVENT, handler);
 
-    const result = mod.applyProfilePreset('corporativo');
+    // applyProfilePreset es async (espera seedProfileData) → await.
+    const result = await mod.applyProfilePreset('corporativo');
     expect(result.rol).toBe('tecnico');
     expect(result.perfil_demo).toBe('corporativo');
 
@@ -98,10 +99,11 @@ describe('profilePresets — getActivePresetId / applyProfilePreset (con localSt
     window.removeEventListener(mod.PROFILE_CHANGED_EVENT, handler);
   });
 
-  it('applyProfilePreset: id inválido → null y NO toca el perfil', () => {
-    mod.applyProfilePreset('cafetero');
+  it('applyProfilePreset: id inválido → null y NO toca el perfil', async () => {
+    await mod.applyProfilePreset('cafetero');
     const before = mod.getActivePresetId();
-    expect(mod.applyProfilePreset('no-existe')).toBeNull();
+    // id inválido se rechaza antes del await → la promesa resuelve a null.
+    await expect(mod.applyProfilePreset('no-existe')).resolves.toBeNull();
     expect(mod.getActivePresetId()).toBe(before); // sin cambios
   });
 });

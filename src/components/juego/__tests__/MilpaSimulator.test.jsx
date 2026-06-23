@@ -21,6 +21,14 @@ describe('MilpaSimulator', () => {
     fireEvent.click(screen.getByRole('button', { name: /Milpa \(Tres Hermanas\)/ }));
   };
 
+  // Tras iniciar la temporada, el flujo pasa por la fase "seleccion-evento"
+  // (el jugador elige 1 de 3 eventos antes de que golpee). Elegimos el primero.
+  const enfrentarPrimerEvento = () => {
+    const panel = screen.getByTestId('milpa-seleccion-evento');
+    const enfrentarBtns = within(panel).getAllByRole('button', { name: /Enfrentar/ });
+    fireEvent.click(enfrentarBtns[0]);
+  };
+
   it('arranca en selección y entra a siembra con seis parcelas vacías', () => {
     render(<MilpaSimulator />);
     expect(screen.getByTestId('milpa-simulator')).toBeInTheDocument();
@@ -68,6 +76,8 @@ describe('MilpaSimulator', () => {
     fireEvent.click(screen.getByTestId('milpa-sembrar-ahuyama'));
 
     fireEvent.click(screen.getByTestId('milpa-iniciar-temporada'));
+    // Nueva fase: elegir el evento antes de que golpee la temporada.
+    enfrentarPrimerEvento();
     expect(screen.getByTestId('milpa-panel-evento')).toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId('milpa-ver-resultado'));
@@ -86,6 +96,7 @@ describe('MilpaSimulator', () => {
     elegirMilpa();
     fireEvent.click(screen.getByTestId('milpa-sembrar-maiz'));
     fireEvent.click(screen.getByTestId('milpa-iniciar-temporada'));
+    enfrentarPrimerEvento();
     fireEvent.click(screen.getByTestId('milpa-ver-resultado'));
 
     fireEvent.click(screen.getByRole('button', { name: /Siguiente temporada/ }));
