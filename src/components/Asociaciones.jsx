@@ -517,7 +517,12 @@ export default function Asociaciones({ profile = {}, esOperador = false }) {
                 ))}
               </div>
               <p className="mt-1 text-xs font-semibold text-emerald-700">
-                {selected && cultivosFinca.includes(selected) ? '¡Ya tienes este cultivo!' : 'Selecciona uno para ver recomendaciones'}
+                {selected && cultivosFinca.some((slug) => {
+                  // cultivosFinca son slugs crudos (zea_mays); `selected` es id/nombre (maiz).
+                  // Resolver slug→cultivo igual que el resto del componente para que el match funcione.
+                  const c = findCultivoInItems(arquetipos, slug);
+                  return slug === selected || c?.id === selected || c?.nombre === selected;
+                }) ? '¡Ya tienes este cultivo!' : 'Selecciona uno para ver recomendaciones'}
               </p>
             </div>
           )}
