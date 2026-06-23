@@ -5593,6 +5593,274 @@
       "antagonists": [],
       "tracking_mode": "aggregate",
       "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "BORRADOR_IA — gap de Pest.cultivos_afectados (grafo AGE chagra_kg); taxonomía y altitud verificadas (POWO/GBIF/Bernal 2015); prosa pendiente DR de verificación agronómica.",
+      "id": "rosa_hybrida",
+      "nombre_comun": "Rosa",
+      "nombre_comunes_regionales": [
+        "rosa de corte",
+        "rosa de exportación",
+        "rosal"
+      ],
+      "nombre_cientifico": "Rosa × hybrida hort.",
+      "familia_botanica": "Rosaceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "harvest_type": "flor",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "La rosa de corte (Rosa × hybrida hort., familia Rosaceae) es un arbusto ornamental híbrido cultivado bajo invernadero en la Sabana de Bogotá (Cundinamarca) y el oriente antioqueño (Rionegro, La Ceja), donde el clima frío de altiplano (2.200–2.800 msnm), la radiación intensa y los días casi constantes del trópico permiten producción durante todo el año. Es el principal renglón de la floricultura colombiana de exportación, segundo exportador mundial de flores cortadas después de Países Bajos, con destino principal a Estados Unidos para fechas como San Valentín y el Día de la Madre. En la chagra y en sistemas agroecológicos, las rosas atraen polinizadores y sirven de planta indicadora del manejo sanitario: son altamente susceptibles a arañita roja (Tetranychus urticae) y trips de las flores (Frankliniella occidentalis), plagas que la curaduría de Chagra documenta como controlables con caldos botánicos, jabón potásico y control biológico (ácaros depredadores Phytoseiulus), reduciendo la dependencia de agroquímicos característica del monocultivo florícola convencional. Lección viva sobre cadena de exportación, condiciones laborales del sector flores y transición a manejo integrado de plagas. Fuentes Tier A de taxonomía: GBIF, POWO Kew, Bernal 2015.",
+      "tracking_mode": "aggregate"
+    },
+    {
+      "_curation_status": "BORRADOR_IA — gap de Pest.cultivos_afectados (grafo AGE chagra_kg); taxonomía y altitud verificadas (POWO/GBIF/Bernal 2015); prosa pendiente DR de verificación agronómica.",
+      "id": "chrysanthemum_morifolium",
+      "nombre_comun": "Crisantemo / Pompón",
+      "nombre_comunes_regionales": [
+        "pompón",
+        "crisantemo",
+        "margarita de otoño"
+      ],
+      "nombre_cientifico": "Chrysanthemum × morifolium Ramat.",
+      "familia_botanica": "Asteraceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1600,
+        "optimo_min": 2000,
+        "optimo_max": 2700,
+        "max_absoluto": 2900
+      },
+      "harvest_type": "flor",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El crisantemo o pompón (Chrysanthemum × morifolium Ramat., familia Asteraceae) es una herbácea ornamental de día corto cultivada de forma intensiva en la Sabana de Bogotá y el oriente antioqueño para flor de corte de exportación, donde Colombia es uno de los mayores proveedores mundiales. Su floración se induce manipulando el fotoperíodo (luz suplementaria nocturna y oscurecimiento con telas negras), una práctica que enseña la fisiología vegetal del fotoperiodismo de manera tangible. En el monocultivo florícola es susceptible a la roya blanca del crisantemo (Puccinia horiana), enfermedad cuarentenaria, y al minador de la hoja (Liriomyza spp.); la curaduría de Chagra registra ambas con su manejo agroecológico (eliminación de tejido infectado, trampas amarillas, conservación de avispas parasitoides). Pertenece a la misma familia (Asteraceae) que la caléndula y el girasol, plantas compañeras atractoras de polinizadores y controladoras naturales en la chagra. Lección viva sobre floricultura de exportación, fotoperiodismo y manejo integrado de plagas cuarentenarias. Fuentes Tier A de taxonomía: GBIF, POWO Kew, Bernal 2015.",
+      "tracking_mode": "aggregate"
+    },
+    {
+      "_curation_status": "BORRADOR_IA — gap de Pest.cultivos_afectados (grafo AGE chagra_kg); taxonomía y altitud verificadas (POWO/GBIF/Bernal 2015); prosa pendiente DR de verificación agronómica.",
+      "id": "dianthus_caryophyllus",
+      "nombre_comun": "Clavel",
+      "nombre_comunes_regionales": [
+        "clavel de exportación",
+        "clavel estándar",
+        "clavel miniatura"
+      ],
+      "nombre_cientifico": "Dianthus caryophyllus L.",
+      "familia_botanica": "Caryophyllaceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 2700,
+        "max_absoluto": 2900
+      },
+      "harvest_type": "flor",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "_anti_confusion": "NO confundir con el 'clavel chino' (Tagetes patula, Asteraceae) ni el 'clavel de muerto' (Tagetes erecta): el clavel de corte de exportación es Dianthus caryophyllus, familia Caryophyllaceae.",
+      "valor_pedagogico": "El clavel (Dianthus caryophyllus L., familia Caryophyllaceae) es una herbácea ornamental perenne de origen mediterráneo, históricamente la primera flor de corte que posicionó a Colombia en el mercado mundial desde la Sabana de Bogotá en los años 1970. Se cultiva bajo invernadero en clima frío de altiplano (2.200–2.700 msnm) tanto en variedad estándar (una flor por tallo) como spray o miniatura (varias flores). Es especialmente vulnerable a la marchitez vascular por Fusarium oxysporum f. sp. dianthi, que obliga a manejo sanitario riguroso de suelo y material vegetal; la curaduría de Chagra registra el complejo Fusarium con su manejo agroecológico (sustratos sanos, biocontrol con Trichoderma, rotación). No debe confundirse con el 'clavel chino' (Tagetes patula), que es una asterácea distinta usada como repelente en la chagra. Lección viva sobre la historia de la floricultura colombiana, marchitez vascular del suelo y biocontrol con hongos antagonistas. Fuentes Tier A de taxonomía: GBIF, POWO Kew, Bernal 2015.",
+      "tracking_mode": "aggregate"
+    },
+    {
+      "_curation_status": "BORRADOR_IA — gap de Pest.cultivos_afectados (grafo AGE chagra_kg); taxonomía y altitud verificadas (POWO/GBIF/Bernal 2015); prosa pendiente DR de verificación agronómica.",
+      "id": "vitis_vinifera",
+      "nombre_comun": "Vid / Uva",
+      "nombre_comunes_regionales": [
+        "uva",
+        "parra",
+        "vid europea",
+        "uva de mesa"
+      ],
+      "nombre_cientifico": "Vitis vinifera L.",
+      "familia_botanica": "Vitaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 400,
+        "optimo_min": 900,
+        "optimo_max": 1600,
+        "max_absoluto": 2000
+      },
+      "harvest_type": "fruto",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "_anti_confusion": "Vitis vinifera (vid europea, uva de mesa/vino) es especie distinta de Vitis labrusca (uva Isabella) y NO tiene relación con la 'uva caimarona' (Pourouma cecropiifolia, Urticaceae) ni la 'uva camarona' (Macleania rupestris, Ericaceae), ambos frutos nativos.",
+      "valor_pedagogico": "La vid o uva (Vitis vinifera L., familia Vitaceae) es una liana leñosa trepadora caducifolia originaria de Eurasia, cultivada en Colombia principalmente en el Valle del Cauca (zona de La Unión, Roldanillo, Toro — clima cálido moderado) y en el norte del Valle y Boyacá, tanto como uva de mesa como para vinos artesanales. A diferencia del clima templado estacional de origen, en el trópico la vid no entra en dormancia natural, por lo que se maneja con poda forzada para inducir hasta dos cosechas anuales, una práctica agronómica única que enseña cómo se adapta un cultivo de zona templada al trópico. Requiere tutorado (espaldera o parral) y es susceptible a la podredumbre gris (Botrytis cinerea) en racimo y a nematodos; la curaduría de Chagra registra ambos problemas. No debe confundirse con la 'uva caimarona' (Pourouma cecropiifolia) ni la 'uva camarona' (Macleania rupestris), frutos nativos amazónico-andinos sin parentesco botánico. Lección viva sobre adaptación de cultivos templados al trópico y poda fisiológica. Fuentes Tier A de taxonomía: GBIF, POWO Kew, Bernal 2015.",
+      "tracking_mode": "aggregate"
+    },
+    {
+      "_curation_status": "BORRADOR_IA — gap de Pest.cultivos_afectados (grafo AGE chagra_kg); taxonomía y altitud verificadas (POWO/GBIF/Bernal 2015); prosa pendiente DR de verificación agronómica.",
+      "id": "elaeis_guineensis",
+      "nombre_comun": "Palma de aceite",
+      "nombre_comunes_regionales": [
+        "palma africana",
+        "palma aceitera"
+      ],
+      "nombre_cientifico": "Elaeis guineensis Jacq.",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 500,
+        "max_absoluto": 700
+      },
+      "harvest_type": "fruto",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "La palma de aceite o palma africana (Elaeis guineensis Jacq., familia Arecaceae) es una palma perenne de tierra caliente originaria del África occidental, hoy el cultivo oleaginoso más extenso de Colombia, sembrado en cuatro zonas (Norte: Magdalena, Cesar; Central: Santander; Oriental: Meta, Casanare; Suroccidental: Tumaco), siendo Colombia el primer productor de aceite de palma de América y cuarto del mundo. Su racimo de frutos rojo-anaranjados se procesa para aceite de palma (mesocarpio) y de palmiste (almendra). Es un cultivo de fuerte controversia socioambiental por su asociación histórica con deforestación, conflictos de tierra y pérdida de biodiversidad cuando reemplaza bosque o sistemas campesinos, aunque existen modelos de certificación sostenible. Está afectada por un complejo sanitario severo: pudrición del cogollo (Phytophthora palmivora), anillo rojo (nematodo Bursaphelenchus cocophilus transmitido por el picudo Rhynchophorus palmarum), marchitez letal (vector Haplaxius crudus) y pudrición basal por Ganoderma zonatum, todos registrados en la curaduría de Chagra. Lección viva crítica sobre agroindustria tropical, monocultivo, transición agroecológica y tensiones entre exportación y soberanía alimentaria. Fuentes Tier A de taxonomía: GBIF, POWO Kew, Bernal 2015.",
+      "tracking_mode": "aggregate"
+    },
+    {
+      "_curation_status": "BORRADOR_IA — gap de Pest.cultivos_afectados (grafo AGE chagra_kg); taxonomía y altitud verificadas (POWO/GBIF/Bernal 2015); prosa pendiente DR de verificación agronómica.",
+      "id": "heliconia_psittacorum",
+      "nombre_comun": "Heliconia",
+      "nombre_comunes_regionales": [
+        "platanillo",
+        "bihao",
+        "pico de loro",
+        "ave del paraíso falsa"
+      ],
+      "nombre_cientifico": "Heliconia psittacorum L.f.",
+      "familia_botanica": "Heliconiaceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1200,
+        "max_absoluto": 1800
+      },
+      "harvest_type": "flor",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "La heliconia o platanillo (Heliconia psittacorum L.f., familia Heliconiaceae) es una herbácea rizomatosa perenne nativa del Neotrópico, de las cuales Colombia es uno de los países con mayor diversidad de especies del género Heliconia. Sus inflorescencias de brácteas vistosas (rojas, naranjas, amarillas) la convirtieron en una flor tropical de corte de exportación cultivada en zonas cálidas y de piedemonte (Eje Cafetero, Tolima, Llanos, Pacífico). Ecológicamente es clave: sus flores tubulares son polinizadas casi exclusivamente por colibríes, y las brácteas acumulan agua (fitotelmata) que alberga fauna acuática especializada, por lo que sirve para enseñar coevolución planta-polinizador y microhábitats. Comparte con el plátano y el banano (orden Zingiberales) la susceptibilidad al moko (Ralstonia solanacearum raza 2), registrado en la curaduría de Chagra como riesgo de manejo en cultivos asociados. Lección viva sobre biodiversidad nativa colombiana, floricultura tropical sostenible y relaciones colibrí-planta. Fuentes Tier A de taxonomía: GBIF, POWO Kew, Bernal 2015, SiB Colombia.",
+      "tracking_mode": "aggregate"
+    },
+    {
+      "_curation_status": "BORRADOR_IA — gap de Pest.cultivos_afectados (grafo AGE chagra_kg); incluida como HOSPEDERO/RESERVORIO del vector del HLB de cítricos; taxonomía y altitud verificadas (POWO/GBIF/Bernal 2015); prosa pendiente DR de verificación agronómica.",
+      "id": "murraya_paniculata",
+      "nombre_comun": "Mirto / Azahar de la India",
+      "nombre_comunes_regionales": [
+        "azahar de la india",
+        "mirto",
+        "jazmín naranjo",
+        "naranjo jazmín"
+      ],
+      "nombre_cientifico": "Murraya paniculata (L.) Jack",
+      "familia_botanica": "Rutaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "living_fence",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1500,
+        "max_absoluto": 1800
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "_anti_confusion": "El 'mirto' aquí es Murraya paniculata (Rutaceae, ornamental asiático), NO el mirto mediterráneo (Myrtus communis, Myrtaceae). Pertenece a la misma familia (Rutaceae) que los cítricos, de ahí su papel como reservorio del psílido vector del HLB.",
+      "valor_pedagogico": "El mirto o azahar de la India (Murraya paniculata (L.) Jack, familia Rutaceae) es un arbusto ornamental siempreverde originario de Asia tropical, muy usado como cerca viva y seto recortado en jardines y antejardines de tierra cálida y templada en Colombia por sus flores blancas perfumadas (similares al azahar de los cítricos) y su follaje denso. Pertenece a la familia Rutaceae, la misma de los cítricos, y por ello es importante en sanidad vegetal: es el hospedero preferido y reservorio del psílido asiático de los cítricos (Diaphorina citri), insecto vector de la bacteria del Huanglongbing (HLB) o 'dragón amarillo', la enfermedad más destructiva de la citricultura mundial. El ICA y la curaduría de Chagra desaconsejan sembrar mirto cerca de huertos cítricos precisamente por servir de puente epidemiológico del vector. No debe confundirse con el mirto mediterráneo (Myrtus communis). Lección viva sobre epidemiología vegetal, plantas reservorio de vectores y el principio de no introducir hospederos de plagas cerca de cultivos sensibles. Fuentes Tier A de taxonomía: GBIF, POWO Kew, Bernal 2015.",
+      "tracking_mode": "aggregate"
     }
   ],
   "sources": [
