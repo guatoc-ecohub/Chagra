@@ -70,7 +70,7 @@ describe('TaskScreen — validacion de formulario', () => {
 
     render(<TaskScreen onBack={onBack} onSave={onSave} />);
 
-    const nameInput = screen.getByPlaceholderText(/riego fertiorganico/i);
+    const nameInput = screen.getByPlaceholderText(/riego fertiorgánico/i);
     fireEvent.change(nameInput, { target: { value: 'Riego manana' } });
 
     const saveBtn = screen.getByRole('button', { name: /programar tarea/i });

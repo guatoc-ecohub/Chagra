@@ -21,122 +21,40 @@
  * Nota: shouldStartNewSession, getLastTurnTimestamp y computeSourceMetadata
  * ya están cubiertos en tests separados (.session.test.js y .sourceMetadata.test.js)
  */
-import { describe, test, expect, beforeEach, vi } from 'vitest';
+import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
+// `fake-indexeddb/auto` ya está cargado globalmente por tests/unit/setup.js
+// (instala indexedDB, IDBKeyRange, IDBObjectStore, etc. en globalThis). Usamos
+// la implementación real en memoria — fiel a la spec — en vez del fake hecho a
+// mano que rompía en vitest 4.x por timing de oncomplete/onerror. Mismo patrón
+// que el resto del repo (no toca código de prod: solo el openDB mockeado).
+import 'fake-indexeddb/auto';
+import { IDBFactory } from 'fake-indexeddb';
+
+const STORE_NAME = 'conversation_memory';
+let memoryDB = null;
+
+// Crea una DB real de fake-indexeddb con el store `conversation_memory`
+// (keyPath: id) + índice `operator_id`, igual al schema de src/db/dbCore.js.
+function createMemoryDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('ChagraDB-conversationMemory-test', 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+      store.createIndex('operator_id', 'operator_id', { unique: false });
+      store.createIndex('timestamp', 'timestamp', { unique: false });
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
 
 // ─── Mocks ────────────────────────────────────────────────────────────────
-// Fake IndexedDB compatible con conversationMemory.js
-let fakeStorage = [];
-
-const makeFakeDB = () => ({
-  transaction(_storeName, _mode) {
-    const tx = { oncomplete: null, onerror: null, error: null };
-    let opsScheduled = 0;
-    let opsCompleted = 0;
-    const maybeComplete = () => {
-      if (opsScheduled === opsCompleted) {
-        setTimeout(() => tx.oncomplete?.(), 0);
-      }
-    };
-    const trackOp = (fn) => {
-      opsScheduled += 1;
-      setTimeout(() => {
-        fn();
-        opsCompleted += 1;
-        maybeComplete();
-      }, 0);
-    };
-    setTimeout(() => {
-      if (opsScheduled === 0) tx.oncomplete?.();
-    }, 1);
-
-    return {
-      get oncomplete() { return tx.oncomplete; },
-      set oncomplete(fn) { tx.oncomplete = fn; },
-      get onerror() { return tx.onerror; },
-      set onerror(fn) { tx.onerror = fn; },
-      get error() { return tx.error; },
-      objectStore(_name) {
-        return {
-          add(turn) {
-            const req = { onsuccess: null, onerror: null };
-            trackOp(() => {
-              fakeStorage.push(turn);
-              req.result = turn;
-              req.onsuccess?.({ target: req });
-            });
-            return req;
-          },
-          delete(id) {
-            const req = { onsuccess: null, onerror: null };
-            trackOp(() => {
-              fakeStorage = fakeStorage.filter((t) => t.id !== id);
-              req.onsuccess?.({ target: req });
-            });
-            return req;
-          },
-          index(_indexName) {
-            return {
-              getAll(range) {
-                const req = { onsuccess: null, onerror: null };
-                trackOp(() => {
-                  const target = range?._only;
-                  req.result = fakeStorage.filter((t) => t.operator_id === target);
-                  req.onsuccess?.({ target: req });
-                });
-                return req;
-              },
-              openCursor(range) {
-                const req = { onsuccess: null, onerror: null };
-                opsScheduled += 1;
-                const target = range?._only;
-                let entries;
-                let idx = 0;
-                const step = () => {
-                  if (entries === undefined) {
-                    entries = fakeStorage.filter((t) => t.operator_id === target);
-                  }
-                  if (idx >= entries.length) {
-                    setTimeout(() => {
-                      req.onsuccess?.({ target: { result: null } });
-                      opsCompleted += 1;
-                      maybeComplete();
-                    }, 0);
-                    return;
-                  }
-                  const entry = entries[idx];
-                  idx += 1;
-                  const cursor = {
-                    value: entry,
-                    delete() {
-                      fakeStorage = fakeStorage.filter((t) => t.id !== entry.id);
-                    },
-                    continue() {
-                      step();
-                    },
-                  };
-                  setTimeout(() => req.onsuccess?.({ target: { result: cursor } }), 0);
-                };
-                setTimeout(step, 0);
-                return req;
-              },
-            };
-          },
-        };
-      },
-    };
-  },
-});
-
+// openDB devuelve la DB real de fake-indexeddb sembrada por test.
 vi.mock('../../db/dbCore', () => ({
-  openDB: vi.fn(() => Promise.resolve(makeFakeDB())),
+  openDB: vi.fn(() => Promise.resolve(memoryDB)),
   STORES: { CONVERSATION_MEMORY: 'conversation_memory' },
 }));
-
-if (typeof globalThis.IDBKeyRange === 'undefined') {
-  globalThis.IDBKeyRange = {
-    only: (value) => ({ _only: value }),
-  };
-}
 
 import {
   addTurn,
@@ -146,8 +64,36 @@ import {
   clearMemory,
 } from '../conversationMemory';
 
-beforeEach(() => {
-  fakeStorage = [];
+// Reloj monótono: addTurn usa Date.now() como timestamp y getRecentContext
+// ordena por él. En un loop tight, varios addTurn comparten el mismo
+// milisegundo y, con fake-indexeddb real, getAll del índice los devuelve por
+// clave primaria (id aleatorio), no por inserción → orden no determinista.
+// En producción los turnos están separados por segundos, así que avanzar el
+// reloj 1ms por llamada reproduce el orden real sin tocar código de prod.
+let clockTick = 0;
+let dateNowSpy = null;
+
+beforeEach(async () => {
+  // DB en memoria fresca por test → aislamiento total. Reseteamos el factory
+  // global para que la base anterior no persista entre tests.
+  globalThis.indexedDB = new IDBFactory();
+  memoryDB = await createMemoryDB();
+
+  clockTick = 0;
+  const realNow = Date.now();
+  dateNowSpy = vi.spyOn(Date, 'now').mockImplementation(() => realNow + clockTick++);
+});
+
+afterEach(() => {
+  if (dateNowSpy) {
+    dateNowSpy.mockRestore();
+    dateNowSpy = null;
+  }
+  if (memoryDB) {
+    memoryDB.close();
+    memoryDB = null;
+  }
+  vi.clearAllMocks();
 });
 
 describe('addTurn', () => {

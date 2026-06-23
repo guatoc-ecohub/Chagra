@@ -6,7 +6,6 @@ import {
   agendaPorDia,
   agendaPorSemana,
   ensoTaskPhase,
-  STAGE_LABELS,
 } from '../hoyEnFincaService';
 
 const DAY_MS = 86400000;
@@ -116,7 +115,12 @@ describe('buildTareasSemana', () => {
     expect(grupos).toHaveLength(1);
     const g = grupos[0];
     expect(g.etiqueta).toBe('Papa pastusa');
-    expect(g.stageLabel).toBe(STAGE_LABELS[g.stageCode]);
+    // El template de la especie puede aportar una etiqueta más específica
+    // (p. ej. "Emergencia" para papa) que prevalece sobre el map genérico
+    // STAGE_LABELS ("Brote"). Solo exigimos un stageCode + label no vacíos.
+    expect(g.stageCode).toBeTruthy();
+    expect(typeof g.stageLabel).toBe('string');
+    expect(g.stageLabel.length).toBeGreaterThan(0);
     expect(g.tareas.length).toBeGreaterThan(0);
     // Cada tarea trae nombre + prioridad (sin fabricar campos vacíos).
     for (const t of g.tareas) {

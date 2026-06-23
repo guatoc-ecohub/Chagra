@@ -2,7 +2,7 @@
  * sw-precache-audit.test.js — verifica el contrato de precache del SW.
  *
  * Lee public/sw.js y audita:
- *   1. CACHE_NAME sigue el patron `chagra-v<N>`.
+ *   1. CACHE_NAME se deriva del SHA de build (`chagra-${SW_BUILD_SHA}`).
  *   2. RAG_GROUNDING_CACHE existe con prefijo y version correctos.
  *   3. MAP_TILES_CACHE existe con prefijo y version.
  *   4. ASSETS_TO_CACHE contiene app shell esencial.
@@ -55,10 +55,14 @@ function extractArray(name) {
 }
 
 describe('SW precache contract', () => {
-  it('CACHE_NAME sigue el patron chagra-v<N>', () => {
-    const name = extractConst('CACHE_NAME');
-    expect(name).toBeTruthy();
-    expect(name).toMatch(/^chagra-v\d+$/);
+  it('CACHE_NAME se deriva del SHA de build (chagra-${SW_BUILD_SHA})', () => {
+    // Desde #1716 el shell se versiona por SHA del bundle, no por chagra-v<N>.
+    // CACHE_NAME es un ternario: chagra-<sha> en prod, chagra-dev cuando el
+    // placeholder no fue sustituido. Verificamos el contrato de derivacion.
+    const placeholder = extractConst('SW_BUILD_SHA');
+    expect(placeholder).toBe('__CHAGRA_SW_BUILD_SHA__');
+    expect(swSource).toMatch(/const CACHE_NAME\s*=[\s\S]*?`chagra-\$\{SW_BUILD_SHA\}`/);
+    expect(swSource).toMatch(/'chagra-dev'/);
   });
 
   it('RAG_GROUNDING_PREFIX y RAG_GROUNDING_CACHE tienen formato correcto', () => {

@@ -30,13 +30,17 @@ describe('OnboardingHero — validacion de campos requeridos', () => {
   });
 
   it('con altitud sin confirmar: muestra confirmacion obligatoria antes de registrar', () => {
+    // La clave real del perfil es `chagra:profile:v1` (userProfileService),
+    // no `chagra_profile`. El test antiguo escribía la clave equivocada y el
+    // perfil quedaba vacío → nunca se mostraba la confirmación de piso.
     window.localStorage.setItem(
-      'chagra_profile',
+      'chagra:profile:v1',
       JSON.stringify({ finca_altitud: '1800' })
     );
     render(<OnboardingHero onNavigate={vi.fn()} />);
     expect(screen.getByTestId('onboarding-piso-confirm')).toBeTruthy();
-    expect(screen.getByText(/correcto/i)).toBeTruthy();
+    // "correcto" aparece en "¿Es correcto?" y en el botón "Sí, es correcto".
+    expect(screen.getAllByText(/correcto/i).length).toBeGreaterThan(0);
   });
 
   it('las 3 rutas de registro estan presentes tras los pasos de validacion', () => {
@@ -54,7 +58,7 @@ describe('OnboardingHero — validacion de campos requeridos', () => {
 
   it('compact con piso confirmado: no renderiza nada', () => {
     window.localStorage.setItem(
-      'chagra_profile',
+      'chagra:profile:v1',
       JSON.stringify({ finca_altitud: '2200', piso_confirmado: '1' })
     );
     const { container } = render(<OnboardingHero onNavigate={vi.fn()} compact />);

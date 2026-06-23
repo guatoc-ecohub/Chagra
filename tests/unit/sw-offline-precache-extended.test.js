@@ -20,11 +20,14 @@ const SW_PATH = path.resolve(__dirnameLocal, '../../public/sw.js');
 // Mock de Cache Storage para tests unitarios sin cargar el SW completo.
 // Verifica que los nombres de cache y su estructura son correctos.
 describe('SW cache bucket names', () => {
-  it('define CACHE_NAME para el shell', async () => {
+  it('define CACHE_NAME para el shell (derivado del SHA de build)', async () => {
     const code = await import('node:fs').then((fs) =>
       fs.readFileSync(SW_PATH, 'utf8'),
     );
-    expect(code).toMatch(/const CACHE_NAME\s*=\s*'chagra-v\d+'/);
+    // Desde #1716 el shell se versiona por SHA del bundle (chagra-<sha>),
+    // no por chagra-v<N>. CACHE_NAME es un ternario sobre SW_BUILD_SHA.
+    expect(code).toMatch(/const CACHE_NAME\s*=[\s\S]*?`chagra-\$\{SW_BUILD_SHA\}`/);
+    expect(code).toContain("'chagra-dev'");
   });
 
   it('define RAG_GROUNDING_CACHE como bucket separado', async () => {

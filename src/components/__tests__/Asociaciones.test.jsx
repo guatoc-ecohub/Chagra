@@ -60,8 +60,9 @@ describe('Asociaciones - Rediseño Útil y Accionable', () => {
     const milpaCard = screen.getByRole('article', { name: /Milpa de maíz, fríjol y ahuyama/ });
     const withinMilpa = within(milpaCard);
 
-    // Verificar métricas específicas de datos reales
-    expect(withinMilpa.getByText(/LER/)).toBeInTheDocument();
+    // Verificar métricas específicas de datos reales. LER aparece en el badge
+    // y en las métricas comparativas (varios nodos) → getAllByText.
+    expect(withinMilpa.getAllByText(/LER/).length).toBeGreaterThan(0);
     expect(withinMilpa.getByText(/fijación N/)).toBeInTheDocument();
   });
 
@@ -77,10 +78,11 @@ describe('Asociaciones - Rediseño Útil y Accionable', () => {
     const cafeCard = screen.getByRole('article', { name: /Café con guamo y plátano/ });
     expect(cafeCard).toBeInTheDocument();
 
-    // Verificar elementos específicos del café
+    // Verificar elementos específicos del café. "guamo"/"plátano" aparecen en
+    // el título del sistema y en los chips de compañeros → getAllByText.
     const withinCafe = within(cafeCard);
-    expect(withinCafe.getByText(/guamo/)).toBeInTheDocument();
-    expect(withinCafe.getByText(/plátano/)).toBeInTheDocument();
+    expect(withinCafe.getAllByText(/guamo/).length).toBeGreaterThan(0);
+    expect(withinCafe.getAllByText(/plátano/).length).toBeGreaterThan(0);
   });
 
   test('detecta cultivos de la finca y muestra indicador', () => {
@@ -98,10 +100,12 @@ describe('Asociaciones - Rediseño Útil y Accionable', () => {
 
     render(<Asociaciones profile={{ rol: 'campesino' }} />);
 
-    // Verificar que se detecte el cultivo
+    // Verificar que se detecte el cultivo. "café" aparece también como opción
+    // del selector → acotamos al indicador "Detectado en tu finca".
     expect(screen.getByLabelText(/¿Qué cultivo quieres planear?/)).toHaveValue('cafe');
-    expect(screen.getByText(/Detectado en tu finca/)).toBeInTheDocument();
-    expect(screen.getByText(/café/)).toBeInTheDocument();
+    const indicador = screen.getByText(/Detectado en tu finca/).closest('div').parentElement;
+    expect(indicador).toBeInTheDocument();
+    expect(within(indicador).getByText(/café/)).toBeInTheDocument();
   });
 
   test('muestra múltiples cultivos de la finca cuando existen', () => {
@@ -126,10 +130,11 @@ describe('Asociaciones - Rediseño Útil y Accionable', () => {
 
     render(<Asociaciones profile={{ rol: 'campesino' }} />);
 
-    // Debería detectar ambos cultivos
-    expect(screen.getByText(/Detectado en tu finca/)).toBeInTheDocument();
-    expect(screen.getByText(/maíz/)).toBeInTheDocument();
-    expect(screen.getByText(/fríjol/)).toBeInTheDocument();
+    // Debería detectar ambos cultivos. Los nombres aparecen también como
+    // opciones del selector → acotamos al indicador "Detectado en tu finca".
+    const indicador = screen.getByText(/Detectado en tu finca/).closest('div').parentElement;
+    expect(within(indicador).getByText(/maíz/)).toBeInTheDocument();
+    expect(within(indicador).getByText(/fríjol/)).toBeInTheDocument();
   });
 
   test('muestra estado vacío cuando no hay asociaciones disponibles', () => {
@@ -174,8 +179,9 @@ describe('Asociaciones - Rediseño Útil y Accionable', () => {
     // Verificar que se muestren antagonistas
     expect(withinMilpa.getByText(/Evitar estas combinaciones/)).toBeInTheDocument();
 
-    // Para maíz, debería evitar hinojo
-    expect(withinMilpa.getByText(/hinojo/)).toBeInTheDocument();
+    // Para maíz, debería evitar hinojo. El nombre aparece en el título del
+    // antagonista y en la razón → getAllByText.
+    expect(withinMilpa.getAllByText(/hinojo/).length).toBeGreaterThan(0);
   });
 
   test('muestra mensaje cuando no hay antagonistas conocidos', () => {
