@@ -20,6 +20,7 @@ import {
   guardToolingLeakRedaction,
   guardBurnEndorsementCorrection,
   buildBurnSafetyCorrection,
+  guardConciseResponse,
   TOOLING_LEAK_REDACTION,
   applyOutputGuards,
   getOutputGuardTelemetry,
@@ -234,5 +235,65 @@ describe('applyOutputGuards — integración (capa que reescribe el texto)', () 
     expect(out.text).toMatch(/Ley 1930 de 2018/);
     expect(out.text).toMatch(/compost/i);
     expect(out.text).toMatch(/caldo bordel[ée]s/i);
+  });
+});
+
+// ── FIX P0 (audit 2026-06-23) ────────────────────────────────────────────────
+// Regresión: guardConciseResponse truncaba la corrección anti-quema cuando
+// la respuesta total (corrección + cuerpo) superaba el límite de palabras,
+// porque "⚠️ Importante:" no estaba en SAFETY_PREFIX_MARKERS.
+// Fix: se añadió "importante:" al regex SAFETY_PREFIX_MARKERS.
+// FIX P0: guardConciseResponse con SAFETY_PREFIX_MARKERS que incluye "importante:"
+// garantiza que la PRIMERA oración de la corrección anti-quema ("⚠️ Importante:
+// no se recomienda quemar. ...") sea preservada como parte del prefixCount, de
+// modo que al truncar por hard_limit/verbose el usuario siempre vea la advertencia
+// principal. El bloque multilínea completo (Ley 1930, alternativas) puede truncarse
+// si la respuesta total es muy larga — la garantía es la primera oración de alarma.
+describe('guardConciseResponse — corrección anti-quema sobrevive al truncar (FIX P0)', () => {
+  // Genera un cuerpo largo que excede MAX_CONCISE_WORDS_HARD (400 palabras).
+  const longBody = Array.from(
+    { length: 50 },
+    (_, i) => `La técnica ${i + 1} consiste en incorporar rastrojo picado al suelo con ayuda de un machete afilado.`,
+  ).join(' ');
+
+  it('la corrección anti-quema (prefijo ⚠️ Importante:) aparece en el texto truncado', () => {
+    const burnCorrection = buildBurnSafetyCorrection(false);
+    const fullText = `${burnCorrection}\n\n${longBody}`;
+
+    const result = guardConciseResponse(fullText);
+
+    // Debe truncar (el texto es muy largo).
+    expect(result.modified).toBe(true);
+    expect(result.reason).toMatch(/guardConciseResponse:(hard_limit|verbose)/);
+
+    // La PRIMERA oración de la advertencia anti-quema DEBE aparecer en el truncado.
+    // Antes del fix, "importante:" no estaba en SAFETY_PREFIX_MARKERS → el truncador
+    // solo veía el texto como cuerpo normal y podía botar todo por completo.
+    expect(result.text).toMatch(/⚠️ Importante: no se recomienda quemar/);
+    // La corrección no puede haber desaparecido por completo.
+    expect(result.text).not.toBe('');
+  });
+
+  it('la corrección anti-quema en páramo aparece en el texto truncado', () => {
+    const burnCorrectionParamo = buildBurnSafetyCorrection(true);
+    const fullText = `${burnCorrectionParamo}\n\n${longBody}`;
+
+    const result = guardConciseResponse(fullText);
+
+    expect(result.modified).toBe(true);
+    // La primera oración del bloque de páramo también empieza con "⚠️ Importante:"
+    expect(result.text).toMatch(/⚠️ Importante: no se recomienda quemar/);
+  });
+
+  it('applyOutputGuards: burn correction seguida de cuerpo largo → advertencia visible', () => {
+    // Simula el flujo completo: LLM endosa quema + respuesta muy larga.
+    const llmLong =
+      'La quema puede tener beneficios y liberar nutrientes. ' + longBody;
+    const out = applyOutputGuards(llmLong, { userMessage: '¿quemo el rastrojo?' });
+
+    // El guard de quema debe haber disparado.
+    expect(out.reasons.some((r) => r.startsWith('quema_balanceada_corregida'))).toBe(true);
+    // La advertencia anti-quema principal debe sobrevivir en el texto final truncado.
+    expect(out.text).toMatch(/⚠️ Importante: no se recomienda quemar/);
   });
 });
