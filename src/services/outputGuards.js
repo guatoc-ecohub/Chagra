@@ -7634,14 +7634,35 @@ export function guardConciseResponse(responseText) {
   }
   const hasRedundancy = Object.values(recommendationCounts).some(c => c >= 3);
 
+  // BUGFIX coherencia (gota→stub, 2026-06-23): cuando un guard de SEGURIDAD
+  // prepende un preámbulo ("⚠️ Ojo de seguridad: … no es problema de riego."),
+  // ese aviso ocupa las primeras oraciones. La truncación naíf "primeras N
+  // oraciones" se quedaba SOLO con el aviso y BOTABA el plan real → respuesta
+  // stub repetitiva ("…¿Quieres que profundice?") turno a turno (el fallo que
+  // reportó el operador con la gota del tomate). Fix: si el texto arranca con el
+  // aviso de seguridad, contamos cuántas oraciones iniciales son del preámbulo y
+  // las PRESERVAMOS, y además conservamos N oraciones SUSTANTIVAS del cuerpo.
+  // Sin preámbulo de seguridad, prefixCount=0 → comportamiento idéntico al previo.
+  const SAFETY_PREFIX_MARKERS =
+    /(ojo de seguridad|no es (un )?problema de|no problema de|patogen|toxic|veneno|letal|no consumir|no apta|peligro|cuidado:)/;
+  let prefixCount = 0;
+  if (_stripDiacritics(responseText).trimStart().toLowerCase().startsWith('⚠️ ojo de seguridad')
+      || responseText.trimStart().startsWith('⚠️ Ojo de seguridad')) {
+    for (let i = 0; i < sentences.length; i++) {
+      if (i === 0 || SAFETY_PREFIX_MARKERS.test(_stripDiacritics(sentences[i]).toLowerCase())) {
+        prefixCount = i + 1;
+      } else break;
+    }
+  }
+
   // Construir versión concisa
   let conciseText = '';
   let reason = '';
 
   if (words.length >= MAX_CONCISE_WORDS_HARD) {
-    // Hard limit: extraer primeras 2 oraciones como resumen
-    const firstTwo = sentences.slice(0, 2).join(' ').trim();
-    conciseText = `${firstTwo}\n\n¿Quieres que profundice en algo específico?`;
+    // Hard limit: preámbulo de seguridad (si lo hay) + 2 oraciones del cuerpo.
+    const kept = [...sentences.slice(0, prefixCount), ...sentences.slice(prefixCount, prefixCount + 2)];
+    conciseText = `${kept.join(' ').trim()}\n\n¿Quieres que profundice en algo específico?`;
     reason = `guardConciseResponse:hard_limit (${words.length} palabras, max ${MAX_CONCISE_WORDS_HARD})`;
   } else if (hasRedundancy) {
     // Deduplicar: mantener primera mención de cada recomendación
@@ -7656,9 +7677,9 @@ export function guardConciseResponse(responseText) {
     if (conciseText.length < 30) conciseText = responseText.slice(0, 500) + '...';
     reason = `guardConciseResponse:redundant_recommendation (${sentences.length} -> ${deduped.length} oraciones)`;
   } else {
-    // Soft limit: recortar a primeras 3 oraciones + oferta profundizar
-    const firstThree = sentences.slice(0, 3).join(' ').trim();
-    conciseText = `${firstThree}\n\n¿Quieres que profundice en algo específico?`;
+    // Soft limit: preámbulo de seguridad (si lo hay) + 3 oraciones del cuerpo.
+    const kept = [...sentences.slice(0, prefixCount), ...sentences.slice(prefixCount, prefixCount + 3)];
+    conciseText = `${kept.join(' ').trim()}\n\n¿Quieres que profundice en algo específico?`;
     reason = `guardConciseResponse:verbose (${words.length} palabras, recomendado <${MAX_CONCISE_WORDS})`;
   }
 
