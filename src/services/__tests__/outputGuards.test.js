@@ -1529,6 +1529,24 @@ describe('applyOutputGuards (cadena)', () => {
       expect(out.reason).toMatch(/redundant/i);
     });
 
+    it('safety-led: preserva el plan del cuerpo, no solo el preámbulo (bug gota→stub 2026-06-23)', () => {
+      // Regresión: con un preámbulo de seguridad al frente, la truncación naíf
+      // "primeras N oraciones" se quedaba SOLO con el aviso y botaba el plan →
+      // respuesta stub repetitiva. El fix preserva aviso + N oraciones del cuerpo.
+      const prefix =
+        '⚠️ Ojo de seguridad: Phytophthora infestans (tizón tardío) en papa/tomate. ' +
+        'Gota es patógeno letal, no es problema de riego. ';
+      const body = Array.from({ length: 60 }, (_, i) =>
+        `Paso de manejo número ${i + 1}: aplica caldo bordelés preventivo y mejora el drenaje del cultivo.`
+      ).join(' ');
+      const out = guardConciseResponse(prefix + body);
+      expect(out.modified).toBe(true);
+      // El aviso de seguridad sobrevive…
+      expect(out.text).toMatch(/Ojo de seguridad/);
+      // …Y TAMBIÉN contenido sustantivo del cuerpo (no solo el preámbulo + oferta).
+      expect(out.text).toMatch(/caldo bordel|manejo|drenaje/i);
+    });
+
     it('no-op para string vacío', () => {
       expect(guardConciseResponse('').modified).toBe(false);
     });
