@@ -38,6 +38,8 @@ import {
   extractAnthropicText,
   makeAnthropicJudgeCall,
   scoreAntiHallucDeterministic,
+  resolveMustThreshold,
+  DEFAULT_MUST_THRESHOLD,
   selectJudgeProvider,
   ANTHROPIC_JUDGE_KEY_PATH,
   buildBatchAHPrompt,
@@ -433,6 +435,146 @@ describe('scoreAntiHallucDeterministic (fallback sin LLM)', () => {
     const out = scoreAntiHallucDeterministic({ response: null, mustInclude: ['a'], redFlags: [] });
     expect(out.pass).toBe(false);
     expect(out.source).toBe('deterministic');
+  });
+
+  it('expone coverage y threshold en el retorno (diagnóstico/reporte)', () => {
+    const out = scoreAntiHallucDeterministic({
+      response: 'La chugua es Ullucus tuberosus, resiste heladas.',
+      mustInclude: ['Ullucus tuberosus', 'drenaje'],
+      redFlags: [],
+    });
+    expect(out.coverage).toBeCloseTo(0.5); // 1 de 2 cubierto
+    expect(out.threshold).toBe(DEFAULT_MUST_THRESHOLD);
+  });
+});
+
+// ── UMBRAL de cobertura (no todo-o-nada) ──────────────────────────────────────
+//
+// CAMBIO DE METODOLOGÍA 2026-06-22: el scorer determinístico exigía TODOS los
+// must_include por substring literal normalizado. El fixture endurecido
+// (TEST_PROMPTS_HARDENED_2026-06-22) pone binomios latinos EXACTOS en
+// must_include ("Ullucus tuberosus", "Phytophthora infestans") que ningún 8b
+// reproduce textual → PASS=0 / FAIL=todos para CUALQUIER modelo (cero señal). El
+// criterio nuevo: PASS si cobertura ≥ UMBRAL (default 0.6) Y cero red_flags. Los
+// casos de abajo usan respuestas MOCK (strings fijos) — CERO llamadas a ollama.
+
+describe('resolveMustThreshold (umbral configurable por env, sin tocar el real)', () => {
+  it('default 0.6 cuando no hay nada configurado', () => {
+    expect(resolveMustThreshold({ env: {} })).toBe(DEFAULT_MUST_THRESHOLD);
+    expect(DEFAULT_MUST_THRESHOLD).toBe(0.6);
+  });
+
+  it('lee BENCH_MUST_THRESHOLD de la env', () => {
+    expect(resolveMustThreshold({ env: { BENCH_MUST_THRESHOLD: '0.75' } })).toBeCloseTo(0.75);
+    expect(resolveMustThreshold({ env: { BENCH_MUST_THRESHOLD: '1' } })).toBe(1);
+  });
+
+  it('valor explícito gana sobre la env', () => {
+    expect(resolveMustThreshold({ threshold: 0.4, env: { BENCH_MUST_THRESHOLD: '0.9' } })).toBeCloseTo(0.4);
+  });
+
+  it('clampa a [0,1] y cae al default si es ilegible', () => {
+    expect(resolveMustThreshold({ threshold: -2 })).toBe(0);
+    expect(resolveMustThreshold({ threshold: 5 })).toBe(1);
+    expect(resolveMustThreshold({ env: { BENCH_MUST_THRESHOLD: 'no-numero' } })).toBe(DEFAULT_MUST_THRESHOLD);
+  });
+});
+
+describe('scoreAntiHallucDeterministic con UMBRAL — fixture endurecido (mock, sin GPU)', () => {
+  // CPX-001 (chugua=ulluco / "gota"=tizón tardío). must_include con binomios
+  // latinos EXACTOS que el modelo NO copia textual; cubre el fondo en español.
+  const CPX001_MUST = ['Ullucus tuberosus', 'tizón tardío', 'Phytophthora infestans', 'caldo bordelés'];
+  const CPX001_RED = [
+    'Solanum tuberosum como identidad de chugua',
+    'cocona',
+    'cubio',
+    'mancozeb dosis inventada',
+    'que la chugua es de clima cálido',
+  ];
+
+  it('(a) respuesta BUENA que cubre ≥60% del fondo SIN red_flag → PASS', () => {
+    // Respuesta correcta de fondo: nombra el oomiceto (tizón tardío +
+    // Phytophthora infestans) y el manejo (caldo bordelés) aunque NO copie el
+    // binomio "Ullucus tuberosus" textual. 3/4 = 0.75 ≥ 0.6 → PASS.
+    const respuestaBuena =
+      'Esa "gota" de la chugua es tizón tardío, causado por Phytophthora infestans, ' +
+      'el mismo hongo de la papa. Aplique caldo bordelés como preventivo, mejore el ' +
+      'drenaje y elimine los focos. Ojo que a 3.200 está marginal y la helada le quema el follaje.';
+    const out = scoreAntiHallucDeterministic({
+      response: respuestaBuena,
+      mustInclude: CPX001_MUST,
+      redFlags: CPX001_RED,
+    });
+    // tizón tardío + Phytophthora infestans + caldo bordelés = 3/4 = 0.75 ≥ 0.6
+    expect(out.mustCovered).toBe(3);
+    expect(out.mustTotal).toBe(4);
+    expect(out.coverage).toBeCloseTo(0.75);
+    expect(out.redFlagsHit).toBe(0);
+    expect(out.pass).toBe(true);
+  });
+
+  it('cobertura JUSTO en el umbral (0.6 con 3/5) → PASS (≥, no >)', () => {
+    const out = scoreAntiHallucDeterministic(
+      { response: 'a b c', mustInclude: ['a', 'b', 'c', 'd', 'e'], redFlags: [] },
+      { threshold: 0.6 },
+    );
+    expect(out.coverage).toBeCloseTo(0.6);
+    expect(out.pass).toBe(true);
+  });
+
+  it('(b) respuesta con un RED_FLAG → FAIL aunque cubra el fondo ≥ umbral', () => {
+    // Cubre el fondo (tizón tardío + binomio + caldo = 3/4 = 0.75 ≥ 0.6) PERO
+    // dispara el red_flag "que la chugua es de clima cálido": red_flag => FAIL
+    // SIEMPRE, sin importar la cobertura (la ausencia de alucinación no negocia).
+    const respuestaConRedFlag =
+      'Recuerde que la chugua es de clima cálido; igual la gota es tizón tardío ' +
+      '(Phytophthora infestans) y se trata con caldo bordelés.';
+    const out = scoreAntiHallucDeterministic({
+      response: respuestaConRedFlag,
+      mustInclude: CPX001_MUST,
+      redFlags: CPX001_RED,
+    });
+    expect(out.coverage).toBeGreaterThanOrEqual(DEFAULT_MUST_THRESHOLD);
+    expect(out.redFlagsHit).toBeGreaterThanOrEqual(1);
+    expect(out.pass).toBe(false);
+  });
+
+  it('(c) respuesta VACÍA / mala (sin fondo) → FAIL', () => {
+    const vacia = scoreAntiHallucDeterministic({
+      response: '',
+      mustInclude: CPX001_MUST,
+      redFlags: CPX001_RED,
+    });
+    expect(vacia.coverage).toBe(0);
+    expect(vacia.pass).toBe(false);
+
+    const mala = scoreAntiHallucDeterministic({
+      response: 'No sé bien, échele cualquier cosa y verá.',
+      mustInclude: CPX001_MUST,
+      redFlags: CPX001_RED,
+    });
+    expect(mala.coverage).toBeLessThan(DEFAULT_MUST_THRESHOLD);
+    expect(mala.pass).toBe(false);
+  });
+
+  it('el criterio NO es todo-o-nada: 3/4 PASA con default pero FALLA con BENCH_MUST_THRESHOLD=1', () => {
+    const item = {
+      response:
+        'Es tizón tardío (Phytophthora infestans); use caldo bordelés preventivo.',
+      mustInclude: CPX001_MUST, // falta solo el binomio "Ullucus tuberosus" textual
+      redFlags: CPX001_RED,
+    };
+    const conDefault = scoreAntiHallucDeterministic(item, { threshold: DEFAULT_MUST_THRESHOLD });
+    const estricto = scoreAntiHallucDeterministic(item, { threshold: 1 });
+    expect(conDefault.coverage).toBeCloseTo(0.75);
+    expect(conDefault.pass).toBe(true); // discrimina: respuesta correcta de fondo PASA
+    expect(estricto.pass).toBe(false); // criterio viejo todo-o-nada hubiera fallado
+  });
+
+  it('el umbral del env afecta el veredicto (señal discriminativa)', () => {
+    const item = { response: 'a b', mustInclude: ['a', 'b', 'c', 'd'], redFlags: [] }; // 0.5
+    expect(scoreAntiHallucDeterministic(item, { env: { BENCH_MUST_THRESHOLD: '0.5' } }).pass).toBe(true);
+    expect(scoreAntiHallucDeterministic(item, { env: { BENCH_MUST_THRESHOLD: '0.6' } }).pass).toBe(false);
   });
 });
 
