@@ -179,7 +179,7 @@ function calcularProductividadMESMIS(processes) {
  * @returns {number|null} 0-4 o null si no hay datos
  */
 function calcularEstabilidadResilienciaMESMIS(processes) {
-  const activeProcesses = processes.filter(p => p.attributes?.status === 'active');
+  const activeProcesses = processes.filter(p => (p.status ?? p.attributes?.status) === 'active');
   if (activeProcesses.length === 0) return null;
   
   // Contar etapas distintas
@@ -329,7 +329,7 @@ function calcularEficienciaTAPE() {
  * @returns {number|null} 0-4 o null si no hay datos
  */
 function calcularResilienciaTAPE(processes) {
-  const activeProcesses = processes.filter(p => p.attributes?.status === 'active');
+  const activeProcesses = processes.filter(p => (p.status ?? p.attributes?.status) === 'active');
   if (activeProcesses.length === 0) return null;
   
   // Contar tipos de proceso distintos
@@ -516,7 +516,7 @@ export function evaluarEvolucionFinca({ processes = [], observations = [] } = {}
   // Metadata para debug/validación
   const metadata = {
     processes_count: processes.length,
-    active_processes_count: processes.filter(p => p.attributes?.status === 'active').length,
+    active_processes_count: processes.filter(p => (p.status ?? p.attributes?.status) === 'active').length,
     observations_count: observations.length,
     mesmis_non_null_count: Object.values(mesmis).filter(v => v !== null).length,
     tape_non_null_count: Object.values(tape).filter(v => v !== null).length,
