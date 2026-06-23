@@ -250,12 +250,25 @@ describe('llmTools — funciones de registry', () => {
 
     it('agendar_riego tiene schema con asset_id y scheduled_time requeridos', () => {
       const tool = getTool('agendar_riego');
-      
+
       expect(tool.parameters.required).toContain('asset_id');
       expect(tool.parameters.required).toContain('scheduled_time');
       expect(tool.parameters.properties.method.enum).toContain('goteo');
       expect(tool.parameters.properties.method.enum).toContain('aspersion');
       expect(tool.parameters.properties.method.enum).toContain('manual');
+    });
+
+    // Regresión incidente 2026-06-22: el LLM eligió agendar_riego ante "plan
+    // más serio para la gota del tomate" (gota = enfermedad). La descripción
+    // debe acotar el disparo a intención EXPLÍCITA de agendar y advertir contra
+    // diagnóstico/"plan".
+    it('agendar_riego acota su descripción a intención explícita de agendar (no plan/enfermedad)', () => {
+      const tool = getTool('agendar_riego');
+      const desc = tool.description.toLowerCase();
+      expect(desc).toContain('explícita');
+      expect(desc).toContain('agénda');
+      // Debe desincentivar su uso ante problemas fitosanitarios / "plan".
+      expect(desc).toMatch(/enfermedad|gota|plan/);
     });
 
     it('query_corpus_dr034 tiene schema con query requerido y species opcional', () => {

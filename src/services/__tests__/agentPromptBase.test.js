@@ -288,3 +288,113 @@ describe('buildBasePrompt: coherencia multiturno', () => {
     expect(prompt).not.toContain('CONTEXTO DE LA CONVERSACIÓN');
   });
 });
+
+// Regresión incidente 2026-06-22: "plan más serio para la gota de mi tomate
+// san marzano" enrutó a agendar_riego (plan de riego) ignorando que "gota" es
+// una enfermedad (Phytophthora). Seguimientos perdían el hilo (gota+tomate).
+describe('buildBasePrompt — REGLA PROBLEMA-PRIMERO (gota/enfermedad ≠ riego)', () => {
+  const baseArgs = {
+    plantContext: 'tomate ×10',
+    fincaContext: '',
+    indoorContext: '',
+    finca: null,
+    contextMemory: '',
+    isEnum: false,
+  };
+
+  it('inyecta PROBLEMA-PRIMERO ante "plan más serio para la gota de mi tomate"', () => {
+    const prompt = buildBasePrompt({
+      ...baseArgs,
+      query: 'dame un plan más serio para la gota de mi tomate san marzano',
+    });
+    expect(prompt).toContain('REGLA PROBLEMA-PRIMERO');
+    expect(prompt).toContain('Phytophthora infestans');
+    // No debe empujar a riego/agendar como salida ante una enfermedad.
+    expect(prompt).toContain('PROHIBIDO desviar a un "plan de riego"');
+  });
+
+  it('NO inyecta PROBLEMA-PRIMERO cuando el usuario SÍ pide agendar riego', () => {
+    const prompt = buildBasePrompt({
+      ...baseArgs,
+      query: 'agéndame el riego del tomate para mañana a las 6 am',
+    });
+    expect(prompt).not.toContain('REGLA PROBLEMA-PRIMERO');
+  });
+
+  it('NO inyecta PROBLEMA-PRIMERO en query sin problema fitosanitario', () => {
+    const prompt = buildBasePrompt({
+      ...baseArgs,
+      query: '¿cómo tutoro el tomate?',
+    });
+    expect(prompt).not.toContain('REGLA PROBLEMA-PRIMERO');
+  });
+
+  it('mantiene PROBLEMA-PRIMERO en seguimiento anáfórico si el contexto trae la enfermedad', () => {
+    // T4 del incidente: "sí, ¿cómo la trato?" sin nombrar la enfermedad, pero
+    // el contextMemory todavía trae gota+tomate del T1.
+    const prompt = buildBasePrompt({
+      ...baseArgs,
+      query: 'sí, ¿cómo la trato?',
+      contextMemory:
+        'Usuario: qué le echo para la gota de mi tomate\nAsistente: Para la gota usa caldo bordelés.\nUsuario: sí, ¿cómo la trato?',
+    });
+    expect(prompt).toContain('REGLA PROBLEMA-PRIMERO');
+    // El contexto debe haber fijado cultivo y problema previos.
+    expect(prompt).toContain('Cultivo: tomate');
+    expect(prompt).toContain('Problema previo: gota');
+  });
+});
+
+describe('buildBasePrompt — REGLA CONTINUIDAD DE HILO (anti re-presentación)', () => {
+  const baseArgs = {
+    plantContext: 'tomate ×10',
+    fincaContext: '',
+    indoorContext: '',
+    finca: null,
+    isEnum: false,
+    query: 'sí, ¿cómo la trato?',
+  };
+
+  it('con historial prohíbe re-presentarse y exige resolver la anáfora', () => {
+    const prompt = buildBasePrompt({
+      ...baseArgs,
+      contextMemory:
+        'Usuario: qué le echo para la gota de mi tomate\nAsistente: Caldo bordelés.\nUsuario: sí, ¿cómo la trato?',
+    });
+    expect(prompt).toContain('REGLA CONTINUIDAD DE HILO');
+    expect(prompt).toContain('PROHIBIDO re-presentarte');
+    expect(prompt).toContain('Resuelve los pronombres');
+  });
+
+  it('sin historial NO inyecta la regla de continuidad', () => {
+    const prompt = buildBasePrompt({ ...baseArgs, contextMemory: '' });
+    expect(prompt).not.toContain('REGLA CONTINUIDAD DE HILO');
+  });
+});
+
+describe('buildConversationContextPin — carga problema + cultivo previos (gota tomate)', () => {
+  it('captura gota y tomate del primer turno para no perder el hilo', () => {
+    const pin = buildConversationContextPin(
+      'Usuario: qué le echo para la gota de mi tomate san marzano',
+    );
+    expect(pin).toContain('Cultivo: tomate');
+    expect(pin).toContain('Problema previo: gota');
+  });
+});
+
+describe('analyzeQuery — topic plaga/enfermedad para enfermedades sin pest glossary', () => {
+  it('clasifica "gota" como plaga/enfermedad aunque no esté en PEST_GLOSSARY', () => {
+    const r = analyzeQuery('dame un plan para la gota del tomate');
+    expect(r.topic).toBe('plaga/enfermedad');
+  });
+
+  it('clasifica "tizón tardío" como plaga/enfermedad', () => {
+    const r = analyzeQuery('cómo manejo el tizón tardío en papa');
+    expect(r.topic).toBe('plaga/enfermedad');
+  });
+
+  it('una query de manejo sin enfermedad sigue siendo manejo', () => {
+    const r = analyzeQuery('cómo podo el aguacate');
+    expect(r.topic).toBe('manejo');
+  });
+});
