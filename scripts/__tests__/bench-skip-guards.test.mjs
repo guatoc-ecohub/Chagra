@@ -24,6 +24,7 @@ describe('bench skip guards', () => {
 
   it('vision ab rag salta limpio sin ground truth', () => {
     const r = runScript('scripts/bench-vision-ab-rag.mjs', {
+      CHAGRA_MCP_TOKEN: 'dummy-test-token',
       VISION_GROUND_TRUTH_PATH: '/no/such/ground-truth.json',
     });
     expect(r.status).toBe(0);

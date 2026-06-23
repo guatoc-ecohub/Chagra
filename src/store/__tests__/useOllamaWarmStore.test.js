@@ -187,12 +187,8 @@ describe('useOllamaWarmStore — NN4 pre-warm Ollama al login', () => {
     expect(useOllamaWarmStore.getState().status).toBe('warm');
   });
 
-  it('resetWarmup vuelve al estado inicial limpio', async () => {
-    fetch.mockResolvedValueOnce({ ok: true, status: 200 });
-    useOllamaWarmStore.getState().startWarmup();
-    await new Promise((r) => setTimeout(r, 0));
-    expect(useOllamaWarmStore.getState().status).toBe('warm');
-
+  it('resetWarmup vuelve al estado inicial limpio', () => {
+    useOllamaWarmStore.setState({ status: 'warm', startedAt: 1000, completedAt: 2000 });
     useOllamaWarmStore.getState().resetWarmup();
     const s = useOllamaWarmStore.getState();
     expect(s.status).toBe('unknown');
