@@ -22,7 +22,7 @@ jobs:
     name: Playwright visual snapshots
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.59.1-jammy
+      image: mcr.microsoft.com/playwright:v1.60.0-jammy
     timeout-minutes: 60
     continue-on-error: ${{ github.event_name == 'pull_request' }}
     env:
