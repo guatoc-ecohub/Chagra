@@ -3,7 +3,7 @@
  * "La Milpa" y los textos para niños conviven en el componente; la migración a
  * messages.js (ADR-050) está fuera de alcance de esta PR.
  */
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ScreenShell } from '../common/ScreenShell';
 import { Sprout, RotateCcw, Volume2, VolumeX, Sparkles, Trophy, Target, Leaf } from 'lucide-react';
 
@@ -47,6 +47,7 @@ import {
 } from '../../services/milpaGameEngine';
 import { agentSounds, isSoundEnabled, setSoundEnabled } from '../../services/agentSoundService';
 import { speak, stop as stopSpeak, isSupported as ttsSupported } from '../../services/ttsService';
+import { recordGameStart, recordGameComplete } from '../../services/usageTelemetryService';
 
 import './milpa.css';
 
@@ -195,6 +196,17 @@ export default function MilpaSimulator({ onBack, onHome }) {
   const [consejoVisible, setConsejoVisible] = useState({});
   const [resultadosTemporadas, setResultadosTemporadas] = useState([]);
   const [medallasObtenidas, setMedallasObtenidas] = useState([]);
+
+  // Telemetría de uso ANÓNIMA: inicio del juego al montar (una vez).
+  useEffect(() => { recordGameStart('milpa'); }, []);
+  // Guard para que el evento de completado se dispare una sola vez por sesión de juego.
+  const completadoRef = useRef(false);
+  useEffect(() => {
+    if (fase === 'final' && !completadoRef.current) {
+      completadoRef.current = true;
+      recordGameComplete('milpa');
+    }
+  }, [fase]);
 
   const parcelaActiva = useMemo(
     () => parcelas.find((p) => p.id === activa) || parcelas[0],

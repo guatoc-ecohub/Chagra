@@ -10,6 +10,7 @@ import {
   GraduationCap, Play, ChevronRight, Heart, Zap,
 } from 'lucide-react';
 import { agentSounds, isSoundEnabled } from '../../services/agentSoundService';
+import { recordGameStart, recordGameComplete } from '../../services/usageTelemetryService';
 import {
   MAPA, PALETA, MATERIALES, DECORACIONES, CONFIG_DOOM,
   PLAGAS_DOOM, BENEFICOS_DOOM, ESCENARIOS,
@@ -356,6 +357,17 @@ export default function DoomFincaScreen({ onBack, onHome }) {
 
   // Inicializa el mundo
   useEffect(() => { worldRef.current = createWorld(); }, []);
+
+  // Telemetría de uso ANÓNIMA: inicio del juego al montar (una vez).
+  useEffect(() => { recordGameStart('doom_finca'); }, []);
+  // Completado: cuando la fase llega a 'gano' (una sola vez).
+  const completadoRef = useRef(false);
+  useEffect(() => {
+    if (fase === 'gano' && !completadoRef.current) {
+      completadoRef.current = true;
+      recordGameComplete('doom_finca');
+    }
+  }, [fase]);
 
   // Keyboard controls
   useEffect(() => {

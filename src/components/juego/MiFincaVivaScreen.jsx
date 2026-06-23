@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Sparkles, Volume2, VolumeX, Trophy, Sprout, Crosshair } from 'lucide-react';
 import { ScreenShell } from '../common/ScreenShell';
 import FincaWorldScene from './FincaWorldScene';
@@ -22,6 +22,7 @@ import {
 } from '../../services/fincaGameStateService';
 import { agentSounds, isSoundEnabled, setSoundEnabled } from '../../services/agentSoundService';
 import { speak, stop as stopSpeak, isSupported as ttsSupported } from '../../services/ttsService';
+import { recordGameStart, recordGameComplete } from '../../services/usageTelemetryService';
 
 /**
  * MiFincaVivaScreen — el JUEGO "Mi Finca Viva" para Julieta (y toda niña).
@@ -104,6 +105,20 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
   const [celebracionDescartada, setCelebracionDescartada] = useState(false);
   const subioNivel = !cargando && detectLevelUp(game.nivel, baselineLevel).subio;
   const celebrando = subioNivel && !celebracionDescartada;
+
+  // Telemetría de uso ANÓNIMA: inicio del juego al montar (una vez).
+  useEffect(() => { recordGameStart('mi_finca_viva'); }, []);
+  // Cada subida de nivel cuenta como un "completado". Guard para no repetir
+  // mientras `subioNivel` se mantenga en true en renders consecutivos.
+  const subidaRegistradaRef = useRef(false);
+  useEffect(() => {
+    if (subioNivel && !subidaRegistradaRef.current) {
+      subidaRegistradaRef.current = true;
+      recordGameComplete('mi_finca_viva');
+    } else if (!subioNivel) {
+      subidaRegistradaRef.current = false;
+    }
+  }, [subioNivel]);
 
   // Sella el nivel actual como "visto" (la celebración no se repite al volver).
   // Persistir es sincronización con un sistema externo (localStorage): efecto OK.
