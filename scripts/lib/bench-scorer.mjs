@@ -130,7 +130,7 @@ function stem(word) {
     'aciones', 'iciones', 'acion', 'icion', 'cion', 'sion',
     'antes', 'entes', 'ante', 'ente',
     'ables', 'ibles', 'able', 'ible',
-    'adas', 'idas', 'ados', 'idos', 'ada', 'ido', 'ada', 'ido',
+    'adas', 'idas', 'ados', 'idos', 'ada', 'ido',
     'ando', 'iendo', 'ar', 'er', 'ir',
     'mente',
     'es', 'as', 'os', 'a', 'o', 's',
