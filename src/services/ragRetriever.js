@@ -439,7 +439,7 @@ async function embedQuery(queryText) {
     const res = await fetchWithAuthRetry('/api/ollama/api/embeddings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'nomic-embed-text', prompt: queryText }),
+      body: JSON.stringify({ model: 'snowflake-arctic-embed2', prompt: queryText }),
       signal: AbortSignal.timeout(TOOL_TIMEOUT_MS),
     });
     if (!res.ok) return null;
