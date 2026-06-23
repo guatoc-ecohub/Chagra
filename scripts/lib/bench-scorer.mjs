@@ -573,17 +573,63 @@ export function makeAnthropicJudgeCall({
 }
 
 /**
+ * Umbral por defecto de COBERTURA de must_include para el scorer determinístico.
+ * Una respuesta PASA si cubre ≥ esta fracción de los must_include (no todos) y
+ * NO dispara red_flags. Configurable por env `BENCH_MUST_THRESHOLD`.
+ *
+ * Por qué 0.6 y no 1.0: el fixture endurecido (TEST_PROMPTS_HARDENED_2026-06-22)
+ * pone binomios científicos EXACTOS en must_include ("Ullucus tuberosus",
+ * "Phytophthora infestans"). Ningún modelo 8b los reproduce textual, así que el
+ * criterio todo-o-nada literal daba PASS=0 / FAIL=todos para CUALQUIER modelo:
+ * cero señal discriminativa. 0.6 exige cubrir la mayoría del fondo (p. ej. usar
+ * "tizón tardío" cuenta aunque omita el latín) sin perdonar omitir todo.
+ */
+export const DEFAULT_MUST_THRESHOLD = 0.6;
+
+/**
+ * resolveMustThreshold — resuelve el umbral de cobertura desde un valor explícito
+ * o de la env `BENCH_MUST_THRESHOLD`, con `DEFAULT_MUST_THRESHOLD` de respaldo.
+ * Clampa a [0,1]; valores ilegibles caen al default. `env` se inyecta en tests.
+ *
+ * @param {{ threshold?: number, env?: Record<string,string|undefined> }} [opts]
+ * @returns {number} fracción en [0,1]
+ */
+export function resolveMustThreshold({ threshold, env = process.env } = {}) {
+  const raw = Number.isFinite(threshold)
+    ? threshold
+    : Number(env && env.BENCH_MUST_THRESHOLD);
+  if (!Number.isFinite(raw)) return DEFAULT_MUST_THRESHOLD;
+  if (raw < 0) return 0;
+  if (raw > 1) return 1;
+  return raw;
+}
+
+/**
  * scoreAntiHallucDeterministic — fallback SIN LLM para anti-alucinación. PASS si
- * TODOS los `mustInclude` aparecen por substring/lema/sinónimo (vía
- * `scoreKeywordsFlexible`) Y NINGÚN `redFlags` aparece. Es conservador: un
- * red_flag textual presente = FAIL; un must_include ausente = FAIL. NO detecta
- * alucinaciones semánticas finas (para eso está el juez Claude), pero da una
- * señal honesta y reproducible cuando no hay key. NO crashea.
+ * la COBERTURA de `mustInclude` (fracción cubierta por substring/lema/sinónimo
+ * del dominio vía `scoreKeywordsFlexible`) es ≥ UMBRAL **Y** NINGÚN `redFlags`
+ * aparece. Un red_flag presente = FAIL siempre (la ausencia de alucinaciones no
+ * se negocia con umbral). NO detecta alucinaciones semánticas finas (para eso
+ * está el juez Claude), pero da una señal honesta y reproducible cuando no hay
+ * key. NO crashea.
+ *
+ * CAMBIO DE METODOLOGÍA (2026-06-22): antes el criterio era todo-o-nada literal
+ * (`mustCovered === mustTotal`). Con el fixture endurecido, cuyos must_include
+ * son binomios latinos exactos que ningún 8b reproduce textual, eso daba PASS=0
+ * para TODOS los modelos (cero señal: el scorer era demasiado literal, no el
+ * modelo). Ahora pasa con cobertura parcial ≥ UMBRAL (default 0.6, configurable
+ * por `BENCH_MUST_THRESHOLD`). CONSECUENCIA: los pass-rates de esta función YA NO
+ * son comparables 1:1 con corridas previas (las viejas eran todo-o-nada). Para
+ * replicar el criterio estricto antiguo, correr con `BENCH_MUST_THRESHOLD=1`.
+ *
+ * El `umbral` se puede pasar explícito (tests) o se lee de la env; `mustCovered`
+ * / `mustTotal` se mantienen en el retorno para el reporte (diagnóstico).
  *
  * @param {{response:string, mustInclude?:string[], redFlags?:string[]}} item
- * @returns {{pass:boolean, mustCovered:number, mustTotal:number, redFlagsHit:number, source:'deterministic'}}
+ * @param {{ threshold?: number, env?: Record<string,string|undefined> }} [opts]
+ * @returns {{pass:boolean, mustCovered:number, mustTotal:number, coverage:number, threshold:number, redFlagsHit:number, source:'deterministic'}}
  */
-export function scoreAntiHallucDeterministic(item = {}) {
+export function scoreAntiHallucDeterministic(item = {}, opts = {}) {
   const must = Array.isArray(item.mustInclude) ? item.mustInclude : [];
   const red = Array.isArray(item.redFlags) ? item.redFlags : [];
   const response = typeof item.response === 'string' ? item.response : '';
@@ -591,12 +637,15 @@ export function scoreAntiHallucDeterministic(item = {}) {
   const mustFlex = scoreKeywordsFlexible(response, must);
   const mustCovered = mustFlex.matched;
   const mustTotal = must.length;
+  // Sin must_include declarados la cobertura es trivialmente 1 (no penaliza).
+  const coverage = mustTotal > 0 ? mustCovered / mustTotal : 1;
 
   const redFlex = scoreKeywordsFlexible(response, red);
   const redFlagsHit = redFlex.matched;
 
-  const pass = mustCovered === mustTotal && redFlagsHit === 0;
-  return { pass, mustCovered, mustTotal, redFlagsHit, source: 'deterministic' };
+  const threshold = resolveMustThreshold(opts);
+  const pass = coverage >= threshold && redFlagsHit === 0;
+  return { pass, mustCovered, mustTotal, coverage, threshold, redFlagsHit, source: 'deterministic' };
 }
 
 /**

@@ -21,8 +21,16 @@
  *     Maxwell 'signal during cgo'); Haiku cloud no disponible (sin
  *     ANTHROPIC_API_KEY en el entorno). assertIndependentJudge aborta si el
  *     juez coincidiera con el generador.
- *   - MÉTRICA AH: PASS solo si todos los must_include están presentes (por
- *     fondo) Y cero red_flags. AH% = PASS / total.
+ *   - MÉTRICA AH (juez LLM): PASS solo si todos los must_include están presentes
+ *     (por fondo) Y cero red_flags. AH% = PASS / total.
+ *   - MÉTRICA AH (scorer DETERMINÍSTICO, default sin --judge): PASS si la
+ *     COBERTURA de must_include ≥ UMBRAL (default 0.6, env BENCH_MUST_THRESHOLD)
+ *     Y cero red_flags. CAMBIO DE METODOLOGÍA 2026-06-22: antes era todo-o-nada
+ *     literal, que con el fixture endurecido (binomios latinos exactos que ningún
+ *     8b reproduce textual) daba PASS=0 para TODOS los modelos — cero señal. El
+ *     umbral hace el pass-rate discriminativo. Los números YA NO son comparables
+ *     1:1 con corridas previas todo-o-nada (usar BENCH_MUST_THRESHOLD=1 para el
+ *     criterio estricto antiguo).
  *
  * Térmica: GPU ~38° al arrancar. Pausa entre prompts + chequeo de temperatura;
  * si pasa 88° pausa hasta enfriar (vigilancia, no daño).
@@ -44,6 +52,7 @@ import { execSync } from 'node:child_process';
 import {
   scoreAntiHalluc,
   scoreAntiHallucDeterministic,
+  resolveMustThreshold,
   assertIndependentJudge,
   selectJudgeProvider,
 } from './lib/bench-scorer.mjs';
@@ -93,6 +102,9 @@ const JUDGE = selectJudgeProvider({
 });
 const JUDGE_MODEL = JUDGE.judgeModel;
 const JUDGE_TEMPERATURE = 0; // determinismo del juez.
+// Umbral de cobertura de must_include para el scorer DETERMINÍSTICO (sin --judge).
+// PASS si cobertura ≥ MUST_THRESHOLD Y cero red_flags. Configurable por env.
+const MUST_THRESHOLD = resolveMustThreshold();
 const JUDGE_TIMEOUT_MS = 120_000; // el juez local en Maxwell es lento (si se fuerza).
 
 const SIDECAR_URL = process.env.SIDECAR_URL || 'http://localhost:7880';
@@ -195,6 +207,9 @@ async function main() {
   console.log('[bench-complejos] re-bench HONESTO — juez confiable + config-prod');
   console.log(`[bench-complejos] generador: ${GEN_MODEL} temp=${GEN_TEMPERATURE} seed=${SEED} max_tokens=${GEN_MAX_TOKENS}`);
   console.log(`[bench-complejos] juez:      ${JUDGE_MODEL} (provider=${JUDGE.provider}, temp=${JUDGE_TEMPERATURE})`);
+  if (JUDGE.deterministic) {
+    console.log(`[bench-complejos] scorer determinístico: umbral cobertura must_include = ${MUST_THRESHOLD} (BENCH_MUST_THRESHOLD)`);
+  }
   console.log(`[bench-complejos] prompts:   ${prompts.length} (${PROMPTS_FILE.split('/').pop()})`);
   console.log(`[bench-complejos] GPU temp inicial: ${gpuTemp() ?? 'n/d'}°C`);
 
@@ -246,7 +261,7 @@ async function main() {
       shouldInclude: p.should_include,
     };
     const ah = JUDGE.deterministic
-      ? scoreAntiHallucDeterministic(ahItem)
+      ? scoreAntiHallucDeterministic(ahItem, { threshold: MUST_THRESHOLD })
       : await scoreAntiHalluc(ahItem, { ollamaCall: JUDGE.judgeCall });
 
     if (ah.source === 'unjudged') unjudged++;
@@ -278,6 +293,8 @@ async function main() {
       ah_pass: ah.pass,
       ah_must_covered: ah.mustCovered,
       ah_must_total: ah.mustTotal ?? (p.must_include ? p.must_include.length : null),
+      ah_coverage: ah.coverage ?? null,
+      ah_must_threshold: ah.threshold ?? null,
       ah_red_flags_hit: ah.redFlagsHit,
       latency_gen_ms: gen.latency_ms,
     });
@@ -296,7 +313,14 @@ async function main() {
   const summary = {
     generated_at: new Date().toISOString(),
     generator: { model: GEN_MODEL, temperature: GEN_TEMPERATURE, seed: SEED, max_tokens: GEN_MAX_TOKENS, config: 'PROD (llmRouter chat_complex)' },
-    judge: { model: JUDGE_MODEL, provider: JUDGE.provider, independent: !JUDGE.deterministic, temperature: JUDGE_TEMPERATURE },
+    judge: {
+      model: JUDGE_MODEL,
+      provider: JUDGE.provider,
+      independent: !JUDGE.deterministic,
+      temperature: JUDGE_TEMPERATURE,
+      // Solo aplica al scorer determinístico; con juez LLM el criterio es por fondo.
+      must_threshold: JUDGE.deterministic ? MUST_THRESHOLD : null,
+    },
     fixture: PROMPTS_FILE,
     n_prompts: prompts.length,
     pass,
