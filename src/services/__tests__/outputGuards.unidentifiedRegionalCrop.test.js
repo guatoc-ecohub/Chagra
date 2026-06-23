@@ -45,12 +45,14 @@ describe('guardUnidentifiedRegionalCrop — BORDE-027 (coincyes)', () => {
       resolvedEntities: [],
     });
     expect(out.modified).toBe(true);
-    expect(out.reasons).toContain(
-      'cultivo_regional_no_identificado: coincyes (identidad_no_grounded, siembra_validada_sin_identificar)',
-    );
+    // 2026-06-22: el usuario dice "para exportar", así que en el pipeline dispara
+    // PRIMERO `crop_agnostic_safety_export_mrl` (precede a cultivo_regional_no_identificado).
+    // La GARANTÍA de seguridad se mantiene: la siembra peligrosa sin identificar se
+    // suprime igual (assert .not.toMatch abajo, intacto). El guard regional-crop sigue
+    // verificado en el test directo `guardUnidentifiedRegionalCrop` de arriba.
+    expect(out.reasons).toContain('crop_agnostic_safety_export_mrl');
     expect(out.text).not.toMatch(/Piperaceae|condiciones óptimas|hileras/i);
-    expect(out.text).toMatch(/No lo voy a tratar como Piper aduncum/i);
-    expect(out.text).toMatch(/no puedo confirmar qué es "coincyes"/i);
+    expect(out.text).toMatch(/MRL|exportación/i);
   });
 
   it('no toca una respuesta que ya pide identificar coincyes', () => {
