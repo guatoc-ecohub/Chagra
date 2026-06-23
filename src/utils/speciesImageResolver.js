@@ -92,12 +92,39 @@ export function buildSpeciesIdCandidates(normalized) {
 }
 
 /**
+ * Deriva la variante LIGERA (`medium`, ~150–250 KB) de una foto de iNaturalist
+ * cuyo `image_url` apunta a la variante `original` (1.7–3.5 MB).
+ *
+ * Bug #61 (ficha de especie, foto no carga): el 85% del catálogo (535/626)
+ * referencia `…/photos/<id>/original.jpg`. En señal móvil rural —el usuario
+ * real— esos varios MB por ficha frecuentemente se cuelgan o nunca terminan
+ * de bajar, dejando la foto en blanco o rota. La variante `medium` de
+ * iNaturalist es 10–20× más liviana y visualmente idéntica al tamaño en que
+ * la ficha la muestra (80 px / 176 px de alto). Servimos `medium` como
+ * `thumbUrl` (el que el <img> prefiere) y conservamos `original` como `url`
+ * de respaldo. Para URLs que no son de iNaturalist devolvemos el original
+ * sin tocar.
+ *
+ * iNaturalist sirve las variantes en la MISMA ruta: solo cambia el último
+ * segmento del path (original|large|medium|small|square). No tocamos query
+ * params ni el host.
+ */
+function inaturalistThumb(imageUrl) {
+  const url = String(imageUrl || '');
+  if (!/inaturalist/i.test(url)) return url;
+  return url.replace(
+    /\/photos\/(\d+)\/(?:original|large)(\.[a-z]+)(\?|$)/i,
+    '/photos/$1/medium$2$3',
+  );
+}
+
+/**
  * Mapea una entrada del JSON al shape de imagen consumido por los componentes.
  */
 function toImageResult(entry) {
   return {
     url: entry.image_url,
-    thumbUrl: entry.image_url,
+    thumbUrl: inaturalistThumb(entry.image_url),
     license: formatLicense(entry.license),
     rightsHolder: entry.attribution || 'Autor no informado',
     source: 'iNaturalist',
@@ -181,4 +208,5 @@ export function __resetSpeciesImageCache() {
 export const __TEST__ = {
   normalizeScientificName,
   formatLicense,
+  inaturalistThumb,
 };

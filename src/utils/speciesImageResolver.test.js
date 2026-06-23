@@ -15,7 +15,7 @@ import {
   __resetSpeciesImageCache,
 } from './speciesImageResolver';
 
-const { normalizeScientificName, formatLicense } = __TEST__;
+const { normalizeScientificName, formatLicense, inaturalistThumb } = __TEST__;
 
 const MOCK_SPECIES_JSON = {
   species: [
@@ -46,6 +46,13 @@ const MOCK_SPECIES_JSON = {
       image_url: 'https://example.com/tamarind.jpg',
       license: 'http://creativecommons.org/licenses/by/4.0/',
       attribution: 'Anthony Batista',
+    },
+    {
+      species_id: 'abatia_parviflora',
+      scientific_name: 'Abatia parviflora Ruiz & Pav.',
+      image_url: 'https://inaturalist-open-data.s3.amazonaws.com/photos/622718953/original.jpg',
+      license: 'http://creativecommons.org/licenses/by/4.0/',
+      attribution: 'EstebanMH',
     },
   ],
 };
@@ -147,6 +154,52 @@ describe('formatLicense', () => {
   });
 });
 
+// ── inaturalistThumb (bug #61: foto de ficha no carga en señal rural) ──────
+
+describe('inaturalistThumb', () => {
+  it('deriva la variante medium liviana de una URL original de iNaturalist', () => {
+    expect(
+      inaturalistThumb('https://inaturalist-open-data.s3.amazonaws.com/photos/640133931/original.jpg'),
+    ).toBe('https://inaturalist-open-data.s3.amazonaws.com/photos/640133931/medium.jpg');
+  });
+
+  it('respeta la extension (.jpeg, .png) al derivar medium', () => {
+    expect(
+      inaturalistThumb('https://inaturalist-open-data.s3.amazonaws.com/photos/1/original.jpeg'),
+    ).toBe('https://inaturalist-open-data.s3.amazonaws.com/photos/1/medium.jpeg');
+    expect(
+      inaturalistThumb('https://inaturalist-open-data.s3.amazonaws.com/photos/2/original.png'),
+    ).toBe('https://inaturalist-open-data.s3.amazonaws.com/photos/2/medium.png');
+  });
+
+  it('tambien reduce la variante "large" a "medium"', () => {
+    expect(
+      inaturalistThumb('https://inaturalist-open-data.s3.amazonaws.com/photos/3/large.jpg'),
+    ).toBe('https://inaturalist-open-data.s3.amazonaws.com/photos/3/medium.jpg');
+  });
+
+  it('preserva query params al derivar', () => {
+    expect(
+      inaturalistThumb('https://inaturalist-open-data.s3.amazonaws.com/photos/4/original.jpg?1700000000'),
+    ).toBe('https://inaturalist-open-data.s3.amazonaws.com/photos/4/medium.jpg?1700000000');
+  });
+
+  it('NO toca URLs que no son de iNaturalist', () => {
+    const other = 'https://object.jacq.org/europeana/LAGU/1169748.jpg';
+    expect(inaturalistThumb(other)).toBe(other);
+  });
+
+  it('NO toca una URL de iNaturalist que ya es medium', () => {
+    const med = 'https://inaturalist-open-data.s3.amazonaws.com/photos/5/medium.jpg';
+    expect(inaturalistThumb(med)).toBe(med);
+  });
+
+  it('tolera valores no-string sin lanzar', () => {
+    expect(inaturalistThumb(null)).toBe('');
+    expect(inaturalistThumb(undefined)).toBe('');
+  });
+});
+
 // ── findLocalImage ────────────────────────────────────────────────────────
 
 describe('findLocalImage', () => {
@@ -244,6 +297,21 @@ describe('findLocalImage', () => {
     const result = await findLocalImage('Coffea arabica');
     expect(result).not.toBeNull();
     expect(result.license).toBe('CC-BY');
+  });
+
+  it('(#61) para una foto iNaturalist sirve thumbUrl liviano (medium) y conserva url original', async () => {
+    setupFetch();
+    const result = await findLocalImage('Abatia parviflora');
+    expect(result).not.toBeNull();
+    // url = full-res original (respaldo); thumbUrl = variante medium liviana
+    // que el <img> de SpeciesImage prefiere. Sin esto, los ~2 MB del original
+    // se cuelgan en señal rural y la ficha queda sin foto.
+    expect(result.url).toBe(
+      'https://inaturalist-open-data.s3.amazonaws.com/photos/622718953/original.jpg',
+    );
+    expect(result.thumbUrl).toBe(
+      'https://inaturalist-open-data.s3.amazonaws.com/photos/622718953/medium.jpg',
+    );
   });
 });
 
