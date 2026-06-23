@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Cpu, Zap, RefreshCw, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Cpu, Zap, RefreshCw, AlertTriangle } from 'lucide-react';
 import { getGpuSnapshot } from '../services/gpuTelemetryService';
 
 /**
@@ -22,10 +22,10 @@ import { getGpuSnapshot } from '../services/gpuTelemetryService';
  */
 
 const PROCESSOR_STYLES = {
-  gpu: { label: 'GPU', color: 'bg-emerald-900/40 text-emerald-300 border-emerald-700/50' },
-  partial: { label: 'Parcial', color: 'bg-amber-900/40 text-amber-300 border-amber-700/50' },
-  cpu: { label: 'CPU', color: 'bg-slate-700/40 text-slate-300 border-slate-600/50' },
-  unknown: { label: '?', color: 'bg-slate-800/40 text-slate-500 border-slate-700/50' },
+  gpu: { label: 'GPU', color: 'bg-emerald-900/40 text-emerald-400 border-emerald-700/50 font-bold' },
+  partial: { label: 'Parcial', color: 'bg-amber-900/40 text-amber-400 border-amber-700/50 font-bold' },
+  cpu: { label: 'CPU', color: 'bg-slate-700/40 text-slate-300 border-slate-600/50 font-bold' },
+  unknown: { label: '?', color: 'bg-slate-800/40 text-slate-400 border-slate-700/50 font-bold' },
 };
 
 const formatVram = (mb) => {
@@ -50,23 +50,37 @@ export default function HytaPanel() {
   const refresh = useCallback(async () => {
     setLoading(true);
     setError(null);
-    try {
-      const snap = await getGpuSnapshot({ force: true });
-      setGpuSnapshot(snap);
-      if (!snap.available) {
-        setError(snap.error || 'GPU info no disponible');
-      }
-    } catch (err) {
-      console.error('[HytaPanel] Error al obtener snapshot GPU:', err);
-      setError('GPU info no disponible');
-    } finally {
-      setLoading(false);
-    }
+    getGpuSnapshot({ force: true })
+      .then((snap) => {
+        setGpuSnapshot(snap);
+        if (!snap.available) {
+          setError(snap.error || 'GPU info no disponible');
+        }
+      })
+      .catch(() => {
+        setError('GPU info no disponible');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    let cancelled = false;
+    getGpuSnapshot({ force: true })
+      .then((snap) => {
+        if (cancelled) return;
+        setGpuSnapshot(snap);
+        if (!snap.available) setError(snap.error || 'GPU info no disponible');
+      })
+      .catch(() => {
+        if (!cancelled) setError('GPU info no disponible');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   return (
     <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
@@ -77,7 +91,7 @@ export default function HytaPanel() {
         </h3>
       </div>
 
-      <p className="text-[11px] text-slate-500 px-1 leading-relaxed">
+      <p className="text-xs text-slate-400 px-1 leading-relaxed">
         Estado del acelerador GPU y modelos cargados en VRAM. Privacy-safe:
         solo muestra modelo y uso de memoria, nunca prompts ni respuestas.
       </p>
@@ -118,7 +132,7 @@ export default function HytaPanel() {
               </p>
             ) : (
               <div className="space-y-2 mt-3">
-                <p className="text-[10px] text-slate-600 uppercase tracking-wide font-bold">
+                <p className="text-xs text-slate-400 uppercase tracking-wide font-bold">
                   Modelos cargados ({gpuSnapshot.models.length})
                 </p>
                 {gpuSnapshot.models.map((m) => {
@@ -129,15 +143,15 @@ export default function HytaPanel() {
                       className="flex items-center justify-between gap-3 p-2 rounded-lg bg-slate-800/40 border border-slate-800"
                     >
                       <div className="flex-1 min-w-0">
-                        <div className="text-xs font-bold text-white truncate">{m.name}</div>
-                        <div className="text-[9px] text-slate-500">
-                          {m.details.parameterSize || '?'} · {m.details.quantization || '?'}
+                        <div className="text-xs font-bold text-slate-100 truncate">{m.name}</div>
+                        <div className="text-xs text-slate-400">
+                          {m.details.parameterSize || '—'} · {m.details.quantization || '—'}
                         </div>
                       </div>
                       <div className="text-right shrink-0">
                         <div className="text-xs font-mono text-emerald-400">{formatVram(m.vramMB)}</div>
                       </div>
-                      <span className={`text-[9px] px-2 py-1 rounded-full border font-mono ${procStyle.color}`}>
+                      <span className={`text-[10px] px-2 py-1 rounded-full border font-mono ${procStyle.color}`}>
                         {procStyle.label}
                       </span>
                     </div>
@@ -147,7 +161,7 @@ export default function HytaPanel() {
             )}
 
             {/* Timestamp */}
-            <p className="text-[9px] text-slate-600 mt-2">
+            <p className="text-xs text-slate-500 mt-2">
               Actualizado: {formatTs(gpuSnapshot.ts)}
             </p>
           </div>
@@ -175,7 +189,7 @@ export default function HytaPanel() {
       </button>
 
       {/* Nota sobre privacidad */}
-      <p className="text-[9px] text-slate-600 text-center leading-tight">
+      <p className="text-xs text-slate-500 text-center leading-tight">
         La telemetría LLM detallada vive en el panel privado del operador (ADR-020 / ADR-029).
       </p>
     </div>
