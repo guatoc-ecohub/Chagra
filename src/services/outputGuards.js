@@ -7643,8 +7643,12 @@ export function guardConciseResponse(responseText) {
   // aviso de seguridad, contamos cuántas oraciones iniciales son del preámbulo y
   // las PRESERVAMOS, y además conservamos N oraciones SUSTANTIVAS del cuerpo.
   // Sin preámbulo de seguridad, prefixCount=0 → comportamiento idéntico al previo.
+  // FIX P0 (audit 2026-06-23): añadido "importante:" para que las correcciones
+  // de guardBurnEndorsementCorrection (prefijo "⚠️ Importante: no se recomienda
+  // quemar") no sean truncadas por guardConciseResponse — el usuario perdía la
+  // advertencia de quema/Ley 1930 cuando la respuesta total era larga.
   const SAFETY_PREFIX_MARKERS =
-    /(ojo de seguridad|no es (un )?problema de|no problema de|patogen|toxic|veneno|letal|no consumir|no apta|peligro|cuidado:)/;
+    /(ojo de seguridad|importante:|no es (un )?problema de|no problema de|patogen|toxic|veneno|letal|no consumir|no apta|peligro|cuidado:)/;
   let prefixCount = 0;
   if (_stripDiacritics(responseText).trimStart().toLowerCase().startsWith('⚠️ ojo de seguridad')
       || responseText.trimStart().startsWith('⚠️ Ojo de seguridad')) {

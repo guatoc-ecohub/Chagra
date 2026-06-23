@@ -621,9 +621,11 @@ export function buildClimaContext(snapshot, opts = {}) {
  *   1. VIABILIDAD HONESTA: si el usuario quiere sembrar una especie cuya altitud
  *      de finca cae FUERA del rango [altitud_min, altitud_max] de esa especie,
  *      lo dice con honestidad directa pero amable (probabilidad muy baja + el
- *      porqué) y SUGIERE alternativas viables SOLO del catálogo/grounding o del
- *      tool get_cultivos_viables — NUNCA inventadas. Si no tiene el rango de la
- *      especie, NO afirma nada sobre viabilidad (degrada con gracia).
+ *      porqué) y SUGIERE alternativas viables SOLO del catálogo/grounding —
+ *      NUNCA inventadas. Si no tiene el rango de la especie, NO afirma nada
+ *      sobre viabilidad (degrada con gracia).
+ *      (FIX P0 audit 2026-06-23: get_cultivos_viables eliminada del prompt —
+ *      no está en el allowlist del sidecar; prometida → falla en silencio.)
  *   2. DEFAULT FINCA-CONTEXT: las preguntas son POR DEFECTO sobre la finca del
  *      usuario sin que él lo tenga que decir (lo habilita buildFincaContext;
  *      aquí solo se declara como comportamiento por defecto).
@@ -636,10 +638,11 @@ export function buildClimaContext(snapshot, opts = {}) {
  * @returns {string}
  */
 export function generateViabilityRules() {
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
   return `REGLA DE VIABILIDAD HONESTA: las preguntas son POR DEFECTO sobre SU finca (altitud, piso, clima) aunque no lo diga — ya está en "=== CONTEXTO AMBIENTAL DE LA FINCA ===". Si el grounding trae el rango de la especie (altitud_min/altitud_max):
 - Finca FUERA de [altitud_min, altitud_max]: dilo con honestidad amable — probabilidad de éxito muy baja y POR QUÉ (ej: coco 0–1000 m cálido, tu finca 2580 m frío) y sugiere 2–3 alternativas viables para SU altitud.
 - PREMISA FALSA EMBEBIDA: si da por hecho un cultivo ya sembrado/prosperando en un piso incompatible con su rango ("el café que sembré a nivel del mar", "mi mango del páramo"), NO des cosecha/cuidados como si fuera cierto: corrige con amabilidad ("ojo: el café no prospera a nivel del mar") y orienta con alternativas o pide aclaración.
-- Alternativas SOLO del catálogo/grounding o get_cultivos_viables. NUNCA inventes especies, viabilidad ni incompatibilidad.
+- Alternativas SOLO del catálogo/grounding. NUNCA inventes especies, viabilidad ni incompatibilidad.
 - Sin rango (null): NO afirmes NADA; sé neutral y pide el dato.
 PRESENTACIÓN LOCAL: que los datos de finca se noten SUYOS ("En tu finca…", "Para tu altura (2580 m)…"); usuario campesino o niño. Conciso.`;
 }
@@ -791,7 +794,7 @@ ${secciones.join('\n\n')}
 REGLA (intelligence-first, tono HUMILDE):
 - MARGINAL: nunca digas "no se puede". Di que está al límite (tu finca a X, su máx Y) pero es POSIBLE con cuidados extra: protección de heladas, microclima abrigado, variedad adaptada; "hay quien lo logra en zonas así". La EXPERIENCIA del campesino manda sobre la base de datos.
 - INVIABLE: sé honesto y amable — probabilidad muy baja, no vale la pena el esfuerzo — y LIDERA con la primera alternativa viable listada (suele ser el primo del mismo género), luego 2 más.
-- Las alternativas salen SOLO del catálogo / grounding de este mensaje o del tool get_cultivos_viables — NUNCA inventes especies ni inventes viabilidad.
+- Las alternativas salen SOLO del catálogo / grounding de este mensaje — NUNCA inventes especies ni inventes viabilidad.
 === FIN VIABILIDAD POR ALTITUD ===`;
 }
 
@@ -1077,7 +1080,7 @@ REGLA: si el usuario pregunta por la dosis, preparación o uso de un biopreparad
 export function generateAgronomicGuidanceRules() {
   return `DOCTRINA AGRONÓMICA (guía, no dogma): toda regla agronómica es una GUÍA con zona gris; navégala con los datos del grafo + clima en vivo + RESPETO a la experiencia del campesino. NUNCA inventes; si falta el dato, sé neutral.
 - Viabilidad marginal: nunca "no se puede" — está al límite, posible con cuidados; el campesino que ya lo logró tiene la razón sobre la base de datos.
-- Diseño de finca: si pregunta cómo mejorar su finca, por qué su cultivo no carga o qué sembrar alrededor, usa get_diseno_finca(altitud) para sugerir polinizadores, abonos verdes, sombra y cercas vivas del catálogo viables a su altitud — SOLO cuando sea pertinente.
+- Diseño de finca: si pregunta cómo mejorar su finca, por qué su cultivo no carga o qué sembrar alrededor, sugiere polinizadores, abonos verdes, sombra y cercas vivas del catálogo viables a su altitud — SOLO cuando sea pertinente.
 - Invasoras / conservación: jamás recomiendes sembrar especie invasora o de conservación sensible; sé honesto y ofrece alternativa nativa.
 - Cura milagrosa: si afirma que una mezcla cura algo y pide dosis/frecuencia exacta, no confirmes ni inventes una cifra; evalúa si tiene sustento, si no, dilo con respeto y ofrece el manejo real.`;
 }
@@ -1381,6 +1384,7 @@ export function buildFincaContext({
     ubic.push(`(${lat.toFixed(3)}, ${lng.toFixed(3)})`);
   }
   if (finca && finca.nombre) {
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
     lines.push(`Finca activa: "${finca.nombre}"${ubic.length ? ` — ${ubic.join(', ')}` : ''}.`);
   } else if (ubic.length) {
     lines.push(`Ubicación: ${ubic.join(', ')}.`);

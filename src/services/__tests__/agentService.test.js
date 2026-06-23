@@ -816,7 +816,11 @@ describe('agentService — Task #202 Profile Context', () => {
 
     it('exige que las alternativas salgan SOLO del catálogo/grounding, nunca inventadas', () => {
       expect(rules).toContain('NUNCA inventes');
-      expect(rules).toContain('get_cultivos_viables');
+      // FIX P0 (audit 2026-06-23): get_cultivos_viables eliminada del prompt
+      // (no está en el allowlist del sidecar → prometida y falla en silencio).
+      // El modelo debe usar solo el catálogo/grounding, sin invocar esa tool.
+      expect(rules).not.toContain('get_cultivos_viables');
+      expect(rules).toContain('catálogo/grounding');
     });
 
     it('degrada con gracia: sin rango no se afirma viabilidad', () => {
@@ -888,8 +892,10 @@ describe('agentService — Task #202 Profile Context', () => {
       expect(ctx).toContain('0');
       expect(ctx).toContain('1000');
       expect(ctx).toContain('2580');
-      // Debe instruir sugerir alternativas del grounding/tool, no inventar
-      expect(ctx).toContain('get_cultivos_viables');
+      // Debe instruir sugerir alternativas del grounding, no inventar.
+      // FIX P0 (audit 2026-06-23): get_cultivos_viables eliminada del prompt.
+      expect(ctx).not.toContain('get_cultivos_viables');
+      expect(ctx).toContain('catálogo / grounding');
     });
 
     it('caso especie VIABLE: altitud de finca dentro del rango → no la marca inviable', () => {
@@ -1299,9 +1305,13 @@ describe('agentService — Task #202 Profile Context', () => {
       expect(rules).toContain('NUNCA inventes');
     });
 
-    it('menciona get_diseno_finca SOLO cuando pertinente', () => {
-      expect(rules).toContain('get_diseno_finca');
+    it('menciona diseño de finca SOLO cuando pertinente (sin invocar tool muerta)', () => {
+      // FIX P0 (audit 2026-06-23): get_diseno_finca eliminada del prompt —
+      // no está en el allowlist del sidecar → prometida y falla en silencio.
+      expect(rules).not.toContain('get_diseno_finca');
       expect(rules.toLowerCase()).toContain('pertinente');
+      // La funcionalidad de diseño de finca sigue presente — solo sin tool.
+      expect(rules.toLowerCase()).toContain('diseño de finca');
     });
 
     it('cero voseo argentino', () => {

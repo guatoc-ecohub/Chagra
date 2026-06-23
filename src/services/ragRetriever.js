@@ -396,16 +396,32 @@ function cosineSimilarity(a, b) {
  */
 async function loadEmbeddings() {
   if (embeddingsCache) return embeddingsCache;
+  // FIX P0 (audit 2026-06-23): antes había `if (embeddingsLoadPromise) return
+  // embeddingsLoadPromise` — pero el promise IIFE resuelve a null en cualquier
+  // fallo/HTTP-error, y el objeto Promise sigue siendo truthy → la siguiente
+  // consulta reusaba el promise resuelto a null y el agente quedaba en BM25-only
+  // permanente y silencioso. Ahora: al fallar/null reseteamos la var a null para
+  // que el siguiente turno vuelva a intentar la carga (retries naturales).
+  // El happy-path (carga exitosa) sigue cacheado en `embeddingsCache`.
   if (embeddingsLoadPromise) return embeddingsLoadPromise;
 
   embeddingsLoadPromise = (async () => {
     try {
       const res = await fetch(EMBEDDINGS_PATH);
-      if (!res.ok) return null;
+      if (!res.ok) {
+        embeddingsLoadPromise = null; // permitir reintento en próxima consulta
+        return null;
+      }
       const ct = res.headers.get('content-type') || '';
-      if (!ct.includes('json')) return null;
+      if (!ct.includes('json')) {
+        embeddingsLoadPromise = null;
+        return null;
+      }
       const raw = await res.json();
-      if (!raw || typeof raw !== 'object') return null;
+      if (!raw || typeof raw !== 'object') {
+        embeddingsLoadPromise = null;
+        return null;
+      }
       // Convertir a Float32Array. Soporta int8 quantizado (q:'int8',s:scale,v:Int8Array)
       const converted = {};
       for (const [slug, entry] of Object.entries(raw)) {
@@ -423,6 +439,7 @@ async function loadEmbeddings() {
       return converted;
     } catch (err) {
       console.warn('[RAG] No se pudieron cargar embeddings — modo semántico desactivado:', err?.message);
+      embeddingsLoadPromise = null; // permitir reintento en próxima consulta
       return null;
     }
   })();
