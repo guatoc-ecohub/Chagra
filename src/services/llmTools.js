@@ -1,5 +1,10 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 /**
  * llmTools.js — Tool registry para function calling.
+ *
+ * NOTA i18n (ADR-050): los `description` de las tools y los mensajes de error
+ * del corpus son texto de razonamiento que consume el LLM (no UI visible al
+ * usuario), por eso viven en español aquí y no en src/config/messages.js.
  *
  * Implementa el patrón de registry paralelo a moduleRegistry.js.
  * Herramientas mínimas para DR-034 + tool use básico.
@@ -205,7 +210,8 @@ registerTool({
  */
 registerTool({
   name: 'agendar_riego',
-  description: 'Programar riego para un cultivo o planta',
+  description:
+    'Crea una TAREA de riego programada (entrada en calendario) SOLO cuando el usuario lo pide EXPLÍCITAMENTE con verbos de agendar: "agéndame el riego", "prográmame riego", "recuérdame regar", "crea una tarea de riego". NO usar para diagnóstico ni manejo de problemas: si el usuario describe una enfermedad o plaga (gota, tizón, roya, mildiu, manchas, "se está muriendo") o pide un "plan", "qué hago" o "cómo resuelvo", NO es esta herramienta — responde con el manejo agroecológico en texto, sin agendar nada.',
   parameters: {
     type: 'object',
     properties: {
