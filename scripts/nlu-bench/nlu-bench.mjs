@@ -75,13 +75,18 @@ const REPS = Number(argVal("--reps", "3"));
 const ONLY = argVal("--only", null);
 
 const CANDIDATES = [
-  "granite3.1-dense:8b", // BASELINE (NLU real de prod)
-  "granite3.3:8b",       // posible upgrade chat — ¿mejor routing?
-  "gemma4:e4b",          // Maxwell-safe
-  "ministral-3:latest",  // Maxwell-safe
-  "ministral-3:14b",     // Maxwell-safe (más grande)
-  "granite3.1-moe:1b",
-  "qwen2.5:1.5b",
+  "granite3.3:8b",       // PROD actual (chat+NLU unificado tras fix #93)
+  "granite3.1-dense:8b", // baseline previo
+  "ministral-3:latest",  // ganó NLU (0.90); candidato unificado NLU+visión+tools
+  "ministral-3:14b",     // ganó NLU (0.95) pero p95 alto
+  // --- INTEGRADOS 2026-06-23 (gemma + cuantizados nuevos / perdidos de vista) ---
+  "gemma3:4b",           // CO-RESIDE con granite3.3 (visión OK); medir como NLU
+  "gemma3:12b",          // gemma grande
+  "qwen3.5:9b",          // NUEVO, pulled pero NUNCA benchado (perdido de vista)
+  "qwen3.5:4b",          // qwen3.5 chico
+  "command-r7b:7b",      // Cohere, tool-calling-first, multilingüe — sin benchar
+  "gemma4:e2b",          // gemma4 chico (7.2GB) — pulled, sin benchar (e4b dio 0.45)
+  // descartados por bench previo (acc<0.7): gemma4:e4b 0.45, granite3.1-moe:1b 0.55, qwen2.5:1.5b 0.70
 ].filter((m) => !ONLY || m === ONLY);
 
 // --- llamada a Ollama: MISMO requestBody que planNlu en prod ----------------
