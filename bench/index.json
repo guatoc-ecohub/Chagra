@@ -78,6 +78,8 @@
       "cluster": "anti-hallucination",
       "status": "active",
       "protected": true,
+      "external": true,
+      "provenance": "chagra-pro: el runner + fixtures adversariales viven en el repo privado (movidos en #1687). Esta entrada documenta el bench para --list/historial; el script NO existe en el repo OSS a proposito.",
       "script": "scripts/bench-borde-alucinacion.mjs",
       "cmd": [
         "node",

@@ -53,6 +53,20 @@ describe('validateEntry', () => {
     const p = validateEntry({ id: 'x', title: 't', type: 'meta', cluster: 'c', infra: ['ninguna'], script: 'scripts/x.mjs' });
     expect(p).toEqual([]);
   });
+  it('checkScript exige que el script exista para entradas locales', () => {
+    const p = validateEntry(
+      { id: 'x', title: 't', type: 'bench-llm', cluster: 'c', infra: ['ninguna'], script: 'scripts/no-existe-xyz.mjs' },
+      { checkScript: true },
+    );
+    expect(p.join(' ')).toMatch(/script no existe/);
+  });
+  it('external: true salta el chequeo de existencia del script (runner en chagra-pro)', () => {
+    const p = validateEntry(
+      { id: 'x', title: 't', type: 'bench-llm', cluster: 'c', infra: ['ninguna'], script: 'scripts/no-existe-xyz.mjs', external: true },
+      { checkScript: true },
+    );
+    expect(p).toEqual([]);
+  });
 });
 
 describe('findEntry', () => {
