@@ -105,20 +105,8 @@ export const ROUTES = {
     stop: CHAT_STOP_SEQUENCES,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Swap 2026-05-24 post-bug producción: granite3.1-dense:8b promovido a ' +
-      'baseline chat. Bench nocturno Phase C (100 prompts con tools+AGE): ' +
-      'granite3.1-dense:8b #1 (56% AH, 0 halluc flags, 24.7s lat) vs ' +
-      'llama3.1:8b #2 (44% AH, 12.9s) y gemma3:4b #4 (40% AH, 11.7s). ' +
-      '12 puntos AH de mejora justifican +11.8s latencia bajo intelligence-first ' +
-      'principle (memoria feedback-intelligence-first-never-shrink-models). ' +
-      'Mismo modelo chat + chat_complex evita cold-start en escalado complex. ' +
-      'VRAM: ~5 GB (más chico que llama 6.2 GB) → libera ~1.2 GB para Kokoro ' +
-      'CUDA cuando se re-active (PR #112 rollback temporal hasta este swap). ' +
-      'keep_alive=30m. Override env: VITE_LLM_CHAT_MODEL para experimentos. ' +
-      'Bugs que mitiga: Choachí confundido con "Shoeachi" + Sibundoy, café ' +
-      'supremo asumido como variedad, mango como sombra a 2400 msnm, ' +
-      'Tabebuia rosea como "roble", Inga edulis como "guayabo". Todos ' +
-      'derivados de llama ignorando evidence de tools.',
+      'granite3.3:8b (chat+complex unificado, evita cold-start). ' +
+      'Detalle + por qué + alternativas en Chagra-strategy/ops/MODELS.md (fuente única).',
   },
   chat_complex: {
     // Override por env para que el operador pueda probar otros modelos
@@ -138,29 +126,22 @@ export const ROUTES = {
     stop: CHAT_STOP_SEQUENCES,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Bench 2026-05-23 anti-alucinación: granite3.1-dense:8b 37 t/s, ' +
-      '~6 GB VRAM, ~37s avg con context completo. Más lento que gemma3:4b ' +
-      'pero clavó "Monalonion velezangeli" sin pifia donde 4b derivaba a ' +
-      'Fusarium genéricos. keep_alive_min=5 (no 30): el chat hot sigue ' +
-      'siendo gemma3:4b → no mantener dos modelos calientes simultáneos ' +
-      'para no presionar VRAM contra vision (qwen2.5vl 11.8 GB). ' +
-      'max_tokens 768 (vs 512 del chat simple) porque queries complejas ' +
-      'tienden a respuestas más estructuradas (planes, asocios, ' +
-      'enumeraciones). temperature mantenida en 0.3 — la regla ' +
-      'intelligence-first aplica igual: temperature baja + prompt ' +
-      'agresivo > modelo más grande con temperature alta.',
+      'granite3.3:8b (chat+complex unificado, evita cold-start). ' +
+      'Detalle + por qué + alternativas en Chagra-strategy/ops/MODELS.md (fuente única).',
   },
   nlu: {
-    model: 'qwen2.5-coder:7b',
+    // NLU REAL = sidecar agro-mcp nlu.ts (granite3.3:8b). Este campo es
+    // vestigial: la PWA delega NLU al sidecar /nlu. Ver
+    // Chagra-strategy/ops/MODELS.md (fuente única de verdad de modelos).
+    model: 'granite3.3:8b',
     keep_alive_min: 0,
     temperature: 0,
     max_tokens: 150,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Bench: único modelo que pasó chat ✓ AND NLU ✓ en llama.cpp puro ' +
-      'con prompts JSON estrictos. gemma3:4b devuelve {} plano cuando ' +
-      'schema pide [{...}] (bug #685). qwen2.5-coder entrenado en código, ' +
-      'devuelve schemas válidos consistentemente.',
+      'Vestigial — NLU real ejecuta en sidecar agro-mcp nlu.ts con ' +
+      'granite3.3:8b (unificado con chat para no tener 2 modelos en 12 GB). ' +
+      'Detalle en Chagra-strategy/ops/MODELS.md (fuente única).',
   },
   reasoning: {
     model: 'gemma2:9b',
@@ -176,17 +157,17 @@ export const ROUTES = {
       'mejor capability) o deepseek-r1:8b (46 t/s, chain-of-thought).',
   },
   vision: {
-    model: 'qwen2.5vl:7b',
+    model: 'gemma3:4b',
     keep_alive_min: 0,
     temperature: 0.2,
     max_tokens: 512,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Bench GPU: 78 t/s, 11.8 GB VRAM (apretado pero cabe en M6000 12 GB). ' +
-      'Multimodal nativo, antes inviable por OOM CPU. Habilita pest ' +
-      'diagnostic (DR-040 F2) y plant ID. Alternativa: llava:13b (22.94 t/s) ' +
-      'si Qwen falla con flora silvestre. unload tras request porque ' +
-      'compite con chat hot por VRAM.',
+      'Bench visión M6000 2026-06-23: qwen2.5vl:7b es el PEOR (alucina + ' +
+      'offload 14 GB → thrash). gemma3:4b co-reside con granite3.3:8b ' +
+      '(10.2/12 GB, sin offload) e identifica patógenos mejor. Validado ' +
+      'contra gate AGE validate_visual_match. Detalle en ' +
+      'Chagra-strategy/ops/MODELS.md (fuente única).',
   },
 };
 
