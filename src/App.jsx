@@ -7,7 +7,7 @@
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Sprout, MapPin, Eye, Package, Clock, NotebookPen, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette, FileText, Network, Beaker, PawPrint } from 'lucide-react';
+import { Sprout, MapPin, Eye, Package, Clock, NotebookPen, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette, FileText, Network, Beaker, PawPrint, Layers, TestTube, ShieldAlert } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
 import { useClimaAtmosphere } from './hooks/useClimaAtmosphere';
@@ -150,6 +150,9 @@ const NAV_TILES = [
   { id: 'biodiversidad', label: 'Flora y fauna', icon: Leaf, accent: 'emerald', desc: 'Ecosistema, estratos y gremios' },
   { id: 'animales', label: 'Animales', icon: PawPrint, accent: 'rose', desc: 'Gallinas, vacas, cerdos, abejas y ciclo cerrado' },
   { id: 'fermentos', label: 'Fermentos', icon: Beaker, accent: 'orange', desc: 'Recetas tradicionales y seguridad' },
+  { id: 'suelo', label: 'Suelo', icon: Layers, accent: 'amber', desc: 'Diagnóstico y salud del suelo' },
+  { id: 'germinacion', label: 'Semilleros', icon: TestTube, accent: 'teal', desc: 'Prueba de semillas y germinación' },
+  { id: 'toxicologia', label: 'Seguridad', icon: ShieldAlert, accent: 'rose', desc: 'Toxicidad de insumos y riesgo de suelo' },
   { id: 'reportar_invasora', label: 'Plagas', icon: AlertCircle, accent: 'amber', desc: 'Reporte de plagas y malezas' },
   { id: 'casos', label: 'Casos', icon: FileText, accent: 'amber', desc: 'Seguimiento de problemas y tratamientos' },
   { id: 'informes', label: 'Informes', icon: FileText, accent: 'lime', desc: 'Descargas de reportes en CSV' },
