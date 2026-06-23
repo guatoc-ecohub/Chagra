@@ -7,6 +7,8 @@ import {
   buildCorpusContext,
   buildCorpusVariants,
   formatToolEvidence,
+  buildResolvedEntitiesBlock,
+  MIN_ENTITY_CONFIDENCE,
   TOOL_EVIDENCE_MAX_CHARS,
 } from '../agentPromptBase.js';
 
@@ -396,5 +398,96 @@ describe('analyzeQuery — topic plaga/enfermedad para enfermedades sin pest glo
   it('una query de manejo sin enfermedad sigue siendo manejo', () => {
     const r = analyzeQuery('cómo podo el aguacate');
     expect(r.topic).toBe('manejo');
+  });
+});
+
+// ── Tests fix #95: buildResolvedEntitiesBlock con umbral de confianza ───────
+
+describe('buildResolvedEntitiesBlock — filtro de confianza (fix #95)', () => {
+  const GULUPA_HIGH = {
+    mentioned: 'gulupa',
+    kind: 'species',
+    canonical_id: 'passiflora_edulis_morada',
+    nombre_comun: 'Gulupa',
+    nombre_cientifico: 'Passiflora edulis f. edulis Sims',
+    confidence: 1,
+  };
+
+  const CAFE_HIGH = {
+    mentioned: 'cafe',
+    kind: 'species',
+    canonical_id: 'coffea_arabica',
+    nombre_comun: 'Café arábica',
+    nombre_cientifico: 'Coffea arabica L.',
+    confidence: 0.95,
+  };
+
+  const LOW_CONF = {
+    mentioned: 'yumbolo',
+    kind: 'species',
+    canonical_id: 'hesperomeles_obtusifolia',
+    nombre_comun: 'Durazno criollo',
+    nombre_cientifico: 'Hesperomeles obtusifolia',
+    confidence: 0.45,
+  };
+
+  it('MIN_ENTITY_CONFIDENCE es 0.8', () => {
+    expect(MIN_ENTITY_CONFIDENCE).toBe(0.8);
+  });
+
+  it('retorna vacio para array vacio', () => {
+    expect(buildResolvedEntitiesBlock([])).toBe('');
+    expect(buildResolvedEntitiesBlock(null)).toBe('');
+  });
+
+  it('entidades de alta confianza van al bloque AUTORITATIVO', () => {
+    const block = buildResolvedEntitiesBlock([GULUPA_HIGH]);
+    expect(block).toContain('ENTIDADES RESUELTAS DEL CATÁLOGO');
+    expect(block).toContain('gulupa');
+    expect(block).toContain('Passiflora edulis f. edulis Sims');
+    expect(block).toContain('confidence: 1');
+    // NO debe haber bloque CASO B (la entidad es de alta confianza)
+    expect(block).not.toContain('TÉRMINOS SIN GROUNDING VERIFICADO');
+  });
+
+  it('entidades de baja confianza NO van al bloque autoritativo y activan CASO B', () => {
+    const block = buildResolvedEntitiesBlock([LOW_CONF]);
+    // No debe tener bloque autoritativo (no hay entidades de alta confianza)
+    expect(block).not.toContain('ENTIDADES RESUELTAS DEL CATÁLOGO');
+    // Debe emitir el bloque CASO B
+    expect(block).toContain('TÉRMINOS SIN GROUNDING VERIFICADO');
+    expect(block).toContain('"yumbolo"');
+    expect(block).toContain('NUNCA inventes');
+    expect(block).toContain('CASO B');
+  });
+
+  it('mezcla: alta confianza va al autoritativo, baja al CASO B', () => {
+    const block = buildResolvedEntitiesBlock([CAFE_HIGH, LOW_CONF]);
+    // El café de alta confianza va al bloque autoritativo
+    expect(block).toContain('ENTIDADES RESUELTAS DEL CATÁLOGO');
+    expect(block).toContain('Coffea arabica');
+    // yumbolo con baja confianza activa CASO B
+    expect(block).toContain('TÉRMINOS SIN GROUNDING VERIFICADO');
+    expect(block).toContain('"yumbolo"');
+    // El durazno criollo NO va al bloque autoritativo
+    expect(block).not.toContain('Hesperomeles');
+  });
+
+  it('entidad sin campo confidence numérico se trata como baja confianza', () => {
+    const noConf = { mentioned: 'coincyes', kind: 'species', nombre_comun: 'Algo', nombre_cientifico: 'Genus species' };
+    const block = buildResolvedEntitiesBlock([noConf]);
+    expect(block).toContain('TÉRMINOS SIN GROUNDING VERIFICADO');
+    expect(block).not.toContain('ENTIDADES RESUELTAS DEL CATÁLOGO');
+  });
+
+  it('gulupa y café con alta confianza siguen funcionando después del fix', () => {
+    const block = buildResolvedEntitiesBlock([GULUPA_HIGH, CAFE_HIGH]);
+    expect(block).toContain('ENTIDADES RESUELTAS DEL CATÁLOGO');
+    expect(block).toContain('gulupa');
+    expect(block).toContain('Passiflora edulis');
+    expect(block).toContain('cafe');
+    expect(block).toContain('Coffea arabica');
+    // Sin CASO B porque ambas tienen alta confianza
+    expect(block).not.toContain('TÉRMINOS SIN GROUNDING VERIFICADO');
   });
 });

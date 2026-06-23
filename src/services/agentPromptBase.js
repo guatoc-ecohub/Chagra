@@ -652,23 +652,66 @@ export function buildCorpusVariants(contextCorpus) {
 }
 
 /**
+ * Umbral mínimo de confianza para que una entidad del resolver se inyecte
+ * como grounding autoritativo en el prompt. Entidades con confidence < este
+ * valor se descartan del bloque AUTORITATIVO y el término del usuario queda
+ * sin grounding → activa CASO B (pedir aclaración). Umbral calibrado en
+ * bench: confidence 1.0 = match exacto en AGE; 0.95 = alias canónico;
+ * 0.8-0.94 = match fuzzy aceptable; < 0.8 = ruido o falso positivo.
+ *
+ * Fix #95 (2026-06-23): el bug "coincyes → Momordica charantia" ocurría
+ * porque el sidecar devolvía entidades con confidence baja que el LLM tomaba
+ * como grounding válido, ignorando el CASO B del prompt.
+ */
+export const MIN_ENTITY_CONFIDENCE = 0.8;
+
+/**
  * buildResolvedEntitiesBlock — ENTIDADES RESUELTAS (DR taxonómico Tier 1 B).
  * El sidecar /resolve-entities ya verificó contra Apache AGE qué plantas/
  * plagas menciona el usuario y resolvió los binomios canónicos. Capa
  * DETERMINÍSTICA: bypassea que el LLM ignore reglas generales del prompt.
  *
+ * Solo se inyectan entidades con confidence >= MIN_ENTITY_CONFIDENCE (0.8).
+ * Las entidades de baja confianza NO se descartan silenciosamente: si hay
+ * términos mencionados que no superaron el umbral, se emite un bloque CASO B
+ * explícito para que el LLM pida aclaración en lugar de inventar el binomio.
+ *
  * @param {Array<object>|null} resolvedEntities
- * @returns {string} bloque, o '' si no hay entidades.
+ * @returns {string} bloque autoritativo + (si aplica) bloque CASO B, o ''.
  */
 export function buildResolvedEntitiesBlock(resolvedEntities) {
   if (!Array.isArray(resolvedEntities) || resolvedEntities.length === 0) return '';
-  return `
 
+  const highConf = resolvedEntities.filter(
+    (e) => typeof e.confidence === 'number' && e.confidence >= MIN_ENTITY_CONFIDENCE
+  );
+  const lowConf = resolvedEntities.filter(
+    (e) => typeof e.confidence !== 'number' || e.confidence < MIN_ENTITY_CONFIDENCE
+  );
+
+  const parts = [];
+
+  if (highConf.length > 0) {
+    parts.push(`
 === ENTIDADES RESUELTAS DEL CATÁLOGO (autoritativo, verificado en Apache AGE) ===
 El catálogo Chagra confirma estos binomios CANÓNICOS para lo que el usuario mencionó. Si tu respuesta los menciona, USA el nombre científico EXACTO listado — JAMÁS otro género por similitud de sonido (gulupa NO es Psidium ni Cucurbita; aguacate NO es Psidium). Si dudas entre varias, elige la de mayor confidence.
 
-${resolvedEntities.map((e) => `- "${e.mentioned}" (${e.kind}) → ${e.nombre_comun} = ${e.nombre_cientifico} [id: ${e.canonical_id}, confidence: ${e.confidence}]`).join('\n')}
-=== FIN ENTIDADES RESUELTAS ===`;
+${highConf.map((e) => `- "${e.mentioned}" (${e.kind}) → ${e.nombre_comun} = ${e.nombre_cientifico} [id: ${e.canonical_id}, confidence: ${e.confidence}]`).join('\n')}
+=== FIN ENTIDADES RESUELTAS ===`);
+  }
+
+  if (lowConf.length > 0) {
+    // Deduplica los términos mencionados (el sidecar puede devolver varias
+    // entidades de baja confianza para el mismo token).
+    const uniqueTerms = [...new Set(lowConf.map((e) => e.mentioned).filter(Boolean))];
+    parts.push(`
+=== TÉRMINOS SIN GROUNDING VERIFICADO (CASO B OBLIGATORIO) ===
+Los siguientes términos mencionados por el usuario NO tienen match de alta confianza en el catálogo Chagra (confidence < ${MIN_ENTITY_CONFIDENCE}): ${uniqueTerms.map((t) => `"${t}"`).join(', ')}.
+INSTRUCCIÓN OBLIGATORIA anti-alucinación: NUNCA inventes ni afirmes un nombre científico (binomio latino) para estos términos. Aplica CASO B: "No reconozco el término '[término]'. ¿Podrías describirlo, enviarme una foto, o decirme si quisiste decir otra planta?". ES PREFERIBLE QUEDAR COMO IGNORANTE QUE INVENTAR UN BINOMIO.
+=== FIN TÉRMINOS SIN GROUNDING ===`);
+  }
+
+  return parts.join('\n');
 }
 
 /**

@@ -6544,6 +6544,187 @@ export function guardUnidentifiedRegionalCrop(responseText, { userMessage = null
   };
 }
 
+// ── C3 (fix #95): binomio latino para término regional no verificado ─────────
+
+/**
+ * Regex que detecta un binomio latino (Género especie) en la respuesta.
+ * Requisitos anti-falsos-positivos:
+ *   - Primera letra mayúscula (género) seguida de minúscula + mínimo 2 chars.
+ *   - Especia en minúsculas, mínimo 3 chars.
+ *   - NO captura: siglas (ICA, MRL), palabras solas, nombres propios cortos.
+ * Calibrado para detectar "Piper aduncum", "Cointzia sp.", "Momordica charantia",
+ * etc. sin disparar sobre texto normal como "En Colombia se..." o "La región".
+ *
+ * Notas de diseño: el patrón es intencionalmente amplio en la captura (captura
+ * el binomio), pero el guard solo actúa si ADEMÁS el término del usuario no está
+ * grounded. Así el falso positivo es imposible: si el LLM inventó el binomio en
+ * contexto sin grounding, el guard actúa; si había grounding de alta confianza
+ * para ese término, `resolvedMentions` lo incluye y el guard NO actúa.
+ */
+// Regex estricto para binomio botánico:
+//   - Genus: mayúscula inicial + ≥4 letras [a-z] sin tilde (latín puro). Total ≥5 chars.
+//   - Epithet: todo [a-z] sin tilde, mínimo 4 chars. Excluye español con tilde
+//     ("más", "así", "allí") porque los epítetos botánicos son latín puro sin diacríticos.
+// Anti-falsos-positivos: "Cuéntame más" no matchea (Cuéntame tiene tilde → no captura
+// por [a-z] puro en el genus; además "más" tiene 3 chars < 4 mínimo del epithet).
+const LATIN_BINOMIAL_RE =
+  /\b([A-Z][a-z]{4,})\s+([a-z]{4,}(?:\s+(?:var\.|f\.|subsp\.|ssp\.)?\s*[a-z]{4,})?)\b/g;
+
+/**
+ * Palabras comunes que podrían parecer binomios pero NO lo son.
+ * Anti-falsos-positivos para el detector de binomios.
+ */
+const BINOMIAL_FALSE_POSITIVES = new Set([
+  // términos agroecológicos comunes Género-like
+  'chagra ia', 'chagra tiene', 'colombia tiene', 'colombia es', 'colombia no',
+  // nombres propios frecuentes en contexto agro
+  'cauca valle', 'boyaca cundinamarca', 'nino nina',
+  // verbos/frases con mayúscula al inicio de oración (el regex solo toma
+  // el token, pero por si acaso)
+  'asistente chagra',
+]);
+
+/**
+ * ¿El texto contiene al menos un binomio latino?
+ * @param {string} normText  texto sin diacríticos y en minúsculas
+ * @returns {string|null} el primer binomio encontrado, o null
+ */
+function _extractLatinBinomial(text) {
+  // Reseteamos el lastIndex porque el regex es global
+  LATIN_BINOMIAL_RE.lastIndex = 0;
+  let match;
+  while ((match = LATIN_BINOMIAL_RE.exec(text)) !== null) {
+    const genus = match[1];
+    const epithet = match[2].split(/\s+/)[0]; // primera palabra de la especia
+    // El género debe tener ≥4 chars para reducir falsos (evita "El", "La", etc.)
+    if (genus.length < 4) continue;
+    const pair = `${genus} ${epithet}`;
+    if (BINOMIAL_FALSE_POSITIVES.has(pair.toLowerCase())) continue;
+    return pair;
+  }
+  return null;
+}
+
+/**
+ * guardUnverifiedTermBinomial — fix #95. Detecta cuando la respuesta contiene
+ * un binomio latino (Género especie) atribuido a un término que el usuario
+ * mencionó pero que NO tiene grounding de alta confianza en el catálogo.
+ *
+ * Actúa solo si:
+ *   1. El usuario introdujo un término (userMessage) que no aparece en los
+ *      `mentioned` de alta confianza (resolvedMentions).
+ *   2. La respuesta contiene un binomio latino.
+ *   3. La respuesta no usa ya el marcador de incertidumbre ("no puedo confirmar",
+ *      "no reconozco el término", "no tengo información sobre").
+ *
+ * Es SUPPRESS-AND-REPLACE: si la respuesta ya inventó el binomio, la reemplaza
+ * por una petición de aclaración con foto. Si la respuesta es honesta, no toca.
+ *
+ * Anti-falsos-positivos: si resolvedMentions incluye el término del usuario
+ * con alta confianza, el guard NO actúa (el binomio es legítimo del catálogo).
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null, resolvedMentions?: Set<string>}} ctx
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardUnverifiedTermBinomial(
+  responseText,
+  { userMessage = null, resolvedMentions = new Set() } = {}
+) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Si la respuesta ya es honesta sobre no saber, no tocar.
+  const norm = responseText.toLowerCase();
+  if (
+    norm.includes('no puedo confirmar') ||
+    norm.includes('no reconozco el término') ||
+    norm.includes('no tengo información sobre') ||
+    norm.includes('no lo voy a tratar como') ||
+    norm.includes('¿podrías describirlo') ||
+    norm.includes('necesito que me confirmes') ||
+    norm.includes('foto de la') ||
+    norm.includes('cuéntame qué planta') ||
+    norm.includes('¿puedes enviar una foto') ||
+    norm.includes('puedes enviar una foto')
+  ) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  if (typeof userMessage !== 'string' || !userMessage.trim()) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Condición PRINCIPAL: el guard actúa solo cuando NO hay ningún mentioned de
+  // alta confianza del resolver para esta consulta. Si hay al menos un término
+  // verificado (gulupa, café...), el binomio en la respuesta es probablemente
+  // legítimo y NO tocamos nada.
+  //
+  // Diseño conservador: si resolvedMentions tiene cualquier entrada, asumimos
+  // que el grounding es legítimo. Falsos negativos (nombre regional + nombre
+  // verificado en la misma consulta) son aceptables frente a los falsos
+  // positivos (bloquear respuesta legítima sobre gulupa).
+  if (resolvedMentions.size > 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Sin ningún mentioned de alta confianza: ¿la respuesta contiene un binomio latino?
+  const binomial = _extractLatinBinomial(responseText);
+  if (!binomial) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Extrae el término más probable que el usuario introdujo como nombre regional.
+  // Usa el token más corto y menos común del userMessage (heurística: nombres
+  // regionales tienden a ser palabras únicas no en el vocabulario español estándar).
+  const USER_STOPWORDS = new Set([
+    // preposiciones y conjunciones
+    'para', 'como', 'porque', 'desde', 'hasta', 'sobre', 'entre', 'hacia', 'ante',
+    // verbos comunes conjugados
+    'tiene', 'tengo', 'tenemos', 'tener', 'pueden', 'puede', 'dijeron', 'ofrecen',
+    'quiero', 'quiere', 'quieren', 'traer', 'traigo', 'traen', 'seria', 'seria',
+    'creen', 'creo', 'dicen', 'dice', 'piden', 'pide',
+    // sustantivos agrícolas genéricos
+    'semilla', 'planta', 'plantas', 'mata', 'matas', 'cultivo', 'cultivos',
+    'finca', 'campo', 'lote', 'tierra', 'suelo', 'agua', 'ganado', 'siembra',
+    'cosecha', 'riego', 'abono', 'monte', 'pasto',
+    // adjetivos comunes
+    'buena', 'bueno', 'buenas', 'buenos', 'muchas', 'mucho', 'estas', 'estos',
+    // interrogativos y relativos
+    'cuando', 'donde', 'esto', 'esta', 'este', 'esos', 'esas',
+  ]);
+
+  const userTokens = userMessage
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .split(/\W+/)
+    .filter((t) => t.length >= 4 && !USER_STOPWORDS.has(t));
+
+  // Término sospechoso: el más corto (heurística para nombres regionales únicos).
+  const suspectTerm = userTokens.length > 0
+    ? userTokens.sort((a, b) => a.length - b.length)[0]
+    : 'ese término';
+
+  bumpGuardTelemetry('unverified_term_binomial');
+  const replacement =
+    `No puedo confirmar qué es "${suspectTerm}" porque ese término no está en el catálogo Chagra ` +
+    `y no tengo un grounding verificado para él. No lo voy a tratar como ${binomial} sin evidencia.\n\n` +
+    `Para identificar la planta correctamente necesito:\n` +
+    `- Foto de la hoja (haz y envés), tallo, flor o fruto si hay.\n` +
+    `- Nombre local que usan en tu vereda o municipio, y quién lo usa así.\n` +
+    `- Altura de la finca (msnm) y departamento.\n` +
+    `- Para qué la usarías: alimento, medicinal, sombrío, forraje, madera o mercado.\n\n` +
+    `Con esa información sí puedo cruzar el catálogo y darte una respuesta con respaldo real, ` +
+    `no inventada. ¿Puedes enviar una foto?`;
+
+  return {
+    text: replacement,
+    modified: true,
+    reason: `binomio_no_verificado: "${suspectTerm}" → ${binomial} (sin grounding en catálogo)`,
+  };
+}
+
 // ── Bench V2: prompt truncado / toxico alimentario / benéfico inventado ─────
 
 const TRUNCATED_PROMPT_MARKER = 'necesito que completes la pregunta';
@@ -8392,6 +8573,33 @@ export function applyOutputGuards(
     const regional = guardUnidentifiedRegionalCrop(text, { userMessage });
     if (regional && regional.modified) {
       return { text: regional.text, modified: true, reasons: regional.reason ? [regional.reason] : [] };
+    }
+  }
+
+  // GUARD BINOMIO NO VERIFICADO (fix #95): generaliza BORDE-027 para cualquier
+  // nombre regional desconocido, no solo "coincyes". Si la respuesta contiene un
+  // binomio latino para un término del usuario que NO está en los mentioned de
+  // alta confianza del resolver, REEMPLAZA por petición de identificación.
+  // Solo actúa si no hubo grounding legítimo (resolvedMentions vacío o incompleto).
+  // Corre SIEMPRE (no solo siembra): un binomio inventado es alucinación en
+  // cualquier contexto (consulta de info, manejo, siembra). Es SUPPRESS-AND-REPLACE.
+  {
+    // Construye el set de mentioned de ALTA confianza (entidades que SÍ pasaron el
+    // umbral MIN_ENTITY_CONFIDENCE en buildResolvedEntitiesBlock). Usamos `entities`
+    // (ya filtrado de ruido NLU) y filtramos por confidence >= 0.8.
+    const resolvedMentions = new Set(
+      (Array.isArray(entities) ? entities : [])
+        .filter((e) => typeof e.confidence === 'number' && e.confidence >= 0.8)
+        .map((e) => (e.mentioned || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim())
+        .filter(Boolean)
+    );
+    const unverifiedGuard = guardUnverifiedTermBinomial(text, { userMessage, resolvedMentions });
+    if (unverifiedGuard && unverifiedGuard.modified) {
+      return {
+        text: unverifiedGuard.text,
+        modified: true,
+        reasons: unverifiedGuard.reason ? [unverifiedGuard.reason] : [],
+      };
     }
   }
 
