@@ -398,3 +398,174 @@ describe('analyzeQuery — topic plaga/enfermedad para enfermedades sin pest glo
     expect(r.topic).toBe('manejo');
   });
 });
+
+// ── Suite de regresión multiturno (2026-06-24) ─────────────────────────────
+// Anáfora: "la"/"lo" resuelven al cultivo + problema previo cuando el turno
+// actual no los nombra explícitamente. Coherencia: no re-presentarse, respeta
+// cultivo/altitud/variedad ya dichos en turnos anteriores.
+
+describe('buildConversationContextPin — regresión multiturno: anáfora "la"/"lo"', () => {
+  it('extrae café+roya del historial cuando T2 solo dice "¿cómo la controlo?" (la = roya)', () => {
+    const history =
+      'Usuario: Mi café variedad Colombia está con roya.\n' +
+      'Asistente: Aplica caldo bordelés cada 15 días.\n' +
+      'Usuario: ¿cómo la controlo?';
+    const pin = buildConversationContextPin(history);
+    expect(pin).toContain('Cultivo: café');
+    expect(pin).toContain('Variedad: Colombia');
+    expect(pin).toContain('Problema previo: roya');
+  });
+
+  it('extrae café cuando T2 dice "¿cómo lo abono?" (lo = café)', () => {
+    const history =
+      'Usuario: Tengo café variedad Caturra a 1600 msnm.\n' +
+      'Asistente: Excelente altitud para café.\n' +
+      'Usuario: ¿cómo lo abono?';
+    const pin = buildConversationContextPin(history);
+    expect(pin).toContain('Cultivo: café');
+    expect(pin).toContain('Variedad: Caturra');
+    expect(pin).toContain('1600 msnm');
+  });
+
+  it('extrae papa+gota de historial con array de turnos', () => {
+    const history = [
+      { role: 'user', content: 'Tengo papa variedad Diacol Capiro con gota.' },
+      { role: 'assistant', content: 'Revisa el drenaje y aplica cobre.' },
+      { role: 'user', content: 'sí, ¿cómo la trato?' },
+    ];
+    const pin = buildConversationContextPin(history);
+    expect(pin).toContain('Cultivo: papa');
+    expect(pin).toContain('Variedad: Diacol Capiro');
+    expect(pin).toContain('Problema previo: gota');
+  });
+
+  it('extrae solo cultivo cuando no hay problema fitosanitario (consulta cultural)', () => {
+    const history =
+      'Usuario: Tengo aguacate Hass.\n' +
+      'Asistente: Bien.\n' +
+      'Usuario: ¿cómo lo podo?';
+    const pin = buildConversationContextPin(history);
+    expect(pin).toContain('Cultivo: aguacate');
+    expect(pin).toContain('Variedad: Hass');
+    expect(pin).not.toContain('Problema previo');
+  });
+
+  it('altitud sobrevive aunque el turno anafórico no la repita', () => {
+    const history =
+      'Usuario: café a 2200 msnm con broca.\n' +
+      'Asistente: La broca se controla con trampas.\n' +
+      'Usuario: ok, ¿y cómo la evito?';
+    const pin = buildConversationContextPin(history);
+    expect(pin).toContain('Cultivo: café');
+    expect(pin).toContain('2200 msnm');
+    expect(pin).toContain('Problema previo: broca');
+  });
+
+  it('historial vacío retorna string vacío', () => {
+    expect(buildConversationContextPin('')).toBe('');
+    expect(buildConversationContextPin([])).toBe('');
+  });
+});
+
+describe('buildBasePrompt — regresión multiturno: anáfora + coherencia', () => {
+  const BASE = {
+    plantContext: 'café x5',
+    fincaContext: '',
+    indoorContext: '',
+    finca: null,
+    isEnum: false,
+  };
+
+  it('con historial de café+roya y query anafórica "la": inyecta pin + PROBLEMA-PRIMERO + CONTINUIDAD', () => {
+    const prompt = buildBasePrompt({
+      ...BASE,
+      contextMemory:
+        'Usuario: Mi café variedad Colombia está con roya.\n' +
+        'Asistente: Aplica caldo bordelés cada 15 días.\n' +
+        'Usuario: ¿cómo la controlo?',
+      query: '¿cómo la controlo?',
+    });
+    expect(prompt).toContain('CONTEXTO DE LA CONVERSACIÓN');
+    expect(prompt).toContain('Cultivo: café');
+    expect(prompt).toContain('Variedad: Colombia');
+    expect(prompt).toContain('Problema previo: roya');
+    expect(prompt).toContain('REGLA PROBLEMA-PRIMERO');
+    expect(prompt).toContain('REGLA CONTINUIDAD DE HILO');
+    expect(prompt).toContain('PROHIBIDO re-presentarte');
+    expect(prompt).toContain('Resuelve los pronombres ("la"/"lo")');
+  });
+
+  it('con historial de papa+gota y query anafórica "lo": inyecta pin con cultivo y problema', () => {
+    const prompt = buildBasePrompt({
+      ...BASE,
+      query: '¿cómo lo evito?',
+      contextMemory:
+        'Usuario: Mi papa tiene gota.\n' +
+        'Asistente: Gota es Phytophthora infestans.\n' +
+        'Usuario: ¿cómo lo evito?',
+    });
+    expect(prompt).toContain('Cultivo: papa');
+    expect(prompt).toContain('Problema previo: gota');
+    expect(prompt).toContain('REGLA PROBLEMA-PRIMERO');
+    expect(prompt).toContain('REGLA CONTINUIDAD DE HILO');
+  });
+
+  it('query anafórica sin problema previo en historial NO dispara PROBLEMA-PRIMERO', () => {
+    const prompt = buildBasePrompt({
+      ...BASE,
+      query: '¿cómo lo abono?',
+      contextMemory:
+        'Usuario: Tengo café.\n' +
+        'Asistente: Buen cultivo.\n' +
+        'Usuario: ¿cómo lo abono?',
+    });
+    expect(prompt).toContain('CONTEXTO DE LA CONVERSACIÓN');
+    expect(prompt).not.toContain('Problema previo');
+    expect(prompt).not.toContain('REGLA PROBLEMA-PRIMERO');
+    expect(prompt).toContain('REGLA CONTINUIDAD DE HILO');
+  });
+
+  it('no se re-presenta cuando contextMemory tiene historial de seguimiento', () => {
+    const prompt = buildBasePrompt({
+      ...BASE,
+      query: '¿y para la variedad qué recomiendas?',
+      contextMemory:
+        'Usuario: Tengo café a 1800 msnm variedad Castillo.\n' +
+        'Asistente: Buen café. ¿Qué problema tienes?\n' +
+        'Usuario: ¿y para la variedad qué recomiendas?',
+    });
+    expect(prompt).toContain('REGLA CONTINUIDAD DE HILO');
+    expect(prompt).toContain('PROHIBIDO re-presentarte');
+    expect(prompt).not.toContain('REGLA PROBLEMA-PRIMERO');
+  });
+
+  it('mantiene coherencia en cadena de 3+ turnos (café→roya→tratamiento→seguimiento)', () => {
+    const history =
+      'Usuario: Café variedad Colombia con roya.\n' +
+      'Asistente: Aplica caldo bordelés.\n' +
+      'Usuario: ¿cada cuánto?';
+    const prompt = buildBasePrompt({
+      ...BASE,
+      query: '¿cada cuánto?',
+      contextMemory: history,
+    });
+    expect(prompt).toContain('Cultivo: café');
+    expect(prompt).toContain('Variedad: Colombia');
+    expect(prompt).toContain('Problema previo: roya');
+    expect(prompt).toContain('COHERENCIA MULTITURNO');
+    expect(prompt).toContain('REGLA CONTINUIDAD DE HILO');
+  });
+
+  it('respeta altitud dicha en T1 aunque query T2 no la repita', () => {
+    const prompt = buildBasePrompt({
+      ...BASE,
+      query: '¿qué variedad me recomiendas?',
+      contextMemory:
+        'Usuario: Tengo café a 2000 msnm.\n' +
+        'Asistente: Excelente.\n' +
+        'Usuario: ¿qué variedad me recomiendas?',
+    });
+    expect(prompt).toContain('CONTEXTO DE LA CONVERSACIÓN');
+    expect(prompt).toContain('2000 msnm');
+  });
+});
