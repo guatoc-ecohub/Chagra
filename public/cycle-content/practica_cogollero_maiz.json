@@ -1,0 +1,84 @@
+{
+  "_doc_type": "practica_agroecologica",
+  "_generated_by": "feat/rag-corpus-practicas (manual curation)",
+  "_generated_at": "2026-06-23T00:00:00.000Z",
+  "species_slug": "practica_cogollero_maiz",
+  "scientific_name": null,
+  "common_names": [
+    "Manejo agroecológico del gusano cogollero del maíz",
+    "Control de Spodoptera frugiperda",
+    "Cogollero del maíz manejo integrado"
+  ],
+  "family": null,
+  "category": "practica_agroecologica",
+  "cultivable": false,
+  "conservation_status": "practica_validada",
+  "thermal_zones": ["calido", "templado", "frio"],
+  "roles_in_guild": ["control_biologico"],
+  "valor_pedagogico": "El gusano cogollero (Spodoptera frugiperda J.E. Smith, Lepidoptera: Noctuidae) es la principal plaga del maíz en el trópico americano y, desde 2016, una plaga invasora de alcance mundial (África y Asia). La larva se aloja en el cogollo (verticilo) de la planta y raspa y perfora las hojas tiernas, produciendo el daño característico de 'ventanas' y orificios con aserrín (excremento) en el cogollo; en ataques severos puede destruir el punto de crecimiento. El manejo agroecológico se basa en el control biológico, el manejo cultural y el monitoreo, evitando el uso rutinario de insecticidas de amplio espectro que eliminan a los enemigos naturales y aceleran la resistencia. Control biológico validado: (1) Bacillus thuringiensis variedad kurstaki (Bt) — bacteria entomopatógena de toxicidad selectiva a larvas de lepidópteros, con formulaciones comerciales registradas ante el ICA; es más eficaz sobre larvas pequeñas (primeros instares) y debe llegar dentro del cogollo donde se aloja la larva. (2) Baculovirus de Spodoptera frugiperda (nucleopoliedrovirus, conocido como VPN o SfMNPV) — virus específico de la plaga, validado en Latinoamérica (AGROSAVIA en Colombia, EMBRAPA en Brasil) como bioplaguicida selectivo que no afecta enemigos naturales. (3) Hongos entomopatógenos Beauveria bassiana y Metarhizium anisopliae. Enemigos naturales que se deben conservar: el parasitoide de huevos Telenomus remus y las avispas del género Trichogramma (parasitoides de huevos), parasitoides de larvas del género Chelonus y Campoletis, y depredadores como la tijereta Doru luteipes y chinches depredadores. La conservación de estos benéficos mediante diversidad vegetal y bordes florales es central. Manejo cultural: siembra temprana y uniforme en la zona (evitar siembras escalonadas que mantienen la plaga); rotación; asociación del maíz con leguminosas y otras especies (policultivo) que dificultan el encuentro de la planta hospedera y albergan enemigos naturales; en sistemas de manejo se ha validado la estrategia 'push-pull' (desarrollada por el ICIPE en África) que asocia el maíz con Desmodium en el sotobosque (repelente, 'push') y un pasto borde como Brachiaria (atrayente-trampa, 'pull'). Monitoreo: revisar el cogollo de las plantas jóvenes (etapas V3 a V8) buscando daño fresco y larvas pequeñas; las trampas de feromona sirven para monitorear la presencia de adultos. El umbral de acción orientativo es alrededor del 20 % de plantas con daño fresco en el cogollo en etapas tempranas, pero debe ajustarse a la asistencia técnica local. Práctica tradicional: la aplicación de ceniza o arena seca directamente en el cogollo es un método campesino antiguo de efecto físico/abrasivo y de bajo costo; su eficacia es parcial y complementaria, no sustituye al control biológico. NOTA DE HONESTIDAD: cuando la larva ya es grande y está protegida en lo profundo del cogollo, el control biológico de contacto (Bt, virus) pierde eficacia porque el producto no la alcanza; por eso el momento de aplicación (larvas pequeñas, aspersión dirigida al cogollo) es decisivo.",
+  "milestones": [
+    {
+      "label": "Siembra temprana y uniforme",
+      "description": "Sembrar en ventana corta y uniforme con los vecinos de la zona. Las siembras escalonadas mantienen alimento permanente para la plaga y elevan la presión en todo el sector."
+    },
+    {
+      "label": "Monitoreo del cogollo (V3-V8)",
+      "description": "Revisar el cogollo de las plantas jóvenes buscando daño fresco ('ventanas', aserrín) y larvas pequeñas. Si cerca del 20 % de plantas tienen daño fresco en etapa temprana, activar el control biológico."
+    },
+    {
+      "label": "Aplicación dirigida al cogollo",
+      "description": "Aplicar Bt (var. kurstaki) o baculovirus SfMNPV sobre larvas pequeñas, dirigiendo la aspersión DENTRO del cogollo, preferiblemente al final de la tarde (la luz ultravioleta degrada el Bt y el virus). Respetar la dosis de la etiqueta del producto registrado ICA."
+    },
+    {
+      "label": "Conservar enemigos naturales",
+      "description": "Mantener diversidad y bordes florales para Telenomus remus, Trichogramma y depredadores como Doru luteipes. Evitar insecticidas de amplio espectro que los eliminan y dejan la plaga sin control natural."
+    }
+  ],
+  "failure_modes": [
+    {
+      "mode": "El Bt o el virus no controlan la plaga",
+      "solucion": "Verificar: (1) tamaño de la larva — Bt y baculovirus solo funcionan bien sobre larvas pequeñas; las grandes y profundas en el cogollo no se alcanzan; (2) hora de aplicación — aplicar al atardecer, la UV inactiva el producto; (3) la aspersión llegó realmente al interior del cogollo; (4) producto vencido o mal almacenado. Si la larva ya es grande, esperar la siguiente generación y aplicar temprano."
+    },
+    {
+      "mode": "La plaga reaparece campaña tras campaña con fuerza",
+      "solucion": "Probablemente hay siembras escalonadas en la zona (alimento continuo) y/o se está eliminando a los enemigos naturales con insecticidas de amplio espectro. Coordinar siembra uniforme con vecinos y reducir el uso de químicos no selectivos."
+    },
+    {
+      "mode": "Daño severo al punto de crecimiento",
+      "solucion": "Ataque tardío no detectado a tiempo. Reforzar el monitoreo temprano del cogollo en V3-V8 y actuar sobre larvas pequeñas; una vez destruido el cogollo el daño es irreversible para esa planta."
+    }
+  ],
+  "leccion_agroecologica": "El cogollero enseña que el momento manda: el control biológico (Bt, baculovirus, enemigos naturales) es muy eficaz sobre larvas pequeñas y casi inútil sobre larvas grandes escondidas en el cogollo. Monitoreo temprano + siembra uniforme + conservación de benéficos vencen a la plaga sin químicos de amplio espectro.",
+  "advertencia_toxicologica": "Bacillus thuringiensis y los baculovirus son de muy baja toxicidad para mamíferos, peces y abejas (controles selectivos). Aun así, usar protección personal al manipular formulaciones en polvo (evitar inhalación) y mantener fuera del alcance de niños. La ceniza aplicada al cogollo no debe inhalarse (usar pañuelo o mascarilla). Evitar insecticidas químicos de amplio espectro: además de envenenar a los enemigos naturales del cogollero, son tóxicos para abejas y para quien aplica. Consultar siempre la etiqueta del producto registrado ICA.",
+  "fuente_principal": "AGROSAVIA. Manejo integrado del gusano cogollero del maíz (Spodoptera frugiperda) con control biológico (Bt, baculovirus, Telenomus remus). / EMBRAPA. Manejo de Spodoptera frugiperda en milho. / ICIPE. Estrategia push-pull para fall armyworm.",
+  "validation_level": "field_tested",
+  "ica_registro_requerido": true,
+  "ica_nota": "Las formulaciones comerciales de Bacillus thuringiensis y de baculovirus requieren registro ICA vigente; verificar el número de registro del producto antes de comprar. Las prácticas culturales y la aplicación de ceniza de preparación predial no requieren registro.",
+  "uso_predial_libre": false,
+  "sources": [
+    {
+      "id": "agrosavia-cogollero-maiz",
+      "title": "AGROSAVIA. Manejo integrado del gusano cogollero del maíz con control biológico.",
+      "tier": "A",
+      "url": "https://www.agrosavia.co"
+    },
+    {
+      "id": "embrapa-spodoptera-milho",
+      "title": "EMBRAPA. Manejo de Spodoptera frugiperda em milho.",
+      "tier": "A",
+      "url": "https://www.embrapa.br"
+    },
+    {
+      "id": "icipe-push-pull-faw",
+      "title": "ICIPE. Push-pull technology for fall armyworm management.",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "ica-res-698-2011",
+      "title": "ICA Resolución 698 de 2011 — Registro de bioinsumos",
+      "tier": "A",
+      "url": null
+    }
+  ]
+}
