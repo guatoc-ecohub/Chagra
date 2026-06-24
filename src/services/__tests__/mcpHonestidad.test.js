@@ -10,7 +10,10 @@
  * presentar nada como "respuesta del sistema" porque no hubo respuesta.
  * El LLM recibe menos contexto, pero nunca un dato falso.
  */
-import { describe, it, expect, vi } from 'vitest';
+
+/* eslint-disable no-undef */
+
+import { describe, it, expect } from 'vitest';
 
 // ---------------------------------------------------------------------------
 // 1. callTool nunca fabrica datos en fallo
@@ -118,7 +121,7 @@ describe('mcp honestidad — stubMessage no contiene datos falsos', () => {
    */
   const DATA_LIKE_PATTERNS = [
     /\$\s*\d+/,          // $123, $ 123
-    /\d+[\.,]\d+\s*(pesos|usd|cop)/i, // 1.500 pesos, 2,50 USD
+    /\d+[.,]\d+\s*(pesos|usd|cop)/i, // 1.500 pesos, 2,50 USD
     /\d{4}[-/]\d{1,2}[-/]\d{1,2}/,    // fechas 2024-01-01
     /\b(precio|valor)\s*(de|del)?\s*\d+/i, // "precio de 5000"
   ];
