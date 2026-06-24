@@ -17,7 +17,7 @@ import {
     rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert } from 'lucide-react';
+import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen } from 'lucide-react';
 import AgentHero from './AgentHero';
 import OnboardingHero from '../OnboardingHero';
 import {
@@ -103,6 +103,7 @@ const HERRAMIENTAS_TILES = [
     { view: 'suelo', label: 'Suelo', icon: Layers, desc: 'Diagnóstico y salud del suelo', accent: 'text-amber-400 border-l-amber-500' },
     { view: 'germinacion', label: 'Semilleros', icon: TestTube, desc: 'Prueba de semillas y germinación', accent: 'text-teal-400 border-l-teal-500' },
     { view: 'toxicologia', label: 'Seguridad', icon: ShieldAlert, desc: 'Toxicidad de insumos y riesgo de suelo', accent: 'text-rose-400 border-l-rose-500' },
+    { view: 'aprende', label: 'Aprende', icon: BookOpen, desc: 'Lecciones agroecológicas con fuente', accent: 'text-emerald-400 border-l-emerald-500' },
 ];
 
 function SortableSection({ id, onNavigate, sensors }) {
