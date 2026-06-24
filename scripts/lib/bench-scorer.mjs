@@ -81,7 +81,7 @@ export const RECOMMENDED_JUDGE_MODEL = RECOMMENDED_ANTHROPIC_JUDGE_MODEL;
 export const RECOMMENDED_OLLAMA_JUDGE_MODEL = 'qwen2.5:14b';
 
 /** El generador del bench cuyo uso como juez = auto-evaluación (prohibido). */
-export const GENERATOR_MODEL = 'granite3.1-dense:8b';
+export const GENERATOR_MODEL = 'granite3.3:8b';
 
 /**
  * assertIndependentJudge — lanza si el modelo juez es el mismo que generó la
