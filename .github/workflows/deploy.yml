@@ -56,57 +56,16 @@ jobs:
         name: Install dependencies
         run: npm ci
 
-      - if: env.SKIP_DEPLOY != '1'
-        name: Lint
-        # 2026-06-15: eslint . OOMea/thrashea el runner self-hosted de alpha y
-        # consumia los 30min del job -> el deploy se cancelaba por timeout y prod
-        # quedaba atras. Pasa a NO bloquear (lint = check de PR, no de deploy) con
-        # timeout propio corto, asi build+rsync proceden siempre. Fix de fondo:
-        # lint como required check del PR + eslint scoped (plan infra #132).
-        continue-on-error: true
-        timeout-minutes: 6
-        # max-warnings 20 ya es el cap; si excede, debe BLOQUEAR el deploy.
-        # Removido continue-on-error: true que silenciaba errores fatales.
-        #
-        # Visibilidad (2026-05-21 — Task #77): el lint step NO es required
-        # check del PR (corre solo `on: push` a main), así que un PR puede
-        # mergearse verde y romper deploy aquí sin warning visible en la UI
-        # del PR — prod queda atrás N versiones hasta que alguien revise
-        # `gh run list --workflow=deploy.yml`. Para mitigar el silent-block:
-        #   1) Capturamos stdout+stderr a un archivo.
-        #   2) En fail, lo volcamos al $GITHUB_STEP_SUMMARY así aparece en
-        #      la home del run como banner rojo legible (no enterrado en logs).
-        #   3) Re-emitimos como ::error:: para que GitHub muestre annotations
-        #      inline en el commit y mande email con detalle (no solo
-        #      "Deploy failed" genérico).
-        run: |
-          set -o pipefail
-          # 2026-06-11: el codebase crecio (muchos PRs) y eslint OOMeaba con el
-          # heap default (~4GB) -> FATAL "heap out of memory" -> tumbaba el deploy
-          # ENTERO (no era un error de lint, era falta de memoria, y el crash se
-          # comia la logica soft-fail). Subimos el heap de node para que eslint
-          # complete. El runner (alpha) tiene RAM de sobra.
-          export NODE_OPTIONS="--max-old-space-size=16384"
-          if ! npm run lint -- --max-warnings 9999 2>&1 | tee /tmp/lint.log; then
-            {
-              echo "## Deploy bloqueado: lint failed"
-              echo ""
-              echo "Prod chagra.guatoc.co queda atrasado hasta que el lint pase."
-              echo "Fix recomendado: rama \`fix/lint-deploy-<fecha>\` con el PR pequeño que corrige los warnings."
-              echo ""
-              echo "<details><summary>Output completo del lint</summary>"
-              echo ""
-              echo '```'
-              cat /tmp/lint.log
-              echo '```'
-              echo "</details>"
-            } >> "$GITHUB_STEP_SUMMARY"
-            # Annotations inline por cada error de eslint (aparecen en commit + email).
-            grep -m 20 -E "^\s+[0-9]+:[0-9]+\s+error" /tmp/lint.log | while read -r line; do
-              echo "::warning::deploy lint: $line"
-            done
-            echo "::warning::Lint had errors but deploy continues (soft-fail desde 2026-05-28). Fix en rama fix/lint-deploy-<fecha>."
-          fi
+      # 2026-06-24 — RAÍZ del "prod vieja N días": el step Lint corría eslint con
+      # NODE_OPTIONS=--max-old-space-size=16384 (16GB de heap) en una caja de 16GB.
+      # Con ollama (~7GB @ num_ctx 8192) + el build cargados, eslint OOM-mata al
+      # RUNNER a mitad del job -> todos los steps desde 'Lint' quedan VACÍOS ->
+      # el run = completed/failure -> nunca llega a build+rsync -> prod congelada
+      # (06-22 → 06-24). continue-on-error NO salva: el crash mata al runner
+      # entero, no al step. El lint NO pertenece al deploy: ya lo enforza lefthook
+      # pre-commit (eslint max-warnings=0, no se puede commitear sucio) y el branch
+      # `qa` (qa-deploy.yml). El deploy ahora = checkout + npm ci + build + rsync
+      # (liviano, sin eslint OOM). Gate de calidad = donde debe estar: el commit/PR.
 
       - if: env.SKIP_DEPLOY != '1'
         name: Verify secrets
