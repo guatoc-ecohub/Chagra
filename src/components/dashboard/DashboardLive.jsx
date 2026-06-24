@@ -17,7 +17,7 @@ import {
     rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Snowflake, ChevronRight } from 'lucide-react';
+import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert } from 'lucide-react';
 import AgentHero from './AgentHero';
 import OnboardingHero from '../OnboardingHero';
 import {
@@ -90,6 +90,20 @@ const SECTION_COMPONENTS = {
     fermentos: { Component: FermentosCard },
     informes: { Component: InformesCard },
 };
+
+// Herramientas de finca que NO son secciones-módulo del grid (no tienen
+// componente en SECTION_COMPONENTS): son TILES de acceso directo a una pantalla
+// completa (Suelo · Semilleros · Seguridad). El commit #1827 las metió por
+// error en NAV_TILES (la pantalla de navegación de App.jsx), que NO es este
+// home dashboard — por eso no aparecían al loguear ("Semilleros=0"). Acá viven
+// como su propio bloque de tiles navegables (onNavigate(view) → currentView),
+// reusando label/icon/desc de NAV_TILES. Universales: las ve todo perfil (igual
+// que en NAV_TILES, sin gating por rol — son herramientas básicas de manejo).
+const HERRAMIENTAS_TILES = [
+    { view: 'suelo', label: 'Suelo', icon: Layers, desc: 'Diagnóstico y salud del suelo', accent: 'text-amber-400 border-l-amber-500' },
+    { view: 'germinacion', label: 'Semilleros', icon: TestTube, desc: 'Prueba de semillas y germinación', accent: 'text-teal-400 border-l-teal-500' },
+    { view: 'toxicologia', label: 'Seguridad', icon: ShieldAlert, desc: 'Toxicidad de insumos y riesgo de suelo', accent: 'text-rose-400 border-l-rose-500' },
+];
 
 function SortableSection({ id, onNavigate, sensors }) {
     const {
@@ -421,6 +435,39 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
                     </div>
                 </div>
             )}
+
+            {/* HERRAMIENTAS DE FINCA (Suelo · Semilleros · Seguridad): tiles de
+                acceso directo a pantallas completas que NO son secciones del
+                grid draggable (no tienen componente en SECTION_COMPONENTS). El
+                commit #1827 las agregó por error a NAV_TILES (pantalla de
+                navegación de App.jsx), no a ESTE home → no aparecían al loguear
+                ("Semilleros=0"). Acá van como su propio bloque navegable. Cada
+                tile llama onNavigate(view) → currentView (suelo/germinacion/
+                toxicologia), que monta la pantalla real ya existente. */}
+            <div className="px-4 pt-3">
+                <p className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2.5">
+                    <span
+                        aria-hidden="true"
+                        className="h-3.5 w-1 rounded-full bg-gradient-to-b from-amber-400 to-rose-400"
+                    />
+                    Herramientas de finca
+                </p>
+                <div className="grid grid-cols-3 gap-3" data-testid="herramientas-tiles">
+                    {HERRAMIENTAS_TILES.map((tile) => (
+                        <button
+                            key={tile.view}
+                            type="button"
+                            onClick={() => onNavigate(tile.view)}
+                            aria-label={`${tile.label}: ${tile.desc}`}
+                            className={`bg-slate-900/60 border border-slate-800 border-l-4 ${tile.accent} rounded-xl p-3 text-left min-h-[88px] active:bg-slate-800/70 transition-colors flex flex-col`}
+                        >
+                            <tile.icon size={24} strokeWidth={2} className={`mb-1.5 ${tile.accent.split(' ')[0]}`} aria-hidden="true" />
+                            <span className={`text-sm font-black block leading-tight ${tile.accent.split(' ')[0]}`}>{tile.label}</span>
+                            <span className="text-2xs text-slate-500 block mt-0.5 leading-tight">{tile.desc}</span>
+                        </button>
+                    ))}
+                </div>
+            </div>
 
             {/* MÓDULO ANIMALES (finca integrada): gallinas, cerdos y abejas, con
                 el ciclo cerrado (estiércol → biopreparado → suelo → planta) y la
