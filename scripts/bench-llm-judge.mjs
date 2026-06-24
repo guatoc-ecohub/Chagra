@@ -47,13 +47,13 @@ const JUDGE_MODEL = process.env.JUDGE_MODEL || 'gemma3:4b';
 const TIMEOUT_MS = 60_000;
 
 // Modelo cuyo turno se evalúa cuando el JSONL es per-model (bench-agente-completo).
-// Default granite3.1-dense:8b = el chat de PROD (llmRouter chat_complex).
-const TARGET_MODEL = process.env.TARGET_MODEL || 'granite3.1-dense:8b';
+const TARGET_MODEL = process.env.TARGET_MODEL || 'granite3.3:8b';
 
 // Mapa modelKey (clave del objeto per-model en el JSONL) → nombre ollama, para
 // poder seleccionar por nombre real del modelo cuando TARGET_MODEL es un nombre.
 const MODEL_KEY_BY_NAME = {
   'gemma3:4b': 'gemma3_4b',
+  'granite3.3:8b': 'granite3_3_8b',
   'granite3.1-dense:8b': 'granite3_1_8b',
   'ministral-3:latest': 'ministral_3b',
   'aya:8b': 'aya_8b',

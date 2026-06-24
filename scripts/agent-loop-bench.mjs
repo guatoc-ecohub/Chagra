@@ -106,7 +106,7 @@ async function queryAgent(prompt, maxIterations = 3) {
         headers,
         body: JSON.stringify({
           query: currentPrompt,
-          model: 'granite3.1-dense:8b',
+          model: 'granite3.3:8b',
         }),
       });
 

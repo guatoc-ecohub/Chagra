@@ -60,7 +60,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
 const BENCH_RUNS_DIR = join(ROOT_DIR, 'data', 'bench-runs');
 
-const GEN_MODEL = process.env.GEN_MODEL || 'granite3.1-dense:8b';
+const GEN_MODEL = process.env.GEN_MODEL || 'granite3.3:8b';
 const GEN_TEMPERATURE = 0.3;
 const GEN_MAX_TOKENS = 768;
 const SEED = Number(process.env.SEED || 42);

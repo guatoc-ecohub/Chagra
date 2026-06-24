@@ -6,7 +6,6 @@ export const PRIMARY_MODELS = [
   'gemma3:12b',
   'qwen3.5:9b',
   'gemma3:4b',
-  'granite3.1-dense:8b',
 ];
 
 export const SMOKE_ONLY_MODELS = [
