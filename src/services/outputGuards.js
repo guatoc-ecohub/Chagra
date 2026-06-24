@@ -4542,6 +4542,171 @@ export function guardInventedVariety(responseText, { userMessage = null } = {}) 
   };
 }
 
+// ── CASO C: variedad/cultivar enumerada SIN bloque EVIDENCIA AUTORITATIVA ─────
+
+/**
+ * Marcador de idempotencia para guardVarietyWithoutEvidence.
+ * Si el texto ya contiene esta frase, no re-procesar.
+ */
+const CASO_C_MARKER = 'no tiene un inventario de variedades de';
+
+/** La respuesta YA niega tener info de variedades (el modelo acertó CASO C). */
+const CASO_C_DENIED_RE = /no\s+(?:t(?:engo|enemos)|hay|est[áa]n\s+(?:documentad|registrad|catalogad)|se\s+(?:tiene|encuentran?))\s+(?:informaci[oó]n|datos|registro|inventario)\s+(?:sobre\s+)?(?:las\s+)?(?:variedades?|cultivares?)/i;
+
+/**
+ * Patrones de enumeración de variedades/cultivares de una planta.
+ * El nombre de la planta SIEMPRE es el grupo de captura 1.
+ *
+ * Cubre:
+ *   - "variedades/cultivares de <PLANT>: A, B, C…"
+ *   - "principales variedades de <PLANT> son/incluyen"
+ *   - "<PLANT> tiene [N] variedades/cultivares"
+ *   - "existen [N] variedades de <PLANT>"
+ *
+ * NO cubre "tipos de" para evitar FP con "tipos de suelo/abono/riego".
+ * NO cubre "varias/muchas" sin número para evitar FP con "tiene varias
+ * variedades" (declaración genérica, no enumeración).
+ */
+const CASO_C_PLANT_PATTERNS = [
+  // "variedades/cultivares de <PLANT>: <word>…"
+  // Plant name en grupo 1.
+  /\b(?:variedades?|cultivares?)\s+de\s+(?:la\s+|el\s+|los\s+|las\s+|del\s+)?([a-záéíóúñ]+(?:\s+[a-záéíóúñ]+)?)\s*:\s*\w+/i,
+  // "variedades/cultivares de <PLANT> son/incluyen <word>…"
+  // Plant name en grupo 1.
+  /\b(?:variedades?|cultivares?)\s+de\s+(?:la\s+|el\s+|los\s+|las\s+|del\s+)?([a-záéíóúñ]+(?:\s+[a-záéíóúñ]+)?)\s+(?:son\s+(?:las?\s+siguientes\s*)?:?\s*|incluyen?|comprenden?|abarcan?)\s+\w+/i,
+  // "principales variedades de <PLANT>: <word>" o "son <word>"
+  // Plant name en grupo 1.
+  /\b(?:principales?|diferentes|distintas)\s+(?:variedades?|cultivares?)\s+de\s+(?:la\s+|el\s+|los\s+|las\s+|del\s+)?([a-záéíóúñ]+(?:\s+[a-záéíóúñ]+)?)\s*(?::\s*\w+|son\s+(?:las?\s+siguientes\s*)?:?\s*\w+|incluyen?\s+\w+|comprenden?\s+\w+|abarcan?\s+\w+)/i,
+  // "<PLANT> tiene <N> variedades/cultivares"
+  // Plant name en grupo 1.
+  /\b([a-záéíóúñ]+(?:\s+[a-záéíóúñ]+)?)\s+tiene\s+\d+\s+(?:variedades?|cultivares?)\b/i,
+  // "existen/hay <N> variedades de <PLANT>"
+  // Plant name en grupo 1.
+  /\b(?:existen|hay)\s+\d+\s+(?:variedades?|cultivares?)\s+de\s+(?:la\s+|el\s+|los\s+|las\s+|del\s+)?([a-záéíóúñ]+(?:\s+[a-záéíóúñ]+)?)\b/i,
+];
+
+/**
+ * Artículos y partículas que pueden prefijar el nombre de planta capturado.
+ */
+const CASO_C_LEADING_ARTICLES = /\b(?:el\s+|la\s+|los\s+|las\s+|del\s+|un\s+|una\s+)/i;
+
+/** Palabras-función que NO son parte del nombre de la planta (cortas o stop). */
+const CASO_C_TRAILING_STOP = /\s+(?:en|de|del|con|para|por|sin|son|hay|tiene|las|los|sus|las|sus|ese|esa|eso|este|esta|esto|son|como|pero)\s*$/i;
+
+/**
+ * Limpia el nombre de planta capturado: quita artículos iniciales y palabras
+ * función que el matching greedy se llevó de más.
+ * @param {string} raw
+ * @returns {string}
+ */
+function _cleanPlantName(raw) {
+  let s = raw.trim();
+  s = s.replace(CASO_C_LEADING_ARTICLES, '');
+  s = s.replace(CASO_C_TRAILING_STOP, '');
+  return s.trim();
+}
+
+/**
+ * Busca en texto normalizado un patrón de enumeración de variedades/
+ * cultivares y extrae el nombre de la planta limpio.
+ * @param {string} norm
+ * @returns {string|null}
+ */
+function _findVarietyEnumPlant(norm) {
+  for (const re of CASO_C_PLANT_PATTERNS) {
+    const m = norm.match(re);
+    if (m && m[1]) {
+      const plant = _cleanPlantName(m[1]);
+      if (plant && plant.length <= 40) return plant;
+    }
+  }
+  return null;
+}
+
+/** ¿El texto normalizado contiene un patrón de enumeración de variedades? */
+function _hasVarietyEnumeration(norm) {
+  return CASO_C_PLANT_PATTERNS.some((re) => re.test(norm));
+}
+
+/**
+ * Construye la deflexión honesta para CASO C.
+ * @param {string} plantName
+ * @returns {string}
+ */
+function _casoCReplacement(plantName) {
+  const p = plantName.trim();
+  return (
+    `El catálogo Chagra todavía no tiene un inventario de variedades de ${p} documentado todavía. ` +
+    `¿Quieres información general del cultivo, o prefieres registrar las variedades que tengas en tu finca?`
+  );
+}
+
+/**
+ * guardVarietyWithoutEvidence — CASO C. ANTI-VARIEDAD/CULTIVAR ENUMERADO SIN
+ * EVIDENCIA AUTORITATIVA.
+ *
+ * Cuando la respuesta enumera variedades/cultivares de una planta SIN que el
+ * prompt contuviera un bloque "=== EVIDENCIA AUTORITATIVA ===" respaldando
+ * tales enumeraciones (cf. REGLA CASO C de agentPromptBase), SUPRIME el cuerpo
+ * y lo REEMPLAZA por la deflexión honesta:
+ *   "El catálogo Chagra todavía no tiene un inventario de variedades de
+ *    [planta] documentado todavía."
+ *
+ * GATING:
+ *   1. La respuesta contiene un patrón de enumeración de variedades o
+ *      cultivares para una especie.
+ *   2. La respuesta NO niega ya que carece de info de variedades (el modelo
+ *      ya acertó → idempotencia sobre la regla).
+ *   3. Idempotencia: nuestro reemplazo no está presente ya.
+ *   4. Anti-FP userMessage: si el usuario mencionó variedades específicas
+ *      en su pregunta, la respuesta puede repetirlas sin ser invento.
+ *
+ * Firma propia (necesita userMessage) → se invoca aparte en applyOutputGuards,
+ * justo tras guardInventedVariety y dentro del mismo gate de siembra.
+ * SUPPRESS-AND-REPLACE (early-return).
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardVarietyWithoutEvidence(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Idempotencia: nuestro reemplazo ya está → no re-suprimir.
+  if (responseText.includes(CASO_C_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const respNorm = _stripDiacritics(responseText);
+  const userNorm = typeof userMessage === 'string' ? _stripDiacritics(userMessage) : '';
+
+  // Gate 1: ¿hay un patrón de enumeración de variedades/cultivares en la respuesta?
+  const plant = _findVarietyEnumPlant(respNorm);
+  if (!plant) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Gate 2: si la respuesta YA niega tener info de variedades, el modelo acertó.
+  if (CASO_C_DENIED_RE.test(respNorm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Gate 4 (anti-FP): si el usuario preguntó/listó variedades, permitir eco.
+  if (userNorm && _hasVarietyEnumeration(userNorm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('variety_without_evidence');
+  // SUPPRESS-AND-REPLACE: descartamos la enumeración inventada y devolvemos
+  // el mensaje honesto de CASO C.
+  return {
+    text: _casoCReplacement(plant),
+    modified: true,
+    reason: `variedad_sin_evidencia: ${plant}`,
+  };
+}
+
 // ── GUARD: viabilidad FALSO-NEGATIVO (cultivo viable marcado inviable) ──────
 
 /**
@@ -8454,6 +8619,21 @@ export function applyOutputGuards(
     const iv = guardInventedVariety(text, { userMessage });
     if (iv && iv.modified) {
       return { text: iv.text, modified: true, reasons: iv.reason ? [iv.reason] : [] };
+    }
+  }
+
+  // GUARD CASO C: variedad/cultivar enumerado SIN EVIDENCIA AUTORITATIVA. Si la
+  // respuesta enumera variedades/cultivares de una planta SIN que el prompt
+  // tuviera un bloque "=== EVIDENCIA AUTORITATIVA ===" respaldándolas (el
+  // catálogo Chagra no tiene inventario de variedades por especie), SUPRIME el
+  // cuerpo y REEMPLAZA por la deflexión honesta de CASO C. Complementa a
+  // guardInventedVariety (que cubre el sub-caso de variedad climáticamente
+  // imposible). Es un suppress-and-replace con firma propia (userMessage) →
+  // early-return. Guard de SIEMBRA/identidad.
+  if (runPlantingGuards && !(vis && vis.modified)) {
+    const ve = guardVarietyWithoutEvidence(text, { userMessage });
+    if (ve && ve.modified) {
+      return { text: ve.text, modified: true, reasons: ve.reason ? [ve.reason] : [] };
     }
   }
 
