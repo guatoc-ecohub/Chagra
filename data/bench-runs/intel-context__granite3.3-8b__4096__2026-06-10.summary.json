@@ -1,0 +1,17 @@
+{
+  "generated_at": "2026-06-10T10:00:00.000Z",
+  "generator": {
+    "model": "granite3.3:8b"
+  },
+  "config": {
+    "num_ctx": 4096,
+    "tools": true
+  },
+  "pass": 888,
+  "n_prompts": 1000,
+  "judged": 1000,
+  "ah_pct": 888,
+  "pass_pct": 88.8,
+  "bench_type": "intel-context",
+  "fixture": "intel-context"
+}
