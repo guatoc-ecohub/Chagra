@@ -7335,6 +7335,121 @@ export function guardFabricatedBeneficialBinomial(responseText, resolvedEntities
   };
 }
 
+// ── GUARD #95: BINOMIO LATINO INVENTADO FUERA DEL GROUNDING (atribución) ──────
+
+/**
+ * Patrón de ATRIBUCIÓN común: "<nombre común> (Genus species)". El nombre común
+ * (≥3 letras) precede inmediatamente a un binomio entre paréntesis. Capturamos:
+ *   m[1] = nombre común crudo (lo que dijo el usuario / el catálogo),
+ *   m[2] = género (capitalizado), m[3] = epíteto.
+ * Tolera un rango infra-específico ignorable tras el epíteto (var./subsp.).
+ * Diseño anti-ruido: el género va Capitalizado y el epíteto en minúscula
+ * (convención binomial), igual que `SCI_BINOMIAL_RE` pero anclado al paréntesis
+ * de atribución — la firma EXACTA de la alucinación que reporta la tarea #95
+ * ("tomate de árbol (Solanum lycopersicum)" cuando el grounding no trae esa
+ * especie). No tocamos binomios sueltos en prosa: ahí los guards 5/5b/benéfico/
+ * extracto ya razonan con su propio contexto, y un binomio suelto sin paréntesis
+ * suele ser una identificación de patógeno/insumo legítima.
+ */
+const ATTRIBUTED_BINOMIAL_RE =
+  /\b([A-Za-zÁÉÍÓÚÜÑáéíóúüñ][\wÁÉÍÓÚÜÑáéíóúüñ-]*(?:\s+[\wÁÉÍÓÚÜÑáéíóúüñ-]+){0,4}?)\s*\(\s*([A-Z][a-zé]+)\s+([a-zé][a-zé-]+)\b[^)]*\)/g;
+
+/** Reason estable + marca de telemetría del guard #95. */
+const INVENTED_BINOMIAL_REASON = 'binomio_inventado_fuera_de_grounding';
+
+/**
+ * guardInventedBinomialOutOfGrounding — GUARD DETERMINÍSTICO #95.
+ *
+ * PROBLEMA (tarea #95, prompt-rule "REGLA CRÍTICA DE ESPECIE DESCONOCIDA" en
+ * agentService): cuando el usuario nombra una planta/cultivo cuyo binomio NO está
+ * en el grounding del turno (ni en `resolvedEntities.nombre_cientifico` ni en los
+ * sub-arrays/evidencia), el modelo a veces INVENTA un binomio latino por similitud
+ * fonética y lo cuelga entre paréntesis del nombre común ("tomate de árbol
+ * (Solanum lycopersicum)"). El system prompt lo prohíbe, pero falta el GUARD de
+ * SALIDA que lo capture cuando el modelo igual lo inventa.
+ *
+ * QUÉ HACE: por cada atribución "<nombre común> (Genus species)" del texto, si el
+ * binomio NO está respaldado por el grounding del turno (`_groundedBinomials`) y
+ * NO es un binomio legítimo conocido fuera del grafo (patógeno identificado,
+ * insumo/biocontrol real, género de organismo benéfico), NEUTRALIZA el binomio
+ * inventado QUITANDO el paréntesis y dejando SOLO el nombre común. Quirúrgico (no
+ * nuke): el resto de la respuesta queda intacto.
+ *
+ * DISEÑO CONSERVADOR (anti-falso-positivo — prioridad: falsos negativos sobre
+ * romper respuestas válidas):
+ *  - Solo actúa sobre la atribución entre PARÉNTESIS "común (Genus species)" — la
+ *    firma exacta de la alucinación. Binomios sueltos en prosa NO se tocan (ahí ya
+ *    razonan los guards 5/5b/benéfico/extracto con su contexto, y suelen ser
+ *    identificación legítima de patógeno/insumo).
+ *  - Un binomio que SÍ está en el grounding (`_groundedBinomials`, incl.
+ *    companions/antagonists/alternativas/pest_controllers) se CONSERVA tal cual.
+ *  - Whitelist de binomios legítimos fuera del grafo: patógenos conocidos
+ *    (`KNOWN_PATHOGEN_BINOMIALS`), insumos/biocontroles reales (`_isRealAgroInput`),
+ *    y géneros de organismos benéficos (`BENEFICIAL_GENERA_ALLOWLIST`). Ninguno se
+ *    neutraliza (un caldo bordelés sobre Mycosphaerella fijiensis, un neem
+ *    (Azadirachta indica), un Aphidius colemani son correctos sin grounding).
+ *  - Pares de prosa española capitalizada ("(Sin embargo ...)") se descartan con
+ *    `_looksLikeLatinBinomial`.
+ *  - Si NO hay grounding (`resolvedEntities` vacío/null), NO actúa: sin grounding
+ *    no podemos distinguir inventado de legítimo → ante la duda, no modificar.
+ *  - Determinístico, barato (regex + lookups), idempotente (al quitar el paréntesis
+ *    el binomio ya no está → segunda pasada no re-dispara).
+ *
+ * @param {string} responseText — texto del LLM.
+ * @param {Array<object>|null} resolvedEntities — grounding AGE del turno.
+ * @returns {{text:string, modified:boolean, reason:string|null, binomials?:string[]}}
+ */
+export function guardInventedBinomialOutOfGrounding(responseText, resolvedEntities = null) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Sin grounding NO podemos distinguir inventado de legítimo. Conservador:
+  // ante la duda, no modificar (preferir falso negativo a romper respuesta).
+  const entities = Array.isArray(resolvedEntities) ? resolvedEntities : [];
+  if (entities.length === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  // Gate barato: ¿hay siquiera un paréntesis con forma de binomio?
+  ATTRIBUTED_BINOMIAL_RE.lastIndex = 0;
+  if (!ATTRIBUTED_BINOMIAL_RE.test(responseText)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const grounded = _groundedBinomials(entities);
+  /** binomios neutralizados (canónicos), en orden, dedup, para el reason. */
+  const removed = [];
+
+  ATTRIBUTED_BINOMIAL_RE.lastIndex = 0;
+  const out = responseText.replace(ATTRIBUTED_BINOMIAL_RE, (match, common, genusRaw, epithetRaw) => {
+    // ¿Par latino plausible? (descarta "(Sin embargo)" y prosa capitalizada).
+    if (!_looksLikeLatinBinomial(genusRaw, epithetRaw)) return match;
+    const bin = _binomial(`${genusRaw} ${epithetRaw}`);
+    if (!bin) return match;
+    // CONSERVAR: respaldado por el grounding del turno.
+    if (grounded.has(bin)) return match;
+    // CONSERVAR: legítimos fuera del grafo (patógeno / insumo-biocontrol / benéfico).
+    if (KNOWN_PATHOGEN_BINOMIALS.has(bin)) return match;
+    const genusNorm = _stripDiacritics(genusRaw).toLowerCase();
+    if (BENEFICIAL_GENERA_ALLOWLIST.has(genusNorm)) return match;
+    if (_isRealAgroInput(bin) || _isRealAgroInput(genusNorm)) return match;
+    // NEUTRALIZAR: binomio inventado fuera del grounding → solo el nombre común.
+    if (!removed.includes(bin)) removed.push(bin);
+    return common.trimEnd();
+  });
+
+  if (removed.length === 0 || out === responseText) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('invented_binomial_out_of_grounding');
+  return {
+    text: out,
+    modified: true,
+    reason: `${INVENTED_BINOMIAL_REASON}: ${removed.join(', ')}`,
+    binomials: removed,
+  };
+}
+
 /**
  * Guard de NORMATIVA (Ley 1930 - Páramo).
  *
@@ -8639,6 +8754,22 @@ export function applyOutputGuards(
     text = benefRes.text;
     modified = true;
     if (benefRes.reason) reasons.push(benefRes.reason);
+  }
+  // Guard #95 ANTI-ALUCINACIÓN-DE-ESPECIE (binomio inventado fuera del grounding):
+  // firma propia (usa el grounding crudo del turno). Corre SIEMPRE (no es de
+  // siembra). QUIRÚRGICO: si el texto cuelga un binomio latino entre paréntesis de
+  // un nombre común ("tomate de árbol (Solanum lycopersicum)") cuyo binomio NO está
+  // en el grounding del turno (ni patógeno/insumo/benéfico conocido), NEUTRALIZA ese
+  // binomio dejando solo el nombre común. Es el GUARD de SALIDA que respalda la
+  // prompt-rule "REGLA CRÍTICA DE ESPECIE DESCONOCIDA" cuando el modelo igual lo
+  // inventa. Va tras el caveat de benéfico (que solo cubre el contexto biocontrol) y
+  // antes de la superficie de ConfusionWarning, para que su prefijo tóxico siga
+  // liderando. Conservador: sin grounding no actúa.
+  const invBinRes = guardInventedBinomialOutOfGrounding(text, resolvedEntities);
+  if (invBinRes && invBinRes.modified) {
+    text = invBinRes.text;
+    modified = true;
+    if (invBinRes.reason) reasons.push(invBinRes.reason);
   }
   // Guard SAFETY-CRITICAL de superficie de ConfusionWarning (BORDE-001 ·
   // cianuro/escopolamina/ricina/rotenona): firma propia (necesita las entidades
