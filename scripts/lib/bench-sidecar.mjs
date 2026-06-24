@@ -197,10 +197,12 @@ export async function generateChat({
   temperature = 0.3,
   seed = 42,
   maxTokens = 768,
+  numCtx,
   ollamaUrl = DEFAULT_OLLAMA_CHAT_URL,
   timeoutMs = 180_000,
   fetchImpl = fetch,
 }) {
+  const resolvedNumCtx = numCtx ?? (process.env.BENCH_NUM_CTX ? Number(process.env.BENCH_NUM_CTX) : undefined);
   const start = performance.now();
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -215,7 +217,7 @@ export async function generateChat({
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
         ],
-        options: { temperature, seed, num_predict: maxTokens },
+        options: { temperature, seed, num_predict: maxTokens, ...(resolvedNumCtx !== undefined ? { num_ctx: resolvedNumCtx } : {}) },
         keep_alive: '30m',
       }),
       signal: controller.signal,

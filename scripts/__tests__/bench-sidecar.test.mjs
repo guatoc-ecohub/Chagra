@@ -122,6 +122,35 @@ describe('generateChat (fetch inyectado)', () => {
       generateChat({ model: 'm', systemPrompt: 's', userPrompt: 'u', fetchImpl }),
     ).rejects.toThrow(/HTTP 503/);
   });
+  it('incluye num_ctx en options cuando se pasa por param', async () => {
+    let sentBody;
+    const fetchImpl = async (_url, opts) => {
+      sentBody = JSON.parse(opts.body);
+      return okJson({ message: { content: 'ok' } });
+    };
+    await generateChat({ model: 'm', systemPrompt: 's', userPrompt: 'u', numCtx: 8192, fetchImpl });
+    expect(sentBody.options.num_ctx).toBe(8192);
+  });
+  it('incluye num_ctx desde env BENCH_NUM_CTX cuando no hay param', async () => {
+    let sentBody;
+    const fetchImpl = async (_url, opts) => {
+      sentBody = JSON.parse(opts.body);
+      return okJson({ message: { content: 'ok' } });
+    };
+    process.env.BENCH_NUM_CTX = '4096';
+    await generateChat({ model: 'm', systemPrompt: 's', userPrompt: 'u', fetchImpl });
+    expect(sentBody.options.num_ctx).toBe(4096);
+    delete process.env.BENCH_NUM_CTX;
+  });
+  it('no incluye num_ctx en options si no se pasa ni env', async () => {
+    let sentBody;
+    const fetchImpl = async (_url, opts) => {
+      sentBody = JSON.parse(opts.body);
+      return okJson({ message: { content: 'ok' } });
+    };
+    await generateChat({ model: 'm', systemPrompt: 's', userPrompt: 'u', fetchImpl });
+    expect(sentBody.options.num_ctx).toBeUndefined();
+  });
 });
 
 describe('makeJudgeOllamaCall', () => {
