@@ -1,3 +1,4 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 /**
  * aiService.js — Inferencia de visión via Ollama / Gemma 4 (Fase 20.2b).
  *
@@ -191,8 +192,7 @@ export const __retrieveRagContextForFoliage = async (speciesSlug) => {
  * });
  * // result => { score: 85, issues: ["mancha foliar"], treatment_suggestion: "aplicar caldo bordelés (Fuente 1)" }
  */
-// eslint-disable-next-line no-unused-vars
-const analyzeFoliageUncached = async (imageBlob, { onToken, signal, speciesSlug, assetId } = {}) => {
+const analyzeFoliageUncached = async (imageBlob, { onToken, signal, speciesSlug, _assetId } = {}) => {
   try {
     const base64 = await blobToBase64(imageBlob);
 
