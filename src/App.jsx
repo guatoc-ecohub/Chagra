@@ -110,6 +110,7 @@ const OnboardingHero = lazy(() => import('./components/OnboardingHero'));
 const WelcomeStatsHero = lazy(() => import('./components/WelcomeStatsHero'));
 const TopBar = lazy(() => import('./components/TopBar'));
 const DashboardLive = lazy(() => import('./components/dashboard/DashboardLive'));
+const AprenderConAgente = lazy(() => import('./components/Aprende/AprenderConAgente'));
 const HoyEnFincaScreen = lazy(() => import('./components/hoy/HoyEnFincaScreen'));
 const MiFincaEvolucionScreen = lazy(() => import('./components/hoy/MiFincaEvolucionScreen'));
 const MiFincaVivaScreen = lazy(() => import('./components/juego/MiFincaVivaScreen'));
@@ -203,6 +204,7 @@ const HASH_VIEW_ROUTES = {
   'doom-finca': 'doom_finca',
   toxicologia: 'toxicologia',
   suelo: 'suelo',
+  aprende: 'aprende',
   'usage-stats': 'usage_stats',
 };
 
@@ -213,7 +215,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas',
   'hoy_finca', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'suelo', 'toxicologia',
+  'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'suelo', 'toxicologia', 'aprende',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia',
   'usage_stats',
@@ -1251,6 +1253,18 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Cromatografia de Suelo">
               <CromatografiaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'aprende':
+        // Módulo "Aprende con el agente" (#1824): 5 lecciones agroecológicas
+        // (suelo · asociaciones · biopreparados · MIP · fenología) con datos
+        // verificados y fuente, más InsightCards al cierre de cada lección.
+        // Componente autocontenido (maneja su propio estado interno).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Aprende con el agente">
+              <AprenderConAgente onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
