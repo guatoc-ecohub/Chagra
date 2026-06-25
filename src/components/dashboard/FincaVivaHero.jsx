@@ -6,6 +6,7 @@
  * FincaRedInstitucional.jsx en este mismo directorio. */
 import { useEffect, useMemo, useState } from 'react';
 import { listFarmProcesses } from '../../db/farmProcessCache';
+import useAssetStore from '../../store/useAssetStore';
 import { buildFincaScene } from '../../services/fincaSceneService';
 import { selectSceneVariant, SCENE_KINDS } from '../../services/fincaSceneProfileSelector';
 import { getProfile } from '../../services/userProfileService';
@@ -78,7 +79,19 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, children, titul
     return () => { alive = false; };
   }, []);
 
-  const scene = useMemo(() => buildFincaScene({ processes }), [processes]);
+  // CONTEO REAL DE PLANTAS (los ASSETS) — la MISMA fuente de verdad que el
+  // dashboard ("Mis plantas: N" en FincaCards y "llevo seguimiento a N cultivos"
+  // en AnalisisProactivoIA): useAssetStore.plants. Una finca puede tener decenas
+  // de plantas REGISTRADAS sin que exista aún un FarmProcess (ciclo) para ellas;
+  // los processes solo cubren los ciclos abiertos. Sin esto, la escena decía
+  // "terreno listo / 0 siembras" pese a haber plantas reales. Hidratado al boot
+  // por App.jsx; aquí solo nos suscribimos al store (reactivo, offline-first).
+  const plantAssetsCount = useAssetStore((s) => (Array.isArray(s.plants) ? s.plants.length : 0));
+
+  const scene = useMemo(
+    () => buildFincaScene({ processes, plantAssetsCount }),
+    [processes, plantAssetsCount],
+  );
 
   // ── Ubicación real de la finca (vereda · municipio · msnm · piso) ─────────
   const ubicacion = useMemo(() => buildUbicacion(), []);
