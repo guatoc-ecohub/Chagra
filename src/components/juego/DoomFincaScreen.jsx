@@ -334,6 +334,9 @@ export default function DoomFincaScreen({ onBack, onHome }) {
   const inputRef = useRef({
     forward: false, backward: false, left: false, right: false,
     strafeLeft: false, strafeRight: false, fire: false, mouseDown: false,
+    // FEEL gated (dev-only): balance más amable (daño + combo). Con la flag OFF
+    // el motor recibe feelOn=false → BALANCE EXACTO como hoy en producción.
+    feelOn: fincaVivaHomePerfilActivo(),
   });
   const touchRef = useRef({
     joystickActive: false, joystickId: null, joystickX: 0, joystickY: 0,

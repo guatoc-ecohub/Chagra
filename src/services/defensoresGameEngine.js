@@ -253,6 +253,66 @@ export function intentarSalto(estado) {
 }
 
 /**
+ * Resume el PROGRESO del nivel para el HUD: cuántos cultivos van de la meta,
+ * cuántas plagas quedan por controlar y, si hay mini-jefe, si sigue vivo.
+ *
+ * Es la pieza que faltaba para que el jugador (un niño, un campesino) ENTIENDA
+ * qué le falta para ganar — antes el HUD solo mostraba energía y puntos, así que
+ * el objetivo quedaba implícito. Lógica PURA y testeable; la UI solo lo pinta.
+ *
+ * @param {Object} p
+ * @param {number} p.cultivosRecogidos
+ * @param {number} p.metaCultivos
+ * @param {number} p.plagasVivas
+ * @param {boolean} [p.hayJefe=false]
+ * @param {boolean} [p.jefeVivo=false]
+ * @returns {{
+ *   cultivos: { hechos:number, meta:number, listo:boolean },
+ *   plagas:   { restantes:number, listo:boolean },
+ *   jefe:     { hay:boolean, vivo:boolean, listo:boolean },
+ *   todoListo: boolean,
+ * }}
+ */
+export function resumenObjetivos({
+  cultivosRecogidos = 0,
+  metaCultivos = 0,
+  plagasVivas = 0,
+  hayJefe = false,
+  jefeVivo = false,
+} = {}) {
+  const hechos = clamp(cultivosRecogidos, 0, metaCultivos);
+  const cultivosListo = cultivosRecogidos >= metaCultivos;
+  const plagasListo = plagasVivas <= 0;
+  const jefeListo = !hayJefe || !jefeVivo;
+  return {
+    cultivos: { hechos, meta: metaCultivos, listo: cultivosListo },
+    plagas: { restantes: Math.max(0, plagasVivas), listo: plagasListo },
+    jefe: { hay: !!hayJefe, vivo: !!jefeVivo, listo: jefeListo },
+    todoListo: cultivosListo && plagasListo && jefeListo,
+  };
+}
+
+/**
+ * Factor de dificultad de patrulla de plagas (FEEL, gated dev-only).
+ *
+ * Las plagas patrullan a `vel` base. En los niveles altos, con muchas plagas y
+ * terreno con altura, el ritmo puede sentirse caótico para un niño. Este factor
+ * RALENTIZA un poco la patrulla en los niveles tardíos para una curva de
+ * dificultad más amable, sin tocar la del nivel 1 (que ya es suave).
+ *
+ * Solo se aplica con la flag de FEEL encendida (lo decide la UI); con la flag
+ * apagada la UI usa 1 → patrulla EXACTA como hoy.
+ *
+ * @param {number} numero  número de nivel (1..4).
+ * @returns {number} multiplicador de velocidad de patrulla en [0,1].
+ */
+export function factorPatrulla(numero) {
+  // 1 → 1.0, 2 → 0.95, 3 → 0.9, 4 → 0.85: cada nivel afina un pelín el ritmo.
+  const f = 1 - Math.max(0, (numero || 1) - 1) * 0.05;
+  return clamp(f, 0.8, 1);
+}
+
+/**
  * Evalúa el estado de fin de nivel.
  *
  * Gana al recoger la meta de cultivos Y controlar todas las plagas Y, si el

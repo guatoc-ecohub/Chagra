@@ -30,7 +30,10 @@ import {
   golpearJefe,
   intentarSalto,
   evaluarFinNivel,
+  resumenObjetivos,
+  factorPatrulla,
 } from '../../services/defensoresGameEngine';
+import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 import { agentSounds, isSoundEnabled } from '../../services/agentSoundService';
 import { recordGameStart, recordGameComplete } from '../../services/usageTelemetryService';
 
@@ -107,6 +110,22 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
   const [leccion, setLeccion] = useState('');
   const [beneficoSel, setBeneficoSel] = useState(beneficos[0]?.id || null);
   const [jefeVida, setJefeVida] = useState(nivel.jefe ? nivel.jefe.vida : 0);
+  // Progreso de objetivos para el HUD (cuántos cultivos van de la meta y cuántas
+  // plagas quedan). Antes el objetivo quedaba implícito; ahora se ve.
+  const [cultivosHechos, setCultivosHechos] = useState(0);
+  const [plagasVivas, setPlagasVivas] = useState(pares.length);
+
+  // FEEL gated (dev-only): con la flag ON la patrulla de plagas se afina por
+  // nivel (curva de dificultad más amable en niveles altos); con OFF = 1 (hoy).
+  // El factor es constante para el nivel; se guarda en ref para que el rAF lo
+  // lea sin re-suscribirse. El valor inicial se calcula fuera del render (en el
+  // efecto de abajo) para no leer refs durante el render.
+  const patrullaFactor = useRef(1);
+  useEffect(() => {
+    patrullaFactor.current = fincaVivaHomePerfilActivo()
+      ? factorPatrulla(nivel.numero)
+      : 1;
+  }, [nivel.numero]);
 
   // Refs del mundo (mutables, leídos por el loop a 60fps sin re-render).
   const world = useRef(null);
@@ -339,15 +358,17 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
       const objetivoCam = w.player.x + w.player.w / 2 - VIEW_W / 2;
       w.camX = clamp(objetivoCam, 0, Math.max(0, w.mundoAncho - VIEW_W));
 
-      // Plagas patrullan (más rápido/amplio = más difícil).
+      // Plagas patrullan (más rápido/amplio = más difícil). Con la flag de FEEL
+      // ON, `patrullaFactor` afina el ritmo por nivel; con OFF es 1 (= hoy).
       if (estado === 'jugando') {
+        const pf = patrullaFactor.current;
         for (const p of w.plagas) {
           if (!p.alive) continue;
-          p.x += p.dir * p.vel;
+          p.x += p.dir * p.vel * pf;
           if (Math.abs(p.x - p.baseX) > p.rango) p.dir *= -1;
         }
         if (w.jefe && w.jefe.vivo) {
-          w.jefe.x += w.jefe.dir * 0.7;
+          w.jefe.x += w.jefe.dir * 0.7 * pf;
           if (Math.abs(w.jefe.x - w.jefe.baseX) > 70) w.jefe.dir *= -1;
         }
       }
@@ -359,6 +380,7 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
         w.cultivosRecogidos += rec.recogidos.length;
         w.puntaje = sumarPuntaje(w.puntaje, { cultivos: rec.recogidos.length });
         setPuntaje(w.puntaje);
+        setCultivosHechos(Math.min(w.cultivosRecogidos, nivel.metaCultivos));
         beep('good');
       }
 
@@ -387,14 +409,15 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
       }
 
       // Fin de nivel.
-      const plagasVivas = w.plagas.filter((p) => p.alive).length;
+      const vivas = w.plagas.filter((p) => p.alive).length;
       const hayJefe = !!w.jefe;
       const jefeVivo = !!(w.jefe && w.jefe.vivo);
+      setPlagasVivas((prev) => (prev !== vivas ? vivas : prev));
       const fin = evaluarFinNivel({
         energia: w.energia,
         cultivosRecogidos: w.cultivosRecogidos,
         metaCultivos: nivel.metaCultivos,
-        plagasVivas,
+        plagasVivas: vivas,
         hayJefe,
         jefeVivo,
       });
@@ -536,11 +559,23 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
     setLeccion('');
     setEstado('jugando');
     setJefeVida(nivel.jefe ? nivel.jefe.vida : 0);
-  }, [crearMundo, nivel]);
+    setCultivosHechos(0);
+    setPlagasVivas(pares.length);
+  }, [crearMundo, nivel, pares.length]);
 
   const energiaMax = nivel.energiaMax;
   const hayJefe = !!nivel.jefe;
   const siguienteAbierto = nivelDesbloqueado(nivel.numero + 1, superados);
+
+  // Resumen de objetivos para el HUD (cultivos X/meta · plagas restantes).
+  // Lógica pura del motor; aquí solo se pinta.
+  const objetivos = resumenObjetivos({
+    cultivosRecogidos: cultivosHechos,
+    metaCultivos: nivel.metaCultivos,
+    plagasVivas,
+    hayJefe,
+    jefeVivo: hayJefe && jefeVida > 0,
+  });
 
   return (
     <>
@@ -565,6 +600,33 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
             {puntaje}
           </span>
         </div>
+      </div>
+
+      {/* Progreso de objetivos: lo que faltaba para que se vea QUÉ falta para
+          ganar (antes solo había energía + puntos). Universal, bajo riesgo. */}
+      <div className="df-objetivos" data-testid="defensores-objetivos" aria-label="Lo que te falta para ganar el nivel">
+        <span
+          className={`df-objetivo ${objetivos.cultivos.listo ? 'df-objetivo-listo' : ''}`}
+          data-testid="defensores-objetivo-cultivos"
+        >
+          🌽 Cultivos {objetivos.cultivos.hechos}/{objetivos.cultivos.meta}
+          {objetivos.cultivos.listo ? ' ✓' : ''}
+        </span>
+        <span
+          className={`df-objetivo ${objetivos.plagas.listo ? 'df-objetivo-listo' : ''}`}
+          data-testid="defensores-objetivo-plagas"
+        >
+          🐛 Plagas {objetivos.plagas.restantes}
+          {objetivos.plagas.listo ? ' ✓' : ''}
+        </span>
+        {hayJefe && (
+          <span
+            className={`df-objetivo ${objetivos.jefe.listo ? 'df-objetivo-listo' : ''}`}
+            data-testid="defensores-objetivo-jefe"
+          >
+            {nivel.jefe.emoji} Jefe{objetivos.jefe.listo ? ' ✓' : ''}
+          </span>
+        )}
       </div>
 
       {/* Aviso de mini-jefe (solo niveles con jefe). */}
