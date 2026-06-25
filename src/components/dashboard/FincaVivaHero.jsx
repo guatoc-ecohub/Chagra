@@ -60,13 +60,32 @@ import './finca-viva-hero.css';
  * @param {Object} props
  * @param {Function} [props.onNavigate]   navegación de la app.
  * @param {Function} [props.onOpenAgent]  abre el agente (globo + composer + portal).
+ * @param {Function} [props.onGestionar]  abre la GESTIÓN de la finca (registros y
+ *   acciones). En el home F2 la gestión vive como una sección (GESTION_TILES) en
+ *   la MISMA página, bajo el hero, así que el portal "Gestionar" la REVELA con un
+ *   scroll a su ancla — NO navega a otra vista (mucho menos al juego). Si no se
+ *   pasa, cae a un scroll directo al ancla #finca-gestion (mismo destino).
  * @param {React.ReactNode} [props.children]  escena alterna (red institucional).
  * @param {string} [props.titulo]  título accesible (default "Mi finca viva").
  */
-export default function FincaVivaHero({ onNavigate, onOpenAgent, children, titulo }) {
+export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, children, titulo }) {
   const abrirAgente = () => {
     if (onOpenAgent) onOpenAgent();
     else onNavigate?.('agente');
+  };
+
+  // El portal "Gestionar" lleva a la GESTIÓN de la finca (siembras, zonas,
+  // animales), que en el home F2 es la sección #finca-gestion de ESTA misma
+  // página (bajo el hero). Lo correcto es revelarla con un scroll suave, no
+  // navegar a otra vista. `onGestionar` (lo provee DashboardLive) hace ese
+  // scroll; si faltara, caemos a un scroll directo al ancla por id para que
+  // "Gestionar" NUNCA termine en la pantalla equivocada (el juego, el bug viejo).
+  const irAGestion = () => {
+    if (onGestionar) { onGestionar(); return; }
+    if (typeof document !== 'undefined') {
+      const seccion = document.getElementById('finca-gestion');
+      if (seccion?.scrollIntoView) seccion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   // ── Datos reales de la finca (offline-first) ─────────────────────────────
@@ -196,7 +215,13 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, children, titul
           )}
 
           <div className="fvh-top-pills">
-            <button type="button" className="fvh-pill" title="Ayuda" aria-label="Ayuda">
+            <button
+              type="button"
+              className="fvh-pill"
+              title="Ayuda"
+              aria-label="Ayuda"
+              onClick={() => onNavigate?.('ayuda')}
+            >
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
                 <circle cx="12" cy="12" r="9" stroke="#3a4a3a" strokeWidth="2" />
                 <path d="M9.2 9.2a2.8 2.8 0 1 1 4 2.5c-.9.5-1.2 1-1.2 1.9" stroke="#3a4a3a" strokeWidth="2" strokeLinecap="round" fill="none" />
@@ -328,7 +353,7 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, children, titul
         {/* ── 4 PORTALES = LUGARES DE LA FINCA ───────────────────────────────── */}
         <div className="fvh-portales-tit">Lugares de su finca <span /></div>
         <nav className="fvh-portales" aria-label="Lugares de su finca" data-testid="finca-viva-portales">
-          {buildPortales({ onNavigate, abrirAgente, scene, poblada, escala }).map((p) => (
+          {buildPortales({ onNavigate, abrirAgente, irAGestion, scene, poblada, escala }).map((p) => (
             <button
               key={p.id}
               type="button"
@@ -662,7 +687,7 @@ const COLIBRI = {
  * Los 4 portales/lugares del home F2. El badge de "Gestionar" refleja el DATO
  * REAL de la finca (0 siembras → "EMPIECE AQUÍ"; con siembras → resumen real).
  */
-function buildPortales({ onNavigate, abrirAgente, scene, poblada, escala }) {
+function buildPortales({ onNavigate, abrirAgente, irAGestion, scene, poblada, escala }) {
   const total = Number(scene?.totalCultivos) || 0;
   const animales = Array.isArray(scene?.animales) ? scene.animales.length : 0;
   let badgeGestionar;
@@ -689,7 +714,10 @@ function buildPortales({ onNavigate, abrirAgente, scene, poblada, escala }) {
       delay: '.1s',
       badge: badgeGestionar,
       placeSvg: <PlaceGestionar />,
-      onClick: () => onNavigate?.('juego'),
+      // GESTIÓN, no el juego: revela la sección de registros/acciones de la
+      // finca (siembras, zonas, animales) en esta misma página. El bug viejo
+      // mandaba a onNavigate('juego') — el mismo destino que el portal "Jugar".
+      onClick: () => irAGestion(),
     },
     {
       id: 'aprender',
