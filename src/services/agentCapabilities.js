@@ -413,15 +413,23 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     heroRoute: { kind: 'nav', view: 'suelo' },
   },
   {
+    // BOTÓN ÚNICO DE VOZ (#23): entrada principal voz-first del grupo
+    // "Guardar lo que hago". Reemplaza "procesos por voz" en la mano: este
+    // botón consolida las 3 pantallas de voz en UN flujo que clasifica la
+    // intención entre TODOS los tipos (planta/siembra/cosecha/insumo/
+    // mantenimiento/observación/plaga) y extrae los campos del lenguaje
+    // natural. La vista 'procesos' (ProcesosPorVozScreen, ciclo productivo)
+    // sigue viva y enlazada desde otras pantallas; solo la MANO apunta ahora
+    // al flujo unificado 'registro_voz'. tool/id se conservan (capabilityHealth).
     id: 'procesos',
     group: 'registrar',
     status: 'live',
-    icon: '🔄',
-    label: 'Procesos por voz',
-    desc: 'Registra el ciclo de un cultivo hablando con Chagra.',
+    icon: '🎙️',
+    label: 'Registrar hablando',
+    desc: 'Cuéntame qué hiciste o qué viste: siembra, cosecha, insumo, mantenimiento, observación o plaga, y lo guardo.',
     tool: 'farm_process',
     hero: true,
-    heroRoute: { kind: 'nav', view: 'procesos' },
+    heroRoute: { kind: 'nav', view: 'registro_voz' },
   },
   {
     id: 'alertas-cultivo',

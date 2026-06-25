@@ -1,0 +1,30 @@
+{
+  "proposito": "Casos de prueba del MÓDULO DE VOZ unificado (#23). Principio (operador): UN intento/registro por mensaje, pero el mensaje puede ser rico (varios atributos de UNA cosa). Cada caso = un enunciado natural de campesino + la extracción esperada. Sirve para (a) guiar el build del extractor y (b) correr contra el agente grounded y medir si es capaz.",
+  "principio": "una solicitud por mensaje (facilidad del agente); el extractor debe sacar todos los campos presentes de ESA solicitud.",
+  "base": [
+    { "id": "b1", "voz": "aquí tengo un durazno que tiene como dos metros de alto y está floriado", "intent": "registrar_planta", "especie": "durazno", "slug": "prunus_persica", "altura_m": 2, "fenologia": "floracion", "posicion": "GPS (aquí)" },
+    { "id": "b2", "voz": "estoy al lado de un aguacate que tiene como 4 metros de alto y como 3 de ancho pero tiene pepas chiquitas y mucha flor caída", "intent": "registrar_planta+observacion", "especie": "aguacate", "slug": "persea_americana", "altura_m": 4, "ancho_m": 3, "fenologia": "cuajado (pepas chiquitas)", "observacion": "caída de flor (posible estrés/polinización/nutrición)", "posicion": "GPS" }
+  ],
+  "casos": [
+    { "id": "c1", "dificultad": 1, "voz": "sembré veinte maticas de cebolla larga aquí en la era nueva, hace dos días", "intent": "registrar_siembra", "especie": "cebolla larga", "slug": "allium_fistulosum", "cantidad": 20, "posicion": "GPS (era nueva)", "fecha": "hace 2 días" },
+    { "id": "c2", "dificultad": 1, "voz": "acabo de coger como tres arrobas de mora en el lote de abajo", "intent": "registrar_cosecha", "especie": "mora", "slug": "rubus_glaucus", "cantidad": "3 arrobas (~37.5 kg)", "posicion": "lote de abajo", "fecha": "ahora" },
+    { "id": "c3", "dificultad": 2, "voz": "le eché caldo bordelés a los tomates esta mañana porque tenían tizón", "intent": "registrar_insumo", "insumo": "caldo bordelés", "cultivo": "tomate", "slug": "solanum_lycopersicum", "motivo": "tizón (enfermedad)", "fecha": "esta mañana", "grounded": "caldo bordelés controla tizón → dosis/uso del catálogo" },
+    { "id": "c4", "dificultad": 2, "voz": "hoy podé los duraznos y limpié de maleza todo el lote de la entrada", "intent": "registrar_mantenimiento", "labores": ["poda", "deshierbe"], "cultivo": "durazno", "zona": "lote de la entrada", "fecha": "hoy" },
+    { "id": "c5", "dificultad": 3, "voz": "el palo de mango grande ya está cargado, tiene como cincuenta mangos pintones y mide unos seis metros", "intent": "registrar_planta+observacion", "especie": "mango", "slug": "mangifera_indica", "altura_m": 6, "fenologia": "madurez (pintón)", "carga_frutos": 50, "señal": "cosecha próxima" },
+    { "id": "c6", "dificultad": 3, "voz": "las matas de fríjol tienen la hoja toda comida, parece que es un gusano que está en el envés", "intent": "registrar_observacion_plaga", "especie": "fríjol", "slug": "phaseolus_vulgaris", "sintoma": "defoliación (hoja comida)", "plaga_sospecha": "gusano (envés)", "grounded": "controladores biológicos del gusano (get_pest_controllers)" },
+    { "id": "c7", "dificultad": 4, "voz": "este cafetal está en grano verde pero veo muchas hojas con manchas amarillas y como quemadas en los bordes", "intent": "registrar_observacion", "especie": "café", "slug": "coffea_arabica", "fenologia": "llenado de grano (grano verde)", "sintoma": "manchas amarillas + bordes quemados", "diagnostico_sospecha": "roya / deficiencia (K?)", "grounded": "diagnóstico + manejo grounded" },
+    { "id": "c8", "dificultad": 4, "voz": "encontré un nido de hormiga arriera al lado del nacedero, está acabando con los aguacates nuevos", "intent": "reportar_plaga_invasora", "organismo": "hormiga arriera", "binomio": "Atta sp.", "ubicacion": "cerca del nacedero (zona sensible: agua)", "afecta": "aguacates jóvenes", "grounded": "manejo agroecológico de arriera + nota: cerca de nacedero = cuidado con químicos" },
+    { "id": "c9", "dificultad": 5, "voz": "esta gulupa está reventando en flor pero se le están cayendo las hojas de abajo y tiene como una telaraña en las puntas", "intent": "registrar_observacion", "especie": "gulupa", "slug": "passiflora_edulis_f_edulis", "TRAMPA": "NO confundir con guayaba (gulupa=Passiflora). Desambiguación obligatoria.", "fenologia": "floración plena", "sintomas": ["defoliación basal", "telaraña en puntas → posible ácaro/araña roja"], "grounded": "controlador de ácaro + no alucinar especie" },
+    { "id": "c10", "dificultad": 5, "voz": "aquí en el filo tengo una huerta con lechuga, cilantro y acelga, la lechuga ya está pa cortar, el cilantro espigado y la acelga apenas pegando", "intent": "registrar_observacion_multi-cultivo (UNA huerta, varios cultivos con estados distintos)", "especies": [ {"especie":"lechuga","slug":"lactuca_sativa","estado":"cosecha (pa cortar)"}, {"especie":"cilantro","slug":"coriandrum_sativum","estado":"espigado (floración/bolting → ya no sirve hoja)"}, {"especie":"acelga","slug":"beta_vulgaris_cicla","estado":"establecimiento (apenas pegando)"} ], "posicion": "GPS (el filo)", "RETO": "una huerta = una unidad, pero 3 cultivos con 3 fenologías distintas en un solo enunciado. Límite del principio 'un intento por mensaje'." }
+  ],
+  "que_mide_la_prueba": [
+    "Resolución de especie incl. trampas de confusión (gulupa≠guayaba) y regionalismos (palo/mata/matica, pepas, pintón, espigado, pa cortar).",
+    "Extracción de medidas (alto/ancho), cantidades + unidades regionales (arrobas), carga de frutos.",
+    "Fenología en lenguaje campesino (floriado, grano verde, pintón, espigado, reventando en flor, apenas pegando).",
+    "Síntomas/problemas → ruteo a observación/diagnóstico grounded (no inventar).",
+    "Posición (aquí/al lado de/en el filo) → GPS.",
+    "Tiempo (hoy, hace dos días, esta mañana, ahora).",
+    "Tipo de registro (planta/cosecha/insumo/mantenimiento/observación/invasora).",
+    "Límite: c10 rompe 'un intento por mensaje' (1 huerta, 3 cultivos) — sirve para ver hasta dónde llega."
+  ]
+}
