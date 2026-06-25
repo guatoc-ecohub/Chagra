@@ -39,6 +39,7 @@
 import { deriveRole, profileTieneAnimales, PROFILE_ROLES } from './profileChipSelector.js';
 import { esPerfilUrbano, profileTieneCerdos } from './homeModuleSelector.js';
 import { clasificarPisoTermico } from './pisoTermicoClassifier.js';
+import { getInvernaderoEstructura, getComposicionFinca } from './userProfileService.js';
 
 /**
  * Tipos de escena (BACKDROP) que el componente `FincaWorldScene` sabe pintar.
@@ -171,6 +172,26 @@ function quiereRestaurar(p) {
 }
 
 /**
+ * Deriva la ESTRUCTURA de la finca (#34, fase 1) que la escena F2 dibuja: la
+ * forma/tamaño del invernadero y las ZONAS (huerta/frutales/aromáticas/animales)
+ * del esqueleto declarado en el onboarding. Reusa los getters tipados de
+ * `userProfileService` (fuente única + migración suave: perfil viejo → defaults
+ * sanos). Pasa el perfil EXPLÍCITO para no tocar localStorage (este módulo es
+ * puro). Estos campos solo enriquecen la variante; NO cambian el `kind`.
+ *
+ * @param {Object} p — perfil del usuario.
+ * @returns {{ invernaderoForma: string|null, invernaderoTamano: string|null, zonas: string[] }}
+ */
+function deriveEstructura(p) {
+  const inv = getInvernaderoEstructura(p);
+  return {
+    invernaderoForma: inv.forma,
+    invernaderoTamano: inv.tamano,
+    zonas: getComposicionFinca(p),
+  };
+}
+
+/**
  * API de alto nivel: del PERFIL completo → la VARIANTE de escena del home.
  *
  * Reglas (alineadas con el override urbano de `homeModuleSelector` y con
@@ -188,15 +209,25 @@ function quiereRestaurar(p) {
  * media, tinte templado, sin animales) aunque el perfil venga vacío o null —
  * nunca null, para que el componente tenga algo que pintar.
  *
+ * ESTRUCTURA (#34, fase 1): además del backdrop, la variante trae el ESQUELETO
+ * declarado en el onboarding para que la escena F2 dibuje la nave del
+ * invernadero (`invernaderoForma`/`invernaderoTamano`) y siembre las ZONAS
+ * (`zonas`: huerta/frutales/aromáticas/animales). Migración suave: un perfil
+ * viejo sin estos campos trae `forma:null`, `tamano:null`, `zonas:[]` y la
+ * escena no rompe. Estos campos NO alteran el `kind` (solo lo enriquecen).
+ *
  * @param {Object} profile — perfil del usuario (chagra:profile).
  * @param {Object} [opts]
  * @param {boolean} [opts.esGuiaGlaciar=false] — username en whitelist Cordada
  *   (lo resuelve el call-site con glaciarAccess, fuera de este módulo puro).
- * @returns {{ kind: string, escala: string, animales: boolean, cerdos: boolean, tinte: string }}
+ * @returns {{ kind: string, escala: string, animales: boolean, cerdos: boolean,
+ *   tinte: string, invernaderoForma: string|null, invernaderoTamano: string|null,
+ *   zonas: string[] }}
  */
 export function selectSceneVariant(profile, opts = {}) {
   const p = profile && typeof profile === 'object' ? profile : {};
   const tinte = deriveTinte(p);
+  const estructura = deriveEstructura(p);
 
   // 1. OVERRIDE DURO urbano → balcón. Sin animales/cerdos (un balcón no los
   // tiene). Gana sobre cualquier rol derivado, igual que homeModuleSelector.
@@ -207,6 +238,7 @@ export function selectSceneVariant(profile, opts = {}) {
       animales: false,
       cerdos: false,
       tinte,
+      ...estructura,
     };
   }
 
@@ -218,6 +250,7 @@ export function selectSceneVariant(profile, opts = {}) {
       animales: false,
       cerdos: false,
       tinte,
+      ...estructura,
     };
   }
 
@@ -232,6 +265,7 @@ export function selectSceneVariant(profile, opts = {}) {
       animales: false,
       cerdos: false,
       tinte,
+      ...estructura,
     };
   }
 
@@ -244,6 +278,7 @@ export function selectSceneVariant(profile, opts = {}) {
       animales: false,
       cerdos: false,
       tinte: SCENE_TINTES.paramo,
+      ...estructura,
     };
   }
 
@@ -256,5 +291,6 @@ export function selectSceneVariant(profile, opts = {}) {
     animales: profileTieneAnimales(p),
     cerdos: profileTieneCerdos(p),
     tinte,
+    ...estructura,
   };
 }
