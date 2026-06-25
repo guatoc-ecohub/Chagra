@@ -116,6 +116,7 @@ const DoomFincaScreen = lazy(() => import('./components/juego/DoomFincaScreen'))
 // feature flag VITE_FEATURE_EXTENSIONISTA + rol (ver config/extensionistaAccess).
 const ExtensionistaScreen = lazy(() => import('./components/ExtensionistaScreen'));
 import HomeRegionalGreeting from './components/HomeRegionalGreeting';
+import { fincaVivaHomePerfilActivo } from './config/fincaVivaHomeFlag';
 import { esExtensionistaActual } from './config/extensionistaAccess';
 
 localforage.config({
@@ -198,11 +199,30 @@ const DashboardLiveView = React.memo(function DashboardLiveView({ onNavigate, on
   const hydrate = useAssetStore((s) => s.hydrate);
   const syncFromServer = useAssetStore((s) => s.syncFromServer);
   const idle = useIdleDetection(12000);
+  // HOME "Finca Viva" por perfil (flag VITE_FINCA_VIVA_HOME_PERFIL). Con la flag
+  // ON, FincaVivaHero ES el home: trae su PROPIA barra superior (marca + chip de
+  // ubicación + ayuda/perfil) y su propio saludo. El shell inmersivo del agente
+  // (TopBar flotante legacy + scrim oscuro + capa biopunk) DUPLICABA esa barra y
+  // chocaba con la estética clara del F2 — se ven DOS "Chagra" apilados. Con la
+  // flag ON lo retiramos: una sola barra, un solo home cohesivo. Con la flag OFF
+  // (default, prod) todo queda intacto.
+  const fincaViva = fincaVivaHomePerfilActivo();
   useEffect(() => {
     hydrate().then(() => {
       if (navigator.onLine) syncFromServer(fetchFromFarmOS);
     });
   }, [hydrate, syncFromServer]);
+
+  if (fincaViva) {
+    // F2: el hero (FincaVivaHero, dentro de DashboardLive) gobierna el fondo, la
+    // barra y el saludo. Sin TopBar flotante ni scrim/biopunk oscuro encima — el
+    // "resto de la finca" fluye en una hoja clara bajo el hero (DashboardLive).
+    return (
+      <div className="relative h-[100dvh] w-full flex flex-col overflow-hidden bg-[#c8e8cb]">
+        <DashboardLive onNavigate={onNavigate} onLogout={onLogout} />
+      </div>
+    );
+  }
 
   return (
     // .app-scrim (scrim por token, spec 2026-06-05): antes bg-slate-950/55

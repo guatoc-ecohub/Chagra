@@ -238,7 +238,7 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
             <span className="block text-base font-black text-white">Defensores de la Finca</span>
             <span className="block text-sm text-teal-100/90 leading-snug">
               Corre y salta por la finca, recoge cultivos y suelta los bichos
-              buenos que controlan a las plagas. ¡Aprende control biológico!
+              buenos que controlan a las plagas. Así aprendes control biológico.
             </span>
           </span>
           <Sparkles size={22} className="text-teal-200 shrink-0" aria-hidden="true" />
