@@ -1,5 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Mic, BookOpen, Sprout, ChevronRight, Library, Bot, Database, Search, X } from 'lucide-react';
+import {
+  Mic, BookOpen, Sprout, ChevronRight, Library, Bot, Database, Search, X,
+  Leaf, CalendarDays, Store, HelpCircle, Gamepad2, MessageSquare,
+} from 'lucide-react';
 import HelpRegionSelector from './HelpRegionSelector.jsx';
 
 /**
@@ -12,9 +15,27 @@ import HelpRegionSelector from './HelpRegionSelector.jsx';
  *
  * El buscador NO usa IA: es un filtro de texto plano sobre título, resumen
  * y palabras clave de cada tema. Sin red, sin latencia, sin sorpresas.
+ *
+ * Actualización ola 1.1.0 (2026-06-25): la app se reorganizó en cuatro
+ * lugares (Gestionar / Aprender / Jugar / Agente) y estrenó directorio de
+ * especies, calendario de finca, mercado y FAQ. El Manual ahora:
+ *   - explica de entrada los cuatro lugares (mapa mental del campesino),
+ *   - ofrece atajos que ABREN esas pantallas nuevas (no solo las describen),
+ *   - mantiene los seis temas guía (voz/uso/ciclo/diccionario/agente/datos).
+ * Consistente con el FAQ groundeado (src/data/faqChagra.json, #1856).
+ *
+ * @param {Function} props.onSelect    cambia de sub-vista DENTRO del Manual.
+ * @param {Function} [props.onNavigate] cierra el Manual y abre una pantalla
+ *   real de la app (atajos a especies / calendario / mercados / faq...).
  */
-export default function HelpHomeScreen({ onSelect }) {
+export default function HelpHomeScreen({ onSelect, onNavigate }) {
   const [query, setQuery] = useState('');
+
+  // Atajos que SALEN del Manual hacia una pantalla real de la app (las
+  // rutas existen en App.jsx y son las mismas que usa el FAQ groundeado).
+  const go = (route) => {
+    if (typeof onNavigate === 'function') onNavigate(route);
+  };
 
   const cards = [
     {
@@ -47,8 +68,8 @@ export default function HelpHomeScreen({ onSelect }) {
       key: 'ciclo',
       icon: Sprout,
       title: 'Aprende sembrando',
-      sub: 'Lechuga, fresa, tomate y los próximos. Corpus consolidado y voz IA con guardrails.',
-      keywords: 'aprender sembrar cultivar ciclo lechuga fresa tomate germinar cosechar biopreparado bocashi compañeros',
+      sub: 'El ciclo de un cultivo paso a paso: germinar, crecer, florecer, cosechar. Con su fuente.',
+      keywords: 'aprender sembrar cultivar ciclo lechuga fresa tomate germinar cosechar floracion fenologia biopreparado bocashi compañeros perenne',
       accent: 'from-pink-900/40 to-rose-950/80',
       border: 'border-pink-600/40 hover:border-pink-400/70',
       iconBg: 'bg-pink-700/30 border-pink-500/40',
@@ -102,6 +123,93 @@ export default function HelpHomeScreen({ onSelect }) {
     },
   ];
 
+  // Los cuatro lugares de Chagra (home F2 "Finca Viva"): el mapa mental que
+  // un campesino nuevo necesita para no perderse. Cada uno abre una pantalla
+  // real. Mismos nombres que los portales del home (FincaVivaHero).
+  const lugares = [
+    {
+      key: 'gestionar',
+      icon: Sprout,
+      title: 'Gestionar',
+      sub: 'Registre y cuide sus siembras, zonas, animales y bitácora.',
+      route: 'juego',
+      iconColor: 'text-emerald-300',
+      ring: 'border-emerald-600/40 hover:border-emerald-400/70',
+    },
+    {
+      key: 'aprender',
+      icon: BookOpen,
+      title: 'Aprender',
+      sub: 'Suelo vivo, milpa, biopreparados, MIP y fenología. Cinco lecciones.',
+      route: 'aprende',
+      iconColor: 'text-amber-300',
+      ring: 'border-amber-600/40 hover:border-amber-400/70',
+    },
+    {
+      key: 'jugar',
+      icon: Gamepad2,
+      title: 'Jugar',
+      sub: 'Haga crecer su finca y defiéndala jugando: Mi Finca Viva.',
+      route: 'juego',
+      iconColor: 'text-pink-300',
+      ring: 'border-pink-600/40 hover:border-pink-400/70',
+    },
+    {
+      key: 'agente',
+      icon: MessageSquare,
+      title: 'Agente',
+      sub: 'Pregunte lo que sea por texto, voz o foto. Respuestas con su fuente.',
+      route: 'agente',
+      iconColor: 'text-sky-300',
+      ring: 'border-sky-600/40 hover:border-sky-400/70',
+    },
+  ];
+
+  // Atajos a las pantallas nuevas de la ola 1.1.0 (rutas reales, mismas que
+  // el FAQ groundeado). No describen: ABREN la pantalla.
+  const shortcuts = [
+    {
+      key: 'especies',
+      icon: Leaf,
+      title: 'Directorio de especies',
+      sub: 'Ficha de cada planta: piso térmico, asociaciones, plagas y biopreparados.',
+      keywords: 'especie especies catalogo catálogo directorio ficha planta cultivo piso termico térmico altitud asociaciones compañeras plaga biopreparado buscar',
+      route: 'especies',
+      iconColor: 'text-emerald-300',
+      ring: 'border-emerald-600/40 hover:border-emerald-400/70',
+    },
+    {
+      key: 'calendario',
+      icon: CalendarDays,
+      title: 'Calendario de finca',
+      sub: 'Cuándo sembrar, abonar, cuidar de plagas y cosechar, según su altitud.',
+      keywords: 'calendario fecha cuando sembrar cosechar abonar nutricion nutrición fenologia fenología mip plaga perenne mes temporada',
+      route: 'calendario',
+      iconColor: 'text-amber-300',
+      ring: 'border-amber-600/40 hover:border-amber-400/70',
+    },
+    {
+      key: 'mercados',
+      icon: Store,
+      title: 'Vender mi cosecha',
+      sub: 'Publique lo que produce y véndalo por circuitos cortos (WhatsApp).',
+      keywords: 'vender venta mercado marketplace cosecha precio circuito corto whatsapp comprador feria plaza',
+      route: 'mercados',
+      iconColor: 'text-rose-300',
+      ring: 'border-rose-600/40 hover:border-rose-400/70',
+    },
+    {
+      key: 'faq',
+      icon: HelpCircle,
+      title: 'Preguntas frecuentes',
+      sub: 'Una pregunta corta y le decimos dónde está la respuesta en la app.',
+      keywords: 'faq pregunta preguntas frecuentes duda respuesta donde dónde como cómo busco encuentro',
+      route: 'faq',
+      iconColor: 'text-violet-300',
+      ring: 'border-violet-600/40 hover:border-violet-400/70',
+    },
+  ];
+
   // Filtro de texto plano (sin IA). Normaliza tildes para que "camara"
   // encuentre "cámara". Vacío = muestra todas las tarjetas.
   const normalize = (s) =>
@@ -110,22 +218,68 @@ export default function HelpHomeScreen({ onSelect }) {
       .normalize('NFD')
       .replace(/[̀-ͯ]/g, '');
 
+  const matches = (c, terms) => {
+    const haystack = normalize(`${c.title} ${c.sub} ${c.keywords || ''}`);
+    return terms.every((t) => haystack.includes(t));
+  };
+
   const visibleCards = useMemo(() => {
     const q = normalize(query).trim();
     if (!q) return cards;
     const terms = q.split(/\s+/);
-    return cards.filter((c) => {
-      const haystack = normalize(`${c.title} ${c.sub} ${c.keywords || ''}`);
-      return terms.every((t) => haystack.includes(t));
-    });
+    return cards.filter((c) => matches(c, terms));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- cards es constante (definido arriba), no cambia por referencia
   }, [query]);
+
+  const visibleShortcuts = useMemo(() => {
+    const q = normalize(query).trim();
+    if (!q) return shortcuts;
+    const terms = q.split(/\s+/);
+    return shortcuts.filter((c) => matches(c, terms));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- shortcuts es constante (definido arriba)
+  }, [query]);
+
+  // "Sin resultados" solo si NI temas NI atajos coinciden.
+  const noResults = query && visibleCards.length === 0 && visibleShortcuts.length === 0;
 
   return (
     <main className="flex-1 p-4 max-w-2xl mx-auto w-full pb-12 flex flex-col gap-4">
       <p className="text-sm text-slate-300 leading-relaxed">
         Una mano rápida para entrar a Chagra. Toca lo que necesites o busca tu pregunta.
       </p>
+
+      {/* Mapa mental: los cuatro lugares de Chagra (home F2). Solo cuando no
+          hay búsqueda activa — es orientación, no un resultado buscable. */}
+      {!query && (
+        <section
+          aria-labelledby="lugares-chagra"
+          className="rounded-2xl border border-emerald-800/40 bg-gradient-to-br from-emerald-950/60 to-slate-950/70 p-4"
+        >
+          <p id="lugares-chagra" className="text-[11px] uppercase tracking-wider text-emerald-400/90 font-bold mb-1">
+            Chagra tiene cuatro lugares
+          </p>
+          <p className="text-xs text-slate-400 leading-relaxed mb-3">
+            En la pantalla de inicio (su finca dibujada) toca uno de estos lugares. Aquí los abre directo:
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            {lugares.map((l) => {
+              const Icon = l.icon;
+              return (
+                <button
+                  key={l.key}
+                  type="button"
+                  onClick={() => go(l.route)}
+                  className={`rounded-xl bg-slate-900/60 border ${l.ring} active:scale-[0.99] transition-all p-3 text-left flex flex-col gap-1.5 min-h-[96px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60`}
+                >
+                  <Icon size={22} className={`${l.iconColor} shrink-0`} />
+                  <p className="text-sm font-black text-slate-100 leading-tight">{l.title}</p>
+                  <p className="text-[11px] text-slate-400 leading-snug">{l.sub}</p>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Buscador simple (filtro de texto, sin IA) */}
       <div className="relative">
@@ -149,6 +303,43 @@ export default function HelpHomeScreen({ onSelect }) {
           </button>
         )}
       </div>
+
+      {/* Atajos a las pantallas nuevas (abren la app, no describen). */}
+      {visibleShortcuts.length > 0 && (
+        <div className="flex flex-col gap-2">
+          {!query && (
+            <p className="text-[11px] uppercase tracking-wider text-slate-500 font-bold mt-1">
+              Ir directo a…
+            </p>
+          )}
+          {visibleShortcuts.map((s) => {
+            const Icon = s.icon;
+            return (
+              <button
+                key={s.key}
+                type="button"
+                onClick={() => go(s.route)}
+                className={`rounded-xl bg-slate-900/60 border ${s.ring} active:scale-[0.99] transition-all p-4 text-left flex items-center gap-3 min-h-[72px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60`}
+              >
+                <span className="shrink-0 inline-flex items-center justify-center w-11 h-11 rounded-lg bg-slate-800/60 border border-slate-700/60">
+                  <Icon size={22} className={s.iconColor} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-black text-slate-100 leading-tight">{s.title}</p>
+                  <p className="text-[11px] text-slate-400 leading-snug mt-0.5">{s.sub}</p>
+                </div>
+                <ChevronRight size={18} className="shrink-0 text-slate-500" />
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {visibleCards.length > 0 && !query && (
+        <p className="text-[11px] uppercase tracking-wider text-slate-500 font-bold mt-1">
+          Guías y temas
+        </p>
+      )}
 
       <div className="flex flex-col gap-3">
         {visibleCards.map((c) => {
@@ -174,7 +365,7 @@ export default function HelpHomeScreen({ onSelect }) {
       </div>
 
       {/* Sin resultados: invita a reportar en lugar de dejar pantalla vacía */}
-      {query && visibleCards.length === 0 && (
+      {noResults && (
         <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-5 text-center">
           <p className="text-sm text-slate-300 leading-relaxed">
             No encontramos un tema con esa palabra.
@@ -182,8 +373,8 @@ export default function HelpHomeScreen({ onSelect }) {
           <p className="text-xs text-slate-500 leading-relaxed mt-1.5">
             Prueba con otra (ej. <strong className="text-slate-300">datos</strong>,{' '}
             <strong className="text-slate-300">voz</strong>,{' '}
-            <strong className="text-slate-300">cosecha</strong>) o usa el botón
-            flotante 💬 para preguntarnos directo.
+            <strong className="text-slate-300">cosecha</strong>) o repórtalo en{' '}
+            <strong className="text-slate-300">Cómo usar Chagra → Reportar problema</strong>.
           </p>
         </div>
       )}
@@ -194,7 +385,7 @@ export default function HelpHomeScreen({ onSelect }) {
       )}
 
       <p className="text-[11px] text-slate-600 text-center mt-4 italic leading-relaxed">
-        Si algo no está aquí, toca el botón flotante 💬 para reportarlo. La app aprende contigo.
+        Si algo no está aquí, repórtalo desde el tema de uso → &ldquo;Reportar problema&rdquo;. La app aprende contigo.
       </p>
     </main>
   );

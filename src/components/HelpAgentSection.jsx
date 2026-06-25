@@ -93,10 +93,17 @@ export default function HelpAgentSection({ onBackToHome, onNavigate }) {
             </p>
             <p>
               Para conversar usa un modelo de inteligencia artificial abierto
-              llamado <strong className="text-sky-300">Granite 3.1</strong> (de
-              IBM) que corre en nuestros servidores en Colombia. Lo anclamos al
-              catálogo: si un dato no está en las fichas, el agente lo dice en
-              vez de inventarlo.
+              llamado <strong className="text-sky-300">Granite 3.3</strong> (de
+              IBM) que corre en nuestros servidores en Colombia, con energía
+              solar. Lo anclamos a un catálogo de especies y a un mapa de
+              relaciones entre ellas: si un dato no está ahí, el agente lo dice
+              en vez de inventarlo.
+            </p>
+            <p>
+              Le puede escribir, hablarle (toca el micrófono) o mandarle una
+              foto. Vive en el lugar <strong className="text-sky-300">Agente</strong>{' '}
+              del inicio, y también aparece como burbuja para preguntarle desde
+              cualquier pantalla.
             </p>
           </div>
         </section>
@@ -127,8 +134,10 @@ export default function HelpAgentSection({ onBackToHome, onNavigate }) {
                 </p>
                 <p className="text-xs text-slate-400 mt-1">
                   Ejemplo: pregúntale &ldquo;qué plantas van con el
-                  café&rdquo; y te responde con datos del catálogo Chagra (263
-                  especies curadas a la fecha, incluidas 60 de páramo).
+                  café&rdquo; y te responde con datos del catálogo Chagra (más
+                  de 700 especies curadas a la fecha, incluidas plantas de
+                  páramo). Para ver la ficha completa de una planta, entra al{' '}
+                  <strong className="text-emerald-300">Directorio de especies</strong>.
                 </p>
               </div>
             </li>
@@ -144,8 +153,10 @@ export default function HelpAgentSection({ onBackToHome, onNavigate }) {
                   agroecológicos (caldos, abonos, repelentes naturales).
                 </p>
                 <p className="text-xs text-slate-400 mt-1">
-                  Fuente: 36 biopreparados curados con literatura y prácticas
-                  campesinas registradas. Cita la fuente cuando la tiene.
+                  Fuente: biopreparados curados con literatura y prácticas
+                  campesinas registradas. Cuando tiene la dosis y la frecuencia,
+                  te las dice; cuando no, lo confiesa. Cita la fuente cuando la
+                  tiene.
                 </p>
               </div>
             </li>
@@ -174,7 +185,12 @@ export default function HelpAgentSection({ onBackToHome, onNavigate }) {
               <div>
                 <p>
                   <strong>Te recuerda fechas importantes</strong> de siembra y
-                  cosecha según la especie y tu zona térmica.
+                  cosecha según la especie y tu altitud.
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
+                  Todo eso reunido lo ves en el{' '}
+                  <strong className="text-amber-300">Calendario de finca</strong>:
+                  cuándo sembrar, abonar, cuidar de plagas y cosechar.
                 </p>
               </div>
             </li>
@@ -282,10 +298,19 @@ export default function HelpAgentSection({ onBackToHome, onNavigate }) {
                 className="text-rose-400 mt-1 shrink-0"
                 aria-hidden="true"
               />
-              <p>
-                <strong>NO sabe los precios del mercado</strong> en tiempo
-                real. Todavía no. Algún día tal vez.
-              </p>
+              <div>
+                <p>
+                  <strong>NO te dice un precio de venta exacto</strong> ni el
+                  precio del mercado en tiempo real. Esa parte aún está en
+                  construcción.
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
+                  Lo que SÍ puedes hacer: publicar tu cosecha y venderla por
+                  circuitos cortos en el{' '}
+                  <strong className="text-rose-300">Mercado de la finca</strong>{' '}
+                  (lugar Gestionar → Vender). El precio lo pones tú.
+                </p>
+              </div>
             </li>
             <li className="flex items-start gap-2">
               <XCircle
@@ -374,9 +399,11 @@ export default function HelpAgentSection({ onBackToHome, onNavigate }) {
           </h3>
           <ul className="space-y-3 text-sm text-slate-200 leading-relaxed">
             <li>
-              <strong>El catálogo abierto tiene 263 especies hoy</strong>{' '}
-              (incluidas 60 de páramo). Si tu planta no está, el agente te lo
-              dirá. Crece con aportes de la comunidad.
+              <strong>El catálogo abierto tiene más de 700 especies hoy</strong>{' '}
+              (incluidas plantas de páramo), conectadas por más de doce mil
+              relaciones (qué se lleva con qué, qué controla qué plaga). Si tu
+              planta no está, el agente te lo dirá. Crece con aportes de la
+              comunidad.
             </li>
             <li>
               <strong>El modelo se equivoca</strong> en cierto porcentaje de
