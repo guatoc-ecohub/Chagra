@@ -109,6 +109,7 @@ const TopBar = lazy(() => import('./components/TopBar'));
 const DashboardLive = lazy(() => import('./components/dashboard/DashboardLive'));
 const AprenderConAgente = lazy(() => import('./components/Aprende/AprenderConAgente'));
 const DirectorioEspeciesScreen = lazy(() => import('./components/DirectorioEspecies/DirectorioEspeciesScreen'));
+const MercadosScreen = lazy(() => import('./components/MercadosScreen'));
 const HoyEnFincaScreen = lazy(() => import('./components/hoy/HoyEnFincaScreen'));
 const MiFincaEvolucionScreen = lazy(() => import('./components/hoy/MiFincaEvolucionScreen'));
 const MiFincaVivaScreen = lazy(() => import('./components/juego/MiFincaVivaScreen'));
@@ -189,7 +190,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'toxicologia', 'aprende', 'directorio',
+  'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'toxicologia', 'aprende', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia',
   'usage_stats',
@@ -1147,7 +1148,29 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Aprende con el agente">
-              <AprenderConAgente onBack={() => navigate('dashboard')} />
+              <AprenderConAgente
+                onBack={() => navigate('dashboard')}
+                onAskAgent={(pregunta) =>
+                  navigate('agente', { prefilledPrompt: pregunta })
+                }
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mercados':
+        // Rama "Vender" de la mano de Chagra (auditoría UX §7.4 P3): superficie
+        // HONESTA "en preparación" — alcanzable, no un dead-end. Explica el
+        // estado real de la consulta de precios y orienta a las fuentes públicas
+        // (DANE/SIPSA, centrales de abasto). onAskAgent puentea al agente.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Vender mejor">
+              <MercadosScreen
+                onBack={() => navigate('dashboard')}
+                onAskAgent={(pregunta) =>
+                  navigate('agente', { prefilledPrompt: pregunta })
+                }
+              />
             </ErrorFallback>
           </ErrorBoundary>
         );

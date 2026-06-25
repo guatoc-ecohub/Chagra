@@ -32,7 +32,8 @@
         "tipo": "advertencia",
         "texto": "El pH del suelo no se mide con vinagre y bicarbonato. Esa prueba solo reacciona con carbonatos masivos (suelos con pH mayor que 7,5), y en los suelos andinos la acidez viene del aluminio, que no se detecta así. Usa tiras de pH o un medidor calibrado."
       }
-    ]
+    ],
+    "pregunta_agente": "¿Cómo puedo mejorar la vida de mi suelo de forma natural?"
   },
   {
     "slug": "asociaciones",
@@ -68,7 +69,8 @@
         "texto": "Franjas florales bien diseñadas reducen los áfidos en cultivos adyacentes hasta un 75 % y aumentan los huevos de insectos benéficos (sírfidos, crisopas) en más del 100 %.",
         "fuente": "Tschumi et al. (2016), Journal of Applied Ecology, DOI 10.1111/1365-2664.12653"
       }
-    ]
+    ],
+    "pregunta_agente": "¿Qué plantas puedo asociar para que se ayuden entre sí?"
   },
   {
     "slug": "biopreparados",
@@ -98,7 +100,8 @@
         "tipo": "texto",
         "texto": "El caldo bordelés (sulfato de cobre + cal + agua) se usa como fungicida en agroecología, pero el cobre es tóxico para las abejas en dosis alta y no se aplica en floración. Es un caso especial que requiere orientación técnica."
       }
-    ]
+    ],
+    "pregunta_agente": "¿Qué biopreparado casero me sirve y cómo lo preparo?"
   },
   {
     "slug": "mip",
@@ -128,7 +131,8 @@
         "tipo": "advertencia",
         "texto": "Chagra no recomienda agroquímicos sintéticos. Si la situación es grave y necesitas ese tipo de producto, busca orientación de un agrónomo certificado. El agente puede orientarte sobre biopreparados y control biológico documentados."
       }
-    ]
+    ],
+    "pregunta_agente": "¿Cómo manejo una plaga sin químicos paso a paso?"
   },
   {
     "slug": "fenologia",
@@ -159,6 +163,7 @@
         "tipo": "texto",
         "texto": "El frijol es especialmente vulnerable al estrés hídrico en la floración (etapa R6). Mantener humedad adecuada esa semana puede salvar la cosecha."
       }
-    ]
+    ],
+    "pregunta_agente": "¿En qué etapa está mi cultivo y qué debo cuidar ahora?"
   }
 ]

@@ -118,6 +118,11 @@ import ManoChagraGlyph from '../dashboard/ManoChagraGlyph';
 // mano (operador 2026-06-18). Misma fuente que TopBar.jsx / AgentHero.jsx.
 import { useTheme } from '../../hooks/useTheme';
 import { iconForTheme } from '../dashboard/themeIcon';
+// Agente guiado: selección PURA de un insight verificado proactivo a partir del
+// texto del turno (cultivo detectado → dato con fuente que el usuario no vio).
+// El hook useInsightProactivo exporta estas funciones puras; aquí las usamos
+// imperativamente al cerrar cada turno para ofrecer el insight DENTRO del chat.
+import { detectarSlugEnTexto, elegirInsight } from '../../hooks/useInsightProactivo';
 import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
 import useAgentNotificationStore from '../../store/useAgentNotificationStore';
@@ -189,6 +194,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   const activeAlerts = useAlertStore((s) => s.activeAlerts);
 
   const [messages, setMessages] = useState([]);
+  // Agente guiado: ids de insights ya ofrecidos/vistos en esta sesión de chat,
+  // para no repetir el mismo dato en turnos sucesivos. Ref (no state): solo lo
+  // lee/escribe la lógica de cierre de turno; no debe re-renderizar.
+  const insightsVistosRef = useRef([]);
   const [inputText, setInputText] = useState('');
   const [state, setState] = useState(STATE_IDLE);
   // Compositor inline (foto adjuntada directamente en AgentScreen, sin outbox).
@@ -2032,12 +2041,36 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // tocó relaciones del grafo → [] (sin regresión).
       const turnEdges = extractEdges(toolEvidence);
 
+      // AGENTE GUIADO (auditoría UX §7.4 P3): ofrecer un insight verificado
+      // proactivo DENTRO de la conversación. Detectamos el cultivo en el texto
+      // del turno (pregunta del usuario + respuesta del agente) y elegimos un
+      // dato con fuente que el usuario aún no ha visto en esta sesión. Si no hay
+      // cultivo o ya se ofrecieron todos, no se adjunta nada (sin regresión).
+      // La OFERTA es opt-in: la tarjeta en el chat pide confirmación antes de
+      // expandir el dato. Funciones puras (detectarSlugEnTexto/elegirInsight).
+      let insightProactivo = null;
+      try {
+        const textoTurno = `${text || ''} ${response || ''}`;
+        const slug = detectarSlugEnTexto(textoTurno);
+        if (slug) {
+          const candidato = elegirInsight(slug, insightsVistosRef.current);
+          if (candidato && candidato.id) {
+            insightProactivo = candidato;
+            insightsVistosRef.current = [...insightsVistosRef.current, candidato.id];
+          }
+        }
+      } catch (e) {
+        // El insight es secundario: jamás debe romper la respuesta del agente.
+        console.warn('[Agent] insight proactivo no disponible (continuo):', e?.message);
+      }
+
       const assistantMessage = {
         role: 'assistant',
         content: response,
         timestamp: Date.now(),
         metadata: sourceMetadata,
         _edges: turnEdges,
+        ...(insightProactivo ? { _insightProactivo: insightProactivo } : {}),
       };
 
       await addTurn(operatorId, {
@@ -2299,6 +2332,20 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       prev.map((m) =>
         m.id === msgId && m._deepResearch
           ? { ...m, _deepResearch: { ...m._deepResearch, status: 'error' } }
+          : m,
+      ),
+    );
+  }, []);
+
+  // AGENTE GUIADO: descartar la oferta de insight proactivo de un turno ("Ahora
+  // no"). ChatHistory pasa la clave del mensaje (id o índice de render). Quitamos
+  // el flag _insightProactivo de ese mensaje para que la tarjeta desaparezca sin
+  // tocar el resto de la conversación.
+  const handleDismissInsight = useCallback((key) => {
+    setMessages((prev) =>
+      prev.map((m, i) =>
+        (m.id != null ? m.id === key : i === key) && m._insightProactivo
+          ? (() => { const { _insightProactivo, ...rest } = m; void _insightProactivo; return rest; })()
           : m,
       ),
     );
@@ -3117,6 +3164,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         onConsentNeeded={handleFeedbackConsentNeeded}
         onRetryOrphan={handleRetryOrphan}
         onCancelDeepResearch={handleCancelDeepResearch}
+        onDismissInsight={handleDismissInsight}
         proactiveGreeting={proactiveGreeting}
         onBack={onBack}
       />

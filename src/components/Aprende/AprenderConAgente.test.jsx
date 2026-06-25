@@ -17,6 +17,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import AprenderConAgente, { AprenderEntryCard } from './AprenderConAgente.jsx';
 import { detectarSlugEnTexto, elegirInsight } from '../../hooks/useInsightProactivo.js';
 import todasLasCards from '../../data/agro-insight-cards.json';
+import lecciones from '../../data/agro-lecciones.json';
 
 // --- Card de entrada ---
 
@@ -226,5 +227,40 @@ describe('elegirInsight', () => {
         expect(resultado.non_co).toBe(false);
       }
     }
+  });
+});
+
+// --- Aprender → Agente: botón "Pregúntale al agente" (cableado) ---
+
+describe('AprenderConAgente — Pregúntale al agente (Aprender → Agente)', () => {
+  it('cada lección tiene una pregunta_agente no vacía', () => {
+    for (const leccion of lecciones) {
+      expect(typeof leccion.pregunta_agente).toBe('string');
+      expect(leccion.pregunta_agente.trim().length).toBeGreaterThan(8);
+    }
+  });
+
+  it('muestra el botón "Pregúntale al agente" dentro de una lección', () => {
+    render(<AprenderConAgente onAskAgent={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('leccion-card-suelo'));
+    expect(screen.getAllByTestId('preguntale-al-agente').length).toBeGreaterThan(0);
+  });
+
+  it('clic en el botón llama onAskAgent con la pregunta de la lección', () => {
+    const onAskAgent = vi.fn();
+    render(<AprenderConAgente onAskAgent={onAskAgent} />);
+    fireEvent.click(screen.getByTestId('leccion-card-suelo'));
+
+    const leccionSuelo = lecciones.find((l) => l.slug === 'suelo');
+    fireEvent.click(screen.getAllByTestId('preguntale-al-agente')[0]);
+
+    expect(onAskAgent).toHaveBeenCalledTimes(1);
+    expect(onAskAgent).toHaveBeenCalledWith(leccionSuelo.pregunta_agente);
+  });
+
+  it('NO muestra el botón si no se pasa onAskAgent (degrada limpio)', () => {
+    render(<AprenderConAgente />);
+    fireEvent.click(screen.getByTestId('leccion-card-suelo'));
+    expect(screen.queryByTestId('preguntale-al-agente')).toBeNull();
   });
 });
