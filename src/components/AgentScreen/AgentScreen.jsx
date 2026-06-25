@@ -45,7 +45,7 @@ import { createStreamDeadline } from '../../services/streamDeadline';
 // Sidecar agro-mcp (ADR-045 Fase 2 Step B/C). Detrás de feature flag
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
-import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, biopreparadoGrounding, postValidate, getClimaIdeam } from '../../services/sidecarClient';
+import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, biopreparadoGrounding, postValidate, getClimaIdeam, isToolAllowed } from '../../services/sidecarClient';
 // CHIPS DE MODO (A3/A4, decisión operador 2026-06-02): el router PURO mapea
 // la intención forzada del chip → tool determinístico, SALTANDO el NLU
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
@@ -1645,6 +1645,27 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
                 latencyChain: Math.round(tTool1 - tTool0),
               });
             }
+          } else if (plan?.useTool && plan.tool && plan.args && !isToolAllowed(plan.tool)) {
+            // GUARD ALLOW-LIST (fix grounding P0 2026-06-24). El NLU planner
+            // conoce 41 tools, pero el cliente solo expone ~20 (ver ALLOWED_TOOLS
+            // en sidecarClient). Si el planner rutea a una NO expuesta,
+            // `callTool` la rechazaría con `{_error, reason:'not_allowed'}`,
+            // indistinguible de un fallo transitorio de red — y el turno
+            // degradaba a RAG SIN grounding en SILENCIO. Lo detectamos ANTES de
+            // llamar y lo manejamos EXPLÍCITO y OBSERVABLE: NO disparamos el
+            // tool (evitamos el roundtrip + el bloque "ERROR DE CONSULTA"
+            // engañoso) y dejamos `toolEvidence` en null para que el turno
+            // siga con el grounding disponible (entidades resueltas + RAG),
+            // marcando la ruta para telemetría. NO exponemos las 41 a ciegas:
+            // algunas (get_cultivos_viables, get_diseno_finca) se EXCLUYEN a
+            // propósito para evitar misrouting ("FIX P0 audit 2026-06-23").
+            // TODO: sincronizar allow-list cliente vs 41 del NLU (decisión consciente).
+            nluRoute = `nlu:not_allowed:${plan.tool}`;
+            console.warn('[sidecar] NLU ruteó a tool NO expuesta por el cliente — degradación transparente a RAG/entidades (sin callTool)', {
+              tool: plan.tool,
+              latencyNlu: Math.round(tNlu1 - tNlu0),
+              reason: 'tool_not_in_client_allowlist',
+            });
           } else if (plan?.useTool && plan.tool && plan.args) {
             const tTool0 = performance.now();
             const result = await callTool(plan.tool, plan.args);

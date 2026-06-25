@@ -73,7 +73,9 @@ const CHIP_REGISTRY = [
     label: 'Calendario',
     emoji: '📅',
     kind: 'tool',
-    tool: 'get_species',
+    // fix grounding P0 2026-06-24: el chip ahora routea al tool dedicado
+    // get_calendario_siembra (vivo en el sidecar), no a get_species.
+    tool: 'get_calendario_siembra',
     stub: false,
     deep: false,
   },
@@ -198,6 +200,7 @@ describe('agentCapabilities — cada tool del chip está en ALLOWED_TOOLS', () =
       'validate_visual_match', 'validate_taxonomy',
       'get_normativa_ica', 'get_clima_ideam', 'get_precio_sipsa',
       'get_enso_status', 'get_alertas_clima_zona',
+      'get_calendario_siembra',
     ]);
     for (const entry of CHIP_REGISTRY) {
       if (entry.tool) {
