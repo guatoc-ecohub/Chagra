@@ -90,6 +90,7 @@ const LocationDetectedScreen = lazy(() => import('./components/LocationDetectedS
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
 const PlantaPorVozScreen = lazy(() => import('./components/PlantaPorVozScreen'));
 const ProcesosPorVozScreen = lazy(() => import('./components/ProcesosPorVozScreen'));
+const RegistroVozScreen = lazy(() => import('./components/RegistroVozScreen'));
 const CicloCultivoScreen = lazy(() => import('./components/CicloCultivoScreen'));
 const GerminacionScreen = lazy(() => import('./components/GerminacionScreen'));
 const CicloNutrientesScreen = lazy(() => import('./components/CicloNutrientesScreen'));
@@ -193,7 +194,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'toxicologia', 'aprende', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'toxicologia', 'aprende', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia',
   'usage_stats', 'mercado',
@@ -1065,6 +1066,15 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ProcesosPorVozScreen onBack={() => navigate('dashboard')} onSave={showToast} />
+          </ErrorBoundary>
+        );
+      case 'registro_voz':
+        // BOTÓN ÚNICO DE VOZ (#23): entrada principal voz-first que clasifica
+        // la intención entre TODOS los tipos y extrae los campos. Es el
+        // "guardar lo que hago" de la mano radial (reemplaza "procesos por voz").
+        return (
+          <ErrorBoundary>
+            <RegistroVozScreen onBack={() => navigate('dashboard')} onSave={showToast} />
           </ErrorBoundary>
         );
       case 'ciclo':
