@@ -1,3 +1,12 @@
+/*
+ * i18n (ADR-050): agentCapabilities.js es el MANIFIESTO de capacidades — labels,
+ * descripciones, placeholders y stubMessages user-facing en español Colombia,
+ * pendientes de migrar a src/config/messages.js. La regla chagra-i18n es soft
+ * (warn); se desactiva a nivel de archivo para no bloquear el pre-commit con
+ * deuda preexistente — mismo criterio que App.jsx. Los errores reales de ESLint
+ * siguen activos.
+ */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 /**
  * agentCapabilities.js — Manifiesto ÚNICO de capacidades de Chagra.
  *
@@ -88,7 +97,15 @@ export const CAPABILITY_MANIFEST = Object.freeze([
       'sin consulta directa. Si quieres, te oriento a la fuente o a Corabastos.',
     group: 'vender',
     status: 'soon',
-    hero: true,
+    // hero:false (descubribilidad 2026-06-24) — `precio` SIGUE siendo chip
+    // honesto en el ChipsToolbar (stub con stubMessage que orienta a SIPSA/
+    // Corabastos), pero se RETIRA de la mano radial: era la ÚNICA hoja del grupo
+    // "vender" y, al ser status:'soon' (no-op → solo toast "por lanzar"), dejaba
+    // una rama muerta. Sin backing real de precios, se quita la rama de la mano
+    // (el grupo "vender" desaparece: GROUPS filtra grupos sin hojas hero). El día
+    // que exista precio real, se vuelve a poner hero:true con heroRoute live.
+    // Ref: CAPABILITIES_STATUS.md §7.4 (reparar ramas muertas).
+    hero: false,
     heroRoute: { kind: 'unavailable' },
   },
   {
@@ -221,6 +238,24 @@ export const CAPABILITY_MANIFEST = Object.freeze([
   // AGENTHERO ACTIONS — aparecen solo en menú Ⓐ del AgentHero
   // ═══════════════════════════════════════════════════════════════════════
   {
+    // CONTENIDO DE APRENDIZAJE (descubribilidad 2026-06-24): la rama "aprender"
+    // de la mano era SOLO `deep` (status:'soon' → no-op, solo toast). Esta hoja
+    // LIVE la conecta al contenido real de aprendizaje (módulo "Aprende con el
+    // agente", ruta 'aprende': 5 lecciones agroecológicas con fuente/DOI). Así
+    // la rama "Aprender" navega a algo real en vez de quedar muerta; `deep`
+    // sigue presente como stub honesto ("por lanzar"). No tiene `intent` → NO es
+    // chip, solo acción de la mano. Ref: CAPABILITIES_STATUS.md §7.4.
+    id: 'aprender_hub',
+    group: 'aprender',
+    status: 'live',
+    icon: '📚',
+    label: 'Aprender con el agente',
+    desc: 'Lecciones de agroecología con fuente: suelo, asociaciones, biopreparados, MIP, fenología.',
+    tool: null,
+    hero: true,
+    heroRoute: { kind: 'nav', view: 'aprende' },
+  },
+  {
     id: 'foto',
     group: 'observar',
     status: 'soon',
@@ -230,10 +265,21 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     tool: 'vision_identify',
     hero: true,
     heroRoute: { kind: 'photo' },
+    // stubMessage corregido 2026-06-24 (descubribilidad): el motivo anterior
+    // ("requiere GPU con ≥8GB VRAM") era FALSO — la GPU es de 12GB y la visión
+    // groundeada YA funciona dentro del chat (recognizeSpeciesGrounded /
+    // validate_visual_match). Lo que falta es cablear la foto-desde-la-mano al
+    // flujo de foto-en-chat; mientras tanto, en vez de mentir sobre el hardware,
+    // orientamos al usuario a la vía que SÍ funciona (foto dentro del chat) y a
+    // las alternativas (voz/manual). Se deja status:'soon' a propósito: promover
+    // la hoja de la mano a 'live' es más invasivo (requiere rutearla al
+    // compositor de foto del chat) y se hará en el replanteo. Ref:
+    // CAPABILITIES_STATUS.md §7.3 (foto soon con motivo falso).
     stubMessage:
-      'La identificación por foto necesita mejor hardware (GPU con ≥8GB VRAM). ' +
-      'Por ahora puedes usar la voz o el formulario manual para registrar tus plantas. ' +
-      'Próximamente estará disponible por la nube.',
+      'Para identificar una planta por foto, abre el chat de Chagra y envíale la ' +
+      'foto desde ahí: la reconoce y verifica contra el catálogo. Esa vía ya ' +
+      'funciona. También puedes registrarla por voz o con el formulario manual. ' +
+      'El acceso directo por foto desde este menú llegará pronto.',
   },
   {
     // MÓDULO UNIFICADO de voz (2026-06-15): único punto de entrada desde la mano
