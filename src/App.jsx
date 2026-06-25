@@ -107,6 +107,7 @@ const HelpManual = lazy(() => import('./components/HelpManual'));
 const TopBar = lazy(() => import('./components/TopBar'));
 const DashboardLive = lazy(() => import('./components/dashboard/DashboardLive'));
 const AprenderConAgente = lazy(() => import('./components/Aprende/AprenderConAgente'));
+const DirectorioEspeciesScreen = lazy(() => import('./components/DirectorioEspecies/DirectorioEspeciesScreen'));
 const HoyEnFincaScreen = lazy(() => import('./components/hoy/HoyEnFincaScreen'));
 const MiFincaEvolucionScreen = lazy(() => import('./components/hoy/MiFincaEvolucionScreen'));
 const MiFincaVivaScreen = lazy(() => import('./components/juego/MiFincaVivaScreen'));
@@ -173,6 +174,9 @@ const HASH_VIEW_ROUTES = {
   toxicologia: 'toxicologia',
   suelo: 'suelo',
   aprende: 'aprende',
+  directorio: 'directorio',
+  'directorio-especies': 'directorio',
+  especies: 'directorio',
   'usage-stats': 'usage_stats',
 };
 
@@ -183,7 +187,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas',
   'hoy_finca', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'toxicologia', 'aprende',
+  'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'toxicologia', 'aprende', 'directorio',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia',
   'usage_stats',
@@ -1142,6 +1146,22 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Aprende con el agente">
               <AprenderConAgente onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'directorio':
+        // Directorio de especies: explorador visual del catálogo. Buscador con
+        // resolución de nombre (matcher canónico del proyecto) + ficha grounded
+        // por especie (foto, piso térmico, asociaciones, biopreparados,
+        // plagas/control biológico, saberes), todo offline-first desde
+        // catalog.sqlite + grafo-relations.json. initialQuery vía deep-link.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Directorio de especies">
+              <DirectorioEspeciesScreen
+                onBack={() => navigate('dashboard')}
+                initialQuery={currentViewData?.query || ''}
+              />
             </ErrorFallback>
           </ErrorBoundary>
         );
