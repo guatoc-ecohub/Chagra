@@ -93,6 +93,7 @@ const ProcesosPorVozScreen = lazy(() => import('./components/ProcesosPorVozScree
 const CicloCultivoScreen = lazy(() => import('./components/CicloCultivoScreen'));
 const GerminacionScreen = lazy(() => import('./components/GerminacionScreen'));
 const CicloNutrientesScreen = lazy(() => import('./components/CicloNutrientesScreen'));
+const CalendarioFincaScreen = lazy(() => import('./components/CalendarioFincaScreen'));
 const SeguimientoProcesoScreen = lazy(() => import('./components/SeguimientoProcesoScreen'));
 const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
 const CromatografiaScreen = lazy(() => import('./components/CromatografiaScreen'));
@@ -161,6 +162,8 @@ const HASH_VIEW_ROUTES = {
   cromatografia: 'cromatografia',
   germinacion: 'germinacion',
   'ciclo-nutrientes': 'ciclo_nutrientes',
+  calendario: 'calendario_finca',
+  'calendario-finca': 'calendario_finca',
   animales: 'animales',
   'animales-gallinas': 'animales_gallinas',
   'animales-abejas': 'animales_abejas',
@@ -179,7 +182,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas',
   'hoy_finca', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'suelo', 'toxicologia', 'aprende',
+  'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'toxicologia', 'aprende',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia',
   'usage_stats',
@@ -1068,6 +1071,25 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Ciclo de Nutrientes">
               <CicloNutrientesScreen
+                onBack={() => navigate('dashboard')}
+                onHome={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'calendario_finca':
+        // Módulo CALENDARIO DE FINCA: UN SOLO calendario que UNIFICA por planta
+        // (ciclos de la finca, o especies del catálogo si no hay finca) las
+        // fases y tareas que viven dispersas: fenología (phenologyCalculator),
+        // nutrición (feedingPlanGeneric / feeding_plan del catálogo), siembra,
+        // cosecha, sanidad por etapa (climateCycleService) y ciclo perenne
+        // (perennialCalculator). Todo groundeado (farmCalendarService) — sin
+        // inventar fechas; deflexión honesta cuando no hay datos.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Calendario de Finca">
+              <CalendarioFincaScreen
                 onBack={() => navigate('dashboard')}
                 onHome={() => navigate('dashboard')}
                 onNavigate={navigate}
