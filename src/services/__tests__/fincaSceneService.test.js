@@ -199,6 +199,30 @@ describe('fincaSceneService — buildFincaScene (datos reales)', () => {
     expect(cafe.etiquetaEtapa).toBe('Florecida');
   });
 
+  it('deriva el TIPO botánico de cada lote (frutal/hortaliza/aromatica)', () => {
+    const s = buildFincaScene({
+      processes: [
+        proc({ id: 'p1', stage: 'flowering', slug: 'fragaria_ananassa', label: 'Fresa' }),
+        proc({ id: 'p2', stage: 'fruiting', slug: 'persea_americana', label: 'Aguacate' }),
+        proc({ id: 'p3', stage: 'sowing_confirmed', slug: 'lactuca_sativa', label: 'Lechuga' }),
+        proc({ id: 'p4', stage: 'vegetative', slug: 'rosmarinus_officinalis', label: 'Romero' }),
+      ],
+    });
+    const byNombre = Object.fromEntries(s.lotes.map((l) => [l.nombre, l.tipo]));
+    expect(byNombre.Fresa).toBe('frutal');
+    expect(byNombre.Aguacate).toBe('frutal');
+    expect(byNombre.Lechuga).toBe('hortaliza');
+    expect(byNombre.Romero).toBe('aromatica');
+  });
+
+  it('cada lote SIEMPRE trae un tipo (nunca undefined)', () => {
+    const s = buildFincaScene({
+      processes: [proc({ id: 'p1', slug: 'especie_rara_xyz', label: 'Rara' })],
+    });
+    expect(s.lotes[0].tipo).toBeDefined();
+    expect(['frutal', 'hortaliza', 'aromatica', 'otro']).toContain(s.lotes[0].tipo);
+  });
+
   it('acepta procesos anidados en .attributes (shape real)', () => {
     const s = buildFincaScene({ processes: [procAnidado({ id: 'p1' })] });
     expect(s.lotes).toHaveLength(1);

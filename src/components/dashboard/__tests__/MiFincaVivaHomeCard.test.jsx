@@ -48,10 +48,15 @@ describe('MiFincaVivaHomeCard', () => {
     });
   });
 
-  it('con cultivos → muestra escena y vitalidad real', async () => {
+  it('con cultivos → muestra la escena RICA (tipo×fase) y vitalidad real', async () => {
     listFarmProcessesMock.mockResolvedValue(fincaConCultivos());
     render(<MiFincaVivaHomeCard />);
-    expect(await screen.findByTestId('finca-scene-2d')).toBeInTheDocument();
+    // #34 fase 2: la escena rica (FincaWorldScene en modo 'rica') es la visible.
+    const escena = await screen.findByTestId('finca-world-scene');
+    expect(escena).toBeInTheDocument();
+    expect(escena.getAttribute('data-modo')).toBe('rica');
+    // aria-label honesto del estado real (café florecido + maíz en cosecha).
+    expect(escena.getAttribute('aria-label')).toMatch(/huerta|frutales/i);
     await waitFor(() => {
       // Resumen del campesino: 2 cultivos activos, 1 listo para cosechar.
       expect(screen.getByText(/cultivos activos/i)).toBeInTheDocument();
