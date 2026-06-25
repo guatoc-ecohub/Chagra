@@ -86,7 +86,7 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
   // VISTA FICHA -------------------------------------------------------------
   if (selected) {
     return (
-      <div className="min-h-[100dvh] text-white">
+      <div className="min-h-[100dvh] bg-slate-950 text-white">
         <header className="sticky top-0 z-10 flex items-center gap-2 px-4 pt-[calc(14px+env(safe-area-inset-top))] pb-2 bg-slate-950/85 backdrop-blur border-b border-slate-800/60">
           <button
             type="button"
@@ -111,7 +111,7 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
 
   // VISTA BÚSQUEDA ----------------------------------------------------------
   return (
-    <div className="min-h-[100dvh] text-white">
+    <div className="min-h-[100dvh] bg-slate-950 text-white">
       <header className="flex items-center gap-2 px-4 pt-[calc(14px+env(safe-area-inset-top))] pb-2">
         {onBack ? (
           <button
@@ -194,7 +194,7 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
                   <button
                     type="button"
                     onClick={() => selectSpecies(r.id)}
-                    className="w-full text-left rounded-xl bg-slate-900/60 border border-slate-800 hover:border-emerald-600/60 active:bg-slate-800/70 p-3 transition-colors flex items-center gap-3"
+                    className="w-full text-left rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-600/60 active:bg-slate-800/70 p-3 transition-colors flex items-center gap-3"
                   >
                     <Leaf size={18} className="text-emerald-400 shrink-0" aria-hidden="true" />
                     <span className="min-w-0">
