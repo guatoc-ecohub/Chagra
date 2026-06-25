@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 import ChatBubble from './ChatBubble';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import DeepResearchCard from '../DeepResearchCard';
+import InsightProactivoCard from '../Aprende/InsightProactivoCard';
 import { MSG } from '../../config/messages';
 
 // Bug piloto 2026-06-04 (B): "para devolverme tengo que ir hasta el inicio de
@@ -28,7 +29,7 @@ const FLOATING_BACK_THRESHOLD_PX = 160;
  * @param {Object|null} [props.proactiveGreeting=null] - Datos del saludo proactivo dinámico.
  * @param {Function} props.onBack - Callback para volver a la pantalla anterior.
  */
-export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, onConsentNeeded, onRetryOrphan, onCancelDeepResearch, proactiveGreeting = null, onBack }) {
+export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, onConsentNeeded, onRetryOrphan, onCancelDeepResearch, onDismissInsight, proactiveGreeting = null, onBack }) {
   const bottomRef = useRef(null);
   const scrollRef = useRef(null);
   // (B) Botón "Volver" flotante: visible solo cuando el operador se alejó del
@@ -183,14 +184,29 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
           );
         }
         return (
-          <ChatBubble
-            key={msg.id || idx}
-            message={msg}
-            isStreaming={false}
-            promptText={msg.role === 'assistant' ? findPromptForResponse(idx) : undefined}
-            onConsentNeeded={onConsentNeeded}
-            onRetryOrphan={onRetryOrphan}
-          />
+          <React.Fragment key={msg.id || idx}>
+            <ChatBubble
+              message={msg}
+              isStreaming={false}
+              promptText={msg.role === 'assistant' ? findPromptForResponse(idx) : undefined}
+              onConsentNeeded={onConsentNeeded}
+              onRetryOrphan={onRetryOrphan}
+            />
+            {/* AGENTE GUIADO (auditoría UX §7.4 P3): si este turno del agente trae
+                un insight verificado proactivo, lo ofrecemos como una tarjeta más
+                de la conversación (opt-in). Aparece DENTRO del chat, justo bajo la
+                respuesta que lo motivó — no es un panel aparte. */}
+            {msg._insightProactivo && (
+              <InsightProactivoCard
+                insight={msg._insightProactivo}
+                onDismiss={
+                  typeof onDismissInsight === 'function'
+                    ? () => onDismissInsight(msg.id || idx)
+                    : undefined
+                }
+              />
+            )}
+          </React.Fragment>
         );
       })}
 

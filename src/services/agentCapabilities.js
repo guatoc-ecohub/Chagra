@@ -414,6 +414,39 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     hero: true,
     heroRoute: { kind: 'nav', view: 'ciclo' },
   },
+  {
+    // RAMA "Aprender" de la mano: antes el grupo solo tenía 'deep'
+    // (Investigación profunda, status 'soon' → no clickeable), así que la rama
+    // moría en un nodo atenuado sin destino real. Esta entrada conecta la rama
+    // al hub educativo que YA existe y es alcanzable (vista 'aprende',
+    // AprenderConAgente): lecciones agroecológicas con fuente verificada.
+    id: 'aprender-hub',
+    group: 'aprender',
+    status: 'live',
+    icon: '📚',
+    label: 'Aprende con el agente',
+    desc: 'Lecciones agroecológicas con fuente: suelo, asociaciones, biopreparados, MIP y fenología.',
+    tool: null,
+    hero: true,
+    heroRoute: { kind: 'nav', view: 'aprende' },
+  },
+  {
+    // RAMA "Vender" de la mano: antes el grupo solo tenía 'precio'
+    // (status 'soon' → no clickeable), así que la rama no iba a ningún lado.
+    // Esta entrada la conecta a una superficie HONESTA y alcanzable ('mercados',
+    // MercadosScreen): explica el estado real de la consulta de precios y orienta
+    // a las fuentes públicas (DANE/SIPSA, centrales de abasto). No es un
+    // dead-end ni una promesa: es una pantalla real "en preparación".
+    id: 'vender-mercados',
+    group: 'vender',
+    status: 'live',
+    icon: '🤝',
+    label: 'Vender mejor',
+    desc: 'A dónde llevar la cosecha y dónde consultar precios mayoristas. En preparación.',
+    tool: null,
+    hero: true,
+    heroRoute: { kind: 'nav', view: 'mercados' },
+  },
 ]);
 
 // ── Vistas derivadas ──────────────────────────────────────────────────────
