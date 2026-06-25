@@ -50,6 +50,7 @@ import MiFincaVivaHomeCard from './MiFincaVivaHomeCard';
 import FincaRedInstitucional from './FincaRedInstitucional';
 import FincaVivaHero from './FincaVivaHero';
 import './finca-viva-resto.css';
+import './dashboard-resto-redistribucion.css';
 // Rescate huérfano 2026-06-24 (descubribilidad): CaseStudyTopWidget vivía solo
 // en el DashboardView MUERTO de App.jsx (única vía a `casos`). Se trae a la home
 // viva; se auto-oculta si no hay casos activos (KISS, zero footprint). Ref:
@@ -110,54 +111,84 @@ const SECTION_COMPONENTS = {
     informes: { Component: InformesCard },
 };
 
-// Herramientas de finca que NO son secciones-módulo del grid (no tienen
-// componente en SECTION_COMPONENTS): son TILES de acceso directo a una pantalla
-// completa (Suelo · Semilleros · Seguridad). El commit #1827 las metió por
-// error en NAV_TILES (la pantalla de navegación de App.jsx), que NO es este
-// home dashboard — por eso no aparecían al loguear ("Semilleros=0"). Acá viven
-// como su propio bloque de tiles navegables (onNavigate(view) → currentView),
-// reusando label/icon/desc de NAV_TILES. Universales: las ve todo perfil (igual
-// que en NAV_TILES, sin gating por rol — son herramientas básicas de manejo).
-const HERRAMIENTAS_TILES = [
-    { view: 'suelo', label: 'Suelo', icon: Layers, desc: 'Diagnóstico y salud del suelo', accent: 'text-amber-400 border-l-amber-500' },
-    { view: 'germinacion', label: 'Semilleros', icon: TestTube, desc: 'Prueba de semillas y germinación', accent: 'text-teal-400 border-l-teal-500' },
-    { view: 'toxicologia', label: 'Seguridad', icon: ShieldAlert, desc: 'Toxicidad de insumos y riesgo de suelo', accent: 'text-rose-400 border-l-rose-500' },
-    { view: 'aprende', label: 'Aprende', icon: BookOpen, desc: 'Lecciones agroecológicas con fuente', accent: 'text-emerald-400 border-l-emerald-500' },
-    { view: 'directorio', label: 'Especies', icon: Sprout, desc: 'Directorio: clima, asociaciones y plagas', accent: 'text-lime-400 border-l-lime-500' },
-    // Huérfanos rescatados 2026-06-24 (descubribilidad). Eran rutas vivas en el
-    // router pero sin entrada en la home viva (CAPABILITIES_STATUS.md §2):
-    //  · biopreparados → galería de recetas paso a paso (antes solo desde el juego).
-    //  · ciclo_nutrientes → plan de alimentación / ciclo cerrado (antes solo
-    //    desde dentro de AnimalesScreen).
-    //  · casos → casos de estudio (antes solo desde el DashboardView muerto / #casos).
-    // `data: { back: 'dashboard' }`: la galería de biopreparados también se abre
-    // desde el juego (misión, sin back → vuelve al juego). Desde la home pasamos
-    // back:'dashboard' para que el botón Volver regrese acá y no al juego
-    // (corrige el onBack huérfano). Ver App.jsx case 'biopreparados'.
-    { view: 'biopreparados', label: 'Biopreparados', icon: FlaskConical, desc: 'Recetas caseras paso a paso', accent: 'text-lime-400 border-l-lime-500', data: { back: 'dashboard' } },
-    { view: 'ciclo_nutrientes', label: 'Nutrientes', icon: Recycle, desc: 'Ciclo cerrado: del animal al suelo y la planta', accent: 'text-emerald-400 border-l-emerald-500' },
-    { view: 'casos', label: 'Casos', icon: ClipboardList, desc: 'Seguimiento de problemas y tratamientos', accent: 'text-amber-400 border-l-amber-500' },
+// ───────────────────────────────────────────────────────────────────────────
+// REDISTRIBUCIÓN del "resto de su finca" (auditoría CAPABILITIES_STATUS §7.2 +
+// §7.4 #2, 2026-06-25). Antes: UN solo bloque "Herramientas de finca" apilaba
+// 11 tiles sueltos (suelo, semilleros, seguridad, aprende, especies,
+// biopreparados, nutrientes, casos, calendario, faq, mercado) — la
+// fragmentación que la auditoría quiere eliminar. Ahora se reparten en TRES
+// grupos con JERARQUÍA explícita, para que el campesino distinga de un vistazo
+// lo SÓLIDO de lo flojo:
+//
+//   1. DESTACADO_TILES  → lo FUERTE y grounded (§7.2 elevar): directorio de
+//      especies + calendario de finca. Arriba, tiles grandes (2 columnas).
+//   2. APRENDER_TILES   → todo lo de APRENDIZAJE/contenido consolidado bajo un
+//      solo hub "Aprender" (§7.4 #2): lecciones (aprende), casos de estudio,
+//      ciclo de nutrientes, galería de biopreparados, suelo/micorrizas como
+//      contenido, toxicología (seguridad de insumos) y las preguntas frecuentes.
+//      Ya NO son tiles top-level sueltos.
+//   3. GESTION_TILES    → "Mi finca / gestión": registros y acciones (semilleros,
+//      cosechar, insumos, mantenimiento). Accesible pero de-enfatizado.
+//   4. MERCADO_TILE     → marketplace, BAJADO (§7.2: el precio SIPSA es la
+//      fachada más delgada). Va al fondo, en su propio rótulo discreto.
+//
+// Cada tile navega con onNavigate(view, data) → currentView (la pantalla real ya
+// existe en App.jsx). Universales: las ve todo perfil (herramientas básicas),
+// salvo el gating por perfil que ya gobierna el resto del home.
+// ───────────────────────────────────────────────────────────────────────────
+
+// 1) DESTACADO — lo más sólido y grounded de Chagra, elevado (§7.2). El
+//    directorio (721 especies con clima/asociaciones/plagas groundeadas) y el
+//    calendario unificado son superficies 100% AGE/catálogo: el campesino debe
+//    distinguirlas como el núcleo fuerte. Se renderizan en tiles GRANDES.
+const DESTACADO_TILES = [
+    { view: 'directorio', label: 'Especies', icon: Sprout, desc: 'Directorio: clima, asociaciones, plagas y biopreparados por especie', accent: 'text-lime-400 border-l-lime-500' },
     // Calendario de finca: UN solo calendario que unifica por planta fenología,
     // nutrición, siembra, cosecha, sanidad y ciclo perenne (App.jsx case
     // 'calendario_finca' → CalendarioFincaScreen). Groundeado en
     // farmCalendarService; reusa los ciclos de la finca y el catálogo.
-    { view: 'calendario_finca', label: 'Calendario', icon: CalendarDays, desc: 'Siembra, abono, plagas y cosecha en un solo lugar', accent: 'text-violet-400 border-l-violet-500' },
-    { view: 'faq', label: 'Preguntas frecuentes', icon: HelpCircle, desc: 'Respuestas sobre el funcionamiento de Chagra', accent: 'text-violet-400 border-l-violet-500' },
-    // Marketplace agroecológico (circuitos cortos): segundo punto de entrada
-    // VISIBLE además de la rama "Vender" de la mano radial. Publicar lo que
-    // vende la finca + explorar ofertas de fincas vecinas. Ruta 'mercado'
-    // (App.jsx case 'mercado' → MercadosScreen).
-    { view: 'mercado', label: 'Mercado', icon: Store, desc: 'Vende y compra directo entre fincas, sin intermediarios', accent: 'text-emerald-400 border-l-emerald-500' },
+    { view: 'calendario_finca', label: 'Calendario', icon: CalendarDays, desc: 'Siembra, abono, plagas y cosecha de su finca en una sola línea de tiempo', accent: 'text-violet-400 border-l-violet-500' },
 ];
 
-// Acciones de gestión sin launcher directo en la home (huérfanas):
-// cosechar / insumos / mantenimiento. Eran alcanzables solo por back-nav interno
-// o por la mano. Se exponen como tiles propios (CAPABILITIES_STATUS.md §2).
+// 2) APRENDER — hub único de contenido/aprendizaje (§7.4 #2). Consolida todas
+//    las superficies de aprendizaje que antes vivían sueltas:
+//      · aprende        → 5 lecciones agroecológicas con fuente (el hub; sólo en
+//                         layout legacy: con F2 el portal "Aprender" del hero ya
+//                         entra al hub, así que aquí se filtra para no duplicarlo).
+//      · casos          → casos de estudio (antes solo en el DashboardView muerto).
+//      · ciclo_nutrientes → ciclo cerrado animal→suelo→planta (antes dentro de
+//                         AnimalesScreen).
+//      · biopreparados  → galería de recetas paso a paso (antes solo desde el
+//                         juego). `data:{back:'dashboard'}` para que Volver regrese
+//                         aquí y no al juego (corrige el onBack huérfano).
+//      · suelo          → diagnóstico y salud del suelo / micorrizas (contenido).
+//      · toxicologia    → seguridad/toxicidad de insumos (contenido de manejo).
+//      · faq            → preguntas frecuentes sobre Chagra.
+const APRENDER_TILES = [
+    { view: 'aprende', label: 'Aprender', icon: BookOpen, desc: 'Lecciones agroecológicas con fuente', accent: 'text-emerald-400 border-l-emerald-500' },
+    { view: 'casos', label: 'Casos de estudio', icon: ClipboardList, desc: 'Problemas reales y su tratamiento', accent: 'text-amber-400 border-l-amber-500' },
+    { view: 'ciclo_nutrientes', label: 'Ciclo de nutrientes', icon: Recycle, desc: 'Del animal al suelo y la planta', accent: 'text-emerald-400 border-l-emerald-500' },
+    { view: 'biopreparados', label: 'Biopreparados', icon: FlaskConical, desc: 'Recetas caseras paso a paso', accent: 'text-lime-400 border-l-lime-500', data: { back: 'dashboard' } },
+    { view: 'suelo', label: 'Suelo', icon: Layers, desc: 'Salud del suelo y micorrizas', accent: 'text-amber-400 border-l-amber-500' },
+    { view: 'toxicologia', label: 'Seguridad', icon: ShieldAlert, desc: 'Toxicidad de insumos y riesgo', accent: 'text-rose-400 border-l-rose-500' },
+    { view: 'faq', label: 'Preguntas frecuentes', icon: HelpCircle, desc: 'Cómo funciona Chagra', accent: 'text-violet-400 border-l-violet-500' },
+];
+
+// 3) GESTIÓN — "Mi finca": registros y acciones de manejo, sin launcher directo
+//    antes (huérfanas o solo por la mano). Semilleros entra aquí (es gestión de
+//    siembra, no contenido). Accesible pero de-enfatizado respecto a lo fuerte.
 const GESTION_TILES = [
+    { view: 'germinacion', label: 'Semilleros', icon: TestTube, desc: 'Prueba de semillas y germinación', accent: 'text-teal-400 border-l-teal-500' },
     { view: 'cosechar', label: 'Cosechar', icon: Wheat, desc: 'Registrar una cosecha', accent: 'text-amber-400 border-l-amber-500' },
     { view: 'insumos', label: 'Insumos aplicados', icon: Droplets, desc: 'Registrar una aplicación de bioinsumo', accent: 'text-sky-400 border-l-sky-500' },
     { view: 'mantenimiento', label: 'Mantenimiento', icon: Wrench, desc: 'Labores de mantenimiento de la finca', accent: 'text-slate-300 border-l-slate-500' },
 ];
+
+// 4) MERCADO — marketplace de circuitos cortos. BAJADO (§7.2): la fachada de
+//    precio (SIPSA) es la capa más delgada hoy, así que va al fondo, en su
+//    propio rótulo discreto, no mezclado con lo fuerte. Sigue siendo el segundo
+//    punto de entrada además de la rama "Vender" de la mano radial.
+const MERCADO_TILE = { view: 'mercado', label: 'Mercado', icon: Store, desc: 'Vende y compra directo entre fincas, sin intermediarios', accent: 'text-emerald-400 border-l-emerald-500' };
 
 function SortableSection({ id, onNavigate, sensors }) {
     const {
@@ -586,27 +617,60 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                 </div>
             )}
 
-            {/* HERRAMIENTAS DE FINCA (Suelo · Semilleros · Seguridad): tiles de
-                acceso directo a pantallas completas que NO son secciones del
-                grid draggable (no tienen componente en SECTION_COMPONENTS). El
-                commit #1827 las agregó por error a NAV_TILES (pantalla de
-                navegación de App.jsx), no a ESTE home → no aparecían al loguear
-                ("Semilleros=0"). Acá van como su propio bloque navegable. Cada
-                tile llama onNavigate(view) → currentView (suelo/germinacion/
-                toxicologia), que monta la pantalla real ya existente. */}
+            {/* ════════════════════════════════════════════════════════════════
+                REDISTRIBUCIÓN del "resto de su finca" (auditoría §7.2 + §7.4 #2):
+                un solo bloque-pila se reparte en TRES grupos con jerarquía clara.
+                `renderTile` mantiene un único estilo de tile (incluye el fix de
+                contraste: en F2 el label/desc van con tinta oscura forzada por
+                .fvh-tile-label/.fvh-tile-desc en finca-viva-resto.css, no con el
+                color de acento que sería ilegible sobre el pastel claro). El
+                refuerzo WCAG AA de los tiles DESTACADOS grandes vive en
+                dashboard-resto-redistribucion.css. ════════════════════════════ */}
+
+            {/* 1) DESTACADO — lo más sólido y grounded, ELEVADO (§7.2): directorio
+                de especies + calendario unificado. Tiles GRANDES (2 columnas) con
+                ícono prominente, para que se lean como el núcleo fuerte. */}
             <div className={`px-4 pt-3 ${fincaVivaFlag ? 'fvh-resto-block' : ''}`}>
                 <p className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-2.5 ${fincaVivaFlag ? 'fvh-block-label' : 'text-slate-400'}`}>
                     <span
                         aria-hidden="true"
-                        className="h-3.5 w-1 rounded-full bg-gradient-to-b from-amber-400 to-rose-400"
+                        className="h-3.5 w-1 rounded-full bg-gradient-to-b from-lime-400 to-emerald-400"
                     />
-                    Herramientas de finca
+                    Lo más sólido de Chagra
                 </p>
-                <div className="grid grid-cols-3 gap-3" data-testid="herramientas-tiles">
-                    {HERRAMIENTAS_TILES
-                        // Con F2 ON, "Aprende" YA es uno de los 4 portales del hero
-                        // (Aprender). No lo repetimos como tile aquí: dedup del
-                        // portal duplicado (auditoría §7.4 #1).
+                <div className="grid grid-cols-2 gap-3" data-testid="destacado-tiles">
+                    {DESTACADO_TILES.map((tile) => (
+                        <button
+                            key={tile.view}
+                            type="button"
+                            onClick={() => onNavigate(tile.view, tile.data)}
+                            aria-label={`${tile.label}: ${tile.desc}`}
+                            className={`dash-tile dash-tile--destacado ${fincaVivaFlag ? 'fvh-tile-claro' : 'bg-slate-900/60'} border border-slate-800 border-l-4 ${tile.accent} rounded-2xl p-4 text-left min-h-[112px] active:bg-slate-800/70 transition-colors flex flex-col`}
+                        >
+                            <tile.icon size={30} strokeWidth={2} className={`mb-2 ${tile.accent.split(' ')[0]}`} aria-hidden="true" />
+                            <span className={`text-base font-black block leading-tight fvh-tile-label ${tile.accent.split(' ')[0]}`}>{tile.label}</span>
+                            <span className={`text-xs block mt-1 leading-snug fvh-tile-desc ${fincaVivaFlag ? '' : 'text-slate-400'}`}>{tile.desc}</span>
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* 2) APRENDER — hub único de contenido (§7.4 #2): todas las superficies
+                de aprendizaje consolidadas bajo un solo rótulo. Con F2 ON el portal
+                "Aprender" del hero ya entra al hub `aprende`, así que aquí se filtra
+                ese tile para no duplicarlo; las lecciones individuales (casos,
+                nutrientes, biopreparados, suelo, seguridad, faq) sí se ofrecen como
+                accesos directos al contenido. */}
+            <div className={`px-4 pt-3 ${fincaVivaFlag ? 'fvh-resto-block' : ''}`}>
+                <p className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-2.5 ${fincaVivaFlag ? 'fvh-block-label' : 'text-slate-400'}`}>
+                    <span
+                        aria-hidden="true"
+                        className="h-3.5 w-1 rounded-full bg-gradient-to-b from-emerald-400 to-teal-400"
+                    />
+                    Aprender
+                </p>
+                <div className="grid grid-cols-3 gap-3" data-testid="aprender-tiles">
+                    {APRENDER_TILES
                         .filter((tile) => !(fincaVivaFlag && tile.view === 'aprende'))
                         .map((tile) => (
                         <button
@@ -614,7 +678,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                             type="button"
                             onClick={() => onNavigate(tile.view, tile.data)}
                             aria-label={`${tile.label}: ${tile.desc}`}
-                            className={`${fincaVivaFlag ? 'fvh-tile-claro' : 'bg-slate-900/60'} border border-slate-800 border-l-4 ${tile.accent} rounded-xl p-3 text-left min-h-[88px] active:bg-slate-800/70 transition-colors flex flex-col`}
+                            className={`dash-tile ${fincaVivaFlag ? 'fvh-tile-claro' : 'bg-slate-900/60'} border border-slate-800 border-l-4 ${tile.accent} rounded-xl p-3 text-left min-h-[88px] active:bg-slate-800/70 transition-colors flex flex-col`}
                         >
                             <tile.icon size={24} strokeWidth={2} className={`mb-1.5 ${tile.accent.split(' ')[0]}`} aria-hidden="true" />
                             <span className={`text-sm font-black block leading-tight fvh-tile-label ${tile.accent.split(' ')[0]}`}>{tile.label}</span>
@@ -624,32 +688,60 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                 </div>
             </div>
 
-            {/* GESTIÓN — acciones de registro sin launcher directo en la home
-                (cosechar · insumos aplicados · mantenimiento). Rescate huérfano
-                2026-06-24: eran alcanzables solo por back-nav interno o la mano
-                (CAPABILITIES_STATUS.md §2). Las rutas ya existen en App.jsx. */}
+            {/* 3) GESTIÓN — "Mi finca": registros y acciones de manejo (semilleros,
+                cosechar, insumos, mantenimiento). De-enfatizado respecto a lo
+                fuerte; las rutas ya existen en App.jsx. */}
             <div className={`px-4 pt-3 ${fincaVivaFlag ? 'fvh-resto-block' : ''}`}>
                 <p className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-2.5 ${fincaVivaFlag ? 'fvh-block-label' : 'text-slate-400'}`}>
                     <span
                         aria-hidden="true"
                         className="h-3.5 w-1 rounded-full bg-gradient-to-b from-sky-400 to-emerald-400"
                     />
-                    Registrar en la finca
+                    Mi finca · gestión
                 </p>
                 <div className="grid grid-cols-3 gap-3" data-testid="gestion-tiles">
                     {GESTION_TILES.map((tile) => (
                         <button
                             key={tile.view}
                             type="button"
-                            onClick={() => onNavigate(tile.view)}
+                            onClick={() => onNavigate(tile.view, tile.data)}
                             aria-label={`${tile.label}: ${tile.desc}`}
-                            className={`${fincaVivaFlag ? 'fvh-tile-claro' : 'bg-slate-900/60'} border border-slate-800 border-l-4 ${tile.accent} rounded-xl p-3 text-left min-h-[88px] active:bg-slate-800/70 transition-colors flex flex-col`}
+                            className={`dash-tile ${fincaVivaFlag ? 'fvh-tile-claro' : 'bg-slate-900/60'} border border-slate-800 border-l-4 ${tile.accent} rounded-xl p-3 text-left min-h-[88px] active:bg-slate-800/70 transition-colors flex flex-col`}
                         >
                             <tile.icon size={24} strokeWidth={2} className={`mb-1.5 ${tile.accent.split(' ')[0]}`} aria-hidden="true" />
                             <span className={`text-sm font-black block leading-tight fvh-tile-label ${tile.accent.split(' ')[0]}`}>{tile.label}</span>
                             <span className={`text-2xs block mt-0.5 leading-tight fvh-tile-desc ${fincaVivaFlag ? '' : 'text-slate-500'}`}>{tile.desc}</span>
                         </button>
                     ))}
+                </div>
+            </div>
+
+            {/* 4) MERCADO — marketplace de circuitos cortos, BAJADO (§7.2: el
+                precio SIPSA es la fachada más delgada). Va al fondo, en su propio
+                rótulo discreto, sin mezclarse con lo fuerte. Tile a ancho completo
+                de baja jerarquía visual. */}
+            <div className={`px-4 pt-3 ${fincaVivaFlag ? 'fvh-resto-block' : ''}`}>
+                <p className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-2.5 ${fincaVivaFlag ? 'fvh-block-label' : 'text-slate-400'}`}>
+                    <span
+                        aria-hidden="true"
+                        className="h-3.5 w-1 rounded-full bg-gradient-to-b from-emerald-400 to-lime-400"
+                    />
+                    Vender y comprar
+                </p>
+                <div className="grid grid-cols-1 gap-3" data-testid="mercado-tiles">
+                    <button
+                        type="button"
+                        onClick={() => onNavigate(MERCADO_TILE.view, MERCADO_TILE.data)}
+                        aria-label={`${MERCADO_TILE.label}: ${MERCADO_TILE.desc}`}
+                        className={`dash-tile ${fincaVivaFlag ? 'fvh-tile-claro' : 'bg-slate-900/60'} border border-slate-800 border-l-4 ${MERCADO_TILE.accent} rounded-xl p-3.5 text-left active:bg-slate-800/70 transition-colors flex items-center gap-3`}
+                    >
+                        <MERCADO_TILE.icon size={26} strokeWidth={2} className={`${MERCADO_TILE.accent.split(' ')[0]} shrink-0`} aria-hidden="true" />
+                        <span className="flex-1 min-w-0">
+                            <span className={`text-sm font-black block leading-tight fvh-tile-label ${MERCADO_TILE.accent.split(' ')[0]}`}>{MERCADO_TILE.label}</span>
+                            <span className={`text-2xs block mt-0.5 leading-tight fvh-tile-desc ${fincaVivaFlag ? '' : 'text-slate-500'}`}>{MERCADO_TILE.desc}</span>
+                        </span>
+                        <ChevronRight size={18} className={`shrink-0 ${MERCADO_TILE.accent.split(' ')[0]} opacity-70`} aria-hidden="true" />
+                    </button>
                 </div>
             </div>
 
