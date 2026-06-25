@@ -43,8 +43,11 @@ import {
     esPerfilUrbano,
 } from '../../services/homeModuleSelector';
 import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciarAccess';
+import { esExtensionistaActual } from '../../config/extensionistaAccess';
+import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 import SelectedBackgroundReveal from './SelectedBackgroundReveal';
 import MiFincaVivaHomeCard from './MiFincaVivaHomeCard';
+import FincaRedInstitucional from './FincaRedInstitucional';
 // Rescate huérfano 2026-06-24 (descubribilidad): CaseStudyTopWidget vivía solo
 // en el DashboardView MUERTO de App.jsx (única vía a `casos`). Se trae a la home
 // viva; se auto-oculta si no hay casos activos (KISS, zero footprint). Ref:
@@ -294,6 +297,18 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
         return !hasAltitud || p.piso_confirmado !== '1';
     });
 
+    // HOME "Finca Viva" por perfil (flag VITE_FINCA_VIVA_HOME_PERFIL). Se evalúa
+    // una vez al montar. Con la flag ON: (1) la escena de la finca se muestra
+    // SIEMPRE — incluso con 0 plantas, que la propia escena cubre con su estado
+    // "por sembrar" (fix UX: la escena por perfil orienta desde el primer uso);
+    // (2) si el usuario es extensionista (rol supervisor, con bypass de operador),
+    // se monta la RED institucional de fincas en vez de la escena de finca única.
+    // Con la flag OFF (default), el home conserva su comportamiento actual.
+    const [fincaVivaFlag] = useState(() => fincaVivaHomePerfilActivo());
+    const [esExtensionista] = useState(() => {
+        try { return esExtensionistaActual(); } catch (_) { return false; }
+    });
+
     // Escuchar cambios en visibilidad de módulos desde ProfileScreen (#7003)
     useEffect(() => {
         const handler = (e) => {
@@ -447,16 +462,38 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
                 </div>
             )}
 
-            {/* MI FINCA VIVA — la finca REAL del usuario como escena 2D viva
-                (cultivos por etapa fenológica + animales + vitalidad). Solo se
-                muestra cuando ya hay algo sembrado, para no competir con el
-                OnboardingHero del primer uso (que ya invita a sembrar). La
-                tarjeta es autocontenida: lee sus datos de farmProcessCache
-                (offline-first) y abre el juego completo al tocarla. */}
-            {plantsCount > 0 && (
-                <div className="px-4 pt-3">
-                    <MiFincaVivaHomeCard onNavigate={onNavigate} />
-                </div>
+            {/* MI FINCA VIVA / RED INSTITUCIONAL — la escena del home.
+                ─────────────────────────────────────────────────────────────
+                Flag VITE_FINCA_VIVA_HOME_PERFIL (fincaVivaHomePerfilActivo):
+                  · ON  + extensionista → RED institucional de fincas
+                          (FincaRedInstitucional): agregados + mini-escenas por
+                          finca supervisada (no la escena de finca única).
+                  · ON  + resto          → escena "Finca Viva" por PERFIL,
+                          mostrada SIEMPRE (incluso con 0 plantas: la escena lo
+                          cubre con su estado "por sembrar" — fix UX; el backdrop
+                          por perfil orienta desde el primer uso).
+                  · OFF (default)        → comportamiento actual intacto: la
+                          escena 2D fenológica solo cuando ya hay algo sembrado
+                          (plantsCount > 0), para no competir con el OnboardingHero.
+                La tarjeta es autocontenida: lee sus datos de farmProcessCache /
+                del tablero del extensionista (offline-first) y abre el destino al
+                tocarla. */}
+            {fincaVivaFlag ? (
+                esExtensionista ? (
+                    <div className="px-4 pt-3">
+                        <FincaRedInstitucional onNavigate={onNavigate} />
+                    </div>
+                ) : (
+                    <div className="px-4 pt-3">
+                        <MiFincaVivaHomeCard onNavigate={onNavigate} />
+                    </div>
+                )
+            ) : (
+                plantsCount > 0 && (
+                    <div className="px-4 pt-3">
+                        <MiFincaVivaHomeCard onNavigate={onNavigate} />
+                    </div>
+                )
             )}
 
             {/* Top problemas activos (casos de estudio, DR-044). Rescate huérfano

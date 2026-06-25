@@ -8,7 +8,30 @@ import { useEffect, useMemo, useState } from 'react';
 import { Sprout, ChevronRight } from 'lucide-react';
 import { listFarmProcesses } from '../../db/farmProcessCache';
 import { buildFincaScene } from '../../services/fincaSceneService';
+import { selectSceneVariant } from '../../services/fincaSceneProfileSelector';
+import { getProfile } from '../../services/userProfileService';
+import { tieneAccesoGlaciarActual } from '../../config/glaciarAccess';
+import { WORLD_STAGES } from '../../services/fincaGameService';
+import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
+import FincaWorldScene from '../juego/FincaWorldScene';
 import '../juego/juego-finca.css';
+
+/**
+ * Mapea la vitalidad (0-100) de la finca a un nivel WORLD_STAGES (0-4) para el
+ * BACKDROP por perfil (flag ON). No inventa progreso: la vitalidad ya sale de
+ * datos reales (fincaSceneService.calcularVitalidad). Vacía → nivel 0.
+ * @param {{ vacia?: boolean, vitalidad?: number }} scene
+ * @returns {number} nivel 0..4
+ */
+function nivelDesdeVitalidad(scene) {
+  if (!scene || scene.vacia) return 0;
+  const v = Number(scene.vitalidad) || 0;
+  if (v >= 75) return 4;
+  if (v >= 50) return 3;
+  if (v >= 25) return 2;
+  if (v > 0) return 1;
+  return 0;
+}
 
 /**
  * MiFincaVivaHomeCard — la finca REAL del usuario como ESCENA 2D viva en el home.
@@ -46,6 +69,27 @@ export default function MiFincaVivaHomeCard({ onNavigate }) {
 
   const scene = useMemo(() => buildFincaScene({ processes }), [processes]);
 
+  // VARIANTE POR PERFIL (flag VITE_FINCA_VIVA_HOME_PERFIL). Cuando está ON, el
+  // BACKDROP de la escena se elige por el perfil del usuario (balcón / invernadero
+  // / finca / restauración / páramo). Apagada (default), se conserva la escena 2D
+  // fenológica clásica. El cálculo es barato y puro (selector sin red).
+  const flagOn = fincaVivaHomePerfilActivo();
+  const variant = useMemo(() => {
+    if (!flagOn) return null;
+    try {
+      return selectSceneVariant(getProfile(), { esGuiaGlaciar: tieneAccesoGlaciarActual() });
+    } catch (_) {
+      return null; // Fail-safe: cae a la escena clásica.
+    }
+  }, [flagOn]);
+
+  // Stage (nivel del mundo) para el backdrop por perfil, derivado de la
+  // vitalidad real de la finca (no inventa progreso).
+  const stageVariante = useMemo(
+    () => WORLD_STAGES[nivelDesdeVitalidad(scene)] || WORLD_STAGES[0],
+    [scene],
+  );
+
   const abrirJuego = () => onNavigate?.('juego');
 
   return (
@@ -81,7 +125,16 @@ export default function MiFincaVivaHomeCard({ onNavigate }) {
         }
         className="block w-full text-left active:scale-[0.99] transition"
       >
-        <FincaScene2D scene={scene} cargando={cargando} />
+        {variant ? (
+          <FincaWorldScene
+            stage={stageVariante}
+            criaturas={[]}
+            vacia={scene.vacia}
+            variant={variant}
+          />
+        ) : (
+          <FincaScene2D scene={scene} cargando={cargando} />
+        )}
       </button>
 
       {/* Vitalidad + resumen (vistazo útil para el campesino) */}
