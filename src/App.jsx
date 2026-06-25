@@ -103,6 +103,7 @@ const GlaciarHistorialScreen = lazy(() => import('./components/GlaciarHistorialS
 const ProfileScreen = lazy(() => import('./components/ProfileScreen'));
 const CaseStudyScreen = lazy(() => import('./components/CaseStudyScreen'));
 const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
+const FaqScreen = lazy(() => import('./components/FaqScreen'));
 const HelpManual = lazy(() => import('./components/HelpManual'));
 const TopBar = lazy(() => import('./components/TopBar'));
 const DashboardLive = lazy(() => import('./components/dashboard/DashboardLive'));
@@ -144,6 +145,7 @@ const LoadingFallback = () => (
 
 const HASH_VIEW_ROUTES = {
   agente: 'agente',
+  faq: 'faq',
   inventario: 'activos',
   activos: 'activos',
   biodiversidad: 'biodiversidad',
@@ -185,7 +187,7 @@ const MODULE_VIEWS = new Set([
   'activos', 'mapa', 'javier', 'bodega', 'task_log', 'historial',
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas',
-  'hoy_finca', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
+  'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'toxicologia', 'aprende', 'directorio',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
@@ -1271,6 +1273,14 @@ export default function App() {
               onBack={() => navigate('casos')}
               onHome={() => navigate('dashboard')}
             />
+          </ErrorBoundary>
+        );
+      case 'faq':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Preguntas Frecuentes">
+              <FaqScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'help':

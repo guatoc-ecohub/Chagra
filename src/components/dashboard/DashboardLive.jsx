@@ -26,7 +26,7 @@ import {
     rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays, Sprout } from 'lucide-react';
+import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays, Sprout, HelpCircle } from 'lucide-react';
 import AgentHero from './AgentHero';
 import OnboardingHero from '../OnboardingHero';
 import {
@@ -142,6 +142,7 @@ const HERRAMIENTAS_TILES = [
     // 'calendario_finca' → CalendarioFincaScreen). Groundeado en
     // farmCalendarService; reusa los ciclos de la finca y el catálogo.
     { view: 'calendario_finca', label: 'Calendario', icon: CalendarDays, desc: 'Siembra, abono, plagas y cosecha en un solo lugar', accent: 'text-violet-400 border-l-violet-500' },
+    { view: 'faq', label: 'Preguntas frecuentes', icon: HelpCircle, desc: 'Respuestas sobre el funcionamiento de Chagra', accent: 'text-violet-400 border-l-violet-500' },
 ];
 
 // Acciones de gestión sin launcher directo en la home (huérfanas):
