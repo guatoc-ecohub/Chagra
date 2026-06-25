@@ -95,7 +95,7 @@ function mapSensorAlertsToIot(alerts) {
   });
 }
 
-const NotificationsBell = React.memo(function NotificationsBell({ onNavigate }) {
+const NotificationsBell = React.memo(function NotificationsBell({ onNavigate, variant }) {
     const [open, setOpen] = useState(false);
     const [tick, setTick] = useState(0);
     // PoC #316 — tabs Notificaciones / Clima. Default "notif" para no romper
@@ -294,11 +294,18 @@ const NotificationsBell = React.memo(function NotificationsBell({ onNavigate }) 
     // expansivo, icono Bell shake suave. Si warning: ámbar steady. Si info: sky.
     const hasCritical = criticalCount > 0;
     const hasWarning = warningCount > 0;
+    // Variante F2 (modo "Finca Viva", gateado en ScreenShell): la campana toma
+    // la forma REDONDA del demo del home (paridad ux-audit P1-3) en vez del
+    // rectángulo clásico. Las clases siguen resolviendo color contra los
+    // tokens --c-* del tema activo, así que respeta nature/biopunk/minimalista.
+    // El estilo 'actual' (default, sin variant) NO cambia → prod intacto.
+    const isF2 = variant === 'f2';
+    const f2Shape = isF2 ? 'rounded-full' : 'rounded-lg';
     const buttonClass = hasCritical
-        ? 'relative p-2 rounded-lg bg-red-900/40 border-2 border-red-500 text-red-200 min-h-[44px] min-w-[44px] flex items-center justify-center chagra-bell-critical'
+        ? `relative p-2 ${f2Shape} bg-red-900/40 border-2 border-red-500 text-red-200 min-h-[44px] min-w-[44px] flex items-center justify-center chagra-bell-critical`
         : hasWarning
-            ? 'relative p-2 rounded-lg bg-amber-900/30 border border-amber-600/60 text-amber-200 min-h-[44px] min-w-[44px] flex items-center justify-center'
-            : 'relative p-2 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 active:bg-slate-700 border border-slate-700 text-slate-300 min-h-[44px] min-w-[44px] flex items-center justify-center';
+            ? `relative p-2 ${f2Shape} bg-amber-900/30 border border-amber-600/60 text-amber-200 min-h-[44px] min-w-[44px] flex items-center justify-center`
+            : `relative p-2 ${f2Shape} bg-slate-800/60 hover:bg-slate-700/60 active:bg-slate-700 border border-slate-700 text-slate-300 min-h-[44px] min-w-[44px] flex items-center justify-center`;
 
     const badgeBg = hasCritical ? 'bg-red-600' : hasWarning ? 'bg-amber-500' : 'bg-sky-500';
 

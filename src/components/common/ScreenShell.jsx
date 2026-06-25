@@ -1,6 +1,10 @@
 import React from 'react';
 import { ArrowLeft, Home, HelpCircle } from 'lucide-react';
 import NotificationsBell from '../NotificationsBell';
+import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
+import { useTheme } from '../../hooks/useTheme';
+import { iconForTheme } from '../dashboard/themeIcon';
+import './screen-shell-f2.css';
 
 /**
  * Helper para navegación global desde ScreenShell sin necesidad de prop
@@ -28,6 +32,22 @@ function navigateGlobal(view) {
  * solo en el dashboard. Click → dispatchEvent('chagra:nav', view).
  * App.jsx tiene el listener que llama setCurrentView correspondiente.
  *
+ * ──────────────────────────────────────────────────────────────────────────
+ * MODO "Finca Viva" (F2) — fase 1 de la integración de temas (2026-06-24):
+ * cuando la flag VITE_FINCA_VIVA_HOME_PERFIL está ON, el shell adopta la
+ * DISPOSICIÓN del home F2 (topbar con aire, marca con el ícono del agente del
+ * tema, pastillas redondas) y hereda la PIEL del tema activo (nature cálido /
+ * biopunk neón-oscuro / minimalista claro-sobrio) en vez de las cards slate
+ * oscuras fijas. La piel sale de la indirección --c-* (themes.css/index.css) +
+ * el lenguaje del home (screen-shell-f2.css), reaccionando a data-luz noche
+ * igual que la portada. Arregla los hallazgos de paridad del ux-audit
+ * (P1-3 campana, P2-1 cards slate). DECISIÓN del operador: la finca-viva es la
+ * disposición; los temas son la piel.
+ *
+ * Con la flag OFF (default, PROD) el shell conserva EXACTAMENTE su markup y
+ * comportamiento actual — esta feature se shippa DARK en producción.
+ * ──────────────────────────────────────────────────────────────────────────
+ *
  * Props:
  *   - title:    string (obligatorio)
  *   - onBack:   handler del botón de regreso (un paso atrás)
@@ -38,6 +58,24 @@ function navigateGlobal(view) {
  */
 export const ScreenShell = ({ title, onBack, onHome, icon: Icon, children, actions }) => {
     const handleHome = onHome || (() => navigateGlobal('dashboard'));
+
+    // La flag se evalúa una sola vez (no cambia en runtime: import.meta.env).
+    // Con OFF se cae al shell legacy idéntico al de prod.
+    const fincaViva = fincaVivaHomePerfilActivo();
+    if (fincaViva) {
+        return (
+            <ScreenShellF2
+                title={title}
+                onBack={onBack}
+                handleHome={handleHome}
+                Icon={Icon}
+                actions={actions}
+            >
+                {children}
+            </ScreenShellF2>
+        );
+    }
+
     return (
         // FIX fondo (2026-05-28): el wrapper era `bg-slate-950` SÓLIDO y tapaba
         // por completo la imagen `--app-bg-image` que App.jsx escribe en el
@@ -100,5 +138,79 @@ export const ScreenShell = ({ title, onBack, onHome, icon: Icon, children, actio
         </div>
     );
 };
+
+/**
+ * ScreenShellF2 — variante "Finca Viva" del shell (solo flag ON). Misma API
+ * funcional que el shell legacy (back/home/help/bell + título + ícono), pero
+ * con la DISPOSICIÓN del home F2 y la PIEL del tema activo. Las clases
+ * .screen-shell-f2-* (screen-shell-f2.css) resuelven color contra los tokens
+ * --c-* del tema, así que una sola estructura sirve a las 3 pieles.
+ */
+function ScreenShellF2({ title, onBack, handleHome, Icon, actions, children }) {
+    const { theme } = useTheme();
+    return (
+        <div className="screen-shell-f2" data-testid="screen-shell-f2">
+            <header className="screen-shell-f2-topbar">
+                <div className="screen-shell-f2-left">
+                    {onBack && (
+                        <button
+                            type="button"
+                            onClick={onBack}
+                            className="screen-shell-f2-pill"
+                            aria-label="Volver"
+                        >
+                            <ArrowLeft size={20} />
+                        </button>
+                    )}
+                    {/* Marca: la A del agente del tema activo (la misma del home
+                        F2 / TopBar). Decorativa (el botón Inicio de al lado hace
+                        la navegación); aria-hidden para no duplicar el control. */}
+                    <button
+                        type="button"
+                        onClick={handleHome}
+                        className="screen-shell-f2-brand"
+                        aria-label="Chagra: ir al inicio"
+                        title="Chagra"
+                    >
+                        <span aria-hidden="true">{iconForTheme(theme)}</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleHome}
+                        className="screen-shell-f2-pill is-home"
+                        aria-label="Inicio"
+                        title="Inicio"
+                    >
+                        <Home size={18} />
+                    </button>
+                    <h1 className="screen-shell-f2-title">
+                        {Icon && (
+                            <span className="screen-shell-f2-title-icon">
+                                <Icon size={20} />
+                            </span>
+                        )}
+                        {title}
+                    </h1>
+                </div>
+                <div className="screen-shell-f2-right">
+                    {actions}
+                    <button
+                        type="button"
+                        onClick={() => navigateGlobal('help')}
+                        aria-label="Manual de uso: cómo usar Chagra"
+                        title="Manual de uso"
+                        className="screen-shell-f2-help"
+                    >
+                        <HelpCircle size={22} aria-hidden="true" strokeWidth={2.5} />
+                    </button>
+                    {/* Campana REDONDA del demo del home (ux-audit P1-3) — misma
+                        lógica de notificaciones, forma F2 theme-aware. */}
+                    <NotificationsBell onNavigate={navigateGlobal} variant="f2" />
+                </div>
+            </header>
+            <main className="screen-shell-f2-main">{children}</main>
+        </div>
+    );
+}
 
 export default ScreenShell;
