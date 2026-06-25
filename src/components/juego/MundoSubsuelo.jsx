@@ -16,7 +16,10 @@ function getSoilStage(score) {
 
 function Mascot({ name, title, children, active }) {
   return (
-    <article className={`rounded-2xl border p-3 shadow-sm ${active ? 'border-cyan-300 bg-cyan-50' : 'border-lime-200 bg-white/88'}`}>
+    <article
+      data-active={active ? 'true' : 'false'}
+      className={`jp-ms-mascota rounded-2xl border p-3 shadow-sm ${active ? 'border-cyan-300 bg-cyan-50' : 'border-lime-200 bg-white/88'}`}
+    >
       <div className="flex items-center gap-3">
         <div
           aria-hidden="true"
@@ -199,9 +202,9 @@ export default function MundoSubsuelo() {
   }
 
   return (
-    <main data-testid="mundo-subsuelo" className={fvhSkinClass('ms-root mx-auto flex w-full max-w-6xl flex-col gap-4 bg-[#fff8e8] px-3 py-4 text-stone-950 sm:px-5')}>
-      <header className="overflow-hidden rounded-3xl border border-lime-200 bg-[linear-gradient(135deg,#fef3c7,#d9f99d_52%,#a5f3fc)] p-4 shadow-sm sm:p-6">
-        <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-900">Aprende a Cultivar Jugando</p>
+    <main data-testid="mundo-subsuelo" className={fvhSkinClass('ms-root jp-ambiente mx-auto flex w-full max-w-6xl flex-col gap-4 bg-[#fff8e8] px-3 py-4 text-stone-950 sm:px-5')}>
+      <header className="jp-ms-header overflow-hidden rounded-3xl border border-lime-200 bg-[linear-gradient(135deg,#fef3c7,#d9f99d_52%,#a5f3fc)] p-4 shadow-sm sm:p-6">
+        <p className="jp-ms-kicker text-xs font-black uppercase tracking-[0.2em] text-emerald-900">Aprende a Cultivar Jugando</p>
         <div className="mt-2 grid gap-4 lg:grid-cols-[1.3fr_0.7fr] lg:items-end">
           <div>
             <h1 className="text-4xl font-black leading-none text-stone-950 sm:text-5xl">Mundo Subsuelo</h1>
@@ -241,7 +244,7 @@ export default function MundoSubsuelo() {
         <SoilScene soilLife={soilLife} activeDecision={activeDecision} />
 
         <div className="flex flex-col gap-3">
-          <section data-testid="decision-activa" className="rounded-3xl border border-cyan-200 bg-white p-4 shadow-sm">
+          <section data-testid="decision-activa" className="jp-ms-panel rounded-3xl border border-cyan-200 bg-white p-4 shadow-sm">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-700">Carta activa</p>
@@ -265,7 +268,8 @@ export default function MundoSubsuelo() {
                   key={decision.id}
                   type="button"
                   onClick={() => chooseDecision(decision)}
-                  className={`min-h-28 rounded-2xl border p-3 text-left shadow-sm transition active:scale-[0.98] ${
+                  data-selected={selected ? 'true' : 'false'}
+                  className={`jp-ms-carta min-h-28 rounded-2xl border p-3 text-left shadow-sm transition active:scale-[0.98] ${
                     selected
                       ? 'border-cyan-400 bg-cyan-50 ring-2 ring-cyan-200'
                       : decision.tone === 'good'

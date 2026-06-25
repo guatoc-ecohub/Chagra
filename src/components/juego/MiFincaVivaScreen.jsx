@@ -23,6 +23,7 @@ import {
 import { agentSounds, isSoundEnabled, setSoundEnabled } from '../../services/agentSoundService';
 import { speak, stop as stopSpeak, isSupported as ttsSupported } from '../../services/ttsService';
 import { recordGameStart, recordGameComplete } from '../../services/usageTelemetryService';
+import { fvhSkinClass } from '../../config/fvhSkin';
 
 /**
  * MiFincaVivaScreen — el JUEGO "Mi Finca Viva" para Julieta (y toda niña).
@@ -180,7 +181,7 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
     <ScreenShell title="Mi Finca Viva" icon={Sprout} onBack={onBack} onHome={onHome}>
       <div
         data-testid="mi-finca-viva-screen"
-        className="flex flex-col gap-4 px-4 pt-3 pb-10 max-w-2xl mx-auto"
+        className={fvhSkinClass('jp-ambiente flex flex-col gap-4 px-4 pt-3 pb-10 max-w-2xl mx-auto')}
       >
         {/* Encabezado lúdico + botón de audio grande */}
         <div className="flex items-center justify-between gap-3">
@@ -208,7 +209,7 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
         <FincaWorldScene stage={mundo} criaturas={game.criaturas} vacia={game.vacia} />
 
         {/* Mensaje del mundo + botón de escuchar */}
-        <div className="bg-emerald-950/50 border border-emerald-800/40 rounded-2xl p-4 flex items-start gap-3">
+        <div className="jp-mfv-panel bg-emerald-950/50 border border-emerald-800/40 rounded-2xl p-4 flex items-start gap-3">
           <button
             type="button"
             onClick={() => hablar(narrarFinca(game))}
@@ -230,7 +231,7 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
           type="button"
           data-testid="entrada-defensores-finca"
           onClick={() => irAccion('defensores')}
-          className="w-full text-left rounded-2xl p-4 bg-gradient-to-br from-teal-600/40 to-emerald-800/40 border-2 border-teal-400/40 hover:border-teal-300/60 active:scale-[0.99] transition flex items-center gap-3"
+          className="jp-mfv-entrada w-full text-left rounded-2xl p-4 bg-gradient-to-br from-teal-600/40 to-emerald-800/40 border-2 border-teal-400/40 hover:border-teal-300/60 active:scale-[0.99] transition flex items-center gap-3"
         >
           <span className="text-4xl shrink-0" aria-hidden="true">🛡️</span>
           <span className="flex-1 min-w-0">
@@ -249,7 +250,7 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
           type="button"
           data-testid="entrada-milpa"
           onClick={() => irAccion('milpa')}
-          className="w-full text-left rounded-2xl p-4 bg-gradient-to-br from-lime-600/40 to-amber-800/40 border-2 border-lime-400/40 hover:border-lime-300/60 active:scale-[0.99] transition flex items-center gap-3"
+          className="jp-mfv-entrada w-full text-left rounded-2xl p-4 bg-gradient-to-br from-lime-600/40 to-amber-800/40 border-2 border-lime-400/40 hover:border-lime-300/60 active:scale-[0.99] transition flex items-center gap-3"
         >
           <span className="text-4xl shrink-0" aria-hidden="true">🌽</span>
           <span className="flex-1 min-w-0">
@@ -267,7 +268,7 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
           type="button"
           data-testid="entrada-doom-finca"
           onClick={() => irAccion('doom_finca')}
-          className="w-full text-left rounded-2xl p-4 bg-gradient-to-br from-orange-600/40 to-amber-800/40 border-2 border-orange-400/40 hover:border-orange-300/60 active:scale-[0.99] transition flex items-center gap-3"
+          className="jp-mfv-entrada w-full text-left rounded-2xl p-4 bg-gradient-to-br from-orange-600/40 to-amber-800/40 border-2 border-orange-400/40 hover:border-orange-300/60 active:scale-[0.99] transition flex items-center gap-3"
         >
           <span className="text-4xl shrink-0" aria-hidden="true">🎯</span>
           <span className="flex-1 min-w-0">
@@ -287,7 +288,7 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
           type="button"
           data-testid="entrada-subsuelo"
           onClick={() => irAccion('subsuelo')}
-          className="w-full text-left rounded-2xl p-4 bg-gradient-to-br from-cyan-600/40 to-amber-800/40 border-2 border-cyan-400/40 hover:border-cyan-300/60 active:scale-[0.99] transition flex items-center gap-3"
+          className="jp-mfv-entrada w-full text-left rounded-2xl p-4 bg-gradient-to-br from-cyan-600/40 to-amber-800/40 border-2 border-cyan-400/40 hover:border-cyan-300/60 active:scale-[0.99] transition flex items-center gap-3"
         >
           <span className="text-4xl shrink-0" aria-hidden="true">🪱</span>
           <span className="flex-1 min-w-0">
@@ -379,7 +380,7 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
         {game.insigniasGanadas > 0 && (
           <section
             data-testid="insignias-juego"
-            className="bg-gradient-to-br from-amber-950/50 to-yellow-950/30 border border-amber-700/40 rounded-3xl p-4"
+            className="jp-mfv-panel bg-gradient-to-br from-amber-950/50 to-yellow-950/30 border border-amber-700/40 rounded-3xl p-4"
           >
             <h3 className="text-lg font-black text-white flex items-center gap-2 mb-3">
               <Trophy size={20} className="text-amber-300" aria-hidden="true" />
@@ -390,7 +391,7 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
                 <div
                   key={b.id}
                   data-testid={`insignia-${b.id}`}
-                  className="flex flex-col items-center gap-1 bg-amber-900/30 border border-amber-500/40 rounded-2xl p-3 w-[88px]"
+                  className="jp-mfv-insignia flex flex-col items-center gap-1 bg-amber-900/30 border border-amber-500/40 rounded-2xl p-3 w-[88px]"
                   title={b.descripcion}
                 >
                   <span className="text-3xl" aria-hidden="true">{b.emoji}</span>

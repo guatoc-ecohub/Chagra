@@ -16,7 +16,7 @@ import {
   PLAGAS_DOOM, BENEFICOS_DOOM, ESCENARIOS, paletaPorTema,
 } from './doomFincaData';
 import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
-import { temaActivoDom } from '../../config/fvhSkin';
+import { temaActivoDom, fvhSkinClass } from '../../config/fvhSkin';
 import {
   castRay, projectSprite, createWorld, tickWorld, cambiarBenefico,
   decoracionEnMira, plagaObjetivo, avanzarRonda,
@@ -974,10 +974,10 @@ export default function DoomFincaScreen({ onBack, onHome }) {
         (selector + ayuda) queda fija abajo. El -mb compensa el padding-bottom
         que ScreenShell reserva para los FAB de otras pantallas (aqui sobra).
       */}
-      <div className="flex flex-col gap-2 px-3 pt-2 pb-[max(env(safe-area-inset-bottom),8px)] w-full max-w-lg mx-auto h-full min-h-0 -mb-[max(env(safe-area-inset-bottom),0px)_+_120px]">
+      <div className={fvhSkinClass('jp-ambiente flex flex-col gap-2 px-3 pt-2 pb-[max(env(safe-area-inset-bottom),8px)] w-full max-w-lg mx-auto h-full min-h-0 -mb-[max(env(safe-area-inset-bottom),0px)_+_120px]')}>
 
         {/* ── HUD superior: ronda, plagas, puntaje, combo ── */}
-        <div className="flex items-center justify-between gap-2 text-xs font-bold shrink-0">
+        <div className="jp-doom-hud flex items-center justify-between gap-2 text-xs font-bold shrink-0">
           <span className="flex items-center gap-1 text-emerald-200 whitespace-nowrap">
             <span aria-hidden="true">{escenarioActual.icono}</span>
             <span>Ronda {rondaIdx + 1}/{ESCENARIOS.length}</span>
@@ -998,7 +998,7 @@ export default function DoomFincaScreen({ onBack, onHome }) {
         {/* Barra de vitalidad */}
         <div className="flex items-center gap-2 text-xs font-bold shrink-0">
           <Heart size={13} className="text-emerald-300" aria-hidden="true" />
-          <div className="flex-1 h-3.5 bg-slate-800/60 rounded-full overflow-hidden border border-emerald-900/40">
+          <div className="jp-doom-vital-riel flex-1 h-3.5 bg-slate-800/60 rounded-full overflow-hidden border border-emerald-900/40">
             <div
               className="h-full bg-gradient-to-r from-emerald-500 to-lime-400 rounded-full transition-all duration-300"
               style={{ width: `${vitalidadPct}%` }}
@@ -1008,7 +1008,7 @@ export default function DoomFincaScreen({ onBack, onHome }) {
         </div>
 
         {/* ── Canvas del juego (crece para llenar el alto disponible) ── */}
-        <div className="relative flex-1 min-h-0 rounded-xl overflow-hidden border-2 border-emerald-700/50 bg-black shadow-lg shadow-emerald-900/30">
+        <div className="jp-doom-lienzo relative flex-1 min-h-0 rounded-xl overflow-hidden border-2 border-emerald-700/50 bg-black shadow-lg shadow-emerald-900/30">
           <canvas
             ref={canvasRef}
             width={W}
@@ -1077,7 +1077,7 @@ export default function DoomFincaScreen({ onBack, onHome }) {
           {/* ── Ficha educativa al controlar bien una plaga ── */}
           {fase === 'jugando' && ficha && (
             <div
-              className="absolute inset-x-2 bottom-2 bg-emerald-950/95 border-2 border-emerald-400/60 rounded-xl p-3 shadow-xl"
+              className="jp-doom-ficha absolute inset-x-2 bottom-2 bg-emerald-950/95 border-2 border-emerald-400/60 rounded-xl p-3 shadow-xl"
               role="status"
               aria-live="polite"
             >
@@ -1210,7 +1210,7 @@ export default function DoomFincaScreen({ onBack, onHome }) {
                 aria-pressed={sel}
                 aria-label={`${b.nombre}. ${b.desc}${recomendado ? ' Recomendado esta ronda.' : ''}`}
                 title={`${b.nombre} — ${b.desc}`}
-                className="relative min-h-[54px] w-[60px] px-1 rounded-xl border-2 flex flex-col items-center justify-center gap-0.5 transition active:scale-95"
+                className="jp-doom-beneficio relative min-h-[54px] w-[60px] px-1 rounded-xl border-2 flex flex-col items-center justify-center gap-0.5 transition active:scale-95"
                 style={{
                   borderColor: sel ? b.color : recomendado ? 'rgba(52,211,153,0.5)' : 'rgba(255,255,255,0.15)',
                   backgroundColor: sel ? `${b.color}22` : 'rgba(255,255,255,0.05)',

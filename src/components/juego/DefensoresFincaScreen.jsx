@@ -750,9 +750,9 @@ export default function DefensoresFincaScreen({ onBack, onHome }) {
     <ScreenShell title="Defensores de la Finca" icon={Shield} onBack={onBack} onHome={onHome}>
       <div
         data-testid="defensores-finca-screen"
-        className="flex flex-col gap-1 px-3 pt-2 pb-10 max-w-3xl mx-auto"
+        className={fvhSkinClass('jp-ambiente flex flex-col gap-1 px-3 pt-2 pb-10 max-w-3xl mx-auto')}
       >
-        <p className="text-2xs font-black uppercase tracking-[0.2em] text-emerald-300/80">
+        <p className="jp-df-kicker text-2xs font-black uppercase tracking-[0.2em] text-emerald-300/80">
           Aprende a Cultivar Jugando
         </p>
         <h2 className="text-2xl font-black text-white leading-tight flex items-center gap-2">
