@@ -26,6 +26,7 @@
  */
 
 import { findMunicipio } from '../utils/colombiaLocations.js';
+import { getActiveTenantId } from './tenantContext.js';
 
 const PROFILE_PREFIX = 'chagra:profile:';
 const PROFILE_KEY = `${PROFILE_PREFIX}v1`;
@@ -33,6 +34,91 @@ const PROFILE_DONE_KEY = `${PROFILE_PREFIX}done:v1`;
 const PROFILE_SKIPPED_KEY = `${PROFILE_PREFIX}skipped:v1`;
 
 const hasStorage = () => typeof window !== 'undefined' && !!window.localStorage;
+
+/**
+ * Deriva un userKey estable del usuario logueado (farmOS username).
+ * @returns {string|null} username del tenant activo, o null si no hay sesión.
+ */
+function getUserKey() {
+  try {
+    const id = getActiveTenantId();
+    return id && typeof id === 'string' && id.trim().length > 0 ? id.trim() : null;
+  } catch { return null; }
+}
+
+function getProfileKey() {
+  const uk = getUserKey();
+  return uk ? `${PROFILE_KEY}:${uk}` : PROFILE_KEY;
+}
+
+function getProfileDoneKey() {
+  const uk = getUserKey();
+  return uk ? `${PROFILE_DONE_KEY}:${uk}` : PROFILE_DONE_KEY;
+}
+
+function getProfileSkippedKey() {
+  const uk = getUserKey();
+  return uk ? `${PROFILE_SKIPPED_KEY}:${uk}` : PROFILE_SKIPPED_KEY;
+}
+
+/** @type {boolean} flag module-level para ejecutar la migración una sola vez. */
+let _migrated = false;
+
+function _getOperatorUsernames() {
+  try {
+    return (import.meta.env.VITE_OPERATOR_USERNAME || '')
+      .split(',')
+      .map(s => s.trim().toLowerCase())
+      .filter(Boolean);
+  } catch { return []; }
+}
+
+function _cleanupLegacyKeys() {
+  try {
+    window.localStorage.removeItem(PROFILE_KEY);
+    window.localStorage.removeItem(PROFILE_DONE_KEY);
+    window.localStorage.removeItem(PROFILE_SKIPPED_KEY);
+  } catch (_) { /* noop */ }
+}
+
+/**
+ * Migración suave: si existe la clave GLOBAL vieja y NO existe la del
+ * usuario actual, NO la hereda para usuarios nuevos (que vean onboarding).
+ * Solo migra si el usuario actual es identificable como operador via
+ * VITE_OPERATOR_USERNAME. Si no hay usuario logueado (pre-login), mantiene
+ * el comportamiento actual con claves globales.
+ */
+function migrateLegacyProfile() {
+  if (!hasStorage() || _migrated) return;
+  _migrated = true;
+
+  const uk = getUserKey();
+  if (!uk) return;
+
+  const oldDone = window.localStorage.getItem(PROFILE_DONE_KEY);
+  const oldSkipped = window.localStorage.getItem(PROFILE_SKIPPED_KEY);
+  const oldProfile = window.localStorage.getItem(PROFILE_KEY);
+
+  if (!oldDone && !oldSkipped && !oldProfile) return;
+
+  // Si el usuario ya tiene datos per-user, solo limpiar legado
+  const hasUserDone = window.localStorage.getItem(getProfileDoneKey());
+  const hasUserSkipped = window.localStorage.getItem(getProfileSkippedKey());
+  if (hasUserDone || hasUserSkipped) {
+    _cleanupLegacyKeys();
+    return;
+  }
+
+  // Solo migrar si el usuario actual es el operador
+  const opNames = _getOperatorUsernames();
+  if (opNames.length > 0 && opNames.includes(uk.toLowerCase())) {
+    if (oldDone) window.localStorage.setItem(getProfileDoneKey(), oldDone);
+    if (oldSkipped) window.localStorage.setItem(getProfileSkippedKey(), oldSkipped);
+    if (oldProfile) window.localStorage.setItem(getProfileKey(), oldProfile);
+    _cleanupLegacyKeys();
+  }
+  // Usuarios nuevos (no operador): NO heredan — ven onboarding.
+}
 
 /**
  * Catálogo de preguntas del onboarding extendido.
@@ -357,8 +443,10 @@ export function getApplicableQuestions(answers = {}) {
  */
 export function getProfile() {
   if (!hasStorage()) return {};
+  migrateLegacyProfile();
+  const key = getProfileKey();
   try {
-    const raw = window.localStorage.getItem(PROFILE_KEY);
+    const raw = window.localStorage.getItem(key);
     if (!raw) return {};
     const parsed = JSON.parse(raw);
     return parsed && typeof parsed === 'object' ? parsed : {};
@@ -453,10 +541,11 @@ export function resolveAltitudToSave({
  */
 export function saveProfile(partial = {}) {
   if (!hasStorage()) return { ...partial };
+  migrateLegacyProfile();
   const current = getProfile();
   const next = { ...current, ...partial, updatedAt: new Date().toISOString() };
   try {
-    window.localStorage.setItem(PROFILE_KEY, JSON.stringify(next));
+    window.localStorage.setItem(getProfileKey(), JSON.stringify(next));
   } catch (e) {
     console.warn('[userProfile] No se pudo guardar el perfil:', e);
   }
@@ -507,8 +596,9 @@ export function setNotificationStyle(style) {
 /** Marca el onboarding de perfil como completado. */
 export function markProfileDone() {
   if (!hasStorage()) return;
+  migrateLegacyProfile();
   try {
-    window.localStorage.setItem(PROFILE_DONE_KEY, '1');
+    window.localStorage.setItem(getProfileDoneKey(), '1');
   } catch (e) {
     console.warn('[userProfile] markProfileDone:', e);
   }
@@ -531,8 +621,9 @@ export function markProfileDone() {
 /** Marca que el usuario saltó el onboarding (respeta #283). */
 export function markProfileSkipped() {
   if (!hasStorage()) return;
+  migrateLegacyProfile();
   try {
-    window.localStorage.setItem(PROFILE_SKIPPED_KEY, '1');
+    window.localStorage.setItem(getProfileSkippedKey(), '1');
   } catch (e) {
     console.warn('[userProfile] markProfileSkipped:', e);
   }
@@ -541,9 +632,10 @@ export function markProfileSkipped() {
 /** @returns {boolean} si el usuario ya completó o saltó el onboarding. */
 export function hasSeenProfileOnboarding() {
   if (!hasStorage()) return false;
+  migrateLegacyProfile();
   return (
-    window.localStorage.getItem(PROFILE_DONE_KEY) === '1' ||
-    window.localStorage.getItem(PROFILE_SKIPPED_KEY) === '1'
+    window.localStorage.getItem(getProfileDoneKey()) === '1' ||
+    window.localStorage.getItem(getProfileSkippedKey()) === '1'
   );
 }
 
@@ -1019,3 +1111,8 @@ export const __PROFILE_KEYS__ = {
   PROFILE_SKIPPED_KEY,
   TELEMETRY_CONSENT_KEY,
 };
+
+/** Resetea el flag de migración para tests. */
+export function _resetProfileMigration() {
+  _migrated = false;
+}
