@@ -97,7 +97,7 @@ export default function FincaWorldScene({
   // (acogedoras), no un campo muerto. Sin nada declarado → cae a la semillita.
   const ricaTieneContenido = modoRico
     && escenaRica
-    && (escenaRica.bandas.length > 0 || escenaRica.tieneInv);
+    && (escenaRica.bandas.length > 0 || escenaRica.camas.length > 0 || escenaRica.tieneInv);
 
   const [cieloA, cieloB] = stage?.cielo || ['#bcd9e8', '#e8f3ee'];
   const [tierraA, tierraB] = stage?.tierra || ['#c9a878', '#a98a5e'];
@@ -398,14 +398,21 @@ function construirEscenaRica({ lotes, variant }) {
   const zonaX0 = 22;
   const zonaW = 356;
 
-  const nBandas = Math.max(zonasActivas.length, 1);
+  // Separamos zonas CON plantas (bandas de profundidad) de zonas VACÍAS
+  // declaradas (camas "por sembrar"), porque su layout es distinto: las
+  // sembradas se apilan en bandas (atrás→frente); las por sembrar se reparten
+  // como CAMITAS pequeñas separadas horizontalmente (no franjas apiladas).
+  const conPlantas = zonasActivas.filter((z) => porZona[z].length > 0);
+  const porSembrar = zonasActivas.filter((z) => porZona[z].length === 0);
+
+  const nBandas = Math.max(conPlantas.length, 1);
   // Líneas base de las bandas: TODAS las plantas se paran sobre el suelo (no
   // flotan ni se meten en las colinas). La profundidad se da con un leve offset
   // (atrás un poco más arriba) + escala (atrás un poco más chico), no subiendo
   // árboles al cielo. Rango compacto sobre la tierra: 196 (atrás) → 224 (frente).
   const yTop = 196;
   const yBot = 224;
-  const bandas = zonasActivas.map((zona, i) => {
+  const bandas = conPlantas.map((zona, i) => {
     const baseY = nBandas === 1
       ? 210
       : Math.round(yTop + (i * (yBot - yTop)) / (nBandas - 1));
@@ -436,14 +443,38 @@ function construirEscenaRica({ lotes, variant }) {
       plantas,
       escala,
       declarada: declaradas.has(zona),
-      vacia: plantas.length === 0,
+      vacia: false,
       x: xIzq,
       y: baseY,
       w: anchoBanda,
     };
   });
 
-  return { bandas, invernaderoForma, tieneInv };
+  // Camas "por sembrar": camitas pequeñas REPARTIDAS horizontalmente en el frente
+  // de la escena (donde irían de verdad). Si hay invernadero, empiezan a su
+  // derecha. Cada cama es compacta, con su etiqueta discreta al lado — nada de
+  // franjas de ancho completo apiladas ni columna central de puntos.
+  const camas = (() => {
+    if (porSembrar.length === 0) return [];
+    const camX0 = tieneInv ? 158 : 40;
+    const camX1 = 372;
+    const ancho = camX1 - camX0;
+    const n = porSembrar.length;
+    // baseline: si NO hay plantas sembradas, las camas se ven más centradas en el
+    // frente cálido; si conviven con plantas, van al frente (abajo).
+    const baseY = conPlantas.length > 0 ? 230 : 214;
+    return porSembrar.map((zona, i) => {
+      // centro de cada cama, repartido uniforme con margen.
+      const cx = n === 1
+        ? camX0 + ancho / 2
+        : Math.round(camX0 + 28 + (i * (ancho - 56)) / (n - 1));
+      // ligero escalonado vertical para dar naturalidad (no una fila rígida).
+      const cy = baseY + (i % 2 === 0 ? 0 : 8);
+      return { zona, label: ZONA_LABEL[zona], cx, cy, key: `cama-${zona}` };
+    });
+  })();
+
+  return { bandas, camas, invernaderoForma, tieneInv };
 }
 
 /** aria-label honesto del estado real de la escena rica. */
@@ -451,10 +482,6 @@ function ariaDeLotes(escena, animales) {
   if (!escena) return '';
   const partes = [];
   for (const b of escena.bandas) {
-    if (b.vacia) {
-      partes.push(`${b.label} por sembrar`);
-      continue;
-    }
     // Resumen de fases presentes en la zona (florecidas, con frutos, etc.).
     const fases = new Set(b.plantas.map((p) => p.fase));
     const detalle = [];
@@ -464,6 +491,10 @@ function ariaDeLotes(escena, animales) {
     partes.push(
       `${b.plantas.length} en ${b.label}${detalle.length ? ` (${detalle.join(', ')})` : ''}`,
     );
+  }
+  // Zonas declaradas aún sin plantas → "por sembrar" (acogedoras, honestas).
+  for (const c of escena.camas || []) {
+    partes.push(`${c.label} por sembrar`);
   }
   if (escena.invernaderoForma) {
     const forma = escena.invernaderoForma === 'cuadrado'
@@ -487,40 +518,41 @@ function EscenaRica({ escena, animales }) {
       {/* Invernadero (a la izquierda) según su forma declarada */}
       {escena.invernaderoForma && <Invernadero forma={escena.invernaderoForma} />}
 
-      {/* Bandas de zonas, de atrás (frutales) hacia adelante (huerta) */}
+      {/* Bandas de zonas CON plantas, de atrás (frutales) hacia adelante (huerta) */}
       {escena.bandas.map((banda, bi) => (
         <g key={banda.zona}>
           {/* Parche de suelo suave que AGRUPA la zona (la hace legible como una
               unidad, no plantas sueltas). Tono de tierra cálida (paleta Chagra). */}
-          {!banda.vacia && banda.zona !== 'huerta' && (
+          {banda.zona !== 'huerta' && (
             <ParcheZona x={banda.x} y={banda.y} w={banda.w} />
           )}
           {/* Cama/era de la zona huerta (suelo labrado) — da contexto de "huerta" */}
-          {banda.zona === 'huerta' && !banda.vacia && (
+          {banda.zona === 'huerta' && (
             <CamaHuerta x={banda.x} y={banda.y} w={banda.w} />
           )}
-          {/* Zona declarada SIN plantas → "por sembrar" acogedora */}
-          {banda.vacia ? (
-            <ZonaPorSembrar
-              zona={banda.zona}
-              x={banda.x}
-              y={banda.y}
-              w={banda.w}
-              delay={bi * 0.1}
-            />
-          ) : (
-            banda.plantas.map((p, pi) => (
-              <g
-                key={p.key}
-                className={`fv-grow ${pi % 2 === 0 ? 'fv-sway' : 'fv-sway-slow'}`}
-                transform={`translate(${p.px} ${p.py}) scale(${p.escala})`}
-                style={{ animationDelay: `${Math.min(bi * 0.12 + pi * 0.07, 1)}s` }}
-              >
-                <PlantaPorTipo tipo={p.tipo} fase={p.fase} growth={p.growth} />
-              </g>
-            ))
-          )}
+          {banda.plantas.map((p, pi) => (
+            <g
+              key={p.key}
+              className={`fv-grow ${pi % 2 === 0 ? 'fv-sway' : 'fv-sway-slow'}`}
+              transform={`translate(${p.px} ${p.py}) scale(${p.escala})`}
+              style={{ animationDelay: `${Math.min(bi * 0.12 + pi * 0.07, 1)}s` }}
+            >
+              <PlantaPorTipo tipo={p.tipo} fase={p.fase} growth={p.growth} />
+            </g>
+          ))}
         </g>
+      ))}
+
+      {/* Camas "por sembrar": zonas declaradas aún sin plantas, repartidas como
+          camitas pequeñas y acogedoras (no franjas apiladas ni columna central) */}
+      {(escena.camas || []).map((cama, ci) => (
+        <CamaPorSembrar
+          key={cama.key}
+          zona={cama.zona}
+          cx={cama.cx}
+          cy={cama.cy}
+          delay={0.15 + ci * 0.1}
+        />
       ))}
 
       {/* Corral de animales (si los hay) — esquina inferior derecha */}
@@ -616,33 +648,39 @@ function Frutal({ fase, growth = 0.6 }) {
   );
 }
 
-// ── AROMÁTICA: mata redondeada compacta y mullida; flor=florecitas. ──────────
+// ── AROMÁTICA: mata redondeada COMPACTA y mullida (domo cerrado, tipo arbusto de
+//    hierba). flor=florecitas lila SOBRE el domo. Silueta clara: NO antenas, NO
+//    flores flotando — para que en aislamiento se lea como una matica de hierba. ─
 function Aromatica({ fase, growth = 0.5 }) {
-  const r = 8 + growth * 6;
+  const r = 9 + growth * 6; // radio del domo
+  // El domo se apoya en el suelo (y=0). Centro del domo en cy.
+  const cy = -r * 0.78;
   return (
     <>
-      {/* matita mullida: varios lóbulos pequeños = textura compacta */}
-      <ellipse cx="0" cy="-2" rx={r + 2} ry={r * 0.7} fill="#3f8f4e" opacity="0.35" />
-      <circle cx="0" cy={-r * 0.6} r={r * 0.8} fill="#5aa861" />
-      <circle cx={-r * 0.6} cy={-r * 0.2} r={r * 0.62} fill="#6cc07e" />
-      <circle cx={r * 0.6} cy={-r * 0.2} r={r * 0.62} fill="#6cc07e" />
-      <circle cx={-r * 0.25} cy={-r * 0.85} r={r * 0.5} fill="#7fce8e" />
-      <circle cx={r * 0.3} cy={-r * 0.7} r={r * 0.46} fill="#7fce8e" />
-      {/* hojitas finas asomando (textura de aromática) */}
-      <path d={`M0 ${-r * 0.6} q-3 -6 -1 -${r + 4}`} stroke="#5aa861" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-      <path d={`M0 ${-r * 0.6} q3 -6 1 -${r + 2}`} stroke="#5aa861" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-      {/* FASE: floración → florecitas moradas/lila (lavanda, romero, etc.) */}
+      {/* sombra/base de la mata sobre el suelo (la asienta, no flota) */}
+      <ellipse cx="0" cy="0" rx={r * 1.05} ry={r * 0.32} fill="#3f8f4e" opacity="0.3" />
+      {/* domo principal cerrado (media-luna mullida apoyada en el suelo) */}
+      <path
+        d={`M${-r} 0 A ${r} ${r * 1.05} 0 0 1 ${r} 0 Z`}
+        fill="#4ca35c"
+      />
+      {/* lóbulos internos = textura mullida compacta, todos DENTRO del domo */}
+      <circle cx={-r * 0.42} cy={cy + r * 0.18} r={r * 0.5} fill="#5aa861" />
+      <circle cx={r * 0.42} cy={cy + r * 0.18} r={r * 0.5} fill="#5aa861" />
+      <circle cx="0" cy={cy - r * 0.05} r={r * 0.56} fill="#6cc07e" />
+      <circle cx={-r * 0.2} cy={cy - r * 0.18} r={r * 0.34} fill="#7fce8e" />
+      <circle cx={r * 0.28} cy={cy - r * 0.12} r={r * 0.3} fill="#7fce8e" />
+      {/* FASE: floración → racimitos lila SOBRE la mata (integrados, no flotando) */}
       {fase === 'flower' && (
         <g>
-          <circle cx={-r * 0.5} cy={-r * 0.9} r="2.4" fill="#b79cf0" />
-          <circle cx={r * 0.45} cy={-r * 0.7} r="2.4" fill="#c9b3f5" />
-          <circle cx={0} cy={-r * 1.15} r="2.2" fill="#b79cf0" />
-          <circle cx={r * 0.1} cy={-r * 0.4} r="2" fill="#d8c6f8" />
+          <Florecita cx={-r * 0.42} cy={cy - r * 0.08} color="#c9b3f5" small />
+          <Florecita cx={r * 0.4} cy={cy - r * 0.02} color="#b79cf0" small />
+          <Florecita cx={0} cy={cy - r * 0.42} color="#d8c6f8" small />
         </g>
       )}
-      {/* cosecha de aromática: un toque dorado de madurez */}
+      {/* cosecha de aromática: un toque dorado de madurez sobre la mata */}
       {fase === 'harvest' && (
-        <circle cx="0" cy={-r * 0.9} r="2.4" fill="#f6c44b" />
+        <Florecita cx={0} cy={cy - r * 0.2} color="#f6c44b" small />
       )}
     </>
   );
@@ -666,22 +704,22 @@ function Hortaliza({ fase, growth = 0.4 }) {
             </>
           ) : (
             <>
-              {/* tallo */}
+              {/* tallo corto */}
               <rect x="-1.2" y={-h} width="2.4" height={h} rx="1.2" fill="#4f9a55" />
-              {/* hojas (acelga/lechuga) */}
-              <ellipse cx={-3} cy={-h + 4} rx="4.5" ry="2.6" fill="#6cc07e" transform={`rotate(-22 -3 ${-h + 4})`} />
-              <ellipse cx={3} cy={-h + 6} rx="4.5" ry="2.6" fill="#6cc07e" transform={`rotate(22 3 ${-h + 6})`} />
-              <ellipse cx={0} cy={-h - 1} rx="4" ry="2.6" fill="#7fce8e" />
-              {/* FASE flor → florecita pequeña amarilla (p.ej. brócoli/calabaza) */}
+              {/* roseta de hojas (acelga/lechuga) — mata compacta de plántula */}
+              <ellipse cx={-3.4} cy={-h + 3} rx="5" ry="3" fill="#6cc07e" transform={`rotate(-26 -3.4 ${-h + 3})`} />
+              <ellipse cx={3.4} cy={-h + 3} rx="5" ry="3" fill="#6cc07e" transform={`rotate(26 3.4 ${-h + 3})`} />
+              <ellipse cx={0} cy={-h - 1.5} rx="4.4" ry="3.4" fill="#7fce8e" />
+              {/* FASE flor → florecita amarilla integrada en el cogollo central */}
               {fase === 'flower' && i === 1 && (
-                <Florecita cx={0} cy={-h - 4} color="#ffe08a" small />
+                <Florecita cx={0} cy={-h - 1} color="#ffe08a" small />
               )}
-              {/* FASE fruto → frutito (tomate/ají) colgando */}
+              {/* FASE fruto → frutito (tomate/ají) anidado entre las hojas */}
               {(fase === 'fruit' || fase === 'harvest') && (
                 <circle
-                  cx={i === 1 ? 0 : x > 0 ? 2 : -2}
-                  cy={-h - 1}
-                  r={fase === 'harvest' ? 2.6 : 2.2}
+                  cx={i === 1 ? 1.5 : x > 0 ? 1 : -1}
+                  cy={-h + 1}
+                  r={fase === 'harvest' ? 2.8 : 2.4}
                   fill={fase === 'harvest' ? '#e0532f' : '#e58a3c'}
                 />
               )}
@@ -757,39 +795,65 @@ function CamaHuerta({ x, y, w }) {
 }
 
 /**
- * ZonaPorSembrar — una zona declarada en el perfil que aún no tiene plantas
- * reales: cama/lote acogedor "listo para sembrar" (NO campo muerto). Coherente
- * con "vacía = invita a empezar". Nunca dibuja plantas que no existen.
+ * CamaPorSembrar — una zona declarada en el perfil aún SIN plantas: una CAMITA
+ * preparada, pequeña y acogedora ("lista para sembrar", NO campo muerto): un
+ * montículo de tierra mullida, 2-3 hoyitos/semillitas insinuadas y su etiqueta
+ * DISCRETA al lado. Se posiciona donde iría la zona (repartidas en la escena).
+ * Coherente con "vacía = invita a empezar". Nunca dibuja plantas inexistentes.
+ *
+ * @param {Object} props
+ * @param {string} props.zona  id de la zona (huerta/frutales/aromaticas)
+ * @param {number} props.cx    centro x de la cama
+ * @param {number} props.cy    línea de suelo de la cama (y)
+ * @param {number} [props.delay]
  */
-function ZonaPorSembrar({ zona, x, y, w, delay = 0 }) {
-  const cx = x + w / 2;
-  const left = x + 10;
-  const right = x + w - 10;
+function CamaPorSembrar({ zona, cx, cy, delay = 0 }) {
+  const rx = 30; // media-anchura de la camita
   return (
     <g className="fv-grow" style={{ animationDelay: `${delay}s` }}>
-      {/* cama de tierra preparada */}
-      <rect x={left} y={y - 4} width={right - left} height="14" rx="6" fill="#8a6a3a" opacity="0.55" />
-      <g stroke="#6e5634" strokeWidth="1" opacity="0.5" strokeDasharray="3 3">
-        <line x1={left + 6} y1={y + 1} x2={right - 6} y2={y + 1} />
-        <line x1={left + 6} y1={y + 6} x2={right - 6} y2={y + 6} />
+      {/* montículo de tierra mullida (cama preparada, cálida) */}
+      <ellipse cx={cx} cy={cy + 5} rx={rx + 3} ry="9" fill="#7a5a32" opacity="0.55" />
+      <path
+        d={`M${cx - rx} ${cy + 4} Q${cx} ${cy - 7} ${cx + rx} ${cy + 4} Z`}
+        fill="#9c7a45"
+        opacity="0.92"
+      />
+      <path
+        d={`M${cx - rx + 4} ${cy + 3} Q${cx} ${cy - 4} ${cx + rx - 4} ${cy + 3}`}
+        fill="none"
+        stroke="#b08f55"
+        strokeWidth="1.4"
+        opacity="0.7"
+      />
+      {/* 3 hoyitos/semillitas insinuadas a lo largo de la cresta (invitan) */}
+      <g>
+        <Hoyito cx={cx - 13} cy={cy - 1} />
+        <Hoyito cx={cx} cy={cy - 3} />
+        <Hoyito cx={cx + 13} cy={cy - 1} />
       </g>
-      {/* semillita central que invita (mismo gesto que el estado vacío global) */}
-      <g transform={`translate(${cx} ${y + 2})`}>
-        <ellipse cx="0" cy="3" rx="5" ry="3" fill="#9c7a45" />
-        <path d="M0 0 Q-3 -6 0 -10 Q3 -6 0 0" fill="#7fce8e" opacity="0.9" />
-      </g>
-      {/* rótulo accesible de la zona como <text> rsvg-safe, discreto */}
+      {/* etiqueta DISCRETA al pie de la cama (no apilada al centro) */}
       <text
         x={cx}
-        y={y - 7}
+        y={cy + 18}
         textAnchor="middle"
-        fontSize="7"
-        fill="#caa86a"
-        opacity="0.85"
+        fontSize="8"
+        fontWeight="600"
+        fill="#7c5f38"
+        opacity="0.95"
         fontFamily="system-ui, sans-serif"
       >
         {ZONA_LABEL[zona] || zona}
       </text>
+    </g>
+  );
+}
+
+/** Hoyito con semillita insinuada: surco redondo + un puntito de brote tierno. */
+function Hoyito({ cx, cy }) {
+  return (
+    <g transform={`translate(${cx} ${cy})`}>
+      <ellipse cx="0" cy="0" rx="3" ry="1.8" fill="#6e5634" opacity="0.85" />
+      <circle cx="0" cy="-0.5" r="1.3" fill="#7fce8e" opacity="0.95" />
     </g>
   );
 }
@@ -801,27 +865,29 @@ function ZonaPorSembrar({ zona, x, y, w, delay = 0 }) {
  */
 function Invernadero({ forma }) {
   if (forma === 'tunel') {
-    // macrotúnel: arco/media-luna translúcida pequeño
+    // macrotúnel: media-luna translúcida pequeña, con 1-2 nervaduras LIMPIAS.
     return (
       <g className="fv-grow" style={{ animationDelay: '0.05s' }}>
         {/* piso */}
         <rect x="20" y="200" width="118" height="36" rx="4" fill="#8a6a3a" opacity="0.7" />
-        {/* arco translúcido (media luna) */}
+        {/* cubierta translúcida (media luna) */}
         <path d="M26 202 Q79 150 132 202 Z" fill="#cdeef0" opacity="0.42" stroke="#a8dfe2" strokeWidth="2" />
-        {/* costillas del túnel */}
-        <g stroke="#bfe6ea" strokeWidth="1.6" opacity="0.8" fill="none">
-          <path d="M44 202 Q79 168 114 202" />
-          <path d="M58 202 Q79 176 100 202" />
-        </g>
+        {/* contorno superior nítido del arco */}
         <path d="M26 202 Q79 150 132 202" fill="none" stroke="#dff4f5" strokeWidth="2.4" />
-        {/* hileritas adentro (lo que se cultiva bajo el túnel) */}
+        {/* nervaduras (hoops): 2 arcos verticales limpios que cruzan la cubierta,
+            paralelos al contorno — estructura del macrotúnel, sin garabato. */}
+        <g stroke="#bfe6ea" strokeWidth="1.6" opacity="0.85" fill="none">
+          <path d="M60 202 Q60 168 79 158" />
+          <path d="M98 202 Q98 168 79 158" />
+        </g>
+        {/* hileritas de cultivo adentro */}
         <g stroke="#4f9a55" strokeWidth="3" strokeLinecap="round" opacity="0.85">
-          <line x1="40" y1="214" x2="118" y2="214" />
-          <line x1="36" y1="224" x2="122" y2="224" />
+          <line x1="40" y1="216" x2="118" y2="216" />
+          <line x1="36" y1="226" x2="122" y2="226" />
         </g>
         {/* plantitas asomando */}
         <g fill="#6cc07e">
-          <circle cx="56" cy="212" r="2.4" /><circle cx="79" cy="212" r="2.4" /><circle cx="102" cy="212" r="2.4" />
+          <circle cx="56" cy="214" r="2.4" /><circle cx="79" cy="214" r="2.4" /><circle cx="102" cy="214" r="2.4" />
         </g>
         <text x="79" y="198" textAnchor="middle" fontSize="7" fill="#7fb8b0" opacity="0.9" fontFamily="system-ui, sans-serif">
           túnel
