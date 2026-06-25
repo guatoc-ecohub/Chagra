@@ -198,6 +198,62 @@
   --scrim-opacity: 0.12;
 }
 
+/* VERDE VIVO — la PIEL propia de la finca viva (operador 2026-06-24): verde
+ * frondoso + sol cálido + tierra/ocre. Es la identidad por defecto del home F2
+ * (mano radial, solar/soberanía Chagra) como su skin. Tema CLARO y vivo: fondo
+ * crema con tinte verde fresco, tinta bosque profundo, acento verde-hoja
+ * vibrante (#2e8b3d) + sol/ocre cálido (#e0922e / #f2b441 / tierra #8a5a2b).
+ * Rampa slate invertida y entonada verde-cálida (como nature, pero más viva y
+ * más verde). Cumple AA: tinta bosque sobre crema = 13.3:1 (sonda). */
+[data-theme="verde-vivo"] {
+  --c-slate-950: 238 243 226;  /* fondo base = crema frondosa (#eef3e2) */
+  --c-slate-900: 251 253 244;  /* card / superficie (blanco hueso verdoso) */
+  --c-slate-800: 233 240 216;  /* raised (#e9f0d8) */
+  --c-slate-700: 200 214 168;  /* línea / borde (verde salvia claro #c8d6a8) */
+  --c-slate-600: 214 224 188;  /* borde suave (#d6e0bc) */
+  --c-slate-500: 106 122 78;   /* terciario / placeholder (verde-oliva #6a7a4e) */
+  --c-slate-400: 86 100 60;    /* secundario (#56643c) */
+  --c-slate-300: 64 80 44;     /* texto fuerte (verde bosque medio #40502c) */
+  --c-slate-200: 40 56 26;     /* casi tinta */
+  --c-slate-100: 28 42 22;     /* tinta = bosque profundo (#1c2a16) */
+  --c-slate-50: 18 30 14;      /* tinta más oscura */
+  --c-emerald-200: 220 236 200; /* verde claro suave */
+  --c-emerald-300: 58 132 70;   /* verde-hoja medio (AA sobre crema) */
+  --c-emerald-400: 46 139 61;   /* VERDE VIVO frondoso (acento) #2e8b3d */
+  --c-emerald-500: 40 122 52;   /* verde profundo */
+  --c-emerald-600: 34 102 44;
+  --c-emerald-700: 34 84 40;    /* verde bosque (números impacto, AA sobre crema) */
+  --c-emerald-800: 26 64 32;
+  --c-emerald-900: 220 236 200;
+  --c-amber-200: 250 226 170;
+  --c-amber-300: 235 170 70;
+  --c-amber-400: 242 180 65;   /* sol dorado (#f2b441) */
+  --c-amber-500: 224 146 46;   /* sol cálido / ocre (#e0922e) */
+  --c-amber-600: 196 122 42;
+  --c-amber-700: 138 90 43;    /* tierra / ocre profundo (#8a5a2b) */
+  --c-amber-900: 245 230 200;
+  --c-surface: 238 243 226;
+  --c-surface-card: 251 253 244;
+  --c-surface-raised: 233 240 216;
+  --c-surface-border: 200 214 168;
+  /* acentos: verde-hoja vivo + sol/ocre cálido + tierra. */
+  --c-muzo: 46 139 61;          /* verde vivo */
+  --c-muzo-glow: 88 176 96;
+  --c-morpho: 46 139 61;        /* verde vivo */
+  --c-morpho-glow: 88 176 96;
+  --c-orchid: 224 146 46;       /* sol cálido / ocre (acento secundario) */
+  --c-orchid-glow: 242 180 65;
+  --c-frog: 242 180 65;
+  --c-frog-glow: 250 200 90;
+  /* FX OFF — verde-vivo es un degradado vivo, no confeti/glow neón. El velo de
+   * fondo es un crema verdoso sutil que NO lava la escena. */
+  --fx-particles: 0;
+  --fx-glow-opacity: 0;
+  --fx-bg-pattern: 0;
+  --scrim-bg: 238 243 226;  /* velo = crema frondosa del tema → vela suave */
+  --scrim-opacity: 0.12;
+}
+
 @layer base {
   :root {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;

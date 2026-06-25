@@ -32,19 +32,29 @@
   src: url('/fonts/nunito-latin.woff2') format('woff2');
 }
 
-/* ── Variables de paleta REAL Mi Finca Viva (WORLD_STAGES nivel 3) ─────────── */
+/* ── Variables de paleta de Mi Finca Viva — PIEL POR TEMA ───────────────────
+   La escena/hero ya se ve bajo CUALQUIER tema (la monta la flag, no el tema).
+   Para que tome la PIEL del tema activo (como los bocetos aprobados: misma
+   disposición+escena, distinta piel), la paleta del hero deriva de los tokens
+   --c-* del tema (index.css/themes.css) con un FALLBACK al look "Verde Vivo"
+   original. Así cambian con el tema: el cielo del shell, la marca, el título de
+   portales, el hero text, las sombras. Cada tema afina además el cielo/verde/
+   sol de la ESCENA en su bloque [data-theme] más abajo.
+
+   Default (sin data-theme = bio-punk base) y verde-vivo comparten el look vivo
+   original; nature y minimalista lo retiñen a su piel cálida/papel. */
 .fvh {
   --fvh-cielo-a: #7ac3da;
   --fvh-cielo-b: #c8e8cb;
-  --fvh-verde-1: #3f8f4e;
+  --fvh-verde-1: rgb(var(--c-emerald-400, 63 143 78));
   --fvh-sol-a: #fff3c4;
   --fvh-sol-b: #ffd24d;
   --fvh-lima: #a3e635;
   --fvh-lima-claro: #bef264;
-  --fvh-crema: #fbf6e9;
-  --fvh-tinta: #26331f;
-  --fvh-tinta-suave: #4e5c42;
-  --fvh-sello: #2f6b3a;
+  --fvh-crema: rgb(var(--c-surface-card, 251 246 233));
+  --fvh-tinta: rgb(var(--c-slate-100, 38 51 31));
+  --fvh-tinta-suave: rgb(var(--c-slate-300, 78 92 66));
+  --fvh-sello: rgb(var(--c-emerald-500, 47 107 58));
   --fvh-sombra-iso: rgba(60, 44, 20, 0.30);
   --fvh-r: 24px;
   --fvh-max: 1180px;          /* ancho máximo del shell en desktop */
@@ -76,6 +86,49 @@
 .fvh[data-luz="amanecer"] { --fvh-cielo-a: #f3b58c; }
 .fvh[data-luz="atardecer"] { --fvh-cielo-a: #f0a072; }
 
+/* ── PIEL DE LA ESCENA POR TEMA (operador 2026-06-24) ──────────────────────
+   La MISMA escena/disposición, distinta piel: cada tema retiñe el cielo, el
+   verde y el sol del shell de la escena para que combine con su paleta. El
+   contenido (las plantas, los animales, el colibrí) es el mismo; lo que cambia
+   es la ATMÓSFERA de color, como en los bocetos aprobados.
+
+   · Default (sin data-theme = bio-punk base) y VERDE VIVO → cielo fresco vivo +
+     verde-hoja + sol dorado (el look original de la finca viva).
+   · NATURE → cielo crema cálido + verde salvia + sol ámbar (piel terrosa).
+   · MINIMALISTA → cielo papel claro + verde sobrio + sol pálido (piel limpia).
+   El acento --fvh-verde-1/--fvh-sello ya salen de --c-* (arriba); aquí ajustamos
+   el degradado del cielo del shell, que es lo que más "tiñe" la escena. */
+
+/* VERDE VIVO — refuerza el cielo fresco-verde y el sol dorado de la identidad. */
+[data-theme="verde-vivo"] .fvh {
+  --fvh-cielo-a: #8fd1c2;     /* turquesa-verde fresco */
+  --fvh-cielo-b: #e2f0cf;     /* verde-crema frondoso */
+  --fvh-sol-a: #fff3c4;
+  --fvh-sol-b: #f2b441;       /* sol cálido de la identidad */
+  --fvh-lima: #6cc24a;
+  --fvh-lima-claro: #a7e17a;
+}
+
+/* NATURE — cielo crema cálido + sol ámbar (piel terrosa del tema). */
+[data-theme="nature"] .fvh {
+  --fvh-cielo-a: #ead7b0;     /* crema cálida */
+  --fvh-cielo-b: #f6efe0;     /* crema base del tema */
+  --fvh-sol-a: #ffe6a8;
+  --fvh-sol-b: #d9742a;       /* ocre quemado del tema */
+  --fvh-lima: #c8a02f;
+  --fvh-lima-claro: #e6c873;
+}
+
+/* MINIMALISTA — cielo papel claro + verde sobrio + sol pálido. */
+[data-theme="minimalista"] .fvh {
+  --fvh-cielo-a: #d8e2da;     /* gris-salvia claro */
+  --fvh-cielo-b: #f6f3ec;     /* papel del tema */
+  --fvh-sol-a: #f4efd8;
+  --fvh-sol-b: #cbb96a;       /* dorado apagado */
+  --fvh-lima: #6f9a85;
+  --fvh-lima-claro: #b6d3c4;
+}
+
 /* ── SHELL de ancho máximo (clave del responsive desktop #7) ───────────────── */
 .fvh-shell {
   position: relative;
@@ -102,7 +155,10 @@
   gap: 11px;
   flex: 0 0 auto;
 }
-/* A ROJA del agente (THEME_ICON.biopunk) — feedback #4 */
+/* Ícono de marca del agente del tema activo — feedback #4. Plinto OSCURO por
+   defecto (la A roja biopunk luce sobre fondo oscuro). Para los temas de piel
+   CLARA (nature, minimalista, verde-vivo) el ícono es verde/tierra/monoline y
+   debe ir sobre un plinto CLARO del tema, no sobre el cuadro negro rojizo. */
 .fvh-brand-a {
   width: 46px;
   height: 46px;
@@ -114,6 +170,14 @@
   background: radial-gradient(circle at 32% 26%, #2a2024, #140d10);
   box-shadow: 0 6px 16px rgba(120, 20, 20, 0.32),
               0 0 0 1.5px rgba(231, 76, 60, 0.55) inset;
+}
+/* Temas de piel clara → plinto claro del tema (superficie + borde --c-*). */
+[data-theme="verde-vivo"] .fvh-brand-a,
+[data-theme="nature"] .fvh-brand-a,
+[data-theme="minimalista"] .fvh-brand-a {
+  background: rgb(var(--c-surface-card));
+  box-shadow: 0 6px 16px rgba(40, 60, 30, 0.18),
+              0 0 0 1.5px rgb(var(--c-surface-border)) inset;
 }
 .fvh-brand-a svg { width: 100%; height: 100%; display: block; }
 .fvh-brand-txt { line-height: 1.04; }

@@ -54,7 +54,7 @@ describe('temas claros — indirección CSS-var (index.css)', () => {
     const uniqueBase = [...new Set(baseVars)];
     expect(uniqueBase.length, 'pocas vars --c-* en :root').toBeGreaterThan(25);
 
-    for (const theme of ['minimalista', 'nature']) {
+    for (const theme of ['minimalista', 'nature', 'verde-vivo']) {
       const blockMatch = indexCss.match(
         new RegExp(`\\[data-theme="${theme}"\\]\\s*\\{([\\s\\S]*?)\\}`)
       );
@@ -73,7 +73,7 @@ describe('temas claros — indirección CSS-var (index.css)', () => {
       const m = block.match(new RegExp(`${varName}:\\s*([0-9]+)\\s+([0-9]+)\\s+([0-9]+)`));
       return m ? [Number(m[1]), Number(m[2]), Number(m[3])] : null;
     };
-    for (const theme of ['minimalista', 'nature']) {
+    for (const theme of ['minimalista', 'nature', 'verde-vivo']) {
       const [r, g, b] = grab(theme, '--c-slate-950');
       const avg = (r + g + b) / 3;
       expect(avg, `${theme} --c-slate-950 debe ser claro`).toBeGreaterThan(200);
@@ -144,7 +144,7 @@ describe('contrato de efectos (FX) gateados por tema (index.css)', () => {
   it('redefine TODOS los --fx-*/--scrim-* en cada tema (sin tokens huérfanos)', () => {
     // Si un tema NO redefine un --fx-*, hereda el 1 de :root → FX bio-punk
     // sangrando sobre el tema claro. El contrato exige redefinición explícita.
-    for (const theme of ['minimalista', 'nature']) {
+    for (const theme of ['minimalista', 'nature', 'verde-vivo']) {
       const block = themeBlock(theme);
       expect(block, `falta bloque [data-theme="${theme}"]`).toBeTruthy();
       for (const v of [...FX_VARS, ...SCRIM_VARS]) {
@@ -154,7 +154,7 @@ describe('contrato de efectos (FX) gateados por tema (index.css)', () => {
   });
 
   it('los temas CLAROS apagan partículas, patrón y glow (--fx-*: 0)', () => {
-    for (const theme of ['minimalista', 'nature']) {
+    for (const theme of ['minimalista', 'nature', 'verde-vivo']) {
       const block = themeBlock(theme);
       expect(readScalar(block, '--fx-particles'), `${theme} --fx-particles`).toBe('0');
       expect(readScalar(block, '--fx-bg-pattern'), `${theme} --fx-bg-pattern`).toBe('0');
@@ -165,7 +165,7 @@ describe('contrato de efectos (FX) gateados por tema (index.css)', () => {
   it('el scrim de los temas claros es CLARO (velo crema, no navy que lava)', () => {
     // En claros el --scrim-bg debe ser claro (promedio > 200) → un velo sutil
     // sobre la imagen, nunca el navy 2 6 23 que oscurecía la foto.
-    for (const theme of ['minimalista', 'nature']) {
+    for (const theme of ['minimalista', 'nature', 'verde-vivo']) {
       const block = themeBlock(theme);
       const rgb = readRgb(block, '--scrim-bg');
       expect(rgb, `${theme} --scrim-bg ausente`).toBeTruthy();
@@ -182,6 +182,7 @@ describe('contraste AA del texto principal de cada tema (sonda numérica)', () =
     { theme: ':root', name: 'bio-punk' },
     { theme: 'minimalista', name: 'minimalista' },
     { theme: 'nature', name: 'nature' },
+    { theme: 'verde-vivo', name: 'verde-vivo' },
   ];
   for (const { theme, name } of cases) {
     it(`${name}: texto principal ≥4.5 sobre fondo y card`, () => {

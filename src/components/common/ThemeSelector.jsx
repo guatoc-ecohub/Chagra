@@ -1,11 +1,17 @@
 import React from 'react';
-import { useTheme, THEMES } from '../../hooks/useTheme';
+import { useTheme, getSelectableThemes } from '../../hooks/useTheme';
+import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 
 /**
  * ThemeSelector — switcher de tema visual (skin) de la app.
  * Vive en Perfil. Default bio-punk; el usuario puede cambiar a Nature o
  * Minimalista (persistido en localStorage vía useTheme). El tema se aplica
  * app-wide desde el login mediante data-theme en <html>.
+ *
+ * El 4º tema "Verde Vivo" (la piel de la finca viva) aparece SOLO cuando la
+ * flag VITE_FINCA_VIVA_HOME_PERFIL está ON (dev): getSelectableThemes lo añade
+ * al final. Con la flag OFF (prod) el selector muestra EXACTO los 3 temas + auto
+ * de hoy, sin cambios para el usuario de producción.
  *
  * Cada tema muestra un swatch con sus colores característicos para que el
  * cambio sea evidente antes de aplicarlo.
@@ -18,15 +24,18 @@ const SWATCHES = {
   biopunk: ['#0a0e14', '#19c79a', '#3be8a6'],
   nature: ['#f6efe0', '#d98a4f', '#7a8f4a'],
   minimalista: ['#f6f3ec', '#2f6e5a', '#878d86'],
+  // Verde Vivo: crema frondosa + verde-hoja vivo + sol/ocre cálido.
+  'verde-vivo': ['#eef3e2', '#2e8b3d', '#e0922e'],
 };
 
 export default function ThemeSelector() {
   const { theme, setTheme } = useTheme();
+  const themes = getSelectableThemes(fincaVivaHomePerfilActivo());
 
   return (
     <div className="space-y-3">
       <div className="flex flex-col gap-2">
-        {THEMES.map((t) => {
+        {themes.map((t) => {
           const active = theme === t.id;
           const swatch = SWATCHES[t.id] || SWATCHES.biopunk;
           return (
