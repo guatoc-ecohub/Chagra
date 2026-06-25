@@ -1385,14 +1385,29 @@ export default function App() {
     }
   };
 
+  // Vistas pre-autenticación: el formulario manda y NO debe quedar tapado ni
+  // empujado por overlays flotantes. Mismo conjunto que ya gatea showBg,
+  // DataLossBanner, CriticalAlertBanner, SyncProgressIndicator, etc.
+  const isPreAuthView =
+    currentView === 'loading' ||
+    currentView === 'login' ||
+    currentView === 'oauth-callback';
+
   return (
     <>
       {/* Transición colibrí home→conversación (~2s). Encima de todo (z alto);
           la conversación monta detrás y queda limpia al terminar. */}
       <ColibriTransition active={colibriTransition} onDone={() => setColibriTransition(false)} />
       <NetworkStatusBar />
-      <IosInstallBanner />
-      <AndroidInstallBanner />
+      {/* Banners de instalación PWA: NO en las vistas pre-auth (login /
+          loading / oauth-callback). En el login son un overlay `fixed`
+          z-50 que se encimaba sobre el formulario —en desktop tapaba e
+          interceptaba el clic del campo "Usuario"; en móvil empujaba
+          Usuario/Contraseña/Ingresar bajo el fold—. La instalación se
+          ofrece una vez dentro de la app, igual que DataLossBanner y
+          los demás flotantes (mismo guard de vista). */}
+      {!isPreAuthView && <IosInstallBanner />}
+      {!isPreAuthView && <AndroidInstallBanner />}
       <UpdateAvailableBanner />
       <Confetti />
       <GpsFincaBanner />
