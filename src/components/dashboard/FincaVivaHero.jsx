@@ -14,7 +14,8 @@ import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciar
 import { deriveAtmosphere } from '../../services/atmosphereService';
 import { resolveClimaLocation, getCachedClimaSnapshot, CLIMA_UPDATED_EVENT } from '../../services/climaService';
 import { clasificarPisoTermico } from '../../services/pisoTermicoClassifier';
-import { THEME_ICON } from './themeIcon';
+import { useTheme } from '../../hooks/useTheme';
+import { iconForTheme } from './themeIcon';
 import './finca-viva-hero.css';
 
 /**
@@ -69,6 +70,11 @@ import './finca-viva-hero.css';
  * @param {string} [props.titulo]  título accesible (default "Mi finca viva").
  */
 export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, children, titulo }) {
+  // Piel del tema activo: el ícono de marca del agente (la A roja en biopunk, la
+  // sol-mano en verde-vivo, etc.) sigue al tema, igual que la escena toma su piel
+  // del tema vía los tokens --c-*/--fvh-* del CSS. Con la flag OFF este hero no se
+  // monta, así que esto solo corre en dev.
+  const { theme } = useTheme();
   const abrirAgente = () => {
     if (onOpenAgent) onOpenAgent();
     else onNavigate?.('agente');
@@ -170,8 +176,10 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
         {/* ── TOPBAR (con jerarquía y aire — feedback #3) ───────────────────── */}
         <header className="fvh-topbar">
           <div className="fvh-brand">
-            {/* La A ROJA del agente (THEME_ICON.biopunk) — feedback #4 */}
-            <span className="fvh-brand-a" aria-hidden="true">{THEME_ICON.biopunk}</span>
+            {/* Ícono de marca del agente del TEMA ACTIVO (feedback #4): la A roja
+                en biopunk, la sol-mano frondosa en verde-vivo, etc. — la escena
+                toma la piel del tema. */}
+            <span className="fvh-brand-a" data-theme-icon={theme} aria-hidden="true">{iconForTheme(theme)}</span>
             <div className="fvh-brand-txt">
               <b>Chagra</b>
               <span>Su finca viva</span>
