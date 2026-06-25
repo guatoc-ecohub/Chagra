@@ -447,6 +447,21 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
         });
     }, []);
 
+    // Portal "Gestionar" del hero F2 → la GESTIÓN de la finca (registrar y cuidar
+    // siembras, zonas y animales) vive como la sección #finca-gestion en ESTA
+    // misma página, bajo el hero. La revelamos con un scroll suave (no es otra
+    // vista; antes el portal navegaba por error al juego). Movemos también el
+    // foco al rótulo de la sección para teclado y lector de pantalla.
+    const revelarGestion = useCallback(() => {
+        if (typeof document === 'undefined') return;
+        const seccion = document.getElementById('finca-gestion');
+        if (!seccion) return;
+        if (seccion.scrollIntoView) seccion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (seccion.focus) {
+            try { seccion.focus({ preventScroll: true }); } catch (_) { /* preventScroll no soportado */ }
+        }
+    }, []);
+
     return (
         <div
             className="relative flex flex-col w-full h-full overflow-y-auto pb-6"
@@ -469,6 +484,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                 <FincaVivaHero
                     onNavigate={onNavigate}
                     onOpenAgent={() => onNavigate('agente')}
+                    onGestionar={revelarGestion}
                     titulo={esExtensionista ? 'Red de fincas que acompaño' : 'Mi finca viva'}
                 >
                     {esExtensionista ? (
@@ -690,8 +706,18 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
 
             {/* 3) GESTIÓN — "Mi finca": registros y acciones de manejo (semilleros,
                 cosechar, insumos, mantenimiento). De-enfatizado respecto a lo
-                fuerte; las rutas ya existen en App.jsx. */}
-            <div className={`px-4 pt-3 ${fincaVivaFlag ? 'fvh-resto-block' : ''}`}>
+                fuerte; las rutas ya existen en App.jsx.
+
+                ANCLA #finca-gestion: el portal "Gestionar" del hero F2 hace scroll
+                hasta aquí (revelarGestion). `tabIndex=-1` permite mover el foco
+                programáticamente (teclado/lector) sin volverlo tabulable; el
+                scroll-margin-top deja aire bajo el topbar flotante. */}
+            <div
+                id="finca-gestion"
+                tabIndex={-1}
+                style={{ scrollMarginTop: '88px', outline: 'none' }}
+                className={`px-4 pt-3 ${fincaVivaFlag ? 'fvh-resto-block' : ''}`}
+            >
                 <p className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-2.5 ${fincaVivaFlag ? 'fvh-block-label' : 'text-slate-400'}`}>
                     <span
                         aria-hidden="true"

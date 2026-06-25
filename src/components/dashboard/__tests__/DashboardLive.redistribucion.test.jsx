@@ -23,7 +23,23 @@ vi.mock('../../../config/extensionistaAccess', () => ({
 }));
 
 vi.mock('../AgentHero', () => ({ default: () => <div data-testid="agent-hero" /> }));
-vi.mock('../FincaVivaHero', () => ({ default: ({ children }) => <div data-testid="finca-viva-hero">{children}</div> }));
+// Capturamos las props del hero para verificar el cableado del portal "Gestionar"
+// (onGestionar) sin montar todo el hero. El botón expuesto invoca onGestionar tal
+// como lo haría el portal real.
+let lastHeroProps = null;
+vi.mock('../FincaVivaHero', () => ({
+  default: (props) => {
+    lastHeroProps = props;
+    return (
+      <div data-testid="finca-viva-hero">
+        <button type="button" data-testid="hero-gestionar" onClick={() => props.onGestionar?.()}>
+          Gestionar
+        </button>
+        {props.children}
+      </div>
+    );
+  },
+}));
 vi.mock('../FincaRedInstitucional', () => ({ default: () => <div /> }));
 vi.mock('../../OnboardingHero', () => ({ default: () => <div /> }));
 vi.mock('../SelectedBackgroundReveal', () => ({ default: () => <div /> }));
@@ -131,6 +147,31 @@ describe('DashboardLive — redistribución del resto de su finca', () => {
     expect(onNavigate).toHaveBeenCalledWith('casos', undefined);
     fireEvent.click(screen.getByRole('button', { name: /^Biopreparados/ }));
     expect(onNavigate).toHaveBeenCalledWith('biopreparados', { back: 'dashboard' });
+  });
+
+  test('la sección de gestión expone el ancla #finca-gestion (destino del portal Gestionar)', async () => {
+    render(<DashboardLive onNavigate={vi.fn()} />);
+    const block = await screen.findByTestId('gestion-tiles');
+    const ancla = document.getElementById('finca-gestion');
+    // El ancla existe y CONTIENE los tiles de gestión (es la sección, no otra cosa).
+    expect(ancla).toBeInTheDocument();
+    expect(ancla).toContainElement(block);
+  });
+
+  test('el hero recibe onGestionar y, al invocarlo, hace scroll al ancla de gestión (no navega al juego)', async () => {
+    const onNavigate = vi.fn();
+    render(<DashboardLive onNavigate={onNavigate} />);
+    await screen.findByTestId('gestion-tiles');
+
+    const ancla = document.getElementById('finca-gestion');
+    ancla.scrollIntoView = vi.fn();
+    ancla.focus = vi.fn();
+
+    expect(typeof lastHeroProps.onGestionar).toBe('function');
+    fireEvent.click(screen.getByTestId('hero-gestionar'));
+
+    expect(ancla.scrollIntoView).toHaveBeenCalledTimes(1);
+    expect(onNavigate).not.toHaveBeenCalledWith('juego');
   });
 
   test('layout legacy (F2 OFF) SÍ muestra el hub Aprender como tile', async () => {
