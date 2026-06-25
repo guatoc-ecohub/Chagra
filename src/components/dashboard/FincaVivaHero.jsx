@@ -9,32 +9,40 @@ import { listFarmProcesses } from '../../db/farmProcessCache';
 import { buildFincaScene } from '../../services/fincaSceneService';
 import { selectSceneVariant, SCENE_KINDS } from '../../services/fincaSceneProfileSelector';
 import { getProfile } from '../../services/userProfileService';
-import { tieneAccesoGlaciarActual } from '../../config/glaciarAccess';
+import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciarAccess';
+import { deriveAtmosphere } from '../../services/atmosphereService';
+import { resolveClimaLocation, getCachedClimaSnapshot, CLIMA_UPDATED_EVENT } from '../../services/climaService';
+import { clasificarPisoTermico } from '../../services/pisoTermicoClassifier';
+import { THEME_ICON } from './themeIcon';
 import './finca-viva-hero.css';
 
 /**
- * FincaVivaHero — el HOME INMERSIVO "Finca Viva" (PORTADO FIELMENTE del mockup
- * F2 v2 "Finca Viva Evolutiva"). La escena isométrica de TU finca ES la portada
- * del dashboard: lo PRIMERO que se ve al entrar. NO es una tarjeta debajo del
- * agente, y NO reusa el motor de escena del juego (FincaWorldScene) — el arte
- * sale del mockup F2, pixel a pixel.
+ * FincaVivaHero — el HOME INMERSIVO "Finca Viva" (refinado del mockup F2 v2
+ * "Finca Viva Evolutiva" con el feedback DIRECTO del operador, 2026-06-24).
+ * La escena isométrica de TU finca ES la portada del dashboard: lo PRIMERO que
+ * se ve al entrar. NO es una tarjeta debajo del agente.
  *
- * Estructura (1:1 con el mockup F2):
- *   - TOPBAR: la mano de Chagra + "Chagra · su finca viva" + pills (ayuda/perfil).
- *   - SELECTOR DE ESCALA: 3 chips Duolingo (Mi balcón / Invernadero / Mi finca).
- *     El chip ACTIVO lo decide el PERFIL real vía selectSceneVariant; tocar otro
- *     permite previsualizar esa escala (igual que el mockup).
- *   - CINTA DE MUNDO + TOGGLE de estado (recién empiezo / mi finca poblada). El
- *     estado por defecto lo decide el DATO REAL (buildFincaScene.vacia): finca
- *     vacía → "recién empiezo" inmersivo; con siembras → poblada.
- *   - ESCENA ISOMÉTRICA: 3 variantes (balcón urbano / invernadero / finca
- *     diversa), cada una con su estado poblado vs. recién-empieza. Animales SVG
- *     vivos (cerdo que se menea, gallina picotea, pato chapotea, vaca cola,
- *     abejas/mariposas). Sol que respira, nubes, prefers-reduced-motion.
- *   - GLOBO del agente colibrí flotando sobre la escena.
- *   - COMPOSITOR del agente (avatar + "Pregúntele a Chagra…" + 🎙️).
- *   - HERO TEXT: "SU AGENTE AGROECOLÓGICO" + título por escala.
- *   - 4 PORTALES como lugares: Gestionar · Aprender · Jugar · Agente.
+ * Refinamientos sobre el port fiel del mockup (feedback operador):
+ *   1. UBICACIÓN VISIBLE: chip de portada con vereda · municipio · msnm · piso
+ *      térmico, leído del perfil real (resolveClimaLocation + perfil). Dato
+ *      vital que estaba ausente.
+ *   2. CIELO REAL POR HORA Y CLIMA: la escena reusa el sistema de atmósfera del
+ *      tema (atmosphereService.deriveAtmosphere → luz dia/noche/amanecer/
+ *      atardecer + condición despejado/nublado/lluvia/niebla). De día sale el
+ *      SOL; de noche, LUNA + ESTRELLAS; con lluvia/nubes, su velo. No inventa
+ *      otro motor: consume el mismo servicio que clima-atmosfera.css.
+ *   3. BARRA SUPERIOR con jerarquía y aire (no plana ni apretada).
+ *   4. ÍCONO = la A ROJA del agente (THEME_ICON.biopunk de AgentScreen/
+ *      AgentRedMenu) en vez de la mano de Chagra.
+ *   5. COLIBRÍ DE VERDAD (pico largo, alas, iridiscencia) en vez de un pájaro
+ *      genérico tipo Twitter.
+ *   6. SIN SELECTOR de escala para el usuario: la escena sale SOLO del perfil
+ *      real (selectSceneVariant). Override visible únicamente si esOperador()
+ *      (QA), oculto al usuario normal.
+ *   7. RESPONSIVE DESKTOP: layout de ancho máximo centrado; en pantalla ancha
+ *      la escena y los 4 portales respiran (grilla legible), sin gradientes
+ *      estirados (lo gobierna finca-viva-hero.css con un shell --fvh-max).
+ *   8. PORTALES con más velo/legibilidad sobre la fauna.
  *
  * Se monta SOLO con la flag VITE_FINCA_VIVA_HOME_PERFIL ON (lo decide
  * DashboardLive). Con la flag OFF el home conserva su portada actual (AgentHero).
@@ -72,6 +80,17 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, children, titul
 
   const scene = useMemo(() => buildFincaScene({ processes }), [processes]);
 
+  // ── Ubicación real de la finca (vereda · municipio · msnm · piso) ─────────
+  const ubicacion = useMemo(() => buildUbicacion(), []);
+
+  // ── ¿Operador? (override de escala SOLO para QA, oculto al usuario) ───────
+  const operador = useMemo(() => {
+    try { return esOperadorActual(); } catch (_) { return false; }
+  }, []);
+
+  // ── Cielo real: hora + clima (REUSA atmosphereService, no inventa motor) ──
+  const atmosfera = useAtmosferaEscena();
+
   // Variante de escena por PERFIL (override duro urbano, invernadero, finca…).
   const variant = useMemo(() => {
     try {
@@ -83,7 +102,7 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, children, titul
 
   // El mockup F2 tiene 3 escenas: balcon / invernadero / finca. Las variantes
   // ecológicas (restauracion/paramo) caen a la escena de finca diversa (su arte
-  // dedicado es trabajo aparte). El kind del perfil elige el chip por defecto.
+  // dedicado es trabajo aparte). El kind del perfil elige la escena.
   const escalaPerfil = useMemo(() => {
     const k = variant?.kind;
     if (k === SCENE_KINDS.balcon) return 'balcon';
@@ -91,22 +110,18 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, children, titul
     return 'finca';
   }, [variant]);
 
-  // Chip de escala: el valor EFECTIVO es la escala del perfil, salvo que el
-  // usuario haya elegido manualmente otra (override) para previsualizarla —
-  // igual que el mockup F2. Guardamos SÓLO el override del usuario en estado
-  // (no sincronizamos derivados con efectos: eso causa renders en cascada).
+  // La escena la decide SIEMPRE el perfil. El operador puede previsualizar otra
+  // escala para QA (override oculto al usuario normal). El usuario corriente NO
+  // elige escala: ya no hay selector de 3 chips en su UI (feedback operador #6).
   const [escalaOverride, setEscalaOverride] = useState(null);
-  const escala = escalaOverride ?? escalaPerfil;
-  const setEscala = setEscalaOverride;
+  const escala = (operador && escalaOverride) ? escalaOverride : escalaPerfil;
 
-  // Estado poblada vs. recién-empieza: el valor por defecto es el DATO REAL
-  // (finca vacía → recién empiezo); el toggle deja previsualizar el otro estado
-  // como override explícito del usuario. Sin efectos de sincronización.
+  // Estado poblada vs. recién-empieza: lo decide el DATO REAL (finca vacía →
+  // recién empiezo). El operador puede alternar para QA.
   const vacia = !!scene?.vacia;
   const estadoPorDefecto = vacia ? 'empieza' : 'poblada';
   const [estadoOverride, setEstadoOverride] = useState(null);
-  const estado = estadoOverride ?? estadoPorDefecto;
-  const setEstado = setEstadoOverride;
+  const estado = (operador && estadoOverride) ? estadoOverride : estadoPorDefecto;
   const poblada = estado === 'poblada';
 
   const tieneFincaPropia = !children; // children = red institucional del extensionista.
@@ -116,176 +131,500 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, children, titul
       data-testid="finca-viva-hero"
       aria-label="Su finca viva"
       className="fvh"
+      data-luz={atmosfera.luz || undefined}
+      data-clima={atmosfera.condicion || undefined}
     >
-      {/* ── TOPBAR ─────────────────────────────────────────────────────────── */}
-      <div className="fvh-topbar">
-        <div className="fvh-brand-mano">
-          {/* La mano de Chagra (emblema, brote por yema) */}
-          <svg width="27" height="27" viewBox="0 0 26 26" aria-hidden="true">
-            <g fill="#2f6b3a">
-              <path d="M13 23c-3.4-.2-6-2.6-6.2-6 0-1 .2-2.4.6-3.6.3-.9 1.4-.8 1.5.1l.3 2.3c.05.4.6.4.6 0V7.8c0-.7 1.1-.7 1.1 0v6.1c0 .35.5.35.5 0V6.4c0-.7 1.1-.7 1.1 0v7.5c0 .35.5.35.5 0V7.4c0-.7 1.1-.7 1.1 0v6.5c0 .35.5.35.5 0V8.9c0-.7 1.1-.7 1.1 0v5.9c.7-1 1.9-2.5 2.8-1.7.5.5.2 1.3-.3 2.2-1.4 2.6-1.5 3.4-1.6 4.5-.2 2.7-1.9 3.9-3.6 3.9z" />
-            </g>
-            <circle cx="13" cy="4.4" r="2.3" fill="#a3e635" />
-          </svg>
-        </div>
-        <div className="fvh-brand-txt">
-          <b>Chagra</b>
-          <span>su finca viva</span>
-        </div>
-        <div className="fvh-top-pills">
-          <button type="button" className="fvh-pill" title="Ayuda" aria-label="Ayuda">❔</button>
-          <button
-            type="button"
-            className="fvh-pill"
-            title="Perfil"
-            aria-label="Perfil"
-            onClick={() => onNavigate?.('perfil')}
-          >
-            🧑‍🌾
-          </button>
-        </div>
-      </div>
+      <div className="fvh-shell">
+        {/* ── TOPBAR (con jerarquía y aire — feedback #3) ───────────────────── */}
+        <header className="fvh-topbar">
+          <div className="fvh-brand">
+            {/* La A ROJA del agente (THEME_ICON.biopunk) — feedback #4 */}
+            <span className="fvh-brand-a" aria-hidden="true">{THEME_ICON.biopunk}</span>
+            <div className="fvh-brand-txt">
+              <b>Chagra</b>
+              <span>Su finca viva</span>
+            </div>
+          </div>
 
-      {/* ── SELECTOR DE ESCALA (chips) ─────────────────────────────────────── */}
-      <div className="fvh-escala-chips" role="tablist" aria-label="Tamaño de su finca">
-        {ESCALAS.map((e) => (
-          <button
-            key={e.id}
-            type="button"
-            role="tab"
-            aria-selected={escala === e.id}
-            className={`fvh-echip ${escala === e.id ? 'on' : ''}`}
-            onClick={() => setEscala(e.id)}
-          >
-            <span className="ei" aria-hidden="true">{e.emoji}</span>{e.label}
-          </button>
-        ))}
-      </div>
+          {/* CHIP DE UBICACIÓN — vereda · municipio · msnm · piso (feedback #1) */}
+          {ubicacion ? (
+            <button
+              type="button"
+              className="fvh-ubic"
+              onClick={() => onNavigate?.('perfil')}
+              aria-label={`Ubicación de la finca: ${ubicacion.aria}. Toque para editar.`}
+              title={ubicacion.aria}
+            >
+              <span className="fvh-ubic-pin" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
+                  <path d="M12 22s7-7.2 7-12a7 7 0 1 0-14 0c0 4.8 7 12 7 12Z" fill="#2f6b3a" stroke="#fff" strokeWidth="1.4" />
+                  <circle cx="12" cy="10" r="2.6" fill="#bef264" />
+                </svg>
+              </span>
+              <span className="fvh-ubic-txt">
+                {ubicacion.lugar && <b>{ubicacion.lugar}</b>}
+                {ubicacion.altitud && <em>{ubicacion.altitud}</em>}
+              </span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="fvh-ubic fvh-ubic-vacia"
+              onClick={() => onNavigate?.('perfil')}
+              aria-label="Aún no ha confirmado la ubicación de su finca. Toque para completarla."
+            >
+              <span className="fvh-ubic-pin" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
+                  <path d="M12 22s7-7.2 7-12a7 7 0 1 0-14 0c0 4.8 7 12 7 12Z" fill="#9aa595" stroke="#fff" strokeWidth="1.4" />
+                </svg>
+              </span>
+              <span className="fvh-ubic-txt"><b>Ubicar mi finca</b></span>
+            </button>
+          )}
 
-      {/* ── CINTA DE MUNDO + TOGGLE DE ESTADO ──────────────────────────────── */}
-      <div className="fvh-mundo-row">
-        <div className="fvh-mundo-cinta">
-          <span className="dot" aria-hidden="true" />
-          <span>{MUNDO_LABEL[escala]}</span>
-        </div>
-        <div className="fvh-estado-toggle" role="group" aria-label="Estado de la finca">
-          <button
-            type="button"
-            className={!poblada ? 'on' : ''}
-            onClick={() => setEstado('empieza')}
-          >
-            Recién empiezo
-          </button>
-          <button
-            type="button"
-            className={poblada ? 'on' : ''}
-            onClick={() => setEstado('poblada')}
-          >
-            Mi finca poblada
-          </button>
-        </div>
-      </div>
+          <div className="fvh-top-pills">
+            <button type="button" className="fvh-pill" title="Ayuda" aria-label="Ayuda">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" stroke="#3a4a3a" strokeWidth="2" />
+                <path d="M9.2 9.2a2.8 2.8 0 1 1 4 2.5c-.9.5-1.2 1-1.2 1.9" stroke="#3a4a3a" strokeWidth="2" strokeLinecap="round" fill="none" />
+                <circle cx="12" cy="17" r="1.2" fill="#3a4a3a" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              className="fvh-pill"
+              title="Perfil"
+              aria-label="Perfil"
+              onClick={() => onNavigate?.('perfil')}
+            >
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+                <circle cx="12" cy="8.4" r="4" fill="#3a4a3a" />
+                <path d="M4.6 19.5c.7-3.7 3.8-5.8 7.4-5.8s6.7 2.1 7.4 5.8" stroke="#3a4a3a" strokeWidth="2" strokeLinecap="round" fill="none" />
+              </svg>
+            </button>
+          </div>
+        </header>
 
-      {/* ── ESCENA ISOMÉTRICA (o slot institucional) ───────────────────────── */}
-      <div className="fvh-escena">
-        {/* globo del agente colibrí */}
-        <button
-          type="button"
-          className="fvh-colibri-globo"
-          onClick={abrirAgente}
-          aria-label="Hablar con Chagra"
-        >
-          <b>{COLIBRI[escala][0]}</b>
-          <small>
-            {poblada
-              ? COLIBRI[escala][1]
-              : 'Su finca está empezando. Registre su primera siembra y la escena cobra vida.'}
-          </small>
-        </button>
-
-        {tieneFincaPropia ? (
-          <>
-            {escala === 'balcon' && <SceneBalcon poblada={poblada} />}
-            {escala === 'invernadero' && <SceneInvernadero poblada={poblada} />}
-            {escala === 'finca' && <SceneFinca poblada={poblada} />}
-
-            {/* criaturas vivas flotando (comunes; sólo si poblada) */}
-            {poblada && (
-              <div className="fvh-bichos" aria-hidden="true">
-                <span className="fvh-bicho" style={{ left: '16%', top: '18%', animationDelay: '.1s' }}>🦋</span>
-                <span className="fvh-bicho" style={{ left: '72%', top: '22%', fontSize: '18px', animationDelay: '1.1s' }}>🐦</span>
-                <span className="fvh-bicho abeja" style={{ left: '42%', top: '30%', fontSize: '17px' }}>🐝</span>
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="fvh-institucional">{children}</div>
+        {/* ── OVERRIDE DE ESCALA (SOLO OPERADOR · QA) — oculto al usuario #6 ── */}
+        {operador && (
+          <div className="fvh-qa" role="group" aria-label="QA del operador: previsualizar escala">
+            <span className="fvh-qa-lbl">QA</span>
+            {ESCALAS.map((e) => (
+              <button
+                key={e.id}
+                type="button"
+                aria-pressed={escala === e.id}
+                className={`fvh-qa-chip ${escala === e.id ? 'on' : ''}`}
+                onClick={() => setEscalaOverride(escalaOverride === e.id ? null : e.id)}
+                title={`Previsualizar escena: ${e.label}`}
+              >
+                {e.label}
+              </button>
+            ))}
+            <button
+              type="button"
+              className={`fvh-qa-chip ${poblada ? 'on' : ''}`}
+              onClick={() => setEstadoOverride(poblada ? 'empieza' : 'poblada')}
+              title="Alternar finca poblada / recién empieza"
+            >
+              {poblada ? 'Poblada' : 'Vacía'}
+            </button>
+          </div>
         )}
+
+        <main className="fvh-main">
+          {/* ── ESCENA ISOMÉTRICA (o slot institucional) ────────────────────── */}
+          <div className="fvh-escena-wrap">
+            <div className="fvh-escena">
+              {/* globo del agente colibrí */}
+              <button
+                type="button"
+                className="fvh-colibri-globo"
+                onClick={abrirAgente}
+                aria-label="Hablar con Chagra"
+              >
+                <b>{COLIBRI[escala][0]}</b>
+                <small>
+                  {poblada
+                    ? COLIBRI[escala][1]
+                    : 'Su finca está empezando. Registre su primera siembra y la escena cobra vida.'}
+                </small>
+              </button>
+
+              {tieneFincaPropia ? (
+                <>
+                  {escala === 'balcon' && <SceneBalcon poblada={poblada} cielo={atmosfera} />}
+                  {escala === 'invernadero' && <SceneInvernadero poblada={poblada} cielo={atmosfera} />}
+                  {escala === 'finca' && <SceneFinca poblada={poblada} cielo={atmosfera} />}
+
+                  {/* fauna sobre la escena. El COLIBRÍ (criatura insignia del
+                      agente) vuela SIEMPRE — es el guía, no ganado; acompaña
+                      también la finca recién empezada. La mariposa y la abeja
+                      (fauna que prospera) sólo aparecen cuando la finca está
+                      poblada. */}
+                  <div className="fvh-bichos" aria-hidden="true">
+                    <span className="fvh-bicho fvh-colibri-vuela" style={{ left: '66%', top: '20%' }}>
+                      <ColibriVuela />
+                    </span>
+                    {poblada && (
+                      <>
+                        <span className="fvh-bicho" style={{ left: '16%', top: '18%', animationDelay: '.1s' }}>🦋</span>
+                        <span className="fvh-bicho abeja" style={{ left: '42%', top: '32%', fontSize: '17px' }}>🐝</span>
+                      </>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div className="fvh-institucional">{children}</div>
+              )}
+            </div>
+          </div>
+
+          {/* ── COLUMNA derecha en desktop / debajo en móvil ────────────────── */}
+          <div className="fvh-aside">
+            {/* COMPOSITOR DEL AGENTE */}
+            <div className="fvh-composer-wrap">
+              <button
+                type="button"
+                className="fvh-composer"
+                onClick={abrirAgente}
+                data-testid="finca-viva-agent-fab"
+                aria-label="Pregúntele a Chagra"
+              >
+                <span className="av" aria-hidden="true"><ColibriAvatar /></span>
+                <span className="ph">Pregúntele a Chagra…</span>
+                <span className="mic" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+                    <rect x="9" y="3" width="6" height="11" rx="3" fill="#1f3300" />
+                    <path d="M6 11a6 6 0 0 0 12 0M12 17v3" stroke="#1f3300" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                </span>
+              </button>
+              <div className="fvh-composer-hint">Toque 🎙️ y pregunte en voz alta — o escriba arriba</div>
+            </div>
+
+            {/* HERO TEXT */}
+            <div className="fvh-hero-saludo">
+              <div className="h-small">SU AGENTE AGROECOLÓGICO</div>
+              <h1 dangerouslySetInnerHTML={{ __html: HERO[escala][0] }} />
+              <p>{HERO[escala][1]}</p>
+            </div>
+          </div>
+        </main>
+
+        {/* ── 4 PORTALES = LUGARES DE LA FINCA ───────────────────────────────── */}
+        <div className="fvh-portales-tit">Lugares de su finca <span /></div>
+        <nav className="fvh-portales" aria-label="Lugares de su finca" data-testid="finca-viva-portales">
+          {buildPortales({ onNavigate, abrirAgente, scene, poblada, escala }).map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              className={`fvh-portal ${p.clase}`}
+              onClick={p.onClick}
+              style={{ animationDelay: p.delay }}
+              aria-label={`${p.titulo}: ${p.desc}`}
+            >
+              <span className="ir" aria-hidden="true">Entrar →</span>
+              {p.placeSvg}
+              <span className="fvh-p-scrim" aria-hidden="true" />
+              <span className="fvh-p-nuevo">{p.badge}</span>
+              <div className="p-head"><div className="p-emoji" aria-hidden="true">{p.emoji}</div><h3>{p.titulo}</h3></div>
+              <p>{p.desc}</p>
+            </button>
+          ))}
+        </nav>
+
+        <div className="fvh-fill" />
+        <p className="fvh-titulo-sr">{titulo || 'Mi finca viva'}</p>
       </div>
-
-      {/* ── COMPOSITOR DEL AGENTE ──────────────────────────────────────────── */}
-      <div className="fvh-composer-wrap">
-        <button
-          type="button"
-          className="fvh-composer"
-          onClick={abrirAgente}
-          data-testid="finca-viva-agent-fab"
-          aria-label="Pregúntele a Chagra"
-        >
-          <span className="av" aria-hidden="true">🐦</span>
-          <span className="ph">Pregúntele a Chagra…</span>
-          <span className="mic" aria-hidden="true">🎙️</span>
-        </button>
-      </div>
-      <div className="fvh-composer-hint">Toque 🎙️ y pregunte en voz alta — o escriba arriba</div>
-
-      {/* ── HERO TEXT ──────────────────────────────────────────────────────── */}
-      <div className="fvh-hero-saludo">
-        <div className="h-small">SU AGENTE AGROECOLÓGICO</div>
-        <h1 dangerouslySetInnerHTML={{ __html: HERO[escala][0] }} />
-        <p>{HERO[escala][1]}</p>
-      </div>
-
-      {/* ── 4 PORTALES = LUGARES DE LA FINCA ───────────────────────────────── */}
-      <div className="fvh-portales-tit">Lugares de su finca <span /></div>
-      <nav className="fvh-portales" aria-label="Lugares de su finca" data-testid="finca-viva-portales">
-        {buildPortales({ onNavigate, abrirAgente, scene, poblada, escala }).map((p) => (
-          <button
-            key={p.id}
-            type="button"
-            className={`fvh-portal ${p.clase}`}
-            onClick={p.onClick}
-            style={{ animationDelay: p.delay }}
-            aria-label={`${p.titulo}: ${p.desc}`}
-          >
-            <span className="ir" aria-hidden="true">Entrar →</span>
-            {p.placeSvg}
-            <span className="fvh-p-nuevo">{p.badge}</span>
-            <div className="p-head"><div className="p-emoji" aria-hidden="true">{p.emoji}</div><h3>{p.titulo}</h3></div>
-            <p>{p.desc}</p>
-          </button>
-        ))}
-      </nav>
-
-      <div className="fvh-fill" />
-      <p className="fvh-titulo-sr">{titulo || 'Mi finca viva'}</p>
     </section>
   );
 }
 
-// ── Catálogos de texto (1:1 con el mockup F2) ──────────────────────────────
+// ════════════════════════════════════════════════════════════════════════════
+//  UBICACIÓN — vereda · municipio · msnm · piso térmico (feedback #1).
+// ════════════════════════════════════════════════════════════════════════════
+
+const PISO_LABEL = {
+  calido: 'Cálido',
+  templado: 'Templado',
+  frio: 'Frío',
+  paramo: 'Páramo',
+};
+
+/**
+ * Compone el chip de ubicación de la portada a partir del perfil real. Reusa
+ * `resolveClimaLocation` (fuente única: vereda/municipio/departamento/msnm) y
+ * complementa con los campos directos del perfil (finca_altitud/piso_termico).
+ * Devuelve null si no hay NINGÚN dato de ubicación (→ se muestra "Ubicar mi
+ * finca"). Nunca inventa: solo muestra lo que el usuario ya confirmó.
+ *
+ * @returns {{ lugar: string|null, altitud: string|null, aria: string }|null}
+ */
+function buildUbicacion() {
+  let loc = {};
+  let perfil = {};
+  try { perfil = getProfile() || {}; } catch (_) { perfil = {}; }
+  try { loc = resolveClimaLocation({ profile: perfil }) || {}; } catch (_) { loc = {}; }
+
+  const vereda = limpiar(loc.vereda || perfil.vereda);
+  const municipio = limpiar(loc.municipio || perfil.municipio);
+  const departamento = limpiar(loc.departamento || perfil.departamento);
+
+  const msnm = primerNumero([loc.elevation, perfil.finca_altitud]);
+  let piso = limpiar(perfil.piso_termico);
+  if (!piso && msnm != null) {
+    const cls = clasificarPisoTermico(msnm);
+    if (cls?.id) piso = cls.id;
+  }
+  const pisoTxt = piso ? (PISO_LABEL[piso] || cap(piso)) : null;
+
+  // Parte geográfica: "Vereda X · Municipio, Depto" (sin redundar el departamento
+  // si ya aparece en el municipio compuesto).
+  const geo = [];
+  if (vereda) geo.push(`Vereda ${vereda}`);
+  if (municipio) geo.push(departamento ? `${municipio}, ${departamento}` : municipio);
+  else if (departamento) geo.push(departamento);
+  const lugar = geo.length ? geo.join(' · ') : null;
+
+  // Parte de altitud: "2.600 msnm · Páramo".
+  const altPartes = [];
+  if (msnm != null) altPartes.push(`${formatoMiles(msnm)} msnm`);
+  if (pisoTxt) altPartes.push(pisoTxt);
+  const altitud = altPartes.length ? altPartes.join(' · ') : null;
+
+  if (!lugar && !altitud) return null;
+
+  const aria = [lugar, altitud].filter(Boolean).join(' · ');
+  return { lugar, altitud, aria };
+}
+
+function limpiar(v) {
+  if (typeof v !== 'string') return null;
+  const t = v.trim();
+  return t.length ? t : null;
+}
+function primerNumero(arr) {
+  for (const v of arr) {
+    const n = Number(v);
+    if (Number.isFinite(n) && n >= 0 && n <= 6500) return Math.round(n);
+  }
+  return null;
+}
+function formatoMiles(n) {
+  return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+// ════════════════════════════════════════════════════════════════════════════
+//  CIELO REAL — hora + clima vía atmosphereService (feedback #2).
+//  NO inventa motor: consume deriveAtmosphere (el mismo de clima-atmosfera.css)
+//  y re-evalúa al pasar el sol / al refrescar el clima.
+// ════════════════════════════════════════════════════════════════════════════
+
+const ATM_REEVAL_MS = 10 * 60 * 1000; // mismo ritmo que useClimaAtmosphere.
+
+function leerAtmosfera() {
+  try {
+    const location = resolveClimaLocation();
+    const snapshot = getCachedClimaSnapshot();
+    return deriveAtmosphere({ snapshot, now: new Date(), location });
+  } catch (_) {
+    return { luz: null, condicion: null, enso: null };
+  }
+}
+
+/**
+ * Estado de cielo de la escena: { luz, condicion }. La escena dibuja sol/luna/
+ * estrellas según `luz` y velo de nubes/lluvia según `condicion`. Re-evalúa con
+ * el reloj y al evento de clima refrescado, sin pedir nada a la red.
+ */
+function useAtmosferaEscena() {
+  const [atm, setAtm] = useState(() => leerAtmosfera());
+  useEffect(() => {
+    const update = () => setAtm(leerAtmosfera());
+    update();
+    window.addEventListener(CLIMA_UPDATED_EVENT, update);
+    const id = setInterval(update, ATM_REEVAL_MS);
+    return () => {
+      window.removeEventListener(CLIMA_UPDATED_EVENT, update);
+      clearInterval(id);
+    };
+  }, []);
+  return atm;
+}
+
+/** ¿Es de noche? (luna + estrellas en vez de sol). */
+function esNoche(cielo) { return cielo?.luz === 'noche'; }
+/** ¿Cielo cubierto/lluvia? (velo + nubes densas). */
+function esCubierto(cielo) {
+  return cielo?.condicion === 'nublado' || cielo?.condicion === 'lluvia' || cielo?.condicion === 'niebla';
+}
+
+/**
+ * SKY — capa de cielo compartida por las 3 escenas: sol que respira de día,
+ * luna + estrellas de noche, nubes/lluvia según el clima. Recibe la geometría
+ * (cx, cy, r) del astro para encajar en cada escena. rsvg-safe (sin filtros de
+ * blur para la lluvia, sólo trazos).
+ */
+function Sky({ cielo, cx, cy, r, lluviaY = 150 }) {
+  const noche = esNoche(cielo);
+  const cubierto = esCubierto(cielo);
+  const lluvia = cielo?.condicion === 'lluvia';
+  return (
+    <g aria-hidden="true">
+      {noche ? (
+        <g className="fvh-sky-noche">
+          {/* estrellas */}
+          <g fill="#fdf6d8" className="fvh-estrellas">
+            <circle cx={cx - 120} cy={cy - 14} r="1.4" />
+            <circle cx={cx - 88} cy={cy + 22} r="1" />
+            <circle cx={cx - 150} cy={cy + 36} r="1.2" />
+            <circle cx={cx - 40} cy={cy - 26} r="1" />
+            <circle cx={cx + 18} cy={cy + 30} r="1.3" />
+            <circle cx={cx - 196} cy={cy + 6} r="1" />
+            <circle cx={cx + 30} cy={cy - 10} r="0.9" />
+          </g>
+          {/* luna creciente */}
+          <g transform={`translate(${cx} ${cy})`}>
+            <circle r={r * 0.92} fill="#e8edf7" opacity="0.25" />
+            <circle r={r * 0.7} fill="#f4f1e0" />
+            <circle cx={r * 0.32} cy={-r * 0.12} r={r * 0.6} fill="#1d2b4a" />
+            <circle cx={-r * 0.18} cy={r * 0.14} r={r * 0.07} fill="#dcd6bc" opacity="0.6" />
+            <circle cx={-r * 0.3} cy={-r * 0.18} r={r * 0.05} fill="#dcd6bc" opacity="0.5" />
+          </g>
+        </g>
+      ) : (
+        <g transform={`translate(${cx} ${cy})`}>
+          <circle r={r * 1.4} fill="#ffe08a" opacity={cubierto ? 0.18 : 0.35}>
+            <animate attributeName="r" values={`${r * 1.4};${r * 1.6};${r * 1.4}`} dur="6s" repeatCount="indefinite" />
+          </circle>
+          <circle r={r} fill="url(#fvh-sol-grad)" opacity={cubierto ? 0.7 : 1} />
+        </g>
+      )}
+
+      {/* NUBES densas cuando está cubierto (o nubes ligeras siempre, suaves) */}
+      {cubierto && (
+        <g fill={noche ? '#9aa6bb' : '#f3f6f4'} opacity={noche ? 0.7 : 0.92}>
+          <g className="fvh-nube-a">
+            <ellipse cx={cx - 30} cy={cy + 4} rx="30" ry="14" />
+            <ellipse cx={cx - 4} cy={cy} rx="22" ry="14" />
+            <ellipse cx={cx - 52} cy={cy} rx="18" ry="12" />
+          </g>
+        </g>
+      )}
+
+      {/* LLUVIA — trazos diagonales (rsvg-safe, sin filtros) */}
+      {lluvia && (
+        <g className="fvh-lluvia" stroke={noche ? '#aebfe0' : '#cfe6f0'} strokeWidth="1.6" strokeLinecap="round" opacity="0.7">
+          <line x1={cx - 90} y1={lluviaY} x2={cx - 96} y2={lluviaY + 14} />
+          <line x1={cx - 50} y1={lluviaY + 8} x2={cx - 56} y2={lluviaY + 22} />
+          <line x1={cx - 10} y1={lluviaY} x2={cx - 16} y2={lluviaY + 14} />
+          <line x1={cx + 28} y1={lluviaY + 6} x2={cx + 22} y2={lluviaY + 20} />
+          <line x1={cx + 64} y1={lluviaY} x2={cx + 58} y2={lluviaY + 14} />
+        </g>
+      )}
+    </g>
+  );
+}
+
+/** Gradiente del sol — compartido por las 3 escenas (un solo def reusable). */
+function SolGrad() {
+  return (
+    <radialGradient id="fvh-sol-grad" cx="50%" cy="45%" r="60%">
+      <stop offset="0" stopColor="#fff3c4" />
+      <stop offset="70%" stopColor="#ffe08a" />
+      <stop offset="100%" stopColor="#ffd24d" />
+    </radialGradient>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  COLIBRÍ DE VERDAD (feedback #5) — pico largo, alas, iridiscencia.
+//  Inspirado en ChagraAgentAvatarColibri (mismo plumaje turquesa→violeta).
+// ════════════════════════════════════════════════════════════════════════════
+
+/** Colibrí que vuela estacionario sobre la escena (criatura insignia). */
+function ColibriVuela() {
+  return (
+    <svg viewBox="0 0 64 48" width="44" height="33" aria-hidden="true" className="fvh-colibri-svg">
+      <defs>
+        <linearGradient id="fvh-colibri-plum" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#34d399" />
+          <stop offset="40%" stopColor="#10b981" />
+          <stop offset="72%" stopColor="#06b6d4" />
+          <stop offset="100%" stopColor="#8b5cf6" />
+        </linearGradient>
+        <radialGradient id="fvh-colibri-gorget" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stopColor="#fde68a" />
+          <stop offset="45%" stopColor="#f59e0b" />
+          <stop offset="100%" stopColor="#dc2626" />
+        </radialGradient>
+      </defs>
+      {/* cola en abanico */}
+      <path d="M10 28 L1 24 L6 30 L0 35 L8 33 L5 40 L14 32 Z" fill="url(#fvh-colibri-plum)" opacity="0.9" />
+      {/* ala trasera (batiendo) */}
+      <g className="fvh-ala-tras" style={{ transformOrigin: '24px 24px' }}>
+        <path d="M24 24 Q12 16 4 24 Q12 32 24 28 Z" fill="url(#fvh-colibri-plum)" opacity="0.55" />
+      </g>
+      {/* cuerpo */}
+      <ellipse cx="26" cy="27" rx="13" ry="7.5" fill="url(#fvh-colibri-plum)" transform="rotate(-16 26 27)" />
+      {/* vientre claro */}
+      <ellipse cx="25" cy="30" rx="8" ry="3.4" fill="#fef3c7" opacity="0.5" transform="rotate(-16 25 30)" />
+      {/* cabeza */}
+      <circle cx="40" cy="22" r="6.4" fill="url(#fvh-colibri-plum)" />
+      {/* garganta iridiscente (gorget) */}
+      <ellipse cx="41" cy="26" rx="3.6" ry="2.4" fill="url(#fvh-colibri-gorget)" opacity="0.92" />
+      {/* ojo */}
+      <circle cx="41.5" cy="20.6" r="1.5" fill="#0c0a09" />
+      <circle cx="41" cy="20.1" r="0.5" fill="#fff" opacity="0.95" />
+      {/* PICO LARGO característico del colibrí */}
+      <path d="M46 22 Q58 24 63 30" fill="none" stroke="#26201b" strokeWidth="1.7" strokeLinecap="round" />
+      {/* ala frontal (batiendo, sobre el cuerpo) */}
+      <g className="fvh-ala-fron" style={{ transformOrigin: '28px 23px' }}>
+        <path d="M28 23 Q16 6 2 12 Q14 26 30 21 Z" fill="url(#fvh-colibri-plum)" opacity="0.78" />
+      </g>
+    </svg>
+  );
+}
+
+/** Mismo colibrí en versión avatar redondo para el compositor del agente. */
+function ColibriAvatar() {
+  return (
+    <svg viewBox="0 0 48 48" width="26" height="26" aria-hidden="true">
+      <defs>
+        <linearGradient id="fvh-colibri-av-plum" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#34d399" />
+          <stop offset="45%" stopColor="#10b981" />
+          <stop offset="75%" stopColor="#22d3ee" />
+          <stop offset="100%" stopColor="#a78bfa" />
+        </linearGradient>
+        <radialGradient id="fvh-colibri-av-gor" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stopColor="#fde68a" />
+          <stop offset="50%" stopColor="#f59e0b" />
+          <stop offset="100%" stopColor="#dc2626" />
+        </radialGradient>
+      </defs>
+      <path d="M8 26 L2 22 L6 28 L1 32 L7 31 L5 37 L12 30 Z" fill="url(#fvh-colibri-av-plum)" opacity="0.9" />
+      <path d="M20 22 Q10 15 4 22 Q11 29 21 25 Z" fill="url(#fvh-colibri-av-plum)" opacity="0.6" />
+      <ellipse cx="22" cy="25" rx="11" ry="6.6" fill="url(#fvh-colibri-av-plum)" transform="rotate(-16 22 25)" />
+      <circle cx="33" cy="20" r="5.6" fill="url(#fvh-colibri-av-plum)" />
+      <ellipse cx="34" cy="24" rx="3" ry="2" fill="url(#fvh-colibri-av-gor)" opacity="0.95" />
+      <circle cx="34.4" cy="18.6" r="1.3" fill="#0c0a09" />
+      <circle cx="34" cy="18.2" r="0.45" fill="#fff" />
+      <path d="M38.5 20 Q46 22 47 27" fill="none" stroke="#e2e8f0" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+// ── Catálogos de texto (refinados del mockup F2) ───────────────────────────
 
 const ESCALAS = [
-  { id: 'balcon', emoji: '🪴', label: 'Mi balcón' },
-  { id: 'invernadero', emoji: '🏭', label: 'Invernadero' },
-  { id: 'finca', emoji: '🌄', label: 'Mi finca' },
+  { id: 'balcon', label: 'Balcón' },
+  { id: 'invernadero', label: 'Invernadero' },
+  { id: 'finca', label: 'Finca' },
 ];
 
-const MUNDO_LABEL = {
-  balcon: 'Mi balcón verde · ciudad',
-  invernadero: 'Invernadero · monocultivo',
-  finca: 'El bosque de comida · sol y templado',
-};
 const HERO = {
   balcon: [
     'Este es <em>su balcón vivo</em>.<br>¿Qué quiere hacer hoy?',
@@ -301,9 +640,9 @@ const HERO = {
   ],
 };
 const COLIBRI = {
-  balcon: ['Buenas, soy Chagra 🌿', 'Su balcón está al día. Toque una matera o pregúnteme aquí abajo.'],
-  invernadero: ['Buenas, soy Chagra 🌿', 'Sus hileras están bien. ¿Reviso riego o plagas? Pregúnteme abajo.'],
-  finca: ['Buenas tardes, soy Chagra 🌿', 'Todo tranquilo en su finca. Toque un lugar para entrar, o pregúnteme aquí abajo.'],
+  balcon: ['Buenas, soy Chagra', 'Su balcón está al día. Toque una matera o pregúnteme aquí abajo.'],
+  invernadero: ['Buenas, soy Chagra', 'Sus hileras están bien. ¿Reviso riego o plagas? Pregúnteme abajo.'],
+  finca: ['Buenas, soy Chagra', 'Todo tranquilo en su finca. Toque un lugar para entrar, o pregúnteme aquí abajo.'],
 };
 
 /**
@@ -375,7 +714,7 @@ function buildPortales({ onNavigate, abrirAgente, scene, poblada, escala }) {
   ];
 }
 
-// ── SVG de los 4 portales (place-svg), portados del mockup F2 ───────────────
+// ── SVG de los 4 portales (place-svg), del mockup F2 ────────────────────────
 
 function PlaceGestionar() {
   return (
@@ -418,42 +757,50 @@ function PlaceAgente() {
       <polygon points="90,52 150,84 90,116 30,84" fill="#5d4db0" />
       <circle cx="90" cy="80" r="26" fill="#11281f" />
       <circle cx="90" cy="80" r="26" fill="none" stroke="#a3e635" strokeWidth="2.5" opacity=".8" />
-      <text x="90" y="88" fontSize="26" textAnchor="middle">🐦</text>
+      {/* colibrí pequeño en el portal del agente (coherencia con la insignia) */}
+      <g transform="translate(74 72)">
+        <ellipse cx="9" cy="10" rx="9" ry="5" fill="#10b981" transform="rotate(-16 9 10)" />
+        <circle cx="18" cy="7" r="4.4" fill="#06b6d4" />
+        <ellipse cx="19" cy="10" rx="2.4" ry="1.6" fill="#f59e0b" />
+        <circle cx="19" cy="6" r="1" fill="#0c0a09" />
+        <path d="M22 7 Q30 8 33 12" fill="none" stroke="#e2e8f0" strokeWidth="1.4" strokeLinecap="round" />
+        <path d="M10 7 Q3 1 -3 5 Q4 12 12 8 Z" fill="#8b5cf6" opacity="0.8" />
+      </g>
     </svg>
   );
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-//  ESCENAS ISOMÉTRICAS — portadas FIELMENTE del mockup F2 (un SVG por escala).
-//  Cada escena tiene su estado poblada vs. recién-empieza.
+//  ESCENAS ISOMÉTRICAS — del mockup F2 (un SVG por escala). Cada escena recibe
+//  el `cielo` real y dibuja sol/luna/estrellas + velo de clima vía <Sky>.
 // ════════════════════════════════════════════════════════════════════════════
 
 /** VARIANTE A · BALCÓN URBANO (materas, baranda, ciudad de fondo). */
-function SceneBalcon({ poblada }) {
+function SceneBalcon({ poblada, cielo }) {
+  const noche = esNoche(cielo);
   return (
     <svg viewBox="0 0 390 360" preserveAspectRatio="xMidYMid meet"
       aria-label="Su balcón urbano visto en isométrico: materas con tomate y aromáticas, baranda y la ciudad de fondo.">
       <defs>
+        <SolGrad />
         <linearGradient id="fvh-sky-balc" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#8fd0e8" /><stop offset="1" stopColor="#dff0e3" />
+          {noche
+            ? (<><stop offset="0" stopColor="#1d2b4a" /><stop offset="1" stopColor="#46566b" /></>)
+            : (<><stop offset="0" stopColor="#8fd0e8" /><stop offset="1" stopColor="#dff0e3" /></>)}
         </linearGradient>
         <linearGradient id="fvh-city-balc" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#b9c9cf" /><stop offset="1" stopColor="#9fb3bb" />
+          {noche
+            ? (<><stop offset="0" stopColor="#33415a" /><stop offset="1" stopColor="#2a364b" /></>)
+            : (<><stop offset="0" stopColor="#b9c9cf" /><stop offset="1" stopColor="#9fb3bb" /></>)}
         </linearGradient>
-        <radialGradient id="fvh-sun-balc" cx="50%" cy="45%" r="60%">
-          <stop offset="0" stopColor="#fff3c4" /><stop offset="70%" stopColor="#ffe08a" /><stop offset="100%" stopColor="#ffd24d" />
-        </radialGradient>
         <pattern id="fvh-madera-balc" width="14" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-31)">
           <rect width="14" height="8" fill="#c8a06a" /><line x1="0" y1="0" x2="14" y2="0" stroke="#9c7642" strokeWidth="1" opacity=".5" />
         </pattern>
       </defs>
       <rect x="0" y="0" width="390" height="360" fill="url(#fvh-sky-balc)" />
-      {/* sol */}
-      <g transform="translate(322 50)">
-        <circle r="26" fill="#ffe08a" opacity=".35"><animate attributeName="r" values="26;30;26" dur="6s" repeatCount="indefinite" /></circle>
-        <circle r="18" fill="url(#fvh-sun-balc)" />
-      </g>
-      {/* ciudad de fondo */}
+      {/* cielo real: sol/luna/estrellas + clima */}
+      <Sky cielo={cielo} cx={322} cy={50} r={18} lluviaY={140} />
+      {/* ventanas encendidas de la ciudad (de noche brillan más) */}
       <g fill="url(#fvh-city-balc)" opacity=".9">
         <rect x="20" y="118" width="42" height="120" rx="3" />
         <rect x="70" y="92" width="36" height="146" rx="3" />
@@ -462,15 +809,11 @@ function SceneBalcon({ poblada }) {
         <rect x="296" y="134" width="32" height="104" rx="3" />
         <rect x="334" y="110" width="36" height="128" rx="3" />
       </g>
-      <g fill="#fff5cf" opacity=".75">
+      <g fill={noche ? '#ffd86b' : '#fff5cf'} opacity={noche ? '0.95' : '.75'}>
         <rect x="78" y="104" width="7" height="9" rx="1" /><rect x="90" y="104" width="7" height="9" rx="1" />
         <rect x="78" y="122" width="7" height="9" rx="1" /><rect x="90" y="122" width="7" height="9" rx="1" />
         <rect x="258" y="118" width="7" height="9" rx="1" /><rect x="270" y="118" width="7" height="9" rx="1" />
         <rect x="342" y="124" width="7" height="9" rx="1" /><rect x="354" y="124" width="7" height="9" rx="1" />
-      </g>
-      <g>
-        <animateTransform attributeName="transform" type="translate" values="0 0;30 -6;0 0" dur="14s" repeatCount="indefinite" />
-        <path d="M150 96 q6 -5 12 0 q6 -5 12 0" stroke="#3a4a52" strokeWidth="2" fill="none" strokeLinecap="round" />
       </g>
 
       {/* PISO DEL BALCÓN */}
@@ -565,7 +908,8 @@ function SceneBalcon({ poblada }) {
 }
 
 /** VARIANTE B · INVERNADERO (techo translúcido, hileras densas de tomate). */
-function SceneInvernadero({ poblada }) {
+function SceneInvernadero({ poblada, cielo }) {
+  const noche = esNoche(cielo);
   // Hileras densas (monocultivo) generadas como en el mockup (buildInvernadero).
   const hileras = useMemo(() => {
     const filas = [
@@ -591,13 +935,18 @@ function SceneInvernadero({ poblada }) {
     <svg viewBox="0 0 390 360" preserveAspectRatio="xMidYMid meet"
       aria-label="Su invernadero visto en isométrico: techo translúcido y hileras densas de tomate en monocultivo, con líneas de riego. Diez mil plantas.">
       <defs>
-        <linearGradient id="fvh-sky-inv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#90cce0" /><stop offset="1" stopColor="#d4ecd6" /></linearGradient>
+        <SolGrad />
+        <linearGradient id="fvh-sky-inv" x1="0" y1="0" x2="0" y2="1">
+          {noche
+            ? (<><stop offset="0" stopColor="#1d2b4a" /><stop offset="1" stopColor="#465a64" /></>)
+            : (<><stop offset="0" stopColor="#90cce0" /><stop offset="1" stopColor="#d4ecd6" /></>)}
+        </linearGradient>
         <linearGradient id="fvh-piso-inv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#bfae8a" /><stop offset="1" stopColor="#9a8a64" /></linearGradient>
         <linearGradient id="fvh-techo-inv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#cdeef0" stopOpacity=".82" /><stop offset="1" stopColor="#a6dde2" stopOpacity=".5" /></linearGradient>
         <linearGradient id="fvh-hilera-inv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#7fc06f" /><stop offset="1" stopColor="#3f8f4e" /></linearGradient>
       </defs>
       <rect x="0" y="0" width="390" height="360" fill="url(#fvh-sky-inv)" />
-      <g transform="translate(326 48)"><circle r="22" fill="#ffe08a" opacity=".4" /><circle r="15" fill="#ffd24d" /></g>
+      <Sky cielo={cielo} cx={326} cy={48} r={15} lluviaY={120} />
 
       {poblada && (
         <g className="fvh-rise-svg" style={{ animationDelay: '.05s' }} transform="translate(195 64)">
@@ -685,17 +1034,22 @@ function SceneInvernadero({ poblada }) {
  * gallina, la vaca, la colmena, el guamo de sombra y los arbolitos del mockup
  * F2. El estado vacío es la versión "recién empieza" (terreno listo · 0 siembras).
  */
-function SceneFinca({ poblada }) {
+function SceneFinca({ poblada, cielo }) {
+  const noche = esNoche(cielo);
   return (
     <svg viewBox="0 0 390 360" preserveAspectRatio="xMidYMid meet"
       aria-label="Su finca vista en isométrico: milpa, hortaliza, estanque con pato, corral con cerdo, gallina, vaca y abejas, y un guamo de sombra al centro.">
       <defs>
-        <linearGradient id="fvh-sky-f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#7ac3da" /><stop offset="1" stopColor="#c8e8cb" /></linearGradient>
+        <SolGrad />
+        <linearGradient id="fvh-sky-f" x1="0" y1="0" x2="0" y2="1">
+          {noche
+            ? (<><stop offset="0" stopColor="#162544" /><stop offset="1" stopColor="#3d5560" /></>)
+            : (<><stop offset="0" stopColor="#7ac3da" /><stop offset="1" stopColor="#c8e8cb" /></>)}
+        </linearGradient>
         <linearGradient id="fvh-agua-f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#9fe3ee" /><stop offset="1" stopColor="#5ab8d8" /></linearGradient>
         <linearGradient id="fvh-tile-suelo-f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#9bb45a" /><stop offset="1" stopColor="#6f8a3f" /></linearGradient>
         <linearGradient id="fvh-tile-verde-f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#7fc06f" /><stop offset="1" stopColor="#4ca35c" /></linearGradient>
         <linearGradient id="fvh-tile-milpa-f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#c8d96a" /><stop offset="1" stopColor="#9bbf48" /></linearGradient>
-        <radialGradient id="fvh-sol-f" cx="50%" cy="45%" r="60%"><stop offset="0" stopColor="#fff3c4" /><stop offset="70%" stopColor="#ffe08a" /><stop offset="100%" stopColor="#ffd24d" /></radialGradient>
         <pattern id="fvh-pasto-f" width="12" height="12" patternUnits="userSpaceOnUse">
           <path d="M3 9 q1 -4 0 -6 M6 10 q0 -5 1 -7 M9 9 q-1 -4 0 -6" stroke="#5f8a3f" strokeWidth="1" fill="none" opacity=".45" strokeLinecap="round" />
         </pattern>
@@ -703,18 +1057,17 @@ function SceneFinca({ poblada }) {
       </defs>
 
       <rect x="0" y="0" width="390" height="360" fill="url(#fvh-sky-f)" />
-      {/* sol (respira) */}
-      <g transform="translate(322 52)">
-        <circle r="30" fill="#ffe08a" opacity=".35"><animate attributeName="r" values="30;34;30" dur="6s" repeatCount="indefinite" /></circle>
-        <circle r="20" fill="url(#fvh-sol-f)" />
-      </g>
-      {/* nubes */}
-      <g fill="#ffffff" opacity=".9">
-        <g><animateTransform attributeName="transform" type="translate" values="0 0;12 0;0 0" dur="20s" repeatCount="indefinite" />
-          <ellipse cx="70" cy="42" rx="24" ry="12" /><ellipse cx="92" cy="38" rx="17" ry="12" /><ellipse cx="54" cy="38" rx="14" ry="10" /></g>
-        <g opacity=".75"><animateTransform attributeName="transform" type="translate" values="0 0;-10 0;0 0" dur="26s" repeatCount="indefinite" />
-          <ellipse cx="212" cy="32" rx="18" ry="9" /><ellipse cx="228" cy="29" rx="13" ry="9" /></g>
-      </g>
+      {/* cielo real: sol que respira de día / luna + estrellas de noche + clima */}
+      <Sky cielo={cielo} cx={322} cy={52} r={20} lluviaY={140} />
+      {/* nubes ambiente (suaves) — sólo de día y si no está ya cubierto */}
+      {!noche && !esCubierto(cielo) && (
+        <g fill="#ffffff" opacity=".9">
+          <g><animateTransform attributeName="transform" type="translate" values="0 0;12 0;0 0" dur="20s" repeatCount="indefinite" />
+            <ellipse cx="70" cy="42" rx="24" ry="12" /><ellipse cx="92" cy="38" rx="17" ry="12" /><ellipse cx="54" cy="38" rx="14" ry="10" /></g>
+          <g opacity=".75"><animateTransform attributeName="transform" type="translate" values="0 0;-10 0;0 0" dur="26s" repeatCount="indefinite" />
+            <ellipse cx="212" cy="32" rx="18" ry="9" /><ellipse cx="228" cy="29" rx="13" ry="9" /></g>
+        </g>
+      )}
       {/* colinas de fondo */}
       <path d="M0 158 Q100 122 200 150 T390 146 V210 H0 Z" fill="#6f9a52" opacity=".5" />
       <path d="M0 174 Q120 144 250 168 T390 164 V220 H0 Z" fill="#5f8a47" opacity=".55" />
