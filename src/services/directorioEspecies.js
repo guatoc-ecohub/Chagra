@@ -147,16 +147,28 @@ export async function searchSpecies(query, opts = {}) {
   }
   if (!Array.isArray(list) || list.length === 0) return [];
 
-  // 0) Alias curado → si el destino existe, gana solo (sin ambigüedad).
-  const aliasTarget = CURATED_ALIASES[q];
-  if (aliasTarget) {
-    const hit = list.find((s) => s?.id === aliasTarget || s?.slug === aliasTarget);
-    if (hit) return [{ ...labelWithFamilia(hit), match: 'alias' }];
-  }
-
+  const aliasFirst = [];
   const exact = [];
   const word = [];
   const seen = new Set();
+
+  // 0) Alias curado → si el destino existe, lo PROMOVEMOS al primer lugar
+  // (tier tope) pero NO corta-circuita: el explorador debe seguir listando los
+  // demás candidatos (todos los tomates, no solo el de mesa). El alias resuelve
+  // el "default esperado" (tomate → cerasiforme, no tomate de árbol); el resto
+  // se recolecta debajo por match exacto/palabra. Lo metemos en `seen` para no
+  // duplicarlo cuando el loop lo vuelva a encontrar por nombre.
+  const aliasTarget = CURATED_ALIASES[q];
+  if (aliasTarget) {
+    const hit = list.find((s) => s?.id === aliasTarget || s?.slug === aliasTarget);
+    if (hit) {
+      const aliasId = hit.id || hit.slug;
+      if (aliasId) {
+        aliasFirst.push({ ...labelWithFamilia(hit), match: 'alias' });
+        seen.add(aliasId);
+      }
+    }
+  }
 
   for (const sp of list) {
     if (!sp) continue;
@@ -193,7 +205,7 @@ export async function searchSpecies(query, opts = {}) {
   }
 
   word.sort((a, b) => a._w - b._w);
-  const ranked = [...exact, ...word.map(({ _w, ...rest }) => rest)];
+  const ranked = [...aliasFirst, ...exact, ...word.map(({ _w, ...rest }) => rest)];
   return ranked.slice(0, limit);
 }
 
