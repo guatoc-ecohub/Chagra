@@ -186,10 +186,10 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
         {/* Encabezado lúdico + botón de audio grande */}
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-xs font-bold text-emerald-300/80 uppercase tracking-widest">
+            <p className="jp-tinta-suave text-xs font-bold text-emerald-300/80 uppercase tracking-widest">
               Nivel {game.nivel} de 4
             </p>
-            <h2 className="text-2xl font-black text-white leading-tight flex items-center gap-2">
+            <h2 className="jp-tinta text-2xl font-black text-white leading-tight flex items-center gap-2">
               <span aria-hidden="true">{mundo.emoji}</span>
               {mundo.nombreNino}
             </h2>
@@ -219,8 +219,8 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
             <Volume2 size={22} aria-hidden="true" />
           </button>
           <div className="flex-1">
-            <p className="text-base text-emerald-50 font-medium leading-relaxed">{mundo.mensaje}</p>
-            <p className="text-xs text-emerald-300/70 mt-1">
+            <p className="jp-tinta text-base text-emerald-50 font-medium leading-relaxed">{mundo.mensaje}</p>
+            <p className="jp-tinta-suave text-xs text-emerald-300/70 mt-1">
               Esto es de verdad: tu finca está en la etapa «{mundo.nombreReal}».
             </p>
           </div>
@@ -236,8 +236,8 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
           <span className="text-4xl shrink-0" aria-hidden="true">🛡️</span>
           <span className="flex-1 min-w-0">
             {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- nombre del juego, ES-CO. */}
-            <span className="block text-base font-black text-white">Defensores de la Finca</span>
-            <span className="block text-sm text-teal-100/90 leading-snug">
+            <span className="jp-tinta block text-base font-black text-white">Defensores de la Finca</span>
+            <span className="jp-tinta-suave block text-sm text-teal-100/90 leading-snug">
               Corre y salta por la finca, recoge cultivos y suelta los bichos
               buenos que controlan a las plagas. Así aprendes control biológico.
             </span>
@@ -254,8 +254,8 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
         >
           <span className="text-4xl shrink-0" aria-hidden="true">🌽</span>
           <span className="flex-1 min-w-0">
-            <span className="block text-base font-black text-white">La Milpa</span>
-            <span className="block text-sm text-lime-100/90 leading-snug">
+            <span className="jp-tinta block text-base font-black text-white">La Milpa</span>
+            <span className="jp-tinta-suave block text-sm text-lime-100/90 leading-snug">
               Siembra maíz, fríjol y ahuyama juntos (las tres hermanas) y mira
               cómo se ayudan y rinden más que sembrar cada uno solo.
             </span>
@@ -272,8 +272,9 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
         >
           <span className="text-4xl shrink-0" aria-hidden="true">🎯</span>
           <span className="flex-1 min-w-0">
-            <span className="block text-base font-black text-white">Doom de la Finca</span>
-            <span className="block text-sm text-orange-100/90 leading-snug">
+            {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- nombre del juego, ES-CO. */}
+            <span className="jp-tinta block text-base font-black text-white">Doom de la Finca</span>
+            <span className="jp-tinta-suave block text-sm text-orange-100/90 leading-snug">
               Recorre el invernadero en primera persona, identifica las plagas y
               lanza el controlador biologico correcto. Protege tu cultivo.
             </span>
@@ -292,8 +293,8 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
         >
           <span className="text-4xl shrink-0" aria-hidden="true">🪱</span>
           <span className="flex-1 min-w-0">
-            <span className="block text-base font-black text-white">Mundo Subsuelo</span>
-            <span className="block text-sm text-cyan-100/90 leading-snug">
+            <span className="jp-tinta block text-base font-black text-white">Mundo Subsuelo</span>
+            <span className="jp-tinta-suave block text-sm text-cyan-100/90 leading-snug">
               Baja bajo tus botas: alimenta la tierra con compost, conecta raíces
               con hongos y despierta a las lombrices. Mira cómo revive el suelo.
             </span>
@@ -304,8 +305,8 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
         {/* Barra de progreso del mundo (alegre, pero honesta: % real) */}
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-sm font-bold text-emerald-200">Tu finca crece</span>
-            <span className="text-sm font-black text-emerald-300">{game.progreso}%</span>
+            <span className="jp-tinta text-sm font-bold text-emerald-200">Tu finca crece</span>
+            <span className="jp-acento-vida text-sm font-black text-emerald-300">{game.progreso}%</span>
           </div>
           <div className="h-4 bg-slate-800/60 rounded-full overflow-hidden border border-emerald-900/40">
             <div
@@ -319,7 +320,7 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
             />
           </div>
           {game.mundoSiguiente && !game.vacia && (
-            <p className="text-xs text-emerald-300/70 mt-1.5">
+            <p className="jp-tinta-suave text-xs text-emerald-300/70 mt-1.5">
               Lo que sigue: {game.mundoSiguiente.emoji} {game.mundoSiguiente.nombreNino}
             </p>
           )}
@@ -332,8 +333,8 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
             className="bg-gradient-to-br from-amber-900/30 to-emerald-900/30 border-2 border-amber-400/40 rounded-3xl p-5 text-center"
           >
             <div className="text-5xl mb-2" aria-hidden="true">🌱</div>
-            <h3 className="text-xl font-black text-white">¡Empieza tu finca!</h3>
-            <p className="text-sm text-amber-50 mt-2 leading-relaxed">
+            <h3 className="jp-tinta text-xl font-black text-white">¡Empieza tu finca!</h3>
+            <p className="jp-tinta text-sm text-amber-50 mt-2 leading-relaxed">
               Tu finca está esperando. Siembra tu primera planta y mira cómo cobra
               vida: llegarán mariposas, abejas y muchas criaturas más.
             </p>
@@ -349,7 +350,7 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
           <>
             {/* Misiones */}
             <section data-testid="misiones-juego" className="flex flex-col gap-3">
-              <h3 className="text-lg font-black text-white flex items-center gap-2">
+              <h3 className="jp-tinta text-lg font-black text-white flex items-center gap-2">
                 🎯 Mis misiones
                 <span className="text-sm font-bold text-emerald-300 bg-emerald-800/50 rounded-full px-3 py-0.5">
                   {game.misiones.filter((m) => m.cumplida).length} / {game.misiones.length}
@@ -382,7 +383,7 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
             data-testid="insignias-juego"
             className="jp-mfv-panel bg-gradient-to-br from-amber-950/50 to-yellow-950/30 border border-amber-700/40 rounded-3xl p-4"
           >
-            <h3 className="text-lg font-black text-white flex items-center gap-2 mb-3">
+            <h3 className="jp-tinta text-lg font-black text-white flex items-center gap-2 mb-3">
               <Trophy size={20} className="text-amber-300" aria-hidden="true" />
               Mis insignias
             </h3>
@@ -407,7 +408,7 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
         {/* Nota honesta para acompañantes (anti-paternalismo, cariño real) */}
         <div className="flex items-start gap-2 pt-1">
           <Sparkles size={14} className="text-emerald-500 shrink-0 mt-0.5" aria-hidden="true" />
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="jp-tinta-suave text-xs text-slate-400 leading-relaxed">
             Este juego no inventa premios: tu finca crece de verdad con el trabajo
             real. Cada planta que siembras, cada cosecha y cada cuidado sin venenos
             hace que tu mundo florezca. 🌿
