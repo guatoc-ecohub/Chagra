@@ -1646,22 +1646,42 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               });
             }
           } else if (plan?.useTool && plan.tool && plan.args && !isToolAllowed(plan.tool)) {
-            // GUARD ALLOW-LIST (fix grounding P0 2026-06-24). El NLU planner
-            // conoce 41 tools, pero el cliente solo expone ~20 (ver ALLOWED_TOOLS
-            // en sidecarClient). Si el planner rutea a una NO expuesta,
-            // `callTool` la rechazaría con `{_error, reason:'not_allowed'}`,
-            // indistinguible de un fallo transitorio de red — y el turno
-            // degradaba a RAG SIN grounding en SILENCIO. Lo detectamos ANTES de
-            // llamar y lo manejamos EXPLÍCITO y OBSERVABLE: NO disparamos el
-            // tool (evitamos el roundtrip + el bloque "ERROR DE CONSULTA"
-            // engañoso) y dejamos `toolEvidence` en null para que el turno
-            // siga con el grounding disponible (entidades resueltas + RAG),
-            // marcando la ruta para telemetría. NO exponemos las 41 a ciegas:
-            // algunas (get_cultivos_viables, get_diseno_finca) se EXCLUYEN a
-            // propósito para evitar misrouting ("FIX P0 audit 2026-06-23").
-            // TODO: sincronizar allow-list cliente vs 41 del NLU (decisión consciente).
+            // GUARD ALLOW-LIST + DEFLECCIÓN HONESTA (fix grounding P0 2026-06-25,
+            // amplía #1848). El NLU planner conoce 41 tools; el cliente expone un
+            // subconjunto (ver ALLOWED_TOOLS en sidecarClient). Si el planner
+            // rutea a una NO expuesta, `callTool` la rechazaría con
+            // `{_error, reason:'not_allowed'}`, indistinguible de un fallo
+            // transitorio de red — y el turno degradaba a RAG SIN grounding y SIN
+            // avisar al usuario (degradación SILENCIOSA).
+            //
+            // Las tools que QUEDAN fuera del allow-list son las que el NLU no
+            // puede rellenar desde una frase de chat (exigen credenciales farmOS,
+            // coords de dispositivo o NIT DIAN: add_planta_finca, get_finca_overview,
+            // get_sensor_finca, get_weather_data, get_clima_finca,
+            // get_documento_soporte_dian, get_ubicacion_actual) o cuyo arg
+            // obligatorio el planner no conoce (altitud de la finca para
+            // get_cultivos_viables / get_diseno_finca; fecha de siembra para
+            // get_grado_dia; biopreparado_id/pest_id para get_dosis_biopreparado).
+            //
+            // En vez de degradar callado a RAG, inyectamos una DEFLECCIÓN HONESTA
+            // (lección "deflección honesta": el agente dice claro que esa consulta
+            // todavía NO está disponible, found:false explícito, NO inventa). El
+            // bloque lo materializa formatToolEvidence (rama available:false).
             nluRoute = `nlu:not_allowed:${plan.tool}`;
-            console.warn('[sidecar] NLU ruteó a tool NO expuesta por el cliente — degradación transparente a RAG/entidades (sin callTool)', {
+            toolEvidence = {
+              tool: plan.tool,
+              args: plan.args,
+              result: {
+                available: false,
+                reason: 'tool_no_disponible_en_cliente',
+                hint:
+                  'Esta consulta específica todavía NO está disponible en Chagra. ' +
+                  'NO inventes datos: dilo con honestidad ("esa información todavía no la tengo disponible") ' +
+                  'y, si puedes, orienta con lo que SÍ está a la mano (chips de siembra, plaga, ' +
+                  'biopreparado, clima, calendario) o pide el dato que falte.',
+              },
+            };
+            console.warn('[sidecar] NLU ruteó a tool NO expuesta por el cliente — deflección honesta (sin callTool)', {
               tool: plan.tool,
               latencyNlu: Math.round(tNlu1 - tNlu0),
               reason: 'tool_not_in_client_allowlist',

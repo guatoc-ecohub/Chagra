@@ -327,11 +327,35 @@ const ALLOWED_TOOLS = new Set([
   // sidecar pero NO estaba en esta allow-list — el chip routeaba a get_species
   // por un comentario stale. Es read-only seguro (solo lee el catálogo).
   'get_calendario_siembra',
-  // TODO: sincronizar allow-list cliente vs 41 del NLU (decisión consciente).
-  // El cliente expone deliberadamente un subconjunto: algunas tools del NLU se
-  // EXCLUYEN a propósito para evitar misrouting (ej. get_cultivos_viables y
-  // get_diseno_finca — ver "FIX P0 audit 2026-06-23" en agentService.js). No
-  // exponer las 41 a ciegas; cada alta a esta lista es una decisión revisada.
+  // ── Reconciliación allow-list cliente ↔ 41 tools del NLU (fix grounding P0
+  //    2026-06-25). El NLU planner conocía 41 tools pero el cliente exponía 20:
+  //    si el planner ruteaba a una de las 21 restantes, el turno degradaba a
+  //    RAG SIN grounding en silencio. Agregamos acá las tools que son SEGURAS y
+  //    VALIOSAS de exponer (grounding del grafo AGE / catálogo / dataset
+  //    institucional local, ruteables por el NLU con id|nombre|término).
+  //
+  //    NO se exponen las que exigen credenciales farmOS, coords de dispositivo
+  //    o NIT DIAN (add_planta_finca, get_finca_overview, get_sensor_finca,
+  //    get_weather_data, get_clima_finca, get_documento_soporte_dian,
+  //    get_ubicacion_actual): el NLU no puede rellenar esos args desde una
+  //    frase de chat → devolverían {available:false}/502. Esas quedan en
+  //    DEFLECCIÓN HONESTA (ver guard `not_allowed` en AgentScreen): el agente
+  //    dice claro "esa consulta todavía no está disponible" en vez de degradar
+  //    callado a RAG.
+
+  // Grounding del grafo AGE por especie (id snake_case O nombre común): el NLU
+  // rellena `species_id` (o el arg análogo) desde el nombre que dijo el usuario.
+  'get_associations', //          asociaciones benéficas + técnicas aplicables
+  'get_fenologia', //             etapas BBCH + ventanas de plaga por etapa
+  'get_polinizacion', //          polinizadores + colmenas/ha + efecto cuaje
+  'get_invasoras_alternativas', // nativas de reemplazo a invasoras combustibles
+  // Grounding standalone (catálogo / glosario / dataset institucional local):
+  'get_saberes_tradicionales', // glosario agroecológico (96 términos) por término
+  'get_variedades_cultivo', //    variedades registradas ICA/AGROSAVIA por cultivo
+  'get_psa_elegibilidad', //      Pago por Servicios Ambientales (Decreto 1007/2018)
+  'get_alerta_carbono', //        alerta defensiva bonos de carbono + PSA estatal
+  'get_alerta_normativa_paramo', // alerta regulatoria de páramo (Ley 1930/2018)
+  'get_alerta_clima_consejo', //  alerta de decisión por cambio climático
 ]);
 
 /**

@@ -256,30 +256,24 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     heroRoute: { kind: 'nav', view: 'aprende' },
   },
   {
+    // FOTO EN LA MANO promovida a 'live' (fix grounding P0 2026-06-25). El gate
+    // 'soon' tenía un motivo FALSO ("requiere GPU con ≥8GB VRAM"): la GPU es de
+    // 12GB y la visión groundeada YA corre en el chat (recognizeSpeciesGrounded /
+    // analyzeFoliage / validate_visual_match + visionContext). La hoja además ya
+    // estaba CABLEADA: `heroRoute: { kind: 'photo' }` → mapCapabilityPick(onPhoto)
+    // → cameraInputAgentRef/cameraInputRef.click() → handleAgentPhotoPick →
+    // processPhotoItem (mismo pipeline de visión groundeada del compositor del
+    // chat). Lo único que faltaba era quitar el gate 'soon' (mapCapabilityPick
+    // hacía no-op antes de llamar onPhoto). Sin stubMessage: la capacidad ES real.
     id: 'foto',
     group: 'observar',
-    status: 'soon',
+    status: 'live',
     icon: '📷',
     label: 'Agregar planta por foto',
-    desc: 'Tómale una foto y la identifico y registro.',
+    desc: 'Tómale una foto y la identifico contra el catálogo.',
     tool: 'vision_identify',
     hero: true,
     heroRoute: { kind: 'photo' },
-    // stubMessage corregido 2026-06-24 (descubribilidad): el motivo anterior
-    // ("requiere GPU con ≥8GB VRAM") era FALSO — la GPU es de 12GB y la visión
-    // groundeada YA funciona dentro del chat (recognizeSpeciesGrounded /
-    // validate_visual_match). Lo que falta es cablear la foto-desde-la-mano al
-    // flujo de foto-en-chat; mientras tanto, en vez de mentir sobre el hardware,
-    // orientamos al usuario a la vía que SÍ funciona (foto dentro del chat) y a
-    // las alternativas (voz/manual). Se deja status:'soon' a propósito: promover
-    // la hoja de la mano a 'live' es más invasivo (requiere rutearla al
-    // compositor de foto del chat) y se hará en el replanteo. Ref:
-    // CAPABILITIES_STATUS.md §7.3 (foto soon con motivo falso).
-    stubMessage:
-      'Para identificar una planta por foto, abre el chat de Chagra y envíale la ' +
-      'foto desde ahí: la reconoce y verifica contra el catálogo. Esa vía ya ' +
-      'funciona. También puedes registrarla por voz o con el formulario manual. ' +
-      'El acceso directo por foto desde este menú llegará pronto.',
   },
   {
     // MÓDULO UNIFICADO de voz (2026-06-15): único punto de entrada desde la mano
