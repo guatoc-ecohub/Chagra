@@ -37,6 +37,24 @@ describe('PLAGAS_DOOM — shape y par de control real', () => {
     const ids = PLAGAS_DOOM.map((p) => p.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
+
+  it('cada plaga lista los cultivos que ataca y declara su fuente honesta', () => {
+    const FUENTES = ['grafo', 'cenicafe', 'ica-ciat', 'ecologia'];
+    for (const p of PLAGAS_DOOM) {
+      expect(Array.isArray(p.cultivos)).toBe(true);
+      expect(p.cultivos.length).toBeGreaterThan(0);
+      expect(FUENTES).toContain(p.fuente);
+      // el dano es una frase clara, no una etiqueta suelta
+      expect(p.dano.length).toBeGreaterThan(15);
+    }
+  });
+
+  it('no hay voseo argentino en el dano de las plagas (es-CO)', () => {
+    const VOSEO = /\b(usá|usás|tenés|querés|empezá|elegí)\b/i;
+    for (const p of PLAGAS_DOOM) {
+      expect(`${p.dano} ${p.porQue}`).not.toMatch(VOSEO);
+    }
+  });
 });
 
 describe('BENEFICOS_DOOM — shape', () => {

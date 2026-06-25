@@ -88,6 +88,12 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
     [nivel],
   );
   const beneficos = useMemo(() => pares.map((p) => p.benefico), [pares]);
+  // Benéfico → su par completo, para decir QUÉ plaga controla cuando el jugador
+  // suelta el aliado equivocado (microcopy didáctico, no solo "fallaste").
+  const parPorBenefico = useMemo(
+    () => Object.fromEntries(pares.map((p) => [p.benefico.id, p])),
+    [pares],
+  );
   const leccionPorBenefico = useMemo(
     () => Object.fromEntries(pares.map((p) => [p.benefico.id, p.leccion])),
     [pares],
@@ -261,9 +267,16 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
       setLeccion(leccionPorBenefico[id] || '');
       beep('good');
     } else {
-      setLeccion('Ese benéfico controla otra plaga. Mira cuál bicho malo hay cerca.');
+      // No acertó: en vez de un "fallaste" seco, le enseñamos qué controla SÍ
+      // el aliado que soltó, para que aprenda el emparejamiento correcto.
+      const par = parPorBenefico[id];
+      setLeccion(
+        par
+          ? `${par.benefico.nombre} controla al ${par.plaga.nombre.toLowerCase()}. Apunta a ese bicho o cambia de aliado.`
+          : 'Ese aliado controla otra plaga. Mira cuál bicho malo tienes cerca.',
+      );
     }
-  }, [estado, leccionPorBenefico, beep]);
+  }, [estado, leccionPorBenefico, parPorBenefico, beep]);
 
   // ── Bucle principal de juego (canvas 2D) ───────────────────────────
   useEffect(() => {
@@ -615,21 +628,29 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
       )}
 
       {/* Selector de benéficos (control biológico) */}
-      <div className="df-beneficios" role="group" aria-label="Elige el organismo benéfico">
-        {beneficos.map((b) => (
-          <button
-            key={b.id}
-            type="button"
-            data-testid={`beneficio-${b.id}`}
-            data-selected={beneficoSel === b.id}
-            onClick={() => setBeneficoSel(b.id)}
-            aria-pressed={beneficoSel === b.id}
-            className="df-beneficio"
-          >
-            <span className="df-beneficio-emoji" aria-hidden="true">{b.emoji}</span>
-            <span className="df-beneficio-nombre">{b.nombre}</span>
-          </button>
-        ))}
+      <div className="df-beneficios" role="group" aria-label="Elige el aliado que controla cada plaga">
+        {beneficos.map((b) => {
+          const plagaQueControla = parPorBenefico[b.id]?.plaga?.nombre;
+          const ayuda = plagaQueControla
+            ? `${b.nombre}: controla al ${plagaQueControla.toLowerCase()}`
+            : b.nombre;
+          return (
+            <button
+              key={b.id}
+              type="button"
+              data-testid={`beneficio-${b.id}`}
+              data-selected={beneficoSel === b.id}
+              onClick={() => setBeneficoSel(b.id)}
+              aria-pressed={beneficoSel === b.id}
+              aria-label={ayuda}
+              title={ayuda}
+              className="df-beneficio"
+            >
+              <span className="df-beneficio-emoji" aria-hidden="true">{b.emoji}</span>
+              <span className="df-beneficio-nombre">{b.nombre}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Controles táctiles (mobile-first) + teclado en desktop */}
