@@ -74,9 +74,11 @@ describe('getCapabilityHealth — estado real por capacidad', () => {
     expect(getCapabilityHealth('voz', deps)).toBe('live');
   });
 
-  it('foto retorna soon (manifest: identificacion por foto necesita GPU >=8GB)', () => {
-    // foto es status:'soon' en el manifiesto (hardware insuficiente en Maxwell);
-    // el manifest manda, sin importar el estado del sidecar.
+  it('foto retorna soon (manifest: foto-desde-la-mano aun sin cablear al chat)', () => {
+    // foto es status:'soon' en el manifiesto, pero NO por hardware: la visión
+    // groundeada ya corre en el chat (GPU 12GB). Falta cablear el acceso directo
+    // por foto desde la mano al flujo de foto-en-chat (ver stubMessage corregido
+    // 2026-06-24). El manifest manda, sin importar el estado del sidecar.
     const deps = makeDeps({ isSidecarEnabled: false });
     expect(getCapabilityHealth('foto', deps)).toBe('soon');
     expect(getCapabilityHealth('foto', makeDeps({ isSidecarEnabled: true }))).toBe('soon');

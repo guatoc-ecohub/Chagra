@@ -1,3 +1,12 @@
+/*
+ * i18n (ADR-050): DashboardLive.jsx contiene etiquetas de navegación de la home
+ * en español Colombia (títulos de tiles/bloques: Suelo, Semilleros, Cosechar,
+ * Insumos aplicados, "Registrar en la finca"…) pendientes de migrar a
+ * src/config/messages.js. La regla chagra-i18n es soft (warn); se desactiva a
+ * nivel de archivo para no bloquear el pre-commit con deuda preexistente —
+ * mismo criterio que App.jsx. Los errores reales de ESLint siguen activos.
+ */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useScrollRestoration } from '../../hooks/useScrollRestoration';
 import {
@@ -17,7 +26,7 @@ import {
     rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen } from 'lucide-react';
+import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye } from 'lucide-react';
 import AgentHero from './AgentHero';
 import OnboardingHero from '../OnboardingHero';
 import {
@@ -36,6 +45,11 @@ import {
 import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciarAccess';
 import SelectedBackgroundReveal from './SelectedBackgroundReveal';
 import MiFincaVivaHomeCard from './MiFincaVivaHomeCard';
+// Rescate huérfano 2026-06-24 (descubribilidad): CaseStudyTopWidget vivía solo
+// en el DashboardView MUERTO de App.jsx (única vía a `casos`). Se trae a la home
+// viva; se auto-oculta si no hay casos activos (KISS, zero footprint). Ref:
+// CAPABILITIES_STATUS.md §2.
+import CaseStudyTopWidget from '../CaseStudyTopWidget';
 import ClimaStrip from './ClimaStrip';
 import HoyEnFincaStrip from './HoyEnFincaStrip';
 import AIStatusFooter from './AIStatusFooter';
@@ -104,6 +118,28 @@ const HERRAMIENTAS_TILES = [
     { view: 'germinacion', label: 'Semilleros', icon: TestTube, desc: 'Prueba de semillas y germinación', accent: 'text-teal-400 border-l-teal-500' },
     { view: 'toxicologia', label: 'Seguridad', icon: ShieldAlert, desc: 'Toxicidad de insumos y riesgo de suelo', accent: 'text-rose-400 border-l-rose-500' },
     { view: 'aprende', label: 'Aprende', icon: BookOpen, desc: 'Lecciones agroecológicas con fuente', accent: 'text-emerald-400 border-l-emerald-500' },
+    // Huérfanos rescatados 2026-06-24 (descubribilidad). Eran rutas vivas en el
+    // router pero sin entrada en la home viva (CAPABILITIES_STATUS.md §2):
+    //  · biopreparados → galería de recetas paso a paso (antes solo desde el juego).
+    //  · ciclo_nutrientes → plan de alimentación / ciclo cerrado (antes solo
+    //    desde dentro de AnimalesScreen).
+    //  · casos → casos de estudio (antes solo desde el DashboardView muerto / #casos).
+    // `data: { back: 'dashboard' }`: la galería de biopreparados también se abre
+    // desde el juego (misión, sin back → vuelve al juego). Desde la home pasamos
+    // back:'dashboard' para que el botón Volver regrese acá y no al juego
+    // (corrige el onBack huérfano). Ver App.jsx case 'biopreparados'.
+    { view: 'biopreparados', label: 'Biopreparados', icon: FlaskConical, desc: 'Recetas caseras paso a paso', accent: 'text-lime-400 border-l-lime-500', data: { back: 'dashboard' } },
+    { view: 'ciclo_nutrientes', label: 'Nutrientes', icon: Recycle, desc: 'Ciclo cerrado: del animal al suelo y la planta', accent: 'text-emerald-400 border-l-emerald-500' },
+    { view: 'casos', label: 'Casos', icon: ClipboardList, desc: 'Seguimiento de problemas y tratamientos', accent: 'text-amber-400 border-l-amber-500' },
+];
+
+// Acciones de gestión sin launcher directo en la home (huérfanas):
+// cosechar / insumos / mantenimiento. Eran alcanzables solo por back-nav interno
+// o por la mano. Se exponen como tiles propios (CAPABILITIES_STATUS.md §2).
+const GESTION_TILES = [
+    { view: 'cosechar', label: 'Cosechar', icon: Wheat, desc: 'Registrar una cosecha', accent: 'text-amber-400 border-l-amber-500' },
+    { view: 'insumos', label: 'Insumos aplicados', icon: Droplets, desc: 'Registrar una aplicación de bioinsumo', accent: 'text-sky-400 border-l-sky-500' },
+    { view: 'mantenimiento', label: 'Mantenimiento', icon: Wrench, desc: 'Labores de mantenimiento de la finca', accent: 'text-slate-300 border-l-slate-500' },
 ];
 
 function SortableSection({ id, onNavigate, sensors }) {
@@ -227,6 +263,19 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
             return !esPerfilUrbano(getProfile());
         } catch (_) {
             return true; // Fail-open: no esconder el módulo por un error.
+        }
+    });
+    // Rescate huérfano 2026-06-24 (descubribilidad): "Campo, Javier"
+    // (WorkerDashboard) era HUÉRFANO — solo accesible desde el NAV_TILES del
+    // DashboardView muerto o por #javier. Es una vista de SUPERVISOR/trabajador
+    // (nicho), así que la exponemos gateada al OPERADOR (no se la mostramos al
+    // campesino dueño para no ensuciar la home). La ruta #javier sigue viva en el
+    // router. Ref: CAPABILITIES_STATUS.md §2.
+    const [mostrarJavier] = useState(() => {
+        try {
+            return esOperadorActual();
+        } catch (_) {
+            return false; // Fail-closed: vista de nicho, no exponer por error.
         }
     });
     const iotAlerts = useAssetStore((s) => s.iotAlerts) || [];
@@ -410,6 +459,14 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
                 </div>
             )}
 
+            {/* Top problemas activos (casos de estudio, DR-044). Rescate huérfano
+                2026-06-24: vivía solo en el DashboardView muerto. Se auto-oculta
+                si no hay casos activos (retorna null) → zero footprint. Abre
+                'casos' al tocarlo. */}
+            <div className="px-4 pt-3">
+                <CaseStudyTopWidget onNavigate={onNavigate} maxItems={3} />
+            </div>
+
             {/* Seguimiento de procesos de finca (2026-06-15): TARJETAS en el
                 home — Reforestación · Silvopastoreo · Páramo · Cerdos — al estilo
                 de "Mis plantas". Cada una abre su VISTA de seguimiento (iniciar
@@ -458,6 +515,35 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
                         <button
                             key={tile.view}
                             type="button"
+                            onClick={() => onNavigate(tile.view, tile.data)}
+                            aria-label={`${tile.label}: ${tile.desc}`}
+                            className={`bg-slate-900/60 border border-slate-800 border-l-4 ${tile.accent} rounded-xl p-3 text-left min-h-[88px] active:bg-slate-800/70 transition-colors flex flex-col`}
+                        >
+                            <tile.icon size={24} strokeWidth={2} className={`mb-1.5 ${tile.accent.split(' ')[0]}`} aria-hidden="true" />
+                            <span className={`text-sm font-black block leading-tight ${tile.accent.split(' ')[0]}`}>{tile.label}</span>
+                            <span className="text-2xs text-slate-500 block mt-0.5 leading-tight">{tile.desc}</span>
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* GESTIÓN — acciones de registro sin launcher directo en la home
+                (cosechar · insumos aplicados · mantenimiento). Rescate huérfano
+                2026-06-24: eran alcanzables solo por back-nav interno o la mano
+                (CAPABILITIES_STATUS.md §2). Las rutas ya existen en App.jsx. */}
+            <div className="px-4 pt-3">
+                <p className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2.5">
+                    <span
+                        aria-hidden="true"
+                        className="h-3.5 w-1 rounded-full bg-gradient-to-b from-sky-400 to-emerald-400"
+                    />
+                    Registrar en la finca
+                </p>
+                <div className="grid grid-cols-3 gap-3" data-testid="gestion-tiles">
+                    {GESTION_TILES.map((tile) => (
+                        <button
+                            key={tile.view}
+                            type="button"
                             onClick={() => onNavigate(tile.view)}
                             aria-label={`${tile.label}: ${tile.desc}`}
                             className={`bg-slate-900/60 border border-slate-800 border-l-4 ${tile.accent} rounded-xl p-3 text-left min-h-[88px] active:bg-slate-800/70 transition-colors flex flex-col`}
@@ -469,6 +555,31 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
                     ))}
                 </div>
             </div>
+
+            {/* "Campo, Javier" (WorkerDashboard) — rescate huérfano 2026-06-24,
+                gateado al OPERADOR (vista de supervisor/trabajador, nicho). La
+                ruta #javier sigue viva en el router. Ref: CAPABILITIES_STATUS §2. */}
+            {mostrarJavier && (
+                <div className="px-4 pt-3">
+                    <button
+                        type="button"
+                        onClick={() => onNavigate('javier')}
+                        className="w-full flex items-center gap-3 p-3.5 rounded-2xl border border-slate-700/60 bg-slate-900/40 hover:bg-slate-800/50 active:scale-[0.99] transition text-left"
+                        aria-label="Campo, Javier: panel de trabajo en finca"
+                    >
+                        <span className="shrink-0 w-11 h-11 rounded-xl bg-emerald-500/15 grid place-items-center">
+                            <Eye size={24} className="text-emerald-300" />
+                        </span>
+                        <span className="flex-1 min-w-0">
+                            <span className="block font-bold text-slate-100 leading-tight">Campo, Javier</span>
+                            <span className="block text-xs text-slate-400 leading-tight">
+                                Panel de trabajo: tareas por proximidad y registro en finca
+                            </span>
+                        </span>
+                        <ChevronRight size={20} className="text-slate-400/70 shrink-0" />
+                    </button>
+                </div>
+            )}
 
             {/* MÓDULO ANIMALES (finca integrada): gallinas, cerdos y abejas, con
                 el ciclo cerrado (estiércol → biopreparado → suelo → planta) y la

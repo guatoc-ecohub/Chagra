@@ -6,12 +6,11 @@
  * errores reales de ESLint siguen activos.
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
-import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Sprout, MapPin, Eye, Package, Clock, NotebookPen, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette, FileText, Network, Beaker, PawPrint, Layers, TestTube, ShieldAlert } from 'lucide-react';
+import React, { lazy, Suspense, useState, useEffect, useCallback, useRef } from 'react';
+import { MapPin, Eye, Package, CheckCircle, WifiOff, Mic, AlertCircle, Network, Beaker } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
 import { useClimaAtmosphere } from './hooks/useClimaAtmosphere';
-import { useScrollRestoration } from './hooks/useScrollRestoration';
 import useIdleDetection from './hooks/useIdleDetection';
 import useGlobalKeyboardShortcuts from './hooks/useGlobalKeyboardShortcuts';
 import BiopunkBackground from './components/dashboard/BiopunkBackground';
@@ -59,7 +58,6 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { ErrorFallback } from './components/common/ErrorFallback';
 
 // Lazy-loaded route components
-const TelemetryAlerts = lazy(() => import('./components/TelemetryAlerts'));
 const LoginScreen = lazy(() => import('./components/LoginScreen'));
 const OAuthCallback = lazy(() => import('./components/OAuthCallback'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
@@ -104,10 +102,7 @@ const GlaciarHistorialScreen = lazy(() => import('./components/GlaciarHistorialS
 const ProfileScreen = lazy(() => import('./components/ProfileScreen'));
 const CaseStudyScreen = lazy(() => import('./components/CaseStudyScreen'));
 const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
-const CaseStudyTopWidget = lazy(() => import('./components/CaseStudyTopWidget'));
 const HelpManual = lazy(() => import('./components/HelpManual'));
-const OnboardingHero = lazy(() => import('./components/OnboardingHero'));
-const WelcomeStatsHero = lazy(() => import('./components/WelcomeStatsHero'));
 const TopBar = lazy(() => import('./components/TopBar'));
 const DashboardLive = lazy(() => import('./components/dashboard/DashboardLive'));
 const AprenderConAgente = lazy(() => import('./components/Aprende/AprenderConAgente'));
@@ -134,46 +129,15 @@ const LoadingFallback = () => (
   </div>
 );
 
-// NAV tiles, vocabulario user-facing post DR-030 QW2 (decisión D3+D4 del DR).
-// Tile "Voz" eliminada: la captura por voz vive dentro del agente / compositor
-// (el FAB global MicFab se removió 2026-05-30 por decisión del operador).
-// Iconos canónicos: Sprout para plantas, NotebookPen para bitácora.
-// Card-sort n>=5 con usuarios 0-contexto colombianos pendiente para
-// validar empíricamente, esta release ships con hipótesis cultural
-// (lenguaje agronómico colombiano) y se itera post-feedback.
-const NAV_TILES = [
-  { id: 'activos', label: 'Plantas', icon: Sprout, accent: 'teal', desc: 'Cultivos, zonas e infraestructura' },
-  { id: 'mapa', label: 'Mapa', icon: MapPin, accent: 'blue', desc: 'Vista espacial de la finca' },
-  { id: 'javier', label: 'Hoy en finca', icon: Eye, accent: 'green', desc: `Tareas por proximidad (${PRIMARY_WORKER_NAME})` },
-  { id: 'bodega', label: 'Insumos', icon: Package, accent: 'sky', desc: 'Stock de biopreparados' },
-  { id: 'task_log', label: 'Tareas', icon: Clock, accent: 'rose', desc: 'Cola de pendientes' },
-  { id: 'historial', label: 'Bitácora', icon: NotebookPen, accent: 'indigo', desc: 'Historial de actividades' },
-  { id: 'biodiversidad', label: 'Flora y fauna', icon: Leaf, accent: 'emerald', desc: 'Ecosistema, estratos y gremios' },
-  { id: 'animales', label: 'Animales', icon: PawPrint, accent: 'rose', desc: 'Gallinas, vacas, cerdos, abejas y ciclo cerrado' },
-  { id: 'fermentos', label: 'Fermentos', icon: Beaker, accent: 'orange', desc: 'Recetas tradicionales y seguridad' },
-  { id: 'suelo', label: 'Suelo', icon: Layers, accent: 'amber', desc: 'Diagnóstico y salud del suelo' },
-  { id: 'germinacion', label: 'Semilleros', icon: TestTube, accent: 'teal', desc: 'Prueba de semillas y germinación' },
-  { id: 'toxicologia', label: 'Seguridad', icon: ShieldAlert, accent: 'rose', desc: 'Toxicidad de insumos y riesgo de suelo' },
-  { id: 'reportar_invasora', label: 'Plagas', icon: AlertCircle, accent: 'amber', desc: 'Reporte de plagas y malezas' },
-  { id: 'casos', label: 'Casos', icon: FileText, accent: 'amber', desc: 'Seguimiento de problemas y tratamientos' },
-  { id: 'informes', label: 'Informes', icon: FileText, accent: 'lime', desc: 'Descargas de reportes en CSV' },
-  { id: 'perfil', label: 'Perfil', icon: Palette, accent: 'indigo', desc: 'Temas y configuración' },
-];
-
-// Mapa de accents → clases Tailwind (para que el JIT genere los estilos).
-// Keeping static literals so Tailwind purgue funcione.
-const ACCENT_CLASSES = {
-  teal: { border: 'border-l-teal-500', text: 'text-teal-400' },
-  blue: { border: 'border-l-blue-500', text: 'text-blue-400' },
-  green: { border: 'border-l-green-500', text: 'text-green-400' },
-  sky: { border: 'border-l-sky-500', text: 'text-sky-400' },
-  rose: { border: 'border-l-rose-500', text: 'text-rose-400' },
-  indigo: { border: 'border-l-indigo-500', text: 'text-indigo-400' },
-  emerald: { border: 'border-l-emerald-500', text: 'text-emerald-400' },
-  lime: { border: 'border-l-lime-500', text: 'text-lime-400' },
-  amber: { border: 'border-l-amber-500', text: 'text-amber-400' },
-  orange: { border: 'border-l-orange-500', text: 'text-orange-400' },
-};
+// CÓDIGO MUERTO REMOVIDO 2026-06-24 (descubribilidad): `NAV_TILES` +
+// `ACCENT_CLASSES` solo los consumía `DashboardView` (la grilla de 16 tiles del
+// dashboard legacy), que NUNCA se montaba — `case 'dashboard'` renderiza
+// `DashboardLiveView`. La home viva es `DashboardLive.jsx` (HERRAMIENTAS_TILES +
+// FincaCards + mano radial). Los launchers que SOLO vivían en ese código muerto
+// (`casos` vía CaseStudyTopWidget, `javier` vía el tile) se rescataron a la home
+// viva (HERRAMIENTAS_TILES en DashboardLive). Las rutas `casos`/`caso_detail`/
+// `javier`/`usage_stats` siguen vivas en el router (más abajo) y por hash.
+// Ref: CAPABILITIES_STATUS.md §4 (deuda de navegación) + §2 (huérfanos).
 
 const HASH_VIEW_ROUTES = {
   agente: 'agente',
@@ -285,149 +249,6 @@ const DashboardLiveView = React.memo(function DashboardLiveView({ onNavigate, on
           `}</style>
         </div>
       )}
-    </div>
-  );
-});
-
-const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, lastLogMessage }) {
-  // Feedback piloto #103: preservar scroll al volver de Voz/FieldFeedback/sub-screens.
-  // Sin esto, navegar dashboard → vista_X → dashboard volvía siempre al top.
-  useScrollRestoration('dashboard');
-
-  // Selectores shallow: solo re-renderiza cuando las longitudes cambian
-  const plantsCount = useAssetStore((s) => s.plants.length);
-  const landsCount = useAssetStore((s) => s.lands.length);
-  const structuresCount = useAssetStore((s) => s.structures.length);
-  const materialsCount = useAssetStore((s) => s.materials.length);
-  const plants = useAssetStore((s) => s.plants);
-  const structures = useAssetStore((s) => s.structures);
-  const lands = useAssetStore((s) => s.lands);
-  const hydrate = useAssetStore((s) => s.hydrate);
-  const syncFromServer = useAssetStore((s) => s.syncFromServer);
-
-  // T2: Hidratación al montar, llena contadores desde IndexedDB inmediatamente
-  useEffect(() => {
-    hydrate().then(() => {
-      if (navigator.onLine) syncFromServer(fetchFromFarmOS);
-    });
-  }, [hydrate, syncFromServer]);
-
-  const noGeoCount = useMemo(() => {
-    const allAssets = [...plants, ...structures, ...lands];
-    return allAssets.filter((a) => {
-      const geo = a.attributes?.intrinsic_geometry;
-      return !geo || !(typeof geo === 'object' ? geo.value : geo);
-    }).length;
-  }, [plants, structures, lands]);
-
-  const assetCounts = useMemo(() => [
-    { label: 'Cultivos', count: plantsCount, color: 'text-lime-400' },
-    { label: 'Zonas', count: landsCount, color: 'text-amber-400' },
-    { label: 'Infraestructura', count: structuresCount, color: 'text-emerald-400' },
-    { label: 'Insumos', count: materialsCount, color: 'text-sky-400' },
-  ], [plantsCount, landsCount, structuresCount, materialsCount]);
-
-  return (
-    <div className="h-[100dvh] w-full app-scrim-strong text-white flex flex-col overflow-hidden">
-      {/* DR-030 QW2: TopBar persistente con identidad operador + acciones
-          globales. Reemplaza el header inline previo. La info ambiental
-          (msnm/luna/sol) pasó al EnvironmentalCard colapsable bajo el TopBar.
-          2026-05-18: wrapper translúcido (.app-scrim-strong, scrim por token)
-          para que se vea la imagen de fondo agroecológica aplicada al body en
-          App.jsx — navy en bio-punk, velo crema sutil en temas claros. */}
-      <TopBar onNavigate={onNavigate} onLogout={onLogout} />
-      <HomeRegionalGreeting />
-
-      {/* Feedback piloto #116: estadísticas al header (siempre visibles).
-          Antes: el bloque assetCounts vivía dentro del <main scrollable>,
-          se perdía al scrollear hacia abajo. usuaria piloto pidió "deberían ir al
-          inicio en el header", ahora es hermano del TopBar (queda fuera
-          del overflow del main, sticky de facto al top siempre). */}
-      {plantsCount > 0 && (
-        <button
-          type="button"
-          onClick={() => onNavigate('activos')}
-          aria-label="Ver inventario de activos"
-          className="w-full bg-slate-900/95 backdrop-blur-md border-b border-slate-800 hover:bg-slate-800/50 transition-colors shrink-0"
-        >
-          <div className="grid grid-cols-4 divide-x divide-slate-800 py-2">
-            {assetCounts.map((ac) => (
-              <div key={ac.label} className="text-center px-2">
-                <p className={`text-xl font-black tabular-nums ${ac.color}`}>{ac.count}</p>
-                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{ac.label}</p>
-              </div>
-            ))}
-          </div>
-        </button>
-      )}
-
-      {/* Feedback piloto #5 (Lili 2026-05-18): pb-4 no era suficiente —
-          los FABs flotantes (Agent) tapaban el final del scroll. Cambio a
-          calc seguro con safe-area iOS notch + 120px para que el último
-          widget quede accesible al tap. */}
-      <main className="flex-1 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+120px)] flex flex-col overflow-y-auto gap-3">
-        {/* Bug 2026-05-18 (operator): TelemetryAlerts mostraba errores IoT +
-            sync no resueltos como PRIMERA cosa visible post-login. Mal first
-            impression — Chagra debe arrancar con stats positivos (especies,
-            plantas cuidadas, fichas pedagógicas, biopreparados).
-            Ahora: WelcomeStatsHero como hero card SIEMPRE primera.
-            OnboardingHero (CTAs 📸/🎤/✍) sigue mostrándose si plantsCount=0
-            (junto al WelcomeStatsHero, para guiar al primer registro).
-            TelemetryAlerts se mueve más abajo (problemas técnicos visibles
-            pero no como hero). */}
-        <ErrorBoundary>
-          <WelcomeStatsHero mode="post-login" onNavigate={onNavigate} />
-        </ErrorBoundary>
-
-        {plantsCount === 0 && (
-          <OnboardingHero onNavigate={onNavigate} />
-        )}
-
-        {plantsCount > 0 && (
-          <ErrorBoundary>
-            <TelemetryAlerts onNavigate={onNavigate} lastFarmOsLog={lastLogMessage} />
-          </ErrorBoundary>
-        )}
-
-        {/* Top problemas activos casos de estudio (DR-044 sub-iv). */}
-        {/* Se auto-oculta cuando no hay casos activos (KISS, zero footprint). */}
-        <ErrorBoundary>
-          <CaseStudyTopWidget onNavigate={onNavigate} maxItems={3} />
-        </ErrorBoundary>
-
-        {noGeoCount > 0 && (
-          <button
-            onClick={() => onNavigate('activos')}
-            className="w-full p-3 rounded-xl bg-amber-900/20 border border-amber-800/50 flex items-center justify-between hover:bg-amber-900/30 transition-colors"
-          >
-            <span className="text-xs text-amber-400 font-bold flex items-center gap-2">
-              <MapPin size={14} aria-hidden="true" />
-              {noGeoCount} activo{noGeoCount > 1 ? 's' : ''} sin ubicación registrada
-            </span>
-            <span className="text-2xs text-amber-400/60">Tocar para corregir</span>
-          </button>
-        )}
-
-        <div className="h-4 shrink-0" />
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {NAV_TILES.map((tile) => {
-            const a = ACCENT_CLASSES[tile.accent] || ACCENT_CLASSES.teal;
-            return (
-              <button
-                key={tile.id}
-                onClick={() => onNavigate(tile.id)}
-                aria-label={`${tile.label}: ${tile.desc}`}
-                className={`bg-slate-900/60 border border-slate-800 border-l-4 ${a.border} rounded-xl p-4 text-left min-h-[80px] active:bg-slate-800/70 transition-colors`}
-              >
-                <tile.icon size={28} strokeWidth={2} className={`mb-2 ${a.text}`} aria-hidden="true" />
-                <span className={`text-lg font-black block ${a.text}`}>{tile.label}</span>
-                <span className="text-2xs text-slate-500 block mt-0.5">{tile.desc}</span>
-              </button>
-            );
-          })}
-        </div>
-      </main>
     </div>
   );
 });
@@ -970,10 +791,16 @@ export default function App() {
         );
       case 'biopreparados':
         // Galería de recetas de biopreparados PASO A PASO (no la pantalla de
-        // insumos/inventario). La misión "Prepárale comida natural" navega acá.
+        // insumos/inventario). Dos entradas: (1) la misión "Prepárale comida
+        // natural" del juego (sin `back` → vuelve al juego, default) y (2) la
+        // home viva (Herramientas de finca → Biopreparados, rescatada
+        // 2026-06-24, pasa back:'dashboard'). El botón Volver respeta de dónde
+        // se vino: por defecto al juego (back-compat de la misión); desde la
+        // home, al dashboard. Antes onBack iba SIEMPRE a 'juego', así que desde
+        // la home el usuario caía en el juego (huérfano).
         return (
           <ErrorBoundary>
-            <ScreenShell title="Biopreparados" onBack={() => navigate('juego')} onHome={() => navigate('dashboard')}>
+            <ScreenShell title="Biopreparados" onBack={() => navigate(currentViewData?.back || 'juego')} onHome={() => navigate('dashboard')}>
               <div className="px-4 pt-3 pb-10 max-w-2xl mx-auto flex flex-col gap-4">
                 {/* Acceso a la toxicología de insumos (EPI, dosis seguras,
                     restricción ICA). Caso crítico: caldo bordelés / sulfocálcico. */}
@@ -1062,6 +889,14 @@ export default function App() {
           </ErrorBoundary>
         );
       case 'mapa':
+        // #mapa renderiza el MAPA real (Leaflet, FarmMap). VERIFICADO 2026-06-24:
+        // NO colapsa a la vista Activos. Si no hay activos georreferenciados,
+        // FarmMap sigue mostrando el mapa de la finca (centrado por defecto) con
+        // un aviso honesto "Sin activos georreferenciados aún." encima — no es un
+        // fallback ni una redirección. El único salto a 'activos' es el
+        // drill-down al TOCAR un activo del mapa (onAssetClick). La premisa de
+        // "colapso a Activos" era un hallazgo de auditoría stale.
+        // Ref: CAPABILITIES_STATUS.md §1/§7.4.
         return (
           <ErrorBoundary>
             <ScreenShell title="Mapa de la Finca" icon={MapPin} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
