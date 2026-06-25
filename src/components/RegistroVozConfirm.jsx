@@ -3,7 +3,7 @@ import {
   Check, X, MapPin, LocateFixed, Leaf, AlertTriangle, Sprout, Pencil,
 } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
-import useGeolocation from '../hooks/useGeolocation';
+import { useGeolocation } from '../hooks/useGeolocation';
 import { geoJsonToWkt, latLngToPoint, wktToGeoJson } from '../utils/geo';
 import { INTENTS, INTENT_META } from '../services/voiceFieldExtractor';
 
