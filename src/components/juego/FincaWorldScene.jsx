@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { fvhSkinClass } from '../../config/fvhSkin';
 
 /**
  * FincaWorldScene — el MUNDO ilustrado de "Mi Finca Viva".
@@ -124,7 +125,7 @@ export default function FincaWorldScene({
 
   return (
     <div
-      className="fv-scene"
+      className={fvhSkinClass('fv-scene')}
       data-testid="finca-world-scene"
       data-level={level}
       data-variant={kind}
