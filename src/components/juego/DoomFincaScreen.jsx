@@ -999,7 +999,7 @@ export default function DoomFincaScreen({ onBack, onHome }) {
         </div>
 
         {/* Barra de vitalidad */}
-        <div className="flex items-center gap-2 text-xs font-bold shrink-0">
+        <div className="jp-doom-vital flex items-center gap-2 text-xs font-bold shrink-0">
           <Heart size={13} className="text-emerald-300" aria-hidden="true" />
           <div className="jp-doom-vital-riel flex-1 h-3.5 bg-slate-800/60 rounded-full overflow-hidden border border-emerald-900/40">
             <div
@@ -1085,25 +1085,25 @@ export default function DoomFincaScreen({ onBack, onHome }) {
               aria-live="polite"
             >
               <div className="flex items-center justify-between gap-2 mb-1">
-                <span className="flex items-center gap-1 text-emerald-300 font-black text-xs">
+                <span className="jp-acento-vida flex items-center gap-1 text-emerald-300 font-black text-xs">
                   <GraduationCap size={14} aria-hidden="true" /> ¡Control biologico!
                 </span>
-                <span className="text-lime-300 font-black text-xs">+{ficha.puntos}{ficha.combo > 1 ? ` · combo x${ficha.combo}` : ''}</span>
+                <span className="jp-acento-vida text-lime-300 font-black text-xs">+{ficha.puntos}{ficha.combo > 1 ? ` · combo x${ficha.combo}` : ''}</span>
               </div>
-              <p className="text-2xs text-white/90 leading-snug">
-                <b className="text-amber-200">{ficha.benefico}</b>
-                <span className="text-white/60"> ({ficha.beneficoCientifico})</span>
-                <span className="text-emerald-300"> controla a </span>
-                <b className="text-red-200">{ficha.plaga}</b>
-                {ficha.cultivo ? <span className="text-white/70"> en {ficha.cultivo}</span> : null}.
+              <p className="jp-tinta text-2xs text-white/90 leading-snug">
+                <b className="jp-doom-benefico text-amber-200">{ficha.benefico}</b>
+                <span className="jp-tinta-suave text-white/60"> ({ficha.beneficoCientifico})</span>
+                <span className="jp-acento-vida text-emerald-300"> controla a </span>
+                <b className="jp-doom-plaga text-red-200">{ficha.plaga}</b>
+                {ficha.cultivo ? <span className="jp-tinta-suave text-white/70"> en {ficha.cultivo}</span> : null}.
               </p>
               {ficha.dano ? (
-                <p className="text-2xs text-red-200/80 leading-snug mt-1">
-                  <b className="text-red-300">El dano:</b> {ficha.dano}
+                <p className="jp-doom-plaga text-2xs text-red-200/80 leading-snug mt-1">
+                  <b className="jp-doom-plaga text-red-300">El dano:</b> {ficha.dano}
                 </p>
               ) : null}
-              <p className="text-2xs text-emerald-100/90 leading-snug mt-1">
-                <b className="text-emerald-300">Por que funciona:</b> {ficha.porQue}
+              <p className="jp-tinta text-2xs text-emerald-100/90 leading-snug mt-1">
+                <b className="jp-acento-vida text-emerald-300">Por que funciona:</b> {ficha.porQue}
               </p>
             </div>
           )}
@@ -1190,9 +1190,9 @@ export default function DoomFincaScreen({ onBack, onHome }) {
 
         {/* ── Tarjeta de la decoracion mirada (ciclo de la finca) ── */}
         {fase === 'jugando' && leccion && (
-          <div className="bg-amber-950/50 border border-amber-600/40 rounded-xl p-2.5 text-center" role="status">
+          <div className="jp-doom-leccion bg-amber-950/50 border border-amber-600/40 rounded-xl p-2.5 text-center" role="status">
             <Sprout size={13} className="inline-block mr-1 text-amber-300" aria-hidden="true" />
-            <span className="text-xs text-amber-100 font-medium">{leccion}</span>
+            <span className="jp-tinta text-xs text-amber-100 font-medium">{leccion}</span>
           </div>
         )}
 
@@ -1219,25 +1219,25 @@ export default function DoomFincaScreen({ onBack, onHome }) {
                   backgroundColor: sel ? `${b.color}22` : 'rgba(255,255,255,0.05)',
                 }}
               >
-                <span className="absolute top-0.5 left-1 text-2xs text-white/40 font-bold">{i + 1}</span>
+                <span className="jp-tinta-suave absolute top-0.5 left-1 text-2xs text-white/40 font-bold">{i + 1}</span>
                 <span className="text-lg" aria-hidden="true">{b.emoji}</span>
-                <span className="text-2xs font-bold text-white/80 leading-none text-center">{b.nombre.split(' ')[0]}</span>
+                <span className="jp-tinta text-2xs font-bold text-white/80 leading-none text-center">{b.nombre.split(' ')[0]}</span>
               </button>
             );
           })}
         </div>
-        <p className="text-2xs text-emerald-400/70 text-center -mt-1">
+        <p className="jp-acento-vida text-2xs text-emerald-400/70 text-center -mt-1">
           Verde = recomendado para esta ronda. Toca para equipar.
         </p>
 
         {/* ── Controles desktop ── */}
-        <div className="text-2xs text-slate-500 text-center leading-relaxed">
+        <div className="jp-tinta-suave text-2xs text-slate-500 text-center leading-relaxed">
           WASD = mover · Q/E = lateral · raton = girar · barra/F = soltar · 1-5 = elegir benefico
         </div>
 
         {/* ── Referencia: pares plaga-benefico reales (control biologico) ── */}
-        <details className="text-2xs text-slate-400">
-          <summary className="cursor-pointer font-bold text-emerald-400/80">
+        <details className="jp-tinta-suave text-2xs text-slate-400">
+          <summary className="jp-acento-vida cursor-pointer font-bold text-emerald-400/80">
             Pares plaga → control biologico (datos del grafo de Chagra)
           </summary>
           <ul className="mt-2 space-y-1.5 pl-1">
@@ -1247,14 +1247,14 @@ export default function DoomFincaScreen({ onBack, onHome }) {
                 <li key={plaga.id} className="leading-snug">
                   <span className="flex items-center gap-1 flex-wrap">
                     <span aria-hidden="true">{plaga.emoji}</span>
-                    <b className="text-white/85">{plaga.nombre}</b>
-                    <span className="text-slate-600 italic">({plaga.cientifico})</span>
+                    <b className="jp-tinta text-white/85">{plaga.nombre}</b>
+                    <span className="jp-tinta-suave text-slate-600 italic">({plaga.cientifico})</span>
                     {plaga.cultivo ? (
-                      <span className="text-amber-300/70">en {plaga.cultivo}</span>
+                      <span className="jp-tinta-suave text-amber-300/70">en {plaga.cultivo}</span>
                     ) : null}
                     <ChevronRight size={11} className="text-slate-600" aria-hidden="true" />
                     <span aria-hidden="true">{benef?.emoji}</span>
-                    <span className="text-emerald-300">{benef?.nombre || plaga.controladoPor}</span>
+                    <span className="jp-acento-vida text-emerald-300">{benef?.nombre || plaga.controladoPor}</span>
                   </span>
                 </li>
               );

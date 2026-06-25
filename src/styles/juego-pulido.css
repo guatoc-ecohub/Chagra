@@ -31,10 +31,18 @@
   --jp-raised: rgb(var(--c-surface-raised, 30 41 59));
   --jp-tinta: rgb(var(--c-slate-100, 241 245 249));
   --jp-tinta-2: rgb(var(--c-slate-200, 226 232 240));
+  /* Tinta SECUNDARIA (texto suave/meta). En claros vira a --c-slate-400 (café/
+     stone, AA ≥4.7 sobre superficie del tema); en oscuros queda slate-400 claro.
+     Es la pareja de --jp-tinta para el cuerpo de los paneles retiñidos. */
+  --jp-tinta-3: rgb(var(--c-slate-400, 148 163 184));
   --jp-sol: rgb(var(--c-amber-500, 245 158 11));
   --jp-sol-suave: rgb(var(--c-amber-500, 245 158 11) / 0.16);
   --jp-vida: rgb(var(--c-emerald-500, 16 185 129));
   --jp-vida-clara: rgb(var(--c-emerald-400, 52 211 153));
+  /* Acento de vida para TEXTO (legible AA). En oscuros = emerald-300 vivo; en
+     claros lo afinamos a emerald-500 (salvia profunda AA ≥4.7 sobre superficie
+     clara) en el bloque [data-theme] de abajo. */
+  --jp-vida-texto: rgb(var(--c-emerald-300, 110 231 183));
   --jp-vida-suave: rgb(var(--c-emerald-500, 16 185 129) / 0.14);
   --jp-velo: rgb(var(--scrim-bg, 8 30 22));
   /* Sombras consistentes (escalera de elevación) para todo el juego. */
@@ -309,6 +317,99 @@
   transition: transform 0.12s ease;
 }
 .fvh-skin .jp-mfv-insignia:hover { transform: translateY(-2px); }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   CONTRASTE DE TEXTO POR TEMA (Fase 2.1) — los paneles de arriba retiñen su
+   FONDO a la superficie del tema (blanco/crema en nature/minimalista), pero el
+   texto de cuerpo seguía en utilidades Tailwind pensadas para fondo OSCURO
+   (text-white, text-emerald-50/100/200…) → claro-sobre-claro = ILEGIBLE en los
+   temas claros. Aquí tonamos ESE texto vía las vars del tema (--jp-tinta /
+   --jp-tinta-3, derivadas de --c-slate-100/400 que ya viran AA por tema).
+
+   Regla de oro: SOLO el texto de CUERPO sobre superficie del tema. NO tocamos
+   el texto sobre botones de ACENTO saturado (bg-emerald-500 → text-emerald-950,
+   que ya es oscuro-sobre-claro y se lee), ni el texto sobre el canvas/overlays
+   NEGROS del Doom (bg-black/80, etiqueta del objetivo, intro) que son oscuros
+   en los 4 temas. Verde-vivo y biopunk (oscuros) no cambian: --jp-tinta vuelve
+   a slate-100 claro → idénticos a hoy. Gated bajo .fvh-skin (prod intacto).
+
+   Las clases `jp-tinta`/`jp-tinta-suave` marcan el texto-cuerpo en el JSX; aquí
+   las resolvemos al tono correcto del tema con !important (vencen la utilidad
+   Tailwind de igual especificidad). El icono/acento decorativo se deja aparte. */
+
+/* Texto-cuerpo PRINCIPAL de los paneles del juego (títulos de mundo, mensajes,
+   descripciones de subjuegos, nombre/cuerpo de fichas). */
+.fvh-skin .jp-tinta { color: var(--jp-tinta) !important; }
+/* Texto-cuerpo SECUNDARIO (kickers, meta, notas, leyendas, ayuda). */
+.fvh-skin .jp-tinta-suave { color: var(--jp-tinta-3) !important; }
+/* Acento de VIDA (verde del tema) para piezas de TEXTO legibles (no decorativas):
+   en oscuros es el emerald vivo; en claros la salvia profunda AA del tema. Útil
+   para etiquetas tipo "controla a" / "por qué funciona" / "%". */
+.fvh-skin .jp-acento-vida { color: var(--jp-vida-texto) !important; }
+[data-theme="nature"] .fvh-skin,
+[data-theme="minimalista"] .fvh-skin { --jp-vida-texto: rgb(var(--c-emerald-500, 16 185 129)); }
+
+/* ── MI FINCA VIVA (hub): kicker de nivel, título del mundo, mensaje del mundo,
+   descripciones de las tarjetas de subjuego, barra de progreso, misiones,
+   insignias y la nota para acompañantes. El panel de mensaje (.jp-mfv-panel) y
+   las tarjetas (.jp-mfv-entrada) ya tienen fondo del tema; tonamos su texto. */
+.fvh-skin .jp-mfv-panel .jp-tinta,
+.fvh-skin .jp-mfv-entrada .jp-tinta { color: var(--jp-tinta) !important; }
+.fvh-skin .jp-mfv-panel .jp-tinta-suave,
+.fvh-skin .jp-mfv-entrada .jp-tinta-suave { color: var(--jp-tinta-3) !important; }
+
+/* ── DOOM: la ficha educativa tras un acierto (.jp-doom-ficha) tiene fondo del
+   tema (claro en nature/minimalista) por el !important de arriba → su texto debe
+   virar. El cuerpo va a --jp-tinta; el "controla a"/"por qué" usan el acento de
+   vida del tema. Los <b> de plaga (rojo) y benéfico (ámbar) son CUE semántico:
+   se leen sobre superficie clara/oscura, no se tocan. */
+.fvh-skin .jp-doom-ficha .jp-tinta { color: var(--jp-tinta) !important; }
+.fvh-skin .jp-doom-ficha .jp-tinta-suave { color: var(--jp-tinta-3) !important; }
+
+/* CUE de color plaga (rojo) / benéfico (ámbar): conserva su SEMÁNTICA en los 4
+   temas. En oscuros (biopunk/verde-vivo) queda su tono claro original (no se
+   toca). En CLAROS (nature/minimalista) la ficha tiene fondo blanco/crema → el
+   rojo/ámbar pálido se lavaba; lo bajamos a un tono profundo AA (≥4.8) que sigue
+   leyéndose como rojo/ámbar (CUE intacto). */
+[data-theme="nature"] .fvh-skin .jp-doom-plaga,
+[data-theme="minimalista"] .fvh-skin .jp-doom-plaga { color: rgb(190 30 30) !important; }
+[data-theme="nature"] .fvh-skin .jp-doom-benefico,
+[data-theme="minimalista"] .fvh-skin .jp-doom-benefico { color: rgb(var(--c-amber-700, 180 83 9)) !important; }
+
+/* Banner de lección del Doom (la decoración mirada): tenía fondo amber-950/50
+   (oscuro translúcido). En claros lo asentamos sobre superficie del tema con un
+   tinte solar para que el texto-tinta se lea. En oscuros queda como hoy. */
+[data-theme="nature"] .fvh-skin .jp-doom-leccion,
+[data-theme="minimalista"] .fvh-skin .jp-doom-leccion {
+  background: linear-gradient(180deg, var(--jp-raised), var(--jp-card)) !important;
+  border-color: rgb(var(--c-amber-500, 245 158 11) / 0.45) !important;
+}
+
+/* HUD superior del Doom (ronda/plagas/puntaje/combo/vitalidad): vive sobre
+   .jp-doom-hud, cuyo fondo ya viró a superficie del tema. Sus números usaban
+   utilidades vivas (emerald-200/amber-300/lime-300/orange-300/white) que se
+   lavaban en claros. Las tonamos a la tinta del tema SOLO en claros; el color
+   se mantiene en oscuros (donde el fondo es navy). */
+[data-theme="nature"] .fvh-skin .jp-doom-hud [class*="text-"],
+[data-theme="minimalista"] .fvh-skin .jp-doom-hud [class*="text-"],
+[data-theme="nature"] .fvh-skin .jp-doom-vital [class*="text-"],
+[data-theme="minimalista"] .fvh-skin .jp-doom-vital [class*="text-"] {
+  color: var(--jp-tinta) !important;
+}
+
+/* ── DIRECTORIO DE ESPECIES (versión skineada): el contenedor raíz pasa a
+   superficie del tema; tonamos título (nombre común), binomio, familia, header
+   y estados (buscando/vacío/guía). El nombre común usaba text-emerald-100 que
+   se lavaba sobre cream → ahora tinta del tema (AA en los 4). */
+.fvh-skin.jp-directorio { background: rgb(var(--c-surface, 2 6 23)) !important; }
+.fvh-skin.jp-directorio,
+.fvh-skin.jp-directorio .jp-tinta { color: var(--jp-tinta) !important; }
+.fvh-skin.jp-directorio .jp-tinta-suave { color: var(--jp-tinta-3) !important; }
+/* Cabecera y tarjetas de resultado del directorio: superficie + borde del tema
+   (vencen los bg-slate-9xx fijos del componente). */
+.fvh-skin.jp-directorio .jp-dir-header { background: rgb(var(--c-surface, 2 6 23) / 0.85) !important; border-color: var(--jp-borde) !important; }
+.fvh-skin.jp-directorio .jp-dir-card { background: var(--jp-card) !important; border-color: var(--jp-borde) !important; }
+.fvh-skin.jp-directorio .jp-dir-input { background: var(--jp-card) !important; border-color: var(--jp-borde) !important; color: var(--jp-tinta) !important; }
 
 /* ── Accesibilidad: nada de esto introduce movimiento autónomo; las únicas
    transiciones son de hover/active (inocuas) y respetan el resto del sistema.
