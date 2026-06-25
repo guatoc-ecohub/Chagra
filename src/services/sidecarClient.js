@@ -2,10 +2,10 @@
  * sidecarClient.js — Cliente HTTP del sidecar chagra-agro-mcp (ADR-045 Fase 2).
  *
  * Wirea el AgentScreen del PWA con el endpoint `/api/mcp/agro/` (nginx
- * proxia a sidecar :7880 en alpha). Detrás de un feature flag — mientras
- * el deploy del sidecar (PR #103 guatoc-nixos) no esté merged, la flag
- * queda en false y el comportamiento del cliente es idéntico al anterior
- * (todas las funciones devuelven null sin hacer fetch).
+ * proxia al sidecar). Detrás de un feature flag — mientras el deploy del
+ * sidecar no esté disponible, la flag queda en false y el comportamiento
+ * del cliente es idéntico al anterior (todas las funciones devuelven null
+ * sin hacer fetch).
  *
  * Pipeline esperado (cuando flag=true + sidecar live):
  *   userMessage → planNlu() → { use_tool, tool, args, ... }
@@ -322,7 +322,35 @@ const ALLOWED_TOOLS = new Set([
   'get_toxicidad',
   'get_variedades',
   'get_suelo',
+  // Calendario de siembra (chip "calendario", fix grounding P0 2026-06-24):
+  // cultivos a sembrar este mes según el piso térmico. El tool ya vivía en el
+  // sidecar pero NO estaba en esta allow-list — el chip routeaba a get_species
+  // por un comentario stale. Es read-only seguro (solo lee el catálogo).
+  'get_calendario_siembra',
+  // TODO: sincronizar allow-list cliente vs 41 del NLU (decisión consciente).
+  // El cliente expone deliberadamente un subconjunto: algunas tools del NLU se
+  // EXCLUYEN a propósito para evitar misrouting (ej. get_cultivos_viables y
+  // get_diseno_finca — ver "FIX P0 audit 2026-06-23" en agentService.js). No
+  // exponer las 41 a ciegas; cada alta a esta lista es una decisión revisada.
 ]);
+
+/**
+ * ¿Está `toolName` en la allow-list que el cliente PWA expone?
+ *
+ * El NLU planner del sidecar conoce 41 tools, pero el cliente solo expone un
+ * subconjunto (ver ALLOWED_TOOLS). Si el planner rutea a una de las restantes,
+ * `callTool` la rechaza internamente con `{_error, reason:'not_allowed'}` —
+ * pero ese rechazo es indistinguible de un fallo transitorio de red. Este
+ * predicado permite al caller (AgentScreen) detectar el caso ANTES de llamar y
+ * manejarlo de forma EXPLÍCITA y OBSERVABLE (telemetría + degradación
+ * transparente) en vez de degradar a RAG en silencio.
+ *
+ * @param {string} toolName
+ * @returns {boolean}
+ */
+export function isToolAllowed(toolName) {
+  return typeof toolName === 'string' && ALLOWED_TOOLS.has(toolName);
+}
 
 const NORMATIVA_ICA_ACTIONS = new Set([
   'latest_active_ingredients',
