@@ -280,6 +280,26 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
           <Crosshair size={22} className="text-orange-200 shrink-0" aria-hidden="true" />
         </button>
 
+        {/* Mundo Subsuelo: cartas de decisión sobre la vida del suelo (compost,
+            micorrizas, lombrices vs labranza/químico). Rescatado del ux-audit
+            P1-1: el componente existía pero no tenía entrada ni ruta. */}
+        <button
+          type="button"
+          data-testid="entrada-subsuelo"
+          onClick={() => irAccion('subsuelo')}
+          className="w-full text-left rounded-2xl p-4 bg-gradient-to-br from-cyan-600/40 to-amber-800/40 border-2 border-cyan-400/40 hover:border-cyan-300/60 active:scale-[0.99] transition flex items-center gap-3"
+        >
+          <span className="text-4xl shrink-0" aria-hidden="true">🪱</span>
+          <span className="flex-1 min-w-0">
+            <span className="block text-base font-black text-white">Mundo Subsuelo</span>
+            <span className="block text-sm text-cyan-100/90 leading-snug">
+              Baja bajo tus botas: alimenta la tierra con compost, conecta raíces
+              con hongos y despierta a las lombrices. Mira cómo revive el suelo.
+            </span>
+          </span>
+          <Sparkles size={22} className="text-cyan-200 shrink-0" aria-hidden="true" />
+        </button>
+
         {/* Barra de progreso del mundo (alegre, pero honesta: % real) */}
         <div>
           <div className="flex items-center justify-between mb-1.5">

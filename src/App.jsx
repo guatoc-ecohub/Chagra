@@ -117,6 +117,7 @@ const MiFincaVivaScreen = lazy(() => import('./components/juego/MiFincaVivaScree
 const DefensoresFincaScreen = lazy(() => import('./components/juego/DefensoresFincaScreen'));
 const MilpaSimulator = lazy(() => import('./components/juego/MilpaSimulator'));
 const DoomFincaScreen = lazy(() => import('./components/juego/DoomFincaScreen'));
+const MundoSubsuelo = lazy(() => import('./components/juego/MundoSubsuelo'));
 // Modo extensionista (panel supervisor multi-finca, ADR-048 MVP). Gateado por
 // feature flag VITE_FEATURE_EXTENSIONISTA + rol (ver config/extensionistaAccess).
 const ExtensionistaScreen = lazy(() => import('./components/ExtensionistaScreen'));
@@ -175,6 +176,8 @@ const HASH_VIEW_ROUTES = {
   'animales-abejas': 'animales_abejas',
   'animales-vacas': 'animales_vacas',
   'doom-finca': 'doom_finca',
+  subsuelo: 'subsuelo',
+  'mundo-subsuelo': 'subsuelo',
   toxicologia: 'toxicologia',
   suelo: 'suelo',
   aprende: 'aprende',
@@ -192,7 +195,7 @@ const MODULE_VIEWS = new Set([
   'activos', 'mapa', 'javier', 'bodega', 'task_log', 'historial',
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas',
-  'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
+  'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'toxicologia', 'aprende', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
@@ -802,6 +805,20 @@ export default function App() {
                 onBack={() => navigate('juego')}
                 onHome={() => navigate('dashboard')}
               />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'subsuelo':
+        // Sub-mundo del juego (huérfano del ux-audit P1-1): la entrada vive en
+        // MiFincaVivaScreen (irAccion('subsuelo')) pero faltaba el case → caía en
+        // "Vista no disponible". MundoSubsuelo no acepta props de navegación; lo
+        // envolvemos en ScreenShell (como 'biopreparados') para dar Volver/Inicio.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mundo Subsuelo">
+              <ScreenShell title="Mundo Subsuelo" onBack={() => navigate('juego')} onHome={() => navigate('dashboard')}>
+                <MundoSubsuelo />
+              </ScreenShell>
             </ErrorFallback>
           </ErrorBoundary>
         );

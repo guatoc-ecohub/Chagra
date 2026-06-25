@@ -97,6 +97,15 @@ describe('MiFincaVivaScreen', () => {
     expect(onNavigate).toHaveBeenCalledWith('sembrar');
   });
 
+  it('expone la entrada a Mundo Subsuelo y navega a su ruta (ux-audit P1-1)', async () => {
+    const onNavigate = vi.fn();
+    render(<MiFincaVivaScreen onNavigate={onNavigate} />);
+    const entrada = await screen.findByTestId('entrada-subsuelo');
+    expect(entrada).toBeTruthy();
+    fireEvent.click(entrada);
+    expect(onNavigate).toHaveBeenCalledWith('subsuelo');
+  });
+
   it('siempre muestra la galería de criaturas (con siluetas si vacía)', async () => {
     render(<MiFincaVivaScreen />);
     expect(await screen.findByTestId('criatura-collection')).toBeTruthy();
