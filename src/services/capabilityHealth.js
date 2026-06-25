@@ -35,6 +35,21 @@ export const SIDECAR_TOOL_NAMES = new Set([
   'get_toxicidad',
   'get_variedades',
   'get_suelo',
+  // Reconciliación allow-list ↔ NLU (fix grounding P0 2026-06-25): tools
+  // agregadas a ALLOWED_TOOLS en sidecarClient. Se sirven vía el endpoint del
+  // sidecar (grafo AGE / catálogo / dataset institucional), así que dependen
+  // de que el sidecar esté arriba. Se mantiene en sync con ALLOWED_TOOLS.
+  'get_calendario_siembra',
+  'get_associations',
+  'get_fenologia',
+  'get_polinizacion',
+  'get_invasoras_alternativas',
+  'get_saberes_tradicionales',
+  'get_variedades_cultivo',
+  'get_psa_elegibilidad',
+  'get_alerta_carbono',
+  'get_alerta_normativa_paramo',
+  'get_alerta_clima_consejo',
 ]);
 
 /**

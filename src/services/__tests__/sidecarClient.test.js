@@ -308,6 +308,54 @@ describe('sidecarClient — feature flag on', () => {
       expect(__TEST__.ALLOWED_TOOLS.has('get_precio_sipsa')).toBe(true);
     });
 
+    it('reconciliación allow-list ↔ NLU (fix P0 2026-06-25): tools SEGURAS expuestas', async () => {
+      // El NLU planner conoce 41 tools; estas son las que se agregaron al cliente
+      // por ser seguras + valiosas + ruteables por el NLU (grounding del grafo/
+      // catálogo/dataset institucional, con id|nombre|término que el planner
+      // rellena desde el mensaje). Verificación: están en el allow-list.
+      const { __TEST__ } = await importFresh();
+      const expuestas = [
+        'get_associations',
+        'get_fenologia',
+        'get_polinizacion',
+        'get_invasoras_alternativas',
+        'get_saberes_tradicionales',
+        'get_variedades_cultivo',
+        'get_psa_elegibilidad',
+        'get_alerta_carbono',
+        'get_alerta_normativa_paramo',
+        'get_alerta_clima_consejo',
+      ];
+      for (const t of expuestas) {
+        expect(__TEST__.ALLOWED_TOOLS.has(t)).toBe(true);
+      }
+    });
+
+    it('reconciliación allow-list ↔ NLU (fix P0 2026-06-25): tools sin args ruteables quedan en DEFLECCIÓN HONESTA', async () => {
+      // NO se exponen: exigen credenciales farmOS / coords de dispositivo / NIT
+      // DIAN, o un arg obligatorio que el NLU no conoce (altitud de finca, fecha
+      // de siembra, biopreparado_id). Si el planner rutea a una de ellas, el
+      // guard de AgentScreen inyecta deflección honesta en vez de degradar callado
+      // a RAG. Verificación: NO están en el allow-list (callTool las rechaza).
+      const { __TEST__ } = await importFresh();
+      const deflectadas = [
+        'add_planta_finca',
+        'get_finca_overview',
+        'get_sensor_finca',
+        'get_weather_data',
+        'get_clima_finca',
+        'get_documento_soporte_dian',
+        'get_ubicacion_actual',
+        'get_cultivos_viables',
+        'get_diseno_finca',
+        'get_grado_dia',
+        'get_dosis_biopreparado',
+      ];
+      for (const t of deflectadas) {
+        expect(__TEST__.ALLOWED_TOOLS.has(t)).toBe(false);
+      }
+    });
+
     it('5xx → ToolError fetch_failed sin throw', async () => {
       fetchMock.mockResolvedValueOnce(jsonResponse(500, { error: 'kg down' }));
       const { callTool } = await importFresh();
