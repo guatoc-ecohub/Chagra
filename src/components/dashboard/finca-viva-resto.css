@@ -102,3 +102,36 @@
 
 /* La nota "mantén presionado ⋮⋮ para reorganizar" legible sobre crema. */
 .fvh-resto .fvh-resto-hint { color: var(--fvh-tinta-suave); opacity: 0.75; }
+
+/* ============================================================================
+   CONTRASTE WCAG AA de las tarjetas OSCURAS del resto (extiende el #1859, que
+   arregló los TILES claros). Las tarjetas full-width "Hoy en finca", "Clima" y
+   el "Análisis IA" conservan su fondo navy oscuro (gradientes from-emerald-950 /
+   from-sky-950 / from-slate-900), pero su texto secundario venía en slate-400
+   (#94a3b8) / slate-500 (#64748b) — gris-tenue que NO cumple AA sobre el navy.
+
+   Aquí NO cambiamos el fondo (la tarjeta oscura es intencional y contrasta bien
+   con la hoja crema): solo SUBIMOS el texto apagado a un slate claro que sí
+   cumple AA (≥4.5:1) sobre ese navy. Scope acotado a esas tarjetas oscuras por
+   su clase de gradiente, para no tocar los tiles claros ya resueltos por #1859.
+   ========================================================================== */
+.fvh-resto [class*="from-emerald-950"] .text-slate-400,
+.fvh-resto [class*="from-emerald-950"] .text-slate-500,
+.fvh-resto [class*="from-sky-950"] .text-slate-400,
+.fvh-resto [class*="from-sky-950"] .text-slate-500,
+.fvh-resto [class*="from-slate-900"] .text-slate-400,
+.fvh-resto [class*="from-slate-900"] .text-slate-500 {
+  color: #cbd5e1 !important; /* slate-300 — AA sobre navy */
+}
+.fvh-resto [class*="from-emerald-950"] .text-slate-300,
+.fvh-resto [class*="from-sky-950"] .text-slate-300,
+.fvh-resto [class*="from-slate-900"] .text-slate-300 {
+  color: #e2e8f0 !important; /* slate-200 — más holgura AA para texto fino */
+}
+/* El chevron/“fecha” de cabecera (slate-500) también se levanta para que la
+   tarjeta no se lea apagada en su esquina. */
+.fvh-resto [class*="from-emerald-950"] .text-slate-500.group-hover\:text-slate-300,
+.fvh-resto [class*="from-sky-950"] .text-slate-500.group-hover\:text-slate-300,
+.fvh-resto [class*="from-slate-900"] .text-slate-500.group-hover\:text-slate-300 {
+  color: #cbd5e1 !important;
+}

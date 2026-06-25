@@ -671,3 +671,78 @@
   .fvh-rise-svg,
   .fvh-colibri-globo { opacity: 1 !important; }
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   CONTRASTE WCAG AA del HERO (extiende el #1859 que arregló los tiles del
+   "resto"). Aquí cubrimos lo que faltaba: los textos del HERO que se apoyan
+   DIRECTAMENTE sobre el cielo del shell (marca, saludo del agente, hint del
+   compositor, título de portales) y que en día sobre el celeste, y sobre todo
+   de NOCHE sobre el navy, quedaban gris-tenue ilegibles (tinta verde oscura
+   sobre fondo oscuro).
+
+   No tocamos los chips (su fondo blanco translúcido ya da contraste) ni los
+   portales (texto blanco sobre gradiente de color, ya AA). Solo reforzamos el
+   texto sobre el cielo descubierto.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* DÍA — el tinta suave (#4e5c42) sobre el celeste claro del cielo era borde:
+   lo oscurecemos a un verde más profundo (AA ≥4.5:1 sobre el degradado de
+   cielo) y le ponemos un velo de texto blanco tenue para asentarlo sobre la
+   parte más clara/saturada del gradiente. */
+.fvh .fvh-brand-txt span,
+.fvh .fvh-hero-saludo .h-small,
+.fvh .fvh-hero-saludo p,
+.fvh .fvh-composer-hint,
+.fvh .fvh-portales-tit {
+  color: #2c3a23;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.55);
+}
+.fvh .fvh-brand-txt b,
+.fvh .fvh-hero-saludo h1 {
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+/* NOCHE / AMANECER / ATARDECER — el cielo del shell se vuelve oscuro (navy o
+   naranja profundo). El texto del hero apoyado sobre él DEBE virar a claro,
+   o queda tinta-oscura-sobre-oscuro (ilegible). Flip a casi-blanco con un
+   velo oscuro para asentarlo (AA sobre el navy del nocturno). */
+.fvh[data-luz="noche"] .fvh-brand-txt b,
+.fvh[data-luz="noche"] .fvh-brand-txt span,
+.fvh[data-luz="noche"] .fvh-hero-saludo .h-small,
+.fvh[data-luz="noche"] .fvh-hero-saludo h1,
+.fvh[data-luz="noche"] .fvh-hero-saludo p,
+.fvh[data-luz="noche"] .fvh-composer-hint,
+.fvh[data-luz="noche"] .fvh-portales-tit,
+.fvh[data-luz="amanecer"] .fvh-brand-txt b,
+.fvh[data-luz="amanecer"] .fvh-brand-txt span,
+.fvh[data-luz="amanecer"] .fvh-hero-saludo .h-small,
+.fvh[data-luz="amanecer"] .fvh-hero-saludo h1,
+.fvh[data-luz="amanecer"] .fvh-hero-saludo p,
+.fvh[data-luz="amanecer"] .fvh-composer-hint,
+.fvh[data-luz="amanecer"] .fvh-portales-tit,
+.fvh[data-luz="atardecer"] .fvh-brand-txt b,
+.fvh[data-luz="atardecer"] .fvh-brand-txt span,
+.fvh[data-luz="atardecer"] .fvh-hero-saludo .h-small,
+.fvh[data-luz="atardecer"] .fvh-hero-saludo h1,
+.fvh[data-luz="atardecer"] .fvh-hero-saludo p,
+.fvh[data-luz="atardecer"] .fvh-composer-hint,
+.fvh[data-luz="atardecer"] .fvh-portales-tit {
+  color: #f4f7ef;
+  text-shadow: 0 1px 3px rgba(8, 16, 28, 0.7);
+}
+/* El acento verde del título (em) y el rótulo "SU AGENTE…" se aclaran a un
+   lima brillante para no perder el realce sobre el navy. */
+.fvh[data-luz="noche"] .fvh-hero-saludo h1 em,
+.fvh[data-luz="amanecer"] .fvh-hero-saludo h1 em,
+.fvh[data-luz="atardecer"] .fvh-hero-saludo h1 em {
+  color: #bef264;
+}
+.fvh[data-luz="noche"] .fvh-hero-saludo .h-small {
+  color: #cdeacb;
+}
+/* El divisor del título de portales también se aclara para verse sobre navy. */
+.fvh[data-luz="noche"] .fvh-portales-tit span,
+.fvh[data-luz="amanecer"] .fvh-portales-tit span,
+.fvh[data-luz="atardecer"] .fvh-portales-tit span {
+  background: linear-gradient(90deg, rgba(244, 247, 239, 0.45), transparent);
+}
