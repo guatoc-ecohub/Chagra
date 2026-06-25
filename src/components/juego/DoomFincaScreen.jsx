@@ -1091,9 +1091,17 @@ export default function DoomFincaScreen({ onBack, onHome }) {
                 <b className="text-amber-200">{ficha.benefico}</b>
                 <span className="text-white/60"> ({ficha.beneficoCientifico})</span>
                 <span className="text-emerald-300"> controla a </span>
-                <b className="text-red-200">{ficha.plaga}</b>.
+                <b className="text-red-200">{ficha.plaga}</b>
+                {ficha.cultivo ? <span className="text-white/70"> en {ficha.cultivo}</span> : null}.
               </p>
-              <p className="text-2xs text-emerald-100/90 leading-snug mt-1">{ficha.porQue}</p>
+              {ficha.dano ? (
+                <p className="text-2xs text-red-200/80 leading-snug mt-1">
+                  <b className="text-red-300">El dano:</b> {ficha.dano}
+                </p>
+              ) : null}
+              <p className="text-2xs text-emerald-100/90 leading-snug mt-1">
+                <b className="text-emerald-300">Por que funciona:</b> {ficha.porQue}
+              </p>
             </div>
           )}
 
@@ -1238,6 +1246,9 @@ export default function DoomFincaScreen({ onBack, onHome }) {
                     <span aria-hidden="true">{plaga.emoji}</span>
                     <b className="text-white/85">{plaga.nombre}</b>
                     <span className="text-slate-600 italic">({plaga.cientifico})</span>
+                    {plaga.cultivo ? (
+                      <span className="text-amber-300/70">en {plaga.cultivo}</span>
+                    ) : null}
                     <ChevronRight size={11} className="text-slate-600" aria-hidden="true" />
                     <span aria-hidden="true">{benef?.emoji}</span>
                     <span className="text-emerald-300">{benef?.nombre || plaga.controladoPor}</span>

@@ -94,6 +94,54 @@ describe('PARES_CONTROL — shape, unicidad y relaciones', () => {
   });
 });
 
+// ── DIDÁCTICA grounded (cultivos, daño, cómo, fuente) ───────────────
+
+describe('PARES_CONTROL — didáctica grounded para el pilar campesino', () => {
+  const FUENTES_VALIDAS = ['grafo', 'cenicafe', 'ica-ciat', 'ecologia'];
+
+  it('cada plaga declara los cultivos que ataca (lista no vacía)', () => {
+    for (const par of PARES_CONTROL) {
+      expect(Array.isArray(par.plaga.cultivos)).toBe(true);
+      expect(par.plaga.cultivos.length).toBeGreaterThan(0);
+      for (const c of par.plaga.cultivos) {
+        expect(typeof c).toBe('string');
+        expect(c.length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('cada par marca una fuente honesta del par plaga↔cura', () => {
+    for (const par of PARES_CONTROL) {
+      expect(par).toHaveProperty('fuente');
+      expect(FUENTES_VALIDAS).toContain(par.fuente);
+    }
+  });
+
+  it('el daño y el cómo son frases claras (no etiquetas sueltas)', () => {
+    for (const par of PARES_CONTROL) {
+      // una frase explicativa, no una palabra técnica suelta
+      expect(par.plaga.dano.length).toBeGreaterThan(15);
+      expect(par.benefico.como.length).toBeGreaterThan(15);
+      expect(par.leccion.length).toBeGreaterThan(15);
+    }
+  });
+
+  it('la mayoría de los pares está grounded en el grafo AGE', () => {
+    const enGrafo = PARES_CONTROL.filter((p) => p.fuente === 'grafo').length;
+    // al menos la mitad debe venir verificado del grafo (el resto es control
+    // biológico institucional documentado o depredación ecológica rotulada).
+    expect(enGrafo).toBeGreaterThanOrEqual(Math.ceil(PARES_CONTROL.length / 2));
+  });
+
+  it('sin voseo argentino en el microcopy (tú/usted colombiano)', () => {
+    const VOSEO = /\b(usá|usás|tenés|querés|empezá|empezás|elegí|fijate|mirá|soltá|hacé|poné)\b/i;
+    for (const par of PARES_CONTROL) {
+      const texto = `${par.plaga.dano} ${par.benefico.como} ${par.leccion}`;
+      expect(texto).not.toMatch(VOSEO);
+    }
+  });
+});
+
 // ── NIVELES — forma y progresión ───────────────────────────────────
 
 describe('NIVELES — campos obligatorios sin undefined', () => {
