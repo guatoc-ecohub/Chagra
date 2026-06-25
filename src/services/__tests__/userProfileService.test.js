@@ -24,6 +24,7 @@ import {
   setModuleOrder,
   hasManualModuleOrder,
   __PROFILE_KEYS__,
+  _resetProfileMigration,
 } from '../userProfileService.js';
 
 describe('userProfileService (#200)', () => {
@@ -596,5 +597,146 @@ describe('orden de módulos del Home (reorder por drag, 2026-06-15)', () => {
       setModuleOrder(desired);
       expect(getModuleOrder().slice(0, 4)).toEqual(desired);
     });
+  });
+});
+
+describe('per-user keying del perfil (onboarding por usuario)', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    _resetProfileMigration();
+  });
+
+  it('sin usuario logueado usa claves globales (comportamiento actual)', () => {
+    saveProfile({ nombre: 'Test' });
+    expect(localStorage.getItem('chagra:profile:v1')).toBeTruthy();
+    expect(getProfile().nombre).toBe('Test');
+    expect(hasSeenProfileOnboarding()).toBe(false);
+    markProfileDone();
+    expect(hasSeenProfileOnboarding()).toBe(true);
+  });
+
+  it('usuario logueado usa claves con sufijo del tenantId', () => {
+    localStorage.setItem('chagra:active_tenant_id', 'alice');
+    saveProfile({ nombre: 'Alice' });
+    // El perfil se guarda bajo clave per-user, no global
+    expect(localStorage.getItem('chagra:profile:v1:alice')).toBeTruthy();
+    expect(localStorage.getItem('chagra:profile:v1')).toBeNull();
+    expect(getProfile().nombre).toBe('Alice');
+  });
+
+  it('done/skipped keys tambien llevan sufijo por usuario', () => {
+    localStorage.setItem('chagra:active_tenant_id', 'alice');
+    expect(hasSeenProfileOnboarding()).toBe(false);
+    markProfileDone();
+    expect(localStorage.getItem('chagra:profile:done:v1:alice')).toBe('1');
+    expect(localStorage.getItem('chagra:profile:done:v1')).toBeNull();
+    expect(hasSeenProfileOnboarding()).toBe(true);
+
+    _resetProfileMigration();
+    localStorage.setItem('chagra:active_tenant_id', 'bob');
+    expect(hasSeenProfileOnboarding()).toBe(false);
+  });
+
+  it('dos usuarios logueados no comparten perfil', () => {
+    localStorage.setItem('chagra:active_tenant_id', 'alice');
+    saveProfile({ nombre: 'Alice' });
+    markProfileDone();
+    expect(hasSeenProfileOnboarding()).toBe(true);
+
+    // Cambiar a otro usuario
+    _resetProfileMigration();
+    localStorage.setItem('chagra:active_tenant_id', 'bob');
+    const bobProfile = getProfile();
+    expect(bobProfile).toEqual({});
+    expect(bobProfile.nombre).toBeUndefined();
+    expect(hasSeenProfileOnboarding()).toBe(false);
+  });
+
+  it('saveProfile hace merge correcto con perfil per-user', () => {
+    localStorage.setItem('chagra:active_tenant_id', 'alice');
+    saveProfile({ nombre: 'Alice' });
+    saveProfile({ region: 'Cauca' });
+    const p = getProfile();
+    expect(p.nombre).toBe('Alice');
+    expect(p.region).toBe('Cauca');
+    expect(p.updatedAt).toBeTruthy();
+  });
+});
+
+describe('migracion suave de claves globales a per-user', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    _resetProfileMigration();
+  });
+
+  it('usuario nuevo (sin clave propia) NO hereda clave global vieja', () => {
+    // Simular estado previo: claves globales del operador
+    localStorage.setItem('chagra:profile:v1', JSON.stringify({ nombre: 'Miguel', region: 'Choachí' }));
+    localStorage.setItem('chagra:profile:done:v1', '1');
+
+    // Ana entra al mismo navegador
+    localStorage.setItem('chagra:active_tenant_id', 'ana');
+    expect(hasSeenProfileOnboarding()).toBe(false);
+    expect(getProfile()).toEqual({});
+
+    // Las claves globales no deben haberse limpiado (aún hay anonymous fallback)
+    expect(localStorage.getItem('chagra:profile:v1')).toBeTruthy();
+  });
+
+  it('usuario sin VITE_OPERATOR_USERNAME no migra (seguro por defecto)', () => {
+    // Sin env var de operador, nadie migra
+    localStorage.setItem('chagra:profile:v1', JSON.stringify({ nombre: 'Op' }));
+    localStorage.setItem('chagra:profile:done:v1', '1');
+
+    localStorage.setItem('chagra:active_tenant_id', 'cualquier');
+    expect(getProfile()).toEqual({});
+    expect(hasSeenProfileOnboarding()).toBe(false);
+  });
+
+  it('migra datos globales al perfil del operador cuando coincide VITE_OPERATOR_USERNAME', () => {
+    localStorage.setItem('chagra:profile:v1', JSON.stringify({ nombre: 'Op', region: 'Cauca' }));
+    localStorage.setItem('chagra:profile:done:v1', '1');
+
+    // Simular que el operador se loguea
+    import.meta.env.VITE_OPERATOR_USERNAME = 'operador';
+    localStorage.setItem('chagra:active_tenant_id', 'operador');
+
+    expect(hasSeenProfileOnboarding()).toBe(true);
+    const p = getProfile();
+    expect(p.nombre).toBe('Op');
+    expect(p.region).toBe('Cauca');
+
+    // Claves globales se limpiaron tras la migración
+    expect(localStorage.getItem('chagra:profile:v1')).toBeNull();
+    expect(localStorage.getItem('chagra:profile:done:v1')).toBeNull();
+
+    delete import.meta.env.VITE_OPERATOR_USERNAME;
+  });
+
+  it('migracion con múltiples operadores (VITE_OPERATOR_USERNAME lista separada por coma)', () => {
+    localStorage.setItem('chagra:profile:v1', JSON.stringify({ nombre: 'Richi' }));
+    localStorage.setItem('chagra:profile:done:v1', '1');
+
+    import.meta.env.VITE_OPERATOR_USERNAME = 'miguel,richi,ana';
+    localStorage.setItem('chagra:active_tenant_id', 'richi');
+
+    expect(hasSeenProfileOnboarding()).toBe(true);
+    expect(getProfile().nombre).toBe('Richi');
+    expect(localStorage.getItem('chagra:profile:v1')).toBeNull();
+
+    delete import.meta.env.VITE_OPERATOR_USERNAME;
+  });
+
+  it('migracion respeta case-insensitive en username', () => {
+    localStorage.setItem('chagra:profile:v1', JSON.stringify({ nombre: 'Admin' }));
+    localStorage.setItem('chagra:profile:done:v1', '1');
+
+    import.meta.env.VITE_OPERATOR_USERNAME = 'Admin';
+    localStorage.setItem('chagra:active_tenant_id', 'admin');
+
+    expect(hasSeenProfileOnboarding()).toBe(true);
+    expect(getProfile().nombre).toBe('Admin');
+
+    delete import.meta.env.VITE_OPERATOR_USERNAME;
   });
 });
