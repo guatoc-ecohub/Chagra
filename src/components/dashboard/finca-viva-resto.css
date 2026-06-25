@@ -1,0 +1,104 @@
+/* ============================================================================
+   finca-viva-resto.css — "El resto de su finca": la hoja cohesiva que fluye
+   DEBAJO del hero F2 (FincaVivaHero) cuando la flag VITE_FINCA_VIVA_HOME_PERFIL
+   está ON. Consolida las superficies valiosas del dashboard (herramientas,
+   casos de estudio, seguimiento de procesos, animales e inventario de un
+   vistazo) en UNA sola superficie clara, sin un segundo AgentHero, sin un
+   segundo set de portales ni un segundo saludo.
+
+   Objetivo de cohesión (auditoría §7.4 #1): que el home se lea como UNA finca
+   viva — el hero claro arriba y, sin corte oscuro abrupto, una hoja crema que
+   sube desde él. Reusa la paleta de finca-viva-hero.css (--fvh-*).
+
+   Scope: TODO vive bajo `.fvh-resto` (no toca el dashboard legacy con flag OFF).
+   ES-CO (tú/usted), sin voseo.
+   ========================================================================== */
+
+.fvh-resto {
+  --fvh-crema: #fbf6e9;
+  --fvh-tinta: #26331f;
+  --fvh-tinta-suave: #4e5c42;
+  --fvh-verde-1: #3f8f4e;
+  --fvh-max: 1180px;
+
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  /* La hoja sube desde el hero: gradiente crema→blanco roto, esquinas
+     superiores redondeadas y una sombra suave hacia arriba para el "rise". */
+  background: linear-gradient(180deg, #d8efd9 0%, var(--fvh-crema) 12%, #f4efe2 100%);
+  border-radius: 26px 26px 0 0;
+  margin-top: -22px;            /* solapa el borde inferior del hero */
+  padding-top: 10px;
+  box-shadow: 0 -10px 28px rgba(38, 51, 31, 0.10);
+  color: var(--fvh-tinta);
+  font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* Centro de ancho máximo en desktop (coherente con el shell del hero). */
+.fvh-resto-shell {
+  width: 100%;
+  max-width: var(--fvh-max);
+  margin: 0 auto;
+  padding: 4px 16px 28px;
+}
+
+/* "Tirador" superior — señal visual de que es una hoja que sube del hero. */
+.fvh-resto-grip {
+  width: 44px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(63, 143, 78, 0.30);
+  margin: 8px auto 14px;
+}
+
+/* Título de la hoja. */
+.fvh-resto-tit {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  color: var(--fvh-tinta);
+  margin: 2px 2px 4px;
+}
+.fvh-resto-tit::before {
+  content: '';
+  width: 6px;
+  height: 18px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #4ade80, #2f6b3a);
+}
+.fvh-resto-sub {
+  font-size: 12.5px;
+  color: var(--fvh-tinta-suave);
+  margin: 0 2px 12px;
+  line-height: 1.35;
+}
+
+/* Encabezados de cada bloque dentro de la hoja: tinta verde sobre crema (legible),
+   en vez del slate-400 sobre oscuro del dashboard legacy. Aplica al <p> que el
+   dashboard usa como rótulo de sección. */
+.fvh-resto .fvh-resto-block > p:first-child,
+.fvh-resto .fvh-block-label {
+  color: var(--fvh-tinta-suave) !important;
+}
+
+/* Cada bloque respira con un poco de aire vertical. */
+.fvh-resto-block { margin-top: 18px; }
+.fvh-resto-block:first-of-type { margin-top: 4px; }
+
+/* Las tarjetas-tile claras de herramientas/gestión: sobre crema NO usamos el
+   slate-900 oscuro del legacy (chocaba). Las viramos a tarjeta clara con borde
+   de acento (el border-l-4 de acento se conserva). */
+.fvh-resto .fvh-tile-claro {
+  background: rgba(255, 255, 255, 0.82) !important;
+  border-color: rgba(38, 51, 31, 0.10) !important;
+  box-shadow: 0 2px 8px rgba(38, 51, 31, 0.06);
+}
+.fvh-resto .fvh-tile-claro .fvh-tile-label { color: var(--fvh-tinta) !important; }
+.fvh-resto .fvh-tile-claro .fvh-tile-desc { color: var(--fvh-tinta-suave) !important; }
+
+/* La nota "mantén presionado ⋮⋮ para reorganizar" legible sobre crema. */
+.fvh-resto .fvh-resto-hint { color: var(--fvh-tinta-suave); opacity: 0.75; }
