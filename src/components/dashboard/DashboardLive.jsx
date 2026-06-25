@@ -26,7 +26,7 @@ import {
     rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye } from 'lucide-react';
+import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays } from 'lucide-react';
 import AgentHero from './AgentHero';
 import OnboardingHero from '../OnboardingHero';
 import {
@@ -136,6 +136,11 @@ const HERRAMIENTAS_TILES = [
     { view: 'biopreparados', label: 'Biopreparados', icon: FlaskConical, desc: 'Recetas caseras paso a paso', accent: 'text-lime-400 border-l-lime-500', data: { back: 'dashboard' } },
     { view: 'ciclo_nutrientes', label: 'Nutrientes', icon: Recycle, desc: 'Ciclo cerrado: del animal al suelo y la planta', accent: 'text-emerald-400 border-l-emerald-500' },
     { view: 'casos', label: 'Casos', icon: ClipboardList, desc: 'Seguimiento de problemas y tratamientos', accent: 'text-amber-400 border-l-amber-500' },
+    // Calendario de finca: UN solo calendario que unifica por planta fenología,
+    // nutrición, siembra, cosecha, sanidad y ciclo perenne (App.jsx case
+    // 'calendario_finca' → CalendarioFincaScreen). Groundeado en
+    // farmCalendarService; reusa los ciclos de la finca y el catálogo.
+    { view: 'calendario_finca', label: 'Calendario', icon: CalendarDays, desc: 'Siembra, abono, plagas y cosecha en un solo lugar', accent: 'text-violet-400 border-l-violet-500' },
 ];
 
 // Acciones de gestión sin launcher directo en la home (huérfanas):
