@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ScreenShell } from '../common/ScreenShell';
 import { Bug, Shield, RotateCcw, Lock } from 'lucide-react';
+import { fvhSkinClass } from '../../config/fvhSkin';
 import './defensores-finca.css';
 
 import {
@@ -561,8 +562,9 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
         </div>
       )}
 
-      {/* Escenario (canvas) */}
-      <div className="df-stage">
+      {/* Escenario (canvas) — con la flag ON, el lienzo adopta el cielo del
+          tema activo (Fase 2 de temas); con OFF queda igual que hoy. */}
+      <div className={fvhSkinClass('df-stage')}>
         <canvas
           ref={canvasRef}
           width={VIEW_W}

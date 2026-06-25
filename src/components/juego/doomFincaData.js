@@ -324,6 +324,63 @@ export const PALETA = {
 };
 
 /**
+ * PIEL POR TEMA del raycaster (Fase 2 de temas, operador 2026-06-25).
+ *
+ * El cielo/cordillera/sol del Doom se PINTAN en canvas (no pueden leer CSS
+ * vars). Para que el juego combine con el tema activo sin perder la jugabilidad
+ * ni la LEGIBILIDAD (depth: cielo claro arriba → tierra oscura abajo, que es la
+ * clave para leer profundidad en un raycaster), solo retiñimos el CIELO, la
+ * cordillera y el sol — la tierra/surco/pasto/mulch (el piso jugable) NO se
+ * tocan, para conservar el contraste suelo↔cielo que da sensación de espacio.
+ *
+ * biopunk (base) y verde-vivo comparten el cielo vivo original; nature lleva un
+ * cielo crema-cálido y minimalista un cielo salvia-papel sobrio. Solo se aplica
+ * con la flag VITE_FINCA_VIVA_HOME_PERFIL ON (lo decide el componente); con OFF
+ * el juego usa PALETA tal cual (= EXACTO como hoy).
+ */
+export const PALETAS_TEMA = {
+  biopunk: PALETA,
+  'verde-vivo': {
+    ...PALETA,
+    cieloAlto: [86, 162, 150],   // turquesa-verde fresco (identidad finca viva)
+    cieloBajo: [210, 232, 188],  // verde-crema frondoso
+    montana: [96, 128, 110],     // cordillera verdosa
+    montanaSombra: [70, 98, 82],
+    sol: [255, 248, 214],
+    solBrillo: [242, 180, 65],   // sol dorado de la identidad
+  },
+  nature: {
+    ...PALETA,
+    cieloAlto: [196, 158, 110],  // crema cálida (cenit)
+    cieloBajo: [240, 226, 196],  // crema base del tema (horizonte)
+    montana: [150, 128, 96],     // cordillera terrosa
+    montanaSombra: [120, 100, 74],
+    sol: [255, 244, 206],
+    solBrillo: [217, 116, 42],   // ocre quemado del tema
+  },
+  minimalista: {
+    ...PALETA,
+    cieloAlto: [176, 192, 182],  // gris-salvia claro (cenit)
+    cieloBajo: [232, 236, 228],  // papel del tema (horizonte)
+    montana: [150, 162, 152],    // cordillera neutra
+    montanaSombra: [120, 132, 122],
+    sol: [244, 239, 216],
+    solBrillo: [203, 185, 106],  // dorado apagado
+  },
+};
+
+/**
+ * Selecciona la paleta del Doom según el tema activo. Un id desconocido cae a
+ * la PALETA base (biopunk) — comportamiento idéntico al de hoy.
+ *
+ * @param {string} tema biopunk | nature | minimalista | verde-vivo
+ * @returns {object} la PALETA (posiblemente retiñida) para ese tema.
+ */
+export function paletaPorTema(tema) {
+  return PALETAS_TEMA[tema] || PALETA;
+}
+
+/**
  * Tamano de celda del mapa (en unidades del mundo).
  */
 export const CELDA = 1.0;

@@ -118,6 +118,7 @@ import ManoChagraGlyph from '../dashboard/ManoChagraGlyph';
 // mano (operador 2026-06-18). Misma fuente que TopBar.jsx / AgentHero.jsx.
 import { useTheme } from '../../hooks/useTheme';
 import { iconForTheme } from '../dashboard/themeIcon';
+import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 // Agente guiado: selección PURA de un insight verificado proactivo a partir del
 // texto del turno (cultivo detectado → dato con fuente que el usuario no vio).
 // El hook useInsightProactivo exporta estas funciones puras; aquí las usamos
@@ -3020,6 +3021,15 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     ? (CHIP_DEFS.find((c) => c.intent === activeIntent)?.placeholder || 'Escribe tu pregunta...')
     : 'Escribe tu pregunta...';
 
+  // PIEL POR TEMA del botón enviar (Fase 2 de temas). Con la flag ON y el botón
+  // habilitado (hay texto/adjunto y no se está grabando ni hay cola), aplicamos
+  // `.agent-send-accent` para que themes.css lo pinte con el acento del tema
+  // activo (teal/ocre/verde), igual que AgentHero. Con la flag OFF (prod) queda
+  // EXACTO como hoy: el gradiente teal→cian fijo del compositor.
+  const enviarHabilitado =
+    !((!inputText.trim() && !agentAttachment) || state === STATE_RECORDING || queuePending.length >= 1);
+  const agentSendAccent = fincaVivaHomePerfilActivo() && enviarHabilitado;
+
   return (
     <div className={`h-[100dvh] flex flex-col overflow-hidden relative text-white ${entranceClassRef.current}`}>
       {/* Velo de legibilidad: deja ver --app-bg-image del body PERO garantiza
@@ -3437,12 +3447,22 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               }
               data-testid="agent-submit"
               aria-label="Enviar al agente"
-              className="as-send"
+              className={[
+                'as-send',
+                // PIEL POR TEMA del botón enviar (Fase 2). Con la flag ON y el
+                // botón activo, toma `.agent-send-accent` → themes.css lo pinta
+                // con el acento del tema (teal/ocre/verde), igual que AgentHero,
+                // en vez del gradiente teal→cian fijo. Con OFF queda como hoy.
+                agentSendAccent ? 'agent-send-accent' : '',
+              ].filter(Boolean).join(' ')}
               style={{
                 background:
                   (!inputText.trim() && !agentAttachment) || state === STATE_RECORDING || queuePending.length >= 1
                     ? 'rgba(51,65,85,0.8)'
-                    : 'linear-gradient(135deg,#10b981 0%,#0891b2 100%)',
+                    // Con `agent-send-accent` activo, el color lo pone themes.css
+                    // (background-color !important del acento del tema); aquí no
+                    // forzamos el gradiente para no taparlo.
+                    : agentSendAccent ? undefined : 'linear-gradient(135deg,#10b981 0%,#0891b2 100%)',
                 boxShadow:
                   (!inputText.trim() && !agentAttachment) || state === STATE_RECORDING || queuePending.length >= 1
                     ? 'none'

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { BASE_SOIL_LIFE, mundoSubsueloDecisions } from './mundoSubsueloData';
 import { recordGameStart, recordGameComplete } from '../../services/usageTelemetryService';
+import { fvhSkinClass } from '../../config/fvhSkin';
 
 function clamp(value, min = 0, max = 100) {
   return Math.max(min, Math.min(max, value));
@@ -64,7 +65,7 @@ function SoilScene({ soilLife, activeDecision }) {
       data-testid="mundo-subsuelo-escena"
       data-soil-life={soilLife}
       data-stage={stage}
-      className="overflow-hidden rounded-3xl border border-amber-200 bg-[#f6efe1] shadow-[0_24px_70px_rgba(60,46,26,0.16)]"
+      className={fvhSkinClass('ms-vinneta overflow-hidden rounded-3xl border border-amber-200 bg-[#f6efe1] shadow-[0_24px_70px_rgba(60,46,26,0.16)]')}
     >
       <svg viewBox="0 0 760 430" role="img" aria-label="Corte transversal del suelo con raices, hongos, agua y lombrices" className="block h-auto w-full">
         <defs>
@@ -198,7 +199,7 @@ export default function MundoSubsuelo() {
   }
 
   return (
-    <main data-testid="mundo-subsuelo" className="mx-auto flex w-full max-w-6xl flex-col gap-4 bg-[#fff8e8] px-3 py-4 text-stone-950 sm:px-5">
+    <main data-testid="mundo-subsuelo" className={fvhSkinClass('ms-root mx-auto flex w-full max-w-6xl flex-col gap-4 bg-[#fff8e8] px-3 py-4 text-stone-950 sm:px-5')}>
       <header className="overflow-hidden rounded-3xl border border-lime-200 bg-[linear-gradient(135deg,#fef3c7,#d9f99d_52%,#a5f3fc)] p-4 shadow-sm sm:p-6">
         <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-900">Aprende a Cultivar Jugando</p>
         <div className="mt-2 grid gap-4 lg:grid-cols-[1.3fr_0.7fr] lg:items-end">

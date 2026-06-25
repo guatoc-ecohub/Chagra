@@ -4,6 +4,8 @@ import useAgentNotificationStore from '../store/useAgentNotificationStore';
 import usePrefsStore from '../store/usePrefsStore';
 import { isSpeaking, stop, replayLast, isKokoroAvailable } from '../services/ttsService';
 import { agentSounds } from '../services/agentSoundService';
+import { fvhSkinClass } from '../config/fvhSkin';
+import './agent-fab-skin.css';
 
 /**
  * AgentFab — Floating Action Button para abrir el agente Chagra IA.
@@ -81,6 +83,7 @@ export default function AgentFab({ onNavigate }) {
   return (
     <button
       type="button"
+      className={fvhSkinClass(`chagra-fab${hover ? ' is-hover' : ''}${responseReady ? ' is-ready' : ''}`)}
       aria-label={responseReady ? 'Chagra IA tiene respuesta nueva' : 'Asistente Chagra IA'}
       title={
         responseReady

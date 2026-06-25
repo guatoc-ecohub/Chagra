@@ -13,8 +13,10 @@ import { agentSounds, isSoundEnabled } from '../../services/agentSoundService';
 import { recordGameStart, recordGameComplete } from '../../services/usageTelemetryService';
 import {
   MAPA, PALETA, MATERIALES, DECORACIONES, CONFIG_DOOM,
-  PLAGAS_DOOM, BENEFICOS_DOOM, ESCENARIOS,
+  PLAGAS_DOOM, BENEFICOS_DOOM, ESCENARIOS, paletaPorTema,
 } from './doomFincaData';
+import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
+import { temaActivoDom } from '../../config/fvhSkin';
 import {
   castRay, projectSprite, createWorld, tickWorld, cambiarBenefico,
   decoracionEnMira, plagaObjetivo, avanzarRonda,
@@ -312,6 +314,23 @@ const DECO_DIM = {
 export default function DoomFincaScreen({ onBack, onHome }) {
   const canvasRef = useRef(null);
   const worldRef = useRef(null);
+  // PIEL POR TEMA del cielo del raycaster (Fase 2 de temas). Con la flag ON, el
+  // cielo/cordillera/sol se retiñen al tema activo (la tierra/jugabilidad NO);
+  // con OFF queda la PALETA base (EXACTO como hoy). Se lee en el hot-loop vía
+  // ref para no re-suscribir el rAF al cambiar de tema.
+  const paletaRef = useRef(
+    fincaVivaHomePerfilActivo() ? paletaPorTema(temaActivoDom()) : PALETA,
+  );
+  useEffect(() => {
+    if (!fincaVivaHomePerfilActivo()) { paletaRef.current = PALETA; return undefined; }
+    const sync = () => { paletaRef.current = paletaPorTema(temaActivoDom()); };
+    sync();
+    // El tema se escribe en <html data-theme>; observamos ese atributo para
+    // repintar el cielo si el usuario cambia de tema con el Doom abierto.
+    const obs = new MutationObserver(sync);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => obs.disconnect();
+  }, []);
   const inputRef = useRef({
     forward: false, backward: false, left: false, right: false,
     strafeLeft: false, strafeRight: false, fire: false, mouseDown: false,
@@ -532,17 +551,20 @@ export default function DoomFincaScreen({ onBack, onHome }) {
 
       const zBuffer = new Float64Array(W);
       const horizon = halfH;
-      const sky0 = PALETA.cieloAlto;
-      const sky1 = PALETA.cieloBajo;
-      const mtn = PALETA.montana;
-      const mtnS = PALETA.montanaSombra;
-      const sunC = PALETA.sol;
-      const sunG = PALETA.solBrillo;
-      const nube = PALETA.nube;
-      const tierra = PALETA.tierra;
-      const surco = PALETA.tierraSurco;
-      const pasto = PALETA.pasto;
-      const mulch = PALETA.mulch;
+      // Paleta del cielo según el tema activo (Fase 2). La tierra/surco/pasto/
+      // mulch salen igual de esta paleta — con la flag OFF es la PALETA base.
+      const pal = paletaRef.current || PALETA;
+      const sky0 = pal.cieloAlto;
+      const sky1 = pal.cieloBajo;
+      const mtn = pal.montana;
+      const mtnS = pal.montanaSombra;
+      const sunC = pal.sol;
+      const sunG = pal.solBrillo;
+      const nube = pal.nube;
+      const tierra = pal.tierra;
+      const surco = pal.tierraSurco;
+      const pasto = pal.pasto;
+      const mulch = pal.mulch;
 
       for (let col = 0; col < W; col += 1) {
         const rayAngle = pa - fovHalf + (col / W) * FOV;
