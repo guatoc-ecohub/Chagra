@@ -106,6 +106,18 @@ export default function HelpVozScreen({ onBackToHome, onNavigate }) {
           })}
         </div>
 
+        {/* Qué puedes registrar por voz — los tipos del registro unificado */}
+        <div className="rounded-xl bg-slate-900/70 border border-emerald-800/40 p-4 mt-2">
+          <p className="text-[11px] uppercase tracking-wider text-emerald-400 font-bold mb-2">Con la voz puedes registrar</p>
+          <ul className="text-sm text-slate-200 space-y-1.5 leading-relaxed">
+            <li>🌱 <strong className="text-emerald-200">Sembrar</strong> — lo que pusiste en tierra.</li>
+            <li>🍎 <strong className="text-emerald-200">Cosechar</strong> — cuánto recogiste.</li>
+            <li>🧪 <strong className="text-emerald-200">Insumo</strong> — qué abono o biopreparado aplicaste.</li>
+            <li>🔧 <strong className="text-emerald-200">Mantenimiento</strong> — poda, deshierbe, riego.</li>
+            <li>👀 <strong className="text-emerald-200">Observación</strong> — lo que viste en campo (una plaga, una flor, un daño).</li>
+          </ul>
+        </div>
+
         {/* Ejemplos */}
         <div className="rounded-xl bg-emerald-950/60 border border-emerald-800/40 p-4 mt-2">
           <p className="text-[11px] uppercase tracking-wider text-emerald-400 font-bold mb-2">Ejemplos que entiende bien</p>
@@ -114,7 +126,8 @@ export default function HelpVozScreen({ onBackToHome, onNavigate }) {
             <li>&ldquo;Planté 100 cafés en la parcela tres&rdquo;</li>
             <li>&ldquo;Puse 10 fresas y 30 lechugas en la cama uno&rdquo; <span className="text-emerald-400/70 text-[11px]">(multi-especie OK)</span></li>
             <li>&ldquo;Coseché 3 kilos de gulupas&rdquo;</li>
-            <li>&ldquo;Aplicué bocashi a la mata de tomate de ayer&rdquo;</li>
+            <li>&ldquo;Apliqué bocashi a la mata de tomate de ayer&rdquo;</li>
+            <li>&ldquo;Podé el aguacate y vi una broca en el café&rdquo;</li>
           </ul>
         </div>
 
