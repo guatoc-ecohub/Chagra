@@ -204,8 +204,19 @@ describe('fincaSceneProfileSelector — DEFAULT seguro (perfil vacío/null)', ()
     expect(selectSceneVariant(undefined).kind).toBe(SCENE_KINDS.finca);
   });
 
-  it('siempre devuelve las 5 claves del contrato', () => {
+  it('siempre devuelve las claves del contrato (incl. estructura #34)', () => {
     const v = selectSceneVariant({ vocacion: 'campesino' });
-    expect(Object.keys(v).sort()).toEqual(['animales', 'cerdos', 'escala', 'kind', 'tinte']);
+    // Contrato base (kind/escala/animales/cerdos/tinte) + estructura de finca
+    // para la escena rica #34 (invernaderoForma/invernaderoTamano/zonas).
+    expect(Object.keys(v).sort()).toEqual([
+      'animales',
+      'cerdos',
+      'escala',
+      'invernaderoForma',
+      'invernaderoTamano',
+      'kind',
+      'tinte',
+      'zonas',
+    ]);
   });
 });

@@ -349,17 +349,25 @@ describe('userProfileService.questions — getApplicableQuestions y saveProfile'
       expect(urbano.map((q) => q.id)).not.toContain('animales');
     });
 
-    it('rural muestra 15-17 preguntas (más que urbano)', () => {
-      const rural = getApplicableQuestions({ 
+    it('rural muestra 18-20 preguntas (más que urbano)', () => {
+      // Subió el rango al sumar la estructura de finca para la escena #34:
+      // composicion (base) + invernadero_tiene (condicional rural). La forma y
+      // el tamaño del invernadero NO se muestran hasta declarar que SÍ tiene.
+      const rural = getApplicableQuestions({
         vocacion: 'campesino',
         finca_tipo: 'rural'
       });
-      
-      expect(rural.length).toBeGreaterThanOrEqual(15);
-      expect(rural.length).toBeLessThanOrEqual(17);
+
+      expect(rural.length).toBeGreaterThanOrEqual(18);
+      expect(rural.length).toBeLessThanOrEqual(20);
       expect(rural.map((q) => q.id)).toContain('finca_hectareas');
       expect(rural.map((q) => q.id)).toContain('finca_altitud');
       expect(rural.map((q) => q.id)).toContain('riego');
+      expect(rural.map((q) => q.id)).toContain('composicion');
+      expect(rural.map((q) => q.id)).toContain('invernadero_tiene');
+      // No declaró tener invernadero → no se le piden forma ni tamaño.
+      expect(rural.map((q) => q.id)).not.toContain('invernadero_forma');
+      expect(rural.map((q) => q.id)).not.toContain('invernadero_tamano');
     });
 
     it('balcon tiene mismo número que urbano (comparte condicionales)', () => {
@@ -372,17 +380,25 @@ describe('userProfileService.questions — getApplicableQuestions y saveProfile'
       expect(balcon.length).toBe(urbano.length);
     });
 
-    it('invernadero tiene mismo número que rural (comparte condicionales)', () => {
-      const invernadero = getApplicableQuestions({ 
+    it('invernadero muestra MÁS que rural: forma y tamaño del invernadero (#34)', () => {
+      // finca_tipo === 'invernadero' implica que SÍ tiene invernadero, así que
+      // además de las condicionales rurales se le piden forma y tamaño para que
+      // la escena #34 pueda dibujar la estructura.
+      const invernadero = getApplicableQuestions({
         vocacion: 'tecnico',
         finca_tipo: 'invernadero'
       });
-      const rural = getApplicableQuestions({ 
+      const rural = getApplicableQuestions({
         vocacion: 'campesino',
         finca_tipo: 'rural'
       });
-      
-      expect(invernadero.length).toBe(rural.length);
+
+      // Hereda todo lo rural + forma + tamaño (las dos preguntas extra).
+      expect(invernadero.length).toBe(rural.length + 2);
+      const ids = invernadero.map((q) => q.id);
+      expect(ids).toContain('invernadero_forma');
+      expect(ids).toContain('invernadero_tamano');
+      expect(ids).toContain('composicion');
     });
 
     it('todas las preguntas tienen category válida', () => {
