@@ -69,19 +69,30 @@ export default function MiFincaVivaHomeCard({ onNavigate }) {
 
   const scene = useMemo(() => buildFincaScene({ processes }), [processes]);
 
-  // VARIANTE POR PERFIL (flag VITE_FINCA_VIVA_HOME_PERFIL). Cuando está ON, el
-  // BACKDROP de la escena se elige por el perfil del usuario (balcón / invernadero
-  // / finca / restauración / páramo). Apagada (default), se conserva la escena 2D
-  // fenológica clásica. El cálculo es barato y puro (selector sin red).
-  const flagOn = fincaVivaHomePerfilActivo();
+  // VARIANTE POR PERFIL (#34 fase 2): la escena RICA distingue cada planta por
+  // TIPO botánico × FASE fenológica real, agrupada en las ZONAS declaradas en el
+  // onboarding (huerta / frutales / aromáticas / animales) y dibuja el INVERNADERO
+  // según su forma (cuadrado / túnel). El selector es puro (sin red) y aporta el
+  // ESQUELETO (zonas + forma del invernadero) que la escena rica necesita.
+  //
+  // El flag VITE_FINCA_VIVA_HOME_PERFIL controla solo el BACKDROP por perfil
+  // (balcón / páramo / restauración) de la fase 1: cuando está OFF mantenemos la
+  // finca rural por defecto, pero SIEMPRE pasamos zonas+invernadero para la escena
+  // rica. El cálculo es barato y a prueba de fallos (cae a la escena clásica).
+  const flagBackdrop = fincaVivaHomePerfilActivo();
   const variant = useMemo(() => {
-    if (!flagOn) return null;
     try {
-      return selectSceneVariant(getProfile(), { esGuiaGlaciar: tieneAccesoGlaciarActual() });
+      const v = selectSceneVariant(getProfile(), { esGuiaGlaciar: tieneAccesoGlaciarActual() });
+      // Sin el flag de backdrop por perfil, forzamos finca rural como base (la
+      // escena rica vive sobre el backdrop de finca), conservando zonas+invernadero.
+      if (!flagBackdrop && v && v.kind !== 'invernadero') {
+        return { ...v, kind: 'finca' };
+      }
+      return v;
     } catch (_) {
-      return null; // Fail-safe: cae a la escena clásica.
+      return null; // Fail-safe: cae a la escena 2D clásica.
     }
-  }, [flagOn]);
+  }, [flagBackdrop]);
 
   // Stage (nivel del mundo) para el backdrop por perfil, derivado de la
   // vitalidad real de la finca (no inventa progreso).
@@ -126,11 +137,15 @@ export default function MiFincaVivaHomeCard({ onNavigate }) {
         className="block w-full text-left active:scale-[0.99] transition"
       >
         {variant ? (
+          // Escena RICA (#34 fase 2): plantas por tipo×fase, zonas declaradas e
+          // invernadero por forma. Pasa los lotes/animales REALES de la escena.
           <FincaWorldScene
             stage={stageVariante}
             criaturas={[]}
             vacia={scene.vacia}
             variant={variant}
+            lotes={scene.lotes}
+            animales={scene.animales}
           />
         ) : (
           <FincaScene2D scene={scene} cargando={cargando} />

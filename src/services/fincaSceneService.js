@@ -25,6 +25,8 @@
  * @module services/fincaSceneService
  */
 
+import { tipoDeSubject } from './subjectTipo.js';
+
 // ─── Etapas fenológicas → cómo se ve la planta ──────────────────────────────
 
 /**
@@ -205,6 +207,9 @@ export function etiquetaVitalidad(vitalidad) {
  * @property {string} sprite        id del sprite de planta a dibujar
  * @property {number} growth        0..1 altura/madurez visual
  * @property {string} fase          fase visual (seed/sprout/leaf/flower/fruit/harvest/rest)
+ * @property {string} tipo          tipo botánico (frutal/hortaliza/aromatica/otro)
+ *                                  para elegir la SILUETA: árbol vs cama de huerta
+ *                                  vs mata aromática. Derivado del slug (offline).
  * @property {string} etiquetaEtapa etiqueta corta de la etapa real
  */
 
@@ -271,9 +276,10 @@ export function buildFincaScene({
       continue;
     }
     const s = spriteForStage(p.current_stage);
+    const nombre = p.subject_label || 'Cultivo';
     plantas.push({
       id: p.process_id,
-      nombre: p.subject_label || 'Cultivo',
+      nombre,
       subjectSlug: p.subject_slug || p.process_id,
       activo,
       animal: false,
@@ -281,6 +287,9 @@ export function buildFincaScene({
       sprite: s.sprite,
       growth: s.growth,
       fase: s.fase,
+      // Tipo botánico para la silueta correcta (frutal=árbol, hortaliza=cama,
+      // aromatica=mata). Offline, derivado del slug + nombre (subjectTipo).
+      tipo: tipoDeSubject(p.subject_slug, { nombre }),
       etiquetaEtapa: s.etiqueta,
     });
   }
