@@ -38,7 +38,7 @@
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 25;
+export const DB_VERSION = 26;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -101,6 +101,14 @@ export const STORES = {
   // uso (onboarding, módulos, preguntas al agente, feedback, sync) sin PII.
   // keyPath: id; indexes: event_type, created_at, synced.
   PILOT_TELEMETRY: 'pilot_telemetry',
+  // v26: marketplace_ofertas — ofertas del marketplace agroecológico (circuitos
+  // cortos). Cada oferta (producto, cantidad, unidad, precio, finca/vereda,
+  // contacto, foto opcional dataURL) se publica y persiste LOCAL, sobrevive
+  // recargas sin red (offline-first, igual que glaciar_reportes). No requiere
+  // backend nuevo: el contacto es directo (WhatsApp/teléfono), sin transacción
+  // dentro de la app. keyPath 'id' (string generado en cliente). Índices:
+  // createdAt (timeline), categoria (filtro), municipio (filtro por ubicación).
+  MARKETPLACE_OFERTAS: 'marketplace_ofertas',
 };
 
 let dbInstance = null;
@@ -429,6 +437,22 @@ export const openDB = async () => {
           store.createIndex('event_type', 'event_type', { unique: false });
           store.createIndex('created_at', 'created_at', { unique: false });
           store.createIndex('synced', 'synced', { unique: false });
+        }
+      }
+
+      // v26: marketplace_ofertas — ofertas del marketplace agroecológico
+      // (circuitos cortos / mercados campesinos). El productor publica un
+      // producto de su finca (cantidad, unidad, precio que él pone, ubicación,
+      // foto opcional) y se persiste OFFLINE-first: sobrevive recargas sin red.
+      // El contacto al vendedor es directo (WhatsApp/teléfono), sin transacción
+      // dentro de la app. keyPath 'id' (string generado en cliente). Índices:
+      // createdAt (timeline), categoria (filtro), municipio (filtro ubicación).
+      if (event.oldVersion < 26) {
+        if (!db.objectStoreNames.contains(STORES.MARKETPLACE_OFERTAS)) {
+          const store = db.createObjectStore(STORES.MARKETPLACE_OFERTAS, { keyPath: 'id' });
+          store.createIndex('createdAt', 'createdAt', { unique: false });
+          store.createIndex('categoria', 'categoria', { unique: false });
+          store.createIndex('municipio', 'municipio', { unique: false });
         }
       }
     };

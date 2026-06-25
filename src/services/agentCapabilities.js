@@ -109,6 +109,26 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     heroRoute: { kind: 'unavailable' },
   },
   {
+    // MARKETPLACE agroecológico (circuitos cortos): el productor publica lo que
+    // cosecha y explora ofertas de fincas vecinas, con contacto DIRECTO
+    // (WhatsApp), sin transacción dentro de la app. Offline-first. El precio de
+    // referencia mayorista se cita solo si hay fuente (SIPSA/DANE) — si no,
+    // deflección honesta (NO se inventan precios). Es la capacidad LIVE que
+    // REVIVE la rama "Vender" de la mano: con `precio` ya en hero:false (rama
+    // muerta retirada §7.4), `mercado` es ahora la única hoja hero del grupo
+    // 'vender' → el grupo vuelve a aparecer en la mano. kind:'nav' → vista
+    // 'mercado' (App.jsx). Reemplaza el placeholder "en preparación" previo.
+    id: 'mercado',
+    group: 'vender',
+    status: 'live',
+    icon: '🛒',
+    label: 'Mercado de la finca',
+    desc: 'Publica lo que vendes y mira ofertas de fincas vecinas, sin intermediarios.',
+    tool: 'marketplace',
+    hero: true,
+    heroRoute: { kind: 'nav', view: 'mercado' },
+  },
+  {
     id: 'calendario',
     group: 'planear',
     status: 'live',
