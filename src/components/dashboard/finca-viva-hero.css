@@ -1,0 +1,532 @@
+/* ============================================================================
+   FincaVivaHero — estilos del HOME inmersivo "Finca Viva" (mockup F2 v2).
+   Portado FIELMENTE del mockup F2 "Finca Viva Evolutiva". El arte sale del
+   mockup, no del motor del juego. Self-host de las fuentes (offline-first; la
+   CSP de la app sólo permite font-src 'self', por eso NO se usa Google Fonts
+   por red). Español de Colombia (tú/usted), sin voseo.
+   ========================================================================== */
+
+/* ── Fuentes self-host (variable woff2, subset latin) ──────────────────────── */
+@font-face {
+  font-family: 'Baloo 2';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/baloo2-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Nunito';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/nunito-latin.woff2') format('woff2');
+}
+
+/* ── Variables de paleta REAL Mi Finca Viva (WORLD_STAGES nivel 3) ─────────── */
+.fvh {
+  --fvh-cielo-a: #7ac3da;
+  --fvh-cielo-b: #c8e8cb;
+  --fvh-verde-1: #3f8f4e;
+  --fvh-sol-a: #fff3c4;
+  --fvh-sol-b: #ffd24d;
+  --fvh-lima: #a3e635;
+  --fvh-lima-claro: #bef264;
+  --fvh-crema: #fbf6e9;
+  --fvh-tinta: #26331f;
+  --fvh-tinta-suave: #4e5c42;
+  --fvh-sello: #2f6b3a;
+  --fvh-sombra-iso: rgba(60, 44, 20, 0.30);
+  --fvh-r: 24px;
+  --fvh-display: 'Baloo 2', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --fvh-body: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  overflow: hidden;
+  font-family: var(--fvh-body);
+  color: var(--fvh-tinta);
+  background: linear-gradient(180deg, var(--fvh-cielo-a) 0%, var(--fvh-cielo-b) 44%);
+  -webkit-tap-highlight-color: transparent;
+}
+.fvh *,
+.fvh *::before,
+.fvh *::after { box-sizing: border-box; }
+
+/* ── TOPBAR ────────────────────────────────────────────────────────────────── */
+.fvh-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: calc(env(safe-area-inset-top, 0px) + 14px) 18px 8px;
+  position: relative;
+  z-index: 20;
+}
+.fvh-brand-mano {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  background: radial-gradient(circle at 32% 28%, #fff8e6, #ffe7a8);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 5px 14px rgba(120, 82, 20, 0.34), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+}
+.fvh-brand-txt { line-height: 1.02; }
+.fvh-brand-txt b {
+  font-family: var(--fvh-display);
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--fvh-tinta);
+  letter-spacing: -0.3px;
+}
+.fvh-brand-txt span {
+  font-family: var(--fvh-body);
+  font-weight: 700;
+  font-size: 10.5px;
+  color: var(--fvh-tinta-suave);
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  display: block;
+  margin-top: -1px;
+}
+.fvh-top-pills { margin-left: auto; display: flex; gap: 8px; }
+.fvh-pill {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  background: rgba(255, 255, 255, 0.66);
+  box-shadow: 0 3px 9px rgba(60, 40, 10, 0.2);
+  border: 1.5px solid rgba(255, 255, 255, 0.72);
+  cursor: pointer;
+}
+
+/* ── SELECTOR DE ESCALA (chips Duolingo) ───────────────────────────────────── */
+.fvh-escala-chips {
+  display: flex;
+  gap: 8px;
+  padding: 6px 16px 2px;
+  position: relative;
+  z-index: 18;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.fvh-escala-chips::-webkit-scrollbar { display: none; }
+.fvh-echip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.62);
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  border-radius: 999px;
+  padding: 7px 13px 7px 8px;
+  font-family: var(--fvh-display);
+  font-weight: 700;
+  font-size: 12.5px;
+  color: var(--fvh-tinta-suave);
+  box-shadow: 0 3px 9px rgba(60, 40, 10, 0.14);
+  transition: transform 0.14s ease, background 0.2s ease, color 0.2s ease;
+}
+.fvh-echip .ei {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
+}
+.fvh-echip.on {
+  background: linear-gradient(135deg, #2e7d40, #1f5d30);
+  color: #fff;
+  border-color: rgba(163, 230, 53, 0.7);
+  box-shadow: 0 6px 16px rgba(30, 80, 40, 0.32);
+}
+.fvh-echip.on .ei { background: var(--fvh-lima-claro); }
+.fvh-echip:active { transform: scale(0.96); }
+
+/* ── Cinta de mundo + toggle de estado ─────────────────────────────────────── */
+.fvh-mundo-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px 0;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 18;
+}
+.fvh-mundo-cinta {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  padding: 5px 12px 5px 8px;
+  border-radius: 999px;
+  font-family: var(--fvh-display);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--fvh-sello);
+  border: 1.5px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 2px 7px rgba(60, 40, 10, 0.12);
+}
+.fvh-mundo-cinta .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4ca35c;
+  box-shadow: 0 0 0 3px rgba(76, 163, 92, 0.25);
+}
+.fvh-estado-toggle {
+  margin-left: auto;
+  display: inline-flex;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1.5px solid rgba(255, 255, 255, 0.65);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+  box-shadow: 0 2px 7px rgba(60, 40, 10, 0.12);
+}
+.fvh-estado-toggle button {
+  border: 0;
+  cursor: pointer;
+  background: transparent;
+  font-family: var(--fvh-display);
+  font-weight: 700;
+  font-size: 10.5px;
+  color: var(--fvh-tinta-suave);
+  padding: 5px 10px;
+  border-radius: 999px;
+  transition: background 0.2s, color 0.2s;
+}
+.fvh-estado-toggle button.on {
+  background: var(--fvh-verde-1);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(40, 120, 60, 0.3);
+}
+
+/* ── ESCENA ISOMÉTRICA ─────────────────────────────────────────────────────── */
+.fvh-escena {
+  position: relative;
+  margin: 6px 0 0;
+  height: 360px;
+  z-index: 2;
+}
+.fvh-escena svg { display: block; width: 100%; height: 100%; }
+
+/* globo del agente colibrí */
+.fvh-colibri-globo {
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  transform: translateX(-50%);
+  background: #fff;
+  border: 2px solid #fff;
+  border-radius: 18px 18px 18px 6px;
+  padding: 10px 14px;
+  max-width: 260px;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 12px 28px rgba(40, 60, 40, 0.26);
+  opacity: 0;
+  animation: fvh-globo-in 0.6s 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  z-index: 8;
+}
+.fvh-colibri-globo b {
+  font-family: var(--fvh-display);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--fvh-tinta);
+  display: block;
+}
+.fvh-colibri-globo small {
+  font-weight: 700;
+  font-size: 11.5px;
+  color: var(--fvh-tinta-suave);
+  line-height: 1.32;
+  display: block;
+  margin-top: 1px;
+}
+.fvh-colibri-globo::after {
+  content: "";
+  position: absolute;
+  left: 30px;
+  bottom: -9px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 0 0 0 5px;
+  transform: rotate(45deg);
+  box-shadow: -3px 3px 6px rgba(40, 60, 40, 0.1);
+}
+@keyframes fvh-globo-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(0.85); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+/* criaturas vivas flotando (emoji) sobre la escena */
+.fvh-bichos { position: absolute; inset: 0; pointer-events: none; z-index: 7; }
+.fvh-bicho {
+  position: absolute;
+  font-size: 22px;
+  animation: fvh-flota 4.4s ease-in-out infinite;
+  filter: drop-shadow(0 3px 3px rgba(40, 40, 20, 0.25));
+}
+@keyframes fvh-flota {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50%      { transform: translateY(-11px) rotate(5deg); }
+}
+.fvh-bicho.abeja { animation: fvh-zigzag 6s linear infinite; }
+@keyframes fvh-zigzag {
+  0%   { transform: translate(0, 0); }
+  25%  { transform: translate(14px, -10px); }
+  50%  { transform: translate(28px, 2px); }
+  75%  { transform: translate(14px, 12px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* reveals escalonados */
+.fvh-rise { opacity: 0; animation: fvh-rise 0.7s cubic-bezier(0.34, 1.4, 0.5, 1) forwards; }
+@keyframes fvh-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fvh-rise-svg { opacity: 0; animation: fvh-riseop 0.7s ease forwards; }
+@keyframes fvh-riseop { from { opacity: 0; } to { opacity: 1; } }
+
+/* animaciones de animales vivos (SVG groups) */
+.fvh-an { transform-box: fill-box; transform-origin: center; }
+.fvh-an-menea { animation: fvh-menea 2.6s ease-in-out infinite; transform-box: fill-box; }
+@keyframes fvh-menea { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
+.fvh-an-picotea { animation: fvh-picotea 1.8s ease-in-out infinite; transform-box: fill-box; transform-origin: 6px -4px; }
+@keyframes fvh-picotea { 0%, 60%, 100% { transform: rotate(0); } 30% { transform: rotate(26deg) translateY(2px); } }
+.fvh-an-cola { animation: fvh-cola 2.2s ease-in-out infinite; transform-box: fill-box; transform-origin: -16px -4px; }
+@keyframes fvh-cola { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(16deg); } }
+.fvh-an-chapotea { animation: fvh-chapotea 3s ease-in-out infinite; transform-box: fill-box; }
+@keyframes fvh-chapotea { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+.fvh-an-trotecito { animation: fvh-trote 2.4s ease-in-out infinite; transform-box: fill-box; }
+@keyframes fvh-trote { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(7deg); } }
+.fvh-sway { animation: fvh-sway 5s ease-in-out infinite; transform-box: fill-box; transform-origin: bottom center; }
+@keyframes fvh-sway { 0%, 100% { transform: rotate(-1.6deg); } 50% { transform: rotate(1.6deg); } }
+.fvh-sway-slow { animation: fvh-sway 7s ease-in-out infinite; transform-box: fill-box; transform-origin: bottom center; }
+.fvh-ripple { animation: fvh-ripple 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes fvh-ripple { 0%, 100% { opacity: 0.35; transform: scaleX(1); } 50% { opacity: 0.7; transform: scaleX(1.12); } }
+
+/* ── COMPOSITOR AGENTE ─────────────────────────────────────────────────────── */
+.fvh-composer-wrap { position: relative; z-index: 5; margin: -28px 16px 0; }
+.fvh-composer {
+  background: #fff;
+  border-radius: 24px;
+  padding: 12px 12px 12px 14px;
+  box-shadow: 0 16px 34px rgba(40, 60, 40, 0.22), 0 0 0 1px rgba(38, 51, 31, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  border: 0;
+  width: 100%;
+  text-align: left;
+}
+.fvh-composer .av {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: radial-gradient(circle at 35% 30%, #1f3d33, #0c241d);
+  display: grid;
+  place-items: center;
+  font-size: 21px;
+  box-shadow: 0 0 0 2px var(--fvh-lima-claro), 0 0 16px rgba(163, 230, 53, 0.45);
+}
+.fvh-composer .ph {
+  flex: 1;
+  font-family: var(--fvh-body);
+  font-weight: 600;
+  font-size: 14.5px;
+  color: #9aa595;
+}
+.fvh-composer .mic {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: linear-gradient(135deg, var(--fvh-lima), #8fd62e);
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  color: #1f3300;
+  box-shadow: 0 6px 16px rgba(120, 180, 30, 0.5);
+  animation: fvh-micpulse 3s ease-in-out infinite;
+}
+@keyframes fvh-micpulse {
+  0%, 100% { box-shadow: 0 6px 16px rgba(120, 180, 30, 0.5); }
+  50%      { box-shadow: 0 6px 22px rgba(120, 180, 30, 0.8); }
+}
+.fvh-composer-hint {
+  text-align: center;
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--fvh-tinta-suave);
+  margin: 9px 16px 0;
+}
+
+/* ── HERO TEXT ─────────────────────────────────────────────────────────────── */
+.fvh-hero-saludo { padding: 14px 20px 0; position: relative; z-index: 3; }
+.fvh-hero-saludo .h-small { font-weight: 800; font-size: 12.5px; color: var(--fvh-sello); letter-spacing: 0.2px; }
+.fvh-hero-saludo h1 {
+  font-family: var(--fvh-display);
+  font-weight: 800;
+  font-size: 26px;
+  line-height: 1.05;
+  color: var(--fvh-tinta);
+  margin-top: 2px;
+  letter-spacing: -0.5px;
+}
+.fvh-hero-saludo h1 em { font-style: normal; color: var(--fvh-verde-1); }
+.fvh-hero-saludo p {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--fvh-tinta-suave);
+  margin-top: 6px;
+  line-height: 1.35;
+  max-width: 300px;
+}
+
+/* ── 4 PORTALES ────────────────────────────────────────────────────────────── */
+.fvh-portales-tit {
+  margin: 18px 18px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--fvh-display);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--fvh-tinta);
+}
+.fvh-portales-tit span {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(38, 51, 31, 0.18), transparent);
+  border-radius: 2px;
+}
+.fvh-portales { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; padding: 0 16px; }
+.fvh-portal {
+  position: relative;
+  border: 0;
+  border-radius: var(--fvh-r);
+  overflow: hidden;
+  min-height: 148px;
+  padding: 13px;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 14px 28px var(--fvh-sombra-iso), 0 1px 0 rgba(255, 255, 255, 0.28) inset;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  opacity: 0;
+  animation: fvh-rise 0.6s forwards;
+}
+.fvh-portal:active { transform: translateY(2px) scale(0.985); }
+.fvh-portal .place-svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+.fvh-portal .p-head { position: relative; z-index: 2; display: flex; align-items: center; gap: 7px; margin-top: auto; }
+.fvh-portal .p-emoji {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.22);
+}
+.fvh-portal h3 {
+  font-family: var(--fvh-display);
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 1;
+  text-shadow: 0 1px 6px rgba(20, 30, 15, 0.45);
+}
+.fvh-portal p {
+  position: relative;
+  z-index: 2;
+  font-weight: 700;
+  font-size: 11.5px;
+  line-height: 1.25;
+  margin-top: 6px;
+  opacity: 0.97;
+  text-shadow: 0 1px 5px rgba(20, 30, 15, 0.5);
+  max-width: 96%;
+}
+.fvh-portal .ir {
+  position: absolute;
+  top: 11px;
+  right: 11px;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.24);
+  border: 1.5px solid rgba(255, 255, 255, 0.48);
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 10px;
+  padding: 3px 9px;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+.fvh-portal.p-gestionar { background: linear-gradient(160deg, #5fa86b, #3f7a4e); }
+.fvh-portal.p-aprender  { background: linear-gradient(160deg, #e0a64e, #c47b2f); }
+.fvh-portal.p-jugar     { background: linear-gradient(160deg, #7cb6d8, #4f8fc0); }
+.fvh-portal.p-agente    { background: linear-gradient(160deg, #7d6bd6, #5d4db0); }
+.fvh-p-nuevo {
+  position: relative;
+  z-index: 2;
+  align-self: flex-start;
+  background: var(--fvh-lima-claro);
+  color: #274200;
+  font-weight: 800;
+  font-size: 9.5px;
+  letter-spacing: 0.3px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  margin-bottom: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.fvh-fill { flex: 1 1 auto; }
+
+/* ── Vista institucional (slot children del extensionista) ─────────────────── */
+.fvh-institucional {
+  position: relative;
+  z-index: 2;
+  margin: 6px 12px 0;
+}
+
+/* ── A11y: título sólo lector de pantalla ──────────────────────────────────── */
+.fvh-titulo-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fvh *, .fvh *::before, .fvh *::after { animation: none !important; }
+  .fvh-portal,
+  .fvh-rise,
+  .fvh-rise-svg,
+  .fvh-colibri-globo { opacity: 1 !important; }
+}
