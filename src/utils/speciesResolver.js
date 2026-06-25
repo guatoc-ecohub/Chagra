@@ -34,20 +34,74 @@
  */
 
 /**
+ * Calificadores de estructura/ubicación que el operador agrega al nombre de un
+ * cultivo de su finca y que NO son parte del nombre de la ESPECIE. El campesino
+ * nombra sus plantas por dónde están o en qué unidad: "Fresa - Invernadero #1",
+ * "Tomate - Era 3", "Guayaba - Lote 2", "Mora - Cama 4". El nombre de la especie
+ * es siempre lo que va ANTES del " - "; lo de después es ubicación/manejo.
+ *
+ * Estas palabras también aparecen a veces sin guion ("Fresa Invernadero 1") y se
+ * recortan como sufijo cuando son la última palabra significativa. Lista cerrada
+ * y conservadora: solo términos de estructura predial inequívocos, NUNCA nombres
+ * de especie (anti-confusión: no recortar "árbol" porque "Tomate de árbol" es una
+ * especie distinta — por eso "arbol" NO está aquí).
+ */
+const FARM_STRUCTURE_WORDS = [
+  'invernadero', 'era', 'eras', 'cama', 'camas', 'lote', 'lotes',
+  'surco', 'surcos', 'bancal', 'bancales', 'parcela', 'parcelas',
+  'huerta', 'huerto', 'maceta', 'macetas', 'bolsa', 'bolsas',
+  'tunel', 'mesa', 'mesas', 'hilera', 'hileras', 'planta', 'plantas',
+];
+
+const STRUCTURE_RE = new RegExp(`^(?:${FARM_STRUCTURE_WORDS.join('|')})\\b`);
+
+/**
  * Normaliza un string para comparación laxa: minúsculas, sin acentos, sin
- * sufijos de conteo (`#3`), guiones-bajos/espacios colapsados.
+ * sufijos de conteo (`#3`, `#01`, ` 3`), sin calificadores de estructura/
+ * ubicación de finca ("- Invernadero"), guiones-bajos/espacios colapsados.
+ *
+ * Reduce el nombre que escribe el operador ("Fresa - Invernadero #1") al nombre
+ * de la ESPECIE ("fresa") para que matchee el catálogo, sin tocar nombres
+ * científicos entre paréntesis ("Tomate (Solanum lycopersicum)" → se conserva
+ * para que el paso 2/3 los aproveche).
+ *
  * @param {string} value
  * @returns {string}
  */
 export function normalizeForMatch(value) {
   if (!value || typeof value !== 'string') return '';
-  return value
+  let s = value
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '') // quita acentos/diacríticos
     .toLowerCase()
-    .replace(/\s+#\d+\s*$/, '') // sufijo de conteo "#3"
     .replace(/[_\s]+/g, ' ')
     .trim();
+
+  // 1) Recorta el calificador de estructura/ubicación introducido por " - "
+  //    cuando lo que sigue es una palabra de estructura predial conocida.
+  //    "fresa - invernadero #1" → "fresa"; "guayaba - invernadero" → "guayaba".
+  //    No recorta separadores que no sean estructura ("aji - dulce" se conserva).
+  const dashIdx = s.indexOf(' - ');
+  if (dashIdx > 0) {
+    const tail = s.slice(dashIdx + 3).trim();
+    if (STRUCTURE_RE.test(tail)) {
+      s = s.slice(0, dashIdx).trim();
+    }
+  }
+
+  // 2) Recorta un sufijo de estructura sin guion como última palabra significativa
+  //    ("fresa invernadero 1" → "fresa"), respetando que quede al menos una
+  //    palabra (no vaciar el nombre).
+  s = s.replace(/\s+#?\d+\s*$/, '').trim(); // primero el conteo final "#3"/"3"/"#01"
+  const words = s.split(' ');
+  if (words.length > 1 && STRUCTURE_RE.test(words[words.length - 1])) {
+    words.pop();
+    s = words.join(' ').trim();
+  }
+
+  // 3) Recorta cualquier conteo residual (#01) que haya quedado tras el calificador.
+  s = s.replace(/\s*#\d+\s*$/, '').trim();
+  return s;
 }
 
 /**
