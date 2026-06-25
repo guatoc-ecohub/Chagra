@@ -41,6 +41,32 @@ describe('DefensoresFincaScreen', () => {
     }
   });
 
+  it('muestra el progreso de objetivos (cultivos X/meta · plagas restantes)', () => {
+    render(<DefensoresFincaScreen />);
+
+    const objetivos = screen.getByTestId('defensores-objetivos');
+    expect(objetivos).toBeInTheDocument();
+
+    // Cultivos arranca en 0 sobre la meta del nivel 1.
+    const cultivos = screen.getByTestId('defensores-objetivo-cultivos');
+    expect(cultivos.textContent).toContain(`0/${NIVEL_1.metaCultivos}`);
+
+    // Plagas restantes = número de pares del nivel 1.
+    const plagas = screen.getByTestId('defensores-objetivo-plagas');
+    const paresNivel = PARES_CONTROL.filter((p) => NIVEL_1.paresIds.includes(p.id));
+    expect(plagas.textContent).toContain(String(paresNivel.length));
+
+    // El nivel 1 no tiene mini-jefe: no hay chip de jefe.
+    expect(screen.queryByTestId('defensores-objetivo-jefe')).toBeNull();
+  });
+
+  it('el chip de jefe aparece en un nivel con mini-jefe', () => {
+    localStorage.setItem(PROGRESO_KEY, JSON.stringify({ superados: [1] }));
+    render(<DefensoresFincaScreen />);
+    fireEvent.click(screen.getByTestId('nivel-2'));
+    expect(screen.getByTestId('defensores-objetivo-jefe')).toBeInTheDocument();
+  });
+
   it('al soltar el benéfico correcto muestra la lección de control biológico', () => {
     // El loop de canvas usa requestAnimationFrame; lo dejamos correr sin asserts
     // sobre el dibujo (ctx es null). La acción "soltar benéfico" no depende del

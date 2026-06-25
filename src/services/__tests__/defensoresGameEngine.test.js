@@ -12,6 +12,8 @@ import {
   golpearJefe,
   intentarSalto,
   evaluarFinNivel,
+  resumenObjetivos,
+  factorPatrulla,
   clamp,
   PUNTOS_CULTIVO,
   PUNTOS_PLAGA_CONTROLADA,
@@ -488,5 +490,79 @@ describe('niveles — configuración y desbloqueo', () => {
     expect(Object.isFrozen(NIVEL_2)).toBe(true);
     expect(Object.isFrozen(NIVEL_3)).toBe(true);
     expect(Object.isFrozen(NIVEL_4)).toBe(true);
+  });
+});
+
+describe('resumenObjetivos — progreso para el HUD', () => {
+  it('reporta cultivos X/meta, plagas restantes y jefe, con clamp del exceso', () => {
+    const r = resumenObjetivos({
+      cultivosRecogidos: 4,
+      metaCultivos: 6,
+      plagasVivas: 2,
+      hayJefe: true,
+      jefeVivo: true,
+    });
+    expect(r.cultivos).toEqual({ hechos: 4, meta: 6, listo: false });
+    expect(r.plagas).toEqual({ restantes: 2, listo: false });
+    expect(r.jefe).toEqual({ hay: true, vivo: true, listo: false });
+    expect(r.todoListo).toBe(false);
+  });
+
+  it('marca cada objetivo como listo y todoListo cuando se cumplen', () => {
+    const r = resumenObjetivos({
+      cultivosRecogidos: 9, // supera la meta → se acota a la meta
+      metaCultivos: 6,
+      plagasVivas: 0,
+      hayJefe: true,
+      jefeVivo: false,
+    });
+    expect(r.cultivos).toEqual({ hechos: 6, meta: 6, listo: true });
+    expect(r.plagas.listo).toBe(true);
+    expect(r.jefe.listo).toBe(true);
+    expect(r.todoListo).toBe(true);
+  });
+
+  it('sin jefe, el jefe siempre cuenta como listo', () => {
+    const r = resumenObjetivos({
+      cultivosRecogidos: 6,
+      metaCultivos: 6,
+      plagasVivas: 0,
+      hayJefe: false,
+    });
+    expect(r.jefe.listo).toBe(true);
+    expect(r.todoListo).toBe(true);
+  });
+
+  it('nunca reporta plagas restantes negativas', () => {
+    const r = resumenObjetivos({ cultivosRecogidos: 0, metaCultivos: 6, plagasVivas: -3 });
+    expect(r.plagas.restantes).toBe(0);
+  });
+
+  it('coincide con evaluarFinNivel: todoListo ⇒ gana (con energía)', () => {
+    const r = resumenObjetivos({
+      cultivosRecogidos: 6, metaCultivos: 6, plagasVivas: 0, hayJefe: false,
+    });
+    const fin = evaluarFinNivel({
+      energia: 3, cultivosRecogidos: 6, metaCultivos: 6, plagasVivas: 0,
+    });
+    expect(r.todoListo).toBe(true);
+    expect(fin.estado).toBe('gano');
+  });
+});
+
+describe('factorPatrulla — curva de dificultad por nivel (FEEL gated)', () => {
+  it('el nivel 1 no se atenúa (1.0) y los niveles altos bajan un pelín', () => {
+    expect(factorPatrulla(1)).toBe(1);
+    expect(factorPatrulla(2)).toBeCloseTo(0.95, 5);
+    expect(factorPatrulla(3)).toBeCloseTo(0.9, 5);
+    expect(factorPatrulla(4)).toBeCloseTo(0.85, 5);
+  });
+
+  it('siempre queda en el rango [0.8, 1] (no detiene ni acelera la patrulla)', () => {
+    for (let n = 1; n <= 10; n += 1) {
+      const f = factorPatrulla(n);
+      expect(f).toBeGreaterThanOrEqual(0.8);
+      expect(f).toBeLessThanOrEqual(1);
+    }
   });
 });

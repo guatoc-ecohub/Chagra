@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { BASE_SOIL_LIFE, mundoSubsueloDecisions } from './mundoSubsueloData';
 import { recordGameStart, recordGameComplete } from '../../services/usageTelemetryService';
 import { fvhSkinClass } from '../../config/fvhSkin';
+import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
+import { evaluarSubsuelo, mensajeMeta } from '../../services/mundoSubsueloEngine';
 
 function clamp(value, min = 0, max = 100) {
   return Math.max(min, Math.min(max, value));
@@ -171,9 +173,21 @@ function SoilScene({ soilLife, activeDecision }) {
 export default function MundoSubsuelo() {
   const [soilLife, setSoilLife] = useState(BASE_SOIL_LIFE);
   const [activeId, setActiveId] = useState('compost-bocashi');
+  // Cuenta de jugadas (cartas tomadas) para dar un pequeño arco de reto.
+  const [jugadas, setJugadas] = useState(0);
   const activeDecision = mundoSubsueloDecisions.find((decision) => decision.id === activeId) || mundoSubsueloDecisions[0];
   const stage = getSoilStage(soilLife);
   const meterColor = soilLife >= 60 ? 'bg-emerald-500' : soilLife >= 35 ? 'bg-amber-500' : 'bg-rose-500';
+
+  // FEEL gated (dev-only): con la flag ON se enciende la capa de OBJETIVO (meta
+  // de suelo vivo + celebración al lograrla). Con OFF el juego queda EXACTO como
+  // hoy (sandbox libre, sin meta ni celebración).
+  const feelOn = fincaVivaHomePerfilActivo();
+  const objetivo = useMemo(() => evaluarSubsuelo(soilLife, jugadas), [soilLife, jugadas]);
+  // La celebración aparece UNA vez al cruzar la meta hacia arriba; se cierra a
+  // mano. `metaFestejada` evita que reaparezca al seguir jugando tras lograrla.
+  const [metaFestejada, setMetaFestejada] = useState(false);
+  const celebrandoMeta = feelOn && objetivo.alcanzada && !metaFestejada;
 
   // Telemetría de uso ANÓNIMA: inicio del juego al montar (una vez).
   useEffect(() => { recordGameStart('mundo_subsuelo'); }, []);
@@ -199,6 +213,14 @@ export default function MundoSubsuelo() {
   function chooseDecision(decision) {
     setActiveId(decision.id);
     setSoilLife((current) => clamp(current + decision.effect));
+    setJugadas((n) => n + 1);
+  }
+
+  function reiniciarSuelo() {
+    setSoilLife(BASE_SOIL_LIFE);
+    setJugadas(0);
+    setActiveId('compost-bocashi');
+    setMetaFestejada(false);
   }
 
   return (
@@ -227,6 +249,17 @@ export default function MundoSubsuelo() {
             <div className="mt-3 h-4 overflow-hidden rounded-full bg-stone-200" aria-hidden="true">
               <div className={`h-full rounded-full ${meterColor}`} style={{ width: `${soilLife}%` }} />
             </div>
+            {/* Línea de meta (gated dev-only): marca dónde está "suelo vivo". */}
+            {feelOn && (
+              <p
+                data-testid="subsuelo-meta"
+                className="mt-2 text-xs font-bold leading-snug text-stone-700"
+                role="status"
+              >
+                {mensajeMeta(objetivo)}
+                <span className="ml-1 text-stone-400">· Jugadas: {jugadas}</span>
+              </p>
+            )}
           </div>
         </div>
       </header>
@@ -289,6 +322,38 @@ export default function MundoSubsuelo() {
           </section>
         </div>
       </section>
+
+      {/* Celebración al lograr la meta (gated dev-only). Sandbox intacto con la
+          flag OFF: nunca aparece y no hay objetivo que "cerrar". */}
+      {celebrandoMeta && (
+        <section
+          data-testid="subsuelo-meta-lograda"
+          className="rounded-3xl border-2 border-lime-400 bg-[linear-gradient(135deg,#ecfccb,#a5f3fc)] p-5 text-center shadow-sm"
+          role="status"
+        >
+          <div className="text-5xl" aria-hidden="true">🌱✨</div>
+          <h2 className="mt-2 text-2xl font-black text-stone-950">¡Suelo vivo!</h2>
+          <p className="mt-1 text-sm font-semibold leading-relaxed text-stone-700">
+            {mensajeMeta(objetivo)} Sigue cuidándolo o vuelve a empezar para
+            lograrlo en menos jugadas.
+          </p>
+          <button
+            type="button"
+            data-testid="subsuelo-reiniciar"
+            onClick={reiniciarSuelo}
+            className="mt-4 min-h-[52px] rounded-2xl bg-emerald-600 px-6 font-black text-white shadow active:scale-95"
+          >
+            Empezar de nuevo
+          </button>
+          <button
+            type="button"
+            onClick={() => setMetaFestejada(true)}
+            className="mt-2 block w-full text-sm font-bold text-stone-500 underline"
+          >
+            Seguir explorando el suelo
+          </button>
+        </section>
+      )}
     </main>
   );
 }
