@@ -48,6 +48,7 @@ import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 import SelectedBackgroundReveal from './SelectedBackgroundReveal';
 import MiFincaVivaHomeCard from './MiFincaVivaHomeCard';
 import FincaRedInstitucional from './FincaRedInstitucional';
+import FincaVivaHero from './FincaVivaHero';
 // Rescate huérfano 2026-06-24 (descubribilidad): CaseStudyTopWidget vivía solo
 // en el DashboardView MUERTO de App.jsx (única vía a `casos`). Se trae a la home
 // viva; se auto-oculta si no hay casos activos (KISS, zero footprint). Ref:
@@ -404,32 +405,58 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
             className="relative flex flex-col w-full h-full overflow-y-auto pb-6"
             data-scroll-key="dashboard-live"
         >
-            {/* Agente: PORTADA INMERSIVA a pantalla completa (≈100dvh).
-                Protagonista absoluto, primera pantalla. El resto del dashboard
-                (saludo regional + secciones) queda DEBAJO del fold y se llega
-                scrolleando. */}
-            {/* Primer uso sin piso confirmado: BANNER compacto del Paso 1
-                (piso térmico) flotando SOBRE la zona decorativa superior del
-                AgentHero, justo bajo el TopBar flotante. Es un OVERLAY (absolute)
-                a propósito (regresión 2026-06-13): montarlo en el flujo flex
-                EMPUJABA el AgentHero ≈100dvh hacia arriba y, al abrir la araña, su
-                fila superior de nodos quedaba TAPADA por el TopBar flotante (los
-                clics aterrizaban en el TopBar). Como overlay no desplaza al hero:
-                la araña conserva su geometría y sigue alcanzable. Las 3 rutas de
-                registro viven en el hero completo bajo el fold, una vez
-                confirmado el piso. */}
-            {plantsCount === 0 && needsPisoCapture && (
-                <div
-                    className="absolute inset-x-0 top-[132px] z-[6] px-4 pointer-events-none"
-                    data-testid="dashboard-onboarding-top"
+            {/* PORTADA del home — depende de la flag VITE_FINCA_VIVA_HOME_PERFIL:
+                ─────────────────────────────────────────────────────────────────
+                · Flag ON  → la ESCENA ISOMÉTRICA "Finca Viva" (mockup F2) es el
+                  HERO inmersivo: lo PRIMERO que se ve (≈100dvh), con los 4
+                  portales como lugares y el agente DEGRADADO a un acceso flotante
+                  ("Pregúntale a Chagra"). El AgentHero deja de ser la portada.
+                  Para el extensionista la escena se reemplaza por la RED
+                  institucional (mismo shell F2). El estado vacío (0 plantas) se ve
+                  igual de inmersivo ("por sembrar"), nunca como una tarjeta.
+                · Flag OFF → comportamiento ACTUAL intacto (prod seguro): el
+                  AgentHero es la PORTADA INMERSIVA a pantalla completa (≈100dvh) y
+                  el banner de onboarding flota sobre él.
+                ───────────────────────────────────────────────────────────────── */}
+            {fincaVivaFlag ? (
+                <FincaVivaHero
+                    onNavigate={onNavigate}
+                    onOpenAgent={() => onNavigate('agente')}
+                    titulo={esExtensionista ? 'Red de fincas que acompaño' : 'Mi finca viva'}
                 >
-                    <div className="pointer-events-auto mx-auto w-full max-w-[26rem]">
-                        <OnboardingHero onNavigate={onNavigate} compact />
-                    </div>
-                </div>
-            )}
+                    {esExtensionista ? (
+                        <div className="absolute inset-0 overflow-y-auto px-3 pt-[calc(env(safe-area-inset-top)+108px)] pb-4">
+                            <FincaRedInstitucional onNavigate={onNavigate} />
+                        </div>
+                    ) : null}
+                </FincaVivaHero>
+            ) : (
+                <>
+                    {/* Primer uso sin piso confirmado: BANNER compacto del Paso 1
+                        (piso térmico) flotando SOBRE la zona decorativa superior
+                        del AgentHero, justo bajo el TopBar flotante. Es un OVERLAY
+                        (absolute) a propósito (regresión 2026-06-13): montarlo en
+                        el flujo flex EMPUJABA el AgentHero ≈100dvh hacia arriba y,
+                        al abrir la araña, su fila superior de nodos quedaba TAPADA
+                        por el TopBar flotante (los clics aterrizaban en el
+                        TopBar). Como overlay no desplaza al hero: la araña
+                        conserva su geometría y sigue alcanzable. Las 3 rutas de
+                        registro viven en el hero completo bajo el fold, una vez
+                        confirmado el piso. */}
+                    {plantsCount === 0 && needsPisoCapture && (
+                        <div
+                            className="absolute inset-x-0 top-[132px] z-[6] px-4 pointer-events-none"
+                            data-testid="dashboard-onboarding-top"
+                        >
+                            <div className="pointer-events-auto mx-auto w-full max-w-[26rem]">
+                                <OnboardingHero onNavigate={onNavigate} compact />
+                            </div>
+                        </div>
+                    )}
 
-            <AgentHero onNavigate={onNavigate} />
+                    <AgentHero onNavigate={onNavigate} />
+                </>
+            )}
 
             {/* Paisaje elegido — la foto de biodiversidad seleccionada, JUSTO
                 bajo el hero, visible en todos los temas (operador 2026-06-09). */}
@@ -465,35 +492,19 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null }) {
             {/* MI FINCA VIVA / RED INSTITUCIONAL — la escena del home.
                 ─────────────────────────────────────────────────────────────
                 Flag VITE_FINCA_VIVA_HOME_PERFIL (fincaVivaHomePerfilActivo):
-                  · ON  + extensionista → RED institucional de fincas
-                          (FincaRedInstitucional): agregados + mini-escenas por
-                          finca supervisada (no la escena de finca única).
-                  · ON  + resto          → escena "Finca Viva" por PERFIL,
-                          mostrada SIEMPRE (incluso con 0 plantas: la escena lo
-                          cubre con su estado "por sembrar" — fix UX; el backdrop
-                          por perfil orienta desde el primer uso).
-                  · OFF (default)        → comportamiento actual intacto: la
-                          escena 2D fenológica solo cuando ya hay algo sembrado
-                          (plantsCount > 0), para no competir con el OnboardingHero.
-                La tarjeta es autocontenida: lee sus datos de farmProcessCache /
-                del tablero del extensionista (offline-first) y abre el destino al
-                tocarla. */}
-            {fincaVivaFlag ? (
-                esExtensionista ? (
-                    <div className="px-4 pt-3">
-                        <FincaRedInstitucional onNavigate={onNavigate} />
-                    </div>
-                ) : (
-                    <div className="px-4 pt-3">
-                        <MiFincaVivaHomeCard onNavigate={onNavigate} />
-                    </div>
-                )
-            ) : (
-                plantsCount > 0 && (
-                    <div className="px-4 pt-3">
-                        <MiFincaVivaHomeCard onNavigate={onNavigate} />
-                    </div>
-                )
+                  · ON  → la escena (finca propia o RED institucional) YA es el
+                          HERO inmersivo de arriba (FincaVivaHero), no una tarjeta
+                          aquí abajo. No se repite el bloque (mockup F2).
+                  · OFF (default) → comportamiento actual intacto: la escena 2D
+                          fenológica como TARJETA, solo cuando ya hay algo
+                          sembrado (plantsCount > 0), para no competir con el
+                          OnboardingHero. La tarjeta es autocontenida (lee
+                          farmProcessCache offline-first y abre el juego al
+                          tocarla). */}
+            {!fincaVivaFlag && plantsCount > 0 && (
+                <div className="px-4 pt-3">
+                    <MiFincaVivaHomeCard onNavigate={onNavigate} />
+                </div>
             )}
 
             {/* Top problemas activos (casos de estudio, DR-044). Rescate huérfano
