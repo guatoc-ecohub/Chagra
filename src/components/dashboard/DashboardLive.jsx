@@ -26,7 +26,7 @@ import {
     rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays, Sprout, HelpCircle } from 'lucide-react';
+import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays, Sprout, HelpCircle, Store } from 'lucide-react';
 import AgentHero from './AgentHero';
 import OnboardingHero from '../OnboardingHero';
 import {
@@ -143,6 +143,11 @@ const HERRAMIENTAS_TILES = [
     // farmCalendarService; reusa los ciclos de la finca y el catálogo.
     { view: 'calendario_finca', label: 'Calendario', icon: CalendarDays, desc: 'Siembra, abono, plagas y cosecha en un solo lugar', accent: 'text-violet-400 border-l-violet-500' },
     { view: 'faq', label: 'Preguntas frecuentes', icon: HelpCircle, desc: 'Respuestas sobre el funcionamiento de Chagra', accent: 'text-violet-400 border-l-violet-500' },
+    // Marketplace agroecológico (circuitos cortos): segundo punto de entrada
+    // VISIBLE además de la rama "Vender" de la mano radial. Publicar lo que
+    // vende la finca + explorar ofertas de fincas vecinas. Ruta 'mercado'
+    // (App.jsx case 'mercado' → MercadosScreen).
+    { view: 'mercado', label: 'Mercado', icon: Store, desc: 'Vende y compra directo entre fincas, sin intermediarios', accent: 'text-emerald-400 border-l-emerald-500' },
 ];
 
 // Acciones de gestión sin launcher directo en la home (huérfanas):

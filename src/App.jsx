@@ -98,6 +98,7 @@ const SeguimientoProcesoScreen = lazy(() => import('./components/SeguimientoProc
 const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
 const CromatografiaScreen = lazy(() => import('./components/CromatografiaScreen'));
 const ToxicologiaScreen = lazy(() => import('./components/ToxicologiaScreen'));
+const MercadosScreen = lazy(() => import('./components/MercadosScreen'));
 const GlaciarReporteScreen = lazy(() => import('./components/GlaciarReporteScreen'));
 const GlaciarHistorialScreen = lazy(() => import('./components/GlaciarHistorialScreen'));
 const ProfileScreen = lazy(() => import('./components/ProfileScreen'));
@@ -109,7 +110,6 @@ const TopBar = lazy(() => import('./components/TopBar'));
 const DashboardLive = lazy(() => import('./components/dashboard/DashboardLive'));
 const AprenderConAgente = lazy(() => import('./components/Aprende/AprenderConAgente'));
 const DirectorioEspeciesScreen = lazy(() => import('./components/DirectorioEspecies/DirectorioEspeciesScreen'));
-const MercadosScreen = lazy(() => import('./components/MercadosScreen'));
 const HoyEnFincaScreen = lazy(() => import('./components/hoy/HoyEnFincaScreen'));
 const MiFincaEvolucionScreen = lazy(() => import('./components/hoy/MiFincaEvolucionScreen'));
 const MiFincaVivaScreen = lazy(() => import('./components/juego/MiFincaVivaScreen'));
@@ -181,6 +181,9 @@ const HASH_VIEW_ROUTES = {
   'directorio-especies': 'directorio',
   especies: 'directorio',
   'usage-stats': 'usage_stats',
+  mercado: 'mercado',
+  mercados: 'mercado',
+  vender: 'mercado',
 };
 
 // Vistas que cuentan como "módulo" para telemetría de piloto.
@@ -193,7 +196,7 @@ const MODULE_VIEWS = new Set([
   'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'toxicologia', 'aprende', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia',
-  'usage_stats',
+  'usage_stats', 'mercado',
 ]);
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
@@ -1137,6 +1140,18 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Cromatografia de Suelo">
               <CromatografiaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mercado':
+        // Marketplace agroecológico (circuitos cortos): publicar productos de la
+        // finca + explorar ofertas de fincas vecinas + contacto directo. Es la
+        // capacidad LIVE de la rama "Vender" de la mano (manifiesto `mercado`).
+        // Offline-first; precio de referencia citado solo si hay fuente.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mercado de la finca">
+              <MercadosScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
