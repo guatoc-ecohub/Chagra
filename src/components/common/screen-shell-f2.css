@@ -1,0 +1,171 @@
+/* ============================================================================
+   screen-shell-f2.css — PIEL del shell de pantallas secundarias en modo
+   "Finca Viva" (F2). Gateado tras VITE_FINCA_VIVA_HOME_PERFIL: SOLO se aplica
+   cuando ScreenShell se monta con la variante F2 (clase `.screen-shell-f2`).
+   Con la flag OFF el shell conserva su markup/estilo actual (prod intacto).
+
+   DECISIÓN del operador (2026-06-24): la finca-viva es la DISPOSICIÓN (layout);
+   los TEMAS son la PIEL (color, cielo, ícono del agente). Por eso este archivo
+   NO hardcodea color de tema: bebe de la indirección `--c-*` (index.css; biopunk
+   en :root, nature/minimalista en [data-theme]) y del lenguaje del home F2
+   (finca-viva-hero.css: --fvh-tinta, --fvh-sello, --fvh-crema, data-luz noche).
+   Así, una sola hoja resuelve las 3 pieles:
+     · nature       → crema cálida, café/salvia (las --c-* viran a papel cálido).
+     · biopunk      → oscuro neón teal (las --c-* base; foto del body se ve).
+     · minimalista  → papel claro sobrio (las --c-* viran a blanco/tinta).
+
+   Reacciona a html[data-luz="noche"] igual que el home F2 (cielo nocturno),
+   para coherencia con la portada. Español de Colombia (tú/usted), sin voseo.
+   ========================================================================== */
+
+/* ── Tokens-puente F2 ↔ tema. Reusan los --c-* del tema activo (resueltos por
+   index.css) y el lenguaje cálido del home (--fvh-*). El default de cada var()
+   garantiza que biopunk (sin data-theme) tenga su valor sin depender de nada. */
+.screen-shell-f2 {
+  /* Topbar: superficie elevada del tema con un velo translúcido (deja ver la
+     foto/fondo del body detrás, como el home). */
+  --ssf2-topbar-bg: rgb(var(--c-surface-card, 15 23 42) / 0.72);
+  --ssf2-topbar-border: rgb(var(--c-surface-border, 51 65 85) / 0.55);
+  /* Lienzo principal: scrim suave del tema (NO slate-950 fijo). En claros vira
+     a crema/papel translúcido; en biopunk a navy translúcido. */
+  --ssf2-main-scrim: rgb(var(--c-slate-950, 2 6 23) / 0.42);
+  /* Botones de chrome (back/home): pastilla redonda del tema. */
+  --ssf2-pill-bg: rgb(var(--c-surface-raised, 30 41 59) / 0.85);
+  --ssf2-pill-bg-hover: rgb(var(--c-surface-raised, 30 41 59) / 1);
+  --ssf2-pill-tinta: rgb(var(--c-slate-100, 241 245 249));
+  /* Acento (Home, ícono de título): emerald del tema (vira cálido en nature). */
+  --ssf2-acento: rgb(var(--c-emerald-400, 52 211 153));
+  --ssf2-titulo: rgb(var(--c-slate-100, 241 245 249));
+}
+
+/* En temas CLAROS el velo translúcido del lienzo debe quedar muy tenue para no
+   lavar el papel cálido del demo (nature) / el blanco sobrio (minimalista). */
+[data-theme="nature"] .screen-shell-f2,
+[data-theme="minimalista"] .screen-shell-f2 {
+  --ssf2-main-scrim: rgb(var(--c-slate-950) / 0.10);
+  --ssf2-topbar-bg: rgb(var(--c-surface-card) / 0.86);
+}
+
+/* Noche (mismo data-luz del home F2): el velo se profundiza un poco para
+   sostener legibilidad cuando el cielo del fondo se oscurece. */
+html[data-luz="noche"] .screen-shell-f2 {
+  --ssf2-main-scrim: rgb(var(--c-slate-950, 2 6 23) / 0.52);
+}
+html[data-luz="noche"][data-theme="nature"] .screen-shell-f2,
+html[data-luz="noche"][data-theme="minimalista"] .screen-shell-f2 {
+  --ssf2-main-scrim: rgb(var(--c-slate-950) / 0.18);
+}
+
+.screen-shell-f2 {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--ssf2-titulo);
+}
+
+/* ── TOPBAR estilo F2: aire, jerarquía, marca con el ícono del agente ──────── */
+.screen-shell-f2-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: calc(env(safe-area-inset-top, 0px) + 12px) 16px 12px;
+  background: var(--ssf2-topbar-bg);
+  border-bottom: 1px solid var(--ssf2-topbar-border);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  flex-shrink: 0;
+}
+.screen-shell-f2-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+.screen-shell-f2-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Marca: la A del agente del tema activo (la misma que el home F2 / TopBar). */
+.screen-shell-f2-brand {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  padding: 6px;
+  background: rgb(var(--c-surface-raised, 30 41 59) / 0.7);
+}
+.screen-shell-f2-brand svg { width: 100%; height: 100%; display: block; }
+
+/* Pastillas de chrome (back/home): redondas, del tema (no slate fijo). */
+.screen-shell-f2-pill {
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid var(--ssf2-topbar-border);
+  background: var(--ssf2-pill-bg);
+  color: var(--ssf2-pill-tinta);
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.1s ease;
+}
+.screen-shell-f2-pill:hover { background: var(--ssf2-pill-bg-hover); }
+.screen-shell-f2-pill:active { transform: scale(0.94); }
+.screen-shell-f2-pill.is-home { color: var(--ssf2-acento); }
+
+/* Título: tinta del tema + ícono en el acento del tema. */
+.screen-shell-f2-title {
+  font-size: 1.18rem;
+  font-weight: 800;
+  line-height: 1.1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: var(--ssf2-titulo);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.screen-shell-f2-title-icon {
+  color: var(--ssf2-acento);
+  flex-shrink: 0;
+  display: inline-flex;
+}
+
+/* Botón de ayuda: ámbar del tema (la indirección lo lleva al ámbar correcto). */
+.screen-shell-f2-help {
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 1px solid rgb(var(--c-amber-500, 245 158 11) / 0.42);
+  background: rgb(var(--c-amber-500, 245 158 11) / 0.18);
+  color: rgb(var(--c-amber-300, 252 211 77));
+  cursor: pointer;
+}
+.screen-shell-f2-help:hover { background: rgb(var(--c-amber-500, 245 158 11) / 0.3); }
+
+/* ── LIENZO principal: scrim del tema (deja ver el fondo del body) ─────────── */
+.screen-shell-f2-main {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--ssf2-main-scrim);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 120px);
+}
+
+/* prefers-reduced-motion: sin transiciones de pastilla. */
+@media (prefers-reduced-motion: reduce) {
+  .screen-shell-f2-pill { transition: none; }
+}
