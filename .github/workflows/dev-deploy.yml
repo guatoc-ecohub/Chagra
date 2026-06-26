@@ -56,6 +56,9 @@ jobs:
           # PRUEBA dev-only: colibrí 3D en el home Finca Viva + el FAB del agente.
           # Solo en dev; en prod (deploy.yml) esta flag NO existe → colibrí 2D.
           VITE_COLIBRI_3D: "true"
+          # Registro unificado (#23): puerta única "Registrar" (voz + manual) en
+          # dev. OFF en prod (deploy.yml no la define) hasta el visto bueno.
+          VITE_REGISTRO_UNIFICADO: "true"
           VITE_CHAGRA_MCP_TOKEN: ${{ secrets.VITE_CHAGRA_MCP_TOKEN }}
 
       - if: env.SKIP_DEPLOY != '1'
