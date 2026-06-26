@@ -84,11 +84,23 @@ const TOMATE_ARBOL = {
   familia_botanica: 'Solanaceae',
 };
 
+// Cebolla larga con la sinonimia regional GROUNDED de este PR (cebolla junca /
+// cebolla de rama). El campesino que dice el nombre LOCAL debe resolver la
+// especie correcta — y NO confundirse con la cebolla cabezona (Allium cepa).
+const CEBOLLA_LARGA = {
+  id: 'allium_fistulosum',
+  nombre_comun: 'Cebollín / Cebolla larga',
+  nombre_cientifico: 'Allium fistulosum L.',
+  nombre_comunes_regionales: ['cebolla junca', 'cebolla de rama', 'cebolla en rama'],
+  familia_botanica: 'Amaryllidaceae',
+};
+
 const CATALOG = [
   FRIJOL,
   MAIZ,
   CALABAZA,
   CEBOLLA,
+  CEBOLLA_LARGA,
   TOMATE_CERASIFORME,
   TOMATE_CHONTO,
   TOMATE_SAN_MARZANO,
@@ -116,6 +128,14 @@ describe('searchSpecies', () => {
   it('encuentra por nombre regional', async () => {
     const res = await searchSpecies('Frijol cargamanto');
     expect(res.some((r) => r.id === 'phaseolus_vulgaris')).toBe(true);
+  });
+
+  it('sinonimia regional GROUNDED: "cebolla junca" resuelve a Allium fistulosum (no a la cabezona)', async () => {
+    const res = await searchSpecies('cebolla junca');
+    expect(res[0].id).toBe('allium_fistulosum');
+    expect(res[0].match).toBe('exact');
+    // anti-confusión: NO debe resolver a la cebolla cabezona (Allium cepa).
+    expect(res[0].id).not.toBe('allium_cepa');
   });
 
   it('resuelve alias curado (frijol → phaseolus_vulgaris) ranqueado primero', async () => {
