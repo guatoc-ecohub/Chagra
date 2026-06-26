@@ -903,7 +903,14 @@
 [data-theme="minimalista"] .fvh {
   --fvh-on-cielo: #20301a;
   --fvh-on-cielo-suave: #33472a;
-  --fvh-on-cielo-acento: rgb(var(--c-emerald-500));
+  /* ACENTO (eyebrow "SU AGENTE AGROECOLÓGICO" + el <em> "su finca viva"): antes
+     era --c-emerald-500, que sobre el cielo del shell de los temas claros daba
+     SOLO 3.08–4.03:1 en el stop superior (turquesa/crema/papel) → bajo AA y se
+     veía "teal/olivo lavado" (audit Bug 1; #1886 cubrió el globo/perfil pero NO
+     este bloque). Subimos a --c-emerald-700 (verde bosque por tema): 5.10:1
+     verde-vivo · 5.80:1 nature · 9.63:1 minimalista en el stop superior = AA en
+     los 4. El <em> es texto grande (26px bold) y de todos modos pasa large-AA. */
+  --fvh-on-cielo-acento: rgb(var(--c-emerald-700));
   --fvh-on-cielo-sombra: 0 1px 2px rgba(255, 255, 255, 0.55);
   --fvh-on-cielo-div: linear-gradient(90deg, rgba(38, 51, 31, 0.2), transparent);
 }

@@ -303,6 +303,23 @@
 }
 .fvh-skin .jp-mfv-entrada:hover { box-shadow: var(--jp-sombra-2); }
 
+/* En los TEMAS CLAROS la tarjeta conservaba su degradado Tailwind translúcido
+   (p.ej. el Doom: from-orange-600/40 to-amber-800/40 = KHAKI) sobre la crema del
+   tema → la descripción `jp-tinta-suave` oscura caía sobre khaki = ratio 1.8–3.2,
+   bajo AA (audit Bug 3: "Doom intro 'Recorre la finca…' gris-oscuro sobre
+   khaki-oscuro"). El comentario de Fase 2.1 asumía "ya tienen fondo del tema",
+   pero la regla nunca lo seteaba. Aquí SÍ retiñimos el fondo a la superficie del
+   tema (un velo del acento del color de cada tarjeta da identidad sin lavar): la
+   tinta (13.8:1) y la suave (5.9:1 verde-vivo) leen AA. Solo claros; biopunk
+   (sin data-theme) conserva su degradado neón sobre navy. verde-vivo entra como
+   tema CLARO que es (estaba mal agrupado con biopunk). */
+[data-theme="nature"] .fvh-skin .jp-mfv-entrada,
+[data-theme="minimalista"] .fvh-skin .jp-mfv-entrada,
+[data-theme="verde-vivo"] .fvh-skin .jp-mfv-entrada {
+  background-image: linear-gradient(160deg, var(--jp-raised), var(--jp-card)) !important;
+  border-color: var(--jp-borde) !important;
+}
+
 /* Marco del mundo vivo (FincaWorldScene): el halo de identidad + marco pulido
    se aplican vía .fv-scene en temas-fase2.css; aquí solo redondeamos un punto. */
 .fvh-skin.fv-scene { border-radius: 1.35rem !important; }
@@ -344,10 +361,13 @@
 .fvh-skin .jp-tinta-suave { color: var(--jp-tinta-3) !important; }
 /* Acento de VIDA (verde del tema) para piezas de TEXTO legibles (no decorativas):
    en oscuros es el emerald vivo; en claros la salvia profunda AA del tema. Útil
-   para etiquetas tipo "controla a" / "por qué funciona" / "%". */
+   para etiquetas tipo "controla a" / "por qué funciona" / "%".
+   verde-vivo es CLARO (audit Bug 3): con el default emerald-300 daba 4.48:1
+   sobre su tarjeta (bajo AA); --c-emerald-500 (#287a34) sube a 5.21:1 = AA. */
 .fvh-skin .jp-acento-vida { color: var(--jp-vida-texto) !important; }
 [data-theme="nature"] .fvh-skin,
-[data-theme="minimalista"] .fvh-skin { --jp-vida-texto: rgb(var(--c-emerald-500, 16 185 129)); }
+[data-theme="minimalista"] .fvh-skin,
+[data-theme="verde-vivo"] .fvh-skin { --jp-vida-texto: rgb(var(--c-emerald-500, 16 185 129)); }
 
 /* ── MI FINCA VIVA (hub): kicker de nivel, título del mundo, mensaje del mundo,
    descripciones de las tarjetas de subjuego, barra de progreso, misiones,
@@ -367,20 +387,26 @@
 .fvh-skin .jp-doom-ficha .jp-tinta-suave { color: var(--jp-tinta-3) !important; }
 
 /* CUE de color plaga (rojo) / benéfico (ámbar): conserva su SEMÁNTICA en los 4
-   temas. En oscuros (biopunk/verde-vivo) queda su tono claro original (no se
-   toca). En CLAROS (nature/minimalista) la ficha tiene fondo blanco/crema → el
-   rojo/ámbar pálido se lavaba; lo bajamos a un tono profundo AA (≥4.8) que sigue
-   leyéndose como rojo/ámbar (CUE intacto). */
+   temas. En oscuro (biopunk, SIN data-theme) queda su tono claro original (no se
+   toca). En los 3 temas CLAROS (nature/minimalista/VERDE-VIVO) la ficha tiene
+   fondo blanco/crema → el rojo/ámbar pálido se lavaba (red-200 1.41:1 ·
+   amber-200 1.21:1 en verde-vivo); lo bajamos a un tono profundo AA (≥5.7 en
+   verde-vivo) que sigue leyéndose como rojo/ámbar (CUE intacto).
+   verde-vivo es CLARO y estaba ERRÓNEAMENTE agrupado con biopunk (audit Bug 3). */
 [data-theme="nature"] .fvh-skin .jp-doom-plaga,
-[data-theme="minimalista"] .fvh-skin .jp-doom-plaga { color: rgb(190 30 30) !important; }
+[data-theme="minimalista"] .fvh-skin .jp-doom-plaga,
+[data-theme="verde-vivo"] .fvh-skin .jp-doom-plaga { color: rgb(190 30 30) !important; }
 [data-theme="nature"] .fvh-skin .jp-doom-benefico,
-[data-theme="minimalista"] .fvh-skin .jp-doom-benefico { color: rgb(var(--c-amber-700, 180 83 9)) !important; }
+[data-theme="minimalista"] .fvh-skin .jp-doom-benefico,
+[data-theme="verde-vivo"] .fvh-skin .jp-doom-benefico { color: rgb(var(--c-amber-700, 180 83 9)) !important; }
 
 /* Banner de lección del Doom (la decoración mirada): tenía fondo amber-950/50
-   (oscuro translúcido). En claros lo asentamos sobre superficie del tema con un
-   tinte solar para que el texto-tinta se lea. En oscuros queda como hoy. */
+   (oscuro translúcido). En los temas claros lo asentamos sobre superficie del
+   tema con un tinte solar para que el texto-tinta se lea. En biopunk queda como
+   hoy. (verde-vivo incluido: tema claro.) */
 [data-theme="nature"] .fvh-skin .jp-doom-leccion,
-[data-theme="minimalista"] .fvh-skin .jp-doom-leccion {
+[data-theme="minimalista"] .fvh-skin .jp-doom-leccion,
+[data-theme="verde-vivo"] .fvh-skin .jp-doom-leccion {
   background: linear-gradient(180deg, var(--jp-raised), var(--jp-card)) !important;
   border-color: rgb(var(--c-amber-500, 245 158 11) / 0.45) !important;
 }
@@ -388,12 +414,31 @@
 /* HUD superior del Doom (ronda/plagas/puntaje/combo/vitalidad): vive sobre
    .jp-doom-hud, cuyo fondo ya viró a superficie del tema. Sus números usaban
    utilidades vivas (emerald-200/amber-300/lime-300/orange-300/white) que se
-   lavaban en claros. Las tonamos a la tinta del tema SOLO en claros; el color
-   se mantiene en oscuros (donde el fondo es navy). */
+   lavaban en claros (1.09–1.20:1 en verde-vivo). Las tonamos a la tinta del tema
+   (13.81:1) SOLO en los 3 temas claros; el color se mantiene en biopunk (donde
+   el fondo es navy). verde-vivo es CLARO → entra aquí (audit Bug 3). */
 [data-theme="nature"] .fvh-skin .jp-doom-hud [class*="text-"],
 [data-theme="minimalista"] .fvh-skin .jp-doom-hud [class*="text-"],
+[data-theme="verde-vivo"] .fvh-skin .jp-doom-hud [class*="text-"],
 [data-theme="nature"] .fvh-skin .jp-doom-vital [class*="text-"],
-[data-theme="minimalista"] .fvh-skin .jp-doom-vital [class*="text-"] {
+[data-theme="minimalista"] .fvh-skin .jp-doom-vital [class*="text-"],
+[data-theme="verde-vivo"] .fvh-skin .jp-doom-vital [class*="text-"] {
+  color: var(--jp-tinta) !important;
+}
+
+/* HUD de DEFENSORES (.df-hud: corazones de energía + "Puntos"/puntaje) y el
+   subtítulo del nivel: usan utilidades vivas (text-emerald-200/70,
+   text-emerald-300/70, text-white) pensadas para fondo oscuro. En los 3 temas
+   claros el HUD se apoya sobre la superficie del tema (la foto de la app ya no
+   se cuela en verde-vivo) → esos tonos claros se lavaban (audit Bug 3:
+   "Defensores HUD/header lavado en verde-vivo"). Los tonamos a la tinta del tema
+   (≥13:1) SOLO en claros; en biopunk se mantienen vivos sobre el navy. */
+[data-theme="nature"] .fvh-skin .df-hud [class*="text-"],
+[data-theme="minimalista"] .fvh-skin .df-hud [class*="text-"],
+[data-theme="verde-vivo"] .fvh-skin .df-hud [class*="text-"],
+[data-theme="nature"] .fvh-skin [data-testid="defensores-subtitulo"],
+[data-theme="minimalista"] .fvh-skin [data-testid="defensores-subtitulo"],
+[data-theme="verde-vivo"] .fvh-skin [data-testid="defensores-subtitulo"] {
   color: var(--jp-tinta) !important;
 }
 

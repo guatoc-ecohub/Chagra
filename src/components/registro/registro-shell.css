@@ -15,11 +15,17 @@
  * ========================================================================== */
 
 .registro-shell {
-  /* Fondo base = superficie del tema, con un sutil halo del acento arriba
-     para dar identidad sin romper contraste. */
-  background:
-    radial-gradient(120% 60% at 50% -10%, rgb(var(--t-accent-rgb) / 0.10), transparent 60%),
-    rgb(var(--c-surface));
+  /* Fondo base = superficie SÓLIDA del tema, con un sutil halo del acento arriba
+     para dar identidad sin romper contraste. La capa de color del tema es opaca
+     (--c-surface no lleva alpha en ningún tema) y se pinta como `background-color`
+     ADEMÁS del shorthand: así la superficie del tema queda bajo TODO el formulario
+     —labels, intro/tip e inputs por igual— y la foto de fondo de la app jamás se
+     cuela detrás de las etiquetas (audit Bug 2). En verde-vivo la foto biopunk ya
+     no se pinta (index.css la exime como en nature/minimalista), pero dejamos la
+     superficie sólida explícita como cinturón-y-tirantes. */
+  background-color: rgb(var(--c-surface));
+  background-image:
+    radial-gradient(120% 60% at 50% -10%, rgb(var(--t-accent-rgb) / 0.10), transparent 60%);
   color: rgb(var(--c-slate-100));
 }
 
