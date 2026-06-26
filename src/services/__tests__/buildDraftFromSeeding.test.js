@@ -182,4 +182,46 @@ describe('buildDraftFromSeeding', () => {
     expect(typeof draft.location_land_asset_id).toBe('string');
     expect(draft.location_land_asset_id).toBeTruthy();
   });
+
+  // Bug operador 2026-06-25: el selector de especies entrega el id canónico del
+  // catálogo. Debe usarse DIRECTO como subject_slug, sin depender del parseo del
+  // nombre (que fallaba con "Fresa - Invernadero #1").
+  describe('opts.speciesSlug — id explícito del selector', () => {
+    it('usa el slug explícito directo como subject_slug', async () => {
+      const payload = makeSeedingPayload({
+        attributes: { name: 'Siembra de café - N/A', timestamp: '2026-06-10T00:00:00+00:00', status: 'done' },
+      });
+      const draft = await buildDraftFromSeeding(payload, { speciesSlug: 'coffea_arabica' });
+      expect(draft.subject_slug).toBe('coffea_arabica');
+      expect(draft.subject_kind).toBe('individual');
+    });
+
+    it('el slug explícito gana aunque el nombre sea ambiguo o sucio', async () => {
+      const payload = makeSeedingPayload({
+        // Nombre "sucio" que el parseo NO resolvería bien.
+        attributes: { name: 'Siembra de cultivo raro - N/A', timestamp: '2026-06-10T00:00:00+00:00', status: 'done' },
+      });
+      const draft = await buildDraftFromSeeding(payload, { speciesSlug: 'zea_mays' });
+      expect(draft.subject_slug).toBe('zea_mays');
+      // tracking_mode del catálogo (aggregate) → unidad semillas.
+      expect(draft.subject_kind).toBe('aggregate');
+      expect(draft.unit).toBe('semillas');
+    });
+
+    it('conserva el slug explícito aunque el catálogo no lo tenga cargado', async () => {
+      const payload = makeSeedingPayload({
+        attributes: { name: 'Siembra de exotica - N/A', timestamp: '2026-06-10T00:00:00+00:00', status: 'done' },
+      });
+      const draft = await buildDraftFromSeeding(payload, { speciesSlug: 'especie_offline_id' });
+      expect(draft.subject_slug).toBe('especie_offline_id');
+    });
+
+    it('sin slug explícito mantiene la resolución por nombre (retrocompatible)', async () => {
+      const payload = makeSeedingPayload({
+        attributes: { name: 'Siembra de tomate - N/A', timestamp: '2026-06-10T00:00:00+00:00', status: 'done' },
+      });
+      const draft = await buildDraftFromSeeding(payload, {});
+      expect(draft.subject_slug).toBe('solanum_lycopersicum');
+    });
+  });
 });
