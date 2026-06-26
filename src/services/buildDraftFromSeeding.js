@@ -13,13 +13,20 @@ import { FARM_CONFIG } from '../config/defaults';
  * Crea un draft de FarmProcess desde un payload de log--seeding.
  *
  * @param {Object|null} payload — payload de SeedingLog
+ * @param {Object} [opts]
+ * @param {string|null} [opts.speciesSlug] — id canónico del catálogo elegido en
+ *   el selector de especies (SpeciesCombobox). Si viene, se usa DIRECTO como
+ *   subject_slug sin depender del parseo del nombre (bug operador 2026-06-25:
+ *   "Fresa - Invernadero #1" no resolvía). Si es null/desconocido, cae a la
+ *   resolución por nombre común (retrocompatible).
  * @returns {Promise<Object|null>} FarmProcessDraft o null si no es seeding
  */
-export async function buildDraftFromSeeding(payload) {
+export async function buildDraftFromSeeding(payload, opts = {}) {
   if (!payload || !payload.data || payload.data.type !== 'log--seeding') return null;
 
   const attrs = payload.data.attributes || {};
   const name = attrs.name || '';
+  const explicitSlug = opts && typeof opts.speciesSlug === 'string' ? opts.speciesSlug.trim() : '';
 
   const cropName = parseCropName(name);
   const quantity = extractQuantity(payload);
@@ -31,13 +38,22 @@ export async function buildDraftFromSeeding(payload) {
 
   try {
     const catalog = await getAllSpecies();
-    const match = findSpeciesInCatalog(cropName, catalog);
+    // Prioridad 1: id explícito del selector (camino grounded, sin ambigüedad).
+    const byId = explicitSlug
+      ? (Array.isArray(catalog) ? catalog.find((s) => s?.id === explicitSlug) : null)
+      : null;
+    const match = byId || findSpeciesInCatalog(cropName, catalog);
     if (match) {
       speciesSlug = match.id;
       subjectKind = match.tracking_mode || 'individual';
+    } else if (explicitSlug) {
+      // El id vino del selector pero el catálogo no lo tiene cargado (offline /
+      // subset): respetamos el slug igual, mejor que perderlo.
+      speciesSlug = explicitSlug;
     }
   } catch {
-    // catálogo caído — no romper, seguir sin slug
+    // catálogo caído — no romper. Si hubo id explícito, conservarlo.
+    if (explicitSlug) speciesSlug = explicitSlug;
   }
 
   if (subjectKind === 'aggregate') {
