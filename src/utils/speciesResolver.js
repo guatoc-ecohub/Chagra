@@ -127,6 +127,15 @@ const CURATED_ALIASES = {
   // frijol → frijol común (Phaseolus), no caupí (Vigna). Ambos son frijol,
   // pero el común es el default esperado por el operador.
   frijol: 'phaseolus_vulgaris',
+  // papa → papa canónica (Solanum tuberosum), NUNCA "papa china" (Colocasia
+  // esculenta) ni papayuela. Confusión surgida al ampliar el catálogo con
+  // colocasia ("Taro / Papa china"), cuyo nombre contiene la palabra "papa".
+  papa: 'solanum_tuberosum',
+  // guayaba → guayaba común (Psidium guajava, cultivar manzana) que tiene el
+  // ciclo PERENNE grounded de Agrosavia, NUNCA "Guayaba ácida" (Psidium
+  // friedrichsthalianum) ni otra Psidium. Confusión surgida al ampliar el
+  // catálogo con friedrichsthalianum, cuyo nombre común coincide más corto.
+  guayaba: 'psidium_guajava_manzana',
   // confusiones históricas del proyecto (gulupa/aguacate ≠ guayaba).
   gulupa: 'passiflora_edulis_morada',
   aguacate: 'persea_americana',
