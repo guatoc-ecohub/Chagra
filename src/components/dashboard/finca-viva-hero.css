@@ -56,6 +56,24 @@
   --fvh-tinta-suave: rgb(var(--c-slate-300, 78 92 66));
   --fvh-sello: rgb(var(--c-emerald-500, 47 107 58));
   --fvh-sombra-iso: rgba(60, 44, 20, 0.30);
+  /* SUPERFICIES DE TARJETA (globo del agente, compositor, chip de ubicación):
+     antes eran #fff fijo + texto --fvh-tinta. En los temas CLAROS (verde-vivo/
+     nature/minimalista) --fvh-tinta es tinta OSCURA → legible sobre blanco. Pero
+     en BIOPUNK (base) --fvh-tinta es casi-BLANCO → texto blanco sobre tarjeta
+     blanca = INVISIBLE (era el bug "Buenas, soy Chagra" y "2.923 msnm" tapados).
+     Solución cohesiva (misma disposición, distinta piel): la superficie deriva
+     del tema (--c-surface-card) y el texto de su par AA (--fvh-tinta sobre esa
+     superficie SIEMPRE contrasta, porque ambos vienen del mismo tema). */
+  --fvh-card-bg: rgb(var(--c-surface-card, 255 255 255));
+  --fvh-card-border: rgb(var(--c-surface-border, 255 255 255) / 0.9);
+  --fvh-card-tinta: var(--fvh-tinta);
+  --fvh-card-tinta-suave: var(--fvh-tinta-suave);
+  /* Color de los íconos del topbar (ayuda/perfil): antes #3a4a3a fijo (gris
+     oscuro) → invisible sobre el plinto/píldora oscura de biopunk. Ahora sigue
+     a la tinta del tema vía currentColor en el SVG. */
+  --fvh-pill-bg: rgb(var(--c-surface-card, 255 255 255));
+  --fvh-pill-border: rgb(var(--c-surface-border, 255 255 255) / 0.85);
+  --fvh-pill-ink: var(--fvh-tinta);
   --fvh-r: 24px;
   --fvh-max: 1180px;          /* ancho máximo del shell en desktop */
   --fvh-display: 'Baloo 2', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -140,6 +158,51 @@
   --fvh-lima-claro: #b6d3c4;
 }
 
+/* ── BIOPUNK (tema base, sin data-theme) — ESCENA COHERENTE CON LA NOCHE/NEÓN
+   (feedback operador #3: la escena se veía verde-DIURNA sobre cielo nocturno
+   con luna → incoherente; el boceto biopunk aprobado es navy + neón teal/
+   orquídea). En biopunk el tema YA es oscuro/neón, así que la escena debe leerse
+   en esa misma clave, NO como una finca diurna suelta.
+
+   Lo logramos SIN reescribir cada SVG: (1) el cielo del shell se fija en navy
+   (no celeste), y (2) un VELO de atmósfera neón sobre la escena unifica la
+   paleta (teal/orquídea) — el mismo recurso de veladura de clima-atmosfera.css.
+   Así el verde de las plantas queda integrado bajo el wash navy+neón en vez de
+   chillar como finca de mediodía. Los temas claros NO llevan velo (su escena
+   diurna SÍ es coherente con su piel). */
+/* Biopunk = tema base (sin data-theme). El velo neón está ON por defecto; los
+   temas claros lo apagan (--fvh-neon-velo:0). El cielo del shell en biopunk se
+   fija navy SIEMPRE (incluso de día), para que combine con la veladura neón de
+   la escena en vez de un celeste de mediodía suelto. La regla data-luz (navy de
+   noche) sigue válida; este default cubre el día. */
+.fvh {
+  --fvh-neon-velo: 1;
+  --fvh-cielo-a: #0c1830;       /* navy profundo del biopunk */
+  --fvh-cielo-b: #16263f;
+}
+/* Velo de atmósfera neón sobre la escena (solo biopunk). teal arriba-derecha
+   (donde va la luna del boceto) + orquídea abajo-izquierda + wash navy: integra
+   el verde de las plantas a la clave nocturna del tema. */
+.fvh-escena-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;                   /* sobre la escena (z2), bajo bichos (z7)/globo (z8) */
+  border-radius: inherit;
+  opacity: var(--fvh-neon-velo, 0);
+  background:
+    radial-gradient(120% 78% at 80% 12%, rgba(34, 211, 238, 0.26), transparent 56%),
+    radial-gradient(110% 92% at 16% 92%, rgba(217, 70, 239, 0.22), transparent 58%),
+    linear-gradient(180deg, rgba(8, 16, 34, 0.42) 0%, rgba(8, 16, 34, 0.08) 40%, rgba(10, 22, 44, 0.36) 100%);
+  transition: opacity 0.5s ease;
+}
+/* Temas claros: sin velo neón + su propio cielo (se define más arriba en sus
+   bloques [data-theme] .fvh). Su escena diurna SÍ combina con su piel. */
+[data-theme="verde-vivo"] .fvh,
+[data-theme="nature"] .fvh,
+[data-theme="minimalista"] .fvh { --fvh-neon-velo: 0; }
+
 /* ── SHELL de ancho máximo (clave del responsive desktop #7) ───────────────── */
 .fvh-shell {
   position: relative;
@@ -218,8 +281,12 @@
   margin: 0 auto 0 8px;          /* empuja levemente desde la marca */
   max-width: min(48%, 360px);
   cursor: pointer;
-  border: 1.5px solid rgba(255, 255, 255, 0.78);
-  background: rgba(255, 255, 255, 0.74);
+  /* Superficie del tema (no #fff fijo): en biopunk es navy con borde neón →
+     el texto del tema contrasta; en los claros es papel con borde tierra. Era
+     el bug del subtítulo "2.923 msnm · Frío" invisible (texto claro sobre chip
+     blanco en biopunk). */
+  border: 1.5px solid var(--fvh-card-border);
+  background: var(--fvh-card-bg);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
   border-radius: 16px;
@@ -234,7 +301,7 @@
   border-radius: 9px;
   display: grid;
   place-items: center;
-  background: rgba(47, 107, 58, 0.12);
+  background: rgb(var(--c-emerald-500, 47 107 58) / 0.16);
 }
 .fvh-ubic-txt {
   display: flex;
@@ -270,12 +337,23 @@
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.78);
+  /* Píldora del tema: navy+borde en biopunk, papel en los claros. El ícono usa
+     currentColor (la tinta del tema) en vez de #3a4a3a fijo, que se perdía
+     sobre el navy de biopunk. */
+  background: var(--fvh-pill-bg);
   box-shadow: 0 4px 11px rgba(60, 40, 10, 0.18);
-  border: 1.5px solid rgba(255, 255, 255, 0.82);
+  border: 1.5px solid var(--fvh-pill-border);
+  color: var(--fvh-pill-ink);
   cursor: pointer;
 }
 .fvh-pill svg { display: block; }
+/* El botón de PERFIL (feedback #2: "solo aparece el ?") se distingue del de
+   ayuda con un anillo de acento del tema, para que SIEMPRE se reconozca como el
+   acceso al perfil junto al "?". */
+.fvh-pill.fvh-pill-perfil {
+  box-shadow: 0 4px 11px rgba(60, 40, 10, 0.18),
+              0 0 0 2px rgb(var(--c-emerald-500, 47 107 58) / 0.55);
+}
 
 /* ── QA del operador (override de escala, oculto al usuario — feedback #6) ──── */
 .fvh-qa {
@@ -339,8 +417,8 @@
   left: 50%;
   top: 6px;
   transform: translateX(-50%);
-  background: #fff;
-  border: 2px solid #fff;
+  background: var(--fvh-card-bg);
+  border: 2px solid var(--fvh-card-border);
   border-radius: 18px 18px 18px 6px;
   padding: 10px 14px;
   max-width: 260px;
@@ -355,13 +433,13 @@
   font-family: var(--fvh-display);
   font-weight: 700;
   font-size: 14px;
-  color: var(--fvh-tinta);
+  color: var(--fvh-card-tinta);
   display: block;
 }
 .fvh-colibri-globo small {
   font-weight: 700;
   font-size: 11.5px;
-  color: var(--fvh-tinta-suave);
+  color: var(--fvh-card-tinta-suave);
   line-height: 1.32;
   display: block;
   margin-top: 1px;
@@ -373,7 +451,7 @@
   bottom: -9px;
   width: 16px;
   height: 16px;
-  background: #fff;
+  background: var(--fvh-card-bg);
   border-radius: 0 0 0 5px;
   transform: rotate(45deg);
   box-shadow: -3px 3px 6px rgba(40, 60, 40, 0.1);
@@ -470,10 +548,10 @@
 .fvh-aside { display: flex; flex-direction: column; }
 .fvh-composer-wrap { position: relative; z-index: 5; margin: -28px 16px 0; }
 .fvh-composer {
-  background: #fff;
+  background: var(--fvh-card-bg);
   border-radius: 24px;
   padding: 12px 12px 12px 14px;
-  box-shadow: 0 16px 34px rgba(40, 60, 40, 0.22), 0 0 0 1px rgba(38, 51, 31, 0.05);
+  box-shadow: 0 16px 34px rgba(40, 60, 40, 0.22), 0 0 0 1px var(--fvh-card-border);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -498,7 +576,11 @@
   font-family: var(--fvh-body);
   font-weight: 600;
   font-size: 14.5px;
-  color: #9aa595;
+  /* Placeholder: mezcla tinta del tema con su superficie → gris coherente y
+     legible (AA) sobre la tarjeta del tema, sea clara (verde-vivo/nature/
+     minimalista) u oscura (biopunk). Antes #9aa595 fijo desaparecía sobre el
+     navy de biopunk. */
+  color: color-mix(in srgb, var(--fvh-card-tinta) 62%, var(--fvh-card-bg));
 }
 .fvh-composer .mic {
   width: 44px;
@@ -788,76 +870,90 @@
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
-   CONTRASTE WCAG AA del HERO (extiende el #1859 que arregló los tiles del
-   "resto"). Aquí cubrimos lo que faltaba: los textos del HERO que se apoyan
-   DIRECTAMENTE sobre el cielo del shell (marca, saludo del agente, hint del
-   compositor, título de portales) y que en día sobre el celeste, y sobre todo
-   de NOCHE sobre el navy, quedaban gris-tenue ilegibles (tinta verde oscura
-   sobre fondo oscuro).
+   CONTRASTE WCAG AA del HERO — REESCRITO theme-aware (feedback operador #1:
+   "contraste roto en biopunk y en todo lado"; saludo del agente y subtítulo de
+   ubicación invisibles).
 
-   No tocamos los chips (su fondo blanco translúcido ya da contraste) ni los
-   portales (texto blanco sobre gradiente de color, ya AA). Solo reforzamos el
-   texto sobre el cielo descubierto.
+   Causa raíz: el contraste del texto sobre el CIELO del shell se decidía SOLO
+   por `data-luz` (proxy de "cielo oscuro"). Pero ahora el cielo de BIOPUNK es
+   navy SIEMPRE (de día también), así que la rama "día → texto oscuro" pintaba
+   tinta oscura sobre navy = ilegible. Y los textos en superficies de tarjeta
+   (globo/chip) heredaban una tinta que en biopunk era casi-blanca → blanco
+   sobre blanco.
+
+   Solución cohesiva (misma disposición, distinta piel): el color del texto
+   sobre el cielo sale de UN token por tema, `--fvh-on-cielo` (+ su variante
+   suave y acento), que cada tema fija según si su cielo es oscuro o claro. Los
+   temas CLAROS además viran a claro cuando el clima oscurece el cielo (noche/
+   amanecer/atardecer). Biopunk ya es oscuro siempre → texto claro siempre.
    ════════════════════════════════════════════════════════════════════════ */
 
-/* DÍA — el tinta suave (#4e5c42) sobre el celeste claro del cielo era borde:
-   lo oscurecemos a un verde más profundo (AA ≥4.5:1 sobre el degradado de
-   cielo) y le ponemos un velo de texto blanco tenue para asentarlo sobre la
-   parte más clara/saturada del gradiente. */
-.fvh .fvh-brand-txt span,
-.fvh .fvh-hero-saludo .h-small,
-.fvh .fvh-hero-saludo p,
-.fvh .fvh-composer-hint,
-.fvh .fvh-portales-tit {
-  color: #2c3a23;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.55);
+/* Tokens de texto-sobre-cielo. Default = BIOPUNK (cielo navy) → texto claro. */
+.fvh {
+  --fvh-on-cielo: #f4f7ef;                  /* casi-blanco, AA sobre navy */
+  --fvh-on-cielo-suave: #cfe0d6;            /* gris-verdoso claro, AA sobre navy */
+  --fvh-on-cielo-acento: #6ee7b7;           /* esmeralda neón (em + "SU AGENTE") */
+  --fvh-on-cielo-sombra: 0 1px 3px rgba(4, 10, 22, 0.78);
+  --fvh-on-cielo-div: linear-gradient(90deg, rgba(110, 231, 183, 0.5), transparent);
 }
-.fvh .fvh-brand-txt b,
-.fvh .fvh-hero-saludo h1 {
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+/* TEMAS CLAROS de DÍA (cielo claro) → texto OSCURO del tema (AA sobre celeste/
+   crema/papel). */
+[data-theme="verde-vivo"] .fvh,
+[data-theme="nature"] .fvh,
+[data-theme="minimalista"] .fvh {
+  --fvh-on-cielo: #20301a;
+  --fvh-on-cielo-suave: #33472a;
+  /* ACENTO (eyebrow "SU AGENTE AGROECOLÓGICO" + el <em> "su finca viva"): antes
+     era --c-emerald-500, que sobre el cielo del shell de los temas claros daba
+     SOLO 3.08–4.03:1 en el stop superior (turquesa/crema/papel) → bajo AA y se
+     veía "teal/olivo lavado" (audit Bug 1; #1886 cubrió el globo/perfil pero NO
+     este bloque). Subimos a --c-emerald-700 (verde bosque por tema): 5.10:1
+     verde-vivo · 5.80:1 nature · 9.63:1 minimalista en el stop superior = AA en
+     los 4. El <em> es texto grande (26px bold) y de todos modos pasa large-AA. */
+  --fvh-on-cielo-acento: rgb(var(--c-emerald-700));
+  --fvh-on-cielo-sombra: 0 1px 2px rgba(255, 255, 255, 0.55);
+  --fvh-on-cielo-div: linear-gradient(90deg, rgba(38, 51, 31, 0.2), transparent);
+}
+/* TEMAS CLAROS cuando el CLIMA oscurece el cielo (noche/amanecer/atardecer) →
+   viran a texto claro (cielo navy/naranja profundo). Biopunk no necesita esto:
+   ya es claro siempre. */
+[data-theme="verde-vivo"] .fvh[data-luz="noche"],
+[data-theme="verde-vivo"] .fvh[data-luz="amanecer"],
+[data-theme="verde-vivo"] .fvh[data-luz="atardecer"],
+[data-theme="nature"] .fvh[data-luz="noche"],
+[data-theme="nature"] .fvh[data-luz="amanecer"],
+[data-theme="nature"] .fvh[data-luz="atardecer"],
+[data-theme="minimalista"] .fvh[data-luz="noche"],
+[data-theme="minimalista"] .fvh[data-luz="amanecer"],
+[data-theme="minimalista"] .fvh[data-luz="atardecer"] {
+  --fvh-on-cielo: #f4f7ef;
+  --fvh-on-cielo-suave: #d7e6dd;
+  --fvh-on-cielo-acento: #bef264;
+  --fvh-on-cielo-sombra: 0 1px 3px rgba(8, 16, 28, 0.7);
+  --fvh-on-cielo-div: linear-gradient(90deg, rgba(244, 247, 239, 0.45), transparent);
 }
 
-/* NOCHE / AMANECER / ATARDECER — el cielo del shell se vuelve oscuro (navy o
-   naranja profundo). El texto del hero apoyado sobre él DEBE virar a claro,
-   o queda tinta-oscura-sobre-oscuro (ilegible). Flip a casi-blanco con un
-   velo oscuro para asentarlo (AA sobre el navy del nocturno). */
-.fvh[data-luz="noche"] .fvh-brand-txt b,
-.fvh[data-luz="noche"] .fvh-brand-txt span,
-.fvh[data-luz="noche"] .fvh-hero-saludo .h-small,
-.fvh[data-luz="noche"] .fvh-hero-saludo h1,
-.fvh[data-luz="noche"] .fvh-hero-saludo p,
-.fvh[data-luz="noche"] .fvh-composer-hint,
-.fvh[data-luz="noche"] .fvh-portales-tit,
-.fvh[data-luz="amanecer"] .fvh-brand-txt b,
-.fvh[data-luz="amanecer"] .fvh-brand-txt span,
-.fvh[data-luz="amanecer"] .fvh-hero-saludo .h-small,
-.fvh[data-luz="amanecer"] .fvh-hero-saludo h1,
-.fvh[data-luz="amanecer"] .fvh-hero-saludo p,
-.fvh[data-luz="amanecer"] .fvh-composer-hint,
-.fvh[data-luz="amanecer"] .fvh-portales-tit,
-.fvh[data-luz="atardecer"] .fvh-brand-txt b,
-.fvh[data-luz="atardecer"] .fvh-brand-txt span,
-.fvh[data-luz="atardecer"] .fvh-hero-saludo .h-small,
-.fvh[data-luz="atardecer"] .fvh-hero-saludo h1,
-.fvh[data-luz="atardecer"] .fvh-hero-saludo p,
-.fvh[data-luz="atardecer"] .fvh-composer-hint,
-.fvh[data-luz="atardecer"] .fvh-portales-tit {
-  color: #f4f7ef;
-  text-shadow: 0 1px 3px rgba(8, 16, 28, 0.7);
+/* Aplicación: TODO el texto que se apoya sobre el cielo descubierto del shell.
+   (El globo, el compositor y el chip de ubicación NO van aquí: viven sobre una
+   tarjeta del tema y ya resuelven su contraste con --fvh-card-tinta.) */
+.fvh .fvh-brand-txt b,
+.fvh .fvh-hero-saludo h1 {
+  color: var(--fvh-on-cielo);
+  text-shadow: var(--fvh-on-cielo-sombra);
 }
-/* El acento verde del título (em) y el rótulo "SU AGENTE…" se aclaran a un
-   lima brillante para no perder el realce sobre el navy. */
-.fvh[data-luz="noche"] .fvh-hero-saludo h1 em,
-.fvh[data-luz="amanecer"] .fvh-hero-saludo h1 em,
-.fvh[data-luz="atardecer"] .fvh-hero-saludo h1 em {
-  color: #bef264;
+.fvh .fvh-brand-txt span,
+.fvh .fvh-hero-saludo p,
+.fvh .fvh-composer-hint {
+  color: var(--fvh-on-cielo-suave);
+  text-shadow: var(--fvh-on-cielo-sombra);
 }
-.fvh[data-luz="noche"] .fvh-hero-saludo .h-small {
-  color: #cdeacb;
+.fvh .fvh-portales-tit {
+  color: var(--fvh-on-cielo);
+  text-shadow: var(--fvh-on-cielo-sombra);
 }
-/* El divisor del título de portales también se aclara para verse sobre navy. */
-.fvh[data-luz="noche"] .fvh-portales-tit span,
-.fvh[data-luz="amanecer"] .fvh-portales-tit span,
-.fvh[data-luz="atardecer"] .fvh-portales-tit span {
-  background: linear-gradient(90deg, rgba(244, 247, 239, 0.45), transparent);
+.fvh .fvh-hero-saludo .h-small,
+.fvh .fvh-hero-saludo h1 em {
+  color: var(--fvh-on-cielo-acento);
+  text-shadow: var(--fvh-on-cielo-sombra);
 }
+.fvh .fvh-portales-tit span { background: var(--fvh-on-cielo-div); }

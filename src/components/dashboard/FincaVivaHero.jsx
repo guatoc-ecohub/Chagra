@@ -251,22 +251,27 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
               aria-label="Ayuda"
               onClick={() => onNavigate?.('ayuda')}
             >
+              {/* currentColor → toma la tinta del tema (legible en biopunk navy y
+                  en los temas claros), no un gris fijo que se perdía. */}
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
-                <circle cx="12" cy="12" r="9" stroke="#3a4a3a" strokeWidth="2" />
-                <path d="M9.2 9.2a2.8 2.8 0 1 1 4 2.5c-.9.5-1.2 1-1.2 1.9" stroke="#3a4a3a" strokeWidth="2" strokeLinecap="round" fill="none" />
-                <circle cx="12" cy="17" r="1.2" fill="#3a4a3a" />
+                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+                <path d="M9.2 9.2a2.8 2.8 0 1 1 4 2.5c-.9.5-1.2 1-1.2 1.9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
+                <circle cx="12" cy="17" r="1.2" fill="currentColor" />
               </svg>
             </button>
+            {/* PERFIL (feedback #2): acceso al perfil junto al "?". Anillo de
+                acento del tema para que se reconozca SIEMPRE, no solo el "?". */}
             <button
               type="button"
-              className="fvh-pill"
-              title="Perfil"
-              aria-label="Perfil"
+              className="fvh-pill fvh-pill-perfil"
+              title="Mi perfil"
+              aria-label="Mi perfil"
+              data-testid="finca-viva-perfil"
               onClick={() => onNavigate?.('perfil')}
             >
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
-                <circle cx="12" cy="8.4" r="4" fill="#3a4a3a" />
-                <path d="M4.6 19.5c.7-3.7 3.8-5.8 7.4-5.8s6.7 2.1 7.4 5.8" stroke="#3a4a3a" strokeWidth="2" strokeLinecap="round" fill="none" />
+                <circle cx="12" cy="8.4" r="4" fill="currentColor" />
+                <path d="M4.6 19.5c.7-3.7 3.8-5.8 7.4-5.8s6.7 2.1 7.4 5.8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
               </svg>
             </button>
           </div>

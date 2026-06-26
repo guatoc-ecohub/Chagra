@@ -624,6 +624,60 @@
   text-shadow: none !important;
 }
 
+/* ───────────────────────────────────────────────────────────────────────────
+ * PILLS/CHIPS TENUES en temas claros (audit Bug 4, P3): los chips de leyenda del
+ * Calendario (Siembra/Cosecha/Nutrición/Fenología/Sanidad) usan texto
+ * `text-{teal,emerald,violet,rose}-200` (muy claro) sobre un relleno
+ * `bg-{color}-500/20` → en los 3 temas claros quedaba claro-sobre-claro (~1.2:1).
+ * En biopunk (oscuro, sin data-theme) se ven bien y NO se tocan.
+ *
+ * Subimos el texto al tono -800 del color (5.5–6.9:1 sobre el relleno) y ALIGERAMOS
+ * el relleno (de /20 a /14) para que el tono profundo respire. Conserva la
+ * SEMÁNTICA de color de cada capa (sigue leyéndose teal/verde/violeta/rosa/ámbar).
+ * Solo afecta a estos chips por la combinación de clases; el resto de la app que
+ * use estos colores ya tenía sus propias reglas. */
+[data-theme="nature"] .text-teal-200,
+[data-theme="minimalista"] .text-teal-200,
+[data-theme="verde-vivo"] .text-teal-200{ color: rgb(17 94 89) !important; text-shadow: none !important; }
+[data-theme="nature"] .text-emerald-200,
+[data-theme="minimalista"] .text-emerald-200,
+[data-theme="verde-vivo"] .text-emerald-200{ color: rgb(22 101 52) !important; text-shadow: none !important; }
+[data-theme="nature"] .text-violet-200,
+[data-theme="minimalista"] .text-violet-200,
+[data-theme="verde-vivo"] .text-violet-200{ color: rgb(91 33 182) !important; text-shadow: none !important; }
+[data-theme="nature"] .text-rose-200,
+[data-theme="minimalista"] .text-rose-200,
+[data-theme="verde-vivo"] .text-rose-200{ color: rgb(159 18 57) !important; text-shadow: none !important; }
+/* Relleno de los chips de leyenda (bg-{color}-500/20) → /14: más papel, el tono
+ * -800 del texto destaca. (text-amber-200 ya lo cubre la regla de arriba.) */
+[data-theme="nature"] .bg-teal-500\/20,
+[data-theme="minimalista"] .bg-teal-500\/20,
+[data-theme="verde-vivo"] .bg-teal-500\/20{ background-color: rgb(20 184 166 / 0.14) !important; }
+[data-theme="nature"] .bg-emerald-500\/20,
+[data-theme="minimalista"] .bg-emerald-500\/20,
+[data-theme="verde-vivo"] .bg-emerald-500\/20{ background-color: rgb(16 185 129 / 0.14) !important; }
+[data-theme="nature"] .bg-violet-500\/20,
+[data-theme="minimalista"] .bg-violet-500\/20,
+[data-theme="verde-vivo"] .bg-violet-500\/20{ background-color: rgb(139 92 246 / 0.14) !important; }
+[data-theme="nature"] .bg-rose-500\/20,
+[data-theme="minimalista"] .bg-rose-500\/20,
+[data-theme="verde-vivo"] .bg-rose-500\/20{ background-color: rgb(244 63 94 / 0.14) !important; }
+[data-theme="nature"] .bg-amber-500\/20,
+[data-theme="minimalista"] .bg-amber-500\/20,
+[data-theme="verde-vivo"] .bg-amber-500\/20{ background-color: rgb(245 158 11 / 0.14) !important; }
+
+/* Pill "en preparación" del FAQ (text-amber-400/70 sobre bg-amber-400/10): el
+ * alpha /70 la dejaba fantasmal en claros. La afirmamos al ámbar profundo del
+ * tema (color sólido, sin el /70) y reforzamos su relleno para que el chip se
+ * distinga del fondo. El modificador de opacidad /70 es una clase aparte
+ * (.text-amber-400\/70), no la cubre la regla .text-amber-400 de arriba. */
+[data-theme="nature"] .text-amber-400\/70,
+[data-theme="minimalista"] .text-amber-400\/70,
+[data-theme="verde-vivo"] .text-amber-400\/70{ color: rgb(160 76 20) !important; text-shadow: none !important; }
+[data-theme="nature"] .bg-amber-400\/10,
+[data-theme="minimalista"] .bg-amber-400\/10,
+[data-theme="verde-vivo"] .bg-amber-400\/10{ background-color: rgb(245 158 11 / 0.16) !important; }
+
 /* Bordes blancos (sólidos y con opacidad) → línea sutil del tema. */
 [data-theme="minimalista"] .border-white,
 [data-theme="minimalista"] [class*="border-white\/"],

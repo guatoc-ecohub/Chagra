@@ -81,13 +81,21 @@ html:not([data-theme])[data-luz="noche"] {
   --w-night-a: 0;
 }
 /* TEMAS CLAROS SIEMPRE CLAROS (operador 2026-06-20: "siempre claro como los
- * demos"). nature y minimalista NO adoptan la veladura navy ni el tinte azul
- * de noche: conservan su atmósfera diurna a cualquier hora. !important para
- * ganar sobre las reglas de clima nocturno (p.ej. niebla/lluvia de noche, de
- * igual especificidad) sin depender del orden de declaración. La modulación
- * climática DIURNA (nubes/lluvia/sol) se mantiene intacta. */
+ * demos"). nature, minimalista y verde-vivo NO adoptan la veladura navy ni el
+ * tinte azul de noche: conservan su atmósfera diurna a cualquier hora.
+ * !important para ganar sobre las reglas de clima nocturno (p.ej. niebla/lluvia
+ * de noche, de igual especificidad) sin depender del orden de declaración. La
+ * modulación climática DIURNA (nubes/lluvia/sol) se mantiene intacta.
+ *
+ * VERDE VIVO (audit "OJO"): es un tema CLARO igual que nature/minimalista, pero
+ * quedó FUERA de esta exención (se añadió en #1871, después de #1747). De noche
+ * el velo navy plano (0.25) + tinte azul (0.10) se sumaba sobre su crema y
+ * AGRAVABA el lavado del bloque finca-viva y demás texto claro. Con verde-vivo
+ * aquí, los 3 temas claros quedan exentos por igual. Biopunk (base, sin
+ * data-theme) conserva su modo nocturno por diseño. */
 html[data-theme="nature"][data-luz="noche"],
-html[data-theme="minimalista"][data-luz="noche"] {
+html[data-theme="minimalista"][data-luz="noche"],
+html[data-theme="verde-vivo"][data-luz="noche"] {
   --w-night-a: 0 !important;
   --w-tint-a: 0 !important;
 }
