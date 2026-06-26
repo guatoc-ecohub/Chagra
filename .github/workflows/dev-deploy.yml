@@ -53,9 +53,12 @@ jobs:
           VITE_HA_ACCESS_TOKEN: ${{ secrets.VITE_HA_ACCESS_TOKEN }}
           VITE_USE_SIDECAR_AGRO_MCP: "true"
           VITE_FINCA_VIVA_HOME_PERFIL: "true"
-          # PRUEBA dev-only: colibrí 3D en el home Finca Viva + el FAB del agente.
-          # Solo en dev; en prod (deploy.yml) esta flag NO existe → colibrí 2D.
-          VITE_COLIBRI_3D: "true"
+          # Colibrí REAL (barbudito de páramo) en home (ventana viva) + FAB
+          # (posado) + transición (fly-across). Dev-only para revisión del
+          # operador; AUSENTE en deploy.yml (prod) → prod conserva el colibrí 2D
+          # / video actual. Reemplaza el colibrí 3D rechazado (la flag
+          # VITE_COLIBRI_3D quedó retirada del preview).
+          VITE_COLIBRI: "true"
           # Registro unificado (#23): puerta única "Registrar" (voz + manual) en
           # dev. OFF en prod (deploy.yml no la define) hasta el visto bueno.
           VITE_REGISTRO_UNIFICADO: "true"

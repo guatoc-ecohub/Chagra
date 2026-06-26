@@ -86,8 +86,8 @@
 |-----------|-------------|
 | `ChagraAgentAvatar.jsx` | Avatar del agente |
 | `ChagraAgentAvatarColibri.jsx` | Avatar colibrí |
-| `ChagraAgentAvatarColibri3D.jsx` | Avatar colibrí 3D |
 | `ChagraAgentAvatarColibriPhoto.jsx` | Avatar colibrí con foto |
+| `colibri/Barbudito.jsx` | Colibrí real (barbudito de páramo): ventana viva (home), posado (FAB), fly-across (transición). Gateado por `VITE_COLIBRI` |
 | `ChagraAgentAvatarMaiz.jsx` | Avatar maíz |
 | `AgentFab.jsx` | Botón flotante del agente |
 | `AgentDemoExample.jsx` | Demo del agente |

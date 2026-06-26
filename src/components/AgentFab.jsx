@@ -1,18 +1,19 @@
 import React, { useState, useCallback } from 'react';
 import ChagraAgentAvatar from './ChagraAgentAvatar';
-import ChagraColibri3DLite from './ChagraColibri3DLite';
 import useAgentNotificationStore from '../store/useAgentNotificationStore';
 import usePrefsStore from '../store/usePrefsStore';
 import { isSpeaking, stop, replayLast, isKokoroAvailable } from '../services/ttsService';
 import { agentSounds } from '../services/agentSoundService';
 import { fvhSkinClass } from '../config/fvhSkin';
-import { colibri3dActivo } from '../config/colibri3dFlag';
+import { colibriRealActivo } from '../config/colibriFlag';
+import { BarbuditoPosado } from './colibri/Barbudito';
 import './agent-fab-skin.css';
 
-// PRUEBA dev-only: con la flag VITE_COLIBRI_3D ON (dev) el FAB lleva un colibrí
-// 3D que aletea sutil; con la flag OFF (prod) conserva su avatar 2D actual. Flag
-// de build (no cambia en runtime), por eso se evalúa una vez al cargar el módulo.
-const COLIBRI_3D = colibri3dActivo();
+// ¿Avatar del FAB = colibrí REAL (barbudito posado)? Gateado por VITE_COLIBRI
+// (dev-only). Con la flag OFF (prod) el FAB conserva su avatar actual
+// (ChagraAgentAvatar). Se evalúa una sola vez (flag de build). Reemplaza el
+// colibrí 3D rechazado (ChagraColibri3DLite / VITE_COLIBRI_3D, retirado).
+const COLIBRI_REAL = colibriRealActivo();
 
 /**
  * AgentFab — Floating Action Button para abrir el agente Chagra IA.
@@ -135,13 +136,10 @@ export default function AgentFab({ onNavigate }) {
         transition: 'transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease, background .25s ease, border-color .25s ease',
       }}
     >
-      {COLIBRI_3D ? (
-        <ChagraColibri3DLite
-          variant="fab"
-          state={state}
-          size={50}
-          ariaLabel="Chagra IA"
-        />
+      {COLIBRI_REAL ? (
+        // Colibrí REAL (barbudito POSADO recortado), con un leve flotar. El
+        // botón ya es circular y recorta (overflow:hidden).
+        <BarbuditoPosado size={46} ariaLabel="Chagra IA" />
       ) : (
         <ChagraAgentAvatar state={state} size={48} ariaLabel="Chagra IA" glow={responseReady} />
       )}
