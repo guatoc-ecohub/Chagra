@@ -1,11 +1,19 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish --
+ * Los textos de UI de este paso de confirmación (rótulos de campos, botones
+ * "Cancelar"/"Guardar registro", avisos de GPS) son strings de interfaz. Su
+ * migración a src/config/messages.js es la TAREA i18n de ADR-050 (transversal a
+ * toda la app), fuera del alcance de este fix — mismo criterio que los hermanos
+ * de este flujo (DashboardLive.jsx, FincaVivaHero.jsx, FincaCards.jsx,
+ * MiFincaVivaHomeCard.jsx). Los errores reales de ESLint siguen activos. */
 import React, { lazy, Suspense, useMemo, useRef, useState } from 'react';
 import {
-  Check, X, MapPin, LocateFixed, Leaf, AlertTriangle, Sprout, Pencil,
+  Check, X, MapPin, LocateFixed, AlertTriangle, Sprout, Pencil,
 } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { geoJsonToWkt, latLngToPoint, wktToGeoJson } from '../utils/geo';
 import { INTENTS, INTENT_META } from '../services/voiceFieldExtractor';
+import SpeciesCombobox from './SpeciesCombobox';
 
 const MapPicker = lazy(() => import('./MapPicker').then((m) => ({ default: m.MapPicker || m.default })));
 
@@ -43,7 +51,14 @@ export default function RegistroVozConfirm({ record, onConfirm, onCancel, isSavi
   const primary = (record.species && record.species[0]) || null;
 
   const [intent, setIntent] = useState(record.intent);
+  // Especie: NOMBRE común (subject) + SLUG del catálogo (speciesId) separados.
+  // Se precargan con lo que la voz extrajo (ej. "Durazno" → prunus_persica),
+  // pero el usuario CONFIRMA/CAMBIA desde el catálogo con SpeciesCombobox, igual
+  // que en SeedingLog. Así la especie del registro por voz resuelve siempre a un
+  // slug canónico para calendario/fenología (texto libre = salida explícita,
+  // marcada por el propio combobox, con slug null).
   const [subject, setSubject] = useState(primary?.common || record.speciesHint || primary?.raw || '');
+  const [speciesId, setSpeciesId] = useState(primary?.slug || null);
   const [cantidad, setCantidad] = useState(record.measures?.cantidad ?? '');
   const [alturaM, setAlturaM] = useState(record.measures?.altura_m ?? '');
   const [anchoM, setAnchoM] = useState(record.measures?.ancho_m ?? '');
@@ -87,18 +102,33 @@ export default function RegistroVozConfirm({ record, onConfirm, onCancel, isSavi
     }
   }, [georef, requestGps]);
 
-  const slug = primary?.slug || null;
-  const subjectEdited = subject.trim() && subject.trim().toLowerCase() !== (primary?.common || '').toLowerCase();
-
   const handleConfirm = () => {
     if (isSaving) return;
-    // Reconstruye el registro editado preservando lo no-editable.
+    // Reconstruye el registro editado preservando lo no-editable. La especie sale
+    // del SpeciesCombobox: `subject` = nombre común, `speciesId` = slug del
+    // catálogo (o null si el usuario eligió texto libre marcado).
     let species = record.species || [];
     let speciesHint = record.speciesHint || null;
     const typed = subject.trim();
     if (typed) {
-      if (species.length > 0) species = [{ ...species[0], common: typed }, ...species.slice(1)];
-      else speciesHint = typed;
+      const base = species[0] || {};
+      if (speciesId) {
+        // Especie grounded del catálogo: hila el slug canónico (calendario,
+        // fenología, plan). Si cambió respecto a lo extraído, descartamos el
+        // `canonical` viejo para no mezclar nombre científico de otra especie.
+        const canonical = base.slug === speciesId ? (base.canonical || null) : null;
+        species = [{ ...base, common: typed, slug: speciesId, canonical }, ...species.slice(1)];
+        speciesHint = null;
+      } else if (species.length > 0) {
+        // Texto libre marcado: sin slug (el combobox ya advirtió que no resuelve).
+        species = [{ ...base, common: typed, slug: null, canonical: null }, ...species.slice(1)];
+      } else {
+        speciesHint = typed;
+      }
+    } else {
+      // Sin especie: no inventamos ninguna.
+      species = [];
+      speciesHint = null;
     }
     const num = (v) => (v === '' || v == null ? null : Number(v));
     const edited = {
@@ -154,30 +184,18 @@ export default function RegistroVozConfirm({ record, onConfirm, onCancel, isSavi
         </div>
       </section>
 
-      {/* Sujeto / especie */}
-      <Field label="Cultivo o especie">
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            placeholder="ej. durazno"
-            className={`${INPUT_CLS} flex-1`}
-            disabled={isSaving}
-          />
-          {slug && !subjectEdited && (
-            <span className="inline-flex items-center gap-1 text-2xs text-emerald-300/90 shrink-0" title={primary?.canonical || ''}>
-              <Leaf size={12} /> catálogo ✓
-            </span>
-          )}
-        </div>
-        {primary?.canonical && !subjectEdited && (
-          <span className="text-2xs text-lime-300/80">{primary.canonical}</span>
-        )}
-        {record.speciesHint && !slug && (
-          <span className="text-2xs text-slate-500">Oí: "{record.speciesHint}" — no está en el catálogo, queda como texto.</span>
-        )}
-      </Field>
+      {/* Sujeto / especie — SELECTOR del catálogo (no texto libre). Mismo
+          SpeciesCombobox que SeedingLog (#1879): precargado con lo que la voz
+          extrajo, pero el usuario ELIGE/confirma del catálogo → resuelve al slug
+          canónico. El texto libre queda como salida explícita y marcada. */}
+      <SpeciesCombobox
+        label="Cultivo o especie"
+        value={subject}
+        speciesId={speciesId}
+        inputName="voz-cultivo"
+        placeholder="Buscar especie… (ej: durazno, mora, café)"
+        onChange={(name, id) => { setSubject(name); setSpeciesId(id || null); }}
+      />
 
       {/* Medidas contextuales */}
       <div className="grid grid-cols-3 gap-2">

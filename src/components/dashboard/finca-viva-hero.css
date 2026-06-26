@@ -67,6 +67,17 @@
   flex-direction: column;
   align-items: center;        /* centra el shell de ancho máximo en desktop */
   min-height: 100dvh;
+  /* NO COMPRIMIR el hero por debajo de su contenido (fix hoja "resto" tapa los
+     portales, 2026-06-25). El hero es un flex-item del scroller de DashboardLive
+     (h-[100dvh] flex-col en App.jsx con la flag F2). En móvil el contenido
+     —escena 360px + compositor + saludo + los 4 PORTALES— supera el viewport;
+     con flex-shrink:1 (default) el algoritmo flex encogía .fvh hasta 100dvh
+     (su min-height explícita) y `overflow:hidden` RECORTABA la fila inferior de
+     portales (Jugar/Agente). La hoja .fvh-resto (margin-top:-22px) caía entonces
+     sobre esa zona recortada y los tapaba. flex-shrink:0 hace que el hero crezca
+     hasta su contenido (los 4 portales SIEMPRE completos) y la hoja arranque
+     debajo del último portal. */
+  flex-shrink: 0;
   overflow: hidden;
   font-family: var(--fvh-body);
   color: var(--fvh-tinta);
@@ -642,7 +653,13 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-.fvh-fill { flex: 1 1 auto; }
+/* Aire bajo los portales: garantiza un colchón SIEMPRE presente entre el último
+   portal y el borde inferior del hero, para que la "subida" de la hoja .fvh-resto
+   (su margin-top:-22px) se solape sobre este colchón vacío del hero —el efecto
+   "hoja que sube"— y NUNCA sobre las tarjetas de los portales. Cuando el
+   contenido excede el viewport (flex-shrink:0 arriba), el flex-grow no aporta
+   espacio, así que la cota mínima es lo que asegura el colchón. */
+.fvh-fill { flex: 1 1 auto; min-height: 36px; }
 
 /* ── Vista institucional (slot children del extensionista) ─────────────────── */
 .fvh-institucional {
