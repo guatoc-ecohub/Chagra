@@ -135,3 +135,23 @@
 .fvh-resto [class*="from-slate-900"] .text-slate-500.group-hover\:text-slate-300 {
   color: #cbd5e1 !important;
 }
+
+/* ── Bloque "Consultar y aprender" colapsable (audit 2026-06-26 §4) ─────────
+   Es de consulta ocasional, no del primer scroll: va en un <details> abierto
+   por defecto pero plegable. Ocultamos el marcador nativo y dejamos el rótulo
+   (BlockLabel) como toda la cabecera clicable; un chevron sutil indica el
+   estado. */
+.fvh-resto .fvh-consultar > summary { list-style: none; }
+.fvh-resto .fvh-consultar > summary::-webkit-details-marker { display: none; }
+.fvh-resto .fvh-consultar > summary > p { margin-bottom: 8px; }
+.fvh-resto .fvh-consultar > summary > p::after {
+  content: "▾";
+  margin-left: auto;
+  font-size: 13px;
+  opacity: 0.7;
+  transition: transform 160ms ease;
+}
+.fvh-resto .fvh-consultar[open] > summary > p::after { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) {
+  .fvh-resto .fvh-consultar > summary > p::after { transition: none; }
+}

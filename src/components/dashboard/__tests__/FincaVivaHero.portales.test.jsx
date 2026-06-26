@@ -4,11 +4,11 @@ import '@testing-library/jest-dom';
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Home F2 "Finca Viva" — los 4 portales del hero deben llevar a SU destino:
-//   · Gestionar → la GESTIÓN de la finca (registros/acciones), NO el juego.
+//   · Mi finca  → la GESTIÓN de la finca (registros/acciones), NO el juego.
 //                 (bug: iba a onNavigate('juego'), igual que el portal "Jugar".)
 //   · Aprender  → la vista 'aprende'.
 //   · Jugar     → la vista 'juego' (ese SÍ es el juego).
-//   · Agente    → abre el agente (onOpenAgent).
+//   · Pregúntele a Chagra → abre el agente (onOpenAgent).
 // Y el resto del shell F2 (chip de ubicación, pastilla de ayuda, pastilla de
 // perfil) debe navegar a su ruta, sin botones muertos.
 
@@ -54,22 +54,22 @@ describe('FincaVivaHero — los 4 portales llevan a su destino correcto', () => 
       .find((b) => portalLabel(b) === nombre);
   };
 
-  test('el portal "Gestionar" NO navega al juego', () => {
+  test('el portal "Mi finca" NO navega al juego', () => {
     const { onNavigate } = renderHero();
-    fireEvent.click(getPortal('Gestionar'));
+    fireEvent.click(getPortal('Mi finca'));
     expect(onNavigate).not.toHaveBeenCalledWith('juego');
   });
 
-  test('el portal "Gestionar" abre la GESTIÓN de la finca (onGestionar), no otra vista', () => {
+  test('el portal "Mi finca" abre la GESTIÓN de la finca (onGestionar), no otra vista', () => {
     const { onNavigate, onOpenAgent, onGestionar } = renderHero();
-    fireEvent.click(getPortal('Gestionar'));
+    fireEvent.click(getPortal('Mi finca'));
     expect(onGestionar).toHaveBeenCalledTimes(1);
     // No se cuela a ninguna otra ruta ni al agente.
     expect(onNavigate).not.toHaveBeenCalled();
     expect(onOpenAgent).not.toHaveBeenCalled();
   });
 
-  test('sin onGestionar, "Gestionar" hace scroll al ancla #finca-gestion (no al juego)', () => {
+  test('sin onGestionar, "Mi finca" hace scroll al ancla #finca-gestion (no al juego)', () => {
     const onNavigate = vi.fn();
     const seccion = document.createElement('div');
     seccion.id = 'finca-gestion';
@@ -77,7 +77,7 @@ describe('FincaVivaHero — los 4 portales llevan a su destino correcto', () => 
     document.body.appendChild(seccion);
 
     render(<FincaVivaHero onNavigate={onNavigate} onOpenAgent={vi.fn()} />);
-    fireEvent.click(getPortal('Gestionar'));
+    fireEvent.click(getPortal('Mi finca'));
 
     expect(seccion.scrollIntoView).toHaveBeenCalledTimes(1);
     expect(onNavigate).not.toHaveBeenCalledWith('juego');
@@ -96,18 +96,18 @@ describe('FincaVivaHero — los 4 portales llevan a su destino correcto', () => 
     expect(onNavigate).toHaveBeenCalledWith('juego');
   });
 
-  test('el portal "Agente" abre el agente (onOpenAgent), no navega a una vista', () => {
+  test('el portal "Pregúntele a Chagra" abre el agente (onOpenAgent), no navega a una vista', () => {
     const { onNavigate, onOpenAgent } = renderHero();
-    fireEvent.click(getPortal('Agente'));
+    fireEvent.click(getPortal('Pregúntele a Chagra'));
     expect(onOpenAgent).toHaveBeenCalledTimes(1);
     expect(onNavigate).not.toHaveBeenCalled();
   });
 
-  test('cada portal mapea a un destino distinto (Gestionar ≠ Jugar)', () => {
+  test('cada portal mapea a un destino distinto (Mi finca ≠ Jugar)', () => {
     const { onNavigate, onOpenAgent, onGestionar } = renderHero();
-    fireEvent.click(getPortal('Gestionar'));
+    fireEvent.click(getPortal('Mi finca'));
     fireEvent.click(getPortal('Jugar'));
-    // Gestionar fue a la gestión; Jugar al juego. No coinciden.
+    // Mi finca fue a la gestión; Jugar al juego. No coinciden.
     expect(onGestionar).toHaveBeenCalledTimes(1);
     expect(onNavigate).toHaveBeenCalledWith('juego');
     expect(onNavigate).not.toHaveBeenCalledWith('gestionar');
