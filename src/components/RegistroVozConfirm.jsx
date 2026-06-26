@@ -163,11 +163,15 @@ export default function RegistroVozConfirm({ record, onConfirm, onCancel, isSavi
 
   return (
     <div className="p-4 flex flex-col gap-4">
-      {/* Transcripción */}
-      <section className="bg-slate-900 border border-slate-800 rounded-xl p-3">
-        <p className="text-2xs uppercase font-bold text-slate-500 mb-1">Lo que oí</p>
-        <p className="text-sm text-slate-200 italic">"{record.transcription}"</p>
-      </section>
+      {/* Transcripción — solo en el camino de VOZ. En el respaldo manual del
+          registro unificado (#23) no hay transcripción, así que no se muestra
+          la caja vacía "Lo que oí" con comillas vacías. */}
+      {record.transcription && (
+        <section className="bg-slate-900 border border-slate-800 rounded-xl p-3">
+          <p className="text-2xs uppercase font-bold text-slate-500 mb-1">Lo que oí</p>
+          <p className="text-sm text-slate-200 italic">"{record.transcription}"</p>
+        </section>
+      )}
 
       {/* Selector de intención (chips) */}
       <section>
