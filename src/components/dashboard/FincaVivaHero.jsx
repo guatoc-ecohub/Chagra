@@ -9,7 +9,7 @@ import { listFarmProcesses } from '../../db/farmProcessCache';
 import useAssetStore from '../../store/useAssetStore';
 import { buildFincaScene } from '../../services/fincaSceneService';
 import { selectSceneVariant, SCENE_KINDS } from '../../services/fincaSceneProfileSelector';
-import { getProfile } from '../../services/userProfileService';
+import { getProfile, saveProfile } from '../../services/userProfileService';
 import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciarAccess';
 import { deriveAtmosphere } from '../../services/atmosphereService';
 import { resolveClimaLocation, getCachedClimaSnapshot, CLIMA_UPDATED_EVENT } from '../../services/climaService';
@@ -125,6 +125,27 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
   const operador = useMemo(() => {
     try { return esOperadorActual(); } catch (_) { return false; }
   }, []);
+
+  // ── Nivel de respuestas del agente ("Claro y corto" / "Con detalle") ──────
+  // El toggle vive JUNTO al compositor del agente (es una preferencia de CÓMO
+  // responde Chagra, no una decoración de la barra). Renombrado del antiguo
+  // "🌾 Campesino / 🔬 Experto" del AgentHero (flag OFF) a un nombre sobre la
+  // RESPUESTA, no sobre la persona — de-estigmatiza (audit 2026-06-26 §5). El
+  // cableado es el MISMO motor real: persiste `nivel_respuestas` en el perfil
+  // (simple=claro/corto · detallado=con detalle), el campo que lee
+  // buildUserProfileBlock para el system-prompt del LLM. No reinventa el motor.
+  const [nivelRespuestas, setNivelRespuestas] = useState(() => {
+    try { return getProfile()?.nivel_respuestas === 'detallado' ? 'detallado' : 'simple'; }
+    catch (_) { return 'simple'; }
+  });
+  const detalladoActivo = nivelRespuestas === 'detallado';
+  const cambiarNivel = (next) => {
+    if (next === nivelRespuestas) return;
+    setNivelRespuestas(next);
+    // saveProfile puede no existir en algunos mocks de test (perfil opcional).
+    try { if (typeof saveProfile === 'function') saveProfile({ nivel_respuestas: next }); }
+    catch (_) { /* perfil opcional: el toggle igual refleja la elección en sesión */ }
+  };
 
   // ── Cielo real: hora + clima (REUSA atmosphereService, no inventa motor) ──
   const atmosfera = useAtmosferaEscena();
@@ -347,6 +368,37 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
                 </span>
               </button>
               <div className="fvh-composer-hint">Toque 🎙️ y pregunte en voz alta — o escriba arriba</div>
+
+              {/* NIVEL DE RESPUESTA — junto al agente, porque define CÓMO le
+                  responde Chagra. Renombrado del antiguo "Campesino/Experto"
+                  (que clasificaba a la persona) a un nombre sobre la RESPUESTA:
+                  "Claro y corto" / "Con detalle". Cableado al MISMO
+                  `nivel_respuestas` que arma el system-prompt del LLM. */}
+              <div
+                className="fvh-nivel"
+                role="radiogroup"
+                aria-label="Cómo le responde Chagra"
+                data-testid="finca-viva-nivel-respuestas"
+              >
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={!detalladoActivo}
+                  className={`fvh-nivel-btn ${!detalladoActivo ? 'on' : ''}`}
+                  onClick={() => cambiarNivel('simple')}
+                >
+                  Claro y corto
+                </button>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={detalladoActivo}
+                  className={`fvh-nivel-btn ${detalladoActivo ? 'on' : ''}`}
+                  onClick={() => cambiarNivel('detallado')}
+                >
+                  Con detalle
+                </button>
+              </div>
             </div>
 
             {/* HERO TEXT */}
@@ -692,7 +744,8 @@ const COLIBRI = {
 };
 
 /**
- * Los 4 portales/lugares del home F2. El badge de "Gestionar" refleja el DATO
+ * Los 4 portales/lugares del home F2 ("Mi finca", "Aprender", "Jugar",
+ * "Pregúntele a Chagra"). El badge del portal "Mi finca" refleja el DATO
  * REAL de la finca (0 siembras → "EMPIECE AQUÍ"; con siembras → resumen real).
  */
 function buildPortales({ onNavigate, abrirAgente, irAGestion, scene, poblada, escala }) {
@@ -715,7 +768,7 @@ function buildPortales({ onNavigate, abrirAgente, irAGestion, scene, poblada, es
   return [
     {
       id: 'gestionar',
-      titulo: 'Gestionar',
+      titulo: 'Mi finca',
       desc: 'Registre y cuide sus siembras, zonas y animales.',
       emoji: '🌱',
       clase: 'p-gestionar',
@@ -751,7 +804,7 @@ function buildPortales({ onNavigate, abrirAgente, irAGestion, scene, poblada, es
     },
     {
       id: 'agente',
-      titulo: 'Agente',
+      titulo: 'Pregúntele a Chagra',
       desc: 'Pregunte lo que sea: respuestas con su fuente.',
       emoji: '💬',
       clase: 'p-agente',

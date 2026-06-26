@@ -3,11 +3,12 @@ import { render, screen, fireEvent, cleanup, waitFor, within } from '@testing-li
 import '@testing-library/jest-dom';
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// Redistribución de "el resto de su finca" (auditoría §7.2 + §7.4 #2):
-// verifica que los tiles se reparten en los grupos correctos, en el orden de
-// jerarquía esperado (Destacado → Aprender → Gestión → Mercado) y que cada tile
-// navega a su ruta. Cubre el layout F2 ON (que filtra el hub `aprende` porque ya
-// es portal del hero) y el legacy OFF (que sí muestra el hub `aprende`).
+// Reorganización del HOME F2 EN 5 BLOQUES (audit botones/distribución
+// 2026-06-26). Verifica que, con la flag F2 ON, el "resto de su finca" se ordena
+// por el flujo mental del campesino (estado → tengo → hago → consulto → vendo),
+// con copy campesino, dedup aplicado y el bloque condicional de proyectos BAJADO.
+// Y que con la flag OFF el home conserva su layout legacy (grid draggable +
+// AIStatusFooter + rótulos viejos) — "flag OFF = home actual intacto".
 
 vi.mock('../../../config/glaciarAccess', () => ({
   tieneAccesoGlaciarActual: () => false,
@@ -23,7 +24,7 @@ vi.mock('../../../config/extensionistaAccess', () => ({
 }));
 
 vi.mock('../AgentHero', () => ({ default: () => <div data-testid="agent-hero" /> }));
-// Capturamos las props del hero para verificar el cableado del portal "Gestionar"
+// Capturamos las props del hero para verificar el cableado del portal "Mi finca"
 // (onGestionar) sin montar todo el hero. El botón expuesto invoca onGestionar tal
 // como lo haría el portal real.
 let lastHeroProps = null;
@@ -33,7 +34,7 @@ vi.mock('../FincaVivaHero', () => ({
     return (
       <div data-testid="finca-viva-hero">
         <button type="button" data-testid="hero-gestionar" onClick={() => props.onGestionar?.()}>
-          Gestionar
+          Mi finca
         </button>
         {props.children}
       </div>
@@ -45,10 +46,10 @@ vi.mock('../../OnboardingHero', () => ({ default: () => <div /> }));
 vi.mock('../SelectedBackgroundReveal', () => ({ default: () => <div /> }));
 vi.mock('../MiFincaVivaHomeCard', () => ({ default: () => <div /> }));
 vi.mock('../../CaseStudyTopWidget', () => ({ default: () => null }));
-vi.mock('../ClimaStrip', () => ({ default: () => <div /> }));
-vi.mock('../HoyEnFincaStrip', () => ({ default: () => <div /> }));
-vi.mock('../AIStatusFooter', () => ({ default: () => <div /> }));
-vi.mock('../AnalisisProactivoIA', () => ({ default: () => <div /> }));
+vi.mock('../ClimaStrip', () => ({ default: () => <div data-testid="clima-strip" /> }));
+vi.mock('../HoyEnFincaStrip', () => ({ default: () => <div data-testid="hoy-strip" /> }));
+vi.mock('../AIStatusFooter', () => ({ default: () => <div data-testid="ai-status-footer" /> }));
+vi.mock('../AnalisisProactivoIA', () => ({ default: () => <div data-testid="analisis-ia" /> }));
 
 vi.mock('../../../store/useAssetStore', () => ({
   default: (selector) => selector({
@@ -79,89 +80,134 @@ beforeEach(() => {
 afterEach(() => cleanup());
 
 const labelOf = (el) => el.getAttribute('aria-label')?.split(':')[0];
+const indexInDom = (node) =>
+  Array.prototype.indexOf.call(document.querySelectorAll('[data-testid]'), node);
 
-describe('DashboardLive — redistribución del resto de su finca', () => {
-  test('los 4 grupos existen en el orden de jerarquía esperado', async () => {
+describe('Home F2 — reorganización en 5 bloques (audit 2026-06-26)', () => {
+  test('los 5 bloques existen en el orden del flujo del campesino', async () => {
     render(<DashboardLive onNavigate={vi.fn()} />);
-    await waitFor(() => expect(screen.getByTestId('destacado-tiles')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId('bloque-finca-hoy')).toBeInTheDocument());
 
-    const groups = ['destacado-tiles', 'aprender-tiles', 'gestion-tiles', 'mercado-tiles'];
-    for (const g of groups) expect(screen.getByTestId(g)).toBeInTheDocument();
+    // estado → tengo → hago → consulto → vendo.
+    const blocks = [
+      'bloque-finca-hoy',        // 1. Cómo va su finca hoy
+      'bloque-plantas-animales', // 2. Sus plantas y animales
+      'bloque-registrar',        // 3. Registrar en la finca
+      'bloque-consultar',        // 4. Consultar y aprender
+      'mercado-tiles',           // 5. Vender y comprar
+    ];
+    for (const b of blocks) expect(screen.getByTestId(b)).toBeInTheDocument();
 
-    // Orden en el DOM (jerarquía): Destacado antes que Aprender antes que
-    // Gestión antes que Mercado.
-    const positions = groups.map((g) => {
-      const node = screen.getByTestId(g);
-      return { g, top: Array.prototype.indexOf.call(document.querySelectorAll('[data-testid]'), node) };
-    });
-    const order = positions
-      .sort((a, b) => a.top - b.top)
-      .map((p) => p.g);
-    expect(order).toEqual(groups);
+    const order = blocks
+      .map((b) => ({ b, top: indexInDom(screen.getByTestId(b)) }))
+      .sort((a, z) => a.top - z.top)
+      .map((p) => p.b);
+    expect(order).toEqual(blocks);
   });
 
-  test('DESTACADO eleva solo Especies y Calendario (lo fuerte y grounded)', async () => {
+  test('BLOQUE 1 funde el día + clima + aviso de Chagra y NO duplica IA ni "hoy"', async () => {
     render(<DashboardLive onNavigate={vi.fn()} />);
-    const block = await screen.findByTestId('destacado-tiles');
-    const labels = within(block).getAllByRole('button').map(labelOf);
-    expect(labels).toEqual(['Especies', 'Calendario']);
+    const block = await screen.findByTestId('bloque-finca-hoy');
+    // El estado del día: UNA sola tira "hoy", el clima y el aviso de Chagra.
+    expect(within(block).getByTestId('hoy-strip')).toBeInTheDocument();
+    expect(within(block).getByTestId('clima-strip')).toBeInTheDocument();
+    expect(within(block).getByTestId('analisis-ia')).toBeInTheDocument();
+    // No hay un SEGUNDO panel de IA al pie (AIStatusFooter "Status proactivo IA"
+    // NO se monta en F2: su idea ES este bloque).
+    expect(screen.queryByTestId('ai-status-footer')).toBeNull();
+    // Y solo hay UNA tira "hoy" en todo el home (dedup del strip + tile).
+    expect(screen.getAllByTestId('hoy-strip')).toHaveLength(1);
   });
 
-  test('APRENDER consolida el contenido; con F2 ON NO duplica el hub Aprender', async () => {
+  test('BLOQUE 2 agrupa plantas, zonas, plagas, asociaciones y flora/fauna', async () => {
     render(<DashboardLive onNavigate={vi.fn()} />);
-    const block = await screen.findByTestId('aprender-tiles');
-    const labels = within(block).getAllByRole('button').map(labelOf);
-    // F2 ON: el portal "Aprender" del hero ya entra al hub, así que el tile
-    // 'aprende' se filtra; quedan las superficies de contenido consolidadas.
+    const block = await screen.findByTestId('bloque-plantas-animales');
+    const txt = block.textContent;
+    expect(block).toHaveTextContent('Sus plantas y animales');
+    for (const t of ['Mis plantas', 'Mis zonas', 'Plagas', 'Asociaciones', 'Plantas y animales del monte']) {
+      expect(txt).toContain(t);
+    }
+  });
+
+  test('BLOQUE 3 "Registrar" unifica abonos e insumos y usa copy campesino', async () => {
+    render(<DashboardLive onNavigate={vi.fn()} />);
+    const block = await screen.findByTestId('bloque-registrar');
+    const gestion = within(block).getByTestId('gestion-tiles');
+    const tileLabels = within(gestion).getAllByRole('button').map(labelOf);
+    expect(tileLabels).toEqual(['Semilleros', 'Cosechar', 'Abonos e insumos', 'Labores de la finca']);
+    // La bitácora vive en el bloque de acción.
+    expect(block).toHaveTextContent('Bitácora');
+  });
+
+  test('BLOQUE 3 conserva el ancla #finca-gestion (destino del portal Mi finca)', async () => {
+    render(<DashboardLive onNavigate={vi.fn()} />);
+    const block = await screen.findByTestId('bloque-registrar');
+    const ancla = document.getElementById('finca-gestion');
+    expect(ancla).toBeInTheDocument();
+    expect(ancla).toBe(block);
+  });
+
+  test('BLOQUE 4 "Consultar y aprender" con catálogo, calendario, contenido y reportes', async () => {
+    render(<DashboardLive onNavigate={vi.fn()} />);
+    const block = await screen.findByTestId('bloque-consultar');
+
+    // Lo fuerte y grounded, con copy campesino.
+    const destacado = within(block).getByTestId('destacado-tiles');
+    expect(within(destacado).getAllByRole('button').map(labelOf))
+      .toEqual(['Qué puedo sembrar', 'Calendario de la finca']);
+
+    // El contenido consolidado + "Sacar reportes"; NO duplica el hub "Aprender"
+    // (ese es el portal del hero en F2).
+    const aprender = within(block).getByTestId('aprender-tiles');
+    const labels = within(aprender).getAllByRole('button').map(labelOf);
+    expect(labels).not.toContain('Aprender');
     expect(labels).toEqual([
-      'Casos de estudio', 'Ciclo de nutrientes', 'Biopreparados', 'Suelo', 'Seguridad', 'Preguntas frecuentes',
+      'Casos reales', 'Ciclo de nutrientes', 'Biopreparados', 'Suelo', 'Seguridad', 'Preguntas frecuentes', 'Sacar reportes',
     ]);
   });
 
-  test('GESTIÓN agrupa registros/manejo (semilleros incluido)', async () => {
-    render(<DashboardLive onNavigate={vi.fn()} />);
-    const block = await screen.findByTestId('gestion-tiles');
-    const labels = within(block).getAllByRole('button').map(labelOf);
-    expect(labels).toEqual(['Semilleros', 'Cosechar', 'Insumos aplicados', 'Mantenimiento']);
-  });
-
-  test('MERCADO queda al fondo, de-enfatizado, y navega a la ruta mercado', async () => {
+  test('BLOQUE 5 Mercado al fondo y navega a la ruta mercado', async () => {
     const onNavigate = vi.fn();
     render(<DashboardLive onNavigate={onNavigate} />);
     const block = await screen.findByTestId('mercado-tiles');
-    const btn = within(block).getByRole('button', { name: /Mercado/ });
-    fireEvent.click(btn);
+    fireEvent.click(within(block).getByRole('button', { name: /Mercado/ }));
     expect(onNavigate).toHaveBeenCalledWith('mercado', undefined);
   });
 
-  test('los tiles navegan a sus rutas (directorio, calendario, casos, biopreparados con back)', async () => {
+  test('"Sus proyectos de finca" va MÁS ABAJO que lo cotidiano (estado/registrar)', async () => {
+    render(<DashboardLive onNavigate={vi.fn()} />);
+    await screen.findByTestId('seguimiento-cards');
+    const seguimiento = screen.getByTestId('seguimiento-cards');
+    const registrar = screen.getByTestId('bloque-registrar');
+    const hoy = screen.getByTestId('bloque-finca-hoy');
+    // El bloque condicional de proyectos queda debajo de lo cotidiano.
+    expect(indexInDom(seguimiento)).toBeGreaterThan(indexInDom(registrar));
+    expect(indexInDom(seguimiento)).toBeGreaterThan(indexInDom(hoy));
+    // Y lleva su rótulo campesino renombrado.
+    expect(seguimiento.closest('[class*="px-4"]')).toHaveTextContent('Sus proyectos de finca');
+  });
+
+  test('los tiles navegan a sus rutas reales (directorio, calendario, casos, biopreparados con back, reportes)', async () => {
     const onNavigate = vi.fn();
     render(<DashboardLive onNavigate={onNavigate} />);
-    await screen.findByTestId('destacado-tiles');
+    await screen.findByTestId('bloque-consultar');
 
-    fireEvent.click(screen.getByRole('button', { name: /^Especies/ }));
+    fireEvent.click(screen.getByRole('button', { name: /^Qué puedo sembrar/ }));
     expect(onNavigate).toHaveBeenCalledWith('directorio', undefined);
-    fireEvent.click(screen.getByRole('button', { name: /^Calendario/ }));
+    fireEvent.click(screen.getByRole('button', { name: /^Calendario de la finca/ }));
     expect(onNavigate).toHaveBeenCalledWith('calendario_finca', undefined);
-    fireEvent.click(screen.getByRole('button', { name: /^Casos de estudio/ }));
+    fireEvent.click(screen.getByRole('button', { name: /^Casos reales/ }));
     expect(onNavigate).toHaveBeenCalledWith('casos', undefined);
     fireEvent.click(screen.getByRole('button', { name: /^Biopreparados/ }));
     expect(onNavigate).toHaveBeenCalledWith('biopreparados', { back: 'dashboard' });
-  });
-
-  test('la sección de gestión expone el ancla #finca-gestion (destino del portal Gestionar)', async () => {
-    render(<DashboardLive onNavigate={vi.fn()} />);
-    const block = await screen.findByTestId('gestion-tiles');
-    const ancla = document.getElementById('finca-gestion');
-    // El ancla existe y CONTIENE los tiles de gestión (es la sección, no otra cosa).
-    expect(ancla).toBeInTheDocument();
-    expect(ancla).toContainElement(block);
+    fireEvent.click(screen.getByRole('button', { name: /^Sacar reportes/ }));
+    expect(onNavigate).toHaveBeenCalledWith('informes', undefined);
   });
 
   test('el hero recibe onGestionar y, al invocarlo, hace scroll al ancla de gestión (no navega al juego)', async () => {
     const onNavigate = vi.fn();
     render(<DashboardLive onNavigate={onNavigate} />);
-    await screen.findByTestId('gestion-tiles');
+    await screen.findByTestId('bloque-registrar');
 
     const ancla = document.getElementById('finca-gestion');
     ancla.scrollIntoView = vi.fn();
@@ -173,13 +219,36 @@ describe('DashboardLive — redistribución del resto de su finca', () => {
     expect(ancla.scrollIntoView).toHaveBeenCalledTimes(1);
     expect(onNavigate).not.toHaveBeenCalledWith('juego');
   });
+});
 
-  test('layout legacy (F2 OFF) SÍ muestra el hub Aprender como tile', async () => {
-    flagOn = false;
+describe('Home — flag OFF conserva el layout legacy (prod intacto)', () => {
+  beforeEach(() => { flagOn = false; });
+
+  test('NO existen los bloques F2 nuevos', async () => {
     render(<DashboardLive onNavigate={vi.fn()} />);
-    const block = await screen.findByTestId('aprender-tiles');
-    const labels = within(block).getAllByRole('button').map(labelOf);
+    await screen.findByTestId('destacado-tiles');
+    expect(screen.queryByTestId('bloque-finca-hoy')).toBeNull();
+    expect(screen.queryByTestId('bloque-plantas-animales')).toBeNull();
+    expect(screen.queryByTestId('bloque-registrar')).toBeNull();
+    expect(screen.queryByTestId('bloque-consultar')).toBeNull();
+  });
+
+  test('conserva el grid draggable + AIStatusFooter + rótulos viejos', async () => {
+    render(<DashboardLive onNavigate={vi.fn()} />);
+    await screen.findByTestId('destacado-tiles');
+    // Footer de IA legacy presente (en F2 se omite, acá NO).
+    expect(screen.getByTestId('ai-status-footer')).toBeInTheDocument();
+    // Hub "Aprender" como tile (con OFF SÍ se muestra) y labels legacy.
+    const aprender = screen.getByTestId('aprender-tiles');
+    const labels = within(aprender).getAllByRole('button').map(labelOf);
     expect(labels[0]).toBe('Aprender');
-    expect(labels).toContain('Casos de estudio');
+    expect(labels).toContain('Casos de estudio'); // copy legacy, NO "Casos reales"
+    // DESTACADO con labels legacy.
+    const destacado = screen.getByTestId('destacado-tiles');
+    expect(within(destacado).getAllByRole('button').map(labelOf)).toEqual(['Especies', 'Calendario']);
+    // GESTIÓN con label legacy "Insumos aplicados" (no "Abonos e insumos").
+    const gestion = screen.getByTestId('gestion-tiles');
+    expect(within(gestion).getAllByRole('button').map(labelOf))
+      .toEqual(['Semilleros', 'Cosechar', 'Insumos aplicados', 'Mantenimiento']);
   });
 });

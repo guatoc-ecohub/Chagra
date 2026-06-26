@@ -524,6 +524,40 @@
   margin: 9px 16px 0;
 }
 
+/* NIVEL DE RESPUESTA ("Claro y corto" / "Con detalle") — segmented junto al
+   compositor del agente. Píldora clara sobre la escena; el segmento activo se
+   resalta en lima (la piel del agente). */
+.fvh-nivel {
+  display: inline-flex;
+  align-self: center;
+  gap: 2px;
+  margin: 10px auto 0;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 4px 12px rgba(40, 60, 40, 0.16), 0 0 0 1px rgba(38, 51, 31, 0.06);
+}
+.fvh-nivel-btn {
+  border: 0;
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 5px 13px;
+  font-family: var(--fvh-body);
+  font-weight: 800;
+  font-size: 11.5px;
+  color: var(--fvh-tinta-suave);
+  background: transparent;
+  transition: background 160ms ease, color 160ms ease;
+}
+.fvh-nivel-btn.on {
+  background: linear-gradient(135deg, var(--fvh-lima), #8fd62e);
+  color: #1f3300;
+  box-shadow: 0 3px 8px rgba(120, 180, 30, 0.4);
+}
+@media (prefers-reduced-motion: reduce) {
+  .fvh-nivel-btn { transition: none; }
+}
+
 /* ── HERO TEXT ─────────────────────────────────────────────────────────────── */
 .fvh-hero-saludo { padding: 14px 20px 0; position: relative; z-index: 3; }
 .fvh-hero-saludo .h-small { font-weight: 800; font-size: 12.5px; color: var(--fvh-sello); letter-spacing: 0.2px; }
