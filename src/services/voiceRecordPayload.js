@@ -1,3 +1,9 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish --
+ * Los nombres/labels de los registros FarmOS que arma este módulo (ej.
+ * "Cosecha de …", "Aplicación de …", "Observación: …") NO son texto de UI: son
+ * los `name` que se escriben en el servidor y aparecen en la bitácora. Su
+ * migración a src/config/messages.js (ADR-050 i18n) es transversal y fuera del
+ * alcance de #23. Los errores reales de ESLint siguen activos. */
 /**
  * voiceRecordPayload — Construye el payload FarmOS estructurado a partir de un
  * registro de voz CONFIRMADO (#23). Cada intención mapea a su entidad FarmOS,
@@ -39,7 +45,15 @@ function subjectName(record) {
 
 /** Resumen humano de los campos extraídos, para las notas del registro. */
 function buildNotes(record) {
-  const lines = [`Registrado por voz: "${record.transcription}".`];
+  // Procedencia: el flujo unificado (#23) también escribe a MANO (sin voz). En
+  // ese caso `transcription` viene vacío y `source === 'manual'`: la nota debe
+  // decir "Registrado a mano" en vez de "por voz" (sin comillas vacías).
+  const isManual = record.source === 'manual' || !record.transcription;
+  const lines = [
+    isManual
+      ? 'Registrado a mano en la finca.'
+      : `Registrado por voz: "${record.transcription}".`,
+  ];
   const m = record.measures || {};
   const bits = [];
   if (m.altura_m != null) bits.push(`alto ${m.altura_m} m`);

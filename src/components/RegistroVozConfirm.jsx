@@ -64,6 +64,13 @@ export default function RegistroVozConfirm({ record, onConfirm, onCancel, isSavi
   const [anchoM, setAnchoM] = useState(record.measures?.ancho_m ?? '');
   const [fenologia, setFenologia] = useState((record.phenology || []).map((p) => p.canon).join(', '));
   const [notas, setNotas] = useState((record.symptoms || []).join('; '));
+  // Campos específicos por tipo, editables para el respaldo MANUAL del flujo
+  // unificado (#23): insumo aplicado, labor realizada y plaga. En voz vienen
+  // extraídos; a mano el usuario los escribe. Se persisten vía buildVoicePayload
+  // (input → log--input.category; labors → log--task.name; pest → log--observation).
+  const [insumo, setInsumo] = useState(record.input || '');
+  const [labor, setLabor] = useState((record.labors || []).join(', '));
+  const [pest, setPest] = useState(record.pest || '');
   const lugar = record.position?.raw || '';
   const [locationAssetId, setLocationAssetId] = useState('');
   const [wkt, setWkt] = useState(null);
@@ -146,6 +153,9 @@ export default function RegistroVozConfirm({ record, onConfirm, onCancel, isSavi
         ? fenologia.split(',').map((s) => ({ raw: s.trim(), canon: s.trim() })).filter((p) => p.canon)
         : [],
       symptoms: notas.trim() ? notas.split(';').map((s) => s.trim()).filter(Boolean) : [],
+      input: insumo.trim() || null,
+      labors: labor.trim() ? labor.split(',').map((s) => s.trim()).filter(Boolean) : [],
+      pest: pest.trim() || null,
       position: { ...record.position, raw: lugar.trim() },
     };
     onConfirm(edited, { locationAssetId: locationAssetId || null, wkt: wkt || null });
@@ -213,6 +223,27 @@ export default function RegistroVozConfirm({ record, onConfirm, onCancel, isSavi
       <Field label="Estado / fenología">
         <input type="text" value={fenologia} onChange={(e) => setFenologia(e.target.value)} placeholder="ej. floración" className={INPUT_CLS} disabled={isSaving} />
       </Field>
+
+      {/* Campos por tipo: aparecen según la intención elegida (form adaptativo).
+          Esto da el "un solo formulario que cambia los campos" del registro
+          unificado manual (#23), sin pantallas separadas por tipo. */}
+      {intent === INTENTS.INSUMO && (
+        <Field label="Insumo aplicado">
+          <input type="text" value={insumo} onChange={(e) => setInsumo(e.target.value)} placeholder="ej. caldo bordelés, biol, bocashi" className={INPUT_CLS} disabled={isSaving} />
+        </Field>
+      )}
+
+      {intent === INTENTS.MANTENIMIENTO && (
+        <Field label="Labor realizada">
+          <input type="text" value={labor} onChange={(e) => setLabor(e.target.value)} placeholder="ej. poda, deshierbe, guadaña" className={INPUT_CLS} disabled={isSaving} />
+        </Field>
+      )}
+
+      {intent === INTENTS.PLAGA && (
+        <Field label="Plaga o invasora">
+          <input type="text" value={pest} onChange={(e) => setPest(e.target.value)} placeholder="ej. hormiga arriera, pulgón" className={INPUT_CLS} disabled={isSaving} />
+        </Field>
+      )}
 
       <Field label="Notas / síntomas">
         <textarea rows={2} value={notas} onChange={(e) => setNotas(e.target.value)} className={`${INPUT_CLS} resize-none`} disabled={isSaving} />

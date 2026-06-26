@@ -26,7 +26,7 @@ import {
     rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays, Sprout, HelpCircle, Store, FileText } from 'lucide-react';
+import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays, Sprout, HelpCircle, Store, FileText, Mic } from 'lucide-react';
 import AgentHero from './AgentHero';
 import OnboardingHero from '../OnboardingHero';
 import {
@@ -45,6 +45,7 @@ import {
 import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciarAccess';
 import { esExtensionistaActual } from '../../config/extensionistaAccess';
 import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
+import { registroUnificadoActivo } from '../../config/registroUnificadoFlag';
 import SelectedBackgroundReveal from './SelectedBackgroundReveal';
 import MiFincaVivaHomeCard from './MiFincaVivaHomeCard';
 import FincaRedInstitucional from './FincaRedInstitucional';
@@ -372,6 +373,9 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
     // se monta la RED institucional de fincas en vez de la escena de finca única.
     // Con la flag OFF (default), el home conserva su comportamiento actual.
     const [fincaVivaFlag] = useState(() => fincaVivaHomePerfilActivo());
+    // Registro unificado (#23): con la flag ON, el bloque "Registrar en la finca"
+    // muestra UNA sola puerta (→ registro_unificado) en vez de los tiles sueltos.
+    const [registroUnifFlag] = useState(() => registroUnificadoActivo());
     const [esExtensionista] = useState(() => {
         try { return esExtensionistaActual(); } catch (_) { return false; }
     });
@@ -747,9 +751,40 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                     data-testid="bloque-registrar"
                 >
                     {blockLabel('Registrar en la finca', 'from-sky-400 to-emerald-400')}
-                    <div className="grid grid-cols-3 gap-3" data-testid="gestion-tiles">
-                        {GESTION_TILES.map((tile) => renderTile(tile))}
-                    </div>
+                    {registroUnifFlag ? (
+                        // PUERTA ÚNICA (#23): una sola "Registrar" voz-primero
+                        // reemplaza Cosechar/Insumos/Labores. Semilleros (prueba de
+                        // germinación, una herramienta, no un "registrar lo que hice")
+                        // queda como acceso secundario. El bloque pasa a tener UNA
+                        // entrada visible de registro, no cinco.
+                        <>
+                            <button
+                                type="button"
+                                onClick={() => onNavigate('registro_unificado')}
+                                aria-label="Registrar: cuéntame qué hiciste en la finca por voz o a mano"
+                                data-testid="tile-registrar-unificado"
+                                className={`w-full dash-tile ${fincaVivaFlag ? 'fvh-tile-claro' : 'bg-slate-900/60'} border border-slate-800 border-l-4 border-l-lime-500 rounded-2xl p-4 min-h-[112px] text-left active:bg-slate-800/70 transition-colors flex items-center gap-4`}
+                            >
+                                <span aria-hidden="true" className="shrink-0 w-14 h-14 rounded-2xl bg-lime-700/20 border border-lime-600/40 flex items-center justify-center">
+                                    <Mic size={28} className="text-lime-400" />
+                                </span>
+                                <span className="min-w-0 flex-1">
+                                    <span className="text-lg font-black block leading-tight fvh-tile-label text-lime-400">Registrar</span>
+                                    <span className={`text-xs mt-1 leading-snug block fvh-tile-desc ${fincaVivaFlag ? '' : 'text-slate-400'}`}>
+                                        Cuéntame qué hiciste hoy: cosecha, abono, labor, lo que vio o una plaga. Por voz o a mano.
+                                    </span>
+                                </span>
+                                <ChevronRight size={22} className="shrink-0 text-slate-500" aria-hidden="true" />
+                            </button>
+                            <div className="grid grid-cols-3 gap-3 mt-3" data-testid="gestion-tiles">
+                                {GESTION_TILES.filter((t) => t.view === 'germinacion').map((tile) => renderTile(tile))}
+                            </div>
+                        </>
+                    ) : (
+                        <div className="grid grid-cols-3 gap-3" data-testid="gestion-tiles">
+                            {GESTION_TILES.map((tile) => renderTile(tile))}
+                        </div>
+                    )}
                     <div className="mt-3">
                         <BitacoraCard onNavigate={onNavigate} variant="list" />
                     </div>

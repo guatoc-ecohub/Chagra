@@ -1,6 +1,12 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish --
+ * Los textos de UI de esta pantalla de registro por voz (microcopy de estados,
+ * frases-ejemplo, rótulos de botones) son strings de interfaz. Su migración a
+ * src/config/messages.js es la TAREA i18n de ADR-050 (transversal a la app),
+ * fuera del alcance de #23 — mismo criterio que RegistroVozConfirm.jsx, su
+ * pantalla hermana. Los errores reales de ESLint siguen activos. */
 import React, { useCallback, useState } from 'react';
 import {
-  Mic, MicOff, ChevronLeft, AlertTriangle, RotateCcw, Check, Sparkles,
+  Mic, MicOff, ChevronLeft, AlertTriangle, RotateCcw, Check, Sparkles, PencilLine,
 } from 'lucide-react';
 import useVoiceRecorder from '../hooks/useVoiceRecorder';
 import { transcribe, queueForRetry } from '../services/voiceService';
@@ -58,7 +64,7 @@ const fmt = (ms) => {
   return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 };
 
-export default function RegistroVozScreen({ onBack, onSave }) {
+export default function RegistroVozScreen({ onBack, onSave, onManual = null }) {
   const { audioLevel, amplitudeHistory, durationMs, start, stop, reset, error: recorderError, hardLimitMs } = useVoiceRecorder();
 
   const [view, setView] = useState(ST.IDLE);
@@ -190,6 +196,20 @@ export default function RegistroVozScreen({ onBack, onSave }) {
               <Mic size={56} className="text-white" />
             </button>
             <p className="text-xs text-slate-500">Toca para grabar (máx. 30s)</p>
+
+            {/* Respaldo manual del flujo unificado (#23): para quien no quiere o
+                no puede usar la voz, un solo formulario adaptativo. Solo se
+                muestra si el contenedor pasó onManual (flujo unificado). */}
+            {onManual && (
+              <button
+                type="button"
+                onClick={onManual}
+                className="inline-flex items-center gap-2 px-4 py-2 min-h-[44px] rounded-xl bg-slate-800/70 hover:bg-slate-700 border border-slate-700 text-sm font-semibold text-slate-200"
+                data-testid="registro-manual-cta"
+              >
+                <PencilLine size={16} className="text-lime-400" /> O escríbelo a mano
+              </button>
+            )}
 
             <div className="w-full max-w-md">
               <p className="text-2xs uppercase font-bold text-slate-500 mb-2 flex items-center gap-1">
