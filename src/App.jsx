@@ -192,7 +192,7 @@ const HASH_VIEW_ROUTES = {
 
 // Vistas que cuentan como "módulo" para telemetría de piloto.
 const MODULE_VIEWS = new Set([
-  'activos', 'mapa', 'javier', 'bodega', 'task_log', 'historial',
+  'activos', 'mapa', 'javier', 'bodega', 'task_log', 'historial', 'bitacora',
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
@@ -984,7 +984,12 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      // 'historial' y 'bitacora' son ALIAS de la misma pantalla (WorkerHistory).
+      // Antes solo existía 'historial': AnalisisProactivoIA navegaba a 'bitacora'
+      // (chip "Tareas") y caía en "Vista no disponible". Ahora ambas entradas
+      // llegan a la Bitácora viva. Fix bitácora rota (tarea #22).
       case 'historial':
+      case 'bitacora':
         return (
           <ErrorBoundary>
             <WorkerHistory onBack={() => navigate('dashboard')} onEntryClick={(entry) => navigate('bitacora_detail', { entry })} />

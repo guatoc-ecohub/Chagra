@@ -1,0 +1,222 @@
+/* registro-shell.css
+ * ============================================================================
+ * Piel VISUAL común de las 4 ventanas de registro de Chagra (Cosechar,
+ * Insumos, Labores, Bitácora). Theme-aware: TODO sale de las CSS vars del
+ * tema activo:
+ *   --c-surface / --c-surface-card / --c-surface-raised / --c-surface-border
+ *   --c-slate-* (texto, remapeado por tema en index.css)
+ *   --t-accent-rgb (acento de marca del tema: teal / ocre / verde)
+ * No hay colores hardcodeados: en los 4 temas (biopunk, nature, minimalista,
+ * verde-vivo) se ve coherente y legible (AA).
+ *
+ * Se aplica SOLO cuando la flag `fincaVivaHomePerfilActivo()` está encendida
+ * (el rediseño va gated en dev). Con la flag apagada estos estilos no se
+ * montan porque el JSX legacy no usa estas clases.
+ * ========================================================================== */
+
+.registro-shell {
+  /* Fondo base = superficie del tema, con un sutil halo del acento arriba
+     para dar identidad sin romper contraste. */
+  background:
+    radial-gradient(120% 60% at 50% -10%, rgb(var(--t-accent-rgb) / 0.10), transparent 60%),
+    rgb(var(--c-surface));
+  color: rgb(var(--c-slate-100));
+}
+
+.registro-shell__header {
+  background: linear-gradient(
+    to bottom,
+    rgb(var(--c-surface) / 0.96),
+    rgb(var(--c-surface) / 0.82)
+  );
+  backdrop-filter: blur(6px);
+}
+
+.registro-shell__back {
+  background: rgb(var(--c-surface-raised));
+  border: 1px solid rgb(var(--c-surface-border));
+  color: rgb(var(--c-slate-200));
+}
+.registro-shell__back:active {
+  background: rgb(var(--c-surface-card));
+}
+
+/* Sello Chagra: disco con el acento del tema. */
+.registro-shell__badge {
+  background: rgb(var(--t-accent-rgb) / 0.16);
+  border: 1px solid rgb(var(--t-accent-rgb) / 0.38);
+  color: rgb(var(--t-accent-rgb));
+  box-shadow: inset 0 0 0 1px rgb(var(--t-accent-rgb) / 0.10);
+}
+
+.registro-shell__title {
+  color: rgb(var(--c-slate-100));
+  letter-spacing: -0.01em;
+}
+.registro-shell__subtitle {
+  color: rgb(var(--c-slate-400));
+}
+
+/* Hairline de acento bajo el header — marca de identidad. */
+.registro-shell__rule {
+  height: 3px;
+  background: linear-gradient(
+    to right,
+    rgb(var(--t-accent-rgb)),
+    rgb(var(--t-accent-rgb) / 0.35) 55%,
+    transparent
+  );
+}
+
+.registro-shell__footer {
+  background: linear-gradient(
+    to top,
+    rgb(var(--c-surface)) 60%,
+    rgb(var(--c-surface) / 0)
+  );
+}
+
+/* ---------------------------------------------------------------------------
+ * Primitivas de formulario reutilizadas por las 4 pantallas.
+ * ------------------------------------------------------------------------- */
+
+.registro-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.registro-field__label {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: rgb(var(--c-slate-300));
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  letter-spacing: 0.01em;
+}
+.registro-field__hint {
+  font-size: 0.78rem;
+  color: rgb(var(--c-slate-500));
+  font-weight: 500;
+}
+
+.registro-input,
+.registro-select,
+.registro-textarea {
+  width: 100%;
+  min-height: 60px;
+  padding: 0.9rem 1rem;
+  font-size: 1.15rem;
+  border-radius: 1rem;
+  background: rgb(var(--c-surface-card));
+  border: 1.5px solid rgb(var(--c-surface-border));
+  color: rgb(var(--c-slate-100));
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.registro-textarea {
+  min-height: 92px;
+  line-height: 1.45;
+  resize: vertical;
+}
+.registro-input::placeholder,
+.registro-textarea::placeholder {
+  color: rgb(var(--c-slate-500));
+}
+.registro-input:focus,
+.registro-select:focus,
+.registro-textarea:focus {
+  outline: none;
+  border-color: rgb(var(--t-accent-rgb));
+  box-shadow: 0 0 0 3px rgb(var(--t-accent-rgb) / 0.18);
+}
+.registro-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.75rem;
+}
+.registro-input--invalid,
+.registro-select--invalid {
+  border-color: rgb(220 60 60);
+}
+
+.registro-error {
+  font-size: 0.82rem;
+  color: rgb(239 110 110);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* CTA principal: relleno SÓLIDO del acento del tema. El punto focal de acción
+   de la pantalla, coherente con el botón "enviar" del agente. */
+.registro-cta {
+  width: 100%;
+  min-height: 68px;
+  padding: 1rem 1.25rem;
+  border-radius: 1.1rem;
+  font-size: 1.3rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  color: rgb(255 255 255);
+  background: rgb(var(--t-accent-rgb));
+  border: none;
+  box-shadow:
+    0 8px 22px rgb(var(--t-accent-rgb) / 0.30),
+    inset 0 -3px 0 rgb(0 0 0 / 0.18);
+  transition: transform 0.08s ease, filter 0.15s ease;
+}
+.registro-cta:active {
+  transform: translateY(1px);
+  filter: brightness(0.95);
+}
+.registro-cta:disabled {
+  opacity: 0.5;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Tarjeta de "consejo / contexto" — microcopy campesino con identidad. */
+.registro-tip {
+  border-radius: 1rem;
+  padding: 0.85rem 1rem;
+  background: rgb(var(--t-accent-rgb) / 0.10);
+  border: 1px solid rgb(var(--t-accent-rgb) / 0.28);
+  color: rgb(var(--c-slate-200));
+  font-size: 0.9rem;
+  line-height: 1.45;
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+}
+.registro-tip__icon {
+  color: rgb(var(--t-accent-rgb));
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+/* Chips de selección rápida (segmentos, accesos). */
+.registro-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  background: rgb(var(--c-surface-raised));
+  border: 1.5px solid rgb(var(--c-surface-border));
+  color: rgb(var(--c-slate-300));
+  transition: all 0.12s ease;
+}
+.registro-chip--active {
+  background: rgb(var(--t-accent-rgb) / 0.16);
+  border-color: rgb(var(--t-accent-rgb));
+  color: rgb(var(--t-accent-rgb));
+}

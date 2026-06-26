@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Droplets } from 'lucide-react';
 import DateField from './DateField';
 import { savePayload } from '../services/payloadService';
 import { FARM_CONFIG } from '../config/defaults';
+import { fincaVivaHomePerfilActivo } from '../config/fincaVivaHomeFlag';
+import RegistroShell from './registro/RegistroShell';
+import { SelectField, NumberField, TextAreaField } from './registro/RegistroFields';
 
 const INPUT_MATERIALS = [
   { id: 'mat-bio', name: 'Bioactivador Lácteo' },
@@ -45,11 +48,7 @@ export default function InputLog({ onBack, onSave }) {
 
   const handleInput = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => {
-      const next = { ...prev, [name]: value };
-      if (name === 'mainArea') next.subArea = '';
-      return next;
-    });
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSave = async () => {
@@ -106,6 +105,92 @@ export default function InputLog({ onBack, onSave }) {
     }
   };
 
+  // ── REDISEÑO (gated): caparazón Chagra theme-aware ──────────────────────
+  if (fincaVivaHomePerfilActivo()) {
+    return (
+      <RegistroShell
+        title="Abonos e insumos"
+        subtitle="Qué le echaste a la finca y cuánto gastaste"
+        Icon={Droplets}
+        onBack={onBack}
+        footer={
+          <button onClick={handleSave} className="registro-cta">
+            Registrar aplicación
+          </button>
+        }
+      >
+        <div className="registro-tip">
+          <Droplets size={18} className="registro-tip__icon" aria-hidden="true" />
+          <span>Anota cada aplicación de abono, biopreparado o riego. Así controlas la bodega y sabes qué le funciona a cada lote.</span>
+        </div>
+
+        <DateField
+          label="¿Qué día aplicaste?"
+          value={formData.date}
+          onChange={(val) => setFormData(p => ({ ...p, date: val }))}
+          required
+        />
+
+        <SelectField
+          label="Ubicación o lote"
+          name="locationId"
+          value={formData.locationId}
+          onChange={handleInput}
+          options={REAL_LAND_ASSETS.map(a => ({ value: a.id, label: a.name }))}
+        />
+
+        <SelectField
+          label="¿Qué aplicaste?"
+          name="materialId"
+          value={formData.materialId}
+          onChange={handleInput}
+          placeholder="-- Escoge el insumo --"
+          options={INPUT_MATERIALS.map(m => ({ value: m.id, label: m.name }))}
+        />
+
+        <SelectField
+          label="¿Cómo lo aplicaste?"
+          name="method"
+          value={formData.method}
+          onChange={handleInput}
+          options={APPLICATION_METHODS.map(m => ({ value: m, label: m }))}
+        />
+
+        <div className="grid grid-cols-2 gap-3">
+          <NumberField
+            label="Cantidad"
+            step="0.01"
+            name="quantity"
+            value={formData.quantity}
+            onChange={handleInput}
+            placeholder="0.00"
+          />
+          <SelectField
+            label="Unidad"
+            name="unit"
+            value={formData.unit}
+            onChange={handleInput}
+            options={[
+              { value: 'Litros', label: 'Litros' },
+              { value: 'Kilogramos', label: 'Kilogramos' },
+            ]}
+          />
+        </div>
+
+        <TextAreaField
+          label="Notas"
+          hint="opcional"
+          name="notes"
+          rows="3"
+          value={formData.notes}
+          onChange={handleInput}
+          placeholder="Ej: el suelo estaba seco, dosis baja…"
+        />
+      </RegistroShell>
+    );
+  }
+
+  // ── LEGACY (flag OFF): markup 0.1 sin cambios visuales ──────────────────
   return (
     <div className="h-[100dvh] w-full bg-slate-950 text-slate-100 flex flex-col overflow-y-auto">
       <header className="p-4 sticky top-0 bg-slate-950 border-b border-slate-800 flex items-center gap-4 z-10 shrink-0 shadow-md">

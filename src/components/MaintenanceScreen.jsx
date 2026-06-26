@@ -1,8 +1,18 @@
 import React, { useState, useRef } from 'react';
-import { ArrowLeft, Camera, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Camera, Image as ImageIcon, Wrench } from 'lucide-react';
 import DateField from './DateField';
 import { syncManager } from '../services/syncManager';
 import { compressImage, IMAGE_TOO_LARGE_MESSAGE } from '../utils/imageCompress';
+import { fincaVivaHomePerfilActivo } from '../config/fincaVivaHomeFlag';
+import RegistroShell from './registro/RegistroShell';
+import { SelectField, TextField, TextAreaField } from './registro/RegistroFields';
+
+const MAINTENANCE_TYPES = [
+  { value: 'routine', label: 'Rutinaria' },
+  { value: 'preventive', label: 'Preventiva' },
+  { value: 'corrective', label: 'Correctiva' },
+  { value: 'emergency', label: 'Emergencia' },
+];
 
 function MaintenanceScreen({ onBack, onSave }) {
   const [formData, setFormData] = useState({
@@ -10,7 +20,8 @@ function MaintenanceScreen({ onBack, onSave }) {
     maintenanceType: 'routine',
     description: '',
     duration: '',
-    cost: ''
+    cost: '',
+    notes: ''
   });
   const [photo, setPhoto] = useState(null);
   const [photoUrl, setPhotoUrl] = useState(null);
@@ -78,7 +89,8 @@ function MaintenanceScreen({ onBack, onSave }) {
         maintenanceType: 'routine',
         description: '',
         duration: '',
-        cost: ''
+        cost: '',
+        notes: ''
       });
       setPhoto(null);
       setPhotoUrl(null);
@@ -89,6 +101,103 @@ function MaintenanceScreen({ onBack, onSave }) {
     }
   };
 
+  // Bloque de foto reutilizable (cámara + galería). Comparte refs/handlers.
+  const photoBlock = (
+    <div className="flex flex-col gap-2">
+      <span className="registro-field__label">Foto (opcional)</span>
+      <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handlePhotoCapture} className="hidden" aria-label="Tomar foto con camara" />
+      <input ref={galleryInputRef} type="file" accept="image/*" onChange={handlePhotoCapture} className="hidden" aria-label="Seleccionar foto de galeria" />
+      <div className="grid grid-cols-2 gap-2">
+        <button type="button" onClick={() => cameraInputRef.current?.click()} className="registro-chip justify-center min-h-[64px]">
+          <Camera size={22} aria-hidden="true" /> Tomar foto
+        </button>
+        <button type="button" onClick={() => galleryInputRef.current?.click()} className="registro-chip justify-center min-h-[64px]">
+          <ImageIcon size={22} aria-hidden="true" /> Desde galería
+        </button>
+      </div>
+      {photo && (
+        <p className="text-sm text-emerald-400">Foto lista ({Math.round(photo.size / 1024)} KB).</p>
+      )}
+    </div>
+  );
+
+  // ── REDISEÑO (gated): caparazón Chagra theme-aware ──────────────────────
+  if (fincaVivaHomePerfilActivo()) {
+    return (
+      <RegistroShell
+        title="Labores de la finca"
+        subtitle="Arreglos, mantenimiento y trabajos del día"
+        Icon={Wrench}
+        onBack={onBack}
+        footer={
+          <button onClick={handleSave} className="registro-cta">
+            Guardar labor
+          </button>
+        }
+      >
+        <div className="registro-tip">
+          <Wrench size={18} className="registro-tip__icon" aria-hidden="true" />
+          <span>Deja constancia de cercas, herramientas, riego o cualquier arreglo. La foto ayuda a recordar cómo quedó.</span>
+        </div>
+
+        <SelectField
+          label="Tipo de labor"
+          name="maintenanceType"
+          value={formData.maintenanceType}
+          onChange={handleInput}
+          options={MAINTENANCE_TYPES}
+        />
+
+        <TextAreaField
+          label="¿Qué hiciste?"
+          name="description"
+          rows="4"
+          value={formData.description}
+          onChange={handleInput}
+          placeholder="Ej: arreglé la cerca del lote norte, cambié la manguera de riego…"
+        />
+
+        <div className="grid grid-cols-2 gap-3">
+          <TextField
+            label="¿Cuánto demoró?"
+            name="duration"
+            value={formData.duration}
+            onChange={handleInput}
+            placeholder="Ej: 2 horas"
+          />
+          <TextField
+            label="Costo"
+            hint="opcional"
+            name="cost"
+            value={formData.cost}
+            onChange={handleInput}
+            placeholder="Ej: $5.000"
+          />
+        </div>
+
+        <DateField
+          label="¿Qué día?"
+          value={formData.date}
+          onChange={(val) => setFormData(p => ({ ...p, date: val }))}
+          required
+        />
+
+        <TextAreaField
+          label="Notas"
+          hint="opcional"
+          name="notes"
+          rows="2"
+          value={formData.notes}
+          onChange={handleInput}
+          placeholder="Ej: pendiente revisar la otra semana…"
+        />
+
+        {photoBlock}
+      </RegistroShell>
+    );
+  }
+
+  // ── LEGACY (flag OFF): markup 0.1 sin cambios visuales ──────────────────
   return (
     <div className="h-[100dvh] w-full bg-slate-950 text-slate-100 flex flex-col overflow-y-auto">
       <header className="p-4 sticky top-0 bg-slate-950 border-b border-slate-800 flex items-center gap-4 z-10 shrink-0 shadow-md">
