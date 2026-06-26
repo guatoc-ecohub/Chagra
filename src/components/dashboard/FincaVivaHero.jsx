@@ -16,7 +16,14 @@ import { resolveClimaLocation, getCachedClimaSnapshot, CLIMA_UPDATED_EVENT } fro
 import { clasificarPisoTermico } from '../../services/pisoTermicoClassifier';
 import { useTheme } from '../../hooks/useTheme';
 import { iconForTheme } from './themeIcon';
+import { colibri3dActivo } from '../../config/colibri3dFlag';
+import ChagraColibri3DLite from '../ChagraColibri3DLite';
 import './finca-viva-hero.css';
+
+// PRUEBA dev-only: ¿mostrar el colibrí 3D que revolotea en la escena (en vez del
+// SVG 2D)? Gateado por VITE_COLIBRI_3D (colibri3dFlag.js). Se evalúa una sola vez
+// al cargar el módulo: la flag es de build, no cambia en runtime.
+const COLIBRI_3D = colibri3dActivo();
 
 /**
  * FincaVivaHero — el HOME INMERSIVO "Finca Viva" (refinado del mockup F2 v2
@@ -335,9 +342,19 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
                       (fauna que prospera) sólo aparecen cuando la finca está
                       poblada. */}
                   <div className="fvh-bichos" aria-hidden="true">
-                    <span className="fvh-bicho fvh-colibri-vuela" style={{ left: '66%', top: '20%' }}>
-                      <ColibriVuela />
-                    </span>
+                    {/* COLIBRÍ insignia: con la flag VITE_COLIBRI_3D ON (dev) sale
+                        el modelo 3D que revolotea; con la flag OFF (prod) el SVG
+                        2D de siempre. El 3D cae a su fallback 2D solo si WebGL
+                        fallara (Suspense interno). Prueba dev-only, NO toca prod. */}
+                    {COLIBRI_3D ? (
+                      <span className="fvh-bicho fvh-colibri-3d" style={{ left: '62%', top: '12%' }}>
+                        <ChagraColibri3DLite variant="home" size={108} state="idle" ariaLabel="Colibrí Chagra" />
+                      </span>
+                    ) : (
+                      <span className="fvh-bicho fvh-colibri-vuela" style={{ left: '66%', top: '20%' }}>
+                        <ColibriVuela />
+                      </span>
+                    )}
                     {poblada && (
                       <>
                         <span className="fvh-bicho" style={{ left: '16%', top: '18%', animationDelay: '.1s' }}>🦋</span>

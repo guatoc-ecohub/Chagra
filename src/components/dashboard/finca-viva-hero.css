@@ -493,6 +493,25 @@
   60%  { transform: translate(-10px, -6px) rotate(-2deg); }
   100% { transform: translate(0, 0) rotate(-3deg); }
 }
+/* COLIBRÍ 3D (PRUEBA dev-only, flag VITE_COLIBRI_3D): el modelo Three.js maneja
+   su propio vuelo/aleteo internamente. El contenedor solo aporta una deriva CSS
+   muy lenta para ampliar el arco, y un drop-shadow tenue para asentarlo en la
+   escena. NO heredamos la animación fvh-flota del .fvh-bicho (chocaría con la
+   animación interna del 3D). */
+.fvh-colibri-3d {
+  animation: fvh-colibri-3d-deriva 9s ease-in-out infinite;
+  filter: drop-shadow(0 6px 7px rgba(20, 40, 20, 0.22));
+  z-index: 8;
+}
+@keyframes fvh-colibri-3d-deriva {
+  0%, 100% { transform: translate(0, 0); }
+  35%      { transform: translate(-22px, 10px); }
+  70%      { transform: translate(8px, -8px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fvh-colibri-3d { animation: none; }
+}
+
 .fvh-colibri-svg .fvh-ala-fron { animation: fvh-ala-flap 0.13s ease-in-out infinite; }
 .fvh-colibri-svg .fvh-ala-tras { animation: fvh-ala-flap-back 0.13s ease-in-out infinite; }
 @keyframes fvh-ala-flap {

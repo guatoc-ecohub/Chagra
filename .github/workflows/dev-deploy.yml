@@ -53,6 +53,9 @@ jobs:
           VITE_HA_ACCESS_TOKEN: ${{ secrets.VITE_HA_ACCESS_TOKEN }}
           VITE_USE_SIDECAR_AGRO_MCP: "true"
           VITE_FINCA_VIVA_HOME_PERFIL: "true"
+          # PRUEBA dev-only: colibrí 3D en el home Finca Viva + el FAB del agente.
+          # Solo en dev; en prod (deploy.yml) esta flag NO existe → colibrí 2D.
+          VITE_COLIBRI_3D: "true"
           VITE_CHAGRA_MCP_TOKEN: ${{ secrets.VITE_CHAGRA_MCP_TOKEN }}
 
       - if: env.SKIP_DEPLOY != '1'

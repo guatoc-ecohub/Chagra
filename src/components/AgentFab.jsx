@@ -1,11 +1,18 @@
 import React, { useState, useCallback } from 'react';
 import ChagraAgentAvatar from './ChagraAgentAvatar';
+import ChagraColibri3DLite from './ChagraColibri3DLite';
 import useAgentNotificationStore from '../store/useAgentNotificationStore';
 import usePrefsStore from '../store/usePrefsStore';
 import { isSpeaking, stop, replayLast, isKokoroAvailable } from '../services/ttsService';
 import { agentSounds } from '../services/agentSoundService';
 import { fvhSkinClass } from '../config/fvhSkin';
+import { colibri3dActivo } from '../config/colibri3dFlag';
 import './agent-fab-skin.css';
+
+// PRUEBA dev-only: con la flag VITE_COLIBRI_3D ON (dev) el FAB lleva un colibrí
+// 3D que aletea sutil; con la flag OFF (prod) conserva su avatar 2D actual. Flag
+// de build (no cambia en runtime), por eso se evalúa una vez al cargar el módulo.
+const COLIBRI_3D = colibri3dActivo();
 
 /**
  * AgentFab — Floating Action Button para abrir el agente Chagra IA.
@@ -128,7 +135,16 @@ export default function AgentFab({ onNavigate }) {
         transition: 'transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease, background .25s ease, border-color .25s ease',
       }}
     >
-      <ChagraAgentAvatar state={state} size={48} ariaLabel="Chagra IA" glow={responseReady} />
+      {COLIBRI_3D ? (
+        <ChagraColibri3DLite
+          variant="fab"
+          state={state}
+          size={50}
+          ariaLabel="Chagra IA"
+        />
+      ) : (
+        <ChagraAgentAvatar state={state} size={48} ariaLabel="Chagra IA" glow={responseReady} />
+      )}
     </button>
   );
 }
