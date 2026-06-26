@@ -126,7 +126,18 @@ describe('FincaVivaHero — barra superior sin botones muertos', () => {
   test('la pastilla de Perfil navega a la vista perfil', () => {
     const onNavigate = vi.fn();
     render(<FincaVivaHero onNavigate={onNavigate} onOpenAgent={vi.fn()} onGestionar={vi.fn()} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Perfil' }));
+    // feedback operador #2: el acceso a PERFIL debe existir junto al "?".
+    fireEvent.click(screen.getByRole('button', { name: 'Mi perfil' }));
     expect(onNavigate).toHaveBeenCalledWith('perfil');
+  });
+
+  test('el botón de Perfil está presente en el topbar junto al de Ayuda (no se pierde)', () => {
+    render(<FincaVivaHero onNavigate={vi.fn()} onOpenAgent={vi.fn()} onGestionar={vi.fn()} />);
+    const ayuda = screen.getByRole('button', { name: 'Ayuda' });
+    const perfil = screen.getByTestId('finca-viva-perfil');
+    expect(perfil).toBeInTheDocument();
+    expect(perfil).toHaveAttribute('aria-label', 'Mi perfil');
+    // Ambos viven en la misma barra de pastillas (mismo contenedor).
+    expect(ayuda.parentElement).toBe(perfil.parentElement);
   });
 });
