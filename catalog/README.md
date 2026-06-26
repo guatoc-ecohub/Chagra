@@ -9,7 +9,7 @@
 | Archivo | Rol |
 |---------|-----|
 | `schema-v3.1.json` | JSON Schema draft-07 con definición formal de `species`, `biopreparado`, `source` |
-| `chagra-catalog-oss-subset-v3.2.json` | **Subset OSS público (263 species, 36 biopreparados, 68 fuentes)** — el archivo que **realmente** consume la PWA via `npm run build:catalog` → `public/catalog.sqlite` (es el `DEFAULT_SEED` en `scripts/build-catalog-sqlite.mjs`). |
+| `chagra-catalog-oss-subset-v3.2.json` | **Catálogo OSS canónico que SHIPEA (530 species, 36 biopreparados, 71 fuentes)** — el archivo que **realmente** consume la PWA via `npm run build:catalog` → `public/catalog.sqlite` (es el `DEFAULT_SEED` en `scripts/build-catalog-sqlite.mjs`). Es self-contained: ya no se deriva en vivo de otro seed. Ver `CATALOG_VERSIONS.md` para el estado de cada archivo. |
 | `chagra-catalog-seed-v3.1.json` | Catálogo fuente (formato v3.1) del cual se extrae el subset OSS via `scripts/extract-oss-subset-v32.mjs`. El corpus full curado vive en el repo privado hermano; en este repo público se conserva la base referenciada por los scripts de validación/ETL. |
 | `chagra-catalog-oss-subset-v3.1.json` | Snapshot histórico del primer subset OSS (50 species, cobertura multi-piso térmico, generado por `scripts/extract-oss-subset.mjs` el 2026-05-20). Deprecado tras el revert PR #1012; preservado por trazabilidad y como ruta de rollback. |
 | `chagra-catalog-seed-v3.0.json` | Versión histórica preservada (referencia para `migrate-v30-to-v31.mjs`) |
@@ -24,9 +24,9 @@ Desde 2026-05-23 (cutover step 2, ADR-024) lo que se publica bajo CC-BY-NC-SA 4.
 
 El subset que **realmente ships** y compila a `public/catalog.sqlite` es `chagra-catalog-oss-subset-v3.2.json`:
 
-- **263 species** — curación inicial top-uso (205 species, criterio intelligence-first, ver `SUBSET_OSS_V3.2_RATIONALE.md`) + enriquecimiento de páramo Cruz Verde (58 species, 2026-06-10, ver `_paramo_enrichment` en el JSON).
+- **530 species** — curación inicial top-uso (205 species, criterio intelligence-first, ver `SUBSET_OSS_V3.2_RATIONALE.md`) + enriquecimiento de páramo Cruz Verde (58 species, 2026-06-10) + ampliación grounded grafo→catálogo (+267 species cultivables y nativas con asocio construidas desde `public/cycle-content` + el grafo AGE `chagra_kg` + `public/species-images.json`, 2026-06-25).
 - **36 biopreparados** — `biopreparados-seed.json` queda íntegro en OSS (decisión 2026-05-23, valor pedagógico inmediato, sin curaduría editorial Pro diferencial).
-- **68 fuentes** científicas referenciadas.
+- **71 fuentes** científicas referenciadas (68 + 3 añadidas con metadata del grafo: `agrosavia-forrajeras-2022`, `agrosavia-estrella`, `correa-pabon-carulla-2008`).
 
 El primer subset OSS (`chagra-catalog-oss-subset-v3.1.json`, 50 species, criterio editorial-v2) cortaba species críticas (aguacate, tomate, lechuga, acelga) y fue revertido en PR #1012; se conserva solo como snapshot histórico / rollback.
 
@@ -76,13 +76,13 @@ Las contribuciones externas vía PR DEBEN venir con `validation_level: claude_dr
 
 Al usar, modificar o redistribuir este catálogo, cite:
 
-> Chagra (2026). Chagra species catalog v3.2 (OSS subset, 263 species). CC-BY-NC-SA 4.0. https://github.com/guatoc-ecohub/Chagra
+> Chagra (2026). Chagra species catalog v3.2 (OSS subset, 530 species). CC-BY-NC-SA 4.0. https://github.com/guatoc-ecohub/Chagra
 
 ## Boundary OSS / Pro
 
 Este catálogo (capas 1-2 de ADR-026) es **OSS público**. Los componentes Pro (catálogo full ~495 species, gremios receta curados, planes nutrición optimizados, casos exitosos documentados, presets certificación) viven en repo privado hermano `chagra-pro`, NO aquí. Específicamente:
 
-- Subset OSS (263 species) → este repo, `chagra-catalog-oss-subset-v3.2.json` (compila a `public/catalog.sqlite`).
+- Subset OSS (530 species) → este repo, `chagra-catalog-oss-subset-v3.2.json` (compila a `public/catalog.sqlite`).
 - Catálogo full (~495 species) → repo privado, `data/catalog/chagra-catalog-full-v3.1.json`. Diferencial editorial: variedades ICA detalladas, endemismos paramunos (Espeletia, Aragoa, Diplostephium), cultivares con curaduría profunda.
 - `biopreparados-seed.json` → este repo (decisión 2026-05-23, queda OSS por valor pedagógico inmediato).
 
