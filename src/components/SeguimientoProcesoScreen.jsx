@@ -836,7 +836,28 @@ function ProcesoDetalle({ def, proceso, stageSeq, locationOptions = [], onReload
           <div className="border-t border-slate-800 pt-3">
             <h3 className="text-xs font-bold text-slate-200 mb-2">Registrar lote</h3>
             <div className="grid grid-cols-2 gap-2">
-              <input value={loteDraft.raza} onChange={(e) => setLoteDraft((p) => ({ ...p, raza: e.target.value }))} className="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white" placeholder="Raza" disabled={pigBusy} />
+              <div className="col-span-2">
+                <input
+                  list="razas-cerdos"
+                  value={loteDraft.raza}
+                  onChange={(e) => setLoteDraft((p) => ({ ...p, raza: e.target.value }))}
+                  className="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white w-full"
+                  placeholder="Raza"
+                  disabled={pigBusy}
+                />
+                <datalist id="razas-cerdos">
+                  <option value="Yorkshire (Large White)" />
+                  <option value="Landrace" />
+                  <option value="Duroc" />
+                  <option value="Pietrain" />
+                  <option value="Hampshire" />
+                  <option value="Criollo Zungo costeño" />
+                  <option value="San Pedreño" />
+                  <option value="Casco de Mula" />
+                  <option value="Yorkshire x Landrace" />
+                  <option value="Landrace x Duroc" />
+                </datalist>
+              </div>
               <input type="date" value={loteDraft.fecha_ingreso} onChange={(e) => setLoteDraft((p) => ({ ...p, fecha_ingreso: e.target.value }))} className="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white" disabled={pigBusy} />
               <input type="number" min="1" value={loteDraft.cantidad} onChange={(e) => setLoteDraft((p) => ({ ...p, cantidad: e.target.value }))} className="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white" placeholder="Cantidad" disabled={pigBusy} />
               <input type="number" min="0" step="0.1" value={loteDraft.peso_inicial} onChange={(e) => setLoteDraft((p) => ({ ...p, peso_inicial: e.target.value }))} className="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white" placeholder="Peso inicial kg" disabled={pigBusy} />
