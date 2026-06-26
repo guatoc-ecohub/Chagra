@@ -1,0 +1,95 @@
+/*
+ * barbudito.css — el colibrí REAL (barbudito de páramo) curado por el operador.
+ * Reemplazo aprobado del colibrí 3D inflado (Three.js / R3F, rechazado).
+ *
+ * Tres usos, tres assets, todos liviano y universales (sin WebGL):
+ *   1. HOME  → "ventana viva" enmarcada: video H.264 del barbudito tomando
+ *      néctar de la flor del frailejón (sin alpha → corre en TODO navegador,
+ *      incl. iOS), en un recuadro redondeado.
+ *   2. FAB   → barbudito POSADO recortado (PNG transparente), estático con un
+ *      leve flotar opcional.
+ *   3. TRANSICIÓN → fly-across UNA pasada: webm VP9-alpha cruzando en arco; en
+ *      navegadores sin VP9-alpha (iOS), sprite con steps(16) + translateX.
+ */
+
+/* ── 1. VENTANA VIVA (home) ──────────────────────────────────────────────── */
+.barbudito-ventana {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 22px;
+  /* Marco sutil tipo "ventana al páramo": borde claro + halo verde tenue. */
+  border: 2px solid rgba(190, 242, 100, 0.35);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.38),
+    0 0 22px rgba(16, 185, 129, 0.18),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  background: #0d1f17;
+  line-height: 0;
+}
+.barbudito-ventana video,
+.barbudito-ventana img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 46%;
+}
+/* Viñeta suave para fundir los bordes del clip con el marco. */
+.barbudito-ventana::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 26px 6px rgba(8, 22, 16, 0.45);
+}
+
+/* ── 2. POSADO (FAB) ─────────────────────────────────────────────────────── */
+.barbudito-posado {
+  display: block;
+  object-fit: contain;
+  /* Leve flotar para darle vida sin distraer (se apaga con reduced-motion). */
+  animation: barbudito-posado-flotar 4.2s ease-in-out infinite;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.4));
+}
+@keyframes barbudito-posado-flotar {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50%      { transform: translateY(-3px) rotate(1deg); }
+}
+
+/* ── 3. FLY-ACROSS sprite fallback (transición, sin VP9-alpha) ───────────── */
+/* Tira horizontal de 16 frames (1×16). Con background-size 1600% 100% y
+   posicionamiento en porcentaje, 0%→100% con steps(16) recorre los 16 frames
+   (verificado en chromium). El cruce es UNA sola pasada (sin loop ni rebote). */
+.barbudito-cruza {
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 1600% 100%;
+  will-change: background-position, transform;
+  animation:
+    barbudito-aleteo 0.55s steps(16) infinite,
+    barbudito-cruzar 1.15s cubic-bezier(0.22, 0.61, 0.36, 1) 1 forwards;
+}
+@keyframes barbudito-aleteo {
+  from { background-position-x: 0%; }
+  to   { background-position-x: 100%; }
+}
+/* Arco diagonal de lado a lado, UNA pasada (sube y sale; sin rebote). */
+@keyframes barbudito-cruzar {
+  0%   { transform: translate3d(-34vw, 10vh, 0) scale(0.78); opacity: 0; }
+  14%  { opacity: 1; }
+  50%  { transform: translate3d(0, -6vh, 0) scale(1.05); opacity: 1; }
+  86%  { opacity: 1; }
+  100% { transform: translate3d(36vw, 4vh, 0) scale(0.8); opacity: 0; }
+}
+
+/* ── prefers-reduced-motion: nada se mueve ───────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .barbudito-posado,
+  .barbudito-cruza {
+    animation: none !important;
+    transform: none !important;
+  }
+}

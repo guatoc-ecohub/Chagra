@@ -1,20 +1,29 @@
 import { useEffect, useRef, useState } from 'react';
+import { colibriRealActivo } from '../../config/colibriFlag';
+import { BarbuditoCruza } from '../colibri/Barbudito';
 
 /**
  * ColibriTransition — transición HIPER LINDA pero LIMPIA del home a la
- * conversación (~2s).
+ * conversación (~1–2s).
  *
  * Al enviar desde el hero del home, en vez de un corte seco hacia AgentScreen,
- * el colibrí entra en VIDEO (`/avatar/colibri-transition.webm`, el mismo asset
- * vivo que usa el avatar) a pantalla completa, sobre un fondo oscuro suave, y
+ * el colibrí cruza/aparece a pantalla completa sobre un fondo oscuro suave, y
  * se desvanece dejando la conversación montada detrás. Llama la atención sin
  * saltos ni flash.
  *
- * Contrato:
- *   - Duración total acotada (~2s): el video se reproduce y a `HOLD_MS` el
- *     overlay hace fade-out (`FADE_MS`) y se desmonta. Si el video falla
- *     (onError) o no soporta WebM, cae al still del colibrí sin video.
- *   - prefers-reduced-motion → SIN video: solo un fade corto y limpio.
+ * DOS modos (según la flag VITE_COLIBRI, dev-only):
+ *   - Flag ON (colibrí REAL): el barbudito de páramo CRUZA la pantalla UNA sola
+ *     pasada en arco diagonal (webm VP9-alpha `barbudito-transition.webm`; en
+ *     iOS, que no soporta VP9-alpha, sprite steps(16)+translateX). Rápido y
+ *     encantador (~1.2s), sin rebote (no es un loop).
+ *   - Flag OFF (default, prod): el colibrí entra en VIDEO
+ *     (`/avatar/colibri-transition.webm`) como hasta ahora; si el video falla
+ *     o no soporta WebM, cae al still.
+ *
+ * Contrato común:
+ *   - Duración total acotada: tras `HOLD_MS` el overlay hace fade-out
+ *     (`FADE_MS`) y se desmonta.
+ *   - prefers-reduced-motion → SIN animación pesada: solo un fade corto.
  *   - No bloquea el montaje de la conversación: el overlay va ENCIMA; cuando se
  *     va, la conversación ya está lista detrás (cero parpadeo).
  *   - Cleanup total de timers al desmontar.
@@ -25,8 +34,15 @@ import { useEffect, useRef, useState } from 'react';
 export const COLIBRI_TRANSITION_HOLD_MS = 1500; // video visible antes del fade
 export const COLIBRI_TRANSITION_FADE_MS = 480; // fade-out suave
 export const COLIBRI_TRANSITION_TOTAL_MS = COLIBRI_TRANSITION_HOLD_MS + COLIBRI_TRANSITION_FADE_MS;
-// Reduced-motion: transición mínima y sobria, sin video.
+// Reduced-motion: transición mínima y sobria, sin animación.
 export const COLIBRI_TRANSITION_REDUCED_MS = 360;
+// Colibrí REAL cruzando: corto y encantador. El cruce CSS dura ~1.15s
+// (barbudito-cruzar); dejamos visible un pelín menos y luego el fade.
+export const COLIBRI_TRANSITION_CRUCE_HOLD_MS = 1050;
+
+// ¿Transición con el colibrí REAL (barbudito cruzando) en vez del video?
+// Gateado por VITE_COLIBRI (dev-only). Se evalúa una sola vez (flag de build).
+const COLIBRI_REAL = colibriRealActivo();
 
 function prefersReducedMotion() {
   return typeof window !== 'undefined' && typeof window.matchMedia === 'function'
@@ -62,6 +78,9 @@ const CSS = `
     from { opacity: 0; transform: scale(0.82); }
     to   { opacity: 1; transform: scale(1); }
   }
+  /* Colibrí REAL cruzando: el sprite (BarbuditoSprite variant="cruzando") trae
+     su propia animación de aleteo + translateX; aquí solo lo dimensionamos. */
+  .colibri-tx-cruce { filter: drop-shadow(0 8px 22px rgba(0,0,0,0.45)); }
   @media (prefers-reduced-motion: reduce) {
     .colibri-tx-video, .colibri-tx-still { animation: none !important; }
     .colibri-tx { transition: opacity ${COLIBRI_TRANSITION_REDUCED_MS}ms linear; }
@@ -84,9 +103,13 @@ function ColibriOverlay({ onDone }) {
     const reduce = prefersReducedMotion();
     const timers = [];
     if (reduce) {
-      // Fade simple y corto, sin video.
+      // Fade simple y corto, sin video ni cruce.
       timers.push(setTimeout(() => setLeaving(true), 40));
       timers.push(setTimeout(() => doneRef.current?.(), COLIBRI_TRANSITION_REDUCED_MS + 60));
+    } else if (COLIBRI_REAL) {
+      // Colibrí REAL cruzando: corto y encantador.
+      timers.push(setTimeout(() => setLeaving(true), COLIBRI_TRANSITION_CRUCE_HOLD_MS));
+      timers.push(setTimeout(() => doneRef.current?.(), COLIBRI_TRANSITION_CRUCE_HOLD_MS + COLIBRI_TRANSITION_FADE_MS));
     } else {
       timers.push(setTimeout(() => setLeaving(true), COLIBRI_TRANSITION_HOLD_MS));
       timers.push(setTimeout(() => doneRef.current?.(), COLIBRI_TRANSITION_TOTAL_MS));
@@ -95,7 +118,7 @@ function ColibriOverlay({ onDone }) {
   }, []);
 
   const reduce = prefersReducedMotion();
-  const showVideo = !reduce && !videoFailed;
+  const showVideo = !COLIBRI_REAL && !reduce && !videoFailed;
 
   return (
     <div
@@ -104,7 +127,11 @@ function ColibriOverlay({ onDone }) {
       data-testid="colibri-transition"
     >
       <style>{CSS}</style>
-      {showVideo ? (
+      {COLIBRI_REAL && !reduce ? (
+        // Barbudito REAL cruzando la pantalla UNA pasada (webm VP9-alpha; en
+        // iOS, sprite steps(16)+translateX). Universal.
+        <BarbuditoCruza size={172} className="colibri-tx-cruce" />
+      ) : showVideo ? (
         <video
           className="colibri-tx-video"
           autoPlay
@@ -115,6 +142,9 @@ function ColibriOverlay({ onDone }) {
         >
           <source src="/avatar/colibri-transition.webm" type="video/webm" />
         </video>
+      ) : COLIBRI_REAL ? (
+        // Flag ON + reduced-motion: el póster del barbudito, sin cruce.
+        <img className="colibri-tx-still" src="/colibri/barbudito-poster.png" alt="" draggable={false} />
       ) : (
         <img className="colibri-tx-still" src="/avatar/colibri-hero-still.jpg" alt="" draggable={false} />
       )}

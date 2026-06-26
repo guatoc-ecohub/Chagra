@@ -482,6 +482,15 @@
   100% { transform: translate(0, 0); }
 }
 
+/* VENTANA VIVA DEL PÁRAMO (barbudito real en la flor, flag VITE_COLIBRI ON). El
+   recuadro trae su propio marco/sombra (barbudito.css); aquí solo lo ubicamos
+   sobre la escena y anulamos la animación de bicho heredada (no debe revolotear:
+   es una ventana fija, no un bicho que cruza). */
+.fvh-colibri-ventana {
+  animation: none !important;
+  z-index: 8;
+}
+
 /* COLIBRÍ insignia volando (feedback #5) — vuelo estacionario + batido de alas */
 .fvh-colibri-vuela {
   animation: fvh-colibri-vuelo 5.5s ease-in-out infinite;

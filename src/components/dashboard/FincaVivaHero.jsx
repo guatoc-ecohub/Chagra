@@ -16,7 +16,16 @@ import { resolveClimaLocation, getCachedClimaSnapshot, CLIMA_UPDATED_EVENT } fro
 import { clasificarPisoTermico } from '../../services/pisoTermicoClassifier';
 import { useTheme } from '../../hooks/useTheme';
 import { iconForTheme } from './themeIcon';
+import { colibriRealActivo } from '../../config/colibriFlag';
+import { BarbuditoVentana } from '../colibri/Barbudito';
 import './finca-viva-hero.css';
+
+// ¿Mostrar el colibrí REAL (barbudito de páramo) en vez del SVG 2D? Gateado por
+// VITE_COLIBRI (colibriFlag.js), dev-only. Se evalúa una sola vez al cargar el
+// módulo (la flag es de build, no cambia en runtime). Con la flag OFF (prod) el
+// home conserva el colibrí SVG 2D `ColibriVuela` de siempre. Con la flag ON, el
+// home muestra la "ventana viva del páramo" (video del barbudito en la flor).
+const COLIBRI_REAL = colibriRealActivo();
 
 /**
  * FincaVivaHero — el HOME INMERSIVO "Finca Viva" (refinado del mockup F2 v2
@@ -335,9 +344,20 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
                       (fauna que prospera) sólo aparecen cuando la finca está
                       poblada. */}
                   <div className="fvh-bichos" aria-hidden="true">
-                    <span className="fvh-bicho fvh-colibri-vuela" style={{ left: '66%', top: '20%' }}>
-                      <ColibriVuela />
-                    </span>
+                    {/* COLIBRÍ insignia. Con la flag VITE_COLIBRI ON (dev), una
+                        "ventana viva del páramo": video real del barbudito
+                        tomando néctar de la flor del frailejón, enmarcado en un
+                        recuadro redondeado sobre la escena. Con la flag OFF
+                        (prod), el colibrí SVG 2D `ColibriVuela` de siempre. */}
+                    {COLIBRI_REAL ? (
+                      <span className="fvh-bicho fvh-colibri-ventana" style={{ right: '5%', top: '8%' }}>
+                        <BarbuditoVentana size={148} ariaLabel="El barbudito de páramo en su finca" />
+                      </span>
+                    ) : (
+                      <span className="fvh-bicho fvh-colibri-vuela" style={{ left: '66%', top: '20%' }}>
+                        <ColibriVuela />
+                      </span>
+                    )}
                     {poblada && (
                       <>
                         <span className="fvh-bicho" style={{ left: '16%', top: '18%', animationDelay: '.1s' }}>🦋</span>
