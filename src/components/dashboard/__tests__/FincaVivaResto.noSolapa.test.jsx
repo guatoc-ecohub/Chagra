@@ -120,13 +120,17 @@ describe('Bug 2 · DOM — hero F2: 4 portales visibles + hoja "resto" separada'
     const portales = within(nav).getAllByRole('button');
     expect(portales).toHaveLength(4);
     const labels = portales.map((b) => b.getAttribute('aria-label')?.split(':')[0]);
-    expect(labels).toEqual(['Gestionar', 'Aprender', 'Jugar', 'Agente']);
+    // Copy campesino vigente (#1883/#1884): "Mi finca" (gestión), "Aprender",
+    // "Jugar", "Pregúntele a Chagra" (agente). Antes eran Gestionar/Agente.
+    expect(labels).toEqual(['Mi finca', 'Aprender', 'Jugar', 'Pregúntele a Chagra']);
   });
 
-  test('la hoja "El resto de su finca" NO contiene los portales (superficies separadas)', async () => {
+  test('la hoja "resto" NO contiene los portales (superficies separadas)', async () => {
     render(<DashboardLive onNavigate={vi.fn()} />);
     const nav = await screen.findByTestId('finca-viva-portales');
-    const hoja = screen.getByText('El resto de su finca').closest('.fvh-resto');
+    // La hoja "resto" se reorganizó en bloques (#1883/#1884); su contenedor es
+    // .fvh-resto (data-testid estable), ya no el título "El resto de su finca".
+    const hoja = screen.getByTestId('fvh-resto');
     expect(hoja).toBeTruthy();
     // La hoja "resto" es un contenedor distinto: NO envuelve la grilla de portales
     // (si la envolviera, los taparía/empujaría dentro de su superficie).
@@ -136,7 +140,7 @@ describe('Bug 2 · DOM — hero F2: 4 portales visibles + hoja "resto" separada'
   test('en orden de documento, los portales van ANTES de la hoja "resto"', async () => {
     render(<DashboardLive onNavigate={vi.fn()} />);
     const nav = await screen.findByTestId('finca-viva-portales');
-    const tit = screen.getByText('El resto de su finca');
+    const tit = screen.getByTestId('fvh-resto');
     await waitFor(() => expect(nav).toBeInTheDocument());
     // compareDocumentPosition: nav precede a tit → DOCUMENT_POSITION_FOLLOWING.
     const rel = nav.compareDocumentPosition(tit);

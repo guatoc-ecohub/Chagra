@@ -648,7 +648,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                 El extensionista (red institucional) NO lleva hoja: su red ocupa
                 el hero completo. ════════════════════════════════════════════ */}
             {fincaVivaFlag && esExtensionista ? null : (
-            <div className={fincaVivaFlag ? 'fvh-resto' : 'contents'}>
+            <div className={fincaVivaFlag ? 'fvh-resto' : 'contents'} data-testid={fincaVivaFlag ? 'fvh-resto' : undefined}>
             <div className={fincaVivaFlag ? 'fvh-resto-shell' : 'contents'}>
 
             {/* Acceso al módulo "Reporte de Punto Glaciar" (guías de glaciar).
