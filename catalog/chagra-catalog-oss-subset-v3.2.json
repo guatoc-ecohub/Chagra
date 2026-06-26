@@ -133,7 +133,13 @@
         "solanum_tuberosum_sabanera"
       ],
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "cebolla de bulbo",
+        "cebolla huevo",
+        "cebolla bulbosa",
+        "cebolla roja"
+      ]
     },
     {
       "id": "allium_fistulosum",
@@ -181,7 +187,14 @@
         "phaseolus_vulgaris"
       ],
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "cebolla junca",
+        "cebolla de rama",
+        "cebolla en rama",
+        "cebolla rama",
+        "cebolla verdeo"
+      ]
     },
     {
       "id": "allium_sativum",
@@ -280,6 +293,10 @@
         "daucus_carota_subsp_sativus",
         "petroselinum_crispum",
         "solanum_melongena"
+      ],
+      "nombre_comunes_regionales": [
+        "ajo de bulbo",
+        "ajo común"
       ]
     },
     {
@@ -506,6 +523,10 @@
       "cultivar": false,
       "antagonists": [
         "petroselinum_crispum"
+      ],
+      "nombre_comunes_regionales": [
+        "apio de pencas",
+        "célery"
       ]
     },
     {
@@ -602,7 +623,12 @@
       ],
       "valor_pedagogico": "La remolacha o betarraga (Beta vulgaris L. subsp. vulgaris Conditiva Group) es una quenopodiácea bienal cultivada como anual por su raíz hipocotila engrosada rica en azúcares, betalaínas (pigmentos antioxidantes) y nitratos vegetales. Hortaliza tradicional de huertas andinas colombianas. Se cultiva en Sabana de Bogotá (Mosquera, Madrid, Funza), Boyacá altiplano (Tunja, Duitama), Nariño y Antioquia entre 1.800 y 2.900 msnm en zona térmica fría. Ciclo 90-120 días desde siembra directa hasta raíz comercial (5-10 cm diámetro). Rendimientos 25-40 t/ha. Lección viva: muestra cómo la planta acumula reservas en raíz hipocotila para sobrevivir período seco o frío. Manejo agroecológico: siembra directa a chorrillo, aclareo a 10-15 cm planta, suelos francos profundos pH 6.5-7.5, fertilización con compost + bocashi al fondo, asocio con lechugas y zanahorias en cama mixta, control de minador hoja (Pegomya betae) con purín de ortiga + caldo sulfocálcico. Fuentes Tier A: ICA Resolución 3168/2015, Restrepo 1996 ABC Agricultura Orgánica, POWO Kew, GBIF Backbone Taxonomy.",
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "betabel",
+        "betarraga",
+        "beterraga"
+      ]
     },
     {
       "id": "brassica_oleracea_acephala_curly",
@@ -753,7 +779,10 @@
       "nombre_comun": "Caléndula",
       "nombre_cientifico": "Calendula officinalis L.",
       "nombre_comunes_regionales": [
-        "Margarita dorada"
+        "Margarita dorada",
+        "mercadela",
+        "maravilla",
+        "caléndula común"
       ],
       "familia_botanica": "Asteraceae",
       "category": "atractores_polinizadores",
@@ -852,7 +881,12 @@
         "zea_mays"
       ],
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "quínoa",
+        "quingua",
+        "arrocillo andino"
+      ]
     },
     {
       "id": "coffea_arabica",
@@ -860,7 +894,9 @@
       "nombre_cientifico": "Coffea arabica L.",
       "nombre_comunes_regionales": [
         "Café Supremo (categoría comercial)",
-        "Café Arábigo"
+        "Café Arábigo",
+        "café de altura",
+        "cafeto"
       ],
       "familia_botanica": "Rubiaceae",
       "category": "medicinales_alelopaticas",
@@ -1049,7 +1085,12 @@
       ],
       "valor_pedagogico": "El cilantro (Coriandrum sativum L.) es una aromática mediterránea naturalizada en Colombia, cultivada permanentemente en Cundinamarca entre 1000-2400 msnm en zonas térmicas templadas y frías. Su ciclo corto de 40-60 días permite cosechas escalonadas de hojas y semillas utilizadas en preparaciones culinarias tradicionales. Se propaga por siembra directa cada 15 días, prefiriendo medio-sombra en épocas cálidas, y se asocia beneficiosamente con repollo y zanahoria para reducir plagas como áfidos y trips. En el contexto andino campesino, su uso culinario se remonta a tiempos coloniales integrado en sofritos y guayos, mientras su cultivo sostenible evita sintéticos mediante manejo agroecológico. Fuentes: GBIF Taxonomic Backbone, POWO Kew, ICA Resolución 3168/2015.",
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "culantro",
+        "cilantro común",
+        "cilantro de castilla"
+      ]
     },
     {
       "id": "cymbopogon_citratus",
@@ -1098,7 +1139,13 @@
         "solanum_lycopersicum_san_marzano"
       ],
       "tracking_mode": "individual",
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "limoncillo",
+        "pasto limón",
+        "hierba limón",
+        "citronela de té"
+      ]
     },
     {
       "id": "erythrina_edulis",
@@ -1390,6 +1437,10 @@
       "companions": [
         "pyrus_communis_anjou",
         "spinacia_oleracea"
+      ],
+      "nombre_comunes_regionales": [
+        "fresa",
+        "frutilla"
       ]
     },
     {
@@ -1438,6 +1489,9 @@
       "companions": [
         "phaseolus_vulgaris",
         "zea_mays"
+      ],
+      "nombre_comunes_regionales": [
+        "boniato"
       ]
     },
     {
@@ -1499,7 +1553,12 @@
         "tabebuia_rosea",
         "vismia_baccifera"
       ],
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "guama",
+        "guamo santafereño",
+        "guaba"
+      ]
     },
     {
       "id": "lactuca_sativa_capitata",
@@ -1729,7 +1788,13 @@
         "zea_mays"
       ],
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "tarhui",
+        "altramuz",
+        "chocho andino",
+        "tauri"
+      ]
     },
     {
       "id": "melissa_officinalis",
@@ -1828,7 +1893,11 @@
       "companions": [
         "viola_odorata"
       ],
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "menta verde",
+        "yerba buena"
+      ]
     },
     {
       "id": "origanum_vulgare",
@@ -1873,7 +1942,11 @@
       ],
       "valor_pedagogico": "El orégano común (Origanum vulgare L.) es una labiada perenne aromática originaria del Mediterráneo, ampliamente cultivada en huertas familiares y campesinas colombianas para uso culinario, medicinal y como repelente natural. Se cultiva en zonas frías y templadas: Sabana de Bogotá, Boyacá, Antioquia, Quindío, Caldas y Risaralda entre 1.200 y 2.800 msnm en zona térmica fría a templada. Propagación por estaca leñosa (60-80% prendimiento) o división de mata establecida. Ciclo perenne con vida productiva 4-6 años. Cortes graduales mensuales mantienen el porte compacto. Manejo agroecológico: cama elevada con drenaje excelente, suelos calcáreos pH 6.5-7.5, riego moderado (NO encharcamiento), asocio con tomate y pimentón (efecto repelente). Aceite esencial con carvacrol y timol confiere propiedades antibacterianas y antifúngicas. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "tracking_mode": "individual",
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "orégano común",
+        "orégano de huerta"
+      ]
     },
     {
       "id": "oxalis_tuberosa",
@@ -1925,7 +1998,11 @@
         "zea_mays"
       ],
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "ibia",
+        "oca andina"
+      ]
     },
     {
       "id": "passiflora_edulis_flavicarpa",
@@ -1971,7 +2048,13 @@
       "valor_pedagogico": "La Passiflora edulis f. flavicarpa, conocida como maracuyá amarilla, se cultiva en departamentos colombianos como Antioquia, Cundinamarca, Santander y el Valle del Cauca entre 0 y 1800 msnm en zonas térmicas cálidas y templadas. Su manejo agronómico incluye propagación por semilla o injerto, ciclo productivo de 18-24 meses, asociaciones beneficiosas con cultivos de sombra como plátano y caucho para reducir estrés hídrico, y requiere manejo de plagas como la mosca de la fruta (Ceratitis capitata) y ácaros mediante monitoreo y biopreparados. En el contexto andino-colombiano, aunque originaria de Brasil, su cultivo se ha integrado en sistemas agrofrutícolas de mediana altura, contribuyendo a la diversificación económica de pequeños productores. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Passiflora edulis f. flavicarpa Deg.",
       "estrato": "alto",
       "tracking_mode": "individual",
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "maracuyá amarillo",
+        "parchita",
+        "parcha",
+        "maracujá"
+      ]
     },
     {
       "id": "passiflora_edulis_morada",
@@ -2120,7 +2203,11 @@
       "valor_pedagogico": "La granadilla (Passiflora ligularis Juss.) se distribuye en los departamentos andinos de Colombia como Cundinamarca, Boyacá, Antioquia, Nariño y Santander entre 1500 y 2600 msnm, con óptimo productivo entre 1800 y 2400 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con tratamiento de escarificación para acelerar la germinación (14-21 días), ciclo productivo de 12-18 meses desde siembra hasta primera cosecha, requiere tutoraje con espalderas o emparrillados sturdy para soportar el peso de los racimos, y se asocia beneficiosamente con plátano y café como sombra parcial. Las principales plagas incluyen nematodos del género Meloidogyne, trips (Frankliniella spp.), mosca de la fruta (Ceratitis capitata) y enfermedades fungosas como antracnosis (Colletotrichum gloeosporioides), requeridas de manejo integrado mediante monitoreo quincenal y biopreparados andinos. En el contexto cultural muisca y andino, esta passiflora ha sido tradicionalmente cultivada en huertos caseros y chagras de altura, donde sus frutos se consumen frescos en jugos y obras, mientras la planta se usa como cerca viva decorativa por sus flores vistosas. Los saberes tradicionales incluyen el uso de hojas en infusiones para calmar aftas y la aplicación del mucílago de los frutos como gelatinizante natural en la cocina campesina. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), respaldada por AGROSAVIA Sol Andina y la ICA Resolución 3168/2015, su nombre científico válido es Passiflora ligularis Juss.",
       "estrato": "alto",
       "tracking_mode": "individual",
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "granadilla común",
+        "granadilla de China"
+      ]
     },
     {
       "id": "passiflora_tripartita_mollissima",
@@ -2169,7 +2256,13 @@
         "urtica_dioica"
       ],
       "tracking_mode": "individual",
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "curuba",
+        "tacso",
+        "taxo",
+        "parcha"
+      ]
     },
     {
       "id": "pennisetum_setaceum",
@@ -2361,6 +2454,10 @@
         "apium_graveolens",
         "brassica_oleracea_italica",
         "foeniculum_vulgare"
+      ],
+      "nombre_comunes_regionales": [
+        "perejil rizado",
+        "perejil común"
       ]
     },
     {
@@ -2370,7 +2467,9 @@
       "nombre_comunes_regionales": [
         "Frijol cargamanto",
         "Bola roja",
-        "Frijol recal"
+        "Frijol recal",
+        "habichuela",
+        "frijol radical"
       ],
       "familia_botanica": "Fabaceae",
       "category": "granos_legumbres",
@@ -2514,6 +2613,12 @@
       "cultivar": false,
       "companions": [
         "vasconcellea_pubescens"
+      ],
+      "nombre_comunes_regionales": [
+        "uvilla",
+        "aguaymanto",
+        "topotopo",
+        "guchuva"
       ]
     },
     {
@@ -2885,6 +2990,9 @@
       "cultivar": false,
       "companions": [
         "petroselinum_crispum"
+      ],
+      "nombre_comunes_regionales": [
+        "rábano rojo"
       ]
     },
     {
@@ -2936,7 +3044,11 @@
         "urtica_dioica"
       ],
       "tracking_mode": "individual",
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "romero común",
+        "romero de huerta"
+      ]
     },
     {
       "id": "solanum_betaceum",
@@ -2982,7 +3094,12 @@
       "valor_pedagogico": "El tomate de árbol (Solanum betaceum Cav.) se cultiva en departamentos andinos de Colombia como Cundinamarca, Boyacá, Nariño, Valle del Cauca, Antioquia y Tolima entre 1200 y 3000 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla o injerto, ciclo de fructificación de 8-12 meses desde la siembra, asociaciones beneficiosas con café, cacao y especies de sombra que mejoran la estructura del huerto, y requiere manejo integrado de nematodos, mosca de la fruta y trips mediante monitoreo y biopreparados andinos. En el contexto cultural muisca y andino, este frutal ha sido tradicionalmente consumido fresco o en jugos, conservando su valor como alimento nativo de los Andes colombianos. Según las fuentes taxonómicas verificadas de GBIF Backbone Taxonomy, Plants of the World Online (POWO), AGROSAVIA Manual de Uchuva y la ICA Resolución 3168/2015, su nombre científico válido es Solanum betaceum Cav.",
       "estrato": "medio",
       "tracking_mode": "individual",
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "tomate de palo",
+        "tomate de monte",
+        "tomate cimarrón"
+      ]
     },
     {
       "id": "solanum_lycopersicum_cerasiforme",
@@ -3524,7 +3641,11 @@
           "_revisor": "claude-opus-4-7"
         }
       ],
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "papa amarilla",
+        "papa criolla colombiana"
+      ]
     },
     {
       "id": "theobroma_cacao",
@@ -3576,6 +3697,10 @@
         "gliricidia_sepium",
         "musa_paradisiaca",
         "vanilla_planifolia"
+      ],
+      "nombre_comunes_regionales": [
+        "cacao común",
+        "cacao de monte"
       ]
     },
     {
@@ -3682,7 +3807,10 @@
         "zea_mays"
       ],
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "isaño"
+      ]
     },
     {
       "id": "ulex_europaeus",
@@ -3864,6 +3992,12 @@
         "lepidium_meyenii",
         "mirabilis_expansa",
         "tropaeolum_tuberosum"
+      ],
+      "nombre_comunes_regionales": [
+        "olloco",
+        "melloco",
+        "ruba",
+        "tiquiño"
       ]
     },
     {
@@ -4270,7 +4404,11 @@
       "nombre_comunes_regionales": [
         "Maíz capio",
         "Maíz pira",
-        "Maíz de montaña"
+        "Maíz de montaña",
+        "maíz",
+        "choclo",
+        "elote",
+        "mazorca"
       ],
       "familia_botanica": "Poaceae",
       "category": "cereales",
@@ -4385,7 +4523,9 @@
       "nombre_comun": "Amaranto",
       "nombre_comunes_regionales": [
         "Kiwicha",
-        "Achis"
+        "Achis",
+        "bledo",
+        "sangorache"
       ],
       "nombre_cientifico": "Amaranthus caudatus L.",
       "familia_botanica": "Amaranthaceae",
@@ -4481,13 +4621,19 @@
         "avena_sativa"
       ],
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "haba común"
+      ]
     },
     {
       "id": "pisum_sativum_andina",
       "nombre_comun": "Arveja andina",
       "nombre_comunes_regionales": [
-        "Alverja"
+        "Alverja",
+        "arveja verde",
+        "guisante",
+        "chícharo"
       ],
       "nombre_cientifico": "Pisum sativum L. var. andina",
       "familia_botanica": "Fabaceae",
@@ -4607,7 +4753,8 @@
       "nombre_comunes_regionales": [
         "jiquima",
         "aricoma",
-        "papa japonesa (impropiamente)"
+        "papa japonesa (impropiamente)",
+        "jícama andina"
       ],
       "nombre_cientifico": "Smallanthus sonchifolius (Poepp.) H.Rob.",
       "familia_botanica": "Asteraceae",
@@ -4889,7 +5036,12 @@
         "viola_odorata",
         "viola_tricolor"
       ],
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "fresa silvestre",
+        "fresón silvestre",
+        "frutilla del bosque"
+      ]
     },
     {
       "id": "rubus_glaucus",
@@ -4987,7 +5139,10 @@
         "urtica_dioica"
       ],
       "tracking_mode": "individual",
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "zarzamora andina"
+      ]
     },
     {
       "id": "solanum_quitoense",
@@ -5037,7 +5192,11 @@
       "valor_pedagogico": "El lulo o naranjilla (Solanum quitoense Lam., familia Solanaceae) es una solanácea subarbustiva perenne nativa de la región andina norte (Colombia, Ecuador, Perú), cultivada tradicionalmente en sistemas agroforestales campesinos colombianos por sus frutos esféricos anaranjados de pulpa verde ácida (pH 2.8-3.4), ricos en vitamina C, ácido cítrico y carotenoides, considerada el cítrico andino por excelencia. Se cultiva en Cundinamarca (Fómeque, Quetame, Une), Boyacá (Miraflores, Garagoa), Huila (San Agustín, Pitalito), Caquetá (Florencia) y Cauca (Silvia, Inzá) entre 1.600 y 2.400 msnm en zona térmica templada a fría. Ciclo perenne con primera cosecha a los 9-12 meses, producción sostenida 3-4 años. Rendimientos 12-20 t/ha fruto fresco. Lección viva: enseña la importancia de la acidez (ácido cítrico y málico) como mecanismo de defensa natural anti-herbívoros y anti-microbiano, su valor en la gastronomía tradicional (jugo, sorbete, mermelada, lulada vallecaucana) y la sensibilidad a nematodos del nudo radical Meloidogyne incognita como bioindicador de salud del suelo. Manejo agroecológico: siembra con sombra parcial (40-60%) en sistemas con plátano o guamo (Inga edulis) como sombra temporal, asocio con maíz para protección contra viento, podas sanitarias de hojas viejas, control biológico de Neoleucinodes elegantalis (perforador) con Trichogramma pretiosum, no requiere agroquímicos. Fuentes Tier A: AGROSAVIA Manual Frutales Tropicales, POWO Kew, GBIF Backbone Taxonomy, SIB Colombia, Bernal 2015 Catálogo Plantas Colombia.",
       "validation_level": "claude_draft",
       "tracking_mode": "individual",
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "lulo de castilla",
+        "lulo común"
+      ]
     },
     {
       "id": "thymus_vulgaris",
@@ -5163,7 +5322,8 @@
       "nombre_comun": "Manzanilla",
       "nombre_comunes_regionales": [
         "Camomila",
-        "Manzanilla dulce"
+        "Manzanilla dulce",
+        "manzanilla común"
       ],
       "nombre_cientifico": "Matricaria chamomilla L.",
       "familia_botanica": "Asteraceae",
@@ -5481,6 +5641,10 @@
         "allium_cepa",
         "allium_sativum",
         "raphanus_sativus_niger"
+      ],
+      "nombre_comunes_regionales": [
+        "zanahoria común",
+        "azanoria"
       ]
     },
     {
@@ -6011,7 +6175,8 @@
       "nombre_comunes_regionales": [
         "aloe",
         "zabila",
-        "savila"
+        "savila",
+        "penca sábila"
       ],
       "nombre_cientifico": "Aloe vera (L.) Burm.f.",
       "familia_botanica": "Asphodelaceae",
@@ -6065,7 +6230,8 @@
       "nombre_comun": "Jengibre",
       "nombre_comunes_regionales": [
         "Kion",
-        "Jengibre dulce"
+        "Jengibre dulce",
+        "ajengibre"
       ],
       "nombre_cientifico": "Zingiber officinale Roscoe",
       "familia_botanica": "Zingiberaceae",
@@ -6120,7 +6286,9 @@
       "nombre_comunes_regionales": [
         "Palillo",
         "Azafran de la tierra",
-        "Guisador"
+        "Guisador",
+        "azafrán de raíz",
+        "yuquilla"
       ],
       "nombre_cientifico": "Curcuma longa L.",
       "familia_botanica": "Zingiberaceae",
@@ -6589,7 +6757,9 @@
         "casabe",
         "fariña",
         "yuca venenosa",
-        "tapioca"
+        "tapioca",
+        "mandioca",
+        "yuca dulce"
       ],
       "nombre_cientifico": "Manihot esculenta Crantz",
       "familia_botanica": "Euphorbiaceae",
@@ -6705,7 +6875,10 @@
         "albahaca dulce",
         "albahaca de hoja ancha",
         "alfavaca",
-        "basil"
+        "basil",
+        "albahaca común",
+        "albahaca blanca",
+        "alfábega"
       ],
       "nombre_cientifico": "Ocimum basilicum L.",
       "familia_botanica": "Lamiaceae",
@@ -6751,7 +6924,9 @@
         "parchita guanábana",
         "maracuyá gigante",
         "giant granadilla",
-        "tumbo gigante"
+        "tumbo gigante",
+        "tumbo",
+        "barbadina"
       ],
       "nombre_cientifico": "Passiflora quadrangularis L.",
       "familia_botanica": "Passifloraceae",
@@ -7337,6 +7512,12 @@
       ],
       "antagonists": [
         "eucalyptus_globulus"
+      ],
+      "nombre_comunes_regionales": [
+        "palta",
+        "cura",
+        "aguacate criollo",
+        "abacate"
       ]
     },
     {
@@ -7775,7 +7956,12 @@
       "valor_pedagogico": "La granadilla de fraile o maracuyá silvestre (Passiflora maliformis) es una pasiflora trepadora perenne nativa de América tropical, que produce frutos amarillo-verdosos comestibles de pulpa ácida aromática. Se cultiva en Colombia como cercana viva productiva o en sistemas agroforestales de ladera en zonas cálidas y templadas del Valle del Cauca, Tolima, Huila y Cundinamarca (0-1.500 msnm). Los frutos son más pequeños que la maracuyá (Passiflora edulis) pero de sabor intenso, se consumen frescos o en jugos. Planta rústica, tolerante sequía, de uso tradicional en cercas vivas multifuncionales (producción + delimitación + control erosión). Lección: muestra la diversidad de pasifloras colombianas (~50 especies nativas), el valor de las especies silvestres emparentadas con cultivos comerciales como reserva genética, y el uso multifuncional de cercas vivas. Fuentes: POWO Kew, GBIF.",
       "validation_level": "claude_draft",
       "tracking_mode": "individual",
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "chulupa",
+        "sandía de monte",
+        "granadilla de piedra"
+      ]
     },
     {
       "id": "passiflora_tarminiana",
@@ -7927,7 +8113,12 @@
         "solanum_lycopersicum_san_marzano",
         "solanum_tuberosum_sabanera"
       ],
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "pepino",
+        "cohombro",
+        "pepino de ensalada"
+      ]
     },
     {
       "id": "cucumis_melo",
@@ -7970,7 +8161,10 @@
       "valor_pedagogico": "El melón (Cucumis melo) es una cucurbita rastrera anual cultivada por sus frutos grandes dulces aromáticos, de origen africano/asiático. En Colombia se cultiva comercialmente en la Atlántico, Huila, Tolima y Cundinamarca (400-1.400 msnm), y en huertos caseros escala pequeña. Planta de clima cálido, requiere alta radiación y temperaturas >20°C para dulzura óptima, sensible a exceso humedad (pudrición apical, oidio). Hay variedades de red (reticulado), cantalupo (rayado), honeydew (blanco) y casaba (verde). Lección: muestra la adaptación de cucurbitáceas globales a contextos tropicales, la importancia del clima en calidad poscosecha (dulzura), y el manejo del riego en frutos de alta demanda hídrica. Fuentes: POWO Kew, GBIF.",
       "validation_level": "claude_draft",
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "melón cantalupo"
+      ]
     },
     {
       "id": "citrullus_lanatus",
@@ -8015,7 +8209,10 @@
       "companions": [
         "zea_mays"
       ],
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "melón de agua"
+      ]
     },
     {
       "id": "ananas_comosus_md_gold",
@@ -8607,7 +8804,10 @@
       "antagonists": [
         "solanum_tuberosum_sabanera"
       ],
-      "cultivar": false
+      "cultivar": false,
+      "nombre_comunes_regionales": [
+        "espinaca común"
+      ]
     },
     {
       "id": "brassica_oleracea_sabellica",
@@ -15859,7 +16059,12 @@
       ],
       "valor_pedagogico": "El puerro (Allium ampeloprasum var. porrum) se cultiva en los departamentos andinos de Colombia como Cundinamarca y Boyacá entre 500 y 3400 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con trasplante profundo para favorecer el 'blanqueado' del tallo, ciclo vegetativo de 150-180 días, asociaciones beneficiosas con zanahoria y fresa que mejoran la salud del huerto, y requiere manejo de plagas como trips y minadores de hojas mediante monitoreo frecuente y biopreparados andinos. En el contexto campesino andino, esta verdura ha sido tradicionalmente utilizada en sopros y guisos como ingrediente esencial, preservando sabores prehispánicos en las cocinas rurales. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Allium ampeloprasum var. porrum (L.) J. Gay.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "nombre_comunes_regionales": [
+        "puerro",
+        "ajo porro",
+        "poro"
+      ]
     },
     {
       "id": "alocasia_macrorrhizos",
@@ -15908,7 +16113,12 @@
       ],
       "valor_pedagogico": "El bore o malanga gigante (Alocasia macrorrhizos (L.) G.Don, familia Araceae) es una arácea herbácea perenne robusta (1-4 m altura) originaria del sureste asiático tropical (Filipinas, Indonesia, Borneo, Malasia) y aclimatada hace siglos en sistemas tradicionales del trópico húmedo colombiano por comunidades afrocolombianas e indígenas. Produce hojas sagitadas-cordadas gigantes verde-brillantes (60-150 cm largo) sostenidas por pecíolos suculentos largos, inflorescencia tipo espádice con espata color crema y cormo subterráneo grande (10-25 cm diámetro) rico en almidón (60-80% peso seco), proteínas (3-5%) y minerales. Contiene cristales de oxalato de calcio (rafidios) que deben neutralizarse por cocción prolongada o fermentación previo al consumo humano y animal. Se cultiva en Chocó (Atrato, Quibdó, Bajo Baudó), Valle del Cauca (Buenaventura, Bajo Calima), Cauca (Guapi, Timbiquí), Nariño (Tumaco, Mosquera, Olaya Herrera), Amazonas (Leticia, Puerto Nariño), Vaupés (Mitú), Putumayo, Caquetá y Magdalena medio bajo entre 0 y 400 msnm en zona térmica cálida húmeda. Ciclo perenne, primera cosecha de cormo a los 10-14 meses. Rendimientos 25-50 t/ha cormo fresco. Lección viva: cultivo de seguridad alimentaria del trópico húmedo cuyos cormos ricos en almidón sostienen comunidades indígenas del Pacífico y Amazonia, enseñando sistemas agroforestales de chagra indígena (Embera, Wounaan, Tikuna, Curripaco), policultivo tropical con yuca y plátano, manejo tradicional de plantas con compuestos antinutricionales por procesamiento culinario (cocción, fermentación, rallado y lavado) y diversificación de fuentes de carbohidratos resistente a sequías y plagas que afectan cultivos comerciales monocultivo. Manejo agroecológico: propagación por hijos basales o secciones de cormo con yemas activas, siembra a 1.5-2 m entre plantas en sistemas con sombra parcial bajo plátano y palmera, asocio con yuca y plátano en chagra, cosecha rotacional planta por planta, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia, SINCHI Amazonia Colombiana.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "nombre_comunes_regionales": [
+        "rascadera",
+        "oreja de elefante",
+        "papa china grande"
+      ]
     },
     {
       "id": "aloysia_citrodora",
@@ -16234,7 +16444,10 @@
       ],
       "valor_pedagogico": "La chirimoya (Annona cherimola Mill.) es un frutal perenne de la familia Annonaceae originario de los valles interandinos de Ecuador-Perú, cultivado en Colombia entre 1.500 y 2.400 msnm en zona térmica templada a fría moderada. Se siembra en Boyacá (Sutamarchán, Santa Sofía, Tinjacá), Cundinamarca (Anolaima, Quipile, La Mesa), Santander, Huila y Cauca, donde la noche fresca favorece el cuajado del fruto. Árbol semicaducifolio 5-8 m, ciclo a primera cosecha 3-5 años por injerto. Manejo agroecológico: poda de formación en copa abierta para aireación, fertilización orgánica con compost + roca fosfórica + ceniza de madera (K), embolsado de frutos contra Bephratelloides cubensis (perforador de la semilla), y polinización manual con pincel al amanecer porque las flores son dicógamas protogínicas (estigma receptivo antes que las anteras liberen polen) y los polinizadores nativos (escarabajos Nitidulidae) son insuficientes en monocultivo. Asociar con leguminosas de cobertura (Arachis pintoi, Crotalaria spp.) para fijación de N y supresión de arvenses. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, ICA Resolución 3168/2015.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "nombre_comunes_regionales": [
+        "anón"
+      ]
     },
     {
       "id": "annona_mucosa",
@@ -18605,7 +18818,10 @@
       ],
       "valor_pedagogico": "El garbanzo (Cicer arietinum L., familia Fabaceae, tribu Cicereae) es una leguminosa anual herbácea de clima templado-frío seco mediterráneo originaria del Cuerno Fértil del Cercano Oriente (Anatolia turca — Karacadağ, sureste de Turquía y norte de Siria) donde fue domesticada hace ~9500-10000 años junto con trigo, cebada y lenteja como uno de los 'cultivos fundadores' (founder crops) de la agricultura neolítica. Diseminada vía Mediterráneo a Iberia y de allí introducida en América durante la conquista española como cultivo de tradición castellana arraigado profundamente en el altiplano andino colombiano. Se cultiva tradicionalmente en altiplano cundiboyacense (Boyacá — Tunja, Sotaquirá, Toca, Soracá, Villa de Leyva, Sutamarchán, Tinjacá; Cundinamarca — Sabana de Bogotá, Sopó, Zipaquirá, Pacho, Ubaté, Susa, Carmen de Carupa; Nariño — Pasto, Yacuanquer, Tangua, Túquerres, Ipiales; Cauca — Silvia, Totoró), Santander (Mogotes, San Gil, Barichara, Curití zonas semiáridas) y zonas semiáridas de Boyacá (Cañón del Chicamocha — Soatá, Tipacoque, Capitanejo) entre 1.200 y 3.000 msnm en zonas térmicas templadas-frías secas-semiáridas mediterráneas-andinas. Lección viva PEDAGÓGICAMENTE EXCELENTE de cultivo neolítico fundador de la agricultura humana: enseña a niñas y niños las raíces históricas de 10000 años de agricultura cerealera-leguminosa del Creciente Fértil, la geografía de la difusión transcultural mediterránea-andina, y las propiedades nutricionales completas del garbanzo (proteína 18-22%, carbohidratos 60-65% — almidón resistente prebiótico —, fibra 12-17%, minerales Fe-Zn-Mn-K, vitaminas grupo B — folato, vitamina B6 —, sin gluten, índice glicémico bajo IG 28) que lo convierten en 'alimento completo' de la dieta mediterránea y vegetariana mundial. Planta herbácea erecta-semi-erecta pequeña (30-60 cm altura) con tallos angulosos pubescente-glandulares (las glándulas secretan ácidos oxálico-málico — característica taxonómica del género Cicer), hojas imparipinnadas con 9-17 foliolos elípticos pequeños dentados, flores pequeñas papilionadas blancas (variedad kabuli — semilla grande blanco-cremosa, mediterránea-española) o rosado-violáceas (variedad desi — semilla pequeña marrón-oscura-moteada, india-etíope), frutos legumbres pequeñas ovaladas-globosas inflado-vesiculadas (2-3 cm largo) verdes a maduras paja, semillas características con punta ahusada-rostradas (aspecto de cabeza de carnero — Cicer arietinum, del latín 'aries' carnero), una a dos semillas por vaina. Tolerancia extraordinaria a sequía-frío seco (sobrevive heladas suaves hasta -4°C en estado vegetativo joven), suelos calcáreos básicos alcalinos (pH 6-8.5 — único leguminosa del catálogo que prefiere suelos calizos), pero crítica: INTOLERANTE a humedad excesiva-encharcamiento (susceptible a Fusarium oxysporum f.sp. ciceris marchitez vascular y Ascochyta rabiei rabia del garbanzo en humedad alta) por lo que requiere drenaje excelente — exclusivo de zonas secas-semiáridas altoandinas. Fija 60-120 kg N/ha por simbiosis con Mesorhizobium ciceri (rizobio específico del garbanzo, NO el mismo de fríjol o haba — requiere inoculación específica en suelos vírgenes). Manejo agroecológico altoandino: siembra directa de semilla pre-remojada 12h a 4-6 cm profundidad, distancia 10-15 cm x 30-40 cm, densidad 80-100 kg/ha, inoculación con Mesorhizobium ciceri obligatoria en suelos sin cultivo previo de garbanzo, asocio limitado con cebada-trigo en rotación (no asocio simultáneo — el garbanzo necesita sol pleno), no requiere fertilización N (autosuficiente), encalado moderado a alcalinizar suelos ácidos hasta pH 6.5-7, control biológico de Ascochyta con caldo bordelés moderado + rotación 3-4 años, cosecha 110-150 días, rendimientos 0.8-2 t/ha grano seco. Función en chagra/huerto escolar altoandino seco-semiárido como leguminosa proteica mediterránea-fundadora de agricultura, fijador N alcalino, cultivo histórico-patrimonial de soberanía alimentaria castellana-andina, alimento completo nutricionalmente balanceado para escuelas-comedores comunitarios, lección viva de los 'founder crops' neolíticos del Creciente Fértil. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, FAO Ecocrop Cicer arietinum, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "nombre_comunes_regionales": [
+        "garbanzo común"
+      ]
     },
     {
       "id": "cinchona_officinalis",
@@ -18993,7 +19209,12 @@
       ],
       "valor_pedagogico": "El taro o papa china (Colocasia esculenta (L.) Schott, familia Araceae) es una de las plantas alimenticias más antiguas domesticadas por la humanidad — su domesticación se remonta a 9.000-10.000 años atrás en el sudeste asiático (norte de India, Birmania, sur de China) y Melanesia tropical, considerándose uno de los cinco cultivos pilar de los pueblos austronesios y polinesios (junto con ñame, banana, coco y caña), y llegó a América tropical durante el periodo colonial con el comercio esclavista transatlántico desde África occidental como alimento de subsistencia de las comunidades afrodescendientes esclavizadas, donde se naturalizó y se adoptó por comunidades indígenas, campesinas y palenqueras en todo el trópico húmedo americano. En Colombia se cultiva ampliamente en el Pacífico colombiano (Chocó, Valle del Cauca litoral, Cauca litoral, Nariño litoral — Tumaco, Buenaventura, Quibdó, Tadó, Istmina), Caribe húmedo (Magdalena medio, Antioquia bajo, Urabá, Bolívar, Sucre, Córdoba, San Andrés y Providencia), Amazonía (piedemonte amazónico Putumayo-Caquetá, trapecio amazónico Leticia) y zonas bajas inundables del Magdalena medio entre 0 y 1.200 msnm en zona térmica cálida húmeda. Es una de las plantas insignia de la soberanía alimentaria afrocolombiana del Pacífico — alimento ancestral que sostuvo a comunidades cimarronas, palenques y consejos comunitarios del Pacífico colombiano durante siglos. Existen dos grandes grupos varietales tradicionales: 'dasheen' (cormo central grande, cormos hijos pequeños, preferida para consumo directo) y 'eddoe' (cormos hijos múltiples bien desarrollados, preferida para reproducción y comercialización). El cormo central tuberoso (4-15 cm diámetro, 0.5-2 kg peso) y los cormelos hijos son ricos en almidón resistente, mucílagos, vitamina A, vitamina C, potasio y proteína vegetal moderada (3-4%), consumidos cocidos (hervidos, fritos, asados, en sancocho, en cremas, en sopa de queso del Pacífico). Las hojas grandes acorazonadas-peltadas son comestibles también como espinaca tropical ('callaloo' caribeño) tras cocción prolongada. Lección viva de bioseguridad alimentaria: TODA la planta contiene rafidios de oxalato de calcio — cristales aciculares microscópicos que provocan irritación urticante intensa en mucosas (boca, esófago) si se consume cruda — pero la cocción prolongada (mínimo 30-45 minutos a 100°C, o asado directo en brasas) destruye completamente los oxalatos solubles y desnaturaliza los cristales, transformando la planta tóxica cruda en alimento básico nutritivo. Esta lección de procesamiento culinario obligatorio para detoxificar plantas alimenticias es paralela a la nixtamalización del maíz mesoamericano y al procesamiento de yuca brava amazónica, y enseña que la cocina tradicional NO es solo cultura, sino tecnología etnoquímica milenaria de bioseguridad. Manejo agroecológico: propagación por cormos hijos o trozos de cormo madre con yemas activas, plantación a 60-80 cm entre plantas y 1 m entre surcos, prefiere suelos encharcados o de bordes de humedales tropicales (zona ribereña, manglares de transición, marismas), ciclo 6-12 meses a cosecha, rendimientos 8-25 t/ha cormos. Asocio tradicional con plátano hartón, yuca, piña, achiote, caña de azúcar y árboles frutales en finca pacífica colombiana ('azotea' o 'finca tradicional pacífica'). Plagas: barrenador del cormo (Papuana spp.), pudrición Pythium spp. en suelos mal drenados. Especie clave para reactivar como cultivo en humedales, zonas inundables y áreas con problemas de drenaje donde otros cultivos no prosperan. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, FAO EcoCrop, Bernal 2015 Catálogo Plantas Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "nombre_comunes_regionales": [
+        "malanga",
+        "rascadera",
+        "bore"
+      ]
     },
     {
       "id": "cosmos_sulphureus",
@@ -19630,7 +19851,12 @@
       ],
       "valor_pedagogico": "El ñame blanco o ñame de agua (Dioscorea alata L., familia Dioscoreaceae) es una dioscoreácea herbácea perenne trepadora vigorosa originaria del sureste asiático tropical (Malasia, Indonesia, Nueva Guinea), introducida en América durante el comercio transatlántico y aclimatada profundamente en sistemas campesinos del Caribe colombiano donde es considerada cultivo básico de seguridad alimentaria. Produce un tubérculo subterráneo grande (1-8 kg, hasta 25 kg en variedades gigantes) cilíndrico o irregular de pulpa blanca a violácea, rico en almidón (70-80% peso seco), proteínas (5-8%) y minerales, además de tallos cuadrangulares alados verde-purpúreos (rasgo diagnóstico de D. alata) trepadores hasta 4-10 m sobre tutorado. Se cultiva en Caribe colombiano (Bolívar — María La Baja, San Juan Nepomuceno, San Jacinto; Córdoba — Ciénaga de Oro, San Bernardo; Sucre — Sincelejo, Corozal; Magdalena, Cesar), Antioquia (Urabá, Magdalena medio), Chocó (Quibdó, Bajo Baudó), Valle del Cauca y Cauca pacíficos entre 0 y 400 msnm en zona térmica cálida húmeda. Ciclo 8-10 meses desde siembra a cosecha. Rendimientos 15-30 t/ha tubérculo. Lección viva: tubérculo básico de la dieta tropical colombiana, fuente de carbohidratos complejos de bajo índice glicémico, enseñando sistemas de cultivo en espaldera (tutorado vivo con yuca, plátano o tutor muerto de guadua) y la importancia de los ñames en la seguridad alimentaria del Caribe colombiano (sancocho, pasteles, sopas), región con dependencia alimentaria histórica de este cultivo afrocolombiano. Manejo agroecológico: propagación por trozos de tubérculo con yemas o tubérculos pequeños semilla 200-500 g, siembra en hoyos profundos 30-40 cm con compost al fondo, requiere tutorado obligatorio en espaldera o tutor vivo, asocio con yuca y plátano, control biológico de antracnosis Colletotrichum gloeosporioides con podas sanitarias y rotación 3 años, no requiere agroquímicos. Fuentes Tier A: AGROSAVIA Manual Tubérculos, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "nombre_comunes_regionales": [
+        "ñame",
+        "ñame de agua",
+        "ñame espino"
+      ]
     },
     {
       "id": "dioscorea_cayennensis",
@@ -19671,7 +19897,11 @@
       ],
       "valor_pedagogico": "El ñame amarillo (Dioscorea cayennensis Lam., familia Dioscoreaceae) es una dioscoreácea herbácea perenne trepadora vigorosa originaria del África Occidental tropical húmedo (Costa de Marfil, Liberia, Sierra Leona, Guinea, Guinea-Bissau — bosque húmedo tropical más que sabana) donde se ha cultivado por milenios junto con D. rotundata (el otro 'ñame guineano') aunque genéticamente distinto. Introducida en América durante el comercio transatlántico de esclavos como cultivo de subsistencia afroamericano, naturalizada profundamente en Costa Pacífica colombiana donde encuentra condiciones ecológicas óptimas (lluvias 3000-7000 mm anuales — el Chocó biogeográfico es uno de los lugares más lluviosos del planeta, equivalente al cinturón ñamero africano húmedo). Se cultiva tradicionalmente en Costa Pacífica colombiana (Chocó — Quibdó, Bajo Baudó, Istmina, Condoto, San José del Palmar; Valle del Cauca — Buenaventura, Bajo San Juan; Cauca — Guapi, Timbiquí, López de Micay; Nariño — Tumaco, Olaya Herrera, Roberto Payán, Barbacoas, Magüí), Caribe húmedo de Bolívar-Córdoba (María La Baja, San Juan Nepomuceno, San Onofre, Tolú), Magdalena medio antioqueño (Bajo Cauca, Magdalena medio), Urabá antioqueño (Apartadó, Turbo, Chigorodó) y Catatumbo norte santandereano entre 0 y 900 msnm en zonas térmicas cálidas húmedas-superhúmedas tropicales pluviales. Lección viva PEDAGÓGICAMENTE EXCELENTE de cultivo afrocolombiano del Pacífico de seguridad alimentaria: enseña a niñas y niños la riqueza nutricional del ñame amarillo (carbohidratos 70-75%, proteínas 5-7%, CAROTENOIDES — provitamina A, beta-caroteno — que dan el característico color amarillo a la pulpa, antioxidantes naturales, riboflavina, niacina, vitamina C, minerales K-Mg-Mn-Cu), su rol como cultivo patrimonial afrocolombiano del Pacífico biogeográfico, y la adaptación extrema a lluvias superpluviales tropicales chocoanas (3000-7000 mm/año — sobrevive incluso a inundaciones temporales en suelos con buen drenaje interno). Diferencia diagnóstica taxonómica clave con D. rotundata y D. alata: D. cayennensis tiene tubérculo único subcilíndrico-cordiforme con pulpa AMARILLA-OCRE característica (rica en carotenoides — diferenciador inmediato con D. rotundata pulpa blanca-cremosa y D. alata pulpa blanca a veces violácea), ciclo 10-12 meses (más largo que D. rotundata 9-11 y D. alata 8-10 — el ñame de ciclo más largo del catálogo), preferencia ecológica por bosques húmedos tropicales pluviales del Chocó biogeográfico (D. rotundata por sabanas africanas y Caribe colombiano semihúmedo, D. alata por trópicos húmedos asiáticos), tallos cilíndricos espinescentes en la base como D. rotundata, hojas cordiformes-acuminadas grandes verde oscuras. Planta trepadora vigorosa con tallos cilíndricos verdes-marrón, hojas cordiformes-acuminadas alternas grandes (10-25 cm) verde oscuras brillantes, planta dioica con flores masculinas-femeninas separadas en plantas distintas (espigas axilares pequeñas blanco-amarillentas), tubérculo único subcilíndrico-cordiforme vertical (2-12 kg, ocasionalmente hasta 20 kg) corteza marrón-oscura rugosa con pulpa amarilla-ocre firme harinosa rica en almidón (65-75% peso seco), carotenoides (provitamina A), proteínas (5-7%), fibra (3-5%), polisacáridos mucilaginosos. Manejo agroecológico afrocolombiano del Pacífico tradicional: propagación por trozos de tubérculo-semilla 150-300 g con yemas viables, siembra en hoyos profundos 30-40 cm con compost-tierra negra al fondo, distancia 1 m x 1 m (10000 plantas/ha), tutorado obligatorio en espaldera o tutor vivo con guadua-caña brava-chontaduro-plátano, asocio tradicional milpa pacífica con plátano-yuca-chontaduro-borojó en sistemas multiestrato afrocolombianos, control biológico de antracnosis Colletotrichum gloeosporioides + roya Puccinia con podas sanitarias y rotación 3-4 años, manejo del agua con drenaje superficial en surcos elevados (camas raised beds) para evitar encharcamiento prolongado a pesar de las altas lluvias, cosecha 10-12 meses por arranque manual, almacenamiento post-cosecha en pilas ventiladas a la sombra 3-5 meses (más perecedero que D. rotundata por mayor contenido hídrico-carotenoide). Rendimientos 8-20 t/ha tubérculo según manejo y variedad. Función en chagra/huerto escolar afrocolombiano del Pacífico como TUBÉRCULO BASE DE LA SEGURIDAD ALIMENTARIA AFROPACÍFICA, cultivo patrimonial afrocolombiano del Chocó biogeográfico, ñame de pulpa carotenoide-amarilla con provitamina A nutricionalmente superior, lección viva de adaptación tropical superpluvial chocoana, sistema productivo tradicional de comunidades negras del Pacífico colombiano. Fuentes Tier A: AGROSAVIA Manual Tubérculos Andinos 2017, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "nombre_comunes_regionales": [
+        "ñame",
+        "ñame de espino"
+      ]
     },
     {
       "id": "dioscorea_japonica",
@@ -19758,7 +19988,11 @@
       ],
       "valor_pedagogico": "El ñame blanco africano (Dioscorea rotundata Poir., familia Dioscoreaceae) es una dioscoreácea herbácea perenne trepadora vigorosa originaria del África Occidental tropical (cinturón ñamero — Nigeria, Ghana, Costa de Marfil, Benín, Togo, Camerún del sur, Sierra Leona — el llamado 'Yam Belt' o cinturón del ñame africano que produce el 95% del ñame mundial) donde fue domesticada hace ~7000 años por pueblos bantúes-Niger-Congo y constituye cultivo de base alimentaria de >70 millones de africanos occidentales. Introducida masivamente en el Caribe americano durante el comercio transatlántico de esclavos (siglos XVI-XIX) como cultivo de subsistencia de poblaciones afroamericanas esclavizadas, naturalizada profundamente en el Caribe colombiano donde se ha cultivado por casi 4 siglos como base alimentaria afrocaribeña — patrimonio agroecológico-cultural afrocolombiano fundamental. Se cultiva tradicionalmente en Caribe colombiano (Córdoba — Montería, Ciénaga de Oro, San Bernardo del Viento, Lorica, Tierralta; Sucre — Sincelejo, Sampués, San Onofre, Tolú, Corozal; Bolívar — María La Baja, San Juan Nepomuceno, San Jacinto, El Carmen de Bolívar — DENOMINACIÓN DE ORIGEN para ñame Montes de María; Magdalena — Plato, Pivijay, Sitionuevo; Cesar — Valledupar, San Diego; La Guajira — Riohacha sur), Antioquia (Urabá — Apartadó, Turbo, Chigorodó; Bajo Cauca — Caucasia, El Bagre) y Chocó (Quibdó, Bajo Baudó) entre 0 y 1.000 msnm en zonas térmicas cálidas húmedas-bimodales. Lección viva PEDAGÓGICAMENTE EXCELENTE de cultivo afrocolombiano patrimonial diasporán de seguridad alimentaria: enseña a niñas y niños las raíces históricas del 'Triángulo Atlántico' (África-Caribe-América) en cultivos alimentarios diaspóranos, la importancia de los Montes de María como zona ñamera de denominación de origen colombiana, y la nutrición del ñame como carbohidrato de bajo índice glicémico (IG 51, almidón resistente prebiótico) base de la dieta sancocho-mote-pasteles-pasabocas costeñas. Diferencia diagnóstica taxonómica clave con D. alata (ñame blanco asiático): D. rotundata tiene tallos CILÍNDRICOS lisos sin alas (D. alata tiene tallos cuadrangulares-alados característicos), foliolos cordiformes-acuminados (D. alata sagitados-cordados), tubérculo único cilíndrico-irregular vertical 2-15 kg con pulpa blanca harinosa firme (D. alata produce 1-3 tubérculos irregulares pulpa blanca-violácea), ciclo 9-11 meses (D. alata 8-10 meses), preferencia por sabanas africanas con estación seca marcada (D. alata por trópicos húmedos asiáticos sin estación seca pronunciada). Planta trepadora vigorosa con tallos cilíndricos lisos verdes a marrones espinescentes en la base, hojas cordiformes-acuminadas alternas grandes (8-20 cm) verde oscuras brillantes, inflorescencias en espigas axilares pequeñas (planta dioica — flores masculinas y femeninas separadas en plantas distintas), frutos cápsulas trialadas (rara vez forma fruto en cultivo — predomina propagación vegetativa por tubérculo-semilla), tubérculo subterráneo único cilíndrico-irregular vertical (2-15 kg, hasta 30 kg en variedades gigantes africanas) corteza marrón-negruzca rugosa con pulpa blanca-cremosa harinosa firme rica en almidón (70-78% peso seco), proteínas (6-8%), fibra (3-5%), minerales K-Mg-Ca-P-Fe, vitaminas C-B6, polisacáridos mucilaginosos digestivos. Manejo agroecológico afrocaribeño tradicional: propagación por trozos de tubérculo-semilla 100-300 g con yemas viables o tubérculos pequeños enteros, siembra en hoyos profundos 30-40 cm con compost-bocashi al fondo, distancia 1 m x 1 m (10000 plantas/ha), requiere tutorado obligatorio en espaldera 2-3 m de altura o tutor vivo con guadua o caña brava (tradicional Montes de María) o tutorado vivo con yuca-plátano, asocio tradicional milpa caribeña con maíz-yuca-plátano-ñame en sistema multiestrato afrocolombiano, control biológico de antracnosis Colletotrichum gloeosporioides con podas sanitarias + rotación 3-4 años + caldo bordelés moderado, control de cochinillas Pseudococcidae con sulfocálcico-jabón potásico, cosecha por arranque manual a los 8-10 meses cuando hojas amarillean, almacenamiento post-cosecha en pilas ventiladas a la sombra 4-6 meses sin refrigeración. Rendimientos 10-25 t/ha tubérculo según variedad y manejo (Montes de María registra hasta 30 t/ha en cultivares élite). Función en chagra/huerto escolar afrocaribeño como TUBÉRCULO BASE DE LA SEGURIDAD ALIMENTARIA AFROCOLOMBIANA, cultivo patrimonial diaspórico africano-caribeño, ground cover trepador, sistema productivo tradicional Montes de María (denominación de origen colombiana), lección viva del Triángulo Atlántico de cultivos diaspórinos, soberanía alimentaria comunidades afrodescendientes. Fuentes Tier A: AGROSAVIA Manual Tubérculos Andinos 2017, NRC 1996 Lost Crops Africa Vol III, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "nombre_comunes_regionales": [
+        "ñame",
+        "ñame de Guinea"
+      ]
     },
     {
       "id": "dioscorea_trifida",
@@ -20125,7 +20359,15 @@
       ],
       "valor_pedagogico": "El cilantro cimarrón o culantro (Eryngium foetidum L., familia Apiaceae) es una apiácea bienal a perenne herbácea nativa de las Américas tropicales (Caribe, Mesoamérica, norte de Sudamérica), cultivada y silvestre en huertos campesinos colombianos por sus hojas dentadas en roseta basal de aroma intenso similar al cilantro común (Coriandrum sativum) pero más estable al calor de cocción. Su aroma característico proviene de aldehídos aromáticos volátiles (E-2-dodecenal, dodecanal) presentes en mayor concentración que en el cilantro común. Se cultiva en Caribe colombiano (Magdalena, Bolívar, Sucre, Córdoba), Antioquia (Urabá, Magdalena medio), Valle del Cauca, Tolima, Huila y Eje cafetero entre 500 y 2.200 msnm en zona térmica cálida a fría, con preferencia por sombra parcial y humedad alta. Ciclo bienal con producción continua de hojas durante 12-18 meses. Rendimientos 0.5-1 t/ha hoja fresca. Lección viva: enseña la relevancia de las especias locales frente a las introducidas, su rol en el hogao colombiano y los sancochos costeños como sustituto resistente al calor de cocción del cilantro común, y su valor como planta multipropósito (condimento, medicinal contra cólicos y gripes, atrayente de polinizadores apícolas por sus inflorescencias verde-amarillas). Manejo agroecológico: siembra directa o en bandeja con germinación lenta 14-21 días, suelo orgánico bien drenado con pH 5.5-7, asocio con plátano y yuca como sombra temporal, cosecha de hojas externas dejando corazón intacto, autoresiembra natural prolífica en el huerto bien manejado, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, SIB Colombia, Bernal 2015 Catálogo Plantas Colombia, AGROSAVIA.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "nombre_comunes_regionales": [
+        "culantro",
+        "culantro de monte",
+        "culantro cimarrón",
+        "cilantro de pozo",
+        "cimarrón",
+        "culantro coyote"
+      ]
     },
     {
       "id": "erythrina_rubrinervia",
@@ -21761,7 +22003,11 @@
       ],
       "valor_pedagogico": "La lenteja andina (Lens culinaris Medik. variedad andina) es una leguminosa de grano alto en proteína (~24-26%) y fibra, tradicionalmente cultivada en sistemas campesinos del altiplano colombiano para autoconsumo y mercados locales. Se siembra en Boyacá (Tunja, Sotaquirá, Toca), Cundinamarca (Ubaté, Chiquinquirá), Nariño y Norte de Santander entre 2.000 y 2.800 msnm en zona térmica fría. Ciclo corto 90-110 días, rendimientos 0.8-1.5 t/ha en sistema agroecológico. Fija nitrógeno biológico (~50-90 kg N/ha) por simbiosis con Rhizobium, mejorando suelos antecesores. Manejo: rotación con cereales (cebada, trigo, quinua), control mecánico de malezas en estado de roseta, baja demanda de insumos. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, NRC 1989 Cultivos Andinos, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "nombre_comunes_regionales": [
+        "lenteja",
+        "lenteja común"
+      ]
     },
     {
       "id": "levisticum_officinale",
@@ -22487,7 +22733,11 @@
       ],
       "valor_pedagogico": "El poleo (Mentha pulegium L., Lamiaceae) es una menta rastrera-decumbente de origen mediterráneo-europeo, naturalizada en climas templados y fríos de Colombia (1.900-2.700 msnm: Cundinamarca, Boyacá, Nariño, Antioquia, Caldas), distinta de la yerbabuena (Mentha spicata) por su porte bajo (10-40 cm), hojas pequeñas elípticas-ovadas de 1-2 cm densamente pubescentes y verticilastros florales globulares lila-rosado-pálido que aparecen apilados a lo largo del tallo (no en espigas terminales como spicata). Su aceite esencial es químicamente único entre las mentas: dominado por pulegona (60-90%) en lugar de mentol, lo que le confiere un aroma intenso, dulzón-acre característico distintivo al tacto y excelente acción repelente de insectos (mosquitos, hormigas, pulgas, ácaros). Es lección viva de quimiotipos vegetales y soberanía herbácea que enseña a niñas y niños por qué dos plantas tan parecidas (poleo vs hierbabuena) pueden tener usos y precauciones tan diferentes: la pulegona del poleo es a la vez su mayor virtud (digestivo carminativo potente, emenagogo, repelente natural) y su mayor riesgo (hepatotóxico en aceite esencial puro o dosis altas, abortivo histórico documentado). Uso tradicional colombiano validado por JBB y Pamplona-Roger: infusión suave de hojas frescas (1 cucharadita por taza) tras las comidas como digestivo y carminativo, contra dolor de estómago, gases y nauseas; aplicación externa de hojas frescas frotadas en piel y collares de hierba seca para repeler mosquitos y pulgas de mascotas; sembrado en linderos de huerta como repelente vivo de pulgones y hormigas cortadoras. Manejo agroecológico: propagación por estolones rastreros (corta porciones de 10-15 cm con raicillas, planta a 30-40 cm, prendimiento >95% en lluvias), no se propaga bien por semilla (mejor vegetativa), suelos húmedos ligeramente ácidos, sol pleno o semisombra, requiere control de su tendencia invasora vegetativa (rizomas extensos), función como cobertura aromática, repelente vivo y atractora de abejas pequeñas y avispas parasitoides benéficas. PRECAUCIÓN: no usar aceite esencial puro vía oral, no en mujeres embarazadas, no en niños menores de 2 años, no en dosis prolongadas (limitar a infusiones suaves esporádicas). Fuentes Tier A: GBIF, POWO Kew, Pamplona-Roger 2006, JBB Plantas Medicinales, Pérez-Arbeláez 1947.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "nombre_comunes_regionales": [
+        "poleo de monte",
+        "poleo común"
+      ]
     },
     {
       "id": "mentha_villosa",
@@ -22535,7 +22785,12 @@
       ],
       "valor_pedagogico": "La hierbabuena criolla o menta vellosa (Mentha × villosa Huds., Lamiaceae), llamada también menta de Castilla, es un híbrido natural entre Mentha spicata y Mentha suaveolens originario de Europa y ampliamente naturalizado en huertas caseras colombianas desde zonas cálidas húmedas hasta el altiplano frío (300-2.500 msnm: Llanos, Eje cafetero, Cundinamarca, Boyacá, Nariño, Antioquia). Tolera heladas suaves hasta -5 °C y rebrota desde el rizoma cuando el frío quema la parte aérea. Es una lección viva de hibridación interespecífica y propagación vegetativa que enseña a niñas y niños un concepto biológico clave: por ser un híbrido estéril (sus semillas casi nunca germinan o producen plantas inviables) solo se reproduce por estolones — tallos rastreros que se entierran y echan raíces en cada nudo — lo que significa que todas las matas de hierbabuena del país son clones genéticos, copias idénticas de una misma planta madre que se ha multiplicado por miles de manos campesinas durante siglos. Esta propagación vegetativa preserva exactamente el aroma, el sabor y el contenido de aceite esencial (mentol, mentona, pulegona) generación tras generación, garantizando que el agua de panela con hierbabuena de la abuela sepa igual que la del nieto. Manejo agroecológico: siembra de estolones en suelo húmedo y rico en materia orgánica, sombra parcial preferida en clima cálido, riego frecuente, cosecha de hojas y tallos tiernos antes de floración para máxima concentración de aceites esenciales, control del crecimiento con bordes enterrados porque tiende a invadir camas vecinas. Usos: aromática digestiva, carminativa, antiespasmódica, repelente suave de hormigas en despensa. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Pérez Arbeláez 1947 Plantas Útiles, JBB Plantas Medicinales Cundinamarca-Boyacá, Pamplona-Roger 2006.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "nombre_comunes_regionales": [
+        "yerbabuena",
+        "hierbabuena",
+        "yerba buena"
+      ]
     },
     {
       "id": "miconia_squamulosa",
@@ -24272,7 +24527,13 @@
       ],
       "valor_pedagogico": "El fríjol lima andino (Phaseolus lunatus L. cv. andino) es una de las cinco especies del género Phaseolus domesticadas en América (junto con P. vulgaris, P. acutifolius, P. coccineus y P. polyanthus) y la única con doble centro de domesticación independiente: el linaje andino de grano grande (llamado 'pallar' en Perú, 'torta' en Colombia y Ecuador) domesticado hace 5-6.000 años en la costa peruana, y el linaje mesoamericano de grano pequeño ('sieva') domesticado en paralelo en México-Guatemala. El linaje andino llegó al territorio colombiano por intercambios prehispánicos con culturas Mochica, Wari e Inca, y hoy se conserva por familias campesinas en Nariño (Ipiales, Túquerres, Cumbal), Cauca (Silvia, Totoró), Boyacá (Tunja, Ramiriquí) y Cundinamarca (Une, Choachí) entre 1.800 y 2.600 msnm. Planta voluble (trepadora) de tallos largos, hojas trifolioladas grandes, vainas anchas con 2-4 granos por vaina, grano grande aplanado (1.5-2.5 cm) en forma de luna creciente (de ahí 'lunatus'), color blanco, crema, manchado morado, rojo o jaspeado. Es lección viva de domesticación dual y rescate de leguminosas marginadas: el fríjol lima andino, junto con el chocho/tarwi (Lupinus mutabilis), está en riesgo de erosión genética por dominio comercial del fríjol arbustivo P. vulgaris ICA. Su grano es nutricionalmente superior (proteína 20-25%, alto en hierro, magnesio, folato), aunque requiere remojo prolongado y descarte del agua de cocción para eliminar trazas de glucósidos cianogénicos (linamarina) presentes en algunas variedades. Manejo agroecológico: siembra con tutor (puede ser maíz, también caña o tutor seco), distancia 50-70 cm; abono al hoyo (compost); biopreparados: caldo sulfocalcio contra antracnosis, trichoderma; fija nitrógeno atmosférico 50-100 kg N/ha/ciclo, mejor que vulgaris en altura por sistema radicular profundo. Conservación de semilla en frascos secos con ceniza, vida útil 3-5 años. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, NRC 1989 Cultivos Andinos, Pérez Arbeláez 1947, FAO EcoCrop, GBIF Backbone, POWO Kew.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "nombre_comunes_regionales": [
+        "frijol lima",
+        "frijol de manteca",
+        "haba lima",
+        "guandú lima"
+      ]
     },
     {
       "id": "phaseolus_vulgaris_bola_roja",
@@ -24319,7 +24580,10 @@
       ],
       "valor_pedagogico": "El fríjol bola roja (Phaseolus vulgaris L. cv. 'Bola Roja') es una variedad nativa cundiboyacense del altiplano andino colombiano, voluble (trepadora) de grano grande esférico color rojo brillante. Se cultiva por pequeños productores y campesinas tradicionales en Boyacá (Tunja, Ventaquemada, Ramiriquí, Tibasosa, Toca), Cundinamarca (Subachoque, Pacho, Une, Choachí) y zonas templadas de Nariño y Cauca entre 2.200 y 2.800 msnm. Su carácter voluble (trepa por tutor) lo hace pareja ideal del maíz capio en el policultivo 'tres hermanas' altoandino: el maíz da soporte vertical, el fríjol fija nitrógeno atmosférico vía simbiosis con Rhizobium leguminosarum (40-80 kg N/ha/ciclo), y la ahuyama de altura (Cucurbita maxima) o el cubio (Tropaeolum tuberosum) cubren el suelo. Es lección viva de la lógica policultivo prehispánica: el bola roja no es solo grano, es servicio ecosistémico de fertilidad del suelo, dependiente de la presencia del maíz como soporte (sin él se enreda en sí mismo y reduce producción). Grano apreciado para sopas espesas (sopa de mute boyacense, mazamorra de fríjol), guisos campesinos, fríjoles antioqueños 'paisas' (bandeja paisa), conserva seca tradicional. Comparado con variedades arbustivas comerciales (ICA Caraota), el bola roja conserva mejor sabor y textura mantecosa al cocinarse pero requiere más tiempo de cocción (45-90 min con remojo previo). Manejo agroecológico: siembra simultánea con maíz capio al inicio de lluvias mayores; 2-3 granos por hoyo a 20 cm del tallo del maíz; abono orgánico al surco (compost o bocashi); biopreparados: caldo sulfocalcio contra antracnosis (Colletotrichum lindemuthianum), trichoderma al inicio. Cosecha en seco a los 5-7 meses, vainas marchitadas; desvainado manual; conservación con ceniza de leña o piedras de cal en frasco hermético. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, Pérez Arbeláez 1947, NRC 1989 Cultivos Andinos, Pérez-Rodríguez-Gómez 2008, GBIF Backbone, POWO Kew.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "nombre_comunes_regionales": [
+        "bola roja"
+      ]
     },
     {
       "id": "phaseolus_vulgaris_nuna",
@@ -27657,7 +27921,13 @@
       ],
       "valor_pedagogico": "La malanga blanca u ocumo blanco (Xanthosoma sagittifolium (L.) Schott, familia Araceae) es la aroidea tuberosa nativa neotropical por excelencia — domesticada en Centroamérica, Antillas y Amazonía sudamericana hace al menos 4.000-5.000 años por pueblos arawak, tainos, kuna, emberá y otros pueblos neotropicales antes del contacto europeo, distinguible morfológicamente de la papa china asiática (Colocasia esculenta) por sus hojas grandes sagitado-hastadas con peciolo inserto en el borde basal (NO peltadas con peciolo central como Colocasia — diferencia diagnóstica clave para identificación rápida en campo). En Colombia es ampliamente cultivada en el Pacífico colombiano (Chocó-Valle litoral-Cauca litoral-Nariño litoral: Buenaventura, Quibdó, Tadó, Tumaco, Guapi), Caribe húmedo (Magdalena medio, Antioquia bajo, Urabá, Bolívar, Sucre, Córdoba, San Andrés y Providencia), Amazonía (trapecio amazónico, Putumayo, Caquetá, Guaviare), Orinoquía (piedemonte llanero, Casanare, Meta) y zonas bajas inundables del Magdalena medio entre 0 y 1.000 msnm en zona térmica cálida húmeda, donde se conoce con nombres regionales diversos: 'ocumo' o 'mafafa' (Caribe), 'malanga' (Pacífico afrocolombiano), 'uncucha' (Amazonía) y 'tiquisque' (frontera con Centroamérica). Lección viva de identificación botánica precisa Colocasia vs Xanthosoma — la confusión campesina entre 'taro' (papa china asiática Colocasia esculenta) y 'malanga blanca' (ocumo americano Xanthosoma sagittifolium) es uno de los casos pedagógicos más útiles de etnobotánica neotropical: ambas Araceae se cultivan en humedad-calor tropical, ambas producen cormos comestibles, ambas contienen rafidios de oxalato que exigen cocción, pero son géneros distintos con orígenes geográficos opuestos (Asia vs Neotrópico), morfología foliar diferente (peltada vs sagitada-hastada), perfil culinario distinto (Colocasia más mucilaginosa, Xanthosoma más harinosa) y manejo agroecológico diferenciado (Colocasia tolera mejor encharcamiento permanente, Xanthosoma prefiere suelo húmedo pero drenado). Esta lección enseña magistralmente la importancia de la identificación botánica precisa por morfología foliar como herramienta de soberanía agrícola — el campesino que distingue entre las dos especies conserva mejor el germoplasma local y diferencia mejor las técnicas de cocina tradicional. El cormo central (5-15 cm diámetro, 0.5-3 kg) y los cormelos hijos múltiples bien desarrollados son ricos en almidón fácilmente digerible, mucílago, vitaminas B1-B6, vitamina C, potasio, magnesio y proteína vegetal moderada (2-3%), consumidos cocidos en sancocho, ajiaco bogotano (donde a veces sustituye a la papa criolla), sopa, frituras, croquetas y cremas. Las hojas grandes acorazonadas (peciolo de 1-2 m) son comestibles también como espinaca tropical tras cocción prolongada (cocción mín 30 min para destruir oxalatos) — el 'callaloo' caribeño afrocolombiano. Manejo agroecológico: propagación por cormelos hijos (preferencia) o trozos de cormo madre con yemas activas, plantación a 60-80 cm entre plantas en suelo húmedo bien drenado rico en MO con pH 5.5-6.5, ciclo 8-12 meses a cosecha, rendimientos 10-25 t/ha cormos. Asocio tradicional con plátano hartón, yuca dulce, piña, achiote, caña panelera y árboles frutales en finca pacífica-caribe-amazónica. Apta para sotobosque cafetalero-cacaotero (tolerante a sombra parcial 40-60%) y orillas de cuerpos de agua. Plagas: pudrición de cormo Pythium spp. y Erwinia spp. en suelos mal drenados, hormigas arrieras (Atta spp.). Especie pilar de soberanía alimentaria afrocolombiana del Pacífico y caribe húmedo. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, FAO EcoCrop, Bernal 2015 Catálogo Plantas Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia, SINCHI Amazonía Colombiana.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "nombre_comunes_regionales": [
+        "mafafa",
+        "rascadera",
+        "yautía",
+        "bore blanco"
+      ]
     },
     {
       "id": "xanthosoma_violaceum",

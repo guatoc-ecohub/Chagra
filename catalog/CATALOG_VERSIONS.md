@@ -1,10 +1,27 @@
 # Estado de los archivos de catálogo (versionado)
 
-> Última actualización: **2026-06-25** (ampliación grounded grafo→catálogo).
+> Última actualización: **2026-06-25** (sinonimia regional grounded — 1ª pasada).
 > Este documento aclara cuál archivo es la **verdad** y qué es cada uno de los
 > demás, para que ningún script ni contributor tome el seed equivocado. No se
 > borró ningún archivo: los stale se documentan aquí y se conservan por
 > trazabilidad / referencia de scripts.
+
+> **Sinonimia regional (2026-06-25)**: 1ª pasada grounded sobre
+> `nombre_comunes_regionales` (campo array — nótese el typo histórico "nombre"
+> singular, es el nombre real del campo que lee `speciesResolver`/
+> `directorioEspecies`). Cobertura **107 → 160 / 530** (53 staples 0→con
+> regionales: cebolla cabezona/junca, ajo, apio, remolacha, cilantro, papa
+> criolla, lulo, tomate de árbol, uchuva, maracuyá, granadilla, curuba, badea,
+> chulupa, aguacate, cacao, café, ñame, oca, ulluco, cubio/mashua, quinua,
+> chocho/tarwi, etc.). Fuentes del lote: SiB Colombia (vernacular), GBIF
+> vernacularName CO, manuales AGROSAVIA, etnobotánica andina/amazónica
+> documentada. Anti-confusión respetada (Cucurbita moschata≠maxima; Passiflora;
+> Solanum betaceum≠lycopersicum; Persea≠Psidium). Plagas/enfermedades:
+> `public/grafo-relations.json` gana `_pest_synonyms` (157 sinónimos → 56
+> etiquetas canónicas) + `_pest_index` (etiqueta → especies afectadas);
+> `grafoRelations.resolvePestSynonym()` resuelve "gota"/"monilia"/"broca"/
+> "phytophthora infestans" → la plaga real. Backlog para DRs en
+> `scratchpad/backlog-*.txt` (370 especies + 22 plagas sin sinónimo aún).
 
 ## La verdad (lo que SHIPEA)
 
