@@ -482,13 +482,32 @@
   100% { transform: translate(0, 0); }
 }
 
-/* VENTANA VIVA DEL PÁRAMO (barbudito real en la flor, flag VITE_COLIBRI ON). El
-   recuadro trae su propio marco/sombra (barbudito.css); aquí solo lo ubicamos
-   sobre la escena y anulamos la animación de bicho heredada (no debe revolotear:
-   es una ventana fija, no un bicho que cruza). */
-.fvh-colibri-ventana {
+/* A/B del colibrí del páramo (flag VITE_COLIBRI ON, dev). Dos barbuditos, uno a
+   cada costado de la escena, para que el operador elija. Cada uno trae su propia
+   animación (ilustrado = aleteo/vuelo CSS; real = sprite en loop), así que aquí
+   anulamos la animación de bicho heredada y solo los ubicamos. Es A/B TEMPORAL:
+   cada uno con su etiquetita. */
+.fvh-colibri-ab {
   animation: none !important;
   z-index: 8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+/* etiquetita discreta "ilustrado" / "real" (solo en este modo A/B dev) */
+.fvh-ab-tag {
+  font: 600 9px/1 var(--fvh-body, system-ui, sans-serif);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(20, 30, 18, 0.6);
+  border: 1px solid rgba(190, 242, 100, 0.4);
+  border-radius: 999px;
+  padding: 2px 7px;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  white-space: nowrap;
 }
 
 /* COLIBRÍ insignia volando (feedback #5) — vuelo estacionario + batido de alas */

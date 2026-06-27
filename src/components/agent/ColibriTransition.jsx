@@ -1,21 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import { colibriRealActivo } from '../../config/colibriFlag';
-import { BarbuditoCruza } from '../colibri/Barbudito';
+import { BarbuditoFlor } from '../colibri/Barbudito';
 
 /**
  * ColibriTransition — transición HIPER LINDA pero LIMPIA del home a la
- * conversación (~1–2s).
+ * conversación (~2–3s).
  *
  * Al enviar desde el hero del home, en vez de un corte seco hacia AgentScreen,
- * el colibrí cruza/aparece a pantalla completa sobre un fondo oscuro suave, y
- * se desvanece dejando la conversación montada detrás. Llama la atención sin
- * saltos ni flash.
+ * aparece a pantalla completa sobre un fondo oscuro suave, y se desvanece
+ * dejando la conversación montada detrás. Llama la atención sin saltos ni flash.
  *
  * DOS modos (según la flag VITE_COLIBRI, dev-only):
- *   - Flag ON (colibrí REAL): el barbudito de páramo CRUZA la pantalla UNA sola
- *     pasada en arco diagonal (webm VP9-alpha `barbudito-transition.webm`; en
- *     iOS, que no soporta VP9-alpha, sprite steps(16)+translateX). Rápido y
- *     encantador (~1.2s), sin rebote (no es un loop).
+ *   - Flag ON (colibrí REAL): el CLIP DE LA FLOR del frailejón (~2.5s,
+ *     `flower-transition.mp4`, H.264 SIN alpha → corre en TODO navegador incl.
+ *     iOS), centrado y grande, con el barbudito tomando néctar; el video trae su
+ *     propio fade in/out y el overlay hace además un fade suave hacia la pantalla
+ *     del agente. El operador rechazó el recuadro de la flor en el HOME, pero lo
+ *     quiere AQUÍ, en la transición, donde se ve claro y entero.
  *   - Flag OFF (default, prod): el colibrí entra en VIDEO
  *     (`/avatar/colibri-transition.webm`) como hasta ahora; si el video falla
  *     o no soporta WebM, cae al still.
@@ -36,11 +37,11 @@ export const COLIBRI_TRANSITION_FADE_MS = 480; // fade-out suave
 export const COLIBRI_TRANSITION_TOTAL_MS = COLIBRI_TRANSITION_HOLD_MS + COLIBRI_TRANSITION_FADE_MS;
 // Reduced-motion: transición mínima y sobria, sin animación.
 export const COLIBRI_TRANSITION_REDUCED_MS = 360;
-// Colibrí REAL cruzando: corto y encantador. El cruce CSS dura ~1.15s
-// (barbudito-cruzar); dejamos visible un pelín menos y luego el fade.
-export const COLIBRI_TRANSITION_CRUCE_HOLD_MS = 1050;
+// Clip de la FLOR (flag ON): el mp4 dura ~2.5s con su propio fade in/out.
+// Lo dejamos correr casi entero (2.4s) y luego el overlay hace su fade-out.
+export const COLIBRI_TRANSITION_FLOR_HOLD_MS = 2400;
 
-// ¿Transición con el colibrí REAL (barbudito cruzando) en vez del video?
+// ¿Transición con el clip de la FLOR del frailejón (barbudito libando néctar)?
 // Gateado por VITE_COLIBRI (dev-only). Se evalúa una sola vez (flag de build).
 const COLIBRI_REAL = colibriRealActivo();
 
@@ -78,11 +79,26 @@ const CSS = `
     from { opacity: 0; transform: scale(0.82); }
     to   { opacity: 1; transform: scale(1); }
   }
-  /* Colibrí REAL cruzando (BarbuditoCruza): el webm/sprite trae su propio
-     movimiento; aquí solo le damos una sombra para asentarlo. */
-  .colibri-tx-cruce { filter: drop-shadow(0 8px 22px rgba(0,0,0,0.45)); }
+  /* Clip de la FLOR (flag ON): grande y centrado, casi cubriendo, con esquinas
+     redondeadas y una viñeta suave que funde sus bordes con el fondo oscuro. El
+     video trae su propio fade interno; aquí lo asentamos. */
+  .colibri-tx-flor {
+    width: min(86vw, 560px); height: min(86vw, 560px);
+    max-width: 92vh; max-height: 92vh;
+    border-radius: 28px; object-fit: cover; object-position: center 50%;
+    box-shadow: 0 18px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(190,242,100,0.18);
+    animation: colibri-tx-in 0.55s cubic-bezier(0.22,0.61,0.36,1) both;
+    background: #0d1f17;
+  }
+  .colibri-tx-flor-wrap { position: relative; line-height: 0; }
+  /* viñeta para fundir el clip con el fondo (no un recuadro duro) */
+  .colibri-tx-flor-wrap::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    border-radius: 28px;
+    box-shadow: inset 0 0 60px 16px rgba(7,11,16,0.55);
+  }
   @media (prefers-reduced-motion: reduce) {
-    .colibri-tx-video, .colibri-tx-still { animation: none !important; }
+    .colibri-tx-video, .colibri-tx-still, .colibri-tx-flor { animation: none !important; }
     .colibri-tx { transition: opacity ${COLIBRI_TRANSITION_REDUCED_MS}ms linear; }
   }
 `;
@@ -107,9 +123,9 @@ function ColibriOverlay({ onDone }) {
       timers.push(setTimeout(() => setLeaving(true), 40));
       timers.push(setTimeout(() => doneRef.current?.(), COLIBRI_TRANSITION_REDUCED_MS + 60));
     } else if (COLIBRI_REAL) {
-      // Colibrí REAL cruzando: corto y encantador.
-      timers.push(setTimeout(() => setLeaving(true), COLIBRI_TRANSITION_CRUCE_HOLD_MS));
-      timers.push(setTimeout(() => doneRef.current?.(), COLIBRI_TRANSITION_CRUCE_HOLD_MS + COLIBRI_TRANSITION_FADE_MS));
+      // Clip de la flor: lo dejamos correr casi entero (~2.4s) y luego el fade.
+      timers.push(setTimeout(() => setLeaving(true), COLIBRI_TRANSITION_FLOR_HOLD_MS));
+      timers.push(setTimeout(() => doneRef.current?.(), COLIBRI_TRANSITION_FLOR_HOLD_MS + COLIBRI_TRANSITION_FADE_MS));
     } else {
       timers.push(setTimeout(() => setLeaving(true), COLIBRI_TRANSITION_HOLD_MS));
       timers.push(setTimeout(() => doneRef.current?.(), COLIBRI_TRANSITION_TOTAL_MS));
@@ -128,9 +144,11 @@ function ColibriOverlay({ onDone }) {
     >
       <style>{CSS}</style>
       {COLIBRI_REAL && !reduce ? (
-        // Barbudito REAL cruzando la pantalla UNA pasada (webm VP9-alpha; en
-        // iOS, sprite steps(16)+translateX). Universal.
-        <BarbuditoCruza size={172} className="colibri-tx-cruce" />
+        // Clip de la FLOR del frailejón: el barbudito tomando néctar, grande y
+        // centrado, con fade suave. H.264 sin alpha → universal (incl. iOS).
+        <span className="colibri-tx-flor-wrap">
+          <BarbuditoFlor className="colibri-tx-flor" />
+        </span>
       ) : showVideo ? (
         <video
           className="colibri-tx-video"
