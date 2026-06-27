@@ -17,15 +17,19 @@ import { clasificarPisoTermico } from '../../services/pisoTermicoClassifier';
 import { useTheme } from '../../hooks/useTheme';
 import { iconForTheme } from './themeIcon';
 import { colibriRealActivo } from '../../config/colibriFlag';
-import { BarbuditoVentana } from '../colibri/Barbudito';
+import { BarbuditoIlustrado, BarbuditoRealLoop } from '../colibri/Barbudito';
 import './finca-viva-hero.css';
 
-// ¿Mostrar el colibrí REAL (barbudito de páramo) en vez del SVG 2D? Gateado por
-// VITE_COLIBRI (colibriFlag.js), dev-only. Se evalúa una sola vez al cargar el
-// módulo (la flag es de build, no cambia en runtime). Con la flag OFF (prod) el
-// home conserva el colibrí SVG 2D `ColibriVuela` de siempre. Con la flag ON, el
-// home muestra la "ventana viva del páramo" (video del barbudito en la flor).
-// Reemplaza el colibrí 3D rechazado (ChagraColibri3DLite / VITE_COLIBRI_3D).
+// ¿Modo A/B del colibrí del páramo? Gateado por VITE_COLIBRI (colibriFlag.js),
+// dev-only. Se evalúa una sola vez al cargar el módulo (la flag es de build, no
+// cambia en runtime). Con la flag OFF (prod) el home conserva el colibrí SVG 2D
+// `ColibriVuela` de siempre. Con la flag ON (dev), el operador rechazó el
+// recuadro de video de la flor (rompía la escena ilustrada): en su lugar el home
+// COMPARA dos colibrís, uno a cada costado, para que el operador elija cuál
+// queda — IZQUIERDA el ILUSTRADO (SVG/CSS, barbudito de páramo dibujado),
+// DERECHA el REAL recortado (sprite en loop, sin recuadro). Es un A/B TEMPORAL:
+// cada uno lleva una etiquetita ("ilustrado" / "real") solo en este modo dev.
+// (Reemplazó al colibrí 3D rechazado: ChagraColibri3DLite / VITE_COLIBRI_3D.)
 const COLIBRI_REAL = colibriRealActivo();
 
 /**
@@ -345,15 +349,24 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
                       (fauna que prospera) sólo aparecen cuando la finca está
                       poblada. */}
                   <div className="fvh-bichos" aria-hidden="true">
-                    {/* COLIBRÍ insignia. Con la flag VITE_COLIBRI ON (dev), una
-                        "ventana viva del páramo": video real del barbudito
-                        tomando néctar de la flor del frailejón, enmarcado en un
-                        recuadro redondeado sobre la escena. Con la flag OFF
-                        (prod), el colibrí SVG 2D `ColibriVuela` de siempre. */}
+                    {/* COLIBRÍ insignia. Con la flag VITE_COLIBRI ON (dev) =
+                        modo A/B TEMPORAL: dos barbuditos de páramo, uno a cada
+                        costado, para que el operador elija. IZQUIERDA el
+                        ILUSTRADO (SVG/CSS dibujado); DERECHA el REAL recortado
+                        (sprite en loop, sin recuadro). Cada uno con su etiquetita
+                        ("ilustrado"/"real"). Con la flag OFF (prod), el colibrí
+                        SVG 2D `ColibriVuela` de siempre. */}
                     {COLIBRI_REAL ? (
-                      <span className="fvh-bicho fvh-colibri-ventana" style={{ right: '5%', top: '8%' }}>
-                        <BarbuditoVentana size={148} ariaLabel="El barbudito de páramo en su finca" />
-                      </span>
+                      <>
+                        <span className="fvh-bicho fvh-colibri-ab fvh-colibri-ab-izq" style={{ left: '4%', top: '12%' }}>
+                          <BarbuditoIlustrado size={104} ariaLabel="Colibrí del páramo ilustrado" />
+                          <span className="fvh-ab-tag">ilustrado</span>
+                        </span>
+                        <span className="fvh-bicho fvh-colibri-ab fvh-colibri-ab-der" style={{ right: '4%', top: '10%' }}>
+                          <BarbuditoRealLoop size={112} ariaLabel="Barbudito de páramo real" />
+                          <span className="fvh-ab-tag">real</span>
+                        </span>
+                      </>
                     ) : (
                       <span className="fvh-bicho fvh-colibri-vuela" style={{ left: '66%', top: '20%' }}>
                         <ColibriVuela />
