@@ -73,7 +73,7 @@ import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../
 // sidecarClient/deepResearchClient vía buildSidecarHeaders (defense-in-depth).
 import { getCurrentTier } from '../../services/tierService';
 import DeepResearchCard from '../DeepResearchCard';
-import { normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildSuggestedEntitiesContext, isLowConfidenceEntity, buildFallbackResponse, pisoTermicoFromAltitud } from '../../services/agentService';
+import { normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildPriceAnswer, buildSuggestedEntitiesContext, isLowConfidenceEntity, buildFallbackResponse, pisoTermicoFromAltitud } from '../../services/agentService';
 import { buildBasePrompt, analyzeQuery, buildQueryAnalysisBlock, buildCorpusVariants, buildResolvedEntitiesBlock, formatToolEvidence, truncateEdgesBlock } from '../../services/agentPromptBase';
 // Nubosidad real para el grounding (fix Choachí 2026-06) — solo lee caches.
 import { summarizeSkyForGrounding } from '../../services/skyConditionService';
@@ -1878,7 +1878,22 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // (el sidecar las ordena por relevancia). No-op si el bloque no excede.
       const edgesTruncated = truncateEdgesBlock(subgrafoBloque);
 
-      const rawResponse = await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, edgesTruncated, biopreparadoBlock);
+      // ESCENA DE PRECIO (demo campesino): si la consulta es de PRECIO y
+      // get_precio_sipsa devolvió un dato REAL (available:true, leído de la
+      // tabla `chagra.sipsa_precios` que llena el feed diario DANE/SIPSA), el
+      // agente CANTA el número de forma DETERMINISTA en vez de delegar en el LLM
+      // —que lo entierra en agronomía genérica o lo razona mal—. Anti-alucinación:
+      // buildPriceAnswer SOLO emite con un precio numérico real; sin dato →
+      // null → caemos al LLM (que recibe el decline block honesto). El texto
+      // sigue pasando por voseo/guards/badges/persistencia/TTS como cualquier
+      // respuesta, por lo que la UX (badge de fuente, voz) no cambia.
+      const deterministicPrice = buildPriceAnswer({ userMessage: text, toolEvidence });
+      const rawResponse = deterministicPrice != null
+        ? deterministicPrice
+        : await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, edgesTruncated, biopreparadoBlock);
+      if (deterministicPrice != null) {
+        console.debug('[precio] respuesta determinista SIPSA (sin LLM)', { route: nluRoute });
+      }
       // Fallback estructurado (Item 9): si el LLM retornó vacío (timeout, OOM,
       // modelo caído), construimos una respuesta útil con lo que sabemos
       // (toolEvidence, entidades) en vez de un silencio o banner rojo.
