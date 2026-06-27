@@ -9,13 +9,15 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-const { listFarmProcesses, getPestRisksByStage } = vi.hoisted(() => ({
+const { listFarmProcesses, getPestRisksByStage, getPrecioSipsa } = vi.hoisted(() => ({
   listFarmProcesses: vi.fn(),
   getPestRisksByStage: vi.fn(),
+  getPrecioSipsa: vi.fn(),
 }));
 
 vi.mock('../../db/farmProcessCache', () => ({ listFarmProcesses }));
 vi.mock('../climateCycleService', () => ({ getPestRisksByStage }));
+vi.mock('../sidecarClient', () => ({ getPrecioSipsa }));
 
 import { runCropAlerts } from '../cropAlertEngine';
 
@@ -28,6 +30,8 @@ let events;
 beforeEach(() => {
   listFarmProcesses.mockReset();
   getPestRisksByStage.mockReset();
+  getPrecioSipsa.mockReset();
+  getPrecioSipsa.mockResolvedValue(null);
   events = [];
   vi.spyOn(window, 'dispatchEvent').mockImplementation((ev) => {
     events.push({ name: ev.type, detail: ev.detail });
@@ -65,5 +69,34 @@ describe('cropAlertEngine.runCropAlerts', () => {
     const res = await runCropAlerts();
     expect(res).toEqual({ emitted: 0, cleared: 0 });
     expect(events.length).toBe(0);
+  });
+
+  it('en cosecha: emite alerta con el PRECIO REAL de SIPSA anexado', async () => {
+    listFarmProcesses.mockResolvedValue([cycle('p3', 'harvest_window', 'solanum_tuberosum', 'Papa')]);
+    getPestRisksByStage.mockReturnValue([]);
+    getPrecioSipsa.mockResolvedValue({
+      available: true,
+      price: { precio_promedio_cop_kg: 4600, plaza: 'Bucaramanga, Centroabastos', fecha: '2026-06-25' },
+      frescura: { desactualizado: false },
+    });
+    const res = await runCropAlerts();
+    const harvest = events.find((e) => e.name === 'alertTriggered' && e.detail.type === 'crop_harvest_p3');
+    expect(harvest).toBeTruthy();
+    expect(harvest.detail.message).toMatch(/cosecha/i);
+    expect(harvest.detail.message).toMatch(/\$4\.600\/kg/);
+    expect(harvest.detail.message).toMatch(/SIPSA\/DANE/);
+    expect(getPrecioSipsa).toHaveBeenCalledWith('latest_price', { producto: 'Papa' });
+    expect(res.emitted).toBeGreaterThanOrEqual(1);
+  });
+
+  it('en cosecha sin dato de precio: alerta sale igual, SIN inventar precio', async () => {
+    listFarmProcesses.mockResolvedValue([cycle('p4', 'harvest_window', 'zea_mays', 'Maíz')]);
+    getPestRisksByStage.mockReturnValue([]);
+    getPrecioSipsa.mockResolvedValue({ available: false, reason: 'no_matches' });
+    await runCropAlerts();
+    const harvest = events.find((e) => e.name === 'alertTriggered' && e.detail.type === 'crop_harvest_p4');
+    expect(harvest).toBeTruthy();
+    expect(harvest.detail.message).toMatch(/cosecha/i);
+    expect(harvest.detail.message).not.toMatch(/\$/);
   });
 });

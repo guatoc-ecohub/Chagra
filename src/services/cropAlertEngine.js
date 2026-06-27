@@ -15,8 +15,42 @@
 import { listFarmProcesses } from '../db/farmProcessCache';
 import { getPestRisksByStage } from './climateCycleService';
 import { getEnsoServicePhase, getEnsoLabel } from './ensoService';
+import { getPrecioSipsa } from './sidecarClient';
 
 const SEVERITY_BY_RISK = { 'crítico': 'danger', critico: 'danger', alto: 'warning' };
+
+/** "4600" → "4.600" (es-CO). null si no es número finito. */
+function formatCop(n) {
+  if (typeof n !== 'number' || !Number.isFinite(n)) return null;
+  return Math.round(n).toLocaleString('es-CO');
+}
+
+/**
+ * Consulta el PRECIO mayorista REAL (SIPSA/DANE) para el cultivo de un ciclo en
+ * etapa de cosecha. Devuelve un fragmento de mensaje listo para anexar a la
+ * alerta, o '' si no hay dato (NUNCA inventa — graceful degrade). El precio sale
+ * del tool get_precio_sipsa, que lee la tabla `chagra.sipsa_precios` poblada por
+ * el feed diario DANE.
+ *
+ * @param {string} producto — nombre/slug del producto (subject_label o slug).
+ * @returns {Promise<string>} fragmento " Hoy en mercado está a $X/kg (…)." o ''.
+ */
+async function buildHarvestPriceLine(producto) {
+  if (!producto || typeof producto !== 'string') return '';
+  let res = null;
+  try {
+    res = await getPrecioSipsa('latest_price', { producto });
+  } catch {
+    return '';
+  }
+  if (!res || res.available !== true || !res.price) return '';
+  const prom = formatCop(res.price.precio_promedio_cop_kg);
+  if (!prom) return '';
+  const plaza = typeof res.price.plaza === 'string' ? res.price.plaza.trim() : '';
+  const desactualizado = !!(res.frescura && res.frescura.desactualizado === true);
+  const sello = desactualizado ? ' (último dato disponible)' : '';
+  return ` Hoy el precio mayorista está a $${prom}/kg${plaza ? ` en ${plaza}` : ''} (SIPSA/DANE${sello}).`;
+}
 
 function emit(name, detail) {
   try {
@@ -70,6 +104,27 @@ export async function runCropAlerts() {
     } else {
       emit('alertCleared', { type });
       cleared++;
+    }
+
+    // Alerta de COSECHA con PRECIO REAL: si el ciclo está en ventana de cosecha,
+    // avisamos que está listo y ANEXAMOS el precio mayorista real de SIPSA/DANE
+    // (no un mock). Graceful: sin dato de precio, la alerta sale igual sin la
+    // línea de precio (NUNCA inventa). Tipo propio para de-dup/limpieza.
+    const harvestType = `crop_harvest_${id}`;
+    if (a.current_stage === 'harvest_window') {
+      const cultivo = a.subject_label || a.subject_slug || 'tu cultivo';
+      const priceLine = await buildHarvestPriceLine(a.subject_label || a.subject_slug);
+      emit('alertTriggered', {
+        type: harvestType,
+        severity: 'info',
+        title: `${cultivo} en ventana de cosecha`,
+        message: `Tu ${cultivo} está en etapa de cosecha.${priceLine}`,
+        source: 'crop',
+        processId: id,
+      });
+      emitted++;
+    } else {
+      emit('alertCleared', { type: harvestType });
     }
   }
 
