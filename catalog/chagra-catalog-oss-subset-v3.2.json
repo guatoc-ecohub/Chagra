@@ -7980,8 +7980,18 @@
     },
     {
       "id": "passiflora_tarminiana",
-      "nombre_comun": "Granadilla común / Granadilla de China",
+      "nombre_comun": "Curuba india",
       "nombre_cientifico": "Passiflora tarminiana Coppens & V.E.Barney",
+      "nombre_comunes_regionales": [
+        "curuba",
+        "curuba quiteña",
+        "curuba ecuatoriana",
+        "tacso",
+        "tacso amarillo",
+        "taxo",
+        "tumbo",
+        "curuba de monte"
+      ],
       "familia_botanica": "Passifloraceae",
       "category": "frutales_perennes",
       "thermal_zones": [
@@ -8016,7 +8026,7 @@
         "powo-kew",
         "gbif-taxonomic-backbone"
       ],
-      "valor_pedagogico": "La granadilla común (Passiflora tarminiana) es una pasiflora trepadora perenne cultivada en Colombia por sus frutos ovoides verde-amarillentos de pulpa ácida aromática, rica en vitamina A y C. Es el cultivo de pasifloras más importante del país después del maracuyá, con énfasis en producción de Huila, Boyacá, Cundinamarca y Antioquia entre 2.200 y 2.800 msnm en zona térmica templada. Planta vigorosa (5-8 m), requiere tutorado y podas de formación, producción de 15-20 kg/planta/año. Requiere polinización por abejorros grandes (Xylocopa), por lo que se recomienda conservar poblaciones de polinizadores nativos. Lección: enseña la importancia de la polinización entomófila en frutales andinos, el manejo de trepadoras perennes en sistemas productivos, y el papel de las pasifloras en seguridad alimentaria campesina. Fuentes: POWO Kew, GBIF.",
+      "valor_pedagogico": "La curuba india (Passiflora tarminiana) es una pasiflora trepadora perenne cultivada en Colombia por sus frutos ovoides verde-amarillentos de pulpa ácida aromática, rica en vitamina A y C. Es el cultivo de pasifloras más importante del país después del maracuyá, con énfasis en producción de Huila, Boyacá, Cundinamarca y Antioquia entre 2.200 y 2.800 msnm en zona térmica templada. Planta vigorosa (5-8 m), requiere tutorado y podas de formación, producción de 15-20 kg/planta/año. Requiere polinización por abejorros grandes (Xylocopa), por lo que se recomienda conservar poblaciones de polinizadores nativos. Lección: enseña la importancia de la polinización entomófila en frutales andinos, el manejo de trepadoras perennes en sistemas productivos, y el papel de las pasifloras en seguridad alimentaria campesina. Fuentes: POWO Kew, GBIF.",
       "validation_level": "claude_draft",
       "tracking_mode": "individual",
       "companions": [

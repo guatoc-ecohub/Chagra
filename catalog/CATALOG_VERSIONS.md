@@ -1,10 +1,27 @@
 # Estado de los archivos de catálogo (versionado)
 
-> Última actualización: **2026-06-25** (sinonimia regional grounded — 1ª pasada).
+> Última actualización: **2026-06-27** (sinonimia regional confirmada por DR + corrección de mal-etiquetados).
 > Este documento aclara cuál archivo es la **verdad** y qué es cada uno de los
 > demás, para que ningún script ni contributor tome el seed equivocado. No se
 > borró ningún archivo: los stale se documentan aquí y se conservan por
 > trazabilidad / referencia de scripts.
+
+> **Sinonimia regional confirmada por DR (2026-06-27)**: pasada grounded sobre el
+> DR de sinonimia (Gemini, 19 fuentes). Solo se integró lo marcado
+> `usado_en_Colombia=SI`; descartados los nombres en inglés/extranjeros (banana
+> passionfruit / banana poka / gulián / bananadilla / *(French)*) y los
+> etiquetados de otro país (*(Ecuador/Perú/Bolivia/Venezuela)*). **Corrección de
+> mal-etiquetado crítico**: `passiflora_tarminiana` figuraba como "Granadilla
+> común / Granadilla de China" (colisión exacta con la granadilla real,
+> `passiflora_ligularis`); el DR confirma granadilla=NO para esta especie →
+> `nombre_comun` corregido a **"Curuba india"** + 8 `nombre_comunes_regionales`
+> (curuba, curuba quiteña, curuba ecuatoriana, tacso, tacso amarillo, taxo, tumbo,
+> curuba de monte). Se excluyó "curuba de Castilla" (es el principal de
+> `passiflora_tripartita_mollissima` — anti-confusión). La prosa de
+> `valor_pedagogico` también se corrigió ("La granadilla común" → "La curuba
+> india"). `physalis_angulata` ya estaba correcto ("Uchuva silvestre / Topotopo",
+> no "tomate") y el DR no trajo filas para él. El resto del DR quedó sin integrar:
+> la tabla degeneró y solo contiene filas de `passiflora_tarminiana`.
 
 > **Sinonimia regional (2026-06-25)**: 1ª pasada grounded sobre
 > `nombre_comunes_regionales` (campo array — nótese el typo histórico "nombre"
