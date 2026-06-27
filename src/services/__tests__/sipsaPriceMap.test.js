@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { resolveSipsaProduct } from '../sipsaPriceMap.js';
+import { resolveSipsaProduct, resolveProductoFromSlug } from '../sipsaPriceMap.js';
 
 describe('resolveSipsaProduct', () => {
   it('match exacto minusculas', () => {
@@ -64,5 +64,39 @@ describe('resolveSipsaProduct', () => {
 
   it('undefined input retorna null', () => {
     expect(resolveSipsaProduct(undefined)).toBeNull();
+  });
+});
+
+describe('resolveProductoFromSlug (índice inverso slug→producto)', () => {
+  it('slug de especie → producto SIPSA: solanum_tuberosum → papa', () => {
+    expect(resolveProductoFromSlug('solanum_tuberosum')).toBe('papa');
+  });
+
+  it('solanum_phureja → papa criolla', () => {
+    expect(resolveProductoFromSlug('solanum_phureja')).toBe('papa criolla');
+  });
+
+  it('persea_americana → aguacate', () => {
+    expect(resolveProductoFromSlug('persea_americana')).toBe('aguacate');
+  });
+
+  it('round-trip: producto → slug → producto base', () => {
+    const slug = resolveSipsaProduct('tomate');
+    expect(resolveProductoFromSlug(slug)).toBe('tomate');
+  });
+
+  it('especie sin producto SIPSA mapeado → null (honesto)', () => {
+    expect(resolveProductoFromSlug('coffea_arabica')).toBeNull();
+  });
+
+  it('slug compartido (musa_paradisiaca: platano/banano) → primero declarado', () => {
+    // 'banano' aparece antes que 'platano' en el JSON fuente → gana banano.
+    expect(resolveProductoFromSlug('musa_paradisiaca')).toBe('banano');
+  });
+
+  it('input inválido → null', () => {
+    expect(resolveProductoFromSlug('')).toBeNull();
+    expect(resolveProductoFromSlug(null)).toBeNull();
+    expect(resolveProductoFromSlug(undefined)).toBeNull();
   });
 });

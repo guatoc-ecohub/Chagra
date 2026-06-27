@@ -316,12 +316,25 @@
   }
 
   /* CRÍTICO (theming P0 2026-06-04): en temas claros la foto biopunk OSCURA
-   * (/fondo-biopunk-4.jpg) + su overlay slate-950 se filtraba detrás de la UI
-   * clara → "integra pésimo". En minimalista/nature el fondo es liso tipo papel,
-   * como en los demos. Quitamos foto, overlay y patrón biopunk; el color base
-   * sale del token --c-slate-950 (papel/crema del tema). */
+   * (/fondo-biopunk-4.jpg, o /fondo-biopunk-1.jpg por defecto) + su overlay
+   * slate-950 se filtraba detrás de la UI clara → "integra pésimo". En
+   * minimalista/nature el fondo es liso tipo papel, como en los demos. Quitamos
+   * foto, overlay y patrón biopunk; el color base sale del token --c-slate-950
+   * (papel/crema del tema).
+   *
+   * VERDE VIVO (audit Bug 2, P0): es un tema CLARO (crema frondosa #eef3e2) que
+   * se añadió DESPUÉS (#1871) y quedó FUERA de esta exención → seguía pintando
+   * la foto biopunk oscura tras toda la app. Eso es lo que se colaba detrás de
+   * los formularios de Registro (las labels/intro sin tarjeta caían sobre la
+   * foto → ratio 1.34–2.31, ilegible) y lavaba el HUD de Defensores. Con
+   * verde-vivo aquí, su fondo pasa a superficie sólida del tema igual que
+   * nature/minimalista (el patrón de los 4 que ya hace bien el Directorio), y la
+   * superficie sólida de RegistroShell queda bajo TODO el formulario, no solo
+   * los inputs. Su FX ya estaba OFF (index.css §verde-vivo: --fx-bg-pattern:0),
+   * así que esto es coherente con su diseño "degradado vivo, sin foto". */
   [data-theme="minimalista"] body.app-bg-biodiversidad,
-  [data-theme="nature"] body.app-bg-biodiversidad {
+  [data-theme="nature"] body.app-bg-biodiversidad,
+  [data-theme="verde-vivo"] body.app-bg-biodiversidad {
     background-image: none !important;
     background-color: rgb(var(--c-slate-950)) !important;
   }
@@ -340,7 +353,8 @@
   }
 
   [data-theme="minimalista"] .bg-biopunk-pattern,
-  [data-theme="nature"] .bg-biopunk-pattern {
+  [data-theme="nature"] .bg-biopunk-pattern,
+  [data-theme="verde-vivo"] .bg-biopunk-pattern {
     background-image: none !important;
   }
 
