@@ -24,6 +24,7 @@ import {
   pisoTermicoFromAltitud,
   temporadaColombiana,
   buildFallbackResponse,
+  buildPriceAnswer,
 } from '../agentService.js';
 
 describe('agentService — Task #202 Profile Context', () => {
@@ -1396,6 +1397,85 @@ describe('agentService — Task #202 Profile Context', () => {
       const r = buildFallbackResponse('', toolEvidence, []);
       expect(r).toMatch(/Café/);
       expect(r).toMatch(/No pude obtener/);
+    });
+  });
+
+  // ─── buildPriceAnswer (escena de precio del demo campesino) ───────────────
+  describe('buildPriceAnswer', () => {
+    const priceEvidence = {
+      tool: 'get_precio_sipsa',
+      args: { action: 'latest_price', producto: 'papa' },
+      result: {
+        available: true,
+        price: {
+          fecha: '2026-06-25',
+          producto: 'Papa criolla limpia',
+          producto_id: 'papa_criolla_limpia',
+          plaza: 'Bucaramanga, Centroabastos',
+          precio_promedio_cop_kg: 4600,
+          precio_min_cop_kg: 4400,
+          precio_max_cop_kg: 4800,
+          unidad: 'Kilogramo',
+        },
+        central_abastos: 'Bucaramanga, Centroabastos',
+        frescura: { fecha_dato: '2026-06-25', dias_desde_dato: 1, desactualizado: false, sello: 'fresco' },
+        especie: 'solanum_phureja',
+      },
+    };
+
+    it('CANTA el número real con plaza, fecha y fuente SIPSA/DANE', () => {
+      const r = buildPriceAnswer({ userMessage: '¿a cómo está la papa?', toolEvidence: priceEvidence });
+      expect(r).not.toBeNull();
+      expect(r).toMatch(/\$4\.600\/kg/);
+      expect(r).toMatch(/Bucaramanga, Centroabastos/);
+      expect(r).toMatch(/SIPSA\/DANE/);
+      expect(r).toMatch(/Papa criolla limpia/);
+      // Rango del día.
+      expect(r).toMatch(/\$4\.400–\$4\.800\/kg/);
+      // Aclaración mayorista.
+      expect(r).toMatch(/mayorista/);
+    });
+
+    it('marca el dato como desactualizado cuando frescura.desactualizado=true', () => {
+      const stale = {
+        ...priceEvidence,
+        result: {
+          ...priceEvidence.result,
+          frescura: { fecha_dato: '2026-06-10', dias_desde_dato: 15, desactualizado: true, sello: 'desactualizado' },
+        },
+      };
+      const r = buildPriceAnswer({ userMessage: 'precio de la papa', toolEvidence: stale });
+      expect(r).toMatch(/último dato disponible/);
+      expect(r).toMatch(/15 días/);
+    });
+
+    it('devuelve null si available:false (sin dato → caller declina honesto)', () => {
+      const miss = {
+        tool: 'get_precio_sipsa',
+        result: { available: false, reason: 'sipsa_federated_href' },
+      };
+      expect(buildPriceAnswer({ userMessage: '¿a cómo está la papa?', toolEvidence: miss })).toBeNull();
+    });
+
+    it('devuelve null si la consulta NO es de precio (no convierte otras intents)', () => {
+      expect(buildPriceAnswer({ userMessage: '¿cómo siembro papa?', toolEvidence: priceEvidence })).toBeNull();
+    });
+
+    it('acepta toolEvidence como array (NLU tool_chain) y toma el hit de precio', () => {
+      const chain = [
+        { tool: 'get_species', result: { available: true, species_name: 'Papa' } },
+        priceEvidence,
+      ];
+      const r = buildPriceAnswer({ userMessage: 'a cómo está la papa', toolEvidence: chain });
+      expect(r).toMatch(/\$4\.600\/kg/);
+    });
+
+    it('NUNCA inventa: sin precio numérico en el payload → null', () => {
+      const bad = {
+        tool: 'get_precio_sipsa',
+        result: { available: true, price: { producto: 'Papa', plaza: 'X' } },
+      };
+      expect(buildPriceAnswer({ userMessage: 'precio de la papa', toolEvidence: bad })).toBeNull();
     });
   });
 });

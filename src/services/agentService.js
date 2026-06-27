@@ -1597,6 +1597,126 @@ Usuario: "¿a cómo está la papa?"
 === FIN REGLA DE PRECIO ===`;
 }
 
+// ── Respuesta DETERMINISTA de precio (escena de precio del demo campesino) ──
+
+/**
+ * Extrae el record de precio de una evidencia get_precio_sipsa con
+ * `available:true`. Tolera la forma simple ({tool,result}) y el array de
+ * tool_chain (D2 #246) — devuelve el PRIMER hit de precio disponible. Devuelve
+ * `null` si no hay precio disponible (el caller cae al LLM / al decline block).
+ *
+ * @param {object|Array<object>|null} toolEvidence
+ * @returns {{ price: object, especie: (string|null) }|null}
+ */
+function _extractAvailablePrice(toolEvidence) {
+  const pick = (ev) => {
+    if (!ev || typeof ev !== 'object') return null;
+    const toolName = String(ev.tool || '').toLowerCase();
+    const isPriceTool = toolName.includes('precio') || toolName.includes('sipsa');
+    if (!isPriceTool) return null;
+    const r = ev.result;
+    if (!r || typeof r !== 'object') return null;
+    if (r.available !== true) return null;
+    const price = r.price;
+    if (!price || typeof price !== 'object') return null;
+    if (typeof price.precio_promedio_cop_kg !== 'number') return null;
+    return { price, frescura: r.frescura || null, especie: r.especie ?? null };
+  };
+  if (Array.isArray(toolEvidence)) {
+    for (const ev of toolEvidence) {
+      const hit = pick(ev);
+      if (hit) return hit;
+    }
+    return null;
+  }
+  return pick(toolEvidence);
+}
+
+/** Formatea un entero COP con separador de miles (es-CO): 4600 → "4.600". */
+function _formatCop(n) {
+  if (typeof n !== 'number' || !Number.isFinite(n)) return null;
+  return Math.round(n).toLocaleString('es-CO');
+}
+
+/** "2026-06-25" → "25 de junio". Devuelve la ISO cruda si no parsea. */
+function _formatFechaCorta(iso) {
+  if (typeof iso !== 'string') return '';
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  if (!m) return iso;
+  const meses = [
+    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+  ];
+  const mes = meses[Number(m[2]) - 1] || m[2];
+  return `${Number(m[3])} de ${mes}`;
+}
+
+/**
+ * buildPriceAnswer — RESPUESTA DETERMINISTA para una consulta de precio cuando
+ * get_precio_sipsa devolvió un dato REAL (available:true). Es la escena de
+ * precio del demo campesino: el agente debe CANTAR el número, no enterrarlo en
+ * agronomía genérica ni depender de que granite lo razone bien.
+ *
+ * Anti-alucinación: SOLO emite cuando hay un precio numérico real en la
+ * evidencia del tool (que lee la tabla `chagra.sipsa_precios` poblada por el
+ * feed diario DANE). Sin dato disponible → devuelve `null` y el caller cae al
+ * decline block honesto (buildPriceDeclineContext) o al LLM. NUNCA inventa.
+ *
+ * Salida ejemplo:
+ *   "💰 La papa (Papa criolla limpia) está a $4.600/kg en Bucaramanga,
+ *    Centroabastos. Rango del día: $4.400–$4.800/kg. (Fuente: SIPSA/DANE,
+ *    25 de junio.)"
+ *
+ * @param {object} args
+ * @param {string|null|undefined} args.userMessage — pregunta cruda del usuario.
+ * @param {object|Array<object>|null} args.toolEvidence — evidencia del sidecar.
+ * @returns {string|null} respuesta lista para mostrar, o null si no aplica.
+ */
+export function buildPriceAnswer({ userMessage = null, toolEvidence = null } = {}) {
+  // Solo para intent de PRECIO inequívoco (no convertimos otras consultas).
+  if (classifyQueryIntent(userMessage) !== 'precio') return null;
+  const hit = _extractAvailablePrice(toolEvidence);
+  if (!hit) return null;
+
+  const { price, frescura } = hit;
+  const prom = _formatCop(price.precio_promedio_cop_kg);
+  if (!prom) return null;
+
+  // Lo que el usuario preguntó vs el nombre exacto del dato (variedad SIPSA).
+  const productoDato = typeof price.producto === 'string' ? price.producto.trim() : '';
+  const plaza = typeof price.plaza === 'string' ? price.plaza.trim() : '';
+
+  let frase = `💰 ${productoDato || 'El producto'} está a **$${prom}/kg**`;
+  if (plaza) frase += ` en ${plaza}`;
+  frase += '.';
+
+  // Rango min–max del día si ambos existen y difieren del promedio.
+  const min = _formatCop(price.precio_min_cop_kg);
+  const max = _formatCop(price.precio_max_cop_kg);
+  if (min && max && min !== max) {
+    frase += ` Rango del día: $${min}–$${max}/kg.`;
+  }
+
+  // Fuente + fecha. Sello de frescura honesto si el dato está desactualizado.
+  const fechaTxt = _formatFechaCorta(price.fecha);
+  const desactualizado = !!(frescura && frescura.desactualizado === true);
+  const dias = frescura && typeof frescura.dias_desde_dato === 'number'
+    ? frescura.dias_desde_dato
+    : null;
+  if (desactualizado) {
+    const cuanto = dias != null ? ` (de hace ${dias} día${dias === 1 ? '' : 's'})` : '';
+    frase += ` Ojo: es el último dato disponible${cuanto}, no el de hoy.`;
+    frase += ` (Fuente: SIPSA/DANE${fechaTxt ? `, ${fechaTxt}` : ''}.)`;
+  } else {
+    frase += ` (Fuente: SIPSA/DANE${fechaTxt ? `, ${fechaTxt}` : ''}.)`;
+  }
+
+  // Precio mayorista: aclaración útil para el campesino.
+  frase += ' Es precio mayorista en central de abastos; en plaza local puede variar.';
+
+  return frase;
+}
+
 // ── P4b: entidades de BAJA confianza como SUGERENCIA (gatilla CASO B) ───────
 
 /**
