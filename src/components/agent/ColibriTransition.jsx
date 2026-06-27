@@ -78,8 +78,8 @@ const CSS = `
     from { opacity: 0; transform: scale(0.82); }
     to   { opacity: 1; transform: scale(1); }
   }
-  /* Colibrí REAL cruzando: el sprite (BarbuditoSprite variant="cruzando") trae
-     su propia animación de aleteo + translateX; aquí solo lo dimensionamos. */
+  /* Colibrí REAL cruzando (BarbuditoCruza): el webm/sprite trae su propio
+     movimiento; aquí solo le damos una sombra para asentarlo. */
   .colibri-tx-cruce { filter: drop-shadow(0 8px 22px rgba(0,0,0,0.45)); }
   @media (prefers-reduced-motion: reduce) {
     .colibri-tx-video, .colibri-tx-still { animation: none !important; }
