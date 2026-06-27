@@ -17,19 +17,18 @@ import { clasificarPisoTermico } from '../../services/pisoTermicoClassifier';
 import { useTheme } from '../../hooks/useTheme';
 import { iconForTheme } from './themeIcon';
 import { colibriRealActivo } from '../../config/colibriFlag';
-import { BarbuditoIlustrado, BarbuditoRealLoop } from '../colibri/Barbudito';
 import './finca-viva-hero.css';
 
-// ¿Modo A/B del colibrí del páramo? Gateado por VITE_COLIBRI (colibriFlag.js),
-// dev-only. Se evalúa una sola vez al cargar el módulo (la flag es de build, no
-// cambia en runtime). Con la flag OFF (prod) el home conserva el colibrí SVG 2D
-// `ColibriVuela` de siempre. Con la flag ON (dev), el operador rechazó el
-// recuadro de video de la flor (rompía la escena ilustrada): en su lugar el home
-// COMPARA dos colibrís, uno a cada costado, para que el operador elija cuál
-// queda — IZQUIERDA el ILUSTRADO (SVG/CSS, barbudito de páramo dibujado),
-// DERECHA el REAL recortado (sprite en loop, sin recuadro). Es un A/B TEMPORAL:
-// cada uno lleva una etiquetita ("ilustrado" / "real") solo en este modo dev.
-// (Reemplazó al colibrí 3D rechazado: ChagraColibri3DLite / VITE_COLIBRI_3D.)
+// ¿Modo A/B del colibrí? Gateado por VITE_COLIBRI (colibriFlag.js), dev-only. Se
+// evalúa una sola vez al cargar el módulo (la flag es de build, no cambia en
+// runtime). Con la flag OFF (prod) el home conserva el colibrí SVG 2D
+// `ColibriVuela` de siempre. Con la flag ON (dev) el home COMPARA dos colibrís
+// DIBUJADOS en el mismo estilo, uno a cada costado, para que el operador elija:
+// IZQUIERDA el `ColibriVuela` BASE pulido (turquesa→violeta, el de la escena),
+// DERECHA `BarbuditoVuela`, el barbudito de páramo adaptado desde cero a ese
+// mismo estilo (cresta + barba blanca con raya verde + pico corto). Es un A/B
+// TEMPORAL: cada uno lleva una etiquetita ("base" / "barbudito") solo en dev.
+// (El video real y el ilustrado anterior se descartaron por feedback.)
 const COLIBRI_REAL = colibriRealActivo();
 
 /**
@@ -350,21 +349,21 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
                       poblada. */}
                   <div className="fvh-bichos" aria-hidden="true">
                     {/* COLIBRÍ insignia. Con la flag VITE_COLIBRI ON (dev) =
-                        modo A/B TEMPORAL: dos barbuditos de páramo, uno a cada
-                        costado, para que el operador elija. IZQUIERDA el
-                        ILUSTRADO (SVG/CSS dibujado); DERECHA el REAL recortado
-                        (sprite en loop, sin recuadro). Cada uno con su etiquetita
-                        ("ilustrado"/"real"). Con la flag OFF (prod), el colibrí
-                        SVG 2D `ColibriVuela` de siempre. */}
+                        modo A/B TEMPORAL: dos colibrís DIBUJADOS en el mismo
+                        estilo, uno a cada costado, para que el operador elija.
+                        IZQUIERDA el `ColibriVuela` BASE pulido; DERECHA el
+                        `BarbuditoVuela` (barbudito de páramo adaptado a ese
+                        estilo). Cada uno con su etiquetita ("base"/"barbudito").
+                        Con la flag OFF (prod), el `ColibriVuela` de siempre. */}
                     {COLIBRI_REAL ? (
                       <>
-                        <span className="fvh-bicho fvh-colibri-ab fvh-colibri-ab-izq" style={{ left: '4%', top: '12%' }}>
-                          <BarbuditoIlustrado size={104} ariaLabel="Colibrí del páramo ilustrado" />
-                          <span className="fvh-ab-tag">ilustrado</span>
+                        <span className="fvh-bicho fvh-colibri-ab fvh-colibri-ab-izq" style={{ left: '5%', top: '12%' }}>
+                          <ColibriVuela size={120} />
+                          <span className="fvh-ab-tag">base</span>
                         </span>
-                        <span className="fvh-bicho fvh-colibri-ab fvh-colibri-ab-der" style={{ right: '4%', top: '10%' }}>
-                          <BarbuditoRealLoop size={112} ariaLabel="Barbudito de páramo real" />
-                          <span className="fvh-ab-tag">real</span>
+                        <span className="fvh-bicho fvh-colibri-ab fvh-colibri-ab-der" style={{ right: '5%', top: '11%' }}>
+                          <BarbuditoVuela size={120} />
+                          <span className="fvh-ab-tag">barbudito</span>
                         </span>
                       </>
                     ) : (
@@ -681,45 +680,131 @@ function SolGrad() {
 //  Inspirado en ChagraAgentAvatarColibri (mismo plumaje turquesa→violeta).
 // ════════════════════════════════════════════════════════════════════════════
 
-/** Colibrí que vuela estacionario sobre la escena (criatura insignia). */
-function ColibriVuela() {
+/** Colibrí insignia "base" — el clásico turquesa→violeta con el que se diseñó la
+ *  escena, en versión PULIDA: gradiente iridiscente de 5 paradas, cola
+ *  ahorquillada de dos plumas, brillo de vientre y de corona, alas con su propio
+ *  gradiente y un halo tenue de aleteo. `size` ajusta el tamaño (A/B del home). */
+function ColibriVuela({ size = 44 }) {
+  const h = Math.round(size * 0.75);
   return (
-    <svg viewBox="0 0 64 48" width="44" height="33" aria-hidden="true" className="fvh-colibri-svg">
+    <svg viewBox="0 0 64 48" width={size} height={h} aria-hidden="true" className="fvh-colibri-svg">
       <defs>
-        <linearGradient id="fvh-colibri-plum" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#34d399" />
-          <stop offset="40%" stopColor="#10b981" />
-          <stop offset="72%" stopColor="#06b6d4" />
+        <linearGradient id="fvh-cv-plum" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#6ee7b7" />
+          <stop offset="30%" stopColor="#10b981" />
+          <stop offset="58%" stopColor="#06b6d4" />
+          <stop offset="82%" stopColor="#6366f1" />
           <stop offset="100%" stopColor="#8b5cf6" />
         </linearGradient>
-        <radialGradient id="fvh-colibri-gorget" cx="50%" cy="50%" r="50%">
-          <stop offset="0" stopColor="#fde68a" />
-          <stop offset="45%" stopColor="#f59e0b" />
+        <linearGradient id="fvh-cv-wing" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#a7f3d0" />
+          <stop offset="55%" stopColor="#22d3ee" />
+          <stop offset="100%" stopColor="#818cf8" />
+        </linearGradient>
+        <radialGradient id="fvh-cv-gorget" cx="35%" cy="30%" r="75%">
+          <stop offset="0" stopColor="#fff7ed" />
+          <stop offset="28%" stopColor="#fbbf24" />
+          <stop offset="68%" stopColor="#f97316" />
           <stop offset="100%" stopColor="#dc2626" />
         </radialGradient>
+        <radialGradient id="fvh-cv-belly" cx="50%" cy="38%" r="62%">
+          <stop offset="0" stopColor="#fffbeb" stopOpacity="0.95" />
+          <stop offset="100%" stopColor="#d1fae5" stopOpacity="0" />
+        </radialGradient>
       </defs>
-      {/* cola en abanico */}
-      <path d="M10 28 L1 24 L6 30 L0 35 L8 33 L5 40 L14 32 Z" fill="url(#fvh-colibri-plum)" opacity="0.9" />
+      {/* halo del aleteo (sensación de vuelo estacionario) */}
+      <ellipse cx="18" cy="22" rx="20" ry="12" fill="url(#fvh-cv-wing)" opacity="0.12" />
+      {/* cola ahorquillada (dos plumas largas) */}
+      <path d="M16 27 L0 21 L7 28 L1 31 L11 30 Z" fill="url(#fvh-cv-plum)" opacity="0.92" />
+      <path d="M16 30 L2 37 L9 31 L4 35 L14 33 Z" fill="url(#fvh-cv-plum)" opacity="0.78" />
       {/* ala trasera (batiendo) */}
       <g className="fvh-ala-tras" style={{ transformOrigin: '24px 24px' }}>
-        <path d="M24 24 Q12 16 4 24 Q12 32 24 28 Z" fill="url(#fvh-colibri-plum)" opacity="0.55" />
+        <path d="M25 24 Q11 15 3 23 Q11 33 25 28 Z" fill="url(#fvh-cv-wing)" opacity="0.5" />
       </g>
       {/* cuerpo */}
-      <ellipse cx="26" cy="27" rx="13" ry="7.5" fill="url(#fvh-colibri-plum)" transform="rotate(-16 26 27)" />
-      {/* vientre claro */}
-      <ellipse cx="25" cy="30" rx="8" ry="3.4" fill="#fef3c7" opacity="0.5" transform="rotate(-16 25 30)" />
+      <ellipse cx="26" cy="27" rx="13" ry="7.6" fill="url(#fvh-cv-plum)" transform="rotate(-15 26 27)" />
+      {/* vientre claro (brillo) */}
+      <ellipse cx="25" cy="30" rx="9" ry="4" fill="url(#fvh-cv-belly)" transform="rotate(-15 25 30)" />
       {/* cabeza */}
-      <circle cx="40" cy="22" r="6.4" fill="url(#fvh-colibri-plum)" />
+      <circle cx="40" cy="22" r="6.6" fill="url(#fvh-cv-plum)" />
+      {/* brillo de corona (iridiscencia) */}
+      <ellipse cx="38.5" cy="18.5" rx="3.2" ry="1.6" fill="#d1fae5" opacity="0.5" transform="rotate(-25 38.5 18.5)" />
       {/* garganta iridiscente (gorget) */}
-      <ellipse cx="41" cy="26" rx="3.6" ry="2.4" fill="url(#fvh-colibri-gorget)" opacity="0.92" />
-      {/* ojo */}
-      <circle cx="41.5" cy="20.6" r="1.5" fill="#0c0a09" />
-      <circle cx="41" cy="20.1" r="0.5" fill="#fff" opacity="0.95" />
-      {/* PICO LARGO característico del colibrí */}
-      <path d="M46 22 Q58 24 63 30" fill="none" stroke="#26201b" strokeWidth="1.7" strokeLinecap="round" />
+      <ellipse cx="41" cy="26.2" rx="3.8" ry="2.6" fill="url(#fvh-cv-gorget)" opacity="0.95" transform="rotate(-8 41 26)" />
+      {/* ojo + brillo */}
+      <circle cx="41.6" cy="20.6" r="1.5" fill="#0c0a09" />
+      <circle cx="41.1" cy="20.1" r="0.55" fill="#fff" opacity="0.95" />
+      {/* pico largo curvo característico */}
+      <path d="M46 22 Q57 24 63 29" fill="none" stroke="#2a2320" strokeWidth="1.7" strokeLinecap="round" />
       {/* ala frontal (batiendo, sobre el cuerpo) */}
       <g className="fvh-ala-fron" style={{ transformOrigin: '28px 23px' }}>
-        <path d="M28 23 Q16 6 2 12 Q14 26 30 21 Z" fill="url(#fvh-colibri-plum)" opacity="0.78" />
+        <path d="M29 23 Q15 5 1 11 Q13 27 31 21 Z" fill="url(#fvh-cv-wing)" opacity="0.82" />
+      </g>
+    </svg>
+  );
+}
+
+/** Barbudito de páramo (Oxypogon) dibujado DESDE CERO en el mismo lenguaje
+ *  ilustrado que `ColibriVuela`, para integrarlo a la escena sin romperla. Rasgos
+ *  reales del ave: CRESTA erguida tipo casco, larga BARBA blanca con raya
+ *  iridiscente verde central (su seña), PICO CORTO recto (no el largo del
+ *  colibrí) y plumaje oliva-bronce de altura. `size` ajusta el tamaño. */
+function BarbuditoVuela({ size = 44 }) {
+  const h = Math.round(size * 0.75);
+  return (
+    <svg viewBox="0 0 64 48" width={size} height={h} aria-hidden="true" className="fvh-colibri-svg">
+      <defs>
+        <linearGradient id="fvh-bv-plum" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#bef264" />
+          <stop offset="32%" stopColor="#84a35a" />
+          <stop offset="64%" stopColor="#5c7a4e" />
+          <stop offset="100%" stopColor="#3f5e3a" />
+        </linearGradient>
+        <linearGradient id="fvh-bv-wing" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#d9f99d" />
+          <stop offset="55%" stopColor="#6f9c5c" />
+          <stop offset="100%" stopColor="#3f5e3a" />
+        </linearGradient>
+        <linearGradient id="fvh-bv-beard" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#ffffff" />
+          <stop offset="100%" stopColor="#dbe7d4" />
+        </linearGradient>
+      </defs>
+      {/* halo del aleteo */}
+      <ellipse cx="18" cy="23" rx="19" ry="12" fill="url(#fvh-bv-wing)" opacity="0.12" />
+      {/* cola oliva levemente ahorquillada */}
+      <path d="M16 28 L1 23 L8 29 L2 33 L13 32 Z" fill="url(#fvh-bv-plum)" opacity="0.9" />
+      {/* ala trasera */}
+      <g className="fvh-ala-tras" style={{ transformOrigin: '24px 25px' }}>
+        <path d="M25 25 Q11 16 3 24 Q11 34 25 29 Z" fill="url(#fvh-bv-wing)" opacity="0.5" />
+      </g>
+      {/* cuerpo oliva-bronce */}
+      <ellipse cx="26" cy="28" rx="12.5" ry="7.4" fill="url(#fvh-bv-plum)" transform="rotate(-13 26 28)" />
+      {/* vientre grisáceo-ante */}
+      <ellipse cx="24" cy="31" rx="8.5" ry="3.6" fill="#ece7d6" opacity="0.6" transform="rotate(-13 24 31)" />
+      {/* BARBA tipo babero sobre el pecho (rasgo insignia del barbudito) */}
+      <path d="M37 26 Q32.4 30 34 36.6 Q37.4 39.6 40.6 37 Q43.6 32.4 42 26.4 Q39.6 24.4 37 26 Z" fill="url(#fvh-bv-beard)" />
+      {/* raya iridiscente verde central de la barba */}
+      <path d="M38.3 27 Q37.5 32 38.3 36.4" fill="none" stroke="#15803d" strokeWidth="1.4" strokeLinecap="round" opacity="0.9" />
+      <path d="M38.1 28 Q37.7 31.6 38.1 35" fill="none" stroke="#4ade80" strokeWidth="0.55" strokeLinecap="round" opacity="0.85" />
+      {/* moteado tenue de la barba */}
+      <circle cx="36" cy="31" r="0.5" fill="#9ca3af" opacity="0.55" />
+      <circle cx="40" cy="33" r="0.5" fill="#9ca3af" opacity="0.55" />
+      {/* cabeza (sobre el arranque de la barba) */}
+      <circle cx="40" cy="21.5" r="6.2" fill="url(#fvh-bv-plum)" />
+      {/* CRESTA peinada hacia atrás, suavizada (helmetcrest) */}
+      <path d="M37.5 15.5 L34.5 7 L39.5 14 Z" fill="#4f4a31" />
+      <path d="M40 14.5 L38.5 5.5 L42.5 13.5 Z" fill="#5c5638" />
+      <path d="M42.5 15 L45.5 7.5 L44.5 14.5 Z" fill="#4f4a31" />
+      <path d="M34.9 7.7 L36 9.4 M38.7 6.1 L39.6 7.8 M45.2 8.2 L44.6 9.8" stroke="#eef5e0" strokeWidth="0.6" strokeLinecap="round" />
+      {/* ojo + brillo */}
+      <circle cx="41.4" cy="20.2" r="1.4" fill="#0c0a09" />
+      <circle cx="41" cy="19.8" r="0.5" fill="#fff" opacity="0.95" />
+      {/* pico CORTO recto (no el largo del colibrí) */}
+      <path d="M45.5 22 L53.5 22.6" fill="none" stroke="#2a2320" strokeWidth="1.5" strokeLinecap="round" />
+      {/* ala frontal */}
+      <g className="fvh-ala-fron" style={{ transformOrigin: '28px 24px' }}>
+        <path d="M29 24 Q15 7 2 13 Q14 28 31 22 Z" fill="url(#fvh-bv-wing)" opacity="0.82" />
       </g>
     </svg>
   );

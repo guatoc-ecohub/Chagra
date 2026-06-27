@@ -482,20 +482,29 @@
   100% { transform: translate(0, 0); }
 }
 
-/* A/B del colibrí del páramo (flag VITE_COLIBRI ON, dev). Dos barbuditos, uno a
-   cada costado de la escena, para que el operador elija. Cada uno trae su propia
-   animación (ilustrado = aleteo/vuelo CSS; real = sprite en loop), así que aquí
-   anulamos la animación de bicho heredada y solo los ubicamos. Es A/B TEMPORAL:
-   cada uno con su etiquetita. */
+/* A/B del colibrí (flag VITE_COLIBRI ON, dev). Dos colibrís DIBUJADOS en el
+   mismo estilo, uno a cada costado, para que el operador elija: base vs barbudito
+   de páramo. Las alas baten solas (.fvh-colibri-svg .fvh-ala-*); aquí solo los
+   ubicamos, les damos un cabeceo suave de vuelo estacionario (con tiempos
+   distintos para que no vayan sincronizados) y su etiquetita. */
 .fvh-colibri-ab {
-  animation: none !important;
   z-index: 8;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 5px;
+  filter: drop-shadow(0 5px 6px rgba(20, 40, 20, 0.3));
 }
-/* etiquetita discreta "ilustrado" / "real" (solo en este modo A/B dev) */
+.fvh-colibri-ab-izq { animation: fvh-colibri-cabeceo 5.6s ease-in-out infinite; }
+.fvh-colibri-ab-der {
+  animation: fvh-colibri-cabeceo 6.4s ease-in-out infinite;
+  animation-delay: -2.3s;
+}
+@keyframes fvh-colibri-cabeceo {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-9px) rotate(2deg); }
+}
+/* etiquetita discreta "base" / "barbudito" (solo en este modo A/B dev) */
 .fvh-ab-tag {
   font: 600 9px/1 var(--fvh-body, system-ui, sans-serif);
   letter-spacing: 0.06em;
