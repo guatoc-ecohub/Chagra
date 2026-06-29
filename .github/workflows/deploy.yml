@@ -114,6 +114,12 @@ jobs:
           # Si sidecar timeout/5xx/red caida, sidecarClient devuelve null y el
           # comportamiento es identico al pre-wiring.
           VITE_USE_SIDECAR_AGRO_MCP: "true"
+          # Captura server-side de conversaciones del agente para la auditoría
+          # diaria (review de respuestas en todas las aristas). Doble gate: esta
+          # flag + hasConsent() por usuario (privacy-first). PII completa (sin
+          # VITE_CAPTURE_ANONYMIZE); el store cae en /var/lib/agro-mcp/conversations
+          # (fuera del rsync --delete del deploy). Habeas Data: Ley 1581.
+          VITE_CAPTURE_CONVERSATIONS: "true"
           # Token X-Chagra-Token shared-secret. NOTA: termina en bundle JS
           # publico - defense-in-depth, NO auth real (auth real = nginx CORS
           # lockdown). Sincronizado con SOPS de alpha; rotacion coordinada.
