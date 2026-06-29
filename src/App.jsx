@@ -91,6 +91,7 @@ const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
 const PlantaPorVozScreen = lazy(() => import('./components/PlantaPorVozScreen'));
 const ProcesosPorVozScreen = lazy(() => import('./components/ProcesosPorVozScreen'));
 const RegistroVozScreen = lazy(() => import('./components/RegistroVozScreen'));
+const RegistroUnificadoScreen = lazy(() => import('./components/RegistroUnificadoScreen'));
 const CicloCultivoScreen = lazy(() => import('./components/CicloCultivoScreen'));
 const GerminacionScreen = lazy(() => import('./components/GerminacionScreen'));
 const CicloNutrientesScreen = lazy(() => import('./components/CicloNutrientesScreen'));
@@ -197,7 +198,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'toxicologia', 'aprende', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'toxicologia', 'aprende', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia',
   'usage_stats', 'mercado',
@@ -1097,6 +1098,19 @@ export default function App() {
         return (
           <ErrorBoundary>
             <RegistroVozScreen onBack={() => navigate('dashboard')} onSave={showToast} />
+          </ErrorBoundary>
+        );
+      case 'registro_unificado':
+        // PUERTA ÚNICA "Registrar" (#23, registro unificado): una sola entrada
+        // visible que reemplaza las ~5 sueltas (Cosechar/Insumos/Labores/
+        // Semilleros/Bitácora). Voz primero + respaldo manual adaptativo; ambos
+        // escriben con buildVoicePayload → savePayload (mismo contrato probado).
+        // Gateada en el dashboard tras registroUnificadoActivo() (flag dev-only).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Registrar">
+              <RegistroUnificadoScreen onBack={() => navigate('dashboard')} onSave={showToast} />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'ciclo':

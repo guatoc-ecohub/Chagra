@@ -53,6 +53,9 @@ jobs:
           VITE_HA_ACCESS_TOKEN: ${{ secrets.VITE_HA_ACCESS_TOKEN }}
           VITE_USE_SIDECAR_AGRO_MCP: "true"
           VITE_FINCA_VIVA_HOME_PERFIL: "true"
+          # Registro unificado (#23): puerta única "Registrar" (voz + manual) en
+          # dev. OFF en prod (deploy.yml no la define) hasta el visto bueno.
+          VITE_REGISTRO_UNIFICADO: "true"
           # Colibrí REAL (barbudito de páramo por sprite) en home + FAB +
           # transición. Dev-only para revisión del operador; AUSENTE en
           # deploy.yml (prod) → prod conserva el colibrí 2D / video actual.
