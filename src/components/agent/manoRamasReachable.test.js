@@ -29,13 +29,16 @@ describe('mano radial — ramas Aprender y Vender alcanzables (no dead-end)', ()
     expect(navAprende).toBeTruthy();
   });
 
-  it('la rama "vender" tiene una capacidad LIVE que navega a una superficie real (mercados)', () => {
+  it('la rama "vender" tiene una capacidad LIVE que navega a una superficie real (mercado)', () => {
+    // dedup mano 2026-06-28: 'vender-mercados' (vista 'mercados', en preparación)
+    // se retiró de la mano; la rama vive por 'mercado' (marketplace LIVE,
+    // vista 'mercado'). Ambas renderizaban la misma MercadosScreen.
     const leaves = heroLiveLeavesForGroup('vender');
     expect(leaves.length).toBeGreaterThan(0);
-    const navMercados = leaves.find(
-      (c) => c.heroRoute?.kind === 'nav' && c.heroRoute?.view === 'mercados',
+    const navMercado = leaves.find(
+      (c) => c.heroRoute?.kind === 'nav' && c.heroRoute?.view === 'mercado',
     );
-    expect(navMercados).toBeTruthy();
+    expect(navMercado).toBeTruthy();
   });
 
   it('mapCapabilityPick enruta la rama "aprender" a onNav("aprende")', () => {
@@ -48,14 +51,14 @@ describe('mano radial — ramas Aprender y Vender alcanzables (no dead-end)', ()
     expect(onNav).toHaveBeenCalledWith('aprende');
   });
 
-  it('mapCapabilityPick enruta la rama "vender" a onNav("mercados")', () => {
+  it('mapCapabilityPick enruta la rama "vender" a onNav("mercado")', () => {
     const cap = heroLiveLeavesForGroup('vender').find(
-      (c) => c.heroRoute?.view === 'mercados',
+      (c) => c.heroRoute?.view === 'mercado',
     );
     const onNav = vi.fn();
     const acted = mapCapabilityPick(cap, { onNav });
     expect(acted).toBe(true);
-    expect(onNav).toHaveBeenCalledWith('mercados');
+    expect(onNav).toHaveBeenCalledWith('mercado');
   });
 
   it('las capacidades de navegación de las ramas no son no-op (acted=true)', () => {
