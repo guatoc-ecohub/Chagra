@@ -68,7 +68,13 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
       ? container.scrollHeight - container.scrollTop - container.clientHeight
       : 0;
     const nearBottom = distFromBottom < 120;
-    if (nearBottom || isStreaming) {
+    // Operador 2026-06-28: "mientras responde es imposible mover el scroll para
+    // leer mensajes anteriores". Antes seguíamos al fondo SIEMPRE que había
+    // streaming (`|| isStreaming`), lo que re-anclaba al fondo en cada token y
+    // le arrebataba el scroll al usuario que subió a releer. Ahora seguimos al
+    // fondo SOLO si ya estaba cerca del fondo — durante el streaming o no. Si
+    // subió, lo dejamos leer en paz (puede volver al fondo deslizando).
+    if (nearBottom) {
       anchor.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
   }, [messages, streamingContent, isStreaming]);

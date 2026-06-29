@@ -24,9 +24,12 @@ describe('VoiceStatusStrip — estados de voz para baja alfabetización', () => 
     expect(label.getAttribute('aria-live')).toBe('polite');
   });
 
-  it('phase=thinking muestra "Chagra está pensando"', () => {
-    render(<VoiceStatusStrip phase="thinking" />);
-    expect(screen.getByText(/Chagra está pensando/i)).toBeTruthy();
+  it('phase=thinking NO renderiza el strip (auditoría UX P1-3: "pensando" vive en el chat + el ETA, no acá — evita triple redundancia)', () => {
+    const { container } = render(<VoiceStatusStrip phase="thinking" />);
+    // Sin escucha/habla/repeat/notice, el strip se oculta por completo.
+    expect(screen.queryByTestId('voice-status-strip')).toBeNull();
+    expect(screen.queryByText(/Chagra está pensando/i)).toBeNull();
+    expect(container).toBeTruthy();
   });
 
   it('phase=speaking muestra "Chagra está hablando" + botón Parar que dispara onStopSpeaking', () => {

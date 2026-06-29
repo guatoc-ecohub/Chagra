@@ -57,16 +57,6 @@ function Equalizer() {
   );
 }
 
-function ThinkingDots() {
-  return (
-    <span className="flex items-center gap-1.5" aria-hidden="true">
-      {[0, 1, 2].map((i) => (
-        <span key={i} className="vsb-dot" style={{ animationDelay: `${i * 0.22}s` }} />
-      ))}
-    </span>
-  );
-}
-
 export default function VoiceStatusStrip({
   phase = 'idle',
   canRepeat = false,
@@ -76,12 +66,15 @@ export default function VoiceStatusStrip({
   onDismissNotice,
 }) {
   const isListening = phase === 'listening';
-  const isThinking = phase === 'thinking';
+  // "thinking" NO se muestra aquí (auditoría UX 2026-06-28 P1-3): el estado
+  // "pensando" ya aparece en el chat (burbuja del colibrí + "Pensando…") y en el
+  // bloque ETA del compositor. Tenerlo además acá era triple redundancia que
+  // aplastaba la lectura. El strip solo cubre escucha/habla/volver-a-oír/aviso.
   const isSpeaking = phase === 'speaking';
   const showRepeat = phase === 'idle' && canRepeat && typeof onRepeat === 'function';
   const showNotice = typeof notice === 'string' && notice.length > 0;
 
-  if (!isListening && !isThinking && !isSpeaking && !showRepeat && !showNotice) {
+  if (!isListening && !isSpeaking && !showRepeat && !showNotice) {
     return null;
   }
 
@@ -89,29 +82,28 @@ export default function VoiceStatusStrip({
     <div className="px-4 pb-1" data-testid="voice-status-strip">
       <style>{STRIP_CSS}</style>
 
-      {/* Estado activo: ícono + animación + frase corta, grande y legible */}
-      {(isListening || isThinking || isSpeaking) && (
+      {/* Estado activo: CHIP compacto de una línea (operador 2026-06-28: la barra
+          gruesa "está hablando/pensando" comía espacio valioso de lectura). Mantiene
+          ícono+animación+frase corta (claridad para baja alfabetización) y el botón
+          Parar, pero en ~la mitad del alto: rounded-full, padding chico, texto sm. */}
+      {(isListening || isSpeaking) && (
         <div
-          className={`flex items-center gap-3 rounded-2xl px-4 py-3 border ${
+          className={`flex items-center gap-2 rounded-full px-3 py-1.5 border ${
             isListening
-              ? 'bg-rose-900/30 border-rose-700/50 text-rose-300'
-              : isThinking
-                ? 'bg-violet-900/30 border-violet-700/50 text-violet-300'
-                : 'bg-emerald-900/30 border-emerald-700/50 text-emerald-300'
+              ? 'bg-rose-900/25 border-rose-700/40 text-rose-300'
+              : 'bg-emerald-900/25 border-emerald-700/40 text-emerald-300'
           }`}
         >
-          <span className="shrink-0 flex items-center justify-center w-9 h-9 rounded-full bg-slate-900/60">
-            {isListening && <Mic size={20} className="animate-pulse" aria-hidden="true" />}
-            {isThinking && <ThinkingDots />}
+          <span className="shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-slate-900/50">
+            {isListening && <Mic size={15} className="animate-pulse" aria-hidden="true" />}
             {isSpeaking && <Equalizer />}
           </span>
           <p
-            className="flex-1 text-base font-bold leading-tight"
+            className="flex-1 text-sm font-semibold leading-tight truncate"
             data-testid="voice-state-label"
             aria-live="polite"
           >
             {isListening && 'Chagra te escucha'}
-            {isThinking && 'Chagra está pensando'}
             {isSpeaking && 'Chagra está hablando'}
           </p>
           {isSpeaking && typeof onStopSpeaking === 'function' && (
@@ -120,25 +112,29 @@ export default function VoiceStatusStrip({
               onClick={onStopSpeaking}
               data-testid="voice-stop-btn"
               aria-label="Parar la voz de Chagra"
-              className="shrink-0 flex items-center gap-1.5 px-3 min-h-[44px] rounded-full bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 text-sm font-bold border border-slate-600 transition-all"
+              className="shrink-0 flex items-center gap-1 px-2.5 min-h-[36px] rounded-full bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 text-xs font-bold border border-slate-600 transition-all"
             >
-              <Square size={14} strokeWidth={2.5} aria-hidden="true" />
+              <Square size={12} strokeWidth={2.5} aria-hidden="true" />
               Parar
             </button>
           )}
         </div>
       )}
 
-      {/* Botón GRANDE "Volver a oír" — re-reproduce la última respuesta */}
+      {/* "Volver a oír" — re-reproduce la última respuesta. Auditoría UX P1-2:
+          antes era una barra FULL-WIDTH de 52px que quedaba fija sobre el
+          compositor tras la 1ª respuesta y comía lectura. Ahora es un botón
+          COMPACTO (auto-width, alto 40) alineado a la izquierda — sigue siendo
+          un toque grande accesible, pero no ocupa una franja entera. */}
       {showRepeat && (
         <button
           type="button"
           onClick={onRepeat}
           data-testid="voice-repeat-btn"
           aria-label="Volver a oír la última respuesta de Chagra"
-          className="w-full min-h-[52px] mt-1 flex items-center justify-center gap-2.5 rounded-2xl bg-emerald-900/40 hover:bg-emerald-800/50 active:scale-[0.99] text-emerald-200 text-base font-bold border border-emerald-700/60 transition-all"
+          className="inline-flex min-h-[40px] mt-1 items-center gap-2 px-3.5 rounded-full bg-emerald-900/40 hover:bg-emerald-800/50 active:scale-95 text-emerald-200 text-sm font-bold border border-emerald-700/60 transition-all"
         >
-          <Volume2 size={20} aria-hidden="true" />
+          <Volume2 size={17} aria-hidden="true" />
           Volver a oír
         </button>
       )}

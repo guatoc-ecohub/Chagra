@@ -3305,9 +3305,13 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         )}
 
         {/* Tip de primera vez (feat/onboarding-ayuda): cómo pedir diagnóstico
-            con foto. Apunta al botón 📷 real del compositor de abajo;
-            descartable y no se repite (contextTips). */}
-        {state !== STATE_RECORDING && !agentAttachment && (
+            con foto. Apunta al botón 📷 real del compositor de abajo.
+            Operador 2026-06-28: ocupaba espacio valioso DURANTE la conversación
+            y no dejaba leer la respuesta. Ahora SOLO aparece en la pantalla
+            inicial vacía (messages.length === 0) — como guía de primer mensaje;
+            apenas el usuario pregunta o el agente responde, desaparece y libera
+            la lectura. Sigue siendo descartable (contextTips) cuando se ve. */}
+        {state !== STATE_RECORDING && !agentAttachment && messages.length === 0 && (
           <ContextTip
             id="foto-diagnostico"
             emoji="📷"
