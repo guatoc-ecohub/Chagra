@@ -74,12 +74,16 @@ describe('getCapabilityHealth — estado real por capacidad', () => {
     expect(getCapabilityHealth('voz', deps)).toBe('live');
   });
 
-  it('foto retorna soon (manifest: identificacion por foto necesita GPU >=8GB)', () => {
-    // foto es status:'soon' en el manifiesto (hardware insuficiente en Maxwell);
-    // el manifest manda, sin importar el estado del sidecar.
-    const deps = makeDeps({ isSidecarEnabled: false });
-    expect(getCapabilityHealth('foto', deps)).toBe('soon');
-    expect(getCapabilityHealth('foto', makeDeps({ isSidecarEnabled: true }))).toBe('soon');
+  it('foto retorna live (visión groundeada ya corre; foto-en-la-mano cableada, fix P0 2026-06-25)', () => {
+    // foto pasó de 'soon' a 'live': el gate 'soon' tenía un motivo FALSO
+    // ("requiere GPU ≥8GB") — la GPU es de 12GB y la visión groundeada YA corre
+    // en el chat (analyzeFoliage / validate_visual_match), y la hoja de la mano
+    // ya estaba cableada (heroRoute photo → onPhoto → cameraInput → pipeline de
+    // visión). Su tool 'vision_identify' NO está en SIDECAR_TOOL_NAMES (la visión
+    // corre por ollama, no por el sidecar agro), así que es 'live' con o sin
+    // sidecar.
+    expect(getCapabilityHealth('foto', makeDeps({ isSidecarEnabled: false }))).toBe('live');
+    expect(getCapabilityHealth('foto', makeDeps({ isSidecarEnabled: true }))).toBe('live');
   });
 
   it('capacidades sidecar-dependent retornan live con sidecar habilitado', () => {

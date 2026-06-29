@@ -133,6 +133,55 @@ describe('fincaSceneService — buildFincaScene (estado vacío)', () => {
     expect(s.vacia).toBe(true);
     expect(s.lotes).toHaveLength(0);
   });
+
+  it('sin procesos ni plantas-asset → vacía (deflección honesta)', () => {
+    const s = buildFincaScene({ processes: [], plantAssetsCount: 0 });
+    expect(s.vacia).toBe(true);
+    expect(s.totalCultivos).toBe(0);
+    expect(s.plantAssetsCount).toBe(0);
+  });
+});
+
+describe('fincaSceneService — buildFincaScene (plantas-asset reales, BUG home F2)', () => {
+  // El conteo real "Mis plantas: N" del dashboard vive en los ASSETS
+  // (useAssetStore.plants), NO en los FarmProcess. Una finca puede tener
+  // plantas registradas sin ningún proceso abierto → la escena DEBE poblarse,
+  // nunca decir "terreno listo / 0 siembras".
+  it('plantas-asset sin procesos → escena POBLADA (no vacía)', () => {
+    const s = buildFincaScene({ processes: [], plantAssetsCount: 43 });
+    expect(s.vacia).toBe(false);
+    expect(s.totalCultivos).toBe(43);
+    expect(s.cultivosActivos).toBe(43);
+    expect(s.plantAssetsCount).toBe(43);
+  });
+
+  it('totalCultivos honra la fuente mayor (plantas-asset > procesos)', () => {
+    const s = buildFincaScene({
+      processes: [proc({ id: 'p1', stage: 'vegetative', slug: 'zea_mays' })],
+      plantAssetsCount: 43,
+    });
+    expect(s.vacia).toBe(false);
+    expect(s.totalCultivos).toBe(43); // 43 plantas-asset > 1 proceso
+    expect(s.lotes).toHaveLength(1);  // pero solo hay 1 proceso para dibujar lote
+  });
+
+  it('más procesos que plantas-asset → manda el conteo de procesos', () => {
+    const s = buildFincaScene({
+      processes: [
+        proc({ id: 'p1', slug: 'a' }),
+        proc({ id: 'p2', slug: 'b' }),
+        proc({ id: 'p3', slug: 'c' }),
+      ],
+      plantAssetsCount: 1,
+    });
+    expect(s.totalCultivos).toBe(3);
+  });
+
+  it('plantAssetsCount inválido o negativo se sanea a 0 (no fabrica)', () => {
+    expect(buildFincaScene({ processes: [], plantAssetsCount: -5 }).vacia).toBe(true);
+    expect(buildFincaScene({ processes: [], plantAssetsCount: NaN }).plantAssetsCount).toBe(0);
+    expect(buildFincaScene({ processes: [] }).plantAssetsCount).toBe(0);
+  });
 });
 
 describe('fincaSceneService — buildFincaScene (datos reales)', () => {
@@ -148,6 +197,30 @@ describe('fincaSceneService — buildFincaScene (datos reales)', () => {
     const cafe = s.lotes.find((l) => l.nombre === 'Café');
     expect(cafe.fase).toBe('flower');
     expect(cafe.etiquetaEtapa).toBe('Florecida');
+  });
+
+  it('deriva el TIPO botánico de cada lote (frutal/hortaliza/aromatica)', () => {
+    const s = buildFincaScene({
+      processes: [
+        proc({ id: 'p1', stage: 'flowering', slug: 'fragaria_ananassa', label: 'Fresa' }),
+        proc({ id: 'p2', stage: 'fruiting', slug: 'persea_americana', label: 'Aguacate' }),
+        proc({ id: 'p3', stage: 'sowing_confirmed', slug: 'lactuca_sativa', label: 'Lechuga' }),
+        proc({ id: 'p4', stage: 'vegetative', slug: 'rosmarinus_officinalis', label: 'Romero' }),
+      ],
+    });
+    const byNombre = Object.fromEntries(s.lotes.map((l) => [l.nombre, l.tipo]));
+    expect(byNombre.Fresa).toBe('frutal');
+    expect(byNombre.Aguacate).toBe('frutal');
+    expect(byNombre.Lechuga).toBe('hortaliza');
+    expect(byNombre.Romero).toBe('aromatica');
+  });
+
+  it('cada lote SIEMPRE trae un tipo (nunca undefined)', () => {
+    const s = buildFincaScene({
+      processes: [proc({ id: 'p1', slug: 'especie_rara_xyz', label: 'Rara' })],
+    });
+    expect(s.lotes[0].tipo).toBeDefined();
+    expect(['frutal', 'hortaliza', 'aromatica', 'otro']).toContain(s.lotes[0].tipo);
   });
 
   it('acepta procesos anidados en .attributes (shape real)', () => {

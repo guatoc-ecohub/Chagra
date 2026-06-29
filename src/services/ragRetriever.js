@@ -396,16 +396,32 @@ function cosineSimilarity(a, b) {
  */
 async function loadEmbeddings() {
   if (embeddingsCache) return embeddingsCache;
+  // FIX P0 (audit 2026-06-23): antes había `if (embeddingsLoadPromise) return
+  // embeddingsLoadPromise` — pero el promise IIFE resuelve a null en cualquier
+  // fallo/HTTP-error, y el objeto Promise sigue siendo truthy → la siguiente
+  // consulta reusaba el promise resuelto a null y el agente quedaba en BM25-only
+  // permanente y silencioso. Ahora: al fallar/null reseteamos la var a null para
+  // que el siguiente turno vuelva a intentar la carga (retries naturales).
+  // El happy-path (carga exitosa) sigue cacheado en `embeddingsCache`.
   if (embeddingsLoadPromise) return embeddingsLoadPromise;
 
   embeddingsLoadPromise = (async () => {
     try {
       const res = await fetch(EMBEDDINGS_PATH);
-      if (!res.ok) return null;
+      if (!res.ok) {
+        embeddingsLoadPromise = null; // permitir reintento en próxima consulta
+        return null;
+      }
       const ct = res.headers.get('content-type') || '';
-      if (!ct.includes('json')) return null;
+      if (!ct.includes('json')) {
+        embeddingsLoadPromise = null;
+        return null;
+      }
       const raw = await res.json();
-      if (!raw || typeof raw !== 'object') return null;
+      if (!raw || typeof raw !== 'object') {
+        embeddingsLoadPromise = null;
+        return null;
+      }
       // Convertir a Float32Array. Soporta int8 quantizado (q:'int8',s:scale,v:Int8Array)
       const converted = {};
       for (const [slug, entry] of Object.entries(raw)) {
@@ -423,6 +439,7 @@ async function loadEmbeddings() {
       return converted;
     } catch (err) {
       console.warn('[RAG] No se pudieron cargar embeddings — modo semántico desactivado:', err?.message);
+      embeddingsLoadPromise = null; // permitir reintento en próxima consulta
       return null;
     }
   })();
@@ -433,13 +450,25 @@ async function loadEmbeddings() {
 /**
  * Embebe una query via Ollama (POST /api/ollama/api/embeddings).
  * Si falla (sin red, modelo caído), retorna null → fallback a BM25 solo.
+ *
+ * `options.num_gpu: 0` fuerza el embed a CPU (P0 warm, audit 2026-06-28): evita
+ * que snowflake-arctic-embed2 co-resida en la GPU del chat y dispare OOM.
  */
 async function embedQuery(queryText) {
   try {
     const res = await fetchWithAuthRetry('/api/ollama/api/embeddings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'nomic-embed-text', prompt: queryText }),
+      // num_gpu:0 → el embedder corre en CPU, NO en la M6000 (12 GiB). La
+      // co-residencia embedder(~4.5G) + granite3.3:8b(~7.2G) > 12G dispara un
+      // cudaMalloc OOM que MATA el runner compartido de granite → los turnos
+      // siguientes quedan fríos. Se conserva snowflake (1024d, mismo espacio que
+      // los vectores precomputados) y el RAG híbrido queda intacto.
+      body: JSON.stringify({
+        model: 'snowflake-arctic-embed2',
+        prompt: queryText,
+        options: { num_gpu: 0 },
+      }),
       signal: AbortSignal.timeout(TOOL_TIMEOUT_MS),
     });
     if (!res.ok) return null;

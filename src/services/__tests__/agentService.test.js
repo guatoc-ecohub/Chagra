@@ -24,6 +24,7 @@ import {
   pisoTermicoFromAltitud,
   temporadaColombiana,
   buildFallbackResponse,
+  buildPriceAnswer,
 } from '../agentService.js';
 
 describe('agentService — Task #202 Profile Context', () => {
@@ -816,7 +817,11 @@ describe('agentService — Task #202 Profile Context', () => {
 
     it('exige que las alternativas salgan SOLO del catálogo/grounding, nunca inventadas', () => {
       expect(rules).toContain('NUNCA inventes');
-      expect(rules).toContain('get_cultivos_viables');
+      // FIX P0 (audit 2026-06-23): get_cultivos_viables eliminada del prompt
+      // (no está en el allowlist del sidecar → prometida y falla en silencio).
+      // El modelo debe usar solo el catálogo/grounding, sin invocar esa tool.
+      expect(rules).not.toContain('get_cultivos_viables');
+      expect(rules).toContain('catálogo/grounding');
     });
 
     it('degrada con gracia: sin rango no se afirma viabilidad', () => {
@@ -888,8 +893,10 @@ describe('agentService — Task #202 Profile Context', () => {
       expect(ctx).toContain('0');
       expect(ctx).toContain('1000');
       expect(ctx).toContain('2580');
-      // Debe instruir sugerir alternativas del grounding/tool, no inventar
-      expect(ctx).toContain('get_cultivos_viables');
+      // Debe instruir sugerir alternativas del grounding, no inventar.
+      // FIX P0 (audit 2026-06-23): get_cultivos_viables eliminada del prompt.
+      expect(ctx).not.toContain('get_cultivos_viables');
+      expect(ctx).toContain('catálogo / grounding');
     });
 
     it('caso especie VIABLE: altitud de finca dentro del rango → no la marca inviable', () => {
@@ -1299,9 +1306,13 @@ describe('agentService — Task #202 Profile Context', () => {
       expect(rules).toContain('NUNCA inventes');
     });
 
-    it('menciona get_diseno_finca SOLO cuando pertinente', () => {
-      expect(rules).toContain('get_diseno_finca');
+    it('menciona diseño de finca SOLO cuando pertinente (sin invocar tool muerta)', () => {
+      // FIX P0 (audit 2026-06-23): get_diseno_finca eliminada del prompt —
+      // no está en el allowlist del sidecar → prometida y falla en silencio.
+      expect(rules).not.toContain('get_diseno_finca');
       expect(rules.toLowerCase()).toContain('pertinente');
+      // La funcionalidad de diseño de finca sigue presente — solo sin tool.
+      expect(rules.toLowerCase()).toContain('diseño de finca');
     });
 
     it('cero voseo argentino', () => {
@@ -1386,6 +1397,85 @@ describe('agentService — Task #202 Profile Context', () => {
       const r = buildFallbackResponse('', toolEvidence, []);
       expect(r).toMatch(/Café/);
       expect(r).toMatch(/No pude obtener/);
+    });
+  });
+
+  // ─── buildPriceAnswer (escena de precio del demo campesino) ───────────────
+  describe('buildPriceAnswer', () => {
+    const priceEvidence = {
+      tool: 'get_precio_sipsa',
+      args: { action: 'latest_price', producto: 'papa' },
+      result: {
+        available: true,
+        price: {
+          fecha: '2026-06-25',
+          producto: 'Papa criolla limpia',
+          producto_id: 'papa_criolla_limpia',
+          plaza: 'Bucaramanga, Centroabastos',
+          precio_promedio_cop_kg: 4600,
+          precio_min_cop_kg: 4400,
+          precio_max_cop_kg: 4800,
+          unidad: 'Kilogramo',
+        },
+        central_abastos: 'Bucaramanga, Centroabastos',
+        frescura: { fecha_dato: '2026-06-25', dias_desde_dato: 1, desactualizado: false, sello: 'fresco' },
+        especie: 'solanum_phureja',
+      },
+    };
+
+    it('CANTA el número real con plaza, fecha y fuente SIPSA/DANE', () => {
+      const r = buildPriceAnswer({ userMessage: '¿a cómo está la papa?', toolEvidence: priceEvidence });
+      expect(r).not.toBeNull();
+      expect(r).toMatch(/\$4\.600\/kg/);
+      expect(r).toMatch(/Bucaramanga, Centroabastos/);
+      expect(r).toMatch(/SIPSA\/DANE/);
+      expect(r).toMatch(/Papa criolla limpia/);
+      // Rango del día.
+      expect(r).toMatch(/\$4\.400–\$4\.800\/kg/);
+      // Aclaración mayorista.
+      expect(r).toMatch(/mayorista/);
+    });
+
+    it('marca el dato como desactualizado cuando frescura.desactualizado=true', () => {
+      const stale = {
+        ...priceEvidence,
+        result: {
+          ...priceEvidence.result,
+          frescura: { fecha_dato: '2026-06-10', dias_desde_dato: 15, desactualizado: true, sello: 'desactualizado' },
+        },
+      };
+      const r = buildPriceAnswer({ userMessage: 'precio de la papa', toolEvidence: stale });
+      expect(r).toMatch(/último dato disponible/);
+      expect(r).toMatch(/15 días/);
+    });
+
+    it('devuelve null si available:false (sin dato → caller declina honesto)', () => {
+      const miss = {
+        tool: 'get_precio_sipsa',
+        result: { available: false, reason: 'sipsa_federated_href' },
+      };
+      expect(buildPriceAnswer({ userMessage: '¿a cómo está la papa?', toolEvidence: miss })).toBeNull();
+    });
+
+    it('devuelve null si la consulta NO es de precio (no convierte otras intents)', () => {
+      expect(buildPriceAnswer({ userMessage: '¿cómo siembro papa?', toolEvidence: priceEvidence })).toBeNull();
+    });
+
+    it('acepta toolEvidence como array (NLU tool_chain) y toma el hit de precio', () => {
+      const chain = [
+        { tool: 'get_species', result: { available: true, species_name: 'Papa' } },
+        priceEvidence,
+      ];
+      const r = buildPriceAnswer({ userMessage: 'a cómo está la papa', toolEvidence: chain });
+      expect(r).toMatch(/\$4\.600\/kg/);
+    });
+
+    it('NUNCA inventa: sin precio numérico en el payload → null', () => {
+      const bad = {
+        tool: 'get_precio_sipsa',
+        result: { available: true, price: { producto: 'Papa', plaza: 'X' } },
+      };
+      expect(buildPriceAnswer({ userMessage: 'precio de la papa', toolEvidence: bad })).toBeNull();
     });
   });
 });

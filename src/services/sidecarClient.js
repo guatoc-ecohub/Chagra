@@ -2,10 +2,10 @@
  * sidecarClient.js — Cliente HTTP del sidecar chagra-agro-mcp (ADR-045 Fase 2).
  *
  * Wirea el AgentScreen del PWA con el endpoint `/api/mcp/agro/` (nginx
- * proxia a sidecar :7880 en alpha). Detrás de un feature flag — mientras
- * el deploy del sidecar (PR #103 guatoc-nixos) no esté merged, la flag
- * queda en false y el comportamiento del cliente es idéntico al anterior
- * (todas las funciones devuelven null sin hacer fetch).
+ * proxia al sidecar). Detrás de un feature flag — mientras el deploy del
+ * sidecar no esté disponible, la flag queda en false y el comportamiento
+ * del cliente es idéntico al anterior (todas las funciones devuelven null
+ * sin hacer fetch).
  *
  * Pipeline esperado (cuando flag=true + sidecar live):
  *   userMessage → planNlu() → { use_tool, tool, args, ... }
@@ -322,7 +322,59 @@ const ALLOWED_TOOLS = new Set([
   'get_toxicidad',
   'get_variedades',
   'get_suelo',
+  // Calendario de siembra (chip "calendario", fix grounding P0 2026-06-24):
+  // cultivos a sembrar este mes según el piso térmico. El tool ya vivía en el
+  // sidecar pero NO estaba en esta allow-list — el chip routeaba a get_species
+  // por un comentario stale. Es read-only seguro (solo lee el catálogo).
+  'get_calendario_siembra',
+  // ── Reconciliación allow-list cliente ↔ 41 tools del NLU (fix grounding P0
+  //    2026-06-25). El NLU planner conocía 41 tools pero el cliente exponía 20:
+  //    si el planner ruteaba a una de las 21 restantes, el turno degradaba a
+  //    RAG SIN grounding en silencio. Agregamos acá las tools que son SEGURAS y
+  //    VALIOSAS de exponer (grounding del grafo AGE / catálogo / dataset
+  //    institucional local, ruteables por el NLU con id|nombre|término).
+  //
+  //    NO se exponen las que exigen credenciales farmOS, coords de dispositivo
+  //    o NIT DIAN (add_planta_finca, get_finca_overview, get_sensor_finca,
+  //    get_weather_data, get_clima_finca, get_documento_soporte_dian,
+  //    get_ubicacion_actual): el NLU no puede rellenar esos args desde una
+  //    frase de chat → devolverían {available:false}/502. Esas quedan en
+  //    DEFLECCIÓN HONESTA (ver guard `not_allowed` en AgentScreen): el agente
+  //    dice claro "esa consulta todavía no está disponible" en vez de degradar
+  //    callado a RAG.
+
+  // Grounding del grafo AGE por especie (id snake_case O nombre común): el NLU
+  // rellena `species_id` (o el arg análogo) desde el nombre que dijo el usuario.
+  'get_associations', //          asociaciones benéficas + técnicas aplicables
+  'get_fenologia', //             etapas BBCH + ventanas de plaga por etapa
+  'get_polinizacion', //          polinizadores + colmenas/ha + efecto cuaje
+  'get_invasoras_alternativas', // nativas de reemplazo a invasoras combustibles
+  // Grounding standalone (catálogo / glosario / dataset institucional local):
+  'get_saberes_tradicionales', // glosario agroecológico (96 términos) por término
+  'get_variedades_cultivo', //    variedades registradas ICA/AGROSAVIA por cultivo
+  'get_psa_elegibilidad', //      Pago por Servicios Ambientales (Decreto 1007/2018)
+  'get_alerta_carbono', //        alerta defensiva bonos de carbono + PSA estatal
+  'get_alerta_normativa_paramo', // alerta regulatoria de páramo (Ley 1930/2018)
+  'get_alerta_clima_consejo', //  alerta de decisión por cambio climático
 ]);
+
+/**
+ * ¿Está `toolName` en la allow-list que el cliente PWA expone?
+ *
+ * El NLU planner del sidecar conoce 41 tools, pero el cliente solo expone un
+ * subconjunto (ver ALLOWED_TOOLS). Si el planner rutea a una de las restantes,
+ * `callTool` la rechaza internamente con `{_error, reason:'not_allowed'}` —
+ * pero ese rechazo es indistinguible de un fallo transitorio de red. Este
+ * predicado permite al caller (AgentScreen) detectar el caso ANTES de llamar y
+ * manejarlo de forma EXPLÍCITA y OBSERVABLE (telemetría + degradación
+ * transparente) en vez de degradar a RAG en silencio.
+ *
+ * @param {string} toolName
+ * @returns {boolean}
+ */
+export function isToolAllowed(toolName) {
+  return typeof toolName === 'string' && ALLOWED_TOOLS.has(toolName);
+}
 
 const NORMATIVA_ICA_ACTIONS = new Set([
   'latest_active_ingredients',
@@ -646,10 +698,14 @@ export async function getClimaIdeam(action, args) {
 }
 
 /**
- * Wrapper de `get_precio_sipsa`. Precios mayoristas SIPSA — hoy el dataset
- * DANE está publicado como ZIP federated (no consulta directa), así que
- * el tool devuelve metadata + URL del ZIP en vez de precio puntual. El
- * agente debe orientar al usuario al ZIP DANE o sugerir Corabastos.
+ * Wrapper de `get_precio_sipsa`. Precios mayoristas SIPSA — el tool lee la
+ * tabla `chagra.sipsa_precios` que llena el feed DIARIO en vivo del servicio
+ * REST oficial DANE (pipeline #19, `dane-live`), así que para los staples
+ * comunes (papa, tomate, cebolla, yuca, plátano, zanahoria, aguacate, maíz)
+ * devuelve un PRECIO PUNTUAL real: {price{precio_promedio_cop_kg, plaza,
+ * fecha, min/max}, central_abastos, frescura, especie}. Si un producto no está
+ * en la tabla ni en Socrata, devuelve {available:false} (honesto, no inventa)
+ * y el agente orienta al ZIP DANE / Corabastos.
  *
  * @param {string} action — uno de PRECIO_SIPSA_ACTIONS
  * @param {object} [args] — body adicional (producto, fecha, etc.)

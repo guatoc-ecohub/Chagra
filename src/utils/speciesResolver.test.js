@@ -79,6 +79,17 @@ describe('matchSpeciesInCatalog', () => {
     expect(matchSpeciesInCatalog(CATALOG, 'xyz', 'Especie Marciana')).toBeNull();
   });
 
+  it('resuelve cultivos del operador con calificador de estructura ("Fresa - Invernadero #1")', () => {
+    // Antes del fix, "Fresa - Invernadero #1" normalizaba a "fresa - invernadero"
+    // y NO matcheaba ninguna especie → calendario vacío.
+    expect(
+      matchSpeciesInCatalog(CATALOG, 'fresa_invernadero', 'Fresa - Invernadero #1')?.id,
+    ).toBe('fragaria_ananassa');
+    expect(
+      matchSpeciesInCatalog(CATALOG, 'fresa_invernadero', 'Fresa - Invernadero #10')?.id,
+    ).toBe('fragaria_ananassa');
+  });
+
   it('tolera lista vacía o inválida', () => {
     expect(matchSpeciesInCatalog([], 'fresa', 'Fresa')).toBeNull();
     expect(matchSpeciesInCatalog(null, 'fresa', 'Fresa')).toBeNull();
@@ -200,5 +211,41 @@ describe('normalizeForMatch — ampliado', () => {
 
   it('passthrough: string ya limpio queda igual', () => {
     expect(normalizeForMatch('fresa organica')).toBe('fresa organica');
+  });
+});
+
+describe('normalizeForMatch — calificadores de estructura de finca (cultivos del operador)', () => {
+  it('recorta "- Invernadero #N" al nombre de la especie', () => {
+    expect(normalizeForMatch('Fresa - Invernadero #1')).toBe('fresa');
+    expect(normalizeForMatch('Fresa - Invernadero #10')).toBe('fresa');
+    expect(normalizeForMatch('Guayaba - Invernadero')).toBe('guayaba');
+  });
+
+  it('recorta otros calificadores de ubicación predial', () => {
+    expect(normalizeForMatch('Tomate - Era 3')).toBe('tomate');
+    expect(normalizeForMatch('Mora - Cama 4')).toBe('mora');
+    expect(normalizeForMatch('Cilantro - Lote 2')).toBe('cilantro');
+  });
+
+  it('recorta el calificador de estructura aunque venga sin guion', () => {
+    expect(normalizeForMatch('Fresa Invernadero #1')).toBe('fresa');
+  });
+
+  it('recorta conteo con cero a la izquierda (#01)', () => {
+    expect(normalizeForMatch('Fresa #01')).toBe('fresa');
+  });
+
+  it('CONSERVA el nombre científico entre paréntesis (lo usa el paso 2/3)', () => {
+    expect(normalizeForMatch('Tomate (Solanum lycopersicum)')).toBe('tomate (solanum lycopersicum)');
+    expect(normalizeForMatch('Guayaba (Psidium guajava)')).toBe('guayaba (psidium guajava)');
+  });
+
+  it('NO recorta separadores que no son estructura predial (anti-falso-positivo)', () => {
+    // "Ají - dulce" NO es ubicación; el guion separa una variedad, se conserva.
+    expect(normalizeForMatch('Ají - dulce')).toBe('aji - dulce');
+  });
+
+  it('anti-confusión: NO recorta "árbol" (Tomate de árbol es OTRA especie)', () => {
+    expect(normalizeForMatch('Tomate de árbol')).toBe('tomate de arbol');
   });
 });

@@ -78,6 +78,7 @@ export function estimateTokens(text) {
  */
 export const BLOCK_ORDER = [
   'base', // instrucciones + glosarios + perfil (protegido)
+  'campesino', // MODO CAMPESINO registro oral — sacrificable
   'clima', // contexto ambiental — sacrificable en emergencia
   'finca', // contexto ambiental — sacrificable en emergencia
   'asociacion', // policultivo — sacrificable en emergencia
@@ -106,10 +107,11 @@ export const BLOCK_ORDER = [
 // chunks), luego la MEMORIA EPISÓDICA (personalización: valiosa pero nunca por
 // encima de las guardas ni la evidencia — TIER 2 #6), luego el contexto
 // AMBIENTAL (asociaciones, fase ENSO, riesgo térmico y por último el marco de
-// finca — su altitud también la cita el bloque de viabilidad). El grounding
+// finca — su altitud también la cita el bloque de viabilidad), y finalmente el
+// MODO CAMPESINO (cambio de registro, valioso pero sacrificable). El grounding
 // duro (evidencia, entidades, dosis curadas, cadena del grafo) y las guardas
 // NUNCA están aquí: jamás se recortan.
-const SACRIFICE_ORDER = ['corpus', 'memoria', 'asociacion', 'clima', 'frostHeat', 'finca'];
+const SACRIFICE_ORDER = ['corpus', 'memoria', 'asociacion', 'clima', 'frostHeat', 'finca', 'campesino'];
 
 const _normalize = (t) => (typeof t === 'string' ? t.replace(/^\n+|\n+$/g, '') : '');
 

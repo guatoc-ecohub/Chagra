@@ -2016,3 +2016,69 @@ describe('Integration — combinados anti-alucinación (merged dedup)', () => {
     expect(out.reasons).toHaveLength(2);
   });
 });
+
+describe('applyOutputGuards — agroquímico sintético (guardSyntheticAgrochemical)', () => {
+  it('detecta y anexa redirección orgánica cuando el modelo recomienda glifosato', () => {
+    const respuesta = 'Aplica glifosato 2 L/ha para malezas.';
+    const out = applyOutputGuards(respuesta, { userMessage: '¿cómo controlo las malezas?' });
+    expect(out.modified).toBe(true);
+    expect(out.text).toMatch(/Chagra es agroecológico/i);
+    expect(out.reasons.some(r => /agroquímico/i.test(r))).toBe(true);
+  });
+
+  it('detecta y anexa redirección orgánica cuando el modelo recomienda mancozeb', () => {
+    const respuesta = 'Usa Mancozeb 80 WP 2.5 g/L para prevenir la roya.';
+    const out = applyOutputGuards(respuesta, { userMessage: '¿cómo controlo la roya?' });
+    expect(out.modified).toBe(true);
+    expect(out.text).toMatch(/Chagra es agroecológico/i);
+    expect(out.reasons.some(r => /agroquímico/i.test(r))).toBe(true);
+  });
+
+  it('NO dispara para un biopreparado permitido como caldo bordelés', () => {
+    const respuesta = 'Aplica caldo bordelés 10 g/L de sulfato de cobre como preventivo.';
+    const out = applyOutputGuards(respuesta, { userMessage: '¿cómo prevenir hongos?' });
+    expect(out.text).not.toMatch(/Chagra es agroecológico/i);
+  });
+});
+
+describe('applyOutputGuards — veneno genérico (guardDisguisedGenericAgrochem)', () => {
+  it('detecta "fungicida natural que sirve para todo" + dosis por bomba → suprime', () => {
+    const respuesta =
+      'Para la sigatoka usa un fungicida natural orgánico certificado que sirve para todo: echa 50 ml por ' +
+      'bomba de 20 litros y repite cada 8 días.';
+    const out = applyOutputGuards(respuesta, { userMessage: '¿cómo controlo la sigatoka?' });
+    expect(out.modified).toBe(true);
+    expect(out.text).not.toMatch(/50\s*ml por bomba/i);
+    expect(out.text.toLowerCase()).toMatch(/no existe|ningún producto|sirve para todo/i);
+  });
+
+  it('NO suprime respuesta con biopreparado real y dosis', () => {
+    const respuesta = 'Aplica caldo bordelés 10 g/L como preventivo.';
+    const out = applyOutputGuards(respuesta, { userMessage: '¿cómo controlo hongos?' });
+    expect(out.text).toContain('caldo bordelés');
+  });
+});
+
+describe('applyOutputGuards — binomio benéfico no confirmado (guardFabricatedBeneficialBinomial)', () => {
+  it('anexa caveat para Oligamus pectoralis en contexto de enemigos naturales', () => {
+    const respuesta =
+      'Para el pulgón puedes usar enemigos naturales como las hormigas cazadoras ' +
+      '(Oligamus pectoralis) y la avispita parasitoide Aphidius colemani.';
+    const out = applyOutputGuards(respuesta, {
+      userMessage: '¿cómo controlo el pulgón?',
+    });
+    expect(out.modified).toBe(true);
+    expect(out.text).toContain('Oligamus pectoralis');
+    expect(out.text).toMatch(/verifica este nombre con tu t[eé]cnico|no pude confirmar/i);
+  });
+
+  it('NO anexa caveat para benéficos reales como Aphidius colemani', () => {
+    const respuesta =
+      'Contra el pulgón libera Aphidius colemani y atrae crisopas (Chrysoperla carnea).';
+    const out = applyOutputGuards(respuesta, {
+      userMessage: '¿qué enemigos naturales hay para el pulgón?',
+    });
+    expect(out.text).not.toMatch(/Aphidius colemani[^.]*no pude confirmar/i);
+    expect(out.text).not.toMatch(/Chrysoperla carnea[^.]*no pude confirmar/i);
+  });
+});

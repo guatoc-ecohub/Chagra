@@ -8,6 +8,14 @@
  * del grafo de conocimiento de Chagra (Apache AGE, fuentes ICA / CIAT /
  * Cenicafe / FAO; ver public/grafo-relations.json, relacion pest_controllers).
  *
+ * DIDACTICA: cada plaga dice QUE CULTIVO ataca y QUE DANO le hace; cada cura
+ * explica COMO actua (el porque del control biologico). El campo `dano` y el
+ * `porQue` se muestran en la ficha que sale al controlar bien una plaga, para
+ * que el jugador (nino o campesino) entienda "para esta plaga, este control".
+ * Lenguaje claro tu/usted colombiano. Si una relacion no esta en el subset OSS
+ * del grafo, viene de literatura institucional documentada (Cenicafe para cafe,
+ * estandar Bt/Beauveria para orugas y mosca blanca); nunca se inventa un par.
+ *
  * El escenario muestra el "kit completo" de la finca: setos vivos, corral de
  * animales, compostera, camas de cultivo, colmena, girasoles para
  * polinizadores; todo se puede mirar para leer su rol en el ciclo.
@@ -128,7 +136,7 @@ export const BENEFICOS_DOOM = [
     emoji: '🐝',
     color: '#f5c842',
     tipo: 'avispa',
-    desc: 'Parasitoide de huevos.',
+    desc: 'Avispita que ataca los HUEVOS de los gusanos.',
     mecanismo: 'La avispita pone su huevo DENTRO del huevo de la mariposa-polilla. La larva nunca nace: no hay gusano que coma el cultivo.',
   },
   {
@@ -138,7 +146,7 @@ export const BENEFICOS_DOOM = [
     emoji: '🐞',
     color: '#e74c3c',
     tipo: 'mariquita',
-    desc: 'Depredador de pulgones.',
+    desc: 'Se come pulgones y cochinillas.',
     mecanismo: 'Adultos y larvas de mariquita devoran colonias enteras de pulgones y cochinillas: hasta 50 al dia.',
   },
   {
@@ -148,8 +156,8 @@ export const BENEFICOS_DOOM = [
     emoji: '🦗',
     color: '#7ed957',
     tipo: 'crisopa',
-    desc: 'Depredador generalista.',
-    mecanismo: 'La larva de crisopa, el "leon de afidos", chupa pulgones, huevos y acaros con sus mandibulas curvas.',
+    desc: 'Caza pulgones, mosca blanca y aranita.',
+    mecanismo: 'La larva de crisopa, el "leon de afidos", chupa pulgones, huevos, mosca blanca y aranita con sus mandibulas curvas.',
   },
   {
     id: 'beauveria',
@@ -158,8 +166,8 @@ export const BENEFICOS_DOOM = [
     emoji: '🍄',
     color: '#eef0e6',
     tipo: 'hongo',
-    desc: 'Hongo entomopatogeno.',
-    mecanismo: 'El hongo germina sobre el insecto, lo penetra y lo coloniza por dentro hasta secarlo. Estandar contra broca y mosca blanca.',
+    desc: 'Hongo bueno: enferma broca y mosca blanca.',
+    mecanismo: 'El hongo germina sobre el insecto, lo penetra y lo coloniza por dentro hasta secarlo. Es el estandar de Cenicafe contra broca y mosca blanca.',
   },
   {
     id: 'bt',
@@ -168,15 +176,18 @@ export const BENEFICOS_DOOM = [
     emoji: '🧫',
     color: '#9bd3ff',
     tipo: 'bacteria',
-    desc: 'Bioinsecticida para orugas.',
-    mecanismo: 'La oruga come la hoja con Bt; el cristal de la bacteria rompe su intestino y deja de comer en horas. No afecta abejas ni gente.',
+    desc: 'Bioinsecticida para gusanos (orugas).',
+    mecanismo: 'La oruga come la hoja con Bt; el cristal de la bacteria le rompe el intestino y deja de comer en horas. No afecta abejas, gallinas ni gente.',
   },
 ];
 
 /**
  * PLAGAS del nivel. Cada una declara su par benefico CORRECTO (controladoPor)
  * y por que (`porQue`), tomado del grafo. `forma` define el sprite procedural.
- * `cultivo` ata la plaga a un cultivo real para el contexto.
+ * `cultivo` ata la plaga a un cultivo real para el contexto (texto corto que ve
+ * el jugador en la HUD); `cultivos` es la lista de cultivos reales que ataca.
+ * `fuente` es honesto sobre el origen del par: 'grafo' = relacion CONTROLS del
+ * grafo AGE; 'cenicafe' = control del cafe documentado por Cenicafe.
  */
 export const PLAGAS_DOOM = [
   {
@@ -187,9 +198,11 @@ export const PLAGAS_DOOM = [
     forma: 'oruga',
     color: '#8aa84a',
     cultivo: 'Maiz',
-    dano: 'Devora el cogollo del maiz y deja la planta sin punto de crecimiento.',
+    cultivos: ['Maiz'],
+    dano: 'Se mete en el cogollo del maiz y se come el centro tierno: la planta queda sin punto de crecimiento.',
     controladoPor: 'bt',
-    porQue: 'Es una ORUGA que come hoja: el Bt la intoxica al primer bocado. Trichogramma tambien sirve atacando el HUEVO antes de que nazca.',
+    porQue: 'Es una ORUGA que come hoja: el Bt la intoxica al primer bocado y deja de comer en horas. La avispita Trichogramma tambien sirve atacando el HUEVO antes de que nazca.',
+    fuente: 'grafo',
     velocidad: 0.014,
     vitalidad: 2,
   },
@@ -201,9 +214,11 @@ export const PLAGAS_DOOM = [
     forma: 'oruga',
     color: '#c98a4a',
     cultivo: 'Maiz',
-    dano: 'Se mete en la mazorca y se come los granos en formacion.',
+    cultivos: ['Maiz'],
+    dano: 'Entra por la punta de la mazorca y se come los granos tiernos en formacion.',
     controladoPor: 'bt',
-    porQue: 'Otra oruga masticadora: el Bt es el control biologico estandar. Tambien cae con chinche depredador (podisus) y crisopa.',
+    porQue: 'Otra oruga masticadora: el Bt es el control biologico estandar, le rompe el intestino al primer bocado. Tambien cae con el chinche depredador (podisus) y la crisopa.',
+    fuente: 'grafo',
     velocidad: 0.013,
     vitalidad: 2,
   },
@@ -215,9 +230,11 @@ export const PLAGAS_DOOM = [
     forma: 'mosca',
     color: '#f2f2f2',
     cultivo: 'Frijol / hortalizas',
-    dano: 'Chupa savia y transmite virus que enrollan y amarillan la hoja.',
+    cultivos: ['Frijol', 'Ahuyama', 'Hortalizas'],
+    dano: 'Chupa savia por debajo de la hoja y le pega virus que la enrollan y amarillan.',
     controladoPor: 'beauveria',
-    porQue: 'Insecto de cuerpo blando: el hongo Beauveria lo penetra y lo seca. Tambien la parasita la avispita Encarsia.',
+    porQue: 'Insecto de cuerpo blando: el hongo Beauveria germina sobre ella y la seca por dentro. Tambien la parasita la avispita Encarsia y la caza la crisopa.',
+    fuente: 'grafo',
     velocidad: 0.020,
     vitalidad: 1,
   },
@@ -229,9 +246,11 @@ export const PLAGAS_DOOM = [
     forma: 'escarabajo',
     color: '#3a2410',
     cultivo: 'Cafe',
-    dano: 'Perfora el grano de cafe y arruina la calidad de la cosecha.',
+    cultivos: ['Cafe'],
+    dano: 'Escarabajito que perfora el grano de cafe por dentro y arruina la calidad de la cosecha.',
     controladoPor: 'beauveria',
-    porQue: 'El escarabajo vive DENTRO del grano: solo un hongo entomopatogeno como Beauveria lo alcanza ahi. Estandar Cenicafe.',
+    porQue: 'El escarabajo vive DENTRO del grano: solo un hongo como Beauveria lo alcanza ahi y lo seca. Es el estandar de Cenicafe.',
+    fuente: 'grafo',
     velocidad: 0.009,
     vitalidad: 3,
   },
@@ -243,9 +262,11 @@ export const PLAGAS_DOOM = [
     forma: 'afido',
     color: '#4a7a2e',
     cultivo: 'Frijol',
-    dano: 'Forma colonias pegajosas que chupan savia y debilitan los brotes.',
+    cultivos: ['Frijol', 'Hortalizas'],
+    dano: 'Forma colonias pegajosas en los brotes, chupa la savia y debilita la mata.',
     controladoPor: 'catarina',
-    porQue: 'La mariquita y su larva devoran colonias de pulgones a docenas. La crisopa tambien los caza.',
+    porQue: 'La mariquita y su larva devoran colonias enteras de pulgones, a docenas por dia. La crisopa tambien los caza.',
+    fuente: 'grafo',
     velocidad: 0.011,
     vitalidad: 1,
   },
@@ -257,9 +278,11 @@ export const PLAGAS_DOOM = [
     forma: 'acaro',
     color: '#c0392b',
     cultivo: 'Mora / tomate',
-    dano: 'Acaro que pica el enves de la hoja, la puntea y la seca.',
+    cultivos: ['Mora', 'Tomate', 'Fresa'],
+    dano: 'Acaro diminuto que pica el enves de la hoja, la deja punteada y la seca; teje telarana fina.',
     controladoPor: 'crisopa',
-    porQue: 'Acaro chupador diminuto: lo controlan depredadores como la crisopa y acaros benefcos (neoseiulus). El hongo Beauveria ayuda.',
+    porQue: 'Acaro chupador diminuto: lo cazan depredadores como la crisopa y los acaros buenos (neoseiulus, amblyseius). El hongo Beauveria tambien ayuda.',
+    fuente: 'grafo',
     velocidad: 0.012,
     vitalidad: 1,
   },
@@ -322,6 +345,63 @@ export const PALETA = {
   // Angulo (rad) donde esta el sol en el mundo, para parallax al girar.
   solAzimut: 0.7,
 };
+
+/**
+ * PIEL POR TEMA del raycaster (Fase 2 de temas, operador 2026-06-25).
+ *
+ * El cielo/cordillera/sol del Doom se PINTAN en canvas (no pueden leer CSS
+ * vars). Para que el juego combine con el tema activo sin perder la jugabilidad
+ * ni la LEGIBILIDAD (depth: cielo claro arriba → tierra oscura abajo, que es la
+ * clave para leer profundidad en un raycaster), solo retiñimos el CIELO, la
+ * cordillera y el sol — la tierra/surco/pasto/mulch (el piso jugable) NO se
+ * tocan, para conservar el contraste suelo↔cielo que da sensación de espacio.
+ *
+ * biopunk (base) y verde-vivo comparten el cielo vivo original; nature lleva un
+ * cielo crema-cálido y minimalista un cielo salvia-papel sobrio. Solo se aplica
+ * con la flag VITE_FINCA_VIVA_HOME_PERFIL ON (lo decide el componente); con OFF
+ * el juego usa PALETA tal cual (= EXACTO como hoy).
+ */
+export const PALETAS_TEMA = {
+  biopunk: PALETA,
+  'verde-vivo': {
+    ...PALETA,
+    cieloAlto: [86, 162, 150],   // turquesa-verde fresco (identidad finca viva)
+    cieloBajo: [210, 232, 188],  // verde-crema frondoso
+    montana: [96, 128, 110],     // cordillera verdosa
+    montanaSombra: [70, 98, 82],
+    sol: [255, 248, 214],
+    solBrillo: [242, 180, 65],   // sol dorado de la identidad
+  },
+  nature: {
+    ...PALETA,
+    cieloAlto: [196, 158, 110],  // crema cálida (cenit)
+    cieloBajo: [240, 226, 196],  // crema base del tema (horizonte)
+    montana: [150, 128, 96],     // cordillera terrosa
+    montanaSombra: [120, 100, 74],
+    sol: [255, 244, 206],
+    solBrillo: [217, 116, 42],   // ocre quemado del tema
+  },
+  minimalista: {
+    ...PALETA,
+    cieloAlto: [176, 192, 182],  // gris-salvia claro (cenit)
+    cieloBajo: [232, 236, 228],  // papel del tema (horizonte)
+    montana: [150, 162, 152],    // cordillera neutra
+    montanaSombra: [120, 132, 122],
+    sol: [244, 239, 216],
+    solBrillo: [203, 185, 106],  // dorado apagado
+  },
+};
+
+/**
+ * Selecciona la paleta del Doom según el tema activo. Un id desconocido cae a
+ * la PALETA base (biopunk) — comportamiento idéntico al de hoy.
+ *
+ * @param {string} tema biopunk | nature | minimalista | verde-vivo
+ * @returns {object} la PALETA (posiblemente retiñida) para ese tema.
+ */
+export function paletaPorTema(tema) {
+  return PALETAS_TEMA[tema] || PALETA;
+}
 
 /**
  * Tamano de celda del mapa (en unidades del mundo).

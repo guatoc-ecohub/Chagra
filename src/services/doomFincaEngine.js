@@ -416,6 +416,10 @@ export function avanzarRonda(w) {
 export function tickWorld(world, input) {
   const w = { ...world };
   w.t += 1;
+  // FEEL gated (dev-only): la UI pasa input.feelOn=true con la flag encendida.
+  // Afina BALANCE (daño más amable + combo que perdona el fallo de puntería)
+  // sin tocar la mecánica; con la flag OFF (default) todo queda EXACTO como hoy.
+  const feelOn = !!input.feelOn;
 
   if (w.cooldown > 0) w.cooldown -= 1;
   if (w.mensajeTimer > 0) {
@@ -450,18 +454,18 @@ export function tickWorld(world, input) {
     w.cooldown = CONFIG_DOOM.cooldownLanzamiento;
     const benef = beneficoDef(w.beneficoEquipado);
 
+    if (comboSeRompe(r.resultado, feelOn)) w.combo = 0;
+
     if (r.resultado === 'vacio') {
       w.mensaje = 'No hay plaga al frente. Acercate y apunta al bicho.';
       w.mensajeTipo = 'info';
       w.mensajeTimer = 60;
-      w.combo = 0;
     } else if (r.resultado === 'equivocado') {
       const correcto = beneficoDef(r.plaga.controladoPor);
       w.mensaje = `${benef?.nombre} no controla a ${r.plaga.nombre}. Prueba: ${correcto?.nombre}.`;
       w.mensajeTipo = 'error';
       w.mensajeTimer = 110;
       w.errores += 1;
-      w.combo = 0;
     } else if (r.resultado === 'acierto') {
       w.mensaje = `Bien: ${benef?.nombre} es el control de ${r.plaga.nombre}. Insiste.`;
       w.mensajeTipo = 'acierto';
@@ -511,10 +515,13 @@ export function tickWorld(world, input) {
     p.y = np.y;
   }
 
-  // Dano de plagas al jugador
+  // Dano de plagas al jugador. El factor de atenuacion es 0.4 (= hoy) salvo con
+  // la flag de FEEL ON, que lo baja a 0.28 para una curva mas amable (una sola
+  // plaga encima ya no funde la vitalidad en segundos).
   const reach = checkPestReach(w.pests, w.player);
   if (reach.alcanzado) {
-    w.vitalidad -= CONFIG_DOOM.danoPorPlaga * reach.count * 0.4;
+    const factorDano = feelOn ? 0.28 : 0.4;
+    w.vitalidad -= danoJugador(CONFIG_DOOM.danoPorPlaga, reach.count, factorDano);
     if (w.vitalidad < 0) w.vitalidad = 0;
     if (w.mensajeTimer <= 0 && w.fichaTimer <= 0) {
       w.mensaje = 'Una plaga esta encima del cultivo: controlala ya.';
@@ -540,6 +547,44 @@ export function tickWorld(world, input) {
   }
 
   return w;
+}
+
+/**
+ * Daño que reciben los cultivos cuando `count` plagas alcanzan al jugador en un
+ * tick. Lógica pura para que el BALANCE sea testeable y afinable.
+ *
+ * El daño base por plaga (`danoPorPlaga`) se atenúa con `factor` (0.4 en el
+ * comportamiento histórico). Con la flag de FEEL ON, la UI pasa un factor más
+ * suave (curva de dificultad más amable: que una sola plaga encima no funda la
+ * vitalidad en segundos); con OFF pasa 0.4 → EXACTO como hoy.
+ *
+ * @param {number} danoPorPlaga  daño base por plaga (CONFIG_DOOM.danoPorPlaga).
+ * @param {number} count         cuántas plagas tocan al jugador este tick.
+ * @param {number} [factor=0.4]  atenuador del daño total.
+ * @returns {number} daño (>= 0) a restar de la vitalidad.
+ */
+export function danoJugador(danoPorPlaga, count, factor = 0.4) {
+  if (!(count > 0)) return 0;
+  const d = danoPorPlaga * count * factor;
+  return d > 0 ? d : 0;
+}
+
+/**
+ * ¿Un disparo "al vacío" (sin plaga al frente) debe ROMPER el combo?
+ *
+ * Por defecto sí (comportamiento histórico): apuntar mal corta la racha. Con la
+ * flag de FEEL ON, un disparo al vacío NO rompe el combo (perdonar el error de
+ * puntería, que castiga a un niño que aún no afina la mira); solo el benéfico
+ * EQUIVOCADO (error conceptual, no de puntería) sigue cortando la racha.
+ *
+ * @param {'vacio'|'equivocado'|'acierto'|'control'} resultado
+ * @param {boolean} [feelOn=false]  flag de FEEL.
+ * @returns {boolean} true si el combo debe resetearse.
+ */
+export function comboSeRompe(resultado, feelOn = false) {
+  if (resultado === 'equivocado') return true;
+  if (resultado === 'vacio') return !feelOn; // perdona el fallo de puntería con FEEL ON
+  return false;
 }
 
 /**

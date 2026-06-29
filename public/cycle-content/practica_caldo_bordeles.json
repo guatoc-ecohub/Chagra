@@ -1,0 +1,65 @@
+{
+  "_doc_type": "practica_agroecologica",
+  "_generated_by": "feat/rag-corpus-practicas (manual curation)",
+  "_generated_at": "2026-06-23T00:00:00.000Z",
+  "species_slug": "practica_caldo_bordeles",
+  "scientific_name": null,
+  "common_names": ["Caldo bordelés", "Mezcla bordelesa", "Copper bordeaux"],
+  "family": null,
+  "category": "practica_agroecologica",
+  "cultivable": false,
+  "conservation_status": "practica_validada",
+  "thermal_zones": ["calido", "templado", "frio"],
+  "roles_in_guild": ["fungicida_mineral"],
+  "valor_pedagogico": "El caldo bordelés es un fungicida mineral clásico basado en sulfato de cobre neutralizado con cal hidratada, desarrollado en Burdeos, Francia en el siglo XIX y documentado por Jairo Restrepo Rivera en 'Caldo Bordelés, Caldo Sulfocálcico, Caldo Visosa' (SIMAS, 2004). En Colombia se usa para el control preventivo de enfermedades fúngicas y bacterianas en cultivos como papa, tomate, cebolla, vid y árboles frutales. AGROSAVIA lo recomienda con precaución en sistemas de transición agroecológica (Boletín Técnico AGROSAVIA No. 95, 2017). Ingredientes para 20 litros de caldo bordelés al 1 %: 200 g de sulfato de cobre pentahidratado (vitriolo azul o piedra azul), 200 g de cal hidratada (no cal viva), agua no clorada. Preparación (método Restrepo, 2004): disolver el sulfato de cobre en 10 litros de agua en recipiente no metálico (plástico o madera), disolver la cal hidratada por separado en los otros 10 litros, verter lentamente la solución de sulfato de cobre sobre la de cal (nunca al revés), revolver constantemente. Para verificar la neutralización correcta, introducir un clavo de hierro limpio: si el clavo se pone azul (depósito de cobre), la mezcla es todavía ácida — agregar más cal hasta que el clavo no cambie de color. El caldo correctamente preparado tiene pH entre 7 y 8 y es color azul cielo uniforme. Dosis de aplicación preventiva: 20 litros por 1.000 m² (equivalente a 200 litros/ha) en cultivos hortícolas. Para árboles frutales adultos: hasta 2-4 litros de caldo por árbol según tamaño. Frecuencia: cada 8-15 días durante períodos de alta humedad relativa (>80 %) o lluvias frecuentes que favorezcan esporulación fúngica. Patógenos objetivo: Phytophthora infestans (gota de la papa y el tomate), Alternaria solani, Botrytis cinerea, Peronospora spp. (mildeo velloso), Pseudoperonospora cubensis (cebolla), Xanthomonas spp. (bacteriosis). PRECAUCIÓN: No aplicar en floración cuando existan polinizadores activos (fitotóxico para abejas en contacto directo). No aplicar sobre plantas estresadas por sequía (riesgo de fitotoxicidad foliar). No aplicar en las 2 semanas previas a cosecha de frutos para consumo en fresco. El cobre es acumulativo en el suelo: limitar aplicaciones totales anuales según reglamento de certificación orgánica (máximo 6 kg Cu/ha/año según Resolución MADR 199/2016 en sistemas en transición). En suelos ácidos (pH < 5.5), el cobre soluble puede alcanzar concentraciones fitotóxicas con aplicaciones repetidas.",
+  "milestones": [
+    {
+      "label": "Prueba del clavo",
+      "description": "Introducir clavo de hierro limpio en el caldo terminado. Si no cambia de color, la neutralización es correcta (pH 7-8). Si el clavo se azula, agregar más cal y repetir prueba."
+    },
+    {
+      "label": "Aplicación preventiva",
+      "description": "Aplicar en condiciones secas (no lluvia inmediata) preferiblemente en las horas de la mañana. El caldo debe cubrir toda la superficie foliar incluyendo el envés."
+    }
+  ],
+  "failure_modes": [
+    {
+      "mode": "Fitotoxicidad: quemaduras en hojas",
+      "solucion": "El caldo fue preparado ácido (sulfato de cobre sin neutralizar) o se aplicó sobre plantas estresadas. Aumentar la proporción de cal y verificar siempre con el clavo antes de aplicar."
+    },
+    {
+      "mode": "Precipitado cobrizo en el fondo del equipo",
+      "solucion": "Preparación en recipiente metálico o agua con pH muy bajo. Siempre usar recipiente plástico y agua limpia. Agitar constantemente durante aplicación."
+    },
+    {
+      "mode": "Sin efecto sobre la enfermedad",
+      "solucion": "El caldo bordelés es PREVENTIVO, no curativo. Si la enfermedad ya está establecida, no la elimina. Aplicar en las primeras señales de riesgo climático o como preventivo en épocas húmedas."
+    }
+  ],
+  "leccion_agroecologica": "El caldo bordelés demuestra que el manejo de enfermedades fungosas no siempre requiere fungicidas sintéticos, pero exige igual precisión técnica. La neutralización correcta y el uso preventivo son la diferencia entre un fungicida efectivo y un tóxico para la planta. La acumulación de cobre en el suelo obliga a la rotación de alternativas fungicidas.",
+  "advertencia_toxicologica": "ADVERTENCIA DE SEGURIDAD: El sulfato de cobre es un tóxico moderado (Categoría III EPA). Usar guantes de nitrilo, gafas de seguridad y ropa de manga larga durante preparación y aplicación. No ingerir. En caso de contacto con ojos, lavar con abundante agua 15 minutos y consultar médico. No aplicar cerca de fuentes de agua, estanques o pisciculturas (el cobre es altamente tóxico para peces y organismos acuáticos a concentraciones bajas). El cobre es ACUMULATIVO EN SUELO: el uso excesivo y repetido puede llevar a fitotoxicidad por Cu disponible en suelos con pH bajo. En sistemas con certificación orgánica activa, verificar los límites de Cu permitidos por la certificadora (típicamente 6 kg/ha/año según MADR Res. 199/2016). USO RESTRINGIDO EN FLORACIÓN: no aplicar durante floración para proteger polinizadores. Intervalo de seguridad pre-cosecha: mínimo 14 días.",
+  "fuente_principal": "Restrepo Rivera, J. (2004). Caldo Bordelés, Caldo Sulfocálcico, Caldo Visosa. SIMAS, Nicaragua. / AGROSAVIA (2017). Boletín Técnico No. 95.",
+  "validation_level": "field_tested",
+  "ica_registro_requerido": false,
+  "uso_predial_libre": true,
+  "sources": [
+    {
+      "id": "restrepo-caldo-bordeles-2004",
+      "title": "Restrepo Rivera, J. (2004). Caldo Bordelés, Caldo Sulfocálcico, Caldo Visosa. SIMAS.",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-boletin-95-2017",
+      "title": "AGROSAVIA (2017). Boletín Técnico No. 95 — Manejo de enfermedades fúngicas.",
+      "tier": "A",
+      "url": "https://www.agrosavia.co"
+    },
+    {
+      "id": "madr-res-199-2016",
+      "title": "MADR Resolución 199 de 2016 — Reglamento producción ecológica",
+      "tier": "A",
+      "url": null
+    }
+  ]
+}

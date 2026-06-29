@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ArrowLeft, AlertCircle, TrendingUp, CheckCircle } from 'lucide-react';
+import { ArrowLeft, AlertCircle, TrendingUp, CheckCircle, Apple } from 'lucide-react';
 import DateField from './DateField';
 import { savePayload } from '../services/payloadService';
 import { logCache } from '../db/logCache';
+import { fincaVivaHomePerfilActivo } from '../config/fincaVivaHomeFlag';
+import RegistroShell from './registro/RegistroShell';
+import { TextField, NumberField, SelectField, TextAreaField } from './registro/RegistroFields';
 
 // Bug 069.10 — sanity caps para evitar typos absurdos (ej. "100kg" → 100000)
 // que rompan analítica downstream sin que el operador lo note.
@@ -219,15 +222,17 @@ export default function HarvestLog({ onBack, onSave }) {
     }
   };
 
+  const redesign = fincaVivaHomePerfilActivo();
+
   if (view === 'success') {
     return (
-      <div className="h-[100dvh] w-full bg-slate-950 text-slate-100 flex flex-col p-6 items-center justify-center gap-6">
+      <div className={`h-[100dvh] w-full ${redesign ? 'registro-shell' : 'bg-slate-950'} text-slate-100 flex flex-col p-6 items-center justify-center gap-6`}>
         <div className="text-center animate-in fade-in zoom-in duration-300">
           <CheckCircle size={64} className="text-emerald-500 mx-auto mb-4" />
           <h3 className="text-2xl font-bold">Cosecha registrada</h3>
           <p className="text-sm text-slate-400 mt-2">
             {syncedOffline ? (
-              <>Se sincronizará con FarmOS cuando haya conexión. Mientras tanto, lo encuentra en <strong className="text-slate-200">Bitácora → Recientes</strong>.</>
+              <>Se sincronizará con FarmOS cuando haya conexión. Mientras tanto, la encuentras en <strong className="text-slate-200">Bitácora → Recientes</strong>.</>
             ) : (
               <>Sincronizado con FarmOS.</>
             )}
@@ -244,15 +249,131 @@ export default function HarvestLog({ onBack, onSave }) {
           )}
           <button
             onClick={() => { setView('form'); setSyncedOffline(false); }}
-            className="p-4 rounded-xl bg-orange-700 hover:bg-orange-600 text-white font-bold flex items-center justify-center gap-2"
+            className={redesign ? 'registro-cta' : 'p-4 rounded-xl bg-orange-700 hover:bg-orange-600 text-white font-bold flex items-center justify-center gap-2'}
           >
-            Nueva Cosecha
+            Nueva cosecha
           </button>
         </div>
       </div>
     );
   }
 
+  // ── REDISEÑO (gated): caparazón Chagra theme-aware ──────────────────────
+  if (redesign) {
+    const showSubArea = !!formData.mainArea;
+    return (
+      <RegistroShell
+        title="Cosechar"
+        subtitle="Anota lo que recogiste hoy de la chagra"
+        Icon={Apple}
+        onBack={onBack}
+        footer={
+          <button
+            onClick={handleSave}
+            disabled={isSaving || hasErrors}
+            aria-busy={isSaving}
+            title={hasErrors ? 'Completa los campos correctamente' : undefined}
+            className="registro-cta"
+          >
+            {isSaving ? 'Guardando…' : 'Guardar cosecha'}
+          </button>
+        }
+      >
+        <div className="registro-tip">
+          <Apple size={18} className="registro-tip__icon" aria-hidden="true" />
+          <span>Registra cada cosecha apenas la recojas: así la Bitácora arma tu historial y el agente aprende cuánto produce tu finca.</span>
+        </div>
+
+        <DateField
+          label="¿Qué día cosechaste?"
+          value={formData.date}
+          onChange={(val) => { setFormData(p => ({ ...p, date: val })); markTouched('date'); }}
+          required
+        />
+        {touched.date && errors.date && (
+          <p className="registro-error -mt-3" role="alert"><AlertCircle size={14} aria-hidden="true" /> {errors.date}</p>
+        )}
+
+        <SelectField
+          label="Lote o área"
+          name="mainArea"
+          value={formData.mainArea}
+          onChange={handleInput}
+          placeholder="-- Escoge el lote --"
+          options={MOCK_AREAS.map(a => ({ value: a.id, label: a.name }))}
+        />
+
+        {showSubArea && (
+          <SelectField
+            label="Cama o segmento"
+            name="subArea"
+            value={formData.subArea}
+            onChange={handleInput}
+            onBlur={() => markTouched('subArea')}
+            placeholder="-- Escoge el segmento --"
+            options={(MOCK_SUB_AREAS[formData.mainArea] || []).map(a => ({ value: a.id, label: a.name }))}
+            error={touched.subArea ? errors.subArea : ''}
+          />
+        )}
+
+        <TextField
+          label="¿Qué cosechaste?"
+          name="product"
+          value={formData.product}
+          onChange={handleInput}
+          onBlur={() => markTouched('product')}
+          placeholder="Ej: Fresa Monterrey"
+          error={touched.product ? errors.product : ''}
+        />
+
+        <div className="grid grid-cols-2 gap-3 items-start">
+          <div className="flex flex-col gap-1">
+            <NumberField
+              label="Cantidad"
+              step="0.01"
+              min="0"
+              name="quantity"
+              value={formData.quantity}
+              onChange={handleInput}
+              onBlur={() => markTouched('quantity')}
+              placeholder="0.00"
+              error={touched.quantity ? errors.quantity : ''}
+            />
+            {medianHint && (
+              <span className="inline-flex items-center gap-1.5 text-xs text-emerald-400 px-1">
+                <TrendingUp size={12} aria-hidden="true" />
+                Sueles cosechar {medianHint.median} {formData.unit.toLowerCase()} ({medianHint.count}× antes)
+              </span>
+            )}
+          </div>
+          <SelectField
+            label="Unidad"
+            name="unit"
+            value={formData.unit}
+            onChange={handleInput}
+            options={[
+              { value: 'Kilogramos', label: 'Kilogramos' },
+              { value: 'Gramos', label: 'Gramos' },
+              { value: 'Unidades', label: 'Unidades' },
+              { value: 'Manojos', label: 'Manojos' },
+            ]}
+          />
+        </div>
+
+        <TextAreaField
+          label="Observaciones"
+          hint="opcional"
+          name="notes"
+          rows="3"
+          value={formData.notes}
+          onChange={handleInput}
+          placeholder="Ej: fruta pequeña, algo picada por pájaros…"
+        />
+      </RegistroShell>
+    );
+  }
+
+  // ── LEGACY (flag OFF): markup 0.1 sin cambios visuales ──────────────────
   return (
     <div className="h-[100dvh] w-full bg-slate-950 text-slate-100 flex flex-col overflow-y-auto">
       <header className="p-4 sticky top-0 bg-slate-950 border-b border-slate-800 flex items-center gap-4 z-10 shrink-0 shadow-md">

@@ -1,5 +1,5 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish --
- * Las etiquetas de las tarjetas ("Insumos", "Bitácora", "Informes") y los
+ * Las etiquetas de las tarjetas ("Insumos", "Bitácora", "Informes" — o su copy F2) y los
  * textos de carga/aria ("Cargando…", "Cargando contador") son strings de UI
  * preexistentes de este componente. Su migración a src/config/messages.js es
  * la TAREA i18n de ADR-050 (transversal a toda la app), fuera del alcance de
@@ -11,6 +11,18 @@ import useAssetStore from '../../store/useAssetStore';
 import Skeleton from '../common/Skeleton';
 import { listFarmProcesses } from '../../db/farmProcessCache';
 import { SEGUIMIENTO_PROCESOS, seguimientoRoute } from '../../config/seguimientoProcesos';
+import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
+
+// Copy CAMPESINO de algunas tarjetas (audit botones/distribución 2026-06-26):
+// "Insumos"→"Abonos e insumos", "Flora y fauna"→"Plantas y animales del monte",
+// "Informes/CSV"→"Sacar reportes". Se aplica SOLO con la home F2 ON (flag dev);
+// con la flag OFF se conservan los labels legacy (prod intacto). `f2Label` es un
+// helper local: devuelve el texto F2 cuando la flag está activa, si no el legacy.
+const f2Label = (f2, legacy) => {
+    let on = false;
+    try { on = fincaVivaHomePerfilActivo(); } catch (_) { on = false; }
+    return on ? f2 : legacy;
+};
 
 /**
  * FincaCards — secciones del dashboard re-organizadas con sensibilidad
@@ -376,11 +388,11 @@ export function InsumosCard({ onNavigate, variant }) {
         <Card
             variant={variant}
             section="insumos"
-            title="Insumos"
+            title={f2Label('Abonos e insumos', 'Insumos')}
             subtitle={subtitle}
             value={isHydrated ? count : null}
             loading={!isHydrated}
-            tooltip="Bioinsumos (bocashi, biol, caldos), semillas, herramientas. Stock disponible en bodega."
+            tooltip="Abonos y bioinsumos (bocashi, biol, caldos), semillas, herramientas. Lo que tiene en la bodega."
             onClick={() => onNavigate('bodega')}
         />
     );
@@ -433,9 +445,9 @@ export function BiodiversidadCard({ onNavigate, variant }) {
         <Card
             variant={variant}
             section="biodiversidad"
-            title="Flora y fauna"
-            subtitle="Ecosistema de tu chagra"
-            tooltip="Catálogo de especies nativas, endémicas y polinizadores que viven en tu finca."
+            title={f2Label('Plantas y animales del monte', 'Flora y fauna')}
+            subtitle={f2Label('Lo vivo de su finca', 'Ecosistema de tu chagra')}
+            tooltip="Especies nativas, endémicas y polinizadores que viven en su finca."
             onClick={() => onNavigate('biodiversidad')}
         />
     );
@@ -459,9 +471,9 @@ export function InformesCard({ onNavigate, variant }) {
         <Card
             variant={variant}
             section="informes"
-            title="Informes"
-            subtitle="Descarga reportes en CSV"
-            tooltip="Exporta cuaderno de campo, inventario, registros de cosecha y aplicaciones a CSV/PDF."
+            title={f2Label('Sacar reportes', 'Informes')}
+            subtitle={f2Label('Para imprimir o llevar a la cooperativa', 'Descarga reportes en CSV')}
+            tooltip="Saque su cuaderno de campo, inventario y registros de cosecha y aplicaciones para imprimir o llevar al banco o la cooperativa."
             onClick={() => onNavigate('informes')}
         />
     );

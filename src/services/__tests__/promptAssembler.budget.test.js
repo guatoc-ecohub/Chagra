@@ -25,6 +25,7 @@ import {
   buildCorpusVariants,
   buildResolvedEntitiesBlock,
   formatToolEvidence,
+  buildCampesinoModeBlock,
 } from '../agentPromptBase.js';
 import {
   buildClimaContext,
@@ -282,6 +283,7 @@ function assembleForQuery({ query, resolvedEntities, suggestedEntities = null, t
 
   const blocks = {
     base: systemPrompt,
+    campesino: { variants: [buildCampesinoModeBlock(), ''] },
     clima: { variants: [buildClimaContext(CLIMA_SNAPSHOT, { region: 'andina' }), ''] },
     finca: { variants: [fincaContext, ''] },
     asociacion: { variants: [buildAssociationContext({ resolvedEntities, groupedCultivos: GROUPED_CULTIVOS }), ''] },
@@ -327,6 +329,8 @@ beforeAll(() => {
 
 // Bloques de grounding y guardas que JAMÁS pueden degradarse por presupuesto
 // (su recorte es exactamente la regresión GR-10 que este test previene).
+// NOTA: 'campesino' NO está en PROTECTED porque es un bloque sacrificable
+// (puede degradarse por presión de presupuesto sin afectar funcionalidad core).
 const PROTECTED = [
   'base',
   'viabilidad',

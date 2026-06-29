@@ -40,6 +40,8 @@ const GRAFO_RELATIONS_PATH = '/grafo-relations.json';
 
 // Cache en memoria del mapa { species_id -> entry } ya parseado.
 let relationsCache = null;
+// Cache de la raíz completa del JSON (incluye _pest_synonyms / _pest_index).
+let rootCache = null;
 // Coalesce de cargas concurrentes (mismo patrón que loadEmbeddings en ragRetriever).
 let relationsLoadPromise = null;
 
@@ -60,6 +62,7 @@ export async function loadGrafoRelations() {
       const raw = await res.json();
       const species = raw && typeof raw === 'object' ? raw.species : null;
       if (!species || typeof species !== 'object') return null;
+      rootCache = raw;
       relationsCache = species;
       return species;
     } catch (err) {
@@ -72,6 +75,16 @@ export async function loadGrafoRelations() {
   })();
 
   return relationsLoadPromise;
+}
+
+/** Normaliza un término para matching tolerante (minúsculas, sin tildes). */
+function normalizePestTerm(s) {
+  return String(s || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 /**
@@ -177,10 +190,73 @@ export async function buildOfflineGroundingBlock(speciesId) {
   return lines.length > 1 ? lines.join('\n') : '';
 }
 
+// ---- SLICE plagas/enfermedades: resolución por sinónimo ------------------
+
+/**
+ * Resuelve un término coloquial/regional/científico de plaga o enfermedad a la
+ * etiqueta canónica (`plaga`) que existe en el grafo. Permite que el campesino
+ * que dice "gota", "monilia", "se me pudre la mata", "broca" o "phytophthora"
+ * llegue a la plaga/enfermedad real del grafo y, de ahí, a sus controladores
+ * biológicos.
+ *
+ * Matching tolerante: exacto normalizado (sin tildes/mayúsculas) y, si no hay
+ * match exacto, por inclusión de palabra completa del término más corto. Es
+ * GROUNDED: sólo devuelve etiquetas que existen como `plaga` en el grafo (el
+ * mapa `_pest_synonyms` se valida en build contra `_pest_index`).
+ *
+ * @param {string} term término del usuario (ej. "gota", "monilia", "broca")
+ * @returns {Promise<{ plaga: string, especiesAfectadas: string[] } | null>}
+ */
+export async function resolvePestSynonym(term) {
+  if (!term) return null;
+  await loadGrafoRelations();
+  const root = rootCache;
+  if (!root || typeof root !== 'object') return null;
+
+  const synonyms = root._pest_synonyms || {};
+  const pestIndex = root._pest_index || {};
+  const q = normalizePestTerm(term);
+  if (!q) return null;
+
+  // 1) Match exacto del término contra el mapa de sinónimos (normalizado).
+  for (const [syn, canonical] of Object.entries(synonyms)) {
+    if (normalizePestTerm(syn) === q) {
+      return { plaga: canonical, especiesAfectadas: pestIndex[canonical] || [] };
+    }
+  }
+  // 2) Match exacto del término contra una etiqueta canónica del índice.
+  for (const canonical of Object.keys(pestIndex)) {
+    if (normalizePestTerm(canonical) === q) {
+      return { plaga: canonical, especiesAfectadas: pestIndex[canonical] };
+    }
+  }
+  // 3) Match por palabra completa (≥4 chars para evitar ruido como "de"/"la").
+  if (q.length >= 4) {
+    for (const [syn, canonical] of Object.entries(synonyms)) {
+      const n = normalizePestTerm(syn);
+      const re = new RegExp(`(^|\\s)${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\s|$)`);
+      if (re.test(n)) {
+        return { plaga: canonical, especiesAfectadas: pestIndex[canonical] || [] };
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Índice plaga canónica → ids de especies que afecta (según el grafo offline).
+ * @returns {Promise<Record<string, string[]>>}
+ */
+export async function getPestIndex() {
+  await loadGrafoRelations();
+  return (rootCache && rootCache._pest_index) || {};
+}
+
 /**
  * Reinicia el cache en memoria (uso en tests).
  */
 export function __resetGrafoRelationsCache() {
   relationsCache = null;
+  rootCache = null;
   relationsLoadPromise = null;
 }

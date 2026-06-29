@@ -25,6 +25,8 @@
  * @module services/fincaSceneService
  */
 
+import { tipoDeSubject } from './subjectTipo.js';
+
 // ─── Etapas fenológicas → cómo se ve la planta ──────────────────────────────
 
 /**
@@ -205,6 +207,9 @@ export function etiquetaVitalidad(vitalidad) {
  * @property {string} sprite        id del sprite de planta a dibujar
  * @property {number} growth        0..1 altura/madurez visual
  * @property {string} fase          fase visual (seed/sprout/leaf/flower/fruit/harvest/rest)
+ * @property {string} tipo          tipo botánico (frutal/hortaliza/aromatica/otro)
+ *                                  para elegir la SILUETA: árbol vs cama de huerta
+ *                                  vs mata aromática. Derivado del slug (offline).
  * @property {string} etiquetaEtapa etiqueta corta de la etapa real
  */
 
@@ -215,9 +220,10 @@ export function etiquetaVitalidad(vitalidad) {
  * @property {SceneLote[]} animales   animales a dibujar en el corral
  * @property {number} vitalidad       0-100, vistazo de salud de la finca
  * @property {string} vitalidadLabel  etiqueta cariñosa de la vitalidad
- * @property {number} totalCultivos   conteo de cultivos (activos + cerrados)
- * @property {number} cultivosActivos conteo de cultivos activos
+ * @property {number} totalCultivos   conteo de cultivos (max de procesos vs. plantas-asset)
+ * @property {number} cultivosActivos conteo de cultivos activos (max procesos vs. plantas-asset)
  * @property {number} enCosecha       cuántos cultivos están listos/en cosecha
+ * @property {number} plantAssetsCount conteo real de plantas-asset (fuente "Mis plantas: N")
  * @property {string[]} clima         elementos de clima a dibujar (sol, lluvia)
  * @property {string} resumen         frase de vistazo para el campesino
  */
@@ -229,9 +235,21 @@ export function etiquetaVitalidad(vitalidad) {
  * @param {Array} [input.processes=[]]   FarmProcess[] (anidados o planos)
  * @param {Object} [input.clima]         clima opcional { lluvia?:boolean, ensoPhase?:string }
  * @param {number} [input.maxLotes=12]   tope de lotes a dibujar (rendimiento gama baja)
+ * @param {number} [input.plantAssetsCount=0]  conteo REAL de plantas-activo de la
+ *   finca (los ASSETS, p.ej. useAssetStore.plants.length). Fuente de verdad del
+ *   "Mis plantas: N" del dashboard. Una finca puede tener decenas de plantas
+ *   REGISTRADAS como assets sin que aún exista un FarmProcess (ciclo) para ellas:
+ *   en ese caso la escena DEBE poblarse igual (no decir "0 siembras / terreno
+ *   listo"). La escena queda vacía SOLO si no hay NI procesos NI plantas-asset.
+ *   No fabrica nada: si es 0, el comportamiento es idéntico al anterior.
  * @returns {FincaScene}
  */
-export function buildFincaScene({ processes = [], clima = null, maxLotes = 12 } = {}) {
+export function buildFincaScene({
+  processes = [],
+  clima = null,
+  maxLotes = 12,
+  plantAssetsCount = 0,
+} = {}) {
   const flat = (Array.isArray(processes) ? processes : [])
     .map(flatten)
     .filter(Boolean);
@@ -258,9 +276,10 @@ export function buildFincaScene({ processes = [], clima = null, maxLotes = 12 } 
       continue;
     }
     const s = spriteForStage(p.current_stage);
+    const nombre = p.subject_label || 'Cultivo';
     plantas.push({
       id: p.process_id,
-      nombre: p.subject_label || 'Cultivo',
+      nombre,
       subjectSlug: p.subject_slug || p.process_id,
       activo,
       animal: false,
@@ -268,19 +287,39 @@ export function buildFincaScene({ processes = [], clima = null, maxLotes = 12 } 
       sprite: s.sprite,
       growth: s.growth,
       fase: s.fase,
+      // Tipo botánico para la silueta correcta (frutal=árbol, hortaliza=cama,
+      // aromatica=mata). Offline, derivado del slug + nombre (subjectTipo).
+      tipo: tipoDeSubject(p.subject_slug, { nombre }),
       etiquetaEtapa: s.etiqueta,
     });
   }
 
-  const vacia = plantas.length === 0 && animales.length === 0;
+  // Conteo REAL de plantas-asset (saneado): la fuente de verdad del "Mis plantas:
+  // N" del dashboard. Una finca con plantas REGISTRADAS pero sin FarmProcess aún
+  // NO está vacía — tiene siembras reales que la escena debe poblar.
+  const plantasAssetCount = Number.isFinite(plantAssetsCount) && plantAssetsCount > 0
+    ? Math.floor(plantAssetsCount)
+    : 0;
+
+  // Vacía SOLO si no hay NI procesos (plantas/animales) NI plantas-asset. Con
+  // plantas-asset reales la escena se puebla aunque no haya ningún proceso —
+  // deflección honesta: nunca decimos "terreno listo / 0 siembras" si el
+  // usuario sí tiene plantas registradas.
+  const vacia = plantas.length === 0 && animales.length === 0 && plantasAssetCount === 0;
 
   // Ordenar para que los más maduros/cosecha queden adelante (más visibles).
   plantas.sort((a, b) => (b.growth - a.growth) || a.id.localeCompare(b.id));
 
   const lotesDibujados = plantas.slice(0, maxLotes);
   const vitalidad = calcularVitalidad(plantas);
-  const cultivosActivos = plantas.filter((p) => p.activo).length;
+  const cultivosActivosProc = plantas.filter((p) => p.activo).length;
   const enCosecha = plantas.filter((p) => p.activo && (p.fase === 'harvest' || p.fase === 'fruit')).length;
+
+  // totalCultivos / cultivosActivos honran la fuente real más completa: si hay
+  // más plantas-asset registradas que procesos, ese conteo manda (cada planta es
+  // una siembra real). Sin plantas-asset, queda el conteo por proceso de siempre.
+  const totalCultivos = Math.max(plantas.length, plantasAssetCount);
+  const cultivosActivos = Math.max(cultivosActivosProc, plantasAssetCount);
 
   return {
     vacia,
@@ -288,9 +327,10 @@ export function buildFincaScene({ processes = [], clima = null, maxLotes = 12 } 
     animales: animales.slice(0, 4),
     vitalidad,
     vitalidadLabel: etiquetaVitalidad(vitalidad),
-    totalCultivos: plantas.length,
+    totalCultivos,
     cultivosActivos,
     enCosecha,
+    plantAssetsCount: plantasAssetCount,
     clima: derivarClima(clima),
     resumen: construirResumen({ vacia, cultivosActivos, enCosecha, animales }),
   };

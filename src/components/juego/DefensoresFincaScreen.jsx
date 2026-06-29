@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ScreenShell } from '../common/ScreenShell';
 import { Bug, Shield, RotateCcw, Lock } from 'lucide-react';
+import { fvhSkinClass } from '../../config/fvhSkin';
 import './defensores-finca.css';
 
 import {
@@ -29,8 +30,12 @@ import {
   golpearJefe,
   intentarSalto,
   evaluarFinNivel,
+  resumenObjetivos,
+  factorPatrulla,
 } from '../../services/defensoresGameEngine';
+import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 import { agentSounds, isSoundEnabled } from '../../services/agentSoundService';
+import { recordGameStart, recordGameComplete } from '../../services/usageTelemetryService';
 
 // Dimensiones lógicas del LIENZO visible (la cámara recorta el mundo a esto).
 const VIEW_W = 720;
@@ -86,6 +91,12 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
     [nivel],
   );
   const beneficos = useMemo(() => pares.map((p) => p.benefico), [pares]);
+  // Benéfico → su par completo, para decir QUÉ plaga controla cuando el jugador
+  // suelta el aliado equivocado (microcopy didáctico, no solo "fallaste").
+  const parPorBenefico = useMemo(
+    () => Object.fromEntries(pares.map((p) => [p.benefico.id, p])),
+    [pares],
+  );
   const leccionPorBenefico = useMemo(
     () => Object.fromEntries(pares.map((p) => [p.benefico.id, p.leccion])),
     [pares],
@@ -99,6 +110,22 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
   const [leccion, setLeccion] = useState('');
   const [beneficoSel, setBeneficoSel] = useState(beneficos[0]?.id || null);
   const [jefeVida, setJefeVida] = useState(nivel.jefe ? nivel.jefe.vida : 0);
+  // Progreso de objetivos para el HUD (cuántos cultivos van de la meta y cuántas
+  // plagas quedan). Antes el objetivo quedaba implícito; ahora se ve.
+  const [cultivosHechos, setCultivosHechos] = useState(0);
+  const [plagasVivas, setPlagasVivas] = useState(pares.length);
+
+  // FEEL gated (dev-only): con la flag ON la patrulla de plagas se afina por
+  // nivel (curva de dificultad más amable en niveles altos); con OFF = 1 (hoy).
+  // El factor es constante para el nivel; se guarda en ref para que el rAF lo
+  // lea sin re-suscribirse. El valor inicial se calcula fuera del render (en el
+  // efecto de abajo) para no leer refs durante el render.
+  const patrullaFactor = useRef(1);
+  useEffect(() => {
+    patrullaFactor.current = fincaVivaHomePerfilActivo()
+      ? factorPatrulla(nivel.numero)
+      : 1;
+  }, [nivel.numero]);
 
   // Refs del mundo (mutables, leídos por el loop a 60fps sin re-render).
   const world = useRef(null);
@@ -259,9 +286,16 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
       setLeccion(leccionPorBenefico[id] || '');
       beep('good');
     } else {
-      setLeccion('Ese benéfico controla otra plaga. Mira cuál bicho malo hay cerca.');
+      // No acertó: en vez de un "fallaste" seco, le enseñamos qué controla SÍ
+      // el aliado que soltó, para que aprenda el emparejamiento correcto.
+      const par = parPorBenefico[id];
+      setLeccion(
+        par
+          ? `${par.benefico.nombre} controla al ${par.plaga.nombre.toLowerCase()}. Apunta a ese bicho o cambia de aliado.`
+          : 'Ese aliado controla otra plaga. Mira cuál bicho malo tienes cerca.',
+      );
     }
-  }, [estado, leccionPorBenefico, beep]);
+  }, [estado, leccionPorBenefico, parPorBenefico, beep]);
 
   // ── Bucle principal de juego (canvas 2D) ───────────────────────────
   useEffect(() => {
@@ -324,15 +358,17 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
       const objetivoCam = w.player.x + w.player.w / 2 - VIEW_W / 2;
       w.camX = clamp(objetivoCam, 0, Math.max(0, w.mundoAncho - VIEW_W));
 
-      // Plagas patrullan (más rápido/amplio = más difícil).
+      // Plagas patrullan (más rápido/amplio = más difícil). Con la flag de FEEL
+      // ON, `patrullaFactor` afina el ritmo por nivel; con OFF es 1 (= hoy).
       if (estado === 'jugando') {
+        const pf = patrullaFactor.current;
         for (const p of w.plagas) {
           if (!p.alive) continue;
-          p.x += p.dir * p.vel;
+          p.x += p.dir * p.vel * pf;
           if (Math.abs(p.x - p.baseX) > p.rango) p.dir *= -1;
         }
         if (w.jefe && w.jefe.vivo) {
-          w.jefe.x += w.jefe.dir * 0.7;
+          w.jefe.x += w.jefe.dir * 0.7 * pf;
           if (Math.abs(w.jefe.x - w.jefe.baseX) > 70) w.jefe.dir *= -1;
         }
       }
@@ -344,6 +380,7 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
         w.cultivosRecogidos += rec.recogidos.length;
         w.puntaje = sumarPuntaje(w.puntaje, { cultivos: rec.recogidos.length });
         setPuntaje(w.puntaje);
+        setCultivosHechos(Math.min(w.cultivosRecogidos, nivel.metaCultivos));
         beep('good');
       }
 
@@ -372,14 +409,15 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
       }
 
       // Fin de nivel.
-      const plagasVivas = w.plagas.filter((p) => p.alive).length;
+      const vivas = w.plagas.filter((p) => p.alive).length;
       const hayJefe = !!w.jefe;
       const jefeVivo = !!(w.jefe && w.jefe.vivo);
+      setPlagasVivas((prev) => (prev !== vivas ? vivas : prev));
       const fin = evaluarFinNivel({
         energia: w.energia,
         cultivosRecogidos: w.cultivosRecogidos,
         metaCultivos: nivel.metaCultivos,
-        plagasVivas,
+        plagasVivas: vivas,
         hayJefe,
         jefeVivo,
       });
@@ -389,6 +427,9 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
         if (fin.estado === 'gano') {
           beep('good');
           onGanar(nivel.numero);
+          // Telemetría de uso ANÓNIMA: completado de "defensores" (una vez por
+          // nivel; el guard `estado === 'jugando'` evita repetir).
+          recordGameComplete('defensores');
         }
       }
 
@@ -518,11 +559,23 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
     setLeccion('');
     setEstado('jugando');
     setJefeVida(nivel.jefe ? nivel.jefe.vida : 0);
-  }, [crearMundo, nivel]);
+    setCultivosHechos(0);
+    setPlagasVivas(pares.length);
+  }, [crearMundo, nivel, pares.length]);
 
   const energiaMax = nivel.energiaMax;
   const hayJefe = !!nivel.jefe;
   const siguienteAbierto = nivelDesbloqueado(nivel.numero + 1, superados);
+
+  // Resumen de objetivos para el HUD (cultivos X/meta · plagas restantes).
+  // Lógica pura del motor; aquí solo se pinta.
+  const objetivos = resumenObjetivos({
+    cultivosRecogidos: cultivosHechos,
+    metaCultivos: nivel.metaCultivos,
+    plagasVivas,
+    hayJefe,
+    jefeVivo: hayJefe && jefeVida > 0,
+  });
 
   return (
     <>
@@ -549,6 +602,33 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
         </div>
       </div>
 
+      {/* Progreso de objetivos: lo que faltaba para que se vea QUÉ falta para
+          ganar (antes solo había energía + puntos). Universal, bajo riesgo. */}
+      <div className="df-objetivos" data-testid="defensores-objetivos" aria-label="Lo que te falta para ganar el nivel">
+        <span
+          className={`df-objetivo ${objetivos.cultivos.listo ? 'df-objetivo-listo' : ''}`}
+          data-testid="defensores-objetivo-cultivos"
+        >
+          🌽 Cultivos {objetivos.cultivos.hechos}/{objetivos.cultivos.meta}
+          {objetivos.cultivos.listo ? ' ✓' : ''}
+        </span>
+        <span
+          className={`df-objetivo ${objetivos.plagas.listo ? 'df-objetivo-listo' : ''}`}
+          data-testid="defensores-objetivo-plagas"
+        >
+          🐛 Plagas {objetivos.plagas.restantes}
+          {objetivos.plagas.listo ? ' ✓' : ''}
+        </span>
+        {hayJefe && (
+          <span
+            className={`df-objetivo ${objetivos.jefe.listo ? 'df-objetivo-listo' : ''}`}
+            data-testid="defensores-objetivo-jefe"
+          >
+            {nivel.jefe.emoji} Jefe{objetivos.jefe.listo ? ' ✓' : ''}
+          </span>
+        )}
+      </div>
+
       {/* Aviso de mini-jefe (solo niveles con jefe). */}
       {hayJefe && estado === 'jugando' && (
         <div className="df-jefe-aviso" data-testid="defensores-jefe">
@@ -557,8 +637,9 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
         </div>
       )}
 
-      {/* Escenario (canvas) */}
-      <div className="df-stage">
+      {/* Escenario (canvas) — con la flag ON, el lienzo adopta el cielo del
+          tema activo (Fase 2 de temas); con OFF queda igual que hoy. */}
+      <div className={fvhSkinClass('df-stage')}>
         <canvas
           ref={canvasRef}
           width={VIEW_W}
@@ -609,21 +690,29 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
       )}
 
       {/* Selector de benéficos (control biológico) */}
-      <div className="df-beneficios" role="group" aria-label="Elige el organismo benéfico">
-        {beneficos.map((b) => (
-          <button
-            key={b.id}
-            type="button"
-            data-testid={`beneficio-${b.id}`}
-            data-selected={beneficoSel === b.id}
-            onClick={() => setBeneficoSel(b.id)}
-            aria-pressed={beneficoSel === b.id}
-            className="df-beneficio"
-          >
-            <span className="df-beneficio-emoji" aria-hidden="true">{b.emoji}</span>
-            <span className="df-beneficio-nombre">{b.nombre}</span>
-          </button>
-        ))}
+      <div className="df-beneficios" role="group" aria-label="Elige el aliado que controla cada plaga">
+        {beneficos.map((b) => {
+          const plagaQueControla = parPorBenefico[b.id]?.plaga?.nombre;
+          const ayuda = plagaQueControla
+            ? `${b.nombre}: controla al ${plagaQueControla.toLowerCase()}`
+            : b.nombre;
+          return (
+            <button
+              key={b.id}
+              type="button"
+              data-testid={`beneficio-${b.id}`}
+              data-selected={beneficoSel === b.id}
+              onClick={() => setBeneficoSel(b.id)}
+              aria-pressed={beneficoSel === b.id}
+              aria-label={ayuda}
+              title={ayuda}
+              className="df-beneficio"
+            >
+              <span className="df-beneficio-emoji" aria-hidden="true">{b.emoji}</span>
+              <span className="df-beneficio-nombre">{b.nombre}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Controles táctiles (mobile-first) + teclado en desktop */}
@@ -705,6 +794,8 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
  * @param {Function} [props.onHome]
  */
 export default function DefensoresFincaScreen({ onBack, onHome }) {
+  // Telemetría de uso ANÓNIMA: inicio del juego al montar (una vez).
+  useEffect(() => { recordGameStart('defensores'); }, []);
   const [superados, setSuperados] = useState(() => leerSuperados());
   const [nivelNum, setNivelNum] = useState(1);
   const nivel = useMemo(() => getNivel(nivelNum), [nivelNum]);
@@ -721,9 +812,9 @@ export default function DefensoresFincaScreen({ onBack, onHome }) {
     <ScreenShell title="Defensores de la Finca" icon={Shield} onBack={onBack} onHome={onHome}>
       <div
         data-testid="defensores-finca-screen"
-        className="flex flex-col gap-1 px-3 pt-2 pb-10 max-w-3xl mx-auto"
+        className={fvhSkinClass('jp-ambiente flex flex-col gap-1 px-3 pt-2 pb-10 max-w-3xl mx-auto')}
       >
-        <p className="text-2xs font-black uppercase tracking-[0.2em] text-emerald-300/80">
+        <p className="jp-df-kicker text-2xs font-black uppercase tracking-[0.2em] text-emerald-300/80">
           Aprende a Cultivar Jugando
         </p>
         <h2 className="text-2xl font-black text-white leading-tight flex items-center gap-2">

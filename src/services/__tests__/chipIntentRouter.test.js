@@ -121,10 +121,14 @@ describe('chipIntentRouter — intents con tool determinístico (saltan NLU)', (
     expect(plan.skipNlu).toBe(true);
   });
 
-  it('plaga → get_pest_controllers con pest del texto + skipNlu', () => {
+  it('plaga → get_pest_controllers con pest_id_or_name del texto + skipNlu', () => {
+    // El tool del sidecar EXIGE `pest_id_or_name` (NO `pest`): antes el chip
+    // mandaba `{pest}` → `missing_pest` y el chip insignia no groundeaba
+    // (fix grounding P0 2026-06-24).
     const plan = planForcedIntent('plaga', 'broca del café');
     expect(plan.tool).toBe('get_pest_controllers');
-    expect(plan.args).toEqual({ pest: 'broca del café' });
+    expect(plan.args).toEqual({ pest_id_or_name: 'broca del café' });
+    expect(plan.args).not.toHaveProperty('pest');
     expect(plan.stub).toBe(false);
     expect(plan.skipNlu).toBe(true);
   });
@@ -164,14 +168,42 @@ describe('chipIntentRouter — intents con tool determinístico (saltan NLU)', (
     expect(plan.skipNlu).toBe(true);
   });
 
-  it('calendario → get_species con query del texto + skipNlu (no existe tool calendario dedicado)', () => {
-    // No hay get_calendario_siembra en el sidecar; el calendario se deriva de
-    // la ficha de especie (época de siembra / piso térmico). Routeamos a
-    // get_species y dejamos que el grounding traiga la info de ciclo.
-    const plan = planForcedIntent('calendario', 'maíz');
-    expect(plan.tool).toBe('get_species');
-    expect(plan.args).toEqual({ query: 'maíz' });
+  it('calendario → get_calendario_siembra con piso_termico del perfil + skipNlu', () => {
+    // El tool get_calendario_siembra SÍ está vivo en el sidecar (fix grounding
+    // P0 2026-06-24); antes routeaba a get_species por un comentario stale.
+    // EXIGE `piso_termico` (enum frio|templado|calido), que se aporta desde el
+    // perfil/finca (opts.pisoTermico) o se deriva de la altitud.
+    const plan = planForcedIntent('calendario', '¿qué siembro este mes?', { pisoTermico: 'frío' });
+    expect(plan.tool).toBe('get_calendario_siembra');
+    expect(plan.args.piso_termico).toBe('frio'); // normalizado sin tilde
+    expect(plan.args).not.toHaveProperty('mes'); // sin mes en el texto → tool usa el actual
     expect(plan.stub).toBe(false);
+    expect(plan.skipNlu).toBe(true);
+  });
+
+  it('calendario deriva el piso_termico de la altitud cuando no hay pisoTermico explícito', () => {
+    expect(planForcedIntent('calendario', 'qué siembro', { altitud: 2580 }).args.piso_termico).toBe('frio');
+    expect(planForcedIntent('calendario', 'qué siembro', { altitud: 1500 }).args.piso_termico).toBe('templado');
+    expect(planForcedIntent('calendario', 'qué siembro', { altitud: 500 }).args.piso_termico).toBe('calido');
+  });
+
+  it('calendario mapea piso páramo → frio (el tool no soporta paramo en su enum)', () => {
+    const plan = planForcedIntent('calendario', 'qué siembro', { pisoTermico: 'páramo' });
+    expect(plan.args.piso_termico).toBe('frio');
+  });
+
+  it('calendario infiere el mes del texto cuando el usuario lo nombra (1..12)', () => {
+    expect(planForcedIntent('calendario', '¿qué siembro en septiembre?', { pisoTermico: 'templado' }).args.mes).toBe(9);
+    expect(planForcedIntent('calendario', 'qué sembrar en enero', { pisoTermico: 'calido' }).args.mes).toBe(1);
+    expect(planForcedIntent('calendario', 'siembra de diciembre', { pisoTermico: 'frio' }).args.mes).toBe(12);
+  });
+
+  it('calendario SIN piso ni altitud → stub no_piso_termico (pide el dato, NO inventa fechas)', () => {
+    const plan = planForcedIntent('calendario', '¿qué siembro este mes?');
+    expect(plan.tool).toBe('get_calendario_siembra');
+    expect(plan.stub).toBe(true);
+    expect(plan.args).toBeNull();
+    expect(plan.stubResult).toMatchObject({ available: false, reason: 'no_piso_termico' });
     expect(plan.skipNlu).toBe(true);
   });
 });
@@ -362,7 +394,7 @@ describe('chipIntentRouter — opts ruidosos no contaminan los args', () => {
   it('plaga ignora opts no relacionados', () => {
     const plan = planForcedIntent('plaga', 'broca', { foo: 'bar' });
     expect(plan.tool).toBe('get_pest_controllers');
-    expect(plan.args).toEqual({ pest: 'broca' });
+    expect(plan.args).toEqual({ pest_id_or_name: 'broca' });
   });
 
   it('precio ignora opts completamente (es stub)', () => {

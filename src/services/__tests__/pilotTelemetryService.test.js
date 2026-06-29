@@ -56,7 +56,7 @@ vi.mock('../../db/dbCore', () => ({
   STORES: { PILOT_TELEMETRY: 'pilot_telemetry' },
 }));
 
-import { recordPilotEvent, getPilotMetrics, clearOldEvents } from '../pilotTelemetryService.js';
+import { recordPilotEvent, getPilotMetrics, clearOldEvents, getAnonSessionId } from '../pilotTelemetryService.js';
 
 beforeEach(async () => {
   vi.clearAllMocks();
@@ -77,6 +77,9 @@ describe('recordPilotEvent', () => {
     expect(result.id.startsWith('pt_')).toBe(true);
     expect(result.synced).toBe(false);
     expect(result.created_at).toBeTruthy();
+    // session_id anónimo y efímero (no PII) — siempre presente, formato as_*.
+    expect(typeof result.session_id).toBe('string');
+    expect(result.session_id.startsWith('as_')).toBe(true);
     expect(mockStore.add).toHaveBeenCalled();
   });
 
@@ -169,5 +172,17 @@ describe('clearOldEvents', () => {
     openDB.mockRejectedValueOnce(new Error('DB down'));
     const removed = await clearOldEvents(7);
     expect(removed).toBe(0);
+  });
+});
+
+
+describe('getAnonSessionId', () => {
+  it('devuelve un id anónimo estable dentro de la misma sesión (formato as_*)', () => {
+    const a = getAnonSessionId();
+    const b = getAnonSessionId();
+    expect(typeof a).toBe('string');
+    expect(a.startsWith('as_')).toBe(true);
+    // Estable dentro de la sesión: misma llamada → mismo id.
+    expect(a).toBe(b);
   });
 });

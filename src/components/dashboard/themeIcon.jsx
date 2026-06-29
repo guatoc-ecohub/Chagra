@@ -15,6 +15,9 @@
  *     Las clases `aforge`/`aforge-fill` activan la animación de forja
  *     one-shot (stroke-dashoffset) definida en index.css.
  *   - minimalista: círculo + brote-horqueta monoline, acento verde sobrio
+ *   - verde-vivo: SOL-MANO radial de la finca viva — hojas frondosas que
+ *     irradian de un centro solar cálido (identidad Chagra: mano radial +
+ *     solar/soberanía). Verde-hoja vivo + sol/ocre cálido. rsvg-safe.
  */
 
 import React from 'react';
@@ -107,6 +110,37 @@ export const THEME_ICON = {
             <circle cx="60" cy="60" r="46" fill="none" stroke="#2b2b2b" strokeWidth="7" />
             <path d="M60 90 V58 M60 58 L44 40 M60 58 L76 40" fill="none" stroke="#2b2b2b" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
             <circle cx="44" cy="40" r="7" fill="#19a585" /><circle cx="76" cy="40" r="7" fill="#19a585" />
+        </svg>
+    ),
+    // Verde Vivo — SOL-MANO radial de la finca viva: hojas frondosas que
+    // irradian de un centro solar cálido (mano de Chagra + solar/soberanía).
+    // Verde-hoja vivo (#2e8b3d/#3fae54) + sol/ocre cálido (#e0922e/#f2b441).
+    'verde-vivo': (
+        <svg viewBox="0 0 120 120" fill="none" width="100%" height="100%" aria-hidden="true">
+            {/* sol cálido central (centro de la mano radial) */}
+            <circle cx="60" cy="60" r="15" fill="#f2b441" />
+            <circle cx="60" cy="60" r="9.5" fill="#e0922e" />
+            {/* hojas frondosas que irradian del centro — la "mano" de la finca */}
+            <g fill="#2e8b3d">
+                {/* arriba */}
+                <path d="M60 50 C52 38 53 22 60 12 C67 22 68 38 60 50 Z" />
+                {/* arriba-derecha */}
+                <path d="M68 54 C77 46 91 42 104 44 C97 55 84 62 71 60 Z" />
+                {/* abajo-derecha */}
+                <path d="M67 67 C78 70 90 80 95 92 C82 92 70 85 63 74 Z" />
+                {/* abajo-izquierda */}
+                <path d="M53 67 C42 70 30 80 25 92 C38 92 50 85 57 74 Z" />
+                {/* arriba-izquierda */}
+                <path d="M52 54 C43 46 29 42 16 44 C23 55 36 62 49 60 Z" />
+            </g>
+            {/* nervaduras vivas (verde claro) sobre las hojas */}
+            <g stroke="#bdf38a" strokeWidth="2.4" strokeLinecap="round" opacity="0.85">
+                <path d="M60 46 V18" />
+                <path d="M70 56 L98 47" />
+                <path d="M64 70 L90 88" />
+                <path d="M56 70 L30 88" />
+                <path d="M50 56 L22 47" />
+            </g>
         </svg>
     ),
 };

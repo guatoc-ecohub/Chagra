@@ -56,6 +56,9 @@ jobs:
       - name: Commit regenerated baseline
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.update_snapshots == 'true' }}
         run: |
+          # El job corre en contenedor (playwright image); git rechaza el repo por
+          # "dubious ownership" → `fatal: not in a git directory`. Marcarlo seguro.
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add tests/visual

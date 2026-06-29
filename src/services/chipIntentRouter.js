@@ -20,8 +20,11 @@
  *
  * Tools determinísticos (ya existen en el sidecar, ver sidecarClient.ALLOWED_TOOLS):
  *   - siembro      → get_species          (ficha + viabilidad de la especie)
- *   - calendario   → get_species          (época de siembra se deriva de la ficha;
- *                                           NO existe get_calendario_siembra dedicado)
+ *   - calendario   → get_calendario_siembra (cultivos a sembrar este mes según el
+ *                                           piso térmico de la finca; el tool SÍ
+ *                                           está vivo en el sidecar — antes
+ *                                           routeaba a get_species por un comentario
+ *                                           stale, fix grounding P0 2026-06-24)
  *   - plaga        → get_pest_controllers  (controladores agroecológicos de la plaga)
  *   - biopreparado → get_biopreparados     (recetas de biopreparados)
  *   - clima        → get_clima_ideam       (IDEAM nacional; requiere municipio)
@@ -124,15 +127,47 @@ export function planForcedIntent(intent, text, opts = {}) {
 
   switch (intent) {
     case CHIP_INTENTS.siembro:
-    case CHIP_INTENTS.calendario:
-      // Ficha de especie. El calendario/época de siembra se deriva de la ficha
-      // (no hay get_calendario_siembra dedicado en el sidecar). El grounding
-      // trae piso térmico / ciclo y el LLM lo expone como época de siembra.
+      // Ficha de especie. El grounding trae piso térmico / ciclo y el LLM lo
+      // expone como viabilidad + época de siembra de ESA especie concreta.
       return { ...base, tool: 'get_species', args: { query: prompt } };
 
+    case CHIP_INTENTS.calendario: {
+      // "¿Qué siembro este mes?" → get_calendario_siembra (tool VIVO en el
+      // sidecar, fix grounding P0 2026-06-24). El tool EXIGE `piso_termico`
+      // (enum frio|templado|calido, sin tildes) y acepta `mes` opcional (1..12;
+      // default = mes actual America/Bogota). El piso lo aporta el perfil/finca
+      // (opts.pisoTermico) o se deriva de la altitud; el mes se infiere del
+      // texto si el usuario lo nombra ("¿qué siembro en septiembre?").
+      const piso = calendarioPiso(opts);
+      if (!piso) {
+        // Sin piso térmico NO llamamos el tool (el zod lo exige): evidence
+        // sintética que obliga al LLM a PEDIR la altura/municipio (NO inventar
+        // fechas). Mismo contrato que clima sin municipio / silvopastoreo sin
+        // altura.
+        return {
+          ...base,
+          tool: 'get_calendario_siembra',
+          args: null,
+          stub: true,
+          stubResult: {
+            available: false,
+            reason: 'no_piso_termico',
+            hint: 'pedirle al usuario su municipio o la altura de su finca (msnm) para saber el piso térmico (frío/templado/cálido) y poder sugerir qué sembrar este mes',
+          },
+        };
+      }
+      const calArgs = { piso_termico: piso };
+      const mes = detectMesSiembra(prompt);
+      if (mes != null) calArgs.mes = mes;
+      return { ...base, tool: 'get_calendario_siembra', args: calArgs };
+    }
+
     case CHIP_INTENTS.plaga:
-      // Controladores agroecológicos de la plaga (AGE Cypher).
-      return { ...base, tool: 'get_pest_controllers', args: { pest: prompt } };
+      // Controladores agroecológicos de la plaga (AGE Cypher). El tool del
+      // sidecar EXIGE `pest_id_or_name` (NO `pest`): enviar la clave equivocada
+      // disparaba `missing_pest` y el chip insignia no groundeaba (fix P0
+      // 2026-06-24).
+      return { ...base, tool: 'get_pest_controllers', args: { pest_id_or_name: prompt } };
 
     case CHIP_INTENTS.biopreparado:
       // Recetas de biopreparados del catálogo.
@@ -356,4 +391,47 @@ const RE_INVASORA = /\b(retamo|eucalipto|pino\s?p[áa]tula|pasto\s?gordura|le[u�
 function detectInvasoraMencionada(text) {
   const m = String(text).match(RE_INVASORA);
   return m ? m[0].toLowerCase() : null;
+}
+
+/**
+ * Resuelve el `piso_termico` que exige get_calendario_siembra (enum
+ * frio|templado|calido, SIN 'paramo': el tool no lo soporta) a partir de los
+ * opts del chip. Prioridad: opts.pisoTermico normalizado → derivación por
+ * altitud. 'paramo' se mapea a 'frio' (el calendario de páramo bajo cae en el
+ * piso frío). Devuelve null si no se puede determinar → el caller cae al stub
+ * que pide el dato (NO inventa fechas).
+ * @param {object} opts
+ * @returns {('frio'|'templado'|'calido')|null}
+ */
+function calendarioPiso(opts) {
+  const piso = normalizePiso(opts && opts.pisoTermico);
+  if (piso === 'frio' || piso === 'templado' || piso === 'calido') return piso;
+  if (piso === 'paramo') return 'frio';
+  const alt = toAltitud(opts && opts.altitud);
+  if (alt == null) return null;
+  if (alt >= 2000) return 'frio';
+  if (alt >= 1000) return 'templado';
+  return 'calido';
+}
+
+// Meses en español → número (1..12). Sin tildes a propósito (matcheamos sobre
+// texto en minúsculas y sin normalizar tildes para mantenerlo simple; cubrimos
+// ambas grafías donde la tilde es común).
+const MESES = Object.freeze({
+  enero: 1, febrero: 2, marzo: 3, abril: 4, mayo: 5, junio: 6,
+  julio: 7, agosto: 8, septiembre: 9, setiembre: 9, octubre: 10,
+  noviembre: 11, diciembre: 12,
+});
+const RE_MES = new RegExp(`\\b(${Object.keys(MESES).join('|')})\\b`, 'i');
+
+/**
+ * Si el usuario nombra un mes en el texto del chip calendario ("¿qué siembro
+ * en septiembre?"), devuelve su número (1..12) para pasarlo como `mes` al tool.
+ * Si no nombra mes, devuelve null y el tool usa el mes actual (America/Bogota).
+ * @param {string} text
+ * @returns {number|null}
+ */
+function detectMesSiembra(text) {
+  const m = String(text).toLowerCase().match(RE_MES);
+  return m ? (MESES[m[1].toLowerCase()] ?? null) : null;
 }

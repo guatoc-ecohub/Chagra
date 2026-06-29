@@ -500,4 +500,81 @@ describe('grafoRelations — loader offline del grafo', () => {
     expect(await mod.getRelationsForSpecies(undefined)).toBeNull();
     expect(await mod.getRelationsForSpecies(0)).toBeNull();
   });
+
+  // ---- Sinonimia de plagas/enfermedades (resolvePestSynonym) -------------
+  // Fixture con la estructura nueva: _pest_synonyms (sinónimo → etiqueta
+  // canónica) + _pest_index (etiqueta → especies afectadas). Datos REALES del
+  // glosario regional colombiano (gota=tizón tardío, monilia=cacao, broca).
+  const PEST_FIXTURE = {
+    _meta: { schema_version: 1, species_count: 2 },
+    _pest_synonyms: {
+      gota: 'Tizon tardio / gota (papa y tomate)',
+      'tizón tardío': 'Tizon tardio / gota (papa y tomate)',
+      'phytophthora infestans': 'Tizon tardio / gota (papa y tomate)',
+      monilia: 'moniliasis del cacao',
+      moniliasis: 'moniliasis del cacao',
+      broca: 'Broca del café',
+    },
+    _pest_index: {
+      'Tizon tardio / gota (papa y tomate)': ['solanum_tuberosum', 'solanum_lycopersicum'],
+      'moniliasis del cacao': ['theobroma_cacao'],
+      'Broca del café': ['coffea_arabica'],
+    },
+    species: {
+      theobroma_cacao: { nombre_comun: 'Cacao' },
+    },
+  };
+
+  it('resolvePestSynonym: "gota" → tizón tardío + especies afectadas (papa/tomate)', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(PEST_FIXTURE)));
+
+    const r = await mod.resolvePestSynonym('gota');
+    expect(r).not.toBeNull();
+    expect(r.plaga).toBe('Tizon tardio / gota (papa y tomate)');
+    expect(r.especiesAfectadas).toContain('solanum_tuberosum');
+  });
+
+  it('resolvePestSynonym: "Monilia" (mayúscula) → moniliasis del cacao', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(PEST_FIXTURE)));
+
+    const r = await mod.resolvePestSynonym('Monilia');
+    expect(r.plaga).toBe('moniliasis del cacao');
+    expect(r.especiesAfectadas).toEqual(['theobroma_cacao']);
+  });
+
+  it('resolvePestSynonym: nombre científico "Phytophthora infestans" resuelve a la etiqueta', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(PEST_FIXTURE)));
+
+    const r = await mod.resolvePestSynonym('Phytophthora infestans');
+    expect(r.plaga).toBe('Tizon tardio / gota (papa y tomate)');
+  });
+
+  it('resolvePestSynonym: etiqueta canónica exacta también resuelve', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(PEST_FIXTURE)));
+
+    const r = await mod.resolvePestSynonym('Broca del café');
+    expect(r.plaga).toBe('Broca del café');
+    expect(r.especiesAfectadas).toEqual(['coffea_arabica']);
+  });
+
+  it('resolvePestSynonym: término sin match → null sin lanzar', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(PEST_FIXTURE)));
+
+    expect(await mod.resolvePestSynonym('xyz no existe')).toBeNull();
+    expect(await mod.resolvePestSynonym('')).toBeNull();
+  });
+
+  it('getPestIndex: devuelve el índice plaga → especies', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(PEST_FIXTURE)));
+
+    const idx = await mod.getPestIndex();
+    expect(idx['moniliasis del cacao']).toEqual(['theobroma_cacao']);
+  });
+
+  it('resolvePestSynonym OFFLINE (fetch rechaza) → null sin lanzar', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('red caida')));
+
+    expect(await mod.resolvePestSynonym('gota')).toBeNull();
+    expect(await mod.getPestIndex()).toEqual({});
+  });
 });

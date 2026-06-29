@@ -28,7 +28,6 @@ describe('bench nocturno farm process scenarios', () => {
       'gemma3:12b',
       'qwen3.5:9b',
       'gemma3:4b',
-      'granite3.1-dense:8b',
     ]);
     expect(SMOKE_ONLY_MODELS).toContain('qwen3:30b');
   });

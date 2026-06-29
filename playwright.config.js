@@ -137,6 +137,14 @@ export default defineConfig({
       name: 'visual',
       testDir: './tests/visual',
       testMatch: ['*.spec.js'],
+      // demo-personas.spec.js es un VOLCADOR de capturas manuales (page.screenshot
+      // a archivos), NO un test de regresión de baseline (no usa toHaveScreenshot).
+      // Además navega a un :5173 hardcodeado y hace page.click de flujos UI que
+      // expiran (30s) en CI → rompía el paso "Regenerate visual baseline" del
+      // workflow_dispatch y, con él, el commit del baseline (los baselines reales
+      // de app-visual-regression + component-gallery quedaban sin generar). Se
+      // excluye del gate; sigue corriéndose a mano si se quiere.
+      testIgnore: ['**/demo-personas.spec.js'],
       retries: process.env.CI ? 1 : 0,
       use: {
         ...devices['Desktop Chrome'],

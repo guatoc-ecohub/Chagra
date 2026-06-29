@@ -455,6 +455,9 @@ export function generateUserDataRules() {
  * @param {object} [opts]
  * @param {boolean} [opts.climaQuery=true] - si false, omite el bloque de
  *   alertas climáticas regionales (solo aporta en consultas de clima).
+ * @param {string} [opts.nivelRespuestas=''] - 'simple' o 'detallado' (del perfil).
+ *   Si es 'simple', responde con pasos concretos y frases cortas.
+ *   Si es 'detallado', responde con más contexto técnico.
  * @returns {string} Contexto de perfil para system prompt
  */
 export function buildProfileContext(finca, opts = {}) {
@@ -488,10 +491,42 @@ export function buildProfileContext(finca, opts = {}) {
   // en una pregunta de plaga/manejo es peso muerto que empuja a la truncación
   // del grounding. `climaQuery` por defecto true → callers existentes y tests
   // ven el bloque completo; buildBasePrompt lo pasa false para queries no-clima.
-  const { climaQuery = true } = opts || {};
+  // `nivelRespuestas` controla el nivel de detalle: 'simple' (pasos concretos)
+  // o 'detallado' (más contexto técnico).
+  const { climaQuery = true, nivelRespuestas = '' } = opts || {};
+
+  // Añade bloque de nivel de respuestas si está especificado (ej: 'simple' o
+  // 'detallado'). Esto permite adaptar el nivel de detalle al perfil del usuario.
+  const nivelRespuestasBlock = (() => {
+    if (!nivelRespuestas || typeof nivelRespuestas !== 'string') return '';
+    const nivel = nivelRespuestas.toLowerCase().trim();
+    if (nivel === 'simple') {
+      return `NIVEL DE RESPUESTA: SIMPLE (pasos concretos).
+- Responde con pasos claros y cortos, como hablar con un vecino.
+- Evita tecnicismos innecesarios.
+- Prioriza lo práctico: qué hacer, cuándo, cómo.
+- Usa unidades del campo: cuadra, arroba, luna, bike de agua, plaza.
+- Si necesitas explicar algo técnico, usa ejemplos de la finca.`;
+    }
+    if (nivel === 'detallado') {
+      return `NIVEL DE RESPUESTA: DETALLADO (más contexto técnico).
+- Puedes explicar el porqué de las recomendaciones.
+- Incluye referencias a fuentes técnicas cuando sea relevante.
+- Puedes mencionar conceptos técnicos si aclaras su significado.
+- Mantén el lenguaje accesible pero con más profundidad.`;
+    }
+    return '';
+  })();
 
   if (!finca) {
-    return generateSourceCitationRules() + '\n\n' + generateUserDataRules() + profileSuffix + veredaContext;
+    const blocks = [
+      generateSourceCitationRules(),
+      generateUserDataRules(),
+      nivelRespuestasBlock,
+      profileSuffix,
+      veredaContext,
+    ].filter((s) => s && s.trim());
+    return blocks.join('\n\n');
   }
 
   const bioculturalZone = finca.biocultural_zone;
@@ -501,7 +536,13 @@ export function buildProfileContext(finca, opts = {}) {
   const citationRules = generateSourceCitationRules();
   const userDataRules = generateUserDataRules();
 
-  return [toneContext, climateContext, citationRules, `${userDataRules}${profileSuffix}${veredaContext}`]
+  return [
+    toneContext,
+    climateContext,
+    citationRules,
+    nivelRespuestasBlock,
+    `${userDataRules}${profileSuffix}${veredaContext}`,
+  ]
     .filter((s) => s && s.trim())
     .join('\n\n');
 }
@@ -621,9 +662,11 @@ export function buildClimaContext(snapshot, opts = {}) {
  *   1. VIABILIDAD HONESTA: si el usuario quiere sembrar una especie cuya altitud
  *      de finca cae FUERA del rango [altitud_min, altitud_max] de esa especie,
  *      lo dice con honestidad directa pero amable (probabilidad muy baja + el
- *      porqué) y SUGIERE alternativas viables SOLO del catálogo/grounding o del
- *      tool get_cultivos_viables — NUNCA inventadas. Si no tiene el rango de la
- *      especie, NO afirma nada sobre viabilidad (degrada con gracia).
+ *      porqué) y SUGIERE alternativas viables SOLO del catálogo/grounding —
+ *      NUNCA inventadas. Si no tiene el rango de la especie, NO afirma nada
+ *      sobre viabilidad (degrada con gracia).
+ *      (FIX P0 audit 2026-06-23: get_cultivos_viables eliminada del prompt —
+ *      no está en el allowlist del sidecar; prometida → falla en silencio.)
  *   2. DEFAULT FINCA-CONTEXT: las preguntas son POR DEFECTO sobre la finca del
  *      usuario sin que él lo tenga que decir (lo habilita buildFincaContext;
  *      aquí solo se declara como comportamiento por defecto).
@@ -636,10 +679,11 @@ export function buildClimaContext(snapshot, opts = {}) {
  * @returns {string}
  */
 export function generateViabilityRules() {
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
   return `REGLA DE VIABILIDAD HONESTA: las preguntas son POR DEFECTO sobre SU finca (altitud, piso, clima) aunque no lo diga — ya está en "=== CONTEXTO AMBIENTAL DE LA FINCA ===". Si el grounding trae el rango de la especie (altitud_min/altitud_max):
 - Finca FUERA de [altitud_min, altitud_max]: dilo con honestidad amable — probabilidad de éxito muy baja y POR QUÉ (ej: coco 0–1000 m cálido, tu finca 2580 m frío) y sugiere 2–3 alternativas viables para SU altitud.
 - PREMISA FALSA EMBEBIDA: si da por hecho un cultivo ya sembrado/prosperando en un piso incompatible con su rango ("el café que sembré a nivel del mar", "mi mango del páramo"), NO des cosecha/cuidados como si fuera cierto: corrige con amabilidad ("ojo: el café no prospera a nivel del mar") y orienta con alternativas o pide aclaración.
-- Alternativas SOLO del catálogo/grounding o get_cultivos_viables. NUNCA inventes especies, viabilidad ni incompatibilidad.
+- Alternativas SOLO del catálogo/grounding. NUNCA inventes especies, viabilidad ni incompatibilidad.
 - Sin rango (null): NO afirmes NADA; sé neutral y pide el dato.
 PRESENTACIÓN LOCAL: que los datos de finca se noten SUYOS ("En tu finca…", "Para tu altura (2580 m)…"); usuario campesino o niño. Conciso.`;
 }
@@ -791,7 +835,7 @@ ${secciones.join('\n\n')}
 REGLA (intelligence-first, tono HUMILDE):
 - MARGINAL: nunca digas "no se puede". Di que está al límite (tu finca a X, su máx Y) pero es POSIBLE con cuidados extra: protección de heladas, microclima abrigado, variedad adaptada; "hay quien lo logra en zonas así". La EXPERIENCIA del campesino manda sobre la base de datos.
 - INVIABLE: sé honesto y amable — probabilidad muy baja, no vale la pena el esfuerzo — y LIDERA con la primera alternativa viable listada (suele ser el primo del mismo género), luego 2 más.
-- Las alternativas salen SOLO del catálogo / grounding de este mensaje o del tool get_cultivos_viables — NUNCA inventes especies ni inventes viabilidad.
+- Las alternativas salen SOLO del catálogo / grounding de este mensaje — NUNCA inventes especies ni inventes viabilidad.
 === FIN VIABILIDAD POR ALTITUD ===`;
 }
 
@@ -1077,7 +1121,7 @@ REGLA: si el usuario pregunta por la dosis, preparación o uso de un biopreparad
 export function generateAgronomicGuidanceRules() {
   return `DOCTRINA AGRONÓMICA (guía, no dogma): toda regla agronómica es una GUÍA con zona gris; navégala con los datos del grafo + clima en vivo + RESPETO a la experiencia del campesino. NUNCA inventes; si falta el dato, sé neutral.
 - Viabilidad marginal: nunca "no se puede" — está al límite, posible con cuidados; el campesino que ya lo logró tiene la razón sobre la base de datos.
-- Diseño de finca: si pregunta cómo mejorar su finca, por qué su cultivo no carga o qué sembrar alrededor, usa get_diseno_finca(altitud) para sugerir polinizadores, abonos verdes, sombra y cercas vivas del catálogo viables a su altitud — SOLO cuando sea pertinente.
+- Diseño de finca: si pregunta cómo mejorar su finca, por qué su cultivo no carga o qué sembrar alrededor, sugiere polinizadores, abonos verdes, sombra y cercas vivas del catálogo viables a su altitud — SOLO cuando sea pertinente.
 - Invasoras / conservación: jamás recomiendes sembrar especie invasora o de conservación sensible; sé honesto y ofrece alternativa nativa.
 - Cura milagrosa: si afirma que una mezcla cura algo y pide dosis/frecuencia exacta, no confirmes ni inventes una cifra; evalúa si tiene sustento, si no, dilo con respeto y ofrece el manejo real.`;
 }
@@ -1381,6 +1425,7 @@ export function buildFincaContext({
     ubic.push(`(${lat.toFixed(3)}, ${lng.toFixed(3)})`);
   }
   if (finca && finca.nombre) {
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
     lines.push(`Finca activa: "${finca.nombre}"${ubic.length ? ` — ${ubic.join(', ')}` : ''}.`);
   } else if (ubic.length) {
     lines.push(`Ubicación: ${ubic.join(', ')}.`);
@@ -1591,6 +1636,126 @@ Usuario: "¿a cómo está la papa?"
    pregunta directamente en una central de abastos como Corabastos. Si quieres,
    te ayudo con la siembra o el manejo de la papa."
 === FIN REGLA DE PRECIO ===`;
+}
+
+// ── Respuesta DETERMINISTA de precio (escena de precio del demo campesino) ──
+
+/**
+ * Extrae el record de precio de una evidencia get_precio_sipsa con
+ * `available:true`. Tolera la forma simple ({tool,result}) y el array de
+ * tool_chain (D2 #246) — devuelve el PRIMER hit de precio disponible. Devuelve
+ * `null` si no hay precio disponible (el caller cae al LLM / al decline block).
+ *
+ * @param {object|Array<object>|null} toolEvidence
+ * @returns {{ price: object, especie: (string|null) }|null}
+ */
+function _extractAvailablePrice(toolEvidence) {
+  const pick = (ev) => {
+    if (!ev || typeof ev !== 'object') return null;
+    const toolName = String(ev.tool || '').toLowerCase();
+    const isPriceTool = toolName.includes('precio') || toolName.includes('sipsa');
+    if (!isPriceTool) return null;
+    const r = ev.result;
+    if (!r || typeof r !== 'object') return null;
+    if (r.available !== true) return null;
+    const price = r.price;
+    if (!price || typeof price !== 'object') return null;
+    if (typeof price.precio_promedio_cop_kg !== 'number') return null;
+    return { price, frescura: r.frescura || null, especie: r.especie ?? null };
+  };
+  if (Array.isArray(toolEvidence)) {
+    for (const ev of toolEvidence) {
+      const hit = pick(ev);
+      if (hit) return hit;
+    }
+    return null;
+  }
+  return pick(toolEvidence);
+}
+
+/** Formatea un entero COP con separador de miles (es-CO): 4600 → "4.600". */
+function _formatCop(n) {
+  if (typeof n !== 'number' || !Number.isFinite(n)) return null;
+  return Math.round(n).toLocaleString('es-CO');
+}
+
+/** "2026-06-25" → "25 de junio". Devuelve la ISO cruda si no parsea. */
+function _formatFechaCorta(iso) {
+  if (typeof iso !== 'string') return '';
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  if (!m) return iso;
+  const meses = [
+    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+  ];
+  const mes = meses[Number(m[2]) - 1] || m[2];
+  return `${Number(m[3])} de ${mes}`;
+}
+
+/**
+ * buildPriceAnswer — RESPUESTA DETERMINISTA para una consulta de precio cuando
+ * get_precio_sipsa devolvió un dato REAL (available:true). Es la escena de
+ * precio del demo campesino: el agente debe CANTAR el número, no enterrarlo en
+ * agronomía genérica ni depender de que granite lo razone bien.
+ *
+ * Anti-alucinación: SOLO emite cuando hay un precio numérico real en la
+ * evidencia del tool (que lee la tabla `chagra.sipsa_precios` poblada por el
+ * feed diario DANE). Sin dato disponible → devuelve `null` y el caller cae al
+ * decline block honesto (buildPriceDeclineContext) o al LLM. NUNCA inventa.
+ *
+ * Salida ejemplo:
+ *   "💰 La papa (Papa criolla limpia) está a $4.600/kg en Bucaramanga,
+ *    Centroabastos. Rango del día: $4.400–$4.800/kg. (Fuente: SIPSA/DANE,
+ *    25 de junio.)"
+ *
+ * @param {object} args
+ * @param {string|null|undefined} args.userMessage — pregunta cruda del usuario.
+ * @param {object|Array<object>|null} args.toolEvidence — evidencia del sidecar.
+ * @returns {string|null} respuesta lista para mostrar, o null si no aplica.
+ */
+export function buildPriceAnswer({ userMessage = null, toolEvidence = null } = {}) {
+  // Solo para intent de PRECIO inequívoco (no convertimos otras consultas).
+  if (classifyQueryIntent(userMessage) !== 'precio') return null;
+  const hit = _extractAvailablePrice(toolEvidence);
+  if (!hit) return null;
+
+  const { price, frescura } = hit;
+  const prom = _formatCop(price.precio_promedio_cop_kg);
+  if (!prom) return null;
+
+  // Lo que el usuario preguntó vs el nombre exacto del dato (variedad SIPSA).
+  const productoDato = typeof price.producto === 'string' ? price.producto.trim() : '';
+  const plaza = typeof price.plaza === 'string' ? price.plaza.trim() : '';
+
+  let frase = `💰 ${productoDato || 'El producto'} está a **$${prom}/kg**`;
+  if (plaza) frase += ` en ${plaza}`;
+  frase += '.';
+
+  // Rango min–max del día si ambos existen y difieren del promedio.
+  const min = _formatCop(price.precio_min_cop_kg);
+  const max = _formatCop(price.precio_max_cop_kg);
+  if (min && max && min !== max) {
+    frase += ` Rango del día: $${min}–$${max}/kg.`;
+  }
+
+  // Fuente + fecha. Sello de frescura honesto si el dato está desactualizado.
+  const fechaTxt = _formatFechaCorta(price.fecha);
+  const desactualizado = !!(frescura && frescura.desactualizado === true);
+  const dias = frescura && typeof frescura.dias_desde_dato === 'number'
+    ? frescura.dias_desde_dato
+    : null;
+  if (desactualizado) {
+    const cuanto = dias != null ? ` (de hace ${dias} día${dias === 1 ? '' : 's'})` : '';
+    frase += ` Ojo: es el último dato disponible${cuanto}, no el de hoy.`;
+    frase += ` (Fuente: SIPSA/DANE${fechaTxt ? `, ${fechaTxt}` : ''}.)`;
+  } else {
+    frase += ` (Fuente: SIPSA/DANE${fechaTxt ? `, ${fechaTxt}` : ''}.)`;
+  }
+
+  // Precio mayorista: aclaración útil para el campesino.
+  frase += ' Es precio mayorista en central de abastos; en plaza local puede variar.';
+
+  return frase;
 }
 
 // ── P4b: entidades de BAJA confianza como SUGERENCIA (gatilla CASO B) ───────

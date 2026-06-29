@@ -10,10 +10,13 @@ import {
   GraduationCap, Play, ChevronRight, Heart, Zap,
 } from 'lucide-react';
 import { agentSounds, isSoundEnabled } from '../../services/agentSoundService';
+import { recordGameStart, recordGameComplete } from '../../services/usageTelemetryService';
 import {
   MAPA, PALETA, MATERIALES, DECORACIONES, CONFIG_DOOM,
-  PLAGAS_DOOM, BENEFICOS_DOOM, ESCENARIOS,
+  PLAGAS_DOOM, BENEFICOS_DOOM, ESCENARIOS, paletaPorTema,
 } from './doomFincaData';
+import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
+import { temaActivoDom, fvhSkinClass } from '../../config/fvhSkin';
 import {
   castRay, projectSprite, createWorld, tickWorld, cambiarBenefico,
   decoracionEnMira, plagaObjetivo, avanzarRonda,
@@ -311,9 +314,29 @@ const DECO_DIM = {
 export default function DoomFincaScreen({ onBack, onHome }) {
   const canvasRef = useRef(null);
   const worldRef = useRef(null);
+  // PIEL POR TEMA del cielo del raycaster (Fase 2 de temas). Con la flag ON, el
+  // cielo/cordillera/sol se retiñen al tema activo (la tierra/jugabilidad NO);
+  // con OFF queda la PALETA base (EXACTO como hoy). Se lee en el hot-loop vía
+  // ref para no re-suscribir el rAF al cambiar de tema.
+  const paletaRef = useRef(
+    fincaVivaHomePerfilActivo() ? paletaPorTema(temaActivoDom()) : PALETA,
+  );
+  useEffect(() => {
+    if (!fincaVivaHomePerfilActivo()) { paletaRef.current = PALETA; return undefined; }
+    const sync = () => { paletaRef.current = paletaPorTema(temaActivoDom()); };
+    sync();
+    // El tema se escribe en <html data-theme>; observamos ese atributo para
+    // repintar el cielo si el usuario cambia de tema con el Doom abierto.
+    const obs = new MutationObserver(sync);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => obs.disconnect();
+  }, []);
   const inputRef = useRef({
     forward: false, backward: false, left: false, right: false,
     strafeLeft: false, strafeRight: false, fire: false, mouseDown: false,
+    // FEEL gated (dev-only): balance más amable (daño + combo). Con la flag OFF
+    // el motor recibe feelOn=false → BALANCE EXACTO como hoy en producción.
+    feelOn: fincaVivaHomePerfilActivo(),
   });
   const touchRef = useRef({
     joystickActive: false, joystickId: null, joystickX: 0, joystickY: 0,
@@ -356,6 +379,17 @@ export default function DoomFincaScreen({ onBack, onHome }) {
 
   // Inicializa el mundo
   useEffect(() => { worldRef.current = createWorld(); }, []);
+
+  // Telemetría de uso ANÓNIMA: inicio del juego al montar (una vez).
+  useEffect(() => { recordGameStart('doom_finca'); }, []);
+  // Completado: cuando la fase llega a 'gano' (una sola vez).
+  const completadoRef = useRef(false);
+  useEffect(() => {
+    if (fase === 'gano' && !completadoRef.current) {
+      completadoRef.current = true;
+      recordGameComplete('doom_finca');
+    }
+  }, [fase]);
 
   // Keyboard controls
   useEffect(() => {
@@ -520,17 +554,20 @@ export default function DoomFincaScreen({ onBack, onHome }) {
 
       const zBuffer = new Float64Array(W);
       const horizon = halfH;
-      const sky0 = PALETA.cieloAlto;
-      const sky1 = PALETA.cieloBajo;
-      const mtn = PALETA.montana;
-      const mtnS = PALETA.montanaSombra;
-      const sunC = PALETA.sol;
-      const sunG = PALETA.solBrillo;
-      const nube = PALETA.nube;
-      const tierra = PALETA.tierra;
-      const surco = PALETA.tierraSurco;
-      const pasto = PALETA.pasto;
-      const mulch = PALETA.mulch;
+      // Paleta del cielo según el tema activo (Fase 2). La tierra/surco/pasto/
+      // mulch salen igual de esta paleta — con la flag OFF es la PALETA base.
+      const pal = paletaRef.current || PALETA;
+      const sky0 = pal.cieloAlto;
+      const sky1 = pal.cieloBajo;
+      const mtn = pal.montana;
+      const mtnS = pal.montanaSombra;
+      const sunC = pal.sol;
+      const sunG = pal.solBrillo;
+      const nube = pal.nube;
+      const tierra = pal.tierra;
+      const surco = pal.tierraSurco;
+      const pasto = pal.pasto;
+      const mulch = pal.mulch;
 
       for (let col = 0; col < W; col += 1) {
         const rayAngle = pa - fovHalf + (col / W) * FOV;
@@ -940,10 +977,10 @@ export default function DoomFincaScreen({ onBack, onHome }) {
         (selector + ayuda) queda fija abajo. El -mb compensa el padding-bottom
         que ScreenShell reserva para los FAB de otras pantallas (aqui sobra).
       */}
-      <div className="flex flex-col gap-2 px-3 pt-2 pb-[max(env(safe-area-inset-bottom),8px)] w-full max-w-lg mx-auto h-full min-h-0 -mb-[max(env(safe-area-inset-bottom),0px)_+_120px]">
+      <div className={fvhSkinClass('jp-ambiente flex flex-col gap-2 px-3 pt-2 pb-[max(env(safe-area-inset-bottom),8px)] w-full max-w-lg mx-auto h-full min-h-0 -mb-[max(env(safe-area-inset-bottom),0px)_+_120px]')}>
 
         {/* ── HUD superior: ronda, plagas, puntaje, combo ── */}
-        <div className="flex items-center justify-between gap-2 text-xs font-bold shrink-0">
+        <div className="jp-doom-hud flex items-center justify-between gap-2 text-xs font-bold shrink-0">
           <span className="flex items-center gap-1 text-emerald-200 whitespace-nowrap">
             <span aria-hidden="true">{escenarioActual.icono}</span>
             <span>Ronda {rondaIdx + 1}/{ESCENARIOS.length}</span>
@@ -962,9 +999,9 @@ export default function DoomFincaScreen({ onBack, onHome }) {
         </div>
 
         {/* Barra de vitalidad */}
-        <div className="flex items-center gap-2 text-xs font-bold shrink-0">
+        <div className="jp-doom-vital flex items-center gap-2 text-xs font-bold shrink-0">
           <Heart size={13} className="text-emerald-300" aria-hidden="true" />
-          <div className="flex-1 h-3.5 bg-slate-800/60 rounded-full overflow-hidden border border-emerald-900/40">
+          <div className="jp-doom-vital-riel flex-1 h-3.5 bg-slate-800/60 rounded-full overflow-hidden border border-emerald-900/40">
             <div
               className="h-full bg-gradient-to-r from-emerald-500 to-lime-400 rounded-full transition-all duration-300"
               style={{ width: `${vitalidadPct}%` }}
@@ -974,7 +1011,7 @@ export default function DoomFincaScreen({ onBack, onHome }) {
         </div>
 
         {/* ── Canvas del juego (crece para llenar el alto disponible) ── */}
-        <div className="relative flex-1 min-h-0 rounded-xl overflow-hidden border-2 border-emerald-700/50 bg-black shadow-lg shadow-emerald-900/30">
+        <div className="jp-doom-lienzo relative flex-1 min-h-0 rounded-xl overflow-hidden border-2 border-emerald-700/50 bg-black shadow-lg shadow-emerald-900/30">
           <canvas
             ref={canvasRef}
             width={W}
@@ -1043,23 +1080,31 @@ export default function DoomFincaScreen({ onBack, onHome }) {
           {/* ── Ficha educativa al controlar bien una plaga ── */}
           {fase === 'jugando' && ficha && (
             <div
-              className="absolute inset-x-2 bottom-2 bg-emerald-950/95 border-2 border-emerald-400/60 rounded-xl p-3 shadow-xl"
+              className="jp-doom-ficha absolute inset-x-2 bottom-2 bg-emerald-950/95 border-2 border-emerald-400/60 rounded-xl p-3 shadow-xl"
               role="status"
               aria-live="polite"
             >
               <div className="flex items-center justify-between gap-2 mb-1">
-                <span className="flex items-center gap-1 text-emerald-300 font-black text-xs">
+                <span className="jp-acento-vida flex items-center gap-1 text-emerald-300 font-black text-xs">
                   <GraduationCap size={14} aria-hidden="true" /> ¡Control biologico!
                 </span>
-                <span className="text-lime-300 font-black text-xs">+{ficha.puntos}{ficha.combo > 1 ? ` · combo x${ficha.combo}` : ''}</span>
+                <span className="jp-acento-vida text-lime-300 font-black text-xs">+{ficha.puntos}{ficha.combo > 1 ? ` · combo x${ficha.combo}` : ''}</span>
               </div>
-              <p className="text-2xs text-white/90 leading-snug">
-                <b className="text-amber-200">{ficha.benefico}</b>
-                <span className="text-white/60"> ({ficha.beneficoCientifico})</span>
-                <span className="text-emerald-300"> controla a </span>
-                <b className="text-red-200">{ficha.plaga}</b>.
+              <p className="jp-tinta text-2xs text-white/90 leading-snug">
+                <b className="jp-doom-benefico text-amber-200">{ficha.benefico}</b>
+                <span className="jp-tinta-suave text-white/60"> ({ficha.beneficoCientifico})</span>
+                <span className="jp-acento-vida text-emerald-300"> controla a </span>
+                <b className="jp-doom-plaga text-red-200">{ficha.plaga}</b>
+                {ficha.cultivo ? <span className="jp-tinta-suave text-white/70"> en {ficha.cultivo}</span> : null}.
               </p>
-              <p className="text-2xs text-emerald-100/90 leading-snug mt-1">{ficha.porQue}</p>
+              {ficha.dano ? (
+                <p className="jp-doom-plaga text-2xs text-red-200/80 leading-snug mt-1">
+                  <b className="jp-doom-plaga text-red-300">El dano:</b> {ficha.dano}
+                </p>
+              ) : null}
+              <p className="jp-tinta text-2xs text-emerald-100/90 leading-snug mt-1">
+                <b className="jp-acento-vida text-emerald-300">Por que funciona:</b> {ficha.porQue}
+              </p>
             </div>
           )}
 
@@ -1145,9 +1190,9 @@ export default function DoomFincaScreen({ onBack, onHome }) {
 
         {/* ── Tarjeta de la decoracion mirada (ciclo de la finca) ── */}
         {fase === 'jugando' && leccion && (
-          <div className="bg-amber-950/50 border border-amber-600/40 rounded-xl p-2.5 text-center" role="status">
+          <div className="jp-doom-leccion bg-amber-950/50 border border-amber-600/40 rounded-xl p-2.5 text-center" role="status">
             <Sprout size={13} className="inline-block mr-1 text-amber-300" aria-hidden="true" />
-            <span className="text-xs text-amber-100 font-medium">{leccion}</span>
+            <span className="jp-tinta text-xs text-amber-100 font-medium">{leccion}</span>
           </div>
         )}
 
@@ -1168,31 +1213,31 @@ export default function DoomFincaScreen({ onBack, onHome }) {
                 aria-pressed={sel}
                 aria-label={`${b.nombre}. ${b.desc}${recomendado ? ' Recomendado esta ronda.' : ''}`}
                 title={`${b.nombre} — ${b.desc}`}
-                className="relative min-h-[54px] w-[60px] px-1 rounded-xl border-2 flex flex-col items-center justify-center gap-0.5 transition active:scale-95"
+                className="jp-doom-beneficio relative min-h-[54px] w-[60px] px-1 rounded-xl border-2 flex flex-col items-center justify-center gap-0.5 transition active:scale-95"
                 style={{
                   borderColor: sel ? b.color : recomendado ? 'rgba(52,211,153,0.5)' : 'rgba(255,255,255,0.15)',
                   backgroundColor: sel ? `${b.color}22` : 'rgba(255,255,255,0.05)',
                 }}
               >
-                <span className="absolute top-0.5 left-1 text-2xs text-white/40 font-bold">{i + 1}</span>
+                <span className="jp-tinta-suave absolute top-0.5 left-1 text-2xs text-white/40 font-bold">{i + 1}</span>
                 <span className="text-lg" aria-hidden="true">{b.emoji}</span>
-                <span className="text-2xs font-bold text-white/80 leading-none text-center">{b.nombre.split(' ')[0]}</span>
+                <span className="jp-tinta text-2xs font-bold text-white/80 leading-none text-center">{b.nombre.split(' ')[0]}</span>
               </button>
             );
           })}
         </div>
-        <p className="text-2xs text-emerald-400/70 text-center -mt-1">
+        <p className="jp-acento-vida text-2xs text-emerald-400/70 text-center -mt-1">
           Verde = recomendado para esta ronda. Toca para equipar.
         </p>
 
         {/* ── Controles desktop ── */}
-        <div className="text-2xs text-slate-500 text-center leading-relaxed">
+        <div className="jp-tinta-suave text-2xs text-slate-500 text-center leading-relaxed">
           WASD = mover · Q/E = lateral · raton = girar · barra/F = soltar · 1-5 = elegir benefico
         </div>
 
         {/* ── Referencia: pares plaga-benefico reales (control biologico) ── */}
-        <details className="text-2xs text-slate-400">
-          <summary className="cursor-pointer font-bold text-emerald-400/80">
+        <details className="jp-tinta-suave text-2xs text-slate-400">
+          <summary className="jp-acento-vida cursor-pointer font-bold text-emerald-400/80">
             Pares plaga → control biologico (datos del grafo de Chagra)
           </summary>
           <ul className="mt-2 space-y-1.5 pl-1">
@@ -1202,11 +1247,14 @@ export default function DoomFincaScreen({ onBack, onHome }) {
                 <li key={plaga.id} className="leading-snug">
                   <span className="flex items-center gap-1 flex-wrap">
                     <span aria-hidden="true">{plaga.emoji}</span>
-                    <b className="text-white/85">{plaga.nombre}</b>
-                    <span className="text-slate-600 italic">({plaga.cientifico})</span>
+                    <b className="jp-tinta text-white/85">{plaga.nombre}</b>
+                    <span className="jp-tinta-suave text-slate-600 italic">({plaga.cientifico})</span>
+                    {plaga.cultivo ? (
+                      <span className="jp-tinta-suave text-amber-300/70">en {plaga.cultivo}</span>
+                    ) : null}
                     <ChevronRight size={11} className="text-slate-600" aria-hidden="true" />
                     <span aria-hidden="true">{benef?.emoji}</span>
-                    <span className="text-emerald-300">{benef?.nombre || plaga.controladoPor}</span>
+                    <span className="jp-acento-vida text-emerald-300">{benef?.nombre || plaga.controladoPor}</span>
                   </span>
                 </li>
               );
