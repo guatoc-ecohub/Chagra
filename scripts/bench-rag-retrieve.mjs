@@ -74,7 +74,14 @@ export async function load(url, context, nextLoad) {
   if (url.endsWith('.json')) {
     context = { ...context, importAttributes: { ...(context.importAttributes || {}), type: 'json' }, format: 'json' };
   }
-  return nextLoad(url, context);
+  const result = await nextLoad(url, context);
+  // Shim de import.meta.env para modulos src/config que usan VITE_* en Node puro.
+  // Reemplaza import.meta.env por un objeto vacio seguro; los valores VITE_* no
+  // importan para el bench de latencia BM25 que solo mide el retriever.
+  if (result.source && typeof result.source === 'string' && result.source.includes('import.meta.env')) {
+    result.source = result.source.replace(/import\\.meta\\.env/g, '({})');
+  }
+  return result;
 }
 `;
 register(`data:text/javascript,${encodeURIComponent(LOADER_SOURCE)}`);
@@ -133,7 +140,11 @@ async function main() {
     // Import dinamico para que el stub de fetch ya este en su lugar.
     ({ retrieve, getCorpusStats } = await import('../src/services/ragRetriever.js'));
   } catch (err) {
-    console.log(`[bench] SKIP: no se pudo importar ragRetriever.js (${String(err.message).slice(0, 120)})`);
+    const msg = String(err.message).slice(0, 120);
+    console.log(`[bench] SKIP: no se pudo importar ragRetriever.js (${msg})`);
+    if (msg.includes('import.meta.env') || msg.includes('import.meta')) {
+      console.warn('[bench] NOTA: el error puede deberse a un uso de import.meta.env no shimado. Ver LOADER_SOURCE en este archivo.');
+    }
     return;
   }
 

@@ -99,4 +99,63 @@ describe('resolveProductoFromSlug (índice inverso slug→producto)', () => {
     expect(resolveProductoFromSlug(null)).toBeNull();
     expect(resolveProductoFromSlug(undefined)).toBeNull();
   });
+
+  // Tests de nuevos mapeos agregados (verificados contra catálogo v3.2)
+  it('mapeos nuevos: frutales tropicales', () => {
+    expect(resolveSipsaProduct('pitaya')).toBe('hylocereus_undatus');
+    expect(resolveSipsaProduct('pitahaya')).toBe('selenicereus_megalanthus');
+    expect(resolveSipsaProduct('uchuva')).toBe('physalis_peruviana');
+    expect(resolveSipsaProduct('feijoa')).toBe('acca_sellowiana');
+    expect(resolveSipsaProduct('coco')).toBe('cocos_nucifera');
+    expect(resolveSipsaProduct('chirimoya')).toBe('annona_cherimola');
+    expect(resolveSipsaProduct('anon')).toBe('annona_squamosa');
+  });
+
+  it('mapeos nuevos: hortalizas adicionales', () => {
+    expect(resolveSipsaProduct('berenjena')).toBe('solanum_melongena');
+    expect(resolveSipsaProduct('calabaza')).toBe('cucurbita_maxima');
+    expect(resolveSipsaProduct('zapallo')).toBe('cucurbita_maxima');
+    expect(resolveSipsaProduct('perejil')).toBe('petroselinum_crispum');
+    expect(resolveSipsaProduct('cebollin')).toBe('allium_schoenoprasum');
+    expect(resolveSipsaProduct('puerro')).toBe('allium_ampeloprasum');
+    expect(resolveSipsaProduct('nabo')).toBe('brassica_rapa');
+  });
+
+  it('mapeos nuevos: aromáticas y condimentos', () => {
+    expect(resolveSipsaProduct('jengibre')).toBe('zingiber_officinale');
+    expect(resolveSipsaProduct('curcuma')).toBe('curcuma_longa');
+    expect(resolveSipsaProduct('romero')).toBe('rosmarinus_officinalis');
+    expect(resolveSipsaProduct('hierbabuena')).toBe('mentha_spicata');
+    expect(resolveSipsaProduct('eneldo')).toBe('anethum_graveolens');
+    expect(resolveSipsaProduct('tomillo')).toBe('thymus_vulgaris');
+    expect(resolveSipsaProduct('origano')).toBe('origanum_vulgare');
+  });
+
+  it('mapeos nuevos: variedades de papa', () => {
+    expect(resolveSipsaProduct('papa sabanera')).toBe('solanum_tuberosum_sabanera');
+    expect(resolveSipsaProduct('papa pastusa')).toBe('solanum_tuberosum_pastusa_suprema');
+  });
+
+  it('mapeos nuevos: leguminosas adicionales', () => {
+    expect(resolveSipsaProduct('lenteja')).toBe('lens_culinaris_andina');
+    expect(resolveSipsaProduct('garbanzo')).toBe('cicer_arietinum');
+    expect(resolveSipsaProduct('haba')).toBe('vicia_faba');
+  });
+
+  it('mapeos nuevos: cereales', () => {
+    expect(resolveSipsaProduct('trigo')).toBe('triticum_aestivum');
+    expect(resolveSipsaProduct('cebada')).toBe('hordeum_vulgare');
+    expect(resolveSipsaProduct('centeno')).toBe('secale_cereale');
+  });
+
+  it('mapeos nuevos: andinos y tubérculos', () => {
+    expect(resolveSipsaProduct('quinua')).toBe('chenopodium_quinoa');
+    expect(resolveSipsaProduct('amaranto')).toBe('amaranthus_caudatus');
+    expect(resolveSipsaProduct('malanga')).toBe('xanthosoma_sagittifolium');
+    expect(resolveSipsaProduct('name')).toBe('dioscorea_rotundata');
+    expect(resolveSipsaProduct('taro')).toBe('colocasia_esculenta');
+    expect(resolveSipsaProduct('jicama')).toBe('pachyrhizus_erosus');
+    expect(resolveSipsaProduct('yacon')).toBe('smallanthus_sonchifolius');
+    expect(resolveSipsaProduct('achira')).toBe('canna_edulis');
+  });
 });

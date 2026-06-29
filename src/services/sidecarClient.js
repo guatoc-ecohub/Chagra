@@ -698,10 +698,14 @@ export async function getClimaIdeam(action, args) {
 }
 
 /**
- * Wrapper de `get_precio_sipsa`. Precios mayoristas SIPSA — hoy el dataset
- * DANE está publicado como ZIP federated (no consulta directa), así que
- * el tool devuelve metadata + URL del ZIP en vez de precio puntual. El
- * agente debe orientar al usuario al ZIP DANE o sugerir Corabastos.
+ * Wrapper de `get_precio_sipsa`. Precios mayoristas SIPSA — el tool lee la
+ * tabla `chagra.sipsa_precios` que llena el feed DIARIO en vivo del servicio
+ * REST oficial DANE (pipeline #19, `dane-live`), así que para los staples
+ * comunes (papa, tomate, cebolla, yuca, plátano, zanahoria, aguacate, maíz)
+ * devuelve un PRECIO PUNTUAL real: {price{precio_promedio_cop_kg, plaza,
+ * fecha, min/max}, central_abastos, frescura, especie}. Si un producto no está
+ * en la tabla ni en Socrata, devuelve {available:false} (honesto, no inventa)
+ * y el agente orienta al ZIP DANE / Corabastos.
  *
  * @param {string} action — uno de PRECIO_SIPSA_ACTIONS
  * @param {object} [args] — body adicional (producto, fecha, etc.)
