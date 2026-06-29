@@ -455,6 +455,9 @@ export function generateUserDataRules() {
  * @param {object} [opts]
  * @param {boolean} [opts.climaQuery=true] - si false, omite el bloque de
  *   alertas climáticas regionales (solo aporta en consultas de clima).
+ * @param {string} [opts.nivelRespuestas=''] - 'simple' o 'detallado' (del perfil).
+ *   Si es 'simple', responde con pasos concretos y frases cortas.
+ *   Si es 'detallado', responde con más contexto técnico.
  * @returns {string} Contexto de perfil para system prompt
  */
 export function buildProfileContext(finca, opts = {}) {
@@ -488,10 +491,42 @@ export function buildProfileContext(finca, opts = {}) {
   // en una pregunta de plaga/manejo es peso muerto que empuja a la truncación
   // del grounding. `climaQuery` por defecto true → callers existentes y tests
   // ven el bloque completo; buildBasePrompt lo pasa false para queries no-clima.
-  const { climaQuery = true } = opts || {};
+  // `nivelRespuestas` controla el nivel de detalle: 'simple' (pasos concretos)
+  // o 'detallado' (más contexto técnico).
+  const { climaQuery = true, nivelRespuestas = '' } = opts || {};
+
+  // Añade bloque de nivel de respuestas si está especificado (ej: 'simple' o
+  // 'detallado'). Esto permite adaptar el nivel de detalle al perfil del usuario.
+  const nivelRespuestasBlock = (() => {
+    if (!nivelRespuestas || typeof nivelRespuestas !== 'string') return '';
+    const nivel = nivelRespuestas.toLowerCase().trim();
+    if (nivel === 'simple') {
+      return `NIVEL DE RESPUESTA: SIMPLE (pasos concretos).
+- Responde con pasos claros y cortos, como hablar con un vecino.
+- Evita tecnicismos innecesarios.
+- Prioriza lo práctico: qué hacer, cuándo, cómo.
+- Usa unidades del campo: cuadra, arroba, luna, bike de agua, plaza.
+- Si necesitas explicar algo técnico, usa ejemplos de la finca.`;
+    }
+    if (nivel === 'detallado') {
+      return `NIVEL DE RESPUESTA: DETALLADO (más contexto técnico).
+- Puedes explicar el porqué de las recomendaciones.
+- Incluye referencias a fuentes técnicas cuando sea relevante.
+- Puedes mencionar conceptos técnicos si aclaras su significado.
+- Mantén el lenguaje accesible pero con más profundidad.`;
+    }
+    return '';
+  })();
 
   if (!finca) {
-    return generateSourceCitationRules() + '\n\n' + generateUserDataRules() + profileSuffix + veredaContext;
+    const blocks = [
+      generateSourceCitationRules(),
+      generateUserDataRules(),
+      nivelRespuestasBlock,
+      profileSuffix,
+      veredaContext,
+    ].filter((s) => s && s.trim());
+    return blocks.join('\n\n');
   }
 
   const bioculturalZone = finca.biocultural_zone;
@@ -501,7 +536,13 @@ export function buildProfileContext(finca, opts = {}) {
   const citationRules = generateSourceCitationRules();
   const userDataRules = generateUserDataRules();
 
-  return [toneContext, climateContext, citationRules, `${userDataRules}${profileSuffix}${veredaContext}`]
+  return [
+    toneContext,
+    climateContext,
+    citationRules,
+    nivelRespuestasBlock,
+    `${userDataRules}${profileSuffix}${veredaContext}`,
+  ]
     .filter((s) => s && s.trim())
     .join('\n\n');
 }
