@@ -78,6 +78,7 @@ export function estimateTokens(text) {
  */
 export const BLOCK_ORDER = [
   'base', // instrucciones + glosarios + perfil (protegido)
+  'maestro', // capa pedagógica MODO MAESTRO — PRIMER sacrificio bajo presupuesto
   'clima', // contexto ambiental — sacrificable en emergencia
   'finca', // contexto ambiental — sacrificable en emergencia
   'asociacion', // policultivo — sacrificable en emergencia
@@ -109,7 +110,7 @@ export const BLOCK_ORDER = [
 // finca — su altitud también la cita el bloque de viabilidad). El grounding
 // duro (evidencia, entidades, dosis curadas, cadena del grafo) y las guardas
 // NUNCA están aquí: jamás se recortan.
-const SACRIFICE_ORDER = ['corpus', 'memoria', 'asociacion', 'clima', 'frostHeat', 'finca'];
+const SACRIFICE_ORDER = ['maestro', 'corpus', 'memoria', 'asociacion', 'clima', 'frostHeat', 'finca'];
 
 const _normalize = (t) => (typeof t === 'string' ? t.replace(/^\n+|\n+$/g, '') : '');
 

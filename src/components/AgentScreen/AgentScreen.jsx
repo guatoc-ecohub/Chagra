@@ -74,7 +74,7 @@ import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../
 import { getCurrentTier } from '../../services/tierService';
 import DeepResearchCard from '../DeepResearchCard';
 import { normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildPriceAnswer, buildSuggestedEntitiesContext, isLowConfidenceEntity, buildFallbackResponse, pisoTermicoFromAltitud } from '../../services/agentService';
-import { buildBasePrompt, analyzeQuery, buildQueryAnalysisBlock, buildCorpusVariants, buildResolvedEntitiesBlock, formatToolEvidence, truncateEdgesBlock } from '../../services/agentPromptBase';
+import { buildBasePrompt, analyzeQuery, buildQueryAnalysisBlock, buildCorpusVariants, buildResolvedEntitiesBlock, formatToolEvidence, truncateEdgesBlock, MODO_MAESTRO_BLOCK } from '../../services/agentPromptBase';
 // Nubosidad real para el grounding (fix Choachí 2026-06) — solo lee caches.
 import { summarizeSkyForGrounding } from '../../services/skyConditionService';
 import { assembleSystemContent, TOP_N_RAG } from '../../services/promptAssembler';
@@ -1014,6 +1014,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     // ambiental; base, guardas y grounding son intocables.
     const assembled = assembleSystemContent({
       base: systemPrompt,
+      // MODO MAESTRO (capa pedagógica) — bloque SACRIFICABLE: es lo primero que
+      // cede bajo presión de presupuesto (variant a ''), antes que el corpus y
+      // mucho antes que el grounding/guardas. Enseña sin tocar anti-alucinación.
+      maestro: { variants: [MODO_MAESTRO_BLOCK, ''] },
       // Contexto AMBIENTAL sacrificable: si el prompt se pasa de presupuesto,
       // ENSO/alertas, asociaciones, riesgo térmico y el marco de finca ceden
       // ANTES que el grounding duro (variant a ''). La altitud de la finca la

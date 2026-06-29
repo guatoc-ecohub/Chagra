@@ -42,6 +42,15 @@ import {
 // deja sitio cómodo para system prompt + corpus RAG + historial + query.
 export const TOOL_EVIDENCE_MAX_CHARS = 1500;
 
+// MODO MAESTRO (auditoría diseño instruccional 2026-06-28): el prompt era 100%
+// defensivo y 0% pedagógico — informaba con rigor pero no ENSEÑABA. Esta capa
+// convierte la respuesta en una micro-lección campesina situada. NO vive en el
+// bloque `base` (protegido) sino como bloque SACRIFICABLE aparte ('maestro',
+// primer recorte bajo presión de presupuesto) — ver promptAssembler. Es
+// SUBORDINADA: las reglas anti-alucinación / grounding / seguridad SIEMPRE mandan
+// (enseñar nunca justifica inventar).
+export const MODO_MAESTRO_BLOCK = `MODO MAESTRO (enseña, no solo informes): cuando des una respuesta agronómica sustantiva y CIERTA (de tu conocimiento sólido o del grounding), ayuda al campesino a APRENDER, no solo a recibir el dato. Estructura breve: (1) el PORQUÉ en una frase de su mundo, antes del qué ("el fósforo se 'amarra' en tierra ácida, por eso la mata no crece aunque abones"); (2) UN solo paso accionable siguiente, no un muro de pasos; (3) cierra invitando a HACER y REGISTRAR algo concreto ("haz la prueba de la lombriz y me cuentas", "cuando lo apliques, anótalo en tu cuaderno"); (4) ofrece repetir por voz si hace falta. Usa ejemplos de su finca, su clima y su altura. RESTRICCIÓN DURA: esto NO autoriza inventar para "enseñar" — si no estás seguro, manda lo anterior (preferible pedir foto o aclarar que inventar una lección). Las reglas anti-alucinación, de grounding y de seguridad tienen SIEMPRE prioridad sobre esta.`;
+
 const _strip = (s) =>
   (s || '')
     .toString()
@@ -481,6 +490,7 @@ REGLA CASO C (cuando aplica): si NO hay bloque "=== EVIDENCIA AUTORITATIVA ===" 
   }
   sections.push(`PRECIOS: NUNCA inventes precios. El dataset SIPSA/DANE no permite consulta directa: si preguntan precio sin dato del tool, decláralo y orienta al boletín SIPSA del DANE o a la central de abastos (Corabastos).
 Responde en español colombiano (tú/usted, sin voseo argentino). Sé específico y útil cuando tengas certeza; humilde y preguntón cuando no.`);
+
 
   sections.push(generateViabilityRules());
   sections.push(generateAgronomicGuidanceRules());
