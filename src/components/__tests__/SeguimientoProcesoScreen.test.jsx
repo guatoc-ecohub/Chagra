@@ -2,8 +2,9 @@
 // SPDX-FileCopyrightText: 2026 Guatoc Eco Hub
 
 /* i18n (ADR-050): labels en español en aserciones de UI; regla soft (warn)
- * desactivada a nivel de archivo (mismo criterio que la pantalla). */
-/* eslint-disable chagra-i18n/no-hardcoded-spanish */
+ * desactivada a nivel de archivo (mismo criterio que la pantalla).
+ * NOTA: Este test verifica placeholders y valores de data que están en español
+ * porque corresponden a la UI real en español Colombia (ADR-050). */
 
 /**
  * SeguimientoProcesoScreen.test.jsx — vista de SEGUIMIENTO de un proceso de
@@ -186,5 +187,65 @@ describe('SeguimientoProcesoScreen', () => {
     render(<SeguimientoProcesoScreen procesoKey="reforestacion" onBack={vi.fn()} />);
     await waitFor(() => screen.getByText('Iniciar reforestación'));
     expect(screen.queryByText(/[Ll]eucaena/)).not.toBeInTheDocument();
+  });
+
+  test('el campo de raza de cerdo tiene un datalist con razas comunes y acepta texto libre', async () => {
+    processes = [{
+      process_id: 'proc-cerdos-3',
+      type: 'farm_process',
+      attributes: {
+        process_type: 'pigs',
+        subject_kind: 'aggregate',
+        subject_label: 'Lote de engorde',
+        quantity: 10,
+        unit: 'animales',
+        status: 'active',
+        current_stage: 'instalacion',
+        created_at: Date.now(),
+        updated_at: Date.now(),
+        pig_cochera: { nombre: 'Cochera Test', ubicacion: 'Test', capacidad: 20, cama_profunda: 'cascarilla_de_arroz' },
+        pig_lotes: [],
+      },
+    }];
+
+    const { container } = render(<SeguimientoProcesoScreen procesoKey="cerdos" onBack={vi.fn()} onSave={vi.fn()} />);
+    await waitFor(() => screen.getByText('Lote de engorde'));
+    fireEvent.click(screen.getByText('Lote de engorde'));
+
+    // Verificar que existe el datalist con las razas esperadas
+    const datalist = container.querySelector('#razas-cerdos');
+    expect(datalist).toBeInTheDocument();
+
+    const options = datalist.querySelectorAll('option');
+    expect(options.length).toBe(10);
+
+    const razasEsperadas = [
+      'Yorkshire (Large White)',
+      'Landrace',
+      'Duroc',
+      'Pietrain',
+      'Hampshire',
+      'Criollo Zungo costeño',
+      'San Pedreño',
+      'Casco de Mula',
+      'Yorkshire x Landrace',
+      'Landrace x Duroc',
+    ];
+
+    options.forEach((option, i) => {
+      expect(option.getAttribute('value')).toBe(razasEsperadas[i]);
+    });
+
+    // Verificar que el input acepta texto libre (razas no listadas)
+    const inputRaza = screen.getByPlaceholderText('Raza');
+    expect(inputRaza).toBeInTheDocument();
+
+    // Simular selección de una raza del datalist
+    fireEvent.change(inputRaza, { target: { value: 'Landrace' } });
+    expect(inputRaza.value).toBe('Landrace');
+
+    // Simular entrada de una raza personalizada (texto libre)
+    fireEvent.change(inputRaza, { target: { value: 'Raza custom no listada' } });
+    expect(inputRaza.value).toBe('Raza custom no listada');
   });
 });

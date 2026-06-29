@@ -69,6 +69,17 @@
   --t-bg-rgb: 251, 245, 234;     /* crema */
 }
 
+/* VERDE VIVO — la piel de la finca viva: acento VERDE-HOJA vivo (#2e8b3d) para
+ * el botón enviar/wordmark/halo, con matices más profundos para el wordmark y
+ * el hint (AA sobre la crema frondosa). El --t-bg-rgb es el crema verdoso del
+ * tema (para el agujero del halo del agente). */
+[data-theme="verde-vivo"] {
+  --t-accent-rgb: 46, 139, 61;   /* verde vivo frondoso (#2e8b3d) */
+  --t-accent-strong-rgb: 34, 102, 44;   /* verde profundo (wordmark) */
+  --t-accent-deep-rgb: 34, 84, 40;      /* verde bosque (hint/marca) */
+  --t-bg-rgb: 238, 243, 226;     /* crema frondosa del tema */
+}
+
 /* ===========================================================================
  * 0b. ELEMENTOS DE MARCA con el acento del tema (botón enviar + wordmark).
  *    Antes usaban un degradé lime/emerald fijo (no theme-aware en `lime`) → se
@@ -82,8 +93,10 @@
   background-color: rgb(var(--t-accent-rgb)) !important;
   color: #04231b !important;  /* tinta oscura — AA sobre teal/ocre claros */
 }
-/* Sobre acentos oscuros (verde minimalista) la tinta oscura no contrasta → blanco */
-[data-theme="minimalista"] .agent-send-accent {
+/* Sobre acentos oscuros (verde minimalista / verde-vivo) la tinta oscura no
+   contrasta → blanco */
+[data-theme="minimalista"] .agent-send-accent,
+[data-theme="verde-vivo"] .agent-send-accent {
   color: #fff !important;
 }
 
@@ -214,7 +227,8 @@
   color: rgb(var(--c-slate-100));
 }
 
-[data-theme="minimalista"] .onboarding-piso-primary {
+[data-theme="minimalista"] .onboarding-piso-primary,
+[data-theme="verde-vivo"] .onboarding-piso-primary {
   color: #fff;
 }
 
@@ -263,7 +277,8 @@
   z-index: -1;
 }
 [data-theme="nature"] .agent-immersive-topbar::before,
-[data-theme="minimalista"] .agent-immersive-topbar::before {
+[data-theme="minimalista"] .agent-immersive-topbar::before,
+[data-theme="verde-vivo"] .agent-immersive-topbar::before{
   background: linear-gradient(180deg, rgb(var(--c-surface-raised) / 0.7) 0%, rgb(var(--c-surface-raised) / 0) 100%);
 }
 
@@ -276,12 +291,14 @@
  * =========================================================================== */
 
 [data-theme="nature"] .login-bg-photo,
-[data-theme="minimalista"] .login-bg-photo {
+[data-theme="minimalista"] .login-bg-photo,
+[data-theme="verde-vivo"] .login-bg-photo{
   display: none !important;
 }
 
 [data-theme="nature"] .bg-biopunk-pattern,
-[data-theme="minimalista"] .bg-biopunk-pattern {
+[data-theme="minimalista"] .bg-biopunk-pattern,
+[data-theme="verde-vivo"] .bg-biopunk-pattern{
   background-image: none !important;
 }
 
@@ -295,7 +312,8 @@
  * =========================================================================== */
 
 [data-theme="nature"] .chagra-hero-halo,
-[data-theme="minimalista"] .chagra-hero-halo {
+[data-theme="minimalista"] .chagra-hero-halo,
+[data-theme="verde-vivo"] .chagra-hero-halo{
   background: conic-gradient(
     from 0deg,
     rgba(var(--t-accent-rgb), 0.42),
@@ -306,7 +324,8 @@
 }
 
 [data-theme="nature"] .chagra-hero-halo-inner,
-[data-theme="minimalista"] .chagra-hero-halo-inner {
+[data-theme="minimalista"] .chagra-hero-halo-inner,
+[data-theme="verde-vivo"] .chagra-hero-halo-inner{
   background: radial-gradient(
     circle,
     rgba(var(--t-bg-rgb), 0) 50%,
@@ -338,7 +357,14 @@
 [data-theme="nature"] .bg-sky-950\/40,
 [data-theme="nature"] .bg-orange-950\/40,
 [data-theme="nature"] .bg-violet-950\/40,
-[data-theme="nature"] .bg-yellow-950\/40 {
+[data-theme="nature"] .bg-yellow-950\/40,
+[data-theme="verde-vivo"] .bg-cyan-950\/40,
+[data-theme="verde-vivo"] .bg-lime-950\/40,
+[data-theme="verde-vivo"] .bg-fuchsia-950\/40,
+[data-theme="verde-vivo"] .bg-sky-950\/40,
+[data-theme="verde-vivo"] .bg-orange-950\/40,
+[data-theme="verde-vivo"] .bg-violet-950\/40,
+[data-theme="verde-vivo"] .bg-yellow-950\/40{
   background-color: rgb(var(--c-surface-raised)) !important;
 }
 
@@ -355,7 +381,14 @@
 [data-theme="nature"] .border-sky-800\/60,
 [data-theme="nature"] .border-orange-800\/60,
 [data-theme="nature"] .border-violet-800\/60,
-[data-theme="nature"] .border-yellow-800\/60 {
+[data-theme="nature"] .border-yellow-800\/60,
+[data-theme="verde-vivo"] .border-cyan-800\/60,
+[data-theme="verde-vivo"] .border-lime-800\/60,
+[data-theme="verde-vivo"] .border-fuchsia-800\/60,
+[data-theme="verde-vivo"] .border-sky-800\/60,
+[data-theme="verde-vivo"] .border-orange-800\/60,
+[data-theme="verde-vivo"] .border-violet-800\/60,
+[data-theme="verde-vivo"] .border-yellow-800\/60{
   border-color: rgb(var(--c-surface-border)) !important;
 }
 
@@ -381,7 +414,15 @@
 [data-theme="nature"] .text-orange-300,
 [data-theme="nature"] .text-violet-300,
 [data-theme="nature"] .text-violet-400,
-[data-theme="nature"] .text-yellow-300 {
+[data-theme="nature"] .text-yellow-300,
+[data-theme="verde-vivo"] .text-cyan-300,
+[data-theme="verde-vivo"] .text-lime-300,
+[data-theme="verde-vivo"] .text-fuchsia-300,
+[data-theme="verde-vivo"] .text-sky-300,
+[data-theme="verde-vivo"] .text-orange-300,
+[data-theme="verde-vivo"] .text-violet-300,
+[data-theme="verde-vivo"] .text-violet-400,
+[data-theme="verde-vivo"] .text-yellow-300{
   color: rgb(var(--c-emerald-700)) !important;  /* verde profundo cálido (AA) */
   text-shadow: none !important;
 }
@@ -412,7 +453,9 @@
 [data-theme="minimalista"] [data-testid="altitude-badge"],
 [data-theme="nature"] [data-testid="altitude-badge"],
 [data-theme="minimalista"] [data-testid="ai-beta-badge"][data-confidence-level="low"],
-[data-theme="nature"] [data-testid="ai-beta-badge"][data-confidence-level="low"] {
+[data-theme="nature"] [data-testid="ai-beta-badge"][data-confidence-level="low"],
+[data-theme="verde-vivo"] [data-testid="altitude-badge"],
+[data-theme="verde-vivo"] [data-testid="ai-beta-badge"][data-confidence-level="low"]{
   background-color: rgb(var(--c-surface-raised)) !important;
   border-color: rgb(var(--c-surface-border)) !important;
 }
@@ -426,7 +469,9 @@
   text-shadow: none !important;
 }
 [data-theme="nature"] [data-testid="altitude-badge"],
-[data-theme="nature"] [data-testid="ai-beta-badge"][data-confidence-level="low"] {
+[data-theme="nature"] [data-testid="ai-beta-badge"][data-confidence-level="low"],
+[data-theme="verde-vivo"] [data-testid="altitude-badge"],
+[data-theme="verde-vivo"] [data-testid="ai-beta-badge"][data-confidence-level="low"]{
   color: rgb(var(--c-emerald-700)) !important;  /* verde profundo cálido (AA) */
   text-shadow: none !important;
 }
@@ -443,7 +488,8 @@
 
 /* Superficie: matar el gradiente sky/indigo → tarjeta del tema */
 [data-theme="nature"] .from-sky-950\/70,
-[data-theme="minimalista"] .from-sky-950\/70 {
+[data-theme="minimalista"] .from-sky-950\/70,
+[data-theme="verde-vivo"] .from-sky-950\/70{
   background-image: none !important;
   background-color: rgb(var(--c-surface-card)) !important;
 }
@@ -452,13 +498,16 @@
 [data-theme="nature"] .border-sky-800\/40,
 [data-theme="nature"] .border-sky-500\/40,
 [data-theme="minimalista"] .border-sky-800\/40,
-[data-theme="minimalista"] .border-sky-500\/40 {
+[data-theme="minimalista"] .border-sky-500\/40,
+[data-theme="verde-vivo"] .border-sky-800\/40,
+[data-theme="verde-vivo"] .border-sky-500\/40{
   border-color: rgb(var(--c-surface-border)) !important;
 }
 
 /* Texto sky claro → tinta del tema (AA sobre crema/papel) */
 [data-theme="nature"] .text-sky-200,
-[data-theme="minimalista"] .text-sky-200 {
+[data-theme="minimalista"] .text-sky-200,
+[data-theme="verde-vivo"] .text-sky-200{
   color: rgb(var(--c-slate-100)) !important;
 }
 
@@ -466,7 +515,9 @@
 [data-theme="nature"] .bg-sky-700\/30,
 [data-theme="nature"] .bg-sky-600\/40,
 [data-theme="minimalista"] .bg-sky-700\/30,
-[data-theme="minimalista"] .bg-sky-600\/40 {
+[data-theme="minimalista"] .bg-sky-600\/40,
+[data-theme="verde-vivo"] .bg-sky-700\/30,
+[data-theme="verde-vivo"] .bg-sky-600\/40{
   background-color: rgb(var(--t-accent-rgb)) !important;
   color: #fff !important;
 }
@@ -484,7 +535,14 @@
 [data-theme="nature"] .bg-sky-500,
 [data-theme="nature"] .bg-orange-500,
 [data-theme="nature"] .bg-violet-500,
-[data-theme="nature"] .bg-yellow-500 {
+[data-theme="nature"] .bg-yellow-500,
+[data-theme="verde-vivo"] .bg-cyan-500,
+[data-theme="verde-vivo"] .bg-lime-500,
+[data-theme="verde-vivo"] .bg-fuchsia-500,
+[data-theme="verde-vivo"] .bg-sky-500,
+[data-theme="verde-vivo"] .bg-orange-500,
+[data-theme="verde-vivo"] .bg-violet-500,
+[data-theme="verde-vivo"] .bg-yellow-500{
   background-color: rgb(var(--c-emerald-400)) !important;
 }
 
@@ -506,13 +564,16 @@
 
 /* Texto blanco → tinta legible del tema (slate-100 ya es tinta en claro). */
 [data-theme="minimalista"] .text-white,
-[data-theme="nature"] .text-white {
+[data-theme="nature"] .text-white,
+[data-theme="verde-vivo"] .text-white{
   color: rgb(var(--c-slate-100)) !important;
 }
 [data-theme="minimalista"] .text-white\/70,
 [data-theme="minimalista"] .text-white\/60,
 [data-theme="nature"] .text-white\/70,
-[data-theme="nature"] .text-white\/60 {
+[data-theme="nature"] .text-white\/60,
+[data-theme="verde-vivo"] .text-white\/70,
+[data-theme="verde-vivo"] .text-white\/60{
   color: rgb(var(--c-slate-300)) !important; /* secundario, un punto más suave */
 }
 
@@ -528,7 +589,11 @@
 [data-theme="nature"] .bg-emerald-500.text-white,
 [data-theme="nature"] .bg-emerald-600.text-white,
 [data-theme="nature"] .bg-sky-500.text-white,
-[data-theme="nature"] .bg-muzo.text-white {
+[data-theme="nature"] .bg-muzo.text-white,
+[data-theme="verde-vivo"] .bg-emerald-500.text-white,
+[data-theme="verde-vivo"] .bg-emerald-600.text-white,
+[data-theme="verde-vivo"] .bg-sky-500.text-white,
+[data-theme="verde-vivo"] .bg-muzo.text-white{
   color: #fff !important;
 }
 
@@ -549,16 +614,77 @@
 [data-theme="nature"] .text-amber-200,
 [data-theme="nature"] .text-amber-300,
 [data-theme="nature"] .text-amber-400,
-[data-theme="nature"] .text-amber-500 {
+[data-theme="nature"] .text-amber-500,
+[data-theme="verde-vivo"] .text-amber-100,
+[data-theme="verde-vivo"] .text-amber-200,
+[data-theme="verde-vivo"] .text-amber-300,
+[data-theme="verde-vivo"] .text-amber-400,
+[data-theme="verde-vivo"] .text-amber-500{
   color: rgb(160, 76, 20) !important;
   text-shadow: none !important;
 }
+
+/* ───────────────────────────────────────────────────────────────────────────
+ * PILLS/CHIPS TENUES en temas claros (audit Bug 4, P3): los chips de leyenda del
+ * Calendario (Siembra/Cosecha/Nutrición/Fenología/Sanidad) usan texto
+ * `text-{teal,emerald,violet,rose}-200` (muy claro) sobre un relleno
+ * `bg-{color}-500/20` → en los 3 temas claros quedaba claro-sobre-claro (~1.2:1).
+ * En biopunk (oscuro, sin data-theme) se ven bien y NO se tocan.
+ *
+ * Subimos el texto al tono -800 del color (5.5–6.9:1 sobre el relleno) y ALIGERAMOS
+ * el relleno (de /20 a /14) para que el tono profundo respire. Conserva la
+ * SEMÁNTICA de color de cada capa (sigue leyéndose teal/verde/violeta/rosa/ámbar).
+ * Solo afecta a estos chips por la combinación de clases; el resto de la app que
+ * use estos colores ya tenía sus propias reglas. */
+[data-theme="nature"] .text-teal-200,
+[data-theme="minimalista"] .text-teal-200,
+[data-theme="verde-vivo"] .text-teal-200{ color: rgb(17 94 89) !important; text-shadow: none !important; }
+[data-theme="nature"] .text-emerald-200,
+[data-theme="minimalista"] .text-emerald-200,
+[data-theme="verde-vivo"] .text-emerald-200{ color: rgb(22 101 52) !important; text-shadow: none !important; }
+[data-theme="nature"] .text-violet-200,
+[data-theme="minimalista"] .text-violet-200,
+[data-theme="verde-vivo"] .text-violet-200{ color: rgb(91 33 182) !important; text-shadow: none !important; }
+[data-theme="nature"] .text-rose-200,
+[data-theme="minimalista"] .text-rose-200,
+[data-theme="verde-vivo"] .text-rose-200{ color: rgb(159 18 57) !important; text-shadow: none !important; }
+/* Relleno de los chips de leyenda (bg-{color}-500/20) → /14: más papel, el tono
+ * -800 del texto destaca. (text-amber-200 ya lo cubre la regla de arriba.) */
+[data-theme="nature"] .bg-teal-500\/20,
+[data-theme="minimalista"] .bg-teal-500\/20,
+[data-theme="verde-vivo"] .bg-teal-500\/20{ background-color: rgb(20 184 166 / 0.14) !important; }
+[data-theme="nature"] .bg-emerald-500\/20,
+[data-theme="minimalista"] .bg-emerald-500\/20,
+[data-theme="verde-vivo"] .bg-emerald-500\/20{ background-color: rgb(16 185 129 / 0.14) !important; }
+[data-theme="nature"] .bg-violet-500\/20,
+[data-theme="minimalista"] .bg-violet-500\/20,
+[data-theme="verde-vivo"] .bg-violet-500\/20{ background-color: rgb(139 92 246 / 0.14) !important; }
+[data-theme="nature"] .bg-rose-500\/20,
+[data-theme="minimalista"] .bg-rose-500\/20,
+[data-theme="verde-vivo"] .bg-rose-500\/20{ background-color: rgb(244 63 94 / 0.14) !important; }
+[data-theme="nature"] .bg-amber-500\/20,
+[data-theme="minimalista"] .bg-amber-500\/20,
+[data-theme="verde-vivo"] .bg-amber-500\/20{ background-color: rgb(245 158 11 / 0.14) !important; }
+
+/* Pill "en preparación" del FAQ (text-amber-400/70 sobre bg-amber-400/10): el
+ * alpha /70 la dejaba fantasmal en claros. La afirmamos al ámbar profundo del
+ * tema (color sólido, sin el /70) y reforzamos su relleno para que el chip se
+ * distinga del fondo. El modificador de opacidad /70 es una clase aparte
+ * (.text-amber-400\/70), no la cubre la regla .text-amber-400 de arriba. */
+[data-theme="nature"] .text-amber-400\/70,
+[data-theme="minimalista"] .text-amber-400\/70,
+[data-theme="verde-vivo"] .text-amber-400\/70{ color: rgb(160 76 20) !important; text-shadow: none !important; }
+[data-theme="nature"] .bg-amber-400\/10,
+[data-theme="minimalista"] .bg-amber-400\/10,
+[data-theme="verde-vivo"] .bg-amber-400\/10{ background-color: rgb(245 158 11 / 0.16) !important; }
 
 /* Bordes blancos (sólidos y con opacidad) → línea sutil del tema. */
 [data-theme="minimalista"] .border-white,
 [data-theme="minimalista"] [class*="border-white\/"],
 [data-theme="nature"] .border-white,
-[data-theme="nature"] [class*="border-white\/"] {
+[data-theme="nature"] [class*="border-white\/"],
+[data-theme="verde-vivo"] .border-white,
+[data-theme="verde-vivo"] [class*="border-white\/"]{
   border-color: rgb(var(--c-surface-border)) !important;
 }
 
@@ -567,7 +693,8 @@
  * se distingue del fondo crema en vez de desaparecer. NO tocamos `bg-white`
  * SÓLIDO (sin barra de opacidad) que es la card clara correcta. */
 [data-theme="minimalista"] [class*="bg-white\/"],
-[data-theme="nature"] [class*="bg-white\/"] {
+[data-theme="nature"] [class*="bg-white\/"],
+[data-theme="verde-vivo"] [class*="bg-white\/"]{
   background-color: rgb(var(--c-surface-raised) / 0.55) !important;
 }
 
@@ -621,7 +748,8 @@ html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
   border-color: rgb(var(--c-emerald-600) / 0.5);
 }
 [data-theme="minimalista"] .glaciar-estado-estable,
-[data-theme="nature"] .glaciar-estado-estable {
+[data-theme="nature"] .glaciar-estado-estable,
+[data-theme="verde-vivo"] .glaciar-estado-estable{
   background-color: rgb(var(--c-emerald-200) / 0.4);
   border-color: rgb(var(--c-emerald-500) / 0.6);
 }
@@ -631,7 +759,8 @@ html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
   border-color: rgb(var(--c-amber-600) / 0.5);
 }
 [data-theme="minimalista"] .glaciar-estado-precaucion,
-[data-theme="nature"] .glaciar-estado-precaucion {
+[data-theme="nature"] .glaciar-estado-precaucion,
+[data-theme="verde-vivo"] .glaciar-estado-precaucion{
   background-color: rgb(var(--c-amber-200) / 0.4);
   border-color: rgb(var(--c-amber-500) / 0.6);
 }
@@ -641,7 +770,8 @@ html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
   border-color: rgb(var(--c-emerald-500) / 0.6);
 }
 [data-theme="minimalista"] .glaciar-estado-peligro,
-[data-theme="nature"] .glaciar-estado-peligro {
+[data-theme="nature"] .glaciar-estado-peligro,
+[data-theme="verde-vivo"] .glaciar-estado-peligro{
   background-color: rgb(254 226 226 / 0.55);
   border-color: rgb(239 68 68 / 0.7);
 }
@@ -651,7 +781,8 @@ html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
   border-color: rgb(var(--c-morpho) / 0.5);
 }
 [data-theme="minimalista"] .glaciar-estado-observacion,
-[data-theme="nature"] .glaciar-estado-observacion {
+[data-theme="nature"] .glaciar-estado-observacion,
+[data-theme="verde-vivo"] .glaciar-estado-observacion{
   background-color: rgb(var(--c-morpho) / 0.15);
   border-color: rgb(var(--c-morpho) / 0.5);
 }
@@ -662,7 +793,8 @@ html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
   border-color: rgb(var(--c-morpho-glow) / 0.7);
 }
 [data-theme="minimalista"] .glaciar-dureza-mano,
-[data-theme="nature"] .glaciar-dureza-mano {
+[data-theme="nature"] .glaciar-dureza-mano,
+[data-theme="verde-vivo"] .glaciar-dureza-mano{
   background-color: rgb(var(--c-emerald-200) / 0.5);
   border-color: rgb(var(--c-emerald-500) / 0.6);
 }
@@ -672,7 +804,8 @@ html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
   border-color: rgb(var(--c-orchid-glow) / 0.7);
 }
 [data-theme="minimalista"] .glaciar-dureza-piolet,
-[data-theme="nature"] .glaciar-dureza-piolet {
+[data-theme="nature"] .glaciar-dureza-piolet,
+[data-theme="verde-vivo"] .glaciar-dureza-piolet{
   background-color: rgb(var(--c-emerald-300) / 0.5);
   border-color: rgb(var(--c-emerald-600) / 0.6);
 }
@@ -682,7 +815,8 @@ html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
   color: rgb(var(--c-slate-100));
 }
 [data-theme="minimalista"] .glaciar-estado-texto,
-[data-theme="nature"] .glaciar-estado-texto {
+[data-theme="nature"] .glaciar-estado-texto,
+[data-theme="verde-vivo"] .glaciar-estado-texto{
   color: rgb(var(--c-slate-200));
 }
 
@@ -706,7 +840,8 @@ html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
 
 /* Pastilla del compositor → superficie clara del tema (= --superf del demo). */
 [data-theme="nature"] .as-bar,
-[data-theme="minimalista"] .as-bar {
+[data-theme="minimalista"] .as-bar,
+[data-theme="verde-vivo"] .as-bar{
   background: rgb(var(--c-surface-raised) / 0.97);
   border-color: rgb(var(--c-surface-border));
   box-shadow: 0 10px 30px -14px rgba(0, 0, 0, 0.22);
@@ -714,18 +849,21 @@ html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
 /* Texto que escribe el productor: el textarea es text-white (invisible sobre
  * crema). En claros = café/tinta del tema. El placeholder ya sale de --c-*. */
 [data-theme="nature"] .as-bar textarea,
-[data-theme="minimalista"] .as-bar textarea {
+[data-theme="minimalista"] .as-bar textarea,
+[data-theme="verde-vivo"] .as-bar textarea{
   color: rgb(var(--c-slate-100));
 }
 /* Botones de ícono del compositor → blanco/papel con ícono café del tema. */
 [data-theme="nature"] .as-iconbtn,
-[data-theme="minimalista"] .as-iconbtn {
+[data-theme="minimalista"] .as-iconbtn,
+[data-theme="verde-vivo"] .as-iconbtn{
   background: rgb(var(--c-surface-card));
   border-color: rgb(var(--c-surface-border));
   color: rgb(var(--c-slate-300));
 }
 [data-theme="nature"] .as-iconbtn:hover,
-[data-theme="minimalista"] .as-iconbtn:hover {
+[data-theme="minimalista"] .as-iconbtn:hover,
+[data-theme="verde-vivo"] .as-iconbtn:hover{
   color: rgb(var(--c-slate-100));
   border-color: rgb(var(--t-accent-rgb) / 0.55);
 }
@@ -733,7 +871,8 @@ html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
 /* ContextTip ("¿Una mata enferma? Mándeme una foto") — tarjeta clara del tema
  * en vez del verde-oscuro Tailwind (no hay --c-emerald-950 en claros). */
 [data-theme="nature"] .bg-emerald-950\/50,
-[data-theme="minimalista"] .bg-emerald-950\/50 {
+[data-theme="minimalista"] .bg-emerald-950\/50,
+[data-theme="verde-vivo"] .bg-emerald-950\/50{
   background-color: rgb(var(--c-surface-raised) / 0.92) !important;
   border-color: rgb(var(--c-emerald-400) / 0.5) !important;
 }
@@ -741,6 +880,7 @@ html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
  * blanco de Tailwind, ilegible sobre la tarjeta clara). En claros = verde
  * profundo del tema, que sí pasa AA sobre la crema. */
 [data-theme="nature"] .bg-emerald-950\/50 .text-emerald-100,
-[data-theme="minimalista"] .bg-emerald-950\/50 .text-emerald-100 {
+[data-theme="minimalista"] .bg-emerald-950\/50 .text-emerald-100,
+[data-theme="verde-vivo"] .bg-emerald-950\/50 .text-emerald-100{
   color: rgb(var(--c-emerald-700));
 }

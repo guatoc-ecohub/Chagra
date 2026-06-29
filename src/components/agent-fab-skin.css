@@ -1,0 +1,50 @@
+/* ============================================================================
+   agent-fab-skin.css — PIEL POR TEMA del FAB del agente (el colibrí flotante),
+   Fase 2 de la integración de temas (operador 2026-06-25).
+
+   El FAB hoy es una FOTO fija (avatar colibrí) idéntica en todos los temas. El
+   operador pidió que cambie de piel por tema (me dio latitud). Solución limpia:
+   conservamos el AVATAR que el usuario eligió en su preferencia
+   (chagra:agent-avatar-type) — NO lo tocamos — y retiñimos solo la CHROME del
+   botón (plinto/borde/glow) para que combine con el tema activo. Así la piel
+   cambia por tema sin pisar la preferencia del usuario ni el contenido del
+   avatar.
+
+   GATE (innegociable): TODO va scopeado bajo `.fvh-skin.chagra-fab` — la clase
+   `fvh-skin` SOLO se aplica con la flag VITE_FINCA_VIVA_HOME_PERFIL ON (dev).
+   Con la flag OFF (prod), la clase NO se monta → estos overrides no aplican y
+   el FAB queda EXACTO como hoy (plinto navy + glow esmeralda biopunk). Por eso
+   usamos !important: vencen los estilos inline del componente, pero solo bajo
+   `.fvh-skin` → seguro y reversible.
+
+   Los 4 temas leen --c-* / --t-accent-rgb (index.css/themes.css). biopunk-base
+   y verde-vivo conservan el look vivo; nature/minimalista van a su plinto claro.
+
+   Español de Colombia (tú/usted), sin voseo. Offline-first (CSS puro).
+   ========================================================================== */
+
+/* Plinto + borde del FAB por el acento del tema. El plinto es un radial sutil
+   de la superficie del tema; el borde, el acento. */
+.fvh-skin.chagra-fab {
+  background:
+    radial-gradient(circle at 30% 25%,
+      rgb(var(--c-surface-card, 30 41 59)) 0%,
+      rgb(var(--c-surface, 15 23 42)) 72%) !important;
+  border: 2px solid rgb(var(--t-accent-rgb, 16 185 129) / 0.55) !important;
+  box-shadow:
+    0 4px 16px rgb(var(--scrim-bg, 0 0 0) / 0.4),
+    0 0 14px rgb(var(--t-accent-rgb, 16 185 129) / 0.35) !important;
+}
+
+/* Hover: el plinto se realza con un toque más del acento del tema. */
+.fvh-skin.chagra-fab.is-hover {
+  box-shadow:
+    0 6px 22px rgb(var(--scrim-bg, 0 0 0) / 0.5),
+    0 0 22px rgb(var(--t-accent-rgb, 16 185 129) / 0.6) !important;
+}
+
+/* "Respuesta lista": anillo ámbar de aviso (igual semántica en todos los temas
+   para que el aviso sea reconocible; el ámbar ya retiñe vía --c-amber-400). */
+.fvh-skin.chagra-fab.is-ready {
+  border-color: rgb(var(--c-amber-400, 251 191 36) / 0.8) !important;
+}

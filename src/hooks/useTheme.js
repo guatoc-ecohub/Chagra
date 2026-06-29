@@ -11,6 +11,11 @@ import { useEffect, useState, useCallback } from 'react';
  *                           Es el estilo BASE de la app → NO escribe data-theme.
  *   - nature              → cálido botánico (terracota/salvia/ocre).
  *   - minimalista         → limpio, crema, monoline verde #2f6e5a.
+ *   - verde-vivo          → la PIEL propia de la finca viva: verde frondoso +
+ *                           sol cálido + tierra/ocre (identidad Chagra). SOLO
+ *                           visible en el selector con la flag de finca viva ON
+ *                           (VITE_FINCA_VIVA_HOME_PERFIL); con la flag OFF el
+ *                           selector muestra EXACTO los 3 temas de hoy.
  *
  * Más un modo `auto` que alterna entre minimalista (día) y bio-punk (noche).
  *
@@ -49,8 +54,42 @@ export const THEMES = Object.freeze([
   }),
 ]);
 
-/** Ids válidos seleccionables (los 3 temas curados + auto). */
-export const THEME_IDS = Object.freeze(THEMES.map((t) => t.id));
+/**
+ * VERDE VIVO — 4º tema, la PIEL propia de la finca viva. NO va en `THEMES`
+ * (el catálogo base de los 3 temas + auto que ve todo el mundo): es un tema
+ * gateado tras la flag de finca viva. El selector lo añade SOLO cuando la flag
+ * está ON (ver getSelectableThemes); con la flag OFF, el selector es EXACTO el
+ * de hoy (3 temas + auto). Su id sí es válido siempre en THEME_IDS para que una
+ * selección persistida sobreviva y applyTheme la pueda escribir.
+ */
+export const VERDE_VIVO_THEME = Object.freeze({
+  id: 'verde-vivo',
+  label: 'Verde Vivo',
+  desc: 'Verde frondoso, sol cálido y tierra — la piel de tu finca viva.',
+});
+
+/**
+ * Ids válidos seleccionables (los 3 temas curados + auto + verde-vivo). El 4º
+ * tema es id VÁLIDO siempre (normalizeTheme/setTheme lo aceptan) aunque su
+ * VISIBILIDAD en el selector dependa de la flag de finca viva.
+ */
+export const THEME_IDS = Object.freeze([
+  ...THEMES.map((t) => t.id),
+  VERDE_VIVO_THEME.id,
+]);
+
+/**
+ * Catálogo de temas VISIBLES en el selector según la flag de finca viva.
+ * Con la flag ON (dev) aparece el 4º tema "Verde Vivo" al final; con la flag
+ * OFF (prod) devuelve EXACTO los 3 temas + auto de hoy — sin cambios para el
+ * usuario de producción.
+ *
+ * @param {boolean} fincaVivaOn  resultado de fincaVivaHomePerfilActivo().
+ * @returns {ReadonlyArray<{id:string,label:string,desc:string}>}
+ */
+export function getSelectableThemes(fincaVivaOn) {
+  return fincaVivaOn ? [...THEMES, VERDE_VIVO_THEME] : THEMES;
+}
 
 /**
  * Normaliza un id persistido: cualquier valor desconocido o legado

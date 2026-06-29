@@ -164,8 +164,8 @@ export default function HelpDictionary({ onBackToHome }) {
           {filtered.length === 0 && (
             <div className="rounded-xl bg-slate-900/60 border border-slate-800 p-6 text-center text-slate-400">
               <p className="text-sm leading-relaxed">
-                No encontré ese término. ¿Te falta uno importante? Cuéntamelo con el botón flotante 💬
-                — el diccionario crece con tu uso.
+                No encontré ese término. ¿Te falta uno importante? Cuéntamelo en
+                &ldquo;Cómo usar Chagra → Reportar problema&rdquo; — el diccionario crece con tu uso.
               </p>
             </div>
           )}
@@ -337,7 +337,7 @@ export default function HelpDictionary({ onBackToHome }) {
         {/* Footer educativo */}
         <p className="text-[11px] text-slate-600 text-center mt-6 italic leading-relaxed">
           Diccionario v1 · {DICTIONARY.length} términos · Curado con fuentes verificables — sin alucinaciones.<br />
-          Si te falta un término, pídelo con el botón flotante 💬.
+          Si te falta un término, pídelo en &ldquo;Cómo usar Chagra → Reportar problema&rdquo;.
         </p>
       </main>
     </div>

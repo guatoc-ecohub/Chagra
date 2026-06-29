@@ -1,14 +1,21 @@
 name: Deploy Chagra PWA (DEV)
 
-# Deploy automatico a entorno DEV en alpha para ramas dev/*, feat/*, fix/*.
+# Deploy automatico a entorno DEV en alpha para la rama de preview designada.
 # Target: /mnt/fast/appdata/farmos-pwa-dev. Concurrency por branch
 # (cancel-in-progress: true) para que pushes rapidos a la misma rama solo
 # deplieguen el ultimo build. Sin lint step (a diferencia de prod/QA), para
 # iteracion rapida.
+#
+# IMPORTANTE: este workflow ya NO dispara en cada feat/*|fix/*. Antes lo hacia
+# y TODAS las ramas de feature deployaban al MISMO target farmos-pwa-dev,
+# pisandose entre si (stomping) -> el index.html de una rama quedaba sirviendo
+# assets /assets/*.js|css de otra que ya no existian -> pantalla negra. Ahora
+# solo la rama de preview ('dev' / 'dev/*') auto-deploya. Para previsualizar
+# una feature en dev, mergeala a la rama de preview.
 
 on:
   push:
-    branches: ['dev/*', 'feat/*', 'fix/*']
+    branches: ['dev', 'dev/*']
     paths-ignore:
       - '**.md'
       - 'LICENSE'
@@ -45,6 +52,11 @@ jobs:
           VITE_FARMOS_CLIENT_ID: farm
           VITE_HA_ACCESS_TOKEN: ${{ secrets.VITE_HA_ACCESS_TOKEN }}
           VITE_USE_SIDECAR_AGRO_MCP: "true"
+          VITE_FINCA_VIVA_HOME_PERFIL: "true"
+          # Colibrí REAL (barbudito de páramo por sprite) en home + FAB +
+          # transición. Dev-only para revisión del operador; AUSENTE en
+          # deploy.yml (prod) → prod conserva el colibrí 2D / video actual.
+          VITE_COLIBRI: "true"
           VITE_CHAGRA_MCP_TOKEN: ${{ secrets.VITE_CHAGRA_MCP_TOKEN }}
 
       - if: env.SKIP_DEPLOY != '1'
@@ -66,7 +78,14 @@ jobs:
           #   2) sincronizar /assets/ SIN --delete (agregar chunks nuevos,
           #      conservar viejos; los hashes no colisionan).
           #   3) GC de chunks con mtime > 30 dias para no crecer infinito.
-          rsync -avzO --no-perms --delete --no-group --chmod=F644 --exclude='/assets/' dist/ "$TARGET/"
+          #
+          # --exclude='/mockups/': el dir mockups/ del target NO es
+          # group-writable y NO viene en dist/. Sin excluirlo, rsync intenta
+          # tocar sus permisos/borrarlo con --delete y aborta con exit 23
+          # (partial transfer) -> deploy PARCIAL -> index.html referencia
+          # assets que nunca se copiaron -> pantalla negra. Lo dejamos intacto.
+          rsync -avzO --no-perms --delete --no-group --chmod=F644 \
+            --exclude='/assets/' --exclude='/mockups/' dist/ "$TARGET/"
           rsync -avzO --no-perms --no-group --chmod=F644 dist/assets/ "$TARGET/assets/"
           find "$TARGET/assets/" -type f -mtime +30 -delete || true
           find "$TARGET" -type f -user runner ! -perm 644 -exec chmod 644 {} + || true
@@ -78,6 +97,46 @@ jobs:
           test -f "$TARGET/index.html" || exit 1
           HASH=$(sha256sum "$TARGET/index.html" | cut -d' ' -f1)
           echo "DEV Deploy OK: $(date -Iseconds) | index.html sha256: ${HASH:0:12}"
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Verify referenced assets exist
+        run: |
+          set -euo pipefail
+          # Antipantalla-negra: extrae cada referencia /assets/*.js|css del
+          # index.html DESPLEGADO y verifica que el fichero exista en disco.
+          # Si el deploy quedo parcial (p.ej. rsync exit 23 por mockups, o un
+          # stomp), faltara algun chunk hasheado y el job debe FALLAR aqui en
+          # vez de dejar dev sirviendo una pantalla negra silenciosa.
+          TARGET=/mnt/fast/appdata/farmos-pwa-dev
+          INDEX="$TARGET/index.html"
+          test -f "$INDEX" || { echo "index.html ausente en $TARGET"; exit 1; }
+
+          # Captura href/src que apunten a /assets/....js|css (con o sin query).
+          refs=$(grep -oE '/assets/[A-Za-z0-9._/-]+\.(js|css)' "$INDEX" | sort -u || true)
+          if [ -z "$refs" ]; then
+            echo "Advertencia: no se hallaron referencias /assets/*.js|css en index.html"
+            exit 0
+          fi
+
+          missing=0
+          while IFS= read -r ref; do
+            [ -z "$ref" ] && continue
+            # ref es ruta absoluta web -> ruta en disco bajo TARGET.
+            file="$TARGET${ref}"
+            if [ -f "$file" ]; then
+              echo "ok   $ref"
+            else
+              echo "FALTA $ref  (esperado en $file)"
+              missing=$((missing + 1))
+            fi
+          done <<< "$refs"
+
+          if [ "$missing" -gt 0 ]; then
+            echo "Deploy INCOMPLETO: $missing asset(s) referenciados por index.html no existen en disco."
+            echo "dev quedaria en pantalla negra -> fallando el job a proposito."
+            exit 1
+          fi
+          echo "Integridad de assets OK: todos los /assets/*.js|css referenciados existen."
 
       - if: env.SKIP_DEPLOY != '1'
         name: Bump SW cache version (dev)

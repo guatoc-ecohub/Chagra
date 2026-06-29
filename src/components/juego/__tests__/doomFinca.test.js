@@ -13,7 +13,7 @@ import {
 } from '../doomFincaData';
 import {
   createWorld, tickWorld, plagaObjetivo, lanzarBenefico, cambiarBenefico,
-  avanzarRonda, isWall, movePlayer,
+  avanzarRonda, isWall, movePlayer, danoJugador, comboSeRompe,
 } from '../../../services/doomFincaEngine';
 
 // ── INTEGRIDAD DE DATOS ────────────────────────────────────────────
@@ -36,6 +36,24 @@ describe('PLAGAS_DOOM — shape y par de control real', () => {
   it('los ids de plaga son unicos', () => {
     const ids = PLAGAS_DOOM.map((p) => p.id);
     expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it('cada plaga lista los cultivos que ataca y declara su fuente honesta', () => {
+    const FUENTES = ['grafo', 'cenicafe', 'ica-ciat', 'ecologia'];
+    for (const p of PLAGAS_DOOM) {
+      expect(Array.isArray(p.cultivos)).toBe(true);
+      expect(p.cultivos.length).toBeGreaterThan(0);
+      expect(FUENTES).toContain(p.fuente);
+      // el dano es una frase clara, no una etiqueta suelta
+      expect(p.dano.length).toBeGreaterThan(15);
+    }
+  });
+
+  it('no hay voseo argentino en el dano de las plagas (es-CO)', () => {
+    const VOSEO = /\b(usá|usás|tenés|querés|empezá|elegí)\b/i;
+    for (const p of PLAGAS_DOOM) {
+      expect(`${p.dano} ${p.porQue}`).not.toMatch(VOSEO);
+    }
   });
 });
 
@@ -240,6 +258,74 @@ describe('crearPlagasEscenario — todas las plagas nacen transitables', () => {
     for (const p of w.pests) {
       expect(isWall(MAPA, p.x, p.y)).toBe(false);
     }
+  });
+});
+
+describe('danoJugador — balance del daño (puro, afinable)', () => {
+  it('sin plagas no hay daño', () => {
+    expect(danoJugador(9, 0)).toBe(0);
+    expect(danoJugador(9, -1)).toBe(0);
+  });
+
+  it('escala con el número de plagas y el factor (0.4 = histórico)', () => {
+    expect(danoJugador(9, 1, 0.4)).toBeCloseTo(3.6, 5);
+    expect(danoJugador(9, 2, 0.4)).toBeCloseTo(7.2, 5);
+  });
+
+  it('el factor de FEEL (0.28) es más suave que el histórico (0.4)', () => {
+    expect(danoJugador(9, 1, 0.28)).toBeLessThan(danoJugador(9, 1, 0.4));
+  });
+});
+
+describe('comboSeRompe — el combo perdona el fallo de puntería con FEEL ON', () => {
+  it('el benéfico equivocado SIEMPRE rompe el combo (error conceptual)', () => {
+    expect(comboSeRompe('equivocado', false)).toBe(true);
+    expect(comboSeRompe('equivocado', true)).toBe(true);
+  });
+
+  it('disparar al vacío rompe el combo por defecto, pero NO con FEEL ON', () => {
+    expect(comboSeRompe('vacio', false)).toBe(true);
+    expect(comboSeRompe('vacio', true)).toBe(false);
+  });
+
+  it('acierto y control nunca rompen el combo', () => {
+    for (const r of ['acierto', 'control']) {
+      expect(comboSeRompe(r, false)).toBe(false);
+      expect(comboSeRompe(r, true)).toBe(false);
+    }
+  });
+});
+
+describe('tickWorld — FEEL gated: daño más amable y combo perdonado', () => {
+  it('con feelOn, una plaga encima hace MENOS daño que sin la flag', () => {
+    const mk = () => {
+      const w = createWorld();
+      for (const p of w.pests) { p.x = w.player.x; p.y = w.player.y; }
+      return w;
+    };
+    const wOff = tickWorld(mk(), {});
+    const wOn = tickWorld(mk(), { feelOn: true });
+    // Menos daño = vitalidad más alta tras el mismo tick con plagas encima.
+    expect(wOn.vitalidad).toBeGreaterThan(wOff.vitalidad);
+  });
+
+  it('con feelOn, un disparo al vacío NO rompe un combo en curso', () => {
+    let w = createWorld();
+    w.combo = 3;
+    // Mirar lejos de toda plaga: dispara al vacío.
+    w.player = { ...w.player, x: 1.2, y: 1.2, angulo: Math.PI };
+    w.cooldown = 0;
+    w = tickWorld(w, { fire: true, feelOn: true });
+    expect(w.combo).toBe(3);
+  });
+
+  it('sin la flag, un disparo al vacío SÍ rompe el combo (comportamiento histórico)', () => {
+    let w = createWorld();
+    w.combo = 3;
+    w.player = { ...w.player, x: 1.2, y: 1.2, angulo: Math.PI };
+    w.cooldown = 0;
+    w = tickWorld(w, { fire: true });
+    expect(w.combo).toBe(0);
   });
 });
 

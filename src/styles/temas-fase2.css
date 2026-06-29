@@ -1,0 +1,105 @@
+/* ============================================================================
+   temas-fase2.css — PIEL POR TEMA de las superficies que aún tenían paleta
+   PROPIA (Fase 2 de la integración de temas, operador 2026-06-25).
+
+   Continúa #1869 (ScreenShell theme-aware vía --c-*) + #1871 (4º tema
+   "Verde Vivo" + escena hero retiñida). Replica EXACTAMENTE el patrón que
+   quedó en finca-viva-hero.css: las superficies derivan su piel de los tokens
+   --c-* (que cada tema redefine en index.css), con afinado por tema cuando
+   hace falta. El contenido/jugabilidad NO cambia: solo la ATMÓSFERA de color.
+
+   GATE (innegociable): TODO va scopeado bajo `.fvh-skin` — una clase que los
+   componentes solo aplican cuando la flag VITE_FINCA_VIVA_HOME_PERFIL está ON
+   (dev). Con la flag OFF (prod) la clase NO se monta → estas reglas no aplican
+   y las superficies quedan EXACTAS como hoy (dark en prod).
+
+   Los 4 temas: biopunk (base, sin data-theme), nature, minimalista, verde-vivo.
+   verde-vivo y biopunk-base comparten el look "vivo" original de la finca; los
+   claros (nature/minimalista) retiñen a su piel cálida/papel.
+
+   Español de Colombia (tú/usted), sin voseo. Offline-first (CSS puro).
+   ========================================================================== */
+
+/* ── Tokens de PIEL de juego (atmosfera de escena) ──────────────────────────
+   Definimos --fv2-* derivados de --c-*; cada tema afina el cielo/horizonte de
+   la escena en su bloque [data-theme] de abajo. Los componentes leen estos
+   tokens, NUNCA un hex fijo. Default (sin data-theme = biopunk) usa el look
+   vivo original via los fallbacks. */
+.fvh-skin {
+  /* Cielo de escena (degradado cenit→horizonte). */
+  --fv2-cielo-a: #7ac3da;                                   /* cenit fresco */
+  --fv2-cielo-b: #c8e8cb;                                   /* horizonte verde-crema */
+  /* Superficie/lienzo exterior del juego = superficie del tema. */
+  --fv2-lienzo: rgb(var(--c-surface-raised, 30 41 59));
+  --fv2-lienzo-borde: rgb(var(--c-surface-border, 51 65 85));
+  /* Velo/scrim del juego (overlays, fin de nivel) = scrim del tema. */
+  --fv2-velo: rgb(var(--scrim-bg, 8 30 22));
+}
+
+/* VERDE VIVO — cielo fresco-verde + sol dorado de la identidad (igual al hero
+   en #1871). Comparte el look vivo con la base biopunk. */
+[data-theme="verde-vivo"] .fvh-skin {
+  --fv2-cielo-a: #8fd1c2;
+  --fv2-cielo-b: #e2f0cf;
+}
+
+/* NATURE — cielo crema cálido (piel terrosa del tema). */
+[data-theme="nature"] .fvh-skin {
+  --fv2-cielo-a: #ead7b0;
+  --fv2-cielo-b: #f6efe0;
+}
+
+/* MINIMALISTA — cielo papel claro + salvia sobria (piel limpia). */
+[data-theme="minimalista"] .fvh-skin {
+  --fv2-cielo-a: #d8e2da;
+  --fv2-cielo-b: #f6f3ec;
+}
+
+/* ── DEFENSORES DE LA FINCA — lienzo plataformero ──────────────────────────
+   El escenario tenía sky #bde0f5 fijo (choca con biopunk/claros). Ahora el
+   degradado del stage sale del cielo del tema. El canvas 2D interior (sprites,
+   plataformas) conserva su arte/legibilidad — solo cambia el fondo del lienzo
+   que asoma alrededor. (!important: vencemos el `background:#bde0f5` base de
+   .df-stage; gated dev-only → seguro.) */
+.fvh-skin.df-stage {
+  background: linear-gradient(180deg, var(--fv2-cielo-a) 0%, var(--fv2-cielo-b) 100%) !important;
+}
+
+/* ── MUNDO SUBSUELO — superficie exterior + sky de la viñeta ────────────────
+   El <main> tenía bg-[#fff8e8] fijo (amarillo crema que choca con biopunk) y
+   la viñeta un bg-[#f6efe1]. Ahora ambas derivan de la superficie del tema.
+   (!important: vencemos las utilidades arbitrarias bg-[#…] de Tailwind, que
+   tienen igual especificidad; gated dev-only → seguro.) */
+.fvh-skin.ms-root {
+  background-color: rgb(var(--c-surface, 2 6 23)) !important;
+  color: rgb(var(--c-slate-100, 241 245 249)) !important;
+}
+.fvh-skin.ms-vinneta {
+  background-color: var(--fv2-lienzo) !important;
+  border-color: var(--fv2-lienzo-borde) !important;
+}
+
+/* ── FINCA WORLD SCENE (Mi Finca Viva) — atmosfera del cielo ────────────────
+   La escena dibuja su cielo desde WORLD_STAGES (props), correcto para los
+   "mundos" del juego. Pero el LIENZO (.fv-scene) que la enmarca asoma una
+   sombra interior fija; la armonizamos con el borde del tema para que el marco
+   combine con la piel activa. El SVG interior (plantas/animales) NO se toca. */
+.fvh-skin.fv-scene {
+  box-shadow: inset 0 -8px 24px rgb(var(--scrim-bg, 0 0 0) / 0.10) !important;
+  border: 1px solid var(--fv2-lienzo-borde) !important;
+}
+
+/* ── AGENT SCREEN — compositor + globos del chat ────────────────────────────
+   El scrim/topbar inmersivo ya eran theme-aware (themes.css). Aquí cubrimos lo
+   que quedaba con hex fijo: el plinto del avatar del compositor y el fondo del
+   lienzo del chat, para que combinen con la superficie del tema. Los globos
+   (bg-emerald-700/bg-slate-800) ya retiñen vía tokens Tailwind. */
+.fvh-skin .agent-fase2-canvas {
+  background: rgb(var(--c-surface, 2 6 23));
+}
+.fvh-skin .agent-fase2-plinto {
+  background: rgb(var(--c-surface-card, 15 23 42));
+  border: 1px solid var(--fv2-lienzo-borde);
+}
+
+/* ── Accesibilidad: nada de aquí introduce movimiento; respeta el resto. ──── */

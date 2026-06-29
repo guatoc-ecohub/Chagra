@@ -60,6 +60,10 @@ const COL = {
   latAvg: '#7cb3ff',    // latencia promedio
   latP95: '#c98bff',    // latencia p95
   bad: '#ff7a6b',
+  intel4096: '#7dd3fc',   // azul cielo — num_ctx=4096
+  intel8192: '#f9a8d4',   // rosa — num_ctx=8192
+  intelGranite: '#6ee7a8',  // línea granite3.3 en time series
+  intelDense: '#fbbf24',    // línea granite3.1-dense en time series
 };
 
 // ── 1. Cargar históricos (data/bench-runs/*.summary.json) ─────────────────────
@@ -150,6 +154,34 @@ function loadAB() {
       .sort().reverse()[0];
     if (sf) out.abSummary = readJSON(path.join(AB_BENCH_DIR, sf));
   }
+  return out;
+}
+
+// ── 3. Cargar datos INTEL-CONTEXT (AH% con-tools por num_ctx y modelo) ───────
+// Lee los summary.json con bench_type === 'intel-context'.
+function loadIntelData() {
+  const out = { rowsByCtx: {}, latest: [], all: [] };
+  if (!fs.existsSync(BENCH_RUNS_DIR)) return out;
+  const files = fs.readdirSync(BENCH_RUNS_DIR).filter((f) => f.startsWith('intel-context') && f.endsWith('.summary.json'));
+  for (const f of files) {
+    const s = readJSON(path.join(BENCH_RUNS_DIR, f));
+    if (!s || s.bench_type !== 'intel-context') continue;
+    const date = (s.generated_at || '').slice(0, 10);
+    const model = s.generator?.model || 'n/d';
+    const numCtx = s.config?.num_ctx || 4096;
+    const pass = s.pass ?? 0;
+    const total = s.judged ?? s.n_prompts ?? 1;
+    const ah = total ? round1(((total - pass) / total) * 100) : null;
+    const row = { date, model, numCtx, pass, total, ah, source: f };
+    out.all.push(row);
+    // Grupo por (model, numCtx) para latest
+    const key = `${model}__${numCtx}`;
+    if (!out.rowsByCtx[key] || date > out.rowsByCtx[key].date) {
+      out.rowsByCtx[key] = row;
+    }
+  }
+  out.all.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  out.latest = Object.values(out.rowsByCtx);
   return out;
 }
 
@@ -316,8 +348,147 @@ function chart3(ab) {
   return svg + '</svg>';
 }
 
+// ── GRÁFICO 4: AH% con-tools por modelo × num_ctx (último valor) ────────────
+function chart4(intel) {
+  const W = 700, H = 460, pad = { t: 84, r: 28, b: 96, l: 56 };
+  const plotW = W - pad.l - pad.r, plotH = H - pad.t - pad.b;
+  const x0 = pad.l, y0 = pad.t;
+  let svg = svgOpen(W, H);
+  svg += T(24, 32, 'Gráfico 4 — AH% con-tools por num_ctx y modelo (último valor)', { size: 16, weight: 700 });
+  svg += T(24, 54, 'Menor = mejor. Cada barra = AH% en el último bench de cada configuración.', { size: 12, fill: COL.muted });
+
+  const rows = intel.latest;
+  if (!rows.length) { svg += T(W / 2, H / 2, 'Intel-context sin datos (n/d)', { size: 14, fill: COL.bad, anchor: 'middle' }); return svg + '</svg>'; }
+
+  // Agrupar por modelo y num_ctx para barras agrupadas.
+  const models = [...new Set(rows.map((r) => r.model))].sort();
+  const ctxs = [...new Set(rows.map((r) => r.numCtx))].sort((a, b) => a - b);
+  const maxAH = Math.max(...rows.map((r) => r.ah ?? 0), 10);
+  const yMax = Math.ceil(maxAH / 5) * 5 + 5; // redondear arriba al múltiplo de 5
+
+  // Eje Y.
+  for (let v = 0; v <= yMax; v += Math.max(5, Math.round(yMax / 4))) {
+    const y = y0 + plotH - (v / yMax) * plotH;
+    svg += L(x0, y, x0 + plotW, y, COL.grid, 1);
+    svg += T(x0 - 8, y + 4, `${v}%`, { size: 11, fill: COL.muted, anchor: 'end' });
+  }
+
+  const n = models.length;
+  const groupW = plotW / n;
+  const barW = Math.min(44, groupW * 0.32);
+  const colorForCtx = (ctx) => (ctx === 4096 ? COL.intel4096 : COL.intel8192);
+
+  models.forEach((model, i) => {
+    const gx = x0 + i * groupW + groupW / 2;
+    const modelRows = rows.filter((r) => r.model === model).sort((a, b) => a.numCtx - b.numCtx);
+    const totalBars = modelRows.length;
+    const startDx = -((totalBars * barW) + (totalBars - 1) * 4) / 2 + barW / 2;
+
+    modelRows.forEach((r, j) => {
+      if (r.ah == null) return;
+      const h = (r.ah / yMax) * plotH;
+      const bx = gx + startDx + j * (barW + 4) - barW / 2;
+      const by = y0 + plotH - h;
+      svg += R(bx, by, barW, h, colorForCtx(r.numCtx), 'rx="2"');
+      svg += T(bx + barW / 2, by - 6, `${r.ah}%`, { size: 11, fill: COL.ink, anchor: 'middle', weight: 700 });
+      svg += T(bx + barW / 2, by - 20, `ctx ${r.numCtx}`, { size: 9, fill: COL.muted, anchor: 'middle' });
+    });
+
+    // Etiqueta modelo rotada.
+    const label = model.replace(':8b', '').replace('granite3.', 'g3.');
+    svg += T(gx, y0 + plotH + 16, label, { size: 11, fill: COL.ink, anchor: 'end', rot: -30 });
+    svg += T(gx, y0 + plotH + 30, `${modelRows.length} ctx`, { size: 9, fill: COL.muted, anchor: 'end', rot: -30 });
+  });
+
+  // Leyenda.
+  const ly = H - 22;
+  ctxs.forEach((ctx, i) => {
+    const lx = 24 + i * 180;
+    svg += R(lx, ly - 10, 14, 14, colorForCtx(ctx), 'rx="2"');
+    svg += T(lx + 20, ly + 2, `num_ctx=${ctx}`, { size: 11 });
+  });
+  svg += T(W - 28, ly + 2, 'AH% = (total−pass)/total × 100', { size: 10, fill: COL.muted, anchor: 'end' });
+  svg += L(x0, y0 + plotH, x0 + plotW, y0 + plotH, COL.axis, 1.5);
+  return svg + '</svg>';
+}
+
+// ── GRÁFICO 5: Tendencia temporal AH% por configuración (modelo×ctx) ──────────
+function chart5(intel) {
+  const W = 900, H = 480, pad = { t: 84, r: 28, b: 96, l: 56 };
+  const plotW = W - pad.l - pad.r, plotH = H - pad.t - pad.b;
+  const x0 = pad.l, y0 = pad.t;
+  let svg = svgOpen(W, H);
+  svg += T(24, 32, 'Gráfico 5 — Tendencia temporal AH% por configuración con-tools', { size: 16, weight: 700 });
+  svg += T(24, 54, 'Cada línea = una combinación modelo×num_ctx. Menor = mejor. Datos de data/bench-runs/intel-context-*.', { size: 12, fill: COL.muted });
+
+  const all = intel.all;
+  if (!all.length) { svg += T(W / 2, H / 2, 'Intel-context sin datos (n/d)', { size: 14, fill: COL.bad, anchor: 'middle' }); return svg + '</svg>'; }
+
+  const dates = [...new Set(all.map((r) => r.date))].sort();
+  const xOf = (d) => {
+    if (dates.length === 1) return x0 + plotW / 2;
+    return x0 + (dates.indexOf(d) / (dates.length - 1)) * plotW;
+  };
+  const yOf = (ah) => y0 + plotH - (ah / 25) * plotH; // Eje Y fijo 0-25%
+
+  // Grid 0-25% cada 5%.
+  for (let v = 0; v <= 25; v += 5) {
+    const y = y0 + plotH - (v / 25) * plotH;
+    svg += L(x0, y, x0 + plotW, y, COL.grid, 1);
+    svg += T(x0 - 8, y + 4, `${v}%`, { size: 11, fill: COL.muted, anchor: 'end' });
+  }
+  dates.forEach((d) => { svg += L(xOf(d), y0, xOf(d), y0 + plotH, COL.grid, 0.5); svg += T(xOf(d), y0 + plotH + 18, d.slice(5), { size: 10, fill: COL.muted, anchor: 'middle' }); });
+
+  // Líneas por (modelo, num_ctx)
+  const groups = {};
+  for (const r of all) {
+    const key = `${r.model}|${r.numCtx}`;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(r);
+  }
+
+  const palette = [COL.intelGranite, COL.intelDense, '#7dd3fc', '#f9a8d4'];
+  const dashPatterns = ['', '6,3', '3,3', '9,3'];
+  let pIdx = 0;
+  const keys = Object.keys(groups).sort();
+  let legendX = 24; const ly = H - 22;
+
+  for (const key of keys) {
+    const pts = groups[key].sort((a, b) => (a.date < b.date ? -1 : 1));
+    if (!pts.length) continue;
+    const color = palette[pIdx % palette.length];
+    const dash = dashPatterns[pIdx % dashPatterns.length];
+
+    // Línea
+    if (pts.length > 1) {
+      const poly = pts.map((p) => `${round1(xOf(p.date))},${round1(yOf(p.ah))}`).join(' ');
+      svg += `<polyline points="${poly}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-dasharray="${dash}"/>`;
+    }
+
+    // Puntos con etiqueta AH%
+    for (const p of pts) {
+      svg += `<circle cx="${round1(xOf(p.date))}" cy="${round1(yOf(p.ah))}" r="4" fill="${color}" stroke="${COL.bg}" stroke-width="1.2"><title>${esc(`${p.date} · ${p.model} ctx=${p.numCtx} · AH ${p.ah}% · pass ${p.pass}/${p.total}`)}</title></circle>`;
+      svg += T(xOf(p.date), yOf(p.ah) - 9, `${p.ah}%`, { size: 9, fill: color, anchor: 'middle', weight: 600 });
+    }
+
+    // Leyenda: nombre corto
+    const [model, ctx] = key.split('|');
+    const short = model.replace(':8b', '').replace('granite3.', 'g3.') + ` ctx${ctx}`;
+    svg += R(legendX, ly - 10, 14, 14, color, 'rx="2"');
+    svg += T(legendX + 20, ly + 2, short, { size: 10 });
+    const tw = short.length * 5.8 + 24;
+    legendX += tw;
+    if (legendX > W - 100) { legendX = 24; pIdx += 4; } // nueva fila
+    pIdx++;
+  }
+
+  svg += T(W - 28, ly - 14, 'AH% = alucinación/fallo · menor=mejor', { size: 10, fill: COL.muted, anchor: 'end' });
+  svg += L(x0, y0 + plotH, x0 + plotW, y0 + plotH, COL.axis, 1.5);
+  return svg + '</svg>';
+}
+
 // ── HTML autocontenido ────────────────────────────────────────────────────────
-function buildHTML({ hist, ab, svg1, svg2, svg3 }) {
+function buildHTML({ hist, ab, intel, svg1, svg2, svg3, svg4, svg5 }) {
   const abMeta = ab.abSummary;
   const histRows = hist.rows.slice().sort((a, b) => (a.date < b.date ? 1 : -1));
   const fmt = (v) => (v == null || Number.isNaN(v) ? '<span class="nd">n/d</span>' : v);
@@ -361,6 +532,22 @@ function buildHTML({ hist, ab, svg1, svg2, svg3 }) {
       </tbody>
     </table>`;
 
+  const intelFiles = intel.all.length;
+
+  const intelTable = intelFiles ? `
+    <table>
+      <thead><tr><th>Fecha</th><th>Modelo</th><th>num_ctx</th><th>AH%</th><th>pass/total</th><th>archivo</th></tr></thead>
+      <tbody>
+      ${intel.all.slice().sort((a, b) => (a.date < b.date ? 1 : -1)).map((r) => `
+        <tr>
+          <td>${esc(r.date)}</td><td class="m">${esc(r.model)}</td><td>${r.numCtx}</td>
+          <td class="bad">${r.ah != null ? r.ah + '%' : '<span class="nd">n/d</span>'}</td>
+          <td>${r.pass}/${r.total}</td>
+          <td class="src">${esc(r.source)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>` : '<p class="nd">Sin datos intel-context todavía.</p>';
+
   return `<!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Dashboard de benches — Chagra</title>
@@ -402,8 +589,16 @@ function buildHTML({ hist, ab, svg1, svg2, svg3 }) {
   <h2>Gráfico 3 — Latencia por modelo</h2>
   <div class="card">${svg3}</div>
 
+  <h2>Gráfico 4 — AH% con-tools por num_ctx y modelo (inteligencia contextual)</h2>
+  <div class="card">${svg4}</div>
+  <p class="sub">AH% con tools activados (AGE/guards). ${intelFiles} punto(s) intel-context en <code>data/bench-runs/</code>.</p>
+  ${intelTable}
+
+  <h2>Gráfico 5 — Tendencia temporal AH% por configuración con-tools</h2>
+  <div class="card">${svg5}</div>
+
   <p class="foot">Reproducir: <code>node scripts/bench-dashboard.mjs</code>. PNG para Telegram: <code>nix-shell -p librsvg --run 'rsvg-convert -o out/grafico1.png out/grafico1.svg'</code>.<br>
-  Summaries leídos: ${hist.files.length} · filas de tendencia: ${hist.rows.length} · modelos A/B: ${ab.rows.length}.</p>
+  Summaries leídos: ${hist.files.length} · filas de tendencia: ${hist.rows.length} · modelos A/B: ${ab.rows.length} · intel-context: ${intelFiles}.</p>
 </div></body></html>`;
 }
 
@@ -412,16 +607,20 @@ function main() {
   fs.mkdirSync(OUT_DIR, { recursive: true });
   const hist = loadHistoricos();
   const ab = loadAB();
+  const intel = loadIntelData();
 
   console.log(`[bench-dashboard] summaries históricos leídos: ${hist.files.length}`);
   hist.files.forEach((f) => console.log(`  · ${f}`));
   console.log(`[bench-dashboard] filas de tendencia normalizadas: ${hist.rows.length}`);
   console.log(`[bench-dashboard] A/B: ${ab.present ? ab.rows.length + ' modelo(s) desde ' + ab.tsvPath : 'sin TSV (' + ab.tsvPath + ')'}`);
+  console.log(`[bench-dashboard] intel-context: ${intel.all.length} filas, ${intel.latest.length} configuraciones`);
 
   const svg1 = chart1(ab), svg2 = chart2(hist), svg3 = chart3(ab);
+  const svg4 = chart4(intel), svg5 = chart5(intel);
   const writes = [
     ['grafico1.svg', svg1], ['grafico2.svg', svg2], ['grafico3.svg', svg3],
-    ['bench-dashboard.html', buildHTML({ hist, ab, svg1, svg2, svg3 })],
+    ['grafico4.svg', svg4], ['grafico5.svg', svg5],
+    ['bench-dashboard.html', buildHTML({ hist, ab, intel, svg1, svg2, svg3, svg4, svg5 })],
   ];
   for (const [name, content] of writes) {
     fs.writeFileSync(path.join(OUT_DIR, name), content);

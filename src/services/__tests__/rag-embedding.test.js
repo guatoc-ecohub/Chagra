@@ -19,7 +19,7 @@ describe('ragRetriever — query embedding online/offline', () => {
     vi.stubGlobal('fetch', mockFetch);
 
     // Dynamic import para aislar el modulo
-    const mod = await import('../ragRetriever.js');
+    await import('../ragRetriever.js');
     // El embed se hace dentro de retrieveInternal cuando hay embeddings.
     // Probamos que el endpoint se llama correctamente simulando la presencia de embeddings.
     const embedUrl = '/api/ollama/api/embeddings';
@@ -38,7 +38,7 @@ describe('ragRetriever — query embedding online/offline', () => {
       const results = await mod.retrieve('prueba offline', 3);
       expect(Array.isArray(results)).toBe(true);
       // Puede ser vacio si no hay corpus cargado en este test
-    } catch (e) {
+    } catch {
       // Si lanza porque el corpus no esta, tambien es aceptable
       // (el test verifica que no rompe el embed)
     }

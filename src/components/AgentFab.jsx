@@ -4,6 +4,15 @@ import useAgentNotificationStore from '../store/useAgentNotificationStore';
 import usePrefsStore from '../store/usePrefsStore';
 import { isSpeaking, stop, replayLast, isKokoroAvailable } from '../services/ttsService';
 import { agentSounds } from '../services/agentSoundService';
+import { fvhSkinClass } from '../config/fvhSkin';
+import { colibriRealActivo } from '../config/colibriFlag';
+import { BarbuditoPosado } from './colibri/Barbudito';
+import './agent-fab-skin.css';
+
+// ¿Avatar del FAB = colibrí REAL (barbudito posado)? Gateado por VITE_COLIBRI
+// (dev-only). Con la flag OFF (prod) el FAB conserva su avatar actual
+// (ChagraAgentAvatar). Se evalúa una sola vez (flag de build).
+const COLIBRI_REAL = colibriRealActivo();
 
 /**
  * AgentFab — Floating Action Button para abrir el agente Chagra IA.
@@ -81,6 +90,7 @@ export default function AgentFab({ onNavigate }) {
   return (
     <button
       type="button"
+      className={fvhSkinClass(`chagra-fab${hover ? ' is-hover' : ''}${responseReady ? ' is-ready' : ''}`)}
       aria-label={responseReady ? 'Chagra IA tiene respuesta nueva' : 'Asistente Chagra IA'}
       title={
         responseReady
@@ -125,7 +135,13 @@ export default function AgentFab({ onNavigate }) {
         transition: 'transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease, background .25s ease, border-color .25s ease',
       }}
     >
-      <ChagraAgentAvatar state={state} size={48} ariaLabel="Chagra IA" glow={responseReady} />
+      {COLIBRI_REAL ? (
+        // Colibrí REAL (barbudito POSADO recortado), con un leve flotar. El
+        // botón ya es circular y recorta (overflow:hidden).
+        <BarbuditoPosado size={46} ariaLabel="Chagra IA" />
+      ) : (
+        <ChagraAgentAvatar state={state} size={48} ariaLabel="Chagra IA" glow={responseReady} />
+      )}
     </button>
   );
 }

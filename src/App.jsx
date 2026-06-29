@@ -6,12 +6,11 @@
  * errores reales de ESLint siguen activos.
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
-import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Sprout, MapPin, Eye, Package, Clock, NotebookPen, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette, FileText, Network, Beaker, PawPrint, Layers, TestTube, ShieldAlert } from 'lucide-react';
+import React, { lazy, Suspense, useState, useEffect, useCallback, useRef } from 'react';
+import { MapPin, Eye, Package, CheckCircle, WifiOff, Mic, AlertCircle, Network, Beaker } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
 import { useClimaAtmosphere } from './hooks/useClimaAtmosphere';
-import { useScrollRestoration } from './hooks/useScrollRestoration';
 import useIdleDetection from './hooks/useIdleDetection';
 import useGlobalKeyboardShortcuts from './hooks/useGlobalKeyboardShortcuts';
 import BiopunkBackground from './components/dashboard/BiopunkBackground';
@@ -59,7 +58,6 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { ErrorFallback } from './components/common/ErrorFallback';
 
 // Lazy-loaded route components
-const TelemetryAlerts = lazy(() => import('./components/TelemetryAlerts'));
 const LoginScreen = lazy(() => import('./components/LoginScreen'));
 const OAuthCallback = lazy(() => import('./components/OAuthCallback'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
@@ -92,34 +90,39 @@ const LocationDetectedScreen = lazy(() => import('./components/LocationDetectedS
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
 const PlantaPorVozScreen = lazy(() => import('./components/PlantaPorVozScreen'));
 const ProcesosPorVozScreen = lazy(() => import('./components/ProcesosPorVozScreen'));
+const RegistroVozScreen = lazy(() => import('./components/RegistroVozScreen'));
 const CicloCultivoScreen = lazy(() => import('./components/CicloCultivoScreen'));
 const GerminacionScreen = lazy(() => import('./components/GerminacionScreen'));
 const CicloNutrientesScreen = lazy(() => import('./components/CicloNutrientesScreen'));
+const CalendarioFincaScreen = lazy(() => import('./components/CalendarioFincaScreen'));
 const SeguimientoProcesoScreen = lazy(() => import('./components/SeguimientoProcesoScreen'));
 const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
 const CromatografiaScreen = lazy(() => import('./components/CromatografiaScreen'));
 const ToxicologiaScreen = lazy(() => import('./components/ToxicologiaScreen'));
+const MercadosScreen = lazy(() => import('./components/MercadosScreen'));
 const GlaciarReporteScreen = lazy(() => import('./components/GlaciarReporteScreen'));
 const GlaciarHistorialScreen = lazy(() => import('./components/GlaciarHistorialScreen'));
 const ProfileScreen = lazy(() => import('./components/ProfileScreen'));
 const CaseStudyScreen = lazy(() => import('./components/CaseStudyScreen'));
 const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
-const CaseStudyTopWidget = lazy(() => import('./components/CaseStudyTopWidget'));
+const FaqScreen = lazy(() => import('./components/FaqScreen'));
 const HelpManual = lazy(() => import('./components/HelpManual'));
-const OnboardingHero = lazy(() => import('./components/OnboardingHero'));
-const WelcomeStatsHero = lazy(() => import('./components/WelcomeStatsHero'));
 const TopBar = lazy(() => import('./components/TopBar'));
 const DashboardLive = lazy(() => import('./components/dashboard/DashboardLive'));
+const AprenderConAgente = lazy(() => import('./components/Aprende/AprenderConAgente'));
+const DirectorioEspeciesScreen = lazy(() => import('./components/DirectorioEspecies/DirectorioEspeciesScreen'));
 const HoyEnFincaScreen = lazy(() => import('./components/hoy/HoyEnFincaScreen'));
 const MiFincaEvolucionScreen = lazy(() => import('./components/hoy/MiFincaEvolucionScreen'));
 const MiFincaVivaScreen = lazy(() => import('./components/juego/MiFincaVivaScreen'));
 const DefensoresFincaScreen = lazy(() => import('./components/juego/DefensoresFincaScreen'));
 const MilpaSimulator = lazy(() => import('./components/juego/MilpaSimulator'));
 const DoomFincaScreen = lazy(() => import('./components/juego/DoomFincaScreen'));
+const MundoSubsuelo = lazy(() => import('./components/juego/MundoSubsuelo'));
 // Modo extensionista (panel supervisor multi-finca, ADR-048 MVP). Gateado por
 // feature flag VITE_FEATURE_EXTENSIONISTA + rol (ver config/extensionistaAccess).
 const ExtensionistaScreen = lazy(() => import('./components/ExtensionistaScreen'));
 import HomeRegionalGreeting from './components/HomeRegionalGreeting';
+import { fincaVivaHomePerfilActivo } from './config/fincaVivaHomeFlag';
 import { esExtensionistaActual } from './config/extensionistaAccess';
 
 localforage.config({
@@ -133,49 +136,19 @@ const LoadingFallback = () => (
   </div>
 );
 
-// NAV tiles, vocabulario user-facing post DR-030 QW2 (decisión D3+D4 del DR).
-// Tile "Voz" eliminada: la captura por voz vive dentro del agente / compositor
-// (el FAB global MicFab se removió 2026-05-30 por decisión del operador).
-// Iconos canónicos: Sprout para plantas, NotebookPen para bitácora.
-// Card-sort n>=5 con usuarios 0-contexto colombianos pendiente para
-// validar empíricamente, esta release ships con hipótesis cultural
-// (lenguaje agronómico colombiano) y se itera post-feedback.
-const NAV_TILES = [
-  { id: 'activos', label: 'Plantas', icon: Sprout, accent: 'teal', desc: 'Cultivos, zonas e infraestructura' },
-  { id: 'mapa', label: 'Mapa', icon: MapPin, accent: 'blue', desc: 'Vista espacial de la finca' },
-  { id: 'javier', label: 'Hoy en finca', icon: Eye, accent: 'green', desc: `Tareas por proximidad (${PRIMARY_WORKER_NAME})` },
-  { id: 'bodega', label: 'Insumos', icon: Package, accent: 'sky', desc: 'Stock de biopreparados' },
-  { id: 'task_log', label: 'Tareas', icon: Clock, accent: 'rose', desc: 'Cola de pendientes' },
-  { id: 'historial', label: 'Bitácora', icon: NotebookPen, accent: 'indigo', desc: 'Historial de actividades' },
-  { id: 'biodiversidad', label: 'Flora y fauna', icon: Leaf, accent: 'emerald', desc: 'Ecosistema, estratos y gremios' },
-  { id: 'animales', label: 'Animales', icon: PawPrint, accent: 'rose', desc: 'Gallinas, vacas, cerdos, abejas y ciclo cerrado' },
-  { id: 'fermentos', label: 'Fermentos', icon: Beaker, accent: 'orange', desc: 'Recetas tradicionales y seguridad' },
-  { id: 'suelo', label: 'Suelo', icon: Layers, accent: 'amber', desc: 'Diagnóstico y salud del suelo' },
-  { id: 'germinacion', label: 'Semilleros', icon: TestTube, accent: 'teal', desc: 'Prueba de semillas y germinación' },
-  { id: 'toxicologia', label: 'Seguridad', icon: ShieldAlert, accent: 'rose', desc: 'Toxicidad de insumos y riesgo de suelo' },
-  { id: 'reportar_invasora', label: 'Plagas', icon: AlertCircle, accent: 'amber', desc: 'Reporte de plagas y malezas' },
-  { id: 'casos', label: 'Casos', icon: FileText, accent: 'amber', desc: 'Seguimiento de problemas y tratamientos' },
-  { id: 'informes', label: 'Informes', icon: FileText, accent: 'lime', desc: 'Descargas de reportes en CSV' },
-  { id: 'perfil', label: 'Perfil', icon: Palette, accent: 'indigo', desc: 'Temas y configuración' },
-];
-
-// Mapa de accents → clases Tailwind (para que el JIT genere los estilos).
-// Keeping static literals so Tailwind purgue funcione.
-const ACCENT_CLASSES = {
-  teal: { border: 'border-l-teal-500', text: 'text-teal-400' },
-  blue: { border: 'border-l-blue-500', text: 'text-blue-400' },
-  green: { border: 'border-l-green-500', text: 'text-green-400' },
-  sky: { border: 'border-l-sky-500', text: 'text-sky-400' },
-  rose: { border: 'border-l-rose-500', text: 'text-rose-400' },
-  indigo: { border: 'border-l-indigo-500', text: 'text-indigo-400' },
-  emerald: { border: 'border-l-emerald-500', text: 'text-emerald-400' },
-  lime: { border: 'border-l-lime-500', text: 'text-lime-400' },
-  amber: { border: 'border-l-amber-500', text: 'text-amber-400' },
-  orange: { border: 'border-l-orange-500', text: 'text-orange-400' },
-};
+// CÓDIGO MUERTO REMOVIDO 2026-06-24 (descubribilidad): `NAV_TILES` +
+// `ACCENT_CLASSES` solo los consumía `DashboardView` (la grilla de 16 tiles del
+// dashboard legacy), que NUNCA se montaba — `case 'dashboard'` renderiza
+// `DashboardLiveView`. La home viva es `DashboardLive.jsx` (HERRAMIENTAS_TILES +
+// FincaCards + mano radial). Los launchers que SOLO vivían en ese código muerto
+// (`casos` vía CaseStudyTopWidget, `javier` vía el tile) se rescataron a la home
+// viva (HERRAMIENTAS_TILES en DashboardLive). Las rutas `casos`/`caso_detail`/
+// `javier`/`usage_stats` siguen vivas en el router (más abajo) y por hash.
+// Ref: CAPABILITIES_STATUS.md §4 (deuda de navegación) + §2 (huérfanos).
 
 const HASH_VIEW_ROUTES = {
   agente: 'agente',
+  faq: 'faq',
   inventario: 'activos',
   activos: 'activos',
   biodiversidad: 'biodiversidad',
@@ -196,27 +169,38 @@ const HASH_VIEW_ROUTES = {
   cromatografia: 'cromatografia',
   germinacion: 'germinacion',
   'ciclo-nutrientes': 'ciclo_nutrientes',
+  calendario: 'calendario_finca',
+  'calendario-finca': 'calendario_finca',
   animales: 'animales',
   'animales-gallinas': 'animales_gallinas',
   'animales-abejas': 'animales_abejas',
   'animales-vacas': 'animales_vacas',
   'doom-finca': 'doom_finca',
+  subsuelo: 'subsuelo',
+  'mundo-subsuelo': 'subsuelo',
   toxicologia: 'toxicologia',
   suelo: 'suelo',
+  aprende: 'aprende',
+  directorio: 'directorio',
+  'directorio-especies': 'directorio',
+  especies: 'directorio',
   'usage-stats': 'usage_stats',
+  mercado: 'mercado',
+  mercados: 'mercado',
+  vender: 'mercado',
 };
 
 // Vistas que cuentan como "módulo" para telemetría de piloto.
 const MODULE_VIEWS = new Set([
-  'activos', 'mapa', 'javier', 'bodega', 'task_log', 'historial',
+  'activos', 'mapa', 'javier', 'bodega', 'task_log', 'historial', 'bitacora',
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas',
-  'hoy_finca', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
+  'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'suelo', 'toxicologia',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'toxicologia', 'aprende', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia',
-  'usage_stats',
+  'usage_stats', 'mercado',
 ]);
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
@@ -232,11 +216,30 @@ const DashboardLiveView = React.memo(function DashboardLiveView({ onNavigate, on
   const hydrate = useAssetStore((s) => s.hydrate);
   const syncFromServer = useAssetStore((s) => s.syncFromServer);
   const idle = useIdleDetection(12000);
+  // HOME "Finca Viva" por perfil (flag VITE_FINCA_VIVA_HOME_PERFIL). Con la flag
+  // ON, FincaVivaHero ES el home: trae su PROPIA barra superior (marca + chip de
+  // ubicación + ayuda/perfil) y su propio saludo. El shell inmersivo del agente
+  // (TopBar flotante legacy + scrim oscuro + capa biopunk) DUPLICABA esa barra y
+  // chocaba con la estética clara del F2 — se ven DOS "Chagra" apilados. Con la
+  // flag ON lo retiramos: una sola barra, un solo home cohesivo. Con la flag OFF
+  // (default, prod) todo queda intacto.
+  const fincaViva = fincaVivaHomePerfilActivo();
   useEffect(() => {
     hydrate().then(() => {
       if (navigator.onLine) syncFromServer(fetchFromFarmOS);
     });
   }, [hydrate, syncFromServer]);
+
+  if (fincaViva) {
+    // F2: el hero (FincaVivaHero, dentro de DashboardLive) gobierna el fondo, la
+    // barra y el saludo. Sin TopBar flotante ni scrim/biopunk oscuro encima — el
+    // "resto de la finca" fluye en una hoja clara bajo el hero (DashboardLive).
+    return (
+      <div className="relative h-[100dvh] w-full flex flex-col overflow-hidden bg-[#c8e8cb]">
+        <DashboardLive onNavigate={onNavigate} onLogout={onLogout} />
+      </div>
+    );
+  }
 
   return (
     // .app-scrim (scrim por token, spec 2026-06-05): antes bg-slate-950/55
@@ -283,149 +286,6 @@ const DashboardLiveView = React.memo(function DashboardLiveView({ onNavigate, on
           `}</style>
         </div>
       )}
-    </div>
-  );
-});
-
-const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, lastLogMessage }) {
-  // Feedback piloto #103: preservar scroll al volver de Voz/FieldFeedback/sub-screens.
-  // Sin esto, navegar dashboard → vista_X → dashboard volvía siempre al top.
-  useScrollRestoration('dashboard');
-
-  // Selectores shallow: solo re-renderiza cuando las longitudes cambian
-  const plantsCount = useAssetStore((s) => s.plants.length);
-  const landsCount = useAssetStore((s) => s.lands.length);
-  const structuresCount = useAssetStore((s) => s.structures.length);
-  const materialsCount = useAssetStore((s) => s.materials.length);
-  const plants = useAssetStore((s) => s.plants);
-  const structures = useAssetStore((s) => s.structures);
-  const lands = useAssetStore((s) => s.lands);
-  const hydrate = useAssetStore((s) => s.hydrate);
-  const syncFromServer = useAssetStore((s) => s.syncFromServer);
-
-  // T2: Hidratación al montar, llena contadores desde IndexedDB inmediatamente
-  useEffect(() => {
-    hydrate().then(() => {
-      if (navigator.onLine) syncFromServer(fetchFromFarmOS);
-    });
-  }, [hydrate, syncFromServer]);
-
-  const noGeoCount = useMemo(() => {
-    const allAssets = [...plants, ...structures, ...lands];
-    return allAssets.filter((a) => {
-      const geo = a.attributes?.intrinsic_geometry;
-      return !geo || !(typeof geo === 'object' ? geo.value : geo);
-    }).length;
-  }, [plants, structures, lands]);
-
-  const assetCounts = useMemo(() => [
-    { label: 'Cultivos', count: plantsCount, color: 'text-lime-400' },
-    { label: 'Zonas', count: landsCount, color: 'text-amber-400' },
-    { label: 'Infraestructura', count: structuresCount, color: 'text-emerald-400' },
-    { label: 'Insumos', count: materialsCount, color: 'text-sky-400' },
-  ], [plantsCount, landsCount, structuresCount, materialsCount]);
-
-  return (
-    <div className="h-[100dvh] w-full app-scrim-strong text-white flex flex-col overflow-hidden">
-      {/* DR-030 QW2: TopBar persistente con identidad operador + acciones
-          globales. Reemplaza el header inline previo. La info ambiental
-          (msnm/luna/sol) pasó al EnvironmentalCard colapsable bajo el TopBar.
-          2026-05-18: wrapper translúcido (.app-scrim-strong, scrim por token)
-          para que se vea la imagen de fondo agroecológica aplicada al body en
-          App.jsx — navy en bio-punk, velo crema sutil en temas claros. */}
-      <TopBar onNavigate={onNavigate} onLogout={onLogout} />
-      <HomeRegionalGreeting />
-
-      {/* Feedback piloto #116: estadísticas al header (siempre visibles).
-          Antes: el bloque assetCounts vivía dentro del <main scrollable>,
-          se perdía al scrollear hacia abajo. usuaria piloto pidió "deberían ir al
-          inicio en el header", ahora es hermano del TopBar (queda fuera
-          del overflow del main, sticky de facto al top siempre). */}
-      {plantsCount > 0 && (
-        <button
-          type="button"
-          onClick={() => onNavigate('activos')}
-          aria-label="Ver inventario de activos"
-          className="w-full bg-slate-900/95 backdrop-blur-md border-b border-slate-800 hover:bg-slate-800/50 transition-colors shrink-0"
-        >
-          <div className="grid grid-cols-4 divide-x divide-slate-800 py-2">
-            {assetCounts.map((ac) => (
-              <div key={ac.label} className="text-center px-2">
-                <p className={`text-xl font-black tabular-nums ${ac.color}`}>{ac.count}</p>
-                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{ac.label}</p>
-              </div>
-            ))}
-          </div>
-        </button>
-      )}
-
-      {/* Feedback piloto #5 (Lili 2026-05-18): pb-4 no era suficiente —
-          los FABs flotantes (Agent) tapaban el final del scroll. Cambio a
-          calc seguro con safe-area iOS notch + 120px para que el último
-          widget quede accesible al tap. */}
-      <main className="flex-1 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+120px)] flex flex-col overflow-y-auto gap-3">
-        {/* Bug 2026-05-18 (operator): TelemetryAlerts mostraba errores IoT +
-            sync no resueltos como PRIMERA cosa visible post-login. Mal first
-            impression — Chagra debe arrancar con stats positivos (especies,
-            plantas cuidadas, fichas pedagógicas, biopreparados).
-            Ahora: WelcomeStatsHero como hero card SIEMPRE primera.
-            OnboardingHero (CTAs 📸/🎤/✍) sigue mostrándose si plantsCount=0
-            (junto al WelcomeStatsHero, para guiar al primer registro).
-            TelemetryAlerts se mueve más abajo (problemas técnicos visibles
-            pero no como hero). */}
-        <ErrorBoundary>
-          <WelcomeStatsHero mode="post-login" onNavigate={onNavigate} />
-        </ErrorBoundary>
-
-        {plantsCount === 0 && (
-          <OnboardingHero onNavigate={onNavigate} />
-        )}
-
-        {plantsCount > 0 && (
-          <ErrorBoundary>
-            <TelemetryAlerts onNavigate={onNavigate} lastFarmOsLog={lastLogMessage} />
-          </ErrorBoundary>
-        )}
-
-        {/* Top problemas activos casos de estudio (DR-044 sub-iv). */}
-        {/* Se auto-oculta cuando no hay casos activos (KISS, zero footprint). */}
-        <ErrorBoundary>
-          <CaseStudyTopWidget onNavigate={onNavigate} maxItems={3} />
-        </ErrorBoundary>
-
-        {noGeoCount > 0 && (
-          <button
-            onClick={() => onNavigate('activos')}
-            className="w-full p-3 rounded-xl bg-amber-900/20 border border-amber-800/50 flex items-center justify-between hover:bg-amber-900/30 transition-colors"
-          >
-            <span className="text-xs text-amber-400 font-bold flex items-center gap-2">
-              <MapPin size={14} aria-hidden="true" />
-              {noGeoCount} activo{noGeoCount > 1 ? 's' : ''} sin ubicación registrada
-            </span>
-            <span className="text-2xs text-amber-400/60">Tocar para corregir</span>
-          </button>
-        )}
-
-        <div className="h-4 shrink-0" />
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {NAV_TILES.map((tile) => {
-            const a = ACCENT_CLASSES[tile.accent] || ACCENT_CLASSES.teal;
-            return (
-              <button
-                key={tile.id}
-                onClick={() => onNavigate(tile.id)}
-                aria-label={`${tile.label}: ${tile.desc}`}
-                className={`bg-slate-900/60 border border-slate-800 border-l-4 ${a.border} rounded-xl p-4 text-left min-h-[80px] active:bg-slate-800/70 transition-colors`}
-              >
-                <tile.icon size={28} strokeWidth={2} className={`mb-2 ${a.text}`} aria-hidden="true" />
-                <span className={`text-lg font-black block ${a.text}`}>{tile.label}</span>
-                <span className="text-2xs text-slate-500 block mt-0.5">{tile.desc}</span>
-              </button>
-            );
-          })}
-        </div>
-      </main>
     </div>
   );
 });
@@ -948,6 +808,20 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'subsuelo':
+        // Sub-mundo del juego (huérfano del ux-audit P1-1): la entrada vive en
+        // MiFincaVivaScreen (irAccion('subsuelo')) pero faltaba el case → caía en
+        // "Vista no disponible". MundoSubsuelo no acepta props de navegación; lo
+        // envolvemos en ScreenShell (como 'biopreparados') para dar Volver/Inicio.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mundo Subsuelo">
+              <ScreenShell title="Mundo Subsuelo" onBack={() => navigate('juego')} onHome={() => navigate('dashboard')}>
+                <MundoSubsuelo />
+              </ScreenShell>
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'sembrar':
         return (
           <ErrorBoundary>
@@ -968,10 +842,16 @@ export default function App() {
         );
       case 'biopreparados':
         // Galería de recetas de biopreparados PASO A PASO (no la pantalla de
-        // insumos/inventario). La misión "Prepárale comida natural" navega acá.
+        // insumos/inventario). Dos entradas: (1) la misión "Prepárale comida
+        // natural" del juego (sin `back` → vuelve al juego, default) y (2) la
+        // home viva (Herramientas de finca → Biopreparados, rescatada
+        // 2026-06-24, pasa back:'dashboard'). El botón Volver respeta de dónde
+        // se vino: por defecto al juego (back-compat de la misión); desde la
+        // home, al dashboard. Antes onBack iba SIEMPRE a 'juego', así que desde
+        // la home el usuario caía en el juego (huérfano).
         return (
           <ErrorBoundary>
-            <ScreenShell title="Biopreparados" onBack={() => navigate('juego')} onHome={() => navigate('dashboard')}>
+            <ScreenShell title="Biopreparados" onBack={() => navigate(currentViewData?.back || 'juego')} onHome={() => navigate('dashboard')}>
               <div className="px-4 pt-3 pb-10 max-w-2xl mx-auto flex flex-col gap-4">
                 {/* Acceso a la toxicología de insumos (EPI, dosis seguras,
                     restricción ICA). Caso crítico: caldo bordelés / sulfocálcico. */}
@@ -1060,6 +940,14 @@ export default function App() {
           </ErrorBoundary>
         );
       case 'mapa':
+        // #mapa renderiza el MAPA real (Leaflet, FarmMap). VERIFICADO 2026-06-24:
+        // NO colapsa a la vista Activos. Si no hay activos georreferenciados,
+        // FarmMap sigue mostrando el mapa de la finca (centrado por defecto) con
+        // un aviso honesto "Sin activos georreferenciados aún." encima — no es un
+        // fallback ni una redirección. El único salto a 'activos' es el
+        // drill-down al TOCAR un activo del mapa (onAssetClick). La premisa de
+        // "colapso a Activos" era un hallazgo de auditoría stale.
+        // Ref: CAPABILITIES_STATUS.md §1/§7.4.
         return (
           <ErrorBoundary>
             <ScreenShell title="Mapa de la Finca" icon={MapPin} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
@@ -1096,7 +984,12 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      // 'historial' y 'bitacora' son ALIAS de la misma pantalla (WorkerHistory).
+      // Antes solo existía 'historial': AnalisisProactivoIA navegaba a 'bitacora'
+      // (chip "Tareas") y caía en "Vista no disponible". Ahora ambas entradas
+      // llegan a la Bitácora viva. Fix bitácora rota (tarea #22).
       case 'historial':
+      case 'bitacora':
         return (
           <ErrorBoundary>
             <WorkerHistory onBack={() => navigate('dashboard')} onEntryClick={(entry) => navigate('bitacora_detail', { entry })} />
@@ -1197,6 +1090,15 @@ export default function App() {
             <ProcesosPorVozScreen onBack={() => navigate('dashboard')} onSave={showToast} />
           </ErrorBoundary>
         );
+      case 'registro_voz':
+        // BOTÓN ÚNICO DE VOZ (#23): entrada principal voz-first que clasifica
+        // la intención entre TODOS los tipos y extrae los campos. Es el
+        // "guardar lo que hago" de la mano radial (reemplaza "procesos por voz").
+        return (
+          <ErrorBoundary>
+            <RegistroVozScreen onBack={() => navigate('dashboard')} onSave={showToast} />
+          </ErrorBoundary>
+        );
       case 'ciclo':
         return (
           <ErrorBoundary>
@@ -1238,6 +1140,25 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'calendario_finca':
+        // Módulo CALENDARIO DE FINCA: UN SOLO calendario que UNIFICA por planta
+        // (ciclos de la finca, o especies del catálogo si no hay finca) las
+        // fases y tareas que viven dispersas: fenología (phenologyCalculator),
+        // nutrición (feedingPlanGeneric / feeding_plan del catálogo), siembra,
+        // cosecha, sanidad por etapa (climateCycleService) y ciclo perenne
+        // (perennialCalculator). Todo groundeado (farmCalendarService) — sin
+        // inventar fechas; deflexión honesta cuando no hay datos.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Calendario de Finca">
+              <CalendarioFincaScreen
+                onBack={() => navigate('dashboard')}
+                onHome={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'suelo':
         return (
           <ErrorBoundary>
@@ -1251,6 +1172,68 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Cromatografia de Suelo">
               <CromatografiaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mercado':
+        // Marketplace agroecológico (circuitos cortos): publicar productos de la
+        // finca + explorar ofertas de fincas vecinas + contacto directo. Es la
+        // capacidad LIVE de la rama "Vender" de la mano (manifiesto `mercado`).
+        // Offline-first; precio de referencia citado solo si hay fuente.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mercado de la finca">
+              <MercadosScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'aprende':
+        // Módulo "Aprende con el agente" (#1824): 5 lecciones agroecológicas
+        // (suelo · asociaciones · biopreparados · MIP · fenología) con datos
+        // verificados y fuente, más InsightCards al cierre de cada lección.
+        // Componente autocontenido (maneja su propio estado interno).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Aprende con el agente">
+              <AprenderConAgente
+                onBack={() => navigate('dashboard')}
+                onAskAgent={(pregunta) =>
+                  navigate('agente', { prefilledPrompt: pregunta })
+                }
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mercados':
+        // Rama "Vender" de la mano de Chagra (auditoría UX §7.4 P3): superficie
+        // HONESTA "en preparación" — alcanzable, no un dead-end. Explica el
+        // estado real de la consulta de precios y orienta a las fuentes públicas
+        // (DANE/SIPSA, centrales de abasto). onAskAgent puentea al agente.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Vender mejor">
+              <MercadosScreen
+                onBack={() => navigate('dashboard')}
+                onAskAgent={(pregunta) =>
+                  navigate('agente', { prefilledPrompt: pregunta })
+                }
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'directorio':
+        // Directorio de especies: explorador visual del catálogo. Buscador con
+        // resolución de nombre (matcher canónico del proyecto) + ficha grounded
+        // por especie (foto, piso térmico, asociaciones, biopreparados,
+        // plagas/control biológico, saberes), todo offline-first desde
+        // catalog.sqlite + grafo-relations.json. initialQuery vía deep-link.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Directorio de especies">
+              <DirectorioEspeciesScreen
+                onBack={() => navigate('dashboard')}
+                initialQuery={currentViewData?.query || ''}
+              />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -1362,6 +1345,14 @@ export default function App() {
             />
           </ErrorBoundary>
         );
+      case 'faq':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Preguntas Frecuentes">
+              <FaqScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'help':
         return (
           <ErrorBoundary>
@@ -1416,14 +1407,29 @@ export default function App() {
     }
   };
 
+  // Vistas pre-autenticación: el formulario manda y NO debe quedar tapado ni
+  // empujado por overlays flotantes. Mismo conjunto que ya gatea showBg,
+  // DataLossBanner, CriticalAlertBanner, SyncProgressIndicator, etc.
+  const isPreAuthView =
+    currentView === 'loading' ||
+    currentView === 'login' ||
+    currentView === 'oauth-callback';
+
   return (
     <>
       {/* Transición colibrí home→conversación (~2s). Encima de todo (z alto);
           la conversación monta detrás y queda limpia al terminar. */}
       <ColibriTransition active={colibriTransition} onDone={() => setColibriTransition(false)} />
       <NetworkStatusBar />
-      <IosInstallBanner />
-      <AndroidInstallBanner />
+      {/* Banners de instalación PWA: NO en las vistas pre-auth (login /
+          loading / oauth-callback). En el login son un overlay `fixed`
+          z-50 que se encimaba sobre el formulario —en desktop tapaba e
+          interceptaba el clic del campo "Usuario"; en móvil empujaba
+          Usuario/Contraseña/Ingresar bajo el fold—. La instalación se
+          ofrece una vez dentro de la app, igual que DataLossBanner y
+          los demás flotantes (mismo guard de vista). */}
+      {!isPreAuthView && <IosInstallBanner />}
+      {!isPreAuthView && <AndroidInstallBanner />}
       <UpdateAvailableBanner />
       <Confetti />
       <GpsFincaBanner />

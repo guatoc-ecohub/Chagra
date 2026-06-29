@@ -1,0 +1,51 @@
+/*
+ * dashboard-resto-redistribucion.css — refuerzo visual de la REDISTRIBUCIÓN del
+ * "resto de su finca" (DashboardLive, auditoría CAPABILITIES_STATUS §7.2 + §7.4).
+ *
+ * Por qué un archivo aparte y NO finca-viva-resto.css: ese CSS está bajo trabajo
+ * en paralelo (bugfix). Aquí solo se añaden reglas NUEVAS, scope-limitadas a los
+ * tiles de la redistribución (.dash-tile), sin pisar las clases .fvh-* del hero.
+ *
+ * Objetivos:
+ *  1. JERARQUÍA (§7.2): el grupo DESTACADO (lo fuerte y grounded) se lee como el
+ *     núcleo. Tiles más altos, con una elevación sutil y un realce al pulsar.
+ *  2. CONTRASTE WCAG AA: en el layout F2 los tiles son pastel claro. El label y
+ *     la descripción ya van con tinta oscura forzada por .fvh-tile-label /
+ *     .fvh-tile-desc (finca-viva-resto.css). Aquí garantizamos además que la
+ *     DESCRIPCIÓN nunca caiga por debajo del umbral AA y que el ícono (señal de
+ *     color de acento) tenga cuerpo suficiente sobre el pastel — sin depender del
+ *     único cue de color, que sería inaccesible para daltonismo.
+ */
+
+/* ── 1. Jerarquía: tiles DESTACADOS ─────────────────────────────────────────── */
+.dash-tile--destacado {
+  /* Elevación sutil sobre el resto de tiles para señalar "esto es lo fuerte". */
+  box-shadow: 0 2px 10px -4px rgba(16, 24, 12, 0.35);
+}
+.dash-tile--destacado:active {
+  transform: scale(0.985);
+}
+
+/* ── 2. Contraste WCAG AA en el layout F2 (tile pastel claro) ────────────────── */
+/* La tinta del label/desc la fuerza finca-viva-resto.css (#26331f / #4e5c42).
+   Aquí solo subimos el contraste de la DESCRIPCIÓN de los tiles destacados (texto
+   más largo y pequeño) y le damos peso al texto, sin tocar el color de marca. */
+.fvh-resto .dash-tile--destacado .fvh-tile-desc {
+  color: #3a4733 !important; /* ≈7.5:1 sobre blanco-82% → AA holgado en 12px */
+  font-weight: 500;
+}
+
+/* El ícono usa el color de acento (lime/violet/etc.). Sobre el pastel claro le
+   damos un sutil halo para que el cue de color no sea el único portador de
+   información y se distinga del fondo crema. */
+.fvh-resto .dash-tile svg[aria-hidden='true'] {
+  filter: drop-shadow(0 1px 1px rgba(38, 51, 31, 0.18));
+}
+
+/* ── 3. Contraste en el layout legacy (tile slate-900 oscuro) ────────────────── */
+/* La descripción legacy usa text-slate-500/400 (Tailwind). En los tiles de la
+   redistribución la subimos un escalón para asegurar AA del texto pequeño sobre
+   slate-900 sin cambiar la paleta general del home. */
+:not(.fvh-resto) .dash-tile .fvh-tile-desc {
+  color: rgb(148 163 184); /* slate-400 ≈ 5.9:1 sobre slate-900 → AA */
+}

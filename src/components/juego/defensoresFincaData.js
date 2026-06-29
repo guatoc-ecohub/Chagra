@@ -6,6 +6,22 @@
  * Chagra). El jugador invoca un benéfico y este elimina EXACTAMENTE la plaga que
  * de verdad controla — enseña control biológico real, no fabricado.
  *
+ * DIDÁCTICA (para que un niño y un campesino lo entiendan):
+ *   - Cada PLAGA dice su nombre común + científico, QUÉ CULTIVOS ataca y QUÉ
+ *     DAÑO les hace, en una línea clara (tú/usted colombiano).
+ *   - Cada CURA (benéfico) explica CÓMO controla a esa plaga: el "porqué" del
+ *     control biológico, no solo que la mata.
+ *   - El campo `fuente` es honesto sobre de dónde sale la relación:
+ *       'grafo'    → relación CONTROLS verificada en el grafo AGE de Chagra
+ *                    (public/grafo-relations.json, pest_controllers).
+ *       'cenicafe' → control biológico del café documentado por Cenicafé
+ *                    Colombia (par no incluido en el subset OSS del grafo).
+ *       'ica-ciat' → control biológico del maíz documentado por ICA / CIAT /
+ *                    EMBRAPA (par clásico no incluido en el subset del grafo).
+ *       'ecologia' → depredación natural real pero GENÉRICA (no es una receta
+ *                    MIP dirigida); se rotula como "depredador general" para no
+ *                    enseñar una recomendación que no existe como tal.
+ *
  * Fuentes de las relaciones (control biológico clásico, ampliamente documentado
  * por ICA Colombia, CIAT, FAO, Cenicafé y la literatura de manejo integrado de
  * plagas): coccinélidos depredan áfidos; crisopas depredan mosca blanca y
@@ -41,14 +57,17 @@ export const CULTIVOS = [
  * @property {string} plaga.nombre   Nombre común campesino.
  * @property {string} plaga.cientifico
  * @property {string} plaga.emoji
- * @property {string} plaga.dano     Qué le hace al cultivo (1 línea).
+ * @property {string[]} plaga.cultivos Cultivos que ataca (nombre claro).
+ * @property {string} plaga.dano     Qué le hace al cultivo (1 línea clara).
  * @property {Object} benefico       El "bicho bueno" que la controla.
  * @property {string} benefico.id
  * @property {string} benefico.nombre
  * @property {string} benefico.cientifico
  * @property {string} benefico.emoji
- * @property {string} benefico.como  Cómo controla la plaga (1 línea).
+ * @property {string} benefico.como  Cómo controla la plaga (1 línea: el porqué).
  * @property {string} leccion        Mensaje pedagógico al limpiar la plaga.
+ * @property {'grafo'|'cenicafe'|'ica-ciat'|'ecologia'} fuente Origen de la
+ *           relación plaga↔cura (ver cabecera del archivo).
  */
 
 /** @type {ParControl[]} */
@@ -60,16 +79,18 @@ export const PARES_CONTROL = [
       nombre: 'Pulgón',
       cientifico: 'Aphididae',
       emoji: '🦟',
-      dano: 'Chupa la savia y enrolla las hojas tiernas.',
+      cultivos: ['Frijol', 'Tomate', 'Hortalizas'],
+      dano: 'Chupa la savia de los brotes; la hoja tierna se enrolla y se pone pegajosa.',
     },
     benefico: {
       id: 'catarina',
       nombre: 'Mariquita',
       cientifico: 'Coccinellidae',
       emoji: '🐞',
-      como: 'La mariquita y sus larvas se comen cientos de pulgones.',
+      como: 'La mariquita y sus larvas se comen colonias enteras de pulgón, hasta decenas al día.',
     },
-    leccion: 'La mariquita controla el pulgón: es control biológico de verdad.',
+    leccion: 'Para el pulgón, suelta mariquitas: se los comen vivos. Eso es control biológico, no veneno.',
+    fuente: 'grafo',
   },
   {
     id: 'moscablanca-crisopa',
@@ -78,16 +99,18 @@ export const PARES_CONTROL = [
       nombre: 'Mosca blanca',
       cientifico: 'Bemisia tabaci',
       emoji: '🪰',
-      dano: 'Chupa savia y transmite virus al tomate.',
+      cultivos: ['Tomate', 'Frijol', 'Ahuyama'],
+      dano: 'Chupa savia por debajo de la hoja y transmite virus que la enrollan y amarillan.',
     },
     benefico: {
       id: 'crisopa',
       nombre: 'Crisopa',
       cientifico: 'Chrysoperla',
       emoji: '🦗',
-      como: 'La larva de crisopa devora mosca blanca y áfidos.',
+      como: 'La larva de crisopa ("león de los áfidos") atrapa mosca blanca y pulgones con sus mandíbulas curvas.',
     },
-    leccion: 'La crisopa (león de los áfidos) limpia la mosca blanca.',
+    leccion: 'Para la mosca blanca, suelta crisopas: su larva caza los bichos que chupan la hoja.',
+    fuente: 'grafo',
   },
   {
     id: 'cogollero-trichogramma',
@@ -96,16 +119,18 @@ export const PARES_CONTROL = [
       nombre: 'Gusano cogollero',
       cientifico: 'Spodoptera frugiperda',
       emoji: '🐛',
-      dano: 'Se come el cogollo del maíz y deja huecos.',
+      cultivos: ['Maíz'],
+      dano: 'Se mete en el cogollo del maíz, se come el centro tierno y deja la hoja con huecos.',
     },
     benefico: {
       id: 'trichogramma',
       nombre: 'Avispita Trichogramma',
       cientifico: 'Trichogramma',
       emoji: '🐝',
-      como: 'Pone sus huevos dentro de los huevos del gusano y los anula.',
+      como: 'Pone su huevo DENTRO del huevo del gusano: la larva nunca nace, así no hay quién coma el cogollo.',
     },
-    leccion: 'Trichogramma parasita los huevos del cogollero antes de que nazca.',
+    leccion: 'Suelta la avispita Trichogramma cuando veas las posturas: ataca el huevo del cogollero antes de que nazca.',
+    fuente: 'grafo',
   },
   {
     id: 'trips-amblyseius',
@@ -114,34 +139,38 @@ export const PARES_CONTROL = [
       nombre: 'Trips',
       cientifico: 'Thysanoptera',
       emoji: '🦠',
-      dano: 'Raspa las hojas y deja manchas plateadas.',
+      cultivos: ['Cebolla', 'Tomate', 'Hortalizas'],
+      dano: 'Raspa la hoja y la flor para chupar; deja manchas plateadas y puntos negros.',
     },
     benefico: {
       id: 'amblyseius',
       nombre: 'Ácaro Amblyseius',
       cientifico: 'Amblyseius',
       emoji: '🕷️',
-      como: 'Este ácaro benéfico depreda los trips jóvenes.',
+      como: 'Es un ácaro bueno que se come a los trips chiquitos antes de que se vuelvan plaga.',
     },
-    leccion: 'El ácaro Amblyseius controla los trips sin venenos.',
+    leccion: 'Para los trips, suelta el ácaro bueno Amblyseius: caza los trips jóvenes sin un solo veneno.',
+    fuente: 'grafo',
   },
   {
     id: 'acaro-phytoseiulus',
     plaga: {
       id: 'acaro',
-      nombre: 'Ácaro rojo',
+      nombre: 'Ácaro rojo (araña roja)',
       cientifico: 'Tetranychus urticae',
       emoji: '🔴',
-      dano: 'Teje telarañas finas y amarillea las hojas.',
+      cultivos: ['Tomate', 'Frijol', 'Mora', 'Fresa'],
+      dano: 'Pica el envés de la hoja, la puntea y la seca; teje telarañas finas en los bordes.',
     },
     benefico: {
       id: 'phytoseiulus',
       nombre: 'Ácaro depredador',
       cientifico: 'Phytoseiulus persimilis',
       emoji: '🕷️',
-      como: 'Caza y devora al ácaro rojo plaga.',
+      como: 'Es un ácaro cazador que persigue y se come a la araña roja plaga, huevo por huevo.',
     },
-    leccion: 'Phytoseiulus es un ácaro bueno que se come al ácaro rojo.',
+    leccion: 'Para la araña roja, suelta el ácaro depredador: un ácaro bueno se come al ácaro malo.',
+    fuente: 'grafo',
   },
   {
     id: 'afido-sirfido',
@@ -150,16 +179,18 @@ export const PARES_CONTROL = [
       nombre: 'Áfido del frijol',
       cientifico: 'Aphis fabae',
       emoji: '🦟',
-      dano: 'Forma colonias y debilita la planta de frijol.',
+      cultivos: ['Frijol'],
+      dano: 'Forma colonias pegajosas en los brotes, chupa savia y debilita la mata de frijol.',
     },
     benefico: {
       id: 'sirfido',
-      nombre: 'Mosca de las flores',
+      nombre: 'Mosca de las flores (sírfido)',
       cientifico: 'Syrphidae',
       emoji: '🪰',
-      como: 'Su larva se come los áfidos; el adulto poliniza.',
+      como: 'Su larva se come los áfidos uno a uno; el adulto, además, poliniza las flores.',
     },
-    leccion: 'La larva del sírfido devora áfidos y el adulto poliniza.',
+    leccion: 'El sírfido es doble ayuda: la cría se come los áfidos y el adulto poliniza tu cultivo.',
+    fuente: 'grafo',
   },
   {
     id: 'saltamontes-mantis',
@@ -168,16 +199,18 @@ export const PARES_CONTROL = [
       nombre: 'Saltamontes',
       cientifico: 'Caelifera',
       emoji: '🦗',
-      dano: 'Mastica hojas y brotes tiernos.',
+      cultivos: ['Maíz', 'Hortalizas'],
+      dano: 'Mastica las hojas y los brotes tiernos; en grupo deja la planta pelada.',
     },
     benefico: {
       id: 'mantis',
       nombre: 'Mantis religiosa',
       cientifico: 'Mantodea',
       emoji: '🦂',
-      como: 'La mantis caza y se come al saltamontes.',
+      como: 'Es una cazadora general: atrapa al saltamontes con sus patas y se lo come.',
     },
-    leccion: 'La mantis religiosa es una cazadora que controla saltamontes.',
+    leccion: 'La mantis es una cazadora general que atrapa saltamontes; cuídala, no la mates: ayuda a tu finca.',
+    fuente: 'ecologia',
   },
   // ── Plagas y aliados del CAFETAL (nivel 3) ─────────────────────────────
   // Control biológico documentado por Cenicafé Colombia para el café.
@@ -188,16 +221,18 @@ export const PARES_CONTROL = [
       nombre: 'Broca del café',
       cientifico: 'Hypothenemus hampei',
       emoji: '🪲',
-      dano: 'Perfora el grano de café y arruina la cosecha.',
+      cultivos: ['Café'],
+      dano: 'Es un escarabajito que perfora el grano de café por dentro y daña la calidad de la cosecha.',
     },
     benefico: {
       id: 'cephalonomia',
       nombre: 'Avispa Cephalonomia',
       cientifico: 'Cephalonomia stephanoderis',
       emoji: '🐝',
-      como: 'Esta avispita entra al grano y parasita a la broca.',
+      como: 'Esta avispita entra al grano picado, parasita a la broca y corta su reproducción.',
     },
-    leccion: 'La avispa Cephalonomia controla la broca dentro del grano de café.',
+    leccion: 'Para la broca, la avispa Cephalonomia entra al grano y la ataca donde el veneno no llega.',
+    fuente: 'cenicafe',
   },
   {
     id: 'minador-closterocerus',
@@ -206,16 +241,18 @@ export const PARES_CONTROL = [
       nombre: 'Minador de la hoja',
       cientifico: 'Leucoptera coffeella',
       emoji: '🐛',
-      dano: 'Hace galerías cafés en la hoja del café y la seca.',
+      cultivos: ['Café'],
+      dano: 'Su larva cava galerías cafés por dentro de la hoja del café; la hoja se seca y se cae.',
     },
     benefico: {
       id: 'closterocerus',
       nombre: 'Avispa Closterocerus',
       cientifico: 'Closterocerus coffeellae',
       emoji: '🐝',
-      como: 'Esta avispita parasita a la larva del minador en la hoja.',
+      como: 'Es una avispita que busca la larva del minador dentro de la galería y la parasita.',
     },
-    leccion: 'La avispa Closterocerus controla el minador de la hoja del café.',
+    leccion: 'Para el minador del café, la avispa Closterocerus encuentra la larva en la hoja y la controla.',
+    fuente: 'cenicafe',
   },
   {
     id: 'cochinilla-cryptolaemus',
@@ -224,16 +261,18 @@ export const PARES_CONTROL = [
       nombre: 'Cochinilla harinosa',
       cientifico: 'Planococcus citri',
       emoji: '🐌',
-      dano: 'Forma motas blancas y chupa la savia de las ramas.',
+      cultivos: ['Café', 'Frutales'],
+      dano: 'Forma motas blancas pegajosas en ramas y raíces, chupa la savia y atrae hormigas.',
     },
     benefico: {
       id: 'cryptolaemus',
       nombre: 'Escarabajo come-cochinillas',
       cientifico: 'Cryptolaemus montrouzieri',
       emoji: '🐞',
-      como: 'Este escarabajo y sus larvas devoran las cochinillas.',
+      como: 'Este escarabajo y sus larvas (parecidas a la cochinilla) devoran las motas blancas.',
     },
-    leccion: 'El escarabajo Cryptolaemus se come la cochinilla harinosa.',
+    leccion: 'Para la cochinilla, el escarabajo Cryptolaemus se la come; le dicen "destructor de cochinillas".',
+    fuente: 'grafo',
   },
   // ── Plagas y aliados del MAIZAL (nivel 4) ────────────────────────────────
   // Control biológico documentado por CIAT, EMBRAPA e ICA Colombia para el maíz.
@@ -244,34 +283,38 @@ export const PARES_CONTROL = [
       nombre: 'Chicharrita del maíz',
       cientifico: 'Dalbulus maidis',
       emoji: '🦗',
-      dano: 'Chupa la savia y transmite el achaparramiento del maíz.',
+      cultivos: ['Maíz'],
+      dano: 'Chupa la savia y le pega al maíz el achaparramiento, una enfermedad que enana la planta.',
     },
     benefico: {
       id: 'doru',
       nombre: 'Tijereta',
       cientifico: 'Doru luteipes',
       emoji: '🪲',
-      como: 'La tijereta caza de noche y devora chicharritas y huevos de plaga.',
+      como: 'La tijereta patrulla el cogollo de noche y devora chicharritas y huevos de otras plagas.',
     },
-    leccion: 'La tijereta Doru luteipes es guardiana nocturna del maizal.',
+    leccion: 'La tijereta Doru es la guardiana nocturna del maizal: come chicharritas mientras usted duerme.',
+    fuente: 'ica-ciat',
   },
   {
     id: 'elotero-telenomus',
     plaga: {
       id: 'elotero',
-      nombre: 'Gusano elotero',
+      nombre: 'Gusano elotero (de la mazorca)',
       cientifico: 'Helicoverpa zea',
       emoji: '🐛',
-      dano: 'Se mete en la mazorca y devora los granos tiernos.',
+      cultivos: ['Maíz'],
+      dano: 'Entra por la punta de la mazorca y se come los granos tiernos en formación.',
     },
     benefico: {
       id: 'telenomus',
       nombre: 'Avispita Telenomus',
       cientifico: 'Telenomus remus',
       emoji: '🐝',
-      como: 'Parasita los huevos del elotero antes de que nazca la larva.',
+      como: 'Pone su huevo dentro del huevo del elotero: el gusano no alcanza a nacer ni a entrar a la mazorca.',
     },
-    leccion: 'La avispa Telenomus remus destruye los huevos del gusano elotero.',
+    leccion: 'Para el elotero, la avispita Telenomus ataca el huevo: sin huevo no hay gusano en la mazorca.',
+    fuente: 'ica-ciat',
   },
   {
     id: 'barrenador-cotesia',
@@ -280,16 +323,18 @@ export const PARES_CONTROL = [
       nombre: 'Barrenador del tallo',
       cientifico: 'Diatraea saccharalis',
       emoji: '🐛',
-      dano: 'Perfora el tallo del maíz por dentro y lo debilita.',
+      cultivos: ['Maíz'],
+      dano: 'Hace túneles por dentro del tallo del maíz; la planta se debilita y se quiebra con el viento.',
     },
     benefico: {
       id: 'cotesia',
       nombre: 'Avispita Cotesia',
       cientifico: 'Cotesia flavipes',
       emoji: '🐝',
-      como: 'Busca las larvas del barrenador dentro del tallo y las parasita.',
+      como: 'Rastrea la larva del barrenador dentro del tallo y la parasita en su propio túnel.',
     },
-    leccion: 'La avispa Cotesia flavipes controla el barrenador del tallo del maíz.',
+    leccion: 'Para el barrenador, la avispa Cotesia lo persigue dentro del tallo, donde nada más lo alcanza.',
+    fuente: 'ica-ciat',
   },
 ];
 

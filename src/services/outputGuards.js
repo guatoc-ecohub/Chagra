@@ -4542,6 +4542,171 @@ export function guardInventedVariety(responseText, { userMessage = null } = {}) 
   };
 }
 
+// ── CASO C: variedad/cultivar enumerada SIN bloque EVIDENCIA AUTORITATIVA ─────
+
+/**
+ * Marcador de idempotencia para guardVarietyWithoutEvidence.
+ * Si el texto ya contiene esta frase, no re-procesar.
+ */
+const CASO_C_MARKER = 'no tiene un inventario de variedades de';
+
+/** La respuesta YA niega tener info de variedades (el modelo acertó CASO C). */
+const CASO_C_DENIED_RE = /no\s+(?:t(?:engo|enemos)|hay|est[áa]n\s+(?:documentad|registrad|catalogad)|se\s+(?:tiene|encuentran?))\s+(?:informaci[oó]n|datos|registro|inventario)\s+(?:sobre\s+)?(?:las\s+)?(?:variedades?|cultivares?)/i;
+
+/**
+ * Patrones de enumeración de variedades/cultivares de una planta.
+ * El nombre de la planta SIEMPRE es el grupo de captura 1.
+ *
+ * Cubre:
+ *   - "variedades/cultivares de <PLANT>: A, B, C…"
+ *   - "principales variedades de <PLANT> son/incluyen"
+ *   - "<PLANT> tiene [N] variedades/cultivares"
+ *   - "existen [N] variedades de <PLANT>"
+ *
+ * NO cubre "tipos de" para evitar FP con "tipos de suelo/abono/riego".
+ * NO cubre "varias/muchas" sin número para evitar FP con "tiene varias
+ * variedades" (declaración genérica, no enumeración).
+ */
+const CASO_C_PLANT_PATTERNS = [
+  // "variedades/cultivares de <PLANT>: <word>…"
+  // Plant name en grupo 1.
+  /\b(?:variedades?|cultivares?)\s+de\s+(?:la\s+|el\s+|los\s+|las\s+|del\s+)?([a-záéíóúñ]+(?:\s+[a-záéíóúñ]+)?)\s*:\s*\w+/i,
+  // "variedades/cultivares de <PLANT> son/incluyen <word>…"
+  // Plant name en grupo 1.
+  /\b(?:variedades?|cultivares?)\s+de\s+(?:la\s+|el\s+|los\s+|las\s+|del\s+)?([a-záéíóúñ]+(?:\s+[a-záéíóúñ]+)?)\s+(?:son\s+(?:las?\s+siguientes\s*)?:?\s*|incluyen?|comprenden?|abarcan?)\s+\w+/i,
+  // "principales variedades de <PLANT>: <word>" o "son <word>"
+  // Plant name en grupo 1.
+  /\b(?:principales?|diferentes|distintas)\s+(?:variedades?|cultivares?)\s+de\s+(?:la\s+|el\s+|los\s+|las\s+|del\s+)?([a-záéíóúñ]+(?:\s+[a-záéíóúñ]+)?)\s*(?::\s*\w+|son\s+(?:las?\s+siguientes\s*)?:?\s*\w+|incluyen?\s+\w+|comprenden?\s+\w+|abarcan?\s+\w+)/i,
+  // "<PLANT> tiene <N> variedades/cultivares"
+  // Plant name en grupo 1.
+  /\b([a-záéíóúñ]+(?:\s+[a-záéíóúñ]+)?)\s+tiene\s+\d+\s+(?:variedades?|cultivares?)\b/i,
+  // "existen/hay <N> variedades de <PLANT>"
+  // Plant name en grupo 1.
+  /\b(?:existen|hay)\s+\d+\s+(?:variedades?|cultivares?)\s+de\s+(?:la\s+|el\s+|los\s+|las\s+|del\s+)?([a-záéíóúñ]+(?:\s+[a-záéíóúñ]+)?)\b/i,
+];
+
+/**
+ * Artículos y partículas que pueden prefijar el nombre de planta capturado.
+ */
+const CASO_C_LEADING_ARTICLES = /\b(?:el\s+|la\s+|los\s+|las\s+|del\s+|un\s+|una\s+)/i;
+
+/** Palabras-función que NO son parte del nombre de la planta (cortas o stop). */
+const CASO_C_TRAILING_STOP = /\s+(?:en|de|del|con|para|por|sin|son|hay|tiene|las|los|sus|las|sus|ese|esa|eso|este|esta|esto|son|como|pero)\s*$/i;
+
+/**
+ * Limpia el nombre de planta capturado: quita artículos iniciales y palabras
+ * función que el matching greedy se llevó de más.
+ * @param {string} raw
+ * @returns {string}
+ */
+function _cleanPlantName(raw) {
+  let s = raw.trim();
+  s = s.replace(CASO_C_LEADING_ARTICLES, '');
+  s = s.replace(CASO_C_TRAILING_STOP, '');
+  return s.trim();
+}
+
+/**
+ * Busca en texto normalizado un patrón de enumeración de variedades/
+ * cultivares y extrae el nombre de la planta limpio.
+ * @param {string} norm
+ * @returns {string|null}
+ */
+function _findVarietyEnumPlant(norm) {
+  for (const re of CASO_C_PLANT_PATTERNS) {
+    const m = norm.match(re);
+    if (m && m[1]) {
+      const plant = _cleanPlantName(m[1]);
+      if (plant && plant.length <= 40) return plant;
+    }
+  }
+  return null;
+}
+
+/** ¿El texto normalizado contiene un patrón de enumeración de variedades? */
+function _hasVarietyEnumeration(norm) {
+  return CASO_C_PLANT_PATTERNS.some((re) => re.test(norm));
+}
+
+/**
+ * Construye la deflexión honesta para CASO C.
+ * @param {string} plantName
+ * @returns {string}
+ */
+function _casoCReplacement(plantName) {
+  const p = plantName.trim();
+  return (
+    `El catálogo Chagra todavía no tiene un inventario de variedades de ${p} documentado todavía. ` +
+    `¿Quieres información general del cultivo, o prefieres registrar las variedades que tengas en tu finca?`
+  );
+}
+
+/**
+ * guardVarietyWithoutEvidence — CASO C. ANTI-VARIEDAD/CULTIVAR ENUMERADO SIN
+ * EVIDENCIA AUTORITATIVA.
+ *
+ * Cuando la respuesta enumera variedades/cultivares de una planta SIN que el
+ * prompt contuviera un bloque "=== EVIDENCIA AUTORITATIVA ===" respaldando
+ * tales enumeraciones (cf. REGLA CASO C de agentPromptBase), SUPRIME el cuerpo
+ * y lo REEMPLAZA por la deflexión honesta:
+ *   "El catálogo Chagra todavía no tiene un inventario de variedades de
+ *    [planta] documentado todavía."
+ *
+ * GATING:
+ *   1. La respuesta contiene un patrón de enumeración de variedades o
+ *      cultivares para una especie.
+ *   2. La respuesta NO niega ya que carece de info de variedades (el modelo
+ *      ya acertó → idempotencia sobre la regla).
+ *   3. Idempotencia: nuestro reemplazo no está presente ya.
+ *   4. Anti-FP userMessage: si el usuario mencionó variedades específicas
+ *      en su pregunta, la respuesta puede repetirlas sin ser invento.
+ *
+ * Firma propia (necesita userMessage) → se invoca aparte en applyOutputGuards,
+ * justo tras guardInventedVariety y dentro del mismo gate de siembra.
+ * SUPPRESS-AND-REPLACE (early-return).
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardVarietyWithoutEvidence(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Idempotencia: nuestro reemplazo ya está → no re-suprimir.
+  if (responseText.includes(CASO_C_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const respNorm = _stripDiacritics(responseText);
+  const userNorm = typeof userMessage === 'string' ? _stripDiacritics(userMessage) : '';
+
+  // Gate 1: ¿hay un patrón de enumeración de variedades/cultivares en la respuesta?
+  const plant = _findVarietyEnumPlant(respNorm);
+  if (!plant) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Gate 2: si la respuesta YA niega tener info de variedades, el modelo acertó.
+  if (CASO_C_DENIED_RE.test(respNorm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Gate 4 (anti-FP): si el usuario preguntó/listó variedades, permitir eco.
+  if (userNorm && _hasVarietyEnumeration(userNorm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('variety_without_evidence');
+  // SUPPRESS-AND-REPLACE: descartamos la enumeración inventada y devolvemos
+  // el mensaje honesto de CASO C.
+  return {
+    text: _casoCReplacement(plant),
+    modified: true,
+    reason: `variedad_sin_evidencia: ${plant}`,
+  };
+}
+
 // ── GUARD: viabilidad FALSO-NEGATIVO (cultivo viable marcado inviable) ──────
 
 /**
@@ -7335,6 +7500,121 @@ export function guardFabricatedBeneficialBinomial(responseText, resolvedEntities
   };
 }
 
+// ── GUARD #95: BINOMIO LATINO INVENTADO FUERA DEL GROUNDING (atribución) ──────
+
+/**
+ * Patrón de ATRIBUCIÓN común: "<nombre común> (Genus species)". El nombre común
+ * (≥3 letras) precede inmediatamente a un binomio entre paréntesis. Capturamos:
+ *   m[1] = nombre común crudo (lo que dijo el usuario / el catálogo),
+ *   m[2] = género (capitalizado), m[3] = epíteto.
+ * Tolera un rango infra-específico ignorable tras el epíteto (var./subsp.).
+ * Diseño anti-ruido: el género va Capitalizado y el epíteto en minúscula
+ * (convención binomial), igual que `SCI_BINOMIAL_RE` pero anclado al paréntesis
+ * de atribución — la firma EXACTA de la alucinación que reporta la tarea #95
+ * ("tomate de árbol (Solanum lycopersicum)" cuando el grounding no trae esa
+ * especie). No tocamos binomios sueltos en prosa: ahí los guards 5/5b/benéfico/
+ * extracto ya razonan con su propio contexto, y un binomio suelto sin paréntesis
+ * suele ser una identificación de patógeno/insumo legítima.
+ */
+const ATTRIBUTED_BINOMIAL_RE =
+  /\b([A-Za-zÁÉÍÓÚÜÑáéíóúüñ][\wÁÉÍÓÚÜÑáéíóúüñ-]*(?:\s+[\wÁÉÍÓÚÜÑáéíóúüñ-]+){0,4}?)\s*\(\s*([A-Z][a-zé]+)\s+([a-zé][a-zé-]+)\b[^)]*\)/g;
+
+/** Reason estable + marca de telemetría del guard #95. */
+const INVENTED_BINOMIAL_REASON = 'binomio_inventado_fuera_de_grounding';
+
+/**
+ * guardInventedBinomialOutOfGrounding — GUARD DETERMINÍSTICO #95.
+ *
+ * PROBLEMA (tarea #95, prompt-rule "REGLA CRÍTICA DE ESPECIE DESCONOCIDA" en
+ * agentService): cuando el usuario nombra una planta/cultivo cuyo binomio NO está
+ * en el grounding del turno (ni en `resolvedEntities.nombre_cientifico` ni en los
+ * sub-arrays/evidencia), el modelo a veces INVENTA un binomio latino por similitud
+ * fonética y lo cuelga entre paréntesis del nombre común ("tomate de árbol
+ * (Solanum lycopersicum)"). El system prompt lo prohíbe, pero falta el GUARD de
+ * SALIDA que lo capture cuando el modelo igual lo inventa.
+ *
+ * QUÉ HACE: por cada atribución "<nombre común> (Genus species)" del texto, si el
+ * binomio NO está respaldado por el grounding del turno (`_groundedBinomials`) y
+ * NO es un binomio legítimo conocido fuera del grafo (patógeno identificado,
+ * insumo/biocontrol real, género de organismo benéfico), NEUTRALIZA el binomio
+ * inventado QUITANDO el paréntesis y dejando SOLO el nombre común. Quirúrgico (no
+ * nuke): el resto de la respuesta queda intacto.
+ *
+ * DISEÑO CONSERVADOR (anti-falso-positivo — prioridad: falsos negativos sobre
+ * romper respuestas válidas):
+ *  - Solo actúa sobre la atribución entre PARÉNTESIS "común (Genus species)" — la
+ *    firma exacta de la alucinación. Binomios sueltos en prosa NO se tocan (ahí ya
+ *    razonan los guards 5/5b/benéfico/extracto con su contexto, y suelen ser
+ *    identificación legítima de patógeno/insumo).
+ *  - Un binomio que SÍ está en el grounding (`_groundedBinomials`, incl.
+ *    companions/antagonists/alternativas/pest_controllers) se CONSERVA tal cual.
+ *  - Whitelist de binomios legítimos fuera del grafo: patógenos conocidos
+ *    (`KNOWN_PATHOGEN_BINOMIALS`), insumos/biocontroles reales (`_isRealAgroInput`),
+ *    y géneros de organismos benéficos (`BENEFICIAL_GENERA_ALLOWLIST`). Ninguno se
+ *    neutraliza (un caldo bordelés sobre Mycosphaerella fijiensis, un neem
+ *    (Azadirachta indica), un Aphidius colemani son correctos sin grounding).
+ *  - Pares de prosa española capitalizada ("(Sin embargo ...)") se descartan con
+ *    `_looksLikeLatinBinomial`.
+ *  - Si NO hay grounding (`resolvedEntities` vacío/null), NO actúa: sin grounding
+ *    no podemos distinguir inventado de legítimo → ante la duda, no modificar.
+ *  - Determinístico, barato (regex + lookups), idempotente (al quitar el paréntesis
+ *    el binomio ya no está → segunda pasada no re-dispara).
+ *
+ * @param {string} responseText — texto del LLM.
+ * @param {Array<object>|null} resolvedEntities — grounding AGE del turno.
+ * @returns {{text:string, modified:boolean, reason:string|null, binomials?:string[]}}
+ */
+export function guardInventedBinomialOutOfGrounding(responseText, resolvedEntities = null) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Sin grounding NO podemos distinguir inventado de legítimo. Conservador:
+  // ante la duda, no modificar (preferir falso negativo a romper respuesta).
+  const entities = Array.isArray(resolvedEntities) ? resolvedEntities : [];
+  if (entities.length === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  // Gate barato: ¿hay siquiera un paréntesis con forma de binomio?
+  ATTRIBUTED_BINOMIAL_RE.lastIndex = 0;
+  if (!ATTRIBUTED_BINOMIAL_RE.test(responseText)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const grounded = _groundedBinomials(entities);
+  /** binomios neutralizados (canónicos), en orden, dedup, para el reason. */
+  const removed = [];
+
+  ATTRIBUTED_BINOMIAL_RE.lastIndex = 0;
+  const out = responseText.replace(ATTRIBUTED_BINOMIAL_RE, (match, common, genusRaw, epithetRaw) => {
+    // ¿Par latino plausible? (descarta "(Sin embargo)" y prosa capitalizada).
+    if (!_looksLikeLatinBinomial(genusRaw, epithetRaw)) return match;
+    const bin = _binomial(`${genusRaw} ${epithetRaw}`);
+    if (!bin) return match;
+    // CONSERVAR: respaldado por el grounding del turno.
+    if (grounded.has(bin)) return match;
+    // CONSERVAR: legítimos fuera del grafo (patógeno / insumo-biocontrol / benéfico).
+    if (KNOWN_PATHOGEN_BINOMIALS.has(bin)) return match;
+    const genusNorm = _stripDiacritics(genusRaw).toLowerCase();
+    if (BENEFICIAL_GENERA_ALLOWLIST.has(genusNorm)) return match;
+    if (_isRealAgroInput(bin) || _isRealAgroInput(genusNorm)) return match;
+    // NEUTRALIZAR: binomio inventado fuera del grounding → solo el nombre común.
+    if (!removed.includes(bin)) removed.push(bin);
+    return common.trimEnd();
+  });
+
+  if (removed.length === 0 || out === responseText) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('invented_binomial_out_of_grounding');
+  return {
+    text: out,
+    modified: true,
+    reason: `${INVENTED_BINOMIAL_REASON}: ${removed.join(', ')}`,
+    binomials: removed,
+  };
+}
+
 /**
  * Guard de NORMATIVA (Ley 1930 - Páramo).
  *
@@ -8342,6 +8622,21 @@ export function applyOutputGuards(
     }
   }
 
+  // GUARD CASO C: variedad/cultivar enumerado SIN EVIDENCIA AUTORITATIVA. Si la
+  // respuesta enumera variedades/cultivares de una planta SIN que el prompt
+  // tuviera un bloque "=== EVIDENCIA AUTORITATIVA ===" respaldándolas (el
+  // catálogo Chagra no tiene inventario de variedades por especie), SUPRIME el
+  // cuerpo y REEMPLAZA por la deflexión honesta de CASO C. Complementa a
+  // guardInventedVariety (que cubre el sub-caso de variedad climáticamente
+  // imposible). Es un suppress-and-replace con firma propia (userMessage) →
+  // early-return. Guard de SIEMBRA/identidad.
+  if (runPlantingGuards && !(vis && vis.modified)) {
+    const ve = guardVarietyWithoutEvidence(text, { userMessage });
+    if (ve && ve.modified) {
+      return { text: ve.text, modified: true, reasons: ve.reason ? [ve.reason] : [] };
+    }
+  }
+
   // GUARD VIABILIDAD-ALTITUD DURA (BORDE-015/019/023 · V2): si la respuesta PROMUEVE
   // un cultivo de clima inequívoco a una altitud CLARAMENTE FUERA de su banda viable
   // (café a 3600 m, Hass a 2800 m, mora de Castilla a 450 m), SUPRIME el cuerpo y lo
@@ -8639,6 +8934,22 @@ export function applyOutputGuards(
     text = benefRes.text;
     modified = true;
     if (benefRes.reason) reasons.push(benefRes.reason);
+  }
+  // Guard #95 ANTI-ALUCINACIÓN-DE-ESPECIE (binomio inventado fuera del grounding):
+  // firma propia (usa el grounding crudo del turno). Corre SIEMPRE (no es de
+  // siembra). QUIRÚRGICO: si el texto cuelga un binomio latino entre paréntesis de
+  // un nombre común ("tomate de árbol (Solanum lycopersicum)") cuyo binomio NO está
+  // en el grounding del turno (ni patógeno/insumo/benéfico conocido), NEUTRALIZA ese
+  // binomio dejando solo el nombre común. Es el GUARD de SALIDA que respalda la
+  // prompt-rule "REGLA CRÍTICA DE ESPECIE DESCONOCIDA" cuando el modelo igual lo
+  // inventa. Va tras el caveat de benéfico (que solo cubre el contexto biocontrol) y
+  // antes de la superficie de ConfusionWarning, para que su prefijo tóxico siga
+  // liderando. Conservador: sin grounding no actúa.
+  const invBinRes = guardInventedBinomialOutOfGrounding(text, resolvedEntities);
+  if (invBinRes && invBinRes.modified) {
+    text = invBinRes.text;
+    modified = true;
+    if (invBinRes.reason) reasons.push(invBinRes.reason);
   }
   // Guard SAFETY-CRITICAL de superficie de ConfusionWarning (BORDE-001 ·
   // cianuro/escopolamina/ricina/rotenona): firma propia (necesita las entidades

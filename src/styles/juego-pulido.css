@@ -1,0 +1,471 @@
+/* ============================================================================
+   juego-pulido.css — PULIDO VISUAL de los tableros del juego de Chagra.
+
+   Pasada de CALIDAD VISUAL (NO mecánica, NO didáctica): jerarquía, espaciados,
+   tipografía, fichas de plaga/cura (legibilidad + belleza), bordes/sombras/
+   contraste, micro-detalles y coherencia con la IDENTIDAD CHAGRA (mano radial,
+   sol/soberanía solar, paletas reales de los 4 temas). Continúa #1872 (piel por
+   tema) y #1873 (didáctica de plagas/curas) — NO los repite.
+
+   GATE (innegociable): TODO va scopeado bajo `.fvh-skin`, la clase que los
+   componentes solo montan cuando la flag VITE_FINCA_VIVA_HOME_PERFIL está ON
+   (dev). Con la flag OFF (prod) estas reglas NO aplican y los tableros quedan
+   EXACTOS como hoy (dark en prod). Así el operador aprueba el LOOK en dev antes
+   de prod, sin riesgo.
+
+   Tokens: derivamos de los --c-* / --scrim-bg que cada tema redefine en
+   index.css (mismo patrón que temas-fase2.css). NUNCA un hex de paleta fija que
+   choque con un tema. El sol/dorado de la identidad sale de --c-amber-*.
+
+   Español de Colombia (tú/usted), sin voseo. Offline-first (CSS puro). Respeta
+   prefers-reduced-motion.
+   ========================================================================== */
+
+/* ── Tokens de pulido derivados de la piel del tema ─────────────────────────
+   --jp-* = capa de PULIDO. Se apoyan en --c-* (tema) para no romper ninguna
+   paleta. El "dorado solar" es el ámbar del tema = identidad de soberanía
+   energética solar de Chagra. */
+.fvh-skin {
+  --jp-borde: rgb(var(--c-surface-border, 51 65 85));
+  --jp-card: rgb(var(--c-surface-card, 15 23 42));
+  --jp-raised: rgb(var(--c-surface-raised, 30 41 59));
+  --jp-tinta: rgb(var(--c-slate-100, 241 245 249));
+  --jp-tinta-2: rgb(var(--c-slate-200, 226 232 240));
+  /* Tinta SECUNDARIA (texto suave/meta). En claros vira a --c-slate-400 (café/
+     stone, AA ≥4.7 sobre superficie del tema); en oscuros queda slate-400 claro.
+     Es la pareja de --jp-tinta para el cuerpo de los paneles retiñidos. */
+  --jp-tinta-3: rgb(var(--c-slate-400, 148 163 184));
+  --jp-sol: rgb(var(--c-amber-500, 245 158 11));
+  --jp-sol-suave: rgb(var(--c-amber-500, 245 158 11) / 0.16);
+  --jp-vida: rgb(var(--c-emerald-500, 16 185 129));
+  --jp-vida-clara: rgb(var(--c-emerald-400, 52 211 153));
+  /* Acento de vida para TEXTO (legible AA). En oscuros = emerald-300 vivo; en
+     claros lo afinamos a emerald-500 (salvia profunda AA ≥4.7 sobre superficie
+     clara) en el bloque [data-theme] de abajo. */
+  --jp-vida-texto: rgb(var(--c-emerald-300, 110 231 183));
+  --jp-vida-suave: rgb(var(--c-emerald-500, 16 185 129) / 0.14);
+  --jp-velo: rgb(var(--scrim-bg, 8 30 22));
+  /* Sombras consistentes (escalera de elevación) para todo el juego. */
+  --jp-sombra-1: 0 1px 2px rgb(var(--scrim-bg, 8 30 22) / 0.18);
+  --jp-sombra-2: 0 6px 18px rgb(var(--scrim-bg, 8 30 22) / 0.22);
+  --jp-sombra-3: 0 16px 44px rgb(var(--scrim-bg, 8 30 22) / 0.30);
+}
+
+/* ── DETALLE DE IDENTIDAD: ambiente radial de "la mano de Chagra" + sol ───────
+   Un degradado radial muy tenue tras el contenido del tablero (esquina superior
+   = sol/soberanía solar; esquina inferior = vida verde). Se pinta como
+   `background` del propio contenedor → el contenido se apila ENCIMA sin pelear
+   con z-index. Sutil: ambienta, no compite con la escena ni resta legibilidad. */
+.fvh-skin.jp-ambiente {
+  background-image:
+    radial-gradient(70% 48% at 92% -6%, var(--jp-sol-suave), transparent 60%),
+    radial-gradient(64% 46% at -6% 104%, var(--jp-vida-suave), transparent 64%);
+  background-repeat: no-repeat;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DEFENSORES DE LA FINCA
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Encabezado: kicker con un trazo solar; jerarquía más clara. */
+.fvh-skin .jp-df-kicker {
+  position: relative;
+  padding-left: 0.65rem;
+}
+.fvh-skin .jp-df-kicker::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.1em;
+  bottom: 0.1em;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--jp-sol), var(--jp-vida));
+}
+
+/* Selector de nivel: tarjetas más pulidas, estado activo con glow solar/vida. */
+.fvh-skin .df-nivel {
+  border-radius: 1rem;
+  border-color: var(--jp-borde);
+  background: var(--jp-card);
+  box-shadow: var(--jp-sombra-1);
+  transition: transform 0.1s ease, border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+}
+.fvh-skin .df-nivel:hover:not(:disabled) {
+  border-color: var(--jp-vida);
+}
+.fvh-skin .df-nivel[data-selected='true'] {
+  border-color: var(--jp-vida-clara);
+  background: linear-gradient(160deg, var(--jp-raised), var(--jp-card));
+  box-shadow: var(--jp-sombra-2), inset 0 0 0 1px var(--jp-vida-suave);
+}
+.fvh-skin .df-nivel-num { letter-spacing: 0.01em; }
+.fvh-skin .df-nivel-nombre { opacity: 0.92; }
+
+/* Aviso de mini-jefe: ficha con franja de peligro a la izquierda. */
+.fvh-skin .df-jefe-aviso {
+  position: relative;
+  border-radius: 0.9rem;
+  padding-left: 0.95rem;
+  box-shadow: var(--jp-sombra-1);
+}
+.fvh-skin .df-jefe-aviso::before {
+  content: '';
+  position: absolute;
+  left: 0.35rem;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  width: 4px;
+  border-radius: 999px;
+  background: rgb(248 113 113);
+}
+
+/* HUD: corazones con brillo suave, número de puntos con tabular-nums. */
+.fvh-skin .df-hearts { filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.25)); }
+.fvh-skin [data-testid='defensores-puntaje'] {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Lienzo del plataformero: marco más pulido + halo de identidad (heredado). */
+.fvh-skin.df-stage {
+  border-radius: 1.35rem;
+  box-shadow: var(--jp-sombra-3);
+  border: 1px solid var(--jp-borde);
+}
+
+/* FICHAS DE CURA (benéficos = control biológico): el corazón del aprendizaje.
+   Más legibles y bellas: emoji en plinto, nombre nítido, activo con anillo. */
+.fvh-skin .df-beneficios { gap: 0.6rem; }
+.fvh-skin .df-beneficio {
+  border-radius: 1rem;
+  border-color: var(--jp-borde);
+  background: var(--jp-card);
+  box-shadow: var(--jp-sombra-1);
+  padding: 0.5rem 0.55rem;
+  gap: 0.3rem;
+  transition: transform 0.1s ease, border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+}
+.fvh-skin .df-beneficio:hover { border-color: var(--jp-vida); }
+.fvh-skin .df-beneficio[data-selected='true'] {
+  border-color: var(--jp-vida-clara);
+  background: linear-gradient(160deg, var(--jp-raised), var(--jp-card));
+  box-shadow: var(--jp-sombra-2), inset 0 0 0 1.5px var(--jp-vida-suave);
+}
+/* El emoji del aliado sobre un plinto circular = ficha de cura reconocible. */
+.fvh-skin .df-beneficio-emoji {
+  display: grid;
+  place-items: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 999px;
+  background: radial-gradient(circle at 38% 32%, var(--jp-vida-suave), transparent 72%), var(--jp-raised);
+  box-shadow: inset 0 0 0 1px var(--jp-borde);
+}
+.fvh-skin .df-beneficio[data-selected='true'] .df-beneficio-emoji {
+  box-shadow: inset 0 0 0 1px var(--jp-vida-clara), 0 0 12px var(--jp-vida-suave);
+}
+.fvh-skin .df-beneficio-nombre {
+  font-size: 0.72rem;
+  color: var(--jp-tinta-2);
+  letter-spacing: 0.005em;
+}
+
+/* Banner de lección: tipografía y respiración mejores, acento de vida. */
+.fvh-skin .df-leccion {
+  border-radius: 1rem;
+  border-color: var(--jp-vida);
+  background: linear-gradient(180deg, var(--jp-raised), var(--jp-card));
+  box-shadow: var(--jp-sombra-1);
+  padding: 0.7rem 0.9rem;
+  color: var(--jp-tinta);
+  line-height: 1.4;
+}
+
+/* Overlay de fin de nivel: velo del tema + tarjeta centrada elegante. */
+.fvh-skin .df-overlay {
+  background: rgb(var(--scrim-bg, 8 30 22) / 0.9);
+  gap: 0.85rem;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DOOM DE LA FINCA — HUD, lienzo, fichas (UI alrededor del raycaster)
+   El canvas/raycaster NO se toca aquí (su paleta vive en doomFincaData).
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Lienzo del juego: marco pulido coherente con el resto. */
+.fvh-skin .jp-doom-lienzo {
+  border-radius: 1.1rem;
+  box-shadow: var(--jp-sombra-3);
+}
+/* HUD superior: una banda con respiración y separadores sutiles. */
+.fvh-skin .jp-doom-hud {
+  background: linear-gradient(180deg, var(--jp-raised), var(--jp-card));
+  border: 1px solid var(--jp-borde);
+  border-radius: 0.9rem;
+  padding: 0.5rem 0.75rem;
+  box-shadow: var(--jp-sombra-1);
+}
+.fvh-skin .jp-doom-hud [aria-label*='puntaje' i],
+.fvh-skin .jp-doom-hud [aria-label*='plagas' i],
+.fvh-skin .jp-doom-hud [aria-label*='combo' i] {
+  font-variant-numeric: tabular-nums;
+}
+/* Barra de vitalidad: riel más profundo + relleno con brillo. */
+.fvh-skin .jp-doom-vital-riel {
+  background: rgb(var(--scrim-bg, 8 30 22) / 0.55);
+  border-color: var(--jp-borde);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.25);
+}
+
+/* FICHA DE CURA tras un acierto (la tarjeta didáctica plaga→aliado): bella y
+   legible, con plinto y acento solar para el "por qué funciona". */
+.fvh-skin .jp-doom-ficha {
+  background: linear-gradient(180deg, var(--jp-raised), var(--jp-card)) !important;
+  border-color: var(--jp-vida) !important;
+  border-radius: 1rem !important;
+  box-shadow: var(--jp-sombra-3);
+}
+
+/* Selector de benéficos (fichas de cura compactas): redondeo + elevación.
+   NO tocamos background/border-color: el componente los usa inline para señalar
+   "equipado/recomendado" (cue funcional). Solo añadimos forma y sombra. */
+.fvh-skin .jp-doom-beneficio {
+  border-radius: 0.95rem !important;
+  box-shadow: var(--jp-sombra-1);
+  transition: transform 0.1s ease, box-shadow 0.16s ease;
+}
+.fvh-skin .jp-doom-beneficio:hover { box-shadow: var(--jp-sombra-2); }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   MUNDO SUBSUELO — header, mascotas, cartas (fichas de decisión)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Header: el degradado crema fijo choca con biopunk; lo retiñimos a una franja
+   de superficie del tema con un toque solar→vida (identidad). */
+.fvh-skin.ms-root .jp-ms-header {
+  background: linear-gradient(135deg, var(--jp-sol-suave), var(--jp-raised) 55%, var(--jp-vida-suave)) !important;
+  border-color: var(--jp-borde) !important;
+  box-shadow: var(--jp-sombra-2);
+}
+.fvh-skin.ms-root .jp-ms-header h1,
+.fvh-skin.ms-root .jp-ms-header p,
+.fvh-skin.ms-root .jp-ms-kicker {
+  color: var(--jp-tinta) !important;
+}
+.fvh-skin.ms-root .jp-ms-kicker { letter-spacing: 0.2em; }
+
+/* Mascotas (Lombricita / Miquito): conservan sus tarjetas CLARAS (que destacan
+   sobre el root oscuro del tema y dejan legible el texto stone oscuro). Solo
+   unificamos redondeo y elevación; el activo gana una sombra de vida más
+   marcada. NO tocamos background/color → legibilidad intacta. */
+.fvh-skin.ms-root .jp-ms-mascota {
+  border-radius: 1.1rem;
+  box-shadow: var(--jp-sombra-1);
+}
+.fvh-skin.ms-root .jp-ms-mascota[data-active='true'] {
+  box-shadow: var(--jp-sombra-2), 0 0 0 2px var(--jp-vida-suave);
+}
+
+/* Viñeta de la escena: marco pulido más profundo. El SVG interior del suelo NO
+   se toca (es la lección). */
+.fvh-skin.ms-vinneta {
+  border-radius: 1.5rem !important;
+  box-shadow: var(--jp-sombra-3) !important;
+}
+
+/* Carta activa + cartas de decisión: conservan sus tonos (lime=bueno / rose=malo
+   / cyan=seleccionada) porque son CUE de la lección. Solo pulimos forma y
+   elevación; la seleccionada gana sombra. */
+.fvh-skin.ms-root .jp-ms-panel {
+  border-radius: 1.2rem;
+  box-shadow: var(--jp-sombra-2);
+}
+.fvh-skin.ms-root .jp-ms-carta {
+  border-radius: 1rem;
+  box-shadow: var(--jp-sombra-1);
+  transition: transform 0.1s ease, box-shadow 0.16s ease;
+}
+.fvh-skin.ms-root .jp-ms-carta:hover { box-shadow: var(--jp-sombra-2); }
+.fvh-skin.ms-root .jp-ms-carta[data-selected='true'] {
+  box-shadow: var(--jp-sombra-2), 0 0 0 1px var(--jp-vida-suave);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   MI FINCA VIVA — panel del hub del juego (secciones, misiones, insignias)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Tarjetas de entrada a subjuegos: borde y sombra coherentes, hover con vida. */
+.fvh-skin .jp-mfv-entrada {
+  border-radius: 1.1rem;
+  box-shadow: var(--jp-sombra-1);
+  transition: transform 0.1s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+.fvh-skin .jp-mfv-entrada:hover { box-shadow: var(--jp-sombra-2); }
+
+/* En los TEMAS CLAROS la tarjeta conservaba su degradado Tailwind translúcido
+   (p.ej. el Doom: from-orange-600/40 to-amber-800/40 = KHAKI) sobre la crema del
+   tema → la descripción `jp-tinta-suave` oscura caía sobre khaki = ratio 1.8–3.2,
+   bajo AA (audit Bug 3: "Doom intro 'Recorre la finca…' gris-oscuro sobre
+   khaki-oscuro"). El comentario de Fase 2.1 asumía "ya tienen fondo del tema",
+   pero la regla nunca lo seteaba. Aquí SÍ retiñimos el fondo a la superficie del
+   tema (un velo del acento del color de cada tarjeta da identidad sin lavar): la
+   tinta (13.8:1) y la suave (5.9:1 verde-vivo) leen AA. Solo claros; biopunk
+   (sin data-theme) conserva su degradado neón sobre navy. verde-vivo entra como
+   tema CLARO que es (estaba mal agrupado con biopunk). */
+[data-theme="nature"] .fvh-skin .jp-mfv-entrada,
+[data-theme="minimalista"] .fvh-skin .jp-mfv-entrada,
+[data-theme="verde-vivo"] .fvh-skin .jp-mfv-entrada {
+  background-image: linear-gradient(160deg, var(--jp-raised), var(--jp-card)) !important;
+  border-color: var(--jp-borde) !important;
+}
+
+/* Marco del mundo vivo (FincaWorldScene): el halo de identidad + marco pulido
+   se aplican vía .fv-scene en temas-fase2.css; aquí solo redondeamos un punto. */
+.fvh-skin.fv-scene { border-radius: 1.35rem !important; }
+
+/* Panel de mensaje del mundo + insignias: respiración y elevación suaves. */
+.fvh-skin .jp-mfv-panel {
+  border-radius: 1.2rem;
+  box-shadow: var(--jp-sombra-1);
+}
+.fvh-skin .jp-mfv-insignia {
+  box-shadow: var(--jp-sombra-1);
+  transition: transform 0.12s ease;
+}
+.fvh-skin .jp-mfv-insignia:hover { transform: translateY(-2px); }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   CONTRASTE DE TEXTO POR TEMA (Fase 2.1) — los paneles de arriba retiñen su
+   FONDO a la superficie del tema (blanco/crema en nature/minimalista), pero el
+   texto de cuerpo seguía en utilidades Tailwind pensadas para fondo OSCURO
+   (text-white, text-emerald-50/100/200…) → claro-sobre-claro = ILEGIBLE en los
+   temas claros. Aquí tonamos ESE texto vía las vars del tema (--jp-tinta /
+   --jp-tinta-3, derivadas de --c-slate-100/400 que ya viran AA por tema).
+
+   Regla de oro: SOLO el texto de CUERPO sobre superficie del tema. NO tocamos
+   el texto sobre botones de ACENTO saturado (bg-emerald-500 → text-emerald-950,
+   que ya es oscuro-sobre-claro y se lee), ni el texto sobre el canvas/overlays
+   NEGROS del Doom (bg-black/80, etiqueta del objetivo, intro) que son oscuros
+   en los 4 temas. Verde-vivo y biopunk (oscuros) no cambian: --jp-tinta vuelve
+   a slate-100 claro → idénticos a hoy. Gated bajo .fvh-skin (prod intacto).
+
+   Las clases `jp-tinta`/`jp-tinta-suave` marcan el texto-cuerpo en el JSX; aquí
+   las resolvemos al tono correcto del tema con !important (vencen la utilidad
+   Tailwind de igual especificidad). El icono/acento decorativo se deja aparte. */
+
+/* Texto-cuerpo PRINCIPAL de los paneles del juego (títulos de mundo, mensajes,
+   descripciones de subjuegos, nombre/cuerpo de fichas). */
+.fvh-skin .jp-tinta { color: var(--jp-tinta) !important; }
+/* Texto-cuerpo SECUNDARIO (kickers, meta, notas, leyendas, ayuda). */
+.fvh-skin .jp-tinta-suave { color: var(--jp-tinta-3) !important; }
+/* Acento de VIDA (verde del tema) para piezas de TEXTO legibles (no decorativas):
+   en oscuros es el emerald vivo; en claros la salvia profunda AA del tema. Útil
+   para etiquetas tipo "controla a" / "por qué funciona" / "%".
+   verde-vivo es CLARO (audit Bug 3): con el default emerald-300 daba 4.48:1
+   sobre su tarjeta (bajo AA); --c-emerald-500 (#287a34) sube a 5.21:1 = AA. */
+.fvh-skin .jp-acento-vida { color: var(--jp-vida-texto) !important; }
+[data-theme="nature"] .fvh-skin,
+[data-theme="minimalista"] .fvh-skin,
+[data-theme="verde-vivo"] .fvh-skin { --jp-vida-texto: rgb(var(--c-emerald-500, 16 185 129)); }
+
+/* ── MI FINCA VIVA (hub): kicker de nivel, título del mundo, mensaje del mundo,
+   descripciones de las tarjetas de subjuego, barra de progreso, misiones,
+   insignias y la nota para acompañantes. El panel de mensaje (.jp-mfv-panel) y
+   las tarjetas (.jp-mfv-entrada) ya tienen fondo del tema; tonamos su texto. */
+.fvh-skin .jp-mfv-panel .jp-tinta,
+.fvh-skin .jp-mfv-entrada .jp-tinta { color: var(--jp-tinta) !important; }
+.fvh-skin .jp-mfv-panel .jp-tinta-suave,
+.fvh-skin .jp-mfv-entrada .jp-tinta-suave { color: var(--jp-tinta-3) !important; }
+
+/* ── DOOM: la ficha educativa tras un acierto (.jp-doom-ficha) tiene fondo del
+   tema (claro en nature/minimalista) por el !important de arriba → su texto debe
+   virar. El cuerpo va a --jp-tinta; el "controla a"/"por qué" usan el acento de
+   vida del tema. Los <b> de plaga (rojo) y benéfico (ámbar) son CUE semántico:
+   se leen sobre superficie clara/oscura, no se tocan. */
+.fvh-skin .jp-doom-ficha .jp-tinta { color: var(--jp-tinta) !important; }
+.fvh-skin .jp-doom-ficha .jp-tinta-suave { color: var(--jp-tinta-3) !important; }
+
+/* CUE de color plaga (rojo) / benéfico (ámbar): conserva su SEMÁNTICA en los 4
+   temas. En oscuro (biopunk, SIN data-theme) queda su tono claro original (no se
+   toca). En los 3 temas CLAROS (nature/minimalista/VERDE-VIVO) la ficha tiene
+   fondo blanco/crema → el rojo/ámbar pálido se lavaba (red-200 1.41:1 ·
+   amber-200 1.21:1 en verde-vivo); lo bajamos a un tono profundo AA (≥5.7 en
+   verde-vivo) que sigue leyéndose como rojo/ámbar (CUE intacto).
+   verde-vivo es CLARO y estaba ERRÓNEAMENTE agrupado con biopunk (audit Bug 3). */
+[data-theme="nature"] .fvh-skin .jp-doom-plaga,
+[data-theme="minimalista"] .fvh-skin .jp-doom-plaga,
+[data-theme="verde-vivo"] .fvh-skin .jp-doom-plaga { color: rgb(190 30 30) !important; }
+[data-theme="nature"] .fvh-skin .jp-doom-benefico,
+[data-theme="minimalista"] .fvh-skin .jp-doom-benefico,
+[data-theme="verde-vivo"] .fvh-skin .jp-doom-benefico { color: rgb(var(--c-amber-700, 180 83 9)) !important; }
+
+/* Banner de lección del Doom (la decoración mirada): tenía fondo amber-950/50
+   (oscuro translúcido). En los temas claros lo asentamos sobre superficie del
+   tema con un tinte solar para que el texto-tinta se lea. En biopunk queda como
+   hoy. (verde-vivo incluido: tema claro.) */
+[data-theme="nature"] .fvh-skin .jp-doom-leccion,
+[data-theme="minimalista"] .fvh-skin .jp-doom-leccion,
+[data-theme="verde-vivo"] .fvh-skin .jp-doom-leccion {
+  background: linear-gradient(180deg, var(--jp-raised), var(--jp-card)) !important;
+  border-color: rgb(var(--c-amber-500, 245 158 11) / 0.45) !important;
+}
+
+/* HUD superior del Doom (ronda/plagas/puntaje/combo/vitalidad): vive sobre
+   .jp-doom-hud, cuyo fondo ya viró a superficie del tema. Sus números usaban
+   utilidades vivas (emerald-200/amber-300/lime-300/orange-300/white) que se
+   lavaban en claros (1.09–1.20:1 en verde-vivo). Las tonamos a la tinta del tema
+   (13.81:1) SOLO en los 3 temas claros; el color se mantiene en biopunk (donde
+   el fondo es navy). verde-vivo es CLARO → entra aquí (audit Bug 3). */
+[data-theme="nature"] .fvh-skin .jp-doom-hud [class*="text-"],
+[data-theme="minimalista"] .fvh-skin .jp-doom-hud [class*="text-"],
+[data-theme="verde-vivo"] .fvh-skin .jp-doom-hud [class*="text-"],
+[data-theme="nature"] .fvh-skin .jp-doom-vital [class*="text-"],
+[data-theme="minimalista"] .fvh-skin .jp-doom-vital [class*="text-"],
+[data-theme="verde-vivo"] .fvh-skin .jp-doom-vital [class*="text-"] {
+  color: var(--jp-tinta) !important;
+}
+
+/* HUD de DEFENSORES (.df-hud: corazones de energía + "Puntos"/puntaje) y el
+   subtítulo del nivel: usan utilidades vivas (text-emerald-200/70,
+   text-emerald-300/70, text-white) pensadas para fondo oscuro. En los 3 temas
+   claros el HUD se apoya sobre la superficie del tema (la foto de la app ya no
+   se cuela en verde-vivo) → esos tonos claros se lavaban (audit Bug 3:
+   "Defensores HUD/header lavado en verde-vivo"). Los tonamos a la tinta del tema
+   (≥13:1) SOLO en claros; en biopunk se mantienen vivos sobre el navy. */
+[data-theme="nature"] .fvh-skin .df-hud [class*="text-"],
+[data-theme="minimalista"] .fvh-skin .df-hud [class*="text-"],
+[data-theme="verde-vivo"] .fvh-skin .df-hud [class*="text-"],
+[data-theme="nature"] .fvh-skin [data-testid="defensores-subtitulo"],
+[data-theme="minimalista"] .fvh-skin [data-testid="defensores-subtitulo"],
+[data-theme="verde-vivo"] .fvh-skin [data-testid="defensores-subtitulo"] {
+  color: var(--jp-tinta) !important;
+}
+
+/* ── DIRECTORIO DE ESPECIES (versión skineada): el contenedor raíz pasa a
+   superficie del tema; tonamos título (nombre común), binomio, familia, header
+   y estados (buscando/vacío/guía). El nombre común usaba text-emerald-100 que
+   se lavaba sobre cream → ahora tinta del tema (AA en los 4). */
+.fvh-skin.jp-directorio { background: rgb(var(--c-surface, 2 6 23)) !important; }
+.fvh-skin.jp-directorio,
+.fvh-skin.jp-directorio .jp-tinta { color: var(--jp-tinta) !important; }
+.fvh-skin.jp-directorio .jp-tinta-suave { color: var(--jp-tinta-3) !important; }
+/* Cabecera y tarjetas de resultado del directorio: superficie + borde del tema
+   (vencen los bg-slate-9xx fijos del componente). */
+.fvh-skin.jp-directorio .jp-dir-header { background: rgb(var(--c-surface, 2 6 23) / 0.85) !important; border-color: var(--jp-borde) !important; }
+.fvh-skin.jp-directorio .jp-dir-card { background: var(--jp-card) !important; border-color: var(--jp-borde) !important; }
+.fvh-skin.jp-directorio .jp-dir-input { background: var(--jp-card) !important; border-color: var(--jp-borde) !important; color: var(--jp-tinta) !important; }
+
+/* ── Accesibilidad: nada de esto introduce movimiento autónomo; las únicas
+   transiciones son de hover/active (inocuas) y respetan el resto del sistema.
+   Sin :hover en táctil; en reduced-motion neutralizamos los micro-lifts. ──── */
+@media (prefers-reduced-motion: reduce) {
+  .fvh-skin .jp-mfv-insignia:hover,
+  .fvh-skin .df-nivel,
+  .fvh-skin .df-beneficio,
+  .fvh-skin .jp-ms-carta,
+  .fvh-skin .jp-mfv-entrada {
+    transition: none !important;
+  }
+  .fvh-skin .jp-mfv-insignia:hover { transform: none !important; }
+}

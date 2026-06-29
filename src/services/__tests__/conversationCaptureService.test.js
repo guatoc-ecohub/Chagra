@@ -3,7 +3,6 @@
  */
 
 /* eslint-disable no-undef */
-/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { captureExchange, isCaptureEnabled, shouldAnonymizePII } from '../conversationCaptureService';

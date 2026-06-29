@@ -1,3 +1,9 @@
+/* i18n (ADR-050): este formulario es 100% user-facing en español Colombia
+ * (etiquetas, ayudas, toasts). La regla chagra-i18n es soft (warn); se desactiva
+ * a nivel de archivo —mismo criterio que SpeciesSelect / SeguimientoProcesoScreen—
+ * para no bloquear el pre-commit (max-warnings=0). La migración i18n es trabajo
+ * aparte. */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { ArrowLeft, AlertCircle, MapPin, CheckCircle } from 'lucide-react';
 import { savePayload } from '../services/payloadService';
@@ -9,6 +15,7 @@ import DateField from './DateField';
 import PhotoCaptureField from './PhotoCaptureField';
 import { getAllSpecies } from '../db/catalogDB';
 import { extractVarieties, varietyHelpText } from '../utils/speciesVariety';
+import SpeciesCombobox from './SpeciesCombobox';
 
 // Bug 069.10 — validación client-side: límites razonables para evitar
 // payloads inválidos sincronizándose con FarmOS.
@@ -40,11 +47,19 @@ export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw
   const initialData = initialDataRaw || {};
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
-    crop: initialData.crop || '', // String para UI legacy o label
+    crop: initialData.crop || '', // Nombre común limpio de la especie (ej. "Fresa")
+    // Bug operador 2026-06-25: id canónico del catálogo elegido en el selector.
+    // Si viene null, la especie es texto libre (no resuelve calendario/fenología).
+    crop_species_id: initialData.crop_species_id || initialData.speciesId || null,
     plant_type: initialData.plant_type || null, // ADR-019: { type: 'taxonomy_term--plant_type', id: '...' }
     variety: initialData.variety || '',
     quantity: initialData.quantity || ''
   });
+  // Etiqueta de ubicación SEPARADA del nombre de la especie (bug operador
+  // 2026-06-25): antes el campesino escribía "Fresa - Invernadero #1" todo
+  // junto y la especie no resolvía. Ahora la especie se elige limpia del
+  // catálogo y la ubicación va en su propio campo opcional.
+  const [locationLabel, setLocationLabel] = useState(initialData.locationLabel || '');
   // UX-25 (#286) 2026-05-27: SeedingLog ahora usa PhotoCaptureField (mismo
   // componente bonito que InvasiveObservationLog). Mantenemos solo el
   // estado photo (blob); el preview/retake/remove/compresión lo maneja
@@ -78,15 +93,22 @@ export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw
   // startsWith (para tolerar "Café arábico" vs "Café"). Si no hay match,
   // retorna null (varieties = [] → campo oculto).
   const matchedSpecies = useMemo(() => {
+    if (allSpecies.length === 0) return null;
+    // Camino canónico: el operador eligió una especie del catálogo en el
+    // combobox → tenemos el id exacto, sin ambigüedad de nombre.
+    if (formData.crop_species_id) {
+      const byId = allSpecies.find((s) => s.id === formData.crop_species_id);
+      if (byId) return byId;
+    }
     const q = (formData.crop || '').trim().toLowerCase();
-    if (!q || allSpecies.length === 0) return null;
+    if (!q) return null;
     return (
       allSpecies.find((s) => (s.nombre_comun || '').toLowerCase() === q) ||
       allSpecies.find((s) => (s.id || '').toLowerCase() === q) ||
       allSpecies.find((s) => (s.nombre_comun || '').toLowerCase().startsWith(q) && q.length >= 3) ||
       null
     );
-  }, [formData.crop, allSpecies]);
+  }, [formData.crop, formData.crop_species_id, allSpecies]);
 
   const varieties = useMemo(() => extractVarieties(matchedSpecies), [matchedSpecies]);
   const showVarietyField = varieties.length > 0;
@@ -221,7 +243,14 @@ export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw
         }
       };
 
-      if (notes) payload.data.attributes.notes = { value: notes, format: 'plain_text' };
+      // Notas + ubicación: la etiqueta de ubicación va como línea separada en
+      // las notas, NUNCA mezclada con el nombre de la especie (que queda limpio
+      // para resolver el calendario). Bug operador 2026-06-25.
+      const composedNotes = [
+        notes ? notes.trim() : '',
+        locationLabel.trim() ? `Ubicación: ${locationLabel.trim()}` : '',
+      ].filter(Boolean).join('\n');
+      if (composedNotes) payload.data.attributes.notes = { value: composedNotes, format: 'plain_text' };
 
       const result = await savePayload('seeding', payload);
 
@@ -229,7 +258,10 @@ export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw
       // aparezca como ciclo activo en el agente y en alertas.
       // Tolerante a error: si falla, el seeding NO falla.
       try {
-        const draft = await buildDraftFromSeeding(payload);
+        // Pasamos el id de catálogo elegido en el selector: el draft lo usa
+        // directo como subject_slug, sin depender del parseo del nombre. Si es
+        // null (texto libre), el draft cae a la resolución por nombre.
+        const draft = await buildDraftFromSeeding(payload, { speciesSlug: formData.crop_species_id });
         if (draft) {
           const now = Date.now();
           const processId = newUlid();
@@ -265,7 +297,8 @@ export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw
 
       onSave(result.message || 'Registro guardado localmente (Pendiente de sincronización)', !result.success);
 
-      setFormData({ date: new Date().toISOString().split('T')[0], crop: '', variety: '', quantity: '' });
+      setFormData({ date: new Date().toISOString().split('T')[0], crop: '', crop_species_id: null, variety: '', quantity: '' });
+      setLocationLabel('');
       setPhoto(null);
       // UX-25: PhotoCaptureField maneja su preview/ObjectURL internamente
       // — no necesitamos revoke manual acá.
@@ -351,25 +384,46 @@ export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw
           </p>
         )}
 
-        <label className="flex flex-col gap-2">
-          <span className="text-xl font-bold">Cultivo</span>
-          <input
-            type="text"
-            name="crop"
-            placeholder="Ej: Fresa"
+        {/* Cultivo: SELECTOR del catálogo (no texto libre). Bug operador
+            2026-06-25: el camino por defecto es elegir una especie grounded
+            para que el `crop` resuelva siempre a un id canónico. */}
+        <div className="flex flex-col gap-2">
+          <SpeciesCombobox
+            label="Cultivo"
             value={formData.crop}
-            onChange={handleInput}
-            onBlur={() => markTouched('crop')}
-            aria-invalid={touched.crop && !!errors.crop}
-            className={`p-4 rounded-xl bg-slate-900 border text-2xl text-white placeholder-slate-500 min-h-[64px] ${
-              touched.crop && errors.crop ? 'border-red-700' : 'border-slate-700'
-            }`}
+            speciesId={formData.crop_species_id}
+            inputName="crop"
+            placeholder="Buscar cultivo… (ej: fresa, café, mora)"
+            onChange={(name, speciesId) => {
+              setFormData((prev) => ({ ...prev, crop: name, crop_species_id: speciesId || null }));
+              markTouched('crop');
+            }}
           />
           {touched.crop && errors.crop && (
             <p className="text-sm text-red-400 flex items-center gap-1.5">
               <AlertCircle size={14} aria-hidden="true" /> {errors.crop}
             </p>
           )}
+        </div>
+
+        {/* Ubicación / etiqueta SEPARADA del nombre de la especie (bug operador
+            2026-06-25): aquí va "Invernadero #1", "Era 3", etc. Así la especie
+            de arriba siempre resuelve limpia para el calendario y la fenología. */}
+        <label className="flex flex-col gap-2">
+          <span className="text-xl font-bold">
+            Ubicación o etiqueta <span className="text-base font-normal text-slate-400">(opcional)</span>
+          </span>
+          <input
+            type="text"
+            name="location_label"
+            placeholder="Ej: Invernadero #1, Era 3, Lote de abajo"
+            value={locationLabel}
+            onChange={(e) => setLocationLabel(e.target.value)}
+            className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-2xl text-white placeholder-slate-500 min-h-[64px]"
+          />
+          <span className="text-xs text-slate-500">
+            No mezcles la ubicación con el nombre del cultivo: ponla aquí para no romper el calendario.
+          </span>
         </label>
 
         {/* UX-14 (#286) 2026-05-27: variedad dinámica.

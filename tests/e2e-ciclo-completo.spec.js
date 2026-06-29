@@ -199,7 +199,11 @@ test.describe('Ciclo completo del cultivo (offline-first)', () => {
     await expect(page.getByRole('heading', { name: /Sembrar/i })).toBeVisible({ timeout: 10_000 });
 
     // ─── Paso 2: Llenar formulario y guardar (UI real) ───────────
-    await page.locator('input[name="crop"]').fill('Tomate');
+    // El cultivo ahora se ELIGE del catálogo (SpeciesCombobox), no es texto
+    // libre: abrir el selector, buscar y tocar la opción del catálogo.
+    await page.getByText('Seleccionar especie…').click();
+    await page.getByTestId('species-combobox-input').fill('Tomate');
+    await page.getByRole('button', { name: /Tomate \(/i }).first().click();
     await page.locator('input[name="quantity"]').fill('12');
 
     // Fecha: DateField renderiza un único <input type="date">.

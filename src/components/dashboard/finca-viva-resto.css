@@ -1,0 +1,157 @@
+/* ============================================================================
+   finca-viva-resto.css — "El resto de su finca": la hoja cohesiva que fluye
+   DEBAJO del hero F2 (FincaVivaHero) cuando la flag VITE_FINCA_VIVA_HOME_PERFIL
+   está ON. Consolida las superficies valiosas del dashboard (herramientas,
+   casos de estudio, seguimiento de procesos, animales e inventario de un
+   vistazo) en UNA sola superficie clara, sin un segundo AgentHero, sin un
+   segundo set de portales ni un segundo saludo.
+
+   Objetivo de cohesión (auditoría §7.4 #1): que el home se lea como UNA finca
+   viva — el hero claro arriba y, sin corte oscuro abrupto, una hoja crema que
+   sube desde él. Reusa la paleta de finca-viva-hero.css (--fvh-*).
+
+   Scope: TODO vive bajo `.fvh-resto` (no toca el dashboard legacy con flag OFF).
+   ES-CO (tú/usted), sin voseo.
+   ========================================================================== */
+
+.fvh-resto {
+  --fvh-crema: #fbf6e9;
+  --fvh-tinta: #26331f;
+  --fvh-tinta-suave: #4e5c42;
+  --fvh-verde-1: #3f8f4e;
+  --fvh-max: 1180px;
+
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  /* La hoja sube desde el hero: gradiente crema→blanco roto, esquinas
+     superiores redondeadas y una sombra suave hacia arriba para el "rise". */
+  background: linear-gradient(180deg, #d8efd9 0%, var(--fvh-crema) 12%, #f4efe2 100%);
+  border-radius: 26px 26px 0 0;
+  margin-top: -22px;            /* solapa el borde inferior del hero */
+  padding-top: 10px;
+  box-shadow: 0 -10px 28px rgba(38, 51, 31, 0.10);
+  color: var(--fvh-tinta);
+  font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* Centro de ancho máximo en desktop (coherente con el shell del hero). */
+.fvh-resto-shell {
+  width: 100%;
+  max-width: var(--fvh-max);
+  margin: 0 auto;
+  padding: 4px 16px 28px;
+}
+
+/* "Tirador" superior — señal visual de que es una hoja que sube del hero. */
+.fvh-resto-grip {
+  width: 44px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(63, 143, 78, 0.30);
+  margin: 8px auto 14px;
+}
+
+/* Título de la hoja. */
+.fvh-resto-tit {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  color: var(--fvh-tinta);
+  margin: 2px 2px 4px;
+}
+.fvh-resto-tit::before {
+  content: '';
+  width: 6px;
+  height: 18px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #4ade80, #2f6b3a);
+}
+.fvh-resto-sub {
+  font-size: 12.5px;
+  color: var(--fvh-tinta-suave);
+  margin: 0 2px 12px;
+  line-height: 1.35;
+}
+
+/* Encabezados de cada bloque dentro de la hoja: tinta verde sobre crema (legible),
+   en vez del slate-400 sobre oscuro del dashboard legacy. Aplica al <p> que el
+   dashboard usa como rótulo de sección. */
+.fvh-resto .fvh-resto-block > p:first-child,
+.fvh-resto .fvh-block-label {
+  color: var(--fvh-tinta-suave) !important;
+}
+
+/* Cada bloque respira con un poco de aire vertical. */
+.fvh-resto-block { margin-top: 18px; }
+.fvh-resto-block:first-of-type { margin-top: 4px; }
+
+/* Las tarjetas-tile claras de herramientas/gestión: sobre crema NO usamos el
+   slate-900 oscuro del legacy (chocaba). Las viramos a tarjeta clara con borde
+   de acento (el border-l-4 de acento se conserva). */
+.fvh-resto .fvh-tile-claro {
+  background: rgba(255, 255, 255, 0.82) !important;
+  border-color: rgba(38, 51, 31, 0.10) !important;
+  box-shadow: 0 2px 8px rgba(38, 51, 31, 0.06);
+}
+.fvh-resto .fvh-tile-claro .fvh-tile-label { color: var(--fvh-tinta) !important; }
+.fvh-resto .fvh-tile-claro .fvh-tile-desc { color: var(--fvh-tinta-suave) !important; }
+
+/* La nota "mantén presionado ⋮⋮ para reorganizar" legible sobre crema. */
+.fvh-resto .fvh-resto-hint { color: var(--fvh-tinta-suave); opacity: 0.75; }
+
+/* ============================================================================
+   CONTRASTE WCAG AA de las tarjetas OSCURAS del resto (extiende el #1859, que
+   arregló los TILES claros). Las tarjetas full-width "Hoy en finca", "Clima" y
+   el "Análisis IA" conservan su fondo navy oscuro (gradientes from-emerald-950 /
+   from-sky-950 / from-slate-900), pero su texto secundario venía en slate-400
+   (#94a3b8) / slate-500 (#64748b) — gris-tenue que NO cumple AA sobre el navy.
+
+   Aquí NO cambiamos el fondo (la tarjeta oscura es intencional y contrasta bien
+   con la hoja crema): solo SUBIMOS el texto apagado a un slate claro que sí
+   cumple AA (≥4.5:1) sobre ese navy. Scope acotado a esas tarjetas oscuras por
+   su clase de gradiente, para no tocar los tiles claros ya resueltos por #1859.
+   ========================================================================== */
+.fvh-resto [class*="from-emerald-950"] .text-slate-400,
+.fvh-resto [class*="from-emerald-950"] .text-slate-500,
+.fvh-resto [class*="from-sky-950"] .text-slate-400,
+.fvh-resto [class*="from-sky-950"] .text-slate-500,
+.fvh-resto [class*="from-slate-900"] .text-slate-400,
+.fvh-resto [class*="from-slate-900"] .text-slate-500 {
+  color: #cbd5e1 !important; /* slate-300 — AA sobre navy */
+}
+.fvh-resto [class*="from-emerald-950"] .text-slate-300,
+.fvh-resto [class*="from-sky-950"] .text-slate-300,
+.fvh-resto [class*="from-slate-900"] .text-slate-300 {
+  color: #e2e8f0 !important; /* slate-200 — más holgura AA para texto fino */
+}
+/* El chevron/“fecha” de cabecera (slate-500) también se levanta para que la
+   tarjeta no se lea apagada en su esquina. */
+.fvh-resto [class*="from-emerald-950"] .text-slate-500.group-hover\:text-slate-300,
+.fvh-resto [class*="from-sky-950"] .text-slate-500.group-hover\:text-slate-300,
+.fvh-resto [class*="from-slate-900"] .text-slate-500.group-hover\:text-slate-300 {
+  color: #cbd5e1 !important;
+}
+
+/* ── Bloque "Consultar y aprender" colapsable (audit 2026-06-26 §4) ─────────
+   Es de consulta ocasional, no del primer scroll: va en un <details> abierto
+   por defecto pero plegable. Ocultamos el marcador nativo y dejamos el rótulo
+   (BlockLabel) como toda la cabecera clicable; un chevron sutil indica el
+   estado. */
+.fvh-resto .fvh-consultar > summary { list-style: none; }
+.fvh-resto .fvh-consultar > summary::-webkit-details-marker { display: none; }
+.fvh-resto .fvh-consultar > summary > p { margin-bottom: 8px; }
+.fvh-resto .fvh-consultar > summary > p::after {
+  content: "▾";
+  margin-left: auto;
+  font-size: 13px;
+  opacity: 0.7;
+  transition: transform 160ms ease;
+}
+.fvh-resto .fvh-consultar[open] > summary > p::after { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) {
+  .fvh-resto .fvh-consultar > summary > p::after { transition: none; }
+}

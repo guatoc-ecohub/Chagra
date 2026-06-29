@@ -45,7 +45,7 @@ import { createStreamDeadline } from '../../services/streamDeadline';
 // Sidecar agro-mcp (ADR-045 Fase 2 Step B/C). Detrás de feature flag
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
-import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, biopreparadoGrounding, postValidate, getClimaIdeam } from '../../services/sidecarClient';
+import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, biopreparadoGrounding, postValidate, getClimaIdeam, isToolAllowed } from '../../services/sidecarClient';
 // CHIPS DE MODO (A3/A4, decisión operador 2026-06-02): el router PURO mapea
 // la intención forzada del chip → tool determinístico, SALTANDO el NLU
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
@@ -73,7 +73,7 @@ import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../
 // sidecarClient/deepResearchClient vía buildSidecarHeaders (defense-in-depth).
 import { getCurrentTier } from '../../services/tierService';
 import DeepResearchCard from '../DeepResearchCard';
-import { normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildSuggestedEntitiesContext, isLowConfidenceEntity, buildFallbackResponse, pisoTermicoFromAltitud } from '../../services/agentService';
+import { normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildPriceAnswer, buildSuggestedEntitiesContext, isLowConfidenceEntity, buildFallbackResponse, pisoTermicoFromAltitud } from '../../services/agentService';
 import { buildBasePrompt, analyzeQuery, buildQueryAnalysisBlock, buildCorpusVariants, buildResolvedEntitiesBlock, formatToolEvidence, truncateEdgesBlock } from '../../services/agentPromptBase';
 // Nubosidad real para el grounding (fix Choachí 2026-06) — solo lee caches.
 import { summarizeSkyForGrounding } from '../../services/skyConditionService';
@@ -118,6 +118,12 @@ import ManoChagraGlyph from '../dashboard/ManoChagraGlyph';
 // mano (operador 2026-06-18). Misma fuente que TopBar.jsx / AgentHero.jsx.
 import { useTheme } from '../../hooks/useTheme';
 import { iconForTheme } from '../dashboard/themeIcon';
+import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
+// Agente guiado: selección PURA de un insight verificado proactivo a partir del
+// texto del turno (cultivo detectado → dato con fuente que el usuario no vio).
+// El hook useInsightProactivo exporta estas funciones puras; aquí las usamos
+// imperativamente al cerrar cada turno para ofrecer el insight DENTRO del chat.
+import { detectarSlugEnTexto, elegirInsight } from '../../hooks/useInsightProactivo';
 import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
 import useAgentNotificationStore from '../../store/useAgentNotificationStore';
@@ -189,6 +195,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   const activeAlerts = useAlertStore((s) => s.activeAlerts);
 
   const [messages, setMessages] = useState([]);
+  // Agente guiado: ids de insights ya ofrecidos/vistos en esta sesión de chat,
+  // para no repetir el mismo dato en turnos sucesivos. Ref (no state): solo lo
+  // lee/escribe la lógica de cierre de turno; no debe re-renderizar.
+  const insightsVistosRef = useRef([]);
   const [inputText, setInputText] = useState('');
   const [state, setState] = useState(STATE_IDLE);
   // Compositor inline (foto adjuntada directamente en AgentScreen, sin outbox).
@@ -1645,6 +1655,47 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
                 latencyChain: Math.round(tTool1 - tTool0),
               });
             }
+          } else if (plan?.useTool && plan.tool && plan.args && !isToolAllowed(plan.tool)) {
+            // GUARD ALLOW-LIST + DEFLECCIÓN HONESTA (fix grounding P0 2026-06-25,
+            // amplía #1848). El NLU planner conoce 41 tools; el cliente expone un
+            // subconjunto (ver ALLOWED_TOOLS en sidecarClient). Si el planner
+            // rutea a una NO expuesta, `callTool` la rechazaría con
+            // `{_error, reason:'not_allowed'}`, indistinguible de un fallo
+            // transitorio de red — y el turno degradaba a RAG SIN grounding y SIN
+            // avisar al usuario (degradación SILENCIOSA).
+            //
+            // Las tools que QUEDAN fuera del allow-list son las que el NLU no
+            // puede rellenar desde una frase de chat (exigen credenciales farmOS,
+            // coords de dispositivo o NIT DIAN: add_planta_finca, get_finca_overview,
+            // get_sensor_finca, get_weather_data, get_clima_finca,
+            // get_documento_soporte_dian, get_ubicacion_actual) o cuyo arg
+            // obligatorio el planner no conoce (altitud de la finca para
+            // get_cultivos_viables / get_diseno_finca; fecha de siembra para
+            // get_grado_dia; biopreparado_id/pest_id para get_dosis_biopreparado).
+            //
+            // En vez de degradar callado a RAG, inyectamos una DEFLECCIÓN HONESTA
+            // (lección "deflección honesta": el agente dice claro que esa consulta
+            // todavía NO está disponible, found:false explícito, NO inventa). El
+            // bloque lo materializa formatToolEvidence (rama available:false).
+            nluRoute = `nlu:not_allowed:${plan.tool}`;
+            toolEvidence = {
+              tool: plan.tool,
+              args: plan.args,
+              result: {
+                available: false,
+                reason: 'tool_no_disponible_en_cliente',
+                hint:
+                  'Esta consulta específica todavía NO está disponible en Chagra. ' +
+                  'NO inventes datos: dilo con honestidad ("esa información todavía no la tengo disponible") ' +
+                  'y, si puedes, orienta con lo que SÍ está a la mano (chips de siembra, plaga, ' +
+                  'biopreparado, clima, calendario) o pide el dato que falte.',
+              },
+            };
+            console.warn('[sidecar] NLU ruteó a tool NO expuesta por el cliente — deflección honesta (sin callTool)', {
+              tool: plan.tool,
+              latencyNlu: Math.round(tNlu1 - tNlu0),
+              reason: 'tool_not_in_client_allowlist',
+            });
           } else if (plan?.useTool && plan.tool && plan.args) {
             const tTool0 = performance.now();
             const result = await callTool(plan.tool, plan.args);
@@ -1827,7 +1878,22 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // (el sidecar las ordena por relevancia). No-op si el bloque no excede.
       const edgesTruncated = truncateEdgesBlock(subgrafoBloque);
 
-      const rawResponse = await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, edgesTruncated, biopreparadoBlock);
+      // ESCENA DE PRECIO (demo campesino): si la consulta es de PRECIO y
+      // get_precio_sipsa devolvió un dato REAL (available:true, leído de la
+      // tabla `chagra.sipsa_precios` que llena el feed diario DANE/SIPSA), el
+      // agente CANTA el número de forma DETERMINISTA en vez de delegar en el LLM
+      // —que lo entierra en agronomía genérica o lo razona mal—. Anti-alucinación:
+      // buildPriceAnswer SOLO emite con un precio numérico real; sin dato →
+      // null → caemos al LLM (que recibe el decline block honesto). El texto
+      // sigue pasando por voseo/guards/badges/persistencia/TTS como cualquier
+      // respuesta, por lo que la UX (badge de fuente, voz) no cambia.
+      const deterministicPrice = buildPriceAnswer({ userMessage: text, toolEvidence });
+      const rawResponse = deterministicPrice != null
+        ? deterministicPrice
+        : await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, edgesTruncated, biopreparadoBlock);
+      if (deterministicPrice != null) {
+        console.debug('[precio] respuesta determinista SIPSA (sin LLM)', { route: nluRoute });
+      }
       // Fallback estructurado (Item 9): si el LLM retornó vacío (timeout, OOM,
       // modelo caído), construimos una respuesta útil con lo que sabemos
       // (toolEvidence, entidades) en vez de un silencio o banner rojo.
@@ -1991,12 +2057,36 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // tocó relaciones del grafo → [] (sin regresión).
       const turnEdges = extractEdges(toolEvidence);
 
+      // AGENTE GUIADO (auditoría UX §7.4 P3): ofrecer un insight verificado
+      // proactivo DENTRO de la conversación. Detectamos el cultivo en el texto
+      // del turno (pregunta del usuario + respuesta del agente) y elegimos un
+      // dato con fuente que el usuario aún no ha visto en esta sesión. Si no hay
+      // cultivo o ya se ofrecieron todos, no se adjunta nada (sin regresión).
+      // La OFERTA es opt-in: la tarjeta en el chat pide confirmación antes de
+      // expandir el dato. Funciones puras (detectarSlugEnTexto/elegirInsight).
+      let insightProactivo = null;
+      try {
+        const textoTurno = `${text || ''} ${response || ''}`;
+        const slug = detectarSlugEnTexto(textoTurno);
+        if (slug) {
+          const candidato = elegirInsight(slug, insightsVistosRef.current);
+          if (candidato && candidato.id) {
+            insightProactivo = candidato;
+            insightsVistosRef.current = [...insightsVistosRef.current, candidato.id];
+          }
+        }
+      } catch (e) {
+        // El insight es secundario: jamás debe romper la respuesta del agente.
+        console.warn('[Agent] insight proactivo no disponible (continuo):', e?.message);
+      }
+
       const assistantMessage = {
         role: 'assistant',
         content: response,
         timestamp: Date.now(),
         metadata: sourceMetadata,
         _edges: turnEdges,
+        ...(insightProactivo ? { _insightProactivo: insightProactivo } : {}),
       };
 
       await addTurn(operatorId, {
@@ -2258,6 +2348,20 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       prev.map((m) =>
         m.id === msgId && m._deepResearch
           ? { ...m, _deepResearch: { ...m._deepResearch, status: 'error' } }
+          : m,
+      ),
+    );
+  }, []);
+
+  // AGENTE GUIADO: descartar la oferta de insight proactivo de un turno ("Ahora
+  // no"). ChatHistory pasa la clave del mensaje (id o índice de render). Quitamos
+  // el flag _insightProactivo de ese mensaje para que la tarjeta desaparezca sin
+  // tocar el resto de la conversación.
+  const handleDismissInsight = useCallback((key) => {
+    setMessages((prev) =>
+      prev.map((m, i) =>
+        (m.id != null ? m.id === key : i === key) && m._insightProactivo
+          ? (() => { const { _insightProactivo, ...rest } = m; void _insightProactivo; return rest; })()
           : m,
       ),
     );
@@ -2932,6 +3036,15 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     ? (CHIP_DEFS.find((c) => c.intent === activeIntent)?.placeholder || 'Escribe tu pregunta...')
     : 'Escribe tu pregunta...';
 
+  // PIEL POR TEMA del botón enviar (Fase 2 de temas). Con la flag ON y el botón
+  // habilitado (hay texto/adjunto y no se está grabando ni hay cola), aplicamos
+  // `.agent-send-accent` para que themes.css lo pinte con el acento del tema
+  // activo (teal/ocre/verde), igual que AgentHero. Con la flag OFF (prod) queda
+  // EXACTO como hoy: el gradiente teal→cian fijo del compositor.
+  const enviarHabilitado =
+    !((!inputText.trim() && !agentAttachment) || state === STATE_RECORDING || queuePending.length >= 1);
+  const agentSendAccent = fincaVivaHomePerfilActivo() && enviarHabilitado;
+
   return (
     <div className={`h-[100dvh] flex flex-col overflow-hidden relative text-white ${entranceClassRef.current}`}>
       {/* Velo de legibilidad: deja ver --app-bg-image del body PERO garantiza
@@ -3076,6 +3189,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         onConsentNeeded={handleFeedbackConsentNeeded}
         onRetryOrphan={handleRetryOrphan}
         onCancelDeepResearch={handleCancelDeepResearch}
+        onDismissInsight={handleDismissInsight}
         proactiveGreeting={proactiveGreeting}
         onBack={onBack}
       />
@@ -3348,12 +3462,22 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               }
               data-testid="agent-submit"
               aria-label="Enviar al agente"
-              className="as-send"
+              className={[
+                'as-send',
+                // PIEL POR TEMA del botón enviar (Fase 2). Con la flag ON y el
+                // botón activo, toma `.agent-send-accent` → themes.css lo pinta
+                // con el acento del tema (teal/ocre/verde), igual que AgentHero,
+                // en vez del gradiente teal→cian fijo. Con OFF queda como hoy.
+                agentSendAccent ? 'agent-send-accent' : '',
+              ].filter(Boolean).join(' ')}
               style={{
                 background:
                   (!inputText.trim() && !agentAttachment) || state === STATE_RECORDING || queuePending.length >= 1
                     ? 'rgba(51,65,85,0.8)'
-                    : 'linear-gradient(135deg,#10b981 0%,#0891b2 100%)',
+                    // Con `agent-send-accent` activo, el color lo pone themes.css
+                    // (background-color !important del acento del tema); aquí no
+                    // forzamos el gradiente para no taparlo.
+                    : agentSendAccent ? undefined : 'linear-gradient(135deg,#10b981 0%,#0891b2 100%)',
                 boxShadow:
                   (!inputText.trim() && !agentAttachment) || state === STATE_RECORDING || queuePending.length >= 1
                     ? 'none'

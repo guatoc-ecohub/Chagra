@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { BASE_SOIL_LIFE, mundoSubsueloDecisions } from './mundoSubsueloData';
 import { recordGameStart, recordGameComplete } from '../../services/usageTelemetryService';
+import { fvhSkinClass } from '../../config/fvhSkin';
+import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
+import { evaluarSubsuelo, mensajeMeta } from '../../services/mundoSubsueloEngine';
 
 function clamp(value, min = 0, max = 100) {
   return Math.max(min, Math.min(max, value));
@@ -15,7 +18,10 @@ function getSoilStage(score) {
 
 function Mascot({ name, title, children, active }) {
   return (
-    <article className={`rounded-2xl border p-3 shadow-sm ${active ? 'border-cyan-300 bg-cyan-50' : 'border-lime-200 bg-white/88'}`}>
+    <article
+      data-active={active ? 'true' : 'false'}
+      className={`jp-ms-mascota rounded-2xl border p-3 shadow-sm ${active ? 'border-cyan-300 bg-cyan-50' : 'border-lime-200 bg-white/88'}`}
+    >
       <div className="flex items-center gap-3">
         <div
           aria-hidden="true"
@@ -64,7 +70,7 @@ function SoilScene({ soilLife, activeDecision }) {
       data-testid="mundo-subsuelo-escena"
       data-soil-life={soilLife}
       data-stage={stage}
-      className="overflow-hidden rounded-3xl border border-amber-200 bg-[#f6efe1] shadow-[0_24px_70px_rgba(60,46,26,0.16)]"
+      className={fvhSkinClass('ms-vinneta overflow-hidden rounded-3xl border border-amber-200 bg-[#f6efe1] shadow-[0_24px_70px_rgba(60,46,26,0.16)]')}
     >
       <svg viewBox="0 0 760 430" role="img" aria-label="Corte transversal del suelo con raices, hongos, agua y lombrices" className="block h-auto w-full">
         <defs>
@@ -167,9 +173,21 @@ function SoilScene({ soilLife, activeDecision }) {
 export default function MundoSubsuelo() {
   const [soilLife, setSoilLife] = useState(BASE_SOIL_LIFE);
   const [activeId, setActiveId] = useState('compost-bocashi');
+  // Cuenta de jugadas (cartas tomadas) para dar un pequeño arco de reto.
+  const [jugadas, setJugadas] = useState(0);
   const activeDecision = mundoSubsueloDecisions.find((decision) => decision.id === activeId) || mundoSubsueloDecisions[0];
   const stage = getSoilStage(soilLife);
   const meterColor = soilLife >= 60 ? 'bg-emerald-500' : soilLife >= 35 ? 'bg-amber-500' : 'bg-rose-500';
+
+  // FEEL gated (dev-only): con la flag ON se enciende la capa de OBJETIVO (meta
+  // de suelo vivo + celebración al lograrla). Con OFF el juego queda EXACTO como
+  // hoy (sandbox libre, sin meta ni celebración).
+  const feelOn = fincaVivaHomePerfilActivo();
+  const objetivo = useMemo(() => evaluarSubsuelo(soilLife, jugadas), [soilLife, jugadas]);
+  // La celebración aparece UNA vez al cruzar la meta hacia arriba; se cierra a
+  // mano. `metaFestejada` evita que reaparezca al seguir jugando tras lograrla.
+  const [metaFestejada, setMetaFestejada] = useState(false);
+  const celebrandoMeta = feelOn && objetivo.alcanzada && !metaFestejada;
 
   // Telemetría de uso ANÓNIMA: inicio del juego al montar (una vez).
   useEffect(() => { recordGameStart('mundo_subsuelo'); }, []);
@@ -195,12 +213,20 @@ export default function MundoSubsuelo() {
   function chooseDecision(decision) {
     setActiveId(decision.id);
     setSoilLife((current) => clamp(current + decision.effect));
+    setJugadas((n) => n + 1);
+  }
+
+  function reiniciarSuelo() {
+    setSoilLife(BASE_SOIL_LIFE);
+    setJugadas(0);
+    setActiveId('compost-bocashi');
+    setMetaFestejada(false);
   }
 
   return (
-    <main data-testid="mundo-subsuelo" className="mx-auto flex w-full max-w-6xl flex-col gap-4 bg-[#fff8e8] px-3 py-4 text-stone-950 sm:px-5">
-      <header className="overflow-hidden rounded-3xl border border-lime-200 bg-[linear-gradient(135deg,#fef3c7,#d9f99d_52%,#a5f3fc)] p-4 shadow-sm sm:p-6">
-        <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-900">Aprende a Cultivar Jugando</p>
+    <main data-testid="mundo-subsuelo" className={fvhSkinClass('ms-root jp-ambiente mx-auto flex w-full max-w-6xl flex-col gap-4 bg-[#fff8e8] px-3 py-4 text-stone-950 sm:px-5')}>
+      <header className="jp-ms-header overflow-hidden rounded-3xl border border-lime-200 bg-[linear-gradient(135deg,#fef3c7,#d9f99d_52%,#a5f3fc)] p-4 shadow-sm sm:p-6">
+        <p className="jp-ms-kicker text-xs font-black uppercase tracking-[0.2em] text-emerald-900">Aprende a Cultivar Jugando</p>
         <div className="mt-2 grid gap-4 lg:grid-cols-[1.3fr_0.7fr] lg:items-end">
           <div>
             <h1 className="text-4xl font-black leading-none text-stone-950 sm:text-5xl">Mundo Subsuelo</h1>
@@ -223,6 +249,17 @@ export default function MundoSubsuelo() {
             <div className="mt-3 h-4 overflow-hidden rounded-full bg-stone-200" aria-hidden="true">
               <div className={`h-full rounded-full ${meterColor}`} style={{ width: `${soilLife}%` }} />
             </div>
+            {/* Línea de meta (gated dev-only): marca dónde está "suelo vivo". */}
+            {feelOn && (
+              <p
+                data-testid="subsuelo-meta"
+                className="mt-2 text-xs font-bold leading-snug text-stone-700"
+                role="status"
+              >
+                {mensajeMeta(objetivo)}
+                <span className="ml-1 text-stone-400">· Jugadas: {jugadas}</span>
+              </p>
+            )}
           </div>
         </div>
       </header>
@@ -240,7 +277,7 @@ export default function MundoSubsuelo() {
         <SoilScene soilLife={soilLife} activeDecision={activeDecision} />
 
         <div className="flex flex-col gap-3">
-          <section data-testid="decision-activa" className="rounded-3xl border border-cyan-200 bg-white p-4 shadow-sm">
+          <section data-testid="decision-activa" className="jp-ms-panel rounded-3xl border border-cyan-200 bg-white p-4 shadow-sm">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-700">Carta activa</p>
@@ -264,7 +301,8 @@ export default function MundoSubsuelo() {
                   key={decision.id}
                   type="button"
                   onClick={() => chooseDecision(decision)}
-                  className={`min-h-28 rounded-2xl border p-3 text-left shadow-sm transition active:scale-[0.98] ${
+                  data-selected={selected ? 'true' : 'false'}
+                  className={`jp-ms-carta min-h-28 rounded-2xl border p-3 text-left shadow-sm transition active:scale-[0.98] ${
                     selected
                       ? 'border-cyan-400 bg-cyan-50 ring-2 ring-cyan-200'
                       : decision.tone === 'good'
@@ -284,6 +322,38 @@ export default function MundoSubsuelo() {
           </section>
         </div>
       </section>
+
+      {/* Celebración al lograr la meta (gated dev-only). Sandbox intacto con la
+          flag OFF: nunca aparece y no hay objetivo que "cerrar". */}
+      {celebrandoMeta && (
+        <section
+          data-testid="subsuelo-meta-lograda"
+          className="rounded-3xl border-2 border-lime-400 bg-[linear-gradient(135deg,#ecfccb,#a5f3fc)] p-5 text-center shadow-sm"
+          role="status"
+        >
+          <div className="text-5xl" aria-hidden="true">🌱✨</div>
+          <h2 className="mt-2 text-2xl font-black text-stone-950">¡Suelo vivo!</h2>
+          <p className="mt-1 text-sm font-semibold leading-relaxed text-stone-700">
+            {mensajeMeta(objetivo)} Sigue cuidándolo o vuelve a empezar para
+            lograrlo en menos jugadas.
+          </p>
+          <button
+            type="button"
+            data-testid="subsuelo-reiniciar"
+            onClick={reiniciarSuelo}
+            className="mt-4 min-h-[52px] rounded-2xl bg-emerald-600 px-6 font-black text-white shadow active:scale-95"
+          >
+            Empezar de nuevo
+          </button>
+          <button
+            type="button"
+            onClick={() => setMetaFestejada(true)}
+            className="mt-2 block w-full text-sm font-bold text-stone-500 underline"
+          >
+            Seguir explorando el suelo
+          </button>
+        </section>
+      )}
     </main>
   );
 }

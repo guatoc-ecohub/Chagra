@@ -18,12 +18,19 @@ import HelpDatosScreen from './HelpDatosScreen.jsx';
  * Rediseño 2026-05-08 (queue/039 + UX feedback): router interno con 3
  * sub-vistas grandes en lugar de 12 secciones planas apiladas.
  *
- *   Home        → 5 botones grandes (voz / uso / ciclo / diccionario / agente)
+ *   Home        → cuatro lugares de Chagra + atajos a pantallas nuevas
+ *                 (especies/calendario/mercados/faq) + 6 temas guía
  *   Voz         → tutorial híbrido + CTA "Probar voz ahora"
- *   Uso         → FAQs reorganizadas en 6 temas (incluye Reportar bug)
+ *   Uso         → FAQs reorganizadas en temas (incluye Reportar problema)
  *   Ciclo       → wrapper de HelpCycleSection (accordion por especie, PR #201)
  *   Diccionario → ~70 términos curados (identidad/microorg/biopreparados/...)
  *   Agente      → "Sobre el agente Chagra" cero hype, qué SÍ y qué NO puede (task #123)
+ *
+ * Actualización ola 1.1.0 (2026-06-25): el home se reorganizó en cuatro
+ * lugares (Gestionar/Aprender/Jugar/Agente) y se estrenaron directorio de
+ * especies, calendario de finca, mercado y FAQ groundeado (#1849, #1853-#1856).
+ * El Manual ahora apunta a esas pantallas y describe el agente real
+ * (granite3.3, catálogo grande, voz y foto en el chat).
  *
  * Principios aplicados (UX guidelines internos del proyecto):
  *   P1 tono "tú" cercano (anti-ladrillo)
@@ -72,7 +79,7 @@ export default function HelpManual({ onBack, onNavigate }) {
 
       {/* Sub-vistas */}
       {section === 'home' && (
-        <HelpHomeScreen onSelect={setSection} />
+        <HelpHomeScreen onSelect={setSection} onNavigate={closeAndNavigate} />
       )}
       {section === 'voz' && (
         <HelpVozScreen onBackToHome={goHome} onNavigate={closeAndNavigate} />

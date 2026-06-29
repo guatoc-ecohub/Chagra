@@ -54,15 +54,15 @@ describe('normalizeBenchData — transforma el JSONL real del bench a items eval
     query: '¿Qué cuidados requiere la fresa en clima frío?',
     expected_keywords: ['drenaje', 'riego', 'heladas', 'poda'],
     timestamp: '2026-06-03T00:00:00.000Z',
-    granite3_1_8b: {
-      model: 'granite3.1-dense:8b',
+    granite3_3_8b: {
+      model: 'granite3.3:8b',
       response: 'La fresa necesita buen drenaje y protección contra heladas.',
       keywords_matched: 3,
       keywords_total: 4,
       halluc_count: 0,
       error: null,
     },
-    winner: 'granite3_1_8b',
+    winner: 'granite3_3_8b',
   };
 
   it('extrae la respuesta del modelo objetivo (granite por defecto) a model_response', () => {
@@ -103,7 +103,7 @@ describe('normalizeBenchData — transforma el JSONL real del bench a items eval
   it('omite items donde el modelo objetivo falló (error != null) sin crashear', () => {
     const errored = {
       ...benchLine,
-      granite3_1_8b: { model: 'granite3.1-dense:8b', response: null, error: 'Timeout' },
+      granite3_3_8b: { model: 'granite3.3:8b', response: null, error: 'Timeout' },
     };
     const norm = normalizeBenchData([errored]);
     expect(norm.results).toHaveLength(0);
@@ -134,14 +134,14 @@ describe('loadBenchData — lee el JSONL real, NO cae a mock cuando --from exist
           category: 'species',
           query: '¿Cuidados de la fresa?',
           expected_keywords: ['drenaje', 'heladas'],
-          granite3_1_8b: { model: 'granite3.1-dense:8b', response: 'Buen drenaje.', error: null },
+          granite3_3_8b: { model: 'granite3.3:8b', response: 'Buen drenaje.', error: null },
         }),
         JSON.stringify({
           prompt_id: 2,
           category: 'species',
           query: '¿Roya del café?',
           expected_keywords: ['variedades resistentes'],
-          granite3_1_8b: { model: 'granite3.1-dense:8b', response: 'Variedades resistentes.', error: null },
+          granite3_3_8b: { model: 'granite3.3:8b', response: 'Variedades resistentes.', error: null },
         }),
       ];
       writeFileSync(path, lines.join('\n') + '\n');
@@ -165,7 +165,7 @@ describe('loadBenchData — lee el JSONL real, NO cae a mock cuando --from exist
       const path = join(dir, 'legacy.json');
       const payload = {
         timestamp: '2026-06-03T00:00:00.000Z',
-        model: 'granite3.1-dense:8b',
+        model: 'granite3.3:8b',
         results: [
           { id: 1, query: '¿Q?', ground_truth: 'GT.', model_response: 'R.' },
         ],

@@ -24,12 +24,13 @@ import {
   FlaskConical,
   Bug,
   CalendarDays,
-  X,
+  MessageCircle,
 } from 'lucide-react';
 
 import lecciones from '../../data/agro-lecciones.json';
 import todasLasCards from '../../data/agro-insight-cards.json';
 import InsightCard from './InsightCard.jsx';
+import ManoChagraGlyph from '../dashboard/ManoChagraGlyph.jsx';
 
 // Íconos por slug de lección
 const LECCION_ICONS = {
@@ -133,11 +134,66 @@ function BloqueContenido({ bloque }) {
 }
 
 /**
+ * Botón "Pregúntale al agente" — conecta Aprender → Agente. Abre el chat del
+ * agente con la pregunta de la lección pre-cargada en el compositor (el usuario
+ * la revisa y envía; sin auto-submit). Identidad de marca: glifo de la mano de
+ * Chagra + acento del tema (--t-accent-rgb), nada de estética genérica de IA.
+ */
+function PreguntaleAlAgenteButton({ pregunta, onAskAgent }) {
+  return (
+    <button
+      type="button"
+      data-testid="preguntale-al-agente"
+      onClick={() => onAskAgent(pregunta)}
+      className="w-full mt-1 inline-flex items-center gap-3 px-4 py-3 rounded-2xl text-left active:scale-[0.99] transition-transform min-h-[52px] focus-visible:outline-none focus-visible:ring-2"
+      style={{
+        border: '1px solid rgba(var(--t-accent-rgb), 0.5)',
+        background:
+          'linear-gradient(135deg, rgba(var(--t-accent-rgb),0.16), rgba(15,23,20,0.5) 60%)',
+      }}
+    >
+      <span
+        className="shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-xl"
+        style={{
+          color: 'rgb(var(--t-accent-rgb))',
+          background: 'rgba(var(--t-accent-rgb),0.12)',
+        }}
+        aria-hidden="true"
+      >
+        <ManoChagraGlyph size={20} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm font-bold text-slate-100 leading-tight">
+          Pregúntale al agente
+        </span>
+        <span className="block text-xs text-slate-300/80 leading-snug mt-0.5 truncate">
+          “{pregunta}”
+        </span>
+      </span>
+      <MessageCircle
+        size={18}
+        className="shrink-0 self-center"
+        style={{ color: 'rgb(var(--t-accent-rgb))' }}
+        aria-hidden="true"
+      />
+    </button>
+  );
+}
+
+/**
  * Vista de una lección completa con navegación y insights.
  */
-function LeccionView({ leccion, onBack }) {
+function LeccionView({ leccion, onBack, onAskAgent }) {
   const [bloqueIdx, setBloqueIdx] = useState(0);
   const [mostrandoInsights, setMostrandoInsights] = useState(false);
+
+  // "Pregúntale al agente" (conecta Aprender → Agente): la pregunta de ESTA
+  // lección, pre-cargada en el chat. Si la lección no trae pregunta, caemos a
+  // una pregunta honesta derivada del título.
+  const preguntaLeccion =
+    (typeof leccion.pregunta_agente === 'string' && leccion.pregunta_agente.trim())
+      || `Cuéntame más sobre ${(leccion.titulo || leccion.slug || '').toLowerCase()}.`;
+  const puedePreguntar = typeof onAskAgent === 'function';
 
   const bloques = leccion.contenido_bloques;
   const insightsDeLeccion = useMemo(
@@ -232,6 +288,15 @@ function LeccionView({ leccion, onBack }) {
               )}
             </div>
 
+            {/* Pregúntale al agente (Aprender → Agente): abre el chat con la
+                pregunta de esta lección pre-cargada. */}
+            {puedePreguntar && (
+              <PreguntaleAlAgenteButton
+                pregunta={preguntaLeccion}
+                onAskAgent={onAskAgent}
+              />
+            )}
+
             {/* Fuente de la lección */}
             <p className="text-[11px] text-slate-600 leading-relaxed pt-2 border-t border-slate-800/40">
               <strong className="text-slate-500">Fuente base:</strong>{' '}
@@ -267,6 +332,15 @@ function LeccionView({ leccion, onBack }) {
               insightsDeLeccion.map((card) => (
                 <InsightCard key={card.id} card={card} compact={false} />
               ))
+            )}
+
+            {/* Pregúntale al agente (Aprender → Agente): cierre de la lección con
+                la pregunta pre-cargada en el chat. */}
+            {puedePreguntar && (
+              <PreguntaleAlAgenteButton
+                pregunta={preguntaLeccion}
+                onAskAgent={onAskAgent}
+              />
             )}
           </div>
         )}
@@ -305,8 +379,13 @@ export function AprenderEntryCard({ onNavigate }) {
 
 /**
  * Componente principal — muestra el listado de lecciones y navega a cada una.
+ *
+ * @param {object} props
+ * @param {() => void} [props.onBack] — volver al dashboard.
+ * @param {(pregunta: string) => void} [props.onAskAgent] — abre el chat del
+ *   agente con la pregunta de la lección pre-cargada (conecta Aprender → Agente).
  */
-export default function AprenderConAgente({ onBack }) {
+export default function AprenderConAgente({ onBack, onAskAgent }) {
   const [leccionActual, setLeccionActual] = useState(null);
 
   if (leccionActual) {
@@ -314,6 +393,7 @@ export default function AprenderConAgente({ onBack }) {
       <LeccionView
         leccion={leccionActual}
         onBack={() => setLeccionActual(null)}
+        onAskAgent={onAskAgent}
       />
     );
   }

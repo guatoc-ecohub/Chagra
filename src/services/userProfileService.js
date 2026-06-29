@@ -26,6 +26,7 @@
  */
 
 import { findMunicipio } from '../utils/colombiaLocations.js';
+import { getActiveTenantId } from './tenantContext.js';
 
 const PROFILE_PREFIX = 'chagra:profile:';
 const PROFILE_KEY = `${PROFILE_PREFIX}v1`;
@@ -33,6 +34,91 @@ const PROFILE_DONE_KEY = `${PROFILE_PREFIX}done:v1`;
 const PROFILE_SKIPPED_KEY = `${PROFILE_PREFIX}skipped:v1`;
 
 const hasStorage = () => typeof window !== 'undefined' && !!window.localStorage;
+
+/**
+ * Deriva un userKey estable del usuario logueado (farmOS username).
+ * @returns {string|null} username del tenant activo, o null si no hay sesión.
+ */
+function getUserKey() {
+  try {
+    const id = getActiveTenantId();
+    return id && typeof id === 'string' && id.trim().length > 0 ? id.trim() : null;
+  } catch { return null; }
+}
+
+function getProfileKey() {
+  const uk = getUserKey();
+  return uk ? `${PROFILE_KEY}:${uk}` : PROFILE_KEY;
+}
+
+function getProfileDoneKey() {
+  const uk = getUserKey();
+  return uk ? `${PROFILE_DONE_KEY}:${uk}` : PROFILE_DONE_KEY;
+}
+
+function getProfileSkippedKey() {
+  const uk = getUserKey();
+  return uk ? `${PROFILE_SKIPPED_KEY}:${uk}` : PROFILE_SKIPPED_KEY;
+}
+
+/** @type {boolean} flag module-level para ejecutar la migración una sola vez. */
+let _migrated = false;
+
+function _getOperatorUsernames() {
+  try {
+    return (import.meta.env.VITE_OPERATOR_USERNAME || '')
+      .split(',')
+      .map(s => s.trim().toLowerCase())
+      .filter(Boolean);
+  } catch { return []; }
+}
+
+function _cleanupLegacyKeys() {
+  try {
+    window.localStorage.removeItem(PROFILE_KEY);
+    window.localStorage.removeItem(PROFILE_DONE_KEY);
+    window.localStorage.removeItem(PROFILE_SKIPPED_KEY);
+  } catch (_) { /* noop */ }
+}
+
+/**
+ * Migración suave: si existe la clave GLOBAL vieja y NO existe la del
+ * usuario actual, NO la hereda para usuarios nuevos (que vean onboarding).
+ * Solo migra si el usuario actual es identificable como operador via
+ * VITE_OPERATOR_USERNAME. Si no hay usuario logueado (pre-login), mantiene
+ * el comportamiento actual con claves globales.
+ */
+function migrateLegacyProfile() {
+  if (!hasStorage() || _migrated) return;
+  _migrated = true;
+
+  const uk = getUserKey();
+  if (!uk) return;
+
+  const oldDone = window.localStorage.getItem(PROFILE_DONE_KEY);
+  const oldSkipped = window.localStorage.getItem(PROFILE_SKIPPED_KEY);
+  const oldProfile = window.localStorage.getItem(PROFILE_KEY);
+
+  if (!oldDone && !oldSkipped && !oldProfile) return;
+
+  // Si el usuario ya tiene datos per-user, solo limpiar legado
+  const hasUserDone = window.localStorage.getItem(getProfileDoneKey());
+  const hasUserSkipped = window.localStorage.getItem(getProfileSkippedKey());
+  if (hasUserDone || hasUserSkipped) {
+    _cleanupLegacyKeys();
+    return;
+  }
+
+  // Solo migrar si el usuario actual es el operador
+  const opNames = _getOperatorUsernames();
+  if (opNames.length > 0 && opNames.includes(uk.toLowerCase())) {
+    if (oldDone) window.localStorage.setItem(getProfileDoneKey(), oldDone);
+    if (oldSkipped) window.localStorage.setItem(getProfileSkippedKey(), oldSkipped);
+    if (oldProfile) window.localStorage.setItem(getProfileKey(), oldProfile);
+    _cleanupLegacyKeys();
+  }
+  // Usuarios nuevos (no operador): NO heredan — ven onboarding.
+}
 
 /**
  * Catálogo de preguntas del onboarding extendido.
@@ -140,6 +226,68 @@ export const PROFILE_QUESTIONS = [
     unit: 'msnm',
     // Condicional: solo para cultivo rural / invernadero (no aplica a balcón urbano).
     when: (a) => a.vocacion !== 'urbano' && !['balcon', 'terraza'].includes(a.finca_tipo),
+  },
+  {
+    // INVERNADERO — ¿tiene? (#34 escena de finca rica, fase 1: estructura).
+    // Captura el ESQUELETO de la finca para que la escena F2 lo dibuje. No es
+    // fenología ni inventario de plantas (eso lo llena la voz #23 después).
+    // No aplica al cultivo urbano de balcón/terraza (sin espacio para invernadero).
+    id: 'invernadero_tiene',
+    category: 'finca',
+    title: '¿Tienes invernadero?',
+    help: 'Para dibujar bien tu finca. Si no tienes, dilo y seguimos.',
+    type: 'single',
+    options: [
+      { value: 'si', label: '🏠 Sí, tengo invernadero' },
+      { value: 'no', label: 'No, todo a campo abierto' },
+    ],
+    when: (a) => a.vocacion !== 'urbano' && !['balcon', 'terraza'].includes(a.finca_tipo),
+  },
+  {
+    // INVERNADERO — forma (#34). Ejemplos reales del piloto: cuadrado grande
+    // vs. túnel pequeño. Solo si declaró que tiene uno (o si su finca ES un
+    // invernadero). La forma define cómo se dibuja la estructura en la escena.
+    id: 'invernadero_forma',
+    category: 'finca',
+    title: '¿Cómo es tu invernadero?',
+    help: 'Escoge la forma que más se parezca al tuyo.',
+    type: 'single',
+    options: [
+      { value: 'cuadrado', label: '⬜ Cuadrado grande — techo a dos aguas' },
+      { value: 'tunel', label: '🌙 Túnel pequeño — media luna, plástico curvo' },
+      { value: 'otro', label: '🔧 Otra forma' },
+    ],
+    when: (a) => a.invernadero_tiene === 'si' || a.finca_tipo === 'invernadero',
+  },
+  {
+    // INVERNADERO — tamaño aproximado (#34). Texto libre y skippable: el
+    // campesino describe a su manera ("como 6 por 10", "una nave grande"). La
+    // escena F2 usa esto solo para escalar el dibujo, no para cálculos.
+    id: 'invernadero_tamano',
+    category: 'finca',
+    title: '¿De qué tamaño es, más o menos?',
+    help: 'Como lo sientas: "6 por 10 metros", "pequeño", "media hectárea". Puedes saltarlo.',
+    type: 'text',
+    placeholder: 'Ej: 6 x 10 metros, o "uno pequeño"',
+    when: (a) => a.invernadero_tiene === 'si' || a.finca_tipo === 'invernadero',
+  },
+  {
+    // COMPOSICIÓN de la finca (#34 escena de finca rica, fase 1). El ESQUELETO:
+    // qué grandes grupos tiene la finca (huerta, frutales, aromáticas, animales).
+    // NO pide cada planta — eso lo registra la voz #23 después. Multi + skippable.
+    // La escena F2 lo lee para sembrar las "zonas" del dibujo aunque todavía no
+    // haya procesos reales cargados.
+    id: 'composicion',
+    category: 'finca',
+    title: '¿Qué tienes en tu finca?',
+    help: 'Marca lo que tengas. No hace falta el detalle: eso lo vamos llenando con la voz.',
+    type: 'multi',
+    options: [
+      { value: 'huerta', label: '🥬 Huerta — hortalizas y verduras' },
+      { value: 'frutales', label: '🍊 Frutales — árboles de fruta' },
+      { value: 'aromaticas', label: '🌿 Aromáticas y medicinales' },
+      { value: 'animales', label: '🐔 Animales' },
+    ],
   },
   {
     id: 'cultivos_actuales',
@@ -357,8 +505,10 @@ export function getApplicableQuestions(answers = {}) {
  */
 export function getProfile() {
   if (!hasStorage()) return {};
+  migrateLegacyProfile();
+  const key = getProfileKey();
   try {
-    const raw = window.localStorage.getItem(PROFILE_KEY);
+    const raw = window.localStorage.getItem(key);
     if (!raw) return {};
     const parsed = JSON.parse(raw);
     return parsed && typeof parsed === 'object' ? parsed : {};
@@ -388,6 +538,108 @@ export function getProfileMunicipio() {
     if (hit) return hit.name;
   }
   return null;
+}
+
+// ─── Estructura de la finca (#34 — esqueleto para la escena F2) ──────────────
+
+/**
+ * Formas de invernadero válidas. La escena F2 las dibuja distinto:
+ *   - cuadrado: nave a dos aguas (cuadrado grande, ej. David).
+ *   - tunel:    media luna de plástico curvo (túnel pequeño, ej. Miguel).
+ *   - otro:     forma genérica (no encaja en las dos anteriores).
+ */
+export const INVERNADERO_FORMAS = Object.freeze(['cuadrado', 'tunel', 'otro']);
+
+/**
+ * Grupos de composición de la finca (el "esqueleto"). Son los grandes bloques
+ * que la escena F2 dibuja como ZONAS aunque todavía no haya procesos reales:
+ * huerta, frutales, aromáticas/medicinales, animales. NO es el inventario de
+ * plantas (eso lo llena la voz #23 después).
+ */
+export const COMPOSICION_GRUPOS = Object.freeze(['huerta', 'frutales', 'aromaticas', 'animales']);
+
+/**
+ * @typedef {Object} InvernaderoEstructura
+ * @property {boolean} tiene  ¿la finca tiene invernadero?
+ * @property {'cuadrado'|'tunel'|'otro'|null} forma  forma del invernadero (null si no tiene)
+ * @property {string|null} tamano  tamaño aproximado en texto libre (null si no aplica)
+ */
+
+/**
+ * Deriva la estructura TIPADA del invernadero desde las respuestas planas del
+ * onboarding (`invernadero_tiene` / `invernadero_forma` / `invernadero_tamano`).
+ *
+ * MIGRACIÓN SUAVE: un perfil VIEJO (sin estos campos) cae a defaults sanos
+ * `{ tiene: false, forma: null, tamano: null }` — la escena F2 nunca rompe. Si
+ * la finca ES un invernadero (`finca_tipo === 'invernadero'`) pero no se
+ * declaró explícitamente, se asume `tiene: true` (coherencia con #338).
+ *
+ * @param {Object} [profile]  perfil; si se omite, se lee de localStorage
+ * @returns {InvernaderoEstructura}
+ */
+export function getInvernaderoEstructura(profile) {
+  const p = profile || getProfile();
+  if (!p || typeof p !== 'object') return { tiene: false, forma: null, tamano: null };
+
+  const tiene = p.invernadero_tiene === 'si' || p.finca_tipo === 'invernadero';
+  if (!tiene) return { tiene: false, forma: null, tamano: null };
+
+  const forma = INVERNADERO_FORMAS.includes(p.invernadero_forma) ? p.invernadero_forma : null;
+  const tamano =
+    typeof p.invernadero_tamano === 'string' && p.invernadero_tamano.trim() !== ''
+      ? p.invernadero_tamano.trim()
+      : null;
+
+  return { tiene: true, forma, tamano };
+}
+
+/**
+ * Deriva la composición TIPADA de la finca (array saneado de grupos conocidos).
+ *
+ * MIGRACIÓN SUAVE: perfil viejo o respuesta saltada → `[]`. Descarta valores
+ * desconocidos y duplicados para que la escena nunca reciba basura.
+ *
+ * @param {Object} [profile]  perfil; si se omite, se lee de localStorage
+ * @returns {string[]}  subconjunto ordenado de COMPOSICION_GRUPOS
+ */
+export function getComposicionFinca(profile) {
+  const p = profile || getProfile();
+  const raw = p && Array.isArray(p.composicion) ? p.composicion : [];
+  const seen = new Set();
+  const out = [];
+  for (const g of COMPOSICION_GRUPOS) {
+    if (raw.includes(g) && !seen.has(g)) {
+      seen.add(g);
+      out.push(g);
+    }
+  }
+  return out;
+}
+
+/**
+ * @typedef {Object} FincaEstructura
+ * @property {InvernaderoEstructura} invernadero  estructura tipada del invernadero
+ * @property {string[]} composicion  grupos presentes en la finca (esqueleto)
+ */
+
+/**
+ * GANCHO PARA LA ESCENA F2 (#34): devuelve el ESQUELETO tipado de la finca
+ * (invernadero + composición) con defaults sanos. La escena F2 lee SOLO esto
+ * para decidir qué estructura y zonas dibujar; no necesita conocer las claves
+ * planas del onboarding. 100% client-side, sin red.
+ *
+ * Migración garantizada: un usuario existente sin estos campos recibe
+ * `{ invernadero: { tiene: false, ... }, composicion: [] }` y la escena no rompe.
+ *
+ * @param {Object} [profile]  perfil; si se omite, se lee de localStorage
+ * @returns {FincaEstructura}
+ */
+export function getFincaEstructura(profile) {
+  const p = profile || getProfile();
+  return {
+    invernadero: getInvernaderoEstructura(p),
+    composicion: getComposicionFinca(p),
+  };
 }
 
 /**
@@ -453,10 +705,11 @@ export function resolveAltitudToSave({
  */
 export function saveProfile(partial = {}) {
   if (!hasStorage()) return { ...partial };
+  migrateLegacyProfile();
   const current = getProfile();
   const next = { ...current, ...partial, updatedAt: new Date().toISOString() };
   try {
-    window.localStorage.setItem(PROFILE_KEY, JSON.stringify(next));
+    window.localStorage.setItem(getProfileKey(), JSON.stringify(next));
   } catch (e) {
     console.warn('[userProfile] No se pudo guardar el perfil:', e);
   }
@@ -507,8 +760,9 @@ export function setNotificationStyle(style) {
 /** Marca el onboarding de perfil como completado. */
 export function markProfileDone() {
   if (!hasStorage()) return;
+  migrateLegacyProfile();
   try {
-    window.localStorage.setItem(PROFILE_DONE_KEY, '1');
+    window.localStorage.setItem(getProfileDoneKey(), '1');
   } catch (e) {
     console.warn('[userProfile] markProfileDone:', e);
   }
@@ -531,8 +785,9 @@ export function markProfileDone() {
 /** Marca que el usuario saltó el onboarding (respeta #283). */
 export function markProfileSkipped() {
   if (!hasStorage()) return;
+  migrateLegacyProfile();
   try {
-    window.localStorage.setItem(PROFILE_SKIPPED_KEY, '1');
+    window.localStorage.setItem(getProfileSkippedKey(), '1');
   } catch (e) {
     console.warn('[userProfile] markProfileSkipped:', e);
   }
@@ -541,9 +796,10 @@ export function markProfileSkipped() {
 /** @returns {boolean} si el usuario ya completó o saltó el onboarding. */
 export function hasSeenProfileOnboarding() {
   if (!hasStorage()) return false;
+  migrateLegacyProfile();
   return (
-    window.localStorage.getItem(PROFILE_DONE_KEY) === '1' ||
-    window.localStorage.getItem(PROFILE_SKIPPED_KEY) === '1'
+    window.localStorage.getItem(getProfileDoneKey()) === '1' ||
+    window.localStorage.getItem(getProfileSkippedKey()) === '1'
   );
 }
 
@@ -617,6 +873,13 @@ export function buildUserProfileBlock(profile) {
   push('Tamaño', humanizeAnswer(byId('finca_hectareas') || {}, p.finca_hectareas));
   if (p.finca_altitud) push('Altitud', `${p.finca_altitud} msnm`);
   if (p.piso_termico) push('Piso térmico', p.piso_termico);
+  const inv = getInvernaderoEstructura(p);
+  if (inv.tiene) {
+    const formaTxt = humanizeAnswer(byId('invernadero_forma') || {}, inv.forma);
+    const detalle = [formaTxt, inv.tamano].filter(Boolean).join(', ');
+    push('Invernadero', detalle ? `sí (${detalle})` : 'sí');
+  }
+  push('Composición de la finca', humanizeAnswer(byId('composicion') || {}, getComposicionFinca(p)));
   push('Cultivos actuales', p.cultivos_actuales);
   push('Animales', humanizeAnswer(byId('animales') || {}, p.animales));
   push('Manejo de gallinas', humanizeAnswer(byId('gallinas_manejo') || {}, p.gallinas_manejo));
@@ -1019,3 +1282,8 @@ export const __PROFILE_KEYS__ = {
   PROFILE_SKIPPED_KEY,
   TELEMETRY_CONSENT_KEY,
 };
+
+/** Resetea el flag de migración para tests. */
+export function _resetProfileMigration() {
+  _migrated = false;
+}

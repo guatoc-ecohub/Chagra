@@ -74,6 +74,31 @@
   50% { transform: translateY(-8px); }
 }
 
+/* ── Animales vivos de la escena (mockup F2 "Finca Viva") ─────────────── */
+
+/* La gallina picotea: la cabeza baja y vuelve. transform-box para que el
+   transform-origin caiga sobre el grupo SVG, no sobre el viewport. */
+.fv-peck {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fv-peck-anim 1.8s ease-in-out infinite;
+}
+@keyframes fv-peck-anim {
+  0%, 60%, 100% { transform: rotate(0); }
+  30% { transform: rotate(24deg) translateY(2px); }
+}
+
+/* El cerdo se menea de lado a lado, contento. */
+.fv-wiggle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fv-wiggle-anim 2.6s ease-in-out infinite;
+}
+@keyframes fv-wiggle-anim {
+  0%, 100% { transform: rotate(-2.5deg); }
+  50% { transform: rotate(2.5deg); }
+}
+
 /* ── Celebración de subida de nivel ──────────────────────────────────── */
 
 .fv-celebration-overlay {
@@ -151,6 +176,8 @@
   .fv-sway,
   .fv-sway-slow,
   .fv-float,
+  .fv-peck,
+  .fv-wiggle,
   .fv-celebration-emoji,
   .fv-confetti,
   .fv-new-badge,

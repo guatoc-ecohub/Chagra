@@ -1,17 +1,23 @@
 import React, { useState } from 'react';
 import {
   ArrowLeft, ChevronDown, ChevronRight, Sprout, Camera, MapPin, Bug, Apple,
-  MessageCircle, Wrench,
+  MessageCircle, Wrench, Compass, Mic, CalendarDays, Leaf, Store,
 } from 'lucide-react';
 import FieldFeedback from './FieldFeedback';
 
 /**
  * Sub-vista del Manual: cómo usar Chagra (FAQs reorganizadas).
  *
- * Reorganización 2026-05-08: 6 temas en lugar de 12 secciones planas.
- * Tono migrado a "tú" cercano (P1). "Reportar bug" dentro de FAQs (no
- * cuarto botón). "Field test cases" + "Novedades mayo 2026" salieron
- * del Manual público (movidos a docs operativos internos + CHANGELOG.md).
+ * Reorganización 2026-05-08: temas en lugar de secciones planas. Tono "tú"
+ * cercano (P1). "Reportar bug" dentro de FAQs (no cuarto botón). "Field test
+ * cases" + "Novedades" salieron del Manual público (docs internos + CHANGELOG).
+ *
+ * Actualización ola 1.1.0 (2026-06-25): la app se reorganizó en cuatro
+ * lugares (Gestionar/Aprender/Jugar/Agente) y estrenó registro por voz
+ * unificado, directorio de especies, calendario de finca y mercado. Este
+ * tema ahora orienta primero (los cuatro lugares) y agrega esas pantallas.
+ * Consistente con el FAQ groundeado (src/data/faqChagra.json, #1856) y con
+ * "Sobre el agente Chagra" (HelpAgentSection).
  */
 
 // eslint-disable-next-line no-unused-vars -- Icon SE USA en JSX, eslint react-jsx detection falla con destructuring rename
@@ -88,8 +94,34 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
 
       <main className="flex-1 p-4 max-w-2xl mx-auto w-full pb-12 flex flex-col gap-3">
         <p className="text-sm text-slate-300 leading-relaxed">
-          Toca cada tema para abrir o cerrar. Si algo no está aquí, usa el botón flotante 💬 para reportarlo.
+          Toca cada tema para abrir o cerrar. Si algo no está aquí, usa el tema &ldquo;Reportar problema&rdquo; al final.
         </p>
+
+        {/* 0. Orientación — los cuatro lugares de Chagra (home F2). Esto va
+            primero porque es el mapa mental que el campesino nuevo necesita
+            para no perderse. Mismos nombres que los portales del inicio. */}
+        <Section icon={Compass} title="🧭 Los cuatro lugares de Chagra" defaultOpen>
+          <p>
+            Al abrir Chagra ves <strong className="text-emerald-200">su finca dibujada</strong> (la pantalla de inicio). Ahí toca uno de estos cuatro lugares:
+          </p>
+          <ul className="mt-2 space-y-2 text-sm">
+            <li>
+              <strong className="text-emerald-300">🌱 Gestionar</strong> — registrar y cuidar sus siembras, zonas, animales y la bitácora. También vender su cosecha.
+            </li>
+            <li>
+              <strong className="text-amber-300">📚 Aprender</strong> — lecciones de agroecología con fuente: suelo vivo, milpa, biopreparados, MIP, fenología.
+            </li>
+            <li>
+              <strong className="text-pink-300">🎮 Jugar</strong> — haga crecer su finca y defiéndala jugando (Mi Finca Viva).
+            </li>
+            <li>
+              <strong className="text-sky-300">💬 Agente</strong> — pregúntele lo que sea por texto, voz o foto. Responde con su fuente. Mira el tema &ldquo;Sobre el agente Chagra&rdquo; en el Manual.
+            </li>
+          </ul>
+          <p className="text-xs text-slate-400 italic mt-2">
+            Para volver al inicio en cualquier momento, toca el ícono de la casa o la mano de Chagra arriba.
+          </p>
+        </Section>
 
         {/* 1. Inicio rápido */}
         <Section icon={Sprout} title="🌱 Inicio rápido (primera vez)" action={quickAction('Crear primera planta', 'plant_asset')}>
@@ -159,12 +191,13 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
         {/* 4. Plagas y cosechas */}
         <Section icon={Bug} title="🐛 Plagas y 🍎 cosecha">
           <p className="font-bold text-emerald-200">Reportar plaga / invasora</p>
-          <p>Toca menú principal → <strong>&ldquo;Plagas&rdquo;</strong>. Selecciona la especie invasora del catálogo, captura foto y geolocalización.</p>
-          <p>Después de guardar te aparece una pantalla con <strong>sugerencias de especies nativas para reemplazar</strong>. Toca &ldquo;Sembrar aquí&rdquo; y vas al flow de siembra precargado con la nativa + las coordenadas del invasor.</p>
+          <p>En el lugar <strong className="text-emerald-300">Gestionar</strong> toca <strong>&ldquo;Reportar plaga&rdquo;</strong>. Selecciona la especie del catálogo, captura foto y ubicación.</p>
+          <p>Después de guardar te aparece una pantalla con <strong>sugerencias de especies nativas para reemplazar</strong>. Toca &ldquo;Sembrar aquí&rdquo; y vas al registro de siembra ya cargado con la nativa + las coordenadas.</p>
+          <p className="text-xs text-slate-400 mt-1">¿No sabes cómo controlarla sin químicos? Pregúntale al <strong className="text-sky-300">Agente</strong>: te sugiere control biológico y biopreparados con su fuente.</p>
 
           <p className="font-bold text-emerald-200 mt-3">Registrar cosecha</p>
-          <p>Activos → selecciona la planta → en la card aparece &ldquo;Registrar cosecha&rdquo;. Captura cantidad cosechada (kg / unidades) + fecha. Se agrega como log de cosecha a la hoja de vida.</p>
-          <p>También por voz: &ldquo;coseché 5 kilos de gulupas&rdquo; con el botón micrófono.</p>
+          <p>En <strong className="text-emerald-300">Gestionar</strong> → tus plantas → selecciona la planta → &ldquo;Registrar cosecha&rdquo;. Captura cuánto cosechaste (kg / unidades) + fecha. Queda en la hoja de vida de la planta.</p>
+          <p>También por voz: di &ldquo;coseché 5 kilos de gulupas&rdquo; con el botón micrófono. Ver el tema &ldquo;Cómo usar la voz&rdquo;.</p>
 
           <div className="mt-3 flex flex-wrap gap-2">
             <button
@@ -184,7 +217,45 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
           </div>
         </Section>
 
-        {/* 5. Reportar problema / sugerir mejora — embed del FieldFeedback
+        {/* 5. Registrar por voz — atajo al tema completo + tipos. */}
+        <Section icon={Mic} title="🎤 Registrar por voz (con las manos sucias)" action={quickAction('Probar la voz', 'voz')}>
+          <p>La forma más rápida en campo. Toca el micrófono, habla normal y Chagra entiende y te deja confirmar antes de guardar.</p>
+          <p className="mt-1">Con la voz puedes registrar:</p>
+          <ul className="list-disc pl-5 space-y-1 mt-1">
+            <li><strong className="text-emerald-200">Sembrar</strong>: &ldquo;sembré 5 tomates en el invernadero&rdquo;.</li>
+            <li><strong className="text-emerald-200">Cosechar</strong>: &ldquo;coseché 3 kilos de gulupas&rdquo;.</li>
+            <li><strong className="text-emerald-200">Insumo</strong>: &ldquo;apliqué bocashi al tomate de ayer&rdquo;.</li>
+            <li><strong className="text-emerald-200">Mantenimiento</strong>: &ldquo;podé el aguacate&rdquo;.</li>
+            <li><strong className="text-emerald-200">Observación</strong>: &ldquo;vi una broca en el café&rdquo;.</li>
+          </ul>
+          <p className="text-xs text-slate-400 italic mt-2">El tema completo, paso a paso, está en el Manual → &ldquo;Cómo usar la voz&rdquo;.</p>
+        </Section>
+
+        {/* 6. Directorio de especies — pantalla nueva (#1855). */}
+        <Section icon={Leaf} title="🌿 Buscar una especie (directorio)" action={quickAction('Abrir directorio de especies', 'especies')} isNew>
+          <p>El <strong className="text-emerald-200">Directorio de especies</strong> es el catálogo de Chagra como fichas. Busca una planta y mira:</p>
+          <ul className="list-disc pl-5 space-y-1 mt-1">
+            <li>en qué <strong>piso térmico / altitud</strong> prospera,</li>
+            <li>con qué se lleva bien y qué evitar (<strong>asociaciones</strong>),</li>
+            <li>qué <strong>plagas</strong> la afectan y quién las controla,</li>
+            <li>qué <strong>biopreparados</strong> le sirven.</li>
+          </ul>
+          <p className="text-xs text-slate-400 italic mt-2">Si quieres preguntar en palabras (&ldquo;¿qué va con el café?&rdquo;), usa el Agente.</p>
+        </Section>
+
+        {/* 7. Calendario de finca — pantalla nueva (#1853). */}
+        <Section icon={CalendarDays} title="📅 Calendario de finca" action={quickAction('Abrir calendario', 'calendario')} isNew>
+          <p>El <strong className="text-emerald-200">Calendario de finca</strong> reúne en un solo lugar cuándo <strong>sembrar, abonar, cuidar de plagas y cosechar</strong>, según tu altitud y tus cultivos.</p>
+          <p className="mt-1">Junta la fenología, la nutrición, la siembra/cosecha, el manejo de plagas (MIP) y los cultivos perennes. Así sabes qué toca este mes sin tener que adivinar.</p>
+        </Section>
+
+        {/* 8. Vender / Mercado — pantalla nueva (#1854). */}
+        <Section icon={Store} title="🛒 Vender mi cosecha (mercado)" action={quickAction('Abrir el mercado de la finca', 'mercados')} isNew>
+          <p>En el <strong className="text-emerald-200">Mercado de la finca</strong> publicas lo que produces y lo vendes por <strong>circuitos cortos</strong> (de tu finca a quien come), coordinando por WhatsApp.</p>
+          <p className="text-xs text-slate-400 italic mt-2">El precio lo pones tú. Chagra todavía no te dice un precio de mercado exacto — esa parte está en construcción.</p>
+        </Section>
+
+        {/* 9. Reportar problema / sugerir mejora — embed del FieldFeedback
             form. Antes vivía como FAB flotante 💬 global; movido aquí
             2026-05-21 por feedback usuario (más discoverable + no tapa
             contenido). isNew=true para resaltar la nueva ubicación. */}
@@ -270,7 +341,7 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
             </div>
             <div>
               <p className="font-bold text-amber-300">📷 La foto no aparece tras adjuntarla</p>
-              <p className="text-xs text-slate-400 leading-relaxed">Recarga la pantalla, IndexedDB puede tardar en flush. Si persiste, repórtalo via 💬.</p>
+              <p className="text-xs text-slate-400 leading-relaxed">Recarga la pantalla; los datos pueden tardar un momento en aparecer. Si persiste, repórtalo en &ldquo;Reportar problema&rdquo; aquí mismo.</p>
             </div>
             <div>
               <p className="font-bold text-amber-300">🌱 Creé planta y no aparece en la zona</p>
@@ -284,7 +355,7 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
         </Section>
 
         <p className="text-[11px] text-slate-600 text-center mt-4 italic leading-relaxed">
-          Manual v2.0 · Rediseño 2026-05-08 · Colombia es el país de la belleza.
+          Manual v2.1 · Actualizado 2026-06-25 · Colombia es el país de la belleza.
         </p>
       </main>
     </div>

@@ -34,6 +34,12 @@
          "Añadir a pantalla de inicio" instala un shortcut que abre en
          Safari (no standalone) y sin ícono real. Detectado en field
          test 2026-04-30 con Lili. -->
+    <!-- Fuentes self-host del home "Finca Viva" (mockup F2): Baloo 2 (display) +
+         Nunito (cuerpo). Self-host porque la CSP sólo permite font-src 'self'
+         (offline-first, sin Google Fonts por red). El @font-face vive en
+         finca-viva-hero.css; estos preload aceleran el primer paint del hero. -->
+    <link rel="preload" href="/fonts/baloo2-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/nunito-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="apple-touch-icon" href="/icon-180.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />

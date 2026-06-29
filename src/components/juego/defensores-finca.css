@@ -112,6 +112,36 @@
   filter: grayscale(1);
 }
 
+/* ── Progreso de objetivos (cultivos / plagas / jefe) ────────────────── */
+
+.df-objetivos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: -0.35rem 0 0.2rem;
+}
+
+.df-objetivo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(110, 231, 183, 0.3);
+  background: rgba(6, 78, 59, 0.4);
+  color: #d1fae5;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.df-objetivo-listo {
+  border-color: rgba(52, 211, 153, 0.75);
+  background: rgba(5, 150, 105, 0.45);
+  color: #ecfdf5;
+}
+
 /* ── Controles táctiles ──────────────────────────────────────────────── */
 
 .df-controls {
