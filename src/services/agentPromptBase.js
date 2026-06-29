@@ -1,5 +1,5 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
-import { TOP_N_EDGES } from './promptAssembler';
+import { TOP_N_EDGES } from './promptAssembler.js';
 /**
  * agentPromptBase — texto BASE del system prompt del agente + builders puros
  * de bloques por-turno (corpus RAG, evidencia de tools, entidades resueltas,
@@ -800,4 +800,97 @@ export function truncateEdgesBlock(bloque, maxEdges = TOP_N_EDGES) {
     out.push(line);
   }
   return out.join('\n');
+}
+
+/**
+ * MODO_EXPERTO_BLOCK — instrucciones estructuradas para el nivel DETALLADO
+ * (experto). Convierte la directiva cosmética de una línea en un bloque con
+ * CONTRATO verificable: exigir nombre científico, dosis con unidad, mecanismo
+ * de acción, y piso térmico/condición cuando el grounding lo provea.
+ *
+ * Bloque SACRIFICABLE: se agrega a BLOCK_ORDER + SACRIFICE_ORDER en
+ * promptAssembler.js para no reventar el presupuesto de 6144 tokens.
+ *
+ * @param {object} opts
+ * @param {string} [opts.nivelRespuestas] — 'simple' | 'detallado' del perfil
+ * @param {boolean} [opts.hasGrounding] — si hay evidencia/tools en este turno
+ * @returns {string} bloque, o '' si no aplica
+ */
+export function buildModoExpertoBlock(opts = {}) {
+  const { nivelRespuestas = 'simple', hasGrounding = false } = opts;
+
+  // Solo aplica cuando el usuario prefiere DETALLADO
+  if (nivelRespuestas !== 'detallado') return '';
+
+  // Versión ultra-compacta para respetar presupuesto
+  const contrato = hasGrounding
+    ? `CONTRATO CITA: científico exacto de ENTIDADES RESUELTAS/DATOS VERIFICADOS, dosis con unidad (ej: 1x10^9 conidias/mL), mecanismo de acción, piso térmico si grounding la menciona.`
+    : `CONTRATO TÉCNICO: profundiza en por qué/factores/integración; si no hay datos del catálogo, dilo explícitamente.`;
+
+  return `=== MODO EXPERTO ===
+${contrato}
+PROHIBICIONES: NO uses técnica para disimular incertidumbre; NO inventes dosis/datos numéricos; NO mezcles datos de especies.
+RESPUESTA: preciso, citado cuando hay evidencia, honesto cuando no la haya.
+=== FIN ===`;
+}
+
+/**
+ * buildSourceFooter — pie de fuente DETERMINÍSTICO desde la procedencia del
+ * grounding. NO confía en que el modelo cite; genera el pie desde las
+ * entidades/tools que respondieron (AGE/RAG/SIPSA/IDEAM) en código.
+ *
+ * @param {object} opts
+ * @param {Array|object|null} [opts.toolEvidence] — evidencia de tools del turno
+ * @param {Array|null} [opts.resolvedEntities] — entidades resueltas por AGE
+ * @param {boolean} [opts.hasCorpus] — si hay corpus RAG en este turno
+ * @returns {string} pie de fuente, o '' si no hay fuentes
+ */
+export function buildSourceFooter(opts = {}) {
+  const { toolEvidence = null, resolvedEntities = null, hasCorpus = false } = opts;
+
+  const sources = [];
+
+  // Detectar fuentes de tools
+  if (toolEvidence) {
+    const tools = Array.isArray(toolEvidence) ? toolEvidence : [toolEvidence];
+    for (const ev of tools) {
+      if (!ev || !ev.tool) continue;
+
+      // Mapeo de tools a fuentes legibles
+      const toolToSource = {
+        get_species: 'Catálogo Chagra (Apache AGE)',
+        get_companions: 'Catálogo Chagra (Apache AGE)',
+        get_pest_controllers: 'Grafo AGE (relaciones plagas-controles)',
+        get_biopreparados: 'Catálogo chagra-pro (biopreparados)',
+        get_normativa_ica: 'ICA (registro de agroquímicos)',
+        get_clima_ideam: 'IDEAM (estaciones climáticas)',
+        get_precio_sipsa: 'SIPSA/DANE (precios mayoristas)',
+        get_multihop_companions: 'Grafo AGE (companions multi-hop)',
+        validate_visual_match: 'Visión artificial (GLM-4.6)',
+        validate_taxonomy: 'Validación taxonómica AGE',
+      };
+
+      const source = toolToSource[ev.tool];
+      if (source && !sources.includes(source)) {
+        sources.push(source);
+      }
+    }
+  }
+
+  // Entidades resueltas por AGE
+  if (resolvedEntities && resolvedEntities.length > 0) {
+    if (!sources.includes('Catálogo Chagra (Apache AGE)')) {
+      sources.push('Catálogo Chagra (Apache AGE)');
+    }
+  }
+
+  // Corpus RAG
+  if (hasCorpus) {
+    sources.push('Corpus agronómico regional');
+  }
+
+  // Sin fuentes → no prometer cita
+  if (sources.length === 0) return '';
+
+  return `\n\n---\n\nFuentes: ${sources.join(' + ')}.`;
 }
