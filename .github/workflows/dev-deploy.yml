@@ -56,6 +56,10 @@ jobs:
           # Registro unificado (#23): puerta única "Registrar" (voz + manual) en
           # dev. OFF en prod (deploy.yml no la define) hasta el visto bueno.
           VITE_REGISTRO_UNIFICADO: "true"
+          # Colibrí REAL (barbudito de páramo por sprite) en home + FAB +
+          # transición. Dev-only para revisión del operador; AUSENTE en
+          # deploy.yml (prod) → prod conserva el colibrí 2D / video actual.
+          VITE_COLIBRI: "true"
           VITE_CHAGRA_MCP_TOKEN: ${{ secrets.VITE_CHAGRA_MCP_TOKEN }}
 
       - if: env.SKIP_DEPLOY != '1'

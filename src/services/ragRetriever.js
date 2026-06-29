@@ -450,13 +450,25 @@ async function loadEmbeddings() {
 /**
  * Embebe una query via Ollama (POST /api/ollama/api/embeddings).
  * Si falla (sin red, modelo caído), retorna null → fallback a BM25 solo.
+ *
+ * `options.num_gpu: 0` fuerza el embed a CPU (P0 warm, audit 2026-06-28): evita
+ * que snowflake-arctic-embed2 co-resida en la GPU del chat y dispare OOM.
  */
 async function embedQuery(queryText) {
   try {
     const res = await fetchWithAuthRetry('/api/ollama/api/embeddings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'snowflake-arctic-embed2', prompt: queryText }),
+      // num_gpu:0 → el embedder corre en CPU, NO en la M6000 (12 GiB). La
+      // co-residencia embedder(~4.5G) + granite3.3:8b(~7.2G) > 12G dispara un
+      // cudaMalloc OOM que MATA el runner compartido de granite → los turnos
+      // siguientes quedan fríos. Se conserva snowflake (1024d, mismo espacio que
+      // los vectores precomputados) y el RAG híbrido queda intacto.
+      body: JSON.stringify({
+        model: 'snowflake-arctic-embed2',
+        prompt: queryText,
+        options: { num_gpu: 0 },
+      }),
       signal: AbortSignal.timeout(TOOL_TIMEOUT_MS),
     });
     if (!res.ok) return null;

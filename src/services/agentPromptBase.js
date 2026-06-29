@@ -326,6 +326,36 @@ const TOMATE_SAFETY_RULES = [
 ];
 
 /**
+ * buildCampesinoModeBlock — bloque MODO_CAMPESINO para registro oral campesino
+ * colombiano (tu/usted colombiano NUNCA voseo argentino, pasos concretos, frases
+ * cortas, SIN binomios científicos salvo que el usuario los pida, unidades del
+ * campo cuadra/arroba/luna).
+ *
+ * PRINCIPIO CLAVE intelligence-first: NO bajar exactitud ni grounding, solo
+ * cambia el REGISTRO. Bloque SACRIFICABLE que se puede quitar por presión de
+ * presupuesto sin afectar la funcionalidad core.
+ *
+ * @returns {string}
+ */
+export function buildCampesinoModeBlock() {
+  return `=== MODO CAMPESINO (registro oral campesino colombiano) ===
+Habla como un campesino colombiano experimentado, NO como un sistema técnico:
+- Usa tú/usted colombiano (NEVER vos/tenés/querés del argentino/rioplatense)
+- Frases cortas y directas, como habla la gente del campo
+- Unidades del campo: cuadra, arroba, luna, bike de agua, plaza, hueco
+- NO uses binomios científicos (Coffea arabica, Solanum tuberosum) salvo que el usuario los pida explícitamente
+- Usa nombres comunes: café, papa, plátano, tomate, fríjol, maíz
+- Sé respetuoso y cercano, como hablar con un vecino de la finca
+- Explica las cosas con ejemplos prácticos del día a día
+- Conjunto: "mire", "véalo así", "lo que uno hace", "en la finca uno"
+
+PRINCIPIO FUNDAMENTAL: esto es SOLO un cambio de registro. NO sacrificas
+exactitud técnica ni grounding. Si los datos dicen X, dilo X pero con palabras
+sencillas. Si no sabes algo, sé honesto como siempre.
+=== FIN MODO CAMPESINO ===`;
+}
+
+/**
  * buildBasePrompt — system prompt base del agente Chagra (instrucciones +
  * glosarios condicionales + reglas anti-alucinación CASO A/B/C).
  *
@@ -344,6 +374,7 @@ const TOMATE_SAFETY_RULES = [
  * @param {string} [args.query] — query del turno (gatea glosarios/reglas condicionales).
  * @param {string} [args.contextMemory] — historial inyectado (gatea glosarios y turn-aislamiento).
  * @param {boolean} [args.isEnum] — análisis NN2: ¿query enumerativa? (gatea CASO C completo).
+ * @param {string} [args.nivelRespuestas] — 'simple' o 'detallado' (del perfil de usuario).
  * @returns {string}
  */
 export function buildBasePrompt({
@@ -354,7 +385,8 @@ export function buildBasePrompt({
   query = '',
   contextMemory = '',
   isEnum = false,
-}) {
+  nivelRespuestas = '',
+} = {}) {
   const mention = _strip(`${query}\n${contextMemory}`);
   const sections = [];
   const conversationContextPin = buildConversationContextPin(contextMemory);
@@ -486,7 +518,8 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
   sections.push(generateAgronomicGuidanceRules());
   // Las alertas climáticas regionales del perfil solo aportan en consultas de
   // clima; en plaga/manejo se omiten para no empujar la truncación (GR-10).
-  sections.push(buildProfileContext(finca, { climaQuery: CLIMA_QUERY_RE.test(mention) }));
+  // Pasa nivelRespuestas para ajustar el nivel de detalle en buildProfileContext.
+  sections.push(buildProfileContext(finca, { climaQuery: CLIMA_QUERY_RE.test(mention), nivelRespuestas }));
 
   return sections.join('\n\n');
 }

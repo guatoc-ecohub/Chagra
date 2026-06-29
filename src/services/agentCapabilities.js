@@ -35,6 +35,9 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     tool: 'get_species',
     stubMessage: null,
     hero: true,
+    // featured (2026-06-28): una de las 6 funciones clave que brotan primero en
+    // el anillo principal de la mano para el primerizo (resto va bajo grupos).
+    featured: true,
     heroRoute: { kind: 'ask', prompt: '¿Qué puedo sembrar este mes en mi zona?' },
   },
   {
@@ -50,6 +53,7 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     tool: 'get_pest_controllers',
     stubMessage: null,
     hero: true,
+    featured: true, // 1 de las 6 destacadas (anillo principal).
     heroRoute: { kind: 'ask', prompt: '¿Cómo controlo plagas sin químicos?' },
   },
   {
@@ -80,6 +84,7 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     tool: 'get_clima_ideam',
     stubMessage: null,
     hero: true,
+    featured: true, // 1 de las 6 destacadas (anillo principal).
     heroRoute: { kind: 'ask', prompt: 'Dame el reporte del clima de mi zona esta semana.' },
   },
   {
@@ -138,7 +143,11 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     label: 'Calendario',
     desc: 'Cuándo sembrar y cuándo cosechar.',
     placeholder: 'Escribe la planta para ver su época de siembra',
-    tool: 'get_species',
+    // fix chip calendario (2026-06-28): el manifiesto declaraba get_species, pero
+    // la tool dedicada del calendario lunar/estacional es get_calendario_siembra
+    // (viva en el sidecar; el chipIntentRouter ya routeaba ahí). Se alinea el
+    // manifiesto con la tool real — capabilityHealth y auditoría quedan coherentes.
+    tool: 'get_calendario_siembra',
     stubMessage: null,
     hero: true,
     heroRoute: { kind: 'ask', prompt: '¿Cuándo siembro y cuándo cosecho en mi zona?' },
@@ -164,7 +173,13 @@ export const CAPABILITY_MANIFEST = Object.freeze([
       'de siembra, plaga, biopreparado o clima para obtener información curada.',
     group: 'aprender',
     status: 'soon',
-    hero: true,
+    // hero:false (dedup mano 2026-06-28): `deep` es un STUB (status:'soon' → no-op
+    // que solo muestra toast "por lanzar"). Igual que `precio`, se RETIRA de la
+    // mano radial para no dejar una rama muerta — sigue siendo chip honesto en el
+    // ChipsToolbar (stub con stubMessage que orienta). La rama "Aprender" de la
+    // mano vive sana por `aprender_hub` (LIVE → vista 'aprende'). El día que el
+    // backend de deep research se sirva en prod, se vuelve hero:true.
+    hero: false,
     heroRoute: { kind: 'unavailable' },
   },
   {
@@ -179,7 +194,9 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     intent: 'restauracion',
     kind: 'tool',
     icon: '🌳',
-    label: 'Restauración',
+    // jerga campesina (2026-06-28): "Restauración" es término técnico → label
+    // claro para el campo. El id e intent NO cambian (chip/routing intactos).
+    label: 'Sembrar monte nativo',
     desc: 'Recuperar un terreno con nativas, de pioneras a bosque maduro.',
     placeholder: 'Cuéntame qué quieres recuperar: bosque, orilla de quebrada o sitio quemado',
     tool: 'get_diseno_restauracion',
@@ -200,7 +217,9 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     intent: 'silvopastoreo',
     kind: 'tool',
     icon: '🐄',
-    label: 'Silvopastoreo',
+    // jerga campesina (2026-06-28): "Silvopastoreo" es término técnico. id/intent
+    // intactos (chip/routing); solo cambia la etiqueta visible.
+    label: 'Árboles para el ganado',
     desc: 'Forraje y árboles para tu ganado según tu altura.',
     placeholder: 'Escribe tu animal o el forraje que buscas: banco de proteína, cerca viva, sombra',
     tool: 'get_diseno_silvopastoril',
@@ -262,9 +281,11 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     // de la mano era SOLO `deep` (status:'soon' → no-op, solo toast). Esta hoja
     // LIVE la conecta al contenido real de aprendizaje (módulo "Aprende con el
     // agente", ruta 'aprende': 5 lecciones agroecológicas con fuente/DOI). Así
-    // la rama "Aprender" navega a algo real en vez de quedar muerta; `deep`
-    // sigue presente como stub honesto ("por lanzar"). No tiene `intent` → NO es
-    // chip, solo acción de la mano. Ref: CAPABILITIES_STATUS.md §7.4.
+    // la rama "Aprender" navega a algo real en vez de quedar muerta. Tras el
+    // dedup 2026-06-28 es la ÚNICA hoja de la rama "Aprender": 'aprender-hub'
+    // (duplicado) se eliminó y `deep` pasó a hero:false (stub honesto que vive
+    // solo en el ChipsToolbar). No tiene `intent` → NO es chip, solo acción de la
+    // mano. Ref: CAPABILITIES_STATUS.md §7.4.
     id: 'aprender_hub',
     group: 'aprender',
     status: 'live',
@@ -289,10 +310,15 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     group: 'observar',
     status: 'live',
     icon: '📷',
-    label: 'Agregar planta por foto',
-    desc: 'Tómale una foto y la identifico contra el catálogo.',
+    // jerga campesina + alcance real (2026-06-28): la foto NO solo agrega una
+    // planta — identifica la especie Y diagnostica daño foliar/plaga/enfermedad
+    // (visión groundeada: analyzeFoliage / validate_visual_match). El label lo
+    // comunica en usted colombiano.
+    label: 'Tómele foto a una mata',
+    desc: 'Tómele una foto a su planta: le digo qué es y si tiene plaga o enfermedad.',
     tool: 'vision_identify',
     hero: true,
+    featured: true, // 1 de las 6 destacadas (anillo principal).
     heroRoute: { kind: 'photo' },
   },
   {
@@ -310,7 +336,14 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     label: 'Agregar planta por voz',
     desc: 'Dime qué sembraste: lo registro y te muestro su ciclo, bioinsumos y compañeros.',
     tool: 'voice_capture',
-    hero: true,
+    // hero:false (dedup mano 2026-06-28): `procesos` ("Registrar hablando",
+    // vista 'registro_voz' → RegistroVozScreen) YA cubre agregar una planta por
+    // voz — clasifica entre TODOS los tipos incluyendo INTENTS.PLANTA →
+    // saveType 'plant_asset' (verificado en voiceFieldExtractor.INTENT_META). Dos
+    // botones de voz en la mano confundían; se deja solo `procesos`. La vista
+    // 'voz_planta' (PlantaPorVozScreen) sigue viva y enlazada desde otras
+    // pantallas; solo se retira esta puerta duplicada de la mano radial.
+    hero: false,
     heroRoute: { kind: 'nav', view: 'voz_planta' },
   },
   {
@@ -322,6 +355,7 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     desc: 'Ver y manejar lo que tienes en la finca.',
     tool: 'assets',
     hero: true,
+    featured: true, // 1 de las 6 destacadas (anillo principal).
     heroRoute: { kind: 'nav', view: 'activos' },
   },
   {
@@ -373,7 +407,8 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     group: 'observar',
     status: 'live',
     icon: '🦋',
-    label: 'Biodiversidad',
+    // jerga campesina (2026-06-28): "Biodiversidad" es término técnico.
+    label: 'La vida de la finca',
     desc: 'Reconocer y cuidar la vida de la finca.',
     tool: 'biodiversity',
     hero: true,
@@ -395,7 +430,8 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     group: 'cultivo',
     status: 'live',
     icon: '🌱',
-    label: 'Germinación',
+    // jerga campesina (2026-06-28): "Germinación" es término técnico.
+    label: '¿Sirve mi semilla?',
     desc: 'Prueba si tu semilla está viva antes de sembrar.',
     tool: 'germination_test',
     hero: true,
@@ -429,6 +465,7 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     desc: 'Cuéntame qué hiciste o qué viste: siembra, cosecha, insumo, mantenimiento, observación o plaga, y lo guardo.',
     tool: 'farm_process',
     hero: true,
+    featured: true, // 1 de las 6 destacadas (anillo principal) — voz-first.
     heroRoute: { kind: 'nav', view: 'registro_voz' },
   },
   {
@@ -439,25 +476,17 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     label: 'Alertas del cultivo',
     desc: 'Avisos anticipados de riesgo por clima, plagas y etapa.',
     tool: 'crop_alerts',
-    hero: true,
+    // hero:false (dedup mano 2026-06-28): `alertas-cultivo` y `ciclo` apuntaban a
+    // la MISMA vista 'ciclo' → dos puertas al mismo sitio en la mano. Se deja
+    // `ciclo` ("Ciclo del cultivo") como la única hoja de esa vista; las alertas
+    // viven DENTRO de esa pantalla (sección de avisos), no como rama aparte.
+    // status sigue 'live' (capabilityHealth/otros consumidores intactos).
+    hero: false,
     heroRoute: { kind: 'nav', view: 'ciclo' },
   },
-  {
-    // RAMA "Aprender" de la mano: antes el grupo solo tenía 'deep'
-    // (Investigación profunda, status 'soon' → no clickeable), así que la rama
-    // moría en un nodo atenuado sin destino real. Esta entrada conecta la rama
-    // al hub educativo que YA existe y es alcanzable (vista 'aprende',
-    // AprenderConAgente): lecciones agroecológicas con fuente verificada.
-    id: 'aprender-hub',
-    group: 'aprender',
-    status: 'live',
-    icon: '📚',
-    label: 'Aprende con el agente',
-    desc: 'Lecciones agroecológicas con fuente: suelo, asociaciones, biopreparados, MIP y fenología.',
-    tool: null,
-    hero: true,
-    heroRoute: { kind: 'nav', view: 'aprende' },
-  },
+  // NOTA (dedup mano 2026-06-28): la entrada 'aprender-hub' (≡ 'aprender_hub',
+  // mismo destino nav:'aprende') se ELIMINÓ — eran duplicados. Se conserva
+  // 'aprender_hub' ("Aprender con el agente", arriba) como única hoja de la rama.
   {
     // RAMA "Vender" de la mano: antes el grupo solo tenía 'precio'
     // (status 'soon' → no clickeable), así que la rama no iba a ningún lado.
@@ -472,7 +501,13 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     label: 'Vender mejor',
     desc: 'A dónde llevar la cosecha y dónde consultar precios mayoristas. En preparación.',
     tool: null,
-    hero: true,
+    // hero:false (dedup mano 2026-06-28): `mercado` ("Mercado de la finca",
+    // marketplace LIVE) y `vender-mercados` ("Vender mejor", en preparación)
+    // navegan a la MISMA MercadosScreen (App.jsx: vistas 'mercado' y 'mercados'
+    // renderizan el mismo componente). Se deja `mercado` (capacidad real) como la
+    // única hoja de la rama "Vender"; `vender-mercados` se retira de la mano hasta
+    // tener un backend de precios/destinos propio.
+    hero: false,
     heroRoute: { kind: 'nav', view: 'mercados' },
   },
 ]);

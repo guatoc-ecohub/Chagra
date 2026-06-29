@@ -1,0 +1,157 @@
+/*
+ * barbudito.css — el colibrí REAL (barbudito de páramo) curado por el operador.
+ * Reemplazo aprobado del colibrí 3D inflado (Three.js / R3F, rechazado).
+ *
+ * Tres usos, tres assets, todos liviano y universales (sin WebGL):
+ *   1. HOME  → "ventana viva" enmarcada: video H.264 del barbudito tomando
+ *      néctar de la flor del frailejón (sin alpha → corre en TODO navegador,
+ *      incl. iOS), en un recuadro redondeado.
+ *   2. FAB   → barbudito POSADO recortado (PNG transparente), estático con un
+ *      leve flotar opcional.
+ *   3. TRANSICIÓN → fly-across UNA pasada: webm VP9-alpha cruzando en arco; en
+ *      navegadores sin VP9-alpha (iOS), sprite con steps(16) + translateX.
+ */
+
+/* ── 1. VENTANA VIVA (home) ──────────────────────────────────────────────── */
+.barbudito-ventana {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 22px;
+  /* Marco sutil tipo "ventana al páramo": borde claro + halo verde tenue. */
+  border: 2px solid rgba(190, 242, 100, 0.35);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.38),
+    0 0 22px rgba(16, 185, 129, 0.18),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  background: #0d1f17;
+  line-height: 0;
+}
+.barbudito-ventana video,
+.barbudito-ventana img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 46%;
+}
+/* Viñeta suave para fundir los bordes del clip con el marco. */
+.barbudito-ventana::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 26px 6px rgba(8, 22, 16, 0.45);
+}
+
+/* ── HOME A/B (1) — COLIBRÍ ILUSTRADO (SVG/CSS, vectorial) ───────────────────
+   Barbudito de páramo dibujado: aleteo rápido de las alas + vuelo estacionario
+   suave del conjunto. Todo CSS (cero JS), se apaga con reduced-motion. */
+.barbudito-ilustrado {
+  display: inline-block;
+  line-height: 0;
+  filter: drop-shadow(0 4px 6px rgba(40, 30, 12, 0.32));
+  animation: barbudito-ilus-vuelo 5.4s ease-in-out infinite;
+}
+.barbudito-ilus-svg { display: block; overflow: visible; }
+/* aleteo: las dos alas baten en contrafase, rápido como un colibrí */
+.barbudito-ilus-svg .bi-ala-fron { animation: barbudito-ilus-flap 0.14s ease-in-out infinite; }
+.barbudito-ilus-svg .bi-ala-tras { animation: barbudito-ilus-flap-back 0.14s ease-in-out infinite; }
+@keyframes barbudito-ilus-flap {
+  0%, 100% { transform: rotate(-20deg) scaleY(0.96); }
+  50%      { transform: rotate(22deg) scaleY(1); }
+}
+@keyframes barbudito-ilus-flap-back {
+  0%, 100% { transform: rotate(18deg); }
+  50%      { transform: rotate(-20deg); }
+}
+/* vuelo estacionario: deriva mínima, como suspendido en el aire */
+@keyframes barbudito-ilus-vuelo {
+  0%   { transform: translate(0, 0) rotate(-2deg); }
+  30%  { transform: translate(-7px, 6px) rotate(1.5deg); }
+  60%  { transform: translate(4px, -4px) rotate(-1.5deg); }
+  100% { transform: translate(0, 0) rotate(-2deg); }
+}
+
+/* ── HOME A/B (2) — COLIBRÍ REAL en loop (sprite 4×4, transparente) ──────────
+   Sprite de 16 frames en grilla 4×4. background-size 400% 400%: el eje X barre
+   las 4 columnas con steps(4) y el eje Y baja una fila cada vuelta completa de
+   X (4× más lento), recorriendo los 16 frames en bucle. Sin recuadro. */
+.barbudito-real-loop {
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-size: 400% 400%;
+  background-position: 0% 0%;
+  filter: drop-shadow(0 4px 6px rgba(20, 20, 10, 0.30));
+  will-change: background-position;
+}
+.barbudito-real-loop.is-playing {
+  /* steps(4, jump-none): la posición toma EXACTAMENTE los 4 valores 0/33.3/66.7/
+     100% (los 4 frames de la fila/columna), sin saltarse el último. */
+  animation:
+    barbudito-real-fila-x 0.36s steps(4, jump-none) infinite,
+    barbudito-real-col-y 1.44s steps(4, jump-none) infinite;
+}
+.barbudito-real-loop.is-static { background: none; object-fit: contain; }
+@keyframes barbudito-real-fila-x {
+  from { background-position-x: 0%; }
+  to   { background-position-x: 100%; }   /* 4 columnas */
+}
+@keyframes barbudito-real-col-y {
+  from { background-position-y: 0%; }
+  to   { background-position-y: 100%; }   /* 4 filas */
+}
+
+/* ── 2. POSADO (FAB) ─────────────────────────────────────────────────────── */
+.barbudito-posado {
+  display: block;
+  object-fit: contain;
+  /* Leve flotar para darle vida sin distraer (se apaga con reduced-motion). */
+  animation: barbudito-posado-flotar 4.2s ease-in-out infinite;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.4));
+}
+@keyframes barbudito-posado-flotar {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50%      { transform: translateY(-3px) rotate(1deg); }
+}
+
+/* ── 3. FLY-ACROSS sprite fallback (transición, sin VP9-alpha) ───────────── */
+/* Tira horizontal de 16 frames (1×16). Con background-size 1600% 100% y
+   posicionamiento en porcentaje, 0%→100% con steps(16) recorre los 16 frames
+   (verificado en chromium). El cruce es UNA sola pasada (sin loop ni rebote). */
+.barbudito-cruza {
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 1600% 100%;
+  will-change: background-position, transform;
+  animation:
+    barbudito-aleteo 0.55s steps(16) infinite,
+    barbudito-cruzar 1.15s cubic-bezier(0.22, 0.61, 0.36, 1) 1 forwards;
+}
+@keyframes barbudito-aleteo {
+  from { background-position-x: 0%; }
+  to   { background-position-x: 100%; }
+}
+/* Arco diagonal de lado a lado, UNA pasada (sube y sale; sin rebote). */
+@keyframes barbudito-cruzar {
+  0%   { transform: translate3d(-34vw, 10vh, 0) scale(0.78); opacity: 0; }
+  14%  { opacity: 1; }
+  50%  { transform: translate3d(0, -6vh, 0) scale(1.05); opacity: 1; }
+  86%  { opacity: 1; }
+  100% { transform: translate3d(36vw, 4vh, 0) scale(0.8); opacity: 0; }
+}
+
+/* ── prefers-reduced-motion: nada se mueve ───────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .barbudito-posado,
+  .barbudito-cruza,
+  .barbudito-ilustrado,
+  .barbudito-ilus-svg .bi-ala-fron,
+  .barbudito-ilus-svg .bi-ala-tras,
+  .barbudito-real-loop {
+    animation: none !important;
+    transform: none !important;
+  }
+}

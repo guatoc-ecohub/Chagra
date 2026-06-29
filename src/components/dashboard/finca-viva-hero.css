@@ -482,6 +482,34 @@
   100% { transform: translate(0, 0); }
 }
 
+/* A/B del colibrí del páramo (flag VITE_COLIBRI ON, dev). Dos barbuditos, uno a
+   cada costado de la escena, para que el operador elija. Cada uno trae su propia
+   animación (ilustrado = aleteo/vuelo CSS; real = sprite en loop), así que aquí
+   anulamos la animación de bicho heredada y solo los ubicamos. Es A/B TEMPORAL:
+   cada uno con su etiquetita. */
+.fvh-colibri-ab {
+  animation: none !important;
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+/* etiquetita discreta "ilustrado" / "real" (solo en este modo A/B dev) */
+.fvh-ab-tag {
+  font: 600 9px/1 var(--fvh-body, system-ui, sans-serif);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(20, 30, 18, 0.6);
+  border: 1px solid rgba(190, 242, 100, 0.4);
+  border-radius: 999px;
+  padding: 2px 7px;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  white-space: nowrap;
+}
+
 /* COLIBRÍ insignia volando (feedback #5) — vuelo estacionario + batido de alas */
 .fvh-colibri-vuela {
   animation: fvh-colibri-vuelo 5.5s ease-in-out infinite;
@@ -903,7 +931,14 @@
 [data-theme="minimalista"] .fvh {
   --fvh-on-cielo: #20301a;
   --fvh-on-cielo-suave: #33472a;
-  --fvh-on-cielo-acento: rgb(var(--c-emerald-500));
+  /* ACENTO (eyebrow "SU AGENTE AGROECOLÓGICO" + el <em> "su finca viva"): antes
+     era --c-emerald-500, que sobre el cielo del shell de los temas claros daba
+     SOLO 3.08–4.03:1 en el stop superior (turquesa/crema/papel) → bajo AA y se
+     veía "teal/olivo lavado" (audit Bug 1; #1886 cubrió el globo/perfil pero NO
+     este bloque). Subimos a --c-emerald-700 (verde bosque por tema): 5.10:1
+     verde-vivo · 5.80:1 nature · 9.63:1 minimalista en el stop superior = AA en
+     los 4. El <em> es texto grande (26px bold) y de todos modos pasa large-AA. */
+  --fvh-on-cielo-acento: rgb(var(--c-emerald-700));
   --fvh-on-cielo-sombra: 0 1px 2px rgba(255, 255, 255, 0.55);
   --fvh-on-cielo-div: linear-gradient(90deg, rgba(38, 51, 31, 0.2), transparent);
 }
