@@ -8,6 +8,7 @@ import {
   buildCorpusVariants,
   formatToolEvidence,
   TOOL_EVIDENCE_MAX_CHARS,
+  buildCampesinoModeBlock,
 } from '../agentPromptBase.js';
 
 describe('analyzeQuery', () => {
@@ -567,5 +568,36 @@ describe('buildBasePrompt — regresión multiturno: anáfora + coherencia', () 
     });
     expect(prompt).toContain('CONTEXTO DE LA CONVERSACIÓN');
     expect(prompt).toContain('2000 msnm');
+  });
+});
+
+describe('buildCampesinoModeBlock', () => {
+  it('exporta buildCampesinoModeBlock', () => {
+    expect(typeof buildCampesinoModeBlock).toBe('function');
+  });
+
+  it('buildCampesinoModeBlock genera bloque con registro campesino colombiano', () => {
+    const block = buildCampesinoModeBlock();
+
+    expect(block).toContain('MODO CAMPESINO');
+    expect(block).toContain('campesino colombiano');
+    expect(block).toContain('tú/usted');
+    expect(block).toContain('NEVER vos/tenés/querés');
+    expect(block).toContain('cuadra');
+    expect(block).toContain('arroba');
+    expect(block).toContain('luna');
+    expect(block).toContain('NO uses binomios científicos');
+    expect(block).toContain('PRINCIPIO FUNDAMENTAL');
+    expect(block).toContain('NO sacrificas');
+  });
+
+  it('buildCampesinoModeBlock prohíbe voseo argentino explícitamente', () => {
+    const block = buildCampesinoModeBlock();
+
+    // Verifica que el bloque contine advertencias explícitas contra voseo argentino
+    expect(block).toMatch(/vos|tenés|querés|dale|acá|che/i);
+    // Debe mencionar que NO se debe usar voseo argentino
+    expect(block).toContain('NEVER vos');
+    expect(block).toContain('argentino');
   });
 });
