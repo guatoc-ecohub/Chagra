@@ -70,14 +70,40 @@ const GROUP_ORDER = Object.freeze([
   'cultivo', 'cuidar', 'observar', 'restaurar', 'registrar', 'planear', 'aprender', 'vender',
 ]);
 
+/* DESTACADAS (operador 2026-06-28): las 6 funciones clave brotan PRIMERO en el
+   anillo principal como ACCIÓN DIRECTA (sin grupo), para que el primerizo las vea
+   de una. El RESTO de capacidades hero queda un nivel adentro, bajo su grupo
+   ("ver más"). Fuente única: featured===true en el manifiesto. NO se elimina
+   ninguna función — solo cambia la jerarquía de aparición. */
+const FEATURED = CAPABILITY_MANIFEST.filter((e) => e.hero === true && e.featured === true);
+const FEATURED_IDS = new Set(FEATURED.map((c) => c.id));
+
+/* Grupos = el resto de capacidades hero (las NO destacadas), agrupadas. */
 const GROUPS = GROUP_ORDER
   .map((key) => ({
     key,
     icon: GROUP_META[key].icon,
     label: GROUP_META[key].label,
-    leaves: CAPABILITY_MANIFEST.filter((e) => e.hero === true && e.group === key),
+    leaves: CAPABILITY_MANIFEST.filter(
+      (e) => e.hero === true && e.group === key && !FEATURED_IDS.has(e.id),
+    ),
   }))
   .filter((g) => g.leaves.length > 0);
+
+/* Anillo principal = [destacadas (acción directa)] + [grupos (despliegan su
+   resto al enfocar)]. Cada item tiene la MISMA forma que un grupo
+   (key/icon/label/leaves) para que el motor de geometría los trate igual: las
+   destacadas llevan kind:'cap' + cap y leaves:[] (no despliegan, accionan). El
+   orden (destacadas primero) define el orden de sprout: el primerizo ve brotar
+   primero las 6 funciones clave. */
+const RING = [
+  ...FEATURED.map((cap) => ({
+    kind: 'cap', key: cap.id, icon: cap.icon, label: cap.label, cap, leaves: [],
+  })),
+  ...GROUPS.map((g) => ({
+    kind: 'group', key: g.key, icon: g.icon, label: g.label, leaves: g.leaves,
+  })),
+];
 
 /* ══════════════ helpers geométricos (puros, port 1:1) ══════════════ */
 
@@ -309,6 +335,10 @@ const CSS = `
 }
 .arm-node:nth-child(even) .arm-orb{border-radius:var(--orbRadB)}
 .arm-node.arm-leaf .arm-orb{border-color:var(--ringLeaf)}
+/* destacadas (2026-06-28): acción directa en el anillo principal — anillo de
+   hoja (no de grupo) y SIN el latido expansible del grupo, para que se lean como
+   "toque y listo", no como "abra para ver más". */
+.arm-node.arm-feat .arm-orb{border-color:var(--ringLeaf)}
 .arm-node.arm-group .arm-orb::after{
   content:"";position:absolute;inset:-5px;border-radius:inherit;
   border:1px solid var(--pulse);animation:armPing 3.4s ease-out infinite;
@@ -433,7 +463,7 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
     const hintEl = root.querySelector('[data-arm="hint"]');
 
     /* estado de simulación por grupo/hoja (paths SVG creados acá). */
-    const sim = GROUPS.map((g, i) => {
+    const sim = RING.map((g, i) => {
       const el = root.querySelector(`[data-arm-group="${i}"]`);
       return {
         i,
@@ -928,8 +958,25 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
     toastTimerRef.current = setTimeout(() => setToastMsg(null), 1700);
   }
 
-  function handleGroupTap(i) {
+  function handleGroupTap(i, ev) {
     if (disabled) return;
+    const item = RING[i];
+    if (item?.kind === 'cap') {
+      // Destacada = ACCIÓN DIRECTA (no despliega): misma semántica que una hoja.
+      if (ev?.currentTarget) bounce(ev.currentTarget);
+      const cap = item.cap;
+      const health = capabilityHealth.get(cap.id) || 'live';
+      if (health === 'soon') {
+        showToast(`${cap.icon} ${cap.label} — por lanzar`);
+        return;
+      }
+      if (health === 'down') {
+        showToast(`${cap.icon} ${cap.label} — no disponible sin conexión al servidor`);
+        return;
+      }
+      if (onPick) onPick(cap);
+      return;
+    }
     engineRef.current?.toggleFocus(i);
   }
 
@@ -1021,35 +1068,50 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
       </div>
 
       <div className="arm-nodes">
-        {GROUPS.map((g, i) => (
-          <div
-            key={g.key}
-            className="arm-node arm-group"
-            role="button"
-            tabIndex={0}
-            aria-label={g.label}
-            aria-expanded={focusedIdx === i}
-            data-arm-group={i}
-            style={{ opacity: 0, '--pd': `${i * 0.5}s` }}
-            onClick={() => handleGroupTap(i)}
-            onKeyDown={(ev) => pressKey(ev, () => handleGroupTap(i))}
-          >
-            <div className="arm-orb">
-              <i
-                className="arm-ic"
-                style={{
-                  '--swD': `${(4.2 + rand(i + 2) * 2.4).toFixed(1)}s`,
-                  '--swDel': `${(-rand(i + 11) * 4).toFixed(1)}s`,
-                }}
-              >
-                {g.icon}
-              </i>
+        {RING.map((item, i) => {
+          const isCap = item.kind === 'cap';
+          const health = isCap ? (capabilityHealth.get(item.cap.id) || 'live') : 'live';
+          const isDown = health === 'down';
+          const isSoon = health === 'soon';
+          return (
+            <div
+              key={item.key}
+              className={`arm-node ${isCap ? 'arm-feat' : 'arm-group'}${isSoon ? ' arm-soon' : ''}${isDown ? ' arm-down' : ''}`}
+              role="button"
+              tabIndex={isDown ? -1 : 0}
+              aria-label={isCap && isDown ? `${item.label} (sin conexión al servidor)` : item.label}
+              aria-expanded={isCap ? undefined : focusedIdx === i}
+              aria-disabled={isDown || undefined}
+              data-arm-group={i}
+              style={{ opacity: 0, '--pd': `${i * 0.5}s` }}
+              onClick={(ev) => handleGroupTap(i, ev)}
+              onKeyDown={(ev) => pressKey(ev, () => handleGroupTap(i, ev))}
+            >
+              <div className="arm-orb">
+                <i
+                  className="arm-ic"
+                  style={{
+                    '--swD': `${(4.2 + rand(i + 2) * 2.4).toFixed(1)}s`,
+                    '--swDel': `${(-rand(i + 11) * 4).toFixed(1)}s`,
+                  }}
+                >
+                  {item.icon}
+                </i>
+              </div>
+              <div className="arm-lbl">
+                {item.label}
+                {isCap && isDown && (
+                  <>
+                    <br />
+                    <span className="arm-badge arm-badge-down">sin servidor</span>
+                  </>
+                )}
+              </div>
             </div>
-            <div className="arm-lbl">{g.label}</div>
-          </div>
-        ))}
+          );
+        })}
 
-        {GROUPS.map((g, i) =>
+        {RING.map((g, i) =>
           g.leaves.map((cap, j) => {
             const health = capabilityHealth.get(cap.id) || 'live';
             const isSoon = health === 'soon';
@@ -1108,8 +1170,8 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
 
       {focusedIdx != null && (
         <button type="button" className="arm-crumb" onClick={handleRootTap}>
-          ‹ <span>{GROUPS[focusedIdx].icon}</span>
-          <span>{GROUPS[focusedIdx].label}</span>
+          ‹ <span>{RING[focusedIdx].icon}</span>
+          <span>{RING[focusedIdx].label}</span>
         </button>
       )}
 

@@ -91,7 +91,8 @@ const CHIP_REGISTRY = [
   },
   {
     intent: 'restauracion',
-    label: 'Restauración',
+    // jerga campesina 2026-06-28: label renombrado (id/intent intactos).
+    label: 'Sembrar monte nativo',
     emoji: '🌳',
     kind: 'tool',
     tool: 'get_diseno_restauracion',
@@ -100,7 +101,8 @@ const CHIP_REGISTRY = [
   },
   {
     intent: 'silvopastoreo',
-    label: 'Silvopastoreo',
+    // jerga campesina 2026-06-28: label renombrado (id/intent intactos).
+    label: 'Árboles para el ganado',
     emoji: '🐄',
     kind: 'tool',
     tool: 'get_diseno_silvopastoril',
