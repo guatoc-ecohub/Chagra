@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   buildBasePrompt,
   buildConversationContextPin,
@@ -8,7 +8,35 @@ import {
   buildCorpusVariants,
   formatToolEvidence,
   TOOL_EVIDENCE_MAX_CHARS,
+  buildModoCampesinoBlock,
 } from '../agentPromptBase.js';
+import { saveProfile } from '../userProfileService.js';
+
+// Mock localStorage para tests
+const mockLocalStorage = {
+  store: {},
+  getItem(key) {
+    return this.store[key] || null;
+  },
+  setItem(key, value) {
+    this.store[key] = value;
+  },
+  removeItem(key) {
+    delete this.store[key];
+  },
+  clear() {
+    this.store = {};
+  },
+};
+
+function setupMockLocalStorage() {
+  vi.stubGlobal('localStorage', mockLocalStorage);
+}
+
+function cleanupMockLocalStorage() {
+  mockLocalStorage.clear();
+  vi.unstubAllGlobals();
+}
 
 describe('analyzeQuery', () => {
   it('detecta query enumerativa', () => {
@@ -567,5 +595,131 @@ describe('buildBasePrompt — regresión multiturno: anáfora + coherencia', () 
     });
     expect(prompt).toContain('CONTEXTO DE LA CONVERSACIÓN');
     expect(prompt).toContain('2000 msnm');
+  });
+});
+
+// ── Suite de tests del modo campesino (task #agente-modo-campesino) ─────────
+describe('buildModoCampesinoBlock — registro de lenguaje según nivel_respuestas', () => {
+  beforeEach(() => {
+    setupMockLocalStorage();
+  });
+
+  afterEach(() => {
+    cleanupMockLocalStorage();
+  });
+
+  it('retorna vacío sin perfil', () => {
+    const block = buildModoCampesinoBlock();
+    expect(block).toBe('');
+  });
+
+  it('retorna vacío con perfil vacío', () => {
+    saveProfile({});
+    const block = buildModoCampesinoBlock();
+    expect(block).toBe('');
+  });
+
+  it('retorna vacío si nivel_respuestas no está definido', () => {
+    saveProfile({ nombre: 'Juan', region: 'Cundinamarca' });
+    const block = buildModoCampesinoBlock();
+    expect(block).toBe('');
+  });
+
+  it('con nivel_respuestas="simple" inyecta MODO CAMPESINO con registro oral colombiano', () => {
+    saveProfile({ nivel_respuestas: 'simple' });
+    const block = buildModoCampesinoBlock();
+    expect(block).toContain('MODO CAMPESINO');
+    expect(block).toContain('REGISTRO ORAL COLOMBIANO');
+    expect(block).toContain('NUNCA voseo argentino');
+    expect(block).toContain('Frases cortas y pasos concretos');
+    expect(block).toContain('NO uses binomios científicos');
+    expect(block).toContain('cuadra, arroba, carga, luna');
+  });
+
+  it('con nivel_respuestas="detallado" inyecta MODO EXPERTO con registro técnico', () => {
+    saveProfile({ nivel_respuestas: 'detallado' });
+    const block = buildModoCampesinoBlock();
+    expect(block).toContain('MODO EXPERTO');
+    expect(block).toContain('REGISTRO TÉCNICO');
+    expect(block).toContain('Puedes usar nombres científicos');
+    expect(block).toContain('Explica mecanismos, dosis precisas');
+  });
+
+  it('MODO CAMPESINO prohíbe voseo argentino explícitamente', () => {
+    saveProfile({ nivel_respuestas: 'simple' });
+    const block = buildModoCampesinoBlock();
+    expect(block).toContain('vos, tenés, querés, elegí, dale, acá, che');
+    expect(block).toContain('NUNCA voseo argentino');
+  });
+
+  it('MODO CAMPESINO menciona unidades del campo', () => {
+    saveProfile({ nivel_respuestas: 'simple' });
+    const block = buildModoCampesinoBlock();
+    expect(block).toContain('cuadra');
+    expect(block).toContain('arroba');
+    expect(block).toContain('carga');
+    expect(block).toContain('luna');
+  });
+
+  it('buildBasePrompt integra MODO CAMPESINO cuando nivel_respuestas="simple"', () => {
+    saveProfile({ nivel_respuestas: 'simple' });
+    const prompt = buildBasePrompt({
+      plantContext: 'café x3',
+      fincaContext: '',
+      indoorContext: '',
+      finca: null,
+      query: '¿cómo controlo la broca?',
+      contextMemory: '',
+      isEnum: false,
+    });
+    expect(prompt).toContain('MODO CAMPESINO');
+    expect(prompt).toContain('REGISTRO ORAL COLOMBIANO');
+  });
+
+  it('buildBasePrompt integra MODO EXPERTO cuando nivel_respuestas="detallado"', () => {
+    saveProfile({ nivel_respuestas: 'detallado' });
+    const prompt = buildBasePrompt({
+      plantContext: 'café x3',
+      fincaContext: '',
+      indoorContext: '',
+      finca: null,
+      query: '¿cómo controlo la broca?',
+      contextMemory: '',
+      isEnum: false,
+    });
+    expect(prompt).toContain('MODO EXPERTO');
+    expect(prompt).toContain('REGISTRO TÉCNICO');
+  });
+
+  it('buildBasePrompt NO inyecta modo campesino si nivel_respuestas no está definido', () => {
+    saveProfile({ nombre: 'Juan' });
+    const prompt = buildBasePrompt({
+      plantContext: 'café x3',
+      fincaContext: '',
+      indoorContext: '',
+      finca: null,
+      query: '¿cómo controlo la broca?',
+      contextMemory: '',
+      isEnum: false,
+    });
+    expect(prompt).not.toContain('MODO CAMPESINO');
+    expect(prompt).not.toContain('MODO EXPERTO');
+  });
+
+  it('MODO CAMPESINO preserva reglas anti-alucinación (binomio, CASO B, etc.)', () => {
+    saveProfile({ nivel_respuestas: 'simple' });
+    const prompt = buildBasePrompt({
+      plantContext: 'tomate ×10',
+      fincaContext: '',
+      indoorContext: '',
+      finca: null,
+      query: '¿qué le pongo a la plaga?',
+      contextMemory: '',
+      isEnum: false,
+    });
+    // El modo campesino NO debe eliminar las guardas anti-alucinación
+    expect(prompt).toContain('BINOMIO');
+    expect(prompt).toContain('NUNCA inventes el nombre científico');
+    expect(prompt).toContain('TÉRMINO DESCONOCIDO');
   });
 });

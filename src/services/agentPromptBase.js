@@ -31,6 +31,7 @@ import {
   generateAgronomicGuidanceRules,
   buildProfileContext,
 } from './agentService.js';
+import { getProfile } from './userProfileService.js';
 import {
   tagPassagesOrigin,
   reconcileOrigins,
@@ -41,6 +42,59 @@ import {
 // sin reventar la ventana de contexto. ~1500 chars ≈ 500-580 tokens —
 // deja sitio cómodo para system prompt + corpus RAG + historial + query.
 export const TOOL_EVIDENCE_MAX_CHARS = 1500;
+
+/**
+ * buildModoCampesinoBlock — bloque de registro de lenguaje según nivel_respuestas.
+ *
+ * CAMPESINO (simple): registro oral colombiano, tú/usted, pasos concretos,
+ * frases cortas, sin binomios salvo pedido, unidades del campo (cuadra, arroba,
+ * luna). Inteligencia-first: NO baja exactitud ni grounding.
+ *
+ * EXPERTO (detallado): permite nombres científicos, explicación técnica,
+ * mecanismos, dosis precisas.
+ *
+ * Si no hay perfil o nivel_respuestas no está definido, usa un tono neutro
+ * (colombiano estándar, ni hiper-campesino ni hiper-técnico).
+ *
+ * @returns {string}
+ */
+export function buildModoCampesinoBlock() {
+  let profile;
+  try {
+    profile = getProfile();
+  } catch (_) {
+    return '';
+  }
+
+  if (!profile || typeof profile !== 'object') {
+    return '';
+  }
+
+  const nivel = profile.nivel_respuestas; // 'simple' | 'detallado' | undefined
+
+  if (nivel === 'simple') {
+    return `MODO CAMPESINO — REGISTRO ORAL COLOMBIANO:
+- Habla en español colombiano tú/usted, NUNCA voseo argentino (vos, tenés, querés, elegí, dale, acá, che).
+- Frases cortas y pasos concretos. Evita tecnicismos innecesarios.
+- Unidades del campo: cuadra, arroba, carga, luna (menguante/creciente), cabañuelas.
+- NO uses binomios científicos (latín) a menos que el usuario los pida explícitamente.
+- Usa nombre común colombiano: café arábica → "café", Coffea arabica → "café", Solanum lycopersicum → "tomate".
+- Si necesitas mencionar una plaga, usa el nombre común regional: "broca", "chiza", "gotra", "roya".
+- Sé específico y útil cuando tengas certeza; humilde y preguntón cuando no.
+- Ejemplo: en vez de "aplicar Beauveria bassiana 1x10^9 conidias/mL", di "aplicar el hongo Beauveria en el agua, siguiendo las instrucciones del empaque".`;
+  }
+
+  if (nivel === 'detallado') {
+    return `MODO EXPERTO — REGISTRO TÉCNICO:
+- Puedes usar nombres científicos (binomios latinos) cuando corresponda.
+- Explica mecanismos, dosis precisas y citar fuentes.
+- Mantén español colombiano tú/usted, sin voseo argentino.
+- El usuario quiere profundidad técnica, no simplificación excesiva.`;
+  }
+
+  // Sin nivel_respuestas definido → tono neutro (default)
+  return '';
+}
 
 const _strip = (s) =>
   (s || '')
@@ -481,6 +535,14 @@ REGLA CASO C (cuando aplica): si NO hay bloque "=== EVIDENCIA AUTORITATIVA ===" 
   }
   sections.push(`PRECIOS: NUNCA inventes precios. El dataset SIPSA/DANE no permite consulta directa: si preguntan precio sin dato del tool, decláralo y orienta al boletín SIPSA del DANE o a la central de abastos (Corabastos).
 Responde en español colombiano (tú/usted, sin voseo argentino). Sé específico y útil cuando tengas certeza; humilde y preguntón cuando no.`);
+
+  // MODO CAMPESINO: registro de lenguaje según nivel_respuestas del perfil.
+  // Se aplica DESPUÉS de las reglas base y ANTES de las reglas específicas
+  // (viabilidad, agronómicas) para que el tono se respete en toda la respuesta.
+  const modoCampesino = buildModoCampesinoBlock();
+  if (modoCampesino) {
+    sections.push(modoCampesino);
+  }
 
   sections.push(generateViabilityRules());
   sections.push(generateAgronomicGuidanceRules());

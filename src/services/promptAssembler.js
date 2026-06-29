@@ -77,7 +77,8 @@ export function estimateTokens(text) {
  * system prompt). El grounding y las reglas dominantes van al final.
  */
 export const BLOCK_ORDER = [
-  'base', // instrucciones + glosarios + perfil (protegido)
+  'base', // instrucciones + glosarios + perfil + modo campesino (protegido)
+  'modoCampesino', // registro de lenguaje (simple/detallado) — sacrificable en emergencia
   'clima', // contexto ambiental — sacrificable en emergencia
   'finca', // contexto ambiental — sacrificable en emergencia
   'asociacion', // policultivo — sacrificable en emergencia
@@ -103,13 +104,14 @@ export const BLOCK_ORDER = [
  * resto (base, guardas, grounding, análisis) es intocable.
  */
 // Orden de sacrificio bajo presión de presupuesto: primero el corpus RAG (por
-// chunks), luego la MEMORIA EPISÓDICA (personalización: valiosa pero nunca por
-// encima de las guardas ni la evidencia — TIER 2 #6), luego el contexto
-// AMBIENTAL (asociaciones, fase ENSO, riesgo térmico y por último el marco de
-// finca — su altitud también la cita el bloque de viabilidad). El grounding
-// duro (evidencia, entidades, dosis curadas, cadena del grafo) y las guardas
-// NUNCA están aquí: jamás se recortan.
-const SACRIFICE_ORDER = ['corpus', 'memoria', 'asociacion', 'clima', 'frostHeat', 'finca'];
+// chunks), luego el MODO CAMPESINO (registro de lenguaje — importante pero
+// sacrificable antes de memoria), luego la MEMORIA EPISÓDICA (personalización:
+// valiosa pero nunca por encima de las guardas ni la evidencia — TIER 2 #6),
+// luego el contexto AMBIENTAL (asociaciones, fase ENSO, riesgo térmico y por
+// último el marco de finca — su altitud también la cita el bloque de viabilidad).
+// El grounding duro (evidencia, entidades, dosis curadas, cadena del grafo) y las
+// guardas NUNCA están aquí: jamás se recortan.
+const SACRIFICE_ORDER = ['corpus', 'modoCampesino', 'memoria', 'asociacion', 'clima', 'frostHeat', 'finca'];
 
 const _normalize = (t) => (typeof t === 'string' ? t.replace(/^\n+|\n+$/g, '') : '');
 
