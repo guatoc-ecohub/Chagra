@@ -1,11 +1,11 @@
 /**
  * scripts/__tests__/export-ngsi-ld.test.mjs
  *
- * Cobertura unitaria del export NGSI-LD AgriCrop (ADR-051 fase 1). NO toca
- * red ni broker; verifica únicamente que las funciones puras
- * `buildAgriCropEntity(entities)` y `validateAgriCropEntity(entities)`
- * producen/validan entidades NGSI-LD bien-formadas a partir de fixtures
- * sintéticos + de una muestra del catálogo OSS real.
+ * Cobertura unitaria del export NGSI-LD AgriCrop + AgriPest (ADR-051 fase 1).
+ * NO toca red ni broker; verifica únicamente que las funciones puras
+ * `buildAgriCropEntity`/`buildAgriPestEntity` (y sus validadores) producen/
+ * validan entidades NGSI-LD bien-formadas a partir de fixtures sintéticos +
+ * de una muestra del catálogo OSS real.
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
@@ -24,6 +24,13 @@ import {
   buildAgriCropEntities,
   validateAgriCropEntity,
   validateAgriCropEntities,
+  parsePestNameFromRaw,
+  buildPestMipAttribute,
+  derivePestRecords,
+  buildAgriPestEntity,
+  buildAgriPestEntities,
+  validateAgriPestEntity,
+  validateAgriPestEntities,
 } from '../export-ngsi-ld.mjs';
 
 describe('agriCropUrn / agriPestUrn', () => {
@@ -337,6 +344,340 @@ describe('buildAgriCropEntities — muestra real del catálogo OSS v3.2', () => 
       expect(entity.harvestingInterval).toBeUndefined();
       expect(entity.plantingFrom).toBeUndefined();
       expect(entity.hasAgriSoil).toBeUndefined();
+    }
+  });
+});
+
+// =============================================================================
+// AgriPest (ADR-051 fase 1, Anexo A fila AgriPest)
+// =============================================================================
+
+describe('parsePestNameFromRaw', () => {
+  it('separa "Científico (comun)" en alternateName/name', () => {
+    expect(parsePestNameFromRaw('Hemileia vastatrix (roya)')).toEqual({
+      name: 'roya',
+      alternateName: 'Hemileia vastatrix',
+    });
+    expect(parsePestNameFromRaw('Hypothenemus hampei (broca)')).toEqual({
+      name: 'broca',
+      alternateName: 'Hypothenemus hampei',
+    });
+  });
+
+  it('sin paréntesis, devuelve el string completo como name y alternateName null', () => {
+    expect(parsePestNameFromRaw('Scolytidae')).toEqual({ name: 'Scolytidae', alternateName: null });
+    expect(parsePestNameFromRaw('Pulgones')).toEqual({ name: 'Pulgones', alternateName: null });
+  });
+
+  it('ambiguo (ninguno de los dos segmentos parece binomio): no adivina, conserva el string completo', () => {
+    expect(parsePestNameFromRaw('trps (heliothis)')).toEqual({ name: 'trps (heliothis)', alternateName: null });
+  });
+});
+
+describe('buildPestMipAttribute', () => {
+  it('construye {type:Property, value} con los 3 campos MIP cuando están presentes', () => {
+    const mip = buildPestMipAttribute({
+      umbral_accion: '5% tubérculos dañados en muestreo',
+      control_biologico: ['Trichogramma pretiosum sueltas 100mil/ha'],
+      control_cultural: ['aporque profundo'],
+    });
+    expect(mip).toEqual({
+      type: 'Property',
+      value: {
+        umbral_accion: '5% tubérculos dañados en muestreo',
+        control_biologico: ['Trichogramma pretiosum sueltas 100mil/ha'],
+        control_cultural: ['aporque profundo'],
+      },
+    });
+  });
+
+  it('devuelve null si no hay ningún campo MIP reconocible (no inventa)', () => {
+    expect(buildPestMipAttribute({ nombre_cientifico: 'x', nombre_comun: 'y' })).toBeNull();
+    expect(buildPestMipAttribute({})).toBeNull();
+    expect(buildPestMipAttribute(null)).toBeNull();
+  });
+
+  it('omite campos MIP vacíos/mal tipados sin fallar', () => {
+    const mip = buildPestMipAttribute({ umbral_accion: '', control_biologico: [], control_cultural: ['ok'] });
+    expect(mip).toEqual({ type: 'Property', value: { control_cultural: ['ok'] } });
+  });
+});
+
+describe('buildAgriPestEntity — shape string (catálogo público hoy)', () => {
+  it('mapea "Científico (comun)" -> name/alternateName, sin x-chagra-mip (el string no trae MIP)', () => {
+    const entity = buildAgriPestEntity('Hypothenemus hampei (broca)');
+    expect(entity.id).toBe('urn:ngsi-ld:AgriPest:hypothenemus_hampei_broca');
+    expect(entity.type).toBe('AgriPest');
+    expect(entity.name).toEqual({ type: 'Property', value: 'broca' });
+    expect(entity.alternateName).toEqual({ type: 'Property', value: 'Hypothenemus hampei' });
+    expect(entity['x-chagra-mip']).toBeUndefined();
+    expect(entity['@context']).toEqual(DEFAULT_CONTEXT);
+  });
+
+  it('el slug coincide con normalizePest/derivePestSlugs (join AgriCrop.hasAgriPest <-> AgriPest.id)', () => {
+    const raw = 'Hemileia vastatrix (roya)';
+    const entity = buildAgriPestEntity(raw);
+    const [pestSlug] = derivePestSlugs([raw]);
+    expect(entity.id).toBe(`urn:ngsi-ld:AgriPest:${pestSlug}`);
+  });
+
+  it('devuelve null para string vacío', () => {
+    expect(buildAgriPestEntity('')).toBeNull();
+  });
+});
+
+describe('buildAgriPestEntity — shape objeto enriquecido (MIP)', () => {
+  const mipRecord = {
+    nombre_cientifico: 'Phthorimaea operculella',
+    nombre_comun: 'Polilla guatemalteca',
+    umbral_accion: '5% tubérculos dañados en muestreo',
+    control_biologico: ['asociar minthostachys_mollis a 1m perimetro', 'Trichogramma pretiosum sueltas 100mil/ha'],
+    control_cultural: ['aporque profundo', 'no dejar tubérculos en campo post-cosecha'],
+  };
+
+  it('mapea nombre_comun -> name, nombre_cientifico -> alternateName, MIP -> x-chagra-mip', () => {
+    const entity = buildAgriPestEntity(mipRecord);
+    expect(entity.id).toBe('urn:ngsi-ld:AgriPest:phthorimaea_operculella');
+    expect(entity.type).toBe('AgriPest');
+    expect(entity.name).toEqual({ type: 'Property', value: 'Polilla guatemalteca' });
+    expect(entity.alternateName).toEqual({ type: 'Property', value: 'Phthorimaea operculella' });
+    expect(entity['x-chagra-mip']).toEqual({
+      type: 'Property',
+      value: {
+        umbral_accion: '5% tubérculos dañados en muestreo',
+        control_biologico: mipRecord.control_biologico,
+        control_cultural: mipRecord.control_cultural,
+      },
+    });
+  });
+
+  it('NO agrega x-chagra-mip si el objeto no trae ningún campo MIP', () => {
+    const entity = buildAgriPestEntity({ nombre_cientifico: 'Tecia solanivora', nombre_comun: 'Polilla de la papa' });
+    expect(entity['x-chagra-mip']).toBeUndefined();
+  });
+
+  it('mapea descripcion -> description cuando está presente (no la inventa si falta)', () => {
+    const withDesc = buildAgriPestEntity({ ...mipRecord, descripcion: 'Barrenador del tubérculo de papa.' });
+    expect(withDesc.description).toEqual({ type: 'Property', value: 'Barrenador del tubérculo de papa.' });
+
+    const withoutDesc = buildAgriPestEntity(mipRecord);
+    expect(withoutDesc.description).toBeUndefined();
+  });
+
+  it('devuelve null si no se puede derivar slug ni name', () => {
+    expect(buildAgriPestEntity({ umbral_accion: 'x' })).toBeNull();
+    expect(buildAgriPestEntity(null)).toBeNull();
+    expect(buildAgriPestEntity(undefined)).toBeNull();
+  });
+});
+
+describe('derivePestRecords', () => {
+  it('deduplica por slug entre species distintas', () => {
+    const species = [
+      { id: 'sp_a', plagas_criticas: ['Hemileia vastatrix (roya)'] },
+      { id: 'sp_b', plagas_criticas: ['Hemileia vastatrix (roya)', 'Hypothenemus hampei (broca)'] },
+    ];
+    const records = derivePestRecords(species);
+    expect(records).toHaveLength(2);
+  });
+
+  it('prefiere el objeto enriquecido (con MIP) sobre el string plano para el mismo slug', () => {
+    const mipRecord = {
+      nombre_cientifico: 'Phthorimaea operculella',
+      nombre_comun: 'Polilla guatemalteca',
+      umbral_accion: '5% tubérculos dañados',
+    };
+    const species = [
+      { id: 'sp_a', plagas_criticas: ['Phthorimaea operculella'] },
+      { id: 'sp_b', plagas_criticas: [mipRecord] },
+    ];
+    const records = derivePestRecords(species);
+    expect(records).toHaveLength(1);
+    expect(records[0]).toBe(mipRecord);
+  });
+
+  it('devuelve [] si no hay species o plagas_criticas', () => {
+    expect(derivePestRecords([])).toEqual([]);
+    expect(derivePestRecords([{ id: 'sp_sin_plagas' }])).toEqual([]);
+    expect(derivePestRecords(undefined)).toEqual([]);
+  });
+});
+
+describe('buildAgriPestEntities', () => {
+  const fixture = {
+    species: [
+      { id: 'sp_a', plagas_criticas: ['Hemileia vastatrix (roya)'] },
+      { id: 'sp_b', plagas_criticas: ['Hemileia vastatrix (roya)', 'Hypothenemus hampei (broca)'] },
+      { id: 'sp_c', plagas_criticas: [] },
+      { id: 'sp_d' },
+    ],
+  };
+
+  it('emite una entidad AgriPest por plaga única del catálogo', () => {
+    const { entities, report } = buildAgriPestEntities(fixture);
+    expect(entities).toHaveLength(2);
+    expect(report.total).toBe(2);
+    expect(report.emitted).toBe(2);
+    expect(report.omitted).toEqual([]);
+  });
+
+  it('es determinista: misma entrada produce misma salida (idempotente)', () => {
+    const first = buildAgriPestEntities(fixture);
+    const second = buildAgriPestEntities(fixture);
+    expect(JSON.stringify(first.entities)).toBe(JSON.stringify(second.entities));
+  });
+});
+
+describe('validateAgriPestEntity', () => {
+  it('valida OK una entidad AgriPest bien formada (con x-chagra-mip)', () => {
+    const entity = buildAgriPestEntity({
+      nombre_cientifico: 'Phthorimaea operculella',
+      nombre_comun: 'Polilla guatemalteca',
+      umbral_accion: '5% tubérculos dañados en muestreo',
+    });
+    const { valid, errors } = validateAgriPestEntity(entity);
+    expect(valid).toBe(true);
+    expect(errors).toEqual([]);
+  });
+
+  it('valida OK una entidad AgriPest sin x-chagra-mip (shape string)', () => {
+    const entity = buildAgriPestEntity('Hemileia vastatrix (roya)');
+    const { valid, errors } = validateAgriPestEntity(entity);
+    expect(valid).toBe(true);
+    expect(errors).toEqual([]);
+  });
+
+  it('rechaza id sin prefijo urn:ngsi-ld:AgriPest:', () => {
+    const { valid, errors } = validateAgriPestEntity({
+      id: 'not-a-urn',
+      type: 'AgriPest',
+      name: { type: 'Property', value: 'roya' },
+      '@context': DEFAULT_CONTEXT,
+    });
+    expect(valid).toBe(false);
+    expect(errors.some((e) => e.includes('id inválido'))).toBe(true);
+  });
+
+  it('rechaza type distinto de AgriPest', () => {
+    const { valid, errors } = validateAgriPestEntity({
+      id: 'urn:ngsi-ld:AgriPest:roya',
+      type: 'AgriCrop',
+      name: { type: 'Property', value: 'roya' },
+      '@context': DEFAULT_CONTEXT,
+    });
+    expect(valid).toBe(false);
+    expect(errors.some((e) => e.includes('type inválido'))).toBe(true);
+  });
+
+  it('rechaza x-chagra-mip mal formado (sin ningún campo MIP reconocible)', () => {
+    const { valid, errors } = validateAgriPestEntity({
+      id: 'urn:ngsi-ld:AgriPest:roya',
+      type: 'AgriPest',
+      name: { type: 'Property', value: 'roya' },
+      'x-chagra-mip': { type: 'Property', value: {} },
+      '@context': DEFAULT_CONTEXT,
+    });
+    expect(valid).toBe(false);
+    expect(errors.some((e) => e.includes('x-chagra-mip'))).toBe(true);
+  });
+
+  it('rechaza x-chagra-mip que no sea {type:Property, value:object}', () => {
+    const { valid, errors } = validateAgriPestEntity({
+      id: 'urn:ngsi-ld:AgriPest:roya',
+      type: 'AgriPest',
+      name: { type: 'Property', value: 'roya' },
+      'x-chagra-mip': { type: 'Property', value: 'no es un objeto' },
+      '@context': DEFAULT_CONTEXT,
+    });
+    expect(valid).toBe(false);
+    expect(errors.some((e) => e.includes('x-chagra-mip'))).toBe(true);
+  });
+
+  it('rechaza @context faltante', () => {
+    const { valid, errors } = validateAgriPestEntity({
+      id: 'urn:ngsi-ld:AgriPest:roya',
+      type: 'AgriPest',
+      name: { type: 'Property', value: 'roya' },
+    });
+    expect(valid).toBe(false);
+    expect(errors.some((e) => e.includes('@context'))).toBe(true);
+  });
+});
+
+describe('validateAgriPestEntities (agregado)', () => {
+  it('reporta valid=true cuando todas las entidades son válidas', () => {
+    const { entities } = buildAgriPestEntities({
+      species: [{ id: 'sp_a', plagas_criticas: ['Hemileia vastatrix (roya)', 'Hypothenemus hampei (broca)'] }],
+    });
+    const result = validateAgriPestEntities(entities);
+    expect(result.valid).toBe(true);
+    expect(result.invalidCount).toBe(0);
+  });
+
+  it('reporta detalle por entidad inválida', () => {
+    const result = validateAgriPestEntities([
+      { id: 'no-urn', type: 'AgriPest', name: { type: 'Property', value: 'x' }, '@context': DEFAULT_CONTEXT },
+    ]);
+    expect(result.valid).toBe(false);
+    expect(result.invalidCount).toBe(1);
+    expect(result.details[0].errors.length).toBeGreaterThan(0);
+  });
+});
+
+// =============================================================================
+// Integración: muestra real del catálogo OSS v3.2 (ADR-051 fase 1)
+// =============================================================================
+
+describe('buildAgriPestEntities — muestra real del catálogo OSS v3.2', () => {
+  const catalogPath = resolve('catalog/chagra-catalog-oss-subset-v3.2.json');
+  let seed = null;
+  try {
+    seed = JSON.parse(readFileSync(catalogPath, 'utf-8'));
+  } catch {
+    seed = null;
+  }
+
+  it.skipIf(!seed)('emite una entidad AgriPest válida por cada plaga única de plagas_criticas[] del catálogo real', () => {
+    const { entities, report } = buildAgriPestEntities(seed);
+    // El catálogo público de hoy solo trae plagas_criticas[] como strings
+    // libres (sin MIP curado — ver nota de proveniencia en export-ngsi-ld.mjs);
+    // aun así debe emitir N entidades AgriPest reales, no cero ni inventadas.
+    expect(report.total).toBeGreaterThan(0);
+    expect(entities.length).toBe(report.total);
+
+    const validation = validateAgriPestEntities(entities);
+    expect(validation.details).toEqual([]);
+    expect(validation.valid).toBe(true);
+  });
+
+  it.skipIf(!seed)('cada entidad emitida tiene id URN AgriPest único', () => {
+    const { entities } = buildAgriPestEntities(seed);
+    const ids = entities.map((e) => e.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const id of ids) {
+      expect(id).toMatch(/^urn:ngsi-ld:AgriPest:.+$/);
+    }
+  });
+
+  it.skipIf(!seed)('todo hasAgriPest emitido por AgriCrop resuelve a un id AgriPest emitido (join AGE-safe)', () => {
+    const { entities: crops } = buildAgriCropEntities(seed);
+    const { entities: pests } = buildAgriPestEntities(seed);
+    const pestIds = new Set(pests.map((p) => p.id));
+
+    let checked = 0;
+    for (const crop of crops) {
+      for (const rel of crop.hasAgriPest || []) {
+        expect(pestIds.has(rel.object)).toBe(true);
+        checked++;
+      }
+    }
+    expect(checked).toBeGreaterThan(0);
+  });
+
+  it.skipIf(!seed)('no inventa agroVocConcept (gap documentado en ADR-051 — viene del grafo AGE, fuera de alcance)', () => {
+    const { entities } = buildAgriPestEntities(seed);
+    for (const entity of entities) {
+      expect(entity.agroVocConcept).toBeUndefined();
     }
   });
 });
