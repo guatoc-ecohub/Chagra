@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 // estaba ruteado en App.jsx y la capa de auditoría/reconciliación de
 // inventario (InventoryAuditDashboard/InventoryEventTimeline/InventoryAuditTrail
 // + inventoryReconcile.js/inventoryEvents.js) quedaba huérfana (0 importers
-// alcanzables desde la app). Acá probamos DOS caminos de alcance:
+// alcanzables desde la app). Aquí probamos DOS caminos de alcance:
 //   1. Hash directo (#auditoria-inventario) monta InventoryPage.
 //   2. Desde 'bodega' (#bodega), el botón "Auditoría" navega a la misma vista.
 //

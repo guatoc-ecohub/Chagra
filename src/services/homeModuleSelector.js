@@ -23,7 +23,7 @@
  *
  * RESPETO A #1560/#7003: este módulo SOLO calcula el DEFAULT por perfil. Si el
  * usuario guardó una preferencia manual de visibilidad en `ProfileScreen`, esa
- * preferencia GANA — el call-site (DashboardLive) decide cuál usar. Acá no se
+ * preferencia GANA — el call-site (DashboardLive) decide cuál usar. Aquí no se
  * lee ni se escribe ninguna preferencia.
  *
  * Español colombiano (tú/usted), NUNCA voseo argentino.
@@ -168,7 +168,7 @@ const ROLE_MODULES = Object.freeze({
 const ROLE_SEGUIMIENTO = Object.freeze({
   [PROFILE_ROLES.campesino]: Object.freeze([]),
   // Ganadero: silvopastoreo SIEMPRE; cerdos SOLO si el perfil tiene cerdos
-  // (se resuelve en selectHomeModules). Acá dejamos silvopastoreo de base.
+  // (se resuelve en selectHomeModules). Aquí dejamos silvopastoreo de base.
   [PROFILE_ROLES.ganadero]: Object.freeze([SEGUIMIENTO_KEYS.silvopastoreo]),
   [PROFILE_ROLES.restaurador]: Object.freeze([
     SEGUIMIENTO_KEYS.reforestacion,
