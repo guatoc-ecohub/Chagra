@@ -125,7 +125,7 @@
 
 **Entradas**:
 - 50 prompts (20 species + 12 biopreparados + 10 plagas + 4 normativa + 4 agroforestería)
-- Modelos: granite3.3:8b, gemma4:e4b, granite3.1-dense:8b, ministral-3:latest, ministral-3:14b (todos compatibles con Maxwell sm_52)
+- Modelos: granite3.3:8b, gemma3:4b, gemma3:12b, granite3.1-dense:8b, ministral-3:latest, ministral-3:14b (todos compatibles con Maxwell sm_52; `--only`/`--models` filtra a un subconjunto)
 - Sidecar URL (opcional, para resolve-entities + post-validate)
 
 **Métricas**:

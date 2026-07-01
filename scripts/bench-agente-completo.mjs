@@ -30,6 +30,16 @@
  *   node scripts/bench-agente-completo.mjs --judge                 # + LLM-judge (qwen2.5:14b)
  *   node scripts/bench-agente-completo.mjs --judge qwen2.5:14b     # juez explícito
  *   JUDGE_MODEL=qwen2.5:14b node scripts/... --judge               # equivalente por env
+ *
+ * RE-RUN SELECTIVO (--only / --models): filtra ALL_MODELS para correr el
+ * bench solo sobre un subconjunto, sin rehacer los modelos ya benchados
+ * (ej. tras swapear un modelo roto por uno nuevo). Nombres separados por
+ * coma, con o sin espacios; acepta el nombre Ollama (valor) o el key de
+ * ALL_MODELS. `--only` y `--models` son alias; ambos aceptan forma `--flag
+ * valor` o `--flag=valor`. Sin el flag, corre TODOS los modelos de ALL_MODELS.
+ *   node scripts/bench-agente-completo.mjs --only gemma3:4b,gemma3:12b
+ *   node scripts/bench-agente-completo.mjs --models gemma3:4b,gemma3:12b
+ *   node scripts/bench-agente-completo.mjs --models=gemma3:4b,gemma3:12b
  */
 import { writeFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -101,17 +111,85 @@ const JUDGE_TIMEOUT_MS = 60_000;
 
 // Candidatos que CABEN y FUNCIONAN en la M6000 (Maxwell sm_52, 12GB).
 // Verificados empíricamente 2026-06-10 (carga + inferencia sin crash):
-//   granite3.3:8b ✓ · gemma4:e4b ✓ · granite3.1-dense:8b ✓ (prod actual)
+//   granite3.3:8b ✓ · granite3.1-dense:8b ✓ (prod actual)
 //   ministral-3:latest ✓ (6GB) · ministral-3:14b ✓ (13.9B mistral3, NO crashea)
 // DESCARTADOS por crash Maxwell: qwen2.5:14b, qwen3:30b, mistral-nemo:12b
 // ("signal during cgo execution" / arquitectura no soportada en sm_52).
-const MODELS = {
+// gemma4:e4b DESCARTADO 2026-07-01: carga sin crash pero da 0% keywords
+// (salida no-útil en el bench, no es candidato válido) → swap por
+// gemma3:4b / gemma3:12b, verificados en `ollama list` de alpha (pulled) y
+// con salida útil. gemma3:12b (~8GB) cabe en la M6000 12GB single-slot.
+const ALL_MODELS = {
   granite3_3_8b: 'granite3.3:8b',
-  gemma4_e4b: 'gemma4:e4b',
+  gemma3_4b: 'gemma3:4b',
+  gemma3_12b: 'gemma3:12b',
   granite3_1_8b: 'granite3.1-dense:8b',
   ministral_latest: 'ministral-3:latest',
   ministral_14b: 'ministral-3:14b',
 };
+
+/**
+ * parseOnlyModels — parsea `--only <lista>` / `--models <lista>` /
+ * `--models=<lista>` de argv para re-correr el bench solo sobre un
+ * subconjunto de ALL_MODELS (re-run selectivo, ver header del archivo).
+ * PURA — no lee ENV ni hace I/O.
+ * @param {string[]} argv  típicamente process.argv
+ * @returns {string[]|null} nombres solicitados (sin trim de duplicados), o
+ *   null si no se pasó ninguna de las dos flags.
+ */
+function parseOnlyModels(argv) {
+  const splitList = (raw) => raw.split(',').map((s) => s.trim()).filter(Boolean);
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg === '--only' || arg === '--models') {
+      const next = argv[i + 1];
+      if (next && !next.startsWith('--')) return splitList(next);
+      return null;
+    }
+    if (arg.startsWith('--only=')) return splitList(arg.slice('--only='.length));
+    if (arg.startsWith('--models=')) return splitList(arg.slice('--models='.length));
+  }
+  return null;
+}
+
+/**
+ * filterModels — reduce `models` a solo las entradas cuyo key o valor
+ * (nombre Ollama) aparece en `only`. Si `only` es null/vacío devuelve
+ * `models` intacto (corre todos, comportamiento default sin el flag). Lanza
+ * si algún nombre en `only` no matchea ninguna entrada, para detectar typos
+ * ANTES de gastar tiempo de GPU. PURA.
+ * @param {Record<string,string>} models
+ * @param {string[]|null} only
+ * @returns {Record<string,string>}
+ */
+function filterModels(models, only) {
+  if (!only || only.length === 0) return models;
+  const result = {};
+  const unmatched = [];
+  for (const name of only) {
+    const entry = Object.entries(models).find(([key, value]) => value === name || key === name);
+    if (entry) {
+      result[entry[0]] = entry[1];
+    } else {
+      unmatched.push(name);
+    }
+  }
+  if (unmatched.length > 0) {
+    throw new Error(
+      `--only/--models: no reconocido en ALL_MODELS: ${unmatched.join(', ')} ` +
+      `(disponibles: ${Object.values(models).join(', ')})`
+    );
+  }
+  return result;
+}
+
+let MODELS;
+try {
+  MODELS = filterModels(ALL_MODELS, parseOnlyModels(process.argv));
+} catch (err) {
+  console.error(`[bench] ${err.message}`);
+  process.exit(1);
+}
 
 const MAXWELL_ERROR_PATTERNS = [
   'sm_5.2',
@@ -869,7 +947,7 @@ async function main() {
   console.log('  Van desde 3B hasta 30B parámetros, cubriendo perfiles:');
   console.log('    • 3B-4B:     Ejecución local en laptop/edge (gemma3:4b, ministral-3:latest)');
   console.log('    • 8B:        Balance calidad/recursos (granite3.1-dense:8b, aya:8b)');
-  console.log('    • 12B-14B:   Rendimiento medio-alto (mistral-nemo:12b, ministral-3:14b)');
+  console.log('    • 12B-14B:   Rendimiento medio-alto (gemma3:12b, ministral-3:14b)');
   console.log('    • 30B:       Máxima calidad (qwen3:30b, require GPU dedicada)');
   console.log('');
   console.log(`  Categorías de consulta (${PROMPTS.length} totales):`);
@@ -1339,7 +1417,22 @@ La revisión humana es obligatoria antes de promover un modelo.
   }
 }
 
-main().catch((err) => {
-  console.error('[bench] FATAL:', err);
-  process.exit(1);
-});
+// isMain — solo ejecuta main() (fetches a Ollama/sidecar, preflight, escritura
+// de archivos) cuando el archivo corre como entrypoint de CLI. Permite
+// importar parseOnlyModels/filterModels desde tests sin disparar el bench
+// real (mismo patrón que scripts/bench-model-compare.mjs).
+const isMain = (() => {
+  try {
+    return process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
+  } catch {
+    return false;
+  }
+})();
+if (isMain) {
+  main().catch((err) => {
+    console.error('[bench] FATAL:', err);
+    process.exit(1);
+  });
+}
+
+export { parseOnlyModels, filterModels, ALL_MODELS };
