@@ -6726,7 +6726,13 @@
         "aporte_materia_organica"
       ],
       "valor_pedagogico": "Tecnología japonesa (bokashi 暈し, del verbo bokasu — 'mezclar/atenuar'; refiere al proceso de dilución/mezcla del compost en sustrato. La fermentación en japonés agrícola se llama hakkō 発酵 — distinción técnica importante) popularizada en la línea de agricultura natural Fukuoka-Higa y adaptada a Latinoamérica por Jairo Restrepo. Fermentación aeróbica 45-55°C selecciona microbiota termófila (Bacillus, actinomicetos, levaduras) y estabiliza N orgánico no lixiviable, a diferencia de la urea sintética. La cascarilla aporta Si bioactivo; el carbón vegetal actúa como biochar (CEC + hábitat microbiano). Advertencias: >5 kg/m² en hortalizas de hoja → exceso N atrae áfidos y mildeo; humedad >65% vira a pútrida y pierde N. AGROSAVIA 2015 documenta respuestas equivalentes a 50% NPK sintético en papa criolla y maíz andino.",
-      "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17"
+      "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17",
+      "safety_class": "bajo",
+      "ppe_required": [
+        "tapabocas"
+      ],
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "biol",
@@ -6767,7 +6773,13 @@
         "resistencia_induccion_SAR"
       ],
       "valor_pedagogico": "Biofertilizante anaeróbico andino, popularizado por Restrepo y Pinheiro Machado. La fermentación selecciona bacterias fijadoras de N (Azotobacter, Clostridium) y solubilizadoras de P, generando fitohormonas (auxinas, citoquininas) y ácidos quelantes. La leche aporta caseínas fungistáticas y Lactobacillus que inducen ISR (Resistencia Sistémica Inducida, vía jasmonato/etileno; Pieterse et al. 2014 Annu Rev Phytopathol 52:347). Vs. urea 46-0-0 entrega N orgánico sin quemar follaje. Advertencias: olor amoniacal = mal sellado (descartar); filtrar antes de boquilla; >30% en lechuga/fresa necrosa. AGROSAVIA 2015: +15-25% en hortalizas andinas.",
-      "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17"
+      "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17",
+      "safety_class": "bajo",
+      "ppe_required": null,
+      "do_not_use_when": [
+        "pre_cosecha_partes_comestibles"
+      ],
+      "reentry_interval_dias": null
     },
     {
       "id": "purin_ortiga",
@@ -6806,7 +6818,13 @@
         "fitosanitario_preventivo_chupadores"
       ],
       "valor_pedagogico": "Preparado tradicional europeo (purin d'ortie) introducido a la agroecología latinoamericana por Restrepo y validado por AGROSAVIA. Urtica dioica/U. urens concentra Fe (4-7 mg/g MS), Si soluble, ácido fórmico y polifenoles antialimentarios contra áfidos (Myzus persicae) y ácaros (Tetranychus urticae). Corrige clorosis férrica sin acidificar el sustrato. Fermentación completa (cesa espuma) es clave: macerados frescos contienen ácido fórmico libre (HCOOH) fitotóxico. Vs. imidacloprid no deja residuos ni daña polinizadores. NO mezclar con caldos cúpricos (precipita Fe).",
-      "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17"
+      "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17",
+      "safety_class": "bajo",
+      "ppe_required": [
+        "guantes"
+      ],
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "caldo_sulfocalcico",
@@ -6846,7 +6864,19 @@
         "fitosanitario_curativo_amplio_espectro"
       ],
       "valor_pedagogico": "Polisulfuro de calcio (CaSx, x=4-5) coloidal por cocción S:cal 2:1. El S elemental se oxida en la cutícula del patógeno a SO2/H2S, inhibiendo respiración mitocondrial de hongos (Oidium, Erysiphe) y ácaros eriofidos. Permitido en orgánico (IFOAM, EU 2018/848), no genera resistencia cruzada vs. IBE sintéticos (tebuconazol). FITOTÓXICO en cucurbitáceas, durazno y cerezo en floración o con T>28°C — quemaduras severas. NO mezclar con bordelés (precipita CuS) ni con aceites; 21 d de separación. pH ~11-12: guantes y gafas.",
-      "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17"
+      "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17",
+      "safety_class": "alto",
+      "ppe_required": [
+        "guantes",
+        "careta",
+        "gafas"
+      ],
+      "do_not_use_when": [
+        "floracion",
+        "temperatura_mayor_28C",
+        "humedad_relativa_menor_50pct"
+      ],
+      "reentry_interval_dias": 15
     },
     {
       "id": "caldo_bordeles",
@@ -6885,7 +6915,18 @@
         "fungicida_cuprico_preventivo_amplio_espectro"
       ],
       "valor_pedagogico": "Fungicida cúprico de Burdeos 1885 (Millardet), fundacional en orgánico certificado (IFOAM, EU 2018/848 — máx 4 kg Cu/ha/año). CuSO4 neutralizado con cal forma Cu(OH)2·CuSO4 coloidal que libera Cu²⁺ con humedad/exudados fúngicos, inhibiendo tioles en oomicetes (Phytophthora, Peronospora) y hongos (Colletotrichum, Hemileia del café). pH 7-8 crítico: ácido = Cu²⁺ fitotóxico, alcalino = precipita inactivo. Test lámina de hierro: si se cubre de Cu rojizo, falta cal. NO mezclar con sulfocálcico (CuS) ni aceites; Cu >100 ppm daña lombrices y micorrizas — rotar con Bacillus o Trichoderma.",
-      "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17"
+      "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17",
+      "safety_class": "alto",
+      "ppe_required": [
+        "guantes",
+        "careta",
+        "gafas"
+      ],
+      "do_not_use_when": [
+        "floracion",
+        "cucurbitaceas_jovenes"
+      ],
+      "reentry_interval_dias": 21
     },
     {
       "id": "te_compost",
@@ -6923,7 +6964,13 @@
         "ingham-2000-compost-tea",
         "restrepo-1996-abc-agricultura-organica",
         "agrosavia-manual-biopreparados-2015"
-      ]
+      ],
+      "safety_class": "medio",
+      "ppe_required": null,
+      "do_not_use_when": [
+        "pre_cosecha_partes_comestibles_crudas"
+      ],
+      "reentry_interval_dias": null
     },
     {
       "id": "humus_liquido",
@@ -6959,7 +7006,13 @@
         "agrosavia-manual-biopreparados-2015",
         "restrepo-1996-abc-agricultura-organica",
         "restrepo-2007-biopreparados"
-      ]
+      ],
+      "safety_class": "bajo",
+      "ppe_required": null,
+      "do_not_use_when": [
+        "pre_cosecha_partes_comestibles_crudas"
+      ],
+      "reentry_interval_dias": null
     },
     {
       "id": "lixiviado_frutas",
@@ -6989,7 +7042,13 @@
         "restrepo-1996-bocashi",
         "restrepo-2007-biopreparados",
         "agrosavia-manual-biopreparados-2015"
-      ]
+      ],
+      "safety_class": "medio",
+      "ppe_required": null,
+      "do_not_use_when": [
+        "fermento_con_moho_negro_o_verde_olivo"
+      ],
+      "reentry_interval_dias": null
     },
     {
       "id": "supermagro",
@@ -7028,7 +7087,15 @@
         "restrepo-1996-bocashi",
         "restrepo-2005-agroecologia",
         "restrepo-2007-biopreparados"
-      ]
+      ],
+      "safety_class": "bajo",
+      "ppe_required": [
+        "guantes"
+      ],
+      "do_not_use_when": [
+        "floracion_plena"
+      ],
+      "reentry_interval_dias": null
     },
     {
       "id": "trichoderma_harzianum_suelo",
@@ -7060,7 +7127,11 @@
         "agrosavia-manual-biopreparados-2015",
         "agrosavia-bacillus-2018",
         "ica-resolucion-3168-2015"
-      ]
+      ],
+      "safety_class": "bajo",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "bacillus_subtilis_foliar",
@@ -7091,7 +7162,11 @@
         "mildiu_velloso",
         "oidio_temprano"
       ],
-      "valor_pedagogico": "Bacteria Gram+ esporulada *Bacillus subtilis* sensu lato — revisión taxonómica post-2011: las cepas comerciales de biocontrol QST713 (Serenade®) y FZB42 (RhizoVital®), históricamente etiquetadas como *B. subtilis*, fueron reclasificadas como ***Bacillus velezensis*** tras Borriss et al. 2011 *IJSEM* 61:1786 y Dunlap et al. 2016 *Int J Syst Evol Microbiol* 66:1212. En Colombia, las cepas nativas AGROSAVIA bacterias 19 y 35 corresponden a *B. velezensis* (no a *B. subtilis* stricto sensu), aunque los registros ICA conservan el nombre histórico por estabilidad regulatoria. Mecanismos: coloniza la filosfera por exclusión competitiva y secreta lipopéptidos cíclicos (iturina, fengicina, surfactina) que perforan membranas fúngicas y disparan resistencia sistémica inducida (ISR) vía jasmonato/etileno. Estudios de campo con cepas tipo QST713 reportan 40-70% de control de Botrytis en fresa/mora según presión de inóculo y manejo (Punja & Utkhede 2003 *Trends Biotechnol* 21:400); AGROSAVIA 2018 reporta eficacias comparables con cepas nativas, sin resistencia cruzada ni residuos. Restrepo lo combina con bocashi: éste siembra microbiota en suelo, *B. velezensis* (ex *subtilis*) la extiende al follaje. ADVERTENCIA: esporas fotosensibles (UV degrada en 2-4 h) → aplicar SIEMPRE al atardecer con adherente; incompatible con cobre y caldo sulfocálcico (alternar 48 h)."
+      "valor_pedagogico": "Bacteria Gram+ esporulada *Bacillus subtilis* sensu lato — revisión taxonómica post-2011: las cepas comerciales de biocontrol QST713 (Serenade®) y FZB42 (RhizoVital®), históricamente etiquetadas como *B. subtilis*, fueron reclasificadas como ***Bacillus velezensis*** tras Borriss et al. 2011 *IJSEM* 61:1786 y Dunlap et al. 2016 *Int J Syst Evol Microbiol* 66:1212. En Colombia, las cepas nativas AGROSAVIA bacterias 19 y 35 corresponden a *B. velezensis* (no a *B. subtilis* stricto sensu), aunque los registros ICA conservan el nombre histórico por estabilidad regulatoria. Mecanismos: coloniza la filosfera por exclusión competitiva y secreta lipopéptidos cíclicos (iturina, fengicina, surfactina) que perforan membranas fúngicas y disparan resistencia sistémica inducida (ISR) vía jasmonato/etileno. Estudios de campo con cepas tipo QST713 reportan 40-70% de control de Botrytis en fresa/mora según presión de inóculo y manejo (Punja & Utkhede 2003 *Trends Biotechnol* 21:400); AGROSAVIA 2018 reporta eficacias comparables con cepas nativas, sin resistencia cruzada ni residuos. Restrepo lo combina con bocashi: éste siembra microbiota en suelo, *B. velezensis* (ex *subtilis*) la extiende al follaje. ADVERTENCIA: esporas fotosensibles (UV degrada en 2-4 h) → aplicar SIEMPRE al atardecer con adherente; incompatible con cobre y caldo sulfocálcico (alternar 48 h).",
+      "safety_class": "bajo",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "cal_dolomita",
@@ -7123,7 +7198,13 @@
         "deficiencia_magnesio",
         "saturacion_bases_baja"
       ],
-      "valor_pedagogico": "CaMg(CO3)2 neutraliza H+/Al3+ del complejo de intercambio: CaMg(CO3)2 + 2Al3+ → Ca2+ + Mg2+ + 2Al(OH)3↓ + 2CO2. La cal NO es fertilizante de Ca: es corrector de toxicidad de aluminio (Cochrane 1980). Usarla 'a ojo' alcaliniza el complejo, precipita P como Ca-fosfatos insolubles, calcina la microbiota y emite ~440 kg CO2/t. REGLA DURA AGROECOLÓGICA: aplicar SOLO con análisis de suelo que muestre pH<5.5 Y saturación Al>30% —sin esos dos criterios es daño neto. NUNCA cal viva (CaO) ni hidratada (Ca(OH)2) en orgánico: Pinheiro y Restrepo lo prohíben (queman raíces y microbiota). Alternativas: bocashi, biocarbón, compost maduro o yeso (CaSO4·2H2O) si solo se requiere Ca sin subir pH."
+      "valor_pedagogico": "CaMg(CO3)2 neutraliza H+/Al3+ del complejo de intercambio: CaMg(CO3)2 + 2Al3+ → Ca2+ + Mg2+ + 2Al(OH)3↓ + 2CO2. La cal NO es fertilizante de Ca: es corrector de toxicidad de aluminio (Cochrane 1980). Usarla 'a ojo' alcaliniza el complejo, precipita P como Ca-fosfatos insolubles, calcina la microbiota y emite ~440 kg CO2/t. REGLA DURA AGROECOLÓGICA: aplicar SOLO con análisis de suelo que muestre pH<5.5 Y saturación Al>30% —sin esos dos criterios es daño neto. NUNCA cal viva (CaO) ni hidratada (Ca(OH)2) en orgánico: Pinheiro y Restrepo lo prohíben (queman raíces y microbiota). Alternativas: bocashi, biocarbón, compost maduro o yeso (CaSO4·2H2O) si solo se requiere Ca sin subir pH.",
+      "safety_class": "bajo",
+      "ppe_required": null,
+      "do_not_use_when": [
+        "sin_analisis_de_suelo_previo"
+      ],
+      "reentry_interval_dias": null
     },
     {
       "id": "roca_fosforica",
@@ -7153,7 +7234,13 @@
         "enraizamiento_inicial",
         "floracion_fructificacion"
       ],
-      "valor_pedagogico": "Apatita Ca5(PO4)3(F,Cl,OH) de yacimientos colombianos (Pesca-Boyacá, Norte de Santander) molida a malla 200. Libera P-PO4 lentamente sólo en suelo ácido: H+ del rizoplano y ácidos orgánicos (cítrico, oxálico) de micorrizas Glomus protonan el fluorapatito y solubilizan P por 6-24 meses. A pH>6.5 es inerte —aplicarla sobre suelo encalado es desperdicio. AGROSAVIA 2015 y Restrepo 2007 la co-compostan con bocashi: los ácidos del fermento aceleran solubilización 3-5× y Pseudomonas/Bacillus solubilizadores la liberan como P disponible. Vs. DAP/MAP químicos: entrega P sostenida sin acidificar ni salinizar, conserva micorrizas, compatible con IFOAM. Aporta Ca pero no Mg. Usar mascarilla: contiene flúor."
+      "valor_pedagogico": "Apatita Ca5(PO4)3(F,Cl,OH) de yacimientos colombianos (Pesca-Boyacá, Norte de Santander) molida a malla 200. Libera P-PO4 lentamente sólo en suelo ácido: H+ del rizoplano y ácidos orgánicos (cítrico, oxálico) de micorrizas Glomus protonan el fluorapatito y solubilizan P por 6-24 meses. A pH>6.5 es inerte —aplicarla sobre suelo encalado es desperdicio. AGROSAVIA 2015 y Restrepo 2007 la co-compostan con bocashi: los ácidos del fermento aceleran solubilización 3-5× y Pseudomonas/Bacillus solubilizadores la liberan como P disponible. Vs. DAP/MAP químicos: entrega P sostenida sin acidificar ni salinizar, conserva micorrizas, compatible con IFOAM. Aporta Ca pero no Mg. Usar mascarilla: contiene flúor.",
+      "safety_class": "medio",
+      "ppe_required": [
+        "mascarilla"
+      ],
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "ceniza_madera",
@@ -7188,7 +7275,16 @@
         "babosas_caracoles_barrera_fisica",
         "ingrediente_bocashi"
       ],
-      "valor_pedagogico": "Residuo de combustión completa de madera dura no tratada: K2CO3 (5-10%), CaO+CaCO3 (20-35%), MgO, P2O5 y micros (B, Zn, Mn, Cu). Restrepo 1996 la incorpora al bocashi como aporte mineral y modulador de pH. ADVERTENCIAS: (1) NUNCA ceniza tratada/pintada/contrachapado/carbón mineral —Cr-Cu-As (CCA), dioxinas, metales pesados; (2) alcalinizante fuerte (~30-50% eq. CaCO3): prohibida con pH>6.5 y en acidófilos (arándano, té); (3) lixivia K rápido —no almacenar a la intemperie; (4) volatiliza NH3 con fertilizante amoniacal. Vs. KCl químico: aporta K+Ca+micros sin salinización por Cl-. AGROSAVIA 2015 la valida como fuente económica de K en finca con leña disponible."
+      "valor_pedagogico": "Residuo de combustión completa de madera dura no tratada: K2CO3 (5-10%), CaO+CaCO3 (20-35%), MgO, P2O5 y micros (B, Zn, Mn, Cu). Restrepo 1996 la incorpora al bocashi como aporte mineral y modulador de pH. ADVERTENCIAS: (1) NUNCA ceniza tratada/pintada/contrachapado/carbón mineral —Cr-Cu-As (CCA), dioxinas, metales pesados; (2) alcalinizante fuerte (~30-50% eq. CaCO3): prohibida con pH>6.5 y en acidófilos (arándano, té); (3) lixivia K rápido —no almacenar a la intemperie; (4) volatiliza NH3 con fertilizante amoniacal. Vs. KCl químico: aporta K+Ca+micros sin salinización por Cl-. AGROSAVIA 2015 la valida como fuente económica de K en finca con leña disponible.",
+      "safety_class": "medio",
+      "ppe_required": [
+        "guantes",
+        "gafas"
+      ],
+      "do_not_use_when": [
+        "madera_tratada_pintada_o_contrachapado"
+      ],
+      "reentry_interval_dias": null
     },
     {
       "id": "compost_maduro",
@@ -7223,7 +7319,13 @@
         "microbiota_suelo_empobrecida",
         "retencion_agua_suelo"
       ],
-      "valor_pedagogico": "Compostaje aeróbico mesofílico-termofílico: sucesión de bacterias (Bacillus, Pseudomonas), actinomicetos (Streptomyces, olor a tierra) y hongos saprófitos que degradan C:N 30:1 hasta húmicos estables (C:N ~12:1). Fase termofílica 55-70°C esteriliza patógenos y semillas de arvenses. Restrepo 1996 y AGROSAVIA 2015 lo posicionan como pilar agroecológico: vs. bocashi (microbioma fresco), aporta materia orgánica HUMIFICADA estable que mejora CIC y retención hídrica (1 g humus = 4-6 g H2O). Vs. NPK químico: no saliniza, secuestra C y reinocula microbiota. CONTROL: C:N 10-15, germinación rábano >80%, sin olor amoniacal. NO usar inmaduro ni de origen desconocido (clopiralida residual mata leguminosas)."
+      "valor_pedagogico": "Compostaje aeróbico mesofílico-termofílico: sucesión de bacterias (Bacillus, Pseudomonas), actinomicetos (Streptomyces, olor a tierra) y hongos saprófitos que degradan C:N 30:1 hasta húmicos estables (C:N ~12:1). Fase termofílica 55-70°C esteriliza patógenos y semillas de arvenses. Restrepo 1996 y AGROSAVIA 2015 lo posicionan como pilar agroecológico: vs. bocashi (microbioma fresco), aporta materia orgánica HUMIFICADA estable que mejora CIC y retención hídrica (1 g humus = 4-6 g H2O). Vs. NPK químico: no saliniza, secuestra C y reinocula microbiota. CONTROL: C:N 10-15, germinación rábano >80%, sin olor amoniacal. NO usar inmaduro ni de origen desconocido (clopiralida residual mata leguminosas).",
+      "safety_class": "bajo",
+      "ppe_required": null,
+      "do_not_use_when": [
+        "compost_inmaduro_u_origen_desconocido"
+      ],
+      "reentry_interval_dias": null
     },
     {
       "id": "biofertilizante_algas",
@@ -7252,7 +7354,11 @@
       "source_ids": [
         "khan-2009-seaweed-extracts",
         "agrosavia-manual-biopreparados-2015"
-      ]
+      ],
+      "safety_class": "bajo",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (caso David trozador; DR-040 pest catalog)",
@@ -7285,7 +7391,11 @@
         "agrosavia-manual-biopreparados-2015",
         "ica-resolucion-3168-2015",
         "gbif-taxonomic-backbone"
-      ]
+      ],
+      "safety_class": "bajo",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (caso David trozador; DR-040 pest catalog)",
@@ -7316,7 +7426,11 @@
       "source_ids": [
         "agrosavia-manual-biopreparados-2015",
         "gbif-taxonomic-backbone"
-      ]
+      ],
+      "safety_class": "bajo",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (caso David trozador; DR-040 pest catalog)",
@@ -7351,7 +7465,13 @@
         "agrosavia-manual-biopreparados-2015",
         "gbif-taxonomic-backbone",
         "powo-kew"
-      ]
+      ],
+      "safety_class": "medio",
+      "ppe_required": null,
+      "do_not_use_when": [
+        "cerca_de_fuentes_hidricas_menos_30m"
+      ],
+      "reentry_interval_dias": null
     },
     {
       "id": "caldo_visosa",
@@ -7389,7 +7509,15 @@
         "deficiencia_zn_mg_b"
       ],
       "valor_pedagogico": "Originaria de la Universidad Federal de Viçosa (Brasil) para cafetales; combina nutrición foliar con efecto fungicida cúprico suave.",
-      "_curation_status": "BORRADOR_IA"
+      "_curation_status": "BORRADOR_IA",
+      "safety_class": "alto",
+      "ppe_required": [
+        "guantes",
+        "careta",
+        "gafas"
+      ],
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "supermagro_restrepo",
@@ -7425,7 +7553,11 @@
         "induccion_resistencia"
       ],
       "valor_pedagogico": "60-90 días anaeróbico según temperatura ambiente (60 en tierra caliente, 90 en altiplano). A menos de 60 días los sulfatos NO terminan de quelar y queman follaje (Restrepo 2007, capítulo biofertilizantes). Color final ámbar-marrón con olor a chicha; descartar si huele a putrefacción. Origen brasileño (Delvino Magro / Pinheiro Machado) adaptado por Jairo Restrepo en Colombia.",
-      "_curation_status": "BORRADOR_IA"
+      "_curation_status": "BORRADOR_IA",
+      "safety_class": "revisar",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "caldo_m5_restrepo",
@@ -7459,7 +7591,11 @@
         "trips"
       ],
       "valor_pedagogico": "Variante densificada del supermagro. La formulación exacta varía según edición de Restrepo — verificar capítulo 'biofertilizantes especiales' en edición física 2007.",
-      "_curation_status": "BORRADOR_IA"
+      "_curation_status": "BORRADOR_IA",
+      "safety_class": "revisar",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "microorganismos_montana_solido",
@@ -7494,7 +7630,13 @@
         "descomposicion_materia_organica"
       ],
       "valor_pedagogico": "La calidad depende del bosque madre — recolectar en bosques con dosel cerrado, suelo con hojarasca blanca (micelio activo) y sin perturbación reciente. Método Restrepo & Hensel 2015 validado por Vásquez-Solano et al. 2021 Agronomía Costarricense.",
-      "_curation_status": "BORRADOR_IA"
+      "_curation_status": "BORRADOR_IA",
+      "safety_class": "bajo",
+      "ppe_required": [
+        "tapabocas"
+      ],
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "microorganismos_montana_liquido",
@@ -7529,7 +7671,11 @@
         "supresion_patogenos_suelo"
       ],
       "valor_pedagogico": "Vida útil corta (~30 días) — usar fresco. Olor agridulce a chicha indica calidad; rechazar si huele a putrefacción.",
-      "_curation_status": "BORRADOR_IA"
+      "_curation_status": "BORRADOR_IA",
+      "safety_class": "bajo",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "jadam_microbial_solution_jms",
@@ -7558,7 +7704,11 @@
         "supresion_patogenos"
       ],
       "valor_pedagogico": "Vida útil EXTREMADAMENTE corta — aplicar dentro de 24-72h tras pico de actividad microbiana. Reemplaza compra de inoculantes comerciales. Receta canónica Cho 2016 ISBN 9788989220206.",
-      "_curation_status": "BORRADOR_IA"
+      "_curation_status": "BORRADOR_IA",
+      "safety_class": "bajo",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "jadam_wetting_agent_jwa",
@@ -7587,7 +7737,19 @@
         "mosca_blanca"
       ],
       "valor_pedagogico": "Jabón potásico líquido producido por saponificación de aceites vegetales con KOH; actúa como surfactante (rompe la cutícula cerosa de áfidos, cochinillas y mosca blanca) y mejora la adherencia/penetración de caldos foliares. Compatible con caldo sulfocálcico y JMS. PROCEDIMIENTO PROFESIONAL — PRECAUCIONES DE SEGURIDAD INNEGOCIABLES: (1) EPE obligatorio: guantes de nitrilo (NO látex), lentes herméticos tipo química, delantal o tyvek de PVC, mangas largas y botas cerradas. El KOH al disolverse libera calor (saponificación exotérmica) y puede salpicar spray cáustico que ataca piel y córnea en segundos. (2) Si se planea usar agua corriente añadir SIEMPRE el KOH al agua y nunca al revés (regla del químico: ácido o base al agua, jamás agua a la base). (3) Trabajar al aire libre o con extracción; el vapor irrita vías respiratorias. (4) Tener vinagre comercial 5% y agua abundante a mano para neutralizar salpicaduras (KOH es base fuerte: el vinagre la neutraliza). (5) NO usar NaOH: produce jabón sólido en pasta, no líquido, e inutiliza la receta. ALTERNATIVA RECOMENDADA: si tienes dudas sobre seguridad o pureza del KOH disponible, comprar surfactante OMRI listed comercial (jabón potásico foliar registrado ante ICA) — mismo efecto sin riesgo cáustico. Costo equivalente para finca pequeña.",
-      "_curation_status": "BORRADOR_IA"
+      "_curation_status": "BORRADOR_IA",
+      "safety_class": "alto",
+      "ppe_required": [
+        "guantes_nitrilo",
+        "gafas_hermeticas",
+        "delantal_impermeable",
+        "manga_larga",
+        "botas_cerradas"
+      ],
+      "do_not_use_when": [
+        "preparar_sin_ventilacion_o_espacio_cerrado"
+      ],
+      "reentry_interval_dias": null
     },
     {
       "id": "vinagre_madera_pirolenoso",
@@ -7616,7 +7778,14 @@
         "repelente_general"
       ],
       "valor_pedagogico": "Condensado obtenido por pirólisis lenta (250-400 °C en horno cerrado con condensador refrigerado) de leña dura; contiene ácido pirolígneo, guayacol, fenoles y carbonilos que actúan como fungistato preventivo, repelente de insectos y estimulante microbiano del suelo. NO USAR FRESCO — contiene alquitranes (PAHs, hidrocarburos aromáticos policíclicos) fitotóxicos y potencialmente cancerígenos. Reposo mínimo 90 días obligatorio para separación de tres fases y descarte de alquitrán pesado. ADVERTENCIA INELABORABILIDAD EN FINCA: requiere horno de pirólisis controlada (250-400 °C) con condensador refrigerado y termómetro de proceso. **Sin este equipo, NO es elaborable en finca** — comprar producto registrado ICA (e.g. Wood Vinegar de empresas certificadas, o destilados pirolígneos de productores artesanales con control de PAHs). El vinagre casero \"ahumado\" en barbacoa, fogón o tambor sin condensador NO es vinagre de madera real: carece de la concentración de componentes activos (guayacol, ácido pirolígneo, fenoles antimicrobianos) y puede contener residuos cancerígenos sin separación de fases. Si la finca no dispone del horno, derivar a producto comercial o sustituir por extracto fermentado de plantas aromáticas.",
-      "_curation_status": "BORRADOR_IA"
+      "_curation_status": "BORRADOR_IA",
+      "safety_class": "alto",
+      "ppe_required": null,
+      "do_not_use_when": [
+        "producto_fresco_sin_reposo_90_dias",
+        "sin_equipo_pirolisis_controlada_con_condensador"
+      ],
+      "reentry_interval_dias": null
     },
     {
       "id": "fermento_fpj_brotes",
@@ -7643,7 +7812,11 @@
         "induccion_brotacion"
       ],
       "valor_pedagogico": "Proporción correcta 7:3 planta:azúcar según Cho Han-Kyu (KNF) — no 1:1 como suele simplificarse. Cosechar brotes antes del sol para maximizar actividad enzimática.",
-      "_curation_status": "BORRADOR_IA"
+      "_curation_status": "BORRADOR_IA",
+      "safety_class": "revisar",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "fermento_faa_pescado",
@@ -7669,7 +7842,11 @@
         "fuente_nitrogeno"
       ],
       "valor_pedagogico": "Fermentación 3-6 meses para hidrólisis completa. Líquido final ámbar oscuro con olor sui generis (NO putrefacto).",
-      "_curation_status": "BORRADOR_IA"
+      "_curation_status": "BORRADOR_IA",
+      "safety_class": "revisar",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "fermento_lab_lactobacilos",
@@ -7697,7 +7874,11 @@
         "reduccion_olores"
       ],
       "valor_pedagogico": "Procedimiento de dos etapas; rendimiento ~10% del volumen de leche. Mezclar con FPJ y FAA en aspersiones combinadas.",
-      "_curation_status": "BORRADOR_IA"
+      "_curation_status": "BORRADOR_IA",
+      "safety_class": "bajo",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "biofertilizante_purin_rumen",
@@ -7727,7 +7908,11 @@
         "inoculo_microbiano_anaerobio"
       ],
       "valor_pedagogico": "Aprovecha residuo de mataderos. Mamani-Pati et al. 2015 (J Selva Andina Res Soc 6(1)) reportan 123-256 mg/L de N según cantidad de contenido ruminal añadido.",
-      "_curation_status": "BORRADOR_IA"
+      "_curation_status": "BORRADOR_IA",
+      "safety_class": "revisar",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "harina_rocas_basalto",
@@ -7753,7 +7938,11 @@
         "formacion_complejo_arcilla_humus"
       ],
       "valor_pedagogico": "Composición típica SiO₂ 45-52%, Fe 3.4%, Mg 2.1%, Ca 3.8%, >70 oligoelementos.  Liberación lenta — efectos visibles a partir de 6-12 meses. Heredero de Julius Hensel 'Brot aus Steinen' (1894), reeditado por Pinheiro-Restrepo 2009.",
-      "_curation_status": "BORRADOR_IA"
+      "_curation_status": "BORRADOR_IA",
+      "safety_class": "revisar",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "biofertilizante_super_4",
@@ -7794,7 +7983,11 @@
         "estimulante_microbiano_filoplano"
       ],
       "valor_pedagogico": "Variante reducida y \"low-cost\" del Supermagro Restrepo-Pinheiro: usa solo 4 sulfatos críticos (Cu/Zn/Mg/Fe) en vez de los 10+ del Supermagro completo, lo que la hace viable para finca campesina sin acceso a químicas industriales. El proceso anaeróbico de 60-90 días es clave: Lactobacillus y Saccharomyces secretan ácidos orgánicos (láctico, acético, cítrico) y aminoácidos libres que quelan los sulfatos minerales en complejos biodisponibles análogos a EDTA/EDDHA pero biológicos (Restrepo 1996 ABC agricultura orgánica; Pinheiro Machado 2017 Manual biofertilizantes). A menos de 60 días los sulfatos NO terminan de quelar y queman follaje (caso documentado AGROSAVIA Manual Biopreparados 2015). Color final ámbar-marrón con olor a chicha fermentada; descartar si huele a putrefacción amoniacal (descomposición anaeróbica fallida). Origen brasileño (Delvino Magro / Pinheiro Machado), adaptado por Jairo Restrepo en Colombia para fincas cafeteras y hortícolas de altiplano. NO confundir con el Supermagro Restrepo (10 minerales) ni con el supermagro_restrepo del catálogo: este Super 4 es la formulación introductoria para productores sin experiencia previa en biofermentos.",
-      "_curation_status": "BORRADOR_IA"
+      "_curation_status": "BORRADOR_IA",
+      "safety_class": "revisar",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "purin_helecho",
@@ -7826,7 +8019,15 @@
         "fitosanitario_preventivo_chupadores"
       ],
       "valor_pedagogico": "Receta tradicional campesina europea (Francia, Suiza) recogida por Pinheiro Machado y Restrepo Rivera para el contexto latinoamericano (Pinheiro & Restrepo 2003 Cartilha de purines). Pteridium aquilinum contiene ptaquilósido (norsesquiterpenoide), tianinasa y polifenoles que actúan como antialimentarios contra moluscos y áfidos (Vetter 2009 Food Chem Toxicol 47:3185). En Colombia el helecho marranero es nativo cosmopolita y abundante post-disturbio en zonas templadas-frías, por lo que es un recurso gratuito accesible para el productor — NO requiere cultivar la especie (auditoría agroecológica 2026-05-21 advierte: Pteridium NO es cultivable, solo recolectar de poblaciones naturales pero NO en páramo según Res. 684/2018 MADS). ADVERTENCIA: ptaquilósido es cancerígeno por exposición crónica (Smith et al. 2000 Nat Toxins 8:233); el productor debe usar guantes nitrilo al manipular frondes y NO ingerir agua de remojo. Diferencia con purín de ortiga: Pteridium ataca moluscos (babosas/caracoles); Urtica ataca artrópodos (áfidos/ácaros). En la trofobiosis de Chaboussou-Pinheiro 1990, el purín de helecho regula el equilibrio Ca/N foliar haciendo la planta menos atractiva a moluscos sin tóxicos sistémicos.",
-      "_curation_status": "BORRADOR_IA"
+      "_curation_status": "BORRADOR_IA",
+      "safety_class": "alto",
+      "ppe_required": [
+        "guantes_nitrilo"
+      ],
+      "do_not_use_when": [
+        "no_ingerir_el_producto"
+      ],
+      "reentry_interval_dias": 14
     },
     {
       "id": "caldo_ortiga_consuelda",
@@ -7862,7 +8063,15 @@
         "fase_crecimiento_vegetativo"
       ],
       "valor_pedagogico": "Combinación clásica de la agroecología europea (Hans-Peter Rusch, alemán; Maria Thun, biodinámica) introducida a Latinoamérica por Pinheiro Machado y Restrepo Rivera (Pinheiro & Restrepo 2003 Cartilha purines). Urtica dioica aporta Fe (4-7 mg/g MS), Si soluble, ácido fórmico antialimentario y polifenoles inductores de resistencia (ISR mediada por jasmonato/etileno — Pieterse et al. 2014 Annu Rev Phytopathol 52:347). Symphytum officinale aporta allantoina (estimulante de división celular vegetal), K soluble (3-7% MS) y proteínas con alto contenido de aminoácidos libres tras fermentación. La sinergia produce un estimulante foliar fitohormonal natural — Pinheiro Machado 1990 (teoria da trofobiose) demostró que plantas con balance Fe/K/Si adecuado producen menos aminoácidos libres en savia, lo que reduce ataques de áfidos y trips porque estos requieren N-amino disponible en floema. ADVERTENCIA: NO ingerir ni aplicar a cosecha de hoja menos de 14 días antes — consuelda contiene alcaloides pirrolizidínicos (PA) con hepatotoxicidad documentada en uso oral crónico (EMA 2013, restricción europea). Para uso agrícola foliar es seguro. NO mezclar con caldos cúpricos (Cu precipita Fe + Si del extracto como Cu(OH)2 + FeSiO3). Diferencia con purín de ortiga simple: la consuelda agrega allantoina y K — pasa de repelente-mineralizador a estimulante de crecimiento completo.",
-      "_curation_status": "BORRADOR_IA"
+      "_curation_status": "BORRADOR_IA",
+      "safety_class": "medio",
+      "ppe_required": [
+        "guantes"
+      ],
+      "do_not_use_when": [
+        "no_ingerir_el_producto"
+      ],
+      "reentry_interval_dias": 14
     },
     {
       "id": "abono_verde_avena_vicia",
@@ -7897,7 +8106,11 @@
         "baja_materia_organica_suelo"
       ],
       "valor_pedagogico": "Tecnología agroecológica clásica de cobertura biocida documentada en Colombia por AGROSAVIA-CI Tibaitatá (Modelo productivo de abonos verdes en sistemas de papa y hortalizas en Cundinamarca y Boyacá, 2018) y promovida por Restrepo Rivera (ABC de la agricultura orgánica, 1996) y Pinheiro Machado (Manual biofertilizantes, 2017). La mezcla avena+vicia integra dos servicios ecosistémicos complementarios: Avena sativa aporta biomasa estructural (4-8 t MS/ha), root system fibroso que mejora porosidad y estructura del suelo, y exudados radiculares alelopáticos (avenacina, escopoletina) supresores de Pratylenchus y Meloidogyne (nematodos fitoparásitos — Mojtahedi et al. 1991 J Nematol 23:170). Vicia sativa/villosa fija N₂ atmosférico vía simbiosis con Rhizobium leguminosarum bv. viciae aportando 80-150 kg N/ha disponible tras incorporación (AGROSAVIA 2018, dato verificado en CI Tibaitatá-La Selva para zona alta cundiboyacense). En conjunto: avena protege suelo de erosión y compactación + vicia carga N biológico — equivalente fertilizante a 200-350 kg urea/ha sin aporte exógeno. Incorporación al inicio floración vicia maximiza N (relación C:N ~15-20:1, ideal para descomposición rápida sin inmovilización). REGLA AGROECOLÓGICA: rotar siempre antes de cultivo NO-leguminoso. NO sembrar después de otra Vicia o Pisum (saturación nodulación, riesgo enfermedades radiculares).",
-      "_curation_status": "BORRADOR_IA"
+      "_curation_status": "BORRADOR_IA",
+      "safety_class": "bajo",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     }
   ]
 }
