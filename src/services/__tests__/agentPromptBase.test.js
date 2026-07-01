@@ -446,6 +446,16 @@ describe('modos de respuesta (campesino/experto/maestro)', () => {
     expect(prompt).toContain('MODO CAMPESINO');
   });
 
+  // Regresión: el modo MAESTRO ya lo soportaba el backend (normalizeMode
+  // reconoce 'maestro'/'profesor'/'mentor'), pero el selector de perfil de la
+  // UI solo exponía simple/detallado. Ahora nivel_respuestas='maestro' (el
+  // valor que guarda la 3ra opción del perfil) debe inyectar el bloque.
+  it('buildBasePrompt inyecta MODO MAESTRO cuando nivelRespuestas es maestro', () => {
+    const prompt = buildBasePrompt({ query: '¿por qué se enferma mi tomate?', nivelRespuestas: 'maestro' });
+    expect(prompt).toContain('MODO MAESTRO');
+    expect(prompt).toContain('Habla como quien enseña');
+  });
+
   it('buildBasePrompt NO duplica el bloque de nivel de detalle (regresión fix dedup)', () => {
     // El registro de respuesta lo maneja MODO EXPERTO; el viejo bloque
     // "NIVEL DE RESPUESTA" no debe reaparecer en paralelo.

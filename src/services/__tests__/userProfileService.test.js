@@ -57,6 +57,19 @@ describe('userProfileService (#200)', () => {
       const ids = PROFILE_QUESTIONS.map((q) => q.id);
       expect(new Set(ids).size).toBe(ids.length);
     });
+
+    // Regresión: el modo MAESTRO (buildMasterModeBlock en agentPromptBase.js)
+    // ya lo soporta el backend (normalizeMode reconoce 'maestro'), pero el
+    // selector de perfil solo ofrecía simple/detallado. Se agrega la 3ra
+    // opción para que sea alcanzable desde la UI (ProfileScreen → onboarding).
+    it('nivel_respuestas ofrece la opción "maestro" alcanzable desde el perfil', () => {
+      const pregunta = PROFILE_QUESTIONS.find((q) => q.id === 'nivel_respuestas');
+      expect(pregunta).toBeTruthy();
+      const values = pregunta.options.map((o) => o.value);
+      expect(values).toContain('simple');
+      expect(values).toContain('detallado');
+      expect(values).toContain('maestro');
+    });
   });
 
   describe('preguntas condicionales', () => {
@@ -149,6 +162,11 @@ describe('userProfileService (#200)', () => {
     it('preferencia detallado añade directiva técnica', () => {
       const block = buildUserProfileBlock({ nombre: 'X', nivel_respuestas: 'detallado' });
       expect(block).toMatch(/DETALLADAS/);
+    });
+
+    it('preferencia maestro añade directiva de enseñar el porqué', () => {
+      const block = buildUserProfileBlock({ nombre: 'X', nivel_respuestas: 'maestro' });
+      expect(block).toMatch(/enseñes el porqué/);
     });
   });
 });

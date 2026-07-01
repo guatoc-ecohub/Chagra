@@ -431,6 +431,7 @@ export const PROFILE_QUESTIONS = [
     options: [
       { value: 'simple', label: 'Simple y al grano' },
       { value: 'detallado', label: 'Detallado, con explicación técnica' },
+      { value: 'maestro', label: 'Maestro — me enseña el porqué' },
     ],
   },
   {
@@ -901,6 +902,9 @@ export function buildUserProfileBlock(profile) {
   } else if (p.nivel_respuestas === 'detallado') {
     tono =
       '\nIMPORTANTE: este usuario prefiere respuestas DETALLADAS y técnicas. Puedes profundizar con nombres científicos, dosis, mecanismos y citar fuentes.';
+  } else if (p.nivel_respuestas === 'maestro') {
+    tono =
+      '\nIMPORTANTE: este usuario prefiere que le enseñes el porqué. Explica la lógica detrás de cada recomendación y deja criterio para que decida por su cuenta la próxima vez.';
   }
 
   return `=== PERFIL DEL USUARIO (personaliza tus respuestas a este contexto) ===
