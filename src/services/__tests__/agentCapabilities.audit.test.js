@@ -13,7 +13,7 @@
  *   - offline: navigator.onLine=false → null (corta antes del LLM)
  *   - MCP caído: fetch falla → null
  *   - MCP sin datos: available:false / found:false → mensaje honesto
- *   - función no disponible por plan → stubMessage claro (ej. precio)
+ *   - función no disponible por plan → stubMessage claro (ej. deep)
  */
 import { describe, it, expect } from 'vitest';
 import { CHIP_INTENTS, CHIP_DEFS, planForcedIntent } from '../chipIntentRouter.js';
@@ -62,11 +62,10 @@ const CHIP_REGISTRY = [
     intent: 'precio',
     label: 'Precio',
     emoji: '💰',
-    kind: 'stub',
+    kind: 'local',
     tool: null,
-    stub: true,
+    stub: false,
     deep: false,
-    expectsStubMessage: true,
   },
   {
     intent: 'calendario',
@@ -253,16 +252,13 @@ describe('agentCapabilities — fallo explícito corta antes del LLM', () => {
 // 4. Stubs — función no disponible explica qué falta y cómo seguir
 // ---------------------------------------------------------------------------
 describe('agentCapabilities — stubs explican con honestidad', () => {
-  it('precio: stubMessage explica que SIPSA es archivo descargable + fuente alternativa', () => {
+  it('precio: plan local resuelve referencia real sin stubMessage', () => {
     const plan = planForcedIntent('precio', 'papa');
-    expect(plan.stub).toBe(true);
+    expect(plan.stub).toBe(false);
     expect(plan.tool).toBeNull();
-    expect(typeof plan.stubMessage).toBe('string');
-    expect(plan.stubMessage.length).toBeGreaterThan(30);
-    // Debe mencionar que NO está disponible y orientar
-    expect(plan.stubMessage.toLowerCase()).toContain('no');
-    expect(plan.stubMessage).toContain('SIPSA');
-    expect(plan.stubMessage).toContain('Corabastos');
+    expect(plan.localGrounding).toBe('precio_referencia');
+    expect(plan.args).toEqual({ producto: 'papa' });
+    expect(plan.stubMessage).toBeNull();
   });
 
   it('clima sin municipio: stubResult con available:false + reason no_municipio', () => {

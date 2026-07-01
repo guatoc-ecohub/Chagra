@@ -132,8 +132,8 @@ describe('ChipsToolbar — flag Deep Research OFF (chip 🔬 oculto)', () => {
   });
 });
 
-// ──── Chip precio (stub) — no promete capacidades que no existen ────────────
-describe('ChipsToolbar — chip precio stub no engaña', () => {
+// ──── Chip precio (live) — referencia local groundeada ─────────────────────
+describe('ChipsToolbar — chip precio usa referencia local', () => {
   beforeEach(() => {
     vi.spyOn(deepResearchClient, 'isDeepResearchEnabled').mockReturnValue(false);
   });
@@ -141,14 +141,14 @@ describe('ChipsToolbar — chip precio stub no engaña', () => {
     vi.restoreAllMocks();
   });
 
-  test('chip precio tiene placeholder honesto (sin prometer precio)', () => {
+  test('chip precio tiene placeholder claro para escribir el producto', () => {
     render(<ChipsToolbar onSelectIntent={() => {}} />);
     const precioDef = CHIP_DEFS.find((d) => d.intent === 'precio');
     expect(precioDef.placeholder.toLowerCase()).toMatch(/producto|precio/i);
-    expect(precioDef.placeholder.toLowerCase()).not.toMatch(/consulta\s+exitosa|resultado|dato/i);
+    expect(precioDef.kind).toBe('local');
   });
 
-  test('chip precio es clickable (funciona, solo que el backend es stub)', () => {
+  test('chip precio es clickable y no se bloquea', () => {
     const onSelectIntent = vi.fn();
     render(<ChipsToolbar onSelectIntent={onSelectIntent} />);
     fireEvent.click(screen.getByText('Precio'));

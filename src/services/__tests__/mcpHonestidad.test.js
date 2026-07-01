@@ -4,7 +4,7 @@
  * Evita 3 anti-patrones:
  * 1. Presentar datos sintéticos como reales (callTool nunca fabrica).
  * 2. Mensajes idénticos para fallos distintos (available:false ≠ timeout ≠ error).
- * 3. Atribución falsa de fuentes (stubMessage no contiene datos que parezcan reales).
+ * 3. Atribución falsa de fuentes (las respuestas de precio y stub no inventan).
  *
  * Regla: si callTool retorna null, NO hay data. El caller (AgentScreen) no debe
  * presentar nada como "respuesta del sistema" porque no hubo respuesta.
@@ -108,16 +108,15 @@ describe('mcp honestidad — señales de fallo distinguibles', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 3. Mensajes de stub no contienen datos que parezcan reales
+// 3. Precio de referencia local no inventa cifras
 // ---------------------------------------------------------------------------
-describe('mcp honestidad — stubMessage no contiene datos falsos', () => {
+describe('mcp honestidad — precio de referencia local no inventa cifras', () => {
   /**
-   * Los stubMessage son texto visible para el campesino cuando una función
-   * NO está disponible. No deben contener:
-   *   - Números específicos (precios, fechas, cantidades)
-   *   - Valores monetarios ($, COP, pesos con dígitos)
-   *   - Afirmaciones que suenen a dato real de mercado
-   *   - URLs de afiliación o comerciales (sin validación)
+   * Las respuestas del chip precio son texto visible para el campesino.
+   * No deben:
+   *   - Inventar un valor si no hay dato verificable
+   *   - Omitir la fuente institucional cuando sí hay dato
+   *   - Afirmar que el dato proviene del sidecar si no se usó
    */
   const DATA_LIKE_PATTERNS = [
     /\$\s*\d+/,          // $123, $ 123
@@ -126,34 +125,26 @@ describe('mcp honestidad — stubMessage no contiene datos falsos', () => {
     /\b(precio|valor)\s*(de|del)?\s*\d+/i, // "precio de 5000"
   ];
 
-  it('precio: stubMessage no contiene números que parezcan precios', () => {
+  it('precio: plan local expone una respuesta groundeada', async () => {
     const { planForcedIntent } = require('../chipIntentRouter.js');
     const plan = planForcedIntent('precio', 'papa');
-    expect(plan.stub).toBe(true);
+    expect(plan.stub).toBe(false);
+    expect(plan.localGrounding).toBe('precio_referencia');
+
+    const { buildPriceReferenceAnswer } = await import('../marketplaceService.js');
+    const msg = buildPriceReferenceAnswer(plan.args.producto);
+    expect(msg).toContain('SIPSA');
+    expect(msg).toContain('central de abastos');
+    expect(msg).toMatch(/\$\d[\d.]*–\$\d[\d.]* \/ kg/);
+  });
+
+  it('precio: sin dato verificable, la respuesta declina con honestidad', async () => {
+    const { buildPriceReferenceAnswer } = await import('../marketplaceService.js');
+    const msg = buildPriceReferenceAnswer('quinua');
+    expect(msg).toContain('No encontré una referencia SIPSA');
+    expect(msg).toContain('quinua');
     for (const pattern of DATA_LIKE_PATTERNS) {
-      expect(plan.stubMessage).not.toMatch(pattern);
-    }
-  });
-
-  it('precio: stubMessage menciona que no está disponible', () => {
-    const { planForcedIntent } = require('../chipIntentRouter.js');
-    const plan = planForcedIntent('precio', 'papa');
-    const msg = plan.stubMessage.toLowerCase();
-    // Debe contener palabras que indiquen indisponibilidad
-    expect(msg).toMatch(/no\s+(est[aá]|disponible|tiene|hay|puede)/i);
-    // No debe sonar a que la data existe pero no se muestra ("por ahora",
-    // "todavía", "aún no")
-    expect(msg).toMatch(/(por\s+ahora|todav[ií]a|a[uú]n\s+no)/i);
-  });
-
-  it('todos los CHIP_DEFS con stubMessage cumplen contrato de no-datos-falsos', () => {
-    const { CHIP_DEFS } = require('../chipIntentRouter.js');
-    for (const def of CHIP_DEFS) {
-      if (!def.stubMessage) continue;
-      for (const pattern of DATA_LIKE_PATTERNS) {
-        expect(def.stubMessage).not.toMatch(pattern);
-      }
-      expect(def.stubMessage).not.toMatch(/\$\s*\d+/);
+      expect(msg).not.toMatch(pattern);
     }
   });
 });
@@ -257,18 +248,18 @@ describe('mcp honestidad — _hasUnavailablePriceEvidence defensiva', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 6. Sin atribución falsa — sidecar responde con datos reales o nada
+// 6. Sin atribucion falsa
 // ---------------------------------------------------------------------------
-describe('mcp honestidad — sin atribución falsa', () => {
-  it('stubMessage de precio no dice "según SIPSA" ni "el DANE reporta"', () => {
+describe('mcp honestidad — sin atribucion falsa', () => {
+  it('precio local no atribuye al sidecar ni promete un backend fantasma', async () => {
     const { planForcedIntent } = require('../chipIntentRouter.js');
     const plan = planForcedIntent('precio', 'papa');
-    const msg = plan.stubMessage.toLowerCase();
-    // No debe afirmar que hay data de SIPSA (no la hay)
-    expect(msg).not.toMatch(/seg[uú]n\s+sipsa/);
-    expect(msg).not.toMatch(/dane\s+reporta/);
-    expect(msg).not.toMatch(/dane\s+dice/);
-    expect(msg).not.toMatch(/sipsa\s+(tiene|reporta|dice|muestra)/);
+    expect(plan.localGrounding).toBe('precio_referencia');
+    expect(plan.tool).toBeNull();
+    const { buildPriceReferenceAnswer } = await import('../marketplaceService.js');
+    const msg = buildPriceReferenceAnswer('papa');
+    expect(msg).toContain('SIPSA');
+    expect(msg).not.toMatch(/sidecar/i);
   });
 
   it('classifyQueryIntent no confunde precio con siembra', async () => {

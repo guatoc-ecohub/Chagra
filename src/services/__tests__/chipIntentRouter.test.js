@@ -376,19 +376,20 @@ describe('chipIntentRouter — grounding oscuro (chips antes SOLO alcanzables po
   });
 });
 
-describe('chipIntentRouter — intents STUB (backend no existe aún)', () => {
-  it('precio → stub claro "aún no disponible" (NO inventa backend de precio)', () => {
+describe('chipIntentRouter — intents local y stub', () => {
+  it('precio → localGrounding de referencia real (NO inventa backend de precio)', () => {
     const plan = planForcedIntent('precio', 'papa');
     expect(plan.intent).toBe('precio');
-    expect(plan.stub).toBe(true);
     expect(plan.tool).toBeNull();
-    expect(typeof plan.stubMessage).toBe('string');
-    expect(plan.stubMessage.toLowerCase()).toContain('no');
+    expect(plan.stub).toBe(false);
+    expect(plan.localGrounding).toBe('precio_referencia');
+    expect(plan.args).toEqual({ producto: 'papa' });
+    expect(plan.stubMessage).toBeNull();
     expect(plan.skipNlu).toBe(true);
   });
 
-  it('isStubIntent reconoce precio y deep como stub (B14: backend no disponible)', () => {
-    expect(isStubIntent('precio')).toBe(true);
+  it('isStubIntent reconoce solo deep como stub (precio ya es local)', () => {
+    expect(isStubIntent('precio')).toBe(false);
     // B14: investigacion profunda aun NO esta servible — es stub honesto
     expect(isStubIntent('deep')).toBe(true);
     expect(isStubIntent('siembro')).toBe(false);
@@ -402,7 +403,7 @@ describe('chipIntentRouter — Deep Research (B14: stub honesto, backend no serv
   it('deep → stub claro "aún no disponible" + skipNlu + tool null (NO path live)', () => {
     // B14: la investigacion profunda no tiene backend servible en prod (el job
     // async vive detras de VITE_DEEP_RESEARCH_ENABLED, off por defecto). El chip
-    // NO routea a un path "live": devuelve el mismo stub honesto que 'precio'.
+    // NO routea a un path "live": devuelve un stub honesto propio.
     const plan = planForcedIntent('deep', 'sistema agroforestal cacao');
     expect(plan.intent).toBe('deep');
     expect(plan.stub).toBe(true);
@@ -432,7 +433,7 @@ describe('chipIntentRouter — Deep Research (B14: stub honesto, backend no serv
     const deepDef = CHIP_DEFS.find((d) => d.intent === 'deep');
     expect(deepDef).toBeTruthy();
     expect(deepDef.kind).toBe('stub');
-    // Como stub, EXPONE stubMessage honesto (igual que 'precio').
+    // Como stub, EXPONE stubMessage honesto.
     expect(typeof deepDef.stubMessage).toBe('string');
     expect(deepDef.stubMessage.length).toBeGreaterThan(0);
   });
@@ -475,11 +476,12 @@ describe('chipIntentRouter — opts ruidosos no contaminan los args', () => {
     expect(plan.args).toEqual({ pest_id_or_name: 'broca' });
   });
 
-  it('precio ignora opts completamente (es stub)', () => {
+  it('precio conserva el texto como producto candidato y no depende de opts', () => {
     const plan = planForcedIntent('precio', 'papa', { municipio: 'Choachí' });
-    expect(plan.stub).toBe(true);
     expect(plan.tool).toBeNull();
-    expect(plan.args).toBeNull();
+    expect(plan.stub).toBe(false);
+    expect(plan.localGrounding).toBe('precio_referencia');
+    expect(plan.args).toEqual({ producto: 'papa' });
   });
 
   it('deep ignora opts completamente (es stub)', () => {
