@@ -31,6 +31,12 @@ import lecciones from '../../data/agro-lecciones.json';
 import todasLasCards from '../../data/agro-insight-cards.json';
 import InsightCard from './InsightCard.jsx';
 import ManoChagraGlyph from '../dashboard/ManoChagraGlyph.jsx';
+import LessonInfographic from '../LessonInfographic.jsx';
+import { aprenderInfografiaActivo } from '../../config/aprenderInfografiaFlag.js';
+
+// Infográfico por lección (PoC del audit triple: "cero gráficos"). Gateado
+// dev-only por VITE_APRENDER_INFOGRAFIA; se evalúa una sola vez (flag de build).
+const INFOGRAFIA_ACTIVA = aprenderInfografiaActivo();
 
 // Íconos por slug de lección
 const LECCION_ICONS = {
@@ -228,6 +234,14 @@ function LeccionView({ leccion, onBack, onAskAgent }) {
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {!mostrandoInsights ? (
           <>
+            {/* Infográfico de apertura (PoC audit triple: "cero gráficos").
+                Solo en el primer bloque, para introducir la lección de un
+                vistazo. Gateado dev-only (VITE_APRENDER_INFOGRAFIA); si la
+                lección no trae `infografia`, no se renderiza nada. */}
+            {INFOGRAFIA_ACTIVA && bloqueIdx === 0 && leccion.infografia && (
+              <LessonInfographic {...leccion.infografia} />
+            )}
+
             {/* Bloque actual */}
             <div
               data-testid="bloque-actual"
