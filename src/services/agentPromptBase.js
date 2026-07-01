@@ -359,23 +359,96 @@ sencillas. Si no sabes algo, sé honesto como siempre.
 /**
  * buildExpertModeBlock — bloque MODO_EXPERTO para respuesta técnica corta.
  *
- * No cambia la verdad agronómica; cambia el ángulo: más precisión, más
- * conceptos técnicos y menos metáfora de campo cuando el usuario ya pide
- * profundidad.
+ * Delega a buildModoExpertoBlock (estructurado) para mantener un solo punto
+ * de verdad. Sin grounding usa CONTRATO TÉCNICO genérico.
  *
  * @returns {string}
  */
 export function buildExpertModeBlock() {
-  return `=== MODO EXPERTO (registro técnico claro) ===
-Habla como agrónomo/a de extensión con criterio técnico:
-- Usa nombres científicos cuando aporten precisión.
-- Explica el porqué de la recomendación, no solo el qué.
-- Mantén frases claras, pero sin simplificar de más.
-- Si hay tradeoffs, nómbralos explícitamente.
-- Si un dato depende de zona, altitud, humedad o variedad, dilo.
+  return buildModoExpertoBlock({ nivelRespuestas: 'detallado', hasGrounding: false });
+}
 
-PRINCIPIO FUNDAMENTAL: no inventes precisión. Si falta evidencia, pide dato o foto.
-=== FIN MODO EXPERTO ===`;
+/**
+ * buildModoExpertoBlock — bloque MODO EXPERTO ESTRUCTURADO con CONTRATO
+ * verificable. Reemplaza el experto simple con un bloque que exige nombre
+ * científico, dosis con unidad, mecanismo de acción y piso térmico cuando
+ * el grounding lo provea.
+ *
+ * @param {object} opts
+ * @param {string} [opts.nivelRespuestas] — 'simple' | 'detallado'
+ * @param {boolean} [opts.hasGrounding] — si hay evidencia/tools en el turno
+ * @returns {string}
+ */
+export function buildModoExpertoBlock(opts = {}) {
+  const { nivelRespuestas = 'simple', hasGrounding = false } = opts;
+
+  if (nivelRespuestas !== 'detallado') return '';
+
+  const contrato = hasGrounding
+    ? `CONTRATO CITA: científico exacto de ENTIDADES RESUELTAS/DATOS VERIFICADOS, dosis con unidad (ej: 1x10^9 conidias/mL), mecanismo de acción, piso térmico si grounding la menciona.`
+    : `CONTRATO TÉCNICO: profundiza en por qué/factores/integración; si no hay datos del catálogo, dilo explícitamente.`;
+
+  return `=== MODO EXPERTO ===
+${contrato}
+PROHIBICIONES: NO uses técnica para disimular incertidumbre; NO inventes dosis/datos numéricos; NO mezcles datos de especies.
+RESPUESTA: preciso, citado cuando hay evidencia, honesto cuando no la haya.
+=== FIN ===`;
+}
+
+/**
+ * buildSourceFooter — pie de fuente DETERMINÍSTICO desde la procedencia del
+ * grounding. NO confía en que el modelo cite; genera el pie desde las
+ * entidades/tools que respondieron (AGE/RAG/SIPSA/IDEAM) en código.
+ *
+ * @param {object} opts
+ * @param {Array|object|null} [opts.toolEvidence] — evidencia de tools del turno
+ * @param {Array|null} [opts.resolvedEntities] — entidades resueltas por AGE
+ * @param {boolean} [opts.hasCorpus] — si hay corpus RAG en este turno
+ * @returns {string} pie de fuente, o '' si no hay fuentes
+ */
+export function buildSourceFooter(opts = {}) {
+  const { toolEvidence = null, resolvedEntities = null, hasCorpus = false } = opts;
+
+  const sources = [];
+
+  if (toolEvidence) {
+    const tools = Array.isArray(toolEvidence) ? toolEvidence : [toolEvidence];
+    for (const ev of tools) {
+      if (!ev || !ev.tool) continue;
+
+      const toolToSource = {
+        get_species: 'Catálogo Chagra (Apache AGE)',
+        get_companions: 'Catálogo Chagra (Apache AGE)',
+        get_pest_controllers: 'Grafo AGE (relaciones plagas-controles)',
+        get_biopreparados: 'Catálogo chagra-pro (biopreparados)',
+        get_normativa_ica: 'ICA (registro de agroquímicos)',
+        get_clima_ideam: 'IDEAM (estaciones climáticas)',
+        get_precio_sipsa: 'SIPSA/DANE (precios mayoristas)',
+        get_multihop_companions: 'Grafo AGE (companions multi-hop)',
+        validate_visual_match: 'Visión artificial (GLM-4.6)',
+        validate_taxonomy: 'Validación taxonómica AGE',
+      };
+
+      const source = toolToSource[ev.tool];
+      if (source && !sources.includes(source)) {
+        sources.push(source);
+      }
+    }
+  }
+
+  if (resolvedEntities && resolvedEntities.length > 0) {
+    if (!sources.includes('Catálogo Chagra (Apache AGE)')) {
+      sources.push('Catálogo Chagra (Apache AGE)');
+    }
+  }
+
+  if (hasCorpus) {
+    sources.push('Corpus agronómico regional');
+  }
+
+  if (sources.length === 0) return '';
+
+  return `\n\n---\n\nFuentes: ${sources.join(' + ')}.`;
 }
 
 /**
@@ -408,10 +481,10 @@ function normalizeMode(value) {
   return '';
 }
 
-export function buildResponseModeBlock(mode) {
+export function buildResponseModeBlock(mode, hasGrounding = false) {
   const normalized = normalizeMode(mode);
   if (normalized === 'campesino') return buildCampesinoModeBlock();
-  if (normalized === 'experto') return buildExpertModeBlock();
+  if (normalized === 'experto') return buildModoExpertoBlock({ nivelRespuestas: 'detallado', hasGrounding });
   if (normalized === 'maestro') return buildMasterModeBlock();
   return '';
 }
@@ -436,6 +509,9 @@ export function buildResponseModeBlock(mode) {
  * @param {string} [args.contextMemory] — historial inyectado (gatea glosarios y turn-aislamiento).
  * @param {boolean} [args.isEnum] — análisis NN2: ¿query enumerativa? (gatea CASO C completo).
  * @param {string} [args.nivelRespuestas] — 'simple' o 'detallado' (del perfil de usuario).
+ * @param {Array|object|null} [args.toolEvidence] — evidencia de tools (para pie de fuente).
+ * @param {Array|null} [args.resolvedEntities] — entidades resueltas (para pie de fuente).
+ * @param {boolean} [args.hasCorpus] — si hay corpus RAG (para pie de fuente).
  * @returns {string}
  */
 export function buildBasePrompt({
@@ -447,10 +523,14 @@ export function buildBasePrompt({
   contextMemory = '',
   isEnum = false,
   nivelRespuestas = '',
+  toolEvidence = null,
+  resolvedEntities = null,
+  hasCorpus = false,
 } = {}) {
   const mention = _strip(`${query}\n${contextMemory}`);
   const profileMode = normalizeMode(nivelRespuestas || getProfile()?.nivel_respuestas || '');
   const sections = [];
+  const hasGrounding = Boolean(toolEvidence || resolvedEntities || hasCorpus);
   const conversationContextPin = buildConversationContextPin(contextMemory);
 
   sections.push(`Eres Chagra IA, un asistente agroecológico colombiano. Habla como agrónomo experimentado, no como sistema. ${fincaContext}${indoorContext}El usuario tiene estas plantas agrupadas por especie con su conteo: ${plantContext}.`);
@@ -465,7 +545,7 @@ export function buildBasePrompt({
     sections.push(conversationContextPin);
   }
 
-  const responseModeBlock = buildResponseModeBlock(profileMode);
+  const responseModeBlock = buildResponseModeBlock(profileMode, hasGrounding);
   if (responseModeBlock) {
     sections.push(responseModeBlock);
   }
@@ -589,6 +669,13 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
   // buildResponseModeBlock arriba a partir de nivel_respuestas; NO reenviamos
   // nivelRespuestas a buildProfileContext para no duplicar el bloque de nivel.
   sections.push(buildProfileContext(finca, { climaQuery: CLIMA_QUERY_RE.test(mention) }));
+
+  if (profileMode === 'experto') {
+    const footer = buildSourceFooter({ toolEvidence, resolvedEntities, hasCorpus });
+    if (footer) {
+      sections.push(footer.replace(/^\n\n/, ''));
+    }
+  }
 
   return sections.join('\n\n');
 }
