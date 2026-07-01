@@ -54,14 +54,24 @@ describe('construirContacto', () => {
 
 describe('resolverPrecioReferencia (anti-alucinación)', () => {
   it('devuelve no disponible cuando no hay dato citado — NO inventa precios', () => {
-    // La tabla de referencia está vacía a la espera del DR de comercialización.
-    const r = resolverPrecioReferencia('tomate');
+    // 'quinua' no aparece en el boletín SIPSA citado en precioReferencia.js:
+    // sin dato verificable, debe deflectar, nunca fabricar una banda.
+    const r = resolverPrecioReferencia('quinua');
     expect(r.disponible).toBe(false);
     expect(r.banda).toBeUndefined();
   });
   it('no disponible para producto vacío', () => {
     expect(resolverPrecioReferencia('').disponible).toBe(false);
     expect(resolverPrecioReferencia(null).disponible).toBe(false);
+  });
+  it('devuelve la banda citada (SIPSA) cuando el producto SÍ tiene dato', () => {
+    // 'tomate' está en precioReferencia.js con fuente SIPSA/boletín fechado.
+    const r = resolverPrecioReferencia('tomate');
+    expect(r.disponible).toBe(true);
+    expect(r.banda).toMatch(/^\$[\d.]+–\$[\d.]+ \/ kg$/);
+    expect(r.mercado).toContain('Pereira');
+    expect(r.fuente).toBe('SIPSA');
+    expect(r.boletinFecha).toBe('2026-06-09');
   });
 });
 
