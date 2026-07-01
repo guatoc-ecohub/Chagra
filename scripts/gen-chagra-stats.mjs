@@ -74,7 +74,127 @@ export const DEFAULT_CATALOG_PATH = join(ROOT, 'catalog/chagra-catalog-oss-subse
 export const DEFAULT_GRAPH_SNAPSHOT_PATH = join(ROOT, 'src/data/graph-stats-snapshot.json');
 export const DEFAULT_OUTPUT_PATH = join(ROOT, 'public/chagra-stats.json');
 
-export const SCHEMA_VERSION = '1.0.0';
+// 1.1.0 agrega el bloque `capacidades` (estado real por función del ciclo de
+// vida) que consume el widget "El Ciclo Vivo". Aditivo: no rompe consumidores
+// del schema 1.0.0 (WelcomeStatsHero, chagra.bio) — solo agrega una clave.
+export const SCHEMA_VERSION = '1.1.0';
+
+// =============================================================================
+// Capacidades del ciclo de vida — FUENTE ÚNICA DE VERDAD del estado real de
+// cada función que muestra el widget "El Ciclo Vivo" (src/components/CicloVivo).
+//
+// Este bloque es el "interruptor" del pedido del operador: el widget pinta cada
+// chip según el `estado` que se declara AQUÍ. Cuando un artefacto que hoy está
+// 'parcial' o 'proximamente' se termina, se cambia SU estado a 'activo' en esta
+// tabla, se corre `npm run gen:stats` (o el prebuild), y el chip se enciende
+// solo en la UI — sin tocar el componente del widget. Ese es el corazón del
+// diseño: la UI es un reflejo de esta tabla, no una lista hardcodeada aparte.
+//
+// Estados:
+//   'activo'       -> función navegable y funcional end-to-end. Chip encendido,
+//                    navega a `view`.
+//   'parcial'      -> existe pero con stub / dato estático / cobertura incompleta
+//                    / canal en vivo tras flag. Chip atenuado con badge "parcial"
+//                    (sigue navegando si trae `view`).
+//   'proximamente' -> todavía no construido. Chip fantasma con "pronto", no navega.
+//
+// Los estados se asignaron VERIFICANDO el código (auditoría 2026-07-01), no por
+// suposición — regla dura anti-invento del repo. `view` es el slug del router
+// (App.jsx) al que navega el chip cuando aplica.
+//
+// Anti-leak: esta tabla es PÚBLICA (va a public/chagra-stats.json). Solo estados
+// y notas de producto en lenguaje de usuario. Prohibido nombres de host, rutas
+// de infraestructura, nombres de contenedor o de la base del grafo.
+// =============================================================================
+export const CAPABILITIES_STATUS = [
+  // -- Fase Semilla ----------------------------------------------------------
+  { id: 'que_siembro', estado: 'activo', view: 'directorio',
+    nota: 'Qué sembrar según su piso térmico, desde el directorio de especies.' },
+  { id: 'calendario_siembra', estado: 'activo', view: 'calendario_finca',
+    nota: 'Calendario por ciclos con plantillas fenológicas.' },
+  { id: 'viabilidad_semilla', estado: 'proximamente', view: null,
+    nota: 'Prueba de viabilidad de semilla guiada; aún no está disponible.' },
+  { id: 'saberes', estado: 'parcial', view: 'directorio',
+    nota: 'Saberes de origen en la ficha; cobertura del catálogo todavía escasa.' },
+
+  // -- Fase Germinación ------------------------------------------------------
+  { id: 'semilleros', estado: 'activo', view: 'germinacion',
+    nota: 'Guía y registro de semilleros por especie.' },
+  { id: 'riego_agua', estado: 'parcial', view: 'agente',
+    nota: 'Diagnóstico de agua y recordatorio de riego vía el agente; sin pantalla propia.' },
+  { id: 'cromatografia_suelo', estado: 'activo', view: 'cromatografia',
+    nota: 'Guía, registro con foto y comparación temporal; interpretación manual, sin IA.' },
+  { id: 'biopreparados', estado: 'activo', view: 'biopreparados',
+    nota: 'Galería de recetas con diagramas y datos de seguridad.' },
+
+  // -- Fase Crecimiento ------------------------------------------------------
+  { id: 'diagnostico_foto', estado: 'activo', view: 'agente',
+    nota: 'Tómele foto y el agente diagnostica con visión y contexto del catálogo.' },
+  { id: 'mip_plagas', estado: 'parcial', view: 'directorio',
+    nota: 'Plagas y control biológico en la ficha; cobertura del grafo incompleta.' },
+  { id: 'nutricion', estado: 'activo', view: 'ciclo_nutrientes',
+    nota: 'Ciclo de nutrientes con guía por etapa.' },
+  { id: 'asociaciones', estado: 'activo', view: 'asociaciones',
+    nota: 'Asociaciones y antagonismos entre cultivos.' },
+  { id: 'fenologia', estado: 'activo', view: 'ciclo',
+    nota: 'Deriva y confirma la etapa fenológica con línea de tiempo.' },
+
+  // -- Fase Floración --------------------------------------------------------
+  { id: 'polinizacion', estado: 'activo', view: 'animales_abejas',
+    nota: 'Abejas y polinización con registro de colmena.' },
+  { id: 'clima', estado: 'parcial', view: 'agente',
+    nota: 'Alertas de clima y heladas; el canal en vivo depende de disponibilidad.' },
+
+  // -- Fase Fructificación ---------------------------------------------------
+  { id: 'insumos', estado: 'activo', view: 'insumos',
+    nota: 'Registro de insumos aplicados al cultivo.' },
+
+  // -- Fase Cosecha ----------------------------------------------------------
+  { id: 'registrar_cosecha', estado: 'activo', view: 'cosechar',
+    nota: 'Registro de cosecha por planta o lote.' },
+  { id: 'precio_sipsa', estado: 'parcial', view: 'mercado',
+    nota: 'Precio de referencia DANE-SIPSA en foto estática; canal en vivo tras flag.' },
+  { id: 'mercado', estado: 'activo', view: 'mercado',
+    nota: 'Marketplace de circuitos cortos, sin precios inventados.' },
+
+  // -- Fase Poscosecha -------------------------------------------------------
+  { id: 'guardar_semilla', estado: 'proximamente', view: null,
+    nota: 'Banco de semilla propia con trazabilidad; aún no está disponible.' },
+  { id: 'ciclo_cerrado', estado: 'parcial', view: 'ciclo_nutrientes',
+    nota: 'Devolver nutrientes al suelo; hoy educativo, sin recomendación automática.' },
+  { id: 'bitacora', estado: 'activo', view: 'bitacora',
+    nota: 'Bitácora de la finca; el ciclo de aprendizaje automático está en camino.' },
+
+  // -- Motor del agente (transversal, no es un chip de fase) -----------------
+  { id: 'rag_grounding', estado: 'parcial', view: 'agente',
+    nota: 'El agente responde apoyado en el corpus; verificación por DOI en expansión.' },
+  { id: 'action_loop', estado: 'parcial', view: 'agente',
+    nota: 'Ejecuta acciones (registrar, agendar) con su confirmación; nivel 1.' },
+];
+
+const CAPABILITY_ESTADOS = new Set(['activo', 'parcial', 'proximamente']);
+
+/**
+ * Construye el mapa `capacidades` (keyed by id) que va al JSON público. Puro:
+ * no toca disco. Valida que cada estado sea uno de los tres permitidos (falla
+ * ruidoso ante un typo, en vez de shippear un estado que el widget no sabe
+ * pintar). Devuelve un objeto en el mismo orden de declaración.
+ *
+ * @param {Array<{id:string, estado:string, nota:string, view?:string|null}>} [decls]
+ * @returns {Record<string, {estado:string, nota:string, view:string|null}>}
+ */
+export function computeCapabilities(decls = CAPABILITIES_STATUS) {
+  const out = {};
+  for (const c of decls) {
+    if (!c || !c.id) throw new Error('[capacidades] declaración sin id');
+    if (!CAPABILITY_ESTADOS.has(c.estado)) {
+      throw new Error(`[capacidades] estado inválido "${c.estado}" en "${c.id}"`);
+    }
+    if (out[c.id]) throw new Error(`[capacidades] id duplicado "${c.id}"`);
+    out[c.id] = { estado: c.estado, nota: c.nota || '', view: c.view || null };
+  }
+  return out;
+}
 
 // =============================================================================
 // Helpers puros
@@ -175,6 +295,10 @@ export function buildStats({ catalog, graphSnapshot, generatedAt }) {
     schema_version: SCHEMA_VERSION,
     catalogo,
     grafo,
+    // Estado real por función del ciclo de vida — lo consume el widget
+    // "El Ciclo Vivo" para encender/atenuar/apagar cada chip. Ver
+    // CAPABILITIES_STATUS arriba (único lugar donde se cambia un estado).
+    capacidades: computeCapabilities(),
     verificacion: {
       // Moat del producto: % de aristas CONTROLS (biopreparado -> plaga)
       // corroboradas contra OpenAlex con DOI real. Ver auditoría 2026-06-28.

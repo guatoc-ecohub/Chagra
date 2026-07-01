@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-01T19:10:38.824Z",
-  "schema_version": "1.0.0",
+  "generated_at": "2026-07-01T22:14:55.258Z",
+  "schema_version": "1.1.0",
   "catalogo": {
     "especies": 530,
     "biopreparados": 36,
@@ -113,6 +113,128 @@
         "numerador": null,
         "denominador": null
       }
+    }
+  },
+  "capacidades": {
+    "que_siembro": {
+      "estado": "activo",
+      "nota": "Qué sembrar según su piso térmico, desde el directorio de especies.",
+      "view": "directorio"
+    },
+    "calendario_siembra": {
+      "estado": "activo",
+      "nota": "Calendario por ciclos con plantillas fenológicas.",
+      "view": "calendario_finca"
+    },
+    "viabilidad_semilla": {
+      "estado": "proximamente",
+      "nota": "Prueba de viabilidad de semilla guiada; aún no está disponible.",
+      "view": null
+    },
+    "saberes": {
+      "estado": "parcial",
+      "nota": "Saberes de origen en la ficha; cobertura del catálogo todavía escasa.",
+      "view": "directorio"
+    },
+    "semilleros": {
+      "estado": "activo",
+      "nota": "Guía y registro de semilleros por especie.",
+      "view": "germinacion"
+    },
+    "riego_agua": {
+      "estado": "parcial",
+      "nota": "Diagnóstico de agua y recordatorio de riego vía el agente; sin pantalla propia.",
+      "view": "agente"
+    },
+    "cromatografia_suelo": {
+      "estado": "activo",
+      "nota": "Guía, registro con foto y comparación temporal; interpretación manual, sin IA.",
+      "view": "cromatografia"
+    },
+    "biopreparados": {
+      "estado": "activo",
+      "nota": "Galería de recetas con diagramas y datos de seguridad.",
+      "view": "biopreparados"
+    },
+    "diagnostico_foto": {
+      "estado": "activo",
+      "nota": "Tómele foto y el agente diagnostica con visión y contexto del catálogo.",
+      "view": "agente"
+    },
+    "mip_plagas": {
+      "estado": "parcial",
+      "nota": "Plagas y control biológico en la ficha; cobertura del grafo incompleta.",
+      "view": "directorio"
+    },
+    "nutricion": {
+      "estado": "activo",
+      "nota": "Ciclo de nutrientes con guía por etapa.",
+      "view": "ciclo_nutrientes"
+    },
+    "asociaciones": {
+      "estado": "activo",
+      "nota": "Asociaciones y antagonismos entre cultivos.",
+      "view": "asociaciones"
+    },
+    "fenologia": {
+      "estado": "activo",
+      "nota": "Deriva y confirma la etapa fenológica con línea de tiempo.",
+      "view": "ciclo"
+    },
+    "polinizacion": {
+      "estado": "activo",
+      "nota": "Abejas y polinización con registro de colmena.",
+      "view": "animales_abejas"
+    },
+    "clima": {
+      "estado": "parcial",
+      "nota": "Alertas de clima y heladas; el canal en vivo depende de disponibilidad.",
+      "view": "agente"
+    },
+    "insumos": {
+      "estado": "activo",
+      "nota": "Registro de insumos aplicados al cultivo.",
+      "view": "insumos"
+    },
+    "registrar_cosecha": {
+      "estado": "activo",
+      "nota": "Registro de cosecha por planta o lote.",
+      "view": "cosechar"
+    },
+    "precio_sipsa": {
+      "estado": "parcial",
+      "nota": "Precio de referencia DANE-SIPSA en foto estática; canal en vivo tras flag.",
+      "view": "mercado"
+    },
+    "mercado": {
+      "estado": "activo",
+      "nota": "Marketplace de circuitos cortos, sin precios inventados.",
+      "view": "mercado"
+    },
+    "guardar_semilla": {
+      "estado": "proximamente",
+      "nota": "Banco de semilla propia con trazabilidad; aún no está disponible.",
+      "view": null
+    },
+    "ciclo_cerrado": {
+      "estado": "parcial",
+      "nota": "Devolver nutrientes al suelo; hoy educativo, sin recomendación automática.",
+      "view": "ciclo_nutrientes"
+    },
+    "bitacora": {
+      "estado": "activo",
+      "nota": "Bitácora de la finca; el ciclo de aprendizaje automático está en camino.",
+      "view": "bitacora"
+    },
+    "rag_grounding": {
+      "estado": "parcial",
+      "nota": "El agente responde apoyado en el corpus; verificación por DOI en expansión.",
+      "view": "agente"
+    },
+    "action_loop": {
+      "estado": "parcial",
+      "nota": "Ejecuta acciones (registrar, agendar) con su confirmación; nivel 1.",
+      "view": "agente"
     }
   },
   "verificacion": {

@@ -105,6 +105,7 @@ const CalendarioFincaScreen = lazy(() => import('./components/CalendarioFincaScr
 const SeguimientoProcesoScreen = lazy(() => import('./components/SeguimientoProcesoScreen'));
 const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
 const CromatografiaScreen = lazy(() => import('./components/CromatografiaScreen'));
+const CicloVivoFullView = lazy(() => import('./components/CicloVivo/CicloVivoFullView'));
 const ToxicologiaScreen = lazy(() => import('./components/ToxicologiaScreen'));
 const MercadosScreen = lazy(() => import('./components/MercadosScreen'));
 const GlaciarReporteScreen = lazy(() => import('./components/GlaciarReporteScreen'));
@@ -155,6 +156,7 @@ const LoadingFallback = () => (
 
 const HASH_VIEW_ROUTES = {
   agente: 'agente',
+  'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
   inventario: 'activos',
   activos: 'activos',
@@ -209,7 +211,7 @@ const MODULE_VIEWS = new Set([
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'toxicologia', 'aprende', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
-  'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia',
+  'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
   'usage_stats', 'mercado', 'auditoria_inventario',
 ]);
 
@@ -1231,6 +1233,16 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Cromatografia de Suelo">
               <CromatografiaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'ciclo_vivo':
+        // "El Ciclo Vivo": la rueda de las 7 fases. Cada chip de función se
+        // pinta según su estado real en la fuente de verdad (chagra-stats.json).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El Ciclo Vivo">
+              <CicloVivoFullView onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );

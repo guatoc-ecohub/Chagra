@@ -15,7 +15,9 @@ import { dirname, join } from 'node:path';
 import {
   computeCatalogStats,
   computeGraphStats,
+  computeCapabilities,
   buildStats,
+  CAPABILITIES_STATUS,
   DEFAULT_CATALOG_PATH,
   DEFAULT_GRAPH_SNAPSHOT_PATH,
   DEFAULT_OUTPUT_PATH,
@@ -111,10 +113,27 @@ describe('buildStats', () => {
 
   it('tiene el schema top-level esperado', () => {
     expect(Object.keys(stats).sort()).toEqual(
-      ['_fuente', 'catalogo', 'generated_at', 'grafo', 'schema_version', 'verificacion'].sort(),
+      ['_fuente', 'capacidades', 'catalogo', 'generated_at', 'grafo', 'schema_version', 'verificacion'].sort(),
     );
     expect(stats.schema_version).toBe(SCHEMA_VERSION);
     expect(stats.generated_at).toBe('2026-07-01T00:00:00.000Z');
+  });
+
+  it('incluye el bloque capacidades con las 13 funciones nombradas del pedido', () => {
+    const nombradas = [
+      'diagnostico_foto', 'mip_plagas', 'biopreparados', 'calendario_siembra', 'fenologia',
+      'riego_agua', 'nutricion', 'polinizacion', 'precio_sipsa', 'cromatografia_suelo',
+      'saberes', 'rag_grounding', 'action_loop',
+    ];
+    for (const id of nombradas) {
+      expect(stats.capacidades[id], `falta capacidad ${id}`).toBeTruthy();
+      expect(['activo', 'parcial', 'proximamente']).toContain(stats.capacidades[id].estado);
+    }
+    // Estados verificados contra el código (auditoría 2026-07-01).
+    expect(stats.capacidades.precio_sipsa.estado).toBe('parcial');
+    expect(stats.capacidades.rag_grounding.estado).toBe('parcial');
+    expect(stats.capacidades.action_loop.estado).toBe('parcial');
+    expect(stats.capacidades.biopreparados.estado).toBe('activo');
   });
 
   it('calcula verificacion.doi_pct desde controls (no lo repite del snapshot)', () => {
@@ -138,6 +157,43 @@ describe('buildStats', () => {
     // estricto, más abajo — ver describe('anti-leak — mecanismo interno...').
     const json = JSON.stringify(stats);
     expect(json).not.toMatch(/10\.88\.|password|token|bearer|secret|chagra-pro/i);
+  });
+});
+
+describe('computeCapabilities', () => {
+  it('devuelve un objeto keyed by id con estado/nota/view', () => {
+    const caps = computeCapabilities();
+    expect(Object.keys(caps).length).toBe(CAPABILITIES_STATUS.length);
+    for (const [id, c] of Object.entries(caps)) {
+      expect(typeof id).toBe('string');
+      expect(['activo', 'parcial', 'proximamente']).toContain(c.estado);
+      expect(c).toHaveProperty('nota');
+      expect(c).toHaveProperty('view');
+    }
+  });
+
+  it('cubre las tres categorías de estado (activo, parcial y proximamente)', () => {
+    const caps = computeCapabilities();
+    const estados = new Set(Object.values(caps).map((c) => c.estado));
+    expect(estados.has('activo')).toBe(true);
+    expect(estados.has('parcial')).toBe(true);
+    expect(estados.has('proximamente')).toBe(true);
+  });
+
+  it('falla ruidoso ante un estado inválido (evita shippear un chip impintable)', () => {
+    expect(() => computeCapabilities([{ id: 'x', estado: 'listo', nota: '' }])).toThrow(/estado inválido/);
+  });
+
+  it('falla ante ids duplicados', () => {
+    expect(() => computeCapabilities([
+      { id: 'x', estado: 'activo', nota: '' },
+      { id: 'x', estado: 'parcial', nota: '' },
+    ])).toThrow(/duplicado/);
+  });
+
+  it('no filtra infraestructura en las notas (anti-leak)', () => {
+    const json = JSON.stringify(computeCapabilities());
+    expect(json).not.toMatch(/alpha|postgres|chagra_kg|farmos|10\.88\.|sidecar/i);
   });
 });
 
