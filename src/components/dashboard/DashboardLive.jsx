@@ -57,6 +57,7 @@ import './dashboard-resto-redistribucion.css';
 // viva; se auto-oculta si no hay casos activos (KISS, zero footprint). Ref:
 // CAPABILITIES_STATUS.md §2.
 import CaseStudyTopWidget from '../CaseStudyTopWidget';
+import CicloVivoWidget from '../CicloVivo/CicloVivoWidget';
 import ClimaStrip from './ClimaStrip';
 import HoyEnFincaStrip from './HoyEnFincaStrip';
 import AIStatusFooter from './AIStatusFooter';
@@ -708,6 +709,13 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                     </div>
                 </div>
 
+                {/* El Ciclo Vivo: portal a la rueda de las 7 fases. Estado real
+                    por función desde chagra-stats.json (se enciende solo). */}
+                <div className="px-4 pt-3 fvh-resto-block">
+                    {blockLabel('El ciclo de su cultivo', 'from-amber-400 to-lime-400')}
+                    <CicloVivoWidget onNavigate={onNavigate} />
+                </div>
+
                 {/* Top problemas activos (casos de estudio, DR-044). Se auto-oculta
                     si no hay casos → zero footprint. Va tras el estado del día. */}
                 <div className="px-4 pt-3 fvh-resto-block">
@@ -844,6 +852,12 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                     <MiFincaVivaHomeCard onNavigate={onNavigate} />
                 </div>
             )}
+
+            {/* El Ciclo Vivo: portal a la rueda de las 7 fases (estado real por
+                función desde chagra-stats.json). */}
+            <div className="px-4 pt-3">
+                <CicloVivoWidget onNavigate={onNavigate} />
+            </div>
 
             {/* Top problemas activos (casos de estudio). */}
             <div className="px-4 pt-3">
