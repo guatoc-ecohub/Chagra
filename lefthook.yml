@@ -100,13 +100,29 @@ pre-commit:
         [ -z "$filtered" ] && exit 0
         # Límites de palabra que incluyen tildes (evita Sácama→sacá, etc.).
         L="a-zA-ZáéíóúüñÁÉÍÓÚÜÑ"
-        hits=$(echo "$filtered" | xargs grep -lEi "(^|[^$L])(tenés|querés|podés|sabés|hacés|ponés|venís|decís|vivís|empezá|mirá|probá|sembrá|cuidá|anotá|tocá|hacé|poné|dejá|llevá|sacá|buscá|revisá|recogé|aprendé|mandá|contá|esperá|fijate|quedate|acordate|preparale)([^$L]|\$)" 2>/dev/null || true)
+        hits=$(echo "$filtered" | xargs grep -lEi "(^|[^$L])(tenés|querés|podés|sabés|hacés|ponés|venís|decís|vivís|empezá|mirá|probá|sembrá|cuidá|anotá|tocá|hacé|poné|dejá|llevá|sacá|buscá|revisá|recogé|aprendé|mandá|contá|esperá|fijate|quedate|acordate|preparale|usá)([^$L]|\$)" 2>/dev/null || true)
         if [ -n "$hits" ]; then
           echo "✗ Voseo argentino en strings/código (usar tú/usted Colombia):"
           echo "$hits"
           echo "El filtro runtime NO cubre strings estáticos — corrígelo en la fuente (ver voseoFilter.js)."
           exit 1
         fi
+
+    voseo-scan-code-comments:
+      # Complementa voseo-scan (arriba): ese guard mira el ARCHIVO COMPLETO
+      # pero solo dentro de src/**. Este guard cubre el hueco real donde el
+      # voseo se cuela PR tras PR: comentarios de desarrollador y mensajes de
+      # CLI/error en .js/.jsx/.mjs/.ts/.tsx de TODO el repo (scripts/, eval/,
+      # tests/, no solo src/). Solo mira LÍNEAS AGREGADAS del diff (no el
+      # archivo completo) porque suma "acá"/"usá" a la lista — formas que no
+      # se banean a nivel de archivo completo por ser ambiguas en prosa de
+      # cara al usuario (ver docstring de voseoFilter.js) y por aparecer ya
+      # de forma masiva y legítima en comentarios existentes de este repo.
+      # Detalle de diseño + lista completa de formas cubiertas:
+      # scripts/scan-voseo-comments.mjs.
+      tags: i18n
+      glob: "*.{js,jsx,mjs,ts,tsx}"
+      run: node scripts/scan-voseo-comments.mjs {staged_files}
 
     eslint:
       glob: "*.{js,jsx,ts,tsx}"
