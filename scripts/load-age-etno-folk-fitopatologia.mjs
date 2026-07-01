@@ -9,10 +9,10 @@
  *
  * Por defecto usa el patrón del resto del repo:
  *   - si `CHAGRA_AGE_PSQL_COMMAND` está definido, lo usa tal cual
- *   - si no, usa `sudo podman exec -i postgres-farm psql ...`
+ *   - si no, arma `sudo podman exec -i <container> psql ...` desde CHAGRA_DB_*
  *
  * Requiere:
- *   - acceso al host donde corre `postgres-farm`
+ *   - acceso al host donde corre el contenedor de base de datos
  *   - AGE disponible en `chagra_kg`
  *   - PGPASSWORD en el entorno si el comando lo necesita
  */
@@ -21,6 +21,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { buildPreflightSummary } from './age-etno-preflight.mjs';
+import { getDbCmd } from './lib/db-cmd.mjs';
 
 const DEFAULT_SQL_PATH = process.env.CHAGRA_AGE_ETNO_SQL || '';
 
@@ -46,32 +47,33 @@ export function parseArgs(argv) {
   return opts;
 }
 
-export function buildPsqlInvocation() {
-  const override = process.env.CHAGRA_AGE_PSQL_COMMAND;
+export function buildPsqlInvocation(env = process.env) {
+  const override = env.CHAGRA_AGE_PSQL_COMMAND;
   if (override) {
     return { kind: 'shell', command: override };
   }
+  const dbCmd = getDbCmd(env);
   return {
     kind: 'podman',
-    file: 'sudo',
-    args: ['podman', 'exec', '-i', 'postgres-farm', 'psql', '-U', 'farmos', '-d', 'chagra_kg', '-v', 'ON_ERROR_STOP=1', '-f', '-'],
+    file: dbCmd.file,
+    args: [...dbCmd.args, '-v', 'ON_ERROR_STOP=1', '-f', '-'],
   };
 }
 
-export function runSql(sql) {
-  const inv = buildPsqlInvocation();
+export function runSql(sql, env = process.env) {
+  const inv = buildPsqlInvocation(env);
   if (inv.kind === 'shell') {
     return spawnSync(inv.command, {
       input: sql,
       encoding: 'utf8',
       shell: true,
-      env: process.env,
+      env,
     });
   }
   return spawnSync(inv.file, inv.args, {
     input: sql,
     encoding: 'utf8',
-    env: process.env,
+    env,
   });
 }
 
@@ -85,8 +87,8 @@ export function buildVerificationSql(graph = 'chagra_kg') {
   ].join('\n');
 }
 
-export function buildRunReport(summary, opts) {
-  const inv = buildPsqlInvocation();
+export function buildRunReport(summary, opts, env = process.env) {
+  const inv = buildPsqlInvocation(env);
   const psqlCmd = inv.kind === 'shell' ? inv.command : `${inv.file} ${inv.args.join(' ')}`;
   const mode = opts.preflightOnly ? 'preflight-only'
     : opts.dryRun ? 'dry-run'
@@ -110,8 +112,8 @@ export function buildRunReport(summary, opts) {
   };
 }
 
-export function printRunReport(summary, opts) {
-  const report = buildRunReport(summary, opts);
+export function printRunReport(summary, opts, env = process.env) {
+  const report = buildRunReport(summary, opts, env);
   const lines = [
     `[age-etno] mode=${report.mode}`,
     `[age-etno] sql=${report.sqlPath}`,
@@ -153,9 +155,9 @@ export function main(argv = process.argv.slice(2)) {
 
   const summary = buildPreflightSummary();
   if (opts.json) {
-    console.log(JSON.stringify(buildRunReport(summary, opts), null, 2));
+    console.log(JSON.stringify(buildRunReport(summary, opts, process.env), null, 2));
   } else {
-    printRunReport(summary, opts);
+    printRunReport(summary, opts, process.env);
   }
 
   if (!summary.ready && !opts.force) {
@@ -176,7 +178,7 @@ export function main(argv = process.argv.slice(2)) {
   }
 
   // Pipeamos el CONTENIDO del SQL (no `\i <ruta>`): psql corre DENTRO del
-  // contenedor postgres-farm y una ruta del host no existiría en su filesystem.
+  // contenedor y una ruta del host no existiría en su filesystem.
   const sql = readFileSync(resolve(process.cwd(), opts.sql), 'utf8');
   const result = runSql(sql);
   if (result.error) {
@@ -201,5 +203,10 @@ export function main(argv = process.argv.slice(2)) {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  process.exitCode = main();
+  try {
+    process.exitCode = main();
+  } catch (e) {
+    console.error('[age-etno] ' + e.message);
+    process.exitCode = 2;
+  }
 }

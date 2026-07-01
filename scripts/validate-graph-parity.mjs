@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
+import { getDbCmd } from './lib/db-cmd.mjs';
 
 const DEFAULT_GRAPH = 'chagra_kg';
 
@@ -75,33 +76,21 @@ export function formatGraphParityReport(rows) {
   return lines.join('\n');
 }
 
-export function runPsql(sql) {
-  const command = process.env.CHAGRA_AGE_PSQL_COMMAND;
+export function runPsql(sql, env = process.env) {
+  const command = env.CHAGRA_AGE_PSQL_COMMAND;
   if (command) {
     return spawnSync(command, {
       input: sql,
       encoding: 'utf8',
       shell: true,
-      env: process.env,
+      env,
     });
   }
-  return spawnSync('sudo', [
-    'podman',
-    'exec',
-    '-i',
-    'postgres-farm',
-    'psql',
-    '-U',
-    'farmos',
-    '-d',
-    'chagra_kg',
-    '-At',
-    '-F',
-    '\t',
-  ], {
+  const dbCmd = getDbCmd(env);
+  return spawnSync(dbCmd.file, [...dbCmd.args, '-At', '-F', '\t'], {
     input: sql,
     encoding: 'utf8',
-    env: process.env,
+    env,
   });
 }
 
@@ -142,5 +131,10 @@ export function main(argv = process.argv.slice(2)) {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  process.exitCode = main();
+  try {
+    process.exitCode = main();
+  } catch (e) {
+    console.error('[graph-parity] ' + e.message);
+    process.exitCode = 2;
+  }
 }

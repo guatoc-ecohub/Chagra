@@ -308,22 +308,22 @@ describe('formatReportText', () => {
 
 describe('buildPsqlInvocation', () => {
   it('usa sudo podman exec por defecto cuando no hay override', () => {
-    const prev = process.env.CHAGRA_AGE_PSQL_COMMAND;
-    delete process.env.CHAGRA_AGE_PSQL_COMMAND;
-    const inv = buildPsqlInvocation();
-    if (prev !== undefined) process.env.CHAGRA_AGE_PSQL_COMMAND = prev;
+    const inv = buildPsqlInvocation({
+      CHAGRA_DB_CONTAINER: 'db-container',
+      CHAGRA_DB_USER: 'db-user',
+      CHAGRA_DB_NAME: 'db-name',
+    });
     expect(inv.kind).toBe('podman');
     expect(inv.file).toBe('sudo');
-    expect(inv.args).toContain('postgres-farm');
-    expect(inv.args).toContain('chagra_kg');
+    expect(inv.args).toContain('db-container');
+    expect(inv.args).toContain('db-user');
+    expect(inv.args).toContain('db-name');
   });
 
   it('respeta CHAGRA_AGE_PSQL_COMMAND cuando esta definido', () => {
-    const prev = process.env.CHAGRA_AGE_PSQL_COMMAND;
-    process.env.CHAGRA_AGE_PSQL_COMMAND = 'psql -h 127.0.0.1 -U farmos -d chagra_kg';
-    const inv = buildPsqlInvocation();
-    if (prev !== undefined) process.env.CHAGRA_AGE_PSQL_COMMAND = prev;
-    else delete process.env.CHAGRA_AGE_PSQL_COMMAND;
+    const inv = buildPsqlInvocation({
+      CHAGRA_AGE_PSQL_COMMAND: 'psql -h 127.0.0.1 -U farmos -d chagra_kg',
+    });
     expect(inv.kind).toBe('shell');
     expect(inv.command).toContain('psql -h 127.0.0.1');
   });
