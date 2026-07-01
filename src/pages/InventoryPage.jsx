@@ -19,7 +19,7 @@
  * ScreenShell para navegación back/home), accesible desde la Bodega
  * ('bodega') vía el botón "Auditoría y reconciliación" del header.
  *
- * Role-gate recomendado (no implementado acá):
+ * Role-gate recomendado (no implementado aquí):
  *   - Solo usuarios con rol 'operador' o superior
  *   - Owner ve todos los items
  *   - Operadores comunes ven solo items que aplican a sus parcelas (futuro)

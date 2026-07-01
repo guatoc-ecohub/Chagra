@@ -13,13 +13,13 @@
  *
  * Este módulo es PURO (sin red, sin React, sin localStorage): mapea un perfil
  * de usuario → la lista de módulos del home + las tarjetas de seguimiento que
- * le corresponden. Toda la lógica vive acá para testearla en aislamiento
+ * le corresponden. Toda la lógica vive aquí para testearla en aislamiento
  * (TDD), igual que `profileChipSelector.selectChipIntents`.
  *
  * REUSO: la derivación de ROL vive en `profileChipSelector.deriveRole` (fuente
  * única — no se duplica). Este módulo la importa y mapea cada rol a su set de
  * módulos. El gating de seguridad del módulo glaciar (whitelist La Cordada)
- * NO vive acá: el tile glaciar tiene su propio gate (`glaciarAccess`).
+ * NO vive aquí: el tile glaciar tiene su propio gate (`glaciarAccess`).
  *
  * RESPETO A #1560/#7003: este módulo SOLO calcula el DEFAULT por perfil. Si el
  * usuario guardó una preferencia manual de visibilidad en `ProfileScreen`, esa
@@ -36,9 +36,9 @@ import { deriveRole, profileTieneAnimales, PROFILE_ROLES } from './profileChipSe
 /**
  * IDs de los módulos del Home (deben coincidir con `HOME_MODULES` de
  * userProfileService + `SECTION_COMPONENTS` de DashboardLive). Fuente de
- * verdad de los ids: userProfileService.HOME_MODULES — acá solo los nombramos
+ * verdad de los ids: userProfileService.HOME_MODULES — aquí solo los nombramos
  * para los sets por rol. Si se agrega un módulo nuevo allá, agregarlo al set
- * del rol que lo necesite acá (default fail-open en el call-site lo cubre
+ * del rol que lo necesite aquí (default fail-open en el call-site lo cubre
  * mientras tanto).
  *
  * @enum {string}
@@ -68,7 +68,7 @@ export const ALL_HOME_MODULES = Object.freeze(Object.values(HOME_MODULE_IDS));
 /**
  * Keys de las 4 tarjetas de SEGUIMIENTO de procesos de finca. Deben coincidir
  * con las `key` de `config/seguimientoProcesos.js` (reforestacion ·
- * silvopastoreo · paramo · cerdos). Las nombramos acá para no acoplar este
+ * silvopastoreo · paramo · cerdos). Las nombramos aquí para no acoplar este
  * módulo puro al import del catálogo de seguimiento (que arrastra estilos).
  *
  * @enum {string}

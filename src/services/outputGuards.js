@@ -631,7 +631,7 @@ const DOSE_PATTERNS = [
  *
  * Anti-sobre-supresión: la dosis sola (respuesta orgánica con "2 kg de compost")
  * NO basta — hace falta el token sintético. Un biopreparado permitido nunca es
- * sintético (no entra acá).
+ * sintético (no entra aquí).
  *
  * @param {string} norm  texto ya normalizado (minúsculas, sin tildes).
  * @returns {boolean}
@@ -815,7 +815,7 @@ const FUEL_AS_ADJUVANT_RE =
  * ¿El texto normalizado usa un combustible/solvente como adyuvante de un preparado
  * CON una dosis (o con un verbo de mezcla/adherencia)? Esa conjunción delata la
  * RECETA peligrosa de BORDE-020 que debe SUPRIMIRSE. Anti-sobre-supresión: sin el
- * verbo de mezcla/adherencia ni dosis (p.ej. "no le eches diésel") no entra acá; la
+ * verbo de mezcla/adherencia ni dosis (p.ej. "no le eches diésel") no entra aquí; la
  * advertencia de no-usar la corta el gate `esAdvertenciaNoUsar` en el guard.
  *
  * @param {string} norm  texto normalizado (minúsculas, sin tildes).
@@ -1033,7 +1033,7 @@ export function guardSyntheticAgrochemical(responseText, _resolvedEntities = nul
   // devolvemos SOLO el bloque de redirección orgánica. Append-only dejaba la
   // dosis sintética legible debajo del aviso (el campesino igual la leía). La
   // supresión SOLO dispara con sintético + dosis: una respuesta orgánica con
-  // cantidades ("2 kg de compost", "1 L de biol por planta") NO entra acá
+  // cantidades ("2 kg de compost", "1 L de biol por planta") NO entra aquí
   // (`_hasSyntheticFertilizerDose` exige un token SINTÉTICO, no orgánico).
   if (_hasSyntheticFertilizerDose(norm)) {
     return {
@@ -3898,7 +3898,7 @@ const DIFFERENTIAL_PHRASING_RE =
  * oración o conector), colisionan con "Género" de un binomio y producirían
  * falsos positivos en `_namesLatinBinomial` ("Mientras tanto", "Para saber",
  * "Una mancha", "Esas hojas"). Normalizadas sin tildes/case. NO son géneros
- * latinos; si el "Género" candidato está acá, no cuenta como binomio.
+ * latinos; si el "Género" candidato está aquí, no cuenta como binomio.
  */
 const BINOMIAL_GENUS_STOPWORDS = new Set([
   'mientras', 'para', 'una', 'unas', 'unos', 'esas', 'esos', 'esta', 'este', 'estas',
@@ -4023,7 +4023,7 @@ export function guardDiagnosisWithoutPhoto(
   //   (c) fraseo diferencial enumerando candidatos.
   // Un solo patógeno confiado ("es tizón tardío") es el caso MÁS dañino: manda
   // a tratar a ciegas con plena seguridad. Una respuesta que solo da manejo
-  // cultural genérico (sin patógeno ni latín) NO entra acá.
+  // cultural genérico (sin patógeno ni latín) NO entra aquí.
   let nombraPatogeno = false;
   for (const term of PATHOGEN_NAME_TERMS) {
     if (norm.includes(term)) { nombraPatogeno = true; break; }
@@ -5748,7 +5748,7 @@ export function guardSurfaceConfusionWarning(responseText, resolvedEntities = nu
   }
 
   // Sin confusión tóxica crítica activa → no tocamos nada (anti-FP central: un
-  // alimento seguro con consejo de consumo crudo —lechuga, lulo— NO entra acá).
+  // alimento seguro con consejo de consumo crudo —lechuga, lulo— NO entra aquí).
   if (!toxicCw) {
     return { text: responseText, modified: false, reason: null };
   }
@@ -6182,7 +6182,7 @@ function _extractAltitudesWide(norm) {
   const reUnit = /\b(\d{1,2}[.,]?\d{3}|\d{2,4})\s*(m|msnm|metros|mts)\b/g;
   let m;
   while ((m = reUnit.exec(norm)) !== null) {
-    // Excluir falsos: "20 litros"/"8 dias" no llegan acá (la unidad es de altitud),
+    // Excluir falsos: "20 litros"/"8 dias" no llegan aquí (la unidad es de altitud),
     // pero "20 m" sí — la cota inferior plausible para un cultivo es ~100 msnm.
     const n = Number(m[1].replace(/[.,]/g, ''));
     if (Number.isFinite(n) && n >= 50 && n <= 5000) out.push(n);

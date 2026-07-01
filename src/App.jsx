@@ -410,7 +410,7 @@ export default function App() {
 
   // Bug Lili #4: el InputLogForm dispatcha 'syncSuccess' tras registrar una
   // aplicación de bio-insumo, pero nadie escuchaba el evento → el operador
-  // no veía feedback de dónde quedó guardada la info. Listener acá que
+  // no veía feedback de dónde quedó guardada la info. Listener aquí que
   // alimenta el toast con CTA "Ver Bitácora" cuando el evento trae action.
   // detail: { message: string, actionLabel?: string, actionView?: string }
   useEffect(() => {
@@ -591,7 +591,7 @@ export default function App() {
     // los usuarios de La Cordada, mientras hay señal en el dashboard. Sin esto,
     // si un guía instala la app y sube al glaciar SIN haber abierto el módulo
     // online, el chunk `/assets/GlaciarReporteScreen-*.js` nunca se cachea → el
-    // SW responde 504 y el módulo NO abre en campo. Disparar el import() acá
+    // SW responde 504 y el módulo NO abre en campo. Disparar el import() aquí
     // baja el chunk estando online; el handler cache-first de /assets/* del SW
     // lo guarda y sobrevive offline. Idempotente (el bundler cachea el módulo),
     // fire-and-forget, y solo para la whitelist (no malgasta datos del resto).
@@ -1317,7 +1317,7 @@ export default function App() {
         // (src/config/glaciarAccess.js). Guarda defensiva: si por cualquier
         // ruta un usuario no autorizado llega a esta vista, NO montamos el
         // módulo — devolvemos el fallback estándar. Las navegaciones a #glaciar
-        // ya redirigen al dashboard antes de llegar acá (ver effects de ruta).
+        // ya redirigen al dashboard antes de llegar aquí (ver effects de ruta).
         if (!tieneAccesoGlaciarActual()) {
           return (
             <ErrorBoundary>
@@ -1340,7 +1340,7 @@ export default function App() {
         // (src/config/glaciarAccess.js). Guarda defensiva: si por cualquier
         // ruta un usuario no autorizado llega a esta vista, NO montamos el
         // módulo — devolvemos el fallback estándar. Las navegaciones a
-        // #glaciar-historial ya redirigen al dashboard antes de llegar acá.
+        // #glaciar-historial ya redirigen al dashboard antes de llegar aquí.
         if (!tieneAccesoGlaciarActual()) {
           return (
             <ErrorBoundary>
@@ -1365,7 +1365,7 @@ export default function App() {
         // Panel SUPERVISOR del modo extensionista (ADR-048 MVP). ACCESO por
         // feature flag VITE_FEATURE_EXTENSIONISTA + rol (config/extensionistaAccess).
         // Las rutas a #extensionista ya redirigen al dashboard antes de llegar
-        // acá si el usuario no tiene rol; guarda defensiva por si se monta directo.
+        // aquí si el usuario no tiene rol; guarda defensiva por si se monta directo.
         if (!esExtensionistaActual()) {
           return (
             <ErrorBoundary>
@@ -1430,7 +1430,7 @@ export default function App() {
         // chunk no cacheado por el SW, el import() falla → ErrorBoundary genérico
         // ("Algo falló") y el guard offline real (ollamaStream) queda
         // inalcanzable porque el componente nunca monta. Chequear navigator.onLine
-        // acá deja ver el aviso claro ("el asistente necesita internet; tus datos
+        // aquí deja ver el aviso claro ("el asistente necesita internet; tus datos
         // sí funcionan sin conexión") aunque el chunk no esté disponible.
         if (!isAppOnline) {
           return (

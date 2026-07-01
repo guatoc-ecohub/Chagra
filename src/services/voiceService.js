@@ -37,7 +37,7 @@ export async function transcribe(blob, options = {}) {
   // Guard: un Blob vacío o diminuto (captura fallida en móvil — MediaRecorder
   // a veces produce un webm de 0 bytes o truncado) hace que Whisper responda
   // HTTP 500 "Failed to load audio: End of file / invalid EBML number". Cortar
-  // acá con un mensaje claro al usuario en vez del round-trip + 500 críptico.
+  // aquí con un mensaje claro al usuario en vez del round-trip + 500 críptico.
   const MIN_AUDIO_BYTES = 1024;
   if (!blob || typeof blob.size !== 'number' || blob.size < MIN_AUDIO_BYTES) {
     throw new Error('No se grabó audio. Mantén presionado el botón y habla cerca del micrófono.');

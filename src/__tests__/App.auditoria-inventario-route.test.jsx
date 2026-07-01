@@ -14,7 +14,7 @@ import userEvent from '@testing-library/user-event';
 // Los efectos pesados de boot (auth, catálogo SQLite WASM, motores de alerta,
 // RAG, warm-up de Ollama) se mockean para que App arranque limpio en jsdom sin
 // tocar red/IDB. No probamos el render interno de InventoryPage/InventoryDashboard
-// acá (ya cubierto en sus propios tests); solo el wiring de la ruta.
+// aquí (ya cubierto en sus propios tests); solo el wiring de la ruta.
 
 vi.mock('../services/authService', () => ({
   isAuthenticated: () => Promise.resolve(true),

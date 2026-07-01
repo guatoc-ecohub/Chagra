@@ -9,7 +9,7 @@ import InventoryPage from '../InventoryPage';
 // (reconcileAllItems de inventoryReconcile.js) + InventoryEventTimeline
 // (línea de tiempo global), los dos componentes que quedaban huérfanos junto
 // con InventoryAuditTrail. No probamos el render interno de cada componente
-// (fuera de scope acá) — solo que InventoryPage los alcanza y navega bien.
+// (fuera de scope aquí) — solo que InventoryPage los alcanza y navega bien.
 vi.mock('../../components/InventoryDashboard', () => ({
   InventoryDashboard: () => <div data-testid="inventory-dashboard-stub">dashboard stub</div>,
   default: () => <div data-testid="inventory-dashboard-stub">dashboard stub</div>,
