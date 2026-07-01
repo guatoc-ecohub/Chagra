@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CHIP_DEFS, CHIP_INTENTS } from '../services/chipIntentRouter';
 import { isDeepResearchEnabled } from '../services/deepResearchClient';
 
@@ -51,6 +51,16 @@ import { isDeepResearchEnabled } from '../services/deepResearchClient';
  *                     change. Este componente NO decide la selección: solo
  *                     pinta lo que recibe con su CSS actual (la legibilidad/
  *                     estilo la lleva otro stream).
+ *
+ * Grupo "Más" (grounding oscuro, 2026-07-01): algunos chips del manifiesto
+ * (toxicidad, saberes tradicionales, alerta normativa páramo, variedades,
+ * polinización, fenología — `moreGroup:true` en CHIP_DEFS, derivado de
+ * `chipMore` en agentCapabilities.js) son consultas puntuales del grafo, NO el
+ * núcleo diario. Para no saturar la barra principal se agrupan detrás de un
+ * chip toggle "Más" (`data-testid="mode-chip-more"`): al tocarlo se despliega
+ * un SEGUNDO `role="toolbar"` con esos chips, pintados con el MISMO patrón
+ * (mismo `onSelectIntent`, mismo `data-testid="mode-chip"`, mismo
+ * aria-pressed/disabled) — cero mecanismo nuevo, solo una repisa aparte.
  */
 const ChipsToolbar = React.memo(function ChipsToolbar({
   onSelectIntent,
@@ -60,6 +70,11 @@ const ChipsToolbar = React.memo(function ChipsToolbar({
   isPro = false,
   chipDefs = null,
 }) {
+  // Toggle del grupo "Más" (chips de grounding puntual — ver docstring
+  // arriba). Hook ANTES del early-return de abajo (reglas de hooks: siempre
+  // en el mismo orden, nunca condicional).
+  const [showMore, setShowMore] = useState(false);
+
   if (typeof onSelectIntent !== 'function') return null;
 
   // Selección por perfil (si el call-site la pasa) o catálogo completo (default
@@ -76,6 +91,14 @@ const ChipsToolbar = React.memo(function ChipsToolbar({
     ? sourceDefs
     : sourceDefs.filter((def) => def.intent !== CHIP_INTENTS.deep);
 
+  // Grupo "Más": chips de grounding puntual (toxicidad, saberes tradicionales,
+  // alerta páramo, variedades, polinización, fenología) que NO se pintan en la
+  // fila principal — se agrupan detrás del toggle para no saturar la barra
+  // con el núcleo diario. `coreChipDefs` conserva EXACTAMENTE el comportamiento
+  // histórico (mismo orden, mismo contenido) para no romper nada existente.
+  const coreChipDefs = visibleChipDefs.filter((def) => !def.moreGroup);
+  const moreChipDefs = visibleChipDefs.filter((def) => def.moreGroup);
+
   const baseChip =
     'shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border ' +
     'text-sm font-semibold whitespace-nowrap transition-all active:scale-95 ' +
@@ -90,6 +113,46 @@ const ChipsToolbar = React.memo(function ChipsToolbar({
   // Chip Pro bloqueado: apariencia visualmente diferenciada para free users.
   const proLockedChip =
     'bg-slate-800 border-slate-700 text-slate-500 cursor-not-allowed';
+
+  // Render de UN chip de modo — compartido entre la fila principal y el
+  // grupo "Más" (mismo mecanismo: onSelectIntent(def.intent), mismo testid,
+  // mismo aria-pressed/disabled). Evita duplicar el markup entre las dos filas.
+  const renderChip = (def) => {
+    const isActive = activeIntent === def.intent;
+    // El chip 🔬 Deep Research es Pro-only. Para usuarios free: deshabilitado
+    // con copy claro "función Pro" y title explicativo. NO se oculta — el
+    // usuario free debe saber que la funcionalidad existe (upsell suave).
+    const isDeepChip = def.intent === CHIP_INTENTS.deep;
+    const isProLocked = isDeepChip && !isPro;
+    const chipDisabled = disabled || isProLocked;
+    const chipClass = isProLocked
+      ? proLockedChip
+      : isActive
+        ? activeChip
+        : inactiveChip;
+    const chipTitle = isProLocked
+      ? 'Función Pro — disponible para usuarios con acceso avanzado'
+      : def.placeholder;
+
+    return (
+      <button
+        key={def.intent}
+        type="button"
+        data-testid="mode-chip"
+        data-intent={def.intent}
+        data-pro-locked={isProLocked ? 'true' : undefined}
+        onClick={() => !isProLocked && onSelectIntent(def.intent)}
+        disabled={chipDisabled}
+        aria-pressed={isActive}
+        aria-label={isProLocked ? `${def.label} — función Pro` : def.label}
+        title={chipTitle}
+        className={`${baseChip} ${chipClass}`}
+      >
+        <span aria-hidden="true">{def.emoji}</span>
+        <span>{isProLocked ? `${def.label} (Pro)` : def.label}</span>
+      </button>
+    );
+  };
 
   return (
     <div
@@ -116,43 +179,38 @@ const ChipsToolbar = React.memo(function ChipsToolbar({
           </button>
         )}
 
-        {visibleChipDefs.map((def) => {
-          const isActive = activeIntent === def.intent;
-          // El chip 🔬 Deep Research es Pro-only. Para usuarios free: deshabilitado
-          // con copy claro "función Pro" y title explicativo. NO se oculta — el
-          // usuario free debe saber que la funcionalidad existe (upsell suave).
-          const isDeepChip = def.intent === CHIP_INTENTS.deep;
-          const isProLocked = isDeepChip && !isPro;
-          const chipDisabled = disabled || isProLocked;
-          const chipClass = isProLocked
-            ? proLockedChip
-            : isActive
-              ? activeChip
-              : inactiveChip;
-          const chipTitle = isProLocked
-            ? 'Función Pro — disponible para usuarios con acceso avanzado'
-            : def.placeholder;
+        {coreChipDefs.map(renderChip)}
 
-          return (
-            <button
-              key={def.intent}
-              type="button"
-              data-testid="mode-chip"
-              data-intent={def.intent}
-              data-pro-locked={isProLocked ? 'true' : undefined}
-              onClick={() => !isProLocked && onSelectIntent(def.intent)}
-              disabled={chipDisabled}
-              aria-pressed={isActive}
-              aria-label={isProLocked ? `${def.label} — función Pro` : def.label}
-              title={chipTitle}
-              className={`${baseChip} ${chipClass}`}
-            >
-              <span aria-hidden="true">{def.emoji}</span>
-              <span>{isProLocked ? `${def.label} (Pro)` : def.label}</span>
-            </button>
-          );
-        })}
+        {/* Toggle "Más": solo aparece si hay chips de grounding puntual para
+            mostrar. Despliega un segundo toolbar debajo con esos chips. */}
+        {moreChipDefs.length > 0 && (
+          <button
+            type="button"
+            data-testid="mode-chip-more"
+            onClick={() => setShowMore((v) => !v)}
+            disabled={disabled}
+            aria-expanded={showMore}
+            aria-controls="chips-toolbar-more"
+            aria-label={showMore ? 'Ocultar más consultas del agente' : 'Más consultas del agente'}
+            title="Más consultas: toxicidad, saberes tradicionales, variedades, polinización, fenología y normativa de páramo"
+            className={`${baseChip} ${showMore ? activeChip : inactiveChip}`}
+          >
+            <span aria-hidden="true">{showMore ? '➖' : '➕'}</span>
+            <span>Más</span>
+          </button>
+        )}
       </div>
+
+      {moreChipDefs.length > 0 && showMore && (
+        <div
+          id="chips-toolbar-more"
+          role="toolbar"
+          aria-label="Más consultas del agente"
+          className="flex flex-wrap gap-2 pt-2 mt-2 border-t border-white/10"
+        >
+          {moreChipDefs.map(renderChip)}
+        </div>
+      )}
     </div>
   );
 });

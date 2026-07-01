@@ -32,6 +32,12 @@
  *                                           objetivo inferido del texto, default bosque)
  *   - silvopastoreo→ get_diseno_silvopastoril (forrajeras CIPAV; requiere altura)
  *   - paramo       → get_diseno_restauracion (objetivo='paramo'; especies ≥3000 msnm)
+ *   - toxicidad    → get_toxicidad (grounding oscuro 2026-07-01: es_toxica/tox_*)
+ *   - saberes_tradicionales → get_saberes_tradicionales (glosario 96 términos, standalone)
+ *   - alerta_paramo → get_alerta_normativa_paramo (Ley 1930/2018, contexto opcional)
+ *   - variedades   → get_variedades_cultivo (ICA/AGROSAVIA por cultivo, catálogo v3.1)
+ *   - polinizacion → get_polinizacion (polinizadores + colmenas/ha)
+ *   - fenologia    → get_fenologia (etapas BBCH + ventana de plaga por etapa)
  *
  * Intents STUB (el backend aún NO existe — NO inventamos endpoints):
  *   - precio → SIPSA/DANE consulta directa no disponible (dataset ZIP federado).
@@ -269,6 +275,36 @@ export function planForcedIntent(intent, text, opts = {}) {
       if (animal) args.animal = animal;
       return { ...base, tool: 'get_diseno_silvopastoril', args };
     }
+
+    case CHIP_INTENTS.toxicidad:
+      // Perfil de toxicidad/comestibilidad (grounding oscuro, fold 2026-06-05):
+      // el grafo devuelve es_toxica + tox_* con disclaimer; found:false si el
+      // grafo no tiene el dato (CERO fabricación).
+      return { ...base, tool: 'get_toxicidad', args: { species_id_or_name: prompt } };
+
+    case CHIP_INTENTS.saberes_tradicionales:
+      // Glosario agroecológico standalone (96 términos in-app), por TÉRMINO —
+      // distinto de get_saberes (grafo, por especie, con disclaimer médico).
+      return { ...base, tool: 'get_saberes_tradicionales', args: { termino: prompt } };
+
+    case CHIP_INTENTS.alerta_paramo:
+      // Alerta normativa de páramo (Ley 1930/2018). `contexto` es OPCIONAL en
+      // el tool: le pasamos el texto libre para que la alerta cite la
+      // situación puntual del campesino; el tool NO lo interpreta legalmente.
+      return { ...base, tool: 'get_alerta_normativa_paramo', args: { contexto: prompt } };
+
+    case CHIP_INTENTS.variedades:
+      // Variedades registradas ICA/AGROSAVIA del catálogo v3.1, por CULTIVO —
+      // distinto de get_variedades (grafo, nodos :Variety, por especie).
+      return { ...base, tool: 'get_variedades_cultivo', args: { cultivo: prompt } };
+
+    case CHIP_INTENTS.polinizacion:
+      // Polinizadores + colmenas/ha + efecto en cuaje (grafo AGE).
+      return { ...base, tool: 'get_polinizacion', args: { species_id: prompt } };
+
+    case CHIP_INTENTS.fenologia:
+      // Etapas BBCH + ventana de plaga por etapa (grafo AGE).
+      return { ...base, tool: 'get_fenologia', args: { species_id: prompt } };
 
     case CHIP_INTENTS.precio:
       // STUB: backend no implementado. NO inventamos endpoint.
