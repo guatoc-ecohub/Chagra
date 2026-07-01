@@ -32,6 +32,12 @@ import {
   parseArgs,
   KNOWN_RELATION_TYPES,
   NODE_LABEL,
+  RESEARCH_SOURCE_PREFIX,
+  loadLiveLabelSnapshot,
+  resolveLiveLabel,
+  estimateNewNodeLabel,
+  buildNodeLabelPlan,
+  LABEL_PRIORITY,
 } from '../load-age-graph-gaps.mjs';
 
 describe('splitTableRow / isSeparatorRow', () => {
@@ -259,6 +265,162 @@ describe('buildCypherStatements', () => {
     const rel = statements.find((s) => s.includes('MERGE (a)-[r:'));
     expect(rel).toContain("Restrepo\\'s bocashi");
   });
+
+  it('usa el prefijo genérico RESEARCH_SOURCE_PREFIX (no un nombre de paquete privado) en `dr`/`source`', () => {
+    expect(RESEARCH_SOURCE_PREFIX).not.toMatch(/DR-FANOUT/i);
+    const accepted = [{ origen: 'a', tipo: 'AFFECTS', destino: 'b', fuente: 'f1', confianza: 'alta', drId: 'dr1' }];
+    const { statements } = buildCypherStatements(accepted, { dateStr: '2026-07-01' });
+    const joined = statements.join('\n');
+    expect(joined).toContain(`${RESEARCH_SOURCE_PREFIX}:dr1`);
+    expect(joined).not.toMatch(/DR-FANOUT/);
+  });
+});
+
+describe('resolveLiveLabel', () => {
+  it('devuelve null si no hay labels (id no existe en el grafo vivo)', () => {
+    expect(resolveLiveLabel(undefined)).toBeNull();
+    expect(resolveLiveLabel([])).toBeNull();
+  });
+
+  it('devuelve el único label sin marcar ambigüedad', () => {
+    expect(resolveLiveLabel(['Species'])).toEqual({ label: 'Species', ambiguous: false });
+  });
+
+  it('resuelve ambigüedad real (beauveria_bassiana: BeneficialOrganism + Biopreparado) por LABEL_PRIORITY', () => {
+    const resolved = resolveLiveLabel(['Biopreparado', 'BeneficialOrganism']);
+    expect(resolved.ambiguous).toBe(true);
+    expect(resolved.label).toBe('BeneficialOrganism'); // tiene prioridad sobre Biopreparado
+    expect(resolved.candidates).toEqual(['BeneficialOrganism', 'Biopreparado']);
+    expect(LABEL_PRIORITY.indexOf('BeneficialOrganism')).toBeLessThan(LABEL_PRIORITY.indexOf('Biopreparado'));
+  });
+
+  it('cae a orden alfabético si ningún candidato está en LABEL_PRIORITY', () => {
+    const resolved = resolveLiveLabel(['ZLabel', 'ALabel']);
+    expect(resolved.ambiguous).toBe(true);
+    expect(resolved.label).toBe('ALabel');
+  });
+});
+
+describe('estimateNewNodeLabel', () => {
+  it('reconoce ids de suelo (caso real: soil_fertility, suelo_(...)) — primer nodo Soil (queue/081)', () => {
+    expect(estimateNewNodeLabel('soil_fertility')).toBe('Soil');
+    expect(estimateNewNodeLabel('suelo_(a_través_de_compostaje_de_cama_profunda)')).toBe('Soil');
+  });
+
+  it('reconoce ids de práctica de manejo', () => {
+    expect(estimateNewNodeLabel('practica_rotacion_cultivos')).toBe('Practice');
+    expect(estimateNewNodeLabel('manejo_integrado_plagas')).toBe('Practice');
+  });
+
+  it('usa el TIPO de arista como señal secundaria cuando el id no lo dice explícitamente', () => {
+    expect(estimateNewNodeLabel('id_generico', ['AFFECTS_SOIL_FERTILITY'])).toBe('Soil');
+    expect(estimateNewNodeLabel('id_generico', ['MANAGED_WITH_PRACTICE'])).toBe('Practice');
+  });
+
+  it('cae a GraphGapNode cuando no hay señal de Soil/Practice (caso general: especies, plagas, polinizadores)', () => {
+    expect(estimateNewNodeLabel('bephratelloides_maculicollis', ['AFFECTS'])).toBe(NODE_LABEL);
+    expect(estimateNewNodeLabel('xylocopa_spp', ['POLINIZA'])).toBe(NODE_LABEL);
+  });
+});
+
+describe('loadLiveLabelSnapshot', () => {
+  it('parsea el formato recomendado { labels: {...} }', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'age-graph-gaps-livelabels-'));
+    const filePath = join(dir, 'live-labels.json');
+    writeFileSync(filePath, JSON.stringify({
+      meta: { graph: 'chagra_kg' },
+      labels: { annona_squamosa: ['Species'] },
+    }), 'utf8');
+    try {
+      expect(loadLiveLabelSnapshot(filePath)).toEqual({ annona_squamosa: ['Species'] });
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('acepta también un mapa plano sin envoltorio `labels`', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'age-graph-gaps-livelabels-'));
+    const filePath = join(dir, 'live-labels-flat.json');
+    writeFileSync(filePath, JSON.stringify({ annona_squamosa: ['Species'] }), 'utf8');
+    try {
+      expect(loadLiveLabelSnapshot(filePath)).toEqual({ annona_squamosa: ['Species'] });
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('buildNodeLabelPlan', () => {
+  const acceptedEdges = [
+    { origen: 'bephratelloides_maculicollis', tipo: 'AFFECTS', destino: 'annona_squamosa' },
+    { origen: 'flemingia_congesta', tipo: 'AFFECTS', destino: 'soil_fertility' },
+  ];
+  const liveLabels = { annona_squamosa: ['Species'] };
+
+  it('marca reconciliado (isLive=true, label real) el id que existe en el grafo vivo', () => {
+    const { plan } = buildNodeLabelPlan(acceptedEdges, liveLabels);
+    expect(plan.get('annona_squamosa')).toEqual({ label: 'Species', isLive: true, ambiguous: false });
+  });
+
+  it('estima label (Soil/GraphGapNode) para ids nuevos, sin marcarlos como live', () => {
+    const { plan } = buildNodeLabelPlan(acceptedEdges, liveLabels);
+    expect(plan.get('bephratelloides_maculicollis')).toEqual({ label: NODE_LABEL, isLive: false, ambiguous: false });
+    expect(plan.get('soil_fertility')).toEqual({ label: 'Soil', isLive: false, ambiguous: false });
+  });
+
+  it('reporta ambigüedad preexistente del grafo vivo (mismo id con 2 labels)', () => {
+    const { ambiguous } = buildNodeLabelPlan(
+      [{ origen: 'beauveria_bassiana', tipo: 'CONTROLS', destino: 'x' }],
+      { beauveria_bassiana: ['Biopreparado', 'BeneficialOrganism'] },
+    );
+    expect(ambiguous).toEqual([
+      { id: 'beauveria_bassiana', labels: ['BeneficialOrganism', 'Biopreparado'], chosen: 'BeneficialOrganism' },
+    ]);
+  });
+
+  it('regresión real: el TIPO "soil-ish" de una arista NO debe etiquetar como Soil al ORIGEN (solo al destino)', () => {
+    // Caso real del corpus: `cerdo -[AFFECTS_SOIL_FERTILITY]-> suelo_(...)`.
+    // El cerdo es claramente un animal, no un concepto de suelo, aunque
+    // participe (como origen) de una arista con TIPO soil-ish.
+    const { plan } = buildNodeLabelPlan([
+      { origen: 'cerdo_(sus_scrofa_domesticus)', tipo: 'AFFECTS_SOIL_FERTILITY', destino: 'suelo_(via_compostaje)' },
+    ], {});
+    expect(plan.get('cerdo_(sus_scrofa_domesticus)').label).toBe(NODE_LABEL); // NO 'Soil'
+    expect(plan.get('suelo_(via_compostaje)').label).toBe('Soil'); // sí, por texto Y por ser destino
+  });
+});
+
+describe('buildCypherStatements con reconciliación (liveLabels)', () => {
+  const acceptedEdges = [
+    { origen: 'bephratelloides_maculicollis', tipo: 'AFFECTS', destino: 'annona_squamosa', fuente: 'f1', confianza: 'alta', drId: 'dr1' },
+  ];
+  const liveLabels = { annona_squamosa: ['Species'] };
+
+  it('NO emite MERGE de nodo para un id reconciliado (ya existe con label real)', () => {
+    const { statements, reconciledNodeCount, newNodeMergeCount } = buildCypherStatements(
+      acceptedEdges, { dateStr: '2026-07-01', liveLabels },
+    );
+    expect(reconciledNodeCount).toBe(1);
+    expect(newNodeMergeCount).toBe(1);
+    expect(statements.some((s) => s.includes("MERGE (n:Species {id: 'annona_squamosa'}"))).toBe(false);
+    expect(statements.some((s) => s.includes(`MERGE (n:${NODE_LABEL} {id: 'bephratelloides_maculicollis'}`))).toBe(true);
+  });
+
+  it('la arista hace MATCH contra el label real del nodo reconciliado, no contra GraphGapNode', () => {
+    const { statements } = buildCypherStatements(acceptedEdges, { dateStr: '2026-07-01', liveLabels });
+    const rel = statements.find((s) => s.includes('MERGE (a)-[r:'));
+    expect(rel).toContain(`MATCH (a:${NODE_LABEL} {id: 'bephratelloides_maculicollis'})`);
+    expect(rel).toContain("MATCH (b:Species {id: 'annona_squamosa'})");
+  });
+
+  it('sin liveLabels, el comportamiento es idéntico al de antes (todo GraphGapNode, todo MERGE)', () => {
+    const { statements, reconciledNodeCount, newNodeMergeCount } = buildCypherStatements(
+      acceptedEdges, { dateStr: '2026-07-01' },
+    );
+    expect(reconciledNodeCount).toBe(0);
+    expect(newNodeMergeCount).toBe(2);
+    expect(statements.filter((s) => s.includes(`MERGE (n:${NODE_LABEL}`))).toHaveLength(2);
+  });
 });
 
 describe('drIdFromPath / processDrFile', () => {
@@ -342,5 +504,10 @@ describe('parseArgs', () => {
     expect(opts.outCypher).toBe('/tmp/x.sql');
     expect(opts.outReport).toBe('/tmp/x.json');
     expect(opts.graph).toBe('otro_grafo');
+  });
+
+  it('acepta --live-labels para el snapshot de reconciliación', () => {
+    const opts = parseArgs(['--live-labels', '/tmp/live-labels.json']);
+    expect(opts.liveLabels).toBe('/tmp/live-labels.json');
   });
 });
