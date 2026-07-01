@@ -1376,6 +1376,42 @@
             "type": "string"
           }
         },
+        "safety_class": {
+          "type": "string",
+          "enum": ["bajo", "medio", "alto", "revisar"],
+          "description": "Clasificacion estructurada de riesgo de manejo en campo para productores/familias no profesionales (equivalente semaforo verde=bajo, amarillo=medio, rojo=alto). 'revisar' cuando la prosa existente (uso/dosis/proceso_resumen/valor_pedagogico/precaucion_seguridad) no documenta info de seguridad suficiente para clasificar con confianza -- nunca inferir un nivel sin respaldo textual. Introducido para que el agente y la UI puedan filtrar/advertir sin depender de parsear prosa libre (auditoria 2026-07: la seguridad solo vivia en valor_pedagogico, no era filtrable)."
+        },
+        "ppe_required": {
+          "type": ["array", "null"],
+          "items": {
+            "type": "string",
+            "enum": [
+              "guantes",
+              "guantes_nitrilo",
+              "gafas",
+              "gafas_hermeticas",
+              "careta",
+              "tapabocas",
+              "mascarilla",
+              "manga_larga",
+              "botas_cerradas",
+              "delantal_impermeable"
+            ]
+          },
+          "description": "Equipo de proteccion personal mencionado explicitamente en la prosa del biopreparado (uso/dosis/proceso_resumen/valor_pedagogico/precaucion_seguridad) para prepararlo o aplicarlo. null cuando la prosa no menciona EPP explicito -- no inventar por analogia con el ingrediente."
+        },
+        "do_not_use_when": {
+          "type": ["array", "null"],
+          "items": {
+            "type": "string"
+          },
+          "description": "Contextos o condiciones en los que la prosa existente indica explicitamente NO usar o suspender el biopreparado por razones de inocuidad alimentaria, salud humana o riesgo ambiental agudo (p.ej. floracion, cerca_de_fuentes_hidricas_menos_30m, madera_tratada_pintada_o_contrachapado). NO incluye advertencias puramente agronomicas de eficacia (secado, pH optimo del sustrato, compatibilidad de mezcla por perdida de efecto) que ya viven en uso/dosis/valor_pedagogico. null cuando no hay restriccion de este tipo documentada."
+        },
+        "reentry_interval_dias": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Dias de carencia/resguardo documentados explicitamente en la prosa antes de cosechar partes comestibles cercanas o reingresar a la zona tratada tras la aplicacion. null cuando la prosa no da un numero de dias explicito (evitar inventar un valor por defecto)."
+        },
         "valor_pedagogico": {
           "type": "string"
         },

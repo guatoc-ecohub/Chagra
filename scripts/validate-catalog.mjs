@@ -757,6 +757,33 @@ export function validateAmb29_speciesInBiopreparados(catalog) {
   return errors;
 }
 
+// AMB-30: biopreparados con seguridad estructurada incompleta. Introducido
+// 2026-07 tras auditoría de liability de campo: recomendar dosis/insumos a
+// familias reales sin seguridad estructurada y filtrable (safety_class/
+// ppe_required/do_not_use_when/reentry_interval_dias) es un riesgo — antes la
+// seguridad vivía solo en prosa libre (valor_pedagogico), imposible de
+// filtrar para el agente o la UI. Este validador es SIEMPRE warning-only: no
+// bloquea el build, solo guía el sweep de curación (similar a AMB-27). Dos
+// checks: (a) falta el campo safety_class por completo (regresión para
+// entradas nuevas); (b) safety_class ∈ {medio, alto} pero tanto
+// ppe_required como do_not_use_when quedaron null (probable EPP/restricción
+// documentada en la prosa que no se estructuró).
+export function validateAmb30_biopreparadoSafetyStructurada(catalog) {
+  const warnings = [];
+  for (const bp of catalog.biopreparados || []) {
+    if (!bp || typeof bp !== 'object') continue;
+    const id = bp.id || '(sin id)';
+    if (!('safety_class' in bp)) {
+      warnings.push(`AMB-30 [biopreparados.${id}]: falta safety_class (seguridad no estructurada). Ver campos safety_class/ppe_required/do_not_use_when/reentry_interval_dias.`);
+      continue;
+    }
+    if ((bp.safety_class === 'medio' || bp.safety_class === 'alto') && !bp.ppe_required && !bp.do_not_use_when) {
+      warnings.push(`AMB-30 [biopreparados.${id}]: safety_class="${bp.safety_class}" sin ppe_required ni do_not_use_when documentado — revisar si la prosa tiene EPP/restricciones sin estructurar.`);
+    }
+  }
+  return warnings;
+}
+
 // ----------------------------------------------------------------
 // Main (CLI). Gated por `import.meta.url === file://${process.argv[1]}` para
 // permitir importar las funciones validador desde tests (scripts/__tests__/
@@ -891,6 +918,10 @@ function runCli() {
     ['AMB-29 species en array biopreparados', (c) => ({
       errors: validateAmb29_speciesInBiopreparados(c),
       warnings: [],
+    })],
+    ['AMB-30 biopreparados seguridad estructurada (WARN)', (c) => ({
+      errors: [],
+      warnings: validateAmb30_biopreparadoSafetyStructurada(c),
     })],
   ];
 
