@@ -256,9 +256,7 @@
           }
         ]
       },
-      "antagonists": [
-        "vicia_sativa"
-      ],
+      "antagonists": [],
       "tracking_mode": "aggregate"
     },
     {
@@ -315,26 +313,13 @@
       "agua": "alto",
       "drenaje_requerido": "bueno_a_moderado",
       "companions": [
-        "cenchrus_clandestinus_manejado",
         "coffea_arabica",
         "erythrina_edulis",
-        "lupinus_mutabilis",
-        "passiflora_tripartita_mollissima",
-        "quercus_humboldtii",
-        "solanum_phureja",
-        "trifolium_repens",
-        "vicia_faba",
-        "weinmannia_tomentosa"
+        "lupinus_mutabilis"
       ],
       "antagonists": [],
-      "recommended_covers": [
-        "trifolium_repens",
-        "vicia_sativa"
-      ],
-      "recommended_fences": [
-        "sambucus_peruviana",
-        "dodonaea_viscosa"
-      ],
+      "recommended_covers": [],
+      "recommended_fences": [],
       "fence_function": [
         "rompevientos",
         "delimitacion",
@@ -521,9 +506,7 @@
         "nrc-1989-cultivos-andinos"
       ],
       "valor_pedagogico": "El kale rizado (Brassica oleracea var. acephala DC 'Curly') es una Brassicaceae de hoja rizada de origen europeo introducida a los Andes colombianos durante la Colonia. En Colombia se cultiva principalmente en departamentos de clima frío y templado como Cundinamarca (valle de Ubaqué-Choachí), Boyacá, Nariño, Putumayo y el altiplano cundiboyacense, en altitudes entre 1800 y 2800 msnm (rango efectivo 1000-3500 msnm), en zonas térmicas frío y templado con temperaturas óptimas entre 10°C y 18°C. Su manejo agronómico incluye propagación por semilla en semillero, ciclo de vegetativo de 60-90 días hasta primera cosecha, y se asocia tradicionalmente con otras brassicáceas como el repollo y la coliflor, así como en sistemas de policultivo con especies de ciclo corto como radícheta y espinaca. Las principales plagas incluyen pulgones (Brevicoryne brassicae), mosca minadora (Liriomyza spp.) y oruga de la col (Pieris rapae), mientras que las enfermedades críticas son la hernia de la col (Plasmodiophora brassicae) y mildiu velloso (Peronospora parasitica). Culturalmente, esta especie se ha integrado en la dieta campesina andina desde el siglo XVI, utilizándose en preparaciones como hervidos, jugos verdes, sautés y como ingrediente nutricional por su alto contenido en vitaminas A, C, K y antioxidantes. Fuente: nrc-1989-cultivos-andinos.",
-      "antagonists": [
-        "solanum_lycopersicum_san_marzano"
-      ],
+      "antagonists": [],
       "tracking_mode": "aggregate"
     },
     {
@@ -567,10 +550,7 @@
         "ica-resolucion-3168-2015"
       ],
       "valor_pedagogico": "El repollo blanco (Brassica oleracea var. capitata L.) se cultiva ampliamente en los departamentos andinos de Colombia como Cundinamarca, Boyacá, Nariño y Antioquia entre 800 y 3000 msnm en zonas térmicas fría y templada. Su manejo agronómico incluye propagación por semilla en semillero seguido de trasplante profundo para asegurar estabilidad, con un ciclo de cultivo de 90-120 días, se asocia beneficiosamente con zanahoria y cebolla para reducir plagas como áfidos y lepidópteros, y requiere monitoreo de plagas como mosca blanca y gusanos del repollo. En el contexto campesino andino, esta crucífera ha sido tradicionalmente utilizada en soplos, ensaladas y preparaciones fermentadas como base alimenticia esencial, preservando sabores prehispánicos en las cocinas rurales de los Andes colombianos. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Brassica oleracea var. capitata L.",
-      "antagonists": [
-        "solanum_lycopersicum_san_marzano",
-        "vaccinium_corymbosum_biloxi"
-      ],
+      "antagonists": [],
       "tracking_mode": "aggregate"
     },
     {
@@ -612,9 +592,7 @@
         "metodo_principal": "semilla",
         "notas": "Se resiembra sola con facilidad; sus raíces secretan sustancias que controlan nematodos en el suelo."
       },
-      "companions": [
-        "solanum_lycopersicum_san_marzano"
-      ],
+      "companions": [],
       "antagonists": [],
       "valor_pedagogico": "La Caléndula (Calendula officinalis L.) es una especie ornamental-medicinal originaria del Mediterráneo, ampliamente cultivada en jardines campesinos de Cundinamarca entre 0-2800 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con ciclo de floración de 75-90 días, asociándose beneficiosamente con cultivos como el tomate (Solanum lycopersicum) mientras actúa como repelente natural de trips y nemátodos mediante secreciones radiculares. En el contexto cultural andino-campesino, sus flores se utilizan tradicionalmente en preparaciones de crema cicatrizante por sus propiedades flavonoides, saponinas y aceites esenciales. Según GBIF Backbone Taxonomy y Plants of the World Online (POWO), esta especie destaca por su valor ecológico en atracción de polinizadores y manejo integrado de plagas en sistemas agroecológicos de montaña.",
       "source_ids": [
@@ -671,7 +649,6 @@
       ],
       "valor_pedagogico": "La quinua (Chenopodium quinoa Willd.) es un pseudocereal andino tradicional con alto valor proteico (~14-18%) y aminoácidos esenciales, redescubierta como cultivo estratégico de seguridad alimentaria. En Colombia se cultiva en Boyacá, Nariño, Cundinamarca y Cauca entre 2.500 y 3.500 msnm en zona térmica fría a páramo bajo. Las variedades AGROSAVIA Aurora, Tunkahuán y Blanca de Jericó están adaptadas al altiplano cundiboyacense con ciclo 5-6 meses. Tolera salinidad moderada, sequía y heladas leves (-2°C en estados vegetativos). Manejo agroecológico: rotación con leguminosas, fertilización orgánica con bocashi y biol, control mecánico de mildiú (Peronospora variabilis) por densidad de siembra adecuada (60-80 cm entre surcos). Fuentes Tier A: AGROSAVIA fichas técnicas, FAO Quinoa Sourcebook 2013, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone.",
       "companions": [
-        "vicia_sativa",
         "zea_mays"
       ],
       "tracking_mode": "aggregate"
@@ -893,9 +870,7 @@
         "perez-arbelaez-1947-plantas-utiles"
       ],
       "valor_pedagogico": "Gramínea aromática tropical presente en departamentos cálidos y templados de Colombia como Cundinamarca (0-2400 msnm, zonas térmicas cálido, templado y frío). Se propaga fácilmente por división de matas o rizomas, formando densos tocuyos que requieren poda periódica para renovar tallos y maximizar producción de aceite esencial rico en citral (75-85%, compuesto por citronelal y geraniol). En contextos campesinos andinos, su infusión se usa tradicionalmente como antiespasmódico y digestivo, mientras su aroma cítrico actúa como repelente natural de mosquitos y otros insectos. Cultivada en asociación con hortalizas y como barrera antiviento en huertos familiares, contribuye al manejo ecológico de plagas sin insumos químicos. Fuente: GBIF Backbone Taxonomy y Plants of the World Online confirman su distribución neotropical y sinonimia taxonómica aceptada.",
-      "companions": [
-        "solanum_lycopersicum_san_marzano"
-      ],
+      "companions": [],
       "tracking_mode": "individual"
     },
     {
@@ -954,9 +929,7 @@
         "alnus_acuminata",
         "coffea_arabica"
       ],
-      "antagonists": [
-        "ulex_europaeus"
-      ],
+      "antagonists": [],
       "propagation": {
         "metodo_principal": "semilla",
         "notas": "Germina rápidamente; el esqueje se usa principalmente para cercas vivas."
@@ -1024,7 +997,6 @@
       "antagonists": [
         "coffea_arabica",
         "phaseolus_vulgaris",
-        "solanum_lycopersicum_san_marzano",
         "zea_mays"
       ],
       "tracking_mode": "individual"
@@ -1257,8 +1229,7 @@
       ],
       "valor_pedagogico": "La lechuga cogollo morada (Lactuca sativa var. capitata) es una hortaliza de hoja ampliamente cultivada en Colombia, especialmente en departamentos como Cundinamarca (cinturón productivo Choachí-Fómeque), Boyacá, Nariño y Santander, entre 800-3200 msnm en zonas térmicas fría y templada. Su manejo agronómico incluye propagación por semilla en semillero con sustrato fino, riego por nebulización en etapas tempranas, trasplante a los 25-30 días, ciclo de 60-90 días hasta cosecha, y asociaciones beneficiosas con Brassicaceae y Allium para repelencia de pulguilla. Plagas principales: pulgones (Myzus persicae), babosas (Deroceras reticulatum) y minadores (Liriomyza spp.). Culturalmente, aunque no es originaria del contexto muisca, se ha integrado en la agricultura andina contemporánea como cultivo de ciclo corto para seguridad alimentaria. Los cogollos morados deben su pigmentación a las antocianinas, pigmentos que actúan como protección natural contra radiación UV y estrés térmico. Fuente: nrc-1989-cultivos-andinos.",
       "companions": [
-        "phaseolus_vulgaris",
-        "solanum_lycopersicum_san_marzano"
+        "phaseolus_vulgaris"
       ],
       "tracking_mode": "aggregate"
     },
@@ -1353,9 +1324,7 @@
         "ica-resolucion-3168-2015"
       ],
       "valor_pedagogico": "Melissa officinalis, conocida como toronjil o melisa, se cultiva en Colombia en departamentos como Bogotá DC, Boyacá, Cauca, Cundinamarca, Huila, Santander y Valle del Cauca, entre 1200 y 2800 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación vegetativa mediante división de macollos estacionales, ciclo perenne de 2-3 años con podas de renovación, asociaciones beneficiosas con tomate y coles para confundir plagas mediante su aroma cítrico, y manejo de áfidos y trips mediante monitoreo y biopreparados andinos. En el contexto campesino andino, sus hojas se utilizan tradicionalmente en infusiones digestivas y calmantes, siendo parte del botiquín casero desde la época colonial para aliviar nerviosismo y trastornos del sueño. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Melissa officinalis L.",
-      "companions": [
-        "solanum_lycopersicum_san_marzano"
-      ],
+      "companions": [],
       "tracking_mode": "individual"
     },
     {
@@ -1633,9 +1602,7 @@
         ]
       },
       "estrato": "alto",
-      "companions": [
-        "urtica_dioica"
-      ],
+      "companions": [],
       "tracking_mode": "individual"
     },
     {
@@ -1694,7 +1661,6 @@
         "zea_mays"
       ],
       "antagonists": [
-        "allium_ampeloprasum",
         "allium_fistulosum",
         "foeniculum_vulgare"
       ],
@@ -1763,9 +1729,7 @@
       ],
       "valor_pedagogico": "La uchuva (Physalis peruviana L.) es una solanácea perenne nativa de los Andes ahora cultivada comercialmente para exportación. Colombia es el principal exportador mundial con cerca de 1.000 hectáreas en Cundinamarca (Granada, Silvania, Pasca), Boyacá (Ventaquemada), Antioquia (Sonsón) y Nariño entre 1.800 y 2.800 msnm en zona térmica fría a templada. La variedad AGROSAVIA Andina es la más adoptada, con ciclo productivo 8-10 meses y rendimientos 18-25 t/ha. Crece como arbusto perenne con cáliz papiráceo que envuelve la baya naranja madura. Manejo agroecológico: tutorado vertical, poda de formación, manejo integrado de Tuta absoluta (polilla) y Liriomyza huidobrensis (minador hoja) con biopreparados como BT y purín de ortiga, fertilización con bocashi + biol. Fuentes Tier A: AGROSAVIA Manual Uchuva, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone.",
       "estrato": "bajo",
-      "antagonists": [
-        "vaccinium_corymbosum_biloxi"
-      ],
+      "antagonists": [],
       "tracking_mode": "individual"
     },
     {
@@ -1999,11 +1963,7 @@
       "companions": [
         "chenopodium_quinoa",
         "lupinus_mutabilis",
-        "mucuna_pruriens",
-        "phaseolus_vulgaris",
-        "solanum_phureja",
-        "trifolium_repens",
-        "vicia_sativa"
+        "phaseolus_vulgaris"
       ],
       "antagonists": [
         "foeniculum_vulgare"
@@ -2272,9 +2232,7 @@
         ]
       },
       "validation_level": "claude_draft",
-      "companions": [
-        "urtica_dioica"
-      ],
+      "companions": [],
       "tracking_mode": "individual"
     },
     {
@@ -2834,7 +2792,6 @@
         "fuente": "Cenicafé manuales sombrío cafetero; CATIE 1997 'Cordia alliodora en sistemas agroforestales'; Trees of Antioquia"
       },
       "companions": [
-        "cedrela_odorata",
         "coffea_arabica",
         "erythrina_edulis",
         "inga_edulis"
@@ -3065,9 +3022,7 @@
       "companions": [
         "coffea_arabica",
         "cordia_alliodora",
-        "gliricidia_sepium",
-        "pseudosamanea_guachapele",
-        "samanea_saman"
+        "gliricidia_sepium"
       ],
       "antagonists": [],
       "manejo_por_escala": {
@@ -3278,9 +3233,7 @@
       },
       "companions": [
         "alnus_acuminata",
-        "coffea_arabica",
-        "inga_densiflora",
-        "juglans_neotropica"
+        "coffea_arabica"
       ],
       "antagonists": [],
       "manejo_por_escala": {
@@ -3671,7 +3624,6 @@
       "tiempo_elaboracion_dias": 18,
       "vida_util_dias": 180,
       "source_ids": [
-        "restrepo-1996-bocashi",
         "agrosavia-manual-biopreparados-2015",
         "restrepo-2007-biopreparados"
       ],
@@ -3706,9 +3658,7 @@
       "tiempo_elaboracion_dias": 40,
       "vida_util_dias": 180,
       "source_ids": [
-        "restrepo-1996-bocashi",
-        "restrepo-2007-biopreparados",
-        "pinheiro-machado-2017-biofertilizantes"
+        "restrepo-2007-biopreparados"
       ],
       "uso": "Foliar al amanecer o atardecer (evitar sol directo) cada 7-15 días en etapas de crecimiento vegetativo y prefloración. También aplicable al pie/riego durante toda la etapa productiva. Compatible con caldos minerales si se aplica 48 h antes/después.",
       "dosis": "Foliar: 100-200 ml/L de agua (dilución 1:10 a 1:5). Drench/riego al pie: 1-2 L/m² o 200 L/ha del concentrado diluido 1:5. Empezar con dilución alta (1:20) en plántulas para evitar fitotoxicidad.",
@@ -3738,7 +3688,6 @@
       "tiempo_elaboracion_dias": 12,
       "vida_util_dias": 60,
       "source_ids": [
-        "restrepo-1996-bocashi",
         "restrepo-2007-biopreparados",
         "agrosavia-manual-biopreparados-2015"
       ],
@@ -3771,7 +3720,6 @@
       "tiempo_elaboracion_dias": 1,
       "vida_util_dias": 180,
       "source_ids": [
-        "restrepo-1996-bocashi",
         "restrepo-2007-biopreparados",
         "agrosavia-manual-biopreparados-2015"
       ],
@@ -3848,7 +3796,6 @@
       ],
       "valor_pedagogico": "Inóculo microbiano vivo (10^8-10^9 UFC/ml de bacterias aerobias y esporas de hongos saprófitos) extraído del compost por aireación forzada con melaza como carbono lábil. Coloniza filoplano y rizosfera por exclusión competitiva contra patógenos (Ingham; Restrepo, ABC orgánico). Advertencias: si la aireación se detiene >2 h vira anaeróbico y produce ácidos fitotóxicos; no aplicar bajo sol del mediodía (UV mata 90% del inóculo en 30 min); no mezclar con caldo bordelés o sulfocálcico — el cobre/azufre esterilizan la microbiota.",
       "source_ids": [
-        "ingham-2000-compost-tea",
         "restrepo-1996-abc-agricultura-organica",
         "agrosavia-manual-biopreparados-2015"
       ]
@@ -3908,7 +3855,6 @@
       ],
       "valor_pedagogico": "Fermentación láctica-alcohólica: levaduras (Saccharomyces, Hanseniaspora) y lácticas (Lactobacillus) degradan azúcares liberando K soluble (4-12 g/L K2O), B, Zn, Mn y ácidos orgánicos que liberan cationes en suelos calcáreos. Restrepo y Pinheiro lo usan como análogo orgánico al KNO3 en floración, sin salinización. Advertencias: moho blanco (Geotrichum) es seguro; negro/verde (Aspergillus) obliga descarte por micotoxinas. pH final 3.5-4.0; >4.5 indica putrefacción. No aplicar en vegetativa temprana — K antagoniza N.",
       "source_ids": [
-        "restrepo-1996-bocashi",
         "restrepo-2007-biopreparados",
         "agrosavia-manual-biopreparados-2015"
       ]
@@ -3941,8 +3887,6 @@
       ],
       "valor_pedagogico": "Receta de Restrepo (1996) y Pinheiro: fermentación anaeróbica láctica de estiércol + leche + melaza donde Lactobacillus y levaduras solubilizan sulfatos añadidos en 5-7 etapas semanales, quelándolos con ácidos orgánicos y aminoácidos biodisponibles. Análogo orgánico a quelatos EDTA/EDDHA, biodegradable y a 1/10 del costo. Cubre 7 deficiencias típicas en suelos andinos ácidos (Mg, Zn, Mn, Cu, Fe, B, Co). Advertencias: sulfatos de Cu/Zn >2% esterilizan el barril; fermentación <60 días deja sulfatos sin quelatar y quema follaje; pH 3.5-4.2; contraindicado en floración plena.",
       "source_ids": [
-        "restrepo-1996-bocashi",
-        "restrepo-2005-agroecologia",
         "restrepo-2007-biopreparados"
       ]
     },
@@ -3972,9 +3916,7 @@
       ],
       "valor_pedagogico": "Hongo antagonista saprófito que coloniza la rizosfera y controla patógenos vía: (1) micoparasitismo sobre Rhizoctonia, Fusarium, Sclerotinia y Pythium degradándolas con quitinasas/β-1,3-glucanasas; (2) competencia por exudados radiculares; (3) antibióticos volátiles (6-pentil-pirona, gliotoxina); (4) inducción de resistencia sistémica vía jasmonato/etileno. AGROSAVIA y Cenicafé validaron cepas locales ICA-registradas, análogo al carbendazim sin residuos. Advertencias: no aplicar a suelo seco (<30% humedad); incompatible con cúpricos y mancozeb; evitar pleno sol; pH >8.0 contraindicado.",
       "source_ids": [
-        "cenicafe-trichoderma-2010",
         "agrosavia-manual-biopreparados-2015",
-        "agrosavia-bacillus-2018",
         "ica-resolucion-3168-2015"
       ]
     },
@@ -3993,7 +3935,6 @@
       "tiempo_elaboracion_dias": 14,
       "vida_util_dias": 30,
       "source_ids": [
-        "agrosavia-bacillus-2018",
         "agrosavia-manual-biopreparados-2015",
         "restrepo-2007-biopreparados"
       ],
@@ -4024,10 +3965,6 @@
       "tiempo_elaboracion_dias": 0,
       "vida_util_dias": 730,
       "source_ids": [
-        "ica-fertilizantes-2019",
-        "cochrane-1980-aluminio-saturacion",
-        "pinheiro-2003-cartilha-cal",
-        "restrepo-2005-agroecologia",
         "agrosavia-manual-biopreparados-2015"
       ],
       "uso": "Enmienda correctiva para suelos ácidos con saturación de aluminio tóxica, SOLO con análisis de suelo en mano (pH < 5.5 y saturación Al > 30%); aplicar 2-3 meses antes de la siembra e incorporar a 10-15 cm.",
@@ -4056,7 +3993,6 @@
       "tiempo_elaboracion_dias": 0,
       "vida_util_dias": 730,
       "source_ids": [
-        "ica-fertilizantes-2019",
         "agrosavia-manual-biopreparados-2015",
         "restrepo-2007-biopreparados"
       ],
@@ -4086,7 +4022,6 @@
       "tiempo_elaboracion_dias": 0,
       "vida_util_dias": 730,
       "source_ids": [
-        "restrepo-1996-bocashi",
         "agrosavia-manual-biopreparados-2015"
       ],
       "uso": "Aporte de potasio y calcio + corrección suave de acidez en suelos ácidos (pH 5.0-6.0); también ingrediente clave del bocashi (5-10%) y repelente físico de babosas en bordes de era.",
@@ -4118,10 +4053,8 @@
       "tiempo_elaboracion_dias": 100,
       "vida_util_dias": 365,
       "source_ids": [
-        "restrepo-1996-bocashi",
         "agrosavia-manual-biopreparados-2015",
-        "restrepo-2007-biopreparados",
-        "restrepo-2005-agroecologia"
+        "restrepo-2007-biopreparados"
       ],
       "uso": "Enmienda orgánica base para preparación de eras, hoyos de siembra y mantenimiento anual del suelo; restaura materia orgánica, estructura, capacidad de intercambio catiónico (CIC) y microbiota tras décadas de manejo extractivista.",
       "dosis": "Pre-siembra hortalizas: 2-5 kg/m² (20-50 t/ha) incorporados a 15 cm. Hoyo de siembra frutales: 5-10 kg por hoyo mezclado con tierra. Mantenimiento perennes: 3-5 kg/planta/año en corona, sin tocar el tallo. Sustrato semillero: 30-40% del volumen mezclado con tierra negra y cascarilla de arroz.",
@@ -4160,7 +4093,6 @@
       ],
       "valor_pedagogico": "El extracto de algas pardas concentra citoquininas (zeatina) y auxinas (IAA) que estimulan división celular y enraizamiento; aporta manitol osmoprotector y oligoelementos quelados (B, Zn, Mn) biodisponibles vía cutícula foliar. Alginatos y laminarinas activan defensa SAR como elicitores PAMP. En Colombia se usan importados (Ascophyllum nodosum) y lixiviados de Sargassum del Caribe. Advertencia: NO mezclar con caldo bordelés ni sulfocálcico (oxidan los reguladores); aplicar al atardecer (UV degrada citoquininas).",
       "source_ids": [
-        "khan-2009-seaweed-extracts",
         "agrosavia-manual-biopreparados-2015"
       ]
     },
