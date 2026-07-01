@@ -8,7 +8,7 @@
  * Output: catalog/gbif-vernacular-CO.json
  */
 
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -26,7 +26,16 @@ async function fetchJson(url) {
   return res.json();
 }
 
+// Nombre científico válido: letras latinas (con diacríticos), espacio, punto,
+// guion y × (híbrido). Acota el dato que viene del catálogo antes de armar la URL.
+const SCIENTIFIC_NAME_RE = /^[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ.×\s-]{1,119}$/;
+
 async function getUsageKey(nombreCientifico) {
+  // Saneo del nombre (viene de un archivo): corta el flujo dato-de-archivo →
+  // petición de red que marca CodeQL y descarta entradas basura del catálogo.
+  if (typeof nombreCientifico !== 'string' || !SCIENTIFIC_NAME_RE.test(nombreCientifico)) {
+    return null;
+  }
   const url = `${GBIF_BASE}/match?name=${encodeURIComponent(nombreCientifico)}`;
   const data = await fetchJson(url);
   if (data.confidence >= 80 && data.status === 'ACCEPTED' && data.usageKey) {
@@ -71,12 +80,15 @@ async function sleep(ms) {
 export { fetchJson, getUsageKey, getAllVernacularPages };
 
 async function main() {
-  if (!existsSync(CATALOG_PATH)) {
-    console.error(`Catalog not found: ${CATALOG_PATH}`);
+  // Leemos directo con try/catch en vez de existsSync+read (evita la carrera
+  // TOCTOU que marca CodeQL: el archivo podría cambiar entre el chequeo y el uso).
+  let catalog;
+  try {
+    catalog = JSON.parse(readFileSync(CATALOG_PATH, 'utf-8'));
+  } catch (err) {
+    console.error(`Catalog not readable: ${CATALOG_PATH} (${err.message})`);
     process.exit(1);
   }
-
-  const catalog = JSON.parse(readFileSync(CATALOG_PATH, 'utf-8'));
   const speciesList = catalog.species;
 
   if (!Array.isArray(speciesList)) {
@@ -89,9 +101,11 @@ async function main() {
   console.log(`Species without comunes: ${targetSpecies.length}`);
 
   let existing = {};
-  if (existsSync(OUTPUT_PATH)) {
+  try {
     existing = JSON.parse(readFileSync(OUTPUT_PATH, 'utf-8'));
     console.log(`Resuming from existing output with ${Object.keys(existing).length} entries`);
+  } catch {
+    // Primera corrida (o output ilegible): empezamos con acumulador vacío.
   }
 
   const results = { ...existing };
