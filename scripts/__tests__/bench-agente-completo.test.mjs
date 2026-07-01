@@ -10,11 +10,13 @@
  * - Cálculo de ganadores
  * - Escritura de archivos JSONL + summary.md
  * - Integración con sidecar (mockeada)
+ * - Filtro --only / --models (re-run selectivo, ver parseOnlyModels/filterModels)
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseOnlyModels, filterModels, ALL_MODELS } from '../bench-agente-completo.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..', '..');
@@ -233,6 +235,100 @@ describe('bench-agente-completo.mjs — benchmark LARGO agente completo', () => 
     it('timeout es 3 minutos (180000ms)', () => {
       const TIMEOUT_MS = 180_000;
       expect(TIMEOUT_MS).toBe(180000);
+    });
+  });
+
+  describe('ALL_MODELS — swap gemma4 roto por gemma3', () => {
+    it('incluye gemma3:4b y gemma3:12b', () => {
+      expect(Object.values(ALL_MODELS)).toContain('gemma3:4b');
+      expect(Object.values(ALL_MODELS)).toContain('gemma3:12b');
+    });
+
+    it('ya NO incluye gemma4:e4b ni gemma4:e2b (0% keywords, descartados)', () => {
+      expect(Object.values(ALL_MODELS)).not.toContain('gemma4:e4b');
+      expect(Object.values(ALL_MODELS)).not.toContain('gemma4:e2b');
+    });
+  });
+
+  describe('parseOnlyModels — flag --only / --models', () => {
+    it('sin flag devuelve null (corre todos)', () => {
+      expect(parseOnlyModels(['node', 'bench-agente-completo.mjs'])).toBeNull();
+    });
+
+    it('--only <lista> separada por coma', () => {
+      expect(parseOnlyModels(['--only', 'gemma3:4b,gemma3:12b'])).toEqual([
+        'gemma3:4b',
+        'gemma3:12b',
+      ]);
+    });
+
+    it('--only tolera espacios alrededor de las comas', () => {
+      expect(parseOnlyModels(['--only', 'gemma3:4b, gemma3:12b , granite3.3:8b'])).toEqual([
+        'gemma3:4b',
+        'gemma3:12b',
+        'granite3.3:8b',
+      ]);
+    });
+
+    it('--models <lista> es alias de --only', () => {
+      expect(parseOnlyModels(['--models', 'gemma3:4b,gemma3:12b'])).toEqual([
+        'gemma3:4b',
+        'gemma3:12b',
+      ]);
+    });
+
+    it('--only=<lista> (forma con signo igual)', () => {
+      expect(parseOnlyModels(['--only=gemma3:4b,gemma3:12b'])).toEqual(['gemma3:4b', 'gemma3:12b']);
+    });
+
+    it('--models=<lista> (forma con signo igual)', () => {
+      expect(parseOnlyModels(['--models=gemma3:4b,gemma3:12b'])).toEqual(['gemma3:4b', 'gemma3:12b']);
+    });
+
+    it('--only sin valor (seguido de otra flag) devuelve null', () => {
+      expect(parseOnlyModels(['--only', '--judge'])).toBeNull();
+    });
+
+    it('--only al final de argv sin valor devuelve null', () => {
+      expect(parseOnlyModels(['--only'])).toBeNull();
+    });
+  });
+
+  describe('filterModels — aplica el filtro sobre el mapa de modelos', () => {
+    const models = {
+      granite3_3_8b: 'granite3.3:8b',
+      gemma3_4b: 'gemma3:4b',
+      gemma3_12b: 'gemma3:12b',
+      ministral_14b: 'ministral-3:14b',
+    };
+
+    it('sin only (null) devuelve el mapa intacto', () => {
+      expect(filterModels(models, null)).toEqual(models);
+    });
+
+    it('con lista vacía devuelve el mapa intacto', () => {
+      expect(filterModels(models, [])).toEqual(models);
+    });
+
+    it('filtra por nombre de modelo (valor)', () => {
+      expect(filterModels(models, ['gemma3:4b', 'gemma3:12b'])).toEqual({
+        gemma3_4b: 'gemma3:4b',
+        gemma3_12b: 'gemma3:12b',
+      });
+    });
+
+    it('filtra por key', () => {
+      expect(filterModels(models, ['gemma3_4b'])).toEqual({ gemma3_4b: 'gemma3:4b' });
+    });
+
+    it('lanza si algún nombre no matchea (typo) — falla temprano antes de gastar GPU', () => {
+      expect(() => filterModels(models, ['gemma3:4b', 'no-existe:1b'])).toThrow(/no-existe:1b/);
+    });
+
+    it('aplicado a ALL_MODELS real: --only gemma3:4b,gemma3:12b da exactamente esos 2', () => {
+      const only = parseOnlyModels(['--only', 'gemma3:4b,gemma3:12b']);
+      const filtered = filterModels(ALL_MODELS, only);
+      expect(Object.values(filtered).sort()).toEqual(['gemma3:12b', 'gemma3:4b']);
     });
   });
 
