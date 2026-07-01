@@ -73,7 +73,7 @@ import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../
 // sidecarClient/deepResearchClient vía buildSidecarHeaders (defense-in-depth).
 import { getCurrentTier } from '../../services/tierService';
 import DeepResearchCard from '../DeepResearchCard';
-import { normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildPriceAnswer, buildSuggestedEntitiesContext, isLowConfidenceEntity, buildFallbackResponse, pisoTermicoFromAltitud } from '../../services/agentService';
+import { normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildPriceAnswer, buildSuggestedEntitiesContext, isLowConfidenceEntity, buildFallbackResponse, pisoTermicoFromAltitud, groupAndLimitCultivos } from '../../services/agentService';
 import { buildBasePrompt, analyzeQuery, buildQueryAnalysisBlock, buildCorpusVariants, buildResolvedEntitiesBlock, formatToolEvidence, truncateEdgesBlock } from '../../services/agentPromptBase';
 // Nubosidad real para el grounding (fix Choachí 2026-06) — solo lee caches.
 import { summarizeSkyForGrounding } from '../../services/skyConditionService';
@@ -854,15 +854,8 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     //   - activeAlerts: useAlertStore (memoria)
     // Si algún dato no está, buildFincaContext omite su línea (degrada).
     const fincaActivaCtx = fincas.find((f) => f.slug === activeFincaSlug) || null;
-    const groupedCultivos = (() => {
-      const strip = (name) => (name || '').replace(/\s*#\d+\s*$/, '').trim();
-      const counts = (plants || []).reduce((acc, pl) => {
-        const base = strip(pl.attributes?.name);
-        if (base) acc[base] = (acc[base] || 0) + 1;
-        return acc;
-      }, {});
-      return Object.entries(counts).map(([name, count]) => ({ name, count }));
-    })();
+    // Limitar a top-N especies más frecuentes para evitar inflar contexto (fix queue 056.3)
+    const groupedCultivos = groupAndLimitCultivos(plants || []);
     const fincaProfile = (() => { try { return getProfile(); } catch (_) { return null; } })();
     // GATE de precio: en una consulta de mercado NO inyectamos el perfil/altitud
     // de finca (evita la fuga "Tu finca a 0 msnm…").

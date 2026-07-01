@@ -1193,6 +1193,47 @@ const KNOWN_CROP_TOKENS = new Set([
   'cubio', 'ibia', 'oca', 'quinua', 'amaranto', 'caña', 'arandanos',
 ]);
 
+/** Máximo número de especies a procesar para contexto del LLM (defecto 50). */
+const DEFAULT_MAX_CULTIVOS_FOR_CONTEXT = 50;
+
+/**
+ * groupAndLimitCultivos — agrupa plantas por especie y limita a top-N más
+ * frecuentes para evitar procesar miles de especies en fincas grandes.
+ *
+ * Estrategia:
+ *   1. Agrupa todas las plantas por nombre (quitando número #XX)
+ *   2. Ordena por frecuencia descendente
+ *   3. Limita a maxSpecies (por defecto 50) para evitar inflar el contexto
+ *   4. Devuelve array ordenado {name, count}
+ *
+ * El límite es por RELEVANCIA (frecuencia): si el usuario tiene 200 especies
+ * distintas, priorizamos las 50 más abundantes para el contexto del LLM. Las
+ * especies raras tienen menos probabilidad de ser relevantes a la pregunta.
+ *
+ * @param {Array<object>} plants - array del asset store (plants)
+ * @param {number} [maxSpecies=DEFAULT_MAX_CULTIVOS_FOR_CONTEXT] - máximo especies
+ * @returns {Array<{name:string,count:number}>} agrupado y limitado
+ */
+export function groupAndLimitCultivos(plants, maxSpecies = DEFAULT_MAX_CULTIVOS_FOR_CONTEXT) {
+  if (!Array.isArray(plants) || plants.length === 0) return [];
+
+  // 1. Agrupar por nombre (quitando #XX)
+  const strip = (name) => (name || '').replace(/\s*#\d+\s*$/, '').trim();
+  const counts = plants.reduce((acc, pl) => {
+    const base = strip(pl.attributes?.name);
+    if (base) acc[base] = (acc[base] || 0) + 1;
+    return acc;
+  }, {});
+
+  // 2. Convertir a array y ordenar por frecuencia descendente
+  const grouped = Object.entries(counts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count);
+
+  // 3. Limitar a top-N especies más frecuentes
+  return grouped.slice(0, maxSpecies);
+}
+
 /**
  * Valida un inventario agrupado contra el catalogo/grounding y lo separa en
  * cultivos VERIFICADOS (especies reales) y SIN VERIFICAR (datos sospechosos del
@@ -1210,6 +1251,10 @@ const KNOWN_CROP_TOKENS = new Set([
  *
  * PURA y SINCRONA. CERO latencia. Tolerante a entradas raras.
  *
+ * NOTA: Si el input excede DEFAULT_MAX_CULTIVOS_FOR_CONTEXT, automáticamente
+ * se limita a ese número (defensive programming para fincas grandes con miles
+ * de especies distintas).
+ *
  * @param {Array<{name:string,count:number}>} grouped
  * @param {{catalogNames?: string[]}} [opts]
  * @returns {{verificados: Array<{name:string,count:number}>, sinVerificar: Array<{name:string,count:number}>}}
@@ -1218,7 +1263,12 @@ export function validateCultivos(grouped, { catalogNames = null } = {}) {
   if (!Array.isArray(grouped) || grouped.length === 0) {
     return { verificados: [], sinVerificar: [] };
   }
-  const items = grouped.filter((g) => g && typeof g.name === 'string' && g.name.trim());
+
+  // Defensive: limitar input si excede máximo razonable (fincas grandes)
+  const items = (grouped.length > DEFAULT_MAX_CULTIVOS_FOR_CONTEXT
+    ? grouped.slice(0, DEFAULT_MAX_CULTIVOS_FOR_CONTEXT)
+    : grouped
+  ).filter((g) => g && typeof g.name === 'string' && g.name.trim());
 
   let catNorm = null;
   if (Array.isArray(catalogNames) && catalogNames.length > 0) {
