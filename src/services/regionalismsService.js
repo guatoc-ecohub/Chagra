@@ -4,7 +4,7 @@
  * @module regionalismsService
  */
 
-import regionalismsData from '../data/regionalisms-co.json';
+import regionalismsData from '../data/regionalisms-co.json' with { type: 'json' };
 
 export function getRegionFromDepartment(deptSlug) {
   if (!deptSlug) return null;

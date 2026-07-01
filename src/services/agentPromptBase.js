@@ -1,5 +1,5 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
-import { TOP_N_EDGES } from './promptAssembler';
+import { TOP_N_EDGES } from './promptAssembler.js';
 /**
  * agentPromptBase — texto BASE del system prompt del agente + builders puros
  * de bloques por-turno (corpus RAG, evidencia de tools, entidades resueltas,

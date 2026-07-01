@@ -26,7 +26,7 @@
  *     o región definida, conservador: NO aplicar (passthrough).
  */
 
-import glosario from '../data/glosario-regional-cauca.json';
+import glosario from '../data/glosario-regional-cauca.json' with { type: 'json' };
 
 const GLOSARIO_TERMINOS = glosario?.terminos || {};
 
