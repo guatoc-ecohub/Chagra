@@ -167,19 +167,55 @@ jobs:
         #     3) GC de chunks viejos para no crecer infinito: borra archivos en
         #        TARGET/assets/ con mtime > 30 dias. 30 dias cubre de sobra el
         #        tiempo para que un cliente instalado se actualice.
+        #
+        # CI-1 (2026-07-01) — releases versionadas + symlink `current`:
+        #   Este step YA NO escribe TARGET/ in-place. Escribe a
+        #   TARGET/releases/<version>/ y al final hace swap atómico del
+        #   symlink TARGET/current -> releases/<version>. Rollback
+        #   (rollback.yml) reapunta ese symlink sub-segundo, sin rebuild.
+        #   `assets/` sigue siendo un pool COMPARTIDO fuera de releases/ (NO
+        #   se versiona por release): son content-hashed e inmutables, asi
+        #   que duplicarlos por release solo gastaria espacio. Cada release
+        #   lleva un symlink `assets -> ../../assets` para que, sirviendo
+        #   desde TARGET/current/, /assets/*.js resuelva al pool compartido.
+        #   Se retienen las ultimas 10 releases (por mtime); el resto se borra.
+        #
+        #   CRITICO — nginx (guatoc-nixos, fuera de este repo) debe servir
+        #   TARGET/current como root, NO TARGET directo. Ese cambio de infra
+        #   lo aplica el operador; sin el, este CI deja releases/current
+        #   escritos pero nginx sigue sirviendo el arbol viejo. CI-1 (este
+        #   workflow) + el cambio de nginx se despliegan JUNTOS.
         run: |
+          set -e
           umask 022
-          rsync -avzO --no-perms --delete --no-group --chmod=F644 --exclude='/assets/' dist/ /mnt/fast/appdata/farmos-pwa/
-          rsync -avzO --no-perms --no-group --chmod=F644 dist/assets/ /mnt/fast/appdata/farmos-pwa/assets/
-          find /mnt/fast/appdata/farmos-pwa/assets/ -type f -mtime +30 -delete || true
-          find /mnt/fast/appdata/farmos-pwa -type f -user runner ! -perm 644 -exec chmod 644 {} + || true
+          TARGET=/mnt/fast/appdata/farmos-pwa
+          VERSION=$(jq -r .version package.json)
+          RELEASE_DIR="$TARGET/releases/$VERSION"
+          mkdir -p "$RELEASE_DIR"
+
+          rsync -avzO --no-perms --delete --no-group --chmod=F644 --exclude='/assets/' dist/ "$RELEASE_DIR/"
+          rsync -avzO --no-perms --no-group --chmod=F644 dist/assets/ "$TARGET/assets/"
+          ln -sfn ../../assets "$RELEASE_DIR/assets"
+
+          find "$RELEASE_DIR" -type f -user runner ! -perm 644 -exec chmod 644 {} + || true
+          find "$TARGET/assets/" -type f -user runner ! -perm 644 -exec chmod 644 {} + || true
+          find "$TARGET/assets/" -type f -mtime +30 -delete || true
+
+          # Swap atómico: current pasa a apuntar a la release recién escrita.
+          ln -sfn "releases/$VERSION" "$TARGET/current"
+
+          # Retención: conserva solo las últimas 10 releases (por mtime).
+          ( cd "$TARGET/releases" && ls -1dt */ 2>/dev/null | tail -n +11 | xargs -r rm -rf -- )
+
+          echo "Deployed version $VERSION -> $TARGET/current"
 
       - if: env.SKIP_DEPLOY != '1'
         name: Verify deployment
         run: |
-          test -f /mnt/fast/appdata/farmos-pwa/index.html || exit 1
-          HASH=$(sha256sum /mnt/fast/appdata/farmos-pwa/index.html | cut -d' ' -f1)
-          echo "Deploy OK: $(date -Iseconds) | index.html sha256: ${HASH:0:12}"
+          TARGET=/mnt/fast/appdata/farmos-pwa
+          test -f "$TARGET/current/index.html" || exit 1
+          HASH=$(sha256sum "$TARGET/current/index.html" | cut -d' ' -f1)
+          echo "Deploy OK: $(date -Iseconds) | current -> $(readlink "$TARGET/current") | index.html sha256: ${HASH:0:12}"
 
       - if: env.SKIP_DEPLOY != '1'
         name: Notify HA to refresh Nest Hub
@@ -210,8 +246,10 @@ jobs:
         # (RAG_GROUNDING_PREFIX/MAP_TILES_PREFIX viven en otras líneas con su
         # propio versionado v1; no se tocan al limitar el patrón con `0,/.../`.)
         run: |
-          SW_FILE=/mnt/fast/appdata/farmos-pwa/sw.js
-          VERSION_FILE=/mnt/fast/appdata/farmos-pwa/version.json
+          # Rutas a través del symlink `current` (CI-1): editan el archivo
+          # real dentro de releases/<version>/, que es lo que nginx sirve.
+          SW_FILE=/mnt/fast/appdata/farmos-pwa/current/sw.js
+          VERSION_FILE=/mnt/fast/appdata/farmos-pwa/current/version.json
           COMMIT_SHORT=$(git rev-parse --short HEAD)
           if [ -f "$SW_FILE" ]; then
             # 0,/regex/ limita el reemplazo a la PRIMERA línea que matchea
