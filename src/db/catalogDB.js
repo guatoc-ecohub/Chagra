@@ -48,7 +48,7 @@ async function doInit() {
     }
 
     // Validar shape mínimo: tabla species con rows. Si el CDN Pro sirvió un
-    // blob malformado, fallamos rápido acá en vez de degradar silencioso.
+    // blob malformado, fallamos rápido aquí en vez de degradar silencioso.
     assertCatalogShape(db);
 
     return db;
@@ -74,7 +74,7 @@ export async function initCatalog() {
         // NO es bloqueante (el home usa fallback de stats y los componentes
         // reintentan al usar el catálogo) y NO debe gritar console.error: es
         // ruido esperado en cada deploy. Degradamos a debug; loadCatalogBuffer
-        // ya reintentó una vez antes de llegar acá.
+        // ya reintentó una vez antes de llegar aquí.
         if (isAbortLikeFetchError(error)) {
             console.debug('[SQLite WASM] init del catálogo abortado (probable reload por SW nuevo); se reintentará on-demand.');
         } else {

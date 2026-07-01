@@ -8,7 +8,7 @@
  *
  * Este módulo es PURO (sin red, sin React, sin localStorage): mapea un perfil
  * de usuario + sus módulos visibles + su rol → la lista ORDENADA de intents de
- * chip a mostrar. Toda la lógica vive acá para testearla en aislamiento (TDD),
+ * chip a mostrar. Toda la lógica vive aquí para testearla en aislamiento (TDD),
  * igual que `chipIntentRouter.planForcedIntent`.
  *
  * REGLA INVIOLABLE — no inventar chips. Solo seleccionamos y ordenamos los

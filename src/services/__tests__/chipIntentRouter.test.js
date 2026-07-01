@@ -77,7 +77,7 @@ describe('chipIntentRouter — enum y definiciones', () => {
   });
 
   it('ningún string del chip usa voseo argentino', () => {
-    // tú/usted colombiano — NUNCA escribí/tomá/tenés/querés/elegí/dale/acá.
+    // tú/usted colombiano — NUNCA escribí/tomá/tienes/quieres/elegí/dale/aquí.
     const VOSEO = /\b(escrib[íi]|tom[áa]|ten[ée]s|quer[ée]s|eleg[íi]|pod[ée]s|dale|sab[ée]s|and[áa]|fij[áa]te)\b/i;
     for (const def of CHIP_DEFS) {
       expect(def.label).not.toMatch(VOSEO);

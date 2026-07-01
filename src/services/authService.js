@@ -420,7 +420,7 @@ export const logoutUser = async () => {
         console.error('[Auth] logoutUser failed (tokens may persist):', err);
     }
     // ADR-036 MVP multi-finca: limpiar tenantId asegura que un re-login con
-    // otro usuario no herede el scope del anterior. NO purgamos IDB acá —
+    // otro usuario no herede el scope del anterior. NO purgamos IDB aquí —
     // useAssetStore decide qué hacer al detectar el cambio de tenantId.
     try {
         clearActiveTenantId();

@@ -23,7 +23,7 @@
  * REUSO (no se duplica nada): la derivación de ROL vive en
  * `profileChipSelector.deriveRole` (fuente única); `esPerfilUrbano`,
  * `profileTieneAnimales` y `profileTieneCerdos` viven en `homeModuleSelector` /
- * `profileChipSelector` (fuentes únicas). Acá solo se importan y se mapean. El
+ * `profileChipSelector` (fuentes únicas). Aquí solo se importan y se mapean. El
  * cálculo de nivel Gliessman NO vive aquí (es de fincaGameService).
  *
  * REGLA — coherencia con el override urbano del home: si `esPerfilUrbano` es

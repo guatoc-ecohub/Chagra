@@ -11,7 +11,7 @@
  * agentCapabilities.js — Manifiesto ÚNICO de capacidades de Chagra.
  *
  * Fuente normativa para chips de modo y menú Ⓐ del AgentHero.
- * TODO lo demás (chips, tools, labels, placeholders, rutas) se deriva de acá.
+ * TODO lo demás (chips, tools, labels, placeholders, rutas) se deriva de aquí.
  *
  * Regla inviolable: un cambio en la UI (nuevo chip, nuevo tool, label distinto)
  * se hace editando ESTE archivo. NO en CHIP_DEFS ni en CAPABILITIES de AgentHero.
@@ -278,14 +278,14 @@ export const CAPABILITY_MANIFEST = Object.freeze([
   // ALLOWED_TOOLS en sidecarClient.js) pero, hasta ahora, SOLO alcanzables por
   // texto libre en el chat: el NLU las conoce, pero ningún chip las disparaba
   // (auditoría chagra-pro allowed-tools.ts: "datos del grafo que estaban
-  // muertos"). Se exponen acá como chips de modo, agrupados bajo el toggle
+  // muertos"). Se exponen aquí como chips de modo, agrupados bajo el toggle
   // "Más" del ChipsToolbar (chipMore:true) para NO saturar la barra principal
   // con 6 chips nuevos de golpe — son consultas de conocimiento puntuales, no
   // el núcleo diario de siembra/plaga/clima.
   //
   // hero:false a propósito: NO se agregan ramas nuevas a la mano radial
   // (AgentRedMenu solo pinta hero===true) — ese es un cambio de UX aparte que
-  // el operador debe decidir explícitamente. Acá solo se resuelve la
+  // el operador debe decidir explícitamente. Aquí solo se resuelve la
   // descubribilidad vía chips (el pedido puntual de esta tarea).
   {
     id: 'toxicidad',
