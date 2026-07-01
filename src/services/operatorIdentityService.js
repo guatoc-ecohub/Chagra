@@ -36,7 +36,7 @@ export function getOrCreateAccountUUID() {
   if (uuid) return uuid;
   uuid = crypto.randomUUID();
   localStorage.setItem(ACCOUNT_UUID_KEY, uuid);
-  console.log('[operatorIdentity] Generated NEW account_uuid_master. Backup recommended.');
+  console.warn('[operatorIdentity] Generated NEW account_uuid_master. Backup recommended.');
   return uuid;
 }
 

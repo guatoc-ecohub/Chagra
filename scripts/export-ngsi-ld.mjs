@@ -95,12 +95,22 @@
  *
  * Sin `--json` ni `--out`, imprime un reporte humano (conteo, validación)
  * por stdout — pensado para revisión manual del operador antes de un demo.
+ *
+ * Validación de conformidad NGSI-LD (ADR-051 fase 1, ítem CI): además de la
+ * validación estructural propia (`validateAgriCropEntity`/
+ * `validateAgriPestEntity`), `main()` corre `validateEntitiesAjv` (ver
+ * `scripts/lib/ngsi-validate.mjs`) contra los JSON Schema **oficiales** de
+ * `smart-data-models/dataModel.Agrifood` vendorizados en
+ * `scripts/fiware-schemas/`. Si cualquiera de las dos capas falla, el
+ * proceso sale con código 1 — pensado para engancharse a CI vía
+ * `npm run validate:ngsi`.
  */
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import { normalizePest, classifyBiopreparadoTarget, truncText } from './catalog-to-age.mjs';
+import { validateEntitiesAjv } from './lib/ngsi-validate.mjs';
 
 // =============================================================================
 // Contexto NGSI-LD
@@ -622,14 +632,17 @@ export function buildAgriProductTypeEntities(seed, opts = {}) {
 // =============================================================================
 
 /**
- * NOTA: `ajv` no está en las dependencias del repo (verificado en
- * package.json). Por ADR-051 + instrucción de la tarea, no se agrega una
- * dependencia nueva solo para esto — se valida la estructura mínima NGSI-LD
- * exigida (id URN `urn:ngsi-ld:AgriCrop:*`, type, name, y forma de
- * hasAgriPest/@context si están presentes). Si en el futuro `ajv` entra al
- * repo (ver `fiware-ngsild-ajv-ci` en queue), esta función puede
- * reemplazarse por validación JSON Schema completa contra los schemas
- * oficiales `smart-data-models` sin cambiar la firma pública.
+ * NOTA (actualizada — ADR-051 fase 1, ítem "Validación conformidad NGSI-LD
+ * (ajv vs schemas oficiales) en CI"): esta función valida solo la
+ * estructura mínima NGSI-LD (id URN `urn:ngsi-ld:AgriCrop:*`, type, name, y
+ * forma de hasAgriPest/@context si están presentes) — es rápida y no
+ * depende de los schemas oficiales, útil como smoke check dentro de
+ * `buildAgriCropEntities`/CLI. La validación **completa** contra los JSON
+ * Schema oficiales de `smart-data-models` (vendorizados en
+ * `scripts/fiware-schemas/`) vive en `scripts/lib/ngsi-validate.mjs`
+ * (`validateEntitiesAjv`) y se corre además en `main()` más abajo — ambas
+ * capas se mantienen porque esta es más barata y da mensajes más
+ * específicos al dominio Chagra (ej. formato de URN de plaga).
  *
  * @param {object} entity
  * @returns {{valid: boolean, errors: string[]}}
@@ -876,7 +889,7 @@ export function validateAgriProductTypeEntities(entities) {
 
 /**
  * @param {string[]} argv - process.argv.slice(2)
- * @returns {Promise<{outputPath: string|null, entityCount: number, valid: boolean}>}
+ * @returns {Promise<{outputPath: string|null, entityCount: number, valid: boolean, ajvValid: boolean}>}
  */
 export async function main(argv = process.argv.slice(2)) {
   const opts = {
@@ -921,7 +934,13 @@ export async function main(argv = process.argv.slice(2)) {
   // Batch mixto AgriCrop + AgriPest + AgriProductType (formato aceptado por
   // entityOperations/upsert de Orion-LD; ver nota de cabecera del archivo).
   const entities = [...cropResult.entities, ...pestResult.entities, ...productTypeResult.entities];
-  const valid = cropValidation.valid && pestValidation.valid && productTypeValidation.valid;
+
+  // Validación de conformidad NGSI-LD contra los schemas OFICIALES de
+  // smart-data-models (ADR-051 fase 1, ítem CI) — capa adicional a la
+  // validación estructural propia de arriba (ver `scripts/lib/ngsi-validate.mjs`).
+  const ajvValidation = validateEntitiesAjv(entities);
+
+  const valid = cropValidation.valid && pestValidation.valid && productTypeValidation.valid && ajvValidation.valid;
 
   const jsonOut = JSON.stringify(entities, null, 2) + '\n';
 
@@ -974,13 +993,27 @@ export async function main(argv = process.argv.slice(2)) {
         console.log(`  - ${d.id}: ${d.errors.join(' | ')}`);
       }
     }
+    console.log(
+      `Validación ajv vs. schemas oficiales smart-data-models (AgriCrop+AgriPest+AgriProductType): `
+      + `${ajvValidation.valid ? 'OK' : `FALLÓ (${ajvValidation.invalidCount} entidad(es))`}`,
+    );
+    if (!ajvValidation.valid) {
+      for (const d of ajvValidation.details.slice(0, 10)) {
+        console.log(`  - [${d.type}] ${d.id}: ${d.errors.join(' | ')}`);
+      }
+    }
   }
 
   if (!valid) {
     process.exitCode = 1;
   }
 
-  return { outputPath: opts.out, entityCount: entities.length, valid };
+  return {
+    outputPath: opts.out,
+    entityCount: entities.length,
+    valid,
+    ajvValid: ajvValidation.valid,
+  };
 }
 
 // ESM-friendly entry-point check.

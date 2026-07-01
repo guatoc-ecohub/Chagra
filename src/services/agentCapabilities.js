@@ -517,6 +517,7 @@ export const CAPABILITY_MANIFEST = Object.freeze([
 /**
  * CHIP_INTENTS — enum de intentos de chip. Clave === valor (string union).
  * Derivado del manifiesto: solo entradas con `intent` definido.
+ * @type {Record<string, string>}
  */
 export const CHIP_INTENTS = Object.freeze(
   CAPABILITY_MANIFEST
@@ -524,7 +525,7 @@ export const CHIP_INTENTS = Object.freeze(
     .reduce((acc, e) => {
       acc[e.intent] = e.intent;
       return acc;
-    }, {}),
+    }, /** @type {Record<string, string>} */ ({})),
 );
 
 /**
