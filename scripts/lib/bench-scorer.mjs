@@ -33,8 +33,8 @@
  *   - `qwen2.5:14b`      → devuelve respuesta VACÍA (no juzga nada).
  *   - `llama3.1:8b`      → devuelve respuesta VACÍA.
  *   - `mistral-nemo:12b` → aprueba TODO (rubber-stamp; además crash cgo).
- * Por eso el juez confiable por defecto pasa a ser **Claude Haiku** vía la API de
- * Anthropic (`claude-haiku-4-5`: modelo de juez barato y estable). El proveedor
+ * Por eso el juez confiable por defecto pasa a ser **Claude Sonnet** vía la API de
+ * Anthropic (`claude-sonnet-5`: modelo de juez estable y más capaz). El proveedor
  * se elige con la env `JUDGE_PROVIDER` (anthropic|ollama|deterministic). Si NO
  * hay API key disponible, se degrada de forma graceful al scorer DETERMINÍSTICO
  * (substring de must_include + ausencia de red_flags) — nunca crashea.
@@ -56,13 +56,13 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 
 /**
- * Modelo Anthropic de juez (barato y confiable). Se usa cuando
+ * Modelo Anthropic de juez (estable y más capaz). Se usa cuando
  * `JUDGE_PROVIDER=anthropic` (default si hay API key disponible).
  */
-export const RECOMMENDED_ANTHROPIC_JUDGE_MODEL = 'claude-haiku-4-5';
+export const RECOMMENDED_ANTHROPIC_JUDGE_MODEL = 'claude-sonnet-5';
 
 /**
- * Juez recomendado por defecto: Claude Haiku vía API de Anthropic. Los jueces
+ * Juez recomendado por defecto: Claude Sonnet vía API de Anthropic. Los jueces
  * LOCALES están ROTOS en Maxwell (qwen2.5:14b y llama3.1:8b devuelven vacío;
  * mistral-nemo:12b aprueba todo = rubber-stamp). Cuando no hay API key, el
  * pipeline degrada al scorer determinístico (ver `selectJudgeProvider`).
@@ -98,7 +98,7 @@ export function assertIndependentJudge(judgeModel, generatorModel) {
   if (j && g && j === g) {
     throw new Error(
       `Juez NO independiente: '${judgeModel}' es el generador → auto-evaluación. ` +
-        `Usá un juez de otra familia (recomendado: ${RECOMMENDED_JUDGE_MODEL}).`,
+        `Use un juez de otra familia (recomendado: ${RECOMMENDED_JUDGE_MODEL}).`,
     );
   }
 }
@@ -453,7 +453,7 @@ export async function scoreAntiHalluc(item, { ollamaCall } = {}) {
   }
 }
 
-// ── R5: juez Claude Haiku (Anthropic API) + fallback determinístico ───────────
+// ── R5: juez Claude Sonnet (Anthropic API) + fallback determinístico ──────────
 
 /**
  * Ruta del archivo gitignored con la API key del juez Anthropic. chmod 600. El
@@ -504,7 +504,7 @@ export function extractAnthropicText(data) {
 
 /**
  * makeAnthropicJudgeCall — fabrica un caller de juez `(prompt) => Promise<string>`
- * que llama a la API de Anthropic (Messages) con un modelo Haiku barato y
+ * que llama a la API de Anthropic (Messages) con un modelo Sonnet estable y
  * devuelve el TEXTO del veredicto, con el MISMO contrato que el `ollamaCall`
  * inyectable. Así enchufa directo en `scoreAntiHalluc` / `scoreWithJudge` sin
  * cambiarlos.
