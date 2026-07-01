@@ -102,7 +102,7 @@ export const initiateAuthorizationCodeFlow = async (state) => {
  * @returns {Promise<{success: boolean, error?: string}>}
  */
 export const exchangeCodeForToken = async (code, state) => {
-    console.log('[Auth] Intercambiando code por token (PKCE)');
+    console.info('[Auth] Intercambiando code por token (PKCE)');
 
     // Validar state
     const savedState = await localforage.getItem('oauth_state');
@@ -172,7 +172,7 @@ export const exchangeCodeForToken = async (code, state) => {
  * @returns {Promise<{success: boolean, error?: string, deprecation?: string}>}
  */
 export const authenticateUser = async (username, password) => {
-    console.log('[Auth] Intentando login password grant (DEPRECATED) para:', username);
+    console.warn('[Auth] Intentando login password grant (DEPRECATED) para:', username);
 
     // Aviso de deprecation
     const daysUntilDeprecation = Math.max(0, Math.ceil(
@@ -326,7 +326,7 @@ export const refreshAccessToken = async () => {
             const expiresIn = Number(data.expires_in) || 3600;
             await localforage.setItem('farmos_token_expiry', Date.now() + expiresIn * 1000);
 
-            console.log('[Auth] access token renovado vía refresh_token grant.');
+            console.info('[Auth] access token renovado vía refresh_token grant.');
             return data.access_token;
         } catch (err) {
             // Red caída / timeout: NO es expiración del refresh. Devolvemos null

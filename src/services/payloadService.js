@@ -26,7 +26,6 @@ const resolveEndpoint = (type) =>
  * @returns {Promise<{success: boolean, message: string, data: any}>} Resultado de la operación
  */
 export const savePayload = async (type, payload) => {
-  console.log(`Payload Chagra (${type}):`, JSON.stringify(payload, null, 2));
   const endpoint = resolveEndpoint(type);
   if (navigator.onLine) {
     try {
@@ -222,7 +221,6 @@ export const savePayload = async (type, payload) => {
  * @param {object} payload - { data: { type, id, attributes, relationships? } }
  */
 export const updatePayload = async (type, logId, payload) => {
-  console.log(`PATCH Chagra (${type} #${logId}):`, JSON.stringify(payload, null, 2));
   const endpoint = `${resolveEndpoint(type)}/${logId}`;
   if (navigator.onLine) {
     try {

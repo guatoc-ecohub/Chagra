@@ -123,7 +123,7 @@ export const openDB = async () => {
 
     request.onupgradeneeded = (event) => {
       const db = event.target.result;
-      console.log(`[DB] Upgrading schema to v${DB_VERSION}…`);
+      console.info(`[DB] Upgrading schema to v${DB_VERSION}…`);
 
       // pending_transactions (cola de salida — autoincrement + string uuids)
       if (!db.objectStoreNames.contains(STORES.PENDING_TX)) {
