@@ -9,6 +9,9 @@ import {
   formatToolEvidence,
   TOOL_EVIDENCE_MAX_CHARS,
   buildCampesinoModeBlock,
+  buildExpertModeBlock,
+  buildMasterModeBlock,
+  buildResponseModeBlock,
 } from '../agentPromptBase.js';
 
 describe('analyzeQuery', () => {
@@ -599,5 +602,56 @@ describe('buildCampesinoModeBlock', () => {
     // Debe mencionar que NO se debe usar voseo argentino
     expect(block).toContain('NEVER vos');
     expect(block).toContain('argentino');
+  });
+});
+
+describe('modos de respuesta (campesino/experto/maestro)', () => {
+  it('buildResponseModeBlock elige campesino para simple', () => {
+    expect(buildResponseModeBlock('simple')).toContain('MODO CAMPESINO');
+  });
+
+  it('buildResponseModeBlock elige experto para detallado', () => {
+    const block = buildResponseModeBlock('detallado');
+    expect(block).toContain('MODO EXPERTO');
+    expect(block).toContain('nombres científicos');
+  });
+
+  it('buildResponseModeBlock elige maestro para maestro', () => {
+    expect(buildResponseModeBlock('maestro')).toContain('MODO MAESTRO');
+  });
+
+  it('buildResponseModeBlock degrada a vacío para modo desconocido', () => {
+    expect(buildResponseModeBlock('otro')).toBe('');
+    expect(buildResponseModeBlock('')).toBe('');
+    expect(buildResponseModeBlock(null)).toBe('');
+  });
+
+  it('buildExpertModeBlock prioriza precisión técnica y tradeoffs', () => {
+    const block = buildExpertModeBlock();
+    expect(block).toContain('nombres científicos');
+    expect(block).toContain('tradeoffs');
+  });
+
+  it('buildMasterModeBlock enseña con criterio', () => {
+    const block = buildMasterModeBlock();
+    expect(block).toContain('Habla como quien enseña');
+    expect(block).toContain('errores comunes');
+  });
+
+  it('buildBasePrompt inyecta MODO EXPERTO cuando nivelRespuestas es detallado', () => {
+    const prompt = buildBasePrompt({ query: '¿por qué se enferma mi tomate?', nivelRespuestas: 'detallado' });
+    expect(prompt).toContain('MODO EXPERTO');
+  });
+
+  it('buildBasePrompt inyecta MODO CAMPESINO cuando nivelRespuestas es simple', () => {
+    const prompt = buildBasePrompt({ query: '¿por qué se enferma mi tomate?', nivelRespuestas: 'simple' });
+    expect(prompt).toContain('MODO CAMPESINO');
+  });
+
+  it('buildBasePrompt NO duplica el bloque de nivel de detalle (regresión fix dedup)', () => {
+    // El registro de respuesta lo maneja MODO EXPERTO; el viejo bloque
+    // "NIVEL DE RESPUESTA" no debe reaparecer en paralelo.
+    const prompt = buildBasePrompt({ query: 'algo técnico', nivelRespuestas: 'detallado' });
+    expect(prompt).not.toContain('NIVEL DE RESPUESTA');
   });
 });

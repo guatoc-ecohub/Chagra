@@ -31,6 +31,7 @@ import {
   generateAgronomicGuidanceRules,
   buildProfileContext,
 } from './agentService.js';
+import { getProfile } from './userProfileService.js';
 import {
   tagPassagesOrigin,
   reconcileOrigins,
@@ -356,6 +357,66 @@ sencillas. Si no sabes algo, sé honesto como siempre.
 }
 
 /**
+ * buildExpertModeBlock — bloque MODO_EXPERTO para respuesta técnica corta.
+ *
+ * No cambia la verdad agronómica; cambia el ángulo: más precisión, más
+ * conceptos técnicos y menos metáfora de campo cuando el usuario ya pide
+ * profundidad.
+ *
+ * @returns {string}
+ */
+export function buildExpertModeBlock() {
+  return `=== MODO EXPERTO (registro técnico claro) ===
+Habla como agrónomo/a de extensión con criterio técnico:
+- Usa nombres científicos cuando aporten precisión.
+- Explica el porqué de la recomendación, no solo el qué.
+- Mantén frases claras, pero sin simplificar de más.
+- Si hay tradeoffs, nómbralos explícitamente.
+- Si un dato depende de zona, altitud, humedad o variedad, dilo.
+
+PRINCIPIO FUNDAMENTAL: no inventes precisión. Si falta evidencia, pide dato o foto.
+=== FIN MODO EXPERTO ===`;
+}
+
+/**
+ * buildMasterModeBlock — bloque MODO_MAESTRO para explicación/enseñanza.
+ *
+ * Este modo agrega tutoría: además de resolver la duda, enseña criterio para
+ * que el usuario entienda cómo decidir por su cuenta la próxima vez.
+ *
+ * @returns {string}
+ */
+export function buildMasterModeBlock() {
+  return `=== MODO MAESTRO (registro profesor/mentor) ===
+Habla como quien enseña en campo y deja criterio:
+- Resume la decisión principal en una frase.
+- Luego explica la lógica detrás de la recomendación.
+- Si sirve, da un checklist breve para ejecutar y verificar.
+- Señala errores comunes y qué observar después.
+- Usa ejemplos del cultivo del usuario para fijar el aprendizaje.
+
+PRINCIPIO FUNDAMENTAL: enseñar no es adornar. Mantén exactitud, foco y pasos accionables.
+=== FIN MODO MAESTRO ===`;
+}
+
+function normalizeMode(value) {
+  if (!value || typeof value !== 'string') return '';
+  const normalized = value.toLowerCase().trim();
+  if (['simple', 'campesino', 'campesina', 'rural'].includes(normalized)) return 'campesino';
+  if (['detallado', 'detallada', 'experto', 'experta', 'tecnico', 'técnico'].includes(normalized)) return 'experto';
+  if (['maestro', 'maestra', 'profesor', 'profesora', 'mentor'].includes(normalized)) return 'maestro';
+  return '';
+}
+
+export function buildResponseModeBlock(mode) {
+  const normalized = normalizeMode(mode);
+  if (normalized === 'campesino') return buildCampesinoModeBlock();
+  if (normalized === 'experto') return buildExpertModeBlock();
+  if (normalized === 'maestro') return buildMasterModeBlock();
+  return '';
+}
+
+/**
  * buildBasePrompt — system prompt base del agente Chagra (instrucciones +
  * glosarios condicionales + reglas anti-alucinación CASO A/B/C).
  *
@@ -388,6 +449,7 @@ export function buildBasePrompt({
   nivelRespuestas = '',
 } = {}) {
   const mention = _strip(`${query}\n${contextMemory}`);
+  const profileMode = normalizeMode(nivelRespuestas || getProfile()?.nivel_respuestas || '');
   const sections = [];
   const conversationContextPin = buildConversationContextPin(contextMemory);
 
@@ -401,6 +463,11 @@ export function buildBasePrompt({
 
   if (conversationContextPin) {
     sections.push(conversationContextPin);
+  }
+
+  const responseModeBlock = buildResponseModeBlock(profileMode);
+  if (responseModeBlock) {
+    sections.push(responseModeBlock);
   }
 
   if (INVENTORY_QUERY_RE.test(mention)) {
@@ -518,8 +585,10 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
   sections.push(generateAgronomicGuidanceRules());
   // Las alertas climáticas regionales del perfil solo aportan en consultas de
   // clima; en plaga/manejo se omiten para no empujar la truncación (GR-10).
-  // Pasa nivelRespuestas para ajustar el nivel de detalle en buildProfileContext.
-  sections.push(buildProfileContext(finca, { climaQuery: CLIMA_QUERY_RE.test(mention), nivelRespuestas }));
+  // El registro de respuesta (campesino/experto/maestro) ya lo inyecta
+  // buildResponseModeBlock arriba a partir de nivel_respuestas; NO reenviamos
+  // nivelRespuestas a buildProfileContext para no duplicar el bloque de nivel.
+  sections.push(buildProfileContext(finca, { climaQuery: CLIMA_QUERY_RE.test(mention) }));
 
   return sections.join('\n\n');
 }
