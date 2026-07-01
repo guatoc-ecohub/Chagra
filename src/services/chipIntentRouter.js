@@ -13,7 +13,7 @@
  *
  * Este módulo es PURO (sin red, sin React): mapea (intent, texto, opts) a un
  * "plan forzado" que el AgentScreen ejecuta sin pasar por `planNlu()`. Toda la
- * lógica de routing vive acá para poder testearla en aislamiento (TDD).
+ * lógica de routing vive aquí para poder testearla en aislamiento (TDD).
  *
  * CHIP_INTENTS y CHIP_DEFS se importan de agentCapabilities.js (fuente única
  * de verdad). Este módulo NO redefine esas constantes.

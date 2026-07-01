@@ -2,7 +2,7 @@
  * farmEventService — única puerta de escritura para eventos de ciclo.
  *
  * recordFarmEvent es la función autorizada para mutar el agregado.
- * Toda escritura pasa por acá. No exponer al LLM sin pruebas E2E.
+ * Toda escritura pasa por aquí. No exponer al LLM sin pruebas E2E.
  */
 import { openDB, STORES } from '../db/dbCore';
 import { newUlid } from '../utils/id';

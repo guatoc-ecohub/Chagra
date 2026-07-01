@@ -12,7 +12,7 @@ import { fetchWithAuthRetry } from './apiService.js';
 /**
  * Tools que dependen del sidecar MCP agro (ALLOWED_TOOLS en sidecarClient).
  * Si el sidecar está caído/deshabilitado, las capacidades que usan estas
- * tools se marcan 'down'. Las capacidades con tools NO listadas acá son
+ * tools se marcan 'down'. Las capacidades con tools NO listadas aquí son
  * offline-first y siempre están 'live'.
  */
 export const SIDECAR_TOOL_NAMES = new Set([

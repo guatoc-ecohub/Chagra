@@ -287,7 +287,7 @@ export async function executeToolChain(chain) {
  * normativa ICA defensiva, clima IDEAM nacional y precios SIPSA DANE.
  *
  * TODO(NLU): add keywords agroquimico/clima/precio in chagra-pro nlu.ts
- * (sidecar repo, NO acá) para que el planner las routee automáticamente.
+ * (sidecar repo, NO aquí) para que el planner las routee automáticamente.
  * Mientras tanto el frontend hace detection por keywords + invocación
  * directa de los wrappers (ver AgentScreen handleSubmit).
  */
@@ -330,7 +330,7 @@ const ALLOWED_TOOLS = new Set([
   // ── Reconciliación allow-list cliente ↔ 41 tools del NLU (fix grounding P0
   //    2026-06-25). El NLU planner conocía 41 tools pero el cliente exponía 20:
   //    si el planner ruteaba a una de las 21 restantes, el turno degradaba a
-  //    RAG SIN grounding en silencio. Agregamos acá las tools que son SEGURAS y
+  //    RAG SIN grounding en silencio. Agregamos aquí las tools que son SEGURAS y
   //    VALIOSAS de exponer (grounding del grafo AGE / catálogo / dataset
   //    institucional local, ruteables por el NLU con id|nombre|término).
   //

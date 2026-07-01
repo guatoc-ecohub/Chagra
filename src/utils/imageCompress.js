@@ -17,7 +17,7 @@
  * Esta es la primera capa de defensa contra payloads gigantes hacia el
  * sidecar agro-mcp (que arranca con `bodyLimit` chico). Es complementaria a
  * `photoService.captureAndCompress` que apunta a 500 KB para persistencia
- * local — acá apuntamos a un techo distinto (2 MB) porque el sidecar es
+ * local — aquí apuntamos a un techo distinto (2 MB) porque el sidecar es
  * quien define el límite de red.
  *
  * Diseño puro: NO toca IndexedDB, NO toca red, NO toca catálogo. Recibe un

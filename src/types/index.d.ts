@@ -305,7 +305,7 @@ declare global {
 // módulo). Los `@typedef` de `index.js` quedaban entonces inalcanzables
 // para ese import, y tsc reportaba TS2694 "Namespace has no exported
 // member" en los 6 archivos que los usan. Fix de raíz: declarar los alias
-// acá, en el archivo que de verdad se resuelve. `ChagraSpecies` y
+// aquí, en el archivo que de verdad se resuelve. `ChagraSpecies` y
 // `ChagraBiopreparado` NO son alias de los globals `Species`/`Biopreparado`
 // de arriba — son shapes distintos (nombres de campo en inglés, usados por
 // el pipeline de eventos/IA), tal como estaban definidos en `index.js`.

@@ -23,7 +23,7 @@
  * 4. Si el conteo total SUBE respecto al baseline vigente, `--update-baseline`
  *    se niega a escribir (mismo espíritu que el gate: no se puede subir la
  *    deuda "por accidente"). Para un caso excepcional y consciente (p. ej.
- *    upgrade de TypeScript que revela errores reales preexistentes) usá
+ *    upgrade de TypeScript que revela errores reales preexistentes) use
  *    `--update-baseline --force`, y explicá el porqué en el PR.
  *
  * ── LIMITACIÓN CONOCIDA ────────────────────────────────────────────────
@@ -211,7 +211,7 @@ function main() {
       console.error(
         `El conteo actual (${current.total}) es MAYOR que el baseline vigente (${baseline.totalErrors || 0}). ` +
           '`--update-baseline` no sube el baseline por accidente. Si es un caso consciente y justificado, ' +
-          'usá `--update-baseline --force`.'
+          'use `--update-baseline --force`.'
       );
       process.exit(1);
     }

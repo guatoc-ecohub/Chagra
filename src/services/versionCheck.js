@@ -22,7 +22,7 @@
  * (Network-First en el SW) → bundle nuevo → SHA coincide → no recarga otra vez.
  *
  * Es belt-and-suspenders del auto-update: si éste ya recargó, el SHA coincide y
- * acá no pasa nada. Si el auto-update falló, esta ruta lo rescata.
+ * aquí no pasa nada. Si el auto-update falló, esta ruta lo rescata.
  *
  * ── ANTI-LOOP (crítico) ───────────────────────────────────────────────────
  * Guard por sessionStorage (`chagra:self-heal-reloaded`): recargamos como mucho
@@ -81,7 +81,7 @@ export function shasMatch(a, b) {
 
 /**
  * Decide si el cliente debe auto-recuperarse (recargar) por desfase de versión.
- * Función pura: toda la política de decisión vive acá para testearla aislada.
+ * Función pura: toda la política de decisión vive aquí para testearla aislada.
  *
  * @param {object} params
  * @param {string} params.runningSha — SHA embebido en el bundle corriendo.
@@ -302,7 +302,7 @@ async function defaultSkipWaiting() {
 
 function defaultReload() {
   // Indirección vía import dinámico para reusar pageReload (mockeable en test).
-  // Import estático arriba crearía un ciclo innecesario; acá basta location.
+  // Import estático arriba crearía un ciclo innecesario; aquí basta location.
   try {
     window.location.reload();
   } catch (_) { /* entorno sin window (SSR/test) — no-op */ }
