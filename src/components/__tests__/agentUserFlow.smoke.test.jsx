@@ -100,10 +100,16 @@ describe('flujo usuario nuevo — estado activo del modo claro', () => {
 
   it('cada chip visible tiene un accessible label descriptivo (no solo emoji)', () => {
     render(<ChipsToolbar onSelectIntent={() => {}} />);
+    // Expandir "Más" para incluir los chips de grounding puntual (viven
+    // detrás del toggle, no en la fila principal — ver docstring del A4).
+    fireEvent.click(screen.getByTestId('mode-chip-more'));
     // Con DR flag OFF, deep no se renderiza
     const visibleDefs = CHIP_DEFS.filter((d) => d.intent !== CHIP_INTENTS.deep);
     for (const def of visibleDefs) {
-      const chip = screen.getByRole('button', { name: new RegExp(def.label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') });
+      // Match EXACTO (no substring): algunas etiquetas comparten palabras
+      // (ej. "Páramo" vs "Alerta normativa páramo") — un regex suelto
+      // encuentra ambas y `getByRole` revienta con "multiple elements".
+      const chip = screen.getByRole('button', { name: def.label });
       expect(chip).toBeInTheDocument();
       expect(chip).toHaveAttribute('aria-label', expect.stringContaining(def.label));
     }

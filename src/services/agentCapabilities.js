@@ -11,7 +11,7 @@
  * agentCapabilities.js — Manifiesto ÚNICO de capacidades de Chagra.
  *
  * Fuente normativa para chips de modo y menú Ⓐ del AgentHero.
- * TODO lo demás (chips, tools, labels, placeholders, rutas) se deriva de acá.
+ * TODO lo demás (chips, tools, labels, placeholders, rutas) se deriva de aquí.
  *
  * Regla inviolable: un cambio en la UI (nuevo chip, nuevo tool, label distinto)
  * se hace editando ESTE archivo. NO en CHIP_DEFS ni en CAPABILITIES de AgentHero.
@@ -274,6 +274,117 @@ export const CAPABILITY_MANIFEST = Object.freeze([
   },
 
   // ═══════════════════════════════════════════════════════════════════════
+  // GROUNDING OSCURO (2026-07-01) — tools YA vivas en el grafo/catálogo (ver
+  // ALLOWED_TOOLS en sidecarClient.js) pero, hasta ahora, SOLO alcanzables por
+  // texto libre en el chat: el NLU las conoce, pero ningún chip las disparaba
+  // (auditoría chagra-pro allowed-tools.ts: "datos del grafo que estaban
+  // muertos"). Se exponen aquí como chips de modo, agrupados bajo el toggle
+  // "Más" del ChipsToolbar (chipMore:true) para NO saturar la barra principal
+  // con 6 chips nuevos de golpe — son consultas de conocimiento puntuales, no
+  // el núcleo diario de siembra/plaga/clima.
+  //
+  // hero:false a propósito: NO se agregan ramas nuevas a la mano radial
+  // (AgentRedMenu solo pinta hero===true) — ese es un cambio de UX aparte que
+  // el operador debe decidir explícitamente. Aquí solo se resuelve la
+  // descubribilidad vía chips (el pedido puntual de esta tarea).
+  {
+    id: 'toxicidad',
+    group: 'cuidar',
+    status: 'live',
+    intent: 'toxicidad',
+    kind: 'tool',
+    icon: '☠️',
+    label: 'Toxicidad',
+    desc: 'Si una planta es tóxica o se puede comer, con qué cuidado.',
+    placeholder: 'Escriba la planta de la que quiere saber si es tóxica o comestible',
+    tool: 'get_toxicidad',
+    stubMessage: null,
+    hero: false,
+    chipMore: true,
+    heroRoute: { kind: 'unavailable' },
+  },
+  {
+    id: 'saberes_tradicionales',
+    group: 'aprender',
+    status: 'live',
+    intent: 'saberes_tradicionales',
+    kind: 'tool',
+    icon: '📜',
+    label: 'Saberes tradicionales',
+    desc: 'Glosario de saberes agroecológicos: qué significan y cómo se usan.',
+    placeholder: 'Escriba el término que quiere consultar (ej. bocashi, milpa, pionera)',
+    tool: 'get_saberes_tradicionales',
+    stubMessage: null,
+    hero: false,
+    chipMore: true,
+    heroRoute: { kind: 'unavailable' },
+  },
+  {
+    id: 'alerta_paramo',
+    group: 'restaurar',
+    status: 'live',
+    intent: 'alerta_paramo',
+    kind: 'tool',
+    icon: '⚖️',
+    label: 'Alerta normativa páramo',
+    desc: 'Qué dice la Ley 1930 de 2018 sobre sembrar o hacer quemas en el páramo.',
+    placeholder: 'Cuéntele al agente su situación en el páramo',
+    tool: 'get_alerta_normativa_paramo',
+    stubMessage: null,
+    hero: false,
+    chipMore: true,
+    heroRoute: { kind: 'unavailable' },
+  },
+  {
+    id: 'variedades',
+    group: 'cultivo',
+    status: 'live',
+    intent: 'variedades',
+    kind: 'tool',
+    icon: '🧬',
+    label: 'Variedades',
+    desc: 'Variedades registradas ICA/AGROSAVIA de un cultivo.',
+    placeholder: 'Escriba el cultivo del que quiere ver las variedades',
+    tool: 'get_variedades_cultivo',
+    stubMessage: null,
+    hero: false,
+    chipMore: true,
+    heroRoute: { kind: 'unavailable' },
+  },
+  {
+    id: 'polinizacion',
+    group: 'cultivo',
+    status: 'live',
+    intent: 'polinizacion',
+    kind: 'tool',
+    icon: '🐝',
+    label: 'Polinización',
+    desc: 'Qué la poliniza y cuántas colmenas por hectárea necesita.',
+    placeholder: 'Escriba la planta de la que quiere saber cómo se poliniza',
+    tool: 'get_polinizacion',
+    stubMessage: null,
+    hero: false,
+    chipMore: true,
+    heroRoute: { kind: 'unavailable' },
+  },
+  {
+    id: 'fenologia',
+    group: 'cultivo',
+    status: 'live',
+    intent: 'fenologia',
+    kind: 'tool',
+    icon: '📊',
+    label: 'Fenología',
+    desc: 'Etapas de desarrollo de la planta y en cuáles aparece cada plaga.',
+    placeholder: 'Escriba la planta de la que quiere ver sus etapas de desarrollo',
+    tool: 'get_fenologia',
+    stubMessage: null,
+    hero: false,
+    chipMore: true,
+    heroRoute: { kind: 'unavailable' },
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
   // AGENTHERO ACTIONS — aparecen solo en menú Ⓐ del AgentHero
   // ═══════════════════════════════════════════════════════════════════════
   {
@@ -531,7 +642,12 @@ export const CHIP_INTENTS = Object.freeze(
 /**
  * CHIP_DEFS — definiciones de chips de modo para ChipsToolbar.
  * Orden = orden del manifiesto (filtrado a entradas con intent).
- * Cada entrada: { intent, emoji, label, kind, placeholder, stubMessage }.
+ * Cada entrada: { intent, emoji, label, kind, placeholder, stubMessage, moreGroup }.
+ *
+ * `moreGroup` (derivado de `chipMore` del manifiesto): true → el chip es
+ * grounding puntual (toxicidad/saberes/variedades/polinización/fenología/
+ * alerta páramo) que ChipsToolbar agrupa bajo el toggle "Más" para no saturar
+ * la barra principal con el núcleo diario (siembro/plaga/clima/...).
  */
 export const CHIP_DEFS = Object.freeze(
   CAPABILITY_MANIFEST
@@ -543,5 +659,6 @@ export const CHIP_DEFS = Object.freeze(
       kind: e.kind,
       placeholder: e.placeholder,
       ...(e.stubMessage ? { stubMessage: e.stubMessage } : {}),
+      ...(e.chipMore ? { moreGroup: true } : {}),
     })),
 );

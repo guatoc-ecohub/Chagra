@@ -16,16 +16,27 @@ import * as deepResearchClient from '../../services/deepResearchClient';
  *
  * Feature flag Deep Research (VITE_DEEP_RESEARCH_ENABLED):
  *   - flag OFF (default) → el chip 🔬 NO se renderiza (evita dead-end
- *     "no disponible en este plan"): quedan 6 chips.
+ *     "no disponible en este plan").
  *   - flag ON → el chip 🔬 reaparece y queda pro-gated (deshabilitado para
  *     free, activo para pro) — tier gate A1.
+ *
+ * Grupo "Más" (grounding oscuro 2026-07-01): los chips con `moreGroup:true`
+ * (toxicidad, saberes tradicionales, alerta páramo, variedades, polinización,
+ * fenología) NO se pintan en la fila principal — viven detrás del toggle
+ * `mode-chip-more`. Los conteos de abajo distinguen "núcleo visible sin
+ * expandir" de "catálogo completo tras expandir Más" (ver
+ * ChipsToolbar.groundingChips.test.jsx para la cobertura dedicada del grupo).
  *
  * Estos tests controlan la flag mockeando `isDeepResearchEnabled` para no
  * depender del entorno de build.
  */
 
-// Cantidad de chips NO-deep (siembro, plaga, biopreparado, clima, precio, calendario).
+// Cantidad de chips NO-deep (siembro, plaga, biopreparado, clima, precio, calendario, ...).
 const NON_DEEP_CHIP_COUNT = CHIP_DEFS.filter((d) => d.intent !== 'deep').length;
+// Núcleo visible SIN expandir "Más" (excluye los chips moreGroup + deep).
+const CORE_NON_DEEP_CHIP_COUNT = CHIP_DEFS.filter(
+  (d) => d.intent !== 'deep' && !d.moreGroup,
+).length;
 
 describe('ChipsToolbar — flag Deep Research OFF (chip 🔬 oculto)', () => {
   beforeEach(() => {
@@ -40,10 +51,10 @@ describe('ChipsToolbar — flag Deep Research OFF (chip 🔬 oculto)', () => {
     expect(screen.queryByText(/investigación profunda/i)).not.toBeInTheDocument();
   });
 
-  test('renderiza solo los chips no-deep (6) con la flag OFF', () => {
+  test('renderiza solo el núcleo no-deep con la flag OFF (grounding oscuro queda tras "Más")', () => {
     render(<ChipsToolbar onSelectIntent={() => {}} isPro={false} />);
     const chips = screen.getAllByTestId('mode-chip');
-    expect(chips).toHaveLength(NON_DEEP_CHIP_COUNT);
+    expect(chips).toHaveLength(CORE_NON_DEEP_CHIP_COUNT);
     expect(screen.getByText('¿Qué siembro?')).toBeInTheDocument();
     expect(screen.getByText('Plaga')).toBeInTheDocument();
   });
@@ -69,11 +80,17 @@ describe('ChipsToolbar — flag Deep Research OFF (chip 🔬 oculto)', () => {
     expect(siembroChip).toHaveAttribute('aria-pressed', 'false');
   });
 
-  test('cada chip no-deep expone un accessible name no vacío', () => {
+  test('cada chip no-deep expone un accessible name no vacío (incluido el grupo "Más")', () => {
     render(<ChipsToolbar onSelectIntent={() => {}} />);
+    // Expandir "Más" para que los chips de grounding puntual también estén
+    // en el DOM (viven detrás del toggle, no en la fila principal).
+    fireEvent.click(screen.getByTestId('mode-chip-more'));
     for (const def of CHIP_DEFS) {
       if (def.intent === 'deep') continue;
-      const chip = screen.getByRole('button', { name: new RegExp(def.label, 'i') });
+      // Match EXACTO (no substring): el aria-label del botón es def.label tal
+      // cual, y algunas etiquetas comparten palabras (ej. "Páramo" vs "Alerta
+      // normativa páramo") — un regex suelto encuentra ambas.
+      const chip = screen.getByRole('button', { name: def.label });
       expect(chip).toBeInTheDocument();
     }
   });
@@ -220,14 +237,18 @@ describe('ChipsToolbar — prop chipDefs (chips adaptativos por perfil)', () => 
 
   test('sin chipDefs (null) cae al catálogo completo — sin breaking change', () => {
     render(<ChipsToolbar onSelectIntent={() => {}} chipDefs={null} />);
+    // Núcleo visible sin expandir "Más" (el grounding oscuro queda agrupado).
     const chips = screen.getAllByTestId('mode-chip');
-    expect(chips).toHaveLength(NON_DEEP_CHIP_COUNT);
+    expect(chips).toHaveLength(CORE_NON_DEEP_CHIP_COUNT);
+    // Tras expandir "Más" aparece el catálogo COMPLETO.
+    fireEvent.click(screen.getByTestId('mode-chip-more'));
+    expect(screen.getAllByTestId('mode-chip')).toHaveLength(NON_DEEP_CHIP_COUNT);
   });
 
   test('chipDefs vacío [] cae al catálogo completo (defensa, nunca barra vacía)', () => {
     render(<ChipsToolbar onSelectIntent={() => {}} chipDefs={[]} />);
     const chips = screen.getAllByTestId('mode-chip');
-    expect(chips).toHaveLength(NON_DEEP_CHIP_COUNT);
+    expect(chips).toHaveLength(CORE_NON_DEEP_CHIP_COUNT);
   });
 });
 
@@ -240,10 +261,14 @@ describe('ChipsToolbar — flag Deep Research ON (chip 🔬 visible, pro-gated)'
     vi.restoreAllMocks();
   });
 
-  test('renderiza todos los chips (incluido 🔬) con la flag ON', () => {
+  test('renderiza todos los chips (incluido 🔬) con la flag ON, sumando el grupo "Más"', () => {
     render(<ChipsToolbar onSelectIntent={() => {}} isPro={false} />);
-    // Con la flag ON se ven los 10 chips del manifiesto (deep incluido, aunque
-    // quede pro-locked para free).
+    // Núcleo (sin expandir "Más"): manifiesto completo MENOS el grupo agrupado.
+    const coreCount = CHIP_DEFS.filter((d) => !d.moreGroup).length;
+    expect(screen.getAllByTestId('mode-chip')).toHaveLength(coreCount);
+    // Al expandir "Más" se ve el catálogo COMPLETO (deep incluido, pro-locked
+    // para free) — el manifiesto entero queda alcanzable.
+    fireEvent.click(screen.getByTestId('mode-chip-more'));
     expect(screen.getAllByTestId('mode-chip')).toHaveLength(CHIP_DEFS.length);
   });
 
