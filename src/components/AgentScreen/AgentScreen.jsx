@@ -3,6 +3,7 @@ import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { transcribe, queueForRetry } from '../../services/voiceService';
 import VoiceStatusStrip from './VoiceStatusStrip';
+import ChipsToolbar from '../ChipsToolbar';
 import ContextTip from '../ContextTip';
 import {
   claimNext as outboxClaimNext,
@@ -290,6 +291,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       return null;
     }
   }, []);
+  const isPro = useMemo(() => getCurrentTier() === 'pro', []);
   // La MANO de Chagra (AgentRedMenu) — MISMA red que el home, no menús de texto.
   // sheetOpen monta/desmonta el overlay de la mano (AgentManoOverlay).
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -3335,6 +3337,17 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           }}
           onStopSpeaking={() => { stop(); agentSounds.cancel(); }}
           onDismissNotice={() => setVoiceNotice('')}
+        />
+
+        <ChipsToolbar
+          activeIntent={activeIntent}
+          hasAttachment={Boolean(agentAttachment)}
+          disabled={state === STATE_RECORDING || queuePending.length >= 1}
+          isPro={isPro}
+          chipDefs={profileChipDefs}
+          onSelectIntent={(intent) => {
+            setActiveIntent((current) => (current === intent ? null : intent));
+          }}
         />
 
         {/* Pill — unified with AgentHero (as-bar CSS tokens) */}
