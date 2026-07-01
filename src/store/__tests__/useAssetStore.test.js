@@ -32,6 +32,40 @@ describe('useAssetStore', function () {
     expect(useAssetStore.getState().getAllAssets()).toHaveLength(2);
   });
 
+  it('tenantChanged limpia el estado en memoria y rehidrata', async function () {
+    const hydrate = vi.fn().mockResolvedValue(undefined);
+    useAssetStore.setState({
+      plants: [{ id: 'stale-plant' }],
+      structures: [{ id: 'stale-structure' }],
+      equipment: [{ id: 'stale-equipment' }],
+      materials: [{ id: 'stale-material' }],
+      lands: [{ id: 'stale-land' }],
+      taxonomyTerms: [{ id: 'stale-tax' }],
+      lastSync: 123,
+      selectedAssetId: 'selected-stale',
+      syncProgress: { current: 1, total: 1 },
+      error: 'stale-error',
+      hydrate,
+    });
+
+    window.dispatchEvent(
+      new CustomEvent('tenantChanged', { detail: { previous: 'alice', current: 'bob' } }),
+    );
+
+    const s = useAssetStore.getState();
+    expect(s.plants).toEqual([]);
+    expect(s.structures).toEqual([]);
+    expect(s.equipment).toEqual([]);
+    expect(s.materials).toEqual([]);
+    expect(s.lands).toEqual([]);
+    expect(s.taxonomyTerms).toEqual([]);
+    expect(s.lastSync).toBeNull();
+    expect(s.selectedAssetId).toBeNull();
+    expect(s.syncProgress).toBeNull();
+    expect(s.error).toBeNull();
+    expect(hydrate).toHaveBeenCalledTimes(1);
+  });
+
   it('addAssetsBulk rejects empty', async function () {
     await expect(useAssetStore.getState().addAssetsBulk('plant', []))
       .rejects.toThrow('no vac');

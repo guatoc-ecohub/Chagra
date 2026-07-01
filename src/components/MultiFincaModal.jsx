@@ -54,8 +54,9 @@ export default function MultiFincaModal({ onClose }) {
                 aria-modal="true"
                 className="fixed inset-0 z-[101] bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-300 animate-in fade-in"
                 onClick={(e) => e.target === e.currentTarget && onClose()}
+                data-testid="multifinca-modal"
             >
-                <div className="w-full max-w-2xl bg-slate-950 border border-slate-800 rounded-t-3xl sm:rounded-3xl flex flex-col max-h-[95vh] sm:max-h-[85vh] overflow-hidden shadow-2xl animate-in slide-in-from-bottom sm:zoom-in-95 duration-300 text-white">
+                <div className="w-full max-w-2xl bg-slate-950 border border-slate-800 rounded-t-3xl sm:rounded-3xl flex flex-col max-h-[95vh] sm:max-h-[85vh] overflow-hidden shadow-2xl animate-in slide-in-from-bottom sm:zoom-in-95 duration-300 text-white" data-testid="multifinca-panel">
                     <header className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/50 shrink-0">
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-primary/20 rounded-lg text-primary">
@@ -82,6 +83,7 @@ export default function MultiFincaModal({ onClose }) {
                                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-colors ${
                                     viewMode === 'globe' ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                                 }`}
+                                data-testid="multifinca-view-globe"
                             >
                                 <Globe size={14} />
                                 Mapa
@@ -91,6 +93,7 @@ export default function MultiFincaModal({ onClose }) {
                                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-colors ${
                                     viewMode === 'grid' ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                                 }`}
+                                data-testid="multifinca-view-grid"
                             >
                                 <LayoutGrid size={14} />
                                 Cards
@@ -112,7 +115,7 @@ export default function MultiFincaModal({ onClose }) {
                         )}
                     </div>
 
-                    <footer className="p-4 border-t border-slate-900 bg-slate-900/20 shrink-0 flex justify-between items-center">
+                    <footer className="p-4 border-t border-slate-900 bg-slate-900/20 shrink-0 flex justify-between items-center" data-testid="multifinca-footer">
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
                             <span className="text-[10px] text-slate-500 font-mono italic">Nodo Central: Guatoc Choachí</span>

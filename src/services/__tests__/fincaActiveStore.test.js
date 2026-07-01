@@ -3,6 +3,7 @@ import { useFincaActiveStore } from '../fincaActiveStore';
 
 describe('fincaActiveStore', () => {
     beforeEach(() => {
+        localStorage.clear();
         useFincaActiveStore.setState({
             activeFincaSlug: 'guatoc',
             fincas: [
@@ -45,6 +46,15 @@ describe('fincaActiveStore', () => {
         expect(useFincaActiveStore.getState().gpsOverride).toBe(false);
         // Slug debe persistir tras clearGpsOverride
         expect(useFincaActiveStore.getState().activeFincaSlug).toBe('naranjalia');
+    });
+
+    it('persists the active finca slug in localStorage storage payload', () => {
+        useFincaActiveStore.getState().setActiveFincaManual('naranjalia');
+        const raw = localStorage.getItem('chagra:active-finca');
+        expect(raw).toBeTruthy();
+        const parsed = JSON.parse(raw);
+        expect(parsed.state.activeFincaSlug).toBe('naranjalia');
+        expect(parsed.state.gpsOverride).toBe(true);
     });
 
     // Edge: empty fincas[] (boot inicial antes de fetch fincas-publicas.json)

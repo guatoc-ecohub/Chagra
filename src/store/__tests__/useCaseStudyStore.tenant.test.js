@@ -199,6 +199,7 @@ describe('useCaseStudyStore tenant scoping (ADR-036 MVP)', () => {
     const aliceId = makeCase('alice 1');
     setActiveTenantId('bob');
     const bobId = makeCase('bob 1');
+    const before = useCaseStudyStore.getState().cases;
 
     // Disparar el evento simula el switch de login → tenantContext.setActive*.
     setActiveTenantId('alice');
@@ -207,10 +208,41 @@ describe('useCaseStudyStore tenant scoping (ADR-036 MVP)', () => {
     );
 
     // Ambos casos siguen en cases[] (no se borra nada en localStorage).
-    const raw = useCaseStudyStore.getState().cases.map((c) => c.id).sort();
+    const after = useCaseStudyStore.getState().cases;
+    expect(after).not.toBe(before);
+    const raw = after.map((c) => c.id).sort();
     expect(raw).toEqual([aliceId, bobId].sort());
 
     // Pero el selector solo retorna alice.
     expect(useCaseStudyStore.getState().getActive().map((c) => c.title)).toEqual(['alice 1']);
+  });
+
+  it('tenantChanged keeps legacy cases visible for the new active tenant', () => {
+    useCaseStudyStore.setState({
+      cases: [
+        {
+          id: 'LEGACY-2',
+          title: 'legacy visible',
+          finca_slug: 'guatoc',
+          subject: { species_ids: [], count_total: null, count_affected: null },
+          problem: { name_freetext: 'legacy', severity: 'low', detected_at: new Date().toISOString() },
+          treatments_applied: [],
+          event_log_ids: [],
+          photo_asset_ids: [],
+          state: 'open',
+          state_history: [],
+          outcome: { closed_at: null, final_count_affected: null, lessons_learned: '' },
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+      ],
+    });
+
+    setActiveTenantId('alice');
+    const before = useCaseStudyStore.getState().cases;
+    window.dispatchEvent(new CustomEvent('tenantChanged', { detail: { previous: 'bob', current: 'alice' } }));
+    const after = useCaseStudyStore.getState().cases;
+    expect(after).not.toBe(before);
+    expect(useCaseStudyStore.getState().getById('LEGACY-2')?.title).toBe('legacy visible');
   });
 });

@@ -31,7 +31,7 @@ export function FincaCard({finca, onSelect, onConfigure}) {
     const estadoClass = estadoColors[finca.estado] || estadoColors.pendiente;
 
     return (
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3 hover:border-slate-700 transition-colors">
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3 hover:border-slate-700 transition-colors" data-testid={`multifinca-card-${finca.slug}`}>
             <div className="flex items-start justify-between">
                 <div className="space-y-1">
                     <h3 className="font-bold text-lg text-white leading-tight">
@@ -76,6 +76,7 @@ export function FincaCard({finca, onSelect, onConfigure}) {
                     <button
                         onClick={() => onSelect?.(finca)}
                         className="w-full flex items-center justify-center gap-2 py-2.5 bg-emerald-600 text-white rounded-lg font-bold hover:bg-emerald-500 active:scale-95 transition-all"
+                        data-testid={`multifinca-enter-${finca.slug}`}
                     >
                         Entrar a la finca
                         <ArrowRight size={16} />
@@ -84,6 +85,7 @@ export function FincaCard({finca, onSelect, onConfigure}) {
                     <button
                         onClick={() => onConfigure?.(finca)}
                         className="w-full flex items-center justify-center gap-2 py-2.5 bg-amber-600 text-white rounded-lg font-bold hover:bg-amber-500 active:scale-95 transition-all"
+                        data-testid={`multifinca-configure-${finca.slug}`}
                     >
                         <Settings size={16} />
                         Configurar FarmOS
