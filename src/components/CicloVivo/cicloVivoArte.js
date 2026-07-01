@@ -72,6 +72,7 @@ export const CENTER_MAIZ = (function build() {
   s += '<path d="M-4.2,3.5 C-7.8,7.5 -8.4,13.4 -5.8,16.8 C-3.2,12.6 -3,7.6 -4.2,3.5 Z" fill="url(#gHusk)"/>';
   s += '<path d="M4.2,3.5 C7.8,7.5 8.4,13.4 5.8,16.8 C3.2,12.6 3,7.6 4.2,3.5 Z" fill="url(#gHusk)" opacity=".85"/>';
   s += '<ellipse rx="5.4" ry="10.6" fill="url(#gCob)"/>';
+  /** @type {Array<[number, number[]]>} filas de la mazorca: [y, xs de granos] */
   const rows = [[-7.3, [-1.8, 0, 1.8]], [-4.9, [-3, -1.05, 0.9, 2.85]], [-2.5, [-3.5, -1.7, 0.1, 1.9, 3.6]], [-0.1, [-3.7, -1.8, 0, 1.8, 3.7]], [2.3, [-3.6, -1.9, -0.1, 1.7, 3.5]], [4.7, [-2.9, -1, 0.9, 2.8]], [7.1, [-1.7, 0, 1.7]]];
   rows.forEach(function eachRow(row, ri) {
     row[1].forEach(function eachCol(x, ci) {
