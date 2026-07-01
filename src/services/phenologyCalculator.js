@@ -92,8 +92,8 @@ export function normalizePhenologyTemplate(template, speciesSlug = '') {
  *
  * @param {Object} input
  * @param {string} input.speciesSlug
- * @param {Object} [input.template] — plantilla explícita (sin normalizar)
- * @param {string} [input.category] — categoría del catálogo para el genérico
+ * @param {Object} [input.template] - plantilla explícita (sin normalizar)
+ * @param {string} [input.category] - categoría del catálogo para el genérico
  * @returns {(Object & {is_generic?: boolean})|null}
  */
 export function resolveTemplate({ speciesSlug, template, category } = {}) {
@@ -117,9 +117,9 @@ export function resolveTemplate({ speciesSlug, template, category } = {}) {
  * @param {Object} input
  * @param {string} input.speciesSlug
  * @param {number} input.sowingDate — timestamp ms del evento de siembra
- * @param {number} [input.altitudeM] — msnm para corrección por altitud
- * @param {Object} [input.template] — plantilla explícita (sin normalizar)
- * @param {string} [input.category] — categoría del catálogo para el genérico por tipo
+ * @param {number} [input.altitudeM] - msnm para corrección por altitud
+ * @param {Object} [input.template] - plantilla explícita (sin normalizar)
+ * @param {string} [input.category] - categoría del catálogo para el genérico por tipo
  * @returns {PhenologyWindow[]}
  */
 export function calculateWindows({ speciesSlug, sowingDate, altitudeM, template: inputTemplate, category } = {}) {
@@ -217,7 +217,7 @@ export function calculateWindows({ speciesSlug, sowingDate, altitudeM, template:
  * @param {string} input.speciesSlug
  * @param {number} input.sowingDate — timestamp ms del evento de siembra
  * @param {number} [input.altitudeM]
- * @param {number} [input.now=Date.now()] — timestamp ms para el cual calcular la etapa
+ * @param {number} [input.now=Date.now()] - timestamp ms para el cual calcular la etapa
  * @returns {CurrentStageResult|null}
  */
 export function getCurrentStage({ speciesSlug, sowingDate, altitudeM, now, template, category } = {}) {
@@ -265,7 +265,7 @@ export function getCurrentStage({ speciesSlug, sowingDate, altitudeM, now, templ
  * @param {number} input.sowingDate — timestamp ms de la siembra (created_at)
  * @param {number} [input.altitudeM]
  * @param {number} [input.now=Date.now()]
- * @param {string} [input.fallback='sowing_confirmed'] — etapa si no se puede derivar
+ * @param {string} [input.fallback='sowing_confirmed'] - etapa si no se puede derivar
  * @returns {string} código de etapa (ej. 'vegetative', 'flowering', 'sowing_confirmed')
  */
 export function deriveCurrentStage({ speciesSlug, sowingDate, altitudeM, now, template, category, fallback = 'sowing_confirmed' } = {}) {

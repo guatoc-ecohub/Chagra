@@ -61,7 +61,7 @@ export const buildUpsertPlaceholder = (processId, hint, occurredAt) => {
  * @param {string} [input.idempotency_key]
  * @param {number} [input.confidence]
  * @param {string} [input.evidence]
- * @param {import('../types/farmProcess').FarmProcess} [input.process_hint] — proceso
+ * @param {import('../types/farmProcess').FarmProcess} [input.process_hint] - proceso
  *   (ej. el ciclo seleccionado en la UI) para auto-crearlo si todavía no está en
  *   el store. Nunca perdemos una observación del campesino por desincronización.
  * @returns {Promise<import('../types/farmProcess').FarmProcessEvent>}

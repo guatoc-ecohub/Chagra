@@ -78,8 +78,8 @@ function seedDoseText(seedId) {
  * @param {string} cfg.action — qué hacer, en lenguaje campesino
  * @param {string} cfg.biofertilizer_slug — id del biopreparado/enmienda en el seed
  * @param {string} cfg.notes — contexto agronómico del paso (lenguaje campesino)
- * @param {string} [cfg.dose_safe] — dosis concreta y segura del paso (foliar/suelo)
- * @param {number} [cfg.dose_g] — dosis sólida numérica SOLO si está documentada
+ * @param {string} [cfg.dose_safe] - dosis concreta y segura del paso (foliar/suelo)
+ * @param {number} [cfg.dose_g] - dosis sólida numérica SOLO si está documentada
  *   como rango de campo en el seed (ej. bocashi "80-150 g por planta")
  * @returns {Object} paso normalizado, compatible con primary_steps del catálogo
  */
@@ -141,7 +141,7 @@ function soilSteps() {
  * @param {string} cfg.label — etiqueta legible del tipo de cultivo
  * @param {Array<Object>} cfg.steps — pasos de nutrición (post-siembra)
  * @param {boolean} [cfg.isLegume=false]
- * @param {string[]} [cfg.extraNotes=[]] — notas adicionales (override familia)
+ * @param {string[]} [cfg.extraNotes=[]] - notas adicionales (override familia)
  * @returns {Object}
  */
 function template({ categoryId, label, steps, isLegume = false, extraNotes = [] }) {

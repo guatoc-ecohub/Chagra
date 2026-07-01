@@ -26,15 +26,15 @@ import { Sparkles, Flag, ScrollText } from 'lucide-react';
  * Props:
  *   @param {object} props
  *   @param {string}  props.titulo      — título del infográfico (obligatorio).
- *   @param {string}  [props.subtitulo] — línea de apoyo bajo el título.
- *   @param {string}  [props.icono]     — emoji del encabezado (fallback: ícono lucide).
+ *   @param {string}  [props.subtitulo] - línea de apoyo bajo el título.
+ *   @param {string}  [props.icono]     - emoji del encabezado (fallback: ícono lucide).
  *   @param {Array<{emoji?: string, titulo: string, detalle?: string, resaltado?: string}>} props.pasos
  *                                        — pasos numerados. `resaltado` = píldora
  *                                          corta (p. ej. duración) junto al título.
  *   @param {{emoji?: string, titulo?: string, texto: string}} [props.resultado]
  *                                        — meta/desenlace destacado al final.
- *   @param {string}  [props.fuente]     — trazabilidad de los datos re-expresados.
- *   @param {string}  [props.className]  — clases extra para el contenedor.
+ *   @param {string}  [props.fuente]     - trazabilidad de los datos re-expresados.
+ *   @param {string}  [props.className]  - clases extra para el contenedor.
  */
 export default function LessonInfographic({
   titulo,

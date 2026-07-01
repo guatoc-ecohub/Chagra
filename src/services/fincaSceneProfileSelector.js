@@ -218,7 +218,7 @@ function deriveEstructura(p) {
  *
  * @param {Object} profile — perfil del usuario (chagra:profile).
  * @param {Object} [opts]
- * @param {boolean} [opts.esGuiaGlaciar=false] — username en whitelist Cordada
+ * @param {boolean} [opts.esGuiaGlaciar=false] - username en whitelist Cordada
  *   (lo resuelve el call-site con glaciarAccess, fuera de este módulo puro).
  * @returns {{ kind: string, escala: string, animales: boolean, cerdos: boolean,
  *   tinte: string, invernaderoForma: string|null, invernaderoTamano: string|null,

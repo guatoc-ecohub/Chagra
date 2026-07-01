@@ -90,10 +90,10 @@ export function isDeepResearchIntent(intent) {
  * @param {string} intent — uno de CHIP_INTENTS.
  * @param {string} text — texto crudo del usuario (lo que escribió en el input).
  * @param {object} [opts]
- * @param {string|null} [opts.municipio] — municipio de la finca activa (para clima).
- * @param {number|string|null} [opts.altitud] — altura de la finca/perfil en msnm
+ * @param {string|null} [opts.municipio] - municipio de la finca activa (para clima).
+ * @param {number|string|null} [opts.altitud] - altura de la finca/perfil en msnm
  *   (para restauración y silvopastoreo; silvopastoreo la EXIGE).
- * @param {string|null} [opts.pisoTermico] — piso térmico del perfil
+ * @param {string|null} [opts.pisoTermico] - piso térmico del perfil
  *   (frío/templado/cálido/páramo; se prioriza en silvopastoreo).
  * @returns {null | {
  *   intent: string,

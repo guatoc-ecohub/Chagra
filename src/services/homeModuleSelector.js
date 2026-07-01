@@ -281,10 +281,10 @@ function dedupeValid(ids, valid) {
  *
  * @param {Object} profile — perfil del usuario (chagra:profile:v1).
  * @param {Object} [opts]
- * @param {boolean} [opts.esOperador=false] — el usuario es OPERADOR (admin/demo/
+ * @param {boolean} [opts.esOperador=false] - el usuario es OPERADOR (admin/demo/
  *   debug, whitelist en glaciarAccess). BYPASS del gating: ve TODO. Tiene
  *   PRECEDENCIA sobre el override urbano y sobre los mapas por rol.
- * @param {boolean} [opts.esGuiaGlaciar=false] — username en whitelist Cordada
+ * @param {boolean} [opts.esGuiaGlaciar=false] - username en whitelist Cordada
  *   (lo resuelve el call-site con glaciarAccess, fuera de este módulo puro).
  * @returns {{ visibles: string[], seguimiento: string[] }} ids de módulos del
  *   home visibles + keys de tarjetas de seguimiento, ambos filtrados y sin
@@ -367,7 +367,7 @@ export function selectHomeModules(profile, opts = {}) {
  * Cada id de `ALL_HOME_MODULES` queda en true/false según el perfil.
  *
  * @param {Object} profile
- * @param {Object} [opts] — igual que selectHomeModules (esGuiaGlaciar).
+ * @param {Object} [opts] - igual que selectHomeModules (esGuiaGlaciar).
  * @returns {Record<string, boolean>}
  */
 export function selectHomeModuleVisibilityMap(profile, opts = {}) {

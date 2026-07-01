@@ -1,0 +1,40 @@
+name: TSC Gate (anti-regresión)
+
+# Gate anti-regresión de `npm run tsc:check`. NO exige arreglar la deuda
+# acumulada (ver scripts/tsc-baseline.json, ~2335 errores preexistentes tras
+# el cleanup de queue tsc-gate-cleanup) — solo falla si un PR introduce
+# errores de tipo NUEVOS: un archivo que antes no tenía errores y ahora sí,
+# o un archivo cuyo conteo subió respecto al baseline commiteado. Bajar el
+# conteo (arreglar errores reales) siempre está permitido.
+#
+# Cómo bajar el baseline: ver el header de scripts/tsc-check-gate.mjs.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, feat/**, fix/**, chore/**]
+
+permissions:
+  contents: read
+
+jobs:
+  tsc-gate:
+    name: tsc:check vs baseline
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check tsc:check against baseline
+        run: node scripts/tsc-check-gate.mjs

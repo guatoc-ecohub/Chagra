@@ -562,7 +562,7 @@ export function SeguimientoCard({ def, count, onNavigate, variant }) {
  * @param {Object} props
  * @param {(view: string) => void} props.onNavigate
  * @param {'grid'|'list'} [props.variant='grid']
- * @param {string[]|null} [props.keys=null] — keys de seguimiento permitidas
+ * @param {string[]|null} [props.keys=null] - keys de seguimiento permitidas
  *   (subconjunto de SEGUIMIENTO_PROCESOS[].key). null = todas.
  */
 export function SeguimientoCards({ onNavigate, variant = 'grid', keys = null }) {

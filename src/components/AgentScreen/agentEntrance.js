@@ -161,7 +161,7 @@ export function prefersReducedMotion() {
  * es la defensa JS equivalente (y el contrato testeable): nunca emite la clase
  * de animación cuando el usuario pidió quietud.
  *
- * @param {boolean} [reduce] — override explícito (para tests). Si se omite, se
+ * @param {boolean} [reduce] - override explícito (para tests). Si se omite, se
  *   consulta `prefersReducedMotion()`.
  * @returns {string} `AGENT_ENTRANCE_CLASS` o `''`.
  */

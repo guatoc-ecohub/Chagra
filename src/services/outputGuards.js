@@ -2978,7 +2978,7 @@ const LOW_CONFIDENCE_VISION_NOTE =
  *
  * @param {string} responseText
  * @param {object} [ctx]
- * @param {boolean} [ctx.hadVision=false]  ¿hubo una imagen real en el turno?
+ * @param {boolean} [ctx.hadVision=false] - ¿hubo una imagen real en el turno?
  * @param {number|null} [ctx.visionConfidence=null]  confianza de analyzeFoliage.
  * @returns {{text:string, modified:boolean, reason:string|null}}
  */
@@ -7898,8 +7898,8 @@ export function guardParamoNormativa(responseText) {
  *
  * @param {string} responseText — texto del LLM
  * @param {object} [ctx]
- * @param {number|null} [ctx.forecastTempMin] — mínima del pronóstico (°C)
- * @param {number|null} [ctx.forecastTempMax] — máxima del pronóstico (°C)
+ * @param {number|null} [ctx.forecastTempMin] - mínima del pronóstico (°C)
+ * @param {number|null} [ctx.forecastTempMax] - máxima del pronóstico (°C)
  * @returns {{text:string, modified:boolean, reason:string|null}}
  */
 export function guardClimaConsejo(responseText, { forecastTempMin = null, forecastTempMax = null } = {}) {
@@ -8034,21 +8034,21 @@ const GUARD_CHAIN = [
  *
  * @param {string} responseText  texto del LLM (ya pos-voseo / pos-roleLeak).
  * @param {object} [ctx]
- * @param {Array<object>|null} [ctx.resolvedEntities] — grounding AGE del turno.
- * @param {number|string|null} [ctx.fincaAltitud] — msnm de la finca activa.
- * @param {boolean} [ctx.hadVision=false] — ¿hubo una imagen real (item foto /
+ * @param {Array<object>|null} [ctx.resolvedEntities] - grounding AGE del turno.
+ * @param {number|string|null} [ctx.fincaAltitud] - msnm de la finca activa.
+ * @param {boolean} [ctx.hadVision=false] - ¿hubo una imagen real (item foto /
  *   analyzeFoliage corrido) en ESTE turno? Sin esto el guard de visión asume
  *   que NO hubo foto y corrige cualquier diagnóstico visual fabricado.
- * @param {number|null} [ctx.visionConfidence=null] — confianza de analyzeFoliage
+ * @param {number|null} [ctx.visionConfidence=null] - confianza de analyzeFoliage
  *   (para suavizar hallazgos detallados cuando la visión no fue concluyente).
- * @param {string|null} [ctx.profileName] — nombre del usuario (getProfile().nombre)
+ * @param {string|null} [ctx.profileName] - nombre del usuario (getProfile().nombre)
  *   para el guard de nombre inventado. Si falta, cualquier saludo con nombre se remueve.
- * @param {number|null} [ctx.forecastTempMin] — mínima esperada del pronóstico (°C),
+ * @param {number|null} [ctx.forecastTempMin] - mínima esperada del pronóstico (°C),
  *   derivada de climaSnapshot.openmeteo.forecast_7d. Habilita el guard térmico
  *   (riesgo de helada). Sin esto, el guard térmico es no-op.
- * @param {number|null} [ctx.forecastTempMax] — máxima esperada del pronóstico (°C)
+ * @param {number|null} [ctx.forecastTempMax] - máxima esperada del pronóstico (°C)
  *   para el riesgo de golpe de calor. Mismo origen.
- * @param {string|null} [ctx.userMessage] — pregunta cruda del usuario (A12). Si
+ * @param {string|null} [ctx.userMessage] - pregunta cruda del usuario (A12). Si
  *   es claramente de PRECIO/MERCADO (no de siembra), los guards de SIEMBRA
  *   (viabilidad/térmico/sustitución/companion/invasora/falso-negativo) NO corren
  *   —razonan sobre cultivo y son irrelevantes a "¿a cómo está la papa?". Los de

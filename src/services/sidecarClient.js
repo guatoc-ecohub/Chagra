@@ -189,7 +189,7 @@ async function postJson(path, body, timeoutMs) {
  * usuario debe routearse a un MCP tool.
  *
  * @param {string} userMessage — texto del operador
- * @param {string} [context] — context turn opcional (ej. historial reciente)
+ * @param {string} [context] - context turn opcional (ej. historial reciente)
  * @returns {Promise<null | {
  *   useTool: boolean,
  *   tool: string | null,
@@ -417,8 +417,8 @@ const PRECIO_SIPSA_ACTIONS = new Set([
  *
  * @param {string} userMessage
  * @param {object} [opts]
- * @param {number|string|null} [opts.fincaAltitud] — msnm de la finca activa.
- * @param {string} [opts.context] — historial de conversación (últimos N turnos).
+ * @param {number|string|null} [opts.fincaAltitud] - msnm de la finca activa.
+ * @param {string} [opts.context] - historial de conversación (últimos N turnos).
  * @returns {Promise<null | { entities: Array<{
  *   mentioned: string,
  *   kind: 'species' | 'pest' | 'biopreparado',
@@ -548,7 +548,7 @@ export async function biopreparadoGrounding(userMessage) {
  * "sin advertencia" (política conservadora: no advertir si no se pudo verificar).
  *
  * @param {string} text — respuesta del LLM ya generada.
- * @param {string[]} [expected] — nombre_cientifico de las entidades resueltas.
+ * @param {string[]} [expected] - nombre_cientifico de las entidades resueltas.
  * @returns {Promise<null | {hallucinated: string[], validated: Array<{scientific_name: string, canonical_id: string}>, suspect: string[], age_available: boolean, detected_count: number}>}
  */
 export async function postValidate(text, expected) {
@@ -669,7 +669,7 @@ export async function judgeVision(speciesId, imageB64) {
  * prompt del agente debe explicitar esta restricción.
  *
  * @param {string} action — uno de NORMATIVA_ICA_ACTIONS
- * @param {object} [args] — body adicional pasado al tool
+ * @param {object} [args] - body adicional pasado al tool
  * @returns {Promise<null | object>}
  */
 export async function getNormativaIca(action, args) {
@@ -686,7 +686,7 @@ export async function getNormativaIca(action, args) {
  * (graceful degrade — caller debe seguir sin clima inyectado).
  *
  * @param {string} action — uno de CLIMA_IDEAM_ACTIONS
- * @param {object} [args] — body adicional (municipio, metric, desde, etc.)
+ * @param {object} [args] - body adicional (municipio, metric, desde, etc.)
  * @returns {Promise<null | object>}
  */
 export async function getClimaIdeam(action, args) {
@@ -708,7 +708,7 @@ export async function getClimaIdeam(action, args) {
  * y el agente orienta al ZIP DANE / Corabastos.
  *
  * @param {string} action — uno de PRECIO_SIPSA_ACTIONS
- * @param {object} [args] — body adicional (producto, fecha, etc.)
+ * @param {object} [args] - body adicional (producto, fecha, etc.)
  * @returns {Promise<null | object>}
  */
 export async function getPrecioSipsa(action, args) {

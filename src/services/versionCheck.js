@@ -87,7 +87,7 @@ export function shasMatch(a, b) {
  * @param {string} params.runningSha — SHA embebido en el bundle corriendo.
  * @param {string|null} params.deployedSha — SHA reportado por /version.json.
  * @param {boolean} params.alreadyReloaded — ya recargamos en esta sesión.
- * @param {boolean} [params.online=true] — hay conexión.
+ * @param {boolean} [params.online=true] - hay conexión.
  * @returns {boolean} true → mandar SKIP_WAITING + recargar UNA vez.
  */
 export function shouldSelfHeal({ runningSha, deployedSha, alreadyReloaded, online = true }) {
@@ -227,8 +227,8 @@ function defaultNotifyUpdateAvailable(version) {
  * @param {(sha:string) => void} [deps.writePending]
  * @param {() => void} [deps.clearPending]
  * @param {(version:string) => void} [deps.notifyUpdateAvailable]
- * @param {() => Promise<void>} [deps.skipWaiting] — manda SKIP_WAITING al SW.
- * @param {() => void} [deps.reload] — recarga la página.
+ * @param {() => Promise<void>} [deps.skipWaiting] - manda SKIP_WAITING al SW.
+ * @param {() => void} [deps.reload] - recarga la página.
  * @returns {Promise<{healed: boolean, reason: string}>}
  */
 export async function runSelfHealCheck(deps = {}) {

@@ -19,7 +19,7 @@ import { fvhSkinClass } from '../../config/fvhSkin.js';
  *
  * @param {object} props
  * @param {() => void} [props.onBack]
- * @param {string} [props.initialQuery] — consulta inicial (ej. deep-link).
+ * @param {string} [props.initialQuery] - consulta inicial (ej. deep-link).
  */
 export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) {
   const [query, setQuery] = useState(initialQuery);

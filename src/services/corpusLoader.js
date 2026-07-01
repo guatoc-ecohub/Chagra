@@ -126,7 +126,7 @@ export function resolveCatalogUrl() {
  * para que esta pueda reintentar ante un abort sin duplicar la validación.
  *
  * @param {{ url: string, tier: 'OSS'|'PRO', fallback: boolean }} source
- * @param {AbortSignal} [externalSignal] — signal del caller (ej. reload/unload).
+ * @param {AbortSignal} [externalSignal] - signal del caller (ej. reload/unload).
  * @returns {Promise<Uint8Array>}
  */
 async function fetchCatalogOnce(source, externalSignal) {

@@ -56,7 +56,7 @@ export const SIDECAR_TOOL_NAMES = new Set([
  * @typedef {Object} CapabilityStatus
  * @property {string} name — nombre legible
  * @property {'ok'|'degraded'|'down'} status
- * @property {string} [message] — mensaje para el usuario
+ * @property {string} [message] - mensaje para el usuario
  */
 
 /**

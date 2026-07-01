@@ -26,7 +26,7 @@ const TIMEOUT_MS = 15000;
  *
  * @param {Blob} blob - audio/webm;codecs=opus (tipicamente de MediaRecorder).
  * @param {Object} [options]
- * @param {string} [options.language='es'] — códigos ISO-639-1 sin región (whisper rechaza 'es-CO', solo acepta 'es')
+ * @param {string} [options.language='es'] - códigos ISO-639-1 sin región (whisper rechaza 'es-CO', solo acepta 'es')
  * @returns {Promise<string>} texto transcrito (trim).
  * @throws {Error} si la red falla, el servidor responde no-2xx o el texto esta vacio.
  * @example

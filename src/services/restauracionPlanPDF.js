@@ -165,13 +165,13 @@ const drawEspeciesRol = (doc, y, titulo, especies, subtitle) => {
  * @param {object} planData
  * @param {object} planData.diagnostico — salida de diagnosticarRestauracion():
  *   { arreglo, roles, especies, alertas[], guardas[], sin_datos, fuente }.
- * @param {object} [planData.finca]    — { nombre, municipio, vereda, altitud, departamento, coords }.
+ * @param {object} [planData.finca]    - { nombre, municipio, vereda, altitud, departamento, coords }.
  * @param {string} [planData.operatorName]
  * @param {string} [planData.operatorRole]
- * @param {string} [planData.objetivo] — bosque|ribera|cortafuegos|post_incendio|paramo.
- * @param {string} [planData.descripcion] — lo que el usuario describió (talud, quebrada…).
- * @param {object} [planData.riesgoIncendio] — salida de evaluarRiesgoIncendio() (opcional).
- * @param {string} [planData.piso]     — clave de piso (calido_0_1000…) si el diag no la trae.
+ * @param {string} [planData.objetivo] - bosque|ribera|cortafuegos|post_incendio|paramo.
+ * @param {string} [planData.descripcion] - lo que el usuario describió (talud, quebrada…).
+ * @param {object} [planData.riesgoIncendio] - salida de evaluarRiesgoIncendio() (opcional).
+ * @param {string} [planData.piso]     - clave de piso (calido_0_1000…) si el diag no la trae.
  * @returns {Blob} application/pdf
  */
 export const generateRestauracionPlanPDF = (planData) => {

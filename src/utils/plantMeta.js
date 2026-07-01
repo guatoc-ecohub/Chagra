@@ -52,9 +52,9 @@ export const ETAPA_FENOLOGICA_OPTIONS = [
  * limpio cuando el operador omite la sección colapsable).
  *
  * @param {object} formData — state del formulario de planta.
- * @param {string} [formData.fechaGerminacion] — yyyy-mm-dd (input date).
- * @param {string|number} [formData.alturaCm] — string del input number.
- * @param {string} [formData.etapaFenologica] — value de ETAPA_FENOLOGICA_OPTIONS.
+ * @param {string} [formData.fechaGerminacion] - yyyy-mm-dd (input date).
+ * @param {string|number} [formData.alturaCm] - string del input number.
+ * @param {string} [formData.etapaFenologica] - value de ETAPA_FENOLOGICA_OPTIONS.
  * @returns {object|null} `{ fecha_germinacion, altura_cm, etapa_fenologica }`
  *   con solo las claves capturadas. `null` si todo está vacío.
  */

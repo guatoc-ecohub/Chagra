@@ -98,7 +98,7 @@ export function isMultiFincaEnabled() {
  * Acepta un resolver inyectado para tests (función pura sin zustand):
  *   getActiveFincaScope(() => 'mi-finca')
  *
- * @param {() => (string|null|undefined)} [resolveActiveSlug] — override opcional
+ * @param {() => (string|null|undefined)} [resolveActiveSlug] - override opcional
  *   del resolutor del slug activo (default: lee de fincaActiveStore).
  * @returns {string|null} id de finca activo, o `null` si single-finca / sin scope.
  */

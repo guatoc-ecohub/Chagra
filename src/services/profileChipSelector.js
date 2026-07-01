@@ -166,7 +166,7 @@ export function profileTieneAnimales(profile) {
  *
  * @param {Object} profile — perfil del usuario (chagra:profile).
  * @param {Object} [opts]
- * @param {boolean} [opts.esGuiaGlaciar=false] — el username está en la whitelist
+ * @param {boolean} [opts.esGuiaGlaciar=false] - el username está en la whitelist
  *   de "La Cordada" (lo resuelve el call-site con glaciarAccess, fuera de aquí
  *   para mantener este módulo puro/offline).
  * @returns {string} uno de PROFILE_ROLES.
@@ -269,11 +269,11 @@ export function selectChipIntentsForRole({
  *
  * @param {Object} profile — perfil (chagra:profile).
  * @param {Object} [opts]
- * @param {boolean} [opts.esOperador=false] — el usuario es OPERADOR (admin/demo/
+ * @param {boolean} [opts.esOperador=false] - el usuario es OPERADOR (admin/demo/
  *   debug). BYPASS del gating por perfil: devuelve el catálogo COMPLETO de chips
  *   vivos. Tiene PRECEDENCIA sobre el rol y sobre #7003.
- * @param {boolean} [opts.esGuiaGlaciar=false] — username en whitelist Cordada.
- * @param {Object} [opts.moduleVisibility] — { moduleId: boolean } de #7003.
+ * @param {boolean} [opts.esGuiaGlaciar=false] - username en whitelist Cordada.
+ * @param {Object} [opts.moduleVisibility] - { moduleId: boolean } de #7003.
  * @returns {string[]} intents de chip ordenados para este usuario.
  */
 export function selectChipIntents(profile, opts = {}) {
@@ -309,7 +309,7 @@ export function selectChipIntents(profile, opts = {}) {
  * raro), devuelve TODAS las defs vivas para no dejar la barra sin herramientas.
  *
  * @param {Object} profile
- * @param {Object} [opts] — igual que selectChipIntents.
+ * @param {Object} [opts] - igual que selectChipIntents.
  * @returns {Array} subconjunto ordenado de CHIP_DEFS.
  */
 export function selectChipDefs(profile, opts = {}) {

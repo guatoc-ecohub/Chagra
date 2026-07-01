@@ -197,7 +197,7 @@ function containsWholeWord(text, query) {
  *
  * @param {Array<object>} list — especies del catálogo (getAllSpecies()).
  * @param {string|null} slug — slug/id candidato (deriveSpeciesSlug o _speciesSlug).
- * @param {string|null} [name] — nombre legible del asset (ej. "Fresa #1").
+ * @param {string|null} [name] - nombre legible del asset (ej. "Fresa #1").
  * @returns {object|null} la especie del catálogo, o null si no hay match.
  */
 export function matchSpeciesInCatalog(list, slug, name) {

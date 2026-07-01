@@ -156,9 +156,9 @@ function mergeNlu(base, nlu) {
  *
  * @param {string} text — transcripción en español.
  * @param {object} [opts]
- * @param {number} [opts.now=Date.now()] — referencia para el tiempo relativo.
- * @param {Function} [opts.onToken] — streaming del NLU para UI typewriter.
- * @param {boolean} [opts.preferLocal=false] — fuerza solo on-device (tests).
+ * @param {number} [opts.now=Date.now()] - referencia para el tiempo relativo.
+ * @param {Function} [opts.onToken] - streaming del NLU para UI typewriter.
+ * @param {boolean} [opts.preferLocal=false] - fuerza solo on-device (tests).
  * @returns {Promise<object>} registro unificado (ver voiceFieldExtractor).
  */
 export async function classifyAndExtract(text, opts = {}) {

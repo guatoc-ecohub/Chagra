@@ -76,8 +76,8 @@ const OVERLAY_CSS = `
  * @param {()=>void} onClose — cerrar el overlay.
  * @param {(cap:object)=>void} onPick — pick de una hoja viva de la red.
  * @param {object} anchorRef — ref al botón Ⓐ real (raíz geométrica de la red).
- * @param {boolean} [disabled] — desactiva la interacción de la red.
- * @param {string} [subtitle] — copy contextual bajo el título.
+ * @param {boolean} [disabled] - desactiva la interacción de la red.
+ * @param {string} [subtitle] - copy contextual bajo el título.
  */
 export function AgentManoOverlay({
   open,

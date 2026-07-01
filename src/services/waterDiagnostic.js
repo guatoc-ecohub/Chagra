@@ -33,7 +33,7 @@ import WATER_DATA from '../data/water-diagnostics.json';
  * @param {number} area_m2 — area del techo en metros cuadrados
  * @param {number} lluvia_mm — precipitacion anual en mm (IDEAM)
  * @param {number} ce — coeficiente de escorrentia del material del techo
- * @param {number} [eta=0.85] — eficiencia (filtros, perdidas). Default 0.85
+ * @param {number} [eta=0.85] - eficiencia (filtros, perdidas). Default 0.85
  * @returns {CaptacionResult|null}
  */
 export function calcularCaptacion(area_m2, lluvia_mm, ce, eta = 0.85) {
