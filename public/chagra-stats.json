@@ -1,0 +1,68 @@
+{
+  "generated_at": "2026-07-01T17:32:55.005Z",
+  "schema_version": "1.0.0",
+  "catalogo": {
+    "especies": 530,
+    "biopreparados": 36,
+    "biopreparados_con_seguridad": 36,
+    "mip_plagas": {
+      "con_mip": 163,
+      "total": 318,
+      "pct": 51.3
+    },
+    "fuentes": 71,
+    "fuentes_doi": 2,
+    "fuentes_tier_a": 53
+  },
+  "grafo": {
+    "nodos": 2909,
+    "aristas": 12325,
+    "aristas_por_tipo": {
+      "REFERENCED_BY": 2667,
+      "HAS_ROLE": 1244,
+      "GROWS_IN": 1097,
+      "CONTROLS": 591,
+      "HAS_FAMILY": 564,
+      "COMPATIBLE_WITH": 524,
+      "HAS_HABIT": 347,
+      "USED_AS_BIOPREPARADO": 203,
+      "IS_VARIETY_OF": 155,
+      "REFERS_TO_SPECIES": 139,
+      "USED_IN_REGION": 126,
+      "TARGETS_PEST": 122,
+      "ANTAGONIST_OF": 110,
+      "HAS_ORIGIN": 54,
+      "RESISTANT_TO": 50,
+      "AFFECTS": 38,
+      "DISAMBIGUATES": 23,
+      "SUSCEPTIBLE_TO": 2,
+      "SYNONYM_OF": 1
+    },
+    "controls_con_doi": 446,
+    "controls_total": 816,
+    "cobertura_por_vertical": {
+      "control_biologico": {
+        "pct": 54.7,
+        "descripcion": "Aristas CONTROLS corroboradas contra OpenAlex (verificado_openalex=true con DOI real) sobre el total de aristas CONTROLS.",
+        "numerador": 446,
+        "denominador": 816
+      },
+      "mip": {
+        "pct": 51.3,
+        "descripcion": "Nodos Pest con tratamiento MIP completo (umbral de acción económico + control biológico + control cultural + químico ICA de menor toxicidad + fuente Agrosavia/Cenicafé) sobre el total de nodos Pest.",
+        "numerador": 163,
+        "denominador": 318
+      },
+      "asociaciones": {
+        "pct": 19,
+        "descripcion": "Relaciones de asociación/antagonismo (\"milpa\") con fuente citada, sobre el total de esas relaciones. La peor citada del grafo pese a ser la más visible del producto — ver auditoría.",
+        "numerador": null,
+        "denominador": null
+      }
+    }
+  },
+  "verificacion": {
+    "doi_pct": 54.7
+  },
+  "_fuente": "Generado por scripts/gen-chagra-stats.mjs. catalogo <- catalog/chagra-catalog-oss-subset-v3.2.json (canónico shipeado, ver catalog/CATALOG_VERSIONS.md). grafo <- src/data/graph-stats-snapshot.json (snapshot estático del grafo AGE chagra_kg; refrescar con scripts/export-graph-stats.mjs en alpha). Este JSON es la ÚNICA FUENTE DE VERDAD de estos números para login, chagra.bio y desarrollo — no hardcodear estos valores en ningún consumidor, siempre hacer fetch('/chagra-stats.json')."
+}

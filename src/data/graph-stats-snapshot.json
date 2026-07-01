@@ -1,0 +1,67 @@
+{
+  "_meta": {
+    "descripcion": "Snapshot de métricas del grafo de conocimiento Apache AGE `chagra_kg`. NO se calcula en build-time (el build no tiene acceso a la base de datos) — este archivo es la única fuente que `scripts/gen-chagra-stats.mjs` lee para la sección `grafo` de `public/chagra-stats.json`. Se refresca por separado, cuando haga falta, corriendo `scripts/export-graph-stats.mjs` en el host `alpha` (donde vive `postgres-farm`/`chagra_kg`). Ver ese script para las queries Cypher exactas y el procedimiento.",
+    "fecha_snapshot": "2026-06-28",
+    "fuente": [
+      "Chagra-strategy/ops/INFRA_FACTS.md (refresh 2026-06-24, verificado en vivo)",
+      "Chagra-strategy/audit/2026-06-28-triple-auditoria-mano-3ejes.md (cifras corregidas al alza tras la auditoría de la mano)"
+    ],
+    "aristas_por_tipo_fecha": "2026-06-14",
+    "aristas_por_tipo_nota": "Desglose por tipo de arista del snapshot del 2026-06-14 (8057 aristas totales en ese momento). El grafo creció a 12325 aristas totales para el 2026-06-28, pero el desglose fino por tipo no fue re-auditado en esa fecha — por eso la suma de aristas_por_tipo (8057) no cuadra con `aristas` (12325) en este snapshot. Correr export-graph-stats.mjs recalcula ambos en la misma pasada y elimina este desfase.",
+    "cobertura_por_vertical_nota": "Solo se incluyen verticales con porcentaje reportado y verificado en auditoría. Huecos conocidos SIN número verificado todavía (no se inventan): agua/riego (\"casi vacío\" per auditoría), ciclo de nutrientes animal→suelo, rotaciones plurianuales, bancos de semilla."
+  },
+  "especies": 721,
+  "nodos": 2909,
+  "aristas": 12325,
+  "labels_totales": 40,
+  "tipos_arista_totales": 67,
+  "aristas_por_tipo": {
+    "REFERENCED_BY": 2667,
+    "HAS_ROLE": 1244,
+    "GROWS_IN": 1097,
+    "CONTROLS": 591,
+    "HAS_FAMILY": 564,
+    "COMPATIBLE_WITH": 524,
+    "HAS_HABIT": 347,
+    "USED_AS_BIOPREPARADO": 203,
+    "IS_VARIETY_OF": 155,
+    "REFERS_TO_SPECIES": 139,
+    "USED_IN_REGION": 126,
+    "TARGETS_PEST": 122,
+    "ANTAGONIST_OF": 110,
+    "HAS_ORIGIN": 54,
+    "RESISTANT_TO": 50,
+    "AFFECTS": 38,
+    "DISAMBIGUATES": 23,
+    "SUSCEPTIBLE_TO": 2,
+    "SYNONYM_OF": 1
+  },
+  "controls": {
+    "con_doi": 446,
+    "total": 816
+  },
+  "mip_plagas": {
+    "con_mip": 163,
+    "total": 318
+  },
+  "cobertura_por_vertical": {
+    "control_biologico": {
+      "pct": 54.7,
+      "descripcion": "Aristas CONTROLS corroboradas contra OpenAlex (verificado_openalex=true con DOI real) sobre el total de aristas CONTROLS.",
+      "numerador": 446,
+      "denominador": 816
+    },
+    "mip": {
+      "pct": 51.3,
+      "descripcion": "Nodos Pest con tratamiento MIP completo (umbral de acción económico + control biológico + control cultural + químico ICA de menor toxicidad + fuente Agrosavia/Cenicafé) sobre el total de nodos Pest.",
+      "numerador": 163,
+      "denominador": 318
+    },
+    "asociaciones": {
+      "pct": 19,
+      "descripcion": "Relaciones de asociación/antagonismo (\"milpa\") con fuente citada, sobre el total de esas relaciones. La peor citada del grafo pese a ser la más visible del producto — ver auditoría.",
+      "numerador": null,
+      "denominador": null
+    }
+  }
+}
