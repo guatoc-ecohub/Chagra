@@ -25,16 +25,22 @@
  *      loadBenchData reconoce ambos y prioriza el más reciente.
  *   3. el JSONL real es per-model anidado (sin ground_truth ni model_response
  *      plano). normalizeBenchData lo transforma a items evaluables tomando la
- *      respuesta del modelo objetivo (TARGET_MODEL, default granite) y derivando
- *      un ground_truth de los expected_keywords cuando no hay uno explícito.
+ *      respuesta del modelo objetivo inferido desde el JSONL o pasado por
+ *      `--target`, y derivando un ground_truth de los expected_keywords cuando
+ *      no hay uno explícito.
  *   + Si `--from` apunta a un archivo inexistente, se LANZA (no mock silencioso).
  *
- * Smoke con 10 prompts vs granite/llama/gemma.
+ * Smoke con 10 prompts contra el target resuelto desde el JSONL.
  */
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
+import {
+  readAnthropicKey,
+  makeAnthropicJudgeCall,
+  RECOMMENDED_ANTHROPIC_JUDGE_MODEL,
+} from './lib/bench-scorer.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
@@ -42,16 +48,12 @@ const DATA_DIR = join(ROOT_DIR, 'data');
 const BENCH_RUNS_DIR = process.env.BENCH_OUTPUT_DIR || join(DATA_DIR, 'bench-runs');
 const OUTPUT_DIR = process.env.BENCH_JUDGE_OUTPUT_DIR || join(DATA_DIR, 'bench-judge-scores');
 
-const OLLAMA_URL = 'http://localhost:11434/api/generate';
-const JUDGE_MODEL = process.env.JUDGE_MODEL || 'gemma3:4b';
 const TIMEOUT_MS = 60_000;
+const JUDGE_PROVIDER = (process.env.JUDGE_PROVIDER || 'anthropic').trim().toLowerCase();
+const ANTHROPIC_JUDGE_MODEL = RECOMMENDED_ANTHROPIC_JUDGE_MODEL;
 
-// Modelo cuyo turno se evalúa cuando el JSONL es per-model (bench-agente-completo).
-const TARGET_MODEL = process.env.TARGET_MODEL || 'granite3.3:8b';
-
-// Mapa modelKey (clave del objeto per-model en el JSONL) → nombre ollama, para
-// poder seleccionar por nombre real del modelo cuando TARGET_MODEL es un nombre.
-const MODEL_KEY_BY_NAME = {
+// Mapas entre nombre de modelo y clave per-model del JSONL.
+const MODEL_NAME_BY_KEY = {
   'gemma3:4b': 'gemma3_4b',
   'granite3.3:8b': 'granite3_3_8b',
   'granite3.1-dense:8b': 'granite3_1_8b',
@@ -61,6 +63,10 @@ const MODEL_KEY_BY_NAME = {
   'ministral-3:14b': 'ministral_14b',
   'qwen3:30b': 'qwen3_30b',
 };
+
+const MODEL_KEY_BY_NAME = Object.fromEntries(
+  Object.entries(MODEL_NAME_BY_KEY).map(([name, key]) => [key, name]),
+);
 
 // Prompts mock para el smoke test si no hay datos reales
 const MOCK_BENCH_DATA = {
@@ -217,6 +223,29 @@ export function parseFromArg(argv = process.argv) {
 }
 
 /**
+ * parseTargetArg — extrae el target explícito para el JSONL.
+ * Acepta `--target <modelo>` y `--target=<modelo>`.
+ *
+ * @param {string[]} argv
+ * @returns {string|null}
+ */
+export function parseTargetArg(argv = process.argv) {
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    if (a === '--target') {
+      const next = argv[i + 1];
+      if (next && !next.startsWith('--')) return next;
+      return null;
+    }
+    if (a.startsWith('--target=')) {
+      const v = a.slice('--target='.length);
+      return v.length > 0 ? v : null;
+    }
+  }
+  return null;
+}
+
+/**
  * derivedGroundTruth — cuando el bench NO trae un ground_truth explícito (el
  * caso de bench-agente-completo, que solo tiene expected_keywords), arma una
  * referencia legible para el juez a partir de los conceptos esperados. No es una
@@ -232,23 +261,64 @@ function derivedGroundTruth(keywords) {
   return `Una respuesta correcta debe cubrir, por fondo: ${kw.join(', ')}.`;
 }
 
-/**
- * pickModelKey — elige la clave per-model del objeto del JSONL para el modelo
- * objetivo. Acepta un nombre ollama (granite3.1-dense:8b) o ya una clave
- * (granite3_1_8b). Devuelve la clave si está presente en el item, o null.
- *
- * @param {Record<string, any>} item
- * @param {string} target
- * @returns {string|null}
- */
+function normalizeTargetToken(target) {
+  return typeof target === 'string' ? target.trim() : '';
+}
+
+function isPerModelEntry(value) {
+  return Boolean(
+    value && typeof value === 'object' && (
+      typeof value.response === 'string' ||
+      typeof value.error === 'string' ||
+      typeof value.model === 'string'
+    ),
+  );
+}
+
 function pickModelKey(item, target) {
-  const asKey = MODEL_KEY_BY_NAME[target] || target;
+  const normalized = normalizeTargetToken(target);
+  if (!normalized) return null;
+  const asKey = MODEL_NAME_BY_KEY[normalized] || normalized;
   if (item[asKey] && typeof item[asKey] === 'object') return asKey;
-  // fallback: buscar cualquier sub-objeto cuyo .model coincida con el nombre.
   for (const [k, v] of Object.entries(item)) {
-    if (v && typeof v === 'object' && v.model === target) return k;
+    if (v && typeof v === 'object' && v.model === normalized) return k;
   }
   return null;
+}
+
+function inferTargetModelKey(lines) {
+  const counts = new Map();
+  for (const item of Array.isArray(lines) ? lines : []) {
+    if (!item || typeof item !== 'object') continue;
+    for (const [key, value] of Object.entries(item)) {
+      if (!isPerModelEntry(value)) continue;
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+  }
+
+  if (counts.size === 0) return null;
+  const ranked = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+  const top = ranked[0];
+  const tied = ranked.filter(([, count]) => count === top[1]);
+  if (tied.length !== 1) return null;
+  return top[0];
+}
+
+function resolveTargetDescriptor(lines, { targetModel } = {}) {
+  const explicit = normalizeTargetToken(targetModel);
+  if (explicit) {
+    const keyFromExplicit = MODEL_NAME_BY_KEY[explicit] || explicit;
+    const nameFromExplicit = MODEL_KEY_BY_NAME[keyFromExplicit] || explicit;
+    return { targetKey: keyFromExplicit, targetName: nameFromExplicit, explicit: true };
+  }
+
+  const inferredKey = inferTargetModelKey(lines);
+  if (!inferredKey) return { targetKey: null, targetName: null, explicit: false };
+  return {
+    targetKey: inferredKey,
+    targetName: MODEL_KEY_BY_NAME[inferredKey] || inferredKey,
+    explicit: false,
+  };
 }
 
 /**
@@ -263,13 +333,14 @@ function pickModelKey(item, target) {
  *   (c) modelo objetivo con error → se OMITE (no se evalúa una no-respuesta).
  *
  * @param {Array<Record<string,any>>} lines
- * @param {{ targetModel?: string }} [opts]
- * @returns {{ timestamp:string, model:string, results:Array, skipped:number }}
+ * @param {{ targetModel?: string, targetName?: string }} [opts]
+ * @returns {{ timestamp:string, model:string, results:Array, skipped:number, skippedSeeded:number }}
  */
-export function normalizeBenchData(lines, { targetModel = TARGET_MODEL } = {}) {
+export function normalizeBenchData(lines, { targetModel = null, targetName = null } = {}) {
   const arr = Array.isArray(lines) ? lines : [];
   const results = [];
   let skipped = 0;
+  let skippedSeeded = 0;
 
   for (const item of arr) {
     if (!item || typeof item !== 'object') {
@@ -277,9 +348,16 @@ export function normalizeBenchData(lines, { targetModel = TARGET_MODEL } = {}) {
       continue;
     }
 
+    if (item.seed === true || item.seeded === true) {
+      skipped++;
+      skippedSeeded++;
+      continue;
+    }
+
     // (b) ya está en formato judge plano.
     const flatResponse = item.model_response ?? item.response;
-    const isFlat = typeof flatResponse === 'string' && !pickModelKey(item, targetModel);
+    const resolvedTargetKey = targetModel ? pickModelKey(item, targetModel) : null;
+    const isFlat = typeof flatResponse === 'string' && !resolvedTargetKey;
     if (isFlat) {
       results.push({
         id: item.id ?? item.prompt_id ?? results.length + 1,
@@ -294,7 +372,7 @@ export function normalizeBenchData(lines, { targetModel = TARGET_MODEL } = {}) {
     }
 
     // (a) per-model anidado.
-    const key = pickModelKey(item, targetModel);
+    const key = resolvedTargetKey;
     if (!key) {
       skipped++;
       continue;
@@ -317,9 +395,10 @@ export function normalizeBenchData(lines, { targetModel = TARGET_MODEL } = {}) {
 
   return {
     timestamp: new Date().toISOString(),
-    model: targetModel,
+    model: targetName || targetModel || 'mixed',
     results,
     skipped,
+    skippedSeeded,
   };
 }
 
@@ -337,9 +416,10 @@ export function normalizeBenchData(lines, { targetModel = TARGET_MODEL } = {}) {
  * Marca `usedMock` para que el caller pueda distinguir.
  *
  * @param {string|null} fromPath
+ * @param {{ targetModel?: string }} [opts]
  * @returns {{ timestamp:string, model:string, results:Array, usedMock:boolean, skipped?:number, source?:string }}
  */
-export function loadBenchData(fromPath) {
+export function loadBenchData(fromPath, { targetModel } = {}) {
   if (fromPath) {
     if (!existsSync(fromPath)) {
       throw new Error(
@@ -347,7 +427,7 @@ export function loadBenchData(fromPath) {
           `NO se cae a mock para no enmascarar un path roto.`,
       );
     }
-    return { ...parseBenchFile(fromPath), usedMock: false, source: fromPath };
+    return { ...parseBenchFile(fromPath, { targetModel }), usedMock: false, source: fromPath };
   }
 
   // Auto-discovery: el más reciente .jsonl o .json en bench-runs/.
@@ -367,7 +447,7 @@ export function loadBenchData(fromPath) {
       .sort((a, b) => b.mtime - a.mtime);
     if (candidates.length > 0) {
       const latest = candidates[0].full;
-      return { ...parseBenchFile(latest), usedMock: false, source: latest };
+      return { ...parseBenchFile(latest, { targetModel }), usedMock: false, source: latest };
     }
   }
 
@@ -380,12 +460,21 @@ export function loadBenchData(fromPath) {
  * y devuelve `{ timestamp, model, results, skipped }` normalizado.
  *
  * @param {string} path
+ * @param {{ targetModel?: string }} [opts]
  * @returns {{ timestamp:string, model:string, results:Array, skipped:number }}
  */
-function parseBenchFile(path) {
+function parseBenchFile(path, { targetModel } = {}) {
   const raw = readFileSync(path, 'utf-8');
   const trimmed = raw.trim();
-  if (trimmed.length === 0) return { timestamp: new Date().toISOString(), model: TARGET_MODEL, results: [], skipped: 0 };
+  if (trimmed.length === 0) {
+    return {
+      timestamp: new Date().toISOString(),
+      model: targetModel || 'mixed',
+      results: [],
+      skipped: 0,
+      skippedSeeded: 0,
+    };
+  }
 
   // JSONL: varias líneas, cada una un objeto. Detecta por ≥2 líneas JSON o
   // por extensión .jsonl.
@@ -396,45 +485,64 @@ function parseBenchFile(path) {
     const parsed = lines.map((l) => JSON.parse(l));
     // Si ya viene en formato judge `{ results: [...] }` por línea, aplanar.
     if (parsed.length === 1 && Array.isArray(parsed[0].results)) {
-      return normalizeBenchData(parsed[0].results);
+      return normalizeBenchData(parsed[0].results, { targetModel });
     }
-    return normalizeBenchData(parsed);
+    const resolved = resolveTargetDescriptor(parsed, { targetModel });
+    if (resolved.targetKey === null && parsed.some((item) => Object.values(item || {}).some(isPerModelEntry))) {
+      throw new Error(
+        '[judge] No se pudo inferir el modelo objetivo desde el JSONL. ' +
+          'Use --target <modelo> o TARGET_MODEL para seleccionar una sola tanda.',
+      );
+    }
+    return normalizeBenchData(parsed, {
+      targetModel: resolved.targetKey,
+      targetName: resolved.targetName,
+    });
   }
 
   // JSON: un objeto. Puede ser `{ results: [...] }` (judge) o un único item.
   const obj = JSON.parse(trimmed);
   if (Array.isArray(obj.results)) {
-    const norm = normalizeBenchData(obj.results);
+    const norm = normalizeBenchData(obj.results, { targetModel });
     return { ...norm, timestamp: obj.timestamp ?? norm.timestamp, model: obj.model ?? norm.model };
   }
-  return normalizeBenchData([obj]);
+  return normalizeBenchData([obj], { targetModel });
 }
 
-async function callJudge(prompt, signal) {
-  const start = performance.now();
-  const res = await fetch(OLLAMA_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: JUDGE_MODEL,
-      system: JUDGE_PROMPT,
-      prompt: prompt,
-      stream: false,
-      options: {
-        temperature: 0.1, // Baja temperatura para consistencia
-        num_predict: 200,
-      },
-      keep_alive: '30m',
-    }),
-    signal,
-  });
-  const elapsed = performance.now() - start;
-  if (!res.ok) {
-    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+export function resolveJudgeCall({ env = process.env, fetchImpl = globalThis.fetch } = {}) {
+  const provider = normalizeTargetToken(env?.JUDGE_PROVIDER || JUDGE_PROVIDER || 'anthropic').toLowerCase();
+  if (provider !== 'anthropic') {
+    throw new Error(
+      `[judge] bench-llm-judge requiere JUDGE_PROVIDER=anthropic, no '${provider || '(vacío)'}'.`,
+    );
   }
-  const data = await res.json();
+
+  const apiKey = readAnthropicKey({ env });
+  if (!apiKey) {
+    throw new Error(
+      '[judge] No se pudo leer la key de Anthropic desde ANTHROPIC_API_KEY ni desde ~/.config/chagra-anthropic-judge-key.',
+    );
+  }
+
   return {
-    raw_response: data.response,
+    provider: 'anthropic',
+    model: ANTHROPIC_JUDGE_MODEL,
+    judgeCall: makeAnthropicJudgeCall({
+      apiKey,
+      model: ANTHROPIC_JUDGE_MODEL,
+      fetchImpl,
+      timeoutMs: TIMEOUT_MS,
+      maxTokens: 256,
+    }),
+  };
+}
+
+async function callJudge(prompt, judgeCall) {
+  const start = performance.now();
+  const raw_response = await judgeCall(prompt);
+  const elapsed = performance.now() - start;
+  return {
+    raw_response,
     latency_ms: elapsed,
   };
 }
@@ -457,7 +565,7 @@ function calculateAvg(scores) {
   return values.reduce((a, b) => a + b, 0) / values.length;
 }
 
-async function evaluateItem(item, index, total) {
+async function evaluateItem(item, index, total, judgeCall) {
   const { query, ground_truth, model_response } = item;
   if (!model_response && !item.response) {
     return { error: 'No hay respuesta del modelo para evaluar' };
@@ -473,19 +581,25 @@ RESPUESTA DEL MODELO: "${response}"
 Evalúa esta respuesta en las 4 dimensiones.`;
 
   console.log(`[judge] Evaluando item ${index + 1}/${total}...`);
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
-
   try {
-    const result = await callJudge(prompt, controller.signal);
+    const result = await callJudge(prompt, judgeCall);
     const scores = parseJudgeResponse(result.raw_response);
+    const requiredFields = ['factualidad', 'claridad_colombiana', 'anti_alucinacion', 'completitud'];
+    for (const field of requiredFields) {
+      const value = Number(scores[field]);
+      if (!Number.isFinite(value)) {
+        throw new Error(`Veredicto incompleto del juez: falta ${field}`);
+      }
+      scores[field] = value;
+    }
 
     // Calcular promedio si no está presente
     if (!scores.promedio) {
       scores.promedio = calculateAvg(scores);
+    } else {
+      scores.promedio = Number(scores.promedio);
     }
 
-    clearTimeout(timer);
     return {
       item_id: item.id,
       scores: {
@@ -499,7 +613,6 @@ Evalúa esta respuesta en las 4 dimensiones.`;
       judge_latency_ms: result.latency_ms,
     };
   } catch (err) {
-    clearTimeout(timer);
     console.error(`  → ERROR: ${err.message}`);
     return { error: err.message, item_id: item.id };
   }
@@ -507,29 +620,37 @@ Evalúa esta respuesta en las 4 dimensiones.`;
 
 async function main() {
   console.log('[judge] LLM-Judge smoke test v2');
-  console.log(`[judge] Modelo juez: ${JUDGE_MODEL}`);
+  console.log(`[judge] Proveedor juez: ${JUDGE_PROVIDER}`);
+  console.log(`[judge] Modelo juez: ${ANTHROPIC_JUDGE_MODEL}`);
   console.log(`[judge] Directorio output: ${OUTPUT_DIR}`);
 
   const fromPath = parseFromArg(process.argv);
-  const benchData = loadBenchData(fromPath);
+  const targetModel = parseTargetArg(process.argv) || process.env.TARGET_MODEL || null;
+  const { judgeCall } = resolveJudgeCall();
+  const benchData = loadBenchData(fromPath, { targetModel });
 
   console.log(`[judge] Fuente: ${benchData.source || 'N/A'}${benchData.usedMock ? ' (MOCK — smoke test)' : ' (datos REALES)'}`);
   if (typeof benchData.skipped === 'number' && benchData.skipped > 0) {
-    console.log(`[judge] Items omitidos (modelo objetivo con error/sin respuesta): ${benchData.skipped}`);
+    const skippedSeeded = typeof benchData.skippedSeeded === 'number' ? benchData.skippedSeeded : 0;
+    const skippedFailure = Math.max(0, benchData.skipped - skippedSeeded);
+    console.log(`[judge] Items omitidos por error/sin respuesta: ${skippedFailure}`);
+  }
+  if (typeof benchData.skippedSeeded === 'number' && benchData.skippedSeeded > 0) {
+    console.log(`[judge] Items omitidos (seed:true, no-medición): ${benchData.skippedSeeded}`);
   }
   console.log(`[judge] Datos cargados: ${benchData.results.length} items`);
   console.log(`[judge] Timestamp bench: ${benchData.timestamp}`);
   console.log(`[judge] Modelo evaluado: ${benchData.model || 'N/A'}`);
 
   if (benchData.results.length === 0) {
-    throw new Error('[judge] 0 items evaluables tras normalizar. Revisá el JSONL de origen / TARGET_MODEL.');
+    throw new Error('[judge] 0 items evaluables tras normalizar. Revise el JSONL de origen y el target.');
   }
 
   const results = [];
   const startTime = performance.now();
 
   for (let i = 0; i < benchData.results.length; i++) {
-    const evaluation = await evaluateItem(benchData.results[i], i, benchData.results.length);
+    const evaluation = await evaluateItem(benchData.results[i], i, benchData.results.length, judgeCall);
     results.push(evaluation);
 
     // Pequeña pausa entre items
@@ -541,6 +662,11 @@ async function main() {
   const totalTime = performance.now() - startTime;
   const successful = results.filter((r) => !r.error);
   const failed = results.filter((r) => r.error);
+
+  if (successful.length === 0) {
+    const reasons = failed.slice(0, 3).map((r) => `#${r.item_id}: ${r.error}`).join('; ') || 'sin detalle';
+    throw new Error(`[judge] No se pudo juzgar ningún item. ${reasons}`);
+  }
 
   // Calcular agregados
   const avgScores = {
@@ -574,11 +700,13 @@ async function main() {
 
 ## Metadata
 - **Timestamp**: ${new Date().toISOString()}
-- **Juez**: ${JUDGE_MODEL}
+- **Juez**: ${ANTHROPIC_JUDGE_MODEL} (${JUDGE_PROVIDER})
 - **Modelo evaluado**: ${benchData.model || 'smoke-test'}
 - **Items evaluados**: ${results.length}
 - **Exitosos**: ${successful.length}
 - **Fallidos**: ${failed.length}
+- **Omitidos**: ${typeof benchData.skipped === 'number' ? benchData.skipped : 0}
+- **Omitidos seed:true**: ${typeof benchData.skippedSeeded === 'number' ? benchData.skippedSeeded : 0}
 - **Tiempo total**: ${(totalTime / 1000).toFixed(2)}s
 - **Tiempo promedio por item**: ${(totalTime / results.length).toFixed(2)}ms
 

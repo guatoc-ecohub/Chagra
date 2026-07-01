@@ -107,8 +107,24 @@ function scoreBM25(doc, queryTerms, idf, avgLen) {
   return score;
 }
 
-function flattenDoc(doc, prefix = '', speciesSlug = null) {
-  const slug = speciesSlug || doc.species_slug || '';
+function resolveSpeciesSlug(doc, speciesSlug = null) {
+  if (typeof speciesSlug === 'string' && speciesSlug.trim()) return speciesSlug.trim();
+  if (!doc || typeof doc !== 'object') return '';
+  const candidates = [
+    doc.species_slug,
+    doc.speciesSlug,
+    doc.species_id,
+    doc.slug,
+    typeof doc.species === 'string' ? doc.species : '',
+  ];
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string' && candidate.trim()) return candidate.trim();
+  }
+  return '';
+}
+
+export function flattenDoc(doc, prefix = '', speciesSlug = null) {
+  const slug = resolveSpeciesSlug(doc, speciesSlug);
   const passages = [];
   const addPassage = (key, val) => {
     if (typeof val === 'string' && val.length > 20) {
