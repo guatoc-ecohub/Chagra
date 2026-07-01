@@ -7,10 +7,8 @@ import {
   buildCorpusContext,
   buildCorpusVariants,
   formatToolEvidence,
-  buildResolvedEntitiesBlock,
   MIN_ENTITY_CONFIDENCE,
   TOOL_EVIDENCE_MAX_CHARS,
-  buildCampesinoModeBlock,
   buildExpertModeBlock,
   buildMasterModeBlock,
   buildResponseModeBlock,
@@ -405,9 +403,6 @@ describe('analyzeQuery — topic plaga/enfermedad para enfermedades sin pest glo
   });
 });
 
-  });
-});
-
 describe('modos de respuesta (campesino/experto/maestro)', () => {
   it('buildResponseModeBlock elige campesino para simple', () => {
     expect(buildResponseModeBlock('simple')).toContain('MODO CAMPESINO');
@@ -416,7 +411,7 @@ describe('modos de respuesta (campesino/experto/maestro)', () => {
   it('buildResponseModeBlock elige experto para detallado', () => {
     const block = buildResponseModeBlock('detallado');
     expect(block).toContain('MODO EXPERTO');
-    expect(block).toContain('nombres científicos');
+    expect(block).toContain('CONTRATO TÉCNICO');
   });
 
   it('buildResponseModeBlock elige maestro para maestro', () => {
@@ -429,10 +424,10 @@ describe('modos de respuesta (campesino/experto/maestro)', () => {
     expect(buildResponseModeBlock(null)).toBe('');
   });
 
-  it('buildExpertModeBlock prioriza precisión técnica y tradeoffs', () => {
+  it('buildExpertModeBlock delega al modo experto estructurado', () => {
     const block = buildExpertModeBlock();
-    expect(block).toContain('nombres científicos');
-    expect(block).toContain('tradeoffs');
+    expect(block).toContain('MODO EXPERTO');
+    expect(block).toContain('CONTRATO TÉCNICO');
   });
 
   it('buildMasterModeBlock enseña con criterio', () => {
@@ -456,5 +451,11 @@ describe('modos de respuesta (campesino/experto/maestro)', () => {
     // "NIVEL DE RESPUESTA" no debe reaparecer en paralelo.
     const prompt = buildBasePrompt({ query: 'algo técnico', nivelRespuestas: 'detallado' });
     expect(prompt).not.toContain('NIVEL DE RESPUESTA');
+  });
+
+  it('buildBasePrompt con nivelRespuestas detallado contiene exactamente UN MODO EXPERTO (no duplicación)', () => {
+    const prompt = buildBasePrompt({ query: 'algo técnico', nivelRespuestas: 'detallado' });
+    const matches = prompt.match(/=== MODO EXPERTO ===/g);
+    expect(matches ? matches.length : 0).toBe(1);
   });
 });
