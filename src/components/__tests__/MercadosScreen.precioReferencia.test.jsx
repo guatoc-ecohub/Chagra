@@ -11,7 +11,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 
-// No probamos la cámara acá (mismo patrón que GlaciarReporteScreen.test.jsx).
+// No probamos la cámara aquí (mismo patrón que GlaciarReporteScreen.test.jsx).
 vi.mock('../PhotoCaptureField', () => ({ default: () => null }));
 
 import MercadosScreen from '../MercadosScreen';
