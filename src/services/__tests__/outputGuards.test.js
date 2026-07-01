@@ -16,6 +16,7 @@ import {
   guardInvasiveSpecies,
   guardInvertedViability,
   guardDoseWithoutSource,
+  guardInventedContact,
   guardSpeciesSubstitution,
   guardCompanionBinomial,
   guardVisionWithoutPhoto,
@@ -761,6 +762,118 @@ describe('guardDoseWithoutSource', () => {
     const txt = 'Aplica 30 ml/L. confirma la dosis con la etiqueta.';
     const out = guardDoseWithoutSource(txt);
     expect(out.modified).toBe(false);
+  });
+
+  // Test para verify que una cita fabricada NO suprime el caveat (fix #guardrail-contacts)
+  it('AÑADE caveat incluso si el modelo inventa una cita genérica de fuente', () => {
+    // El modelo inventa "según una recomendación de la entidad" sin especificar cuál
+    const txt = 'Según una recomendación de la entidad, aplica 30 ml/L de la solución.';
+    const out = guardDoseWithoutSource(txt);
+    // Debe añadir caveat porque "de la entidad" NO es una fuente verificada
+    expect(out.modified).toBe(true);
+    expect(out.text).toMatch(/confirma la dosis/i);
+  });
+
+  it('AÑADE caveat si cita un decreto inventado', () => {
+    // El modelo inventa "Decreto 1234 de 2020" que no existe
+    const txt = 'Según el Decreto 1234 de 2020, aplica 5 g por planta.';
+    const out = guardDoseWithoutSource(txt);
+    // Debe añadir caveat porque el decreto no está verificado
+    expect(out.modified).toBe(true);
+    expect(out.text).toMatch(/confirma la dosis/i);
+  });
+
+  it('NO suaviza si cita ICA (fuente verificada)', () => {
+    const txt = 'Según el ICA, aplica 30 ml/L de caldo bordelés.';
+    const out = guardDoseWithoutSource(txt);
+    expect(out.modified).toBe(false);
+    expect(out.text).toBe(txt);
+  });
+
+  it('NO suaviza si cita Agrosavia (fuente verificada)', () => {
+    const txt = 'De acuerdo con Agrosavia, diluye 2 cc en agua.';
+    const out = guardDoseWithoutSource(txt);
+    expect(out.modified).toBe(false);
+    expect(out.text).toBe(txt);
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────
+// GUARD 5 — contacto inventado (teléfonos, correos, URLs, decretos)
+// ──────────────────────────────────────────────────────────────────────────
+describe('guardInventedContact', () => {
+  it('detecta y reemplaza teléfono inventado', () => {
+    // El modelo inventa un teléfono institucional
+    const txt = 'Para reportar la plaga cuarentenaria, llama al 300 123 4567.';
+    const out = guardInventedContact(txt);
+    expect(out.modified).toBe(true);
+    expect(out.reason).toMatch(/teléfono/);
+    expect(out.text).toMatch(/VERIFICAR CONTACTO OFICIAL/);
+    expect(out.text).not.toMatch(/300 123 4567/);
+  });
+
+  it('detecta y reemplaza correo inventado', () => {
+    const txt = 'Envía tu reporte a reportes@ica-inventado.gov.co para revisión.';
+    const out = guardInventedContact(txt);
+    expect(out.modified).toBe(true);
+    expect(out.reason).toMatch(/correo/);
+    expect(out.text).toMatch(/VERIFICAR CONTACTO OFICIAL/);
+    expect(out.text).not.toMatch(/reportes@ica-inventado\.gov\.co/);
+  });
+
+  it('detecta y reemplaza URL inventada', () => {
+    const txt = 'Visita www.minagricultura-falso.gov.co para más información.';
+    const out = guardInventedContact(txt);
+    expect(out.modified).toBe(true);
+    expect(out.reason).toMatch(/URL/);
+    expect(out.text).toMatch(/VERIFICAR CONTACTO OFICIAL/);
+    expect(out.text).not.toMatch(/www\.minagricultura-falso\.gov\.co/);
+  });
+
+  it('detecta y reemplaza decreto/resolución inventado', () => {
+    const txt = 'Según el Decreto 9999 de 2025, debes aplicar esta dosis.';
+    const out = guardInventedContact(txt);
+    expect(out.modified).toBe(true);
+    expect(out.reason).toMatch(/normativa/);
+    expect(out.text).toMatch(/VERIFICAR NORMATIVA OFICIAL/);
+  });
+
+  it('NO toca Ley 1930 (decreto verificado conocido)', () => {
+    const txt = 'La Ley 1930 de 2018 prohíbe la quema en páramo.';
+    const out = guardInventedContact(txt);
+    expect(out.modified).toBe(false);
+    expect(out.text).toBe(txt);
+  });
+
+  it('detecta múltiples contactos inventados en un solo texto', () => {
+    const txt =
+      'Llama al 320 987 6543 o escribe a contacto@umata-inventado.gov.co. ' +
+      'También visita www.agricultura-falsa.co para más info.';
+    const out = guardInventedContact(txt);
+    expect(out.modified).toBe(true);
+    expect(out.text).toMatch(/VERIFICAR CONTACTO OFICIAL/);
+    expect(out.text).not.toMatch(/320 987 6543|contacto@umata-inventado\.gov\.co|www\.agricultura-falsa\.co/);
+  });
+
+  it('NO dispara si no hay contactos', () => {
+    const txt = 'Aplica caldo bordelés como preventivo.';
+    const out = guardInventedContact(txt);
+    expect(out.modified).toBe(false);
+    expect(out.text).toBe(txt);
+  });
+
+  it('detecta teléfono con formato (+57)', () => {
+    const txt = 'Contacta al +57 300 123 4567 para ayuda.';
+    const out = guardInventedContact(txt);
+    expect(out.modified).toBe(true);
+    expect(out.text).toMatch(/VERIFICAR CONTACTO OFICIAL/);
+  });
+
+  it('detecta teléfono con paréntesis', () => {
+    const txt = 'Llama al (300) 123-4567 para reportar.';
+    const out = guardInventedContact(txt);
+    expect(out.modified).toBe(true);
+    expect(out.text).toMatch(/VERIFICAR CONTACTO OFICIAL/);
   });
 });
 
