@@ -4,9 +4,10 @@
  *
  * ADR-051 (FIWARE Smart Data Models como capa de interoperabilidad NGSI-LD),
  * Fase 1: lee el catálogo público (`catalog/chagra-catalog-oss-subset-v3.2.json`)
- * y emite entidades **NGSI-LD `AgriCrop`** y **`AgriPest`** (Smart Data
- * Models — Smart AgriFood) para cada `species` cultivable y cada plaga
- * referenciada en `species.plagas_criticas[]` del catálogo.
+ * y emite entidades **NGSI-LD `AgriCrop`**, **`AgriPest`** y
+ * **`AgriProductType`** (Smart Data Models — Smart AgriFood) para cada
+ * `species` cultivable, cada plaga referenciada en
+ * `species.plagas_criticas[]`, y cada `biopreparado` del catálogo.
  *
  * Análogo de `scripts/catalog-to-age.mjs`: función pura + CLI delgado. NO
  * toca red ni base de datos — es un export offline, no un cliente de un
@@ -29,6 +30,23 @@
  *     **`x-chagra-mip`** (Property custom, NO campo FIWARE estándar — ver
  *     nota junto a `buildPestMipAttribute` más abajo).
  *
+ * Mapeo AgriProductType (Anexo A de ADR-051, fila bonus AgriProductType):
+ *   - `biopreparado.id`              -> id (`urn:ngsi-ld:AgriProductType:<id>`)
+ *   - `biopreparado.nombre`          -> name
+ *   - `biopreparado.proceso_resumen` -> description (truncado, ver truncText)
+ *   - `biopreparado.tipo` + `biopreparado.proposito[]` ->
+ *     **`x-chagra-clasificacion`** (Property custom — ver nota junto a
+ *     `buildBiopreparadoClasificacionAttribute` más abajo: el `category`
+ *     oficial de AgriProductType es un enum cerrado de 5 valores que NO tiene
+ *     mapeo 1:1 sin pérdida/distorsión con la taxonomía propia de Chagra de
+ *     `tipo` (7 valores) + `proposito` (8 valores), así que se expone tal
+ *     cual en vez de forzarla).
+ *   - Jerarquía padre-hijo (`hasAgriProductTypeParent`/
+ *     `hasAgriProductTypeChildren`) y `root` -> **se OMITEN** (gap
+ *     documentado en el Anexo A de ADR-051; Chagra no modela jerarquía entre
+ *     biopreparados hoy, y `root` es booleano derivado de esa jerarquía —
+ *     no se inventa un valor).
+ *
  * NOTA DE PROVENIENCIA (verificado 2026-07-01): el catálogo público
  * (`chagra-catalog-oss-subset-v3.2.json`) solo trae `plagas_criticas[]` como
  * strings libres (ej. "Hemileia vastatrix (roya)"), sin campos MIP — el MIP
@@ -48,7 +66,10 @@
  * en el schema oficial `dataModel.Agrifood/AgriCrop`. NO se rellenan con
  * datos inventados (regla explícita de ADR-051 y del anti-alucinación
  * general del catálogo). `agroVocConcept` en `AgriPest` también se OMITE
- * (viene del grafo AGE — fuera de alcance de este export).
+ * (viene del grafo AGE — fuera de alcance de este export). `agroVocConcept`,
+ * `category`, `hasAgriProductTypeParent`, `hasAgriProductTypeChildren` y
+ * `root` en `AgriProductType` también se OMITEN (ver Mapeo AgriProductType
+ * arriba).
  *
  * Slugs de plaga: reutiliza `normalizePest`/`classifyBiopreparadoTarget` de
  * `catalog-to-age.mjs` para que el `urn:ngsi-ld:AgriPest:<slug>` quede
@@ -67,9 +88,10 @@
  *     [--limit 10]    # subset de species (default: todas)
  *     [--pretty]      # indenta el JSON (default: 2 espacios; con --json activa igual)
  *
- * El array de salida combina entidades `AgriCrop` seguidas de `AgriPest`
- * (batch mixto — formato aceptado por `entityOperations/upsert` de
- * Orion-LD; ver ADR-051, no implica correr el broker).
+ * El array de salida combina entidades `AgriCrop`, seguidas de `AgriPest`,
+ * seguidas de `AgriProductType` (batch mixto — formato aceptado por
+ * `entityOperations/upsert` de Orion-LD; ver ADR-051, no implica correr el
+ * broker).
  *
  * Sin `--json` ni `--out`, imprime un reporte humano (conteo, validación)
  * por stdout — pensado para revisión manual del operador antes de un demo.
@@ -461,6 +483,141 @@ export function buildAgriPestEntities(seed, opts = {}) {
 }
 
 // =============================================================================
+// AgriProductType — construcción de entidades (ADR-051 Anexo A, fila bonus
+// AgriProductType, mapeada desde `biopreparado` del catálogo público)
+// =============================================================================
+
+/**
+ * Construye el URN NGSI-LD para una entidad AgriProductType a partir del id
+ * canónico de un `biopreparado` del catálogo Chagra (`biopreparados[].id`,
+ * ya snake_case por schema-v3.1.json).
+ *
+ * @param {string} biopreparadoId
+ * @returns {string}
+ */
+export function agriProductTypeUrn(biopreparadoId) {
+  return `urn:ngsi-ld:AgriProductType:${String(biopreparadoId).trim()}`;
+}
+
+/**
+ * Construye el atributo NGSI-LD custom `x-chagra-clasificacion` a partir de
+ * `biopreparado.tipo` (forma física: fermentado/mineral/microbiano/
+ * extracto/caldo/residuo/compuesto) y `biopreparado.proposito[]` (función
+ * agroecológica: fertilizacion/fitosanitario_preventivo/.../
+ * repelente_insectos — ver enum completo en `catalog/schema-v3.1.json`).
+ *
+ * El schema oficial `dataModel.Agrifood/AgriProductType` sí define un campo
+ * `category` (enum cerrado: cropNutrition, cropProtection, cropVariety,
+ * fertiliser, harvestCommodity), pero es una taxonomía de 5 valores que NO
+ * tiene mapeo 1:1 sin pérdida ni distorsión con la taxonomía propia de
+ * Chagra (`tipo`: 7 valores de forma física; `proposito`: 8 valores de
+ * función agroecológica, ej. `enmienda_ph`/`enmienda_ca`/`enmienda_p` no
+ * corresponden a ninguno de los 5 valores oficiales). Forzar un biopreparado
+ * de enmienda de pH dentro de `fertiliser` sería inventar una clasificación
+ * que el catálogo no afirma (regla explícita anti-alucinación de ADR-051).
+ * Por eso, igual que `x-chagra-mip` en AgriPest, se expone la taxonomía real
+ * de Chagra como Property custom en vez de forzarla en `category`.
+ *
+ * Devuelve `null` si el biopreparado no trae `tipo` ni `proposito` (no se
+ * rellena con datos inventados).
+ *
+ * @param {object} biopreparado
+ * @returns {{type:'Property', value:{tipo?: string, proposito?: string[]}}|null}
+ */
+export function buildBiopreparadoClasificacionAttribute(biopreparado) {
+  if (!biopreparado || typeof biopreparado !== 'object') return null;
+
+  const value = {};
+  if (typeof biopreparado.tipo === 'string' && biopreparado.tipo.trim()) {
+    value.tipo = biopreparado.tipo.trim();
+  }
+  if (Array.isArray(biopreparado.proposito) && biopreparado.proposito.length > 0) {
+    value.proposito = biopreparado.proposito.filter((p) => typeof p === 'string' && p.trim());
+  }
+
+  if (Object.keys(value).length === 0) return null;
+  return { type: 'Property', value };
+}
+
+/**
+ * Construye una entidad NGSI-LD `AgriProductType` a partir de un
+ * `biopreparado` del catálogo público (`catalog/chagra-catalog-oss-subset-
+ * v3.2.json` → `biopreparados[]`). Devuelve `null` si falta `id` o `nombre`
+ * — se reporta como "omitida" por el caller, nunca se rellena con datos
+ * inventados.
+ *
+ * La jerarquía padre-hijo (`hasAgriProductTypeParent`/
+ * `hasAgriProductTypeChildren`) y el booleano `root` que exige el schema
+ * oficial se OMITEN a propósito: es el gap documentado en el Anexo A de
+ * ADR-051 ("jerarquía padre-hijo") y Chagra no modela ninguna jerarquía
+ * entre biopreparados hoy — no hay dato del que derivar `root` sin
+ * inventarlo.
+ *
+ * @param {object} biopreparado
+ * @param {object} [opts]
+ * @param {string[]} [opts.context] - `@context` a usar (default DEFAULT_CONTEXT)
+ * @returns {object|null}
+ */
+export function buildAgriProductTypeEntity(biopreparado, opts = {}) {
+  const context = opts.context || DEFAULT_CONTEXT;
+  if (!biopreparado || !biopreparado.id || !biopreparado.nombre) return null;
+
+  const entity = {
+    id: agriProductTypeUrn(biopreparado.id),
+    type: 'AgriProductType',
+  };
+
+  const name = ngsiProperty(biopreparado.nombre);
+  if (name) entity.name = name;
+
+  const description = ngsiProperty(truncText(biopreparado.proceso_resumen, 500));
+  if (description) entity.description = description;
+
+  const clasificacion = buildBiopreparadoClasificacionAttribute(biopreparado);
+  if (clasificacion) entity['x-chagra-clasificacion'] = clasificacion;
+
+  entity['@context'] = context;
+
+  return entity;
+}
+
+/**
+ * Construye entidades AgriProductType para `seed.biopreparados[]`, junto a
+ * un reporte de cuántas se omitieron (y por qué id, si tiene) por faltar
+ * campos mínimos.
+ *
+ * @param {object} seed - catálogo parseado ({ biopreparados: [...] })
+ * @param {object} [opts]
+ * @param {number} [opts.limit] - subset de biopreparados (default: todos)
+ * @param {string[]} [opts.context]
+ * @returns {{entities: object[], report: {total: number, emitted: number, omitted: Array<{id: string|null, reason: string}>}}}
+ */
+export function buildAgriProductTypeEntities(seed, opts = {}) {
+  const biopreparadosAll = Array.isArray(seed?.biopreparados) ? seed.biopreparados : [];
+  const biopreparados = typeof opts.limit === 'number' ? biopreparadosAll.slice(0, opts.limit) : biopreparadosAll;
+
+  const entities = [];
+  const omitted = [];
+  for (const bp of biopreparados) {
+    const entity = buildAgriProductTypeEntity(bp, { context: opts.context });
+    if (entity) {
+      entities.push(entity);
+    } else {
+      omitted.push({ id: bp?.id ?? null, reason: 'missing id o nombre' });
+    }
+  }
+
+  return {
+    entities,
+    report: {
+      total: biopreparados.length,
+      emitted: entities.length,
+      omitted,
+    },
+  };
+}
+
+// =============================================================================
 // Validación estructural (sin dependencia externa — ver nota abajo)
 // =============================================================================
 
@@ -635,6 +792,84 @@ export function validateAgriPestEntities(entities) {
   return { valid: details.length === 0, invalidCount: details.length, details };
 }
 
+/**
+ * Valida la estructura mínima NGSI-LD de una entidad AgriProductType (mismo
+ * alcance y misma nota sobre `ajv` que `validateAgriCropEntity`).
+ * Adicionalmente valida la forma de `x-chagra-clasificacion` si está
+ * presente: debe ser `{type:'Property', value: object}` con al menos
+ * `tipo` (string) o `proposito` (array no-vacío) reconocible. NO exige
+ * `hasAgriProductTypeParent`/`hasAgriProductTypeChildren`/`root`/`category`
+ * — se omiten a propósito (ver `buildAgriProductTypeEntity`).
+ *
+ * @param {object} entity
+ * @returns {{valid: boolean, errors: string[]}}
+ */
+export function validateAgriProductTypeEntity(entity) {
+  const errors = [];
+
+  if (!entity || typeof entity !== 'object') {
+    return { valid: false, errors: ['entity no es un objeto'] };
+  }
+
+  if (typeof entity.id !== 'string' || !/^urn:ngsi-ld:AgriProductType:.+$/.test(entity.id)) {
+    errors.push(`id inválido (esperado urn:ngsi-ld:AgriProductType:*): ${JSON.stringify(entity.id)}`);
+  }
+
+  if (entity.type !== 'AgriProductType') {
+    errors.push(`type inválido (esperado 'AgriProductType'): ${JSON.stringify(entity.type)}`);
+  }
+
+  if (
+    !entity.name
+    || entity.name.type !== 'Property'
+    || typeof entity.name.value !== 'string'
+    || entity.name.value.length === 0
+  ) {
+    errors.push('name faltante o mal formado (esperado {type:"Property", value: string no vacío})');
+  }
+
+  if (entity.description !== undefined) {
+    if (entity.description.type !== 'Property' || typeof entity.description.value !== 'string') {
+      errors.push('description presente pero mal formado');
+    }
+  }
+
+  if (entity['x-chagra-clasificacion'] !== undefined) {
+    const clasificacion = entity['x-chagra-clasificacion'];
+    if (!clasificacion || clasificacion.type !== 'Property' || typeof clasificacion.value !== 'object' || clasificacion.value === null) {
+      errors.push('x-chagra-clasificacion presente pero mal formado (esperado {type:"Property", value: object})');
+    } else {
+      const { tipo, proposito } = clasificacion.value;
+      const hasAnyField = (typeof tipo === 'string' && tipo.length > 0)
+        || (Array.isArray(proposito) && proposito.length > 0);
+      if (!hasAnyField) {
+        errors.push('x-chagra-clasificacion.value no tiene ningún campo reconocible (tipo/proposito)');
+      }
+    }
+  }
+
+  if (!entity['@context'] || (Array.isArray(entity['@context']) && entity['@context'].length === 0)) {
+    errors.push('@context faltante o vacío');
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+/**
+ * Valida un array de entidades AgriProductType. Devuelve un reporte agregado.
+ *
+ * @param {object[]} entities
+ * @returns {{valid: boolean, invalidCount: number, details: Array<{id: string|null, errors: string[]}>}}
+ */
+export function validateAgriProductTypeEntities(entities) {
+  const details = [];
+  for (const entity of entities) {
+    const { valid, errors } = validateAgriProductTypeEntity(entity);
+    if (!valid) details.push({ id: entity?.id ?? null, errors });
+  }
+  return { valid: details.length === 0, invalidCount: details.length, details };
+}
+
 // =============================================================================
 // CLI entry point
 // =============================================================================
@@ -660,10 +895,12 @@ export async function main(argv = process.argv.slice(2)) {
       console.error(
         'Usage: node scripts/export-ngsi-ld.mjs [--input FILE] [--out FILE] [--json] [--limit N]\n\n'
         + '  --input FILE  Catálogo fuente (default: catalog/chagra-catalog-oss-subset-v3.2.json)\n'
-        + '  --out FILE    Escribe el array de entidades NGSI-LD (AgriCrop + AgriPest, JSON) a FILE.\n'
+        + '  --out FILE    Escribe el array de entidades NGSI-LD (AgriCrop + AgriPest + \n'
+        + '                AgriProductType, JSON) a FILE.\n'
         + '  --json        Imprime el array de entidades NGSI-LD crudo por stdout\n'
         + '                (sin esto, imprime un reporte humano de conteo/validación).\n'
-        + '  --limit N     Subset de species de las que se derivan AgriCrop/AgriPest (default: todas).',
+        + '  --limit N     Subset de species (AgriCrop/AgriPest) y de biopreparados\n'
+        + '                (AgriProductType) de los que se derivan entidades (default: todas).',
       );
       return { outputPath: null, entityCount: 0, valid: true };
     }
@@ -678,10 +915,13 @@ export async function main(argv = process.argv.slice(2)) {
   const pestResult = buildAgriPestEntities(seed, { limit: opts.limit ?? undefined });
   const pestValidation = validateAgriPestEntities(pestResult.entities);
 
-  // Batch mixto AgriCrop + AgriPest (formato aceptado por
+  const productTypeResult = buildAgriProductTypeEntities(seed, { limit: opts.limit ?? undefined });
+  const productTypeValidation = validateAgriProductTypeEntities(productTypeResult.entities);
+
+  // Batch mixto AgriCrop + AgriPest + AgriProductType (formato aceptado por
   // entityOperations/upsert de Orion-LD; ver nota de cabecera del archivo).
-  const entities = [...cropResult.entities, ...pestResult.entities];
-  const valid = cropValidation.valid && pestValidation.valid;
+  const entities = [...cropResult.entities, ...pestResult.entities, ...productTypeResult.entities];
+  const valid = cropValidation.valid && pestValidation.valid && productTypeValidation.valid;
 
   const jsonOut = JSON.stringify(entities, null, 2) + '\n';
 
@@ -689,14 +929,14 @@ export async function main(argv = process.argv.slice(2)) {
     writeFileSync(opts.out, jsonOut, 'utf-8');
     console.error(
       `Escrito ${entities.length} entidades NGSI-LD (${cropResult.entities.length} AgriCrop + `
-      + `${pestResult.entities.length} AgriPest) a ${opts.out} `
-      + `(válidas: ${valid ? 'sí' : 'NO'})`,
+      + `${pestResult.entities.length} AgriPest + ${productTypeResult.entities.length} AgriProductType) `
+      + `a ${opts.out} (válidas: ${valid ? 'sí' : 'NO'})`,
     );
   } else if (opts.json) {
     process.stdout.write(jsonOut);
   } else {
     // Reporte humano por stdout — pensado para revisión manual del operador.
-    console.log('--- export-ngsi-ld: reporte AgriCrop + AgriPest (ADR-051 fase 1) ---');
+    console.log('--- export-ngsi-ld: reporte AgriCrop + AgriPest + AgriProductType (ADR-051 fase 1) ---');
     console.log(`Fuente: ${opts.input}`);
     console.log(`Species leídas: ${cropResult.report.total}`);
     console.log(`Entidades AgriCrop emitidas: ${cropResult.report.emitted}`);
@@ -719,6 +959,18 @@ export async function main(argv = process.argv.slice(2)) {
     console.log(`Validación estructural NGSI-LD (AgriPest): ${pestValidation.valid ? 'OK' : `FALLÓ (${pestValidation.invalidCount} entidad(es))`}`);
     if (!pestValidation.valid) {
       for (const d of pestValidation.details.slice(0, 10)) {
+        console.log(`  - ${d.id}: ${d.errors.join(' | ')}`);
+      }
+    }
+    console.log(`Biopreparados leídos: ${productTypeResult.report.total}`);
+    console.log(`Entidades AgriProductType emitidas: ${productTypeResult.report.emitted}`);
+    console.log(`Omitidas (faltan campos mínimos): ${productTypeResult.report.omitted.length}`);
+    if (productTypeResult.report.omitted.length > 0) {
+      console.log('  ids omitidos:', productTypeResult.report.omitted.map((o) => o.id).join(', '));
+    }
+    console.log(`Validación estructural NGSI-LD (AgriProductType): ${productTypeValidation.valid ? 'OK' : `FALLÓ (${productTypeValidation.invalidCount} entidad(es))`}`);
+    if (!productTypeValidation.valid) {
+      for (const d of productTypeValidation.details.slice(0, 10)) {
         console.log(`  - ${d.id}: ${d.errors.join(' | ')}`);
       }
     }
