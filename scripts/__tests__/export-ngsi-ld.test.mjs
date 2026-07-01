@@ -1,11 +1,12 @@
 /**
  * scripts/__tests__/export-ngsi-ld.test.mjs
  *
- * Cobertura unitaria del export NGSI-LD AgriCrop + AgriPest (ADR-051 fase 1).
- * NO toca red ni broker; verifica únicamente que las funciones puras
- * `buildAgriCropEntity`/`buildAgriPestEntity` (y sus validadores) producen/
- * validan entidades NGSI-LD bien-formadas a partir de fixtures sintéticos +
- * de una muestra del catálogo OSS real.
+ * Cobertura unitaria del export NGSI-LD AgriCrop + AgriPest + AgriProductType
+ * (ADR-051 fase 1). NO toca red ni broker; verifica únicamente que las
+ * funciones puras `buildAgriCropEntity`/`buildAgriPestEntity`/
+ * `buildAgriProductTypeEntity` (y sus validadores) producen/validan
+ * entidades NGSI-LD bien-formadas a partir de fixtures sintéticos + de una
+ * muestra del catálogo OSS real.
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
@@ -31,6 +32,12 @@ import {
   buildAgriPestEntities,
   validateAgriPestEntity,
   validateAgriPestEntities,
+  agriProductTypeUrn,
+  buildBiopreparadoClasificacionAttribute,
+  buildAgriProductTypeEntity,
+  buildAgriProductTypeEntities,
+  validateAgriProductTypeEntity,
+  validateAgriProductTypeEntities,
 } from '../export-ngsi-ld.mjs';
 
 describe('agriCropUrn / agriPestUrn', () => {
@@ -677,6 +684,325 @@ describe('buildAgriPestEntities — muestra real del catálogo OSS v3.2', () => 
   it.skipIf(!seed)('no inventa agroVocConcept (gap documentado en ADR-051 — viene del grafo AGE, fuera de alcance)', () => {
     const { entities } = buildAgriPestEntities(seed);
     for (const entity of entities) {
+      expect(entity.agroVocConcept).toBeUndefined();
+    }
+  });
+});
+
+// =============================================================================
+// AgriProductType (ADR-051 Anexo A, fila bonus AgriProductType, desde
+// biopreparados[] del catálogo público)
+// =============================================================================
+
+describe('agriProductTypeUrn', () => {
+  it('construye el URN AgriProductType con prefijo canónico', () => {
+    expect(agriProductTypeUrn('bocashi')).toBe('urn:ngsi-ld:AgriProductType:bocashi');
+  });
+
+  it('trimea espacios en el id de entrada', () => {
+    expect(agriProductTypeUrn('  biol  ')).toBe('urn:ngsi-ld:AgriProductType:biol');
+  });
+});
+
+describe('buildBiopreparadoClasificacionAttribute', () => {
+  it('construye {type:Property, value:{tipo, proposito}} cuando ambos están presentes', () => {
+    const attr = buildBiopreparadoClasificacionAttribute({
+      tipo: 'fermentado',
+      proposito: ['fertilizacion', 'estimulante_microbiano'],
+    });
+    expect(attr).toEqual({
+      type: 'Property',
+      value: { tipo: 'fermentado', proposito: ['fertilizacion', 'estimulante_microbiano'] },
+    });
+  });
+
+  it('omite tipo o proposito individualmente si faltan (no inventa)', () => {
+    expect(buildBiopreparadoClasificacionAttribute({ tipo: 'mineral' })).toEqual({
+      type: 'Property',
+      value: { tipo: 'mineral' },
+    });
+    expect(buildBiopreparadoClasificacionAttribute({ proposito: ['enmienda_ph'] })).toEqual({
+      type: 'Property',
+      value: { proposito: ['enmienda_ph'] },
+    });
+  });
+
+  it('devuelve null si no hay ningún campo reconocible', () => {
+    expect(buildBiopreparadoClasificacionAttribute({})).toBeNull();
+    expect(buildBiopreparadoClasificacionAttribute(null)).toBeNull();
+    expect(buildBiopreparadoClasificacionAttribute({ tipo: '', proposito: [] })).toBeNull();
+  });
+});
+
+describe('buildAgriProductTypeEntity — fixtures sintéticos', () => {
+  it('mapea id -> urn, nombre -> name, proceso_resumen -> description, tipo/proposito -> x-chagra-clasificacion', () => {
+    const biopreparado = {
+      id: 'bocashi',
+      nombre: 'Bocashi',
+      tipo: 'fermentado',
+      proposito: ['fertilizacion', 'estimulante_microbiano'],
+      proceso_resumen: 'Fermentación aeróbica 15-21 días con volteo diario.',
+    };
+    const entity = buildAgriProductTypeEntity(biopreparado);
+
+    expect(entity.id).toBe('urn:ngsi-ld:AgriProductType:bocashi');
+    expect(entity.type).toBe('AgriProductType');
+    expect(entity.name).toEqual({ type: 'Property', value: 'Bocashi' });
+    expect(entity.description).toEqual({
+      type: 'Property',
+      value: 'Fermentación aeróbica 15-21 días con volteo diario.',
+    });
+    expect(entity['x-chagra-clasificacion']).toEqual({
+      type: 'Property',
+      value: { tipo: 'fermentado', proposito: ['fertilizacion', 'estimulante_microbiano'] },
+    });
+    expect(entity['@context']).toEqual(DEFAULT_CONTEXT);
+  });
+
+  it('NO agrega description si proceso_resumen falta (no inventa datos)', () => {
+    const entity = buildAgriProductTypeEntity({ id: 'x', nombre: 'X', tipo: 'caldo', proposito: ['fitosanitario_preventivo'] });
+    expect(entity.description).toBeUndefined();
+  });
+
+  it('NO agrega x-chagra-clasificacion si faltan tipo y proposito', () => {
+    const entity = buildAgriProductTypeEntity({ id: 'x', nombre: 'X' });
+    expect(entity['x-chagra-clasificacion']).toBeUndefined();
+  });
+
+  it('NO inventa jerarquía padre-hijo, root, category ni agroVocConcept (gaps documentados en ADR-051)', () => {
+    const entity = buildAgriProductTypeEntity({
+      id: 'bocashi',
+      nombre: 'Bocashi',
+      tipo: 'fermentado',
+      proposito: ['fertilizacion'],
+    });
+    expect(entity.hasAgriProductTypeParent).toBeUndefined();
+    expect(entity.hasAgriProductTypeChildren).toBeUndefined();
+    expect(entity.root).toBeUndefined();
+    expect(entity.category).toBeUndefined();
+    expect(entity.agroVocConcept).toBeUndefined();
+  });
+
+  it('trunca description larga (reusa truncText, maxLen 500)', () => {
+    const largo = 'x'.repeat(900);
+    const entity = buildAgriProductTypeEntity({ id: 'bp1', nombre: 'BP Uno', proceso_resumen: largo });
+    expect(entity.description.value.length).toBe(500);
+    expect(entity.description.value.endsWith('...')).toBe(true);
+  });
+
+  it('devuelve null si falta id o nombre (no rellena con datos falsos)', () => {
+    expect(buildAgriProductTypeEntity({ nombre: 'Sin id' })).toBeNull();
+    expect(buildAgriProductTypeEntity({ id: 'sin_nombre' })).toBeNull();
+    expect(buildAgriProductTypeEntity(null)).toBeNull();
+  });
+});
+
+describe('buildAgriProductTypeEntities', () => {
+  const fixture = {
+    biopreparados: [
+      { id: 'bp_a', nombre: 'BP A', tipo: 'fermentado', proposito: ['fertilizacion'] },
+      { id: 'bp_b', nombre: 'BP B', tipo: 'caldo', proposito: ['fitosanitario_preventivo'] },
+      { nombre: 'Sin id, se omite' },
+    ],
+  };
+
+  it('emite una entidad por biopreparado válido y reporta las omitidas', () => {
+    const { entities, report } = buildAgriProductTypeEntities(fixture);
+    expect(entities).toHaveLength(2);
+    expect(report.total).toBe(3);
+    expect(report.emitted).toBe(2);
+    expect(report.omitted).toHaveLength(1);
+  });
+
+  it('respeta --limit (slicing de biopreparados[])', () => {
+    const { entities, report } = buildAgriProductTypeEntities(fixture, { limit: 1 });
+    expect(entities).toHaveLength(1);
+    expect(report.total).toBe(1);
+  });
+
+  it('es determinista: misma entrada produce misma salida (idempotente)', () => {
+    const first = buildAgriProductTypeEntities(fixture);
+    const second = buildAgriProductTypeEntities(fixture);
+    expect(JSON.stringify(first.entities)).toBe(JSON.stringify(second.entities));
+  });
+
+  it('devuelve [] si el seed no trae biopreparados[]', () => {
+    const { entities, report } = buildAgriProductTypeEntities({});
+    expect(entities).toEqual([]);
+    expect(report.total).toBe(0);
+  });
+});
+
+describe('validateAgriProductTypeEntity', () => {
+  it('valida OK una entidad bien formada', () => {
+    const entity = buildAgriProductTypeEntity({
+      id: 'bocashi',
+      nombre: 'Bocashi',
+      tipo: 'fermentado',
+      proposito: ['fertilizacion', 'estimulante_microbiano'],
+      proceso_resumen: 'Fermentación aeróbica con volteo diario.',
+    });
+    const { valid, errors } = validateAgriProductTypeEntity(entity);
+    expect(valid).toBe(true);
+    expect(errors).toEqual([]);
+  });
+
+  it('valida OK una entidad sin x-chagra-clasificacion ni description (mínima)', () => {
+    const entity = buildAgriProductTypeEntity({ id: 'x', nombre: 'X' });
+    const { valid, errors } = validateAgriProductTypeEntity(entity);
+    expect(valid).toBe(true);
+    expect(errors).toEqual([]);
+  });
+
+  it('rechaza id sin prefijo urn:ngsi-ld:AgriProductType:', () => {
+    const { valid, errors } = validateAgriProductTypeEntity({
+      id: 'not-a-urn',
+      type: 'AgriProductType',
+      name: { type: 'Property', value: 'x' },
+      '@context': DEFAULT_CONTEXT,
+    });
+    expect(valid).toBe(false);
+    expect(errors.some((e) => e.includes('id inválido'))).toBe(true);
+  });
+
+  it('rechaza type distinto de AgriProductType', () => {
+    const { valid, errors } = validateAgriProductTypeEntity({
+      id: 'urn:ngsi-ld:AgriProductType:x',
+      type: 'AgriCrop',
+      name: { type: 'Property', value: 'x' },
+      '@context': DEFAULT_CONTEXT,
+    });
+    expect(valid).toBe(false);
+    expect(errors.some((e) => e.includes('type inválido'))).toBe(true);
+  });
+
+  it('rechaza name ausente o mal formado', () => {
+    expect(validateAgriProductTypeEntity({
+      id: 'urn:ngsi-ld:AgriProductType:x',
+      type: 'AgriProductType',
+      '@context': DEFAULT_CONTEXT,
+    }).valid).toBe(false);
+
+    expect(validateAgriProductTypeEntity({
+      id: 'urn:ngsi-ld:AgriProductType:x',
+      type: 'AgriProductType',
+      name: { type: 'Property', value: '' },
+      '@context': DEFAULT_CONTEXT,
+    }).valid).toBe(false);
+  });
+
+  it('rechaza x-chagra-clasificacion mal formado (sin tipo ni proposito reconocible)', () => {
+    const { valid, errors } = validateAgriProductTypeEntity({
+      id: 'urn:ngsi-ld:AgriProductType:x',
+      type: 'AgriProductType',
+      name: { type: 'Property', value: 'x' },
+      'x-chagra-clasificacion': { type: 'Property', value: {} },
+      '@context': DEFAULT_CONTEXT,
+    });
+    expect(valid).toBe(false);
+    expect(errors.some((e) => e.includes('x-chagra-clasificacion'))).toBe(true);
+  });
+
+  it('rechaza x-chagra-clasificacion que no sea {type:Property, value:object}', () => {
+    const { valid, errors } = validateAgriProductTypeEntity({
+      id: 'urn:ngsi-ld:AgriProductType:x',
+      type: 'AgriProductType',
+      name: { type: 'Property', value: 'x' },
+      'x-chagra-clasificacion': { type: 'Property', value: 'no es un objeto' },
+      '@context': DEFAULT_CONTEXT,
+    });
+    expect(valid).toBe(false);
+    expect(errors.some((e) => e.includes('x-chagra-clasificacion'))).toBe(true);
+  });
+
+  it('rechaza @context faltante', () => {
+    const { valid, errors } = validateAgriProductTypeEntity({
+      id: 'urn:ngsi-ld:AgriProductType:x',
+      type: 'AgriProductType',
+      name: { type: 'Property', value: 'x' },
+    });
+    expect(valid).toBe(false);
+    expect(errors.some((e) => e.includes('@context'))).toBe(true);
+  });
+});
+
+describe('validateAgriProductTypeEntities (agregado)', () => {
+  it('reporta valid=true cuando todas las entidades son válidas', () => {
+    const { entities } = buildAgriProductTypeEntities({
+      biopreparados: [
+        { id: 'bp_a', nombre: 'BP A', tipo: 'fermentado', proposito: ['fertilizacion'] },
+        { id: 'bp_b', nombre: 'BP B' },
+      ],
+    });
+    const result = validateAgriProductTypeEntities(entities);
+    expect(result.valid).toBe(true);
+    expect(result.invalidCount).toBe(0);
+  });
+
+  it('reporta detalle por entidad inválida', () => {
+    const result = validateAgriProductTypeEntities([
+      { id: 'no-urn', type: 'AgriProductType', name: { type: 'Property', value: 'x' }, '@context': DEFAULT_CONTEXT },
+    ]);
+    expect(result.valid).toBe(false);
+    expect(result.invalidCount).toBe(1);
+    expect(result.details[0].errors.length).toBeGreaterThan(0);
+  });
+});
+
+// =============================================================================
+// Integración: muestra real del catálogo OSS v3.2 (ADR-051 fase 1) — los ~36
+// biopreparados públicos
+// =============================================================================
+
+describe('buildAgriProductTypeEntities — muestra real del catálogo OSS v3.2', () => {
+  const catalogPath = resolve('catalog/chagra-catalog-oss-subset-v3.2.json');
+  let seed = null;
+  try {
+    seed = JSON.parse(readFileSync(catalogPath, 'utf-8'));
+  } catch {
+    // En CI sin acceso al catálogo (poco probable aquí), skip suave.
+    seed = null;
+  }
+
+  it.skipIf(!seed)('emite una entidad AgriProductType válida por cada biopreparado del catálogo (~36)', () => {
+    const { entities, report } = buildAgriProductTypeEntities(seed);
+    expect(report.total).toBeGreaterThanOrEqual(30);
+    expect(entities.length).toBe(report.total);
+    expect(report.omitted).toEqual([]);
+
+    const validation = validateAgriProductTypeEntities(entities);
+    expect(validation.details).toEqual([]);
+    expect(validation.valid).toBe(true);
+  });
+
+  it.skipIf(!seed)('cada entidad emitida tiene id URN AgriProductType único', () => {
+    const { entities } = buildAgriProductTypeEntities(seed);
+    const ids = entities.map((e) => e.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const id of ids) {
+      expect(id).toMatch(/^urn:ngsi-ld:AgriProductType:.+$/);
+    }
+  });
+
+  it.skipIf(!seed)('biopreparados reales con tipo/proposito producen x-chagra-clasificacion válido (ej. bocashi)', () => {
+    const bocashi = seed.biopreparados.find((b) => b.id === 'bocashi');
+    expect(bocashi).toBeTruthy();
+
+    const entity = buildAgriProductTypeEntity(bocashi);
+    const { valid, errors } = validateAgriProductTypeEntity(entity);
+    expect(valid).toBe(true);
+    expect(errors).toEqual([]);
+    expect(entity['x-chagra-clasificacion'].value.tipo).toBe(bocashi.tipo);
+    expect(entity['x-chagra-clasificacion'].value.proposito).toEqual(bocashi.proposito);
+  });
+
+  it.skipIf(!seed)('no inventa jerarquía padre-hijo, root, category ni agroVocConcept (gaps documentados en ADR-051)', () => {
+    const { entities } = buildAgriProductTypeEntities(seed);
+    for (const entity of entities) {
+      expect(entity.hasAgriProductTypeParent).toBeUndefined();
+      expect(entity.hasAgriProductTypeChildren).toBeUndefined();
+      expect(entity.root).toBeUndefined();
+      expect(entity.category).toBeUndefined();
       expect(entity.agroVocConcept).toBeUndefined();
     }
   });
