@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smart-data-models.github.io/dataModel.Agrifood/agrifood-schema.json",
+  "$comment": "VENDORIZADO (ADR-051 fase 1) desde smart-data-models/dataModel.Agrifood (Apache-2.0, https://github.com/smart-data-models/dataModel.Agrifood). Fuente: https://smart-data-models.github.io/dataModel.Agrifood/agrifood-schema.json . Descargado 2026-07-01. Byte-fiel al original salvo este $comment. Si el schema oficial cambia, re-descargar desde la misma URL (o el equivalente raw.githubusercontent.com/.../master/<Entidad>/schema.json) y actualizar los 4 archivos de este directorio juntos (tienen $ref cruzados).",
+  "title": "AgriFood Commons schema",
+  "description": "Common definitions to describe agri food data models",
+  "definitions": {
+    "AgriFood-Commons": {
+      "type": "object",
+      "properties": {
+        "relatedSource": {
+          "type": "array",
+          "description": "Property. List of IDs the current entity may have in external applications",
+          "items": {
+            "type": "object",
+            "properties": {
+              "application": {
+                "$ref": "https://smart-data-models.github.io/data-models/common-schema.json#/definitions/EntityIdentifierType",
+                "description": "Relationship. Identifier of the entity describing the external application"
+              },
+              "applicationEntityId": {
+                "type": "string",
+                "description": "Property. Identifier in the external application"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

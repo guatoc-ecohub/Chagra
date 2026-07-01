@@ -17,6 +17,7 @@
     "coverage": "vitest run --coverage",
     "audit:bundle": "node scripts/audit-bundle.mjs",
     "grafo:snapshot": "node scripts/snapshot-grafo-crecimiento.mjs",
+    "validate:ngsi": "node scripts/export-ngsi-ld.mjs",
     "hooks:install": "lefthook install",
     "tsc:check": "tsc --noEmit -p jsconfig.json",
     "perf-budget": "node scripts/check-perf-budget.mjs"
@@ -51,6 +52,8 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.0",
     "@vitest/coverage-v8": "^4.1.8",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
     "autoprefixer": "^10.4.27",
     "axe-core": "^4.12.1",
     "better-sqlite3": "^12.10.0",
