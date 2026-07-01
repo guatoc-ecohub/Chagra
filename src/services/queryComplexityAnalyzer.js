@@ -200,7 +200,7 @@ export function analyzeQueryComplexity(query) {
 
 /**
  * Export adicional para tests / introspección. No usar en hot path —
- * para chequeos individuales usá `analyzeQueryComplexity`.
+ * para chequeos individuales usa `analyzeQueryComplexity`.
  */
 export const __TEST_GLOSSARIES__ = {
   REGIONAL_PESTS,
