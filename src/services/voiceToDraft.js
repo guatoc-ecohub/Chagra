@@ -24,9 +24,9 @@ import { resolveSpeciesDefaults } from '../config/speciesDefaults';
  * @property {'individual'|'aggregate'} subject_kind — tracking mode
  * @property {string} location_land_asset_id — ID del land resuelto
  * @property {string} [location_land_label]
- * @property {Array} [companions] — del RAG
- * @property {Array} [antagonists] — del RAG
- * @property {Array} [biopreparados] — del RAG
+ * @property {Array} [companions] - del RAG
+ * @property {Array} [antagonists] - del RAG
+ * @property {Array} [biopreparados] - del RAG
  * @property {boolean} invasive
  * @property {string[]} warnings
  */
@@ -38,8 +38,8 @@ import { resolveSpeciesDefaults } from '../config/speciesDefaults';
  * @param {Object} input
  * @param {string} input.transcription — texto original
  * @param {Array<{crop:string, quantity:number, location:string, _ragInsights?:Object}>} input.entities — entidades extraídas
- * @param {function} [input.resolveLocation] — (rawLocation) => {id, type, label} | null
- * @param {function} [input.resolveCrop] — (cropName) => {slug, label, variety, tracking_mode}
+ * @param {function} [input.resolveLocation] - (rawLocation) => {id, type, label} | null
+ * @param {function} [input.resolveCrop] - (cropName) => {slug, label, variety, tracking_mode}
  * @returns {FarmProcessDraft[]} — un draft por entidad
  */
 /**

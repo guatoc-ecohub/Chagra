@@ -130,7 +130,7 @@ export function __resetDirectorioCache() {
  *
  * @param {string} query — texto libre del buscador.
  * @param {object} [opts]
- * @param {number} [opts.limit=12] — máximo de candidatos devueltos.
+ * @param {number} [opts.limit=12] - máximo de candidatos devueltos.
  * @returns {Promise<Array<{ id, comun, cientifico, familia, match: 'alias'|'exact'|'word' }>>}
  */
 export async function searchSpecies(query, opts = {}) {

@@ -395,8 +395,8 @@ export function AprenderEntryCard({ onNavigate }) {
  * Componente principal — muestra el listado de lecciones y navega a cada una.
  *
  * @param {object} props
- * @param {() => void} [props.onBack] — volver al dashboard.
- * @param {(pregunta: string) => void} [props.onAskAgent] — abre el chat del
+ * @param {() => void} [props.onBack] - volver al dashboard.
+ * @param {(pregunta: string) => void} [props.onAskAgent] - abre el chat del
  *   agente con la pregunta de la lección pre-cargada (conecta Aprender → Agente).
  */
 export default function AprenderConAgente({ onBack, onAskAgent }) {

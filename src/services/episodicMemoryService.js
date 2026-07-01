@@ -249,7 +249,7 @@ function _anticipationLines(matched, fincaAltitud, now) {
  * @param {Array<import('../types/farmProcess').FarmProcess>} [args.processes]
  * @param {Object<string, Array<import('../types/farmProcess').FarmProcessEvent>>} [args.eventsByProcess]
  *   eventos por process_id, ordenados por occurred_at DESC (como getFarmEvents).
- * @param {number|null} [args.fincaAltitud] — msnm para la corrección fenológica.
+ * @param {number|null} [args.fincaAltitud] - msnm para la corrección fenológica.
  * @param {number} [args.now=Date.now()]
  * @returns {string} bloque de system prompt, o '' (no-op).
  */

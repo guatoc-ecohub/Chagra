@@ -70,7 +70,7 @@ function _isSpecies(e) {
  * conocimiento del grafo, o null si no hay señal clara (el NLU decide).
  *
  * @param {string} userMessage — texto crudo del usuario.
- * @param {Array<object>|null} [resolvedEntities] — entidades canónicas ya
+ * @param {Array<object>|null} [resolvedEntities] - entidades canónicas ya
  *   resueltas por `resolveEntities` ({ kind, canonical_id, mentioned, ... }).
  * @returns {null | { tool: string, args: { species_id_or_name: string }, source: string }}
  */

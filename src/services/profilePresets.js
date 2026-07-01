@@ -106,7 +106,7 @@ export function getPresetById(id) {
  *   2. inferir por `rol` (si el rol coincide con el de algún preset).
  *   3. fallback 'campesino' (el más general).
  *
- * @param {object} [profile] — perfil; si se omite, se lee de localStorage.
+ * @param {object} [profile] - perfil; si se omite, se lee de localStorage.
  * @returns {string} id de preset (siempre uno válido).
  */
 export function getActivePresetId(profile) {

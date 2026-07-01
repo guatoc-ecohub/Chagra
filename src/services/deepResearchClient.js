@@ -224,7 +224,7 @@ export function normalizeStatus(raw) {
  * @param {string} jobId
  * @param {function(steps: string[], status: string): void} onUpdate
  *   Callback en cada tick con pasos nuevos o cambio de status.
- * @param {AbortSignal} [signal] — para cancelar el loop desde fuera.
+ * @param {AbortSignal} [signal] - para cancelar el loop desde fuera.
  * @returns {Promise<DeepResearchStatus | null>}
  *   Resuelve con el estado final (done/error), o null si cancelado.
  */

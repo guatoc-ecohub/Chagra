@@ -29,7 +29,7 @@ const MAX_DETAIL_CHARS = 240;
  * sin info útil.
  *
  * @param {string|null|undefined} rawBody — response.text() crudo
- * @param {string} [contentType] — opcional, content-type header
+ * @param {string} [contentType] - opcional, content-type header
  * @returns {string|null}
  */
 export function sanitizeErrorDetail(rawBody, contentType = '') {
@@ -79,7 +79,7 @@ export function sanitizeErrorDetail(rawBody, contentType = '') {
  * @param {number} status — HTTP status code
  * @param {string} statusText — HTTP status text
  * @param {string|null} rawBody — response body string
- * @param {string} [contentType] — content-type header
+ * @param {string} [contentType] - content-type header
  * @returns {string}
  */
 export function buildCleanErrorMessage(prefix, status, statusText, rawBody, contentType = '') {

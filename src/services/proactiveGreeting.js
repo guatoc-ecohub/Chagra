@@ -32,7 +32,7 @@ import { temporadaColombiana, pisoTermicoFromAltitud } from './agentService';
  * @property {string} kind   — 'alert' | 'task'
  * @property {string} icon   — emoji para el item
  * @property {string} title  — título corto y humano del pendiente
- * @property {string} [due]  — vencimiento legible (ej. "Hoy", "Vencida hace 2 días")
+ * @property {string} [due]  - vencimiento legible (ej. "Hoy", "Vencida hace 2 días")
  *
  * @typedef {Object} Greeting
  * @property {string} hi      — saludo según hora ("Buenos días" / etc).
@@ -234,8 +234,8 @@ function buildIdeaLead({ cultivos = [], altitud = null, ensoOutlook = null, date
  * @param {Array<{name:string,count:number}>} input.cultivos — inventario agrupado.
  * @param {number|null} input.altitud — altitud de la finca activa (msnm).
  * @param {Object|null} input.ensoOutlook — getEnsoOutlook (ensoContext).
- * @param {Date} [input.date] — inyectable para test.
- * @param {number} [input.maxItems=2] — cuántos pendientes destacar como máximo.
+ * @param {Date} [input.date] - inyectable para test.
+ * @param {number} [input.maxItems=2] - cuántos pendientes destacar como máximo.
  * @returns {Greeting}
  */
 export function buildProactiveGreeting({

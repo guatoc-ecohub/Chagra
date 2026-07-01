@@ -375,8 +375,8 @@ export function buildExpertModeBlock() {
  * el grounding lo provea.
  *
  * @param {object} opts
- * @param {string} [opts.nivelRespuestas] — 'simple' | 'detallado'
- * @param {boolean} [opts.hasGrounding] — si hay evidencia/tools en el turno
+ * @param {string} [opts.nivelRespuestas] - 'simple' | 'detallado'
+ * @param {boolean} [opts.hasGrounding] - si hay evidencia/tools en el turno
  * @returns {string}
  */
 export function buildModoExpertoBlock(opts = {}) {
@@ -401,9 +401,9 @@ RESPUESTA: preciso, citado cuando hay evidencia, honesto cuando no la haya.
  * entidades/tools que respondieron (AGE/RAG/SIPSA/IDEAM) en código.
  *
  * @param {object} opts
- * @param {Array|object|null} [opts.toolEvidence] — evidencia de tools del turno
- * @param {Array|null} [opts.resolvedEntities] — entidades resueltas por AGE
- * @param {boolean} [opts.hasCorpus] — si hay corpus RAG en este turno
+ * @param {Array|object|null} [opts.toolEvidence] - evidencia de tools del turno
+ * @param {Array|null} [opts.resolvedEntities] - entidades resueltas por AGE
+ * @param {boolean} [opts.hasCorpus] - si hay corpus RAG en este turno
  * @returns {string} pie de fuente, o '' si no hay fuentes
  */
 export function buildSourceFooter(opts = {}) {
@@ -502,16 +502,16 @@ export function buildResponseModeBlock(mode, hasGrounding = false) {
  *
  * @param {object} args
  * @param {string} args.plantContext — inventario agrupado ("café ×3, …" o "ninguna").
- * @param {string} [args.fincaContext] — línea "Estás asistiendo en la finca…" o ''.
- * @param {string} [args.indoorContext] — línea de invernadero o ''.
- * @param {object|null} [args.finca] — finca activa (para buildProfileContext).
- * @param {string} [args.query] — query del turno (gatea glosarios/reglas condicionales).
- * @param {string} [args.contextMemory] — historial inyectado (gatea glosarios y turn-aislamiento).
- * @param {boolean} [args.isEnum] — análisis NN2: ¿query enumerativa? (gatea CASO C completo).
- * @param {string} [args.nivelRespuestas] — 'simple' o 'detallado' (del perfil de usuario).
- * @param {Array|object|null} [args.toolEvidence] — evidencia de tools (para pie de fuente).
- * @param {Array|null} [args.resolvedEntities] — entidades resueltas (para pie de fuente).
- * @param {boolean} [args.hasCorpus] — si hay corpus RAG (para pie de fuente).
+ * @param {string} [args.fincaContext] - línea "Estás asistiendo en la finca…" o ''.
+ * @param {string} [args.indoorContext] - línea de invernadero o ''.
+ * @param {object|null} [args.finca] - finca activa (para buildProfileContext).
+ * @param {string} [args.query] - query del turno (gatea glosarios/reglas condicionales).
+ * @param {string} [args.contextMemory] - historial inyectado (gatea glosarios y turn-aislamiento).
+ * @param {boolean} [args.isEnum] - análisis NN2: ¿query enumerativa? (gatea CASO C completo).
+ * @param {string} [args.nivelRespuestas] - 'simple' o 'detallado' (del perfil de usuario).
+ * @param {Array|object|null} [args.toolEvidence] - evidencia de tools (para pie de fuente).
+ * @param {Array|null} [args.resolvedEntities] - entidades resueltas (para pie de fuente).
+ * @param {boolean} [args.hasCorpus] - si hay corpus RAG (para pie de fuente).
  * @returns {string}
  */
 export function buildBasePrompt({
@@ -1016,7 +1016,7 @@ RESPONDE SOLO a lo que el usuario preguntó usando ÚNICAMENTE los datos verific
  * No-op si el bloque no excede maxEdges o no es string válido.
  *
  * @param {string} bloque — texto del bloque relacional
- * @param {number} [maxEdges=TOP_N_EDGES] — tope de aristas
+ * @param {number} [maxEdges=TOP_N_EDGES] - tope de aristas
  * @returns {string} bloque truncado o el original si no aplica
  */
 export function truncateEdgesBlock(bloque, maxEdges = TOP_N_EDGES) {

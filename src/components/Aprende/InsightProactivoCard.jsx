@@ -102,7 +102,7 @@ function ChagraInsightFrame({ children, titulo }) {
  * InsightProactivoCard
  * @param {object} props
  * @param {object} props.insight — la card de agro-insight-cards.json elegida.
- * @param {() => void} [props.onDismiss] — descarta la oferta/entrega.
+ * @param {() => void} [props.onDismiss] - descarta la oferta/entrega.
  */
 export default function InsightProactivoCard({ insight, onDismiss }) {
   const [aceptado, setAceptado] = useState(false);

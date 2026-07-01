@@ -26,7 +26,7 @@ const TIMEOUT_MS = 15000;
  *
  * @param {Blob} blob - audio/webm;codecs=opus (tipicamente de MediaRecorder).
  * @param {Object} [options]
- * @param {string} [options.language='es'] — códigos ISO-639-1 sin región (whisper rechaza 'es-CO', solo acepta 'es')
+ * @param {string} [options.language='es'] - códigos ISO-639-1 sin región (whisper rechaza 'es-CO', solo acepta 'es')
  * @returns {Promise<string>} texto transcrito (trim).
  * @throws {Error} si la red falla, el servidor responde no-2xx o el texto esta vacio.
  * @example
@@ -37,7 +37,7 @@ export async function transcribe(blob, options = {}) {
   // Guard: un Blob vacío o diminuto (captura fallida en móvil — MediaRecorder
   // a veces produce un webm de 0 bytes o truncado) hace que Whisper responda
   // HTTP 500 "Failed to load audio: End of file / invalid EBML number". Cortar
-  // acá con un mensaje claro al usuario en vez del round-trip + 500 críptico.
+  // aquí con un mensaje claro al usuario en vez del round-trip + 500 críptico.
   const MIN_AUDIO_BYTES = 1024;
   if (!blob || typeof blob.size !== 'number' || blob.size < MIN_AUDIO_BYTES) {
     throw new Error('No se grabó audio. Mantén presionado el botón y habla cerca del micrófono.');

@@ -81,7 +81,7 @@ function _isSpecies(e) {
  * Deriva un plan de tool OBVIO para el path de fallo del NLU.
  *
  * @param {string} userMessage — texto crudo del operador.
- * @param {Array<object>|null} [resolvedEntities] — entidades ya resueltas por
+ * @param {Array<object>|null} [resolvedEntities] - entidades ya resueltas por
  *   `resolveEntities` (cada una puede traer { kind, canonical_id, nombre_comun }).
  * @returns {null | { tool: string, args: object, source: string }}
  *   null si el mensaje no es un string útil. En caso contrario, SIEMPRE un plan.

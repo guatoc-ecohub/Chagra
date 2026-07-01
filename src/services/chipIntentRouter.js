@@ -13,7 +13,7 @@
  *
  * Este módulo es PURO (sin red, sin React): mapea (intent, texto, opts) a un
  * "plan forzado" que el AgentScreen ejecuta sin pasar por `planNlu()`. Toda la
- * lógica de routing vive acá para poder testearla en aislamiento (TDD).
+ * lógica de routing vive aquí para poder testearla en aislamiento (TDD).
  *
  * CHIP_INTENTS y CHIP_DEFS se importan de agentCapabilities.js (fuente única
  * de verdad). Este módulo NO redefine esas constantes.
@@ -90,10 +90,10 @@ export function isDeepResearchIntent(intent) {
  * @param {string} intent — uno de CHIP_INTENTS.
  * @param {string} text — texto crudo del usuario (lo que escribió en el input).
  * @param {object} [opts]
- * @param {string|null} [opts.municipio] — municipio de la finca activa (para clima).
- * @param {number|string|null} [opts.altitud] — altura de la finca/perfil en msnm
+ * @param {string|null} [opts.municipio] - municipio de la finca activa (para clima).
+ * @param {number|string|null} [opts.altitud] - altura de la finca/perfil en msnm
  *   (para restauración y silvopastoreo; silvopastoreo la EXIGE).
- * @param {string|null} [opts.pisoTermico] — piso térmico del perfil
+ * @param {string|null} [opts.pisoTermico] - piso térmico del perfil
  *   (frío/templado/cálido/páramo; se prioriza en silvopastoreo).
  * @returns {null | {
  *   intent: string,

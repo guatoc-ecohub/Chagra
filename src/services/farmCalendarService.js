@@ -431,7 +431,7 @@ export function buildPlantCalendar({ id, name, speciesSlug, species, sowingDate,
  * tira anual de 12 meses. Cuenta, por mes, cuántas entradas hay de cada capa.
  *
  * @param {PlantCalendar[]} plants
- * @param {Set<string>|null} [activeLayers] — capas a contar (null = todas)
+ * @param {Set<string>|null} [activeLayers] - capas a contar (null = todas)
  * @returns {Array<{ month:number, layers: Record<string, number>, total:number }>}
  */
 export function aggregateMonthlyMatrix(plants, activeLayers = null) {

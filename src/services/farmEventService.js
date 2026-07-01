@@ -2,7 +2,7 @@
  * farmEventService — única puerta de escritura para eventos de ciclo.
  *
  * recordFarmEvent es la función autorizada para mutar el agregado.
- * Toda escritura pasa por acá. No exponer al LLM sin pruebas E2E.
+ * Toda escritura pasa por aquí. No exponer al LLM sin pruebas E2E.
  */
 import { openDB, STORES } from '../db/dbCore';
 import { newUlid } from '../utils/id';
@@ -61,7 +61,7 @@ export const buildUpsertPlaceholder = (processId, hint, occurredAt) => {
  * @param {string} [input.idempotency_key]
  * @param {number} [input.confidence]
  * @param {string} [input.evidence]
- * @param {import('../types/farmProcess').FarmProcess} [input.process_hint] — proceso
+ * @param {import('../types/farmProcess').FarmProcess} [input.process_hint] - proceso
  *   (ej. el ciclo seleccionado en la UI) para auto-crearlo si todavía no está en
  *   el store. Nunca perdemos una observación del campesino por desincronización.
  * @returns {Promise<import('../types/farmProcess').FarmProcessEvent>}

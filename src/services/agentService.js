@@ -588,7 +588,7 @@ export function formatClimateAlert(bioculturalZone, climateData = null) {
  *
  * @param {object | null} snapshot — payload de climaService.getCachedClimaSnapshot
  * @param {object} [opts]
- * @param {string|null} [opts.region] — región natural de la finca (ensoContext).
+ * @param {string|null} [opts.region] - región natural de la finca (ensoContext).
  *   Si se pasa, se inyecta la LECTURA REGIONAL ENSO (DR-MISSION-2/4): qué
  *   implica la fase actual para esa región (p. ej. heladas paradójicas en el
  *   altiplano bajo El Niño seco). Si no, solo se inyecta el bloque base.
@@ -745,12 +745,12 @@ function _normViabilidad(v) {
  * y la altitud de la finca (ya en profile/store).
  *
  * @param {object} args
- * @param {number|string|null} [args.fincaAltitud] — msnm de la finca activa.
- * @param {Array<object>|null} [args.resolvedEntities] — entidades AGE del turno.
+ * @param {number|string|null} [args.fincaAltitud] - msnm de la finca activa.
+ * @param {Array<object>|null} [args.resolvedEntities] - entidades AGE del turno.
  *   Cada una puede traer { kind, nombre_comun, altitud_min, altitud_max,
  *   piso_termico, viabilidad, delta_altitud, alternativas_viables[],
  *   alternativas_cercanas[] }.
- * @param {number} [args.marginMsnm=300] — holgura para clasificar "marginal"
+ * @param {number} [args.marginMsnm=300] - holgura para clasificar "marginal"
  *   en el fallback por rango.
  * @returns {string} bloque compacto, o '' si no hay nada accionable.
  */
@@ -853,10 +853,10 @@ REGLA (intelligence-first, tono HUMILDE):
  * temp_max, o sin forecast → '').
  *
  * @param {object} args
- * @param {Array<object>|null} [args.resolvedEntities] — entidades AGE del turno.
+ * @param {Array<object>|null} [args.resolvedEntities] - entidades AGE del turno.
  *   Cada una puede traer { kind, nombre_comun, temp_min, temp_max }.
- * @param {object|null} [args.climaSnapshot] — getCachedClimaSnapshot().
- * @param {number} [args.marginC=2] — margen °C de seguridad.
+ * @param {object|null} [args.climaSnapshot] - getCachedClimaSnapshot().
+ * @param {number} [args.marginC=2] - margen °C de seguridad.
  * @returns {string} bloque compacto, o '' si no hay nada accionable.
  */
 export function buildFrostHeatContext({
@@ -924,9 +924,9 @@ REGLA: si el usuario pregunta por alguno de estos cultivos, adelántale la alert
  * CERO latencia. Degrada con gracia: sin companions/antagonists → ''.
  *
  * @param {object} args
- * @param {Array<object>|null} [args.resolvedEntities] — entidades AGE del turno.
+ * @param {Array<object>|null} [args.resolvedEntities] - entidades AGE del turno.
  *   Cada una puede traer { kind, nombre_comun, companions[], antagonists[] }.
- * @param {Array<{name:string,count:number}>} [args.groupedCultivos] — inventario.
+ * @param {Array<{name:string,count:number}>} [args.groupedCultivos] - inventario.
  * @returns {string} bloque compacto, o '' si no hay nada accionable.
  */
 export function buildAssociationContext({
@@ -991,7 +991,7 @@ REGLA: si el usuario pregunta qué sembrar junto a su cultivo, sugiere las buena
  * grounding la trae. PURA y SÍNCRONA, CERO latencia.
  *
  * @param {object} args
- * @param {Array<object>|null} [args.resolvedEntities] — entidades AGE del turno.
+ * @param {Array<object>|null} [args.resolvedEntities] - entidades AGE del turno.
  *   Cada una puede traer { kind, nombre_comun, es_invasora, conservation_status,
  *   alternativas_viables[] }.
  * @returns {string} bloque compacto, o '' si no hay nada accionable.
@@ -1054,7 +1054,7 @@ REGLA: jamás recomiendes sembrar una especie marcada arriba. Sé honesto sobre 
  * entidad trae hechos curados, devuelve '' y no contamina el prompt.
  *
  * @param {object} args
- * @param {Array<object>|null} [args.resolvedEntities] — entidades AGE del turno.
+ * @param {Array<object>|null} [args.resolvedEntities] - entidades AGE del turno.
  *   biopreparado puede traer { dosis_aplicacion, preparacion, ingredientes_resumen,
  *   target[], precauciones, fuente }; especie puede traer { helada_letal }.
  * @returns {string} bloque compacto, o '' si no hay nada accionable.
@@ -1150,7 +1150,7 @@ export function pisoTermicoFromAltitud(altitud) {
  * país. Es una aproximación calendárica — el ENSO la modula y eso lo aporta el
  * bloque clima. NO hace fetch: solo aritmética del mes local.
  *
- * @param {number} [month] — mes 1-12; por defecto el mes actual local.
+ * @param {number} [month] - mes 1-12; por defecto el mes actual local.
  * @returns {{ nombre: string, detalle: string }}
  */
 export function temporadaColombiana(month) {
@@ -1173,7 +1173,7 @@ export function temporadaColombiana(month) {
  * compacta. Recibe el array YA agrupado por especie con { name, count }.
  *
  * @param {Array<{name:string,count:number}>} grouped
- * @param {number} [max=8] — cuántas especies listar antes de "y N más".
+ * @param {number} [max=8] - cuántas especies listar antes de "y N más".
  * @returns {string} ej. "maíz ×2, café, frijol y 3 más" o '' si vacío.
  */
 /**
@@ -1329,15 +1329,15 @@ function crossResolvedWithInventory(resolvedEntities, groupedCultivos) {
  * relevantes a la pregunta. El bloque lo instruye explícitamente.
  *
  * @param {object} args
- * @param {object|null} [args.profile] — userProfileService.getProfile()
- * @param {object|null} [args.finca] — finca activa (fincaActiveStore)
- * @param {object|null} [args.climaSnapshot] — getCachedClimaSnapshot()
- * @param {Array<{name:string,count:number}>} [args.groupedCultivos] — inventario agrupado
- * @param {Array<object>|null} [args.resolvedEntities] — entidades AGE del turno
- * @param {Array<object>} [args.activeAlerts] — useAlertStore activeAlerts
- * @param {string[]|null} [args.catalogNames] — nombres reales del catalogo (sync, opcional);
+ * @param {object|null} [args.profile] - userProfileService.getProfile()
+ * @param {object|null} [args.finca] - finca activa (fincaActiveStore)
+ * @param {object|null} [args.climaSnapshot] - getCachedClimaSnapshot()
+ * @param {Array<{name:string,count:number}>} [args.groupedCultivos] - inventario agrupado
+ * @param {Array<object>|null} [args.resolvedEntities] - entidades AGE del turno
+ * @param {Array<object>} [args.activeAlerts] - useAlertStore activeAlerts
+ * @param {string[]|null} [args.catalogNames] - nombres reales del catalogo (sync, opcional);
  *   si se pasa, valida cultivos contra el catalogo; si no, usa heuristica anti-mash.
- * @param {number} [args.month] — override de mes para tests (1-12)
+ * @param {number} [args.month] - override de mes para tests (1-12)
  * @returns {string} bloque compacto (siempre incluye al menos la temporada).
  */
 export function buildFincaContext({

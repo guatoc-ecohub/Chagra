@@ -155,7 +155,7 @@ const parseJsonTolerant = (raw) => {
  *
  * @param {string} text — transcripción en español.
  * @param {Object} [options]
- * @param {Function} [options.onToken] — callback (chunk, fullText) invocado
+ * @param {Function} [options.onToken] - callback (chunk, fullText) invocado
  *        por cada token emitido por el modelo. La UI lo usa para mostrar la
  *        respuesta en streaming con efecto typewriter.
  * @returns {Promise<Array<{crop:string, quantity:number, location:string}>>}
