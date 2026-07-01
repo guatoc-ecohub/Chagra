@@ -90,26 +90,18 @@ export const CAPABILITY_MANIFEST = Object.freeze([
   {
     id: 'precio',
     intent: 'precio',
-    kind: 'stub',
+    kind: 'local',
     icon: '💰',
     label: 'Precio',
     desc: 'Consultar precios mayoristas del día.',
     placeholder: 'Escribe el producto del que quieres saber el precio',
     tool: null,
-    stubMessage:
-      'La consulta de precios todavía no está disponible en Chagra. ' +
-      'Por ahora el precio mayorista lo publica el DANE (SIPSA) como archivo descargable, ' +
-      'sin consulta directa. Si quieres, te oriento a la fuente o a Corabastos.',
+    stubMessage: null,
     group: 'vender',
-    status: 'soon',
-    // hero:false (descubribilidad 2026-06-24) — `precio` SIGUE siendo chip
-    // honesto en el ChipsToolbar (stub con stubMessage que orienta a SIPSA/
-    // Corabastos), pero se RETIRA de la mano radial: era la ÚNICA hoja del grupo
-    // "vender" y, al ser status:'soon' (no-op → solo toast "por lanzar"), dejaba
-    // una rama muerta. Sin backing real de precios, se quita la rama de la mano
-    // (el grupo "vender" desaparece: GROUPS filtra grupos sin hojas hero). El día
-    // que exista precio real, se vuelve a poner hero:true con heroRoute live.
-    // Ref: CAPABILITIES_STATUS.md §7.4 (reparar ramas muertas).
+    status: 'live',
+    // hero:false (descubribilidad 2026-07-01): `precio` ya consulta la
+    // referencia real desde el cliente, pero sigue fuera de la mano radial
+    // para no reabrir la rama "vender" sin una decision de UX aparte.
     hero: false,
     heroRoute: { kind: 'unavailable' },
   },

@@ -39,11 +39,11 @@
  *   - polinizacion → get_polinizacion (polinizadores + colmenas/ha)
  *   - fenologia    → get_fenologia (etapas BBCH + ventana de plaga por etapa)
  *
- * Intents STUB (el backend aún NO existe — NO inventamos endpoints):
- *   - precio → SIPSA/DANE consulta directa no disponible (dataset ZIP federado).
+ * Intents sin tool sidecar:
+ *   - precio → referencia de mercado calculada localmente desde precioReferencia.
  *   - deep   → investigación profunda multi-fuente sin pipeline implementado.
- *   Ambos devuelven un mensaje honesto "aún no disponible" en vez de routear
- *   a un tool fantasma.
+ *   `precio` no es stub: consulta la referencia groundeada y responde
+ *   determinísticamente sin inventar cifras.
  *
  * IMPORTANTE — español colombiano (tú/usted), NUNCA voseo argentino. Todos los
  * strings visibles al campesino se redactan en neutro colombiano.
@@ -61,9 +61,9 @@ const DEF_BY_INTENT = Object.freeze(
 
 /**
  * ¿Este intent es un STUB (backend no disponible aún)?
- * Devuelve true para 'precio' y 'deep' (kind:'stub' en el manifiesto): ambos
- * carecen de backend servible en esta versión y muestran un mensaje honesto
- * "aún no disponible" en vez de routear a un tool/path fantasma.
+ * Devuelve true para los intents con kind:'stub' en el manifiesto. Hoy ese
+ * contrato aplica a `deep`; `precio` ya se resuelve localmente contra la
+ * referencia de mercado.
  * @param {string} intent
  * @returns {boolean}
  */
@@ -77,10 +77,10 @@ export function isStubIntent(intent) {
  *
  * B14: mientras la investigación profunda NO esté servible, 'deep' es kind
  * 'stub' en el manifiesto, así que esta función devuelve false para 'deep' y el
- * chip cae al stub honesto (mismo handler que 'precio'). La función se conserva
- * como punto de enganche: cuando el backend deep-research esté servido en prod
- * (feature flag VITE_DEEP_RESEARCH_ENABLED), basta volver 'deep' a kind 'deep'
- * en el manifiesto para reactivar el path live SIN tocar el AgentScreen.
+ * chip cae al stub honesto. La función se conserva como punto de enganche:
+ * cuando el backend deep-research esté servido en prod (feature flag
+ * VITE_DEEP_RESEARCH_ENABLED), basta volver 'deep' a kind 'deep' en el
+ * manifiesto para reactivar el path live SIN tocar el AgentScreen.
  * @param {string} intent
  * @returns {boolean}
  */
@@ -307,15 +307,21 @@ export function planForcedIntent(intent, text, opts = {}) {
       return { ...base, tool: 'get_fenologia', args: { species_id: prompt } };
 
     case CHIP_INTENTS.precio:
-      // STUB: backend no implementado. NO inventamos endpoint.
-      return { ...base, stub: true, stubMessage: def.stubMessage };
+      // Ruta local groundeada: usa el mismo resolver de referencia del
+      // marketplace, sin inventar backend ni tocar el sidecar.
+      return {
+        ...base,
+        tool: null,
+        args: { producto: prompt },
+        localGrounding: 'precio_referencia',
+      };
 
     case CHIP_INTENTS.deep:
       // STUB (B14): la investigación profunda aún no tiene backend servible en
       // prod (el job async vive detrás de VITE_DEEP_RESEARCH_ENABLED, off por
-      // defecto). Devolvemos el mismo stub honesto que 'precio' — NO routeamos
-      // a un path "live" inexistente. Coherente con el manifiesto (status 'soon')
-      // y con el menú de capacidades, que ya pinta 'deep' como por-lanzar.
+      // defecto). Devolvemos un stub honesto y no routeamos a un path "live"
+      // inexistente. Coherente con el manifiesto (status 'soon') y con el
+      // menú de capacidades, que ya pinta 'deep' como por-lanzar.
       return { ...base, stub: true, stubMessage: def.stubMessage };
 
     default:

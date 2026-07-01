@@ -92,12 +92,46 @@ export function resolverPrecioReferencia(producto) {
   const cita = classifySource(ref.fuente, { concept: producto });
   return {
     disponible: true,
+    producto: ref.producto,
     banda,
     mercado: ref.mercado,
     fuente: cita.fuente || ref.fuente,
     fuenteUrl: cita.fuente_url || null,
     boletinFecha: ref.boletinFecha,
   };
+}
+
+/**
+ * Construye una respuesta humana de precio de referencia para el chip Precio.
+ * Usa la misma base groundeada que el marketplace: resolverPrecioReferencia().
+ * Si no hay dato verificable, devuelve una declinacion honesta.
+ *
+ * @param {string} producto
+ * @returns {string|null}
+ */
+export function buildPriceReferenceAnswer(producto) {
+  const query = String(producto || '').trim();
+  if (!query) return null;
+
+  const ref = resolverPrecioReferencia(query);
+  if (!ref.disponible) {
+    return `No encontré una referencia SIPSA para "${query}". Si quiere, escriba el producto exacto y lo reviso de nuevo.`;
+  }
+
+  const fecha = ref.boletinFecha
+    ? new Intl.DateTimeFormat('es-CO', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(new Date(`${ref.boletinFecha}T00:00:00Z`))
+    : null;
+
+  const productoCanonico = ref.producto || query;
+  let msg = `💰 ${productoCanonico} está entre ${ref.banda} en ${ref.mercado}.`;
+  msg += ` (Fuente: ${ref.fuente}${fecha ? `, ${fecha}` : ''}.)`;
+  msg += ' Es precio mayorista en central de abastos; en plaza local puede variar.';
+  return msg;
 }
 
 /**

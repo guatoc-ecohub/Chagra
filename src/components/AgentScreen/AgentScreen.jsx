@@ -49,7 +49,7 @@ import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities,
 // CHIPS DE MODO (A3/A4, decisión operador 2026-06-02): el router PURO mapea
 // la intención forzada del chip → tool determinístico, SALTANDO el NLU
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
-// los chips cuyo backend aún no existe (precio/deep).
+// el chip cuyo backend aún no existe (deep).
 import { planForcedIntent, isStubIntent, isDeepResearchIntent, CHIP_DEFS } from '../../services/chipIntentRouter';
 // #349 — router heurístico de GROUNDING para el path de FALLO del NLU. Cuando
 // `planNlu` devuelve null (timeout/fail del sidecar bajo contención de GPU), el
@@ -74,6 +74,7 @@ import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../
 import { getCurrentTier } from '../../services/tierService';
 import DeepResearchCard from '../DeepResearchCard';
 import { normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildPriceAnswer, buildSuggestedEntitiesContext, isLowConfidenceEntity, buildFallbackResponse, pisoTermicoFromAltitud, groupAndLimitCultivos } from '../../services/agentService';
+import { buildPriceReferenceAnswer } from '../../services/marketplaceService';
 import { buildBasePrompt, analyzeQuery, buildQueryAnalysisBlock, buildCorpusVariants, buildResolvedEntitiesBlock, formatToolEvidence, truncateEdgesBlock } from '../../services/agentPromptBase';
 // Nubosidad real para el grounding (fix Choachí 2026-06) — solo lee caches.
 import { summarizeSkyForGrounding } from '../../services/skyConditionService';
@@ -1554,7 +1555,26 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               altitud: fincaAltitudChip,
               pisoTermico: pisoTermicoChip,
             });
-            if (forcedPlan && forcedPlan.localGrounding === 'incendio') {
+            if (forcedPlan && forcedPlan.localGrounding === 'precio_referencia') {
+              const priceMsg = buildPriceReferenceAnswer(forcedPlan.args?.producto || textForLLM);
+              if (priceMsg) {
+                const userMessage = { role: 'user', content: trimmed, timestamp: Date.now() };
+                const assistantMessage = {
+                  role: 'assistant',
+                  content: priceMsg,
+                  timestamp: Date.now(),
+                };
+                setMessages((prev) => [...prev, userMessage, assistantMessage]);
+                try {
+                  await addTurn(operatorId, { role: 'user', content: trimmed });
+                  await addTurn(operatorId, { role: 'assistant', content: priceMsg });
+                } catch (e) {
+                  console.warn('[Agent] precio addTurn failed (continuo):', e?.message);
+                }
+                setActiveIntent(null);
+                return;
+              }
+            } else if (forcedPlan && forcedPlan.localGrounding === 'incendio') {
               // Riesgo de incendio: estimación client-side (NO tool sidecar, NO
               // API de alerta en tiempo real). Calculamos el bloque honesto y lo
               // inyectamos como evidence; el LLM lo presenta como estimación.
@@ -2368,7 +2388,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     // VITE_DEEP_RESEARCH_ENABLED + online. B14: mientras la feature no esté
     // servible en prod, 'deep' es kind:'stub' en el manifiesto, así que
     // isDeepResearchIntent('deep') es false y este branch NO se dispara vía chip
-    // — la pregunta cae al stub honesto de abajo (mismo handler que 'precio').
+    // — la pregunta cae al stub honesto de abajo.
     // El branch se conserva intacto: reactivar es volver 'deep' a kind:'deep' en
     // agentCapabilities.js cuando el backend esté live (sin tocar este flujo).
     if (forcedIntent && isDeepResearchIntent(forcedIntent)) {
@@ -2512,11 +2532,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       return;
     }
 
-    // CHIPS DE MODO — STUB (A3): precio no tiene backend todavía. NO
-    // routeamos a un tool fantasma ni gastamos una inferencia del LLM:
+    // CHIPS DE MODO — STUB (A3): solo los chips sin backend van por aquí.
+    // No routeamos a un tool fantasma ni gastamos una inferencia del LLM:
     // pintamos la pregunta del usuario + una respuesta honesta "aún no
-    // disponible" y salimos. Esto evita el misrouting del NLU (que mandaba
-    // "papa" al tool de precio inexistente) y es transparente con el campesino.
+    // disponible" y salimos.
     if (forcedIntent && isStubIntent(forcedIntent)) {
       const stubPlan = planForcedIntent(forcedIntent, trimmed);
       if (stubPlan && stubPlan.stub && stubPlan.stubMessage) {
