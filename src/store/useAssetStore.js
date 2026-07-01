@@ -1014,10 +1014,10 @@ if (typeof window !== 'undefined') {
             _pending: false,
             _pendingReason: null,
           });
-          console.log(`[Sync] Activo ${id} liberado para actualización oficial.`);
+          console.info(`[Sync] Activo ${id} liberado para actualización oficial.`);
         }
       } else {
-        console.log(`[Sync] Log ${type}/${id} sincronizado — pull ${assetType} para captar inlines.`);
+        console.info(`[Sync] Log ${type}/${id} sincronizado — pull ${assetType} para captar inlines.`);
       }
 
       // 2. Pull dirigido al tipo afectado (no refresca los 4 tipos)

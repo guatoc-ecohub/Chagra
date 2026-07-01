@@ -182,7 +182,7 @@ async function logAuditTrail(proposal, operatorId, actionResult) {
       auditLog.push(entry);
       localStorage.setItem(ACTION_LOG_KEY, JSON.stringify(auditLog.slice(-100)));
     } else {
-      console.log('[ActionAudit]', entry);
+      console.info('[ActionAudit]', entry);
     }
   } catch (e) {
     console.warn('[ActionAudit] Failed to store:', e);

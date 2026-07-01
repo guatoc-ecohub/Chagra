@@ -117,7 +117,7 @@ if (typeof window !== 'undefined') {
         if (localLog.asset_id) {
           await useLogStore.getState().loadLogsForAsset(localLog.asset_id);
         }
-        console.log(`[Log-Sync] Log ${id} liberado y actualizado en UI.`);
+        console.info(`[Log-Sync] Log ${id} liberado y actualizado en UI.`);
       }
     } catch (err) {
       console.error('[LogStore-Listener] Error en liberación de flag:', err);
