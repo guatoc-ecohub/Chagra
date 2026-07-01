@@ -40,7 +40,13 @@
       "fuente": "Restrepo Rivera, J. — ABC de la agricultura organica (Bocashi); manuales SENA/Agrosavia de compostaje rapido. Dosis g/planta de referencia campesina.",
       "confianza": "media",
       "dosis": "1-2 kg/m² al voleo en cama de siembra; 100-300 g/planta en hoyo de trasplante; 8-15 t/ha en aplicación general. Reducir 30% si el suelo ya tiene >4% MO.",
-      "uso": "Al sustrato pre-siembra incorporado 0-15 cm, o como abonado de fondo en hoyos de trasplante. Reaplicación cada ciclo de cultivo (3-6 meses) en bandas al pie de la planta."
+      "uso": "Al sustrato pre-siembra incorporado 0-15 cm, o como abonado de fondo en hoyos de trasplante. Reaplicación cada ciclo de cultivo (3-6 meses) en bandas al pie de la planta.",
+      "safety_class": "bajo",
+      "ppe_required": [
+        "tapabocas"
+      ],
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "biol",
@@ -71,7 +77,13 @@
       "fuente": "Restrepo Rivera / literatura andina de biodigestores (PROMMRA-UNALM rangos de dilucion). Dilucion variable entre fuentes.",
       "confianza": "media",
       "dosis": "Foliar: 100-200 ml/L de agua (dilución 1:10 a 1:5). Drench/riego al pie: 1-2 L/m² o 200 L/ha del concentrado diluido 1:5. Empezar con dilución alta (1:20) en plántulas para evitar fitotoxicidad.",
-      "uso": "Foliar al amanecer o atardecer (evitar sol directo) cada 7-15 días en etapas de crecimiento vegetativo y prefloración. También aplicable al pie/riego durante toda la etapa productiva. Compatible con caldos minerales si se aplica 48 h antes/después."
+      "uso": "Foliar al amanecer o atardecer (evitar sol directo) cada 7-15 días en etapas de crecimiento vegetativo y prefloración. También aplicable al pie/riego durante toda la etapa productiva. Compatible con caldos minerales si se aplica 48 h antes/después.",
+      "safety_class": "bajo",
+      "ppe_required": null,
+      "do_not_use_when": [
+        "proximo_a_cosecha"
+      ],
+      "reentry_interval_dias": null
     },
     {
       "id": "purin_ortiga",
@@ -99,7 +111,13 @@
       "fuente": "Restrepo Rivera / tradicion agroecologica europea-andina del purin de ortiga. Dilucion 1:10-1:20 estandar; concentracion del macerado variable.",
       "confianza": "media",
       "dosis": "Foliar: 100 ml/L de agua (1:10) preventivo, 200 ml/L (1:5) curativo contra pulgón. Drench/raíz: 50 ml/L (1:20). Macerado fresco no fermentado (24-48 h) se usa más diluido 1:20 a 1:50.",
-      "uso": "Foliar al amanecer cada 7-10 días en etapa vegetativa. Como repelente preventivo: aplicar al detectar plagas chupadoras incipientes. También al pie como bioestimulante de enraizamiento en plántulas y trasplantes."
+      "uso": "Foliar al amanecer cada 7-10 días en etapa vegetativa. Como repelente preventivo: aplicar al detectar plagas chupadoras incipientes. También al pie como bioestimulante de enraizamiento en plántulas y trasplantes.",
+      "safety_class": "bajo",
+      "ppe_required": [
+        "guantes"
+      ],
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "caldo_sulfocalcico",
@@ -127,7 +145,17 @@
       "fuente": "Restrepo Rivera, J. — ABC de la agricultura organica; SENA/Agrosavia manuales de caldos minerales (relacion 2:1:10, dilucion 100-200 cc/20 L).",
       "confianza": "alta",
       "dosis": "Preventivo foliar: 10 ml/L de agua (1:100). Curativo foliar: 50 ml/L (1:20). Invernal o tratamiento de troncos (escamas, chancros): 100-200 ml/L (1:10 a 1:5). En invernadero reducir 50%.",
-      "uso": "Foliar al atardecer cada 10-15 días en preventivo; cada 7 días en curativo activo contra hongos y ácaros. Suspender 15 días antes de cosecha. NO aplicar en frutales durante floración ni con temperaturas >28°C o humedad relativa <50% (riesgo fitotoxicidad)."
+      "uso": "Foliar al atardecer cada 10-15 días en preventivo; cada 7 días en curativo activo contra hongos y ácaros. Suspender 15 días antes de cosecha. NO aplicar en frutales durante floración ni con temperaturas >28°C o humedad relativa <50% (riesgo fitotoxicidad).",
+      "safety_class": "alto",
+      "ppe_required": [
+        "guantes",
+        "careta",
+        "gafas"
+      ],
+      "do_not_use_when": [
+        "floracion"
+      ],
+      "reentry_interval_dias": 15
     },
     {
       "id": "caldo_bordeles",
@@ -154,7 +182,17 @@
       "fuente": "Restrepo Rivera, J. — ABC de la agricultura organica (concentracion 1% clasica); Agrosavia/ICA manejo fitosanitario; Resolucion ICA 698/2011 (uso restringido).",
       "confianza": "alta",
       "dosis": "Concentración estándar 1% (10 g sulfato + 10 g cal por L de agua); foliar 1:1 (sin diluir, 10 L/100 m²) o lo equivalente a 200-400 L/ha. Cultivos sensibles (solanáceas en floración, durazno): bajar a 0.5%. Tratamiento invernal de troncos: hasta 2%.",
-      "uso": "Foliar preventivo al amanecer cada 10-14 días durante etapas de alta humedad relativa (>80%) o llovizna persistente. Suspender en floración (afecta polinizadores y cuaje) y 21 días antes de cosecha. Aplicar el mismo día de preparación — vida útil <24 h una vez mezclado."
+      "uso": "Foliar preventivo al amanecer cada 10-14 días durante etapas de alta humedad relativa (>80%) o llovizna persistente. Suspender en floración (afecta polinizadores y cuaje) y 21 días antes de cosecha. Aplicar el mismo día de preparación — vida útil <24 h una vez mezclado.",
+      "safety_class": "alto",
+      "ppe_required": [
+        "guantes",
+        "careta",
+        "gafas"
+      ],
+      "do_not_use_when": [
+        "floracion"
+      ],
+      "reentry_interval_dias": 21
     },
     {
       "id": "te_compost",
@@ -183,7 +221,13 @@
       "fuente": "Agrosavia / SENA / Ingham (2000) — te de compost y lombricompuesto; relacion 1:5-1:10 estandar; advertencia sanitaria de tes aireados (literatura compost tea).",
       "confianza": "media",
       "dosis": "Foliar: dilución 1:5 con agua declorada (≈200 ml de té por L de agua, 200-300 L/ha). Drench al pie: 1:10 (≈1 L por planta hortícola, 5 L por árbol joven).",
-      "uso": "Foliar al amanecer o atardecer cada 10-15 días en fase vegetativa, o como empapado al sustrato pre-trasplante; aplicar dentro de las 4 h posteriores a cortar la aireación para no perder la microbiota activa."
+      "uso": "Foliar al amanecer o atardecer cada 10-15 días en fase vegetativa, o como empapado al sustrato pre-trasplante; aplicar dentro de las 4 h posteriores a cortar la aireación para no perder la microbiota activa.",
+      "safety_class": "bajo",
+      "ppe_required": null,
+      "do_not_use_when": [
+        "proximo_a_cosecha"
+      ],
+      "reentry_interval_dias": null
     },
     {
       "id": "humus_liquido",
@@ -210,7 +254,13 @@
       "fuente": "Agrosavia / SENA — te de lombricompuesto; relacion 1:5-1:10 estandar (analogo al te de estiercol/lombricompuesto verificado).",
       "confianza": "media",
       "dosis": "Foliar: 1:10 con agua (≈100 ml de lixiviado por L, ≈300 L de mezcla/ha). Drench: 1:5 (≈250 ml por planta hortícola, 1-2 L por árbol joven).",
-      "uso": "Foliar cada 7-15 días en fase vegetativa y vegetativa-reproductiva, preferentemente al amanecer; también drench al pie de plántulas recién trasplantadas para mitigar estrés de transplante."
+      "uso": "Foliar cada 7-15 días en fase vegetativa y vegetativa-reproductiva, preferentemente al amanecer; también drench al pie de plántulas recién trasplantadas para mitigar estrés de transplante.",
+      "safety_class": "bajo",
+      "ppe_required": null,
+      "do_not_use_when": [
+        "proximo_a_cosecha"
+      ],
+      "reentry_interval_dias": null
     },
     {
       "id": "lixiviado_frutas",
@@ -229,7 +279,11 @@
       "vida_util_dias": 120,
       "source_ids": [
         "restrepo-1996-bocashi"
-      ]
+      ],
+      "safety_class": "revisar",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "supermagro",
@@ -259,7 +313,13 @@
       "fuente": "Restrepo Rivera, J. — Manual practico de biofertilizantes (Supermagro); diluciones 2-7% segun el autor.",
       "confianza": "media",
       "dosis": "Foliar: 1:20 con agua (≈50 ml/L, 200-400 L/ha). Preventivo: 1:50 cada 30 días. Nunca superar 100 ml/L — riesgo de fitotoxicidad por exceso de Cu/Zn.",
-      "uso": "Foliar correctivo de micronutrientes cada 15-21 días durante todo el ciclo, intensificando frecuencia en cultivos con síntomas visibles de deficiencia (clorosis intervenal, brotes deformes, frutos pequeños) o en suelos pobres/calcáreos del altiplano cundiboyacense."
+      "uso": "Foliar correctivo de micronutrientes cada 15-21 días durante todo el ciclo, intensificando frecuencia en cultivos con síntomas visibles de deficiencia (clorosis intervenal, brotes deformes, frutos pequeños) o en suelos pobres/calcáreos del altiplano cundiboyacense.",
+      "safety_class": "bajo",
+      "ppe_required": [
+        "guantes"
+      ],
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "trichoderma_harzianum_suelo",
@@ -277,7 +337,11 @@
       "vida_util_dias": 90,
       "source_ids": [
         "cenicafe-trichoderma-2010"
-      ]
+      ],
+      "safety_class": "revisar",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "bacillus_subtilis_foliar",
@@ -295,7 +359,11 @@
       "vida_util_dias": 30,
       "source_ids": [
         "agrosavia-bacillus-2018"
-      ]
+      ],
+      "safety_class": "revisar",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "cal_dolomita",
@@ -313,7 +381,11 @@
       "vida_util_dias": 730,
       "source_ids": [
         "ica-fertilizantes-2019"
-      ]
+      ],
+      "safety_class": "revisar",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "roca_fosforica",
@@ -331,7 +403,11 @@
       "vida_util_dias": 730,
       "source_ids": [
         "ica-fertilizantes-2019"
-      ]
+      ],
+      "safety_class": "revisar",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "ceniza_madera",
@@ -357,7 +433,16 @@
       "fuente": "SENA / Restrepo Rivera — caldos caseros (ceniza + jabon) y ceniza como enmienda; concentracion de campo no estandarizada entre fuentes.",
       "confianza": "baja",
       "dosis": "Riego al pie: 100-200 g por planta/año en frutales jóvenes; 50-80 g/planta en hortalizas de fruto (tomate, pimentón). Suelo: 1-3 t/ha incorporadas pre-siembra. Bocashi: 5-10% del peso total. Barrera anti-babosa: cordón de 2-3 cm alrededor del cultivo (re-aplicar tras lluvia).",
-      "uso": "Aporte de potasio y calcio + corrección suave de acidez en suelos ácidos (pH 5.0-6.0); también ingrediente clave del bocashi (5-10%) y repelente físico de babosas en bordes de era."
+      "uso": "Aporte de potasio y calcio + corrección suave de acidez en suelos ácidos (pH 5.0-6.0); también ingrediente clave del bocashi (5-10%) y repelente físico de babosas en bordes de era.",
+      "safety_class": "medio",
+      "ppe_required": [
+        "guantes",
+        "gafas"
+      ],
+      "do_not_use_when": [
+        "suelo_ph_mayor_6_5"
+      ],
+      "reentry_interval_dias": null
     },
     {
       "id": "compost_maduro",
@@ -379,7 +464,11 @@
       "source_ids": [
         "restrepo-1996-bocashi",
         "agrosavia-manual-biopreparados-2015"
-      ]
+      ],
+      "safety_class": "revisar",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     },
     {
       "id": "biofertilizante_algas",
@@ -397,7 +486,11 @@
       "vida_util_dias": 365,
       "source_ids": [
         "khan-2009-seaweed-extracts"
-      ]
+      ],
+      "safety_class": "revisar",
+      "ppe_required": null,
+      "do_not_use_when": null,
+      "reentry_interval_dias": null
     }
   ]
 }
