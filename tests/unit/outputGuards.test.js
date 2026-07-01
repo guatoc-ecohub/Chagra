@@ -426,7 +426,8 @@ describe('generateSourceCitationRules — (a) especie inventada NO se describe',
     expect(rules).not.toBe('');
     // Debe mencionar explícitamente la regla de especie desconocida
     expect(rules).toMatch(/especie desconocida|NO aparece.*catálogo/);
-    expect(rules).toMatch(/NO inventes.*descripción|inventar.*usos|inventar.*manejo/);
+    // Wording endurecido (#95): PROHÍBE describir/manejar la especie desconocida.
+    expect(rules).toMatch(/PROHIBIDO.*(descripci[oó]n|manejo|usos)|NO improvises|[Ii]nventar.*(manejo|descripci[oó]n)/);
   });
 
   it('contiene regla de NO inventar nombres científicos (binomios)', () => {
