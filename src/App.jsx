@@ -7,7 +7,7 @@
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import React, { lazy, Suspense, useState, useEffect, useCallback, useRef } from 'react';
-import { MapPin, Eye, Package, CheckCircle, WifiOff, Mic, AlertCircle, Network, Beaker } from 'lucide-react';
+import { MapPin, Eye, Package, CheckCircle, WifiOff, Mic, AlertCircle, Network, Beaker, Scale } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
 import { useClimaAtmosphere } from './hooks/useClimaAtmosphere';
@@ -73,6 +73,12 @@ const WorkerHistory = lazy(() => import('./components/WorkerHistory'));
 const BitacoraEntryDetail = lazy(() => import('./components/BitacoraEntryDetail'));
 const InformesScreen = lazy(() => import('./components/InformesScreen'));
 const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').then(m => ({ default: m.InventoryDashboard })));
+// InventoryPage orquesta la capa de auditoría/reconciliación de inventario
+// (InventoryAuditTrail + InventoryAuditDashboard + InventoryEventTimeline),
+// completa pero huérfana (0 rutas) antes de este wiring — descubribilidad
+// 2026-06-30. Se alcanza desde 'bodega' vía el botón "Auditoría y
+// reconciliación", o directo por hash (#auditoria-inventario).
+const InventoryPage = lazy(() => import('./pages/InventoryPage'));
 const BiopreparadoRecetasGallery = lazy(() => import('./components/BiopreparadoRecetasGallery'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
@@ -152,6 +158,9 @@ const HASH_VIEW_ROUTES = {
   faq: 'faq',
   inventario: 'activos',
   activos: 'activos',
+  bodega: 'bodega',
+  'auditoria-inventario': 'auditoria_inventario',
+  'inventario-auditoria': 'auditoria_inventario',
   biodiversidad: 'biodiversidad',
   ayuda: 'ayuda',
   perfil: 'perfil',
@@ -201,7 +210,7 @@ const MODULE_VIEWS = new Set([
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'toxicologia', 'aprende', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia',
-  'usage_stats', 'mercado',
+  'usage_stats', 'mercado', 'auditoria_inventario',
 ]);
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
@@ -401,7 +410,7 @@ export default function App() {
 
   // Bug Lili #4: el InputLogForm dispatcha 'syncSuccess' tras registrar una
   // aplicación de bio-insumo, pero nadie escuchaba el evento → el operador
-  // no veía feedback de dónde quedó guardada la info. Listener acá que
+  // no veía feedback de dónde quedó guardada la info. Listener aquí que
   // alimenta el toast con CTA "Ver Bitácora" cuando el evento trae action.
   // detail: { message: string, actionLabel?: string, actionView?: string }
   useEffect(() => {
@@ -582,7 +591,7 @@ export default function App() {
     // los usuarios de La Cordada, mientras hay señal en el dashboard. Sin esto,
     // si un guía instala la app y sube al glaciar SIN haber abierto el módulo
     // online, el chunk `/assets/GlaciarReporteScreen-*.js` nunca se cachea → el
-    // SW responde 504 y el módulo NO abre en campo. Disparar el import() acá
+    // SW responde 504 y el módulo NO abre en campo. Disparar el import() aquí
     // baja el chunk estando online; el handler cache-first de /assets/* del SW
     // lo guarda y sobrevive offline. Idempotente (el bundler cachea el módulo),
     // fire-and-forget, y solo para la whitelist (no malgasta datos del resto).
@@ -971,8 +980,44 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Insumos">
-              <ScreenShell title="Bodega" icon={Package} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
+              <ScreenShell
+                title="Bodega"
+                icon={Package}
+                onBack={() => navigate('dashboard')}
+                onHome={() => navigate('dashboard')}
+                actions={
+                  <button
+                    type="button"
+                    onClick={() => navigate('auditoria_inventario')}
+                    data-testid="bodega-open-auditoria"
+                    className="px-3 py-1.5 rounded-lg bg-indigo-600/80 hover:bg-indigo-500 text-white text-xs font-bold transition-colors flex items-center gap-1.5"
+                  >
+                    <Scale className="w-3.5 h-3.5" /> Auditoría
+                  </button>
+                }
+              >
                 <InventoryDashboard />
+              </ScreenShell>
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'auditoria_inventario':
+        // Capa de auditoría/reconciliación de inventario (descubribilidad
+        // 2026-06-30): antes InventoryPage no estaba ruteado y
+        // InventoryAuditDashboard/InventoryEventTimeline/InventoryAuditTrail
+        // (+ inventoryReconcile.js/inventoryEvents.js) quedaban huérfanos (0
+        // importers). InventoryPage orquesta los 3 componentes; se alcanza
+        // desde 'bodega' (botón "Auditoría") o por hash directo.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Auditoría de Inventario">
+              <ScreenShell
+                title="Auditoría de Inventario"
+                icon={Scale}
+                onBack={() => navigate('bodega')}
+                onHome={() => navigate('dashboard')}
+              >
+                <InventoryPage />
               </ScreenShell>
             </ErrorFallback>
           </ErrorBoundary>
@@ -1272,7 +1317,7 @@ export default function App() {
         // (src/config/glaciarAccess.js). Guarda defensiva: si por cualquier
         // ruta un usuario no autorizado llega a esta vista, NO montamos el
         // módulo — devolvemos el fallback estándar. Las navegaciones a #glaciar
-        // ya redirigen al dashboard antes de llegar acá (ver effects de ruta).
+        // ya redirigen al dashboard antes de llegar aquí (ver effects de ruta).
         if (!tieneAccesoGlaciarActual()) {
           return (
             <ErrorBoundary>
@@ -1295,7 +1340,7 @@ export default function App() {
         // (src/config/glaciarAccess.js). Guarda defensiva: si por cualquier
         // ruta un usuario no autorizado llega a esta vista, NO montamos el
         // módulo — devolvemos el fallback estándar. Las navegaciones a
-        // #glaciar-historial ya redirigen al dashboard antes de llegar acá.
+        // #glaciar-historial ya redirigen al dashboard antes de llegar aquí.
         if (!tieneAccesoGlaciarActual()) {
           return (
             <ErrorBoundary>
@@ -1320,7 +1365,7 @@ export default function App() {
         // Panel SUPERVISOR del modo extensionista (ADR-048 MVP). ACCESO por
         // feature flag VITE_FEATURE_EXTENSIONISTA + rol (config/extensionistaAccess).
         // Las rutas a #extensionista ya redirigen al dashboard antes de llegar
-        // acá si el usuario no tiene rol; guarda defensiva por si se monta directo.
+        // aquí si el usuario no tiene rol; guarda defensiva por si se monta directo.
         if (!esExtensionistaActual()) {
           return (
             <ErrorBoundary>
@@ -1385,7 +1430,7 @@ export default function App() {
         // chunk no cacheado por el SW, el import() falla → ErrorBoundary genérico
         // ("Algo falló") y el guard offline real (ollamaStream) queda
         // inalcanzable porque el componente nunca monta. Chequear navigator.onLine
-        // acá deja ver el aviso claro ("el asistente necesita internet; tus datos
+        // aquí deja ver el aviso claro ("el asistente necesita internet; tus datos
         // sí funcionan sin conexión") aunque el chunk no esté disponible.
         if (!isAppOnline) {
           return (
