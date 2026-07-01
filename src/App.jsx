@@ -7,7 +7,7 @@
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import React, { lazy, Suspense, useState, useEffect, useCallback, useRef } from 'react';
-import { MapPin, Eye, Package, CheckCircle, WifiOff, Mic, AlertCircle, Network, Beaker } from 'lucide-react';
+import { MapPin, Eye, Package, CheckCircle, WifiOff, Mic, AlertCircle, Network, Beaker, Scale } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
 import { useClimaAtmosphere } from './hooks/useClimaAtmosphere';
@@ -73,6 +73,12 @@ const WorkerHistory = lazy(() => import('./components/WorkerHistory'));
 const BitacoraEntryDetail = lazy(() => import('./components/BitacoraEntryDetail'));
 const InformesScreen = lazy(() => import('./components/InformesScreen'));
 const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').then(m => ({ default: m.InventoryDashboard })));
+// InventoryPage orquesta la capa de auditoría/reconciliación de inventario
+// (InventoryAuditTrail + InventoryAuditDashboard + InventoryEventTimeline),
+// completa pero huérfana (0 rutas) antes de este wiring — descubribilidad
+// 2026-06-30. Se alcanza desde 'bodega' vía el botón "Auditoría y
+// reconciliación", o directo por hash (#auditoria-inventario).
+const InventoryPage = lazy(() => import('./pages/InventoryPage'));
 const BiopreparadoRecetasGallery = lazy(() => import('./components/BiopreparadoRecetasGallery'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
@@ -152,6 +158,9 @@ const HASH_VIEW_ROUTES = {
   faq: 'faq',
   inventario: 'activos',
   activos: 'activos',
+  bodega: 'bodega',
+  'auditoria-inventario': 'auditoria_inventario',
+  'inventario-auditoria': 'auditoria_inventario',
   biodiversidad: 'biodiversidad',
   ayuda: 'ayuda',
   perfil: 'perfil',
@@ -201,7 +210,7 @@ const MODULE_VIEWS = new Set([
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'toxicologia', 'aprende', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia',
-  'usage_stats', 'mercado',
+  'usage_stats', 'mercado', 'auditoria_inventario',
 ]);
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
@@ -971,8 +980,44 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Insumos">
-              <ScreenShell title="Bodega" icon={Package} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
+              <ScreenShell
+                title="Bodega"
+                icon={Package}
+                onBack={() => navigate('dashboard')}
+                onHome={() => navigate('dashboard')}
+                actions={
+                  <button
+                    type="button"
+                    onClick={() => navigate('auditoria_inventario')}
+                    data-testid="bodega-open-auditoria"
+                    className="px-3 py-1.5 rounded-lg bg-indigo-600/80 hover:bg-indigo-500 text-white text-xs font-bold transition-colors flex items-center gap-1.5"
+                  >
+                    <Scale className="w-3.5 h-3.5" /> Auditoría
+                  </button>
+                }
+              >
                 <InventoryDashboard />
+              </ScreenShell>
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'auditoria_inventario':
+        // Capa de auditoría/reconciliación de inventario (descubribilidad
+        // 2026-06-30): antes InventoryPage no estaba ruteado y
+        // InventoryAuditDashboard/InventoryEventTimeline/InventoryAuditTrail
+        // (+ inventoryReconcile.js/inventoryEvents.js) quedaban huérfanos (0
+        // importers). InventoryPage orquesta los 3 componentes; se alcanza
+        // desde 'bodega' (botón "Auditoría") o por hash directo.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Auditoría de Inventario">
+              <ScreenShell
+                title="Auditoría de Inventario"
+                icon={Scale}
+                onBack={() => navigate('bodega')}
+                onHome={() => navigate('dashboard')}
+              >
+                <InventoryPage />
               </ScreenShell>
             </ErrorFallback>
           </ErrorBoundary>
