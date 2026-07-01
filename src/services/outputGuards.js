@@ -6732,8 +6732,14 @@ export function guardUnidentifiedRegionalCrop(responseText, { userMessage = null
 //     ("más", "así", "allí") porque los epítetos botánicos son latín puro sin diacríticos.
 // Anti-falsos-positivos: "Cuéntame más" no matchea (Cuéntame tiene tilde → no captura
 // por [a-z] puro en el genus; además "más" tiene 3 chars < 4 mínimo del epithet).
+// Fix #95 — anti falsos positivos: SOLO binomios entre paréntesis, que es el
+// patrón real con que el LLM "identifica" un término ("La yumbolo (Tithonia
+// diversifolia) es..."). Así NO matchea verbos capitalizados a inicio de oración
+// ("Aplica glifosato", "Evita usar") ni binomios reales recomendados sin
+// paréntesis ("...y Bacillus thuringiensis para orugas"), que no son atribución
+// al término desconocido del usuario y disparaban clobbereo de respuestas sanas.
 const LATIN_BINOMIAL_RE =
-  /\b([A-Z][a-z]{4,})\s+([a-z]{4,}(?:\s+(?:var\.|f\.|subsp\.|ssp\.)?\s*[a-z]{4,})?)\b/g;
+  /\(\s*([A-Z][a-z]{4,})\s+([a-z]{4,}(?:\s+(?:var\.|f\.|subsp\.|ssp\.)?\s*[a-z]{4,})?)\b/g;
 
 /**
  * Palabras comunes que podrían parecer binomios pero NO lo son.
@@ -8875,32 +8881,12 @@ export function applyOutputGuards(
     }
   }
 
-  // GUARD BINOMIO NO VERIFICADO (fix #95): generaliza BORDE-027 para cualquier
-  // nombre regional desconocido, no solo "coincyes". Si la respuesta contiene un
-  // binomio latino para un término del usuario que NO está en los mentioned de
-  // alta confianza del resolver, REEMPLAZA por petición de identificación.
-  // Solo actúa si no hubo grounding legítimo (resolvedMentions vacío o incompleto).
-  // Corre SIEMPRE (no solo siembra): un binomio inventado es alucinación en
-  // cualquier contexto (consulta de info, manejo, siembra). Es SUPPRESS-AND-REPLACE.
-  {
-    // Construye el set de mentioned de ALTA confianza (entidades que SÍ pasaron el
-    // umbral MIN_ENTITY_CONFIDENCE en buildResolvedEntitiesBlock). Usamos `entities`
-    // (ya filtrado de ruido NLU) y filtramos por confidence >= 0.8.
-    const resolvedMentions = new Set(
-      (Array.isArray(entities) ? entities : [])
-        .filter((e) => typeof e.confidence === 'number' && e.confidence >= 0.8)
-        .map((e) => (e.mentioned || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim())
-        .filter(Boolean)
-    );
-    const unverifiedGuard = guardUnverifiedTermBinomial(text, { userMessage, resolvedMentions });
-    if (unverifiedGuard && unverifiedGuard.modified) {
-      return {
-        text: unverifiedGuard.text,
-        modified: true,
-        reasons: unverifiedGuard.reason ? [unverifiedGuard.reason] : [],
-      };
-    }
-  }
+  // GUARD BINOMIO NO VERIFICADO (fix #95): MOVIDO al final de la cadena como
+  // último recurso (ver tras los guards de tóxico/benéfico/binomio-inventado),
+  // para que esos guards más específicos tengan precedencia y no los pise su
+  // suppress-and-replace. Antes corría aquí con return temprano y clobbereaba
+  // la deflexión honesta, el caveat de benéfico fabricado y la neutralización
+  // quirúrgica de binomio inventado.
 
   // GUARD RECETA de CALDO CLÁSICO pedida en dosis exacta (BORDE-003 / 004): cuando
   // el usuario pide la receta EXACTA en gramos de un caldo clásico (bordelés/
@@ -9158,6 +9144,26 @@ export function applyOutputGuards(
     text = invBinRes.text;
     modified = true;
     if (invBinRes.reason) reasons.push(invBinRes.reason);
+  }
+  // GUARD BINOMIO NO VERIFICADO (fix #95) — ÚLTIMO RECURSO. Solo si NINGÚN guard
+  // más específico tocó ya la respuesta: cuando cuelga un binomio latino ENTRE
+  // PARÉNTESIS de un término del usuario sin grounding de alta confianza, la
+  // reemplaza por una petición de identificación con foto. SUPPRESS-AND-REPLACE;
+  // por eso va al final y solo con `modified` aún en false (no clobberea guards
+  // más específicos ni deflexiones/caveats previos).
+  if (!modified) {
+    const resolvedMentions = new Set(
+      (Array.isArray(entities) ? entities : [])
+        .filter((e) => typeof e.confidence === 'number' && e.confidence >= 0.8)
+        .map((e) => (e.mentioned || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim())
+        .filter(Boolean)
+    );
+    const unverifiedGuard = guardUnverifiedTermBinomial(text, { userMessage, resolvedMentions });
+    if (unverifiedGuard && unverifiedGuard.modified) {
+      text = unverifiedGuard.text;
+      modified = true;
+      if (unverifiedGuard.reason) reasons.push(unverifiedGuard.reason);
+    }
   }
   // Guard SAFETY-CRITICAL de superficie de ConfusionWarning (BORDE-001 ·
   // cianuro/escopolamina/ricina/rotenona): firma propia (necesita las entidades
