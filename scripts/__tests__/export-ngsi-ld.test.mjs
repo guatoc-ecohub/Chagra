@@ -296,7 +296,7 @@ describe('buildAgriCropEntities — muestra real del catálogo OSS v3.2', () => 
   try {
     seed = JSON.parse(readFileSync(catalogPath, 'utf-8'));
   } catch {
-    // En CI sin acceso al catálogo (poco probable acá), skip suave.
+    // En CI sin acceso al catálogo (poco probable aquí), skip suave.
     seed = null;
   }
 

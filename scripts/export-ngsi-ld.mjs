@@ -128,7 +128,7 @@ export function derivePestSlugs(plagasCriticas) {
   const slugs = [];
   const seen = new Set();
   for (const raw of Array.isArray(plagasCriticas) ? plagasCriticas : []) {
-    // classifyBiopreparadoTarget solo se usa acá para reafirmar que el
+    // classifyBiopreparadoTarget solo se usa aquí para reafirmar que el
     // normalizador de slugs es el mismo del grafo AGE; el `kind` resultante
     // no se usa para filtrar (plagas_criticas ya es una lista curada).
     void classifyBiopreparadoTarget(raw);
