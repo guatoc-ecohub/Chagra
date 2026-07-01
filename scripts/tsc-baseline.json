@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-07-01T16:07:21.033Z",
-  "totalErrors": 2335,
+  "generatedAt": "2026-07-01T17:15:07.849Z",
+  "totalErrors": 2336,
   "byFile": {
-    "node_modules/fake-indexeddb/auto/index.mjs": 1,
-    "node_modules/fake-indexeddb/build/esm/FDBFactory.js": 4,
-    "node_modules/fake-indexeddb/build/esm/FDBTransaction.js": 3,
+    "../../home/kortux/Workspace/chagra/node_modules/fake-indexeddb/auto/index.mjs": 1,
+    "../../home/kortux/Workspace/chagra/node_modules/fake-indexeddb/build/esm/FDBFactory.js": 4,
+    "../../home/kortux/Workspace/chagra/node_modules/fake-indexeddb/build/esm/FDBTransaction.js": 3,
     "scripts/lib/bench-scorer.mjs": 22,
     "scripts/seed-demo.ts": 1,
     "src/App.jsx": 17,
@@ -209,6 +209,7 @@
     "src/data/__tests__/perennialCycles.test.js": 4,
     "src/data/__tests__/phenologyGeneric.test.js": 1,
     "src/data/__tests__/phenologyTemplates.test.js": 1,
+    "src/data/__tests__/precioReferencia.test.js": 1,
     "src/data/phenologyTemplates.js": 2,
     "src/db/__tests__/assetCache.tenant.test.js": 1,
     "src/db/__tests__/farmProcessHydration.test.js": 27,
