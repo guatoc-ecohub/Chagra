@@ -34,7 +34,7 @@ import { PISO_TERMICO_INFO } from '../services/locationService';
  * Sin breaking change: este flujo extiende el onboarding base, no lo
  * reemplaza. El piloto (OnboardingPiloto) sigue intacto.
  *
- * Español colombiano (tú/usted, SIN voseo argentino).
+ * Español colombiano (usted, SIN voseo argentino).
  *
  * Props:
  *   - onComplete(profile): llamado al terminar o saltar todo.
@@ -107,7 +107,7 @@ export default function OnboardingProfile({ onComplete, onClose }) {
           </div>
           <div className="flex-1">
             <h1 className="text-lg font-bold text-white leading-tight">
-              Conozcamos tu cultivo
+              Conozcamos su cultivo
             </h1>
             <p className="text-xs text-slate-400">
               Pregunta {Math.min(index + 1, total)} de {total}
