@@ -18,7 +18,6 @@
     "audit:bundle": "node scripts/audit-bundle.mjs",
     "grafo:snapshot": "node scripts/snapshot-grafo-crecimiento.mjs",
     "gen:stats": "node scripts/gen-chagra-stats.mjs",
-    "graph:stats:export": "node scripts/export-graph-stats.mjs --write",
     "validate:ngsi": "node scripts/export-ngsi-ld.mjs",
     "hooks:install": "lefthook install",
     "tsc:check": "tsc --noEmit -p jsconfig.json",

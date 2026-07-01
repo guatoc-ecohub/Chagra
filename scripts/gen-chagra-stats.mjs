@@ -16,12 +16,12 @@
  *    seguridad estructurada reciente) y fuentes (+ cuántas con `doi` /
  *    `tier: "A"`).
  * 2. Lee `src/data/graph-stats-snapshot.json` — un snapshot ESTÁTICO del
- *    grafo de conocimiento Apache AGE `chagra_kg` (nodos, aristas, aristas
- *    por tipo, aristas CONTROLS verificadas con DOI, plagas con MIP
- *    completo, cobertura por vertical). Este script NUNCA toca la base de
- *    datos — el build no tiene acceso a `postgres-farm` (vive en `alpha`).
- *    El snapshot se refresca aparte, cuando haga falta, con
- *    `scripts/export-graph-stats.mjs` corriendo en `alpha`.
+ *    grafo de conocimiento (nodos, aristas, aristas por tipo, aristas
+ *    CONTROLS verificadas con DOI, plagas con MIP completo, cobertura por
+ *    vertical). Este script NUNCA toca la base de datos — el build no tiene
+ *    acceso al backend del grafo. El snapshot se refresca aparte, cuando
+ *    haga falta, con el proceso de ops documentado en Chagra-strategy
+ *    (privado).
  * 3. Combina ambos en un único JSON con schema fijo (ver `buildStats`) y lo
  *    escribe en `public/chagra-stats.json` — servible estático,
  *    fetcheable en runtime desde `/chagra-stats.json`.
@@ -133,7 +133,8 @@ export function computeCatalogStats(catalog, opts = {}) {
 /**
  * Computa las métricas de `grafo` a partir del snapshot estático
  * (src/data/graph-stats-snapshot.json). Puro: no toca disco ni la DB —
- * ese snapshot ya es el resultado de scripts/export-graph-stats.mjs.
+ * ese snapshot ya es el resultado del proceso de ops documentado en
+ * Chagra-strategy (privado).
  *
  * @param {object} snapshot - JSON parseado del snapshot del grafo
  * @returns {object}
@@ -156,7 +157,7 @@ export function computeGraphStats(snapshot) {
 
 /**
  * Ensambla el JSON final de `public/chagra-stats.json`. Puro — recibe los
- * JSON ya parseados y una fecha explícita (nunca llama a `Date()` acá; ese
+ * JSON ya parseados y una fecha explícita (nunca llama a `Date()` aquí; ese
  * es el único punto permitido en `main()`, igual que el resto de
  * generadores del repo — ver scripts/snapshot-grafo-crecimiento.mjs).
  *
@@ -182,7 +183,8 @@ export function buildStats({ catalog, graphSnapshot, generatedAt }) {
     _fuente:
       'Generado por scripts/gen-chagra-stats.mjs. catalogo <- catalog/chagra-catalog-oss-subset-v3.2.json ' +
       '(canónico shipeado, ver catalog/CATALOG_VERSIONS.md). grafo <- src/data/graph-stats-snapshot.json ' +
-      '(snapshot estático del grafo AGE chagra_kg; refrescar con scripts/export-graph-stats.mjs en alpha). ' +
+      '(snapshot estático del grafo de conocimiento; se refresca con el proceso de ops documentado en ' +
+      'Chagra-strategy, repo privado). ' +
       'Este JSON es la ÚNICA FUENTE DE VERDAD de estos números para login, chagra.bio y desarrollo — ' +
       'no hardcodear estos valores en ningún consumidor, siempre hacer fetch(\'/chagra-stats.json\').',
   };

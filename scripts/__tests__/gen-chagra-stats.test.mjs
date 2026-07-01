@@ -9,7 +9,8 @@
  * exactos (crecen con el catálogo; ver catalog/CATALOG_VERSIONS.md).
  */
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 
 import {
   computeCatalogStats,
@@ -17,8 +18,14 @@ import {
   buildStats,
   DEFAULT_CATALOG_PATH,
   DEFAULT_GRAPH_SNAPSHOT_PATH,
+  DEFAULT_OUTPUT_PATH,
   SCHEMA_VERSION,
 } from '../gen-chagra-stats.mjs';
+
+// Deriva scripts/ desde DEFAULT_CATALOG_PATH (= ROOT/catalog/...) en vez de
+// import.meta.url — vitest reescribe módulos y esa URL no siempre resuelve
+// a un path de archivo real.
+const SCRIPTS_DIR = join(dirname(dirname(DEFAULT_CATALOG_PATH)), 'scripts');
 
 const MOCK_CATALOG = {
   species: [{ id: 'a' }, { id: 'b' }, { id: 'c' }],
@@ -125,10 +132,10 @@ describe('buildStats', () => {
   });
 
   it('no filtra nada fuera de conteos agregados (anti-leak repo público)', () => {
-    // Nota: la mención bare del codename "alpha" (sin IP/URL/token) ya es
-    // práctica aceptada en el repo público (ver docs/PENDIENTE-OPERADOR.md,
-    // docs/POC_APACHE_AGE.md) — lo prohibido por SOP §2 es hardcodear IPs,
-    // URLs internas, tokens o secretos, no el nombre del host.
+    // Chequeo genérico: IPs internas, credenciales o contenido chagra-pro no
+    // shipeado. El mecanismo interno de refresco del snapshot (host,
+    // contenedor, base de datos, usuario) tiene su propio chequeo, más
+    // estricto, más abajo — ver describe('anti-leak — mecanismo interno...').
     const json = JSON.stringify(stats);
     expect(json).not.toMatch(/10\.88\.|password|token|bearer|secret|chagra-pro/i);
   });
@@ -168,5 +175,44 @@ describe('buildStats — integración con archivos reales del repo', () => {
     // No comparamos especies grafo vs catalogo aquí a nivel de assert estricto
     // porque son fuentes independientes que evolucionan por separado; solo
     // afirmamos que ambos existen y son positivos (arriba).
+  });
+});
+
+// =============================================================================
+// Anti-leak — el mecanismo interno de refresco del snapshot (host, contenedor,
+// base de datos, usuario) NUNCA debe aparecer en la superficie pública de
+// chagra-stats. Ese detalle vive documentado en Chagra-strategy (privado, ver
+// ops/fleet/export-graph-stats.mjs ahí) — este generador y el snapshot que
+// consume solo necesitan decir QUÉ es el dato, nunca CÓMO se obtuvo.
+//
+// Alcance deliberadamente acotado a la superficie de ESTE pipeline (no todo
+// scripts/): otros scripts del repo (bench-*, audit-milpa-citations.mjs,
+// snapshot-grafo-crecimiento.mjs, etc.) ya mencionan de forma aceptada el
+// codename "alpha" o el nombre del grafo AGE `chagra_kg` sin URL/IP/token —
+// barrer todo scripts/ con este patrón rompería esa convención existente.
+// Lo que nunca debe repetirse es la combinación concreta host + contenedor +
+// usuario + comando que exponía scripts/export-graph-stats.mjs antes de
+// moverse fuera de este repo.
+// =============================================================================
+describe('anti-leak — mecanismo interno de refresco fuera de la superficie pública', () => {
+  const INFRA_LEAK_RE = /alpha|postgres-farm|chagra_kg|farmos/i;
+
+  it('scripts/gen-chagra-stats.mjs no menciona host/contenedor/DB/usuario internos', () => {
+    const source = readFileSync(join(SCRIPTS_DIR, 'gen-chagra-stats.mjs'), 'utf-8');
+    expect(source).not.toMatch(INFRA_LEAK_RE);
+  });
+
+  it('src/data/graph-stats-snapshot.json no menciona host/contenedor/DB/usuario internos', () => {
+    const raw = readFileSync(DEFAULT_GRAPH_SNAPSHOT_PATH, 'utf-8');
+    expect(raw).not.toMatch(INFRA_LEAK_RE);
+  });
+
+  it('public/chagra-stats.json (generado) no menciona host/contenedor/DB/usuario internos', () => {
+    const raw = readFileSync(DEFAULT_OUTPUT_PATH, 'utf-8');
+    expect(raw).not.toMatch(INFRA_LEAK_RE);
+  });
+
+  it('scripts/export-graph-stats.mjs ya no vive en el repo público (se movió a Chagra-strategy)', () => {
+    expect(existsSync(join(SCRIPTS_DIR, 'export-graph-stats.mjs'))).toBe(false);
   });
 });

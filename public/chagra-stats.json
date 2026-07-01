@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-01T17:32:55.005Z",
+  "generated_at": "2026-07-01T18:15:16.991Z",
   "schema_version": "1.0.0",
   "catalogo": {
     "especies": 530,
@@ -64,5 +64,5 @@
   "verificacion": {
     "doi_pct": 54.7
   },
-  "_fuente": "Generado por scripts/gen-chagra-stats.mjs. catalogo <- catalog/chagra-catalog-oss-subset-v3.2.json (canónico shipeado, ver catalog/CATALOG_VERSIONS.md). grafo <- src/data/graph-stats-snapshot.json (snapshot estático del grafo AGE chagra_kg; refrescar con scripts/export-graph-stats.mjs en alpha). Este JSON es la ÚNICA FUENTE DE VERDAD de estos números para login, chagra.bio y desarrollo — no hardcodear estos valores en ningún consumidor, siempre hacer fetch('/chagra-stats.json')."
+  "_fuente": "Generado por scripts/gen-chagra-stats.mjs. catalogo <- catalog/chagra-catalog-oss-subset-v3.2.json (canónico shipeado, ver catalog/CATALOG_VERSIONS.md). grafo <- src/data/graph-stats-snapshot.json (snapshot estático del grafo de conocimiento; se refresca con el proceso de ops documentado en Chagra-strategy, repo privado). Este JSON es la ÚNICA FUENTE DE VERDAD de estos números para login, chagra.bio y desarrollo — no hardcodear estos valores en ningún consumidor, siempre hacer fetch('/chagra-stats.json')."
 }

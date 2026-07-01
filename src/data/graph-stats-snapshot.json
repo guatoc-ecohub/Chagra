@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "descripcion": "Snapshot de métricas del grafo de conocimiento Apache AGE `chagra_kg`. NO se calcula en build-time (el build no tiene acceso a la base de datos) — este archivo es la única fuente que `scripts/gen-chagra-stats.mjs` lee para la sección `grafo` de `public/chagra-stats.json`. Se refresca por separado, cuando haga falta, corriendo `scripts/export-graph-stats.mjs` en el host `alpha` (donde vive `postgres-farm`/`chagra_kg`). Ver ese script para las queries Cypher exactas y el procedimiento.",
+    "descripcion": "Snapshot de métricas del grafo de conocimiento. NO se calcula en build-time (el build no tiene acceso a la base de datos) — este archivo es la única fuente que `scripts/gen-chagra-stats.mjs` lee para la sección `grafo` de `public/chagra-stats.json`. Se refresca por separado, cuando haga falta, con el proceso de ops documentado en Chagra-strategy (privado).",
     "fecha_snapshot": "2026-06-28",
     "fuente": [
       "Chagra-strategy/ops/INFRA_FACTS.md (refresh 2026-06-24, verificado en vivo)",
