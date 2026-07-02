@@ -51,6 +51,24 @@ const BASELINE_PATH = join(import.meta.dirname, 'tsc-baseline.json');
 const ERROR_LINE_RE = /^(.+?)\((\d+),(\d+)\): error (TS\d+):/;
 
 /**
+ * Normaliza el path que reporta tsc para que el baseline sea comparable
+ * entre máquinas. Caso real (PR #1936): en worktrees locales con
+ * node_modules symlinkeado, tsc reporta los .js de dependencias con el
+ * path RESUELTO fuera del repo ("../../home/<user>/.../node_modules/
+ * fake-indexeddb/...") mientras CI reporta "node_modules/fake-indexeddb/
+ * ...". El mismo error contaba como "archivo nuevo" en un lado u otro.
+ * Se recorta todo lo anterior a `node_modules/` para que ambas formas
+ * coincidan.
+ *
+ * @param {string} file
+ * @returns {string}
+ */
+export function normalizeTscFile(file) {
+  const idx = file.indexOf('node_modules/');
+  return idx >= 0 ? file.slice(idx) : file;
+}
+
+/**
  * Parsea la salida cruda de `tsc --noEmit` y agrupa el conteo de errores
  * por archivo. Ignora líneas de continuación (mensajes multilínea) — solo
  * cuenta la línea que abre cada error.
@@ -65,7 +83,7 @@ export function parseTscOutput(output) {
   for (const line of lines) {
     const m = line.match(ERROR_LINE_RE);
     if (!m) continue;
-    const file = m[1];
+    const file = normalizeTscFile(m[1]);
     byFile[file] = (byFile[file] || 0) + 1;
     total++;
   }
