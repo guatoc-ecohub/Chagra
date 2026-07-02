@@ -21,9 +21,11 @@ export default function Skeleton({
   height,
   className = '',
   rounded = 'md',
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- default de aria-label preexistente al gate i18n; migración a messages.js (ADR-050) pendiente fuera de este cambio
   ariaLabel = 'Cargando…',
 }) {
-  const base = 'bg-slate-700/40 animate-pulse';
+  // motion-safe: el shimmer se apaga solo con prefers-reduced-motion.
+  const base = 'bg-slate-700/40 motion-safe:animate-pulse';
   const roundedClass = {
     none: '',
     sm: 'rounded-sm',
