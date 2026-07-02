@@ -45,9 +45,13 @@ const SEED_MODE = args.includes('--seed-mode');
 const LENIENT_SCHEMA = args.includes('--lenient-schema');
 const positional = args.filter((a) => !a.startsWith('--'));
 const [catalogArg, schemaArg] = positional;
+// v3.2 gate: validar el archivo canónico que shipea (530 especies), no el seed
+// stale (72 especies). Esto previene regresiones como el caso Trozador que
+// sobrevivió 46 días porque el CI validaba el archivo equivocado.
+// Cambiado 2026-07-02 (fix/ci-gate-semantic).
 const CATALOG_PATH = catalogArg
   ? resolve(catalogArg)
-  : join(ROOT, 'catalog/chagra-catalog-seed-v3.1.json');
+  : join(ROOT, 'catalog/chagra-catalog-oss-subset-v3.2.json');
 const SCHEMA_PATH = schemaArg
   ? resolve(schemaArg)
   : join(ROOT, 'catalog/schema-v3.1.json');
@@ -784,6 +788,56 @@ export function validateAmb30_biopreparadoSafetyStructurada(catalog) {
   return warnings;
 }
 
+// AMB-31: contaminación cruzada insectos ↔ patógenos. Detecta cuando insectos
+// están categorizados como enfermedades (enfermedades_criticas) o cuando
+// patógenos están categorizados como plagas (plagas_criticas). Esto es un
+// error epistémico que rompe las recomendaciones del agente: el usuario con
+// una plaga de insectos recibiría biopreparados curativos para enfermedades
+// (hongos/bacterias), y viceversa.
+// Lista de insectos comunes en agroecología colombiana: Agrotis (trozador),
+// Phyllophaga (gusano blanco), Tecia (palomilla), Bemisia (mosca blanca).
+// Lista de patógenos: Phytophthora (pudrición radicular), Erwinia (fuego
+// bacterial), Hemileia (roya del café). Match case-insensitive y substring
+// para capturar variantes (e.g. "Royas del cafeto" contiene "roya").
+// Introducido 2026-07-02 (fix/ci-gate-semantic) tras auditoría de contaminación.
+export const INSECT_KEYWORDS = [
+  'agrotis',     // Trozador (Agrotis ipsilon)
+  'phyllophaga', // Gusano blanco (Phyllophaga spp.)
+  'tecia',       // Palomilla del tomate (Tecia solanivora)
+  'bemisia',     // Mosca blanca (Bemisia tabaci)
+];
+export const PATHOGEN_KEYWORDS = [
+  'phytophthora', // Pudrición radicular (Phytophthora infestans, P. capsici)
+  'erwinia',      // Fuego bacterial (Erwinia amylovora, E. carotovora)
+  'hemileia',     // Roya del café (Hemileia vastatrix)
+  'roya',         // Roya (genérico para Hemileia, Puccinia, etc.)
+];
+export function validateAmb31_crossContaminationInsectoPatogeno(catalog) {
+  const errors = [];
+  for (const sp of catalog.species || []) {
+    // Check insectos en enfermedades_criticas
+    for (const enf of sp.enfermedades_criticas || []) {
+      const nombre = String(enf || '').toLowerCase();
+      for (const ins of INSECT_KEYWORDS) {
+        if (nombre.includes(ins)) {
+          errors.push(`AMB-31 [${sp.id}.enfermedades_criticas]: "${enf}" es un insecto (${ins}) pero está en enfermedades_criticas — debe moverse a plagas_criticas`);
+        }
+      }
+    }
+
+    // Check patógenos en plagas_criticas
+    for (const pla of sp.plagas_criticas || []) {
+      const nombre = String(pla || '').toLowerCase();
+      for (const pat of PATHOGEN_KEYWORDS) {
+        if (nombre.includes(pat)) {
+          errors.push(`AMB-31 [${sp.id}.plagas_criticas]: "${pla}" es un patógeno (${pat}) pero está en plagas_criticas — debe moverse a enfermedades_criticas`);
+        }
+      }
+    }
+  }
+  return errors;
+}
+
 // ----------------------------------------------------------------
 // Main (CLI). Gated por `import.meta.url === file://${process.argv[1]}` para
 // permitir importar las funciones validador desde tests (scripts/__tests__/
@@ -922,6 +976,15 @@ function runCli() {
     ['AMB-30 biopreparados seguridad estructurada (WARN)', (c) => ({
       errors: [],
       warnings: validateAmb30_biopreparadoSafetyStructurada(c),
+    })],
+    // AMB-31 introducido 2026-07-02 (fix/ci-gate-semantic) para detectar
+    // contaminación cruzada insectos ↔ patógenos. Error duro porque rompe
+    // las recomendaciones del agente: el usuario con una plaga de insectos
+    // recibiría biopreparados curativos para enfermedades (hongos/bacterias),
+    // y viceversa.
+    ['AMB-31 contaminación cruzada insecto ↔ patógeno', (c) => ({
+      errors: validateAmb31_crossContaminationInsectoPatogeno(c),
+      warnings: [],
     })],
   ];
 
