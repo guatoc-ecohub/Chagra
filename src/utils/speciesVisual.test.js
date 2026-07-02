@@ -15,7 +15,7 @@ describe('normalizeSpeciesText', () => {
   it('tolera null/undefined/no-string', () => {
     expect(normalizeSpeciesText(null)).toBe('');
     expect(normalizeSpeciesText(undefined)).toBe('');
-    expect(normalizeSpeciesText(42)).toBe('');
+    expect(normalizeSpeciesText(/** @type {any} */ (42))).toBe('');
   });
 });
 

@@ -88,7 +88,7 @@ const normaliza = (s) =>
 /**
  * Resuelve el componente lucide de una etapa.
  * @param {{ code?: string, nombre?: string }} etapa
- * @returns {React.ComponentType} siempre retorna un icono (fallback Sprout).
+ * @returns {import('lucide-react').LucideIcon} siempre retorna un icono (fallback Sprout).
  */
 export function getEtapaIcon({ code, nombre } = {}) {
   const base = normaliza(code).replace(/_confirmed$/, '');
