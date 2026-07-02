@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  CalendarDays, ChevronDown, ChevronRight, Sprout, Flower2, Apple,
+  CalendarDays, ChevronDown, ChevronLeft, ChevronRight, Sprout, Flower2, Apple,
   FlaskConical, Bug, AlertTriangle, RotateCcw, MessageCircle, Info, Mountain,
 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import ChagraGrowLoader from './ChagraGrowLoader';
+import EtapaCicloIcon from './icons/EtapaCicloIcon';
 import { listFarmProcesses, hydrateCyclesFromFarmOS } from '../db/farmProcessCache';
 import { getProfile } from '../services/userProfileService';
 import { getAllSpecies } from '../db/catalogDB';
 import { matchSpeciesInCatalog } from '../utils/speciesResolver';
+import { getSpeciesVisual, SPECIES_TONE_CLASSES } from '../utils/speciesVisual';
 import { isPerennialSpecies, monthShortName } from '../data/perennialCycles';
 import { getTemplate } from '../data/phenologyTemplates';
 import {
@@ -33,19 +35,90 @@ import {
  * Reusa el mismo cargado de ciclos que CicloCultivoScreen (listFarmProcesses +
  * hydrateCyclesFromFarmOS) y la misma resolución de especie del catálogo
  * (matchSpeciesInCatalog) — no reinventa nada.
+ *
+ * CAPA VISUAL (2026-07, solo presentación — la lógica de datos NO cambia):
+ *   - Tira anual como barras de COMPOSICIÓN: la altura dice cuánto trabajo
+ *     tiene el mes y los colores dicen de qué tipo (siembra/nutrición/…).
+ *   - Estado temporal por labor derivado de windowStart/windowEnd que ya
+ *     traían las entradas: En curso · Próximo · Ya pasó, con fechas reales.
+ *     Lo pasado se atenúa; lo actionable sube primero en la lista.
+ *   - Iconografía del set común: EtapaCicloIcon por etapa (siembra/fenología/
+ *     cosecha) y emoji de especie (speciesVisual) en la cabecera de cada planta.
+ *   - Navegación de mes (◀ ▶ + botón "Hoy") para hojear el año en campo.
  */
 
 // Presentación por capa: color de chip y de celda en la tira anual. Estáticos
 // para que el JIT de Tailwind los genere (no construir clases dinámicas).
 const LAYER_STYLE = {
-  siembra: { Icon: Sprout, chip: 'bg-teal-500/20 text-teal-200 border-teal-500/40', dot: 'bg-teal-400', cell: 'bg-teal-600' },
-  fenologia: { Icon: Flower2, chip: 'bg-violet-500/20 text-violet-200 border-violet-500/40', dot: 'bg-violet-400', cell: 'bg-violet-600' },
-  nutricion: { Icon: FlaskConical, chip: 'bg-amber-500/20 text-amber-200 border-amber-500/40', dot: 'bg-amber-400', cell: 'bg-amber-600' },
-  sanidad: { Icon: Bug, chip: 'bg-rose-500/20 text-rose-200 border-rose-500/40', dot: 'bg-rose-400', cell: 'bg-rose-600' },
-  cosecha: { Icon: Apple, chip: 'bg-emerald-500/20 text-emerald-200 border-emerald-500/40', dot: 'bg-emerald-400', cell: 'bg-emerald-600' },
+  siembra: { Icon: Sprout, chip: 'bg-teal-500/20 text-teal-200 border-teal-500/40', dot: 'bg-teal-400', cell: 'bg-teal-500' },
+  fenologia: { Icon: Flower2, chip: 'bg-violet-500/20 text-violet-200 border-violet-500/40', dot: 'bg-violet-400', cell: 'bg-violet-500' },
+  nutricion: { Icon: FlaskConical, chip: 'bg-amber-500/20 text-amber-200 border-amber-500/40', dot: 'bg-amber-400', cell: 'bg-amber-500' },
+  sanidad: { Icon: Bug, chip: 'bg-rose-500/20 text-rose-200 border-rose-500/40', dot: 'bg-rose-400', cell: 'bg-rose-500' },
+  cosecha: { Icon: Apple, chip: 'bg-emerald-500/20 text-emerald-200 border-emerald-500/40', dot: 'bg-emerald-400', cell: 'bg-emerald-500' },
 };
 
-const MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+// Estado temporal de una labor (derivado de las ventanas que YA trae la
+// entrada — presentación pura, sin tocar el servicio).
+const STATUS_META = {
+  ahora: { label: 'En curso', chip: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' },
+  proximo: { label: 'Próximo', chip: 'bg-sky-500/15 text-sky-300 border-sky-500/40' },
+  pasado: { label: 'Ya pasó', chip: 'bg-slate-800 text-slate-500 border-slate-700' },
+};
+
+// Orden de acción en campo: lo que está en curso primero, luego lo próximo,
+// lo sin fecha ancla, y al final lo que ya pasó. Empates conservan el orden
+// por capa que trae entriesForMonth (Array.sort es estable).
+const STATUS_RANK = { ahora: 0, proximo: 1, none: 2, pasado: 3 };
+
+const MONTH_FULL = [
+  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
+];
+
+const MS_PER_DAY = 86400000;
+
+/**
+ * Estado temporal de una entrada respecto a `now`. Solo aplica a entradas con
+ * fecha real (ancladas): las continuas y las secuencias sin siembra registrada
+ * no tienen estado. Una entrada puntual (sin fin) cuenta como "en curso" su día.
+ * @returns {'ahora'|'proximo'|'pasado'|null}
+ */
+function entryTemporalStatus(entry, now) {
+  if (entry.continuous) return null;
+  if (entry.anchored === false) return null; // secuencia proyectada, sin fecha real
+  const start = entry.windowStart;
+  if (!Number.isFinite(start) || start <= 0) return null;
+  const end = Number.isFinite(entry.windowEnd) && entry.windowEnd > start
+    ? entry.windowEnd
+    : start + MS_PER_DAY;
+  if (now < start) return 'proximo';
+  if (now > end) return 'pasado';
+  return 'ahora';
+}
+
+/** "12 mar" — fecha corta en español, para las ventanas de labor. */
+function fmtDay(ts) {
+  return new Date(ts).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' });
+}
+
+/**
+ * Texto de fechas de una entrada: rango real si hay ventana, "≈ fecha" si es
+ * puntual, o el offset del ciclo cuando no hay siembra registrada (honesto:
+ * no se pintan fechas inventadas).
+ */
+function entryDateText(entry) {
+  if (entry.continuous) return '';
+  if (entry.anchored === false) {
+    return Number.isFinite(entry.offsetDays) ? `día ${entry.offsetDays} del ciclo` : '';
+  }
+  const start = entry.windowStart;
+  if (!Number.isFinite(start) || start <= 0) return '';
+  const end = entry.windowEnd;
+  if (Number.isFinite(end) && end > start) return `${fmtDay(start)} – ${fmtDay(end)}`;
+  return `≈ ${fmtDay(start)}`;
+}
+
+const MONTHS_COUNT = 12;
 
 /** Slugs del catálogo con plantilla fenológica o ciclo perenne grounded. Se usa
  * como fallback cuando el usuario no tiene ciclos en su finca: mostramos el
@@ -59,6 +132,17 @@ function speciesHasCalendar(species) {
   return cat === 'frutales_perennes' || cat === 'arboles_sombra';
 }
 
+/** Emoji + tono de la especie para la cabecera de cada planta (set común). */
+function visualForSpecies(species, name, slug) {
+  return getSpeciesVisual({
+    comun: species?.nombre_comun || name,
+    cientifico: species?.nombre_cientifico,
+    id: slug,
+    familia: species?.familia,
+    categoria: species?.category,
+  });
+}
+
 export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -67,6 +151,10 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
   const [activeLayers, setActiveLayers] = useState(() => new Set(CALENDAR_LAYERS));
   const [selectedMonth, setSelectedMonth] = useState(() => new Date().getMonth() + 1);
   const [expanded, setExpanded] = useState({});
+
+  // Referencia temporal estable del montaje: mes actual + estados pasado/hoy/próximo.
+  const [nowTs] = useState(() => Date.now());
+  const todayMonth = useMemo(() => new Date(nowTs).getMonth() + 1, [nowTs]);
 
   const altitudeM = useMemo(() => {
     const v = getProfile()?.finca_altitud;
@@ -101,15 +189,19 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
           const a = cycle.attributes || {};
           const species = matchSpeciesInCatalog(catalog, a.subject_slug, a.subject_label);
           const speciesSlug = species?.id || species?.slug || a.subject_slug;
-          return buildPlantCalendar({
-            id: cycle.process_id || cycle.id,
-            name: a.subject_label || species?.nombre_comun || speciesSlug,
-            speciesSlug,
-            species,
-            sowingDate: a.created_at,
-            altitudeM,
-            now,
-          });
+          const name = a.subject_label || species?.nombre_comun || speciesSlug;
+          return {
+            ...buildPlantCalendar({
+              id: cycle.process_id || cycle.id,
+              name,
+              speciesSlug,
+              species,
+              sowingDate: a.created_at,
+              altitudeM,
+              now,
+            }),
+            visual: visualForSpecies(species, name, speciesSlug),
+          };
         });
       } else {
         // 2. Sin finca: calendario por especie del catálogo con datos honestos.
@@ -118,15 +210,19 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
           .filter(speciesHasCalendar)
           .map((species) => {
             const slug = species.id || species.slug;
-            return buildPlantCalendar({
-              id: slug,
-              name: species.nombre_comun || slug,
-              speciesSlug: slug,
-              species,
-              sowingDate: null,
-              altitudeM,
-              now,
-            });
+            const name = species.nombre_comun || slug;
+            return {
+              ...buildPlantCalendar({
+                id: slug,
+                name,
+                speciesSlug: slug,
+                species,
+                sowingDate: null,
+                altitudeM,
+                now,
+              }),
+              visual: visualForSpecies(species, name, slug),
+            };
           })
           .filter((p) => p.status === 'ok');
       }
@@ -142,7 +238,7 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
         setUsingCatalogFallback(fallback);
       }
     } catch (err) {
-      if (mounted) setError(`No pude armar tu calendario: ${err.message}`);
+      if (mounted) setError(`No pude armar su calendario: ${err.message}`);
     } finally {
       if (mounted) setLoading(false);
     }
@@ -160,6 +256,10 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
     });
   }, []);
 
+  const goToMonth = useCallback((delta) => {
+    setSelectedMonth((m) => ((m - 1 + delta + MONTHS_COUNT) % MONTHS_COUNT) + 1);
+  }, []);
+
   const matrix = useMemo(
     () => aggregateMonthlyMatrix(plants, activeLayers),
     [plants, activeLayers],
@@ -173,11 +273,19 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
   const plantsNoData = useMemo(() => plants.filter((p) => p.status === 'no_data'), [plants]);
 
   // Plantas con al menos una entrada en el mes seleccionado y capas activas.
+  // Orden presentacional de acción: en curso → próximo → sin fecha → ya pasó.
   const plantsForMonth = useMemo(
     () => plantsWithData
-      .map((p) => ({ plant: p, entries: entriesForMonth(p, selectedMonth, activeLayers) }))
+      .map((p) => {
+        const entries = entriesForMonth(p, selectedMonth, activeLayers);
+        const rank = (e) => {
+          const s = entryTemporalStatus(e, nowTs);
+          return s ? STATUS_RANK[s] : STATUS_RANK.none;
+        };
+        return { plant: p, entries: [...entries].sort((a, b) => rank(a) - rank(b)) };
+      })
       .filter((x) => x.entries.length > 0),
-    [plantsWithData, selectedMonth, activeLayers],
+    [plantsWithData, selectedMonth, activeLayers, nowTs],
   );
 
   const askAgent = useCallback((plant, entry) => {
@@ -194,7 +302,7 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
       <ScreenShell title="Calendario de finca" icon={CalendarDays} onBack={onBack} onHome={onHome}>
         <div className="flex flex-col items-center gap-3 py-16">
           <ChagraGrowLoader size={56} />
-          <p className="text-sm text-slate-400">Armando tu calendario…</p>
+          <p className="text-sm text-slate-400">Armando su calendario…</p>
         </div>
       </ScreenShell>
     );
@@ -214,34 +322,36 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
     );
   }
 
+  const isCurrentMonth = selectedMonth === todayMonth;
+
   return (
     <ScreenShell title="Calendario de finca" icon={CalendarDays} onBack={onBack} onHome={onHome}>
       <div className="px-4 py-3 flex flex-col gap-4 max-w-2xl mx-auto">
         {/* Intro + contexto del perfil */}
         <div className="flex flex-col gap-1">
           <p className="text-sm text-slate-300 leading-snug">
-            Todo junto en un solo calendario: cuándo siembra, abona, vigila plagas
-            y cosecha cada planta de tu finca.
+            Todo junto en un solo calendario: cuándo sembrar, abonar, vigilar
+            plagas y cosechar cada planta de su finca.
           </p>
           <p className="text-2xs text-slate-500 flex items-center gap-1.5">
             <Mountain size={11} className="shrink-0" />
             {altitudeM
-              ? `Ajustado a tu finca (${altitudeM} msnm).`
-              : 'Pon tu altitud en el perfil para afinar las fechas a tu piso térmico.'}
+              ? `Ajustado a su finca (${altitudeM} msnm).`
+              : 'Ponga su altitud en el perfil para afinar las fechas a su piso térmico.'}
           </p>
           {usingCatalogFallback && (
             <p className="text-2xs text-amber-300 flex items-start gap-1.5 mt-0.5">
               <Info size={11} className="shrink-0 mt-0.5" />
               <span>
-                Aún no tienes cultivos registrados; te muestro el calendario de las
-                especies del catálogo con datos. Registra tus plantas para verlo por tu finca.
+                Aún no tiene cultivos registrados; le muestro el calendario de las
+                especies del catálogo con datos. Registre sus plantas para verlo por su finca.
               </span>
             </p>
           )}
         </div>
 
-        {/* Filtros por capa */}
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar por tipo">
+        {/* Filtros por capa — también funcionan de leyenda de color */}
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar por tipo de labor">
           {CALENDAR_LAYERS.map((layer) => {
             const meta = LAYER_STYLE[layer];
             const on = activeLayers.has(layer);
@@ -261,12 +371,14 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
           })}
         </div>
 
-        {/* Tira anual de 12 meses — densidad por mes según capas activas */}
+        {/* Tira anual de 12 meses — barras de composición: la altura dice cuánto
+            trabajo tiene el mes, el color dice de qué tipo (capas activas). */}
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-3">
-          <p className="text-2xs uppercase font-bold text-slate-500 mb-2">El año de tu finca</p>
+          <p className="text-2xs uppercase font-bold text-slate-500 mb-2">El año de su finca</p>
           <div className="grid grid-cols-12 gap-1" role="list" aria-label="Calendario anual">
             {matrix.map((cell) => {
               const isSel = cell.month === selectedMonth;
+              const isNow = cell.month === todayMonth;
               const intensity = maxCell > 0 ? cell.total / maxCell : 0;
               const hasAny = cell.total > 0;
               return (
@@ -274,41 +386,93 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
                   key={cell.month}
                   type="button"
                   role="listitem"
-                  aria-label={`${monthShortName(cell.month)}: ${cell.total} tareas`}
+                  aria-label={`${monthShortName(cell.month)}${isNow ? ' (mes actual)' : ''}: ${cell.total} labores`}
                   aria-pressed={isSel}
                   onClick={() => setSelectedMonth(cell.month)}
                   className={`flex flex-col items-center gap-1 rounded-lg py-1.5 transition-colors ${isSel ? 'bg-slate-700 ring-2 ring-emerald-400' : 'bg-slate-800/60 hover:bg-slate-800'}`}
                 >
-                  <span className={`text-2xs font-bold ${isSel ? 'text-white' : 'text-slate-400'}`}>
+                  <span className={`text-2xs font-bold ${isSel ? 'text-white' : isNow ? 'text-amber-300' : 'text-slate-400'}`}>
                     {monthShortName(cell.month).charAt(0).toUpperCase()}
                   </span>
-                  <span
-                    aria-hidden="true"
-                    className={`h-6 w-2 rounded-full ${hasAny ? 'bg-emerald-500' : 'bg-slate-700'}`}
-                    style={hasAny ? { opacity: 0.35 + intensity * 0.65 } : undefined}
-                  />
+                  <span aria-hidden="true" className="h-9 w-2.5 flex flex-col justify-end">
+                    {hasAny ? (
+                      <span
+                        className="w-full rounded-full overflow-hidden flex flex-col"
+                        style={{ height: `${25 + intensity * 75}%` }}
+                      >
+                        {CALENDAR_LAYERS.map((l) => (cell.layers[l] ? (
+                          <span
+                            key={l}
+                            className={`w-full min-h-0 ${LAYER_STYLE[l].cell}`}
+                            style={{ flexGrow: cell.layers[l] }}
+                          />
+                        ) : null))}
+                      </span>
+                    ) : (
+                      <span className="w-full h-1 rounded-full bg-slate-700" />
+                    )}
+                  </span>
                   <span className={`text-2xs ${hasAny ? 'text-slate-300' : 'text-slate-600'}`}>{cell.total || ''}</span>
+                  <span aria-hidden="true" className={`h-1 w-1 rounded-full ${isNow ? 'bg-amber-400' : 'bg-transparent'}`} />
                 </button>
               );
             })}
           </div>
+          <p className="text-2xs text-slate-500 mt-2">
+            Altura = cuánto trabajo tiene el mes · color = tipo de labor · <span className="text-amber-300">●</span> mes actual.
+          </p>
         </div>
 
         {/* Detalle del mes seleccionado, por planta */}
         <div className="flex flex-col gap-2">
-          <h2 className="text-sm font-bold text-white flex items-center gap-2">
-            <CalendarDays size={15} className="text-emerald-400" />
-            {monthShortName(selectedMonth)} en tu finca
-            <span className="text-xs font-normal text-slate-500">· {plantsForMonth.length} {plantsForMonth.length === 1 ? 'planta' : 'plantas'}</span>
-          </h2>
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-sm font-bold text-white flex items-center gap-2 min-w-0">
+              <CalendarDays size={15} className="text-emerald-400 shrink-0" />
+              <span className="truncate">{MONTH_FULL[selectedMonth - 1]} en su finca</span>
+              {isCurrentMonth && (
+                <span className="text-2xs font-bold px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/40 shrink-0">
+                  este mes
+                </span>
+              )}
+              <span className="text-xs font-normal text-slate-500 shrink-0">· {plantsForMonth.length} {plantsForMonth.length === 1 ? 'planta' : 'plantas'}</span>
+            </h2>
+            <div className="flex items-center gap-1 shrink-0">
+              {!isCurrentMonth && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedMonth(todayMonth)}
+                  className="text-2xs font-bold px-2 py-1 rounded-lg bg-slate-800 text-emerald-300 hover:bg-slate-700 transition-colors"
+                >
+                  Hoy
+                </button>
+              )}
+              <button
+                type="button"
+                aria-label="Mes anterior"
+                onClick={() => goToMonth(-1)}
+                className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors"
+              >
+                <ChevronLeft size={14} />
+              </button>
+              <button
+                type="button"
+                aria-label="Mes siguiente"
+                onClick={() => goToMonth(1)}
+                className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors"
+              >
+                <ChevronRight size={14} />
+              </button>
+            </div>
+          </div>
 
           {plantsForMonth.length === 0 ? (
             <p className="text-sm text-slate-400 bg-slate-900 border border-slate-800 rounded-xl p-3">
-              Nada programado en {monthShortName(selectedMonth)} con los filtros activos. Prueba otro mes o activa más capas.
+              Nada programado en {monthShortName(selectedMonth)} con los filtros activos. Pruebe otro mes o active más capas.
             </p>
           ) : (
             plantsForMonth.map(({ plant, entries }) => {
               const isOpen = expanded[plant.id] !== false; // abierto por defecto
+              const tone = SPECIES_TONE_CLASSES[plant.visual?.tone] || SPECIES_TONE_CLASSES.slate;
               return (
                 <div key={plant.id} className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
                   <button
@@ -318,6 +482,9 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
                     aria-expanded={isOpen}
                   >
                     <span className="flex items-center gap-2 min-w-0">
+                      <span className={`h-7 w-7 shrink-0 rounded-lg border flex items-center justify-center text-base leading-none ${tone}`} aria-hidden="true">
+                        {plant.visual?.emoji || '🌱'}
+                      </span>
                       <span className="text-sm font-bold text-white truncate">{plant.name}</span>
                       {plant.isGeneric && (
                         <span className="text-2xs text-amber-400 shrink-0">aprox.</span>
@@ -341,22 +508,44 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
                       {entries.map((entry, i) => {
                         const meta = LAYER_STYLE[entry.layer];
                         const Icon = meta.Icon;
+                        const status = entryTemporalStatus(entry, nowTs);
+                        const statusMeta = status ? STATUS_META[status] : null;
+                        const dateText = entryDateText(entry);
+                        const useStageIcon = entry.stageCode
+                          && (entry.layer === 'siembra' || entry.layer === 'fenologia' || entry.layer === 'cosecha');
                         return (
-                          <li key={`${plant.id}-${entry.layer}-${i}`} className="flex items-start gap-2.5 border-t border-slate-800 pt-2 first:border-t-0 first:pt-0">
+                          <li
+                            key={`${plant.id}-${entry.layer}-${i}`}
+                            className={`flex items-start gap-2.5 border-t border-slate-800 pt-2 first:border-t-0 first:pt-0 ${status === 'pasado' ? 'opacity-55' : ''}`}
+                          >
                             <span className={`mt-0.5 h-7 w-7 shrink-0 rounded-lg flex items-center justify-center border ${meta.chip}`}>
-                              <Icon size={14} aria-hidden="true" />
+                              {useStageIcon
+                                ? <EtapaCicloIcon code={entry.stageCode} nombre={entry.title} size={14} />
+                                : <Icon size={14} aria-hidden="true" />}
                             </span>
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center gap-2 flex-wrap">
                                 <span className="text-sm font-semibold text-slate-100">{entry.title}</span>
                                 <span className={`text-2xs px-1.5 py-0.5 rounded-full border ${meta.chip}`}>{LAYER_META[entry.layer].label}</span>
-                                {entry.approximate && (
-                                  <span className="text-2xs text-amber-400">aproximado</span>
+                                {statusMeta && (
+                                  <span className={`text-2xs font-bold px-1.5 py-0.5 rounded-full border ${statusMeta.chip}`}>
+                                    {statusMeta.label}
+                                  </span>
                                 )}
                                 {entry.continuous && (
                                   <span className="text-2xs text-emerald-400">todo el año</span>
                                 )}
                               </div>
+                              {(dateText || entry.approximate) && (
+                                <p className="text-2xs text-slate-400 mt-0.5 flex items-center gap-1.5 flex-wrap">
+                                  {dateText && (
+                                    <span className="font-semibold text-slate-300">{dateText}</span>
+                                  )}
+                                  {entry.approximate && (
+                                    <span className="text-amber-400">aproximado</span>
+                                  )}
+                                </p>
+                              )}
                               {entry.detail && (
                                 <p className="text-xs text-slate-400 leading-snug mt-0.5">{entry.detail}</p>
                               )}
@@ -371,7 +560,7 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
                                     onClick={() => askAgent(plant, entry)}
                                     className="shrink-0 flex items-center gap-1 text-2xs font-bold text-emerald-300 hover:text-emerald-200"
                                   >
-                                    <MessageCircle size={11} /> Pregúntale al agente
+                                    <MessageCircle size={11} /> Pregúntele al agente
                                   </button>
                                 )}
                               </div>
@@ -406,7 +595,7 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
           <span>
             Fechas estimadas a partir de plantillas fenológicas, planes de
             alimentación y ciclos perennes del catálogo. Aproximadas; varían por
-            región, altitud, clima y manejo. Confirma con lo que veas en la planta.
+            región, altitud, clima y manejo. Confirme con lo que vea en la planta.
           </span>
         </p>
       </div>
