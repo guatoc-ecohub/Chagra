@@ -103,7 +103,7 @@ describe('LoginScreen — submit y lógica de auth (intacta)', () => {
   });
 
   it('login exitoso llama a authenticateUser y a onLoginSuccess', async () => {
-    authenticateUser.mockResolvedValue({ success: true });
+    vi.mocked(authenticateUser).mockResolvedValue({ success: true });
     const { onLoginSuccess } = setup();
     fireEvent.change(screen.getByLabelText('Usuario'), { target: { value: 'juanita' } });
     fireEvent.change(screen.getByLabelText('Contraseña'), { target: { value: 'clave-buena' } });
@@ -114,7 +114,7 @@ describe('LoginScreen — submit y lógica de auth (intacta)', () => {
   });
 
   it('credenciales inválidas avisan por onSave con isError y no navegan', async () => {
-    authenticateUser.mockResolvedValue({ success: false });
+    vi.mocked(authenticateUser).mockResolvedValue({ success: false });
     const { onSave, onLoginSuccess } = setup();
     fireEvent.change(screen.getByLabelText('Usuario'), { target: { value: 'juanita' } });
     fireEvent.change(screen.getByLabelText('Contraseña'), { target: { value: 'clave-mala' } });

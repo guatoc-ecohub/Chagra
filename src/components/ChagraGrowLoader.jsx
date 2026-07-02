@@ -645,16 +645,21 @@ const SPECIES_RENDERERS = {
 // ============================================================================
 
 export function ChagraGrowLoader({
-  species,
-  thermalZone,
-  altitude,
+  // Default undefined explícito: species/thermalZone/altitude/ariaLabel son
+  // opcionales de verdad (resolveSpecies maneja undefined con fallback a
+  // maíz), pero sin default tsc las infiere requeridas y cada caller que no
+  // las pasa (login, botones de carga) suma un falso error al gate tsc:check.
+  species = undefined,
+  thermalZone = undefined,
+  altitude = undefined,
   size = 48,
   speed = 1,
   showLabel = false,
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- default preexistente al gate i18n; migración a messages.js (ADR-050) pendiente fuera de este cambio
   labelText = 'Pensando...',
   paused = false,
   className = '',
-  ariaLabel,
+  ariaLabel = undefined,
   initialProgress = 0,
 }) {
   useEffect(() => { ensureStylesInjected(); }, []);
@@ -664,6 +669,7 @@ export function ChagraGrowLoader({
   const meta = SPECIES_META[resolvedSpecies];
 
   const duration = 4 / Math.max(0.1, speed);
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- aria-label preexistente al gate i18n; migración a messages.js (ADR-050) pendiente fuera de este cambio
   const a11y = ariaLabel || `Cargando: ${meta?.commonName || 'planta'} creciendo`;
   const clampedProgress = Math.max(0, Math.min(0.95, initialProgress));
   const animationDelay = clampedProgress > 0 ? `-${(duration * clampedProgress).toFixed(3)}s` : '0s';

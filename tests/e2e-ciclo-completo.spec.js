@@ -182,7 +182,7 @@ test.describe('Ciclo completo del cultivo (offline-first)', () => {
     // ─── Paso 0: Login ───────────────────────────────────────────
     await page.goto('/');
     await page.getByLabel(/usuario/i).fill('e2e-ciclista');
-    await page.getByLabel(/contraseña/i).fill('e2e-pass');
+    await page.getByRole('textbox', { name: /contraseña/i }).fill('e2e-pass');
     await page.getByRole('button', { name: /ingresar/i }).click();
 
     // Dashboard cargado: el dashboard en vivo muestra "Cola de tareas"

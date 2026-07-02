@@ -53,7 +53,7 @@ test.describe('ADR-019 Fase 5: log--task & Inmutabilidad', () => {
 
         await page.goto('/');
         await page.getByLabel(/usuario/i).fill('operator');
-        await page.getByLabel(/contraseña/i).fill('pass');
+        await page.getByRole('textbox', { name: /contraseña/i }).fill('pass');
         await page.getByRole('button', { name: /ingresar/i }).click();
         await expect(page.getByText(/chagra/i).first()).toBeVisible();
     });
