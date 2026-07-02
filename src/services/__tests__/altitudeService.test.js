@@ -65,12 +65,12 @@ beforeEach(() => {
   originalFetch = globalThis.window?.fetch;
   
   // Setup default navigator
-  globalThis.navigator = {
+  globalThis.navigator = /** @type {any} */ ({
     geolocation: {
       getCurrentPosition: vi.fn(),
     },
     onLine: true,
-  };
+  });
   
   // Setup default fetch
   if (typeof window !== 'undefined') {
@@ -118,7 +118,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
           });
         }
       );
-      openDB.mockResolvedValue(makeFakeDB());
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB());
       
       const result = await getDeviceAltitude();
       
@@ -140,7 +140,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
           });
         }
       );
-      openDB.mockResolvedValue(makeFakeDB());
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB());
       
       const result = await getDeviceAltitude();
       
@@ -162,7 +162,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
           });
         }
       );
-      openDB.mockResolvedValue(makeFakeDB());
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB());
       
       await getDeviceAltitude();
       
@@ -186,13 +186,13 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
       );
       
       const apiAltitude = 1800;
-      window.fetch.mockResolvedValue({
+      vi.mocked(window.fetch).mockResolvedValue({
         ok: true,
         json: async () => ({
           results: [{ elevation: apiAltitude }],
         }),
       });
-      openDB.mockResolvedValue(makeFakeDB());
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB());
       
       const result = await getDeviceAltitude();
       
@@ -218,13 +218,13 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
         }
       );
       
-      window.fetch.mockResolvedValue({
+      vi.mocked(window.fetch).mockResolvedValue({
         ok: true,
         json: async () => ({
           results: [{ elevation: 2000 }],
         }),
       });
-      openDB.mockResolvedValue(makeFakeDB());
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB());
       
       await getDeviceAltitude();
       
@@ -248,13 +248,13 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
       );
       
       const apiAltitude = 2200;
-      window.fetch.mockResolvedValue({
+      vi.mocked(window.fetch).mockResolvedValue({
         ok: true,
         json: async () => ({
           results: [{ elevation: apiAltitude }],
         }),
       });
-      openDB.mockResolvedValue(makeFakeDB());
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB());
       
       await getDeviceAltitude();
       
@@ -270,7 +270,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
           error({ code: 1, message: 'permission denied' });
         }
       );
-      openDB.mockResolvedValue(makeFakeDB(cachedAlt));
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB(cachedAlt));
       
       const result = await getDeviceAltitude();
       
@@ -292,11 +292,11 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
         }
       );
       
-      window.fetch.mockResolvedValue({
+      vi.mocked(window.fetch).mockResolvedValue({
         ok: false,
         status: 500,
       });
-      openDB.mockResolvedValue(makeFakeDB(cachedAlt));
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB(cachedAlt));
       
       const result = await getDeviceAltitude();
       
@@ -310,7 +310,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
           error({ code: 1, message: 'permission denied' });
         }
       );
-      openDB.mockResolvedValue(makeFakeDB(2000, oldTimestamp));
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB(2000, oldTimestamp));
       
       const result = await getDeviceAltitude();
       
@@ -324,7 +324,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
           error({ code: 1, message: 'permission denied' });
         }
       );
-      openDB.mockResolvedValue(makeFakeDB(1900, recentTimestamp));
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB(1900, recentTimestamp));
       
       const result = await getDeviceAltitude();
       
@@ -346,7 +346,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
           });
         }
       );
-      openDB.mockResolvedValue(makeFakeDB());
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB());
       
       const result = await getDeviceAltitude();
       
@@ -367,7 +367,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
           });
         }
       );
-      openDB.mockResolvedValue(makeFakeDB());
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB());
       
       const result = await getDeviceAltitude();
       
@@ -388,7 +388,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
           });
         }
       );
-      openDB.mockResolvedValue(makeFakeDB());
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB());
       
       const result = await getDeviceAltitude();
       
@@ -411,10 +411,10 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
         }
       );
       
-      window.fetch.mockResolvedValue({
+      vi.mocked(window.fetch).mockResolvedValue({
         ok: false,
       });
-      openDB.mockResolvedValue(makeFakeDB(null)); // sin cache
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB(null)); // sin cache
       
       const result = await getDeviceAltitude();
       
@@ -435,10 +435,10 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
         }
       );
       
-      window.fetch.mockResolvedValue({
+      vi.mocked(window.fetch).mockResolvedValue({
         ok: false,
       });
-      openDB.mockResolvedValue(makeFakeDB(null));
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB(null));
       
       const result = await getDeviceAltitude();
       
@@ -452,7 +452,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
         }
       );
       
-      openDB.mockResolvedValue(makeFakeDB(null)); // sin cache
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB(null)); // sin cache
       
       const result = await getDeviceAltitude();
       
@@ -468,7 +468,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
         }
       );
       
-      openDB.mockResolvedValue(makeFakeDB(1500));
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB(1500));
       
       const result = await getDeviceAltitude();
       
@@ -490,8 +490,8 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
         }
       );
       
-      window.fetch.mockRejectedValue(new Error('Network error'));
-      openDB.mockResolvedValue(makeFakeDB(1200));
+      vi.mocked(window.fetch).mockRejectedValue(new Error('Network error'));
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB(1200));
       
       const result = await getDeviceAltitude();
       
@@ -513,7 +513,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
         }
       );
       
-      openDB.mockRejectedValue(new Error('DB error'));
+      vi.mocked(openDB).mockRejectedValue(new Error('DB error'));
       
       const result = await getDeviceAltitude();
       
@@ -528,7 +528,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
         }
       );
       
-      openDB.mockRejectedValue(new Error('DB read error'));
+      vi.mocked(openDB).mockRejectedValue(new Error('DB read error'));
       
       const result = await getDeviceAltitude();
       
@@ -542,7 +542,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
       // @ts-ignore
       delete globalThis.navigator.geolocation;
       
-      openDB.mockResolvedValue(makeFakeDB(1300));
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB(1300));
       
       const result = await getDeviceAltitude();
       
@@ -552,7 +552,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
     it('salta a fallbacks cuando getCurrentPosition no es función', async () => {
       globalThis.navigator.geolocation = {};
       
-      openDB.mockResolvedValue(makeFakeDB(1600));
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB(1600));
       
       const result = await getDeviceAltitude();
       
@@ -562,7 +562,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
 
   describe('offline mode', () => {
     it('no llama a API si navigator.onLine es false', async () => {
-      globalThis.navigator.onLine = false;
+      globalThis.navigator.onLine = /** @type {any} */ (false);
       
       globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
         (success) => {
@@ -577,7 +577,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
         }
       );
       
-      openDB.mockResolvedValue(makeFakeDB(1400));
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB(1400));
       
       await getDeviceAltitude();
       
@@ -600,11 +600,11 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
         }
       );
       
-      window.fetch.mockResolvedValue({
+      vi.mocked(window.fetch).mockResolvedValue({
         ok: true,
         json: async () => ({ results: [] }),
       });
-      openDB.mockResolvedValue(makeFakeDB(null));
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB(null));
       
       const result = await getDeviceAltitude();
       
@@ -625,13 +625,13 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
         }
       );
       
-      window.fetch.mockResolvedValue({
+      vi.mocked(window.fetch).mockResolvedValue({
         ok: true,
         json: async () => ({
           results: [{ elevation: null }],
         }),
       });
-      openDB.mockResolvedValue(makeFakeDB(null));
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB(null));
       
       const result = await getDeviceAltitude();
       
@@ -657,7 +657,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
           });
         }
       );
-      openDB.mockResolvedValue(makeFakeDB());
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB());
       
       const result = await getDeviceAltitude();
       
@@ -679,7 +679,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
           });
         }
       );
-      openDB.mockResolvedValue(makeFakeDB());
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB());
       
       const result = await getDeviceAltitude();
       
@@ -701,7 +701,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
           });
         }
       );
-      openDB.mockResolvedValue(makeFakeDB());
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB());
       
       const result = await getDeviceAltitude();
       
@@ -723,7 +723,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
           });
         }
       );
-      openDB.mockResolvedValue(makeFakeDB());
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB());
       
       const result = await getDeviceAltitude();
       
@@ -745,7 +745,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
           });
         }
       );
-      openDB.mockResolvedValue(makeFakeDB());
+      vi.mocked(openDB).mockResolvedValue(makeFakeDB());
       
       const result = await getDeviceAltitude();
       

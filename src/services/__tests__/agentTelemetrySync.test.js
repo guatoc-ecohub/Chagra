@@ -53,7 +53,7 @@ beforeEach(() => {
     ok: true,
     json: async () => ({ success: true }),
   });
-  fetchWithAuthRetry.mockImplementation((...args) => global.fetch(...args));
+  vi.mocked(fetchWithAuthRetry).mockImplementation((...args) => global.fetch(...args));
 });
 
 afterEach(() => {
@@ -72,7 +72,7 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
     vi.stubEnv('VITE_TELEMETRY_INGEST_URL', '');
     const { syncAgentTelemetry } = await import('../agentTelemetrySync.js');
     
-    getTelemetryConsent.mockReturnValue(false);
+    vi.mocked(getTelemetryConsent).mockReturnValue(false);
 
     const Result = await syncAgentTelemetry();
 
@@ -85,7 +85,7 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
     vi.stubEnv('VITE_TELEMETRY_INGEST_URL', '');
     const { syncAgentTelemetry } = await import('../agentTelemetrySync.js');
     
-    getTelemetryConsent.mockReturnValue(true);
+    vi.mocked(getTelemetryConsent).mockReturnValue(true);
     setOnline(false);
 
     const Result = await syncAgentTelemetry();
@@ -99,7 +99,7 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
     vi.stubEnv('VITE_TELEMETRY_INGEST_URL', '');
     const { syncAgentTelemetry } = await import('../agentTelemetrySync.js');
     
-    getTelemetryConsent.mockReturnValue(true);
+    vi.mocked(getTelemetryConsent).mockReturnValue(true);
     setOnline(true);
 
     const Result = await syncAgentTelemetry();
@@ -113,9 +113,9 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
     vi.stubEnv('VITE_TELEMETRY_INGEST_URL', 'https://telemetry.example.com/ingest');
     const { syncAgentTelemetry } = await import('../agentTelemetrySync.js');
     
-    getTelemetryConsent.mockReturnValue(true);
+    vi.mocked(getTelemetryConsent).mockReturnValue(true);
     setOnline(true);
-    listRequests.mockResolvedValue([]);
+    vi.mocked(listRequests).mockResolvedValue([]);
 
     const Result = await syncAgentTelemetry();
 
@@ -128,7 +128,7 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
     vi.stubEnv('VITE_TELEMETRY_INGEST_URL', 'https://telemetry.example.com/ingest');
     const { syncAgentTelemetry } = await import('../agentTelemetrySync.js');
     
-    getTelemetryConsent.mockReturnValue(true);
+    vi.mocked(getTelemetryConsent).mockReturnValue(true);
     setOnline(true);
 
     const doneRequests = [
@@ -166,8 +166,8 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
       },
     ];
 
-    listRequests.mockResolvedValue(doneRequests);
-    getRequest.mockImplementation(async (_id) => {
+    vi.mocked(listRequests).mockResolvedValue(doneRequests);
+    vi.mocked(getRequest).mockImplementation(async (_id) => {
       return doneRequests.find((r) => r.id === _id) || null;
     });
 
@@ -210,12 +210,12 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
     vi.stubEnv('VITE_CHAGRA_MCP_TOKEN', 'tok-123');
     const { syncAgentTelemetry } = await import('../agentTelemetrySync.js');
 
-    getTelemetryConsent.mockReturnValue(true);
+    vi.mocked(getTelemetryConsent).mockReturnValue(true);
     setOnline(true);
 
     const doneRequests = [{ id: 9, route: 'chat', model: 'granite3.3:8b', status: 'done', synced: false }];
-    listRequests.mockResolvedValue(doneRequests);
-    getRequest.mockImplementation(async (_id) => doneRequests.find((r) => r.id === _id) || null);
+    vi.mocked(listRequests).mockResolvedValue(doneRequests);
+    vi.mocked(getRequest).mockImplementation(async (_id) => doneRequests.find((r) => r.id === _id) || null);
 
     await syncAgentTelemetry();
 
@@ -231,7 +231,7 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
     vi.stubEnv('VITE_TELEMETRY_INGEST_URL', 'https://telemetry.example.com/ingest');
     const { syncAgentTelemetry } = await import('../agentTelemetrySync.js');
     
-    getTelemetryConsent.mockReturnValue(true);
+    vi.mocked(getTelemetryConsent).mockReturnValue(true);
     setOnline(true);
 
     const requests = [
@@ -240,7 +240,7 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
       { id: 3, status: 'sending', synced: false }, // No done
     ];
 
-    listRequests.mockResolvedValue(requests);
+    vi.mocked(listRequests).mockResolvedValue(requests);
 
     const Result = await syncAgentTelemetry();
 
@@ -253,7 +253,7 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
     vi.stubEnv('VITE_TELEMETRY_INGEST_URL', 'https://telemetry.example.com/ingest');
     const { syncAgentTelemetry } = await import('../agentTelemetrySync.js');
     
-    getTelemetryConsent.mockReturnValue(true);
+    vi.mocked(getTelemetryConsent).mockReturnValue(true);
     setOnline(true);
 
     const requests = [
@@ -266,7 +266,7 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
       },
     ];
 
-    listRequests.mockResolvedValue(requests);
+    vi.mocked(listRequests).mockResolvedValue(requests);
 
     const Result = await syncAgentTelemetry();
 
@@ -279,7 +279,7 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
     vi.stubEnv('VITE_TELEMETRY_INGEST_URL', 'https://telemetry.example.com/ingest');
     const { syncAgentTelemetry } = await import('../agentTelemetrySync.js');
     
-    getTelemetryConsent.mockReturnValue(true);
+    vi.mocked(getTelemetryConsent).mockReturnValue(true);
     setOnline(true);
 
     const doneRequests = [
@@ -297,8 +297,8 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
       },
     ];
 
-    listRequests.mockResolvedValue(doneRequests);
-    getRequest.mockImplementation(async (_id) => {
+    vi.mocked(listRequests).mockResolvedValue(doneRequests);
+    vi.mocked(getRequest).mockImplementation(async (_id) => {
       return doneRequests.find((r) => r.id === _id) || null;
     });
 
@@ -317,7 +317,7 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
     vi.stubEnv('VITE_TELEMETRY_INGEST_URL', 'https://telemetry.example.com/ingest');
     const { syncAgentTelemetry } = await import('../agentTelemetrySync.js');
     
-    getTelemetryConsent.mockReturnValue(true);
+    vi.mocked(getTelemetryConsent).mockReturnValue(true);
     setOnline(true);
 
     const doneRequests = [
@@ -334,7 +334,7 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
       },
     ];
 
-    listRequests.mockResolvedValue(doneRequests);
+    vi.mocked(listRequests).mockResolvedValue(doneRequests);
 
     // Mock response error
     global.fetch.mockResolvedValue({
@@ -353,11 +353,11 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
     vi.stubEnv('VITE_TELEMETRY_INGEST_URL', 'https://telemetry.example.com/ingest');
     const { syncAgentTelemetry } = await import('../agentTelemetrySync.js');
     
-    getTelemetryConsent.mockReturnValue(true);
+    vi.mocked(getTelemetryConsent).mockReturnValue(true);
     setOnline(true);
 
     // Mock que lanza excepción
-    getTelemetryConsent.mockImplementation(() => {
+    vi.mocked(getTelemetryConsent).mockImplementation(() => {
       throw new Error('localStorage error');
     });
 
@@ -373,7 +373,7 @@ describe('agentTelemetrySync — isTelemetrySyncEnabled', () => {
     vi.stubEnv('VITE_TELEMETRY_INGEST_URL', 'https://telemetry.example.com/ingest');
     const { isTelemetrySyncEnabled } = await import('../agentTelemetrySync.js');
     
-    getTelemetryConsent.mockReturnValue(false);
+    vi.mocked(getTelemetryConsent).mockReturnValue(false);
     setOnline(true);
 
     expect(isTelemetrySyncEnabled()).toBe(false);
@@ -384,7 +384,7 @@ describe('agentTelemetrySync — isTelemetrySyncEnabled', () => {
     vi.stubEnv('VITE_TELEMETRY_INGEST_URL', 'https://telemetry.example.com/ingest');
     const { isTelemetrySyncEnabled } = await import('../agentTelemetrySync.js');
     
-    getTelemetryConsent.mockReturnValue(true);
+    vi.mocked(getTelemetryConsent).mockReturnValue(true);
     setOnline(false);
 
     expect(isTelemetrySyncEnabled()).toBe(false);
@@ -397,7 +397,7 @@ describe('agentTelemetrySync — isTelemetrySyncEnabled', () => {
     vi.stubEnv('VITE_TELEMETRY_INGEST_URL', '');
     const { isTelemetrySyncEnabled, getTelemetryIngestUrl } = await import('../agentTelemetrySync.js');
 
-    getTelemetryConsent.mockReturnValue(true);
+    vi.mocked(getTelemetryConsent).mockReturnValue(true);
     setOnline(true);
 
     expect(getTelemetryIngestUrl()).toMatch(/\/ingest$/);
@@ -409,7 +409,7 @@ describe('agentTelemetrySync — isTelemetrySyncEnabled', () => {
     vi.stubEnv('VITE_TELEMETRY_INGEST_URL', 'https://telemetry.example.com/ingest');
     const { isTelemetrySyncEnabled } = await import('../agentTelemetrySync.js');
     
-    getTelemetryConsent.mockReturnValue(true);
+    vi.mocked(getTelemetryConsent).mockReturnValue(true);
     setOnline(true);
 
     expect(isTelemetrySyncEnabled()).toBe(true);

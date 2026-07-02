@@ -60,7 +60,7 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
       },
     ];
 
-    assetCache.getByType.mockResolvedValue([]);
+    vi.mocked(assetCache.getByType).mockResolvedValue([]);
 
     const result = await hydrateCyclesFromFarmOS(localProcesses);
 
@@ -90,8 +90,8 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
       },
     ];
 
-    assetCache.getByType.mockResolvedValue(plants);
-    getAllSpecies.mockResolvedValue([
+    vi.mocked(assetCache.getByType).mockResolvedValue(plants);
+    vi.mocked(getAllSpecies).mockResolvedValue([
       { id: 'caffea_arabica', nombre_comun: 'café', tracking_mode: 'individual' },
     ]);
 
@@ -136,7 +136,7 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
       },
     ];
 
-    assetCache.getByType.mockResolvedValue(plants);
+    vi.mocked(assetCache.getByType).mockResolvedValue(plants);
 
     const result = await hydrateCyclesFromFarmOS(localProcesses);
 
@@ -166,7 +166,7 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
       },
     ];
 
-    assetCache.getByType.mockResolvedValue(plants);
+    vi.mocked(assetCache.getByType).mockResolvedValue(plants);
 
     const result = await hydrateCyclesFromFarmOS(localProcesses);
 
@@ -221,8 +221,8 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
       },
     ];
 
-    assetCache.getByType.mockResolvedValue(plants);
-    getAllSpecies.mockResolvedValue([
+    vi.mocked(assetCache.getByType).mockResolvedValue(plants);
+    vi.mocked(getAllSpecies).mockResolvedValue([
       { id: 'caffea_arabica', nombre_comun: 'café', tracking_mode: 'individual' },
       { id: 'fragaria_x_ananassa', nombre_comun: 'fresa', tracking_mode: 'individual' },
     ]);
@@ -254,8 +254,8 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
       },
     ];
 
-    assetCache.getByType.mockResolvedValue(plants);
-    getAllSpecies.mockRejectedValue(new Error('Catálogo caído'));
+    vi.mocked(assetCache.getByType).mockResolvedValue(plants);
+    vi.mocked(getAllSpecies).mockRejectedValue(new Error('Catálogo caído'));
 
     const result = await hydrateCyclesFromFarmOS(localProcesses);
 
@@ -289,8 +289,8 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
       },
     ];
 
-    assetCache.getByType.mockResolvedValue(plants);
-    getAllSpecies.mockResolvedValue([
+    vi.mocked(assetCache.getByType).mockResolvedValue(plants);
+    vi.mocked(getAllSpecies).mockResolvedValue([
       { id: 'caffea_arabica', nombre_comun: 'café', tracking_mode: 'individual' },
     ]);
 
@@ -313,7 +313,7 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
       },
     ];
 
-    assetCache.getByType.mockRejectedValue(new Error('Error de cache'));
+    vi.mocked(assetCache.getByType).mockRejectedValue(new Error('Error de cache'));
 
     const result = await hydrateCyclesFromFarmOS(localProcesses);
 
@@ -328,8 +328,8 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
       attributes: { name: 'Fresa', status: 'active' },
       relationships: { location: { data: { id: 'land-1' } } },
     }];
-    assetCache.getByType.mockResolvedValue(plants);
-    getAllSpecies.mockResolvedValue([{ id: 'fragaria_ananassa', nombre_comun: 'fresa', tracking_mode: 'individual' }]);
+    vi.mocked(assetCache.getByType).mockResolvedValue(plants);
+    vi.mocked(getAllSpecies).mockResolvedValue([{ id: 'fragaria_ananassa', nombre_comun: 'fresa', tracking_mode: 'individual' }]);
 
     const result = await hydrateCyclesFromFarmOS([]);
 
@@ -344,8 +344,8 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
       attributes: { name: 'Fresa', status: 'active' },
       relationships: { location: { data: { id: 'land-1' } } },
     }];
-    assetCache.getByType.mockResolvedValue(plants);
-    getAllSpecies.mockResolvedValue([{ id: 'fragaria_ananassa', nombre_comun: 'fresa', tracking_mode: 'individual' }]);
+    vi.mocked(assetCache.getByType).mockResolvedValue(plants);
+    vi.mocked(getAllSpecies).mockResolvedValue([{ id: 'fragaria_ananassa', nombre_comun: 'fresa', tracking_mode: 'individual' }]);
 
     const result = await hydrateCyclesFromFarmOS([], { persist: false });
 
@@ -362,8 +362,8 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
       attributes: { name: 'Tomate', status: 'active', timestamp: sowingDate },
       relationships: { location: { data: { id: 'land-1' } } },
     }];
-    assetCache.getByType.mockResolvedValue(plants);
-    getAllSpecies.mockResolvedValue([{ id: 'solanum_lycopersicum', nombre_comun: 'tomate', tracking_mode: 'individual' }]);
+    vi.mocked(assetCache.getByType).mockResolvedValue(plants);
+    vi.mocked(getAllSpecies).mockResolvedValue([{ id: 'solanum_lycopersicum', nombre_comun: 'tomate', tracking_mode: 'individual' }]);
 
     const result = await hydrateCyclesFromFarmOS([]);
 
@@ -378,8 +378,8 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
       attributes: { name: 'Tomate', status: 'active', timestamp: Date.now() },
       relationships: { location: { data: { id: 'land-1' } } },
     }];
-    assetCache.getByType.mockResolvedValue(plants);
-    getAllSpecies.mockResolvedValue([{ id: 'solanum_lycopersicum', nombre_comun: 'tomate', tracking_mode: 'individual' }]);
+    vi.mocked(assetCache.getByType).mockResolvedValue(plants);
+    vi.mocked(getAllSpecies).mockResolvedValue([{ id: 'solanum_lycopersicum', nombre_comun: 'tomate', tracking_mode: 'individual' }]);
 
     const result = await hydrateCyclesFromFarmOS([]);
 
@@ -392,8 +392,8 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
       attributes: { name: 'Planta rara', status: 'active', timestamp: Date.now() - 100 * 86400000 },
       relationships: { location: { data: { id: 'land-1' } } },
     }];
-    assetCache.getByType.mockResolvedValue(plants);
-    getAllSpecies.mockResolvedValue([]); // sin match → sin slug → sin template
+    vi.mocked(assetCache.getByType).mockResolvedValue(plants);
+    vi.mocked(getAllSpecies).mockResolvedValue([]); // sin match → sin slug → sin template
 
     const result = await hydrateCyclesFromFarmOS([]);
 
