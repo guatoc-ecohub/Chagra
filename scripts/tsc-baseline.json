@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-07-02T04:07:31.649Z",
+  "generatedAt": "2026-07-02T04:33:54.406Z",
   "totalErrors": 2351,
   "byFile": {
-    "../../home/kortux/Workspace/chagra/node_modules/fake-indexeddb/auto/index.mjs": 1,
-    "../../home/kortux/Workspace/chagra/node_modules/fake-indexeddb/build/esm/FDBFactory.js": 4,
-    "../../home/kortux/Workspace/chagra/node_modules/fake-indexeddb/build/esm/FDBTransaction.js": 3,
+    "node_modules/fake-indexeddb/auto/index.mjs": 1,
+    "node_modules/fake-indexeddb/build/esm/FDBFactory.js": 4,
+    "node_modules/fake-indexeddb/build/esm/FDBTransaction.js": 3,
     "scripts/lib/bench-scorer.mjs": 22,
     "scripts/seed-demo.ts": 1,
     "src/App.jsx": 16,
