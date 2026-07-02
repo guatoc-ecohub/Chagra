@@ -16,6 +16,8 @@ on:
     paths:
       - 'catalog/**/*.json'
       - 'scripts/validate-catalog.mjs'
+      - 'scripts/audit-contaminacion.mjs'
+      - 'scripts/audit-contaminacion-baseline.json'
       - '.github/workflows/catalog-validate.yml'
   # También en push a main para detectar regresiones (si alguien hace push
   # directo bypassing PRs — branch protection lo bloquea pero defense in depth).
@@ -45,6 +47,14 @@ jobs:
 
       - name: Run catalog validator (lenient, strict semantic)
         run: node scripts/validate-catalog.mjs --lenient-schema
+
+      # Gate anti-regresión de contaminación de datos (queue: test de
+      # contaminación catálogo+grafo). Solo Node built-ins, sin npm install.
+      # Falla si aparece un hallazgo NUEVO (fingerprint no presente en
+      # scripts/audit-contaminacion-baseline.json) — bajar el baseline
+      # (arreglar datos) siempre está permitido vía --update-baseline.
+      - name: Run data contamination gate
+        run: node scripts/audit-contaminacion.mjs --check
 
       # Comentario informativo en el PR cuando hay warnings significativos.
       # Si AMB-16 sigue creciendo (vp <200 chars), señala que el batch de
