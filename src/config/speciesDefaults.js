@@ -36,7 +36,7 @@ export const SPECIES_DEFAULTS = {
   // --- Leguminosas y Granos ---
   // Milpa clásica: Maíz + Frijol + Calabaza (Tres Hermanas americanas)
   zea_mays: { category: 'leguminosas_granos', estrato: 'medio', gremio: 'productivo_principal', production: 'grano', cycleMonths: 4, companions: ['phaseolus_vulgaris', 'cucurbita_maxima', 'cucurbita_pepo'], antagonists: [] },
-  phaseolus_vulgaris: { category: 'leguminosas_granos', estrato: 'bajo', gremio: 'fijador_nitrogeno', production: 'grano', cycleMonths: 3, companions: ['zea_mays', 'cucurbita_maxima', 'daucus_carota'], antagonists: ['allium_cepa', 'allium_cepa'] },
+  phaseolus_vulgaris: { category: 'leguminosas_granos', estrato: 'bajo', gremio: 'fijador_nitrogeno', production: 'grano', cycleMonths: 3, companions: ['zea_mays', 'cucurbita_maxima', 'daucus_carota'], antagonists: ['allium_cepa'] },
   pisum_sativum: { category: 'leguminosas_granos', estrato: 'bajo', gremio: 'fijador_nitrogeno', production: 'grano', cycleMonths: 3, companions: ['daucus_carota', 'lactuca_sativa', 'spinacia_oleracea'], antagonists: ['allium_cepa'] },
   vicia_faba: { category: 'leguminosas_granos', estrato: 'bajo', gremio: 'fijador_nitrogeno', production: 'grano', cycleMonths: 4, companions: ['solanum_tuberosum', 'spinacia_oleracea', 'avena_sativa'], antagonists: ['allium_cepa'] },
   lupinus_mutabilis: { category: 'leguminosas_granos', estrato: 'bajo', gremio: 'fijador_nitrogeno', production: 'grano', cycleMonths: 6, companions: ['solanum_tuberosum', 'zea_mays'], antagonists: [] },
