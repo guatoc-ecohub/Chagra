@@ -1,0 +1,148 @@
+/*
+ * chivito.css — el CHIVITO DE PÁRAMO vivo (Oxypogon guerinii, "barbudito
+ * paramuno") dibujado 100% en SVG/CSS. Cero assets, cero red, offline-first,
+ * gama baja. Reemplaza al colibrí del A/B en las tres piezas del ave insignia
+ * (home, botón del agente, transición).
+ *
+ * Dos mockups, dos niveles de detalle:
+ *   - Mockup A (`.chiv-a`) → simple / estilizado, colores planos.
+ *   - Mockup B (`.chiv-b`) → detallado / rico, gradientes, barba iridiscente
+ *     verde→violeta con brillo animado, plumas, sombras.
+ *
+ * Todo el movimiento se apaga con prefers-reduced-motion (gama baja + a11y).
+ * Español colombiano (usted), NUNCA voseo.
+ */
+
+/* ── contenedor del ave ──────────────────────────────────────────────────── */
+.chivito {
+  display: inline-block;
+  line-height: 0;
+}
+.chivito svg { display: block; overflow: visible; }
+
+/* aleteo de las alas — rápido, en contrafase, como un colibrí de altura */
+.chivito .chiv-ala-fron { transform-box: fill-box; transform-origin: 78% 30%; }
+.chivito .chiv-ala-tras { transform-box: fill-box; transform-origin: 82% 26%; }
+.chivito.is-flap .chiv-ala-fron { animation: chiv-flap 0.16s ease-in-out infinite; }
+.chivito.is-flap .chiv-ala-tras { animation: chiv-flap-back 0.16s ease-in-out infinite; }
+@keyframes chiv-flap {
+  0%, 100% { transform: rotate(-16deg) scaleY(0.94); }
+  50%      { transform: rotate(20deg) scaleY(1); }
+}
+@keyframes chiv-flap-back {
+  0%, 100% { transform: rotate(14deg); }
+  50%      { transform: rotate(-18deg); }
+}
+
+/* cresta puntiaguda — leve tremor de las plumas, muy sutil */
+.chivito .chiv-cresta { transform-box: fill-box; transform-origin: 50% 100%; }
+.chivito.is-flap .chiv-cresta { animation: chiv-cresta 2.4s ease-in-out infinite; }
+@keyframes chiv-cresta {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(-3deg); }
+}
+
+/* barba iridiscente (Mockup B) — franja de brillo que baja por la barba
+   pasando de verde a violeta, dando el destello metálico del gorget real */
+.chivito .chiv-barba-brillo { opacity: 0; }
+.chivito.is-flap.chiv-b .chiv-barba-brillo { animation: chiv-barba-brillo 2.8s ease-in-out infinite; }
+@keyframes chiv-barba-brillo {
+  0%, 100% { opacity: 0; transform: translateY(-3px); }
+  45%      { opacity: 0.85; }
+  55%      { opacity: 0.85; }
+  100%     { opacity: 0; transform: translateY(4px); }
+}
+
+/* ── ESCENA DEL HOME — el chivito libando la flor del frailejón ───────────── */
+.chiv-escena {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+.chiv-escena .chiv-ave-wrap {
+  position: absolute;
+  left: 2%;
+  top: 4%;
+  width: 62%;
+  z-index: 3;
+  /* vuelo estacionario: el ave se acerca y retira de la flor (sip) */
+  animation: chiv-sip 5.6s ease-in-out infinite;
+}
+@keyframes chiv-sip {
+  0%   { transform: translate(0, 0) rotate(-1deg); }
+  35%  { transform: translate(10px, -5px) rotate(1.5deg); }
+  60%  { transform: translate(6px, -2px) rotate(0.5deg); }
+  100% { transform: translate(0, 0) rotate(-1deg); }
+}
+/* el frailejón (roseta plateada + flores amarillas) al fondo-derecha */
+.chiv-escena .chiv-frailejon-wrap {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── BOTÓN — el chivito ES el icono del botón enviar/hablar ───────────────── */
+.chiv-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+.chiv-boton .chivito { filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35)); }
+/* estado "thinking/speaking" del botón: el ave se inclina como para libar */
+.chiv-boton.is-active .chivito { animation: chiv-boton-lean 0.9s ease-in-out infinite; }
+@keyframes chiv-boton-lean {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  50%      { transform: translateX(1.5px) rotate(3deg); }
+}
+
+/* ── TRANSICIÓN — el chivito cruza aleteando ─────────────────────────────── */
+.chiv-cruza {
+  display: inline-block;
+  will-change: transform, opacity;
+  animation: chiv-cruzar 1.5s cubic-bezier(0.22, 0.61, 0.36, 1) 1 both;
+}
+@keyframes chiv-cruzar {
+  0%   { transform: translate3d(-34vw, 12vh, 0) scale(0.72) rotate(-6deg); opacity: 0; }
+  16%  { opacity: 1; }
+  52%  { transform: translate3d(0, -5vh, 0) scale(1.06) rotate(2deg); opacity: 1; }
+  86%  { opacity: 1; }
+  100% { transform: translate3d(34vw, 3vh, 0) scale(0.78) rotate(-3deg); opacity: 0; }
+}
+
+/* ── A/B del chivito en el home (flag VITE_CHIVITO=ab) ────────────────────── */
+.chiv-ab {
+  animation: none !important;
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.chiv-ab-tag {
+  font: 600 9px/1 var(--fvh-body, system-ui, sans-serif);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(20, 30, 18, 0.6);
+  border: 1px solid rgba(190, 242, 100, 0.4);
+  border-radius: 999px;
+  padding: 2px 7px;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  white-space: nowrap;
+}
+
+/* ── prefers-reduced-motion: nada se mueve (gama baja + a11y) ─────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .chivito .chiv-ala-fron,
+  .chivito .chiv-ala-tras,
+  .chivito .chiv-cresta,
+  .chivito .chiv-barba-brillo,
+  .chiv-escena .chiv-ave-wrap,
+  .chiv-boton.is-active .chivito,
+  .chiv-cruza {
+    animation: none !important;
+    transform: none !important;
+  }
+  .chivito .chiv-barba-brillo { opacity: 0.5 !important; }
+}

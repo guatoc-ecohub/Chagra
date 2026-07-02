@@ -18,6 +18,8 @@ import { useTheme } from '../../hooks/useTheme';
 import { iconForTheme } from './themeIcon';
 import { colibriRealActivo } from '../../config/colibriFlag';
 import { BarbuditoIlustrado, BarbuditoRealLoop } from '../colibri/Barbudito';
+import { chivitoMockup } from '../../config/chivitoFlag';
+import { ChivitoEscena, ChivitoBoton } from '../chivito/Chivito';
 import './finca-viva-hero.css';
 
 // ¿Modo A/B del colibrí del páramo? Gateado por VITE_COLIBRI (colibriFlag.js),
@@ -30,6 +32,12 @@ import './finca-viva-hero.css';
 // DERECHA el REAL recortado (sprite en loop, sin recuadro). Es un A/B TEMPORAL:
 // cada uno lleva una etiquetita ("ilustrado" / "real") solo en este modo dev.
 const COLIBRI_REAL = colibriRealActivo();
+
+// ¿Modo CHIVITO DE PÁRAMO? Gateado por VITE_CHIVITO (chivitoFlag.js), dev-only.
+// Reemplaza al colibrí del A/B por el chivito vivo (Oxypogon) libando la flor
+// del frailejón, dibujado 100% SVG/CSS. 'ab' = A y B lado a lado; 'a'/'b' = un
+// solo mockup. Tiene precedencia sobre VITE_COLIBRI (es su reemplazo).
+const CHIVITO = chivitoMockup();
 
 /**
  * FincaVivaHero — el HOME INMERSIVO "Finca Viva" (refinado del mockup F2 v2
@@ -384,7 +392,27 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
                         (sprite en loop, sin recuadro). Cada uno con su etiquetita
                         ("ilustrado"/"real"). Con la flag OFF (prod), el colibrí
                         SVG 2D `ColibriVuela` de siempre. */}
-                    {COLIBRI_REAL ? (
+                    {CHIVITO ? (
+                      // CHIVITO DE PÁRAMO libando la flor del frailejón (SVG/CSS
+                      // vivo). 'ab' = los dos mockups lado a lado con etiqueta,
+                      // para que el operador elija; 'a'/'b' = uno solo, centrado.
+                      CHIVITO === 'ab' ? (
+                        <>
+                          <span className="fvh-bicho chiv-ab" style={{ left: '2%', top: '6%' }}>
+                            <ChivitoEscena mockup="a" size={150} />
+                            <span className="chiv-ab-tag">mockup A · simple</span>
+                          </span>
+                          <span className="fvh-bicho chiv-ab" style={{ right: '2%', top: '6%' }}>
+                            <ChivitoEscena mockup="b" size={150} />
+                            <span className="chiv-ab-tag">mockup B · detalle</span>
+                          </span>
+                        </>
+                      ) : (
+                        <span className="fvh-bicho chiv-ab" style={{ left: '50%', top: '6%', transform: 'translateX(-50%)' }}>
+                          <ChivitoEscena mockup={CHIVITO} size={172} />
+                        </span>
+                      )
+                    ) : COLIBRI_REAL ? (
                       <>
                         <span className="fvh-bicho fvh-colibri-ab fvh-colibri-ab-izq" style={{ left: '4%', top: '12%' }}>
                           <BarbuditoIlustrado size={104} ariaLabel="Colibrí del páramo ilustrado" />
@@ -425,7 +453,15 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
                 data-testid="finca-viva-agent-fab"
                 aria-label="Pregúntele a Chagra"
               >
-                <span className="av" aria-hidden="true"><ColibriAvatar /></span>
+                <span className="av" aria-hidden="true">
+                  {CHIVITO ? (
+                    // El chivito ES el icono del acceso al agente (Mockup A si es
+                    // A/B, para leer limpio a tamaño chico; si no, el elegido).
+                    <ChivitoBoton mockup={CHIVITO === 'ab' ? 'a' : CHIVITO} size={34} ariaLabel="Pregúntele a Chagra" />
+                  ) : (
+                    <ColibriAvatar />
+                  )}
+                </span>
                 <span className="ph">Pregúntele a Chagra…</span>
                 <span className="mic" aria-hidden="true">
                   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
