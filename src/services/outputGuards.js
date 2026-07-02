@@ -2276,11 +2276,41 @@ const DOSE_RE =
   /\b\d+(?:[.,]\d+)?\s*(?:ml|cc|g|gr|gramos?|kg|l|lt|litros?|cm3|cucharad(?:as|ita)s?)\b(?:\s*(?:\/|por|por\s+cada|x)\s*(?:l|lt|litro|litros|planta|plantas|mata|matas|ha|hect|hectarea|m2|arbol|arboles|bomba|caneca)\b)?/gi;
 
 /**
- * Indicios de que la dosis SÍ trae respaldo (cita de fuente / etiqueta). Si
- * está presente cerca de la dosis, NO suavizamos.
+ * Allowlist de fuentes VERIFICADAS que pueden respaldar una dosis.
+ * Solo estas fuentes se consideran válidas para suprimir el caveat de dosis.
  */
-const SOURCE_HINT_RE =
-  /(seg[uú]n|etiqueta|\bICA\b|Agrosavia|Cenicaf[eé]|Restrepo|\bfuente\b|cat[aá]logo Chagra|recomienda(?:ci[oó]n)? de la|de acuerdo (?:a|con))/i;
+const VERIFIED_SOURCE_ALLOWLIST = new Set([
+  'ica',
+  'ica.gov.co',
+  'agrosavia',
+  'agrosavia.co',
+  'cenicafe',
+  'cenicafe.org',
+  'restrepo', // Dr. Carlos Restrepo, autoridad en agroecología colombiana
+  'catalogo chagra',
+  'etiqueta', // Etiqueta del producto (siempre verificable)
+  'ficha tecnica', // normalizado (sin tilde): se compara contra texto _stripDiacritics()
+]);
+
+/** Escapa caracteres especiales de regex para usar una cadena como literal. */
+const _escapeRegExpLiteral = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * Detecta si el texto cita alguna fuente VERIFICADA (de VERIFIED_SOURCE_ALLOWLIST).
+ * CRÍTICO: la allowlist es la ÚNICA fuente de verdad — no hay una lista paralela
+ * de nombres "hardcodeada" que pueda desincronizarse de ella. Normaliza el texto
+ * (minúsculas, sin tildes) y busca cada entrada de la allowlist como palabra/
+ * frase completa. Si el modelo inventa "según el INTA" (fuente NO verificada),
+ * esto NO cuenta como respaldo y el caveat de dosis se mantiene.
+ */
+function _hasVerifiedSourceMention(responseText) {
+  const norm = _stripDiacritics(responseText);
+  for (const fuente of VERIFIED_SOURCE_ALLOWLIST) {
+    const re = new RegExp(`\\b${_escapeRegExpLiteral(fuente)}\\b`, 'i');
+    if (re.test(norm)) return true;
+  }
+  return false;
+}
 
 /**
  * Guard 4 — dosis sin fuente (PARCIAL: suaviza, no borra). Si el texto da una
@@ -2300,10 +2330,19 @@ export function guardDoseWithoutSource(responseText, _resolvedEntities = null, _
   if (doses.length === 0) {
     return { text: responseText, modified: false, reason: null };
   }
-  // Si ya hay cita de fuente en el texto, asumimos respaldo → no suavizar.
-  if (SOURCE_HINT_RE.test(responseText)) {
+
+  // CRÍTICO: Solo si hay una fuente de VERIFIED_SOURCE_ALLOWLIST en el texto,
+  // asumimos respaldo. _hasVerifiedSourceMention() está atada directamente a la
+  // allowlist (no hay una lista paralela hardcodeada que pueda desincronizarse).
+  // Si el modelo inventa "según una recomendación del ICA" con un decreto falso,
+  // esto matcheará "ICA" (que está en la allowlist) pero esto es seguro: si
+  // menciona ICA, el usuario puede verificar. Lo peligroso es NO mencionar
+  // fuente alguna, o citar una fuente que NO está en la allowlist.
+  const hasVerifiedSource = _hasVerifiedSourceMention(responseText);
+  if (hasVerifiedSource) {
     return { text: responseText, modified: false, reason: null };
   }
+
   // Evitar duplicar la nota si ya está.
   if (/confirma la dosis con/i.test(responseText)) {
     return { text: responseText, modified: false, reason: null };
@@ -2315,6 +2354,135 @@ export function guardDoseWithoutSource(responseText, _resolvedEntities = null, _
     'antes de aplicar — las cantidades varían según el producto y no conviene guiarse por una cifra sin fuente.';
   const text = `${responseText.trim()}\n\n${nota}`;
   return { text, modified: true, reason: `dosis_sin_fuente: ${[...new Set(doses)].slice(0, 5).join(', ')}` };
+}
+
+// ── GUARD: contacto inventado (teléfonos, correos, URLs, decretos) ──
+
+/**
+ * Allowlist de contactos VERIFICADOS oficiales. Solo estos contactos pueden
+ * aparecer en la respuesta sin ser marcados como inventados.
+ */
+const VERIFIED_CONTACTS_ALLOWLIST = new Set([
+  // URLs oficiales verificadas
+  'www.gov.co',
+  'www.ica.gov.co',
+  'www.minagricultura.gov.co',
+  'www.agrosavia.co',
+  'www.cenicafe.org',
+  // No incluimos teléfonos/correos específicos porque el modelo puede inventar variaciones
+  // Si el usuario necesita un contacto oficial, debe buscarlo en los sitios oficiales
+]);
+
+/**
+ * Regex para detectar teléfonos colombianos. Formatos:
+ * - (+57) 300 123 4567
+ * - 300 123 4567
+ * - 300-123-4567
+ * - (300) 123 4567
+ */
+const PHONE_RE =
+  /(?:\+57\s?)?(\(?3\d{2}\)?[-\s]?\d{3}[-\s]?\d{4}|\d{3}[-\s]?\d{7})/g;
+
+/**
+ * Regex para detectar correos electrónicos.
+ */
+const EMAIL_RE =
+  /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g;
+
+/**
+ * Regex para detectar URLs (http, https, www).
+ */
+const URL_RE =
+  /\b(?:https?:\/\/|www\.)[A-Za-z0-9-]{2,}\.[A-Za-z]{2,}(?:\/[^\s]*)?\b/g;
+
+/**
+ * Regex para detectar números de decreto/resolución. Formatos:
+ * - Decreto 1234 de 2015
+ * - Resolución 567 de 2020
+ * - Decreto No. 890
+ */
+const DECREE_RE =
+  /\b(?:Decreto|Resolución|Res|Dec\.|Decreto\s+No\.?)\s*(?:\d+|[IVXLCDM]+)(?:\s+de\s+\d{4})?\b/gi;
+
+/**
+ * Guard 5 — contacto inventado. Si el texto incluye teléfonos, correos,
+ * URLs o números de decreto/resolución que NO estén en la allowlist
+ * verificada, los MARCA/REEMPLAZA por un texto seguro que indica al
+ * usuario que verifique el contacto oficial con su UMATA o el ICA.
+ *
+ * Este es un guard de SEGURIDAD porque el modelo puede inventar contactos
+ * institucionales falsos para reportar plagas cuarentenarias, aplicar
+ * agroquímicos, o tramitar trámites, lo cual puede llevar al usuario a
+ * contactos fraudulentos o inexistentes.
+ *
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardInventedContact(responseText, _resolvedEntities = null, _fincaAltitud = null) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+
+  let modified = false;
+  let inventedContacts = [];
+  let text = responseText;
+
+  // Detectar teléfonos
+  const phones = text.match(PHONE_RE) || [];
+  for (const phone of phones) {
+    // Normalizar el teléfono para comparar (remover espacios, guiones, paréntesis)
+    const normalizedPhone = phone.replace(/[\s\-()]/g, '');
+    // Verificar si NO está en la allowlist (la allowlist está vacía para teléfonos)
+    if (!VERIFIED_CONTACTS_ALLOWLIST.has(normalizedPhone)) {
+      inventedContacts.push(`teléfono: ${phone}`);
+      text = text.replace(phone, '[VERIFICAR CONTACTO OFICIAL CON SU UMATA O EL ICA]');
+      modified = true;
+    }
+  }
+
+  // Detectar correos
+  const emails = text.match(EMAIL_RE) || [];
+  for (const email of emails) {
+    if (!VERIFIED_CONTACTS_ALLOWLIST.has(email.toLowerCase())) {
+      inventedContacts.push(`correo: ${email}`);
+      text = text.replace(email, '[VERIFICAR CONTACTO OFICIAL CON SU UMATA O EL ICA]');
+      modified = true;
+    }
+  }
+
+  // Detectar URLs
+  const urls = text.match(URL_RE) || [];
+  for (const url of urls) {
+    const normalizedUrl = url.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0].toLowerCase();
+    if (!VERIFIED_CONTACTS_ALLOWLIST.has(normalizedUrl)) {
+      inventedContacts.push(`URL: ${url}`);
+      text = text.replace(url, '[VERIFICAR CONTACTO OFICIAL CON SU UMATA O EL ICA]');
+      modified = true;
+    }
+  }
+
+  // Detectar decretos/resoluciones
+  const decrees = text.match(DECREE_RE) || [];
+  for (const decree of decrees) {
+    // Solo algunos decretos específicos están verificados
+    // Por ejemplo, Ley 1930 de 2018 es conocida, pero otros pueden ser inventados
+    const isKnownDecree = /Ley\s+1930|Ley\s+2041|Decreto\s+1071/i.test(decree);
+    if (!isKnownDecree) {
+      inventedContacts.push(`normativa: ${decree}`);
+      text = text.replace(decree, '[VERIFICAR NORMATIVA OFICIAL CON SU UMATA O EL ICA]');
+      modified = true;
+    }
+  }
+
+  if (modified) {
+    bumpGuardTelemetry('invented_contact');
+    return {
+      text,
+      modified: true,
+      reason: `contacto_inventado: ${[...new Set(inventedContacts)].slice(0, 5).join(', ')}`,
+    };
+  }
+
+  return { text: responseText, modified: false, reason: null };
 }
 
 // ── GUARD: receta EXACTA de caldo clásico pedida en dosis (BORDE-003 / 004) ──
@@ -9075,6 +9243,18 @@ export function applyOutputGuards(
     text = brandRes.text;
     modified = true;
     if (brandRes.reason) reasons.push(brandRes.reason);
+  }
+  // Guard SAFETY de CONTACTO INVENTADO (teléfonos, correos, URLs, decretos):
+  // firma propia (solo el texto). Corre SIEMPRE (no es de siembra). SUPPRESS-AND-REPLACE:
+  // si el cuerpo incluye teléfonos, correos, URLs o números de decreto/resolución
+  // que NO estén en la allowlist verificada, los reemplaza por un texto seguro que
+  // indica al usuario que verifique el contacto oficial con su UMATA o el ICA.
+  // Va tras la marca inventada. Idempotente.
+  const contactRes = guardInventedContact(text);
+  if (contactRes.modified) {
+    text = contactRes.text;
+    modified = true;
+    if (contactRes.reason) reasons.push(contactRes.reason);
   }
   // Guard SAFETY de AGROQUÍMICO DISFRAZADO con genérico inventado (BORDE-017/022 · V2):
   // firma propia (solo el texto). Corre SIEMPRE (no es de siembra). SUPPRESS-AND-REPLACE:
