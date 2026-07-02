@@ -105,6 +105,15 @@ export const AGENT_COMPOSITOR_CSS = `
     0%, 100% { box-shadow: 0 0 0 0 rgba(var(--t-accent-rgb, 25, 201, 154), 0.35); }
     50%      { box-shadow: 0 0 0 7px rgba(var(--t-accent-rgb, 25, 201, 154), 0); }
   }
+  /* REC activo: halo rojo que se expande desde el mic (más urgente que el
+     "respirar" idle). Selector compuesto para ganarle a la animación de
+     .as-mic-big. Reduced-motion lo apaga (queda el rojo estático de
+     .as-mic-on, que ya comunica el estado sin movimiento). */
+  .as-mic-big.as-mic-on { animation: as-mic-rec 1.3s ease-out infinite; }
+  @keyframes as-mic-rec {
+    0%   { box-shadow: 0 0 0 0 rgba(244,63,94,0.5); }
+    100% { box-shadow: 0 0 0 16px rgba(244,63,94,0); }
+  }
   .as-send {
     width: 46px; height: 46px; flex: none; border: none; border-radius: 50%;
     display: flex; align-items: center; justify-content: center; cursor: pointer;
@@ -138,6 +147,7 @@ export const AGENT_COMPOSITOR_CSS = `
     .as-shimmer::after, .as-sending { animation: none !important; }
     .as-tool { animation: none !important; }
     .as-mic-big { animation: none !important; }
+    .as-mic-big.as-mic-on { animation: none !important; }
   }
 `;
 

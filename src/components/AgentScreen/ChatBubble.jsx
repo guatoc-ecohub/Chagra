@@ -323,7 +323,10 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
   };
 
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3`}>
+    // `chagra-bubble-in`: entrada suave (fade+rise) definida en el CSS del área
+    // de chat (ChatHistory). Bajo prefers-reduced-motion queda inerte; fuera de
+    // ChatHistory (tests / usos sueltos) la clase sin keyframes es un no-op.
+    <div className={`chagra-bubble-in flex ${isUser ? 'justify-end' : 'justify-start'} mb-3`}>
       <div className={`flex gap-2 max-w-[85%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
         {isUser ? (
           <div className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-emerald-600">
@@ -340,10 +343,14 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
         )}
 
         <div
-          className={`rounded-2xl px-4 py-2.5 ${
+          /* Polish visual 2026-07: borde sutil + sombra corta para que la
+             burbuja "flote" sobre el scrim con foto de fondo sin perder
+             contraste. Usuario en degradé esmeralda (dirección del envío),
+             agente en slate con borde — se distinguen de un vistazo. */
+          className={`rounded-2xl px-4 py-2.5 shadow-md ${
             isUser
-              ? 'bg-emerald-700/60 text-white rounded-tr-sm'
-              : 'bg-slate-800/80 text-slate-100 rounded-tl-sm cursor-pointer'
+              ? 'bg-gradient-to-br from-emerald-600/70 to-emerald-800/65 text-white rounded-tr-sm border border-emerald-500/25 shadow-emerald-950/25'
+              : 'bg-slate-800/90 text-slate-100 rounded-tl-sm cursor-pointer border border-slate-700/60 shadow-slate-950/30'
           }`}
           onDoubleClick={handleBubbleDoubleClick}
           title={!isUser && !isStreaming ? 'Doble click reproduce o silencia esta respuesta' : undefined}
