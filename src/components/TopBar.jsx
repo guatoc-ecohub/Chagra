@@ -12,6 +12,7 @@ import { getOperatorPhoto } from '../services/operatorPhotoService';
 import { findMunicipio } from '../utils/colombiaLocations';
 import { useTheme } from '../hooks/useTheme';
 import { iconForTheme } from './dashboard/themeIcon';
+import { MSG } from '../config/messages';
 
 /**
  * TopBar, header persistente con identidad del operador (DR-030 QW2).
@@ -167,9 +168,9 @@ export default function TopBar({ onNavigate, onLogout }) {
         <button
           type="button"
           onClick={() => onNavigate('dashboard')}
-          aria-label={isBreathing ? 'Chagra está procesando' : 'Volver al inicio'}
-          title={isBreathing ? 'Chagra está pensando…' : 'Volver al inicio'}
-          className="font-bold flex items-center gap-2 shrink-0 rounded-lg px-2 py-1 hover:bg-slate-800/60 active:bg-slate-700 transition-colors min-h-[44px]"
+          aria-label={isBreathing ? MSG.topbar.procesando : MSG.topbar.volverInicio}
+          title={isBreathing ? MSG.topbar.pensando : MSG.topbar.volverInicio}
+          className="font-bold flex items-center gap-2 min-w-0 flex-1 rounded-lg px-2 py-1 hover:bg-slate-800/60 active:bg-slate-700 transition-colors min-h-[44px]"
         >
           {/* Ícono del tema (A de anarquía o similar según tema) */}
           <span
@@ -180,13 +181,13 @@ export default function TopBar({ onNavigate, onLogout }) {
             {iconForTheme(theme)}
           </span>
           {/* Wordmark completo: visible también en móvil para no dejar el logo vacío. */}
-          <div className="flex flex-col items-start min-w-0 text-left ml-1">
+          <div className="flex flex-col items-start min-w-0 flex-1 text-left ml-1">
             <span className="text-base font-bold leading-tight text-white">Chagra</span>
             <span className="text-[10px] leading-tight text-emerald-300/90 font-semibold">
               su mano en el campo
             </span>
             {locationLabel && (
-              <span className="mt-1 inline-block whitespace-normal break-words rounded-lg border border-emerald-400/20 bg-emerald-950/25 px-2 py-1 text-[10px] leading-snug text-emerald-200/95 font-medium max-w-[50vw]">
+              <span className="mt-1 block min-w-0 w-full max-w-[50vw] shrink truncate rounded-lg border border-emerald-400/20 bg-emerald-950/25 px-2 py-1 text-[10px] leading-snug text-emerald-200/95 font-medium">
                 {locationLabel}
               </span>
             )}
