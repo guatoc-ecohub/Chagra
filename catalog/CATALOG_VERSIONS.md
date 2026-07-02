@@ -73,6 +73,12 @@ schema estricto son el patrón legacy de `sources[]` (`_url_pendiente` /
 | `chagra-catalog-oss-subset-v3.1.json` | 50 | Snapshot histórico del primer subset OSS (editorial-v2, 2026-05-20). Deprecado tras revert PR #1012 (cortaba aguacate/tomate/lechuga/acelga). | Ruta de rollback / trazabilidad. |
 | `chagra-catalog-seed-v3.0.json` | 0 | **Roto** (`species[]` vacío). Solo referencia de estructura para `migrate-v30-to-v31.mjs`. | Lo usa el migrador como esqueleto histórico. |
 
+## Snapshot del grafo `chagra_kg` (entidades que NO existen en ningún catálogo)
+
+| Archivo | Qué es | Quién lo consume |
+|---|---|---|
+| `chagra-kg-graph-snapshot.json` | Snapshot versionado (2026-07-02, vía `podman exec ... psql` read-only sobre `chagra_kg`) de nodos `Pest` (391), `BeneficialOrganism` (136), `Biopreparado` (83) con TODAS sus propiedades, + `Species` mínimo (id/nombre_comun/nombre_cientifico/familia_botanica/category, 721) + aristas `AFFECTS` y `CONTROLS`. Estas entidades (sobre todo `BeneficialOrganism`) **no existen en ningún `catalog/*.json`** — solo viven en el grafo. | `scripts/audit-contaminacion.mjs` (clases "cruce_cultivo" vía `cultivos_afectados` + aristas reales, "sobre_asociacion" vía conteo de controladores, "placeholder" vía etiquetas genéricas de `BeneficialOrganism`). Se regenera manualmente (no hay script automatizado de refresco todavía — TODO) siguiendo el patrón de `scripts/audit-milpa-citations.mjs` / `CHAGRA_AGE_PSQL_COMMAND`. |
+
 ## Nota sobre el gate de CI
 
 `catalog-validate.yml` y `lefthook` corren `validate-catalog.mjs --lenient-schema`
