@@ -3,6 +3,27 @@ import { ChevronLeft, Search, Sprout, Leaf, X, BookOpen } from 'lucide-react';
 import { searchSpecies, buildSpeciesFicha } from '../../services/directorioEspecies.js';
 import SpeciesFicha from './SpeciesFicha.jsx';
 import { fvhSkinClass } from '../../config/fvhSkin.js';
+import { getSpeciesVisual, SPECIES_TONE_CLASSES } from '../../utils/speciesVisual.js';
+
+/**
+ * Badge de especie: emoji reconocible por especie sobre fondo tonal.
+ * Reemplaza el Leaf genérico que hacía idénticas todas las filas del
+ * catálogo — a 16–24px el emoji distingue papa/café/guayacán de un vistazo.
+ */
+function SpeciesBadge({ sp, size = 'md' }) {
+  const { emoji, tone } = getSpeciesVisual(sp);
+  const toneCls = SPECIES_TONE_CLASSES[tone] || SPECIES_TONE_CLASSES.emerald;
+  const sizeCls = size === 'sm' ? 'w-8 h-8 text-base' : 'w-10 h-10 text-lg';
+  return (
+    <span
+      className={`${sizeCls} rounded-xl border grid place-items-center shrink-0 leading-none ${toneCls}`}
+      aria-hidden="true"
+      data-testid="species-badge"
+    >
+      {emoji}
+    </span>
+  );
+}
 
 /**
  * DirectorioEspeciesScreen — explorador visual del catálogo de especies.
@@ -98,7 +119,7 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
             <ChevronLeft size={20} />
           </button>
           <div className="flex items-center gap-2 min-w-0">
-            <Leaf size={20} className="text-emerald-400 shrink-0" aria-hidden="true" />
+            <SpeciesBadge sp={selected} size="sm" />
             <div className="min-w-0">
               <h1 className="jp-tinta text-base font-bold leading-tight text-white truncate">{selected.comun}</h1>
               <p className="jp-tinta-suave text-xs text-slate-400 leading-tight italic truncate">{selected.cientifico}</p>
@@ -197,7 +218,7 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
                     onClick={() => selectSpecies(r.id)}
                     className="jp-dir-card w-full text-left rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-600/60 active:bg-slate-800/70 p-3 transition-colors flex items-center gap-3"
                   >
-                    <Leaf size={18} className="text-emerald-400 shrink-0" aria-hidden="true" />
+                    <SpeciesBadge sp={r} />
                     <span className="min-w-0">
                       <span className="jp-tinta block text-sm font-bold text-emerald-100 leading-tight truncate">{r.comun || r.id}</span>
                       {r.cientifico && (

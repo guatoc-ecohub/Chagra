@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Clock, Eye, HelpCircle, AlertTriangle, CheckCircle, Sprout, Timer } from 'lucide-react';
+import EtapaCicloIcon from './icons/EtapaCicloIcon.jsx';
 import { calculateWindows, formatWindow, getCurrentStage } from '../services/phenologyCalculator';
 
 // Colores theme-aware: la rampa slate/emerald/amber y los acentos custom
@@ -13,17 +14,21 @@ const confidenceColor = (c) => {
   return 'text-slate-500';
 };
 
+// Rampa por etapa: bg/border (se conserva la rampa theme-aware) + color del
+// GLIFO de etapa. El icono va claro sobre el disco lleno para ser legible a
+// 11px dentro del badge de 20px (antes era un punto de 12px sin glifo: sin
+// leer el label no se sabía qué etapa era).
 const stageColor = (code) => {
   const map = {
-    sowing: 'bg-emerald-800 border-emerald-600',
-    emergence: 'bg-emerald-700 border-emerald-500',
-    vegetative: 'bg-emerald-600 border-emerald-400',
-    flowering: 'bg-orchid border-orchid',
-    fruiting: 'bg-amber-700 border-amber-500',
-    harvest_window: 'bg-amber-600 border-amber-400',
-    closed: 'bg-slate-700 border-slate-500',
+    sowing: 'bg-emerald-800 border-emerald-600 text-emerald-100',
+    emergence: 'bg-emerald-700 border-emerald-500 text-emerald-100',
+    vegetative: 'bg-emerald-600 border-emerald-400 text-emerald-50',
+    flowering: 'bg-orchid border-orchid text-white',
+    fruiting: 'bg-amber-700 border-amber-500 text-amber-100',
+    harvest_window: 'bg-amber-600 border-amber-400 text-amber-50',
+    closed: 'bg-slate-700 border-slate-500 text-slate-200',
   };
-  return map[code] || 'bg-slate-700 border-slate-500';
+  return map[code] || 'bg-slate-700 border-slate-500 text-slate-200';
 };
 
 /**
@@ -113,10 +118,15 @@ export default function PhenologyTimeline({
 
           return (
             <div key={win.code} className={`flex gap-2 ${compact ? 'items-center' : ''}`}>
-              {/* Indicador de etapa */}
+              {/* Indicador de etapa: badge con GLIFO de la etapa (set
+                  compartido EtapaCicloIcon). Conserva los estados visuales:
+                  observado (ring emerald), estimado (ring morpho + borde
+                  punteado) y pasado (atenuado). */}
               <div className="flex flex-col items-center gap-0.5 shrink-0">
-                <div className={`w-3 h-3 rounded-full border ${stageColor(win.code)} ${isObservedCurrent ? 'ring-2 ring-emerald-400/50' : ''} ${isEstimatedCurrent ? 'ring-2 ring-morpho/40 border-dashed' : ''} ${isPast ? 'opacity-50' : ''}`} />
-                {i < windows.length - 1 && <div className="w-px h-4 bg-slate-700" />}
+                <div className={`w-5 h-5 rounded-full border grid place-items-center ${stageColor(win.code)} ${isObservedCurrent ? 'ring-2 ring-emerald-400/50' : ''} ${isEstimatedCurrent ? 'ring-2 ring-morpho/40 border-dashed' : ''} ${isPast ? 'opacity-50' : ''}`}>
+                  <EtapaCicloIcon code={win.code} nombre={win.label} size={11} strokeWidth={2.25} />
+                </div>
+                {i < windows.length - 1 && <div className="w-px h-3 bg-slate-700" />}
               </div>
 
               {/* Contenido */}

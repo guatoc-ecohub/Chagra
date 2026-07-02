@@ -3,6 +3,7 @@ import { Search, ChevronDown, X, AlertTriangle, Check } from 'lucide-react';
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { fuzzyFilter } from '../utils/fuzzySearch';
 import { getAllSpecies } from '../db/catalogDB';
+import { getSpeciesVisual } from '../utils/speciesVisual';
 
 /**
  * SpeciesCombobox — selector de especie con búsqueda/autocompletado, respaldado
@@ -233,10 +234,17 @@ export const SpeciesCombobox = ({
                 key={sp.id}
                 type="button"
                 onClick={() => handleSelect(sp)}
-                className="w-full text-left px-4 py-3 hover:bg-slate-800 border-b border-slate-800/50 last:border-0 transition-colors"
+                className="w-full text-left px-4 py-3 hover:bg-slate-800 border-b border-slate-800/50 last:border-0 transition-colors flex items-center gap-2.5"
               >
-                <span className="text-sm text-white font-medium block truncate">{sp.displayName}</span>
-                <span className="text-[10px] text-slate-500">{sp.groupLabel}</span>
+                {/* Icono por especie (utils/speciesVisual): distingue las
+                    filas del catálogo de un vistazo — antes eran solo texto. */}
+                <span className="text-lg leading-none shrink-0" aria-hidden="true">
+                  {getSpeciesVisual({ comun: sp.nombre_comun, cientifico: sp.nombre_cientifico, id: sp.id, categoria: sp.groupId }).emoji}
+                </span>
+                <span className="min-w-0">
+                  <span className="text-sm text-white font-medium block truncate">{sp.displayName}</span>
+                  <span className="text-[10px] text-slate-500">{sp.groupLabel}</span>
+                </span>
               </button>
             ))
           )}
