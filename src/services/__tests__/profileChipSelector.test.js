@@ -114,6 +114,7 @@ describe('profileChipSelector — selectChipIntentsForRole (núcleo puro)', () =
       CHIP_INTENTS.plaga,
       CHIP_INTENTS.biopreparado,
       CHIP_INTENTS.clima,
+      CHIP_INTENTS.precio,
     ]);
     // NO debe mostrar páramo a un campesino que no pidió restauración.
     expect(intents).not.toContain(CHIP_INTENTS.paramo);
@@ -132,6 +133,7 @@ describe('profileChipSelector — selectChipIntentsForRole (núcleo puro)', () =
   it('guía glaciar: clima + páramo + restauración, SIN biopreparado/calendario', () => {
     const intents = selectChipIntentsForRole({ role: PROFILE_ROLES.guia_glaciar });
     expect(intents).toContain(CHIP_INTENTS.clima);
+    expect(intents).toContain(CHIP_INTENTS.precio);
     expect(intents).toContain(CHIP_INTENTS.paramo);
     expect(intents).not.toContain(CHIP_INTENTS.biopreparado);
     expect(intents).not.toContain(CHIP_INTENTS.calendario);
@@ -191,6 +193,7 @@ describe('profileChipSelector — selectChipIntents (perfil completo)', () => {
     });
     expect(intents).toContain(CHIP_INTENTS.siembro);
     expect(intents).toContain(CHIP_INTENTS.silvopastoreo);
+    expect(intents).toContain(CHIP_INTENTS.precio);
     expect(intents).not.toContain(CHIP_INTENTS.paramo);
     // NUNCA chips irrelevantes para este campesino: deep no aparece.
     expect(intents).not.toContain(CHIP_INTENTS.deep);
@@ -210,6 +213,7 @@ describe('profileChipSelector — selectChipIntents (perfil completo)', () => {
   it('guía glaciar por whitelist → clima/páramo, sin biopreparado', () => {
     const intents = selectChipIntents({ vocacion: 'campesino' }, { esGuiaGlaciar: true });
     expect(intents).toContain(CHIP_INTENTS.clima);
+    expect(intents).toContain(CHIP_INTENTS.precio);
     expect(intents).toContain(CHIP_INTENTS.paramo);
     expect(intents).not.toContain(CHIP_INTENTS.biopreparado);
   });
@@ -322,6 +326,7 @@ describe('profileChipSelector — chips POR TIPO DE USUARIO', () => {
     expect(intents).toContain(CHIP_INTENTS.plaga);
     expect(intents).toContain(CHIP_INTENTS.biopreparado);
     expect(intents).toContain(CHIP_INTENTS.clima);
+    expect(intents).toContain(CHIP_INTENTS.precio);
     expect(intents).not.toContain(CHIP_INTENTS.silvopastoreo);
     expect(intents).not.toContain(CHIP_INTENTS.paramo);
   });
@@ -329,6 +334,7 @@ describe('profileChipSelector — chips POR TIPO DE USUARIO', () => {
   it('guia_glaciar: solo clima/paramo/restauracion, sin cultivo', () => {
     const intents = selectChipIntents({}, { esGuiaGlaciar: true });
     expect(intents).toContain(CHIP_INTENTS.clima);
+    expect(intents).toContain(CHIP_INTENTS.precio);
     expect(intents).toContain(CHIP_INTENTS.paramo);
     expect(intents).toContain(CHIP_INTENTS.restauracion);
     expect(intents).not.toContain(CHIP_INTENTS.siembro);
@@ -341,11 +347,12 @@ describe('profileChipSelector — chips POR TIPO DE USUARIO', () => {
     expect(intents).toContain(CHIP_INTENTS.biopreparado);
     expect(intents).toContain(CHIP_INTENTS.siembro);
     expect(intents).toContain(CHIP_INTENTS.clima);
+    expect(intents).toContain(CHIP_INTENTS.precio);
     expect(intents).toContain(CHIP_INTENTS.paramo);
     expect(intents).toContain(CHIP_INTENTS.silvopastoreo);
     expect(intents).toContain(CHIP_INTENTS.restauracion);
     // Los stubs NO aparecen
-    expect(intents).not.toContain(CHIP_INTENTS.precio);
+    expect(intents).not.toContain(CHIP_INTENTS.deep);
   });
 
   it('porcicultor (campesino con cerdos): ve cultivo + silvopastoreo', () => {
@@ -379,7 +386,7 @@ describe('profileChipSelector — chips POR TIPO DE USUARIO', () => {
 });
 
 describe('profileChipSelector — invariantes', () => {
-  it('NUNCA devuelve chips stubs (precio/deep) para ningun perfil no-operador', () => {
+  it('NUNCA devuelve chips stubs para ningun perfil no-operador', () => {
     const perfiles = [
       { rol: 'campesino' },
       { rol: 'restaurador' },
@@ -389,7 +396,6 @@ describe('profileChipSelector — invariantes', () => {
     ];
     for (const p of perfiles) {
       const intents = selectChipIntents(p);
-      expect(intents).not.toContain(CHIP_INTENTS.precio);
       expect(intents).not.toContain(CHIP_INTENTS.deep);
     }
   });

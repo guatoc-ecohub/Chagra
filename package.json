@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "test": "vitest run && node scripts/validate-catalog-consistency.mjs --report-only",
-    "prebuild": "node scripts/build-catalog-sqlite.mjs && node scripts/generate-cycle-content-manifest.mjs",
+    "prebuild": "node scripts/build-catalog-sqlite.mjs && node scripts/generate-cycle-content-manifest.mjs && node scripts/gen-chagra-stats.mjs",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -17,6 +17,7 @@
     "coverage": "vitest run --coverage",
     "audit:bundle": "node scripts/audit-bundle.mjs",
     "grafo:snapshot": "node scripts/snapshot-grafo-crecimiento.mjs",
+    "gen:stats": "node scripts/gen-chagra-stats.mjs",
     "validate:ngsi": "node scripts/export-ngsi-ld.mjs",
     "hooks:install": "lefthook install",
     "tsc:check": "tsc --noEmit -p jsconfig.json",

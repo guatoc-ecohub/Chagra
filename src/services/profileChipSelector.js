@@ -55,6 +55,11 @@ const CULTIVO_CHIPS = Object.freeze([
   CHIP_INTENTS.clima,
 ]);
 
+/** Chips de consulta general. */
+const GENERAL_CHIPS = Object.freeze([
+  CHIP_INTENTS.precio,
+]);
+
 /** Chips de restauración ecológica. @type {readonly string[]} */
 const RESTAURACION_CHIPS = Object.freeze([
   CHIP_INTENTS.restauracion,
@@ -70,11 +75,15 @@ const RESTAURACION_CHIPS = Object.freeze([
  * @type {Record<string, readonly string[]>}
  */
 const ROLE_BASE_CHIPS = Object.freeze({
-  [PROFILE_ROLES.campesino]: Object.freeze([...CULTIVO_CHIPS]),
+  [PROFILE_ROLES.campesino]: Object.freeze([
+    ...CULTIVO_CHIPS,
+    ...GENERAL_CHIPS,
+  ]),
   [PROFILE_ROLES.restaurador]: Object.freeze([
     ...RESTAURACION_CHIPS,
     CHIP_INTENTS.siembro,
     CHIP_INTENTS.clima,
+    ...GENERAL_CHIPS,
   ]),
   [PROFILE_ROLES.guia_glaciar]: Object.freeze([
     // Un guía de glaciar trabaja el clima de alta montaña y la restauración de
@@ -82,12 +91,14 @@ const ROLE_BASE_CHIPS = Object.freeze({
     // "Reporte de Punto Glaciar" es un tile del Home con su propio gate, NO un
     // chip — no existe chip 'glaciar' en el manifiesto, así que no lo inventamos.)
     CHIP_INTENTS.clima,
+    ...GENERAL_CHIPS,
     CHIP_INTENTS.paramo,
     CHIP_INTENTS.restauracion,
   ]),
   [PROFILE_ROLES.ganadero]: Object.freeze([
     CHIP_INTENTS.silvopastoreo,
     CHIP_INTENTS.clima,
+    ...GENERAL_CHIPS,
     CHIP_INTENTS.plaga,
     CHIP_INTENTS.siembro,
   ]),
@@ -95,11 +106,13 @@ const ROLE_BASE_CHIPS = Object.freeze({
   [PROFILE_ROLES.socio]: Object.freeze([
     CHIP_INTENTS.siembro,
     CHIP_INTENTS.clima,
+    ...GENERAL_CHIPS,
     CHIP_INTENTS.plaga,
   ]),
   // Técnico/agrónomo: set amplio (sabe usar todo); orden = cultivo luego ecológico.
   [PROFILE_ROLES.tecnico]: Object.freeze([
     ...CULTIVO_CHIPS,
+    ...GENERAL_CHIPS,
     ...RESTAURACION_CHIPS,
   ]),
 });
@@ -115,8 +128,8 @@ const STUB_INTENTS = new Set(
 /**
  * Catálogo COMPLETO de chips VIVOS (todos los `CHIP_DEFS` con `kind !== 'stub'`),
  * en el orden del manifiesto. Es lo que ve el OPERADOR (bypass del gating por
- * perfil): la caja de herramientas entera, sin estrechar. Los stubs (precio/deep,
- * sin backend) quedan fuera, igual que para cualquier otro perfil.
+ * perfil): la caja de herramientas entera, sin estrechar. Los stubs quedan
+ * fuera, igual que para cualquier otro perfil.
  * @type {readonly string[]}
  */
 const ALL_LIVE_CHIP_INTENTS = Object.freeze(
@@ -217,8 +230,7 @@ export function deriveRole(profile, opts = {}) {
  *   - Si el objetivo incluye restauración/biodiversidad, suma los chips de
  *     restauración al final (sin desordenar el núcleo del rol).
  *   - Filtra a intents válidos del manifiesto.
- *   - Mueve los stubs (precio/deep) al final: existen pero sin backend, no deben
- *     desplazar a las herramientas vivas más arriba.
+ *   - Mueve los stubs al final: hoy solo `deep` cae en ese grupo.
  *   - Dedupe preservando el primer orden visto.
  *
  * @param {Object} args
@@ -254,8 +266,8 @@ export function selectChipIntentsForRole({
     if (STUB_INTENTS.has(intent)) stubs.push(intent);
     else live.push(intent);
   }
-  // Stubs (precio/deep) al final: hoy ningún rol base los incluye, pero si en el
-  // futuro un rol los agrega, quedan después de las herramientas vivas.
+  // Stubs al final: hoy ningún rol base los incluye, pero si en el futuro un
+  // rol los agrega, quedan después de las herramientas vivas.
   return [...live, ...stubs];
 }
 
@@ -278,7 +290,7 @@ export function selectChipIntentsForRole({
  */
 export function selectChipIntents(profile, opts = {}) {
   // BYPASS OPERADOR (primer check): la caja de herramientas completa, sin
-  // estrechar por rol/visibilidad. Solo se omiten los stubs (sin backend),
+  // estrechar por rol/visibilidad. Solo se omiten los stubs (hoy solo deep),
   // igual que para todos. Va antes de deriveRole para que la whitelist Cordada
   // del operador no recorte el set por el rol guia_glaciar.
   if (opts.esOperador) return [...ALL_LIVE_CHIP_INTENTS];

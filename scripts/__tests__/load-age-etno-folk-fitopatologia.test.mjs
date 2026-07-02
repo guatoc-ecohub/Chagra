@@ -22,21 +22,21 @@ describe('load-age-etno-folk-fitopatologia', () => {
   });
 
   it('usa podman exec por defecto cuando no hay override', () => {
-    const prev = process.env.CHAGRA_AGE_PSQL_COMMAND;
-    delete process.env.CHAGRA_AGE_PSQL_COMMAND;
-    const inv = buildPsqlInvocation();
-    if (prev !== undefined) process.env.CHAGRA_AGE_PSQL_COMMAND = prev;
+    const inv = buildPsqlInvocation({
+      CHAGRA_DB_CONTAINER: 'db-container',
+      CHAGRA_DB_USER: 'db-user',
+      CHAGRA_DB_NAME: 'db-name',
+    });
     expect(inv.kind).toBe('podman');
-    expect(inv.args).toContain('postgres-farm');
-    expect(inv.args).toContain('psql');
+    expect(inv.args).toContain('db-container');
+    expect(inv.args).toContain('db-user');
+    expect(inv.args).toContain('db-name');
   });
 
   it('respeta override shell explícito', () => {
-    const prev = process.env.CHAGRA_AGE_PSQL_COMMAND;
-    process.env.CHAGRA_AGE_PSQL_COMMAND = 'psql -h 127.0.0.1 -p 5432 -U farmos -d chagra_kg';
-    const inv = buildPsqlInvocation();
-    if (prev !== undefined) process.env.CHAGRA_AGE_PSQL_COMMAND = prev;
-    else delete process.env.CHAGRA_AGE_PSQL_COMMAND;
+    const inv = buildPsqlInvocation({
+      CHAGRA_AGE_PSQL_COMMAND: 'psql -h 127.0.0.1 -p 5432 -U farmos -d chagra_kg',
+    });
     expect(inv.kind).toBe('shell');
     expect(inv.command).toContain('psql -h 127.0.0.1');
   });
@@ -58,41 +58,70 @@ describe('buildRunReport', () => {
     missingLabels: [],
     missingPests: [],
   };
+  const mockEnv = {
+    CHAGRA_DB_CONTAINER: 'db-container',
+    CHAGRA_DB_USER: 'db-user',
+    CHAGRA_DB_NAME: 'db-name',
+  };
 
   it('reporta modo preflight-only', () => {
-    const report = buildRunReport(mockSummary, { preflightOnly: true, dryRun: false, verify: true, sql: '/tmp/x.sql', force: false });
+    const report = buildRunReport(
+      mockSummary,
+      { preflightOnly: true, dryRun: false, verify: true, sql: '/tmp/x.sql', force: false },
+      mockEnv,
+    );
     expect(report.mode).toBe('preflight-only');
     expect(report.preflight.ready).toBe(true);
     expect(report.verify).toBe('on');
   });
 
   it('reporta modo dry-run', () => {
-    const report = buildRunReport(mockSummary, { preflightOnly: false, dryRun: true, verify: true, sql: '/tmp/x.sql', force: false });
+    const report = buildRunReport(
+      mockSummary,
+      { preflightOnly: false, dryRun: true, verify: true, sql: '/tmp/x.sql', force: false },
+      mockEnv,
+    );
     expect(report.mode).toBe('dry-run');
     expect(report.verify).toBe('on');
   });
 
   it('reporta modo real-run', () => {
-    const report = buildRunReport(mockSummary, { preflightOnly: false, dryRun: false, verify: true, sql: '/tmp/x.sql', force: false });
+    const report = buildRunReport(
+      mockSummary,
+      { preflightOnly: false, dryRun: false, verify: true, sql: '/tmp/x.sql', force: false },
+      mockEnv,
+    );
     expect(report.mode).toBe('real-run');
     expect(report.preflight.mappingCount).toBe(10);
   });
 
   it('reporta missing labels cuando hay', () => {
     const badSummary = { ...mockSummary, ready: false, missingLabels: ['gota'] };
-    const report = buildRunReport(badSummary, { preflightOnly: true, dryRun: false, verify: true, sql: '/tmp/x.sql', force: false });
+    const report = buildRunReport(
+      badSummary,
+      { preflightOnly: true, dryRun: false, verify: true, sql: '/tmp/x.sql', force: false },
+      mockEnv,
+    );
     expect(report.preflight.ready).toBe(false);
     expect(report.preflight.missingLabels).toEqual(['gota']);
   });
 
   it('incluye psql command en el reporte', () => {
-    const report = buildRunReport(mockSummary, { preflightOnly: true, dryRun: false, verify: true, sql: '/tmp/x.sql', force: false });
+    const report = buildRunReport(
+      mockSummary,
+      { preflightOnly: true, dryRun: false, verify: true, sql: '/tmp/x.sql', force: false },
+      mockEnv,
+    );
     expect(report.psqlCommand).toBeTruthy();
     expect(typeof report.psqlCommand).toBe('string');
   });
 
   it('verificationSql es null cuando verify=off', () => {
-    const report = buildRunReport(mockSummary, { preflightOnly: true, dryRun: false, verify: false, sql: '/tmp/x.sql', force: false });
+    const report = buildRunReport(
+      mockSummary,
+      { preflightOnly: true, dryRun: false, verify: false, sql: '/tmp/x.sql', force: false },
+      mockEnv,
+    );
     expect(report.verificationSql).toBeNull();
     expect(report.verify).toBe('off');
   });

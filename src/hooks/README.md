@@ -11,6 +11,7 @@
 | `useAssetPerformance.js` | Métricas de rendimiento de assets (cosechas, insumos) |
 | `useBackgroundImage.js` | Imagen de fondo dinámica por clima/hora |
 | `useCinemaMode.js` | Modo cine (pantalla completa, sin distracciones) |
+| `useChagraStats.js` | Fetch de `/chagra-stats.json` (fuente única de verdad: especies/MIP/biopreparados/grafo) |
 | `useClimaAtmosphere.js` | Datos atmosféricos en tiempo real |
 | `useConsumptionMetrics.js` | Métricas de consumo de insumos |
 | `useFarmProcessConfirm.js` | Confirmación de procesos de finca |

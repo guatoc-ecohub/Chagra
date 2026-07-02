@@ -6,6 +6,7 @@ import { parseAiInference, parseAiReview } from '../utils/aiInferenceParser';
 import { savePayload } from '../services/payloadService';
 import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 import { usePhotoUrl } from '../hooks/usePhotoUrl';
+import BeforeAfterPhoto from './BeforeAfterPhoto';
 
 /**
  * AssetTimeline, Línea de tiempo agroecológica de un activo (plant).
@@ -138,6 +139,33 @@ const PhotoAttachmentThumb = ({ photoId, timestamp, pending }) => {
   );
 };
 
+// PhotoEvolutionSection — comparador antes/después (FEAT-C #294, descubribilidad
+// 2026-06-30): reusa las dos fotos MÁS ANTIGUA y MÁS RECIENTE adjuntadas a esta
+// misma planta (marcadores [PHOTO_ATTACHMENT] del propio timeline) para que el
+// productor vea la evolución del cultivo con el slider de BeforeAfterPhoto, sin
+// tener que ir foto por foto. Solo se muestra si hay al menos 2 fotos distintas
+// Y ambas URLs resuelven (usePhotoUrl); si falta alguna, no se renderiza nada
+// (degrada limpio, no deja un hueco roto).
+const PhotoEvolutionSection = ({ oldest, newest }) => {
+  const beforePhoto = usePhotoUrl({ photoId: oldest.photoId });
+  const afterPhoto = usePhotoUrl({ photoId: newest.photoId });
+
+  if (beforePhoto.loading || afterPhoto.loading) return null;
+  if (!beforePhoto.url || !afterPhoto.url) return null;
+
+  return (
+    <div className="mb-4 shrink-0" data-testid="asset-timeline-before-after">
+      <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <Camera size={12} /> Evolución de la planta
+      </h4>
+      <BeforeAfterPhoto
+        before={{ url: beforePhoto.url, taken_at: oldest.timestamp ? oldest.timestamp * 1000 : null }}
+        after={{ url: afterPhoto.url, taken_at: newest.timestamp ? newest.timestamp * 1000 : null }}
+      />
+    </div>
+  );
+};
+
 const extractQuantity = (log) => {
   const qty = log.relationships?.quantity?.data?.[0]?.attributes;
   if (!qty) return '';
@@ -240,6 +268,22 @@ export default function AssetTimeline({ assetId }) {
     const totalGroups = new Set(logs.map(l => formatMonthKey(l.timestamp))).size;
     return totalGroups > visibleMonths;
   }, [logs, visibleMonths]);
+
+  // Fotos adjuntas ([PHOTO_ATTACHMENT]) de ESTE activo, ordenadas cronológicamente.
+  // Se derivan de TODOS los logs (no solo los meses visibles/paginados) para que
+  // la comparación antes/después no dependa de cuántos meses haya cargado el
+  // operador. oldestPhoto/newestPhoto alimentan PhotoEvolutionSection.
+  const photoAttachments = useMemo(() => {
+    const found = [];
+    for (const log of logs) {
+      const attachment = parsePhotoAttachment(extractNotes(log));
+      if (attachment) found.push({ photoId: attachment.photoId, timestamp: log.timestamp });
+    }
+    return found.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+  }, [logs]);
+  const oldestPhoto = photoAttachments[0];
+  const newestPhoto = photoAttachments[photoAttachments.length - 1];
+  const showPhotoEvolution = photoAttachments.length >= 2 && oldestPhoto !== newestPhoto;
 
   if (!assetId) {
     return (
@@ -420,6 +464,10 @@ export default function AssetTimeline({ assetId }) {
           </span>
         )}
       </div>
+
+      {showPhotoEvolution && (
+        <PhotoEvolutionSection oldest={oldestPhoto} newest={newestPhoto} />
+      )}
 
       {logs.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center text-slate-500 min-h-[300px]">

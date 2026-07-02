@@ -1825,7 +1825,7 @@ function _presentaComoViable(textNorm, nombreNorm) {
  * viabilidad. El re-bench (2026-05-31) mostró que el detector anterior
  * (`_presentaComoViable`) se apoyaba en un léxico de viabilidad ("es viable",
  * "prospera", "recomendable") y se le escapaban respuestas que igual mandaban a
- * sembrar con otro fraseo (curuba CPX-010, chugua CPX-001). Acá basta con que
+ * sembrar con otro fraseo (curuba CPX-010, chugua CPX-001). Aquí basta con que
  * el texto INVITE a sembrar/cultivar la especie y NO advierta inviabilidad.
  *
  * Esto se usa SOLO cuando el grounding (campo viabilidad o banda de altitud) ya

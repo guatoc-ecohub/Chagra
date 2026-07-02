@@ -36,26 +36,39 @@
  * `--dr-dir` / env `CHAGRA_AGE_GAPS_DR_DIR`, igual que `CHAGRA_AGE_ETNO_SQL`
  * en el loader hermano.
  *
- * Nodo genérico: las entidades de estas DRs (especies, plagas, polinizadores,
- * conceptos abstractos como "fuego" o "riesgo_incendio", prácticas de manejo)
- * son demasiado heterogéneas para inferir su label canónico (Species/Pest/...)
- * sin consultar el grafo vivo — y esta etapa es offline por diseño. Por eso
- * se etiquetan bajo un label nuevo y genérico `GraphGapNode` (mismo espíritu
- * que `FolkSymptom` en el PR #1907: un label explícito para conceptos que
- * todavía no calzan en la ontología establecida). LIMITACIÓN CONOCIDA: si un
- * id ya existe como nodo canónico (p.ej. una Species ya catalogada), esto
- * crea un nodo `GraphGapNode` paralelo con el mismo `id` en vez de fusionarse
- * con el nodo existente — a resolver en una pasada de reconciliación con
- * lectura contra el grafo vivo, antes de cualquier aplicación real.
+ * Nodo genérico + reconciliación de labels: las entidades de estas DRs
+ * (especies, plagas, polinizadores, conceptos abstractos como "fuego" o
+ * "riesgo_incendio", prácticas de manejo) son demasiado heterogéneas para
+ * inferir su label canónico (Species/Pest/...) sin consultar el grafo vivo
+ * — y esta etapa sigue siendo offline por diseño (este script NUNCA se
+ * conecta a postgres/AGE). Para evitar crear nodos `GraphGapNode` paralelos
+ * que dupliquen un nodo canónico ya existente (p.ej. una Species ya
+ * catalogada), el script acepta opcionalmente un snapshot de solo-lectura
+ * del grafo vivo vía `--live-labels` / env `CHAGRA_AGE_GAPS_LIVE_LABELS`
+ * (JSON `{ labels: { "<id>": ["Species", ...] } }`, generado aparte por el
+ * operador con una query `MATCH (n) RETURN n.id, labels(n)` — nunca por
+ * este script). Con ese snapshot:
+ *   - un id que YA existe en el grafo vivo se reconcilia: la arista hace
+ *     `MATCH` contra el nodo real con su label real (Species/Pest/...) en
+ *     vez de `MERGE` un `GraphGapNode` duplicado. No se toca ni sobreescribe
+ *     ninguna propiedad del nodo existente.
+ *   - un id genuinamente nuevo recibe un label estimado a partir de la
+ *     relación/contenido (`Soil`, `Practice`; ver `estimateNewNodeLabel`),
+ *     con `GraphGapNode` como fallback cuando no hay señal suficiente —
+ *     mismo espíritu que `FolkSymptom` en el PR #1907: un label explícito
+ *     para conceptos que todavía no calzan en la ontología establecida.
+ *   - sin `--live-labels`, el comportamiento es idéntico al de antes de la
+ *     reconciliación (todo trata como nuevo, con el mismo fallback).
  *
  * Uso:
  *   node scripts/load-age-graph-gaps.mjs \
- *     --dr-dir /ruta/privada/deepresearch/DR-FANOUT \
+ *     --dr-dir /ruta/privada/research/edge-tables \
  *     --glob 'aristas-grafo-*.md' \
  *     --file porcicultura-y-avicultura-....md \
  *     --file micorrizas-y-salud-de-suelo-....md \
  *     --file recuperacion-de-suelos-....md \
  *     --file captacion-de-agua-....md \
+ *     --live-labels /ruta/privada/ops/age-graph-gaps/live-labels.json \
  *     --out-cypher /ruta/privada/ops/age-graph-gaps/gaps.cypher.sql \
  *     --out-report /ruta/privada/ops/age-graph-gaps/gaps.report.json
  *
@@ -74,6 +87,12 @@ const _here = dirname(fileURLToPath(import.meta.url));
 
 export const NODE_LABEL = 'GraphGapNode';
 
+// Prefijo genérico para la propiedad `dr` que queda grabada en cada nodo/
+// arista generada (trazabilidad hacia el DR de origen). Deliberadamente
+// genérico — el nombre real del directorio/paquete de DRs vive fuera de
+// este repo público (Chagra-strategy, privado); ver `--dr-dir` más arriba.
+export const RESEARCH_SOURCE_PREFIX = 'research/edge-tables';
+
 // Snapshot de tipos de arista ya establecidos en chagra_kg — fuente:
 // Chagra-strategy/ops/INFRA_FACTS.md (auditoría en vivo 2026-06-14) +
 // FOLK_NAME_OF (introducido en PR #1907). Solo enriquece el reporte
@@ -88,6 +107,149 @@ export const KNOWN_RELATION_TYPES = new Set([
 ]);
 
 const CO_SCOPE_RE = /colombia|andin|\bandes\b|p[aá]ramo/i;
+
+// =============================================================================
+// Reconciliación de labels contra un snapshot de solo-lectura del grafo vivo
+// =============================================================================
+//
+// Este bloque NUNCA abre una conexión: consume un snapshot ya generado
+// (JSON) que otro proceso (fuera de este script) obtuvo con una query
+// read-only contra `chagra_kg`. Objetivo: que el MERGE de un id que YA
+// existe en el grafo apunte a su label real (Species/Pest/BeneficialOrganism/
+// ...) en vez de crear un `GraphGapNode` paralelo con el mismo id.
+
+/**
+ * Carga un snapshot de labels del grafo vivo. Acepta dos formas:
+ *   - `{ labels: { "<id>": ["Species", ...] } }` (formato recomendado, con
+ *     metadata en `meta`).
+ *   - `{ "<id>": ["Species", ...] }` (mapa plano, sin envoltorio).
+ * Un id puede traer más de un label si el grafo vivo ya tiene una
+ * ambigüedad preexistente (mismo id en dos nodos con label distinto) —
+ * ver `resolveLiveLabel`. Esto es una condición preexistente del grafo, no
+ * algo introducido por este loader.
+ *
+ * @param {string} filePath
+ * @returns {Record<string, string[]>}
+ */
+export function loadLiveLabelSnapshot(filePath) {
+  const raw = JSON.parse(readFileSync(filePath, 'utf8'));
+  const labels = raw && typeof raw === 'object' && raw.labels ? raw.labels : raw;
+  return labels && typeof labels === 'object' ? labels : {};
+}
+
+// Orden de preferencia cuando un id ya existe en el grafo vivo bajo MÁS DE
+// un label (ambigüedad preexistente — p.ej. `beauveria_bassiana` catalogado
+// a la vez como `BeneficialOrganism` y `Biopreparado`). No resuelve la
+// ambigüedad de fondo (eso es un problema de calidad de datos del grafo,
+// fuera de alcance de este loader) — solo decide determinísticamente a cuál
+// de los nodos existentes apunta la arista nueva, y lo deja explícito en el
+// reporte (`ambiguousLiveMatches`) para revisión humana.
+export const LABEL_PRIORITY = [
+  'Species', 'Pest', 'Variety', 'Family', 'BeneficialOrganism', 'Biopreparado',
+  'Animal', 'Fermento', 'Origen', 'RoleInGuild', 'PisoTermico', 'Region',
+  'RegionalLabel', 'Source',
+];
+
+/**
+ * Resuelve el label "primario" para un id dado su lista de labels en el
+ * grafo vivo. Si trae un único label, ese es. Si trae varios, se usa
+ * `LABEL_PRIORITY`; si ninguno de los candidatos está priorizado, se elige
+ * el primero en orden alfabético (determinístico, no arbitrario).
+ *
+ * @param {string[]} liveLabelsForId
+ * @returns {{label:string, ambiguous:boolean, candidates?:string[]}|null}
+ */
+export function resolveLiveLabel(liveLabelsForId) {
+  if (!Array.isArray(liveLabelsForId) || liveLabelsForId.length === 0) return null;
+  if (liveLabelsForId.length === 1) return { label: liveLabelsForId[0], ambiguous: false };
+  const candidates = [...liveLabelsForId].sort();
+  const byPriority = LABEL_PRIORITY.find((l) => candidates.includes(l));
+  return { label: byPriority || candidates[0], ambiguous: true, candidates };
+}
+
+// Heurísticas para estimar el label de un id GENUINAMENTE nuevo (no existe
+// en el grafo vivo) a partir de su propio texto. Cubre los dos casos reales
+// vistos en el corpus de "huecos" (agua/riego, incendios, micorrizas-suelo):
+// conceptos de suelo (`suelo_...`, `soil_fertility`) y de prácticas de
+// manejo. Deliberadamente conservador: solo dos labels nuevos con evidencia
+// real en los DR de esta línea de trabajo (ver queue/081 — "micorrizas
+// sería el primer nodo Soil real del grafo"); todo lo demás cae en el
+// fallback `GraphGapNode`, igual que antes de la reconciliación.
+export const NEW_NODE_LABEL_HINTS = [
+  { pattern: /(^|_)(suelo|soil)(_|$)/i, label: 'Soil' },
+  { pattern: /(^|_)(practica|manejo|practice)(_|$)/i, label: 'Practice' },
+];
+
+/**
+ * Estima el label de un id nuevo (no reconciliado contra el grafo vivo).
+ * Primero prueba el propio texto del id (más específico — p.ej.
+ * `soil_fertility` ya lo dice todo aunque el TIPO de la arista sea el
+ * genérico `AFFECTS`); si no matchea, prueba el/los TIPO(s) de arista donde
+ * el id participa como **destino** (objeto de la relación — p.ej. un futuro
+ * `AFFECTS_SOIL_FERTILITY`; el origen de esa arista típicamente es un
+ * animal/práctica que AFECTA el suelo, no el suelo en sí — ver
+ * `buildNodeLabelPlan`, que es quien decide qué TIPOs pasar aquí). Si nada
+ * matchea, fallback a `GraphGapNode`.
+ *
+ * @param {string} nodeId
+ * @param {Iterable<string>} [relTypes] - TIPOs de arista donde el id es destino
+ * @returns {string}
+ */
+export function estimateNewNodeLabel(nodeId, relTypes = []) {
+  for (const hint of NEW_NODE_LABEL_HINTS) {
+    if (hint.pattern.test(nodeId)) return hint.label;
+  }
+  for (const relType of relTypes) {
+    if (/SOIL/.test(relType)) return 'Soil';
+    if (/PRACTIC|MANEJO|MANAGEMENT/.test(relType)) return 'Practice';
+  }
+  return NODE_LABEL;
+}
+
+/**
+ * Construye el plan de labels para todos los ids (origen+destino) de un
+ * batch de aristas curadas: para cada id, decide si ya existe en el grafo
+ * vivo (y con qué label real) o si es nuevo (con label estimado).
+ *
+ * Nota de dirección: el TIPO de arista solo se usa como señal secundaria de
+ * `estimateNewNodeLabel` cuando el id aparece como **destino** (objeto) de
+ * esa relación — no como origen. Ej.: en
+ * `cerdo -[AFFECTS_SOIL_FERTILITY]-> suelo_(...)`, el TIPO "suelo-ish" es
+ * evidencia razonable para `suelo_(...)` (destino) pero NO para `cerdo`
+ * (origen, claramente un animal) — usar el TIPO sin importar la dirección
+ * fue un bug real encontrado corriendo este loader contra el corpus real
+ * (etiquetaba `cerdo_(sus_scrofa_domesticus)` como `Soil`).
+ *
+ * @param {Array<{origen:string,tipo:string,destino:string}>} acceptedEdges
+ * @param {Record<string,string[]>} [liveLabels]
+ * @returns {{plan: Map<string,{label:string,isLive:boolean,ambiguous:boolean}>, ambiguous: Array<{id:string,labels:string[],chosen:string}>}}
+ */
+export function buildNodeLabelPlan(acceptedEdges, liveLabels = {}) {
+  const allNodeIds = new Set();
+  const destinoRelTypesByNode = new Map();
+  for (const e of acceptedEdges) {
+    allNodeIds.add(e.origen);
+    allNodeIds.add(e.destino);
+    if (!destinoRelTypesByNode.has(e.destino)) destinoRelTypesByNode.set(e.destino, new Set());
+    destinoRelTypesByNode.get(e.destino).add(e.tipo);
+  }
+
+  const plan = new Map();
+  const ambiguous = [];
+  for (const nodeId of allNodeIds) {
+    const resolved = resolveLiveLabel(liveLabels[nodeId]);
+    if (resolved) {
+      plan.set(nodeId, { label: resolved.label, isLive: true, ambiguous: resolved.ambiguous });
+      if (resolved.ambiguous) {
+        ambiguous.push({ id: nodeId, labels: resolved.candidates, chosen: resolved.label });
+      }
+    } else {
+      const relTypes = destinoRelTypesByNode.get(nodeId) || new Set();
+      plan.set(nodeId, { label: estimateNewNodeLabel(nodeId, relTypes), isLive: false, ambiguous: false });
+    }
+  }
+  return { plan, ambiguous };
+}
 
 // =============================================================================
 // Detección genérica de tablas markdown
@@ -307,26 +469,53 @@ export function curateRawEdges(rawEdges, { drScoped, drId }) {
  * aristas ya curadas. Dedupea el MERGE de nodo por id (el mismo id puede
  * aparecer en decenas de aristas dentro y entre DRs) para no inflar el
  * archivo de salida con el mismo MERGE repetido.
+ *
+ * Reconciliación (`liveLabels`, opcional): para un id que YA existe en el
+ * grafo vivo, NO se emite un `MERGE` de nodo — la arista se conecta por
+ * `MATCH` directo contra el nodo real (ver `emitRel`), con su label real
+ * (Species/Pest/...). Así el apply es idempotente y no crea un
+ * `GraphGapNode` paralelo ni toca las propiedades del nodo existente. Solo
+ * los ids genuinamente nuevos (no encontrados en `liveLabels`) reciben un
+ * `MERGE` de nodo, con label estimado (`estimateNewNodeLabel`).
+ *
+ * @param {Array<object>} acceptedEdges
+ * @param {{graph?:string, dateStr?:string, liveLabels?:Record<string,string[]>}} [opts]
  */
-export function buildCypherStatements(acceptedEdges, { graph = 'chagra_kg', dateStr } = {}) {
+export function buildCypherStatements(acceptedEdges, { graph = 'chagra_kg', dateStr, liveLabels = {} } = {}) {
   const statements = [];
   const emittedNodes = new Set();
   const today = dateStr || new Date().toISOString().slice(0, 10);
+  const { plan, ambiguous } = buildNodeLabelPlan(acceptedEdges, liveLabels);
+  let newNodeMergeCount = 0;
+  let reconciledNodeCount = 0;
+  const reconciledByLabel = {};
+  const newByEstimatedLabel = {};
+
   for (const e of acceptedEdges) {
-    const drRef = `DR-FANOUT:${e.drId}`;
+    const drRef = `${RESEARCH_SOURCE_PREFIX}:${e.drId}`;
     for (const nodeId of [e.origen, e.destino]) {
       if (emittedNodes.has(nodeId)) continue;
       emittedNodes.add(nodeId);
-      statements.push(wrapCypher(graph, emitNode(NODE_LABEL, {
+      const info = plan.get(nodeId);
+      if (info.isLive) {
+        // Nodo ya existe en chagra_kg — se referencia por MATCH en la
+        // arista (abajo), sin tocar sus propiedades.
+        reconciledNodeCount++;
+        reconciledByLabel[info.label] = (reconciledByLabel[info.label] || 0) + 1;
+        continue;
+      }
+      newNodeMergeCount++;
+      newByEstimatedLabel[info.label] = (newByEstimatedLabel[info.label] || 0) + 1;
+      statements.push(wrapCypher(graph, emitNode(info.label, {
         id: nodeId,
         source: drRef,
         added_at: today,
       })));
     }
     statements.push(wrapCypher(graph, emitRel(
-      { label: NODE_LABEL, id: e.origen },
+      { label: plan.get(e.origen).label, id: e.origen },
       e.tipo,
-      { label: NODE_LABEL, id: e.destino },
+      { label: plan.get(e.destino).label, id: e.destino },
       {
         source: e.fuente,
         confidence: e.confianza,
@@ -335,7 +524,15 @@ export function buildCypherStatements(acceptedEdges, { graph = 'chagra_kg', date
       },
     )));
   }
-  return { statements, nodeCount: emittedNodes.size };
+  return {
+    statements,
+    nodeCount: emittedNodes.size,
+    newNodeMergeCount,
+    reconciledNodeCount,
+    reconciledByLabel,
+    newByEstimatedLabel,
+    ambiguousLiveMatches: ambiguous,
+  };
 }
 
 // =============================================================================
@@ -438,6 +635,29 @@ export function formatReportText(report) {
   for (const dr of report.perDr) {
     lines.push(`  - ${dr.drId}: aceptadas=${dr.acceptedCount} descartadas=${dr.rejectedCount} tablas_aristas=${dr.edgeTablesFound}/${dr.tablesFound} scoped_co=${dr.drScoped ? 'si' : 'no'}`);
   }
+  if (report.reconciliation) {
+    const rc = report.reconciliation;
+    lines.push(`[age-graph-gaps] reconciliación live-labels: snapshot=${rc.liveLabelsProvided ? 'si' : 'no'}`);
+    lines.push(`[age-graph-gaps] nodos referenciados: ${rc.totalNodeIds} | reconciliados (label real): ${rc.reconciledCount} | nuevos (label estimado): ${rc.newCount}`);
+    if (rc.reconciledCount) {
+      lines.push('[age-graph-gaps] reconciliados por label real (MATCH, sin MERGE de nodo):');
+      for (const [label, count] of Object.entries(rc.reconciledByLabel).sort((a, b) => b[1] - a[1])) {
+        lines.push(`  - ${label}: ${count}`);
+      }
+    }
+    if (rc.newCount) {
+      lines.push('[age-graph-gaps] nuevos por label estimado (MERGE de nodo):');
+      for (const [label, count] of Object.entries(rc.newByEstimatedLabel).sort((a, b) => b[1] - a[1])) {
+        lines.push(`  - ${label}: ${count}`);
+      }
+    }
+    if (rc.ambiguousMatches.length) {
+      lines.push(`[age-graph-gaps] AVISO: ${rc.ambiguousMatches.length} id(s) con más de un label en el grafo vivo (ambigüedad preexistente, no introducida por este loader):`);
+      for (const a of rc.ambiguousMatches) {
+        lines.push(`  - ${a.id}: candidatos=[${a.labels.join(', ')}] elegido=${a.chosen}`);
+      }
+    }
+  }
   return lines.join('\n');
 }
 
@@ -457,6 +677,7 @@ export function parseArgs(argv) {
     files: [],
     outCypher: process.env.CHAGRA_AGE_GAPS_OUT_CYPHER || '',
     outReport: process.env.CHAGRA_AGE_GAPS_OUT_REPORT || '',
+    liveLabels: process.env.CHAGRA_AGE_GAPS_LIVE_LABELS || '',
     graph: 'chagra_kg',
     json: false,
     help: false,
@@ -468,6 +689,7 @@ export function parseArgs(argv) {
     else if (a === '--file') opts.files.push(argv[++i]);
     else if (a === '--out-cypher') opts.outCypher = argv[++i];
     else if (a === '--out-report') opts.outReport = argv[++i];
+    else if (a === '--live-labels') opts.liveLabels = argv[++i];
     else if (a === '--graph') opts.graph = argv[++i];
     else if (a === '--json') opts.json = true;
     else if (a === '--help' || a === '-h') opts.help = true;
@@ -497,9 +719,12 @@ export function main(argv = process.argv.slice(2)) {
   const opts = parseArgs(argv);
   if (opts.help) {
     console.log([
-      'Usage: node scripts/load-age-graph-gaps.mjs --dr-dir DIR [--glob PATTERN]... [--file NAME]... [--out-cypher FILE] [--out-report FILE] [--graph chagra_kg] [--json]',
+      'Usage: node scripts/load-age-graph-gaps.mjs --dr-dir DIR [--glob PATTERN]... [--file NAME]... [--live-labels FILE] [--out-cypher FILE] [--out-report FILE] [--graph chagra_kg] [--json]',
       '',
       'BUILD + DRY-RUN: nunca se conecta a AGE/postgres. Genera Cypher + reporte a archivo.',
+      '--live-labels FILE (o env CHAGRA_AGE_GAPS_LIVE_LABELS): snapshot read-only',
+      'del grafo vivo ({ labels: { "<id>": ["Species", ...] } }) para reconciliar',
+      'MERGE contra nodos reales en vez de crear GraphGapNode paralelos.',
     ].join('\n'));
     return 0;
   }
@@ -518,12 +743,26 @@ export function main(argv = process.argv.slice(2)) {
     return 2;
   }
 
+  const liveLabels = opts.liveLabels ? loadLiveLabelSnapshot(opts.liveLabels) : {};
+
   const perDrResults = files.map((f) => processDrFile(f));
   const allAccepted = perDrResults.flatMap((r) => r.accepted);
-  const { statements, nodeCount } = buildCypherStatements(allAccepted, { graph: opts.graph });
+  const {
+    statements, nodeCount, newNodeMergeCount, reconciledNodeCount,
+    reconciledByLabel, newByEstimatedLabel, ambiguousLiveMatches,
+  } = buildCypherStatements(allAccepted, { graph: opts.graph, liveLabels });
   const report = buildDryRunReport(perDrResults, { graph: opts.graph });
   report.totals.cypherStatements = statements.length;
-  report.totals.cypherNodeMerges = nodeCount;
+  report.totals.cypherNodeMerges = newNodeMergeCount;
+  report.reconciliation = {
+    liveLabelsProvided: Boolean(opts.liveLabels),
+    totalNodeIds: nodeCount,
+    reconciledCount: reconciledNodeCount,
+    newCount: newNodeMergeCount,
+    reconciledByLabel,
+    newByEstimatedLabel,
+    ambiguousMatches: ambiguousLiveMatches,
+  };
 
   const outCypher = opts.outCypher || join(_here, '..', '.local', 'age-graph-gaps', 'gaps.cypher.sql');
   const outReport = opts.outReport || join(_here, '..', '.local', 'age-graph-gaps', 'gaps.report.json');
@@ -534,7 +773,9 @@ export function main(argv = process.argv.slice(2)) {
     '-- Generado por scripts/load-age-graph-gaps.mjs — DRY-RUN, NO aplicado.',
     `-- Grafo destino: ${opts.graph}`,
     `-- DRs fuente: ${perDrResults.map((r) => r.drId).join(', ')}`,
-    `-- Statements: ${statements.length} (MERGE-only, idempotente, no destructivo)`,
+    `-- Statements: ${statements.length} (MERGE/MATCH, idempotente, no destructivo)`,
+    `-- Reconciliación live-labels: ${opts.liveLabels ? 'aplicada' : 'NO aplicada (todo id tratado como nuevo)'} — ` +
+      `${reconciledNodeCount} nodo(s) reconciliado(s) contra label real (MATCH, sin MERGE), ${newNodeMergeCount} nodo(s) nuevo(s) (MERGE).`,
     '-- Revisión humana requerida antes de ejecutar contra postgres-farm.',
     '',
     "LOAD 'age';",

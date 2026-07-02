@@ -21,7 +21,7 @@ import {
  */
 
 describe('chipIntentRouter — enum y definiciones', () => {
-  it('expone los 11 intents del enum (incluye restauración, silvopastoreo, páramo, incendio)', () => {
+  it('expone los 17 intents del enum (incluye restauración, silvopastoreo, páramo, incendio, grounding oscuro)', () => {
     expect(CHIP_INTENTS).toEqual({
       siembro: 'siembro',
       plaga: 'plaga',
@@ -34,10 +34,18 @@ describe('chipIntentRouter — enum y definiciones', () => {
       silvopastoreo: 'silvopastoreo',
       paramo: 'paramo',
       incendio: 'incendio',
+      // Grounding oscuro (2026-07-01): consultas puntuales del grafo, ahora
+      // discutibles vía el grupo "Más" del ChipsToolbar.
+      toxicidad: 'toxicidad',
+      saberes_tradicionales: 'saberes_tradicionales',
+      alerta_paramo: 'alerta_paramo',
+      variedades: 'variedades',
+      polinizacion: 'polinizacion',
+      fenologia: 'fenologia',
     });
   });
 
-  it('CHIP_DEFS tiene los 11 chips con label en español colombiano (sin voseo)', () => {
+  it('CHIP_DEFS tiene los 17 chips con label en español colombiano (sin voseo)', () => {
     const ids = CHIP_DEFS.map((c) => c.intent);
     expect(ids).toEqual([
       'siembro',
@@ -51,6 +59,12 @@ describe('chipIntentRouter — enum y definiciones', () => {
       'silvopastoreo',
       'paramo',
       'incendio',
+      'toxicidad',
+      'saberes_tradicionales',
+      'alerta_paramo',
+      'variedades',
+      'polinizacion',
+      'fenologia',
     ]);
     // Labels presentes y emoji declarado
     for (const def of CHIP_DEFS) {
@@ -63,7 +77,7 @@ describe('chipIntentRouter — enum y definiciones', () => {
   });
 
   it('ningún string del chip usa voseo argentino', () => {
-    // tú/usted colombiano — NUNCA escribí/tomá/tenés/querés/elegí/dale/acá.
+    // tú/usted colombiano — NUNCA escribí/tomá/tienes/quieres/elegí/dale/aquí.
     const VOSEO = /\b(escrib[íi]|tom[áa]|ten[ée]s|quer[ée]s|eleg[íi]|pod[ée]s|dale|sab[ée]s|and[áa]|fij[áa]te)\b/i;
     for (const def of CHIP_DEFS) {
       expect(def.label).not.toMatch(VOSEO);
@@ -299,19 +313,83 @@ describe('chipIntentRouter — chips de diseño (capacidades antes dark)', () =>
   });
 });
 
-describe('chipIntentRouter — intents STUB (backend no existe aún)', () => {
-  it('precio → stub claro "aún no disponible" (NO inventa backend de precio)', () => {
-    const plan = planForcedIntent('precio', 'papa');
-    expect(plan.intent).toBe('precio');
-    expect(plan.stub).toBe(true);
-    expect(plan.tool).toBeNull();
-    expect(typeof plan.stubMessage).toBe('string');
-    expect(plan.stubMessage.toLowerCase()).toContain('no');
+describe('chipIntentRouter — grounding oscuro (chips antes SOLO alcanzables por texto libre)', () => {
+  it('toxicidad → get_toxicidad con species_id_or_name del texto + skipNlu', () => {
+    const plan = planForcedIntent('toxicidad', 'ruda');
+    expect(plan.tool).toBe('get_toxicidad');
+    expect(plan.args).toEqual({ species_id_or_name: 'ruda' });
+    expect(plan.stub).toBe(false);
     expect(plan.skipNlu).toBe(true);
   });
 
-  it('isStubIntent reconoce precio y deep como stub (B14: backend no disponible)', () => {
-    expect(isStubIntent('precio')).toBe(true);
+  it('saberes_tradicionales → get_saberes_tradicionales con termino del texto + skipNlu', () => {
+    const plan = planForcedIntent('saberes_tradicionales', 'bocashi');
+    expect(plan.tool).toBe('get_saberes_tradicionales');
+    expect(plan.args).toEqual({ termino: 'bocashi' });
+    expect(plan.stub).toBe(false);
+    expect(plan.skipNlu).toBe(true);
+  });
+
+  it('alerta_paramo → get_alerta_normativa_paramo con contexto del texto + skipNlu', () => {
+    const plan = planForcedIntent('alerta_paramo', 'tengo tierra en el páramo');
+    expect(plan.tool).toBe('get_alerta_normativa_paramo');
+    expect(plan.args).toEqual({ contexto: 'tengo tierra en el páramo' });
+    expect(plan.stub).toBe(false);
+    expect(plan.skipNlu).toBe(true);
+  });
+
+  it('variedades → get_variedades_cultivo con cultivo del texto + skipNlu', () => {
+    const plan = planForcedIntent('variedades', 'papa criolla');
+    expect(plan.tool).toBe('get_variedades_cultivo');
+    expect(plan.args).toEqual({ cultivo: 'papa criolla' });
+    expect(plan.stub).toBe(false);
+    expect(plan.skipNlu).toBe(true);
+  });
+
+  it('polinizacion → get_polinizacion con species_id del texto + skipNlu', () => {
+    const plan = planForcedIntent('polinizacion', 'fresa');
+    expect(plan.tool).toBe('get_polinizacion');
+    expect(plan.args).toEqual({ species_id: 'fresa' });
+    expect(plan.stub).toBe(false);
+    expect(plan.skipNlu).toBe(true);
+  });
+
+  it('fenologia → get_fenologia con species_id del texto + skipNlu', () => {
+    const plan = planForcedIntent('fenologia', 'café');
+    expect(plan.tool).toBe('get_fenologia');
+    expect(plan.args).toEqual({ species_id: 'café' });
+    expect(plan.stub).toBe(false);
+    expect(plan.skipNlu).toBe(true);
+  });
+
+  it('los 6 chips de grounding oscuro son kind:tool en CHIP_DEFS (no stub)', () => {
+    const groundingIntents = [
+      'toxicidad', 'saberes_tradicionales', 'alerta_paramo',
+      'variedades', 'polinizacion', 'fenologia',
+    ];
+    for (const intent of groundingIntents) {
+      const def = CHIP_DEFS.find((d) => d.intent === intent);
+      expect(def).toBeTruthy();
+      expect(def.kind).toBe('tool');
+      expect(def.moreGroup).toBe(true);
+    }
+  });
+});
+
+describe('chipIntentRouter — intents local y stub', () => {
+  it('precio → localGrounding de referencia real (NO inventa backend de precio)', () => {
+    const plan = planForcedIntent('precio', 'papa');
+    expect(plan.intent).toBe('precio');
+    expect(plan.tool).toBeNull();
+    expect(plan.stub).toBe(false);
+    expect(plan.localGrounding).toBe('precio_referencia');
+    expect(plan.args).toEqual({ producto: 'papa' });
+    expect(plan.stubMessage).toBeNull();
+    expect(plan.skipNlu).toBe(true);
+  });
+
+  it('isStubIntent reconoce solo deep como stub (precio ya es local)', () => {
+    expect(isStubIntent('precio')).toBe(false);
     // B14: investigacion profunda aun NO esta servible — es stub honesto
     expect(isStubIntent('deep')).toBe(true);
     expect(isStubIntent('siembro')).toBe(false);
@@ -325,7 +403,7 @@ describe('chipIntentRouter — Deep Research (B14: stub honesto, backend no serv
   it('deep → stub claro "aún no disponible" + skipNlu + tool null (NO path live)', () => {
     // B14: la investigacion profunda no tiene backend servible en prod (el job
     // async vive detras de VITE_DEEP_RESEARCH_ENABLED, off por defecto). El chip
-    // NO routea a un path "live": devuelve el mismo stub honesto que 'precio'.
+    // NO routea a un path "live": devuelve un stub honesto propio.
     const plan = planForcedIntent('deep', 'sistema agroforestal cacao');
     expect(plan.intent).toBe('deep');
     expect(plan.stub).toBe(true);
@@ -355,18 +433,19 @@ describe('chipIntentRouter — Deep Research (B14: stub honesto, backend no serv
     const deepDef = CHIP_DEFS.find((d) => d.intent === 'deep');
     expect(deepDef).toBeTruthy();
     expect(deepDef.kind).toBe('stub');
-    // Como stub, EXPONE stubMessage honesto (igual que 'precio').
+    // Como stub, EXPONE stubMessage honesto.
     expect(typeof deepDef.stubMessage).toBe('string');
     expect(deepDef.stubMessage.length).toBeGreaterThan(0);
   });
 });
 
 describe('chipIntentRouter — contrato de orden y consistencia del índice', () => {
-  it('CHIP_DEFS mantiene el orden de render estable (chips base + restauración/silvopastoreo/páramo/incendio al final)', () => {
+  it('CHIP_DEFS mantiene el orden de render estable (chips base + restauración/silvopastoreo/páramo/incendio + grounding oscuro al final)', () => {
     const order = CHIP_DEFS.map((d) => d.intent);
     expect(order).toEqual([
       'siembro', 'plaga', 'biopreparado', 'clima', 'precio', 'calendario', 'deep',
       'restauracion', 'silvopastoreo', 'paramo', 'incendio',
+      'toxicidad', 'saberes_tradicionales', 'alerta_paramo', 'variedades', 'polinizacion', 'fenologia',
     ]);
   });
 
@@ -397,11 +476,12 @@ describe('chipIntentRouter — opts ruidosos no contaminan los args', () => {
     expect(plan.args).toEqual({ pest_id_or_name: 'broca' });
   });
 
-  it('precio ignora opts completamente (es stub)', () => {
+  it('precio conserva el texto como producto candidato y no depende de opts', () => {
     const plan = planForcedIntent('precio', 'papa', { municipio: 'Choachí' });
-    expect(plan.stub).toBe(true);
     expect(plan.tool).toBeNull();
-    expect(plan.args).toBeNull();
+    expect(plan.stub).toBe(false);
+    expect(plan.localGrounding).toBe('precio_referencia');
+    expect(plan.args).toEqual({ producto: 'papa' });
   });
 
   it('deep ignora opts completamente (es stub)', () => {

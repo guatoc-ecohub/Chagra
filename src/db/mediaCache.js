@@ -2,20 +2,42 @@
  * mediaCache.js — CRUD para binarios de evidencia fotográfica (Fase 20.2).
  *
  * Store: media_cache (ChagraDB v11)
- * Schema: { id (auto), logId, blob, mimeType, createdAt, lastAccessedAt, pinned }
- * v11: Agrega LRU eviction policy para prevenirllenado de disco del browser.
+ * Schema: { id (auto), logId, blob, sizeBytes, mimeType, createdAt, lastAccessedAt, pinned }
+ * v11: Agrega LRU eviction policy para prevenir llenado de disco del browser.
  */
 
 import { openDB, STORES } from './dbCore';
 
-const MAX_MEDIA_ENTRIES = 300;
-const MAX_MEDIA_MB = parseInt(import.meta.env.VITE_MEDIA_CACHE_MAX_MB || '150', 10);
-const EVICT_DOWN_TO = 250;
+const DEFAULT_MAX_MEDIA_ENTRIES = 300;
+const DEFAULT_MAX_MEDIA_MB = 150;
+
+function parsePositiveInt(raw, fallback) {
+  const parsed = Number.parseInt(String(raw ?? ''), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function getMediaCacheLimits() {
+  const env = import.meta.env ?? {};
+  const maxEntries = parsePositiveInt(env.VITE_MEDIA_CACHE_MAX_ENTRIES, DEFAULT_MAX_MEDIA_ENTRIES);
+  const maxBytes = parsePositiveInt(
+    env.VITE_MEDIA_CACHE_MAX_BYTES,
+    parsePositiveInt(env.VITE_MEDIA_CACHE_MAX_MB, DEFAULT_MAX_MEDIA_MB) * 1024 * 1024
+  );
+
+  return { maxEntries, maxBytes };
+}
+
+function getRecordSizeBytes(record) {
+  const size = record?.sizeBytes ?? record?.blob?.size ?? 0;
+  const parsed = Number(size);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+}
 
 export const mediaCache = {
   /**
    * Guarda un blob de imagen asociado a un logId y opcionalmente a un assetId.
-   * Hace LRU eviction ANTES de insertar si el cache supera el limite.
+   * Hace LRU eviction ANTES de insertar si el cache supera el limite por
+   * entradas o bytes.
    * @param {string} logId
    * @param {Blob} blob
    * @param {object} options — { mimeType, assetId, ai_diagnosis }
@@ -25,9 +47,10 @@ export const mediaCache = {
     const { mimeType = 'image/webp', assetId = null, ai_diagnosis = null, pinned = false } = typeof options === 'string' ? { mimeType: options } : options;
     const db = await openDB();
     const now = Date.now();
+    const sizeBytes = getRecordSizeBytes({ blob });
 
-    // LRU eviction antes de agregar — libera espacio para el nuevo registro
-    await evictOldestIfNeeded();
+    // LRU eviction antes de agregar libera espacio para el nuevo registro.
+    await evictOldestIfNeeded({ incomingEntries: 1, incomingBytes: sizeBytes });
 
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.MEDIA_CACHE, 'readwrite');
@@ -35,6 +58,7 @@ export const mediaCache = {
         logId,
         assetId,
         blob,
+        sizeBytes,
         mimeType,
         ai_diagnosis,
         pinned,
@@ -197,64 +221,98 @@ export const mediaCache = {
 };
 
 /**
- * LRU eviction por conteo de entradas en media_cache.
- * Cuando el numero de registros supera MAX_MEDIA_ENTRIES, elimina los
- * blobs menos-recientemente-accedidos (lastAccessedAt ascendente) hasta
- * llegar a EVICT_DOWN_TO. NO elimina registros con pinned: true.
+ * LRU eviction por conteo de entradas y bytes totales en media_cache.
+ * Cuando alguno de los limites se supera, elimina los blobs menos
+ * recientemente-accedidos (lastAccessedAt ascendente) hasta volver a estar
+ * dentro del presupuesto. NO elimina registros con pinned: true.
  *
- * @param {number} maxEntries — tope de entradas antes de evictar
- * @param {number} maxMB — tope opcional de MB (no implementado; reservado)
- * @returns {Promise<number>} — cantidad de entradas eliminadas
+ * @param {object} options
+ * @param {number} options.maxEntries - tope de entradas antes de evictar
+ * @param {number} options.maxBytes - tope de bytes antes de evictar
+ * @param {number} options.incomingEntries - entradas que se van a sumar
+ * @param {number} options.incomingBytes - bytes que se van a sumar
+ * @returns {Promise<number>} - cantidad de entradas eliminadas
  */
-async function evictOldestIfNeeded(maxEntries = MAX_MEDIA_ENTRIES, _maxMB = MAX_MEDIA_MB) {
-  const db = await openDB();
-
+async function evictOldestIfNeeded(options = {}) {
   try {
-    // Fase 1: contar registros en media_cache
-    const countTx = db.transaction(STORES.MEDIA_CACHE, 'readonly');
-    const countStore = countTx.objectStore(STORES.MEDIA_CACHE);
-    const count = await new Promise((resolve, reject) => {
-      const req = countStore.count();
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-    });
+    const db = await openDB();
+    const { maxEntries, maxBytes } = getMediaCacheLimits();
+    const incomingEntries = options.incomingEntries ?? 0;
+    const incomingBytes = options.incomingBytes ?? 0;
+    const targetEntries = Math.max(0, maxEntries - incomingEntries);
+    const targetBytes = Math.max(0, maxBytes - incomingBytes);
 
-    if (count <= maxEntries) {
-      return 0;
-    }
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORES.MEDIA_CACHE, 'readwrite');
+      const store = tx.objectStore(STORES.MEDIA_CACHE);
+      const index = store.index('lastAccessedAt');
+      const orderedRecords = [];
+      let count = 0;
+      let totalBytes = 0;
 
-    // Fase 2: evictar los mas viejos (por lastAccessedAt) hasta EVICT_DOWN_TO
-    const target = Math.max(EVICT_DOWN_TO, Math.floor(maxEntries * 0.8));
-    const toEvict = count - target;
-    let evicted = 0;
-
-    const writeTx = db.transaction(STORES.MEDIA_CACHE, 'readwrite');
-    const writeStore = writeTx.objectStore(STORES.MEDIA_CACHE);
-    const index = writeStore.index('lastAccessedAt');
-
-    return new Promise((resolve, reject) => {
       const cursorReq = index.openCursor();
-      let deleted = 0;
       cursorReq.onsuccess = (event) => {
         const cursor = event.target.result;
-        if (!cursor || deleted >= toEvict) return;
-        if (!cursor.value.pinned) {
-          cursor.delete();
-          deleted++;
-          evicted++;
+        if (cursor) {
+          const record = cursor.value || {};
+          const sizeBytes = getRecordSizeBytes(record);
+          orderedRecords.push({
+            id: record.id,
+            pinned: Boolean(record.pinned),
+            sizeBytes,
+          });
+          count += 1;
+          totalBytes += sizeBytes;
+          cursor.continue();
+          return;
         }
-        cursor.continue();
-      };
-      writeTx.oncomplete = () => {
-        if (evicted > 0) {
-          console.info(`[MediaCache] LRU evicted ${evicted} entries (${count} → ${count - evicted})`);
+
+        const needsEntriesEviction = count > targetEntries;
+        const needsBytesEviction = totalBytes > targetBytes;
+
+        if (!needsEntriesEviction && !needsBytesEviction) {
+          resolve(0);
+          return;
         }
-        resolve(evicted);
+
+        let remainingCount = count;
+        let remainingBytes = totalBytes;
+        let evicted = 0;
+
+        for (const record of orderedRecords) {
+          const entriesOk = remainingCount <= targetEntries;
+          const bytesOk = remainingBytes <= targetBytes;
+          if (entriesOk && bytesOk) {
+            break;
+          }
+
+          if (record.pinned) {
+            continue;
+          }
+
+          store.delete(record.id);
+          remainingCount -= 1;
+          remainingBytes -= record.sizeBytes;
+          evicted += 1;
+        }
+
+        tx.oncomplete = () => {
+          if (evicted > 0) {
+            console.info(
+              `[MediaCache] LRU evicted ${evicted} entries (${count} -> ${count - evicted}, ${totalBytes} -> ${remainingBytes} bytes)`
+            );
+          }
+          resolve(evicted);
+        };
       };
-      writeTx.onerror = () => reject(writeTx.error);
+
+      cursorReq.onerror = () => reject(cursorReq.error);
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error || new Error('media_cache eviction aborted'));
     });
   } catch (err) {
-    console.warn('[MediaCache] LRU eviction failed:', err.message);
+    const message = err instanceof Error ? err.message : String(err);
+    console.warn('[MediaCache] LRU eviction failed:', message);
     return 0;
   }
 }

@@ -7,7 +7,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   formatearCOP, normalizarTelefono, construirContacto,
-  resolverPrecioReferencia, validarOferta, filtrarOfertas,
+  resolverPrecioReferencia, buildPriceReferenceAnswer, validarOferta, filtrarOfertas,
 } from '../marketplaceService';
 
 describe('formatearCOP', () => {
@@ -72,6 +72,27 @@ describe('resolverPrecioReferencia (anti-alucinación)', () => {
     expect(r.mercado).toContain('Pereira');
     expect(r.fuente).toBe('SIPSA');
     expect(r.boletinFecha).toBe('2026-06-09');
+  });
+});
+
+describe('buildPriceReferenceAnswer', () => {
+  it('devuelve una referencia de mercado legible cuando hay dato', () => {
+    const msg = buildPriceReferenceAnswer('tomate');
+    expect(msg).toContain('tomate');
+    expect(msg).toContain('SIPSA');
+    expect(msg).toContain('central de abastos');
+    expect(msg).toMatch(/\$\d[\d.]*–\$\d[\d.]* \/ kg/);
+  });
+
+  it('declina honestamente cuando no hay dato verificable', () => {
+    const msg = buildPriceReferenceAnswer('quinua');
+    expect(msg).toContain('No encontré una referencia SIPSA');
+    expect(msg).toContain('quinua');
+  });
+
+  it('retorna null para entrada vacia', () => {
+    expect(buildPriceReferenceAnswer('')).toBeNull();
+    expect(buildPriceReferenceAnswer(null)).toBeNull();
   });
 });
 

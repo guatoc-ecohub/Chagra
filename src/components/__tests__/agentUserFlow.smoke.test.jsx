@@ -29,14 +29,6 @@ const JERGA_TECNICA = [
   /\bdisponible en este plan\b/i,
 ];
 
-// Palabras/patrones que DEBEN aparecer en mensajes de fallo para ser útiles
-const FALLO_UTIL = [
-  /no\s+(pude|pudo|está|est[aá]|hay|tengo|encontr)/i,
-  /conexión|red|internet|verifica/i,
-  /intenta|prueba|vuelve/i,
-  /ayuda|orient|fuente|alternativa/i,
-];
-
 describe('flujo usuario nuevo — chips visibles sin jerga técnica', () => {
   beforeEach(() => {
     vi.spyOn(deepResearchClient, 'isDeepResearchEnabled').mockReturnValue(false);
@@ -54,14 +46,10 @@ describe('flujo usuario nuevo — chips visibles sin jerga técnica', () => {
     }
   });
 
-  it('stubMessage de precio es entendible (menciona alternativa concreta)', () => {
+  it('chip precio ya no es stub y usa referencia local', () => {
     const precioDef = CHIP_DEFS.find((d) => d.intent === 'precio');
-    expect(precioDef.stubMessage).toBeTruthy();
-    for (const pattern of JERGA_TECNICA) {
-      expect(precioDef.stubMessage).not.toMatch(pattern);
-    }
-    // Debe mencionar fuentes alternativas concretas (no "vuelva luego")
-    expect(precioDef.stubMessage).toMatch(/SIPSA|DANE|Corabastos|central|fuente/i);
+    expect(precioDef.kind).toBe('local');
+    expect(precioDef.placeholder.toLowerCase()).toMatch(/producto|precio/i);
   });
 
   it('chip "¿Qué siembro?" usa fraseo de pregunta, no comando técnico', () => {
@@ -100,10 +88,16 @@ describe('flujo usuario nuevo — estado activo del modo claro', () => {
 
   it('cada chip visible tiene un accessible label descriptivo (no solo emoji)', () => {
     render(<ChipsToolbar onSelectIntent={() => {}} />);
+    // Expandir "Más" para incluir los chips de grounding puntual (viven
+    // detrás del toggle, no en la fila principal — ver docstring del A4).
+    fireEvent.click(screen.getByTestId('mode-chip-more'));
     // Con DR flag OFF, deep no se renderiza
     const visibleDefs = CHIP_DEFS.filter((d) => d.intent !== CHIP_INTENTS.deep);
     for (const def of visibleDefs) {
-      const chip = screen.getByRole('button', { name: new RegExp(def.label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') });
+      // Match EXACTO (no substring): algunas etiquetas comparten palabras
+      // (ej. "Páramo" vs "Alerta normativa páramo") — un regex suelto
+      // encuentra ambas y `getByRole` revienta con "multiple elements".
+      const chip = screen.getByRole('button', { name: def.label });
       expect(chip).toBeInTheDocument();
       expect(chip).toHaveAttribute('aria-label', expect.stringContaining(def.label));
     }
@@ -118,19 +112,15 @@ describe('flujo usuario nuevo — respuesta entendible cuando falla una herramie
     vi.restoreAllMocks();
   });
 
-  it('chip precio (stub) tiene stubMessage útil con alternativas', () => {
+  it('chip precio es local y mantiene contrato visible', () => {
     const precioDef = CHIP_DEFS.find((d) => d.intent === 'precio');
-    const msg = precioDef.stubMessage;
-    // El mensaje debe contener al menos un patrón de "fallo útil"
-    const tieneFalloUtil = FALLO_UTIL.some((re) => re.test(msg));
-    expect(tieneFalloUtil).toBe(true);
+    expect(precioDef.kind).toBe('local');
   });
 
-  it('chip precio stubMessage orienta a fuente real (no solo "no disponible")', () => {
+  it('chip precio conserva una etiqueta clara para consultar referencias', () => {
     const precioDef = CHIP_DEFS.find((d) => d.intent === 'precio');
-    const msg = precioDef.stubMessage;
-    // Debe mencionar una fuente o paso concreto (SIPSA, DANE, Corabastos, DANE)
-    expect(msg).toMatch(/SIPSA|DANE|Corabastos|central\s+de\s+abastos/i);
+    expect(precioDef.label).toBe('Precio');
+    expect(precioDef.placeholder).toMatch(/producto/i);
   });
 
   it('placeholder de clima pide municipio (guía al usuario a dar información útil)', () => {

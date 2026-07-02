@@ -18,6 +18,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { getDbCmd } from './lib/db-cmd.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..');
@@ -32,9 +33,10 @@ const BASICOS = [
 function ageQuery(cypher, ncols) {
   const cols = Array.from({ length: ncols }, (_, i) => `c${i} agtype`).join(', ');
   const sql = `LOAD 'age'; SET search_path=ag_catalog,public; SELECT * FROM cypher('chagra_kg', $$ ${cypher} $$) as (${cols});`;
+  const dbCmd = getDbCmd();
   const r = spawnSync(
-    'sudo',
-    ['podman', 'exec', '-i', 'postgres-farm', 'psql', '-U', 'farmos', '-d', 'chagra_kg', '-tAF', '\t', '-c', sql],
+    dbCmd.file,
+    [...dbCmd.args, '-tAF', '\t', '-c', sql],
     { encoding: 'utf8', maxBuffer: 96 * 1024 * 1024 },
   );
   if (r.status !== 0) throw new Error('AGE no accesible: ' + String(r.stderr || r.error || '').slice(0, 200));

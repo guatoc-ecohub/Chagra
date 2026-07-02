@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // In-memory IDB substitute para mediaCache
 let store;
@@ -86,10 +86,13 @@ const fakeStore = {
       openCursor() {
         const req = makeRequest();
         let stopped = false;
+        const orderedRecords = cursorRecords.length
+          ? cursorRecords
+          : [...store].sort((a, b) => (a.lastAccessedAt ?? 0) - (b.lastAccessedAt ?? 0));
         const next = () => {
           if (stopped) return;
           Promise.resolve().then(() => {
-            const record = cursorRecords[cursorIndex];
+            const record = orderedRecords[cursorIndex];
             cursorIndex++;
             if (record) {
               req.result = {
@@ -125,14 +128,23 @@ const fakeTx = {
 
 const fakeDB = {
   transaction(_storeNames, _mode) {
-    const tx = { ...fakeTx, oncomplete: null, onabort: null, onerror: null };
-    // Simulate async oncomplete tick con varios microtasks
-    Promise.resolve()
-      .then(() => Promise.resolve())
-      .then(() => Promise.resolve())
-      .then(() => {
-        tx.oncomplete?.();
-      });
+    const tx = { ...fakeTx, onabort: null, onerror: null };
+    let completeHandler = null;
+    Object.defineProperty(tx, 'oncomplete', {
+      configurable: true,
+      enumerable: true,
+      get() {
+        return completeHandler;
+      },
+      set(fn) {
+        completeHandler = fn;
+        if (typeof fn === 'function') {
+          setTimeout(() => {
+            fn();
+          }, 0);
+        }
+      },
+    });
     return tx;
   },
   close: vi.fn(),
@@ -145,6 +157,7 @@ vi.mock('../dbCore', () => ({
 
 // jsdom no expone IDBKeyRange por defecto
 beforeEach(() => {
+  vi.unstubAllEnvs();
   globalThis.IDBKeyRange = {
     only: (val) => ({ lower: val, upper: val }),
   };
@@ -153,6 +166,10 @@ beforeEach(() => {
   cursorIndex = 0;
   cursorRecords = [];
   vi.clearAllMocks();
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 const { mediaCache } = await import('../mediaCache');
@@ -167,6 +184,90 @@ describe('mediaCache — 056.4 LRU eviction', () => {
     expect(id).toBe(1);
     expect(store.length).toBe(initialStoreLength + 1);
     expect(store[0].logId).toBe('log-1');
+  });
+
+  it('save evicta por entradas cuando supera el limite configurable', async () => {
+    vi.stubEnv('VITE_MEDIA_CACHE_MAX_ENTRIES', '2');
+    vi.stubEnv('VITE_MEDIA_CACHE_MAX_BYTES', '1048576');
+
+    store = [
+      {
+        id: 1,
+        logId: 'log-1',
+        blob: new Blob(['a'], { type: 'image/webp' }),
+        sizeBytes: 1,
+        pinned: false,
+        lastAccessedAt: 1,
+        createdAt: 1,
+      },
+      {
+        id: 2,
+        logId: 'log-2',
+        blob: new Blob(['b'], { type: 'image/webp' }),
+        sizeBytes: 1,
+        pinned: false,
+        lastAccessedAt: 2,
+        createdAt: 2,
+      },
+      {
+        id: 3,
+        logId: 'log-3',
+        blob: new Blob(['c'], { type: 'image/webp' }),
+        sizeBytes: 1,
+        pinned: false,
+        lastAccessedAt: 3,
+        createdAt: 3,
+      },
+    ];
+    nextId = 4;
+    cursorRecords = [];
+
+    const blob = new Blob(['d'], { type: 'image/webp' });
+    const id = await mediaCache.save('log-new', blob);
+
+    expect(id).toBe(4);
+    expect(store).toHaveLength(2);
+    expect(store.some(r => r.id === 1)).toBe(false);
+    expect(store.some(r => r.id === 2)).toBe(false);
+    expect(store.some(r => r.id === 3)).toBe(true);
+    expect(store.some(r => r.logId === 'log-new' && r.sizeBytes === 1)).toBe(true);
+  });
+
+  it('save evicta por bytes cuando supera el limite configurable', async () => {
+    vi.stubEnv('VITE_MEDIA_CACHE_MAX_ENTRIES', '10');
+    vi.stubEnv('VITE_MEDIA_CACHE_MAX_BYTES', '12');
+
+    store = [
+      {
+        id: 1,
+        logId: 'log-1',
+        blob: new Blob(['123456'], { type: 'image/webp' }),
+        sizeBytes: 6,
+        pinned: false,
+        lastAccessedAt: 1,
+        createdAt: 1,
+      },
+      {
+        id: 2,
+        logId: 'log-2',
+        blob: new Blob(['abcdef'], { type: 'image/webp' }),
+        sizeBytes: 6,
+        pinned: false,
+        lastAccessedAt: 2,
+        createdAt: 2,
+      },
+    ];
+    nextId = 3;
+    cursorRecords = [];
+
+    const blob = new Blob(['xyz12'], { type: 'image/webp' });
+    const id = await mediaCache.save('log-new', blob);
+
+    expect(id).toBe(3);
+    expect(store).toHaveLength(2);
+    expect(store.some(r => r.id === 1)).toBe(false);
+    expect(store.some(r => r.id === 2)).toBe(true);
+    expect(store.some(r => r.logId === 'log-new' && r.sizeBytes === 5)).toBe(true);
   });
 
   it('save evicta entradas cuando store supera MAX_MEDIA_ENTRIES', async () => {

@@ -341,7 +341,7 @@ const TOMATE_SAFETY_RULES = [
 export function buildCampesinoModeBlock() {
   return `=== MODO CAMPESINO (registro oral campesino colombiano) ===
 Habla como un campesino colombiano experimentado, NO como un sistema técnico:
-- Usa tú/usted colombiano (NEVER vos/tenés/querés del argentino/rioplatense)
+- Usa tú/usted colombiano (NEVER vos/tienes/quieres del argentino/rioplatense)
 - Frases cortas y directas, como habla la gente del campo
 - Unidades del campo: cuadra, arroba, luna, bike de agua, plaza, hueco
 - NO uses binomios científicos (Coffea arabica, Solanum tuberosum) salvo que el usuario los pida explícitamente

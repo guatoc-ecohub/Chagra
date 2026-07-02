@@ -41,11 +41,11 @@
  * Modos de ejecución
  * -------------------
  *   1. LIVE (default): consulta `chagra_kg` vía psql. Por defecto usa
- *      `sudo podman exec -i postgres-farm psql -U farmos -d chagra_kg`;
+ *      `sudo podman exec -i <container> psql -U <user> -d <db>`;
  *      si `CHAGRA_AGE_PSQL_COMMAND` está definido en el entorno, lo usa tal
  *      cual (mismo patrón que scripts/validate-graph-parity.mjs y
- *      scripts/load-age-etno-folk-fitopatologia.mjs). Sin credenciales
- *      hardcodeadas — todo entra por process.env.
+ *      scripts/load-age-etno-folk-fitopatologia.mjs). Los valores salen de
+ *      CHAGRA_DB_CONTAINER, CHAGRA_DB_USER y CHAGRA_DB_NAME.
  *   2. OFFLINE (--from-dump FILE): NO toca la DB. Parsea un dump JSON
  *      `{nodes, edges}` (mismo shape que scripts/check-age-integrity.mjs) o
  *      un catálogo `{species: [...]}` (companions[] se leen como aristas
@@ -67,6 +67,7 @@
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { getDbCmd } from './lib/db-cmd.mjs';
 
 // =============================================================================
 // Constantes de dominio
@@ -369,42 +370,39 @@ export function formatReportText(report) {
 }
 
 // =============================================================================
-// Conexion a AGE — mismo patron que scripts/validate-graph-parity.mjs y
+// Conexion a AGE - mismo patron que scripts/validate-graph-parity.mjs y
 // scripts/load-age-etno-folk-fitopatologia.mjs: CHAGRA_AGE_PSQL_COMMAND
-// override, o `sudo podman exec -i postgres-farm psql ...` por defecto.
-// Sin credenciales hardcodeadas — todo entra por process.env.
+// override, o `sudo podman exec -i <container> psql ...` por defecto.
+// Los valores de container/user/db salen de CHAGRA_DB_*.
 // =============================================================================
 
-export function buildPsqlInvocation() {
-  const override = process.env.CHAGRA_AGE_PSQL_COMMAND;
+export function buildPsqlInvocation(env = process.env) {
+  const override = env.CHAGRA_AGE_PSQL_COMMAND;
   if (override) {
     return { kind: 'shell', command: override };
   }
+  const dbCmd = getDbCmd(env);
   return {
     kind: 'podman',
-    file: 'sudo',
-    args: [
-      'podman', 'exec', '-i', 'postgres-farm',
-      'psql', '-U', 'farmos', '-d', 'chagra_kg',
-      '-At', '-F', '\t',
-    ],
+    file: dbCmd.file,
+    args: [...dbCmd.args, '-At', '-F', '\t'],
   };
 }
 
-export function runPsql(sql) {
-  const inv = buildPsqlInvocation();
+export function runPsql(sql, env = process.env) {
+  const inv = buildPsqlInvocation(env);
   if (inv.kind === 'shell') {
     return spawnSync(inv.command, {
       input: sql,
       encoding: 'utf8',
       shell: true,
-      env: process.env,
+      env,
     });
   }
   return spawnSync(inv.file, inv.args, {
     input: sql,
     encoding: 'utf8',
-    env: process.env,
+    env,
   });
 }
 
@@ -445,7 +443,7 @@ export function main(argv = process.argv.slice(2)) {
       + '                    catalogo {species}. Seguro para CI.\n'
       + '  --print-sql       Imprime el SQL y sale (no ejecuta nada).\n\n'
       + 'Sin --from-dump, consulta chagra_kg vivo via psql. Override con\n'
-      + 'CHAGRA_AGE_PSQL_COMMAND; por defecto usa sudo podman exec postgres-farm.',
+      + 'CHAGRA_AGE_PSQL_COMMAND; el podman exec sale de CHAGRA_DB_*.',
     );
     return 0;
   }
@@ -483,5 +481,10 @@ export function main(argv = process.argv.slice(2)) {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  process.exitCode = main();
+  try {
+    process.exitCode = main();
+  } catch (e) {
+    console.error('[audit-milpa] ' + e.message);
+    process.exitCode = 2;
+  }
 }
