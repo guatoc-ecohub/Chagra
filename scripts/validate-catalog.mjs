@@ -788,6 +788,20 @@ export function validateAmb30_biopreparadoSafetyStructurada(catalog) {
   return warnings;
 }
 
+// NOTA PARA REVISIÓN DE FUENTES EN BIOPREPARADOS:
+// Algunos biopreparados pueden tener afirmaciones específicas en campos de prosa
+// (valor_pedagogico, dosis_aplicacion, precaucion_seguridad) que citan fuentes
+// explícitas con formato académico (ej: "Punja & Utkhede 2003 Trends Biotechnol 21:400")
+// pero estas citas NO están incluidas en el campo source_ids[]. Para mantener la
+// integridad referencial, cuando una afirmación específica cite una fuente con
+// autor/año/revista/pagina, esa fuente debería estar en source_ids[] y estar
+// definida en catalog.sources[]. Ejemplo de patrón a buscar:
+//   - "(Autor1 & Autor2 AÑO Revista Volumen:Página)" en valor_pedagogico
+//   - Verificar que source_ids[] incluya el ID correspondiente (ej: "autor1-autor2-AÑO-revista")
+// Si se encuentra un biopreparado con citas sin source_ids correspondientes,
+// agregar el ID faltante al campo source_ids[] y crear la entrada en sources[]
+// si no existe aún.
+
 // AMB-31: contaminación cruzada insectos ↔ patógenos. Detecta cuando insectos
 // están categorizados como enfermedades (enfermedades_criticas) o cuando
 // patógenos están categorizados como plagas (plagas_criticas). Esto es un
