@@ -379,6 +379,31 @@ export function emitRel(from, relType, to, relProps = {}) {
 }
 
 /**
+ * Construye un upsert seguro para una relacion existente.
+ *
+ * Usa MERGE solo sobre endpoints + tipo, y luego aplica propiedades con SET.
+ * Eso evita duplicar la arista cuando queremos enriquecer una relacion ya
+ * cargada con citaciones o metadatos nuevos.
+ *
+ * @param {{label:string,id:string}} from
+ * @param {string} relType
+ * @param {{label:string,id:string}} to
+ * @param {Record<string, unknown>} [relProps]
+ */
+export function emitRelUpsert(from, relType, to, relProps = {}) {
+  const propEntries = Object.entries(relProps)
+    .filter(([, v]) => v !== null && v !== undefined && v !== '');
+  const setClause = propEntries.length
+    ? ` SET r += {${propEntries.map(([k, v]) => `${k}: ${cypherLiteral(v)}`).join(', ')}}`
+    : '';
+  return [
+    `MATCH (a:${from.label} {id: ${cypherLiteral(from.id)}})`,
+    `MATCH (b:${to.label} {id: ${cypherLiteral(to.id)}})`,
+    `MERGE (a)-[r:${relType}]->(b)${setClause}`,
+  ].join(' ');
+}
+
+/**
  * Genera el bloque SQL completo `SELECT * FROM cypher(...)` que envuelve
  * uno o más statements Cypher. AGE no soporta múltiples statements por
  * cypher() call, así que cada statement va en su propio SELECT.

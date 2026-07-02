@@ -17,6 +17,7 @@ import {
   normalizePest,
   emitNode,
   emitRel,
+  emitRelUpsert,
   wrapCypher,
   buildSqlScript,
   classifyBiopreparadoTarget,
@@ -166,6 +167,23 @@ describe('emitRel', () => {
     );
     expect(out).toContain("source: 'feeding_plan_template'");
     expect(out).toContain("etapa: 'establecimiento'");
+  });
+});
+
+describe('emitRelUpsert', () => {
+  it('mergea solo endpoints y aplica props con SET r +=', () => {
+    const out = emitRelUpsert(
+      { label: 'Species', id: 'a' },
+      'ASOCIA_CON',
+      { label: 'Species', id: 'b' },
+      { fuente: 'Agrosavia', doi: '10.1234/x', verificado_openalex: true },
+    );
+    expect(out).toContain('MERGE (a)-[r:ASOCIA_CON]->(b)');
+    expect(out).not.toContain('MERGE (a)-[r:ASOCIA_CON {');
+    expect(out).toContain('SET r += {');
+    expect(out).toContain("fuente: 'Agrosavia'");
+    expect(out).toContain("doi: '10.1234/x'");
+    expect(out).toContain('verificado_openalex: true');
   });
 });
 
