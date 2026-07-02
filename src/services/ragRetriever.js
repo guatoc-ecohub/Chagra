@@ -474,10 +474,27 @@ async function embedQuery(queryText) {
       headers: { 'Content-Type': 'application/json' },
       // num_gpu:0 → el embedder corre en CPU, NO en la M6000 (12 GiB). La
       // co-residencia embedder + granite3.3:8b puede disparar un cudaMalloc
-      // OOM y tumbar el runner compartido. El corpus se generó con
-      // nomic-embed-text, así que la query debe usar el mismo modelo.
+      // OOM y tumbar el runner compartido.
+      //
+      // FIX P0 (auditoría RAG 2026-07-02): el commit anterior de esta rama
+      // había puesto `model: 'nomic-embed-text'` aquí, con el comentario (falso)
+      // de que "el corpus se generó con nomic-embed-text". El corpus real de
+      // `public/rag-embeddings.json` (verificado: 501 vectores, TODOS de
+      // dimensión 1024) fue re-indexado con snowflake-arctic-embed2 en #1825 y
+      // #1828 — nomic-embed-text emite 768d. Con el modelo equivocado pasan dos
+      // cosas, cualquiera de las dos deja el híbrido en BM25-only silencioso:
+      // (a) si el modelo no está pulled en el host de Ollama, el POST devuelve
+      // 404 y embedQuery() retorna null; (b) si SÍ está pulled, cosineSimilarity()
+      // descarta el par por `a.length !== b.length` (768 vs 1024) y el score
+      // semántico da 0 para TODOS los docs. En ambos casos combineResults()
+      // fusiona con semanticNorm=0 en todo el corpus, así que el ranking final
+      // es idéntico al de BM25-only — exactamente el +0.0pp que reportó el
+      // benchmark de este PR. snowflake-arctic-embed2 es también el modelo
+      // documentado como fuente de verdad en Chagra-strategy/ops/MODELS.md
+      // ("embeddings (RAG) | snowflake-arctic-embed2 | ragRetriever.js:442") y
+      // el que usa scripts/bench-complejos-con-tools.mjs. Restaurado en esta línea.
       body: JSON.stringify({
-        model: 'nomic-embed-text',
+        model: 'snowflake-arctic-embed2',
         prompt: queryText,
         options: { num_gpu: 0 },
       }),

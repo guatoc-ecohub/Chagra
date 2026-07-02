@@ -11,7 +11,7 @@ describe('ragRetriever — query embedding online/offline', () => {
     vi.unstubAllGlobals();
   });
 
-  it('embed de query llama a /api/ollama/api/embeddings con nomic-embed-text', async () => {
+  it('embed de query llama a /api/ollama/api/embeddings con el modelo del corpus (snowflake-arctic-embed2)', async () => {
     const mockFetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ embedding: new Array(768).fill(0.01) }),
