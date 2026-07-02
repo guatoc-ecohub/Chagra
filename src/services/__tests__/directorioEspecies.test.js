@@ -8,6 +8,7 @@ vi.mock('../../db/catalogDB.js', () => ({
 }));
 vi.mock('../grafoRelations.js', () => ({
   getRelationsForSpecies: vi.fn(),
+  resolvePestSynonym: vi.fn(),
 }));
 vi.mock('../../utils/speciesImageResolver.js', () => ({
   findLocalImage: vi.fn(),
@@ -18,7 +19,7 @@ import {
   getSpeciesById,
   getAllBiopreparados,
 } from '../../db/catalogDB.js';
-import { getRelationsForSpecies } from '../grafoRelations.js';
+import { getRelationsForSpecies, resolvePestSynonym } from '../grafoRelations.js';
 import { findLocalImage } from '../../utils/speciesImageResolver.js';
 import {
   searchSpecies,
@@ -48,6 +49,13 @@ const FRIJOL = {
 const MAIZ = { id: 'zea_mays', nombre_comun: 'Maíz criollo', nombre_cientifico: 'Zea mays L.', familia_botanica: 'Poaceae' };
 const CALABAZA = { id: 'cucurbita_maxima', nombre_comun: 'Zapallo', nombre_cientifico: 'Cucurbita maxima Duchesne' };
 const CEBOLLA = { id: 'allium_cepa', nombre_comun: 'Cebolla cabezona', nombre_cientifico: 'Allium cepa L.' };
+const PAPA = {
+  id: 'solanum_tuberosum',
+  nombre_comun: 'Papa',
+  nombre_cientifico: 'Solanum tuberosum L.',
+  familia_botanica: 'Solanaceae',
+  plagas_criticas: ['Tizón de la vaina del arroz', 'Gusano blanco del maíz (gallina ciega)'],
+};
 
 // Familia "tomate": el alias curado `tomate` apunta al cerasiforme (tomate de
 // mesa silvestre). El explorador debe LISTAR todos los tomates del catálogo, con
@@ -100,6 +108,7 @@ const CATALOG = [
   MAIZ,
   CALABAZA,
   CEBOLLA,
+  PAPA,
   CEBOLLA_LARGA,
   TOMATE_CERASIFORME,
   TOMATE_CHONTO,
@@ -115,6 +124,7 @@ beforeEach(() => {
   getSpeciesById.mockImplementation(async (id) => CATALOG.find((s) => s.id === id) || null);
   getAllBiopreparados.mockResolvedValue([]);
   getRelationsForSpecies.mockResolvedValue(null);
+  resolvePestSynonym.mockResolvedValue(null);
   findLocalImage.mockResolvedValue(null);
 });
 
@@ -228,6 +238,35 @@ describe('buildSpeciesFicha', () => {
     const bemisia = f.amenazas.find((a) => a.nombre.toLowerCase().includes('bemisia'));
     expect(bemisia.controladores).toContain('Encarsia formosa');
     expect(f.biopreparados[0].nombre).toBe('Beauveria bassiana');
+  });
+
+  it('reconcilia amenazas de papa con el puente de sinonimia del grafo', async () => {
+    getRelationsForSpecies.mockResolvedValueOnce({
+      compatible_with: [],
+      antagonist_of: [],
+      biopreparados: [],
+      pest_controllers: [
+        { plaga: 'Tizón de la vaina del arroz', controladores: ['Trichoderma harzianum'] },
+        { plaga: 'Gusano blanco del maíz (gallina ciega)', controladores: ['Beauveria bassiana'] },
+      ],
+    });
+    resolvePestSynonym.mockImplementation(async (term) => {
+      if (term === 'Tizón de la vaina del arroz') {
+        return { plaga: 'Rhizoctonia solani', especiesAfectadas: ['solanum_tuberosum'] };
+      }
+      if (term === 'Gusano blanco del maíz (gallina ciega)') {
+        return { plaga: 'Phyllophaga spp.', especiesAfectadas: ['solanum_tuberosum'] };
+      }
+      return null;
+    });
+
+    const f = await buildSpeciesFicha('solanum_tuberosum');
+    const nombres = f.amenazas.map((a) => a.nombre);
+
+    expect(nombres).toContain('Rhizoctonia solani');
+    expect(nombres).toContain('Phyllophaga spp.');
+    expect(nombres).not.toContain('Tizón de la vaina del arroz');
+    expect(nombres).not.toContain('Gusano blanco del maíz (gallina ciega)');
   });
 
   it('enriquece biopreparado con dosis del catálogo si el id coincide', async () => {
