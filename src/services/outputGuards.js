@@ -2289,15 +2289,28 @@ const VERIFIED_SOURCE_ALLOWLIST = new Set([
   'restrepo', // Dr. Carlos Restrepo, autoridad en agroecología colombiana
   'catalogo chagra',
   'etiqueta', // Etiqueta del producto (siempre verificable)
-  'ficha técnica',
+  'ficha tecnica', // normalizado (sin tilde): se compara contra texto _stripDiacritics()
 ]);
 
+/** Escapa caracteres especiales de regex para usar una cadena como literal. */
+const _escapeRegExpLiteral = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 /**
- * Indicios de que la dosis SÍ trae respaldo (cita de fuente / etiqueta).
- * CRÍTICO: Solo confiamos en fuentes de la allowlist verificada.
+ * Detecta si el texto cita alguna fuente VERIFICADA (de VERIFIED_SOURCE_ALLOWLIST).
+ * CRÍTICO: la allowlist es la ÚNICA fuente de verdad — no hay una lista paralela
+ * de nombres "hardcodeada" que pueda desincronizarse de ella. Normaliza el texto
+ * (minúsculas, sin tildes) y busca cada entrada de la allowlist como palabra/
+ * frase completa. Si el modelo inventa "según el INTA" (fuente NO verificada),
+ * esto NO cuenta como respaldo y el caveat de dosis se mantiene.
  */
-const SOURCE_HINT_RE =
-  /(?:seg[uú]n|de acuerdo (?:a|con)|recomienda(?:ci[oó]n)? de la)\s+(?:el\s+)?(?:ICA|Agrosavia|Cenicaf[eé]|Restrepo|cat[aá]logo Chagra|ficha t[ée]cnica|etiqueta)|\bICA\b|Agrosavia|Cenicaf[eé]|Restrepo|cat[aá]logo Chagra|ficha\s+t[ée]cnica|etiqueta/gi;
+function _hasVerifiedSourceMention(responseText) {
+  const norm = _stripDiacritics(responseText);
+  for (const fuente of VERIFIED_SOURCE_ALLOWLIST) {
+    const re = new RegExp(`\\b${_escapeRegExpLiteral(fuente)}\\b`, 'i');
+    if (re.test(norm)) return true;
+  }
+  return false;
+}
 
 /**
  * Guard 4 — dosis sin fuente (PARCIAL: suaviza, no borra). Si el texto da una
@@ -2318,13 +2331,14 @@ export function guardDoseWithoutSource(responseText, _resolvedEntities = null, _
     return { text: responseText, modified: false, reason: null };
   }
 
-  // CRÍTICO: Solo si hay una fuente VERIFICADA en el texto, asumimos respaldo.
-  // El SOURCE_HINT_RE ahora solo matchea fuentes de la allowlist verificada.
+  // CRÍTICO: Solo si hay una fuente de VERIFIED_SOURCE_ALLOWLIST en el texto,
+  // asumimos respaldo. _hasVerifiedSourceMention() está atada directamente a la
+  // allowlist (no hay una lista paralela hardcodeada que pueda desincronizarse).
   // Si el modelo inventa "según una recomendación del ICA" con un decreto falso,
-  // SOURCE_HINT_RE matcheará "ICA" (que está en la allowlist) pero esto es seguro:
-  // si menciona ICA, el usuario puede verificar. Lo peligroso es NO mencionar
-  // fuente alguna.
-  const hasVerifiedSource = SOURCE_HINT_RE.test(responseText);
+  // esto matcheará "ICA" (que está en la allowlist) pero esto es seguro: si
+  // menciona ICA, el usuario puede verificar. Lo peligroso es NO mencionar
+  // fuente alguna, o citar una fuente que NO está en la allowlist.
+  const hasVerifiedSource = _hasVerifiedSourceMention(responseText);
   if (hasVerifiedSource) {
     return { text: responseText, modified: false, reason: null };
   }
@@ -2373,13 +2387,13 @@ const PHONE_RE =
  * Regex para detectar correos electrónicos.
  */
 const EMAIL_RE =
-  /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
+  /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g;
 
 /**
  * Regex para detectar URLs (http, https, www).
  */
 const URL_RE =
-  /\b(?:https?:\/\/|www\.)[A-Z|a-z|0-9|-]{2,}\.[A-Z|a-z]{2,}(?:\/[^\s]*)?\b/g;
+  /\b(?:https?:\/\/|www\.)[A-Za-z0-9-]{2,}\.[A-Za-z]{2,}(?:\/[^\s]*)?\b/g;
 
 /**
  * Regex para detectar números de decreto/resolución. Formatos:
@@ -9237,7 +9251,7 @@ export function applyOutputGuards(
   // indica al usuario que verifique el contacto oficial con su UMATA o el ICA.
   // Va tras la marca inventada. Idempotente.
   const contactRes = guardInventedContact(text);
-  if (contactRes && contactRes.modified) {
+  if (contactRes.modified) {
     text = contactRes.text;
     modified = true;
     if (contactRes.reason) reasons.push(contactRes.reason);

@@ -827,7 +827,7 @@ describe('guardInventedContact', () => {
     expect(out.modified).toBe(true);
     expect(out.reason).toMatch(/URL/);
     expect(out.text).toMatch(/VERIFICAR CONTACTO OFICIAL/);
-    expect(out.text).not.toMatch(/www\.minagricultura-falso\.gov\.co/);
+    expect(out.text).not.toContain('www.minagricultura-falso.gov.co');
   });
 
   it('detecta y reemplaza decreto/resolución inventado', () => {
