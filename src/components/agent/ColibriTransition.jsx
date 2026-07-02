@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { colibriRealActivo } from '../../config/colibriFlag';
 import { BarbuditoFlor } from '../colibri/Barbudito';
+import { chivitoMockup } from '../../config/chivitoFlag';
+import { ChivitoCruza } from '../chivito/Chivito';
 
 /**
  * ColibriTransition — transición HIPER LINDA pero LIMPIA del home a la
@@ -40,10 +42,18 @@ export const COLIBRI_TRANSITION_REDUCED_MS = 360;
 // Clip de la FLOR (flag ON): el mp4 dura ~2.5s con su propio fade in/out.
 // Lo dejamos correr casi entero (2.4s) y luego el overlay hace su fade-out.
 export const COLIBRI_TRANSITION_FLOR_HOLD_MS = 2400;
+// Cruce del CHIVITO (VITE_CHIVITO): el ave cruza en ~1.5s; lo dejamos completar
+// y luego el overlay hace su fade-out.
+export const CHIVITO_TRANSITION_HOLD_MS = 1500;
 
 // ¿Transición con el clip de la FLOR del frailejón (barbudito libando néctar)?
 // Gateado por VITE_COLIBRI (dev-only). Se evalúa una sola vez (flag de build).
 const COLIBRI_REAL = colibriRealActivo();
+
+// ¿Transición con el CHIVITO de páramo cruzando aleteando (SVG/CSS vivo)?
+// Gateado por VITE_CHIVITO (dev-only). Tiene precedencia sobre VITE_COLIBRI.
+// 'ab' = cruzan los dos mockups en paralelo (A arriba, B abajo) para comparar.
+const CHIVITO = chivitoMockup();
 
 function prefersReducedMotion() {
   return typeof window !== 'undefined' && typeof window.matchMedia === 'function'
@@ -122,6 +132,10 @@ function ColibriOverlay({ onDone }) {
       // Fade simple y corto, sin video ni cruce.
       timers.push(setTimeout(() => setLeaving(true), 40));
       timers.push(setTimeout(() => doneRef.current?.(), COLIBRI_TRANSITION_REDUCED_MS + 60));
+    } else if (CHIVITO) {
+      // El chivito cruza aleteando (~1.5s) y luego el overlay se desvanece.
+      timers.push(setTimeout(() => setLeaving(true), CHIVITO_TRANSITION_HOLD_MS));
+      timers.push(setTimeout(() => doneRef.current?.(), CHIVITO_TRANSITION_HOLD_MS + COLIBRI_TRANSITION_FADE_MS));
     } else if (COLIBRI_REAL) {
       // Clip de la flor: lo dejamos correr casi entero (~2.4s) y luego el fade.
       timers.push(setTimeout(() => setLeaving(true), COLIBRI_TRANSITION_FLOR_HOLD_MS));
@@ -143,7 +157,18 @@ function ColibriOverlay({ onDone }) {
       data-testid="colibri-transition"
     >
       <style>{CSS}</style>
-      {COLIBRI_REAL && !reduce ? (
+      {CHIVITO ? (
+        // El CHIVITO de páramo cruza aleteando (SVG/CSS vivo, universal). En A/B
+        // cruzan los dos mockups (A arriba, B abajo) para compararlos.
+        CHIVITO === 'ab' ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6vh', alignItems: 'center' }}>
+            <ChivitoCruza mockup="a" size={150} />
+            <ChivitoCruza mockup="b" size={150} />
+          </div>
+        ) : (
+          <ChivitoCruza mockup={CHIVITO} size={190} />
+        )
+      ) : COLIBRI_REAL && !reduce ? (
         // Clip de la FLOR del frailejón: el barbudito tomando néctar, grande y
         // centrado, con fade suave. H.264 sin alpha → universal (incl. iOS).
         <span className="colibri-tx-flor-wrap">

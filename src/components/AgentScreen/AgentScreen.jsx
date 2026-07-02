@@ -111,6 +111,8 @@ import ActionConfirmModal from '../ActionConfirmModal';
 import FeedbackConsentModal from '../FeedbackConsentModal';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import ChagraAgentAvatarColibriPhoto from '../ChagraAgentAvatarColibriPhoto';
+import { chivitoMockup } from '../../config/chivitoFlag';
+import { ChivitoBoton } from '../chivito/Chivito';
 import { AgentManoOverlay } from '../agent/AgentShell';
 import { mapCapabilityPick } from '../agent/capabilityRouting';
 import { agentSounds } from '../../services/agentSoundService';
@@ -156,6 +158,12 @@ import { createAgentRequestSender } from '../../services/agentRequestSender';
 const STATE_IDLE = 'idle';
 const STATE_RECORDING = 'recording';
 const STATE_THINKING = 'thinking';
+
+// ¿El botón de enviar/hablar del compositor ES el CHIVITO de páramo? Gateado por
+// VITE_CHIVITO (dev-only). En A/B el botón usa Mockup B (más rico); con 'a'/'b'
+// el elegido. Con la flag OFF, el botón conserva ChagraAgentAvatar de siempre.
+const CHIVITO = chivitoMockup();
+const CHIVITO_BTN = CHIVITO === 'ab' ? 'b' : CHIVITO;
 
 export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // B1: clase de animación de entrada, resuelta UNA vez al montar (no en cada
@@ -3509,11 +3517,21 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
                     : '0 0 18px rgba(16,185,129,0.5)',
               }}
             >
-              <ChagraAgentAvatar
-                size={38}
-                state={state === STATE_THINKING ? 'thinking' : 'idle'}
-                ariaLabel="Enviar al agente"
-              />
+              {CHIVITO_BTN ? (
+                // El CHIVITO de páramo ES el botón de enviar (SVG/CSS vivo).
+                <ChivitoBoton
+                  mockup={CHIVITO_BTN}
+                  size={34}
+                  state={state === STATE_THINKING ? 'thinking' : 'idle'}
+                  ariaLabel="Enviar al agente"
+                />
+              ) : (
+                <ChagraAgentAvatar
+                  size={38}
+                  state={state === STATE_THINKING ? 'thinking' : 'idle'}
+                  ariaLabel="Enviar al agente"
+                />
+              )}
             </button>
           </div>
         </div>
