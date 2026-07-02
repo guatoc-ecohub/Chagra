@@ -1,7 +1,9 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- legacy service copy already tracked separately */
 import { ulid } from 'ulid';
 import { openDB, STORES } from '../db/dbCore.js';
 import { appendEvent, getStock } from './inventoryService.js';
 import { createInventoryEvent, EVENT_TYPES } from './inventoryEvents.js';
+import { resolveFeedingPlanTemplateForSpecies } from '../data/feedingPlanFrutales.js';
 
 /** @typedef {import('../types').ChagraAsset} ChagraAsset */
 /** @typedef {import('../types').ChagraLog} ChagraLog */
@@ -177,7 +179,7 @@ export async function generatePlanForPlant({ assetId, speciesSlug, plantingDate,
     }
 
     if (!speciesData) return null;
-    const template = speciesData.feeding_plan_template;
+    const template = resolveFeedingPlanTemplateForSpecies(speciesData);
     if (!template || !template.primary_steps) {
         // Returns empty plan with no steps
         return await savePlan({
@@ -260,6 +262,8 @@ export async function generatePlanForPlant({ assetId, speciesSlug, plantingDate,
         species_slug: speciesSlug,
         generated_at: generatedAt,
         scale_notes: scaleNotes,
+        feeding_plan_source: template.source || null,
+        feeding_plan_notes: Array.isArray(template.notes) ? template.notes : [],
         companions: speciesData.companions || [],
         antagonists: speciesData.antagonists || [],
         steps,
