@@ -24,7 +24,7 @@
  *   getDepartamentos() / getMunicipios(dpto) / findMunicipio(query)
  */
 
-import dataset from '../data/colombia-locations.dane.json';
+import dataset from '../data/colombia-locations.dane.json' with { type: 'json' };
 
 /**
  * Estructura: { departamento: [ { name, lat, lng, altitud, codigo } ] }.

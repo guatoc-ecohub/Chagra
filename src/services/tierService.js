@@ -101,7 +101,7 @@ export function getCurrentTier() {
  * Uso típico en sidecarClient y deepResearchClient:
  *   const headers = buildSidecarHeaders(getToken());
  *
- * @param {string} [token] — VITE_CHAGRA_MCP_TOKEN (puede ser vacío si no está configurado).
+ * @param {string} [token] - VITE_CHAGRA_MCP_TOKEN (puede ser vacío si no está configurado).
  * @returns {Object.<string, string>} headers listos para inyectar en fetch.
  */
 export function buildSidecarHeaders(token) {

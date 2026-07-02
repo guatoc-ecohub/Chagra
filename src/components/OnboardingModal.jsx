@@ -1,7 +1,8 @@
-import React from 'react';
-import { X, ExternalLink, Server, BookOpen, ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, ExternalLink, Server, BookOpen, ArrowRight, ChevronDown } from 'lucide-react';
 
 export function OnboardingModal({finca, onClose, onConfigureLater}) {
+    const [showTech, setShowTech] = useState(false);
     if (!finca) return null;
 
     return (
@@ -35,24 +36,35 @@ export function OnboardingModal({finca, onClose, onConfigureLater}) {
                     </div>
 
                     <div className="bg-slate-800/50 rounded-xl p-4 space-y-3">
-                        <h3 className="text-sm font-bold text-slate-300 flex items-center gap-2">
-                            <BookOpen size={16} className="text-emerald-400" />
-                            Opciones disponibles:
-                        </h3>
-                        <ul className="text-xs text-slate-400 space-y-2">
-                            <li className="flex items-start gap-2">
-                                <span className="text-emerald-400 mt-0.5">1.</span>
-                                <span>Instala <strong className="text-slate-300">FarmOS</strong> en un servidor local o VPS</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <span className="text-emerald-400 mt-0.5">2.</span>
-                                <span>Usa el servicio <strong className="text-slate-300">Hosted FarmOS</strong> (farmos.org)</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <span className="text-emerald-400 mt-0.5">3.</span>
-                                <span>Configura el endpoint en las settings de Chagra</span>
-                            </li>
-                        </ul>
+                        <p className="text-xs text-slate-400 leading-relaxed">
+                            Chagra se conecta a un servidor FarmOS para guardar los datos de su finca.
+                            Si usted no administra el servidor, pídale a su técnico de confianza que
+                            lo configure.
+                        </p>
+                        <button
+                            type="button"
+                            onClick={() => setShowTech((v) => !v)}
+                            className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-300 transition-colors"
+                        >
+                            <ChevronDown size={14} className={`transition-transform ${showTech ? 'rotate-180' : ''}`} />
+                            {showTech ? 'Ocultar opciones técnicas' : 'Ver opciones técnicas'}
+                        </button>
+                        {showTech && (
+                            <ul className="text-xs text-slate-400 space-y-2">
+                                <li className="flex items-start gap-2">
+                                    <span className="text-emerald-400 mt-0.5">1.</span>
+                                    <span>Instale <strong className="text-slate-300">FarmOS</strong> en un servidor local o VPS</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-emerald-400 mt-0.5">2.</span>
+                                    <span>Use el servicio <strong className="text-slate-300">Hosted FarmOS</strong> (farmos.org)</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-emerald-400 mt-0.5">3.</span>
+                                    <span>Configure el endpoint en las settings de Chagra</span>
+                                </li>
+                            </ul>
+                        )}
                     </div>
 
                     <div className="flex flex-col gap-2">

@@ -64,7 +64,7 @@ test.describe.skip('Inventory LWW — Fase 4 ADR-019', () => {
 
     // Login (mismo patrón offline.spec.js).
     await page.getByLabel(/usuario/i).fill('e2e-operator');
-    await page.getByLabel(/contraseña/i).fill('e2e-pass');
+    await page.getByRole('textbox', { name: /contraseña/i }).fill('e2e-pass');
     await page.getByRole('button', { name: /ingresar/i }).click();
 
     // Inyectar localmente un asset--material con timestamp MÁS reciente

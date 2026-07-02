@@ -99,9 +99,9 @@ export function isReloadSafe() {
  * crea su propio estado). En prod se llama UNA vez desde main.jsx.
  *
  * @param {object} [opts]
- * @param {(version:string)=>void} [opts.onUpdateAvailable] — callback opcional
+ * @param {(version:string)=>void} [opts.onUpdateAvailable] - callback opcional
  *   cuando hay versión nueva (además del CustomEvent del banner). Para tests.
- * @param {boolean} [opts.autoUpdate=true] — si false, vuelve a consent-only
+ * @param {boolean} [opts.autoUpdate=true] - si false, vuelve a consent-only
  *   (solo banner, sin skipWaiting automático). Permite al operador desactivar
  *   el comportamiento sin revertir código (ver tradeoff en el PR).
  * @param {number} [opts.autoUpdateDelayMs=AUTO_UPDATE_DELAY_MS]
@@ -198,7 +198,7 @@ export function registerServiceWorker(opts = {}) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
       .then((registration) => {
-        console.log('Service Worker registrado:', registration.scope);
+        console.info('Service Worker registrado:', registration.scope);
         if (typeof registration.update === 'function') {
           registration.update().catch(() => {});
         }

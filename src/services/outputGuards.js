@@ -631,7 +631,7 @@ const DOSE_PATTERNS = [
  *
  * Anti-sobre-supresión: la dosis sola (respuesta orgánica con "2 kg de compost")
  * NO basta — hace falta el token sintético. Un biopreparado permitido nunca es
- * sintético (no entra acá).
+ * sintético (no entra aquí).
  *
  * @param {string} norm  texto ya normalizado (minúsculas, sin tildes).
  * @returns {boolean}
@@ -815,7 +815,7 @@ const FUEL_AS_ADJUVANT_RE =
  * ¿El texto normalizado usa un combustible/solvente como adyuvante de un preparado
  * CON una dosis (o con un verbo de mezcla/adherencia)? Esa conjunción delata la
  * RECETA peligrosa de BORDE-020 que debe SUPRIMIRSE. Anti-sobre-supresión: sin el
- * verbo de mezcla/adherencia ni dosis (p.ej. "no le eches diésel") no entra acá; la
+ * verbo de mezcla/adherencia ni dosis (p.ej. "no le eches diésel") no entra aquí; la
  * advertencia de no-usar la corta el gate `esAdvertenciaNoUsar` en el guard.
  *
  * @param {string} norm  texto normalizado (minúsculas, sin tildes).
@@ -1033,7 +1033,7 @@ export function guardSyntheticAgrochemical(responseText, _resolvedEntities = nul
   // devolvemos SOLO el bloque de redirección orgánica. Append-only dejaba la
   // dosis sintética legible debajo del aviso (el campesino igual la leía). La
   // supresión SOLO dispara con sintético + dosis: una respuesta orgánica con
-  // cantidades ("2 kg de compost", "1 L de biol por planta") NO entra acá
+  // cantidades ("2 kg de compost", "1 L de biol por planta") NO entra aquí
   // (`_hasSyntheticFertilizerDose` exige un token SINTÉTICO, no orgánico).
   if (_hasSyntheticFertilizerDose(norm)) {
     return {
@@ -1825,7 +1825,7 @@ function _presentaComoViable(textNorm, nombreNorm) {
  * viabilidad. El re-bench (2026-05-31) mostró que el detector anterior
  * (`_presentaComoViable`) se apoyaba en un léxico de viabilidad ("es viable",
  * "prospera", "recomendable") y se le escapaban respuestas que igual mandaban a
- * sembrar con otro fraseo (curuba CPX-010, chugua CPX-001). Acá basta con que
+ * sembrar con otro fraseo (curuba CPX-010, chugua CPX-001). Aquí basta con que
  * el texto INVITE a sembrar/cultivar la especie y NO advierta inviabilidad.
  *
  * Esto se usa SOLO cuando el grounding (campo viabilidad o banda de altitud) ya
@@ -2276,11 +2276,41 @@ const DOSE_RE =
   /\b\d+(?:[.,]\d+)?\s*(?:ml|cc|g|gr|gramos?|kg|l|lt|litros?|cm3|cucharad(?:as|ita)s?)\b(?:\s*(?:\/|por|por\s+cada|x)\s*(?:l|lt|litro|litros|planta|plantas|mata|matas|ha|hect|hectarea|m2|arbol|arboles|bomba|caneca)\b)?/gi;
 
 /**
- * Indicios de que la dosis SÍ trae respaldo (cita de fuente / etiqueta). Si
- * está presente cerca de la dosis, NO suavizamos.
+ * Allowlist de fuentes VERIFICADAS que pueden respaldar una dosis.
+ * Solo estas fuentes se consideran válidas para suprimir el caveat de dosis.
  */
-const SOURCE_HINT_RE =
-  /(seg[uú]n|etiqueta|\bICA\b|Agrosavia|Cenicaf[eé]|Restrepo|\bfuente\b|cat[aá]logo Chagra|recomienda(?:ci[oó]n)? de la|de acuerdo (?:a|con))/i;
+const VERIFIED_SOURCE_ALLOWLIST = new Set([
+  'ica',
+  'ica.gov.co',
+  'agrosavia',
+  'agrosavia.co',
+  'cenicafe',
+  'cenicafe.org',
+  'restrepo', // Dr. Carlos Restrepo, autoridad en agroecología colombiana
+  'catalogo chagra',
+  'etiqueta', // Etiqueta del producto (siempre verificable)
+  'ficha tecnica', // normalizado (sin tilde): se compara contra texto _stripDiacritics()
+]);
+
+/** Escapa caracteres especiales de regex para usar una cadena como literal. */
+const _escapeRegExpLiteral = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * Detecta si el texto cita alguna fuente VERIFICADA (de VERIFIED_SOURCE_ALLOWLIST).
+ * CRÍTICO: la allowlist es la ÚNICA fuente de verdad — no hay una lista paralela
+ * de nombres "hardcodeada" que pueda desincronizarse de ella. Normaliza el texto
+ * (minúsculas, sin tildes) y busca cada entrada de la allowlist como palabra/
+ * frase completa. Si el modelo inventa "según el INTA" (fuente NO verificada),
+ * esto NO cuenta como respaldo y el caveat de dosis se mantiene.
+ */
+function _hasVerifiedSourceMention(responseText) {
+  const norm = _stripDiacritics(responseText);
+  for (const fuente of VERIFIED_SOURCE_ALLOWLIST) {
+    const re = new RegExp(`\\b${_escapeRegExpLiteral(fuente)}\\b`, 'i');
+    if (re.test(norm)) return true;
+  }
+  return false;
+}
 
 /**
  * Guard 4 — dosis sin fuente (PARCIAL: suaviza, no borra). Si el texto da una
@@ -2300,10 +2330,19 @@ export function guardDoseWithoutSource(responseText, _resolvedEntities = null, _
   if (doses.length === 0) {
     return { text: responseText, modified: false, reason: null };
   }
-  // Si ya hay cita de fuente en el texto, asumimos respaldo → no suavizar.
-  if (SOURCE_HINT_RE.test(responseText)) {
+
+  // CRÍTICO: Solo si hay una fuente de VERIFIED_SOURCE_ALLOWLIST en el texto,
+  // asumimos respaldo. _hasVerifiedSourceMention() está atada directamente a la
+  // allowlist (no hay una lista paralela hardcodeada que pueda desincronizarse).
+  // Si el modelo inventa "según una recomendación del ICA" con un decreto falso,
+  // esto matcheará "ICA" (que está en la allowlist) pero esto es seguro: si
+  // menciona ICA, el usuario puede verificar. Lo peligroso es NO mencionar
+  // fuente alguna, o citar una fuente que NO está en la allowlist.
+  const hasVerifiedSource = _hasVerifiedSourceMention(responseText);
+  if (hasVerifiedSource) {
     return { text: responseText, modified: false, reason: null };
   }
+
   // Evitar duplicar la nota si ya está.
   if (/confirma la dosis con/i.test(responseText)) {
     return { text: responseText, modified: false, reason: null };
@@ -2315,6 +2354,135 @@ export function guardDoseWithoutSource(responseText, _resolvedEntities = null, _
     'antes de aplicar — las cantidades varían según el producto y no conviene guiarse por una cifra sin fuente.';
   const text = `${responseText.trim()}\n\n${nota}`;
   return { text, modified: true, reason: `dosis_sin_fuente: ${[...new Set(doses)].slice(0, 5).join(', ')}` };
+}
+
+// ── GUARD: contacto inventado (teléfonos, correos, URLs, decretos) ──
+
+/**
+ * Allowlist de contactos VERIFICADOS oficiales. Solo estos contactos pueden
+ * aparecer en la respuesta sin ser marcados como inventados.
+ */
+const VERIFIED_CONTACTS_ALLOWLIST = new Set([
+  // URLs oficiales verificadas
+  'www.gov.co',
+  'www.ica.gov.co',
+  'www.minagricultura.gov.co',
+  'www.agrosavia.co',
+  'www.cenicafe.org',
+  // No incluimos teléfonos/correos específicos porque el modelo puede inventar variaciones
+  // Si el usuario necesita un contacto oficial, debe buscarlo en los sitios oficiales
+]);
+
+/**
+ * Regex para detectar teléfonos colombianos. Formatos:
+ * - (+57) 300 123 4567
+ * - 300 123 4567
+ * - 300-123-4567
+ * - (300) 123 4567
+ */
+const PHONE_RE =
+  /(?:\+57\s?)?(\(?3\d{2}\)?[-\s]?\d{3}[-\s]?\d{4}|\d{3}[-\s]?\d{7})/g;
+
+/**
+ * Regex para detectar correos electrónicos.
+ */
+const EMAIL_RE =
+  /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g;
+
+/**
+ * Regex para detectar URLs (http, https, www).
+ */
+const URL_RE =
+  /\b(?:https?:\/\/|www\.)[A-Za-z0-9-]{2,}\.[A-Za-z]{2,}(?:\/[^\s]*)?\b/g;
+
+/**
+ * Regex para detectar números de decreto/resolución. Formatos:
+ * - Decreto 1234 de 2015
+ * - Resolución 567 de 2020
+ * - Decreto No. 890
+ */
+const DECREE_RE =
+  /\b(?:Decreto|Resolución|Res|Dec\.|Decreto\s+No\.?)\s*(?:\d+|[IVXLCDM]+)(?:\s+de\s+\d{4})?\b/gi;
+
+/**
+ * Guard 5 — contacto inventado. Si el texto incluye teléfonos, correos,
+ * URLs o números de decreto/resolución que NO estén en la allowlist
+ * verificada, los MARCA/REEMPLAZA por un texto seguro que indica al
+ * usuario que verifique el contacto oficial con su UMATA o el ICA.
+ *
+ * Este es un guard de SEGURIDAD porque el modelo puede inventar contactos
+ * institucionales falsos para reportar plagas cuarentenarias, aplicar
+ * agroquímicos, o tramitar trámites, lo cual puede llevar al usuario a
+ * contactos fraudulentos o inexistentes.
+ *
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardInventedContact(responseText, _resolvedEntities = null, _fincaAltitud = null) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+
+  let modified = false;
+  let inventedContacts = [];
+  let text = responseText;
+
+  // Detectar teléfonos
+  const phones = text.match(PHONE_RE) || [];
+  for (const phone of phones) {
+    // Normalizar el teléfono para comparar (remover espacios, guiones, paréntesis)
+    const normalizedPhone = phone.replace(/[\s\-()]/g, '');
+    // Verificar si NO está en la allowlist (la allowlist está vacía para teléfonos)
+    if (!VERIFIED_CONTACTS_ALLOWLIST.has(normalizedPhone)) {
+      inventedContacts.push(`teléfono: ${phone}`);
+      text = text.replace(phone, '[VERIFICAR CONTACTO OFICIAL CON SU UMATA O EL ICA]');
+      modified = true;
+    }
+  }
+
+  // Detectar correos
+  const emails = text.match(EMAIL_RE) || [];
+  for (const email of emails) {
+    if (!VERIFIED_CONTACTS_ALLOWLIST.has(email.toLowerCase())) {
+      inventedContacts.push(`correo: ${email}`);
+      text = text.replace(email, '[VERIFICAR CONTACTO OFICIAL CON SU UMATA O EL ICA]');
+      modified = true;
+    }
+  }
+
+  // Detectar URLs
+  const urls = text.match(URL_RE) || [];
+  for (const url of urls) {
+    const normalizedUrl = url.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0].toLowerCase();
+    if (!VERIFIED_CONTACTS_ALLOWLIST.has(normalizedUrl)) {
+      inventedContacts.push(`URL: ${url}`);
+      text = text.replace(url, '[VERIFICAR CONTACTO OFICIAL CON SU UMATA O EL ICA]');
+      modified = true;
+    }
+  }
+
+  // Detectar decretos/resoluciones
+  const decrees = text.match(DECREE_RE) || [];
+  for (const decree of decrees) {
+    // Solo algunos decretos específicos están verificados
+    // Por ejemplo, Ley 1930 de 2018 es conocida, pero otros pueden ser inventados
+    const isKnownDecree = /Ley\s+1930|Ley\s+2041|Decreto\s+1071/i.test(decree);
+    if (!isKnownDecree) {
+      inventedContacts.push(`normativa: ${decree}`);
+      text = text.replace(decree, '[VERIFICAR NORMATIVA OFICIAL CON SU UMATA O EL ICA]');
+      modified = true;
+    }
+  }
+
+  if (modified) {
+    bumpGuardTelemetry('invented_contact');
+    return {
+      text,
+      modified: true,
+      reason: `contacto_inventado: ${[...new Set(inventedContacts)].slice(0, 5).join(', ')}`,
+    };
+  }
+
+  return { text: responseText, modified: false, reason: null };
 }
 
 // ── GUARD: receta EXACTA de caldo clásico pedida en dosis (BORDE-003 / 004) ──
@@ -2978,7 +3146,7 @@ const LOW_CONFIDENCE_VISION_NOTE =
  *
  * @param {string} responseText
  * @param {object} [ctx]
- * @param {boolean} [ctx.hadVision=false]  ¿hubo una imagen real en el turno?
+ * @param {boolean} [ctx.hadVision=false] - ¿hubo una imagen real en el turno?
  * @param {number|null} [ctx.visionConfidence=null]  confianza de analyzeFoliage.
  * @returns {{text:string, modified:boolean, reason:string|null}}
  */
@@ -3898,7 +4066,7 @@ const DIFFERENTIAL_PHRASING_RE =
  * oración o conector), colisionan con "Género" de un binomio y producirían
  * falsos positivos en `_namesLatinBinomial` ("Mientras tanto", "Para saber",
  * "Una mancha", "Esas hojas"). Normalizadas sin tildes/case. NO son géneros
- * latinos; si el "Género" candidato está acá, no cuenta como binomio.
+ * latinos; si el "Género" candidato está aquí, no cuenta como binomio.
  */
 const BINOMIAL_GENUS_STOPWORDS = new Set([
   'mientras', 'para', 'una', 'unas', 'unos', 'esas', 'esos', 'esta', 'este', 'estas',
@@ -4023,7 +4191,7 @@ export function guardDiagnosisWithoutPhoto(
   //   (c) fraseo diferencial enumerando candidatos.
   // Un solo patógeno confiado ("es tizón tardío") es el caso MÁS dañino: manda
   // a tratar a ciegas con plena seguridad. Una respuesta que solo da manejo
-  // cultural genérico (sin patógeno ni latín) NO entra acá.
+  // cultural genérico (sin patógeno ni latín) NO entra aquí.
   let nombraPatogeno = false;
   for (const term of PATHOGEN_NAME_TERMS) {
     if (norm.includes(term)) { nombraPatogeno = true; break; }
@@ -5748,7 +5916,7 @@ export function guardSurfaceConfusionWarning(responseText, resolvedEntities = nu
   }
 
   // Sin confusión tóxica crítica activa → no tocamos nada (anti-FP central: un
-  // alimento seguro con consejo de consumo crudo —lechuga, lulo— NO entra acá).
+  // alimento seguro con consejo de consumo crudo —lechuga, lulo— NO entra aquí).
   if (!toxicCw) {
     return { text: responseText, modified: false, reason: null };
   }
@@ -6182,7 +6350,7 @@ function _extractAltitudesWide(norm) {
   const reUnit = /\b(\d{1,2}[.,]?\d{3}|\d{2,4})\s*(m|msnm|metros|mts)\b/g;
   let m;
   while ((m = reUnit.exec(norm)) !== null) {
-    // Excluir falsos: "20 litros"/"8 dias" no llegan acá (la unidad es de altitud),
+    // Excluir falsos: "20 litros"/"8 dias" no llegan aquí (la unidad es de altitud),
     // pero "20 m" sí — la cota inferior plausible para un cultivo es ~100 msnm.
     const n = Number(m[1].replace(/[.,]/g, ''));
     if (Number.isFinite(n) && n >= 50 && n <= 5000) out.push(n);
@@ -6706,6 +6874,193 @@ export function guardUnidentifiedRegionalCrop(responseText, { userMessage = null
     text: _coincyesReplacement(),
     modified: true,
     reason: `cultivo_regional_no_identificado: coincyes (${signals.join(', ')})`,
+  };
+}
+
+// ── C3 (fix #95): binomio latino para término regional no verificado ─────────
+
+/**
+ * Regex que detecta un binomio latino (Género especie) en la respuesta.
+ * Requisitos anti-falsos-positivos:
+ *   - Primera letra mayúscula (género) seguida de minúscula + mínimo 2 chars.
+ *   - Especia en minúsculas, mínimo 3 chars.
+ *   - NO captura: siglas (ICA, MRL), palabras solas, nombres propios cortos.
+ * Calibrado para detectar "Piper aduncum", "Cointzia sp.", "Momordica charantia",
+ * etc. sin disparar sobre texto normal como "En Colombia se..." o "La región".
+ *
+ * Notas de diseño: el patrón es intencionalmente amplio en la captura (captura
+ * el binomio), pero el guard solo actúa si ADEMÁS el término del usuario no está
+ * grounded. Así el falso positivo es imposible: si el LLM inventó el binomio en
+ * contexto sin grounding, el guard actúa; si había grounding de alta confianza
+ * para ese término, `resolvedMentions` lo incluye y el guard NO actúa.
+ */
+// Regex estricto para binomio botánico:
+//   - Genus: mayúscula inicial + ≥4 letras [a-z] sin tilde (latín puro). Total ≥5 chars.
+//   - Epithet: todo [a-z] sin tilde, mínimo 4 chars. Excluye español con tilde
+//     ("más", "así", "allí") porque los epítetos botánicos son latín puro sin diacríticos.
+// Anti-falsos-positivos: "Cuéntame más" no matchea (Cuéntame tiene tilde → no captura
+// por [a-z] puro en el genus; además "más" tiene 3 chars < 4 mínimo del epithet).
+// Fix #95 — anti falsos positivos: SOLO binomios entre paréntesis, que es el
+// patrón real con que el LLM "identifica" un término ("La yumbolo (Tithonia
+// diversifolia) es..."). Así NO matchea verbos capitalizados a inicio de oración
+// ("Aplica glifosato", "Evita usar") ni binomios reales recomendados sin
+// paréntesis ("...y Bacillus thuringiensis para orugas"), que no son atribución
+// al término desconocido del usuario y disparaban clobbereo de respuestas sanas.
+const LATIN_BINOMIAL_RE =
+  /\(\s*([A-Z][a-z]{4,})\s+([a-z]{4,}(?:\s+(?:var\.|f\.|subsp\.|ssp\.)?\s*[a-z]{4,})?)\b/g;
+
+/**
+ * Palabras comunes que podrían parecer binomios pero NO lo son.
+ * Anti-falsos-positivos para el detector de binomios.
+ */
+const BINOMIAL_FALSE_POSITIVES = new Set([
+  // términos agroecológicos comunes Género-like
+  'chagra ia', 'chagra tiene', 'colombia tiene', 'colombia es', 'colombia no',
+  // nombres propios frecuentes en contexto agro
+  'cauca valle', 'boyaca cundinamarca', 'nino nina',
+  // verbos/frases con mayúscula al inicio de oración (el regex solo toma
+  // el token, pero por si acaso)
+  'asistente chagra',
+]);
+
+/**
+ * ¿El texto contiene al menos un binomio latino?
+ * @param {string} normText  texto sin diacríticos y en minúsculas
+ * @returns {string|null} el primer binomio encontrado, o null
+ */
+function _extractLatinBinomial(text) {
+  // Reseteamos el lastIndex porque el regex es global
+  LATIN_BINOMIAL_RE.lastIndex = 0;
+  let match;
+  while ((match = LATIN_BINOMIAL_RE.exec(text)) !== null) {
+    const genus = match[1];
+    const epithet = match[2].split(/\s+/)[0]; // primera palabra de la especia
+    // El género debe tener ≥4 chars para reducir falsos (evita "El", "La", etc.)
+    if (genus.length < 4) continue;
+    const pair = `${genus} ${epithet}`;
+    if (BINOMIAL_FALSE_POSITIVES.has(pair.toLowerCase())) continue;
+    return pair;
+  }
+  return null;
+}
+
+/**
+ * guardUnverifiedTermBinomial — fix #95. Detecta cuando la respuesta contiene
+ * un binomio latino (Género especie) atribuido a un término que el usuario
+ * mencionó pero que NO tiene grounding de alta confianza en el catálogo.
+ *
+ * Actúa solo si:
+ *   1. El usuario introdujo un término (userMessage) que no aparece en los
+ *      `mentioned` de alta confianza (resolvedMentions).
+ *   2. La respuesta contiene un binomio latino.
+ *   3. La respuesta no usa ya el marcador de incertidumbre ("no puedo confirmar",
+ *      "no reconozco el término", "no tengo información sobre").
+ *
+ * Es SUPPRESS-AND-REPLACE: si la respuesta ya inventó el binomio, la reemplaza
+ * por una petición de aclaración con foto. Si la respuesta es honesta, no toca.
+ *
+ * Anti-falsos-positivos: si resolvedMentions incluye el término del usuario
+ * con alta confianza, el guard NO actúa (el binomio es legítimo del catálogo).
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null, resolvedMentions?: Set<string>}} ctx
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardUnverifiedTermBinomial(
+  responseText,
+  { userMessage = null, resolvedMentions = new Set() } = {}
+) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Si la respuesta ya es honesta sobre no saber, no tocar.
+  const norm = responseText.toLowerCase();
+  if (
+    norm.includes('no puedo confirmar') ||
+    norm.includes('no reconozco el término') ||
+    norm.includes('no tengo información sobre') ||
+    norm.includes('no lo voy a tratar como') ||
+    norm.includes('¿podrías describirlo') ||
+    norm.includes('necesito que me confirmes') ||
+    norm.includes('foto de la') ||
+    norm.includes('cuéntame qué planta') ||
+    norm.includes('¿puedes enviar una foto') ||
+    norm.includes('puedes enviar una foto')
+  ) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  if (typeof userMessage !== 'string' || !userMessage.trim()) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Condición PRINCIPAL: el guard actúa solo cuando NO hay ningún mentioned de
+  // alta confianza del resolver para esta consulta. Si hay al menos un término
+  // verificado (gulupa, café...), el binomio en la respuesta es probablemente
+  // legítimo y NO tocamos nada.
+  //
+  // Diseño conservador: si resolvedMentions tiene cualquier entrada, asumimos
+  // que el grounding es legítimo. Falsos negativos (nombre regional + nombre
+  // verificado en la misma consulta) son aceptables frente a los falsos
+  // positivos (bloquear respuesta legítima sobre gulupa).
+  if (resolvedMentions.size > 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Sin ningún mentioned de alta confianza: ¿la respuesta contiene un binomio latino?
+  const binomial = _extractLatinBinomial(responseText);
+  if (!binomial) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Extrae el término más probable que el usuario introdujo como nombre regional.
+  // Usa el token más corto y menos común del userMessage (heurística: nombres
+  // regionales tienden a ser palabras únicas no en el vocabulario español estándar).
+  const USER_STOPWORDS = new Set([
+    // preposiciones y conjunciones
+    'para', 'como', 'porque', 'desde', 'hasta', 'sobre', 'entre', 'hacia', 'ante',
+    // verbos comunes conjugados
+    'tiene', 'tengo', 'tenemos', 'tener', 'pueden', 'puede', 'dijeron', 'ofrecen',
+    'quiero', 'quiere', 'quieren', 'traer', 'traigo', 'traen', 'seria', 'seria',
+    'creen', 'creo', 'dicen', 'dice', 'piden', 'pide',
+    // sustantivos agrícolas genéricos
+    'semilla', 'planta', 'plantas', 'mata', 'matas', 'cultivo', 'cultivos',
+    'finca', 'campo', 'lote', 'tierra', 'suelo', 'agua', 'ganado', 'siembra',
+    'cosecha', 'riego', 'abono', 'monte', 'pasto',
+    // adjetivos comunes
+    'buena', 'bueno', 'buenas', 'buenos', 'muchas', 'mucho', 'estas', 'estos',
+    // interrogativos y relativos
+    'cuando', 'donde', 'esto', 'esta', 'este', 'esos', 'esas',
+  ]);
+
+  const userTokens = userMessage
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .split(/\W+/)
+    .filter((t) => t.length >= 4 && !USER_STOPWORDS.has(t));
+
+  // Término sospechoso: el más corto (heurística para nombres regionales únicos).
+  const suspectTerm = userTokens.length > 0
+    ? userTokens.sort((a, b) => a.length - b.length)[0]
+    : 'ese término';
+
+  bumpGuardTelemetry('unverified_term_binomial');
+  const replacement =
+    `No puedo confirmar qué es "${suspectTerm}" porque ese término no está en el catálogo Chagra ` +
+    `y no tengo un grounding verificado para él. No lo voy a tratar como ${binomial} sin evidencia.\n\n` +
+    `Para identificar la planta correctamente necesito:\n` +
+    `- Foto de la hoja (haz y envés), tallo, flor o fruto si hay.\n` +
+    `- Nombre local que usan en tu vereda o municipio, y quién lo usa así.\n` +
+    `- Altura de la finca (msnm) y departamento.\n` +
+    `- Para qué la usarías: alimento, medicinal, sombrío, forraje, madera o mercado.\n\n` +
+    `Con esa información sí puedo cruzar el catálogo y darte una respuesta con respaldo real, ` +
+    `no inventada. ¿Puedes enviar una foto?`;
+
+  return {
+    text: replacement,
+    modified: true,
+    reason: `binomio_no_verificado: "${suspectTerm}" → ${binomial} (sin grounding en catálogo)`,
   };
 }
 
@@ -7711,8 +8066,8 @@ export function guardParamoNormativa(responseText) {
  *
  * @param {string} responseText — texto del LLM
  * @param {object} [ctx]
- * @param {number|null} [ctx.forecastTempMin] — mínima del pronóstico (°C)
- * @param {number|null} [ctx.forecastTempMax] — máxima del pronóstico (°C)
+ * @param {number|null} [ctx.forecastTempMin] - mínima del pronóstico (°C)
+ * @param {number|null} [ctx.forecastTempMax] - máxima del pronóstico (°C)
  * @returns {{text:string, modified:boolean, reason:string|null}}
  */
 export function guardClimaConsejo(responseText, { forecastTempMin = null, forecastTempMax = null } = {}) {
@@ -7847,21 +8202,21 @@ const GUARD_CHAIN = [
  *
  * @param {string} responseText  texto del LLM (ya pos-voseo / pos-roleLeak).
  * @param {object} [ctx]
- * @param {Array<object>|null} [ctx.resolvedEntities] — grounding AGE del turno.
- * @param {number|string|null} [ctx.fincaAltitud] — msnm de la finca activa.
- * @param {boolean} [ctx.hadVision=false] — ¿hubo una imagen real (item foto /
+ * @param {Array<object>|null} [ctx.resolvedEntities] - grounding AGE del turno.
+ * @param {number|string|null} [ctx.fincaAltitud] - msnm de la finca activa.
+ * @param {boolean} [ctx.hadVision=false] - ¿hubo una imagen real (item foto /
  *   analyzeFoliage corrido) en ESTE turno? Sin esto el guard de visión asume
  *   que NO hubo foto y corrige cualquier diagnóstico visual fabricado.
- * @param {number|null} [ctx.visionConfidence=null] — confianza de analyzeFoliage
+ * @param {number|null} [ctx.visionConfidence=null] - confianza de analyzeFoliage
  *   (para suavizar hallazgos detallados cuando la visión no fue concluyente).
- * @param {string|null} [ctx.profileName] — nombre del usuario (getProfile().nombre)
+ * @param {string|null} [ctx.profileName] - nombre del usuario (getProfile().nombre)
  *   para el guard de nombre inventado. Si falta, cualquier saludo con nombre se remueve.
- * @param {number|null} [ctx.forecastTempMin] — mínima esperada del pronóstico (°C),
+ * @param {number|null} [ctx.forecastTempMin] - mínima esperada del pronóstico (°C),
  *   derivada de climaSnapshot.openmeteo.forecast_7d. Habilita el guard térmico
  *   (riesgo de helada). Sin esto, el guard térmico es no-op.
- * @param {number|null} [ctx.forecastTempMax] — máxima esperada del pronóstico (°C)
+ * @param {number|null} [ctx.forecastTempMax] - máxima esperada del pronóstico (°C)
  *   para el riesgo de golpe de calor. Mismo origen.
- * @param {string|null} [ctx.userMessage] — pregunta cruda del usuario (A12). Si
+ * @param {string|null} [ctx.userMessage] - pregunta cruda del usuario (A12). Si
  *   es claramente de PRECIO/MERCADO (no de siembra), los guards de SIEMBRA
  *   (viabilidad/térmico/sustitución/companion/invasora/falso-negativo) NO corren
  *   —razonan sobre cultivo y son irrelevantes a "¿a cómo está la papa?". Los de
@@ -8694,6 +9049,13 @@ export function applyOutputGuards(
     }
   }
 
+  // GUARD BINOMIO NO VERIFICADO (fix #95): MOVIDO al final de la cadena como
+  // último recurso (ver tras los guards de tóxico/benéfico/binomio-inventado),
+  // para que esos guards más específicos tengan precedencia y no los pise su
+  // suppress-and-replace. Antes corría aquí con return temprano y clobbereaba
+  // la deflexión honesta, el caveat de benéfico fabricado y la neutralización
+  // quirúrgica de binomio inventado.
+
   // GUARD RECETA de CALDO CLÁSICO pedida en dosis exacta (BORDE-003 / 004): cuando
   // el usuario pide la receta EXACTA en gramos de un caldo clásico (bordelés/
   // sulfocálcico), ANTEPONE la guía de referencia segura (proporción 1:1 + prueba del
@@ -8882,6 +9244,18 @@ export function applyOutputGuards(
     modified = true;
     if (brandRes.reason) reasons.push(brandRes.reason);
   }
+  // Guard SAFETY de CONTACTO INVENTADO (teléfonos, correos, URLs, decretos):
+  // firma propia (solo el texto). Corre SIEMPRE (no es de siembra). SUPPRESS-AND-REPLACE:
+  // si el cuerpo incluye teléfonos, correos, URLs o números de decreto/resolución
+  // que NO estén en la allowlist verificada, los reemplaza por un texto seguro que
+  // indica al usuario que verifique el contacto oficial con su UMATA o el ICA.
+  // Va tras la marca inventada. Idempotente.
+  const contactRes = guardInventedContact(text);
+  if (contactRes.modified) {
+    text = contactRes.text;
+    modified = true;
+    if (contactRes.reason) reasons.push(contactRes.reason);
+  }
   // Guard SAFETY de AGROQUÍMICO DISFRAZADO con genérico inventado (BORDE-017/022 · V2):
   // firma propia (solo el texto). Corre SIEMPRE (no es de siembra). SUPPRESS-AND-REPLACE:
   // si el cuerpo recomienda un "fungicida/cebo natural que sirve para todo" o un ID de
@@ -8950,6 +9324,26 @@ export function applyOutputGuards(
     text = invBinRes.text;
     modified = true;
     if (invBinRes.reason) reasons.push(invBinRes.reason);
+  }
+  // GUARD BINOMIO NO VERIFICADO (fix #95) — ÚLTIMO RECURSO. Solo si NINGÚN guard
+  // más específico tocó ya la respuesta: cuando cuelga un binomio latino ENTRE
+  // PARÉNTESIS de un término del usuario sin grounding de alta confianza, la
+  // reemplaza por una petición de identificación con foto. SUPPRESS-AND-REPLACE;
+  // por eso va al final y solo con `modified` aún en false (no clobberea guards
+  // más específicos ni deflexiones/caveats previos).
+  if (!modified) {
+    const resolvedMentions = new Set(
+      (Array.isArray(entities) ? entities : [])
+        .filter((e) => typeof e.confidence === 'number' && e.confidence >= 0.8)
+        .map((e) => (e.mentioned || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim())
+        .filter(Boolean)
+    );
+    const unverifiedGuard = guardUnverifiedTermBinomial(text, { userMessage, resolvedMentions });
+    if (unverifiedGuard && unverifiedGuard.modified) {
+      text = unverifiedGuard.text;
+      modified = true;
+      if (unverifiedGuard.reason) reasons.push(unverifiedGuard.reason);
+    }
   }
   // Guard SAFETY-CRITICAL de superficie de ConfusionWarning (BORDE-001 ·
   // cianuro/escopolamina/ricina/rotenona): firma propia (necesita las entidades

@@ -58,19 +58,19 @@ describe('scoreKeywordsFlexible', () => {
   });
 
   it('ignora tildes y mayúsculas', () => {
-    const resp = 'Aplicá CALDO BORDELÉS como preventivo; mejora la AIREACIÓN.';
+    const resp = 'Aplique CALDO BORDELÉS como preventivo; mejora la AIREACIÓN.';
     const out = scoreKeywordsFlexible(resp, ['caldo bordeles', 'aireacion']);
     expect(out.matched).toBe(2);
   });
 
   it('match por LEMA: "podas"/"podar"/"podado" cuentan por keyword "poda"', () => {
-    expect(scoreKeywordsFlexible('Hacé podas de renovación.', ['poda']).matched).toBe(1);
+    expect(scoreKeywordsFlexible('Haga podas de renovación.', ['poda']).matched).toBe(1);
     expect(scoreKeywordsFlexible('Conviene podar las hojas secas.', ['poda']).matched).toBe(1);
     expect(scoreKeywordsFlexible('El cafetal ya está podado.', ['poda']).matched).toBe(1);
   });
 
   it('match por LEMA en la keyword multi-palabra: "variedad resistente" ~ "variedades resistentes"', () => {
-    const resp = 'Usá variedades resistentes como Castillo.';
+    const resp = 'Use variedades resistentes como Castillo.';
     expect(scoreKeywordsFlexible(resp, ['variedades resistentes']).matched).toBe(1);
     // y la forma singular del keyword también casa con el plural del texto
     expect(scoreKeywordsFlexible(resp, ['variedad resistente']).matched).toBe(1);
@@ -84,7 +84,7 @@ describe('scoreKeywordsFlexible', () => {
 
   it('match por SINÓNIMO: "nitrógeno" casa con "fijar nitrógeno"/"abono nitrogenado"/"leguminosas"', () => {
     expect(scoreKeywordsFlexible('Las leguminosas aportan al suelo.', ['nitrógeno']).matched).toBe(1);
-    expect(scoreKeywordsFlexible('Usá un abono nitrogenado.', ['nitrógeno']).matched).toBe(1);
+    expect(scoreKeywordsFlexible('Use un abono nitrogenado.', ['nitrógeno']).matched).toBe(1);
   });
 
   it('NO infla: keyword ausente sin sinónimo ni lema sigue sin contar', () => {
@@ -271,15 +271,15 @@ describe('scoreAntiHalluc (caller inyectado, sin GPU)', () => {
   });
 });
 
-// ── R5: juez Claude Haiku (Anthropic) + fallback determinístico ───────────────
+// ── R5: juez Claude Sonnet (Anthropic) + fallback determinístico ─────────────
 //
 // NOTA DE SEGURIDAD: ningún test usa una API key real ni llama a la red. La
 // llamada HTTP se mockea (`fetchImpl`) y la lectura de la key se inyecta (`env`
 // / `keyPath`). Estos tests pasan en CI SIN ANTHROPIC_API_KEY.
 
-describe('RECOMMENDED_JUDGE_MODEL ahora es Claude Haiku (local roto en Maxwell)', () => {
+describe('RECOMMENDED_JUDGE_MODEL ahora es Claude Sonnet (local roto en Maxwell)', () => {
   it('el default es el modelo Anthropic, no un modelo de ollama', () => {
-    expect(RECOMMENDED_JUDGE_MODEL).toBe('claude-haiku-4-5');
+    expect(RECOMMENDED_JUDGE_MODEL).toBe('claude-sonnet-5');
     expect(RECOMMENDED_JUDGE_MODEL).toBe(RECOMMENDED_ANTHROPIC_JUDGE_MODEL);
   });
 
@@ -357,12 +357,12 @@ describe('makeAnthropicJudgeCall (fetch mockeado, sin key real)', () => {
     const raw = await judgeCall('PROMPT DEL JUEZ');
     expect(raw).toBe('{"pass": true, "must_covered": 2, "must_total": 2, "red_flags_hit": 0}');
 
-    // contrato del request: endpoint + headers anthropic + modelo Haiku + temp 0
+    // contrato del request: endpoint + headers anthropic + modelo Sonnet + temp 0
     expect(captured.url).toBe('https://api.anthropic.com/v1/messages');
     expect(captured.init.headers['x-api-key']).toBe('sk-test-FAKE');
     expect(captured.init.headers['anthropic-version']).toBeTruthy();
     const body = JSON.parse(captured.init.body);
-    expect(body.model).toBe('claude-haiku-4-5');
+    expect(body.model).toBe('claude-sonnet-5');
     expect(body.temperature).toBe(0);
     expect(body.messages[0].content).toBe('PROMPT DEL JUEZ');
   });
@@ -582,7 +582,7 @@ describe('selectJudgeProvider', () => {
   it('AUTO con key → anthropic + judgeCall listo', () => {
     const sel = selectJudgeProvider({ env: { ANTHROPIC_API_KEY: 'sk-test-FAKE' }, fetchImpl: async () => ({}) });
     expect(sel.provider).toBe('anthropic');
-    expect(sel.judgeModel).toBe('claude-haiku-4-5');
+    expect(sel.judgeModel).toBe('claude-sonnet-5');
     expect(typeof sel.judgeCall).toBe('function');
     expect(sel.deterministic).toBe(false);
   });

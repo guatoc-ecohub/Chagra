@@ -29,7 +29,7 @@ import {
   getSpeciesById,
   getAllBiopreparados,
 } from '../db/catalogDB.js';
-import { getRelationsForSpecies } from './grafoRelations.js';
+import { getRelationsForSpecies, resolvePestSynonym } from './grafoRelations.js';
 import { findLocalImage } from '../utils/speciesImageResolver.js';
 import { normalizeForMatch, __TEST__ as RESOLVER_TEST } from '../utils/speciesResolver.js';
 
@@ -130,7 +130,7 @@ export function __resetDirectorioCache() {
  *
  * @param {string} query — texto libre del buscador.
  * @param {object} [opts]
- * @param {number} [opts.limit=12] — máximo de candidatos devueltos.
+ * @param {number} [opts.limit=12] - máximo de candidatos devueltos.
  * @returns {Promise<Array<{ id, comun, cientifico, familia, match: 'alias'|'exact'|'word' }>>}
  */
 export async function searchSpecies(query, opts = {}) {
@@ -342,7 +342,7 @@ export async function buildSpeciesFicha(speciesId) {
       }
     }
   }
-  const amenazas = buildAmenazas(sp, controllersByPlaga);
+  const amenazas = await buildAmenazas(sp, controllersByPlaga);
 
   return {
     id: speciesId,
@@ -379,9 +379,21 @@ export async function buildSpeciesFicha(speciesId) {
 }
 
 /** Une plagas/enfermedades del catálogo con sus controladores del grafo. */
-function buildAmenazas(sp, controllersByPlaga) {
+async function buildAmenazas(sp, controllersByPlaga) {
   const out = [];
-  const push = (nombre, tipo) => {
+  const speciesId = sp?.id || sp?.slug || '';
+  const resolvedCache = new Map();
+
+  const getResolvedPest = async (nombre) => {
+    const key = normalizeForMatch(nombre);
+    if (!key) return null;
+    if (resolvedCache.has(key)) return resolvedCache.get(key);
+    const resolved = await resolvePestSynonym(nombre);
+    resolvedCache.set(key, resolved);
+    return resolved;
+  };
+
+  const push = async (nombre, tipo) => {
     if (!nombre) return;
     const key = normalizeForMatch(nombre);
     // match por palabra completa contra las plagas del grafo (los nombres no
@@ -399,10 +411,22 @@ function buildAmenazas(sp, controllersByPlaga) {
         }
       }
     }
-    out.push({ nombre, tipo, controladores });
+    const resolved = await getResolvedPest(nombre);
+    const displayName = resolved && speciesId && Array.isArray(resolved.especiesAfectadas) && resolved.especiesAfectadas.includes(speciesId)
+      ? (resolved.plaga || nombre)
+      : nombre;
+    out.push({ nombre: displayName, tipo, controladores });
   };
-  if (Array.isArray(sp.plagas_criticas)) for (const p of sp.plagas_criticas) push(p, 'plaga');
-  if (Array.isArray(sp.enfermedades_criticas)) for (const e of sp.enfermedades_criticas) push(e, 'enfermedad');
+  if (Array.isArray(sp.plagas_criticas)) {
+    for (const p of sp.plagas_criticas) {
+      await push(p, 'plaga');
+    }
+  }
+  if (Array.isArray(sp.enfermedades_criticas)) {
+    for (const e of sp.enfermedades_criticas) {
+      await push(e, 'enfermedad');
+    }
+  }
   // Plagas que SOLO trae el grafo (no listadas como críticas en el catálogo).
   for (const [, pc] of controllersByPlaga) {
     const ya = out.some((a) => {
@@ -410,7 +434,13 @@ function buildAmenazas(sp, controllersByPlaga) {
       const pk = normalizeForMatch(pc.plaga);
       return containsWholeWord(ak, pk) || containsWholeWord(pk, ak) || ak === pk;
     });
-    if (!ya) out.push({ nombre: pc.plaga, tipo: 'plaga', controladores: pc.controladores });
+    if (!ya) {
+      const resolved = await getResolvedPest(pc.plaga);
+      const displayName = resolved && speciesId && Array.isArray(resolved.especiesAfectadas) && resolved.especiesAfectadas.includes(speciesId)
+        ? (resolved.plaga || pc.plaga)
+        : pc.plaga;
+      out.push({ nombre: displayName, tipo: 'plaga', controladores: pc.controladores });
+    }
   }
   return out;
 }

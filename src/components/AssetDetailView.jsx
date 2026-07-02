@@ -1,3 +1,4 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- legacy UI copy already tracked separately */
 import React, { useState, useMemo, useEffect } from 'react';
 import { X, Calendar, Tag, Activity, MapPin, AlertCircle, Images, Skull, Layers, Sprout } from 'lucide-react';
 import { SplitFlow } from './SplitFlow';
@@ -20,7 +21,7 @@ import { ETAPA_FENOLOGICA_LABELS } from '../utils/plantMeta';
 import { getAllSpecies } from '../db/catalogDB';
 import SpeciesImage from './SpeciesImage';
 import { matchSpeciesInCatalog } from '../utils/speciesResolver';
-import { resolveGenericFeedingForSpecies } from '../data/feedingPlanGeneric';
+import { getFeedingPlanKindForSpecies, resolveFeedingPlanTemplateForSpecies } from '../data/feedingPlanFrutales';
 
 // Derive speciesSlug from asset name.
 function deriveSpeciesSlug(name) {
@@ -363,12 +364,12 @@ const GenericFeedingPlan = ({ template }) => {
           data-testid="plan-generic-badge"
           className="text-[10px] font-bold uppercase tracking-wide text-amber-300 bg-amber-900/40 border border-amber-700/50 px-2 py-0.5 rounded-full"
         >
-          General por tipo de cultivo
+          Generico por categoria
         </span>
       </div>
 
       <p className="text-xs text-amber-200/90 italic">
-        No hay un plan propio para esta especie. Mostramos uno orientativo para{' '}
+        No hay un plan propio para esta especie. Mostramos uno generico por categoria para{' '}
         <span className="font-semibold">{template.label}</span>.
       </p>
 
@@ -448,17 +449,17 @@ const PlanSection = ({ asset }) => {
         // matchSpeciesInCatalog resuelve la des-coincidencia.
         const match = matchSpeciesInCatalog(list || [], speciesSlug, assetName);
         if (match?.id) setCanonicalSlug(match.id);
-        const tpl = match?.feeding_plan_template;
-        const present = !!(tpl && tpl.primary_steps && tpl.primary_steps.length > 0);
+        const tplKind = getFeedingPlanKindForSpecies(match);
+        const tpl = resolveFeedingPlanTemplateForSpecies(match);
+        const present = tplKind === 'poblado';
         if (present) {
           setStatus('present');
           return;
         }
-        // Cascada: sin template propio → intentar un genérico por tipo de
-        // cultivo (+ override por familia/rol), marcado como orientativo.
-        const generic = match ? resolveGenericFeedingForSpecies(match) : null;
-        if (generic) {
-          setGenericTemplate(generic);
+        // Cascada: sin template propio → usar la derivación genérica por
+        // categoria, marcada como orientativa y con notas de contexto.
+        if (tplKind === 'generico' && tpl) {
+          setGenericTemplate(tpl);
           setStatus('generic');
         } else {
           setStatus('absent');

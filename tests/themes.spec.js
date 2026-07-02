@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-// eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- Test suite description
+ 
 test.describe('Themes - Perfil de usuario y persistencia', () => {
     test.beforeEach(async ({ context }) => {
         // Mock de auth para entrar directo al dashboard
@@ -30,7 +30,7 @@ test.describe('Themes - Perfil de usuario y persistencia', () => {
 
         // Login
         await page.getByLabel(/usuario/i).fill('e2e-operator');
-        await page.getByLabel(/contraseña/i).fill('e2e-pass');
+        await page.getByRole('textbox', { name: /contraseña/i }).fill('e2e-pass');
         await page.getByRole('button', { name: /ingresar/i }).click();
 
         // Entrar a Perfil > Apariencia desde el menú de usuario.
@@ -57,7 +57,7 @@ test.describe('Themes - Perfil de usuario y persistencia', () => {
     test('tema Minimalista aplica el atributo correcto', async ({ page }) => {
         await page.goto('/');
         await page.getByLabel(/usuario/i).fill('e2e-operator');
-        await page.getByLabel(/contraseña/i).fill('e2e-pass');
+        await page.getByRole('textbox', { name: /contraseña/i }).fill('e2e-pass');
         await page.getByRole('button', { name: /ingresar/i }).click();
 
         await openAppearance(page);
@@ -69,7 +69,7 @@ test.describe('Themes - Perfil de usuario y persistencia', () => {
     test('tema Minimalista oculta el colibrí (#72 regression)', async ({ page }) => {
         await page.goto('/');
         await page.getByLabel(/usuario/i).fill('e2e-operator');
-        await page.getByLabel(/contraseña/i).fill('e2e-pass');
+        await page.getByRole('textbox', { name: /contraseña/i }).fill('e2e-pass');
         await page.getByRole('button', { name: /ingresar/i }).click();
 
         // Navegar al home para ver el AgentHero
@@ -113,7 +113,7 @@ test.describe('Themes - Perfil de usuario y persistencia', () => {
  * o ≥3.0 para botones/acentos de texto grande). Si alguien vuelve a meter
  * text-white sin theming en un tema claro, esta prueba falla.
  */
-// eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- Contrast test fixture with intentional Spanish labels
+ 
 const FIXTURE = `
   <div id="contrast-fixture" style="max-width:412px;padding:16px">
     <div class="bg-slate-900/60 border border-white/10 rounded-2xl p-4">

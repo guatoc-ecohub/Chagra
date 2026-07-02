@@ -41,6 +41,7 @@ import React from 'react';
 
 const STATE_LABEL = {
   idle: 'Chagra IA',
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- string preexistente al gate i18n; migración a messages.js (ADR-050) pendiente fuera de este cambio
   thinking: 'Chagra IA · pensando',
   speaking: 'Chagra IA · hablando',
   listening: 'Chagra IA · escuchando',
@@ -57,11 +58,15 @@ export default function ChagraAgentAvatarColibri({
   state = 'idle',
   size = 56,
   withLabel = false,
-  onClick,
-  onDoubleClick,
+  // Default undefined explícito: son props opcionales de verdad (el JSDoc de
+  // arriba las documenta como opcionales y el código guarda con `typeof`),
+  // pero sin default tsc las infiere requeridas y cada caller estático
+  // (p. ej. LoginScreen) suma un falso error al gate tsc:check.
+  onClick = undefined,
+  onDoubleClick = undefined,
   glow = false,
   className = '',
-  ariaLabel,
+  ariaLabel = undefined,
 }) {
   const tone = STATE_TONE_TEXT[state] || STATE_TONE_TEXT.idle;
   const label = STATE_LABEL[state] || STATE_LABEL.idle;

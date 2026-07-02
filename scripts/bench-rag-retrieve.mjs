@@ -1,35 +1,23 @@
 #!/usr/bin/env node
 /**
- * bench-rag-retrieve.mjs - benchmark de latencia del retrieve BM25 (cold + warm).
+ * bench-rag-retrieve.mjs - benchmark de recall y latencia del retrieve RAG.
  *
- * Mide el costo de `retrieve(query, topK)` sobre el corpus real (491+ species
- * en public/cycle-content/). Verifica el efecto del fix de pre-tokenize
- * (2026-05-20): antes scoreBM25 re-tokenizaba cada doc por query (500ms-2s
- * blocking), ahora usa termCounts pre-computados (~ms).
+ * Corre dos pasadas sobre el mismo golden set:
+ *   1. BM25 only, con /rag-embeddings.json deshabilitado.
+ *   2. Hybrid, con /rag-embeddings.json y embeddings de query activos.
  *
- * REINGENIERIA 2026-06-15: antes eran 3 archivos (este + .loader.mjs +
- * .register.mjs) para una sola invocacion rara
- * (`node --import ./scripts/bench-rag-retrieve.register.mjs scripts/bench-rag-retrieve.mjs`).
- * Ahora el loader hook (que agrega `.js` a los imports estilo Vite de src/) se
- * registra AQUI via `register()` con un modulo data: URL, asi corre con una sola
- * invocacion simple:
+ * El benchmark usa el corpus real en public/cycle-content/ y el gold set
+ * eval/rag-golden.json. La comparacion de recall no se hardcodea: se calcula
+ * en cada corrida a partir de los resultados del retriever.
  *
+ * Uso:
  *   node scripts/bench-rag-retrieve.mjs
+ *   OLLAMA_URL=http://localhost:11434 node scripts/bench-rag-retrieve.mjs
  *
- * Opcional: emite un registro de historial estandarizado v1 con --history.
- *
- * NOTA (2026-06-15): el loader resuelve imports estilo Vite (.js implicito +
- * JSON sin atributo). La ejecucion completa contra el ragRetriever.js actual
- * ademas necesita el layer `import.meta.env` de Vite (varios config/*.js lo
- * usan) - gap PRE-EXISTENTE en main, NO introducido por esta consolidacion.
- * La fusion 3->1 archivos es valida igual; correr bajo Node puro requiere ese
- * shim de entorno (pendiente, ver INDEX/README).
- *
- * No usa Vitest. Stubea `fetch` con `fs.readFile` para servir el corpus desde
- * public/cycle-content/, simulando el flujo de carga del PWA.
+ * Opcional:
+ *   --history   escribe un record JSONL estandarizado en data/bench-runs/
  */
-import { readFile } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'node:fs';
 import { performance } from 'node:perf_hooks';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -39,80 +27,25 @@ import { buildHistoryRecord, writeHistoryRecord } from '../bench/lib/history.mjs
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
-const CORPUS_ROOT = join(ROOT_DIR, 'public', 'cycle-content');
+const PUBLIC_DIR = join(ROOT_DIR, 'public');
+const CORPUS_ROOT = join(PUBLIC_DIR, 'cycle-content');
+const MANIFEST_PATH = join(CORPUS_ROOT, 'manifest.json');
+const EMBEDDINGS_PATH = join(PUBLIC_DIR, 'rag-embeddings.json');
+const GOLDEN_PATH = join(ROOT_DIR, 'eval', 'rag-golden.json');
+const OUTPUT_DIR = join(ROOT_DIR, 'data', 'bench-runs');
+const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
+const nativeFetch = globalThis.fetch?.bind(globalThis);
+register(new URL('./bench-rag-retrieve.loader.mjs', import.meta.url).href);
 
-// El codigo de src/ usa imports estilo Vite sin extension `.js` (ej.
-// `from '../config/taxonomy'`). Node nativo exige extension. Registramos un
-// resolve-hook que prueba extensiones cuando el specifier falla. Se define como
-// modulo data: URL para que pueda registrarse ANTES del import dinamico de
-// ragRetriever.js, sin necesitar un archivo separado (antes: bench-rag-retrieve.loader.mjs).
-const LOADER_SOURCE = `
-import { stat } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
-const EXT_CANDIDATES = ['.js', '.mjs', '.jsx', '.ts', '.tsx'];
-async function fileExists(url) {
-  try { const s = await stat(fileURLToPath(url)); return s.isFile(); } catch { return false; }
-}
-export async function resolve(specifier, context, nextResolve) {
-  // Imports JSON estilo Vite (sin 'with { type: json }'): inyectamos el atributo.
-  if (specifier.endsWith('.json')) {
-    context = { ...context, importAttributes: { ...(context.importAttributes || {}), type: 'json' } };
-  }
-  try {
-    return await nextResolve(specifier, context);
-  } catch (err) {
-    if (!specifier.startsWith('.') && !specifier.startsWith('/')) throw err;
-    const base = context.parentURL ?? import.meta.url;
-    for (const ext of EXT_CANDIDATES) {
-      const candidate = new URL(specifier + ext, base);
-      if (await fileExists(candidate)) return nextResolve(specifier + ext, context);
-    }
-    throw err;
-  }
-}
-export async function load(url, context, nextLoad) {
-  if (url.endsWith('.json')) {
-    context = { ...context, importAttributes: { ...(context.importAttributes || {}), type: 'json' }, format: 'json' };
-  }
-  return nextLoad(url, context);
-}
-`;
-register(`data:text/javascript,${encodeURIComponent(LOADER_SOURCE)}`);
+const GOLDEN_SET = JSON.parse(readFileSync(GOLDEN_PATH, 'utf8'));
 
-// Stub global.fetch para que ragRetriever.js pueda cargar desde el FS.
-globalThis.fetch = async (url) => {
-  const u = String(url);
-  const m = u.match(/\/cycle-content\/(.+)$/);
-  if (!m) {
-    return { ok: false, status: 404, headers: { get: () => '' }, json: async () => ({}) };
-  }
-  const file = join(CORPUS_ROOT, m[1]);
-  try {
-    const buf = await readFile(file, 'utf-8');
-    const data = JSON.parse(buf);
-    return {
-      ok: true,
-      status: 200,
-      headers: { get: (h) => (h.toLowerCase() === 'content-type' ? 'application/json' : '') },
-      json: async () => data,
-    };
-  } catch {
-    return { ok: false, status: 404, headers: { get: () => '' }, json: async () => ({}) };
-  }
-};
+function loadJson(file) {
+  return JSON.parse(readFileSync(file, 'utf8'));
+}
 
-const QUERIES = [
-  'fresa cuidados clima frio',
-  'cafe arabica sombra parcial roya',
-  'lechuga bolting hortaliza',
-  'maiz siembra suelo asociacion frijol',
-  'aguacate poda fertilizacion clima calido',
-  'banano sigatoka manejo sombra',
-  'platano harton cosecha tiempo',
-  'tomate plagas mosca blanca control biologico',
-  'arroz drenaje suelo manejo agua',
-  'yuca propagacion esquejes suelos arcillosos',
-];
+function matchesSpecies(topSlug, expectedSpecies) {
+  return topSlug === expectedSpecies || String(topSlug).startsWith(`${expectedSpecies}_`);
+}
 
 function percentile(sorted, p) {
   if (sorted.length === 0) return 0;
@@ -120,79 +53,229 @@ function percentile(sorted, p) {
   return sorted[idx];
 }
 
+function rankMetrics(rows) {
+  if (rows.length === 0) {
+    return { recall1: 0, recall3: 0, recall5: 0, mrr: 0 };
+  }
+  let hit1 = 0;
+  let hit3 = 0;
+  let hit5 = 0;
+  let rr = 0;
+  for (const row of rows) {
+    const rank = row.rank;
+    if (rank === 1) hit1 += 1;
+    if (rank >= 1 && rank <= 3) hit3 += 1;
+    if (rank >= 1 && rank <= 5) hit5 += 1;
+    if (rank >= 1) rr += 1 / rank;
+  }
+  const n = rows.length;
+  return {
+    recall1: hit1 / n,
+    recall3: hit3 / n,
+    recall5: hit5 / n,
+    mrr: rr / n,
+  };
+}
+
+function makeBenchFetch({ includeEmbeddings }) {
+  const manifest = loadJson(MANIFEST_PATH);
+  const embeddings = includeEmbeddings ? loadJson(EMBEDDINGS_PATH) : null;
+  return async (url, options = {}) => {
+    const u = String(url);
+
+    if (u.endsWith('/cycle-content/manifest.json')) {
+      return {
+        ok: true,
+        status: 200,
+        headers: { get: (h) => (h.toLowerCase() === 'content-type' ? 'application/json' : '') },
+        json: async () => manifest,
+      };
+    }
+
+    const match = u.match(/\/cycle-content\/([^/]+)\.json$/);
+    if (match) {
+      const file = join(CORPUS_ROOT, `${match[1]}.json`);
+      if (!existsSync(file)) {
+        return { ok: false, status: 404, headers: { get: () => '' }, json: async () => ({}) };
+      }
+      return {
+        ok: true,
+        status: 200,
+        headers: { get: (h) => (h.toLowerCase() === 'content-type' ? 'application/json' : '') },
+        json: async () => loadJson(file),
+      };
+    }
+
+    if (u.endsWith('/rag-embeddings.json')) {
+      if (!embeddings) {
+        return { ok: false, status: 404, headers: { get: () => '' }, json: async () => ({}) };
+      }
+      return {
+        ok: true,
+        status: 200,
+        headers: { get: (h) => (h.toLowerCase() === 'content-type' ? 'application/json' : '') },
+        json: async () => embeddings,
+      };
+    }
+
+    if (u.includes('/api/ollama/api/embeddings')) {
+      if (!includeEmbeddings) {
+        return Promise.reject(new Error('query embeddings disabled for BM25-only run'));
+      }
+      if (!nativeFetch) {
+        return { ok: false, status: 503, headers: { get: () => '' }, json: async () => ({}) };
+      }
+      const target = `${OLLAMA_URL}/api/embeddings`;
+      return nativeFetch(target, options);
+    }
+
+    return { ok: false, status: 404, headers: { get: () => '' }, json: async () => ({}) };
+  };
+}
+
+async function runMode(mode, { includeEmbeddings }) {
+  globalThis.fetch = makeBenchFetch({ includeEmbeddings });
+  const moduleUrl = new URL(`../src/services/ragRetriever.js?bench=${mode}`, import.meta.url);
+  const { retrieve, getCorpusStats } = await import(moduleUrl.href);
+
+  const firstT0 = performance.now();
+  const firstHits = await retrieve(GOLDEN_SET[0].query, 5, 'bench');
+  const coldMs = performance.now() - firstT0;
+  const stats = await getCorpusStats();
+
+  let passed = 0;
+  const latencies = [];
+  const details = [];
+
+  for (const item of GOLDEN_SET) {
+    const t0 = performance.now();
+    const hits = await retrieve(item.query, 5, 'bench');
+    latencies.push(performance.now() - t0);
+
+    const topSlugs = hits.map((h) => h.species).filter(Boolean);
+    const rank = topSlugs.findIndex((slug) => matchesSpecies(slug, item.expected));
+    const found = rank >= 0;
+    if (found) passed += 1;
+    details.push({
+      id: item.id,
+      expected: item.expected,
+      found,
+      rank: found ? rank + 1 : null,
+      topSlugs: topSlugs.slice(0, 5),
+    });
+  }
+
+  const metrics = rankMetrics(details);
+  const sorted = [...latencies].sort((a, b) => a - b);
+  const avg = latencies.reduce((sum, n) => sum + n, 0) / Math.max(latencies.length, 1);
+
+  return {
+    mode,
+    includeEmbeddings,
+    coldMs,
+    stats,
+    firstHitCount: firstHits.length,
+    metrics,
+    passed,
+    total: GOLDEN_SET.length,
+    latency: {
+      avgMs: avg,
+      p50Ms: percentile(sorted, 50),
+      p95Ms: percentile(sorted, 95),
+      minMs: sorted[0] || 0,
+      maxMs: sorted[sorted.length - 1] || 0,
+    },
+    details,
+  };
+}
+
+function printMode(result) {
+  const label = result.mode === 'bm25' ? 'BM25-only' : 'Hybrid';
+  console.log(`\n[bench] ${label}`);
+  console.log(`[bench]   cold load: ${result.coldMs.toFixed(1)} ms`);
+  console.log(`[bench]   corpus: ${result.stats.totalDocs} docs, ${result.stats.uniqueTerms} terms, avgDocLen=${result.stats.avgDocLen}`);
+  console.log(`[bench]   recall@1: ${(result.metrics.recall1 * 100).toFixed(1)}%`);
+  console.log(`[bench]   recall@3: ${(result.metrics.recall3 * 100).toFixed(1)}%`);
+  console.log(`[bench]   recall@5: ${(result.metrics.recall5 * 100).toFixed(1)}%`);
+  console.log(`[bench]   MRR: ${result.metrics.mrr.toFixed(4)}`);
+  console.log(`[bench]   latency avg=${result.latency.avgMs.toFixed(1)} ms p50=${result.latency.p50Ms.toFixed(1)} ms p95=${result.latency.p95Ms.toFixed(1)} ms`);
+}
+
 async function main() {
-  const emitHistory = process.argv.includes('--history');
   if (!existsSync(CORPUS_ROOT)) {
     console.log(`[bench] SKIP: no existe corpus en ${CORPUS_ROOT}`);
     return;
   }
 
-  let retrieve;
-  let getCorpusStats;
-  try {
-    // Import dinamico para que el stub de fetch ya este en su lugar.
-    ({ retrieve, getCorpusStats } = await import('../src/services/ragRetriever.js'));
-  } catch (err) {
-    console.log(`[bench] SKIP: no se pudo importar ragRetriever.js (${String(err.message).slice(0, 120)})`);
-    return;
-  }
+  const bm25 = await runMode('bm25', { includeEmbeddings: false });
+  printMode(bm25);
 
-  console.log('[bench] Cold load: cargando corpus completo + primera query...');
-  const coldStart = performance.now();
-  const firstHits = await retrieve(QUERIES[0], 5, 'bench');
-  const coldMs = performance.now() - coldStart;
-  const stats = await getCorpusStats();
-  console.log(`[bench] Cold load: ${coldMs.toFixed(1)} ms`);
-  console.log(`[bench] Corpus: ${stats.totalDocs} docs, ${stats.uniqueTerms} terms unicos, avgDocLen=${stats.avgDocLen}`);
-  console.log(`[bench] Primera query devolvio ${firstHits.length} hits (top score=${firstHits[0]?.score?.toFixed(3) ?? 'n/a'})`);
-  console.log('');
+  const hybrid = await runMode('hybrid', { includeEmbeddings: true });
+  printMode(hybrid);
 
-  const ITERATIONS = 3;
-  const timings = [];
-  console.log(`[bench] Warm: ${QUERIES.length} queries x ${ITERATIONS} iteraciones...`);
-  for (let iter = 0; iter < ITERATIONS; iter++) {
-    for (const q of QUERIES) {
-      const t0 = performance.now();
-      await retrieve(q, 5, 'bench');
-      timings.push(performance.now() - t0);
-    }
-  }
-  timings.sort((a, b) => a - b);
-  const total = timings.reduce((s, t) => s + t, 0);
-  const p50 = percentile(timings, 50);
-  const p95 = percentile(timings, 95);
-  const avg = total / timings.length;
-  console.log(`[bench] Warm: n=${timings.length}`);
-  console.log(`[bench]   min   = ${timings[0].toFixed(2)} ms`);
-  console.log(`[bench]   p50   = ${p50.toFixed(2)} ms`);
-  console.log(`[bench]   p95   = ${p95.toFixed(2)} ms`);
-  console.log(`[bench]   max   = ${timings[timings.length - 1].toFixed(2)} ms`);
-  console.log(`[bench]   avg   = ${avg.toFixed(2)} ms`);
+  const deltaRecall = (hybrid.metrics.recall5 - bm25.metrics.recall5) * 100;
+  console.log('\n[bench] resumen');
+  console.log(`[bench]   recall@1 bm25  : ${(bm25.metrics.recall1 * 100).toFixed(1)}%`);
+  console.log(`[bench]   recall@1 hybrid: ${(hybrid.metrics.recall1 * 100).toFixed(1)}%`);
+  console.log(`[bench]   recall@3 bm25  : ${(bm25.metrics.recall3 * 100).toFixed(1)}%`);
+  console.log(`[bench]   recall@3 hybrid: ${(hybrid.metrics.recall3 * 100).toFixed(1)}%`);
+  console.log(`[bench]   recall@5 bm25  : ${(bm25.metrics.recall5 * 100).toFixed(1)}%`);
+  console.log(`[bench]   recall@5 hybrid: ${(hybrid.metrics.recall5 * 100).toFixed(1)}%`);
+  console.log(`[bench]   MRR bm25      : ${bm25.metrics.mrr.toFixed(4)}`);
+  console.log(`[bench]   MRR hybrid    : ${hybrid.metrics.mrr.toFixed(4)}`);
+  console.log(`[bench]   delta          : ${deltaRecall >= 0 ? '+' : ''}${deltaRecall.toFixed(1)} pp`);
 
-  const tokensTotal = stats.totalDocs * stats.avgDocLen;
-  const memEstKB = (tokensTotal * 16 + stats.totalDocs * 64) / 1024;
-  console.log(`[bench]   memoria extra estimada del pre-tokenize: ~${(memEstKB / 1024).toFixed(2)} MB`);
+  mkdirSync(OUTPUT_DIR, { recursive: true });
+  const output = {
+    bench: 'rag-retrieve',
+    date: new Date().toISOString(),
+    ollama_url: OLLAMA_URL,
+    corpus: {
+      root: CORPUS_ROOT,
+      manifest: MANIFEST_PATH,
+      embeddings: EMBEDDINGS_PATH,
+      gold: GOLDEN_PATH,
+    },
+    modes: {
+      bm25,
+      hybrid,
+    },
+    delta: {
+      recall_pp: Number(deltaRecall.toFixed(1)),
+      recall_relative: bm25.metrics.recall5 > 0 ? Number(((hybrid.metrics.recall5 - bm25.metrics.recall5) / bm25.metrics.recall5).toFixed(4)) : null,
+    },
+  };
+  const outputPath = join(OUTPUT_DIR, `rag-retrieve-${new Date().toISOString().slice(0, 10)}.json`);
+  writeFileSync(outputPath, JSON.stringify(output, null, 2));
+  console.log(`[bench] resultados guardados en ${outputPath}`);
 
-  if (emitHistory) {
+  if (process.argv.includes('--history')) {
     let commit = '';
     try {
       commit = execSync('git rev-parse --short HEAD', { cwd: ROOT_DIR }).toString().trim();
-    } catch { /* sin git */ }
-    const path = writeHistoryRecord(
+    } catch {
+      commit = '';
+    }
+    const historyPath = writeHistoryRecord(
       buildHistoryRecord({
         bench: 'rag-retrieve',
-        model: null,
-        config: 'bm25',
+        model: 'bm25-vs-hybrid',
+        config: 'recall',
         commit,
         metrics: {
-          cold_load_ms: Number(coldMs.toFixed(1)),
-          latency_p50_ms: Number(p50.toFixed(2)),
-          latency_p95_ms: Number(p95.toFixed(2)),
-          latency_avg_ms: Number(avg.toFixed(2)),
+          recall1_bm25: Number((bm25.metrics.recall1 * 100).toFixed(1)),
+          recall1_hybrid: Number((hybrid.metrics.recall1 * 100).toFixed(1)),
+          recall3_bm25: Number((bm25.metrics.recall3 * 100).toFixed(1)),
+          recall3_hybrid: Number((hybrid.metrics.recall3 * 100).toFixed(1)),
+          recall5_bm25: Number((bm25.metrics.recall5 * 100).toFixed(1)),
+          recall5_hybrid: Number((hybrid.metrics.recall5 * 100).toFixed(1)),
+          mrr_bm25: Number(bm25.metrics.mrr.toFixed(4)),
+          mrr_hybrid: Number(hybrid.metrics.mrr.toFixed(4)),
+          recall_delta_pp: Number(deltaRecall.toFixed(1)),
         },
       }),
     );
-    console.log(`[bench] historial estandarizado escrito: ${path}`);
+    console.log(`[bench] historial estandarizado escrito: ${historyPath}`);
   }
 }
 

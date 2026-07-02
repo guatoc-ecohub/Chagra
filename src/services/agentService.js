@@ -436,7 +436,7 @@ ${baseClimateRule}`;
 export function generateSourceCitationRules() {
   return `REGLA CRÍTICA DE CITACIÓN DE FUENTES: toda información técnica (altitud, siembra, manejo, plagas, clima) DEBE citar su origen — "según Restrepo & Rivera (1994)", "ICA Resolución [número]", "Agrosavia [año]", "IDEAM [año]", "SENA [curso]", "Papel técnico [título]" o "El catálogo Chagra indica…". Si NO tienes fuente verificable, dilo: "No tengo una fuente confiable para este dato; consúltalo con [técnico local/agrónomo/IDEAM]." NUNCA inventes datos ni fuentes.
 REGLA CRÍTICA DE NOMBRES CIENTÍFICOS (BINOMIO): solo cita un binomio Linneano si proviene del grounding/catálogo provisto en este mensaje (bloques "=== ENTIDADES RESUELTAS ===" o "=== EVIDENCIA AUTORITATIVA ==="). Si la planta/plaga NO aparece ahí, NO inventes el binomio: usa SOLO el nombre común tal cual lo dijo el usuario, sin paréntesis con científico — inventarlo por similitud fonética es alucinación grave (ej. "tomate de árbol" es Solanum betaceum, NUNCA "Solanum lycopersicum"). Ante la duda: nombre común, sin binomio.
-REGLA CRÍTICA DE ESPECIE DESCONOCIDA: si el usuario nombra una planta, cultivo o animal que NO aparece en "=== ENTIDADES RESUELTAS ===" ni en el grounding de este mensaje, NO inventes su descripción, usos, manejo, dosis ni cómo sembrarla. Di honestamente: "No tengo esa especie en mi catálogo; confírmame el nombre o consúltalo con un técnico local." Describir una especie que no reconoces —aunque sea solo por el nombre común— es alucinación grave.`;
+REGLA CRÍTICA DE ESPECIE DESCONOCIDA (OBLIGATORIA, prioridad máxima): si el usuario nombra una planta, cultivo o animal que NO aparece textualmente en "=== ENTIDADES RESUELTAS ===" ni en el grounding de este mensaje, está TERMINANTEMENTE PROHIBIDO darle siembra, manejo, poda, riego, fechas, dosis, descripción o usos de esa planta. NO improvises NI un dato, NI consejos genéricos de cultivo. Tu ÚNICA respuesta válida sobre ella es UNA frase: "No tengo [nombre tal cual lo dijo el usuario] en mi catálogo todavía; confírmame el nombre o el nombre científico, o consúltalo con un técnico local." Y DETENTE AHÍ — no añadas nada más. Ejemplo PROHIBIDO: usuario "¿cómo siembro el tomatillo de monte?" → MAL: explicar cómo sembrarlo o dar tips genéricos; BIEN: solo la frase anterior. Inventar el manejo, la descripción o el binomio de una planta que no reconoces —aunque suene parecida a otra— es alucinación grave.`;
 }
 
 /**
@@ -455,6 +455,9 @@ export function generateUserDataRules() {
  * @param {object} [opts]
  * @param {boolean} [opts.climaQuery=true] - si false, omite el bloque de
  *   alertas climáticas regionales (solo aporta en consultas de clima).
+ * @param {string} [opts.nivelRespuestas=''] - 'simple' o 'detallado' (del perfil).
+ *   Si es 'simple', responde con pasos concretos y frases cortas.
+ *   Si es 'detallado', responde con más contexto técnico.
  * @returns {string} Contexto de perfil para system prompt
  */
 export function buildProfileContext(finca, opts = {}) {
@@ -488,10 +491,42 @@ export function buildProfileContext(finca, opts = {}) {
   // en una pregunta de plaga/manejo es peso muerto que empuja a la truncación
   // del grounding. `climaQuery` por defecto true → callers existentes y tests
   // ven el bloque completo; buildBasePrompt lo pasa false para queries no-clima.
-  const { climaQuery = true } = opts || {};
+  // `nivelRespuestas` controla el nivel de detalle: 'simple' (pasos concretos)
+  // o 'detallado' (más contexto técnico).
+  const { climaQuery = true, nivelRespuestas = '' } = opts || {};
+
+  // Añade bloque de nivel de respuestas si está especificado (ej: 'simple' o
+  // 'detallado'). Esto permite adaptar el nivel de detalle al perfil del usuario.
+  const nivelRespuestasBlock = (() => {
+    if (!nivelRespuestas || typeof nivelRespuestas !== 'string') return '';
+    const nivel = nivelRespuestas.toLowerCase().trim();
+    if (nivel === 'simple') {
+      return `NIVEL DE RESPUESTA: SIMPLE (pasos concretos).
+- Responde con pasos claros y cortos, como hablar con un vecino.
+- Evita tecnicismos innecesarios.
+- Prioriza lo práctico: qué hacer, cuándo, cómo.
+- Usa unidades del campo: cuadra, arroba, luna, bike de agua, plaza.
+- Si necesitas explicar algo técnico, usa ejemplos de la finca.`;
+    }
+    if (nivel === 'detallado') {
+      return `NIVEL DE RESPUESTA: DETALLADO (más contexto técnico).
+- Puedes explicar el porqué de las recomendaciones.
+- Incluye referencias a fuentes técnicas cuando sea relevante.
+- Puedes mencionar conceptos técnicos si aclaras su significado.
+- Mantén el lenguaje accesible pero con más profundidad.`;
+    }
+    return '';
+  })();
 
   if (!finca) {
-    return generateSourceCitationRules() + '\n\n' + generateUserDataRules() + profileSuffix + veredaContext;
+    const blocks = [
+      generateSourceCitationRules(),
+      generateUserDataRules(),
+      nivelRespuestasBlock,
+      profileSuffix,
+      veredaContext,
+    ].filter((s) => s && s.trim());
+    return blocks.join('\n\n');
   }
 
   const bioculturalZone = finca.biocultural_zone;
@@ -501,7 +536,13 @@ export function buildProfileContext(finca, opts = {}) {
   const citationRules = generateSourceCitationRules();
   const userDataRules = generateUserDataRules();
 
-  return [toneContext, climateContext, citationRules, `${userDataRules}${profileSuffix}${veredaContext}`]
+  return [
+    toneContext,
+    climateContext,
+    citationRules,
+    nivelRespuestasBlock,
+    `${userDataRules}${profileSuffix}${veredaContext}`,
+  ]
     .filter((s) => s && s.trim())
     .join('\n\n');
 }
@@ -547,7 +588,7 @@ export function formatClimateAlert(bioculturalZone, climateData = null) {
  *
  * @param {object | null} snapshot — payload de climaService.getCachedClimaSnapshot
  * @param {object} [opts]
- * @param {string|null} [opts.region] — región natural de la finca (ensoContext).
+ * @param {string|null} [opts.region] - región natural de la finca (ensoContext).
  *   Si se pasa, se inyecta la LECTURA REGIONAL ENSO (DR-MISSION-2/4): qué
  *   implica la fase actual para esa región (p. ej. heladas paradójicas en el
  *   altiplano bajo El Niño seco). Si no, solo se inyecta el bloque base.
@@ -704,12 +745,12 @@ function _normViabilidad(v) {
  * y la altitud de la finca (ya en profile/store).
  *
  * @param {object} args
- * @param {number|string|null} [args.fincaAltitud] — msnm de la finca activa.
- * @param {Array<object>|null} [args.resolvedEntities] — entidades AGE del turno.
+ * @param {number|string|null} [args.fincaAltitud] - msnm de la finca activa.
+ * @param {Array<object>|null} [args.resolvedEntities] - entidades AGE del turno.
  *   Cada una puede traer { kind, nombre_comun, altitud_min, altitud_max,
  *   piso_termico, viabilidad, delta_altitud, alternativas_viables[],
  *   alternativas_cercanas[] }.
- * @param {number} [args.marginMsnm=300] — holgura para clasificar "marginal"
+ * @param {number} [args.marginMsnm=300] - holgura para clasificar "marginal"
  *   en el fallback por rango.
  * @returns {string} bloque compacto, o '' si no hay nada accionable.
  */
@@ -812,10 +853,10 @@ REGLA (intelligence-first, tono HUMILDE):
  * temp_max, o sin forecast → '').
  *
  * @param {object} args
- * @param {Array<object>|null} [args.resolvedEntities] — entidades AGE del turno.
+ * @param {Array<object>|null} [args.resolvedEntities] - entidades AGE del turno.
  *   Cada una puede traer { kind, nombre_comun, temp_min, temp_max }.
- * @param {object|null} [args.climaSnapshot] — getCachedClimaSnapshot().
- * @param {number} [args.marginC=2] — margen °C de seguridad.
+ * @param {object|null} [args.climaSnapshot] - getCachedClimaSnapshot().
+ * @param {number} [args.marginC=2] - margen °C de seguridad.
  * @returns {string} bloque compacto, o '' si no hay nada accionable.
  */
 export function buildFrostHeatContext({
@@ -883,9 +924,9 @@ REGLA: si el usuario pregunta por alguno de estos cultivos, adelántale la alert
  * CERO latencia. Degrada con gracia: sin companions/antagonists → ''.
  *
  * @param {object} args
- * @param {Array<object>|null} [args.resolvedEntities] — entidades AGE del turno.
+ * @param {Array<object>|null} [args.resolvedEntities] - entidades AGE del turno.
  *   Cada una puede traer { kind, nombre_comun, companions[], antagonists[] }.
- * @param {Array<{name:string,count:number}>} [args.groupedCultivos] — inventario.
+ * @param {Array<{name:string,count:number}>} [args.groupedCultivos] - inventario.
  * @returns {string} bloque compacto, o '' si no hay nada accionable.
  */
 export function buildAssociationContext({
@@ -950,7 +991,7 @@ REGLA: si el usuario pregunta qué sembrar junto a su cultivo, sugiere las buena
  * grounding la trae. PURA y SÍNCRONA, CERO latencia.
  *
  * @param {object} args
- * @param {Array<object>|null} [args.resolvedEntities] — entidades AGE del turno.
+ * @param {Array<object>|null} [args.resolvedEntities] - entidades AGE del turno.
  *   Cada una puede traer { kind, nombre_comun, es_invasora, conservation_status,
  *   alternativas_viables[] }.
  * @returns {string} bloque compacto, o '' si no hay nada accionable.
@@ -1013,7 +1054,7 @@ REGLA: jamás recomiendes sembrar una especie marcada arriba. Sé honesto sobre 
  * entidad trae hechos curados, devuelve '' y no contamina el prompt.
  *
  * @param {object} args
- * @param {Array<object>|null} [args.resolvedEntities] — entidades AGE del turno.
+ * @param {Array<object>|null} [args.resolvedEntities] - entidades AGE del turno.
  *   biopreparado puede traer { dosis_aplicacion, preparacion, ingredientes_resumen,
  *   target[], precauciones, fuente }; especie puede traer { helada_letal }.
  * @returns {string} bloque compacto, o '' si no hay nada accionable.
@@ -1109,7 +1150,7 @@ export function pisoTermicoFromAltitud(altitud) {
  * país. Es una aproximación calendárica — el ENSO la modula y eso lo aporta el
  * bloque clima. NO hace fetch: solo aritmética del mes local.
  *
- * @param {number} [month] — mes 1-12; por defecto el mes actual local.
+ * @param {number} [month] - mes 1-12; por defecto el mes actual local.
  * @returns {{ nombre: string, detalle: string }}
  */
 export function temporadaColombiana(month) {
@@ -1132,7 +1173,7 @@ export function temporadaColombiana(month) {
  * compacta. Recibe el array YA agrupado por especie con { name, count }.
  *
  * @param {Array<{name:string,count:number}>} grouped
- * @param {number} [max=8] — cuántas especies listar antes de "y N más".
+ * @param {number} [max=8] - cuántas especies listar antes de "y N más".
  * @returns {string} ej. "maíz ×2, café, frijol y 3 más" o '' si vacío.
  */
 /**
@@ -1152,6 +1193,47 @@ const KNOWN_CROP_TOKENS = new Set([
   'cubio', 'ibia', 'oca', 'quinua', 'amaranto', 'caña', 'arandanos',
 ]);
 
+/** Máximo número de especies a procesar para contexto del LLM (defecto 50). */
+const DEFAULT_MAX_CULTIVOS_FOR_CONTEXT = 50;
+
+/**
+ * groupAndLimitCultivos — agrupa plantas por especie y limita a top-N más
+ * frecuentes para evitar procesar miles de especies en fincas grandes.
+ *
+ * Estrategia:
+ *   1. Agrupa todas las plantas por nombre (quitando número #XX)
+ *   2. Ordena por frecuencia descendente
+ *   3. Limita a maxSpecies (por defecto 50) para evitar inflar el contexto
+ *   4. Devuelve array ordenado {name, count}
+ *
+ * El límite es por RELEVANCIA (frecuencia): si el usuario tiene 200 especies
+ * distintas, priorizamos las 50 más abundantes para el contexto del LLM. Las
+ * especies raras tienen menos probabilidad de ser relevantes a la pregunta.
+ *
+ * @param {Array<object>} plants - array del asset store (plants)
+ * @param {number} [maxSpecies=DEFAULT_MAX_CULTIVOS_FOR_CONTEXT] - máximo especies
+ * @returns {Array<{name:string,count:number}>} agrupado y limitado
+ */
+export function groupAndLimitCultivos(plants, maxSpecies = DEFAULT_MAX_CULTIVOS_FOR_CONTEXT) {
+  if (!Array.isArray(plants) || plants.length === 0) return [];
+
+  // 1. Agrupar por nombre (quitando #XX)
+  const strip = (name) => (name || '').replace(/\s*#\d+\s*$/, '').trim();
+  const counts = plants.reduce((acc, pl) => {
+    const base = strip(pl.attributes?.name);
+    if (base) acc[base] = (acc[base] || 0) + 1;
+    return acc;
+  }, {});
+
+  // 2. Convertir a array y ordenar por frecuencia descendente
+  const grouped = Object.entries(counts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count);
+
+  // 3. Limitar a top-N especies más frecuentes
+  return grouped.slice(0, maxSpecies);
+}
+
 /**
  * Valida un inventario agrupado contra el catalogo/grounding y lo separa en
  * cultivos VERIFICADOS (especies reales) y SIN VERIFICAR (datos sospechosos del
@@ -1169,6 +1251,10 @@ const KNOWN_CROP_TOKENS = new Set([
  *
  * PURA y SINCRONA. CERO latencia. Tolerante a entradas raras.
  *
+ * NOTA: Si el input excede DEFAULT_MAX_CULTIVOS_FOR_CONTEXT, automáticamente
+ * se limita a ese número (defensive programming para fincas grandes con miles
+ * de especies distintas).
+ *
  * @param {Array<{name:string,count:number}>} grouped
  * @param {{catalogNames?: string[]}} [opts]
  * @returns {{verificados: Array<{name:string,count:number}>, sinVerificar: Array<{name:string,count:number}>}}
@@ -1177,7 +1263,12 @@ export function validateCultivos(grouped, { catalogNames = null } = {}) {
   if (!Array.isArray(grouped) || grouped.length === 0) {
     return { verificados: [], sinVerificar: [] };
   }
-  const items = grouped.filter((g) => g && typeof g.name === 'string' && g.name.trim());
+
+  // Defensive: limitar input si excede máximo razonable (fincas grandes)
+  const items = (grouped.length > DEFAULT_MAX_CULTIVOS_FOR_CONTEXT
+    ? grouped.slice(0, DEFAULT_MAX_CULTIVOS_FOR_CONTEXT)
+    : grouped
+  ).filter((g) => g && typeof g.name === 'string' && g.name.trim());
 
   let catNorm = null;
   if (Array.isArray(catalogNames) && catalogNames.length > 0) {
@@ -1288,15 +1379,15 @@ function crossResolvedWithInventory(resolvedEntities, groupedCultivos) {
  * relevantes a la pregunta. El bloque lo instruye explícitamente.
  *
  * @param {object} args
- * @param {object|null} [args.profile] — userProfileService.getProfile()
- * @param {object|null} [args.finca] — finca activa (fincaActiveStore)
- * @param {object|null} [args.climaSnapshot] — getCachedClimaSnapshot()
- * @param {Array<{name:string,count:number}>} [args.groupedCultivos] — inventario agrupado
- * @param {Array<object>|null} [args.resolvedEntities] — entidades AGE del turno
- * @param {Array<object>} [args.activeAlerts] — useAlertStore activeAlerts
- * @param {string[]|null} [args.catalogNames] — nombres reales del catalogo (sync, opcional);
+ * @param {object|null} [args.profile] - userProfileService.getProfile()
+ * @param {object|null} [args.finca] - finca activa (fincaActiveStore)
+ * @param {object|null} [args.climaSnapshot] - getCachedClimaSnapshot()
+ * @param {Array<{name:string,count:number}>} [args.groupedCultivos] - inventario agrupado
+ * @param {Array<object>|null} [args.resolvedEntities] - entidades AGE del turno
+ * @param {Array<object>} [args.activeAlerts] - useAlertStore activeAlerts
+ * @param {string[]|null} [args.catalogNames] - nombres reales del catalogo (sync, opcional);
  *   si se pasa, valida cultivos contra el catalogo; si no, usa heuristica anti-mash.
- * @param {number} [args.month] — override de mes para tests (1-12)
+ * @param {number} [args.month] - override de mes para tests (1-12)
  * @returns {string} bloque compacto (siempre incluye al menos la temporada).
  */
 export function buildFincaContext({

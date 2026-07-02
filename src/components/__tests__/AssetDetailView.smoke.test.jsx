@@ -33,6 +33,18 @@ vi.mock('../../db/catalogDB', () => {
       id: 'lactuca_sativa',
       // sin feeding_plan_template
     },
+    {
+      id: 'eugenia_stipitata',
+      nombre_comun: 'Arazá',
+      nombre_cientifico: 'Eugenia stipitata',
+      category: 'frutales_perennes',
+      familia_botanica: 'Myrtaceae',
+      altitud_msnm: { min_absoluto: 0, optimo_min: 100, optimo_max: 600, max_absoluto: 1000 },
+      temperatura_c: { optimo_min: 22, optimo_max: 28, max_tolerable: 35 },
+      agua: 'alto',
+      drenaje_requerido: 'bueno',
+      light: 'sol_pleno',
+    },
   ];
   return {
     getAllSpecies: vi.fn().mockResolvedValue(speciesFixtures),
@@ -176,6 +188,25 @@ describe('AssetDetailView — PlanSection wiring (audit 070.7)', () => {
     });
     expect(screen.getByText(/Sin plan disponible/i)).toBeTruthy();
     expect(screen.getByRole('button', { name: /Solicitar al equipo Chagra/i })).toBeTruthy();
+  });
+
+  it('muestra plan generico por categoria para un frutal sin template explicito', async () => {
+    mockState.selectedAssetId = 'plant-araza';
+    mockState.plants = [{
+      id: 'plant-araza',
+      asset_type: 'plant',
+      attributes: {
+        name: 'Arazá #1',
+        _speciesSlug: 'eugenia_stipitata',
+      },
+    }];
+
+    render(<AssetDetailView />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('plan-section-generic')).toBeTruthy();
+    });
+    expect(screen.getByTestId('plan-generic-badge').textContent).toMatch(/Generico por categoria/i);
   });
 
   // Bug 2026-06-20 (operador, fresa): asset viejo SIN _speciesSlug cuyo

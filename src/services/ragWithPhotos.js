@@ -61,9 +61,9 @@ function sortPhotosRecentFirst(photos) {
  *     `[]` (no rompe las otras). photoService ya hace try/catch interno.
  *
  * @param {string} query — texto libre del usuario / agente.
- * @param {number} [topK=5] — top-K passages a recuperar del corpus de texto.
+ * @param {number} [topK=5] - top-K passages a recuperar del corpus de texto.
  * @param {Object} [opts]
- * @param {number} [opts.photosPerSpecies=2] — máximo de fotos por species
+ * @param {number} [opts.photosPerSpecies=2] - máximo de fotos por species
  *   incluidas en el resultado. Negativo o 0 desactiva el join de fotos.
  * @returns {Promise<{passages: Array<Object>, photosBySpecies: Object<string, Array<Object>>}>}
  *   `passages` mantiene el shape original de `ragRetriever.retrieve()`.

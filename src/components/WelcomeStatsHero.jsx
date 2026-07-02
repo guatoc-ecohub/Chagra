@@ -31,6 +31,15 @@ import { MSG } from '../config/messages.js';
  * - Compacta: hero card rotativa + dots + minor 2x2.
  * - Expandida (modal): full-screen demo-listo, todas las stats visibles
  *   en grid + descripción larga + breakdown federado. Toggle con botón.
+ *
+ * Fuente de verdad de especies/biopreparados/fuentes Tier A (2026-07-01,
+ * cierre de drift de cifras entre superficies): se prioriza
+ * `fetch('/chagra-stats.json')` — el JSON único generado en build por
+ * `scripts/gen-chagra-stats.mjs` (ver #1938) que evita que este componente
+ * contradiga el one-pager u otras superficies con números fabricados. Si
+ * ese archivo todavía no existe en el deploy o el fetch falla, se conserva
+ * el conteo SQLite en vivo (`getCatalogStats`) y, en último caso,
+ * `CATALOG_FALLBACK`.
  */
 
 // Feedback UX usuaria piloto 2026-05-19: 6s era muy poco para leer el card.
@@ -42,8 +51,11 @@ const HERO_PAUSE_AFTER_INTERACTION_MS = 5000;
 const MONITOR_DAYS_PER_PLANT = 90;
 const DRIP_SAVING_L_PER_DAY = 5;
 
-// Fallback inicial: el catálogo seed tiene exactamente estos números.
-// Renderizar valores reales desde el primer paint evita el destello "0".
+// Último recurso: solo se usa si `chagra-stats.json` todavía no existe en
+// este deploy o el fetch falla, y además falla el conteo SQLite en vivo.
+// Renderizar valores razonables desde el primer paint evita el destello "0";
+// NO representan la fuente de verdad actual del catálogo (esa vive en
+// `public/chagra-stats.json`, ver #1938).
 const CATALOG_FALLBACK = {
   species: 486,
   biopreparados: 19,
@@ -53,6 +65,11 @@ const CATALOG_FALLBACK = {
   endemicasCount: 9,
   invasorasCount: 17,
 };
+
+// Fuente única de verdad del catálogo/grafo (generada en build por
+// scripts/gen-chagra-stats.mjs, ver #1938). Se consume vía fetch directo
+// porque el hook de conveniencia `useChagraStats` todavía no está en main.
+const CHAGRA_STATS_URL = '/chagra-stats.json';
 
 // Federación pre-login: cuando no hay store hidratado, usar números globales
 // agregados. Hoy hay 1 finca activa (Guatoc) pero proyectamos crecimiento
@@ -274,7 +291,11 @@ function readCollapsedPref(plantsCount) {
   return plantsCount > 0;
 }
 
-export default function WelcomeStatsHero({ mode = 'post-login', onNavigate }) {
+// onNavigate con default undefined explícito: es opcional de verdad (todo el
+// código guarda con `typeof onNavigate === 'function'` y el hero queda inerte
+// en pre-login), pero sin default tsc la infiere requerida y el caller
+// pre-login (LoginScreen) suma un falso error al gate tsc:check.
+export default function WelcomeStatsHero({ mode = 'post-login', onNavigate = undefined }) {
   const isPreLogin = mode === 'pre-login';
   const plantsCount = useAssetStore((s) => s.plants?.length ?? 0);
   const [catalogStats, setCatalogStats] = useState(CATALOG_FALLBACK);
@@ -331,6 +352,25 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate }) {
             }
           }
         } catch { /* keep fallback */ }
+
+        // Fuente única de verdad (#1938): pisa species/biopreparados/sourcesTierA
+        // con el JSON generado en build cuando está disponible, para que este
+        // componente nunca contradiga el one-pager ni otra superficie que lea
+        // el mismo archivo. Si el fetch falla o el archivo todavía no existe
+        // en este deploy, quedan los valores ya resueltos arriba (conteo
+        // SQLite en vivo o CATALOG_FALLBACK).
+        try {
+          const chagraStatsRes = await fetch(CHAGRA_STATS_URL, { cache: 'no-cache' });
+          if (chagraStatsRes.ok) {
+            const chagraStats = await chagraStatsRes.json();
+            const catalogo = chagraStats?.catalogo;
+            if (catalogo && typeof catalogo === 'object') {
+              if (typeof catalogo.especies === 'number') species = catalogo.especies;
+              if (typeof catalogo.biopreparados === 'number') biopreparados = catalogo.biopreparados;
+              if (typeof catalogo.fuentes_tier_a === 'number') sourcesTierA = catalogo.fuentes_tier_a;
+            }
+          }
+        } catch { /* JSON aún no existe en este deploy o falló el fetch: se conservan los valores anteriores */ }
 
         if (alive) setCatalogStats({ species, biopreparados, ragDocs, sourcesTierA, endangeredCount, endemicasCount, invasorasCount });
 

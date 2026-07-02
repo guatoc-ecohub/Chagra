@@ -17,7 +17,7 @@
  * Esta es la primera capa de defensa contra payloads gigantes hacia el
  * sidecar agro-mcp (que arranca con `bodyLimit` chico). Es complementaria a
  * `photoService.captureAndCompress` que apunta a 500 KB para persistencia
- * local — acá apuntamos a un techo distinto (2 MB) porque el sidecar es
+ * local — aquí apuntamos a un techo distinto (2 MB) porque el sidecar es
  * quien define el límite de red.
  *
  * Diseño puro: NO toca IndexedDB, NO toca red, NO toca catálogo. Recibe un
@@ -36,11 +36,11 @@ const DEFAULT_MIME = 'image/jpeg';
  * @param {Blob|File} blob — imagen original (cámara, galería, o blob ya
  *   procesado por otro path).
  * @param {Object}    [opts]
- * @param {number}    [opts.maxDimension=1600]    — lado mayor en px
- * @param {number}    [opts.quality=0.85]         — JPEG quality 1er intento
- * @param {number}    [opts.qualityFallback=0.7]  — JPEG quality 2do intento
- * @param {number}    [opts.maxBytes=2097152]     — techo de bytes para subir
- * @param {string}    [opts.mime='image/jpeg']    — MIME de salida
+ * @param {number}    [opts.maxDimension=1600]    - lado mayor en px
+ * @param {number}    [opts.quality=0.85]         - JPEG quality 1er intento
+ * @param {number}    [opts.qualityFallback=0.7]  - JPEG quality 2do intento
+ * @param {number}    [opts.maxBytes=2097152]     - techo de bytes para subir
+ * @param {string}    [opts.mime='image/jpeg']    - MIME de salida
  *
  * @returns {Promise<
  *   | { ok: true,  blob: Blob, width: number, height: number, quality: number, size: number, originalSize: number }

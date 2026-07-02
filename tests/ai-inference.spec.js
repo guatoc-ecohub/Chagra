@@ -31,7 +31,7 @@ test.describe.skip('Flujo de Inferencia IA y Revisión Humana (ADR-019 Phase 3)'
 
         // Login
         await page.getByLabel(/usuario/i).fill('e2e-operator');
-        await page.getByLabel(/contraseña/i).fill('e2e-pass');
+        await page.getByRole('textbox', { name: /contraseña/i }).fill('e2e-pass');
         await page.getByRole('button', { name: /ingresar/i }).click();
 
         // 1. Navegar a un activo existente

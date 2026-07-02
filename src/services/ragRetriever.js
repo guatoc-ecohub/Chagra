@@ -15,15 +15,11 @@ const BM25_PARAMS = {
   b: 0.75,
 };
 
-// RRF (Reciprocal Rank Fusion): parámetro de suavizado. k=60 es el
-// estándar empírico (Cormack et al. 2009, TREC). No requiere calibrar
-// contra el dataset — la fusión es parameter-free en la práctica.
-const RRF_K = 60;
-
-// Peso relativo BM25 vs semántico en la fusión RRF. 1.0 = mismo peso.
-// BM25 1.0 + semántico 1.0 = ambos contribuyen igual.
+// Peso relativo BM25 vs semántico en la fusión por score combinado.
+// Ambos se normalizan a [0, 1] antes de sumar, así el peso se interpreta
+// de forma directa.
 const BM25_WEIGHT = 1.0;
-const SEMANTIC_WEIGHT = 1.0;
+const SEMANTIC_WEIGHT = 1.5;
 
 let corpusCache = null;
 let avgDocLen = 0;
@@ -107,8 +103,31 @@ function scoreBM25(doc, queryTerms, idf, avgLen) {
   return score;
 }
 
-function flattenDoc(doc, prefix = '', speciesSlug = null) {
-  const slug = speciesSlug || doc.species_slug || '';
+function normalizeScore(score, maxScore) {
+  if (!Number.isFinite(score) || score <= 0 || !Number.isFinite(maxScore) || maxScore <= 0) {
+    return 0;
+  }
+  return score / maxScore;
+}
+
+function resolveSpeciesSlug(doc, speciesSlug = null) {
+  if (typeof speciesSlug === 'string' && speciesSlug.trim()) return speciesSlug.trim();
+  if (!doc || typeof doc !== 'object') return '';
+  const candidates = [
+    doc.species_slug,
+    doc.speciesSlug,
+    doc.species_id,
+    doc.slug,
+    typeof doc.species === 'string' ? doc.species : '',
+  ];
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string' && candidate.trim()) return candidate.trim();
+  }
+  return '';
+}
+
+export function flattenDoc(doc, prefix = '', speciesSlug = null) {
+  const slug = resolveSpeciesSlug(doc, speciesSlug);
   const passages = [];
   const addPassage = (key, val) => {
     if (typeof val === 'string' && val.length > 20) {
@@ -322,51 +341,45 @@ export function prewarmCorpus() {
  * Implementación interna del retrieve HÍBRIDO (BM25 + semántico).
  *
  * Flujo:
- * 1. BM25 léxico (siempre, incluso offline) — con expansión de sinónimos
- *    campesinos para mejorar recall en vocabulario no-técnico.
- * 2. Semántico (solo si ollama responde): embebe la query, calcula
- *    similitud coseno contra vectores precomputados.
- * 3. RRF fusion: combina ambos rankings por posición (robusto a escalas
- *    distintas de score).
- * 4. Fallback offline: si el semántico falla → solo BM25 (comportamiento
- *    actual intacto, offline-first SAGRADO).
+ * 1. BM25 léxico (siempre, incluso offline) con expansión de sinónimos.
+ * 2. Semántico (solo si existe `rag-embeddings.json` y Ollama responde).
+ * 3. Fusión por score combinado normalizado.
+ * 4. Fallback offline: si el semántico falla, devuelve solo BM25.
  */
 async function retrieveInternal(query, topK) {
   const { docs, idf } = await loadCorpus();
 
-  // BM25 léxico con expansión de sinónimos campesinos (AIA-004)
   const rawTokens = tokenize(query);
   const queryTerms = expandQueryTokens(rawTokens);
-
   if (queryTerms.length === 0) return [];
 
-  // Ranking BM25
-  const bm25Results = docs.map((doc) => ({
-    species: doc.species,
-    text: doc.text,
-    key: doc.key,
+  const bm25Scored = docs.map((doc) => ({
+    doc,
     score: scoreBM25(doc, queryTerms, idf, avgDocLen),
   }));
-  bm25Results.sort((a, b) => b.score - a.score);
-  const bm25Top = bm25Results.filter((d) => d.score > 0);
+  bm25Scored.sort((a, b) => b.score - a.score);
+  const bm25Top = bm25Scored
+    .filter((item) => item.score > 0)
+    .map(({ doc, score }) => ({
+      species: doc.species,
+      text: doc.text,
+      key: doc.key,
+      score,
+    }));
 
-  // Semántico: intentar, pero nunca bloquear si falla
   const embeddings = await loadEmbeddings();
   if (!embeddings) {
-    // Sin embeddings precomputados → solo BM25 (offline o sin build)
     return bm25Top.slice(0, topK);
   }
 
   const queryEmbedding = await embedQuery(query);
   if (!queryEmbedding) {
-    // Ollama caído / sin red → fallback a BM25 solo (offline-first)
     return bm25Top.slice(0, topK);
   }
 
-  const semanticResults = semanticRetrieve(queryEmbedding, docs, embeddings, topK * 3);
-
-  // RRF fusion: combinar ambos rankings
-  return rrfFusion(bm25Top, semanticResults, topK);
+  const semanticScored = scoreSemanticDocs(queryEmbedding, docs, embeddings);
+  const fused = combineResults(bm25Scored, semanticScored);
+  return fused.slice(0, topK);
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -452,7 +465,7 @@ async function loadEmbeddings() {
  * Si falla (sin red, modelo caído), retorna null → fallback a BM25 solo.
  *
  * `options.num_gpu: 0` fuerza el embed a CPU (P0 warm, audit 2026-06-28): evita
- * que snowflake-arctic-embed2 co-resida en la GPU del chat y dispare OOM.
+ * que el embedder co-resida en la GPU del chat y dispare OOM.
  */
 async function embedQuery(queryText) {
   try {
@@ -460,10 +473,26 @@ async function embedQuery(queryText) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       // num_gpu:0 → el embedder corre en CPU, NO en la M6000 (12 GiB). La
-      // co-residencia embedder(~4.5G) + granite3.3:8b(~7.2G) > 12G dispara un
-      // cudaMalloc OOM que MATA el runner compartido de granite → los turnos
-      // siguientes quedan fríos. Se conserva snowflake (1024d, mismo espacio que
-      // los vectores precomputados) y el RAG híbrido queda intacto.
+      // co-residencia embedder + granite3.3:8b puede disparar un cudaMalloc
+      // OOM y tumbar el runner compartido.
+      //
+      // FIX P0 (auditoría RAG 2026-07-02): el commit anterior de esta rama
+      // había puesto `model: 'nomic-embed-text'` aquí, con el comentario (falso)
+      // de que "el corpus se generó con nomic-embed-text". El corpus real de
+      // `public/rag-embeddings.json` (verificado: 501 vectores, TODOS de
+      // dimensión 1024) fue re-indexado con snowflake-arctic-embed2 en #1825 y
+      // #1828 — nomic-embed-text emite 768d. Con el modelo equivocado pasan dos
+      // cosas, cualquiera de las dos deja el híbrido en BM25-only silencioso:
+      // (a) si el modelo no está pulled en el host de Ollama, el POST devuelve
+      // 404 y embedQuery() retorna null; (b) si SÍ está pulled, cosineSimilarity()
+      // descarta el par por `a.length !== b.length` (768 vs 1024) y el score
+      // semántico da 0 para TODOS los docs. En ambos casos combineResults()
+      // fusiona con semanticNorm=0 en todo el corpus, así que el ranking final
+      // es idéntico al de BM25-only — exactamente el +0.0pp que reportó el
+      // benchmark de este PR. snowflake-arctic-embed2 es también el modelo
+      // documentado como fuente de verdad en Chagra-strategy/ops/MODELS.md
+      // ("embeddings (RAG) | snowflake-arctic-embed2 | ragRetriever.js:442") y
+      // el que usa scripts/bench-complejos-con-tools.mjs. Restaurado en esta línea.
       body: JSON.stringify({
         model: 'snowflake-arctic-embed2',
         prompt: queryText,
@@ -484,65 +513,83 @@ async function embedQuery(queryText) {
 
 /**
  * Retrieval semántico: calcula similitud coseno entre el embedding de la
- * query y los vectores precomputados de cada doc, retorna top-K con scores.
+ * query y los vectores precomputados de cada doc.
  */
-function semanticRetrieve(queryEmbedding, docs, embeddings, topK) {
+function scoreSemanticDocs(queryEmbedding, docs, embeddings) {
   const scored = [];
   for (const doc of docs) {
     const slugVec = embeddings[doc.species];
     if (!slugVec) continue;
-    const sim = cosineSimilarity(queryEmbedding, slugVec);
+    const sim = Math.max(0, cosineSimilarity(queryEmbedding, slugVec));
     if (sim > 0) {
       scored.push({
-        species: doc.species,
-        text: doc.text,
-        key: doc.key,
+        doc,
         score: sim,
       });
     }
   }
   scored.sort((a, b) => b.score - a.score);
-  return scored.slice(0, topK);
+  return scored;
 }
 
-/**
- * Reciprocal Rank Fusion (RRF): fusiona dos rankings BM25 + semántico.
- * score_rrf(doc) = w_bm25 / (k + rank_bm25) + w_sem / (k + rank_sem)
- *
- * Ventaja sobre score ponderado: no requiere normalizar scores entre
- * sistemas con escalas distintas (BM25 es no acotado, coseno es [-1,1]).
- * RRF solo usa la POSICIÓN en el ranking → robusto a diferencias de escala.
- */
-function rrfFusion(bm25Results, semanticResults, topK) {
-  const bm25Rank = new Map();
-  bm25Results.forEach((r, i) => bm25Rank.set(_docKey(r), i + 1));
-
-  const semRank = new Map();
-  semanticResults.forEach((r, i) => semRank.set(_docKey(r), i + 1));
-
-  const fused = new Map();
-  for (const [key, rank] of bm25Rank) {
-    fused.set(key, {
-      species: bm25Results[rank - 1].species,
-      text: bm25Results[rank - 1].text,
-      key: bm25Results[rank - 1].key,
-      score: (BM25_WEIGHT / (RRF_K + rank)) + (SEMANTIC_WEIGHT / (RRF_K + (semRank.get(key) || topK + 1))),
-    });
+function combineResults(bm25Scored, semanticScored) {
+  const bm25ByKey = new Map();
+  let maxBm25 = 0;
+  for (const item of bm25Scored) {
+    const key = _docKey(item.doc);
+    bm25ByKey.set(key, item.score);
+    if (item.score > maxBm25) maxBm25 = item.score;
   }
-  for (const [key, rank] of semRank) {
-    if (!fused.has(key)) {
-      fused.set(key, {
-        species: semanticResults[rank - 1].species,
-        text: semanticResults[rank - 1].text,
-        key: semanticResults[rank - 1].key,
-        score: (BM25_WEIGHT / (RRF_K + (bm25Rank.get(key) || topK + 1))) + (SEMANTIC_WEIGHT / (RRF_K + rank)),
+
+  const semanticByKey = new Map();
+  let maxSemantic = 0;
+  for (const item of semanticScored) {
+    const key = _docKey(item.doc);
+    semanticByKey.set(key, item.score);
+    if (item.score > maxSemantic) maxSemantic = item.score;
+  }
+
+  const fused = [];
+  for (const item of bm25Scored) {
+    const key = _docKey(item.doc);
+    const bm25Norm = normalizeScore(bm25ByKey.get(key) || 0, maxBm25);
+    const semanticNorm = normalizeScore(semanticByKey.get(key) || 0, maxSemantic);
+    const score = (BM25_WEIGHT * bm25Norm) + (SEMANTIC_WEIGHT * semanticNorm);
+    if (score > 0) {
+      fused.push({
+        species: item.doc.species,
+        text: item.doc.text,
+        key: item.doc.key,
+        score,
+        bm25Score: item.score,
+        semanticScore: semanticByKey.get(key) || 0,
       });
     }
   }
 
-  return Array.from(fused.values())
-    .sort((a, b) => b.score - a.score)
-    .slice(0, topK);
+  for (const item of semanticScored) {
+    const key = _docKey(item.doc);
+    if (bm25ByKey.has(key)) continue;
+    const score = SEMANTIC_WEIGHT * normalizeScore(item.score, maxSemantic);
+    if (score > 0) {
+      fused.push({
+        species: item.doc.species,
+        text: item.doc.text,
+        key: item.doc.key,
+        score,
+        bm25Score: 0,
+        semanticScore: item.score,
+      });
+    }
+  }
+
+  return fused.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    if (b.semanticScore !== a.semanticScore) return b.semanticScore - a.semanticScore;
+    if (b.bm25Score !== a.bm25Score) return b.bm25Score - a.bm25Score;
+    if (a.species !== b.species) return a.species.localeCompare(b.species);
+    return a.key.localeCompare(b.key);
+  });
 }
 
 function _docKey(doc) {
@@ -569,7 +616,7 @@ function collapseVarieties(results) {
 }
 
 /**
- * Recupera los top-K passages más relevantes al query usando BM25.
+ * Recupera los top-K passages más relevantes al query con ranking híbrido.
  *
  * @param {string} query - texto a buscar (se tokeniza con normalización NFD).
  * @param {number} [topK=5] - cantidad máxima de passages a devolver.

@@ -120,17 +120,17 @@ function parseSseLine(line) {
  * @param {Object}   params
  * @param {string}   params.model     — Ollama tag (e.g. "<modelo-configurado>")
  * @param {Array}    params.messages  — OpenAI-style [{role, content}, ...]
- * @param {string}   [params.system]  — optional system prepended by sidecar
+ * @param {string}   [params.system]  - optional system prepended by sidecar
  *                                       if first message isn't already system
- * @param {Object}   [params.options] — Ollama options passthrough
+ * @param {Object}   [params.options] - Ollama options passthrough
  *                                       (temperature, num_predict, etc.)
- * @param {string}   [params.keep_alive] — Ollama keep_alive ("5m", "30m")
- * @param {Function} [params.onToken]   — (chunk, fullText) per delta
- * @param {Function} [params.onStart]   — ({model, request_id})
- * @param {Function} [params.onDone]    — (stats) once, before promise resolves
- * @param {Function} [params.onError]   — (errInfo) for upstream stream errors
+ * @param {string}   [params.keep_alive] - Ollama keep_alive ("5m", "30m")
+ * @param {Function} [params.onToken]   - (chunk, fullText) per delta
+ * @param {Function} [params.onStart]   - ({model, request_id})
+ * @param {Function} [params.onDone]    - (stats) once, before promise resolves
+ * @param {Function} [params.onError]   - (errInfo) for upstream stream errors
  *                                         emitted as {type:"error"} mid-stream
- * @param {AbortSignal} [params.signal] — abort propagated to fetch
+ * @param {AbortSignal} [params.signal] - abort propagated to fetch
  * @returns {Promise<{fullText: string, stats: Object}>}
  * @throws {Error} when transport fails, sidecar returns non-2xx, or
  *                  AbortError on signal cancellation.

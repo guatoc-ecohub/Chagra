@@ -78,7 +78,7 @@ function normOrigin(v) {
  *
  * @param {object} passage — { species, text, key, origin?, origen?, pais?, continente? }
  * @param {object} [opts]
- * @param {Record<string,string>} [opts.establishmentMeans] — species→means (opcional, no usado para forzar co/foreign).
+ * @param {Record<string,string>} [opts.establishmentMeans] - species→means (opcional, no usado para forzar co/foreign).
  * @returns {{ tag: OriginTag, label: string|null }} etiqueta + label geográfico
  *   estructurado SI existe (país/continente real del dato), o null.
  */
@@ -122,7 +122,7 @@ export function classifyPassageOrigin(passage, opts = {}) {
 /**
  * Etiqueta una lista de pasajes con su origen (no muta los originales).
  * @param {Array<object>} passages
- * @param {object} [opts] — ver classifyPassageOrigin.
+ * @param {object} [opts] - ver classifyPassageOrigin.
  * @returns {Array<object>} pasajes con `_origin: OriginTag` y `_originLabel`.
  */
 export function tagPassagesOrigin(passages, opts = {}) {

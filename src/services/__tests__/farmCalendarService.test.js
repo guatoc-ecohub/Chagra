@@ -48,6 +48,33 @@ describe('farmCalendarService — grounding y deflección honesta', () => {
     }
   });
 
+  it('un frutal sin plan explicito deriva nutricion generica por categoria', () => {
+    const cal = buildPlantCalendar({
+      id: 'a1',
+      name: 'Arazá',
+      speciesSlug: 'eugenia_stipitata',
+      species: {
+        id: 'eugenia_stipitata',
+        nombre_comun: 'Arazá',
+        category: 'frutales_perennes',
+        familia_botanica: 'Myrtaceae',
+        altitud_msnm: { min_absoluto: 0, optimo_min: 100, optimo_max: 600, max_absoluto: 1000 },
+        temperatura_c: { optimo_min: 22, optimo_max: 28, max_tolerable: 35 },
+        agua: 'alto',
+        drenaje_requerido: 'bueno',
+        light: 'sol_pleno',
+      },
+      sowingDate: null,
+      altitudeM: 300,
+      now: NOW,
+    });
+    expect(cal.status).toBe('ok');
+    const nutricion = cal.entries.filter((e) => e.layer === 'nutricion');
+    expect(nutricion.length).toBeGreaterThan(0);
+    expect(nutricion[0].approximate).toBe(true);
+    expect(nutricion[0].source).toMatch(/generico por categoria/i);
+  });
+
   it('un cultivo anual con plantilla y fecha de siembra produce fenología + cosecha groundeadas', () => {
     const cal = buildPlantCalendar({
       id: 't1',

@@ -104,12 +104,12 @@ describe('getCapabilityHealth — estado real por capacidad', () => {
     expect(getCapabilityHealth('calendario', deps)).toBe('down');
   });
 
-  it('precio retorna soon (explicito en manifest)', () => {
+  it('precio retorna live porque ya es local y no depende del sidecar', () => {
     const deps = makeDeps({ isSidecarEnabled: true });
-    expect(getCapabilityHealth('precio', deps)).toBe('soon');
-    // sidecar no afecta: aunque este habilitado, el manifest dice soon
+    expect(getCapabilityHealth('precio', deps)).toBe('live');
+    // sidecar no afecta: aunque este deshabilitado, la capacidad sigue live
     const depsOff = makeDeps({ isSidecarEnabled: false });
-    expect(getCapabilityHealth('precio', depsOff)).toBe('soon');
+    expect(getCapabilityHealth('precio', depsOff)).toBe('live');
   });
 
   it('deep retorna soon (explicito en manifest, B14: backend no disponible aun)', () => {

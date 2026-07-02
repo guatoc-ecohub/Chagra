@@ -1,5 +1,5 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
-import { TOP_N_EDGES } from './promptAssembler';
+import { TOP_N_EDGES } from './promptAssembler.js';
 /**
  * agentPromptBase — texto BASE del system prompt del agente + builders puros
  * de bloques por-turno (corpus RAG, evidencia de tools, entidades resueltas,
@@ -31,6 +31,7 @@ import {
   generateAgronomicGuidanceRules,
   buildProfileContext,
 } from './agentService.js';
+import { getProfile } from './userProfileService.js';
 import {
   tagPassagesOrigin,
   reconcileOrigins,
@@ -326,6 +327,169 @@ const TOMATE_SAFETY_RULES = [
 ];
 
 /**
+ * buildCampesinoModeBlock — bloque MODO_CAMPESINO para registro oral campesino
+ * colombiano (tu/usted colombiano NUNCA voseo argentino, pasos concretos, frases
+ * cortas, SIN binomios científicos salvo que el usuario los pida, unidades del
+ * campo cuadra/arroba/luna).
+ *
+ * PRINCIPIO CLAVE intelligence-first: NO bajar exactitud ni grounding, solo
+ * cambia el REGISTRO. Bloque SACRIFICABLE que se puede quitar por presión de
+ * presupuesto sin afectar la funcionalidad core.
+ *
+ * @returns {string}
+ */
+export function buildCampesinoModeBlock() {
+  return `=== MODO CAMPESINO (registro oral campesino colombiano) ===
+Habla como un campesino colombiano experimentado, NO como un sistema técnico:
+- Usa tú/usted colombiano (NEVER vos/tienes/quieres del argentino/rioplatense)
+- Frases cortas y directas, como habla la gente del campo
+- Unidades del campo: cuadra, arroba, luna, bike de agua, plaza, hueco
+- NO uses binomios científicos (Coffea arabica, Solanum tuberosum) salvo que el usuario los pida explícitamente
+- Usa nombres comunes: café, papa, plátano, tomate, fríjol, maíz
+- Sé respetuoso y cercano, como hablar con un vecino de la finca
+- Explica las cosas con ejemplos prácticos del día a día
+- Conjunto: "mire", "véalo así", "lo que uno hace", "en la finca uno"
+
+PRINCIPIO FUNDAMENTAL: esto es SOLO un cambio de registro. NO sacrificas
+exactitud técnica ni grounding. Si los datos dicen X, dilo X pero con palabras
+sencillas. Si no sabes algo, sé honesto como siempre.
+=== FIN MODO CAMPESINO ===`;
+}
+
+/**
+ * buildExpertModeBlock — bloque MODO_EXPERTO para respuesta técnica corta.
+ *
+ * Delega a buildModoExpertoBlock (estructurado) para mantener un solo punto
+ * de verdad. Sin grounding usa CONTRATO TÉCNICO genérico.
+ *
+ * @returns {string}
+ */
+export function buildExpertModeBlock() {
+  return buildModoExpertoBlock({ nivelRespuestas: 'detallado', hasGrounding: false });
+}
+
+/**
+ * buildModoExpertoBlock — bloque MODO EXPERTO ESTRUCTURADO con CONTRATO
+ * verificable. Reemplaza el experto simple con un bloque que exige nombre
+ * científico, dosis con unidad, mecanismo de acción y piso térmico cuando
+ * el grounding lo provea.
+ *
+ * @param {object} opts
+ * @param {string} [opts.nivelRespuestas] - 'simple' | 'detallado'
+ * @param {boolean} [opts.hasGrounding] - si hay evidencia/tools en el turno
+ * @returns {string}
+ */
+export function buildModoExpertoBlock(opts = {}) {
+  const { nivelRespuestas = 'simple', hasGrounding = false } = opts;
+
+  if (nivelRespuestas !== 'detallado') return '';
+
+  const contrato = hasGrounding
+    ? `CONTRATO CITA: científico exacto de ENTIDADES RESUELTAS/DATOS VERIFICADOS, dosis con unidad (ej: 1x10^9 conidias/mL), mecanismo de acción, piso térmico si grounding la menciona.`
+    : `CONTRATO TÉCNICO: profundiza en por qué/factores/integración; si no hay datos del catálogo, dilo explícitamente.`;
+
+  return `=== MODO EXPERTO ===
+${contrato}
+PROHIBICIONES: NO uses técnica para disimular incertidumbre; NO inventes dosis/datos numéricos; NO mezcles datos de especies.
+RESPUESTA: preciso, citado cuando hay evidencia, honesto cuando no la haya.
+=== FIN ===`;
+}
+
+/**
+ * buildSourceFooter — pie de fuente DETERMINÍSTICO desde la procedencia del
+ * grounding. NO confía en que el modelo cite; genera el pie desde las
+ * entidades/tools que respondieron (AGE/RAG/SIPSA/IDEAM) en código.
+ *
+ * @param {object} opts
+ * @param {Array|object|null} [opts.toolEvidence] - evidencia de tools del turno
+ * @param {Array|null} [opts.resolvedEntities] - entidades resueltas por AGE
+ * @param {boolean} [opts.hasCorpus] - si hay corpus RAG en este turno
+ * @returns {string} pie de fuente, o '' si no hay fuentes
+ */
+export function buildSourceFooter(opts = {}) {
+  const { toolEvidence = null, resolvedEntities = null, hasCorpus = false } = opts;
+
+  const sources = [];
+
+  if (toolEvidence) {
+    const tools = Array.isArray(toolEvidence) ? toolEvidence : [toolEvidence];
+    for (const ev of tools) {
+      if (!ev || !ev.tool) continue;
+
+      const toolToSource = {
+        get_species: 'Catálogo Chagra (Apache AGE)',
+        get_companions: 'Catálogo Chagra (Apache AGE)',
+        get_pest_controllers: 'Grafo AGE (relaciones plagas-controles)',
+        get_biopreparados: 'Catálogo chagra-pro (biopreparados)',
+        get_normativa_ica: 'ICA (registro de agroquímicos)',
+        get_clima_ideam: 'IDEAM (estaciones climáticas)',
+        get_precio_sipsa: 'SIPSA/DANE (precios mayoristas)',
+        get_multihop_companions: 'Grafo AGE (companions multi-hop)',
+        validate_visual_match: 'Visión artificial (GLM-4.6)',
+        validate_taxonomy: 'Validación taxonómica AGE',
+      };
+
+      const source = toolToSource[ev.tool];
+      if (source && !sources.includes(source)) {
+        sources.push(source);
+      }
+    }
+  }
+
+  if (resolvedEntities && resolvedEntities.length > 0) {
+    if (!sources.includes('Catálogo Chagra (Apache AGE)')) {
+      sources.push('Catálogo Chagra (Apache AGE)');
+    }
+  }
+
+  if (hasCorpus) {
+    sources.push('Corpus agronómico regional');
+  }
+
+  if (sources.length === 0) return '';
+
+  return `\n\n---\n\nFuentes: ${sources.join(' + ')}.`;
+}
+
+/**
+ * buildMasterModeBlock — bloque MODO_MAESTRO para explicación/enseñanza.
+ *
+ * Este modo agrega tutoría: además de resolver la duda, enseña criterio para
+ * que el usuario entienda cómo decidir por su cuenta la próxima vez.
+ *
+ * @returns {string}
+ */
+export function buildMasterModeBlock() {
+  return `=== MODO MAESTRO (registro profesor/mentor) ===
+Habla como quien enseña en campo y deja criterio:
+- Resume la decisión principal en una frase.
+- Luego explica la lógica detrás de la recomendación.
+- Si sirve, da un checklist breve para ejecutar y verificar.
+- Señala errores comunes y qué observar después.
+- Usa ejemplos del cultivo del usuario para fijar el aprendizaje.
+
+PRINCIPIO FUNDAMENTAL: enseñar no es adornar. Mantén exactitud, foco y pasos accionables.
+=== FIN MODO MAESTRO ===`;
+}
+
+function normalizeMode(value) {
+  if (!value || typeof value !== 'string') return '';
+  const normalized = value.toLowerCase().trim();
+  if (['simple', 'campesino', 'campesina', 'rural'].includes(normalized)) return 'campesino';
+  if (['detallado', 'detallada', 'experto', 'experta', 'tecnico', 'técnico'].includes(normalized)) return 'experto';
+  if (['maestro', 'maestra', 'profesor', 'profesora', 'mentor'].includes(normalized)) return 'maestro';
+  return '';
+}
+
+export function buildResponseModeBlock(mode, hasGrounding = false) {
+  const normalized = normalizeMode(mode);
+  if (normalized === 'campesino') return buildCampesinoModeBlock();
+  if (normalized === 'experto') return buildModoExpertoBlock({ nivelRespuestas: 'detallado', hasGrounding });
+  if (normalized === 'maestro') return buildMasterModeBlock();
+  return '';
+}
+
+/**
  * buildBasePrompt — system prompt base del agente Chagra (instrucciones +
  * glosarios condicionales + reglas anti-alucinación CASO A/B/C).
  *
@@ -338,12 +502,16 @@ const TOMATE_SAFETY_RULES = [
  *
  * @param {object} args
  * @param {string} args.plantContext — inventario agrupado ("café ×3, …" o "ninguna").
- * @param {string} [args.fincaContext] — línea "Estás asistiendo en la finca…" o ''.
- * @param {string} [args.indoorContext] — línea de invernadero o ''.
- * @param {object|null} [args.finca] — finca activa (para buildProfileContext).
- * @param {string} [args.query] — query del turno (gatea glosarios/reglas condicionales).
- * @param {string} [args.contextMemory] — historial inyectado (gatea glosarios y turn-aislamiento).
- * @param {boolean} [args.isEnum] — análisis NN2: ¿query enumerativa? (gatea CASO C completo).
+ * @param {string} [args.fincaContext] - línea "Estás asistiendo en la finca…" o ''.
+ * @param {string} [args.indoorContext] - línea de invernadero o ''.
+ * @param {object|null} [args.finca] - finca activa (para buildProfileContext).
+ * @param {string} [args.query] - query del turno (gatea glosarios/reglas condicionales).
+ * @param {string} [args.contextMemory] - historial inyectado (gatea glosarios y turn-aislamiento).
+ * @param {boolean} [args.isEnum] - análisis NN2: ¿query enumerativa? (gatea CASO C completo).
+ * @param {string} [args.nivelRespuestas] - 'simple' o 'detallado' (del perfil de usuario).
+ * @param {Array|object|null} [args.toolEvidence] - evidencia de tools (para pie de fuente).
+ * @param {Array|null} [args.resolvedEntities] - entidades resueltas (para pie de fuente).
+ * @param {boolean} [args.hasCorpus] - si hay corpus RAG (para pie de fuente).
  * @returns {string}
  */
 export function buildBasePrompt({
@@ -354,9 +522,15 @@ export function buildBasePrompt({
   query = '',
   contextMemory = '',
   isEnum = false,
-}) {
+  nivelRespuestas = '',
+  toolEvidence = null,
+  resolvedEntities = null,
+  hasCorpus = false,
+} = {}) {
   const mention = _strip(`${query}\n${contextMemory}`);
+  const profileMode = normalizeMode(nivelRespuestas || getProfile()?.nivel_respuestas || '');
   const sections = [];
+  const hasGrounding = Boolean(toolEvidence || resolvedEntities || hasCorpus);
   const conversationContextPin = buildConversationContextPin(contextMemory);
 
   sections.push(`Eres Chagra IA, un asistente agroecológico colombiano. Habla como agrónomo experimentado, no como sistema. ${fincaContext}${indoorContext}El usuario tiene estas plantas agrupadas por especie con su conteo: ${plantContext}.`);
@@ -369,6 +543,11 @@ export function buildBasePrompt({
 
   if (conversationContextPin) {
     sections.push(conversationContextPin);
+  }
+
+  const responseModeBlock = buildResponseModeBlock(profileMode, hasGrounding);
+  if (responseModeBlock) {
+    sections.push(responseModeBlock);
   }
 
   if (INVENTORY_QUERY_RE.test(mention)) {
@@ -486,7 +665,17 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
   sections.push(generateAgronomicGuidanceRules());
   // Las alertas climáticas regionales del perfil solo aportan en consultas de
   // clima; en plaga/manejo se omiten para no empujar la truncación (GR-10).
+  // El registro de respuesta (campesino/experto/maestro) ya lo inyecta
+  // buildResponseModeBlock arriba a partir de nivel_respuestas; NO reenviamos
+  // nivelRespuestas a buildProfileContext para no duplicar el bloque de nivel.
   sections.push(buildProfileContext(finca, { climaQuery: CLIMA_QUERY_RE.test(mention) }));
+
+  if (profileMode === 'experto') {
+    const footer = buildSourceFooter({ toolEvidence, resolvedEntities, hasCorpus });
+    if (footer) {
+      sections.push(footer.replace(/^\n\n/, ''));
+    }
+  }
 
   return sections.join('\n\n');
 }
@@ -652,23 +841,66 @@ export function buildCorpusVariants(contextCorpus) {
 }
 
 /**
+ * Umbral mínimo de confianza para que una entidad del resolver se inyecte
+ * como grounding autoritativo en el prompt. Entidades con confidence < este
+ * valor se descartan del bloque AUTORITATIVO y el término del usuario queda
+ * sin grounding → activa CASO B (pedir aclaración). Umbral calibrado en
+ * bench: confidence 1.0 = match exacto en AGE; 0.95 = alias canónico;
+ * 0.8-0.94 = match fuzzy aceptable; < 0.8 = ruido o falso positivo.
+ *
+ * Fix #95 (2026-06-23): el bug "coincyes → Momordica charantia" ocurría
+ * porque el sidecar devolvía entidades con confidence baja que el LLM tomaba
+ * como grounding válido, ignorando el CASO B del prompt.
+ */
+export const MIN_ENTITY_CONFIDENCE = 0.8;
+
+/**
  * buildResolvedEntitiesBlock — ENTIDADES RESUELTAS (DR taxonómico Tier 1 B).
  * El sidecar /resolve-entities ya verificó contra Apache AGE qué plantas/
  * plagas menciona el usuario y resolvió los binomios canónicos. Capa
  * DETERMINÍSTICA: bypassea que el LLM ignore reglas generales del prompt.
  *
+ * Solo se inyectan entidades con confidence >= MIN_ENTITY_CONFIDENCE (0.8).
+ * Las entidades de baja confianza NO se descartan silenciosamente: si hay
+ * términos mencionados que no superaron el umbral, se emite un bloque CASO B
+ * explícito para que el LLM pida aclaración en lugar de inventar el binomio.
+ *
  * @param {Array<object>|null} resolvedEntities
- * @returns {string} bloque, o '' si no hay entidades.
+ * @returns {string} bloque autoritativo + (si aplica) bloque CASO B, o ''.
  */
 export function buildResolvedEntitiesBlock(resolvedEntities) {
   if (!Array.isArray(resolvedEntities) || resolvedEntities.length === 0) return '';
-  return `
 
+  const highConf = resolvedEntities.filter(
+    (e) => typeof e.confidence === 'number' && e.confidence >= MIN_ENTITY_CONFIDENCE
+  );
+  const lowConf = resolvedEntities.filter(
+    (e) => typeof e.confidence !== 'number' || e.confidence < MIN_ENTITY_CONFIDENCE
+  );
+
+  const parts = [];
+
+  if (highConf.length > 0) {
+    parts.push(`
 === ENTIDADES RESUELTAS DEL CATÁLOGO (autoritativo, verificado en Apache AGE) ===
 El catálogo Chagra confirma estos binomios CANÓNICOS para lo que el usuario mencionó. Si tu respuesta los menciona, USA el nombre científico EXACTO listado — JAMÁS otro género por similitud de sonido (gulupa NO es Psidium ni Cucurbita; aguacate NO es Psidium). Si dudas entre varias, elige la de mayor confidence.
 
-${resolvedEntities.map((e) => `- "${e.mentioned}" (${e.kind}) → ${e.nombre_comun} = ${e.nombre_cientifico} [id: ${e.canonical_id}, confidence: ${e.confidence}]`).join('\n')}
-=== FIN ENTIDADES RESUELTAS ===`;
+${highConf.map((e) => `- "${e.mentioned}" (${e.kind}) → ${e.nombre_comun} = ${e.nombre_cientifico} [id: ${e.canonical_id}, confidence: ${e.confidence}]`).join('\n')}
+=== FIN ENTIDADES RESUELTAS ===`);
+  }
+
+  if (lowConf.length > 0) {
+    // Deduplica los términos mencionados (el sidecar puede devolver varias
+    // entidades de baja confianza para el mismo token).
+    const uniqueTerms = [...new Set(lowConf.map((e) => e.mentioned).filter(Boolean))];
+    parts.push(`
+=== TÉRMINOS SIN GROUNDING VERIFICADO (CASO B OBLIGATORIO) ===
+Los siguientes términos mencionados por el usuario NO tienen match de alta confianza en el catálogo Chagra (confidence < ${MIN_ENTITY_CONFIDENCE}): ${uniqueTerms.map((t) => `"${t}"`).join(', ')}.
+INSTRUCCIÓN OBLIGATORIA anti-alucinación: NUNCA inventes ni afirmes un nombre científico (binomio latino) para estos términos. Aplica CASO B: "No reconozco el término '[término]'. ¿Podrías describirlo, enviarme una foto, o decirme si quisiste decir otra planta?". ES PREFERIBLE QUEDAR COMO IGNORANTE QUE INVENTAR UN BINOMIO.
+=== FIN TÉRMINOS SIN GROUNDING ===`);
+  }
+
+  return parts.join('\n');
 }
 
 /**
@@ -784,7 +1016,7 @@ RESPONDE SOLO a lo que el usuario preguntó usando ÚNICAMENTE los datos verific
  * No-op si el bloque no excede maxEdges o no es string válido.
  *
  * @param {string} bloque — texto del bloque relacional
- * @param {number} [maxEdges=TOP_N_EDGES] — tope de aristas
+ * @param {number} [maxEdges=TOP_N_EDGES] - tope de aristas
  * @returns {string} bloque truncado o el original si no aplica
  */
 export function truncateEdgesBlock(bloque, maxEdges = TOP_N_EDGES) {

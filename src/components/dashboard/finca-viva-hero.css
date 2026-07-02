@@ -203,6 +203,21 @@
 [data-theme="nature"] .fvh,
 [data-theme="minimalista"] .fvh { --fvh-neon-velo: 0; }
 
+/* VIÑETA DE PROFUNDIDAD de la escena (todos los temas): un brillo apenas
+   perceptible arriba (aire) + una caída suave abajo que asienta la escena
+   contra el compositor. z5: sobre la escena (z2), bajo el velo neón (z6). */
+.fvh-escena-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  border-radius: inherit;
+  background:
+    radial-gradient(130% 70% at 50% 0%, rgba(255, 255, 255, 0.07), transparent 46%),
+    linear-gradient(180deg, transparent 76%, rgba(15, 25, 12, 0.16) 100%);
+}
+
 /* ── SHELL de ancho máximo (clave del responsive desktop #7) ───────────────── */
 .fvh-shell {
   position: relative;
@@ -482,29 +497,20 @@
   100% { transform: translate(0, 0); }
 }
 
-/* A/B del colibrí (flag VITE_COLIBRI ON, dev). Dos colibrís DIBUJADOS en el
-   mismo estilo, uno a cada costado, para que el operador elija: base vs barbudito
-   de páramo. Las alas baten solas (.fvh-colibri-svg .fvh-ala-*); aquí solo los
-   ubicamos, les damos un cabeceo suave de vuelo estacionario (con tiempos
-   distintos para que no vayan sincronizados) y su etiquetita. */
+/* A/B del colibrí del páramo (flag VITE_COLIBRI ON, dev). Dos barbuditos, uno a
+   cada costado de la escena, para que el operador elija. Cada uno trae su propia
+   animación (ilustrado = aleteo/vuelo CSS; real = sprite en loop), así que aquí
+   anulamos la animación de bicho heredada y solo los ubicamos. Es A/B TEMPORAL:
+   cada uno con su etiquetita. */
 .fvh-colibri-ab {
+  animation: none !important;
   z-index: 8;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
-  filter: drop-shadow(0 5px 6px rgba(20, 40, 20, 0.3));
+  gap: 3px;
 }
-.fvh-colibri-ab-izq { animation: fvh-colibri-cabeceo 5.6s ease-in-out infinite; }
-.fvh-colibri-ab-der {
-  animation: fvh-colibri-cabeceo 6.4s ease-in-out infinite;
-  animation-delay: -2.3s;
-}
-@keyframes fvh-colibri-cabeceo {
-  0%, 100% { transform: translateY(0) rotate(-2deg); }
-  50%      { transform: translateY(-9px) rotate(2deg); }
-}
-/* etiquetita discreta "base" / "barbudito" (solo en este modo A/B dev) */
+/* etiquetita discreta "ilustrado" / "real" (solo en este modo A/B dev) */
 .fvh-ab-tag {
   font: 600 9px/1 var(--fvh-body, system-ui, sans-serif);
   letter-spacing: 0.06em;
@@ -550,7 +556,7 @@
 .fvh-lluvia line { animation: fvh-cae 0.9s linear infinite; }
 .fvh-lluvia line:nth-child(2n) { animation-delay: 0.3s; }
 .fvh-lluvia line:nth-child(3n) { animation-delay: 0.6s; }
-@keyframes fvh-cae { 0% { transform: translateY(-6px); opacity: 0; } 30% { opacity: 0.8; } 100% { transform: translateY(16px); opacity: 0; } }
+@keyframes fvh-cae { 0% { transform: translateY(-8px); opacity: 0; } 30% { opacity: 0.95; } 100% { transform: translateY(20px); opacity: 0; } }
 .fvh-nube-a { animation: fvh-nube 24s ease-in-out infinite; }
 @keyframes fvh-nube { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(18px); } }
 
@@ -580,6 +586,100 @@
 .fvh-sway-slow { animation: fvh-sway 7s ease-in-out infinite; transform-box: fill-box; transform-origin: bottom center; }
 .fvh-ripple { animation: fvh-ripple 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
 @keyframes fvh-ripple { 0%, 100% { opacity: 0.35; transform: scaleX(1); } 50% { opacity: 0.7; transform: scaleX(1.12); } }
+
+/* ── ATMÓSFERA DE LA ESCENA (profundidad + vida por hora/clima) ─────────────
+   Capas nuevas del arte: bruma del valle que deriva, luciérnagas nocturnas,
+   estrella fugaz, bancos de niebla, aves que planean. Todas viven dentro de
+   .fvh → el kill-switch de prefers-reduced-motion de abajo las congela. */
+
+/* bruma del valle — banda que deriva muy despacio entre cordillera y lomas */
+.fvh-bruma { animation: fvh-bruma 26s ease-in-out infinite; }
+@keyframes fvh-bruma {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(22px); }
+}
+
+/* luciérnagas — titilan y ascienden apenas (noche despejada) */
+.fvh-luci {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fvh-luci 4.2s ease-in-out infinite;
+}
+@keyframes fvh-luci {
+  0%, 100% { opacity: 0.05; transform: translateY(0) scale(0.8); }
+  45%      { opacity: 0.95; transform: translateY(-7px) scale(1.15); }
+  70%      { opacity: 0.3; transform: translateY(-10px) scale(0.9); }
+}
+
+/* estrella fugaz — casi siempre invisible; cada ~9s cruza y se apaga */
+.fvh-fugaz { opacity: 0; animation: fvh-fugaz 9s ease-in 2s infinite; }
+@keyframes fvh-fugaz {
+  0%, 86%  { opacity: 0; transform: translate(0, 0); }
+  88%      { opacity: 0.9; }
+  94%      { opacity: 0; transform: translate(-46px, 22px); }
+  100%     { opacity: 0; transform: translate(-46px, 22px); }
+}
+
+/* bancos de niebla — derivan en contrafase (condición niebla) */
+.fvh-neblina-a { animation: fvh-neblina 18s ease-in-out infinite; }
+.fvh-neblina-b { animation: fvh-neblina 24s ease-in-out infinite reverse; }
+@keyframes fvh-neblina {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(30px); }
+}
+
+/* aves lejanas — planean cruzando despacio */
+.fvh-aves { animation: fvh-aves 34s linear infinite; }
+@keyframes fvh-aves {
+  0%   { transform: translate(0, 0); }
+  50%  { transform: translate(-56px, 8px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* segunda nube densa (clima cubierto) — deriva en contrafase de la primera */
+.fvh-nube-b { animation: fvh-nube 30s ease-in-out infinite reverse; }
+
+/* ── VIDA DE LOS PORTALES (micro-motion de cada lugar) ────────────────────── */
+/* humo de la casita de "Mi finca" — sube y se disuelve */
+.fvh-p-humo { animation: fvh-p-humo 3.6s ease-in-out infinite; }
+@keyframes fvh-p-humo {
+  0%, 100% { opacity: 0.3; transform: translateY(0); }
+  50%      { opacity: 0.85; transform: translateY(-2.5px); }
+}
+/* matas de la parcela — mecidas por el viento */
+.fvh-p-mata { animation: fvh-sway 5.4s ease-in-out infinite; transform-box: fill-box; transform-origin: bottom center; }
+/* hojas-página de "Aprender" — flotan a la deriva */
+.fvh-p-hoja { animation: fvh-p-hoja 6s ease-in-out infinite; }
+@keyframes fvh-p-hoja {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50%      { transform: translate(-6px, -5px) rotate(-8deg); }
+}
+/* bichos del juego (mariquita/mariposa) — el mismo flote de la fauna */
+.fvh-p-bicho { animation: fvh-flota 4.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+/* dado — un botecito juguetón */
+.fvh-p-dado { animation: fvh-p-dado 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes fvh-p-dado {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-3px) rotate(3deg); }
+}
+/* anillos del claro del agente — laten (invitación a hablar) */
+.fvh-p-anillo {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fvh-p-anillo 2.8s ease-in-out infinite;
+}
+@keyframes fvh-p-anillo {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50%      { opacity: 0.85; transform: scale(1.05); }
+}
+/* globo de conversación del agente — flota apenas */
+.fvh-p-globo { animation: fvh-p-globo 4s ease-in-out infinite; }
+@keyframes fvh-p-globo {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+/* brillos (estrellitas de Jugar/Agente) — parpadean suave */
+.fvh-p-brillo { animation: fvh-titila 3.8s ease-in-out infinite; }
 
 /* ── COLUMNA del agente (compositor + hero text) ───────────────────────────── */
 .fvh-aside { display: flex; flex-direction: column; }
@@ -653,8 +753,11 @@
   margin: 10px auto 0;
   padding: 3px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 4px 12px rgba(40, 60, 40, 0.16), 0 0 0 1px rgba(38, 51, 31, 0.06);
+  /* Superficie del TEMA (no blanco fijo): en biopunk la píldora era blanca con
+     tinta casi-blanca → "Con detalle" ilegible. Con la superficie del tema, la
+     tinta AA del tema siempre contrasta (mismo criterio que el globo/chip). */
+  background: var(--fvh-card-bg);
+  box-shadow: 0 4px 12px rgba(40, 60, 40, 0.16), 0 0 0 1px var(--fvh-card-border);
 }
 .fvh-nivel-btn {
   border: 0;
@@ -664,7 +767,7 @@
   font-family: var(--fvh-body);
   font-weight: 800;
   font-size: 11.5px;
-  color: var(--fvh-tinta-suave);
+  color: var(--fvh-card-tinta-suave);
   background: transparent;
   transition: background 160ms ease, color 160ms ease;
 }
@@ -718,6 +821,9 @@
 }
 .fvh-portales { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; padding: 0 16px; }
 .fvh-portal {
+  /* --p-glow: tinte RGB del lugar (lo fija cada .p-*): alimenta la sombra de
+     hover para que cada portal "encienda" con su propio color. */
+  --p-glow: 40 60 40;
   position: relative;
   border: 0;
   border-radius: var(--fvh-r);
@@ -730,12 +836,43 @@
   display: flex;
   flex-direction: column;
   box-shadow: 0 14px 28px var(--fvh-sombra-iso), 0 1px 0 rgba(255, 255, 255, 0.28) inset;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
   opacity: 0;
   animation: fvh-rise 0.6s forwards;
 }
 .fvh-portal:active { transform: translateY(2px) scale(0.985); }
-.fvh-portal .place-svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+/* teclado: anillo lima del sistema, visible sobre cualquier lugar */
+.fvh-portal:focus-visible {
+  outline: 3px solid var(--fvh-lima);
+  outline-offset: 3px;
+}
+.fvh-portal .place-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  transition: transform 0.45s cubic-bezier(0.22, 0.9, 0.35, 1);
+}
+/* HOVER (solo puntero fino: en táctil no hay hover que valga) — el lugar se
+   acerca: la tarjeta se alza con sombra de su color, la ilustración hace un
+   zoom sutil y el "Entrar →" se enciende. */
+@media (hover: hover) and (pointer: fine) {
+  .fvh-portal:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 22px 42px rgb(var(--p-glow) / 0.5),
+                0 1px 0 rgba(255, 255, 255, 0.34) inset;
+  }
+  .fvh-portal:hover .place-svg { transform: scale(1.05); }
+  .fvh-portal:hover .ir {
+    background: var(--fvh-lima-claro);
+    border-color: var(--fvh-lima-claro);
+    color: #274200;
+    transform: translateX(2px);
+  }
+  .fvh-portal:hover .p-emoji { transform: scale(1.08) rotate(-4deg); }
+  .fvh-portal:active { transform: translateY(0) scale(0.99); }
+}
 /* VELO de legibilidad sobre la fauna (feedback #8): gradiente que oscurece la
    base de la tarjeta donde van el título y el texto. */
 .fvh-p-scrim {
@@ -754,6 +891,7 @@
   font-size: 20px;
   background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 3px 9px rgba(0, 0, 0, 0.26);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .fvh-portal h3 {
   font-family: var(--fvh-display);
@@ -786,11 +924,14 @@
   padding: 3px 9px;
   -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
 }
-.fvh-portal.p-gestionar { background: linear-gradient(160deg, #5fa86b, #3f7a4e); }
-.fvh-portal.p-aprender  { background: linear-gradient(160deg, #e0a64e, #c47b2f); }
-.fvh-portal.p-jugar     { background: linear-gradient(160deg, #7cb6d8, #4f8fc0); }
-.fvh-portal.p-agente    { background: linear-gradient(160deg, #7d6bd6, #5d4db0); }
+/* Cada portal es un LUGAR con su clima de color propio (cielo arriba → tierra
+   abajo, 3 paradas) + su tinte de glow para el hover. */
+.fvh-portal.p-gestionar { background: linear-gradient(168deg, #8cc997 0%, #4d9260 46%, #2e6b3a 100%); --p-glow: 61 122 78; }
+.fvh-portal.p-aprender  { background: linear-gradient(168deg, #f0c078 0%, #cf8a3a 46%, #9a5f24 100%); --p-glow: 196 123 47; }
+.fvh-portal.p-jugar     { background: linear-gradient(168deg, #a3d3ec 0%, #5b97c6 46%, #3a6f9e 100%); --p-glow: 79 143 192; }
+.fvh-portal.p-agente    { background: linear-gradient(168deg, #a394e8 0%, #6a59c0 46%, #453788 100%); --p-glow: 109 92 190; }
 .fvh-p-nuevo {
   position: relative;
   z-index: 2;

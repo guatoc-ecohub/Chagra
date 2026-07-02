@@ -22,7 +22,7 @@
  * (Network-First en el SW) → bundle nuevo → SHA coincide → no recarga otra vez.
  *
  * Es belt-and-suspenders del auto-update: si éste ya recargó, el SHA coincide y
- * acá no pasa nada. Si el auto-update falló, esta ruta lo rescata.
+ * aquí no pasa nada. Si el auto-update falló, esta ruta lo rescata.
  *
  * ── ANTI-LOOP (crítico) ───────────────────────────────────────────────────
  * Guard por sessionStorage (`chagra:self-heal-reloaded`): recargamos como mucho
@@ -81,13 +81,13 @@ export function shasMatch(a, b) {
 
 /**
  * Decide si el cliente debe auto-recuperarse (recargar) por desfase de versión.
- * Función pura: toda la política de decisión vive acá para testearla aislada.
+ * Función pura: toda la política de decisión vive aquí para testearla aislada.
  *
  * @param {object} params
  * @param {string} params.runningSha — SHA embebido en el bundle corriendo.
  * @param {string|null} params.deployedSha — SHA reportado por /version.json.
  * @param {boolean} params.alreadyReloaded — ya recargamos en esta sesión.
- * @param {boolean} [params.online=true] — hay conexión.
+ * @param {boolean} [params.online=true] - hay conexión.
  * @returns {boolean} true → mandar SKIP_WAITING + recargar UNA vez.
  */
 export function shouldSelfHeal({ runningSha, deployedSha, alreadyReloaded, online = true }) {
@@ -227,8 +227,8 @@ function defaultNotifyUpdateAvailable(version) {
  * @param {(sha:string) => void} [deps.writePending]
  * @param {() => void} [deps.clearPending]
  * @param {(version:string) => void} [deps.notifyUpdateAvailable]
- * @param {() => Promise<void>} [deps.skipWaiting] — manda SKIP_WAITING al SW.
- * @param {() => void} [deps.reload] — recarga la página.
+ * @param {() => Promise<void>} [deps.skipWaiting] - manda SKIP_WAITING al SW.
+ * @param {() => void} [deps.reload] - recarga la página.
  * @returns {Promise<{healed: boolean, reason: string}>}
  */
 export async function runSelfHealCheck(deps = {}) {
@@ -302,7 +302,7 @@ async function defaultSkipWaiting() {
 
 function defaultReload() {
   // Indirección vía import dinámico para reusar pageReload (mockeable en test).
-  // Import estático arriba crearía un ciclo innecesario; acá basta location.
+  // Import estático arriba crearía un ciclo innecesario; aquí basta location.
   try {
     window.location.reload();
   } catch (_) { /* entorno sin window (SSR/test) — no-op */ }

@@ -14,7 +14,7 @@ import { FARM_CONFIG } from '../config/defaults';
  *
  * @param {Object|null} payload — payload de SeedingLog
  * @param {Object} [opts]
- * @param {string|null} [opts.speciesSlug] — id canónico del catálogo elegido en
+ * @param {string|null} [opts.speciesSlug] - id canónico del catálogo elegido en
  *   el selector de especies (SpeciesCombobox). Si viene, se usa DIRECTO como
  *   subject_slug sin depender del parseo del nombre (bug operador 2026-06-25:
  *   "Fresa - Invernadero #1" no resolvía). Si es null/desconocido, cae a la

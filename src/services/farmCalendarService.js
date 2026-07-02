@@ -29,7 +29,7 @@
 import { calculateWindows, normalizePhenologyTemplate, resolveTemplate } from './phenologyCalculator';
 import { resolvePerennialCycle } from './perennialCalculator';
 import { isPerennialSpecies } from '../data/perennialCycles';
-import { resolveGenericFeedingForSpecies } from '../data/feedingPlanGeneric';
+import { resolveFeedingPlanTemplateForSpecies } from '../data/feedingPlanFrutales';
 import { getBiopreparadosForStage } from './climateCycleService';
 
 /** Capas del calendario. El orden importa para el ordenamiento estable. */
@@ -196,29 +196,16 @@ function buildAnnualEntries({ speciesSlug, sowingDate, altitudeM, template, cate
 function buildNutritionEntries({ species, sowingDate, now }) {
   if (!species) return [];
 
-  // 1. Plan específico del catálogo (pocas especies lo traen hoy).
-  const specificSteps = Array.isArray(species.feeding_plan_template?.primary_steps)
-    ? species.feeding_plan_template.primary_steps
-    : Array.isArray(species.feeding_plan?.primary_steps)
-      ? species.feeding_plan.primary_steps
-      : null;
-
-  let template = specificSteps
-    ? { primary_steps: specificSteps, isGeneric: false, source: 'Plan de alimentación del catálogo' }
-    : null;
-
-  // 2. Genérico por tipo de cultivo (con overrides por familia: legumbre, etc.).
-  if (!template) {
-    const generic = resolveGenericFeedingForSpecies(species);
-    if (generic) template = generic;
-  }
+  const hasExplicitPlan = Array.isArray(species.feeding_plan_template?.primary_steps)
+    && species.feeding_plan_template.primary_steps.length > 0;
+  const template = resolveFeedingPlanTemplateForSpecies(species);
   if (!template || !Array.isArray(template.primary_steps) || template.primary_steps.length === 0) {
     return [];
   }
 
   const anchor = Number.isFinite(sowingDate) && sowingDate > 0 ? sowingDate : now;
   const anchored = Number.isFinite(sowingDate) && sowingDate > 0;
-  const isGeneric = !!template.isGeneric;
+  const isGeneric = !hasExplicitPlan;
 
   return template.primary_steps.map((s) => {
     const offset = Number.isFinite(s.offset_days) ? s.offset_days : 0;
@@ -431,7 +418,7 @@ export function buildPlantCalendar({ id, name, speciesSlug, species, sowingDate,
  * tira anual de 12 meses. Cuenta, por mes, cuántas entradas hay de cada capa.
  *
  * @param {PlantCalendar[]} plants
- * @param {Set<string>|null} [activeLayers] — capas a contar (null = todas)
+ * @param {Set<string>|null} [activeLayers] - capas a contar (null = todas)
  * @returns {Array<{ month:number, layers: Record<string, number>, total:number }>}
  */
 export function aggregateMonthlyMatrix(plants, activeLayers = null) {

@@ -52,7 +52,7 @@ export function recordGameStart(gameId) {
 /**
  * Registra que se COMPLETÓ (se ganó) un juego.
  * @param {string} gameId — id corto del juego.
- * @param {object} [extra] — metadata numérica/categórica opcional (sin PII).
+ * @param {object} [extra] - metadata numérica/categórica opcional (sin PII).
  * @returns {Promise<object|null>|null}
  */
 export function recordGameComplete(gameId, extra = {}) {
@@ -84,7 +84,7 @@ export function recordScreenView(screen) {
 /**
  * Registra el USO de una función concreta del producto.
  * @param {string} feature — id corto de la función (ej. 'foto_diagnostico').
- * @param {object} [extra] — metadata numérica/categórica opcional (sin PII).
+ * @param {object} [extra] - metadata numérica/categórica opcional (sin PII).
  * @returns {Promise<object|null>|null}
  */
 export function recordFeatureUse(feature, extra = {}) {

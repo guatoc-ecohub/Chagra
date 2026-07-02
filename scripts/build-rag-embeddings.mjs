@@ -2,19 +2,27 @@
 /**
  * build-rag-embeddings.mjs — precómputo de embeddings para RAG semántico (AIA-004).
  *
- * Genera un asset compacto `public/rag-embeddings.json` con vectores 768d
- * por slug del corpus, usando nomic-embed-text via Ollama local.
+ * Genera un asset compacto `public/rag-embeddings.json` con vectores 1024d
+ * por slug del corpus, usando snowflake-arctic-embed2 via Ollama local — el
+ * mismo modelo que embedQuery() en src/services/ragRetriever.js usa en runtime
+ * (ver Chagra-strategy/ops/MODELS.md, fila "embeddings (RAG)"). Los dos DEBEN
+ * coincidir: si se regenera este asset con un modelo/dimensión distinto al de
+ * embedQuery(), cosineSimilarity() descarta cada par por longitud de vector
+ * desigual y el híbrido degrada a BM25-only en silencio (root cause auditado
+ * 2026-07-02, ver comentario en embedQuery()).
  *
  * Uso:
  *   node scripts/build-rag-embeddings.mjs
  *   OLLAMA_URL=http://alpha.local:11434 node scripts/build-rag-embeddings.mjs
+ *   RAG_EMBED_MODEL=otro-modelo node scripts/build-rag-embeddings.mjs  # actualizar también embedQuery()
  *
- * Salida: `public/rag-embeddings.json` → { slug: vector[768], ... }
+ * Salida: `public/rag-embeddings.json` → { slug: vector[1024], ... }
  *
  * Idempotente: si ya existe, lo sobreescribe.
  * NO corre contra prod sin avisar — es build-time, no runtime.
  *
- * Tamaño esperado: ~491 docs × 768 floats × 4 bytes ≈ 1.5 MB (sin comprimir).
+ * Tamaño esperado: ~491 docs × 1024 floats × 4 bytes ≈ 2.0 MB (sin comprimir,
+ * ~1.9 MB con --quantize int8).
  */
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -28,7 +36,7 @@ const CORPUS_DIR = resolve(ROOT, 'public/cycle-content');
 const OUTPUT_PATH = resolve(ROOT, 'public/rag-embeddings.json');
 
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
-const EMBED_MODEL = process.env.RAG_EMBED_MODEL || 'nomic-embed-text';
+const EMBED_MODEL = process.env.RAG_EMBED_MODEL || 'snowflake-arctic-embed2';
 const BATCH_SIZE = 10;
 
 async function embedTexts(texts) {

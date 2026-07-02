@@ -3,7 +3,7 @@
  * textos de carga/aria ("Cargando…", "Cargando contador") son strings de UI
  * preexistentes de este componente. Su migración a src/config/messages.js es
  * la TAREA i18n de ADR-050 (transversal a toda la app), fuera del alcance de
- * este refinamiento visual. Se silencia el warning soft acá para no bloquear
+ * este refinamiento visual. Se silencia el warning soft aquí para no bloquear
  * el commit sin arrastrar ese refactor i18n. */
 import { useEffect, useState } from 'react';
 import { Sprout, MapPin, Package, NotebookPen, Eye, AlertCircle, FileText, ChevronRight, Leaf, Network, Beaker, PawPrint } from 'lucide-react';
@@ -556,13 +556,13 @@ export function SeguimientoCard({ def, count, onNavigate, variant }) {
  * el perfil del usuario ("el usuario solo ve lo que necesita" — un urbano
  * NUNCA ve Cerdos). Lo decide el call-site (DashboardLive) vía
  * homeModuleSelector. Si `keys` se omite (null/undefined), se muestran las 4 —
- * comportamiento histórico, sin breaking change. La selección NO se decide acá;
+ * comportamiento histórico, sin breaking change. La selección NO se decide aquí;
  * este componente solo pinta las tarjetas permitidas.
  *
  * @param {Object} props
  * @param {(view: string) => void} props.onNavigate
  * @param {'grid'|'list'} [props.variant='grid']
- * @param {string[]|null} [props.keys=null] — keys de seguimiento permitidas
+ * @param {string[]|null} [props.keys=null] - keys de seguimiento permitidas
  *   (subconjunto de SEGUIMIENTO_PROCESOS[].key). null = todas.
  */
 export function SeguimientoCards({ onNavigate, variant = 'grid', keys = null }) {

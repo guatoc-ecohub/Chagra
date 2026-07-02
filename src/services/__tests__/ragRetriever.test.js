@@ -106,6 +106,25 @@ describe('ragRetriever — corpus extendido v2', () => {
     vi.clearAllMocks();
   });
 
+  it('flattenDoc propaga species desde slug y la conserva en pasajes anidados', async () => {
+    const { flattenDoc } = await import('../ragRetriever.js');
+    const passages = flattenDoc({
+      slug: 'sluggy_test',
+      intro: 'Este es un texto largo de prueba para el passage principal.',
+      sections: [
+        { title: 'Primer pasaje anidado con suficiente longitud para indexar.' },
+      ],
+      nested: {
+        note: 'Otro pasaje largo que debe heredar el slug de la especie.',
+      },
+    });
+
+    expect(passages).toHaveLength(3);
+    passages.forEach((p) => {
+      expect(p.species).toBe('sluggy_test');
+    });
+  });
+
   it('retrieve("plan alimentación fresa") devuelve passage con "### Plan de alimentación"', async () => {
     const { retrieve } = await import('../ragRetriever.js');
     const hits = await retrieve('plan alimentación fresa bocashi humus', 5);

@@ -13,9 +13,10 @@
     "skipLibCheck": true,
     "jsx": "react-jsx",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "leaflet": ["./src/types/leaflet-stub.d.ts"]
     }
   },
-  "include": ["src/**/*.js", "src/**/*.jsx", "src/types/**/*.js"],
+  "include": ["src/**/*.js", "src/**/*.jsx", "src/types/**/*.js", "src/types/**/*.d.ts"],
   "exclude": ["node_modules", "dist", "build", "tests", "tests/e2e"]
 }

@@ -58,7 +58,7 @@ test.describe('Eventos de planta — muerte, enfermedad y proactividad', () => {
     // ─── Paso 1: Login ─────────────────────────────────────────────
     await page.goto(ORIGIN);
     await page.getByLabel(/usuario/i).fill('e2e-planta-eventos');
-    await page.getByLabel(/contraseña/i).fill('e2e-pass');
+    await page.getByRole('textbox', { name: /contraseña/i }).fill('e2e-pass');
     await page.getByRole('button', { name: /ingresar/i }).click();
 
     await expect(page.locator('#root')).toBeVisible({ timeout: 15_000 });
@@ -145,7 +145,7 @@ test.describe('Eventos de planta — muerte, enfermedad y proactividad', () => {
     // ─── Paso 1: Login ─────────────────────────────────────────────
     await page.goto(ORIGIN);
     await page.getByLabel(/usuario/i).fill('e2e-planta-eventos');
-    await page.getByLabel(/contraseña/i).fill('e2e-pass');
+    await page.getByRole('textbox', { name: /contraseña/i }).fill('e2e-pass');
     await page.getByRole('button', { name: /ingresar/i }).click();
 
     await expect(page.locator('#root')).toBeVisible({ timeout: 15_000 });

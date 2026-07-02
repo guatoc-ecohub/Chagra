@@ -89,8 +89,8 @@ function regimeNote(cycle) {
  *
  * @param {Object} input
  * @param {string} input.speciesId — id de catálogo
- * @param {number} [input.plantingDate] — timestamp ms de la siembra
- * @param {number} [input.now] — timestamp ms de referencia (default Date.now())
+ * @param {number} [input.plantingDate] - timestamp ms de la siembra
+ * @param {number} [input.now] - timestamp ms de referencia (default Date.now())
  * @returns {PerennialResolution|null}
  */
 export function resolvePerennialCycle({ speciesId, plantingDate, now } = {}) {

@@ -292,4 +292,45 @@ declare global {
   }
 }
 
+// ───────────────────────────────────────────────
+// Alias "Chagra*" (queue tsc-gate-cleanup)
+// ───────────────────────────────────────────────
+//
+// Varios servicios importan estos 4 tipos vía JSDoc
+// `@typedef {import('../types').ChagraAsset}` (y ChagraLog/ChagraSpecies/
+// ChagraBiopreparado). Antes vivían SOLO como `@typedef` locales en
+// `./index.js` — pero cuando `index.js` e `index.d.ts` coexisten en el
+// mismo directorio, TS resuelve el specifier sin extensión (`'../types'`)
+// contra `index.d.ts`, no `index.js` (el `.d.ts` gana la resolución de
+// módulo). Los `@typedef` de `index.js` quedaban entonces inalcanzables
+// para ese import, y tsc reportaba TS2694 "Namespace has no exported
+// member" en los 6 archivos que los usan. Fix de raíz: declarar los alias
+// aquí, en el archivo que de verdad se resuelve. `ChagraSpecies` y
+// `ChagraBiopreparado` NO son alias de los globals `Species`/`Biopreparado`
+// de arriba — son shapes distintos (nombres de campo en inglés, usados por
+// el pipeline de eventos/IA), tal como estaban definidos en `index.js`.
+export type ChagraAsset = Asset;
+export type ChagraLog = Log;
+
+export interface ChagraSpecies {
+  slug: string;
+  canonical_name_es: string;
+  scientific_name: string;
+  /** gremios */
+  categories: string[];
+  tracking_mode?: {
+    /** 'individual' | 'aggregate' */
+    default?: string;
+  };
+}
+
+export interface ChagraBiopreparado {
+  id: string;
+  name: string;
+  ingredients: Array<{ ingredient: string; qty: number; unit: string }>;
+  steps: string[];
+  preparation_time: string;
+  expiration: string;
+}
+
 export {};

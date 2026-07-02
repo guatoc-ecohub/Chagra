@@ -57,7 +57,7 @@ async function normalizeSpeciesIds(caseObj) {
  *   `useCaseStudyStore` directamente; el loader llama
  *   `store.getState().hydrateDemoCases(...)`.
  * @param {object} opts
- * @param {typeof fetch} [opts.fetchImpl] — inyectable para tests.
+ * @param {typeof fetch} [opts.fetchImpl] - inyectable para tests.
  */
 export async function loadCaseStudyDemos(store, { fetchImpl = fetch } = {}) {
   if (!store || typeof store.getState !== 'function') {

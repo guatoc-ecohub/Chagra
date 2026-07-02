@@ -28,7 +28,17 @@ const FIXTURE = {
       threat_status: 'ENDANGERED',
       compatible_with: ['erythrina_edulis', 'inga_edulis', 'musa_paradisiaca'],
       antagonist_of: ['foeniculum_vulgare'],
-      biopreparados: [{ id: 'caldo_bordeles', nombre: 'Caldo bordelés' }],
+      biopreparados: [
+        {
+          id: 'caldo_bordeles',
+          nombre: 'Caldo bordelés',
+          specificity: {
+            score: 0.98,
+            label: 'muy alta',
+            provenance: 'Late blight and potato-focused manual curation',
+          },
+        },
+      ],
     },
   },
 };
@@ -292,6 +302,27 @@ describe('grafoRelations — loader offline del grafo', () => {
 
     const bloque = await mod.buildOfflineGroundingBlock('arrays_vacios');
     expect(bloque).toBe('');
+  });
+
+  it('buildOfflineGroundingBlock ordena biopreparados por especificidad y muestra la etiqueta', async () => {
+    const ORDER_FIXTURE = {
+      _meta: { schema_version: 1, species_count: 1 },
+      species: {
+        papa_priorizada: {
+          nombre_comun: 'Papa priorizada',
+          biopreparados: [
+            { id: 'bocashi', nombre: 'Bocashi', specificity: { score: 0.2, label: 'baja' } },
+            { id: 'caldo_bordeles', nombre: 'Caldo bordelés', specificity: { score: 0.98, label: 'muy alta' } },
+            { id: 'te_compost', nombre: 'Té de compost' },
+          ],
+        },
+      },
+    };
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(ORDER_FIXTURE)));
+
+    const bloque = await mod.buildOfflineGroundingBlock('papa_priorizada');
+    expect(bloque).toContain('Biopreparados: Caldo bordelés (muy alta), Bocashi (baja), Té de compost.');
   });
 
   // (b) buildOfflineGroundingBlock con pest_controllers que tienen plaga vacía o null no falla.

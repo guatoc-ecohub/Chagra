@@ -141,13 +141,13 @@ export default function NetworkStatusBar() {
       bg: 'bg-frog/10',
       border: 'border-frog/50',
       icon: <WifiOff size={16} className="shrink-0 text-frog" />,
-      text: `Sin conexion. ${pendingCount > 0 ? `${pendingCount} registro${pendingCount > 1 ? 's' : ''} guardado${pendingCount > 1 ? 's' : ''} localmente.` : 'Datos guardados localmente.'}`,
+      text: pendingCount > 0 ? MSG.status.sinConexionPendientes(pendingCount) : MSG.status.sinConexionSinPendientes,
     },
     [STATUS.SYNCING]: {
       bg: 'bg-morpho/10',
       border: 'border-morpho/50',
       icon: <RefreshCw size={16} className="animate-spin shrink-0 text-morpho" />,
-      text: MSG.format(MSG.ui.sincronizandoRegistros, { count: pendingCount }),
+      text: MSG.ui.sincronizandoRegistros(pendingCount),
     },
     [STATUS.SYNCED]: {
       bg: 'bg-muzo/10',
@@ -159,7 +159,7 @@ export default function NetworkStatusBar() {
       bg: 'bg-red-900/90',
       border: 'border-red-700',
       icon: <AlertTriangle size={16} className="shrink-0" />,
-      text: errorMessage || 'Error al sincronizar.',
+      text: errorMessage || MSG.status.errorSincronizar,
     },
     [STATUS.ONLINE]: {
       bg: 'bg-muzo/10',

@@ -164,6 +164,44 @@
         "texto": "El frijol es especialmente vulnerable al estrés hídrico en la floración (etapa R6). Mantener humedad adecuada esa semana puede salvar la cosecha."
       }
     ],
-    "pregunta_agente": "¿En qué etapa está mi cultivo y qué debo cuidar ahora?"
+    "pregunta_agente": "¿En qué etapa está mi cultivo y qué debo cuidar ahora?",
+    "infografia": {
+      "titulo": "El ritmo del cultivo, paso a paso",
+      "subtitulo": "Cada etapa pide un cuidado distinto. Mírela de un vistazo.",
+      "icono": "🗓️",
+      "pasos": [
+        {
+          "emoji": "🌱",
+          "titulo": "Germinación",
+          "detalle": "La semilla despierta y salen las primeras raíces y hojas."
+        },
+        {
+          "emoji": "🌿",
+          "titulo": "Crecimiento",
+          "detalle": "La planta forma tallo, hojas y raíces fuertes."
+        },
+        {
+          "emoji": "🌼",
+          "titulo": "Floración",
+          "detalle": "Aparecen las flores. Etapa delicada: cuide el agua, sobre todo en el fríjol."
+        },
+        {
+          "emoji": "🍅",
+          "titulo": "Fructificación",
+          "detalle": "Se forma y se llena el fruto o el tubérculo. Vigile plagas de esta etapa (broca en el café, gota en la papa)."
+        },
+        {
+          "emoji": "🧺",
+          "titulo": "Cosecha",
+          "detalle": "El cultivo llega a su punto. Recoja en el momento justo."
+        }
+      ],
+      "resultado": {
+        "emoji": "👀",
+        "titulo": "El truco",
+        "texto": "Vigile por evento (la primera flor, el cuajado del fruto), no solo por el calendario de días. El Niño o La Niña pueden correr las etapas 2 a 4 semanas."
+      },
+      "fuente": "DR-FENOLOGIA-RECONCILED-2026-06-18; Agrosavia / BBCH / CIP"
+    }
   }
 ]

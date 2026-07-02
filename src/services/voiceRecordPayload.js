@@ -221,9 +221,9 @@ const BUILDERS = {
  *
  * @param {object} record — registro unificado (posiblemente editado en confirm).
  * @param {object} [ctx]
- * @param {string} [ctx.locationAssetId] — UUID de asset--land seleccionado.
- * @param {string} [ctx.wkt] — geometría WKT 'POINT(lon lat)' capturada por GPS.
- * @param {string} [ctx.plantTypeTermId] — UUID de taxonomy_term--plant_type si ya existe.
+ * @param {string} [ctx.locationAssetId] - UUID de asset--land seleccionado.
+ * @param {string} [ctx.wkt] - geometría WKT 'POINT(lon lat)' capturada por GPS.
+ * @param {string} [ctx.plantTypeTermId] - UUID de taxonomy_term--plant_type si ya existe.
  * @returns {{saveType: string, payload: object}}
  */
 export function buildVoicePayload(record, ctx = {}) {

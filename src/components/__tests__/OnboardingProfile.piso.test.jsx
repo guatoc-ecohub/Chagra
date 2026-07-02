@@ -25,7 +25,7 @@ afterEach(() => cleanup());
 /** Avanza con "Saltar pregunta" hasta que aparezca la pregunta de altura. */
 function goToAltitudQuestion() {
   for (let i = 0; i < 8; i += 1) {
-    if (screen.queryByText(/¿A qué altura está tu finca\?/i)) return;
+    if (screen.queryByText(/¿A qué altura está su finca\?/i)) return;
     fireEvent.click(screen.getByRole('button', { name: /saltar pregunta/i }));
   }
 }
@@ -34,7 +34,7 @@ describe('OnboardingProfile — quick-pick de piso térmico', () => {
   it('la pregunta de altura muestra los 4 pisos térmicos con emoji y rango', () => {
     render(<OnboardingProfile onComplete={vi.fn()} />);
     goToAltitudQuestion();
-    expect(screen.getByText(/¿A qué altura está tu finca\?/i)).toBeTruthy();
+    expect(screen.getByText(/¿A qué altura está su finca\?/i)).toBeTruthy();
     expect(screen.getByRole('button', { name: /cálido/i })).toBeTruthy();
     expect(screen.getByRole('button', { name: /templado/i })).toBeTruthy();
     expect(screen.getByRole('button', { name: /frío/i })).toBeTruthy();

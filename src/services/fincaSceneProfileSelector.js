@@ -23,7 +23,7 @@
  * REUSO (no se duplica nada): la derivación de ROL vive en
  * `profileChipSelector.deriveRole` (fuente única); `esPerfilUrbano`,
  * `profileTieneAnimales` y `profileTieneCerdos` viven en `homeModuleSelector` /
- * `profileChipSelector` (fuentes únicas). Acá solo se importan y se mapean. El
+ * `profileChipSelector` (fuentes únicas). Aquí solo se importan y se mapean. El
  * cálculo de nivel Gliessman NO vive aquí (es de fincaGameService).
  *
  * REGLA — coherencia con el override urbano del home: si `esPerfilUrbano` es
@@ -218,7 +218,7 @@ function deriveEstructura(p) {
  *
  * @param {Object} profile — perfil del usuario (chagra:profile).
  * @param {Object} [opts]
- * @param {boolean} [opts.esGuiaGlaciar=false] — username en whitelist Cordada
+ * @param {boolean} [opts.esGuiaGlaciar=false] - username en whitelist Cordada
  *   (lo resuelve el call-site con glaciarAccess, fuera de este módulo puro).
  * @returns {{ kind: string, escala: string, animales: boolean, cerdos: boolean,
  *   tinte: string, invernaderoForma: string|null, invernaderoTamano: string|null,

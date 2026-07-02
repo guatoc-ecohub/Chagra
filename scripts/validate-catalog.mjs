@@ -45,9 +45,13 @@ const SEED_MODE = args.includes('--seed-mode');
 const LENIENT_SCHEMA = args.includes('--lenient-schema');
 const positional = args.filter((a) => !a.startsWith('--'));
 const [catalogArg, schemaArg] = positional;
+// v3.2 gate: validar el archivo canónico que shipea (530 especies), no el seed
+// stale (72 especies). Esto previene regresiones como el caso Trozador que
+// sobrevivió 46 días porque el CI validaba el archivo equivocado.
+// Cambiado 2026-07-02 (fix/ci-gate-semantic).
 const CATALOG_PATH = catalogArg
   ? resolve(catalogArg)
-  : join(ROOT, 'catalog/chagra-catalog-seed-v3.1.json');
+  : join(ROOT, 'catalog/chagra-catalog-oss-subset-v3.2.json');
 const SCHEMA_PATH = schemaArg
   ? resolve(schemaArg)
   : join(ROOT, 'catalog/schema-v3.1.json');
@@ -221,7 +225,7 @@ function validateAmb10_companionsSymmetry(catalog) {
   return errors;
 }
 
-function validateAmb13_crossRefs(catalog, seedMode) {
+export function validateAmb13_crossRefs(catalog, seedMode) {
   const errors = [];
   const warnings = [];
   const speciesIds = new Set((catalog.species || []).map((s) => s.id));
@@ -757,6 +761,97 @@ export function validateAmb29_speciesInBiopreparados(catalog) {
   return errors;
 }
 
+// AMB-30: biopreparados con seguridad estructurada incompleta. Introducido
+// 2026-07 tras auditoría de liability de campo: recomendar dosis/insumos a
+// familias reales sin seguridad estructurada y filtrable (safety_class/
+// ppe_required/do_not_use_when/reentry_interval_dias) es un riesgo — antes la
+// seguridad vivía solo en prosa libre (valor_pedagogico), imposible de
+// filtrar para el agente o la UI. Este validador es SIEMPRE warning-only: no
+// bloquea el build, solo guía el sweep de curación (similar a AMB-27). Dos
+// checks: (a) falta el campo safety_class por completo (regresión para
+// entradas nuevas); (b) safety_class ∈ {medio, alto} pero tanto
+// ppe_required como do_not_use_when quedaron null (probable EPP/restricción
+// documentada en la prosa que no se estructuró).
+export function validateAmb30_biopreparadoSafetyStructurada(catalog) {
+  const warnings = [];
+  for (const bp of catalog.biopreparados || []) {
+    if (!bp || typeof bp !== 'object') continue;
+    const id = bp.id || '(sin id)';
+    if (!('safety_class' in bp)) {
+      warnings.push(`AMB-30 [biopreparados.${id}]: falta safety_class (seguridad no estructurada). Ver campos safety_class/ppe_required/do_not_use_when/reentry_interval_dias.`);
+      continue;
+    }
+    if ((bp.safety_class === 'medio' || bp.safety_class === 'alto') && !bp.ppe_required && !bp.do_not_use_when) {
+      warnings.push(`AMB-30 [biopreparados.${id}]: safety_class="${bp.safety_class}" sin ppe_required ni do_not_use_when documentado — revisar si la prosa tiene EPP/restricciones sin estructurar.`);
+    }
+  }
+  return warnings;
+}
+
+// NOTA PARA REVISIÓN DE FUENTES EN BIOPREPARADOS:
+// Algunos biopreparados pueden tener afirmaciones específicas en campos de prosa
+// (valor_pedagogico, dosis_aplicacion, precaucion_seguridad) que citan fuentes
+// explícitas con formato académico (ej: "Punja & Utkhede 2003 Trends Biotechnol 21:400")
+// pero estas citas NO están incluidas en el campo source_ids[]. Para mantener la
+// integridad referencial, cuando una afirmación específica cite una fuente con
+// autor/año/revista/pagina, esa fuente debería estar en source_ids[] y estar
+// definida en catalog.sources[]. Ejemplo de patrón a buscar:
+//   - "(Autor1 & Autor2 AÑO Revista Volumen:Página)" en valor_pedagogico
+//   - Verificar que source_ids[] incluya el ID correspondiente (ej: "autor1-autor2-AÑO-revista")
+// Si se encuentra un biopreparado con citas sin source_ids correspondientes,
+// agregar el ID faltante al campo source_ids[] y crear la entrada en sources[]
+// si no existe aún.
+
+// AMB-31: contaminación cruzada insectos ↔ patógenos. Detecta cuando insectos
+// están categorizados como enfermedades (enfermedades_criticas) o cuando
+// patógenos están categorizados como plagas (plagas_criticas). Esto es un
+// error epistémico que rompe las recomendaciones del agente: el usuario con
+// una plaga de insectos recibiría biopreparados curativos para enfermedades
+// (hongos/bacterias), y viceversa.
+// Lista de insectos comunes en agroecología colombiana: Agrotis (trozador),
+// Phyllophaga (gusano blanco), Tecia (palomilla), Bemisia (mosca blanca).
+// Lista de patógenos: Phytophthora (pudrición radicular), Erwinia (fuego
+// bacterial), Hemileia (roya del café). Match case-insensitive y substring
+// para capturar variantes (e.g. "Royas del cafeto" contiene "roya").
+// Introducido 2026-07-02 (fix/ci-gate-semantic) tras auditoría de contaminación.
+export const INSECT_KEYWORDS = [
+  'agrotis',     // Trozador (Agrotis ipsilon)
+  'phyllophaga', // Gusano blanco (Phyllophaga spp.)
+  'tecia',       // Palomilla del tomate (Tecia solanivora)
+  'bemisia',     // Mosca blanca (Bemisia tabaci)
+];
+export const PATHOGEN_KEYWORDS = [
+  'phytophthora', // Pudrición radicular (Phytophthora infestans, P. capsici)
+  'erwinia',      // Fuego bacterial (Erwinia amylovora, E. carotovora)
+  'hemileia',     // Roya del café (Hemileia vastatrix)
+  'roya',         // Roya (genérico para Hemileia, Puccinia, etc.)
+];
+export function validateAmb31_crossContaminationInsectoPatogeno(catalog) {
+  const errors = [];
+  for (const sp of catalog.species || []) {
+    // Check insectos en enfermedades_criticas
+    for (const enf of sp.enfermedades_criticas || []) {
+      const nombre = String(enf || '').toLowerCase();
+      for (const ins of INSECT_KEYWORDS) {
+        if (nombre.includes(ins)) {
+          errors.push(`AMB-31 [${sp.id}.enfermedades_criticas]: "${enf}" es un insecto (${ins}) pero está en enfermedades_criticas — debe moverse a plagas_criticas`);
+        }
+      }
+    }
+
+    // Check patógenos en plagas_criticas
+    for (const pla of sp.plagas_criticas || []) {
+      const nombre = String(pla || '').toLowerCase();
+      for (const pat of PATHOGEN_KEYWORDS) {
+        if (nombre.includes(pat)) {
+          errors.push(`AMB-31 [${sp.id}.plagas_criticas]: "${pla}" es un patógeno (${pat}) pero está en plagas_criticas — debe moverse a enfermedades_criticas`);
+        }
+      }
+    }
+  }
+  return errors;
+}
+
 // ----------------------------------------------------------------
 // Main (CLI). Gated por `import.meta.url === file://${process.argv[1]}` para
 // permitir importar las funciones validador desde tests (scripts/__tests__/
@@ -890,6 +985,19 @@ function runCli() {
     })],
     ['AMB-29 species en array biopreparados', (c) => ({
       errors: validateAmb29_speciesInBiopreparados(c),
+      warnings: [],
+    })],
+    ['AMB-30 biopreparados seguridad estructurada (WARN)', (c) => ({
+      errors: [],
+      warnings: validateAmb30_biopreparadoSafetyStructurada(c),
+    })],
+    // AMB-31 introducido 2026-07-02 (fix/ci-gate-semantic) para detectar
+    // contaminación cruzada insectos ↔ patógenos. Error duro porque rompe
+    // las recomendaciones del agente: el usuario con una plaga de insectos
+    // recibiría biopreparados curativos para enfermedades (hongos/bacterias),
+    // y viceversa.
+    ['AMB-31 contaminación cruzada insecto ↔ patógeno', (c) => ({
+      errors: validateAmb31_crossContaminationInsectoPatogeno(c),
       warnings: [],
     })],
   ];

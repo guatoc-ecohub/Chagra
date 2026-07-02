@@ -1,9 +1,8 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- deuda preexistente
+   (rationale por defecto), no tocada por queue/069.6; mismo criterio que
+   agentCapabilities.js/App.jsx: regla soft, no bloquea este fix de tipos. */
 import { newUlid } from '../utils/id';
 import { validateLogSplit } from '../types/logSplit';
-
-/**
- * @typedef {import('./useAssetStore').Asset} Asset
- */
 
 /**
  * Previews a split operation.

@@ -70,7 +70,7 @@ export default function OnboardingHero({ onNavigate, compact = false }) {
   let title;
   let subtitle;
   if (hasZones) {
-    title = MSG.format(MSG.onboarding.zonasListas, { count: lands.length });
+    title = MSG.onboarding.zonasListas(lands.length);
     subtitle = MSG.onboarding.elegirRegistro;
   } else if (hasFarmContext) {
     title = MSG.onboarding.fincaConfigurada;

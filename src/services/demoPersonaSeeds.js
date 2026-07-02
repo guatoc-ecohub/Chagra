@@ -612,7 +612,7 @@ export async function seedProfileData(profileId) {
 
     await new Promise((resolve, reject) => {
       tx.oncomplete = () => {
-        console.log(`[demoPersonaSeeds] Seeded profile: ${profileId} (${assetsToInsert.length} assets, ${processesToInsert.length} processes, ${logsToInsert.length} logs)`);
+        console.info(`[demoPersonaSeeds] Seeded profile: ${profileId} (${assetsToInsert.length} assets, ${processesToInsert.length} processes, ${logsToInsert.length} logs)`);
         resolve(true);
       };
       tx.onerror = () => reject(tx.error);

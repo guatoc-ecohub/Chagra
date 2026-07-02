@@ -11,9 +11,9 @@
  * bench recurrente para que la cobertura sea TENDENCIA visible (memoria
  * project-test-bench-automejorable). NO escribe en el grafo. NO inventa. Solo cuenta.
  *
- * Acceso AGE: `sudo podman exec -i postgres-farm psql` (sin dependencia pg, sin rutas
- * personales en codigo). Salta limpio si postgres-farm no esta (p. ej. en CI): la infra
- * "age" no estara disponible y bench/run.mjs lo salta.
+ * Acceso AGE: `sudo podman exec -i <container> psql` via CHAGRA_DB_* (sin dependencia
+ * pg, sin rutas personales en codigo). Salta limpio si la infra "age" no esta
+ * disponible (p. ej. en CI) y bench/run.mjs lo salta.
  *
  * @module scripts/bench-grafo-cobertura
  */
@@ -21,6 +21,7 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { getDbCmd } from './lib/db-cmd.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..');
@@ -30,9 +31,10 @@ const HISTORY_DIR = join(REPO_ROOT, 'bench', 'history');
 function ageQuery(cypher, ncols) {
   const cols = Array.from({ length: ncols }, (_, i) => `c${i} agtype`).join(', ');
   const sql = `LOAD 'age'; SET search_path=ag_catalog,public; SELECT * FROM cypher('chagra_kg', $$ ${cypher} $$) as (${cols});`;
+  const dbCmd = getDbCmd();
   const r = spawnSync(
-    'sudo',
-    ['podman', 'exec', '-i', 'postgres-farm', 'psql', '-U', 'farmos', '-d', 'chagra_kg', '-tAF', '\t', '-c', sql],
+    dbCmd.file,
+    [...dbCmd.args, '-tAF', '\t', '-c', sql],
     { encoding: 'utf8', maxBuffer: 96 * 1024 * 1024 },
   );
   if (r.status !== 0) throw new Error('AGE no accesible: ' + String(r.stderr || r.error || '').slice(0, 200));

@@ -19,11 +19,14 @@ import {
   AUTORIDAD_ENUM_CANONICA_ESTRICTA,
   VALIDATION_LEVEL_ENUM,
   TOXICO_KEYWORDS,
+  INSECT_KEYWORDS,
+  PATHOGEN_KEYWORDS,
   validateAmb25_autoridadCanonicaEstricta,
   validateAmb26_validationLevelCanonico,
   validateAmb27_toxicoSinAdvertencia,
   validateAmb28_taxonomicConfusion,
   validateAmb29_speciesInBiopreparados,
+  validateAmb31_crossContaminationInsectoPatogeno,
 } from '../validate-catalog.mjs';
 
 describe('AMB-25 — autoridad canónica estricta', () => {
@@ -420,5 +423,276 @@ describe('AMB-29 — species en array biopreparados', () => {
     const errors = validateAmb29_speciesInBiopreparados(catalog);
     expect(errors).toHaveLength(1);
     expect(errors[0]).toContain('companions');
+  });
+});
+
+describe('AMB-31 — contaminación cruzada insecto ↔ patógeno', () => {
+  it('expone las keywords de insectos canónicas', () => {
+    expect(INSECT_KEYWORDS.length).toBe(4);
+    expect(INSECT_KEYWORDS).toContain('agrotis');
+    expect(INSECT_KEYWORDS).toContain('phyllophaga');
+    expect(INSECT_KEYWORDS).toContain('tecia');
+    expect(INSECT_KEYWORDS).toContain('bemisia');
+  });
+
+  it('expone las keywords de patógenos canónicas', () => {
+    expect(PATHOGEN_KEYWORDS.length).toBe(4);
+    expect(PATHOGEN_KEYWORDS).toContain('phytophthora');
+    expect(PATHOGEN_KEYWORDS).toContain('erwinia');
+    expect(PATHOGEN_KEYWORDS).toContain('hemileia');
+    expect(PATHOGEN_KEYWORDS).toContain('roya');
+  });
+
+  it('detecta insecto (Agrotis) en enfermedades_criticas', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'solanum_tuberosum',
+          nombre_comun: 'Papa',
+          enfermedades_criticas: [
+            'Tizón tardío (Phytophthora infestans)',
+            'Trozador (Agrotis ipsilon)', // ERROR: es insecto, no enfermedad
+          ],
+        },
+      ],
+    };
+    const errors = validateAmb31_crossContaminationInsectoPatogeno(catalog);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('solanum_tuberosum');
+    expect(errors[0]).toContain('Agrotis');
+    expect(errors[0]).toContain('enfermedades_criticas');
+    expect(errors[0]).toContain('plagas_criticas');
+  });
+
+  it('detecta insecto (Phyllophaga) en enfermedades_criticas', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'zea_mays',
+          nombre_comun: 'Maíz',
+          enfermedades_criticas: [
+            'Gusano blanco (Phyllophaga spp.)', // ERROR: es insecto
+          ],
+        },
+      ],
+    };
+    const errors = validateAmb31_crossContaminationInsectoPatogeno(catalog);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('Phyllophaga');
+  });
+
+  it('detecta insecto (Tecia) en enfermedades_criticas', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'solanum_lycopersicum',
+          nombre_comun: 'Tomate',
+          enfermedades_criticas: [
+            'Palomilla (Tecia solanivora)', // ERROR: es insecto
+          ],
+        },
+      ],
+    };
+    const errors = validateAmb31_crossContaminationInsectoPatogeno(catalog);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('Tecia');
+  });
+
+  it('detecta insecto (Bemisia) en enfermedades_criticas', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'phaseolus_vulgaris',
+          nombre_comun: 'Fríjol',
+          enfermedades_criticas: [
+            'Mosca blanca (Bemisia tabaci)', // ERROR: es insecto
+          ],
+        },
+      ],
+    };
+    const errors = validateAmb31_crossContaminationInsectoPatogeno(catalog);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('Bemisia');
+  });
+
+  it('detecta patógeno (Phytophthora) en plagas_criticas', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'solanum_tuberosum',
+          nombre_comun: 'Papa',
+          plagas_criticas: [
+            'Broca (Rhyzoconia similis)',
+            'Tizón tardío (Phytophthora infestans)', // ERROR: es patógeno, no plaga
+          ],
+        },
+      ],
+    };
+    const errors = validateAmb31_crossContaminationInsectoPatogeno(catalog);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('solanum_tuberosum');
+    expect(errors[0]).toContain('Phytophthora');
+    expect(errors[0]).toContain('plagas_criticas');
+    expect(errors[0]).toContain('enfermedades_criticas');
+  });
+
+  it('detecta patógeno (Erwinia) en plagas_criticas', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'malus_domestica',
+          nombre_comun: 'Manzano',
+          plagas_criticas: [
+            'Fuego bacterial (Erwinia amylovora)', // ERROR: es patógeno
+          ],
+        },
+      ],
+    };
+    const errors = validateAmb31_crossContaminationInsectoPatogeno(catalog);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('Erwinia');
+  });
+
+  it('detecta patógeno (Hemileia) en plagas_criticas', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'coffea_arabica',
+          nombre_comun: 'Café',
+          plagas_criticas: [
+            'Roya del café (Hemileia vastatrix)', // ERROR: es patógeno
+          ],
+        },
+      ],
+    };
+    const errors = validateAmb31_crossContaminationInsectoPatogeno(catalog);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('Hemileia');
+  });
+
+  it('detecta patógeno (roya) en plagas_criticas', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'triticum_aestivum',
+          nombre_comun: 'Trigo',
+          plagas_criticas: [
+            'Royas del trigo (Puccinia spp.)', // ERROR: es patógeno
+          ],
+        },
+      ],
+    };
+    const errors = validateAmb31_crossContaminationInsectoPatogeno(catalog);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('roya');
+  });
+
+  it('detecta múltiples contaminaciones en una sola especie', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'solanum_tuberosum',
+          nombre_comun: 'Papa',
+          enfermedades_criticas: [
+            'Trozador (Agrotis ipsilon)', // ERROR: insecto
+            'Gusano blanco (Phyllophaga spp.)', // ERROR: insecto
+          ],
+          plagas_criticas: [
+            'Tizón tardío (Phytophthora infestans)', // ERROR: patógeno
+          ],
+        },
+      ],
+    };
+    const errors = validateAmb31_crossContaminationInsectoPatogeno(catalog);
+    expect(errors).toHaveLength(3);
+    expect(errors.some(e => e.includes('Agrotis'))).toBe(true);
+    expect(errors.some(e => e.includes('Phyllophaga'))).toBe(true);
+    expect(errors.some(e => e.includes('Phytophthora'))).toBe(true);
+  });
+
+  it('acepta categorización correcta sin errores', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'solanum_tuberosum',
+          nombre_comun: 'Papa',
+          plagas_criticas: [
+            'Trozador (Agrotis ipsilon)', // CORRECTO: insecto en plagas
+            'Gusano blanco (Phyllophaga spp.)', // CORRECTO: insecto en plagas
+          ],
+          enfermedades_criticas: [
+            'Tizón tardío (Phytophthora infestans)', // CORRECTO: patógeno en enfermedades
+            'Fuego bacterial (Erwinia carotovora)', // CORRECTO: patógeno en enfermedades
+          ],
+        },
+        {
+          id: 'coffea_arabica',
+          nombre_comun: 'Café',
+          plagas_criticas: [
+            'Broca (Hypothenemus hampei)',
+          ],
+          enfermedades_criticas: [
+            'Roya del café (Hemileia vastatrix)',
+          ],
+        },
+      ],
+    };
+    expect(validateAmb31_crossContaminationInsectoPatogeno(catalog)).toEqual([]);
+  });
+
+  it('ignora species sin plagas_criticas ni enfermedades_criticas', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'sin_pest',
+          nombre_comun: 'Sin plagas ni enfermedades',
+        },
+        {
+          id: 'solo_plagas',
+          nombre_comun: 'Solo plagas',
+          plagas_criticas: ['Broca'],
+        },
+        {
+          id: 'solo_enfermedades',
+          nombre_comun: 'Solo enfermedades',
+          enfermedades_criticas: ['Roya'],
+        },
+      ],
+    };
+    expect(validateAmb31_crossContaminationInsectoPatogeno(catalog)).toEqual([]);
+  });
+
+  it('match es case-insensitive', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'test_case',
+          enfermedades_criticas: [
+            'AGROTIS IPSILON', // mayúsculas
+            'agrotis ipsilon', // minúsculas
+            'Agrotis Ipsilon', // mixto
+          ],
+        },
+      ],
+    };
+    const errors = validateAmb31_crossContaminationInsectoPatogeno(catalog);
+    expect(errors).toHaveLength(3);
+  });
+
+  it('match es substring para capturar variantes', () => {
+    const catalog = {
+      species: [
+        {
+          id: 'test_substring',
+          plagas_criticas: [
+            'Royas del cafeto (Hemileia vastatrix)', // contiene "roya"
+            'Royas múltiples (Puccinia triticina)', // contiene "roya"
+          ],
+        },
+      ],
+    };
+    const errors = validateAmb31_crossContaminationInsectoPatogeno(catalog);
+    expect(errors).toHaveLength(2);
+    expect(errors.every(e => e.includes('roya'))).toBe(true);
   });
 });

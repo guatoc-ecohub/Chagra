@@ -14,9 +14,9 @@
 /**
  * @param {object} cap — entrada del CAPABILITY_MANIFEST seleccionada.
  * @param {object} handlers
- * @param {(prompt:string)=>void} [handlers.onAsk] — enviar una pregunta.
- * @param {(view:string)=>void} [handlers.onNav] — navegar a otra vista.
- * @param {()=>void} [handlers.onPhoto] — abrir el selector de foto.
+ * @param {(prompt:string)=>void} [handlers.onAsk] - enviar una pregunta.
+ * @param {(view:string)=>void} [handlers.onNav] - navegar a otra vista.
+ * @param {()=>void} [handlers.onPhoto] - abrir el selector de foto.
  * @returns {boolean} true si se ejecutó una acción; false si fue no-op.
  */
 export function mapCapabilityPick(cap, { onAsk, onNav, onPhoto } = {}) {

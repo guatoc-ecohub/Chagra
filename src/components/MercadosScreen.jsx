@@ -36,9 +36,15 @@ import {
  *      deflección honesta sobre pagos.
  *
  * Precio de referencia GROUNDEADO: si hay dato citado (SIPSA/DANE) para el
- * producto, se muestra con su fuente; si no, deflección honesta ("sin precio de
- * referencia todavía"). NUNCA se inventa un precio. El gancho para el dato vivo
- * lo alimentará el DR de comercialización/mercados en cola (precioReferencia.js).
+ * producto, se muestra con su fuente y la fecha del boletín; si no, deflección
+ * honesta ("sin precio de referencia todavía"). NUNCA se inventa un precio ni
+ * una tendencia (la tabla es una foto puntual del boletín, no una serie
+ * temporal — por eso no hay flecha de subida/bajada). Se muestra en DOS
+ * momentos: (1) al PUBLICAR, para que el productor calibre su precio mientras
+ * escribe el nombre del producto; (2) en el detalle de una oferta, para que el
+ * comprador la vea también. Mismo componente (`PrecioReferenciaBloque`), texto
+ * de deflección adaptado por `contexto`. El gancho para el dato SIPSA EN VIVO
+ * (no esta foto estática) sigue en cola — ver precioReferencia.js.
  *
  * @param {object} props
  * @param {Function} [props.onBack] - volver al dashboard.
@@ -413,12 +419,29 @@ function DetalleOferta({ oferta, onClose, onEliminar }) {
   );
 }
 
-function PrecioReferenciaBloque({ referencia }) {
+/**
+ * PrecioReferenciaBloque — cita el precio de referencia mayorista SIPSA/DANE
+ * (banda + plaza(s) + boletín fechado) o deflecta honestamente si no hay dato
+ * para el producto. Es una FOTO puntual del boletín, no un precio en vivo: por
+ * eso el rótulo dice "referencia" y siempre muestra la fecha del boletín, y
+ * por eso NUNCA se dibuja una flecha de tendencia (no hay serie temporal
+ * detrás, solo un punto — inventar una tendencia sería alucinar).
+ *
+ * `contexto` ajusta solo el texto de la deflección (cuando no hay dato):
+ *   - 'oferta'   (default): la ve un comprador mirando una oferta publicada.
+ *   - 'publicar': la ve el productor mientras redacta su propia oferta.
+ *
+ * @param {object} props
+ * @param {{disponible:boolean, banda?:string, mercado?:string, fuente?:string,
+ *   fuenteUrl?:string, boletinFecha?:string}} props.referencia
+ * @param {'oferta'|'publicar'} [props.contexto]
+ */
+function PrecioReferenciaBloque({ referencia, contexto = 'oferta' }) {
   if (referencia.disponible) {
     return (
       <div className="rounded-lg border border-sky-500/30 bg-sky-500/5 p-3 text-sm">
         <p className="text-sky-200 font-semibold flex items-center gap-1.5">
-          <Tag size={14} /> Precio de referencia mayorista
+          <Tag size={14} /> Referencia SIPSA (precio mayorista)
         </p>
         <p className="text-white mt-1">{referencia.banda}{referencia.mercado ? ` · ${referencia.mercado}` : ''}</p>
         <p className="text-slate-400 text-xs mt-1">
@@ -431,6 +454,11 @@ function PrecioReferenciaBloque({ referencia }) {
           )}
           {referencia.boletinFecha ? ` · boletín ${referencia.boletinFecha}` : ''}
         </p>
+        <p className="text-slate-500 text-[11px] mt-1.5">
+          {contexto === 'publicar'
+            ? 'Es una referencia mayorista, no lo que le van a pagar a usted en finca. Úsela solo para calibrar su precio.'
+            : 'Es una referencia mayorista de ese día, no un precio en vivo.'}
+        </p>
       </div>
     );
   }
@@ -439,9 +467,9 @@ function PrecioReferenciaBloque({ referencia }) {
     <div className="rounded-lg border border-slate-700 bg-slate-800/60 p-3 text-sm text-slate-300 flex gap-2">
       <Info size={15} className="text-slate-400 shrink-0 mt-0.5" />
       <span>
-        Sin precio de referencia todavía. La consulta de precios mayoristas
-        (SIPSA/DANE) aún no está disponible en Chagra; el precio que ves lo puso
-        el productor.
+        {contexto === 'publicar'
+          ? 'Sin referencia SIPSA para este producto todavía. Ponga usted el precio que considere justo.'
+          : 'Sin precio de referencia todavía. La consulta de precios mayoristas (SIPSA/DANE) aún no está disponible en Chagra; el precio que usted ve lo puso el productor.'}
       </span>
     </div>
   );
@@ -468,6 +496,15 @@ function PublicarPanel({ onPublicada, onCancelar }) {
   const [guardando, setGuardando] = useState(false);
 
   const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
+
+  // Precio de referencia SIPSA/DANE mientras el productor escribe el producto:
+  // se calcula solo con 3+ caracteres para no mostrar la deflección sobre un
+  // campo recién abierto. Reusa la misma lógica GROUNDEADA que el detalle de
+  // la oferta (resolverPrecioReferencia) — nunca inventa un precio.
+  const refPrecio = useMemo(() => {
+    const q = form.producto.trim();
+    return q.length >= 3 ? resolverPrecioReferencia(q) : null;
+  }, [form.producto]);
 
   const handleGuardar = useCallback(async () => {
     const { ok, errors: errs } = validarOferta(form);
@@ -543,6 +580,8 @@ function PublicarPanel({ onPublicada, onCancelar }) {
           </select>
         </Field>
       </div>
+
+      {refPrecio && <PrecioReferenciaBloque referencia={refPrecio} contexto="publicar" />}
 
       <Field label="Precio por unidad (opcional)" error={errors.precio} hint="Déjalo vacío si prefieres 'a convenir'. Chagra no sugiere precios.">
         <div className="relative">

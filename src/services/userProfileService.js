@@ -20,7 +20,7 @@
  *     respuestas previas (ej: si vocación = "urbano" no se pregunta
  *     hectáreas ni altitud rural).
  *
- * Español colombiano (tú/usted, SIN voseo argentino).
+ * Español colombiano (usted, SIN voseo argentino).
  *
  * @module userProfileService
  */
@@ -142,23 +142,23 @@ export const PROFILE_QUESTIONS = [
   {
     id: 'nombre',
     category: 'identidad',
-    title: '¿Cómo te llamas?',
-    help: 'Para que el agente te salude por tu nombre. Puedes dejarlo en blanco.',
+    title: '¿Cómo se llama?',
+    help: 'Para que el agente lo salude por su nombre. Puede dejarlo en blanco.',
     type: 'text',
-    placeholder: 'Tu nombre',
+    placeholder: 'Su nombre',
   },
   {
     id: 'region',
     category: 'identidad',
-    title: '¿En qué municipio o región cultivas?',
-    help: 'Ej: Choachí, Cauca, Antioquia. Ayuda a dar consejos según tu clima y costumbres.',
+    title: '¿En qué municipio o región cultiva?',
+    help: 'Ej: Choachí, Cauca, Antioquia. Ayuda a dar consejos según su clima y costumbres.',
     type: 'text',
     placeholder: 'Municipio o departamento',
   },
   {
     id: 'vocacion',
     category: 'identidad',
-    title: '¿Cómo te describes mejor?',
+    title: '¿Cómo se describe mejor?',
     type: 'single',
     options: [
       { value: 'campesino', label: 'Campesino/a — vivo del campo' },
@@ -175,8 +175,8 @@ export const PROFILE_QUESTIONS = [
     // si lo saltan, el rol se infiere de vocación/objetivo/animales.
     id: 'rol',
     category: 'identidad',
-    title: '¿Qué es lo tuyo en el campo?',
-    help: 'Define qué herramientas te mostramos primero. Puedes saltarlo.',
+    title: '¿Cuál es su labor en el campo?',
+    help: 'Define qué herramientas le mostramos primero. Puede saltarlo.',
     type: 'single',
     options: [
       { value: 'campesino', label: '🌱 Cultivo comida — siembro y cosecho' },
@@ -192,7 +192,7 @@ export const PROFILE_QUESTIONS = [
   {
     id: 'finca_tipo',
     category: 'finca',
-    title: '¿Dónde cultivas?',
+    title: '¿Dónde cultiva?',
     type: 'single',
     options: [
       { value: 'rural', label: 'Finca o parcela rural' },
@@ -204,8 +204,8 @@ export const PROFILE_QUESTIONS = [
   {
     id: 'finca_hectareas',
     category: 'finca',
-    title: '¿Qué tamaño tiene tu finca?',
-    help: 'Aproximado, en hectáreas. Si no lo sabes, sáltalo.',
+    title: '¿Qué tamaño tiene su finca?',
+    help: 'Aproximado, en hectáreas. Si no lo sabe, sáltelo.',
     type: 'single',
     options: [
       { value: 'menos_1', label: 'Menos de 1 hectárea' },
@@ -219,8 +219,8 @@ export const PROFILE_QUESTIONS = [
   {
     id: 'finca_altitud',
     category: 'finca',
-    title: '¿A qué altura está tu finca?',
-    help: 'En metros sobre el nivel del mar (msnm). Define tu piso térmico. Si no la sabes, la detectamos por ubicación.',
+    title: '¿A qué altura está su finca?',
+    help: 'En metros sobre el nivel del mar (msnm). Define su piso térmico. Si no la sabe, la detectamos por ubicación.',
     type: 'number',
     placeholder: '1730',
     unit: 'msnm',
@@ -234,8 +234,8 @@ export const PROFILE_QUESTIONS = [
     // No aplica al cultivo urbano de balcón/terraza (sin espacio para invernadero).
     id: 'invernadero_tiene',
     category: 'finca',
-    title: '¿Tienes invernadero?',
-    help: 'Para dibujar bien tu finca. Si no tienes, dilo y seguimos.',
+    title: '¿Tiene invernadero?',
+    help: 'Para dibujar bien su finca. Si no tiene, dígalo y seguimos.',
     type: 'single',
     options: [
       { value: 'si', label: '🏠 Sí, tengo invernadero' },
@@ -249,8 +249,8 @@ export const PROFILE_QUESTIONS = [
     // invernadero). La forma define cómo se dibuja la estructura en la escena.
     id: 'invernadero_forma',
     category: 'finca',
-    title: '¿Cómo es tu invernadero?',
-    help: 'Escoge la forma que más se parezca al tuyo.',
+    title: '¿Cómo es su invernadero?',
+    help: 'Escoja la forma que más se parezca al suyo.',
     type: 'single',
     options: [
       { value: 'cuadrado', label: '⬜ Cuadrado grande — techo a dos aguas' },
@@ -266,7 +266,7 @@ export const PROFILE_QUESTIONS = [
     id: 'invernadero_tamano',
     category: 'finca',
     title: '¿De qué tamaño es, más o menos?',
-    help: 'Como lo sientas: "6 por 10 metros", "pequeño", "media hectárea". Puedes saltarlo.',
+    help: 'Como lo sienta: "6 por 10 metros", "pequeño", "media hectárea". Puede saltarlo.',
     type: 'text',
     placeholder: 'Ej: 6 x 10 metros, o "uno pequeño"',
     when: (a) => a.invernadero_tiene === 'si' || a.finca_tipo === 'invernadero',
@@ -279,8 +279,8 @@ export const PROFILE_QUESTIONS = [
     // haya procesos reales cargados.
     id: 'composicion',
     category: 'finca',
-    title: '¿Qué tienes en tu finca?',
-    help: 'Marca lo que tengas. No hace falta el detalle: eso lo vamos llenando con la voz.',
+    title: '¿Qué tiene en su finca?',
+    help: 'Marque lo que tenga. No hace falta el detalle: eso lo vamos llenando con la voz.',
     type: 'multi',
     options: [
       { value: 'huerta', label: '🥬 Huerta — hortalizas y verduras' },
@@ -292,8 +292,8 @@ export const PROFILE_QUESTIONS = [
   {
     id: 'cultivos_actuales',
     category: 'finca',
-    title: '¿Qué cultivas ahora mismo?',
-    help: 'Escribe los cultivos que tienes. Ej: café, mora, tomate, plátano.',
+    title: '¿Qué cultiva ahora mismo?',
+    help: 'Escriba los cultivos que tiene. Ej: café, mora, tomate, plátano.',
     type: 'text',
     placeholder: 'Café, mora, tomate...',
   },
@@ -306,8 +306,8 @@ export const PROFILE_QUESTIONS = [
     // urbano de balcón (sin espacio para animales).
     id: 'animales',
     category: 'finca',
-    title: '¿Qué animales tienes?',
-    help: 'Marca todos los que apliquen, o sáltala si no tienes.',
+    title: '¿Qué animales tiene?',
+    help: 'Marque todos los que apliquen, o sáltela si no tiene.',
     type: 'multi',
     options: [
       { value: 'gallinas', label: '🐔 Gallinas o pollos' },
@@ -326,7 +326,7 @@ export const PROFILE_QUESTIONS = [
     // contexto del agente; no cambia la selección de chips por sí sola.
     id: 'gallinas_manejo',
     category: 'finca',
-    title: '¿Cómo tienes las gallinas?',
+    title: '¿Cómo tiene las gallinas?',
     help: 'Ayuda a dar mejor consejo de sanidad y postura.',
     type: 'single',
     options: [
@@ -343,8 +343,8 @@ export const PROFILE_QUESTIONS = [
     // la selección de chips de restauración. Skippable.
     id: 'restauracion_objetivo',
     category: 'finca',
-    title: '¿Qué te gustaría recuperar?',
-    help: 'Marca lo que quieres restaurar con nativas. Opcional.',
+    title: '¿Qué le gustaría recuperar?',
+    help: 'Marque lo que quiere restaurar con nativas. Opcional.',
     type: 'multi',
     options: [
       { value: 'bosque', label: '🌳 Bosque nativo' },
@@ -361,7 +361,7 @@ export const PROFILE_QUESTIONS = [
   {
     id: 'anios_cultivando',
     category: 'experiencia',
-    title: '¿Hace cuánto cultivas?',
+    title: '¿Hace cuánto cultiva?',
     type: 'single',
     options: [
       { value: 'apenas', label: 'Apenas estoy empezando' },
@@ -373,7 +373,7 @@ export const PROFILE_QUESTIONS = [
   {
     id: 'manejo',
     category: 'experiencia',
-    title: '¿Cómo manejas tus cultivos?',
+    title: '¿Cómo maneja sus cultivos?',
     type: 'single',
     options: [
       { value: 'organico', label: 'Orgánico / agroecológico' },
@@ -385,8 +385,8 @@ export const PROFILE_QUESTIONS = [
   {
     id: 'problemas',
     category: 'experiencia',
-    title: '¿Qué problemas tienes con frecuencia?',
-    help: 'Marca todos los que apliquen.',
+    title: '¿Qué problemas tiene con frecuencia?',
+    help: 'Marque todos los que apliquen.',
     type: 'multi',
     options: [
       { value: 'plagas', label: 'Plagas e insectos' },
@@ -402,7 +402,7 @@ export const PROFILE_QUESTIONS = [
   {
     id: 'objetivo',
     category: 'objetivos',
-    title: '¿Qué quieres lograr con Chagra?',
+    title: '¿Qué quiere lograr con Chagra?',
     type: 'multi',
     options: [
       { value: 'producir_mas', label: 'Producir más y mejor' },
@@ -416,8 +416,8 @@ export const PROFILE_QUESTIONS = [
   {
     id: 'cultivos_interes',
     category: 'objetivos',
-    title: '¿Qué cultivos te gustaría sembrar o mejorar?',
-    help: 'Cultivos nuevos que te interesan. Opcional.',
+    title: '¿Qué cultivos le gustaría sembrar o mejorar?',
+    help: 'Cultivos nuevos que le interesan. Opcional.',
     type: 'text',
     placeholder: 'Aguacate, cacao, hortalizas...',
   },
@@ -426,18 +426,19 @@ export const PROFILE_QUESTIONS = [
   {
     id: 'nivel_respuestas',
     category: 'preferencias',
-    title: '¿Cómo prefieres que el agente te responda?',
+    title: '¿Cómo prefiere que el agente le responda?',
     type: 'single',
     options: [
       { value: 'simple', label: 'Simple y al grano' },
       { value: 'detallado', label: 'Detallado, con explicación técnica' },
+      { value: 'maestro', label: 'Maestro — me enseña el porqué' },
     ],
   },
   {
     id: 'notif_clima',
     category: 'preferencias',
-    title: '¿Quieres alertas de clima para tu zona?',
-    help: 'Avisos de lluvia, heladas o sequía relevantes para tus cultivos.',
+    title: '¿Quiere alertas de clima para su zona?',
+    help: 'Avisos de lluvia, heladas o sequía relevantes para sus cultivos.',
     type: 'single',
     options: [
       { value: 'si', label: 'Sí, avísame' },
@@ -447,8 +448,8 @@ export const PROFILE_QUESTIONS = [
   {
     id: 'estrato',
     category: 'finca',
-    title: '¿En qué estrato vives?',
-    help: 'Solo para cultivo urbano — ayuda a sugerir soluciones según tu espacio. Opcional.',
+    title: '¿En qué estrato vive?',
+    help: 'Solo para cultivo urbano — ayuda a sugerir soluciones según su espacio. Opcional.',
     type: 'single',
     options: [
       { value: '1_2', label: 'Estrato 1 o 2' },
@@ -461,7 +462,7 @@ export const PROFILE_QUESTIONS = [
   {
     id: 'espacio_urbano',
     category: 'finca',
-    title: '¿Cuánto espacio tienes para cultivar?',
+    title: '¿Cuánto espacio tiene para cultivar?',
     help: 'Aproximado. Solo para cultivo urbano.',
     type: 'single',
     options: [
@@ -474,7 +475,7 @@ export const PROFILE_QUESTIONS = [
   {
     id: 'riego',
     category: 'finca',
-    title: '¿Cómo riegas tus cultivos?',
+    title: '¿Cómo riega sus cultivos?',
     type: 'single',
     options: [
       { value: 'lluvia', label: 'Solo lluvia (secano)' },
@@ -543,12 +544,28 @@ export function getProfileMunicipio() {
 // ─── Estructura de la finca (#34 — esqueleto para la escena F2) ──────────────
 
 /**
- * Formas de invernadero válidas. La escena F2 las dibuja distinto:
- *   - cuadrado: nave a dos aguas (cuadrado grande, ej. David).
- *   - tunel:    media luna de plástico curvo (túnel pequeño, ej. Miguel).
- *   - otro:     forma genérica (no encaja en las dos anteriores).
+ * Formas de estructura de cubierta válidas. La escena F2 las dibuja distinto:
+ *   - cuadrado:     nave a dos aguas (cuadrado grande, ej. David).
+ *   - tunel:        media luna de plástico curvo (túnel pequeño, ej. Miguel).
+ *   - casa_sombra:  casa-sombra — estructura de malla anti-insectos con techo.
+ *   - malla_sombra: malla-sombra (polisombra) plana sobre postes, sin paredes.
+ *   - umbraculo:    umbráculo — techo de listones de madera sobre postes.
+ *   - otro:         forma genérica (no encaja en las anteriores).
+ *
+ * NOTA ONBOARDING: la pregunta `invernadero_forma` (PROFILE_QUESTIONS) hoy solo
+ * ofrece cuadrado/tunel/otro. Las formas casa_sombra/malla_sombra/umbraculo ya
+ * son válidas aquí y la escena F2 ya sabe dibujarlas (FincaVivaHero →
+ * EstructuraCubierta); para que un usuario las declare falta AGREGAR sus
+ * opciones a esa pregunta del onboarding (o poblarlas por la voz #23).
  */
-export const INVERNADERO_FORMAS = Object.freeze(['cuadrado', 'tunel', 'otro']);
+export const INVERNADERO_FORMAS = Object.freeze([
+  'cuadrado',
+  'tunel',
+  'casa_sombra',
+  'malla_sombra',
+  'umbraculo',
+  'otro',
+]);
 
 /**
  * Grupos de composición de la finca (el "esqueleto"). Son los grandes bloques
@@ -901,6 +918,9 @@ export function buildUserProfileBlock(profile) {
   } else if (p.nivel_respuestas === 'detallado') {
     tono =
       '\nIMPORTANTE: este usuario prefiere respuestas DETALLADAS y técnicas. Puedes profundizar con nombres científicos, dosis, mecanismos y citar fuentes.';
+  } else if (p.nivel_respuestas === 'maestro') {
+    tono =
+      '\nIMPORTANTE: este usuario prefiere que le enseñes el porqué. Explica la lógica detrás de cada recomendación y deja criterio para que decida por su cuenta la próxima vez.';
   }
 
   return `=== PERFIL DEL USUARIO (personaliza tus respuestas a este contexto) ===

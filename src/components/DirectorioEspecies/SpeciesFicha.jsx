@@ -24,7 +24,7 @@ import PisoTermicoBand from './PisoTermicoBand.jsx';
  *
  * @param {object} props
  * @param {object} props.ficha — salida de buildSpeciesFicha.
- * @param {(id: string) => void} [props.onSelectSpecies] — navegar a otra especie
+ * @param {(id: string) => void} [props.onSelectSpecies] - navegar a otra especie
  *   (al tocar una asociación que está en el catálogo).
  */
 export default function SpeciesFicha({ ficha, onSelectSpecies }) {

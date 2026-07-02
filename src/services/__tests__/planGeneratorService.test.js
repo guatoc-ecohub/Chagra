@@ -58,17 +58,34 @@ describe('tryGeneratePlanFromSeeding — helper compartido (audit finding #2)', 
         // catalogDB stub: una especie 'tomate' con 2 steps simples.
         vi.doMock('../../db/catalogDB.js', () => ({
             initCatalog: vi.fn().mockResolvedValue({
-                exec: () => [{
-                    data: JSON.stringify({
-                        id: 'tomate',
-                        feeding_plan_template: {
-                            primary_steps: [
-                                { offset_days: 0, action: 'apply_biofertilizer', biofertilizer_slug: 'humus', dose_ml: 100, notes: 'siembra' },
-                                { offset_days: 30, action: 'apply_biofertilizer', biofertilizer_slug: 'humus', dose_ml: 100, notes: 'mes 1' },
-                            ],
+                exec: ({ bind } = {}) => {
+                    const rows = {
+                        tomate: {
+                            id: 'tomate',
+                            feeding_plan_template: {
+                                primary_steps: [
+                                    { offset_days: 0, action: 'apply_biofertilizer', biofertilizer_slug: 'humus', dose_ml: 100, notes: 'siembra' },
+                                    { offset_days: 30, action: 'apply_biofertilizer', biofertilizer_slug: 'humus', dose_ml: 100, notes: 'mes 1' },
+                                ],
+                            },
                         },
-                    }),
-                }],
+                        eugenia_stipitata: {
+                            id: 'eugenia_stipitata',
+                            nombre_comun: 'Arazá',
+                            nombre_cientifico: 'Eugenia stipitata',
+                            category: 'frutales_perennes',
+                            familia_botanica: 'Myrtaceae',
+                            altitud_msnm: { min_absoluto: 0, optimo_min: 100, optimo_max: 600, max_absoluto: 1000 },
+                            temperatura_c: { optimo_min: 22, optimo_max: 28, max_tolerable: 35 },
+                            agua: 'alto',
+                            drenaje_requerido: 'bueno',
+                            light: 'sol_pleno',
+                        },
+                    };
+                    const id = bind?.[0];
+                    const row = rows[id];
+                    return row ? [{ data: JSON.stringify(row) }] : [];
+                },
             }),
         }));
 
@@ -96,6 +113,20 @@ describe('tryGeneratePlanFromSeeding — helper compartido (audit finding #2)', 
         expect(plan.asset_id).toBe(PLANT_UUID);
         expect(plan.steps.length).toBeGreaterThan(0);
         expect(plan._plantName).toBe('Tomate Cherry');
+    });
+
+    it('genera un plan derivado generico para un frutal sin template explicito', async () => {
+        const plan = await tryGeneratePlanFromSeeding({
+            assetId: 'ffffffff-eeee-dddd-cccc-bbbbbbbbbbbb',
+            speciesSlug: 'eugenia_stipitata',
+            plantingDate: new Date(1_700_000_000 * 1000).toISOString(),
+            plantName: 'Arazá',
+        });
+
+        expect(plan).toBeTruthy();
+        expect(plan.steps.length).toBeGreaterThan(0);
+        expect(plan.feeding_plan_source).toMatch(/generico por categoria/i);
+        expect(plan.feeding_plan_source).toMatch(/frutales_perennes/i);
     });
 
     it('idempotente: si ya hay plan para el asset, retorna el existente sin regenerar', async () => {

@@ -217,7 +217,7 @@ const isGoneBundle = (endpoint) =>
 
 export const fetchFromFarmOS = async (endpoint, options = {}, _retried = false) => {
   if (import.meta.env.VITE_DEMO_MODE === 'true') {
-    console.log(`[DEMO] blocked FarmOS call to ${endpoint}`);
+    console.info(`[DEMO] blocked FarmOS call to ${endpoint}`);
     return {};
   }
 

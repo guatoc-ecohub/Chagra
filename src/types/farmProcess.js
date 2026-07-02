@@ -8,13 +8,13 @@
  * @typedef {Object} FarmProcessAttributes
  * @property {string} process_type — 'sowing' | 'restoration' | 'silvopasture' | 'pest_management' | 'harvest' | 'post_harvest'
  * @property {'individual' | 'aggregate'} subject_kind — qué representa: planta individual o población
- * @property {string} [subject_slug] — species slug del catálogo, ej. "solanum_lycopersicum"
- * @property {string} [subject_label] — nombre común, ej. "Tomate chonto"
+ * @property {string} [subject_slug] - species slug del catálogo, ej. "solanum_lycopersicum"
+ * @property {string} [subject_label] - nombre común, ej. "Tomate chonto"
  * @property {number} quantity — cantidad total declarada
  * @property {string} unit — 'plantas' | 'semillas' | 'arboles' | 'matas' | 'kg' | 'g'
- * @property {string} [variety] — variedad si aplica, ej. "Chonto"
+ * @property {string} [variety] - variedad si aplica, ej. "Chonto"
  * @property {string} location_land_asset_id — ID del asset--land donde ocurre
- * @property {string} [location_zone_id] — ID de la zona específica (asset--structure opcional)
+ * @property {string} [location_zone_id] - ID de la zona específica (asset--structure opcional)
  * @property {string} status — 'active' | 'completed' | 'cancelled'
  * @property {string} current_stage — última etapa confirmada, ej. "sowing_confirmed" | "germination" | "growth" | "flowering" | "fruiting" | "harvest" | "fallow"
  * @property {number} created_at — unix ms
@@ -36,11 +36,11 @@
  * @property {string} process_id — ref al FarmProcess
  * @property {string} event_type — 'sowing_confirmed' | 'observation' | 'stage_transition' | 'task_completed' | 'photo_attached' | 'weather_snapshot' | 'note'
  * @property {number} occurred_at — unix ms
- * @property {string} [actor] — quién registró
- * @property {string} [evidence] — ref a media_cache o texto
- * @property {Object} [payload] — datos específicos del evento
- * @property {number} [confidence] — 0-1 para eventos inferidos
- * @property {string} [source] — 'operator' | 'llm' | 'sensor' | 'external'
+ * @property {string} [actor] - quién registró
+ * @property {string} [evidence] - ref a media_cache o texto
+ * @property {Object} [payload] - datos específicos del evento
+ * @property {number} [confidence] - 0-1 para eventos inferidos
+ * @property {string} [source] - 'operator' | 'llm' | 'sensor' | 'external'
  */
 
 /**
@@ -61,8 +61,8 @@
  * @property {string} species_label
  * @property {string} default_unit
  * @property {'individual' | 'aggregate'} default_tracking_mode
- * @property {number} [gdd_base_temp] — grados-día base para fenología
- * @property {number} [gdd_max_temp] — temperatura máxima para GDD
+ * @property {number} [gdd_base_temp] - grados-día base para fenología
+ * @property {number} [gdd_max_temp] - temperatura máxima para GDD
  * @property {Array<{stage: string, label: string, gdd_range?: number[], calendar_range?: number[]}>} [phenology_stages]
  * @property {number} [min_altitude]
  * @property {number} [max_altitude]

@@ -29,7 +29,7 @@
  *         establishment_means, threat_status, conservation_status,
  *         compatible_with: [species_id],
  *         antagonist_of: [species_id],
- *         biopreparados: [{ id, nombre }],
+ *         biopreparados: [{ id, nombre, specificity?: { score, label, provenance } }],
  *         pest_controllers: [{ plaga, controladores: [str] }]
  *       }
  *     }
@@ -180,14 +180,36 @@ export async function buildOfflineGroundingBlock(speciesId) {
   }
   if (Array.isArray(rel.biopreparados) && rel.biopreparados.length) {
     const nombres = rel.biopreparados
-      .filter((b) => !b.disputed) // Filtrar biopreparados disputed
-      .map((b) => b.nombre || b.id)
+      .map((b, index) => ({ biopreparado: b, index }))
+      .filter(({ biopreparado }) => biopreparado && !biopreparado.disputed)
+      .sort((a, b) => {
+        const scoreA = getBiopreparadoSpecificityScore(a.biopreparado);
+        const scoreB = getBiopreparadoSpecificityScore(b.biopreparado);
+        if (scoreA !== scoreB) return scoreB - scoreA;
+        return a.index - b.index;
+      })
+      .map(({ biopreparado }) => formatBiopreparadoLabel(biopreparado))
       .filter(Boolean);
     if (nombres.length) lines.push(`- Biopreparados: ${nombres.join(', ')}.`);
   }
 
   // Sólo el encabezado → sin relaciones útiles → no-op.
   return lines.length > 1 ? lines.join('\n') : '';
+}
+
+function getBiopreparadoSpecificityScore(biopreparado) {
+  if (!biopreparado || typeof biopreparado !== 'object') return 0;
+  const raw = biopreparado.specificity?.score;
+  const score = typeof raw === 'number' ? raw : Number(raw);
+  return Number.isFinite(score) ? score : 0;
+}
+
+function formatBiopreparadoLabel(biopreparado) {
+  if (!biopreparado || typeof biopreparado !== 'object') return '';
+  const name = biopreparado.nombre || biopreparado.id || '';
+  if (!name) return '';
+  const label = biopreparado.specificity?.label;
+  return label ? `${name} (${label})` : name;
 }
 
 // ---- SLICE plagas/enfermedades: resolución por sinónimo ------------------

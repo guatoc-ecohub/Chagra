@@ -1450,6 +1450,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
             onClick={() => setShowFincaModal(true)}
             className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-emerald-400 bg-emerald-900/30 border border-emerald-700/40 rounded-full px-3 py-1.5 shrink-0 hover:bg-emerald-900/50 transition-all active:scale-95 group"
             aria-label={hasMultipleFincas ? `Cambiar de finca (actual: ${fincaNombre})` : `Finca activa: ${fincaNombre}`}
+            data-testid="assets-finca-switcher"
           >
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse group-hover:scale-125 transition-transform"></div>
             <span className="truncate max-w-[10ch]">{fincaNombre}</span>

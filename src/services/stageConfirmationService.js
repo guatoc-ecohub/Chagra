@@ -10,8 +10,8 @@ import { validateFarmProcess } from '../types/farmProcess';
  * @param {Object} input
  * @param {string} input.processId
  * @param {string} input.newStage — código de la nueva etapa
- * @param {string} [input.previousStage] — etapa anterior (se lee del proceso si no se pasa)
- * @param {string} [input.reason] — por qué cambió
+ * @param {string} [input.previousStage] - etapa anterior (se lee del proceso si no se pasa)
+ * @param {string} [input.reason] - por qué cambió
  * @param {string} [input.actor]
  * @param {string} [input.evidence]
  * @param {number} [input.confidence]

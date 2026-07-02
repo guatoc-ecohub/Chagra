@@ -6,17 +6,17 @@ let initPromise = null;
 
 async function doInit() {
     const sqlite3 = await sqlite3InitModule({
-        print: console.log,
+        print: console.info,
         printErr: console.error,
     });
-    console.log('[SQLite WASM] Engine loaded successfully.');
+    console.info('[SQLite WASM] Engine loaded successfully.');
 
     // CHAGRA_TIER detection (#74): el blob SQLite puede venir del bundle
     // OSS (`/catalog.sqlite`) o de un CDN Pro override. corpusLoader
     // resuelve la URL, fetchea y valida magic header. Si TIER=PRO sin URL
     // set, hace fallback a OSS (no rompe deploy).
     const { buffer: uint8Array, source } = await loadCatalogBuffer();
-    console.log(`[SQLite WASM] Catalog loaded from ${source.url} (tier=${source.tier}${source.fallback ? ', fallback' : ''})`);
+    console.info(`[SQLite WASM] Catalog loaded from ${source.url} (tier=${source.tier}${source.fallback ? ', fallback' : ''})`);
 
     let db = null;
     if (sqlite3.opfs && typeof navigator !== 'undefined' && navigator.storage && navigator.storage.getDirectory) {
@@ -29,7 +29,7 @@ async function doInit() {
             await writable.close();
 
             db = new sqlite3.oo1.OpfsDb('/catalog.sqlite');
-            console.log('[SQLite WASM] Opened SQLite DB backed by OPFS');
+            console.info('[SQLite WASM] Opened SQLite DB backed by OPFS');
         } catch (e) {
             console.warn('[SQLite WASM] Failed to use OPFS cleanly in this thread. Falling back to memory...', e);
         }
@@ -44,11 +44,11 @@ async function doInit() {
             db.pointer, 'main', p, uint8Array.byteLength, uint8Array.byteLength, deserializeFlag
         );
         if (rc !== 0) throw new Error('Deserialize failed with code ' + rc);
-        console.log('[SQLite WASM] Opened SQLite DB locally from Memory deserialization');
+        console.info('[SQLite WASM] Opened SQLite DB locally from Memory deserialization');
     }
 
     // Validar shape mínimo: tabla species con rows. Si el CDN Pro sirvió un
-    // blob malformado, fallamos rápido acá en vez de degradar silencioso.
+    // blob malformado, fallamos rápido aquí en vez de degradar silencioso.
     assertCatalogShape(db);
 
     return db;
@@ -74,7 +74,7 @@ export async function initCatalog() {
         // NO es bloqueante (el home usa fallback de stats y los componentes
         // reintentan al usar el catálogo) y NO debe gritar console.error: es
         // ruido esperado en cada deploy. Degradamos a debug; loadCatalogBuffer
-        // ya reintentó una vez antes de llegar acá.
+        // ya reintentó una vez antes de llegar aquí.
         if (isAbortLikeFetchError(error)) {
             console.debug('[SQLite WASM] init del catálogo abortado (probable reload por SW nuevo); se reintentará on-demand.');
         } else {

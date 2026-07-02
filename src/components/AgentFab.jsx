@@ -11,8 +11,7 @@ import './agent-fab-skin.css';
 
 // ¿Avatar del FAB = colibrí REAL (barbudito posado)? Gateado por VITE_COLIBRI
 // (dev-only). Con la flag OFF (prod) el FAB conserva su avatar actual
-// (ChagraAgentAvatar). Se evalúa una sola vez (flag de build). Reemplaza el
-// colibrí 3D rechazado (ChagraColibri3DLite / VITE_COLIBRI_3D, retirado).
+// (ChagraAgentAvatar). Se evalúa una sola vez (flag de build).
 const COLIBRI_REAL = colibriRealActivo();
 
 /**
