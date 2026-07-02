@@ -253,7 +253,7 @@ const ENTRY_QUESTION = 'hola chagra';
 async function gotoAgentScreen(page) {
   await page.goto('/');
   await page.getByLabel(/usuario/i).fill('e2e-anti-halluc');
-  await page.getByLabel(/contraseña/i).fill('e2e-pwd');
+  await page.getByRole('textbox', { name: /contraseña/i }).fill('e2e-pwd');
   await page.getByRole('button', { name: /ingresar/i }).click();
 
   // Compositor de la portada (AgentHero): escribir + enviar (colibrí) navega al

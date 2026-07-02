@@ -34,6 +34,22 @@ describe('parseTscOutput', function () {
   it('empty output has zero errors', function () {
     expect(parseTscOutput('')).toEqual({ total: 0, byFile: {} });
   });
+
+  it('normaliza paths de node_modules resueltos fuera del repo (symlink local vs CI)', function () {
+    var output = [
+      '../../home/alguien/Workspace/chagra/node_modules/fake-indexeddb/auto/index.mjs(3,1): error TS7016: no declaration file.',
+      'node_modules/fake-indexeddb/auto/index.mjs(9,1): error TS7016: no declaration file.',
+      'src/a.js(1,1): error TS2322: Type mismatch.',
+    ].join('\n');
+    var r = parseTscOutput(output);
+    expect(r.total).toBe(3);
+    // La forma local (path resuelto por symlink) y la de CI cuentan como el
+    // MISMO archivo — sin esto el baseline no era portable entre máquinas.
+    expect(r.byFile).toEqual({
+      'node_modules/fake-indexeddb/auto/index.mjs': 2,
+      'src/a.js': 1,
+    });
+  });
 });
 
 describe('compareToBaseline', function () {

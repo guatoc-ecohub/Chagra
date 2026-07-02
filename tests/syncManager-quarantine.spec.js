@@ -78,7 +78,7 @@ const loginAndWaitForMain = async (page, context) => {
 
   await page.goto('/');
   await page.getByLabel(/usuario/i).fill('e2e-quarantine-op');
-  await page.getByLabel(/contraseña/i).fill('e2e-quarantine-pass');
+  await page.getByRole('textbox', { name: /contraseña/i }).fill('e2e-quarantine-pass');
   await page.getByRole('button', { name: /ingresar/i }).click();
   await expect(page.getByText('Cola de tareas')).toBeVisible({ timeout: 15_000 });
 };

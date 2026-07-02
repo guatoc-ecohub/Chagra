@@ -37,7 +37,7 @@ test.describe.skip('Flujo de Invasoras y Sustitución Nativa (ADR-019 Phase 1)',
 
         // Login (mismo patrón que offline.spec.js).
         await page.getByLabel(/usuario/i).fill('e2e-operator');
-        await page.getByLabel(/contraseña/i).fill('e2e-pass');
+        await page.getByRole('textbox', { name: /contraseña/i }).fill('e2e-pass');
         await page.getByRole('button', { name: /ingresar/i }).click();
 
         // 1. Acceso desde Dashboard — la nav tile es <button aria-label="Invasoras: ...">.

@@ -53,7 +53,7 @@ test.describe('Ficha de planta — foto, datos básicos y ciclo fenológico', ()
     // ─── Paso 1: Login ─────────────────────────────────────────────
     await page.goto(ORIGIN);
     await page.getByLabel(/usuario/i).fill('e2e-planta-test');
-    await page.getByLabel(/contraseña/i).fill('e2e-pass');
+    await page.getByRole('textbox', { name: /contraseña/i }).fill('e2e-pass');
     await page.getByRole('button', { name: /ingresar/i }).click();
 
     // Esperar a que el dashboard cargue (DashboardLiveView).
