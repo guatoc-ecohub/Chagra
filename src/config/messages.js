@@ -79,6 +79,10 @@ const messages = {
     sincronizando: 'Sincronizando...',
     pendientes: 'Pendientes',
     errorGeneral: 'Ocurrio un error',
+    errorSincronizar: 'Error al sincronizar.',
+    sinConexionPendientes: (count) =>
+      `Sin conexion. ${count} registro${count !== 1 ? 's' : ''} guardado${count !== 1 ? 's' : ''} localmente.`,
+    sinConexionSinPendientes: 'Sin conexion. Datos guardados localmente.',
   },
   agente: {
     placeholder: 'Escribe tu consulta...',
@@ -123,7 +127,8 @@ const messages = {
     bienvenido: 'Bienvenido a Chagra',
     comenzar: 'Comenzar',
     primeraPlanta: 'Bienvenido a Chagra. Empiece registrando su primera planta.',
-    zonasListas: 'Tiene {count} {count === 1 ? \'zona\' : \'zonas\'} lista{count === 1 ? \'\' : \'s\'}. Falta su primera planta.',
+    zonasListas: (count) =>
+      `Tiene ${count} ${count === 1 ? 'zona' : 'zonas'} lista${count === 1 ? '' : 's'}. Falta su primera planta.`,
     fincaConfigurada: 'Su finca está configurada. Sembremos la primera planta.',
     elegirRegistro: 'Elija cómo registrarla. Las tres rutas guardan lo mismo.',
     tipZonas: 'Tip: tras la primera, puede crear zonas (parcelas, camas) para organizarlas.',
@@ -137,7 +142,8 @@ const messages = {
     cargandoTareas: 'Cargando tareas...',
     cargandoCatalogo: 'Cargando catálogo...',
     sincronizandoSensores: 'Sincronizando sensores...',
-    sincronizandoRegistros: 'Sincronizando {count} registro{count !== 1 ? \'s\' : \'\'}...',
+    sincronizandoRegistros: (count) =>
+      `Sincronizando ${count} registro${count !== 1 ? 's' : ''}...`,
     sincronizarSensoresBtn: 'Sincronizar Sensores',
     sincronizarOffline: 'Sincronizar Offline...',
     registrarProduccion: 'Registrar Producción',
@@ -147,7 +153,8 @@ const messages = {
     confirmarEliminar: '¿Eliminar este reporte? Esta acción no se puede deshacer.',
     eliminarReporte: 'Eliminar reporte',
     cancelarInvestigacion: 'Cancelar investigación',
-    guardarPlantas: 'Guardar ({count} {count === 1 ? \'planta\' : \'plantas\'})',
+    guardarPlantas: (count) =>
+      `Guardar (${count} ${count === 1 ? 'planta' : 'plantas'})`,
     guardando: 'Guardando…',
     ingresoBitacora: 'Registrar en Bitácora',
     errorReporteCsv: 'No se pudo generar el reporte CSV.',

@@ -463,7 +463,7 @@ export default function VoiceConfirmation({
           disabled={!allValid || isSaving}
           className="flex-1 px-4 py-3 min-h-[44px] bg-lime-700 hover:bg-lime-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50 disabled:bg-slate-700"
         >
-          <Check size={18} /> {isSaving ? MSG.ui.guardando : MSG.format(MSG.ui.guardarPlantas, { count: totalAssetsToCreate })}
+          <Check size={18} /> {isSaving ? MSG.ui.guardando : MSG.ui.guardarPlantas(totalAssetsToCreate)}
         </button>
       </div>
     </div>
