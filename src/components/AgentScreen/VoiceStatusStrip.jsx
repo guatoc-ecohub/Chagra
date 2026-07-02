@@ -42,8 +42,27 @@ const STRIP_CSS = `
   display: inline-block; width: 8px; height: 8px; border-radius: 9999px;
   background: currentColor; animation: vsb-dot 1.2s ease-in-out infinite;
 }
+/* Ondas del micrófono "escuchando": dos anillos concéntricos que se expanden
+   desde el mic con currentColor (rose). Comunican "le estoy oyendo" sin texto.
+   Base opacity:0 → bajo reduced-motion (animation:none) quedan invisibles. */
+@keyframes vsb-ring {
+  0% { transform: scale(0.55); opacity: 0.65; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+.vsb-ring {
+  position: absolute; inset: 0; border-radius: 9999px;
+  border: 2px solid currentColor; opacity: 0; pointer-events: none;
+  animation: vsb-ring 1.6s ease-out infinite;
+}
+/* Transición suave entre fases (escucha → piensa → habla): el pill
+   re-entra con un fade+rise corto cada vez que cambia la fase (key={phase}). */
+@keyframes vsb-phase-in {
+  0% { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.vsb-phase-in { animation: vsb-phase-in 240ms ease-out both; }
 @media (prefers-reduced-motion: reduce) {
-  .vsb-eq-bar, .vsb-dot { animation: none !important; }
+  .vsb-eq-bar, .vsb-dot, .vsb-ring, .vsb-phase-in { animation: none !important; }
 }
 `;
 
@@ -92,7 +111,11 @@ export default function VoiceStatusStrip({
       {/* Estado activo: ícono + animación + frase corta, grande y legible */}
       {(isListening || isThinking || isSpeaking) && (
         <div
-          className={`flex items-center gap-3 rounded-2xl px-4 py-3 border ${
+          /* key={phase}: al cambiar de fase el pill se re-monta y re-dispara la
+             animación vsb-phase-in — transición suave escucha→pensando→hablando
+             en vez de un swap seco de colores. Reduced-motion la apaga. */
+          key={phase}
+          className={`vsb-phase-in flex items-center gap-3 rounded-2xl px-4 py-3 border transition-colors duration-300 ${
             isListening
               ? 'bg-rose-900/30 border-rose-700/50 text-rose-300'
               : isThinking
@@ -100,7 +123,14 @@ export default function VoiceStatusStrip({
                 : 'bg-emerald-900/30 border-emerald-700/50 text-emerald-300'
           }`}
         >
-          <span className="shrink-0 flex items-center justify-center w-9 h-9 rounded-full bg-slate-900/60">
+          <span className="relative shrink-0 flex items-center justify-center w-9 h-9 rounded-full bg-slate-900/60">
+            {/* Ondas concéntricas mientras escucha: el mic "irradia" que oye. */}
+            {isListening && (
+              <>
+                <span className="vsb-ring" aria-hidden="true" />
+                <span className="vsb-ring" style={{ animationDelay: '0.55s' }} aria-hidden="true" />
+              </>
+            )}
             {isListening && <Mic size={20} className="animate-pulse" aria-hidden="true" />}
             {isThinking && <ThinkingDots />}
             {isSpeaking && <Equalizer />}
@@ -111,6 +141,7 @@ export default function VoiceStatusStrip({
             aria-live="polite"
           >
             {isListening && 'Chagra te escucha'}
+            {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- copy de voz para baja alfabetización; migración a messages.js va con ADR-050 */}
             {isThinking && 'Chagra está pensando'}
             {isSpeaking && 'Chagra está hablando'}
           </p>

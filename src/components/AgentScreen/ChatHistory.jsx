@@ -247,9 +247,13 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
 }
 
 /**
- * CSS del botón "Volver" flotante. Fade+rise corto al aparecer; neutralizado
- * bajo prefers-reduced-motion siguiendo el patrón del proyecto (agentEntrance,
- * BiopunkBackground). Inyectado una vez vía <style> en el área de chat.
+ * CSS de movimiento del área de chat, inyectado una vez vía <style>:
+ *   - botón "Volver" flotante: fade+rise corto al aparecer.
+ *   - burbujas de chat (`.chagra-bubble-in`): entrada suave fade+rise+scale.
+ *     Solo opacity/transform (compositor de GPU, apto gama baja); al abrir un
+ *     historial largo corren una vez en el mount y quedan quietas (`both`).
+ * Todo neutralizado bajo prefers-reduced-motion siguiendo el patrón del
+ * proyecto (agentEntrance, BiopunkBackground).
  */
 const FLOATING_BACK_CSS = `
 @keyframes chagra-floating-back-kf {
@@ -259,8 +263,16 @@ const FLOATING_BACK_CSS = `
 .chagra-floating-back {
   animation: chagra-floating-back-kf 200ms ease-out both;
 }
+@keyframes chagra-bubble-in-kf {
+  0% { opacity: 0; transform: translateY(8px) scale(0.98); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.chagra-bubble-in {
+  animation: chagra-bubble-in-kf 260ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
 @media (prefers-reduced-motion: reduce) {
   .chagra-floating-back { animation: none !important; }
+  .chagra-bubble-in { animation: none !important; }
 }
 `;
 
