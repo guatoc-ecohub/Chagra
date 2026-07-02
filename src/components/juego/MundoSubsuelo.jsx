@@ -4,6 +4,7 @@ import { recordGameStart, recordGameComplete } from '../../services/usageTelemet
 import { fvhSkinClass } from '../../config/fvhSkin';
 import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 import { evaluarSubsuelo, mensajeMeta } from '../../services/mundoSubsueloEngine';
+import './mundo-subsuelo.css';
 
 function clamp(value, min = 0, max = 100) {
   return Math.max(min, Math.min(max, value));
@@ -98,7 +99,12 @@ function SoilScene({ soilLife, activeDecision }) {
 
         {[92, 265, 438, 608].map((x, index) => (
           <g key={x}>
-            <path d={`M${x} 153c-8-28 8-49 29-52 20 4 36 24 29 52Z`} fill={index % 2 ? '#84cc16' : '#22c55e'} />
+            <path
+              className="ms-planta"
+              style={{ animationDelay: `${index * 0.6}s` }}
+              d={`M${x} 153c-8-28 8-49 29-52 20 4 36 24 29 52Z`}
+              fill={index % 2 ? '#84cc16' : '#22c55e'}
+            />
             <path d={`M${x + 29} 153v${rootDepth}`} stroke="#f5e8b7" strokeWidth="7" strokeLinecap="round" />
             <path d={`M${x + 29} 205c-${18 + index * 4} 16-${28 + index * 3} 31-${38 + index * 2} 49`} stroke="#f5e8b7" strokeWidth="4" fill="none" strokeLinecap="round" />
             <path d={`M${x + 29} 224c${18 + index * 3} 17 ${31 + index * 2} 34 ${42 + index * 2} 58`} stroke="#f5e8b7" strokeWidth="4" fill="none" strokeLinecap="round" />
@@ -111,6 +117,8 @@ function SoilScene({ soilLife, activeDecision }) {
           return (
             <path
               key={`hifa-${index}`}
+              className="ms-hifa"
+              style={{ animationDelay: `${index * 0.35}s` }}
               d={`M${start} ${y} C${start + 42} ${y - 30}, ${start + 96} ${y + 28}, ${start + 148} ${y - 6}`}
               stroke="#67e8f9"
               strokeWidth={soilLife > 70 ? 5 : 3}
@@ -126,6 +134,8 @@ function SoilScene({ soilLife, activeDecision }) {
           <circle
             key={`spark-${index}`}
             data-testid="nutrient-spark"
+            className="ms-spark"
+            style={{ animationDelay: `${index * 0.45}s` }}
             cx={132 + index * 92}
             cy={238 + (index % 3) * 46}
             r="6"
@@ -137,6 +147,8 @@ function SoilScene({ soilLife, activeDecision }) {
         {Array.from({ length: wormCount }).map((_, index) => (
           <path
             key={`worm-${index}`}
+            className="ms-worm"
+            style={{ animationDelay: `${index * 0.8}s` }}
             d={`M${112 + index * 178} ${345 - (index % 2) * 34}c20-18 45 16 68-4`}
             stroke="#f59e0b"
             strokeWidth="10"
@@ -147,9 +159,9 @@ function SoilScene({ soilLife, activeDecision }) {
 
         {soilLife >= 55 && (
           <g fill="#38bdf8" opacity="0.82">
-            <path d="M641 161c-22 47-24 78-2 116 22-38 21-69 2-116Z" />
-            <path d="M688 154c-18 37-20 62-1 92 18-30 17-56 1-92Z" />
-            <path d="M595 164c-15 33-17 54-1 81 15-27 14-49 1-81Z" />
+            <path className="ms-agua" d="M641 161c-22 47-24 78-2 116 22-38 21-69 2-116Z" />
+            <path className="ms-agua" style={{ animationDelay: '1.2s' }} d="M688 154c-18 37-20 62-1 92 18-30 17-56 1-92Z" />
+            <path className="ms-agua" style={{ animationDelay: '2.1s' }} d="M595 164c-15 33-17 54-1 81 15-27 14-49 1-81Z" />
           </g>
         )}
 
@@ -177,7 +189,11 @@ export default function MundoSubsuelo() {
   const [jugadas, setJugadas] = useState(0);
   const activeDecision = mundoSubsueloDecisions.find((decision) => decision.id === activeId) || mundoSubsueloDecisions[0];
   const stage = getSoilStage(soilLife);
-  const meterColor = soilLife >= 60 ? 'bg-emerald-500' : soilLife >= 35 ? 'bg-amber-500' : 'bg-rose-500';
+  const meterColor = soilLife >= 60
+    ? 'bg-gradient-to-r from-emerald-500 to-lime-400'
+    : soilLife >= 35
+      ? 'bg-gradient-to-r from-amber-500 to-yellow-400'
+      : 'bg-gradient-to-r from-rose-500 to-red-400';
 
   // FEEL gated (dev-only): con la flag ON se enciende la capa de OBJETIVO (meta
   // de suelo vivo + celebración al lograrla). Con OFF el juego queda EXACTO como
@@ -246,8 +262,11 @@ export default function MundoSubsuelo() {
               </div>
               <span className="rounded-full bg-stone-950 px-3 py-1 text-xs font-black uppercase text-white">{stage}</span>
             </div>
-            <div className="mt-3 h-4 overflow-hidden rounded-full bg-stone-200" aria-hidden="true">
-              <div className={`h-full rounded-full ${meterColor}`} style={{ width: `${soilLife}%` }} />
+            <div className="mt-3 h-4 overflow-hidden rounded-full bg-stone-200 shadow-inner" aria-hidden="true">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ease-out ${meterColor}`}
+                style={{ width: `${soilLife}%` }}
+              />
             </div>
             {/* Línea de meta (gated dev-only): marca dónde está "suelo vivo". */}
             {feelOn && (
@@ -302,9 +321,9 @@ export default function MundoSubsuelo() {
                   type="button"
                   onClick={() => chooseDecision(decision)}
                   data-selected={selected ? 'true' : 'false'}
-                  className={`jp-ms-carta min-h-28 rounded-2xl border p-3 text-left shadow-sm transition active:scale-[0.98] ${
+                  className={`jp-ms-carta min-h-28 rounded-2xl border p-3 text-left shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98] ${
                     selected
-                      ? 'border-cyan-400 bg-cyan-50 ring-2 ring-cyan-200'
+                      ? 'border-cyan-400 bg-cyan-50 ring-2 ring-cyan-200 shadow-[0_6px_16px_rgba(34,211,238,0.25)]'
                       : decision.tone === 'good'
                         ? 'border-lime-200 bg-white hover:bg-lime-50'
                         : 'border-rose-200 bg-white hover:bg-rose-50'

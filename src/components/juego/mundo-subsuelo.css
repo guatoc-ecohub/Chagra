@@ -1,0 +1,69 @@
+/*
+ * mundo-subsuelo.css — vida sutil para la escena del suelo de "Mundo Subsuelo".
+ *
+ * Movimientos suaves en CSS puro (offline-first, sin libs), pensados para
+ * gama baja: solo transform/opacity. Respeta prefers-reduced-motion.
+ */
+
+/* Lombrices que ondulan despacito bajo tierra. */
+.ms-worm {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ms-worm-ondular 3.2s ease-in-out infinite;
+}
+@keyframes ms-worm-ondular {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  50% { transform: translateX(5px) rotate(2.5deg); }
+}
+
+/* Hifas de micorriza: el flujo recorre la red (dash animado, se ve "vivo"). */
+.ms-hifa {
+  stroke-dasharray: 12 10;
+  animation: ms-hifa-fluir 3.5s linear infinite;
+}
+@keyframes ms-hifa-fluir {
+  to { stroke-dashoffset: -44; }
+}
+
+/* Chispas de nutrientes que titilan. */
+.ms-spark {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ms-spark-titilar 1.8s ease-in-out infinite;
+}
+@keyframes ms-spark-titilar {
+  0%, 100% { opacity: 0.55; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Gotas de agua infiltrándose (bajan suave y vuelven). */
+.ms-agua {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ms-agua-bajar 4s ease-in-out infinite;
+}
+@keyframes ms-agua-bajar {
+  0%, 100% { transform: translateY(0); opacity: 0.8; }
+  50% { transform: translateY(7px); opacity: 0.95; }
+}
+
+/* Plantas de superficie que se mecen con el viento. */
+.ms-planta {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: ms-planta-mecer 4.5s ease-in-out infinite;
+}
+@keyframes ms-planta-mecer {
+  0%, 100% { transform: rotate(-1.5deg); }
+  50% { transform: rotate(1.5deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ms-worm,
+  .ms-hifa,
+  .ms-spark,
+  .ms-agua,
+  .ms-planta {
+    animation: none !important;
+  }
+}

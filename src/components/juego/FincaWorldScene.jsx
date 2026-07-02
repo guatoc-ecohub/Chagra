@@ -149,8 +149,9 @@ export default function FincaWorldScene({
         {/* Cielo (común a todas las variantes; el tinte viene del stage real) */}
         <rect x="0" y="0" width="400" height="240" fill={`url(#${gradId})`} />
 
-        {/* Sol — cálido, identidad solar de Chagra */}
+        {/* Sol — cálido, identidad solar de Chagra (con halo exterior suave) */}
         <g className="fv-sun">
+          <circle cx="330" cy="48" r="34" fill="#ffe08a" opacity="0.35" />
           <circle cx="330" cy="48" r="26" fill="#ffe08a" opacity="0.95" />
           <circle cx="330" cy="48" r="18" fill="#ffd24d" />
           {/* rayos sutiles (mano radial / energía solar — motivo Chagra) */}
@@ -172,6 +173,18 @@ export default function FincaWorldScene({
           <ellipse cx="210" cy="64" rx="22" ry="11" />
           <ellipse cx="228" cy="60" rx="16" ry="11" />
         </g>
+
+        {/* Pajaritos cruzando el cielo — aparecen cuando el mundo ya tiene vida */}
+        {!vacia && level >= 2 && (
+          <g stroke="#4a5a68" strokeWidth="1.8" fill="none" strokeLinecap="round">
+            <g className="fv-bird">
+              <path d="M150 56 q4 -5 8 0 q4 -5 8 0" />
+            </g>
+            <g className="fv-bird-2">
+              <path d="M116 74 q3 -4 6 0 q3 -4 6 0" opacity="0.75" />
+            </g>
+          </g>
+        )}
 
         {/* ── BACKDROP POR VARIANTE ──────────────────────────────────────── */}
         {kind === 'balcon' && <BalconBackdrop />}
@@ -245,6 +258,16 @@ export default function FincaWorldScene({
             </g>
           );
         })}
+
+        {/* Florecitas silvestres en el pasto cuando el mundo ya florece */}
+        {!modoRico && !vacia && kind === 'finca' && level >= 2 && (
+          <g className="fv-grow" style={{ animationDelay: '0.6s' }}>
+            <Florecita cx={36} cy={206} color="#ff9ec4" small />
+            <Florecita cx={132} cy={214} color="#fff0f6" small />
+            <Florecita cx={238} cy={208} color="#c9b3f5" small />
+            <Florecita cx={352} cy={216} color="#ffd9e6" small />
+          </g>
+        )}
 
         {/* Animales del juego (MODO MUNDO) — solo finca rural si la variante los habilita */}
         {!modoRico && !vacia && kind === 'finca' && animalesEnEscena && (

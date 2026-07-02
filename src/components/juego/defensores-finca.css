@@ -14,7 +14,9 @@
   margin: 0 auto;
   border-radius: 1.25rem;
   overflow: hidden;
-  box-shadow: 0 18px 50px rgba(8, 30, 22, 0.35);
+  box-shadow:
+    0 18px 50px rgba(8, 30, 22, 0.35),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.08);
   background: #bde0f5;
   /* Bloquea el scroll-touch del navegador mientras se juega con el pulgar. */
   touch-action: none;
@@ -56,7 +58,8 @@
 }
 .df-nivel[data-selected='true'] {
   border-color: #34d399;
-  background: rgba(16, 185, 129, 0.32);
+  background: linear-gradient(160deg, rgba(16, 185, 129, 0.42), rgba(6, 78, 59, 0.5));
+  box-shadow: 0 0 14px rgba(52, 211, 153, 0.35);
 }
 .df-nivel:disabled {
   opacity: 0.5;
@@ -107,9 +110,23 @@
   line-height: 1;
 }
 
+.df-hearts span {
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+  animation: df-heart-beat 2.4s ease-in-out infinite;
+}
+.df-hearts span:nth-child(2) { animation-delay: 0.2s; }
+.df-hearts span:nth-child(3) { animation-delay: 0.4s; }
+.df-hearts span:nth-child(4) { animation-delay: 0.6s; }
+@keyframes df-heart-beat {
+  0%, 88%, 100% { transform: scale(1); }
+  92% { transform: scale(1.14); }
+  96% { transform: scale(0.98); }
+}
+
 .df-heart-empty {
   opacity: 0.28;
   filter: grayscale(1);
+  animation: none;
 }
 
 /* ── Progreso de objetivos (cultivos / plagas / jefe) ────────────────── */
@@ -140,6 +157,12 @@
   border-color: rgba(52, 211, 153, 0.75);
   background: rgba(5, 150, 105, 0.45);
   color: #ecfdf5;
+  animation: df-objetivo-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes df-objetivo-pop {
+  0% { transform: scale(0.85); }
+  60% { transform: scale(1.08); }
+  100% { transform: scale(1); }
 }
 
 /* ── Controles táctiles ──────────────────────────────────────────────── */
@@ -164,7 +187,7 @@
   min-height: 64px;
   border-radius: 1rem;
   border: 2px solid rgba(16, 185, 129, 0.45);
-  background: rgba(6, 78, 59, 0.55);
+  background: linear-gradient(180deg, rgba(6, 95, 70, 0.65), rgba(6, 78, 59, 0.55));
   color: #ecfdf5;
   display: flex;
   align-items: center;
@@ -172,7 +195,8 @@
   font-weight: 900;
   font-size: 1.25rem;
   cursor: pointer;
-  transition: transform 0.08s ease, background 0.12s ease;
+  box-shadow: 0 4px 10px rgba(8, 30, 22, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: transform 0.08s ease, background 0.12s ease, box-shadow 0.12s ease;
   -webkit-tap-highlight-color: transparent;
   touch-action: none;
 }
@@ -181,11 +205,12 @@
 .df-btn[data-pressed='true'] {
   transform: scale(0.92);
   background: rgba(16, 185, 129, 0.7);
+  box-shadow: 0 2px 5px rgba(8, 30, 22, 0.3);
 }
 
 .df-btn-jump {
   min-width: 84px;
-  background: rgba(180, 83, 9, 0.6);
+  background: linear-gradient(180deg, rgba(217, 119, 6, 0.7), rgba(180, 83, 9, 0.6));
   border-color: rgba(251, 191, 36, 0.55);
 }
 .df-btn-jump:active,
@@ -195,7 +220,7 @@
 
 .df-btn-action {
   min-width: 84px;
-  background: rgba(13, 148, 136, 0.6);
+  background: linear-gradient(180deg, rgba(20, 184, 166, 0.7), rgba(13, 148, 136, 0.6));
   border-color: rgba(45, 212, 191, 0.6);
 }
 
@@ -275,7 +300,7 @@
   gap: 0.75rem;
   text-align: center;
   padding: 1.25rem;
-  background: rgba(8, 30, 22, 0.86);
+  background: radial-gradient(circle at 50% 32%, rgba(13, 60, 40, 0.82), rgba(8, 30, 22, 0.92));
   backdrop-filter: blur(4px);
   animation: df-fade-in 0.3s ease both;
 }
@@ -296,7 +321,9 @@
 @media (prefers-reduced-motion: reduce) {
   .df-leccion,
   .df-overlay,
-  .df-overlay-emoji {
+  .df-overlay-emoji,
+  .df-hearts span,
+  .df-objetivo-listo {
     animation: none !important;
   }
 }

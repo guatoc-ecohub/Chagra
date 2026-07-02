@@ -231,9 +231,9 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
           type="button"
           data-testid="entrada-defensores-finca"
           onClick={() => irAccion('defensores')}
-          className="jp-mfv-entrada w-full text-left rounded-2xl p-4 bg-gradient-to-br from-teal-600/40 to-emerald-800/40 border-2 border-teal-400/40 hover:border-teal-300/60 active:scale-[0.99] transition flex items-center gap-3"
+          className="jp-mfv-entrada group w-full text-left rounded-2xl p-4 bg-gradient-to-br from-teal-600/40 to-emerald-800/40 border-2 border-teal-400/40 hover:border-teal-300/60 active:scale-[0.99] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-lg flex items-center gap-3"
         >
-          <span className="text-4xl shrink-0" aria-hidden="true">🛡️</span>
+          <span className="text-4xl shrink-0 transition-transform duration-150 group-hover:scale-110" aria-hidden="true">🛡️</span>
           <span className="flex-1 min-w-0">
             {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- nombre del juego, ES-CO. */}
             <span className="jp-tinta block text-base font-black text-white">Defensores de la Finca</span>
@@ -250,9 +250,9 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
           type="button"
           data-testid="entrada-milpa"
           onClick={() => irAccion('milpa')}
-          className="jp-mfv-entrada w-full text-left rounded-2xl p-4 bg-gradient-to-br from-lime-600/40 to-amber-800/40 border-2 border-lime-400/40 hover:border-lime-300/60 active:scale-[0.99] transition flex items-center gap-3"
+          className="jp-mfv-entrada group w-full text-left rounded-2xl p-4 bg-gradient-to-br from-lime-600/40 to-amber-800/40 border-2 border-lime-400/40 hover:border-lime-300/60 active:scale-[0.99] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-lg flex items-center gap-3"
         >
-          <span className="text-4xl shrink-0" aria-hidden="true">🌽</span>
+          <span className="text-4xl shrink-0 transition-transform duration-150 group-hover:scale-110" aria-hidden="true">🌽</span>
           <span className="flex-1 min-w-0">
             <span className="jp-tinta block text-base font-black text-white">La Milpa</span>
             <span className="jp-tinta-suave block text-sm text-lime-100/90 leading-snug">
@@ -268,9 +268,9 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
           type="button"
           data-testid="entrada-doom-finca"
           onClick={() => irAccion('doom_finca')}
-          className="jp-mfv-entrada w-full text-left rounded-2xl p-4 bg-gradient-to-br from-orange-600/40 to-amber-800/40 border-2 border-orange-400/40 hover:border-orange-300/60 active:scale-[0.99] transition flex items-center gap-3"
+          className="jp-mfv-entrada group w-full text-left rounded-2xl p-4 bg-gradient-to-br from-orange-600/40 to-amber-800/40 border-2 border-orange-400/40 hover:border-orange-300/60 active:scale-[0.99] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-lg flex items-center gap-3"
         >
-          <span className="text-4xl shrink-0" aria-hidden="true">🎯</span>
+          <span className="text-4xl shrink-0 transition-transform duration-150 group-hover:scale-110" aria-hidden="true">🎯</span>
           <span className="flex-1 min-w-0">
             {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- nombre del juego, ES-CO. */}
             <span className="jp-tinta block text-base font-black text-white">Doom de la Finca</span>
@@ -289,9 +289,9 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
           type="button"
           data-testid="entrada-subsuelo"
           onClick={() => irAccion('subsuelo')}
-          className="jp-mfv-entrada w-full text-left rounded-2xl p-4 bg-gradient-to-br from-cyan-600/40 to-amber-800/40 border-2 border-cyan-400/40 hover:border-cyan-300/60 active:scale-[0.99] transition flex items-center gap-3"
+          className="jp-mfv-entrada group w-full text-left rounded-2xl p-4 bg-gradient-to-br from-cyan-600/40 to-amber-800/40 border-2 border-cyan-400/40 hover:border-cyan-300/60 active:scale-[0.99] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-lg flex items-center gap-3"
         >
-          <span className="text-4xl shrink-0" aria-hidden="true">🪱</span>
+          <span className="text-4xl shrink-0 transition-transform duration-150 group-hover:scale-110" aria-hidden="true">🪱</span>
           <span className="flex-1 min-w-0">
             <span className="jp-tinta block text-base font-black text-white">Mundo Subsuelo</span>
             <span className="jp-tinta-suave block text-sm text-cyan-100/90 leading-snug">
@@ -310,7 +310,7 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
           </div>
           <div className="h-4 bg-slate-800/60 rounded-full overflow-hidden border border-emerald-900/40">
             <div
-              className="h-full bg-gradient-to-r from-emerald-500 via-lime-400 to-emerald-400 rounded-full transition-all duration-700"
+              className="fv-shimmer h-full bg-gradient-to-r from-emerald-500 via-lime-400 to-emerald-400 rounded-full transition-all duration-700"
               style={{ width: `${Math.max(game.progreso, game.vacia ? 0 : 4)}%` }}
               role="progressbar"
               aria-valuenow={game.progreso}

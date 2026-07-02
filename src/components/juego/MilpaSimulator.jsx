@@ -92,7 +92,7 @@ function ParcelaCard({ parcela, salud, seleccionada, onSelect, mostrarTipo }) {
       className={[
         'relative flex min-h-[120px] flex-col items-center justify-center gap-1 rounded-3xl border-2 p-3 transition active:scale-[0.98]',
         seleccionada
-          ? 'border-lime-300 bg-emerald-800/60 ring-2 ring-lime-300'
+          ? 'milpa-parcela-activa border-lime-300 bg-gradient-to-b from-emerald-800/70 to-emerald-900/60 ring-2 ring-lime-300'
           : 'border-emerald-800/50 bg-emerald-950/40 hover:border-emerald-600/60',
       ].join(' ')}
     >
@@ -102,7 +102,18 @@ function ParcelaCard({ parcela, salud, seleccionada, onSelect, mostrarTipo }) {
         </span>
       )}
       {d === 0 ? (
-        <span className="text-3xl opacity-40" aria-hidden="true">🟫</span>
+        // Camita de tierra preparada (dibujada, más cálida que un emoji plano).
+        <svg viewBox="0 0 48 24" className="h-9 w-[72px]" aria-hidden="true">
+          <ellipse cx="24" cy="18" rx="21" ry="5" fill="#4a3520" opacity="0.7" />
+          <path d="M4 18 Q24 4 44 18 Z" fill="#8a6a3a" />
+          <path d="M8 16.5 Q24 7 40 16.5" fill="none" stroke="#a8894f" strokeWidth="1.6" opacity="0.9" />
+          <g fill="#3f2d20">
+            <ellipse cx="15" cy="13.5" rx="2.2" ry="1.2" />
+            <ellipse cx="24" cy="11" rx="2.2" ry="1.2" />
+            <ellipse cx="33" cy="13.5" rx="2.2" ry="1.2" />
+          </g>
+          <circle cx="24" cy="10" r="1.1" fill="#7fce8e" />
+        </svg>
       ) : (
         <span className="flex gap-0.5 text-3xl" aria-hidden="true">
           {cultivos.map((c) => (
@@ -444,12 +455,14 @@ export default function MilpaSimulator({ onBack, onHome }) {
             <span className="text-sm font-bold text-emerald-200">
               Temporada {juego.temporadaActual} de {NUM_TEMPORADAS}
             </span>
-            <div className="flex gap-1">
+            <div className="flex items-center gap-1.5">
               {Array.from({ length: NUM_TEMPORADAS }, (_, i) => (
                 <div
                   key={i}
-                  className={`h-2 w-2 rounded-full ${
-                    i < juego.temporadaActual ? 'bg-lime-400' : 'bg-emerald-800'
+                  className={`rounded-full transition-all duration-500 ${
+                    i < juego.temporadaActual
+                      ? 'h-2.5 w-2.5 bg-lime-400 shadow-[0_0_6px_rgba(163,230,53,0.7)]'
+                      : 'h-2 w-2 bg-emerald-800'
                   }`}
                 />
               ))}
@@ -460,14 +473,20 @@ export default function MilpaSimulator({ onBack, onHome }) {
         {/* FASE SELECCIÓN: intro y selección de sistema */}
         {fase === 'seleccion' && (
           <>
-            <header className="rounded-3xl border border-lime-300/30 bg-gradient-to-br from-emerald-900/60 to-emerald-950/60 p-4 milpa-deslizar-arriba">
+            <header className="relative overflow-hidden rounded-3xl border border-lime-300/30 bg-gradient-to-br from-emerald-900/60 to-emerald-950/60 p-4 milpa-deslizar-arriba">
+              {/* Las tres hermanas saludando (decorativo) */}
+              <div className="pointer-events-none absolute right-3 top-3 flex gap-1 text-3xl opacity-90" aria-hidden="true">
+                <span className="milpa-pulso">🌽</span>
+                <span className="milpa-pulso" style={{ animationDelay: '0.4s' }}>🫘</span>
+                <span className="milpa-pulso" style={{ animationDelay: '0.8s' }}>🎃</span>
+              </div>
               <p className="text-xs font-black uppercase tracking-widest text-lime-300">
                 Asociaciones agroecológicas
               </p>
               <h2 className="mt-1 text-2xl font-black leading-tight text-white">
                 ¿Qué quieres sembrar hoy?
               </h2>
-              <p className="mt-2 text-sm font-medium leading-relaxed text-emerald-100">
+              <p className="mt-2 max-w-[85%] text-sm font-medium leading-relaxed text-emerald-100">
                 Las plantas se ayudan cuando crecen juntas. Elige una asociación
                 y descubre cómo rinde más que sembrar cada cultivo solo.
               </p>
@@ -485,16 +504,21 @@ export default function MilpaSimulator({ onBack, onHome }) {
                     hablar(asoc.nombre);
                     try { agentSounds.start(); } catch { /* noop */ }
                   }}
-                  className="flex items-center gap-3 rounded-2xl border border-emerald-800/50 bg-emerald-950/40 p-4 text-left transition hover:border-emerald-600/60 active:scale-[0.98]"
+                  className="group flex items-center gap-3 rounded-2xl border border-emerald-800/50 bg-gradient-to-br from-emerald-900/50 to-emerald-950/50 p-4 text-left transition hover:border-lime-400/50 hover:from-emerald-800/60 active:scale-[0.98]"
                 >
-                  <span className="text-3xl" aria-hidden="true">{asoc.icono}</span>
+                  <span
+                    className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-lime-400/15 text-3xl ring-1 ring-lime-300/30 transition group-hover:scale-110"
+                    aria-hidden="true"
+                  >
+                    {asoc.icono}
+                  </span>
                   <div className="flex-1">
                     <p className="text-sm font-black text-white">{asoc.nombre}</p>
                     <p className="text-xs text-emerald-300">
                       {asoc.cultivos.length} cultivos que se ayudan
                     </p>
                   </div>
-                  <span className="text-lime-300">→</span>
+                  <span className="text-lime-300 transition group-hover:translate-x-1">→</span>
                 </button>
               ))}
             </section>
@@ -1103,10 +1127,10 @@ function BarraComparacion({ asociacion, monocultivo }) {
         />
       </div>
 
-      {/* Barra asociación (superpuesta) */}
+      {/* Barra asociación (superpuesta, con brillo que la recorre) */}
       <div className="absolute top-0 left-0 h-12 w-full overflow-hidden rounded-xl">
         <div
-          className="h-full rounded-xl bg-gradient-to-r from-lime-500 via-emerald-400 to-lime-300 transition-all duration-1000 ease-out milpa-brota"
+          className="milpa-shimmer h-full rounded-xl bg-gradient-to-r from-lime-500 via-emerald-400 to-lime-300 transition-all duration-1000 ease-out milpa-brota"
           style={{ width: `${porcentajeAsociacion}%` }}
         />
       </div>

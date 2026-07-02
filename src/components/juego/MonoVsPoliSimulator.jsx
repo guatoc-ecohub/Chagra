@@ -1,5 +1,64 @@
 import { BarChart3, FlaskConical, Leaf, ShieldCheck, Sprout, TrendingUp } from 'lucide-react';
 import asociaciones from '../../data/asociaciones-comparativa.json';
+import './mono-vs-poli.css';
+
+/**
+ * Hero ilustrado del encabezado: a la izquierda un lote de monocultivo
+ * (hileras idénticas), a la derecha un policultivo mezclado (alturas y
+ * colores distintos conviviendo). Decorativo, aria-hidden.
+ */
+function HeroMonoVsPoli() {
+  return (
+    <svg viewBox="0 0 240 84" className="h-20 w-full max-w-[240px]" aria-hidden="true">
+      {/* lote monocultivo: hileras uniformes del mismo verde apagado */}
+      <rect x="2" y="46" width="104" height="34" rx="8" fill="#d6cdb4" />
+      {Array.from({ length: 3 }).map((_, fila) => (
+        <g key={`fila-${fila}`}>
+          {Array.from({ length: 6 }).map((_, col) => (
+            <g key={`m-${fila}-${col}`} transform={`translate(${14 + col * 16} ${58 + fila * 9})`}>
+              <line x1="0" y1="0" x2="0" y2="-7" stroke="#8a9a6a" strokeWidth="1.6" />
+              <circle cx="0" cy="-8" r="3" fill="#9db07c" />
+            </g>
+          ))}
+        </g>
+      ))}
+      {/* vs */}
+      <circle cx="120" cy="62" r="11" fill="#193a2f" />
+      <text x="120" y="66" textAnchor="middle" fontSize="9" fontWeight="800" fill="#d9f99d" fontFamily="system-ui, sans-serif">vs</text>
+      {/* lote policultivo: mezcla viva (maíz alto, fríjol trepador, ahuyama) */}
+      <rect x="134" y="46" width="104" height="34" rx="8" fill="#cfe0b0" />
+      <g className="mvp-planta">
+        <line x1="152" y1="76" x2="152" y2="34" stroke="#4d7c0f" strokeWidth="3" strokeLinecap="round" />
+        <path d="M152 44 q-10 -4 -13 -12" stroke="#65a30d" strokeWidth="2.4" fill="none" strokeLinecap="round" />
+        <path d="M152 52 q10 -4 13 -12" stroke="#65a30d" strokeWidth="2.4" fill="none" strokeLinecap="round" />
+        <ellipse cx="152" cy="32" rx="4" ry="7" fill="#fbbf24" />
+      </g>
+      <g className="mvp-planta" style={{ animationDelay: '0.8s' }}>
+        <path d="M170 76 Q166 60 172 48" stroke="#16a34a" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+        <circle cx="171" cy="50" r="2.6" fill="#22c55e" />
+        <circle cx="168" cy="60" r="2.6" fill="#22c55e" />
+      </g>
+      <g className="mvp-planta" style={{ animationDelay: '1.4s' }}>
+        <path d="M186 76 q10 -14 22 -8" stroke="#3f8f4e" strokeWidth="2.4" fill="none" strokeLinecap="round" />
+        <circle cx="206" cy="70" r="6.5" fill="#e58a3c" />
+        <path d="M206 63 q2 -3 4 -3" stroke="#4d7c0f" strokeWidth="1.8" fill="none" strokeLinecap="round" />
+      </g>
+      <g className="mvp-planta" style={{ animationDelay: '0.4s' }}>
+        <line x1="224" y1="76" x2="224" y2="52" stroke="#4d7c0f" strokeWidth="2.6" strokeLinecap="round" />
+        <circle cx="224" cy="49" r="4.4" fill="#84cc16" />
+      </g>
+      {/* sol compartido */}
+      <circle cx="120" cy="16" r="9" fill="#ffd24d" />
+      <g stroke="#ffd98a" strokeWidth="1.8" strokeLinecap="round">
+        <line x1="120" y1="2" x2="120" y2="6" />
+        <line x1="106" y1="16" x2="110" y2="16" />
+        <line x1="130" y1="16" x2="134" y2="16" />
+        <line x1="110" y1="6" x2="113" y2="9" />
+        <line x1="130" y1="6" x2="127" y2="9" />
+      </g>
+    </svg>
+  );
+}
 
 const confidenceStyles = {
   alta: 'bg-emerald-100 text-emerald-900 border-emerald-300',
@@ -115,7 +174,7 @@ function MetricCard({ icon, label, mono, poli, emphasis }) {
           <p className="text-[0.68rem] font-bold uppercase tracking-wide text-stone-500">Monocultivo</p>
           <p className="mt-1 text-sm font-extrabold leading-tight text-stone-900">{mono}</p>
         </div>
-        <div className="rounded-xl bg-emerald-50 p-2 ring-1 ring-emerald-200">
+        <div className="rounded-xl bg-gradient-to-br from-emerald-50 to-lime-50 p-2 ring-1 ring-emerald-200">
           <p className="text-[0.68rem] font-bold uppercase tracking-wide text-emerald-700">Policultivo</p>
           <p className="mt-1 text-sm font-extrabold leading-tight text-emerald-950">{poli}</p>
         </div>
@@ -125,14 +184,15 @@ function MetricCard({ icon, label, mono, poli, emphasis }) {
   );
 }
 
-function AssociationPanel({ item }) {
+function AssociationPanel({ item, index = 0 }) {
   const confidenceClass = confidenceStyles[item.confianza] || confidenceStyles.media;
   const extra = extraIndicator(item);
 
   return (
     <section
       data-testid={`asociacion-${item.id}`}
-      className="overflow-hidden rounded-[1.75rem] border border-lime-200 bg-stone-50 shadow-[0_20px_60px_rgba(63,72,47,0.14)]"
+      className="mvp-entrar overflow-hidden rounded-[1.75rem] border border-lime-200 bg-stone-50 shadow-[0_20px_60px_rgba(63,72,47,0.14)]"
+      style={{ animationDelay: `${Math.min(index * 0.12, 0.6)}s` }}
     >
       <div className="bg-[linear-gradient(135deg,#193a2f,#386641_52%,#a7c957)] p-4 text-white sm:p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -224,20 +284,25 @@ function AssociationPanel({ item }) {
 export default function MonoVsPoliSimulator({ data = asociaciones }) {
   return (
     <div data-testid="mono-vs-poli-simulator" className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-3 py-4 sm:px-5">
-      <header className="rounded-[1.75rem] border border-lime-200 bg-[#f7f3e8] p-4 shadow-sm sm:p-6">
-        <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">Juego monocultivo vs policultivo</p>
-        <h2 className="mt-2 text-3xl font-black leading-tight text-stone-950 sm:text-4xl">
-          Compare cifras reales antes de sembrar
-        </h2>
-        <p className="mt-3 max-w-3xl text-base font-semibold leading-relaxed text-stone-700">
-          Cada tarjeta pone el monocultivo y el policultivo lado a lado, con rendimiento, nitrogeno,
-          ahorro de insumos, control de plaga, frase campesina, fuente y confianza.
-        </p>
+      <header className="mvp-entrar rounded-[1.75rem] border border-lime-200 bg-[#f7f3e8] p-4 shadow-sm sm:p-6">
+        <div className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-center">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">Juego monocultivo vs policultivo</p>
+            <h2 className="mt-2 text-3xl font-black leading-tight text-stone-950 sm:text-4xl">
+              Compare cifras reales antes de sembrar
+            </h2>
+            <p className="mt-3 max-w-3xl text-base font-semibold leading-relaxed text-stone-700">
+              Cada tarjeta pone el monocultivo y el policultivo lado a lado, con rendimiento, nitrogeno,
+              ahorro de insumos, control de plaga, frase campesina, fuente y confianza.
+            </p>
+          </div>
+          <HeroMonoVsPoli />
+        </div>
       </header>
 
       <div className="flex flex-col gap-5">
-        {data.map((item) => (
-          <AssociationPanel key={item.id} item={item} />
+        {data.map((item, index) => (
+          <AssociationPanel key={item.id} item={item} index={index + 1} />
         ))}
       </div>
     </div>

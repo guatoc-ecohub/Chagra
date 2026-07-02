@@ -56,6 +56,35 @@ function leerSuperados() {
   }
 }
 
+/**
+ * Chispas decorativas (feedback visual de acierto/daño). Viven en `world.fx`
+ * y SOLO se dibujan en el canvas: no tocan física, colisiones ni puntaje.
+ */
+function pushChispas(w, x, y, color, n = 8) {
+  if (!w) return;
+  if (!w.fx) w.fx = [];
+  for (let i = 0; i < n; i += 1) {
+    const ang = (i / n) * Math.PI * 2;
+    const vel = 1.1 + (i % 3) * 0.6;
+    w.fx.push({
+      x,
+      y,
+      vx: Math.cos(ang) * vel,
+      vy: Math.sin(ang) * vel - 1.2,
+      vida: 24 + (i % 5) * 5,
+      vidaMax: 30,
+      r: 2.5 + (i % 2),
+      color,
+    });
+  }
+}
+
+/** Hash determinista 0..1 por posición (decoración estable del terreno). */
+function hashDeco(x) {
+  const s = Math.sin(x * 12.9898) * 43758.5453;
+  return s - Math.floor(s);
+}
+
 /** Marca un nivel como superado en localStorage y devuelve la lista resultante. */
 function guardarSuperado(numero) {
   try {
@@ -221,6 +250,7 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
       puntaje: 0,
       energia: nivel.energiaInicial,
       t: 0,
+      fx: [], // chispas decorativas (solo dibujo, cero lógica)
     };
   }, [nivel, pares]);
 
@@ -269,15 +299,23 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
     if (!w || estado !== 'jugando') return;
     const id = beneficoSelRef.current;
     if (!id) return;
+    const vivasAntes = new Set(w.plagas.filter((p) => p.alive).map((p) => p.id));
     const { plagas, eliminadas } = aplicarBenefico(w.plagas, id);
     w.plagas = plagas;
+    // Chispas verdes donde cayó cada plaga (feedback visual, no lógica).
+    for (const p of plagas) {
+      if (!p.alive && vivasAntes.has(p.id)) pushChispas(w, p.x + 17, p.y + 17, '#6ee7b7', 10);
+    }
 
     let golpeoJefe = false;
     if (w.jefe && w.jefe.vivo) {
       const res = golpearJefe(w.jefe, id);
       w.jefe = res.jefe;
       golpeoJefe = res.golpeo;
-      if (res.golpeo) setJefeVida(w.jefe.vida);
+      if (res.golpeo) {
+        setJefeVida(w.jefe.vida);
+        pushChispas(w, w.jefe.x + w.jefe.w / 2, w.jefe.y + 10, '#fbbf24', 12);
+      }
     }
 
     if (eliminadas > 0 || golpeoJefe) {
@@ -376,6 +414,11 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
       // Recolección de cultivos.
       const rec = recolectarCultivos(w.player, w.cultivos);
       if (rec.recogidos.length > 0) {
+        // Chispas doradas donde estaba cada cultivo (feedback visual).
+        for (const cid of rec.recogidos) {
+          const c = w.cultivos.find((k) => k.id === cid);
+          if (c) pushChispas(w, c.x + 15, c.y + 15, '#fde68a', 8);
+        }
         w.cultivos = rec.cultivos;
         w.cultivosRecogidos += rec.recogidos.length;
         w.puntaje = sumarPuntaje(w.puntaje, { cultivos: rec.recogidos.length });
@@ -405,6 +448,7 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
           w.player.invulnUntil = w.t + 60; // ~1s a 60fps
           setEnergia(w.energia);
           beep('hit');
+          pushChispas(w, w.player.x + w.player.w / 2, w.player.y + 20, '#fca5a5', 7);
         }
       }
 
@@ -453,11 +497,45 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
         }
       }
 
-      // Astro (sol/luna), anclado a la vista.
+      // Astro (sol/luna) con halo suave, anclado a la vista.
+      const astroX = w.camX + VIEW_W - 70;
+      const halo = ctx.createRadialGradient(astroX, 70, 8, astroX, 70, 95);
+      halo.addColorStop(0, 'rgba(255,255,240,0.30)');
+      halo.addColorStop(1, 'rgba(255,255,240,0)');
+      ctx.fillStyle = halo;
+      ctx.fillRect(astroX - 95, -25, 190, 190);
       ctx.fillStyle = esc.astro;
       ctx.beginPath();
-      ctx.arc(w.camX + VIEW_W - 70, 70, 34, 0, Math.PI * 2);
+      ctx.arc(astroX, 70, 34, 0, Math.PI * 2);
       ctx.fill();
+
+      // Nubes suaves que derivan despacio (decoración, ancladas a la vista).
+      ctx.fillStyle = 'rgba(255,255,255,0.55)';
+      for (let i = 0; i < 4; i += 1) {
+        const drift = ((i * 197 + w.t * (0.10 + i * 0.03)) % (VIEW_W + 180)) - 90;
+        const cy = 42 + (i % 3) * 26;
+        const cx = w.camX * 0.92 + drift;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, 34 + (i % 2) * 12, 10, 0, 0, Math.PI * 2);
+        ctx.ellipse(cx + 22, cy - 6, 20, 9, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Cordillera LEJANA con parallax (se mueve más lento que la cámara =
+      // profundidad). Solo decoración de fondo.
+      ctx.globalAlpha = 0.4;
+      ctx.fillStyle = esc.montana;
+      ctx.beginPath();
+      ctx.moveTo(w.camX - 20, GROUND_Y);
+      const parFar = (w.camX * 0.45) % 300;
+      for (let sx = -parFar - 300; sx <= VIEW_W + 300; sx += 300) {
+        ctx.lineTo(w.camX + sx + 140, 210);
+        ctx.lineTo(w.camX + sx + 300, GROUND_Y);
+      }
+      ctx.lineTo(w.camX + VIEW_W + 20, GROUND_Y);
+      ctx.closePath();
+      ctx.fill();
+      ctx.globalAlpha = 1;
 
       // Montañas de fondo (repetidas a lo largo del mundo).
       ctx.fillStyle = esc.montana;
@@ -493,50 +571,149 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
         ctx.fillRect(cursor, GROUND_Y - 6, M - cursor, 10);
       }
 
-      // Plataformas.
+      // Vegetación decorativa del terreno: maticas de pasto y florecitas
+      // deterministas por posición (no cambian entre frames ni afectan nada).
+      const gx0 = Math.floor(w.camX / 26) * 26;
+      for (let gx = gx0 - 26; gx < w.camX + VIEW_W + 26; gx += 26) {
+        const enHueco = huecos.some((h) => gx >= h.x - 8 && gx <= h.x + h.w + 2);
+        if (enHueco || gx < 0 || gx > M) continue;
+        const hsh = hashDeco(gx);
+        const sway = Math.sin(w.t * 0.03 + gx * 0.5) * 1.6;
+        if (hsh < 0.45) {
+          // matica de pasto que se mece
+          ctx.strokeStyle = esc.pasto;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(gx, GROUND_Y + 2);
+          ctx.quadraticCurveTo(gx - 3, GROUND_Y - 6, gx - 4 + sway, GROUND_Y - 12);
+          ctx.moveTo(gx + 3, GROUND_Y + 2);
+          ctx.quadraticCurveTo(gx + 5, GROUND_Y - 5, gx + 6 + sway, GROUND_Y - 11);
+          ctx.stroke();
+        } else if (hsh > 0.88) {
+          // florecita silvestre
+          ctx.strokeStyle = esc.pasto;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(gx, GROUND_Y + 2);
+          ctx.lineTo(gx + sway * 0.6, GROUND_Y - 10);
+          ctx.stroke();
+          ctx.fillStyle = hsh > 0.94 ? '#fda4af' : '#fde68a';
+          ctx.beginPath();
+          ctx.arc(gx + sway * 0.6, GROUND_Y - 12, 3.4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(gx + sway * 0.6, GROUND_Y - 12, 1.3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // Plataformas (con borde inferior sombreado para dar volumen).
       for (const p of w.plataformas) {
+        ctx.fillStyle = 'rgba(0,0,0,0.18)';
+        ctx.fillRect(p.x + 2, p.y + p.h, p.w - 4, 3);
         ctx.fillStyle = esc.sueloTop;
         ctx.fillRect(p.x, p.y, p.w, p.h);
         ctx.fillStyle = esc.pasto;
         ctx.fillRect(p.x, p.y - 4, p.w, 6);
       }
 
-      // Cultivos (puntos).
+      // Cultivos (puntos) — flotan suavecito con un brillo cálido debajo.
       for (const c of w.cultivos) {
-        if (!c.recogido) drawEmoji(c.emoji, c.x, c.y, 30);
+        if (c.recogido) continue;
+        const bob = Math.sin(w.t * 0.06 + c.x * 0.13) * 2.5;
+        const gl = ctx.createRadialGradient(c.x + 15, c.y + 15 + bob, 2, c.x + 15, c.y + 15 + bob, 22);
+        gl.addColorStop(0, 'rgba(253,230,138,0.35)');
+        gl.addColorStop(1, 'rgba(253,230,138,0)');
+        ctx.fillStyle = gl;
+        ctx.fillRect(c.x - 8, c.y - 8 + bob, 46, 46);
+        drawEmoji(c.emoji, c.x, c.y + bob, 30);
       }
-      // Plagas vivas.
+      // Plagas vivas (sombra en el piso + leve vaivén al patrullar).
       for (const p of w.plagas) {
-        if (p.alive) drawEmoji(p.emoji, p.x, p.y, 32);
+        if (!p.alive) continue;
+        const bobP = Math.sin(w.t * 0.12 + p.baseX) * 1.5;
+        ctx.fillStyle = 'rgba(0,0,0,0.16)';
+        ctx.beginPath();
+        ctx.ellipse(p.x + p.w / 2, p.y + p.h + 3, p.w * 0.42, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+        drawEmoji(p.emoji, p.x, p.y + bobP, 32);
       }
-      // Mini-jefe + barra de vida.
+      // Mini-jefe + sombra + barra de vida con marco.
       if (w.jefe && w.jefe.vivo) {
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+        ctx.beginPath();
+        ctx.ellipse(w.jefe.x + w.jefe.w / 2, w.jefe.y + w.jefe.h + 2, w.jefe.w * 0.44, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
         drawEmoji(w.jefe.emoji, w.jefe.x, w.jefe.y, 60);
         const bw = w.jefe.w;
-        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        ctx.fillStyle = 'rgba(0,0,0,0.45)';
+        ctx.fillRect(w.jefe.x - 1, w.jefe.y - 13, bw + 2, 9);
+        ctx.fillStyle = '#7f1d1d';
         ctx.fillRect(w.jefe.x, w.jefe.y - 12, bw, 7);
         ctx.fillStyle = '#ef4444';
         ctx.fillRect(w.jefe.x, w.jefe.y - 12, (bw * w.jefe.vida) / w.jefe.vidaMax, 7);
+        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        ctx.fillRect(w.jefe.x, w.jefe.y - 12, (bw * w.jefe.vida) / w.jefe.vidaMax, 2);
       }
 
       // Jugador (campesino neutro dibujado a mano — sin nombre propio).
+      // Sombra a los pies + rebote de caminado + piernas que alternan:
+      // todo es DIBUJO (la caja de colisión no cambia).
       const px = w.player.x;
       const py = w.player.y;
       const blink = w.t < w.player.invulnUntil && Math.floor(w.t / 6) % 2 === 0;
+      const caminando = (input.current.left || input.current.right) && w.player.onGround;
+      const bobJ = caminando ? Math.abs(Math.sin(w.t * 0.22)) * 2 : 0;
+      const paso = caminando ? Math.sin(w.t * 0.22) * 4 : 0;
+      ctx.fillStyle = 'rgba(0,0,0,0.2)';
+      ctx.beginPath();
+      ctx.ellipse(px + w.player.w / 2, py + w.player.h + 2, w.player.w * 0.5, 4.5, 0, 0, Math.PI * 2);
+      ctx.fill();
       if (!blink) {
+        const pyd = py - bobJ;
+        // sombrero campesino (ala ancha + copa con cinta)
         ctx.fillStyle = '#a16207';
-        ctx.fillRect(px - 4, py, w.player.w + 8, 8);
-        ctx.fillRect(px + 6, py - 8, w.player.w - 12, 10);
+        ctx.fillRect(px - 4, pyd, w.player.w + 8, 8);
+        ctx.fillRect(px + 6, pyd - 8, w.player.w - 12, 10);
+        ctx.fillStyle = '#7c2d12';
+        ctx.fillRect(px + 6, pyd - 1, w.player.w - 12, 3);
+        // cara
         ctx.fillStyle = '#e8b98a';
-        ctx.fillRect(px + 8, py + 8, w.player.w - 16, 16);
+        ctx.fillRect(px + 8, pyd + 8, w.player.w - 16, 16);
+        // camisa
         ctx.fillStyle = '#15803d';
-        ctx.fillRect(px + 6, py + 24, w.player.w - 12, 20);
+        ctx.fillRect(px + 6, pyd + 24, w.player.w - 12, 20);
+        ctx.fillStyle = 'rgba(255,255,255,0.14)';
+        ctx.fillRect(px + 6, pyd + 24, 4, 20);
+        // piernas (alternan al caminar)
         ctx.fillStyle = '#1e3a5f';
-        ctx.fillRect(px + 8, py + 42, w.player.w - 16, 12);
+        ctx.fillRect(px + 8 + paso, py + 42, 8, 12);
+        ctx.fillRect(px + w.player.w - 16 - paso, py + 42, 8, 12);
+        // ojos + sonrisa mirando hacia donde corre
         ctx.fillStyle = '#1c1917';
         const ex = w.player.face === 1 ? px + 16 : px + 12;
-        ctx.fillRect(ex, py + 14, 3, 3);
-        ctx.fillRect(ex + 8, py + 14, 3, 3);
+        ctx.fillRect(ex, pyd + 14, 3, 3);
+        ctx.fillRect(ex + 8, pyd + 14, 3, 3);
+        ctx.fillRect(ex + 3, pyd + 20, 6, 2);
+      }
+
+      // Chispas decorativas de feedback (se actualizan y pintan aquí; si el
+      // juego está pausado en overlay simplemente terminan de desvanecerse).
+      if (w.fx && w.fx.length > 0) {
+        const vivos = [];
+        for (const s of w.fx) {
+          s.x += s.vx;
+          s.y += s.vy;
+          s.vy += 0.06;
+          s.vida -= 1;
+          if (s.vida > 0) vivos.push(s);
+          ctx.globalAlpha = Math.max(0, s.vida / s.vidaMax);
+          ctx.fillStyle = s.color;
+          ctx.fillRect(s.x, s.y, s.r, s.r);
+        }
+        ctx.globalAlpha = 1;
+        w.fx = vivos;
       }
 
       ctx.restore();
