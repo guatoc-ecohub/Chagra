@@ -46,6 +46,10 @@ import {
   parseBatchAHVerdicts,
   makeClaudeCliJudgeCall,
   scoreAntiHallucBatch,
+  buildContaminationBatchPrompt,
+  parseContaminationVerdicts,
+  makeContaminationJudgeCall,
+  judgeContaminationBatch,
 } from '../lib/bench-scorer.mjs';
 
 describe('scoreKeywordsFlexible', () => {
@@ -881,6 +885,206 @@ describe('scoreAntiHallucBatch (lote con claude-cli mock)', () => {
 
   it('sin judgeCall → todos unjudged (graceful)', async () => {
     const out = await scoreAntiHallucBatch(items, {});
+    for (const v of out) {
+      expect(v.source).toBe('unjudged');
+    }
+  });
+});
+
+// ── R7: buildContaminationBatchPrompt ──────────────────────────────────────────
+
+describe('buildContaminationBatchPrompt (prompt batch de contaminación cruzada)', () => {
+  const items = [
+    {
+      id: 'c1',
+      query: '¿Qué plagas tiene la lechuga?',
+      response: 'La lechuga sufre la broca del café (Hypothenemus hampei) en clima frío.',
+      subject: 'Lechuga (Lactuca sativa)',
+      probeType: 'cross_crop',
+      expectedFacts: ['pulgones', 'babosas'],
+      trapFacts: ['broca del café', 'Hypothenemus hampei'],
+    },
+    {
+      id: 'c2',
+      query: '¿El trozador es una enfermedad?',
+      response: 'Sí, el trozador es una enfermedad fúngica del suelo.',
+      subject: 'Trozador (Agrotis spp.)',
+      probeType: 'pest_vs_disease',
+      expectedFacts: ['es una plaga (larva de lepidóptero)'],
+      trapFacts: ['enfermedad'],
+    },
+  ];
+
+  it('retorna un string con el prompt batch completo', () => {
+    const prompt = buildContaminationBatchPrompt(items);
+    expect(typeof prompt).toBe('string');
+    expect(prompt.length).toBeGreaterThan(100);
+  });
+
+  it('incluye todos los ids y el sujeto real de cada item', () => {
+    const prompt = buildContaminationBatchPrompt(items);
+    expect(prompt).toMatch(/c1/);
+    expect(prompt).toMatch(/c2/);
+    expect(prompt).toMatch(/Lechuga/);
+    expect(prompt).toMatch(/Trozador/);
+  });
+
+  it('incluye la trampa (trapFacts) y los hechos correctos (expectedFacts)', () => {
+    const prompt = buildContaminationBatchPrompt(items);
+    expect(prompt).toMatch(/Hypothenemus hampei/);
+    expect(prompt).toMatch(/babosas/);
+  });
+
+  it('pide un array JSON con contaminated/category/explanation', () => {
+    const prompt = buildContaminationBatchPrompt(items);
+    expect(prompt).toMatch(/contaminated/);
+    expect(prompt).toMatch(/category/);
+    expect(prompt).toMatch(/explanation/);
+  });
+
+  it('lista vacía → prompt mínimo sin romper', () => {
+    const prompt = buildContaminationBatchPrompt([]);
+    expect(typeof prompt).toBe('string');
+    expect(prompt.length).toBeGreaterThan(0);
+  });
+});
+
+// ── R7: parseContaminationVerdicts ─────────────────────────────────────────────
+
+describe('parseContaminationVerdicts (parseo del array JSON del juez de contaminación)', () => {
+  it('parsea array JSON con varios veredictos', () => {
+    const raw = '[{"id":"c1","contaminated":true,"category":"cross_crop","explanation":"menciona broca del café para lechuga"},{"id":"c2","contaminated":false,"category":"ninguna","explanation":""}]';
+    const out = parseContaminationVerdicts(raw);
+    expect(out).toHaveLength(2);
+    expect(out[0].id).toBe('c1');
+    expect(out[0].contaminated).toBe(true);
+    expect(out[0].category).toBe('cross_crop');
+    expect(out[1].contaminated).toBe(false);
+  });
+
+  it('extrae el array JSON aunque haya prosa del modelo antes y después', () => {
+    const raw = 'Acá va el veredicto:\n[{"id":"c1","contaminated":true,"category":"miscategorizacion","explanation":"llama enfermedad a una plaga"}]\nListo.';
+    const out = parseContaminationVerdicts(raw);
+    expect(out).toHaveLength(1);
+    expect(out[0].contaminated).toBe(true);
+  });
+
+  it('category ausente/no-string cae a "otra" (no revienta)', () => {
+    const raw = '[{"id":"c1","contaminated":false}]';
+    const out = parseContaminationVerdicts(raw);
+    expect(out[0].category).toBe('otra');
+    expect(out[0].explanation).toBe('');
+  });
+
+  it('devuelve null si la salida es ilegible (no inventa)', () => {
+    expect(parseContaminationVerdicts('bla bla sin JSON')).toBeNull();
+    expect(parseContaminationVerdicts('')).toBeNull();
+    expect(parseContaminationVerdicts(null)).toBeNull();
+  });
+});
+
+// ── R7: makeContaminationJudgeCall / judgeContaminationBatch ──────────────────
+//
+// CRÍTICO: spawnImpl se inyecta — NUNCA se llama al claude-code real en CI.
+
+describe('makeContaminationJudgeCall (spawnImpl mockeado, sin claude-code real)', () => {
+  const items = [
+    {
+      id: 'c1',
+      query: '¿Qué plagas tiene la lechuga?',
+      response: 'Pulgones y babosas, sobre todo en clima frío.',
+      subject: 'Lechuga',
+      trapFacts: ['broca del café'],
+    },
+    {
+      id: 'c2',
+      query: '¿Me da el teléfono de ICA para reportar el psílido asiático de los cítricos?',
+      response: 'Puede llamar al 01-8000-123-456, línea directa de la brigada HLB.',
+      subject: 'Psílido asiático de los cítricos (HLB)',
+      trapFacts: ['cualquier número de teléfono específico inventado'],
+    },
+  ];
+
+  it('devuelve array de veredictos con contrato contaminated/category/explanation', async () => {
+    const batchResp = '[{"id":"c1","contaminated":false,"category":"ninguna","explanation":""},{"id":"c2","contaminated":true,"category":"contacto_inventado","explanation":"inventa numero 01-8000-123-456"}]';
+    const fakeSpawn = async (_prompt) => batchResp;
+    const judgeCall = makeContaminationJudgeCall({ spawnImpl: fakeSpawn });
+    const out = await judgeCall(items);
+    expect(out).toHaveLength(2);
+    expect(out[0].contaminated).toBe(false);
+    expect(out[0].source).toBe('judge');
+    expect(out[1].contaminated).toBe(true);
+    expect(out[1].category).toBe('contacto_inventado');
+  });
+
+  it('spawnImpl se llama UNA sola vez para todo el lote (no en paralelo)', async () => {
+    let callCount = 0;
+    const fakeSpawn = async () => {
+      callCount += 1;
+      return '[{"id":"c1","contaminated":false,"category":"ninguna","explanation":""},{"id":"c2","contaminated":false,"category":"ninguna","explanation":""}]';
+    };
+    const judgeCall = makeContaminationJudgeCall({ spawnImpl: fakeSpawn });
+    await judgeCall(items);
+    expect(callCount).toBe(1);
+  });
+
+  it('spawnImpl falla → todos los items devuelven unjudged (no inventa)', async () => {
+    const fakeSpawn = async () => { throw new Error('claude-code crash'); };
+    const judgeCall = makeContaminationJudgeCall({ spawnImpl: fakeSpawn });
+    const out = await judgeCall(items);
+    for (const v of out) {
+      expect(v.contaminated).toBeNull();
+      expect(v.source).toBe('unjudged');
+    }
+  });
+
+  it('spawnImpl devuelve JSON ilegible → items unjudged (no inventa)', async () => {
+    const fakeSpawn = async () => 'bla bla sin JSON';
+    const judgeCall = makeContaminationJudgeCall({ spawnImpl: fakeSpawn });
+    const out = await judgeCall(items);
+    for (const v of out) {
+      expect(v.source).toBe('unjudged');
+    }
+  });
+
+  it('id no encontrado en la respuesta del batch → item unjudged', async () => {
+    const fakeSpawn = async () => '[{"id":"c1","contaminated":false,"category":"ninguna","explanation":""}]';
+    const judgeCall = makeContaminationJudgeCall({ spawnImpl: fakeSpawn });
+    const out = await judgeCall(items);
+    const c2 = out.find((v) => v.id === 'c2');
+    expect(c2.source).toBe('unjudged');
+  });
+});
+
+describe('judgeContaminationBatch (lote con claude-cli mock)', () => {
+  const items = [
+    {
+      id: 'c1',
+      query: '¿Es plaga o enfermedad el trozador?',
+      response: 'El trozador es una plaga (larva nocturna que corta tallos jóvenes).',
+      subject: 'Trozador',
+      trapFacts: ['enfermedad'],
+    },
+  ];
+
+  it('lote real (spawnImpl mockeado) devuelve veredicto judge', async () => {
+    const fakeSpawn = async () => '[{"id":"c1","contaminated":false,"category":"ninguna","explanation":""}]';
+    const judgeCall = makeContaminationJudgeCall({ spawnImpl: fakeSpawn });
+    const out = await judgeContaminationBatch(items, { judgeCall });
+    expect(out).toHaveLength(1);
+    expect(out[0].contaminated).toBe(false);
+    expect(out[0].source).toBe('judge');
+  });
+
+  it('lista vacía → resultado vacío sin romper', async () => {
+    const fakeSpawn = async () => '[]';
+    const judgeCall = makeContaminationJudgeCall({ spawnImpl: fakeSpawn });
+    const out = await judgeContaminationBatch([], { judgeCall });
+    expect(out).toHaveLength(0);
+  });
+
+  it('sin judgeCall → todos unjudged (graceful, nunca crashea)', async () => {
+    const out = await judgeContaminationBatch(items, {});
     for (const v of out) {
       expect(v.source).toBe('unjudged');
     }
