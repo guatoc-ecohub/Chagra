@@ -291,7 +291,11 @@ function readCollapsedPref(plantsCount) {
   return plantsCount > 0;
 }
 
-export default function WelcomeStatsHero({ mode = 'post-login', onNavigate }) {
+// onNavigate con default undefined explícito: es opcional de verdad (todo el
+// código guarda con `typeof onNavigate === 'function'` y el hero queda inerte
+// en pre-login), pero sin default tsc la infiere requerida y el caller
+// pre-login (LoginScreen) suma un falso error al gate tsc:check.
+export default function WelcomeStatsHero({ mode = 'post-login', onNavigate = undefined }) {
   const isPreLogin = mode === 'pre-login';
   const plantsCount = useAssetStore((s) => s.plants?.length ?? 0);
   const [catalogStats, setCatalogStats] = useState(CATALOG_FALLBACK);
