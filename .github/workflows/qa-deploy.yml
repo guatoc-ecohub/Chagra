@@ -59,6 +59,16 @@ jobs:
 
       - if: env.SKIP_DEPLOY != '1'
         name: Deploy to qa
+        # CI-1 (2026-07-01) — releases versionadas + symlink `current`: ver
+        # comentario extenso en deploy.yml (prod). Mismo patrón acá: escribe a
+        # TARGET/releases/<version>/ (version = short SHA, qa no bumpea
+        # package.json) y hace swap atómico TARGET/current -> releases/<v>.
+        # assets/ sigue siendo pool COMPARTIDO fuera de releases/ (append-only,
+        # igual que antes); cada release lleva un symlink assets -> ../../assets.
+        # Retiene las últimas 10 releases.
+        #
+        # CRÍTICO — nginx (guatoc-nixos) debe servir TARGET/current, no TARGET
+        # directo. Cambio de infra que aplica el operador junto con este CI.
         run: |
           set -e
           TARGET=/mnt/fast/appdata/farmos-pwa-qa
@@ -76,23 +86,40 @@ jobs:
           #   2) sincronizar /assets/ SIN --delete (agregar chunks nuevos,
           #      conservar viejos; los hashes no colisionan).
           #   3) GC de chunks con mtime > 30 dias para no crecer infinito.
-          rsync -avzO --no-perms --delete --no-group --chmod=F644 --exclude='/assets/' dist/ "$TARGET/"
+          VERSION=$(git rev-parse --short HEAD)
+          RELEASE_DIR="$TARGET/releases/$VERSION"
+          mkdir -p "$RELEASE_DIR"
+
+          rsync -avzO --no-perms --delete --no-group --chmod=F644 --exclude='/assets/' dist/ "$RELEASE_DIR/"
           rsync -avzO --no-perms --no-group --chmod=F644 dist/assets/ "$TARGET/assets/"
+          ln -sfn ../../assets "$RELEASE_DIR/assets"
+
+          find "$RELEASE_DIR" -type f -user runner ! -perm 644 -exec chmod 644 {} + || true
+          find "$TARGET/assets/" -type f -user runner ! -perm 644 -exec chmod 644 {} + || true
           find "$TARGET/assets/" -type f -mtime +30 -delete || true
-          find "$TARGET" -type f -user runner ! -perm 644 -exec chmod 644 {} + || true
+
+          # Swap atómico: current pasa a apuntar a la release recién escrita.
+          ln -sfn "releases/$VERSION" "$TARGET/current"
+
+          # Retención: conserva solo las últimas 10 releases (por mtime).
+          ( cd "$TARGET/releases" && ls -1dt */ 2>/dev/null | tail -n +11 | xargs -r rm -rf -- )
+
+          echo "Deployed version $VERSION -> $TARGET/current"
 
       - if: env.SKIP_DEPLOY != '1'
         name: Verify deployment
         run: |
           TARGET=/mnt/fast/appdata/farmos-pwa-qa
-          test -f "$TARGET/index.html" || exit 1
-          HASH=$(sha256sum "$TARGET/index.html" | cut -d' ' -f1)
-          echo "QA Deploy OK: $(date -Iseconds) | index.html sha256: ${HASH:0:12}"
+          test -f "$TARGET/current/index.html" || exit 1
+          HASH=$(sha256sum "$TARGET/current/index.html" | cut -d' ' -f1)
+          echo "QA Deploy OK: $(date -Iseconds) | current -> $(readlink "$TARGET/current") | index.html sha256: ${HASH:0:12}"
 
       - if: env.SKIP_DEPLOY != '1'
         name: Bump SW cache version (qa)
         run: |
-          SW_FILE=/mnt/fast/appdata/farmos-pwa-qa/sw.js
+          # Ruta a través del symlink `current` (CI-1): edita el archivo real
+          # dentro de releases/<version>/, que es lo que nginx sirve.
+          SW_FILE=/mnt/fast/appdata/farmos-pwa-qa/current/sw.js
           if [ -f "$SW_FILE" ]; then
             COMMIT_SHORT=$(git rev-parse --short HEAD)
             sed -i -E "s/chagra-[0-9a-z]+/chagra-qa-${COMMIT_SHORT}/" "$SW_FILE"

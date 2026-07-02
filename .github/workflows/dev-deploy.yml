@@ -64,6 +64,13 @@ jobs:
 
       - if: env.SKIP_DEPLOY != '1'
         name: Deploy to dev
+        # CI-1 (2026-07-01) — releases versionadas + symlink `current`: ver
+        # comentario extenso en deploy.yml (prod). Mismo patrón acá: escribe a
+        # TARGET/releases/<version>/ (version = short SHA) y hace swap atómico
+        # TARGET/current -> releases/<v>. Retiene las últimas 10 releases.
+        #
+        # CRÍTICO — nginx (guatoc-nixos) debe servir TARGET/current, no TARGET
+        # directo. Cambio de infra que aplica el operador junto con este CI.
         run: |
           set -e
           TARGET=/mnt/fast/appdata/farmos-pwa-dev
@@ -87,19 +94,41 @@ jobs:
           # tocar sus permisos/borrarlo con --delete y aborta con exit 23
           # (partial transfer) -> deploy PARCIAL -> index.html referencia
           # assets que nunca se copiaron -> pantalla negra. Lo dejamos intacto.
+          #
+          # mockups/ (igual que assets/) es un pool COMPARTIDO fuera de
+          # releases/, no versionado por release: se linkea SI existe en el
+          # target (dir manual, opcional, no viene del build).
+          VERSION=$(git rev-parse --short HEAD)
+          RELEASE_DIR="$TARGET/releases/$VERSION"
+          mkdir -p "$RELEASE_DIR"
+
           rsync -avzO --no-perms --delete --no-group --chmod=F644 \
-            --exclude='/assets/' --exclude='/mockups/' dist/ "$TARGET/"
+            --exclude='/assets/' --exclude='/mockups/' dist/ "$RELEASE_DIR/"
           rsync -avzO --no-perms --no-group --chmod=F644 dist/assets/ "$TARGET/assets/"
+          ln -sfn ../../assets "$RELEASE_DIR/assets"
+          if [ -d "$TARGET/mockups" ]; then
+            ln -sfn ../../mockups "$RELEASE_DIR/mockups"
+          fi
+
+          find "$RELEASE_DIR" -type f -user runner ! -perm 644 -exec chmod 644 {} + || true
+          find "$TARGET/assets/" -type f -user runner ! -perm 644 -exec chmod 644 {} + || true
           find "$TARGET/assets/" -type f -mtime +30 -delete || true
-          find "$TARGET" -type f -user runner ! -perm 644 -exec chmod 644 {} + || true
+
+          # Swap atómico: current pasa a apuntar a la release recién escrita.
+          ln -sfn "releases/$VERSION" "$TARGET/current"
+
+          # Retención: conserva solo las últimas 10 releases (por mtime).
+          ( cd "$TARGET/releases" && ls -1dt */ 2>/dev/null | tail -n +11 | xargs -r rm -rf -- )
+
+          echo "Deployed version $VERSION -> $TARGET/current"
 
       - if: env.SKIP_DEPLOY != '1'
         name: Verify deployment
         run: |
           TARGET=/mnt/fast/appdata/farmos-pwa-dev
-          test -f "$TARGET/index.html" || exit 1
-          HASH=$(sha256sum "$TARGET/index.html" | cut -d' ' -f1)
-          echo "DEV Deploy OK: $(date -Iseconds) | index.html sha256: ${HASH:0:12}"
+          test -f "$TARGET/current/index.html" || exit 1
+          HASH=$(sha256sum "$TARGET/current/index.html" | cut -d' ' -f1)
+          echo "DEV Deploy OK: $(date -Iseconds) | current -> $(readlink "$TARGET/current") | index.html sha256: ${HASH:0:12}"
 
       - if: env.SKIP_DEPLOY != '1'
         name: Verify referenced assets exist
@@ -110,7 +139,9 @@ jobs:
           # Si el deploy quedo parcial (p.ej. rsync exit 23 por mockups, o un
           # stomp), faltara algun chunk hasheado y el job debe FALLAR aqui en
           # vez de dejar dev sirviendo una pantalla negra silenciosa.
-          TARGET=/mnt/fast/appdata/farmos-pwa-dev
+          # CI-1: se verifica a través de current/ (lo que nginx sirve), no
+          # el TARGET raíz — ahí ya no vive index.html directamente.
+          TARGET=/mnt/fast/appdata/farmos-pwa-dev/current
           INDEX="$TARGET/index.html"
           test -f "$INDEX" || { echo "index.html ausente en $TARGET"; exit 1; }
 
@@ -144,7 +175,9 @@ jobs:
       - if: env.SKIP_DEPLOY != '1'
         name: Bump SW cache version (dev)
         run: |
-          SW_FILE=/mnt/fast/appdata/farmos-pwa-dev/sw.js
+          # Ruta a través del symlink `current` (CI-1): edita el archivo real
+          # dentro de releases/<version>/, que es lo que nginx sirve.
+          SW_FILE=/mnt/fast/appdata/farmos-pwa-dev/current/sw.js
           if [ -f "$SW_FILE" ]; then
             COMMIT_SHORT=$(git rev-parse --short HEAD)
             sed -i -E "s/chagra-[0-9a-z]+/chagra-dev-${COMMIT_SHORT}/" "$SW_FILE"

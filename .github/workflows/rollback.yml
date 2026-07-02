@@ -1,0 +1,111 @@
+name: Rollback Chagra PWA
+
+# CI-2 (2026-07-01): rollback manual, sub-segundo, sin rebuild. Re-apunta el
+# symlink TARGET/current a una release ya escrita en TARGET/releases/<v>/
+# (ver CI-1 en dev-deploy.yml / qa-deploy.yml / deploy.yml).
+#
+# CRÍTICO — depende de que nginx (guatoc-nixos, fuera de este repo) sirva
+# TARGET/current como root. Si ese cambio de infra aún no lo aplicó el
+# operador, este workflow reapunta el symlink correctamente pero nginx
+# sigue sirviendo el árbol viejo (sin efecto visible hasta que nginx se
+# actualice). CI-1 + el cambio de nginx se despliegan JUNTOS.
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Ambiente a revertir"
+        required: true
+        type: choice
+        options:
+          - dev
+          - qa
+          - prod
+      release:
+        description: "Release a la que volver (ej. 1.0.184 en prod, o abc1234 en dev/qa). Vacío = penúltima release disponible."
+        required: false
+        type: string
+
+concurrency:
+  # prod/qa comparten grupo con su deploy normal (deploy-chagra-prod /
+  # deploy-chagra-qa) para no correr rollback y deploy en simultáneo sobre
+  # el mismo TARGET. dev usa grupo propio: el deploy de dev serializa POR
+  # BRANCH (deploy-chagra-dev-<ref>), así que no hay un único grupo de deploy
+  # con el que cruzar — un rollback en dev igual queda serializado contra
+  # otros rollbacks de dev.
+  group: ${{ inputs.environment == 'prod' && 'deploy-chagra-prod' || inputs.environment == 'qa' && 'deploy-chagra-qa' || 'rollback-chagra-dev' }}
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    runs-on: [self-hosted, alpha]
+    timeout-minutes: 5
+    steps:
+      - name: Detect runner identity
+        # Mismo guard que dev-deploy.yml/qa-deploy.yml/deploy.yml: si GitHub
+        # asigna el job al claude-runner (sin acceso esperado a /mnt/fast),
+        # saltar todos los steps posteriores con success silencioso.
+        run: |
+          if echo "$HOME" | grep -q claude-runner; then
+            echo "::warning::Job matcheado al claude-runner ($HOME). Skipping (success). Re-ejecutar el workflow para forzar otro draw del runner."
+            echo "SKIP_DEPLOY=1" >> "$GITHUB_ENV"
+          else
+            echo "Runner OK ($HOME) — procediendo con rollback."
+          fi
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Resolver TARGET por ambiente
+        run: |
+          case "${{ inputs.environment }}" in
+            dev)  TARGET=/mnt/fast/appdata/farmos-pwa-dev ;;
+            qa)   TARGET=/mnt/fast/appdata/farmos-pwa-qa ;;
+            prod) TARGET=/mnt/fast/appdata/farmos-pwa ;;
+            *)
+              echo "::error::Ambiente desconocido: '${{ inputs.environment }}'"
+              exit 1
+              ;;
+          esac
+          echo "TARGET=$TARGET" >> "$GITHUB_ENV"
+          echo "Ambiente=${{ inputs.environment }} -> TARGET=$TARGET"
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Rollback (swap symlink current)
+        run: |
+          set -euo pipefail
+          if [ ! -d "$TARGET/releases" ]; then
+            echo "::error::No existe $TARGET/releases — este ambiente aún no tiene releases versionadas (CI-1 nunca corrió acá, o es la primera vez)."
+            exit 1
+          fi
+
+          cd "$TARGET/releases"
+          RELEASE_INPUT="${{ inputs.release }}"
+
+          if [ -n "$RELEASE_INPUT" ]; then
+            TARGET_RELEASE="$RELEASE_INPUT"
+            if [ ! -d "$TARGET_RELEASE" ]; then
+              echo "::error::Release '$TARGET_RELEASE' no existe en $TARGET/releases/. Disponibles:"
+              ls -1dt */ | sed 's#/$##'
+              exit 1
+            fi
+          else
+            # Default: penúltima release = la más reciente por mtime que NO
+            # sea la que 'current' apunta hoy.
+            CURRENT_RELEASE=$(readlink "$TARGET/current" 2>/dev/null | sed 's#^releases/##' || true)
+            TARGET_RELEASE=$(ls -1dt */ | sed 's#/$##' | grep -v -x "$CURRENT_RELEASE" | head -n 1 || true)
+            if [ -z "$TARGET_RELEASE" ]; then
+              echo "::error::No se encontró una release anterior para rollback automático (¿solo hay una release?). Especificá 'release' manualmente."
+              exit 1
+            fi
+            echo "Sin 'release' especificado -> penúltima release detectada: $TARGET_RELEASE (current hoy: ${CURRENT_RELEASE:-ninguna})"
+          fi
+
+          echo "Rollback ${{ inputs.environment }}: current -> releases/$TARGET_RELEASE"
+          ln -sfn "releases/$TARGET_RELEASE" "$TARGET/current"
+          echo "OK. current ahora apunta a releases/$TARGET_RELEASE"
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Verify rollback
+        run: |
+          test -f "$TARGET/current/index.html" || exit 1
+          HASH=$(sha256sum "$TARGET/current/index.html" | cut -d' ' -f1)
+          echo "Rollback OK (${{ inputs.environment }}): $(date -Iseconds) | current -> $(readlink "$TARGET/current") | index.html sha256: ${HASH:0:12}"
