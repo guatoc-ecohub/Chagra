@@ -221,7 +221,7 @@ function validateAmb10_companionsSymmetry(catalog) {
   return errors;
 }
 
-function validateAmb13_crossRefs(catalog, seedMode) {
+export function validateAmb13_crossRefs(catalog, seedMode) {
   const errors = [];
   const warnings = [];
   const speciesIds = new Set((catalog.species || []).map((s) => s.id));
