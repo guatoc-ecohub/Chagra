@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "bench": "rag-retrieve",
+  "date": "2026-07-02T04:50:55.948Z",
+  "model": "bm25-vs-hybrid",
+  "config": "recall",
+  "commit": "c0a0b336",
+  "metrics": {
+    "recall1_bm25": 14,
+    "recall1_hybrid": 42,
+    "recall3_bm25": 28,
+    "recall3_hybrid": 56,
+    "recall5_bm25": 40,
+    "recall5_hybrid": 64,
+    "mrr_bm25": 0.237,
+    "mrr_hybrid": 0.5033,
+    "recall_delta_pp": 24
+  },
+  "passCount": null,
+  "failCount": null,
+  "passPct": null,
+  "notes": "",
+  "seed": false
+}
