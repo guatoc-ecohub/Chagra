@@ -9,7 +9,7 @@ import { listFarmProcesses } from '../../db/farmProcessCache';
 import useAssetStore from '../../store/useAssetStore';
 import { buildFincaScene } from '../../services/fincaSceneService';
 import { selectSceneVariant, SCENE_KINDS } from '../../services/fincaSceneProfileSelector';
-import { getProfile, saveProfile } from '../../services/userProfileService';
+import { getProfile, saveProfile, getInvernaderoEstructura } from '../../services/userProfileService';
 import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciarAccess';
 import { deriveAtmosphere } from '../../services/atmosphereService';
 import { resolveClimaLocation, getCachedClimaSnapshot, CLIMA_UPDATED_EVENT } from '../../services/climaService';
@@ -170,6 +170,22 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
     } catch (_) {
       return null;
     }
+  }, []);
+
+  // ── Estructura de cubierta declarada en el perfil (#34 fase 1) ────────────
+  // Si el usuario declaró en el onboarding que su finca TIENE invernadero
+  // (invernadero_tiene='si' + invernadero_forma/tamano), la escena de finca lo
+  // DIBUJA (antes el dato se guardaba y la escena lo ignoraba — bug reportado
+  // por el operador). Reusa el getter tipado (fuente única, migración suave:
+  // perfil viejo → { tiene:false } y no se dibuja nada). El typeof protege los
+  // mocks de test que solo exportan getProfile (mismo criterio que saveProfile).
+  const estructuraFinca = useMemo(() => {
+    try {
+      if (typeof getInvernaderoEstructura === 'function') {
+        return getInvernaderoEstructura(getProfile());
+      }
+    } catch (_) { /* perfil opcional: sin estructura declarada */ }
+    return { tiene: false, forma: null, tamano: null };
   }, []);
 
   // El mockup F2 tiene 3 escenas: balcon / invernadero / finca. Las variantes
@@ -340,7 +356,14 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
                 <>
                   {escala === 'balcon' && <SceneBalcon poblada={poblada} cielo={atmosfera} />}
                   {escala === 'invernadero' && <SceneInvernadero poblada={poblada} cielo={atmosfera} />}
-                  {escala === 'finca' && <SceneFinca poblada={poblada} cielo={atmosfera} />}
+                  {escala === 'finca' && (
+                    <SceneFinca
+                      poblada={poblada}
+                      cielo={atmosfera}
+                      estructura={estructuraFinca}
+                      escalaFinca={variant?.escala}
+                    />
+                  )}
 
                   {/* fauna sobre la escena. El COLIBRÍ (criatura insignia del
                       agente) vuela SIEMPRE — es el guía, no ganado; acompaña
@@ -1419,12 +1442,20 @@ function SceneInvernadero({ poblada, cielo }) {
  * gallina, la vaca, la colmena, el guamo de sombra y los arbolitos del mockup
  * F2. El estado vacío es la versión "recién empieza" (terreno listo · 0 siembras).
  */
-function SceneFinca({ poblada, cielo }) {
+function SceneFinca({ poblada, cielo, estructura, escalaFinca }) {
   const noche = esNoche(cielo);
   const [cieloA, cieloB] = cieloEscena(cielo, 'finca');
+  // Estructura de cubierta declarada en el perfil (#34 fase 1): invernadero de
+  // túnel / nave a dos aguas / casa-sombra / malla-sombra / umbráculo. Se
+  // dibuja también con la finca vacía: la estructura EXISTE aunque no haya
+  // siembras registradas (es infraestructura declarada, no fenología).
+  const conEstructura = !!estructura?.tiene;
+  const ariaEstructura = conEstructura
+    ? ` Incluye su ${nombreEstructura(estructura.forma)}.`
+    : '';
   return (
     <svg viewBox="0 0 390 360" preserveAspectRatio="xMidYMid slice"
-      aria-label="Su finca vista en isométrico: milpa, hortaliza, estanque con pato, corral con cerdo, gallina, vaca y abejas, y un guamo de sombra al centro.">
+      aria-label={`Su finca vista en isométrico: milpa, hortaliza, estanque con pato, corral con cerdo, gallina, vaca y abejas, y un guamo de sombra al centro.${ariaEstructura}`}>
       <defs>
         <SolGrad />
         <linearGradient id="fvh-sky-f" x1="0" y1="0" x2="0" y2="1">
@@ -1442,6 +1473,10 @@ function SceneFinca({ poblada, cielo }) {
         </linearGradient>
         <pattern id="fvh-pasto-f" width="12" height="12" patternUnits="userSpaceOnUse">
           <path d="M3 9 q1 -4 0 -6 M6 10 q0 -5 1 -7 M9 9 q-1 -4 0 -6" stroke="#5f8a3f" strokeWidth="1" fill="none" opacity=".45" strokeLinecap="round" />
+        </pattern>
+        {/* trama de malla (polisombra) — la usan casa-sombra y malla-sombra */}
+        <pattern id="fvh-malla-f" width="4" height="4" patternUnits="userSpaceOnUse">
+          <path d="M0 0 L4 4 M4 0 L0 4" stroke="#425446" strokeWidth=".6" opacity=".5" fill="none" />
         </pattern>
         <filter id="fvh-soft-f" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.2" /></filter>
       </defs>
@@ -1520,6 +1555,21 @@ function SceneFinca({ poblada, cielo }) {
         <g fill="#ff9ec4"><circle cx="236" cy="250" r="1.8" /><circle cx="242" cy="253" r="1.4" /></g>
         <g fill="#e8e2d2" opacity=".8"><ellipse cx="176" cy="290" rx="3" ry="1.8" /><ellipse cx="216" cy="293" rx="2.4" ry="1.5" /></g>
       </g>
+
+      {/* ESTRUCTURA DE CUBIERTA DECLARADA (#34 fase 1 — bug del operador: el
+          perfil decía "tengo invernadero" y la escena no lo dibujaba). Se pinta
+          al fondo de la isla (banda superior libre, entre la milpa y la
+          hortaliza), ANTES de las parcelas para respetar la profundidad
+          isométrica. El tamaño acompaña la escala declarada de la finca:
+          en una finca extensa el invernadero se ve proporcionalmente menor. */}
+      {conEstructura && (
+        <EstructuraCubierta
+          forma={estructura.forma}
+          tamano={estructura.tamano}
+          escalaFinca={escalaFinca}
+          noche={noche}
+        />
+      )}
 
       {poblada ? (
         <>
@@ -1689,5 +1739,262 @@ function SceneFinca({ poblada, cielo }) {
       {/* veladura ámbar del sol bajo — tiñe TODA la escena al amanecer/atardecer */}
       <WashSolBajo cielo={cielo} />
     </svg>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  ESTRUCTURA DE CUBIERTA DECLARADA (#34 fase 1 — fix del bug del operador).
+//  El onboarding pregunta "¿Tiene invernadero?" + forma + tamaño y el dato se
+//  guardaba en el perfil… pero la escena de finca NUNCA lo dibujaba. Aquí vive
+//  el dibujo: una estructura SVG por forma declarada (rsvg-safe, sin filtros),
+//  con el tamaño relativo acompañando la escala de la finca. La fuente del dato
+//  es getInvernaderoEstructura(perfil) (userProfileService — fuente única).
+//
+//  Formas que este componente ya sabe dibujar:
+//    · tunel        → invernadero de túnel (media luna de plástico curvo).
+//    · cuadrado     → invernadero de nave a dos aguas.
+//    · casa_sombra  → casa-sombra (paredes y techo de malla anti-insectos).
+//    · malla_sombra → malla-sombra (polisombra plana sobre postes, sin paredes).
+//    · umbraculo    → umbráculo (techo de listones de madera sobre postes).
+//    · otro / null  → estructura cubierta genérica (media agua translúcida).
+//
+//  NOTA ONBOARDING: hoy la pregunta `invernadero_forma` solo ofrece
+//  cuadrado/tunel/otro. Para que el usuario declare casa-sombra, malla-sombra
+//  o umbráculo hay que AGREGAR esas opciones a PROFILE_QUESTIONS
+//  (userProfileService) — los valores ya son válidos en INVERNADERO_FORMAS y el
+//  render de cada una ya está listo aquí.
+// ════════════════════════════════════════════════════════════════════════════
+
+/** Nombre legible de cada forma (para el aria-label de la escena). */
+const ESTRUCTURA_NOMBRES = Object.freeze({
+  tunel: 'invernadero de túnel',
+  cuadrado: 'invernadero de nave a dos aguas',
+  casa_sombra: 'casa-sombra',
+  malla_sombra: 'malla-sombra',
+  umbraculo: 'umbráculo',
+});
+function nombreEstructura(forma) {
+  return ESTRUCTURA_NOMBRES[forma] || 'estructura cubierta';
+}
+
+/**
+ * Factor de tamaño de la estructura según la ESCALA declarada de la finca
+ * (SCENE_ESCALAS del selector): en una finca extensa el mismo invernadero se ve
+ * proporcionalmente menor que en una de menos de 1 ha. El texto libre de
+ * `invernadero_tamano` ("uno pequeño", "media hectárea") solo AFINA ese factor
+ * con una heurística mínima — nunca lo decide solo.
+ */
+const ESCALA_FACTOR_ESTRUCTURA = Object.freeze({
+  micro: 1,
+  pequena: 1,
+  media: 0.86,
+  grande: 0.74,
+  extensa: 0.64,
+});
+function factorEstructura(escalaFinca, tamano) {
+  let f = ESCALA_FACTOR_ESTRUCTURA[escalaFinca] ?? ESCALA_FACTOR_ESTRUCTURA.media;
+  if (typeof tamano === 'string') {
+    const t = tamano.toLowerCase();
+    if (/peque|chic/.test(t)) f *= 0.85;
+    else if (/grande|hect|nave/.test(t)) f *= 1.12;
+  }
+  return Math.round(f * 100) / 100;
+}
+
+/**
+ * La estructura de cubierta dentro de la escena de finca. Se ancla en la banda
+ * superior libre de la isla (entre la milpa y la hortaliza) y se dibuja ANTES
+ * de las parcelas para respetar la profundidad isométrica. `noche` solo la
+ * atenúa levemente (el resto de la escena maneja su propia paleta nocturna).
+ *
+ * @param {Object} props
+ * @param {string|null} props.forma       una de INVERNADERO_FORMAS (o null).
+ * @param {string|null} props.tamano      texto libre del onboarding.
+ * @param {string} [props.escalaFinca]    una de SCENE_ESCALAS (variant.escala).
+ * @param {boolean} [props.noche]         ¿la escena está en su paleta nocturna?
+ */
+function EstructuraCubierta({ forma, tamano, escalaFinca, noche }) {
+  const f = factorEstructura(escalaFinca, tamano);
+  // Compensa el scale para que el piso de la estructura no "flote": el punto de
+  // apoyo local está en y≈12, así que al encoger bajamos el ancla esa diferencia.
+  const ty = Math.round((191 + 12 * (1 - f)) * 10) / 10;
+  let cuerpo;
+  switch (forma) {
+    case 'tunel': cuerpo = <EstructuraTunel />; break;
+    case 'cuadrado': cuerpo = <EstructuraNave />; break;
+    case 'casa_sombra': cuerpo = <EstructuraCasaSombra />; break;
+    case 'malla_sombra': cuerpo = <EstructuraMallaSombra />; break;
+    case 'umbraculo': cuerpo = <EstructuraUmbraculo />; break;
+    default: cuerpo = <EstructuraGenerica />; // 'otro' o tiene=si sin forma declarada.
+  }
+  return (
+    <g
+      className="fvh-rise-svg"
+      style={{ animationDelay: '.12s' }}
+      transform={`translate(195 ${ty}) scale(${f})`}
+      opacity={noche ? 0.88 : 1}
+      data-testid="fvh-estructura"
+      data-forma={forma || 'generica'}
+    >
+      {cuerpo}
+    </g>
+  );
+}
+
+/** Invernadero de TÚNEL — media luna de plástico curvo (ej. el de Miguel). */
+function EstructuraTunel() {
+  return (
+    <g>
+      <ellipse cx="1" cy="13" rx="37" ry="7" fill="#1c2418" opacity=".18" />
+      {/* lomo de plástico curvo (media luna extruida) */}
+      <path d="M-34 12 Q-34 -15 -10 -17 L12 -17 Q36 -15 36 12 Z" fill="#cdeef0" opacity=".8" stroke="#9fd0d6" strokeWidth="1.6" />
+      {/* matas adentro, silueta a través del plástico */}
+      <g fill="#4ca35c" opacity=".5">
+        <circle cx="-16" cy="4" r="4.4" /><circle cx="-2" cy="5" r="4" />
+        <circle cx="12" cy="4" r="4.4" /><circle cx="24" cy="5" r="3.6" />
+      </g>
+      {/* costillas de los arcos */}
+      <g stroke="#eef9fa" strokeWidth="1.4" opacity=".85">
+        <line x1="-20" y1="12" x2="-20" y2="-13" />
+        <line x1="-4" y1="12" x2="-4" y2="-16" />
+        <line x1="12" y1="12" x2="12" y2="-16" />
+        <line x1="26" y1="12" x2="26" y2="-11" />
+      </g>
+      {/* brillo del lomo */}
+      <path d="M-30 -6 Q-10 -19 14 -14" stroke="#f2fbfc" strokeWidth="1.6" opacity=".7" fill="none" strokeLinecap="round" />
+      {/* boca del túnel (entrada abierta) */}
+      <path d="M-30 12 Q-30 -4 -21 -5 Q-12 -4 -12 12 Z" fill="#41604b" opacity=".8" />
+    </g>
+  );
+}
+
+/** Invernadero CUADRADO — nave a dos aguas con paredes translúcidas. */
+function EstructuraNave() {
+  return (
+    <g>
+      <ellipse cx="0" cy="14" rx="36" ry="7" fill="#1c2418" opacity=".18" />
+      {/* pared lateral que recede */}
+      <polygon points="-2,12 -2,-8 -30,-21 -30,-1" fill="#bfe4e9" opacity=".78" stroke="#9fd0d6" strokeWidth="1.2" />
+      {/* matas tras el plástico de la pared lateral */}
+      <g fill="#4ca35c" opacity=".45">
+        <circle cx="-12" cy="-1" r="3.4" /><circle cx="-21" cy="-6" r="3" />
+      </g>
+      {/* plano del techo (dos aguas, cae hacia el fondo) */}
+      <polygon points="14,-20 -14,-33 -30,-21 -2,-8" fill="#e8f7f8" opacity=".9" stroke="#9fd0d6" strokeWidth="1.2" />
+      <line x1="14" y1="-20" x2="-14" y2="-33" stroke="#f6fcfc" strokeWidth="1.6" opacity=".8" />
+      {/* frente con hastial */}
+      <polygon points="-2,12 -2,-8 14,-20 30,-8 30,12" fill="#dff2f4" opacity=".88" stroke="#9fd0d6" strokeWidth="1.4" />
+      <circle cx="0" cy="4" r="3.6" fill="#4ca35c" opacity=".45" />
+      {/* puerta */}
+      <rect x="8" y="-1" width="12" height="13" rx="1.5" fill="#55705c" opacity=".85" />
+    </g>
+  );
+}
+
+/** CASA-SOMBRA — casa de malla anti-insectos (paredes y techo de trama). */
+function EstructuraCasaSombra() {
+  return (
+    <g>
+      <ellipse cx="0" cy="14" rx="34" ry="6.5" fill="#1c2418" opacity=".18" />
+      {/* pared lateral de malla */}
+      <polygon points="-2,12 -2,-6 -30,-19 -30,1" fill="#eef2e6" opacity=".5" stroke="#8aa08e" strokeWidth="1.2" />
+      <polygon points="-2,12 -2,-6 -30,-19 -30,1" fill="url(#fvh-malla-f)" />
+      {/* matas visibles a través de la malla */}
+      <g fill="#4ca35c" opacity=".4">
+        <circle cx="-12" cy="0" r="3.4" /><circle cx="-21" cy="-5" r="3" />
+      </g>
+      {/* techo de malla (dos aguas suave) */}
+      <polygon points="12,-16 -16,-29 -30,-19 -2,-6" fill="#eef2e6" opacity=".55" stroke="#8aa08e" strokeWidth="1.2" />
+      <polygon points="12,-16 -16,-29 -30,-19 -2,-6" fill="url(#fvh-malla-f)" />
+      {/* frente de malla con hastial */}
+      <polygon points="-2,12 -2,-6 12,-16 26,-6 26,12" fill="#eef2e6" opacity=".5" stroke="#8aa08e" strokeWidth="1.4" />
+      <polygon points="-2,12 -2,-6 12,-16 26,-6 26,12" fill="url(#fvh-malla-f)" />
+      <circle cx="2" cy="4" r="3.4" fill="#4ca35c" opacity=".4" />
+      {/* marcos de madera de las esquinas */}
+      <g stroke="#7a5230" strokeWidth="2" strokeLinecap="round">
+        <line x1="-2" y1="12" x2="-2" y2="-6" /><line x1="26" y1="12" x2="26" y2="-6" />
+      </g>
+      {/* puerta de malla (paño más denso) */}
+      <rect x="7" y="0" width="11" height="12" rx="1.5" fill="#4e5f52" opacity=".8" />
+    </g>
+  );
+}
+
+/** MALLA-SOMBRA — polisombra plana sobre postes, sin paredes. */
+function EstructuraMallaSombra() {
+  return (
+    <g>
+      <ellipse cx="2" cy="13" rx="35" ry="6.5" fill="#1c2418" opacity=".18" />
+      {/* postes traseros (más cortos en pantalla: están más lejos) */}
+      <g stroke="#8a6038" strokeWidth="2.2" strokeLinecap="round">
+        <line x1="-20" y1="4" x2="-20" y2="-18" /><line x1="34" y1="4" x2="34" y2="-18" />
+      </g>
+      {/* matas bajo la sombra (sin paredes: se ven directo) */}
+      <g fill="#4ca35c" opacity=".8">
+        <circle cx="-20" cy="6" r="4" /><circle cx="-6" cy="8" r="4.4" />
+        <circle cx="8" cy="7" r="4" /><circle cx="22" cy="8" r="4.2" />
+      </g>
+      {/* paño de polisombra (leve pandeo al frente) */}
+      <polygon points="-30,-8 26,-8 34,-18 -22,-18" fill="#46584a" opacity=".55" stroke="#3b4a3f" strokeWidth="1" />
+      <polygon points="-30,-8 26,-8 34,-18 -22,-18" fill="url(#fvh-malla-f)" />
+      <path d="M-30 -8 Q-2 -4.5 26 -8" stroke="#3b4a3f" strokeWidth="1.2" opacity=".6" fill="none" />
+      {/* postes delanteros */}
+      <g stroke="#7a5230" strokeWidth="2.6" strokeLinecap="round">
+        <line x1="-30" y1="12" x2="-30" y2="-8" /><line x1="-2" y1="13" x2="-2" y2="-6" />
+        <line x1="26" y1="12" x2="26" y2="-8" />
+      </g>
+    </g>
+  );
+}
+
+/** UMBRÁCULO — techo de listones de madera sobre postes (sombra parcial). */
+function EstructuraUmbraculo() {
+  return (
+    <g>
+      <ellipse cx="2" cy="13" rx="35" ry="6.5" fill="#1c2418" opacity=".18" />
+      {/* postes traseros */}
+      <g stroke="#8a6038" strokeWidth="2.4" strokeLinecap="round">
+        <line x1="-20" y1="4" x2="-20" y2="-18" /><line x1="34" y1="4" x2="34" y2="-18" />
+      </g>
+      {/* matas bajo la sombra parcial */}
+      <g fill="#4ca35c" opacity=".85">
+        <circle cx="-18" cy="7" r="4.2" /><circle cx="-4" cy="8" r="4.4" />
+        <circle cx="10" cy="7" r="4" /><circle cx="23" cy="8" r="3.8" />
+      </g>
+      {/* plano del techo + listones */}
+      <polygon points="-30,-8 26,-8 34,-18 -22,-18" fill="#caa066" opacity=".3" stroke="#a8763e" strokeWidth="1.2" />
+      <g stroke="#a8763e" strokeWidth="2" strokeLinecap="round" opacity=".85">
+        <line x1="-26" y1="-9" x2="-19" y2="-17" /><line x1="-18" y1="-9" x2="-11" y2="-17" />
+        <line x1="-10" y1="-9" x2="-3" y2="-17" /><line x1="-2" y1="-9" x2="5" y2="-17" />
+        <line x1="6" y1="-9" x2="13" y2="-17" /><line x1="14" y1="-9" x2="21" y2="-17" />
+        <line x1="22" y1="-9" x2="29" y2="-17" />
+      </g>
+      {/* postes delanteros de madera */}
+      <g stroke="#7a5230" strokeWidth="3" strokeLinecap="round">
+        <line x1="-30" y1="12" x2="-30" y2="-8" /><line x1="-2" y1="13" x2="-2" y2="-6" />
+        <line x1="26" y1="12" x2="26" y2="-8" />
+      </g>
+    </g>
+  );
+}
+
+/** GENÉRICA ('otro' / sin forma) — cobertizo a un agua translúcido. */
+function EstructuraGenerica() {
+  return (
+    <g>
+      <ellipse cx="0" cy="14" rx="32" ry="6.5" fill="#1c2418" opacity=".18" />
+      {/* pared lateral derecha (recede hacia el fondo) */}
+      <polygon points="22,12 22,-8 30,-19 30,1" fill="#bfe4e9" opacity=".78" stroke="#9fd0d6" strokeWidth="1.2" />
+      {/* techo a un agua */}
+      <polygon points="-24,-8 22,-8 30,-19 -16,-19" fill="#e8f7f8" opacity=".9" stroke="#9fd0d6" strokeWidth="1.2" />
+      {/* frente translúcido */}
+      <polygon points="-24,12 -24,-8 22,-8 22,12" fill="#dff2f4" opacity=".85" stroke="#9fd0d6" strokeWidth="1.4" />
+      {/* matas tras el plástico */}
+      <g fill="#4ca35c" opacity=".45">
+        <circle cx="-16" cy="3" r="3.6" /><circle cx="12" cy="4" r="3.4" />
+      </g>
+      {/* puerta */}
+      <rect x="-6" y="-1" width="11" height="13" rx="1.5" fill="#55705c" opacity=".85" />
+    </g>
   );
 }
