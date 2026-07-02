@@ -28557,7 +28557,7 @@
       "titulo": "The Compost Tea Brewing Manual",
       "revista_o_editorial": "Soil Foodweb Inc.",
       "observaciones": "Fuente internacional; validada contra condiciones colombianas por AGROSAVIA 2015. _audit_note: publicación Soil Foodweb Inc. (Corvallis, OR); múltiples ediciones (2000, 2002, 2005) con ISBNs distintos — verificar edición específica usada en validación AGROSAVIA 2015.",
-      "tier": "A",
+      "tier": "B",
       "_url_pendiente": true,
       "_isbn_pendiente": true
     },
@@ -28634,7 +28634,7 @@
       "titulo": "El retamo espinoso: la plaga que amenaza los páramos colombianos",
       "url": "https://es.mongabay.com",
       "observaciones": "STUB — artículo periodístico, validar contra fuente primaria antes de citar en ministerial.",
-      "tier": "A"
+      "tier": "B"
     },
     {
       "id": "mujica-1992-quinua",
@@ -28643,7 +28643,7 @@
       "año": 1992,
       "titulo": "Revisión bibliográfica sobre el cultivo de la quinua (Chenopodium quinoa Willd.) y el amaranto (Amaranthus caudatus L.) en los Andes",
       "observaciones": "Publicación del Instituto Nacional de Investigaciones Agropecuarias (INIAP), Ecuador. Revisión exhaustiva de germoplasma, agronomía y usos tradicionales. _audit_note: buscar en repositorio.iniap.gob.ec o FAO ECOPORT (Mujica autor afiliado UNAP Puno + INIAP).",
-      "tier": "B",
+      "tier": "A",
       "_url_pendiente": true
     },
     {
@@ -28664,7 +28664,7 @@
       "titulo": "Papa criolla Grupo Phureja, manual de recomendaciones técnicas para Cundinamarca",
       "revista_o_editorial": "Editorial Universidad Nacional de Colombia",
       "isbn": "9789585054929",
-      "tier": "B"
+      "tier": "A"
     },
     {
       "id": "ocampo-solorza-2017",
@@ -28673,7 +28673,7 @@
       "año": 2017,
       "titulo": "Manejo de retamo espinoso (Ulex europaeus) en zonas altoandinas de Cundinamarca",
       "observaciones": "STUB migrado de v3.0 — revista y paginación pendientes. _audit_note: cita incompleta, requiere localizar revista (posibles candidatos: Colombia Forestal, Caldasia, boletín IAvH).",
-      "tier": "B",
+      "tier": "A",
       "_url_pendiente": true
     },
     {
@@ -28710,7 +28710,7 @@
       "volumen_numero": "26(3)",
       "paginas": "477-486",
       "observaciones": "_audit_note: Agronomía Colombiana revista UNAL — buscar artículo en revistas.unal.edu.co/index.php/agrocol por autor Pérez L. + año 2008.",
-      "tier": "B",
+      "tier": "A",
       "_url_pendiente": true
     },
     {
@@ -28775,7 +28775,7 @@
       "titulo": "Abonos orgánicos fermentados — experiencias de agricultores en Centroamérica y Brasil",
       "revista_o_editorial": "OIT",
       "observaciones": "_audit_note: publicación OIT/ILO en programa PROCMD Centroamérica; buscar en ilo.org/publns o catálogo OIT San José Costa Rica.",
-      "tier": "B",
+      "tier": "A",
       "_url_pendiente": true,
       "_isbn_pendiente": true
     },
@@ -28919,7 +28919,7 @@
       "titulo": "Natural Farming: Lactic Acid Bacteria / Fish Amino Acid / Fermented Plant Juice — Sustainable Agriculture factsheets",
       "institucion": "University of Hawaii — College of Tropical Agriculture and Human Resources (CTAHR)",
       "observaciones": "_audit_note: factsheet set publicado por CTAHR Sustainable Agriculture program (SA-7, SA-8, SA-9); URLs canónicas en repository.ctahr.hawaii.edu — requiere localizar handle específico por factsheet.",
-      "tier": "B",
+      "tier": "A",
       "_url_pendiente": true
     },
     {
