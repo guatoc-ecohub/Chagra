@@ -40,7 +40,7 @@ export default function SkeletonList({
         <div key={i} aria-hidden="true">
           {variant === 'row' ? (
             <div className="flex items-center gap-3 px-1 py-2.5">
-              <Skeleton variant="circle" width={32} ariaLabel="" />
+              <Skeleton variant="circle" width={32} height={32} ariaLabel="" />
               <div className="flex-1 space-y-1.5">
                 <Skeleton variant="line" width="55%" height={12} ariaLabel="" />
                 <Skeleton variant="line" width="35%" height={10} ariaLabel="" />

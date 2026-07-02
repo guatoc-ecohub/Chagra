@@ -51,17 +51,19 @@ const VARIANT_STYLES = {
   },
 };
 
+// Defaults undefined explícitos: props opcionales para el gate tsc:check
+// (sin default, la inferencia JS de tsc las marca requeridas en cada caller).
 export default function EmptyState({
   variant = 'empty',
   size = 'full',
-  icon,
-  illustration,
-  title,
-  description,
-  actionLabel,
-  onAction,
-  actionIcon,
-  secondaryHint,
+  icon = undefined,
+  illustration = undefined,
+  title = undefined,
+  description = undefined,
+  actionLabel = undefined,
+  onAction = undefined,
+  actionIcon = undefined,
+  secondaryHint = undefined,
   className = '',
   'data-testid': testId = 'empty-state',
 }) {
@@ -135,7 +137,7 @@ export default function EmptyState({
  * OfflineNotice — franja calmada para trabajo sin conexión (offline-first).
  * No es un error: es el modo normal de la app en el campo. Tono tranquilo.
  */
-export function OfflineNotice({ className = '', message, 'data-testid': testId = 'offline-notice' }) {
+export function OfflineNotice({ className = '', message = undefined, 'data-testid': testId = 'offline-notice' }) {
   return (
     <div
       role="status"
