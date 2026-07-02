@@ -38,6 +38,11 @@ import {
   buildAgriProductTypeEntities,
   validateAgriProductTypeEntity,
   validateAgriProductTypeEntities,
+  agriParcelRecordUrn,
+  buildAgriParcelRecordEntity,
+  buildAgriParcelRecordEntities,
+  validateAgriParcelRecordEntity,
+  validateAgriParcelRecordEntities,
 } from '../export-ngsi-ld.mjs';
 
 describe('agriCropUrn / agriPestUrn', () => {
@@ -1005,5 +1010,117 @@ describe('buildAgriProductTypeEntities — muestra real del catálogo OSS v3.2',
       expect(entity.category).toBeUndefined();
       expect(entity.agroVocConcept).toBeUndefined();
     }
+  });
+});
+
+// =============================================================================
+// AgriParcelRecord (ADR-051 fase 2, Anexo A fila AgriParcelRecord)
+// =============================================================================
+
+describe('AgriParcelRecord helpers', () => {
+  it('construye el URN AgriParcelRecord con prefijo canonico', () => {
+    expect(agriParcelRecordUrn('obs-123')).toBe('urn:ngsi-ld:AgriParcelRecord:obs-123');
+  });
+});
+
+describe('buildAgriParcelRecordEntity', () => {
+  const observation = {
+    id: 'obs-fdr-1',
+    type: 'log--observation',
+    attributes: {
+      name: 'FDR lote norte',
+      timestamp: '2026-05-04T12:30:00Z',
+      notes: { value: 'Registro FDR diario de suelo.', format: 'plain_text' },
+      geometry: 'POINT(-74.1 4.6)',
+      soilTemperature: 27.5,
+      soilMoistureVwc: '0.42',
+      soilMoistureEc: 1.8,
+      solarRadiation: 15,
+      relativeHumidity: 0.84,
+      leafWetness: 0.1,
+      atmosphericPressure: 1013.25,
+      depth: 20,
+    },
+    relationships: {
+      location: { data: [{ type: 'asset--land', id: 'urn:ngsi-ld:AgriParcel:lote-norte' }] },
+      device: { data: [{ type: 'device', id: 'urn:ngsi-ld:Device:fdr-01' }] },
+      sensor: { data: [{ type: 'device', id: 'urn:ngsi-ld:Device:fdr-02' }] },
+    },
+  };
+
+  it('mapea log--observation a AgriParcelRecord con geografia y medidas', () => {
+    const entity = buildAgriParcelRecordEntity(observation);
+
+    expect(entity.id).toBe('urn:ngsi-ld:AgriParcelRecord:obs-fdr-1');
+    expect(entity.type).toBe('AgriParcelRecord');
+    expect(entity.name).toEqual({ type: 'Property', value: 'FDR lote norte' });
+    expect(entity.description).toEqual({ type: 'Property', value: 'Registro FDR diario de suelo.' });
+    expect(entity.hasAgriParcel).toEqual({ type: 'Relationship', object: 'urn:ngsi-ld:AgriParcel:lote-norte' });
+    expect(entity.location).toEqual({
+      type: 'GeoProperty',
+      value: { type: 'Point', coordinates: [-74.1, 4.6] },
+    });
+    expect(entity.soilTemperature.value).toBe(27.5);
+    expect(entity.soilTemperature.observedAt).toBe('2026-05-04T12:30:00.000Z');
+    expect(entity.soilMoistureVwc.value).toBe(0.42);
+    expect(entity.hasDevice).toEqual({
+      type: 'Relationship',
+      object: ['urn:ngsi-ld:Device:fdr-01', 'urn:ngsi-ld:Device:fdr-02'],
+    });
+    expect(entity['@context']).toEqual(DEFAULT_CONTEXT);
+
+    const { valid, errors } = validateAgriParcelRecordEntity(entity);
+    expect(valid).toBe(true);
+    expect(errors).toEqual([]);
+  });
+
+  it('retorna null si falta location GeoJSON o hasAgriParcel', () => {
+    expect(buildAgriParcelRecordEntity({
+      id: 'obs-sin-geo',
+      type: 'log--observation',
+      attributes: { name: 'Sin geo' },
+      relationships: { location: { data: [{ type: 'asset--land', id: 'urn:ngsi-ld:AgriParcel:lote-x' }] } },
+    })).toBeNull();
+
+    expect(buildAgriParcelRecordEntity({
+      id: 'obs-sin-parcela',
+      type: 'log--observation',
+      attributes: { name: 'Sin parcela', geometry: 'POINT(-74.0 4.6)' },
+    })).toBeNull();
+  });
+});
+
+describe('buildAgriParcelRecordEntities', () => {
+  it('emite una entidad por observacion valida y reporta la omitida', () => {
+    const { entities, report } = buildAgriParcelRecordEntities({
+      logs: [
+        {
+          id: 'obs-ok',
+          type: 'log--observation',
+          attributes: {
+            name: 'Obs valida',
+            timestamp: '2026-05-04T12:30:00Z',
+            geometry: 'POINT(-74.1 4.6)',
+          },
+          relationships: {
+            location: { data: [{ type: 'asset--land', id: 'urn:ngsi-ld:AgriParcel:lote-norte' }] },
+          },
+        },
+        {
+          id: 'obs-missing-geo',
+          type: 'log--observation',
+          attributes: { name: 'Obs incompleta' },
+          relationships: {
+            location: { data: [{ type: 'asset--land', id: 'urn:ngsi-ld:AgriParcel:lote-norte' }] },
+          },
+        },
+      ],
+    });
+
+    expect(report.total).toBe(2);
+    expect(report.emitted).toBe(1);
+    expect(report.omitted).toHaveLength(1);
+    expect(entities).toHaveLength(1);
+    expect(validateAgriParcelRecordEntities(entities).valid).toBe(true);
   });
 });

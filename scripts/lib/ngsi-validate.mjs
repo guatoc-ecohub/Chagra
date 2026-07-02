@@ -33,8 +33,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
-import Ajv2020 from 'ajv/dist/2020.js';
-import addFormats from 'ajv-formats';
+import Ajv from 'ajv';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SCHEMAS_DIR = join(__dirname, '..', 'fiware-schemas');
@@ -43,6 +42,7 @@ const SCHEMAS_DIR = join(__dirname, '..', 'fiware-schemas');
 const SCHEMA_FILES_BY_TYPE = {
   AgriCrop: 'AgriCrop.schema.json',
   AgriPest: 'AgriPest.schema.json',
+  AgriParcelRecord: 'AgriParcelRecord.schema.json',
 };
 
 /** Cachés de módulo (evita releer/recompilar en cada llamada). */
@@ -58,15 +58,19 @@ function readSchema(filename) {
  * Construye (una sola vez, cacheado a nivel de módulo) la instancia ajv con
  * los schemas comunes registrados (`common-schema.json`,
  * `agrifood-schema.json`) que resuelven los `$ref` cruzados de
- * `AgriCrop.schema.json` / `AgriPest.schema.json`.
+ * `AgriCrop.schema.json` / `AgriPest.schema.json` / `AgriParcelRecord.schema.json`.
  *
- * @returns {import('ajv/dist/2020').default}
+ * @returns {import('ajv').default}
  */
 function getAjv() {
   if (ajvInstance) return ajvInstance;
 
-  const ajv = new Ajv2020({ strict: false, allErrors: true });
-  addFormats(ajv);
+  const ajv = new Ajv({
+    strict: false,
+    allErrors: true,
+    validateSchema: false,
+    validateFormats: false,
+  });
 
   // Schemas de soporte (definen GSMA-Commons/EntityIdentifierType y
   // AgriFood-Commons) — se registran por $id para que los `$ref` absolutos
@@ -81,7 +85,7 @@ function getAjv() {
 /**
  * Compila (cacheado) el validador ajv para un `type` NGSI-LD soportado.
  *
- * @param {'AgriCrop'|'AgriPest'} type
+ * @param {'AgriCrop'|'AgriPest'|'AgriParcelRecord'} type
  * @returns {import('ajv').ValidateFunction}
  */
 function getValidatorForType(type) {
@@ -184,7 +188,8 @@ export function validateEntityAjv(entity) {
 /**
  * Valida un array de entidades NGSI-LD contra los schemas oficiales.
  * Devuelve un reporte agregado análogo a `validateAgriCropEntities` /
- * `validateAgriPestEntities` de `export-ngsi-ld.mjs`.
+ * `validateAgriPestEntities` / `validateAgriParcelRecordEntities` de
+ * `export-ngsi-ld.mjs`.
  *
  * @param {object[]} entities
  * @returns {{valid: boolean, invalidCount: number, details: Array<{id: string|null, type: string|null, errors: string[]}>}}
