@@ -40,3 +40,11 @@ Sin estas cerradas, cada PR agrega inconsistencias que luego son costosas de cor
 3. Migrar las 80 spp actuales al schema v3 resuelto (ver `scripts/migrate-species-defaults-to-v3.ts`).
 4. Incorporar las especies curadas del seed v3.0 de Claude (papa criolla, aliso, ortiga, 3 páramo, 4 invasoras, 1 gremio-receta, 4 lab tests).
 5. Publicar guía para curadores externos en `CONTRIBUTING.md`.
+# AMB-10 Asymmetries Documented as Intentionally Asymmetric
+# These relationships are inherently directional and were removed from the forward species
+# 2026-07-02T07:45:04.566Z
+
+# cover crop → main crop (vicia_sativa as green manure before planting)
+pisum_sativum_andina → solanum_tuberosum: rotation (pea fixes N for subsequent potato crop)
+vicia_sativa → chenopodium_quinoa: vetch as winter cover before quinoa
+vicia_sativa → zea_mays: vetch as cover crop before corn
