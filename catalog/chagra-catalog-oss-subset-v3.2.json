@@ -1026,11 +1026,11 @@
       },
       "plagas_criticas": [
         "Hypothenemus hampei (broca)",
-        "Hemileia vastatrix (roya)",
         "Mycena citricolor"
       ],
       "enfermedades_criticas": [
-        "Cercospora coffeicola"
+        "Cercospora coffeicola",
+        "Hemileia vastatrix (roya)"
       ],
       "source_ids": [
         "cenicafe-manual-cafetero-2013",
@@ -3152,9 +3152,6 @@
       "antagonists": [
         "juglans_neotropica"
       ],
-      "enfermedades_criticas": [
-        "Trozador (Agrotis ipsilon)"
-      ],
       "tracking_mode": "aggregate",
       "cultivar": false,
       "feeding_plan_template": {
@@ -3211,7 +3208,10 @@
           }
         ],
         "derived_from": "solanum_lycopersicum_san_marzano"
-      }
+      },
+      "plagas_criticas": [
+        "Trozador (Agrotis ipsilon)"
+      ]
     },
     {
       "id": "solanum_lycopersicum_san_marzano",
@@ -3343,11 +3343,11 @@
       },
       "plagas_criticas": [
         "Trps",
-        "Heliothis"
+        "Heliothis",
+        "Trozador (Agrotis ipsilon)"
       ],
       "enfermedades_criticas": [
-        "Podredumbre apical (Blossom end rot)",
-        "Trozador (Agrotis ipsilon)"
+        "Podredumbre apical (Blossom end rot)"
       ],
       "source_ids": [
         "gbif-taxonomic-backbone",
@@ -3406,9 +3406,6 @@
       "antagonists": [
         "juglans_neotropica"
       ],
-      "enfermedades_criticas": [
-        "Trozador (Agrotis ipsilon)"
-      ],
       "tracking_mode": "aggregate",
       "cultivar": false,
       "feeding_plan_template": {
@@ -3465,7 +3462,10 @@
           }
         ],
         "derived_from": "solanum_lycopersicum_san_marzano"
-      }
+      },
+      "plagas_criticas": [
+        "Trozador (Agrotis ipsilon)"
+      ]
     },
     {
       "id": "solanum_phureja",
@@ -3517,9 +3517,6 @@
       "antagonists": [
         "solanum_lycopersicum_san_marzano",
         "solanum_melongena"
-      ],
-      "enfermedades_criticas": [
-        "Trozador (Agrotis ipsilon)"
       ],
       "tracking_mode": "aggregate",
       "variedades_registradas_ica": [
@@ -3648,6 +3645,9 @@
       "nombre_comunes_regionales": [
         "papa amarilla",
         "papa criolla colombiana"
+      ],
+      "plagas_criticas": [
+        "Trozador (Agrotis ipsilon)"
       ]
     },
     {
@@ -4728,9 +4728,6 @@
         "powo-kew"
       ],
       "valor_pedagogico": "La papa Sabanera (Solanum tuberosum L. variedad Sabanera) es una variedad colombiana de papa de gran adaptación al altiplano cundiboyacense, desarrollada y registrada por ICA y AGROSAVIA. Se cultiva en Cundinamarca (Mosquera, Bojacá, Soacha), Boyacá (Tunja, Ventaquemada, Toca) y Nariño entre 2.500 y 3.200 msnm en zona térmica fría. Ciclo vegetativo 5-6 meses, rendimientos comerciales 25-35 t/ha. Tubérculo grande oblongo con piel crema y carne amarilla suave. Susceptible a Phytophthora infestans (tizón tardío); manejo agroecológico incluye rotación trienal con leguminosas (haba, arveja andina), siembra escalonada, manejo de inóculo de papa-volunta, biopreparados como caldo bordelés y trichoderma. Fuentes Tier A: AGROSAVIA fichas papa, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy, Bernal et al. Catálogo Plantas y Líquenes Colombia.",
-      "enfermedades_criticas": [
-        "Trozador (Agrotis ipsilon)"
-      ],
       "tracking_mode": "aggregate",
       "companions": [
         "allium_cepa",
@@ -4748,7 +4745,10 @@
         "solanum_melongena",
         "spinacia_oleracea"
       ],
-      "cultivar": false
+      "cultivar": false,
+      "plagas_criticas": [
+        "Trozador (Agrotis ipsilon)"
+      ]
     },
     {
       "id": "smallanthus_sonchifolius",
@@ -12848,12 +12848,12 @@
       ],
       "_nota_companions": "Asocio papa-arveja (DR Gemini): la papa es tutor físico de la arveja (evita volcamiento); ~21.000 ha/año, 65% de productores del altiplano.",
       "enfermedades_criticas": [
-        "Phytophthora infestans",
-        "Trozador (Agrotis ipsilon)"
+        "Phytophthora infestans"
       ],
       "plagas_criticas": [
         "Tecia solanivora",
-        "Phyllophaga spp."
+        "Phyllophaga spp.",
+        "Trozador (Agrotis ipsilon)"
       ],
       "feeding_plan_template": {
         "source": "Agrosavia Manual tuberculos andinos (2017) + Perez-Rodriguez-Gomez (2008). Paridad base-variedad para papa; detalle operativo vive en variedades comerciales.",
