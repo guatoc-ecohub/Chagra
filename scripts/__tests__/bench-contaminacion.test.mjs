@@ -38,6 +38,7 @@ import {
   summarizeContamination,
   runOnAlpha,
   sidecarReachableLocally,
+  generateMarkdownReport,
 } from '../bench-contaminacion.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -525,6 +526,51 @@ describe('sidecarReachableLocally', () => {
   it('devuelve false si fetch falla (sin sidecar local — caso normal en stg)', async () => {
     const reachable = await sidecarReachableLocally({ url: 'http://127.0.0.1:1/healthz', timeoutMs: 300 });
     expect(reachable).toBe(false);
+  });
+});
+
+// ── generateMarkdownReport ─────────────────────────────────────────────────
+
+describe('generateMarkdownReport (reporte .md para ops/rebench-mensual.sh)', () => {
+  const summary = {
+    generated_at: '2026-07-02T00:00:00.000Z',
+    model: 'granite3.3:8b',
+    catalog: 'catalog/chagra-catalog-oss-subset-v3.2.json',
+    total_probes: 10,
+    total_run_ok: 10,
+    total_errors: 0,
+    total_judged: 10,
+    total_unjudged: 0,
+    total_contaminated: 3,
+    contamination_rate_pct: 30,
+    by_type: { cross_crop: { total: 5, contaminated: 2, rate_pct: 40 } },
+    worst_cases: [
+      { id: 'c1', type: 'cross_crop', category: 'cross_crop', subject: 'S1', query: 'q1', response: 'r1', explanation: 'mezcla info' },
+    ],
+  };
+
+  it('incluye la tasa de contaminación y el modelo evaluado', () => {
+    const md = generateMarkdownReport(summary);
+    expect(md).toMatch(/30%/);
+    expect(md).toMatch(/granite3\.3:8b/);
+  });
+
+  it('incluye la tabla por tipo de sonda', () => {
+    const md = generateMarkdownReport(summary);
+    expect(md).toMatch(/cross_crop/);
+    expect(md).toMatch(/40%/);
+  });
+
+  it('incluye los peores casos con pregunta/respuesta/explicación', () => {
+    const md = generateMarkdownReport(summary);
+    expect(md).toMatch(/q1/);
+    expect(md).toMatch(/r1/);
+    expect(md).toMatch(/mezcla info/);
+  });
+
+  it('sin peores casos → dice explícitamente que no hubo contaminación (no revienta)', () => {
+    const md = generateMarkdownReport({ ...summary, worst_cases: [] });
+    expect(md).toMatch(/ninguno/i);
   });
 });
 

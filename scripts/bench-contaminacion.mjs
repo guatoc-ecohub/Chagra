@@ -855,6 +855,57 @@ export async function sidecarReachableLocally({ url = `${SIDECAR_URL}/healthz`, 
   }
 }
 
+/**
+ * generateMarkdownReport — arma el reporte .md legible por humanos (mismo
+ * espíritu que `audit-contaminacion.mjs --write-report`, para que
+ * `ops/rebench-mensual.sh` en Chagra-strategy pueda escribir ambos reportes
+ * mensuales con el mismo patrón). PURA.
+ * @param {object} summary  salida de summarizeContamination (+ model/catalog/generated_at)
+ * @returns {string}
+ */
+export function generateMarkdownReport(summary) {
+  const lines = [];
+  lines.push('# Auditoría de contaminación del AGENTE — bench-contaminacion.mjs');
+  lines.push('');
+  lines.push(`Generado: ${summary.generated_at || new Date().toISOString()}`);
+  lines.push('');
+  lines.push(`Modelo evaluado: \`${summary.model || 'desconocido'}\`. Catálogo: \`${summary.catalog || 'desconocido'}\`.`);
+  lines.push('');
+  lines.push('Script: `scripts/bench-contaminacion.mjs` (repo `chagra`). Sondas dinámicas derivadas de `catalog/*.json` real + 3 sondas fijas curadas. Juez: `claude-code -p` (suscripción, batch secuencial). NO modifica catálogo, grafo ni prod — es de solo lectura/medición.');
+  lines.push('');
+  lines.push('## Resumen');
+  lines.push('');
+  lines.push(`- Sondas totales: **${summary.total_probes}**`);
+  lines.push(`- Corridas OK: ${summary.total_run_ok} · Errores de pipeline: ${summary.total_errors}`);
+  lines.push(`- Juzgadas: ${summary.total_judged} · Sin juzgar: ${summary.total_unjudged}`);
+  lines.push(`- **Tasa de contaminación: ${summary.contamination_rate_pct}%** (${summary.total_contaminated}/${summary.total_judged} juzgadas)`);
+  lines.push('');
+  lines.push('## Por tipo de sonda');
+  lines.push('');
+  lines.push('| Tipo | Contaminadas | Total | Tasa |');
+  lines.push('|---|---:|---:|---:|');
+  for (const [t, v] of Object.entries(summary.by_type || {})) {
+    lines.push(`| ${t} | ${v.contaminated} | ${v.total} | ${v.rate_pct}% |`);
+  }
+  lines.push('');
+  lines.push('## Peores casos');
+  lines.push('');
+  if (!summary.worst_cases || summary.worst_cases.length === 0) {
+    lines.push('(ninguno — sin contaminación detectada en esta corrida)');
+  } else {
+    for (const w of summary.worst_cases) {
+      lines.push(`### ${w.id} (${w.type} / ${w.category})`);
+      lines.push('');
+      lines.push(`- **Sujeto**: ${w.subject || '(sin dato)'}`);
+      lines.push(`- **Pregunta**: ${w.query}`);
+      lines.push(`- **Respuesta del agente**: ${w.response}`);
+      lines.push(`- **Por qué contaminó**: ${w.explanation || '(sin explicación del juez)'}`);
+      lines.push('');
+    }
+  }
+  return lines.join('\n');
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // 9) CLI
 // ═══════════════════════════════════════════════════════════════════════════
@@ -969,10 +1020,17 @@ async function main() {
     });
     const jsonlPath = join(BENCH_RUNS_DIR, `contaminacion-${ts}.judged.jsonl`);
     const summaryPath = join(BENCH_RUNS_DIR, `contaminacion-${ts}.summary.json`);
+    const fullSummary = { ...summary, model: argVal('--model', DEFAULT_PROD_MODEL), generated_at: new Date().toISOString() };
     writeFileSync(jsonlPath, judged.map((r) => JSON.stringify(r)).join('\n') + '\n');
-    writeFileSync(summaryPath, JSON.stringify(summary, null, 2) + '\n');
+    writeFileSync(summaryPath, JSON.stringify(fullSummary, null, 2) + '\n');
     console.log(`[judge] escrito: ${jsonlPath}`);
     console.log(`[judge] escrito: ${summaryPath}`);
+    const reportPath = argVal('--write-report');
+    if (reportPath) {
+      mkdirSync(dirname(reportPath), { recursive: true });
+      writeFileSync(reportPath, generateMarkdownReport(fullSummary));
+      console.log(`[judge] reporte .md escrito: ${reportPath}`);
+    }
     return;
   }
 
@@ -1010,8 +1068,9 @@ async function main() {
 
   const judgedPath = join(BENCH_RUNS_DIR, `contaminacion-${ts}.judged.jsonl`);
   const summaryPath = join(BENCH_RUNS_DIR, `contaminacion-${ts}.summary.json`);
+  const fullSummary = { ...summary, model, catalog: set.catalog_path, generated_at: set.generated_at };
   writeFileSync(judgedPath, judged.map((r) => JSON.stringify(r)).join('\n') + '\n');
-  writeFileSync(summaryPath, JSON.stringify({ ...summary, model, catalog: set.catalog_path, generated_at: set.generated_at }, null, 2) + '\n');
+  writeFileSync(summaryPath, JSON.stringify(fullSummary, null, 2) + '\n');
 
   console.log('\n══════════════════════════════════════════════════════════════════');
   console.log(`TASA DE CONTAMINACIÓN: ${summary.contamination_rate_pct}%  (${summary.total_contaminated}/${summary.total_judged} juzgados, ${summary.total_errors} errores, ${summary.total_unjudged} sin juzgar)`);
@@ -1023,6 +1082,13 @@ async function main() {
   console.log(`Crudo:    ${rawJsonlPath}`);
   console.log(`Juzgado:  ${judgedPath}`);
   console.log(`Summary:  ${summaryPath}`);
+
+  const reportPath = argVal('--write-report');
+  if (reportPath) {
+    mkdirSync(dirname(reportPath), { recursive: true });
+    writeFileSync(reportPath, generateMarkdownReport(fullSummary));
+    console.log(`Reporte:  ${reportPath}`);
+  }
   console.log('══════════════════════════════════════════════════════════════════');
 }
 
