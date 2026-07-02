@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Sprout, AlertTriangle, CheckCircle, ChevronDown, ChevronUp, Bug, Wrench } from 'lucide-react';
+import { Sprout, AlertTriangle, ChevronDown, ChevronUp, Bug, Wrench } from 'lucide-react';
+import EtapaCicloIcon from '../icons/EtapaCicloIcon.jsx';
 import { GUIAS_DEMO } from '../../data/aprendizaje/guias-demo.js';
 
 /**
@@ -56,17 +57,6 @@ export default function GuiaEspecieCards({ especie = 'papa', etapas: etapasProp 
     return colors[orden - 1] || colors[colors.length - 1];
   };
 
-  const getEtapaIcon = (orden) => {
-    const icons = [
-      <Sprout size={16} />,    // Germinación
-      <Sprout size={16} />,    // Vegetativo
-      <CheckCircle size={16} />, // Floración
-      <CheckCircle size={16} />, // Fructificación
-      <CheckCircle size={16} />, // Cosecha
-      <CheckCircle size={16} />  // Producto
-    ];
-    return icons[orden - 1] || icons[icons.length - 1];
-  };
 
   return (
     <div
@@ -107,8 +97,12 @@ export default function GuiaEspecieCards({ especie = 'papa', etapas: etapasProp 
               {/* Header de la tarjeta */}
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div className="flex items-center gap-2">
-                  <div className={`p-1.5 rounded-lg ${getEtapaColor(etapa.orden)}`}>
-                    {getEtapaIcon(etapa.orden)}
+                  <div className={`p-1.5 rounded-lg border ${getEtapaColor(etapa.orden)}`}>
+                    {/* Icono distinto POR etapa (set compartido EtapaCicloIcon):
+                        germina=Sprout, crece=Leaf, florece=Flower2, fruto=Apple,
+                        cosecha=Basket, producto=Package — antes eran Sprout y
+                        CheckCircle repetidos y no se distinguían a 16px. */}
+                    <EtapaCicloIcon nombre={etapa.nombre} size={16} />
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-slate-100">

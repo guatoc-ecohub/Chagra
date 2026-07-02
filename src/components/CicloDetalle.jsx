@@ -2,6 +2,7 @@
  * src/config/messages.js (ADR-050 i18n) fuera del alcance de este fix. */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Sprout, FlaskConical, AlertTriangle } from 'lucide-react';
+import EtapaCicloIcon from './icons/EtapaCicloIcon.jsx';
 import FarmProcessSummary from './FarmProcessSummary';
 import PhenologyTimeline from './PhenologyTimeline';
 import PerennialCycleView from './PerennialCycleView';
@@ -202,7 +203,13 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
       {/* Etapa actual + confirmar cambio (stageConfirmationService) */}
       <section className="bg-slate-900 border border-slate-800 rounded-xl p-3">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-sm text-slate-300">Etapa: <strong className="text-emerald-400">{speciesStageLabel(displayStage)}</strong></span>
+          <span className="text-sm text-slate-300 inline-flex items-center gap-1.5">
+            Etapa:
+            <strong className="text-emerald-400 inline-flex items-center gap-1">
+              <EtapaCicloIcon code={displayStage} nombre={speciesStageLabel(displayStage)} size={14} />
+              {speciesStageLabel(displayStage)}
+            </strong>
+          </span>
           <button
             type="button"
             onClick={() => setPickStage((o) => !o)}
@@ -220,8 +227,11 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
                 disabled={busy}
                 onClick={() => handleStage(s)}
                 aria-label={`Confirmar etapa ${speciesStageLabel(s)}`}
-                className="text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 disabled:opacity-50"
+                className="text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 disabled:opacity-50 inline-flex items-center gap-1.5"
               >
+                {/* Glifo por etapa (set compartido): el selector se escanea
+                    por icono, no solo leyendo cada chip. */}
+                <EtapaCicloIcon code={s} nombre={speciesStageLabel(s)} size={13} className="text-emerald-400/90" />
                 {speciesStageLabel(s)}
               </button>
             ))}
