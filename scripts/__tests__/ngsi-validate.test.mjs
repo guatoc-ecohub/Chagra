@@ -21,6 +21,7 @@ import {
 import {
   buildAgriCropEntity,
   buildAgriPestEntity,
+  buildAgriParcelRecordEntity,
 } from '../export-ngsi-ld.mjs';
 
 describe('toSimplifiedEntity', () => {
@@ -117,6 +118,41 @@ describe('validateEntityAjv — AgriPest', () => {
     const { valid, errors } = validateEntityAjv({
       type: 'AgriPest',
       name: { type: 'Property', value: 'roya' },
+    });
+    expect(valid).toBe(false);
+    expect(errors.length).toBeGreaterThan(0);
+  });
+});
+
+describe('validateEntityAjv — AgriParcelRecord', () => {
+  it('valida OK una entidad AgriParcelRecord bien formada', () => {
+    const entity = buildAgriParcelRecordEntity({
+      id: 'obs-fdr-1',
+      type: 'log--observation',
+      attributes: {
+        name: 'FDR lote norte',
+        timestamp: '2026-05-04T12:30:00Z',
+        geometry: 'POINT(-74.1 4.6)',
+        soilTemperature: 27.5,
+        soilMoistureVwc: 0.42,
+      },
+      relationships: {
+        location: { data: [{ type: 'asset--land', id: 'urn:ngsi-ld:AgriParcel:lote-norte' }] },
+      },
+    });
+
+    const { valid, errors } = validateEntityAjv(entity);
+    expect(valid).toBe(true);
+    expect(errors).toEqual([]);
+  });
+
+  it('rechaza una entidad AgriParcelRecord malformada sin location', () => {
+    const { valid, errors } = validateEntityAjv({
+      id: 'urn:ngsi-ld:AgriParcelRecord:obs',
+      type: 'AgriParcelRecord',
+      name: { type: 'Property', value: 'x' },
+      hasAgriParcel: { type: 'Relationship', object: 'urn:ngsi-ld:AgriParcel:lote' },
+      '@context': ['https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld'],
     });
     expect(valid).toBe(false);
     expect(errors.length).toBeGreaterThan(0);

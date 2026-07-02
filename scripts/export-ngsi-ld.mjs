@@ -4,10 +4,11 @@
  *
  * ADR-051 (FIWARE Smart Data Models como capa de interoperabilidad NGSI-LD),
  * Fase 1: lee el catálogo público (`catalog/chagra-catalog-oss-subset-v3.2.json`)
- * y emite entidades **NGSI-LD `AgriCrop`**, **`AgriPest`** y
- * **`AgriProductType`** (Smart Data Models — Smart AgriFood) para cada
- * `species` cultivable, cada plaga referenciada en
- * `species.plagas_criticas[]`, y cada `biopreparado` del catálogo.
+ * y emite entidades **NGSI-LD `AgriCrop`**, **`AgriPest`**,
+ * **`AgriProductType`** y **`AgriParcelRecord`** (Smart Data Models —
+ * Smart AgriFood) para cada `species` cultivable, cada plaga referenciada
+ * en `species.plagas_criticas[]`, cada `biopreparado` del catálogo y cada
+ * `log--observation` derivable.
  *
  * Análogo de `scripts/catalog-to-age.mjs`: función pura + CLI delgado. NO
  * toca red ni base de datos — es un export offline, no un cliente de un
@@ -46,6 +47,21 @@
  *     documentado en el Anexo A de ADR-051; Chagra no modela jerarquía entre
  *     biopreparados hoy, y `root` es booleano derivado de esa jerarquía —
  *     no se inventa un valor).
+ *
+ * Mapeo AgriParcelRecord (Anexo A de ADR-051, fila AgriParcelRecord):
+ *   - `log.id`                       -> id (`urn:ngsi-ld:AgriParcelRecord:<id>`)
+ *   - `log.attributes.name`          -> name
+ *   - `log.attributes.notes`         -> description (cuando existe)
+ *   - `log.relationships.location`   -> hasAgriParcel
+ *   - `log.attributes.geometry` / `log.location` -> location (GeoProperty)
+ *   - `soilTemperature` / `soilMoistureVwc` / `soilMoistureEc` /
+ *     `solarRadiation` / `soilSalinity` / `relativeHumidity` /
+ *     `leafWetness` / `leafRelativeHumidity` / `leafTemperature` /
+ *     `atmosphericPressure` / `depth` -> propiedades homónimas si existen
+ *   - `log.relationships.device` / `hasDevice` / `sensor` -> hasDevice
+ *
+ * La entidad solo se emite cuando hay un parcel id y una ubicación GeoJSON
+ * derivable. No se inventan coordenadas ni referencias a parcela.
  *
  * NOTA DE PROVENIENCIA (verificado 2026-07-01): el catálogo público
  * (`chagra-catalog-oss-subset-v3.2.json`) solo trae `plagas_criticas[]` como
@@ -98,7 +114,7 @@
  *
  * Validación de conformidad NGSI-LD (ADR-051 fase 1, ítem CI): además de la
  * validación estructural propia (`validateAgriCropEntity`/
- * `validateAgriPestEntity`), `main()` corre `validateEntitiesAjv` (ver
+ * `validateAgriPestEntity`/`validateAgriParcelRecordEntity`), `main()` corre `validateEntitiesAjv` (ver
  * `scripts/lib/ngsi-validate.mjs`) contra los JSON Schema **oficiales** de
  * `smart-data-models/dataModel.Agrifood` vendorizados en
  * `scripts/fiware-schemas/`. Si cualquiera de las dos capas falla, el
@@ -111,6 +127,7 @@ import { resolve } from 'node:path';
 
 import { normalizePest, classifyBiopreparadoTarget, truncText } from './catalog-to-age.mjs';
 import { validateEntitiesAjv } from './lib/ngsi-validate.mjs';
+import { wktToGeoJson } from '../src/utils/geo.js';
 
 // =============================================================================
 // Contexto NGSI-LD
@@ -173,6 +190,309 @@ export function ngsiProperty(value) {
  */
 export function ngsiRelationship(objectUrn) {
   return { type: 'Relationship', object: objectUrn };
+}
+
+/**
+ * Construye un atributo NGSI-LD `Relationship` apuntando a varios objetos.
+ *
+ * @param {string[]} objectUrns
+ * @returns {{type:'Relationship', object: string[]}}
+ */
+export function ngsiRelationshipMany(objectUrns) {
+  return { type: 'Relationship', object: objectUrns };
+}
+
+/**
+ * Normaliza un valor temporal a ISO-8601 si es posible.
+ *
+ * @param {string|number|Date|null|undefined} value
+ * @returns {string|null}
+ */
+export function normalizeDateTime(value) {
+  if (value === null || value === undefined || value === '') return null;
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : value.toISOString();
+  }
+  if (typeof value === 'number') {
+    const ms = value < 1e12 ? value * 1000 : value;
+    const date = new Date(ms);
+    return Number.isNaN(date.getTime()) ? null : date.toISOString();
+  }
+  const str = String(value).trim();
+  if (!str) return null;
+  const date = new Date(str);
+  return Number.isNaN(date.getTime()) ? str : date.toISOString();
+}
+
+/**
+ * Envuelve un valor en `Property` y agrega `observedAt` si existe.
+ *
+ * @param {unknown} value
+ * @param {string|null} [observedAt]
+ * @param {Record<string, unknown>} [extra]
+ * @returns {{type:'Property', value: unknown, observedAt?: string}|null}
+ */
+export function ngsiObservedProperty(value, observedAt = null, extra = {}) {
+  const prop = ngsiProperty(value);
+  if (!prop) return null;
+  if (observedAt) prop.observedAt = observedAt;
+  return { ...prop, ...extra };
+}
+
+/**
+ * Construye el URN NGSI-LD para una entidad AgriParcelRecord.
+ *
+ * @param {string} logId
+ * @returns {string}
+ */
+export function agriParcelRecordUrn(logId) {
+  return `urn:ngsi-ld:AgriParcelRecord:${String(logId).trim()}`;
+}
+
+function firstNonEmptyString(...values) {
+  for (const value of values) {
+    if (typeof value !== 'string') continue;
+    const trimmed = value.trim();
+    if (trimmed) return trimmed;
+  }
+  for (const value of values) {
+    if (!value || typeof value !== 'object') continue;
+    if (typeof value.value === 'string') {
+      const trimmed = value.value.trim();
+      if (trimmed) return trimmed;
+    }
+  }
+  return null;
+}
+
+function readSourceField(source, key) {
+  if (!source || typeof source !== 'object') return null;
+  const attrs = source.attributes && typeof source.attributes === 'object' ? source.attributes : {};
+  const candidates = [attrs[key], source[key]];
+  for (const candidate of candidates) {
+    if (candidate === null || candidate === undefined || candidate === '') continue;
+    return candidate;
+  }
+  return null;
+}
+
+function extractRelationshipIds(rel) {
+  const source = rel?.data ?? rel?.object ?? rel;
+  if (!source) return [];
+
+  const items = Array.isArray(source) ? source : [source];
+  const ids = [];
+  for (const item of items) {
+    if (typeof item === 'string' && item.trim()) {
+      ids.push(item.trim());
+      continue;
+    }
+    if (!item || typeof item !== 'object') continue;
+    if (typeof item.id === 'string' && item.id.trim()) {
+      ids.push(item.id.trim());
+      continue;
+    }
+    if (typeof item.object === 'string' && item.object.trim()) {
+      ids.push(item.object.trim());
+    }
+  }
+  return ids;
+}
+
+function extractGeoJsonLocation(source) {
+  const directLocation = readSourceField(source, 'location');
+  if (directLocation && typeof directLocation === 'object' && typeof directLocation.type === 'string') {
+    if (directLocation.type === 'GeoProperty' && directLocation.value && typeof directLocation.value === 'object') {
+      return directLocation.value;
+    }
+    return directLocation;
+  }
+
+  const rawGeometry = readSourceField(source, 'geometry') ?? readSourceField(source, 'wkt');
+  if (typeof rawGeometry === 'string') {
+    return wktToGeoJson(rawGeometry);
+  }
+  if (rawGeometry && typeof rawGeometry === 'object') {
+    if (typeof rawGeometry.type === 'string' && rawGeometry.coordinates) {
+      return rawGeometry;
+    }
+    if (typeof rawGeometry.value === 'string') {
+      return wktToGeoJson(rawGeometry.value);
+    }
+    if (rawGeometry.value && typeof rawGeometry.value === 'object' && typeof rawGeometry.value.type === 'string') {
+      return rawGeometry.value;
+    }
+  }
+
+  return null;
+}
+
+function extractParcelId(log) {
+  const locationRefs = extractRelationshipIds(log?.relationships?.location);
+  if (locationRefs.length > 0) return locationRefs[0];
+
+  const assetRefs = extractRelationshipIds(log?.relationships?.asset);
+  for (const ref of assetRefs) {
+    if (/^urn:ngsi-ld:AgriParcel:/.test(ref) || /^urn:ngsi-ld:AgriLand:/.test(ref)) {
+      return ref;
+    }
+  }
+
+  return null;
+}
+
+function extractDeviceIds(log) {
+  const rels = log?.relationships || {};
+  const candidates = [
+    ...extractRelationshipIds(rels.hasDevice),
+    ...extractRelationshipIds(rels.device),
+    ...extractRelationshipIds(rels.sensor),
+  ];
+  return Array.from(new Set(candidates.filter(Boolean)));
+}
+
+function extractParcelRecordDescription(log) {
+  const notes = readSourceField(log, 'notes');
+  if (typeof notes === 'string') {
+    return notes.trim() || null;
+  }
+  if (notes && typeof notes === 'object') {
+    if (typeof notes.value === 'string' && notes.value.trim()) {
+      return notes.value.trim();
+    }
+  }
+  return firstNonEmptyString(readSourceField(log, 'description'), readSourceField(log, 'name'));
+}
+
+function buildParcelRecordProperty(log, key, observedAt) {
+  const raw = readSourceField(log, key);
+  if (raw === null || raw === undefined || raw === '') return null;
+  const candidate = raw && typeof raw === 'object' && 'value' in raw ? raw.value : raw;
+  const value = typeof candidate === 'string' ? Number(candidate) : candidate;
+  if (!Number.isFinite(value)) return null;
+  return ngsiObservedProperty(value, observedAt);
+}
+
+/**
+ * Construye una entidad NGSI-LD `AgriParcelRecord` a partir de un
+ * `log--observation` o un objeto de observación compatible.
+ *
+ * Devuelve `null` si faltan `id`, `hasAgriParcel` o una ubicación GeoJSON
+ * derivable. No se inventa ningún dato estructural.
+ *
+ * @param {object} logRecord
+ * @param {object} [opts]
+ * @param {string[]} [opts.context]
+ * @returns {object|null}
+ */
+export function buildAgriParcelRecordEntity(logRecord, opts = {}) {
+  const context = opts.context || DEFAULT_CONTEXT;
+  if (!logRecord || typeof logRecord !== 'object') return null;
+
+  const type = logRecord.type || logRecord.attributes?.type;
+  if (type && type !== 'log--observation' && type !== 'observation') return null;
+  if (!logRecord.id) return null;
+
+  const parcelId = extractParcelId(logRecord);
+  const location = extractGeoJsonLocation(logRecord);
+  if (!parcelId || !location) return null;
+
+  const observedAt = normalizeDateTime(readSourceField(logRecord, 'timestamp') ?? logRecord.timestamp);
+  const description = extractParcelRecordDescription(logRecord);
+  const name = firstNonEmptyString(readSourceField(logRecord, 'name'), description);
+  if (!name) return null;
+
+  const entity = {
+    id: agriParcelRecordUrn(logRecord.id),
+    type: 'AgriParcelRecord',
+  };
+
+  const nameProp = ngsiProperty(name);
+  if (nameProp) entity.name = nameProp;
+
+  if (description && description !== name) {
+    const descriptionProp = ngsiProperty(description);
+    if (descriptionProp) entity.description = descriptionProp;
+  }
+
+  entity.hasAgriParcel = ngsiRelationship(parcelId);
+  entity.location = {
+    type: 'GeoProperty',
+    value: location,
+  };
+
+  const measurementKeys = [
+    'soilTemperature',
+    'soilMoistureVwc',
+    'soilMoistureEc',
+    'solarRadiation',
+    'soilSalinity',
+    'relativeHumidity',
+    'leafWetness',
+    'leafRelativeHumidity',
+    'leafTemperature',
+    'atmosphericPressure',
+    'depth',
+  ];
+  for (const key of measurementKeys) {
+    const prop = buildParcelRecordProperty(logRecord, key, observedAt);
+    if (prop) entity[key] = prop;
+  }
+
+  const deviceIds = extractDeviceIds(logRecord);
+  if (deviceIds.length > 0) {
+    entity.hasDevice = ngsiRelationshipMany(deviceIds);
+  }
+
+  entity['@context'] = context;
+
+  return entity;
+}
+
+/**
+ * Construye entidades AgriParcelRecord para una lista de log--observation,
+ * junto a un reporte de cuántas se omitieron.
+ *
+ * @param {object} seed
+ * @param {object} [opts]
+ * @param {number} [opts.limit]
+ * @param {string[]} [opts.context]
+ * @returns {{entities: object[], report: {total: number, emitted: number, omitted: Array<{id: string|null, reason: string}>}}}
+ */
+export function buildAgriParcelRecordEntities(seed, opts = {}) {
+  const logsAll = Array.isArray(seed)
+    ? seed
+    : Array.isArray(seed?.logs)
+    ? seed.logs
+    : Array.isArray(seed?.observations)
+      ? seed.observations
+      : [];
+  const logs = typeof opts.limit === 'number' ? logsAll.slice(0, opts.limit) : logsAll;
+  const candidates = logs.filter((log) => {
+    if (!log || typeof log !== 'object') return false;
+    const type = log.type || log.attributes?.type;
+    return !type || type === 'log--observation' || type === 'observation';
+  });
+
+  const entities = [];
+  const omitted = [];
+  for (const log of candidates) {
+    const entity = buildAgriParcelRecordEntity(log, { context: opts.context });
+    if (entity) {
+      entities.push(entity);
+    } else {
+      omitted.push({ id: log?.id ?? null, reason: 'missing id, parcel or location' });
+    }
+  }
+
+  return {
+    entities,
+    report: {
+      total: candidates.length,
+      emitted: entities.length,
+      omitted,
+    },
+  };
 }
 
 /**
@@ -627,6 +947,116 @@ export function buildAgriProductTypeEntities(seed, opts = {}) {
   };
 }
 
+/**
+ * Valida la estructura minima NGSI-LD de una entidad AgriParcelRecord.
+ *
+ * @param {object} entity
+ * @returns {{valid: boolean, errors: string[]}}
+ */
+export function validateAgriParcelRecordEntity(entity) {
+  const errors = [];
+
+  if (!entity || typeof entity !== 'object') {
+    return { valid: false, errors: ['entity no es un objeto'] };
+  }
+
+  if (typeof entity.id !== 'string' || !/^urn:ngsi-ld:AgriParcelRecord:.+$/.test(entity.id)) {
+    errors.push(`id inválido (esperado urn:ngsi-ld:AgriParcelRecord:*): ${JSON.stringify(entity.id)}`);
+  }
+
+  if (entity.type !== 'AgriParcelRecord') {
+    errors.push(`type inválido (esperado 'AgriParcelRecord'): ${JSON.stringify(entity.type)}`);
+  }
+
+  if (
+    !entity.name
+    || entity.name.type !== 'Property'
+    || typeof entity.name.value !== 'string'
+    || entity.name.value.length === 0
+  ) {
+    errors.push('name faltante o mal formado (esperado {type:"Property", value: string no vacío})');
+  }
+
+  if (entity.description !== undefined) {
+    if (entity.description.type !== 'Property' || typeof entity.description.value !== 'string') {
+      errors.push('description presente pero mal formado');
+    }
+  }
+
+  if (
+    !entity.hasAgriParcel
+    || entity.hasAgriParcel.type !== 'Relationship'
+    || (
+      typeof entity.hasAgriParcel.object !== 'string'
+      && !Array.isArray(entity.hasAgriParcel.object)
+    )
+  ) {
+    errors.push('hasAgriParcel faltante o mal formado');
+  }
+
+  if (
+    !entity.location
+    || entity.location.type !== 'GeoProperty'
+    || typeof entity.location.value !== 'object'
+    || entity.location.value === null
+    || typeof entity.location.value.type !== 'string'
+  ) {
+    errors.push('location faltante o mal formado (esperado GeoJSON)');
+  }
+
+  const measurementKeys = [
+    'soilTemperature',
+    'soilMoistureVwc',
+    'soilMoistureEc',
+    'solarRadiation',
+    'soilSalinity',
+    'relativeHumidity',
+    'leafWetness',
+    'leafRelativeHumidity',
+    'leafTemperature',
+    'atmosphericPressure',
+    'depth',
+  ];
+  for (const key of measurementKeys) {
+    if (entity[key] !== undefined) {
+      if (entity[key].type !== 'Property' || typeof entity[key].value !== 'number') {
+        errors.push(`${key} presente pero mal formado`);
+      }
+    }
+  }
+
+  if (entity.hasDevice !== undefined) {
+    if (
+      !entity.hasDevice
+      || entity.hasDevice.type !== 'Relationship'
+      || (!Array.isArray(entity.hasDevice.object) && typeof entity.hasDevice.object !== 'string')
+    ) {
+      errors.push('hasDevice presente pero mal formado');
+    }
+  }
+
+  if (!entity['@context'] || (Array.isArray(entity['@context']) && entity['@context'].length === 0)) {
+    errors.push('@context faltante o vacío');
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+/**
+ * Valida un array de entidades AgriParcelRecord. Devuelve un reporte agregado.
+ *
+ * @param {object[]} entities
+ * @returns {{valid: boolean, invalidCount: number, details: Array<{id: string|null, errors: string[]}>}}
+ */
+export function validateAgriParcelRecordEntities(entities) {
+  const details = [];
+  for (const entity of entities) {
+    const { valid, errors } = validateAgriParcelRecordEntity(entity);
+    if (!valid) details.push({ id: entity?.id ?? null, errors });
+  }
+  return { valid: details.length === 0, invalidCount: details.length, details };
+}
+
 // =============================================================================
 // Validación estructural (sin dependencia externa — ver nota abajo)
 // =============================================================================
@@ -908,8 +1338,8 @@ export async function main(argv = process.argv.slice(2)) {
       console.error(
         'Usage: node scripts/export-ngsi-ld.mjs [--input FILE] [--out FILE] [--json] [--limit N]\n\n'
         + '  --input FILE  Catálogo fuente (default: catalog/chagra-catalog-oss-subset-v3.2.json)\n'
-        + '  --out FILE    Escribe el array de entidades NGSI-LD (AgriCrop + AgriPest + \n'
-        + '                AgriProductType, JSON) a FILE.\n'
+        + '  --out FILE    Escribe el array de entidades NGSI-LD (AgriCrop + AgriPest +\n'
+        + '                AgriProductType + AgriParcelRecord, JSON) a FILE.\n'
         + '  --json        Imprime el array de entidades NGSI-LD crudo por stdout\n'
         + '                (sin esto, imprime un reporte humano de conteo/validación).\n'
         + '  --limit N     Subset de species (AgriCrop/AgriPest) y de biopreparados\n'
@@ -931,16 +1361,28 @@ export async function main(argv = process.argv.slice(2)) {
   const productTypeResult = buildAgriProductTypeEntities(seed, { limit: opts.limit ?? undefined });
   const productTypeValidation = validateAgriProductTypeEntities(productTypeResult.entities);
 
-  // Batch mixto AgriCrop + AgriPest + AgriProductType (formato aceptado por
+  const parcelRecordResult = buildAgriParcelRecordEntities(seed, { limit: opts.limit ?? undefined });
+  const parcelRecordValidation = validateAgriParcelRecordEntities(parcelRecordResult.entities);
+
+  // Batch mixto AgriCrop + AgriPest + AgriProductType + AgriParcelRecord (formato aceptado por
   // entityOperations/upsert de Orion-LD; ver nota de cabecera del archivo).
-  const entities = [...cropResult.entities, ...pestResult.entities, ...productTypeResult.entities];
+  const entities = [
+    ...cropResult.entities,
+    ...pestResult.entities,
+    ...productTypeResult.entities,
+    ...parcelRecordResult.entities,
+  ];
 
   // Validación de conformidad NGSI-LD contra los schemas OFICIALES de
   // smart-data-models (ADR-051 fase 1, ítem CI) — capa adicional a la
   // validación estructural propia de arriba (ver `scripts/lib/ngsi-validate.mjs`).
   const ajvValidation = validateEntitiesAjv(entities);
 
-  const valid = cropValidation.valid && pestValidation.valid && productTypeValidation.valid && ajvValidation.valid;
+  const valid = cropValidation.valid
+    && pestValidation.valid
+    && productTypeValidation.valid
+    && parcelRecordValidation.valid
+    && ajvValidation.valid;
 
   const jsonOut = JSON.stringify(entities, null, 2) + '\n';
 
@@ -948,14 +1390,15 @@ export async function main(argv = process.argv.slice(2)) {
     writeFileSync(opts.out, jsonOut, 'utf-8');
     console.error(
       `Escrito ${entities.length} entidades NGSI-LD (${cropResult.entities.length} AgriCrop + `
-      + `${pestResult.entities.length} AgriPest + ${productTypeResult.entities.length} AgriProductType) `
+      + `${pestResult.entities.length} AgriPest + ${productTypeResult.entities.length} AgriProductType + `
+      + `${parcelRecordResult.entities.length} AgriParcelRecord) `
       + `a ${opts.out} (válidas: ${valid ? 'sí' : 'NO'})`,
     );
   } else if (opts.json) {
     process.stdout.write(jsonOut);
   } else {
     // Reporte humano por stdout — pensado para revisión manual del operador.
-    console.log('--- export-ngsi-ld: reporte AgriCrop + AgriPest + AgriProductType (ADR-051 fase 1) ---');
+    console.log('--- export-ngsi-ld: reporte AgriCrop + AgriPest + AgriProductType + AgriParcelRecord (ADR-051 fase 2) ---');
     console.log(`Fuente: ${opts.input}`);
     console.log(`Species leídas: ${cropResult.report.total}`);
     console.log(`Entidades AgriCrop emitidas: ${cropResult.report.emitted}`);
@@ -994,12 +1437,24 @@ export async function main(argv = process.argv.slice(2)) {
       }
     }
     console.log(
-      `Validación ajv vs. schemas oficiales smart-data-models (AgriCrop+AgriPest+AgriProductType): `
+      `Validación ajv vs. schemas oficiales smart-data-models (AgriCrop+AgriPest+AgriProductType+AgriParcelRecord): `
       + `${ajvValidation.valid ? 'OK' : `FALLÓ (${ajvValidation.invalidCount} entidad(es))`}`,
     );
     if (!ajvValidation.valid) {
       for (const d of ajvValidation.details.slice(0, 10)) {
         console.log(`  - [${d.type}] ${d.id}: ${d.errors.join(' | ')}`);
+      }
+    }
+    console.log(`Log observations leídos: ${parcelRecordResult.report.total}`);
+    console.log(`Entidades AgriParcelRecord emitidas: ${parcelRecordResult.report.emitted}`);
+    console.log(`Omitidas (faltan campos mínimos): ${parcelRecordResult.report.omitted.length}`);
+    if (parcelRecordResult.report.omitted.length > 0) {
+      console.log('  logs omitidos:', parcelRecordResult.report.omitted.map((o) => o.id).join(', '));
+    }
+    console.log(`Validación estructural NGSI-LD (AgriParcelRecord): ${parcelRecordValidation.valid ? 'OK' : `FALLÓ (${parcelRecordValidation.invalidCount} entidad(es))`}`);
+    if (!parcelRecordValidation.valid) {
+      for (const d of parcelRecordValidation.details.slice(0, 10)) {
+        console.log(`  - ${d.id}: ${d.errors.join(' | ')}`);
       }
     }
   }
