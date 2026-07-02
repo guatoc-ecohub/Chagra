@@ -24,6 +24,39 @@ import TopBar from '../TopBar';
 
 // Mocks: sub-componentes pesados o que tocan store global. No nos importan
 // para este test del TopBar.
+const { fincaState, mockGetProfile, mockGetProfileMunicipio } = vi.hoisted(() => ({
+  fincaState: {
+    activeFincaSlug: 'finca-demo',
+    fincas: [{ slug: 'finca-demo', nombre: 'Finca demo' }],
+  },
+  mockGetProfile: vi.fn(() => ({})),
+  mockGetProfileMunicipio: vi.fn(() => null),
+}));
+
+vi.mock('../../store/useOllamaWarmStore', () => ({
+  default: () => ({ status: 'idle' }),
+}));
+vi.mock('../../store/useAssetStore', () => ({
+  default: () => ({ syncProgress: null }),
+}));
+vi.mock('../../services/fincaActiveStore', () => {
+  const useFincaActiveStore = (selector) => selector(fincaState);
+  return { useFincaActiveStore, default: useFincaActiveStore };
+});
+vi.mock('../../services/userProfileService', async (importOriginal) => {
+  const real = await importOriginal();
+  return {
+    ...real,
+    getProfile: mockGetProfile,
+    getProfileMunicipio: mockGetProfileMunicipio,
+  };
+});
+vi.mock('../dashboard/themeIcon', () => ({
+  iconForTheme: () => <span data-testid="theme-icon" />,
+}));
+vi.mock('../../hooks/useTheme', () => ({
+  useTheme: () => ({ theme: 'default' }),
+}));
 vi.mock('../EnvironmentalCard', () => ({ default: () => <div data-testid="env-stub" /> }));
 vi.mock('../AltitudeBadge', () => ({ default: () => <div data-testid="alt-stub" /> }));
 vi.mock('../OfflineChip', () => ({ default: () => <div data-testid="chip-stub" /> }));
@@ -39,6 +72,10 @@ describe('TopBar — captura por voz removida (#323)', () => {
     onNavigate = vi.fn();
     onLogout = vi.fn();
     localStorage.clear();
+    mockGetProfile.mockReturnValue({});
+    mockGetProfileMunicipio.mockReturnValue(null);
+    fincaState.activeFincaSlug = 'finca-demo';
+    fincaState.fincas = [{ slug: 'finca-demo', nombre: 'Finca demo' }];
   });
 
   it('YA NO existe el botón unificado "Agregar planta por voz"', () => {
@@ -65,5 +102,27 @@ describe('TopBar — captura por voz removida (#323)', () => {
   it('con estilo "demo" (default) NO renderiza el NotificationsBell (campana única en el hero)', () => {
     render(<TopBar onNavigate={onNavigate} onLogout={onLogout} />);
     expect(screen.queryByTestId('notifications-bell-stub')).toBeNull();
+  });
+
+  it('trunca una vereda larga sin empujar las acciones del extremo derecho', () => {
+    fincaState.fincas = [
+      {
+        slug: 'finca-demo',
+        nombre: 'Finca demo',
+        vereda: 'Vereda Potrero Grande',
+        municipio: 'Choachí',
+        altitud: 1923,
+      },
+    ];
+
+    render(<TopBar onNavigate={onNavigate} onLogout={onLogout} />);
+
+    const locationPill = screen.getByText('Vereda Potrero Grande · Choachí · 1923 msnm');
+    expect(locationPill).toHaveClass('truncate');
+    expect(locationPill).toHaveClass('min-w-0');
+    expect(locationPill).toHaveClass('shrink');
+    expect(locationPill).toHaveClass('max-w-[50vw]');
+    expect(screen.getByTestId('topbar-user-menu')).toBeInTheDocument();
+    expect(screen.getByLabelText('Manual de uso: cómo usar Chagra')).toBeInTheDocument();
   });
 });

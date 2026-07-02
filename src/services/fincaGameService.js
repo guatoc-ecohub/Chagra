@@ -67,7 +67,7 @@ export const WORLD_STAGES = Object.freeze([
     nombreNino: 'La tierra viva',
     nombreReal: 'Sustitución orgánica',
     emoji: '🪱',
-    mensaje: '¡El suelo está lleno de vida! Las lombrices trabajan para vos.',
+    mensaje: '¡El suelo está lleno de vida! Las lombrices trabajan para ti.',
     cielo: ['#90cce0', '#d4ecd6'],
     tierra: ['#9a8456', '#7a9655'],
     arboles: 4,

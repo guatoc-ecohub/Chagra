@@ -280,6 +280,11 @@
       "source_ids": [
         "restrepo-1996-bocashi"
       ],
+      "dosis": "Foliar: dilución 1:20 con agua (≈50 ml de lixiviado por L).",
+      "uso": "Foliar en fase reproductiva (floración y llenado de fruto) como aporte de potasio y micronutrientes.",
+      "metodo": "foliar diluido",
+      "fuente": "Restrepo Rivera, J. — Manual de biopreparados (referenciado por source_ids); fermentación aeróbica de frutas con dilución foliar 1:20.",
+      "confianza": "media",
       "safety_class": "revisar",
       "ppe_required": null,
       "do_not_use_when": null,
@@ -338,6 +343,11 @@
       "source_ids": [
         "cenicafe-trichoderma-2010"
       ],
+      "dosis": "1 kg/ha de sustrato sólido con cepa propagada, mezclado con compost maduro e incorporado a los primeros 10 cm del suelo.",
+      "uso": "Control biológico al suelo pre-siembra o pre-trasplante contra Rhizoctonia, Fusarium y Sclerotinia.",
+      "metodo": "suelo (incorporado con compost maduro)",
+      "fuente": "Cenicafé 2010 — Uso de Trichoderma spp. en manejo integrado de enfermedades del café.",
+      "confianza": "alta",
       "safety_class": "revisar",
       "ppe_required": null,
       "do_not_use_when": null,
@@ -360,6 +370,12 @@
       "source_ids": [
         "agrosavia-bacillus-2018"
       ],
+      "dosis": "Foliar: 1 L/ha de suspensión 10^9 UFC/ml.",
+      "frecuencia": "Foliar cada 7-10 días.",
+      "uso": "Control biológico foliar contra Botrytis, Alternaria y Monilia; compatible con caldos minerales.",
+      "metodo": "foliar",
+      "fuente": "AGROSAVIA 2018 — Control biológico con Bacillus subtilis en cultivos hortícolas andinos.",
+      "confianza": "alta",
       "safety_class": "revisar",
       "ppe_required": null,
       "do_not_use_when": null,
@@ -382,6 +398,12 @@
       "source_ids": [
         "ica-fertilizantes-2019"
       ],
+      "dosis": "500-2000 kg/ha al suelo según análisis, para subir pH ~0.5 unidades.",
+      "frecuencia": "Según análisis de suelo; típicamente 1 aplicación pre-siembra por ciclo.",
+      "uso": "Enmienda directa al suelo antes de siembra según análisis de suelo.",
+      "metodo": "suelo (incorporado pre-siembra)",
+      "fuente": "ICA 2019 — Guía de uso racional de fertilizantes y enmiendas en Colombia.",
+      "confianza": "alta",
       "safety_class": "revisar",
       "ppe_required": null,
       "do_not_use_when": null,
@@ -404,6 +426,11 @@
       "source_ids": [
         "ica-fertilizantes-2019"
       ],
+      "dosis": "500-1000 kg/ha incorporados pre-siembra.",
+      "uso": "Enmienda de fósforo al suelo pre-siembra en suelos ácidos (pH<5.5), o co-compostaje con ácidos orgánicos para acelerar solubilización.",
+      "metodo": "suelo (incorporado pre-siembra) o co-compostaje",
+      "fuente": "ICA 2019 — Guía de uso racional de fertilizantes y enmiendas en Colombia.",
+      "confianza": "alta",
       "safety_class": "revisar",
       "ppe_required": null,
       "do_not_use_when": null,
@@ -465,6 +492,10 @@
         "restrepo-1996-bocashi",
         "agrosavia-manual-biopreparados-2015"
       ],
+      "uso": "Enmienda orgánica al suelo como producto final del compostaje aeróbico de residuos vegetales y estiércol.",
+      "metodo": "suelo (incorporado)",
+      "fuente": "Restrepo Rivera, J. — ABC de la agricultura orgánica; AGROSAVIA 2015 — Manual de biopreparados para la agricultura sostenible.",
+      "confianza": "alta",
       "safety_class": "revisar",
       "ppe_required": null,
       "do_not_use_when": null,
@@ -487,6 +518,11 @@
       "source_ids": [
         "khan-2009-seaweed-extracts"
       ],
+      "dosis": "Foliar: dilución 1:500 con agua.",
+      "uso": "Foliar como estimulante de enraizamiento; fuente de citoquininas, auxinas y oligoelementos.",
+      "metodo": "foliar diluido",
+      "fuente": "Khan et al. 2009 — Seaweed extracts as biostimulants of plant growth and development (J Plant Growth Regul 28(4):386-399).",
+      "confianza": "alta",
       "safety_class": "revisar",
       "ppe_required": null,
       "do_not_use_when": null,

@@ -96,6 +96,11 @@ const messages = {
     confianzaMedia: 'Confianza media',
     confianzaBaja: 'Confianza baja',
   },
+  topbar: {
+    volverInicio: 'Volver al inicio',
+    procesando: 'Chagra está procesando',
+    pensando: 'Chagra está pensando…',
+  },
   perfil: {
     nombre: 'Nombre',
     operador: 'Operador',

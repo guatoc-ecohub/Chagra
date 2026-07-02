@@ -1,7 +1,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import ChatBubble from '../AgentScreen/ChatBubble';
+import ChatBubbleRaw from '../AgentScreen/ChatBubble';
+/** @type {any} */
+const ChatBubble = ChatBubbleRaw;
 import usePrefsStore from '../../store/usePrefsStore';
 import { describe, test, expect, beforeEach, vi } from 'vitest';
 
@@ -9,6 +11,8 @@ import { describe, test, expect, beforeEach, vi } from 'vitest';
 // handler de doble-click. No los ejercitamos en estos tests — el foco está
 // en el badge de "fuente". Evitamos que jsdom intente speechSynthesis.
 vi.mock('../../services/ttsService', () => ({
+  onConsentNeeded: vi.fn(),
+  onRetryOrphan: vi.fn(),
   speak: vi.fn(),
   speakKokoro: vi.fn(),
   stop: vi.fn(),

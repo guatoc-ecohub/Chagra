@@ -34,15 +34,15 @@ import {
 beforeEach(() => {
   vi.clearAllMocks();
   // Defaults: catálogo local responde por etapa; grafo apagado (null).
-  getBiopreparadosForStage.mockImplementation((stage) => {
+  vi.mocked(getBiopreparadosForStage).mockImplementation((stage) => {
     if (stage === 'vegetative') return [{ nombre: 'Caldo bordelés', uso: 'Preventivo fungoso' }];
     if (stage === 'flowering') return [{ nombre: 'Aceite de neem', uso: 'Trips en floración' }];
     return [];
   });
-  callTool.mockResolvedValue(null);
-  suggestGuildsFor.mockResolvedValue({ companions: [], antagonists: [], strata: [] });
-  listFarmProcesses.mockResolvedValue([]);
-  getTemplate.mockReturnValue(null);
+  vi.mocked(callTool).mockResolvedValue(null);
+  vi.mocked(suggestGuildsFor).mockResolvedValue({ companions: [], antagonists: [], strata: [] });
+  vi.mocked(listFarmProcesses).mockResolvedValue([]);
+  vi.mocked(getTemplate).mockReturnValue(null);
 });
 
 describe('getBioinsumosForPlant', () => {
@@ -56,20 +56,20 @@ describe('getBioinsumosForPlant', () => {
   });
 
   it('mergea recetas del grafo AGE y deja el grafo primero', async () => {
-    callTool.mockResolvedValueOnce({ recipes: [{ nombre: 'Supermagro', uso: 'Foliar quincenal' }] });
+    vi.mocked(callTool).mockResolvedValueOnce({ recipes: [{ nombre: 'Supermagro', uso: 'Foliar quincenal' }] });
     const { items, fromGraph } = await getBioinsumosForPlant('coffea_arabica');
     expect(fromGraph).toBe(true);
     expect(items[0]).toMatchObject({ nombre: 'Supermagro', source: 'grafo' });
   });
 
   it('deduplica un biopreparado que aparece en varias etapas', async () => {
-    getBiopreparadosForStage.mockReturnValue([{ nombre: 'Bocashi', uso: 'Fertilización' }]);
+    vi.mocked(getBiopreparadosForStage).mockReturnValue([{ nombre: 'Bocashi', uso: 'Fertilización' }]);
     const { items } = await getBioinsumosForPlant('zea_mays');
     expect(items.filter((b) => b.nombre === 'Bocashi')).toHaveLength(1);
   });
 
   it('no rompe si el catálogo lanza', async () => {
-    getBiopreparadosForStage.mockImplementation(() => { throw new Error('boom'); });
+    vi.mocked(getBiopreparadosForStage).mockImplementation(() => { throw new Error('boom'); });
     const { items } = await getBioinsumosForPlant('x');
     expect(Array.isArray(items)).toBe(true);
   });
@@ -77,7 +77,7 @@ describe('getBioinsumosForPlant', () => {
 
 describe('getRelationsForPlant', () => {
   it('usa guildService como base (offline-safe)', async () => {
-    suggestGuildsFor.mockResolvedValue({
+    vi.mocked(suggestGuildsFor).mockResolvedValue({
       companions: [{ slug: 'allium_sativum', name: 'Ajo', reason: 'r' }],
       antagonists: [{ slug: 'solanum_lycopersicum', name: 'Tomate', reason: 'r' }],
       strata: [{ species: 'fragaria_ananassa', layer: 'bajo' }],
@@ -90,11 +90,11 @@ describe('getRelationsForPlant', () => {
   });
 
   it('enriquece con el grafo AGE y deduplica por slug', async () => {
-    suggestGuildsFor.mockResolvedValue({
+    vi.mocked(suggestGuildsFor).mockResolvedValue({
       companions: [{ slug: 'allium_sativum', name: 'Ajo', reason: 'curado' }],
       antagonists: [], strata: [],
     });
-    callTool.mockResolvedValueOnce({
+    vi.mocked(callTool).mockResolvedValueOnce({
       companions: [
         { canonical_id: 'allium_sativum', nombre_comun: 'Ajo' }, // duplicado por slug
         { canonical_id: 'tagetes_patula', nombre_comun: 'Caléndula' },
@@ -109,14 +109,14 @@ describe('getRelationsForPlant', () => {
   });
 
   it('degrada a vacío si guildService y grafo fallan', async () => {
-    suggestGuildsFor.mockRejectedValue(new Error('cold'));
-    callTool.mockRejectedValue(new Error('down'));
+    vi.mocked(suggestGuildsFor).mockRejectedValue(new Error('cold'));
+    vi.mocked(callTool).mockRejectedValue(new Error('down'));
     const rel = await getRelationsForPlant('x');
     expect(rel).toEqual({ companions: [], antagonists: [], strata: [], fromGraph: false });
   });
 
   it('ignora ToolError del grafo (no lo cuenta como fromGraph)', async () => {
-    callTool.mockResolvedValueOnce({ _error: true, reason: 'fetch_failed', tool: 'get_companions' });
+    vi.mocked(callTool).mockResolvedValueOnce({ _error: true, reason: 'fetch_failed', tool: 'get_companions' });
     const rel = await getRelationsForPlant('x');
     expect(rel.fromGraph).toBe(false);
   });
@@ -124,18 +124,18 @@ describe('getRelationsForPlant', () => {
 
 describe('getCycleForPlant', () => {
   it('devuelve la plantilla fenológica de la especie', () => {
-    getTemplate.mockReturnValue({ template_id: 't1', species_label: 'Tomate', stages: [{ code: 'sowing' }], sources: [] });
+    vi.mocked(getTemplate).mockReturnValue({ template_id: 't1', species_label: 'Tomate', stages: [{ code: 'sowing' }], sources: [] });
     expect(getCycleForPlant('solanum_lycopersicum').template_id).toBe('t1');
   });
   it('null si no hay plantilla', () => {
-    getTemplate.mockReturnValue(null);
+    vi.mocked(getTemplate).mockReturnValue(null);
     expect(getCycleForPlant('rara_avis')).toBeNull();
   });
 });
 
 describe('getAssociatedCycles', () => {
   it('filtra FarmProcess por subject_slug y ordena recientes primero', async () => {
-    listFarmProcesses.mockResolvedValue([
+    vi.mocked(listFarmProcesses).mockResolvedValue([
       { process_id: 'a', attributes: { subject_slug: 'zea_mays', updated_at: '2026-01-01' } },
       { process_id: 'b', attributes: { subject_slug: 'fragaria_ananassa', updated_at: '2026-06-01' } },
       { process_id: 'c', attributes: { subject_slug: 'fragaria_ananassa', updated_at: '2026-06-10' } },
@@ -144,20 +144,20 @@ describe('getAssociatedCycles', () => {
     expect(cycles.map((c) => c.process_id)).toEqual(['c', 'b']);
   });
   it('devuelve [] si IndexedDB falla', async () => {
-    listFarmProcesses.mockRejectedValue(new Error('db'));
+    vi.mocked(listFarmProcesses).mockRejectedValue(new Error('db'));
     expect(await getAssociatedCycles('x')).toEqual([]);
   });
 });
 
 describe('buildPlantDossier', () => {
   it('compone el dossier completo de una planta con slug', async () => {
-    getTemplate.mockReturnValue({ template_id: 't', species_label: 'Fresa', stages: [], sources: [] });
-    suggestGuildsFor.mockResolvedValue({
+    vi.mocked(getTemplate).mockReturnValue({ template_id: 't', species_label: 'Fresa', stages: [], sources: [] });
+    vi.mocked(suggestGuildsFor).mockResolvedValue({
       companions: [{ slug: 'allium_sativum', name: 'Ajo', reason: 'r' }],
       antagonists: [{ slug: 'solanum_lycopersicum', name: 'Tomate', reason: 'r' }],
       strata: [],
     });
-    listFarmProcesses.mockResolvedValue([
+    vi.mocked(listFarmProcesses).mockResolvedValue([
       { process_id: 'p1', attributes: { subject_slug: 'fragaria_ananassa', updated_at: '2026-06-10' } },
     ]);
 
@@ -183,11 +183,11 @@ describe('buildPlantDossier', () => {
   });
 
   it('NUNCA lanza aunque todas las fuentes fallen', async () => {
-    getTemplate.mockImplementation(() => { throw new Error('x'); });
-    suggestGuildsFor.mockRejectedValue(new Error('x'));
-    callTool.mockRejectedValue(new Error('x'));
-    listFarmProcesses.mockRejectedValue(new Error('x'));
-    getBiopreparadosForStage.mockImplementation(() => { throw new Error('x'); });
+    vi.mocked(getTemplate).mockImplementation(() => { throw new Error('x'); });
+    vi.mocked(suggestGuildsFor).mockRejectedValue(new Error('x'));
+    vi.mocked(callTool).mockRejectedValue(new Error('x'));
+    vi.mocked(listFarmProcesses).mockRejectedValue(new Error('x'));
+    vi.mocked(getBiopreparadosForStage).mockImplementation(() => { throw new Error('x'); });
     const d = await buildPlantDossier({ cropSlug: 'fragaria_ananassa' });
     expect(d.slug).toBe('fragaria_ananassa');
     expect(d.cycle).toBeNull();
