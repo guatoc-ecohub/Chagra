@@ -545,15 +545,26 @@ export function extractOrganismMentions(text) {
   if (!m) return [];
   const lead = m[1].trim();
   const paren = m[2] ? m[2].trim() : null;
-  if (BINOMIAL_RE.test(lead)) {
+  if (isBinomialSequence(lead)) {
     return lead.split('/').map((s) => ({ scientific: s.trim(), common: paren }));
   }
-  if (paren && BINOMIAL_RE.test(paren)) {
+  if (paren && isBinomialSequence(paren)) {
     return paren.split('/').map((s) => ({ scientific: s.trim(), common: lead }));
   }
   return [];
 }
-const BINOMIAL_RE = /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+\s+(?:spp\.?|[a-záéíóúñ.]+)(?:\s*\/\s*[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+\s+(?:spp\.?|[a-záéíóúñ.]+))*$/;
+
+// "Genus species" (o "Genus spp."). Regex plana (sin cuantificadores
+// anidados) para evitar ReDoS — un binomio con varias especies separadas
+// por "/" (p. ej. "Globodera pallida / Globodera rostochiensis") se separa
+// en código ANTES de testear cada parte, en vez de repetir el patrón dentro
+// de la misma regex (eso sí sería vulnerable a backtracking exponencial).
+const BINOMIAL_PART_RE = /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+\s+(?:spp\.?|[a-záéíóúñ.]+)$/;
+
+function isBinomialSequence(text) {
+  const parts = text.split('/').map((s) => s.trim()).filter(Boolean);
+  return parts.length > 0 && parts.every((p) => BINOMIAL_PART_RE.test(p));
+}
 
 function levenshtein(a, b) {
   const m = a.length;
