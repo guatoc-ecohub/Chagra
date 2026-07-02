@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-07-02T05:38:31.816Z",
-  "total": 59,
+  "generatedAt": "2026-07-02T06:01:00.248Z",
+  "total": 52,
   "porClase": {
     "cruce_cultivo": 7,
-    "miscategorizacion": 16,
+    "miscategorizacion": 9,
     "duplicado": 22,
     "sobre_asociacion": 9,
     "placeholder": 5
