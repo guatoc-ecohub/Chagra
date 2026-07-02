@@ -2,7 +2,9 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
-import ChipsToolbar from '../ChipsToolbar';
+import ChipsToolbarRaw from '../ChipsToolbar';
+/** @type {any} */
+const ChipsToolbar = ChipsToolbarRaw;
 import { CHIP_DEFS } from '../../services/chipIntentRouter';
 import * as deepResearchClient from '../../services/deepResearchClient';
 
