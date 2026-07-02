@@ -1,3 +1,4 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- legacy UI copy already tracked separately (misma convención que AssetDetailView.jsx) */
 import React, { useEffect, useMemo, useState } from 'react';
 import { Sprout, Droplets, Apple, Leaf, RefreshCw, Clock, Bot, Sparkles, Check, X, Camera } from 'lucide-react';
 import { GroupedVirtuoso } from 'react-virtuoso';
@@ -70,8 +71,31 @@ const formatMonthKey = (ts) => {
   return `${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`;
 };
 
+// Hoja de vida (2026-07): diferencia en DÍAS calendario entre el log y hoy
+// (negativo = pasado, 0 = hoy, positivo = próximo). Se compara inicio de día
+// contra inicio de día para que "ayer 11pm" no salga como "hoy".
+const DAY_MS = 86400000;
+const startOfDay = (ms) => {
+  const d = new Date(ms);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+};
+const dayDiffFromToday = (ts) => {
+  if (!ts) return null;
+  return Math.round((startOfDay(ts * 1000) - startOfDay(Date.now())) / DAY_MS);
+};
+
+// Hoja de vida (2026-07): fecha RELATIVA para la semana cercana ("Hoy",
+// "Ayer", "Hace 3 días", "Mañana", "En 4 días") — el productor piensa en
+// "¿cuándo fue?" más que en fechas absolutas. Más allá de una semana se
+// mantiene la fecha corta es-CO de siempre.
 const formatDayLabel = (ts) => {
   if (!ts) return '—';
+  const diff = dayDiffFromToday(ts);
+  if (diff === 0) return 'Hoy';
+  if (diff === -1) return 'Ayer';
+  if (diff === 1) return 'Mañana';
+  if (diff < 0 && diff >= -6) return `Hace ${-diff} días`;
+  if (diff > 1 && diff <= 6) return `En ${diff} días`;
   const d = new Date(ts * 1000);
   return d.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' });
 };
@@ -111,7 +135,7 @@ const PhotoAttachmentThumb = ({ photoId, timestamp, pending }) => {
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           {photo.loading ? (
-            <div className="w-16 h-16 rounded bg-slate-800 shrink-0 animate-pulse" />
+            <div className="w-16 h-16 rounded bg-slate-800 shrink-0 motion-safe:animate-pulse" />
           ) : photo.url ? (
             <img
               src={photo.url}
@@ -132,7 +156,9 @@ const PhotoAttachmentThumb = ({ photoId, timestamp, pending }) => {
           </div>
         </div>
         <span className="text-xs text-slate-500 shrink-0 whitespace-nowrap">
-          {timestamp ? new Date(timestamp * 1000).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' }) : '—'}
+          {/* Hoja de vida (2026-07): misma fecha relativa que el resto del
+              timeline (Hoy / Ayer / Hace N días) para lectura consistente. */}
+          {formatDayLabel(timestamp)}
         </span>
       </div>
     </li>
@@ -317,6 +343,12 @@ export default function AssetTimeline({ assetId }) {
     const Icon = isAi ? (aiData.needs_human_review ? Sparkles : Bot) : config.icon;
     const qty = extractQuantity(log);
     const pending = log._pending;
+    // Hoja de vida (2026-07): pasado / hoy / próximo legibles de un vistazo.
+    // Hoy → anillo emerald sutil + fecha destacada; futuro (tareas
+    // programadas) → chip "Próximo" en sky. Solo presentación.
+    const dayDiff = dayDiffFromToday(log.timestamp);
+    const isToday = dayDiff === 0;
+    const isFuture = dayDiff != null && dayDiff > 0;
 
     const handleReview = async (verdict) => {
       const payload = {
@@ -351,7 +383,7 @@ export default function AssetTimeline({ assetId }) {
       <div className="py-2 pr-2">
         <div
           className={`relative p-3 rounded-xl border transition-all ${isAi ? 'bg-indigo-900/10 border-indigo-500/30' : config.bg + ' ' + config.border} ${pending ? 'opacity-60' : ''
-            } ${isAi && aiData.needs_human_review && !reviewData ? 'border-amber-500/50 shadow-[0_0_10px_rgba(245,158,11,0.1)]' : ''}`}
+            } ${isAi && aiData.needs_human_review && !reviewData ? 'border-amber-500/50 shadow-[0_0_10px_rgba(245,158,11,0.1)]' : ''} ${isToday ? 'ring-1 ring-emerald-500/40' : ''}`}
         >
           <span
             className={`absolute -left-[26px] top-4 w-4 h-4 rounded-full ${isAi ? 'bg-indigo-900 border-indigo-500' : config.bg + ' border-2 ' + config.border} flex items-center justify-center z-10`}
@@ -382,14 +414,20 @@ export default function AssetTimeline({ assetId }) {
                 )}
 
                 {!reviewData && isAi && aiData.needs_human_review && (
-                  <span className="text-[10px] font-black bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/40 animate-pulse">
+                  <span className="text-[10px] font-black bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/40 motion-safe:animate-pulse">
                     Pendiente revisión
+                  </span>
+                )}
+
+                {isFuture && (
+                  <span className="text-[10px] font-black text-sky-300 bg-sky-900/40 border border-sky-700/50 px-1.5 py-0.5 rounded-full">
+                    Próximo
                   </span>
                 )}
 
                 {pending && (
                   <span className="text-[10px] font-bold text-amber-400 bg-amber-900/40 px-1.5 py-0.5 rounded-full flex items-center gap-1">
-                    <RefreshCw size={8} className="animate-spin" />
+                    <RefreshCw size={8} className="motion-safe:animate-spin" />
                     Sincronizando…
                   </span>
                 )}
@@ -441,7 +479,9 @@ export default function AssetTimeline({ assetId }) {
                 </>
               )}
             </div>
-            <span className="text-xs text-slate-500 shrink-0 tabular-nums">
+            <span
+              className={`text-xs shrink-0 tabular-nums ${isToday ? 'text-emerald-300 font-bold' : isFuture ? 'text-sky-300 font-semibold' : 'text-slate-500'}`}
+            >
               {formatDayLabel(log.timestamp)}
             </span>
           </div>
@@ -459,7 +499,7 @@ export default function AssetTimeline({ assetId }) {
         </h3>
         {isSyncing && (
           <span className="text-xs text-blue-400 flex items-center gap-1">
-            <RefreshCw size={12} className="animate-spin" />
+            <RefreshCw size={12} className="motion-safe:animate-spin" />
             Actualizando…
           </span>
         )}
