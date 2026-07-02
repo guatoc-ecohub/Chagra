@@ -95,14 +95,25 @@ const GROUPS = GROUP_ORDER
    (key/icon/label/leaves) para que el motor de geometría los trate igual: las
    destacadas llevan kind:'cap' + cap y leaves:[] (no despliegan, accionan). El
    orden (destacadas primero) define el orden de sprout: el primerizo ve brotar
-   primero las 6 funciones clave. */
+   primero las 6 funciones clave.
+
+   RAMAS DE UNA SOLA HOJA → ACCIÓN DIRECTA (redistribución 2026-07-02, replanteo
+   F del audit 06-28): un grupo con exactamente UNA hoja era una fachada de
+   submenú — tocar "Aprender" desplegaba… una única hoja casi homónima (dos
+   toques para un solo destino). La rama se promueve a kind:'cap': conserva su
+   puesto en el anillo y su identidad de rama (icono/rótulo del grupo, alineado
+   con el portal "Aprender" del home), pero actúa de una, como las destacadas.
+   NO cambia el routing: es la MISMA capacidad hoja (mapCapabilityPick la enruta
+   igual) y su salud (soon/down) se sigue evaluando por el id de la hoja. */
 const RING = [
   ...FEATURED.map((cap) => ({
     kind: 'cap', key: cap.id, icon: cap.icon, label: cap.label, cap, leaves: [],
   })),
-  ...GROUPS.map((g) => ({
-    kind: 'group', key: g.key, icon: g.icon, label: g.label, leaves: g.leaves,
-  })),
+  ...GROUPS.map((g) => (
+    g.leaves.length === 1
+      ? { kind: 'cap', key: g.key, icon: g.icon, label: g.label, cap: g.leaves[0], leaves: [] }
+      : { kind: 'group', key: g.key, icon: g.icon, label: g.label, leaves: g.leaves }
+  )),
 ];
 
 /* ══════════════ helpers geométricos (puros, port 1:1) ══════════════ */

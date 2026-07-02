@@ -360,7 +360,12 @@ test.describe('La mano de Chagra — conversación real por cada nodo (≥3 mens
       await openMano(page);
       await expectManoNoBloqueada(page);
       // Tocar un grupo distinto responde (la mano sigue interactiva, no muerta).
-      await expandGroup(page, 'Aprender');
+      // 'Restaurar y conservar' y no 'Aprender': desde la redistribución del
+      // replanteo F (2026-07-02) las ramas de UNA sola hoja (Aprender/Vender
+      // mejor) son acción directa (.arm-feat, navegan de una) — ya no son
+      // grupos desplegables. Restaurar conserva varias hojas y sigue siendo
+      // rama con aria-expanded.
+      await expandGroup(page, 'Restaurar y conservar');
       await expectManoNoBloqueada(page);
 
       expect(pageErrors, `pageerrors durante la conversación de ${cap.id}`).toEqual([]);

@@ -58,6 +58,12 @@ const COLIBRI_REAL = colibriRealActivo();
  *      la escena y los 4 portales respiran (grilla legible), sin gradientes
  *      estirados (lo gobierna finca-viva-hero.css con un shell --fvh-max).
  *   8. PORTALES con más velo/legibilidad sobre la fauna.
+ *   9. PORTALES VISIBLES EN MÓVIL (replanteo F, audit 2026-06-28): en pantalla
+ *      angosta la escena cede altura y los 4 portales SUBEN justo bajo el
+ *      compositor (el saludo grande cierra el hero). El usuario nuevo entiende
+ *      qué es Chagra en el primer viewport, sin scroll. Reorden 100% CSS
+ *      (display:contents + order en finca-viva-hero.css): el DOM y el desktop
+ *      no cambian.
  *
  * Se monta SOLO con la flag VITE_FINCA_VIVA_HOME_PERFIL ON (lo decide
  * DashboardLive). Con la flag OFF el home conserva su portada actual (AgentHero).

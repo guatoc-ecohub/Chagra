@@ -1039,6 +1039,49 @@
   .fvh-escena { height: 540px; }
 }
 
+/* ════════════════════════════════════════════════════════════════════════════
+   DISTRIBUCIÓN MÓVIL (replanteo F del audit 2026-06-28 — "4 portales VISIBLES,
+   no escondidos"): en el celular del campesino los 4 portales quedaban ENTEROS
+   bajo el fold (topbar + escena 360px + compositor + saludo ≈ 690px antes del
+   primer portal). El usuario nuevo con 0 plantas veía escena y saludo… y nada
+   de qué ES Chagra. Dos movidas, solo de layout (cero lógica nueva):
+
+   1. La ESCENA cede altura en pantalla angosta (clamp por dvh): sigue siendo la
+      portada inmersiva, pero no se come media pantalla. Si el navegador no
+      soporta dvh/clamp, la declaración se ignora y quedan los 360px de siempre.
+   2. Los 4 PORTALES SUBEN justo bajo el compositor del agente y el saludo
+      grande baja a cerrar el hero. Se logra SIN tocar el DOM (el desktop
+      conserva su grilla escena|columna): .fvh-main/.fvh-aside pasan a
+      display:contents y los bloques se reordenan con `order` sobre la columna
+      flex del shell. Todos los bloques llevan order explícito, de modo que si
+      un navegador viejo ignora display:contents el orden efectivo es EXACTO al
+      de hoy (degradación limpia). El saludo es texto no interactivo: el orden
+      del DOM (y del lector de pantalla / tab) no cambia.
+   Jerarquía resultante para el primerizo: su finca (escena) → pregúntele al
+   agente (compositor) → los 4 portales (Mi finca · Aprender · Jugar · Agente). */
+@media (max-width: 899.98px) {
+  .fvh-main,
+  .fvh-aside { display: contents; }
+
+  .fvh-topbar { order: 1; }
+  .fvh-qa { order: 2; }
+  .fvh-main,
+  .fvh-escena-wrap { order: 3; }
+  .fvh-aside,
+  .fvh-composer-wrap { order: 4; }
+  .fvh-portales-tit { order: 5; }
+  .fvh-portales { order: 6; }
+  .fvh-hero-saludo { order: 7; }
+  .fvh-fill { order: 8; }
+
+  /* La escena respira pero deja ver los portales: ~1/3 del viewport. */
+  .fvh-escena { height: clamp(224px, 32dvh, 340px); }
+
+  /* Aire justo entre compositor → portales → saludo de cierre. */
+  .fvh-portales-tit { margin-top: 14px; }
+  .fvh-hero-saludo { padding-top: 18px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fvh *, .fvh *::before, .fvh *::after { animation: none !important; }
   .fvh-portal,
