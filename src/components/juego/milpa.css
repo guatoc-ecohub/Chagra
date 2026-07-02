@@ -172,7 +172,36 @@
   100% { transform: translateX(0); opacity: 1; }
 }
 
+/* Brillo que recorre las barras de resultado (celebra sin estorbar). */
+.milpa-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.milpa-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
+  transform: translateX(-100%);
+  animation: milpa-shimmer-mover 2.6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes milpa-shimmer-mover {
+  to { transform: translateX(100%); }
+}
+
+/* Halo vivo de la parcela seleccionada (se ve dónde estoy sembrando). */
+.milpa-parcela-activa {
+  animation: milpa-parcela-halo 2s ease-in-out infinite;
+}
+@keyframes milpa-parcela-halo {
+  0%, 100% { box-shadow: 0 0 6px rgba(190, 242, 100, 0.25); }
+  50% { box-shadow: 0 0 18px rgba(190, 242, 100, 0.5); }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .milpa-shimmer::after,
+  .milpa-parcela-activa,
   .milpa-badge-pop,
   .milpa-brota,
   .milpa-pulso,

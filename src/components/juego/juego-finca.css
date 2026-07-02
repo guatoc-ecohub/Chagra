@@ -74,6 +74,38 @@
   50% { transform: translateY(-8px); }
 }
 
+/* Pajaritos que cruzan el cielo despacito (ida y vuelta suave). */
+.fv-bird {
+  animation: fv-bird-cruzar 16s ease-in-out infinite;
+}
+.fv-bird-2 {
+  animation: fv-bird-cruzar 22s ease-in-out infinite reverse;
+}
+@keyframes fv-bird-cruzar {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(26px, -5px); }
+  50% { transform: translate(52px, 2px); }
+  75% { transform: translate(26px, -4px); }
+}
+
+/* Brillo que recorre la barra de progreso de la finca (celebra sin ruido). */
+.fv-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.fv-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 32%, rgba(255, 255, 255, 0.3) 50%, transparent 68%);
+  transform: translateX(-100%);
+  animation: fv-shimmer-mover 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes fv-shimmer-mover {
+  to { transform: translateX(100%); }
+}
+
 /* ── Animales vivos de la escena (mockup F2 "Finca Viva") ─────────────── */
 
 /* La gallina picotea: la cabeza baja y vuelve. transform-box para que el
@@ -176,6 +208,9 @@
   .fv-sway,
   .fv-sway-slow,
   .fv-float,
+  .fv-bird,
+  .fv-bird-2,
+  .fv-shimmer::after,
   .fv-peck,
   .fv-wiggle,
   .fv-celebration-emoji,

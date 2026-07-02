@@ -737,6 +737,25 @@ export default function DoomFincaScreen({ onBack, onHome }) {
 
       ctx.putImageData(imageData, 0, 0);
 
+      // ── Viñeta cinematográfica (solo estética: bordes suaves oscuros) ──
+      const vig = ctx.createRadialGradient(W / 2, H / 2, H * 0.42, W / 2, H / 2, H * 0.88);
+      vig.addColorStop(0, 'rgba(0,0,0,0)');
+      vig.addColorStop(1, 'rgba(8,16,10,0.4)');
+      ctx.fillStyle = vig;
+      ctx.fillRect(0, 0, W, H);
+
+      // ── Aviso de vitalidad baja: halo rojo que respira (urgencia visible) ──
+      const vitFrac = Math.max(0, w.vitalidad / CONFIG_DOOM.vitalidadMax);
+      if (vitFrac < 0.35) {
+        const urgencia = 1 - vitFrac / 0.35;
+        const pulso = (0.12 + 0.12 * (0.5 + 0.5 * Math.sin(w.t * 0.14))) * urgencia;
+        const rojo = ctx.createRadialGradient(W / 2, H / 2, H * 0.32, W / 2, H / 2, H * 0.8);
+        rojo.addColorStop(0, 'rgba(0,0,0,0)');
+        rojo.addColorStop(1, `rgba(190,30,30,${pulso.toFixed(3)})`);
+        ctx.fillStyle = rojo;
+        ctx.fillRect(0, 0, W, H);
+      }
+
       // ── Marcador de color sobre cada plaga cercana (verde/rojo) ──
       for (const r of plagaRects) {
         if (r.dist > 9) continue;
@@ -783,7 +802,10 @@ export default function DoomFincaScreen({ onBack, onHome }) {
       const miraColor = aim.plaga
         ? (aim.correcto ? 'rgba(130,255,130,0.98)' : 'rgba(255,180,70,0.98)')
         : 'rgba(255,255,255,0.7)';
-      const ringR = aim.plaga ? 6 : 4;
+      // La mira "late" suave cuando hay objetivo con el benéfico correcto.
+      const ringR = aim.plaga
+        ? 6 + (aim.correcto ? (0.5 + 0.5 * Math.sin(w.t * 0.22)) * 1.6 : 0)
+        : 4;
       ctx.strokeStyle = miraColor;
       ctx.lineWidth = aim.plaga ? 1.4 : 1;
       ctx.beginPath();
@@ -958,6 +980,13 @@ export default function DoomFincaScreen({ onBack, onHome }) {
   }, [beep]);
 
   const vitalidadPct = Math.round((vitalidad / CONFIG_DOOM.vitalidadMax) * 100);
+  // Color de la barra de vitalidad según el estado (verde → ámbar → rojo):
+  // el número ya estaba, ahora el color también cuenta la historia.
+  const vitalGradiente = vitalidadPct > 60
+    ? 'from-emerald-500 to-lime-400'
+    : vitalidadPct > 30
+      ? 'from-amber-500 to-yellow-400'
+      : 'from-rose-600 to-red-400 animate-pulse';
   const escenarioActual = ESCENARIOS[rondaIdx] || ESCENARIOS[0];
   const sugeridos = escenarioActual.beneficosSugeridos;
   // En la transicion ('ronda') el rondaIdx todavia apunta a la ronda ya
@@ -981,18 +1010,21 @@ export default function DoomFincaScreen({ onBack, onHome }) {
 
         {/* ── HUD superior: ronda, plagas, puntaje, combo ── */}
         <div className="jp-doom-hud flex items-center justify-between gap-2 text-xs font-bold shrink-0">
-          <span className="flex items-center gap-1 text-emerald-200 whitespace-nowrap">
+          <span className="flex items-center gap-1 text-emerald-200 whitespace-nowrap rounded-full bg-emerald-950/60 border border-emerald-700/30 px-2 py-0.5">
             <span aria-hidden="true">{escenarioActual.icono}</span>
             <span>Ronda {rondaIdx + 1}/{ESCENARIOS.length}</span>
           </span>
-          <span className="flex items-center gap-1 text-amber-300 whitespace-nowrap" aria-label={`${plagasRestantes} plagas restantes`}>
+          <span className="flex items-center gap-1 text-amber-300 whitespace-nowrap rounded-full bg-amber-950/50 border border-amber-700/30 px-2 py-0.5" aria-label={`${plagasRestantes} plagas restantes`}>
             <Bug size={13} aria-hidden="true" />{plagasRestantes}
           </span>
-          <span className="flex items-center gap-1 text-lime-300 whitespace-nowrap" aria-label={`Puntaje ${puntaje}`}>
+          <span className="flex items-center gap-1 text-lime-300 whitespace-nowrap rounded-full bg-lime-950/50 border border-lime-700/30 px-2 py-0.5" aria-label={`Puntaje ${puntaje}`}>
             <Trophy size={13} aria-hidden="true" />{puntaje}
           </span>
           {combo > 1 && (
-            <span className="flex items-center gap-0.5 text-orange-300 whitespace-nowrap" aria-label={`Combo ${combo}`}>
+            <span
+              className="flex items-center gap-0.5 text-orange-200 whitespace-nowrap rounded-full bg-orange-500/25 border border-orange-400/40 px-2 py-0.5 animate-pulse"
+              aria-label={`Combo ${combo}`}
+            >
               <Zap size={13} aria-hidden="true" />x{combo}
             </span>
           )}
@@ -1003,7 +1035,7 @@ export default function DoomFincaScreen({ onBack, onHome }) {
           <Heart size={13} className="text-emerald-300" aria-hidden="true" />
           <div className="jp-doom-vital-riel flex-1 h-3.5 bg-slate-800/60 rounded-full overflow-hidden border border-emerald-900/40">
             <div
-              className="h-full bg-gradient-to-r from-emerald-500 to-lime-400 rounded-full transition-all duration-300"
+              className={`h-full bg-gradient-to-r ${vitalGradiente} rounded-full transition-all duration-300`}
               style={{ width: `${vitalidadPct}%` }}
             />
           </div>
@@ -1217,8 +1249,15 @@ export default function DoomFincaScreen({ onBack, onHome }) {
                 style={{
                   borderColor: sel ? b.color : recomendado ? 'rgba(52,211,153,0.5)' : 'rgba(255,255,255,0.15)',
                   backgroundColor: sel ? `${b.color}22` : 'rgba(255,255,255,0.05)',
+                  boxShadow: sel ? `0 0 12px ${b.color}55` : 'none',
                 }}
               >
+                {recomendado && !sel && (
+                  <span
+                    className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-emerald-400 border border-emerald-200"
+                    aria-hidden="true"
+                  />
+                )}
                 <span className="jp-tinta-suave absolute top-0.5 left-1 text-2xs text-white/40 font-bold">{i + 1}</span>
                 <span className="text-lg" aria-hidden="true">{b.emoji}</span>
                 <span className="jp-tinta text-2xs font-bold text-white/80 leading-none text-center">{b.nombre.split(' ')[0]}</span>

@@ -1,0 +1,32 @@
+/*
+ * mono-vs-poli.css — entradas suaves para el simulador Monocultivo vs
+ * Policultivo. CSS puro, offline-first, gama baja (solo transform/opacity).
+ * Respeta prefers-reduced-motion.
+ */
+
+/* Cada tarjeta de asociación entra con un levantamiento suave. */
+.mvp-entrar {
+  animation: mvp-entrar 0.5s ease-out both;
+}
+@keyframes mvp-entrar {
+  0% { transform: translateY(14px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* Las plantas del hero se mecen apenas. */
+.mvp-planta {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: mvp-mecer 5s ease-in-out infinite;
+}
+@keyframes mvp-mecer {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mvp-entrar,
+  .mvp-planta {
+    animation: none !important;
+  }
+}
