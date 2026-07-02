@@ -207,3 +207,4 @@ Lo demás es ingeniería y TDAH a tope.
 4. **No tocar**: `.env.example`, `LICENSE`, ni el footer "For the next custodian / Este código existe…" (lo preserva el bloque final).
 5. **Validación visual**: GitHub renderiza correctamente los anchors `#chagra-es` y `#chagra-en` con TOC arriba.
 6. **Anti-leak**: no menciona infraestructura privada, modelos no-públicos, ni decisiones de pricing.
+// redeploy trigger 1783021143
