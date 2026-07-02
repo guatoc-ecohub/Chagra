@@ -4,7 +4,7 @@
  * (despliegue de ramas, onPick) se valida en vivo con chromium.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, cleanup } from '@testing-library/react';
+import { render, cleanup, fireEvent } from '@testing-library/react';
 
 // jsdom no trae ResizeObserver (lo usa el motor de geometría viva).
 globalThis.ResizeObserver = globalThis.ResizeObserver || class {
@@ -154,5 +154,49 @@ describe('AgentRedMenu — smoke', () => {
     const anchorRef = { current: null };
     const { container } = render(<AgentRedMenu onPick={vi.fn()} anchorRef={anchorRef} />);
     expect(container.querySelector('.arm-root')).toBeTruthy();
+  });
+});
+
+describe('AgentRedMenu — ramas de una sola hoja = acción directa (replanteo F, audit 06-28)', () => {
+  // Un grupo con exactamente UNA hoja no despliega submenú (fachada de dos
+  // toques): se promueve a acción directa que dispara onPick con la hoja real.
+  const nodo = (container, label) =>
+    container.querySelector(`.arm-nodes [aria-label="${label}"]`);
+
+  it('"Aprender" es acción directa (sin submenú) y abre el hub real (aprender_hub → aprende)', () => {
+    const onPick = vi.fn();
+    const { container } = render(<AgentRedMenu onPick={onPick} />);
+    const n = nodo(container, 'Aprender');
+    expect(n).toBeTruthy();
+    expect(n.className).toContain('arm-feat');          // acción directa
+    expect(n.getAttribute('aria-expanded')).toBeNull(); // no es submenú
+    fireEvent.click(n);
+    expect(onPick).toHaveBeenCalledTimes(1);
+    const cap = onPick.mock.calls[0][0];
+    expect(cap.id).toBe('aprender_hub');
+    expect(cap.heroRoute).toEqual({ kind: 'nav', view: 'aprende' });
+  });
+
+  it('"Vender mejor" es acción directa y lleva al mercado real (mercado → vista mercado)', () => {
+    const onPick = vi.fn();
+    const { container } = render(<AgentRedMenu onPick={onPick} />);
+    const n = nodo(container, 'Vender mejor');
+    expect(n).toBeTruthy();
+    expect(n.className).toContain('arm-feat');
+    expect(n.getAttribute('aria-expanded')).toBeNull();
+    fireEvent.click(n);
+    expect(onPick).toHaveBeenCalledTimes(1);
+    const cap = onPick.mock.calls[0][0];
+    expect(cap.id).toBe('mercado');
+    expect(cap.heroRoute).toEqual({ kind: 'nav', view: 'mercado' });
+  });
+
+  it('los grupos con VARIAS hojas siguen siendo ramas desplegables (aria-expanded presente)', () => {
+    const { container } = render(<AgentRedMenu onPick={vi.fn()} />);
+    const grupos = container.querySelectorAll('.arm-nodes .arm-group');
+    expect(grupos.length).toBeGreaterThan(0);
+    grupos.forEach((g) => {
+      expect(g.getAttribute('aria-expanded')).not.toBeNull();
+    });
   });
 });
