@@ -1,6 +1,6 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish -- legacy UI copy already tracked separately */
 import React, { useState, useMemo, useEffect } from 'react';
-import { X, Calendar, Tag, Activity, MapPin, AlertCircle, Images, Skull, Layers, Sprout } from 'lucide-react';
+import { X, Calendar, Tag, Activity, MapPin, AlertCircle, Images, Skull, Layers, Sprout, Ruler } from 'lucide-react';
 import { SplitFlow } from './SplitFlow';
 import PlantCemeteryModal from './PlantCemeteryModal';
 import useAssetStore from '../store/useAssetStore';
@@ -20,6 +20,8 @@ import { usePhotoUrl } from '../hooks/usePhotoUrl';
 import { ETAPA_FENOLOGICA_LABELS } from '../utils/plantMeta';
 import { getAllSpecies } from '../db/catalogDB';
 import SpeciesImage from './SpeciesImage';
+import EtapaCicloIcon from './icons/EtapaCicloIcon.jsx';
+import { getSpeciesVisual, SPECIES_TONE_CLASSES } from '../utils/speciesVisual';
 import { matchSpeciesInCatalog } from '../utils/speciesResolver';
 import { getFeedingPlanKindForSpecies, resolveFeedingPlanTemplateForSpecies } from '../data/feedingPlanFrutales';
 
@@ -68,6 +70,20 @@ const PHOTO_SUCCESS_LABELS = {
   equipment: '✓ Foto guardada para este equipo.',
   default: '✓ Foto guardada.',
 };
+
+// Hoja de vida (2026-07) — capa VISUAL del estado del activo. Mapea el
+// `status` FarmOS a un badge legible en español (el raw "active" en inglés
+// no le dice nada al productor). Solo presentación: los values persistidos
+// no cambian. Fallback: cualquier status desconocido se muestra tal cual
+// en tono neutro — nunca un hueco.
+const STATUS_META = {
+  active: { label: 'Activa', dot: 'bg-emerald-400', chip: 'bg-emerald-900/40 text-emerald-300 border-emerald-700/50' },
+  dead: { label: 'Muerta', dot: 'bg-rose-400', chip: 'bg-rose-900/40 text-rose-300 border-rose-700/50' },
+  archived: { label: 'Archivada', dot: 'bg-slate-400', chip: 'bg-slate-800/60 text-slate-300 border-slate-600/50' },
+};
+
+const resolveStatusMeta = (status) => STATUS_META[status]
+  || { label: status || 'Sin estado', dot: 'bg-slate-400', chip: 'bg-slate-800/60 text-slate-300 border-slate-600/50' };
 
 function PhotoHeroSection({ assetId, speciesSlug, assetType, scientificName, commonName, category, catalogImage }) {
   const [busy, setBusy] = useState(false);
@@ -298,16 +314,35 @@ const PlantMetaPanel = ({ asset }) => {
 
   if (!fechaLabel && !alturaLabel && !etapaLabel) return null;
 
+  // Hoja de vida (2026-07): la lista plana de <li> se vuelve chips con
+  // glifo (set único EtapaCicloIcon para la etapa — misma familia que
+  // PhenologyTimeline y GuiaEspecieCards). El momento de la planta es el
+  // dato más importante del estado actual → chip destacado en emerald.
   return (
     <section
       data-testid="plant-meta-panel"
-      className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50 space-y-2"
+      className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50 space-y-3"
     >
       <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Estado actual</h3>
-      <ul className="space-y-1 text-sm text-white">
-        {fechaLabel && <li>{fechaLabel}</li>}
-        {alturaLabel && <li>{alturaLabel}</li>}
-        {etapaLabel && <li>{etapaLabel}</li>}
+      <ul className="flex flex-wrap gap-2 text-sm text-white">
+        {etapaLabel && (
+          <li className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-900/30 border border-emerald-700/40 text-emerald-100 font-medium">
+            <EtapaCicloIcon code={etapaRaw} size={14} className="text-emerald-300 shrink-0" />
+            {etapaLabel}
+          </li>
+        )}
+        {fechaLabel && (
+          <li className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/60 border border-slate-700/50 text-slate-200">
+            <Calendar size={13} className="text-slate-400 shrink-0" aria-hidden="true" />
+            {fechaLabel}
+          </li>
+        )}
+        {alturaLabel && (
+          <li className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/60 border border-slate-700/50 text-slate-200">
+            <Ruler size={13} className="text-slate-400 shrink-0" aria-hidden="true" />
+            {alturaLabel}
+          </li>
+        )}
       </ul>
     </section>
   );
@@ -751,6 +786,15 @@ export const AssetDetailView = () => {
   const name = asset.attributes?.name || asset.name || 'Sin nombre';
   const speciesSlug = isPlantType ? resolveSpeciesSlug(asset) : null;
   const status = asset.attributes?.status || 'active';
+  // Hoja de vida (2026-07): identidad visual del hero. El emoji por especie
+  // (utils/speciesVisual — mismo criterio que el Directorio y el combobox)
+  // ancla la ficha de un vistazo; el badge de estado y el momento de la
+  // planta suben al header para que el "cómo va" se lea sin scrolear.
+  const speciesVisual = isPlantType
+    ? getSpeciesVisual({ comun: commonName || deriveCommonName(name), cientifico: scientificName, categoria: speciesCategory })
+    : null;
+  const statusMeta = resolveStatusMeta(status);
+  const headerEtapa = isPlantType ? asset.attributes?._chagra_plant_meta?.etapa_fenologica : null;
   // Bug 2026-06-20 operator: Invalid Date en Registro.
   // asset.attributes.created viene del server FarmOS post-sync. Para optimistic locales
   // (recién creadas aún no sincronizadas), fallback a asset._createdAt (timestamp local en ms).
@@ -788,9 +832,38 @@ export const AssetDetailView = () => {
             aria-label explícito para screenreaders.
             Bug 2026-06-20: Aplicar tema estándar de la app usando variables CSS. */}
         <div className="p-6 border-b border-[rgb(var(--c-surface-border))] flex justify-between items-start bg-[rgb(var(--c-surface-card))] sticky top-0 z-10">
-          <div className="min-w-0">
-            <h2 className="text-2xl font-bold text-white truncate">{name}</h2>
-            <p className="text-slate-500 text-xs font-mono">ID: {asset.id}</p>
+          {/* Hoja de vida (2026-07): hero de identidad — emoji de especie +
+              nombre + badges de estado/momento. La jerarquía es
+              quién-es → cómo-está; el ID técnico baja a nota al pie. */}
+          <div className="min-w-0 flex items-start gap-3">
+            {speciesVisual && (
+              <span
+                aria-hidden="true"
+                data-testid="asset-detail-species-badge"
+                className={`w-12 h-12 shrink-0 rounded-2xl border flex items-center justify-center text-2xl leading-none ${SPECIES_TONE_CLASSES[speciesVisual.tone] || SPECIES_TONE_CLASSES.emerald}`}
+              >
+                {speciesVisual.emoji}
+              </span>
+            )}
+            <div className="min-w-0">
+              <h2 className="text-2xl font-bold text-white truncate">{name}</h2>
+              <div className="flex items-center gap-2 flex-wrap mt-1.5">
+                <span
+                  data-testid="asset-detail-status-badge"
+                  className={`inline-flex items-center gap-1.5 text-[11px] font-bold px-2 py-0.5 rounded-full border ${statusMeta.chip}`}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${statusMeta.dot}`} aria-hidden="true" />
+                  {statusMeta.label}
+                </span>
+                {headerEtapa && (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full border bg-slate-800/60 text-slate-200 border-slate-600/50">
+                    <EtapaCicloIcon code={headerEtapa} size={12} className="text-emerald-300 shrink-0" />
+                    {ETAPA_FENOLOGICA_LABELS[headerEtapa] || headerEtapa}
+                  </span>
+                )}
+              </div>
+              <p className="text-slate-500 text-[11px] font-mono truncate mt-1">ID: {asset.id}</p>
+            </div>
           </div>
           <button
             type="button"
@@ -828,7 +901,12 @@ export const AssetDetailView = () => {
             </div>
             <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50">
               <span className="text-xs text-slate-500 flex items-center gap-1 italic mb-1"><Activity size={12} /> Estado</span>
-              <p className="text-white text-sm font-medium capitalize">{status}</p>
+              {/* Hoja de vida (2026-07): label en español + punto de color en
+                  vez del raw "active" capitalizado en inglés. */}
+              <p className="text-white text-sm font-medium flex items-center gap-1.5">
+                <span className={`w-2 h-2 rounded-full shrink-0 ${statusMeta.dot}`} aria-hidden="true" />
+                {statusMeta.label}
+              </p>
             </div>
           </div>
 
@@ -893,8 +971,10 @@ export const AssetDetailView = () => {
             </button>
           )}
 
+          {/* Hoja de vida (2026-07): se quita el h3 "Línea de Tiempo"
+              duplicado — AssetTimeline ya trae su propio encabezado con
+              icono, y el doble título se veía redundante en el scroll. */}
           <section className="pb-10">
-            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4 px-1">Línea de Tiempo</h3>
             <AssetTimeline assetId={asset.id} />
           </section>
 
