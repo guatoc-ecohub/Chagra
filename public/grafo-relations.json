@@ -2020,108 +2020,238 @@
       ],
       "biopreparados": [
         {
-          "id": "beauveria_bassiana",
-          "nombre": "Beauveria bassiana (hongo entomopatógeno)"
-        },
-        {
           "id": "caldo_bordeles",
-          "nombre": "Caldo bordelés"
-        },
-        {
-          "id": "bocashi",
-          "nombre": "Bocashi"
-        },
-        {
-          "id": "humus_liquido",
-          "nombre": "Humus líquido (lixiviado de lombriz)"
-        },
-        {
-          "id": "trampa_amarilla_pegante",
-          "nombre": "Trampa amarilla pegante (mosca blanca / áfidos alados)"
-        },
-        {
-          "id": "extracto_paraiso_melia",
-          "nombre": "Extracto/purín de paraíso (Melia azedarach)"
-        },
-        {
-          "id": "trampa_azul_pegante",
-          "nombre": "Trampa azul pegante (trips)"
-        },
-        {
-          "id": "purpureocillium_lilacinum",
-          "nombre": "Hongo nematófago Purpureocillium lilacinum (Paecilomyces)"
-        },
-        {
-          "id": "pochonia_chlamydosporia",
-          "nombre": "Hongo nematófago Pochonia chlamydosporia"
-        },
-        {
-          "id": "abono_verde_crotalaria",
-          "nombre": "Abono verde de crotalaria (Crotalaria spectabilis/juncea) supresor de nematodos"
-        },
-        {
-          "id": "caldo_ceniza_cal_antigota",
-          "nombre": "Caldo de ceniza y cal anti-gota (variante mineral para tizón de papa)"
-        },
-        {
-          "id": "harina_neem_suelo",
-          "nombre": "Harina de neem aplicada al suelo (torta de nim)"
-        },
-        {
-          "id": "trampa_feromona_cogollero",
-          "nombre": "Trampa de feromona sexual para cogollero / polilla"
-        },
-        {
-          "id": "extracto_eucalipto",
-          "nombre": "Extracto de eucalipto repelente"
-        },
-        {
-          "id": "azufre_mojable_foliar",
-          "nombre": "Azufre mojable foliar (anti-ácaros y oídio)"
+          "nombre": "Caldo bordelés",
+          "specificity": {
+            "score": 0.98,
+            "label": "muy alta",
+            "provenance": "AGROSAVIA manual biopreparados and potato late blight literature"
+          }
         },
         {
           "id": "caldo_bordeles_trichoderma",
-          "nombre": "Caldo bordelés enriquecido con Trichoderma (manejo de gota integrado)"
-        },
-        {
-          "id": "ceniza_vegetal_espolvoreo",
-          "nombre": "Ceniza vegetal espolvoreada en seco"
-        },
-        {
-          "id": "caldo_cola_caballo",
-          "nombre": "Caldo/macerado de cola de caballo (Equisetum)"
-        },
-        {
-          "id": "sal_epsom_foliar",
-          "nombre": "Sal de Epsom foliar (sulfato de magnesio)"
-        },
-        {
-          "id": "extracto_tagetes_nematicida",
-          "nombre": "Extracto/incorporación de tagetes (Tagetes — flor de muerto) nematicida"
-        },
-        {
-          "id": "tierra_diatomeas",
-          "nombre": "Tierra de diatomeas (polvo de sílice amorfo)"
-        },
-        {
-          "id": "trichoderma_tratamiento_semilla",
-          "nombre": "Trichoderma para tratamiento de semilla (fríjol/papa/maíz)"
-        },
-        {
-          "id": "biol",
-          "nombre": "Biol"
-        },
-        {
-          "id": "supermagro",
-          "nombre": "Supermagro"
+          "nombre": "Caldo bordelés enriquecido con Trichoderma (manejo de gota integrado)",
+          "specificity": {
+            "score": 0.97,
+            "label": "muy alta",
+            "provenance": "Integrated potato late blight and soil disease management"
+          }
         },
         {
           "id": "trichoderma_harzianum_suelo",
-          "nombre": "Trichoderma harzianum (aplicación al suelo)"
+          "nombre": "Trichoderma harzianum (aplicación al suelo)",
+          "specificity": {
+            "score": 0.96,
+            "label": "muy alta",
+            "provenance": "Potato soilborne disease control, especially Rhizoctonia"
+          }
+        },
+        {
+          "id": "trichoderma_tratamiento_semilla",
+          "nombre": "Trichoderma para tratamiento de semilla (fríjol/papa/maíz)",
+          "specificity": {
+            "score": 0.94,
+            "label": "alta",
+            "provenance": "Potato seed tuber treatment for soilborne disease pressure"
+          }
+        },
+        {
+          "id": "caldo_ceniza_cal_antigota",
+          "nombre": "Caldo de ceniza y cal anti-gota (variante mineral para tizón de papa)",
+          "specificity": {
+            "score": 0.88,
+            "label": "alta",
+            "provenance": "Potato late blight preventive variant"
+          }
+        },
+        {
+          "id": "trampa_feromona_cogollero",
+          "nombre": "Trampa de feromona sexual para cogollero / polilla",
+          "specificity": {
+            "score": 0.83,
+            "label": "alta",
+            "provenance": "Potato moth monitoring and lepidopteran pressure"
+          }
+        },
+        {
+          "id": "beauveria_bassiana",
+          "nombre": "Beauveria bassiana (hongo entomopatógeno)",
+          "specificity": {
+            "score": 0.82,
+            "label": "alta",
+            "provenance": "Potato tuber moth and potato beetle biocontrol literature"
+          }
         },
         {
           "id": "metarhizium_anisopliae",
-          "nombre": "Metarhizium anisopliae (hongo entomopatógeno verde)"
+          "nombre": "Metarhizium anisopliae (hongo entomopatógeno verde)",
+          "specificity": {
+            "score": 0.8,
+            "label": "alta",
+            "provenance": "Broad entomopathogen used against potato soil pests"
+          }
+        },
+        {
+          "id": "purpureocillium_lilacinum",
+          "nombre": "Hongo nematófago Purpureocillium lilacinum (Paecilomyces)",
+          "specificity": {
+            "score": 0.78,
+            "label": "media",
+            "provenance": "Potato cyst nematodes and root-knot nematodes"
+          }
+        },
+        {
+          "id": "pochonia_chlamydosporia",
+          "nombre": "Hongo nematófago Pochonia chlamydosporia",
+          "specificity": {
+            "score": 0.78,
+            "label": "media",
+            "provenance": "Potato cyst nematodes and root-knot nematodes"
+          }
+        },
+        {
+          "id": "trampa_azul_pegante",
+          "nombre": "Trampa azul pegante (trips)",
+          "specificity": {
+            "score": 0.76,
+            "label": "media",
+            "provenance": "Potato thrips monitoring"
+          }
+        },
+        {
+          "id": "trampa_amarilla_pegante",
+          "nombre": "Trampa amarilla pegante (mosca blanca / áfidos alados)",
+          "specificity": {
+            "score": 0.74,
+            "label": "media",
+            "provenance": "Potato whitefly and aphid monitoring"
+          }
+        },
+        {
+          "id": "extracto_tagetes_nematicida",
+          "nombre": "Extracto/incorporación de tagetes (Tagetes — flor de muerto) nematicida",
+          "specificity": {
+            "score": 0.69,
+            "label": "media",
+            "provenance": "Nematicide used in potato rotations and soil sanitation"
+          }
+        },
+        {
+          "id": "harina_neem_suelo",
+          "nombre": "Harina de neem aplicada al suelo (torta de nim)",
+          "specificity": {
+            "score": 0.68,
+            "label": "media",
+            "provenance": "Potato soil pest and nematode suppression"
+          }
+        },
+        {
+          "id": "tierra_diatomeas",
+          "nombre": "Tierra de diatomeas (polvo de sílice amorfo)",
+          "specificity": {
+            "score": 0.64,
+            "label": "media",
+            "provenance": "Contact pest control, generic but useful in potato"
+          }
+        },
+        {
+          "id": "extracto_paraiso_melia",
+          "nombre": "Extracto/purín de paraíso (Melia azedarach)",
+          "specificity": {
+            "score": 0.62,
+            "label": "media",
+            "provenance": "Botanical repellent used in potato systems"
+          }
+        },
+        {
+          "id": "azufre_mojable_foliar",
+          "nombre": "Azufre mojable foliar (anti-ácaros y oídio)",
+          "specificity": {
+            "score": 0.6,
+            "label": "media",
+            "provenance": "Broad fungicide and acaricide useful on potato"
+          }
+        },
+        {
+          "id": "caldo_cola_caballo",
+          "nombre": "Caldo/macerado de cola de caballo (Equisetum)",
+          "specificity": {
+            "score": 0.58,
+            "label": "media",
+            "provenance": "Broad antifungal, sometimes used on potato foliage"
+          }
+        },
+        {
+          "id": "abono_verde_crotalaria",
+          "nombre": "Abono verde de crotalaria (Crotalaria spectabilis/juncea) supresor de nematodos",
+          "specificity": {
+            "score": 0.52,
+            "label": "media",
+            "provenance": "Rotation and nematode suppression in potato systems"
+          }
+        },
+        {
+          "id": "sal_epsom_foliar",
+          "nombre": "Sal de Epsom foliar (sulfato de magnesio)",
+          "specificity": {
+            "score": 0.5,
+            "label": "media",
+            "provenance": "Nutrient correction useful in potato but not exclusive"
+          }
+        },
+        {
+          "id": "extracto_eucalipto",
+          "nombre": "Extracto de eucalipto repelente",
+          "specificity": {
+            "score": 0.42,
+            "label": "baja",
+            "provenance": "Broad botanical repellent, not potato-specific"
+          }
+        },
+        {
+          "id": "ceniza_vegetal_espolvoreo",
+          "nombre": "Ceniza vegetal espolvoreada en seco",
+          "specificity": {
+            "score": 0.36,
+            "label": "baja",
+            "provenance": "Mineral barrier, broadly applicable across crops"
+          }
+        },
+        {
+          "id": "supermagro",
+          "nombre": "Supermagro",
+          "specificity": {
+            "score": 0.31,
+            "label": "baja",
+            "provenance": "General biofertilizer, applicable across crops"
+          }
+        },
+        {
+          "id": "bocashi",
+          "nombre": "Bocashi",
+          "specificity": {
+            "score": 0.3,
+            "label": "baja",
+            "provenance": "General soil amendment, not potato-specific"
+          }
+        },
+        {
+          "id": "biol",
+          "nombre": "Biol",
+          "specificity": {
+            "score": 0.29,
+            "label": "baja",
+            "provenance": "General biofertilizer, applicable across crops"
+          }
+        },
+        {
+          "id": "humus_liquido",
+          "nombre": "Humus líquido (lixiviado de lombriz)",
+          "specificity": {
+            "score": 0.28,
+            "label": "baja",
+            "provenance": "General fertility input, broadly applicable"
+          }
         }
       ],
       "pest_controllers": [
