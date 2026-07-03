@@ -74,7 +74,9 @@ export default function LegalLinks() {
     <>
       <div className="mt-8 pt-5 border-t border-slate-800 w-full text-center">
         <p className="text-xs text-slate-500 leading-relaxed px-2">
-          Al ingresar aceptas los{' '}
+          {/* Tono usted colombiano (decisión operador 2026-05-04): "acepta",
+              no "aceptas" — este texto vive en la pantalla de ingreso. */}
+          Al ingresar usted acepta los{' '}
           <button
             type="button"
             onClick={() => open(tycRef)}

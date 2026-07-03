@@ -1,11 +1,14 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- UI copy ES-CO de la
+ * pantalla puente OAuth (mismo criterio que App.jsx/AssetsDashboard); la
+ * migración a messages.js (ADR-050) se trackea aparte. */
 import React, { useEffect, useState } from 'react';
-import { Sprout } from 'lucide-react';
 import { handleOAuthCallback } from '../services/authService';
 import { setCurrentOperator } from '../services/operatorIdentityService';
 import { setActiveTenantId } from '../services/tenantContext';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
 import { prewarmCorpus } from '../services/ragRetriever';
 import ChagraGrowLoader from './ChagraGrowLoader';
+import ChagraAgentAvatarColibri from './ChagraAgentAvatarColibri';
 
 /**
  * OAuthCallback — pantalla puente del flujo Authorization Code + PKCE.
@@ -108,17 +111,40 @@ export default function OAuthCallback({ onSuccess, onError }) {
     return () => { cancelled = true; };
   }, [onSuccess, onError]);
 
+  // Capa visual alineada con LoginScreen (lavada visual): mismo orbe del
+  // Colibrí Barbudito, misma aurora esmeralda/cian y mensajes en USTED.
+  // La lógica del intercambio PKCE de arriba NO cambia.
   return (
-    <div className="relative min-h-[100dvh] w-full bg-slate-950 bg-biopunk-pattern flex flex-col justify-center items-center p-6 text-slate-100">
-      <div className="w-24 h-24 bg-muzo/20 rounded-full flex items-center justify-center shadow-neon-muzo mb-6">
-        <Sprout size={56} className="text-muzo-glow" />
+    <div className="relative min-h-[100dvh] w-full bg-slate-950 bg-biopunk-pattern flex flex-col justify-center items-center text-slate-100 px-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+      {/* Aurora del páramo — misma firma de fondo del login. */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-[60vh] pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(60% 45% at 50% 8%, rgba(16,185,129,0.20), transparent 70%), radial-gradient(55% 40% at 78% 22%, rgba(6,182,212,0.14), transparent 70%)',
+        }}
+      />
+      <div className="relative z-10 flex flex-col items-center">
+        <div className="relative w-28 h-28 rounded-full bg-slate-900/70 backdrop-blur-sm ring-1 ring-muzo/40 shadow-neon-muzo flex items-center justify-center mb-6">
+          <span aria-hidden="true" className="absolute inset-0 rounded-full ring-1 ring-muzo/20 animate-pulse" />
+          <ChagraAgentAvatarColibri
+            state="thinking"
+            size={88}
+            ariaLabel="Colibrí Barbudito, símbolo de Chagra"
+          />
+        </div>
+        <ChagraGrowLoader size={64} showLabel labelText="Verificando su sesión…" />
+        {status === 'error' && (
+          <p
+            role="alert"
+            className="mt-6 flex items-start gap-2.5 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-amber-200 font-semibold text-center max-w-sm leading-snug"
+          >
+            No se pudo completar el inicio de sesión. Lo llevamos de vuelta a
+            la pantalla de ingreso.
+          </p>
+        )}
       </div>
-      <ChagraGrowLoader size={64} showLabel labelText="Verificando sesión..." />
-      {status === 'error' && (
-        <p role="alert" className="mt-6 text-amber-400 font-bold text-center max-w-sm">
-          No se pudo completar el inicio de sesión. Te llevamos de vuelta al login.
-        </p>
-      )}
     </div>
   );
 }
