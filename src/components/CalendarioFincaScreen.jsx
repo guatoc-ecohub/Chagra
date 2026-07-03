@@ -35,17 +35,31 @@ import {
  * (matchSpeciesInCatalog) — no reinventa nada.
  */
 
-// Presentación por capa: color de chip y de celda en la tira anual. Estáticos
-// para que el JIT de Tailwind los genere (no construir clases dinámicas).
+// Presentación por capa. Estáticos para que el JIT de Tailwind los genere (no
+// construir clases dinámicas).
+//
+// PASADA VISUAL 2026-07: rellenos SÓLIDOS saturados (700) con texto blanco en
+// vez de tintes /20 + texto *-200. Razones:
+//   1. Sol directo (uso en campo): un relleno sólido conserva el contraste;
+//      un tinte translúcido se lava.
+//   2. Temas claros (nature/minimalista/verde-vivo): text-teal-200 sobre card
+//      blanca era ilegible. teal/violet/sky/rose/orange NO están var-ificados
+//      (tailwind.config.js), así el lenguaje de color de las capas es idéntico
+//      en los 4 temas: siembra siempre teal, sanidad siempre rose, etc.
+// `seg` pinta los segmentos de la tira anual apilada; `dot` los puntos-resumen.
 const LAYER_STYLE = {
-  siembra: { Icon: Sprout, chip: 'bg-teal-500/20 text-teal-200 border-teal-500/40', dot: 'bg-teal-400', cell: 'bg-teal-600' },
-  fenologia: { Icon: Flower2, chip: 'bg-violet-500/20 text-violet-200 border-violet-500/40', dot: 'bg-violet-400', cell: 'bg-violet-600' },
-  nutricion: { Icon: FlaskConical, chip: 'bg-amber-500/20 text-amber-200 border-amber-500/40', dot: 'bg-amber-400', cell: 'bg-amber-600' },
-  sanidad: { Icon: Bug, chip: 'bg-rose-500/20 text-rose-200 border-rose-500/40', dot: 'bg-rose-400', cell: 'bg-rose-600' },
-  cosecha: { Icon: Apple, chip: 'bg-emerald-500/20 text-emerald-200 border-emerald-500/40', dot: 'bg-emerald-400', cell: 'bg-emerald-600' },
+  siembra: { Icon: Sprout, solid: 'bg-teal-700 text-white', seg: 'bg-teal-500', dot: 'bg-teal-500' },
+  fenologia: { Icon: Flower2, solid: 'bg-violet-600 text-white', seg: 'bg-violet-500', dot: 'bg-violet-500' },
+  nutricion: { Icon: FlaskConical, solid: 'bg-sky-700 text-white', seg: 'bg-sky-500', dot: 'bg-sky-500' },
+  sanidad: { Icon: Bug, solid: 'bg-rose-700 text-white', seg: 'bg-rose-500', dot: 'bg-rose-500' },
+  cosecha: { Icon: Apple, solid: 'bg-orange-700 text-white', seg: 'bg-orange-500', dot: 'bg-orange-500' },
 };
 
-const MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+/** Estado temporal de un mes dentro del año en curso: hoy / pasado / próximo. */
+function monthTemporalState(month, currentMonth) {
+  if (month === currentMonth) return 'hoy';
+  return month < currentMonth ? 'pasado' : 'proximo';
+}
 
 /** Slugs del catálogo con plantilla fenológica o ciclo perenne grounded. Se usa
  * como fallback cuando el usuario no tiene ciclos en su finca: mostramos el
@@ -67,6 +81,8 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
   const [activeLayers, setActiveLayers] = useState(() => new Set(CALENDAR_LAYERS));
   const [selectedMonth, setSelectedMonth] = useState(() => new Date().getMonth() + 1);
   const [expanded, setExpanded] = useState({});
+  // Mes actual del dispositivo — solo presentación (marcar "hoy" en la tira).
+  const currentMonth = useMemo(() => new Date().getMonth() + 1, []);
 
   const altitudeM = useMemo(() => {
     const v = getProfile()?.finca_altitud;
@@ -240,7 +256,8 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
           )}
         </div>
 
-        {/* Filtros por capa */}
+        {/* Filtros por capa — también son la leyenda de color de la tira anual:
+            encendido = relleno sólido de la capa; apagado = contorno neutro. */}
         <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar por tipo">
           {CALENDAR_LAYERS.map((layer) => {
             const meta = LAYER_STYLE[layer];
@@ -252,7 +269,11 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
                 type="button"
                 aria-pressed={on}
                 onClick={() => toggleLayer(layer)}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border transition-opacity ${meta.chip} ${on ? 'opacity-100' : 'opacity-35'}`}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-bold border transition-colors ${
+                  on
+                    ? `${meta.solid} border-transparent shadow-sm`
+                    : 'bg-transparent text-slate-500 border-slate-700 hover:text-slate-300'
+                }`}
               >
                 <Icon size={13} aria-hidden="true" />
                 {LAYER_META[layer].label}
@@ -261,33 +282,71 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
           })}
         </div>
 
-        {/* Tira anual de 12 meses — densidad por mes según capas activas */}
+        {/* Tira anual de 12 meses — columnas APILADAS por capa: cada mes muestra
+            no solo cuánto trabajo hay sino de qué tipo (color = capa, mismo
+            lenguaje que los filtros de arriba). Los meses ya pasados del año se
+            atenúan; el mes actual lleva marca "hoy". */}
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-3">
-          <p className="text-2xs uppercase font-bold text-slate-500 mb-2">El año de tu finca</p>
+          <div className="flex items-baseline justify-between gap-2 mb-2">
+            <p className="text-2xs uppercase font-bold text-slate-500 tracking-wide">El año de tu finca</p>
+            <p className="text-2xs text-slate-600">toca un mes</p>
+          </div>
           <div className="grid grid-cols-12 gap-1" role="list" aria-label="Calendario anual">
             {matrix.map((cell) => {
               const isSel = cell.month === selectedMonth;
-              const intensity = maxCell > 0 ? cell.total / maxCell : 0;
+              const temporal = monthTemporalState(cell.month, currentMonth);
+              const isToday = temporal === 'hoy';
+              const isPast = temporal === 'pasado';
               const hasAny = cell.total > 0;
               return (
                 <button
                   key={cell.month}
                   type="button"
                   role="listitem"
-                  aria-label={`${monthShortName(cell.month)}: ${cell.total} tareas`}
+                  aria-label={`${monthShortName(cell.month)}${isToday ? ' (mes actual)' : ''}: ${cell.total} tareas`}
                   aria-pressed={isSel}
                   onClick={() => setSelectedMonth(cell.month)}
-                  className={`flex flex-col items-center gap-1 rounded-lg py-1.5 transition-colors ${isSel ? 'bg-slate-700 ring-2 ring-emerald-400' : 'bg-slate-800/60 hover:bg-slate-800'}`}
+                  className={`flex flex-col items-center gap-1 rounded-lg py-1.5 transition-colors ${
+                    isSel
+                      ? 'bg-slate-800 ring-2 ring-emerald-400'
+                      : 'bg-slate-800/40 hover:bg-slate-800'
+                  }`}
                 >
-                  <span className={`text-2xs font-bold ${isSel ? 'text-white' : 'text-slate-400'}`}>
+                  <span className={`text-2xs font-bold ${
+                    isToday ? 'text-emerald-400' : isSel ? 'text-slate-100' : isPast ? 'text-slate-600' : 'text-slate-400'
+                  }`}
+                  >
                     {monthShortName(cell.month).charAt(0).toUpperCase()}
                   </span>
+                  {/* Columna apilada: segmentos por capa, de abajo hacia arriba,
+                      altura proporcional al mes más cargado del año. */}
                   <span
                     aria-hidden="true"
-                    className={`h-6 w-2 rounded-full ${hasAny ? 'bg-emerald-500' : 'bg-slate-700'}`}
-                    style={hasAny ? { opacity: 0.35 + intensity * 0.65 } : undefined}
+                    className={`flex h-9 w-2.5 flex-col-reverse overflow-hidden rounded-full bg-slate-800 ${isPast ? 'opacity-50' : ''}`}
+                  >
+                    {hasAny && maxCell > 0 && CALENDAR_LAYERS.map((layer) => {
+                      const n = cell.layers[layer] || 0;
+                      if (n === 0) return null;
+                      return (
+                        <span
+                          key={layer}
+                          className={`w-full shrink-0 ${LAYER_STYLE[layer].seg}`}
+                          style={{ height: `${(n / maxCell) * 100}%` }}
+                        />
+                      );
+                    })}
+                  </span>
+                  <span className={`text-2xs tabular-nums ${
+                    isPast ? 'text-slate-600' : hasAny ? 'text-slate-300' : 'text-slate-600'
+                  }`}
+                  >
+                    {cell.total || '·'}
+                  </span>
+                  {/* Marca "hoy": punto acento bajo el mes actual. */}
+                  <span
+                    aria-hidden="true"
+                    className={`h-1 w-1 rounded-full ${isToday ? 'bg-emerald-400' : 'bg-transparent'}`}
                   />
-                  <span className={`text-2xs ${hasAny ? 'text-slate-300' : 'text-slate-600'}`}>{cell.total || ''}</span>
                 </button>
               );
             })}
@@ -296,9 +355,19 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
 
         {/* Detalle del mes seleccionado, por planta */}
         <div className="flex flex-col gap-2">
-          <h2 className="text-sm font-bold text-white flex items-center gap-2">
+          <h2 className="text-sm font-bold text-white flex items-center gap-2 flex-wrap">
             <CalendarDays size={15} className="text-emerald-400" />
             {monthShortName(selectedMonth)} en tu finca
+            {/* Estado temporal del mes elegido — orienta sin cambiar datos. */}
+            {monthTemporalState(selectedMonth, currentMonth) === 'hoy' && (
+              <span className="text-2xs font-bold uppercase px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/40">este mes</span>
+            )}
+            {monthTemporalState(selectedMonth, currentMonth) === 'pasado' && (
+              <span className="text-2xs font-bold uppercase px-1.5 py-0.5 rounded-full text-slate-500 border border-slate-700">ya pasó</span>
+            )}
+            {monthTemporalState(selectedMonth, currentMonth) === 'proximo' && (
+              <span className="text-2xs font-bold uppercase px-1.5 py-0.5 rounded-full text-amber-400 border border-amber-500/40">viene</span>
+            )}
             <span className="text-xs font-normal text-slate-500">· {plantsForMonth.length} {plantsForMonth.length === 1 ? 'planta' : 'plantas'}</span>
           </h2>
 
@@ -327,9 +396,9 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
                       )}
                     </span>
                     <span className="flex items-center gap-1.5 shrink-0">
-                      <span className="flex gap-0.5">
+                      <span className="flex gap-1">
                         {[...new Set(entries.map((e) => e.layer))].map((l) => (
-                          <span key={l} className={`h-1.5 w-1.5 rounded-full ${LAYER_STYLE[l].dot}`} aria-hidden="true" />
+                          <span key={l} className={`h-2 w-2 rounded-full ${LAYER_STYLE[l].dot}`} aria-hidden="true" />
                         ))}
                       </span>
                       {isOpen ? <ChevronDown size={16} className="text-slate-500" /> : <ChevronRight size={16} className="text-slate-500" />}
@@ -343,13 +412,16 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
                         const Icon = meta.Icon;
                         return (
                           <li key={`${plant.id}-${entry.layer}-${i}`} className="flex items-start gap-2.5 border-t border-slate-800 pt-2 first:border-t-0 first:pt-0">
-                            <span className={`mt-0.5 h-7 w-7 shrink-0 rounded-lg flex items-center justify-center border ${meta.chip}`}>
-                              <Icon size={14} aria-hidden="true" />
+                            <span className={`mt-0.5 h-8 w-8 shrink-0 rounded-lg flex items-center justify-center shadow-sm ${meta.solid}`}>
+                              <Icon size={15} aria-hidden="true" />
                             </span>
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center gap-2 flex-wrap">
                                 <span className="text-sm font-semibold text-slate-100">{entry.title}</span>
-                                <span className={`text-2xs px-1.5 py-0.5 rounded-full border ${meta.chip}`}>{LAYER_META[entry.layer].label}</span>
+                                <span className="text-2xs text-slate-400 flex items-center gap-1">
+                                  <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} aria-hidden="true" />
+                                  {LAYER_META[entry.layer].label}
+                                </span>
                                 {entry.approximate && (
                                   <span className="text-2xs text-amber-400">aproximado</span>
                                 )}
