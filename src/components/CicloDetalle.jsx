@@ -220,21 +220,28 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
         </div>
         {pickStage && (
           <div className="mt-2.5 flex flex-wrap gap-1.5">
-            {speciesStageOrder.map((s) => (
-              <button
-                key={s}
-                type="button"
-                disabled={busy}
-                onClick={() => handleStage(s)}
-                aria-label={`Confirmar etapa ${speciesStageLabel(s)}`}
-                className="text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 disabled:opacity-50 inline-flex items-center gap-1.5"
-              >
-                {/* Glifo por etapa (set compartido): el selector se escanea
-                    por icono, no solo leyendo cada chip. */}
-                <EtapaCicloIcon code={s} nombre={speciesStageLabel(s)} size={13} className="text-emerald-400/90" />
-                {speciesStageLabel(s)}
-              </button>
-            ))}
+            {speciesStageOrder.map((s) => {
+              // Chip de la etapa ACTUAL resaltado: el selector muestra dónde
+              // está el ciclo sin tener que leer arriba (coherente con el
+              // arco de PhenologyTimeline).
+              const isCurrent = s === baseStage(displayStage);
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  disabled={busy}
+                  onClick={() => handleStage(s)}
+                  aria-label={`Confirmar etapa ${speciesStageLabel(s)}`}
+                  aria-pressed={isCurrent}
+                  className={`text-xs px-2.5 py-1.5 rounded-lg disabled:opacity-50 inline-flex items-center gap-1.5 transition-colors duration-[var(--dur-estado,0.18s)] ${isCurrent ? 'bg-emerald-900/50 border border-emerald-600/60 text-emerald-200 font-bold' : 'bg-slate-800 hover:bg-slate-700 border border-transparent text-slate-200'}`}
+                >
+                  {/* Glifo por etapa (set compartido): el selector se escanea
+                      por icono, no solo leyendo cada chip. */}
+                  <EtapaCicloIcon code={s} nombre={speciesStageLabel(s)} size={13} className={isCurrent ? 'text-emerald-300' : 'text-emerald-400/90'} />
+                  {speciesStageLabel(s)}
+                </button>
+              );
+            })}
           </div>
         )}
       </section>
