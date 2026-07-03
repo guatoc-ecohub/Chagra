@@ -95,7 +95,7 @@ export const PHASES = [
 
 /* Capacidades del motor del agente (transversales, no cuelgan de una fase).
    Se muestran como una tira aparte al pie de la vista completa. */
-export const MOTOR_CAPS = ['rag_grounding', 'action_loop'];
+export const MOTOR_CAPS = ['rag_grounding', 'action_loop', 'precio_sipsa'];
 
 export const WHEEL_CAPTION = '"De la cosecha vuelve a nacer la semilla."';
 
@@ -223,7 +223,7 @@ export const FALLBACK_CAPACIDADES = {
   clima: { estado: 'parcial', view: 'agente', nota: 'Alertas de clima y heladas; canal en vivo según disponibilidad.' },
   insumos: { estado: 'activo', view: 'insumos', nota: 'Registro de insumos aplicados.' },
   registrar_cosecha: { estado: 'activo', view: 'cosechar', nota: 'Registro de cosecha por planta o lote.' },
-  precio_sipsa: { estado: 'parcial', view: 'mercado', nota: 'Precio de referencia estático; canal en vivo tras flag.' },
+  precio_sipsa: { estado: 'parcial', view: 'mercado', nota: 'Precio SIPSA del día, con valor vivo si hay dato.' },
   mercado: { estado: 'activo', view: 'mercado', nota: 'Marketplace de circuitos cortos.' },
   guardar_semilla: { estado: 'proximamente', view: null, nota: 'Banco de semilla propia; aún no está disponible.' },
   ciclo_cerrado: { estado: 'parcial', view: 'ciclo_nutrientes', nota: 'Devolver nutrientes al suelo; hoy educativo.' },

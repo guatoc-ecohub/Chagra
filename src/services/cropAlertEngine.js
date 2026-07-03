@@ -32,17 +32,12 @@ import { getPestRisksByStage } from './climateCycleService';
 import { getEnsoServicePhase, getEnsoLabel } from './ensoService';
 import { getPrecioSipsa } from './sidecarClient';
 import { resolveProductoFromSlug } from './sipsaPriceMap';
+import { formatCop } from './sipsaPriceService.js';
 
 const SEVERITY_BY_RISK = { 'crítico': 'danger', critico: 'danger', alto: 'warning' };
 
 /** Etapas en las que tiene sentido avisar el precio de mercado del producto. */
 const PRECIO_STAGES = new Set(['harvest_window', 'fruiting']);
-
-/** Formatea un precio COP/kg como entero con separador de miles colombiano. */
-function formatCop(valor) {
-  if (typeof valor !== 'number' || !Number.isFinite(valor)) return null;
-  return `$${Math.round(valor).toLocaleString('es-CO')}`;
-}
 
 function emit(name, detail) {
   try {

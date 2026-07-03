@@ -5,7 +5,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import {
-  PHASES, SPECIES, SPECIES_ORDER, FALLBACK_CAPACIDADES,
+  PHASES, SPECIES, SPECIES_ORDER, MOTOR_CAPS, FALLBACK_CAPACIDADES,
   resolverEspecie, resolverEstado,
 } from './cicloVivoData';
 
@@ -23,6 +23,10 @@ describe('cicloVivoData — estructura de fases', () => {
         expect(FALLBACK_CAPACIDADES[fn.cap], `falta ${fn.cap} en FALLBACK_CAPACIDADES`).toBeTruthy();
       }
     }
+  });
+
+  it('la tira motora incluye el indicador SIPSA', () => {
+    expect(MOTOR_CAPS).toContain('precio_sipsa');
   });
 
   it('cada especie tiene 7 notas de observación (una por fase)', () => {
