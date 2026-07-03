@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { AlertTriangle, BarChart3, CheckCircle2, Leaf, Network, Sprout, TrendingUp, Layers, ArrowRight, Sparkles, Users, Zap, Shield } from 'lucide-react';
+import { AlertTriangle, ArrowRight, Ban, BarChart3, CheckCircle2, Layers, Leaf, Network, Shield, Sparkles, Sprout, TrendingUp, Users, Zap } from 'lucide-react';
 import arquetipos from '../data/asociaciones-arquetipos.json';
 import comparativas from '../data/asociaciones-comparativa.json';
 import {
@@ -9,30 +9,92 @@ import {
   selectCultivoInicial,
 } from '../services/asociacionesFilter';
 import useAssetStore from '../store/useAssetStore';
+import { getSpeciesVisual, SPECIES_TONE_CLASSES } from '../utils/speciesVisual';
+
+/*
+ * Asociaciones — pasada VISUAL (2026-07). La lógica (filtros, métricas,
+ * selección de cultivo) no se toca: vive en services/asociacionesFilter.
+ *
+ * Sistema visual alineado con el Directorio de especies y SpeciesFicha:
+ *   - Superficies oscuras slate-900/950 con acentos tonales (emerald =
+ *     compañeras, rose = antagonistas, lime = beneficios medidos) — la
+ *     pantalla ya vive dentro del shell oscuro de la app.
+ *   - Emoji POR ESPECIE (utils/speciesVisual): a golpe de vista se distingue
+ *     🌽 de 🫘 de 🎃 — clave para leer la milpa sin leer texto.
+ *   - Relaciones como FLUJO visual: [quién] → beneficio → [a quién].
+ *   - Radios/sombras/táctil desde tokens globales (styles/tokens.css) vía
+ *     valores arbitrarios con fallback byte-idéntico.
+ *   - Todo movimiento va tras `motion-safe:` (prefers-reduced-motion).
+ */
+
+const SOMBRA_1 = 'shadow-[var(--sombra-1,0_1px_2px_rgb(8_30_22/0.18))]';
+const SOMBRA_2 = 'shadow-[var(--sombra-2,0_6px_18px_rgb(8_30_22/0.22))]';
+
+/* Etiquetas humanas para los tipos de relación del grafo (presentación pura). */
+const TIPO_LABELS = {
+  ANTAGONIST_OF: 'antagonista',
+  ASOCIA_CON: 'asociación',
+  COMPATIBLE_WITH: 'compatible',
+};
+
+function tipoLabel(tipo) {
+  return TIPO_LABELS[String(tipo || '').toUpperCase()] || String(tipo || '').toLowerCase();
+}
+
+/**
+ * Visual (emoji + tono) de un cultivo del arquetipo {id, slug, nombre}.
+ * El slug científico (zea_mays) le da el match fuerte a speciesVisual.
+ */
+function cultivoVisual(cultivo) {
+  if (!cultivo || typeof cultivo !== 'object') return getSpeciesVisual(null);
+  return getSpeciesVisual({ comun: cultivo.nombre, id: cultivo.slug || cultivo.id });
+}
+
+/**
+ * Chip de cultivo con su emoji — la unidad visual básica de la pantalla.
+ * tone="species" usa el tono propio de la especie; "rose" fuerza la piel de
+ * antagonista (lo que NO se siembra junto).
+ */
+function CultivoChip({ cultivo, label, tone = 'species' }) {
+  const visual = cultivo ? cultivoVisual(cultivo) : getSpeciesVisual({ comun: label });
+  const nombre = cultivo?.nombre || label || '';
+  const toneCls = tone === 'rose'
+    ? 'border-rose-700/40 bg-rose-900/30 text-rose-100'
+    : `${SPECIES_TONE_CLASSES[visual.tone] || SPECIES_TONE_CLASSES.emerald} text-slate-100`;
+  return (
+    <span className={`inline-flex items-center gap-1.5 rounded-[var(--r-pill,999px)] border px-2.5 py-1 text-sm font-bold leading-tight ${toneCls}`}>
+      <span aria-hidden="true" className="leading-none">{visual.emoji}</span>
+      {nombre}
+    </span>
+  );
+}
 
 const plotPositions = [
-  { left: '50%', top: '14%' },
-  { left: '23%', top: '52%' },
-  { left: '77%', top: '52%' },
-  { left: '50%', top: '78%' },
+  { left: '50%', top: '18%' },
+  { left: '22%', top: '50%' },
+  { left: '78%', top: '50%' },
+  { left: '50%', top: '80%' },
 ];
 
 function CultivoNode({ cultivo, index, selected, isCompanera }) {
   const pos = plotPositions[index % plotPositions.length];
   const isSelected = cultivo.id === selected || cultivo.nombre === selected;
+  const { emoji, tone } = cultivoVisual(cultivo);
+  const toneCls = SPECIES_TONE_CLASSES[tone] || SPECIES_TONE_CLASSES.emerald;
 
   return (
     <div
-      className={`absolute grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 text-center shadow-sm transition-all duration-300 ${
+      className={`absolute flex h-[4.5rem] w-[4.5rem] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-0.5 rounded-full border-2 text-center backdrop-blur-sm motion-safe:transition-transform motion-safe:duration-[var(--dur-estado,0.18s)] ${SOMBRA_1} ${
         isSelected
-          ? 'border-emerald-950 bg-emerald-700 text-white scale-110 z-10'
+          ? 'z-10 scale-110 border-emerald-300 bg-emerald-700 text-white ring-2 ring-emerald-400/40'
           : isCompanera
-          ? 'border-lime-400 bg-lime-50 text-lime-900'
-          : 'border-emerald-200 bg-white text-emerald-950'
+          ? `border-2 ${toneCls} text-emerald-50`
+          : 'border-slate-700 bg-slate-900/90 text-slate-200'
       }`}
       style={pos}
     >
-      <span className="px-1 text-[11px] font-black leading-tight">{cultivo.nombre}</span>
+      <span className="text-xl leading-none" aria-hidden="true">{emoji}</span>
+      <span className="px-1 text-[10px] font-black leading-tight">{cultivo.nombre}</span>
     </div>
   );
 }
@@ -42,39 +104,49 @@ function PolycultureDiagram({ item, cultivoSeleccionado }) {
   const companeras = (item.companeras || []).map(c => c.id || c.nombre);
 
   return (
-    <div className="relative min-h-64 overflow-hidden rounded-xl border-2 border-emerald-300 bg-gradient-to-br from-emerald-50 to-lime-50 p-4 shadow-lg">
+    <div className={`relative min-h-72 overflow-hidden rounded-[var(--r-lg,20px)] border border-emerald-800/50 bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950 p-4 ${SOMBRA_2}`}>
       <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" aria-hidden="true">
-        <defs>
-          <linearGradient id="grid-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="rgba(16,185,129,0.1)" />
-            <stop offset="100%" stopColor="rgba(132,204,22,0.1)" />
-          </linearGradient>
-        </defs>
-        <rect width="100" height="100" fill="url(#grid-gradient)" />
-        <path d="M50 14 L23 52 L50 78 L77 52 Z" fill="none" stroke="#047857" strokeWidth="2" strokeDasharray="5 4" opacity="0.6" />
-        <path d="M23 52 H77" fill="none" stroke="#65a30d" strokeWidth="2" opacity="0.4" />
-        <path d="M50 14 V78" fill="none" stroke="#65a30d" strokeWidth="2" opacity="0.4" />
+        <path d="M50 18 L22 50 L50 80 L78 50 Z" fill="none" stroke="#10b981" strokeWidth="1.5" strokeDasharray="5 4" opacity="0.45" />
+        <path d="M22 50 H78" fill="none" stroke="#84cc16" strokeWidth="1.5" opacity="0.25" />
+        <path d="M50 18 V80" fill="none" stroke="#84cc16" strokeWidth="1.5" opacity="0.25" />
       </svg>
 
-      {/* Leyenda mejorada */}
-      <div className="absolute left-3 top-3 rounded-lg bg-white/95 px-3 py-2 shadow-md border border-emerald-200">
-        <div className="flex items-center gap-2 mb-1">
-          <Network className="h-4 w-4 text-emerald-700" />
-          <span className="text-xs font-black uppercase text-emerald-900">Diagrama de siembra</span>
+      {/* Leyenda */}
+      <div className={`absolute left-3 top-3 rounded-[var(--r-sm,12px)] border border-slate-700/70 bg-slate-900/90 px-3 py-2 backdrop-blur ${SOMBRA_1}`}>
+        <div className="mb-1 flex items-center gap-2">
+          <Network className="h-4 w-4 text-emerald-400" aria-hidden="true" />
+          <span className="text-xs font-black uppercase tracking-wide text-emerald-200">Diagrama de siembra</span>
         </div>
-        <div className="flex gap-3 text-[10px] font-semibold">
+        <div className="flex gap-3 text-[10px] font-semibold text-slate-300">
           <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-emerald-700"></div>
-            <span>Tu cultivo</span>
+            <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden="true"></span>
+            <span>Su cultivo</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-lime-400"></div>
-            <span>Compañeros</span>
+            <span className="h-2 w-2 rounded-full bg-lime-400" aria-hidden="true"></span>
+            <span>Compañeras</span>
           </div>
         </div>
       </div>
 
-      {/* Nodos de cultivo */}
+      {/* Indicador de LER si está disponible */}
+      {item.comparativa?.policultivo?.LER && (
+        <div className={`absolute right-3 top-3 rounded-[var(--r-sm,12px)] bg-gradient-to-br from-lime-500 to-lime-600 px-3 py-2 ${SOMBRA_2}`}>
+          <div className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-white" aria-hidden="true" />
+            <div>
+              <div className="text-[10px] font-bold uppercase text-lime-50">LER</div>
+              <div className="text-sm font-black text-white">
+                {item.comparativa.policultivo.LER.valor_aprox ||
+                 item.comparativa.policultivo.LER.valor ||
+                 `${item.comparativa.policultivo.LER.min}-${item.comparativa.policultivo.LER.max}`}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Nodos de cultivo — emoji por especie, reconocibles sin leer */}
       {(item.cultivos || []).map((cultivo, index) => (
         <CultivoNode
           key={cultivo.id}
@@ -85,38 +157,21 @@ function PolycultureDiagram({ item, cultivoSeleccionado }) {
         />
       ))}
 
-      {/* Información de estratos mejorada */}
-      <div className="absolute bottom-3 left-3 right-3 rounded-lg bg-white/95 px-4 py-3 shadow-md border border-emerald-200">
-        <div className="flex items-center gap-2 mb-2">
-          <Layers className="h-4 w-4 text-emerald-700" />
-          <span className="text-xs font-black uppercase text-emerald-900">Estratos del sistema</span>
+      {/* Estratos del sistema */}
+      <div className={`absolute bottom-3 left-3 right-3 rounded-[var(--r-sm,12px)] border border-slate-700/70 bg-slate-900/90 px-4 py-3 backdrop-blur ${SOMBRA_1}`}>
+        <div className="mb-2 flex items-center gap-2">
+          <Layers className="h-4 w-4 text-emerald-400" aria-hidden="true" />
+          <span className="text-xs font-black uppercase tracking-wide text-emerald-200">Estratos del sistema</span>
         </div>
-        <div className="grid grid-cols-2 gap-2 text-xs font-semibold leading-snug text-slate-700">
+        <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs font-semibold leading-snug text-slate-200">
           {(item.cultivos || []).map((cultivo) => (
-            <div key={cultivo.id} className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-              <span>{cultivo.nombre} ({cultivo.estrato})</span>
+            <div key={cultivo.id} className="flex items-center gap-1.5">
+              <span aria-hidden="true" className="leading-none">{cultivoVisual(cultivo).emoji}</span>
+              <span className="truncate">{cultivo.nombre} <span className="text-slate-400">({cultivo.estrato})</span></span>
             </div>
           ))}
         </div>
       </div>
-
-      {/* Indicador de LER si está disponible */}
-      {item.comparativa?.policultivo?.LER && (
-        <div className="absolute top-3 right-3 rounded-lg bg-gradient-to-br from-lime-500 to-lime-600 px-3 py-2 shadow-lg">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-white" />
-            <div>
-              <div className="text-[10px] font-bold text-lime-50 uppercase">LER</div>
-              <div className="text-sm font-black text-white">
-                {item.comparativa.policultivo.LER.valor_aprox ||
-                 item.comparativa.policultivo.LER.valor ||
-                 `${item.comparativa.policultivo.LER.min}-${item.comparativa.policultivo.LER.max}`}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -124,12 +179,12 @@ function PolycultureDiagram({ item, cultivoSeleccionado }) {
 function Metricas({ metricas, comparativa }) {
   if (!metricas.length) {
     return (
-      <div className="rounded-lg border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-amber-100 p-4 text-sm font-semibold text-amber-900 shadow-md">
+      <div className={`rounded-[var(--r-md,16px)] border border-amber-700/40 bg-amber-950/20 p-4 text-sm font-semibold text-amber-100 ${SOMBRA_1}`}>
         <div className="flex items-start gap-2">
-          <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-400" aria-hidden="true" />
           <div>
-            <p className="font-bold">Datos en investigación</p>
-            <p className="mt-1 text-sm leading-relaxed">Este arquetipo aún no tiene cifras verificadas en asociaciones-comparativa.json. Próximamente añadiremos métricas reales.</p>
+            <p className="font-bold text-amber-200">Datos en investigación</p>
+            <p className="mt-1 text-sm leading-relaxed text-amber-100/80">Este arquetipo aún no tiene cifras verificadas en asociaciones-comparativa.json. Próximamente añadiremos métricas reales.</p>
           </div>
         </div>
       </div>
@@ -139,41 +194,37 @@ function Metricas({ metricas, comparativa }) {
   // Agrupar métricas por categoría para mejor visualización
   const metricasPrincipales = metricas.slice(0, 3);
   const metricasSecundarias = metricas.slice(3);
+  const PRINCIPAL = [
+    { icon: TrendingUp, label: 'Rendimiento', cls: 'border-lime-700/40 bg-lime-950/30', iconCls: 'text-lime-300', labelCls: 'text-lime-300/90' },
+    { icon: Sparkles, label: 'Nutrición', cls: 'border-emerald-700/40 bg-emerald-950/30', iconCls: 'text-emerald-300', labelCls: 'text-emerald-300/90' },
+    { icon: Shield, label: 'Protección', cls: 'border-teal-700/40 bg-teal-950/30', iconCls: 'text-teal-300', labelCls: 'text-teal-300/90' },
+  ];
 
   return (
     <div className="space-y-3">
       {/* Métricas principales destacadas */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        {metricasPrincipales.map((metrica, index) => (
-          <div
-            key={metrica}
-            className={`rounded-lg border-2 px-4 py-3 shadow-sm transition-all hover:shadow-md ${
-              index === 0
-                ? 'border-lime-400 bg-gradient-to-br from-lime-50 to-lime-100'
-                : index === 1
-                ? 'border-emerald-400 bg-gradient-to-br from-emerald-50 to-emerald-100'
-                : 'border-teal-400 bg-gradient-to-br from-teal-50 to-teal-100'
-            }`}
-          >
-            <div className="flex items-center gap-2 mb-1">
-              {index === 0 && <TrendingUp className="h-4 w-4 text-lime-700" />}
-              {index === 1 && <Sparkles className="h-4 w-4 text-emerald-700" />}
-              {index === 2 && <Shield className="h-4 w-4 text-teal-700" />}
-              <p className="text-xs font-bold uppercase tracking-wide text-slate-700">
-                {index === 0 ? 'Rendimiento' : index === 1 ? 'Nutrición' : 'Protección'}
-              </p>
+        {metricasPrincipales.map((metrica, index) => {
+          const p = PRINCIPAL[index] || PRINCIPAL[0];
+          const PIcon = p.icon;
+          return (
+            <div key={metrica} className={`rounded-[var(--r-md,16px)] border px-4 py-3 ${SOMBRA_1} ${p.cls}`}>
+              <div className="mb-1 flex items-center gap-2">
+                <PIcon className={`h-4 w-4 ${p.iconCls}`} aria-hidden="true" />
+                <p className={`text-xs font-bold uppercase tracking-wide ${p.labelCls}`}>{p.label}</p>
+              </div>
+              <p className="text-sm font-black leading-tight text-slate-100">{metrica}</p>
             </div>
-            <p className="text-sm font-black leading-tight text-slate-900">{metrica}</p>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Métricas secundarias */}
       {metricasSecundarias.length > 0 && (
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {metricasSecundarias.map((metrica) => (
-            <div key={metrica} className="rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-sm">
-              <p className="text-sm font-semibold leading-tight text-slate-800">{metrica}</p>
+            <div key={metrica} className="rounded-[var(--r-sm,12px)] border border-slate-700/50 bg-slate-800/60 px-3 py-2">
+              <p className="text-sm font-semibold leading-tight text-slate-200">{metrica}</p>
             </div>
           ))}
         </div>
@@ -181,18 +232,68 @@ function Metricas({ metricas, comparativa }) {
 
       {/* Indicador de confianza */}
       {comparativa?.confianza && (
-        <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-2">
+        <div className="flex items-center gap-3 rounded-[var(--r-sm,12px)] border border-slate-700/50 bg-slate-900/60 px-4 py-2">
           <div className="flex items-center gap-2">
-            <div className={`h-3 w-3 rounded-full ${
-              comparativa.confianza === 'alta' ? 'bg-green-600' :
-              comparativa.confianza === 'media' ? 'bg-amber-500' : 'bg-red-500'
-            }`}></div>
-            <span className="text-sm font-bold text-slate-700">
-              Confianza científica: <span className="uppercase">{comparativa.confianza}</span>
+            <span
+              aria-hidden="true"
+              className={`h-3 w-3 rounded-full ${
+                comparativa.confianza === 'alta' ? 'bg-emerald-500' :
+                comparativa.confianza === 'media' ? 'bg-amber-400' : 'bg-rose-500'
+              }`}
+            ></span>
+            <span className="text-sm font-bold text-slate-300">
+              Confianza científica: <span className="uppercase text-slate-100">{comparativa.confianza}</span>
             </span>
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/**
+ * Una relación como flujo visual: [origen] → beneficio → [destino].
+ * El campesino lee QUIÉN ayuda a QUIÉN sin descifrar prosa; la razón queda
+ * debajo como apoyo.
+ */
+function RelacionFlow({ rel, cultivosPorId }) {
+  const origen = cultivosPorId[rel.origen];
+  const destino = cultivosPorId[rel.destino];
+  return (
+    <div className={`rounded-[var(--r-md,16px)] border border-emerald-800/40 bg-emerald-950/20 p-3 ${SOMBRA_1}`}>
+      <div className="flex flex-wrap items-center gap-1.5">
+        <CultivoChip cultivo={origen} label={rel.origen} />
+        <span className="inline-flex items-center gap-1 text-emerald-400" aria-hidden="true">
+          <ArrowRight className="h-4 w-4" />
+        </span>
+        <CultivoChip cultivo={destino} label={rel.destino} />
+        <span className="inline-flex items-center gap-1 rounded-[var(--r-pill,999px)] border border-emerald-600/40 bg-emerald-900/40 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-emerald-300">
+          <Sparkles className="h-3 w-3" aria-hidden="true" />
+          {rel.beneficio}
+        </span>
+      </div>
+      <p className="mt-2 text-sm leading-relaxed text-slate-300">{rel.razon}</p>
+    </div>
+  );
+}
+
+/** Un antagonista como advertencia visual: [cultivo] ⊘ [evitar]. */
+function AntagonistaCard({ ant, cultivosPorId }) {
+  const cultivo = cultivosPorId[ant.cultivo];
+  return (
+    <div className={`rounded-[var(--r-md,16px)] border border-rose-800/40 bg-rose-950/20 p-3 ${SOMBRA_1}`}>
+      <div className="flex flex-wrap items-center gap-1.5">
+        <CultivoChip cultivo={cultivo} label={ant.cultivo} />
+        <Ban className="h-4 w-4 text-rose-400" aria-hidden="true" />
+        <CultivoChip
+          cultivo={{ nombre: ant.evitar, slug: ant.slug, id: ant.slug }}
+          tone="rose"
+        />
+        <span className="rounded-[var(--r-pill,999px)] border border-rose-700/40 bg-rose-900/40 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-rose-300">
+          {tipoLabel(ant.tipo)}
+        </span>
+      </div>
+      <p className="mt-2 text-sm leading-relaxed text-rose-100/80">{ant.razon}</p>
     </div>
   );
 }
@@ -202,155 +303,128 @@ function RecomendacionCard({ item, cultivoSeleccionado }) {
   const antagonistas = item.antagonistasCultivo.length ? item.antagonistasCultivo : item.antagonistas || [];
   const hasLER = item.comparativa?.policultivo?.LER;
 
+  // Índice id/nombre → cultivo para resolver los extremos de cada relación
+  // (presentación pura: solo mapea lo que ya viene en el arquetipo).
+  const cultivosPorId = useMemo(() => {
+    const map = {};
+    for (const c of item.cultivos || []) {
+      if (c.id) map[c.id] = c;
+      if (c.nombre) map[c.nombre] = c;
+    }
+    return map;
+  }, [item]);
+
   return (
     <article
       aria-label={item.nombre}
-      className="overflow-hidden rounded-xl border-2 border-emerald-200 bg-white shadow-lg hover:shadow-xl transition-shadow"
+      className={`overflow-hidden rounded-[var(--r-lg,20px)] border border-slate-800 bg-slate-900 ${SOMBRA_2}`}
     >
-      {/* Header más impactante */}
-      <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 px-4 py-3 sm:px-5">
+      {/* Header del sistema */}
+      <div className="bg-gradient-to-r from-emerald-800 to-emerald-950 px-4 py-3 sm:px-5">
         <div className="flex items-start gap-3">
-          <span className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-white/20 text-4xl backdrop-blur-sm" aria-hidden="true">
+          <span className="grid h-14 w-14 shrink-0 place-items-center rounded-[var(--r-md,16px)] border border-white/10 bg-white/10 text-4xl backdrop-blur-sm" aria-hidden="true">
             {item.icono}
           </span>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <p className="text-xs font-black uppercase tracking-wider text-emerald-100">Sistema recomendado</p>
+            <div className="mb-1 flex items-center gap-2">
+              <p className="text-xs font-black uppercase tracking-wider text-emerald-300">Sistema recomendado</p>
               {hasLER && (
-                <span className="rounded-full bg-lime-400 px-2 py-0.5 text-xs font-black text-lime-900">
+                <span className="rounded-[var(--r-pill,999px)] bg-lime-400 px-2 py-0.5 text-xs font-black text-lime-950">
                   Alto rendimiento
                 </span>
               )}
             </div>
-            <h3 className="text-xl sm:text-2xl font-black leading-tight text-white">{item.nombre}</h3>
+            <h3 className="text-xl font-black leading-tight text-white sm:text-2xl">{item.nombre}</h3>
           </div>
         </div>
       </div>
 
       <div className="grid gap-4 p-4 lg:grid-cols-[1fr_320px]">
         <div className="min-w-0 space-y-4">
-          {/* Compañeros destacados */}
-          <div className="rounded-lg border-2 border-lime-200 bg-gradient-to-r from-lime-50 to-emerald-50 p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Users className="h-5 w-5 text-lime-700" />
-              <h4 className="text-sm font-black uppercase text-slate-800">Compañeros ideales</h4>
+          {/* Compañeras con emoji por especie */}
+          <div className={`rounded-[var(--r-md,16px)] border border-emerald-700/40 bg-emerald-950/30 p-4 ${SOMBRA_1}`}>
+            <div className="mb-3 flex items-center gap-2">
+              <Users className="h-5 w-5 text-emerald-300" aria-hidden="true" />
+              <h4 className="text-sm font-black uppercase tracking-wide text-emerald-200">Compañeros ideales</h4>
             </div>
             <div className="flex flex-wrap gap-2">
               {(item.companeras || []).map((cultivo) => (
-                <span
-                  key={cultivo.id}
-                  className="inline-flex items-center gap-1 rounded-full bg-lime-100 px-3 py-1 text-sm font-bold text-lime-900 border border-lime-300"
-                >
-                  <span className="text-lime-600">🌱</span>
-                  {cultivo.nombre}
-                </span>
+                <CultivoChip key={cultivo.id} cultivo={cultivo} />
               ))}
               {(!item.companeras || item.companeras.length === 0) && (
-                <span className="text-sm font-semibold text-slate-600">Sistema completo integrado</span>
+                <span className="text-sm font-semibold text-slate-400">Sistema completo integrado</span>
               )}
             </div>
           </div>
 
-          {/* Acción recomendada más destacada */}
-          <div className="rounded-lg bg-gradient-to-br from-emerald-800 to-emerald-900 p-4 text-white shadow-md">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="grid h-10 w-10 place-items-center rounded-full bg-emerald-500">
-                <Zap className="h-6 w-6 text-white" />
+          {/* Acción recomendada */}
+          <div className={`rounded-[var(--r-md,16px)] border border-emerald-700/40 bg-gradient-to-br from-emerald-900 to-emerald-950 p-4 text-white ${SOMBRA_1}`}>
+            <div className="mb-2 flex items-center gap-3">
+              <div className="grid h-10 w-10 place-items-center rounded-full bg-emerald-600">
+                <Zap className="h-6 w-6 text-white" aria-hidden="true" />
               </div>
               <div>
-                <p className="text-sm font-bold uppercase text-emerald-200">Plan de acción</p>
-                <p className="text-xs font-semibold text-emerald-100">Implementación práctica</p>
+                <p className="text-sm font-bold uppercase tracking-wide text-emerald-300">Plan de acción</p>
+                <p className="text-xs font-semibold text-emerald-200/80">Implementación práctica</p>
               </div>
             </div>
-            <p className="text-base leading-relaxed font-medium text-emerald-50">{item.accion}</p>
+            <p className="text-base font-medium leading-relaxed text-emerald-50">{item.accion}</p>
           </div>
 
-          {/* Por qué funciona - Rediseñado */}
+          {/* Por qué funciona — flujos quién ayuda a quién */}
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <Leaf className="h-5 w-5 text-emerald-700" />
-              <h4 className="text-sm font-black uppercase text-slate-800">Por qué funciona</h4>
+            <div className="mb-3 flex items-center gap-2">
+              <Leaf className="h-5 w-5 text-emerald-400" aria-hidden="true" />
+              <h4 className="text-sm font-black uppercase tracking-wide text-slate-200">Por qué funciona</h4>
             </div>
             <div className="space-y-2">
-              {relaciones.map((rel, index) => (
-                <div
+              {relaciones.map((rel) => (
+                <RelacionFlow
                   key={`${rel.origen}-${rel.destino}-${rel.beneficio}`}
-                  className={`rounded-lg border-l-4 p-3 shadow-sm transition-all hover:shadow-md ${
-                    index === 0
-                      ? 'border-l-emerald-500 bg-emerald-50'
-                      : index === 1
-                      ? 'border-l-lime-500 bg-lime-50'
-                      : 'border-l-teal-500 bg-teal-50'
-                  }`}
-                >
-                  <div className="flex items-start gap-2">
-                    <div className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-xs font-black ${
-                      index === 0 ? 'bg-emerald-600 text-white' :
-                      index === 1 ? 'bg-lime-500 text-white' : 'bg-teal-600 text-white'
-                    }`}>
-                      {index + 1}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-black text-slate-950">
-                        {rel.beneficio}
-                      </p>
-                      <p className="mt-1 text-sm leading-relaxed text-slate-700">{rel.razon}</p>
-                    </div>
-                  </div>
-                </div>
+                  rel={rel}
+                  cultivosPorId={cultivosPorId}
+                />
               ))}
             </div>
           </div>
 
           {/* Beneficio real con cifras */}
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <BarChart3 className="h-5 w-5 text-lime-700" />
-              <h4 className="text-sm font-black uppercase text-slate-800">Beneficio comprobado</h4>
+            <div className="mb-3 flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-lime-400" aria-hidden="true" />
+              <h4 className="text-sm font-black uppercase tracking-wide text-slate-200">Beneficio comprobado</h4>
             </div>
             <div className="mt-2">
               <Metricas metricas={item.metricas} comparativa={item.comparativa} />
             </div>
             {item.comparativa?.diferencia_resumen && (
-              <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
-                <p className="text-sm leading-relaxed text-slate-700 font-medium">{item.comparativa.diferencia_resumen}</p>
+              <div className="mt-3 rounded-[var(--r-sm,12px)] border border-slate-700/50 bg-slate-800/50 p-3">
+                <p className="text-sm font-medium leading-relaxed text-slate-300">{item.comparativa.diferencia_resumen}</p>
               </div>
             )}
           </div>
 
-          {/* Evitar - Alerta clara */}
+          {/* Evitar — advertencias en piel rose (misma que la ficha) */}
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <AlertTriangle className="h-5 w-5 text-red-700" />
-              <h4 className="text-sm font-black uppercase text-red-900">Evitar estas combinaciones</h4>
+            <div className="mb-3 flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-rose-400" aria-hidden="true" />
+              <h4 className="text-sm font-black uppercase tracking-wide text-rose-200">Evitar estas combinaciones</h4>
             </div>
             {antagonistas.length ? (
               <div className="space-y-2">
                 {antagonistas.map((ant) => (
-                  <div
+                  <AntagonistaCard
                     key={`${ant.cultivo}-${ant.slug}`}
-                    className="rounded-lg border-2 border-red-200 bg-gradient-to-r from-red-50 to-red-100 p-3 shadow-sm"
-                  >
-                    <div className="flex items-start gap-2">
-                      <div className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-red-600 text-white">
-                        <AlertTriangle className="h-4 w-4" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-black text-red-950">
-                          {ant.evitar}
-                        </p>
-                        <p className="mt-1 text-xs font-bold uppercase text-red-700">{ant.tipo}</p>
-                        <p className="mt-1 text-sm leading-relaxed text-red-900">{ant.razon}</p>
-                      </div>
-                    </div>
-                  </div>
+                    ant={ant}
+                    cultivosPorId={cultivosPorId}
+                  />
                 ))}
               </div>
             ) : (
-              <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+              <div className={`rounded-[var(--r-md,16px)] border border-emerald-700/40 bg-emerald-950/30 p-4 ${SOMBRA_1}`}>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-green-600" />
-                  <p className="text-sm font-semibold text-green-900">
+                  <CheckCircle2 className="h-5 w-5 text-emerald-400" aria-hidden="true" />
+                  <p className="text-sm font-semibold text-emerald-100">
                     No hay antagonistas conocidos para este cultivo en este sistema.
                   </p>
                 </div>
@@ -364,15 +438,15 @@ function RecomendacionCard({ item, cultivoSeleccionado }) {
       </div>
 
       {/* Footer con fuentes */}
-      <div className="border-t border-slate-200 bg-slate-50 px-4 py-3 sm:px-5">
-        <div className="flex flex-col gap-1 text-xs font-semibold leading-snug text-slate-600">
+      <div className="border-t border-slate-800 bg-slate-950/60 px-4 py-3 sm:px-5">
+        <div className="flex flex-col gap-1 text-xs font-semibold leading-snug text-slate-400">
           <div className="flex items-start gap-2">
-            <span className="font-bold text-slate-700">📚 Fuente:</span>
+            <span className="font-bold text-slate-300">📚 Fuente:</span>
             <span>{item.fuente}</span>
           </div>
           {item.comparativa?.fuente && (
             <div className="flex items-start gap-2">
-              <span className="font-bold text-slate-700">📊 Cifras:</span>
+              <span className="font-bold text-slate-300">📊 Cifras:</span>
               <span>{item.comparativa.fuente}</span>
             </div>
           )}
@@ -410,18 +484,18 @@ export default function Asociaciones({ profile = {}, esOperador = false }) {
 
   return (
     <section className="space-y-4 sm:space-y-6" aria-labelledby="asociaciones-title">
-      {/* Header más impactante y orientado a la acción */}
-      <div className="rounded-xl border-2 border-emerald-900 bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 p-4 text-white shadow-xl sm:p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="grid h-12 w-12 place-items-center rounded-xl bg-emerald-700">
-            <Network className="h-7 w-7 text-emerald-100" />
+      {/* Header orientado a la acción */}
+      <div className={`rounded-[var(--r-xl,24px)] border border-emerald-800/60 bg-gradient-to-br from-emerald-900 via-emerald-950 to-slate-950 p-4 text-white sm:p-6 ${SOMBRA_2}`}>
+        <div className="mb-4 flex items-center gap-3">
+          <div className="grid h-12 w-12 place-items-center rounded-[var(--r-md,16px)] border border-emerald-700/60 bg-emerald-800/70">
+            <Network className="h-7 w-7 text-emerald-200" aria-hidden="true" />
           </div>
           <div>
             <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-emerald-200">
-              <span className="rounded-full bg-emerald-600 px-2 py-1">Offline</span>
-              <span className="rounded-full bg-lime-600 px-2 py-1">Datos reales</span>
+              <span className="rounded-[var(--r-pill,999px)] bg-emerald-700/80 px-2 py-1">Offline</span>
+              <span className="rounded-[var(--r-pill,999px)] bg-lime-600/80 px-2 py-1">Datos reales</span>
             </div>
-            <h2 id="asociaciones-title" className="mt-1 text-2xl sm:text-3xl font-black leading-tight">
+            <h2 id="asociaciones-title" className="mt-1 text-2xl font-black leading-tight sm:text-3xl">
               Asociaciones inteligentes
             </h2>
           </div>
@@ -429,67 +503,67 @@ export default function Asociaciones({ profile = {}, esOperador = false }) {
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="flex items-start gap-3">
-            <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-emerald-700">
-              <Users className="h-5 w-5 text-emerald-100" />
+            <div className="grid h-8 w-8 shrink-0 place-items-center rounded-[var(--r-xs,8px)] bg-emerald-700/70">
+              <Users className="h-5 w-5 text-emerald-100" aria-hidden="true" />
             </div>
             <div>
-              <p className="text-xs font-bold text-emerald-200 uppercase">Compañeros ideales</p>
+              <p className="text-xs font-bold uppercase text-emerald-300">Compañeros ideales</p>
               <p className="text-sm font-semibold text-emerald-50">Saber qué sembrar junto</p>
             </div>
           </div>
 
           <div className="flex items-start gap-3">
-            <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-red-600">
-              <AlertTriangle className="h-5 w-5 text-red-100" />
+            <div className="grid h-8 w-8 shrink-0 place-items-center rounded-[var(--r-xs,8px)] bg-rose-700/70">
+              <Ban className="h-5 w-5 text-rose-100" aria-hidden="true" />
             </div>
             <div>
-              <p className="text-xs font-bold text-red-200 uppercase">Evitar combinaciones</p>
+              <p className="text-xs font-bold uppercase text-rose-300">Evitar combinaciones</p>
               <p className="text-sm font-semibold text-emerald-50">Antagonistas conocidos</p>
             </div>
           </div>
 
           <div className="flex items-start gap-3">
-            <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-lime-600">
-              <BarChart3 className="h-5 w-5 text-lime-100" />
+            <div className="grid h-8 w-8 shrink-0 place-items-center rounded-[var(--r-xs,8px)] bg-lime-700/70">
+              <BarChart3 className="h-5 w-5 text-lime-100" aria-hidden="true" />
             </div>
             <div>
-              <p className="text-xs font-bold text-lime-200 uppercase">Beneficios reales</p>
+              <p className="text-xs font-bold uppercase text-lime-300">Beneficios reales</p>
               <p className="text-sm font-semibold text-emerald-50">LER, fijación N, ahorro</p>
             </div>
           </div>
 
           <div className="flex items-start gap-3">
-            <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-teal-600">
-              <Sparkles className="h-5 w-5 text-teal-100" />
+            <div className="grid h-8 w-8 shrink-0 place-items-center rounded-[var(--r-xs,8px)] bg-teal-700/70">
+              <Sparkles className="h-5 w-5 text-teal-100" aria-hidden="true" />
             </div>
             <div>
-              <p className="text-xs font-bold text-teal-200 uppercase">Plan de acción</p>
+              <p className="text-xs font-bold uppercase text-teal-300">Plan de acción</p>
               <p className="text-sm font-semibold text-emerald-50">Instrucciones prácticas</p>
             </div>
           </div>
         </div>
 
-        <p className="mt-4 max-w-3xl text-base leading-relaxed text-emerald-50 border-t border-emerald-700 pt-4">
-          <strong>Elige tu cultivo</strong> y descubre qué sembrar con él, qué evitar, por qué funciona y cuánto puedes ganar.
+        <p className="mt-4 max-w-3xl border-t border-emerald-800/60 pt-4 text-base leading-relaxed text-emerald-50">
+          <strong>Elija su cultivo</strong> y descubra qué sembrar con él, qué evitar, por qué funciona y cuánto puede ganar.
           Todo basado en <strong>investigación real</strong>, no en promesas.
         </p>
       </div>
 
-      {/* Selector de cultivo mejorado */}
-      <div className="rounded-xl border-2 border-slate-200 bg-white p-4 shadow-lg sm:p-5">
+      {/* Selector de cultivo */}
+      <div className={`rounded-[var(--r-lg,20px)] border border-slate-800 bg-slate-900 p-4 sm:p-5 ${SOMBRA_1}`}>
         <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
           <div>
-            <label htmlFor="cultivo-asociaciones" className="flex items-center gap-2 text-sm font-black text-slate-900 mb-3">
-              <div className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-100">
-                <Sprout className="h-5 w-5 text-emerald-700" />
+            <label htmlFor="cultivo-asociaciones" className="mb-3 flex items-center gap-2 text-sm font-black text-slate-100">
+              <div className="grid h-8 w-8 place-items-center rounded-[var(--r-xs,8px)] border border-emerald-700/40 bg-emerald-950/40">
+                <Sprout className="h-5 w-5 text-emerald-400" aria-hidden="true" />
               </div>
-              <span>¿Qué cultivo quieres planear?</span>
+              <span>¿Qué cultivo quiere planear?</span>
             </label>
             <select
               id="cultivo-asociaciones"
               value={selected}
               onChange={(event) => setCultivoManual(event.target.value)}
-              className="w-full rounded-xl border-2 border-slate-300 bg-white px-4 py-3 text-base font-bold text-slate-950 outline-none transition-all hover:border-emerald-400 focus:border-emerald-700 focus:ring-4 focus:ring-emerald-200"
+              className="w-full min-h-[var(--tap-min,44px)] rounded-[var(--r-md,16px)] border border-slate-700 bg-slate-950 px-4 py-3 text-[length:var(--fs-cuerpo-lg,1.15rem)] font-bold text-white outline-none motion-safe:transition-colors hover:border-emerald-600/60 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/40"
             >
               {view.disponibles.map((cultivo) => (
                 <option key={cultivo.id} value={cultivo.id}>
@@ -501,58 +575,58 @@ export default function Asociaciones({ profile = {}, esOperador = false }) {
 
           {/* Indicador de cultivos de la finca */}
           {tieneCultivosFinca && (
-            <div className="rounded-lg border-2 border-emerald-200 bg-emerald-50 p-3 sm:text-right">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-bold uppercase text-emerald-700">Detectado en tu finca</span>
+            <div className="rounded-[var(--r-md,16px)] border border-emerald-700/40 bg-emerald-950/40 p-3 sm:text-right">
+              <div className="mb-1 flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wide text-emerald-300">Detectado en su finca</span>
               </div>
-              <div className="flex flex-wrap gap-1">
+              <div className="flex flex-wrap gap-1 sm:justify-end">
                 {cultivosFincaPrincipales.map((cultivo) => (
                   <span
                     key={cultivo}
-                    className="inline-flex items-center gap-1 rounded-full bg-emerald-200 px-2 py-1 text-xs font-bold text-emerald-900"
+                    className="inline-flex items-center gap-1 rounded-[var(--r-pill,999px)] border border-emerald-700/40 bg-emerald-900/50 px-2 py-1 text-xs font-bold text-emerald-100"
                   >
-                    <span className="text-emerald-700">🌱</span>
+                    <span aria-hidden="true">{getSpeciesVisual({ comun: cultivo }).emoji}</span>
                     {cultivo}
                   </span>
                 ))}
               </div>
-              <p className="mt-1 text-xs font-semibold text-emerald-700">
+              <p className="mt-1 text-xs font-semibold text-emerald-300/80">
                 {selected && cultivosFinca.some((slug) => {
                   // cultivosFinca son slugs crudos (zea_mays); `selected` es id/nombre (maiz).
                   // Resolver slug→cultivo igual que el resto del componente para que el match funcione.
                   const c = findCultivoInItems(arquetipos, slug);
                   return slug === selected || c?.id === selected || c?.nombre === selected;
-                }) ? '¡Ya tienes este cultivo!' : 'Selecciona uno para ver recomendaciones'}
+                }) ? '¡Ya tiene este cultivo!' : 'Seleccione uno para ver recomendaciones'}
               </p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Estado vacío mejorado */}
+      {/* Estado vacío */}
       {view.recomendaciones.length === 0 ? (
-        <div className="rounded-xl border-2 border-slate-300 bg-white p-6 text-center shadow-lg">
-          <div className="grid h-16 w-16 place-items-center rounded-full bg-slate-100 mx-auto mb-4">
-            <Leaf className="h-8 w-8 text-slate-400" />
+        <div className={`rounded-[var(--r-lg,20px)] border border-slate-800 bg-slate-900 p-6 text-center ${SOMBRA_1}`}>
+          <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full border border-slate-700 bg-slate-800">
+            <Leaf className="h-8 w-8 text-slate-400" aria-hidden="true" />
           </div>
-          <h3 className="text-xl font-black text-slate-900 mb-2">Sin asociaciones disponibles</h3>
-          <p className="text-base text-slate-700 leading-relaxed">
+          <h3 className="mb-2 text-xl font-black text-slate-100">Sin asociaciones disponibles</h3>
+          <p className="text-base leading-relaxed text-slate-300">
             Aún no tenemos asociaciones curadas para <strong>{view.cultivo?.nombre || selected}</strong>.
             Estamos trabajando en agregar más cultivos con bases científicas.
           </p>
-          <div className="mt-4 rounded-lg bg-emerald-50 p-3 text-sm font-semibold text-emerald-900 border border-emerald-200">
-            💡 Prueba con maíz, café, cacao, frutales u hortalizas
+          <div className="mt-4 rounded-[var(--r-md,16px)] border border-emerald-700/40 bg-emerald-950/30 p-3 text-sm font-semibold text-emerald-200">
+            💡 Pruebe con maíz, café, cacao, frutales u hortalizas
           </div>
         </div>
       ) : (
         <>
           {/* Contador de resultados */}
           <div className="flex items-center justify-between">
-            <p className="text-sm font-bold text-slate-700">
-              <span className="bg-emerald-600 text-white px-2 py-1 rounded-full text-xs">
+            <p className="text-sm font-bold text-slate-300">
+              <span className="rounded-[var(--r-pill,999px)] bg-emerald-600 px-2 py-1 text-xs text-white">
                 {view.recomendaciones.length}
               </span>
-              {' '}sistemas recomendados para <strong>{view.cultivo?.nombre || selected}</strong>
+              {' '}sistemas recomendados para <strong className="text-slate-100">{view.cultivo?.nombre || selected}</strong>
             </p>
           </div>
 
@@ -561,9 +635,9 @@ export default function Asociaciones({ profile = {}, esOperador = false }) {
             {view.recomendaciones.map((item, index) => (
               <div key={item.id} className="relative">
                 {index === 0 && (
-                  <div className="absolute -top-2 -left-2 z-10">
-                    <div className="bg-lime-500 text-white px-3 py-1 rounded-full text-xs font-black uppercase shadow-lg flex items-center gap-1">
-                      <Sparkles className="h-3 w-3" />
+                  <div className="absolute -left-2 -top-2 z-10">
+                    <div className={`flex items-center gap-1 rounded-[var(--r-pill,999px)] bg-lime-500 px-3 py-1 text-xs font-black uppercase text-lime-950 ${SOMBRA_2}`}>
+                      <Sparkles className="h-3 w-3" aria-hidden="true" />
                       Mejor opción
                     </div>
                   </div>
@@ -576,8 +650,8 @@ export default function Asociaciones({ profile = {}, esOperador = false }) {
       )}
 
       {/* Footer informativo */}
-      <div className="rounded-lg border border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100 p-4 text-center">
-        <p className="text-xs font-semibold text-slate-600 mb-1">
+      <div className="rounded-[var(--r-md,16px)] border border-slate-800 bg-slate-900/60 p-4 text-center">
+        <p className="mb-1 text-xs font-semibold text-slate-400">
           📚 Todos los datos están basados en investigación agronómica publicada y experiencia de campo en Colombia.
         </p>
         <p className="text-xs font-semibold text-slate-500">
