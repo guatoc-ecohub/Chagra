@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { ChevronLeft, Search, Sprout, Leaf, X } from 'lucide-react';
 import { searchSpecies, buildSpeciesFicha, listSpeciesForBrowse } from '../../services/directorioEspecies.js';
-import SpeciesFicha from './SpeciesFicha.jsx';
+import SpeciesFicha, { SpeciesFichaSkeleton } from './SpeciesFicha.jsx';
 import EmptyState from '../common/EmptyState.jsx';
 import SkeletonList from '../common/SkeletonList.jsx';
 import { fvhSkinClass } from '../../config/fvhSkin.js';
@@ -363,14 +363,12 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
 
       {/* Resultados / estados */}
       <div className="px-4 pt-3 pb-10">
-        {/* Abriendo una ficha: skeleton con la silueta de la ficha que viene. */}
+        {/* Abriendo una ficha: skeleton con la silueta REAL de la ficha que
+            viene (foto + identidad + secciones) — sin salto de layout. */}
         {loadingFicha && (
-          <SkeletonList
-            count={4}
-            variant="row"
-            ariaLabel="Abriendo la ficha…"
-            data-testid="directorio-loading-ficha"
-          />
+          <div data-testid="directorio-loading-ficha" className="-mx-4">
+            <SpeciesFichaSkeleton />
+          </div>
         )}
 
         {/* Buscando: skeleton de filas (percepción de rapidez, sin salto). */}
