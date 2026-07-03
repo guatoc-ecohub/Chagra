@@ -12,13 +12,6 @@ import { logCache } from '../db/logCache';
  * el store, los parsea con `wktToGeoJson` y los dibuja como capas de Leaflet
  * tipadas por `asset_type`. Usa `L.featureGroup` para permitir encuadre
  * automático (fitBounds) tanto global como por zona filtrada.
- *
- * Props:
- *   - focusZoneId: UUID de asset--land para filtrar y hacer zoom (drill-down espacial).
- *                  Si es null, muestra toda la finca.
- *   - onAssetClick: callback(assetId) al tocar una capa. Integra con detalle/logs.
- *   - onTaskComplete: callback(logId) al completar tarea desde popup del mapa.
- *   - showTasks:  boolean, si true, renderiza capa de tareas pendientes.
  */
 
 const DEFAULT_CENTER = [4.5306, -73.9247]; // Choachí, Cundinamarca
@@ -88,6 +81,13 @@ const TASK_STYLES = {
   'log--activity':    { color: '#06b6d4', label: 'Tarea' },
 };
 
+/**
+ * @param {Object} props
+ * @param {string} [props.focusZoneId]
+ * @param {Function} [props.onAssetClick]
+ * @param {Function} [props.onTaskComplete]
+ * @param {boolean} [props.showTasks]
+ */
 export const FarmMap = ({ focusZoneId = null, onAssetClick, onTaskComplete, showTasks = false }) => {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
@@ -169,7 +169,13 @@ export const FarmMap = ({ focusZoneId = null, onAssetClick, onTaskComplete, show
 
   // Cargar tareas pendientes con geometría
   useEffect(() => {
-    if (!showTasks) { setPendingTasks([]); return; }
+    if (!showTasks) {
+      // Avoid cascading renders: queue microtask instead of sync setState.
+      // This pattern is allowed when the effect early-returns (no external
+      // state subscription needed for the disabled path).
+      const t = setTimeout(() => setPendingTasks([]), 0);
+      return () => clearTimeout(t);
+    }
     (async () => {
       try {
         const all = await logCache.getAll();

@@ -40,10 +40,10 @@ const MARGIN = 18;
 const CONTENT_W = PAGE_W - MARGIN * 2;
 
 // Paleta — verde Chagra para títulos, gris para secundario.
-const COLOR_EMERALD = [16, 122, 87];
-const COLOR_SLATE = [71, 85, 105];
-const COLOR_MUTED = [148, 163, 184];
-const COLOR_DARK = [15, 23, 42];
+/** @type {[number, number, number]} */ const COLOR_EMERALD = [16, 122, 87];
+/** @type {[number, number, number]} */ const COLOR_SLATE = [71, 85, 105];
+/** @type {[number, number, number]} */ const COLOR_MUTED = [148, 163, 184];
+/** @type {[number, number, number]} */ const COLOR_DARK = [15, 23, 42];
 
 // Versión del schema del cuaderno (bump si cambiamos columnas / orden).
 export const CUADERNO_VERSION = '1';

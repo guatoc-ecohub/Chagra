@@ -41,6 +41,10 @@
  *   aparecen aislados en una oración sin otro marcador voseo. Esto evita
  *   sobre-corregir el habla rural colombiana del piedemonte y Nariño,
  *   donde `acá` es usual sin connotación rioplatense.
+ * @property {string|null} [region=null]
+ *   Clave de región lingüística (paisa, caribe, cundiboyacense, etc.).
+ *   Si se pasa, el filtro es region-aware: en regiones voseantes preserva
+ *   la morfología voseo y solo limpia el léxico rioplatense.
  */
 
 /**

@@ -68,6 +68,11 @@ const STATE_DONE = 'done';
  * antagonistas. Sin esta prop el comportamiento es idéntico al anterior.
  * `hideDoneScreen` (opcional): omite el estado DONE interno cuando el padre
  * toma el control de la pantalla post-guardado (el dossier).
+ *
+ * @param {Object} props
+ * @param {Function} [props.onSave]
+ * @param {Function} [props.onPlantsSaved]
+ * @param {boolean} [props.hideDoneScreen]
  */
 export default function VoiceCapture({ onSave, onPlantsSaved, hideDoneScreen = false }) {
   const { audioLevel, amplitudeHistory, durationMs, error: recorderError, start, stop, reset, hardLimitMs } = useVoiceRecorder();

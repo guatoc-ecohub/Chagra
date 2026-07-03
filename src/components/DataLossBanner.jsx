@@ -21,6 +21,9 @@ import { shouldWarnDataLoss } from '../services/emptyDbDetector';
  *     borra el flag). Si el operador refresca, vuelve. Sin esta vía
  *     mínima de descarte la banner bloquearía la app si fue falso
  *     positivo.
+ *
+ * @param {Object} props
+ * @param {Function} [props.onDismiss]
  */
 export default function DataLossBanner({ onDismiss }) {
   const [status, setStatus] = useState({ shouldWarn: false, lastKnownCount: 0, lastMarkedAt: null });

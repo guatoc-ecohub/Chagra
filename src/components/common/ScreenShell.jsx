@@ -48,13 +48,13 @@ function navigateGlobal(view) {
  * comportamiento actual — esta feature se shippa DARK en producción.
  * ──────────────────────────────────────────────────────────────────────────
  *
- * Props:
- *   - title:    string (obligatorio)
- *   - onBack:   handler del botón de regreso (un paso atrás)
- *   - onHome:   handler opcional. Si no se pasa, default a CustomEvent('chagra:nav', 'dashboard').
- *   - icon:     componente de lucide-react opcional para el header
- *   - children: contenido principal
- *   - actions:  slot opcional para botones extra antes de los globales
+ * @param {Object} props
+ * @param {string} props.title
+ * @param {Function} [props.onBack]
+ * @param {Function} [props.onHome]
+ * @param {import('react').ComponentType<{size?: number, className?: string}>} [props.icon]
+ * @param {import('react').ReactNode} props.children
+ * @param {import('react').ReactNode} [props.actions]
  */
 export const ScreenShell = ({ title, onBack, onHome, icon: Icon, children, actions }) => {
     const handleHome = onHome || (() => navigateGlobal('dashboard'));
@@ -88,7 +88,7 @@ export const ScreenShell = ({ title, onBack, onHome, icon: Icon, children, actio
                 <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                     {onBack && (
                         <button
-                            onClick={onBack}
+                            onClick={/** @type {React.MouseEventHandler} */(onBack)}
                             className="p-3 bg-slate-800 hover:bg-slate-700 rounded-full transition-colors text-slate-300 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
                             aria-label="Volver"
                         >
@@ -96,7 +96,7 @@ export const ScreenShell = ({ title, onBack, onHome, icon: Icon, children, actio
                         </button>
                     )}
                     <button
-                        onClick={handleHome}
+                        onClick={/** @type {React.MouseEventHandler} */(handleHome)}
                         className="p-3 bg-slate-800 hover:bg-emerald-700/40 hover:text-emerald-200 active:bg-emerald-700/60 rounded-full transition-colors text-emerald-300 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
                         aria-label="Volver al inicio"
                         title="Volver al inicio"
