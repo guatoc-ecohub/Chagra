@@ -160,7 +160,7 @@ function FuenteBadge({ metadata }) {
         data-testid="fuente-badge"
         data-source="verifiable-source"
         title={`Esta respuesta cita una fuente verificable (${label}). Abre el recurso citado en una pestaña nueva.`}
-        className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-sky-600/20 text-sky-300 border border-sky-700 hover:bg-sky-600/30 underline-offset-2 hover:underline"
+        className="tap-target text-xs px-2.5 py-1.5 rounded-md inline-flex items-center gap-1 mt-1 bg-sky-600/20 text-sky-300 border border-sky-700 hover:bg-sky-600/30 underline-offset-2 hover:underline"
       >
         <ShieldCheck size={12} aria-hidden="true" />
         <span>Fuente verificable: {label}</span>

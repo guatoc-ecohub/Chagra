@@ -3259,10 +3259,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           <button
             type="button"
             onClick={() => setAlertContextBanner(null)}
-            className="shrink-0 p-1 rounded-md hover:bg-white/10 text-slate-400"
+            className="tap-target shrink-0 p-1.5 rounded-md hover:bg-white/10 text-slate-400"
             aria-label="Cerrar contexto de alerta"
           >
-            <X size={14} />
+            <X size={16} />
           </button>
         </div>
       )}
@@ -3307,10 +3307,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             <button
               type="button"
               onClick={clearAgentAttachment}
-              className="p-1.5 rounded-full bg-slate-700 hover:bg-slate-600 text-slate-300"
+              className="tap-target p-2 rounded-full bg-slate-700 hover:bg-slate-600 text-slate-300"
               aria-label="Quitar foto"
             >
-              <X size={13} />
+              <X size={15} />
             </button>
           </div>
         )}
