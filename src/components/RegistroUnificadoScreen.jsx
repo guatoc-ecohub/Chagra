@@ -114,15 +114,15 @@ export default function RegistroUnificadoScreen({ onBack, onSave }) {
             type="button"
             onClick={() => setMode(MODE.VOICE)}
             aria-label="Volver a registrar hablando"
-            className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center shrink-0"
+            className="w-11 h-11 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400"
           >
             <ChevronLeft size={20} />
           </button>
           <div className="flex items-center gap-2 min-w-0">
             <PencilLine size={18} className="text-lime-400 shrink-0" />
             <div className="min-w-0">
-              <h1 className="text-base font-bold leading-tight truncate">Registrar a mano</h1>
-              <p className="text-2xs text-slate-400 leading-tight">Elige qué registras y llena los campos.</p>
+              <h1 className="text-lg font-bold leading-tight truncate">Registrar a mano</h1>
+              <p className="text-xs text-slate-400 leading-tight">Elija qué registra y llene los campos.</p>
             </div>
           </div>
         </header>
@@ -140,14 +140,19 @@ export default function RegistroUnificadoScreen({ onBack, onSave }) {
 
   if (mode === MODE.ERROR) {
     return (
-      <div className="min-h-[100dvh] bg-slate-950 text-white flex flex-col items-center justify-center gap-4 px-4" data-testid="registro-unificado-error">
-        <AlertTriangle size={48} className="text-amber-400" />
-        <p className="text-sm text-amber-200 text-center max-w-sm">{errorMsg || 'Error desconocido'}</p>
-        <div className="flex gap-2">
-          <button onClick={() => setMode(MODE.MANUAL)} className="px-6 py-3 min-h-[44px] bg-slate-800 hover:bg-slate-700 rounded-xl font-bold flex items-center gap-2">
-            <RotateCcw size={18} /> Reintentar
+      <div className="min-h-[100dvh] bg-slate-950 text-white flex flex-col items-center justify-center gap-4 px-4" data-testid="registro-unificado-error" aria-live="polite">
+        <div className="w-20 h-20 rounded-full bg-amber-950/60 border border-amber-800/60 flex items-center justify-center">
+          <AlertTriangle size={40} className="text-amber-400" aria-hidden="true" />
+        </div>
+        <div className="text-center max-w-sm">
+          <p className="text-base font-bold text-amber-200">No se pudo guardar</p>
+          <p className="text-sm text-amber-200/80 mt-1 leading-snug">{errorMsg || 'Error desconocido'}</p>
+        </div>
+        <div className="flex flex-wrap gap-2.5 justify-center">
+          <button onClick={() => setMode(MODE.MANUAL)} className="px-6 py-3.5 min-h-[52px] bg-lime-700 hover:bg-lime-600 rounded-xl font-bold text-base flex items-center gap-2 shadow-lg shadow-lime-900/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">
+            <RotateCcw size={18} aria-hidden="true" /> Intentar de nuevo
           </button>
-          <button onClick={onBack} className="px-6 py-3 min-h-[44px] bg-slate-800 hover:bg-slate-700 rounded-xl font-bold text-slate-200">
+          <button onClick={onBack} className="px-6 py-3.5 min-h-[52px] bg-slate-800 hover:bg-slate-700 rounded-xl font-bold text-base text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400">
             Volver
           </button>
         </div>
@@ -157,18 +162,20 @@ export default function RegistroUnificadoScreen({ onBack, onSave }) {
 
   // DONE
   return (
-    <div className="min-h-[100dvh] bg-slate-950 text-white flex flex-col items-center justify-center gap-4 px-4" data-testid="registro-unificado-done">
-      <Check size={48} className="text-green-400" />
+    <div className="min-h-[100dvh] bg-slate-950 text-white flex flex-col items-center justify-center gap-4 px-4" data-testid="registro-unificado-done" aria-live="polite">
+      <div className="w-20 h-20 rounded-full bg-green-950/60 border border-green-800/60 flex items-center justify-center">
+        <Check size={40} className="text-green-400" aria-hidden="true" />
+      </div>
       <div className="text-center max-w-xs">
-        <p className="text-base font-bold text-green-300">{savedKind} guardado ✓</p>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-lg font-bold text-green-300">{savedKind} guardado ✓</p>
+        <p className="text-sm text-slate-400 mt-1.5 leading-snug">
           {savedOffline
-            ? <>Se sincronizará con FarmOS cuando haya conexión. Mientras tanto queda en <strong className="text-slate-200">Cuaderno de campo</strong>.</>
+            ? <>Quedó guardado en su <strong className="text-slate-200">Cuaderno de campo</strong> y se sincronizará con FarmOS cuando haya conexión.</>
             : <>Sincronizado con FarmOS.</>}
         </p>
       </div>
       <div className="flex flex-wrap gap-2 justify-center">
-        <button onClick={onBack} className="px-6 py-3 min-h-[44px] bg-lime-700 hover:bg-lime-600 rounded-xl font-bold">
+        <button onClick={onBack} className="px-6 py-3.5 min-h-[52px] bg-lime-700 hover:bg-lime-600 rounded-xl font-bold text-base shadow-lg shadow-lime-900/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">
           Volver a la finca
         </button>
       </div>

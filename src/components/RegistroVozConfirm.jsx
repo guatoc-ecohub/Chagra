@@ -17,14 +17,16 @@ import SpeciesCombobox from './SpeciesCombobox';
 
 const MapPicker = lazy(() => import('./MapPicker').then((m) => ({ default: m.MapPicker || m.default })));
 
-const INPUT_CLS = 'bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:border-lime-500 focus:outline-none';
+// Campos táctiles para el campo: 16px (evita el zoom de iOS), min 48px de alto
+// y anillo de foco visible — coherente con SpeciesCombobox (p-4, text-lg).
+const INPUT_CLS = 'w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 min-h-[48px] text-white text-base placeholder:text-slate-500 focus:border-lime-500 focus:outline-none focus:ring-2 focus:ring-lime-500/25 disabled:opacity-60 transition-colors motion-reduce:transition-none';
 
 // Hoisted fuera del componente: definirlo en el cuerpo remonta los inputs en
 // cada render y se pierde el foco al escribir.
 function Field({ label, children }) {
   return (
-    <label className="flex flex-col gap-1">
-      <span className="text-2xs font-bold text-slate-400 uppercase tracking-wide">{label}</span>
+    <label className="flex flex-col gap-1.5">
+      <span className="text-xs font-bold text-slate-300 uppercase tracking-wide">{label}</span>
       {children}
     </label>
   );
@@ -167,15 +169,15 @@ export default function RegistroVozConfirm({ record, onConfirm, onCancel, isSavi
           registro unificado (#23) no hay transcripción, así que no se muestra
           la caja vacía "Lo que oí" con comillas vacías. */}
       {record.transcription && (
-        <section className="bg-slate-900 border border-slate-800 rounded-xl p-3">
-          <p className="text-2xs uppercase font-bold text-slate-500 mb-1">Lo que oí</p>
-          <p className="text-sm text-slate-200 italic">"{record.transcription}"</p>
+        <section className="bg-slate-900 border-l-2 border-l-lime-500 border-y border-r border-slate-800 rounded-xl p-3.5">
+          <p className="text-xs uppercase font-bold text-lime-400/90 tracking-wide mb-1">Lo que oí</p>
+          <p className="text-base text-slate-100 italic leading-snug">"{record.transcription}"</p>
         </section>
       )}
 
       {/* Selector de intención (chips) */}
       <section>
-        <p className="text-2xs uppercase font-bold text-slate-500 mb-2">¿Qué estás registrando?</p>
+        <p className="text-xs uppercase font-bold text-slate-300 tracking-wide mb-2">¿Qué está registrando?</p>
         <div className="flex flex-wrap gap-2">
           {Object.entries(INTENT_META).map(([key, m]) => {
             const active = key === intent;
@@ -185,13 +187,14 @@ export default function RegistroVozConfirm({ record, onConfirm, onCancel, isSavi
                 type="button"
                 onClick={() => setIntent(key)}
                 disabled={isSaving}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-colors ${
+                aria-pressed={active}
+                className={`px-3.5 py-2 min-h-[44px] rounded-full text-sm font-bold border transition-colors motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400 disabled:opacity-60 ${
                   active
-                    ? 'bg-lime-700 border-lime-500 text-white'
+                    ? 'bg-lime-700 border-lime-500 text-white shadow-md shadow-lime-900/40'
                     : 'bg-slate-800/60 border-slate-700 text-slate-300 hover:bg-slate-800'
                 }`}
               >
-                <span className="mr-1">{m.icon}</span>{m.label}
+                <span className="mr-1.5" aria-hidden="true">{m.icon}</span>{m.label}
               </button>
             );
           })}
@@ -212,7 +215,7 @@ export default function RegistroVozConfirm({ record, onConfirm, onCancel, isSavi
       />
 
       {/* Medidas contextuales */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-2.5">
         <Field label="Cantidad">
           <input type="number" min="0" value={cantidad} onChange={(e) => setCantidad(e.target.value)} className={INPUT_CLS} disabled={isSaving} />
         </Field>
@@ -250,7 +253,7 @@ export default function RegistroVozConfirm({ record, onConfirm, onCancel, isSavi
       )}
 
       <Field label="Notas / síntomas">
-        <textarea rows={2} value={notas} onChange={(e) => setNotas(e.target.value)} className={`${INPUT_CLS} resize-none`} disabled={isSaving} />
+        <textarea rows={3} value={notas} onChange={(e) => setNotas(e.target.value)} placeholder="Lo que quiera anotar de más" className={`${INPUT_CLS} resize-none`} disabled={isSaving} />
       </Field>
 
       {/* Ubicación: zona + GPS */}
@@ -264,37 +267,37 @@ export default function RegistroVozConfirm({ record, onConfirm, onCancel, isSavi
       </Field>
 
       {georef && (
-        <section className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <span className="text-2xs uppercase font-bold text-slate-500 flex items-center gap-1">
-              <MapPin size={12} className="text-lime-400" /> Georreferencia
+        <section className="bg-slate-900/60 border border-slate-800 rounded-xl p-3.5 flex flex-col gap-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs uppercase font-bold text-slate-300 tracking-wide flex items-center gap-1.5">
+              <MapPin size={13} className="text-lime-400" aria-hidden="true" /> Georreferencia
             </span>
-            {lugar && <span className="text-2xs text-slate-500 italic">"{lugar}"</span>}
+            {lugar && <span className="text-2xs text-slate-500 italic truncate">"{lugar}"</span>}
           </div>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
               onClick={() => requestGps()}
               disabled={isSaving || gpsLoading}
-              className="px-3 py-2 min-h-[40px] bg-lime-700 hover:bg-lime-600 disabled:bg-slate-700 rounded-lg text-xs font-bold flex items-center gap-2"
+              className="px-4 py-2.5 min-h-[44px] bg-lime-700 hover:bg-lime-600 disabled:bg-slate-700 disabled:opacity-70 rounded-xl text-sm font-bold flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400"
             >
-              <LocateFixed size={14} /> {gpsLoading ? 'Ubicando…' : 'Usar mi ubicación (GPS)'}
+              <LocateFixed size={16} className={gpsLoading ? 'motion-safe:animate-pulse' : ''} aria-hidden="true" /> {gpsLoading ? 'Ubicando…' : 'Usar mi ubicación (GPS)'}
             </button>
             {wkt && (
               <button
                 type="button"
                 onClick={() => setShowMap(true)}
                 disabled={isSaving}
-                className="px-3 py-2 min-h-[40px] bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold flex items-center gap-2 text-slate-200"
+                className="px-4 py-2.5 min-h-[44px] bg-slate-800 hover:bg-slate-700 disabled:opacity-60 rounded-xl text-sm font-bold flex items-center gap-2 text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400"
               >
-                <Pencil size={14} /> Ajustar en el mapa
+                <Pencil size={16} aria-hidden="true" /> Ajustar en el mapa
               </button>
             )}
           </div>
-          {wkt && <p className="text-2xs text-emerald-300/80 font-mono">📍 {wkt}</p>}
+          {wkt && <p className="text-2xs text-emerald-300/80 font-mono break-all">📍 {wkt}</p>}
           {gpsError && (
-            <p className="text-2xs text-amber-300/90 flex items-center gap-1">
-              <AlertTriangle size={11} /> No se pudo tomar el GPS. Puedes ajustar en el mapa o guardar sin ubicación.
+            <p className="text-xs text-amber-300/90 flex items-start gap-1.5 leading-snug">
+              <AlertTriangle size={13} className="shrink-0 mt-0.5" aria-hidden="true" /> No se pudo tomar el GPS. Puede ajustar el punto en el mapa o guardar sin ubicación.
             </p>
           )}
         </section>
@@ -313,21 +316,23 @@ export default function RegistroVozConfirm({ record, onConfirm, onCancel, isSavi
         </Suspense>
       )}
 
-      {/* Acciones */}
-      <div className="flex gap-2 sticky bottom-0 bg-slate-950 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+      {/* Acciones — barra fija abajo con borde propio para separarla del form.
+          Guardar pesa más (2:1) que Cancelar: es la acción principal. */}
+      <div className="flex gap-2.5 sticky bottom-0 bg-slate-950 -mx-4 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t border-slate-800">
         <button
           onClick={onCancel}
           disabled={isSaving}
-          className="flex-1 px-4 py-3 min-h-[44px] bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
+          className="flex-1 px-4 py-3.5 min-h-[52px] bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl font-bold text-base flex items-center justify-center gap-2 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
         >
-          <X size={18} /> Cancelar
+          <X size={18} aria-hidden="true" /> Cancelar
         </button>
         <button
           onClick={handleConfirm}
           disabled={isSaving}
-          className="flex-1 px-4 py-3 min-h-[44px] bg-lime-700 hover:bg-lime-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50 disabled:bg-slate-700"
+          aria-busy={isSaving}
+          className="flex-[2] px-4 py-3.5 min-h-[52px] bg-lime-700 hover:bg-lime-600 active:bg-lime-800 text-white rounded-xl font-bold text-base flex items-center justify-center gap-2 shadow-lg shadow-lime-900/40 disabled:opacity-60 disabled:bg-slate-700 disabled:shadow-none focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-300"
         >
-          {isSaving ? <Sprout size={18} className="animate-pulse" /> : <Check size={18} />}
+          {isSaving ? <Sprout size={20} className="motion-safe:animate-pulse" aria-hidden="true" /> : <Check size={20} aria-hidden="true" />}
           {isSaving ? 'Guardando…' : 'Guardar registro'}
         </button>
       </div>
