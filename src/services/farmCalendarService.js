@@ -309,6 +309,11 @@ function buildPerennialEntries({ speciesId, plantingDate, now }) {
  * @property {boolean} approximate — el dato es aproximado (genérico / sin anclar)
  * @property {number} confidence — 0-1
  * @property {string} source — procedencia real del dato
+ * @property {string} [stageCode] — código de etapa canónico cuando aplica
+ * @property {boolean} [continuous] — la entrada se repite todo el año
+ * @property {boolean} [anchored] — la entrada está anclada a una siembra real
+ * @property {number|null} [windowStart] — inicio de la ventana en ms
+ * @property {number|null} [windowEnd] — fin de la ventana en ms
  */
 
 /**

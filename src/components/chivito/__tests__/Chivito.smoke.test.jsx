@@ -3,29 +3,44 @@ import { render } from '@testing-library/react';
 import { ChivitoAve, ChivitoEscena, ChivitoBoton, ChivitoCruza } from '../Chivito';
 import { chivitoActivo } from '../../../config/chivitoFlag';
 
+/** @type {Record<string, string | boolean | undefined>} */
+const chivitoEnv = import.meta.env;
+
+/** @type {MediaQueryList} */
+const reducedMotionMql = {
+  matches: true,
+  media: '(prefers-reduced-motion: reduce)',
+  onchange: null,
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  dispatchEvent: vi.fn(),
+  addListener: vi.fn(),
+  removeListener: vi.fn(),
+};
+
 describe('chivitoFlag', () => {
-  const orig = import.meta.env.VITE_CHIVITO;
-  beforeEach(() => { import.meta.env.VITE_CHIVITO = orig; });
+  const orig = chivitoEnv.VITE_CHIVITO;
+  beforeEach(() => { chivitoEnv.VITE_CHIVITO = orig; });
 
   it('false cuando la flag está apagada o con valor no reconocido', () => {
-    import.meta.env.VITE_CHIVITO = undefined;
+    chivitoEnv.VITE_CHIVITO = undefined;
     expect(chivitoActivo()).toBe(false);
-    import.meta.env.VITE_CHIVITO = 'nope';
+    chivitoEnv.VITE_CHIVITO = 'nope';
     expect(chivitoActivo()).toBe(false);
-    import.meta.env.VITE_CHIVITO = 'false';
+    chivitoEnv.VITE_CHIVITO = 'false';
     expect(chivitoActivo()).toBe(false);
   });
 
   it('true con true/1 y con los valores legados del A/B (a/b/ab)', () => {
-    import.meta.env.VITE_CHIVITO = 'true';
+    chivitoEnv.VITE_CHIVITO = 'true';
     expect(chivitoActivo()).toBe(true);
-    import.meta.env.VITE_CHIVITO = ' 1 ';
+    chivitoEnv.VITE_CHIVITO = ' 1 ';
     expect(chivitoActivo()).toBe(true);
-    import.meta.env.VITE_CHIVITO = 'a';
+    chivitoEnv.VITE_CHIVITO = 'a';
     expect(chivitoActivo()).toBe(true);
-    import.meta.env.VITE_CHIVITO = 'B';
+    chivitoEnv.VITE_CHIVITO = 'B';
     expect(chivitoActivo()).toBe(true);
-    import.meta.env.VITE_CHIVITO = ' AB ';
+    chivitoEnv.VITE_CHIVITO = ' AB ';
     expect(chivitoActivo()).toBe(true);
   });
 });
@@ -57,9 +72,9 @@ describe('Chivito piezas SVG', () => {
 
   it('ChivitoEscena integra el ave al 55% del ancho de la escena', () => {
     const { container } = render(<ChivitoEscena size={200} />);
-    const ave = container.querySelector('.chiv-ave-wrap .chivito');
+    const ave = /** @type {HTMLElement | null} */ (container.querySelector('.chiv-ave-wrap .chivito'));
     expect(ave).toBeTruthy();
-    expect(ave.style.width).toBe('110px'); // 200 * 0.55
+    expect(ave?.style.width).toBe('110px'); // 200 * 0.55
   });
 
   it('ChivitoBoton marca is-active en thinking/speaking y expone aria-label', () => {
@@ -71,7 +86,7 @@ describe('Chivito piezas SVG', () => {
   });
 
   it('ChivitoCruza sin animación cuando prefers-reduced-motion', () => {
-    const spy = vi.spyOn(window, 'matchMedia').mockReturnValue({ matches: true });
+    const spy = vi.spyOn(window, 'matchMedia').mockReturnValue(reducedMotionMql);
     const { container } = render(<ChivitoCruza />);
     // el ave no lleva la clase de aleteo cuando se reduce el movimiento
     expect(container.querySelector('.chivito.is-flap')).toBeNull();

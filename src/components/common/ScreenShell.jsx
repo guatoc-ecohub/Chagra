@@ -56,7 +56,7 @@ function navigateGlobal(view) {
  *   - children: contenido principal
  *   - actions:  slot opcional para botones extra antes de los globales
  */
-export const ScreenShell = ({ title, onBack, onHome, icon: Icon, children, actions }) => {
+export const ScreenShell = ({ title, onBack, onHome, icon: Icon, children, actions = null }) => {
     const handleHome = onHome || (() => navigateGlobal('dashboard'));
 
     // La flag se evalúa una sola vez (no cambia en runtime: import.meta.env).
@@ -146,7 +146,7 @@ export const ScreenShell = ({ title, onBack, onHome, icon: Icon, children, actio
  * .screen-shell-f2-* (screen-shell-f2.css) resuelven color contra los tokens
  * --c-* del tema, así que una sola estructura sirve a las 3 pieles.
  */
-function ScreenShellF2({ title, onBack, handleHome, Icon, actions, children }) {
+function ScreenShellF2({ title, onBack, handleHome, Icon, actions = null, children }) {
     const { theme } = useTheme();
     return (
         <div className="screen-shell-f2" data-testid="screen-shell-f2">

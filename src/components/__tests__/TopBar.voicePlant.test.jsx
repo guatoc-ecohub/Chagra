@@ -43,12 +43,15 @@ vi.mock('../../services/fincaActiveStore', () => {
   const useFincaActiveStore = (selector) => selector(fincaState);
   return { useFincaActiveStore, default: useFincaActiveStore };
 });
-vi.mock('../../services/userProfileService', async (importOriginal) => {
-  const real = await importOriginal();
+vi.mock('../../services/userProfileService', async () => {
   return {
-    ...real,
     getProfile: mockGetProfile,
     getProfileMunicipio: mockGetProfileMunicipio,
+    getNotificationStyle: () => {
+      const raw = localStorage.getItem('chagra:profile:v1');
+      const profile = raw ? JSON.parse(raw) : mockGetProfile();
+      return profile?.estilo_notificacion === 'actual' ? 'actual' : 'demo';
+    },
   };
 });
 vi.mock('../dashboard/themeIcon', () => ({

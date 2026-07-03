@@ -39,6 +39,12 @@ const SEVERITY_ICONS = {
     info: Info,
 };
 
+/**
+ * @typedef {Object} NotificationsBellProps
+ * @property {(view: string, payload?: Record<string, unknown>) => void} [onNavigate]
+ * @property {'notif'|'f2'} [variant]
+ */
+
 function readOnboardingComplete() {
     try {
         const raw = localStorage.getItem('chagra:onboarding:profile-v1');
@@ -95,7 +101,10 @@ function mapSensorAlertsToIot(alerts) {
   });
 }
 
-const NotificationsBell = React.memo(function NotificationsBell({ onNavigate, variant }) {
+const NotificationsBell = React.memo(
+function NotificationsBell(
+  /** @type {NotificationsBellProps} */ { onNavigate, variant },
+) {
     const [open, setOpen] = useState(false);
     const [tick, setTick] = useState(0);
     // PoC #316 — tabs Notificaciones / Clima. Default "notif" para no romper

@@ -35,6 +35,13 @@
  */
 
 /**
+ * @typedef {Object} ObservacionZonaCruda
+ * @property {string} zona - Zona observada, sin normalizar
+ * @property {string[]} colores - Colores en texto libre
+ * @property {string} [descripcion] - Descripción libre de la observación
+ */
+
+/**
  * @typedef {Object} InterpretacionCromatografia
  * @property {EstadoSuelo} estado - Estado diagnosticado del suelo
  * @property {string} mensaje - Mensaje explicativo en tono usted campesino
@@ -214,7 +221,7 @@ const PATRONES_SUELO_QUIMICALIZADO = [
  * Calcula el puntaje de vitalidad del suelo a partir de observaciones.
  * Positivo = suelo vivo, Negativo = suelo degradado/químicalizado.
  *
- * @param {ObservacionZona[]} observaciones - Observaciones del cromatograma
+ * @param {ObservacionZonaCruda[]} observaciones - Observaciones del cromatograma
  * @returns {number} -5 a +5
  */
 function calcularPuntajeVitalidad(observaciones) {
@@ -263,7 +270,7 @@ function calcularPuntajeVitalidad(observaciones) {
 /**
  * Identifica patrones específicos encontrados en las observaciones.
  *
- * @param {ObservacionZona[]} observaciones - Observaciones del cromatograma
+ * @param {ObservacionZonaCruda[]} observaciones - Observaciones del cromatograma
  * @returns {string[]} - Nombres de patrones encontrados
  */
 function identificarPatrones(observaciones) {
@@ -287,7 +294,7 @@ function identificarPatrones(observaciones) {
 /**
  * Valida que las observaciones tengan datos mínimos para interpretar.
  *
- * @param {ObservacionZona[]} observaciones - Observaciones a validar
+ * @param {ObservacionZonaCruda[]} observaciones - Observaciones a validar
  * @returns {{valido: boolean, mensaje: string}}
  */
 function validarObservaciones(observaciones) {
@@ -357,7 +364,7 @@ function generarMensajeCampesino(estado, _patrones) {
 /**
  * Calcula el nivel de confianza del diagnóstico.
  *
- * @param {ObservacionZona[]} observaciones - Observaciones del cromatograma
+ * @param {ObservacionZonaCruda[]} observaciones - Observaciones del cromatograma
  * @param {number} puntaje - Puntaje de vitalidad
  * @returns {number} - Confianza entre 0 y 1
  */
@@ -384,7 +391,7 @@ function calcularConfianza(observaciones, puntaje) {
 /**
  * Función principal de interpretación de cromatografía de suelo.
  *
- * @param {ObservacionZona[]} observaciones - Observaciones del cromatograma
+ * @param {ObservacionZonaCruda[]} observaciones - Observaciones del cromatograma
  * @returns {InterpretacionCromatografia} - Interpretación completa
  */
 export function interpretarCromatografia(observaciones) {
@@ -407,7 +414,8 @@ export function interpretarCromatografia(observaciones) {
   const patrones = identificarPatrones(observaciones);
 
   // Determinar estado según puntaje
-  let estado;
+  /** @type {EstadoSuelo} */
+  let estado = 'incertidumbre_alta';
   if (puntaje >= 3) {
     estado = 'vivo';
   } else if (puntaje <= -3) {
@@ -484,7 +492,7 @@ export function normalizarColor(colorNombre) {
 
   const normalizado = colorNombre.toLowerCase().trim();
 
-  const mapa = {
+  const mapa = /** @type {Record<string, ColorCromatograma>} */ ({
     'marrón oscuro': 'marron_oscuro',
     marron: 'marron_oscuro',
     café: 'marron_oscuro',
@@ -499,7 +507,7 @@ export function normalizarColor(colorNombre) {
     rosa: 'rosado',
     amarillo: 'amarillo',
     dorado: 'amarillo',
-  };
+  });
 
   return mapa[normalizado] || null;
 }
@@ -517,7 +525,7 @@ export function normalizarZona(zonaNombre) {
 
   const normalizado = zonaNombre.toLowerCase().trim();
 
-  const mapa = {
+  const mapa = /** @type {Record<string, ZonaCromatograma>} */ ({
     central: 'central',
     'zona central': 'central',
     centro: 'central',
@@ -532,7 +540,7 @@ export function normalizarZona(zonaNombre) {
     'picos bordes': 'picos',
     radiaciones: 'picos',
     borde: 'picos',
-  };
+  });
 
   return mapa[normalizado] || null;
 }
@@ -554,6 +562,7 @@ export function crearObservacionDesdeRaw(rawData) {
     return null;
   }
 
+  /** @type {ColorCromatograma[]} */
   const coloresNormalizados = [];
   if (Array.isArray(rawData.colores)) {
     for (const color of rawData.colores) {
@@ -574,7 +583,7 @@ export function crearObservacionDesdeRaw(rawData) {
 /**
  * Valida si una interpretación indica suelo vivo.
  *
- * @param {InterpretacionCromatografia} interpretacion - Interpretación a verificar
+ * @param {{ estado?: EstadoSuelo, confianza?: number } | null | undefined} interpretacion - Interpretación a verificar
  * @returns {boolean} - true si el suelo está vivo
  */
 export function esSueloVivo(interpretacion) {
@@ -584,7 +593,7 @@ export function esSueloVivo(interpretacion) {
 /**
  * Valida si una interpretación indica suelo degradado.
  *
- * @param {InterpretacionCromatografia} interpretacion - Interpretación a verificar
+ * @param {{ estado?: EstadoSuelo, confianza?: number } | null | undefined} interpretacion - Interpretación a verificar
  * @returns {boolean} - true si el suelo está degradado
  */
 export function esSueloDegradado(interpretacion) {
@@ -596,7 +605,7 @@ export function esSueloDegradado(interpretacion) {
 /**
  * Valida si una interpretación indica suelo químicalizado.
  *
- * @param {InterpretacionCromatografia} interpretacion - Interpretación a verificar
+ * @param {{ estado?: EstadoSuelo, confianza?: number } | null | undefined} interpretacion - Interpretación a verificar
  * @returns {boolean} - true si el suelo está químicalizado
  */
 export function esSueloQuimicalizado(interpretacion) {

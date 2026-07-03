@@ -41,6 +41,27 @@ function useUid(prefix) {
   return `${prefix}-${useId().replace(/:/g, '')}`;
 }
 
+/**
+ * @typedef {Object} ChivitoAveProps
+ * @property {number} [size]
+ * @property {boolean} [flap]
+ * @property {string} [className]
+ * @property {string} [ariaLabel]
+ *
+ * @typedef {Object} ChivitoEscenaProps
+ * @property {number} [size]
+ * @property {string} [ariaLabel]
+ *
+ * @typedef {Object} ChivitoBotonProps
+ * @property {number} [size]
+ * @property {'idle'|'thinking'|'speaking'} [state]
+ * @property {string} [ariaLabel]
+ *
+ * @typedef {Object} ChivitoCruzaProps
+ * @property {number} [size]
+ * @property {string} [className]
+ */
+
 /* ══════════════════════════════════════════════════════════════════════════
  *  EL CHIVITO — detallado / rico (gradientes, iridiscencia animada, plumas,
  *  sombras). Perfil mirando a la derecha.
@@ -187,6 +208,12 @@ function ChivitoSVG({ id }) {
  * ChivitoAve — sólo el ave. `flap` activa el aleteo/vida (respeta
  * reduced-motion vía CSS). `size` = ancho en px.
  */
+/**
+ * ChivitoAve — sólo el ave. `flap` activa el aleteo/vida (respeta
+ * reduced-motion vía CSS). `size` = ancho en px.
+ *
+ * @param {ChivitoAveProps} props
+ */
 export function ChivitoAve({ size = 120, flap = true, className = '', ariaLabel }) {
   const id = useUid('chiv');
   return (
@@ -286,6 +313,13 @@ function FrailejonSVG({ id }) {
  * (`chiv-sip`) la acerca y retira de la flor con una pausa al libar. Respeta
  * prefers-reduced-motion.
  */
+/**
+ * ChivitoEscena — HERO del home: el chivito tomando néctar de la flor amarilla
+ * del frailejón (roseta plateada + flores amarillas). La simbiosis real del
+ * páramo.
+ *
+ * @param {ChivitoEscenaProps} props
+ */
 export function ChivitoEscena({ size = 200, ariaLabel = 'Chivito de páramo tomando néctar de la flor del frailejón' }) {
   const id = useUid('chiv-esc');
   return (
@@ -310,6 +344,12 @@ export function ChivitoEscena({ size = 200, ariaLabel = 'Chivito de páramo toma
  * Encuadre compacto (cabeza + barba + cuerpo) centrado en el botón circular.
  * `state` 'thinking'|'speaking' inclina al ave como para libar.
  */
+/**
+ * ChivitoBoton — el chivito ES el icono del botón enviar/hablar del agente.
+ * Encuadre compacto (cabeza + barba + cuerpo) centrado en el botón circular.
+ *
+ * @param {ChivitoBotonProps} props
+ */
 export function ChivitoBoton({ size = 38, state = 'idle', ariaLabel = 'Enviar al agente' }) {
   const active = state === 'thinking' || state === 'speaking';
   return (
@@ -322,6 +362,12 @@ export function ChivitoBoton({ size = 38, state = 'idle', ariaLabel = 'Enviar al
 /**
  * ChivitoCruza — TRANSICIÓN home→agente: el chivito cruza aleteando en arco,
  * UNA pasada. Respeta reduced-motion (sin cruce; el padre acorta la transición).
+ */
+/**
+ * ChivitoCruza — TRANSICIÓN home→agente: el chivito cruza aleteando en arco,
+ * UNA pasada. Respeta reduced-motion (sin cruce; el padre acorta la transición).
+ *
+ * @param {ChivitoCruzaProps} props
  */
 export function ChivitoCruza({ size = 170, className = '' }) {
   const [reduce] = useState(() => prefersReducedMotion());

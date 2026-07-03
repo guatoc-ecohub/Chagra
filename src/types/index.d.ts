@@ -15,6 +15,17 @@
  */
 
 declare global {
+  interface ImportMetaEnv {
+    readonly VITE_CHIVITO?: string;
+    readonly VITE_COLIBRI?: string;
+    readonly VITE_FINCA_VIVA_HOME_PERFIL?: string;
+    [key: string]: string | boolean | undefined;
+  }
+
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
+  }
+
   // ───────────────────────────────────────────────
   // Asset (FarmOS asset--*)
   // ───────────────────────────────────────────────

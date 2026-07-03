@@ -41,9 +41,8 @@ const FLAG_KEY = 'VITE_CHIVITO';
 export function chivitoActivo() {
   try {
     const raw = import.meta.env?.[FLAG_KEY];
-    if (raw === true) return true;
-    if (typeof raw !== 'string') return false;
-    const v = raw.trim().toLowerCase();
+    if (raw == null) return false;
+    const v = String(raw).trim().toLowerCase();
     return v === 'true' || v === '1' || v === 'a' || v === 'b' || v === 'ab';
   } catch (_) {
     return false;
