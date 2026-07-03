@@ -1,18 +1,20 @@
 import React from 'react';
-import { Clock, ShieldAlert, ScrollText, Sprout } from 'lucide-react';
+import { Clock, ShieldAlert, ScrollText, Sprout, Droplets, SprayCan, Repeat } from 'lucide-react';
 import {
   getDiagramaBiopreparado,
   iconoIngrediente,
 } from '../data/biopreparado-diagramas';
 
 /**
- * BiopreparadoDiagrama — diagrama visual PASO A PASO de un biopreparado,
- * pensado para campesinos de baja alfabetización: el usuario debería poder
- * PREPARARLO mirando el dibujo, casi sin leer.
+ * BiopreparadoDiagrama — ficha de receta paso a paso de un biopreparado,
+ * pensada para campesinos de baja alfabetización: el usuario debería poder
+ * PREPARARLO y APLICARLO mirando la ficha, casi sin leer, y legible al sol
+ * en el campo.
  *
  * Renderiza desde dos fuentes, ninguna inventada:
  *   - el objeto del catálogo (`biopreparado`, de catalog/biopreparados-seed.json):
- *     ingredientes, tiempo de elaboración, precaución de seguridad, fuente.
+ *     ingredientes, dosis de aplicación, método, frecuencia, tiempo de
+ *     elaboración, precaución de seguridad, fuente. Se muestran TEXTUALES.
  *   - el overlay visual (src/data/biopreparado-diagramas.js): los pasos
  *     numerados, que RE-EXPRESAN el `proceso_resumen`/`dosis_aplicacion` del
  *     mismo catálogo. Cero fabricación de recetas/dosis.
@@ -23,6 +25,8 @@ import {
  * Theme-aware: usa SOLO familias redefinidas por `[data-theme]` (slate /
  * emerald / amber / surface) + el acento de marca `--t-accent-rgb`
  * (teal biopunk · ocre nature · verde minimalista). Nada de sky/lime/cyan.
+ * Radios/sombras/tacto vienen de los tokens unificados (styles/tokens.css) con
+ * fallback byte-idéntico. Todo movimiento respeta prefers-reduced-motion.
  *
  * Props:
  *   - biopreparado: objeto del catálogo (requiere id, ingredientes, fuente…)
@@ -30,6 +34,18 @@ import {
  *     (Miguel UX: el material que el usuario acaba de agregar a la bodega)
  *   - compact: (opcional) oculta el encabezado de nombre (cuando ya hay título)
  */
+
+/** Eyebrow de sección — etiqueta corta en versalitas, consistente en la ficha. */
+function SectionLabel({ children, className = '' }) {
+  return (
+    <p
+      className={`text-[10px] uppercase tracking-[0.14em] font-bold mb-2 ${className}`}
+    >
+      {children}
+    </p>
+  );
+}
+
 export default function BiopreparadoDiagrama({
   biopreparado,
   highlightIngredient = '',
@@ -42,6 +58,9 @@ export default function BiopreparadoDiagrama({
   const {
     nombre,
     ingredientes = [],
+    dosis_aplicacion: dosis,
+    metodo,
+    frecuencia,
     tiempo_elaboracion_dias: dias,
     precaucion_seguridad: precaucion,
     fuente,
@@ -53,14 +72,24 @@ export default function BiopreparadoDiagrama({
     <section
       data-testid="biopreparado-diagrama"
       aria-label={`Cómo preparar ${nombre || 'el biopreparado'} paso a paso`}
-      className="space-y-4"
+      className={
+        compact
+          ? 'space-y-4'
+          : 'space-y-4 rounded-[var(--r-xl,24px)] border border-slate-800 bg-slate-900/50 p-4 shadow-[var(--sombra-1,0_1px_2px_rgb(8_30_22/0.18))]'
+      }
     >
       {!compact && (
-        <header className="flex items-center gap-2">
-          <Sprout size={18} className="text-emerald-400 shrink-0" aria-hidden="true" />
-          <h4 className="text-sm font-bold text-slate-100">{nombre}</h4>
+        <header className="flex items-center gap-2.5 border-b border-slate-800 pb-3">
+          <span
+            className="grid place-items-center w-9 h-9 shrink-0 rounded-[var(--r-sm,12px)]"
+            style={{ background: 'rgb(var(--t-accent-rgb) / 0.16)' }}
+            aria-hidden="true"
+          >
+            <Sprout size={18} className="text-emerald-400" />
+          </span>
+          <h4 className="text-[0.95rem] font-bold text-slate-100 leading-tight">{nombre}</h4>
           {diagrama.rinde && (
-            <span className="ml-auto text-[10px] text-slate-400 bg-slate-800/70 px-2 py-0.5 rounded-full">
+            <span className="ml-auto text-[10px] font-semibold text-emerald-300 bg-emerald-900/30 border border-emerald-800/60 px-2.5 py-1 rounded-[var(--r-pill,999px)] shrink-0">
               {diagrama.rinde}
             </span>
           )}
@@ -70,22 +99,20 @@ export default function BiopreparadoDiagrama({
       {/* ── Ingredientes: fichas con ícono concreto ─────────────────────── */}
       {ingredientes.length > 0 && (
         <div>
-          <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-2">
-            Necesita
-          </p>
+          <SectionLabel className="text-slate-500">Necesita</SectionLabel>
           <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4">
             {ingredientes.map((ing, i) => {
               const isMatch = hl && ing.toLowerCase().includes(hl);
               return (
                 <li
                   key={i}
-                  className={`flex flex-col items-center gap-1 rounded-xl border p-2 text-center ${
+                  className={`flex flex-col items-center justify-start gap-1.5 rounded-[var(--r-md,16px)] border p-2.5 text-center min-h-[76px] ${
                     isMatch
-                      ? 'border-emerald-700 bg-emerald-900/30'
+                      ? 'border-emerald-600 bg-emerald-900/30 shadow-[var(--sombra-1,0_1px_2px_rgb(8_30_22/0.18))]'
                       : 'border-slate-800 bg-slate-900/60'
                   }`}
                 >
-                  <span className="text-2xl leading-none" aria-hidden="true">
+                  <span className="text-[1.7rem] leading-none" aria-hidden="true">
                     {iconoIngrediente(ing)}
                   </span>
                   <span
@@ -104,9 +131,7 @@ export default function BiopreparadoDiagrama({
 
       {/* ── Pasos: stepper vertical con número SVG + emoji ──────────────── */}
       <div>
-        <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-2">
-          Paso a paso
-        </p>
+        <SectionLabel className="text-slate-500">Paso a paso</SectionLabel>
         <ol className="space-y-0">
           {diagrama.pasos.map((paso, idx) => {
             const isLast = idx === diagrama.pasos.length - 1;
@@ -147,7 +172,7 @@ export default function BiopreparadoDiagrama({
                 </div>
 
                 {/* Columna derecha: emoji + título + detalle */}
-                <div className={`flex-1 pb-4 ${isLast ? '' : ''}`}>
+                <div className="flex-1 pb-4">
                   <div className="flex items-start gap-2">
                     <span className="text-2xl leading-none shrink-0" aria-hidden="true">
                       {paso.icon}
@@ -156,7 +181,7 @@ export default function BiopreparadoDiagrama({
                       <p className="text-sm font-semibold text-slate-100 flex items-center flex-wrap gap-1.5">
                         {paso.titulo}
                         {paso.cantidad && (
-                          <span className="text-[11px] font-bold text-emerald-300 bg-emerald-900/40 px-1.5 py-0.5 rounded">
+                          <span className="text-[11px] font-bold text-emerald-200 bg-emerald-800/50 border border-emerald-700/60 px-1.5 py-0.5 rounded-[var(--r-xs,8px)]">
                             {paso.cantidad}
                           </span>
                         )}
@@ -186,7 +211,7 @@ export default function BiopreparadoDiagrama({
 
       {/* ── Tiempo de fermentación / elaboración ───────────────────────── */}
       {dias != null && (
-        <div className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/60 px-3 py-2">
+        <div className="flex items-center gap-2 rounded-[var(--r-md,16px)] border border-slate-800 bg-slate-900/60 px-3 py-2.5">
           <Clock size={16} className="text-emerald-400 shrink-0" aria-hidden="true" />
           <span className="text-xs text-slate-300">
             {dias <= 1 ? (
@@ -202,24 +227,47 @@ export default function BiopreparadoDiagrama({
         </div>
       )}
 
+      {/* ── Dosis de aplicación (cifra de campo destacada, TEXTUAL del
+             catálogo — cero fabricación) + método y frecuencia como meta ── */}
+      {dosis && (
+        <div className="rounded-[var(--r-md,16px)] border border-emerald-800/60 bg-emerald-950/40 px-3 py-2.5">
+          <SectionLabel className="text-emerald-400/80 flex items-center gap-1.5">
+            <Droplets size={12} aria-hidden="true" /> Dosis de aplicación
+          </SectionLabel>
+          <p className="text-sm text-emerald-50/95 leading-relaxed font-medium">{dosis}</p>
+          {(metodo || frecuencia) && (
+            <div className="mt-2.5 flex flex-wrap gap-1.5">
+              {metodo && (
+                <span className="inline-flex items-center gap-1 text-[11px] text-emerald-200/90 bg-emerald-900/50 border border-emerald-800/60 px-2 py-1 rounded-[var(--r-pill,999px)]">
+                  <SprayCan size={11} aria-hidden="true" /> {metodo}
+                </span>
+              )}
+              {frecuencia && (
+                <span className="inline-flex items-center gap-1 text-[11px] text-emerald-200/90 bg-emerald-900/50 border border-emerald-800/60 px-2 py-1 rounded-[var(--r-pill,999px)]">
+                  <Repeat size={11} aria-hidden="true" /> {frecuencia}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── Banda de seguridad (guarda existente del catálogo) ─────────── */}
       {precaucion && (
-        <div className="flex items-start gap-2 rounded-xl border border-amber-800/60 bg-amber-900/20 px-3 py-2">
-          <ShieldAlert size={16} className="text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
+        <div className="flex items-start gap-2.5 rounded-[var(--r-md,16px)] border border-amber-700/60 bg-amber-950/40 px-3 py-2.5 shadow-[var(--sombra-1,0_1px_2px_rgb(8_30_22/0.18))]">
+          <ShieldAlert size={18} className="text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
           <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-wider text-amber-400/80 font-bold mb-0.5">
-              Cuidado
-            </p>
-            <p className="text-xs text-amber-200/90 leading-relaxed">{precaucion}</p>
+            <SectionLabel className="text-amber-400/90 mb-1">Cuidado</SectionLabel>
+            <p className="text-xs text-amber-100/90 leading-relaxed">{precaucion}</p>
           </div>
         </div>
       )}
 
       {/* ── Fuente (trazabilidad — no se inventa nada) ─────────────────── */}
       {fuente && (
-        <div className="flex items-start gap-2 pt-1">
-          <ScrollText size={12} className="text-slate-600 shrink-0 mt-0.5" aria-hidden="true" />
-          <p className="text-[10px] text-slate-500 italic leading-relaxed">{fuente}</p>
+        <div className="flex items-start gap-2 pt-1 border-t border-slate-800/70 mt-1">
+          <ScrollText size={12} className="text-slate-600 shrink-0 mt-1.5" aria-hidden="true" />
+          <p className="text-[10px] text-slate-500 italic leading-relaxed pt-1">{fuente}</p>
         </div>
       )}
     </section>
