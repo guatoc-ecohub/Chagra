@@ -29,6 +29,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays, Sprout, HelpCircle, Store, FileText, Mic } from 'lucide-react';
 import AgentHero from './AgentHero';
 import OnboardingHero from '../OnboardingHero';
+import CaminoPrimerCultivo from '../onboarding/CaminoPrimerCultivo';
 import {
     getProfile,
     getModuleVisibility,
@@ -691,6 +692,21 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                BAJADO. Solo activo con la flag ON; el legacy (else) queda intacto.
                ════════════════════════════════════════════════════════════════ */
             <>
+                {/* ── BLOQUE 0 · "El camino de su primer cultivo" ─────────────
+                    Onboarding ilustrado del productor NUEVO (0 siembras): qué
+                    es Chagra + sendero de 3 pasos (ubicar finca → primera
+                    siembra → conocer al asistente) sobre los flujos que YA
+                    existen. Omitible y persistido en el dispositivo. Es lo
+                    PRIMERO de la hoja: para quien empieza, orienta más que la
+                    telemetría del día. Con siembras registradas desaparece. */}
+                {plantsCount === 0 && (
+                    <CaminoPrimerCultivo
+                        onNavigate={onNavigate}
+                        plantsCount={plantsCount}
+                        rutaSiembra={registroUnifFlag ? 'registro_unificado' : 'sembrar'}
+                    />
+                )}
+
                 {/* ── BLOQUE 1 · "Cómo va su finca hoy" ───────────────────────
                     FUNDE lo que antes eran cuatro superficies solapadas (audit
                     §3.7/§3.8): el día (HoyEnFincaStrip — UNA sola vez; el tile
