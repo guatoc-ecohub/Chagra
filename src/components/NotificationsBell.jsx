@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Bell, X, AlertTriangle, Info, AlertCircle, Sprout, Cloud, CloudFog, Wifi, Droplets, ListChecks, Sparkles, Snowflake, CloudRain, Sun, CloudSun, Thermometer, Wind, Activity, RefreshCw } from 'lucide-react';
+import { Bell, X, AlertTriangle, Info, AlertCircle, Sprout, Cloud, CloudFog, Wifi, Droplets, ListChecks, Sparkles, Snowflake, CloudRain, Sun, CloudSun, Thermometer, Wind, Activity, RefreshCw, CheckCheck } from 'lucide-react';
+import EmptyState from './common/EmptyState';
+import Skeleton from './common/Skeleton';
 import useAssetStore from '../store/useAssetStore';
 import useAlertStore from '../store/useAlertStore';
 import useFincaActiveStore from '../services/fincaActiveStore';
@@ -39,6 +41,27 @@ const SEVERITY_ICONS = {
     info: Info,
 };
 
+// Pasada visual 2026-07: la lista ya llega ordenada por severidad desde
+// aggregateNotifications; estos encabezados de sección hacen esa prioridad
+// LEGIBLE para el productor (urgente arriba, contexto abajo). Solo visual.
+const SEVERITY_GROUP_LABELS = {
+    critical: 'Urgente',
+    warning: 'Requiere atención',
+    info: 'Para tener en cuenta',
+};
+
+const SEVERITY_GROUP_CLASSES = {
+    critical: 'text-red-300',
+    warning: 'text-amber-300',
+    info: 'text-sky-300',
+};
+
+const SEVERITY_DOT_CLASSES = {
+    critical: 'bg-red-400',
+    warning: 'bg-amber-400',
+    info: 'bg-sky-400',
+};
+
 function readOnboardingComplete() {
     try {
         const raw = localStorage.getItem('chagra:onboarding:profile-v1');
@@ -55,6 +78,31 @@ function readUpdateAvailable() {
         return localStorage.getItem('chagra:sw:update-available') === '1';
     } catch {
         return false;
+    }
+}
+
+// Estado leído/no-leído — capa VISUAL pura (no toca dismiss ni el badge).
+// Una notificación cuenta como "vista" cuando el panel se cierra con ella en
+// pantalla; en la siguiente apertura se pinta atenuada, sin el punto "nueva".
+const STORAGE_SEEN = 'chagra:notifications:seen:v1';
+const SEEN_MAX = 100;
+
+function readSeenIds() {
+    try {
+        const raw = localStorage.getItem(STORAGE_SEEN);
+        const parsed = raw ? JSON.parse(raw) : null;
+        return new Set(Array.isArray(parsed) ? parsed : []);
+    } catch {
+        return new Set();
+    }
+}
+
+function markIdsAsSeen(ids) {
+    try {
+        const merged = Array.from(new Set([...readSeenIds(), ...ids]));
+        localStorage.setItem(STORAGE_SEEN, JSON.stringify(merged.slice(-SEEN_MAX)));
+    } catch {
+        // ignore quota
     }
 }
 
@@ -112,6 +160,10 @@ const NotificationsBell = React.memo(function NotificationsBell({ onNavigate, va
     // tasks vencidas reales desde useLogStore (log--task pending). Antes estaba
     // hardcodeado a [], así que el bell nunca mostraba "tareas vencidas".
     const [pendingTasks, setPendingTasks] = useState([]);
+    // Snapshot de ids "ya vistos" tomado AL ABRIR el panel — así lo nuevo
+    // conserva su punto mientras el panel está abierto y solo se atenúa en
+    // la siguiente apertura. Visual puro, no afecta conteos del badge.
+    const [seenSnapshot, setSeenSnapshot] = useState(() => readSeenIds());
 
     const plants = useAssetStore((s) => s.plants);
     const sensorAlerts = useAlertStore((s) => s.activeAlerts);
@@ -182,6 +234,26 @@ const NotificationsBell = React.memo(function NotificationsBell({ onNavigate, va
         // tick force re-run on dismiss event
     }, [plants, sensorAlerts, activeFincaSlug, fincas, tick, failedTxCount, pendingTasks]); // eslint-disable-line react-hooks/exhaustive-deps -- aggregateNotifications y read* son funciones estables, no requieren deps
 
+    // Leído/no-leído (visual): al abrir se congela el set "visto" para pintar
+    // los puntos; al cerrar se persiste lo que quedó en pantalla como visto.
+    // Va en los handlers de apertura/cierre (no en un effect) para no disparar
+    // setState sincrónico dentro de effects (regla react-hooks del repo).
+    const closePanel = useCallback(() => {
+        markIdsAsSeen(notifications.map((n) => n.id));
+        setOpen(false);
+    }, [notifications]);
+
+    const togglePanel = useCallback(() => {
+        if (open) {
+            closePanel();
+        } else {
+            setSeenSnapshot(readSeenIds());
+            setOpen(true);
+        }
+    }, [open, closePanel]);
+
+    const unseenCount = notifications.filter((n) => !seenSnapshot.has(n.id)).length;
+
     // PoC #316 — el clima cuenta para los badges del bell. Las alertas
     // locales de Open-Meteo (helada/calor/torrencial/etc) escalan severity;
     // la fase ENSO solo contribuye con "warning" si está en moderado/fuerte.
@@ -228,8 +300,8 @@ const NotificationsBell = React.memo(function NotificationsBell({ onNavigate, va
                 onNavigate?.(notif.cta_view);
             }
         }
-        setOpen(false);
-    }, [onNavigate]);
+        closePanel();
+    }, [onNavigate, closePanel]);
 
     // 2026-05-28: handler para alertas dentro del ClimaPanel. Cada alerta
     // local (helada/lluvia/calor/etc.) puede saltar al agente con un prompt
@@ -255,8 +327,8 @@ const NotificationsBell = React.memo(function NotificationsBell({ onNavigate, va
                 type: 'climate_local_alert',
             },
         });
-        setOpen(false);
-    }, [onNavigate, clima]);
+        closePanel();
+    }, [onNavigate, clima, closePanel]);
 
     // 2026-05-28: handler para ENSO badge → agente con prompt situado.
     // El operador puede preguntar "qué significa para mi finca" sin re-tipear,
@@ -282,13 +354,21 @@ const NotificationsBell = React.memo(function NotificationsBell({ onNavigate, va
                 type: 'enso_phase',
             },
         });
-        setOpen(false);
-    }, [onNavigate, clima]);
+        closePanel();
+    }, [onNavigate, clima, closePanel]);
 
     const handleDismiss = useCallback((id, e) => {
         e?.stopPropagation();
         dismissNotification(id);
     }, []);
+
+    // Acción rápida "Descartar todas" — solo para lo NO crítico. Lo crítico
+    // (helada, sync roto) se descarta una a una, a propósito: que no se vaya
+    // en un barrido. Reusa dismissNotification existente, cero lógica nueva.
+    const dismissibleIds = notifications.filter((n) => n.severity !== 'critical').map((n) => n.id);
+    const handleDismissAll = () => {
+        dismissibleIds.forEach((id) => dismissNotification(id));
+    };
 
     // VIVO — severity-aware visual del botón. Si crítico: pulsa rojo, halo
     // expansivo, icono Bell shake suave. Si warning: ámbar steady. Si info: sky.
@@ -330,10 +410,18 @@ const NotificationsBell = React.memo(function NotificationsBell({ onNavigate, va
                     animation: chagra-bell-shake 1.6s ease-in-out infinite;
                     transform-origin: 50% 20%;
                 }
+                /* Campo con mareo/vestibular: sin pulso ni campanazo. El borde
+                   rojo + badge siguen comunicando la urgencia sin movimiento. */
+                @media (prefers-reduced-motion: reduce) {
+                    .chagra-bell-critical,
+                    .chagra-bell-critical .chagra-bell-icon {
+                        animation: none;
+                    }
+                }
             `}</style>
             <button
                 type="button"
-                onClick={() => setOpen((v) => !v)}
+                onClick={togglePanel}
                 aria-label={totalCount > 0 ? `Notificaciones (${totalCount}${hasCritical ? ', urgente' : ''})` : 'Notificaciones'}
                 title={hasCritical ? '⚠️ Alerta crítica' : 'Notificaciones'}
                 aria-expanded={open}
@@ -354,22 +442,28 @@ const NotificationsBell = React.memo(function NotificationsBell({ onNavigate, va
                 <>
                     <div
                         className="fixed inset-0 bg-black/50 z-[90]"
-                        onClick={() => setOpen(false)}
+                        onClick={closePanel}
                         aria-hidden="true"
                     />
                     <div
                         role="dialog"
                         aria-label="Panel de notificaciones"
-                        className="fixed top-[60px] right-2 left-2 sm:left-auto sm:right-3 sm:w-[400px] max-h-[80vh] overflow-y-auto bg-slate-900 border-2 border-slate-700 rounded-2xl shadow-2xl z-[95]"
+                        className="fixed top-[60px] right-2 left-2 sm:left-auto sm:right-3 sm:w-[400px] max-h-[80vh] overflow-y-auto bg-slate-900 border-2 border-slate-700 rounded-[var(--r-xl,24px)] shadow-[var(--sombra-3,0_16px_44px_rgb(8_30_22/0.30))] z-[95]"
                     >
                         <div className="sticky top-0 bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between">
                             <h3 className="text-base font-bold text-white flex items-center gap-2">
                                 <Bell size={18} className="text-emerald-400" />
-                                Notificaciones {hasCritical && <span className="text-xs text-red-400 font-medium animate-pulse">· urgente</span>}
+                                Notificaciones
+                                {hasCritical && <span className="text-xs text-red-400 font-medium motion-safe:animate-pulse">· urgente</span>}
+                                {!hasCritical && unseenCount > 0 && (
+                                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-[var(--r-pill,999px)] bg-emerald-900/50 border border-emerald-700/50 text-emerald-300">
+                                        {unseenCount} nueva{unseenCount === 1 ? '' : 's'}
+                                    </span>
+                                )}
                             </h3>
                             <button
                                 type="button"
-                                onClick={() => setOpen(false)}
+                                onClick={closePanel}
                                 aria-label="Cerrar panel"
                                 className="p-1 rounded-full hover:bg-slate-800 text-slate-400"
                             >
@@ -401,58 +495,99 @@ const NotificationsBell = React.memo(function NotificationsBell({ onNavigate, va
 
                         {activeTab === 'notif' && (
                             notifications.length === 0 ? (
-                                <div className="p-6 text-center text-slate-500 text-sm">
-                                    <Bell size={36} className="mx-auto mb-3 opacity-40" />
-                                    <p className="font-medium">Todo en orden por ahora.</p>
-                                    <p className="text-xs mt-1">Te avisaré si hay algo urgente en tu finca.</p>
-                                </div>
+                                <EmptyState
+                                    size="compact"
+                                    icon={Bell}
+                                    title="Todo en orden por ahora."
+                                    description="Le avisaremos aquí si hay algo urgente en su finca: heladas, tareas vencidas o cambios sin sincronizar."
+                                    data-testid="notif-empty-state"
+                                />
                             ) : (
-                                <ul className="divide-y divide-slate-800">
-                                    {notifications.map((n) => {
-                                        const TypeIcon = TYPE_ICONS[n.type] || Info;
-                                        const SeverityIcon = SEVERITY_ICONS[n.severity] || Info;
-                                        return (
-                                            <li
-                                                key={n.id}
-                                                className={`px-4 py-3 border-l-4 ${SEVERITY_STYLES[n.severity] || SEVERITY_STYLES.info}`}
+                                <>
+                                    {dismissibleIds.length > 1 && (
+                                        <div className="px-4 pt-2.5 pb-1 flex justify-end">
+                                            <button
+                                                type="button"
+                                                onClick={handleDismissAll}
+                                                className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1.5 rounded-[var(--r-pill,999px)] text-slate-400 hover:text-slate-200 hover:bg-white/5 motion-safe:transition-colors motion-safe:duration-[var(--dur-estado,0.18s)]"
+                                                aria-label="Descartar todas las notificaciones no urgentes"
                                             >
-                                                <div className="flex items-start gap-3">
-                                                    <span className="shrink-0 mt-0.5">
-                                                        <TypeIcon size={22} aria-hidden="true" />
-                                                    </span>
-                                                    <div className="flex-1 min-w-0">
-                                                        <div className="flex items-start gap-2">
-                                                            <SeverityIcon size={14} className="shrink-0 mt-0.5 opacity-70" />
-                                                            <h4 className="text-sm font-bold leading-tight">{n.title}</h4>
+                                                <CheckCheck size={14} aria-hidden="true" />
+                                                Descartar no urgentes
+                                            </button>
+                                        </div>
+                                    )}
+                                    <ul className="divide-y divide-slate-800">
+                                        {notifications.map((n, idx) => {
+                                            const TypeIcon = TYPE_ICONS[n.type] || Info;
+                                            const SeverityIcon = SEVERITY_ICONS[n.severity] || Info;
+                                            const unread = !seenSnapshot.has(n.id);
+                                            // Encabezado de sección cuando cambia la severidad
+                                            // (la lista ya viene ordenada crítico→warning→info).
+                                            const newGroup = idx === 0 || notifications[idx - 1].severity !== n.severity;
+                                            return (
+                                                <React.Fragment key={n.id}>
+                                                    {newGroup && SEVERITY_GROUP_LABELS[n.severity] && (
+                                                        <li
+                                                            aria-hidden="true"
+                                                            className={`px-4 pt-3 pb-1 text-[10px] font-bold uppercase tracking-wider ${SEVERITY_GROUP_CLASSES[n.severity] || 'text-slate-400'}`}
+                                                        >
+                                                            {SEVERITY_GROUP_LABELS[n.severity]}
+                                                        </li>
+                                                    )}
+                                                    <li
+                                                        className={`px-4 py-3 border-l-4 ${SEVERITY_STYLES[n.severity] || SEVERITY_STYLES.info} ${unread ? '' : 'opacity-70 saturate-50'} motion-safe:transition-opacity motion-safe:duration-[var(--dur-estado,0.18s)]`}
+                                                        data-unread={unread ? 'true' : 'false'}
+                                                    >
+                                                        <div className="flex items-start gap-3">
+                                                            <span className="shrink-0 mt-0.5 relative">
+                                                                <TypeIcon size={22} aria-hidden="true" />
+                                                                {unread && (
+                                                                    <span
+                                                                        aria-hidden="true"
+                                                                        title="Sin leer"
+                                                                        className={`absolute -top-1 -right-1 w-2 h-2 rounded-full ring-2 ring-slate-900 ${SEVERITY_DOT_CLASSES[n.severity] || SEVERITY_DOT_CLASSES.info}`}
+                                                                    />
+                                                                )}
+                                                            </span>
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="flex items-start gap-2">
+                                                                    <SeverityIcon size={14} className="shrink-0 mt-0.5 opacity-70" />
+                                                                    <h4 className={`text-sm leading-tight ${unread ? 'font-bold' : 'font-semibold'}`}>
+                                                                        {n.title}
+                                                                        {unread && <span className="sr-only"> (sin leer)</span>}
+                                                                    </h4>
+                                                                </div>
+                                                                {n.body && (
+                                                                    <p className="text-xs mt-1 opacity-85 leading-relaxed">{n.body}</p>
+                                                                )}
+                                                                <div className="flex items-center gap-2 mt-2">
+                                                                    {n.cta_label && (
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => handleAction(n)}
+                                                                            className="text-xs font-bold px-3 py-1.5 rounded-[var(--r-sm,12px)] bg-white/10 hover:bg-white/20 active:bg-white/30 text-white motion-safe:transition-colors motion-safe:duration-[var(--dur-estado,0.18s)]"
+                                                                        >
+                                                                            {n.cta_label}
+                                                                        </button>
+                                                                    )}
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={(e) => handleDismiss(n.id, e)}
+                                                                        className="text-xs px-2 py-1.5 rounded-[var(--r-sm,12px)] hover:bg-white/5 opacity-70 hover:opacity-100 motion-safe:transition-opacity motion-safe:duration-[var(--dur-estado,0.18s)]"
+                                                                        aria-label={`Descartar: ${n.title}`}
+                                                                    >
+                                                                        Descartar
+                                                                    </button>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        {n.body && (
-                                                            <p className="text-xs mt-1 opacity-85 leading-relaxed">{n.body}</p>
-                                                        )}
-                                                        <div className="flex items-center gap-2 mt-2">
-                                                            {n.cta_label && (
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => handleAction(n)}
-                                                                    className="text-xs font-bold px-3 py-1 rounded-md bg-white/10 hover:bg-white/20 active:bg-white/30 text-white"
-                                                                >
-                                                                    {n.cta_label}
-                                                                </button>
-                                                            )}
-                                                            <button
-                                                                type="button"
-                                                                onClick={(e) => handleDismiss(n.id, e)}
-                                                                className="text-xs px-2 py-1 rounded-md hover:bg-white/5 opacity-70 hover:opacity-100"
-                                                                aria-label={`Descartar: ${n.title}`}
-                                                            >
-                                                                Descartar
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
+                                                    </li>
+                                                </React.Fragment>
+                                            );
+                                        })}
+                                    </ul>
+                                </>
                             )
                         )}
 
@@ -565,25 +700,39 @@ function formatDayLabel(isoDate, i) {
  */
 function ClimaPanel({ snapshot, loading, onRefresh, climaInfo, onAlertAction, onEnsoAction }) {
     if (!snapshot) {
+        if (loading) {
+            // Skeleton con la forma real del panel (badge ENSO + pronóstico),
+            // shimmer motion-safe — sin spinner técnico.
+            return (
+                <div className="p-4 space-y-4" data-testid="clima-skeleton" aria-label="Consultando IDEAM, NOAA y Open-Meteo…">
+                    <div className="flex items-center gap-3">
+                        <Skeleton variant="circle" width={36} height={36} ariaLabel="" />
+                        <div className="flex-1 space-y-2">
+                            <Skeleton variant="line" width="55%" height={12} ariaLabel="" />
+                            <Skeleton variant="line" width="80%" height={10} ariaLabel="" />
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-7 gap-1.5">
+                        {Array.from({ length: 7 }).map((_, i) => (
+                            <Skeleton key={i} variant="rect" width="100%" height={72} rounded="lg" ariaLabel="" />
+                        ))}
+                    </div>
+                    <Skeleton variant="rect" width="100%" height={56} rounded="xl" ariaLabel="" />
+                </div>
+            );
+        }
         return (
-            <div className="p-6 text-center text-slate-500 text-sm">
-                <Cloud size={36} className="mx-auto mb-3 opacity-40" />
-                {loading ? (
-                    <p className="font-medium">Consultando IDEAM, NOAA y Open-Meteo…</p>
-                ) : (
-                    <>
-                        <p className="font-medium">Clima no disponible.</p>
-                        <p className="text-xs mt-1">El sidecar de Chagra no contestó. Inténtalo más tarde.</p>
-                        <button
-                            type="button"
-                            onClick={onRefresh}
-                            className="mt-3 inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-200"
-                        >
-                            <RefreshCw size={14} /> Reintentar
-                        </button>
-                    </>
-                )}
-            </div>
+            <EmptyState
+                variant="offline"
+                size="compact"
+                icon={Cloud}
+                title="Clima no disponible por ahora."
+                description="No pudimos consultar el pronóstico. Sus datos de finca siguen a salvo; inténtelo cuando vuelva la señal."
+                actionLabel="Reintentar"
+                onAction={onRefresh}
+                actionIcon={RefreshCw}
+                data-testid="clima-empty-state"
+            />
         );
     }
 
@@ -721,7 +870,7 @@ function ClimaPanel({ snapshot, loading, onRefresh, climaInfo, onAlertAction, on
                 <h5 className="text-xs font-bold uppercase tracking-wider text-emerald-300 mb-1.5">Recomendación del agente</h5>
                 <p className="text-xs text-slate-200 leading-relaxed whitespace-pre-line">{recomendacion}</p>
                 {climaInfo > 0 && (
-                    <p className="text-[10px] text-slate-400 mt-2 italic">Pregunta al agente "¿cómo afecta a mi cultivo?" para recomendación específica de manejo.</p>
+                    <p className="text-[10px] text-slate-400 mt-2 italic">Pregúntele al agente "¿cómo afecta a mi cultivo?" para una recomendación específica de manejo.</p>
                 )}
             </section>
 
@@ -746,16 +895,16 @@ function buildClientRecommendation(snapshot) {
     const phase = snapshot?.enso_status?.phase || 'neutral';
     const critical = (snapshot?.alertas_locales || []).filter((a) => a.severity === 'critical');
     if (critical.length > 0) {
-        return `Tienes ${critical.length} alerta${critical.length === 1 ? '' : 's'} crítica${critical.length === 1 ? '' : 's'} en los próximos días. Protege primero los cultivos sensibles (semilleros, recién trasplantados, fruta a punto). Si vas al campo, lleva el celular para registrar lo que cambies.`;
+        return `Tiene ${critical.length} alerta${critical.length === 1 ? '' : 's'} crítica${critical.length === 1 ? '' : 's'} en los próximos días. Proteja primero los cultivos sensibles (semilleros, recién trasplantados, fruta a punto). Si va al campo, lleve el celular para registrar lo que cambie.`;
     }
     if (phase === 'nino_fuerte' || phase === 'nino_moderado') {
-        return 'El Niño activo. Espera más calor y menos lluvia que el promedio. Prioriza riego eficiente (goteo), mulch para conservar humedad, sombrío en cultivos jóvenes, y siembra variedades tolerantes a estrés hídrico.';
+        return 'El Niño activo. Espere más calor y menos lluvia que el promedio. Priorice riego eficiente (goteo), mulch para conservar humedad, sombrío en cultivos jóvenes, y siembre variedades tolerantes a estrés hídrico.';
     }
     if (phase === 'nina_fuerte' || phase === 'nina_moderada') {
-        return 'La Niña activa. Espera más lluvia que el promedio y enfermedades fúngicas. Revisa drenajes, rota fungicidas preventivos (biopreparados primero), siembra en camas altas y monitorea Phytophthora/mildiu en solanáceas.';
+        return 'La Niña activa. Espere más lluvia que el promedio y enfermedades fúngicas. Revise drenajes, rote fungicidas preventivos (biopreparados primero), siembre en camas altas y monitoree Phytophthora/mildiu en solanáceas.';
     }
     if (phase === 'nino_debil' || phase === 'nina_debil') {
-        return 'Señal ENSO débil — el clima de los próximos meses se comporta cerca del promedio histórico. Mantén el calendario habitual de siembra y atención normal a plagas.';
+        return 'Señal ENSO débil — el clima de los próximos meses se comporta cerca del promedio histórico. Mantenga el calendario habitual de siembra y la atención normal a plagas.';
     }
-    return 'Condiciones ENSO neutras. Sigue tu calendario de siembra habitual y revisa el pronóstico de 7 días para decisiones de corto plazo.';
+    return 'Condiciones ENSO neutras. Siga su calendario de siembra habitual y revise el pronóstico de 7 días para decisiones de corto plazo.';
 }
