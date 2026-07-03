@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ChevronLeft, Search, Sprout, Leaf, X, BookOpen } from 'lucide-react';
-import { searchSpecies, buildSpeciesFicha } from '../../services/directorioEspecies.js';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { ChevronLeft, Search, Sprout, Leaf, X } from 'lucide-react';
+import { searchSpecies, buildSpeciesFicha, listSpeciesForBrowse } from '../../services/directorioEspecies.js';
 import SpeciesFicha from './SpeciesFicha.jsx';
+import EmptyState from '../common/EmptyState.jsx';
+import SkeletonList from '../common/SkeletonList.jsx';
 import { fvhSkinClass } from '../../config/fvhSkin.js';
 import { getSpeciesVisual, SPECIES_TONE_CLASSES } from '../../utils/speciesVisual.js';
 
@@ -25,18 +27,118 @@ function SpeciesBadge({ sp, size = 'md' }) {
   );
 }
 
+/*
+ * Etiquetas legibles de las categorías del catálogo v3.1 (slugs reales del
+ * seed). Un slug sin entrada cae a humanización simple — nunca un hueco.
+ */
+const CATEGORIA_LABELS = {
+  frutales_perennes: 'Frutales y perennes',
+  tuberculos_raices: 'Tubérculos y raíces',
+  cereales: 'Cereales',
+  granos_legumbres: 'Granos y legumbres',
+  hortalizas_hoja: 'Hortalizas de hoja',
+  hortalizas_fruto_flor: 'Hortalizas de fruto y flor',
+  medicinales_alelopaticas: 'Medicinales y aromáticas',
+  atractores_polinizadores: 'Atractores de polinizadores',
+  ornamentales_nativas: 'Ornamentales nativas',
+  abonos_verdes_coberturas: 'Abonos verdes y coberturas',
+  arboles_sombra: 'Árboles y sombra',
+  cercas_vivas: 'Cercas vivas',
+  fibras_no_maderables: 'Fibras no maderables',
+  especies_invasoras: 'Especies invasoras',
+  microorganismos: 'Microorganismos',
+  plagas: 'Plagas',
+};
+
+function categoriaLabel(slug) {
+  if (CATEGORIA_LABELS[slug]) return CATEGORIA_LABELS[slug];
+  const s = String(slug || '').replace(/_/g, ' ').trim();
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : 'Otras';
+}
+
+/**
+ * Chip de categoría — píldora táctil (mín. 40px de alto efectivo) con el
+ * emoji de la categoría (mismo set visual que los badges de especie).
+ * aria-pressed marca el filtro activo para lectores de pantalla.
+ */
+function CategoriaChip({ active, onClick, emoji, label, count }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      data-testid="directorio-chip-categoria"
+      className={`shrink-0 inline-flex items-center gap-1.5 min-h-[40px] px-3 rounded-full border text-xs font-semibold whitespace-nowrap motion-safe:transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400/60 ${
+        active
+          ? 'bg-emerald-600 border-emerald-300 text-white shadow-md'
+          : 'jp-dir-card bg-slate-900 border-slate-700 text-slate-300 hover:border-emerald-600/60 active:bg-slate-800/70'
+      }`}
+    >
+      <span aria-hidden="true">{emoji}</span>
+      <span>{label}</span>
+      {typeof count === 'number' && (
+        <span
+          className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold leading-none ${
+            active ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400'
+          }`}
+        >
+          {count}
+        </span>
+      )}
+    </button>
+  );
+}
+
+/**
+ * Tarjeta de especie — misma silueta en exploración y en resultados de
+ * búsqueda (coherencia visual): badge tonal arriba, nombre común como
+ * jerarquía principal, científico y familia como apoyo.
+ */
+function SpeciesCard({ sp, onSelect }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(sp.id)}
+      data-testid="directorio-species-card"
+      className="jp-dir-card w-full h-full text-left rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-600/60 active:bg-slate-800/70 motion-safe:transition-colors p-3 flex flex-col gap-2 min-h-[104px]"
+    >
+      <SpeciesBadge sp={sp} />
+      <span className="min-w-0">
+        <span className="jp-tinta block text-sm font-bold text-emerald-100 leading-tight line-clamp-2">
+          {sp.comun || sp.id}
+        </span>
+        {sp.cientifico && (
+          <span className="jp-tinta-suave block text-[11px] italic text-slate-400 leading-tight truncate mt-0.5">
+            {sp.cientifico}
+          </span>
+        )}
+        {sp.familia && (
+          <span className="jp-tinta-suave block text-[10px] text-slate-500 leading-tight truncate mt-0.5">
+            {sp.familia}
+          </span>
+        )}
+      </span>
+    </button>
+  );
+}
+
 /**
  * DirectorioEspeciesScreen — explorador visual del catálogo de especies.
  *
  * Flujo:
- *   1. Buscador con resolución de nombre (reutiliza el matcher canónico del
- *      proyecto). Si hay varios candidatos, los lista para que el usuario elija.
- *   2. Al seleccionar, monta la FICHA grounded (foto + piso térmico +
+ *   1. EXPLORACIÓN (default): el catálogo completo en grilla de tarjetas,
+ *      filtrable por chips de categoría (emoji + conteo). Nada de pantalla
+ *      vacía esperando que el usuario adivine qué escribir.
+ *   2. BÚSQUEDA: el buscador con resolución de nombre (matcher canónico del
+ *      proyecto) reemplaza la grilla mientras haya consulta activa. Si hay
+ *      varios candidatos, los lista para que el usuario elija.
+ *   3. Al seleccionar, monta la FICHA grounded (foto + piso térmico +
  *      asociaciones + biopreparados + plagas/control + saberes), con deflección
  *      honesta donde falte el dato.
  *
  * Todo es OFFLINE-first: catálogo SQLite + grafo-relations.json + imágenes CC
- * locales. No depende del sidecar/GPU.
+ * locales. No depende del sidecar/GPU. Estados de carga con SkeletonList y
+ * vacíos/errores con EmptyState (componentes comunes del sistema visual).
  *
  * @param {object} props
  * @param {() => void} [props.onBack]
@@ -48,8 +150,46 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
   const [searching, setSearching] = useState(false);
   const [selected, setSelected] = useState(null); // ficha construida
   const [loadingFicha, setLoadingFicha] = useState(false);
-  const [touched, setTouched] = useState(false);
+  const [touched, setTouched] = useState(Boolean(initialQuery));
+  const [catalogo, setCatalogo] = useState(null); // null = cargando, [] = no disponible
+  const [categoria, setCategoria] = useState('todas');
   const debounceRef = useRef(null);
+
+  // --- Catálogo completo para el modo exploración (offline) ----------------
+  // reloadKey re-dispara la carga en "Reintentar"; el efecto solo resuelve la
+  // promesa y setea al llegar (nada de setState síncrono dentro del efecto).
+  const [reloadKey, setReloadKey] = useState(0);
+  useEffect(() => {
+    let alive = true;
+    listSpeciesForBrowse()
+      .then((list) => { if (alive) setCatalogo(Array.isArray(list) ? list : []); })
+      .catch(() => { if (alive) setCatalogo([]); });
+    return () => { alive = false; };
+  }, [reloadKey]);
+
+  const loadCatalogo = useCallback(() => {
+    setCatalogo(null); // volver al skeleton mientras reintenta
+    setReloadKey((k) => k + 1);
+  }, []);
+
+  // Categorías presentes en el catálogo, ordenadas por tamaño (las grandes
+  // primero: es lo que el productor va a tocar más).
+  const categorias = useMemo(() => {
+    const counts = new Map();
+    for (const sp of catalogo || []) {
+      const c = sp.categoria || 'otras';
+      counts.set(c, (counts.get(c) || 0) + 1);
+    }
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([id, count]) => ({ id, count, label: categoriaLabel(id) }));
+  }, [catalogo]);
+
+  const browseList = useMemo(() => {
+    if (!Array.isArray(catalogo)) return [];
+    if (categoria === 'todas') return catalogo;
+    return catalogo.filter((sp) => (sp.categoria || 'otras') === categoria);
+  }, [catalogo, categoria]);
 
   const runSearch = useCallback(async (q) => {
     if (!q || q.trim().length < 2) {
@@ -105,6 +245,11 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
     setSelected(null);
   }, []);
 
+  const clearQuery = useCallback(() => {
+    setQuery('');
+    setResults([]);
+  }, []);
+
   // VISTA FICHA -------------------------------------------------------------
   if (selected) {
     return (
@@ -131,7 +276,10 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
     );
   }
 
-  // VISTA BÚSQUEDA ----------------------------------------------------------
+  // ¿Hay consulta activa? La búsqueda reemplaza la grilla de exploración.
+  const enBusqueda = query.trim().length >= 2;
+
+  // VISTA BÚSQUEDA / EXPLORACIÓN ---------------------------------------------
   return (
     <div className={fvhSkinClass('jp-directorio min-h-[100dvh] bg-slate-950 text-white')}>
       <header className="flex items-center gap-2 px-4 pt-[calc(14px+env(safe-area-inset-top))] pb-2">
@@ -149,7 +297,11 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
           <Sprout size={22} className="text-emerald-400 shrink-0" aria-hidden="true" />
           <div>
             <h1 className="jp-tinta text-lg font-bold leading-tight text-white">Directorio de especies</h1>
-            <p className="jp-tinta-suave text-xs text-slate-400 leading-tight">Explora el catálogo: clima, asociaciones, biopreparados y plagas.</p>
+            <p className="jp-tinta-suave text-xs text-slate-400 leading-tight">
+              {Array.isArray(catalogo) && catalogo.length > 0
+                ? `${catalogo.length} especies: clima, asociaciones, biopreparados y plagas.`
+                : 'Explore el catálogo: clima, asociaciones, biopreparados y plagas.'}
+            </p>
           </div>
         </div>
       </header>
@@ -171,7 +323,7 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
           {query && (
             <button
               type="button"
-              onClick={() => { setQuery(''); setResults([]); }}
+              onClick={clearQuery}
               aria-label="Limpiar búsqueda"
               className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full hover:bg-slate-800 flex items-center justify-center text-slate-400"
             >
@@ -181,69 +333,128 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
         </div>
       </form>
 
+      {/* Chips de categoría — solo en modo exploración con catálogo cargado. */}
+      {!enBusqueda && !loadingFicha && Array.isArray(catalogo) && catalogo.length > 0 && (
+        <div
+          role="toolbar"
+          aria-label="Filtrar por categoría"
+          data-testid="directorio-chips"
+          className="flex gap-2 overflow-x-auto px-4 pt-3 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          <CategoriaChip
+            active={categoria === 'todas'}
+            onClick={() => setCategoria('todas')}
+            emoji="🌱"
+            label="Todas"
+            count={catalogo.length}
+          />
+          {categorias.map((c) => (
+            <CategoriaChip
+              key={c.id}
+              active={categoria === c.id}
+              onClick={() => setCategoria(c.id)}
+              emoji={getSpeciesVisual({ categoria: c.id }).emoji}
+              label={c.label}
+              count={c.count}
+            />
+          ))}
+        </div>
+      )}
+
       {/* Resultados / estados */}
-      <div className="px-4 pt-4">
+      <div className="px-4 pt-3 pb-10">
+        {/* Abriendo una ficha: skeleton con la silueta de la ficha que viene. */}
         {loadingFicha && (
-          <p className="jp-tinta-suave text-sm text-slate-400" data-testid="directorio-loading-ficha">Abriendo la ficha…</p>
+          <SkeletonList
+            count={4}
+            variant="row"
+            ariaLabel="Abriendo la ficha…"
+            data-testid="directorio-loading-ficha"
+          />
         )}
 
-        {!loadingFicha && searching && (
-          <p className="jp-tinta-suave text-sm text-slate-400">Buscando…</p>
+        {/* Buscando: skeleton de filas (percepción de rapidez, sin salto). */}
+        {!loadingFicha && enBusqueda && searching && (
+          <SkeletonList
+            count={3}
+            variant="row"
+            ariaLabel="Buscando…"
+            data-testid="directorio-searching"
+          />
         )}
 
-        {!loadingFicha && !searching && touched && query.trim().length >= 2 && results.length === 0 && (
-          <div className="text-center py-10" data-testid="directorio-empty">
-            <Leaf size={32} className="mx-auto text-slate-700 mb-2" aria-hidden="true" />
-            <p className="jp-tinta text-sm text-slate-400">
-              No encontramos “{query.trim()}” en el catálogo todavía.
-            </p>
-            <p className="jp-tinta-suave text-xs text-slate-500 mt-1">
-              Pruebe con otro nombre común o el nombre científico.
-            </p>
-          </div>
+        {/* Búsqueda sin coincidencias. */}
+        {!loadingFicha && !searching && enBusqueda && touched && results.length === 0 && (
+          <EmptyState
+            size="compact"
+            icon={Leaf}
+            title={`No encontramos “${query.trim()}” en el catálogo todavía`}
+            description="Pruebe con otro nombre común o el nombre científico, o explore por categoría."
+            actionLabel="Limpiar y explorar"
+            actionIcon={X}
+            onAction={clearQuery}
+            data-testid="directorio-empty"
+          />
         )}
 
-        {!loadingFicha && results.length > 0 && (
+        {/* Coincidencias de búsqueda — mismas tarjetas que la exploración. */}
+        {!loadingFicha && !searching && enBusqueda && results.length > 0 && (
           <>
             {results.length > 1 && (
               <p className="jp-tinta-suave text-xs text-slate-400 mb-2">
                 {results.length} coincidencias — elija una:
               </p>
             )}
-            <ul className="space-y-2" data-testid="directorio-results">
+            <ul className="grid grid-cols-2 sm:grid-cols-3 gap-2 list-none" data-testid="directorio-results">
               {results.map((r) => (
-                <li key={r.id}>
-                  <button
-                    type="button"
-                    onClick={() => selectSpecies(r.id)}
-                    className="jp-dir-card w-full text-left rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-600/60 active:bg-slate-800/70 p-3 transition-colors flex items-center gap-3"
-                  >
-                    <SpeciesBadge sp={r} />
-                    <span className="min-w-0">
-                      <span className="jp-tinta block text-sm font-bold text-emerald-100 leading-tight truncate">{r.comun || r.id}</span>
-                      {r.cientifico && (
-                        <span className="jp-tinta-suave block text-xs italic text-slate-400 leading-tight truncate">{r.cientifico}</span>
-                      )}
-                      {r.familia && (
-                        <span className="jp-tinta-suave block text-[10px] text-slate-500 leading-tight">{r.familia}</span>
-                      )}
-                    </span>
-                  </button>
+                <li key={r.id} className="min-w-0">
+                  <SpeciesCard sp={r} onSelect={selectSpecies} />
                 </li>
               ))}
             </ul>
           </>
         )}
 
-        {/* Estado inicial vacío — guía */}
-        {!loadingFicha && !searching && !touched && results.length === 0 && (
-          <div className="text-center py-12" data-testid="directorio-hint">
-            <BookOpen size={34} className="mx-auto text-slate-700 mb-3" aria-hidden="true" />
-            <p className="jp-tinta-suave text-sm text-slate-400 max-w-xs mx-auto leading-relaxed">
-              Busque cualquier especie del catálogo y mire su piso térmico, con qué
-              se asocia, qué biopreparados le sirven y qué plagas la afectan.
-            </p>
-          </div>
+        {/* EXPLORACIÓN: catálogo cargando → skeleton de tarjetas. */}
+        {!loadingFicha && !enBusqueda && catalogo === null && (
+          <SkeletonList
+            count={6}
+            variant="card"
+            ariaLabel="Abriendo el catálogo…"
+            data-testid="directorio-catalogo-cargando"
+          />
+        )}
+
+        {/* EXPLORACIÓN: catálogo no disponible → error calmado con reintento. */}
+        {!loadingFicha && !enBusqueda && Array.isArray(catalogo) && catalogo.length === 0 && (
+          <EmptyState
+            variant="error"
+            title="El catálogo no está disponible todavía"
+            description="No pudimos abrir el catálogo de especies en este dispositivo. Sus demás datos no se afectan."
+            actionLabel="Reintentar"
+            onAction={loadCatalogo}
+            data-testid="directorio-catalogo-error"
+          />
+        )}
+
+        {/* EXPLORACIÓN: grilla de tarjetas filtrada por categoría. */}
+        {!loadingFicha && !enBusqueda && Array.isArray(catalogo) && catalogo.length > 0 && (
+          <>
+            {categoria !== 'todas' && (
+              <p className="jp-tinta-suave text-xs text-slate-400 mb-2" aria-live="polite">
+                {browseList.length === 1
+                  ? '1 especie en esta categoría'
+                  : `${browseList.length} especies en esta categoría`}
+              </p>
+            )}
+            <ul className="grid grid-cols-2 sm:grid-cols-3 gap-2 list-none" data-testid="directorio-grid">
+              {browseList.map((sp) => (
+                <li key={sp.id} className="min-w-0">
+                  <SpeciesCard sp={sp} onSelect={selectSpecies} />
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </div>
     </div>
