@@ -90,6 +90,37 @@ export const AGENT_COMPOSITOR_CSS = `
   .as-mic-on {
     background: rgb(244,63,94) !important; border-color: rgb(244,63,94) !important;
     color: #fff !important; box-shadow: 0 4px 14px -4px rgba(244,63,94,0.5);
+    /* Pulido voice-first 2026-07: en grabación el mic LATE (pulso de sombra,
+       sin transform — no pelea con el scale(0.9) del :active) y emite ondas
+       concéntricas via pseudo-elementos. Feedback táctil visual inequívoco. */
+    animation: as-mic-rec 1.2s ease-in-out infinite;
+  }
+  @keyframes as-mic-rec {
+    0%, 100% { box-shadow: 0 4px 14px -4px rgba(244,63,94,0.5), 0 0 0 0 rgba(244,63,94,0.40); }
+    50%      { box-shadow: 0 4px 18px -4px rgba(244,63,94,0.65), 0 0 0 9px rgba(244,63,94,0); }
+  }
+  .as-mic-on::before, .as-mic-on::after {
+    content: ''; position: absolute; inset: -3px; border-radius: 50%;
+    border: 2px solid rgba(244,63,94,0.55); pointer-events: none;
+    animation: as-mic-ripple 1.6s cubic-bezier(0.22,0.61,0.36,1) infinite;
+  }
+  .as-mic-on::after { animation-delay: 0.8s; }
+  @keyframes as-mic-ripple {
+    0%   { transform: scale(0.85); opacity: 0.85; }
+    100% { transform: scale(1.45); opacity: 0; }
+  }
+  /* Onda de voz en la fila del compositor mientras graba: barras que suben y
+     bajan con currentColor (rose). Reemplaza al punto rojo estático — el
+     campesino VE que el aparato lo está oyendo. */
+  .as-rec-wave { display: inline-flex; align-items: center; gap: 3px; height: 20px; }
+  .as-rec-bar {
+    width: 3px; height: 100%; border-radius: 2px; background: currentColor;
+    transform-origin: 50% 50%;
+    animation: as-rec-bar 1.05s ease-in-out infinite;
+  }
+  @keyframes as-rec-bar {
+    0%, 100% { transform: scaleY(0.3); opacity: 0.7; }
+    50%      { transform: scaleY(1); opacity: 1; }
   }
   /* TIER 2 #5 (voz punta-a-punta): mic GRANDE — el camino principal para
      baja alfabetización es hablar. 54px + anillo de acento del TEMA
@@ -138,6 +169,13 @@ export const AGENT_COMPOSITOR_CSS = `
     .as-shimmer::after, .as-sending { animation: none !important; }
     .as-tool { animation: none !important; }
     .as-mic-big { animation: none !important; }
+    /* Grabación sin movimiento: cae a un anillo estático (::before congelado
+       a opacidad tenue) + barras quietas a media altura. La señal de estado
+       persiste sin animar. */
+    .as-mic-on { animation: none !important; }
+    .as-mic-on::before { animation: none !important; opacity: 0.5; transform: scale(1.08); }
+    .as-mic-on::after { display: none; }
+    .as-rec-bar { animation: none !important; transform: scaleY(0.55); }
   }
 `;
 

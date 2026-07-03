@@ -3380,9 +3380,14 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           {/* Fila 1: textarea o waveform de grabación */}
           {state === STATE_RECORDING ? (
             <div className="flex items-center gap-3 px-3 py-3 min-h-[52px]">
-              <span className="relative flex h-3 w-3 shrink-0">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500" />
+              {/* Onda de voz animada (pulido voice-first 2026-07): reemplaza al
+                  punto rojo estático. Barras que laten en rose — el operador VE
+                  que lo estamos oyendo. CSS en AGENT_COMPOSITOR_CSS (.as-rec-*),
+                  con fallback quieto bajo prefers-reduced-motion. */}
+              <span className="as-rec-wave text-rose-400 shrink-0" aria-hidden="true">
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <span key={i} className="as-rec-bar" style={{ animationDelay: `${i * 0.13}s` }} />
+                ))}
               </span>
               <span className="flex-1 text-sm text-rose-400 font-medium tabular-nums">
                 Grabando… {Math.floor(durationMs / 1000)}s
