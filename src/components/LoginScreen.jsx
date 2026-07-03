@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Lock, Eye, EyeOff, WifiOff, ShieldCheck, Leaf } from 'lucide-react';
+import { User, Lock, Eye, EyeOff, WifiOff, ShieldCheck, Leaf, LogIn, AlertCircle } from 'lucide-react';
 import { applyTheme, normalizeTheme, STORAGE_KEY, DEFAULT_THEME } from '../hooks/useTheme';
 import { authenticateUser } from '../services/authService';
 import { setCurrentOperator } from '../services/operatorIdentityService';
@@ -20,23 +20,42 @@ import { friendlyMessage } from '../utils/friendlyErrors';
  * Es la primera impresión del producto (piloto de campo + demos de
  * convocatorias), así que carga tres trabajos a la vez:
  *   1. Explicar QUÉ es Chagra y POR QUÉ confiarle los datos de la finca
- *      (señales de confianza arriba del formulario: offline, datos propios,
+ *      (señales de confianza junto a la marca: offline, datos propios,
  *      software libre).
  *   2. Dejar entrar rápido a quien ya tiene su usuario (formulario grande,
  *      con objetivos de toque amplios para dedos de campo).
  *   3. Mostrar el impacto real de la red Chagra (WelcomeStatsHero pre-login,
  *      cifras públicas del catálogo — pedido del operador 2026-05-18).
  *
+ * LAVADA VISUAL v2 (feat/login-lavada-visual):
+ *   - Responsive real en 3 tamaños: móvil chico (~360px) = columna única
+ *     compacta (marca más contenida para que la tarjeta de ingreso asome sin
+ *     scroll); móvil grande = la misma columna con más aire; desktop (lg+) =
+ *     DOS columnas — la finca (marca + impacto) a la izquierda y la puerta
+ *     (tarjeta de ingreso) a la derecha, centradas verticalmente.
+ *   - Estados legibles al sol: error INLINE dentro de la tarjeta
+ *     (role="alert", ámbar sobre panel oscuro, AA) además del toast global;
+ *     carga que conserva la identidad esmeralda (no un botón gris "muerto")
+ *     con anuncio aria-live para lectores de pantalla.
+ *   - Firma biopunk contenida: hairline de circuito esmeralda→cian en el
+ *     borde superior de la tarjeta; el resto queda quieto y disciplinado.
+ *
  * Español colombiano en USTED, cálido y campesino (ingrese/escriba/revise).
  * NUNCA voseo argentino.
  *
  * NO cambia la lógica de autenticación: `handleLogin` conserva el mismo flujo
  * (authenticateUser → operador HMAC → tenant → foto → warm-up Ollama + corpus).
- * Solo se rediseñó la capa visual, los textos y la estructura.
+ * Solo se rediseñó la capa visual, los textos y la estructura. El estado
+ * `formError` es puramente presentacional: refleja el mismo mensaje que ya
+ * viaja por `onSave` para que el aviso quede pegado al formulario.
  */
 export default function LoginScreen({ onLoginSuccess, onSave }) {
   const [creds, setCreds] = useState({ username: '', password: '' });
   const [loading, setLoading] = useState(false);
+  // Error inline presentacional (espejo del toast onSave): en el campo, bajo
+  // el sol, el toast global puede pasar desapercibido; el aviso dentro de la
+  // tarjeta queda junto al botón que el operador acaba de tocar.
+  const [formError, setFormError] = useState('');
   // Mostrar/ocultar la contraseña ayuda a quien escribe despacio o con poca
   // costumbre del teclado del teléfono a verificar lo que digitó (a11y +
   // baja alfabetización digital). Arranca oculta: el campo sigue siendo
@@ -63,13 +82,21 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
     };
   }, []);
 
+  // Un solo camino para avisar errores: mismo mensaje al toast global (onSave,
+  // contrato existente) y al alert inline de la tarjeta. NO toca la lógica.
+  const notifyError = (msg) => {
+    setFormError(msg);
+    onSave(msg, true);
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!creds.username || !creds.password) {
-      onSave('Escriba su usuario y su contraseña para ingresar.', true);
+      notifyError('Escriba su usuario y su contraseña para ingresar.');
       return;
     }
 
+    setFormError('');
     setLoading(true);
     // 2026-05-23 auditoría QA bug #10: si `authenticateUser` throw
     // (network error, JSON parse fail, CORS, AbortError) sin try/catch, el
@@ -84,7 +111,7 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
       // NUNCA exponer el mensaje crudo (podía pegar texto técnico de token/HTTP
       // al operador). friendlyMessage mapea a copy claro en español Colombia.
       setLoading(false);
-      onSave(friendlyMessage(err), true);
+      notifyError(friendlyMessage(err));
       return;
     }
 
@@ -153,22 +180,30 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
       const errorMsg = result.error
         ? `${result.error}. Revise su usuario y su contraseña.`
         : 'Usuario o contraseña incorrectos. Revíselos e intente de nuevo.';
-      onSave(errorMsg, true);
+      notifyError(errorMsg);
     }
   };
 
+  // Al corregir un campo, retiramos el aviso inline (el toast global ya hizo
+  // su ciclo). Presentacional puro.
+  const updateCred = (field) => (e) => {
+    const value = e.target.value;
+    setCreds((prev) => ({ ...prev, [field]: value }));
+    if (formError) setFormError('');
+  };
+
   return (
-    <div className="login-screen relative min-h-[100dvh] w-full bg-slate-950 bg-biopunk-pattern flex flex-col items-center overflow-y-auto text-slate-100 px-5 sm:px-6 pt-[max(2rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]">
+    <div className="login-screen relative min-h-[100dvh] w-full bg-slate-950 bg-biopunk-pattern flex flex-col items-center overflow-y-auto text-slate-100 px-5 sm:px-6 lg:px-10 pt-[max(1.75rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]">
       {/* Capa 1 — Foto del páramo curado. Detrás de todo, con un gradiente de
           legibilidad (oscurece arriba y abajo) para que el texto siempre
-          contraste. El patrón biopunk del wrapper queda encima reforzando
-          cohesión de marca. */}
+          contraste, también a mediodía en campo abierto. El patrón biopunk del
+          wrapper queda encima reforzando cohesión de marca. */}
       {loginBgSrc && (
         <div
           aria-hidden="true"
           className="login-bg-photo absolute inset-0 pointer-events-none bg-cover bg-center"
           style={{
-            backgroundImage: `linear-gradient(rgba(2,6,23,0.72), rgba(2,6,23,0.82) 55%, rgba(2,6,23,0.92)), url('${loginBgSrc}')`,
+            backgroundImage: `linear-gradient(rgba(2,6,23,0.74), rgba(2,6,23,0.82) 55%, rgba(2,6,23,0.92)), url('${loginBgSrc}')`,
           }}
         />
       )}
@@ -184,42 +219,47 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
         }}
       />
 
-      <main className="relative z-10 w-full max-w-md flex flex-col items-center gap-7 animate-fadeIn">
+      {/* my-auto: centra el bloque cuando sobra alto (desktop / móvil grande)
+          sin recortar arriba cuando falta (el wrapper scrollea normal).
+          En lg+ pasa de columna a rejilla de dos columnas: la finca (marca +
+          impacto) a la izquierda, la puerta (tarjeta) a la derecha. */}
+      <main className="relative z-10 my-auto w-full max-w-md flex flex-col items-center gap-6 sm:gap-7 lg:max-w-5xl xl:max-w-6xl lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(24rem,27rem)] lg:items-center lg:gap-x-14 xl:gap-x-20 lg:gap-y-10 animate-fadeIn">
         {/* ─────────────────────────────────────────────────────────────
             MARCA — el Colibrí Barbudito (avatar botánico de Chagra IA)
             posado en un orbe neón. Personaje adulto y elegante, no mascota;
-            reemplaza el ícono genérico anterior por el rostro de la marca.
+            es el rostro de la marca. En desktop la marca se alinea a la
+            izquierda (lectura natural hacia la tarjeta de ingreso).
             ───────────────────────────────────────────────────────────── */}
-        <header className="flex flex-col items-center text-center gap-3 pt-2">
-          <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-slate-900/70 backdrop-blur-sm ring-1 ring-muzo/40 shadow-neon-muzo flex items-center justify-center">
+        <header className="flex flex-col items-center text-center gap-3 pt-1 sm:pt-2 lg:pt-0 lg:col-start-1 lg:row-start-1 lg:items-start lg:text-left">
+          <div className="relative w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full bg-slate-900/70 backdrop-blur-sm ring-1 ring-muzo/40 shadow-neon-muzo flex items-center justify-center">
             <span
               aria-hidden="true"
               className="absolute inset-0 rounded-full ring-1 ring-muzo/20 animate-pulse"
             />
             <ChagraAgentAvatarColibri
               state="idle"
-              size={92}
+              size={84}
               ariaLabel="Colibrí Barbudito, símbolo de Chagra"
             />
           </div>
 
           <div>
-            <h1 className="text-5xl font-black tracking-tight text-muzo drop-shadow-[0_0_18px_rgba(16,185,129,0.45)]">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-muzo drop-shadow-[0_0_18px_rgba(16,185,129,0.45)]">
               Chagra
             </h1>
-            <p className="mt-2 text-base sm:text-lg text-slate-200 font-medium leading-snug max-w-xs mx-auto">
+            <p className="mt-2 text-base sm:text-lg text-slate-200 font-medium leading-snug max-w-xs mx-auto lg:mx-0 lg:max-w-sm">
               El cuaderno vivo de su finca agroecológica
             </p>
-            <p className="mt-1 text-sm text-slate-400 leading-snug max-w-xs mx-auto">
+            <p className="mt-1 text-sm text-slate-400 leading-snug max-w-xs mx-auto lg:mx-0 lg:max-w-sm">
               Registre, aprenda y cuide la tierra, con inteligencia que
               protege el páramo, aunque no tenga señal.
             </p>
           </div>
 
-          {/* Señales de confianza — arriba del formulario responden "¿por qué
+          {/* Señales de confianza — junto a la marca responden "¿por qué
               le daría mis datos?": local-first, sin extractivismo, código
               abierto. Chips compactos, legibles, con contraste AA. */}
-          <ul className="flex flex-wrap justify-center gap-2 pt-1" aria-label="Compromisos de Chagra">
+          <ul className="flex flex-wrap justify-center gap-2 pt-1 lg:justify-start" aria-label="Compromisos de Chagra">
             <li className="inline-flex items-center gap-1.5 rounded-full bg-slate-900/70 border border-slate-700/70 px-3 py-1.5 text-xs font-semibold text-emerald-200">
               <WifiOff size={14} className="text-muzo-glow" aria-hidden="true" />
               Funciona sin internet
@@ -237,14 +277,21 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
 
         {/* ─────────────────────────────────────────────────────────────
             FORMULARIO — la acción principal. Tarjeta con superficie propia
-            (blur + borde) para que se lea como un panel confiable sobre la
-            foto. Campos grandes con ícono guía y objetivos de toque amplios.
+            (blur + borde + hairline de circuito esmeralda→cian, la firma
+            biopunk) para que se lea como un panel confiable sobre la foto.
+            Campos grandes con ícono guía y objetivos de toque amplios.
+            En desktop es la columna derecha, centrada verticalmente.
             ───────────────────────────────────────────────────────────── */}
         <section
-          className="w-full rounded-3xl border border-slate-700/70 bg-slate-900/60 backdrop-blur-md shadow-2xl p-5 sm:p-6"
+          className="relative overflow-hidden w-full rounded-3xl border border-slate-700/70 bg-slate-900/70 backdrop-blur-md shadow-2xl p-5 sm:p-6 lg:p-7 lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:self-center"
           aria-labelledby="login-heading"
         >
-          <h2 id="login-heading" className="text-lg font-bold text-slate-100 mb-1">
+          {/* Firma: hairline de circuito en el borde superior de la tarjeta. */}
+          <span
+            aria-hidden="true"
+            className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-muzo/80 to-morpho/0"
+          />
+          <h2 id="login-heading" className="text-xl font-bold text-slate-100 mb-1">
             Entre a su finca
           </h2>
           <p className="text-sm text-slate-400 mb-5">
@@ -266,8 +313,9 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
                   id="login-username"
                   type="text"
                   value={creds.username}
-                  onChange={e => setCreds(prev => ({ ...prev, username: e.target.value }))}
-                  className="w-full pl-12 pr-4 py-4 rounded-xl bg-slate-950/70 border border-slate-700 text-xl min-h-[64px] text-slate-100 placeholder-slate-500 transition-colors focus:border-emerald-500 focus:bg-slate-950"
+                  onChange={updateCred('username')}
+                  disabled={loading}
+                  className="w-full pl-12 pr-4 py-4 rounded-xl bg-slate-950/70 border border-slate-700 text-xl min-h-[64px] text-slate-100 placeholder-slate-500 transition-colors focus:border-emerald-500 focus:bg-slate-950 disabled:opacity-60"
                   placeholder="Su usuario"
                   autoComplete="username"
                   autoCapitalize="none"
@@ -291,8 +339,9 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
                   id="login-password"
                   type={showPassword ? 'text' : 'password'}
                   value={creds.password}
-                  onChange={e => setCreds(prev => ({ ...prev, password: e.target.value }))}
-                  className="w-full pl-12 pr-14 py-4 rounded-xl bg-slate-950/70 border border-slate-700 text-xl min-h-[64px] text-slate-100 placeholder-slate-500 transition-colors focus:border-emerald-500 focus:bg-slate-950"
+                  onChange={updateCred('password')}
+                  disabled={loading}
+                  className="w-full pl-12 pr-14 py-4 rounded-xl bg-slate-950/70 border border-slate-700 text-xl min-h-[64px] text-slate-100 placeholder-slate-500 transition-colors focus:border-emerald-500 focus:bg-slate-950 disabled:opacity-60"
                   placeholder="Su contraseña"
                   autoComplete="current-password"
                 />
@@ -302,31 +351,52 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
                   aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                   aria-pressed={showPassword}
                   title={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800/70 transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 min-w-[var(--tap-min,44px)] min-h-[var(--tap-min,44px)] flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800/70 transition-colors"
                 >
                   {showPassword ? <EyeOff size={22} aria-hidden="true" /> : <Eye size={22} aria-hidden="true" />}
                 </button>
               </div>
             </div>
 
+            {/* Error INLINE — espejo del toast, pegado a la acción. Ámbar
+                sobre panel oscuro (AA), con ícono para lectura rápida al sol. */}
+            {formError && (
+              <div
+                role="alert"
+                className="flex items-start gap-2.5 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm font-semibold text-amber-200 leading-snug"
+              >
+                <AlertCircle size={18} className="mt-0.5 shrink-0 text-amber-300" aria-hidden="true" />
+                <span>{formError}</span>
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={loading}
-              className={`mt-1 min-h-[80px] p-5 rounded-2xl text-2xl font-black flex justify-center items-center gap-3 border-b-4 transition-all active:translate-y-0.5 active:border-b-2 ${
+              className={`mt-1 min-h-[72px] sm:min-h-[80px] p-5 rounded-2xl text-2xl font-black flex justify-center items-center gap-3 border-b-4 transition-all active:translate-y-0.5 active:border-b-2 ${
                 loading
-                  ? 'bg-slate-800 border-slate-950 text-slate-300 cursor-wait'
+                  ? 'bg-emerald-900/80 border-emerald-950 text-emerald-100 cursor-wait'
                   : 'bg-gradient-to-b from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 border-emerald-800 text-white shadow-neon-muzo'
               }`}
             >
               {loading ? (
                 <>
-                  <ChagraGrowLoader size={48} initialProgress={0.4} />
+                  <ChagraGrowLoader size={44} initialProgress={0.4} />
                   <span className="text-lg font-bold">Entrando…</span>
                 </>
               ) : (
-                'Ingresar'
+                <>
+                  <LogIn size={26} aria-hidden="true" />
+                  Ingresar
+                </>
               )}
             </button>
+
+            {/* Anuncio del estado de carga para lectores de pantalla (el
+                cambio visual del botón no siempre se anuncia solo). */}
+            <p aria-live="polite" className="sr-only">
+              {loading ? 'Entrando a su finca, espere un momento.' : ''}
+            </p>
           </form>
 
           {/* Reafirmación local-first / anti-extractivismo, al pie de la acción
@@ -342,22 +412,24 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
 
         {/* ─────────────────────────────────────────────────────────────
             IMPACTO — la red Chagra hoy. Cifras públicas del catálogo, visibles
-            antes de entrar (pedido del operador 2026-05-18). Va después del
-            formulario: sirve de prueba de confianza y de demo para
-            convocatorias, sin estorbarle la entrada al campesino de afán.
+            antes de entrar (pedido del operador 2026-05-18). En móvil va
+            después del formulario (no estorba la entrada al campesino de
+            afán); en desktop acompaña la marca en la columna izquierda.
             ───────────────────────────────────────────────────────────── */}
-        <section className="w-full" aria-label="La red Chagra hoy">
-          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-center mb-3">
+        <section className="w-full lg:col-start-1 lg:row-start-2" aria-label="La red Chagra hoy">
+          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-center mb-3 lg:text-left">
             Lo que Chagra ya cuida
           </p>
           <WelcomeStatsHero mode="pre-login" />
         </section>
 
-        <LegalLinks />
-
-        <p className="text-2xs text-slate-600 font-mono -mt-4 mb-2">
-          Chagra v{APP_VERSION}
-        </p>
+        {/* Pie — legales + versión, centrados bajo las dos columnas. */}
+        <footer className="flex flex-col items-center gap-1 lg:col-span-2 lg:row-start-3">
+          <LegalLinks />
+          <p className="text-2xs text-slate-500 font-mono">
+            Chagra v{APP_VERSION}
+          </p>
+        </footer>
       </main>
     </div>
   );
