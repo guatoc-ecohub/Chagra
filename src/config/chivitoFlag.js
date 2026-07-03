@@ -11,24 +11,18 @@
  *      (`ChivitoBoton`, en el compositor del home, en AgentScreen y en el FAB).
  *   3. TRANSICIÓN home→agente → el chivito cruza aleteando (`ChivitoCruza`).
  *
- * DOS MOCKUPS (dos niveles de detalle) para decidir en chagra-dev:
- *   - Mockup A → simple / estilizado: vectorial limpio, colores planos, al
- *     estilo ilustrado de la escena Finca Viva.
- *   - Mockup B → detallado / rico: gradientes, barba iridiscente verde→violeta
- *     con brillo animado, plumas, texturas del frailejón, sombras.
+ * El A/B de mockups ya se decidió (el operador eligió el detallado, hoy EL
+ * chivito), así que la flag quedó como simple ON/OFF.
  *
- * CÓMO ACTIVARLO (dev): en el `.env` (o `.env.local`) del frontend:
+ * CÓMO ACTIVARLO: en el `.env` (o `.env.local`) del frontend:
  *
- *     VITE_CHIVITO=ab     → A/B lado a lado en el home (A izq, B der, con
- *                           etiquetas). Botón del home = A; botones del agente
- *                           y FAB = B; transición = A y B cruzando en paralelo.
- *     VITE_CHIVITO=a      → mockup A coherente en las 3 piezas.
- *     VITE_CHIVITO=b      → mockup B coherente en las 3 piezas.
+ *     VITE_CHIVITO=true    → chivito ON en las 3 piezas.
  *
- * También acepta 'true' / '1' (= 'ab'). Con la flag APAGADA (default, prod)
- * cada sitio conserva su presentación actual (colibrí SVG / avatar / video),
- * igual que con VITE_COLIBRI apagada. Si ambas flags están prendidas, el
- * chivito tiene precedencia (es el reemplazo del A/B del colibrí).
+ * También acepta '1' y, por compatibilidad con configs previas del A/B,
+ * 'a' / 'b' / 'ab' (todas = ON). Con la flag APAGADA (default, prod) cada
+ * sitio conserva su presentación actual (colibrí SVG / avatar / video). Si
+ * ambas flags están prendidas, el chivito tiene precedencia sobre
+ * VITE_COLIBRI.
  *
  * Mismo criterio de parseo que `colibriRealActivo()` (colibriFlag.js) para
  * mantener la convención del repo. Español colombiano (usted), NUNCA voseo.
@@ -39,21 +33,19 @@
 const FLAG_KEY = 'VITE_CHIVITO';
 
 /**
- * ¿Qué mockup del chivito está activo?
+ * ¿Está activo el chivito de páramo?
  *
- * @returns {'a'|'b'|'ab'|null} 'a' | 'b' | 'ab' según la flag; null (default)
- *   si está apagada, con valor no reconocido o si import.meta.env falla.
+ * @returns {boolean} true si la flag está prendida; false (default) si está
+ *   apagada, con valor no reconocido o si import.meta.env falla.
  */
-export function chivitoMockup() {
+export function chivitoActivo() {
   try {
     const raw = import.meta.env?.[FLAG_KEY];
-    if (raw === true) return 'ab';
-    if (typeof raw !== 'string') return null;
+    if (raw === true) return true;
+    if (typeof raw !== 'string') return false;
     const v = raw.trim().toLowerCase();
-    if (v === 'a' || v === 'b' || v === 'ab') return v;
-    if (v === 'true' || v === '1') return 'ab';
-    return null;
+    return v === 'true' || v === '1' || v === 'a' || v === 'b' || v === 'ab';
   } catch (_) {
-    return null;
+    return false;
   }
 }

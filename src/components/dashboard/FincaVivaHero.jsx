@@ -18,7 +18,7 @@ import { useTheme } from '../../hooks/useTheme';
 import { iconForTheme } from './themeIcon';
 import { colibriRealActivo } from '../../config/colibriFlag';
 import { BarbuditoIlustrado, BarbuditoRealLoop } from '../colibri/Barbudito';
-import { chivitoMockup } from '../../config/chivitoFlag';
+import { chivitoActivo } from '../../config/chivitoFlag';
 import { ChivitoEscena, ChivitoBoton } from '../chivito/Chivito';
 import './finca-viva-hero.css';
 
@@ -35,9 +35,9 @@ const COLIBRI_REAL = colibriRealActivo();
 
 // ¿Modo CHIVITO DE PÁRAMO? Gateado por VITE_CHIVITO (chivitoFlag.js), dev-only.
 // Reemplaza al colibrí del A/B por el chivito vivo (Oxypogon) libando la flor
-// del frailejón, dibujado 100% SVG/CSS. 'ab' = A y B lado a lado; 'a'/'b' = un
-// solo mockup. Tiene precedencia sobre VITE_COLIBRI (es su reemplazo).
-const CHIVITO = chivitoMockup();
+// del frailejón, dibujado 100% SVG/CSS (diseño definitivo, ya elegido). Tiene
+// precedencia sobre VITE_COLIBRI (es su reemplazo).
+const CHIVITO = chivitoActivo();
 
 /**
  * FincaVivaHero — el HOME INMERSIVO "Finca Viva" (refinado del mockup F2 v2
@@ -394,24 +394,10 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
                         SVG 2D `ColibriVuela` de siempre. */}
                     {CHIVITO ? (
                       // CHIVITO DE PÁRAMO libando la flor del frailejón (SVG/CSS
-                      // vivo). 'ab' = los dos mockups lado a lado con etiqueta,
-                      // para que el operador elija; 'a'/'b' = uno solo, centrado.
-                      CHIVITO === 'ab' ? (
-                        <>
-                          <span className="fvh-bicho chiv-ab" style={{ left: '2%', top: '6%' }}>
-                            <ChivitoEscena mockup="a" size={150} />
-                            <span className="chiv-ab-tag">mockup A · simple</span>
-                          </span>
-                          <span className="fvh-bicho chiv-ab" style={{ right: '2%', top: '6%' }}>
-                            <ChivitoEscena mockup="b" size={150} />
-                            <span className="chiv-ab-tag">mockup B · detalle</span>
-                          </span>
-                        </>
-                      ) : (
-                        <span className="fvh-bicho chiv-ab" style={{ left: '50%', top: '6%', transform: 'translateX(-50%)' }}>
-                          <ChivitoEscena mockup={CHIVITO} size={172} />
-                        </span>
-                      )
+                      // vivo, diseño definitivo), centrado sobre la escena.
+                      <span className="fvh-bicho chiv-hero" style={{ left: '50%', top: '6%', transform: 'translateX(-50%)' }}>
+                        <ChivitoEscena size={172} />
+                      </span>
                     ) : COLIBRI_REAL ? (
                       <>
                         <span className="fvh-bicho fvh-colibri-ab fvh-colibri-ab-izq" style={{ left: '4%', top: '12%' }}>
@@ -455,9 +441,8 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
               >
                 <span className="av" aria-hidden="true">
                   {CHIVITO ? (
-                    // El chivito ES el icono del acceso al agente (Mockup A si es
-                    // A/B, para leer limpio a tamaño chico; si no, el elegido).
-                    <ChivitoBoton mockup={CHIVITO === 'ab' ? 'a' : CHIVITO} size={34} ariaLabel="Pregúntele a Chagra" />
+                    // El chivito ES el icono del acceso al agente.
+                    <ChivitoBoton size={34} ariaLabel="Pregúntele a Chagra" />
                   ) : (
                     <ColibriAvatar />
                   )}
