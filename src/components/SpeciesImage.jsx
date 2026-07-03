@@ -3,7 +3,7 @@
  * nombre cientifico. Ese estado async no pertenece al render sincrono.
  */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Bug, ImageOff, Leaf, Microscope } from 'lucide-react';
+import { Bug, ImageOff, Leaf, Microscope, Sprout } from 'lucide-react';
 import { getSpeciesImage, parseCatalogImage } from '../services/speciesImageService';
 
 // Bug #61 (ficha de especie, foto no carga): en senal movil rural el
@@ -26,17 +26,23 @@ function classifySpecies({ category, commonName, scientificName }) {
 function FallbackIcon({ kind, size = 28 }) {
   if (kind === 'microorganismo') return <Microscope size={size} aria-hidden="true" />;
   if (kind === 'patogeno') return <Bug size={size} aria-hidden="true" />;
+  // Maleza / invasora / pasto / helecho: es un ser vivo, no un "sin imagen".
+  // Un brote lo dice mejor que el icono roto de ImageOff.
+  if (kind === 'organismo') return <Sprout size={size} aria-hidden="true" />;
   if (kind === 'planta') return <Leaf size={size} aria-hidden="true" />;
   return <ImageOff size={size} aria-hidden="true" />;
 }
 
 // Emoji grande de categoria - la cara visible del fallback cuando NO hay
-// foto. Contexto inmediato (campesino/nino) sin depender de la red.
+// foto. Contexto inmediato (campesino/nino) sin depender de la red. Un set
+// legible a tamano chico y con las cuatro categorias claramente distintas:
+// cultivo (brote), plaga (insecto), microorganismo (lupa) y maleza/pasto
+// (espiga), sin dos verdes que se confundan de lejos.
 const FALLBACK_EMOJI = {
-  planta: '\u{1F331}',
-  patogeno: '\u{1F41B}',
-  microorganismo: '\u{1F52C}',
-  organismo: '\u{1F33F}',
+  planta: '\u{1F331}', // brote
+  patogeno: '\u{1F41B}', // insecto
+  microorganismo: '\u{1F52C}', // microscopio
+  organismo: '\u{1F33E}', // espiga de pasto/maleza
 };
 
 // Fondo suave por categoria - el fallback NUNCA es un hueco vacio.
@@ -199,10 +205,12 @@ export default function SpeciesImage({
       return (
         <div
           data-testid="species-image-fallback"
-          className={`flex h-20 items-center gap-2 rounded-lg border bg-gradient-to-br px-3 ${bg} ${className}`}
+          className={`flex h-20 items-center gap-2.5 rounded-lg border bg-gradient-to-br px-3 ${bg} ${className}`}
           title={`Sin foto de referencia para ${displayName}`}
         >
-          <span className="text-2xl leading-none" aria-hidden="true">{emoji}</span>
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-slate-950/40 ring-1 ring-white/10">
+            <span className="text-2xl leading-none" aria-hidden="true">{emoji}</span>
+          </span>
           <span className="min-w-0 truncate text-xs font-semibold text-slate-200">{displayName}</span>
         </div>
       );
