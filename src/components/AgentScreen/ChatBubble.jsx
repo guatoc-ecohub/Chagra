@@ -278,6 +278,16 @@ function ConfianzaBadge({ metadata }) {
 export default function ChatBubble({ message, isStreaming = false, promptText, onConsentNeeded, onRetryOrphan }) {
   const isUser = message.role === 'user';
   const showSourceBadges = usePrefsStore((s) => s.showSourceBadges);
+  // Indicador SUTIL de grounding (pulido voice-first 2026-07): además de los
+  // badges detallados (que dependen del pref showSourceBadges), una respuesta
+  // groundeada lleva SIEMPRE un filo esmeralda a la izquierda + un check junto
+  // a la hora. Señal barata de "esto viene respaldado" que el campesino capta
+  // sin leer. Solo lee metadata YA existente en el turno — cero backend nuevo.
+  const isGrounded =
+    !isUser &&
+    !isStreaming &&
+    !message._orphan_recovery &&
+    message?.metadata?.grounded === true;
   // Badge "fuente" solo aplica a respuestas del agente, no del usuario, y
   // no durante streaming (se muestra cuando el turn está estabilizado).
   // Mensajes _orphan_recovery (recuperación de pregunta sin respuesta) no
@@ -323,10 +333,10 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
   };
 
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3`}>
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3.5`}>
       <div className={`flex gap-2 max-w-[85%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
         {isUser ? (
-          <div className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-emerald-600">
+          <div className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-emerald-600 ring-1 ring-emerald-400/40 shadow-sm shadow-emerald-950/30">
             <User size={16} className="text-white" />
           </div>
         ) : (
@@ -340,11 +350,14 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
         )}
 
         <div
-          className={`rounded-2xl px-4 py-2.5 ${
+          className={`rounded-2xl px-4 py-3 shadow-md ${
             isUser
-              ? 'bg-emerald-700/60 text-white rounded-tr-sm'
-              : 'bg-slate-800/80 text-slate-100 rounded-tl-sm cursor-pointer'
+              ? 'bg-emerald-700/70 text-white rounded-tr-md border border-emerald-500/25 shadow-emerald-950/25'
+              : `bg-slate-800/90 text-slate-100 rounded-tl-md border border-slate-700/60 shadow-slate-950/30 cursor-pointer${
+                  isGrounded ? ' border-l-2 border-l-emerald-400/70' : ''
+                }`
           }`}
+          data-grounded={isGrounded ? 'true' : undefined}
           onDoubleClick={handleBubbleDoubleClick}
           title={!isUser && !isStreaming ? 'Doble click reproduce o silencia esta respuesta' : undefined}
         >
@@ -379,7 +392,7 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
               una respuesta "fantasma". Para el usuario sí mostramos su texto
               tal cual (puede ser vacío sólo si tipeó vacío, que el submit ya
               previene). Cero hype, español colombiano. */}
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">
+          <p className="text-[15px] leading-relaxed whitespace-pre-wrap">
             {!isUser && (typeof message.content !== 'string' || message.content.trim().length === 0)
               ? <span className="italic text-slate-400">No recibí respuesta del asistente. Intenta de nuevo.</span>
               : message.content}
@@ -406,12 +419,29 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
             </div>
           )}
           {message.timestamp && (
-            <p className={`text-[10px] mt-1 ${isUser ? 'text-emerald-300/60' : 'text-slate-500'}`}>
-              {formatTime(message.timestamp)}
-            </p>
+            <div className={`flex items-center gap-1 mt-1.5 ${isUser ? 'justify-end' : ''}`}>
+              {/* Check sutil de grounding: siempre visible en respuestas
+                  respaldadas por el catálogo, aunque los badges detallados
+                  estén apagados en preferencias. Solo lectura de metadata. */}
+              {isGrounded && (
+                <span
+                  className="inline-flex shrink-0 text-emerald-400/80"
+                  title="Respuesta con respaldo del catálogo Chagra"
+                  data-testid="grounded-tick"
+                >
+                  <BadgeCheck size={11} aria-hidden="true" />
+                </span>
+              )}
+              <p className={`text-[10px] ${isUser ? 'text-emerald-200/70' : 'text-slate-500'}`}>
+                {formatTime(message.timestamp)}
+              </p>
+            </div>
           )}
           {isStreaming && (
-            <span className="inline-block w-2 h-2 bg-violet-400 rounded-full ml-1 animate-pulse" />
+            <span
+              className="inline-block w-[3px] h-3.5 ml-1 rounded-full bg-emerald-300/90 animate-pulse align-middle"
+              aria-hidden="true"
+            />
           )}
           {/* Task #194: Botones de feedback 👍/👎 para respuestas del agente */}
           {!isUser && !isStreaming && !message._orphan_recovery && (

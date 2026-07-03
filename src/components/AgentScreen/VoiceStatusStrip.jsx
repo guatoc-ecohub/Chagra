@@ -42,8 +42,22 @@ const STRIP_CSS = `
   display: inline-block; width: 8px; height: 8px; border-radius: 9999px;
   background: currentColor; animation: vsb-dot 1.2s ease-in-out infinite;
 }
+@keyframes vsb-ring {
+  0%   { transform: scale(0.72); opacity: 0.85; }
+  100% { transform: scale(1.65); opacity: 0; }
+}
+.vsb-ring {
+  position: absolute; inset: 0; border-radius: 9999px;
+  border: 2px solid currentColor; pointer-events: none;
+  animation: vsb-ring 1.5s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+.vsb-ring--late { animation-delay: 0.75s; }
 @media (prefers-reduced-motion: reduce) {
   .vsb-eq-bar, .vsb-dot { animation: none !important; }
+  /* Sin movimiento: las ondas del mic se congelan como un anillo estático
+     tenue — sigue comunicando "escuchando" sin animar. */
+  .vsb-ring { animation: none !important; opacity: 0.35; transform: scale(1.15); }
+  .vsb-ring--late { display: none; }
 }
 `;
 
@@ -100,8 +114,17 @@ export default function VoiceStatusStrip({
                 : 'bg-emerald-900/30 border-emerald-700/50 text-emerald-300'
           }`}
         >
-          <span className="shrink-0 flex items-center justify-center w-9 h-9 rounded-full bg-slate-900/60">
-            {isListening && <Mic size={20} className="animate-pulse" aria-hidden="true" />}
+          <span className="relative shrink-0 flex items-center justify-center w-9 h-9 rounded-full bg-slate-900/60">
+            {/* Escuchando: ondas tipo sonar que emanan del mic (currentColor
+                → hereda el rose del estado). Bajo prefers-reduced-motion se
+                congelan en un anillo estático tenue (CSS de arriba). */}
+            {isListening && (
+              <>
+                <span className="vsb-ring" aria-hidden="true" />
+                <span className="vsb-ring vsb-ring--late" aria-hidden="true" />
+                <Mic size={20} className="animate-pulse" aria-hidden="true" />
+              </>
+            )}
             {isThinking && <ThinkingDots />}
             {isSpeaking && <Equalizer />}
           </span>
