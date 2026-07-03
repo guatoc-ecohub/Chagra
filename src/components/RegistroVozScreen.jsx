@@ -112,7 +112,7 @@ export default function RegistroVozScreen({ onBack, onSave, onManual = null }) {
       setView(ST.REVIEW);
     } catch (err) {
       // El router degrada solo a on-device; si igual falla, ofrece reintentar.
-      setErrorMsg(`No pude entender lo que dijiste: ${err.message}. Intenta de nuevo.`);
+      setErrorMsg(`No pude entender lo que dijo: ${err.message}. Intente de nuevo.`);
       setView(ST.ERROR);
     }
   }, [recordedAtMs]);
@@ -130,7 +130,7 @@ export default function RegistroVozScreen({ onBack, onSave, onManual = null }) {
   const handleStop = useCallback(async () => {
     const result = await stop();
     if (!result || !result.blob || result.blob.size === 0) {
-      setErrorMsg('Grabación vacía. Intenta de nuevo.');
+      setErrorMsg('La grabación quedó vacía. Intente de nuevo.');
       setView(ST.ERROR);
       return;
     }
@@ -168,15 +168,15 @@ export default function RegistroVozScreen({ onBack, onSave, onManual = null }) {
           type="button"
           onClick={onBack}
           aria-label="Volver"
-          className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center shrink-0"
+          className="w-11 h-11 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400"
         >
           <ChevronLeft size={20} />
         </button>
         <div className="flex items-center gap-2 min-w-0">
           <Mic size={18} className="text-lime-400 shrink-0" />
           <div className="min-w-0">
-            <h1 className="text-base font-bold leading-tight truncate">Registrar hablando</h1>
-            <p className="text-2xs text-slate-400 leading-tight">Cuéntame qué hiciste o qué viste y lo guardo.</p>
+            <h1 className="text-lg font-bold leading-tight truncate">Registrar hablando</h1>
+            <p className="text-xs text-slate-400 leading-tight">Cuénteme qué hizo o qué vio y yo lo guardo.</p>
           </div>
         </div>
       </header>
@@ -188,14 +188,24 @@ export default function RegistroVozScreen({ onBack, onSave, onManual = null }) {
               No tiene que hablar como robot. Diga lo que pasó en la finca; le muestro lo que entendí para que confirme o corrija antes de guardar.
             </ContextTip>
 
-            <button
-              onClick={handleStart}
-              className="w-32 h-32 rounded-full bg-lime-700 hover:bg-lime-600 active:bg-lime-800 flex items-center justify-center shadow-lg shadow-lime-900/40"
-              aria-label="Iniciar grabación"
-            >
-              <Mic size={56} className="text-white" />
-            </button>
-            <p className="text-xs text-slate-500">Toca para grabar (máx. 30s)</p>
+            {/* Botón principal de grabación: halo que respira (solo motion-safe)
+                para invitar a tocar sin gritar. El halo es decorativo. */}
+            <div className="relative flex items-center justify-center">
+              <span
+                aria-hidden="true"
+                className="absolute w-40 h-40 rounded-full bg-lime-500/15 motion-safe:animate-ping"
+                style={{ animationDuration: '2.8s' }}
+              />
+              <span aria-hidden="true" className="absolute w-40 h-40 rounded-full border border-lime-500/25" />
+              <button
+                onClick={handleStart}
+                className="relative w-32 h-32 rounded-full bg-lime-700 hover:bg-lime-600 active:bg-lime-800 active:scale-95 transition-transform motion-reduce:transition-none flex items-center justify-center shadow-lg shadow-lime-900/50 focus:outline-none focus-visible:ring-4 focus-visible:ring-lime-400/60"
+                aria-label="Iniciar grabación"
+              >
+                <Mic size={56} className="text-white" aria-hidden="true" />
+              </button>
+            </div>
+            <p className="text-sm text-slate-400 font-medium">Toque el botón y hable (máx. 30 s)</p>
 
             {/* Respaldo manual del flujo unificado (#23): para quien no quiere o
                 no puede usar la voz, un solo formulario adaptativo. Solo se
@@ -204,20 +214,20 @@ export default function RegistroVozScreen({ onBack, onSave, onManual = null }) {
               <button
                 type="button"
                 onClick={onManual}
-                className="inline-flex items-center gap-2 px-4 py-2 min-h-[44px] rounded-xl bg-slate-800/70 hover:bg-slate-700 border border-slate-700 text-sm font-semibold text-slate-200"
+                className="inline-flex items-center gap-2 px-5 py-2.5 min-h-[48px] rounded-xl bg-slate-800/70 hover:bg-slate-700 border border-slate-700 text-base font-semibold text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400"
                 data-testid="registro-manual-cta"
               >
-                <PencilLine size={16} className="text-lime-400" /> O escríbelo a mano
+                <PencilLine size={18} className="text-lime-400" aria-hidden="true" /> O escríbalo a mano
               </button>
             )}
 
             <div className="w-full max-w-md">
-              <p className="text-2xs uppercase font-bold text-slate-500 mb-2 flex items-center gap-1">
-                <Sparkles size={12} className="text-lime-400" /> Por ejemplo, puede decir:
+              <p className="text-xs uppercase font-bold text-slate-400 tracking-wide mb-2 flex items-center gap-1.5">
+                <Sparkles size={13} className="text-lime-400" aria-hidden="true" /> Por ejemplo, puede decir:
               </p>
               <ul className="flex flex-col gap-1.5">
                 {EXAMPLES.map((ex) => (
-                  <li key={ex} className="text-sm text-slate-300 italic bg-slate-900/50 border border-slate-800 rounded-lg px-3 py-1.5">
+                  <li key={ex} className="text-sm text-slate-300 italic bg-slate-900/50 border border-slate-800 border-l-2 border-l-lime-600/50 rounded-lg px-3 py-2 leading-snug">
                     {ex}
                   </li>
                 ))}
@@ -225,11 +235,11 @@ export default function RegistroVozScreen({ onBack, onSave, onManual = null }) {
             </div>
 
             <div className="w-full max-w-md">
-              <p className="text-2xs uppercase font-bold text-slate-500 mb-2">Entiendo y guardo:</p>
+              <p className="text-xs uppercase font-bold text-slate-400 tracking-wide mb-2">Entiendo y guardo:</p>
               <div className="flex flex-wrap gap-2">
                 {CATEGORIES.map((c) => (
-                  <span key={c.label} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-900/60 border border-slate-800 text-slate-300">
-                    <span>{c.icon}</span> {c.label}
+                  <span key={c.label} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-900/60 border border-slate-800 text-slate-300">
+                    <span aria-hidden="true">{c.icon}</span> {c.label}
                   </span>
                 ))}
               </div>
@@ -238,31 +248,53 @@ export default function RegistroVozScreen({ onBack, onSave, onManual = null }) {
         )}
 
         {view === ST.RECORDING && (
-          <div className="flex flex-col items-center gap-4 py-10 px-4">
+          <div className="flex flex-col items-center gap-4 py-8 px-4" aria-live="polite">
+            <p className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-950/60 border border-red-800/60 text-sm font-bold text-red-300">
+              <span aria-hidden="true" className="w-2.5 h-2.5 rounded-full bg-red-500 motion-safe:animate-pulse" />
+              Escuchando… hable ahora
+            </p>
             <Sparkline values={amplitudeHistory} color="#f87171" width={240} height={48} showLastValue={false} />
-            <div className="tabular-nums text-3xl font-mono text-red-400">
-              {fmt(durationMs)} <span className="text-slate-500 text-sm">/ {fmt(hardLimitMs || 30000)}</span>
+            <div className="tabular-nums text-4xl font-mono text-red-400">
+              {fmt(durationMs)} <span className="text-slate-500 text-base">/ {fmt(hardLimitMs || 30000)}</span>
             </div>
-            <button
-              onClick={handleStop}
-              className="w-32 h-32 rounded-full bg-red-600 hover:bg-red-500 active:bg-red-700 flex items-center justify-center shadow-lg animate-pulse"
-              aria-label="Detener grabación"
-            >
-              <MicOff size={56} className="text-white" />
-            </button>
+            <div className="relative flex items-center justify-center">
+              <span
+                aria-hidden="true"
+                className="absolute w-40 h-40 rounded-full bg-red-500/15 motion-safe:animate-ping"
+                style={{ animationDuration: '1.6s' }}
+              />
+              <button
+                onClick={handleStop}
+                className="relative w-32 h-32 rounded-full bg-red-600 hover:bg-red-500 active:bg-red-700 active:scale-95 transition-transform motion-reduce:transition-none flex items-center justify-center shadow-lg shadow-red-900/50 focus:outline-none focus-visible:ring-4 focus-visible:ring-red-400/60"
+                aria-label="Detener grabación"
+              >
+                <MicOff size={56} className="text-white" aria-hidden="true" />
+              </button>
+            </div>
+            <p className="text-sm text-slate-400 font-medium">Toque para terminar y guardar</p>
             <p className="text-xs text-slate-500">Nivel: {Math.round((audioLevel || 0) * 100)}%</p>
-            {remainingMs < 5000 && <p className="text-xs text-amber-400">Se detendrá en {Math.ceil(remainingMs / 1000)}s</p>}
+            {remainingMs < 5000 && (
+              <p className="text-sm font-bold text-amber-300 bg-amber-950/50 border border-amber-800/60 rounded-full px-4 py-1.5">
+                Se detendrá en {Math.ceil(remainingMs / 1000)} s
+              </p>
+            )}
           </div>
         )}
 
         {(view === ST.TRANSCRIBING || view === ST.EXTRACTING) && (
-          <div className="flex flex-col items-center gap-4 py-14 px-4">
+          <div className="flex flex-col items-center gap-4 py-14 px-4" aria-live="polite">
             <div className="text-lime-400"><ChagraGrowLoader size={64} /></div>
-            <p className="text-sm text-slate-400">
-              {view === ST.TRANSCRIBING ? 'Escuchando lo que dijiste…' : 'Entendiendo y clasificando…'}
+            <p className="text-base font-semibold text-slate-200">
+              {view === ST.TRANSCRIBING ? 'Anotando lo que dijo…' : 'Organizando el registro…'}
             </p>
+            {/* Progreso en dos pasos: anotar → organizar. Sin porcentajes falsos. */}
+            <div className="flex items-center gap-2" aria-hidden="true">
+              <span className={`w-2 h-2 rounded-full ${view === ST.TRANSCRIBING ? 'bg-lime-400 motion-safe:animate-pulse' : 'bg-lime-600'}`} />
+              <span className={`w-2 h-2 rounded-full ${view === ST.EXTRACTING ? 'bg-lime-400 motion-safe:animate-pulse' : 'bg-slate-700'}`} />
+            </div>
+            <p className="text-xs text-slate-500">Un momento, no cierre la aplicación.</p>
             {view === ST.EXTRACTING && transcription && (
-              <p className="text-xs text-slate-500 italic max-w-md text-center">"{transcription}"</p>
+              <p className="text-sm text-slate-400 italic max-w-md text-center leading-snug">"{transcription}"</p>
             )}
             {view === ST.EXTRACTING && liveStream && (
               <div className="w-full max-w-md mt-1">
@@ -282,31 +314,38 @@ export default function RegistroVozScreen({ onBack, onSave, onManual = null }) {
         )}
 
         {view === ST.ERROR && (
-          <div className="flex flex-col items-center gap-4 py-10 px-4">
-            <AlertTriangle size={48} className="text-amber-400" />
-            <p className="text-sm text-amber-200 text-center max-w-sm">{errorMsg || recorderError || 'Error desconocido'}</p>
-            <button onClick={resetAll} className="px-6 py-3 min-h-[44px] bg-slate-800 hover:bg-slate-700 rounded-xl font-bold flex items-center gap-2">
-              <RotateCcw size={18} /> Reintentar
+          <div className="flex flex-col items-center gap-4 py-10 px-4" aria-live="polite">
+            <div className="w-20 h-20 rounded-full bg-amber-950/60 border border-amber-800/60 flex items-center justify-center">
+              <AlertTriangle size={40} className="text-amber-400" aria-hidden="true" />
+            </div>
+            <div className="text-center max-w-sm">
+              <p className="text-base font-bold text-amber-200">No se pudo completar</p>
+              <p className="text-sm text-amber-200/80 mt-1 leading-snug">{errorMsg || recorderError || 'Error desconocido'}</p>
+            </div>
+            <button onClick={resetAll} className="px-6 py-3.5 min-h-[52px] bg-lime-700 hover:bg-lime-600 rounded-xl font-bold text-base flex items-center gap-2 shadow-lg shadow-lime-900/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">
+              <RotateCcw size={18} aria-hidden="true" /> Intentar de nuevo
             </button>
           </div>
         )}
 
         {view === ST.DONE && (
-          <div className="flex flex-col items-center gap-4 py-12 px-4">
-            <Check size={48} className="text-green-400" />
+          <div className="flex flex-col items-center gap-4 py-12 px-4" aria-live="polite">
+            <div className="w-20 h-20 rounded-full bg-green-950/60 border border-green-800/60 flex items-center justify-center">
+              <Check size={40} className="text-green-400" aria-hidden="true" />
+            </div>
             <div className="text-center max-w-xs">
-              <p className="text-base font-bold text-green-300">{savedKind} guardado ✓</p>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-lg font-bold text-green-300">{savedKind} guardado ✓</p>
+              <p className="text-sm text-slate-400 mt-1.5 leading-snug">
                 {savedOffline
-                  ? <>Se sincronizará con FarmOS cuando haya conexión. Mientras tanto queda en <strong className="text-slate-200">Cuaderno de campo</strong>.</>
+                  ? <>Quedó guardado en su <strong className="text-slate-200">Cuaderno de campo</strong> y se sincronizará con FarmOS cuando haya conexión.</>
                   : <>Sincronizado con FarmOS.</>}
               </p>
             </div>
-            <div className="flex flex-wrap gap-2 justify-center">
-              <button onClick={resetAll} className="px-6 py-3 min-h-[44px] bg-lime-700 hover:bg-lime-600 rounded-xl font-bold flex items-center gap-2">
-                <Mic size={18} /> Registrar otra cosa
+            <div className="flex flex-wrap gap-2.5 justify-center">
+              <button onClick={resetAll} className="px-6 py-3.5 min-h-[52px] bg-lime-700 hover:bg-lime-600 rounded-xl font-bold text-base flex items-center gap-2 shadow-lg shadow-lime-900/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-300">
+                <Mic size={18} aria-hidden="true" /> Registrar otra cosa
               </button>
-              <button onClick={onBack} className="px-6 py-3 min-h-[44px] bg-slate-800 hover:bg-slate-700 rounded-xl font-bold text-slate-200">
+              <button onClick={onBack} className="px-6 py-3.5 min-h-[52px] bg-slate-800 hover:bg-slate-700 rounded-xl font-bold text-base text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400">
                 Volver
               </button>
             </div>
