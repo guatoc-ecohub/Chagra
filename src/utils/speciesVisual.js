@@ -109,6 +109,9 @@ const KEYWORD_VISUALS = [
   { kw: ['vainilla', 'vanilla'], emoji: '🌸', tone: 'pink' },
   { kw: ['manzanilla', 'matricaria', 'calendula', 'boton de oro', 'tithonia', 'girasol', 'helianthus', 'crisantemo', 'chrysanthemum', 'pompon'], emoji: '🌼', tone: 'amber' },
   { kw: ['toronjil', 'melissa', 'yerbabuena', 'hierbabuena', ' menta', 'mentha', 'oregano', 'origanum', 'ortiga', 'urtica', 'llanten', 'plantago', 'cilantro', 'coriandrum', 'perejil', 'apio', 'ruda', 'romero', 'tomillo', 'albahaca', 'salvia officinalis', 'limonaria'], emoji: '🌿', tone: 'emerald' },
+  // Hinojo: antagonista clásico en asociaciones (alelopático) — sin esta
+  // keyword caía al 🌱 genérico en las tarjetas de "evitar".
+  { kw: ['hinojo', 'foeniculum'], emoji: '🌿', tone: 'amber' },
 
   // --- Flores y atractores de polinizadores ---
   { kw: [' rosa ', 'rosa x', 'rosa hybrida'], emoji: '🌹', tone: 'rose' },
@@ -121,6 +124,11 @@ const KEYWORD_VISUALS = [
   { kw: ['guadua', 'bambu'], emoji: '🎋', tone: 'emerald' },
   { kw: ['iraca', 'toquilla', 'carludovica'], emoji: '🎋', tone: 'emerald' },
   { kw: ['cedro', 'caoba', 'swietenia', 'nogal', 'cordia', 'guayacan', 'tabebuia', 'aliso', 'alnus', 'roble', 'urapan', 'yarumo', 'eucalipto', 'eucalyptus', ' pino ', 'cipres'], emoji: '🌳', tone: 'emerald' },
+  // Matarratón (Gliricidia sepium): leguminosa arbórea de sombra/cerca viva,
+  // aparece como "leguminosa" en los arquetipos de asociación (SAF cacao).
+  { kw: ['gliricidia', 'matarraton'], emoji: '🌳', tone: 'lime' },
+  // "Frutal" genérico de los arquetipos de asociación (frutal + cobertura).
+  { kw: [' frutal '], emoji: '🍎', tone: 'rose' },
   { kw: ['trebol', 'trifolium', 'alfalfa', 'crotalaria', 'vicia', 'abono verde'], emoji: '☘️', tone: 'lime' },
   { kw: ['kikuyo', 'pasto', 'cenchrus', 'brachiaria', 'raigras', 'melinis'], emoji: '🌾', tone: 'lime' },
   { kw: ['helecho', 'pteridium', 'retamo', 'ulex'], emoji: '🌿', tone: 'rose' },
