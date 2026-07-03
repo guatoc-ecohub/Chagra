@@ -1,0 +1,68 @@
+/* src/components/Aprende/aprender-hub.css
+ * ----------------------------------------------------------------------------
+ * Capa-puente del hub "Aprender" (prefijo --aprh- implícito en clases .aprh-*).
+ * Bebe de los tokens globales de src/styles/tokens.css (radios, sombras,
+ * movimiento, tacto) y del acento de tema (--t-accent-rgb, themes.css).
+ * Todo movimiento respeta prefers-reduced-motion.
+ * ---------------------------------------------------------------------------- */
+
+/* Tarjeta de lección del hub: radio y sombra de la escalera global,
+   press-feedback corto (--dur-tap) y mínimo táctil de campo. */
+.aprh-card {
+  border-radius: var(--r-xl, 24px);
+  box-shadow: var(--sombra-2, 0 6px 18px rgb(8 30 22 / 0.22));
+  min-height: var(--tap-min, 44px);
+  transition:
+    transform var(--dur-tap, 0.12s) var(--ease-suave, cubic-bezier(0.4, 0, 0.2, 1)),
+    border-color var(--dur-estado, 0.18s) var(--ease-suave, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.aprh-card:active {
+  transform: scale(0.99);
+}
+
+/* Marco de la ilustración de la lección: baldosa suave que deja respirar
+   la escena SVG sin encerrarla en un cuadrado duro. */
+.aprh-illo {
+  border-radius: var(--r-lg, 20px);
+  background:
+    radial-gradient(120% 120% at 30% 20%, rgb(255 255 255 / 0.06), transparent 60%),
+    rgb(2 6 12 / 0.35);
+}
+
+/* Barra de progreso por lección (visible en la tarjeta del hub). */
+.aprh-progress-track {
+  height: 4px;
+  border-radius: var(--r-pill, 999px);
+  background: rgb(148 163 184 / 0.22);
+  overflow: hidden;
+}
+
+.aprh-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: rgb(var(--t-accent-rgb, 52 211 153));
+  transition: width var(--dur-estado, 0.18s) var(--ease-suave, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+/* Chip DOI del pie de fuente: monoespaciado, tinta baja, no compite. */
+.aprh-doi {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  letter-spacing: 0.01em;
+  border-radius: var(--r-xs, 8px);
+  padding: 1px 6px;
+  border: 1px solid rgb(148 163 184 / 0.25);
+  background: rgb(148 163 184 / 0.08);
+  word-break: break-all;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aprh-card,
+  .aprh-progress-fill {
+    transition: none;
+  }
+  .aprh-card:active {
+    transform: none;
+  }
+}

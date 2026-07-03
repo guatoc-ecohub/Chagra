@@ -14,11 +14,13 @@
  *   - Lenguaje colombiano (tú/usted, sin voseo argentino).
  *   - Accesible: aria-labels, navegación por teclado.
  */
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   BookOpen,
+  CheckCircle2,
   ChevronRight,
   ChevronLeft,
+  ScrollText,
   Sprout,
   Leaf,
   FlaskConical,
@@ -30,9 +32,11 @@ import {
 import lecciones from '../../data/agro-lecciones.json';
 import todasLasCards from '../../data/agro-insight-cards.json';
 import InsightCard from './InsightCard.jsx';
+import LeccionIlustracion from './LeccionIlustracion.jsx';
 import ManoChagraGlyph from '../dashboard/ManoChagraGlyph.jsx';
 import LessonInfographic from '../LessonInfographic.jsx';
 import { aprenderInfografiaActivo } from '../../config/aprenderInfografiaFlag.js';
+import './aprender-hub.css';
 
 // Infográfico por lección (PoC del audit triple: "cero gráficos"). Gateado
 // dev-only por VITE_APRENDER_INFOGRAFIA; se evalúa una sola vez (flag de build).
@@ -91,6 +95,66 @@ const LECCION_COLORS = {
   },
 };
 
+/* ── Progreso local por lección (solo capa visual, offline-first) ──────────
+   Guarda hasta dónde llegó el usuario en cada lección para que el hub muestre
+   progreso visible (audit: "progreso visible"). localStorage con try/catch:
+   si el almacenamiento falla (modo privado, cuota), el hub degrada limpio
+   a "sin progreso" y la lección funciona igual. */
+const PROGRESO_KEY = 'chagra.aprender.progreso.v1';
+
+function leerProgresoLecciones() {
+  try {
+    const raw = window.localStorage.getItem(PROGRESO_KEY);
+    const data = raw ? JSON.parse(raw) : {};
+    return data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+  } catch {
+    return {};
+  }
+}
+
+function guardarProgresoLeccion(slug, patch) {
+  try {
+    const data = leerProgresoLecciones();
+    data[slug] = { ...(data[slug] || {}), ...patch };
+    window.localStorage.setItem(PROGRESO_KEY, JSON.stringify(data));
+  } catch {
+    /* sin almacenamiento: el progreso simplemente no persiste */
+  }
+}
+
+/* ── Fuente con DOI destacado ──────────────────────────────────────────────
+   Si la fuente trae un DOI, lo separa a un chip monoespaciado propio para que
+   la trazabilidad científica sea visible de un vistazo (audit: pie de
+   fuente/DOI donde aplique). Si no hay DOI, muestra la fuente tal cual. */
+function extraerDoi(fuente) {
+  if (typeof fuente !== 'string') return { texto: fuente || '', doi: null };
+  const match = /,?\s*DOI[:\s]+(\S+)/i.exec(fuente);
+  if (!match) return { texto: fuente, doi: null };
+  return {
+    texto: fuente.slice(0, match.index).trim().replace(/[,;]$/, ''),
+    doi: match[1],
+  };
+}
+
+function FuentePie({ etiqueta = 'Fuente base', fuente }) {
+  const { texto, doi } = extraerDoi(fuente);
+  if (!texto && !doi) return null;
+  return (
+    <div className="flex items-start gap-2 pt-2 border-t border-slate-800/40">
+      <ScrollText size={12} className="text-slate-600 shrink-0 mt-0.5" aria-hidden="true" />
+      <p className="text-[11px] text-slate-500 leading-relaxed min-w-0">
+        <strong className="text-slate-500">{etiqueta}:</strong> {texto}
+        {doi && (
+          <>
+            {' '}
+            <span className="aprh-doi inline-block text-slate-400 mt-0.5">DOI {doi}</span>
+          </>
+        )}
+      </p>
+    </div>
+  );
+}
+
 /**
  * Bloque de contenido individual de una lección.
  */
@@ -105,11 +169,22 @@ function BloqueContenido({ bloque }) {
           Dato verificado
         </p>
         <p className="text-sm text-emerald-100 leading-relaxed">{bloque.texto}</p>
-        {bloque.fuente && (
-          <p className="text-[11px] text-emerald-300/60 mt-2 leading-relaxed">
-            Fuente: {bloque.fuente}
-          </p>
-        )}
+        {bloque.fuente && (() => {
+          const { texto, doi } = extraerDoi(bloque.fuente);
+          return (
+            <p className="text-[11px] text-emerald-300/60 mt-2 leading-relaxed">
+              Fuente: {texto}
+              {doi && (
+                <>
+                  {' '}
+                  <span className="aprh-doi inline-block text-emerald-300/70 mt-0.5">
+                    DOI {doi}
+                  </span>
+                </>
+              )}
+            </p>
+          );
+        })()}
       </div>
     );
   }
@@ -140,7 +215,7 @@ function BloqueContenido({ bloque }) {
 }
 
 /**
- * Botón "Pregúntale al agente" — conecta Aprender → Agente. Abre el chat del
+ * Botón "Pregúntele al agente" — conecta Aprender → Agente. Abre el chat del
  * agente con la pregunta de la lección pre-cargada en el compositor (el usuario
  * la revisa y envía; sin auto-submit). Identidad de marca: glifo de la mano de
  * Chagra + acento del tema (--t-accent-rgb), nada de estética genérica de IA.
@@ -170,7 +245,7 @@ function PreguntaleAlAgenteButton({ pregunta, onAskAgent }) {
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-sm font-bold text-slate-100 leading-tight">
-          Pregúntale al agente
+          Pregúntele al agente
         </span>
         <span className="block text-xs text-slate-300/80 leading-snug mt-0.5 truncate">
           “{pregunta}”
@@ -198,7 +273,7 @@ function LeccionView({ leccion, onBack, onAskAgent }) {
   // una pregunta honesta derivada del título.
   const preguntaLeccion =
     (typeof leccion.pregunta_agente === 'string' && leccion.pregunta_agente.trim())
-      || `Cuéntame más sobre ${(leccion.titulo || leccion.slug || '').toLowerCase()}.`;
+      || `Cuénteme más sobre ${(leccion.titulo || leccion.slug || '').toLowerCase()}.`;
   const puedePreguntar = typeof onAskAgent === 'function';
 
   const bloques = leccion.contenido_bloques;
@@ -206,6 +281,20 @@ function LeccionView({ leccion, onBack, onAskAgent }) {
     () => todasLasCards.filter((c) => c.leccion_base === leccion.slug),
     [leccion.slug]
   );
+
+  // Posición en el currículo ("Lección N de M") para orientar la navegación.
+  const numeroLeccion = lecciones.findIndex((l) => l.slug === leccion.slug) + 1;
+
+  // Progreso visible (hub): persistir hasta dónde llegó en esta lección.
+  // Al llegar a los datos verificados, la lección cuenta como completada.
+  useEffect(() => {
+    const previo = leerProgresoLecciones()[leccion.slug] || {};
+    guardarProgresoLeccion(leccion.slug, {
+      visto: Math.max(previo.visto || 0, bloqueIdx + 1),
+      total: bloques.length,
+      ...(mostrandoInsights ? { completada: true } : {}),
+    });
+  }, [leccion.slug, bloqueIdx, mostrandoInsights, bloques.length]);
 
   const esUltimoBloque = bloqueIdx >= bloques.length - 1;
   const colors = LECCION_COLORS[leccion.slug] || LECCION_COLORS.suelo;
@@ -228,12 +317,35 @@ function LeccionView({ leccion, onBack, onAskAgent }) {
           <ChevronLeft size={20} className="text-sky-400" />
         </button>
         <Icon size={16} className={colors.iconColor} aria-hidden="true" />
-        <p className="text-sm font-bold text-slate-200 truncate">{leccion.titulo}</p>
+        <p className="text-sm font-bold text-slate-200 truncate flex-1 min-w-0">
+          {leccion.titulo}
+        </p>
+        {numeroLeccion > 0 && (
+          <span className="shrink-0 text-[11px] text-slate-500 font-semibold tabular-nums">
+            Lección {numeroLeccion} de {lecciones.length}
+          </span>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {!mostrandoInsights ? (
           <>
+            {/* Portada de la lección: SU ilustración (audit: "una ilustración
+                por lección") + descripción. Solo en el primer bloque, para
+                abrir el tema de un vistazo sin repetirse en cada paso. */}
+            {bloqueIdx === 0 && (
+              <div
+                className={`aprh-card flex items-center gap-4 p-4 bg-gradient-to-br ${colors.accent} border ${colors.border.split(' ')[0]}`}
+              >
+                <span className="aprh-illo shrink-0 inline-flex items-center justify-center w-20 h-20 p-1.5">
+                  <LeccionIlustracion slug={leccion.slug} size={68} />
+                </span>
+                <p className={`text-xs leading-relaxed min-w-0 ${colors.subColor}`}>
+                  {leccion.descripcion}
+                </p>
+              </div>
+            )}
+
             {/* Infográfico de apertura (PoC audit triple: "cero gráficos").
                 Solo en el primer bloque, para introducir la lección de un
                 vistazo. Gateado dev-only (VITE_APRENDER_INFOGRAFIA); si la
@@ -250,20 +362,28 @@ function LeccionView({ leccion, onBack, onAskAgent }) {
               <BloqueContenido bloque={bloques[bloqueIdx]} />
             </div>
 
-            {/* Indicador de progreso */}
-            <div className="flex items-center gap-1" aria-label={`Paso ${bloqueIdx + 1} de ${bloques.length}`}>
-              {bloques.map((_, i) => (
-                <div
-                  key={i}
-                  className={`h-1.5 rounded-full flex-1 transition-colors ${
-                    i === bloqueIdx
-                      ? 'bg-emerald-400'
-                      : i < bloqueIdx
-                      ? 'bg-emerald-700'
-                      : 'bg-slate-700'
-                  }`}
-                />
-              ))}
+            {/* Indicador de progreso (dots + texto visible del paso) */}
+            <div aria-label={`Paso ${bloqueIdx + 1} de ${bloques.length}`}>
+              <div className="flex items-center gap-1">
+                {bloques.map((_, i) => (
+                  <div
+                    key={i}
+                    className={`h-1.5 rounded-full flex-1 transition-colors motion-reduce:transition-none ${
+                      i === bloqueIdx
+                        ? 'bg-emerald-400'
+                        : i < bloqueIdx
+                        ? 'bg-emerald-700'
+                        : 'bg-slate-700'
+                    }`}
+                  />
+                ))}
+              </div>
+              <p
+                className="text-[11px] text-slate-500 mt-1.5 text-center tabular-nums"
+                aria-hidden="true"
+              >
+                Paso {bloqueIdx + 1} de {bloques.length}
+              </p>
             </div>
 
             {/* Navegación */}
@@ -311,11 +431,8 @@ function LeccionView({ leccion, onBack, onAskAgent }) {
               />
             )}
 
-            {/* Fuente de la lección */}
-            <p className="text-[11px] text-slate-600 leading-relaxed pt-2 border-t border-slate-800/40">
-              <strong className="text-slate-500">Fuente base:</strong>{' '}
-              {leccion.fuente}
-            </p>
+            {/* Pie de fuente de la lección (con DOI destacado si aplica) */}
+            <FuentePie fuente={leccion.fuente} />
           </>
         ) : (
           /* Vista de insights */
@@ -373,7 +490,7 @@ export function AprenderEntryCard({ onNavigate }) {
       type="button"
       data-testid="aprende-entry-card"
       onClick={() => onNavigate('aprende')}
-      className="rounded-2xl bg-gradient-to-br from-emerald-900/60 to-teal-950/80 border border-emerald-600/50 hover:border-emerald-400/70 active:scale-[0.99] transition-all p-5 text-left flex items-start gap-4 min-h-[112px] shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 w-full"
+      className="aprh-card bg-gradient-to-br from-emerald-900/60 to-teal-950/80 border border-emerald-600/50 hover:border-emerald-400/70 p-5 text-left flex items-start gap-4 min-h-[112px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 w-full"
     >
       <span className="shrink-0 inline-flex items-center justify-center w-14 h-14 rounded-xl bg-emerald-700/40 border border-emerald-500/50">
         <BookOpen size={28} className="text-emerald-300" />
@@ -401,6 +518,14 @@ export function AprenderEntryCard({ onNavigate }) {
  */
 export default function AprenderConAgente({ onBack, onAskAgent }) {
   const [leccionActual, setLeccionActual] = useState(null);
+
+  // Progreso persistido por lección; se relee al volver de una lección
+  // (leccionActual → null) para que las barras del hub queden al día.
+  const progreso = useMemo(
+    () => (leccionActual ? {} : leerProgresoLecciones()),
+    [leccionActual]
+  );
+  const completadas = lecciones.filter((l) => progreso[l.slug]?.completada).length;
 
   if (leccionActual) {
     return (
@@ -434,16 +559,31 @@ export default function AprenderConAgente({ onBack, onAskAgent }) {
       </div>
 
       <main className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-        <p className="text-xs text-slate-400 leading-relaxed">
-          Elige un tema. Cada lección tiene datos verificados con fuente real: nada inventado.
-        </p>
+        <div className="flex items-end justify-between gap-3">
+          <p className="text-xs text-slate-400 leading-relaxed min-w-0">
+            Elija un tema. Cada lección tiene datos verificados con fuente real: nada inventado.
+          </p>
+          {completadas > 0 && (
+            <span
+              data-testid="aprende-progreso-global"
+              className="shrink-0 text-[11px] font-bold text-emerald-300 tabular-nums inline-flex items-center gap-1"
+            >
+              <CheckCircle2 size={12} aria-hidden="true" />
+              {completadas} de {lecciones.length}
+            </span>
+          )}
+        </div>
 
-        {lecciones.map((leccion) => {
+        {lecciones.map((leccion, idx) => {
           const colors = LECCION_COLORS[leccion.slug] || LECCION_COLORS.suelo;
-          const Icon = LECCION_ICONS[leccion.slug] || BookOpen;
           const insightsCount = todasLasCards.filter(
             (c) => c.leccion_base === leccion.slug
           ).length;
+          const totalBloques = leccion.contenido_bloques.length;
+          const avance = progreso[leccion.slug] || {};
+          const vistos = Math.min(avance.visto || 0, totalBloques);
+          const completada = Boolean(avance.completada);
+          const pct = completada ? 100 : Math.round((vistos / totalBloques) * 100);
 
           return (
             <button
@@ -451,13 +591,27 @@ export default function AprenderConAgente({ onBack, onAskAgent }) {
               type="button"
               data-testid={`leccion-card-${leccion.slug}`}
               onClick={() => setLeccionActual(leccion)}
-              className={`w-full rounded-2xl bg-gradient-to-br ${colors.accent} border ${colors.border} active:scale-[0.99] transition-all p-4 text-left flex items-start gap-3 min-h-[88px] shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60`}
+              aria-label={`Lección ${idx + 1} de ${lecciones.length}: ${leccion.titulo}${
+                completada ? '. Completada' : vistos > 0 ? '. En progreso' : ''
+              }`}
+              className={`aprh-card w-full bg-gradient-to-br ${colors.accent} border ${colors.border} p-4 text-left flex items-start gap-3.5 min-h-[88px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60`}
             >
-              <span className={`shrink-0 inline-flex items-center justify-center w-12 h-12 rounded-xl border ${colors.iconBg}`}>
-                <Icon size={24} className={colors.iconColor} />
+              {/* Ilustración propia de la lección (audit: una por lección) */}
+              <span className={`aprh-illo shrink-0 inline-flex items-center justify-center w-[68px] h-[68px] p-1 border ${colors.iconBg.split(' ').pop()}`}>
+                <LeccionIlustracion slug={leccion.slug} size={60} />
               </span>
+
               <div className="min-w-0 flex-1">
-                <p className={`text-base font-black leading-tight ${colors.titleColor}`}>
+                <p className={`text-[10px] font-bold uppercase tracking-wider ${colors.subColor} opacity-90 flex items-center gap-1.5`}>
+                  Lección {idx + 1}
+                  {completada && (
+                    <span className="inline-flex items-center gap-0.5 text-emerald-300 normal-case tracking-normal">
+                      <CheckCircle2 size={11} aria-hidden="true" />
+                      Completada
+                    </span>
+                  )}
+                </p>
+                <p className={`text-base font-black leading-tight mt-0.5 ${colors.titleColor}`}>
                   {leccion.titulo}
                 </p>
                 <p className={`text-xs mt-1 leading-relaxed ${colors.subColor}`}>
@@ -467,6 +621,19 @@ export default function AprenderConAgente({ onBack, onAskAgent }) {
                   <p className={`text-[11px] mt-1.5 ${colors.subColor} opacity-80`}>
                     {insightsCount} dato{insightsCount !== 1 ? 's' : ''} verificado{insightsCount !== 1 ? 's' : ''}
                   </p>
+                )}
+                {/* Progreso visible por lección (solo si ya la empezó) */}
+                {vistos > 0 && !completada && (
+                  <div
+                    className="aprh-progress-track mt-2"
+                    role="progressbar"
+                    aria-valuenow={pct}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`Progreso de la lección: ${pct} %`}
+                  >
+                    <div className="aprh-progress-fill" style={{ width: `${pct}%` }} />
+                  </div>
                 )}
               </div>
               <ChevronRight size={18} className="shrink-0 text-slate-400 self-center" aria-hidden="true" />
