@@ -14,10 +14,9 @@ import './chivito.css';
  *   - Cuerpo compacto oliva-marrón, vientre pálido, cola larga oscura con
  *     puntas claras, pico corto y recto negro.
  *
- * Dos mockups (dos niveles de detalle) para decidir en chagra-dev:
- *   - mockup="a" → simple / estilizado (vectorial limpio, plano).
- *   - mockup="b" → detallado / rico (gradientes, iridiscencia animada,
- *     plumas, sombras).
+ * DISEÑO DEFINITIVO (el operador eligió el mockup B en el A/B de chagra-dev):
+ * detallado / rico — gradientes, barba iridiscente con destello animado,
+ * plumas, moteado, sombras. El mockup A (plano) fue retirado.
  *
  * Piezas exportadas:
  *   - ChivitoAve       → sólo el ave (perfil, mirando a la derecha).
@@ -34,91 +33,19 @@ function prefersReducedMotion() {
     : false;
 }
 
-// ID único y estable para los <defs> del SVG (varios chivitos coexisten en el
-// A/B, así que cada uno necesita ids de gradiente propios). `useId` es puro
-// (no hay side-effects en render); se limpian los ':' para que sirvan como
-// fragmento en `fill="url(#...)"`.
+// ID único y estable para los <defs> del SVG (varios chivitos coexisten en la
+// página — home, botón, FAB — así que cada uno necesita ids de gradiente
+// propios). `useId` es puro (no hay side-effects en render); se limpian los
+// ':' para que sirvan como fragmento en `fill="url(#...)"`.
 function useUid(prefix) {
   return `${prefix}-${useId().replace(/:/g, '')}`;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
- *  MOCKUP A — el chivito SIMPLE / ESTILIZADO (vectorial limpio, colores planos)
- *  Al estilo ilustrado de la escena Finca Viva. Perfil mirando a la derecha.
+ *  EL CHIVITO — detallado / rico (gradientes, iridiscencia animada, plumas,
+ *  sombras). Perfil mirando a la derecha.
  * ════════════════════════════════════════════════════════════════════════ */
-function ChivitoSVG_A() {
-  return (
-    <svg viewBox="0 0 140 132" className="chiv-svg" aria-hidden="true">
-      {/* COLA larga y oscura, barrida hacia abajo-atrás, con puntas claras */}
-      <g>
-        <path d="M50 74 L10 108 L18 110 L14 118 L26 112 L26 120 L40 104 L58 84 Z" fill="#4a3a24" />
-        {/* dos puntas blancas (rectrices externas del chivito) */}
-        <path d="M10 108 L18 110 L15 115 Z" fill="#efe7d4" />
-        <path d="M22 116 L26 112 L26 120 Z" fill="#efe7d4" />
-      </g>
-
-      {/* ALA trasera (batiendo por detrás) */}
-      <g className="chiv-ala-tras">
-        <path d="M74 56 Q48 40 30 54 Q50 70 76 62 Z" fill="#6b5230" opacity="0.85" />
-      </g>
-
-      {/* CUERPO compacto oliva-marrón */}
-      <ellipse cx="66" cy="70" rx="27" ry="20" fill="#8a7346" transform="rotate(-12 66 70)" />
-      {/* vientre pálido */}
-      <path d="M46 78 Q60 96 86 84 Q74 74 54 72 Z" fill="#d9cdaf" opacity="0.9" />
-
-      {/* CABEZA */}
-      <circle cx="98" cy="46" r="16" fill="#7a5c38" />
-      {/* capucha marrón oscuro sobre la coronilla */}
-      <path d="M86 42 Q98 26 112 42 Q104 34 98 33 Q92 34 86 42 Z" fill="#4d3820" />
-      {/* máscara negra alrededor del ojo */}
-      <path d="M92 40 Q100 36 110 44 Q104 50 94 49 Z" fill="#241a10" />
-      {/* raya de mejilla clara */}
-      <path d="M90 52 Q100 56 112 52 Q102 60 90 57 Z" fill="#efe7d4" opacity="0.92" />
-
-      {/* CRESTA erguida, puntiaguda, blanco-crema con base oscura */}
-      <g className="chiv-cresta">
-        {/* base oscura */}
-        <path d="M90 34 Q96 30 104 34 L102 40 L92 40 Z" fill="#3a2a18" />
-        {/* plumas crema puntiagudas */}
-        <path d="M92 36 Q90 22 89 12 Q95 22 96 36 Z" fill="#f2ead6" stroke="#b9a878" strokeWidth="0.6" />
-        <path d="M97 36 Q97 20 98 9 Q101 20 101 36 Z" fill="#f6efdd" stroke="#b9a878" strokeWidth="0.6" />
-        <path d="M101 36 Q104 22 108 14 Q107 24 105 37 Z" fill="#f2ead6" stroke="#b9a878" strokeWidth="0.6" />
-      </g>
-
-      {/* PICO corto y recto negro */}
-      <path d="M112 48 L130 50" fill="none" stroke="#1c130a" strokeWidth="2.6" strokeLinecap="round" />
-
-      {/* OJO */}
-      <circle cx="101" cy="45" r="2.4" fill="#100a05" />
-      <circle cx="100.2" cy="44.2" r="0.8" fill="#fff" opacity="0.9" />
-
-      {/* BARBA ICÓNICA — larga, puntiaguda, verde arriba → violeta en la punta.
-          En Mockup A: dos bloques planos que forman UNA sola barba en punta
-          (verde el tramo alto, violeta la punta), para leerla clara y grande. */}
-      <g>
-        <path d="M95 53 L105 55 L103 71 L98 71 Z" fill="#1f9e63" />
-        <path d="M98 71 L103 71 L100.5 86 Z" fill="#7c3aed" />
-        {/* filito de brillo verde-claro en el borde superior */}
-        <path d="M96 54 L104 55.6 L103.4 58 L96.4 56.5 Z" fill="#3fd68a" opacity="0.8" />
-      </g>
-
-      {/* ALA frontal (batiendo sobre el cuerpo) */}
-      <g className="chiv-ala-fron">
-        <path d="M78 52 Q50 34 28 50 Q52 68 82 60 Z" fill="#5f4a2e" />
-      </g>
-
-      {/* patas mínimas insinuadas */}
-      <path d="M66 89 L64 98 M74 88 L74 97" stroke="#2a1d12" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-/* ══════════════════════════════════════════════════════════════════════════
- *  MOCKUP B — el chivito DETALLADO / RICO (gradientes, iridiscencia animada,
- *  plumas, sombras). Perfil mirando a la derecha.
- * ════════════════════════════════════════════════════════════════════════ */
-function ChivitoSVG_B({ id }) {
+function ChivitoSVG({ id }) {
   const g = (s) => `${id}-${s}`;
   return (
     <svg viewBox="0 0 140 132" className="chiv-svg" aria-hidden="true">
@@ -257,21 +184,20 @@ function ChivitoSVG_B({ id }) {
 }
 
 /**
- * ChivitoAve — sólo el ave. `mockup` = 'a' | 'b'. `flap` activa el aleteo/vida
- * (respeta reduced-motion vía CSS). `size` = ancho en px.
+ * ChivitoAve — sólo el ave. `flap` activa el aleteo/vida (respeta
+ * reduced-motion vía CSS). `size` = ancho en px.
  */
-export function ChivitoAve({ mockup = 'b', size = 120, flap = true, className = '', ariaLabel }) {
+export function ChivitoAve({ size = 120, flap = true, className = '', ariaLabel }) {
   const id = useUid('chiv');
-  const isB = mockup === 'b';
   return (
     <span
-      className={`chivito ${isB ? 'chiv-b' : 'chiv-a'} ${flap ? 'is-flap' : ''} ${className}`.trim()}
+      className={`chivito ${flap ? 'is-flap' : ''} ${className}`.trim()}
       style={{ width: size }}
       role={ariaLabel ? 'img' : undefined}
       aria-label={ariaLabel || undefined}
       aria-hidden={ariaLabel ? undefined : 'true'}
     >
-      {isB ? <ChivitoSVG_B id={id} /> : <ChivitoSVG_A />}
+      <ChivitoSVG id={id} />
     </span>
   );
 }
@@ -280,24 +206,21 @@ export function ChivitoAve({ mockup = 'b', size = 120, flap = true, className = 
  *  FRAILEJÓN — roseta plateada afelpada (Espeletia) + racimo de flores
  *  amarillas. La simbiosis real del páramo: el chivito liba esta flor.
  * ════════════════════════════════════════════════════════════════════════ */
-function FrailejonSVG({ mockup, id }) {
-  const isB = mockup === 'b';
+function FrailejonSVG({ id }) {
   const g = (s) => `${id}-${s}`;
   return (
     <svg viewBox="0 0 150 150" className="chiv-frailejon-svg" aria-hidden="true" width="100%">
-      {isB && (
-        <defs>
-          <linearGradient id={g('hoja')} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#c8d2b4" />
-            <stop offset="100%" stopColor="#8ea07a" />
-          </linearGradient>
-          <radialGradient id={g('flor')} cx="42%" cy="38%" r="62%">
-            <stop offset="0" stopColor="#ffe17a" />
-            <stop offset="70%" stopColor="#f4c430" />
-            <stop offset="100%" stopColor="#d59f18" />
-          </radialGradient>
-        </defs>
-      )}
+      <defs>
+        <linearGradient id={g('hoja')} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#c8d2b4" />
+          <stop offset="100%" stopColor="#8ea07a" />
+        </linearGradient>
+        <radialGradient id={g('flor')} cx="42%" cy="38%" r="62%">
+          <stop offset="0" stopColor="#ffe17a" />
+          <stop offset="70%" stopColor="#f4c430" />
+          <stop offset="100%" stopColor="#d59f18" />
+        </radialGradient>
+      </defs>
 
       {/* ROSETA de hojas plateadas afelpadas, radiando desde el centro-abajo */}
       <g>
@@ -308,37 +231,30 @@ function FrailejonSVG({ mockup, id }) {
           <g key={i} transform={`translate(75 128) rotate(${leaf.r}) scale(${leaf.s})`}>
             <path
               d="M0 0 Q-11 -46 0 -92 Q11 -46 0 0 Z"
-              fill={isB ? `url(#${g('hoja')})` : '#a9b790'}
-              stroke={isB ? '#7d8e68' : '#8ea077'}
+              fill={`url(#${g('hoja')})`}
+              stroke="#7d8e68"
               strokeWidth="1"
             />
-            {isB && (
-              <>
-                {/* nervadura central */}
-                <path d="M0 -4 L0 -86" stroke="#7d8e68" strokeWidth="0.8" opacity="0.6" fill="none" />
-                {/* pelusa afelpada (líneas finas) */}
-                <g stroke="#e4ecd6" strokeWidth="0.5" opacity="0.55" fill="none">
-                  <path d="M0 -20 L-5 -30" /><path d="M0 -40 L-5 -50" /><path d="M0 -60 L-5 -68" />
-                  <path d="M0 -30 L5 -40" /><path d="M0 -50 L5 -58" />
-                </g>
-              </>
-            )}
+            {/* nervadura central */}
+            <path d="M0 -4 L0 -86" stroke="#7d8e68" strokeWidth="0.8" opacity="0.6" fill="none" />
+            {/* pelusa afelpada (líneas finas) */}
+            <g stroke="#e4ecd6" strokeWidth="0.5" opacity="0.55" fill="none">
+              <path d="M0 -20 L-5 -30" /><path d="M0 -40 L-5 -50" /><path d="M0 -60 L-5 -68" />
+              <path d="M0 -30 L5 -40" /><path d="M0 -50 L5 -58" />
+            </g>
           </g>
         ))}
       </g>
 
       {/* tallo floral que se alza de la roseta */}
-      <path d="M75 60 Q78 40 88 30" fill="none" stroke={isB ? '#8a9a6f' : '#93a377'} strokeWidth="3" strokeLinecap="round" />
+      <path d="M75 60 Q78 40 88 30" fill="none" stroke="#8a9a6f" strokeWidth="3" strokeLinecap="round" />
 
       {/* RACIMO de flores amarillas del frailejón (varios capítulos) */}
       <g>
-        {(isB
-          ? [[88, 28, 11], [74, 34, 9], [100, 36, 8.5], [86, 44, 7.5], [96, 24, 7]]
-          : [[88, 28, 10], [74, 34, 8], [100, 36, 8], [88, 44, 7]]
-        ).map(([cx, cy, r], i) => (
+        {[[88, 28, 11], [74, 34, 9], [100, 36, 8.5], [86, 44, 7.5], [96, 24, 7]].map(([cx, cy, r], i) => (
           <g key={i}>
             {/* pétalos radiales (rayos del capítulo) */}
-            {isB && Array.from({ length: 12 }).map((_, k) => {
+            {Array.from({ length: 12 }).map((_, k) => {
               const a = (k / 12) * Math.PI * 2;
               return (
                 <line
@@ -349,9 +265,9 @@ function FrailejonSVG({ mockup, id }) {
                 />
               );
             })}
-            <circle cx={cx} cy={cy} r={r} fill={isB ? `url(#${g('flor')})` : '#f4c430'} />
+            <circle cx={cx} cy={cy} r={r} fill={`url(#${g('flor')})`} />
             {/* disco central */}
-            <circle cx={cx} cy={cy} r={r * 0.5} fill={isB ? '#c98f14' : '#d59f18'} opacity="0.9" />
+            <circle cx={cx} cy={cy} r={r * 0.5} fill="#c98f14" opacity="0.9" />
           </g>
         ))}
       </g>
@@ -362,10 +278,15 @@ function FrailejonSVG({ mockup, id }) {
 /**
  * ChivitoEscena — HERO del home: el chivito tomando néctar de la flor amarilla
  * del frailejón (roseta plateada + flores amarillas). La simbiosis real del
- * páramo. Animado sutil (el ave se acerca/retira de la flor, aletea), respeta
- * prefers-reduced-motion. `mockup` = 'a' | 'b'.
+ * páramo.
+ *
+ * Composición: el ave ocupa el 55% del ancho de la escena (integrada, ni
+ * gigante ni perdida) y va posicionada (CSS `.chiv-ave-wrap`) de modo que la
+ * punta del pico quede sobre el racimo de flores. El vuelo estacionario
+ * (`chiv-sip`) la acerca y retira de la flor con una pausa al libar. Respeta
+ * prefers-reduced-motion.
  */
-export function ChivitoEscena({ mockup = 'b', size = 200, ariaLabel = 'Chivito de páramo tomando néctar de la flor del frailejón' }) {
+export function ChivitoEscena({ size = 200, ariaLabel = 'Chivito de páramo tomando néctar de la flor del frailejón' }) {
   const id = useUid('chiv-esc');
   return (
     <span
@@ -375,10 +296,10 @@ export function ChivitoEscena({ mockup = 'b', size = 200, ariaLabel = 'Chivito d
       aria-label={ariaLabel}
     >
       <span className="chiv-frailejon-wrap" style={{ width: size, height: size, display: 'block' }}>
-        <FrailejonSVG mockup={mockup} id={id} />
+        <FrailejonSVG id={id} />
       </span>
       <span className="chiv-ave-wrap">
-        <ChivitoAve mockup={mockup} size={size * 0.62} flap ariaLabel={undefined} />
+        <ChivitoAve size={Math.round(size * 0.55)} flap ariaLabel={undefined} />
       </span>
     </span>
   );
@@ -387,13 +308,13 @@ export function ChivitoEscena({ mockup = 'b', size = 200, ariaLabel = 'Chivito d
 /**
  * ChivitoBoton — el chivito ES el icono del botón enviar/hablar del agente.
  * Encuadre compacto (cabeza + barba + cuerpo) centrado en el botón circular.
- * `state` 'thinking'|'speaking' inclina al ave como para libar. `mockup`='a'|'b'.
+ * `state` 'thinking'|'speaking' inclina al ave como para libar.
  */
-export function ChivitoBoton({ mockup = 'b', size = 38, state = 'idle', ariaLabel = 'Enviar al agente' }) {
+export function ChivitoBoton({ size = 38, state = 'idle', ariaLabel = 'Enviar al agente' }) {
   const active = state === 'thinking' || state === 'speaking';
   return (
     <span className={`chiv-boton ${active ? 'is-active' : ''}`} role="img" aria-label={ariaLabel}>
-      <ChivitoAve mockup={mockup} size={size} flap ariaLabel={undefined} />
+      <ChivitoAve size={size} flap ariaLabel={undefined} />
     </span>
   );
 }
@@ -401,13 +322,12 @@ export function ChivitoBoton({ mockup = 'b', size = 38, state = 'idle', ariaLabe
 /**
  * ChivitoCruza — TRANSICIÓN home→agente: el chivito cruza aleteando en arco,
  * UNA pasada. Respeta reduced-motion (sin cruce; el padre acorta la transición).
- * `mockup` = 'a' | 'b'.
  */
-export function ChivitoCruza({ mockup = 'b', size = 170, className = '' }) {
+export function ChivitoCruza({ size = 170, className = '' }) {
   const [reduce] = useState(() => prefersReducedMotion());
   return (
     <span className={`chiv-cruza ${className}`.trim()} style={{ width: size }} aria-hidden="true">
-      <ChivitoAve mockup={mockup} size={size} flap={!reduce} ariaLabel={undefined} />
+      <ChivitoAve size={size} flap={!reduce} ariaLabel={undefined} />
     </span>
   );
 }

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { colibriRealActivo } from '../../config/colibriFlag';
 import { BarbuditoFlor } from '../colibri/Barbudito';
-import { chivitoMockup } from '../../config/chivitoFlag';
+import { chivitoActivo } from '../../config/chivitoFlag';
 import { ChivitoCruza } from '../chivito/Chivito';
 
 /**
@@ -50,10 +50,10 @@ export const CHIVITO_TRANSITION_HOLD_MS = 1500;
 // Gateado por VITE_COLIBRI (dev-only). Se evalúa una sola vez (flag de build).
 const COLIBRI_REAL = colibriRealActivo();
 
-// ¿Transición con el CHIVITO de páramo cruzando aleteando (SVG/CSS vivo)?
-// Gateado por VITE_CHIVITO (dev-only). Tiene precedencia sobre VITE_COLIBRI.
-// 'ab' = cruzan los dos mockups en paralelo (A arriba, B abajo) para comparar.
-const CHIVITO = chivitoMockup();
+// ¿Transición con el CHIVITO de páramo cruzando aleteando (SVG/CSS vivo,
+// diseño definitivo)? Gateado por VITE_CHIVITO (dev-only). Tiene precedencia
+// sobre VITE_COLIBRI.
+const CHIVITO = chivitoActivo();
 
 function prefersReducedMotion() {
   return typeof window !== 'undefined' && typeof window.matchMedia === 'function'
@@ -158,16 +158,8 @@ function ColibriOverlay({ onDone }) {
     >
       <style>{CSS}</style>
       {CHIVITO ? (
-        // El CHIVITO de páramo cruza aleteando (SVG/CSS vivo, universal). En A/B
-        // cruzan los dos mockups (A arriba, B abajo) para compararlos.
-        CHIVITO === 'ab' ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6vh', alignItems: 'center' }}>
-            <ChivitoCruza mockup="a" size={150} />
-            <ChivitoCruza mockup="b" size={150} />
-          </div>
-        ) : (
-          <ChivitoCruza mockup={CHIVITO} size={190} />
-        )
+        // El CHIVITO de páramo cruza aleteando (SVG/CSS vivo, universal).
+        <ChivitoCruza size={190} />
       ) : COLIBRI_REAL && !reduce ? (
         // Clip de la FLOR del frailejón: el barbudito tomando néctar, grande y
         // centrado, con fade suave. H.264 sin alpha → universal (incl. iOS).

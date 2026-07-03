@@ -7,7 +7,7 @@ import { agentSounds } from '../services/agentSoundService';
 import { fvhSkinClass } from '../config/fvhSkin';
 import { colibriRealActivo } from '../config/colibriFlag';
 import { BarbuditoPosado } from './colibri/Barbudito';
-import { chivitoMockup } from '../config/chivitoFlag';
+import { chivitoActivo } from '../config/chivitoFlag';
 import { ChivitoBoton } from './chivito/Chivito';
 import './agent-fab-skin.css';
 
@@ -16,10 +16,9 @@ import './agent-fab-skin.css';
 // (ChagraAgentAvatar). Se evalúa una sola vez (flag de build).
 const COLIBRI_REAL = colibriRealActivo();
 
-// ¿El FAB = CHIVITO de páramo (SVG/CSS vivo)? Gateado por VITE_CHIVITO (dev).
-// Tiene precedencia sobre VITE_COLIBRI. En A/B usa Mockup B (más rico).
-const CHIVITO = chivitoMockup();
-const CHIVITO_FAB = CHIVITO === 'ab' ? 'b' : CHIVITO;
+// ¿El FAB = CHIVITO de páramo (SVG/CSS vivo, diseño definitivo)? Gateado por
+// VITE_CHIVITO (dev). Tiene precedencia sobre VITE_COLIBRI.
+const CHIVITO = chivitoActivo();
 
 /**
  * AgentFab — Floating Action Button para abrir el agente Chagra IA.
@@ -142,9 +141,9 @@ export default function AgentFab({ onNavigate }) {
         transition: 'transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease, background .25s ease, border-color .25s ease',
       }}
     >
-      {CHIVITO_FAB ? (
+      {CHIVITO ? (
         // CHIVITO de páramo (SVG/CSS vivo) como avatar del FAB.
-        <ChivitoBoton mockup={CHIVITO_FAB} size={42} state={state} ariaLabel="Chagra IA" />
+        <ChivitoBoton size={42} state={state} ariaLabel="Chagra IA" />
       ) : COLIBRI_REAL ? (
         // Colibrí REAL (barbudito POSADO recortado), con un leve flotar. El
         // botón ya es circular y recorta (overflow:hidden).

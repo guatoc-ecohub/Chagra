@@ -60,7 +60,10 @@ jobs:
           # transición. Dev-only para revisión del operador; AUSENTE en
           # deploy.yml (prod) → prod conserva el colibrí 2D / video actual.
           VITE_COLIBRI: "true"
-          VITE_CHIVITO: "ab"
+          # Chivito de páramo (SVG/CSS vivo, diseño definitivo ya elegido) en
+          # home + botón + FAB + transición. Tiene precedencia sobre
+          # VITE_COLIBRI. Dev-only; AUSENTE en deploy.yml (prod).
+          VITE_CHIVITO: "true"
           VITE_CHAGRA_MCP_TOKEN: ${{ secrets.VITE_CHAGRA_MCP_TOKEN }}
 
       - if: env.SKIP_DEPLOY != '1'
