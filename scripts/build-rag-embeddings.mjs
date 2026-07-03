@@ -152,7 +152,14 @@ async function main() {
   console.log(`  Tamaño: ${(stats.bytes / 1024).toFixed(1)} KB (${(stats.bytes / (1024 * 1024)).toFixed(2)} MB)`);
 }
 
-main().catch((err) => {
-  console.error(`[build-rag-embeddings] ERROR: ${err.message}`);
-  process.exit(1);
-});
+const IS_CLI = import.meta.url === 'file://' + process.argv[1];
+
+export { main };
+export { extractPassageText };
+
+if (IS_CLI) {
+  main().catch((err) => {
+    console.error(`[build-rag-embeddings] ERROR: ${err.message}`);
+    process.exit(1);
+  });
+}
