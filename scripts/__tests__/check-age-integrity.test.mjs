@@ -65,8 +65,100 @@ describe('checkAgeIntegrity catalog mode', function () {
   });
 });
 
+describe('checkAgeIntegrity self-loops', function () {
+  it('detects self-loop edge (source === target)', function () {
+    var dump = {
+      nodes: [
+        mkNode('a', ['Species'], { origin_layer: 'Co' }),
+        mkNode('b', ['Species'], { origin_layer: 'NON-Co' }),
+      ],
+      edges: [mkEdge('a', 'a'), mkEdge('a', 'b')],
+    };
+    var r = checkAgeIntegrity(dump);
+    expect(r.stats.selfLoops).toBe(1);
+    expect(
+      r.errors.filter(function (e) { return e.indexOf('Self-loop') >= 0; }).length
+    ).toBe(1);
+  });
+  it('does not flag normal edges as self-loops', function () {
+    var dump = {
+      nodes: [
+        mkNode('a', ['Species'], { origin_layer: 'Co' }),
+        mkNode('b', ['Species'], { origin_layer: 'NON-Co' }),
+      ],
+      edges: [mkEdge('a', 'b')],
+    };
+    expect(checkAgeIntegrity(dump).stats.selfLoops).toBe(0);
+  });
+  it('reports multiple self-loops independently', function () {
+    var dump = {
+      nodes: [
+        mkNode('a', ['Species'], { origin_layer: 'Co' }),
+        mkNode('b', ['Species'], { origin_layer: 'NON-Co' }),
+      ],
+      edges: [mkEdge('a', 'a'), mkEdge('b', 'b')],
+    };
+    expect(checkAgeIntegrity(dump).stats.selfLoops).toBe(2);
+  });
+});
+
+describe('checkAgeIntegrity duplicate edges', function () {
+  it('detects duplicate edge (same source+target+label)', function () {
+    var dump = {
+      nodes: [
+        mkNode('a', ['Species'], { origin_layer: 'Co' }),
+        mkNode('b', ['Species'], { origin_layer: 'NON-Co' }),
+      ],
+      edges: [mkEdge('a', 'b'), mkEdge('a', 'b')],
+    };
+    var r = checkAgeIntegrity(dump);
+    expect(r.stats.duplicateEdges).toBe(1);
+    expect(
+      r.errors.filter(function (e) { return e.indexOf('Duplicate') >= 0; }).length
+    ).toBe(1);
+  });
+  it('same source+target but different label is NOT duplicate', function () {
+    var dump = {
+      nodes: [
+        mkNode('a', ['Species'], { origin_layer: 'Co' }),
+        mkNode('b', ['Species'], { origin_layer: 'NON-Co' }),
+      ],
+      edges: [
+        mkEdge('a', 'b', 'COMPATIBLE_WITH'),
+        mkEdge('a', 'b', 'ANTAGONIST_OF'),
+      ],
+    };
+    expect(checkAgeIntegrity(dump).stats.duplicateEdges).toBe(0);
+  });
+  it('reversed direction is NOT duplicate', function () {
+    var dump = {
+      nodes: [
+        mkNode('a', ['Species'], { origin_layer: 'Co' }),
+        mkNode('b', ['Species'], { origin_layer: 'NON-Co' }),
+      ],
+      edges: [mkEdge('a', 'b'), mkEdge('b', 'a')],
+    };
+    expect(checkAgeIntegrity(dump).stats.duplicateEdges).toBe(0);
+  });
+  it('does not flag a single edge as duplicate', function () {
+    var dump = {
+      nodes: [
+        mkNode('a', ['Species'], { origin_layer: 'Co' }),
+        mkNode('b', ['Species'], { origin_layer: 'NON-Co' }),
+      ],
+      edges: [mkEdge('a', 'b')],
+    };
+    expect(checkAgeIntegrity(dump).stats.duplicateEdges).toBe(0);
+  });
+});
+
 describe('checkAgeIntegrity empty', function () {
   it('empty graph is valid', function () {
     expect(checkAgeIntegrity({ nodes: [], edges: [] }).errors).toEqual([]);
+  });
+  it('empty graph reports zero selfLoops and duplicateEdges', function () {
+    var r = checkAgeIntegrity({ nodes: [], edges: [] });
+    expect(r.stats.selfLoops).toBe(0);
+    expect(r.stats.duplicateEdges).toBe(0);
   });
 });

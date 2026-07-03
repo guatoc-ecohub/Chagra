@@ -17,7 +17,15 @@ export function isValidOriginLayer(layer) {
 export function checkAgeIntegrity(data, opts) {
   opts = opts || {};
   const errors = [];
-  const stats = { nodes: 0, edges: 0, orphans: 0, invalidEdges: 0, invalidOriginLayer: 0 };
+  const stats = {
+    nodes: 0,
+    edges: 0,
+    orphans: 0,
+    invalidEdges: 0,
+    invalidOriginLayer: 0,
+    selfLoops: 0,
+    duplicateEdges: 0,
+  };
 
   let nodes;
   let edges;
@@ -50,7 +58,27 @@ export function checkAgeIntegrity(data, opts) {
     }
   }
 
+  const seenEdgeKeys = new Set();
   for (const edge of edges) {
+    if (edge.source === edge.target) {
+      errors.push(
+        'Self-loop edge: ' + edge.source + ' -> ' + edge.target +
+        ' (' + (edge.label || 'UNKNOWN') + ')'
+      );
+      stats.selfLoops++;
+    }
+
+    const edgeKey = edge.source + '|' + edge.target + '|' + (edge.label || '');
+    if (seenEdgeKeys.has(edgeKey)) {
+      errors.push(
+        'Duplicate edge: ' + edge.source + ' -> ' + edge.target +
+        ' (' + (edge.label || 'UNKNOWN') + ')'
+      );
+      stats.duplicateEdges++;
+    } else {
+      seenEdgeKeys.add(edgeKey);
+    }
+
     if (!nodeIds.has(edge.source)) {
       errors.push('Invalid edge source: ' + edge.source);
       stats.invalidEdges++;
