@@ -47,7 +47,7 @@
 .fvh-resto-grip {
   width: 44px;
   height: 5px;
-  border-radius: 999px;
+  border-radius: var(--r-pill, 999px);
   background: rgba(63, 143, 78, 0.30);
   margin: 8px auto 14px;
 }
@@ -67,7 +67,7 @@
   content: '';
   width: 6px;
   height: 18px;
-  border-radius: 999px;
+  border-radius: var(--r-pill, 999px);
   background: linear-gradient(180deg, #4ade80, #2f6b3a);
 }
 .fvh-resto-sub {

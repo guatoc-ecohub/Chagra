@@ -109,7 +109,7 @@
   gap: 12px;
   width: 100%;
   padding: 16px;
-  border-radius: 16px;
+  border-radius: var(--r-md, 16px);
   background:
     linear-gradient(135deg, rgba(var(--t-accent-rgb), 0.14), rgb(var(--c-surface-card) / 0.96) 42%),
     rgb(var(--c-surface-card));

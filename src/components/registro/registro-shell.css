@@ -102,7 +102,7 @@
   letter-spacing: 0.01em;
 }
 .registro-field__hint {
-  font-size: 0.78rem;
+  font-size: var(--fs-nota, 0.78rem);
   color: rgb(var(--c-slate-500));
   font-weight: 500;
 }
@@ -113,8 +113,8 @@
   width: 100%;
   min-height: 60px;
   padding: 0.9rem 1rem;
-  font-size: 1.15rem;
-  border-radius: 1rem;
+  font-size: var(--fs-cuerpo-lg, 1.15rem);
+  border-radius: var(--r-md, 1rem);
   background: rgb(var(--c-surface-card));
   border: 1.5px solid rgb(var(--c-surface-border));
   color: rgb(var(--c-slate-100));
@@ -190,12 +190,12 @@
 
 /* Tarjeta de "consejo / contexto" — microcopy campesino con identidad. */
 .registro-tip {
-  border-radius: 1rem;
+  border-radius: var(--r-md, 1rem);
   padding: 0.85rem 1rem;
   background: rgb(var(--t-accent-rgb) / 0.10);
   border: 1px solid rgb(var(--t-accent-rgb) / 0.28);
   color: rgb(var(--c-slate-200));
-  font-size: 0.9rem;
+  font-size: var(--fs-cuerpo-sm, 0.9rem);
   line-height: 1.45;
   display: flex;
   gap: 0.6rem;
@@ -213,13 +213,13 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.55rem 0.9rem;
-  border-radius: 999px;
+  border-radius: var(--r-pill, 999px);
   font-size: 0.92rem;
   font-weight: 700;
   background: rgb(var(--c-surface-raised));
   border: 1.5px solid rgb(var(--c-surface-border));
   color: rgb(var(--c-slate-300));
-  transition: all 0.12s ease;
+  transition: all var(--dur-tap, 0.12s) ease;
 }
 .registro-chip--active {
   background: rgb(var(--t-accent-rgb) / 0.16);
