@@ -127,12 +127,15 @@ export default function CriticalAlertBanner({ onNavigate }) {
       role="alert"
       aria-live="assertive"
       data-testid="critical-alert-banner"
-      className="fixed top-0 inset-x-0 z-[120] bg-red-950/95 border-b-2 border-red-500 backdrop-blur-sm shadow-lg shadow-red-900/40"
+      className="fixed top-0 inset-x-0 z-[120] bg-gradient-to-r from-red-950/95 via-red-900/95 to-red-950/95 border-b-2 border-red-400 backdrop-blur-sm shadow-lg shadow-red-900/50"
     >
+      {/* Fondo rojo oscuro FIJO (no theme-aware a propósito): una crítica se ve
+          igual de alarmante en biopunk y en los temas claros; el texto claro
+          sobre rojo profundo mantiene contraste AA en todos. */}
       <div className="max-w-2xl mx-auto px-3 py-2.5 flex items-start gap-3">
         <span className="relative flex h-6 w-6 shrink-0 items-center justify-center mt-0.5">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500/60" />
-          <AlertTriangle size={20} className="relative text-red-200" />
+          <span className="absolute inline-flex h-full w-full motion-safe:animate-ping rounded-full bg-red-500/60" />
+          <AlertTriangle size={20} className="relative text-red-100" />
         </span>
         <button
           type="button"
@@ -140,17 +143,17 @@ export default function CriticalAlertBanner({ onNavigate }) {
           className="flex-1 text-left min-w-0"
           aria-label={`${top.title}. ${top.cta_label || 'Ver detalle'}`}
         >
-          <p className="text-sm font-bold text-red-100 leading-tight">{top.title}</p>
+          <p className="text-sm font-black text-white leading-tight">{top.title}</p>
           {top.body && (
-            <p className="text-xs text-red-200/90 mt-0.5 line-clamp-2">{top.body}</p>
+            <p className="text-xs text-red-100/90 mt-0.5 line-clamp-2">{top.body}</p>
           )}
-          <span className="inline-flex items-center gap-1 mt-1 text-2xs font-semibold text-red-200 uppercase tracking-wide">
+          <span className="inline-flex items-center gap-1 mt-1.5 px-2.5 py-1 rounded-full bg-red-500/25 border border-red-300/40 text-2xs font-bold text-red-50 uppercase tracking-wide">
             {top.cta_label || 'Ver detalle'}
             <ChevronRight size={12} />
-            {extraCount > 0 && (
-              <span className="ml-2 normal-case opacity-80">+{extraCount} más crítica{extraCount === 1 ? '' : 's'}</span>
-            )}
           </span>
+          {extraCount > 0 && (
+            <span className="ml-2 text-2xs font-semibold text-red-200/90">+{extraCount} más crítica{extraCount === 1 ? '' : 's'}</span>
+          )}
         </button>
         <button
           type="button"

@@ -44,23 +44,30 @@ const OLLAMA_URL = '/api/ollama';
 // Cooldown de idempotencia persistente (delegado a sync_meta vía assetCache)
 const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutos
 
-// Utilidades de formateo condicional
-const getHumidityColor = (humidity) => {
+// Utilidades de formateo condicional (SOLO presentación — mismos umbrales).
+// Devuelven meta visual { tone, cls, label } por lectura:
+//   tone  → estado semántico (ok | warn | alert | nodata) que IoTSensorCard
+//           usa para diferenciar el contenedor del readout (borde/fondo).
+//   cls   → clase de color del número. Se eligen clases del "safe set"
+//           theme-aware: emerald-* va por tokens CSS-var y rose-300/sky-300
+//           tienen override global en themes.css para los temas claros.
+//   label → etiqueta corta de estado, legible al sol (no solo color).
+const getHumidityMeta = (humidity) => {
   const value = parseFloat(humidity);
-  if (isNaN(value)) return 'text-slate-400';
+  if (isNaN(value)) return { tone: 'nodata', cls: 'text-slate-400', label: 'Sin dato' };
 
-  if (value < 40) return 'text-red-500'; // Humedad crítica
-  if (value <= 70) return 'text-green-500'; // Humedad óptima
-  return 'text-blue-500'; // Humedad saturada
+  if (value < 40) return { tone: 'alert', cls: 'text-rose-300', label: 'Crítica' }; // Humedad crítica
+  if (value <= 70) return { tone: 'ok', cls: 'text-emerald-300', label: 'Óptima' }; // Humedad óptima
+  return { tone: 'warn', cls: 'text-sky-300', label: 'Saturada' }; // Humedad saturada
 };
 
-const getTemperatureColor = (temperature) => {
+const getTemperatureMeta = (temperature) => {
   const value = parseFloat(temperature);
-  if (isNaN(value)) return 'text-slate-400';
+  if (isNaN(value)) return { tone: 'nodata', cls: 'text-slate-400', label: 'Sin dato' };
 
-  if (value < 12) return 'text-blue-400'; // Frío
-  if (value <= 28) return 'text-green-500'; // Óptimo
-  return 'text-red-500'; // Calor crítico
+  if (value < 12) return { tone: 'warn', cls: 'text-sky-300', label: 'Fría' }; // Frío
+  if (value <= 28) return { tone: 'ok', cls: 'text-emerald-300', label: 'Óptima' }; // Óptimo
+  return { tone: 'alert', cls: 'text-rose-300', label: 'Calor crítico' }; // Calor crítico
 };
 
 export default function TelemetryAlerts() {
@@ -731,7 +738,7 @@ export default function TelemetryAlerts() {
             </div>
           </>
         ) : (
-          <div className="motion-safe:animate-glitch-in">
+          <div className="motion-safe:animate-glitch-in space-y-3">
             {wateringEffect && (
               <div className="mb-3 p-3 rounded-xl bg-cyan-950/40 border border-cyan-700/50 text-cyan-200 text-xs flex items-center gap-2 motion-safe:animate-pulse">
                 <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -754,8 +761,8 @@ export default function TelemetryAlerts() {
                 : sensors.invernaderoTemperature}
               humidityHistory={sensorHistory['sensor.matera_cocina_humidity']}
               temperatureHistory={sensorHistory['sensor.matera_cocina_temperature']}
-              getHumidityColor={getHumidityColor}
-              getTemperatureColor={getTemperatureColor}
+              getHumidityMeta={getHumidityMeta}
+              getTemperatureMeta={getTemperatureMeta}
             />
             <IoTSensorCard
               title="MATERA TABACO"
@@ -768,8 +775,8 @@ export default function TelemetryAlerts() {
                 : sensors.tabacoTemperature}
               humidityHistory={sensorHistory['sensor.hobeian_zg_303z_humidity']}
               temperatureHistory={sensorHistory['sensor.hobeian_zg_303z_temperature']}
-              getHumidityColor={getHumidityColor}
-              getTemperatureColor={getTemperatureColor}
+              getHumidityMeta={getHumidityMeta}
+              getTemperatureMeta={getTemperatureMeta}
             />
           </div>
         )}
@@ -859,23 +866,32 @@ export default function TelemetryAlerts() {
                       </div>
                     );
                   }
+                  // Severidad visual por tipo de alerta (SOLO presentación):
+                  //   🚨/🔥 crítico  → rose (acción inmediata)
+                  //   💧/❄️ ambiental → sky (agua/frío)
+                  //   ⚠️ operativo    → amber (revisar)
+                  // Clases del safe set theme-aware (override en themes.css
+                  // para temas claros) + borde izquierdo grueso para que la
+                  // jerarquía se lea también al sol, no solo por el tinte.
+                  const severityCls = (line) => {
+                    if (/^(🚨|🔥)/.test(line))
+                      return 'bg-rose-950/20 border border-rose-500/40 border-l-4 border-l-rose-500 text-rose-200 font-semibold';
+                    if (/^(💧|❄️)/.test(line))
+                      return 'bg-sky-950/40 border border-sky-500/40 border-l-4 border-l-sky-400 text-sky-200 font-medium';
+                    if (/^⚠️/.test(line))
+                      return 'bg-amber-500/10 border border-amber-500/40 border-l-4 border-l-amber-400 text-amber-200 font-medium';
+                    return 'text-slate-300';
+                  };
                   return (
                     <ul className="space-y-1.5">
-                      {lines.map((line, idx) => {
-                        const isAlert = /^(🚨|💧|🔥|❄️|⚠️)/.test(line);
-                        return (
-                          <li
-                            key={idx}
-                            className={`flex items-start gap-2 text-sm leading-relaxed rounded-lg px-3 py-2 ${
-                              isAlert
-                                ? 'bg-amber-950/30 border border-amber-800/50 text-amber-200'
-                                : 'text-slate-300'
-                            }`}
-                          >
-                            <span className="leading-snug">{line}</span>
-                          </li>
-                        );
-                      })}
+                      {lines.map((line, idx) => (
+                        <li
+                          key={idx}
+                          className={`flex items-start gap-2 text-sm leading-relaxed rounded-lg px-3 py-2 ${severityCls(line)}`}
+                        >
+                          <span className="leading-snug">{line}</span>
+                        </li>
+                      ))}
                     </ul>
                   );
                 })()}

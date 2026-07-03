@@ -96,34 +96,36 @@ export default function SensorInsightCard({ sensors = [], onNavigate }) {
         <button
             type="button"
             onClick={() => onNavigate?.('mapa')}
-            className="group relative w-full text-left rounded-2xl bg-gradient-to-br from-cyan-500/10 via-emerald-500/8 to-violet-500/10 backdrop-blur-xl border border-cyan-700/30 p-4 transition-all active:scale-[0.98] hover:border-cyan-500/50 mt-3"
+            className="group relative w-full text-left rounded-2xl bg-gradient-to-br from-morpho/10 via-emerald-500/8 to-orchid/10 backdrop-blur-xl border border-morpho/30 p-4 transition-all active:scale-[0.98] hover:border-morpho/60 mt-3"
             style={{
                 opacity: animateIn ? 1 : 0,
                 transform: animateIn ? 'translateY(0)' : 'translateY(8px)',
                 transition: 'opacity 600ms ease-out, transform 600ms ease-out',
             }}
         >
+            {/* Tokens morpho/orchid (theme-aware) en vez de cyan/violet crudo:
+                neón en biopunk, salvia/terracota legibles en los temas claros. */}
             <div className="flex items-center gap-3">
-                <div className="shrink-0 w-11 h-11 rounded-xl bg-black/35 flex items-center justify-center relative">
-                    <Activity size={20} className="text-cyan-300" />
+                <div className="shrink-0 w-11 h-11 rounded-xl bg-slate-950/50 border border-morpho/20 flex items-center justify-center relative">
+                    <Activity size={20} className="text-morpho-glow" />
                     {/* Pulse indicator */}
-                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-morpho motion-safe:animate-pulse" />
                 </div>
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                         <Icon size={14} className={color} />
-                        <h3 className="text-xs font-bold text-cyan-200 uppercase tracking-wider">
+                        <h3 className="text-xs font-bold text-morpho-glow uppercase tracking-wider">
                             {title}
                         </h3>
-                        <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-cyan-500/20 text-cyan-200 uppercase tracking-wider">
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-morpho/20 text-morpho-glow uppercase tracking-wider">
                             IA
                         </span>
                     </div>
-                    <p className={`text-sm font-medium mt-1 leading-snug ${color}`}>
+                    <p className={`text-sm font-semibold mt-1 leading-snug ${color}`}>
                         {line}
                     </p>
                 </div>
-                <span className="shrink-0 text-xs text-slate-400 group-hover:text-cyan-300 transition-colors">
+                <span className="shrink-0 text-xs font-bold text-slate-400 group-hover:text-morpho-glow transition-colors">
                     {cta} →
                 </span>
             </div>

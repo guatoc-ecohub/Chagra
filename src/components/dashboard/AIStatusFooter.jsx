@@ -63,9 +63,12 @@ function getSensorChip(sensors) {
     if (!label) label = `${sensors.length} sensor${sensors.length === 1 ? '' : 'es'}`;
 
     const sub = stale > 0 ? `${stale} sin update` : 'al día';
+    // Semáforo del chip: todo caído = rose, parcial/extremos = amber, sano =
+    // emerald. Bordes /50 + fondos /15 para que el estado se distinga también
+    // con brillo de sol directo (antes /40 y /10 se lavaban).
     const color = stale === sensors.length ? 'text-rose-300' : (stale > 0 ? 'text-amber-300' : 'text-emerald-300');
-    const bg = stale === sensors.length ? 'bg-rose-500/10' : (stale > 0 ? 'bg-amber-500/10' : 'bg-emerald-500/10');
-    const border = stale === sensors.length ? 'border-rose-600/40' : (stale > 0 ? 'border-amber-600/40' : 'border-emerald-600/40');
+    const bg = stale === sensors.length ? 'bg-rose-500/15' : (stale > 0 ? 'bg-amber-500/15' : 'bg-emerald-500/15');
+    const border = stale === sensors.length ? 'border-rose-500/50' : (stale > 0 ? 'border-amber-500/50' : 'border-emerald-500/50');
     return {
         Icon: stale === sensors.length ? WifiOff : ThermometerSun,
         label,
@@ -88,12 +91,16 @@ function getClimaChip(snapshot) {
         };
     }
     const enso = snapshot.enso_status || 'neutral';
+    // Escala ENSO como rampa de riesgo: neutral (morpho, token theme-aware)
+    // → Niña (sky, húmedo) → Niño débil (amber) → moderado (orange) → fuerte
+    // (rose). Textos -300 del safe set (override en themes.css para claros);
+    // bordes /50 y fondos /15 para legibilidad exterior.
     const ensoColors = {
-        neutral: { color: 'text-cyan-300', bg: 'bg-cyan-500/10', border: 'border-cyan-600/40' },
-        nina: { color: 'text-blue-300', bg: 'bg-blue-500/10', border: 'border-blue-600/40' },
-        nino_debil: { color: 'text-amber-300', bg: 'bg-amber-500/10', border: 'border-amber-600/40' },
-        nino_moderado: { color: 'text-orange-300', bg: 'bg-orange-500/10', border: 'border-orange-600/40' },
-        nino_fuerte: { color: 'text-rose-300', bg: 'bg-rose-500/10', border: 'border-rose-600/40' },
+        neutral: { color: 'text-morpho-glow', bg: 'bg-morpho/10', border: 'border-morpho/50' },
+        nina: { color: 'text-sky-300', bg: 'bg-sky-500/15', border: 'border-sky-500/50' },
+        nino_debil: { color: 'text-amber-300', bg: 'bg-amber-500/15', border: 'border-amber-500/50' },
+        nino_moderado: { color: 'text-orange-300', bg: 'bg-orange-500/15', border: 'border-orange-500/50' },
+        nino_fuerte: { color: 'text-rose-300', bg: 'bg-rose-500/15', border: 'border-rose-500/50' },
     };
     const c = ensoColors[enso] || ensoColors.neutral;
     const labelByEnso = {
@@ -123,17 +130,19 @@ function getAgentChip(hint) {
             label: 'Agente listo',
             sub: 'Pregúntame algo',
             color: 'text-emerald-300',
-            bg: 'bg-emerald-500/10',
-            border: 'border-emerald-600/40',
+            bg: 'bg-emerald-500/15',
+            border: 'border-emerald-500/50',
         };
     }
+    // orchid = token IA generativa del design system (magenta en biopunk,
+    // terracota/ocre en los temas claros) — coherente con AIStreamPanel.
     return {
         Icon: Sparkles,
         label: 'Sugerencia',
         sub: hint.length > 30 ? hint.slice(0, 30) + '…' : hint,
-        color: 'text-violet-300',
-        bg: 'bg-violet-500/10',
-        border: 'border-violet-600/40',
+        color: 'text-orchid-glow',
+        bg: 'bg-orchid/10',
+        border: 'border-orchid/50',
     };
 }
 
@@ -147,8 +156,8 @@ function Chip({ Icon, label, sub, color, bg, border, onClick, ariaLabel }) {
         >
             <Icon size={18} className={`shrink-0 ${color}`} />
             <div className="flex flex-col items-start min-w-0">
-                <span className={`text-xs font-bold truncate w-full text-left ${color}`}>{label}</span>
-                <span className="text-[10px] text-slate-400 truncate w-full text-left">{sub}</span>
+                <span className={`text-xs font-black tracking-wide truncate w-full text-left ${color}`}>{label}</span>
+                <span className="text-[10px] font-medium text-slate-400 truncate w-full text-left">{sub}</span>
             </div>
         </button>
     );
@@ -175,15 +184,17 @@ export default function AIStatusFooter({ sensors = [], climaSnapshot = null, age
                 transition: 'opacity 700ms ease-out, transform 700ms ease-out',
             }}
         >
+            {/* Header con tokens morpho (theme-aware: cyan neón en biopunk,
+                salvia/verde en los temas claros) en vez de cyan-* crudo. */}
             <div className="flex items-center gap-2 mb-2 px-1">
-                <Activity size={14} className="text-cyan-400 animate-pulse" />
-                <span className="text-[10px] font-bold text-cyan-300 uppercase tracking-[0.18em]">
+                <Activity size={14} className="text-morpho motion-safe:animate-pulse" />
+                <span className="text-[10px] font-bold text-morpho-glow uppercase tracking-[0.18em]">
                     Status proactivo IA
                 </span>
-                <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-cyan-500/20 text-cyan-200 uppercase tracking-wider">
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-morpho/20 text-morpho-glow uppercase tracking-wider">
                     Live
                 </span>
-                <div className="flex-1 h-px bg-gradient-to-r from-cyan-700/40 to-transparent" />
+                <div className="flex-1 h-px bg-gradient-to-r from-morpho/40 to-transparent" />
             </div>
             <div className="flex gap-2">
                 <Chip
@@ -202,7 +213,7 @@ export default function AIStatusFooter({ sensors = [], climaSnapshot = null, age
                     ariaLabel={`Agente: ${agentChip.label}, ${agentChip.sub}`}
                 />
             </div>
-            <p className="text-[9px] text-slate-600 text-center mt-2 italic">
+            <p className="text-[9px] text-slate-500 text-center mt-2 italic">
                 Toca cualquier chip para profundizar
             </p>
         </div>
