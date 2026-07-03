@@ -107,6 +107,9 @@ import { executeAction, setActionGateCallback } from '../../services/actionExecu
 import { getToolsForLLM } from '../../services/llmTools';
 import { useRotatingTip } from '../../services/tipsService';
 import ChatHistory from './ChatHistory';
+// Pulido foto-visión 2026-07: estado "analizando su foto" compartido con
+// SpeciesSelect (fases realistas + miniatura de la foto en análisis).
+import VisionLoadingState from '../common/VisionLoadingState';
 import ActionConfirmModal from '../ActionConfirmModal';
 import FeedbackConsentModal from '../FeedbackConsentModal';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
@@ -218,6 +221,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   const aButtonRef = useRef(null);
   const [agentAttachment, setAgentAttachment] = useState(null); // {blob,mime,previewUrl,fileName}
   const [agentPickError, setAgentPickError] = useState('');
+  // Pulido foto-visión 2026-07: mientras analyzeFoliage mira la foto (20-30s
+  // en el campo) mostramos un estado "analizando su foto" amable pegado al
+  // chat, con la miniatura de la foto en análisis. Guarda el object URL de la
+  // foto (o true si no hay URL). Solo visual — la visión no se toca.
+  const [photoAnalyzingUrl, setPhotoAnalyzingUrl] = useState(null);
   const [streamingContent, setStreamingContent] = useState('');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [error, setError] = useState('');
@@ -2035,6 +2043,21 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         ...evidenceSourceLink,
         ...groundingBadges,
         auto_corrected: guarded.modified === true,
+        // Pulido foto-visión 2026-07: si ESTE turno trajo una foto real
+        // (visionContext del flujo de foto — mismo dato que ya consumen los
+        // guards), lo marcamos en metadata para que ChatBubble presente la
+        // respuesta como DIAGNÓSTICO VISUAL: encabezado propio + nivel de
+        // confianza de la visión + pie honesto "confírmelo antes de aplicar".
+        // Solo presentación — no altera la visión ni los guards.
+        ...(visionContext && visionContext.hadVision
+          ? {
+              vision_turn: true,
+              vision_confidence:
+                typeof visionContext.visionConfidence === 'number'
+                  ? visionContext.visionConfidence
+                  : null,
+            }
+          : {}),
       };
 
       // Capa 2 anti-alucinación — cross-check de contexto (operador 2026-05-30).
@@ -2771,7 +2794,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       (file.type && file.type.startsWith('image/')) ||
       isAnalyzableImageAttachment({ mime: file.type, fileName: file.name });
     if (!looksLikeImage) {
-      setAgentPickError('Por ahora solo puedo ver fotos. Mándame una foto de tu planta o cultivo.');
+      setAgentPickError('Por ahora solo puedo ver fotos. Mándeme una foto de su planta o cultivo.');
       return;
     }
     setAgentPickError('');
@@ -2782,7 +2805,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       setAgentAttachment({ blob, mime, previewUrl, fileName: file.name || 'foto.jpg', kind: 'photo' });
     } catch (err) {
       console.error('[AgentScreen] no se pudo procesar la foto:', err);
-      setAgentPickError('No pude procesar esa foto. Inténtalo de nuevo.');
+      setAgentPickError('No pude procesar esa foto. Inténtelo de nuevo.');
     }
   };
 
@@ -2814,11 +2837,19 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       };
       const { message } = buildPhotoUserMessage(item, createUrl);
       setMessages((prev) => [...prev, message]);
-      // Correr visión y armar prompt
-      const { prompt, finding } = await processPhotoItem(item, {
-        analyze: analyzeFoliage,
-        createUrl: null,
-      });
+      // Correr visión y armar prompt. Mientras tanto: estado visible
+      // "analizando su foto" con la miniatura (solo visual, la visión no cambia).
+      setPhotoAnalyzingUrl(message.imageUrl || true);
+      let prompt;
+      let finding;
+      try {
+        ({ prompt, finding } = await processPhotoItem(item, {
+          analyze: analyzeFoliage,
+          createUrl: null,
+        }));
+      } finally {
+        setPhotoAnalyzingUrl(null);
+      }
       setInputText('');
       clearAgentAttachment();
       setActiveIntent(null);
@@ -2959,10 +2990,18 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         // 2) Correr la visión y armar el prompt (degrada a "por descripción"
         //    si analyzeFoliage falla). Reusa processPhotoItem para la parte
         //    pura del prompt (sin re-pintar burbuja: createUrl ya consumido).
-        const { prompt, finding } = await processPhotoItem(item, {
-          analyze: analyzeFoliage,
-          createUrl: null,
-        });
+        //    Mientras corre: estado "analizando su foto" visible (solo visual).
+        setPhotoAnalyzingUrl(message.imageUrl || true);
+        let prompt;
+        let finding;
+        try {
+          ({ prompt, finding } = await processPhotoItem(item, {
+            analyze: analyzeFoliage,
+            createUrl: null,
+          }));
+        } finally {
+          setPhotoAnalyzingUrl(null);
+        }
         // 3) Despachar al pipeline con la burbuja ya pintada (no duplicar).
         //    visionContext marca que ESTE turno SÍ trajo una foto real: el guard
         //    de visión NO corrige un diagnóstico visual legítimo. La confianza
@@ -3215,6 +3254,18 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         onBack={onBack}
       />
 
+      {/* Pulido foto-visión 2026-07: mientras el modelo de visión mira la foto
+          (antes de que arranque el LLM / STATE_THINKING), estado "analizando"
+          amable y pegado a la conversación, con la miniatura de la foto. */}
+      {photoAnalyzingUrl && (
+        <div className="relative z-10 px-4 pb-2">
+          <VisionLoadingState
+            label="Analizando su foto"
+            previewUrl={typeof photoAnalyzingUrl === 'string' ? photoAnalyzingUrl : undefined}
+          />
+        </div>
+      )}
+
       {/* Error */}
       {error && (
         <div className="px-4 py-2 mx-4 mb-2 rounded-lg bg-red-900/30 border border-red-800/50">
@@ -3300,29 +3351,41 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           la foto de fondo (fix 2026-06-15). ── */}
       <div className="relative z-10 px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] pt-2 border-t border-slate-800/60 agent-bar-surface shrink-0">
 
-        {/* Preview de foto adjunta (outbox) */}
+        {/* Preview de foto adjunta — pulido foto-visión 2026-07: miniatura más
+            grande (80px), copy en usted que dice QUÉ va a pasar (diagnóstico),
+            y botón de quitar con área táctil de 44px (dedos con tierra). */}
         {agentAttachment && (
-          <div className="flex items-center gap-2 mb-2 px-1">
+          <div
+            className="flex items-center gap-3 mb-2 p-2 bg-emerald-950/40 border border-emerald-800/40"
+            style={{ borderRadius: 'var(--r-md, 16px)' }}
+            data-testid="agent-photo-preview"
+          >
             <img
               src={agentAttachment.previewUrl}
-              alt="Foto adjunta"
-              className="w-14 h-14 rounded-lg object-cover border border-slate-700"
+              alt="Su foto, lista para el diagnóstico"
+              className="w-20 h-20 object-cover border border-emerald-700/50 shrink-0"
+              style={{ borderRadius: 'var(--r-sm, 12px)' }}
             />
-            <p className="text-xs text-slate-400 flex-1 leading-snug">
-              📷 Foto lista — añade una nota opcional
-            </p>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-emerald-100 leading-snug">
+                📷 Su foto está lista
+              </p>
+              <p className="text-xs text-slate-300 leading-snug mt-0.5">
+                Añada una nota si quiere y toque enviar — le digo qué veo en la planta.
+              </p>
+            </div>
             <button
               type="button"
               onClick={clearAgentAttachment}
-              className="p-1.5 rounded-full bg-slate-700 hover:bg-slate-600 text-slate-300"
-              aria-label="Quitar foto"
+              className="w-11 h-11 shrink-0 rounded-full bg-slate-700 hover:bg-slate-600 active:brightness-90 text-slate-200 flex items-center justify-center"
+              aria-label="Quitar la foto"
             >
-              <X size={13} />
+              <X size={16} />
             </button>
           </div>
         )}
         {agentPickError && (
-          <p className="text-xs text-red-400 mb-2 px-1">{agentPickError}</p>
+          <p className="text-xs text-red-400 mb-2 px-1" role="alert">{agentPickError}</p>
         )}
 
         {/* Tip de primera vez (feat/onboarding-ayuda): cómo pedir diagnóstico
@@ -3452,15 +3515,20 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               </span>
             </button>
 
-            {/* Cámara — sin `capture`, abre galería+cámara igual que AgentHero */}
+            {/* Cámara — sin `capture`, abre galería+cámara igual que AgentHero.
+                Pulido foto-visión 2026-07: botón más grande (48px) con acento
+                ámbar propio (.as-photo) — es la puerta al diagnóstico de plaga
+                por foto y debe encontrarse de un vistazo, aun con sol directo.
+                Con foto adjunta se pinta esmeralda lleno (has-photo). */}
             <button
               type="button"
               onClick={() => cameraInputAgentRef.current?.click()}
               disabled={state === STATE_RECORDING || queuePending.length >= 1}
-              aria-label="Tomar o elegir foto"
-              className="as-iconbtn"
+              aria-label={agentAttachment ? 'Cambiar la foto adjunta' : 'Tomar o subir una foto de su planta'}
+              data-testid="agent-photo-btn"
+              className={['as-iconbtn as-photo', agentAttachment ? 'has-photo' : ''].join(' ')}
             >
-              <Camera size={19} strokeWidth={2} aria-hidden="true" />
+              <Camera size={22} strokeWidth={2} aria-hidden="true" />
             </button>
 
             <div className="flex-1" />
