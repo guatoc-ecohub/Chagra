@@ -1,3 +1,4 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- legacy UI copy preexistente al gate i18n; migración a messages.js (ADR-050) trackeada aparte, mismo criterio que AssetDetailView */
 import React, { useState, useEffect } from 'react';
 import { MSG } from '../config/messages.js';
 import { ArrowLeft, Plus, Trash2, RefreshCw, Building2, Leaf, Search, WifiOff, TreePine, Map as MapIcon, List, Sprout, FlaskConical, Ban, AlertTriangle, Warehouse, Square, ChevronDown } from 'lucide-react';
@@ -26,6 +27,8 @@ import { savePhoto } from '../services/photoService';
 import { wktToGeoJson } from '../utils/geo';
 import { buildPlantMeta, formatPlantMetaFallbackLine, ETAPA_FENOLOGICA_OPTIONS } from '../utils/plantMeta';
 import MultiFincaModal from './MultiFincaModal';
+import EmptyState, { OfflineNotice } from './common/EmptyState';
+import SkeletonList from './common/SkeletonList';
 
 // Note: fincaNombre constant removed. Now derived from useFincaActiveStore inside the component.
 
@@ -975,7 +978,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
           </p>
         ) : !formData.parentLandId ? (
           <p className="mt-1 text-xs text-amber-400/80">
-            Quedará en "Sin zona asignada". La podrás mover a un lote cuando quieras.
+            Quedará en "Sin zona asignada". La podrá mover a un lote cuando quiera.
           </p>
         ) : null}
       </div>
@@ -1505,11 +1508,28 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
         </div>
       </div>
 
-      {/* Error */}
+      {/* Error / sin conexión. Offline NO es un error: tono tranquilo
+          (offline-first, los datos viven en el dispositivo). Error real →
+          mensaje claro + reintento con el mismo syncFromServer del store. */}
       {error && (
-        <div className="mx-3 p-3 bg-red-900/30 border border-red-500 rounded-xl text-red-200 text-sm shrink-0">
-          {error}
-        </div>
+        !navigator.onLine ? (
+          <OfflineNotice className="mx-3 shrink-0" />
+        ) : (
+          <div className="mx-3 p-3 bg-amber-900/20 border border-amber-700/50 rounded-xl text-amber-200 text-sm shrink-0 flex items-start gap-2.5">
+            <AlertTriangle size={16} className="shrink-0 mt-0.5 text-amber-400" aria-hidden="true" />
+            <div className="flex-1 min-w-0">
+              <p className="leading-snug">{error}</p>
+              <p className="text-xs text-amber-300/70 mt-0.5">Sus registros locales están a salvo.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => syncFromServer()}
+              className="shrink-0 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs font-bold flex items-center gap-1.5 min-h-[36px]"
+            >
+              <RefreshCw size={12} aria-hidden="true" /> Reintentar
+            </button>
+          </div>
+        )
       )}
 
       {/* Vista de mapa global (Fase 17.3), reemplaza la lista cuando viewMode === 'map' */}
@@ -1582,11 +1602,22 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
       {viewMode === 'list' && activeTab === 'plant' && !currentZoneId && (
         <div className="flex-1">
           {lands.length === 0 && orphanPlants.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-slate-500">
-              <MapPin size={48} className="mb-3 opacity-30" />
-              <p className="text-lg">Sin zonas registradas</p>
-              <p className="text-sm mt-1">Crea una zona (asset--land) desde FarmOS o la tab Infraestructura</p>
-            </div>
+            /* Primera impresión del productor nuevo (0 plantas, 0 lugares):
+               invitación cálida a la primera siembra, no jerga técnica.
+               El CTA reutiliza el mismo flujo del FAB "Registrar Siembra". */
+            isLoading ? (
+              <SkeletonList count={4} className="p-3" ariaLabel="Cargando su finca…" />
+            ) : (
+              <EmptyState
+                icon={Sprout}
+                title="Aún no ha registrado plantas"
+                description="Registre su primera siembra y Chagra le va armando el calendario, las tareas y la historia de cada mata."
+                actionLabel="Registrar mi primera siembra"
+                onAction={() => { setShowForm(true); resetForm(); }}
+                secondaryHint="Si prefiere, primero cree los lugares de su finca (lotes, eras, invernaderos) en la pestaña Infraestructura."
+                data-testid="assets-empty-first-plant"
+              />
+            )
           ) : (
             <Virtuoso
               data={getZonesForDrillDown()}
@@ -1609,7 +1640,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
                               </div>
                               <div className="min-w-0">
                                 <h4 className="font-bold text-amber-100 truncate">Sin zona asignada</h4>
-                                <p className="text-xs text-amber-300/80">Reasigna estas plantas a una zona</p>
+                                <p className="text-xs text-amber-300/80">Reasigne estas plantas a una zona</p>
                               </div>
                             </div>
                             <div className="text-right shrink-0">
@@ -1688,16 +1719,22 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
       {viewMode === 'list' && !(activeTab === 'plant' && !currentZoneId) && (
         <div className="flex-1 overflow-y-auto p-3 space-y-2">
           {isLoading && currentAssets.length === 0 ? (
-            <div className="flex items-center justify-center py-12">
-              <RefreshCw size={24} className="animate-spin text-slate-500" />
-              <span className="ml-3 text-slate-500">{MSG.ui.cargando}</span>
-            </div>
+            /* Skeleton con la silueta de las cards reales: percepción de
+               rapidez en gama baja y cero salto de layout al llegar datos. */
+            <SkeletonList count={5} ariaLabel={MSG.ui.cargando} />
           ) : currentAssets.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-slate-500">
-              <tabConfig.icon size={48} className="mb-3 opacity-30" />
-              <p className="text-lg">Sin {tabConfig.label.toLowerCase()} registrados</p>
-              <p className="text-sm mt-1">Toca el botón para agregar</p>
-            </div>
+            <EmptyState
+              icon={tabConfig.icon}
+              title={`Aún no ha registrado ${tabConfig.label.toLowerCase()}`}
+              description={
+                activeTab === 'plant'
+                  ? 'Cuando registre una siembra en este lugar, aquí le aparece con su foto, su especie y su historia.'
+                  : 'Registre el primero y quedará guardado en su dispositivo, con o sin señal.'
+              }
+              actionLabel={activeTab === 'plant' ? 'Registrar siembra' : `Agregar ${TAB_LABELS[activeTab]}`}
+              onAction={() => { setShowForm(true); resetForm(); }}
+              data-testid={`assets-empty-${activeTab}`}
+            />
           ) : (
             <Virtuoso
               data={currentAssets}

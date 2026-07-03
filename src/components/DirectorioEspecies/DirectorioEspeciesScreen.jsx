@@ -198,7 +198,7 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
               No encontramos “{query.trim()}” en el catálogo todavía.
             </p>
             <p className="jp-tinta-suave text-xs text-slate-500 mt-1">
-              Prueba con otro nombre común o el nombre científico.
+              Pruebe con otro nombre común o el nombre científico.
             </p>
           </div>
         )}
@@ -207,7 +207,7 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
           <>
             {results.length > 1 && (
               <p className="jp-tinta-suave text-xs text-slate-400 mb-2">
-                {results.length} coincidencias — elige una:
+                {results.length} coincidencias — elija una:
               </p>
             )}
             <ul className="space-y-2" data-testid="directorio-results">
@@ -240,7 +240,7 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
           <div className="text-center py-12" data-testid="directorio-hint">
             <BookOpen size={34} className="mx-auto text-slate-700 mb-3" aria-hidden="true" />
             <p className="jp-tinta-suave text-sm text-slate-400 max-w-xs mx-auto leading-relaxed">
-              Busca cualquier especie del catálogo y mira su piso térmico, con qué
+              Busque cualquier especie del catálogo y mire su piso térmico, con qué
               se asocia, qué biopreparados le sirven y qué plagas la afectan.
             </p>
           </div>
