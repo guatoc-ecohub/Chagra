@@ -102,9 +102,11 @@ describe('AssetTimeline — comparación antes/después (BeforeAfterPhoto)', () 
 
     expect(screen.getByTestId('asset-timeline-before-after')).toBeTruthy();
     expect(screen.getByText('Evolución de la planta')).toBeTruthy();
-    // BeforeAfterPhoto renderiza el hint "Desliza para comparar" cuando ambas
-    // fotos (before/after) resuelven con URL.
-    expect(screen.getByText('Desliza para comparar')).toBeTruthy();
+    // BeforeAfterPhoto renderiza el hint "Deslice para comparar" (tono usted)
+    // cuando ambas fotos (before/after) resuelven con URL.
+    expect(screen.getByText('Deslice para comparar')).toBeTruthy();
+    // Chip de contexto con el conteo de fotos de la hoja de vida.
+    expect(screen.getByText('2 fotos')).toBeTruthy();
   });
 
   it('no renderiza la comparación si solo hay una foto adjunta', () => {
