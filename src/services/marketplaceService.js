@@ -149,14 +149,14 @@ export function validarOferta(form) {
     return { ok: false, errors: { producto: 'Datos inválidos' } };
   }
   if (!String(form.producto || '').trim()) {
-    errors.producto = 'Escribe qué producto vendes';
+    errors.producto = 'Escriba qué producto vende';
   }
   const cantidad = Number(form.cantidad);
   if (!Number.isFinite(cantidad) || cantidad <= 0) {
-    errors.cantidad = 'Indica una cantidad mayor que cero';
+    errors.cantidad = 'Indique una cantidad mayor que cero';
   }
   if (!String(form.unidad || '').trim()) {
-    errors.unidad = 'Elige una unidad (kg, arroba, bulto…)';
+    errors.unidad = 'Elija una unidad (kg, arroba, bulto…)';
   }
   // Precio opcional, pero si lo escriben debe ser positivo.
   if (form.precio !== '' && form.precio != null) {

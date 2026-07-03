@@ -108,42 +108,42 @@ export default function MercadosScreen({ onBack, onNavigate: _onNavigate }) {
     <ScreenShell title="Mercado de la finca" icon={Store} onBack={onBack}>
       <div className="max-w-2xl mx-auto px-4 py-4">
         {/* Encuadre: circuitos cortos / venta directa */}
-        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3 mb-4 flex gap-2.5">
+        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3.5 mb-4 flex gap-3">
           <Sprout className="text-emerald-400 shrink-0 mt-0.5" size={18} />
           <p className="text-sm text-emerald-100/90 leading-snug">
-            Vende directo a fincas y compradores vecinos: <strong>circuitos cortos</strong>,
+            Venda directo a fincas y compradores vecinos: <strong>circuitos cortos</strong>,
             agroferias y mercados campesinos, sin intermediarios. El contacto es
             directo; Chagra no cobra comisión ni procesa pagos.
           </p>
         </div>
 
-        {/* Tabs Explorar / Publicar */}
-        <div className="flex gap-2 mb-4" role="tablist">
+        {/* Tabs Explorar / Publicar — pastillas grandes táctiles */}
+        <div className="flex gap-2 mb-4 p-1 rounded-2xl bg-slate-900/70 border border-slate-800" role="tablist">
           <button
             type="button"
             role="tab"
             aria-selected={tab === 'explorar'}
             onClick={() => setTab('explorar')}
-            className={`flex-1 min-h-[44px] rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-colors ${
+            className={`flex-1 min-h-[48px] rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-colors ${
               tab === 'explorar'
-                ? 'bg-emerald-600 text-white'
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/40'
+                : 'bg-transparent text-slate-300 hover:bg-slate-800 active:bg-slate-700'
             }`}
           >
-            <Search size={16} /> Explorar
+            <Search size={17} /> Explorar
           </button>
           <button
             type="button"
             role="tab"
             aria-selected={tab === 'publicar'}
             onClick={() => setTab('publicar')}
-            className={`flex-1 min-h-[44px] rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-colors ${
+            className={`flex-1 min-h-[48px] rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-colors ${
               tab === 'publicar'
-                ? 'bg-emerald-600 text-white'
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/40'
+                : 'bg-transparent text-slate-300 hover:bg-slate-800 active:bg-slate-700'
             }`}
           >
-            <Plus size={16} /> Publicar
+            <Plus size={17} /> Publicar
           </button>
         </div>
 
@@ -188,19 +188,19 @@ function ExplorarPanel({
     <div>
       {/* Buscador por producto / ubicación */}
       <div className="relative mb-3">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={17} />
         <input
           type="search"
           value={filtroTexto}
           onChange={(e) => setFiltroTexto(e.target.value)}
           placeholder="Buscar producto, vereda o municipio…"
           aria-label="Buscar ofertas"
-          className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-500 text-sm focus:border-emerald-500 focus:outline-none"
+          className="w-full min-h-[48px] pl-10 pr-3 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 text-base focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/40 transition-colors"
         />
       </div>
 
-      {/* Filtro por categoría (chips) */}
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-3 -mx-1 px-1">
+      {/* Filtro por categoría (chips táctiles) */}
+      <div className="flex gap-2 overflow-x-auto pb-2 mb-2 -mx-1 px-1" role="group" aria-label="Filtrar por categoría">
         <CategoriaChip activo={filtroCat === ''} onClick={() => setFiltroCat('')} icon="🛒" label="Todo" />
         {CATEGORIAS.map((c) => (
           <CategoriaChip
@@ -213,31 +213,38 @@ function ExplorarPanel({
         ))}
       </div>
 
-      {/* Toggle ejemplos */}
-      <label className="flex items-center gap-2 text-xs text-slate-400 mb-3 cursor-pointer select-none">
-        <input
-          type="checkbox"
-          checked={mostrarEjemplos}
-          onChange={(e) => setMostrarEjemplos(e.target.checked)}
-          className="accent-emerald-500"
-        />
-        Mostrar ofertas de ejemplo de otras fincas
-      </label>
+      {/* Toggle ejemplos + conteo de resultados */}
+      <div className="flex items-center justify-between gap-3 mb-3">
+        <label className="flex items-center gap-2 text-xs text-slate-400 cursor-pointer select-none min-h-[44px]">
+          <input
+            type="checkbox"
+            checked={mostrarEjemplos}
+            onChange={(e) => setMostrarEjemplos(e.target.checked)}
+            className="accent-emerald-500 w-4 h-4"
+          />
+          Mostrar ofertas de ejemplo
+        </label>
+        {!cargando && ofertas.length > 0 && (
+          <span className="text-xs text-slate-500 tabular-nums shrink-0" aria-live="polite">
+            {ofertas.length} oferta{ofertas.length === 1 ? '' : 's'}
+          </span>
+        )}
+      </div>
 
       {cargando ? (
         <p className="text-center text-slate-500 py-10 text-sm">Cargando ofertas…</p>
       ) : ofertas.length === 0 ? (
-        <div className="text-center py-10">
-          <PackageOpen className="mx-auto text-slate-600 mb-3" size={40} />
-          <p className="text-slate-400 text-sm mb-4">
-            No hay ofertas que coincidan. Sé el primero en publicar lo que vende tu finca.
+        <div className="text-center py-12 px-4 rounded-2xl border border-dashed border-slate-700 bg-slate-900/40">
+          <PackageOpen className="mx-auto text-slate-600 mb-3" size={44} />
+          <p className="text-slate-400 text-sm mb-5 max-w-xs mx-auto leading-snug">
+            No hay ofertas que coincidan. Sea el primero en publicar lo que vende su finca.
           </p>
           <button
             type="button"
             onClick={onPublicarCta}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm"
+            className="inline-flex items-center justify-center gap-2 min-h-[48px] px-5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-sm transition-colors"
           >
-            <Plus size={16} /> Publicar mi producto
+            <Plus size={17} /> Publicar mi producto
           </button>
         </div>
       ) : (
@@ -258,8 +265,11 @@ function CategoriaChip({ activo, onClick, icon, label }) {
     <button
       type="button"
       onClick={onClick}
-      className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
-        activo ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+      aria-pressed={activo}
+      className={`shrink-0 min-h-[40px] px-3.5 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-colors border ${
+        activo
+          ? 'bg-emerald-600 border-emerald-500 text-white'
+          : 'bg-slate-800/80 border-slate-700 text-slate-300 hover:bg-slate-700 active:bg-slate-600'
       }`}
     >
       <span aria-hidden="true">{icon}</span> {label}
@@ -272,34 +282,39 @@ function OfertaCard({ oferta, onContactar }) {
   const cat = CATEGORIAS.find((c) => c.id === oferta.categoria);
   const ubic = [oferta.vereda, oferta.municipio].filter(Boolean).join(', ');
   return (
-    <div className="rounded-xl border border-slate-700 bg-slate-900/70 overflow-hidden">
+    <div className="rounded-2xl border border-slate-700 bg-slate-900/70 overflow-hidden">
       <div className="flex">
         {oferta.fotoDataUrl ? (
           <img
             src={oferta.fotoDataUrl}
             alt={oferta.producto}
-            className="w-24 h-24 object-cover shrink-0"
+            loading="lazy"
+            className="w-28 self-stretch object-cover shrink-0"
           />
         ) : (
-          <div className="w-24 h-24 shrink-0 bg-slate-800 flex items-center justify-center text-3xl" aria-hidden="true">
+          <div
+            className="w-28 self-stretch shrink-0 bg-gradient-to-br from-slate-800 to-slate-800/40 flex items-center justify-center text-4xl"
+            aria-hidden="true"
+          >
             {cat?.icon || '📦'}
           </div>
         )}
-        <div className="flex-1 min-w-0 p-3">
+        <div className="flex-1 min-w-0 p-3.5">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-bold text-white text-sm leading-tight truncate">{oferta.producto}</h3>
+            <h3 className="font-bold text-white text-base leading-tight truncate">{oferta.producto}</h3>
             {oferta.demo && (
-              <span className="shrink-0 text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-slate-700 text-slate-300">
+              <span className="shrink-0 text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md border border-slate-600 bg-slate-800 text-slate-400 mt-0.5">
                 ejemplo
               </span>
             )}
           </div>
-          <p className="text-emerald-300 font-black text-base mt-0.5">
-            {precio ? `${precio}` : 'A convenir'}
-            <span className="text-slate-400 font-normal text-xs"> / {oferta.unidad}</span>
+          <p className="text-emerald-300 font-black text-lg leading-tight mt-1">
+            {precio || 'A convenir'}
+            <span className="text-slate-400 font-medium text-xs"> / {oferta.unidad}</span>
           </p>
-          <p className="text-slate-400 text-xs mt-0.5">
+          <p className="text-slate-400 text-xs mt-1">
             {oferta.cantidad} {oferta.unidad} disponible{oferta.cantidad === 1 ? '' : 's'}
+            {cat && <span className="text-slate-500"> · {cat.label}</span>}
           </p>
           {ubic && (
             <p className="text-slate-500 text-xs mt-1 flex items-center gap-1 truncate">
@@ -311,9 +326,9 @@ function OfertaCard({ oferta, onContactar }) {
       <button
         type="button"
         onClick={() => onContactar(oferta)}
-        className="w-full py-2.5 bg-slate-800/80 hover:bg-emerald-700/40 text-emerald-300 text-sm font-bold flex items-center justify-center gap-2 border-t border-slate-700"
+        className="w-full min-h-[48px] py-2.5 bg-slate-800/80 hover:bg-emerald-700/40 active:bg-emerald-700/50 text-emerald-300 text-sm font-bold flex items-center justify-center gap-2 border-t border-slate-700 transition-colors"
       >
-        <Phone size={14} /> Contactar al vendedor
+        <Phone size={15} /> Contactar al vendedor
       </button>
     </div>
   );
@@ -392,8 +407,8 @@ function DetalleOferta({ oferta, onClose, onEliminar }) {
             <div className="rounded-lg border border-slate-700 bg-slate-800/60 p-3 flex gap-2 text-sm text-slate-300">
               <Info size={16} className="text-slate-400 shrink-0 mt-0.5" />
               {oferta.demo
-                ? 'Esta es una oferta de ejemplo: no tiene un contacto real. Publica la tuya para que te puedan escribir.'
-                : 'Este vendedor no dejó un contacto directo. Coordina con él en tu mercado campesino o agrofería.'}
+                ? 'Esta es una oferta de ejemplo: no tiene un contacto real. Publique la suya para que le puedan escribir.'
+                : 'Este vendedor no dejó un contacto directo. Coordine con él en su mercado campesino o agrofería.'}
             </div>
           )}
 
@@ -439,12 +454,18 @@ function DetalleOferta({ oferta, onClose, onEliminar }) {
 function PrecioReferenciaBloque({ referencia, contexto = 'oferta' }) {
   if (referencia.disponible) {
     return (
-      <div className="rounded-lg border border-sky-500/30 bg-sky-500/5 p-3 text-sm">
-        <p className="text-sky-200 font-semibold flex items-center gap-1.5">
-          <Tag size={14} /> Referencia SIPSA (precio mayorista)
+      <div className="rounded-xl border border-sky-500/30 bg-sky-500/5 p-3.5 text-sm">
+        <p className="text-sky-200 font-semibold text-xs uppercase tracking-wide flex items-center gap-1.5">
+          <Tag size={13} className="shrink-0" /> Referencia SIPSA (precio mayorista)
         </p>
-        <p className="text-white mt-1">{referencia.banda}{referencia.mercado ? ` · ${referencia.mercado}` : ''}</p>
-        <p className="text-slate-400 text-xs mt-1">
+        {/* La banda es el dato: jerarquía tipográfica alta y legible */}
+        <p className="text-white font-black text-lg leading-tight mt-1.5">{referencia.banda}</p>
+        {referencia.mercado && (
+          <p className="text-sky-100/80 text-xs mt-0.5 flex items-center gap-1">
+            <MapPin size={11} className="shrink-0" /> {referencia.mercado}
+          </p>
+        )}
+        <p className="text-slate-400 text-xs mt-2 pt-2 border-t border-sky-500/15">
           {referencia.fuenteUrl ? (
             <a href={referencia.fuenteUrl} target="_blank" rel="noopener noreferrer" className="underline hover:text-sky-300">
               Fuente: {referencia.fuente}
@@ -454,7 +475,7 @@ function PrecioReferenciaBloque({ referencia, contexto = 'oferta' }) {
           )}
           {referencia.boletinFecha ? ` · boletín ${referencia.boletinFecha}` : ''}
         </p>
-        <p className="text-slate-500 text-[11px] mt-1.5">
+        <p className="text-slate-500 text-[11px] mt-1 leading-snug">
           {contexto === 'publicar'
             ? 'Es una referencia mayorista, no lo que le van a pagar a usted en finca. Úsela solo para calibrar su precio.'
             : 'Es una referencia mayorista de ese día, no un precio en vivo.'}
@@ -464,9 +485,9 @@ function PrecioReferenciaBloque({ referencia, contexto = 'oferta' }) {
   }
   // Deflección honesta: NO inventamos un precio de referencia.
   return (
-    <div className="rounded-lg border border-slate-700 bg-slate-800/60 p-3 text-sm text-slate-300 flex gap-2">
+    <div className="rounded-xl border border-slate-700 bg-slate-800/60 p-3.5 text-sm text-slate-300 flex gap-2.5">
       <Info size={15} className="text-slate-400 shrink-0 mt-0.5" />
-      <span>
+      <span className="leading-snug">
         {contexto === 'publicar'
           ? 'Sin referencia SIPSA para este producto todavía. Ponga usted el precio que considere justo.'
           : 'Sin precio de referencia todavía. La consulta de precios mayoristas (SIPSA/DANE) aún no está disponible en Chagra; el precio que usted ve lo puso el productor.'}
@@ -536,7 +557,7 @@ function PublicarPanel({ onPublicada, onCancelar }) {
       onPublicada();
     } catch (e) {
       console.warn('[Mercados] no se pudo publicar la oferta:', e?.message);
-      setErrors({ producto: 'No se pudo guardar. Intenta de nuevo.' });
+      setErrors({ producto: 'No se pudo guardar. Intente de nuevo.' });
     } finally {
       setGuardando(false);
     }
@@ -544,72 +565,79 @@ function PublicarPanel({ onPublicada, onCancelar }) {
 
   return (
     <div className="space-y-4">
-      <Field label="¿Qué vendes?" error={errors.producto} required>
-        <input
-          type="text"
-          value={form.producto}
-          onChange={(e) => set('producto', e.target.value)}
-          placeholder="Ej: Tomate chonto, miel, papa criolla…"
-          className="form-input"
-        />
-      </Field>
-
-      <Field label="Categoría">
-        <select value={form.categoria} onChange={(e) => set('categoria', e.target.value)} className="form-input">
-          {CATEGORIAS.map((c) => (
-            <option key={c.id} value={c.id}>{c.icon} {c.label}</option>
-          ))}
-        </select>
-      </Field>
-
-      <div className="grid grid-cols-2 gap-3">
-        <Field label="Cantidad" error={errors.cantidad} required>
+      {/* ── Sección 1: el producto ── */}
+      <Seccion titulo="Su producto">
+        <Field label="¿Qué vende?" error={errors.producto} required>
           <input
-            type="number"
-            inputMode="decimal"
-            min="0"
-            value={form.cantidad}
-            onChange={(e) => set('cantidad', e.target.value)}
-            placeholder="Ej: 50"
+            type="text"
+            value={form.producto}
+            onChange={(e) => set('producto', e.target.value)}
+            placeholder="Ej: Tomate chonto, miel, papa criolla…"
             className="form-input"
           />
         </Field>
-        <Field label="Unidad" error={errors.unidad} required>
-          <select value={form.unidad} onChange={(e) => set('unidad', e.target.value)} className="form-input">
-            {UNIDADES.map((u) => <option key={u} value={u}>{u}</option>)}
+
+        <Field label="Categoría">
+          <select value={form.categoria} onChange={(e) => set('categoria', e.target.value)} className="form-input">
+            {CATEGORIAS.map((c) => (
+              <option key={c.id} value={c.id}>{c.icon} {c.label}</option>
+            ))}
           </select>
         </Field>
-      </div>
 
-      {refPrecio && <PrecioReferenciaBloque referencia={refPrecio} contexto="publicar" />}
-
-      <Field label="Precio por unidad (opcional)" error={errors.precio} hint="Déjalo vacío si prefieres 'a convenir'. Chagra no sugiere precios.">
-        <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
-          <input
-            type="number"
-            inputMode="numeric"
-            min="0"
-            value={form.precio}
-            onChange={(e) => set('precio', e.target.value)}
-            placeholder="A convenir"
-            className="form-input pl-7"
-          />
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Cantidad" error={errors.cantidad} required>
+            <input
+              type="number"
+              inputMode="decimal"
+              min="0"
+              value={form.cantidad}
+              onChange={(e) => set('cantidad', e.target.value)}
+              placeholder="Ej: 50"
+              className="form-input"
+            />
+          </Field>
+          <Field label="Unidad" error={errors.unidad} required>
+            <select value={form.unidad} onChange={(e) => set('unidad', e.target.value)} className="form-input">
+              {UNIDADES.map((u) => <option key={u} value={u}>{u}</option>)}
+            </select>
+          </Field>
         </div>
-      </Field>
 
-      <Field label="Foto (opcional)">
-        <PhotoCaptureField
-          label="Agregar foto del producto"
-          value={fotoBlob}
-          onPhoto={setFotoBlob}
-          onRemove={() => setFotoBlob(null)}
-        />
-      </Field>
+        <Field label="Foto (opcional)">
+          <PhotoCaptureField
+            label="Agregar foto del producto"
+            value={fotoBlob}
+            onPhoto={setFotoBlob}
+            onRemove={() => setFotoBlob(null)}
+          />
+        </Field>
+      </Seccion>
 
-      <div className="grid grid-cols-1 gap-3">
+      {/* ── Sección 2: el precio (con referencia SIPSA groundeada si existe) ── */}
+      <Seccion titulo="Su precio">
+        {refPrecio && <PrecioReferenciaBloque referencia={refPrecio} contexto="publicar" />}
+
+        <Field label="Precio por unidad (opcional)" error={errors.precio} hint="Déjelo vacío si prefiere «a convenir». Chagra no sugiere precios.">
+          <div className="relative">
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">$</span>
+            <input
+              type="number"
+              inputMode="numeric"
+              min="0"
+              value={form.precio}
+              onChange={(e) => set('precio', e.target.value)}
+              placeholder="A convenir"
+              className="form-input pl-8"
+            />
+          </div>
+        </Field>
+      </Seccion>
+
+      {/* ── Sección 3: finca y contacto ── */}
+      <Seccion titulo="Su finca y contacto">
         <Field label="Finca (opcional)">
-          <input type="text" value={form.finca} onChange={(e) => set('finca', e.target.value)} placeholder="Nombre de tu finca" className="form-input" />
+          <input type="text" value={form.finca} onChange={(e) => set('finca', e.target.value)} placeholder="Nombre de su finca" className="form-input" />
         </Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Vereda (opcional)">
@@ -619,35 +647,35 @@ function PublicarPanel({ onPublicada, onCancelar }) {
             <input type="text" value={form.municipio} onChange={(e) => set('municipio', e.target.value)} placeholder="Municipio" className="form-input" />
           </Field>
         </div>
-      </div>
 
-      <Field label="Teléfono de contacto (opcional)" hint="Para que te escriban por WhatsApp. Si no lo pones, coordinas en el mercado.">
-        <div className="relative">
-          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={15} />
-          <input
-            type="tel"
-            inputMode="tel"
-            value={form.contactoTel}
-            onChange={(e) => set('contactoTel', e.target.value)}
-            placeholder="Ej: 300 123 4567"
-            className="form-input pl-9"
+        <Field label="Teléfono de contacto (opcional)" hint="Para que le escriban por WhatsApp. Si no lo deja, coordina en el mercado.">
+          <div className="relative">
+            <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={15} />
+            <input
+              type="tel"
+              inputMode="tel"
+              value={form.contactoTel}
+              onChange={(e) => set('contactoTel', e.target.value)}
+              placeholder="Ej: 300 123 4567"
+              className="form-input pl-9"
+            />
+          </div>
+        </Field>
+
+        <Field label="Descripción (opcional)">
+          <textarea
+            value={form.nota}
+            onChange={(e) => set('nota', e.target.value)}
+            rows={3}
+            placeholder="Cómo lo produce, cuándo entrega, calidad…"
+            className="form-input resize-none"
           />
-        </div>
-      </Field>
-
-      <Field label="Descripción (opcional)">
-        <textarea
-          value={form.nota}
-          onChange={(e) => set('nota', e.target.value)}
-          rows={3}
-          placeholder="Cómo lo produces, cuándo entregas, calidad…"
-          className="form-input resize-none"
-        />
-      </Field>
+        </Field>
+      </Seccion>
 
       {errors.producto && !form.producto && (
-        <p className="text-rose-400 text-sm flex items-center gap-1.5">
-          <AlertCircle size={14} /> {errors.producto}
+        <p className="text-rose-400 text-sm flex items-center gap-1.5" role="alert">
+          <AlertCircle size={14} className="shrink-0" /> {errors.producto}
         </p>
       )}
 
@@ -655,7 +683,7 @@ function PublicarPanel({ onPublicada, onCancelar }) {
         <button
           type="button"
           onClick={onCancelar}
-          className="flex-1 min-h-[48px] rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold"
+          className="flex-1 min-h-[52px] rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-300 font-bold transition-colors"
         >
           Cancelar
         </button>
@@ -663,7 +691,7 @@ function PublicarPanel({ onPublicada, onCancelar }) {
           type="button"
           onClick={handleGuardar}
           disabled={guardando}
-          className="flex-1 min-h-[48px] rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 text-white font-bold flex items-center justify-center gap-2"
+          className="flex-[2] min-h-[52px] rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 disabled:opacity-60 text-white font-bold flex items-center justify-center gap-2 transition-colors"
         >
           <CheckCircle2 size={18} /> {guardando ? 'Publicando…' : 'Publicar oferta'}
         </button>
@@ -671,14 +699,37 @@ function PublicarPanel({ onPublicada, onCancelar }) {
 
       <style>{`
         .form-input{
-          width:100%;padding:10px 12px;border-radius:10px;
-          background:rgb(30 41 59);border:1px solid rgb(51 65 85);
-          color:#fff;font-size:14px;min-height:44px;
+          width:100%;padding:12px 14px;border-radius:12px;
+          background:rgb(var(--c-slate-800, 30 41 59));
+          border:1px solid rgb(var(--c-slate-700, 51 65 85));
+          color:rgb(var(--c-slate-100, 241 245 249));
+          font-size:16px;min-height:48px;
+          transition:border-color .15s ease;
         }
-        .form-input::placeholder{color:rgb(100 116 139)}
-        .form-input:focus{outline:none;border-color:rgb(16 185 129)}
+        .form-input::placeholder{color:rgb(var(--c-slate-500, 100 116 139))}
+        .form-input:focus{
+          outline:none;
+          border-color:rgb(var(--c-emerald-500, 16 185 129));
+          box-shadow:0 0 0 1px rgb(var(--c-emerald-500, 16 185 129) / .4);
+        }
+        @media (prefers-reduced-motion: reduce){
+          .form-input{transition:none}
+        }
       `}</style>
     </div>
+  );
+}
+
+/**
+ * Seccion — tarjeta agrupadora del formulario de publicar: título corto en
+ * mayúsculas + campos. Solo capa visual (orden y respiración del formulario).
+ */
+function Seccion({ titulo, children }) {
+  return (
+    <section className="rounded-2xl border border-slate-800 bg-slate-900/50 p-4 space-y-4">
+      <h3 className="text-[11px] font-bold uppercase tracking-widest text-emerald-400/90">{titulo}</h3>
+      {children}
+    </section>
   );
 }
 
@@ -686,10 +737,10 @@ function Field({ label, children, error, hint, required }) {
   return (
     <label className="block">
       <span className="block text-sm font-semibold text-slate-200 mb-1.5">
-        {label} {required && <span className="text-rose-400">*</span>}
+        {label} {required && <span className="text-rose-400" aria-hidden="true">*</span>}
       </span>
       {children}
-      {hint && !error && <span className="block text-xs text-slate-500 mt-1">{hint}</span>}
+      {hint && !error && <span className="block text-xs text-slate-500 mt-1 leading-snug">{hint}</span>}
       {error && <span className="block text-xs text-rose-400 mt-1">{error}</span>}
     </label>
   );
