@@ -89,3 +89,26 @@ que falla si el conteo no cuadra) y en `tests/unit/catalog-count.test.js` (gate
 de CI `unit-tests.yml`, que asierta `species.length === 530`). Apuntar el gate del
 validador a v3.2 es una mejora pendiente fuera del alcance de este cambio (evita
 tocar la config de CI en el mismo PR de datos).
+
+## Miscategorizaciones en `audit-contaminacion.mjs` (clase `miscategorizacion`)
+
+Snapshot **2026-07-03** (post-PR #2002 que arregló el único hallazgo que vivía en
+el seed v3.1 — entrada de `oryza_sativa.plagas_criticas` reescrita con acrónimo
+VHB para evitar falso match del regex `VIRUS_RE = /\bvirus\b/i`).
+
+Estado por archivo (verificado con `detectMiscategorizacion` archivo por archivo):
+
+| Archivo | Hallazgos | Nota |
+|---|---:|---|
+| `chagra-catalog-seed-v3.1.json` | 0 | Limpio. Editar este archivo NO reduce el conteo global porque el seed está limpio desde PR #2002. |
+| `chagra-catalog-oss-subset-v3.2.json` | 0 | CANÓNICO que shipea (`DEFAULT_SEED` de `build-catalog-sqlite.mjs`). Limpio. |
+| `chagra-catalog-oss-subset-v3.1.json` | 7 | STALE. Snapshot de 2026-05-20 con texto pre-fix (`Hemileia vastatrix (roya)` en `plagas_criticas` de `coffea_arabica`; `Trozador (Agrotis ipsilon)` en `enfermedades_criticas` de 6 solanums). |
+| `chagra-catalog-graph-export.json` | 1 | STALE. Export viejo grafo→catálogo con texto pre-fix de `Tagosodes orizicolus` en `plagas_criticas` de `oryza_sativa` (usa "Virus" literal en lugar del acrónimo VHB). |
+
+Los 8 hallazgos restantes viven exclusivamente en archivos stale derivados.
+Reducir el conteo requiere regenerar esos snapshots (vía `extract-oss-subset.mjs`
++ `export-graph-to-catalog.mjs`) o editarlos directamente — ambos fuera del scope
+de tasks que prohiben tocar derivados. El gate `--check` del auditor usa
+`scripts/audit-contaminacion-baseline.json` para que el conteo actual (52
+hallazgos, 8 de ellos miscategorización) no bloquee CI mientras llega esa
+regeneración.

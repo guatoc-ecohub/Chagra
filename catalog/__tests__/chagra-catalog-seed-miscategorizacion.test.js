@@ -94,3 +94,72 @@ describe('catalog/chagra-catalog-seed-v3.1.json — invariante global anti_misca
     expect(findings).toEqual([]);
   });
 });
+
+// =============================================================================
+// Documentación ejecutable del estado post-PR #2002 (task #contam-misc-resto).
+//
+// Contexto: la task #contam-misc-resto pide "arregla las ~8 miscategorizaciones
+// RESTANTES, EDITA SOLO el seed". Verificación: el seed YA está limpio desde
+// PR #2002 (que arregló el único hallazgo que vivía en el seed — entrada de
+// oryza_sativa.plagas_criticas reescrita con acrónimo VHB). Los 8 hallazgos
+// restantes viven todos en archivos DERIVADOS stale (oss-subset-v3.1 y
+// graph-export) que la task prohibe editar.
+//
+// Este test codifica ese desglose archivo-por-archivo para:
+//   1. Documentar en código (no solo en CATALOG_VERSIONS.md) dónde viven los
+//      8 hallazgos y por qué editar solo el seed no los reduce.
+//   2. Bloquear regresiones: si alguien limpia los derivados, este test falla
+//      y los obliga a actualizar este descriptor (señal de progreso).
+//   3. Evitar que se reasigne la misma task imposible a un futuro GLM run.
+// =============================================================================
+
+import { loadCatalogSpeciesFiles } from '../../scripts/audit-contaminacion.mjs';
+
+describe('audit-contaminacion.mjs — desglose de miscategorizacion por archivo (task #contam-misc-resto)', () => {
+  // Snapshot del estado conocido post-PR #2002. Si estos números bajan, alguien
+  // limpió derivados y este test debe actualizarse (junto con el baseline del
+  // auditor en scripts/audit-contaminacion-baseline.json).
+  const EXPECTED_BREAKDOWN = {
+    'chagra-catalog-seed-v3.1.json': 0, // limpio desde PR #2002
+    'chagra-catalog-oss-subset-v3.2.json': 0, // canónico que shipea, limpio
+    'chagra-catalog-oss-subset-v3.1.json': 7, // stale snapshot 2026-05-20
+    'chagra-catalog-graph-export.json': 1, // stale export viejo grafo→catálogo
+  };
+
+  it('el seed v3.1 NO tiene miscategorizaciones (invariante post-PR #2002)', () => {
+    const files = loadCatalogSpeciesFiles();
+    const seedFile = files.find((f) => f.file === 'chagra-catalog-seed-v3.1.json');
+    expect(seedFile).toBeDefined();
+    const findings = detectMiscategorizacion([seedFile]);
+    expect(findings).toEqual([]);
+  });
+
+  it('el canónico oss-subset-v3.2 (que shipea) NO tiene miscategorizaciones', () => {
+    const files = loadCatalogSpeciesFiles();
+    const canonical = files.find((f) => f.file === 'chagra-catalog-oss-subset-v3.2.json');
+    expect(canonical).toBeDefined();
+    const findings = detectMiscategorizacion([canonical]);
+    expect(findings).toEqual([]);
+  });
+
+  it('desglose por archivo coincide con el snapshot conocido (8 hallazgos en derivados stale)', () => {
+    const files = loadCatalogSpeciesFiles();
+    const totalByFile = {};
+    let total = 0;
+    for (const f of files) {
+      const count = detectMiscategorizacion([f]).length;
+      totalByFile[f.file] = count;
+      total += count;
+    }
+    for (const [file, expected] of Object.entries(EXPECTED_BREAKDOWN)) {
+      expect({ file, got: totalByFile[file] ?? 'missing', expected }).toEqual({
+        file,
+        got: expected,
+        expected,
+      });
+    }
+    // Los 8 hallazgos restantes viven íntegramente en derivados stale:
+    // 7 en oss-subset-v3.1 + 1 en graph-export = 8.
+    expect(total).toBe(8);
+  });
+});
