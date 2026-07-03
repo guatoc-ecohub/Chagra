@@ -40,7 +40,7 @@ export default function BiopreparadoRecetasGallery() {
         type="button"
         data-testid="ver-recetas-biopreparados"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
+        className="inline-flex items-center gap-2 min-h-[var(--tap-min,44px)] px-4 py-2 rounded-[var(--r-pill,999px)] bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold shadow-[var(--sombra-2,0_6px_18px_rgb(8_30_22/0.22))] motion-safe:transition-all motion-safe:active:scale-95 focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
       >
         <FlaskConical size={16} aria-hidden="true" />
         Ver recetas de biopreparados ({bps.length})
@@ -55,7 +55,7 @@ export default function BiopreparadoRecetasGallery() {
           onClick={() => setOpen(false)}
         >
           <div
-            className="bg-slate-900 border border-slate-700 rounded-t-3xl sm:rounded-3xl w-full sm:max-w-2xl max-h-[88vh] overflow-y-auto"
+            className="bg-slate-900 border border-slate-700 rounded-t-[var(--r-xl,24px)] sm:rounded-[var(--r-xl,24px)] w-full sm:max-w-2xl max-h-[88vh] overflow-y-auto shadow-[var(--sombra-3,0_16px_44px_rgb(8_30_22/0.30))]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="sticky top-0 z-10 bg-slate-900/95 backdrop-blur px-4 py-3 border-b border-slate-700 flex items-center justify-between">
