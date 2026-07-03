@@ -1,0 +1,251 @@
+/* src/styles/farm-map.css
+ * ============================================================================
+ * MAPA DE LA FINCA — piel Chagra para el chrome de Leaflet + overlays propios
+ * (leyenda de campo, chips de lugares). Capa-puente por feature (prefijo
+ * chagra-map-*), bebe de los tokens globales:
+ *   - color: rampas theme-aware --c-slate-* / --c-emerald-* (index.css)
+ *   - radios/sombras/tipo/tacto: --r-* / --sombra-* / --fs-* / --tap-min
+ *     (tokens.css), siempre con fallback byte-idéntico al valor previo.
+ *
+ * Por qué existe: Leaflet trae popups blancos y controles grises que se ven
+ * como un widget ajeno dentro de la app. Acá el mapa habla el mismo idioma
+ * visual que el resto (cards slate, acento esmeralda, pills), y sigue
+ * funcionando en los temas claros porque todo sale de las rampas por tema.
+ * Todo scoped bajo .chagra-farm-map: cero fugas a otros usos de Leaflet.
+ * ============================================================================ */
+
+/* ── Popups: de "widget blanco ajeno" a card Chagra ──────────────────────── */
+.chagra-farm-map .leaflet-popup-content-wrapper {
+  background: rgb(var(--c-slate-900, 15 23 42));
+  color: rgb(var(--c-slate-100, 241 245 249));
+  border: 1px solid rgb(var(--c-slate-700, 51 65 85));
+  border-radius: var(--r-md, 16px);
+  box-shadow: var(--sombra-3, 0 16px 44px rgb(2 6 23 / 0.3));
+}
+
+.chagra-farm-map .leaflet-popup-content {
+  margin: 12px 14px;
+  font-family: inherit;
+  line-height: 1.4;
+}
+
+.chagra-farm-map .leaflet-popup-tip {
+  background: rgb(var(--c-slate-900, 15 23 42));
+  border: 1px solid rgb(var(--c-slate-700, 51 65 85));
+  box-shadow: none;
+}
+
+.chagra-farm-map .leaflet-popup-close-button {
+  color: rgb(var(--c-slate-400, 148 163 184));
+  font-size: 18px;
+  padding: 6px 8px 0 0;
+}
+
+.chagra-farm-map .leaflet-popup-close-button:hover {
+  color: rgb(var(--c-slate-100, 241 245 249));
+}
+
+/* Contenido del popup (clases inyectadas desde buildPopup) */
+.chagra-popup { min-width: 180px; }
+
+.chagra-popup-tipo {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: rgb(var(--c-slate-400, 148 163 184));
+  margin-bottom: 2px;
+}
+
+.chagra-popup-tipo--tarea { color: var(--tarea-color, rgb(var(--c-morpho, 6 182 212))); }
+
+.chagra-popup-nombre {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgb(var(--c-slate-100, 241 245 249));
+}
+
+.chagra-popup-notas {
+  font-size: 11px;
+  color: rgb(var(--c-slate-400, 148 163 184));
+  margin-top: 4px;
+}
+
+.chagra-popup-btn {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: var(--r-sm, 12px);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  transition: filter var(--dur-tap, 0.12s) var(--ease-suave, ease);
+}
+
+.chagra-popup-btn:active { filter: brightness(0.9); }
+
+.chagra-popup-logs {
+  background: rgb(var(--c-emerald-600, 5 150 105));
+  color: #fff;
+}
+
+.chagra-popup-complete {
+  background: var(--tarea-color, rgb(var(--c-emerald-600, 5 150 105)));
+  color: #fff;
+}
+
+/* ── Controles de zoom: mismo chrome que los botones de la app ───────────── */
+.chagra-farm-map .leaflet-control-zoom {
+  border: 1px solid rgb(var(--c-slate-700, 51 65 85));
+  border-radius: var(--r-sm, 12px);
+  box-shadow: var(--sombra-2, 0 6px 18px rgb(2 6 23 / 0.22));
+  overflow: hidden;
+}
+
+.chagra-farm-map .leaflet-control-zoom a {
+  background: rgb(var(--c-slate-900, 15 23 42));
+  color: rgb(var(--c-slate-100, 241 245 249));
+  border-bottom-color: rgb(var(--c-slate-700, 51 65 85));
+  width: 40px;   /* tacto de campo: dedos con tierra, sol directo */
+  height: 40px;
+  line-height: 40px;
+  font-size: 18px;
+}
+
+.chagra-farm-map .leaflet-control-zoom a:hover,
+.chagra-farm-map .leaflet-control-zoom a:focus {
+  background: rgb(var(--c-slate-800, 30 41 59));
+  color: rgb(var(--c-slate-100, 241 245 249));
+}
+
+.chagra-farm-map .leaflet-control-zoom a.leaflet-disabled {
+  background: rgb(var(--c-slate-900, 15 23 42));
+  color: rgb(var(--c-slate-600, 71 85 105));
+}
+
+/* ── Chips de lugares (navegación entre zonas, arriba del mapa) ──────────── */
+.chagra-map-zonas {
+  position: absolute;
+  top: 8px;
+  left: 56px;              /* deja libre el control de zoom (topleft) */
+  right: 8px;
+  z-index: 500;            /* sobre tiles/overlays (400), bajo popups (700) */
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;     /* aire para la sombra al hacer scroll */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.chagra-map-zonas::-webkit-scrollbar { display: none; }
+
+.chagra-map-chip {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 36px;
+  padding: 6px 12px;
+  border-radius: var(--r-pill, 999px);
+  border: 1px solid rgb(var(--c-slate-700, 51 65 85));
+  background: rgb(var(--c-slate-900, 15 23 42) / 0.92);
+  color: rgb(var(--c-slate-200, 226 232 240));
+  font-size: var(--fs-nota, 0.78rem);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: var(--sombra-1, 0 1px 2px rgb(2 6 23 / 0.18));
+  transition:
+    background var(--dur-estado, 0.18s) var(--ease-suave, ease),
+    border-color var(--dur-estado, 0.18s) var(--ease-suave, ease);
+}
+
+.chagra-map-chip:active { filter: brightness(0.9); }
+
+.chagra-map-chip[aria-pressed="true"] {
+  background: rgb(var(--c-emerald-900, 6 78 59) / 0.9);
+  border-color: rgb(var(--c-emerald-600, 5 150 105));
+  color: rgb(var(--c-emerald-300, 110 231 183));
+}
+
+/* Conteo de cultivos dentro del chip: dato, no decoración */
+.chagra-map-chip-num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 900;
+  color: rgb(var(--c-emerald-400, 52 211 153));
+}
+
+.chagra-map-chip[aria-pressed="true"] .chagra-map-chip-num {
+  color: rgb(var(--c-emerald-300, 110 231 183));
+}
+
+/* ── Leyenda de campo (abajo-izquierda): qué significa cada color ────────── */
+.chagra-map-leyenda {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 500;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  max-width: calc(100% - 20px);
+  padding: 6px 10px;
+  border-radius: var(--r-sm, 12px);
+  border: 1px solid rgb(var(--c-slate-700, 51 65 85));
+  background: rgb(var(--c-slate-900, 15 23 42) / 0.88);
+  backdrop-filter: blur(4px);
+  box-shadow: var(--sombra-1, 0 1px 2px rgb(2 6 23 / 0.18));
+}
+
+.chagra-map-leyenda-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgb(var(--c-slate-300, 203 213 225));
+}
+
+.chagra-map-leyenda-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+/* Zona = contorno (así se dibuja en el mapa); resto = relleno */
+.chagra-map-leyenda-swatch--contorno {
+  background: transparent;
+  border: 2px solid currentColor;
+  border-radius: 3px;
+}
+
+/* ── Estado vacío: card sobre el mapa (el mapa sigue navegable detrás) ───── */
+.chagra-map-empty-card {
+  pointer-events: none;
+  max-width: 300px;
+  border-radius: var(--r-lg, 20px);
+  border: 1px solid rgb(var(--c-slate-700, 51 65 85));
+  background: rgb(var(--c-slate-900, 15 23 42) / 0.92);
+  backdrop-filter: blur(4px);
+  box-shadow: var(--sombra-2, 0 6px 18px rgb(2 6 23 / 0.22));
+}
+
+/* ── Movimiento: el mapa respeta prefers-reduced-motion ──────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .chagra-farm-map .leaflet-zoom-animated,
+  .chagra-farm-map .leaflet-fade-anim .leaflet-tile,
+  .chagra-farm-map .leaflet-pan-anim .leaflet-map-pane {
+    transition: none !important;
+  }
+
+  .chagra-map-chip,
+  .chagra-popup-btn {
+    transition: none;
+  }
+}

@@ -1,9 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { MapPin, Maximize2 } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import { wktToGeoJson } from '../utils/geo';
 import { logCache } from '../db/logCache';
+import EmptyState from './common/EmptyState';
+import '../styles/farm-map.css';
 
 /**
  * FarmMap, Vista maestra de activos geolocalizados (Fase 17.2).
@@ -12,6 +15,11 @@ import { logCache } from '../db/logCache';
  * el store, los parsea con `wktToGeoJson` y los dibuja como capas de Leaflet
  * tipadas por `asset_type`. Usa `L.featureGroup` para permitir encuadre
  * automático (fitBounds) tanto global como por zona filtrada.
+ *
+ * Capa visual (pasada 2026-07): chrome de Leaflet con la piel Chagra
+ * (farm-map.css, theme-aware), leyenda de campo, chips de navegación por
+ * zona (solo viewport, no toca datos) y EmptyState estándar. Todo movimiento
+ * de cámara respeta prefers-reduced-motion.
  *
  * Props:
  *   - focusZoneId: UUID de asset--land para filtrar y hacer zoom (drill-down espacial).
@@ -55,6 +63,19 @@ const STYLES = {
   },
 };
 
+// Leyenda de campo: qué significa cada color del mapa. Espeja STYLES /
+// TASK_STYLES — si cambia un color arriba, cambia acá.
+const LEGEND_ASSETS = [
+  { label: 'Zona', color: STYLES.land.color, outline: true },
+  { label: 'Estructura', color: STYLES.structure.color },
+  { label: 'Cultivo', color: STYLES.plant.fillColor },
+];
+
+// Movimiento de cámara accesible: sin animación si el sistema pide calma.
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' &&
+  !!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+
 // Extrae el WKT desde el shape JSON:API de FarmOS.
 const getWkt = (asset) => {
   const geo = asset.attributes?.intrinsic_geometry;
@@ -63,18 +84,33 @@ const getWkt = (asset) => {
   return geo.value || null;
 };
 
+// Id del parent (zona) de un asset, shape JSON:API.
+const getParentId = (asset) => {
+  const rel = asset.relationships?.parent?.data || asset.relationships?.location?.data;
+  return Array.isArray(rel) ? rel[0]?.id : rel?.id;
+};
+
+// Escape mínimo para strings que van dentro del HTML del popup.
+const esc = (s) =>
+  String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
 // Construye el popup HTML (Leaflet acepta string o HTMLElement).
+// Estilos en farm-map.css (.chagra-popup-*), theme-aware.
 const buildPopup = (asset, assetType) => {
   const name = asset.attributes?.name || asset.name || 'Sin nombre';
   const subType = asset.attributes?.land_type || asset.attributes?.sub_type || assetType;
   const notes = asset.attributes?.notes;
   const notesText = typeof notes === 'object' ? notes?.value : notes;
   return `
-    <div style="min-width:180px;font-family:system-ui;">
-      <div style="font-size:10px;text-transform:uppercase;color:#64748b;letter-spacing:0.05em;margin-bottom:2px;">${subType}</div>
-      <div style="font-size:14px;font-weight:700;color:#0f172a;">${name}</div>
-      ${notesText ? `<div style="font-size:11px;color:#475569;margin-top:4px;">${notesText.slice(0, 80)}${notesText.length > 80 ? '…' : ''}</div>` : ''}
-      <button data-asset-id="${asset.id}" class="chagra-popup-logs" style="margin-top:8px;padding:4px 10px;background:#0f172a;color:white;border:none;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;">Ver logs →</button>
+    <div class="chagra-popup">
+      <div class="chagra-popup-tipo">${esc(subType)}</div>
+      <div class="chagra-popup-nombre">${esc(name)}</div>
+      ${notesText ? `<div class="chagra-popup-notas">${esc(notesText.slice(0, 80))}${notesText.length > 80 ? '…' : ''}</div>` : ''}
+      <button data-asset-id="${esc(asset.id)}" class="chagra-popup-logs chagra-popup-btn">Ver historial →</button>
     </div>
   `;
 };
@@ -92,12 +128,28 @@ export const FarmMap = ({ focusZoneId = null, onAssetClick, onTaskComplete, show
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const featureGroupRef = useRef(null);
+  // Capa Leaflet de cada zona, para navegar desde los chips (solo viewport).
+  const landLayersRef = useRef(new Map());
 
   const plants = useAssetStore((s) => s.plants);
   const structures = useAssetStore((s) => s.structures);
   const lands = useAssetStore((s) => s.lands);
 
   const [pendingTasks, setPendingTasks] = useState([]);
+  // Chip activo (id de zona o null = toda la finca). Solo estado visual.
+  const [activeZoneChip, setActiveZoneChip] = useState(null);
+
+  // Chips de navegación: zonas con geometría + conteo de cultivos por zona.
+  // Lectura pura del store (misma relación parent que el filtro del mapa).
+  const zoneChips = useMemo(() => {
+    return lands
+      .filter((land) => getWkt(land))
+      .map((land) => ({
+        id: land.id,
+        name: land.attributes?.name || land.name || 'Sin nombre',
+        plantCount: plants.filter((p) => getParentId(p) === land.id).length,
+      }));
+  }, [lands, plants]);
 
   // Inicialización única del mapa
   useEffect(() => {
@@ -122,6 +174,9 @@ export const FarmMap = ({ focusZoneId = null, onAssetClick, onTaskComplete, show
       zoom: savedZoom,
       zoomControl: true,
       attributionControl: false,
+      // prefers-reduced-motion: cámara sin animaciones (zoom/fade vía CSS).
+      zoomAnimation: !prefersReducedMotion(),
+      fadeAnimation: !prefersReducedMotion(),
     });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -146,7 +201,7 @@ export const FarmMap = ({ focusZoneId = null, onAssetClick, onTaskComplete, show
     map.on('moveend', saveViewport);
     map.on('zoomend', saveViewport);
 
-    // Delegación de click para botones "Ver logs →" dentro de popups
+    // Delegación de click para botones "Ver historial →" dentro de popups
     if (onAssetClick) {
       map.on('popupopen', (e) => {
         const btn = e.popup.getElement()?.querySelector('.chagra-popup-logs');
@@ -163,6 +218,7 @@ export const FarmMap = ({ focusZoneId = null, onAssetClick, onTaskComplete, show
       map.remove();
       mapRef.current = null;
       featureGroupRef.current = null;
+      landLayersRef.current = new Map();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -192,6 +248,7 @@ export const FarmMap = ({ focusZoneId = null, onAssetClick, onTaskComplete, show
     if (!map || !fg) return;
 
     fg.clearLayers();
+    landLayersRef.current = new Map();
 
     // Determinar qué assets dibujar según focusZoneId
     let landsToRender = lands;
@@ -200,11 +257,7 @@ export const FarmMap = ({ focusZoneId = null, onAssetClick, onTaskComplete, show
 
     if (focusZoneId) {
       // Filtrar plants y structures cuyo parent apunte a la zona enfocada
-      const filterByParent = (asset) => {
-        const rel = asset.relationships?.parent?.data || asset.relationships?.location?.data;
-        const parentId = Array.isArray(rel) ? rel[0]?.id : rel?.id;
-        return parentId === focusZoneId;
-      };
+      const filterByParent = (asset) => getParentId(asset) === focusZoneId;
       landsToRender = lands.filter((l) => l.id === focusZoneId);
       structuresToRender = structures.filter(filterByParent);
       plantsToRender = plants.filter(filterByParent);
@@ -227,6 +280,7 @@ export const FarmMap = ({ focusZoneId = null, onAssetClick, onTaskComplete, show
       if (layer) {
         layer.bindPopup(buildPopup(land, 'Zona'));
         fg.addLayer(layer);
+        landLayersRef.current.set(land.id, layer);
       }
     }
 
@@ -293,11 +347,11 @@ export const FarmMap = ({ focusZoneId = null, onAssetClick, onTaskComplete, show
         });
 
         const popupHtml = `
-          <div style="min-width:180px;font-family:system-ui;">
-            <div style="font-size:10px;text-transform:uppercase;color:${style.color};font-weight:700;margin-bottom:2px;">${style.label}</div>
-            <div style="font-size:14px;font-weight:700;color:#0f172a;">${taskName}</div>
-            ${notesText ? `<div style="font-size:11px;color:#475569;margin-top:4px;">${notesText.slice(0, 100)}</div>` : ''}
-            <button data-task-id="${task.id}" class="chagra-popup-complete" style="margin-top:8px;padding:6px 12px;background:${style.color};color:white;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;width:100%;">Completar ahora ✓</button>
+          <div class="chagra-popup" style="--tarea-color:${style.color}">
+            <div class="chagra-popup-tipo chagra-popup-tipo--tarea">${esc(style.label)}</div>
+            <div class="chagra-popup-nombre">${esc(taskName)}</div>
+            ${notesText ? `<div class="chagra-popup-notas">${esc(notesText.slice(0, 100))}</div>` : ''}
+            <button data-task-id="${esc(task.id)}" class="chagra-popup-complete chagra-popup-btn">Completar ahora ✓</button>
           </div>
         `;
         marker.bindPopup(popupHtml);
@@ -317,20 +371,129 @@ export const FarmMap = ({ focusZoneId = null, onAssetClick, onTaskComplete, show
     // Encuadre automático: fitBounds si hay capas con geometría
     if (fg.getLayers().length > 0) {
       try {
-        map.fitBounds(fg.getBounds(), { padding: [30, 30], maxZoom: 18 });
+        map.fitBounds(fg.getBounds(), {
+          padding: [30, 30],
+          maxZoom: 18,
+          animate: !prefersReducedMotion(),
+        });
       } catch (err) {
         console.warn('[FarmMap] fitBounds falló:', err.message);
       }
     }
   }, [plants, structures, lands, focusZoneId, showTasks, pendingTasks, onTaskComplete]);
 
+  // Navegación por chip: encuadra la zona y abre su popup. Solo mueve la
+  // cámara — no filtra datos ni toca el store.
+  const goToZone = (zoneId) => {
+    const map = mapRef.current;
+    const layer = landLayersRef.current.get(zoneId);
+    if (!map || !layer) return;
+    setActiveZoneChip(zoneId);
+    const animate = !prefersReducedMotion();
+    if (typeof layer.getBounds === 'function') {
+      map.fitBounds(layer.getBounds(), { padding: [40, 40], maxZoom: 18, animate });
+    } else if (typeof layer.getLatLng === 'function') {
+      map.setView(layer.getLatLng(), 17, { animate });
+    }
+    if (typeof layer.openPopup === 'function') layer.openPopup();
+  };
+
+  // "Toda la finca": vuelve al encuadre global de todo lo dibujado.
+  const goToAll = () => {
+    const map = mapRef.current;
+    const fg = featureGroupRef.current;
+    setActiveZoneChip(null);
+    if (!map || !fg || fg.getLayers().length === 0) return;
+    try {
+      map.fitBounds(fg.getBounds(), {
+        padding: [30, 30],
+        maxZoom: 18,
+        animate: !prefersReducedMotion(),
+      });
+    } catch (_e) { /* noop */ }
+  };
+
+  const isEmpty = plants.length === 0 && structures.length === 0 && lands.length === 0;
+  const showZoneChips = !focusZoneId && zoneChips.length > 0;
+
   return (
-    <div className="relative w-full h-full">
+    <div className="chagra-farm-map relative w-full h-full">
       <div ref={containerRef} className="absolute inset-0 bg-slate-950" />
-      {plants.length === 0 && structures.length === 0 && lands.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="bg-slate-900/90 border border-slate-700 rounded-xl px-6 py-4 text-slate-300 text-sm">
-            Sin activos georreferenciados aún.
+
+      {/* Chips de lugares: navegación entre zonas sin salir del mapa */}
+      {showZoneChips && (
+        <nav className="chagra-map-zonas" aria-label="Ir a un lugar de la finca">
+          <button
+            type="button"
+            className="chagra-map-chip"
+            aria-pressed={activeZoneChip === null}
+            onClick={goToAll}
+            data-testid="farm-map-chip-all"
+          >
+            <Maximize2 size={12} aria-hidden="true" />
+            <span>Toda la finca</span>
+          </button>
+          {zoneChips.map((zone) => (
+            <button
+              key={zone.id}
+              type="button"
+              className="chagra-map-chip"
+              aria-pressed={activeZoneChip === zone.id}
+              onClick={() => goToZone(zone.id)}
+              data-testid={`farm-map-chip-${zone.id}`}
+            >
+              <MapPin size={12} aria-hidden="true" />
+              <span>{zone.name}</span>
+              {zone.plantCount > 0 && (
+                <span
+                  className="chagra-map-chip-num"
+                  aria-label={`${zone.plantCount} cultivos`}
+                >
+                  {zone.plantCount}
+                </span>
+              )}
+            </button>
+          ))}
+        </nav>
+      )}
+
+      {/* Leyenda de campo: qué significa cada color */}
+      {!isEmpty && (
+        <div className="chagra-map-leyenda" data-testid="farm-map-legend">
+          {LEGEND_ASSETS.map((item) => (
+            <span key={item.label} className="chagra-map-leyenda-item">
+              <span
+                aria-hidden="true"
+                className={`chagra-map-leyenda-swatch${item.outline ? ' chagra-map-leyenda-swatch--contorno' : ''}`}
+                style={item.outline ? { color: item.color } : { background: item.color }}
+              />
+              {item.label}
+            </span>
+          ))}
+          {showTasks && Object.entries(TASK_STYLES).map(([type, style]) => (
+            <span key={type} className="chagra-map-leyenda-item">
+              <span
+                aria-hidden="true"
+                className="chagra-map-leyenda-swatch"
+                style={{ background: style.color }}
+              />
+              {style.label}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Estado vacío honesto: el mapa sigue detrás (navegable), la card invita */}
+      {isEmpty && (
+        <div className="absolute inset-0 z-[500] flex items-center justify-center p-6 pointer-events-none">
+          <div className="chagra-map-empty-card">
+            <EmptyState
+              size="compact"
+              icon={MapPin}
+              title="Sin lugares en el mapa todavía"
+              description="Cuando registre sus zonas y siembras con ubicación, aquí las verá dibujadas sobre su finca."
+              data-testid="farm-map-empty"
+            />
           </div>
         </div>
       )}
