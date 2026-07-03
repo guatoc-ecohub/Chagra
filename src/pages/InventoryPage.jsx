@@ -27,20 +27,39 @@
 
 import { useState, useCallback } from 'react';
 import { Scale } from 'lucide-react';
+import { MSG } from '../config/messages.js';
 import InventoryDashboard from '../components/InventoryDashboard.jsx';
 import InventoryAuditTrail from '../components/InventoryAuditTrail.jsx';
 import InventoryAuditDashboard from '../components/InventoryAuditDashboard.jsx';
 import InventoryEventTimeline from '../components/InventoryEventTimeline.jsx';
 import RecountDrawer from '../components/RecountDrawer.jsx';
 
+// Botón "← Volver" compartido por los headers de audit/reconciliation:
+// tap mínimo de campo (--tap-min) + radio/duración por token.
+const backButtonStyle = {
+  minHeight: 'var(--tap-min, 44px)',
+  padding: '0.4rem 0.9rem',
+  borderRadius: 'var(--r-sm, 12px)',
+  border: '1px solid var(--border, #30363d)',
+  background: 'transparent',
+  color: 'inherit',
+  fontSize: 'var(--fs-cuerpo-sm, 0.9rem)',
+  fontWeight: 700,
+  cursor: 'pointer',
+  transition: 'background var(--dur-estado, 0.18s) var(--ease-suave, ease)',
+};
+
 export default function InventoryPage() {
   const [selectedItemId, setSelectedItemId] = useState(null);
+  // Nombre legible del ítem seleccionado (las tarjetas lo pasan junto al id);
+  // antes el header de la bitácora mostraba el id crudo.
+  const [selectedItemName, setSelectedItemName] = useState(null);
   const [viewMode, setViewMode] = useState('dashboard');
   const [recountTarget, setRecountTarget] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const handleRecount = useCallback((itemId) => {
-    setRecountTarget({ itemId });
+  const handleRecount = useCallback((itemId, meta) => {
+    setRecountTarget({ itemId, currentQty: meta?.qty, currentUnit: meta?.unit });
   }, []);
 
   const handleRecountSubmitted = useCallback(() => {
@@ -48,8 +67,9 @@ export default function InventoryPage() {
     setRecountTarget(null);
   }, []);
 
-  const handleViewAudit = useCallback((itemId) => {
+  const handleViewAudit = useCallback((itemId, name) => {
     setSelectedItemId(itemId);
+    setSelectedItemName(name || null);
     setViewMode('audit');
   }, []);
 
@@ -59,6 +79,7 @@ export default function InventoryPage() {
 
   const handleBackToDashboard = useCallback(() => {
     setSelectedItemId(null);
+    setSelectedItemName(null);
     setViewMode('dashboard');
   }, []);
 
@@ -92,13 +113,15 @@ export default function InventoryPage() {
                 alignItems: 'center',
                 gap: '0.4rem',
                 padding: '0.5rem 0.9rem',
-                borderRadius: '0.6rem',
+                minHeight: 'var(--tap-min, 44px)',
+                borderRadius: 'var(--r-sm, 12px)',
                 border: '1px solid var(--border, #30363d)',
                 background: 'transparent',
                 color: 'inherit',
                 fontSize: '0.8rem',
                 fontWeight: 700,
                 cursor: 'pointer',
+                transition: 'background var(--dur-estado, 0.18s) var(--ease-suave, ease)',
               }}
             >
               <Scale size={14} /> Auditoría y reconciliación
@@ -115,15 +138,17 @@ export default function InventoryPage() {
       {viewMode === 'audit' && (
         <>
           <header style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border, #30363d)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <button onClick={handleBackToDashboard} aria-label="Volver al dashboard">
+            <button onClick={handleBackToDashboard} aria-label="Volver al dashboard" style={backButtonStyle}>
               ← Volver
             </button>
-            <h1 style={{ margin: 0, fontSize: '1.1rem' }}>Bitácora · {selectedItemId}</h1>
+            <h1 style={{ margin: 0, fontSize: 'var(--fs-titulo, 1.1rem)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {MSG.ui.bitacoraDe(selectedItemName || selectedItemId)}
+            </h1>
           </header>
           <InventoryAuditTrail itemId={selectedItemId} />
           <div style={{ padding: '1rem', textAlign: 'center' }}>
-            <button onClick={() => handleRecount(selectedItemId)}>
-              ± Conteo manual de este item
+            <button onClick={() => handleRecount(selectedItemId)} style={backButtonStyle}>
+              ± Conteo manual de este ítem
             </button>
           </div>
         </>
@@ -132,10 +157,10 @@ export default function InventoryPage() {
       {viewMode === 'reconciliation' && (
         <div data-testid="inventory-view-reconciliation">
           <header style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border, #30363d)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <button onClick={handleBackToDashboard} aria-label="Volver al dashboard">
+            <button onClick={handleBackToDashboard} aria-label="Volver al dashboard" style={backButtonStyle}>
               ← Volver
             </button>
-            <h1 style={{ margin: 0, fontSize: '1.1rem' }}>Auditoría y reconciliación</h1>
+            <h1 style={{ margin: 0, fontSize: 'var(--fs-titulo, 1.1rem)' }}>Auditoría y reconciliación</h1>
           </header>
           <InventoryAuditDashboard />
           <section style={{ padding: '1.5rem', paddingTop: '0.5rem' }}>

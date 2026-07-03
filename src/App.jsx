@@ -998,7 +998,9 @@ export default function App() {
                   </button>
                 }
               >
-                <InventoryDashboard />
+                {/* CTA del estado vacío → panel de Activos, donde se registran
+                    los materiales (mismo flujo de alta existente, solo nav). */}
+                <InventoryDashboard onGoToActivos={() => navigate('activos')} />
               </ScreenShell>
             </ErrorFallback>
           </ErrorBoundary>

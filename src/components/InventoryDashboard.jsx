@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Package, AlertTriangle, Plus, X, Download } from 'lucide-react';
+import { Package, AlertTriangle, Plus, X, Download, History } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
-import { UNIT_OPTIONS } from '../config/materials';
+import { UNIT_OPTIONS, MATERIAL_CATEGORIES, MATERIAL_CATEGORY_BY_NAME } from '../config/materials';
 import { useConsumptionMetrics } from '../hooks/useConsumptionMetrics';
 import BiopreparadoRecetasGallery from './BiopreparadoRecetasGallery';
 import { Sparkline } from './charts/Sparkline';
@@ -9,11 +9,42 @@ import { exportTraceabilityCsv } from '../services/exportService';
 import { getAllPlans, markStepExecuted } from '../services/planGeneratorService';
 import { getCurrentOperatorHash } from '../services/operatorIdentityService';
 import { MSG } from '../config/messages.js';
+import EmptyState from './common/EmptyState.jsx';
+import Skeleton from './common/Skeleton.jsx';
 
 // Autopilot #10 (2026-05-03): banner top + sort low-stock primero. Reduce
 // chance que el operador no se entere de stock bajo hasta que use el material.
 function getStockValue(item) {
   return parseFloat(item.attributes?.inventory_value) || 0;
+}
+
+function getMaterialName(item) {
+  return item.attributes?.name || item.name || '';
+}
+
+// Categoría funcional del insumo (config/materials.js) — solo presentación:
+// chip de color en la tarjeta + filtro client-side. 'otros' agrupa insumos
+// custom que no matchean ningún preset.
+function getCategoryId(item) {
+  return MATERIAL_CATEGORY_BY_NAME[getMaterialName(item)] || 'otros';
+}
+
+const CATEGORY_OTROS = { label: 'Otros', color: '#94a3b8' }; // slate-400
+
+function getCategoryMeta(categoryId) {
+  return MATERIAL_CATEGORIES[categoryId] || CATEGORY_OTROS;
+}
+
+// Estado visual del stock — misma vara (LOW_THRESHOLD) que el banner de
+// reorden y el sort de urgencia; esto solo lo hace legible en la tarjeta.
+function getStockState(stock) {
+  if (stock <= 0) {
+    return { label: 'Agotado', className: 'bg-rose-500/15 text-rose-300 border-rose-500/40' };
+  }
+  if (stock < LOW_THRESHOLD) {
+    return { label: 'Poco', className: 'bg-amber-500/15 text-amber-300 border-amber-500/40' };
+  }
+  return { label: 'Suficiente', className: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40' };
 }
 
 /**
@@ -29,8 +60,11 @@ const LOW_THRESHOLD = 5;
 const BAR_CAPACITY = 50;
 
 // Card individual extraída para respetar rules of hooks (useConsumptionMetrics).
-const MaterialCard = ({ item, onRefill }) => {
-  const name = item.attributes?.name || item.name || 'Insumo sin nombre';
+// onViewAudit/onRecount son opcionales: los pasa InventoryPage (auditoría) y
+// se omiten en la ruta 'bodega' — antes InventoryPage los pasaba y el
+// dashboard los IGNORABA (bitácora por ítem inalcanzable desde las tarjetas).
+const MaterialCard = ({ item, onRefill, onViewAudit = undefined, onRecount = undefined }) => {
+  const name = getMaterialName(item) || 'Insumo sin nombre';
   const stock = parseFloat(item.attributes?.inventory_value) || 0;
   const unit = item.attributes?.inventory_unit || 'unidades';
   const isLow = stock < LOW_THRESHOLD;
@@ -42,24 +76,54 @@ const MaterialCard = ({ item, onRefill }) => {
     ? (isLocalPending ? 'border-blue-700/60' : 'border-dashed border-slate-600 opacity-80')
     : 'border-slate-800';
 
+  const category = getCategoryMeta(getCategoryId(item));
+  const stockState = getStockState(stock);
+
   const { values: trend } = useConsumptionMetrics(name, 7);
 
   return (
     <div
-      className={`bg-slate-900 border rounded-2xl p-5 space-y-4 transition-all ${pendingClass}`}
+      data-testid="inventory-material-card"
+      className={`bg-slate-900 border p-5 space-y-4 transition-all ${pendingClass}`}
+      style={{
+        borderRadius: 'var(--r-lg, 20px)',
+        boxShadow: 'var(--sombra-1, 0 1px 2px rgb(8 30 22 / 0.18))',
+        transitionDuration: 'var(--dur-estado, 0.18s)',
+      }}
     >
       <div className="flex justify-between items-start gap-2">
-        <h3 className="font-bold text-slate-200 truncate flex-1">{name}</h3>
+        <div className="flex-1 min-w-0">
+          <h3 className="font-bold text-slate-200 truncate">{name}</h3>
+          <span
+            className="inline-block mt-1.5 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 border"
+            style={{
+              borderRadius: 'var(--r-pill, 999px)',
+              color: category.color,
+              borderColor: `${category.color}55`,
+              background: `${category.color}14`,
+            }}
+          >
+            {category.label}
+          </span>
+        </div>
         {isLocalPending ? (
-          <span className="text-[10px] px-2 py-1 rounded bg-blue-500/15 text-blue-200 border border-blue-500/40 font-bold uppercase">
+          <span className="text-[10px] px-2 py-1 rounded bg-blue-500/15 text-blue-200 border border-blue-500/40 font-bold uppercase shrink-0">
             Guardado local · sync pendiente
           </span>
-        ) : isLow && (
-          <AlertTriangle
-            size={18}
-            className="text-amber-500 animate-pulse shrink-0"
-            aria-label="Stock bajo"
-          />
+        ) : (
+          <span
+            className={`text-[10px] px-2 py-1 border font-bold uppercase shrink-0 inline-flex items-center gap-1 ${stockState.className}`}
+            style={{ borderRadius: 'var(--r-pill, 999px)' }}
+          >
+            {isLow && (
+              <AlertTriangle
+                size={11}
+                className="motion-safe:animate-pulse"
+                aria-hidden="true"
+              />
+            )}
+            {stockState.label}
+          </span>
         )}
       </div>
 
@@ -99,13 +163,41 @@ const MaterialCard = ({ item, onRefill }) => {
         />
       </div>
 
-      <button
-        type="button"
-        onClick={() => onRefill(item)}
-        className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors min-h-[40px]"
-      >
-        <Plus size={16} /> Abastecer
-      </button>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => onRefill(item)}
+          className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors min-h-[44px]"
+        >
+          <Plus size={16} /> Abastecer
+        </button>
+        {typeof onViewAudit === 'function' && (
+          <button
+            type="button"
+            onClick={() => onViewAudit(item.id, name)}
+            title="Ver bitácora de movimientos"
+            aria-label={`Ver bitácora de ${name}`}
+            data-testid="inventory-card-audit"
+            className="px-3 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 rounded-lg flex items-center justify-center transition-colors min-h-[44px]"
+            style={{ minWidth: 'var(--tap-min, 44px)' }}
+          >
+            <History size={16} aria-hidden="true" />
+          </button>
+        )}
+        {typeof onRecount === 'function' && (
+          <button
+            type="button"
+            onClick={() => onRecount(item.id, { qty: stock, unit })}
+            title="Conteo manual (ajuste de stock)"
+            aria-label={`Conteo manual de ${name}`}
+            data-testid="inventory-card-recount"
+            className="px-3 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 rounded-lg flex items-center justify-center transition-colors min-h-[44px] font-bold text-sm"
+            style={{ minWidth: 'var(--tap-min, 44px)' }}
+          >
+            ±
+          </button>
+        )}
+      </div>
     </div>
   );
 };
@@ -121,17 +213,31 @@ const MaterialCard = ({ item, onRefill }) => {
  * - Exportación del inventario como archivo descargable (CSV/JSON).
  * - Sparklines de consumo histórico derivados de logs de tipo input.
  *
+ * Props (todas opcionales — la ruta 'bodega' no pasa ninguna):
+ *   - onViewAudit(itemId, name): abre la bitácora del ítem (InventoryPage).
+ *   - onRecount(itemId, {qty, unit}): abre el conteo manual (InventoryPage).
+ *   - onGoToActivos(): CTA del estado vacío → panel de Activos (App.jsx).
+ *
  * @returns {JSX.Element}
  */
-export const InventoryDashboard = () => {
+export const InventoryDashboard = ({
+  onViewAudit = undefined,
+  onRecount = undefined,
+  onGoToActivos = undefined,
+}) => {
   const materials = useAssetStore((s) => s.materials);
   const refillMaterial = useAssetStore((s) => s.refillMaterial);
+  // Primer paint: mientras hydrate() lee IndexedDB la bodega parecía vacía
+  // ("No hay insumos") aunque tuviera stock — skeleton en vez de vacío frío.
+  const isHydrated = useAssetStore((s) => s.isHydrated);
 
   const [refillTarget, setRefillTarget] = useState(null); // material seleccionado
   const [refillAmount, setRefillAmount] = useState('');
   const [refillUnit, setRefillUnit] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [exporting, setExporting] = useState(false);
+  // Filtro visual por categoría funcional (config/materials.js) — client-side.
+  const [categoryFilter, setCategoryFilter] = useState('all');
 
   const [upcomingSteps, setUpcomingSteps] = useState([]);
 
@@ -149,6 +255,19 @@ export const InventoryDashboard = () => {
     });
     return { lowStockMaterials: low, sortedMaterials: sorted };
   }, [materials]);
+
+  // Categorías presentes en la bodega actual (para pintar los chips de filtro
+  // solo cuando aportan: 2+ categorías distintas).
+  const categoriesPresent = useMemo(() => {
+    const ids = new Set(materials.map(getCategoryId));
+    // Orden estable: el del catálogo, con 'otros' al final.
+    return [...Object.keys(MATERIAL_CATEGORIES), 'otros'].filter((id) => ids.has(id));
+  }, [materials]);
+
+  const visibleMaterials = useMemo(() => {
+    if (categoryFilter === 'all') return sortedMaterials;
+    return sortedMaterials.filter((m) => getCategoryId(m) === categoryFilter);
+  }, [sortedMaterials, categoryFilter]);
 
   const loadUpcomingSteps = async () => {
     try {
@@ -254,7 +373,7 @@ export const InventoryDashboard = () => {
             aria-label="Exportar reporte CSV"
           >
             {exporting ? (
-              <div className="animate-spin h-3.5 w-3.5 border-2 border-white/20 border-t-white rounded-full" />
+              <div className="motion-safe:animate-spin h-3.5 w-3.5 border-2 border-white/20 border-t-white rounded-full" />
             ) : (
               <Download size={14} />
             )}
@@ -268,7 +387,7 @@ export const InventoryDashboard = () => {
       {/* Autopilot #10: Banner reorder cuando hay stock bajo */}
       {lowStockMaterials.length > 0 && (
         <section className="bg-amber-900/20 border border-amber-800/50 rounded-2xl p-4 flex items-start gap-3">
-          <AlertTriangle size={20} className="text-amber-400 shrink-0 mt-0.5 animate-pulse" />
+          <AlertTriangle size={20} className="text-amber-400 shrink-0 mt-0.5 motion-safe:animate-pulse" />
           <div className="flex-1 min-w-0">
             <h3 className="text-sm font-bold text-amber-300 mb-1">
               {lowStockMaterials.length} insumo{lowStockMaterials.length > 1 ? 's' : ''} bajo umbral
@@ -338,20 +457,94 @@ export const InventoryDashboard = () => {
         <BiopreparadoRecetasGallery />
       </div>
 
-      {materials.length === 0 ? (
-        <div className="py-12 text-center text-slate-500">
-          <Package size={40} className="mx-auto mb-3 opacity-40" />
-          <p className="text-sm">No hay insumos registrados en bodega.</p>
-          <p className="text-xs mt-1 opacity-70">
-            Agrega un material desde el panel de Activos para comenzar a trackear el inventario.
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {sortedMaterials.map((item) => (
-            <MaterialCard key={item.id} item={item} onRefill={openRefillModal} />
+      {!isHydrated && materials.length === 0 ? (
+        // Primer paint mientras hydrate() lee IndexedDB: skeleton de tarjetas
+        // (shimmer se apaga solo con prefers-reduced-motion vía motion-safe).
+        <div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          data-testid="inventory-loading-skeleton"
+        >
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="bg-slate-900 border border-slate-800 p-5 space-y-4"
+              style={{ borderRadius: 'var(--r-lg, 20px)' }}
+            >
+              <Skeleton width="55%" height={14} rounded="md" />
+              <Skeleton variant="rect" width="40%" height={36} rounded="lg" />
+              <Skeleton variant="rect" width="100%" height={8} rounded="full" />
+              <Skeleton variant="rect" width="100%" height={44} rounded="lg" />
+            </div>
           ))}
         </div>
+      ) : materials.length === 0 ? (
+        <EmptyState
+          icon={Package}
+          title="Su bodega está vacía por ahora"
+          description="Aquí verá sus insumos y biopreparados con la cantidad disponible: el stock se descuenta solo cada vez que registre una aplicación."
+          actionLabel={typeof onGoToActivos === 'function' ? MSG.ui.registrarPrimerInsumo : undefined}
+          onAction={onGoToActivos}
+          secondaryHint={MSG.ui.insumosSeCreanDesdeActivos}
+          data-testid="inventory-empty-state"
+        />
+      ) : (
+        <>
+          {/* Filtro visual por categoría — solo cuando hay 2+ categorías. */}
+          {categoriesPresent.length > 1 && (
+            <div
+              role="toolbar"
+              aria-label="Filtrar insumos por categoría"
+              className="flex flex-wrap gap-2"
+            >
+              {[{ id: 'all', label: 'Todos' }, ...categoriesPresent.map((id) => ({ id, label: getCategoryMeta(id).label }))].map(({ id, label }) => {
+                const active = categoryFilter === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setCategoryFilter(id)}
+                    aria-pressed={active}
+                    data-testid="inventory-category-chip"
+                    className={`px-3.5 py-2 text-xs font-bold border transition-colors ${
+                      active
+                        ? 'bg-emerald-600 border-emerald-400/60 text-white'
+                        : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-slate-200 hover:border-slate-500'
+                    }`}
+                    style={{
+                      borderRadius: 'var(--r-pill, 999px)',
+                      minHeight: 'var(--tap-min, 44px)',
+                      transitionDuration: 'var(--dur-estado, 0.18s)',
+                    }}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {visibleMaterials.length === 0 ? (
+            <EmptyState
+              size="compact"
+              icon={Package}
+              title="Sin insumos en esta categoría"
+              description="Pruebe con otra categoría o vuelva a «Todos»."
+              data-testid="inventory-filter-empty"
+            />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {visibleMaterials.map((item) => (
+                <MaterialCard
+                  key={item.id}
+                  item={item}
+                  onRefill={openRefillModal}
+                  onViewAudit={onViewAudit}
+                  onRecount={onRecount}
+                />
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {/* Modal de abastecimiento */}
@@ -442,7 +635,7 @@ export const InventoryDashboard = () => {
                 className="flex-1 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors"
               >
                 {submitting ? (
-                  <div className="animate-spin h-4 w-4 border-2 border-white/20 border-t-white rounded-full" />
+                  <div className="motion-safe:animate-spin h-4 w-4 border-2 border-white/20 border-t-white rounded-full" />
                 ) : (
                   <Plus size={16} />
                 )}
