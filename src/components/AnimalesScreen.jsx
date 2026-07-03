@@ -91,21 +91,21 @@ function VerticalCard({ v, onNavigate }) {
       type="button"
       onClick={() => onNavigate(v.route)}
       aria-label={`${v.titulo} — ${v.subtitulo}`}
-      className={`group relative w-full text-left rounded-2xl overflow-hidden bg-gradient-to-br ${v.accent} backdrop-blur-xl border ${v.border} p-4 ring-2 ring-white/0 hover:ring-white/30 shadow-lg shadow-black/20 transition-all duration-200 ease-out active:scale-[0.98] hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70`}
+      className={`group relative w-full text-left rounded-[var(--r-lg,20px)] overflow-hidden bg-gradient-to-br ${v.accent} backdrop-blur-xl border ${v.border} p-4 ring-2 ring-white/0 hover:ring-white/30 shadow-[var(--sombra-2,0_6px_18px_rgb(8_30_22/0.22))] motion-safe:transition-all motion-safe:duration-200 ease-out motion-safe:active:scale-[0.98] motion-safe:hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70`}
     >
       {/* Cinta de acento superior: identidad de color del vertical. */}
       <span
         aria-hidden="true"
-        className={`pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${v.bar} opacity-70 group-hover:opacity-100 transition-opacity`}
+        className={`pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${v.bar} opacity-70 group-hover:opacity-100 motion-safe:transition-opacity`}
       />
       <div className="flex items-center gap-3">
         {/* Icono grande sobre disco de halo tonal (mismo patrón que FincaCards). */}
         <span className="relative grid place-items-center shrink-0">
           <span
             aria-hidden="true"
-            className={`absolute inset-0 -m-1 rounded-full ${v.halo} blur-md scale-110 group-hover:scale-125 transition-transform`}
+            className={`absolute inset-0 -m-1 rounded-full ${v.halo} blur-md scale-110 motion-safe:group-hover:scale-125 motion-safe:transition-transform`}
           />
-          <span className="relative w-12 h-12 rounded-xl bg-black/30 flex items-center justify-center text-3xl select-none">
+          <span className="relative w-12 h-12 rounded-[var(--r-sm,12px)] bg-black/30 flex items-center justify-center text-3xl select-none">
             {v.emoji}
           </span>
         </span>
@@ -117,7 +117,7 @@ function VerticalCard({ v, onNavigate }) {
             {v.aporte}
           </p>
         </div>
-        <ChevronRight size={20} className="shrink-0 text-slate-400 group-hover:text-slate-200 transition-colors" aria-hidden="true" />
+        <ChevronRight size={20} className="shrink-0 text-slate-400 group-hover:text-slate-200 motion-safe:transition-colors" aria-hidden="true" />
       </div>
     </button>
   );
@@ -144,7 +144,7 @@ export default function AnimalesScreen({ onBack, onHome, onNavigate }) {
 
         {/* Explicación del CICLO CERRADO: animal → estiércol → biopreparado →
             suelo → planta. Groundeado en biopreparados-seed.json. */}
-        <section className="mt-6 rounded-2xl border border-emerald-700/40 bg-emerald-900/20 p-4">
+        <section className="mt-6 rounded-[var(--r-lg,20px)] border border-emerald-700/40 bg-emerald-900/20 p-4 shadow-[var(--sombra-1,0_1px_2px_rgb(8_30_22/0.18))]">
           <h2 className="flex items-center gap-2 text-base font-bold text-emerald-200">
             <Recycle size={18} aria-hidden="true" />
             El ciclo cerrado de tu finca
@@ -173,7 +173,7 @@ export default function AnimalesScreen({ onBack, onHome, onNavigate }) {
           <button
             type="button"
             onClick={() => go('ciclo_nutrientes')}
-            className="mt-4 w-full min-h-[48px] rounded-xl font-bold text-sm bg-emerald-700 hover:bg-emerald-600 text-white flex items-center justify-center gap-2"
+            className="mt-4 w-full min-h-[48px] rounded-[var(--r-md,16px)] font-bold text-sm bg-emerald-700 hover:bg-emerald-600 active:brightness-90 text-white flex items-center justify-center gap-2 motion-safe:transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70"
           >
             <Recycle size={16} aria-hidden="true" /> Ver ciclo de nutrientes
             <ChevronRight size={16} aria-hidden="true" />

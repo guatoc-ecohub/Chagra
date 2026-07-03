@@ -5,6 +5,7 @@ import {
 import { ScreenShell } from './common/ScreenShell';
 import FuentesAnimal from './common/FuentesAnimal';
 import ChecklistManejo from './common/ChecklistManejo';
+import { SeccionAnimal, FichaAnimalHero } from './common/SeccionAnimal';
 
 /**
  * VacasScreen — vertical de ganado bovino del módulo Animales.
@@ -27,19 +28,8 @@ import ChecklistManejo from './common/ChecklistManejo';
  * (ambos atribuidos a Restrepo Rivera).
  */
 
-function SeccionCard({ Icon, color, titulo, children }) {
-  return (
-    <section className={`rounded-2xl border ${color.border} ${color.bg} p-4`}>
-      <h2 className={`flex items-center gap-2 text-base font-bold ${color.text}`}>
-        {Icon && <Icon size={18} aria-hidden="true" />}
-        {titulo}
-      </h2>
-      <div className="mt-2 text-sm text-slate-200/90 leading-relaxed space-y-2">
-        {children}
-      </div>
-    </section>
-  );
-}
+// Capa visual compartida del módulo Animales (cinta + disco tonal + tokens).
+const SeccionCard = SeccionAnimal;
 
 // Razas reales manejadas en Colombia, con propósito (AGROSAVIA, FEDEGAN).
 const RAZAS = [
@@ -55,16 +45,30 @@ export default function VacasScreen({ onBack, onHome, onNavigate }) {
   return (
     <ScreenShell title="Vacas y ganado" icon={Beef} onBack={onBack} onHome={onHome}>
       <div className="px-4 pt-4 pb-10 max-w-2xl mx-auto space-y-4">
-        <p className="text-sm text-slate-300 leading-relaxed">
-          Las vacas te dan leche y carne, y además la boñiga (bovinaza) es uno de
-          los mejores abonos de la finca. Bien manejadas, con árboles y pasto, el
-          ganado cuida el suelo en vez de dañarlo.
-        </p>
+        {/* Ficha de identidad del animal — emoji + produce + aporte, de un vistazo. */}
+        <FichaAnimalHero
+          emoji="🐄"
+          titulo="Vacas y ganado"
+          descripcion="Las vacas te dan leche y carne, y además la boñiga (bovinaza) es uno de los mejores abonos de la finca. Bien manejadas, con árboles y pasto, el ganado cuida el suelo en vez de dañarlo."
+          produce={[
+            { emoji: '🥛', label: 'Leche' },
+            { emoji: '🥩', label: 'Carne' },
+            { emoji: '🌱', label: 'Boñiga (abono)' },
+          ]}
+          aporte="Aporte al ciclo: la boñiga es la base del biol y entra al bocashi"
+          tone={{
+            border: 'border-orange-600/40',
+            bg: 'bg-gradient-to-br from-orange-600/25 to-amber-500/10',
+            halo: 'bg-orange-400/20',
+            chip: 'border-orange-500/40 bg-orange-500/15 text-orange-100',
+            aporte: 'text-orange-300',
+          }}
+        />
 
         {/* 1. Registro básico */}
         <SeccionCard
           Icon={Info}
-          color={{ border: 'border-sky-700/40', bg: 'bg-sky-900/20', text: 'text-sky-200' }}
+          color={{ border: 'border-sky-700/40', bg: 'bg-sky-900/20', text: 'text-sky-200', bar: 'from-sky-400 to-cyan-300', disc: 'bg-sky-400/15' }}
           titulo="Registro básico"
         >
           <p>Anota lo esencial de tu ganado para hacerle seguimiento:</p>
@@ -74,32 +78,27 @@ export default function VacasScreen({ onBack, onHome, onNavigate }) {
             <li>• <span className="font-bold">Propósito:</span> leche, carne o doble propósito.</li>
             <li>• <span className="font-bold">Edad y estado:</span> ternero, levante, vaca de cría, vaca en producción.</li>
           </ul>
-          <div className="mt-2 overflow-x-auto">
-            <table className="w-full text-xs border-collapse">
-              <thead>
-                <tr className="text-left text-slate-400 border-b border-slate-700">
-                  <th className="py-1.5 pr-2 font-bold">Raza / cruce</th>
-                  <th className="py-1.5 pr-2 font-bold">Propósito</th>
-                  <th className="py-1.5 font-bold">Nota</th>
-                </tr>
-              </thead>
-              <tbody>
-                {RAZAS.map((r) => (
-                  <tr key={r.nombre} className="border-b border-slate-800/60 align-top">
-                    <td className="py-1.5 pr-2 font-bold text-slate-100">{r.nombre}</td>
-                    <td className="py-1.5 pr-2 text-amber-200">{r.proposito}</td>
-                    <td className="py-1.5 text-slate-300/90">{r.nota}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          {/* Razas como mini-fichas apiladas (más legibles en pantalla angosta
+              que una tabla de 3 columnas). Propósito como chip pastilla. */}
+          <div className="mt-2 space-y-1.5">
+            {RAZAS.map((r) => (
+              <div key={r.nombre} className="rounded-[var(--r-sm,12px)] bg-black/20 border border-slate-700/50 p-2.5">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm font-bold text-slate-100 leading-tight">{r.nombre}</p>
+                  <span className="shrink-0 px-2 py-0.5 rounded-[var(--r-pill,999px)] border border-amber-500/40 bg-amber-500/15 text-[10px] font-bold text-amber-200 leading-tight">
+                    {r.proposito}
+                  </span>
+                </div>
+                <p className="mt-1 text-xs text-slate-300/90 leading-snug">{r.nota}</p>
+              </div>
+            ))}
           </div>
         </SeccionCard>
 
         {/* 2. Sanidad real */}
         <SeccionCard
           Icon={HeartPulse}
-          color={{ border: 'border-rose-700/40', bg: 'bg-rose-900/20', text: 'text-rose-200' }}
+          color={{ border: 'border-rose-700/40', bg: 'bg-rose-900/20', text: 'text-rose-200', bar: 'from-rose-400 to-pink-300', disc: 'bg-rose-400/15' }}
           titulo="Sanidad"
         >
           <p>
@@ -142,7 +141,7 @@ export default function VacasScreen({ onBack, onHome, onNavigate }) {
         {/* 3. Manejo — pastoreo rotacional + SILVOPASTOREO (enlaza al proceso) */}
         <SeccionCard
           Icon={Sprout}
-          color={{ border: 'border-emerald-700/40', bg: 'bg-emerald-900/20', text: 'text-emerald-200' }}
+          color={{ border: 'border-emerald-700/40', bg: 'bg-emerald-900/20', text: 'text-emerald-200', bar: 'from-emerald-400 to-teal-300', disc: 'bg-emerald-400/15' }}
           titulo="Manejo agroecológico"
         >
           <ul className="space-y-2">
@@ -164,7 +163,7 @@ export default function VacasScreen({ onBack, onHome, onNavigate }) {
           <button
             type="button"
             onClick={() => go('seguimiento_silvopastoreo')}
-            className="mt-1 w-full rounded-xl border border-emerald-600/50 bg-emerald-950/40 p-3 flex items-center gap-2.5 text-left hover:border-emerald-500 transition-colors"
+            className="mt-1 w-full min-h-[var(--tap-min,44px)] rounded-[var(--r-md,16px)] border border-emerald-600/50 bg-emerald-950/40 p-3 flex items-center gap-2.5 text-left hover:border-emerald-500 motion-safe:transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70"
           >
             <Trees size={20} className="shrink-0 text-emerald-300" aria-hidden="true" />
             <span className="text-sm text-emerald-100 flex-1">
@@ -177,7 +176,7 @@ export default function VacasScreen({ onBack, onHome, onNavigate }) {
         {/* 4. Producción */}
         <SeccionCard
           Icon={Milk}
-          color={{ border: 'border-amber-700/40', bg: 'bg-amber-900/20', text: 'text-amber-200' }}
+          color={{ border: 'border-amber-700/40', bg: 'bg-amber-900/20', text: 'text-amber-200', bar: 'from-amber-400 to-yellow-300', disc: 'bg-amber-400/15' }}
           titulo="Producción"
         >
           <ul className="space-y-1.5">
@@ -199,7 +198,7 @@ export default function VacasScreen({ onBack, onHome, onNavigate }) {
         {/* 5. Aporte a tu finca — CICLO CERRADO (boñiga → biol → suelo → planta) */}
         <SeccionCard
           Icon={Recycle}
-          color={{ border: 'border-lime-600/50', bg: 'bg-lime-900/25', text: 'text-lime-200' }}
+          color={{ border: 'border-lime-600/50', bg: 'bg-lime-900/25', text: 'text-lime-200', bar: 'from-lime-400 to-emerald-300', disc: 'bg-lime-400/15' }}
           titulo="Aporte a tu finca"
         >
           <p>
