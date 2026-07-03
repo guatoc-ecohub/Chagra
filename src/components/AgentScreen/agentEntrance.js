@@ -82,6 +82,21 @@ export const AGENT_COMPOSITOR_CSS = `
   .as-tool.is-open {
     background: rgb(16,185,129); border-color: rgb(16,185,129); animation: none;
   }
+  /* Pulido foto-visión 2026-07: la cámara es la puerta al diagnóstico por foto
+     (reportar plaga) — botón más GRANDE y con acento ámbar propio para que se
+     distinga del resto del chrome sin competir con el mic (54px, camino de
+     voz). Con foto ya adjunta (.has-photo) se pinta esmeralda lleno: "su foto
+     está lista". Reduced-motion no aplica: no tiene animación propia. */
+  .as-photo {
+    width: 48px; height: 48px;
+    border-color: rgba(245,158,11,0.45);
+    color: rgb(251,191,36);
+    background: rgba(120,53,15,0.25);
+  }
+  .as-photo:hover { color: #fff; border-color: rgba(245,158,11,0.7); }
+  .as-photo.has-photo {
+    background: rgb(5,150,105); border-color: rgb(16,185,129); color: #fff;
+  }
   @keyframes as-pulse-ring {
     0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0.45); }
     70%  { box-shadow: 0 0 0 12px rgba(16,185,129,0); }

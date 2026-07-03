@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, BadgeCheck, Info, Sparkles, AlertTriangle, ExternalLink, ShieldCheck } from 'lucide-react';
+import { User, BadgeCheck, Info, Sparkles, AlertTriangle, ExternalLink, ShieldCheck, ScanSearch } from 'lucide-react';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import { speak, speakKokoro, stop, isSpeaking, isKokoroAvailable } from '../../services/ttsService';
 import { agentSounds } from '../../services/agentSoundService';
@@ -261,6 +261,73 @@ function ConfianzaBadge({ metadata }) {
 }
 
 /**
+ * Pulido foto-visión 2026-07 — presentación legible del diagnóstico por foto.
+ *
+ * Cuando el turno del assistant nace de una foto real (metadata.vision_turn,
+ * marcado por AgentScreen con el mismo visionContext que ya consumen los
+ * guards anti-fabricación), la burbuja abre con un encabezado propio:
+ * "Diagnóstico visual de su foto" + el nivel de confianza de la visión
+ * (alta/media/baja por color, legible sin leer), y cierra con un pie honesto:
+ * el diagnóstico sale de una foto, confírmelo en campo antes de aplicar
+ * cualquier control. Solo presentación — el texto del diagnóstico (qué es +
+ * control sugerido) viene tal cual del pipeline, y los badges de fuente
+ * existentes (SourceBadge/FuenteBadge) siguen dando el pie de fuente.
+ */
+const _VISION_CONF = [
+  { min: 0.75, label: 'Confianza alta', classes: 'bg-emerald-600/25 text-emerald-200 border-emerald-600/60' },
+  { min: 0.5, label: 'Confianza media', classes: 'bg-amber-600/25 text-amber-200 border-amber-600/60' },
+  { min: 0, label: 'Confianza baja', classes: 'bg-slate-600/30 text-slate-300 border-slate-500/60' },
+];
+
+function visionConfidencePill(confidence) {
+  if (typeof confidence !== 'number' || Number.isNaN(confidence)) return null;
+  const c = Math.max(0, Math.min(1, confidence));
+  const level = _VISION_CONF.find((l) => c >= l.min) || _VISION_CONF[_VISION_CONF.length - 1];
+  return { ...level, pct: Math.round(c * 100) };
+}
+
+function VisionDiagnosisHeader({ metadata }) {
+  const md = metadata || {};
+  if (md.vision_turn !== true) return null;
+  const pill = visionConfidencePill(md.vision_confidence);
+  return (
+    <div
+      className="flex flex-wrap items-center gap-1.5 mb-2 pb-2 border-b border-slate-700/60"
+      data-testid="vision-diagnosis-header"
+    >
+      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-300">
+        <ScanSearch size={14} aria-hidden="true" />
+        <span>Diagnóstico visual de su foto</span>
+      </span>
+      {pill && (
+        <span
+          className={`text-[10px] px-2 py-0.5 rounded-full border font-bold ${pill.classes}`}
+          data-testid="vision-confidence-pill"
+          title={`El modelo de visión leyó la foto con ${pill.pct}% de confianza. A menor confianza, más importante confirmar en campo.`}
+        >
+          {pill.label} · {pill.pct}%
+        </span>
+      )}
+    </div>
+  );
+}
+
+function VisionDiagnosisFootnote({ metadata }) {
+  const md = metadata || {};
+  if (md.vision_turn !== true) return null;
+  return (
+    <p
+      className="text-[10px] text-slate-400 leading-snug mt-2 pt-2 border-t border-slate-700/50"
+      data-testid="vision-diagnosis-footnote"
+    >
+      Este diagnóstico sale de la foto que usted envió. Antes de aplicar
+      cualquier control, confírmelo mirando la planta en campo o con un técnico
+      de confianza.
+    </p>
+  );
+}
+
+/**
  * Burbuja individual de chat para un mensaje del usuario o del agente.
  * Soporta renderizado de imágenes, badges de fuente verificable, confianza,
  * auto-corrección, nombres científicos sospechosos/alucinados, feedback,
@@ -380,6 +447,9 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
               data-testid="chat-bubble-photo"
             />
           )}
+          {/* Pulido foto-visión 2026-07: encabezado "Diagnóstico visual" +
+              confianza cuando el turno del agente nace de una foto real. */}
+          {!isUser && !isStreaming && <VisionDiagnosisHeader metadata={message.metadata} />}
           {/* #339: fallback visible si el contenido del assistant llega vacío
               (respuesta degradada del LLM, stream sin tokens, etc.). Nunca
               dejamos la burbuja en blanco — el usuario campesino no debe ver
@@ -412,6 +482,10 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
               <AutoCorrectedBadge metadata={message.metadata} />
             </div>
           )}
+          {/* Pie honesto del diagnóstico por foto: confírmelo en campo antes
+              de aplicar controles. Va SIEMPRE que el turno fue visual (no
+              depende de la preferencia de badges — es parte del diagnóstico). */}
+          {!isUser && !isStreaming && <VisionDiagnosisFootnote metadata={message.metadata} />}
           {message.timestamp && (
             <p className={`text-[10px] mt-1 ${isUser ? 'text-emerald-300/60' : 'text-slate-500'}`}>
               {formatTime(message.timestamp)}
