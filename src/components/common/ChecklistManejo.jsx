@@ -29,16 +29,37 @@ export default function ChecklistManejo({ titulo = 'Lista de chequeo', items = [
 
   if (total === 0) return null;
 
+  const completo = hechos === total;
+
   return (
-    <section className={`rounded-2xl border ${c.border} ${c.bg} p-4`}>
+    <section className={`rounded-[var(--r-lg,20px)] border ${c.border} ${c.bg} p-4 shadow-[var(--sombra-1,0_1px_2px_rgb(8_30_22/0.18))]`}>
       <div className="flex items-center justify-between gap-2">
         <h2 className={`flex items-center gap-2 text-base font-bold ${c.text}`}>
           <ListChecks size={18} aria-hidden="true" />
           {titulo}
         </h2>
-        <span className="text-xs font-bold text-slate-300/80 tabular-nums" aria-live="polite">
-          {hechos}/{total}
+        <span
+          className={`text-xs font-bold tabular-nums ${completo ? 'text-emerald-300' : 'text-slate-300/80'}`}
+          aria-live="polite"
+        >
+          {completo ? `✓ ${hechos}/${total}` : `${hechos}/${total}`}
         </span>
+      </div>
+      {/* Barra de avance del chequeo — el estado del manejo, de un vistazo. */}
+      <div
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={total}
+        aria-valuenow={hechos}
+        aria-label={`Avance: ${hechos} de ${total} prácticas`}
+        className="mt-2.5 h-1.5 rounded-[var(--r-pill,999px)] bg-black/30 overflow-hidden"
+      >
+        <div
+          className={`h-full rounded-[var(--r-pill,999px)] motion-safe:transition-[width] motion-safe:duration-300 ${
+            completo ? 'bg-emerald-400' : 'bg-emerald-500/70'
+          }`}
+          style={{ width: `${total ? Math.round((hechos / total) * 100) : 0}%` }}
+        />
       </div>
       <ul className="mt-3 space-y-1.5">
         {items.map((item, i) => {
@@ -49,7 +70,11 @@ export default function ChecklistManejo({ titulo = 'Lista de chequeo', items = [
                 type="button"
                 onClick={() => toggle(i)}
                 aria-pressed={on}
-                className="group w-full flex items-start gap-2.5 text-left rounded-xl border border-slate-700/50 bg-black/20 p-2.5 hover:border-slate-500/70 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+                className={`group w-full min-h-[var(--tap-min,44px)] flex items-start gap-2.5 text-left rounded-[var(--r-sm,12px)] border p-2.5 motion-safe:transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 ${
+                  on
+                    ? 'border-emerald-700/40 bg-emerald-950/30'
+                    : 'border-slate-700/50 bg-black/20 hover:border-slate-500/70'
+                }`}
               >
                 {on ? (
                   <CheckSquare size={18} className="mt-0.5 shrink-0 text-emerald-300" aria-hidden="true" />

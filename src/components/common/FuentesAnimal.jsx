@@ -22,7 +22,7 @@ export default function FuentesAnimal({ claves = [], nota }) {
   if (items.length === 0) return null;
 
   return (
-    <section className="rounded-2xl border border-slate-700/60 bg-slate-900/50 p-4">
+    <section className="rounded-[var(--r-lg,20px)] border border-slate-700/60 bg-slate-900/50 p-4 shadow-[var(--sombra-1,0_1px_2px_rgb(8_30_22/0.18))]">
       <h2 className="flex items-center gap-2 text-base font-bold text-slate-100">
         <BookOpen size={18} aria-hidden="true" />
         Fuentes y saber más
@@ -38,7 +38,7 @@ export default function FuentesAnimal({ claves = [], nota }) {
               href={f.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-start gap-2.5 rounded-xl border border-slate-700/60 bg-slate-950/40 p-3 hover:border-sky-500/60 hover:bg-slate-900/70 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70"
+              className="group flex items-start gap-2.5 min-h-[var(--tap-min,44px)] rounded-[var(--r-sm,12px)] border border-slate-700/60 bg-slate-950/40 p-3 hover:border-sky-500/60 hover:bg-slate-900/70 motion-safe:transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70"
             >
               <ExternalLink size={16} className="mt-0.5 shrink-0 text-sky-300 group-hover:text-sky-200" aria-hidden="true" />
               <span className="flex-1 min-w-0">

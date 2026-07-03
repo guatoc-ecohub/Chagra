@@ -5,6 +5,7 @@ import {
 import { ScreenShell } from './common/ScreenShell';
 import FuentesAnimal from './common/FuentesAnimal';
 import ChecklistManejo from './common/ChecklistManejo';
+import { SeccionAnimal, FichaAnimalHero } from './common/SeccionAnimal';
 
 /**
  * AbejasScreen — vertical de abejas y apicultura del módulo Animales.
@@ -21,19 +22,8 @@ import ChecklistManejo from './common/ChecklistManejo';
  * separación entre apiarios y meliponarios.
  */
 
-function SeccionCard({ Icon, color, titulo, children }) {
-  return (
-    <section className={`rounded-2xl border ${color.border} ${color.bg} p-4`}>
-      <h2 className={`flex items-center gap-2 text-base font-bold ${color.text}`}>
-        {Icon && <Icon size={18} aria-hidden="true" />}
-        {titulo}
-      </h2>
-      <div className="mt-2 text-sm text-slate-200/90 leading-relaxed space-y-2">
-        {children}
-      </div>
-    </section>
-  );
-}
+// Capa visual compartida del módulo Animales (cinta + disco tonal + tokens).
+const SeccionCard = SeccionAnimal;
 
 // Tipos de abeja manejados en Colombia (FEDEABEJA, ICA).
 const TIPOS = [
@@ -46,16 +36,30 @@ export default function AbejasScreen({ onBack, onHome }) {
   return (
     <ScreenShell title="Abejas y apicultura" icon={Hexagon} onBack={onBack} onHome={onHome}>
       <div className="px-4 pt-4 pb-10 max-w-2xl mx-auto space-y-4">
-        <p className="text-sm text-slate-300 leading-relaxed">
-          Las abejas te dan miel y cera, pero su mayor aporte es invisible:
-          polinizan tus cultivos y mejoran el cuaje y la cosecha. Cuidarlas es
-          cuidar tu finca entera.
-        </p>
+        {/* Ficha de identidad del animal — emoji + produce + aporte, de un vistazo. */}
+        <FichaAnimalHero
+          emoji="🐝"
+          titulo="Abejas y apicultura"
+          descripcion="Las abejas te dan miel y cera, pero su mayor aporte es invisible: polinizan tus cultivos y mejoran el cuaje y la cosecha. Cuidarlas es cuidar tu finca entera."
+          produce={[
+            { emoji: '🍯', label: 'Miel' },
+            { emoji: '🕯️', label: 'Cera' },
+            { emoji: '🌸', label: 'Polinización' },
+          ]}
+          aporte="Aporte al ciclo: polinizan tus cultivos — más cuaje y más cosecha"
+          tone={{
+            border: 'border-yellow-600/40',
+            bg: 'bg-gradient-to-br from-yellow-500/25 to-amber-400/10',
+            halo: 'bg-yellow-400/20',
+            chip: 'border-yellow-500/40 bg-yellow-500/15 text-yellow-100',
+            aporte: 'text-yellow-300',
+          }}
+        />
 
         {/* 1. Colmenas */}
         <SeccionCard
           Icon={Info}
-          color={{ border: 'border-sky-700/40', bg: 'bg-sky-900/20', text: 'text-sky-200' }}
+          color={{ border: 'border-sky-700/40', bg: 'bg-sky-900/20', text: 'text-sky-200', bar: 'from-sky-400 to-cyan-300', disc: 'bg-sky-400/15' }}
           titulo="Tus colmenas"
         >
           <p>Anota lo básico de tu apiario:</p>
@@ -67,9 +71,9 @@ export default function AbejasScreen({ onBack, onHome }) {
           </ul>
           <div className="mt-2 space-y-1.5">
             {TIPOS.map((t) => (
-              <div key={t.nombre} className="rounded-lg bg-black/20 border border-slate-700/50 p-2">
-                <p className="text-sm font-bold text-slate-100">{t.nombre}</p>
-                <p className="text-xs text-slate-300/90">{t.nota}</p>
+              <div key={t.nombre} className="rounded-[var(--r-sm,12px)] bg-black/20 border border-slate-700/50 p-2.5">
+                <p className="text-sm font-bold text-slate-100 leading-tight">{t.nombre}</p>
+                <p className="mt-1 text-xs text-slate-300/90 leading-snug">{t.nota}</p>
               </div>
             ))}
           </div>
@@ -78,7 +82,7 @@ export default function AbejasScreen({ onBack, onHome }) {
         {/* 2. Polinización */}
         <SeccionCard
           Icon={Flower2}
-          color={{ border: 'border-fuchsia-700/40', bg: 'bg-fuchsia-900/20', text: 'text-fuchsia-200' }}
+          color={{ border: 'border-fuchsia-700/40', bg: 'bg-fuchsia-900/20', text: 'text-fuchsia-200', bar: 'from-fuchsia-400 to-pink-300', disc: 'bg-fuchsia-400/15' }}
           titulo="Polinización de tus cultivos"
         >
           <p>
@@ -96,7 +100,7 @@ export default function AbejasScreen({ onBack, onHome }) {
         {/* 3. Productos */}
         <SeccionCard
           Icon={Droplets}
-          color={{ border: 'border-amber-700/40', bg: 'bg-amber-900/20', text: 'text-amber-200' }}
+          color={{ border: 'border-amber-700/40', bg: 'bg-amber-900/20', text: 'text-amber-200', bar: 'from-amber-400 to-yellow-300', disc: 'bg-amber-400/15' }}
           titulo="Miel y cera"
         >
           <ul className="space-y-1.5">
@@ -116,7 +120,7 @@ export default function AbejasScreen({ onBack, onHome }) {
         {/* 4. Sanidad real */}
         <SeccionCard
           Icon={HeartPulse}
-          color={{ border: 'border-rose-700/40', bg: 'bg-rose-900/20', text: 'text-rose-200' }}
+          color={{ border: 'border-rose-700/40', bg: 'bg-rose-900/20', text: 'text-rose-200', bar: 'from-rose-400 to-pink-300', disc: 'bg-rose-400/15' }}
           titulo="Sanidad"
         >
           <p>
@@ -151,7 +155,7 @@ export default function AbejasScreen({ onBack, onHome }) {
         {/* 5. Aporte a tu finca — CICLO (polinización, NO abono) */}
         <SeccionCard
           Icon={Recycle}
-          color={{ border: 'border-lime-600/50', bg: 'bg-lime-900/25', text: 'text-lime-200' }}
+          color={{ border: 'border-lime-600/50', bg: 'bg-lime-900/25', text: 'text-lime-200', bar: 'from-lime-400 to-emerald-300', disc: 'bg-lime-400/15' }}
           titulo="Aporte a tu finca"
         >
           <p>
