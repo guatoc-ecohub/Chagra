@@ -1135,3 +1135,121 @@
   text-shadow: var(--fvh-on-cielo-sombra);
 }
 .fvh .fvh-portales-tit span { background: var(--fvh-on-cielo-div); }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   ELEVACIÓN A NIVEL DEMO (2026-07-03) — la portada es lo PRIMERO que ve el
+   piloto. Sobre la pasada base (#1957) sube el salto de calidad SIN tocar
+   lógica/props/testids ni promover la flag: solo capa visual, aditiva, coherente
+   en los 4 temas y respetuosa de prefers-reduced-motion (el kill-switch de más
+   arriba, `.fvh *,::before,::after { animation:none !important }`, ya congela
+   todo lo de aquí). Cuatro gestos:
+     1. LUZ QUE RESPIRA sobre la escena (bruma dorada de día · resplandor lunar
+        de noche · brasa al amanecer/atardecer) → profundidad y "hora viva".
+     2. Los 4 PORTALES como un ABANICO/mano de acciones (naipes en abanico que se
+        enderezan y se adelantan al escogerlos) → la firma de la portada.
+     3. COLIBRÍ con más carácter: iridiscencia que titila + vuelo con un "dardo".
+     4. Marca "MI finca" con un halo vivo que respira.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Luz atmosférica que respira sobre la escena ────────────────────────
+   Capa decorativa (pointer-events:none) dentro de .fvh-escena, por ENCIMA del
+   arte SVG (z2) y por DEBAJO de los bichos (z7) y el globo (z8). No lava el
+   texto: el único texto sobre la escena es el globo, que va más arriba. */
+.fvh-escena::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  border-radius: inherit;
+  background:
+    radial-gradient(46% 40% at 82% 15%, rgba(255, 226, 156, 0.42), transparent 62%),
+    radial-gradient(96% 60% at 50% 4%, rgba(255, 247, 219, 0.14), transparent 64%);
+  opacity: 0.7;
+  animation: fvh-luz-respira 8.5s ease-in-out infinite;
+}
+.fvh[data-luz="noche"] .fvh-escena::after {
+  background:
+    radial-gradient(46% 40% at 80% 13%, rgba(176, 206, 255, 0.4), transparent 64%),
+    radial-gradient(98% 66% at 50% 6%, rgba(150, 180, 240, 0.1), transparent 66%);
+  opacity: 0.6;
+}
+.fvh[data-luz="amanecer"] .fvh-escena::after,
+.fvh[data-luz="atardecer"] .fvh-escena::after {
+  background:
+    radial-gradient(54% 46% at 78% 22%, rgba(255, 168, 102, 0.5), transparent 62%),
+    radial-gradient(98% 64% at 50% 6%, rgba(255, 202, 142, 0.16), transparent 64%);
+  opacity: 0.72;
+}
+@keyframes fvh-luz-respira {
+  0%, 100% { opacity: 0.52; }
+  50%      { opacity: 0.82; }
+}
+
+/* ── 2. Los 4 portales como un ABANICO/mano de acciones ────────────────────
+   El tilt usa la propiedad independiente `rotate:` — NO `transform:` — para no
+   pelear con la animación de entrada (fvh-rise anima transform) ni con el
+   translate del :hover/:active. Origen en la base = abanico que abre desde la
+   "muñeca". Al pasar el puntero (o el foco), el naipe se ENDEREZA y se adelanta,
+   como cuando uno saca una carta del abanico. */
+.fvh-portales { perspective: 1400px; }
+.fvh-portal {
+  transform-origin: bottom center;
+  transition: transform 0.2s cubic-bezier(0.22, 0.9, 0.35, 1),
+              box-shadow 0.2s ease,
+              rotate 0.34s cubic-bezier(0.22, 0.9, 0.35, 1);
+}
+/* Abanico móvil (2×2): tilt sutil alterno — insinúa el abanico sin desordenar. */
+.fvh-portal:nth-child(1) { rotate: -2.4deg; }
+.fvh-portal:nth-child(2) { rotate: 1.8deg; }
+.fvh-portal:nth-child(3) { rotate: -1.6deg; }
+.fvh-portal:nth-child(4) { rotate: 2.6deg; }
+@media (hover: hover) and (pointer: fine) {
+  .fvh-portal:hover {
+    rotate: 0deg;
+    transform: translateY(-7px) scale(1.015);
+    z-index: 3;
+  }
+  .fvh-portal:focus-visible { rotate: 0deg; z-index: 3; }
+}
+
+/* ── 3. Colibrí con carácter ───────────────────────────────────────────────
+   Iridiscencia: un hue-rotate lento y sutil sobre el plumaje (el mismo SVG,
+   colores que respiran como el tornasol real). Vuelo con un "dardo" ocasional
+   (acelera y frena, como un colibrí de verdad) — reemplaza la curva plana. */
+.fvh-colibri-svg { animation: fvh-colibri-iris 5.5s ease-in-out infinite; }
+@keyframes fvh-colibri-iris {
+  0%, 100% { filter: hue-rotate(0deg) saturate(1); }
+  50%      { filter: hue-rotate(-14deg) saturate(1.12); }
+}
+.fvh-colibri-vuela {
+  animation: fvh-colibri-dardo 6.5s cubic-bezier(0.5, 0, 0.2, 1) infinite;
+}
+@keyframes fvh-colibri-dardo {
+  0%   { transform: translate(0, 0) rotate(-3deg) scale(1); }
+  18%  { transform: translate(-30px, 12px) rotate(4deg) scale(1.04); }
+  24%  { transform: translate(-32px, 13px) rotate(3deg) scale(1); }
+  55%  { transform: translate(-6px, -8px) rotate(-2deg) scale(1.02); }
+  78%  { transform: translate(-18px, 6px) rotate(2deg) scale(1); }
+  100% { transform: translate(0, 0) rotate(-3deg) scale(1); }
+}
+
+/* ── 4. Marca "MI finca" — halo vivo que respira detrás del ícono ──────────── */
+.fvh-brand-a {
+  position: relative;
+  isolation: isolate;
+}
+.fvh-brand-a::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  z-index: -1;
+  border-radius: 19px;
+  background: radial-gradient(circle at 50% 45%, rgb(var(--c-emerald-400, 63 143 78) / 0.5), transparent 70%);
+  opacity: 0.55;
+  animation: fvh-marca-halo 4.5s ease-in-out infinite;
+}
+@keyframes fvh-marca-halo {
+  0%, 100% { opacity: 0.32; transform: scale(0.94); }
+  50%      { opacity: 0.62; transform: scale(1.04); }
+}
