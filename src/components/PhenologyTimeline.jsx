@@ -111,20 +111,37 @@ export default function PhenologyTimeline({
           const isEstimatedCurrent = estimatedCurrent && estimatedCurrent.stage.code === win.code && !isObservedCurrent;
           const isPast = obs && windows.findIndex((w) => w.code === obs.code) > i;
 
+          const isCurrent = isObservedCurrent || isEstimatedCurrent;
+
           return (
-            <div key={win.code} className={`flex gap-2 ${compact ? 'items-center' : ''}`}>
+            <div
+              key={win.code}
+              className={`flex gap-2 ${compact ? 'items-center' : ''} ${
+                // Etapa actual resaltada como fila: legible de un vistazo (sol,
+                // pantalla pequeña), no solo un anillo en el punto. Solo
+                // presentación; el cálculo de etapa no cambia.
+                !compact && isCurrent
+                  ? 'rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1.5 -mx-2'
+                  : ''
+              }`}
+            >
               {/* Indicador de etapa */}
               <div className="flex flex-col items-center gap-0.5 shrink-0">
-                <div className={`w-3 h-3 rounded-full border ${stageColor(win.code)} ${isObservedCurrent ? 'ring-2 ring-emerald-400/50' : ''} ${isEstimatedCurrent ? 'ring-2 ring-morpho/40 border-dashed' : ''} ${isPast ? 'opacity-50' : ''}`} />
+                <div className={`rounded-full border ${isCurrent ? 'w-3.5 h-3.5' : 'w-3 h-3'} ${stageColor(win.code)} ${isObservedCurrent ? 'ring-2 ring-emerald-400/50' : ''} ${isEstimatedCurrent ? 'ring-2 ring-morpho/40 border-dashed' : ''} ${isPast ? 'opacity-50' : ''}`} />
                 {i < windows.length - 1 && <div className="w-px h-4 bg-slate-700" />}
               </div>
 
               {/* Contenido */}
               <div className={`flex-1 min-w-0 ${compact ? 'flex items-center gap-2' : ''}`}>
                 <div className={`flex items-center gap-1.5 ${isPast ? 'opacity-50' : ''}`}>
-                  <span className={`text-sm font-medium ${isObservedCurrent ? 'text-emerald-300' : 'text-slate-200'}`}>
+                  <span className={`text-sm ${isCurrent ? 'font-bold' : 'font-medium'} ${isObservedCurrent ? 'text-emerald-300' : 'text-slate-200'}`}>
                     {win.label}
                   </span>
+                  {isCurrent && !compact && (
+                    <span className="text-2xs font-bold uppercase px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/40">
+                      ahora
+                    </span>
+                  )}
                   {obs && (
                     <span className="inline-flex items-center gap-0.5 text-2xs text-emerald-400" title="Observado">
                       <Eye size={10} />
