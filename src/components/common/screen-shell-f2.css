@@ -96,7 +96,7 @@ html[data-luz="noche"][data-theme="minimalista"] .screen-shell-f2 {
   width: 38px;
   height: 38px;
   flex: 0 0 auto;
-  border-radius: 12px;
+  border-radius: var(--r-sm, 12px);
   display: grid;
   place-items: center;
   padding: 6px;
@@ -106,17 +106,17 @@ html[data-luz="noche"][data-theme="minimalista"] .screen-shell-f2 {
 
 /* Pastillas de chrome (back/home): redondas, del tema (no slate fijo). */
 .screen-shell-f2-pill {
-  min-height: 44px;
-  min-width: 44px;
+  min-height: var(--tap-min, 44px);
+  min-width: var(--tap-min, 44px);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
+  border-radius: var(--r-pill, 999px);
   border: 1px solid var(--ssf2-topbar-border);
   background: var(--ssf2-pill-bg);
   color: var(--ssf2-pill-tinta);
   cursor: pointer;
-  transition: background 0.18s ease, color 0.18s ease, transform 0.1s ease;
+  transition: background var(--dur-estado, 0.18s) ease, color var(--dur-estado, 0.18s) ease, transform 0.1s ease;
 }
 .screen-shell-f2-pill:hover { background: var(--ssf2-pill-bg-hover); }
 .screen-shell-f2-pill:active { transform: scale(0.94); }
@@ -124,7 +124,7 @@ html[data-luz="noche"][data-theme="minimalista"] .screen-shell-f2 {
 
 /* Título: tinta del tema + ícono en el acento del tema. */
 .screen-shell-f2-title {
-  font-size: 1.18rem;
+  font-size: var(--fs-titulo, 1.18rem);
   font-weight: 800;
   line-height: 1.1;
   display: flex;
@@ -144,12 +144,12 @@ html[data-luz="noche"][data-theme="minimalista"] .screen-shell-f2 {
 
 /* Botón de ayuda: ámbar del tema (la indirección lo lleva al ámbar correcto). */
 .screen-shell-f2-help {
-  min-height: 44px;
-  min-width: 44px;
+  min-height: var(--tap-min, 44px);
+  min-width: var(--tap-min, 44px);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: var(--r-sm, 12px);
   border: 1px solid rgb(var(--c-amber-500, 245 158 11) / 0.42);
   background: rgb(var(--c-amber-500, 245 158 11) / 0.18);
   color: rgb(var(--c-amber-300, 252 211 77));

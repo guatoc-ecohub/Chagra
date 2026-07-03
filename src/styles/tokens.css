@@ -1,0 +1,82 @@
+/* src/styles/tokens.css
+ * ============================================================================
+ * TOKENS GLOBALES DE DISEÑO (capa NO-COLOR) — fuente única de verdad para
+ * radios, sombras/elevación, tipografía, espaciado, movimiento y tacto.
+ *
+ * Se importa PRIMERO en main.jsx. Solo define variables nuevas en :root, no
+ * pisa nada: cada uso aguas abajo lleva `var(--token, <valor actual>)` con el
+ * fallback byte-idéntico al valor que había antes → riesgo visual cero.
+ *
+ * ── MAPA DEL SISTEMA DE DISEÑO (auditoría 2026-07-02) ──────────────────────
+ * El COLOR ya está unificado y NO vive aquí (no duplicar):
+ *
+ *   --c-*             index.css      Rampas slate/emerald/amber + superficies
+ *                                    (surface/card/raised/border) + acentos
+ *                                    (muzo/morpho/orchid/frog). RGB triple por
+ *                                    TEMA (:root = biopunk; [data-theme=
+ *                                    "minimalista"|"nature"|"verde-vivo"]).
+ *                                    Tailwind los mapea con <alpha-value>.
+ *   --t-accent-*      themes.css     Acento de marca por tema (base/strong/
+ *                                    deep) + --t-bg-rgb.
+ *   --fx-* / --scrim- index.css      Efectos gateados por tema (partículas,
+ *                                    glow, patrón) y velo de fondo por tema.
+ *
+ * Capas-puente POR FEATURE (prefijo propio, beben de --c-*; se quedan):
+ *   --fvh-*   finca-viva-hero.css    Escena del home F2 (cielo/sol/tinta).
+ *   --ssf2-*  screen-shell-f2.css    Shell de pantallas secundarias F2.
+ *   --jp-*    juego-pulido.css       Pulido de los tableros del juego.
+ *   --cpc-*   camino-primer-cultivo.css  Onboarding (fallbacks a --fvh-*).
+ *
+ * EXCEPCIONES DELIBERADAS (no tokenizar):
+ *   --cv-*    cicloVivo.css          Piel "cuaderno de campo" en papel crema:
+ *                                    identidad propia INTENCIONAL, no un tema.
+ *   chivito.css                      Coreografía de animación del barbudito;
+ *                                    sus tiempos/amplitudes son ajuste fino.
+ * ============================================================================ */
+
+:root {
+  /* ── RADIOS — escala única. Uso: border-radius: var(--r-md, 16px). ────────
+     Referencia adoptada de lo ya mergeado: pastillas/chips = pill; botones y
+     campos = md; tarjetas grandes del hero = --fvh-r (24px) ≈ xl. */
+  --r-xs: 8px;    /* detalles pequeños, badges cuadrados */
+  --r-sm: 12px;   /* botones de chrome, iconos de marca */
+  --r-md: 16px;   /* inputs, cards estándar, tips (= 1rem) */
+  --r-lg: 20px;   /* cards destacadas */
+  --r-xl: 24px;   /* tarjetas del hero (= --fvh-r) */
+  --r-pill: 999px; /* chips, pastillas, CTAs redondos */
+
+  /* ── ELEVACIÓN — escalera de sombras THEME-AWARE. La sombra sale del velo
+     del tema (--scrim-bg): navy en biopunk, crema/papel sutil en claros.
+     Receta = la escalera ya validada del juego (--jp-sombra-*), promovida a
+     global para que cards/calendario/directorio compartan la misma luz. ──── */
+  --sombra-1: 0 1px 2px rgb(var(--scrim-bg, 8 30 22) / 0.18);   /* reposo */
+  --sombra-2: 0 6px 18px rgb(var(--scrim-bg, 8 30 22) / 0.22);  /* raised */
+  --sombra-3: 0 16px 44px rgb(var(--scrim-bg, 8 30 22) / 0.30); /* modal/float */
+
+  /* ── TIPOGRAFÍA — escala corta en rem (base Inter, index.css). Los tamaños
+     px finos de escenas dibujadas (hero, cuaderno) NO entran en la escala. ── */
+  --fs-nota: 0.78rem;      /* hints, metadatos, microcopy secundario */
+  --fs-cuerpo-sm: 0.9rem;  /* texto de apoyo, tips */
+  --fs-cuerpo: 1rem;       /* cuerpo por defecto */
+  --fs-cuerpo-lg: 1.15rem; /* inputs táctiles de campo (legibles al sol) */
+  --fs-titulo: 1.18rem;    /* títulos de pantalla (topbar) */
+  --fs-display: 1.6rem;    /* saludos/display del home */
+
+  /* ── ESPACIADO — escala base 4px para CSS propio (el JSX usa Tailwind). ── */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  /* ── MOVIMIENTO — duraciones/curvas de interacción de UI (NO de escenas
+     animadas). Todo movimiento respeta prefers-reduced-motion (index.css). ── */
+  --dur-tap: 0.12s;    /* press/active de chips y botones */
+  --dur-estado: 0.18s; /* hover / cambio de estado */
+  --ease-suave: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── TACTO — mínimo táctil WCAG/campo (dedos con tierra, sol directo). ─── */
+  --tap-min: 44px;
+}

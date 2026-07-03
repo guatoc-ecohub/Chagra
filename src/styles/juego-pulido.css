@@ -45,10 +45,12 @@
   --jp-vida-texto: rgb(var(--c-emerald-300, 110 231 183));
   --jp-vida-suave: rgb(var(--c-emerald-500, 16 185 129) / 0.14);
   --jp-velo: rgb(var(--scrim-bg, 8 30 22));
-  /* Sombras consistentes (escalera de elevación) para todo el juego. */
-  --jp-sombra-1: 0 1px 2px rgb(var(--scrim-bg, 8 30 22) / 0.18);
-  --jp-sombra-2: 0 6px 18px rgb(var(--scrim-bg, 8 30 22) / 0.22);
-  --jp-sombra-3: 0 16px 44px rgb(var(--scrim-bg, 8 30 22) / 0.30);
+  /* Sombras consistentes (escalera de elevación) para todo el juego.
+     Unificadas con la escalera GLOBAL (styles/tokens.css §ELEVACIÓN); el
+     fallback conserva la receta original byte-idéntica. */
+  --jp-sombra-1: var(--sombra-1, 0 1px 2px rgb(var(--scrim-bg, 8 30 22) / 0.18));
+  --jp-sombra-2: var(--sombra-2, 0 6px 18px rgb(var(--scrim-bg, 8 30 22) / 0.22));
+  --jp-sombra-3: var(--sombra-3, 0 16px 44px rgb(var(--scrim-bg, 8 30 22) / 0.30));
 }
 
 /* ── DETALLE DE IDENTIDAD: ambiente radial de "la mano de Chagra" + sol ───────

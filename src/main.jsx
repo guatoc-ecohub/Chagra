@@ -1,6 +1,7 @@
 import './config/env'; // Validación de env vars al startup
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import './styles/tokens.css' // tokens globales de diseño (radios/sombras/tipo/movimiento) — primero
 import './index.css'
 import './styles/themes.css'
 import './styles/temas-fase2.css'
