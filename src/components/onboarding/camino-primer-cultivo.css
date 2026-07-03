@@ -1,0 +1,303 @@
+/* ============================================================================
+   camino-primer-cultivo.css — onboarding ilustrado "el camino del primer
+   cultivo" (CaminoPrimerCultivo.jsx), dentro de la hoja clara del home F2.
+
+   El SENDERO es el progreso: los tres pasos son "claros" redondos sobre un
+   camino de tierra punteado que se pinta de VERDE sólido tramo a tramo al
+   completarlos. Piel "finca viva": crema/tinta verde (tokens --fvh-* de
+   finca-viva-resto.css con fallback), Baloo 2 para el título y Nunito para
+   el cuerpo (self-host, declaradas en finca-viva-hero.css).
+
+   Scope: TODO vive bajo `.cpc` (solo se monta en el home F2 con 0 siembras).
+   Animaciones gateadas por prefers-reduced-motion. ES-CO (usted), sin voseo.
+   ========================================================================== */
+
+.cpc {
+  --cpc-tinta: var(--fvh-tinta, #26331f);
+  --cpc-tinta-suave: var(--fvh-tinta-suave, #4e5c42);
+  --cpc-verde: var(--fvh-verde-1, #3f8f4e);
+  --cpc-crema: #fffdf5;
+  --cpc-tierra: #a97b46;
+  --cpc-madera: #caa066;
+  --cpc-sol: #ffe08a;
+
+  font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--cpc-tinta);
+}
+
+/* Tarjeta: un pliego claro sobre la hoja crema, sin corte duro. */
+.cpc-card {
+  background: linear-gradient(180deg, var(--cpc-crema) 0%, #fbf4e3 100%);
+  border: 1.5px solid rgba(63, 143, 78, 0.28);
+  border-radius: 20px;
+  padding: 16px 16px 12px;
+  box-shadow: 0 6px 18px rgba(38, 51, 31, 0.08);
+}
+
+/* ── Encabezado: bienvenida + letrero de madera del paso en curso ────────── */
+.cpc-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.cpc-head-txt { flex: 1; min-width: 0; }
+
+.cpc-eyebrow {
+  margin: 0 0 2px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cpc-verde);
+}
+
+.cpc-tit {
+  margin: 0;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 21px;
+  line-height: 1.15;
+  color: var(--cpc-tinta);
+}
+
+.cpc-sub {
+  margin: 5px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--cpc-tinta-suave);
+  max-width: 34rem;
+}
+
+/* Letrero de madera (como el de la parcela del portal "Mi finca"). */
+.cpc-letrero {
+  flex-shrink: 0;
+  align-self: flex-start;
+  padding: 5px 10px 6px;
+  border-radius: 7px;
+  background: linear-gradient(180deg, var(--cpc-madera) 0%, #b8874f 100%);
+  border-bottom: 3px solid #8a6038;
+  color: #3d2a17;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(38, 51, 31, 0.18);
+}
+
+/* ── El sendero: lista vertical con camino de tierra entre viñetas ───────── */
+.cpc-sendero {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+}
+
+.cpc-paso { position: relative; }
+
+/* Tramo de camino bajo cada viñeta (huellas punteadas de tierra). El tramo
+   de un paso HECHO se vuelve verde sólido: el sendero ES la barra de
+   progreso. El último paso no dibuja tramo. */
+.cpc-paso:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 31px; /* centro de la viñeta (64px de ancho / 2 - 1.5px) */
+  top: 60px;
+  bottom: -14px;
+  width: 3px;
+  border-radius: 999px;
+  background-image: repeating-linear-gradient(
+    180deg,
+    rgba(169, 123, 70, 0.55) 0 5px,
+    transparent 5px 11px
+  );
+}
+.cpc-paso-hecho:not(:last-child)::before {
+  background-image: none;
+  background-color: var(--cpc-verde);
+}
+
+/* ── Cada paso: botón de fila (viñeta + texto + flecha) ──────────────────── */
+.cpc-paso-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 6px;
+  margin: 0 0 8px;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.15s ease, transform 0.12s ease;
+}
+.cpc-paso-btn:active {
+  background: rgba(63, 143, 78, 0.10);
+  transform: translateY(1px);
+}
+.cpc-paso-btn:focus-visible {
+  outline: 3px solid var(--cpc-verde);
+  outline-offset: 2px;
+}
+
+/* Viñeta: el "claro" redondo del sendero, con la ilustración adentro. */
+.cpc-vineta {
+  position: relative;
+  flex-shrink: 0;
+  width: 62px;
+  height: 62px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #dff0fa 0%, #eef7e8 60%, #dcedd2 100%);
+  border: 2px solid rgba(63, 143, 78, 0.35);
+  box-shadow: inset 0 -4px 8px rgba(38, 51, 31, 0.08);
+}
+.cpc-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Paso hecho: aro verde pleno + chulo cosechado. */
+.cpc-paso-hecho .cpc-vineta {
+  border-color: var(--cpc-verde);
+}
+.cpc-vineta-check {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 19px;
+  height: 19px;
+  border-radius: 999px;
+  background: var(--cpc-verde);
+  color: #fdf8ea;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--cpc-crema);
+}
+
+/* Paso actual: el claro amanece (halo de sol suave, sin gritar). */
+.cpc-paso-actual .cpc-vineta {
+  border-color: var(--cpc-verde);
+  box-shadow:
+    0 0 0 4px rgba(255, 224, 138, 0.55),
+    inset 0 -4px 8px rgba(38, 51, 31, 0.08);
+}
+
+/* Texto del paso. */
+.cpc-paso-txt {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.cpc-paso-tit {
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  line-height: 1.2;
+  color: var(--cpc-tinta);
+}
+.cpc-paso-desc {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--cpc-tinta-suave);
+}
+.cpc-paso-hecho .cpc-paso-tit {
+  color: var(--cpc-verde);
+}
+.cpc-paso-hecho .cpc-paso-desc {
+  color: var(--cpc-tinta-suave);
+  opacity: 0.85;
+}
+
+.cpc-paso-flecha {
+  flex-shrink: 0;
+  color: rgba(78, 92, 66, 0.6);
+}
+.cpc-paso-actual .cpc-paso-flecha {
+  color: var(--cpc-verde);
+}
+
+/* ── Pie: nota offline-first + omitir (opcional, nunca un muro) ──────────── */
+.cpc-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(169, 123, 70, 0.35);
+}
+.cpc-pie-nota {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--cpc-tinta-suave);
+  opacity: 0.9;
+}
+.cpc-omitir {
+  flex-shrink: 0;
+  border: 0;
+  background: transparent;
+  padding: 8px 10px;
+  min-height: 40px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--cpc-verde);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1.5px;
+}
+.cpc-omitir:active { background: rgba(63, 143, 78, 0.10); }
+.cpc-omitir:focus-visible {
+  outline: 3px solid var(--cpc-verde);
+  outline-offset: 2px;
+}
+
+/* ── Movimiento (solo si el usuario no pidió calma) ──────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  /* El halo del paso actual respira despacio, como el amanecer. */
+  .cpc-paso-actual .cpc-vineta {
+    animation: cpc-amanecer 3.2s ease-in-out infinite;
+  }
+  /* El pin se asienta, el brote se mece, el ave aletea apenas. */
+  .cpc-paso-actual .cpc-anim-pin {
+    animation: cpc-asentar 3.2s ease-in-out infinite;
+    transform-origin: 36px 42px;
+  }
+  .cpc-paso-actual .cpc-anim-brote {
+    animation: cpc-mecer 3.6s ease-in-out infinite;
+    transform-origin: 40px 40px;
+  }
+  .cpc-paso-actual .cpc-anim-ave {
+    animation: cpc-aletear 2.8s ease-in-out infinite;
+  }
+}
+
+@keyframes cpc-amanecer {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(255, 224, 138, 0.55), inset 0 -4px 8px rgba(38, 51, 31, 0.08); }
+  50% { box-shadow: 0 0 0 7px rgba(255, 224, 138, 0.30), inset 0 -4px 8px rgba(38, 51, 31, 0.08); }
+}
+@keyframes cpc-asentar {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2.5px); }
+}
+@keyframes cpc-mecer {
+  0%, 100% { transform: rotate(-2.5deg); }
+  50% { transform: rotate(2.5deg); }
+}
+@keyframes cpc-aletear {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+/* ── Desktop: la tarjeta no se estira infinita dentro de la hoja ─────────── */
+@media (min-width: 720px) {
+  .cpc-card { padding: 20px 22px 14px; }
+  .cpc-tit { font-size: 24px; }
+}
