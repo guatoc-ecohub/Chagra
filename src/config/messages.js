@@ -184,7 +184,7 @@ const messages = {
     tituloPantalla: 'Perfil de Usuario',
     agregarFotoPerfil: 'Agregar foto de perfil',
     agregarFoto: 'Agregar foto',
-    ubicacionDesc: 'Mapa, piso térmico y cultivos de tu zona',
+    ubicacionDesc: 'Mapa, piso térmico y cultivos de su zona',
     guardarCambios: 'Guardar cambios',
     telemetriaVozDesc: 'Registrar eventos del pipeline de voz',
     telemetriaAgenteDesc: 'Ayuda a mejorar el agente. Desactivado por defecto.',
