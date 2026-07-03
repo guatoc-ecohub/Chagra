@@ -1135,3 +1135,107 @@
   text-shadow: var(--fvh-on-cielo-sombra);
 }
 .fvh .fvh-portales-tit span { background: var(--fvh-on-cielo-div); }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   V2 · ELEVACIÓN A NIVEL DEMO — dirección "CINE DE FINCA" (2026-07-03).
+   Distinta de V1 (abanico + bruma que respira): aquí la portada se trata como un
+   PLANO cinematográfico — rayos de luz volumétricos que bajan del sol, una viñeta
+   que enfoca la finca, y los 4 portales como TECLAS FÍSICAS que se hunden al
+   pulsarlas. Solo capa visual, aditiva, coherente en los 4 temas y respetuosa de
+   reduced-motion (el kill-switch de arriba congela todo lo animado). No promueve
+   la flag ni toca lógica/props/testids. Respeta el A/B del colibrí (ambos).
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── Viñeta cinematográfica: enfoca la mirada en la finca (esquinas al fondo,
+     brillo de aire arriba). z3: sobre el arte SVG, bajo los bichos/globo. */
+.fvh-escena::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  border-radius: inherit;
+  background:
+    radial-gradient(130% 78% at 50% 8%, rgba(255, 255, 255, 0.08), transparent 42%),
+    radial-gradient(120% 100% at 50% 108%, rgba(10, 18, 10, 0.34), transparent 60%);
+}
+
+/* ── Rayos de luz volumétricos que bajan del sol (arriba-derecha en la finca).
+     Haz de bandas cálidas, enmascarado para concentrarse cerca del sol y
+     desvanecerse hacia abajo; deriva y respira muy lento. z4: sobre el arte,
+     bajo los bichos (z7)/globo (z8). */
+.fvh-escena::after {
+  content: "";
+  position: absolute;
+  inset: -10% -10% 0 -10%;
+  pointer-events: none;
+  z-index: 4;
+  background: repeating-linear-gradient(
+    106deg,
+    transparent 0 26px,
+    rgba(255, 240, 194, 0.09) 26px 34px,
+    transparent 34px 72px
+  );
+  -webkit-mask-image: radial-gradient(58% 66% at 84% 4%, #000 0, rgba(0,0,0,0.45) 42%, transparent 72%);
+  mask-image: radial-gradient(58% 66% at 84% 4%, #000 0, rgba(0,0,0,0.45) 42%, transparent 72%);
+  opacity: 0.75;
+  animation: fvh-rayos 11s ease-in-out infinite;
+}
+.fvh[data-luz="noche"] .fvh-escena::after {
+  background: repeating-linear-gradient(
+    106deg,
+    transparent 0 26px,
+    rgba(190, 214, 255, 0.07) 26px 34px,
+    transparent 34px 72px
+  );
+  opacity: 0.55;
+}
+.fvh[data-luz="amanecer"] .fvh-escena::after,
+.fvh[data-luz="atardecer"] .fvh-escena::after {
+  background: repeating-linear-gradient(
+    106deg,
+    transparent 0 24px,
+    rgba(255, 186, 120, 0.12) 24px 33px,
+    transparent 33px 70px
+  );
+  opacity: 0.85;
+}
+@keyframes fvh-rayos {
+  0%, 100% { transform: translateX(0); opacity: 0.55; }
+  50%      { transform: translateX(-14px); opacity: 0.85; }
+}
+
+/* ── Los 4 portales como TECLAS FÍSICAS: repisa inferior + filo de luz superior
+     (relieve), y se HUNDEN al pulsarlas (la tecla baja y la sombra se recoge).
+     Sin abanico — otra firma que la de V1. */
+.fvh-portal {
+  box-shadow:
+    0 16px 30px var(--fvh-sombra-iso),
+    0 2px 0 rgba(255, 255, 255, 0.30) inset,
+    0 -8px 14px -8px rgba(10, 18, 10, 0.5) inset;
+  transition: transform 0.14s cubic-bezier(0.34, 1.2, 0.64, 1), box-shadow 0.14s ease;
+}
+.fvh-portal:active {
+  transform: translateY(4px) scale(0.99);
+  box-shadow:
+    0 6px 14px var(--fvh-sombra-iso),
+    0 1px 0 rgba(255, 255, 255, 0.22) inset,
+    0 -5px 10px -8px rgba(10, 18, 10, 0.5) inset;
+}
+@media (hover: hover) and (pointer: fine) {
+  .fvh-portal:hover {
+    transform: translateY(-5px);
+    box-shadow:
+      0 24px 44px rgb(var(--p-glow) / 0.5),
+      0 2px 0 rgba(255, 255, 255, 0.38) inset,
+      0 -8px 14px -8px rgba(10, 18, 10, 0.5) inset;
+  }
+}
+
+/* ── Colibrí: un DESTELLO en el plumaje (brillo que sube y baja) — distinto del
+     tornasol por hue-rotate de V1. */
+.fvh-colibri-svg { animation: fvh-colibri-destello 4.6s ease-in-out infinite; }
+@keyframes fvh-colibri-destello {
+  0%, 100% { filter: brightness(1) saturate(1); }
+  50%      { filter: brightness(1.14) saturate(1.1); }
+}
