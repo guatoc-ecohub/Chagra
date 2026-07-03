@@ -143,6 +143,117 @@ export const AGENT_COMPOSITOR_CSS = `
     transition: opacity 0.25s ease, box-shadow 0.25s ease;
   }
   .as-send:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     MODOS Y HERRAMIENTAS — la bandeja de ~12 chips (ChipsToolbar) que antes
+     vivía SIEMPRE sobre el input y comía media pantalla en el celular ahora se
+     colapsa en UN botón del compositor. Al tocarlo se abre un bottom-sheet con
+     scroll (todos los modos). Con el sheet cerrado el chat recupera el alto
+     completo. Todo token-aware (--c-*/--t-accent-rgb) → coherente en los 4 temas.
+     ══════════════════════════════════════════════════════════════════════════ */
+  .as-modos.has-active {
+    border-color: rgb(var(--t-accent-rgb, 25 201 154) / 0.65);
+    color: rgb(var(--t-accent-rgb, 25 201 154));
+  }
+  .as-modos-dot {
+    position: absolute; top: 5px; right: 5px;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: rgb(var(--t-accent-rgb, 25 201 154));
+    box-shadow: 0 0 0 2px rgb(var(--c-surface-card, 30 41 59));
+  }
+
+  /* Cinta del MODO ACTIVO — fila delgada arriba del compositor, visible SOLO
+     cuando hay un modo forzado. El productor ve qué modo está puesto y lo puede
+     quitar, sin reintroducir la bandeja entera. */
+  .as-modo-activo {
+    display: flex; align-items: center; gap: 8px;
+    margin: 2px 2px 8px; padding: 6px 6px 6px 11px;
+    border-radius: 13px;
+    background: rgb(var(--t-accent-rgb, 25 201 154) / 0.15);
+    border: 1px solid rgb(var(--t-accent-rgb, 25 201 154) / 0.34);
+  }
+  .as-modo-activo-emoji { font-size: 15px; line-height: 1; flex: none; }
+  .as-modo-activo-txt {
+    flex: 1; min-width: 0; font-size: 12.5px; font-weight: 800;
+    letter-spacing: 0.1px;
+    color: rgb(var(--c-slate-100, 226 232 240));
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .as-modo-activo-x {
+    flex: none; width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: rgb(var(--c-slate-300, 148 163 184)); cursor: pointer;
+    background: transparent; border: 0; transition: background 0.18s ease, color 0.18s ease;
+  }
+  .as-modo-activo-x:hover {
+    background: rgb(var(--c-slate-100, 226 232 240) / 0.12);
+    color: rgb(var(--c-slate-100, 226 232 240));
+  }
+
+  .as-modos-sheet {
+    position: fixed; inset: 0; z-index: 60;
+    display: flex; flex-direction: column; justify-content: flex-end;
+  }
+  .as-modos-scrim {
+    position: absolute; inset: 0; border: 0; padding: 0; margin: 0; cursor: pointer;
+    background: rgba(6, 14, 11, 0.56);
+    -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+    animation: as-modos-fade 0.22s ease both;
+  }
+  .as-modos-panel {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 640px; margin: 0 auto;
+    max-height: min(68vh, 540px);
+    display: flex; flex-direction: column;
+    background: rgb(var(--c-surface-card, 17 24 39));
+    border: 1px solid rgb(var(--c-surface-border, 51 65 85));
+    border-bottom: 0;
+    border-radius: 26px 26px 0 0;
+    box-shadow: 0 -20px 52px -16px rgba(0, 0, 0, 0.6);
+    padding: 8px 15px calc(env(safe-area-inset-bottom, 0px) + 16px);
+    animation: as-modos-rise 0.34s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+  .as-modos-grab {
+    width: 44px; height: 4px; border-radius: 999px; flex: none;
+    background: rgb(var(--c-slate-300, 148 163 184) / 0.5);
+    margin: 5px auto 9px;
+  }
+  .as-modos-head { display: flex; align-items: center; gap: 10px; margin-bottom: 3px; }
+  .as-modos-head h2 {
+    flex: 1; min-width: 0;
+    font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+    font-weight: 800; font-size: 17px; letter-spacing: -0.3px;
+    color: rgb(var(--c-slate-100, 241 245 249));
+  }
+  .as-modos-close {
+    flex: none; width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: rgb(var(--c-surface-raised, 30 41 59));
+    border: 1px solid rgb(var(--c-surface-border, 51 65 85));
+    color: rgb(var(--c-slate-300, 148 163 184)); cursor: pointer;
+    transition: color 0.18s ease, border-color 0.18s ease;
+  }
+  .as-modos-close:hover {
+    color: rgb(var(--c-slate-100, 241 245 249));
+    border-color: rgb(var(--t-accent-rgb, 25 201 154) / 0.5);
+  }
+  .as-modos-sub {
+    font-size: 12.5px; line-height: 1.4; margin: 0 2px 6px;
+    color: rgb(var(--c-slate-400, 148 163 184));
+  }
+  .as-modos-body { overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+  /* Dentro del sheet, la bandeja no lleva superficie ni borde propios (el panel
+     ya los da) — solo pinta sus chips. */
+  .as-modos-body .agent-chip-tray {
+    background: transparent !important; border-top: 0 !important;
+    -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+    padding: 4px 2px 2px;
+  }
+  @keyframes as-modos-rise { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  @keyframes as-modos-fade { from { opacity: 0; } to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    .as-modos-panel, .as-modos-scrim { animation: none !important; }
+  }
   @keyframes as-send-shimmer {
     0%   { transform: translateX(-130%); opacity: 0; }
     25%  { opacity: 1; }

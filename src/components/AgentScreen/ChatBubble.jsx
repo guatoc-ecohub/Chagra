@@ -333,16 +333,18 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
   };
 
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3.5`}>
-      <div className={`flex gap-2 max-w-[85%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
+      <div className={`flex gap-2.5 max-w-[86%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
         {isUser ? (
-          <div className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-emerald-600 ring-1 ring-emerald-400/40 shadow-sm shadow-emerald-950/30">
+          <div className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-gradient-to-br from-emerald-500 to-emerald-700 ring-1 ring-emerald-300/40 shadow-sm shadow-emerald-950/40">
             <User size={16} className="text-white" />
           </div>
         ) : (
           <div
-            className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center bg-slate-900 border overflow-hidden ${
-              isStreaming ? 'border-amber-400/60 shadow-[0_0_10px_rgba(245,158,11,.4)]' : 'border-emerald-700/40'
+            className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center bg-[#0f1a14] border overflow-hidden transition-shadow ${
+              isStreaming
+                ? 'border-amber-400/70 shadow-[0_0_14px_rgba(245,158,11,.45)]'
+                : 'border-emerald-600/45 shadow-[0_0_10px_rgba(16,185,129,.18)]'
             }`}
           >
             <ChagraAgentAvatar state={agentState} size={32} ariaLabel="Chagra IA" />
@@ -350,11 +352,11 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
         )}
 
         <div
-          className={`rounded-2xl px-4 py-3 shadow-md ${
+          className={`rounded-[20px] px-4 py-3 shadow-lg ${
             isUser
-              ? 'bg-emerald-700/70 text-white rounded-tr-md border border-emerald-500/25 shadow-emerald-950/25'
-              : `bg-slate-800/90 text-slate-100 rounded-tl-md border border-slate-700/60 shadow-slate-950/30 cursor-pointer${
-                  isGrounded ? ' border-l-2 border-l-emerald-400/70' : ''
+              ? 'bg-gradient-to-br from-emerald-600/85 to-emerald-800/85 text-white rounded-tr-md border border-emerald-400/25 shadow-emerald-950/30'
+              : `bg-[#182421]/94 text-emerald-50/95 rounded-tl-md border border-emerald-900/45 shadow-emerald-950/25 cursor-pointer${
+                  isGrounded ? ' border-l-[3px] border-l-emerald-400/80' : ''
                 }`
           }`}
           data-grounded={isGrounded ? 'true' : undefined}
@@ -392,7 +394,7 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
               una respuesta "fantasma". Para el usuario sí mostramos su texto
               tal cual (puede ser vacío sólo si tipeó vacío, que el submit ya
               previene). Cero hype, español colombiano. */}
-          <p className="text-[15px] leading-relaxed whitespace-pre-wrap">
+          <p className="text-[15.5px] leading-[1.62] whitespace-pre-wrap [text-wrap:pretty]">
             {!isUser && (typeof message.content !== 'string' || message.content.trim().length === 0)
               ? <span className="italic text-slate-400">No recibí respuesta del asistente. Intenta de nuevo.</span>
               : message.content}

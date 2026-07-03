@@ -396,25 +396,35 @@ describe('AgentScreen - chips toolbar', () => {
     vi.clearAllMocks();
   });
 
-  it('monta la barra de chips junto al input y cambia la intencion al tocar un chip', async () => {
+  it('colapsa la bandeja de chips: cerrada no ahoga el chat; el disparador abre el sheet y elegir un modo fuerza la intencion', async () => {
     render(<AgentScreen onBack={() => {}} />);
 
+    // El disparador de modos vive en el compositor y la bandeja arranca CERRADA
+    // (recupera el alto del chat). ChipsToolbar NO está montada hasta abrir.
     await waitFor(() => {
-      expect(screen.getByTestId('chips-toolbar')).toBeInTheDocument();
+      expect(screen.getByTestId('agent-modos-trigger')).toBeInTheDocument();
     });
+    expect(screen.queryByTestId('chips-toolbar')).not.toBeInTheDocument();
 
-    const toolbar = screen.getByTestId('chips-toolbar');
-    const input = screen.getByTestId('agent-input');
-    expect(toolbar.compareDocumentPosition(input) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
-
+    // Abrir el sheet → la bandeja aparece con sus chips.
+    fireEvent.click(screen.getByTestId('agent-modos-trigger'));
+    const toolbar = await screen.findByTestId('chips-toolbar');
     expect(toolbar).toHaveTextContent('Biopreparado');
-    const biopreparadoChip = screen.getByRole('button', { name: /biopreparado/i });
-    fireEvent.click(biopreparadoChip);
 
-    expect(biopreparadoChip).toHaveAttribute('aria-pressed', 'true');
+    // Elegir un modo fuerza la intención: cambia el placeholder del input, cierra
+    // el sheet y muestra la cinta del modo activo. (El chip queda desmontado al
+    // cerrar el sheet, por eso verificamos el efecto persistente, no aria-pressed.)
+    fireEvent.click(screen.getByRole('button', { name: /biopreparado/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('chips-toolbar')).not.toBeInTheDocument();
+    });
     expect(screen.getByTestId('agent-input')).toHaveAttribute(
       'placeholder',
       'Escribe para que plaga o planta quieres el biopreparado',
     );
+    expect(screen.getByTestId('agent-modo-activo')).toHaveTextContent('Modo Biopreparado');
+    // El disparador refleja el modo activo (punto de acento + clase has-active).
+    expect(screen.getByTestId('agent-modos-trigger').className).toMatch(/has-active/);
   });
 });
