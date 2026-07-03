@@ -23,16 +23,17 @@ const pickMimeType = () => {
  * Negocia el tipo MIME soportado, analiza la amplitud en tiempo real mediante
  * AnalyserNode y detiene automáticamente la grabación a los 30 segundos.
  *
- * @returns {Object} Estado y controles de la grabadora de voz.
- * @returns {boolean} returns.isRecording - Indica si la grabación está activa.
- * @returns {number} returns.audioLevel - Nivel de amplitud RMS normalizado (0-1).
- * @returns {number[]} returns.amplitudeHistory - Historial de los últimos 60 niveles de amplitud.
- * @returns {number} returns.durationMs - Duración transcurrida de la grabación en milisegundos.
- * @returns {string|null} returns.error - Mensaje de error o null si no hay error.
- * @returns {Function} returns.start - Función asíncrona que inicia la grabación. Lanza error si falla.
- * @returns {Function} returns.stop - Detiene la grabación y retorna una promesa con { blob, durationMs, mimeType }.
- * @returns {Function} returns.reset - Reinicia todo el estado interno y libera recursos.
- * @returns {number} returns.hardLimitMs - Límite máximo de grabación en milisegundos (30000).
+ * @returns {{
+ *   isRecording: boolean,
+ *   audioLevel: number,
+ *   amplitudeHistory: number[],
+ *   durationMs: number,
+ *   error: (string|null),
+ *   start: Function,
+ *   stop: Function,
+ *   reset: Function,
+ *   hardLimitMs: number
+ * }} Estado y controles de la grabadora de voz.
  */
 export default function useVoiceRecorder() {
   const [isRecording, setIsRecording] = useState(false);
@@ -127,7 +128,7 @@ export default function useVoiceRecorder() {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
 
-      const AC = window.AudioContext || window.webkitAudioContext;
+      const AC = window.AudioContext || /** @type {typeof AudioContext} */(window).webkitAudioContext;
       const ctx = new AC();
       audioCtxRef.current = ctx;
       const source = ctx.createMediaStreamSource(stream);
@@ -156,6 +157,8 @@ export default function useVoiceRecorder() {
           event_type: 'voice_capture_complete',
           flujo: 'voice_recorder',
           duration_ms: dur,
+          accepted: null,
+          edits: null,
           connectivity: navigator.onLine ? 'online' : 'offline',
         }).catch(() => {});
       };
@@ -164,6 +167,9 @@ export default function useVoiceRecorder() {
         recordEvent({
           event_type: 'voice_capture_abort',
           flujo: 'voice_recorder',
+          duration_ms: null,
+          accepted: null,
+          edits: null,
           connectivity: navigator.onLine ? 'online' : 'offline',
         }).catch(() => {});
       };
@@ -180,6 +186,9 @@ export default function useVoiceRecorder() {
       recordEvent({
         event_type: 'voice_capture_start',
         flujo: 'voice_recorder',
+        duration_ms: null,
+        accepted: null,
+        edits: null,
         connectivity: navigator.onLine ? 'online' : 'offline',
       }).catch(() => {});
       rafRef.current = requestAnimationFrame(sampleAmplitude);

@@ -198,6 +198,19 @@ const SECTION_STYLES = {
     },
 };
 
+/**
+ * @param {Object} props
+ * @param {string} props.section
+ * @param {string} props.title
+ * @param {string} [props.subtitle]
+ * @param {number|string|null} [props.value]
+ * @param {() => void} props.onClick
+ * @param {number|string|null} [props.badge]
+ * @param {'list'|'grid'} [props.variant='list']
+ * @param {boolean} [props.loading=false]
+ * @param {string} [props.tooltip]
+ * @param {string} [props.emptyHint]
+ */
 function Card({ section, title, subtitle, value, onClick, badge, variant = 'list', loading = false, tooltip, emptyHint }) {
     const style = SECTION_STYLES[section] || SECTION_STYLES.plantas;
     // Tooltip nativo (title) funciona bien en desktop hover y NO bloquea

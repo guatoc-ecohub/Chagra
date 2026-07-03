@@ -22,6 +22,7 @@ import { validateFarmProcess, validateFarmProcessEvent } from '../types/farmProc
  * @returns {import('../types/farmProcess').FarmProcess}
  */
 export const buildUpsertPlaceholder = (processId, hint, occurredAt) => {
+  /** @type {Partial<import('../types/farmProcess').FarmProcessAttributes>} */
   const ha = (hint && hint.attributes) || {};
   const createdAt = Number.isInteger(ha.created_at) && ha.created_at > 0 ? ha.created_at : occurredAt;
   return {

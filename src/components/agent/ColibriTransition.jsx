@@ -171,8 +171,9 @@ function ColibriOverlay({ onDone }) {
 }
 
 /**
- * @param {boolean} active — true mientras la transición debe mostrarse.
- * @param {()=>void} onDone — llamado cuando la transición terminó (desmontar).
+ * @param {Object} props
+ * @param {boolean} props.active — true mientras la transición debe mostrarse.
+ * @param {() => void} props.onDone — llamado cuando la transición terminó (desmontar).
  */
 export default function ColibriTransition({ active, onDone }) {
   if (!active) return null;

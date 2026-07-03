@@ -32,8 +32,8 @@ const APPLICATION_METHODS = [
  * offline-first.
  *
  * @param {Object} props - Propiedades del componente.
- * @param {Function} props.onBack - Callback para volver a la pantalla anterior.
- * @param {Function} props.onSave - Callback invocado tras guardar: onSave(mensaje, esError).
+ * @param {() => void} props.onBack - Callback para volver a la pantalla anterior.
+ * @param {(mensaje: string, esError: boolean) => void} props.onSave - Callback invocado tras guardar: onSave(mensaje, esError).
  */
 export default function InputLog({ onBack, onSave }) {
   const [formData, setFormData] = useState({
@@ -181,7 +181,7 @@ export default function InputLog({ onBack, onSave }) {
           label="Notas"
           hint="opcional"
           name="notes"
-          rows="3"
+          rows={3}
           value={formData.notes}
           onChange={handleInput}
           placeholder="Ej: el suelo estaba seco, dosis baja…"
@@ -246,7 +246,7 @@ export default function InputLog({ onBack, onSave }) {
 
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Notas Adicionales</span>
-          <textarea name="notes" rows="3" value={formData.notes} onChange={handleInput} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-xl text-white min-h-[80px]" placeholder="Ej: Observaciones sobre el estado del suelo..." />
+          <textarea name="notes" rows={3} value={formData.notes} onChange={handleInput} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-xl text-white min-h-[80px]" placeholder="Ej: Observaciones sobre el estado del suelo..." />
         </label>
 
         <button onClick={handleSave} className="mt-4 p-6 rounded-xl bg-blue-600 active:bg-blue-500 text-2xl lg:text-3xl font-black shadow-xl min-h-[80px] border-b-4 border-blue-800">

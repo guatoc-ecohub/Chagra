@@ -47,8 +47,9 @@ import {
  * (no esta foto estática) sigue en cola — ver precioReferencia.js.
  *
  * @param {object} props
- * @param {Function} [props.onBack] - volver al dashboard.
- * @param {Function} [props.onNavigate] - navegación opcional a otras vistas.
+ * @param {() => void} [props.onBack] - volver al dashboard.
+ * @param {(view: string, data?: any) => void} [props.onNavigate] - navegación opcional a otras vistas.
+ * @param {(pregunta: string) => void} [props.onAskAgent] - opcional, puente al agente desde la vista "Vender mejor".
  */
 export default function MercadosScreen({ onBack, onNavigate: _onNavigate }) {
   const [tab, setTab] = useState('explorar'); // 'explorar' | 'publicar'
@@ -492,7 +493,7 @@ function PublicarPanel({ onPublicada, onCancelar }) {
     nota: '',
   }));
   const [fotoBlob, setFotoBlob] = useState(null);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState(/** @type {{ producto?: string, cantidad?: string, unidad?: string, precio?: string }} */ ({}));
   const [guardando, setGuardando] = useState(false);
 
   const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
@@ -682,6 +683,14 @@ function PublicarPanel({ onPublicada, onCancelar }) {
   );
 }
 
+/**
+ * @param {Object} props
+ * @param {string} props.label
+ * @param {import('react').ReactNode} props.children
+ * @param {string} [props.error]
+ * @param {string} [props.hint]
+ * @param {boolean} [props.required]
+ */
 function Field({ label, children, error, hint, required }) {
   return (
     <label className="block">

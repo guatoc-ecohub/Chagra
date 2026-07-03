@@ -151,7 +151,7 @@ function MaintenanceScreen({ onBack, onSave }) {
         <TextAreaField
           label="¿Qué hiciste?"
           name="description"
-          rows="4"
+          rows={4}
           value={formData.description}
           onChange={handleInput}
           placeholder="Ej: arreglé la cerca del lote norte, cambié la manguera de riego…"
@@ -186,7 +186,7 @@ function MaintenanceScreen({ onBack, onSave }) {
           label="Notas"
           hint="opcional"
           name="notes"
-          rows="2"
+          rows={2}
           value={formData.notes}
           onChange={handleInput}
           placeholder="Ej: pendiente revisar la otra semana…"
@@ -220,7 +220,7 @@ function MaintenanceScreen({ onBack, onSave }) {
 
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Descripcion</span>
-          <textarea name="description" value={formData.description} onChange={handleInput} rows="4" className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-xl text-white min-h-[80px]" />
+          <textarea name="description" value={formData.description} onChange={handleInput} rows={4} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-xl text-white min-h-[80px]" />
         </label>
 
         <label className="flex flex-col gap-2">
@@ -242,7 +242,7 @@ function MaintenanceScreen({ onBack, onSave }) {
 
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Notas</span>
-          <textarea name="notes" value={formData.notes} onChange={handleInput} rows="2" className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-xl text-white min-h-[80px]" />
+          <textarea name="notes" value={formData.notes} onChange={handleInput} rows={2} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-xl text-white min-h-[80px]" />
         </label>
 
         <div className="flex flex-col gap-2">

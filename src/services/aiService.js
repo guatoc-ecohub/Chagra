@@ -134,7 +134,7 @@ const blobToBase64 = (blob) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => {
-      const result = reader.result;
+      const result = /** @type {string} */ (reader.result);
       // Strip "data:image/webp;base64," prefix
       const base64 = result.split(',')[1] || result;
       resolve(base64);
@@ -181,8 +181,8 @@ export const __retrieveRagContextForFoliage = async (speciesSlug) => {
  * @param {string} [options.speciesSlug] - slug del catálogo (ej.
  *        `fragaria_ananassa_monterrey`). Cuando se conoce, el retrieve apunta
  *        al passage de esa especie. Si es null/undefined, fallback genérico.
- * @param {string} [options.assetId] - solo telemetría, opcional. No se
- *        persiste (privacy-safe).
+  * @param {string} [options._assetId] - solo telemetría, opcional. No se
+  *        persiste (privacy-safe).
  * @returns {Promise<{score: number, issues: string[], treatment_suggestion: string} | null>}
  *          null si el modelo no responde o no es multimodal.
  * @example
@@ -216,9 +216,10 @@ const analyzeFoliageUncached = async (imageBlob, { onToken, signal, speciesSlug,
     // prosa antes/después, trailing commas, cierres faltantes por num_predict.
     const r = parseJsonTolerant(text);
     if (!r.ok) {
-      console.warn('[aiService.analyzeFoliage] JSON irrecuperable:', r.error);
+      console.warn('[aiService.analyzeFoliage] JSON irrecuperable:', /** @type {{error: string}} */ (r).error);
       return null;
     }
+    /** @type {{score?: number, issues?: string[], treatment_suggestion?: string, treatment?: string, isPlant?: boolean}} */
     const parsed = r.value;
 
     // Validación y normalización del shape
@@ -233,7 +234,7 @@ const analyzeFoliageUncached = async (imageBlob, { onToken, signal, speciesSlug,
     // Legacy cache (isPlant undefined) se asume plant para no romper.
     if (parsed.isPlant === false) return null;
 
-    return parsed;
+    return /** @type {{score: number, issues: string[], treatment_suggestion: string}} */ (parsed);
   } catch (err) {
     console.warn('[aiService] Diagnóstico no disponible:', err.message);
     return null;
@@ -278,11 +279,13 @@ export const analyzeFoliage = async (imageBlob, options = {}) => {
  * Reconoce especie de planta a partir de una foto (EXPERIMENTAL - Miguel
  * 2026-05-03). Mismo backend multimodal configurado pero prompt distinto.
  *
- * @param {Blob} imageBlob - foto JPEG/WebP comprimida
- * @param {Object} [options]
+ * @param {string} model - nombre del modelo Ollama
+ * @param {string} base64 - imagen en base64 (sin prefijo data:)
+ * @param {Object} options
  * @param {Function} [options.onToken] - streaming token callback
  * @param {AbortSignal} [options.signal]
- * @returns {Promise<{common_name_es: string, scientific_name: string, confidence: number, alternatives: Array} | null>}
+ * @param {Object} [options.telemetryState] - state compartido para telemetría
+ * @returns {Promise<{common_name_es: string, scientific_name: string, confidence: number, alternatives: Array, _model: string} | null>}
  *          null si modelo falla o no parseable. Caller debe distinguir
  *          confidence >=0.7 (sugerir directo) vs <0.7 (mostrar alternativas
  *          y dejar al operario elegir).
@@ -319,8 +322,9 @@ const runSpeciesRecognition = async (model, base64, { onToken, signal, telemetry
   // externo que decide fallback texto).
   const r = parseJsonTolerant(text);
   if (!r.ok) {
-    throw new Error(`runSpeciesRecognition: ${r.error}`);
+    throw new Error(`runSpeciesRecognition: ${/** @type {{error: string}} */ (r).error}`);
   }
+  /** @type {{confidence?: number, common_name_es?: string, scientific_name?: string, alternatives?: Array<any>}} */
   const parsed = r.value;
   const confidence = typeof parsed.confidence === 'number' ? parsed.confidence : 0;
 
@@ -330,13 +334,13 @@ const runSpeciesRecognition = async (model, base64, { onToken, signal, telemetry
   // omitirá el campo. Telemetría nunca debe bloquear el caller.
   if (telemetryState) telemetryState.confidence = confidence;
 
-  return {
+  return /** @type {{common_name_es: string, scientific_name: string, confidence: number, alternatives: Array<any>, _model: string}} */ ({
     common_name_es: (parsed.common_name_es || '').toLowerCase().trim(),
     scientific_name: parsed.scientific_name || '',
     confidence,
     alternatives: Array.isArray(parsed.alternatives) ? parsed.alternatives : [],
     _model: model,
-  };
+  });
 };
 
 /**
@@ -591,6 +595,7 @@ export const recognizeSpeciesGrounded = async (imageBlob, options = {}) => {
   );
 };
 
+/** @param {Blob} imageBlob @param {{onToken?: Function, signal?: AbortSignal, _telemetryState?: Object}} options */
 const recognizeSpeciesUncached = async (imageBlob, { onToken, signal, _telemetryState } = {}) => {
   let base64;
   try {

@@ -592,6 +592,9 @@ export function formatClimateAlert(bioculturalZone, climateData = null) {
  *   Si se pasa, se inyecta la LECTURA REGIONAL ENSO (DR-MISSION-2/4): qué
  *   implica la fase actual para esa región (p. ej. heladas paradójicas en el
  *   altiplano bajo El Niño seco). Si no, solo se inyecta el bloque base.
+ * @param {object|null} [opts.sky] - resumen de cielo del día (skyConditionService).
+ *   Si tiene `label` y opcionalmente `cloudCoverPct` y `degraded`, se inyecta
+ *   una línea con el cielo real del día en la finca.
  * @returns {string}
  */
 export function buildClimaContext(snapshot, opts = {}) {
@@ -1385,6 +1388,7 @@ function crossResolvedWithInventory(resolvedEntities, groupedCultivos) {
  * @param {Array<{name:string,count:number}>} [args.groupedCultivos] - inventario agrupado
  * @param {Array<object>|null} [args.resolvedEntities] - entidades AGE del turno
  * @param {Array<object>} [args.activeAlerts] - useAlertStore activeAlerts
+ * @param {Array<object>} [args.activeCycles] - ciclos productivos activos (FarmProcess)
  * @param {string[]|null} [args.catalogNames] - nombres reales del catalogo (sync, opcional);
  *   si se pasa, valida cultivos contra el catalogo; si no, usa heuristica anti-mash.
  * @param {number} [args.month] - override de mes para tests (1-12)
@@ -1651,9 +1655,9 @@ function _hasUnavailablePriceEvidence(toolEvidence) {
  *   - la evidencia de precio dice no-disponible (available:false).
  * En cualquier otro caso devuelve '' (no-op, no contamina el prompt).
  *
- * @param {object} args
- * @param {string|null|undefined} args.userMessage — la pregunta del usuario.
- * @param {object|Array<object>|null} args.toolEvidence — evidencia del sidecar.
+ * @param {object} [args]
+ * @param {string|null|undefined} [args.userMessage] - la pregunta del usuario.
+ * @param {object|Array<object>|null} [args.toolEvidence] - evidencia del sidecar.
  * @returns {string}
  */
 export function buildPriceDeclineContext({ userMessage = null, toolEvidence = null } = {}) {
@@ -1697,7 +1701,7 @@ Usuario: "¿a cómo está la papa?"
  * `null` si no hay precio disponible (el caller cae al LLM / al decline block).
  *
  * @param {object|Array<object>|null} toolEvidence
- * @returns {{ price: object, especie: (string|null) }|null}
+ * @returns {{ price: object, frescura: object|null, especie: (string|null) }|null}
  */
 function _extractAvailablePrice(toolEvidence) {
   const pick = (ev) => {
@@ -1758,9 +1762,9 @@ function _formatFechaCorta(iso) {
  *    Centroabastos. Rango del día: $4.400–$4.800/kg. (Fuente: SIPSA/DANE,
  *    25 de junio.)"
  *
- * @param {object} args
- * @param {string|null|undefined} args.userMessage — pregunta cruda del usuario.
- * @param {object|Array<object>|null} args.toolEvidence — evidencia del sidecar.
+ * @param {object} [args]
+ * @param {string|null|undefined} [args.userMessage] - pregunta cruda del usuario.
+ * @param {object|Array<object>|null} [args.toolEvidence] - evidencia del sidecar.
  * @returns {string|null} respuesta lista para mostrar, o null si no aplica.
  */
 export function buildPriceAnswer({ userMessage = null, toolEvidence = null } = {}) {
@@ -1848,8 +1852,8 @@ export function isLowConfidenceEntity(e) {
  * confirmación) ANTES de afirmar cualquier dato de ellas. NUNCA se afirma su
  * altitud / nombre científico / viabilidad como hecho.
  *
- * @param {object} args
- * @param {Array<object>|null} args.suggestedEntities — entidades < umbral.
+ * @param {object} [args]
+ * @param {Array<object>|null} [args.suggestedEntities] - entidades < umbral.
  * @returns {string}
  */
 export function buildSuggestedEntitiesContext({ suggestedEntities = null } = {}) {
