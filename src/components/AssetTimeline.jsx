@@ -173,7 +173,7 @@ const PhotoAttachmentThumb = ({ photoId, timestamp, pending }) => {
 // tener que ir foto por foto. Solo se muestra si hay al menos 2 fotos distintas
 // Y ambas URLs resuelven (usePhotoUrl); si falta alguna, no se renderiza nada
 // (degrada limpio, no deja un hueco roto).
-const PhotoEvolutionSection = ({ oldest, newest }) => {
+const PhotoEvolutionSection = ({ oldest, newest, photoCount = 2 }) => {
   const beforePhoto = usePhotoUrl({ photoId: oldest.photoId });
   const afterPhoto = usePhotoUrl({ photoId: newest.photoId });
 
@@ -182,9 +182,16 @@ const PhotoEvolutionSection = ({ oldest, newest }) => {
 
   return (
     <div className="mb-4 shrink-0" data-testid="asset-timeline-before-after">
-      <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-        <Camera size={12} /> Evolución de la planta
-      </h4>
+      <div className="flex items-center justify-between mb-2">
+        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+          <Camera size={12} className="text-emerald-400" /> Evolución de la planta
+        </h4>
+        {/* Contexto: cuántas fotos tiene la hoja de vida (el slider compara
+            la primera y la última). Solo presentación. */}
+        <span className="text-[10px] font-bold text-slate-400 bg-slate-800/80 border border-slate-700/60 px-2 py-0.5 rounded-[var(--r-pill,999px)] tabular-nums whitespace-nowrap">
+          {photoCount === 2 ? '2 fotos' : `${photoCount} fotos · primera vs última`}
+        </span>
+      </div>
       <BeforeAfterPhoto
         before={{ url: beforePhoto.url, taken_at: oldest.timestamp ? oldest.timestamp * 1000 : null }}
         after={{ url: afterPhoto.url, taken_at: newest.timestamp ? newest.timestamp * 1000 : null }}
@@ -507,7 +514,11 @@ export default function AssetTimeline({ assetId }) {
       </div>
 
       {showPhotoEvolution && (
-        <PhotoEvolutionSection oldest={oldestPhoto} newest={newestPhoto} />
+        <PhotoEvolutionSection
+          oldest={oldestPhoto}
+          newest={newestPhoto}
+          photoCount={photoAttachments.length}
+        />
       )}
 
       {logs.length === 0 ? (
