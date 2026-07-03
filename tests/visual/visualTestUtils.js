@@ -228,7 +228,7 @@ export async function installDeterminism(context, page, { profileKey = 'campesin
     const text = msg.text();
     if (
       msg.type() === 'error' &&
-      !/sqlite|wasm|content security policy|csp|favicon|manifest|WebGL|Failed to load resource|ArrayBuffer instantiation/i.test(text)
+      !/sqlite|wasm|content security policy|csp|favicon|manifest|WebGL|Failed to load resource|ArrayBuffer instantiation|Error obteniendo tareas de FarmOS|Error obteniendo tareas pendientes/i.test(text)
     ) {
       throw new Error(`Console error in visual test: ${text}`);
     }

@@ -52,8 +52,8 @@ for screen in "${join_screens[@]}"; do
   before_out="$OUT_ROOT/before/$screen.png"
   after_out="$OUT_ROOT/after/$screen.png"
 
-  (cd "$MAIN_WORKTREE" && node scripts/chagra-shot.mjs --branch main --screen "$screen" --out "$before_out")
-  (cd "$BRANCH_WORKTREE" && node scripts/chagra-shot.mjs --branch "$BRANCH" --screen "$screen" --out "$after_out")
+  (cd "$MAIN_WORKTREE" && node "$ROOT/scripts/chagra-shot.mjs" --branch main --screen "$screen" --out "$before_out")
+  (cd "$BRANCH_WORKTREE" && node "$ROOT/scripts/chagra-shot.mjs" --branch "$BRANCH" --screen "$screen" --out "$after_out")
 done
 
 echo "Capturas listas en: $OUT_ROOT"
