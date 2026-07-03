@@ -209,6 +209,31 @@ export async function searchSpecies(query, opts = {}) {
   return ranked.slice(0, limit);
 }
 
+/**
+ * Lista TODO el catálogo en forma liviana para el modo exploración del
+ * Directorio (grid + chips de categoría). Solo re-etiqueta lo que ya devuelve
+ * `getAllSpecies` — cero lógica nueva de datos: mismo origen, misma fila,
+ * ordenada alfabéticamente por nombre común para browsing.
+ *
+ * @returns {Promise<Array<{ id, comun, cientifico, familia, categoria }>>}
+ *   [] si el catálogo no está disponible (offline-first: la UI degrada a
+ *   estado vacío honesto, nunca lanza).
+ */
+export async function listSpeciesForBrowse() {
+  let list;
+  try {
+    list = await getAllSpecies();
+  } catch (e) {
+    console.warn('[directorioEspecies] catálogo no disponible para explorar:', e?.message || e);
+    return [];
+  }
+  if (!Array.isArray(list)) return [];
+  return list
+    .filter((sp) => sp && (sp.id || sp.slug))
+    .map((sp) => ({ ...labelWithFamilia(sp), categoria: sp.category || '' }))
+    .sort((a, b) => String(a.comun).localeCompare(String(b.comun), 'es'));
+}
+
 /** Recolecta todos los nombres buscables de una especie del catálogo. */
 function collectNames(sp) {
   const out = [];
