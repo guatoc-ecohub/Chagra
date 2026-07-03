@@ -139,7 +139,8 @@
         "cebolla huevo",
         "cebolla bulbosa",
         "cebolla roja"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "allium_fistulosum",
@@ -194,7 +195,8 @@
         "cebolla en rama",
         "cebolla rama",
         "cebolla verdeo"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "allium_sativum",
@@ -297,7 +299,8 @@
       "nombre_comunes_regionales": [
         "ajo de bulbo",
         "ajo común"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "alnus_acuminata",
@@ -527,7 +530,8 @@
       "nombre_comunes_regionales": [
         "apio de pencas",
         "célery"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "beta_vulgaris_cicla_blanca",
@@ -578,7 +582,8 @@
         "allium_cepa",
         "phaseolus_vulgaris",
         "zea_mays"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "beta_vulgaris_conditiva",
@@ -628,7 +633,8 @@
         "betabel",
         "betarraga",
         "beterraga"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "brassica_oleracea_acephala_curly",
@@ -677,7 +683,8 @@
         "solanum_lycopersicum_san_marzano"
       ],
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "brassica_oleracea_capitata_alba",
@@ -725,7 +732,8 @@
         "vaccinium_corymbosum_biloxi"
       ],
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "brassica_oleracea_italica",
@@ -772,7 +780,8 @@
       "cultivar": false,
       "antagonists": [
         "petroselinum_crispum"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "calendula_officinalis",
@@ -886,7 +895,8 @@
         "quínoa",
         "quingua",
         "arrocillo andino"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "coffea_arabica",
@@ -1090,7 +1100,8 @@
         "culantro",
         "cilantro común",
         "cilantro de castilla"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "cymbopogon_citratus",
@@ -1145,7 +1156,8 @@
         "pasto limón",
         "hierba limón",
         "citronela de té"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "erythrina_edulis",
@@ -1335,7 +1347,8 @@
         "zea_mays"
       ],
       "tracking_mode": "individual",
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "fragaria_ananassa_monterrey",
@@ -1441,7 +1454,8 @@
       "nombre_comunes_regionales": [
         "fresa",
         "frutilla"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "ipomoea_batatas",
@@ -1492,7 +1506,8 @@
       ],
       "nombre_comunes_regionales": [
         "boniato"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "inga_edulis",
@@ -1558,7 +1573,8 @@
         "guama",
         "guamo santafereño",
         "guaba"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "lactuca_sativa_capitata",
@@ -1608,7 +1624,8 @@
         "solanum_lycopersicum_san_marzano"
       ],
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "lactuca_sativa_crispa_verde",
@@ -1693,7 +1710,8 @@
         ]
       },
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "lactuca_sativa_longifolia_verde",
@@ -1737,7 +1755,8 @@
       ],
       "valor_pedagogico": "La lechuga romana verde (Lactuca sativa L. var. longifolia Lam.) se cultiva en los departamentos andinos de Colombia como Cundinamarca, Boyacá y Santander entre 1000-3000 msnm, con óptimo desarrollo en zonas térmicas templadas y frías (1800-2800 msnm). Su manejo agronómico incluye propagación por semilla con ciclo de cultivo de 65-80 días, cosechándose cuando la cabeza está firme y las hojas internas blanqueadas por autosombreado; se beneficia de asociaciones con zanahoria y rábano que repelen áfidos, requiriendo monitoreo de plagas como pulgones y caracoles mediante trampas de cerveza y extracto de ajo. En el contexto campesino andino, esta variedad ha sido incorporada a ensaladas y acompañamientos desde la época colonial, valorada por su textura crujiente y sabor suave en platos tradicionales como el sancocho de gallina y los sandwiches de chicharrón. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Lactuca sativa L. var. longifolia Lam.",
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "lupinus_mutabilis",
@@ -1794,7 +1813,8 @@
         "altramuz",
         "chocho andino",
         "tauri"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "melissa_officinalis",
@@ -1843,7 +1863,8 @@
         "solanum_lycopersicum_san_marzano"
       ],
       "tracking_mode": "individual",
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "mentha_spicata",
@@ -1897,7 +1918,8 @@
       "nombre_comunes_regionales": [
         "menta verde",
         "yerba buena"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "origanum_vulgare",
@@ -1946,7 +1968,8 @@
       "nombre_comunes_regionales": [
         "orégano común",
         "orégano de huerta"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "oxalis_tuberosa",
@@ -2002,7 +2025,8 @@
       "nombre_comunes_regionales": [
         "ibia",
         "oca andina"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "passiflora_edulis_flavicarpa",
@@ -2054,7 +2078,8 @@
         "parchita",
         "parcha",
         "maracujá"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "passiflora_edulis_morada",
@@ -2157,7 +2182,8 @@
         "urtica_dioica"
       ],
       "tracking_mode": "individual",
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "passiflora_ligularis",
@@ -2207,7 +2233,8 @@
       "nombre_comunes_regionales": [
         "granadilla común",
         "granadilla de China"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "passiflora_tripartita_mollissima",
@@ -2262,7 +2289,8 @@
         "tacso",
         "taxo",
         "parcha"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "pennisetum_setaceum",
@@ -2458,7 +2486,8 @@
       "nombre_comunes_regionales": [
         "perejil rizado",
         "perejil común"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "phaseolus_vulgaris",
@@ -2619,7 +2648,8 @@
         "aguaymanto",
         "topotopo",
         "guchuva"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "pinus_patula",
@@ -2756,7 +2786,8 @@
       "cultivar": false,
       "nombre_comunes_regionales": [
         "Guayaba"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "pteridium_aquilinum",
@@ -2996,7 +3027,8 @@
       ],
       "nombre_comunes_regionales": [
         "rábano rojo"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "rosmarinus_officinalis",
@@ -3051,7 +3083,8 @@
       "nombre_comunes_regionales": [
         "romero común",
         "romero de huerta"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "solanum_betaceum",
@@ -3102,7 +3135,8 @@
         "tomate de palo",
         "tomate de monte",
         "tomate cimarrón"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "solanum_lycopersicum_cerasiforme",
@@ -3211,7 +3245,8 @@
       },
       "plagas_criticas": [
         "Trozador (Agrotis ipsilon)"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "solanum_lycopersicum_san_marzano",
@@ -3465,7 +3500,8 @@
       },
       "plagas_criticas": [
         "Trozador (Agrotis ipsilon)"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "solanum_phureja",
@@ -3648,7 +3684,8 @@
       ],
       "plagas_criticas": [
         "Trozador (Agrotis ipsilon)"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "theobroma_cacao",
@@ -3813,7 +3850,8 @@
       "cultivar": false,
       "nombre_comunes_regionales": [
         "isaño"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "ulex_europaeus",
@@ -4001,7 +4039,8 @@
         "melloco",
         "ruba",
         "tiquiño"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "urtica_dioica",
@@ -4575,7 +4614,8 @@
       "companions": [
         "phaseolus_vulgaris",
         "zea_mays"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "vicia_faba",
@@ -4627,7 +4667,8 @@
       "cultivar": false,
       "nombre_comunes_regionales": [
         "haba común"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "pisum_sativum_andina",
@@ -4681,7 +4722,8 @@
       "cultivar": false,
       "companions": [
         "solanum_tuberosum"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "solanum_tuberosum_sabanera",
@@ -4748,7 +4790,8 @@
       "cultivar": false,
       "plagas_criticas": [
         "Trozador (Agrotis ipsilon)"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "smallanthus_sonchifolius",
@@ -4800,7 +4843,8 @@
       "cultivar": false,
       "companions": [
         "zea_mays"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "arracacia_xanthorrhiza",
@@ -4943,7 +4987,8 @@
           "_revisor": "claude-opus-4-7"
         }
       ],
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "vaccinium_meridionale",
@@ -5321,7 +5366,8 @@
         "solanum_tuberosum_sabanera",
         "zea_mays"
       ],
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "matricaria_chamomilla",
@@ -5378,7 +5424,8 @@
       "cultivar": false,
       "companions": [
         "allium_cepa"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "espeletia_grandiflora",
@@ -5596,7 +5643,8 @@
       ],
       "valor_pedagogico": "La acelga (Beta vulgaris L. subsp. vulgaris var. cicla, formas verde y pigmentadas) es una quenopodiácea bienal cultivada como anual para hojas y peciolos, hortaliza fundamental en huertas familiares colombianas con alto aporte nutricional (vitamina A, K, magnesio, hierro). Se cultiva en zonas frías y templadas: Sabana de Bogotá (Mosquera, Madrid, Funza), Boyacá altiplano, Nariño y Antioquia entre 1.500 y 2.900 msnm en zona térmica fría a templada. Ciclo 60-90 días desde trasplante a primera cosecha; productividad sostenida con cortes graduales de hojas externas 4-6 meses. Suelos francos pH 6.5-7.5, MO >4%. Manejo agroecológico: doble fila densa (25×30 cm), fertilización con bocashi + biol foliar quincenal, control de minador hoja (Liriomyza huidobrensis) con BT y trampas amarillas. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "daucus_carota_subsp_sativus",
@@ -5651,7 +5699,8 @@
       "nombre_comunes_regionales": [
         "zanahoria común",
         "azanoria"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "allium_schoenoprasum",
@@ -5708,7 +5757,8 @@
       "antagonists": [
         "phaseolus_vulgaris"
       ],
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "cocos_nucifera",
@@ -5773,7 +5823,8 @@
       "cultivar": false,
       "companions": [
         "stylosanthes_guianensis"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "bactris_gasipaes",
@@ -5835,7 +5886,8 @@
       "companions": [
         "borojoa_sorbilis",
         "theobroma_bicolor"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "euterpe_oleracea",
@@ -5900,7 +5952,8 @@
       ],
       "valor_pedagogico": "El açaí o asaí (Euterpe oleracea Mart., familia Arecaceae, subfamilia Arecoideae) es una arecácea palmiforme cespitosa multitallo nativa silvestre de la cuenca amazónica y zonas estuarinas del bajo Amazonas y el Pacífico colombiano, considerada producto forestal no maderable (PFNM) emblemático del Chocó biogeográfico y la Amazonia colombiana. Forma touceiras o macollas de 4-10 estipes (tallos) desde una misma base por rebrote basal, alcanzando 15-25 m de altura, con hojas pinnadas verde-oscuras, inflorescencias en panícula entre las hojas y frutos pequeños globosos negro-morados (1-2 cm) con un único pirene grande y mesocarpo carnoso delgado rico en antocianinas (cianidina-3-glucósido, cianidina-3-rutinósido), ácidos grasos monoinsaturados (oleico 60%), polifenoles antioxidantes y minerales. Se distribuye en Chocó (Quibdó, Atrato medio, Bajo Baudó, Bahía Solano, Nuquí), Valle del Cauca (Buenaventura, Bajo Calima), Cauca (Guapi, Timbiquí, López), Nariño (Tumaco, Mosquera, Olaya Herrera), Amazonas (Leticia, Puerto Nariño, Trapecio amazónico) y Vaupés (Mitú) entre 0 y 200 msnm en zona térmica cálida húmeda con altísima pluviosidad (3.000-9.000 mm/año). Ciclo perenne, primera fructificación a los 4-5 años, productividad sostenida 30-50 años. Rendimientos 6-12 kg fruto/estipe/año, 30-60 kg/touceira/año. Lección viva: el açaí enseña el aprovechamiento sostenible de productos forestales no maderables del Pacífico y la Amazonia colombiana por comunidades afrocolombianas e indígenas (Embera, Wounaan, Tikuna, Yagua), su rol en la canasta amazónica como superalimento (concentra antioxidantes y energía), y la importancia de los manglares ribereños y bosques de várzea estuarina como ecosistemas de provisión. Manejo agroecológico: aprovechamiento por extractivismo regulado certificado con comunidades locales, propagación por semilla en germinador con sombra (90-180 días germinación), siembra a 4-6 m entre touceiras en sistemas agroforestales con plátano, cacao y maderables nativos, cosecha manual de racimos por trepador, no requiere agroquímicos. Fuentes Tier A: SINCHI Amazonia Colombiana, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia.",
       "tracking_mode": "individual",
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "gliricidia_sepium",
@@ -6284,7 +6337,8 @@
       "cultivar": false,
       "companions": [
         "curcuma_longa"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "curcuma_longa",
@@ -6343,7 +6397,8 @@
         "bixa_orellana",
         "musa_paradisiaca",
         "zingiber_officinale"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "borojoa_patinoi",
@@ -6387,7 +6442,8 @@
       "valor_pedagogico": "El borojó (Borojoa patinoi Cuatrec.) es una especie endémica del Pacífico Chocó colombiano, distribuida principalmente en los departamentos de Chocó, Valle del Cauca y Nariño, entre 0 y 1000 msnm en zonas térmicas cálidas con alta humedad relativa (bosque pluvial tropical). Su manejo agronómico incluye propagación por semillas recolectadas de frutos maduros, con requiereniento de sombra parcial durante el establecimiento, ciclo productivo de 3-5 años desde siembra hasta primera fructificación, y asociaciones beneficiosas con otras especies del bosque pluvial como palmas y heliconias. En el contexto cultural de las comunidades afrocolombianas del Pacífico, el borojó se utiliza tradicionalmente en preparaciones de jugos, batidos y dulces por su alto contenido de azúcares naturales y propiedades nutricionales. Según el catálogo de plantas de Colombia de Bernal et al. (2015) y la base de datos del Sistema de Información sobre Biodiversidad de Colombia (SiB Colombia), esta especie está confirmada como endémica del Chocó biogeográfico. Las fuentes taxonómicas verificadas GBIF Backbone Taxonomy y Plants of the World Online (POWO) confirman su nombre científico válido Borojoa patinoi Cuatrec., descrito por el botánico José Cuatrecasas.",
       "estrato": "alto",
       "tracking_mode": "individual",
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "solanum_tuberosum_pastusa_suprema",
@@ -6627,7 +6683,8 @@
           "_revisor": "claude-opus-4-7"
         }
       ],
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "cucurbita_moschata",
@@ -6687,7 +6744,8 @@
         "zea_mays"
       ],
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -6751,7 +6809,8 @@
         "musa_paradisiaca",
         "pouteria_caimito",
         "theobroma_bicolor"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -6820,7 +6879,8 @@
         "zea_mays"
       ],
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -6871,7 +6931,8 @@
         "curcuma_longa",
         "solanum_sessiliflorum",
         "theobroma_grandiflorum"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -6919,7 +6980,8 @@
       "cultivar": false,
       "companions": [
         "petroselinum_crispum"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -6964,7 +7026,8 @@
       ],
       "valor_pedagogico": "La badea o parcha gigante (Passiflora quadrangularis L., Passifloraceae) es una liana frutal perenne nativa del neotrópico (norte de Suramérica y Caribe, posiblemente originaria de Amazonia colombo-peruana), cultivada tradicionalmente en Colombia desde el nivel del mar hasta 1.600 msnm en zonas térmicas cálidas y templadas: Tolima (Mariquita, Honda, Chaparral, Líbano — corazón histórico productor que dio fama nacional a 'la badea del Tolima'), Huila (Neiva, Rivera, Campoalegre), Cundinamarca (Tena, Apulo, Anolaima, Quipile, La Mesa), Antioquia (Oriente cálido — Sonsón bajo, Cocorná), Caldas, Quindío, Valle del Cauca, Santander (Mesa de los Santos, Lebrija) y el piedemonte amazónico (Caquetá, Putumayo). Pertenece a la familia Passifloraceae como el resto del complejo cultivado (gulupa morada, gulupa amarilla, maracuyá amarillo, granadilla, curuba). Liana trepadora vigorosísima con tallos cuadrangulares alados característicos (de ahí el epíteto quadrangularis — el único en el género con esta morfología), hojas grandes ovado-cordadas enteras verde brillante (10-20 cm), zarcillos axilares robustos, flores hermafroditas espectaculares las más grandes del género (10-15 cm de diámetro) con corona filamentosa violeta-blanca multicolor que atraen abejorros carpinteros (Xylocopa) — sus polinizadores específicos —, fruto baya gigante ovoide-elipsoidal (15-30 cm largo, 1-4 kg, los más grandes de todo el género Passiflora a nivel mundial), cáscara verde-amarilla gruesa carnosa comestible cuando madura, pulpa amarilla gelatinosa-aromática con semillas pequeñas. Es lección viva de gigantismo neotropical, agroforestería tropical y patrimonio cultural cafetero-tolimense que enseña a niñas y niños cómo una sola fruta de un solo bejuco puede pesar 4 kilos y alimentar a una familia entera, y cómo en la cultura cafetera del Tolima la badea se cultiva sobre los mismos tutores vivos del café o sobre techos de patio (parras de patio) como sombra alimenticia + frutal + ornamental. Mesocarpo carnoso (la 'carne blanca' bajo la cáscara) consumido en sopas, sancochos y dulces; pulpa interior en jugos refrescantes (sabor dulce-aromático suave), mermeladas y postres. Manejo agroecológico: propagación por semilla (germinación 21-30 días a 25-28°C) o esqueje semileñoso, polinización manual recomendada en cultivos comerciales (sustituye al abejorro Xylocopa en ausencia), tutorado robusto en parra alta (cables 2.5-3 m) o sobre tutor vivo (matarratón, guamo, café de sombra), distancia 4x4 m a 5x5 m por su porte gigante, ciclo a primera cosecha 12-18 meses, vida productiva 4-6 años. Función en chagra como frutal de patio tropical, atractor de Xylocopa carpenter bees, sombra alimenticia integrada en agroforestería cafetera. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, AGROSAVIA Sol Andina, SiB Colombia, Pérez-Arbeláez 1947.",
       "tracking_mode": "individual",
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH38_MADERABLES_SOMBRIO",
@@ -7153,7 +7216,8 @@
         "juglans_neotropica"
       ],
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "capsicum_annuum_aji_dulce_caribe",
@@ -7209,7 +7273,8 @@
         "juglans_neotropica"
       ],
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "tagetes_minuta",
@@ -7266,7 +7331,8 @@
       "companions": [
         "cosmos_sulphureus"
       ],
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "tagetes_lucida",
@@ -7321,7 +7387,8 @@
       ],
       "valor_pedagogico": "El pericón o hierba de Santa María (Tagetes lucida Cav., Asteraceae) es una hierba aromática-medicinal perenne nativa de Mesoamérica (México, Guatemala, Honduras) cultivada ancestralmente y naturalizada en Colombia andina como alternativa al estragón europeo (Artemisia dracunculus) que no prospera en el trópico — su uso como 'estragón mexicano' o 'estragón colombiano' la convierte en el sustituto perfecto del tarragón para cocina internacional sin necesidad de importar la especie europea. Se cultiva en jardines, huertos caseros y zonas medicinales en los departamentos andinos de Cundinamarca, Boyacá, Antioquia, Santander, Valle del Cauca, Cauca, Nariño, Tolima, Huila, Risaralda, Quindío, Caldas entre 500 y 3.000 msnm en zonas térmicas templadas, cálidas y frías. Pertenece a la familia Asteraceae y al género Tagetes (mismo género del cempasúchil mexicano T. erecta, marigold francés T. patula y chinchilla T. minuta), con todas las especies del género caracterizadas por producir aceites esenciales con propiedades aromáticas-medicinales-insecticidas. Planta herbácea perenne de 50-80 cm de altura con hojas linear-lanceoladas verde brillante intenso con glándulas oleíferas visibles, tallos erectos glabros, capítulos pequeños amarillo-dorados en cimas terminales con 3-5 lígulas amarillas y disco amarillo, aroma fuerte característico a anís-estragón-vainilla al estrujar las hojas (debido al alto contenido de estragol, metileugenol, ocimeno y anetol). Sus usos son múltiples y patrimoniales: 1) **culinario** como sustituto del estragón europeo en preparaciones de pollo, pescado, ensaladas, vinagretas, mantequillas aromatizadas y cocina internacional (excelente para platos franceses como bearnaise y pollo a la estragón sin necesidad de importar tarragón europeo); 2) **medicinal** tradicional mexicano-mesoamericano como infusión digestiva-carminativa, antiespasmódica, ansiolítica suave, contra cólicos menstruales y como tranquilizante natural — uso milenario maya-azteca documentado en códices precolombinos como hierba sagrada utilizada en rituales y curaciones; 3) **agroecológico** como repelente de plagas (igual que otras Tagetes) intercalable en huerto, atractora de polinizadores y mariquitas. Es lección extraordinaria de adaptación cultural y soberanía culinaria que enseña a niñas y niños cómo una hierba mesoamericana resolvió en Colombia el problema cultural de tener 'estragón sin estragón': el pericón demuestra que no hace falta importar especies de clima templado europeo cuando el Neotrópico ofrece equivalentes funcionales superiores. Manejo agroecológico: propagación preferente por esqueje basal o división de cepa (perenne, rebrota cada año), o por semilla (germinación 8-15 días); distancia 40-50 cm; cosecha foliar continua tras los 4 meses de establecimiento; planta longeva 5-10 años en condiciones óptimas. Companion plants: hortalizas en general, plantas medicinales, frutales. Función en chagra como aromática culinaria + medicinal + repelente + atractora de polinizadores. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015, JBB Plantas Medicinales, Pamplona-Roger 2006 Plantas Medicinales.",
       "tracking_mode": "individual",
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "salvia_hispanica",
@@ -7373,7 +7440,8 @@
       ],
       "valor_pedagogico": "La chía (Salvia hispanica L., Lamiaceae) es una planta nutracéutica milenaria originaria de México central y Guatemala (no de los Andes a pesar del nombre 'hispanica' que se debe a un error de Linneo que creyó que provenía de España), cultivada ancestralmente por aztecas y mayas precolombinos como uno de los cuatro pilares alimentarios mesoamericanos junto a maíz, fríjol y amaranto. En Colombia se cultiva con creciente expansión comercial y huerto-casero en zonas andinas medias-cálidas de Cundinamarca (Tena, La Mesa), Tolima (Espinal, Guamo, Chaparral), Huila (Pitalito, La Plata, San Agustín), Antioquia (Suroeste, Oriente cálido), Santander (Mesa de los Santos), Valle del Cauca (Restrepo) entre 600 y 2.500 msnm en zonas térmicas templadas y cálidas, expandida significativamente desde 2010 por la demanda mundial de superalimentos. Pertenece a la familia Lamiaceae (igual que albahaca, orégano, romero, menta, hierbabuena, mejorana, salvia, tomillo) y al género Salvia (el más diverso de las Lamiaceae con >900 especies globales) — distinta evolutivamente de la salvia común (S. officinalis L.) aunque comparten género. Planta herbácea anual de 1-1.5 m de altura con tallos cuadrangulares pubescentes característicos de Lamiaceae, hojas opuestas decusadas ovales-lanceoladas dentadas verde-oscuro, espigas terminales de flores azul-violáceas o blancas pequeñas en verticilastros muy atractoras de abejas y abejorros (cultivo melífero adicional), frutos en tetraquenios de los que se cosechan las 'semillas de chía' — pequeñas (1-2 mm), ovaladas, color blanco-crema (chía blanca) o gris-negro moteado (chía negra), oleaginosas con altísimo contenido nutricional. La composición de la semilla la convierte en superalimento: 30-35% aceite (con 60-65% omega-3 alfa-linolénico, la mayor concentración vegetal conocida), 20-25% proteína completa (con todos los aminoácidos esenciales), 30-40% fibra dietaria (mucílagos hidrofílicos que absorben 10-12 veces su peso en agua formando gel — útil para regulación intestinal y saciedad), alta densidad de calcio, hierro, magnesio, zinc, antioxidantes (ácido cafeico, quercetina, miricetina). Es lección extraordinaria de domesticación nutricional precolombina y soberanía alimentaria recuperada que enseña a niñas y niños cómo los aztecas seleccionaron durante siglos una semilla milagrosa con propiedades nutricionales únicas y cómo Colombia puede recuperar esa joya mesoamericana en su huerto andino sin necesidad de importarla. Manejo agroecológico: siembra directa al voleo o en líneas, germinación 4-8 días a 20-25°C, distancia 30-40 cm en línea y 50-60 cm entre líneas, ciclo 4-6 meses a cosecha de semilla, anual obligado, floración fotoperiódica de día corto (siembra abril-mayo para floración octubre-noviembre en Colombia ecuatorial). Trilla manual sencilla. Companion plants: maíz, fríjol, amaranto (las 4 'milpa' mesoamericanas). Función en chagra como pseudocereal nutracéutico patrimonial y atractor melífero. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, AGROSAVIA Manual Frutales Tropicales, Bernal 2015, Pamplona-Roger 2006.",
       "tracking_mode": "aggregate",
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "helianthus_annuus",
@@ -7524,7 +7592,8 @@
         "cura",
         "aguacate criollo",
         "abacate"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "mangifera_indica",
@@ -7563,7 +7632,8 @@
         "melicoccus_bijugatus",
         "spondias_dulcis",
         "stylosanthes_guianensis"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "ananas_comosus",
@@ -7603,7 +7673,8 @@
       ],
       "nombre_comunes_regionales": [
         "Ijibo"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "musa_paradisiaca",
@@ -7718,7 +7789,8 @@
       "cultivar": false,
       "nombre_comunes_regionales": [
         "Õre ingavrea"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "citrus_latifolia",
@@ -7751,7 +7823,8 @@
         "agrosavia-manual-frutales-tropicales",
         "ica-resolucion-3168-2015"
       ],
-      "cultivar": false
+      "cultivar": false,
+      "validation_level": "claude_draft"
     },
     {
       "id": "citrus_sinensis",
@@ -7787,7 +7860,8 @@
       "cultivar": false,
       "companions": [
         "eugenia_stipitata"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "acca_sellowiana",
@@ -12512,7 +12586,8 @@
       "_agroclima_especie_jsonl": "chilco",
       "companions": [
         "dodonaea_viscosa"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "calamagrostis_effusa",
@@ -12635,7 +12710,8 @@
       "_agroclima_fuente": "IAvH (URL por verificar)",
       "_agroclima_requiere_agua": "alta",
       "_agroclima_tolera_helada": "si",
-      "_agroclima_especie_jsonl": "chusque"
+      "_agroclima_especie_jsonl": "chusque",
+      "validation_level": "claude_draft"
     },
     {
       "id": "diplostephium_revolutum",
@@ -12714,7 +12790,8 @@
       "_agroclima_fuente": "IAvH (URL por verificar)",
       "_agroclima_requiere_agua": "media",
       "_agroclima_tolera_helada": "si",
-      "_agroclima_especie_jsonl": "romero de páramo"
+      "_agroclima_especie_jsonl": "romero de páramo",
+      "validation_level": "claude_draft"
     },
     {
       "id": "puya_goudotiana",
@@ -12793,7 +12870,8 @@
       "_agroclima_fuente": "IAvH (URL por verificar)",
       "_agroclima_requiere_agua": "baja",
       "_agroclima_tolera_helada": "si",
-      "_agroclima_especie_jsonl": "cardón de páramo"
+      "_agroclima_especie_jsonl": "cardón de páramo",
+      "validation_level": "claude_draft"
     },
     {
       "id": "solanum_tuberosum",
@@ -12905,7 +12983,8 @@
       "_agroclima_fuente": "Agrosavia (URL por verificar)",
       "_agroclima_requiere_agua": "media",
       "_agroclima_tolera_helada": "si",
-      "_agroclima_especie_jsonl": "papa parda pastusa"
+      "_agroclima_especie_jsonl": "papa parda pastusa",
+      "validation_level": "claude_draft"
     },
     {
       "id": "tropaeolum_tuberosum_mashua",
@@ -12952,7 +13031,8 @@
         "gbif-taxonomic-backbone"
       ],
       "valor_pedagogico": "La mashua silvestre (Tropaeolum tuberosum Ruiz & Pav. subsp. silvestre, familia Tropaeolaceae) es una tropaeolácea andina perenne herbácea trepadora-rastrera que produce tubérculos pequeños amargos ricos en isotiocianatos (glucosinolatos hidrolizados) y alcaloides defensivos, considerada parental silvestre de la mashua cultivada precolombina muisca. Se distribuye en Boyacá altiplano (Tunja, Toca, Sotaquirá), Cundinamarca páramo (Sumapaz, Choachí, Cruz Verde), Nariño (Pasto, Yacuanquer) y Cauca entre 2.800 y 3.800 msnm en zona térmica fría a páramo. Ciclo perenne, brote vigoroso post-quema controlada (manejo muisca). Producción tubérculos 0.5-1.5 t/ha en sistemas silvestres. Lección viva: enseña adaptación altitudinal extrema (heladas nocturnas -5°C) y rol de compuestos alelopáticos naturales (isotiocianatos) como repelentes de nematodos del suelo y antifúngicos en la chagra de alta montaña, función ecosistémica clave en rotaciones papa-mashua-quinua. Manejo agroecológico: siembra por tubérculo-semilla a 30 cm sobre camas elevadas, asocio con papa nativa (Solanum tuberosum subsp. andigenum) y quinua (Chenopodium quinoa), cosecha post-floración 8-10 meses, no requiere fertilización química, control natural de patógenos de papa por alelopatía radical. Fuentes Tier A: NRC 1989 Lost Crops of the Incas, AGROSAVIA Tubérculos Andinos, SIB Colombia, POWO Kew, GBIF Backbone Taxonomy.",
-      "tracking_mode": "aggregate"
+      "tracking_mode": "aggregate",
+      "validation_level": "claude_draft"
     },
     {
       "id": "vaccinium_floribundum",
@@ -13378,7 +13458,8 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El pajonal de páramo (Festuca spp., complejo paramuno nativo, familia Poaceae) agrupa varias especies del género Festuca propias del páramo colombiano (incluyendo F. dolichophylla, F. orthophylla, F. asplundii y otras de difícil delimitación taxonómica sin material reproductivo), gramíneas perennes cespitosas de hojas duras enrolladas longitudinalmente y panículas glumáceas. Constituyen, junto con Calamagrostis effusa y Agrostis spp., el estrato graminoide dominante del páramo de pajonal, tipología de páramo más extendida en Colombia (Sumapaz, Chingaza, Cruz Verde, Pisba, Cocuy, Belmira, Frontino, Romerales, Nevados, Las Hermosas, Puracé, Doña Juana, Chiles-Cumbal) entre 3.000 y 4.200 msnm en la franja altoandina y paramuna. Lección viva del ecosistema páramo: componente estructural fundamental de la fábrica de agua andina — sus matas cespitosas amortiguan lluvias torrenciales, almacenan agua en bases foliares y suelos orgánicos (histosoles y andisoles negros de hasta 60% de materia orgánica), y la liberan gradualmente a las quebradas durante meses secos, regulando el caudal de los acueductos de Bogotá (sistema Chingaza), Tunja, Manizales y Pasto. Tolera heladas nocturnas -4 a -8 °C, radiación UV-B intensa por altitud y suelos ácidos pH 4-5. El páramo está protegido constitucionalmente por la Ley 1930/2018 que prohíbe agricultura, ganadería y minería sobre cota delimitada IAvH, por lo que esta species NO es cultivable — su uso es estrictamente para restauración ecológica participativa con comunidades campesinas en reconversión productiva. Manejo agroecológico (solo restauración): propagación por división de mata cespitosa con semillas asociadas, trasplante en hoyos pequeños sin labranza profunda (no romper turba), sin riego ni fertilización, asocio nodriza con frailejones (Espeletia) y arbustos paramunos en franjas multiestrato. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, Ley 1930/2018 Páramos, IAvH Flora Alto-Andina, IAvH+CAR Plan Restauración Cruz Verde-Sumapaz, SiB Colombia.",
-      "tracking_mode": "aggregate"
+      "tracking_mode": "aggregate",
+      "validation_level": "claude_draft"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -13411,7 +13492,8 @@
         "humboldt-flora-alto-andina"
       ],
       "valor_pedagogico": "Agrostis foliata (Poaceae) es una gramínea nativa rastrera del sub-páramo y páramo andino colombiano (2.500-4.200 msnm) en Cundinamarca-Sumapaz, Boyacá-Chingaza y cordillera Central. Forma matas bajas y estolones que tejen cobertura continua sobre suelo desnudo, función clave en restauración tras sobrepastoreo o quemas. Lección viva: en el páramo no todo es frailejón — las gramíneas son las costureras del suelo, retienen humedad atmosférica y abren paso a especies más exigentes. No se cultiva en chagra: se respeta donde aparece espontánea como indicadora de regeneración. Fuentes Tier A: Bernal 2015 Catálogo Plantas Colombia, POWO Kew, GBIF Backbone, Humboldt Flora Alto-Andina.",
-      "tracking_mode": "aggregate"
+      "tracking_mode": "aggregate",
+      "validation_level": "claude_draft"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -13450,7 +13532,8 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El chacate, pucho o escalonia (Escallonia paniculata (Ruiz & Pav.) Schult., Escalloniaceae) es un árbol o arbusto andino nativo (3-8 m altura) propio del bosque alto-andino y bordes de páramo colombiano entre 2.500 y 3.200 msnm (Cundinamarca: Cruz Verde, Sumapaz, Chingaza, Verjón; Boyacá: páramo de Pisba, Iguaque; Santander: páramo de Berlín; Nariño y Cauca: páramos del macizo colombiano). Hojas pequeñas brillantes, panículas blanco-rosadas que atraen colibríes y abejas nativas, frutos en cápsula que dispersan aves. Es una lección viva de restauración ecológica y soberanía botánica que enseña a niñas y niños por qué las especies nativas son la mejor cerca viva del altoandino: a diferencia del retamo espinoso (Ulex europaeus) y del retamo liso (Genista monspessulana), invasoras introducidas que se vuelven plaga y desplazan flora nativa de páramo, el chacate cumple las mismas funciones de cercar potreros, frenar viento y marcar linderos pero conviviendo con la flora nativa, alimentando avifauna local y generando hojarasca compatible con los suelos andinos. Por eso aparece como sustituta documentada en planes de restauración ecológica de los páramos Cruz Verde-Sumapaz (IAvH + CAR Cundinamarca 2018), donde se siembra en bordes de fragmento de bosque y zonas de transición para acelerar la sucesión vegetal y bloquear el avance del retamo. Manejo agroecológico: propagación por semilla recolectada de frutos maduros, vivero 6-8 meses antes del trasplante en lluvias, distancia 1-2 m en cerca viva, tolerancia a podas, función ecológica como planta niñera (nurse plant) que da sombra a especies de sucesión tardía. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015 Catálogo Plantas y Líquenes de Colombia, IAvH Flora Alto Andina, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -13494,7 +13577,8 @@
       "tracking_mode": "individual",
       "companions": [
         "escallonia_pendula"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -13533,7 +13617,8 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "La chuquiragua andina (Chuquiraga jussieui J.F.Gmel., Asteraceae) es un arbusto leñoso paramuno nativo (50-150 cm altura) emblemático de los páramos altos colombo-ecuatoriano-peruanos entre 3.400 y 4.200 msnm, presente en Colombia en los páramos de Sumapaz, Cruz Verde (sector alto Sumapaz), Chingaza, Pisba, Cocuy, Almorzadero, Santurbán y macizo colombiano (Nariño-Cauca). Hojas rígidas, coriáceas, espinosas en los extremos (adaptación xerofítica al estrés hídrico paramuno), capítulos terminales de un anaranjado-amarillento brillante característico que atraen colibríes paramunos (Oxypogon guerinii, Eriocnemis vestita) y mariposas Pierella. Su flor es símbolo cultural del andinismo y aparece en cosmovisión kichwa-aymara como ofrenda a Pachamama. Es lección viva de soberanía botánica y conservación del páramo que enseña a niñas y niños por qué proteger este ecosistema productor de agua: las especies de páramo como la chuquiragua están entre las más amenazadas por ganadería extensiva, quemas y minería ilegal, prácticas explícitamente prohibidas por la Ley 1930 de 2018 que declara los páramos ecosistemas estratégicos protegidos. Sus tallos y flores se han usado tradicionalmente como medicinal hepatoprotector y antiinflamatorio en infusión (con fitoquímicos validados: flavonoides, sesquiterpenlactonas) por comunidades campesinas de Boyacá y Cundinamarca, aunque hoy se priorizan usos no extractivos en el marco de la Ley de Páramos. Manejo agroecológico: propagación por semilla (germinación lenta 3-6 meses, requiere estratificación fría) o esqueje semileñoso difícil, vivero 18-24 meses antes de plantación, función exclusiva en restauración ecológica de áreas paramunas degradadas (no apta para chagra productiva). Distancia 1-2 m en parches de restauración, asociada a frailejones (Espeletia spp.), pajonales (Calamagrostis) y otras paramunas. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Ley 1930 de 2018 Páramos, SiB Colombia.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -13574,7 +13659,8 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El cordoncillo de Bogotá (Piper bogotense C.DC., Piperaceae) es un arbusto o arbolito andino endémico de Colombia (1-4 m altura), propio del sotobosque del bosque alto-andino y bordes de páramo entre 2.200 y 3.000 msnm, con distribución concentrada en la cordillera Oriental: Cundinamarca (cerros orientales de Bogotá, Cruz Verde, Sumapaz, Verjón, Chingaza, Guasca), Boyacá (Iguaque, Arcabuco, Chiquinquirá), Santander (Berlín, Almorzadero) y norte de Tolima. Hojas elípticas-lanceoladas de 8-15 cm con punto pellúcido aromático característico (aceites esenciales con safrol, miristicina, eugenol), espigas erectas blanco-amarillentas características del género Piper. Su carácter endémico colombiano lo convierte en pieza clave de soberanía botánica y patrimonio biológico nacional. Es lección viva sobre el sotobosque andino que enseña a niñas y niños por qué los bosques nativos son irreemplazables: el cordoncillo solo existe aquí, ningún país más en el mundo lo tiene, y depende del microclima húmedo, sombreado y mantillado del bosque alto-andino que solo las especies nativas pueden generar. Uso tradicional medicinal por comunidades campesinas de Cundinamarca-Boyacá: hojas en cataplasma para inflamaciones, infusión digestiva carminativa (uso validado farmacognosticamente por JBB e ICTA-UNAL); también usado como repelente natural de insectos en huertos (frotando hojas sobre tutores). Manejo agroecológico: propagación por esqueje semileñoso (90% prendimiento bajo cámara húmeda con hojas reducidas a 1/3) o semilla recolectada de espigas maduras (vivero 4-6 meses), trasplante en lluvias bajo sombra parcial, distancia 1.5-2 m, función ecológica como sotobosque enriquecedor en planes de restauración Cruz Verde-Sumapaz y como repelente vivo en linderos de huertas frío-paramunas. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -13613,7 +13699,8 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El vaquero (Tovaria pendula Ruiz & Pav., Tovariaceae) es una hierba o subarbusto andino nativo (50-150 cm altura) emblemático del bosque alto-andino y bordes de páramo de Colombia, Ecuador, Perú y Bolivia entre 2.400 y 3.200 msnm, presente en Colombia en Cundinamarca (Cruz Verde, Sumapaz, Chingaza, Verjón, Guasca), Boyacá (Iguaque, Cocuy), Santander (Berlín), Antioquia (Belmira), Tolima, Caldas y Nariño. Es la única especie del género Tovaria y única representante de la familia Tovariaceae en Colombia (familia monogenérica, monotípica en Tovaria), lo que la convierte en una rareza taxonómica de altísimo valor para biogeografía andina. Hojas trifoliadas pubescentes, racimos colgantes (de ahí pendula) de flores blanco-verdosas pequeñas pero numerosas que atraen abejas nativas y avispas, frutos en baya pequeña. Es lección viva de soberanía botánica y biogeografía que enseña a niñas y niños por qué cada planta del páramo importa: el vaquero es una rareza evolutiva única, sin parientes botánicos cercanos, y solo sobrevive en bordes de bosque alto-andino bien conservados. Si se pierde el ecosistema, no hay reemplazo posible en ningún jardín del mundo. Por eso aparece en planes de restauración Cruz Verde-Sumapaz (IAvH + CAR Cundinamarca) como indicadora de buen estado sucesional. Manejo agroecológico: propagación por semilla recolectada de frutos maduros (vivero 4-8 meses), trasplante en lluvias en sotobosque o bordes sombreados, distancia 0.5-1 m, función exclusiva en restauración ecológica y jardines pedagógicos de flora nativa. No apta para chagra productiva. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -13658,7 +13745,8 @@
       "companions": [
         "myrcia_popayanensis",
         "myrsine_coriacea"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -13700,7 +13788,8 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "La uva camarona (Macleania rupestris (Kunth) A.C.Sm., Ericaceae) es un arbusto andino nativo (1-3 m altura, ocasionalmente epífito sobre árboles del bosque alto-andino) propio del bosque alto-andino y subpáramo colombiano entre 2.600 y 3.400 msnm, distribuido por Cundinamarca (Cruz Verde, Sumapaz, Chingaza, Verjón, Guasca), Boyacá (Iguaque, Cocuy, Pisba), Santander (Berlín, Almorzadero), Tolima, Caldas, Antioquia (Belmira, Sonsón) y Nariño. Pertenece a la familia Ericaceae (misma de los arándanos, blueberries, y mortiño), tribu Vaccinieae. Tallos rojizos quebradizos (de ahí reventadera), hojas coriáceas ovales gruesas, flores tubulares colgantes rojo-rosadas características (corola fusionada de 1.5-2.5 cm) que atraen colibríes paramunos especialistas (Eriocnemis vestita, Coeligena bonapartei, Lafresnaya lafresnayi) en una coevolución planta-colibrí clásica andina, frutos en baya globosa púrpura-negro comestible de sabor agridulce intenso (alto en antocianinas, polifenoles, vitamina C). Es lección viva de coevolución y soberanía alimentaria que enseña a niñas y niños cómo flores y colibríes evolucionaron juntos en los Andes durante millones de años, y por qué los frutos silvestres del páramo son superalimentos nativos. La uva camarona se ha consumido tradicionalmente por comunidades campesinas de Cundinamarca-Boyacá fresca, en mermeladas, conservas y bebidas fermentadas; en los últimos años ha sido reivindicada por chefs colombianos y emprendimientos agroecológicos como producto gourmet de origen. Por eso aparece en planes de restauración Cruz Verde-Sumapaz como especie productiva nativa de doble propósito (restauración + soberanía alimentaria). Manejo agroecológico: propagación por semilla (germinación 60-120 días, requiere luz y sustrato ácido pH 4.5-5.5) o esqueje semileñoso bajo cámara húmeda, vivero 12-18 meses antes de trasplante, distancia 1.5-2 m, fructificación a partir de 3-5 años, función como frutal silvestre integrable a chagra agroecológica frío-paramuna y como atractor de colibríes en restauración. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -13739,7 +13828,8 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El cucubo o parásita de árboles (Bomarea caldasii (Kunth) Asch. & Graebn., Alstroemeriaceae) es una enredadera o trepadora herbácea andina nativa (2-6 m largo) emblemática del bosque alto-andino colombiano entre 2.400 y 3.200 msnm, presente en Cundinamarca (Cruz Verde, Sumapaz, Chingaza, Verjón, Guasca), Boyacá (Iguaque, Arcabuco, Cocuy), Santander, Tolima, Caldas, Antioquia y Nariño. El nombre cucubo viene del muisca cucuba y honra al sabio Francisco José de Caldas. Pese a su nombre vulgar parásita de árboles no es parásita verdadera: solo trepa apoyándose en otras plantas (planta apoyante, scandent) sin extraer savia, usando sus tubérculos subterráneos para almacenar reservas. Hojas alternas resupinadas (giran 180° en el pecíolo, carácter diagnóstico de Alstroemeriaceae), umbelas terminales colgantes con flores tubulares de 3-5 cm rojo-anaranjadas con interior amarillo punteado de marrón características que atraen colibríes paramunos (Lafresnaya lafresnayi, Eriocnemis cupreoventris) en una coevolución clásica. Frutos en cápsula que dispersan aves. Es lección viva de etimología muisca, coevolución y soberanía botánica que enseña a niñas y niños por qué nombres como cucubo o Caldas anclan la flora al territorio: cada nombre vernáculo guarda historia muisca, historia colombiana, historia evolutiva. Por eso aparece en planes de restauración Cruz Verde-Sumapaz como ornamental nativa y atractor de avifauna. Manejo agroecológico: propagación por división de tubérculos (90% éxito) o semilla (germinación 60-120 días), siembra directa o vivero 6-12 meses, requiere tutor o árbol/arbusto soporte, distancia 1-2 m, función ecológica como ornamental trepadora pedagógica en restauración, jardines de flora nativa y patios escolares. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -13779,7 +13869,8 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El azulejito de páramo (Monnina aestuans (L.f.) DC., Polygalaceae) es un arbusto o subarbusto andino nativo (50-200 cm altura) propio del bosque alto-andino y subpáramo colombiano entre 2.600 y 3.400 msnm, presente en Cundinamarca (Cruz Verde, Sumapaz, Chingaza, Verjón, Guasca), Boyacá (Iguaque, Arcabuco, Pisba), Santander (Berlín, Almorzadero), Antioquia, Tolima, Cauca y Nariño. Hojas alternas elípticas-lanceoladas, racimos terminales de flores zigomorfas azul-violeta intenso (1-1.5 cm) con quilla amarilla característica de Polygalaceae que atraen abejorros nativos (Bombus funebris, B. rubicundus) y abejas sin aguijón. Frutos en sámara (con ala) o drupa pequeña azul-negra. Es lección viva de tintes naturales nativos y soberanía botánica que enseña a niñas y niños cómo la flora andina ofreció colores a textiles muiscas y campesinos mucho antes que las anilinas industriales: los frutos azules de la monnina y especies cercanas se usaron como tinte natural azul-morado por comunidades campesinas de Boyacá-Cundinamarca (validado etnobotánicamente por JBB e ICANH), aunque hoy con baja extracción para no afectar reservorios silvestres. También tiene usos medicinales tradicionales como antiinflamatorio y para afecciones bucales (con saponinas y xantonas validadas farmacognosticamente). Es indicadora de buen estado del bosque alto-andino y aparece en planes de restauración Cruz Verde-Sumapaz como especie de sotobosque enriquecedor. Manejo agroecológico: propagación por semilla (germinación 60-90 días) o esqueje semileñoso, vivero 8-12 meses antes de trasplante en lluvias, distancia 1-2 m, función como sotobosque ornamental en restauración, atractor de polinizadores nativos y tinte natural artesanal. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -13820,7 +13911,8 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El asnao o chaquillo (Gaultheria anastomosans (L.f.) Kunth, Ericaceae) es un arbusto andino nativo (30-150 cm altura) propio del bosque alto-andino, subpáramo y páramo colombiano entre 2.800 y 3.600 msnm, presente en Cundinamarca (Cruz Verde, Sumapaz, Chingaza, Verjón), Boyacá (Iguaque, Cocuy, Pisba), Santander (Berlín, Almorzadero), Antioquia (Belmira), Tolima, Cauca y Nariño. Pertenece a la familia Ericaceae (igual que arándanos y uva camarona) y al género Gaultheria del que se extrae tradicionalmente el aceite esencial wintergreen (con metilsalicilato como compuesto activo, presente también en Gaultheria anastomosans). Hojas coriáceas alternas elípticas con margen serrado-glanduloso aromáticas (al estrujarse desprenden olor a wintergreen característico), flores urceoladas (en forma de urna) colgantes blanco-rosadas pequeñas (5-8 mm) que atraen abejorros y abejas nativas, frutos en cápsula carnosa blanca-rosada subglobosa (5-10 mm) comestible de sabor mentolado-dulce característico. Es lección viva de etnobotánica medicinal y soberanía alimentaria-medicinal que enseña a niñas y niños cómo una sola hoja de chaquillo machacada huele a pomada de mentol natural, mostrando que la naturaleza ya tenía el wintergreen mucho antes que la farmacia: los frutos y hojas se han usado tradicionalmente para infecciones respiratorias, inflamaciones musculares y como expectorante por comunidades campesinas de Boyacá-Cundinamarca (uso validado farmacognosticamente por JBB). Frutos comestibles directamente o en preparaciones. Por eso aparece en planes de restauración Cruz Verde-Sumapaz como especie productiva nativa de doble propósito. Manejo agroecológico: propagación por semilla (sustrato ácido pH 4.5-5.5, germinación 90-120 días) o esqueje semileñoso, vivero 12-18 meses, distancia 0.8-1.5 m, fructificación a partir de 3-4 años, función como cobertura baja, frutal silvestre, medicinal y atractor de polinizadores en restauración. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -13862,7 +13954,8 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El uvito de monte o chaquilulo (Cavendishia bracteata (Ruiz & Pav. ex J.St.-Hil.) Hoerold, Ericaceae) es un arbusto o arbolito andino nativo (1-4 m altura, ocasionalmente epífito sobre árboles del bosque alto-andino) propio del bosque alto-andino y subpáramo colombiano entre 2.400 y 3.200 msnm, presente en Cundinamarca (Cruz Verde, Sumapaz, Chingaza, Verjón, Guasca), Boyacá (Iguaque, Arcabuco, Cocuy, Pisba), Santander (Berlín), Antioquia (Belmira, Sonsón), Tolima, Cauca, Caldas, Risaralda y Nariño. Pertenece a Ericaceae tribu Vaccinieae (igual familia que arándanos, uva camarona, mortiño y asnao). Hojas coriáceas alternas elípticas-lanceoladas brillantes con nervadura broquidódroma característica, brácteas florales rojo-vivas muy llamativas (de ahí el epíteto bracteata) que envuelven la inflorescencia y persisten en el fruto, flores tubulares colgantes rojo-anaranjadas o rojo-blancas (1.5-2 cm) que atraen colibríes paramunos especialistas (Lafresnaya lafresnayi, Coeligena bonapartei, Eriocnemis vestita) en una coevolución planta-colibrí clásica andina. Frutos en baya globosa azul-violeta-negra (8-12 mm) comestible de sabor dulce-aromático intenso (alto en antocianinas, polifenoles, vitamina C: comparable a arándanos importados). Es lección viva de soberanía alimentaria y biodiversidad andina que enseña a niñas y niños por qué tenemos arándanos colombianos nativos sin necesidad de importar blueberries de Norteamérica: el chaquilulo, la uva camarona, el asnao y el mortiño son nuestras frutas Ericaceae andinas, adaptadas al páramo, productivas, deliciosas y de menor huella de carbono. Reivindicada hoy por chefs colombianos y agroecólogos como superfruta nativa. Aparece en planes de restauración Cruz Verde-Sumapaz como especie productiva de doble propósito. Manejo agroecológico: propagación por semilla (sustrato ácido pH 4.5-5.5, germinación 60-120 días) o esqueje semileñoso bajo cámara húmeda, vivero 12-24 meses antes de trasplante, distancia 1.5-2 m, fructificación a partir de 4-6 años, función como frutal silvestre, atractor de colibríes, nurse plant en restauración y cultivo agroforestal nativo. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
     },
     {
       "id": "solanum_tuberosum_carrera_negra",
@@ -13916,7 +14009,8 @@
       "antagonists": [
         "juglans_neotropica"
       ],
-      "tracking_mode": "aggregate"
+      "tracking_mode": "aggregate",
+      "validation_level": "claude_draft"
     },
     {
       "id": "zea_mays_negro_paramo",
@@ -13966,7 +14060,8 @@
         "powo-kew"
       ],
       "valor_pedagogico": "El maíz negro de páramo (Zea mays L. cv. 'Negro de Páramo') es una variedad nativa cundiboyacense del altiplano andino colombiano, conservada por comunidades campesinas e indígenas Muisca en el ramal oriental de los Andes entre 2.600 y 3.200 msnm (Cundinamarca: Sumapaz, Choachí, Une, Pasca; Boyacá: Cómbita, Tibasosa, Toca, páramo de Rabanal; Nariño: Ipiales, Cumbal). Es uno de los maíces de mayor altitud del mundo, junto con sus parientes peruano-bolivianos (kculli, morado de la sierra), y su pigmentación morado-negra intensa proviene de altas concentraciones de antocianinas (cianidina-3-glucósido) que cumplen función fotoprotectora frente a la radiación UV extrema del páramo. Es lección viva de coevolución cultural y climática: los Muisca seleccionaron por miles de años maíces capaces de granar bajo días cortos, fríos, heladas tardías y radiación UV alta del páramo, generando un acervo genético irrepetible. Hoy menos del 5% de los maíces sembrados en Colombia son variedades nativas (resto: híbridos comerciales tipo ICA V-115, V-305), por lo que cada chagra que conserva maíz negro de páramo es un acto de resistencia genética. Usos tradicionales: chicha de maíz negro (bebida ceremonial Muisca con maguey o yuca dulce), envueltos, arepas pigmentadas para festividades, tinte natural alimentario, harina rica en antioxidantes. Manejo agroecológico: siembra de 'tres hermanas' adaptada al frío (maíz + haba + cubio o ulluco en vez de fríjol y ahuyama tropicales); siembra a inicio lluvias mayores (marzo-abril); 2-3 granos por hoyo, distancia 70 cm x 70 cm; aporque a los 45-60 días; biopreparados: caldo de ceniza preventivo contra cogollero (Spodoptera frugiperda), trichoderma al surco. Conservación de semilla en mazorcas colgadas en cocina con humo de leña para repeler gorgojo. Fuentes Tier A: Pérez Arbeláez 1947, AGROSAVIA Leguminosas Andinas (policultivos), NRC 1989 Cultivos Andinos, Pérez-Rodríguez-Gómez 2008, GBIF Backbone, POWO Kew.",
-      "tracking_mode": "aggregate"
+      "tracking_mode": "aggregate",
+      "validation_level": "claude_draft"
     },
     {
       "id": "chenopodium_pallidicaule",
@@ -14021,7 +14116,8 @@
       "tracking_mode": "aggregate",
       "companions": [
         "lepidium_meyenii"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -14063,7 +14159,8 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "La valeriana andina (Valeriana microphylla Kunth, Caprifoliaceae, comercializada en mercados andinos también como 'valeriana jatamansi andina' por similitud farmacológica con la verdadera V. jatamansi himaláyica) es una hierba perenne pequeña nativa de los Andes neotropicales (Colombia, Ecuador, Perú, Bolivia, Venezuela), propia del páramo y bosque alto-andino entre 3.000 y 3.800 msnm en Colombia (Cundinamarca: Cruz Verde, Sumapaz, Chingaza, Verjón; Boyacá: Iguaque, Pisba, Cocuy; Santander: Almorzadero, Berlín; Nariño, Tolima, Cauca), de 15-40 cm de altura, con roseta basal de hojas pequeñas elípticas a obovado-espatuladas (1-3 cm) coriáceas, márgenes ondulados, y panículas terminales laxas de flores diminutas blanco-rosadas tubulares con cinco lóbulos asimétricos. Sus raíces son aromáticas, fasciculadas, con olor terroso-balsámico-pungente característico del género Valeriana (debido a iridoides y aceites esenciales). Es lección viva de farmacología andina ancestral y distinción taxonómica entre dos valerianas nativas colombianas que enseña a niñas y niños cómo dos especies del mismo género pueden compartir uso medicinal pero tener ecologías diferentes: a diferencia de Valeriana pavonii (sotobosque alto-andino 2.500-3.300 msnm, planta robusta), V. microphylla es la valeriana de páramo verdadero (3.000-4.000 msnm, planta enana adaptada al frío extremo, viento y radiación UV alta). Uso tradicional muisca y campesino-paramuno validado por JBB-Bogotá, IAvH-Humboldt y Pérez-Arbeláez: las raíces frescas o secas en infusión-decocción suave son uno de los sedantes naturales más antiguos y reconocidos del altiplano cundiboyacense, usadas para insomnio, ansiedad, taquicardia nerviosa, dolor de cabeza tensional, cólicos menstruales, y como ansiolítico ante exámenes y eventos estresantes. Los principios activos son ácido valeriánico, valerenal, valepotriatos, iridoides y aceites esenciales con acción comprobada sobre receptores GABA-A, similar mecanísticamente a benzodiacepinas pero sin dependencia. Manejo agroecológico: propagación por semilla recolectada en mata madura silvestre (germinación 30-60 días en sustrato húmedo frío) o división del rizoma (operar a inicios de lluvias), vivero 12-18 meses antes de trasplante, suelos turbosos-arenosos drenados con pH ligeramente ácido, sol pleno (planta de páramo abierto), cosecha de raíces a partir del segundo año (mejor tercer año), función como medicinal de páramo, atractora de moscas-flores (Syrphidae) paramunas, indicadora de páramo conservado, y candidata clave para programas de domesticación ex-situ para reducir presión sobre poblaciones silvestres paramunas (protegidas hoy por Ley 1930/2018). PRECAUCIÓN: no usar en embarazo, lactancia, ni en menores de 3 años; no combinar con sedantes farmacológicos sin supervisión médica. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, SiB Colombia.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH41_EPIFITAS_ANDES_RETRY",
@@ -14279,7 +14376,8 @@
         "chenopodium_pallidicaule",
         "oxalis_tuberosa",
         "ullucus_tuberosus"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "espeletia_uribei",
@@ -14342,7 +14440,8 @@
       ],
       "valor_pedagogico": "El frailejón de Uribe (Espeletia uribei Cuatrec., familia Asteraceae) es un frailejón endémico del Páramo de Sumapaz — el complejo paramuno más extenso del mundo (333.420 hectáreas entre Cundinamarca, Meta y Huila), corazón hídrico de Bogotá y la región andina central colombiana. Nombrado en honor al sacerdote-botánico Lorenzo Uribe-Uribe S.J. (1900-1980), pionero del estudio florístico colombiano y autor de la 'Flora de Colombia'. Es una roseta caulescente típica del subgénero Espeletia s.s., con tallo corto subterráneo o emergente bajo, hojas lanceoladas plateadas (15-30 cm largo) densamente cubiertas por tricomas blanco-grisáceos que cumplen función termorreguladora (reducen pérdida de calor nocturna y captan agua de niebla matinal por condensación capilar), e inflorescencia en racimo terminal con capítulos amarillos grandes característicos de la subtribu Espeletiinae. En Colombia se distribuye exclusivamente en el complejo paramuno Sumapaz-Cruz Verde-Chingaza-Guerrero-Guacheneque en zona térmica de páramo entre 3.200 y 4.200 msnm, con óptimo en 3.500-3.900 msnm en pajonales-frailejonales del subpáramo-páramo medio dominados por Calamagrostis effusa, Calamagrostis bogotensis y otras especies de Espeletia (E. grandiflora, E. argentea, E. killipii, E. uribei, E. summapacis). Lección viva de endemismo paramuno colombiano y biogeografía de altísima montaña tropical: el género Espeletia, con ~140 especies descritas (Diazgranados-2012), es uno de los radiados evolutivos más espectaculares de la flora andina, con cada complejo paramuno (Sumapaz, Chingaza, Iguaque, Pisba, Cocuy, Santurbán, Belmira, Tatamá, Frontino-Urrao, Las Hermosas) albergando especies endémicas exclusivas — patrón biogeográfico de 'islas en el cielo' (sky islands) donde el aislamiento geográfico entre páramos separados por valles interandinos cálidos ha promovido especiación alopátrica. E. uribei es uno de los frailejones diagnósticos del páramo de Sumapaz junto con E. grandiflora y E. killipii (este último más típico de Chingaza). El crecimiento extremadamente lento (~0.8 cm/año, individuos de 1.5 m con ~180 años de edad) y la baja tasa de germinación natural (5-15%) hacen que la regeneración poblacional sea extraordinariamente vulnerable a cualquier disturbio: quemas para ampliar potreros, pisoteo ganadero, minería ilegal, expansión de frontera papera, cambio climático y deshielo glaciar son amenazas reales y críticas. Protección legal: Ley 1930 de 2018 (Gestión Integral de Páramos) prohíbe TODA actividad agropecuaria, minera, de hidrocarburos y de infraestructura nueva en ecosistemas de páramo delimitados por el Ministerio de Ambiente y el Instituto Humboldt. Resolución 383/2010 MADS declara TODOS los frailejones (todas las especies del género Espeletia y géneros relacionados de Espeletiinae) como especies amenazadas con prohibición absoluta de aprovechamiento, tránsito, comercialización y movilización sin permiso CAR. Sentencia T-361/2017 Corte Constitucional ordena la delimitación participativa del Páramo de Santurbán y por extensión sienta precedente para todos los páramos colombianos. La manipulación legal del frailejón se restringe EXCLUSIVAMENTE a proyectos de restauración ecológica autorizados por la autoridad ambiental competente (CAR Cundinamarca, CORPORINOQUIA, CORPOAMAZONIA según jurisdicción) bajo protocolos validados (Rojas-Zamora 2013, Vargas-Ríos 2007, PNN Sumapaz). Manejo agroecológico (solo restauración): recolección de aquenios maduros (diciembre-febrero, temporada seca cordillera oriental) con autorización CAR, siembra en sustrato turba de páramo + tierra subpáramo 50% + arena gruesa 30% + MO 20%, germinación en invernadero de alta montaña 30-90 días, trasplante a bolsa 4-6 meses, plantación definitiva >12 meses a 15-20 cm en sitios degradados con exclusión ganadera obligatoria mínimo 3 años, densidad 100-400 individuos/ha según grado de degradación, monitoreo anual de supervivencia, asocio con Calamagrostis effusa, Hypericum juniperinum, Senecio formosus y otras especies nativas del cortejo florístico paramuno. La regulación hídrica del frailejón es servicio ecosistémico estratégico: la pubescencia foliar captura agua de niebla y rocío matutino, escurrimiento foliar dirige el agua al cuello de la roseta y al suelo orgánico turboso de páramo (almacenamiento prolongado), regulando caudales base de las cuencas que abastecen >70% del agua potable de las ciudades andinas colombianas (Bogotá, Cundinamarca, Boyacá, Meta). Fuentes Tier A: Humboldt 2016 Frailejones de Colombia, Diazgranados 2012 Revisión Espeletiinae, Ley 1930/2018, Resolución 383/2010 MADS, Libro Rojo de Plantas de Colombia, Bernal 2015 Catálogo Plantas Colombia, Plan de Manejo PNN Sumapaz.",
       "tracking_mode": "individual",
-      "nota_conservacion": "Endémica colombiana restringida (frailejón). conservation_status endemica_critica aplicado en Batch 5A por rango limitado y endemismo paramuno estricto. Páramos altoandinos en riesgo por cambio climático + ganadería + minería. Estrategia: conservación in situ áreas protegidas PNN (Sumapaz/Chingaza/Chiles-Cumbal/Cocuy según species). Sin propagación masiva — solo restauración ecológica en sitio."
+      "nota_conservacion": "Endémica colombiana restringida (frailejón). conservation_status endemica_critica aplicado en Batch 5A por rango limitado y endemismo paramuno estricto. Páramos altoandinos en riesgo por cambio climático + ganadería + minería. Estrategia: conservación in situ áreas protegidas PNN (Sumapaz/Chingaza/Chiles-Cumbal/Cocuy según species). Sin propagación masiva — solo restauración ecológica en sitio.",
+      "validation_level": "claude_draft"
     },
     {
       "id": "espeletia_killipii",
@@ -14405,7 +14504,8 @@
       ],
       "valor_pedagogico": "El frailejón Killip (Espeletia killipii Cuatrec., familia Asteraceae) es uno de los frailejones diagnósticos del Páramo de Chingaza — el complejo paramuno que abastece >80% del agua potable de Bogotá a través del sistema de embalses Chuza-San Rafael-Chingaza operado por la EAAB (Empresa de Acueducto y Alcantarillado de Bogotá). Nombrado en honor al botánico estadounidense Ellsworth Paine Killip (1890-1968), curador del U.S. National Herbarium (Smithsonian) y colector pionero de la flora colombiana junto con Pennell, Cuatrecasas, García-Barriga y Schultes en las expediciones botánicas de las primeras décadas del siglo XX que documentaron la riqueza florística andino-amazónica colombiana. Es una roseta caulescente del subgénero Espeletia s.s. con tallo erecto que alcanza 1-3 m de altura (uno de los frailejones de talla mediana-alta), hojas oblongo-lanceoladas plateadas densamente pubescentes (15-25 cm largo) dispuestas en roseta apical compacta, e inflorescencia en panícula amarilla terminal con capítulos típicos de la subtribu Espeletiinae. En Colombia se distribuye principalmente en el complejo paramuno Chingaza-Cruz Verde-Sumapaz-Guerrero-Guasca-Guatavita-Guacheneque entre 3.000 y 4.100 msnm, con óptimo en 3.300-3.800 msnm en frailejonales-pajonales del subpáramo-páramo medio dominados por Calamagrostis effusa, Calamagrostis bogotensis, Espeletia grandiflora, E. killipii, E. uribei (en Sumapaz) y otras especies del cortejo florístico paramuno. Lección viva de servicio ecosistémico hídrico estratégico nacional: el complejo Chingaza protege ~76.600 ha de páramos, bosques altoandinos y subpáramos, regula la oferta hídrica de la cuenca del río Bogotá y la cuenca del río Guavio, y abastece el sistema Chingaza que entrega 14 m³/s de agua potable a Bogotá (>80% del consumo metropolitano). La densidad de frailejones de Chingaza (estimada en 4.000-8.000 individuos/ha en frailejonal puro) es indicador de salud ecosistémica y de capacidad de captura-regulación hídrica del páramo. E. killipii es uno de los frailejones más estudiados en proyectos de restauración liderados por la EAAB, CAR Cundinamarca, CORPORINOQUIA, PNN Chingaza, Universidad Nacional de Colombia (grupo Restauración Ecológica), Instituto Humboldt y Fundación Conservación Internacional Colombia. El crecimiento lento (~1 cm/año) y la regeneración natural extremadamente baja (5-15% de germinación, alta mortalidad de plántulas) hacen que la conservación dependa esencialmente de la protección activa del hábitat: exclusión ganadera, prevención de quemas, control de minería ilegal, vigilancia comunitaria y restauración asistida en sitios degradados. Protección legal: Ley 1930/2018 (Gestión Integral de Páramos) prohíbe agricultura, ganadería extensiva, minería, hidrocarburos e infraestructura nueva en páramos delimitados; Resolución 383/2010 MADS declara TODOS los frailejones especies amenazadas con prohibición absoluta de aprovechamiento sin permiso CAR; Sentencia C-035/2016 Corte Constitucional confirma constitucionalidad de la prohibición de minería en páramos. Manejo legal restringido EXCLUSIVAMENTE a proyectos de restauración autorizados: recolección de aquenios maduros (octubre-febrero según altitud) con permiso CAR, siembra en sustrato de turba de páramo + tierra de subpáramo + arena + MO, germinación 30-90 días en invernadero alta montaña, trasplante a bolsa 4-6 meses, plantación definitiva >12 meses, densidad 100-400 ind/ha según degradación, asocio con Calamagrostis, Hypericum, Senecio, Bartsia, Disterigma, Pernettya y otras especies nativas paramunas. La protección de E. killipii es indisociable de la protección del recurso hídrico estratégico nacional y de la viabilidad del sistema de acueducto de Bogotá D.C. Fuentes Tier A: Humboldt 2016 Frailejones de Colombia, Diazgranados 2012 Revisión Espeletiinae, Ley 1930/2018, Resolución 383/2010 MADS, Libro Rojo de Plantas de Colombia, Bernal 2015 Catálogo Plantas Colombia, Plan de Manejo PNN Chingaza.",
       "tracking_mode": "individual",
-      "nota_conservacion": "Endémica colombiana restringida (frailejón). conservation_status endemica_critica aplicado en Batch 5A por rango limitado y endemismo paramuno estricto. Páramos altoandinos en riesgo por cambio climático + ganadería + minería. Estrategia: conservación in situ áreas protegidas PNN (Sumapaz/Chingaza/Chiles-Cumbal/Cocuy según species). Sin propagación masiva — solo restauración ecológica en sitio."
+      "nota_conservacion": "Endémica colombiana restringida (frailejón). conservation_status endemica_critica aplicado en Batch 5A por rango limitado y endemismo paramuno estricto. Páramos altoandinos en riesgo por cambio climático + ganadería + minería. Estrategia: conservación in situ áreas protegidas PNN (Sumapaz/Chingaza/Chiles-Cumbal/Cocuy según species). Sin propagación masiva — solo restauración ecológica en sitio.",
+      "validation_level": "claude_draft"
     },
     {
       "id": "senecio_formosus",
@@ -14468,7 +14568,8 @@
       ],
       "valor_pedagogico": "La árnica de páramo (Senecio formosus Kunth, familia Asteraceae) es una hierba perenne paramuna emblemática de la medicina tradicional andina colombiana, conocida como 'árnica andina' o 'árnica paramuna' por su uso etnobotánico ancestral análogo al de la árnica europea (Arnica montana) — aunque taxonómicamente distinta (la verdadera Arnica es género hermano restringido al hemisferio norte). Es una roseta basal con hojas oblanceoladas pubescentes (10-20 cm largo) y tallos florales erectos de 30-80 cm que portan capítulos amarillos vistosos típicos de la familia Asteraceae con flores liguladas y flósculos centrales tubulares. La floración abundante (octubre-febrero, temporada seca de la cordillera oriental colombiana) atrae himenópteros, dípteros y aves nectarívoras paramunas (colibríes de altura como Eriocnemis vestita, Aglaeactis cupripennis, Pterophanes cyanopterus). En Colombia se distribuye ampliamente en los páramos y subpáramos de las tres cordilleras (Oriental: Sumapaz, Chingaza, Cocuy, Pisba, Santurbán; Central: Los Nevados, Las Hermosas; Occidental: Tatamá, Frontino, Paramillo) entre 2.500 y 4.200 msnm, con óptimo en 3.000-3.800 msnm en pajonales-frailejonales-matorrales paramunos. Lección viva de medicina tradicional andina y sustitución funcional intergenérica: la árnica de páramo es un ejemplo magistral de cómo el conocimiento etnobotánico campesino-indígena colombiano identificó una planta nativa con propiedades farmacológicas similares a la árnica europea de farmacopea oficial — los campesinos paramunos y muiscas-uwa-pijao-yanacona del altiplano cundiboyacense, Sumapaz, Cocuy, Tolima alto y Cauca alto usan tradicionalmente la infusión y maceración alcohólica de S. formosus para los mismos fines que la árnica europea: tratamiento tópico de golpes, contusiones, hematomas, dolores musculares, esguinces, inflamación articular y dolor reumático. La fitoquímica moderna ha confirmado parcialmente este uso al detectar en el género Senecio compuestos sesquiterpénicos (lactonas sesquiterpénicas, principalmente del tipo eremofilano), flavonoides (quercetina, kempferol), alcaloides pirrolizidínicos (PRECAUCIÓN: estos últimos son hepatotóxicos si se administran por vía oral en dosis altas o sostenidas, razón por la cual la árnica de páramo se usa EXCLUSIVAMENTE por vía tópica nunca interna), y aceites esenciales con actividad antiinflamatoria y antimicrobiana. ADVERTENCIA TOXICOLÓGICA: los alcaloides pirrolizidínicos del género Senecio son hepatotóxicos por vía oral; el uso tradicional correcto es EXCLUSIVAMENTE TÓPICO mediante maceración alcohólica para frotaciones externas, NUNCA infusión oral. Uso etnobotánico documentado (García-Barriga 1974 Flora Medicinal de Colombia, Bernal 2015): maceración alcohólica de capítulos florales en alcohol de 70-90° por 21 días, filtrado y aplicación tópica directa sobre el área afectada 3-4 veces/día. Uso prudencial: máximo 7-10 días continuos, evitar aplicación sobre heridas abiertas o piel lesionada, contraindicado embarazo y lactancia. Recolección silvestre paramuna con responsabilidad: solo capítulos florales en plena floración (octubre-febrero), nunca arrancar la planta completa, dejar mínimo 70% de los individuos del rodal sin recolectar para garantizar regeneración natural, NO recolectar dentro de Parques Nacionales Naturales ni Áreas Protegidas Regionales sin permiso de la autoridad ambiental competente. Protección indirecta: la Ley 1930/2018 protege los ecosistemas de páramo donde S. formosus habita, por lo que aunque la especie no está en la lista de especies amenazadas del MADS, su hábitat sí está jurídicamente protegido. Manejo agroecológico (cultivo restringido a finca de alta montaña fría >2.500 msnm): propagación por semilla recolectada de aquenios maduros, siembra en sustrato de turba de páramo + tierra de subpáramo + arena + MO en invernadero frío, germinación 20-45 días, trasplante a bolsa 3-4 meses, plantación definitiva 6-8 meses, asocio con otras medicinales paramunas (Hypericum juniperinum, Disterigma, Bartsia, Pernettya), uso doméstico exclusivo NO COMERCIAL. La árnica de páramo es ejemplo paradigmático de la riqueza farmacológica de la flora paramuna colombiana y de la necesidad de preservar conocimiento etnobotánico tradicional con responsabilidad toxicológica moderna. Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, García-Barriga 1974 Flora Medicinal de Colombia, JBB Jardín Botánico de Bogotá, Humboldt Flora de Páramos.",
       "advertencia_toxicologica": "EXCLUSIVAMENTE uso tópico (maceración alcohólica para frotaciones externas): alcaloides pirrolizidínicos hepatotóxicos por vía oral (enfermedad veno-oclusiva hepática). Máximo 7-10 días continuos. NO heridas abiertas, NO embarazo, NO lactancia.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
     },
     {
       "id": "pernettya_prostrata",
@@ -14533,7 +14634,8 @@
       ],
       "valor_pedagogico": "La pernettya o mortiño rastrero (Pernettya prostrata (Cav.) DC., familia Ericaceae, sinónimo taxonómico moderno Gaultheria myrsinoides Kunth según POWO/Kew aunque tradicionalmente tratada como Pernettya en flora paramuna colombiana) es un arbusto rastrero-postrado típico del páramo, subpáramo y bosque altoandino colombiano, reconocible por sus hojas pequeñas coriáceas verde oscuro brillante con margen aserrado y especialmente por sus bayas esféricas blancas-rosadas-rojas-moradas (4-8 mm diámetro) que cubren la planta en temporada de fructificación (febrero-mayo) dando aspecto de tapete moteado de colores. Es una de las plantas más vistosas y fotografiadas del paisaje paramuno colombiano. En Colombia se distribuye ampliamente en páramos, subpáramos y bosques altoandinos de las tres cordilleras y la Sierra Nevada de Santa Marta entre 2.400 y 4.300 msnm, con óptimo en 2.800-3.800 msnm en pajonales-frailejonales, matorrales paramunos, bordes de bosque altoandino y áreas abiertas postglaciares. Es planta acidófila estricta (pH suelo 4-5.5) típica de suelos turbosos paramunos. Lección viva de ericáceas paramunas y advertencia toxicológica etnobotánica: la familia Ericaceae es una de las familias dominantes de páramo y bosque altoandino con géneros emblemáticos (Pernettya, Gaultheria, Disterigma, Vaccinium, Cavendishia, Macleania, Themistoclesia, Satyria, Bejaria, Befaria) que comparten frutos en baya carnosa atractivos para aves frugívoras (mirlos, tángaras, frugívoros de altura como Diglossa) y muchos también consumidos tradicionalmente por humanos. SIN EMBARGO, el género Pernettya es CASO ESPECIAL de TOXICIDAD: a diferencia de Vaccinium (mortiño negro comestible, Vaccinium meridionale) y de algunos Disterigma comestibles, los frutos de Pernettya prostrata contienen glucósidos diterpénicos del grupo de las andromedotoxinas (también llamadas grayanotoxinas) — los mismos compuestos tóxicos presentes en Rhododendron, Kalmia, Pieris y otras ericáceas ornamentales — que actúan como neurotoxinas y cardiotoxinas en mamíferos al unirse a canales de sodio dependientes de voltaje en membranas neuronales y musculares. La intoxicación por Pernettya en cantidades moderadas-altas produce mareo, vómito, salivación profusa, bradicardia, hipotensión, convulsiones y en casos graves coma o muerte. EXISTE reporte etnobotánico de consumo tradicional en cantidades pequeñas (1-3 bayas) en algunas comunidades andinas (especialmente en Perú-Bolivia donde la planta es llamada 'macha-macha' que significa precisamente 'borrachera-borrachera' por sus efectos psicoactivos en dosis bajas) pero ESTA PRÁCTICA NO ES RECOMENDABLE NI SEGURA para consumo libre por desconocimiento de dosis-respuesta individual. En el contexto pedagógico de la chagra colombiana, P. prostrata se reconoce como planta ornamental nativa paramuna y atractor de fauna frugívora, NO como cultivo comestible. Su valor ecológico es alto: cobertura de suelo en páramo (control de erosión postglaciar), atractor de avifauna frugívora paramuna, planta nodriza para regeneración de ericáceas mayores (Bejaria, Cavendishia), e indicador biogeográfico de suelos turbosos ácidos paramunos. Manejo (no cultivo doméstico recomendado): observación in-situ en páramo, fotografía, valor ornamental in-situ. NO recolectar en Parques Nacionales Naturales sin permiso. Si se requiere propagación para restauración ecológica de páramo degradado, semilla de baya madura recolectada con permiso CAR, siembra en sustrato turba ericáceo (pH 4-5) con arena, germinación 30-60 días, trasplante 4-6 meses, plantación definitiva 8-10 meses. Asocio con Calamagrostis, Hypericum juniperinum, Disterigma empetrifolium, Bartsia santolinifolia, otras ericáceas paramunas. Pernettya es lección sobre cómo la biodiversidad paramuna combina belleza visual, valor ecológico, riqueza etnobotánica y advertencias toxicológicas importantes que el conocimiento tradicional y la fitoquímica moderna deben integrar con responsabilidad. Fuentes Tier A: POWO Kew (sinonimia Gaultheria myrsinoides), GBIF Taxonomic Backbone, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, Humboldt Flora de Páramos, JBB Jardín Botánico de Bogotá, Luteyn Ericaceae of the Neotropics.",
       "advertencia_toxicologica": "NO consumir bayas: andromedotoxinas (grayanotoxinas) en frutos → mareo, vómito, bradicardia, hipotensión, convulsiones, coma en dosis altas. Tóxica para humanos, ganado y mascotas. Diferenciar de Disterigma empetrifolium y Vaccinium meridionale (comestibles).",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
     },
     {
       "id": "hypericum_juniperinum",
@@ -14595,7 +14697,8 @@
         "bernal-2015-plantas-liquenes-colombia"
       ],
       "valor_pedagogico": "El hipérico de páramo o chite (Hypericum juniperinum Kunth, familia Hypericaceae) es un arbusto bajo paramuno endémico de los Andes colombianos-venezolano-ecuatorianos, pariente neotropical del célebre hipérico europeo o hierba de San Juan (Hypericum perforatum L.) usado en farmacopea fitoterapéutica europea como antidepresivo natural validado por meta-análisis clínicos. Es una de las plantas más distintivas del paisaje paramuno colombiano por su porte denso ramoso (30-80 cm altura), sus hojas pequeñas escamiformes verde-oscuras tipo junípero (de ahí el epíteto específico 'juniperinum' = parecido a Juniperus, el género del enebro europeo) que cubren los tallos en disposición decussada apretada, y especialmente por sus flores amarillas vistosas (1.5-2.5 cm diámetro) con cinco pétalos amarillo-dorados y un denso penacho central de numerosos estambres amarillos prominentes — patrón floral diagnóstico del género Hypericum a nivel mundial. En Colombia se distribuye en páramos y subpáramos de las tres cordilleras (Oriental: Sumapaz, Chingaza, Cocuy, Pisba, Santurbán, Almorzadero; Central: Los Nevados, Las Hermosas, Puracé; Occidental: Tatamá, Frontino-Urrao, Paramillo) entre 2.700 y 4.200 msnm, con óptimo en 3.000-3.800 msnm en frailejonales-pajonales-matorrales paramunos asociado a Espeletia, Calamagrostis, Disterigma, Pernettya, Bartsia, Diplostephium, Pentacalia y otras especies del cortejo florístico paramuno. Lección viva de farmacognosia comparada neotrópico-paleártico y de medicina tradicional andina: el género Hypericum incluye ~500 especies de distribución cosmopolita con un perfil fitoquímico característico globalmente conservado — naftodiantronas (hipericina, pseudohipericina), floroglucinoles (hiperforina, adhiperforina), flavonoides (quercetina, rutina, hiperósido, quercitrina, isoquercitrina), xantonas, taninos catequínicos y aceite esencial — que confieren al género propiedades farmacológicas validadas: actividad antidepresiva-ansiolítica (por inhibición de recaptación de serotonina, dopamina, noradrenalina y GABA por la hiperforina), antiinflamatoria, cicatrizante tópica, antibacteriana, antiviral (incluyendo actividad contra herpes virus por la hipericina foto-activada) y diurética suave. En Colombia el chite de páramo H. juniperinum (junto con su pariente cercano H. mexicanum) es la sustitución funcional nativa del H. perforatum europeo en la medicina tradicional muisca-uwa-pijao y campesina andina del altiplano cundiboyacense y Cocuy. García-Barriga (1974 Flora Medicinal de Colombia) documenta uso etnobotánico ancestral del chite paramuno en infusión y maceración alcohólica para: tratamiento de melancolía-tristeza-decaimiento (uso 'antidepresivo' tradicional), heridas-quemaduras-úlceras (uso cicatrizante tópico), inflamación urinaria (uso diurético-antiséptico genitourinario), dolor reumático y articular (uso antiinflamatorio tópico) y trastornos del sueño-ansiedad nocturna (uso ansiolítico-hipnótico suave). Uso etnobotánico tradicional (precaución farmacológica importante): infusión 1-2 g de sumidades floridas en 200 ml agua hirviendo 10 min, 1-2 tazas/día, máximo 4-6 semanas continuas. PRECAUCIÓN FARMACOLÓGICA: el género Hypericum (incluido H. juniperinum por analogía fitoquímica) es FOTOSENSIBILIZANTE — la hipericina activada por luz UV solar provoca dermatitis fotosensible en piel expuesta, especialmente en personas de piel clara, ganado bovino-ovino-caprino que pasta H. perforatum en regiones templadas. Más crítico aún, Hypericum es INDUCTOR POTENTE del citocromo P450 (especialmente CYP3A4 y CYP2C9) y de la glicoproteína P, lo que produce INTERACCIONES FARMACOLÓGICAS PELIGROSAS con: anticonceptivos orales (reducción de eficacia, riesgo de embarazo no deseado), warfarina y anticoagulantes (reducción de efecto anticoagulante con riesgo trombótico), ciclosporina y tacrolimus (riesgo de rechazo de injerto en trasplantados), antirretrovirales (especialmente indinavir y otros inhibidores de proteasa con reducción de niveles plasmáticos), digoxina, teofilina, antidepresivos ISRS (riesgo de síndrome serotoninérgico por suma de mecanismo). El uso del chite paramuno requiere supervisión médica calificada si la persona toma alguna de estas medicaciones. Recolección silvestre con responsabilidad: solo sumidades floridas en floración (octubre-febrero), nunca arrancar la planta completa, dejar >70% del rodal sin recolectar para regeneración, NO recolectar dentro de Parques Nacionales Naturales sin permiso. Manejo agroecológico (cultivo restringido a finca alta montaña fría >2.500 msnm): propagación por semilla en sustrato turba paramuna + arena + MO en invernadero frío, germinación 30-60 días, trasplante a bolsa 4-6 meses, plantación definitiva 8-10 meses, asocio con otras medicinales paramunas (Senecio formosus, Bartsia, Disterigma) en huertos pedagógicos de alta montaña. Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, García-Barriga 1974 Flora Medicinal de Colombia, Humboldt Flora de Páramos, Robson Hypericum Monograph (Kew).",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
     },
     {
       "id": "bartsia_santolinifolia",
@@ -14657,7 +14760,8 @@
         "bernal-2015-plantas-liquenes-colombia"
       ],
       "valor_pedagogico": "La santolina paramuna o trompetilla de páramo (Bartsia santolinifolia (Kunth) Benth., familia Orobanchaceae, anteriormente clasificada en Scrophulariaceae sensu lato antes de la reorganización filogenética de las Lamiales) es una hierba perenne paramuna emblemática de los frailejonales-pajonales colombianos, reconocible por sus hojas pequeñas finamente divididas (lobulado-pinnadas, 1-3 cm largo) muy similares en aspecto a las de la santolina mediterránea (Santolina chamaecyparissus) — de ahí el epíteto específico 'santolinifolia' = con hojas de santolina —, sus tallos erectos cespitosos de 10-40 cm altura, y especialmente por sus flores tubulares vistosas (2-3 cm largo) de corola morada-violácea intensa con dos labios bilabiados (labio superior estrecho-galeado, labio inferior trilobado) que la hacen una de las plantas más atractivas visualmente del paisaje paramuno colombiano y un importante recurso nectarífero para colibríes de altura. En Colombia se distribuye en páramos y subpáramos de las tres cordilleras (Oriental: Sumapaz, Chingaza, Cocuy, Pisba, Santurbán; Central: Los Nevados, Las Hermosas, Puracé, Doña Juana; Occidental: Frontino-Urrao, Paramillo, Tatamá) entre 2.800 y 4.300 msnm, con óptimo en 3.200-3.900 msnm en pajonales de Calamagrostis, frailejonales de Espeletia y matorrales paramunos de Diplostephium-Pentacalia-Hypericum. Lección viva de parasitismo radicular vegetal en ecosistemas paramunos y de evolución de Orobanchaceae: la familia Orobanchaceae es una familia botánicamente fascinante porque incluye un gradiente evolutivo completo desde plantas autótrofas no parásitas (Lindenbergia) hasta hemiparásitas facultativas (Bartsia, Pedicularis, Castilleja, Euphrasia, Rhinanthus, Odontites — que tienen clorofila y fotosintetizan pero también extraen agua y nutrientes minerales de raíces de plantas hospederas a través de órganos especializados llamados haustorios) hasta holoparásitas obligadas (Orobanche, Cistanche, Phelipanche, Striga, Conopholis, Aphyllon — que carecen de clorofila completa y dependen 100% del flujo de fotosintatos del hospedero). Bartsia santolinifolia es HEMIPARÁSITA FACULTATIVA: contiene clorofila y fotosintetiza pero también desarrolla haustorios radiculares que penetran en las raíces de plantas hospederas (típicamente gramíneas paramunas como Calamagrostis effusa, Calamagrostis bogotensis, Festuca dolichophylla, Agrostis perennans y en menor grado frailejones de Espeletia y otras dicotiledóneas paramunas) de las cuales extrae agua, nitrógeno mineral, fósforo, potasio y otros nutrientes minerales que complementan su nutrición autotrófica. Esta estrategia mixta hemiparásita le da ventaja competitiva en suelos paramunos pobres en nutrientes y secos por exposición a viento-radiación-helada. La consecuencia ecológica práctica es enorme: B. santolinifolia (y todas las Bartsia/Pedicularis/Castilleja paramunas) son ECOLÓGICAMENTE NO-AISLABLES de sus hospederas. Cualquier intento de cultivo ex-situ en jardín-vivero requiere presencia obligada de Calamagrostis u otra hospedera apropiada en el mismo macetón-cantero; el cultivo en monocultivo aislado fracasa por carencia de fuente haustorial. Esta dependencia obligada con el cortejo florístico paramuno hace que B. santolinifolia sea una especie indicadora robusta de integridad ecosistémica paramuna: solo persiste en páramos con cobertura de pajonal-frailejonal funcional, declina rápidamente con degradación por quema-pastoreo-minería. Servicio ecosistémico: recurso nectarífero estratégico para avifauna nectarívora paramuna especializada — colibríes de altura como Eriocnemis cupreoventris (zamarrito cobrizo), Eriocnemis vestita (calzadito gorgiazul), Aglaeactis cupripennis (rayito brillante), Pterophanes cyanopterus (alas grandes alizafiro), Lesbia victoriae (cola larga azul), Oxypogon guerinii (chivito), Aglaiocercus kingii (cola larga verdiazul), Coeligena lutetiae (incaco coliplomo). La flor tubular morada de B. santolinifolia es coevolutivamente apropiada al pico-recto-largo de estos colibríes. Manejo (NO cultivo doméstico recomendado por dependencia obligada de hospedera y por pertenencia a ecosistema paramuno protegido por Ley 1930/2018): observación in-situ en páramo, fotografía, estudio ecológico. NO recolectar en Parques Nacionales Naturales sin permiso CAR. Si se requiere para restauración ecológica de páramo degradado, propagación por semilla en asocio obligado con Calamagrostis (siembra simultánea de pajonal + Bartsia), germinación 30-60 días, plantación definitiva 8-10 meses asociada a pajonal establecido, asocio con otras especies paramunas (Espeletia, Hypericum, Disterigma, Pernettya, Senecio). Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, Humboldt Flora de Páramos, Molau Bartsia Monograph, JBB Jardín Botánico de Bogotá.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
     },
     {
       "id": "lupinus_alopecuroides",
@@ -14720,7 +14824,8 @@
       ],
       "valor_pedagogico": "El chocho de páramo (Lupinus alopecuroides Desr., familia Fabaceae) es un lupino paramuno endémico de los Andes ecuatorianos-colombianos, especie distinta y CON CARACTERÍSTICAS BIOLÓGICAS DIFERENTES al célebre lupinus_mutabilis Sweet (tarwi-chocho andino, cultivo comestible domesticado de la cordillera andina entre 2.500-3.500 msnm en zona fría) — esta distinción es importante pedagógicamente para evitar confusión entre las dos especies del mismo género en el catálogo de Chagra. L. alopecuroides es planta silvestre paramuna no domesticada, propia de páramo medio-superior y superpáramo entre 3.200 y 4.500 msnm (zona térmica de páramo fría-extrema), mientras que L. mutabilis es cultivo domesticado de zona fría templada (2.500-3.500 msnm) tradicionalmente desamargado y consumido por culturas andinas. Es una herbácea perenne robusta con roseta basal densa de hojas digitado-palmadas (7-11 folíolos oblanceolados) verdoso-plateadas pubescentes, tallo floral erecto vigoroso de 50-150 cm cubierto en su porción apical por una inflorescencia espigada densa larga (20-50 cm) con numerosas flores papilionadas (típicas de Fabaceae) blanco-azuladas a violáceo-azuladas intensas, similar en aspecto general al lupino europeo ornamental (Lupinus polyphyllus) pero adaptada a condiciones paramunas extremas: viento permanente, helada nocturna recurrente, radiación UV-B intensa de altura, suelo turboso ácido pobre en N. Es una de las plantas más vistosas del superpáramo colombiano y una de las pocas leguminosas paramunas presentes en el cortejo florístico del frailejonal-pajonal. En Colombia se distribuye principalmente en páramos altos y superpáramos de la cordillera Central (Los Nevados, Las Hermosas, Doña Juana) y Oriental (Sumapaz, Cocuy, Pisba, Santurbán) entre 3.200 y 4.500 msnm con óptimo en 3.500-4.200 msnm en superpáramo de tipo zonal-azonal y pajonal-frailejonal con presencia de afloramientos rocosos. Lección viva de fijación biológica de nitrógeno (BNF) en ecosistemas paramunos y de quimio-defensa por alcaloides quinolizidínicos: como toda Fabaceae, L. alopecuroides tiene nódulos radiculares simbióticos con bacterias del género Bradyrhizobium (Rhizobiaceae sensu lato) que fijan nitrógeno atmosférico (N₂) convirtiéndolo en amonio (NH₄⁺) asimilable por la planta. Esta capacidad es ESTRATÉGICA en páramos donde el N disponible es extremadamente limitante por: (1) bajas temperaturas que ralentizan la mineralización de la MO turbosa, (2) alta acidez del suelo (pH 4-5.5) que inhibe la nitrificación bacteriana, (3) lixiviación intensa por alta precipitación, y (4) volatilización por viento permanente. L. alopecuroides es por lo tanto un FERTILIZADOR BIOLÓGICO NATURAL del páramo, aumentando la disponibilidad de N para otras especies del cortejo florístico (Calamagrostis, Espeletia, Hypericum) y constituyendo nodo clave del ciclo biogeoquímico del nitrógeno paramuno. Por otra parte, L. alopecuroides (como casi todos los lupinos silvestres no domesticados) contiene altas concentraciones de alcaloides quinolizidínicos amargos y tóxicos: lupinina, lupanina, esparteína, isolupanina, anagirina, y otros (perfil fitoquímico que da nombre al grupo de 'lupinos amargos' versus 'lupinos dulces' de bajo contenido alcaloídico que es donde se ubica el cultivo domesticado L. mutabilis tras siglos de selección campesina andina). Estos alcaloides son neurotóxicos en mamíferos (bloqueo de receptores nicotínicos de acetilcolina, depresión del SNC, convulsiones, parálisis respiratoria en dosis altas) y tienen además función ecológica defensiva contra herbivoría (rumiantes, roedores, insectos). Por esta razón el chocho de páramo NO ES COMESTIBLE en su estado natural — no debe consumirse las semillas ni las hojas. Su pariente cultivado L. mutabilis sí es comestible PERO solo después del proceso ancestral andino de desamargado por lavado prolongado (>4-7 días en agua corriente) que lixivia los alcaloides solubles en agua, técnica desarrollada por las culturas pre-incaicas y conservada por campesinos andinos en Boyacá, Cundinamarca, Nariño, Ecuador, Perú y Bolivia. Servicio ecosistémico de L. alopecuroides: fijación de N en suelos paramunos pobres (40-100 kg N/ha/año en condiciones favorables), atractor nectarífero importante para abejorros andinos (Bombus rohweri, Bombus funebris) y otros himenópteros paramunos, polinización por vibración (buzz pollination), planta nodriza para regeneración de especies pioneras post-disturbio, indicador de páramo en condiciones bien conservadas. Manejo (no cultivo comestible recomendado por su toxicidad alcaloídica y por su carácter silvestre paramuno protegido por Ley 1930/2018): observación in-situ, valor ornamental in-situ, valor ecológico como fijador de N en proyectos de restauración paramuna autorizados. Propagación para restauración (con permiso CAR): semilla escarificada (testa muy dura, escarificación mecánica o térmica con agua caliente 50°C por 30 min seguido de remojo 24h en agua fría), siembra en sustrato turba paramuna + arena, germinación 30-90 días, plantación definitiva 8-12 meses, asocio con pajonal-frailejonal, exclusión ganadera. Distinción pedagógica: si quieres tarwi-chocho comestible cultivable en chagra fría, busca lupinus_mutabilis (especie distinta ya incluida en catálogo Chagra). Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, Humboldt Flora de Páramos, Eastwood Lupinus Monograph, JBB Jardín Botánico de Bogotá.",
       "advertencia_toxicologica": "NO consumir semillas ni hojas: alcaloides quinolizidínicos (lupinina, lupanina, esparteína, anagirina) → neurotoxicidad, bloqueo nicotínico, parálisis respiratoria en dosis altas. Pariente L. mutabilis comestible solo tras desamargado tradicional (lavado 4-7 días).",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
     },
     {
       "id": "loricaria_complanata",
@@ -14781,7 +14886,8 @@
         "bernal-2015-plantas-liquenes-colombia"
       ],
       "valor_pedagogico": "La escobilla paramuna o ciprés de páramo (Loricaria complanata (Sch.Bip.) Wedd., familia Asteraceae) es un arbusto característico del superpáramo colombiano y de la línea altitudinal alta del páramo medio, una de las plantas más distintivas y morfológicamente curiosas del paisaje paramuno andino por su aspecto ericoide-cupresoide que la hace parecer un junípero o ciprés enano más que una Asteraceae típica. Es un arbusto perenne erecto-ramoso de 30-150 cm altura con tallos densamente ramificados, ramas aplanadas (de ahí el epíteto específico 'complanata' = aplanada), hojas escamiformes diminutas (1-3 mm largo) imbricadas en disposición decussada apretada cubriendo completamente los tallos verde-grisáceos plateados, e inflorescencias pequeñas con capítulos amarillos discretos agrupados en panículas terminales típicas de Asteraceae. La morfología foliar escamiforme imbricada — muy distinta de la morfología foliar típica de Asteraceae herbáceas — es un excelente ejemplo de CONVERGENCIA EVOLUTIVA con coníferas (Cupressaceae como Juniperus, Cupressus, Chamaecyparis) y con ericáceas reducidas (Erica, Calluna, Empetrum, Disterigma, Pernettya): adaptación morfológica al estrés climático de alta montaña (xericidad fisiológica por viento permanente, radiación UV-B intensa, helada nocturna, baja presión parcial de CO₂ por altitud) que se manifiesta repetidamente en linajes filogenéticamente distintos como solución estructural similar (hojas pequeñas escamiformes que minimizan superficie de transpiración y maximizan resistencia mecánica al viento). En Colombia se distribuye principalmente en superpáramo y páramo alto de la cordillera Central (Los Nevados, Las Hermosas, Doña Juana, Puracé) y Oriental (Sumapaz, Cocuy, Pisba, Santurbán) entre 3.000 y 4.400 msnm, con óptimo en 3.400-4.100 msnm en superpáramo zonal-azonal de tipo rocoso o turboso, en pajonal-frailejonal de transición a superpáramo, y en afloramientos rocosos de páramo alto. Es indicador robusto de superpáramo bien conservado: solo persiste en sitios con cobertura paramuna funcional poco perturbada por ganadería-quema-minería. Lección viva de convergencia evolutiva morfológica en alta montaña y de diversidad de Asteraceae paramunas colombianas: el género Loricaria (con ~20 especies neotropicales andinas y centroamericanas) es uno de los géneros más fascinantes de Asteraceae andinas por su morfología engañosa que ha confundido a botánicos por más de un siglo — el primer autor que describió el género fue Weddell en 1856 en su 'Chloris Andina'. La revisión taxonómica moderna del género por Cuatrecasas confirmó su pertenencia a Asteraceae tribu Gnaphalieae (subtribu Loricariinae) — el mismo grupo de las inmortales (Helichrysum, Anaphalis) y de las cespitosas paramunas (Antennaria, Belloa, Lucilia, Mniodes). El cortejo florístico paramuno colombiano incluye múltiples Asteraceae con morfologías especializadas a alta montaña: Espeletia (frailejones, roseta caulescente), Diplostephium (arbustos ericoides), Pentacalia (arbustos pubescentes), Senecio (rosetas herbáceas), Baccharis (chilcas), Aphanactis (postradas), Werneria (rosetas acolchonadas), Belloa-Lucilia (cespitosas plateadas) y Loricaria (escamiformes ericoides) — una diversificación adaptativa espectacular dentro de la familia Asteraceae en el ecosistema paramuno. El crecimiento extremadamente lento de Loricaria (estimado en 0.3-0.6 cm/año, individuos de 1 m con ~200 años de edad) y su distribución restringida al superpáramo bien conservado hacen que sea especie sensible a degradación: declina rápidamente con quema, pisoteo ganadero excesivo, minería ilegal de superpáramo, y especialmente con cambio climático que está moviendo el ecotono páramo-glaciar hacia arriba en respuesta al deshielo glaciar acelerado de los nevados colombianos (Pan de Azúcar-Cocuy, Ruiz-Tolima, Huila, Santa Isabel, Cisne, Quindío, Puracé, Chiles). Servicio ecosistémico: regulación hídrica en superpáramo (captura niebla por superficie foliar imbricada), planta nodriza para regeneración de otras especies superparamunas en sitios degradados, indicador biogeográfico de integridad ecosistémica paramuna alta. Manejo (no cultivo doméstico recomendado por carácter silvestre paramuno protegido por Ley 1930/2018, crecimiento extremadamente lento y dependencia de condiciones de superpáramo): observación in-situ, valor ornamental in-situ, valor ecológico en proyectos de restauración paramuna autorizados por CAR. Si se requiere propagación para restauración (con permiso CAR-CORPORINOQUIA-CORPOAMAZONIA), semilla recolectada de inflorescencias maduras (febrero-mayo), siembra en sustrato turba superparamuna + arena gruesa, germinación 30-90 días en invernadero alta montaña, plantación definitiva >12 meses a 30-50 cm, asocio con Espeletia, Calamagrostis, Hypericum, Disterigma, Pernettya, otras especies superparamunas. Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, Humboldt Flora de Páramos, Cuatrecasas Loricaria Revision, JBB Jardín Botánico de Bogotá.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
     },
     {
       "id": "disterigma_empetrifolium",
@@ -14844,7 +14950,8 @@
         "bernal-2015-plantas-liquenes-colombia"
       ],
       "valor_pedagogico": "El disterigma o mortiño rastrero ericáceo (Disterigma empetrifolium (Kunth) Drude, familia Ericaceae) es un arbusto rastrero-postrado típico de páramo y bosque altoandino colombiano, una de las ericáceas más abundantes del cortejo florístico paramuno y un excelente ejemplo de la diversidad ericácea andina. Es un arbusto enano postrado-rastrero de 5-30 cm altura con tallos largos extendidos sobre el suelo turboso, hojas pequeñas coriáceas verde-oscuro brillantes (3-8 mm largo) con margen entero revoluto similar en aspecto a las hojas del crowberry europeo Empetrum nigrum (de ahí el epíteto específico 'empetrifolium' = con hojas de Empetrum), flores tubulares-urceoladas blanco-rosadas pequeñas (3-5 mm largo) en grupos axilares, y especialmente sus bayas esféricas (4-7 mm diámetro) blanco-traslúcidas, blanco-rosadas o moradas-oscuras que cubren la planta en temporada de fructificación (marzo-junio). Las bayas de Disterigma son comestibles en pequeñas cantidades — a DIFERENCIA del género hermano Pernettya (también ericáceo paramuno) que contiene andromedotoxinas tóxicas (ver pernettya_prostrata) — y han sido consumidas tradicionalmente por campesinos paramunos, niños pastores y caminantes de páramo en bocados oportunistas. Sin embargo, su consumo no es extensivo por el tamaño pequeño de las bayas, la dispersión espacial del recurso y el bajo rendimiento por unidad de área en comparación con el mortiño negro mayor (Vaccinium meridionale) que sí es cultivado-aprovechado comercialmente en Colombia. En Colombia se distribuye ampliamente en páramos, subpáramos y bosques altoandinos de las tres cordilleras y la Sierra Nevada de Santa Marta entre 2.500 y 4.200 msnm, con óptimo en 2.900-3.700 msnm en pajonales-frailejonales, matorrales paramunos, bordes de bosque altoandino y turberas paramunas. Es planta acidófila estricta (pH suelo 3.8-5.3) típica de suelos turbosos paramunos con micorrizas ericoides obligadas (ver más abajo). Lección viva de simbiosis micorrízica ericoide y de adaptación ericácea a suelos paramunos extremos: como TODAS las Ericaceae (familia que incluye además de Disterigma a Pernettya, Vaccinium, Gaultheria, Cavendishia, Macleania, Themistoclesia, Satyria, Bejaria, Befaria, y a nivel global Rhododendron, Erica, Calluna, Vaccinium-arándano, blueberry, cranberry, manzanita), Disterigma empetrifolium tiene una asociación micorrízica OBLIGADA muy especializada llamada MICORRIZA ERICOIDE (ErM), formada con hongos ascomicetos del género Rhizoscyphus (anteriormente Hymenoscyphus ericae) y otros taxones ericoides. Esta simbiosis es estratégica en suelos paramunos por: (1) el suelo turboso de páramo es extremadamente ácido (pH 3.5-5.5) y rico en MO refractaria pero pobre en N-P disponibles por inhibición microbiana de descomposición, (2) los hongos ericoides poseen enzimas extracelulares (proteasas, quitinasas, fosfatasas) capaces de hidrolizar MO compleja y liberar N-P para la planta hospedera, (3) tolerancia compartida a aluminio y metales pesados acumulados en turberas paramunas, (4) provisión hídrica complementaria en períodos secos. Esta dependencia obligada con hongos ericoides es la razón por la cual la propagación ex-situ de Disterigma (y de la mayoría de ericáceas paramunas) es extraordinariamente difícil: cualquier intento de cultivo en sustrato esterilizado o sin inóculo ericoide apropiado fracasa por falta de simbiosis funcional. La estrategia exitosa es trasplante con cepellón completo de turba paramuna que contenga propágulos fúngicos endógenos. Servicio ecosistémico paramuno: cobertura de suelo en páramo (control de erosión post-glaciar, retención de turba), atractor de avifauna frugívora paramuna (mirlos paramunos Turdus fuscater quindio, tángaras de altura, Diglossa de páramo), planta nodriza para regeneración de ericáceas mayores (Bejaria, Cavendishia, Macleania, Vaccinium), e indicador biogeográfico de suelos turbosos ácidos paramunos. Manejo agroecológico (cultivo restringido a finca alta montaña fría >2.500 msnm con presencia de sustrato turboso paramuno): propagación por semilla de baya madura en sustrato turba ericáceo paramuno con micorrizas ericoides obligadas (NO sustrato esterilizado), germinación 30-90 días, trasplante a bolsa 6-8 meses, plantación definitiva 10-14 meses, exclusión ganadera, asocio con Calamagrostis, Hypericum, Bartsia, Pernettya, otras ericáceas paramunas. Diferenciación pedagógica importante con Pernettya: aunque ambas son ericáceas paramunas de morfología similar con bayas vistosas, Disterigma empetrifolium es COMESTIBLE en pequeñas cantidades mientras Pernettya prostrata es POTENCIALMENTE TÓXICA por andromedotoxinas (ver pernettya_prostrata). En campo se distinguen por: (1) tamaño de baya (Disterigma 4-7 mm, Pernettya 4-8 mm — similar), (2) color de baya (Disterigma blanco-rosado-morado-traslúcido, Pernettya blanco-rosado-rojo-morado con tonalidades más intensas), (3) sabor (Disterigma dulce-insípido, Pernettya amargo-acre con ardor en mucosa oral), (4) presentación floral (Disterigma flores agrupadas en grupos axilares de 2-5, Pernettya flores solitarias o pareadas), (5) reacción al masticar (Pernettya provoca rápidamente sensación de ardor-anestesia en labios-lengua característica). En caso de duda en campo, NUNCA consumir baya ericácea paramuna sin identificación experta. Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, Luteyn Ericaceae of the Neotropics, Humboldt Flora de Páramos, JBB Jardín Botánico de Bogotá.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
     },
     {
       "id": "paepalanthus_columbiensis",
@@ -14906,7 +15013,8 @@
         "bernal-2015-plantas-liquenes-colombia"
       ],
       "valor_pedagogico": "La paja paramuna o botoncillo de páramo (Paepalanthus columbiensis Ruhland, familia Eriocaulaceae) es una hierba paramuna cespitosa endémica de los páramos colombianos (el epíteto específico 'columbiensis' indica precisamente su tipificación en territorio colombiano), una de las plantas más distintivas y delicadas del paisaje paramuno por su morfología característica de roseta basal compacta de hojas lineares-ensiformes verde-grisáceas (5-15 cm largo, 2-5 mm ancho) y especialmente por sus escapos florales delgados erectos (5-30 cm altura) que terminan en capítulos esféricos blanco-grisáceos a blanco-amarillentos (5-10 mm diámetro) de aspecto curioso de botón o estrellita — patrón floral típico del género Paepalanthus que da nombre a los nombres vernáculos populares 'botoncillo de páramo' o 'estrellita paramuna'. En Colombia se distribuye en páramos y subpáramos de las tres cordilleras (Oriental: Sumapaz, Chingaza, Cocuy, Pisba, Santurbán; Central: Los Nevados, Las Hermosas, Puracé; Occidental: Tatamá, Frontino-Urrao, Paramillo) entre 2.900 y 4.200 msnm, con óptimo en 3.200-3.900 msnm en turberas paramunas, bordes de pantanos paramunos, manantiales paramunos y suelos turbosos húmedos del subpáramo-páramo medio. Es planta indicadora robusta de TURBERAS PARAMUNAS HÚMEDAS — los ecosistemas más vulnerables y biogeoquímicamente importantes del páramo por su función de almacenamiento masivo de carbono orgánico y de regulación hídrica de cuencas altas. Lección viva de Eriocaulaceae neotropicales y de biogeoquímica de turberas paramunas: la familia Eriocaulaceae es una familia botánicamente fascinante de monocotiledóneas paludícolas-paramunas-rupícolas distribuida principalmente en los neotrópicos y en menor medida en el paleotrópico (África-Asia tropical-Australia), con ~1.200 especies en ~10 géneros (Eriocaulon, Paepalanthus, Syngonanthus, Leiothrix, Lachnocaulon, Tonina, etc.). El género Paepalanthus es el segundo en diversidad después de Eriocaulon con ~400 especies neotropicales, con epicentro de diversidad en los campos rupestres del Brasil (Cadena do Espinhaço) y los páramos andinos colombianos-venezolanos-ecuatorianos. Filogenéticamente, Eriocaulaceae es miembro del orden Poales (junto con Poaceae, Cyperaceae, Bromeliaceae, Juncaceae) y comparte con estas familias el síndrome de adaptación a ambientes con estrés hídrico-edáfico (capacidad de tolerar suelos saturados-anegados o suelos secos-pobres, fotosíntesis C3-C4 según linaje, propagación por semilla pequeña con dispersión por viento-agua-fauna). Las Eriocaulaceae son consideradas BIOINDICADORES sensibles de turbera funcional: solo persisten en turberas paramunas con cobertura vegetal funcional, freático superficial estable, baja perturbación por ganadería-quema-drenaje. La turbera paramuna es el ecosistema con mayor concentración de carbono orgánico edáfico del territorio colombiano: 30-50% de C-orgánico en suelo turboso vs 2-5% en suelo agrícola normal, con espesores turbosos de 1-5 m equivalentes a 1.000-15.000 años de acumulación post-glaciar. Las turberas paramunas colombianas almacenan estimadamente 1-3 gigatoneladas de C-orgánico — equivalentes a varias décadas de emisiones de CO₂ del país. La perturbación de turbera (drenaje, quema, sobrepastoreo, minería, papicultivo de páramo) provoca emisión masiva de C-CO₂ por mineralización aeróbica acelerada de la turba expuesta, además de pérdida de regulación hídrica y de biodiversidad turberícola. Por esta razón la Ley 1930/2018 protege con énfasis especial los humedales y turberas dentro de páramos delimitados. Paepalanthus columbiensis es uno de los marcadores florísticos de turbera paramuna funcional bien conservada: si está presente en una turbera, indica que la turbera está estructuralmente íntegra. Su declive en una turbera indica perturbación incipiente y riesgo de pérdida de servicio ecosistémico. Servicio ecosistémico: indicador de turbera paramuna funcional, recurso nectarífero secundario para himenópteros y dípteros paramunos, alimento de fauna granívora paramuna (paseriformes pequeños como semilleros de altura). Manejo (NO cultivo doméstico recomendado por carácter silvestre paramuno protegido por Ley 1930/2018, por dependencia obligada de hidrología turbosa, y por carácter indicador-conservación): observación in-situ, fotografía, estudio bioindicación de turbera. NO recolectar dentro de Parques Nacionales Naturales ni de complejos paramunos delimitados sin permiso CAR-CORPORINOQUIA-CORPOAMAZONIA. Si se requiere propagación para restauración de turbera paramuna autorizada (con permiso CAR), semilla diminuta recolectada de capítulos maduros (febrero-mayo), siembra superficial sobre sustrato turbera-paramuna húmedo + arena fina, germinación 20-60 días con humedad constante, plantación definitiva 6-10 meses en turbera receptora con freático superficial estable, exclusión ganadera, asocio con otras turberícolas paramunas (Cortaderia, Sphagnum, Calamagrostis, Carex de páramo, juncos paramunos). Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, Humboldt Flora de Páramos, Giulietti Eriocaulaceae Monograph, JBB Jardín Botánico de Bogotá.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "validation_level": "claude_draft"
     },
     {
       "id": "polylepis_incana",
@@ -29052,7 +29160,8 @@
         "tapabocas"
       ],
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "media"
     },
     {
       "id": "biol",
@@ -29093,7 +29202,8 @@
       "do_not_use_when": [
         "pre_cosecha_partes_comestibles"
       ],
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "media"
     },
     {
       "id": "purin_ortiga",
@@ -29132,7 +29242,8 @@
         "guantes"
       ],
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "media"
     },
     {
       "id": "caldo_sulfocalcico",
@@ -29178,7 +29289,8 @@
         "temperatura_mayor_28C",
         "humedad_relativa_menor_50pct"
       ],
-      "reentry_interval_dias": 15
+      "reentry_interval_dias": 15,
+      "confianza": "media"
     },
     {
       "id": "caldo_bordeles",
@@ -29222,7 +29334,8 @@
         "floracion",
         "cucurbitaceas_jovenes"
       ],
-      "reentry_interval_dias": 21
+      "reentry_interval_dias": 21,
+      "confianza": "media"
     },
     {
       "id": "te_compost",
@@ -29260,7 +29373,8 @@
       "do_not_use_when": [
         "pre_cosecha_partes_comestibles_crudas"
       ],
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "media"
     },
     {
       "id": "humus_liquido",
@@ -29296,7 +29410,8 @@
       "do_not_use_when": [
         "pre_cosecha_partes_comestibles_crudas"
       ],
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "media"
     },
     {
       "id": "lixiviado_frutas",
@@ -29332,7 +29447,8 @@
       "do_not_use_when": [
         "fermento_con_moho_negro_o_verde_olivo"
       ],
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "media"
     },
     {
       "id": "supermagro",
@@ -29373,7 +29489,8 @@
       "do_not_use_when": [
         "floracion_plena"
       ],
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "media"
     },
     {
       "id": "trichoderma_harzianum_suelo",
@@ -29409,7 +29526,8 @@
       "safety_class": "bajo",
       "ppe_required": null,
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "alta"
     },
     {
       "id": "bacillus_subtilis_foliar",
@@ -29444,7 +29562,8 @@
       "safety_class": "bajo",
       "ppe_required": null,
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "media"
     },
     {
       "id": "cal_dolomita",
@@ -29482,7 +29601,8 @@
       "do_not_use_when": [
         "sin_analisis_de_suelo_previo"
       ],
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "media"
     },
     {
       "id": "roca_fosforica",
@@ -29518,7 +29638,8 @@
         "mascarilla"
       ],
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "media"
     },
     {
       "id": "ceniza_madera",
@@ -29556,7 +29677,8 @@
       "do_not_use_when": [
         "madera_tratada_pintada_o_contrachapado"
       ],
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "alta"
     },
     {
       "id": "compost_maduro",
@@ -29597,7 +29719,8 @@
       "do_not_use_when": [
         "compost_inmaduro_u_origen_desconocido"
       ],
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "media"
     },
     {
       "id": "biofertilizante_algas",
@@ -29630,7 +29753,8 @@
       "safety_class": "bajo",
       "ppe_required": null,
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "alta"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (caso David trozador; DR-040 pest catalog)",
@@ -29667,7 +29791,8 @@
       "safety_class": "bajo",
       "ppe_required": null,
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "alta"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (caso David trozador; DR-040 pest catalog)",
@@ -29702,7 +29827,8 @@
       "safety_class": "bajo",
       "ppe_required": null,
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "alta"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (caso David trozador; DR-040 pest catalog)",
@@ -29743,7 +29869,8 @@
       "do_not_use_when": [
         "cerca_de_fuentes_hidricas_menos_30m"
       ],
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "alta"
     },
     {
       "id": "caldo_visosa",
@@ -29783,7 +29910,8 @@
         "gafas"
       ],
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "alta"
     },
     {
       "id": "supermagro_restrepo",
@@ -29823,7 +29951,8 @@
       "safety_class": "revisar",
       "ppe_required": null,
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "media"
     },
     {
       "id": "caldo_m5_restrepo",
@@ -29861,7 +29990,8 @@
       "safety_class": "revisar",
       "ppe_required": null,
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "media"
     },
     {
       "id": "microorganismos_montana_solido",
@@ -29896,7 +30026,8 @@
         "tapabocas"
       ],
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "media"
     },
     {
       "id": "microorganismos_montana_liquido",
@@ -29929,7 +30060,8 @@
       "safety_class": "bajo",
       "ppe_required": null,
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "media"
     },
     {
       "id": "jadam_microbial_solution_jms",
@@ -29962,7 +30094,8 @@
       "safety_class": "bajo",
       "ppe_required": null,
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "alta"
     },
     {
       "id": "jadam_wetting_agent_jwa",
@@ -30003,7 +30136,8 @@
       "do_not_use_when": [
         "preparar_sin_ventilacion_o_espacio_cerrado"
       ],
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "alta"
     },
     {
       "id": "vinagre_madera_pirolenoso",
@@ -30039,7 +30173,8 @@
         "producto_fresco_sin_reposo_90_dias",
         "sin_equipo_pirolisis_controlada_con_condensador"
       ],
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "alta"
     },
     {
       "id": "fermento_fpj_brotes",
@@ -30070,7 +30205,8 @@
       "safety_class": "revisar",
       "ppe_required": null,
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "alta"
     },
     {
       "id": "fermento_faa_pescado",
@@ -30100,7 +30236,8 @@
       "safety_class": "revisar",
       "ppe_required": null,
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "alta"
     },
     {
       "id": "fermento_lab_lactobacilos",
@@ -30132,7 +30269,8 @@
       "safety_class": "bajo",
       "ppe_required": null,
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "alta"
     },
     {
       "id": "biofertilizante_purin_rumen",
@@ -30166,7 +30304,8 @@
       "safety_class": "revisar",
       "ppe_required": null,
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "alta"
     },
     {
       "id": "harina_rocas_basalto",
@@ -30196,7 +30335,8 @@
       "safety_class": "revisar",
       "ppe_required": null,
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "media"
     },
     {
       "id": "biofertilizante_super_4",
@@ -30241,7 +30381,8 @@
       "safety_class": "revisar",
       "ppe_required": null,
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "media"
     },
     {
       "id": "purin_helecho",
@@ -30281,7 +30422,8 @@
       "do_not_use_when": [
         "no_ingerir_el_producto"
       ],
-      "reentry_interval_dias": 14
+      "reentry_interval_dias": 14,
+      "confianza": "media"
     },
     {
       "id": "caldo_ortiga_consuelda",
@@ -30325,7 +30467,8 @@
       "do_not_use_when": [
         "no_ingerir_el_producto"
       ],
-      "reentry_interval_dias": 14
+      "reentry_interval_dias": 14,
+      "confianza": "media"
     },
     {
       "id": "abono_verde_avena_vicia",
@@ -30364,7 +30507,8 @@
       "safety_class": "bajo",
       "ppe_required": null,
       "do_not_use_when": null,
-      "reentry_interval_dias": null
+      "reentry_interval_dias": null,
+      "confianza": "media"
     }
   ],
   "_paramo_enrichment": {

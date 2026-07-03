@@ -7,7 +7,11 @@
     "estado": "SEMILLA — 14 enemigos naturales curados sobre literatura institucional colombiana (AGROSAVIA, Cenicafé, ICA) y literatura científica primaria. Los estudios temáticos por cultivo pueden proponer adiciones; entran por PR al catálogo auxiliar.",
     "reglas_id": "snake_case: género_especie (ej. trichogramma_pretiosum, beauveria_bassiana).",
     "principio_anti_invento": "Cada nombre científico debe resolverse en GBIF Backbone Taxonomy o Catalogue of Life. Cada practica_conservacion es práctica real documentada en literatura MIP. Cada source_id resuelve contra sources-seed.json. Cuando una afirmación requiera precisión adicional (cepa, dosis, nr de Avance Técnico), la cita completa va en el campo `fuente` de la entrada — nunca se inventan DOIs ni números de publicación.",
-    "tipos_validos": ["depredador", "parasitoide", "entomopatogeno"]
+    "tipos_validos": [
+      "depredador",
+      "parasitoide",
+      "entomopatogeno"
+    ]
   },
   "enemigos_naturales": [
     {
@@ -27,7 +31,8 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "agrosavia-controladores-biologicos-2017"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "cryptolaemus_montrouzieri",
@@ -47,7 +52,8 @@
         "gbif-taxonomic-backbone",
         "agrosavia-controladores-biologicos-2017",
         "ica-registro-bioinsumos-2024"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "chrysoperla_externa",
@@ -66,7 +72,8 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "agrosavia-controladores-biologicos-2017"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "amblyseius_swirskii",
@@ -85,7 +92,8 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "ica-registro-bioinsumos-2024"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "trichogramma_pretiosum",
@@ -105,7 +113,8 @@
         "gbif-taxonomic-backbone",
         "agrosavia-controladores-biologicos-2017",
         "ica-registro-bioinsumos-2024"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "cotesia_margarivera",
@@ -124,7 +133,8 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "agrosavia-controladores-biologicos-2017"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "encarsia_formosa",
@@ -143,7 +153,8 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "ica-registro-bioinsumos-2024"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "tamarixia_radiata",
@@ -162,7 +173,8 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "ica-registro-bioinsumos-2024"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "anagyrus_pseudococci",
@@ -181,7 +193,8 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "agrosavia-controladores-biologicos-2017"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "beauveria_bassiana",
@@ -201,7 +214,8 @@
         "gbif-taxonomic-backbone",
         "cenicafe-avances-tecnicos-serie",
         "ica-registro-bioinsumos-2024"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "metarhizium_anisopliae",
@@ -221,7 +235,8 @@
         "gbif-taxonomic-backbone",
         "agrosavia-controladores-biologicos-2017",
         "ica-registro-bioinsumos-2024"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "bacillus_thuringiensis",
@@ -241,7 +256,8 @@
         "gbif-taxonomic-backbone",
         "ica-registro-bioinsumos-2024",
         "agrosavia-controladores-biologicos-2017"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "lecanicillium_lecanii",
@@ -260,7 +276,8 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "ica-registro-bioinsumos-2024"
-      ]
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "heterorhabditis_indica",
@@ -279,7 +296,8 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "ica-registro-bioinsumos-2024"
-      ]
+      ],
+      "validation_level": "claude_draft"
     }
   ],
   "plaga_controlador": [
