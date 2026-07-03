@@ -90,7 +90,7 @@ const TABS = [
  * SectionCard — card de sección con encabezado (chip de ícono + título) y
  * descripción opcional. Radio/sombra desde tokens.css (--r-lg / --sombra-1).
  */
-function SectionCard({ icon: Icon, iconClass = 'text-emerald-400', iconBgClass = 'bg-emerald-900/40 border-emerald-700/40', title, hint, children, className = '' }) {
+function SectionCard({ icon: Icon, iconClass = 'text-emerald-400', iconBgClass = 'bg-emerald-900/40 border-emerald-700/40', title, hint = null, children, className = '' }) {
   return (
     <section
       className={`bg-slate-900/40 border border-slate-800 p-5 space-y-4 ${className}`}
@@ -120,7 +120,7 @@ function SectionCard({ icon: Icon, iconClass = 'text-emerald-400', iconBgClass =
  * La transición del knob queda cubierta por el guard global de
  * prefers-reduced-motion (index.css).
  */
-function Toggle({ checked, onClick, activeClass = 'bg-emerald-600', ariaLabel, testId }) {
+function Toggle({ checked, onClick = undefined, activeClass = 'bg-emerald-600', ariaLabel = undefined, testId = undefined }) {
   return (
     <button
       type="button"
@@ -149,7 +149,7 @@ function Toggle({ checked, onClick, activeClass = 'bg-emerald-600', ariaLabel, t
  * burbujea a la fila, por eso el handler vive solo en la fila (sin doble
  * disparo). El botón role=switch sigue siendo el control accesible/focusable.
  */
-function ToggleRow({ title, desc, checked, onClick, activeClass, ariaLabel, testId }) {
+function ToggleRow({ title, desc = null, checked, onClick, activeClass = undefined, ariaLabel = undefined, testId = undefined }) {
   return (
     // El control accesible es el Toggle interno (role=switch, focusable, con
     // aria-label); la fila solo amplía el área táctil y el click del botón
