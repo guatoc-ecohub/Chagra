@@ -491,6 +491,35 @@
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
   }
+
+  /* ---------------------------------------------------------------------------
+   * TOUCH TARGET DE CAMPO (a11y 2026-07-03 — dedos grandes, sol, guantes).
+   * Área táctil mínima 44×44px (WCAG 2.5.5 / guías iOS-Android) SIN cambiar el
+   * tamaño visual ni el layout: un pseudo-elemento absoluto centrado extiende
+   * el hit-area del control. Aditivo y reutilizable: aplicá `.tap-target` a
+   * cualquier botón/enlace chico (chips, "x" de limpiar, links de badge).
+   * No usar en contenedores con hijos interactivos propios (taparía sus taps).
+   * ------------------------------------------------------------------------- */
+  .tap-target {
+    position: relative;
+  }
+  /* Si el elemento YA está posicionado (chips absolutos como la "x" del
+   * buscador), conservar su posicionamiento — el ::after funciona igual. */
+  .tap-target.absolute {
+    position: absolute;
+  }
+  .tap-target.fixed {
+    position: fixed;
+  }
+  .tap-target::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
 }
 
 /* ===========================================================================

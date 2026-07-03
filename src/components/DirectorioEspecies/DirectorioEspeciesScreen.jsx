@@ -93,7 +93,7 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
             type="button"
             onClick={backToSearch}
             aria-label="Volver a la búsqueda"
-            className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center shrink-0"
+            className="w-11 h-11 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center shrink-0"
           >
             <ChevronLeft size={20} />
           </button>
@@ -119,7 +119,7 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
             type="button"
             onClick={onBack}
             aria-label="Volver"
-            className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center shrink-0"
+            className="w-11 h-11 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center shrink-0"
           >
             <ChevronLeft size={20} />
           </button>
@@ -152,7 +152,7 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
               type="button"
               onClick={() => { setQuery(''); setResults([]); }}
               aria-label="Limpiar búsqueda"
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full hover:bg-slate-800 flex items-center justify-center text-slate-400"
+              className="tap-target absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full hover:bg-slate-800 flex items-center justify-center text-slate-400"
             >
               <X size={16} />
             </button>
@@ -204,7 +204,7 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
                         <span className="jp-tinta-suave block text-xs italic text-slate-400 leading-tight truncate">{r.cientifico}</span>
                       )}
                       {r.familia && (
-                        <span className="jp-tinta-suave block text-[10px] text-slate-500 leading-tight">{r.familia}</span>
+                        <span className="jp-tinta-suave block text-[11px] text-slate-400 leading-tight">{r.familia}</span>
                       )}
                     </span>
                   </button>

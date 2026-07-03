@@ -100,7 +100,7 @@ export default function SpeciesFicha({ ficha, onSelectSpecies }) {
                   {b.nombre}
                 </p>
                 {b.tipo && (
-                  <span className="text-[10px] uppercase tracking-wide text-teal-400/80">{b.tipo}</span>
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-teal-300">{b.tipo}</span>
                 )}
                 {b.dosis && (
                   <p className="text-xs text-slate-300 mt-1"><span className="font-semibold text-slate-200">Dosis:</span> {b.dosis}</p>
@@ -109,7 +109,7 @@ export default function SpeciesFicha({ ficha, onSelectSpecies }) {
                   <p className="text-xs text-slate-400 mt-0.5">{b.uso}</p>
                 )}
                 {!b.enCatalogo && (
-                  <p className="text-[10px] text-slate-500 italic mt-0.5">Receta detallada no curada en el catálogo todavía.</p>
+                  <p className="text-[11px] text-slate-400 italic mt-0.5">Receta detallada no curada en el catálogo todavía.</p>
                 )}
               </li>
             ))}
@@ -133,7 +133,7 @@ export default function SpeciesFicha({ ficha, onSelectSpecies }) {
                     ? <ShieldAlert size={14} className="text-rose-300 shrink-0" aria-hidden="true" />
                     : <Bug size={14} className="text-rose-300 shrink-0" aria-hidden="true" />}
                   {a.nombre}
-                  <span className="text-[10px] uppercase tracking-wide text-rose-400/70">{a.tipo}</span>
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-rose-300">{a.tipo}</span>
                 </p>
                 {a.controladores && a.controladores.length > 0 ? (
                   <p className="text-xs text-emerald-200/90 mt-1">
@@ -213,7 +213,7 @@ function SpeciesPhoto({ imagen, comun }) {
         />
         <path d="M60 105 L60 70" stroke="#065f46" strokeWidth="3" strokeLinecap="round" />
       </svg>
-      <p className="mt-1 flex items-center gap-1.5 text-[11px] text-emerald-200/70">
+      <p className="mt-1 flex items-center gap-1.5 text-xs text-emerald-200/70">
         <ImageOff size={12} aria-hidden="true" /> Sin foto en el catálogo todavía
       </p>
     </div>
@@ -256,7 +256,7 @@ function AssocGroup({ label, icon, tone, items, emptyText, onSelectSpecies }) {
       {list.length === 0 ? (
         <Empty>{emptyText}</Empty>
       ) : (
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {list.map((s) => {
             const clickable = s.enCatalogo && typeof onSelectSpecies === 'function';
             const content = (
@@ -270,12 +270,12 @@ function AssocGroup({ label, icon, tone, items, emptyText, onSelectSpecies }) {
                 key={s.id}
                 type="button"
                 onClick={() => onSelectSpecies(s.id)}
-                className={`px-2 py-1 rounded-md border text-[11px] leading-tight ${TONE} hover:brightness-125 transition`}
+                className={`min-h-[38px] px-3 py-1.5 rounded-lg border text-xs leading-tight ${TONE} hover:brightness-125 transition`}
               >
                 {content}
               </button>
             ) : (
-              <span key={s.id} className={`px-2 py-1 rounded-md border text-[11px] leading-tight ${TONE} opacity-90`}>
+              <span key={s.id} className={`inline-flex items-center px-3 py-1.5 rounded-lg border text-xs leading-tight ${TONE} opacity-90`}>
                 {content}
               </span>
             );

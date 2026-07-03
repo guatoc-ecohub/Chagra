@@ -678,6 +678,125 @@
 [data-theme="minimalista"] .bg-amber-400\/10,
 [data-theme="verde-vivo"] .bg-amber-400\/10{ background-color: rgb(245 158 11 / 0.16) !important; }
 
+/* ───────────────────────────────────────────────────────────────────────────
+ * §3d. FAMILIAS ESTÁTICAS RESTANTES en temas claros (a11y campo 2026-07-03).
+ * Pantallas de alto tráfico auditadas con sonda WCAG: Directorio de especies
+ * (SpeciesFicha/PisoTermicoBand: teal/rose/orange/indigo), Agente (badges de
+ * fuente de ChatBubble: green/red/sky ya cubierto), Home/Dashboard
+ * (AIStatusFooter/SensorInsightCard/FincaCards: cyan/blue/pink/indigo/teal).
+ * Esas familias NO están en la indirección --c-* (solo slate/emerald/amber),
+ * así que texto -100/-200/-300 claro + tinte bg-*-950/xx o bg-*-500/20 quedaba
+ * claro-sobre-claro (medido 1.0–1.7:1) en los 3 temas claros. Mismo patrón que
+ * el bloque de chips de arriba: texto al tono -800 del MISMO color (conserva
+ * la semántica; 4.8–7.4:1 medido sobre crema/tinte) y tintes oscuros -950/xx
+ * aligerados a un velo claro. Biopunk (oscuro, sin data-theme) NO se toca. */
+
+/* Texto claro → tono -800/-700 de su propia familia (AA sobre crema/papel). */
+[data-theme="nature"] .text-teal-100,
+[data-theme="minimalista"] .text-teal-100,
+[data-theme="verde-vivo"] .text-teal-100,
+[data-theme="nature"] .text-teal-300,
+[data-theme="minimalista"] .text-teal-300,
+[data-theme="verde-vivo"] .text-teal-300{ color: rgb(17 94 89) !important; text-shadow: none !important; }
+[data-theme="nature"] .text-teal-400\/80,
+[data-theme="minimalista"] .text-teal-400\/80,
+[data-theme="verde-vivo"] .text-teal-400\/80{ color: rgb(15 118 110) !important; text-shadow: none !important; }
+[data-theme="nature"] .text-rose-100,
+[data-theme="minimalista"] .text-rose-100,
+[data-theme="verde-vivo"] .text-rose-100,
+[data-theme="nature"] .text-rose-300,
+[data-theme="minimalista"] .text-rose-300,
+[data-theme="verde-vivo"] .text-rose-300,
+[data-theme="nature"] .text-rose-400\/70,
+[data-theme="minimalista"] .text-rose-400\/70,
+[data-theme="verde-vivo"] .text-rose-400\/70{ color: rgb(159 18 57) !important; text-shadow: none !important; }
+[data-theme="nature"] .text-orange-200,
+[data-theme="minimalista"] .text-orange-200,
+[data-theme="verde-vivo"] .text-orange-200{ color: rgb(154 52 18) !important; text-shadow: none !important; }
+[data-theme="nature"] .text-indigo-200,
+[data-theme="minimalista"] .text-indigo-200,
+[data-theme="verde-vivo"] .text-indigo-200,
+[data-theme="nature"] .text-indigo-300,
+[data-theme="minimalista"] .text-indigo-300,
+[data-theme="verde-vivo"] .text-indigo-300{ color: rgb(55 48 163) !important; text-shadow: none !important; }
+[data-theme="nature"] .text-cyan-200,
+[data-theme="minimalista"] .text-cyan-200,
+[data-theme="verde-vivo"] .text-cyan-200{ color: rgb(21 94 117) !important; text-shadow: none !important; }
+[data-theme="nature"] .text-green-300,
+[data-theme="minimalista"] .text-green-300,
+[data-theme="verde-vivo"] .text-green-300{ color: rgb(22 101 52) !important; text-shadow: none !important; }
+[data-theme="nature"] .text-red-200,
+[data-theme="minimalista"] .text-red-200,
+[data-theme="verde-vivo"] .text-red-200{ color: rgb(153 27 27) !important; text-shadow: none !important; }
+[data-theme="nature"] .text-blue-300,
+[data-theme="minimalista"] .text-blue-300,
+[data-theme="verde-vivo"] .text-blue-300{ color: rgb(30 64 175) !important; text-shadow: none !important; }
+[data-theme="nature"] .text-pink-300,
+[data-theme="minimalista"] .text-pink-300,
+[data-theme="verde-vivo"] .text-pink-300{ color: rgb(157 23 77) !important; text-shadow: none !important; }
+
+/* emerald -100 y variantes con alpha: los tokens claros de emerald-100/200 son
+ * VERDES PÁLIDOS (pensados como fill), como texto sobre crema no contrastan
+ * (medido 1.07–1.65). Al verde profundo del tema (AA, 7.2–10:1). */
+[data-theme="nature"] .text-emerald-100,
+[data-theme="minimalista"] .text-emerald-100,
+[data-theme="verde-vivo"] .text-emerald-100,
+[data-theme="nature"] .text-emerald-200\/90,
+[data-theme="minimalista"] .text-emerald-200\/90,
+[data-theme="verde-vivo"] .text-emerald-200\/90,
+[data-theme="nature"] .text-emerald-200\/70,
+[data-theme="minimalista"] .text-emerald-200\/70,
+[data-theme="verde-vivo"] .text-emerald-200\/70{ color: rgb(var(--c-emerald-700)) !important; text-shadow: none !important; }
+
+/* Tintes OSCUROS -950/xx (cards de biopreparados/amenazas/asociaciones de la
+ * ficha de especie): sobre crema sobrevivían como bloques oscuros Tailwind
+ * (no hay --c-*-950 para estas familias). → velo claro de la misma familia. */
+[data-theme="nature"] .bg-teal-950\/30,
+[data-theme="minimalista"] .bg-teal-950\/30,
+[data-theme="verde-vivo"] .bg-teal-950\/30{ background-color: rgb(20 184 166 / 0.12) !important; }
+[data-theme="nature"] .bg-rose-950\/20,
+[data-theme="minimalista"] .bg-rose-950\/20,
+[data-theme="verde-vivo"] .bg-rose-950\/20{ background-color: rgb(244 63 94 / 0.10) !important; }
+[data-theme="nature"] .bg-emerald-950\/30,
+[data-theme="minimalista"] .bg-emerald-950\/30,
+[data-theme="verde-vivo"] .bg-emerald-950\/30{ background-color: rgb(16 185 129 / 0.12) !important; }
+
+/* Rellenos /20 de chips en familias que faltaban (pisos térmicos, badge IA). */
+[data-theme="nature"] .bg-orange-500\/20,
+[data-theme="minimalista"] .bg-orange-500\/20,
+[data-theme="verde-vivo"] .bg-orange-500\/20{ background-color: rgb(249 115 22 / 0.14) !important; }
+[data-theme="nature"] .bg-indigo-500\/20,
+[data-theme="minimalista"] .bg-indigo-500\/20,
+[data-theme="verde-vivo"] .bg-indigo-500\/20{ background-color: rgb(99 102 241 / 0.14) !important; }
+[data-theme="nature"] .bg-cyan-500\/20,
+[data-theme="minimalista"] .bg-cyan-500\/20,
+[data-theme="verde-vivo"] .bg-cyan-500\/20{ background-color: rgb(6 182 212 / 0.14) !important; }
+
+/* Fallback "sin foto" de la ficha de especie: gradiente esmeralda-oscuro fijo
+ * → sobre los temas claros queda un bloque negro-verdoso. Anclado al testid
+ * (patrón §3c) para no arrastrar otros gradientes. */
+[data-theme="nature"] [data-testid="species-photo-fallback"],
+[data-theme="minimalista"] [data-testid="species-photo-fallback"],
+[data-theme="verde-vivo"] [data-testid="species-photo-fallback"]{
+  background-image: none !important;
+  background-color: rgb(var(--c-surface-raised)) !important;
+}
+
+/* Etiqueta de estrato del PisoTermicoBand (Directorio): texto blanco font-black
+ * sobre la franja de color del piso térmico. En biopunk la franja monta sobre
+ * fondo oscuro → blanco + sombra lee bien; en claros la franja translúcida
+ * aclara (blanco medía 1.7–2.1) → tinta oscura con halo claro. */
+.piso-band-label {
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+[data-theme="nature"] .piso-band-label,
+[data-theme="minimalista"] .piso-band-label,
+[data-theme="verde-vivo"] .piso-band-label{
+  color: rgb(30 26 12);
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.45);
+}
+
 /* Bordes blancos (sólidos y con opacidad) → línea sutil del tema. */
 [data-theme="minimalista"] .border-white,
 [data-theme="minimalista"] [class*="border-white\/"],

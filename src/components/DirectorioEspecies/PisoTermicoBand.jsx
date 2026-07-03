@@ -64,7 +64,7 @@ export default function PisoTermicoBand({ pisoTermico }) {
                   title={`${p.label} · ${p.minM}–${p.maxM} msnm`}
                 >
                   {active && (
-                    <span className="absolute inset-0 flex items-center justify-center text-[9px] font-black text-white/90 tracking-tight uppercase">
+                    <span className="piso-band-label absolute inset-0 flex items-center justify-center text-[10px] font-black tracking-tight uppercase">
                       {p.label}
                     </span>
                   )}
@@ -139,7 +139,7 @@ export default function PisoTermicoBand({ pisoTermico }) {
             return (
               <span
                 key={z}
-                className={`px-2 py-0.5 rounded-md border text-[11px] font-bold ${tone.chip}`}
+                className={`px-2.5 py-1 rounded-md border text-xs font-bold ${tone.chip}`}
               >
                 {ZONE_LABEL[z] || z}
               </span>
