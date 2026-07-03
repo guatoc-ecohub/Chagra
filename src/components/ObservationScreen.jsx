@@ -35,6 +35,7 @@ const RAG_SUGGEST_SHOW_LIMIT = 3;
 const RAG_PASSAGE_EXCERPT_LEN = 220;
 
 function ObservationScreen({ onBack, onSave }) {
+  /** @type {{ date: string, observationType: string, description: string, locationId: string, plantId: string, severity: string, notes?: string }} */
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     observationType: 'general',
@@ -46,6 +47,7 @@ function ObservationScreen({ onBack, onSave }) {
   const [photo, setPhoto] = useState(null);
   const [photoUrl, setPhotoUrl] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  /** @type {{ description?: boolean, date?: boolean }} */
   const [touched, setTouched] = useState({});
   // Audit 070.6 — modal payload tras éxito en severity high/critical.
   // Shape: { logId, severity, description, speciesSlug, plantId, landId }.
@@ -64,6 +66,7 @@ function ObservationScreen({ onBack, onSave }) {
   // Bug 069.10 — validación inline para description + date. `locationId` no
   // tiene input en la UI todavía (queda en el handleSave check legacy) — no se
   // incluye acá para no deshabilitar el botón de forma permanente.
+  /** @type {{ description?: string, date?: string }} */
   const errors = useMemo(() => {
     const e = {};
     const today = new Date().toISOString().split('T')[0];
@@ -161,7 +164,7 @@ function ObservationScreen({ onBack, onSave }) {
     // → fallback 0.7 → reject > 2 MB.
     const compressed = await compressImage(file);
     if (!compressed.ok) {
-      if (compressed.reason === 'too_large') {
+      if ('reason' in compressed && compressed.reason === 'too_large') {
         window.dispatchEvent(new CustomEvent('chagraToast', {
           detail: { message: IMAGE_TOO_LARGE_MESSAGE },
         }));
@@ -322,7 +325,7 @@ function ObservationScreen({ onBack, onSave }) {
             onChange={handleInput}
             onBlur={() => markTouched('description')}
             aria-invalid={touched.description && !!errors.description}
-            rows="4"
+            rows={4}
             maxLength={MAX_DESCRIPTION_LEN}
             className={`p-4 rounded-xl bg-slate-900 border text-xl text-white min-h-[80px] ${
               touched.description && errors.description ? 'border-red-700' : 'border-slate-700'
@@ -448,7 +451,7 @@ function ObservationScreen({ onBack, onSave }) {
 
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Notas Adicionales</span>
-          <textarea name="notes" value={formData.notes} onChange={handleInput} rows="2" className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-xl text-white min-h-[80px]" />
+          <textarea name="notes" value={formData.notes ?? ''} onChange={handleInput} rows={2} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-xl text-white min-h-[80px]" />
         </label>
 
         <div className="flex flex-col gap-2">

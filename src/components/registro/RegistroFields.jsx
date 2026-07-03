@@ -37,6 +37,8 @@ export function FieldError({ children }) {
  * @param {string} [props.hint]
  * @param {import('react').ComponentType<{size?: number}>} [props.Icon]
  * @param {string} [props.error]
+ * @param {string} [props.name]
+ * @param {string} [props.placeholder]
  */
 export function TextField({ label, hint, Icon, error, ...rest }) {
   return (
@@ -58,6 +60,9 @@ export function TextField({ label, hint, Icon, error, ...rest }) {
  * @param {string} [props.hint]
  * @param {import('react').ComponentType<{size?: number}>} [props.Icon]
  * @param {string} [props.error]
+ * @param {string} [props.name]
+ * @param {string|number} [props.step]
+ * @param {string|number} [props.min]
  */
 export function NumberField({ label, hint, Icon, error, ...rest }) {
   return (
@@ -81,6 +86,7 @@ export function NumberField({ label, hint, Icon, error, ...rest }) {
  * @param {string} [props.hint]
  * @param {import('react').ComponentType<{size?: number}>} [props.Icon]
  * @param {string} [props.error]
+ * @param {string} [props.name]
  * @param {Array<{value: string, label: string}>} props.options
  * @param {string} [props.placeholder]
  */
@@ -109,6 +115,8 @@ export function SelectField({ label, hint, Icon, error, options, placeholder, ..
  * @param {string} [props.hint]
  * @param {import('react').ComponentType<{size?: number}>} [props.Icon]
  * @param {string} [props.error]
+ * @param {string} [props.name]
+ * @param {string|number} [props.rows]
  */
 export function TextAreaField({ label, hint, Icon, error, ...rest }) {
   return (

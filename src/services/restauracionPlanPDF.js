@@ -68,6 +68,7 @@ const PISO_LABELS = {
   paramo_3000: 'Páramo (más de 3000 msnm)',
 };
 
+/** @type {{ [key: string]: { label: string, color: [number, number, number] } }} */
 const NIVEL_INCENDIO = {
   alto: { label: 'ALTO', color: COLOR_RED },
   medio: { label: 'MEDIO', color: COLOR_AMBER },
@@ -162,20 +163,11 @@ const drawEspeciesRol = (doc, y, titulo, especies, subtitle) => {
 /**
  * Genera el PDF del plan de restauración en memoria → Blob application/pdf.
  *
- * @param {object} planData
- * @param {object} planData.diagnostico — salida de diagnosticarRestauracion():
- *   { arreglo, roles, especies, alertas[], guardas[], sin_datos, fuente }.
- * @param {object} [planData.finca]    - { nombre, municipio, vereda, altitud, departamento, coords }.
- * @param {string} [planData.operatorName]
- * @param {string} [planData.operatorRole]
- * @param {string} [planData.objetivo] - bosque|ribera|cortafuegos|post_incendio|paramo.
- * @param {string} [planData.descripcion] - lo que el usuario describió (talud, quebrada…).
- * @param {object} [planData.riesgoIncendio] - salida de evaluarRiesgoIncendio() (opcional).
- * @param {string} [planData.piso]     - clave de piso (calido_0_1000…) si el diag no la trae.
+ * @param {{ diagnostico?: object, finca?: object, operatorName?: string, operatorRole?: string, objetivo?: string, descripcion?: string, riesgoIncendio?: object|null, piso?: string }} planData
  * @returns {Blob} application/pdf
  */
 export const generateRestauracionPlanPDF = (planData) => {
-  const data = planData || {};
+  const data = planData || /** @type {{ diagnostico?: object, finca?: object, operatorName?: string, operatorRole?: string, objetivo?: string, descripcion?: string, riesgoIncendio?: object|null, piso?: string }} */({});
   const diag = data.diagnostico || {};
   const finca = data.finca || {};
   const especies = diag.especies || null;
@@ -413,7 +405,7 @@ function drawEspeciesRolNombres(doc, y, titulo, nombres, subtitle) {
 }
 
 /** Infiere la clave de piso desde la presencia de listas (best-effort). */
-function inferPisoFromEspecies() {
+function inferPisoFromEspecies(_especies, _roles) {
   return null; // el caller pasa data.piso explícito; este fallback evita adivinar mal.
 }
 

@@ -96,7 +96,7 @@ export function normalizePhenologyTemplate(template, speciesSlug = '') {
  * @param {string} [input.category] - categoría del catálogo para el genérico
  * @returns {(Object & {is_generic?: boolean})|null}
  */
-export function resolveTemplate({ speciesSlug, template, category } = {}) {
+export function resolveTemplate({ speciesSlug, template, category } = /** @type {{ speciesSlug: string, template?: any, category?: string }} */({})) {
   const explicit = normalizePhenologyTemplate(template, speciesSlug);
   if (explicit) return explicit;
 
@@ -122,7 +122,7 @@ export function resolveTemplate({ speciesSlug, template, category } = {}) {
  * @param {string} [input.category] - categoría del catálogo para el genérico por tipo
  * @returns {PhenologyWindow[]}
  */
-export function calculateWindows({ speciesSlug, sowingDate, altitudeM, template: inputTemplate, category } = {}) {
+export function calculateWindows({ speciesSlug, sowingDate, altitudeM, template: inputTemplate, category } = /** @type {{ speciesSlug: string, sowingDate: number, altitudeM?: number, template?: any, category?: string }} */({})) {
   const template = resolveTemplate({ speciesSlug, template: inputTemplate, category });
   const isGeneric = !!(template && template.is_generic);
 
@@ -217,10 +217,12 @@ export function calculateWindows({ speciesSlug, sowingDate, altitudeM, template:
  * @param {string} input.speciesSlug
  * @param {number} input.sowingDate — timestamp ms del evento de siembra
  * @param {number} [input.altitudeM]
+ * @param {Object} [input.template] - plantilla explícita (sin normalizar)
+ * @param {string} [input.category] - categoría del catálogo para el genérico por tipo
  * @param {number} [input.now=Date.now()] - timestamp ms para el cual calcular la etapa
  * @returns {CurrentStageResult|null}
  */
-export function getCurrentStage({ speciesSlug, sowingDate, altitudeM, now, template, category } = {}) {
+export function getCurrentStage({ speciesSlug, sowingDate, altitudeM, now, template, category } = /** @type {{ speciesSlug: string, sowingDate: number, altitudeM?: number, now?: number, template?: any, category?: string }} */({})) {
   const windows = calculateWindows({ speciesSlug, sowingDate, altitudeM, template, category });
 
   if (!windows.length || (windows.length === 1 && windows[0].status !== 'computed')) {
@@ -264,11 +266,13 @@ export function getCurrentStage({ speciesSlug, sowingDate, altitudeM, now, templ
  * @param {string} input.speciesSlug
  * @param {number} input.sowingDate — timestamp ms de la siembra (created_at)
  * @param {number} [input.altitudeM]
+ * @param {Object} [input.template] - plantilla explícita (sin normalizar)
+ * @param {string} [input.category] - categoría del catálogo para el genérico por tipo
  * @param {number} [input.now=Date.now()]
  * @param {string} [input.fallback='sowing_confirmed'] - etapa si no se puede derivar
  * @returns {string} código de etapa (ej. 'vegetative', 'flowering', 'sowing_confirmed')
  */
-export function deriveCurrentStage({ speciesSlug, sowingDate, altitudeM, now, template, category, fallback = 'sowing_confirmed' } = {}) {
+export function deriveCurrentStage({ speciesSlug, sowingDate, altitudeM, now, template, category, fallback = 'sowing_confirmed' } = /** @type {{ speciesSlug: string, sowingDate: number, altitudeM?: number, now?: number, template?: any, category?: string, fallback?: string }} */({})) {
   let result = null;
   try {
     result = getCurrentStage({ speciesSlug, sowingDate, altitudeM, now, template, category });

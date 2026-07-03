@@ -196,7 +196,7 @@ export function espaciosUsadosParcela(parcela) {
  * @returns {boolean}
  */
 export function cabeCultivoEnParcela(parcela, cultivoId) {
-  const valido = Object.values(CULTIVOS).includes(cultivoId);
+  const valido = /** @type {string[]} */ (Object.values(CULTIVOS)).includes(cultivoId);
   if (!valido) return false;
   if (parcela.cultivos.includes(cultivoId)) return true;
 
@@ -213,7 +213,7 @@ export function cabeCultivoEnParcela(parcela, cultivoId) {
  * @returns {{ id: string, cultivos: string[], motivo?: string }} nueva parcela
  */
 export function sembrarEnParcela(parcela, cultivoId) {
-  const valido = Object.values(CULTIVOS).includes(cultivoId);
+  const valido = /** @type {string[]} */ (Object.values(CULTIVOS)).includes(cultivoId);
   if (!valido) return parcela;
   const tiene = parcela.cultivos.includes(cultivoId);
   if (!tiene && !cabeCultivoEnParcela(parcela, cultivoId)) {
@@ -276,7 +276,7 @@ export function describirAsociacionCompleta(tipo) {
  * @returns {number}
  */
 export function diversidadParcela(parcela) {
-  const set = new Set(parcela.cultivos.filter((c) => Object.values(CULTIVOS).includes(c)));
+  const set = new Set(parcela.cultivos.filter((c) => /** @type {string[]} */ (Object.values(CULTIVOS)).includes(c)));
   return set.size;
 }
 
@@ -303,7 +303,7 @@ export function nitrogenoFijado(parcela) {
     CULTIVOS.MANI_FORRAJERO,
   ];
 
-  const legumsPresentes = parcela.cultivos.filter(c => leguminosas.includes(c));
+  const legumsPresentes = parcela.cultivos.filter(c => /** @type {string[]} */ (leguminosas).includes(c));
 
   if (legumsPresentes.length === 0) return 0;
 
@@ -345,7 +345,7 @@ export function nitrogenoFijado(parcela) {
  */
 export function sombraParcela(parcela) {
   const arboles = [CULTIVOS.GUAMO, CULTIVOS.MATARRATON, CULTIVOS.PLATANO, CULTIVOS.FRUTAL];
-  const arbolesPresentes = parcela.cultivos.filter(c => arboles.includes(c));
+  const arbolesPresentes = parcela.cultivos.filter(c => /** @type {string[]} */ (arboles).includes(c));
 
   if (arbolesPresentes.length === 0) return 0;
 
@@ -382,7 +382,7 @@ export function sombraParcela(parcela) {
  */
 export function coberturaSuelo(parcela) {
   const coberturas = [CULTIVOS.AHUYAMA, CULTIVOS.MANI_FORRAJERO];
-  const presentes = parcela.cultivos.filter(c => coberturas.includes(c));
+  const presentes = parcela.cultivos.filter(c => /** @type {string[]} */ (coberturas).includes(c));
 
   if (presentes.length === 0) return 0;
 
@@ -443,8 +443,8 @@ export function haySoporteFisico(parcela) {
   const arboles = [CULTIVOS.GUAMO, CULTIVOS.MATARRATON, CULTIVOS.PLATANO, CULTIVOS.FRUTAL];
   const cultivosPequenos = [CULTIVOS.CAFE, CULTIVOS.CACAO, CULTIVOS.CEBOLLA, CULTIVOS.ZANAHORIA];
 
-  const hayArbol = parcela.cultivos.some(c => arboles.includes(c));
-  const hayPequeno = parcela.cultivos.some(c => cultivosPequenos.includes(c));
+  const hayArbol = parcela.cultivos.some(c => /** @type {string[]} */ (arboles).includes(c));
+  const hayPequeno = parcela.cultivos.some(c => /** @type {string[]} */ (cultivosPequenos).includes(c));
 
   return hayArbol && hayPequeno;
 }
@@ -664,7 +664,7 @@ export const EVENTOS = Object.freeze([
  *   - Sistema completo → 0.25 (amortigua 75%)
  *
  * @param {{ cultivos: string[] }} parcela
- * @param {{ id: string }} evento
+ * @param {{ id?: string } | null} [evento]
  * @returns {number} factor multiplicador del daño (0–1)
  */
 export function factorResistencia(parcela, evento = null) {
@@ -854,7 +854,7 @@ export function aplicarEvento(parcela, evento) {
  *
  * @param {number} temporada - Número de temporada actual (1-3)
  * @param {Array} historico - Historial de eventos ya usados
- * @returns {{ id: string, nombre: string, emoji: string, dano: number, relacion: string, consejo: string }[]}
+ * @returns {{ id: string, nombre: string, emoji: string, dano: number, relacion: string, afectaA: string[] }[]}
  */
 export function elegirEventosPosibles(temporada, historico = []) {
   // Dificultad creciente por temporada
@@ -1027,6 +1027,7 @@ export function resumenFinca(parcelas) {
     return {
       parcelasSembradas: 0,
       asociacionesCompletas: 0,
+      milpasCompletas: 0,
       tiposAsociaciones: [],
       saludTotal: 0,
       saludPromedio: 0,

@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
 
 export const FARM_CONFIG = {
