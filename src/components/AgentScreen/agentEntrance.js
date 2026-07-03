@@ -143,6 +143,108 @@ export const AGENT_COMPOSITOR_CSS = `
     transition: opacity 0.25s ease, box-shadow 0.25s ease;
   }
   .as-send:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     V2 · MODOS Y HERRAMIENTAS — la bandeja de ~12 chips (ChipsToolbar) que antes
+     vivía SIEMPRE sobre el input y comía media pantalla en el celular se colapsa
+     en un DISPARADOR ETIQUETADO del compositor que TAMBIÉN muestra el modo
+     activo, y las sugerencias se abren en una GAVETA con scroll. Token-aware
+     (--c-*/--t-accent-rgb) → coherente en los 4 temas.
+     ══════════════════════════════════════════════════════════════════════════ */
+  .as-modos-pill {
+    flex: 0 1 auto; min-width: 0; height: 44px; max-width: 148px;
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 0 13px; border-radius: 22px;
+    background: rgb(var(--c-surface-raised, 30 41 59) / 0.9);
+    border: 1px solid rgb(var(--c-surface-border, 100 116 139) / 0.55);
+    color: rgb(var(--c-slate-300, 148 163 184)); cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  .as-modos-pill:hover {
+    color: rgb(var(--c-slate-100, 226 232 240));
+    border-color: rgb(var(--t-accent-rgb, 25 201 154) / 0.5);
+  }
+  .as-modos-pill:disabled { opacity: 0.4; cursor: not-allowed; }
+  .as-modos-pill.is-active {
+    background: rgb(var(--t-accent-rgb, 25 201 154) / 0.16);
+    border-color: rgb(var(--t-accent-rgb, 25 201 154) / 0.6);
+    color: rgb(var(--t-accent-rgb, 25 201 154));
+  }
+  .as-modos-pill-emoji { font-size: 16px; line-height: 1; flex: none; }
+  .as-modos-pill-txt {
+    min-width: 0; font-size: 13px; font-weight: 800; letter-spacing: 0.1px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .as-gaveta {
+    position: fixed; inset: 0; z-index: 60;
+    display: flex; flex-direction: column; justify-content: flex-end;
+  }
+  .as-gaveta-scrim {
+    position: absolute; inset: 0; border: 0; padding: 0; margin: 0; cursor: pointer;
+    background: rgba(6, 14, 11, 0.56);
+    -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+    animation: as-gaveta-fade 0.22s ease both;
+  }
+  .as-gaveta-panel {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 640px; margin: 0 auto;
+    max-height: min(68vh, 540px);
+    display: flex; flex-direction: column;
+    background: rgb(var(--c-surface-card, 17 24 39));
+    border: 1px solid rgb(var(--c-surface-border, 51 65 85));
+    border-bottom: 0; border-radius: 26px 26px 0 0;
+    box-shadow: 0 -20px 52px -16px rgba(0, 0, 0, 0.6);
+    padding: 8px 15px calc(env(safe-area-inset-bottom, 0px) + 16px);
+    animation: as-gaveta-rise 0.34s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+  .as-gaveta-grab {
+    width: 44px; height: 4px; border-radius: 999px; flex: none;
+    background: rgb(var(--c-slate-300, 148 163 184) / 0.5);
+    margin: 5px auto 10px;
+  }
+  .as-gaveta-head { display: flex; align-items: center; gap: 11px; margin-bottom: 6px; }
+  .as-gaveta-ico {
+    flex: none; width: 40px; height: 40px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgb(var(--t-accent-rgb, 25 201 154) / 0.16);
+    color: rgb(var(--t-accent-rgb, 25 201 154));
+    border: 1px solid rgb(var(--t-accent-rgb, 25 201 154) / 0.3);
+  }
+  .as-gaveta-titwrap { flex: 1; min-width: 0; }
+  .as-gaveta-titwrap h2 {
+    font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+    font-weight: 800; font-size: 17px; letter-spacing: -0.3px; line-height: 1.1;
+    color: rgb(var(--c-slate-100, 241 245 249));
+  }
+  .as-gaveta-titwrap p {
+    font-size: 12px; line-height: 1.3; margin-top: 2px;
+    color: rgb(var(--c-slate-400, 148 163 184));
+  }
+  .as-gaveta-close {
+    flex: none; width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: rgb(var(--c-surface-raised, 30 41 59));
+    border: 1px solid rgb(var(--c-surface-border, 51 65 85));
+    color: rgb(var(--c-slate-300, 148 163 184)); cursor: pointer;
+    transition: color 0.18s ease, border-color 0.18s ease;
+  }
+  .as-gaveta-close:hover {
+    color: rgb(var(--c-slate-100, 241 245 249));
+    border-color: rgb(var(--t-accent-rgb, 25 201 154) / 0.5);
+  }
+  .as-gaveta-body { overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+  .as-gaveta-body .agent-chip-tray {
+    background: transparent !important; border-top: 0 !important;
+    -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+    padding: 2px 2px;
+  }
+  @keyframes as-gaveta-rise { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  @keyframes as-gaveta-fade { from { opacity: 0; } to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    .as-gaveta-panel, .as-gaveta-scrim { animation: none !important; }
+    .as-modos-pill { transition: none; }
+  }
   @keyframes as-send-shimmer {
     0%   { transform: translateX(-130%); opacity: 0; }
     25%  { opacity: 1; }

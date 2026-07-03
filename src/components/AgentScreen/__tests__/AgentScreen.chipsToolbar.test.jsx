@@ -396,25 +396,33 @@ describe('AgentScreen - chips toolbar', () => {
     vi.clearAllMocks();
   });
 
-  it('monta la barra de chips junto al input y cambia la intencion al tocar un chip', async () => {
+  it('V2: colapsa la bandeja en la gaveta; el disparador etiquetado la abre y elegir un modo lo fuerza y lo muestra', async () => {
     render(<AgentScreen onBack={() => {}} />);
 
-    await waitFor(() => {
-      expect(screen.getByTestId('chips-toolbar')).toBeInTheDocument();
-    });
+    // El disparador etiquetado vive en el compositor; la gaveta arranca CERRADA
+    // (el chat recupera el alto). ChipsToolbar NO está montada hasta abrirla.
+    const trigger = await screen.findByTestId('agent-modos-trigger');
+    expect(trigger).toHaveTextContent('Modos');
+    expect(screen.queryByTestId('chips-toolbar')).not.toBeInTheDocument();
 
-    const toolbar = screen.getByTestId('chips-toolbar');
-    const input = screen.getByTestId('agent-input');
-    expect(toolbar.compareDocumentPosition(input) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
-
+    // Abrir la gaveta → la bandeja aparece con sus chips.
+    fireEvent.click(trigger);
+    const toolbar = await screen.findByTestId('chips-toolbar');
     expect(toolbar).toHaveTextContent('Biopreparado');
-    const biopreparadoChip = screen.getByRole('button', { name: /biopreparado/i });
-    fireEvent.click(biopreparadoChip);
 
-    expect(biopreparadoChip).toHaveAttribute('aria-pressed', 'true');
+    // Elegir un modo lo fuerza: cambia el placeholder del input, cierra la gaveta
+    // y el disparador pasa a MOSTRAR el modo activo (el chip queda desmontado al
+    // cerrar, por eso verificamos el efecto persistente, no aria-pressed).
+    fireEvent.click(screen.getByRole('button', { name: /biopreparado/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('chips-toolbar')).not.toBeInTheDocument();
+    });
     expect(screen.getByTestId('agent-input')).toHaveAttribute(
       'placeholder',
       'Escribe para que plaga o planta quieres el biopreparado',
     );
+    expect(screen.getByTestId('agent-modos-trigger')).toHaveTextContent('Biopreparado');
+    expect(screen.getByTestId('agent-modos-trigger').className).toMatch(/is-active/);
   });
 });

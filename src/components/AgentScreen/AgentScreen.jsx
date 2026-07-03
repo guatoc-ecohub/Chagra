@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw, X, Home, Camera, Square } from 'lucide-react';
+import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw, X, Home, Camera, Square, Wrench } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { transcribe, queueForRetry } from '../../services/voiceService';
 import VoiceStatusStrip from './VoiceStatusStrip';
@@ -296,6 +296,12 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // La MANO de Chagra (AgentRedMenu) — MISMA red que el home, no menús de texto.
   // sheetOpen monta/desmonta el overlay de la mano (AgentManoOverlay).
   const [sheetOpen, setSheetOpen] = useState(false);
+  // V2 — Gaveta de MODOS/HERRAMIENTAS. La bandeja de ~12 chips (ChipsToolbar) ya
+  // no vive sobre el input; se colapsa en un disparador ETIQUETADO del compositor
+  // que también MUESTRA el modo activo, y las sugerencias se abren en una gaveta
+  // (bottom-sheet) con scroll. Solo estado de presentación; el ruteo sigue en
+  // ChipsToolbar → onSelectIntent → setActiveIntent.
+  const [modosSheetOpen, setModosSheetOpen] = useState(false);
   // Fase del compositor para la animación shimmer/lift al enviar.
   const [composerPhase, setComposerPhase] = useState('idle'); // 'idle' | 'sending'
   // Deep Research (A6/A7): refs para los AbortControllers de los jobs en vuelo.
@@ -3046,9 +3052,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
 
   // CHIPS DE MODO (A4): placeholder guía según el modo activo. Sin modo →
   // placeholder genérico. Español colombiano (tú/usted), nunca voseo.
-  const activePlaceholder = activeIntent
-    ? (CHIP_DEFS.find((c) => c.intent === activeIntent)?.placeholder || 'Escribe tu pregunta...')
-    : 'Escribe tu pregunta...';
+  const activeChipDef = activeIntent
+    ? (CHIP_DEFS.find((c) => c.intent === activeIntent) || null)
+    : null;
+  const activePlaceholder = activeChipDef?.placeholder || 'Escribe tu pregunta...';
 
   // PIEL POR TEMA del botón enviar (Fase 2 de temas). Con la flag ON y el botón
   // habilitado (hay texto/adjunto y no se está grabando ni hay cola), aplicamos
@@ -3358,16 +3365,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           onDismissNotice={() => setVoiceNotice('')}
         />
 
-        <ChipsToolbar
-          activeIntent={activeIntent}
-          hasAttachment={Boolean(agentAttachment)}
-          disabled={state === STATE_RECORDING || queuePending.length >= 1}
-          isPro={isPro}
-          chipDefs={profileChipDefs}
-          onSelectIntent={(intent) => {
-            setActiveIntent((current) => (current === intent ? null : intent));
-          }}
-        />
+        {/* V2: la bandeja de ~12 chips (ChipsToolbar) ya NO vive inline sobre el
+            input — ahogaba el chat. Se colapsó en el disparador etiquetado de la
+            gaveta (fila del compositor de abajo), que además muestra el modo
+            activo. Misma data y ruteo (ChipsToolbar en la gaveta). */}
 
         {/* Pill — unified with AgentHero (as-bar CSS tokens) */}
         <div
@@ -3461,6 +3462,26 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               <Camera size={19} strokeWidth={2} aria-hidden="true" />
             </button>
 
+            {/* V2 — Disparador ETIQUETADO de la gaveta de modos. Colapsa la
+                bandeja de ~12 chips y DOBLA como indicador del modo activo: sin
+                modo dice "Modos"; con un modo muestra su emoji + etiqueta. Abre
+                la gaveta (bottom-sheet) de más abajo. */}
+            <button
+              type="button"
+              onClick={() => setModosSheetOpen(true)}
+              disabled={state === STATE_RECORDING}
+              aria-label={activeChipDef ? `Modo activo: ${activeChipDef.label}. Abrir modos y herramientas` : 'Modos y herramientas del agente'}
+              aria-haspopup="dialog"
+              aria-expanded={modosSheetOpen}
+              data-testid="agent-modos-trigger"
+              className={['as-modos-pill', activeChipDef ? 'is-active' : ''].join(' ')}
+            >
+              {activeChipDef
+                ? <span className="as-modos-pill-emoji" aria-hidden="true">{activeChipDef.emoji}</span>
+                : <Wrench size={16} strokeWidth={2.2} aria-hidden="true" />}
+              <span className="as-modos-pill-txt">{activeChipDef ? activeChipDef.label : 'Modos'}</span>
+            </button>
+
             <div className="flex-1" />
 
             {/* Micrófono (toggle) — GRANDE (TIER 2 #5): el camino principal
@@ -3527,6 +3548,59 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             quitar los chips/líneas de sugerencia que ensucian la pantalla del
             agente. El acceso a capacidades queda por la mano de Chagra (botón
             Ⓐ del compositor + botón de la pantalla vacía). */}
+
+        {/* ── V2 · GAVETA DE MODOS Y HERRAMIENTAS ─────────────────────────────
+            Colapsa la bandeja de ~12 chips (ChipsToolbar) que ahogaba el chat.
+            Misma data y ruteo; solo cambia el contenedor: una gaveta con scroll
+            que se cierra al elegir o al tocar afuera. Con la gaveta cerrada el
+            chat tiene el alto completo. */}
+        {modosSheetOpen && (
+          <div
+            className="as-gaveta"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Modos y herramientas del agente"
+            data-testid="agent-modos-sheet"
+          >
+            <button
+              type="button"
+              className="as-gaveta-scrim"
+              aria-label="Cerrar modos y herramientas"
+              onClick={() => setModosSheetOpen(false)}
+            />
+            <div className="as-gaveta-panel">
+              <span className="as-gaveta-grab" aria-hidden="true" />
+              <div className="as-gaveta-head">
+                <span className="as-gaveta-ico" aria-hidden="true"><Wrench size={17} strokeWidth={2.2} /></span>
+                <div className="as-gaveta-titwrap">
+                  <h2>Modos y herramientas</h2>
+                  <p>Toca un modo y Chagra va directo al grano.</p>
+                </div>
+                <button
+                  type="button"
+                  className="as-gaveta-close"
+                  onClick={() => setModosSheetOpen(false)}
+                  aria-label="Cerrar"
+                >
+                  <X size={18} aria-hidden="true" />
+                </button>
+              </div>
+              <div className="as-gaveta-body">
+                <ChipsToolbar
+                  activeIntent={activeIntent}
+                  hasAttachment={Boolean(agentAttachment)}
+                  disabled={state === STATE_RECORDING || queuePending.length >= 1}
+                  isPro={isPro}
+                  chipDefs={profileChipDefs}
+                  onSelectIntent={(intent) => {
+                    setActiveIntent((current) => (current === intent ? null : intent));
+                    setModosSheetOpen(false);
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Input oculto de foto */}
         <input

@@ -492,6 +492,30 @@
     backdrop-filter: blur(12px);
   }
 
+  /* ─────────────────────────────────────────────────────────────────────────
+   * V2 · BURBUJAS DE CHAT THEME-NATIVE. En vez de un slate oscuro fijo, la
+   * burbuja toma la PIEL del tema: papel cálido en nature/minimalista/verde-vivo,
+   * vidrio oscuro en biopunk. Así el chat se lee como "cuaderno de campo" al sol
+   * y como panel nocturno en biopunk — coherente en los 4 temas, legible siempre.
+   * ------------------------------------------------------------------------- */
+  .chatb-agent {
+    background-color: rgb(var(--c-surface-card));
+    color: rgb(var(--c-slate-100));
+    border: 1px solid rgb(var(--c-surface-border));
+    box-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.45);
+  }
+  /* Filo de "renglón" del cuaderno + realce de grounding cuando la respuesta
+   * viene del catálogo. */
+  .chatb-agent[data-grounded="true"] {
+    border-left: 3px solid rgb(var(--c-emerald-500) / 0.9);
+  }
+  .chatb-user {
+    background-color: rgb(var(--c-emerald-600));
+    color: #fff;
+    border: 1px solid rgb(var(--c-emerald-500) / 0.45);
+    box-shadow: 0 6px 18px -10px rgb(var(--c-emerald-700) / 0.6);
+  }
+
   /* ---------------------------------------------------------------------------
    * TOUCH TARGET DE CAMPO (a11y 2026-07-03 — dedos grandes, sol, guantes).
    * Área táctil mínima 44×44px (WCAG 2.5.5 / guías iOS-Android) SIN cambiar el

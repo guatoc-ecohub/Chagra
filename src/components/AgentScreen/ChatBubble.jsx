@@ -333,8 +333,8 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
   };
 
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3.5`}>
-      <div className={`flex gap-2 max-w-[85%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
+      <div className={`flex gap-2.5 max-w-[86%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
         {isUser ? (
           <div className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-emerald-600 ring-1 ring-emerald-400/40 shadow-sm shadow-emerald-950/30">
             <User size={16} className="text-white" />
@@ -342,20 +342,20 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
         ) : (
           <div
             className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center bg-slate-900 border overflow-hidden ${
-              isStreaming ? 'border-amber-400/60 shadow-[0_0_10px_rgba(245,158,11,.4)]' : 'border-emerald-700/40'
+              isStreaming ? 'border-amber-400/60 shadow-[0_0_12px_rgba(245,158,11,.42)]' : 'border-emerald-600/45'
             }`}
           >
             <ChagraAgentAvatar state={agentState} size={32} ariaLabel="Chagra IA" />
           </div>
         )}
 
+        {/* V2: burbuja THEME-NATIVE (papel en temas claros, vidrio en biopunk)
+            via .chatb-agent/.chatb-user (index.css, tokens). */}
         <div
-          className={`rounded-2xl px-4 py-3 shadow-md ${
+          className={`rounded-[20px] px-4 py-3 ${
             isUser
-              ? 'bg-emerald-700/70 text-white rounded-tr-md border border-emerald-500/25 shadow-emerald-950/25'
-              : `bg-slate-800/90 text-slate-100 rounded-tl-md border border-slate-700/60 shadow-slate-950/30 cursor-pointer${
-                  isGrounded ? ' border-l-2 border-l-emerald-400/70' : ''
-                }`
+              ? 'chatb-user rounded-tr-md'
+              : `chatb-agent rounded-tl-md cursor-pointer`
           }`}
           data-grounded={isGrounded ? 'true' : undefined}
           onDoubleClick={handleBubbleDoubleClick}
