@@ -598,7 +598,10 @@
         "coffea_arabica",
         "erythrina_edulis",
         "lupinus_mutabilis",
-        "trifolium_repens"
+        "oreopanax_floribundum",
+        "passiflora_tripartita_mollissima",
+        "trifolium_repens",
+        "vicia_faba"
       ],
       "antagonists": [],
       "recommended_covers": [
@@ -3032,15 +3035,17 @@
       },
       "companions": [
         "alnus_acuminata",
+        "cajanus_cajan",
+        "cedrela_odorata",
+        "ceiba_pentandra",
+        "cordia_alliodora",
         "erythrina_edulis",
         "inga_edulis",
-        "cedrela_odorata",
-        "cordia_alliodora",
-        "swietenia_macrophylla",
-        "tabebuia_rosea",
-        "tabebuia_chrysantha",
         "musa_paradisiaca",
-        "cajanus_cajan"
+        "oreopanax_floribundum",
+        "swietenia_macrophylla",
+        "tabebuia_chrysantha",
+        "tabebuia_rosea"
       ],
       "companions_con_advertencia": [
         "aniba_perutilis",
@@ -3191,12 +3196,13 @@
       },
       "companions": [
         "cedrela_odorata",
+        "ceiba_pentandra",
         "coffea_arabica",
         "erythrina_edulis",
         "inga_edulis",
         "swietenia_macrophylla",
-        "tabebuia_rosea",
-        "tabebuia_chrysantha"
+        "tabebuia_chrysantha",
+        "tabebuia_rosea"
       ],
       "antagonists": [],
       "manejo_por_escala": {
@@ -3611,7 +3617,10 @@
       "tracking_mode": "aggregate",
       "graph_export_meta": {
         "already_in_seed": true
-      }
+      },
+      "companions": [
+        "allium_sativum"
+      ]
     },
     {
       "id": "desmodium_intortum",
@@ -5242,11 +5251,12 @@
       "valor_pedagogico": "La yuca brava amazónica o mandioca amarga (Manihot esculenta Crantz, familia Euphorbiaceae) es un arbusto leñoso (2-4 m altura) nativo de las tierras bajas de Sudamérica tropical, domesticada hace 8.000-10.000 años en el sudoeste de la cuenca amazónica (frontera Brasil-Bolivia, área de Rondônia) según evidencia arqueobotánica y genética (Olsen & Schaal 1999), considerada la cuarta fuente de carbohidratos para la humanidad después del arroz, el trigo y el maíz, y la base alimentaria milenaria de los pueblos amazónicos colombianos (tikuna, huitoto, bora, miraña, muinane, andoke, ocaina, yagua, kichwa, siona, kofán, secoya, inga, kamëntsá, makuna, yukpa, sikuani, piaroa). Existen dos grupos varietales tradicionales bien diferenciados: yuca dulce (mansa, bajo contenido de glucósidos cianogénicos <50 mg HCN/kg, consumo directo cocida) y yuca brava o amarga (alto contenido cianogénico 100-500 mg HCN/kg, requiere procesamiento elaborado para eliminar el ácido cianhídrico y transformarse en casabe, fariña o manicuera fermentada). El proceso tradicional indígena para procesar la yuca brava — rallado en tabla de aserrín de palma o concha, prensado en sebucán (cilindro tejido de palma con torsión gravitacional) para extraer el manipueira o yare (líquido amarillo cianhídrico tóxico), tamizado de la masa, tostado en budare o tiesto cerámico para hacer casabe (torta delgada) o fariña (granulado seco) — es uno de los logros etnoquímicos más sofisticados de la humanidad precolombina, comparable al procesamiento del maíz por nixtamalización mesoamericana. Lección viva: planta-pilar de la chagra amazónica colombiana que enseña cinco conceptos críticos: (1) la domesticación temprana de plantas tóxicas (yuca amarga) por pueblos amazónicos como ejemplo magistral de coevolución cultura-naturaleza, donde un cultivo venenoso se vuelve alimento básico mediante una tecnología procesual milenaria; (2) la diferencia entre yuca dulce y yuca brava como caso de selección artificial divergente — la yuca brava conserva su defensa cianogénica natural contra herbívoros y la cultura humana la procesa, mientras la yuca dulce ha perdido esa defensa por selección y se cultiva en zonas con menor presión de saqueo (ej. periurbano colombiano); (3) la chagra amazónica de yuca como sistema rotatorio milenario sostenible: tumba-pudre o slash-and-mulch, ciclo de 1-3 años de cultivo seguido de barbecho de 8-15 años, lección magistral de agricultura itinerante de bosque tropical sin uso de fuego en muchas variantes; (4) la soberanía alimentaria amazónica — el casabe y la fariña son alimentos vivos de la identidad cultural de pueblos como los huitoto, tikuna y bora, y la pérdida del manejo tradicional implica erosión cultural y genética simultánea (>200 variedades locales documentadas en chagras del trapecio amazónico colombiano por SINCHI); (5) la bioquímica defensiva vegetal: los glucósidos cianogénicos (linamarina, lotaustralina) liberan HCN al ser hidrolizados por la enzima linamarasa, lección de bioquímica de defensa estructural disociada espacialmente (los glucósidos en vacuola, la enzima en citoplasma, contacto solo al daño mecánico). Manejo agroecológico: siembra en chagras nuevas (tumba-pudre tradicional), asocio con plátano, piña, copoazú, ají, achiote, cocona; cosecha escalonada manual; cero agroquímicos; control biológico de Phenacoccus manihoti (cochinilla de la yuca) con Anagyrus lopezi (avispita brasileña). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Manual Frutales Tropicales, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía, FAO EcoCrop, Pérez-Arbeláez 1947.",
       "advertencia_toxicologica": "NUNCA consumir cruda variedades amargas (HCN 100-500 mg/kg → neurotoxicidad konzo, tropic ataxic neuropathy). Procesamiento tradicional obligatorio (rallado + prensado + tostado) elimina glucósidos cianogénicos. Variedades dulces (<50 mg HCN/kg) seguras tras cocción.",
       "companions": [
-        "zea_mays",
-        "phaseolus_vulgaris",
         "cajanus_cajan",
+        "cucurbita_maxima",
         "musa_paradisiaca",
-        "plukenetia_volubilis"
+        "phaseolus_vulgaris",
+        "plukenetia_volubilis",
+        "zea_mays"
       ],
       "plagas_criticas": [
         "Phenacoccus manihoti (cochinilla harinosa de la yuca, controlada biológicamente con Anagyrus lopezi)",
@@ -6718,11 +6728,13 @@
         "notas": "Altamente sensible a heladas; requiere protección o siembra en épocas seguras."
       },
       "companions": [
+        "cucumis_sativus",
+        "cucurbita_maxima",
         "lactuca_sativa_capitata",
-        "zea_mays",
-        "musa_paradisiaca",
         "manihot_esculenta",
-        "solanum_tuberosum"
+        "musa_paradisiaca",
+        "solanum_tuberosum",
+        "zea_mays"
       ],
       "antagonists": [
         "allium_fistulosum"
@@ -6856,9 +6868,7 @@
       "source_ids": [
         "graph_agrosavia_url_por_verificar_agroclima"
       ],
-      "companions": [
-        "solanum_tuberosum"
-      ],
+      "companions": [],
       "tracking_mode": "aggregate",
       "graph_export_meta": {
         "already_in_seed": false,
@@ -8098,8 +8108,10 @@
       },
       "companions": [
         "calendula_officinalis",
+        "cymbopogon_citratus",
         "lactuca_sativa_capitata",
         "melissa_officinalis",
+        "petroselinum_crispum",
         "urtica_dioica"
       ],
       "antagonists": [],
@@ -9589,6 +9601,9 @@
       },
       "companions": [
         "alnus_acuminata",
+        "avena_sativa",
+        "lolium_perenne",
+        "medicago_sativa",
         "zea_mays"
       ],
       "antagonists": [],
@@ -9889,6 +9904,9 @@
       "agua": "alto",
       "drenaje_requerido": "medio",
       "companions": [
+        "passiflora_edulis_morada",
+        "passiflora_tripartita_mollissima",
+        "rosmarinus_officinalis",
         "rubus_glaucus",
         "solanum_lycopersicum_san_marzano"
       ],
@@ -10524,10 +10542,8 @@
       "companions": [
         "avena_sativa",
         "brassica_rapa_rapifera",
-        "chenopodium_quinoa",
         "phacelia_tanacetifolia",
-        "raphanus_sativus_oleifer",
-        "zea_mays"
+        "raphanus_sativus_oleifer"
       ],
       "tracking_mode": "aggregate",
       "graph_export_meta": {
@@ -10687,16 +10703,18 @@
         "notas": "Sensible en etapas tempranas; variedades altoandinas como 'Capio' tienen mejor comportamiento ante el frío."
       },
       "companions": [
-        "chenopodium_quinoa",
-        "lupinus_mutabilis",
-        "mucuna_pruriens",
-        "phaseolus_vulgaris",
-        "trifolium_repens",
-        "cajanus_cajan",
-        "musa_paradisiaca",
-        "manihot_esculenta",
         "arracacia_xanthorrhiza",
-        "dioscorea_alata_rotundata"
+        "cajanus_cajan",
+        "chenopodium_quinoa",
+        "cucumis_sativus",
+        "cucurbita_maxima",
+        "dioscorea_alata_rotundata",
+        "lupinus_mutabilis",
+        "manihot_esculenta",
+        "mucuna_pruriens",
+        "musa_paradisiaca",
+        "phaseolus_vulgaris",
+        "trifolium_repens"
       ],
       "antagonists": [],
       "propagation": {
@@ -11351,7 +11369,7 @@
       "titulo": "El retamo espinoso: la plaga que amenaza los páramos colombianos",
       "url": "https://es.mongabay.com",
       "observaciones": "STUB — artículo periodístico, validar contra fuente primaria antes de citar en ministerial.",
-      "tier": "A"
+      "tier": "B"
     },
     {
       "id": "mujica-1992-quinua",
@@ -11360,7 +11378,7 @@
       "año": 1992,
       "titulo": "Revisión bibliográfica sobre el cultivo de la quinua (Chenopodium quinoa Willd.) y el amaranto (Amaranthus caudatus L.) en los Andes",
       "observaciones": "Publicación del Instituto Nacional de Investigaciones Agropecuarias (INIAP), Ecuador. Revisión exhaustiva de germoplasma, agronomía y usos tradicionales. _audit_note: buscar en repositorio.iniap.gob.ec o FAO ECOPORT (Mujica autor afiliado UNAP Puno + INIAP).",
-      "tier": "B"
+      "tier": "A"
     },
     {
       "id": "nrc-1989-cultivos-andinos",
@@ -11380,7 +11398,7 @@
       "titulo": "Papa criolla Grupo Phureja, manual de recomendaciones técnicas para Cundinamarca",
       "revista_o_editorial": "Editorial Universidad Nacional de Colombia",
       "isbn": "9789585054929",
-      "tier": "B"
+      "tier": "A"
     },
     {
       "id": "ocampo-solorza-2017",
@@ -11389,7 +11407,7 @@
       "año": 2017,
       "titulo": "Manejo de retamo espinoso (Ulex europaeus) en zonas altoandinas de Cundinamarca",
       "observaciones": "STUB migrado de v3.0 — revista y paginación pendientes. _audit_note: cita incompleta, requiere localizar revista (posibles candidatos: Colombia Forestal, Caldasia, boletín IAvH).",
-      "tier": "B"
+      "tier": "A"
     },
     {
       "id": "pamplona-roger-2006-plantas-medicinales",
@@ -11421,7 +11439,7 @@
       "volumen_numero": "26(3)",
       "paginas": "477-486",
       "observaciones": "_audit_note: Agronomía Colombiana revista UNAL — buscar artículo en revistas.unal.edu.co/index.php/agrocol por autor Pérez L. + año 2008.",
-      "tier": "B"
+      "tier": "A"
     },
     {
       "id": "powo-kew",

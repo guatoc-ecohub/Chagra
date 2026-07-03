@@ -48,6 +48,17 @@ export const AGENT_HERO_CHIPS = Object.freeze([
   { icon: '🌱', label: '¿Qué siembro?', prompt: '¿Qué puedo sembrar este mes en mi zona?' },
   { icon: '🐛', label: 'Plagas', prompt: '¿Cómo controlo plagas sin químicos?' },
   { icon: '🌧️', label: 'Clima', prompt: 'Dame el reporte del clima de mi zona.' },
+  // ── Grounding tools (antes solo por texto libre) ──────────────────────
+  { icon: '🧬', label: 'Variedades', prompt: '¿Qué variedades registradas por ICA o AGROSAVIA hay para mi cultivo?' },
+  { icon: '📊', label: 'Fenología', prompt: '¿Cuáles son las etapas de desarrollo de mi planta y qué plagas aparecen en cada una?' },
+  { icon: '🌡️', label: 'Grado día', prompt: '¿Cómo van los grados día acumulados para mi cultivo?' },
+  { icon: '🐝', label: 'Polinización', prompt: '¿Qué poliniza mi cultivo y cuántas colmenas por hectárea necesita?' },
+  { icon: '📋', label: 'Documento soporte DIAN', prompt: 'Necesito el documento soporte DIAN para mi finca.' },
+  { icon: '⚖️', label: 'Alerta normativa páramo', prompt: '¿Qué dice la Ley 1930 de 2018 sobre sembrar o hacer quemas en el páramo?' },
+  { icon: '🌳', label: 'Restauración', prompt: 'Quiero restaurar un terreno con árboles nativos. ¿Qué especies siembro y en qué orden?' },
+  { icon: '🐄', label: 'Silvopastoril', prompt: 'Quiero un arreglo silvopastoril con forraje y árboles para mi ganado.' },
+  { icon: '☠️', label: 'Toxicidad', prompt: '¿Una planta es tóxica para animales o personas o se puede aprovechar?' },
+  { icon: '📜', label: 'Saberes tradicionales', prompt: 'Explícame un saber tradicional agroecológico, como el uso de un producto local o una práctica de la finca.' },
 ]);
 
 /** Textos planos de SuggestedActions (lo que se envía al agente). */

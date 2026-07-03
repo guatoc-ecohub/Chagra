@@ -1,0 +1,509 @@
+{
+  "schema_version": "3.1",
+  "seed_version": "0.1.0",
+  "generated_at": "2026-07-02",
+  "_meta": {
+    "descripcion": "Catálogo auxiliar de enemigos naturales (depredadores, parasitoides y entomopatógenos) y aristas plaga↔controlador. Profundiza la dimensión BIO del grafo de relaciones: cada plaga con enemigo natural documentado lleva tipo, presa/hospedero, prácticas de conservación y fuente citable. Resuelve task #control-biologico-prof5 (2026-07-02).",
+    "estado": "SEMILLA — 14 enemigos naturales curados sobre literatura institucional colombiana (AGROSAVIA, Cenicafé, ICA) y literatura científica primaria. Los estudios temáticos por cultivo pueden proponer adiciones; entran por PR al catálogo auxiliar.",
+    "reglas_id": "snake_case: género_especie (ej. trichogramma_pretiosum, beauveria_bassiana).",
+    "principio_anti_invento": "Cada nombre científico debe resolverse en GBIF Backbone Taxonomy o Catalogue of Life. Cada practica_conservacion es práctica real documentada en literatura MIP. Cada source_id resuelve contra sources-seed.json. Cuando una afirmación requiera precisión adicional (cepa, dosis, nr de Avance Técnico), la cita completa va en el campo `fuente` de la entrada — nunca se inventan DOIs ni números de publicación.",
+    "tipos_validos": [
+      "depredador",
+      "parasitoide",
+      "entomopatogeno"
+    ]
+  },
+  "enemigos_naturales": [
+    {
+      "id": "hippodamia_convergens",
+      "nombre_comun": "Mariquita convergente",
+      "nombre_cientifico": "Hippodamia convergens",
+      "tipo": "depredador",
+      "familia": "Coccinellidae",
+      "orden": "Coleoptera",
+      "presa_o_hospedero_principal": "Pulgones (áfidos), trips pequeños, huevos y ninfas pequeñas de insectos",
+      "practicas_conservacion": [
+        "Mantener franjas con plantas en flor (ej. Phacelia tanacetifolia, eneldo, cilantro) que proveen polen y néctar para los adultos",
+        "Reducir aplicaciones de insecticidas de amplio espectro (piretroides, neonicotinoides) que rompen las poblaciones del controlador",
+        "Conservar bordos vivos y setos diversificados que sirven de refugio invernal"
+      ],
+      "fuente": "Hippodamia convergens Guérin-Méneville, 1842 (Coleoptera: Coccinellidae). Depredador polífago de áfidos ampliamente documentado en programas de control biológico en Colombia.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "agrosavia-controladores-biologicos-2017"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "cryptolaemus_montrouzieri",
+      "nombre_comun": "Mariquita de la cochinilla harinosa",
+      "nombre_cientifico": "Cryptolaemus montrouzieri",
+      "tipo": "depredador",
+      "familia": "Coccinellidae",
+      "orden": "Coleoptera",
+      "presa_o_hospedero_principal": "Cochinillas harinosas (Pseudococcidae), especialmente Planococcus citri y Phenacoccus spp.",
+      "practicas_conservacion": [
+        "Evitar aplicaciones de insecticidas de amplio espectro durante picos de población de la plaga (cuando el controlador está activo)",
+        "Mantener cubierta vegetal diversificada en el cultivo (citricos, frutales) para refugio del adulto",
+        "Liberaciones aumentativas en momentos de brote temprano (baja densidad) según seguimiento semanal de la plaga"
+      ],
+      "fuente": "Cryptolaemus montrouzieri Mulsant, 1850 (Coleoptera: Coccinellidae). Depredador especialista de Pseudococcidae. Comercializado y liberado en Colombia para cítricos y cultivos ornamentales.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "agrosavia-controladores-biologicos-2017",
+        "ica-registro-bioinsumos-2024"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "chrysoperla_externa",
+      "nombre_comun": "Crisopa verde",
+      "nombre_cientifico": "Chrysoperla externa",
+      "tipo": "depredador",
+      "familia": "Chrysopidae",
+      "orden": "Neuroptera",
+      "presa_o_hospedero_principal": "Larvas depredadoras polífagas: pulgones, huevos de lepidópteros, ninfas de mosca blanca, huevos y ninfas pequeños de trips",
+      "practicas_conservacion": [
+        "Mantener plantas con flor (coriandro, Buckleya, sunflower, phacelia) como fuente de polen y néctar para los adultos no depredadores",
+        "Establecer coberturas vivas entre hileras del cultivo que sirven de refugio y fuente de presas alternativas",
+        "Priorizar controladores selectivos (Bt, hongos entomopatógenos) sobre piretroides cuando la plaga excede umbral"
+      ],
+      "fuente": "Chrysoperla externa (Hagen, 1861) (Neuroptera: Chrysopidae). Especie neotropical ampliamente usada en Colombia en liberaciones aumentativas en hortalizas, café y frutales.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "agrosavia-controladores-biologicos-2017"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "amblyseius_swirskii",
+      "nombre_comun": "Ácaro depredador swirskii",
+      "nombre_cientifico": "Amblyseius swirskii",
+      "tipo": "depredador",
+      "familia": "Phytoseiidae",
+      "orden": "Mesostigmata",
+      "presa_o_hospedero_principal": "Huevos y primeros instares de mosca blanca, huevos y larvas jóvenes de trips, ácaros tarsonémidos",
+      "practicas_conservacion": [
+        "Mantener cubierta vegetal con polen disponible (ej. cosmos, Bridgeflower) que complementa dieta cuando baja la presa",
+        "Evitar acaricidas de amplio espectro (abamectina, clorfenvinfós) que rompen populations del depredador",
+        "En invernadero, liberar preventivamente desde trasplante para evitar picos de plaga"
+      ],
+      "fuente": "Amblyseius swirskii (Athias-Henriot, 1962) (Mesostigmata: Phytoseiidae). Comercializado en Colombia para cultivos protegidos (tomate, pimentón, ornamentales).",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-registro-bioinsumos-2024"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "trichogramma_pretiosum",
+      "nombre_comun": "Avispita parasitoide de huevos",
+      "nombre_cientifico": "Trichogramma pretiosum",
+      "tipo": "parasitoide",
+      "familia": "Trichogrammatidae",
+      "orden": "Hymenoptera",
+      "presa_o_hospedero_principal": "Huevos de lepidópteros plaga (Tuta absoluta, Spodoptera frugiperda, Helicoverpa zea, Plutella xylostella)",
+      "practicas_conservacion": [
+        "Mantener franjas con floración escalonada (ej. Bidens, Phacelia, coriandro) como fuente de néctar para adultos",
+        "Coordinar liberaciones aumentativas con el periodo de oviposición de la plaga (monitoreo con trampas de feromonas)",
+        "Evitar insecticidas de amplio espectro al menos 7 días antes y después de la liberación"
+      ],
+      "fuente": "Trichogramma pretiosum Riley, 1879 (Hymenoptera: Trichogrammatidae). Especie comercial más liberada en Colombia para control de lepidópteros en tomate, maíz, algodón y crucíferas.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "agrosavia-controladores-biologicos-2017",
+        "ica-registro-bioinsumos-2024"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "cotesia_margarivera",
+      "nombre_comun": "Avispita parasitoide de orugas",
+      "nombre_cientifico": "Cotesia spp.",
+      "tipo": "parasitoide",
+      "familia": "Braconidae",
+      "orden": "Hymenoptera",
+      "presa_o_hospedero_principal": "Larvas (orugas) de lepidópteros noctúidos y plútidos (Spodoptera, Helicoverpa, Plutella)",
+      "practicas_conservacion": [
+        "Mantener setos y barreras vivas diversificadas (ej. leucaena, gliricidia, poró) como refugio del adulto",
+        "Reducir insecticidas de amplio espectro en el periodo larval de la plaga (ventana crítica para el parasitoide)",
+        "Conservar malezas en flor en bordes del cultivo como fuente de néctar"
+      ],
+      "fuente": "Cotesia spp. (Hymenoptera: Braconidae, Microgastrinae). Género documentado en Colombia sobre Spodoptera frugiperda en maíz y Plutella xylostella en crucíferas. Especies reportadas incluyen C. flavipes y C. magnangularis; la entrada se mantiene a nivel de género cuando la literatura institucional no detalla especie.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "agrosavia-controladores-biologicos-2017"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "encarsia_formosa",
+      "nombre_comun": "Parasitoide de mosca blanca de invernadero",
+      "nombre_cientifico": "Encarsia formosa",
+      "tipo": "parasitoide",
+      "familia": "Aphelinidae",
+      "orden": "Hymenoptera",
+      "presa_o_hospedero_principal": "Ninfas de mosca blanca de invernadero (Trialeurodes vaporariorum) y algunas especies de Bemisia",
+      "practicas_conservacion": [
+        "Mantener temperatura de invernadero por debajo de 30°C (óptimo del parasitoide 20–25°C) y humedad relativa alta",
+        "Eliminar malezas reservorio de mosca blanca (ej. Datura, Solanum nigrum) antes del ciclo del cultivo para sincronizar parasitoide y plaga",
+        "Liberaciones aumentativas desde trasplante en cultivos protegidos de tomate y pimentón"
+      ],
+      "fuente": "Encarsia formosa Gahan, 1924 (Hymenoptera: Aphelinidae). Parasitoide telitoco ampliamente comercializado en Colombia para Trialeurodes vaporariorum en tomate bajo invernadero.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-registro-bioinsumos-2024"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "tamarixia_radiata",
+      "nombre_comun": "Parasitoide del psílido asiático de los cítricos",
+      "nombre_cientifico": "Tamarixia radiata",
+      "tipo": "parasitoide",
+      "familia": "Eulophidae",
+      "orden": "Hymenoptera",
+      "presa_o_hospedero_principal": "Ninfas de Diaphorina citri (psílido asiático de los cítricos, vector del Huanglongbing)",
+      "practicas_conservacion": [
+        "Mantener cubierta vegetal floral en el piso del citrico (ej. Bidens, Desmodium) como fuente de néctar para el adulto",
+        "Coordinar manejo de insecticidas del psílido con fenología de liberaciones del parasitoide",
+        "Liberaciones aumentativas en brotes vegetativos del cítrico, donde el psílido se concentra"
+      ],
+      "fuente": "Tamarixia radiata (Waterston, 1922) (Hymenoptera: Eulophidae). Introducido y liberado en Colombia por el ICA dentro del programa nacional de manejo del Huanglongbing (HLB) de los cítricos.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-registro-bioinsumos-2024"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "anagyrus_pseudococci",
+      "nombre_comun": "Parasitoide de cochinillas harinosas",
+      "nombre_cientifico": "Anagyrus pseudococci",
+      "tipo": "parasitoide",
+      "familia": "Encyrtidae",
+      "orden": "Hymenoptera",
+      "presa_o_hospedero_principal": "Ninfas y adultas de cochinilla harinosa (Planococcus citri, Pseudococcus spp.)",
+      "practicas_conservacion": [
+        "Mantener cortinas rompevientos diversificadas en cítricos y frutales, refugio del adulto",
+        "Reducir insecticidas de amplio espectro en etapa de ninfas jóvenes (más susceptibles al parasitoide)",
+        "Combinar con Cryptolaemus montrouzieri para sinergia depredador + parasitoide"
+      ],
+      "fuente": "Anagyrus pseudococci (Girault, 1915) (Hymenoptera: Encyrtidae). Parasitoide clásico de Pseudococcidae en frutales en Colombia.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "agrosavia-controladores-biologicos-2017"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "beauveria_bassiana",
+      "nombre_comun": "Hongo entomopatógeno blanco",
+      "nombre_cientifico": "Beauveria bassiana",
+      "tipo": "entomopatogeno",
+      "familia": "Cordycipitaceae",
+      "orden": "Hypocreales",
+      "presa_o_hospedero_principal": "Amplio espectro: broca del café (Hypothenemus hampei), picudos, trips, moscas blancas, chizas, gusano blanco",
+      "practicas_conservacion": [
+        "Conservar hojarasca y residuos orgánicos en el piso del cultivo como reservorio natural del inóculo",
+        "Aplicar al atardecer o nublado con humedad relativa mayor al 70% (el hongo requiere film acuoso para germinar)",
+        "Evitar fungicidas en el cultivo al menos 5 días antes y después de la aplicación del hongo"
+      ],
+      "fuente": "Beauveria bassiana (Bals.-Criv.) Vuill. (Hypocreales: Cordycipitaceae). Cepas comerciales registradas en ICA (Colombia). Base del manejo de Hypothenemus hampei en café (Cenicafé) y de picudos en pasturas (AGROSAVIA).",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "cenicafe-avances-tecnicos-serie",
+        "ica-registro-bioinsumos-2024"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "metarhizium_anisopliae",
+      "nombre_comun": "Hongo entomopatógeno verde",
+      "nombre_cientifico": "Metarhizium anisopliae",
+      "tipo": "entomopatogeno",
+      "familia": "Clavicipitaceae",
+      "orden": "Hypocreales",
+      "presa_o_hospedero_principal": "Salivazo (Aeneolamia, Zulia) en pasturas, gusano blanco (Premnotrypes) en papa, chicharritas y chapulines",
+      "practicas_conservacion": [
+        "Incorporar residuos de cosecha que mantienen inóculo del hongo en el suelo entre ciclos",
+        "Aplicar al suelo (drench) o cebos envenenados para plagas de suelo donde el hongo persiste más tiempo",
+        "Evitar labranza profunda que desplaza el inóculo lejos de la rizosfera donde la plaga pupa"
+      ],
+      "fuente": "Metarhizium anisopliae (Metschn.) Sorokin (Hypocreales: Clavicipitaceae). Cepas registradas en ICA. Documentado en AGROSAVIA como base del Manejo Integrado del Salivazo de los Pastos en el Piedemonte Llanero.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "agrosavia-controladores-biologicos-2017",
+        "ica-registro-bioinsumos-2024"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "bacillus_thuringiensis",
+      "nombre_comun": "Bacteria bioinsecticida (Bt)",
+      "nombre_cientifico": "Bacillus thuringiensis",
+      "tipo": "entomopatogeno",
+      "familia": "Bacillaceae",
+      "orden": "Bacillales",
+      "presa_o_hospedero_principal": "Larvas de lepidópteros (Tuta absoluta, Plutella xylostella, Spodoptera frugiperda, Helicoverpa zea); algunas cepas controlan dípteros y coleópteros",
+      "practicas_conservacion": [
+        "Aplicar cuando la larva está en primeros instares (la toxicidad cae fuerte en larvas grandes)",
+        "Cubrir bien el follaje (la larva debe ingerir la toxina) y repetir cada 7 a 10 días en presión alta",
+        "Rotar con otros mecanismos (hongos, parasitoides) para retardar resistencia en poblaciones de la plaga"
+      ],
+      "fuente": "Bacillus thuringiensis (Berliner, 1915). Bacteria formadora de cristales delta-endotóxicos. Producto biológico más vendido en Colombia; múltiples cepas registradas en ICA (subsp. kurstaki para lepidópteros, subsp. israelensis para dípteros, subsp. tenebrionis para coleópteros).",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-registro-bioinsumos-2024",
+        "agrosavia-controladores-biologicos-2017"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "lecanicillium_lecanii",
+      "nombre_comun": "Hongo de insectos chupadores",
+      "nombre_cientifico": "Lecanicillium lecanii",
+      "tipo": "entomopatogeno",
+      "familia": "Cordycipitaceae",
+      "orden": "Hypocreales",
+      "presa_o_hospedero_principal": "Mosca blanca (Trialeurodes, Bemisia), pulgones (Aphididae), cochinillas (Coccidae) en ornamentales y hortalizas",
+      "practicas_conservacion": [
+        "Aplicar con humedad relativa alta y temperatura entre 20 y 28°C (óptimo del hongo)",
+        "Mantener cobertura foliar densa que preserve microclima húmedo favorable al hongo",
+        "Evitar mezclas con fungicidas en el mismo ciclo de aplicación"
+      ],
+      "fuente": "Lecanicillium lecanii (Zimm.) Zare & W. Gams (Hypocreales: Cordycipitaceae). Basónimo Verticillium lecanii. Registrado en ICA para ornamentales bajo invernadero en la Sabana de Bogotá.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-registro-bioinsumos-2024"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "heterorhabditis_indica",
+      "nombre_comun": "Nematodo entomopatógeno nativo",
+      "nombre_cientifico": "Heterorhabditis indica",
+      "tipo": "entomopatogeno",
+      "familia": "Heterorhabditidae",
+      "orden": "Rhabditida",
+      "presa_o_hospedero_principal": "Larvas de suelo: gusano blanco (Premnotrypes), chizas (Phyllophaga), picudos (Cosmopolites, Metamasius)",
+      "practicas_conservacion": [
+        "Mantener humedad del suelo por encima del 60% de capacidad de campo (el nematodo es sensible a la desecación)",
+        "Aplicar al final de la tarde o noche para evitar radiación UV que mata el nematodo",
+        "Incorporar materia orgánica que preserve porosidad y humedad del suelo donde persiste el nematodo"
+      ],
+      "fuente": "Heterorhabditis indica Poinar, Karunakar & David, 1992 (Rhabditida: Heterorhabditidae). Especie neotropical aislada en Colombia y comercializada para plagas de suelo (papa, plátano, ornamentales).",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-registro-bioinsumos-2024"
+      ],
+      "validation_level": "claude_draft"
+    }
+  ],
+  "plaga_controlador": [
+    {
+      "plaga_id": "hypothenemus_hampei_broca",
+      "plaga_nombre": "Broca del café (Hypothenemus hampei)",
+      "controlador_id": "beauveria_bassiana",
+      "cultivo": "cafe",
+      "modalidad": "aplicacion-aumentativa",
+      "fuente": "Cenicafé — Avances Técnicos (manejo integrado de la broca del café). Strains de Beauveria bassiana comercializadas en Colombia para control de H. hampei.",
+      "source_ids": [
+        "cenicafe-avances-tecnicos-serie",
+        "ica-registro-bioinsumos-2024"
+      ]
+    },
+    {
+      "plaga_id": "tuta_absoluta_minador_tomate",
+      "plaga_nombre": "Minador del tomate (Tuta absoluta)",
+      "controlador_id": "trichogramma_pretiosum",
+      "cultivo": "tomate",
+      "modalidad": "liberacion-aumentativa",
+      "fuente": "Trichogramma pretiosum sobre huevos de Tuta absoluta documentado en MIP de tomate en Colombia (AGROSAVIA, C.I. Tibaitatá).",
+      "source_ids": [
+        "agrosavia-controladores-biologicos-2017"
+      ]
+    },
+    {
+      "plaga_id": "tuta_absoluta_minador_tomate",
+      "plaga_nombre": "Minador del tomate (Tuta absoluta)",
+      "controlador_id": "bacillus_thuringiensis",
+      "cultivo": "tomate",
+      "modalidad": "aplicacion-aumentativa",
+      "fuente": "Bacillus thuringiensis subsp. kurstaki sobre larvas jóvenes de Tuta absoluta. Producto comercial más usado para el minador en Colombia.",
+      "source_ids": [
+        "agrosavia-controladores-biologicos-2017",
+        "ica-registro-bioinsumos-2024"
+      ]
+    },
+    {
+      "plaga_id": "spodoptera_frugiperda_gusano_cogollero",
+      "plaga_nombre": "Cogollero del maíz (Spodoptera frugiperda)",
+      "controlador_id": "bacillus_thuringiensis",
+      "cultivo": "maiz",
+      "modalidad": "aplicacion-aumentativa",
+      "fuente": "Bacillus thuringiensis subsp. kurstaki sobre larvas jóvenes de S. frugiperda. Recomendado en MIP de maíz en Colombia.",
+      "source_ids": [
+        "agrosavia-controladores-biologicos-2017",
+        "ica-registro-bioinsumos-2024"
+      ]
+    },
+    {
+      "plaga_id": "spodoptera_frugiperda_gusano_cogollero",
+      "plaga_nombre": "Cogollero del maíz (Spodoptera frugiperda)",
+      "controlador_id": "cotesia_margarivera",
+      "cultivo": "maiz",
+      "modalidad": "conservacion-inoculo-natural",
+      "fuente": "Cotesia spp. (incluyendo C. magnangularis y C. flavipes) sobre Spodoptera y otros noctúidos en maíz. Documentado en programas MIP colombianos.",
+      "source_ids": [
+        "agrosavia-controladores-biologicos-2017"
+      ]
+    },
+    {
+      "plaga_id": "trialeurodes_vaporariorum_mosca_blanca",
+      "plaga_nombre": "Mosca blanca de invernadero (Trialeurodes vaporariorum)",
+      "controlador_id": "encarsia_formosa",
+      "cultivo": "tomate",
+      "modalidad": "liberacion-aumentativa",
+      "fuente": "Encarsia formosa en MIP de Trialeurodes vaporariorum en tomate bajo invernadero. Comercializado y registrado en ICA.",
+      "source_ids": [
+        "ica-registro-bioinsumos-2024"
+      ]
+    },
+    {
+      "plaga_id": "trialeurodes_vaporariorum_mosca_blanca",
+      "plaga_nombre": "Mosca blanca de invernadero (Trialeurodes vaporariorum)",
+      "controlador_id": "amblyseius_swirskii",
+      "cultivo": "tomate",
+      "modalidad": "liberacion-aumentativa",
+      "fuente": "Amblyseius swirskii depredador de huevos y primeros instares de mosca blanca. Comercializado en Colombia.",
+      "source_ids": [
+        "ica-registro-bioinsumos-2024"
+      ]
+    },
+    {
+      "plaga_id": "diaphorina_citri_psilido_asiatico",
+      "plaga_nombre": "Psílido asiático de los cítricos (Diaphorina citri)",
+      "controlador_id": "tamarixia_radiata",
+      "cultivo": "citricos",
+      "modalidad": "liberacion-clasica-aumentativa",
+      "fuente": "Tamarixia radiata introducido y liberado por el ICA en Colombia dentro del programa nacional de manejo del Huanglongbing (HLB) de los cítricos.",
+      "source_ids": [
+        "ica-registro-bioinsumos-2024"
+      ]
+    },
+    {
+      "plaga_id": "planococcus_citri_cochinilla_harinosa",
+      "plaga_nombre": "Cochinilla harinosa de los cítricos (Planococcus citri)",
+      "controlador_id": "cryptolaemus_montrouzieri",
+      "cultivo": "citricos",
+      "modalidad": "liberacion-aumentativa",
+      "fuente": "Cryptolaemus montrouzieri — depredador especialista de Pseudococcidae. Recomendado por AGROSAVIA para citricos y ornamentales.",
+      "source_ids": [
+        "agrosavia-controladores-biologicos-2017"
+      ]
+    },
+    {
+      "plaga_id": "planococcus_citri_cochinilla_harinosa",
+      "plaga_nombre": "Cochinilla harinosa de los cítricos (Planococcus citri)",
+      "controlador_id": "anagyrus_pseudococci",
+      "cultivo": "citricos",
+      "modalidad": "conservacion-inoculo-natural",
+      "fuente": "Anagyrus pseudococci parasitoide de cochinillas harinosas en frutales colombianos.",
+      "source_ids": [
+        "agrosavia-controladores-biologicos-2017"
+      ]
+    },
+    {
+      "plaga_id": "premnotrypes_spp_gusano_blanco_papa",
+      "plaga_nombre": "Gusano blanco de la papa (Premnotrypes spp.)",
+      "controlador_id": "metarhizium_anisopliae",
+      "cultivo": "papa",
+      "modalidad": "aplicacion-al-suelo",
+      "fuente": "Metarhizium anisopliae aplicado al suelo para larvas de Premnotrypes. Documentado en MIP de papa por AGROSAVIA.",
+      "source_ids": [
+        "agrosavia-controladores-biologicos-2017",
+        "ica-registro-bioinsumos-2024"
+      ]
+    },
+    {
+      "plaga_id": "premnotrypes_spp_gusano_blanco_papa",
+      "plaga_nombre": "Gusano blanco de la papa (Premnotrypes spp.)",
+      "controlador_id": "heterorhabditis_indica",
+      "cultivo": "papa",
+      "modalidad": "aplicacion-al-suelo",
+      "fuente": "Heterorhabditis indica — nematodo nativo comercializado en Colombia para plagas de suelo incluido Premnotrypes.",
+      "source_ids": [
+        "ica-registro-bioinsumos-2024"
+      ]
+    },
+    {
+      "plaga_id": "aeneolamia_spp_salivazo_pasturas",
+      "plaga_nombre": "Salivazo de los pastos (Aeneolamia, Zulia)",
+      "controlador_id": "metarhizium_anisopliae",
+      "cultivo": "pasturas",
+      "modalidad": "cebo-y-aplicacion-foliar",
+      "fuente": "Metarhizium anisopliae — base del Manejo Integrado del Salivazo de los Pastos en el Piedemonte Llanero (AGROSAVIA).",
+      "source_ids": [
+        "agrosavia-controladores-biologicos-2017",
+        "ica-registro-bioinsumos-2024"
+      ]
+    },
+    {
+      "plaga_id": "aphididae_pulgones",
+      "plaga_nombre": "Pulgones (Aphididae)",
+      "controlador_id": "hippodamia_convergens",
+      "cultivo": "hortalizas_y_frutales",
+      "modalidad": "conservacion-inoculo-natural",
+      "fuente": "Hippodamia convergens — depredador polífago de áfidos. Inoculo natural conservado en bordos y cubiertas florales.",
+      "source_ids": [
+        "agrosavia-controladores-biologicos-2017"
+      ]
+    },
+    {
+      "plaga_id": "aphididae_pulgones",
+      "plaga_nombre": "Pulgones (Aphididae)",
+      "controlador_id": "chrysoperla_externa",
+      "cultivo": "hortalizas_y_frutales",
+      "modalidad": "liberacion-aumentativa",
+      "fuente": "Chrysoperla externa — larva depredadora de áfidos. Comercializada y liberada en hortalizas y frutales en Colombia.",
+      "source_ids": [
+        "agrosavia-controladores-biologicos-2017"
+      ]
+    },
+    {
+      "plaga_id": "plutella_xylostella_polilla_de_las_cruciferas",
+      "plaga_nombre": "Polilla de las crucíferas (Plutella xylostella)",
+      "controlador_id": "trichogramma_pretiosum",
+      "cultivo": "brasicas",
+      "modalidad": "liberacion-aumentativa",
+      "fuente": "Trichogramma pretiosum parasitoide de huevos de Plutella xylostella en brócoli, coliflor y repollo (AGROSAVIA).",
+      "source_ids": [
+        "agrosavia-controladores-biologicos-2017"
+      ]
+    },
+    {
+      "plaga_id": "phyllophaga_spp_chizas",
+      "plaga_nombre": "Chizas (Phyllophaga spp.)",
+      "controlador_id": "beauveria_bassiana",
+      "cultivo": "maiz_y_papa",
+      "modalidad": "aplicacion-al-suelo",
+      "fuente": "Beauveria bassiana para larvas de Phyllophaga en suelo. Cepas comerciales registradas en ICA.",
+      "source_ids": [
+        "ica-registro-bioinsumos-2024",
+        "agrosavia-controladores-biologicos-2017"
+      ]
+    },
+    {
+      "plaga_id": "bemisia_tabaci_mosca_blanca_ornamentales",
+      "plaga_nombre": "Mosca blanca (Bemisia tabaci) en ornamentales",
+      "controlador_id": "lecanicillium_lecanii",
+      "cultivo": "ornamentales",
+      "modalidad": "aplicacion-aumentativa",
+      "fuente": "Lecanicillium lecanii — hongo entomopatógeno sobre Bemisia y Trialeurodes en ornamentales bajo invernadero (Sabana de Bogotá). Cepas registradas en ICA.",
+      "source_ids": [
+        "ica-registro-bioinsumos-2024"
+      ]
+    }
+  ]
+}

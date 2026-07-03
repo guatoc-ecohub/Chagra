@@ -105,4 +105,26 @@ describe('RegistroVozConfirm', () => {
     fireEvent.click(screen.getByRole('button', { name: /Planta/i }));
     expect(screen.getByText(/Usar mi ubicación/i)).toBeInTheDocument();
   });
+
+  it('oculta la caja de transcripcion cuando el registro viene vacio en modo manual', () => {
+    const record = {
+      intent: 'registrar_cosecha',
+      source: 'manual',
+      transcription: '',
+      species: [],
+      speciesHint: null,
+      measures: {},
+      phenology: [],
+      symptoms: [],
+      labors: [],
+      input: null,
+      pest: null,
+      position: { raw: '' },
+      timestampMs: NOW,
+    };
+
+    render(<RegistroVozConfirm record={record} onConfirm={vi.fn()} onCancel={vi.fn()} isSaving={false} />);
+
+    expect(screen.queryByText('Lo que oí')).toBeNull();
+  });
 });

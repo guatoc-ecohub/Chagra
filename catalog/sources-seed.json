@@ -500,7 +500,7 @@
     },
     {
       "id": "ocampo-solorza-2017",
-      "tier": "B",
+      "tier": "A",
       "tipo": "articulo_revista",
       "autores": "Ocampo, J.; Solórzano, P.",
       "año": 2017,
@@ -539,7 +539,7 @@
     },
     {
       "id": "mongabay-retamo-2024",
-      "tier": "C",
+      "tier": "B",
       "tipo": "periodismo_ambiental",
       "autores": "Mongabay Latam",
       "año": 2024,
@@ -547,6 +547,39 @@
       "revista_o_editorial": "Mongabay Latam",
       "url": "https://es.mongabay.com",
       "observaciones": "PERIODISMO AMBIENTAL (no peer-reviewed). Aceptable para CONTEXT social/política, NO para data taxonómica o agronómica."
+    },
+    {
+      "id": "agrosavia-controladores-biologicos-2017",
+      "tier": "A",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": 2017,
+      "titulo": "Manuales técnicos de AGROSAVIA — Controladores biológicos y manejo integrado de plagas (serie)",
+      "institucion": "Corporación Colombiana de Investigación Agropecuaria (AGROSAVIA)",
+      "url": "https://www.agrosavia.co",
+      "observaciones": "Serie de boletines y fichas técnicas de AGROSAVIA sobre controladores biológicos (depredadores, parasitoides, entomopatógenos) en cultivos andinos. Referencia institucional pública (Centro de Investigación Tibaitatá)."
+    },
+    {
+      "id": "ica-registro-bioinsumos-2024",
+      "tier": "A",
+      "tipo": "resolucion_oficial",
+      "autores": "ICA — Instituto Colombiano Agropecuario",
+      "año": 2024,
+      "titulo": "Registro Nacional de Plaguicidas Químicos de Uso Agrícola y Bioinsumos de Uso Agrícola — listado de bioinsumos comerciales registrados",
+      "institucion": "ICA",
+      "url": "https://www.ica.gov.co",
+      "observaciones": "Listado público oficial ICA de los microorganismos entomopatógenos, antagonistas y depredadores comerciales con registro vigente en Colombia. Referencia obligatoria para afirmar que un controlador biológico está aprobado comercialmente."
+    },
+    {
+      "id": "cenicafe-avances-tecnicos-serie",
+      "tier": "A",
+      "tipo": "manual_tecnico",
+      "autores": "Cenicafé — Centro Nacional de Investigaciones de Café",
+      "año": 2023,
+      "titulo": "Avances Técnicos Cenicafé — serie de fichas técnicas (manejo integrado de la broca, la roya y otras plagas del cafeto)",
+      "institucion": "Cenicafé (Federación Nacional de Cafeteros de Colombia)",
+      "url": "https://www.cenicafe.org",
+      "observaciones": "Serie institucional de Cenicafé. Base científica colombiana del MIP del cafeto: Beauveria bassiana contra Hypothenemus hampei, parasitoides (Cephalonomia stephanoderis, Prorops nasuta), manejo cultural. Avances Técnicos individuales se citan por número en el campo `fuente` de la entrada que los use."
     }
   ]
 }

@@ -7,12 +7,12 @@ import { Calendar } from 'lucide-react';
  *
  * @param {Object} props
  * @param {string} props.value - Fecha en formato YYYY-MM-DD
- * @param {Function} props.onChange - callback(newDate)
- * @param {string} props.label - Etiqueta
- * @param {boolean} props.required - Obligatorio
- * @param {string} props.className - Estilos extra
- * @param {string} props.min - Fecha mínima
- * @param {string} props.max - Fecha máxima
+ * @param {(newDate: string) => void} props.onChange - callback(newDate)
+ * @param {string} [props.label="Fecha"] - Etiqueta
+ * @param {boolean} [props.required=false] - Obligatorio
+ * @param {string} [props.className=""] - Estilos extra
+ * @param {string} [props.min=""] - Fecha mínima
+ * @param {string} [props.max=""] - Fecha máxima
  */
 const DateField = ({
     value,

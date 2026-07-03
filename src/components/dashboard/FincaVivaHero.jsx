@@ -9,7 +9,7 @@ import { listFarmProcesses } from '../../db/farmProcessCache';
 import useAssetStore from '../../store/useAssetStore';
 import { buildFincaScene } from '../../services/fincaSceneService';
 import { selectSceneVariant, SCENE_KINDS } from '../../services/fincaSceneProfileSelector';
-import { getProfile, saveProfile } from '../../services/userProfileService';
+import { getProfile, saveProfile, getInvernaderoEstructura } from '../../services/userProfileService';
 import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciarAccess';
 import { deriveAtmosphere } from '../../services/atmosphereService';
 import { resolveClimaLocation, getCachedClimaSnapshot, CLIMA_UPDATED_EVENT } from '../../services/climaService';
@@ -170,6 +170,22 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
     } catch (_) {
       return null;
     }
+  }, []);
+
+  // ── Estructura de cubierta declarada en el perfil (#34 fase 1) ────────────
+  // Si el usuario declaró en el onboarding que su finca TIENE invernadero
+  // (invernadero_tiene='si' + invernadero_forma/tamano), la escena de finca lo
+  // DIBUJA (antes el dato se guardaba y la escena lo ignoraba — bug reportado
+  // por el operador). Reusa el getter tipado (fuente única, migración suave:
+  // perfil viejo → { tiene:false } y no se dibuja nada). El typeof protege los
+  // mocks de test que solo exportan getProfile (mismo criterio que saveProfile).
+  const estructuraFinca = useMemo(() => {
+    try {
+      if (typeof getInvernaderoEstructura === 'function') {
+        return getInvernaderoEstructura(getProfile());
+      }
+    } catch (_) { /* perfil opcional: sin estructura declarada */ }
+    return { tiene: false, forma: null, tamano: null };
   }, []);
 
   // El mockup F2 tiene 3 escenas: balcon / invernadero / finca. Las variantes
@@ -340,7 +356,14 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
                 <>
                   {escala === 'balcon' && <SceneBalcon poblada={poblada} cielo={atmosfera} />}
                   {escala === 'invernadero' && <SceneInvernadero poblada={poblada} cielo={atmosfera} />}
-                  {escala === 'finca' && <SceneFinca poblada={poblada} cielo={atmosfera} />}
+                  {escala === 'finca' && (
+                    <SceneFinca
+                      poblada={poblada}
+                      cielo={atmosfera}
+                      estructura={estructuraFinca}
+                      escalaFinca={variant?.escala}
+                    />
+                  )}
 
                   {/* fauna sobre la escena. El COLIBRÍ (criatura insignia del
                       agente) vuela SIEMPRE — es el guía, no ganado; acompaña
@@ -596,22 +619,71 @@ function esNoche(cielo) { return cielo?.luz === 'noche'; }
 function esCubierto(cielo) {
   return cielo?.condicion === 'nublado' || cielo?.condicion === 'lluvia' || cielo?.condicion === 'niebla';
 }
+/**
+ * Tono de luz de la escena. Antes las escenas solo distinguían noche/día: el
+ * amanecer y el atardecer (las horas MÁS bellas del campo) se pintaban como
+ * mediodía. Ahora cada tono tiene su cielo. Mismo dato de siempre
+ * (deriveAtmosphere → luz), sin motor nuevo.
+ * @returns {'dia'|'noche'|'amanecer'|'atardecer'}
+ */
+function tonoLuz(cielo) {
+  const l = cielo?.luz;
+  return (l === 'noche' || l === 'amanecer' || l === 'atardecer') ? l : 'dia';
+}
 
 /**
- * SKY — capa de cielo compartida por las 3 escenas: sol que respira de día,
- * luna + estrellas de noche, nubes/lluvia según el clima. Recibe la geometría
- * (cx, cy, r) del astro para encajar en cada escena. rsvg-safe (sin filtros de
- * blur para la lluvia, sólo trazos).
+ * Cielos por escena y por tono de luz [stop alto, stop bajo]. El degradado de
+ * la escena acompaña la hora real: dorado al amanecer, brasa al atardecer,
+ * fresco al mediodía, navy profundo de noche.
+ */
+const CIELOS_ESCENA = {
+  finca: {
+    dia: ['#7ac3da', '#c8e8cb'],
+    amanecer: ['#e9a06c', '#fbe9c2'],
+    atardecer: ['#d97a4e', '#f6d99e'],
+    noche: ['#121f3d', '#3d5560'],
+  },
+  balcon: {
+    dia: ['#8fd0e8', '#dff0e3'],
+    amanecer: ['#eeb083', '#fdeccb'],
+    atardecer: ['#e08a5c', '#f9dfae'],
+    noche: ['#1d2b4a', '#46566b'],
+  },
+  invernadero: {
+    dia: ['#90cce0', '#d4ecd6'],
+    amanecer: ['#edac7e', '#fceac6'],
+    atardecer: ['#df845a', '#f8dda8'],
+    noche: ['#1d2b4a', '#465a64'],
+  },
+};
+function cieloEscena(cielo, escena) {
+  const mapa = CIELOS_ESCENA[escena] || CIELOS_ESCENA.finca;
+  return mapa[tonoLuz(cielo)] || mapa.dia;
+}
+
+/**
+ * SKY — capa de cielo compartida por las 3 escenas: sol que respira de día
+ * (bajo y ámbar al amanecer/atardecer), luna con halo + estrellas + estrella
+ * fugaz de noche, nubes/niebla/lluvia según el clima real. Recibe la geometría
+ * (cx, cy, r) del astro para encajar en cada escena. rsvg-safe (sin filtros:
+ * halos por círculos concéntricos, lluvia por trazos).
  */
 function Sky({ cielo, cx, cy, r, lluviaY = 150 }) {
   const noche = esNoche(cielo);
   const cubierto = esCubierto(cielo);
   const lluvia = cielo?.condicion === 'lluvia';
+  const niebla = cielo?.condicion === 'niebla';
+  const tono = tonoLuz(cielo);
+  const solBajo = tono === 'amanecer' || tono === 'atardecer';
+  // Al amanecer/atardecer el sol cuelga más bajo y se enciende en ámbar.
+  const cyEf = solBajo ? cy + r * 1.5 : cy;
+  const gradSol = solBajo ? 'url(#fvh-sol-warm)' : 'url(#fvh-sol-grad)';
+  const halo = solBajo ? '#ffb35c' : '#ffe08a';
   return (
     <g aria-hidden="true">
       {noche ? (
         <g className="fvh-sky-noche">
-          {/* estrellas */}
+          {/* estrellas — constelación más generosa, con titileo escalonado */}
           <g fill="#fdf6d8" className="fvh-estrellas">
             <circle cx={cx - 120} cy={cy - 14} r="1.4" />
             <circle cx={cx - 88} cy={cy + 22} r="1" />
@@ -620,9 +692,21 @@ function Sky({ cielo, cx, cy, r, lluviaY = 150 }) {
             <circle cx={cx + 18} cy={cy + 30} r="1.3" />
             <circle cx={cx - 196} cy={cy + 6} r="1" />
             <circle cx={cx + 30} cy={cy - 10} r="0.9" />
+            <circle cx={cx - 244} cy={cy - 22} r="1.1" />
+            <circle cx={cx - 270} cy={cy + 30} r="0.9" />
+            <circle cx={cx - 172} cy={cy - 30} r="0.8" />
+            <circle cx={cx - 64} cy={cy + 44} r="1" />
+            <circle cx={cx - 220} cy={cy + 52} r="1.2" />
           </g>
-          {/* luna creciente */}
+          {/* estrella fugaz ocasional (trazo que cruza y se apaga) */}
+          <line
+            className="fvh-fugaz"
+            x1={cx - 210} y1={cy - 28} x2={cx - 174} y2={cy - 12}
+            stroke="#fdf6d8" strokeWidth="1.4" strokeLinecap="round"
+          />
+          {/* luna creciente con halo doble */}
           <g transform={`translate(${cx} ${cy})`}>
+            <circle r={r * 1.5} fill="#e8edf7" opacity="0.1" />
             <circle r={r * 0.92} fill="#e8edf7" opacity="0.25" />
             <circle r={r * 0.7} fill="#f4f1e0" />
             <circle cx={r * 0.32} cy={-r * 0.12} r={r * 0.6} fill="#1d2b4a" />
@@ -631,47 +715,110 @@ function Sky({ cielo, cx, cy, r, lluviaY = 150 }) {
           </g>
         </g>
       ) : (
-        <g transform={`translate(${cx} ${cy})`}>
-          <circle r={r * 1.4} fill="#ffe08a" opacity={cubierto ? 0.18 : 0.35}>
+        <g transform={`translate(${cx} ${cyEf})`}>
+          {/* halo exterior suave (respira) + anillo de calor con el sol bajo */}
+          <circle r={r * 1.4} fill={halo} opacity={cubierto ? 0.18 : (solBajo ? 0.42 : 0.35)}>
             <animate attributeName="r" values={`${r * 1.4};${r * 1.6};${r * 1.4}`} dur="6s" repeatCount="indefinite" />
           </circle>
-          <circle r={r} fill="url(#fvh-sol-grad)" opacity={cubierto ? 0.7 : 1} />
+          {solBajo && !cubierto && (
+            <circle r={r * 2.1} fill="none" stroke={halo} strokeWidth="1.5" opacity="0.3" />
+          )}
+          <circle r={r} fill={gradSol} opacity={cubierto ? 0.7 : 1} />
         </g>
       )}
 
-      {/* NUBES densas cuando está cubierto (o nubes ligeras siempre, suaves) */}
+      {/* NUBES densas cuando está cubierto — dos masas con brillo superior */}
       {cubierto && (
         <g fill={noche ? '#9aa6bb' : '#f3f6f4'} opacity={noche ? 0.7 : 0.92}>
           <g className="fvh-nube-a">
             <ellipse cx={cx - 30} cy={cy + 4} rx="30" ry="14" />
             <ellipse cx={cx - 4} cy={cy} rx="22" ry="14" />
             <ellipse cx={cx - 52} cy={cy} rx="18" ry="12" />
+            <ellipse cx={cx - 30} cy={cy - 8} rx="16" ry="10" opacity=".9" />
+          </g>
+          <g className="fvh-nube-b" opacity=".8">
+            <ellipse cx={cx - 168} cy={cy + 26} rx="24" ry="11" />
+            <ellipse cx={cx - 146} cy={cy + 22} rx="16" ry="10" />
+            <ellipse cx={cx - 188} cy={cy + 23} rx="13" ry="9" />
           </g>
         </g>
       )}
 
-      {/* LLUVIA — trazos diagonales (rsvg-safe, sin filtros) */}
+      {/* NIEBLA — bancos horizontales que derivan despacio (rsvg-safe). Tres
+          alturas: horizonte, media ladera y un velo bajo sobre la escena. */}
+      {niebla && (
+        <g fill={noche ? '#8b9bb3' : '#ffffff'}>
+          <ellipse className="fvh-neblina-a" cx={cx - 120} cy={lluviaY + 2} rx="190" ry="22" opacity={noche ? 0.4 : 0.62} />
+          <ellipse className="fvh-neblina-b" cx={cx - 30} cy={lluviaY + 30} rx="220" ry="18" opacity={noche ? 0.3 : 0.5} />
+          <ellipse className="fvh-neblina-a" cx={cx - 190} cy={lluviaY + 74} rx="200" ry="20" opacity={noche ? 0.22 : 0.36} />
+        </g>
+      )}
+
+      {/* LLUVIA — cortina ancha de trazos diagonales en dos alturas
+          (rsvg-safe, sin filtros) */}
       {lluvia && (
-        <g className="fvh-lluvia" stroke={noche ? '#aebfe0' : '#cfe6f0'} strokeWidth="1.6" strokeLinecap="round" opacity="0.7">
-          <line x1={cx - 90} y1={lluviaY} x2={cx - 96} y2={lluviaY + 14} />
-          <line x1={cx - 50} y1={lluviaY + 8} x2={cx - 56} y2={lluviaY + 22} />
-          <line x1={cx - 10} y1={lluviaY} x2={cx - 16} y2={lluviaY + 14} />
-          <line x1={cx + 28} y1={lluviaY + 6} x2={cx + 22} y2={lluviaY + 20} />
-          <line x1={cx + 64} y1={lluviaY} x2={cx + 58} y2={lluviaY + 14} />
+        <g className="fvh-lluvia" stroke={noche ? '#aebfe0' : '#4e7d9a'} strokeWidth="2.4" strokeLinecap="round" opacity="0.8">
+          <line x1={cx - 90} y1={lluviaY} x2={cx - 97} y2={lluviaY + 22} />
+          <line x1={cx - 50} y1={lluviaY + 8} x2={cx - 57} y2={lluviaY + 30} />
+          <line x1={cx - 10} y1={lluviaY} x2={cx - 17} y2={lluviaY + 22} />
+          <line x1={cx + 28} y1={lluviaY + 6} x2={cx + 21} y2={lluviaY + 28} />
+          <line x1={cx + 64} y1={lluviaY} x2={cx + 57} y2={lluviaY + 22} />
+          <line x1={cx - 130} y1={lluviaY + 4} x2={cx - 137} y2={lluviaY + 26} />
+          <line x1={cx - 170} y1={lluviaY + 10} x2={cx - 177} y2={lluviaY + 32} />
+          <line x1={cx - 210} y1={lluviaY + 2} x2={cx - 217} y2={lluviaY + 24} />
+          <line x1={cx - 250} y1={lluviaY + 8} x2={cx - 257} y2={lluviaY + 30} />
+          <line x1={cx - 286} y1={lluviaY + 2} x2={cx - 293} y2={lluviaY + 24} />
+          <line x1={cx - 70} y1={lluviaY + 34} x2={cx - 77} y2={lluviaY + 56} />
+          <line x1={cx - 150} y1={lluviaY + 40} x2={cx - 157} y2={lluviaY + 62} />
+          <line x1={cx - 230} y1={lluviaY + 36} x2={cx - 237} y2={lluviaY + 58} />
+          <line x1={cx + 10} y1={lluviaY + 42} x2={cx + 3} y2={lluviaY + 64} />
+          <line x1={cx + 46} y1={lluviaY + 34} x2={cx + 39} y2={lluviaY + 56} />
         </g>
       )}
     </g>
   );
 }
 
-/** Gradiente del sol — compartido por las 3 escenas (un solo def reusable). */
+/** Gradientes del sol — compartidos por las 3 escenas (defs reusables):
+ *  el dorado de mediodía y el ámbar del sol bajo (amanecer/atardecer). */
 function SolGrad() {
   return (
-    <radialGradient id="fvh-sol-grad" cx="50%" cy="45%" r="60%">
-      <stop offset="0" stopColor="#fff3c4" />
-      <stop offset="70%" stopColor="#ffe08a" />
-      <stop offset="100%" stopColor="#ffd24d" />
-    </radialGradient>
+    <>
+      <radialGradient id="fvh-sol-grad" cx="50%" cy="45%" r="60%">
+        <stop offset="0" stopColor="#fff3c4" />
+        <stop offset="70%" stopColor="#ffe08a" />
+        <stop offset="100%" stopColor="#ffd24d" />
+      </radialGradient>
+      <radialGradient id="fvh-sol-warm" cx="50%" cy="45%" r="60%">
+        <stop offset="0" stopColor="#fff0c0" />
+        <stop offset="60%" stopColor="#ffc266" />
+        <stop offset="100%" stopColor="#ff9a4d" />
+      </radialGradient>
+      {/* veladura cálida del sol bajo — baña la escena al amanecer/atardecer */}
+      <linearGradient id="fvh-wash-warm" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stopColor="#ff9a4d" stopOpacity="0.30" />
+        <stop offset="55%" stopColor="#ffb35c" stopOpacity="0.10" />
+        <stop offset="100%" stopColor="#ffb35c" stopOpacity="0" />
+      </linearGradient>
+    </>
+  );
+}
+
+/**
+ * Veladura cálida de sol bajo — rect a pantalla completa de la escena que tiñe
+ * TODO (cielo, lomas, plantas) de ámbar al amanecer/atardecer, como la luz
+ * rasante real. De día/noche no pinta nada.
+ */
+function WashSolBajo({ cielo, w = 390, h = 360 }) {
+  const tono = tonoLuz(cielo);
+  if (tono !== 'amanecer' && tono !== 'atardecer') return null;
+  return (
+    <rect
+      x="0" y="0" width={w} height={h}
+      fill="url(#fvh-wash-warm)"
+      opacity={tono === 'atardecer' ? 0.9 : 0.7}
+      pointerEvents="none"
+    />
   );
 }
 
@@ -854,29 +1001,96 @@ function buildPortales({ onNavigate, abrirAgente, irAGestion, scene, poblada, es
   ];
 }
 
-// ── SVG de los 4 portales (place-svg), del mockup F2 ────────────────────────
+// ── SVG de los 4 portales (place-svg) ────────────────────────────────────────
+// Cada portal es un LUGAR ilustrado con horizonte, tierra y un foco propio
+// (parcela con casita · rancho de lectura · isla de juego · claro del agente).
+// Sin <text> con emoji dentro del SVG: en Android/iOS viejos esos glifos
+// renderizan monocromos o vacíos — todo es dibujo vectorial propio.
 
 function PlaceGestionar() {
   return (
     <svg className="place-svg" viewBox="0 0 180 140" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <polygon points="90,46 150,80 90,114 30,80" fill="#3f7a4e" />
-      <polygon points="90,46 150,80 90,82 30,80" fill="#4f9460" opacity=".7" />
-      <g stroke="#2f6b3a" strokeWidth="2" strokeLinecap="round" fill="none" opacity=".85">
-        <path d="M70 84 v-12" /><path d="M84 90 v-12" /><path d="M98 84 v-12" /><path d="M112 90 v-12" />
+      {/* amanecer del lugar: sol suave + loma de fondo */}
+      <circle cx="146" cy="26" r="14" fill="#ffe08a" opacity=".5" />
+      <circle cx="146" cy="26" r="8" fill="#ffedb3" opacity=".8" />
+      <path d="M-4 66 Q50 42 104 62 T184 58 V90 H-4 Z" fill="#356b42" opacity=".55" />
+      {/* parcela isométrica con surcos */}
+      <polygon points="90,44 152,80 90,116 28,80" fill="#3f7a4e" />
+      <polygon points="90,44 152,80 90,82 28,80" fill="#4f9460" opacity=".7" />
+      <g stroke="#2f6b3a" strokeWidth="2.4" strokeLinecap="round" fill="none" opacity=".7">
+        <path d="M56 82 L90 100" /><path d="M70 74 L108 95" /><path d="M84 66 L122 87" />
       </g>
-      <g fill="#bef264"><circle cx="70" cy="70" r="4" /><circle cx="98" cy="70" r="4" /><circle cx="84" cy="76" r="4" /></g>
+      {/* matas en hilera (tallo + copa + fruto) */}
+      <g className="fvh-p-mata">
+        <g strokeLinecap="round">
+          <path d="M64 84 v-12" stroke="#2f6b3a" strokeWidth="2.2" fill="none" />
+          <circle cx="64" cy="69" r="5" fill="#7fc06f" /><circle cx="62" cy="67" r="2.6" fill="#a7e17a" />
+          <circle cx="67" cy="72" r="2" fill="#ff5d44" />
+        </g>
+        <g strokeLinecap="round">
+          <path d="M88 96 v-13" stroke="#2f6b3a" strokeWidth="2.2" fill="none" />
+          <circle cx="88" cy="79" r="5.5" fill="#7fc06f" /><circle cx="86" cy="77" r="2.8" fill="#a7e17a" />
+          <circle cx="91" cy="82" r="2" fill="#ffd24d" />
+        </g>
+        <g strokeLinecap="round">
+          <path d="M112 88 v-11" stroke="#2f6b3a" strokeWidth="2.2" fill="none" />
+          <circle cx="112" cy="73" r="4.6" fill="#7fc06f" /><circle cx="110" cy="71" r="2.4" fill="#a7e17a" />
+        </g>
+      </g>
+      {/* casita campesina al fondo (pared clara, techo terracota, humo) */}
+      <g transform="translate(38 52)">
+        <path className="fvh-p-humo" d="M14 -12 q-3 -5 1 -8 q4 -3 1 -7" stroke="#f4efe2" strokeWidth="2.2" fill="none" strokeLinecap="round" opacity=".75" />
+        <rect x="11" y="-14" width="5" height="8" fill="#8a5a38" />
+        <polygon points="0,-6 13,-16 26,-6" fill="#c2562f" />
+        <polygon points="2,-6 24,-6 24,10 2,10" fill="#f6efe0" />
+        <rect x="10" y="0" width="6" height="10" fill="#7a5230" />
+        <rect x="4" y="-2" width="4.5" height="4.5" fill="#9fc9d8" />
+        <rect x="18" y="-2" width="4.5" height="4.5" fill="#9fc9d8" />
+      </g>
+      {/* letrero de madera de la parcela */}
+      <g transform="translate(126 92)">
+        <rect x="6" y="0" width="3" height="12" rx="1.5" fill="#7a5230" />
+        <rect x="-2" y="-8" width="19" height="10" rx="2.5" fill="#caa066" />
+        <path d="M2 -3 h11" stroke="#7a5230" strokeWidth="1.6" strokeLinecap="round" />
+      </g>
     </svg>
   );
 }
 function PlaceAprender() {
   return (
     <svg className="place-svg" viewBox="0 0 180 140" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <polygon points="90,52 150,84 90,116 30,84" fill="#c47b2f" />
-      <g transform="translate(90 60)">
-        <polygon points="-22,18 0,6 22,18 22,30 -22,30" fill="#f0c878" />
-        <polygon points="-26,18 0,4 26,18 0,18" fill="#a85d28" />
-        <rect x="-6" y="20" width="12" height="10" fill="#7a5230" />
-        <text x="0" y="0" fontSize="16" textAnchor="middle">📖</text>
+      {/* tarde dorada + loma ocre */}
+      <circle cx="34" cy="24" r="12" fill="#ffe6a8" opacity=".55" />
+      <path d="M-4 70 Q60 48 120 66 T184 62 V96 H-4 Z" fill="#9a5f24" opacity=".45" />
+      {/* explanada de tierra */}
+      <polygon points="90,50 152,84 90,118 28,84" fill="#c47b2f" />
+      <polygon points="90,50 152,84 90,86 28,84" fill="#d18c3f" opacity=".7" />
+      {/* rancho de lectura: paja a trazos + horcones + libro abierto DIBUJADO */}
+      <g transform="translate(90 58)">
+        <polygon points="-30,16 0,0 30,16 24,20 0,7 -24,20" fill="#a85d28" />
+        <polygon points="-26,17 0,4 26,17 0,17" fill="#8a4b20" opacity=".9" />
+        <g stroke="#e8bd7a" strokeWidth="1.4" opacity=".65" strokeLinecap="round">
+          <path d="M-20 13 L0 3" /><path d="M-12 15 L2 8" /><path d="M20 13 L0 3" /><path d="M12 15 L-2 8" />
+        </g>
+        <g stroke="#7a5230" strokeWidth="3" strokeLinecap="round">
+          <path d="M-22 18 V36" /><path d="M22 18 V36" />
+        </g>
+        {/* mesa + libro abierto (páginas blancas, lomo, renglones) */}
+        <polygon points="-16,34 0,26 16,34 0,42" fill="#8a6038" />
+        <g className="fvh-p-libro">
+          <path d="M-11 30 Q-5 26 0 28 L0 36 Q-5 34 -11 37 Z" fill="#fdf8ea" />
+          <path d="M11 30 Q5 26 0 28 L0 36 Q5 34 11 37 Z" fill="#f4ecd8" />
+          <path d="M0 28 V36" stroke="#c9b98e" strokeWidth="1" />
+          <g stroke="#b9a87c" strokeWidth=".9" opacity=".8">
+            <path d="M-8 31 Q-4 29 -1.5 30" /><path d="M-8 33.5 Q-4 31.5 -1.5 32.5" />
+            <path d="M8 31 Q4 29 1.5 30" /><path d="M8 33.5 Q4 31.5 1.5 32.5" />
+          </g>
+        </g>
+      </g>
+      {/* hojas-página que flotan (el saber que vuela) */}
+      <g className="fvh-p-hoja" fill="#e6c873" opacity=".9">
+        <path d="M132 52 q6 -4 10 0 q-4 6 -10 0 Z" />
+        <path d="M44 64 q5 -4 9 0 q-4 5 -9 0 Z" opacity=".8" />
       </g>
     </svg>
   );
@@ -884,27 +1098,80 @@ function PlaceAprender() {
 function PlaceJugar() {
   return (
     <svg className="place-svg" viewBox="0 0 180 140" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <polygon points="90,52 150,84 90,116 30,84" fill="#4f8fc0" />
-      <polygon points="90,72 124,90 90,108 56,90" fill="#9fe3ee" opacity=".85" />
-      <text x="90" y="98" fontSize="22" textAnchor="middle">🎮</text>
-      <text x="48" y="74" fontSize="15">🐞</text><text x="120" y="80" fontSize="14">🦋</text>
+      {/* cielo lúdico con estrellitas de juego */}
+      <g fill="#e8f6ff" className="fvh-p-brillo">
+        <path d="M38 26 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 Z" opacity=".9" />
+        <path d="M142 34 l1.6 4 4 1.6 -4 1.6 -1.6 4 -1.6 -4 -4 -1.6 4 -1.6 Z" opacity=".7" />
+      </g>
+      {/* isla-tablero: casillas isométricas alternadas */}
+      <polygon points="90,50 152,84 90,118 28,84" fill="#4f8fc0" />
+      <g>
+        <polygon points="90,58 121,75 90,92 59,75" fill="#9fe3ee" opacity=".9" />
+        <polygon points="90,58 105.5,66.5 90,75 74.5,66.5" fill="#7fc06f" />
+        <polygon points="105.5,66.5 121,75 105.5,83.5 90,75" fill="#c8f0f6" />
+        <polygon points="74.5,66.5 90,75 74.5,83.5 59,75" fill="#c8f0f6" />
+        <polygon points="90,75 105.5,83.5 90,92 74.5,83.5" fill="#7fc06f" />
+      </g>
+      {/* dado isométrico */}
+      <g className="fvh-p-dado" transform="translate(90 66)">
+        <polygon points="0,-10 11,-4 0,2 -11,-4" fill="#fdf8ea" />
+        <polygon points="-11,-4 0,2 0,15 -11,9" fill="#dfe8ea" />
+        <polygon points="11,-4 0,2 0,15 11,9" fill="#c3d3d8" />
+        <circle cx="0" cy="-4.5" r="1.8" fill="#38506a" />
+        <circle cx="-5.5" cy="3.5" r="1.6" fill="#38506a" /><circle cx="-5.5" cy="9" r="1.6" fill="#38506a" />
+        <circle cx="5.5" cy="3.5" r="1.6" fill="#38506a" /><circle cx="5.5" cy="9" r="1.6" fill="#38506a" /><circle cx="5.5" cy="6.2" r="1.6" fill="#38506a" />
+      </g>
+      {/* banderín de meta */}
+      <g transform="translate(124 78)">
+        <path d="M0 14 V-10" stroke="#38506a" strokeWidth="2.4" strokeLinecap="round" />
+        <path d="M0 -10 L14 -6 L0 -2 Z" fill="#ff5d44" />
+      </g>
+      {/* mariquita dibujada (fauna aliada del juego) */}
+      <g className="fvh-p-bicho" transform="translate(50 88)">
+        <ellipse cx="0" cy="0" rx="6" ry="4.6" fill="#e0532f" />
+        <path d="M0 -4.6 V4.6" stroke="#3a2024" strokeWidth="1.2" />
+        <circle cx="-2.4" cy="-1.4" r="1.1" fill="#3a2024" /><circle cx="2.6" cy="1" r="1.1" fill="#3a2024" />
+        <circle cx="0" cy="-5.4" r="2" fill="#3a2024" />
+      </g>
+      {/* mariposa dibujada */}
+      <g className="fvh-p-bicho" transform="translate(128 58)" style={{ animationDelay: '.6s' }}>
+        <path d="M0 0 q-6 -7 -10 -2 q-2 4 5 5 Z" fill="#f2b441" />
+        <path d="M0 0 q6 -7 10 -2 q2 4 -5 5 Z" fill="#ffd24d" />
+        <path d="M0 -2 V5" stroke="#5a4329" strokeWidth="1.3" strokeLinecap="round" />
+      </g>
     </svg>
   );
 }
 function PlaceAgente() {
   return (
     <svg className="place-svg" viewBox="0 0 180 140" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <polygon points="90,52 150,84 90,116 30,84" fill="#5d4db0" />
-      <circle cx="90" cy="80" r="26" fill="#11281f" />
-      <circle cx="90" cy="80" r="26" fill="none" stroke="#a3e635" strokeWidth="2.5" opacity=".8" />
-      {/* colibrí pequeño en el portal del agente (coherencia con la insignia) */}
+      {/* claro crepuscular con estrellas del agente */}
+      <g fill="#e9e3ff" className="fvh-p-brillo">
+        <circle cx="36" cy="26" r="1.6" /><circle cx="146" cy="22" r="1.3" /><circle cx="120" cy="38" r="1" />
+      </g>
+      <polygon points="90,50 152,84 90,118 28,84" fill="#5d4db0" />
+      <polygon points="90,50 152,84 90,86 28,84" fill="#6f5ec4" opacity=".65" />
+      {/* claro luminoso: anillos concéntricos que laten */}
+      <circle cx="90" cy="80" r="30" fill="#11281f" />
+      <circle className="fvh-p-anillo" cx="90" cy="80" r="30" fill="none" stroke="#a3e635" strokeWidth="2.5" opacity=".8" />
+      <circle className="fvh-p-anillo" cx="90" cy="80" r="36" fill="none" stroke="#a3e635" strokeWidth="1.2" opacity=".35" style={{ animationDelay: '.9s' }} />
+      {/* colibrí insignia (pico largo, gorget ámbar) */}
       <g transform="translate(74 72)">
+        <path d="M4 12 L-3 9 L1 14 L-4 17 L3 16 Z" fill="#8b5cf6" opacity=".85" />
         <ellipse cx="9" cy="10" rx="9" ry="5" fill="#10b981" transform="rotate(-16 9 10)" />
         <circle cx="18" cy="7" r="4.4" fill="#06b6d4" />
         <ellipse cx="19" cy="10" rx="2.4" ry="1.6" fill="#f59e0b" />
         <circle cx="19" cy="6" r="1" fill="#0c0a09" />
         <path d="M22 7 Q30 8 33 12" fill="none" stroke="#e2e8f0" strokeWidth="1.4" strokeLinecap="round" />
         <path d="M10 7 Q3 1 -3 5 Q4 12 12 8 Z" fill="#8b5cf6" opacity="0.8" />
+      </g>
+      {/* globo de conversación con puntitos (la voz del agente) */}
+      <g className="fvh-p-globo" transform="translate(114 50)">
+        <rect x="-14" y="-10" width="30" height="18" rx="9" fill="#fdf8ea" />
+        <path d="M-6 7 L-10 14 L-1 8 Z" fill="#fdf8ea" />
+        <circle cx="-6" cy="-1" r="1.8" fill="#5d4db0" />
+        <circle cx="1" cy="-1" r="1.8" fill="#5d4db0" />
+        <circle cx="8" cy="-1" r="1.8" fill="#5d4db0" />
       </g>
     </svg>
   );
@@ -918,15 +1185,14 @@ function PlaceAgente() {
 /** VARIANTE A · BALCÓN URBANO (materas, baranda, ciudad de fondo). */
 function SceneBalcon({ poblada, cielo }) {
   const noche = esNoche(cielo);
+  const [cieloA, cieloB] = cieloEscena(cielo, 'balcon');
   return (
-    <svg viewBox="0 0 390 360" preserveAspectRatio="xMidYMid meet"
+    <svg viewBox="0 0 390 360" preserveAspectRatio="xMidYMid slice"
       aria-label="Su balcón urbano visto en isométrico: materas con tomate y aromáticas, baranda y la ciudad de fondo.">
       <defs>
         <SolGrad />
         <linearGradient id="fvh-sky-balc" x1="0" y1="0" x2="0" y2="1">
-          {noche
-            ? (<><stop offset="0" stopColor="#1d2b4a" /><stop offset="1" stopColor="#46566b" /></>)
-            : (<><stop offset="0" stopColor="#8fd0e8" /><stop offset="1" stopColor="#dff0e3" /></>)}
+          <stop offset="0" stopColor={cieloA} /><stop offset="1" stopColor={cieloB} />
         </linearGradient>
         <linearGradient id="fvh-city-balc" x1="0" y1="0" x2="0" y2="1">
           {noche
@@ -1043,13 +1309,15 @@ function SceneBalcon({ poblada, cielo }) {
           </g>
         </g>
       )}
+      {/* veladura ámbar del sol bajo (amanecer/atardecer) */}
+      <WashSolBajo cielo={cielo} />
     </svg>
   );
 }
 
 /** VARIANTE B · INVERNADERO (techo translúcido, hileras densas de tomate). */
 function SceneInvernadero({ poblada, cielo }) {
-  const noche = esNoche(cielo);
+  const [cieloA, cieloB] = cieloEscena(cielo, 'invernadero');
   // Hileras densas (monocultivo) generadas como en el mockup (buildInvernadero).
   const hileras = useMemo(() => {
     const filas = [
@@ -1072,14 +1340,12 @@ function SceneInvernadero({ poblada, cielo }) {
   }, []);
 
   return (
-    <svg viewBox="0 0 390 360" preserveAspectRatio="xMidYMid meet"
+    <svg viewBox="0 0 390 360" preserveAspectRatio="xMidYMid slice"
       aria-label="Su invernadero visto en isométrico: techo translúcido y hileras densas de tomate en monocultivo, con líneas de riego. Diez mil plantas.">
       <defs>
         <SolGrad />
         <linearGradient id="fvh-sky-inv" x1="0" y1="0" x2="0" y2="1">
-          {noche
-            ? (<><stop offset="0" stopColor="#1d2b4a" /><stop offset="1" stopColor="#465a64" /></>)
-            : (<><stop offset="0" stopColor="#90cce0" /><stop offset="1" stopColor="#d4ecd6" /></>)}
+          <stop offset="0" stopColor={cieloA} /><stop offset="1" stopColor={cieloB} />
         </linearGradient>
         <linearGradient id="fvh-piso-inv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#bfae8a" /><stop offset="1" stopColor="#9a8a64" /></linearGradient>
         <linearGradient id="fvh-techo-inv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#cdeef0" stopOpacity=".82" /><stop offset="1" stopColor="#a6dde2" stopOpacity=".5" /></linearGradient>
@@ -1164,6 +1430,8 @@ function SceneInvernadero({ poblada, cielo }) {
           </g>
         </>
       )}
+      {/* veladura ámbar del sol bajo (amanecer/atardecer) */}
+      <WashSolBajo cielo={cielo} />
     </svg>
   );
 }
@@ -1174,24 +1442,41 @@ function SceneInvernadero({ poblada, cielo }) {
  * gallina, la vaca, la colmena, el guamo de sombra y los arbolitos del mockup
  * F2. El estado vacío es la versión "recién empieza" (terreno listo · 0 siembras).
  */
-function SceneFinca({ poblada, cielo }) {
+function SceneFinca({ poblada, cielo, estructura, escalaFinca }) {
   const noche = esNoche(cielo);
+  const [cieloA, cieloB] = cieloEscena(cielo, 'finca');
+  // Estructura de cubierta declarada en el perfil (#34 fase 1): invernadero de
+  // túnel / nave a dos aguas / casa-sombra / malla-sombra / umbráculo. Se
+  // dibuja también con la finca vacía: la estructura EXISTE aunque no haya
+  // siembras registradas (es infraestructura declarada, no fenología).
+  const conEstructura = !!estructura?.tiene;
+  const ariaEstructura = conEstructura
+    ? ` Incluye su ${nombreEstructura(estructura.forma)}.`
+    : '';
   return (
-    <svg viewBox="0 0 390 360" preserveAspectRatio="xMidYMid meet"
-      aria-label="Su finca vista en isométrico: milpa, hortaliza, estanque con pato, corral con cerdo, gallina, vaca y abejas, y un guamo de sombra al centro.">
+    <svg viewBox="0 0 390 360" preserveAspectRatio="xMidYMid slice"
+      aria-label={`Su finca vista en isométrico: milpa, hortaliza, estanque con pato, corral con cerdo, gallina, vaca y abejas, y un guamo de sombra al centro.${ariaEstructura}`}>
       <defs>
         <SolGrad />
         <linearGradient id="fvh-sky-f" x1="0" y1="0" x2="0" y2="1">
-          {noche
-            ? (<><stop offset="0" stopColor="#162544" /><stop offset="1" stopColor="#3d5560" /></>)
-            : (<><stop offset="0" stopColor="#7ac3da" /><stop offset="1" stopColor="#c8e8cb" /></>)}
+          <stop offset="0" stopColor={cieloA} /><stop offset="1" stopColor={cieloB} />
         </linearGradient>
         <linearGradient id="fvh-agua-f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#9fe3ee" /><stop offset="1" stopColor="#5ab8d8" /></linearGradient>
         <linearGradient id="fvh-tile-suelo-f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#9bb45a" /><stop offset="1" stopColor="#6f8a3f" /></linearGradient>
         <linearGradient id="fvh-tile-verde-f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#7fc06f" /><stop offset="1" stopColor="#4ca35c" /></linearGradient>
         <linearGradient id="fvh-tile-milpa-f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#c8d96a" /><stop offset="1" stopColor="#9bbf48" /></linearGradient>
+        {/* bruma del valle — banda que separa la cordillera de las lomas */}
+        <linearGradient id="fvh-bruma-f" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#ffffff" stopOpacity="0" />
+          <stop offset="55%" stopColor="#ffffff" stopOpacity="0.55" />
+          <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+        </linearGradient>
         <pattern id="fvh-pasto-f" width="12" height="12" patternUnits="userSpaceOnUse">
           <path d="M3 9 q1 -4 0 -6 M6 10 q0 -5 1 -7 M9 9 q-1 -4 0 -6" stroke="#5f8a3f" strokeWidth="1" fill="none" opacity=".45" strokeLinecap="round" />
+        </pattern>
+        {/* trama de malla (polisombra) — la usan casa-sombra y malla-sombra */}
+        <pattern id="fvh-malla-f" width="4" height="4" patternUnits="userSpaceOnUse">
+          <path d="M0 0 L4 4 M4 0 L0 4" stroke="#425446" strokeWidth=".6" opacity=".5" fill="none" />
         </pattern>
         <filter id="fvh-soft-f" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.2" /></filter>
       </defs>
@@ -1208,19 +1493,83 @@ function SceneFinca({ poblada, cielo }) {
             <ellipse cx="212" cy="32" rx="18" ry="9" /><ellipse cx="228" cy="29" rx="13" ry="9" /></g>
         </g>
       )}
+      {/* aves lejanas (solo de día despejado): dos trazos "m" que planean */}
+      {!noche && !esCubierto(cielo) && (
+        <g className="fvh-aves" stroke="#41616e" strokeWidth="1.6" fill="none" strokeLinecap="round" opacity=".55">
+          <path d="M120 66 q4 -5 8 0 q4 -5 8 0" />
+          <path d="M150 54 q3 -4 6 0 q3 -4 6 0" opacity=".8" />
+        </g>
+      )}
+
+      {/* CORDILLERA LEJANA — perspectiva aérea (azulada, dos planos) */}
+      <path
+        d="M0 148 Q46 108 96 132 Q138 96 186 126 Q232 92 278 124 Q328 98 390 130 V210 H0 Z"
+        fill={noche ? '#243a55' : '#8fb4c2'} opacity=".5"
+      />
+      <path
+        d="M0 158 Q70 120 140 142 Q210 112 280 140 Q340 118 390 142 V214 H0 Z"
+        fill={noche ? '#2b4460' : '#7ba6b0'} opacity=".45"
+      />
+      {/* bruma del valle entre la cordillera y las lomas (deriva lenta) */}
+      <rect className="fvh-bruma" x="-30" y="138" width="450" height="30" fill="url(#fvh-bruma-f)" opacity={noche ? 0.22 : 0.5} />
+
       {/* colinas de fondo */}
-      <path d="M0 158 Q100 122 200 150 T390 146 V210 H0 Z" fill="#6f9a52" opacity=".5" />
-      <path d="M0 174 Q120 144 250 168 T390 164 V220 H0 Z" fill="#5f8a47" opacity=".55" />
+      <path d="M0 158 Q100 122 200 150 T390 146 V210 H0 Z" fill={noche ? '#3a5a40' : '#6f9a52'} opacity=".55" />
+      <path d="M0 174 Q120 144 250 168 T390 164 V220 H0 Z" fill={noche ? '#31503a' : '#5f8a47'} opacity=".6" />
+      {/* arbolitos-silueta sobre la loma (profundidad de plano medio) */}
+      <g fill={noche ? '#2b4634' : '#547d40'} opacity=".7">
+        <path d="M58 160 q4 -12 8 0 l-2 0 v4 h-4 v-4 Z" />
+        <path d="M300 158 q4 -11 8 0 l-2 0 v4 h-4 v-4 Z" />
+        <path d="M338 166 q3 -9 6 0 l-1.5 0 v3 h-3 v-3 Z" />
+      </g>
+
+      {/* LUCIÉRNAGAS — solo de noche, el campo respira (titileo escalonado) */}
+      {noche && (
+        <g fill="#d9f99d" className="fvh-lucis">
+          <circle className="fvh-luci" cx="96" cy="212" r="2" />
+          <circle className="fvh-luci" cx="150" cy="188" r="1.6" style={{ animationDelay: '.9s' }} />
+          <circle className="fvh-luci" cx="252" cy="200" r="1.8" style={{ animationDelay: '1.7s' }} />
+          <circle className="fvh-luci" cx="304" cy="236" r="1.5" style={{ animationDelay: '2.4s' }} />
+          <circle className="fvh-luci" cx="204" cy="172" r="1.4" style={{ animationDelay: '3.1s' }} />
+        </g>
+      )}
 
       {/* PLATAFORMA ISO (la "isla" finca) */}
       <ellipse cx="195" cy="330" rx="150" ry="22" fill="#1c2418" opacity=".22" filter="url(#fvh-soft-f)" />
       <path d="M195 332 L40 244 L40 220 L195 308 L350 220 L350 244 Z" fill="#5e4626" />
       <path d="M195 332 L40 244 L40 220 L195 308 Z" fill="#4d3a1f" />
+      {/* raíces/estratos del talud (la isla tiene suelo VIVO, no un bloque plano) */}
+      <g stroke="#3e2e18" strokeWidth="1.4" opacity=".5" strokeLinecap="round">
+        <path d="M84 252 q6 8 2 16" /><path d="M150 286 q5 7 1 13" /><path d="M262 278 q-5 8 -1 14" /><path d="M316 250 q-6 8 -2 15" />
+      </g>
       <polygon points="195,148 350,220 195,308 40,220" fill="url(#fvh-tile-suelo-f)" />
       <polygon points="195,148 350,220 195,308 40,220" fill="url(#fvh-pasto-f)" />
+      {/* filo de luz sobre las aristas superiores de la isla */}
+      <path d="M40 220 L195 148 L350 220" fill="none" stroke="#e4efb4" strokeWidth="1.6" opacity=".5" />
       <g stroke="#5f8a3f" strokeWidth="1.4" opacity=".4">
         <line x1="118" y1="196" x2="272" y2="196" /><line x1="98" y1="218" x2="292" y2="218" /><line x1="118" y1="240" x2="272" y2="240" />
       </g>
+      {/* matas de flores silvestres + piedritas (textura de pradera viva) */}
+      <g aria-hidden="true">
+        <g fill="#f2b441"><circle cx="152" cy="252" r="2" /><circle cx="158" cy="255" r="1.6" /></g>
+        <g fill="#ff9ec4"><circle cx="236" cy="250" r="1.8" /><circle cx="242" cy="253" r="1.4" /></g>
+        <g fill="#e8e2d2" opacity=".8"><ellipse cx="176" cy="290" rx="3" ry="1.8" /><ellipse cx="216" cy="293" rx="2.4" ry="1.5" /></g>
+      </g>
+
+      {/* ESTRUCTURA DE CUBIERTA DECLARADA (#34 fase 1 — bug del operador: el
+          perfil decía "tengo invernadero" y la escena no lo dibujaba). Se pinta
+          al fondo de la isla (banda superior libre, entre la milpa y la
+          hortaliza), ANTES de las parcelas para respetar la profundidad
+          isométrica. El tamaño acompaña la escala declarada de la finca:
+          en una finca extensa el invernadero se ve proporcionalmente menor. */}
+      {conEstructura && (
+        <EstructuraCubierta
+          forma={estructura.forma}
+          tamano={estructura.tamano}
+          escalaFinca={escalaFinca}
+          noche={noche}
+        />
+      )}
 
       {poblada ? (
         <>
@@ -1350,8 +1699,13 @@ function SceneFinca({ poblada, cielo }) {
             </g>
           </g>
 
-          {/* sendero hacia el frente */}
-          <path d="M195 308 L176 322 L214 322 Z" fill="#d8c39a" opacity=".8" />
+          {/* sendero de piedra hacia el frente (invita a entrar) */}
+          <g>
+            <path d="M195 308 L172 326 L218 326 Z" fill="#d8c39a" opacity=".55" />
+            <ellipse cx="195" cy="311" rx="6" ry="3" fill="#e3d2ab" />
+            <ellipse cx="191" cy="318" rx="7" ry="3.4" fill="#d8c39a" />
+            <ellipse cx="198" cy="325" rx="8" ry="3.6" fill="#cdb78e" />
+          </g>
         </>
       ) : (
         <g>
@@ -1368,6 +1722,279 @@ function SceneFinca({ poblada, cielo }) {
           </g>
         </g>
       )}
+
+      {/* FOLLAJE DE PRIMER PLANO — hojas que enmarcan las esquinas inferiores
+          (tercer plano de profundidad: cordillera → isla → follaje cercano) */}
+      <g aria-hidden="true" opacity={noche ? 0.85 : 0.9}>
+        <g className="fvh-sway-slow" style={{ transformOrigin: '0px 360px' }}>
+          <path d="M-8 366 Q6 322 34 314 Q22 348 40 360 Q10 364 -8 366 Z" fill={noche ? '#152b1c' : '#245832'} />
+          <path d="M-10 368 Q-2 336 18 326 Q12 352 26 364 Q4 366 -10 368 Z" fill={noche ? '#1d3a26' : '#2e6b3a'} />
+        </g>
+        <g className="fvh-sway" style={{ transformOrigin: '390px 360px', animationDelay: '.8s' }}>
+          <path d="M398 366 Q386 328 358 320 Q372 350 354 362 Q382 366 398 366 Z" fill={noche ? '#152b1c' : '#245832'} />
+          <path d="M400 368 Q394 342 376 332 Q382 356 368 366 Q390 368 400 368 Z" fill={noche ? '#1d3a26' : '#2e6b3a'} />
+        </g>
+      </g>
+
+      {/* veladura ámbar del sol bajo — tiñe TODA la escena al amanecer/atardecer */}
+      <WashSolBajo cielo={cielo} />
     </svg>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  ESTRUCTURA DE CUBIERTA DECLARADA (#34 fase 1 — fix del bug del operador).
+//  El onboarding pregunta "¿Tiene invernadero?" + forma + tamaño y el dato se
+//  guardaba en el perfil… pero la escena de finca NUNCA lo dibujaba. Aquí vive
+//  el dibujo: una estructura SVG por forma declarada (rsvg-safe, sin filtros),
+//  con el tamaño relativo acompañando la escala de la finca. La fuente del dato
+//  es getInvernaderoEstructura(perfil) (userProfileService — fuente única).
+//
+//  Formas que este componente ya sabe dibujar:
+//    · tunel        → invernadero de túnel (media luna de plástico curvo).
+//    · cuadrado     → invernadero de nave a dos aguas.
+//    · casa_sombra  → casa-sombra (paredes y techo de malla anti-insectos).
+//    · malla_sombra → malla-sombra (polisombra plana sobre postes, sin paredes).
+//    · umbraculo    → umbráculo (techo de listones de madera sobre postes).
+//    · otro / null  → estructura cubierta genérica (media agua translúcida).
+//
+//  NOTA ONBOARDING: hoy la pregunta `invernadero_forma` solo ofrece
+//  cuadrado/tunel/otro. Para que el usuario declare casa-sombra, malla-sombra
+//  o umbráculo hay que AGREGAR esas opciones a PROFILE_QUESTIONS
+//  (userProfileService) — los valores ya son válidos en INVERNADERO_FORMAS y el
+//  render de cada una ya está listo aquí.
+// ════════════════════════════════════════════════════════════════════════════
+
+/** Nombre legible de cada forma (para el aria-label de la escena). */
+const ESTRUCTURA_NOMBRES = Object.freeze({
+  tunel: 'invernadero de túnel',
+  cuadrado: 'invernadero de nave a dos aguas',
+  casa_sombra: 'casa-sombra',
+  malla_sombra: 'malla-sombra',
+  umbraculo: 'umbráculo',
+});
+function nombreEstructura(forma) {
+  return ESTRUCTURA_NOMBRES[forma] || 'estructura cubierta';
+}
+
+/**
+ * Factor de tamaño de la estructura según la ESCALA declarada de la finca
+ * (SCENE_ESCALAS del selector): en una finca extensa el mismo invernadero se ve
+ * proporcionalmente menor que en una de menos de 1 ha. El texto libre de
+ * `invernadero_tamano` ("uno pequeño", "media hectárea") solo AFINA ese factor
+ * con una heurística mínima — nunca lo decide solo.
+ */
+const ESCALA_FACTOR_ESTRUCTURA = Object.freeze({
+  micro: 1,
+  pequena: 1,
+  media: 0.86,
+  grande: 0.74,
+  extensa: 0.64,
+});
+function factorEstructura(escalaFinca, tamano) {
+  let f = ESCALA_FACTOR_ESTRUCTURA[escalaFinca] ?? ESCALA_FACTOR_ESTRUCTURA.media;
+  if (typeof tamano === 'string') {
+    const t = tamano.toLowerCase();
+    if (/peque|chic/.test(t)) f *= 0.85;
+    else if (/grande|hect|nave/.test(t)) f *= 1.12;
+  }
+  return Math.round(f * 100) / 100;
+}
+
+/**
+ * La estructura de cubierta dentro de la escena de finca. Se ancla en la banda
+ * superior libre de la isla (entre la milpa y la hortaliza) y se dibuja ANTES
+ * de las parcelas para respetar la profundidad isométrica. `noche` solo la
+ * atenúa levemente (el resto de la escena maneja su propia paleta nocturna).
+ *
+ * @param {Object} props
+ * @param {string|null} props.forma       una de INVERNADERO_FORMAS (o null).
+ * @param {string|null} props.tamano      texto libre del onboarding.
+ * @param {string} [props.escalaFinca]    una de SCENE_ESCALAS (variant.escala).
+ * @param {boolean} [props.noche]         ¿la escena está en su paleta nocturna?
+ */
+function EstructuraCubierta({ forma, tamano, escalaFinca, noche }) {
+  const f = factorEstructura(escalaFinca, tamano);
+  // Compensa el scale para que el piso de la estructura no "flote": el punto de
+  // apoyo local está en y≈12, así que al encoger bajamos el ancla esa diferencia.
+  const ty = Math.round((191 + 12 * (1 - f)) * 10) / 10;
+  let cuerpo;
+  switch (forma) {
+    case 'tunel': cuerpo = <EstructuraTunel />; break;
+    case 'cuadrado': cuerpo = <EstructuraNave />; break;
+    case 'casa_sombra': cuerpo = <EstructuraCasaSombra />; break;
+    case 'malla_sombra': cuerpo = <EstructuraMallaSombra />; break;
+    case 'umbraculo': cuerpo = <EstructuraUmbraculo />; break;
+    default: cuerpo = <EstructuraGenerica />; // 'otro' o tiene=si sin forma declarada.
+  }
+  return (
+    <g
+      className="fvh-rise-svg"
+      style={{ animationDelay: '.12s' }}
+      transform={`translate(195 ${ty}) scale(${f})`}
+      opacity={noche ? 0.88 : 1}
+      data-testid="fvh-estructura"
+      data-forma={forma || 'generica'}
+    >
+      {cuerpo}
+    </g>
+  );
+}
+
+/** Invernadero de TÚNEL — media luna de plástico curvo (ej. el de Miguel). */
+function EstructuraTunel() {
+  return (
+    <g>
+      <ellipse cx="1" cy="13" rx="37" ry="7" fill="#1c2418" opacity=".18" />
+      {/* lomo de plástico curvo (media luna extruida) */}
+      <path d="M-34 12 Q-34 -15 -10 -17 L12 -17 Q36 -15 36 12 Z" fill="#cdeef0" opacity=".8" stroke="#9fd0d6" strokeWidth="1.6" />
+      {/* matas adentro, silueta a través del plástico */}
+      <g fill="#4ca35c" opacity=".5">
+        <circle cx="-16" cy="4" r="4.4" /><circle cx="-2" cy="5" r="4" />
+        <circle cx="12" cy="4" r="4.4" /><circle cx="24" cy="5" r="3.6" />
+      </g>
+      {/* costillas de los arcos */}
+      <g stroke="#eef9fa" strokeWidth="1.4" opacity=".85">
+        <line x1="-20" y1="12" x2="-20" y2="-13" />
+        <line x1="-4" y1="12" x2="-4" y2="-16" />
+        <line x1="12" y1="12" x2="12" y2="-16" />
+        <line x1="26" y1="12" x2="26" y2="-11" />
+      </g>
+      {/* brillo del lomo */}
+      <path d="M-30 -6 Q-10 -19 14 -14" stroke="#f2fbfc" strokeWidth="1.6" opacity=".7" fill="none" strokeLinecap="round" />
+      {/* boca del túnel (entrada abierta) */}
+      <path d="M-30 12 Q-30 -4 -21 -5 Q-12 -4 -12 12 Z" fill="#41604b" opacity=".8" />
+    </g>
+  );
+}
+
+/** Invernadero CUADRADO — nave a dos aguas con paredes translúcidas. */
+function EstructuraNave() {
+  return (
+    <g>
+      <ellipse cx="0" cy="14" rx="36" ry="7" fill="#1c2418" opacity=".18" />
+      {/* pared lateral que recede */}
+      <polygon points="-2,12 -2,-8 -30,-21 -30,-1" fill="#bfe4e9" opacity=".78" stroke="#9fd0d6" strokeWidth="1.2" />
+      {/* matas tras el plástico de la pared lateral */}
+      <g fill="#4ca35c" opacity=".45">
+        <circle cx="-12" cy="-1" r="3.4" /><circle cx="-21" cy="-6" r="3" />
+      </g>
+      {/* plano del techo (dos aguas, cae hacia el fondo) */}
+      <polygon points="14,-20 -14,-33 -30,-21 -2,-8" fill="#e8f7f8" opacity=".9" stroke="#9fd0d6" strokeWidth="1.2" />
+      <line x1="14" y1="-20" x2="-14" y2="-33" stroke="#f6fcfc" strokeWidth="1.6" opacity=".8" />
+      {/* frente con hastial */}
+      <polygon points="-2,12 -2,-8 14,-20 30,-8 30,12" fill="#dff2f4" opacity=".88" stroke="#9fd0d6" strokeWidth="1.4" />
+      <circle cx="0" cy="4" r="3.6" fill="#4ca35c" opacity=".45" />
+      {/* puerta */}
+      <rect x="8" y="-1" width="12" height="13" rx="1.5" fill="#55705c" opacity=".85" />
+    </g>
+  );
+}
+
+/** CASA-SOMBRA — casa de malla anti-insectos (paredes y techo de trama). */
+function EstructuraCasaSombra() {
+  return (
+    <g>
+      <ellipse cx="0" cy="14" rx="34" ry="6.5" fill="#1c2418" opacity=".18" />
+      {/* pared lateral de malla */}
+      <polygon points="-2,12 -2,-6 -30,-19 -30,1" fill="#eef2e6" opacity=".5" stroke="#8aa08e" strokeWidth="1.2" />
+      <polygon points="-2,12 -2,-6 -30,-19 -30,1" fill="url(#fvh-malla-f)" />
+      {/* matas visibles a través de la malla */}
+      <g fill="#4ca35c" opacity=".4">
+        <circle cx="-12" cy="0" r="3.4" /><circle cx="-21" cy="-5" r="3" />
+      </g>
+      {/* techo de malla (dos aguas suave) */}
+      <polygon points="12,-16 -16,-29 -30,-19 -2,-6" fill="#eef2e6" opacity=".55" stroke="#8aa08e" strokeWidth="1.2" />
+      <polygon points="12,-16 -16,-29 -30,-19 -2,-6" fill="url(#fvh-malla-f)" />
+      {/* frente de malla con hastial */}
+      <polygon points="-2,12 -2,-6 12,-16 26,-6 26,12" fill="#eef2e6" opacity=".5" stroke="#8aa08e" strokeWidth="1.4" />
+      <polygon points="-2,12 -2,-6 12,-16 26,-6 26,12" fill="url(#fvh-malla-f)" />
+      <circle cx="2" cy="4" r="3.4" fill="#4ca35c" opacity=".4" />
+      {/* marcos de madera de las esquinas */}
+      <g stroke="#7a5230" strokeWidth="2" strokeLinecap="round">
+        <line x1="-2" y1="12" x2="-2" y2="-6" /><line x1="26" y1="12" x2="26" y2="-6" />
+      </g>
+      {/* puerta de malla (paño más denso) */}
+      <rect x="7" y="0" width="11" height="12" rx="1.5" fill="#4e5f52" opacity=".8" />
+    </g>
+  );
+}
+
+/** MALLA-SOMBRA — polisombra plana sobre postes, sin paredes. */
+function EstructuraMallaSombra() {
+  return (
+    <g>
+      <ellipse cx="2" cy="13" rx="35" ry="6.5" fill="#1c2418" opacity=".18" />
+      {/* postes traseros (más cortos en pantalla: están más lejos) */}
+      <g stroke="#8a6038" strokeWidth="2.2" strokeLinecap="round">
+        <line x1="-20" y1="4" x2="-20" y2="-18" /><line x1="34" y1="4" x2="34" y2="-18" />
+      </g>
+      {/* matas bajo la sombra (sin paredes: se ven directo) */}
+      <g fill="#4ca35c" opacity=".8">
+        <circle cx="-20" cy="6" r="4" /><circle cx="-6" cy="8" r="4.4" />
+        <circle cx="8" cy="7" r="4" /><circle cx="22" cy="8" r="4.2" />
+      </g>
+      {/* paño de polisombra (leve pandeo al frente) */}
+      <polygon points="-30,-8 26,-8 34,-18 -22,-18" fill="#46584a" opacity=".55" stroke="#3b4a3f" strokeWidth="1" />
+      <polygon points="-30,-8 26,-8 34,-18 -22,-18" fill="url(#fvh-malla-f)" />
+      <path d="M-30 -8 Q-2 -4.5 26 -8" stroke="#3b4a3f" strokeWidth="1.2" opacity=".6" fill="none" />
+      {/* postes delanteros */}
+      <g stroke="#7a5230" strokeWidth="2.6" strokeLinecap="round">
+        <line x1="-30" y1="12" x2="-30" y2="-8" /><line x1="-2" y1="13" x2="-2" y2="-6" />
+        <line x1="26" y1="12" x2="26" y2="-8" />
+      </g>
+    </g>
+  );
+}
+
+/** UMBRÁCULO — techo de listones de madera sobre postes (sombra parcial). */
+function EstructuraUmbraculo() {
+  return (
+    <g>
+      <ellipse cx="2" cy="13" rx="35" ry="6.5" fill="#1c2418" opacity=".18" />
+      {/* postes traseros */}
+      <g stroke="#8a6038" strokeWidth="2.4" strokeLinecap="round">
+        <line x1="-20" y1="4" x2="-20" y2="-18" /><line x1="34" y1="4" x2="34" y2="-18" />
+      </g>
+      {/* matas bajo la sombra parcial */}
+      <g fill="#4ca35c" opacity=".85">
+        <circle cx="-18" cy="7" r="4.2" /><circle cx="-4" cy="8" r="4.4" />
+        <circle cx="10" cy="7" r="4" /><circle cx="23" cy="8" r="3.8" />
+      </g>
+      {/* plano del techo + listones */}
+      <polygon points="-30,-8 26,-8 34,-18 -22,-18" fill="#caa066" opacity=".3" stroke="#a8763e" strokeWidth="1.2" />
+      <g stroke="#a8763e" strokeWidth="2" strokeLinecap="round" opacity=".85">
+        <line x1="-26" y1="-9" x2="-19" y2="-17" /><line x1="-18" y1="-9" x2="-11" y2="-17" />
+        <line x1="-10" y1="-9" x2="-3" y2="-17" /><line x1="-2" y1="-9" x2="5" y2="-17" />
+        <line x1="6" y1="-9" x2="13" y2="-17" /><line x1="14" y1="-9" x2="21" y2="-17" />
+        <line x1="22" y1="-9" x2="29" y2="-17" />
+      </g>
+      {/* postes delanteros de madera */}
+      <g stroke="#7a5230" strokeWidth="3" strokeLinecap="round">
+        <line x1="-30" y1="12" x2="-30" y2="-8" /><line x1="-2" y1="13" x2="-2" y2="-6" />
+        <line x1="26" y1="12" x2="26" y2="-8" />
+      </g>
+    </g>
+  );
+}
+
+/** GENÉRICA ('otro' / sin forma) — cobertizo a un agua translúcido. */
+function EstructuraGenerica() {
+  return (
+    <g>
+      <ellipse cx="0" cy="14" rx="32" ry="6.5" fill="#1c2418" opacity=".18" />
+      {/* pared lateral derecha (recede hacia el fondo) */}
+      <polygon points="22,12 22,-8 30,-19 30,1" fill="#bfe4e9" opacity=".78" stroke="#9fd0d6" strokeWidth="1.2" />
+      {/* techo a un agua */}
+      <polygon points="-24,-8 22,-8 30,-19 -16,-19" fill="#e8f7f8" opacity=".9" stroke="#9fd0d6" strokeWidth="1.2" />
+      {/* frente translúcido */}
+      <polygon points="-24,12 -24,-8 22,-8 22,12" fill="#dff2f4" opacity=".85" stroke="#9fd0d6" strokeWidth="1.4" />
+      {/* matas tras el plástico */}
+      <g fill="#4ca35c" opacity=".45">
+        <circle cx="-16" cy="3" r="3.6" /><circle cx="12" cy="4" r="3.4" />
+      </g>
+      {/* puerta */}
+      <rect x="-6" y="-1" width="11" height="13" rx="1.5" fill="#55705c" opacity=".85" />
+    </g>
   );
 }

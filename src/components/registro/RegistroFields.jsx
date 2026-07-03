@@ -31,7 +31,13 @@ export function FieldError({ children }) {
   );
 }
 
-/** Campo de texto. */
+/**
+ * @param {Object} props
+ * @param {import('react').ReactNode} props.label
+ * @param {string} [props.hint]
+ * @param {import('react').ComponentType<{size?: number}>} [props.Icon]
+ * @param {string} [props.error]
+ */
 export function TextField({ label, hint, Icon, error, ...rest }) {
   return (
     <label className="registro-field">
@@ -46,7 +52,13 @@ export function TextField({ label, hint, Icon, error, ...rest }) {
   );
 }
 
-/** Campo numérico (cantidad, costo). */
+/**
+ * @param {Object} props
+ * @param {import('react').ReactNode} props.label
+ * @param {string} [props.hint]
+ * @param {import('react').ComponentType<{size?: number}>} [props.Icon]
+ * @param {string} [props.error]
+ */
 export function NumberField({ label, hint, Icon, error, ...rest }) {
   return (
     <label className="registro-field">
@@ -63,7 +75,15 @@ export function NumberField({ label, hint, Icon, error, ...rest }) {
   );
 }
 
-/** Select. `options` = [{ value, label }]. `placeholder` añade opción vacía. */
+/**
+ * @param {Object} props
+ * @param {import('react').ReactNode} props.label
+ * @param {string} [props.hint]
+ * @param {import('react').ComponentType<{size?: number}>} [props.Icon]
+ * @param {string} [props.error]
+ * @param {Array<{value: string, label: string}>} props.options
+ * @param {string} [props.placeholder]
+ */
 export function SelectField({ label, hint, Icon, error, options, placeholder, ...rest }) {
   return (
     <label className="registro-field">
@@ -83,7 +103,13 @@ export function SelectField({ label, hint, Icon, error, options, placeholder, ..
   );
 }
 
-/** Área de texto multilínea (observaciones / notas). */
+/**
+ * @param {Object} props
+ * @param {import('react').ReactNode} props.label
+ * @param {string} [props.hint]
+ * @param {import('react').ComponentType<{size?: number}>} [props.Icon]
+ * @param {string} [props.error]
+ */
 export function TextAreaField({ label, hint, Icon, error, ...rest }) {
   return (
     <label className="registro-field">

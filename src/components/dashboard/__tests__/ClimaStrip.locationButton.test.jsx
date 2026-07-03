@@ -73,20 +73,20 @@ import { getProfile, getProfileMunicipio } from '../../../services/userProfileSe
 // snapshots `Once` se consumen fuera de orden. Lo restauramos al default
 // (sin snapshot) antes de cada test; cada test fija su propio `Once`.
 beforeEach(() => {
-    fetchClimaSnapshot.mockReset();
-    fetchClimaSnapshot.mockResolvedValue(null);
+    vi.mocked(fetchClimaSnapshot).mockReset();
+    vi.mocked(fetchClimaSnapshot).mockResolvedValue(null);
     // Mismo problema con findMunicipio: su cola de `mockReturnValueOnce` y su
     // historial se filtran entre tests (los efectos asíncronos de un render
     // anterior pueden consumir el `Once` del test actual). Lo restauramos al
     // default (sin match DANE) antes de cada test.
-    findMunicipio.mockReset();
-    findMunicipio.mockReturnValue(null);
+    vi.mocked(findMunicipio).mockReset();
+    vi.mocked(findMunicipio).mockReturnValue(null);
     // getProfileMunicipio: algunos tests lo fijan con mockReturnValue(...) y eso
     // reemplaza la implementación para TODOS los tests posteriores. Restauramos
     // la semántica real (deriva de getProfile().municipio) antes de cada test;
     // los tests que prueban el fallback de región la sobrescriben localmente.
-    getProfileMunicipio.mockReset();
-    getProfileMunicipio.mockImplementation(() => getProfile()?.municipio ?? null);
+    vi.mocked(getProfileMunicipio).mockReset();
+    vi.mocked(getProfileMunicipio).mockImplementation(() => getProfile()?.municipio ?? null);
 });
 
 describe('ClimaStrip — botón "Configurar ubicación" (bug fix Brave 2026-05-28)', () => {
@@ -137,29 +137,29 @@ describe('ClimaStrip — botón "Configurar ubicación" (bug fix Brave 2026-05-2
  */
 describe('ClimaStrip — municipio desde perfil (bug fix store mismatch 2026-05-30)', () => {
     test('NO muestra "Configurar ubicación" si el perfil tiene municipio', async () => {
-        getProfile.mockReturnValue({ municipio: 'Choachí' });
-        getProfileMunicipio.mockReturnValueOnce('Choachí');
+        vi.mocked(getProfile).mockReturnValue({ municipio: 'Choachí' });
+        vi.mocked(getProfileMunicipio).mockReturnValueOnce('Choachí');
         render(<ClimaStrip onNavigate={vi.fn()} />);
         // Esperar a que el efecto de carga resuelva (fetchClimaSnapshot mock → null).
         await waitFor(() =>
             expect(screen.queryByText('Configurar ubicación')).not.toBeInTheDocument(),
         );
-        getProfile.mockReturnValue({});
+        vi.mocked(getProfile).mockReturnValue({});
     });
 
     test('refresca al recibir el evento "chagra:location-updated"', async () => {
         // Arranca sin municipio → muestra el CTA.
-        getProfileMunicipio.mockReturnValue(null);
+        vi.mocked(getProfileMunicipio).mockReturnValue(null);
         render(<ClimaStrip onNavigate={vi.fn()} />);
         expect(await screen.findByText('Configurar ubicación')).toBeInTheDocument();
         // El usuario confirma ubicación: el perfil ahora tiene municipio y se
         // dispara el evento. El card debe dejar de mostrar el CTA.
-        getProfileMunicipio.mockReturnValue('Une');
+        vi.mocked(getProfileMunicipio).mockReturnValue('Une');
         fireEvent(window, new CustomEvent('chagra:location-updated', { detail: { municipio: 'Une' } }));
         await waitFor(() =>
             expect(screen.queryByText('Configurar ubicación')).not.toBeInTheDocument(),
         );
-        getProfileMunicipio.mockReturnValue(null);
+        vi.mocked(getProfileMunicipio).mockReturnValue(null);
     });
 });
 
@@ -190,45 +190,45 @@ describe('ClimaStrip — pronóstico real Open-Meteo (fix fuente de datos 2026-0
         // Perfil completo: coords reales de la finca + altitud (2580 msnm). Con
         // la altitud en el perfil, resolveGeo no necesita geocodificar y reenvía
         // elevation para que Open-Meteo corrija la temperatura por gradiente.
-        getProfile.mockReturnValue({
+        vi.mocked(getProfile).mockReturnValue({
             municipio: 'Choachí',
             ubicacion_lat: 4.53,
             ubicacion_lng: -73.92,
             finca_altitud: '2580',
         });
-        findMunicipio.mockClear();
-        fetchClimaSnapshot.mockResolvedValueOnce(snapshotConForecast);
+        vi.mocked(findMunicipio).mockClear();
+        vi.mocked(fetchClimaSnapshot).mockResolvedValueOnce(snapshotConForecast);
         render(<ClimaStrip onNavigate={vi.fn()} />);
         await waitFor(() =>
             expect(fetchClimaSnapshot).toHaveBeenCalledWith({ lat: 4.53, lng: -73.92, elevation: 2580 }),
         );
         // Con coords + altitud del perfil NO debe geocodificar el municipio.
         expect(findMunicipio).not.toHaveBeenCalled();
-        getProfile.mockReturnValue({});
+        vi.mocked(getProfile).mockReturnValue({});
     });
 
     test('con coords pero SIN altitud en el perfil, cae a la curada del municipio (DANE)', async () => {
-        getProfile.mockReturnValue({
+        vi.mocked(getProfile).mockReturnValue({
             municipio: 'Choachí',
             ubicacion_lat: 4.53,
             ubicacion_lng: -73.92,
         });
-        findMunicipio.mockClear();
-        findMunicipio.mockReturnValueOnce({ name: 'Choachí', lat: 4.52, lng: -73.92, altitud: 1923 });
-        fetchClimaSnapshot.mockResolvedValueOnce(snapshotConForecast);
+        vi.mocked(findMunicipio).mockClear();
+        vi.mocked(findMunicipio).mockReturnValueOnce({ name: 'Choachí', lat: 4.52, lng: -73.92, altitud: 1923 });
+        vi.mocked(fetchClimaSnapshot).mockResolvedValueOnce(snapshotConForecast);
         render(<ClimaStrip onNavigate={vi.fn()} />);
         await waitFor(() =>
             // coords del perfil (no las del municipio) + altitud curada del DANE.
             expect(fetchClimaSnapshot).toHaveBeenCalledWith({ lat: 4.53, lng: -73.92, elevation: 1923 }),
         );
         expect(findMunicipio).toHaveBeenCalled();
-        getProfile.mockReturnValue({});
-        findMunicipio.mockReturnValue(null);
+        vi.mocked(getProfile).mockReturnValue({});
+        vi.mocked(findMunicipio).mockReturnValue(null);
     });
 
     test('renderiza temperaturas reales (máx/mín) del forecast', async () => {
-        getProfile.mockReturnValue({ municipio: 'Choachí', ubicacion_lat: 4.53, ubicacion_lng: -73.92 });
-        fetchClimaSnapshot.mockResolvedValueOnce(snapshotConForecast);
+        vi.mocked(getProfile).mockReturnValue({ municipio: 'Choachí', ubicacion_lat: 4.53, ubicacion_lng: -73.92 });
+        vi.mocked(fetchClimaSnapshot).mockResolvedValueOnce(snapshotConForecast);
         render(<ClimaStrip onNavigate={vi.fn()} />);
         // Open-Meteo en el header, NO IDEAM.
         expect(await screen.findByText(/Open-Meteo/i)).toBeInTheDocument();
@@ -238,31 +238,31 @@ describe('ClimaStrip — pronóstico real Open-Meteo (fix fuente de datos 2026-0
         expect(screen.getAllByText('10°').length).toBeGreaterThan(0);
         // Día con lluvia fuerte (14.7mm el día 2) → ícono de lluvia presente.
         expect(screen.getByText('25°')).toBeInTheDocument(); // día 4 máx 24.6 → 25
-        getProfile.mockReturnValue({});
+        vi.mocked(getProfile).mockReturnValue({});
     });
 
     test('geocodifica el municipio si el perfil no tiene coords (con altitud curada)', async () => {
-        getProfile.mockReturnValue({ municipio: 'Une' });
+        vi.mocked(getProfile).mockReturnValue({ municipio: 'Une' });
         // Une, Cundinamarca ≈ 1875 msnm en el dataset DANE curado.
-        findMunicipio.mockReturnValueOnce({ name: 'Une', lat: 4.40, lng: -73.99, altitud: 1875 });
-        fetchClimaSnapshot.mockResolvedValueOnce(snapshotConForecast);
+        vi.mocked(findMunicipio).mockReturnValueOnce({ name: 'Une', lat: 4.40, lng: -73.99, altitud: 1875 });
+        vi.mocked(fetchClimaSnapshot).mockResolvedValueOnce(snapshotConForecast);
         render(<ClimaStrip onNavigate={vi.fn()} />);
         await waitFor(() =>
             expect(fetchClimaSnapshot).toHaveBeenCalledWith({ lat: 4.40, lng: -73.99, elevation: 1875 }),
         );
-        getProfile.mockReturnValue({});
-        findMunicipio.mockReturnValue(null);
+        vi.mocked(getProfile).mockReturnValue({});
+        vi.mocked(findMunicipio).mockReturnValue(null);
     });
 
     test('degrada limpio (sin romper) si Open-Meteo no está disponible', async () => {
-        getProfile.mockReturnValue({ municipio: 'Choachí', ubicacion_lat: 4.53, ubicacion_lng: -73.92 });
-        fetchClimaSnapshot.mockResolvedValueOnce({ openmeteo: { available: false, reason: 'offline' } });
+        vi.mocked(getProfile).mockReturnValue({ municipio: 'Choachí', ubicacion_lat: 4.53, ubicacion_lng: -73.92 });
+        vi.mocked(fetchClimaSnapshot).mockResolvedValueOnce({ openmeteo: { available: false, reason: 'offline' } });
         render(<ClimaStrip onNavigate={vi.fn()} />);
         // El strip se muestra (header con municipio) con el aviso de carga, sin
         // mostrar el CTA de configuración ni lanzar excepción.
         expect(await screen.findByText(/Clima en/i)).toBeInTheDocument();
         expect(screen.queryByText('Configurar ubicación')).not.toBeInTheDocument();
         expect(screen.getByText(/pronóstico fino aún se está cargando/i)).toBeInTheDocument();
-        getProfile.mockReturnValue({});
+        vi.mocked(getProfile).mockReturnValue({});
     });
 });

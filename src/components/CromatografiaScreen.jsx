@@ -6,6 +6,11 @@ import {
   MapPin, Calendar, Eye, CheckCircle2, Image, Layers, Droplets, Sprout,
 } from 'lucide-react';
 import { formatColombiaDate } from '../utils/colombiaDate';
+import {
+  interpretarCromatografia,
+  normalizarColor,
+  obtenerRecomendaciones,
+} from '../utils/cromatografiaInterpretacion';
 
 const STORAGE_KEY = 'chagra:cromatografia:v1';
 const THUMB_MAX = 300;
@@ -304,7 +309,8 @@ export default function CromatografiaScreen({ onBack, onNavigate: _onNavigate })
   const [procesando, setProcesando] = useState(false);
   const fileRef = useRef(null);
   const [comparar, setComparar] = useState([]);
-  const [mostrarZona, setMostrarZona] = useState(null);
+  const [interpretarForm, setInterpretarForm] = useState({ central: [], media: [], externa: [], picos: [] });
+  const [interpretarResult, setInterpretarResult] = useState(null);
 
   useEffect(() => { saveRecords(records); }, [records]);
 
@@ -370,6 +376,49 @@ export default function CromatografiaScreen({ onBack, onNavigate: _onNavigate })
       onBack?.();
     }
   };
+
+  const ejecutarInterpretacion = useCallback(() => {
+    const observaciones = [];
+    const zonas = ['central', 'media', 'externa', 'picos'];
+
+    for (const zona of zonas) {
+      const colores = interpretarForm[zona];
+      if (colores.length > 0) {
+        observaciones.push({
+          zona,
+          colores: colores.map(normalizarColor).filter(Boolean),
+        });
+      }
+    }
+
+    if (observaciones.length === 0) {
+      setError('Seleccione al menos un color en alguna zona');
+      return;
+    }
+
+    setError(null);
+    const resultado = interpretarCromatografia(observaciones);
+    setInterpretarResult(resultado);
+  }, [interpretarForm]);
+
+  const limpiarInterpretacion = useCallback(() => {
+    setInterpretarForm({ central: [], media: [], externa: [], picos: [] });
+    setInterpretarResult(null);
+    setError(null);
+  }, []);
+
+  const toggleColorInterpretacion = useCallback((zona, color) => {
+    setInterpretarForm((prev) => {
+      const zonaActual = prev[zona];
+      const yaSeleccionado = zonaActual.includes(color);
+      return {
+        ...prev,
+        [zona]: yaSeleccionado
+          ? zonaActual.filter((c) => c !== color)
+          : [...zonaActual, color],
+      };
+    });
+  }, []);
 
   /* ════════════════════ Header reutilizable ══════════════════════ */
   const Header = (
@@ -627,6 +676,23 @@ export default function CromatografiaScreen({ onBack, onNavigate: _onNavigate })
 
   /* ════════════════ Paso 3: Interpretacion por zonas ═════════════════════ */
   if (paso === 'interpretacion') {
+    // Opciones de colores por zona
+    const COLORES_OPCIONES = [
+      { id: 'marron_oscuro', nombre: 'Marrón oscuro', clase: 'bg-amber-900 border-amber-700' },
+      { id: 'blanco', nombre: 'Blanco', clase: 'bg-stone-200 border-stone-400' },
+      { id: 'gris', nombre: 'Gris', clase: 'bg-slate-500 border-slate-400' },
+      { id: 'violeta', nombre: 'Violeta', clase: 'bg-violet-800 border-violet-600' },
+      { id: 'rosado', nombre: 'Rosado', clase: 'bg-pink-800 border-pink-600' },
+      { id: 'amarillo', nombre: 'Amarillo', clase: 'bg-yellow-700 border-yellow-500' },
+    ];
+
+    const ZONAS_INTERPRETACION = [
+      { id: 'central', nombre: 'Zona central (mineral)', icono: '🪨' },
+      { id: 'media', nombre: 'Zona media (humica)', icono: '🌱' },
+      { id: 'externa', nombre: 'Zona externa (enzimática)', icono: '🧬' },
+      { id: 'picos', nombre: 'Picos y radiaciones', icono: '⚡' },
+    ];
+
     return (
       <div className="min-h-[100dvh] text-white">
         {Header}
@@ -635,107 +701,226 @@ export default function CromatografiaScreen({ onBack, onNavigate: _onNavigate })
           <div className="bg-sky-950/30 border border-sky-800/50 rounded-xl p-4 flex gap-3">
             <Lightbulb size={20} className="text-sky-400 shrink-0 mt-0.5" />
             <div className="text-sm text-sky-200">
-              <p className="font-bold">Lectura cualitativa, no numerica</p>
+              <p className="font-bold">Motor de interpretación</p>
               <p className="text-sky-300/80 mt-1">
-                La cromatografia de Pfeiffer no da numeros. Es una herramienta
-                visual para que compares tus suelos y veas tendencias. Lo
-                importante es repetir el metodo igual cada vez (misma cantidad de
-                suelo, misma concentracion) y comparar los cambios.
+                Seleccione los colores que observa en cada zona del cromatograma.
+                El motor analizará los patrones y le dará un diagnóstico del estado
+                de su suelo con recomendaciones prácticas.
               </p>
             </div>
           </div>
 
-          <h2 className="text-sm font-bold text-slate-200 uppercase tracking-wide mt-1">
-            Las 4 zonas del cromatograma
-          </h2>
-          <p className="text-xs text-slate-400 -mt-2">
-            Cada zona va desde el centro hacia afuera. Toca cada zona para leer
-            la explicacion completa.
-          </p>
+          {/* Resultado de la interpretación */}
+          {interpretarResult && (
+            <div
+              className={`rounded-xl p-4 border ${
+                interpretarResult.estado === 'vivo'
+                  ? 'bg-emerald-950/40 border-emerald-700/60'
+                  : interpretarResult.estado === 'degradado'
+                  ? 'bg-amber-950/40 border-amber-700/60'
+                  : interpretarResult.estado === 'quimicalizado'
+                  ? 'bg-red-950/40 border-red-700/60'
+                  : 'bg-slate-900 border-slate-700'
+              }`}
+            >
+              <div className="flex items-start gap-3 mb-3">
+                <div className="text-2xl shrink-0">
+                  {interpretarResult.estado === 'vivo'
+                    ? '🌱'
+                    : interpretarResult.estado === 'degradado'
+                    ? '🍂'
+                    : interpretarResult.estado === 'quimicalizado'
+                    ? '⚠️'
+                    : '❓'}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-white mb-1">
+                    Estado del suelo:{' '}
+                    <span className="uppercase">
+                      {interpretarResult.estado === 'vivo'
+                        ? 'VIVO'
+                        : interpretarResult.estado === 'degradado'
+                        ? 'DEGRADADO'
+                        : interpretarResult.estado === 'quimicalizado'
+                        ? 'QUÍMICALIZADO'
+                        : 'INCERTIDUMBRE ALTA'}
+                    </span>
+                  </p>
+                  <p className="text-sm text-slate-300">{interpretarResult.mensaje}</p>
+                </div>
+              </div>
 
-          {/* Diagrama de zonas */}
-          <div className="flex justify-center py-3">
-            <div className="relative w-56 h-56">
-              {/* Zona central */}
-              <div
-                className="absolute inset-[35%] rounded-full bg-amber-950/50 border-2 border-amber-700/60 flex items-center justify-center cursor-pointer hover:bg-amber-900/40 transition-colors"
-                onClick={() => setMostrarZona(mostrarZona === 0 ? null : 0)}
-                aria-label="Zona central o mineral"
-              >
-                <span className="text-xs font-bold text-amber-300 text-center leading-tight px-1">
-                  Zona mineral
-                </span>
+              {/* Confianza */}
+              <div className="mb-3">
+                <p className="text-xs text-slate-400 mb-1">
+                  Confianza del diagnóstico: {Math.round(interpretarResult.confianza * 100)}%
+                </p>
+                <div className="w-full bg-slate-800 rounded-full h-2">
+                  <div
+                    className="bg-emerald-500 h-2 rounded-full transition-all"
+                    style={{ width: `${interpretarResult.confianza * 100}%` }}
+                  />
+                </div>
               </div>
-              {/* Zona media */}
-              <div
-                className="absolute inset-[18%] rounded-full border-2 border-dashed border-amber-600/50 flex items-center justify-center cursor-pointer hover:bg-amber-900/10 transition-colors"
-                onClick={() => setMostrarZona(mostrarZona === 1 ? null : 1)}
-                aria-label="Zona media proteica-humica"
-              >
-                <span className="text-[10px] text-amber-400/70 mt-[-50px]">Zona humica</span>
-              </div>
-              {/* Zona externa */}
-              <div
-                className="absolute inset-[5%] rounded-full border-2 border-violet-600/60 flex items-center justify-center cursor-pointer hover:bg-violet-900/10 transition-colors"
-                onClick={() => setMostrarZona(mostrarZona === 2 ? null : 2)}
-                aria-label="Zona externa enzimatica"
-              >
-                <span className="text-[10px] text-violet-400/70 mt-[-85px]">Zona enzimatica</span>
-              </div>
-              {/* Picos del borde */}
-              <div
-                className="absolute inset-0 rounded-full border-2 border-indigo-500/70 flex items-center justify-center cursor-pointer hover:bg-indigo-900/10 transition-colors"
-                onClick={() => setMostrarZona(mostrarZona === 3 ? null : 3)}
-                aria-label="Picos y radiaciones del borde"
-              >
-                <span className="text-[10px] text-indigo-300/70 mt-[105px]">Picos y radiaciones</span>
-              </div>
-            </div>
-          </div>
 
-          {mostrarZona !== null && (
-            <div className={`${ZONAS[mostrarZona].bg} border ${ZONAS[mostrarZona].texto} rounded-xl p-4 flex gap-3 animate-in fade-in slide-in-from-bottom-2`}>
-              <span className="text-2xl shrink-0" aria-hidden="true">{ZONAS[mostrarZona].icono}</span>
-              <div className="text-sm">
-                <p className="font-bold mb-1">{ZONAS[mostrarZona].nombre}</p>
-                <p className="text-xs opacity-80 mb-2">{ZONAS[mostrarZona].posicion}</p>
-                <p>{ZONAS[mostrarZona].queIndica}</p>
-              </div>
+              {/* Razones */}
+              {interpretarResult.razones.length > 0 && (
+                <div className="mb-3">
+                  <p className="text-xs font-bold text-slate-400 uppercase mb-2">
+                    Patrones identificados:
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {interpretarResult.razones.map((razon, idx) => (
+                      <span
+                        key={idx}
+                        className="text-xs bg-slate-800 text-slate-300 px-2 py-1 rounded-lg"
+                      >
+                        {razon}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Advertencia */}
+              {interpretarResult.advertencia && (
+                <div className="bg-amber-950/30 border border-amber-800/50 rounded-lg p-2.5 flex items-start gap-2">
+                  <AlertTriangle size={14} className="text-amber-400 shrink-0 mt-0.5" />
+                  <p className="text-xs text-amber-200">{interpretarResult.advertencia}</p>
+                </div>
+              )}
+
+              {/* Recomendaciones */}
+              {interpretarResult.estado !== 'incertidumbre_alta' && (
+                <div className="mt-3">
+                  <p className="text-xs font-bold text-slate-400 uppercase mb-2">
+                    Recomendaciones:
+                  </p>
+                  <ul className="space-y-1">
+                    {obtenerRecomendaciones(interpretarResult.estado).map((rec, idx) => (
+                      <li key={idx} className="text-xs text-slate-300 flex items-start gap-2">
+                        <span className="text-emerald-400 shrink-0">•</span>
+                        <span>{rec}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={limpiarInterpretacion}
+                className="mt-3 w-full min-h-[44px] rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-100 flex items-center justify-center gap-2"
+              >
+                <X size={16} />
+                Nueva interpretación
+              </button>
             </div>
           )}
 
-          <h2 className="text-sm font-bold text-slate-200 uppercase tracking-wide mt-2">
-            Colores y su significado
-          </h2>
+          {/* Formulario de interpretación */}
+          {!interpretarResult && (
+            <>
+              <h2 className="text-sm font-bold text-slate-200 uppercase tracking-wide">
+                Seleccione los colores por zona
+              </h2>
+              <p className="text-xs text-slate-400 -mt-2">
+                Toque los colores que observa en cada zona del cromatograma. Puede
+                seleccionar varios colores por zona.
+              </p>
 
-          <div className="grid grid-cols-1 gap-2">
-            {COLORES.map((c) => (
-              <div
-                key={c.color}
-                className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-start gap-3"
-              >
+              {ZONAS_INTERPRETACION.map((zona) => (
                 <div
-                  className={`w-10 h-10 rounded-full shrink-0 border-2 ${c.clase}`}
-                  aria-hidden="true"
-                />
-                <div>
-                  <p className="text-sm font-bold text-slate-200">{c.color}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">{c.significado}</p>
+                  key={zona.id}
+                  className="bg-slate-900 border border-slate-800 rounded-xl p-3"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-lg" aria-hidden="true">
+                      {zona.icono}
+                    </span>
+                    <p className="text-sm font-bold text-slate-200">{zona.nombre}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {COLORES_OPCIONES.map((color) => {
+                      const seleccionado = interpretarForm[zona.id].includes(color.id);
+                      return (
+                        <button
+                          key={color.id}
+                          type="button"
+                          onClick={() => toggleColorInterpretacion(zona.id, color.id)}
+                          className={`min-h-[40px] px-3 rounded-lg text-xs font-bold border-2 transition-all ${
+                            seleccionado
+                              ? 'ring-2 ring-emerald-500 ring-offset-2 ring-offset-slate-900'
+                              : 'opacity-60 hover:opacity-100'
+                          } ${color.clase}`}
+                          aria-label={`Toggle ${color.nombre} en ${zona.nombre}`}
+                          aria-pressed={seleccionado}
+                        >
+                          {color.nombre}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
 
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs text-slate-400 flex items-start gap-2">
-            <Sprout size={14} className="text-emerald-400 shrink-0 mt-0.5" />
-            <p>
-              La interpretacion es subjetiva y depende de las condiciones del
-              ensayo. Lo mas util es comparar cromatografias de la misma zona
-              a lo largo del tiempo, cuando el suelo mejora por practicas de
-              regeneracion, abonos verdes o biopreparados, deberias ver mas
-              vida y color en los anillos.
-            </p>
-          </div>
+              {/* Vista previa de selección */}
+              {Object.values(interpretarForm).some((colores) => colores.length > 0) && (
+                <div className="bg-slate-900 border border-slate-700 rounded-xl p-3">
+                  <p className="text-xs font-bold text-slate-400 uppercase mb-2">
+                    Colores seleccionados:
+                  </p>
+                  <div className="space-y-1.5">
+                    {ZONAS_INTERPRETACION.map((zona) => {
+                      const coloresZona = interpretarForm[zona.id];
+                      if (coloresZona.length === 0) return null;
+                      const nombresColores = coloresZona
+                        .map((id) => COLORES_OPCIONES.find((c) => c.id === id)?.nombre)
+                        .filter(Boolean)
+                        .join(', ');
+                      return (
+                        <div key={zona.id} className="flex items-start gap-2">
+                          <span className="text-sm shrink-0" aria-hidden="true">
+                            {zona.icono}
+                          </span>
+                          <div className="flex-1">
+                            <p className="text-xs font-bold text-slate-300">{zona.nombre}</p>
+                            <p className="text-xs text-slate-400">{nombresColores}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {error && (
+                <div className="flex items-center gap-2 p-3 bg-red-900/20 border border-red-800/50 rounded-xl text-red-400 text-sm">
+                  <AlertTriangle size={16} />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={ejecutarInterpretacion}
+                disabled={!Object.values(interpretarForm).some((colores) => colores.length > 0)}
+                className="min-h-[52px] rounded-xl font-bold text-sm bg-emerald-900/60 hover:bg-emerald-800/60 border border-emerald-700/60 text-emerald-100 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] transition-transform"
+              >
+                <Eye size={18} />
+                Interpretar cromatograma
+              </button>
+
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs text-slate-400 flex items-start gap-2">
+                <Sprout size={14} className="text-emerald-400 shrink-0 mt-0.5" />
+                <p>
+                  La interpretación es cualitativa y depende de su observación. El motor
+                  analiza patrones descritos en el método Pfeiffer/Restrepo, pero el
+                  juicio final siempre es suyo. Compare con otros suelos de su finca.
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </div>
     );

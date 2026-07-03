@@ -31,7 +31,7 @@ describe('apiService', () => {
     });
 
     it('retorna objeto vacio en demo mode', async () => {
-      const original = import.meta.env.VITE_DEMO_MODE;
+      const original = /** @type {any} */(import.meta).env.VITE_DEMO_MODE;
       import.meta.env.VITE_DEMO_MODE = 'true';
       const r = await fetchFromFarmOS('/api/asset/plant');
       expect(r).toEqual({});
@@ -40,14 +40,14 @@ describe('apiService', () => {
 
     it('lanza error si no hay token', async () => {
       const { getAccessToken } = await import('../authService.js');
-      getAccessToken.mockResolvedValueOnce(null);
+      vi.mocked(getAccessToken).mockResolvedValueOnce(null);
       await expect(fetchFromFarmOS('/api/asset/plant')).rejects.toThrow('Token');
     });
 
     it('remappea bundle URL legacy log/task a log/activity', async () => {
       // Verificamos que la URL se transforma antes del fetch
       const { getAccessToken } = await import('../authService.js');
-      getAccessToken.mockResolvedValue('tkn');
+      vi.mocked(getAccessToken).mockResolvedValue('tkn');
 
       const fetchSpy = vi.fn().mockResolvedValue({
         ok: true,
@@ -68,7 +68,7 @@ describe('apiService', () => {
 
     it('remappea bundle URL legacy log/planting a log/seeding', async () => {
       const { getAccessToken } = await import('../authService.js');
-      getAccessToken.mockResolvedValue('tkn');
+      vi.mocked(getAccessToken).mockResolvedValue('tkn');
 
       const fetchSpy = vi.fn().mockResolvedValue({
         ok: true,
@@ -85,7 +85,7 @@ describe('apiService', () => {
 
     it('no remappea URLs que no son legacy', async () => {
       const { getAccessToken } = await import('../authService.js');
-      getAccessToken.mockResolvedValue('tkn');
+      vi.mocked(getAccessToken).mockResolvedValue('tkn');
 
       const fetchSpy = vi.fn().mockResolvedValue({
         ok: true,
@@ -103,8 +103,8 @@ describe('apiService', () => {
     it('inyecta filtro de tenant si hay tenant activo', async () => {
       const { getAccessToken } = await import('../authService.js');
       const { getActiveTenantId } = await import('../tenantContext.js');
-      getAccessToken.mockResolvedValue('tkn');
-      getActiveTenantId.mockReturnValue('finca-principal');
+      vi.mocked(getAccessToken).mockResolvedValue('tkn');
+      vi.mocked(getActiveTenantId).mockReturnValue('finca-principal');
 
       const fetchSpy = vi.fn().mockResolvedValue({
         ok: true,
@@ -122,8 +122,8 @@ describe('apiService', () => {
     it('no inyecta filtro de tenant si ya existe filter[uid]', async () => {
       const { getAccessToken } = await import('../authService.js');
       const { getActiveTenantId } = await import('../tenantContext.js');
-      getAccessToken.mockResolvedValue('tkn');
-      getActiveTenantId.mockReturnValue('otra-finca');
+      vi.mocked(getAccessToken).mockResolvedValue('tkn');
+      vi.mocked(getActiveTenantId).mockReturnValue('otra-finca');
 
       const fetchSpy = vi.fn().mockResolvedValue({
         ok: true,
@@ -141,7 +141,7 @@ describe('apiService', () => {
 
     it('construye headers con Authorization Bearer', async () => {
       const { getAccessToken } = await import('../authService.js');
-      getAccessToken.mockResolvedValue('bearer-token-123');
+      vi.mocked(getAccessToken).mockResolvedValue('bearer-token-123');
 
       const fetchSpy = vi.fn().mockResolvedValue({
         ok: true,
@@ -159,7 +159,7 @@ describe('apiService', () => {
 
     it('remappea type en el body outgoing', async () => {
       const { getAccessToken } = await import('../authService.js');
-      getAccessToken.mockResolvedValue('tkn');
+      vi.mocked(getAccessToken).mockResolvedValue('tkn');
 
       const fetchSpy = vi.fn().mockResolvedValue({
         ok: true,
@@ -186,7 +186,7 @@ describe('apiService', () => {
 
     it('remappea type en respuesta incoming', async () => {
       const { getAccessToken } = await import('../authService.js');
-      getAccessToken.mockResolvedValue('tkn');
+      vi.mocked(getAccessToken).mockResolvedValue('tkn');
 
       vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
         ok: true,
@@ -214,7 +214,7 @@ describe('apiService', () => {
 
     it('no adjunta body en DELETE', async () => {
       const { getAccessToken } = await import('../authService.js');
-      getAccessToken.mockResolvedValue('tkn');
+      vi.mocked(getAccessToken).mockResolvedValue('tkn');
 
       const fetchSpy = vi.fn().mockResolvedValue({
         ok: true,
@@ -234,9 +234,9 @@ describe('apiService', () => {
     beforeEach(async () => {
       const { getAccessToken, refreshAccessToken } = await import('../authService.js');
       const { expireSession } = await import('../authService.js');
-      getAccessToken.mockReset().mockResolvedValue('mock-token');
-      refreshAccessToken.mockReset().mockResolvedValue(null);
-      expireSession.mockReset().mockResolvedValue(undefined);
+      vi.mocked(getAccessToken).mockReset().mockResolvedValue('mock-token');
+      vi.mocked(refreshAccessToken).mockReset().mockResolvedValue(null);
+      vi.mocked(expireSession).mockReset().mockResolvedValue(undefined);
       Object.defineProperty(navigator, 'onLine', {
         configurable: true,
         value: true,
@@ -245,8 +245,8 @@ describe('apiService', () => {
 
     it('ante 401 refresca token y reintenta una vez con el Bearer nuevo', async () => {
       const { getAccessToken, refreshAccessToken } = await import('../authService.js');
-      getAccessToken.mockResolvedValue('token-viejo');
-      refreshAccessToken.mockResolvedValueOnce('token-nuevo');
+      vi.mocked(getAccessToken).mockResolvedValue('token-viejo');
+      vi.mocked(refreshAccessToken).mockResolvedValueOnce('token-nuevo');
 
       const fetchSpy = vi.fn()
         .mockResolvedValueOnce({
@@ -293,8 +293,8 @@ describe('apiService', () => {
 
     it('ante 403 definitivo limpia sesión y devuelve la respuesta original', async () => {
       const { expireSession, getAccessToken, refreshAccessToken } = await import('../authService.js');
-      getAccessToken.mockResolvedValue('token-viejo');
-      refreshAccessToken.mockResolvedValue(null);
+      vi.mocked(getAccessToken).mockResolvedValue('token-viejo');
+      vi.mocked(refreshAccessToken).mockResolvedValue(null);
 
       const forbidden = {
         ok: false,
@@ -327,15 +327,15 @@ describe('apiService', () => {
       // Aislar el conteo de llamadas de refreshAccessToken entre tests.
       const { getAccessToken, refreshAccessToken } = await import('../authService.js');
       const { expireSession } = await import('../authService.js');
-      getAccessToken.mockClear();
-      refreshAccessToken.mockClear();
-      expireSession.mockClear();
+      vi.mocked(getAccessToken).mockClear();
+      vi.mocked(refreshAccessToken).mockClear();
+      vi.mocked(expireSession).mockClear();
     });
 
     it('en 401, si refreshAccessToken da token nuevo, reintenta y devuelve data (sin ir a login)', async () => {
       const { getAccessToken, refreshAccessToken } = await import('../authService.js');
-      getAccessToken.mockResolvedValue('tkn-viejo');
-      refreshAccessToken.mockResolvedValueOnce('tkn-nuevo');
+      vi.mocked(getAccessToken).mockResolvedValue('tkn-viejo');
+      vi.mocked(refreshAccessToken).mockResolvedValueOnce('tkn-nuevo');
 
       // 1er fetch: 401. 2do fetch (retry): 200 con data.
       const fetchSpy = vi.fn()
@@ -362,8 +362,8 @@ describe('apiService', () => {
 
     it('en 401, si la renovación falla, NO reintenta en bucle y lanza el error', async () => {
       const { getAccessToken, refreshAccessToken } = await import('../authService.js');
-      getAccessToken.mockResolvedValue('tkn-viejo');
-      refreshAccessToken.mockResolvedValue(null); // refresh muerto
+      vi.mocked(getAccessToken).mockResolvedValue('tkn-viejo');
+      vi.mocked(refreshAccessToken).mockResolvedValue(null); // refresh muerto
 
       const fetchSpy = vi.fn().mockResolvedValue({
         ok: false,
@@ -386,8 +386,8 @@ describe('apiService', () => {
     // (prod-down 2026-06-18).
     it('en 401 con renovación fallida, expira sesión de forma explícita', async () => {
       const { expireSession, getAccessToken, refreshAccessToken } = await import('../authService.js');
-      getAccessToken.mockResolvedValue('tkn-viejo');
-      refreshAccessToken.mockResolvedValue(null);
+      vi.mocked(getAccessToken).mockResolvedValue('tkn-viejo');
+      vi.mocked(refreshAccessToken).mockResolvedValue(null);
 
       const fetchSpy = vi.fn().mockResolvedValue({
         ok: false,

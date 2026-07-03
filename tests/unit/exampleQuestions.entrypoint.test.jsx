@@ -178,6 +178,39 @@ const MODEL_ANSWERS = Object.freeze({
   'Dame el reporte del clima de mi zona.':
     'Para darte el clima de tu zona necesito tu municipio. Con eso consulto el pronóstico del IDEAM y te ' +
     'digo lluvia y temperatura de los próximos días.',
+
+  // ── Grounding tools (antes solo por texto libre) ──────────────────────
+  '¿Qué variedades registradas por ICA o AGROSAVIA hay para mi cultivo?':
+    'Depende del cultivo. Por ejemplo, para papa hay variedades como Pastusa Suprema, Diacol Capiro y ' +
+    'Parda Pastusa registradas por ICA. Para maíz están ICA V-305 e ICA V-109. ¿Qué cultivo siembras?',
+  '¿Cuáles son las etapas de desarrollo de mi planta y qué plagas aparecen en cada una?':
+    'Las etapas principales son germinación, crecimiento vegetativo, floración, llenado de fruto y ' +
+    'maduración. En crecimiento vegetativo pueden aparecer áfidos y trozadores. En floración, trips y ' +
+    'polilla. ¿Qué cultivo tienes?',
+  '¿Cómo van los grados día acumulados para mi cultivo?':
+    'Los grados día se calculan sumando las temperaturas promedio diarias por encima de la temperatura base ' +
+    'del cultivo. Para saber si van bien necesito tu cultivo, la temperatura base y la fecha de siembra.',
+  '¿Qué poliniza mi cultivo y cuántas colmenas por hectárea necesita?':
+    'La mayoría de cultivos frutales necesitan abejas melíferas y abejas nativas. Por ejemplo, aguacate ' +
+    'necesita 4-6 colmenas por hectárea, y maracuyá 2-3. ¿Qué cultivo tienes?',
+  'Necesito el documento soporte DIAN para mi finca.':
+    'El documento soporte DIAN es un comprobante de transacciones con productores agrícolas que no expiden ' +
+    'factura electrónica. Debe incluir tus datos, los del vendedor, el producto y el valor.',
+  '¿Qué dice la Ley 1930 de 2018 sobre sembrar o hacer quemas en el páramo?':
+    'La Ley 1930 de 2018 prohíbe actividades agropecuarias en páramo, incluyendo quema y nuevas siembras. ' +
+    'Solo se permiten actividades de reconversión y restauración ecológica.',
+  'Quiero restaurar un terreno con árboles nativos. ¿Qué especies siembro y en qué orden?':
+    'Para restaurar un terreno se siembra en etapas: primero especies pioneras como aliso, acacia negra o ' +
+    'chilco; luego especies secundarias como cedro, nogal o roble. ¿A qué altura estás?',
+  'Quiero un arreglo silvopastoril con forraje y árboles para mi ganado.':
+    'Un arreglo silvopastoril combina pastos mejorados con árboles dispersos y cercas vivas. Especies ' +
+    'recomendadas: matarratón, nacedero, leucaena para forraje, y guásimo o algarrobo para sombra.',
+  '¿Una planta es tóxica para animales o personas o se puede aprovechar?':
+    'Para saber si una planta es tóxica necesito el nombre o una foto. Muchas plantas tienen usos ' +
+    'medicinales con precaución y otras son tóxicas crudas pero comestibles cocinadas.',
+  'Explícame un saber tradicional agroecológico, como el uso de un producto local o una práctica de la finca.':
+    'El bocashi es un abono fermentado tradicional que se prepara con estiércol, cascarilla de arroz, ' +
+    'melaza, levadura y carbón molido. Se fermenta de 7 a 14 días volteándolo cada 2 días.',
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

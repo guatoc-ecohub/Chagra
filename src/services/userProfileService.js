@@ -544,12 +544,28 @@ export function getProfileMunicipio() {
 // ─── Estructura de la finca (#34 — esqueleto para la escena F2) ──────────────
 
 /**
- * Formas de invernadero válidas. La escena F2 las dibuja distinto:
- *   - cuadrado: nave a dos aguas (cuadrado grande, ej. David).
- *   - tunel:    media luna de plástico curvo (túnel pequeño, ej. Miguel).
- *   - otro:     forma genérica (no encaja en las dos anteriores).
+ * Formas de estructura de cubierta válidas. La escena F2 las dibuja distinto:
+ *   - cuadrado:     nave a dos aguas (cuadrado grande, ej. David).
+ *   - tunel:        media luna de plástico curvo (túnel pequeño, ej. Miguel).
+ *   - casa_sombra:  casa-sombra — estructura de malla anti-insectos con techo.
+ *   - malla_sombra: malla-sombra (polisombra) plana sobre postes, sin paredes.
+ *   - umbraculo:    umbráculo — techo de listones de madera sobre postes.
+ *   - otro:         forma genérica (no encaja en las anteriores).
+ *
+ * NOTA ONBOARDING: la pregunta `invernadero_forma` (PROFILE_QUESTIONS) hoy solo
+ * ofrece cuadrado/tunel/otro. Las formas casa_sombra/malla_sombra/umbraculo ya
+ * son válidas aquí y la escena F2 ya sabe dibujarlas (FincaVivaHero →
+ * EstructuraCubierta); para que un usuario las declare falta AGREGAR sus
+ * opciones a esa pregunta del onboarding (o poblarlas por la voz #23).
  */
-export const INVERNADERO_FORMAS = Object.freeze(['cuadrado', 'tunel', 'otro']);
+export const INVERNADERO_FORMAS = Object.freeze([
+  'cuadrado',
+  'tunel',
+  'casa_sombra',
+  'malla_sombra',
+  'umbraculo',
+  'otro',
+]);
 
 /**
  * Grupos de composición de la finca (el "esqueleto"). Son los grandes bloques

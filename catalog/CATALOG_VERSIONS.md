@@ -73,6 +73,12 @@ schema estricto son el patrón legacy de `sources[]` (`_url_pendiente` /
 | `chagra-catalog-oss-subset-v3.1.json` | 50 | Snapshot histórico del primer subset OSS (editorial-v2, 2026-05-20). Deprecado tras revert PR #1012 (cortaba aguacate/tomate/lechuga/acelga). | Ruta de rollback / trazabilidad. |
 | `chagra-catalog-seed-v3.0.json` | 0 | **Roto** (`species[]` vacío). Solo referencia de estructura para `migrate-v30-to-v31.mjs`. | Lo usa el migrador como esqueleto histórico. |
 
+## Snapshot del grafo `chagra_kg` (entidades que NO existen en ningún catálogo)
+
+| Archivo | Qué es | Quién lo consume |
+|---|---|---|
+| `chagra-kg-graph-snapshot.json` | Snapshot versionado (2026-07-02, vía `podman exec ... psql` read-only sobre `chagra_kg`) de nodos `Pest` (391), `BeneficialOrganism` (136), `Biopreparado` (83) con TODAS sus propiedades, + `Species` mínimo (id/nombre_comun/nombre_cientifico/familia_botanica/category, 721) + aristas `AFFECTS` y `CONTROLS`. Estas entidades (sobre todo `BeneficialOrganism`) **no existen en ningún `catalog/*.json`** — solo viven en el grafo. | `scripts/audit-contaminacion.mjs` (clases "cruce_cultivo" vía `cultivos_afectados` + aristas reales, "sobre_asociacion" vía conteo de controladores, "placeholder" vía etiquetas genéricas de `BeneficialOrganism`). Se regenera manualmente (no hay script automatizado de refresco todavía — TODO) siguiendo el patrón de `scripts/audit-milpa-citations.mjs` / `CHAGRA_AGE_PSQL_COMMAND`. |
+
 ## Nota sobre el gate de CI
 
 `catalog-validate.yml` y `lefthook` corren `validate-catalog.mjs --lenient-schema`
@@ -83,3 +89,26 @@ que falla si el conteo no cuadra) y en `tests/unit/catalog-count.test.js` (gate
 de CI `unit-tests.yml`, que asierta `species.length === 530`). Apuntar el gate del
 validador a v3.2 es una mejora pendiente fuera del alcance de este cambio (evita
 tocar la config de CI en el mismo PR de datos).
+
+## Miscategorizaciones en `audit-contaminacion.mjs` (clase `miscategorizacion`)
+
+Snapshot **2026-07-03** (post-PR #2002 que arregló el único hallazgo que vivía en
+el seed v3.1 — entrada de `oryza_sativa.plagas_criticas` reescrita con acrónimo
+VHB para evitar falso match del regex `VIRUS_RE = /\bvirus\b/i`).
+
+Estado por archivo (verificado con `detectMiscategorizacion` archivo por archivo):
+
+| Archivo | Hallazgos | Nota |
+|---|---:|---|
+| `chagra-catalog-seed-v3.1.json` | 0 | Limpio. Editar este archivo NO reduce el conteo global porque el seed está limpio desde PR #2002. |
+| `chagra-catalog-oss-subset-v3.2.json` | 0 | CANÓNICO que shipea (`DEFAULT_SEED` de `build-catalog-sqlite.mjs`). Limpio. |
+| `chagra-catalog-oss-subset-v3.1.json` | 7 | STALE. Snapshot de 2026-05-20 con texto pre-fix (`Hemileia vastatrix (roya)` en `plagas_criticas` de `coffea_arabica`; `Trozador (Agrotis ipsilon)` en `enfermedades_criticas` de 6 solanums). |
+| `chagra-catalog-graph-export.json` | 1 | STALE. Export viejo grafo→catálogo con texto pre-fix de `Tagosodes orizicolus` en `plagas_criticas` de `oryza_sativa` (usa "Virus" literal en lugar del acrónimo VHB). |
+
+Los 8 hallazgos restantes viven exclusivamente en archivos stale derivados.
+Reducir el conteo requiere regenerar esos snapshots (vía `extract-oss-subset.mjs`
++ `export-graph-to-catalog.mjs`) o editarlos directamente — ambos fuera del scope
+de tasks que prohiben tocar derivados. El gate `--check` del auditor usa
+`scripts/audit-contaminacion-baseline.json` para que el conteo actual (52
+hallazgos, 8 de ellos miscategorización) no bloquee CI mientras llega esa
+regeneración.

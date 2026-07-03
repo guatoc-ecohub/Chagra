@@ -222,7 +222,13 @@ const MODULE_VIEWS = new Set([
 // agente Chagra protagonista + clima IDEAM + secciones drag-reorder.
 // Mantiene shell (TopBar + HomeRegionalGreeting) y delega contenido a
 // DashboardLive (src/components/dashboard/DashboardLive.jsx).
-const DashboardLiveView = React.memo(function DashboardLiveView({ onNavigate, onLogout }) {
+const DashboardLiveView = React.memo(/**
+ * @param {Object} props
+ * @param {(view: string, data?: any) => void} props.onNavigate
+ * @param {() => void} props.onLogout
+ * @param {string} [props.lastLogMessage]
+ */
+function DashboardLiveView({ onNavigate, onLogout }) {
   // Scroll restoration vive DENTRO de DashboardLive (apunta a su propio
   // scroller — no hay <main> en DashboardLiveView).
   const hydrate = useAssetStore((s) => s.hydrate);

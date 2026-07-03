@@ -72,12 +72,7 @@ const OVERLAY_CSS = `
  * consumidor (`anchorRef`). Cierra al tocar fuera, con Escape, o al elegir una
  * rama (vía `onPick`, que el consumidor enruta con `mapCapabilityPick`).
  *
- * @param {boolean} open — si está montado.
- * @param {()=>void} onClose — cerrar el overlay.
- * @param {(cap:object)=>void} onPick — pick de una hoja viva de la red.
- * @param {object} anchorRef — ref al botón Ⓐ real (raíz geométrica de la red).
- * @param {boolean} [disabled] - desactiva la interacción de la red.
- * @param {string} [subtitle] - copy contextual bajo el título.
+ * @param {{ open: boolean, onClose: () => void, onPick: (cap: object) => void, anchorRef: object, disabled?: boolean, subtitle?: string }} props
  */
 export function AgentManoOverlay({
   open,
