@@ -1,0 +1,218 @@
+/*
+ * mundo-subsuelo.css — capa VISUAL viva del juego "Mundo Subsuelo".
+ *
+ * La escena pasa de diagrama estático a terrario vivo: los nutrientes viajan
+ * por las hifas (la firma visual: el "internet de los hongos" se enciende),
+ * las lombrices se menean, las chispas titilan, el agua se filtra y las
+ * plantas se mecen. Todo en CSS puro (offline-first, sin libs), determinista,
+ * y respetando prefers-reduced-motion.
+ *
+ * Prefijo `msx-` para NO chocar con los ganchos de tema `ms-*` / `jp-ms-*`
+ * (temas-fase2.css / juego-pulido.css), que siguen mandando bajo .fvh-skin.
+ */
+
+/* ── La firma: nutrientes fluyendo por la red de hifas ───────────────── */
+
+.msx-hifa {
+  stroke-dasharray: 10 16;
+  animation: msx-hifa-flujo 2.6s linear infinite;
+}
+@keyframes msx-hifa-flujo {
+  to { stroke-dashoffset: -52; }
+}
+
+/* ── Vida ambiente de la escena ──────────────────────────────────────── */
+
+/* El sol respira despacio. */
+.msx-sol {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: msx-sol-pulso 7s ease-in-out infinite;
+}
+@keyframes msx-sol-pulso {
+  0%, 100% { transform: scale(1); opacity: 0.92; }
+  50% { transform: scale(1.07); opacity: 1; }
+}
+
+/* La nube flota de lado a lado. */
+.msx-nube {
+  animation: msx-nube-brisa 22s ease-in-out infinite;
+}
+@keyframes msx-nube-brisa {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-26px); }
+}
+
+/* Las plantas se mecen con el viento (origen en la base del tallo). */
+.msx-planta {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: msx-mecerse 5.5s ease-in-out infinite;
+}
+@keyframes msx-mecerse {
+  0%, 100% { transform: rotate(-1.6deg); }
+  50% { transform: rotate(1.6deg); }
+}
+
+/* Las raíces "crecen" con un pop suave cada vez que cambian de profundidad
+   (el grupo se re-monta con key nueva y la animación se repite). */
+.msx-raices {
+  transform-box: fill-box;
+  transform-origin: top center;
+  animation: msx-crecer 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes msx-crecer {
+  0% { transform: scaleY(0.82); opacity: 0.45; }
+  100% { transform: scaleY(1); opacity: 1; }
+}
+
+/* Las lombrices se menean, contentas. */
+.msx-lombriz {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: msx-menearse 2.8s ease-in-out infinite;
+}
+@keyframes msx-menearse {
+  0%, 100% { transform: rotate(-3deg) translateX(0); }
+  50% { transform: rotate(3deg) translateX(3px); }
+}
+
+/* Las chispas de nutrientes titilan (escalonadas con animation-delay). */
+.msx-chispa {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: msx-titilar 1.8s ease-in-out infinite;
+}
+@keyframes msx-titilar {
+  0%, 100% { opacity: 0.35; transform: scale(0.75); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+/* El agua se filtra hacia abajo, gota a gota. */
+.msx-agua {
+  transform-box: fill-box;
+  transform-origin: top center;
+  animation: msx-filtrarse 2.4s ease-in-out infinite;
+}
+@keyframes msx-filtrarse {
+  0% { transform: translateY(-4px); opacity: 0.25; }
+  45% { opacity: 0.85; }
+  100% { transform: translateY(12px); opacity: 0.15; }
+}
+
+/* ── HUD: medidor y puntaje con feedback ─────────────────────────────── */
+
+/* La barra se desliza suave hacia su nuevo valor. */
+.msx-meter-fill {
+  transition: width 0.65s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+/* Brillo sutil que recorre la barra: la vida "circula". */
+.msx-meter-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.45) 50%,
+    transparent 80%
+  );
+  transform: translateX(-100%);
+  animation: msx-brillo 3.2s ease-in-out infinite;
+}
+@keyframes msx-brillo {
+  0% { transform: translateX(-100%); }
+  55%, 100% { transform: translateX(100%); }
+}
+
+/* Marca de meta sobre el medidor (solo con la capa de objetivo activa). */
+.msx-meter-meta {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 999px;
+  background: rgba(28, 25, 23, 0.55);
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.75);
+}
+
+/* El número del puntaje "salta" al cambiar (re-montado con key). */
+.msx-punch {
+  display: inline-block;
+  animation: msx-punch-anim 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes msx-punch-anim {
+  0% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+/* ── Paneles y cartas: entrada y tacto ───────────────────────────────── */
+
+/* La carta activa entra deslizándose al elegir (re-montada con key). */
+.msx-entra {
+  animation: msx-entra-anim 0.32s ease both;
+}
+@keyframes msx-entra-anim {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Las cartas se levantan un pelito al pasar el dedo/mouse. */
+.msx-carta {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+@media (hover: hover) {
+  .msx-carta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(60, 46, 26, 0.14);
+  }
+}
+
+/* La mascota activa hace una venia suave. */
+.jp-ms-mascota[data-active='true'] .msx-avatar {
+  animation: msx-venia 2.2s ease-in-out infinite;
+}
+@keyframes msx-venia {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  50% { transform: rotate(-4deg) translateY(-3px); }
+}
+
+/* La celebración de meta aparece con pop. */
+.msx-pop {
+  animation: msx-pop-anim 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes msx-pop-anim {
+  0% { transform: scale(0.88); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ── Accesibilidad: reducción de movimiento apaga TODO ───────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .msx-hifa,
+  .msx-sol,
+  .msx-nube,
+  .msx-planta,
+  .msx-raices,
+  .msx-lombriz,
+  .msx-chispa,
+  .msx-agua,
+  .msx-meter-fill::after,
+  .msx-punch,
+  .msx-entra,
+  .msx-pop,
+  .jp-ms-mascota[data-active='true'] .msx-avatar {
+    animation: none !important;
+  }
+  .msx-meter-fill,
+  .msx-carta {
+    transition: none !important;
+  }
+  /* Sin animación, las hifas vuelven a ser hebras continuas (como hoy). */
+  .msx-hifa { stroke-dasharray: none; }
+  .msx-raices { transform: none !important; opacity: 1 !important; }
+  .msx-entra,
+  .msx-pop { opacity: 1 !important; transform: none !important; }
+}

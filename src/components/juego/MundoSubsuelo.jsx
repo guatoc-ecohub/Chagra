@@ -4,6 +4,7 @@ import { recordGameStart, recordGameComplete } from '../../services/usageTelemet
 import { fvhSkinClass } from '../../config/fvhSkin';
 import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 import { evaluarSubsuelo, mensajeMeta } from '../../services/mundoSubsueloEngine';
+import './mundo-subsuelo.css';
 
 function clamp(value, min = 0, max = 100) {
   return Math.max(min, Math.min(max, value));
@@ -16,6 +17,14 @@ function getSoilStage(score) {
   return 'cansado';
 }
 
+/* Emoji por etapa para el sello del HUD (solo decorativo, aria-hidden). */
+const STAGE_EMOJI = {
+  vivo: '🌟',
+  despertando: '🌱',
+  'en cuidado': '🌤️',
+  cansado: '😴',
+};
+
 function Mascot({ name, title, children, active }) {
   return (
     <article
@@ -25,7 +34,7 @@ function Mascot({ name, title, children, active }) {
       <div className="flex items-center gap-3">
         <div
           aria-hidden="true"
-          className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl ${name === 'Miquito' ? 'bg-cyan-200' : 'bg-amber-200'}`}
+          className={`msx-avatar grid h-12 w-12 shrink-0 place-items-center rounded-2xl ${name === 'Miquito' ? 'bg-cyan-200' : 'bg-amber-200'}`}
         >
           <svg viewBox="0 0 48 48" className="h-10 w-10" role="img" aria-label={name}>
             {name === 'Miquito' ? (
@@ -92,25 +101,101 @@ function SoilScene({ soilLife, activeDecision }) {
         </defs>
 
         <rect width="760" height="160" fill="url(#ms-sky)" />
+
+        {/* Sol que respira y nube a la deriva (decorativos). */}
+        <g className="msx-sol" aria-hidden="true">
+          <circle cx="668" cy="56" r="24" fill="#fde047" />
+          <circle cx="668" cy="56" r="16" fill="#fef08a" />
+          {Array.from({ length: 8 }).map((_, index) => {
+            const angle = (index * Math.PI) / 4;
+            return (
+              <line
+                key={`rayo-${index}`}
+                x1={668 + Math.cos(angle) * 30}
+                y1={56 + Math.sin(angle) * 30}
+                x2={668 + Math.cos(angle) * 38}
+                y2={56 + Math.sin(angle) * 38}
+                stroke="#fcd34d"
+                strokeWidth="4"
+                strokeLinecap="round"
+              />
+            );
+          })}
+        </g>
+        <g className="msx-nube" fill="#ffffff" opacity="0.85" aria-hidden="true">
+          <ellipse cx="505" cy="55" rx="38" ry="14" />
+          <ellipse cx="478" cy="61" rx="24" ry="11" />
+          <ellipse cx="533" cy="62" rx="22" ry="10" />
+        </g>
+
         <rect x="0" y="155" width="760" height="275" fill="url(#ms-soil)" />
         <path d="M0 155c75 12 128-13 206-1 82 13 130 21 225 4 96-17 160-3 329-3v29H0Z" fill="#6f8f32" />
         <path d="M0 184c94 19 153 9 229 14 88 6 161-10 250 0 96 11 162 7 281-4v236H0Z" fill="#5b3825" opacity={isTired ? 0.52 : 0.74} />
 
+        {/* Matas de pasto sobre la superficie (decorativas). */}
+        <g stroke="#4d7c0f" strokeWidth="3" strokeLinecap="round" fill="none" aria-hidden="true">
+          {[152, 208, 332, 396, 522, 578, 700].map((x) => (
+            <g key={`pasto-${x}`}>
+              <path d={`M${x} 158c-1-6-3-10-6-13`} />
+              <path d={`M${x + 4} 158c0-7 0-12 1-15`} />
+              <path d={`M${x + 8} 158c1-6 3-10 6-12`} />
+            </g>
+          ))}
+        </g>
+
+        {/* Textura del perfil: piedritas y motas de materia orgánica. */}
+        <g aria-hidden="true">
+          <ellipse cx="70" cy="300" rx="14" ry="9" fill="#7c5a3a" opacity="0.65" />
+          <ellipse cx="420" cy="395" rx="17" ry="10" fill="#6b4f33" opacity="0.6" />
+          <ellipse cx="580" cy="330" rx="11" ry="7" fill="#7c5a3a" opacity="0.55" />
+          <ellipse cx="250" cy="410" rx="13" ry="8" fill="#6b4f33" opacity="0.6" />
+          {Array.from({ length: 16 }).map((_, index) => (
+            <circle
+              key={`mota-${index}`}
+              cx={42 + index * 46}
+              cy={236 + ((index * 53) % 150)}
+              r="2.5"
+              fill={index % 2 ? '#caa06c' : '#2d2013'}
+              opacity="0.4"
+            />
+          ))}
+        </g>
+
+        {/* Matas verdes: se mecen con la brisa, cada una a su ritmo. */}
         {[92, 265, 438, 608].map((x, index) => (
-          <g key={x}>
+          <g key={`mata-${x}`} className="msx-planta" style={{ animationDelay: `${index * 0.8}s` }}>
             <path d={`M${x} 153c-8-28 8-49 29-52 20 4 36 24 29 52Z`} fill={index % 2 ? '#84cc16' : '#22c55e'} />
-            <path d={`M${x + 29} 153v${rootDepth}`} stroke="#f5e8b7" strokeWidth="7" strokeLinecap="round" />
-            <path d={`M${x + 29} 205c-${18 + index * 4} 16-${28 + index * 3} 31-${38 + index * 2} 49`} stroke="#f5e8b7" strokeWidth="4" fill="none" strokeLinecap="round" />
-            <path d={`M${x + 29} 224c${18 + index * 3} 17 ${31 + index * 2} 34 ${42 + index * 2} 58`} stroke="#f5e8b7" strokeWidth="4" fill="none" strokeLinecap="round" />
+            <path
+              d={`M${x + 14} 132c6-10 12-15 18-18`}
+              stroke="#ecfccb"
+              strokeWidth="3"
+              fill="none"
+              strokeLinecap="round"
+              opacity="0.5"
+            />
           </g>
         ))}
 
+        {/* Raíces: crecen con un pop suave cada vez que ganan profundidad. */}
+        <g key={`raices-${rootDepth}`} className="msx-raices">
+          {[92, 265, 438, 608].map((x, index) => (
+            <g key={x}>
+              <path d={`M${x + 29} 153v${rootDepth}`} stroke="#f5e8b7" strokeWidth="7" strokeLinecap="round" />
+              <path d={`M${x + 29} 205c-${18 + index * 4} 16-${28 + index * 3} 31-${38 + index * 2} 49`} stroke="#f5e8b7" strokeWidth="4" fill="none" strokeLinecap="round" />
+              <path d={`M${x + 29} 224c${18 + index * 3} 17 ${31 + index * 2} 34 ${42 + index * 2} 58`} stroke="#f5e8b7" strokeWidth="4" fill="none" strokeLinecap="round" />
+            </g>
+          ))}
+        </g>
+
+        {/* La firma: nutrientes viajando por el internet de los hongos. */}
         {Array.from({ length: hifaCount }).map((_, index) => {
           const y = 245 + (index % 4) * 35;
           const start = 92 + index * 82;
           return (
             <path
               key={`hifa-${index}`}
+              className="msx-hifa"
+              style={{ animationDelay: `${index * 0.45}s` }}
               d={`M${start} ${y} C${start + 42} ${y - 30}, ${start + 96} ${y + 28}, ${start + 148} ${y - 6}`}
               stroke="#67e8f9"
               strokeWidth={soilLife > 70 ? 5 : 3}
@@ -126,6 +211,8 @@ function SoilScene({ soilLife, activeDecision }) {
           <circle
             key={`spark-${index}`}
             data-testid="nutrient-spark"
+            className="msx-chispa"
+            style={{ animationDelay: `${index * 0.35}s` }}
             cx={132 + index * 92}
             cy={238 + (index % 3) * 46}
             r="6"
@@ -134,22 +221,30 @@ function SoilScene({ soilLife, activeDecision }) {
           />
         ))}
 
-        {Array.from({ length: wormCount }).map((_, index) => (
-          <path
-            key={`worm-${index}`}
-            d={`M${112 + index * 178} ${345 - (index % 2) * 34}c20-18 45 16 68-4`}
-            stroke="#f59e0b"
-            strokeWidth="10"
-            fill="none"
-            strokeLinecap="round"
-          />
-        ))}
+        {/* Lombrices meneándose, con carita para la niña que juega. */}
+        {Array.from({ length: wormCount }).map((_, index) => {
+          const wx = 112 + index * 178;
+          const wy = 345 - (index % 2) * 34;
+          return (
+            <g key={`worm-${index}`} className="msx-lombriz" style={{ animationDelay: `${index * 0.6}s` }}>
+              <path
+                d={`M${wx} ${wy}c20-18 45 16 68-4`}
+                stroke="#f59e0b"
+                strokeWidth="10"
+                fill="none"
+                strokeLinecap="round"
+              />
+              <circle cx={wx + 68} cy={wy - 4} r="6.5" fill="#d97706" />
+              <circle cx={wx + 70} cy={wy - 6} r="1.5" fill="#451a03" />
+            </g>
+          );
+        })}
 
         {soilLife >= 55 && (
           <g fill="#38bdf8" opacity="0.82">
-            <path d="M641 161c-22 47-24 78-2 116 22-38 21-69 2-116Z" />
-            <path d="M688 154c-18 37-20 62-1 92 18-30 17-56 1-92Z" />
-            <path d="M595 164c-15 33-17 54-1 81 15-27 14-49 1-81Z" />
+            <path className="msx-agua" d="M641 161c-22 47-24 78-2 116 22-38 21-69 2-116Z" />
+            <path className="msx-agua" style={{ animationDelay: '0.8s' }} d="M688 154c-18 37-20 62-1 92 18-30 17-56 1-92Z" />
+            <path className="msx-agua" style={{ animationDelay: '1.5s' }} d="M595 164c-15 33-17 54-1 81 15-27 14-49 1-81Z" />
           </g>
         )}
 
@@ -244,10 +339,14 @@ export default function MundoSubsuelo() {
                   <span className="text-lg text-stone-500">/100</span>
                 </p>
               </div>
-              <span className="rounded-full bg-stone-950 px-3 py-1 text-xs font-black uppercase text-white">{stage}</span>
+              <span className="rounded-full bg-stone-950 px-3 py-1 text-xs font-black uppercase text-white">
+                <span aria-hidden="true">{STAGE_EMOJI[stage]} </span>
+                {stage}
+              </span>
             </div>
-            <div className="mt-3 h-4 overflow-hidden rounded-full bg-stone-200" aria-hidden="true">
-              <div className={`h-full rounded-full ${meterColor}`} style={{ width: `${soilLife}%` }} />
+            <div className="relative mt-3 h-4 overflow-hidden rounded-full bg-stone-200" aria-hidden="true">
+              <div className={`msx-meter-fill h-full rounded-full ${meterColor}`} style={{ width: `${soilLife}%` }} />
+              {feelOn && <span className="msx-meter-meta" style={{ left: '75%' }} />}
             </div>
             {/* Línea de meta (gated dev-only): marca dónde está "suelo vivo". */}
             {feelOn && (
@@ -277,13 +376,17 @@ export default function MundoSubsuelo() {
         <SoilScene soilLife={soilLife} activeDecision={activeDecision} />
 
         <div className="flex flex-col gap-3">
-          <section data-testid="decision-activa" className="jp-ms-panel rounded-3xl border border-cyan-200 bg-white p-4 shadow-sm">
+          <section
+            key={`decision-${activeId}-${jugadas}`}
+            data-testid="decision-activa"
+            className="msx-entra jp-ms-panel rounded-3xl border border-cyan-200 bg-white p-4 shadow-sm"
+          >
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-700">Carta activa</p>
                 <h2 className="mt-1 text-2xl font-black leading-tight text-stone-950">{activeDecision.title}</h2>
               </div>
-              <span className={`rounded-full px-3 py-1 text-sm font-black ${activeDecision.tone === 'good' ? 'bg-lime-100 text-lime-900' : 'bg-rose-100 text-rose-900'}`}>
+              <span className={`msx-punch rounded-full px-3 py-1 text-sm font-black ${activeDecision.tone === 'good' ? 'bg-lime-100 text-lime-900' : 'bg-rose-100 text-rose-900'}`}>
                 {activeDecision.effect > 0 ? '+' : ''}
                 {activeDecision.effect}
               </span>
@@ -302,7 +405,7 @@ export default function MundoSubsuelo() {
                   type="button"
                   onClick={() => chooseDecision(decision)}
                   data-selected={selected ? 'true' : 'false'}
-                  className={`jp-ms-carta min-h-28 rounded-2xl border p-3 text-left shadow-sm transition active:scale-[0.98] ${
+                  className={`msx-carta jp-ms-carta min-h-28 rounded-2xl border p-3 text-left shadow-sm transition active:scale-[0.98] ${
                     selected
                       ? 'border-cyan-400 bg-cyan-50 ring-2 ring-cyan-200'
                       : decision.tone === 'good'
@@ -328,7 +431,7 @@ export default function MundoSubsuelo() {
       {celebrandoMeta && (
         <section
           data-testid="subsuelo-meta-lograda"
-          className="rounded-3xl border-2 border-lime-400 bg-[linear-gradient(135deg,#ecfccb,#a5f3fc)] p-5 text-center shadow-sm"
+          className="msx-pop rounded-3xl border-2 border-lime-400 bg-[linear-gradient(135deg,#ecfccb,#a5f3fc)] p-5 text-center shadow-sm"
           role="status"
         >
           <div className="text-5xl" aria-hidden="true">🌱✨</div>
