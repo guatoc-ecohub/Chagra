@@ -1,0 +1,74 @@
+/*
+ * clima.css — micro-animaciones del módulo "El clima que viene".
+ *
+ * Principios (iguales al módulo de agua):
+ *   · Sutiles y de bajo costo (solo transform/opacity, nada de layout).
+ *   · prefers-reduced-motion las apaga TODAS.
+ *   · No fija ningún color de tema: el color sale de las clases Tailwind del
+ *     componente (paleta slate + acentos cielo/ámbar), que ya reaccionan a los
+ *     temas de la app vía data-theme (themes.css). Aquí solo hay movimiento.
+ */
+
+/* Los rayos del sol laten suave (opacity + escala mínima desde el centro). */
+@keyframes clima-sol-late {
+  0%, 100% { opacity: 0.7; transform: scale(0.98); }
+  50% { opacity: 1; transform: scale(1.03); }
+}
+.clima-sol-rayos {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: clima-sol-late 3.4s ease-in-out infinite;
+}
+
+/* La nube deriva de lado a lado, lentísima (como cielo real). */
+@keyframes clima-nube-va {
+  0%, 100% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+}
+.clima-nube-deriva {
+  animation: clima-nube-va 7s ease-in-out infinite;
+}
+
+/* Gotas de lluvia: caen en loop, escalonadas. */
+@keyframes clima-gota-cae {
+  0% { transform: translateY(0); opacity: 0; }
+  20% { opacity: 0.95; }
+  80% { opacity: 0.95; }
+  100% { transform: translateY(20px); opacity: 0; }
+}
+.clima-gota {
+  animation: clima-gota-cae 1.5s linear infinite;
+}
+.clima-gota--2 { animation-delay: 0.4s; }
+.clima-gota--3 { animation-delay: 0.8s; }
+
+/* Entrada suave del contenido del pilar al cambiar de pestaña. */
+@keyframes clima-seccion-entra {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.clima-seccion {
+  animation: clima-seccion-entra 0.3s ease-out;
+}
+
+/* Pulso único del tab activo al seleccionarlo. */
+@keyframes clima-tab-pulso {
+  0% { transform: scale(0.94); }
+  60% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+.clima-tab-activo {
+  animation: clima-tab-pulso 0.4s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clima-sol-rayos,
+  .clima-nube-deriva,
+  .clima-gota,
+  .clima-seccion,
+  .clima-tab-activo {
+    animation: none;
+  }
+  .clima-sol-rayos { opacity: 1; }
+  .clima-gota { opacity: 0.95; }
+}

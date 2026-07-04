@@ -109,6 +109,10 @@ const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScree
 // riego con medida (ETc; Kc/ETo = slots grounded-pendiente) y cuidar el agua
 // (calidad + nacimiento, caso "se me seca el nacimiento en verano").
 const AguaScreen = lazy(() => import('./components/agua/AguaScreen'));
+// "El clima que viene": traductor campesino de los boletines IDEAM/ENSO. Lee la
+// fase ENSO en vivo (ensoService) y remite a la Mesa Técnica Agroclimática — no
+// reimplementa el motor de clima ni pronostica.
+const ClimaBoletinScreen = lazy(() => import('./components/clima/ClimaBoletinScreen'));
 const SaludSueloScreen = lazy(() => import('./components/SaludSueloScreen'));
 // LOS MUNDOS DE MI FINCA (reestructuración 2.0 del home): un mundo por dentro —
 // las funciones existentes agrupadas por lugar. Re-rutea, no reimplementa.
@@ -227,7 +231,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'salud_suelo', 'toxicologia', 'aprende', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'toxicologia', 'aprende', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
   'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
@@ -1290,6 +1294,18 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Agua de la finca">
               <AguaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'clima_boletin':
+        // "El clima que viene" (mundo Clima): TRADUCTOR de los boletines
+        // IDEAM/ENSO. 3 pilares — qué viene (fase ENSO viva de ensoService) /
+        // qué hacer (regla accionable por fase) / dónde mirar (MTA + Fenalce).
+        // No pronostica: lee la fase real y remite al boletín vigente.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El clima que viene">
+              <ClimaBoletinScreen onBack={() => navigate('mundo', { mundo: 'clima' })} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
