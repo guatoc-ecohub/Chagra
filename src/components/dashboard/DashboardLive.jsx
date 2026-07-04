@@ -656,17 +656,21 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
             {/* ════════════════════════════════════════════════════════════════
                 "EL RESTO DE SU FINCA" — la hoja cohesiva bajo el hero.
                 ────────────────────────────────────────────────────────────────
-                Con la flag F2 ON (y finca PROPIA, no la red institucional del
-                extensionista), TODO lo que sigue se consolida en UNA hoja clara
-                (.fvh-resto) que sube desde el hero — sin un segundo AgentHero,
-                sin un segundo set de portales (los 4 viven en el hero), sin un
-                segundo saludo. Sólo el INVENTARIO de un vistazo + herramientas +
-                casos + seguimiento + animales. Con la flag OFF, el wrapper es
-                pass-through (clase vacía): el dashboard legacy queda intacto.
+                Con la flag F2 ON, TODO lo que sigue se consolida en UNA hoja
+                clara (.fvh-resto) que sube desde el hero — sin un segundo
+                AgentHero, sin un segundo set de portales (los 4 viven en el
+                hero), sin un segundo saludo. Sólo el INVENTARIO de un vistazo +
+                herramientas + casos + seguimiento + animales. Con la flag OFF,
+                el wrapper es pass-through (clase vacía): el dashboard legacy
+                queda intacto.
 
-                El extensionista (red institucional) NO lleva hoja: su red ocupa
-                el hero completo. ════════════════════════════════════════════ */}
-            {fincaVivaFlag && esExtensionista ? null : (
+                El extensionista/operador ve la RED institucional como PORTADA
+                del hero y, DEBAJO, esta MISMA hoja (aditiva) con "Los mundos de
+                mi finca": la red no reemplaza ni oculta el home — se suma. Antes
+                un gate `esExtensionista ? null` borraba la hoja completa y el
+                operador (que es extensionista por bypass) se quedaba SIN los
+                mundos; ahora la hoja se renderiza para todos los perfiles.
+                ════════════════════════════════════════════════════════════ */}
             <div className={fincaVivaFlag ? 'fvh-resto' : 'contents'} data-testid={fincaVivaFlag ? 'fvh-resto' : undefined}>
             <div className={fincaVivaFlag ? 'fvh-resto-shell' : 'contents'}>
 
@@ -948,7 +952,6 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
             {/* /fvh-resto-shell + /fvh-resto (o /contents con flag OFF) */}
             </div>
             </div>
-            )}
         </div>
     );
 }
