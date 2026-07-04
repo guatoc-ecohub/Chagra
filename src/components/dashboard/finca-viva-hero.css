@@ -203,6 +203,21 @@
 [data-theme="nature"] .fvh,
 [data-theme="minimalista"] .fvh { --fvh-neon-velo: 0; }
 
+/* CANDADO NAVY DEL BIOPUNK (V4): en biopunk el cielo del shell es SU navy
+   SIEMPRE — también cuando el clima real marca data-luz noche/amanecer/
+   atardecer. Sin esto, `.fvh[data-luz="noche"]` (declarada después del default
+   navy de arriba) pisaba el biopunk con el azul-gris #243a5e→#4a6470 pensado
+   para la vuelta nocturna de los TEMAS CLAROS, y el hero salía lavado/gris en
+   vez del navy profundo del render aprobado (biopunk-proto). Scope biopunk =
+   html sin data-theme (tema base; applyTheme quita el atributo) + el atributo
+   explícito por robustez de harnesses. Los claros conservan su vuelta
+   nocturna/ámbar intacta. */
+html:not([data-theme]) .fvh,
+html[data-theme="biopunk"] .fvh {
+  --fvh-cielo-a: #0c1830;
+  --fvh-cielo-b: #16263f;
+}
+
 /* ── PROFUNDIZAR EL TEMA EN LA ESCENA (V4) ──────────────────────────────────
    Antes los temas retiñían el shell pero la BANDA CENTRAL isométrica quedaba
    casi igual (mismos verdes/tierras del SVG). Dos capas nuevas, sin tocar los
