@@ -243,7 +243,7 @@ export const MUNDOS_FINCA = [
             { view: 'nutricion', label: 'La comida que alimenta', desc: 'Qué te da comer cada cultivo: fuerza, cuerpo, sangre y defensas (ICBF)', emoji: '🍽️' },
             { view: 'bodega', label: 'Bodega de insumos', desc: 'Lo que tiene guardado y lo que se acaba', emoji: '🏚️' },
             { view: 'informes', label: 'Sacar reportes', desc: 'Para imprimir o llevar al banco o la cooperativa', emoji: '🖨️' },
-            { view: 'fermentos', label: 'Fermentos de la cocina', desc: 'Masato, chicha y kéfir con sus vetos de seguridad', emoji: '🫙' },
+            { view: 'fermentos', label: 'Fermentos de la cocina', desc: 'Chucrut, kombucha, yogur y masato: recetas con fotos y su seguridad', emoji: '🫙' },
         ],
     },
     {
