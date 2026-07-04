@@ -203,6 +203,66 @@
 [data-theme="nature"] .fvh,
 [data-theme="minimalista"] .fvh { --fvh-neon-velo: 0; }
 
+/* CANDADO NAVY DEL BIOPUNK (V4): en biopunk el cielo del shell es SU navy
+   SIEMPRE — también cuando el clima real marca data-luz noche/amanecer/
+   atardecer. Sin esto, `.fvh[data-luz="noche"]` (declarada después del default
+   navy de arriba) pisaba el biopunk con el azul-gris #243a5e→#4a6470 pensado
+   para la vuelta nocturna de los TEMAS CLAROS, y el hero salía lavado/gris en
+   vez del navy profundo del render aprobado (biopunk-proto). Scope biopunk =
+   html sin data-theme (tema base; applyTheme quita el atributo) + el atributo
+   explícito por robustez de harnesses. Los claros conservan su vuelta
+   nocturna/ámbar intacta. */
+html:not([data-theme]) .fvh,
+html[data-theme="biopunk"] .fvh {
+  --fvh-cielo-a: #0c1830;
+  --fvh-cielo-b: #16263f;
+}
+
+/* ── PROFUNDIZAR EL TEMA EN LA ESCENA (V4) ──────────────────────────────────
+   Antes los temas retiñían el shell pero la BANDA CENTRAL isométrica quedaba
+   casi igual (mismos verdes/tierras del SVG). Dos capas nuevas, sin tocar los
+   SVG ni la disposición:
+
+   1) GRADE de color por tema sobre el SVG de la escena (.fvh-escena > svg —
+      SOLO la escena; el globo del agente y la fauna quedan fuera): biopunk
+      enfría y apaga hacia su clave nocturna; nature calienta a tierra; el
+      minimalista desatura a papel; verde-vivo sube la savia. Es la misma
+      escena con otra LUZ, como los bocetos por tema aprobados.
+
+   2) VELADURA/TEXTURA por tema (reusa el ::after del velo, que biopunk ya
+      ocupaba con su neón): sol de mañana en verde-vivo, veladura dorada +
+      grano de papel kraft en nature, trama fina de papel en minimalista. */
+.fvh-escena > svg {
+  filter: saturate(0.86) hue-rotate(-8deg) brightness(0.93); /* biopunk base */
+  transition: filter 0.6s ease;
+}
+[data-theme="verde-vivo"] .fvh-escena > svg { filter: saturate(1.14) brightness(1.02); }
+[data-theme="nature"] .fvh-escena > svg { filter: sepia(0.22) saturate(0.95) brightness(1.02); }
+[data-theme="minimalista"] .fvh-escena > svg { filter: saturate(0.62) contrast(0.97) brightness(1.05); }
+
+/* verde-vivo: sol de mañana que entra por la esquina alta izquierda. */
+[data-theme="verde-vivo"] .fvh-escena-wrap::after {
+  opacity: 1;
+  background: radial-gradient(110% 80% at 22% 8%, rgba(255, 240, 180, 0.20), transparent 52%);
+}
+/* nature: veladura dorada de tierra + grano horizontal de papel kraft. */
+[data-theme="nature"] .fvh-escena-wrap::after {
+  opacity: 1;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 214, 150, 0.16), transparent 55%),
+    repeating-linear-gradient(0deg, rgba(122, 82, 48, 0.05) 0 2px, transparent 2px 6px);
+}
+/* minimalista: luz pareja de estudio + trama vertical finísima de papel. */
+[data-theme="minimalista"] .fvh-escena-wrap::after {
+  opacity: 1;
+  background:
+    linear-gradient(180deg, rgba(246, 243, 236, 0.20) 0%, transparent 40%),
+    repeating-linear-gradient(90deg, rgba(60, 70, 60, 0.035) 0 1px, transparent 1px 8px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .fvh-escena > svg { transition: none; }
+}
+
 /* VIÑETA DE PROFUNDIDAD de la escena (todos los temas): un brillo apenas
    perceptible arriba (aire) + una caída suave abajo que asienta la escena
    contra el compositor. z5: sobre la escena (z2), bajo el velo neón (z6). */
@@ -259,6 +319,14 @@
   background: radial-gradient(circle at 32% 26%, #2a2024, #140d10);
   box-shadow: 0 6px 16px rgba(120, 20, 20, 0.32),
               0 0 0 1.5px rgba(231, 76, 60, 0.55) inset;
+  /* Regresión header 2026-07-04: la A pasó de <span> decorativo a BOTÓN del
+     agente (en biopunk la A invoca al agente) — reset del cromo nativo. */
+  border: 0;
+  cursor: pointer;
+}
+.fvh-brand-a:active { transform: scale(0.96); }
+@media (prefers-reduced-motion: reduce) {
+  .fvh-brand-a:active { transform: none; }
 }
 /* Temas de piel clara → plinto claro del tema (superficie + borde --c-*). */
 [data-theme="verde-vivo"] .fvh-brand-a,
@@ -295,6 +363,12 @@
   gap: 9px;
   margin: 0 auto 0 8px;          /* empuja levemente desde la marca */
   max-width: min(48%, 360px);
+  /* Regresión header 2026-07-04 ("se perdió el perfil"): el chip de ubicación
+     no cedía ancho — en pantallas angostas la fila desbordaba y las píldoras
+     de la derecha (campana/?/PERFIL) se salían del viewport. El chip es el
+     único elástico de la fila: cede primero (su texto ya elipsa). */
+  flex: 0 1 auto;
+  min-width: 0;
   cursor: pointer;
   /* Superficie del tema (no #fff fijo): en biopunk es navy con borde neón →
      el texto del tema contrasta; en los claros es papel con borde tierra. Era
@@ -368,6 +442,21 @@
 .fvh-pill.fvh-pill-perfil {
   box-shadow: 0 4px 11px rgba(60, 40, 10, 0.18),
               0 0 0 2px rgb(var(--c-emerald-500, 47 107 58) / 0.55);
+}
+
+/* MÓVIL ANGOSTO (regresión 2026-07-04): con 4 accesos en el header (A del
+   agente + campana + "?" + perfil) más el chip de ubicación, en ≤430px la fila
+   no cabía y el PERFIL quedaba fuera de pantalla. Se recupera aire ocultando
+   el wordmark "Chagra / Su finca viva" (la A de marca queda como sello, y ES
+   el botón del agente) y compactando gaps/píldoras. Los 4 botones quedan
+   SIEMPRE visibles y tocables (≥40px). */
+@media (max-width: 430px) {
+  .fvh-topbar { gap: 8px; padding-left: 12px; padding-right: 12px; }
+  .fvh-brand { gap: 0; }
+  .fvh-brand-txt { display: none; }
+  .fvh-ubic { margin-left: 0; max-width: none; }
+  .fvh-top-pills { gap: 6px; }
+  .fvh-pill { width: 40px; height: 40px; }
 }
 
 /* ── QA del operador (override de escala, oculto al usuario — feedback #6) ──── */
@@ -1135,3 +1224,25 @@
   text-shadow: var(--fvh-on-cielo-sombra);
 }
 .fvh .fvh-portales-tit span { background: var(--fvh-on-cielo-div); }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   ESCENAS VIVAS POR TEMA (`--viva`) — ajustes del contenedor compartidos por
+   las 4 escenas de autor (biopunk "Finca Organismo" · nature "El Árbol de la
+   Vida" · verde-vivo "Huerto Exuberante" · minimalista "Un solo trazo").
+   Todas usan el formato ALTO 390×486 (la biopunk además incluye el corte de
+   suelo con el corazón-semilla; nature, su corte de raíces). El modificador
+   del wrap les da su proporción y apaga las capas de "grade"/velo genéricas:
+   cada escena YA ES el arte final calibrado de su tema. El alias histórico
+   `--organismo` sigue emitiéndose en biopunk para specs externos. */
+.fvh .fvh-escena-wrap--viva .fvh-escena {
+  height: auto;
+  aspect-ratio: 390 / 486;
+  max-width: 460px;
+  max-height: 580px;
+  margin: 6px auto 0;
+}
+/* La escena ya ES el arte final del tema: sin grade de color encima. */
+.fvh .fvh-escena-wrap--viva .fvh-escena > svg { filter: none; }
+/* Sin velo/veladura genérica (::after) — duplicaba brillos/tramas sobre la
+   atmósfera propia de cada escena (aurora neón, rayo dorado, rocío, papel). */
+.fvh .fvh-escena-wrap--viva::after { opacity: 0; }

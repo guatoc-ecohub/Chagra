@@ -114,6 +114,11 @@ jobs:
           # Si sidecar timeout/5xx/red caida, sidecarClient devuelve null y el
           # comportamiento es identico al pre-wiring.
           VITE_USE_SIDECAR_AGRO_MCP: "true"
+          # GO-LIVE 2026-07-04: home finca-viva a produccion (biopunk2 default,
+          # biopunk original de respaldo). Autorizado por el operador. Antes solo
+          # en dev-deploy.yml; ahora prod renderiza el home de 4 portales + escenas
+          # vivas por tema en vez del home oscuro tipo agente.
+          VITE_FINCA_VIVA_HOME_PERFIL: "true"
           # Captura server-side de conversaciones del agente para la auditoría
           # diaria (review de respuestas en todas las aristas). Doble gate: esta
           # flag + hasConsent() por usuario (privacy-first). PII completa (sin

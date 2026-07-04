@@ -9,7 +9,7 @@
  *
  * Esta suite verifica que:
  *   (a) ubicación guardada GRUESA → el widget NO afirma el municipio con
- *       confianza: muestra un aviso "Confirma tu ubicación para un clima
+ *       confianza: muestra un aviso "Confirme su ubicación para un clima
  *       exacto" con CTA al mini-mapa (ubicacion-detectada).
  *   (b) ubicación PRECISA o confirmada por el usuario → NO molesta (sin aviso).
  *   (c) cuando hay municipio, SIEMPRE hay una vía prominente para corregir la
@@ -61,7 +61,7 @@ beforeEach(() => {
 });
 
 describe('ClimaStrip — degradación de confianza con ubicación guardada gruesa', () => {
-    test('ubicación guardada GRUESA → muestra aviso "Confirma tu ubicación" (no afirma el municipio)', async () => {
+    test('ubicación guardada GRUESA → muestra aviso "Confirme su ubicación" (no afirma el municipio)', async () => {
         // Perfil del operador: coords + municipio guardados, PERO la lectura fue
         // gruesa (accuracy 12 km, Brave) y nunca corrigió la altitud a mano.
         getProfile.mockReturnValue({
@@ -74,7 +74,7 @@ describe('ClimaStrip — degradación de confianza con ubicación guardada grues
         render(<ClimaStrip onNavigate={vi.fn()} />);
 
         const warning = await screen.findByTestId('clima-coarse-warning');
-        expect(warning).toHaveTextContent(/confirma tu ubicación/i);
+        expect(warning).toHaveTextContent(/confirme su ubicación/i);
     });
 
     test('aviso gruesa → CTA navega a ubicacion-detectada (mini-mapa)', async () => {

@@ -1,0 +1,267 @@
+/*
+ * i18n (ADR-050): este archivo es CONTENIDO/copy campesino en español Colombia
+ * (prácticas, pasos, señales del módulo Agua), pendiente de migrar a
+ * src/config/messages.js — mismo criterio que sanidadData.js / poscosechaCalculator.js.
+ */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
+/**
+ * aguaFinca.js — CONTENIDO del módulo "Agua de la finca" (3 pilares).
+ *
+ * REGLA ANTI-ALUCINACIÓN del módulo: todo lo CUALITATIVO (prácticas, pasos,
+ * señales) vive aquí como copy; toda CIFRA DURA (mm de lluvia por zona, Kc por
+ * cultivo, ETo por piso térmico, dosis de potabilización, metros legales de
+ * ronda) es un SLOT con `valor: null` + `estado: 'grounded_pendiente'` que el
+ * pipeline de grounding (DR con fuente → catálogo/AGE) llenará. La UI pinta
+ * "dato en camino" cuando el valor es null — NUNCA muestra un número
+ * inventado.
+ *
+ * Convención del slot:
+ *   { estado: 'grounded_pendiente', valor: null, fuentePrevista: '<de dónde saldrá>' }
+ */
+
+export const ESTADO_GROUNDED_PENDIENTE = 'grounded_pendiente';
+
+/* ────────────────────────────────────────────────────────────────────────
+ * PILAR 1 · COSECHAR LA LLUVIA
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Lluvia mensual típica por zona/municipio (mm/mes).
+ * TODO GROUNDED-PENDIENTE: llega aparte por el pipeline de clima (dato
+ * IDEAM/estación por municipio, DR en curso). Mientras tanto la calculadora
+ * usa el mm que la persona digita (por ejemplo, del pluviómetro casero o de
+ * lo que informa el módulo de clima de Chagra).
+ */
+export const LLUVIA_MENSUAL_ZONA = {
+  estado: ESTADO_GROUNDED_PENDIENTE,
+  valor: null,
+  fuentePrevista: 'IDEAM — promedios mensuales de precipitación por municipio (pipeline clima Chagra)',
+};
+
+/** Pasos del sistema techo→tanque, en orden real de construcción. Cualitativo. */
+export const PASOS_COSECHA = [
+  {
+    id: 'techo',
+    titulo: 'El techo que ya tiene',
+    detalle: 'Cualquier techo con caída sirve: casa, cocina, marranera, gallinero. Mida el piso que cubre el techo (largo × ancho): esa es el área que cosecha.',
+  },
+  {
+    id: 'canal',
+    titulo: 'Canal y bajante',
+    detalle: 'Una canaleta con buena pendiente hacia el tanque, sin hojas acumuladas. Revísela antes de las temporadas de lluvia: canal tapada es cosecha perdida.',
+  },
+  {
+    id: 'primeras-aguas',
+    titulo: 'Deje ir la primera lavada',
+    detalle: 'La primera lluvia después de días secos baja lavando el techo (polvo, hollín, excremento de aves). Desvíela o deséchela: al tanque solo debe entrar agua de techo ya lavado.',
+  },
+  {
+    id: 'tanque',
+    titulo: 'Tanque tapado y oscuro',
+    detalle: 'Tanque con tapa y sin luz por dentro: la luz cría algas y el tanque destapado cría zancudos. Con malla en la entrada del agua no entran hojas ni animales.',
+  },
+];
+
+/* ────────────────────────────────────────────────────────────────────────
+ * PILAR 2 · REGAR CON MEDIDA
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/**
+ * ETo de referencia por piso térmico (mm/día).
+ *
+ * GROUNDED (DR agua nacional §2.2): la ETo cae con la altitud según la relación
+ * del IDEAM `ETo(mm/día) = 4,37·exp(−0,0002·altitud[m])`. Se evalúa esa fórmula
+ * en la altitud media de cada piso térmico colombiano (cálido ~500, templado
+ * ~1500, frío ~2500, páramo ~3500 msnm) y se redondea a 0,1 mm/día. Es una
+ * REFERENCIA orientadora (confianza media: fórmula de escala, no medición por
+ * estación): la calculadora sigue aceptando el valor exacto que la persona
+ * digite de su estación o del módulo de clima.
+ *
+ * Fuente: IDEAM — Nota Técnica ETo (relación ETo–altitud). Confianza: media.
+ */
+export const ETO_POR_PISO_TERMICO = [
+  // 4,37·exp(−0,0002·500)  ≈ 3,95
+  { piso: 'cálido', etoMmDia: 4.0, altitudRefM: 500, estado: 'grounded', fuente: 'IDEAM (ETo≈4,37·e^(−0,0002·h))', confianza: 'media' },
+  // 4,37·exp(−0,0002·1500) ≈ 3,24
+  { piso: 'templado', etoMmDia: 3.2, altitudRefM: 1500, estado: 'grounded', fuente: 'IDEAM (ETo≈4,37·e^(−0,0002·h))', confianza: 'media' },
+  // 4,37·exp(−0,0002·2500) ≈ 2,65
+  { piso: 'frío', etoMmDia: 2.7, altitudRefM: 2500, estado: 'grounded', fuente: 'IDEAM (ETo≈4,37·e^(−0,0002·h))', confianza: 'media' },
+  // 4,37·exp(−0,0002·3500) ≈ 2,17
+  { piso: 'páramo', etoMmDia: 2.2, altitudRefM: 3500, estado: 'grounded', fuente: 'IDEAM (ETo≈4,37·e^(−0,0002·h))', confianza: 'media' },
+];
+
+/**
+ * Kc (coeficiente de cultivo) por especie y etapa.
+ *
+ * GROUNDED (DR agua nacional §2.3 — FAO-56 Cuadro 12, clima sub-húmedo). Cada
+ * cultivo trae los tres Kc de etapa (inicial / media / final); `kc` es el de la
+ * etapa MEDIA (el pico de consumo, el número más útil como referencia única
+ * para la calculadora). Ajustar por clima local. Confianza alta (FAO-56,
+ * estándar internacional).
+ */
+export const KC_CULTIVOS = [
+  { slug: 'maiz', nombre: 'Maíz', kc: 1.2, kcInicial: 0.30, kcMedia: 1.20, kcFinal: 0.35, estado: 'grounded', fuente: 'FAO-56 Cuadro 12 (maíz grano)', confianza: 'alta' },
+  { slug: 'frijol', nombre: 'Fríjol', kc: 1.15, kcInicial: 0.40, kcMedia: 1.15, kcFinal: 0.35, estado: 'grounded', fuente: 'FAO-56 Cuadro 12 (fríjol seco)', confianza: 'alta' },
+  { slug: 'cafe', nombre: 'Café', kc: 1.1, kcInicial: 1.05, kcMedia: 1.10, kcFinal: 1.10, estado: 'grounded', fuente: 'FAO-56 Cuadro 12 (café con cobertura)', confianza: 'alta' },
+  { slug: 'platano', nombre: 'Plátano', kc: 1.1, kcInicial: 0.50, kcMedia: 1.10, kcFinal: 1.00, estado: 'grounded', fuente: 'FAO-56 Cuadro 12 (banano/plátano año 1)', confianza: 'alta' },
+  { slug: 'tomate', nombre: 'Tomate', kc: 1.15, kcInicial: 0.60, kcMedia: 1.15, kcFinal: 0.80, estado: 'grounded', fuente: 'FAO-56 Cuadro 12 (tomate)', confianza: 'alta' },
+  { slug: 'papa', nombre: 'Papa', kc: 1.15, kcInicial: 0.50, kcMedia: 1.15, kcFinal: 0.75, estado: 'grounded', fuente: 'FAO-56 Cuadro 12 (papa)', confianza: 'alta' },
+];
+
+/**
+ * Eficiencia por sistema de riego (fracción del agua que sí llega a la raíz).
+ *
+ * GROUNDED (DR agua nacional §2.1): goteo 90–95 % y aspersión 80–85 % son
+ * rangos de literatura (UCLM); surco/gravedad 70–80 % es el ÚNICO valor primario
+ * verificado en el DR (Manual de Métodos de Riego). Se guarda el punto medio del
+ * rango en `coef`, con su `coefRango` y confianza. El orden (goteo > aspersión >
+ * gravedad) no cambia.
+ */
+export const SISTEMAS_RIEGO = [
+  {
+    id: 'goteo',
+    nombre: 'Goteo (o botella gota a gota)',
+    pierde: 'Pierde poquito',
+    coef: 0.92,
+    coefRango: [0.90, 0.95],
+    estado: 'grounded',
+    fuente: 'Literatura de riego (UCLM) vía DR agua §2.1',
+    confianza: 'media',
+    detalle: 'El agua cae despacio al pie de la mata. Se puede armar casero con manguera perforada o botellas. El que más rinde cuando el agua está contada.',
+  },
+  {
+    id: 'aspersion',
+    nombre: 'Aspersión (rociador)',
+    pierde: 'Pierde algo al viento y al sol',
+    coef: 0.82,
+    coefRango: [0.80, 0.85],
+    estado: 'grounded',
+    fuente: 'Literatura de riego (UCLM) vía DR agua §2.1',
+    confianza: 'media',
+    detalle: 'Moja también donde no hay raíz, y con sol fuerte parte se evapora antes de caer. Riegue de madrugada o al caer la tarde.',
+  },
+  {
+    id: 'gravedad',
+    nombre: 'Por surco o manguera suelta',
+    pierde: 'Pierde harto por el camino',
+    coef: 0.75,
+    coefRango: [0.70, 0.80],
+    estado: 'grounded',
+    fuente: 'Manual de Métodos de Riego (surco bien operado, valor verificado) vía DR agua §2.1',
+    confianza: 'media-alta',
+    detalle: 'Mucha agua se infiltra o se escurre antes de llegar a la mata. Si es lo que hay, riegue por tandas cortas y con el surco bien trazado.',
+  },
+];
+
+/** Prácticas que bajan la sed del cultivo. Cualitativas, agroecología clásica. */
+export const PRACTICAS_AHORRO = [
+  { id: 'cobertura', titulo: 'Tape el suelo', detalle: 'Hojarasca, pasto de corte o tamo sobre el suelo: la tierra tapada guarda la humedad y no se agrieta al sol.' },
+  { id: 'materia-organica', titulo: 'Suelo con materia orgánica', detalle: 'Un suelo con compost y bocashi funciona como esponja: recibe el aguacero y lo suelta despacio.' },
+  { id: 'hora', titulo: 'Riegue cuando no hay sol bravo', detalle: 'De madrugada o al atardecer el agua entra a la tierra en vez de evaporarse.' },
+  { id: 'observar', titulo: 'Riegue por la planta, no por costumbre', detalle: 'Meta el dedo a la tierra: si a un jeme de hondo está húmeda, todavía no toca. La mata avisa primero con las hojas.' },
+];
+
+/* ────────────────────────────────────────────────────────────────────────
+ * PILAR 3 · CUIDAR EL AGUA (calidad + nacimiento)
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Dosis de potabilización casera (cloro por litro, minutos de hervor, horas
+ * de SODIS al sol).
+ *
+ * GROUNDED (DR agua nacional §3.3, dosis verificadas contra fuente sanitaria):
+ *   - Cloración: 2 gotas de hipoclorito (lejía sin aroma) al 6 % por litro,
+ *     mezclar y esperar 30 minutos; DOBLAR la dosis si el agua está turbia,
+ *     con color o muy fría. Fuente: EPA (español). Confianza: media.
+ *   - Hervir: 1 minuto a nivel del mar, 3 minutos por encima de ~1.000 msnm
+ *     (menor punto de ebullición en altura). Fuente: OMS/EPA. Confianza: alta.
+ *   - SODIS (desinfección solar): botella PET transparente ≤2 L, 6 horas de sol
+ *     despejado (2 días seguidos si hay mucha nube); SOLO si turbiedad <30 UNT.
+ *     Fuente: EAWAG-SANDEC/Banco Mundial. Confianza: alta.
+ *
+ * SEGURIDAD: el cloro y el SODIS pierden eficacia con agua turbia — asentar o
+ * filtrar primero. Se conserva el mensaje "si huele a químico o viene de potrero
+ * fumigado, ni hervida: consígala de otra fuente".
+ */
+export const DOSIS_POTABILIZACION = {
+  estado: 'grounded',
+  cloroGotasPorLitro: 2,
+  cloroConcentracionPct: 6,
+  cloroEsperaMin: 30,
+  cloroDobleSiTurbia: true,
+  hervorMinutos: 1,
+  hervorMinutosSobre1000m: 3,
+  sodisHorasSol: 6,
+  sodisDiasSiNublado: 2,
+  sodisTurbiedadMaxUNT: 30,
+  fuente: 'EPA (cloración); OMS/EPA (hervido); EAWAG-SANDEC/Banco Mundial (SODIS) — DR agua §3.3',
+  confianza: 'media (cloro); alta (hervido, SODIS)',
+};
+
+/** Escalera de calidad: para qué sirve cada agua de la finca. Cualitativo. */
+export const USOS_DEL_AGUA = [
+  { id: 'lluvia-directa', agua: 'Lluvia recién cosechada (tanque tapado)', sirve: 'Riego, animales, lavar, aseo de la casa', ojo: 'Para tomar o cocinar, trátela primero (hierva o desinfecte).' },
+  { id: 'quebrada', agua: 'Quebrada o acequia', sirve: 'Riego', ojo: 'Aguas abajo de potreros o viviendas puede traer microbios: no la tome sin tratar.' },
+  { id: 'nacimiento', agua: 'Nacimiento protegido', sirve: 'La reserva más valiosa de la finca', ojo: 'Aun así, para consumo humano lo seguro es hervir o desinfectar.' },
+];
+
+/** Señales de alarma en el agua — cuándo NO usarla ni para riego de hortaliza. */
+export const SENALES_ALERTA_AGUA = [
+  'Cambia de color o huele a podrido después de un aguacero.',
+  'Espuma que no se deshace (jabones o agroquímicos aguas arriba).',
+  'Peces o renacuajos muertos en el cauce.',
+  'Nata aceitosa en la superficie.',
+];
+
+/**
+ * Franja legal de protección alrededor de nacimientos y cauces (metros).
+ *
+ * GROUNDED (DR agua nacional §4.1, verificado contra norma): son MÍNIMOS
+ * obligatorios de conservación forestal que recaen sobre el propietario rural.
+ *   - Nacimientos: 100 m a la redonda (mínimo).
+ *   - Cauces (ríos/quebradas/arroyos, permanentes o no): 30 m a cada lado.
+ * Fuente: Decreto 1449 de 1977, Art. 3 (hoy compilado en el Decreto 1076 de
+ * 2015). Confianza: alta. No confundir con la "ronda hídrica" del Art. 83 del
+ * Decreto 2811/1974, que es un MÁXIMO de acotamiento (hasta 30 m) que fija la
+ * CAR; los metros de aquí son mínimos que aplican con o sin acotamiento.
+ */
+export const RONDA_PROTECCION = {
+  estado: 'grounded',
+  metrosNacimiento: 100,
+  metrosCauce: 30,
+  fuente: 'Decreto 1449/1977 Art. 3 (compilado en Decreto 1076/2015) — DR agua §4.1',
+  confianza: 'alta',
+};
+
+/**
+ * CASO INSIGNIA · "Se me seca el nacimiento en verano".
+ * Plan cualitativo por tiempos: qué hacer YA en verano, qué sembrar/cercar en
+ * invierno, y cómo leer el clima que viene (conecta con el módulo de clima y
+ * el ciclo ENSO que Chagra ya sigue — no se re-implementa aquí).
+ */
+export const CASO_NACIMIENTO = {
+  id: 'nacimiento-seco-verano',
+  titulo: 'Se me seca el nacimiento en verano',
+  resumen: 'Un nacimiento no se seca de un día para otro: se va quedando solo. Casi siempre es la suma de potrero hasta el borde, árboles tumbados arriba y todo el mundo sacando agua a la vez en la época seca.',
+  enVerano: [
+    { id: 'no-secar-del-todo', titulo: 'No lo ordeñe hasta el fondo', detalle: 'Si entre todos sacan hasta la última gota, el ojo de agua pierde su hilo y tarda más en volver. Racionen por horas y dejen siempre un remanente corriendo.' },
+    { id: 'lluvia-alivia', titulo: 'Use la lluvia guardada primero', detalle: 'Cada caneca de lluvia cosechada en invierno es agua que en verano NO se le saca al nacimiento. Por eso este módulo empieza por el techo.' },
+    { id: 'sombra-de-emergencia', titulo: 'No despeje más monte alrededor', detalle: 'En plena sequía ni socole ni queme cerca del ojo de agua: esa sombra es lo que le queda de humedad.' },
+  ],
+  enInvierno: [
+    { id: 'cercar', titulo: 'Cierre el paso del ganado', detalle: 'Una cerca sencilla alrededor del nacimiento evita el pisoteo que compacta el suelo y ensucia el agua. Deje un bebedero afuera para los animales.' },
+    { id: 'sembrar-nativas', titulo: 'Siembre monte nativo alrededor', detalle: 'Árboles y matorral nativo de su piso térmico alrededor del ojo de agua y aguas arriba: sus raíces son las que guardan el agua del invierno para soltarla en verano.' },
+    { id: 'zanjas', titulo: 'Ayude a que el aguacero entre a la tierra', detalle: 'Zanjas de infiltración a nivel, terrazas y suelo tapado ladera arriba: el agua que corre se pierde; la que se infiltra es la que el nacimiento le devuelve en verano.' },
+  ],
+  comunidad: [
+    { id: 'vecinos', titulo: 'El agua es de la vereda', detalle: 'Si el nacimiento abastece a varios, siéntense a acordar turnos y a cuidar juntos la parte alta. Un solo vecino cuidando no alcanza.' },
+    { id: 'clima', titulo: 'Léale el paso al clima', detalle: 'Chagra ya sigue el ciclo del Niño y la Niña en su módulo de clima: cuando viene un Niño (más seco), guarde más lluvia desde antes y raciónese temprano.' },
+  ],
+};
+
+/** Los 3 pilares del módulo — estructura de navegación. */
+export const PILARES_AGUA = [
+  { id: 'lluvia', titulo: 'Cosechar la lluvia', corto: 'Lluvia', descripcion: 'Del techo al tanque: cuánta agua le cae gratis y cómo guardarla.' },
+  { id: 'riego', titulo: 'Regar con medida', corto: 'Riego', descripcion: 'Cuánta agua necesita de verdad su cultivo y cómo no botarla.' },
+  { id: 'cuidar', titulo: 'Cuidar el agua', corto: 'Cuidar', descripcion: 'Agua sana para la casa y un nacimiento que no se seque.' },
+];

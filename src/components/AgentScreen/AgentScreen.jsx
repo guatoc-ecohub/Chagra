@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw, X, Home, Camera, Square, Sprout } from 'lucide-react';
+import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw, X, Home, Camera, Square, Sprout, HelpCircle } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { transcribe, queueForRetry } from '../../services/voiceService';
 import VoiceStatusStrip from './VoiceStatusStrip';
@@ -3210,6 +3210,20 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           title={ttsEnabled ? 'Silenciar voz' : 'Activar voz'}
         >
           {ttsEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
+        </button>
+        {/* Ayuda (overhaul ayuda 2026-07): el AgentScreen es inmersivo (sin
+            TopBar), así que el "?" global no existía aquí — el campesino que
+            se pierde EN el chat no tenía puerta al Manual. Mismo mecanismo de
+            navegación global que el botón Home (chagra:nav → App.jsx). */}
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new CustomEvent('chagra:nav', { detail: 'ayuda' }))}
+          className="p-2.5 rounded-full bg-amber-500/15 hover:bg-amber-500/25 active:bg-amber-500/35 text-amber-300 min-h-[44px] min-w-[44px] flex items-center justify-center transition-all"
+          title="Manual de uso"
+          aria-label="Abrir el manual de uso"
+          data-testid="agent-help-btn"
+        >
+          <HelpCircle size={16} strokeWidth={2.5} />
         </button>
         <div className={`hidden sm:flex items-center gap-1 px-2 py-1 rounded-full text-[10px] ${
           isOnline ? 'bg-emerald-900/40 text-emerald-400' : 'bg-red-900/40 text-red-400'

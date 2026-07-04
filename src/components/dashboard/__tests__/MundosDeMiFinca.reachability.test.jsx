@@ -1,0 +1,130 @@
+/**
+ * LOS MUNDOS DE MI FINCA — contrato de ALCANZABILIDAD (reestructuración 2.0).
+ *
+ * La reestructuración quitó del home F2 las tiles sueltas (consultar/aprender,
+ * inventario, mercado, seguimiento). Este test CONGELA el contrato de que nada
+ * quedó huérfano:
+ *   1. Toda función que el home F2 exponía sigue alcanzable vía mundos.
+ *   2. Toda vista referida por el manifiesto EXISTE en el router real
+ *      (case '<view>' en App.jsx, o la familia seguimiento_*).
+ *   3. La pantalla de mundo re-rutea de verdad (click → onNavigate) y su
+ *      fallback sin id muestra el índice, nunca una pantalla rota.
+ */
+import React from 'react';
+// @types/node no está instalado en el repo (gap conocido, ya tolerado en
+// App.glaciar-prefetch.test.jsx / FincaVivaResto.noSolapa.test.jsx /
+// dataJsonValidity.test.js): tsc no resuelve los specifiers "node:*". Runtime
+// (vitest/node) los resuelve sin problema; irreducible sin sumar la
+// dependencia @types/node al repo entero (fuera de alcance de este fix).
+// @ts-expect-error TS2591 — ver comentario arriba.
+import fs from 'node:fs';
+// @ts-expect-error TS2591 — ver comentario arriba.
+import path from 'node:path';
+// @ts-expect-error TS2591 — ver comentario arriba.
+import { fileURLToPath } from 'node:url';
+import { render, screen, fireEvent, cleanup, within } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { describe, test, expect, vi, afterEach } from 'vitest';
+
+import { MUNDOS_FINCA, mundosViews, getMundo } from '../mundosFinca';
+import MundosDeMiFinca from '../MundosDeMiFinca';
+import MundoScreen from '../../MundoScreen';
+
+afterEach(() => cleanup());
+
+const __dir = path.dirname(fileURLToPath(import.meta.url));
+const appSrc = fs.readFileSync(path.resolve(__dir, '../../../App.jsx'), 'utf8');
+
+describe('Mundos — el mapa cubre todo lo que el home F2 exponía (sin huérfanos)', () => {
+  // Las vistas que ANTES eran tiles/tarjetas sueltas del home F2 y ahora deben
+  // vivir dentro de un mundo. Si alguien quita una entrada del manifiesto sin
+  // reubicarla, este test truena.
+  const VIEWS_QUE_NO_PUEDEN_QUEDAR_HUERFANAS = [
+    // Consultar y aprender (ex bloque 4)
+    'directorio', 'calendario_finca', 'casos', 'ciclo_nutrientes', 'estiercol',
+    'biopreparados', 'suelo', 'agua', 'salud_suelo', 'toxicologia', 'informes',
+    // Inventario/plantas y animales (ex bloque 2)
+    'activos', 'mapa', 'reportar_invasora', 'asociaciones', 'biodiversidad', 'animales',
+    // Mercado (ex bloque 5)
+    'mercado',
+    // Seguimiento de procesos (ex tarjetas condicionales)
+    'seguimiento_reforestacion', 'seguimiento_silvopastoreo', 'seguimiento_paramo', 'seguimiento_cerdos',
+  ];
+
+  test('toda vista del home viejo sigue alcanzable vía mundos', () => {
+    const views = new Set(mundosViews());
+    for (const v of VIEWS_QUE_NO_PUEDEN_QUEDAR_HUERFANAS) {
+      expect(views.has(v), `vista huérfana: ${v} no está en ningún mundo`).toBe(true);
+    }
+  });
+
+  test('toda vista del manifiesto existe en el router real (App.jsx)', () => {
+    for (const v of mundosViews()) {
+      const enRouter = appSrc.includes(`case '${v}':`)
+        // La familia seguimiento_<key> se resuelve por parseSeguimientoView.
+        || (/^seguimiento_/.test(v) && appSrc.includes('parseSeguimientoView'));
+      expect(enRouter, `la vista '${v}' del manifiesto no existe en App.jsx`).toBe(true);
+    }
+    // Y la propia ruta de mundo existe.
+    expect(appSrc).toContain("case 'mundo':");
+  });
+
+  test('el manifiesto es sano: ids únicos, tinte, y directo XOR entradas', () => {
+    const ids = MUNDOS_FINCA.map((m) => m.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const m of MUNDOS_FINCA) {
+      expect(Array.isArray(m.tinte) && m.tinte.length === 2, `tinte de ${m.id}`).toBe(true);
+      const tieneDirecto = !!m.directo;
+      const tieneEntradas = (m.entradas || []).length > 0;
+      expect(tieneDirecto !== tieneEntradas, `${m.id} debe ser directo O tener entradas`).toBe(true);
+    }
+  });
+});
+
+describe('MundosDeMiFinca — grilla del home', () => {
+  test('el gate de Animales por perfil oculta SOLO ese mundo', () => {
+    render(<MundosDeMiFinca onNavigate={vi.fn()} mostrarAnimales={false} />);
+    expect(screen.queryByTestId('mundo-animales')).toBeNull();
+    expect(screen.getByTestId('mundo-cultivos')).toBeInTheDocument();
+    expect(screen.getByTestId('mundo-sanidad')).toBeInTheDocument();
+  });
+
+  test('el sello vivo de Cultivos usa el conteo real de matas', () => {
+    render(<MundosDeMiFinca onNavigate={vi.fn()} plantsCount={7} />);
+    expect(screen.getByTestId('mundo-cultivos')).toHaveTextContent('7 matas sembradas');
+  });
+});
+
+describe('MundoScreen — el mundo por dentro re-rutea a las vistas reales', () => {
+  test('cada entrada navega a su vista (con su data)', () => {
+    const onNavigate = vi.fn();
+    render(<MundoScreen mundoId="sanidad" onBack={vi.fn()} onNavigate={onNavigate} />);
+    const mundo = getMundo('sanidad');
+    for (const e of mundo.entradas) {
+      fireEvent.click(screen.getByTestId(`entrada-${e.view}`));
+      expect(onNavigate).toHaveBeenCalledWith(e.view, e.data);
+    }
+    // Biopreparados conserva su back al dashboard (fix del onBack huérfano).
+    expect(onNavigate).toHaveBeenCalledWith('biopreparados', { back: 'dashboard' });
+  });
+
+  test('el agente queda siempre presente en el pie del mundo', () => {
+    const onNavigate = vi.fn();
+    render(<MundoScreen mundoId="suelo" onBack={vi.fn()} onNavigate={onNavigate} />);
+    fireEvent.click(screen.getByTestId('mundo-agente'));
+    expect(onNavigate).toHaveBeenCalledWith('agente');
+  });
+
+  test('sin id (recarga/enlace viejo) muestra el índice de mundos, no un error', () => {
+    const onNavigate = vi.fn();
+    render(<MundoScreen mundoId={undefined} onBack={vi.fn()} onNavigate={onNavigate} />);
+    const indice = screen.getByTestId('mundo-indice');
+    // Todos los mundos listados y navegables.
+    const botones = within(indice).getAllByRole('button');
+    expect(botones.length).toBe(MUNDOS_FINCA.length);
+    fireEvent.click(within(indice).getByRole('button', { name: /El suelo vivo/ }));
+    expect(onNavigate).toHaveBeenCalledWith('mundo', { mundo: 'suelo' });
+    fireEvent.click(within(indice).getByRole('button', { name: /^El agua/ }));
+    expect(onNavigate).toHaveBeenCalledWith('agua', undefined);
+  });
+});

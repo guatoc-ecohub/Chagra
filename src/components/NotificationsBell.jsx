@@ -95,7 +95,15 @@ function mapSensorAlertsToIot(alerts) {
   });
 }
 
-const NotificationsBell = React.memo(function NotificationsBell({ onNavigate, variant }) {
+const NotificationsBell = React.memo(
+  /**
+   * @param {Object} props
+   * @param {(screen: string, options?: Object) => void} props.onNavigate - navegación
+   *   de la app (p. ej. a "agente" con un prompt prellenado por la alerta).
+   * @param {string} [props.variant] - 'f2' para la píldora del home F2; sin variant
+   *   usa el estilo actual del TopBar legacy.
+   */
+  function NotificationsBell({ onNavigate, variant }) {
     const [open, setOpen] = useState(false);
     const [tick, setTick] = useState(0);
     // PoC #316 — tabs Notificaciones / Clima. Default "notif" para no romper

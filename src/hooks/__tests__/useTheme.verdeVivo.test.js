@@ -41,9 +41,10 @@ describe('useTheme — 4º tema Verde Vivo', () => {
     expect(normalizeTheme('verde-vivo')).toBe('verde-vivo');
   });
 
-  it('NO va en el catálogo base THEMES (los 3 temas + auto de siempre)', () => {
+  it('NO va en el catálogo base THEMES (auto + biopunk2 + los 3 curados)', () => {
     expect(THEMES.map((t) => t.id)).toEqual([
       'auto',
+      'biopunk2',
       'biopunk',
       'nature',
       'minimalista',
@@ -51,14 +52,14 @@ describe('useTheme — 4º tema Verde Vivo', () => {
     expect(THEMES.map((t) => t.id)).not.toContain('verde-vivo');
   });
 
-  it('flag ON (dev): el selector muestra el 4º tema al final', () => {
+  it('flag ON (dev): el selector muestra el tema verde-vivo al final', () => {
     const ids = getSelectableThemes(true).map((t) => t.id);
-    expect(ids).toEqual(['auto', 'biopunk', 'nature', 'minimalista', 'verde-vivo']);
+    expect(ids).toEqual(['auto', 'biopunk2', 'biopunk', 'nature', 'minimalista', 'verde-vivo']);
   });
 
-  it('flag OFF (prod): el selector es EXACTO el de hoy (sin verde-vivo)', () => {
+  it('flag OFF (prod): el selector es el catálogo base (sin verde-vivo)', () => {
     const ids = getSelectableThemes(false).map((t) => t.id);
-    expect(ids).toEqual(['auto', 'biopunk', 'nature', 'minimalista']);
+    expect(ids).toEqual(['auto', 'biopunk2', 'biopunk', 'nature', 'minimalista']);
     expect(ids).not.toContain('verde-vivo');
   });
 

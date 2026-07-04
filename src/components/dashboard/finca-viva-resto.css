@@ -136,6 +136,79 @@
   color: #cbd5e1 !important;
 }
 
+/* ════════════════════════════════════════════════════════════════════════════
+   BIOPUNK (tema base, sin data-theme) — LA HOJA DE NOCHE (V4).
+   La hoja "cuaderno crema" está pensada para los temas CLAROS; bajo biopunk
+   quedaba una página clara pegada a un app navy (incoherente con el render
+   aprobado del tema). Aquí la hoja vira a la MISMA clave del hero biopunk:
+   navy #16263f→#0a1426 (los tokens del tema, no colores nuevos) + acento teal
+   #19c79a (--t-accent-rgb de themes.css). Los bloques de adentro ya son
+   theme-aware por la indirección --c-* (el dashboard legacy ES biopunk nativo):
+   solo hay que (1) oscurecer el papel de la hoja, (2) aclarar su tinta y
+   (3) REVERTIR el forzado claro de los tiles (.fvh-tile-claro), que existía
+   para que no chocaran con la crema. Los temas claros no se tocan (scope
+   biopunk: html sin data-theme + el atributo explícito por robustez).
+   ══════════════════════════════════════════════════════════════════════════ */
+html:not([data-theme]) .fvh-resto,
+html[data-theme="biopunk"] .fvh-resto {
+  --fvh-crema: #0e1c33;
+  --fvh-tinta: rgb(var(--c-slate-100));
+  --fvh-tinta-suave: rgb(var(--c-slate-300));
+  --fvh-verde-1: rgb(var(--t-accent-rgb));
+  background: linear-gradient(180deg, #16263f 0%, #0e1c33 12%, #0a1426 100%);
+  box-shadow: 0 -10px 28px rgba(2, 6, 23, 0.55);
+}
+/* Tirador y regla del título: el neón teal del tema, no el verde-crema. */
+html:not([data-theme]) .fvh-resto .fvh-resto-grip,
+html[data-theme="biopunk"] .fvh-resto .fvh-resto-grip {
+  background: rgba(var(--t-accent-rgb), 0.45);
+}
+html:not([data-theme]) .fvh-resto .fvh-resto-tit::before,
+html[data-theme="biopunk"] .fvh-resto .fvh-resto-tit::before {
+  background: linear-gradient(180deg, #3be8a6, #0d7a5f);
+}
+/* Tiles de herramientas: de vuelta a la tarjeta navy nativa del tema (el
+   forzado blanco era para la hoja crema). Misma especificidad + !important
+   para ganarle al override claro de arriba. */
+html:not([data-theme]) .fvh-resto .fvh-tile-claro,
+html[data-theme="biopunk"] .fvh-resto .fvh-tile-claro {
+  background: rgb(var(--c-surface-card) / 0.82) !important;
+  border-color: rgb(var(--c-surface-border) / 0.55) !important;
+  box-shadow: 0 2px 10px rgba(2, 6, 23, 0.4);
+}
+html:not([data-theme]) .fvh-resto .fvh-tile-claro .fvh-tile-label,
+html[data-theme="biopunk"] .fvh-resto .fvh-tile-claro .fvh-tile-label {
+  color: rgb(var(--c-slate-100)) !important;
+}
+html:not([data-theme]) .fvh-resto .fvh-tile-claro .fvh-tile-desc,
+html[data-theme="biopunk"] .fvh-resto .fvh-tile-claro .fvh-tile-desc {
+  color: rgb(var(--c-slate-300)) !important;
+}
+
+/* CicloVivoWidget ("El ciclo de su cultivo"): su tarjeta-portal usa la piel
+   crema/ocre pensada para su vista full-screen (el "cuaderno" del ciclo), pero
+   incrustada en la hoja de noche biopunk quedaba como una tarjeta clara suelta
+   sobre el navy (bug UX audit 2026-07-04 P1-4). Reescribimos SOLO sus tokens
+   de color (--cv-*) a la clave navy del tema — mismo layout/spacing del
+   widget, misma piel que ya usan los tiles de arriba. El acento ocre/dorado
+   (eyebrow, CTA, emblema) se conserva: funciona igual de bien como acento
+   cálido sobre navy que sobre crema. */
+html:not([data-theme]) .fvh-resto .cvivo-root,
+html[data-theme="biopunk"] .fvh-resto .cvivo-root {
+  --cv-cream: rgb(var(--c-surface-card));
+  --cv-cream-2: rgb(var(--c-surface-card));
+  --cv-card: rgb(var(--c-surface-card));
+  --cv-ink: rgb(var(--c-slate-100));
+  --cv-ink-soft: rgb(var(--c-slate-300));
+  --cv-green-deep: rgb(var(--c-slate-100));
+  --cv-shadow-card: 0 2px 10px rgba(2, 6, 23, 0.4);
+}
+html:not([data-theme]) .fvh-resto .cvivo-card,
+html[data-theme="biopunk"] .fvh-resto .cvivo-card {
+  background: rgb(var(--c-surface-card) / 0.82);
+  border-color: rgb(var(--c-surface-border) / 0.55);
+}
+
 /* ── Bloque "Consultar y aprender" colapsable (audit 2026-06-26 §4) ─────────
    Es de consulta ocasional, no del primer scroll: va en un <details> abierto
    por defecto pero plegable. Ocultamos el marcador nativo y dejamos el rótulo

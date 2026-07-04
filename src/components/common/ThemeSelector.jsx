@@ -21,6 +21,10 @@ import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 // Solo presentación del swatch; la paleta real vive en themes.css.
 const SWATCHES = {
   auto: ['#0a0e14', '#d98a4f', '#f6efe0'],
+  // Bio-Punk 2 (default): misma piel biopunk + escena "Finca Organismo" — el
+  // tercer punto lleva el violeta de la aurora del organismo para diferenciarlo
+  // del clásico en el selector.
+  biopunk2: ['#0a0e14', '#19c79a', '#a78bfa'],
   biopunk: ['#0a0e14', '#19c79a', '#3be8a6'],
   nature: ['#f6efe0', '#d98a4f', '#7a8f4a'],
   minimalista: ['#f6f3ec', '#2f6e5a', '#878d86'],

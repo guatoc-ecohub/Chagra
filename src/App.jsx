@@ -90,6 +90,7 @@ const AnimalesScreen = lazy(() => import('./components/AnimalesScreen'));
 const GallinasScreen = lazy(() => import('./components/GallinasScreen'));
 const AbejasScreen = lazy(() => import('./components/AbejasScreen'));
 const VacasScreen = lazy(() => import('./components/VacasScreen'));
+const EstiercolScreen = lazy(() => import('./components/EstiercolScreen'));
 const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
 const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
 const LocationDetectedScreen = lazy(() => import('./components/LocationDetectedScreen'));
@@ -104,6 +105,36 @@ const CicloNutrientesScreen = lazy(() => import('./components/CicloNutrientesScr
 const CalendarioFincaScreen = lazy(() => import('./components/CalendarioFincaScreen'));
 const SeguimientoProcesoScreen = lazy(() => import('./components/SeguimientoProcesoScreen'));
 const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
+// Módulo "Agua de la finca": cosecha de lluvia (calculadora determinista),
+// riego con medida (ETc; Kc/ETo = slots grounded-pendiente) y cuidar el agua
+// (calidad + nacimiento, caso "se me seca el nacimiento en verano").
+const AguaScreen = lazy(() => import('./components/agua/AguaScreen'));
+// "El clima que viene": traductor campesino de los boletines IDEAM/ENSO. Lee la
+// fase ENSO en vivo (ensoService) y remite a la Mesa Técnica Agroclimática — no
+// reimplementa el motor de clima ni pronostica.
+const ClimaBoletinScreen = lazy(() => import('./components/clima/ClimaBoletinScreen'));
+const SaludSueloScreen = lazy(() => import('./components/SaludSueloScreen'));
+// Mini-app "Semilla" (soberanía de semilla): seleccionar (plantas madre),
+// guardar (rama ortodoxa vs recalcitrante + Harrington) y probar germinación
+// (rag-doll + ajuste de densidad). Calculadoras deterministas en
+// src/services/semillaCalculator.js.
+const SemillaScreen = lazy(() => import('./components/semilla/SemillaScreen'));
+// Módulo "Poscosecha y Despensa" (mundo Mercado y despensa): cosechar en punto
+// (índices de madurez), guardar bien (curado + calculadora determinista de
+// secado de grano a humedad segura) y transformar el excedente con su punto
+// crítico de inocuidad. Cifras grounded al DR nacional/internacional.
+const PoscosechaScreen = lazy(() => import('./components/PoscosechaScreen'));
+// LOS MUNDOS DE MI FINCA (reestructuración 2.0 del home): un mundo por dentro —
+// las funciones existentes agrupadas por lugar. Re-rutea, no reimplementa.
+const MundoScreen = lazy(() => import('./components/MundoScreen'));
+// Mini-app insignia del mundo Sanidad: síntoma folk → plaga/enfermedad →
+// manejo agroecológico (grounded DR AGROSAVIA/Cenicafé/SciELO + FAO/IPM).
+const SanidadSintomaScreen = lazy(() => import('./components/sanidad/SanidadSintomaScreen'));
+// Portada a medida del mundo 🌱 CULTIVOS Y SEMILLAS: hub que orienta por
+// región/clima, agrupa las funciones existentes (directorio, ciclo, germinación,
+// calendario, siembra, cosecha) y suma una calculadora de grados-día. Re-rutea,
+// no reimplementa.
+const MundoCultivosHub = lazy(() => import('./components/cultivos/MundoCultivosHub'));
 const CromatografiaScreen = lazy(() => import('./components/CromatografiaScreen'));
 const CicloVivoFullView = lazy(() => import('./components/CicloVivo/CicloVivoFullView'));
 const ToxicologiaScreen = lazy(() => import('./components/ToxicologiaScreen'));
@@ -187,11 +218,23 @@ const HASH_VIEW_ROUTES = {
   'animales-gallinas': 'animales_gallinas',
   'animales-abejas': 'animales_abejas',
   'animales-vacas': 'animales_vacas',
+  estiercol: 'estiercol',
+  'del-corral-al-abono': 'estiercol',
+  abono: 'estiercol',
+  biodigestor: 'estiercol',
   'doom-finca': 'doom_finca',
   subsuelo: 'subsuelo',
   'mundo-subsuelo': 'subsuelo',
   toxicologia: 'toxicologia',
   suelo: 'suelo',
+  agua: 'agua',
+  'manejo-agua': 'agua',
+  'salud-suelo': 'salud_suelo',
+  'cuaderno-suelo': 'salud_suelo',
+  encalado: 'salud_suelo',
+  semilla: 'semilla',
+  semillas: 'semilla',
+  'soberania-semilla': 'semilla',
   aprende: 'aprende',
   directorio: 'directorio',
   'directorio-especies': 'directorio',
@@ -200,19 +243,22 @@ const HASH_VIEW_ROUTES = {
   mercado: 'mercado',
   mercados: 'mercado',
   vender: 'mercado',
+  poscosecha: 'poscosecha',
+  despensa: 'poscosecha',
+  'poscosecha-despensa': 'poscosecha',
 };
 
 // Vistas que cuentan como "módulo" para telemetría de piloto.
 const MODULE_VIEWS = new Set([
   'activos', 'mapa', 'javier', 'bodega', 'task_log', 'historial', 'bitacora',
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
-  'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas',
+  'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
-  'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'toxicologia', 'aprende', 'directorio', 'mercados',
+  'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'toxicologia', 'aprende', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
-  'usage_stats', 'mercado', 'auditoria_inventario',
+  'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
 ]);
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
@@ -917,6 +963,21 @@ export default function App() {
             />
           </ErrorBoundary>
         );
+      case 'sanidad_sintoma':
+        // Mini-app insignia "Sanidad de la mata": el campesino dice el síntoma
+        // folk → la app desambigua (cultivo/detalle) → causa + manejo
+        // agroecológico. Vuelve al mundo Sanidad.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Sanidad de la mata">
+              <SanidadSintomaScreen
+                onBack={() => navigate('mundo', { mundo: 'sanidad' })}
+                onHome={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mantenimiento':
         return (
           <ErrorBoundary>
@@ -976,6 +1037,7 @@ export default function App() {
             </ScreenShell>
           </ErrorBoundary>
         );
+      case 'gestionar': // alias usado por el FAQ ("Gestionar mi finca") — sin este label caía en default "Vista no disponible"
       case 'activos':
         return (
           <ErrorBoundary>
@@ -1113,6 +1175,20 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'estiercol':
+        // Módulo "Del corral al abono": aprovechamiento del estiércol
+        // (olores/gallinaza, biodigestor con calculadora de dimensionamiento y
+        // abonos: gallinaza/porquinaza/bovinaza/biol/biosol/compost/
+        // lombricompost). Calculadora determinista (biodigestorCalculator.js);
+        // dosis/rendimientos exactos quedan en slots grounded-pendiente hasta la
+        // investigación (nacional + internacional). Ruta #estiercol / #biodigestor.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Del corral al abono">
+              <EstiercolScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'asociaciones':
         return (
           <ErrorBoundary>
@@ -1207,6 +1283,7 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'calendario': // alias usado por Manual/FAQ (HASH_VIEW_ROUTES ya lo mapea para hash, pero navigate() no normaliza — sin este label caía en default "Vista no disponible")
       case 'calendario_finca':
         // Módulo CALENDARIO DE FINCA: UN SOLO calendario que UNIFICA por planta
         // (ciclos de la finca, o especies del catálogo si no hay finca) las
@@ -1234,11 +1311,95 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'salud_suelo':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Salud del Suelo">
+              <SaludSueloScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'semilla':
+        // Mini-app "Semilla" (soberanía de semilla): seleccionar / guardar /
+        // germinar, con calculadoras deterministas (semillaCalculator.js).
+        // Ruta #semilla / #soberania-semilla. Vive en el mundo Cultivos.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Semilla">
+              <SemillaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'poscosecha':
+        // Módulo "Poscosecha y Despensa" (mundo Mercado y despensa): 3 pilares
+        // (cosechar en punto / guardar bien / transformar) + calculadora
+        // determinista de secado de grano. Cifras grounded al DR; slots no
+        // cerrados marcados grounded-pendiente en poscosechaCalculator.js.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Poscosecha y Despensa">
+              <PoscosechaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'cromatografia':
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Cromatografia de Suelo">
               <CromatografiaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'agua':
+        // Módulo "Agua de la finca" (3 pilares: cosechar lluvia / regar con
+        // medida / cuidar el agua + nacimiento). Cifras duras pendientes de
+        // grounding se muestran como "dato en camino" (src/data/aguaFinca.js).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Agua de la finca">
+              <AguaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'clima_boletin':
+        // "El clima que viene" (mundo Clima): TRADUCTOR de los boletines
+        // IDEAM/ENSO. 3 pilares — qué viene (fase ENSO viva de ensoService) /
+        // qué hacer (regla accionable por fase) / dónde mirar (MTA + Fenalce).
+        // No pronostica: lee la fase real y remite al boletín vigente.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El clima que viene">
+              <ClimaBoletinScreen onBack={() => navigate('mundo', { mundo: 'clima' })} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mundo':
+        // LOS MUNDOS DE MI FINCA (reestructuración 2.0 del home, V4): la
+        // pantalla de un mundo agrupa sus funciones y RE-RUTEA a las vistas
+        // reales existentes. data = { mundo: id } (mundosFinca.js); sin data o
+        // con id desconocido muestra el índice de mundos (fallback honesto).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mundos de la finca">
+              <MundoScreen
+                mundoId={currentViewData?.mundo}
+                onBack={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mundo_cultivos':
+        // Portada a medida del mundo CULTIVOS Y SEMILLAS (hub): orienta por
+        // región/clima, agrupa las funciones existentes y suma la calculadora
+        // de grados-día. Cada lámina RE-RUTEA a su pantalla real vía navigate.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Cultivos y semillas">
+              <MundoCultivosHub
+                onBack={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -1298,6 +1459,7 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'especies': // alias usado por Manual/FAQ (mismo caso que 'calendario': navigate() no pasa por HASH_VIEW_ROUTES)
       case 'directorio':
         // Directorio de especies: explorador visual del catálogo. Buscador con
         // resolución de nombre (matcher canónico del proyecto) + ficha grounded

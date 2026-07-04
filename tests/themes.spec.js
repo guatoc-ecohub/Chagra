@@ -48,9 +48,11 @@ test.describe('Themes - Perfil de usuario y persistencia', () => {
         await page.reload();
         await expect(page.locator('html')).toHaveAttribute('data-theme', 'nature');
 
-        // Volver a Bio-Punk (default = sin data-theme)
+        // Volver a Bio-Punk 2 (default desde el split GO-LIVE 2026-07-04;
+        // comparte la piel base biopunk = sin data-theme). El "$" ancla el
+        // nombre accesible: "Bio-Punk 2" y "Bio-Punk" coexisten en el selector.
         await openAppearance(page);
-        await page.getByRole('button', { name: /^Bio-Punk/i }).click();
+        await page.getByRole('button', { name: /^Bio-Punk 2/i }).click();
         await expect(page.locator('html')).not.toHaveAttribute('data-theme');
     });
 

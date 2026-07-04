@@ -417,7 +417,7 @@ export function BitacoraCard({ onNavigate, variant }) {
             variant={variant}
             section="bitacora"
             title="Bitácora"
-            subtitle="Todo lo que has hecho en tu finca"
+            subtitle="Todo lo que ha hecho en su finca"
             tooltip="Historial cronológico: siembras, cosechas, aplicaciones de bioinsumo, observaciones."
             onClick={() => onNavigate('historial')}
         />

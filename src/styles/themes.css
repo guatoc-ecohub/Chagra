@@ -2,11 +2,23 @@
  * ============================================================================
  * SISTEMA DE TEMAS (skin global de la app) — capa de OVERRIDES NO-COLOR.
  *
- * Tres temas curados (operador 2026-06-03/04, demo Bogotá), aplicados app-wide
- * desde el LOGIN vía `data-theme` en <html> (lo escribe useTheme.js):
+ * Temas curados (operador 2026-06-03/04, demo Bogotá; split biopunk/biopunk2
+ * GO-LIVE 2026-07-04), aplicados app-wide desde el LOGIN vía `data-theme` en
+ * <html> (lo escribe useTheme.js):
  *
- *   - bio-punk (DEFAULT)  → estilo BASE. NO lleva data-theme. Lienzo "cosecha
- *                           mística" (§4). Tokens de color en :root de index.css.
+ *   - biopunk2 (DEFAULT)  → estilo BASE. NO lleva data-theme (useTheme lo
+ *                           quita, igual que biopunk): TODA la piel biopunk
+ *                           (este archivo, index.css :root, y cada regla
+ *                           `html:not([data-theme])` del repo) le aplica tal
+ *                           cual. Su ÚNICA diferencia con biopunk es la escena
+ *                           del home finca viva ("Finca Organismo"), decidida
+ *                           en JS (FincaVivaHero → ESCENA_VIVA_POR_TEMA), no
+ *                           en CSS. Por eso NO existe (ni debe existir) un
+ *                           bloque [data-theme="biopunk2"] acá.
+ *   - bio-punk            → estilo BASE original (respaldo). NO lleva
+ *                           data-theme. Lienzo "cosecha mística" (§4). Tokens
+ *                           de color en :root de index.css. Escena isométrica
+ *                           clásica en el home finca viva.
  *   - minimalista         → papel claro + tinta + salvia (demo
  *                           demo-agente-minimalista.html).
  *   - nature              → crema cálida + café + salvia + ocre (demo
@@ -1002,4 +1014,130 @@ html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
 [data-theme="minimalista"] .bg-emerald-950\/50 .text-emerald-100,
 [data-theme="verde-vivo"] .bg-emerald-950\/50 .text-emerald-100{
   color: rgb(var(--c-emerald-700));
+}
+
+/* ===========================================================================
+ * BIENVENIDA PRIMERA VEZ (BienvenidaFinca) — la costura
+ * ---------------------------------------------------------------------------
+ * Secuencia a pantalla completa del verdadero primer uso. Todo por tokens de
+ * tema (--c-slate-*, --t-accent-rgb) → coherente en los 4 temas sin overrides.
+ * Firma visual: la "costura" (puntada corrida) como indicador de progreso y
+ * como borde de la tarjeta "respuestas verificadas" (cada consejo va cosido a
+ * su fuente). Las animaciones son sutiles y se apagan con reduced-motion
+ * (guard propio abajo + guard global de index.css).
+ * ======================================================================== */
+.bienvenida-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: calc(env(safe-area-inset-top, 0px) + 18px) 22px
+    calc(env(safe-area-inset-bottom, 0px) + 22px);
+  background:
+    radial-gradient(120% 55% at 50% -10%, rgba(var(--t-accent-rgb), 0.14), transparent 62%),
+    rgb(var(--c-slate-950));
+  color: rgb(var(--c-slate-100));
+  outline: none;
+}
+
+/* La costura de progreso: guía punteada tenue + hilo del acento que se va
+ * cosiendo momento a momento (el ancho crece por pasos). */
+.bienvenida-costura {
+  position: relative;
+  height: 4px;
+  margin-top: 7px;
+  width: min(190px, 52vw);
+}
+.bienvenida-costura-guia,
+.bienvenida-costura-hilo {
+  position: absolute;
+  inset: 0;
+  border-radius: 2px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    currentColor 0 9px,
+    transparent 9px 16px
+  );
+}
+.bienvenida-costura-guia {
+  color: rgb(var(--c-slate-100) / 0.16);
+}
+.bienvenida-costura-hilo {
+  color: rgb(var(--t-accent-rgb));
+  transition: width 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* Tarjeta "respuestas verificadas": el mismo hilo, como borde cosido. */
+.bienvenida-verificada {
+  border: 2px dashed rgba(var(--t-accent-rgb), 0.7);
+}
+
+/* Entrada escalonada de los bloques de cada momento. */
+.bienvenida-item {
+  opacity: 0;
+  transform: translateY(14px);
+  animation: bienvenida-subir 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  animation-delay: var(--bv-delay, 0ms);
+}
+@keyframes bienvenida-subir {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* El colibrí flota suave (vuelo estacionario, no rebote de juguete). */
+.bienvenida-flotar {
+  animation:
+    bienvenida-subir 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) forwards,
+    bienvenida-flotar 3.6s ease-in-out 0.6s infinite;
+}
+@keyframes bienvenida-flotar {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+/* Anillos del pin de ubicación (momento de magia, no formulario). */
+.bienvenida-pin-anillo {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px solid rgba(var(--t-accent-rgb), 0.5);
+  animation: bienvenida-anillo 2.6s ease-out infinite;
+}
+.bienvenida-pin-anillo:nth-child(2) {
+  animation-delay: 1.3s;
+}
+@keyframes bienvenida-anillo {
+  0% {
+    transform: scale(0.62);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bienvenida-item,
+  .bienvenida-flotar {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  .bienvenida-pin-anillo {
+    animation: none;
+    opacity: 0.35;
+  }
+  .bienvenida-costura-hilo {
+    transition: none;
+  }
 }

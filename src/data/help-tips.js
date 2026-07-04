@@ -1,208 +1,257 @@
-// Tips dinámicos rotantes para HelpManual
-// Fuente: extracto de PlantCemeteryModal.jsx + ciclo contenido DR-034
-// Categoría: errores (cementerio), observacion, riego, sustrato, plagas, paciencia
+// Tips dinámicos rotantes para HelpManual (HelpTipCard).
+// Fuente: extracto de PlantCemeteryModal.jsx + ciclo contenido DR-034.
+// Categoría: errores (cementerio), observacion, riego, sustrato, plagas, paciencia.
+//
+// Overhaul 2026-07 (ayuda visual): cada tip ganó `title` (frase corta y
+// escaneable — para quien lee poco, el título ya es el consejo) y el texto se
+// pasó a HABLA CAMPESINA: fuera "humedad edáfica", "impacto cinético",
+// "manejo arquitectónico" — el dato agronómico es el mismo, dicho como se
+// dice en la vereda. Los ids/categorías/sources NO cambian (compat).
+
+/** Metadatos visuales por categoría (ícono grande + etiqueta del chip). */
+export const TIP_CATEGORIES = Object.freeze({
+  riego: { label: 'Riego', emoji: '💧' },
+  plagas: { label: 'Plagas', emoji: '🐛' },
+  sustrato: { label: 'Tierra', emoji: '🪱' },
+  observacion: { label: 'Observar', emoji: '👀' },
+  paciencia: { label: 'Paciencia', emoji: '🌱' },
+});
+
 export const HELP_TIPS = [
   {
     id: 'cemetery-overwatering',
     category: 'riego',
-    text: 'Antes de regar, meta el dedo 3 cm en el sustrato. Si está húmedo, espere. La mayoría de plantas que mueren por riego excesivo se salvan con esta regla.',
+    title: 'El dedo antes que la regadera',
+    text: 'Antes de regar, meta el dedo 3 cm en la tierra. Si sale húmedo, espere. La mayoría de matas que se mueren ahogadas se salvan con esta regla.',
     source: 'cemetery_reason:overwatering'
   },
   {
     id: 'cemetery-underwatering',
     category: 'riego',
-    text: 'Hojas secas en bordes y caída de flores son señales tempranas. Observe la planta antes de programar riego; ajuste frecuencia según piso térmico y tipo de sustrato.',
+    title: 'La mata avisa antes de secarse',
+    text: 'Bordes de hoja secos y flores que se caen son el primer aviso de sed. Mire la planta antes de regar por costumbre: en tierra caliente pide más seguido que en tierra fría.',
     source: 'cemetery_reason:underwatering'
   },
   {
     id: 'cemetery-pest-disease',
     category: 'plagas',
-    text: 'Toda plaga tiene una ventana de 3-7 días donde es controlable con biopreparados (sulfocálcico, ajo-ají, microorganismos). La observación semanal es prevención.',
+    title: 'La plaga da unos días de ventaja',
+    text: 'Toda plaga tiene una ventana de 3 a 7 días en la que todavía se controla con biopreparados (sulfocálcico, ajo-ají, microorganismos). Darle una vuelta al cultivo cada semana es la mejor prevención.',
     source: 'cemetery_reason:pest_disease'
   },
   {
     id: 'cemetery-wrong-soil',
     category: 'sustrato',
-    text: 'Cada especie tolera un rango de pH y textura. Compactación bloquea oxígeno radicular en 2 semanas. Test casero: si el agua tarda más de 30s en infiltrar, incorpore compost + rompa con horca.',
+    title: 'Tierra apretada, raíz ahogada',
+    text: 'La tierra pisada le quita el aire a la raíz en un par de semanas. Prueba casera: riegue un poco de agua; si tarda más de 30 segundos en entrar, meta compost y afloje con horca, sin voltear.',
     source: 'cemetery_reason:wrong_soil'
   },
   {
     id: 'cemetery-temperature',
     category: 'observacion',
-    text: 'Conozca el rango de temperatura de su especie y proteja con mulch + tela antihelada cuando el pronóstico lo exija. Helada nocturna mata hojas bajo 0°C.',
+    title: 'La helada no perdona',
+    text: 'Sepa qué frío aguanta su especie. Cuando anuncien helada, proteja con mulch (cobertura de hojarasca o paja) y tela antihelada: una noche bajo cero quema las hojas.',
     source: 'cemetery_reason:temperature'
   },
   {
     id: 'cemetery-light',
     category: 'observacion',
-    text: 'Las plantas de sol pleno puestas en sombra se ahílan (crecen pálidas y débiles) y se mueren. Las plantas de sombra puestas a pleno sol se queman. Respete la luz que pide cada especie desde la siembra.',
+    title: 'Cada mata pide su sol',
+    text: 'Una planta de pleno sol puesta en sombra crece pálida, larguirucha y débil. Una de sombra puesta al rayo del sol se quema. Respete la luz que pide cada especie desde la siembra.',
     source: 'cemetery_reason:light'
   },
   {
     id: 'cemetery-transplant',
     category: 'observacion',
-    text: 'Trasplante al atardecer, con sustrato húmedo, sin romper el cepellón. Riegue abundante el primer día y sombree 3 días para evitar choque de trasplante.',
+    title: 'Trasplante al caer la tarde',
+    text: 'Trasplante al atardecer, con la tierra húmeda y sin desbaratar el pan de tierra de la raíz. Riegue bien el primer día y dele sombra 3 días para que no sufra el cambio.',
     source: 'cemetery_reason:transplant_shock'
   },
   {
     id: 'cemetery-unknown',
     category: 'paciencia',
-    text: 'No saber la causa también es dato. Guarde foto del estado final y anote síntomas observados para referencia futura. La curva de aprendizaje agroecológica es de meses, no días.',
+    title: 'No saber la causa también es dato',
+    text: 'Si una mata se murió y no sabe por qué, guarde una foto de cómo quedó y anote lo que vio. Aprender a cultivar toma meses, no días — y cada pérdida anotada enseña.',
     source: 'cemetery_reason:unknown'
   },
   {
     id: 'lechuga-lesson',
     category: 'observacion',
-    text: 'Es el cultivo escuela por excelencia. Ciclo corto (60-90 días) permite observar germinación, trasplante, desarrollo, plagas y cosecha en una temporada. Enseña gestión milimétrica de humedad edáfica y velocidad de ciclo.',
+    title: 'La lechuga es el cultivo escuela',
+    text: 'En 60 a 90 días le muestra todo: germinar, trasplantar, crecer, plagas y cosecha. Enseña a manejar el agua con cuidado y a moverse al ritmo del cultivo. Ideal para empezar.',
     source: 'species_lesson:lechuga'
   },
   {
     id: 'lechuga-watering',
     category: 'riego',
-    text: 'Gestione humedad superficial fina durante germinación (nebulización) y evite impacto cinético de gotas grandes. Temperatura óptima 18-20°C.',
+    title: 'A la semilla, agua en rocío',
+    text: 'Mientras germina, riegue la lechuga con llovizna finita (rocío), no con gotas gruesas que golpean y desentierran la semilla. Le va mejor con clima fresco, de 18 a 20 °C.',
     source: 'species_lesson:lechuga'
   },
   {
     id: 'lechuga-transplant-tip',
     category: 'observacion',
-    text: 'Trasplante al atardecer. Hidrate bandeja 2h antes. Hueco profundidad equivalente al cepellón sin enterrar el cuello. Riego inmediato + sombreado parcial 48h.',
+    title: 'Lechuga: trasplante sin ahorcar el cuello',
+    text: 'Trasplante al atardecer. Moje la bandeja 2 horas antes. El hueco, del tamaño del pan de raíces, sin enterrar el cuello de la mata. Riegue de una y dele media sombra 2 días.',
     source: 'species_lesson:lechuga'
   },
   {
     id: 'lechuga-harvest',
     category: 'paciencia',
-    text: 'Corte basal limpio con cuchillo temprano en la mañana. Empaque inmediato en contenedores rígidos para evitar magulladuras. Coseche cuando diámetro comercial se alcance antes del espigado.',
+    title: 'Coseche temprano, con cuchillo limpio',
+    text: 'Corte la lechuga de raíz con cuchillo limpio, temprano en la mañana. Pásela de una a una caja dura para que no se magulle. Coseche cuando llegue al tamaño de venta, antes de que se espigue (eche tallo de flor).',
     source: 'species_lesson:lechuga'
   },
   {
     id: 'lechuga-companions',
     category: 'plagas',
-    text: 'Plante cebolla, zanahoria o rábano cerca de su lechuga. Los compuestos azufrados de la cebolla disuaden herbívoros y el rábano se cosecha antes del acogollado.',
+    title: 'Cebolla y rábano, guardianes de la lechuga',
+    text: 'Siembre cebolla, zanahoria o rábano al lado de la lechuga. El olor azufrado de la cebolla espanta a los que se la comen, y el rábano se cosecha antes de que la lechuga acogolle.',
     source: 'species_lesson:lechuga'
   },
   {
     id: 'lechuga-biolog',
     category: 'plagas',
-    text: 'Aplique biol al 5% cada 10 días desde día 10 post-trasplante para mejorar crecimiento y resistencia a plagas.',
+    title: 'Biol cada 10 días',
+    text: 'Aplique biol al 5 % (medio litro por cada 10 litros de agua) cada 10 días, desde el día 10 después del trasplante. La mata crece más pareja y aguanta mejor las plagas.',
     source: 'species_lesson:lechuga'
   },
   {
     id: 'lechuga-mulch',
     category: 'sustrato',
-    text: 'Use mulch para estabilizar humedad del sustrato y prevenir enfermedades como quemado de bordes (tip burn) y mildiu velloso.',
+    title: 'Mulch: la cobija de la tierra',
+    text: 'Cubra la tierra con hojarasca o paja (mulch): guarda la humedad pareja y previene el quemado de bordes de la hoja y el mildeo velloso.',
     source: 'species_lesson:lechuga'
   },
   {
     id: 'fresa-lesson',
     category: 'observacion',
-    text: 'Cultivo puente entre agricultura sexual (lechuga) y asexual (café/aguacate por injerto). Enseña propagación vegetativa por estolón — clonación natural visible y manejable.',
+    title: 'La fresa enseña a sacar hijos',
+    text: 'La fresa saca estolones: bejucos con matas hijas idénticas a la madre. Es la escuela para aprender a multiplicar sin semilla — el paso antes de injertar café o aguacate.',
     source: 'species_lesson:fresa'
   },
   {
     id: 'fresa-mulch-obligatorio',
     category: 'sustrato',
-    text: 'El mulch es OBLIGATORIO para fresas — aisla el fruto del suelo y previene Botrytis. Use plástico negro o vegetal como cisco de café o paja.',
+    title: 'Fresa sin mulch se pudre',
+    text: 'En fresa el mulch es OBLIGATORIO: separa el fruto del suelo y evita la pudrición del fruto (moho gris, Botrytis). Sirve plástico negro, cisco de café o paja.',
     source: 'species_lesson:fresa'
   },
   {
     id: 'fresa-propagacion',
     category: 'paciencia',
-    text: 'Renueve su cultivo de fresas cada 2 años con estolones propios. Esto mantiene vigor y productividad en su parcela.',
+    title: 'Renueve la fresa cada 2 años',
+    text: 'Cada 2 años renueve el cultivo con los estolones de sus propias matas. Así la fresera se mantiene vigorosa y productiva sin comprar planta.',
     source: 'species_lesson:fresa'
   },
   {
     id: 'fresa-riego-goteo',
     category: 'riego',
-    text: 'Riegue fresas por goteo, nunca por aspersión. La aspersión favorece el desarrollo de Botrytis cinerea en frutos y flores.',
+    title: 'A la fresa, agua al pie',
+    text: 'Riegue la fresa por goteo o al pie de la mata, nunca en lluvia por encima: mojar flores y frutos le abre la puerta al moho gris (Botrytis).',
     source: 'species_lesson:fresa'
   },
   {
     id: 'fresa-higiene',
     category: 'observacion',
-    text: 'Mantenga rigurosa higiene del microclima edáfico alrededor de sus fresas. Elimine hojas secas y frutos dañados para prevenir enfermedades.',
+    title: 'Fresera limpia, fruta sana',
+    text: 'Mantenga limpio el pie de las freseras: saque hojas secas y frutos dañados apenas los vea. Menos material podrido alrededor = menos enfermedad.',
     source: 'species_lesson:fresa'
   },
   {
     id: 'tomate-lesson',
     category: 'observacion',
-    text: 'El tomate chonto es un cultivo aprendiz de poda — enseña manejo arquitectónico de la planta: tutorado, deschuponada semanal, descopado al alcanzar 1.8m.',
+    title: 'El tomate enseña a podar',
+    text: 'El tomate chonto es la escuela de darle forma a la planta: amarrarla a un tutor, quitarle los chupones cada semana y despuntarla cuando llega a 1,80 m.',
     source: 'species_lesson:tomate_chonto'
   },
   {
     id: 'tomate-tutorado',
     category: 'observacion',
-    text: 'Inicie el tutorado de tomate chonto el día 15 post-trasplante. Use estaca de 1.8-2m con hilo en V o malla para apoyar el crecimiento vertical.',
+    title: 'Tutor al día 15',
+    text: 'A los 15 días del trasplante, párele el tutor al tomate: estaca de 1,80 a 2 m con hilo en V o malla, para que suba derecho y el fruto no toque el suelo.',
     source: 'species_lesson:tomate_chonto'
   },
   {
     id: 'tomate-deschupone',
     category: 'plagas',
-    text: 'Realice deschuponada semanal en tomate chonto: elimine los chupones que aparecen en las axilas de las hojas para dirigir energía al fruto principal.',
+    title: 'Chupones fuera, cada semana',
+    text: 'Quítele al tomate chonto los chupones (brotes que salen entre el tallo y la hoja) una vez por semana, para que la fuerza se vaya al fruto y no al monte.',
     source: 'species_lesson:tomate_chonto'
   },
   {
     id: 'tomate-copa-baja',
     category: 'observacion',
-    text: 'Mantenga una copa baja en su tomate chonto (máx 1.8m de altura). Esto facilita la cosecha, mejora la circulación de aire y reduce enfermedades fúngicas.',
+    title: 'Tomate de copa baja',
+    text: 'No deje pasar el tomate chonto de 1,80 m: despúntelo ahí. Así cosecha sin escalera, corre más aire entre las matas y hay menos hongos.',
     source: 'species_lesson:tomate_chonto'
   },
   {
     id: 'tomate-trichoderma-pre',
     category: 'plagas',
-    text: 'Antes del trasplante, inocule masivamente las camas con Trichoderma spp. Esto destruye hifas de Fusarium y Rhizoctonia que causan pudrición de raíces.',
+    title: 'Trichoderma antes de trasplantar',
+    text: 'Antes del trasplante, moje bien las camas con Trichoderma (hongo bueno). Se le adelanta a los hongos que pudren la raíz del tomate (Fusarium y Rhizoctonia).',
     source: 'species_lesson:tomate_chonto'
   },
   {
     id: 'tomate-rotacion-leguminosa',
     category: 'sustrato',
-    text: 'Practique rotación crítica con leguminosas o maíz mínimo 2 ciclos antes de retornar tomate al mismo lote. Esto reduce presión de patógenos del suelo.',
+    title: 'No repita tomate en el mismo lote',
+    text: 'Después de tomate, siembre fríjol (u otra leguminosa) o maíz al menos 2 ciclos antes de volver a meter tomate ahí. Así los males del suelo no se enseñan al lote.',
     source: 'species_lesson:tomate_chonto'
   },
   {
     id: 'tomate-espaldera-colombiana',
     category: 'observacion',
-    text: 'Use la espaldera colombiana para su tomate: poste cada 4m + alambre superior + hilo individual por planta. Esta estructura es económica y efectiva.',
+    title: 'La espaldera colombiana rinde',
+    text: 'Para el tomate: poste cada 4 metros, un alambre arriba y un hilo por mata colgando del alambre. Barata, rápida de armar y aguanta toda la cosecha.',
     source: 'species_lesson:tomate_chonto'
   },
   {
     id: 'tomate-polinizacion-abejorro',
     category: 'observacion',
-    text: 'En climas fríos, introduzca abejorros nativos Bombus atratus para polinizar su tomate chonto. Esto evita aborto floral por temperaturas <10°C nocturnas.',
+    title: 'En clima frío, cuide al abejorro',
+    text: 'En tierra fría el tomate bota la flor si la noche baja de 10 °C y nadie la poliniza. Cuide y atraiga al abejorro nativo (Bombus atratus) dejando flores silvestres cerca: es el mejor polinizador del tomate.',
     source: 'species_lesson:tomate_chonto'
   },
   {
     id: 'observacion-humedad-raices',
     category: 'observacion',
-    text: 'Aprenda a leer las señales de su planta: hojas flojas indican falta de agua; hojas amarillentas pueden indicar exceso. Observe diariamente, no solo riegue por hábito.',
+    title: 'Lea las hojas antes de regar',
+    text: 'Hoja caída y floja: falta agua. Hoja amarilla pareja: puede ser exceso. Mire sus matas todos los días un momento — regar por costumbre mata más que la sequía.',
     source: 'general:observacion'
   },
   {
     id: 'sustrato-compost-maduro',
     category: 'sustrato',
-    text: 'Siempre use compost maduro en su sustrato. El compost fresco puede quemar las raíces y competir por nitrógeno durante su descomposición.',
+    title: 'Compost maduro, nunca caliente',
+    text: 'Use siempre compost maduro (oscuro, con olor a tierra de monte). El compost fresco todavía está "caliente": quema la raíz y le roba nitrógeno a la mata mientras termina de descomponerse.',
     source: 'general:sustrato'
   },
   {
     id: 'plagas-prevencion-semanal',
     category: 'plagas',
-    text: 'La prevención es su mejor aliada contra plagas. Dedique 10 minutos cada semana a inspeccionar el envés de las hojas y tallos en busca de insectos o hongos.',
+    title: '10 minutos que valen la cosecha',
+    text: 'Una vez por semana, voltee hojas y mire el envés y los tallos buscando bichos o manchas. Agarrar la plaga chiquita es la diferencia entre un biopreparado y perder el cultivo.',
     source: 'general:plagas'
   },
   {
     id: 'paciencia-cosecha-escalonada',
     category: 'paciencia',
-    text: 'Siembre en escalonado: cada 2-3 semanas una nueva tanda de semillas. Así tendrá cosecha continua en lugar de un exceso que se pierde.',
+    title: 'Siembre por tandas',
+    text: 'Cada 2 o 3 semanas siembre una tanda nueva en vez de todo de una. Así cosecha seguido todo el tiempo, en lugar de un montón que no alcanza a comerse ni a vender.',
     source: 'general:paciencia'
   },
   {
     id: 'error-aprender-del-fracaso',
     category: 'observacion',
-    text: 'Cada planta que no prospera es un maestro. Anote qué hizo diferente esa vez y ajuste su próximo intento. El fracaso es parte del currículo agroecológico.',
+    title: 'Cada mata perdida es un maestro',
+    text: 'Cuando una planta no prospere, anote qué hizo distinto esa vez y cámbielo en el siguiente intento. Equivocarse hace parte del oficio — lo grave es no anotarlo.',
     source: 'general:mentalidad'
   }
 ];
 
 // Nota: ampliación pendiente según roadmap queue/040 fase 2.
-// Actualmente hay 27 tips cubriendo errores comunes, observación, riego,
-// sustrato, plagas y paciencia. Próximo objetivo: 30-50 tips con curaduría
+// Actualmente hay 33 tips cubriendo errores comunes, observación, riego,
+// tierra, plagas y paciencia. Próximo objetivo: 30-50 tips con curaduría
 // humana basada en Cementerio de Plantas + lecciones de especies clave.

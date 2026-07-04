@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import {
-  ArrowLeft, ChevronDown, ChevronRight, Sprout, Camera, MapPin, Bug, Apple,
-  MessageCircle, Wrench, Compass, Mic, CalendarDays, Leaf, Store,
+  ArrowLeft, ChevronDown, ChevronRight, Sprout, MapPin, Bug, Apple,
+  MessageCircle, Wrench, Mic, CalendarDays, Leaf, Store,
 } from 'lucide-react';
 import FieldFeedback from './FieldFeedback';
+import { IlusFoto, IlusMundos } from './help/HelpIllustrations.jsx';
 
 /**
  * Sub-vista del Manual: cómo usar Chagra (FAQs reorganizadas).
@@ -31,12 +32,12 @@ const Section = ({ icon: Icon, title, children, defaultOpen = false, isNew = fal
         aria-expanded={open}
         className="w-full p-3 flex items-center gap-3 hover:bg-slate-800/60 active:bg-slate-800 text-left min-h-[56px]"
       >
-        <span className={`shrink-0 inline-flex items-center justify-center ${open ? 'animate-pulse' : ''}`}>
+        <span className={`shrink-0 inline-flex items-center justify-center ${open ? 'motion-safe:animate-pulse' : ''}`}>
           <Icon size={20} className="text-emerald-400" />
         </span>
         <span className="text-base font-bold text-white flex-1">{title}</span>
         {isNew && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-600/40 animate-pulse">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-600/40 motion-safe:animate-pulse">
             ✨ NUEVO
           </span>
         )}
@@ -100,13 +101,13 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
         {/* 0. Orientación — los cuatro lugares de Chagra (home F2). Esto va
             primero porque es el mapa mental que el campesino nuevo necesita
             para no perderse. Mismos nombres que los portales del inicio. */}
-        <Section icon={Compass} title="🧭 Los cuatro lugares de Chagra" defaultOpen>
+        <Section icon={IlusMundos} title="🧭 Los cuatro lugares de Chagra" defaultOpen>
           <p>
             Al abrir Chagra ves <strong className="text-emerald-200">su finca dibujada</strong> (la pantalla de inicio). Ahí toca uno de estos cuatro lugares:
           </p>
           <ul className="mt-2 space-y-2 text-sm">
             <li>
-              <strong className="text-emerald-300">🌱 Gestionar</strong> — registrar y cuidar sus siembras, zonas, animales y la bitácora. También vender su cosecha.
+              <strong className="text-emerald-300">🌱 Mi finca (Gestionar)</strong> — registrar y cuidar sus siembras, zonas, animales y la bitácora. También vender su cosecha.
             </li>
             <li>
               <strong className="text-amber-300">📚 Aprender</strong> — lecciones de agroecología con fuente: suelo vivo, milpa, biopreparados, MIP, fenología.
@@ -126,7 +127,9 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
         {/* 1. Inicio rápido */}
         <Section icon={Sprout} title="🌱 Inicio rápido (primera vez)" action={quickAction('Crear primera planta', 'plant_asset')}>
           <ol className="list-decimal pl-5 space-y-1.5">
-            <li>Toca el botón <strong className="text-purple-400">+</strong> arriba (header) para registrar tu primera planta.</li>
+            {/* Corrección 2026-07: el botón "+" del header ya no existe
+                (UX-27 #286 lo reemplazó por el botón unificado mic+planta). */}
+            <li>Toca el botón del <strong className="text-purple-400">micrófono con la plantica</strong> arriba (header) y di lo que sembraste, o crea la planta a mano con el botón de abajo.</li>
             <li>Busca la especie escribiendo (ej. &ldquo;gulpa&rdquo; encuentra Gulupa). Chagra autocompleta estrato, gremio y producción.</li>
             <li>Si tienes foto, súbela desde la cámara o galería.</li>
             <li>Marca la ubicación: toca mapa o &ldquo;Mi ubicación&rdquo;.</li>
@@ -146,7 +149,7 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
         </Section>
 
         {/* 2. Foto + IA */}
-        <Section icon={Camera} title="📸 Foto + IA por foto" action={quickAction('Crear planta con foto', 'plant_asset')}>
+        <Section icon={IlusFoto} title="📸 Foto + IA por foto" action={quickAction('Crear planta con foto', 'plant_asset')}>
           <p><strong>Al crear planta:</strong> el botón cámara abre tu cámara o galería. La foto queda en la hoja de vida de esa planta.</p>
           <p><strong>Adjuntar a evento existente</strong>: entra al evento desde Bitácora → sección &ldquo;Adjuntar foto a este evento&rdquo;. Útil para documentar después.</p>
 
@@ -252,7 +255,9 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
         {/* 8. Vender / Mercado — pantalla nueva (#1854). */}
         <Section icon={Store} title="🛒 Vender mi cosecha (mercado)" action={quickAction('Abrir el mercado de la finca', 'mercados')} isNew>
           <p>En el <strong className="text-emerald-200">Mercado de la finca</strong> publicas lo que produces y lo vendes por <strong>circuitos cortos</strong> (de tu finca a quien come), coordinando por WhatsApp.</p>
-          <p className="text-xs text-slate-400 italic mt-2">El precio lo pones tú. Chagra todavía no te dice un precio de mercado exacto — esa parte está en construcción.</p>
+          {/* Corrección 2026-07: el chip «Precio» del chat ya consulta la
+              referencia mayorista real (SIPSA/DANE) desde 2026-07-01. */}
+          <p className="text-xs text-slate-400 italic mt-2">El precio lo pones tú. Si quieres una referencia mayorista del día (SIPSA/DANE), pregúntale al Agente con el chip «Precio»: te la cita solo si hay fuente.</p>
         </Section>
 
         {/* 9. Reportar problema / sugerir mejora — embed del FieldFeedback
@@ -355,7 +360,7 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
         </Section>
 
         <p className="text-[11px] text-slate-600 text-center mt-4 italic leading-relaxed">
-          Manual v2.1 · Actualizado 2026-06-25 · Colombia es el país de la belleza.
+          Manual v2.2 · Actualizado 2026-07-04 · Colombia es el país de la belleza.
         </p>
       </main>
     </div>
