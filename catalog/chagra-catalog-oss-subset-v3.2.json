@@ -22,13 +22,13 @@
   },
   "schema_version": "3.2",
   "seed_version": "0.2.0-oss-subset-v3.2",
-  "generated_at": "2026-06-26",
+  "generated_at": "2026-07-04T23:00:23.930Z",
   "generated_by": "scripts/extract-oss-subset-v32.mjs",
   "_subset_meta": {
     "subset_name": "oss-subset-263",
     "subset_version": "v3.2",
     "source_file": "chagra-catalog-oss-subset-v3.2.json (canonical, self-contained shipping seed)",
-    "species_count": 530,
+    "species_count": 580,
     "sources_count": 71,
     "biopreparados_count": 36,
     "license": "CC-BY-NC-SA 4.0",
@@ -2556,6 +2556,7 @@
         "ipomoea_batatas_morada",
         "lactuca_sativa_capitata",
         "manihot_esculenta",
+        "manihot_esculenta_dulce",
         "musa_paradisiaca",
         "petroselinum_crispum",
         "solanum_tuberosum_sabanera",
@@ -4517,10 +4518,12 @@
         "ipomoea_batatas_morada",
         "lupinus_mutabilis",
         "manihot_esculenta",
+        "manihot_esculenta_dulce",
         "mucuna_pruriens",
         "musa_paradisiaca",
         "oxalis_tuberosa",
         "passiflora_tarminiana",
+        "phaseolus_coccineus",
         "phaseolus_vulgaris",
         "smallanthus_sonchifolius",
         "solanum_phureja",
@@ -28344,6 +28347,2205 @@
       "valor_pedagogico": "El maíz capio (Zea mays L. cv. 'Capio') es una variedad nativa altoandina amarilla de grano grande harinoso, conservada por comunidades campesinas del altiplano cundiboyacense y nariñense entre 2.400 y 2.900 msnm. Es uno de los maíces tradicionales más apreciados por su calidad culinaria: grano amarillo-anaranjado de endospermo blando harinoso (no córneo como los maíces forrajeros), que al molerse rinde harinas finas para arepas de maíz pelado, envueltos, mazamorra, peto (sopa fría boyacense de granos cocidos con panela y canela) y chichas dulces ceremoniales. Mazorca grande de 12-18 cm con 8-12 hileras de granos prominentes. A diferencia del maíz negro de páramo (variedad ceremonial-tintórea) y del maíz amarillo comercial (híbridos forrajeros tipo ICA V-156), el capio es el maíz de mesa familiar boyacense por excelencia, sembrado por pequeños agricultores en milpa de subsistencia. Es lección viva de patrimonio alimentario: el capio está en riesgo de erosión genética por desplazamiento de híbridos comerciales y por abandono del policultivo tradicional, lo que pone en riesgo no solo el grano sino el conocimiento culinario asociado (arepa rellena boyacense, peto). Manejo agroecológico: siembra en asociación 'tres hermanas' altoandina con fríjol bola roja (Phaseolus vulgaris cv. 'bola roja') y ahuyama de altura (Cucurbita maxima) o haba (Vicia faba); distancia 70 cm x 70 cm a 2-3 semillas por hoyo; aporque a 45 y 75 días; abono orgánico al surco (bocashi, compost); biopreparados: caldo de ceniza contra cogollero (Spodoptera frugiperda), trichoderma al hoyo. Conservación de semilla en mazorca colgada en zarzo o solera de cocina con humo de leña. Cosecha en grano seco a los 7-8 meses, desgranado manual con tusa. Fuentes Tier A: Pérez Arbeláez 1947 Plantas Útiles, AGROSAVIA Leguminosas Andinas (policultivos), NRC 1989 Cultivos Andinos, GBIF Backbone, POWO Kew, FAO EcoCrop.",
       "validation_level": "claude_draft",
       "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+    },
+    {
+      "id": "litchi_chinensis",
+      "nombre_comun": "Lichi / Lychee",
+      "nombre_comunes_regionales": [
+        "lechia"
+      ],
+      "nombre_cientifico": "Litchi chinensis Sonn.",
+      "familia_botanica": "Sapindaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1000,
+        "optimo_max": 1700,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 15,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "injerto (acodo aéreo)",
+        "notas": "Se propaga por acodo aéreo (marcotaje) para conservar cultivares seleccionados; la semilla produce plantas de fructificación tardía y variable. Requiere un periodo fresco-seco (por debajo de ~20°C nocturnos) para inducir floración, condición limitante en trópico bajo cálido."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El lichi (Litchi chinensis Sonn.) es un árbol frutal de la familia Sapindaceae (misma familia del mamoncillo y el rambután), originario del sur de China, donde se cultiva en franjas subtropicales entre 15° y 30° de latitud con inviernos frescos y secos que inducen la floración. En Colombia es una especie introducida y poco extendida: su cultivo comercial es marginal porque el trópico bajo cálido rara vez ofrece el descenso térmico nocturno que el lichi necesita para florecer bien; los reportes de siembra en el país se concentran en fincas de clima medio con noches frescas (aprox. 1.000-1.700 msnm), análogas a las usadas para el rambután y mangostino asiáticos. El fruto es una drupa de cáscara rugosa roja con arilo blanco translúcido dulce-aromático, muy apreciado fresco. Lección pedagógica: el lichi ilustra cómo la floración de muchos frutales subtropicales depende de un estímulo de frío (vernalización floral) ausente en el trópico ecuatorial, y por qué su cultivo en Colombia sigue siendo experimental/de nicho a diferencia del rambután (mismo grupo Sapindaceae) que sí prospera en tierra caliente. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy. Nota: la altitud y viabilidad exactas de cultivo en Colombia no están documentadas en literatura agronómica nacional consultada; validar en campo.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "nephelium_lappaceum",
+      "nombre_comun": "Rambután",
+      "nombre_cientifico": "Nephelium lappaceum L.",
+      "familia_botanica": "Sapindaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 500,
+        "max_absoluto": 800
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 24,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "injerto",
+        "notas": "Injerto de púa o parche sobre patrón franco para asegurar sexo/calidad del fruto (especie dioica-poligama); la semilla produce plantas de fructificación tardía (5-7 años) y calidad variable. Corpoica introdujo clones seleccionados (Jetlee, R134, R156, R162, R167) desde Honduras en 2006."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El rambután (Nephelium lappaceum L., Sapindaceae) es un árbol frutal de origen asiático (sudeste asiático) con investigación de adaptación activa en Colombia desde mediados de la década de 2000. El material de Corpoica se estableció en el C.I. La Libertad (Villavicencio, Meta) a 467 msnm, temperatura media 28,9°C y precipitación de 3.000 mm/año, confirmando su vocación de tierra caliente húmeda (piedemonte llanero, 0-600 msnm). El fruto es una drupa cubierta de espinas blandas ('pelos') rojas a amarillas, con arilo blanco translúcido dulce similar al lichi (mismo género emparentado). Especie dioica: las plantas hembra necesitan machos o clones autofértiles cercanos para buena fructificación, por lo cual el cultivo tecnificado usa clones injertados. Lección pedagógica: el rambután muestra el potencial de diversificación frutícola de la Orinoquia colombiana (piedemonte del Meta) con especies exóticas bien adaptadas al trópico bajo húmedo, y la importancia de la polinización cruzada/dioecia en el manejo agronómico de frutales asiáticos. Fuentes Tier A: POWO Kew, GBIF; investigación Corpoica/Agrosavia (Rev. Colombiana de Ciencias Hortícolas, piedemonte del Meta).",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "garcinia_mangostana",
+      "nombre_comun": "Mangostino / Mangostán",
+      "nombre_cientifico": "Garcinia mangostana L.",
+      "familia_botanica": "Clusiaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 400,
+        "optimo_max": 1000,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 24,
+        "optimo_max": 26,
+        "max_tolerable": 32
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla (poliembrionía)",
+        "notas": "Se propaga por semilla poliembriónica (genéticamente idéntica a la planta madre, apomixis); crecimiento muy lento (fructificación a partir de 8-12 años). Sensible a sequía prolongada y requiere sombra parcial en etapa juvenil."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El mangostino o mangostán (Garcinia mangostana L., familia Clusiaceae) es un árbol frutal de origen sudasiático (archipiélago malayo), introducido a Colombia en la década de 1930 con los primeros cultivos en el norte del Tolima (Mariquita, Fresno, Armero-Guayabal). Actualmente se cultiva también en Risaralda, Antioquia, Meta, Quindío, Boyacá y Caldas, entre 0 y 1.200 msnm, en clima cálido-húmedo con temperaturas de 24-26°C y humedad relativa alta (80%); no tolera sequías prolongadas. El fruto es una baya de cáscara gruesa morada con pulpa blanca segmentada de sabor dulce-ácido, considerada una de las frutas tropicales más finas del mundo. Su semilla poliembriónica reproduce clones de la madre, pero el árbol crece muy lentamente (8-12 años a primera cosecha), lo que limita su expansión comercial. Lección pedagógica: el mangostino enseña el concepto de poliembrionía apomíctica (reproducción por semilla genéticamente idéntica) y el reto agronómico de los cultivos de ciclo de establecimiento muy largo para la planeación de la chagra. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy; reportes agronómicos regionales (Tolima/eje cafetero).",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "dimocarpus_longan",
+      "nombre_comun": "Longan",
+      "nombre_cientifico": "Dimocarpus longan Lour.",
+      "familia_botanica": "Sapindaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 600,
+        "optimo_min": 900,
+        "optimo_max": 1600,
+        "max_absoluto": 1900
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 18,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "injerto (acodo aéreo)",
+        "notas": "Propagación por acodo aéreo o injerto sobre patrón franco para mantener cultivares; requiere, al igual que el lichi, un descenso térmico estacional para inducción floral, poco disponible en trópico bajo ecuatorial."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El longan (Dimocarpus longan Lour., Sapindaceae) es un árbol frutal del sur de China y sudeste asiático, pariente cercano del lichi y el rambután (misma familia Sapindaceae), con el que comparte el requerimiento de un periodo fresco para floración. Su presencia en Colombia es puntual y experimental, sin reportes consolidados de cultivo comercial; se estima que, de establecerse, prosperaría en climas medios frescos análogos a los usados para lichi (aprox. 900-1.600 msnm), más que en tierra caliente plena. El fruto es una drupa pequeña de cáscara delgada café-amarillenta con arilo blanco translúcido dulce, de textura similar al lichi pero de sabor más suave y almizclado. Lección pedagógica: el longan permite comparar dentro de un mismo género de Sapindaceae (junto a lichi, mamoncillo, rambután) cómo especies emparentadas divergen en requerimientos climáticos, ilustrando el concepto de nicho climático específico dentro de una misma familia botánica. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy. Nota: viabilidad y altitud de cultivo en Colombia no están documentadas en literatura agronómica nacional consultada; validar en campo.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "annona_muricata",
+      "nombre_comun": "Guanábana",
+      "nombre_cientifico": "Annona muricata L.",
+      "familia_botanica": "Annonaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 900,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 24,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla (germinación 20-30 días) o injerto sobre patrón de guanábano o anón para uniformidad varietal. Polinización manual asistida recomendada por escasez de polinizadores naturales (coleópteros nitidúlidos)."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "La guanábana (Annona muricata L., familia Annonaceae) es un árbol frutal de origen centroamericano-caribeño, ampliamente naturalizado y cultivado en tierra caliente colombiana (Tolima, Valle del Cauca, Caribe, Meta, Santanderes) entre 0 y 1.200 msnm. Produce el fruto comestible más grande del género Annona (hasta 30 cm), de cáscara verde con espinas blandas y pulpa blanca fibrosa dulce-ácida, muy usada en jugos, sorbetes y postres. La polinización natural es deficiente (depende de pequeños escarabajos nitidúlidos atraídos por el olor floral nocturno), por lo que huertos comerciales suelen requerir polinización manual para buena cuajadura de fruto. Comparte género con el anón (Annona squamosa) y la chirimoya (Annona cherimola), ya presentes en el catálogo, permitiendo comparar el gradiente térmico del género: guanábana en tierra caliente, chirimoya en clima medio-frío. Lección pedagógica: muestra la limitación de polinizadores como cuello de botella productivo y la diversidad térmica dentro de un mismo género botánico. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "annona_reticulata",
+      "nombre_comun": "Anón corazón / Corazón de buey",
+      "nombre_cientifico": "Annona reticulata L.",
+      "familia_botanica": "Annonaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 150,
+        "optimo_max": 1000,
+        "max_absoluto": 1300
+      },
+      "temperatura_c": {
+        "helada_letal": 1,
+        "optimo_min": 23,
+        "optimo_max": 28,
+        "max_tolerable": 33
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla; también se usa como patrón resistente para injertar chirimoya y anón (Annona squamosa) por su vigor y tolerancia a suelos pesados."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El anón corazón o corazón de buey (Annona reticulata L., Annonaceae) es un árbol frutal centroamericano-caribeño naturalizado en tierra caliente y media-baja de Colombia (Caribe, valles interandinos, 0-1.300 msnm), tercer miembro del género Annona documentado en el catálogo junto al anón (A. squamosa) y la chirimoya (A. cherimola), completando el gradiente térmico cálido-templado-frío de las anonáceas comestibles colombianas. Su fruto tiene cáscara lisa reticulada rojiza-parda (de ahí 'reticulata') y pulpa cremosa dulce con muchas semillas, de calidad algo inferior a la chirimoya pero de árbol más rústico y tolerante a suelos pesados y encharcamiento ocasional, razón por la cual se usa frecuentemente como patrón (portainjerto) para injertar chirimoya en zonas donde esta última no arraiga bien. Lección pedagógica: enseña el uso de especies rústicas emparentadas como patrones de injerto para extender el rango de cultivo de parientes más exigentes, técnica común en fruticultura tropical. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "tamarindus_indica",
+      "nombre_comun": "Tamarindo",
+      "nombre_cientifico": "Tamarindus indica L.",
+      "familia_botanica": "Fabaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer",
+        "windbreak"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 800,
+        "max_absoluto": 1000
+      },
+      "temperatura_c": {
+        "helada_letal": 3,
+        "optimo_min": 25,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla escarificada (tegumento duro); injerto de yema para uniformidad varietal en huertos comerciales. Árbol muy longevo (>100 años) y tolerante a sequía prolongada una vez establecido."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El tamarindo (Tamarindus indica L., familia Fabaceae) es un árbol frutal de origen africano naturalizado desde tiempos coloniales en el bosque seco tropical del Caribe colombiano (Bolívar, Atlántico, Magdalena, Cesar, Guajira) y valles secos interandinos del Magdalena y Tolima, entre 0 y 1.000 msnm. Produce vainas leguminosas de cáscara quebradiza con pulpa agridulce fibrosa muy usada en jugos ('agua de panela con tamarindo'), dulces y condimentos. Árbol longevo y muy rústico, tolerante a suelos pobres y sequías estacionales largas, típico de sistemas silvopastoriles y patios tradicionales caribeños donde da sombra al ganado. Al ser una Fabaceae (leguminosa), fija nitrógeno atmosférico en simbiosis con rizobios, mejorando el suelo circundante. Lección pedagógica: enseña la doble función de las leguminosas arbóreas (alimento + fijación de nitrógeno) y la adaptación de especies africanas al bosque seco tropical colombiano, ecosistema crítico con menos del 10% de cobertura remanente. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "morinda_citrifolia",
+      "nombre_comun": "Noni",
+      "nombre_cientifico": "Morinda citrifolia L.",
+      "familia_botanica": "Rubiaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 700,
+        "max_absoluto": 900
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 24,
+        "optimo_max": 29,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "regular",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla flotante (dispersión natural por agua de mar/ríos) o esqueje; planta pionera de crecimiento muy rápido y fructificación precoz (menos de 1 año)."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El noni (Morinda citrifolia L., familia Rubiaceae, misma familia del café) es un arbusto o árbol pequeño de origen indo-pacífico, naturalizado en la costa Caribe colombiana y zonas cálidas húmedas del Pacífico, entre 0 y 900 msnm, donde crece como especie pionera de rápido crecimiento en suelos degradados y bordes costeros. Su fruto ovalado de superficie reticulada, que madura de verde a blanco-amarillento con olor fuertemente fermentado característico, se consume principalmente en jugos y preparaciones fermentadas por su reputación etnobotánica como tónico, aunque su uso culinario directo es limitado por el sabor/olor intensos. Es planta de fácil naturalización y alta producción de semillas flotantes, por lo que en algunos contextos se comporta como invasora de bajo riesgo en bordes de manglar y playas. Lección pedagógica: ilustra el concepto de especie pionera de sucesión ecológica costera y la diferencia entre valor alimenticio directo y valor etnobotánico/funcional de una misma fruta. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "plukenetia_volubilis",
+      "nombre_comun": "Sacha inchi / Maní del inca",
+      "nombre_cientifico": "Plukenetia volubilis L.",
+      "familia_botanica": "Euphorbiaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 200,
+        "optimo_min": 400,
+        "optimo_max": 1500,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 3,
+        "optimo_min": 20,
+        "optimo_max": 26,
+        "max_tolerable": 32
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla; enredadera perenne trepadora que requiere tutorado (espaldera). Entra en producción a los 6-8 meses y puede producir por más de 10 años."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El sacha inchi o maní del inca (Plukenetia volubilis L., familia Euphorbiaceae) es una liana perenne nativa de la Amazonía y el piedemonte andino-amazónico (Perú, Ecuador, Colombia), cultivada en Colombia en Putumayo, Caquetá y Meta, entre 200 y 1.800 msnm en clima cálido-húmedo a templado. Produce cápsulas en forma de estrella con semillas oleaginosas ricas en ácidos grasos omega-3 (mayor concentración que la linaza), que se consumen tostadas, en aceite prensado en frío o harina. Es una liana vigorosa que requiere tutorado tipo espaldera similar al maracuyá, con producción sostenida por varios años una vez establecida. Su auge comercial reciente responde a la demanda de superalimentos con perfil lipídico saludable, posicionando a comunidades amazónicas como proveedoras de una materia prima de alto valor agregado. Lección pedagógica: muestra cómo un cultivo amazónico tradicional puede insertarse en cadenas de valor de 'superalimentos' globales sin perder su base agroecológica campesina, y el manejo de lianas oleaginosas en sistemas agroforestales de piedemonte. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "averrhoa_carambola",
+      "nombre_comun": "Carambolo",
+      "nombre_cientifico": "Averrhoa carambola L.",
+      "familia_botanica": "Oxalidaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1000,
+        "max_absoluto": 1300
+      },
+      "temperatura_c": {
+        "helada_letal": 3,
+        "optimo_min": 23,
+        "optimo_max": 28,
+        "max_tolerable": 33
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla o injerto de yema para cultivares dulces seleccionados; sensible a heladas y requiere riego constante en época seca por su sistema radicular superficial."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El carambolo (Averrhoa carambola L., familia Oxalidaceae) es un árbol frutal de origen sudasiático naturalizado en tierra caliente y media-baja de Colombia (Valle del Cauca, Tolima, Caribe, Casanare), entre 0 y 1.300 msnm. Su fruto de sección estrellada al cortarse transversalmente (de ahí el nombre inglés 'star fruit') tiene cáscara cerosa amarilla comestible y pulpa jugosa que va de ácida a dulce según el cultivar, alta en ácido oxálico (por lo que personas con enfermedad renal deben evitarlo). Se consume fresco, en jugos, ensaladas y como decoración culinaria por su forma geométrica llamativa. Comparte género con el bilimbi o vinagrillo (Averrhoa bilimbi), pariente mucho más ácido usado para encurtidos, ambas especies presentes en este batch para ilustrar el rango de acidez dentro de un mismo género de Oxalidaceae. Lección pedagógica: enseña la variación de sabor (dulce-ácido) dentro de una misma especie según el cultivar, y el concepto de antinutriente (oxalatos) relevante para la nutrición humana. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "anacardium_occidentale",
+      "nombre_comun": "Marañón / Merey",
+      "nombre_cientifico": "Anacardium occidentale L.",
+      "familia_botanica": "Anacardiaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 800,
+        "max_absoluto": 1000
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 25,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla (la nuez es en realidad la semilla externa, el 'fruto' carnoso es el pedúnculo hipertrofiado); tolerante a suelos arenosos pobres y sequía prolongada, típico de bosque seco tropical y sabanas de Orinoquia."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El marañón o merey (Anacardium occidentale L., familia Anacardiaceae) es un árbol de origen brasileño naturalizado en el bosque seco tropical del Caribe colombiano y las sabanas de Arauca y Casanare (Orinoquia), entre 0 y 1.000 msnm, distinto del caracolí (Anacardium excelsum, ya presente en el catálogo), especie nativa continental de porte mucho mayor y fruto no comestible directamente. En el marañón, lo que popularmente se llama 'fruta' es en realidad el pedúnculo floral hipertrofiado (manzana de marañón), jugoso y astringente, que se come fresco o en jugo; la verdadera semilla botánica es la nuez de cáscara dura tóxica en crudo (contiene urushiol, pariente de la hiedra venenosa) que requiere tueste antes de consumirse como 'nuez de marañón' o 'cashew'. Especie muy rústica adaptada a suelos arenosos pobres y sequía estacional prolongada. Lección pedagógica: es un caso de estudio clásico de morfología floral/fructífera (pseudofruto vs. fruto verdadero) y de toxicidad natural que requiere procesamiento térmico para hacer un alimento seguro. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft",
+      "advertencia_toxicologica": "La nuez cruda (semilla) contiene urushiol en la cáscara, compuesto alergénico de contacto (mismo grupo químico del mango y la hiedra venenosa) que causa dermatitis severa; requiere tueste/procesamiento térmico industrial antes de consumirse como nuez de marañón. El pedúnculo carnoso (pseudofruto) no presenta este riesgo y se come fresco sin problema."
+    },
+    {
+      "id": "quararibea_cordata",
+      "nombre_comun": "Zapote costeño / Chupa chupa",
+      "nombre_cientifico": "Quararibea cordata (Bonpl.) Vischer",
+      "familia_botanica": "Malvaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 200,
+        "optimo_min": 400,
+        "optimo_max": 1300,
+        "max_absoluto": 1600
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 22,
+        "optimo_max": 27,
+        "max_tolerable": 32
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla; árbol de gran porte (hasta 40-45 m en bosque) que en cultivo se maneja con podas de formación para mantener porte productivo manejable."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El zapote costeño o chupa chupa (Quararibea cordata (Bonpl.) Vischer, familia Malvaceae; sinónimo Matisia cordata Bonpl., usado en literatura más antigua) es un árbol frutal nativo de la Amazonía y el Pacífico-Valle del Cauca colombianos, distribuido en los valles del Cauca y Magdalena y en el Chocó biogeográfico, entre 200 y 1.600 msnm en bosque húmedo tropical. Su fruto ovoide de cáscara verde-parda áspera contiene una pulpa anaranjada cremosa muy dulce y fibrosa que se chupa directamente de la semilla (de ahí el nombre popular 'chupa-chupa'), muy apetecida en el Pacífico y la Amazonía colombianas. En estado silvestre es un árbol emergente de gran porte del dosel de bosque húmedo; en cultivo de patio se maneja más bajo mediante poda. Lección pedagógica: muestra un fruto amazónico-pacífico poco conocido fuera de su región de origen, y el fenómeno de sinonimia taxonómica (Matisia cordata → Quararibea cordata) que refleja la revisión constante de la clasificación de las Malvaceae s.l. (que hoy agrupa las antiguas Bombacaceae). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "syzygium_malaccense",
+      "nombre_comun": "Pomarrosa / Manzana rosa",
+      "nombre_cientifico": "Syzygium malaccense (L.) Merr. & L.M.Perry",
+      "familia_botanica": "Myrtaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 900,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 23,
+        "optimo_max": 28,
+        "max_tolerable": 33
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla recalcitrante (requiere siembra inmediata, pierde viabilidad al secarse) o acodo aéreo; tolerante a suelos húmedos y encharcamiento ocasional."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "La pomarrosa o manzana rosa (Syzygium malaccense (L.) Merr. & L.M.Perry, familia Myrtaceae, misma familia del clavo ya presente en el catálogo) es un árbol frutal de origen malayo-indonesio naturalizado en tierra caliente húmeda de Colombia (Caribe, Pacífico, Amazonía, valles interandinos bajos), entre 0 y 1.200 msnm. Su fruto piriforme de cáscara delgada rosada-cerosa y pulpa blanca crujiente con aroma a rosas se consume fresco, en ensaladas de fruta y encurtidos; el árbol también se cultiva como ornamental por su follaje denso y flores rojas vistosas polinizadas por aves e insectos. Tolera suelos húmedos e incluso encharcamiento estacional, por lo que se adapta bien a huertos de patio en tierra caliente con lluvias abundantes. Lección pedagógica: enseña la semilla recalcitrante (que no tolera desecación ni almacenamiento prolongado, a diferencia de semillas ortodoxas) como estrategia reproductiva de muchas especies de bosque húmedo tropical, relevante para el manejo de vivero. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "carica_papaya",
+      "nombre_comun": "Papaya",
+      "nombre_cientifico": "Carica papaya L.",
+      "familia_botanica": "Caricaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1000,
+        "max_absoluto": 1600
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 22,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla (germinación 15-20 días); planta dioica-trimonoica (individuos macho, hembra y hermafrodita) de crecimiento rápido, primera cosecha a los 8-10 meses, ciclo productivo 3-4 años."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "La papaya (Carica papaya L., familia Caricaceae) es una de las frutas más comunes y cultivadas de Colombia, presente en prácticamente todos los pisos térmicos cálidos y medios del país (Tolima, Magdalena, Meta, Córdoba, Valle del Cauca), entre 0 y 1.600 msnm, y sorprendentemente ausente hasta ahora del catálogo pese a su omnipresencia en huertos y mercados campesinos. Es una planta herbácea-arbórea de rápido crecimiento y corta vida útil (3-4 años productivos), con sexos separados en plantas distintas (dioica) más un tipo hermafrodita cultivado preferentemente por autofecundarse y dar fruto uniforme; los huertos comerciales manejan proporciones de plantas macho para polinización cruzada de las hembras. Su fruto, rico en papaína (enzima proteolítica usada industrialmente como ablandador de carne) y vitamina C, se consume fresco, en jugos y, verde, cocido como hortaliza. Lección pedagógica: es un caso vivo para enseñar los sistemas sexuales vegetales (dioecia vs. hermafroditismo) y su manejo práctico en el huerto familiar. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy; ICA Resolución 3168/2015 (material de propagación).",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "vitis_vinifera",
+      "nombre_comun": "Uva",
+      "nombre_cientifico": "Vitis vinifera L.",
+      "familia_botanica": "Vitaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 700,
+        "optimo_min": 900,
+        "optimo_max": 1300,
+        "max_absoluto": 1600
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 22,
+        "optimo_max": 27,
+        "max_tolerable": 32
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Propagación por esqueje/estaca leñosa enraizada o injerto sobre patrón; en el trópico bajo colombiano (La Unión, Valle del Cauca) se maneja con poda forzada de 2-3 yemas que permite hasta dos cosechas por año, a diferencia del ciclo anual único de climas templados."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "La uva (Vitis vinifera L., familia Vitaceae) se cultiva en Colombia en un sistema atípico de viticultura tropical de baja altitud: el municipio de La Unión, en el norte del Valle del Cauca, a unos 940-950 msnm y temperatura media de 27°C, se autodenomina 'la capital vitícola de Colombia' y produce variedades como Red Globe e Isabella (esta última Vitis labrusca, especie distinta) mediante poda forzada que induce hasta dos cosechas anuales en ausencia de estación de reposo invernal. Esta técnica de poda drástica (dejando 2-3 yemas por sarmiento) sustituye la latencia invernal que la vid necesita en climas templados, permitiendo su cultivo en trópico cálido-templado bajo. El fruto, una baya agrupada en racimos, se consume fresco o se procesa en vino y jugos artesanales locales. Lección pedagógica: la vid ilustra cómo el manejo agronómico (poda inductiva) puede sustituir un requerimiento climático ausente (frío invernal), abriendo cultivos de zona templada a condiciones tropicales mediante técnica cultural en lugar de mejoramiento genético. Fuentes Tier A: POWO Kew, GBIF; investigación regional Valle del Cauca (La Unión, Roldanillo, Toro) y Agrosavia/Universidad Nacional sobre vid en clima frío tropical.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "manilkara_zapota",
+      "nombre_comun": "Zapote de carne / Níspero costeño",
+      "nombre_comunes_regionales": [
+        "chicozapote",
+        "ácana"
+      ],
+      "nombre_cientifico": "Manilkara zapota (L.) P.Royen",
+      "familia_botanica": "Sapotaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 900,
+        "max_absoluto": 1600
+      },
+      "temperatura_c": {
+        "helada_letal": 3,
+        "optimo_min": 23,
+        "optimo_max": 27,
+        "max_tolerable": 33
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla o injerto de yema; árbol de crecimiento lento pero muy longevo y resistente a vientos fuertes, tradicionalmente explotado también por su látex (chicle natural)."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El zapote de carne o níspero costeño (Manilkara zapota (L.) P.Royen, familia Sapotaceae) es un árbol frutal de origen mesoamericano-caribeño cultivado en la llanura del Caribe colombiano, el valle del Magdalena y el Valle del Cauca, entre 0 y 1.600 msnm. Se distingue deliberadamente en su nombre del níspero ya presente en el catálogo (Eriobotrya japonica, especie asiática de clima frío no emparentada) para evitar la confusión que genera el uso del mismo nombre común 'níspero' en distintas regiones de Colombia para frutas completamente distintas. Su fruto, de cáscara áspera parda y pulpa marrón-anaranjada muy dulce y granulosa, se consume fresco cuando está bien maduro (astringente si se come verde por su alto contenido de taninos). El árbol es además la fuente histórica del chicle natural (chicozapote), obtenido de su látex, antes de la sustitución por gomas sintéticas. Lección pedagógica: es un caso ejemplar de homonimia de nombres comunes regionales ('níspero' para especies no emparentadas de climas opuestos), que enseña por qué el nombre científico es indispensable para evitar errores de identificación. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "pouteria_lucuma",
+      "nombre_comun": "Lúcuma",
+      "nombre_cientifico": "Pouteria lucuma (Ruiz & Pav.) Kuntze",
+      "familia_botanica": "Sapotaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1600,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 14,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla o injerto sobre patrón de la misma especie; árbol de crecimiento lento, fructificación a partir de 5-8 años, tolerante a suelos pobres de ladera andina."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "La lúcuma (Pouteria lucuma (Ruiz & Pav.) Kuntze, familia Sapotaceae, emparentada con el abiu y el zapote ya presentes en el catálogo) es un árbol frutal andino nativo de los valles interandinos templado-fríos de Colombia, Ecuador, Perú y Bolivia, entre 1.500 y 3.000 msnm. En Colombia su uso se concentra en comunidades indígenas Inga y Kamëntšá del Alto Putumayo, donde forma parte de los recursos genéticos ancestrales de la chagra, aunque está en franco declive frente al avance de monocultivos de fríjol, granadilla, lulo y tomate de árbol. Su fruto, de cáscara verde-parda y pulpa amarilla-anaranjada seca, harinosa y muy dulce (sabor a caramelo/maple), se consume fresco o en batidos y helados, siendo muy popular en Perú y Ecuador pero prácticamente desconocido en el resto de Colombia. Lección pedagógica: es un caso de erosión genética de un cultivo ancestral andino-amazónico por sustitución de monocultivos comerciales, relevante para discutir la conservación de agrobiodiversidad en la chagra Inga-Kamëntšá. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy; Universidad Nacional de Colombia (AgroNET, Alto Putumayo).",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "manihot_esculenta_dulce",
+      "nombre_comun": "Yuca dulce / Yuca de comer",
+      "nombre_cientifico": "Manihot esculenta Crantz cv. dulce",
+      "familia_botanica": "Euphorbiaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 300,
+        "optimo_max": 1800,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "esqueje (estaca de tallo)",
+        "notas": "Propagación por estacas de tallo maduro (20-25 cm) plantadas en caballón; ciclo 8-12 meses. A diferencia de la yuca brava amazónica (bajo contenido de glucósidos cianogénicos, HCN < 50 mg/kg), se puede consumir hervida directamente sin proceso de destoxificación (rallado-prensado-tostado usado para casabe/fariña)."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "La yuca dulce o yuca de comer (Manihot esculenta Crantz, cultivares de bajo contenido de glucósidos cianogénicos) es la variante de yuca que efectivamente consume la mayoría de los hogares colombianos hervida, frita o en sancocho, y se cultiva en prácticamente todo el país entre 0 y 2.000 msnm (Córdoba, Sucre, Bolívar, Meta, Tolima, Huila, Santanderes). Se documenta como entrada separada de la 'yuca brava amazónica' (Manihot esculenta, ya presente en el catálogo), que corresponde a las variedades tradicionalmente cultivadas en la Amazonía con alto contenido de ácido cianhídrico (HCN), tóxicas en crudo y que requieren el procesamiento indígena de rallado-prensado-tostado (casabe, fariña, mañoco) para eliminar la toxicidad antes de consumirse. La yuca dulce, en cambio, tiene niveles de HCN bajos y se puede cocinar y comer directamente. Lección pedagógica: enseña que 'yuca' no es una sola planta homogénea sino un gradiente de variedades domesticadas con niveles de toxicidad muy distintos, y que el procesamiento tradicional amazónico (casabe) es una tecnología de destoxificación, no solo una técnica culinaria. Fuentes Tier A: POWO Kew, GBIF; ICA Resolución 3168/2015.",
+      "tracking_mode": "individual",
+      "cultivar": true,
+      "validation_level": "claude_draft",
+      "companions": [
+        "zea_mays",
+        "phaseolus_vulgaris"
+      ],
+      "advertencia_toxicologica": "Aunque de bajo contenido de glucósidos cianogénicos frente a la yuca brava amazónica, TODA yuca (incluida la dulce) debe cocinarse bien antes de consumir: el HCN residual se libera por hidrólisis enzimática al cortar/masticar tejido crudo. No consumir cruda ni en cantidades grandes de variedades no certificadas."
+    },
+    {
+      "id": "poraqueiba_sericea",
+      "nombre_comun": "Umarí",
+      "nombre_cientifico": "Poraqueiba sericea Tul.",
+      "familia_botanica": "Metteniusaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 80,
+        "optimo_min": 100,
+        "optimo_max": 350,
+        "max_absoluto": 500
+      },
+      "temperatura_c": {
+        "helada_letal": 6,
+        "optimo_min": 24,
+        "optimo_max": 28,
+        "max_tolerable": 33
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla; árbol emergente de gran porte (hasta 25-30 m) del bosque de tierra firme amazónico, poco domesticado, aún manejado principalmente por recolección/enriquecimiento de rastrojo más que por cultivo en huerto."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El umarí (Poraqueiba sericea Tul., familia Metteniusaceae — clasificación reciente que reemplazó su ubicación tradicional en Icacinaceae) es un árbol frutal nativo de la Amazonía, distribuido en la zona de frontera entre Colombia, Ecuador y Perú, en bosque de tierra firme de baja altitud (80-500 msnm). Su fruto, una drupa ovalada de cáscara lisa amarilla, roja o negra según la variedad y el grado de madurez, tiene poca pulpa pero de textura muy oleosa y aroma intenso, usada tradicionalmente por comunidades indígenas amazónicas (entre ellas los Uitoto/Witoto) como una especie de 'mantequilla vegetal' para untar sobre el casabe de yuca, y en la Amazonía colombiana también se fermenta la almendra de la semilla para preparar una variante de casabe (casabe de pepa de umarí). Lección pedagógica: muestra un fruto amazónico de bajo perfil comercial pero alto valor nutricional-cultural (grasa vegetal tradicional), y el fenómeno de reclasificación taxonómica reciente (Icacinaceae → Metteniusaceae) que refleja los avances de la filogenia molecular. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "theobroma_subincanum",
+      "nombre_comun": "Cupuí",
+      "nombre_cientifico": "Theobroma subincanum Mart.",
+      "familia_botanica": "Malvaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 100,
+        "optimo_min": 150,
+        "optimo_max": 550,
+        "max_absoluto": 700
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 23,
+        "optimo_max": 27,
+        "max_tolerable": 32
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla, similar al cacao y copoazú (mismo género); requiere sombra parcial en establecimiento, típico del sotobosque amazónico."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El cupuí (Theobroma subincanum Mart., familia Malvaceae) es un árbol frutal amazónico del mismo género que el cacao (Theobroma cacao) y el copoazú (Theobroma grandiflorum), ambos ya presentes en el catálogo, con los que comparte semillas útiles para bebidas tipo chocolate. En Colombia se distribuye de forma nativa en los departamentos de Amazonas, Meta, Putumayo y Vaupés. Su fruto es notablemente más pequeño que el del copoazú ('copoazú de monte' o 'copoazú pequeño' es uno de sus nombres locales) y de pulpa más dulce, aunque con menos cantidad de pulpa comestible aprovechable por fruto. Se cosecha para consumo fresco y jugos, y sus semillas, como las del cacao, sirven para preparar una bebida similar al chocolate. Lección pedagógica: permite comparar dentro de un mismo género (Theobroma: cacao, copoazú, cupuí, y el maraco/Theobroma bicolor ya presente) la variación de tamaño de fruto y proporción pulpa/semilla entre especies emparentadas de la Amazonía, ilustrando la diversidad genética subutilizada del género del chocolate. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy (distribución departamental Amazonas/Meta/Putumayo/Vaupés).",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "elaeis_oleifera",
+      "nombre_comun": "Nolí / Corozo del Sinú",
+      "nombre_cientifico": "Elaeis oleifera (Kunth) Cortés",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 400,
+        "max_absoluto": 600
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 25,
+        "optimo_max": 29,
+        "max_tolerable": 33
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "regular",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla (germinación lenta e irregular, meses); en mejoramiento genético se usa como parental para híbridos interespecíficos OxG (Elaeis oleifera x Elaeis guineensis) que combinan su resistencia a Pudrición del Cogollo con la productividad de la palma africana."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El nolí, corozo del Sinú o palma americana de aceite (Elaeis oleifera (Kunth) Cortés, familia Arecaceae) es una palma oleaginosa nativa de Colombia, Panamá y Costa Rica —a diferencia de la palma de aceite africana (Elaeis guineensis) que es la especie introducida y dominante en la agroindustria—, con poblaciones naturales históricas en la región del Sinú (Córdoba) y en zonas del Pacífico y la Amazonía colombianas. Su aceite tiene mayor proporción de ácidos grasos insaturados (oleico y linoleico) que el de la palma africana, lo que le da un perfil nutricional más favorable, pero su producción de racimos es menor. Por ello, el principal uso agroindustrial actual del nolí es como parental de híbridos interespecíficos OxG con la palma africana, que buscan combinar su resistencia natural a la Pudrición del Cogollo (enfermedad que ha devastado plantaciones de palma africana en Colombia) con mayor productividad. Lección pedagógica: es un ejemplo vivo de uso de recursos genéticos nativos silvestres para resolver un problema fitosanitario de un cultivo introducido, y de la diferencia entre una especie nativa poco cultivada y su pariente exótico dominante en la agroindustria. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy; Agrosavia (Ciencia y Tecnología Agropecuaria, híbridos OxG Tumaco).",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "acrocomia_aculeata",
+      "nombre_comun": "Corozo",
+      "nombre_cientifico": "Acrocomia aculeata (Jacq.) Lodd. ex Mart.",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 900,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 24,
+        "optimo_max": 29,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "regular",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla (germinación lenta, 6-12 meses, escarificación mecánica del endocarpo acelera el proceso); palma muy rústica y espinosa (tronco y hojas con espinas duras), tolerante a suelos pobres y sequía estacional."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El corozo (Acrocomia aculeata (Jacq.) Lodd. ex Mart., familia Arecaceae) es una palma nativa de zonas secas y subhúmedas de América tropical, presente en Colombia principalmente en Santander y otros valles secos interandinos y del Caribe, entre 0 y 1.200 msnm. Se distingue por su tronco cubierto de espinas negras rígidas, mecanismo de defensa contra herbívoros. En Santander, el mesocarpo del fruto (una drupa amarillo-anaranjada) se consume cocido, y tradicionalmente se fermenta para preparar 'chicha de corozo', bebida campesina típica de la región. La almendra de la semilla y la pulpa son además fuente de aceites vegetales de uso alimentario e industrial (similares en composición al aceite de coco y de palmiste), usados en galletería, coberturas y productos tipo cacao. Lección pedagógica: enseña el aprovechamiento integral de una palma silvestre rústica (bebida fermentada + aceite + resistencia a sequía) como ejemplo de seguridad alimentaria campesina basada en especies nativas poco domesticadas. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy; registros etnobotánicos de Santander (chicha de corozo).",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "cucurbita_ficifolia",
+      "nombre_comun": "Chilacayote",
+      "nombre_comunes_regionales": [
+        "calabaza de cidra",
+        "cidra chilacayote"
+      ],
+      "nombre_cientifico": "Cucurbita ficifolia Bouché",
+      "familia_botanica": "Cucurbitaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 13,
+        "optimo_max": 19,
+        "max_tolerable": 25
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa o almácigo con trasplante; enredadera rastrera-trepadora vigorosa que fructifica a los 4-5 meses. El fruto maduro se conserva varios meses a temperatura ambiente por su cáscara dura, a diferencia de otras cucúrbitas."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El chilacayote (Cucurbita ficifolia Bouché, familia Cucurbitaceae) es una calabaza andina de clima frío, cultivada tradicionalmente en Boyacá, Cundinamarca, Nariño y Cauca entre 1.800 y 2.800 msnm, distinta de la ahuyama (Cucurbita moschata) y el zapallo (Cucurbita maxima) ya presentes en el catálogo por tolerar temperaturas mucho más bajas y por su pulpa fibrosa blanca en filamentos (usada tradicionalmente para el dulce de 'cabello de ángel' en repostería andina). El fruto maduro, de cáscara dura veteada verde-blanca, se conserva meses sin refrigeración, lo que históricamente lo convirtió en una reserva alimentaria de la chagra fría para época de escasez. Se consume la pulpa cocida en sopas y dulces, y las semillas tostadas. Lección pedagógica: muestra la diversidad de especies dentro del género Cucurbita cultivadas en Colombia según piso térmico (ficifolia=frío andino, moschata/maxima=cálido-templado), y el valor de los frutos de cáscara dura como reserva alimentaria de larga duración sin tecnología de refrigeración. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "maranta_arundinacea",
+      "nombre_comun": "Sagú / Arrurruz",
+      "nombre_cientifico": "Maranta arundinacea L.",
+      "familia_botanica": "Marantaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 900,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 3,
+        "optimo_min": 22,
+        "optimo_max": 28,
+        "max_tolerable": 33
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "hijuelos (rizoma)",
+        "notas": "Propagación vegetativa por división de rizomas/hijuelos; planta de sotobosque tolerante a sombra parcial, ciclo 10-11 meses hasta cosecha del rizoma."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El sagú o arrurruz (Maranta arundinacea L., familia Marantaceae) es una hierba rizomatosa nativa de América tropical, cultivada tradicionalmente en zonas cálidas húmedas de Colombia (Caribe, Pacífico, piedemonte amazónico) entre 0 y 1.200 msnm, cuyo nombre común 'sagú' comparte de forma confusa con la achira (Canna edulis, ya presente en el catálogo con el mismo nombre regional 'sagú'), aunque son géneros y familias botánicas completamente distintos (Marantaceae vs. Cannaceae). El rizoma del arrurruz se procesa para extraer una fécula fina de alta digestibilidad, tradicionalmente usada para papillas de bebés y personas convalecientes, y como espesante culinario fino, de textura más suave que la fécula de achira. Planta de sotobosque que tolera sombra parcial, apta para asocio bajo frutales de dosel. Lección pedagógica: es un caso de homonimia regional (dos plantas distintas llamadas 'sagú' en Colombia) que enseña la importancia del nombre científico para no confundir especies con usos y manejo agronómico distintos, complementando el caso similar ya documentado con el 'níspero'. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "oryza_sativa",
+      "nombre_comun": "Arroz",
+      "nombre_cientifico": "Oryza sativa L.",
+      "familia_botanica": "Poaceae",
+      "category": "cereales",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1000,
+        "max_absoluto": 1300
+      },
+      "temperatura_c": {
+        "helada_letal": 10,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 38
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "regular",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa (al voleo o en surco) en sistemas de secano o riego por inundación controlada; ciclo 100-150 días según variedad. Requiere lámina de agua constante en el sistema tradicional de riego (arroz de riego) o depende de lluvias en el arroz de secano."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "El arroz (Oryza sativa L., familia Poaceae) es uno de los cereales más cultivados de Colombia (Tolima, Huila, Casanare, Meta, Córdoba, Sucre), entre 0 y 1.300 msnm, y sorprendentemente no figuraba en el subset canónico v3.2 del catálogo (sí estaba en el seed histórico v3.1). Se cultivan dos grandes sistemas: arroz de riego, con inundación controlada de la parcela que suprime malezas y estabiliza la temperatura del suelo, y arroz de secano, dependiente de la distribución de lluvias, de menor rendimiento pero menor huella hídrica. El grano, envuelto en una cáscara (lemma y palea) que se retira en el trillado, es la base calórica de la dieta colombiana junto con el maíz y la papa. Lección pedagógica: el arroz de riego es un caso vivo para enseñar el manejo del agua como herramienta agronómica (control de malezas por inundación, no solo por riego), y la diferencia productiva entre sistemas de riego y secano en un mismo cultivo. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy; ICA Resolución 3168/2015 (variedades registradas).",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "glycine_max",
+      "nombre_comun": "Soya",
+      "nombre_cientifico": "Glycine max (L.) Merr.",
+      "familia_botanica": "Fabaceae",
+      "category": "granos_legumbres",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1000,
+        "max_absoluto": 1300
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa por semilla inoculada con Bradyrhizobium japonicum (bacteria fijadora de nitrógeno específica de la soya) para maximizar la fijación simbiótica; ciclo 90-130 días según variedad y fotoperiodo."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "La soya (Glycine max (L.) Merr., familia Fabaceae) es una leguminosa de grano de origen asiático cultivada comercialmente en Colombia principalmente en los Llanos Orientales (Meta, Casanare) y el Valle del Cauca, entre 0 y 1.300 msnm, como fuente de aceite vegetal y proteína (harina de soya para alimentación animal y humana). Requiere inoculación con la bacteria simbiótica específica Bradyrhizobium japonicum para fijar nitrógeno atmosférico eficientemente, ya que los suelos que no han tenido soya previamente carecen de esta cepa particular (a diferencia de otras leguminosas más generalistas como el fríjol). El grano, rico en proteína (~40%) y aceite (~20%), es la base de derivados como el tofu, la leche de soya y aceites comestibles. Lección pedagógica: enseña la especificidad hospedero-bacteria en la simbiosis rizobial (no todas las leguminosas comparten la misma cepa fijadora de nitrógeno) y la importancia de la inoculación como práctica agronómica, distinta del manejo de leguminosas nativas ya presentes en el catálogo. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy; ICA Resolución 3168/2015.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "sesamum_indicum",
+      "nombre_comun": "Ajonjolí / Sésamo",
+      "nombre_cientifico": "Sesamum indicum L.",
+      "familia_botanica": "Pedaliaceae",
+      "category": "granos_legumbres",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 900,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 25,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa por semilla pequeña; ciclo corto (90-120 días), muy tolerante a sequía una vez establecido, sensible en cambio a exceso de humedad y encharcamiento."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El ajonjolí o sésamo (Sesamum indicum L., familia Pedaliaceae) es una oleaginosa de origen africano-asiático cultivada en Colombia en zonas cálidas secas del Tolima, Huila y el Caribe, entre 0 y 1.200 msnm. Su cápsula, al madurar, se abre explosivamente liberando las pequeñas semillas oleaginosas (de ahí la expresión 'ábrete sésamo'), lo que exige cosechar justo antes de la apertura total para no perder grano en el campo. Las semillas, ricas en aceite (45-55%) y calcio, se consumen tostadas, en pasta (tahini), aceite prensado en frío o como decoración de panadería. Es un cultivo muy rústico y tolerante a sequía prolongada, adaptado a suelos pobres bien drenados, pero muy sensible al exceso de agua. Lección pedagógica: el mecanismo de dehiscencia explosiva de la cápsula del ajonjolí es un ejemplo vivo de estrategia de dispersión de semillas por presión interna, y su manejo de cosecha oportuna enseña la importancia de sincronizar la labor agrícola con la fenología reproductiva de la planta. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "phaseolus_coccineus",
+      "nombre_comun": "Fríjol ayocote / Fríjol trepador andino",
+      "nombre_cientifico": "Phaseolus coccineus L.",
+      "familia_botanica": "Fabaceae",
+      "category": "granos_legumbres",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2000,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 15,
+        "optimo_max": 20,
+        "max_tolerable": 25
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa asociada a maíz (que sirve de tutor natural) o con espaldera; a diferencia del fríjol común, puede manejarse como planta perenne de varios años en clima frío estable, aunque se cultiva generalmente como anual."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El fríjol ayocote o fríjol trepador andino (Phaseolus coccineus L., familia Fabaceae) es una leguminosa de grano grande y flor roja vistosa (poliniza por colibríes), documentada como cultivo de conservación campesina en clima frío de Antioquia junto al fríjol lima (Phaseolus lunatus) y el fríjol común (Phaseolus vulgaris), ambos ya presentes en el catálogo. Crece de forma natural en regiones húmedas por encima de 1.800 msnm, con hábito trepador vigoroso tradicionalmente asociado al maíz en el sistema milpa/chagra andina (el maíz como tutor vivo, el fríjol fijando nitrógeno). A diferencia del fríjol común, puede comportarse como planta perenne de raíz tuberosa en clima frío estable, aunque en la práctica campesina se maneja casi siempre como cultivo anual. Sus semillas grandes, de colores vistosos (rojo, blanco, jaspeado), se consumen secas cocidas. Lección pedagógica: muestra la diversidad genética del género Phaseolus más allá del fríjol común, la polinización ornitófila (por colibríes) como estrategia reproductiva, y el rol de custodios de semillas campesinos en la conservación de variedades poco comerciales. Fuentes Tier A: POWO Kew, GBIF; conservación de variedades en Antioquia (custodios de semillas, Phaseolus lunatus/coccineus/vulgaris).",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft",
+      "companions": [
+        "zea_mays"
+      ]
+    },
+    {
+      "id": "sechium_edule",
+      "nombre_comun": "Chayote / Cidra papa",
+      "nombre_cientifico": "Sechium edule (Jacq.) Sw.",
+      "familia_botanica": "Cucurbitaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1300,
+        "optimo_max": 2200,
+        "max_absoluto": 2600
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 15,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla (fruto entero)",
+        "notas": "Se 'siembra' el fruto entero maduro (que germina desde su única semilla interna sin separarla) enterrado parcialmente; enredadera muy vigorosa que requiere espaldera o enramada robusta, produce durante varios años desde una raíz tuberosa perenne."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El chayote o cidra papa (Sechium edule (Jacq.) Sw., familia Cucurbitaceae) es una cucurbita trepadora perenne de origen mesoamericano, cultivada en clima medio-frío de Boyacá, Cundinamarca, Santander y Nariño, entre 1.300 y 2.200 msnm. Su forma de propagación es inusual entre las hortalizas: se planta el fruto entero maduro (no la semilla separada), que germina espontáneamente desde su única semilla interna al enterrarlo parcialmente inclinado. La planta desarrolla una raíz tuberosa perenne (chinchayote) que también es comestible, además del fruto verde-claro arrugado que se consume cocido en sopas, sudados y rellenos. Es una enredadera de crecimiento muy vigoroso que cubre enramadas y techos rústicos, aportando sombra además de alimento. Lección pedagógica: el chayote enseña un modo de propagación poco común (fruto completo como 'semilla') y el concepto de tubérculo de reserva en una planta que además produce fruto aéreo comestible, es decir, dos órganos de almacenamiento/consumo en una sola especie. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "momordica_charantia",
+      "nombre_comun": "Balsamina / Achocha amarga",
+      "nombre_cientifico": "Momordica charantia L.",
+      "familia_botanica": "Cucurbitaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1400,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa o almácigo; enredadera de ciclo corto (60-70 días a primera cosecha) muy productiva, tutorada en espaldera baja. Se cosecha el fruto inmaduro verde, antes de que amarillee y se abra revelando arilos rojos dulces."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "La balsamina o achocha amarga (Momordica charantia L., familia Cucurbitaceae) es una enredadera de origen asiático-africano naturalizada en zonas cálidas y templadas de Colombia (huertos caseros, cercas, rastrojos), entre 0 y 1.800 msnm, cultivada también con fines ornamentales-medicinales por su fruto verrugoso característico. Se cosecha inmadura (verde) para uso culinario, cuando su amargor intenso (por compuestos tipo cucurbitacinas y momordicina) se modera con remojo en agua salada antes de cocinar, técnica tradicional en cocinas asiáticas adoptada localmente; si se deja madurar, el fruto amarillea y se abre exponiendo semillas cubiertas de un arilo rojo brillante dulce, comestible en pequeñas cantidades. Tradicionalmente usada también en infusión por su reputación hipoglucemiante, aunque su consumo en grandes cantidades no está exento de riesgo (no reemplaza tratamiento médico). Lección pedagógica: enseña que un mismo fruto puede pasar de intensamente amargo (inmaduro) a dulce (maduro) según su estado de desarrollo, y la técnica de remojo salino como método tradicional de reducción de amargor en hortalizas. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "basella_alba",
+      "nombre_comun": "Espinaca malabar / Beledo",
+      "nombre_cientifico": "Basella alba L.",
+      "familia_botanica": "Basellaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1400,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 22,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa o almácigo; enredadera de hoja suculenta de crecimiento muy rápido y cosecha continua por corte de brotes tiernos, tolerante al calor y humedad donde la espinaca común (Spinacia oleracea) se estresa y sube a flor."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "La espinaca malabar o beledo (Basella alba L., familia Basellaceae) es una enredadera de hoja comestible de origen del sudeste asiático, naturalizada en huertos de clima cálido-húmedo de Colombia (Caribe, Pacífico, Meta), entre 0 y 1.800 msnm, donde suple a la espinaca común (Spinacia oleracea, cultivo de clima frío ya presente en el catálogo) en climas donde esta no prospera. Sus hojas suculentas y ligeramente mucilaginosas se consumen cocidas como sustituto de espinaca en sopas y guisos, con sabor suave y textura algo gelatinosa al cocinar (similar al efecto del quimbombó). Es una planta de altísima productividad por unidad de área en clima cálido, con cosecha continua por corte de puntas y hojas jóvenes durante meses. Lección pedagógica: ilustra el concepto de especies 'sustitutas ecológicas' que cumplen la misma función culinaria (hoja verde de sopa) que un cultivo de clima frío, pero adaptadas a un piso térmico distinto, ampliando las opciones de hortaliza de hoja en la chagra de tierra caliente. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "capsicum_frutescens",
+      "nombre_comun": "Ají tabasco / Ají pique",
+      "nombre_cientifico": "Capsicum frutescens L.",
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1200,
+        "max_absoluto": 1600
+      },
+      "temperatura_c": {
+        "helada_letal": 3,
+        "optimo_min": 22,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra en almácigo con trasplante a los 30-45 días; arbusto perenne de vida más larga que el ají anual común, con floración y fructificación continua durante varios años en clima cálido estable."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El ají tabasco o ají pique (Capsicum frutescens L., familia Solanaceae) es una especie de ají distinta de las ya presentes en el catálogo (C. chinense, C. annuum, C. baccatum, C. pubescens), reconocible por sus frutos pequeños erectos muy picantes y su hábito de arbusto perenne longevo, típico de patios y huertos del Pacífico y la costa Caribe colombianos, entre 0 y 1.600 msnm. Es la especie base del tabasco comercial (salsa picante) y de numerosos ajíes pique regionales usados en cantidades mínimas como condimento por su altísimo nivel de capsaicina. A diferencia de los ajíes anuales de ciclo corto, el arbusto de C. frutescens puede producir de forma continua por varios años en clima cálido sin heladas, siendo un elemento permanente del huerto casero más que un cultivo de rotación estacional. Lección pedagógica: permite comparar dentro del género Capsicum (cinco especies ya en el catálogo con esta) cómo domesticaciones distintas de un mismo género dieron lugar a ajíes con hábitos de crecimiento (anual vs. perenne) y niveles de picor muy diferentes. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "portulaca_oleracea",
+      "nombre_comun": "Verdolaga",
+      "nombre_cientifico": "Portulaca oleracea L.",
+      "familia_botanica": "Portulacaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 2000,
+        "max_absoluto": 2600
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 15,
+        "optimo_max": 27,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "regular",
+      "propagation": {
+        "metodo_principal": "semilla (autosiembra)",
+        "notas": "Se autopropaga por semilla en suelos removidos (comportamiento de maleza noble); en huerto se favorece dejándola crecer en bordes o se siembra al voleo para cosecha de hojas y tallos tiernos."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "La verdolaga (Portulaca oleracea L., familia Portulacaceae) es una planta suculenta de amplísima distribución mundial, considerada maleza en muchos contextos agrícolas pero tradicionalmente cosechada como verdura silvestre en Colombia desde tierra caliente hasta clima frío moderado (0-2.600 msnm), presente espontáneamente en huertos, jardines y cultivos removidos de casi todo el país. Sus hojas y tallos suculentos, ricos en ácidos grasos omega-3 (inusual en una hortaliza de hoja) y mucílagos, se consumen crudos en ensalada o cocidos en sopas y guisos tradicionales, con sabor ligeramente ácido. Es planta de fotosíntesis C4/CAM facultativa, extremadamente eficiente en el uso del agua, capaz de completar su ciclo en suelos pobres y secos donde otras hortalizas fracasan. Lección pedagógica: la verdolaga enseña el valor nutricional y culinario de las llamadas 'malezas comestibles', replanteando la frontera entre maleza y hortaliza según la mirada agroecológica campesina, y su fisiología fotosintética C4/CAM como adaptación a estrés hídrico. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "aggregate",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "talinum_triangulare",
+      "nombre_comun": "Espinaca de Ceilán / Verdolaga de Guinea",
+      "nombre_cientifico": "Talinum triangulare (Jacq.) Willd.",
+      "familia_botanica": "Talinaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1200,
+        "max_absoluto": 1600
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 22,
+        "optimo_max": 27,
+        "max_tolerable": 33
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "regular",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa o por esqueje de tallo (enraiza fácilmente); cosecha continua por corte de hojas y brotes tiernos cada 2-3 semanas, planta perenne de patio de bajo mantenimiento."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "La espinaca de Ceilán o verdolaga de Guinea (Talinum triangulare (Jacq.) Willd., familia Talinaceae, emparentada con la verdolaga común Portulaca) es una hierba suculenta perenne de origen tropical americano, naturalizada en patios y huertos de clima cálido-húmedo de Colombia (Caribe, Pacífico, valles cálidos interandinos), entre 0 y 1.600 msnm. Sus hojas carnosas de sabor suave y ligeramente mucilaginoso se cosechan por corte continuo durante meses sin resembrar, siendo una de las hortalizas de hoja más resilientes al calor y la sequía moderada del huerto casero tropical, donde lechugas y espinacas de clima frío no prosperan. Se propaga con facilidad tanto por semilla como por esqueje de tallo enraizado directamente en tierra húmeda. Lección pedagógica: junto con la espinaca malabar (Basella alba) y la verdolaga (Portulaca oleracea), documentadas en este mismo lote, permite enseñar la existencia de un grupo de 'verduras de sustitución' suculentas tropicales que garantizan hoja verde fresca todo el año en climas donde las hortalizas de hoja templadas fallan. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "aggregate",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "amaranthus_dubius",
+      "nombre_comun": "Bledo",
+      "nombre_cientifico": "Amaranthus dubius Mart. ex Thell.",
+      "familia_botanica": "Amaranthaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 2000,
+        "max_absoluto": 2400
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 18,
+        "optimo_max": 26,
+        "max_tolerable": 33
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "regular",
+      "propagation": {
+        "metodo_principal": "semilla (autosiembra)",
+        "notas": "Se autopropaga abundantemente por semilla en suelos removidos; en huerto se cosecha por corte de hojas y puntas tiernas antes de floración, cuando el amargor de las hojas es mínimo."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El bledo (Amaranthus dubius Mart. ex Thell., familia Amaranthaceae) es una hierba de hoja comestible pantropical, pariente cercano del amaranto de grano (Amaranthus caudatus, ya presente en el catálogo) pero cultivado y recolectado por sus hojas tiernas en lugar de su semilla, práctica extendida en huertos campesinos de clima cálido a templado de Colombia (0-2.400 msnm). Se comporta como maleza noble de rápido crecimiento en suelos removidos y fertilizados (indicadora de fertilidad), cosechándose sus hojas y puntas tiernas antes de la floración para sopas y guisos, con un perfil nutricional rico en hierro, calcio y proteína vegetal comparable a otras hojas verdes oscuras. Lección pedagógica: muestra cómo un mismo género botánico (Amaranthus) puede aprovecharse por dos órganos distintos según la especie/uso —grano en el amaranto ornamental-alimentario andino, hoja en el bledo de huerto tropical—, y refuerza el concepto de planta indicadora de fertilidad del suelo. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "aggregate",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "chenopodium_album",
+      "nombre_comun": "Quelite / Cenizo",
+      "nombre_cientifico": "Chenopodium album L.",
+      "familia_botanica": "Amaranthaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "templado",
+        "frio",
+        "paramo"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 3000,
+        "max_absoluto": 3400
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 10,
+        "optimo_max": 17,
+        "max_tolerable": 24
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "regular",
+      "propagation": {
+        "metodo_principal": "semilla (autosiembra)",
+        "notas": "Se autopropaga por semilla en suelos removidos de clima frío; se cosechan hojas y puntas tiernas antes de floración; pariente silvestre de la quinua (Chenopodium quinoa) con la que comparte manejo similar como planta pionera de suelos fértiles."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El quelite o cenizo (Chenopodium album L., familia Amaranthaceae —antes Chenopodiaceae—, pariente silvestre de la quinua (Chenopodium quinoa) y la kañiwa (Chenopodium pallidicaule), ambas ya presentes en el catálogo) es una hierba de hoja comestible de amplia distribución en clima frío andino colombiano (Boyacá, Cundinamarca, Nariño), entre 1.800 y 3.000 msnm, frecuente como planta pionera de suelos removidos y ricos en nitrógeno (huertos, cultivos recién arados, rastrojos). Sus hojas jóvenes, cubiertas de una fina pruina blanquecina característica (de ahí 'cenizo'), se cosechan y consumen cocidas como verdura de hoja, tradición campesina andina que antecede en muchos casos al cultivo comercial de hortalizas introducidas. Al igual que la quinua, acumula compuestos como saponinas y oxalatos en cantidades moderadas, por lo que tradicionalmente se cocina antes de consumir en cantidad. Lección pedagógica: enseña el parentesco entre un 'quelite' silvestre recolectado y un grano andino domesticado (quinua) dentro del mismo género, mostrando el continuo entre planta silvestre comestible y cultivo domesticado. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "aggregate",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "lagenaria_siceraria",
+      "nombre_comun": "Totuma / Calabazo",
+      "nombre_cientifico": "Lagenaria siceraria (Molina) Standl.",
+      "familia_botanica": "Cucurbitaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1200,
+        "max_absoluto": 1600
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 22,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa o almácigo; enredadera vigorosa que requiere espaldera o enramada alta para que los frutos cuelguen rectos (deformación por apoyo en el suelo si no se tutora). Los frutos jóvenes se cosechan tiernos para consumo, los maduros se secan para uso como recipiente."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "La totuma o calabazo (Lagenaria siceraria (Molina) Standl., familia Cucurbitaceae) es una de las plantas cultivadas más antiguas del mundo (domesticada independientemente en varios continentes hace más de 10.000 años), presente en huertos de patio de clima cálido colombiano (Caribe, valles interandinos, Orinoquia) entre 0 y 1.600 msnm, con doble aprovechamiento: el fruto joven, de pulpa blanca suave, se consume cocido como hortaliza (sopas, guisos), mientras que el fruto maduro, una vez seco y vaciado, se usa tradicionalmente como recipiente (totuma para agua, mate para bebidas, maracas y otros utensilios), uso que probablemente antecede históricamente a su consumo como alimento en muchas culturas. En Colombia la palabra 'totuma' se usa también coloquialmente para el recipiente mismo, más allá de la planta. Lección pedagógica: la totuma enseña que una misma especie doméstica puede tener múltiples etapas de aprovechamiento según el estado de madurez del fruto (alimento cuando tierno, utensilio cuando seco), y su domesticación multicontinental independiente es un caso clásico de estudio en historia de la agricultura. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "musa_acuminata",
+      "nombre_comun": "Banano / Guineo",
+      "nombre_cientifico": "Musa acuminata Colla",
+      "familia_botanica": "Musaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1000,
+        "max_absoluto": 1300
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 22,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "hijuelos (rizoma)",
+        "notas": "Propagación por hijuelos de rizoma (colinos); ciclo 9-12 meses a primera cosecha, luego producción continua por resiembra natural de hijuelos. A diferencia del plátano (Musa paradisiaca, para cocción), el banano se consume principalmente crudo como fruta de postre."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "El banano o guineo (Musa acuminata Colla, familia Musaceae) es la especie base de las variedades de banano de mesa (dulce, se come crudo), distinta del plátano (Musa paradisiaca o híbridos AAB, ya presente en el catálogo), que se consume cocido por su almidón y menor dulzura en estado verde. En Colombia el banano de exportación (cultivar Cavendish) se concentra en el Urabá antioqueño y el Magdalena, mientras que variedades criollas de guineo (bocadillo, manzano) se cultivan en huertos de patio de casi toda la tierra caliente y media del país, entre 0 y 1.300 msnm. Se propaga vegetativamente por hijuelos de rizoma, ya que los cultivares comerciales modernos son triploides estériles (sin semillas viables), producto de siglos de selección humana. Lección pedagógica: junto al plátano ya documentado, permite enseñar la diferencia entre variedades de Musa para cocción y para consumo fresco, y el concepto de esterilidad por triploidía en plantas de propagación exclusivamente vegetativa. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy; ICA Resolución 3168/2015.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "diospyros_kaki",
+      "nombre_comun": "Caqui / Persimonio",
+      "nombre_cientifico": "Diospyros kaki L.f.",
+      "familia_botanica": "Ebenaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2000,
+        "optimo_max": 2600,
+        "max_absoluto": 2900
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 12,
+        "optimo_max": 18,
+        "max_tolerable": 24
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "injerto",
+        "notas": "Injerto de yema sobre patrón de Diospyros virginiana o kaki franco; árbol caducifolio que requiere horas-frío moderadas para brotación uniforme, manejado en Colombia de forma análoga al durazno, manzano y peral de clima frío andino ya presentes en el catálogo."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El caqui o persimonio (Diospyros kaki L.f., familia Ebenaceae) es un árbol frutal caducifolio de origen chino-japonés, introducido a Colombia y cultivado de forma incipiente en fincas de clima frío de Boyacá y Cundinamarca, en altitudes análogas a las de otros frutales caducifolios ya presentes en el catálogo (durazno, manzano, peral, membrillo), aproximadamente entre 2.000 y 2.600 msnm, donde las noches frescas suplen parcialmente el requerimiento de horas-frío que la especie tiene en su rango de origen subtropical. Su fruto, una baya anaranjada de pulpa dulce y textura gelatinosa cuando está muy maduro (astringente si se come antes de tiempo por alto contenido de taninos), se consume fresco o deshidratado. Lección pedagógica: junto a durazno, manzano y peral, permite enseñar el requerimiento de horas-frío (acumulación de temperaturas bajas invernales) como factor limitante para frutales caducifolios de origen templado cultivados en trópico de altura, y el fenómeno de astringencia por taninos que desaparece con la maduración completa. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy. Nota: la altitud óptima específica de cultivo comercial en Colombia no está consolidada en fuentes agronómicas nacionales consultadas; se estima por analogía con otros frutales caducifolios de Boyacá/Cundinamarca y debe validarse en campo.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "stevia_rebaudiana",
+      "nombre_comun": "Stevia",
+      "nombre_cientifico": "Stevia rebaudiana (Bertoni) Bertoni",
+      "familia_botanica": "Asteraceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 600,
+        "optimo_min": 1000,
+        "optimo_max": 1800,
+        "max_absoluto": 2200
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 18,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Propagación por esqueje enraizado (más confiable que semilla, de baja viabilidad y variabilidad genética alta); cosecha de hojas cada 60-90 días, varios cortes por año."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "La stevia (Stevia rebaudiana (Bertoni) Bertoni, familia Asteraceae) es un arbusto de origen paraguayo-brasileño cultivado en Colombia en clima medio (Valle del Cauca, Santander, Huila), entre 1.000 y 1.800 msnm, por sus hojas que contienen glucósidos de esteviol, compuestos hasta 300 veces más dulces que el azúcar de mesa pero sin aporte calórico ni impacto glicémico, usados como edulcorante natural alternativo al azúcar refinada y a edulcorantes sintéticos. Se propaga preferentemente por esqueje enraizado, ya que la semilla tiene baja viabilidad y produce plantas muy variables en dulzor. Las hojas se cosechan y secan para infusión directa o para extracción de esteviósido en agroindustria. Lección pedagógica: la stevia es un caso de estudio útil para introducir el concepto de edulcorante no calórico de origen vegetal frente al azúcar de caña (ya presente en el catálogo) y los edulcorantes sintéticos, relevante en la discusión campesina sobre alternativas saludables de endulzante en la chagra. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "laurus_nobilis",
+      "nombre_comun": "Laurel",
+      "nombre_cientifico": "Laurus nobilis L.",
+      "familia_botanica": "Lauraceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1600,
+        "optimo_max": 2400,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 12,
+        "optimo_max": 18,
+        "max_tolerable": 24
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Propagación por esqueje semileñoso (enraizamiento lento, meses) o semilla; arbusto/árbol de crecimiento lento muy longevo, tolerante a poda intensa (se usa también como seto ornamental)."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El laurel (Laurus nobilis L., familia Lauraceae, misma familia del aguacate ya presente en el catálogo) es un arbusto o árbol pequeño mediterráneo cultivado en clima frío-templado de Colombia (Boyacá, Cundinamarca, Nariño, Antioquia), entre 1.600 y 2.400 msnm, apreciado por sus hojas aromáticas perennes usadas como condimento clásico de sopas, guisos, caldos y encurtidos (una o dos hojas enteras que se retiran antes de servir, ya que no se mastican). De crecimiento lento pero muy longevo, tolera poda intensa y se usa también como seto ornamental o árbol de patio. Su aceite esencial (cineol, eugenol) le confiere propiedades antimicrobianas leves además del uso culinario. Lección pedagógica: el laurel enseña el concepto de hoja aromática de infusión prolongada en cocción (a diferencia de hierbas frescas que se agregan al final), y su longevidad como planta perenne de patio contrasta con las hortalizas de ciclo corto documentadas en este mismo lote. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "lippia_origanoides",
+      "nombre_comun": "Orégano de monte",
+      "nombre_cientifico": "Lippia origanoides Kunth",
+      "familia_botanica": "Verbenaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 200,
+        "optimo_min": 400,
+        "optimo_max": 1400,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 3,
+        "optimo_min": 20,
+        "optimo_max": 27,
+        "max_tolerable": 32
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Propagación por esqueje semileñoso o semilla; arbusto aromático rústico tolerante a sequía y suelos pobres, con cosecha de hojas y sumidades floridas para uso en fresco o secado."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El orégano de monte (Lippia origanoides Kunth, familia Verbenaceae) es un arbusto aromático nativo de Colombia, Brasil y Perú, distinto botánicamente del orégano europeo (Origanum vulgare, familia Lamiaceae, ya presente en el catálogo) aunque comparte nombre común y uso culinario similar como condimento de sopas, carnes y guisos. Se distribuye en zonas cálidas-templadas secas de Colombia, con investigación activa de la Universidad Nacional sede Palmira sobre la optimización de su producción y la caracterización de su aceite esencial, rico en carvacrol y timol, compuestos con actividad antimicrobiana y antifúngica documentada, usados también en veterinaria (aditivo alternativo a antibióticos promotores de crecimiento en avicultura y porcicultura). Arbusto rústico muy tolerante a sequía y suelos pobres, apto para cercas vivas aromáticas en zonas secas. Lección pedagógica: es un caso claro de convergencia de nombre común entre dos familias botánicas distintas (Verbenaceae vs. Lamiaceae) que comparten perfil aromático similar por poseer los mismos compuestos volátiles (carvacrol/timol), útil para enseñar que el nombre común 'orégano' no identifica una sola especie. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy; investigación Universidad Nacional de Colombia sede Palmira.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "minthostachys_mollis",
+      "nombre_comun": "Muña",
+      "nombre_cientifico": "Minthostachys mollis (Kunth) Griseb.",
+      "familia_botanica": "Lamiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2400,
+        "optimo_min": 2700,
+        "optimo_max": 3400,
+        "max_absoluto": 3700
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 8,
+        "optimo_max": 14,
+        "max_tolerable": 20
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Propagación por división de mata o esqueje; arbusto pequeño de zonas altoandinas y de páramo bajo, tradicionalmente usado también en poscosecha para proteger tubérculos almacenados de insectos plaga."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "La muña (Minthostachys mollis (Kunth) Griseb., familia Lamiaceae, misma familia de la menta y el romero ya presentes en el catálogo) es un arbusto aromático nativo de los Andes, con presencia confirmada en Colombia además de Ecuador, Perú, Bolivia, Argentina y Venezuela, distribuido en zonas altoandinas frías y de páramo bajo (aproximadamente 2.700-3.400 msnm). Sus hojas de aroma mentolado intenso se usan como condimento y en infusión digestiva-respiratoria en la medicina tradicional andina, y tradicionalmente también se han empleado esparcidas entre tubérculos almacenados (papa, oca, ulluco) como repelente natural de insectos de poscosecha en el sur del Perú, práctica de manejo poscosecha campesino de bajo costo. Lección pedagógica: la muña enseña el concepto de planta con doble función condimento-repelente, y el uso de compuestos volátiles vegetales como alternativa de bajo insumo al control químico de plagas de almacenamiento en la chagra andina. Fuentes: POWO Kew, GBIF Backbone Taxonomy (distribución Colombia-Ecuador-Perú-Bolivia). Nota: la altitud óptima específica para Colombia se estima por analogía regional andina; requiere confirmación de campo local (Nariño/Cauca).",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "pimenta_dioica",
+      "nombre_comun": "Pimienta gorda / Malagueta",
+      "nombre_cientifico": "Pimenta dioica (L.) Merr.",
+      "familia_botanica": "Myrtaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 900,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 27,
+        "max_tolerable": 32
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla; especie dioica (individuos macho y hembra separados) que requiere ambos sexos presentes para fructificación, similar en este aspecto al rambután ya documentado."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "La pimienta gorda o malagueta (Pimenta dioica (L.) Merr., familia Myrtaceae, misma familia del clavo y la pomarrosa ya presentes en el catálogo) es un árbol aromático de origen centroamericano-caribeño (México, Guatemala, Jamaica), cuyo cultivo en Colombia es incipiente y poco documentado, concentrado en algunas fincas experimentales del Caribe y la costa Pacífica en clima cálido húmedo (0-1.200 msnm estimado por analogía con su rango centroamericano de origen). Sus frutos secos, del tamaño de una pimienta grande, combinan en su aroma notas de clavo, canela y nuez moscada —de ahí su nombre en inglés 'allspice'— y se usan molidos como condimento en guisos, encurtidos y repostería caribeña. Especie dioica: requiere árboles macho y hembra plantados juntos para que las hembras fructifiquen, al igual que el rambután ya documentado en este lote. Lección pedagógica: junto al rambután, refuerza el concepto de dioecia como estrategia reproductiva vegetal que exige planificación de siembra (proporción de sexos) distinta al manejo de especies autofértiles. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy. Nota: extensión y altitud real de cultivo en Colombia no consolidadas en fuentes agronómicas nacionales; validar en campo.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "ziziphus_mauritiana",
+      "nombre_comun": "Guinda / Ciruela india",
+      "nombre_cientifico": "Ziziphus mauritiana Lam.",
+      "familia_botanica": "Rhamnaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "living_fence"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 900,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 3,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla o injerto de yema sobre patrón franco; árbol muy espinoso y rústico, extremadamente tolerante a sequía prolongada y suelos pobres, típico del bosque seco tropical."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "La guinda o ciruela india (Ziziphus mauritiana Lam., familia Rhamnaceae) es un árbol frutal de origen indo-asiático naturalizado en el bosque seco tropical del Caribe colombiano, registrado en Colombia con el nombre común 'guinda' (distinto de 'ponsigué', nombre usado para esta misma especie en Venezuela, y distinto también del azufaifo propiamente dicho, Ziziphus jujuba, especie asiática emparentada pero diferente). Su fruto, una drupa pequeña ovalada que pasa de verde a amarillo-rojizo al madurar, tiene pulpa crujiente dulce-ácida comparada con la manzana en miniatura, y se consume fresco o deshidratado. Es un árbol muy espinoso (espinas estipulares en pares) y extremadamente rústico, tolerante a sequías prolongadas y suelos pobres arenosos, por lo que se adapta bien como cerca viva defensiva además de productiva en zonas secas del Caribe. Lección pedagógica: es otro caso de nombre común regional que varía entre países para la misma especie ('guinda' en Colombia, 'ponsigué' en Venezuela), reforzando la lección ya presentada con el níspero y el sagú sobre la necesidad del nombre científico para evitar ambigüedad. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy; SiB Colombia (registro como 'Guinda').",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "vigna_radiata",
+      "nombre_comun": "Frijol mungo",
+      "nombre_cientifico": "Vigna radiata (L.) R.Wilczek",
+      "familia_botanica": "Fabaceae",
+      "category": "granos_legumbres",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1000,
+        "max_absoluto": 1300
+      },
+      "temperatura_c": {
+        "helada_letal": 6,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa; ciclo muy corto (60-90 días), ideal para rotación rápida entre cultivos principales. Grano pequeño verde muy usado germinado (brotes) además de seco."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El fríjol mungo (Vigna radiata (L.) R.Wilczek, familia Fabaceae) es una leguminosa de grano de origen indio, con cultivo minoritario y de nicho en Colombia (Valle del Cauca, Tolima) en comparación con el fríjol caupí (Vigna unguiculata) y el fríjol común (Phaseolus vulgaris) ya presentes en el catálogo, entre 0 y 1.300 msnm. Su rasgo distintivo de uso es que se consume mayoritariamente germinado como 'brotes de soya' (denominación comercial poco precisa, ya que en realidad son brotes de fríjol mungo y no de soya/Glycine max), una técnica sencilla de biodisponibilidad de nutrientes que cualquier hogar puede replicar en pocos días sin necesidad de tierra ni luz solar. También se consume seco en sopas y currys de origen asiático adoptados localmente. Ciclo muy corto (60-90 días), útil para rotaciones rápidas fijadoras de nitrógeno entre cultivos principales. Lección pedagógica: el fríjol mungo enseña la técnica de germinado casero como forma de aumentar biodisponibilidad de nutrientes sin cultivo en suelo, y corrige la confusión comercial frecuente entre 'brotes de soya' y brotes de fríjol mungo. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "citrus_reticulata",
+      "nombre_comun": "Mandarina",
+      "nombre_cientifico": "Citrus reticulata Blanco",
+      "familia_botanica": "Rutaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 200,
+        "optimo_min": 800,
+        "optimo_max": 1800,
+        "max_absoluto": 2200
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 18,
+        "optimo_max": 25,
+        "max_tolerable": 32
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "injerto",
+        "notas": "Injerto de yema sobre patrón de naranjo agrio o limón rugoso, según manejo estándar de cítricos; ciclo de 3-4 años a primera cosecha comercial desde injerto."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "La mandarina (Citrus reticulata Blanco, familia Rutaceae) es uno de los cítricos más consumidos de Colombia (Tolima, Huila, Santander, Valle del Cauca, eje cafetero), cultivada entre 200 y 2.200 msnm en clima cálido a templado, y complementa en el catálogo a la naranja (Citrus sinensis) y la lima Tahití (Citrus latifolia), ya presentes, ampliando la representación de cítricos de consumo masivo colombiano. Se distingue de estos por su cáscara delgada y fácilmente desprendible a mano (sin necesidad de cuchillo), rasgo que la hace popular como fruta de consumo directo e infantil, y por segmentos que se separan con facilidad. Al igual que otros cítricos, se propaga por injerto sobre patrones tolerantes a suelos específicos (naranjo agrio para suelos pesados, limón rugoso para suelos arenosos), técnica estándar de la citricultura mundial que asegura uniformidad varietal y adelanta la entrada en producción frente a la siembra por semilla. Lección pedagógica: junto a naranja y lima ya documentadas, permite enseñar el manejo de patrones e injertos en cítricos como técnica universal del grupo, y la variación de facilidad de pelado entre especies de un mismo género. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy; ICA Resolución 3168/2015.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "citrus_aurantiifolia",
+      "nombre_comun": "Limón común / Limón criollo",
+      "nombre_cientifico": "Citrus aurantiifolia (Christm.) Swingle",
+      "familia_botanica": "Rutaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1200,
+        "max_absoluto": 1600
+      },
+      "temperatura_c": {
+        "helada_letal": 1,
+        "optimo_min": 22,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "injerto",
+        "notas": "Injerto de yema sobre patrón de naranjo agrio; también se propaga por semilla para patios familiares no comerciales. Árbol espinoso de porte medio con floración y fructificación casi continua en clima cálido estable."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "El limón común o limón criollo (Citrus aurantiifolia (Christm.) Swingle, familia Rutaceae, conocido internacionalmente como 'Key lime' o 'lima mexicana') es el cítrico ácido de uso diario más extendido en la cocina colombiana (jugos, aderezos, ceviches, limonada), distinto de la lima Tahití (Citrus latifolia, ya presente en el catálogo, de fruto más grande y sin semillas) por su tamaño pequeño, alto contenido de semillas y aroma más intenso. Se cultiva en tierra caliente y media de casi todo el país (Caribe, Tolima, Huila, Valle del Cauca), entre 0 y 1.600 msnm, en árboles de porte medio espinosos con floración casi continua que permite cosecha escalonada durante buena parte del año en clima cálido estable. Lección pedagógica: junto a la lima Tahití, permite comparar dos cítricos ácidos de aspecto similar pero orígenes genéticos y usos culinarios distintos (con semilla y aroma intenso vs. sin semilla y aroma suave), un ejercicio útil de identificación varietal dentro de un género con altísima variabilidad e hibridación natural. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy; ICA Resolución 3168/2015.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "phyllanthus_acidus",
+      "nombre_comun": "Grosella / Grosella estrellada",
+      "nombre_comunes_regionales": [
+        "jumbalín"
+      ],
+      "nombre_cientifico": "Phyllanthus acidus (L.) Skeels",
+      "familia_botanica": "Phyllanthaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 800,
+        "max_absoluto": 1000
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 24,
+        "optimo_max": 28,
+        "max_tolerable": 33
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla o esqueje; árbol de porte medio con los frutos agrupados en racimillos sobre ramillas cortas cerca del tronco, cosecha manual selectiva por grado de madurez."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "La grosella o grosella estrellada (Phyllanthus acidus (L.) Skeels, familia Phyllanthaceae), llamada 'jumbalín' en el archipiélago de San Andrés y Providencia, es un árbol frutal de origen surasiático cultivado tradicionalmente en patios del Caribe colombiano (Santa Marta, Cartagena, Guajira) y reportado también en Cali, entre 0 y 1.000 msnm. Sus frutos pequeños, translúcidos, acostillados en forma de estrella al corte transversal, son muy ácidos para comer directamente del árbol, por lo que su uso principal es el dulce de grosella tradicional, muy apreciado en Semana Santa en la costa Caribe (especialmente Guajira y Magdalena), preparado en almíbar espeso. Es una fruta de patio que ha ido desapareciendo de los huertos caseros costeños frente a otras opciones comerciales, similar en su trayectoria de erosión cultural a la lúcuma andina ya documentada en este lote. Lección pedagógica: enseña cómo un fruto demasiado ácido para consumo fresco puede tener alto valor cultural-culinario procesado (dulce en almíbar), y documenta la pérdida progresiva de árboles frutales tradicionales de patio caribeño. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy; registros etnobotánicos de Santa Marta/Guajira (dulce de grosella).",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "averrhoa_bilimbi",
+      "nombre_comun": "Mimbro / Vinagrillo",
+      "nombre_cientifico": "Averrhoa bilimbi L.",
+      "familia_botanica": "Oxalidaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 800,
+        "max_absoluto": 1000
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 24,
+        "optimo_max": 28,
+        "max_tolerable": 33
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla; árbol de porte medio con frutos en racimillos que nacen directamente sobre tronco y ramas gruesas (caulifloria, mismo fenómeno documentado en la jaboticaba ya presente en el catálogo)."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El mimbro o vinagrillo (Averrhoa bilimbi L., familia Oxalidaceae, mismo género del carambolo ya documentado en este lote) es un árbol frutal de origen sudasiático naturalizado en tierra caliente húmeda de Colombia desde hace más de tres siglos (introducido a América vía Jamaica en el siglo XVIII y difundido después a Centro y Suramérica), presente en huertos de patio en clima cálido del país entre 0 y 1.000 msnm. A diferencia de su pariente el carambolo, de pulpa dulce-ácida agradable al paladar fresco, el fruto del mimbro es extremadamente ácido (por alto contenido de ácido oxálico) y prácticamente no se come crudo; su uso tradicional es como condimento agrio en sustitución del limón o el vinagre en encurtidos, salsas y bebidas refrescantes, de donde proviene su nombre común 'vinagrillo'. Al igual que la jaboticaba ya presente en el catálogo, presenta caulifloria (frutos que nacen directamente del tronco y ramas gruesas). Lección pedagógica: junto al carambolo, permite comparar dentro de un mismo género (Averrhoa) el rango de acidez entre dos especies emparentadas y sus usos culinarios opuestos (fruta fresca vs. condimento agrio), reforzando también el concepto de caulifloria ya introducido con la jaboticaba. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
+      "tracking_mode": "individual",
+      "cultivar": false,
+      "validation_level": "claude_draft"
     }
   ],
   "sources": [

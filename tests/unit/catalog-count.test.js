@@ -22,7 +22,10 @@ describe('Catalog Count - Task #189', () => {
     // 2026-06-25: ampliación grounded grafo→catálogo (+267 especies cultivables y
     // nativas con asocio construidas desde public/cycle-content + AGE chagra_kg) →
     // 263 → 530. Ver feat(catalogo) promover grafo→catálogo + backfill asociaciones.
-    expect(catalog.species.length).toBe(530);
+    // 2026-07-04: +50 especies comestibles (frutales/hortalizas/tubérculos/
+    // aromáticas relevantes para Colombia, incluido el lichi/Litchi chinensis
+    // notado como faltante) → 530 → 580. Ver scripts/add-50-comestibles.mjs.
+    expect(catalog.species.length).toBe(580);
   });
 
   it('should include Carludovica palmata (palma de iraca) - Task #iraca-seed', () => {
@@ -59,7 +62,8 @@ describe('Catalog Count - Task #189', () => {
     // inicial + 58 páramo Cruz Verde). Antes declaraba 204 (off-by-one heredado).
     // El conteo declarado DEBE coincidir con el array real.
     // 2026-06-25: 263 → 530 tras ampliación grounded grafo→catálogo.
-    expect(catalog._subset_meta.species_count).toBe(530);
+    // 2026-07-04: 530 → 580 tras +50 especies comestibles.
+    expect(catalog._subset_meta.species_count).toBe(580);
     expect(catalog._subset_meta.species_count).toBe(catalog.species.length);
   });
   
@@ -98,5 +102,40 @@ describe('Catalog Count - Task #189', () => {
     expect(newSpeciesIds).toContain('canavalia_ensiformis');
     expect(newSpeciesIds).toContain('vigna_unguiculata');
     expect(newSpeciesIds).toContain('lablab_purpureus');
+  });
+
+  it('should include Litchi chinensis (lichi) - notado como faltante por el operador', () => {
+    const catalogPath = path.join(__dirname, '../../catalog/chagra-catalog-oss-subset-v3.2.json');
+    const catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf-8'));
+
+    const lichi = catalog.species.find((s) => s.id === 'litchi_chinensis');
+    expect(lichi).toBeDefined();
+    expect(lichi.nombre_cientifico).toBe('Litchi chinensis Sonn.');
+    expect(lichi.familia_botanica).toBe('Sapindaceae');
+    expect(lichi.category).toBe('frutales_perennes');
+  });
+
+  it('should include the 50 especies comestibles batch (2026-07-04)', () => {
+    const catalogPath = path.join(__dirname, '../../catalog/chagra-catalog-oss-subset-v3.2.json');
+    const catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf-8'));
+    const ids = catalog.species.map((s) => s.id);
+
+    for (const id of [
+      'litchi_chinensis', 'nephelium_lappaceum', 'garcinia_mangostana', 'dimocarpus_longan',
+      'annona_muricata', 'annona_reticulata', 'tamarindus_indica', 'morinda_citrifolia',
+      'plukenetia_volubilis', 'averrhoa_carambola', 'anacardium_occidentale', 'quararibea_cordata',
+      'syzygium_malaccense', 'carica_papaya', 'vitis_vinifera', 'manilkara_zapota',
+      'pouteria_lucuma', 'manihot_esculenta_dulce', 'poraqueiba_sericea', 'theobroma_subincanum',
+      'elaeis_oleifera', 'acrocomia_aculeata', 'cucurbita_ficifolia', 'maranta_arundinacea',
+      'oryza_sativa', 'glycine_max', 'sesamum_indicum', 'phaseolus_coccineus', 'sechium_edule',
+      'momordica_charantia', 'basella_alba', 'capsicum_frutescens', 'portulaca_oleracea',
+      'talinum_triangulare', 'amaranthus_dubius', 'chenopodium_album', 'lagenaria_siceraria',
+      'musa_acuminata', 'diospyros_kaki', 'stevia_rebaudiana', 'laurus_nobilis',
+      'lippia_origanoides', 'minthostachys_mollis', 'pimenta_dioica', 'ziziphus_mauritiana',
+      'vigna_radiata', 'citrus_reticulata', 'citrus_aurantiifolia', 'phyllanthus_acidus',
+      'averrhoa_bilimbi',
+    ]) {
+      expect(ids, `falta especie comestible: ${id}`).toContain(id);
+    }
   });
 });
