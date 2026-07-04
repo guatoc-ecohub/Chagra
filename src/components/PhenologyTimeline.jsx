@@ -1,6 +1,37 @@
 import React, { useMemo } from 'react';
 import { Clock, Eye, HelpCircle, AlertTriangle, CheckCircle, Sprout, Timer } from 'lucide-react';
 import { calculateWindows, formatWindow, getCurrentStage } from '../services/phenologyCalculator';
+import { GLYPHS } from './CicloVivo/cicloVivoArte';
+
+// Glifo campesino por etapa fenológica. Reusa la familia de arte aprobada de
+// "El Ciclo Vivo" (cicloVivoArte) para que la línea de tiempo y la rueda hablen
+// el MISMO idioma visual: cada etapa se reconoce por su ilustración, no solo por
+// un punto de color. El color es la paleta canónica de fase (semilla parda →
+// cosecha dorada). Solo presentación; el código de etapa no cambia.
+const STAGE_GLYPH = {
+  sowing: { key: 'semilla', color: '#A9793F' },
+  emergence: { key: 'germinacion', color: '#7CA46B' },
+  vegetative: { key: 'crecimiento', color: '#5B9146' },
+  flowering: { key: 'floracion', color: '#E8879C' },
+  fruiting: { key: 'fructificacion', color: '#DA6236' },
+  harvest_window: { key: 'cosecha', color: '#D49A46' },
+  closed: { key: 'poscosecha', color: '#C9A227' },
+};
+
+/** Glifo de etapa (silueta campesina de la fase, coloreada por su paleta). */
+function StageGlyph({ code, size }) {
+  const g = STAGE_GLYPH[code];
+  if (!g || typeof GLYPHS[g.key] !== 'function') return null;
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="-12 -12 24 24"
+      aria-hidden="true"
+      dangerouslySetInnerHTML={{ __html: GLYPHS[g.key](g.color) }}
+    />
+  );
+}
 
 // Colores theme-aware: la rampa slate/emerald/amber y los acentos custom
 // (orchid/morpho) se remapean por tema (themes.css / tailwind.config.js), así el
@@ -11,19 +42,6 @@ const confidenceColor = (c) => {
   if (c >= 0.6) return 'text-emerald-300';
   if (c >= 0.4) return 'text-amber-400';
   return 'text-slate-500';
-};
-
-const stageColor = (code) => {
-  const map = {
-    sowing: 'bg-emerald-800 border-emerald-600',
-    emergence: 'bg-emerald-700 border-emerald-500',
-    vegetative: 'bg-emerald-600 border-emerald-400',
-    flowering: 'bg-orchid border-orchid',
-    fruiting: 'bg-amber-700 border-amber-500',
-    harvest_window: 'bg-amber-600 border-amber-400',
-    closed: 'bg-slate-700 border-slate-500',
-  };
-  return map[code] || 'bg-slate-700 border-slate-500';
 };
 
 /**
@@ -125,10 +143,25 @@ export default function PhenologyTimeline({
                   : ''
               }`}
             >
-              {/* Indicador de etapa */}
+              {/* Indicador de etapa: medallón con el glifo campesino de la fase.
+                  La identidad de color viaja en el propio glifo (paleta de fase);
+                  el disco es un fondo neutro que deja leer la ilustración y porta
+                  los estados (observada / estimada / pasada). */}
               <div className="flex flex-col items-center gap-0.5 shrink-0">
-                <div className={`rounded-full border ${isCurrent ? 'w-3.5 h-3.5' : 'w-3 h-3'} ${stageColor(win.code)} ${isObservedCurrent ? 'ring-2 ring-emerald-400/50' : ''} ${isEstimatedCurrent ? 'ring-2 ring-morpho/40 border-dashed' : ''} ${isPast ? 'opacity-50' : ''}`} />
-                {i < windows.length - 1 && <div className="w-px h-4 bg-slate-700" />}
+                <div
+                  className={`grid place-items-center rounded-full border shrink-0 transition-colors ${
+                    isCurrent ? 'w-7 h-7' : 'w-6 h-6'
+                  } ${
+                    isObservedCurrent
+                      ? 'bg-emerald-500/15 border-emerald-500/50 ring-2 ring-emerald-400/40'
+                      : isEstimatedCurrent
+                        ? 'bg-morpho/10 border-dashed border-morpho/45 ring-2 ring-morpho/30'
+                        : 'bg-slate-800/70 border-slate-700'
+                  } ${isPast ? 'opacity-50' : ''}`}
+                >
+                  <StageGlyph code={win.code} size={isCurrent ? 18 : 15} />
+                </div>
+                {i < windows.length - 1 && <div className="w-px h-4 bg-slate-700/70" />}
               </div>
 
               {/* Contenido */}
