@@ -113,6 +113,9 @@ const SaludSueloScreen = lazy(() => import('./components/SaludSueloScreen'));
 // LOS MUNDOS DE MI FINCA (reestructuración 2.0 del home): un mundo por dentro —
 // las funciones existentes agrupadas por lugar. Re-rutea, no reimplementa.
 const MundoScreen = lazy(() => import('./components/MundoScreen'));
+// Mini-app insignia del mundo Sanidad: síntoma folk → plaga/enfermedad →
+// manejo agroecológico (grounded DR AGROSAVIA/Cenicafé/SciELO + FAO/IPM).
+const SanidadSintomaScreen = lazy(() => import('./components/sanidad/SanidadSintomaScreen'));
 const CromatografiaScreen = lazy(() => import('./components/CromatografiaScreen'));
 const CicloVivoFullView = lazy(() => import('./components/CicloVivo/CicloVivoFullView'));
 const ToxicologiaScreen = lazy(() => import('./components/ToxicologiaScreen'));
@@ -226,7 +229,7 @@ const MODULE_VIEWS = new Set([
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
-  'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
+  'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'salud_suelo', 'toxicologia', 'aprende', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
@@ -933,6 +936,21 @@ export default function App() {
               initialLocationId={currentViewData?.locationId}
               initialWkt={currentViewData?.wkt}
             />
+          </ErrorBoundary>
+        );
+      case 'sanidad_sintoma':
+        // Mini-app insignia "Sanidad de la mata": el campesino dice el síntoma
+        // folk → la app desambigua (cultivo/detalle) → causa + manejo
+        // agroecológico. Vuelve al mundo Sanidad.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Sanidad de la mata">
+              <SanidadSintomaScreen
+                onBack={() => navigate('mundo', { mundo: 'sanidad' })}
+                onHome={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'mantenimiento':
