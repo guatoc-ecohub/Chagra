@@ -104,6 +104,7 @@ const CicloNutrientesScreen = lazy(() => import('./components/CicloNutrientesScr
 const CalendarioFincaScreen = lazy(() => import('./components/CalendarioFincaScreen'));
 const SeguimientoProcesoScreen = lazy(() => import('./components/SeguimientoProcesoScreen'));
 const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
+const SaludSueloScreen = lazy(() => import('./components/SaludSueloScreen'));
 const CromatografiaScreen = lazy(() => import('./components/CromatografiaScreen'));
 const CicloVivoFullView = lazy(() => import('./components/CicloVivo/CicloVivoFullView'));
 const ToxicologiaScreen = lazy(() => import('./components/ToxicologiaScreen'));
@@ -192,6 +193,9 @@ const HASH_VIEW_ROUTES = {
   'mundo-subsuelo': 'subsuelo',
   toxicologia: 'toxicologia',
   suelo: 'suelo',
+  'salud-suelo': 'salud_suelo',
+  'cuaderno-suelo': 'salud_suelo',
+  encalado: 'salud_suelo',
   aprende: 'aprende',
   directorio: 'directorio',
   'directorio-especies': 'directorio',
@@ -209,7 +213,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'toxicologia', 'aprende', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'salud_suelo', 'toxicologia', 'aprende', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
   'usage_stats', 'mercado', 'auditoria_inventario',
@@ -1231,6 +1235,14 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Diagnostico de Suelo">
               <SoilDiagnosticScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'salud_suelo':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Salud del Suelo">
+              <SaludSueloScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );

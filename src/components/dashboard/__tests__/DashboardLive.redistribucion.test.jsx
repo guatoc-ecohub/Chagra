@@ -162,7 +162,7 @@ describe('Home F2 — reorganización en 5 bloques (audit 2026-06-26)', () => {
     const labels = within(aprender).getAllByRole('button').map(labelOf);
     expect(labels).not.toContain('Aprender');
     expect(labels).toEqual([
-      'Casos reales', 'Ciclo de nutrientes', 'Biopreparados', 'Suelo', 'Seguridad', 'Preguntas frecuentes', 'Sacar reportes',
+      'Casos reales', 'Ciclo de nutrientes', 'Biopreparados', 'Suelo', 'Cuaderno del Suelo', 'Seguridad', 'Preguntas frecuentes', 'Sacar reportes',
     ]);
   });
 
