@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { GroupedVirtuoso } from 'react-virtuoso';
 import { Clock, Filter, CheckCircle, Package, ArrowRightLeft, History } from 'lucide-react';
 import { openDB, STORES } from '../db/dbCore';
+import EmptyStateCampo from './common/EmptyStateCampo.jsx';
+import SkeletonCampo from './common/SkeletonCampo.jsx';
 
 const TYPE_CONFIG = {
     input: { icon: ArrowRightLeft, color: 'text-blue-400', label: 'Consumo' },
@@ -134,9 +136,12 @@ export default function InventoryEventTimeline({ itemId }) {
 
     if (loading) {
         return (
-            <div className="p-12 text-center text-slate-500 animate-pulse bg-slate-900/20 rounded-2xl border border-slate-800/50">
-                <History size={32} className="mx-auto mb-3 opacity-20 animate-spin-slow" />
-                <span className="text-xs font-black tracking-widest uppercase">Consultando Inventario…</span>
+            <div className="p-6 bg-slate-900/20 rounded-2xl border border-slate-800/50">
+                <SkeletonCampo
+                    variant="timeline"
+                    count={3}
+                    label="Consultando inventario…"
+                />
             </div>
         );
     }
@@ -168,12 +173,12 @@ export default function InventoryEventTimeline({ itemId }) {
 
             <div className="flex-1 min-h-0 border-l-2 border-slate-800/50 ml-6 my-4 relative">
                 {flatEvents.length === 0 ? (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-600 px-8 text-center">
-                        <div className="w-16 h-16 rounded-full bg-slate-900 flex items-center justify-center mb-4 border border-slate-800">
-                            <History size={32} className="opacity-20" />
-                        </div>
-                        <p className="text-xs font-bold uppercase tracking-widest">Sin actividad registrada</p>
-                        <p className="text-[10px] mt-1 opacity-50">Los movimientos de este ítem aparecerán aquí.</p>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center px-8">
+                        <EmptyStateCampo
+                            variant="bitacora"
+                            title="Sin actividad registrada"
+                            hint="Cada consumo, abastecimiento o auditoría de este ítem queda anotado aquí, como en el cuaderno de la finca."
+                        />
                     </div>
                 ) : (
                     <GroupedVirtuoso

@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Package, AlertTriangle, Plus, X, Download } from 'lucide-react';
+import EmptyStateCampo from './common/EmptyStateCampo.jsx';
 import useAssetStore from '../store/useAssetStore';
 import { UNIT_OPTIONS } from '../config/materials';
 import { useConsumptionMetrics } from '../hooks/useConsumptionMetrics';
@@ -339,12 +340,12 @@ export const InventoryDashboard = () => {
       </div>
 
       {materials.length === 0 ? (
-        <div className="py-12 text-center text-slate-500">
-          <Package size={40} className="mx-auto mb-3 opacity-40" />
-          <p className="text-sm">No hay insumos registrados en bodega.</p>
-          <p className="text-xs mt-1 opacity-70">
-            Agrega un material desde el panel de Activos para comenzar a trackear el inventario.
-          </p>
+        <div className="py-10">
+          <EmptyStateCampo
+            variant="bodega"
+            title="No hay insumos registrados en bodega."
+            hint="Los estantes esperan tu primer biopreparado. Agrega un material desde el panel de Activos y aquí llevamos la cuenta de cada litro y cada kilo."
+          />
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
