@@ -304,11 +304,12 @@
 .cvivo-card-emblem svg { width: 100%; height: 100%; display: block; overflow: visible; }
 .cvivo-card-body { flex: 1; min-width: 0; }
 .cvivo-card-eyebrow {
+  display: block;
   font-size: 10px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase;
   color: var(--cv-ocre); margin: 0 0 2px;
 }
-.cvivo-card-title { font-family: var(--cv-font-display); font-size: 17px; color: var(--cv-green-deep); margin: 0 0 4px; font-weight: 600; }
-.cvivo-card-sub { font-size: 12px; color: var(--cv-ink-soft); line-height: 1.35; margin: 0 0 8px; }
+.cvivo-card-title { display: block; font-family: var(--cv-font-display); font-size: 17px; color: var(--cv-green-deep); margin: 0 0 4px; font-weight: 600; }
+.cvivo-card-sub { display: block; font-size: 12px; color: var(--cv-ink-soft); line-height: 1.35; margin: 0 0 8px; }
 .cvivo-card-states { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .cvivo-state-pill {
   font-size: 10.5px; font-weight: 700; padding: 3px 8px; border-radius: 10px;

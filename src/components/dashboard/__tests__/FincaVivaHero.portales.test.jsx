@@ -23,6 +23,12 @@ vi.mock('../../../config/glaciarAccess', () => ({
   tieneAccesoGlaciarActual: () => false,
   esOperadorActual: () => false,
 }));
+// La campana real arrastra media app (stores + climaService + notificaciones);
+// aquí solo probamos el RUTEO del header, así que va un stub con el mismo rol
+// accesible que la de verdad.
+vi.mock('../../NotificationsBell', () => ({
+  default: () => <button type="button" aria-label="Notificaciones" data-testid="bell-stub" />,
+}));
 
 import FincaVivaHero from '../FincaVivaHero';
 
@@ -139,5 +145,22 @@ describe('FincaVivaHero — barra superior sin botones muertos', () => {
     expect(perfil).toHaveAttribute('aria-label', 'Mi perfil');
     // Ambos viven en la misma barra de pastillas (mismo contenedor).
     expect(ayuda.parentElement).toBe(perfil.parentElement);
+  });
+
+  test('regresión 2026-07-04: agente(A) + campana + ayuda + perfil COEXISTEN en el header', () => {
+    const onNavigate = vi.fn();
+    const onOpenAgent = vi.fn();
+    render(<FincaVivaHero onNavigate={onNavigate} onOpenAgent={onOpenAgent} onGestionar={vi.fn()} />);
+    // La A de marca ES el botón del agente (en biopunk la A invoca al agente),
+    // NO el perfil — son botones distintos y ambos deben estar.
+    const agenteA = screen.getByTestId('fvh-brand-agente');
+    fireEvent.click(agenteA);
+    expect(onOpenAgent).toHaveBeenCalledTimes(1);
+    expect(onNavigate).not.toHaveBeenCalledWith('perfil');
+    // Campana (F2 no monta el TopBar legacy: la campana vive aquí).
+    expect(screen.getByRole('button', { name: 'Notificaciones' })).toBeInTheDocument();
+    // Y el cuarteto completo, visible a la vez.
+    expect(screen.getByRole('button', { name: 'Ayuda' })).toBeInTheDocument();
+    expect(screen.getByTestId('finca-viva-perfil')).toBeInTheDocument();
   });
 });

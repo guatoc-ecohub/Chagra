@@ -3,7 +3,7 @@ import { CAPABILITY_MANIFEST } from '../../services/agentCapabilities';
 import { getCapabilityHealth, SIDECAR_TOOL_NAMES } from '../../services/capabilityHealth';
 import { isSidecarEnabled } from '../../services/sidecarClient';
 import {
-  relax, nodeRect, rimPoint, shelfPack, treeLadder, placeLeavesNoClash,
+  relax, nodeRect, rimPoint, fanPlace, treeLadder, placeLeavesNoClash,
 } from './agentRedMenuGeom';
 
 /**
@@ -12,8 +12,16 @@ import {
  * PORT FIEL del demo aprobado por el operador (`/tmp/red-demo/fable.html`,
  * "aprobados los dos están del putas"): geometría calculada en vivo, ramas
  * Bézier orgánicas con semilla estable, relajación anticolisión, animación
- * por rAF con lerps exponenciales, 3 temas (biopunk/nature/minimalista),
- * nodos icon-first (emoji a color) y 2 niveles grupo→capacidad.
+ * por rAF con lerps exponenciales, 4 temas (biopunk/nature/minimalista/
+ * huerto=verde-vivo), nodos icon-first (emoji a color).
+ *
+ * RED VIVA DE 2 NIVELES (2026-07-04): al abrir la mano, de la Ⓐ brotan
+ * ANIMADAS las RAMAS-GRUPO (~6-8 dominios del manifiesto, nivel 1) en abanico
+ * radial (fanPlace: anillos entrelazados desde la raíz — organismo, no fila).
+ * Tocar una rama despliega SUS hojas = las capacidades TAPPABLES (nivel 2) y
+ * el resto se atenúa; la miga "‹ Volver" pliega. Las opciones SON los nodos
+ * de la red. Las 6 destacadas (featured) brotan primero dentro de su rama con
+ * anillo resaltado (arm-featleaf).
  *
  * Diferencias de integración vs el demo (contrato de producción):
  *   - Datos REALES del manifiesto único (CAPABILITY_MANIFEST, hero===true),
@@ -42,11 +50,14 @@ import {
  *   - `prefers-reduced-motion` → sin loop rAF: un solo paint al estado final.
  *   - Cleanup completo: rAF, timers, ResizeObserver, MutationObserver, paths.
  *
- * Mecánicas por tema (refinamiento 2026-06-10):
- *   - biopunk / minimalista → "micorriza": la red brota del botón Ⓐ
+ * Mecánicas por tema (refinamiento 2026-06-10; huerto 2026-07-04):
+ *   - biopunk / minimalista / huerto → "micorriza": la red brota del botón Ⓐ
  *     (abajo-izquierda) y se despliega en diagonal hacia ARRIBA-DERECHA,
  *     al espacio libre del hero. Al enfocar, el grupo VIAJA al hub (sobre la
  *     diagonal) y los demás se vuelven yemas recogidas junto al origen.
+ *     biopunk = micorriza NEÓN con nodos que pulsan; minimalista = monoline
+ *     sobrio; huerto (tema verde-vivo) = guías/enredaderas verde-hoja con
+ *     halo de sol, orbes-fruto irregulares y polen dorado.
  *   - nature → "árbol": tronco vertical CENTRADO que brota + ramas alternadas;
  *     una vena/raíz orgánica conecta el botón Ⓐ con la base del tronco (un
  *     solo organismo). Al enfocar, el follaje brota EN SITIO.
@@ -70,40 +81,30 @@ const GROUP_ORDER = Object.freeze([
   'cultivo', 'cuidar', 'observar', 'restaurar', 'registrar', 'planear', 'aprender', 'vender',
 ]);
 
-/* DESTACADAS (operador 2026-06-28): las 6 funciones clave brotan PRIMERO en el
-   anillo principal como ACCIÓN DIRECTA (sin grupo), para que el primerizo las vea
-   de una. El RESTO de capacidades hero queda un nivel adentro, bajo su grupo
-   ("ver más"). Fuente única: featured===true en el manifiesto. NO se elimina
-   ninguna función — solo cambia la jerarquía de aparición. */
-const FEATURED = CAPABILITY_MANIFEST.filter((e) => e.hero === true && e.featured === true);
-const FEATURED_IDS = new Set(FEATURED.map((c) => c.id));
+/* RED VIVA DE 2 NIVELES (mano de Chagra, 2026-07-04): el nivel 1 son SOLO las
+   RAMAS-GRUPO (~6-8 dominios del manifiesto) que brotan de la Ⓐ; TODAS las
+   capacidades hero viven como HOJAS de su rama (nivel 2) — las opciones SON
+   los nodos de la red, no una lista. Las 6 destacadas (featured===true,
+   operador 2026-06-28) NO se pierden: brotan PRIMERO dentro de su rama y
+   llevan anillo resaltado (arm-featleaf) para que el primerizo las distinga.
+   NO se elimina ninguna función — solo cambia la jerarquía de aparición. */
+const heroOfGroup = (key) => {
+  const caps = CAPABILITY_MANIFEST.filter((e) => e.hero === true && e.group === key);
+  return [...caps.filter((c) => c.featured === true), ...caps.filter((c) => c.featured !== true)];
+};
 
-/* Grupos = el resto de capacidades hero (las NO destacadas), agrupadas. */
-const GROUPS = GROUP_ORDER
+/* Anillo principal = las ramas-grupo. kind:'group' siempre (el atajo
+   kind:'cap' de acción directa en el anillo se retiró al volver la mano una
+   red pura de 2 niveles). */
+const RING = GROUP_ORDER
   .map((key) => ({
+    kind: 'group',
     key,
     icon: GROUP_META[key].icon,
     label: GROUP_META[key].label,
-    leaves: CAPABILITY_MANIFEST.filter(
-      (e) => e.hero === true && e.group === key && !FEATURED_IDS.has(e.id),
-    ),
+    leaves: heroOfGroup(key),
   }))
   .filter((g) => g.leaves.length > 0);
-
-/* Anillo principal = [destacadas (acción directa)] + [grupos (despliegan su
-   resto al enfocar)]. Cada item tiene la MISMA forma que un grupo
-   (key/icon/label/leaves) para que el motor de geometría los trate igual: las
-   destacadas llevan kind:'cap' + cap y leaves:[] (no despliegan, accionan). El
-   orden (destacadas primero) define el orden de sprout: el primerizo ve brotar
-   primero las 6 funciones clave. */
-const RING = [
-  ...FEATURED.map((cap) => ({
-    kind: 'cap', key: cap.id, icon: cap.icon, label: cap.label, cap, leaves: [],
-  })),
-  ...GROUPS.map((g) => ({
-    kind: 'group', key: g.key, icon: g.icon, label: g.label, leaves: g.leaves,
-  })),
-];
 
 /* ══════════════ helpers geométricos (puros, port 1:1) ══════════════ */
 
@@ -177,11 +178,15 @@ const SPORES = Array.from({ length: 16 }, (_, k) => ({
   rise: `${(180 + rand(k + 7) * 280).toFixed(0)}px`,
 }));
 
-/** Tema efectivo desde <html data-theme> (useTheme ya resolvió 'auto'). */
+/** Tema efectivo desde <html data-theme> (useTheme ya resolvió 'auto').
+ *  Orgánica POR TEMA: biopunk=micorriza neón · nature=árbol · minimalista=
+ *  monoline sobrio · verde-vivo=HUERTO (guías verde-hoja + polen dorado —
+ *  antes caía a biopunk y la red neón desentonaba sobre la crema frondosa). */
 function readThemeKind() {
   const t = document.documentElement.getAttribute('data-theme');
   if (t === 'nature') return 'nature';
   if (t === 'minimalista') return 'min';
+  if (t === 'verde-vivo') return 'huerto';
   return 'biopunk';
 }
 
@@ -273,6 +278,31 @@ const CSS = `
   --hintC:rgba(31,88,71,.7);
   --trunkC:#2f6e5a; --trunkHi:#5ea58d;
 }
+/* ---- tema huerto (verde-vivo: la piel de la finca viva) ----
+   Guías de huerto: enredaderas verde-hoja vivo (#2e8b3d) con halo de sol
+   dorado, orbes crema-verdosa de silueta irregular (frutos/hortalizas),
+   anillo de hoja en ocre-sol y polen dorado que sube. Paleta 1:1 con
+   [data-theme="verde-vivo"] de index.css (operador 2026-06-24). */
+.arm-root[data-armtheme="huerto"]{
+  --fam:Inter,system-ui,Avenir,Helvetica,Arial,sans-serif;
+  --lblSize:13px; --lblSp:0; --lblW:700;
+  --lblC:#1c2a16; --lblBg:rgba(251,253,244,.97); --lblEdge:rgba(46,139,61,.55);
+  --lblShadow:0 2px 8px rgba(28,42,22,.18);
+  --branch:#2e8b3d; --coreW:3.4px;
+  --glowC:rgba(242,180,65,.35); --glowW:10px; --glowO:1; --glowBlur:2.5px;
+  --twigC:rgba(46,139,61,.7);
+  --orbBg:radial-gradient(circle at 32% 28%,#fbfdf4,#e9f0d8 75%);
+  --ringGroup:rgba(46,139,61,.85); --ringLeaf:rgba(224,146,46,.8); --ringW:2.5px;
+  --orbShadow:0 4px 12px rgba(28,42,22,.16),inset 0 1px 0 #fff;
+  --orbRadA:56% 44% 52% 48% / 46% 56% 44% 54%;
+  --orbRadB:45% 55% 50% 50% / 55% 45% 57% 43%;
+  --pulse:rgba(224,146,46,.5);
+  --spore:#f2b441; --spO:.65;
+  --crumbBg:rgba(251,253,244,.92); --crumbC:#1c2a16; --crumbEdge:rgba(46,139,61,.45);
+  --toastBg:#fbfdf4; --toastC:#1c2a16; --toastEdge:rgba(46,139,61,.4);
+  --hintC:rgba(64,80,44,.85);
+  --trunkC:#2e8b3d; --trunkHi:#7fbf6a;
+}
 .arm-root.arm-disabled{pointer-events:none;opacity:.55}
 /* La textura de ruido del demo se quitó en la integración: sobre el lienzo
    transparente del hero dibujaba un rectángulo "sucio" (el marco que el
@@ -335,10 +365,14 @@ const CSS = `
 }
 .arm-node:nth-child(even) .arm-orb{border-radius:var(--orbRadB)}
 .arm-node.arm-leaf .arm-orb{border-color:var(--ringLeaf)}
-/* destacadas (2026-06-28): acción directa en el anillo principal — anillo de
-   hoja (no de grupo) y SIN el latido expansible del grupo, para que se lean como
-   "toque y listo", no como "abra para ver más". */
-.arm-node.arm-feat .arm-orb{border-color:var(--ringLeaf)}
+/* hojas DESTACADAS (featured, operador 2026-06-28): al volver la mano una red
+   pura de 2 niveles (2026-07-04) las 6 funciones clave brotan PRIMERO dentro
+   de su rama con anillo resaltado (color de grupo, trazo más grueso) — el
+   primerizo las distingue sin romper la jerarquía rama→hoja. */
+.arm-node.arm-leaf.arm-featleaf .arm-orb{
+  border-color:var(--ringGroup);
+  border-width:calc(var(--ringW) + .6px);
+}
 .arm-node.arm-group .arm-orb::after{
   content:"";position:absolute;inset:-5px;border-radius:inherit;
   border:1px solid var(--pulse);animation:armPing 3.4s ease-out infinite;
@@ -551,21 +585,22 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
         }
       }
 
-      /* micorriza (biopunk/min): red diagonal desde la Ⓐ (abajo-izquierda)
-         hacia ARRIBA-DERECHA (operador 2026-06-10). La colocación es por
-         ESTANTES con las cajas reales orbe+etiqueta (shelfPack): CERO encime
-         de nodos/etiquetas POR CONSTRUCCIÓN (7 cajas grandes no caben con
-         relajación sola en un celular — mandato anticolisión 2026-06-10).
-         El primer grupo queda arriba-izquierda y el último abajo-derecha:
-         la diagonal viva se conserva; el zigzag de filas rompe la grilla. */
+      /* micorriza (biopunk/min/huerto): red que BROTA de la Ⓐ (abajo-
+         izquierda) hacia ARRIBA-DERECHA. Nivel 1 = ramas-grupo en ABANICO
+         RADIAL (fanPlace, 2026-07-04): anillos entrelazados a radios
+         escalonados desde la raíz — se lee como organismo que crece, no como
+         filas de estante. El mandato CERO-choque (2026-06-10) sigue intacto:
+         fanPlace verifica con las cajas reales orbe+etiqueta y cae a estantes
+         (shelfPack) si el abanico no cabe en el lienzo. */
       const a0 = -1.45, a1 = -0.30; /* casi vertical → casi horizontal der. */
       const gBoxes = sim.map((s) => nodeRect(s.lblEl, 36));
-      posOver = shelfPack(
+      posOver = fanPlace(
+        rootPt,
         gBoxes,
         /* banda de RECTS: bordes reales del lienzo; el piso (H-58) deja
            libre la pista "⸙ toque una rama" de la esquina inferior */
         { x0: 10, x1: W - 10, y0: 44, y1: H - 58 },
-        { pad: 9, jitter: 8, rand },
+        { a0: -1.52, a1: -0.14, pad: 9, rand },
       );
 
       /* yemas: recogidas junto al origen (abajo-izquierda, sobre la Ⓐ). Banda
@@ -592,7 +627,7 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
       /* yemas como obstáculos (orbes chicos sin etiqueta, escala .55) y la
          miga "‹ volver" arriba-izquierda. */
       const budBoxes = posBud.map((p) => ({ x: p.x, y: p.y, hw: 24, hh: 24 }));
-      const crumbBox = { x: 95, y: 33, hw: 90, hh: 32 }; /* tamaño real de la miga */
+      const crumbBox = { x: 120, y: 33, hw: 115, hh: 32 }; /* miga "‹ Volver · rama" */
       sim.forEach((s, i) => {
         /* ANILLO proporcional alrededor del hub: cada hoja recibe arco según
            el ancho real de su caja (no se montan entre sí ni sobre el grupo
@@ -958,25 +993,10 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
     toastTimerRef.current = setTimeout(() => setToastMsg(null), 1700);
   }
 
-  function handleGroupTap(i, ev) {
+  function handleGroupTap(i) {
     if (disabled) return;
-    const item = RING[i];
-    if (item?.kind === 'cap') {
-      // Destacada = ACCIÓN DIRECTA (no despliega): misma semántica que una hoja.
-      if (ev?.currentTarget) bounce(ev.currentTarget);
-      const cap = item.cap;
-      const health = capabilityHealth.get(cap.id) || 'live';
-      if (health === 'soon') {
-        showToast(`${cap.icon} ${cap.label} — por lanzar`);
-        return;
-      }
-      if (health === 'down') {
-        showToast(`${cap.icon} ${cap.label} — no disponible sin conexión al servidor`);
-        return;
-      }
-      if (onPick) onPick(cap);
-      return;
-    }
+    /* Nivel 1 = SOLO ramas-grupo (red pura de 2 niveles, 2026-07-04): tocar
+       la rama despliega/pliega SUS hojas. La acción directa vive en las hojas. */
     engineRef.current?.toggleFocus(i);
   }
 
@@ -1068,48 +1088,34 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
       </div>
 
       <div className="arm-nodes">
-        {RING.map((item, i) => {
-          const isCap = item.kind === 'cap';
-          const health = isCap ? (capabilityHealth.get(item.cap.id) || 'live') : 'live';
-          const isDown = health === 'down';
-          const isSoon = health === 'soon';
-          return (
-            <div
-              key={item.key}
-              className={`arm-node ${isCap ? 'arm-feat' : 'arm-group'}${isSoon ? ' arm-soon' : ''}${isDown ? ' arm-down' : ''}`}
-              role="button"
-              tabIndex={isDown ? -1 : 0}
-              aria-label={isCap && isDown ? `${item.label} (sin conexión al servidor)` : item.label}
-              aria-expanded={isCap ? undefined : focusedIdx === i}
-              aria-disabled={isDown || undefined}
-              data-arm-group={i}
-              style={{ opacity: 0, '--pd': `${i * 0.5}s` }}
-              onClick={(ev) => handleGroupTap(i, ev)}
-              onKeyDown={(ev) => pressKey(ev, () => handleGroupTap(i, ev))}
-            >
-              <div className="arm-orb">
-                <i
-                  className="arm-ic"
-                  style={{
-                    '--swD': `${(4.2 + rand(i + 2) * 2.4).toFixed(1)}s`,
-                    '--swDel': `${(-rand(i + 11) * 4).toFixed(1)}s`,
-                  }}
-                >
-                  {item.icon}
-                </i>
-              </div>
-              <div className="arm-lbl">
-                {item.label}
-                {isCap && isDown && (
-                  <>
-                    <br />
-                    <span className="arm-badge arm-badge-down">sin servidor</span>
-                  </>
-                )}
-              </div>
+        {RING.map((item, i) => (
+          /* nivel 1: ramas-grupo — tocar despliega SUS hojas (nivel 2) */
+          <div
+            key={item.key}
+            className="arm-node arm-group"
+            role="button"
+            tabIndex={0}
+            aria-label={item.label}
+            aria-expanded={focusedIdx === i}
+            data-arm-group={i}
+            style={{ opacity: 0, '--pd': `${i * 0.5}s` }}
+            onClick={() => handleGroupTap(i)}
+            onKeyDown={(ev) => pressKey(ev, () => handleGroupTap(i))}
+          >
+            <div className="arm-orb">
+              <i
+                className="arm-ic"
+                style={{
+                  '--swD': `${(4.2 + rand(i + 2) * 2.4).toFixed(1)}s`,
+                  '--swDel': `${(-rand(i + 11) * 4).toFixed(1)}s`,
+                }}
+              >
+                {item.icon}
+              </i>
             </div>
-          );
-        })}
+            <div className="arm-lbl">{item.label}</div>
+          </div>
+        ))}
 
         {RING.map((g, i) =>
           g.leaves.map((cap, j) => {
@@ -1120,7 +1126,7 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
             return (
               <div
                 key={cap.id}
-                className={`arm-node arm-leaf${isSoon ? ' arm-soon' : ''}${isDown ? ' arm-down' : ''}`}
+                className={`arm-node arm-leaf${cap.featured === true ? ' arm-featleaf' : ''}${isSoon ? ' arm-soon' : ''}${isDown ? ' arm-down' : ''}`}
                 role="button"
                 tabIndex={dimmed ? -1 : 0}
                 aria-label={isSoon ? `${cap.label} (por lanzar)` : isDown ? `${cap.label} (sin conexión al servidor)` : cap.label}
@@ -1169,8 +1175,10 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
       <div className="arm-hint" data-arm="hint">⸙ toque una rama</div>
 
       {focusedIdx != null && (
+        /* miga "‹ Volver": pliega la rama enfocada y regresa al nivel 1 */
         <button type="button" className="arm-crumb" onClick={handleRootTap}>
-          ‹ <span>{RING[focusedIdx].icon}</span>
+          ‹ <span>Volver</span>
+          <span aria-hidden="true">{RING[focusedIdx].icon}</span>
           <span>{RING[focusedIdx].label}</span>
         </button>
       )}

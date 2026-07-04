@@ -135,10 +135,96 @@ describe('AgentRedMenu — geometría de continuidad (raíz↔red sin cortes)', 
   });
 });
 
+describe('AgentRedMenu — fanPlace (abanico radial del nivel 1, red viva 2026-07-04)', () => {
+  const seeded = (n) => {
+    const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+    return x - Math.floor(x);
+  };
+  // 8 ramas-grupo con cajas realistas (orbe 72 + etiqueta debajo)
+  const boxes8 = Array.from({ length: 8 }, (_, i) => ({
+    hw: 52 + (i % 3) * 6, hh: 46 + (i % 2) * 5, oy: 14,
+  }));
+
+  it('coloca las ramas SIN choque visible en un lienzo de celular (mandato cero-choque)', () => {
+    const pts = __geom.fanPlace(
+      { x: 46, y: 560 },
+      boxes8,
+      { x0: 10, x1: 380, y0: 44, y1: 502 },
+      { a0: -1.52, a1: -0.14, pad: 9, rand: seeded },
+    );
+    expect(pts).toHaveLength(8);
+    expect(__geom.rectsOverlap(pts, boxes8, [], 2)).toBe(false);
+    pts.forEach((p) => expect(Number.isFinite(p.x) && Number.isFinite(p.y)).toBe(true));
+  });
+
+  it('las ramas quedan DENTRO de la banda (caja completa orbe+etiqueta)', () => {
+    const band = { x0: 10, x1: 380, y0: 44, y1: 502 };
+    const pts = __geom.fanPlace({ x: 46, y: 560 }, boxes8, band, { rand: seeded });
+    pts.forEach((p, i) => {
+      const b = boxes8[i];
+      expect(p.x - b.hw).toBeGreaterThanOrEqual(band.x0 - 1);
+      expect(p.x + b.hw).toBeLessThanOrEqual(band.x1 + 1);
+      expect(p.y + b.oy - b.hh).toBeGreaterThanOrEqual(band.y0 - 1);
+      expect(p.y + b.oy + b.hh).toBeLessThanOrEqual(band.y1 + 1);
+    });
+  });
+
+  it('se lee como RED, no como fila: los radios desde la raíz VARÍAN (anillos escalonados)', () => {
+    const rootPt = { x: 46, y: 560 };
+    const pts = __geom.fanPlace(
+      rootPt, boxes8, { x0: 10, x1: 380, y0: 44, y1: 502 }, { rand: seeded },
+    );
+    const rads = pts.map((p) => Math.hypot(p.x - rootPt.x, p.y - rootPt.y));
+    const spread = Math.max(...rads) - Math.min(...rads);
+    // si fuera un anillo/fila el spread sería ~0; exigimos escalonado real
+    expect(spread).toBeGreaterThan(60);
+  });
+
+  it('banda degenerada → fallback a estantes sin NaN (nunca crashea el layout)', () => {
+    const pts = __geom.fanPlace(
+      { x: 20, y: 300 },
+      boxes8,
+      { x0: 0, x1: 120, y0: 0, y1: 200 }, // infactible para abanico
+      { rand: seeded },
+    );
+    expect(pts).toHaveLength(8);
+    pts.forEach((p) => expect(Number.isFinite(p.x) && Number.isFinite(p.y)).toBe(true));
+  });
+});
+
 describe('AgentRedMenu — smoke', () => {
   it('renderiza sin crashear y monta la raíz', () => {
     const { container } = render(<AgentRedMenu onPick={vi.fn()} />);
     expect(container.querySelector('.arm-root')).toBeTruthy();
+  });
+
+  it('nivel 1 = SOLO ramas-grupo (red pura de 2 niveles): todo nodo del anillo despliega (aria-expanded)', () => {
+    const { container } = render(<AgentRedMenu onPick={vi.fn()} />);
+    const ring = container.querySelectorAll('[data-arm-group]');
+    expect(ring.length).toBeGreaterThanOrEqual(6); // ~6-8 dominios del manifiesto
+    ring.forEach((n) => {
+      expect(n.classList.contains('arm-group')).toBe(true);
+      expect(n.hasAttribute('aria-expanded')).toBe(true); // rama, no acción directa
+    });
+    // ninguna capacidad suelta en el anillo: las hojas viven en nivel 2
+    expect(container.querySelector('[data-arm-group].arm-feat')).toBeNull();
+  });
+
+  it('las destacadas (featured) viven como HOJAS resaltadas dentro de su rama', () => {
+    const { container } = render(<AgentRedMenu onPick={vi.fn()} />);
+    const featLeaves = container.querySelectorAll('.arm-leaf.arm-featleaf');
+    expect(featLeaves.length).toBe(6); // las 6 funciones clave del manifiesto
+    featLeaves.forEach((n) => expect(n.hasAttribute('data-arm-leaf')).toBe(true));
+  });
+
+  it('tema verde-vivo → mecánica HUERTO (no cae a biopunk neón)', () => {
+    document.documentElement.setAttribute('data-theme', 'verde-vivo');
+    try {
+      const { container } = render(<AgentRedMenu onPick={vi.fn()} />);
+      expect(container.querySelector('.arm-root').getAttribute('data-armtheme')).toBe('huerto');
+    } finally {
+      document.documentElement.removeAttribute('data-theme');
+    }
   });
 
   it('NO duplica la Ⓐ: el menú no trae nodo raíz propio (la raíz es el botón Ⓐ del hero)', () => {

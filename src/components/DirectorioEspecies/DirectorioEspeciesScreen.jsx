@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ChevronLeft, Search, Sprout, Leaf, X, BookOpen } from 'lucide-react';
+import { ChevronLeft, Search, Sprout, Leaf, X } from 'lucide-react';
 import { searchSpecies, buildSpeciesFicha } from '../../services/directorioEspecies.js';
 import SpeciesFicha from './SpeciesFicha.jsx';
+import EmptyStateCampo from '../common/EmptyStateCampo.jsx';
+import SkeletonCampo from '../common/SkeletonCampo.jsx';
+import ChagraGrowLoader from '../ChagraGrowLoader.jsx';
 import { fvhSkinClass } from '../../config/fvhSkin.js';
 
 /**
@@ -163,22 +166,30 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
       {/* Resultados / estados */}
       <div className="px-4 pt-4">
         {loadingFicha && (
-          <p className="jp-tinta-suave text-sm text-slate-400" data-testid="directorio-loading-ficha">Abriendo la ficha…</p>
+          <div data-testid="directorio-loading-ficha">
+            <p className="jp-tinta-suave flex items-center gap-2 text-sm text-slate-400 mb-3">
+              <ChagraGrowLoader size={26} aria-hidden="true" />
+              Abriendo la ficha…
+            </p>
+            <SkeletonCampo variant="ficha" />
+          </div>
         )}
 
         {!loadingFicha && searching && (
-          <p className="jp-tinta-suave text-sm text-slate-400">Buscando…</p>
+          <SkeletonCampo
+            variant="lista"
+            count={3}
+            label={<span className="jp-tinta-suave">Buscando en el catálogo…</span>}
+          />
         )}
 
         {!loadingFicha && !searching && touched && query.trim().length >= 2 && results.length === 0 && (
-          <div className="text-center py-10" data-testid="directorio-empty">
-            <Leaf size={32} className="mx-auto text-slate-700 mb-2" aria-hidden="true" />
-            <p className="jp-tinta text-sm text-slate-400">
-              No encontramos “{query.trim()}” en el catálogo todavía.
-            </p>
-            <p className="jp-tinta-suave text-xs text-slate-500 mt-1">
-              Prueba con otro nombre común o el nombre científico.
-            </p>
+          <div className="py-8" data-testid="directorio-empty">
+            <EmptyStateCampo
+              variant="busqueda"
+              title={<span className="jp-tinta">No encontramos “{query.trim()}” en el catálogo todavía.</span>}
+              hint={<span className="jp-tinta-suave">Prueba con otro nombre común o el nombre científico: la misma planta cambia de nombre de vereda en vereda.</span>}
+            />
           </div>
         )}
 
@@ -216,12 +227,17 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
 
         {/* Estado inicial vacío — guía */}
         {!loadingFicha && !searching && !touched && results.length === 0 && (
-          <div className="text-center py-12" data-testid="directorio-hint">
-            <BookOpen size={34} className="mx-auto text-slate-700 mb-3" aria-hidden="true" />
-            <p className="jp-tinta-suave text-sm text-slate-400 max-w-xs mx-auto leading-relaxed">
-              Busca cualquier especie del catálogo y mira su piso térmico, con qué
-              se asocia, qué biopreparados le sirven y qué plagas la afectan.
-            </p>
+          <div className="py-10" data-testid="directorio-hint">
+            <EmptyStateCampo
+              variant="directorio"
+              title={<span className="jp-tinta">El cuaderno de especies de tu chagra.</span>}
+              hint={
+                <span className="jp-tinta-suave">
+                  Busca cualquier especie del catálogo y mira su piso térmico, con qué
+                  se asocia, qué biopreparados le sirven y qué plagas la afectan.
+                </span>
+              }
+            />
           </div>
         )}
       </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowLeft, ChevronRight, Clock } from 'lucide-react';
 import HelpCycleSection from './HelpCycleSection.jsx';
+import { IlusCiclo } from './help/HelpIllustrations.jsx';
 
 /**
  * Sub-vista del Manual: Aprende sembrando. Wrapper del HelpCycleSection
@@ -25,10 +26,16 @@ export default function HelpCicloScreen({ onBackToHome }) {
       </div>
 
       <main className="flex-1 p-4 max-w-2xl mx-auto w-full pb-12 flex flex-col gap-4">
-        <p className="text-sm text-slate-300 leading-relaxed">
-          Punto de partida educativo para empezar desde cero. No solo cómo usar Chagra: cómo cultivar.
-          Toca cada especie para abrir su corpus consolidado y, si quieres, hazle una pregunta por voz a la IA.
-        </p>
+        {/* Hero con ilustración propia (overhaul ayuda 2026-07) */}
+        <div className="flex items-start gap-3">
+          <span className="shrink-0 inline-flex items-center justify-center w-14 h-14 rounded-[16px_16px_16px_6px] bg-pink-700/30 border border-pink-500/40">
+            <IlusCiclo size={36} className="text-pink-200" />
+          </span>
+          <p className="text-sm text-slate-300 leading-relaxed flex-1 min-w-0">
+            Punto de partida educativo para empezar desde cero. No solo cómo usar Chagra: cómo cultivar.
+            Toca cada especie para abrir su corpus consolidado y, si quieres, hazle una pregunta por voz a la IA.
+          </p>
+        </div>
 
         {/* Accordion principal por especie (PR #201) */}
         <HelpCycleSection />

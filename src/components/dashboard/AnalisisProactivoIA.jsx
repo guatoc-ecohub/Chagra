@@ -41,7 +41,7 @@ import { getEnsoOutlook, regionFromProfile } from '../../services/ensoContext';
  *   - 3 mini-chips destacados (clickables): tareas / plantas / alertas.
  *   - CTA: "Habla con el agente" → onNavigate('agente').
  *
- * Español colombiano (tú/usted, SIN voseo argentino).
+ * Español colombiano, trato de usted (SIN voseo argentino).
  */
 
 const HORAS = {
@@ -91,15 +91,15 @@ function buildNarrative({ hora, plantasCount, pendingTasks, sensorSummary, alert
     // Frase 1: estado general
     if (plantasCount === 0) {
         lines.push(
-            `${saludo}. Tu chagra está vacía por ahora — agrega tu primera planta para que empiece a aprender de tu finca.`,
+            `${saludo}. Su chagra está vacía por ahora — agregue su primera planta para que empiece a aprender de su finca.`,
         );
     } else if (plantasCount === 1) {
         lines.push(
-            `${saludo}. Tienes 1 cultivo registrado en la finca. Vamos paso a paso.`,
+            `${saludo}. Tiene 1 cultivo registrado en la finca. Vamos paso a paso.`,
         );
     } else {
         lines.push(
-            `${saludo}. Hoy llevo seguimiento a ${plantasCount} cultivos en tu finca.`,
+            `${saludo}. Hoy llevo seguimiento a ${plantasCount} cultivos en su finca.`,
         );
     }
 
@@ -108,10 +108,10 @@ function buildNarrative({ hora, plantasCount, pendingTasks, sensorSummary, alert
         if (pendingTasks === 1) {
             lines.push('Hay 1 tarea pendiente que vale la pena resolver hoy.');
         } else if (pendingTasks <= 5) {
-            lines.push(`Tienes ${pendingTasks} tareas pendientes — varias son rápidas.`);
+            lines.push(`Tiene ${pendingTasks} tareas pendientes — varias son rápidas.`);
         } else {
             lines.push(
-                `Llevas ${pendingTasks} tareas en cola, conviene priorizar las del día y reprogramar el resto.`,
+                `Lleva ${pendingTasks} tareas en cola, conviene priorizar las del día y reprogramar el resto.`,
             );
         }
     } else if (plantasCount > 0) {
@@ -173,11 +173,15 @@ function HighlightChip(props) {
     );
 }
 
-export default function AnalisisProactivoIA({ sensors = [], climaSnapshot = null, onNavigate }) {
+export default function AnalisisProactivoIA({ sensors = [], climaSnapshot = null, onNavigate, embedded = false }) {
     const plants = useAssetStore((s) => s.plants) || [];
     const activeAlerts = useAlertStore((s) => s.activeAlerts);
     const [pendingTasks, setPendingTasks] = useState(0);
-    const [revealed, setRevealed] = useState(false);
+    // `embedded` (consolidación home F2 2026-07-04): dentro de EstadoDelDiaCard
+    // el panel pierde su cáscara propia y el slide-in de entrada (el card único
+    // ya pinta la superficie; sin animación también es reduced-motion-safe).
+    // Solo capa visual — narrativa, chips y CTA idénticos.
+    const [revealed, setRevealed] = useState(embedded);
 
     // pendientes: el store los expone via método async (getPendingTasks).
     // Lo computamos on-mount + cada vez que cambie el contador de plantas
@@ -198,11 +202,12 @@ export default function AnalisisProactivoIA({ sensors = [], climaSnapshot = null
         };
     }, [plants.length]);
 
-    // Slide-in suave al primer paint.
+    // Slide-in suave al primer paint (solo standalone — embebido entra plano).
     useEffect(() => {
+        if (embedded) return undefined;
         const t = setTimeout(() => setRevealed(true), 200);
         return () => clearTimeout(t);
-    }, []);
+    }, [embedded]);
 
     const sensorSummary = useMemo(() => summarizeSensors(sensors), [sensors]);
     // useAlertStore.activeAlerts es un array (no Map). Soportamos ambos por
@@ -259,17 +264,19 @@ export default function AnalisisProactivoIA({ sensors = [], climaSnapshot = null
 
     return (
         <div
-            className="mt-4 mb-2 px-1"
-            style={{
+            className={embedded ? '' : 'mt-4 mb-2 px-1'}
+            style={embedded ? undefined : {
                 opacity: revealed ? 1 : 0,
                 transform: revealed ? 'translateY(0)' : 'translateY(10px)',
                 transition: 'opacity 700ms ease-out, transform 700ms ease-out',
             }}
             data-testid="analisis-proactivo-ia"
         >
-            <div className="relative rounded-2xl border border-cyan-700/30 bg-gradient-to-br from-slate-900/70 via-slate-900/40 to-emerald-950/30 backdrop-blur-xl p-3.5 overflow-hidden">
-                {/* Acento gradient suave en el borde superior */}
-                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent" />
+            <div className={embedded
+                ? 'relative p-4 pt-3'
+                : 'relative rounded-2xl border border-cyan-700/30 bg-gradient-to-br from-slate-900/70 via-slate-900/40 to-emerald-950/30 backdrop-blur-xl p-3.5 overflow-hidden'}>
+                {/* Acento gradient suave en el borde superior (solo standalone) */}
+                {!embedded && <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent" />}
 
                 <div className="flex items-center gap-2 mb-2">
                     <div className="relative">

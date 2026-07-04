@@ -160,6 +160,42 @@ describe('AssetsDashboard — lista principal virtualizada (react-virtuoso, queu
     expect(screen.getByTestId('assets-finca-switcher')).toBeTruthy();
   });
 
+  it('colapsa N matas iguales en una fila agrupada "×N" y la expande a las individuales', async () => {
+    const user = userEvent.setup();
+    // 3 fresas sembradas igual (mismo slug + misma fecha + mismo lote) → 1 fila.
+    const meta = { _chagra_plant_meta: { fecha_germinacion: '2026-03-04' } };
+    mockAssetState.plants = [
+      { id: 'fresa-1', type: 'asset--plant', attributes: { name: 'Fresa #01', _speciesSlug: 'fragaria_ananassa', ...meta } },
+      { id: 'fresa-2', type: 'asset--plant', attributes: { name: 'Fresa #02', _speciesSlug: 'fragaria_ananassa', ...meta } },
+      { id: 'fresa-3', type: 'asset--plant', attributes: { name: 'Fresa #03', _speciesSlug: 'fragaria_ananassa', ...meta } },
+    ];
+    render(<AssetsDashboard onBack={() => {}} initialTab="plant" />);
+    await user.click(screen.getByText(/Ver todos/i));
+    // Colapsado: badge "×3", nombre limpio "Fresa", y las individuales ocultas.
+    expect(screen.getByText('×3')).toBeTruthy();
+    expect(screen.getByText('Fresa')).toBeTruthy();
+    expect(screen.queryByText('Fresa #01')).toBeNull();
+    expect(screen.queryByText('Fresa #03')).toBeNull();
+    // Expandir: aparecen las 3 matas individuales.
+    await user.click(screen.getByText('Fresa'));
+    expect(screen.getByText('Fresa #01')).toBeTruthy();
+    expect(screen.getByText('Fresa #02')).toBeTruthy();
+    expect(screen.getByText('Fresa #03')).toBeTruthy();
+  });
+
+  it('deja sueltas las matas de distinta especie (no agrupa lo que no es equivalente)', async () => {
+    const user = userEvent.setup();
+    mockAssetState.plants = [
+      { id: 'plant-1', type: 'asset--plant', attributes: { name: 'Tomate cherry' } },
+      { id: 'plant-2', type: 'asset--plant', attributes: { name: 'Fríjol cargamanto' } },
+    ];
+    render(<AssetsDashboard onBack={() => {}} initialTab="plant" />);
+    await user.click(screen.getByText(/Ver todos/i));
+    expect(screen.getByText('Tomate cherry')).toBeTruthy();
+    expect(screen.getByText('Fríjol cargamanto')).toBeTruthy();
+    expect(screen.queryByText(/^×/)).toBeNull(); // ningún badge de grupo
+  });
+
   it('renderiza la lista de zonas (drill-down raíz de plantas) y permite ver todos los cultivos', async () => {
     const user = userEvent.setup();
     mockAssetState.lands = [

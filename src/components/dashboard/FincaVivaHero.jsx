@@ -18,6 +18,17 @@ import { useTheme } from '../../hooks/useTheme';
 import { iconForTheme } from './themeIcon';
 import { colibriRealActivo } from '../../config/colibriFlag';
 import { BarbuditoIlustrado, BarbuditoRealLoop } from '../colibri/Barbudito';
+// Campana de notificaciones en el header F2 (regresión 2026-07-04): con la flag
+// F2 ON el TopBar legacy (que la montaba) NO se renderiza, así que el home se
+// quedó sin campana. `variant="f2"` es la misma píldora redonda que ya usa
+// ScreenShell en las pantallas F2.
+import NotificationsBell from '../NotificationsBell';
+// Escena "FINCA ORGANISMO" — el arte aprobado del tema BIOPUNK (mockup
+// escena-home-biopunk-v2): corazón-semilla que late + red micorrízica +
+// invernadero-célula. SOLO se monta con el tema biopunk; los demás temas
+// conservan sus escenas isométricas intactas.
+import SceneFincaOrganismo from './SceneFincaOrganismo';
+import './scene-finca-organismo.css';
 import './finca-viva-hero.css';
 
 // ¿Modo A/B del colibrí del páramo? Gateado por VITE_COLIBRI (colibriFlag.js),
@@ -162,6 +173,13 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
 
   // ── Cielo real: hora + clima (REUSA atmosphereService, no inventa motor) ──
   const atmosfera = useAtmosferaEscena();
+  // La atmósfera + el TEMA activo: las escenas pintan su cielo interno con la
+  // piel del tema (CIELOS_TEMA) además de la hora/clima reales. Un solo objeto
+  // para no cambiar la firma de las 3 escenas.
+  const atmosferaTema = useMemo(
+    () => ({ ...atmosfera, tema: theme }),
+    [atmosfera, theme],
+  );
 
   // Variante de escena por PERFIL (override duro urbano, invernadero, finca…).
   const variant = useMemo(() => {
@@ -214,6 +232,21 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
 
   const tieneFincaPropia = !children; // children = red institucional del extensionista.
 
+  // ── Escena "FINCA ORGANISMO" (SOLO tema biopunk) ─────────────────────────
+  // Con el tema biopunk activo, la escena de FINCA es el arte aprobado
+  // "Finca Organismo" (mockup escena-home-biopunk-v2): la finca de noche como
+  // organismo bioluminiscente — corazón-semilla latiendo bajo tierra, red
+  // micorrízica, invernadero-célula, milpa de savia neón, campesino + perro
+  // criollo + colibrí de luz. Los otros temas (nature/minimalista/verde-vivo)
+  // conservan SceneFinca/SceneBalcon/SceneInvernadero INTACTAS, y las escalas
+  // balcon/invernadero del perfil también (su arte biopunk es trabajo aparte).
+  // `theme==='auto'` se resuelve mirando el data-theme efectivo que applyTheme
+  // ya dejó en <html> (biopunk = tema base SIN atributo).
+  const temaEfectivo = theme === 'auto'
+    ? ((typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme')) || 'biopunk')
+    : theme;
+  const organismoActivo = temaEfectivo === 'biopunk' && escala === 'finca' && tieneFincaPropia;
+
   return (
     <section
       data-testid="finca-viva-hero"
@@ -228,8 +261,21 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
           <div className="fvh-brand">
             {/* Ícono de marca del agente del TEMA ACTIVO (feedback #4): la A roja
                 en biopunk, la sol-mano frondosa en verde-vivo, etc. — la escena
-                toma la piel del tema. */}
-            <span className="fvh-brand-a" data-theme-icon={theme} aria-hidden="true">{iconForTheme(theme)}</span>
+                toma la piel del tema. Regresión header 2026-07-04: la A es el
+                BOTÓN DEL AGENTE (en biopunk la A de la mano de Chagra invoca al
+                agente), NO decoración ni perfil — ahora es interactiva y abre el
+                agente, coexistiendo con "?"/campana/perfil a la derecha. */}
+            <button
+              type="button"
+              className="fvh-brand-a"
+              data-theme-icon={theme}
+              data-testid="fvh-brand-agente"
+              aria-label="Abrir el agente Chagra"
+              title="Hablar con el agente"
+              onClick={abrirAgente}
+            >
+              {iconForTheme(theme)}
+            </button>
             <div className="fvh-brand-txt">
               <b>Chagra</b>
               <span>Su finca viva</span>
@@ -273,6 +319,11 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
           )}
 
           <div className="fvh-top-pills">
+            {/* CAMPANA (regresión 2026-07-04): el home F2 no monta el TopBar
+                legacy, que era quien traía NotificationsBell — el usuario se
+                quedaba sin notificaciones en el home. Misma píldora `f2` que
+                ScreenShell usa en el resto de pantallas F2. */}
+            <NotificationsBell onNavigate={onNavigate} variant="f2" />
             <button
               type="button"
               className="fvh-pill"
@@ -335,7 +386,7 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
 
         <main className="fvh-main">
           {/* ── ESCENA ISOMÉTRICA (o slot institucional) ────────────────────── */}
-          <div className="fvh-escena-wrap">
+          <div className={`fvh-escena-wrap${organismoActivo ? ' fvh-escena-wrap--organismo' : ''}`}>
             <div className="fvh-escena">
               {/* globo del agente colibrí */}
               <button
@@ -354,22 +405,33 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
 
               {tieneFincaPropia ? (
                 <>
-                  {escala === 'balcon' && <SceneBalcon poblada={poblada} cielo={atmosfera} />}
-                  {escala === 'invernadero' && <SceneInvernadero poblada={poblada} cielo={atmosfera} />}
+                  {escala === 'balcon' && <SceneBalcon poblada={poblada} cielo={atmosferaTema} />}
+                  {escala === 'invernadero' && <SceneInvernadero poblada={poblada} cielo={atmosferaTema} />}
                   {escala === 'finca' && (
-                    <SceneFinca
-                      poblada={poblada}
-                      cielo={atmosfera}
-                      estructura={estructuraFinca}
-                      escalaFinca={variant?.escala}
-                    />
+                    organismoActivo ? (
+                      /* BIOPUNK → la "Finca Organismo" aprobada. Lleva la
+                         estructura declarada (#34): el invernadero-célula de
+                         la escena porta el marcador fvh-estructura. */
+                      <SceneFincaOrganismo estructura={estructuraFinca} />
+                    ) : (
+                      <SceneFinca
+                        poblada={poblada}
+                        cielo={atmosferaTema}
+                        estructura={estructuraFinca}
+                        escalaFinca={variant?.escala}
+                      />
+                    )
                   )}
 
                   {/* fauna sobre la escena. El COLIBRÍ (criatura insignia del
                       agente) vuela SIEMPRE — es el guía, no ganado; acompaña
                       también la finca recién empezada. La mariposa y la abeja
                       (fauna que prospera) sólo aparecen cuando la finca está
-                      poblada. */}
+                      poblada. Con la "Finca Organismo" (biopunk) NO se
+                      superpone fauna: la escena trae su PROPIO colibrí de luz
+                      y sus cocuyos (el emoji 🦋/🐝 y el colibrí 2D duplicados
+                      rompían la clave nocturna del arte aprobado). */}
+                  {!organismoActivo && (
                   <div className="fvh-bichos" aria-hidden="true">
                     {/* COLIBRÍ insignia. Con la flag VITE_COLIBRI ON (dev) =
                         modo A/B TEMPORAL: dos barbuditos de páramo, uno a cada
@@ -401,6 +463,7 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
                       </>
                     )}
                   </div>
+                  )}
                 </>
               ) : (
                 <div className="fvh-institucional">{children}</div>
@@ -656,9 +719,53 @@ const CIELOS_ESCENA = {
     noche: ['#1d2b4a', '#465a64'],
   },
 };
+/**
+ * CIELOS POR TEMA — la piel del tema DENTRO de la escena (V4, req. "profundizar
+ * el tema en la escena"). Antes los 4 temas casi solo cambiaban la barra y el
+ * degradado del shell: la banda central isométrica seguía con el mismo cielo.
+ * Ahora cada tema fija el cielo INTERNO de la escena por tono de luz:
+ *   · biopunk (base) — navy/teal nocturno-neón incluso de día (coherente con el
+ *     velo neón y el boceto aprobado; adiós al "mediodía suelto").
+ *   · verde-vivo — turquesa fresco + crema frondosa (el look vivo original).
+ *   · nature — cielos de tierra: crema dorada de día, ocres al sol bajo.
+ *   · minimalista — papel: salvia pálida, tonos apagados, noche gris-azul.
+ * Se aplica ANTES que la tabla por escena (que queda como fallback sin tema).
+ * El grade/textura por tema del CSS (.fvh-escena > svg) completa la piel.
+ */
+const CIELOS_TEMA = {
+  biopunk: {
+    dia: ['#16324f', '#2b5a63'],
+    amanecer: ['#3b2f5e', '#b06a55'],
+    atardecer: ['#3a2440', '#c25c4a'],
+    noche: ['#0c1830', '#26404d'],
+  },
+  'verde-vivo': {
+    dia: ['#79c9b7', '#e2f0cf'],
+    amanecer: ['#ecb27a', '#f6ecc4'],
+    atardecer: ['#dd8455', '#f3d99b'],
+    noche: ['#183253', '#3e5a63'],
+  },
+  nature: {
+    dia: ['#d9c493', '#f2e8cd'],
+    amanecer: ['#e0a066', '#f7e6c0'],
+    atardecer: ['#c97a45', '#efd6a0'],
+    noche: ['#26243d', '#5a4a58'],
+  },
+  minimalista: {
+    dia: ['#cfdcd2', '#f3f1e8'],
+    amanecer: ['#e3c3a3', '#f5eddd'],
+    atardecer: ['#d8a887', '#f0e2c8'],
+    noche: ['#31394a', '#5d6672'],
+  },
+};
+
 function cieloEscena(cielo, escena) {
+  const tono = tonoLuz(cielo);
+  // Piel por tema primero (cielo.tema lo inyecta el hero desde useTheme).
+  const porTema = CIELOS_TEMA[cielo?.tema]?.[tono];
+  if (porTema) return porTema;
   const mapa = CIELOS_ESCENA[escena] || CIELOS_ESCENA.finca;
-  return mapa[tonoLuz(cielo)] || mapa.dia;
+  return mapa[tono] || mapa.dia;
 }
 
 /**

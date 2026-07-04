@@ -33,6 +33,12 @@ import { getProfile, getProfileMunicipio } from '../../services/userProfileServi
  *
  * Nota: el IDEAM sigue alimentando el grounding histórico del agente por otro
  * lado (agentService); este cambio solo reapunta la FUENTE de ESTE widget.
+ *
+ * `embedded` (consolidación home F2 2026-07-04): dentro de EstadoDelDiaCard
+ * (card único "Cómo va su finca hoy") el strip pierde su cáscara sky/indigo y
+ * se compacta (header slim, celdas más bajas, sin fila de leyenda) — el clima
+ * de HOY ya lo pinta la cabecera del card, este panel es la tira expandible de
+ * 7 días. Datos y fetching idénticos al widget standalone.
  */
 
 const DAY_LABELS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
@@ -133,7 +139,7 @@ function resolveGeo(profile, municipio) {
     return null;
 }
 
-export default function ClimaStrip({ onNavigate }) {
+export default function ClimaStrip({ onNavigate, embedded = false }) {
     const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
     const fincas = useFincaActiveStore((s) => s.fincas);
     const [snapshot, setSnapshot] = useState(() => getCachedClimaSnapshot());
@@ -234,11 +240,11 @@ export default function ClimaStrip({ onNavigate }) {
 
     if (loading) {
         return (
-            <div className="bg-gradient-to-br from-sky-950/70 to-indigo-950/60 backdrop-blur-xl border border-sky-800/40 rounded-2xl p-5 animate-pulse">
+            <div className={`${embedded ? 'p-4 pt-2' : 'bg-gradient-to-br from-sky-950/70 to-indigo-950/60 backdrop-blur-xl border border-sky-800/40 rounded-2xl p-5'} animate-pulse motion-reduce:animate-none`}>
                 <div className="h-4 w-32 bg-slate-700/40 rounded mb-3" />
                 <div className="grid grid-cols-7 gap-2">
                     {[...Array(7)].map((_, i) => (
-                        <div key={i} className="h-16 bg-slate-700/30 rounded-xl" />
+                        <div key={i} className={`${embedded ? 'h-12' : 'h-16'} bg-slate-700/30 rounded-xl`} />
                     ))}
                 </div>
             </div>
@@ -247,13 +253,13 @@ export default function ClimaStrip({ onNavigate }) {
 
     if (!geo && !municipio) {
         return (
-            <div className="bg-gradient-to-br from-sky-950/70 to-indigo-950/60 backdrop-blur-xl border border-sky-800/40 rounded-2xl p-5">
+            <div className={embedded ? 'p-4 pt-2' : 'bg-gradient-to-br from-sky-950/70 to-indigo-950/60 backdrop-blur-xl border border-sky-800/40 rounded-2xl p-5'}>
                 <div className="flex items-center gap-2 mb-2">
                     <Cloud size={20} className="text-sky-300" />
-                    <h3 className="text-base font-bold text-white">Clima en tu zona</h3>
+                    <h3 className="text-base font-bold text-white">Clima en su zona</h3>
                 </div>
                 <p className="text-sm text-slate-300 leading-relaxed">
-                    Cuéntame en qué municipio queda tu finca y te traigo el pronóstico real de los próximos 7 días.
+                    Cuéntame en qué municipio queda su finca y le traigo el pronóstico real de los próximos 7 días.
                 </p>
                 {/* Bug fix 2026-05-28 (Brave laptop): el botón no tenía
                     onClick — operador clickeaba y nada pasaba.
@@ -316,20 +322,20 @@ export default function ClimaStrip({ onNavigate }) {
     });
 
     const hasReal = filled.some((d) => d.tempMaxC != null);
-    const headerLabel = (municipio || '').split(',')[0] || 'tu finca';
+    const headerLabel = (municipio || '').split(',')[0] || 'su finca';
 
     return (
-        <div className="bg-gradient-to-br from-sky-950/70 to-indigo-950/60 backdrop-blur-xl border border-sky-800/40 rounded-2xl p-5">
-            <div className="flex items-center justify-between mb-3">
+        <div className={embedded ? 'px-4 pb-4 pt-1' : 'bg-gradient-to-br from-sky-950/70 to-indigo-950/60 backdrop-blur-xl border border-sky-800/40 rounded-2xl p-5'}>
+            <div className={`flex items-center justify-between ${embedded ? 'mb-2' : 'mb-3'}`}>
                 <div className="flex items-center gap-2 min-w-0">
-                    <Cloud size={20} className="text-sky-300 shrink-0" />
-                    <h3 className="text-base font-bold text-white truncate">
-                        {coarse ? 'Clima en tu zona' : `Clima en ${headerLabel}`}
+                    {!embedded && <Cloud size={20} className="text-sky-300 shrink-0" />}
+                    <h3 className={`${embedded ? 'text-xs' : 'text-base'} font-bold text-white truncate`}>
+                        {coarse ? 'Clima en su zona' : `Clima en ${headerLabel}`}
                     </h3>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                     <span className="text-[10px] text-sky-300/70 font-bold uppercase tracking-wider">
-                        Open-Meteo · 7 días
+                        {embedded ? 'Open-Meteo' : 'Open-Meteo · 7 días'}
                     </span>
                     {/* Re-pin SIEMPRE alcanzable (mitad geo de #364): corregir una
                         ubicación guardada equivocada sin fricción. Navega al
@@ -363,9 +369,9 @@ export default function ClimaStrip({ onNavigate }) {
                     <AlertCircle size={14} className="shrink-0 mt-0.5" aria-hidden="true" />
                     <div className="flex-1 min-w-0">
                         <p className="leading-relaxed">
-                            Confirma tu ubicación para un clima exacto. La que tenemos
+                            Confirme su ubicación para un clima exacto. La que tenemos
                             guardada es aproximada (puede ser la cabecera del municipio,
-                            no tu finca).
+                            no su finca).
                         </p>
                         <button
                             type="button"
@@ -382,7 +388,7 @@ export default function ClimaStrip({ onNavigate }) {
 
             {!hasReal && (
                 <p className="text-xs text-slate-400 mb-3 italic">
-                    El pronóstico fino aún se está cargando. Mientras tanto, ten precaución en la noche con cultivos sensibles.
+                    El pronóstico fino aún se está cargando. Mientras tanto, tenga precaución en la noche con cultivos sensibles.
                 </p>
             )}
 
@@ -394,12 +400,12 @@ export default function ClimaStrip({ onNavigate }) {
                             key={i}
                             data-condition={d.condition}
                             title={d.conditionLabel}
-                            className="flex flex-col items-center gap-1 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06]"
+                            className={`flex flex-col items-center gap-1 ${embedded ? 'py-1.5' : 'py-2.5'} rounded-xl bg-white/[0.04] border border-white/[0.06]`}
                         >
                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{d.label}</span>
-                            <Icon size={22} className={cls} />
+                            <Icon size={embedded ? 18 : 22} className={cls} />
                             {d.tempMaxC != null && (
-                                <span className="text-sm font-bold text-white tabular-nums">{Math.round(d.tempMaxC)}°</span>
+                                <span className={`${embedded ? 'text-xs' : 'text-sm'} font-bold text-white tabular-nums`}>{Math.round(d.tempMaxC)}°</span>
                             )}
                             {d.tempMinC != null && (
                                 <span className="text-[10px] text-slate-400 tabular-nums">{Math.round(d.tempMinC)}°</span>
@@ -409,20 +415,25 @@ export default function ClimaStrip({ onNavigate }) {
                 })}
             </div>
 
-            <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
-                <div className="flex items-center gap-1.5 text-slate-300">
-                    <Thermometer size={14} className="text-rose-400" />
-                    <span className="truncate">Máx/Mín</span>
+            {/* Leyenda: solo en el widget standalone — embebido el espacio es
+                exactamente lo que la consolidación recorta (los íconos ya se
+                explican solos con el title por día). */}
+            {!embedded && (
+                <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                    <div className="flex items-center gap-1.5 text-slate-300">
+                        <Thermometer size={14} className="text-rose-400" />
+                        <span className="truncate">Máx/Mín</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-slate-300">
+                        <Droplets size={14} className="text-sky-400" />
+                        <span className="truncate">Lluvia</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-slate-300">
+                        <Wind size={14} className="text-emerald-400" />
+                        <span className="truncate">Viento</span>
+                    </div>
                 </div>
-                <div className="flex items-center gap-1.5 text-slate-300">
-                    <Droplets size={14} className="text-sky-400" />
-                    <span className="truncate">Lluvia</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-slate-300">
-                    <Wind size={14} className="text-emerald-400" />
-                    <span className="truncate">Viento</span>
-                </div>
-            </div>
+            )}
         </div>
     );
 }

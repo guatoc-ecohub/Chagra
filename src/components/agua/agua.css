@@ -1,0 +1,73 @@
+/*
+ * agua.css — micro-animaciones del módulo "Agua de la finca".
+ *
+ * Principios:
+ *   · Sutiles y de bajo costo (solo transform/opacity, nada de layout).
+ *   · prefers-reduced-motion las apaga TODAS.
+ *   · Los colores del módulo salen de las clases Tailwind del componente
+ *     (paleta slate + acentos cyan/sky/teal), que ya reaccionan a los temas
+ *     de la app vía data-theme (themes.css) — aquí no se fija ningún color
+ *     de tema, solo movimiento.
+ */
+
+/* Gotas de lluvia del "camino del agua": caen en loop, escalonadas. */
+@keyframes agua-gota-cae {
+  0% { transform: translateY(0); opacity: 0; }
+  15% { opacity: 0.9; }
+  85% { opacity: 0.9; }
+  100% { transform: translateY(26px); opacity: 0; }
+}
+
+.agua-gota {
+  animation: agua-gota-cae 1.6s linear infinite;
+}
+.agua-gota--2 { animation-delay: 0.5s; }
+.agua-gota--3 { animation-delay: 1s; }
+
+/* El hilo del nacimiento "respira" (opacity), como agua corriendo. */
+@keyframes agua-hilo-respira {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+.agua-hilo {
+  animation: agua-hilo-respira 2.8s ease-in-out infinite;
+}
+
+/* Nivel del tanque en la calculadora: sube suave cuando cambia el resultado.
+   Se anima con transform scaleY (transform-origin bottom) — sin reflow. */
+.agua-nivel {
+  transform-origin: center bottom;
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Estación activa del camino: aro que pulsa una sola vez al seleccionar. */
+@keyframes agua-estacion-pulso {
+  0% { transform: scale(0.92); opacity: 0.4; }
+  60% { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.agua-estacion-activa {
+  animation: agua-estacion-pulso 0.45s ease-out;
+}
+
+/* Entrada suave del contenido del pilar al cambiar de pestaña. */
+@keyframes agua-seccion-entra {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.agua-seccion {
+  animation: agua-seccion-entra 0.3s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agua-gota,
+  .agua-hilo,
+  .agua-estacion-activa,
+  .agua-seccion {
+    animation: none;
+  }
+  .agua-gota { opacity: 0.9; }
+  .agua-nivel {
+    transition: none;
+  }
+}

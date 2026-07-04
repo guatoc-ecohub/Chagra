@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ChevronLeft, Sprout, Mic, RotateCcw, AlertTriangle, Beaker } from 'lucide-react';
+import { ChevronLeft, ChevronDown, Sprout, Mic, RotateCcw, AlertTriangle, Beaker } from 'lucide-react';
 import { listFarmProcesses, hydrateCyclesFromFarmOS } from '../db/farmProcessCache';
+import { agruparEntradas, claveMataAgrupada, stripInstanceSuffix, formatFechaSiembra } from '../utils/agruparEntradas';
 import { getProfile } from '../services/userProfileService';
 import DailyTasksView from './DailyTasksView';
 import CicloDetalle from './CicloDetalle';
@@ -22,6 +23,8 @@ export default function CicloCultivoScreen({ onBack, onNavigate }) {
   const [error, setError] = useState('');
   const [cycles, setCycles] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
+  // Grupos expandidos (por clave) — N matas iguales se colapsan en una fila.
+  const [expandedGroups, setExpandedGroups] = useState(() => new Set());
 
   const altitudeM = useMemo(() => {
     const v = getProfile()?.finca_altitud;
@@ -70,6 +73,32 @@ export default function CicloCultivoScreen({ onBack, onNavigate }) {
     () => cycles.find((c) => (c.process_id || c.id) === selectedId) || null,
     [cycles, selectedId],
   );
+
+  // Agrupar ciclos equivalentes (misma especie + fecha de siembra + lote) para
+  // no repetir N filas casi idénticas cuando se sembraron varias matas iguales
+  // ("Fresa #01".."#20"). Cada grupo se puede expandir a sus ciclos individuales
+  // (que siguen navegando a su propio detalle). Presentación pura: DailyTasksView
+  // y el detalle siguen usando `cycles` sin tocar.
+  const cycleGroups = useMemo(
+    () => agruparEntradas(cycles, (c) => {
+      const a = c.attributes || {};
+      return claveMataAgrupada({
+        species: a.subject_slug,
+        name: a.subject_label,
+        date: a.created_at,
+        bed: a.location_land_asset_id,
+      });
+    }),
+    [cycles],
+  );
+
+  const toggleGroup = useCallback((key) => {
+    setExpandedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  }, []);
 
   const Header = (
     <header className="flex items-center gap-2 px-4 pt-[calc(14px+env(safe-area-inset-top))] pb-2">
@@ -161,15 +190,18 @@ export default function CicloCultivoScreen({ onBack, onNavigate }) {
           {/* Digest "para hoy": labores urgentes agregadas de todos los ciclos. */}
           <DailyTasksView processes={cycles} />
           <ul className="flex flex-col gap-2">
-          {cycles.map((c) => {
-            const a = c.attributes || {};
-            const id = c.process_id || c.id;
-            return (
-              <li key={id}>
+          {cycleGroups.map((grupo) => {
+            // Fila individual reutilizable (navega al detalle del ciclo).
+            const renderCycleRow = (c, { nested = false } = {}) => {
+              const a = c.attributes || {};
+              const id = c.process_id || c.id;
+              return (
                 <button
                   type="button"
                   onClick={() => setSelectedId(id)}
-                  className="w-full text-left bg-slate-900 border border-slate-800 hover:border-lime-700/50 rounded-xl p-3 flex items-center gap-3"
+                  className={`w-full text-left border rounded-xl p-3 flex items-center gap-3 ${nested
+                    ? 'bg-slate-900/60 border-slate-800/80 hover:border-lime-700/40'
+                    : 'bg-slate-900 border-slate-800 hover:border-lime-700/50'}`}
                 >
                   <span className="w-10 h-10 rounded-full bg-lime-900/40 border border-lime-800/50 flex items-center justify-center shrink-0">
                     <Sprout size={18} className="text-lime-400" />
@@ -180,6 +212,49 @@ export default function CicloCultivoScreen({ onBack, onNavigate }) {
                   </span>
                   <ChevronLeft size={18} className="text-slate-600 rotate-180" />
                 </button>
+              );
+            };
+
+            // Grupo unitario o pequeño → fila normal (una sola).
+            if (!grupo.grouped) {
+              const c = grupo.representative;
+              return <li key={grupo.key}>{renderCycleRow(c)}</li>;
+            }
+
+            // Grupo colapsado: "Fresa ×20 · sembradas 4 mar" + expandir.
+            const a = grupo.representative.attributes || {};
+            const nombre = stripInstanceSuffix(a.subject_label) || a.subject_label || 'Ciclo';
+            const fecha = formatFechaSiembra(a.created_at);
+            const isOpen = expandedGroups.has(grupo.key);
+            return (
+              <li key={grupo.key}>
+                <button
+                  type="button"
+                  onClick={() => toggleGroup(grupo.key)}
+                  aria-expanded={isOpen}
+                  className="w-full text-left bg-slate-900 border border-slate-800 hover:border-lime-700/50 rounded-xl p-3 flex items-center gap-3"
+                >
+                  <span className="w-10 h-10 rounded-full bg-lime-900/40 border border-lime-800/50 flex items-center justify-center shrink-0">
+                    <Sprout size={18} className="text-lime-400" />
+                  </span>
+                  <span className="flex-1 min-w-0">
+                    <span className="flex items-center gap-1.5 min-w-0">
+                      <span className="text-sm font-bold text-slate-100 truncate">{nombre}</span>
+                      <span className="text-2xs font-bold text-lime-300 bg-lime-900/40 border border-lime-700/40 rounded-full px-1.5 py-0.5 shrink-0 tabular-nums">×{grupo.count}</span>
+                    </span>
+                    <span className="block text-xs text-slate-400">
+                      Etapa: {a.current_stage || '—'}{fecha ? ` · sembradas ${fecha}` : ''}
+                    </span>
+                  </span>
+                  <ChevronDown size={18} className={`text-slate-500 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {isOpen && (
+                  <ul className="mt-1.5 pl-3 border-l border-slate-800 flex flex-col gap-1.5">
+                    {grupo.items.map((c) => (
+                      <li key={c.process_id || c.id}>{renderCycleRow(c, { nested: true })}</li>
+                    ))}
+                  </ul>
+                )}
               </li>
             );
           })}

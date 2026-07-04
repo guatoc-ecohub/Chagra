@@ -7,6 +7,7 @@ import { savePayload } from '../services/payloadService';
 import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 import { usePhotoUrl } from '../hooks/usePhotoUrl';
 import BeforeAfterPhoto from './BeforeAfterPhoto';
+import EmptyStateCampo from './common/EmptyStateCampo.jsx';
 
 /**
  * AssetTimeline, Línea de tiempo agroecológica de un activo (plant).
@@ -470,12 +471,12 @@ export default function AssetTimeline({ assetId }) {
       )}
 
       {logs.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center text-center text-slate-500 min-h-[300px]">
-          <Leaf size={32} className="mx-auto mb-2 opacity-40" />
-          <p className="text-sm">Sin eventos registrados en los últimos 30 días.</p>
-          <p className="text-xs mt-1 opacity-70">
-            Los registros de siembra, insumos y cosecha aparecerán aquí.
-          </p>
+        <div className="flex-1 flex flex-col items-center justify-center min-h-[300px]">
+          <EmptyStateCampo
+            variant="bitacora"
+            title="Sin eventos registrados en los últimos 30 días."
+            hint="La bitácora de esta planta está por escribirse: cada siembra, aplicación y cosecha que registres se anota aquí."
+          />
         </div>
       ) : (
         <div className="flex-1 min-h-0 border-l-2 border-slate-800 ml-2">
