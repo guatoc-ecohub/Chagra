@@ -8,8 +8,14 @@ import { ScreenShell } from './common/ScreenShell';
 import {
   BiodigestorIlustracion, CicloCorralAbono, AbonoGlifo,
 } from './estiercol/EstiercolIlustraciones';
-import { estimarBiodigestor, ANIMALES_BIODIGESTOR } from '../services/biodigestorCalculator';
+import {
+  estimarBiodigestor, ANIMALES_BIODIGESTOR, PISOS_TERMICOS_BIODIGESTOR,
+  TRH_DIAS_POR_PISO,
+} from '../services/biodigestorCalculator';
 import './estiercol/estiercol.css';
+
+/** Días de retención en páramo (grounding CIPAV/LRRD), para el copy honesto. */
+const TRH_PARAMO_DIAS = TRH_DIAS_POR_PISO.paramo.dias;
 
 /**
  * EstiercolScreen — "Del corral al abono".
@@ -186,10 +192,11 @@ const BIODIGESTOR_BENEFICIOS = [
 function PilarBiodigestor() {
   const [tipoAnimal, setTipoAnimal] = useState('cerdo');
   const [numAnimales, setNumAnimales] = useState(300); // caso insignia
+  const [pisoTermico, setPisoTermico] = useState('calido');
 
   const est = useMemo(
-    () => estimarBiodigestor({ tipoAnimal, numAnimales }),
-    [tipoAnimal, numAnimales],
+    () => estimarBiodigestor({ tipoAnimal, numAnimales, pisoTermico }),
+    [tipoAnimal, numAnimales, pisoTermico],
   );
   // Mapa biogás → llenado visual de la cúpula (0.12..1).
   const llenado = Math.min(1, 0.12 + est.biogasM3Dia / 100);
@@ -310,6 +317,38 @@ function PilarBiodigestor() {
           </div>
         </div>
 
+        {/* Piso térmico — el TRH (tiempo de retención) NO es fijo: en clima
+            frío/páramo la digestión es más lenta y el digestor debe ser más
+            grande para el mismo hato (grounding CIPAV/LRRD). */}
+        <div className="mt-3">
+          <p className="text-xs font-bold text-slate-300 mb-1.5">¿Cómo es el clima de su finca?</p>
+          <div className="grid grid-cols-4 gap-1.5" role="group" aria-label="Piso térmico">
+            {PISOS_TERMICOS_BIODIGESTOR.map((p) => {
+              const activo = p.id === pisoTermico;
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => setPisoTermico(p.id)}
+                  aria-pressed={activo}
+                  data-testid={`biodigestor-piso-${p.id}`}
+                  className={`estiercol-pilar-btn rounded-xl border px-1.5 py-2 text-center ${activo
+                    ? 'border-lime-400/70 bg-lime-500/20 text-lime-100'
+                    : 'border-slate-700/60 bg-black/20 text-slate-300'}`}
+                >
+                  <span className="text-lg block" aria-hidden="true">{p.emoji}</span>
+                  <span className="text-2xs font-bold block mt-0.5">{p.nombre}</span>
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-2xs text-slate-400 mt-1.5 leading-snug">
+            Más frío, más días de retención: el digestor tarda más en dar el mismo
+            biogás. En páramo el tiempo de retención sube a <b className="text-slate-300">~{TRH_PARAMO_DIAS} días</b> (vs.
+            30 en clima cálido/templado) — por eso el digestor se ve más grande arriba.
+          </p>
+        </div>
+
         {/* Resultados */}
         <div className="grid grid-cols-2 gap-2.5 mt-4" data-testid="biodigestor-resultados">
           <ResultCard Icon={Container} valor={est.volumenDigestorM3} unidad="m³" etiqueta="Tamaño del digestor" tono="text-sky-200" />
@@ -319,10 +358,11 @@ function PilarBiodigestor() {
         </div>
 
         <div className="mt-3 rounded-lg border border-dashed border-slate-500/50 bg-slate-500/10 px-3 py-2 text-xs text-slate-300/90">
-          <span className="font-bold text-slate-200">Cifras estimadas.</span>{' '}
-          Son un orden de magnitud con relaciones estándar. Los rendimientos
-          exactos por región, raza y dieta se afinan con la investigación
-          (nacional + internacional) que está en curso.
+          <span className="font-bold text-slate-200">Cifras estimadas con datos citados.</span>{' '}
+          El estiércol/día, el biogás/kg (cerdo y bovino) y el tiempo de retención por
+          piso térmico salen de la investigación agronómica (CIPAV/LRRD; Rev. Cubana
+          de Ingeniería). Lo que aún no tiene fuente colombiana específica (biogás de
+          la gallinaza, consumo del fogón) sigue como orden de magnitud.
         </div>
       </SeccionCard>
     </div>

@@ -23,17 +23,34 @@
 
 /**
  * Coeficiente de la fórmula de Cochrane, Salinas & Sánchez (1980).
- * Rango de literatura 1.5–2.0 según el poder tampón (buffer) del suelo.
- * GROUNDED-PENDIENTE: el valor exacto por tipo de suelo (andisol vs oxisol vs
- * suelo de ladera cafetera) debe anclarse a fuente regional.
+ *
+ * GROUNDED (corrección aplicada — grounding 2026-07): verificado carácter por
+ * carácter contra el texto primario AGROSAVIA. El coeficiente de la fórmula
+ * "método por saturación de aluminio" es 1,8, no 1,5 (ese 1,5 corresponde a la
+ * variante distinta "método combinado Al + calidad del encalante", que además
+ * multiplica por un factor F de calidad del encalante). Como esta calculadora
+ * ya ajusta la dosis por el PRNT de la fuente elegida (equivalente a ese factor
+ * F), se usa el coeficiente de la fórmula pura de Cochrane:
+ *
+ *   CaCO₃ (t/ha) = 1,8 × (Al − PSAl) × CICE / 100
+ *
+ * Fuente: AGROSAVIA — Boletín técnico acidez y encalado (banano, Urabá; base
+ * Espinosa & Molina/INPOFOS 1999; fórmula Cochrane, Salinas & Sánchez 1980).
+ * deepresearch/2026-07-03-suelo-salud-nacional-CO.md §3.3. Confianza: alta.
  */
-export const COEF_COCHRANE_DEFAULT = 1.5;
+export const COEF_COCHRANE_DEFAULT = 1.8;
 
 /**
  * Saturación de aluminio OBJETIVO (%) tras el encalado. Se baja el Al hasta un
  * nivel tolerable por el cultivo, NO a cero (encalar de más bloquea P, Zn, B).
- * GROUNDED-PENDIENTE: umbral crítico por cultivo (café, papa, aguacate, maíz…)
- * debe anclarse a fuente. 25 % es un valor conservador de referencia general.
+ * GROUNDED-PENDIENTE: no existe un umbral único verificado para "cualquier
+ * cultivo". El DR (§3.2) solo verificó un umbral crop-specific citable: banano
+ * 5 % (inicio de manejo) a 10 % (tope operativo), AGROSAVIA, confianza alta. El
+ * umbral genérico ~60 % que circula en la web NO se pudo verificar en fuente
+ * primaria (falla SSL) y el propio DR advierte no usarlo como "universal".
+ * Hasta que la calculadora tenga selector de cultivo, se mantiene 25 % como
+ * valor conservador de referencia general — deliberadamente pendiente por
+ * cultivo (no se inventa un umbral universal).
  */
 export const SATURACION_AL_OBJETIVO_DEFAULT = 25;
 
@@ -52,8 +69,17 @@ export const FACTOR_THA_POR_CMOL_20CM_DEFAULT = 1.2;
  * Catálogo de fuentes de cal con su PRNT (Poder Relativo de Neutralización
  * Total, % equivalente a CaCO₃ puro). Baja el requerimiento efectivo: si la cal
  * neutraliza menos, hay que aplicar más.
- * GROUNDED-PENDIENTE: el PRNT REAL depende del proveedor y del lote; el usuario
- * debe leerlo en la ficha del producto. Estos son valores de referencia típicos.
+ *
+ * Contexto groundeado (AGROSAVIA, DR suelo §3.4 — tabla de Equivalente Químico
+ * ECC, no confundir con PRNT): calcítica 85–100 %, dolomítica 95–108 % (aporta
+ * 21,6 % Ca + 13,1 % Mg), hidróxido de calcio 120–135 %, óxido de calcio (cal
+ * viva) 150–175 %. El PRNT real = ECC × eficiencia granulométrica / 100 (ej.
+ * verificado: ECC 90 % × EG 80 % = PRNT 72 %) — SIEMPRE menor que el ECC puro.
+ * GROUNDED-PENDIENTE: el PRNT REAL depende del proveedor, el lote y la
+ * granulometría; el usuario debe leerlo en la ficha del producto. Los valores
+ * de abajo son de referencia típica (compatibles con el rango ECC de AGROSAVIA
+ * una vez descontada la eficiencia granulométrica), no el PRNT exacto de un
+ * producto concreto.
  */
 export const FUENTES_CAL = {
   cal_dolomita: { label: 'Cal dolomita', prnt: 95, aporta: 'Ca + Mg', nota: 'Aporta magnesio; buena si el Mg está bajo.' },

@@ -64,13 +64,18 @@ describe('AguaScreen — pilar riego', () => {
     expect(resultado).toHaveTextContent('4.6 mm/día');
   });
 
-  it('muestra los Kc de cultivos como slots grounded-pendiente (sin cifras inventadas)', () => {
+  it('muestra los Kc de cultivos ya groundeados (FAO-56) y llena el campo al tocar', () => {
     render(<AguaScreen onBack={() => {}} />);
     fireEvent.click(screen.getByTestId('pilar-tab-riego'));
-    // Todos los Kc del seed están en null → cada chip de cultivo lleva su slot
-    const slots = screen.getAllByTestId('slot-grounded-pendiente');
-    expect(slots.length).toBeGreaterThanOrEqual(6);
-    expect(screen.getByText('Maíz')).toBeInTheDocument();
+    // Kc groundeados: el chip de maíz muestra su valor de etapa media (1.2).
+    const chipMaiz = screen.getByTestId('agua-kc-maiz');
+    expect(chipMaiz).toHaveTextContent('Maíz');
+    expect(chipMaiz).toHaveTextContent('1.2');
+    // Al tocarlo, se llena el campo Kc de la calculadora.
+    fireEvent.click(chipMaiz);
+    expect(screen.getByTestId('agua-kc')).toHaveValue(1.2);
+    // La ETo por piso térmico también quedó groundeada (referencia IDEAM).
+    expect(screen.getByTestId('agua-eto-piso-frío')).toBeInTheDocument();
   });
 });
 
@@ -86,13 +91,18 @@ describe('AguaScreen — pilar cuidar (caso nacimiento + ENSO)', () => {
     expect(screen.getByTestId('enso-conexion')).toHaveTextContent(/Neutral|Niño|Niña/);
   });
 
-  it('las dosis de potabilización y la ronda legal quedan como dato en camino', () => {
+  it('muestra las dosis de potabilización y la ronda legal ya groundeadas', () => {
     render(<AguaScreen onBack={() => {}} />);
     fireEvent.click(screen.getByTestId('pilar-tab-cuidar'));
-    const slots = screen.getAllByTestId('slot-grounded-pendiente');
-    // dosis de cloro + metros de ronda, al menos
-    expect(slots.length).toBeGreaterThanOrEqual(2);
-    expect(screen.getByText(/hervirla hasta que suelte borbotones/i)).toBeInTheDocument();
+    // Dosis groundeadas (EPA/OMS/EAWAG): cloro, hervido y SODIS con cifras.
+    const dosis = screen.getByTestId('agua-dosis-potabilizacion');
+    expect(dosis).toHaveTextContent(/2 gotas/i);
+    expect(dosis).toHaveTextContent(/1 minuto/i);
+    expect(dosis).toHaveTextContent(/3 minutos/i);
+    // Ronda legal groundeada (Decreto 1449/1977): 100 m nacimiento, 30 m cauce.
+    const ronda = screen.getByTestId('agua-ronda-legal');
+    expect(ronda).toHaveTextContent(/100 metros a la redonda/i);
+    expect(ronda).toHaveTextContent(/30 metros a cada lado/i);
   });
 });
 

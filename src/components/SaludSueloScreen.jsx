@@ -87,22 +87,33 @@ function PerfilSueloIlustracion() {
   );
 }
 
-/* ── Indicadores del análisis (pilar 1). Umbrales = referencia general;
- *    los cortes finos por cultivo/región son GROUNDED-PENDIENTE. ── */
+/* ── Indicadores del análisis (pilar 1). Umbrales GROUNDED a valores GENERALES
+ *    del DR de suelo (deepresearch/2026-07-03-suelo-salud-nacional-CO.md §1):
+ *      - pH: óptimo general 5,5–7,0; neutro 6,6–7,3; alcalino >7,5 (USDA/IGAC,
+ *        confianza alta).
+ *      - P (Bray II) y K: cortes de la interpretación Cenicafé para café —
+ *        <10 ppm P y <0,2 cmol/kg K = bajo (confianza media-alta, clima
+ *        frío-medio andino).
+ *    Los cortes FINOS por cultivo/región siguen GROUNDED-PENDIENTE — el DR ADVIERTE
+ *    explícitamente que los umbrales de MO de Cenicafé (8–16 %) NO se pueden pasar
+ *    a clima cálido, por eso la MO se deja en un rango general conservador. ── */
 const INDICADORES_ANALISIS = [
   {
     key: 'ph', label: 'pH (acidez)', icon: Gauge, unidad: '', ejemplo: '5.4',
-    ayuda: 'Menos de 5.5 = tierra ácida (muchos cultivos sufren). 6.0–6.8 es lo ideal para la mayoría.',
-    // GROUNDED-PENDIENTE: rango óptimo exacto por cultivo (café/papa/aguacate…).
+    ayuda: 'Menos de 5.5 = tierra ácida (muchos cultivos sufren). 5.5–7.0 es el rango óptimo para la mayoría (USDA).',
+    // GROUNDED (DR suelo §1.1, USDA/IGAC): óptimo 5,5–7,0; alcalino >7,5.
+    // Corte fino por cultivo (café/papa/aguacate) sigue pendiente.
     interpreta: (v) => v == null ? null
       : v < 5.5 ? { txt: 'Ácida — conviene revisar encalado', color: 'amber' }
-      : v <= 6.8 ? { txt: 'En buen rango', color: 'emerald' }
+      : v <= 7.3 ? { txt: 'En buen rango', color: 'emerald' }
       : { txt: 'Alcalina — puede trabar hierro y zinc', color: 'lime' },
   },
   {
     key: 'mo', label: 'Materia orgánica', icon: Leaf, unidad: '%', ejemplo: '3.2',
     ayuda: 'Es la "comida" de la vida del suelo. Más materia orgánica = tierra más viva, más esponja, más retención.',
-    // GROUNDED-PENDIENTE: umbral de MO adecuada varía por clima (andino alto vs cálido).
+    // GROUNDED-PENDIENTE (a propósito): el DR ADVIERTE que los umbrales de MO
+    // varían fuerte por clima (Cenicafé 8–16 % es de clima frío; en cálido un
+    // 5 % ya es "muy alto"). Se usa un rango general conservador, no el andino.
     interpreta: (v) => v == null ? null
       : v < 2 ? { txt: 'Baja — la tierra puede estar cansada', color: 'amber' }
       : v <= 5 ? { txt: 'Aceptable', color: 'emerald' }
@@ -111,14 +122,16 @@ const INDICADORES_ANALISIS = [
   {
     key: 'p', label: 'Fósforo (P)', icon: Sprout, unidad: 'ppm', ejemplo: '12',
     ayuda: 'Clave para raíces y floración. En suelos ácidos el aluminio y el hierro lo "traban": ahí las micorrizas ayudan mucho.',
-    // GROUNDED-PENDIENTE: nivel crítico de P depende del método (Bray/Olsen) y suelo.
+    // GROUNDED (DR suelo §1.1, Cenicafé Bray II, clima frío-medio): <10 ppm bajo,
+    // 10–20 medio, >20 alto. Corte por método (Olsen) y suelo sigue pendiente.
     interpreta: (v) => v == null ? null
       : v < 10 ? { txt: 'Bajo', color: 'amber' } : { txt: 'Suficiente o alto', color: 'emerald' },
   },
   {
     key: 'k', label: 'Potasio (K)', icon: Wheat, unidad: 'cmol/kg', ejemplo: '0.3',
     ayuda: 'Da vigor, resistencia y calidad al fruto. Se pierde fácil en tierras arenosas.',
-    // GROUNDED-PENDIENTE: nivel crítico de K por cultivo.
+    // GROUNDED (DR suelo §1.1, Cenicafé, clima frío-medio): <0,2 bajo, 0,2–0,4
+    // medio, >0,4 alto. Corte fino por cultivo sigue pendiente.
     interpreta: (v) => v == null ? null
       : v < 0.2 ? { txt: 'Bajo', color: 'amber' } : { txt: 'Adecuado', color: 'emerald' },
   },

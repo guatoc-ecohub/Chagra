@@ -1,3 +1,9 @@
+/*
+ * i18n (ADR-050): este archivo es CONTENIDO/copy campesino en español Colombia
+ * (prácticas, pasos, señales del módulo Agua), pendiente de migrar a
+ * src/config/messages.js — mismo criterio que sanidadData.js / poscosechaCalculator.js.
+ */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 /**
  * aguaFinca.js — CONTENIDO del módulo "Agua de la finca" (3 pilares).
  *
@@ -62,61 +68,87 @@ export const PASOS_COSECHA = [
 
 /**
  * ETo de referencia por piso térmico (mm/día).
- * TODO GROUNDED-PENDIENTE: valores por piso térmico colombiano con fuente
- * (FAO-56 + estaciones IDEAM; DR de riego). La calculadora acepta el valor
- * digitado mientras llega el dato por zona.
+ *
+ * GROUNDED (DR agua nacional §2.2): la ETo cae con la altitud según la relación
+ * del IDEAM `ETo(mm/día) = 4,37·exp(−0,0002·altitud[m])`. Se evalúa esa fórmula
+ * en la altitud media de cada piso térmico colombiano (cálido ~500, templado
+ * ~1500, frío ~2500, páramo ~3500 msnm) y se redondea a 0,1 mm/día. Es una
+ * REFERENCIA orientadora (confianza media: fórmula de escala, no medición por
+ * estación): la calculadora sigue aceptando el valor exacto que la persona
+ * digite de su estación o del módulo de clima.
+ *
+ * Fuente: IDEAM — Nota Técnica ETo (relación ETo–altitud). Confianza: media.
  */
 export const ETO_POR_PISO_TERMICO = [
-  { piso: 'cálido', etoMmDia: null, estado: ESTADO_GROUNDED_PENDIENTE },
-  { piso: 'templado', etoMmDia: null, estado: ESTADO_GROUNDED_PENDIENTE },
-  { piso: 'frío', etoMmDia: null, estado: ESTADO_GROUNDED_PENDIENTE },
-  { piso: 'páramo', etoMmDia: null, estado: ESTADO_GROUNDED_PENDIENTE },
+  // 4,37·exp(−0,0002·500)  ≈ 3,95
+  { piso: 'cálido', etoMmDia: 4.0, altitudRefM: 500, estado: 'grounded', fuente: 'IDEAM (ETo≈4,37·e^(−0,0002·h))', confianza: 'media' },
+  // 4,37·exp(−0,0002·1500) ≈ 3,24
+  { piso: 'templado', etoMmDia: 3.2, altitudRefM: 1500, estado: 'grounded', fuente: 'IDEAM (ETo≈4,37·e^(−0,0002·h))', confianza: 'media' },
+  // 4,37·exp(−0,0002·2500) ≈ 2,65
+  { piso: 'frío', etoMmDia: 2.7, altitudRefM: 2500, estado: 'grounded', fuente: 'IDEAM (ETo≈4,37·e^(−0,0002·h))', confianza: 'media' },
+  // 4,37·exp(−0,0002·3500) ≈ 2,17
+  { piso: 'páramo', etoMmDia: 2.2, altitudRefM: 3500, estado: 'grounded', fuente: 'IDEAM (ETo≈4,37·e^(−0,0002·h))', confianza: 'media' },
 ];
 
 /**
  * Kc (coeficiente de cultivo) por especie y etapa.
- * TODO GROUNDED-PENDIENTE: Kc reales FAO-56 / literatura citada, por cultivo
- * y etapa fenológica, vía DR + catálogo (se conectará con el slug de especie
- * del directorio). `kc: null` = la UI muestra "dato en camino".
+ *
+ * GROUNDED (DR agua nacional §2.3 — FAO-56 Cuadro 12, clima sub-húmedo). Cada
+ * cultivo trae los tres Kc de etapa (inicial / media / final); `kc` es el de la
+ * etapa MEDIA (el pico de consumo, el número más útil como referencia única
+ * para la calculadora). Ajustar por clima local. Confianza alta (FAO-56,
+ * estándar internacional).
  */
 export const KC_CULTIVOS = [
-  { slug: 'maiz', nombre: 'Maíz', kc: null, estado: ESTADO_GROUNDED_PENDIENTE },
-  { slug: 'frijol', nombre: 'Fríjol', kc: null, estado: ESTADO_GROUNDED_PENDIENTE },
-  { slug: 'cafe', nombre: 'Café', kc: null, estado: ESTADO_GROUNDED_PENDIENTE },
-  { slug: 'platano', nombre: 'Plátano', kc: null, estado: ESTADO_GROUNDED_PENDIENTE },
-  { slug: 'tomate', nombre: 'Tomate', kc: null, estado: ESTADO_GROUNDED_PENDIENTE },
-  { slug: 'papa', nombre: 'Papa', kc: null, estado: ESTADO_GROUNDED_PENDIENTE },
+  { slug: 'maiz', nombre: 'Maíz', kc: 1.2, kcInicial: 0.30, kcMedia: 1.20, kcFinal: 0.35, estado: 'grounded', fuente: 'FAO-56 Cuadro 12 (maíz grano)', confianza: 'alta' },
+  { slug: 'frijol', nombre: 'Fríjol', kc: 1.15, kcInicial: 0.40, kcMedia: 1.15, kcFinal: 0.35, estado: 'grounded', fuente: 'FAO-56 Cuadro 12 (fríjol seco)', confianza: 'alta' },
+  { slug: 'cafe', nombre: 'Café', kc: 1.1, kcInicial: 1.05, kcMedia: 1.10, kcFinal: 1.10, estado: 'grounded', fuente: 'FAO-56 Cuadro 12 (café con cobertura)', confianza: 'alta' },
+  { slug: 'platano', nombre: 'Plátano', kc: 1.1, kcInicial: 0.50, kcMedia: 1.10, kcFinal: 1.00, estado: 'grounded', fuente: 'FAO-56 Cuadro 12 (banano/plátano año 1)', confianza: 'alta' },
+  { slug: 'tomate', nombre: 'Tomate', kc: 1.15, kcInicial: 0.60, kcMedia: 1.15, kcFinal: 0.80, estado: 'grounded', fuente: 'FAO-56 Cuadro 12 (tomate)', confianza: 'alta' },
+  { slug: 'papa', nombre: 'Papa', kc: 1.15, kcInicial: 0.50, kcMedia: 1.15, kcFinal: 0.75, estado: 'grounded', fuente: 'FAO-56 Cuadro 12 (papa)', confianza: 'alta' },
 ];
 
 /**
  * Eficiencia por sistema de riego (fracción del agua que sí llega a la raíz).
- * TODO GROUNDED-PENDIENTE: coeficientes con fuente (FAO). Mientras tanto la
- * comparación es solo CUALITATIVA (orden goteo > aspersión > gravedad), sin
- * números inventados.
+ *
+ * GROUNDED (DR agua nacional §2.1): goteo 90–95 % y aspersión 80–85 % son
+ * rangos de literatura (UCLM); surco/gravedad 70–80 % es el ÚNICO valor primario
+ * verificado en el DR (Manual de Métodos de Riego). Se guarda el punto medio del
+ * rango en `coef`, con su `coefRango` y confianza. El orden (goteo > aspersión >
+ * gravedad) no cambia.
  */
 export const SISTEMAS_RIEGO = [
   {
     id: 'goteo',
     nombre: 'Goteo (o botella gota a gota)',
     pierde: 'Pierde poquito',
-    coef: null,
-    estado: ESTADO_GROUNDED_PENDIENTE,
+    coef: 0.92,
+    coefRango: [0.90, 0.95],
+    estado: 'grounded',
+    fuente: 'Literatura de riego (UCLM) vía DR agua §2.1',
+    confianza: 'media',
     detalle: 'El agua cae despacio al pie de la mata. Se puede armar casero con manguera perforada o botellas. El que más rinde cuando el agua está contada.',
   },
   {
     id: 'aspersion',
     nombre: 'Aspersión (rociador)',
     pierde: 'Pierde algo al viento y al sol',
-    coef: null,
-    estado: ESTADO_GROUNDED_PENDIENTE,
+    coef: 0.82,
+    coefRango: [0.80, 0.85],
+    estado: 'grounded',
+    fuente: 'Literatura de riego (UCLM) vía DR agua §2.1',
+    confianza: 'media',
     detalle: 'Moja también donde no hay raíz, y con sol fuerte parte se evapora antes de caer. Riegue de madrugada o al caer la tarde.',
   },
   {
     id: 'gravedad',
     nombre: 'Por surco o manguera suelta',
     pierde: 'Pierde harto por el camino',
-    coef: null,
-    estado: ESTADO_GROUNDED_PENDIENTE,
+    coef: 0.75,
+    coefRango: [0.70, 0.80],
+    estado: 'grounded',
+    fuente: 'Manual de Métodos de Riego (surco bien operado, valor verificado) vía DR agua §2.1',
+    confianza: 'media-alta',
     detalle: 'Mucha agua se infiltra o se escurre antes de llegar a la mata. Si es lo que hay, riegue por tandas cortas y con el surco bien trazado.',
   },
 ];
@@ -136,15 +168,34 @@ export const PRACTICAS_AHORRO = [
 /**
  * Dosis de potabilización casera (cloro por litro, minutos de hervor, horas
  * de SODIS al sol).
- * TODO GROUNDED-PENDIENTE: dosis exactas con fuente sanitaria (OMS/MinSalud)
- * vía DR. El copy queda cualitativo y seguro mientras tanto.
+ *
+ * GROUNDED (DR agua nacional §3.3, dosis verificadas contra fuente sanitaria):
+ *   - Cloración: 2 gotas de hipoclorito (lejía sin aroma) al 6 % por litro,
+ *     mezclar y esperar 30 minutos; DOBLAR la dosis si el agua está turbia,
+ *     con color o muy fría. Fuente: EPA (español). Confianza: media.
+ *   - Hervir: 1 minuto a nivel del mar, 3 minutos por encima de ~1.000 msnm
+ *     (menor punto de ebullición en altura). Fuente: OMS/EPA. Confianza: alta.
+ *   - SODIS (desinfección solar): botella PET transparente ≤2 L, 6 horas de sol
+ *     despejado (2 días seguidos si hay mucha nube); SOLO si turbiedad <30 UNT.
+ *     Fuente: EAWAG-SANDEC/Banco Mundial. Confianza: alta.
+ *
+ * SEGURIDAD: el cloro y el SODIS pierden eficacia con agua turbia — asentar o
+ * filtrar primero. Se conserva el mensaje "si huele a químico o viene de potrero
+ * fumigado, ni hervida: consígala de otra fuente".
  */
 export const DOSIS_POTABILIZACION = {
-  estado: ESTADO_GROUNDED_PENDIENTE,
-  cloroGotasPorLitro: null,
-  hervorMinutos: null,
-  sodisHorasSol: null,
-  fuentePrevista: 'OMS / MinSalud — guías de tratamiento casero de agua para consumo',
+  estado: 'grounded',
+  cloroGotasPorLitro: 2,
+  cloroConcentracionPct: 6,
+  cloroEsperaMin: 30,
+  cloroDobleSiTurbia: true,
+  hervorMinutos: 1,
+  hervorMinutosSobre1000m: 3,
+  sodisHorasSol: 6,
+  sodisDiasSiNublado: 2,
+  sodisTurbiedadMaxUNT: 30,
+  fuente: 'EPA (cloración); OMS/EPA (hervido); EAWAG-SANDEC/Banco Mundial (SODIS) — DR agua §3.3',
+  confianza: 'media (cloro); alta (hervido, SODIS)',
 };
 
 /** Escalera de calidad: para qué sirve cada agua de la finca. Cualitativo. */
@@ -164,15 +215,22 @@ export const SENALES_ALERTA_AGUA = [
 
 /**
  * Franja legal de protección alrededor de nacimientos y cauces (metros).
- * TODO GROUNDED-PENDIENTE: metros exactos con la norma citada y vigente
- * (normativa forestal protectora de nacederos y rondas hídricas, DR legal).
- * No se muestra número hasta que esté verificado.
+ *
+ * GROUNDED (DR agua nacional §4.1, verificado contra norma): son MÍNIMOS
+ * obligatorios de conservación forestal que recaen sobre el propietario rural.
+ *   - Nacimientos: 100 m a la redonda (mínimo).
+ *   - Cauces (ríos/quebradas/arroyos, permanentes o no): 30 m a cada lado.
+ * Fuente: Decreto 1449 de 1977, Art. 3 (hoy compilado en el Decreto 1076 de
+ * 2015). Confianza: alta. No confundir con la "ronda hídrica" del Art. 83 del
+ * Decreto 2811/1974, que es un MÁXIMO de acotamiento (hasta 30 m) que fija la
+ * CAR; los metros de aquí son mínimos que aplican con o sin acotamiento.
  */
 export const RONDA_PROTECCION = {
-  estado: ESTADO_GROUNDED_PENDIENTE,
-  metrosNacimiento: null,
-  metrosCauce: null,
-  fuentePrevista: 'Normativa colombiana de rondas hídricas y áreas forestales protectoras (verificación legal en curso)',
+  estado: 'grounded',
+  metrosNacimiento: 100,
+  metrosCauce: 30,
+  fuente: 'Decreto 1449/1977 Art. 3 (compilado en Decreto 1076/2015) — DR agua §4.1',
+  confianza: 'alta',
 };
 
 /**
