@@ -46,7 +46,7 @@ import { createStreamDeadline } from '../../services/streamDeadline';
 // Sidecar agro-mcp (ADR-045 Fase 2 Step B/C). Detrás de feature flag
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
-import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, biopreparadoGrounding, postValidate, getClimaIdeam, isToolAllowed } from '../../services/sidecarClient';
+import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, biopreparadoGrounding, pisoTermicoGuard, postValidate, getClimaIdeam, isToolAllowed } from '../../services/sidecarClient';
 // CHIPS DE MODO (A3/A4, decisión operador 2026-06-02): el router PURO mapea
 // la intención forzada del chip → tool determinístico, SALTANDO el NLU
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
@@ -818,7 +818,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // formatToolEvidence y analyzeQuery viven en agentPromptBase (funciones
   // puras, testeables y medibles fuera de React).
 
-  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null, fermentoBlock = '', subgrafoBloque = '', biopreparadoBlock = '') => {
+  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null, fermentoBlock = '', subgrafoBloque = '', biopreparadoBlock = '', pisoTermicoBlock = '') => {
     const analysis = analyzeQuery(query);
     // El base recibe query/historial/isEnum para inyectar SOLO los glosarios
     // y reglas condicionales que la conversación toca (re-arquitectura GR-10).
@@ -1015,6 +1015,21 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       ? `\n\n${biopreparadoBlock}`
       : '';
 
+    // GUARDA PISO TÉRMICO (chagra-pro #288, driver #1 de contaminación
+    // cross-domain, sonda `cross_thermal` de bench-contaminacion.mjs, ~86.7%
+    // medida 2026-07). El sidecar /piso-termico-guard ya cruzó el piso térmico
+    // del usuario (finca georreferenciada > perfil > texto libre) contra el
+    // rango altitudinal real de la especie (mismo motor de viabilidad AGE de
+    // /resolve-entities) y armó un bloque de SUPRESIÓN-Y-REEMPLAZO cuando hay
+    // desajuste (marginal/inviable). Va de ÚLTIMO (recency máxima, después de
+    // fermento/biopreparado) porque, igual que esas guardas, debe dominar
+    // sobre el consejo de siembra genérico. '' (no-op) cuando el piso
+    // coincide, no hubo señal de piso del usuario, o el sidecar no respondió
+    // (degradación graceful — no rompe el turno, nunca inventa un rango).
+    const pisoTermicoSafetyBlock = (typeof pisoTermicoBlock === 'string' && pisoTermicoBlock.trim())
+      ? `\n\n${pisoTermicoBlock}`
+      : '';
+
     // Re-arquitectura GR-10: ensamblado con PRESUPUESTO de tokens y prioridad
     // por relevancia (promptAssembler). El grounding (evidencia / entidades /
     // hechos curados / cadena) va al FINAL del system — donde la truncación de
@@ -1044,6 +1059,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       priceDecline: priceDeclineBlock,
       fermento: fermentoSafetyBlock,
       biopreparado: biopreparadoSafetyBlock,
+      pisoTermico: pisoTermicoSafetyBlock,
     });
 
     const messages = [
@@ -1340,6 +1356,14 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // system prompt si no hubo intención-biopreparado o el sidecar no respondió
       // (degradación graceful — FAIL-SAFE, no fabrica datos).
       let biopreparadoBlock = '';
+      // GUARDA PISO TÉRMICO (chagra-pro #288, driver #1 de contaminación
+      // cross-domain — sonda `cross_thermal` de bench-contaminacion.mjs, ~86.7%
+      // medida 2026-07). Bloque de SUPRESIÓN-Y-REEMPLAZO ya formateado por el
+      // sidecar (/piso-termico-guard) cuando la especie mencionada resulta
+      // marginal/inviable para el piso térmico del usuario. '' por default →
+      // no-op en el system prompt si el piso coincide, no hubo señal de piso
+      // del usuario, o el sidecar no respondió (degradación graceful).
+      let pisoTermicoBlock = '';
       // GraphRAG multi-hop (#1 intelligence-first): bloque "CADENA DE RELACIONES"
       // del grafo AGE para queries relacionales (plaga+cultivo). '' = no-op.
       let subgrafoBloque = '';
@@ -1354,16 +1378,25 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             try { const p = getProfile(); if (p && p.finca_altitud != null) return p.finca_altitud; } catch (_) { /* noop */ }
             return (fincaActiva && fincaActiva.altitud) || null;
           })();
+          // Piso térmico EXPLÍCITO del perfil (si el usuario lo declaró en su
+          // ficha) — segunda prioridad del guard, detrás de finca_altitud
+          // numérica. Sin esto, el guard igual funciona vía texto libre del
+          // mensaje (degradación por diseño del sidecar).
+          const rePisoTermico = (() => {
+            try { const p = getProfile(); if (p && p.piso_termico) return p.piso_termico; } catch (_) { /* noop */ }
+            return null;
+          })();
           const tRE0 = performance.now();
-          // SAFETY-CRITICAL en PARALELO: /fermento-prefilter y
-          // /biopreparado-grounding corren junto a /resolve-entities (mismo turno,
-          // antes del LLM) — CERO latencia serial añadida. Los tres wrappers son
-          // no-throw (devuelven null en error/timeout), así que Promise.all no
-          // puede rechazar por ellos.
-          const [resolved, fermento, biopreparado] = await Promise.all([
+          // SAFETY-CRITICAL en PARALELO: /fermento-prefilter,
+          // /biopreparado-grounding y /piso-termico-guard corren junto a
+          // /resolve-entities (mismo turno, antes del LLM) — CERO latencia
+          // serial añadida. Los cuatro wrappers son no-throw (devuelven null
+          // en error/timeout), así que Promise.all no puede rechazar por ellos.
+          const [resolved, fermento, biopreparado, pisoTermico] = await Promise.all([
             resolveEntities(textForLLM, { fincaAltitud: reAltitud, context: contextMemory }),
             fermentoPrefilter(textForLLM),
             biopreparadoGrounding(textForLLM),
+            pisoTermicoGuard(textForLLM, { fincaAltitud: reAltitud, pisoTermico: rePisoTermico }),
           ]);
           const tRE1 = performance.now();
           // FERMENTOS: si el sidecar marcó intención-fermento, inyectamos su
@@ -1391,6 +1424,22 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             console.debug('[sidecar] biopreparado-grounding', {
               biopreparadoId: biopreparado.biopreparado_id,
               reason: biopreparado.reason,
+            });
+          }
+          // PISO TÉRMICO: si el sidecar detectó un desajuste (especie
+          // marginal/inviable para el piso del usuario), inyectamos su bloque
+          // de SUPRESIÓN-Y-REEMPLAZO al final del system prompt (recency
+          // máxima). Si el sidecar no respondió (null) o el piso coincide,
+          // pisoTermicoBlock queda '' → no-op, el turno sigue sin romperse
+          // (degradación graceful, FAIL-SAFE — nunca inventa un rango).
+          if (pisoTermico && pisoTermico.has_mismatch && typeof pisoTermico.system_prompt_block === 'string' && pisoTermico.system_prompt_block.trim()) {
+            pisoTermicoBlock = pisoTermico.system_prompt_block;
+            console.debug('[sidecar] piso-termico-guard', {
+              speciesId: pisoTermico.species_id,
+              userPiso: pisoTermico.user_piso_termico,
+              userPisoOrigen: pisoTermico.user_piso_origen,
+              viabilidad: pisoTermico.viabilidad,
+              reason: pisoTermico.reason,
             });
           }
           if (resolved && Array.isArray(resolved.entities) && resolved.entities.length > 0) {
@@ -1918,7 +1967,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       const deterministicPrice = buildPriceAnswer({ userMessage: text, toolEvidence });
       const rawResponse = deterministicPrice != null
         ? deterministicPrice
-        : await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, edgesTruncated, biopreparadoBlock);
+        : await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, edgesTruncated, biopreparadoBlock, pisoTermicoBlock);
       if (deterministicPrice != null) {
         console.debug('[precio] respuesta determinista SIPSA (sin LLM)', { route: nluRoute });
       }

@@ -558,24 +558,78 @@ async function resolveEntities(userMessage, { sidecarUrl = SIDECAR_URL } = {}) {
   }
 }
 
-function buildEnrichedSystemPrompt(entities) {
+/**
+ * pisoTermicoGuard — llama al MISMO endpoint determinista `/piso-termico-guard`
+ * (chagra-pro #288) que consume producción (`src/services/sidecarClient.js`,
+ * cableado en `AgentScreen.jsx`). Este bench debe reflejar el pipeline REAL,
+ * no uno idealizado: si el ensamblador de prod inyecta este guard, el bench
+ * lo inyecta también — de lo contrario la sonda `cross_thermal` mediría un
+ * agente que producción ya no sirve (gaming del número, no del pipeline).
+ * FAIL-SAFE: cualquier error/timeout/non-2xx degrada a `has_mismatch:false`
+ * (no-op), nunca rompe la sonda ni fabrica un bloque.
+ * @param {string} userMessage
+ * @param {{ sidecarUrl?: string }} [opts]
+ * @returns {Promise<{ has_mismatch: boolean, system_prompt_block: string }>}
+ */
+async function pisoTermicoGuard(userMessage, { sidecarUrl = SIDECAR_URL } = {}) {
+  const token = getSidecarToken();
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['X-Chagra-Token'] = token;
+  try {
+    const res = await fetch(`${sidecarUrl}/piso-termico-guard`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ user_message: userMessage }),
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!res.ok) return { has_mismatch: false, system_prompt_block: '' };
+    const data = await res.json();
+    return {
+      has_mismatch: data.has_mismatch === true,
+      system_prompt_block: typeof data.system_prompt_block === 'string' ? data.system_prompt_block : '',
+    };
+  } catch (err) {
+    return { has_mismatch: false, system_prompt_block: '', error: err.message };
+  }
+}
+
+/**
+ * buildEnrichedSystemPrompt — arma el system prompt que ve el modelo en la
+ * fase remote-run. `pisoTermicoBlock` (opcional) es el `system_prompt_block`
+ * YA formateado que devuelve `/piso-termico-guard` cuando detectó un
+ * desajuste (marginal/inviable) — se inyecta al FINAL (recency máxima),
+ * espejo exacto de cómo lo inyecta `AgentScreen.jsx` en producción (guarda
+ * de SUPRESIÓN-Y-REEMPLAZO, debe dominar sobre el consejo genérico). ''/
+ * ausente = no-op, el prompt queda idéntico al de antes de este guard.
+ * @param {object[]} entities
+ * @param {string} [pisoTermicoBlock]
+ */
+export function buildEnrichedSystemPrompt(entities, pisoTermicoBlock = '') {
   const basePrompt = `Eres un asistente agroecológico experto para Colombia. Responde en español claro, práctico para agricultores.
 
 Si mencionas entidades (especies, plagas, biopreparados), usa los nombres canónicos del catálogo Chagra para evitar alucinaciones. Si no tiene un dato verificado (por ejemplo, un contacto o teléfono), dígalo honestamente en vez de inventarlo.`;
 
-  if (!entities || entities.length === 0) return basePrompt;
+  const entityContext = (entities && entities.length > 0)
+    ? entities
+        .map((e) => {
+          if (e.kind === 'species') return `- ${e.mentioned} = especie: ${e.nombre_cientifico} (${e.nombre_comun})`;
+          if (e.kind === 'pest') return `- ${e.mentioned} = plaga/enfermedad del catálogo: ${e.nombre_cientifico || e.nombre_comun}`;
+          if (e.kind === 'biopreparado') return `- ${e.mentioned} = biopreparado: ${e.nombre_comun}`;
+          return null;
+        })
+        .filter(Boolean)
+        .join('\n')
+    : '';
 
-  const entityContext = entities
-    .map((e) => {
-      if (e.kind === 'species') return `- ${e.mentioned} = especie: ${e.nombre_cientifico} (${e.nombre_comun})`;
-      if (e.kind === 'pest') return `- ${e.mentioned} = plaga/enfermedad del catálogo: ${e.nombre_cientifico || e.nombre_comun}`;
-      if (e.kind === 'biopreparado') return `- ${e.mentioned} = biopreparado: ${e.nombre_comun}`;
-      return null;
-    })
-    .filter(Boolean)
-    .join('\n');
+  let prompt = entityContext
+    ? `${basePrompt}\n\nENTIDADES DEL CATÁLOGO (usa estos nombres canónicos):\n${entityContext}`
+    : basePrompt;
 
-  return `${basePrompt}\n\nENTIDADES DEL CATÁLOGO (usa estos nombres canónicos):\n${entityContext}`;
+  if (typeof pisoTermicoBlock === 'string' && pisoTermicoBlock.trim()) {
+    prompt = `${prompt}\n\n${pisoTermicoBlock}`;
+  }
+
+  return prompt;
 }
 
 async function callOllama(model, systemPrompt, userPrompt, { ollamaUrl = OLLAMA_URL, timeoutMs = CALL_TIMEOUT_MS } = {}) {
@@ -631,10 +685,16 @@ async function postValidate(userMessage, modelResponse, { sidecarUrl = SIDECAR_U
 
 /**
  * runProbeAgainstAgent — corre UNA sonda por el pipeline real. Impura (red),
- * pero cada dependencia (resolveEntities/callOllama/postValidate) es
- * inyectable para test sin red.
+ * pero cada dependencia (resolveEntities/callOllama/postValidate/
+ * pisoTermicoGuard) es inyectable para test sin red.
+ *
+ * `pisoTermicoFn` corre EN PARALELO con `resolveFn` (mismo turno, cero
+ * latencia serial añadida — espejo del `Promise.all` que hace
+ * `AgentScreen.jsx` en producción) y, si devuelve `has_mismatch:true`, su
+ * `system_prompt_block` se inyecta en `buildEnrichedSystemPrompt` — así el
+ * bench mide el MISMO pipeline que ve el usuario real, no uno sin el guard.
  * @param {object} probe
- * @param {{ model?: string, resolveFn?: Function, callFn?: Function, validateFn?: Function }} [opts]
+ * @param {{ model?: string, resolveFn?: Function, callFn?: Function, validateFn?: Function, pisoTermicoFn?: Function }} [opts]
  * @returns {Promise<object>}
  */
 export async function runProbeAgainstAgent(probe, opts = {}) {
@@ -643,10 +703,17 @@ export async function runProbeAgainstAgent(probe, opts = {}) {
     resolveFn = resolveEntities,
     callFn = callOllama,
     validateFn = postValidate,
+    pisoTermicoFn = pisoTermicoGuard,
   } = opts;
   const t0 = performance.now();
-  const { entities } = await resolveFn(probe.query);
-  const systemPrompt = buildEnrichedSystemPrompt(entities);
+  const [{ entities }, pisoTermico] = await Promise.all([
+    resolveFn(probe.query),
+    pisoTermicoFn(probe.query),
+  ]);
+  const pisoTermicoBlock = (pisoTermico && pisoTermico.has_mismatch && pisoTermico.system_prompt_block)
+    ? pisoTermico.system_prompt_block
+    : '';
+  const systemPrompt = buildEnrichedSystemPrompt(entities, pisoTermicoBlock);
   const { response, error } = await callFn(model, systemPrompt, probe.query);
   const validation = error ? { hallucinated: [], detected_count: 0 } : await validateFn(probe.query, response);
   return {
@@ -658,6 +725,7 @@ export async function runProbeAgainstAgent(probe, opts = {}) {
     response,
     error: error || null,
     entities_grounded: entities.length,
+    piso_termico_guard_fired: Boolean(pisoTermicoBlock),
     halluc_detected_count: validation.detected_count,
     latency_ms: Math.round(performance.now() - t0),
   };
