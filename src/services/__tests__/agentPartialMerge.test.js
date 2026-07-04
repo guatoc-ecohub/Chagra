@@ -11,13 +11,13 @@ describe('normalizeInterruptReason', () => {
     expect(normalizeInterruptReason(reason)).toBe(reason);
   });
 
-  it.each([
+  it.each(/** @type {Array<[string, any]>} */ ([
     ['undefined', undefined],
     ['null', null],
     ['string desconocido', 'network-error'],
     ['string vacío', ''],
     ['número', 42],
-  ])('normaliza %s a abort', (_label, value) => {
+  ]))('normaliza %s a abort', (_label, value) => {
     expect(normalizeInterruptReason(value)).toBe('abort');
   });
 });
@@ -60,13 +60,13 @@ describe('mergePartialOnInterruption — con parcial no vacío', () => {
 });
 
 describe('mergePartialOnInterruption — sin parcial útil', () => {
-  it.each([
+  it.each(/** @type {Array<[string, any]>} */ ([
     ['string vacío', ''],
     ['solo espacios', '   \n\t  '],
     ['null', null],
     ['undefined', undefined],
     ['no-string (número)', 7],
-  ])('con partialContent %s devuelve el error completo', (_label, partialContent) => {
+  ]))('con partialContent %s devuelve el error completo', (_label, partialContent) => {
     const result = mergePartialOnInterruption({ partialContent, reason: 'timeout' });
 
     expect(result).toEqual({
