@@ -110,6 +110,11 @@ const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScree
 // (calidad + nacimiento, caso "se me seca el nacimiento en verano").
 const AguaScreen = lazy(() => import('./components/agua/AguaScreen'));
 const SaludSueloScreen = lazy(() => import('./components/SaludSueloScreen'));
+// Mini-app "Semilla" (soberanía de semilla): seleccionar (plantas madre),
+// guardar (rama ortodoxa vs recalcitrante + Harrington) y probar germinación
+// (rag-doll + ajuste de densidad). Calculadoras deterministas en
+// src/services/semillaCalculator.js.
+const SemillaScreen = lazy(() => import('./components/semilla/SemillaScreen'));
 // LOS MUNDOS DE MI FINCA (reestructuración 2.0 del home): un mundo por dentro —
 // las funciones existentes agrupadas por lugar. Re-rutea, no reimplementa.
 const MundoScreen = lazy(() => import('./components/MundoScreen'));
@@ -213,6 +218,9 @@ const HASH_VIEW_ROUTES = {
   'salud-suelo': 'salud_suelo',
   'cuaderno-suelo': 'salud_suelo',
   encalado: 'salud_suelo',
+  semilla: 'semilla',
+  semillas: 'semilla',
+  'soberania-semilla': 'semilla',
   aprende: 'aprende',
   directorio: 'directorio',
   'directorio-especies': 'directorio',
@@ -230,7 +238,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'salud_suelo', 'toxicologia', 'aprende', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'salud_suelo', 'semilla', 'toxicologia', 'aprende', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
   'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
@@ -1289,6 +1297,17 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Salud del Suelo">
               <SaludSueloScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'semilla':
+        // Mini-app "Semilla" (soberanía de semilla): seleccionar / guardar /
+        // germinar, con calculadoras deterministas (semillaCalculator.js).
+        // Ruta #semilla / #soberania-semilla. Vive en el mundo Cultivos.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Semilla">
+              <SemillaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
