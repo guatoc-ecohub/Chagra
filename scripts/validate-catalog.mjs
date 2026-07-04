@@ -829,23 +829,24 @@ export const PATHOGEN_KEYWORDS = [
 export function validateAmb31_crossContaminationInsectoPatogeno(catalog) {
   const errors = [];
   for (const sp of catalog.species || []) {
-    // Check insectos en enfermedades_criticas
+    // Check insectos en enfermedades_criticas.
+    // Un ítem se reporta UNA vez aunque matchee varias keywords (p. ej.
+    // "Roya del café (Hemileia vastatrix)" contiene "roya" Y "hemileia"):
+    // la contaminación es del ítem, no de cada keyword.
     for (const enf of sp.enfermedades_criticas || []) {
       const nombre = String(enf || '').toLowerCase();
-      for (const ins of INSECT_KEYWORDS) {
-        if (nombre.includes(ins)) {
-          errors.push(`AMB-31 [${sp.id}.enfermedades_criticas]: "${enf}" es un insecto (${ins}) pero está en enfermedades_criticas — debe moverse a plagas_criticas`);
-        }
+      const matched = INSECT_KEYWORDS.filter((ins) => nombre.includes(ins));
+      if (matched.length) {
+        errors.push(`AMB-31 [${sp.id}.enfermedades_criticas]: "${enf}" es un insecto (${matched.join(', ')}) pero está en enfermedades_criticas — debe moverse a plagas_criticas`);
       }
     }
 
-    // Check patógenos en plagas_criticas
+    // Check patógenos en plagas_criticas (idem: un error por ítem).
     for (const pla of sp.plagas_criticas || []) {
       const nombre = String(pla || '').toLowerCase();
-      for (const pat of PATHOGEN_KEYWORDS) {
-        if (nombre.includes(pat)) {
-          errors.push(`AMB-31 [${sp.id}.plagas_criticas]: "${pla}" es un patógeno (${pat}) pero está en plagas_criticas — debe moverse a enfermedades_criticas`);
-        }
+      const matched = PATHOGEN_KEYWORDS.filter((pat) => nombre.includes(pat));
+      if (matched.length) {
+        errors.push(`AMB-31 [${sp.id}.plagas_criticas]: "${pla}" es un patógeno (${matched.join(', ')}) pero está en plagas_criticas — debe moverse a enfermedades_criticas`);
       }
     }
   }
