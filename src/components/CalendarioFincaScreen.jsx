@@ -9,6 +9,7 @@ import { listFarmProcesses, hydrateCyclesFromFarmOS } from '../db/farmProcessCac
 import { getProfile } from '../services/userProfileService';
 import { getAllSpecies } from '../db/catalogDB';
 import { matchSpeciesInCatalog } from '../utils/speciesResolver';
+import { agruparEntradas, claveMataAgrupada } from '../utils/agruparEntradas';
 import { isPerennialSpecies, monthShortName } from '../data/perennialCycles';
 import { getTemplate } from '../data/phenologyTemplates';
 import {
@@ -113,11 +114,26 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
       let fallback = false;
 
       if (Array.isArray(cycles) && cycles.length > 0) {
-        built = cycles.map((cycle) => {
+        // Agrupar ciclos equivalentes (misma especie + fecha + lote) ANTES de
+        // armar el calendario: N matas iguales ("Fresa #01".."#20") tienen un
+        // calendario fenológico idéntico, así que se colapsan en UNA fila
+        // "Fresa ×20". Sin esto la tira anual y el detalle mensual repiten la
+        // misma información N veces y el conteo de tareas queda inflado.
+        const grupos = agruparEntradas(cycles, (cycle) => {
+          const a = cycle.attributes || {};
+          return claveMataAgrupada({
+            species: a.subject_slug,
+            name: a.subject_label,
+            date: a.created_at,
+            bed: a.location_land_asset_id,
+          });
+        });
+        built = grupos.map((grupo) => {
+          const cycle = grupo.representative;
           const a = cycle.attributes || {};
           const species = matchSpeciesInCatalog(catalog, a.subject_slug, a.subject_label);
           const speciesSlug = species?.id || species?.slug || a.subject_slug;
-          return buildPlantCalendar({
+          const plant = buildPlantCalendar({
             id: cycle.process_id || cycle.id,
             name: a.subject_label || species?.nombre_comun || speciesSlug,
             speciesSlug,
@@ -126,6 +142,9 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
             altitudeM,
             now,
           });
+          // Cuántas matas iguales representa esta fila (para el badge "×N").
+          plant.count = grupo.count;
+          return plant;
         });
       } else {
         // 2. Sin finca: calendario por especie del catálogo con datos honestos.
@@ -388,6 +407,9 @@ export default function CalendarioFincaScreen({ onBack, onHome, onNavigate }) {
                   >
                     <span className="flex items-center gap-2 min-w-0">
                       <span className="text-sm font-bold text-white truncate">{plant.name}</span>
+                      {plant.count > 1 && (
+                        <span className="text-2xs font-bold text-lime-300 bg-lime-900/30 border border-lime-700/40 rounded-full px-1.5 py-0.5 shrink-0 tabular-nums">×{plant.count}</span>
+                      )}
                       {plant.isGeneric && (
                         <span className="text-2xs text-amber-400 shrink-0">aprox.</span>
                       )}
