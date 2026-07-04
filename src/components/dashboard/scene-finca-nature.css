@@ -1,0 +1,149 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   SCENE "EL ÁRBOL DE LA VIDA" (tema nature) — animaciones de la mañana dorada.
+   Todo CSS/SVG declarativo (cero JS por frame). Prefijo `fvn-` para no chocar
+   con el resto del hero. prefers-reduced-motion = mañana quieta digna (sol
+   fijo, copa quieta, bandada a mitad de cielo, sin hojas cayendo).
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.fvn-svg {
+  /* ritmo del viento: copa, matas, mariposas y humo comparten la brisa */
+  --fvn-brisa: 9s;
+}
+
+/* sol que respira (doble halo) */
+.fvn-halo { transform-box: fill-box; transform-origin: center; animation: fvn-halo 7s ease-in-out infinite; }
+.fvn-halo.fvn-h2 { animation-delay: -3.5s; }
+@keyframes fvn-halo { 0%, 100% { transform: scale(1); opacity: 0.26; } 50% { transform: scale(1.14); opacity: 0.45; } }
+
+/* rayo de luz que palpita apenas */
+.fvn-rayo { animation: fvn-rayo 11s ease-in-out infinite; }
+@keyframes fvn-rayo { 0%, 100% { opacity: 0.32; } 50% { opacity: 0.55; } }
+
+/* nubes a la deriva */
+.fvn-nube { animation: fvn-nube 30s ease-in-out infinite alternate; }
+.fvn-nube.fvn-n2 { animation-duration: 40s; animation-delay: -14s; }
+@keyframes fvn-nube { from { transform: translateX(-12px); } to { transform: translateX(16px); } }
+
+/* bandada que cruza el cielo completo (entra por la derecha) */
+.fvn-bandada { animation: fvn-bandada 34s linear infinite; }
+@keyframes fvn-bandada {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(-270px, 10px); }
+  100% { transform: translate(-540px, -4px); }
+}
+
+/* bruma del valle */
+.fvn-bruma { animation: fvn-bruma 32s ease-in-out infinite alternate; }
+@keyframes fvn-bruma { from { transform: translateX(-18px); } to { transform: translateX(20px); } }
+
+/* copa del árbol mecida por la brisa */
+.fvn-copa {
+  transform-box: view-box;
+  transform-origin: 195px 390px;
+  animation: fvn-copa var(--fvn-brisa) ease-in-out infinite;
+}
+@keyframes fvn-copa { 0%, 100% { transform: rotate(-0.6deg); } 50% { transform: rotate(0.7deg); } }
+
+/* frutos que maduran (brillo suave) */
+.fvn-fruto { transform-box: fill-box; transform-origin: center; animation: fvn-fruto 5.4s ease-in-out infinite; }
+.fvn-fruto.fvn-f2 { animation-delay: -1.8s; }
+.fvn-fruto.fvn-f3 { animation-delay: -3.6s; }
+@keyframes fvn-fruto { 0%, 100% { opacity: 0.75; transform: scale(1); } 50% { opacity: 1; transform: scale(1.18); } }
+
+/* hojas que caen del árbol (lento, en espiral suave) */
+.fvn-hoja-cae { animation: fvn-hoja-cae 12s ease-in infinite; transform-box: fill-box; transform-origin: center; }
+.fvn-hoja-cae.fvn-hc2 { animation-duration: 15s; animation-delay: -7s; }
+@keyframes fvn-hoja-cae {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  8% { opacity: 0.9; }
+  50% { transform: translate(-14px, 70px) rotate(120deg); opacity: 0.85; }
+  92% { opacity: 0.5; }
+  100% { transform: translate(6px, 140px) rotate(220deg); opacity: 0; }
+}
+
+/* turpial: giro de cabeza/cola de vez en cuando */
+.fvn-pajaro { transform-box: fill-box; transform-origin: 50% 100%; animation: fvn-pajaro 8s ease-in-out infinite; }
+@keyframes fvn-pajaro { 0%, 58%, 100% { transform: rotate(0); } 66%, 84% { transform: rotate(-5deg) translateY(-0.6px); } }
+
+/* colibrí: vuelo estacionario (bob) + alas */
+.fvn-colibri { animation: fvn-colibri 2.6s ease-in-out infinite; }
+@keyframes fvn-colibri { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(2px, -3px); } }
+.fvn-ala { transform-box: fill-box; transform-origin: 20% 90%; animation: fvn-ala 0.14s ease-in-out infinite alternate; }
+.fvn-ala.fvn-a2 { transform-origin: 20% 10%; animation-delay: -0.07s; }
+@keyframes fvn-ala { from { transform: rotate(-24deg); } to { transform: rotate(30deg); } }
+
+/* mariposas amarillas: vuelan alrededor del árbol (motion path) */
+.fvn-mariposa {
+  offset-path: path('M120,300 C150,240 250,236 292,288 C252,322 158,330 120,300');
+  offset-rotate: 0deg;
+  animation: fvn-vuelo-mp 22s ease-in-out infinite;
+}
+.fvn-mariposa.fvn-mp2 {
+  offset-path: path('M290,320 C240,286 150,282 108,318 C160,346 250,348 290,320');
+  animation-duration: 27s;
+  animation-direction: reverse;
+}
+@keyframes fvn-vuelo-mp { from { offset-distance: 0%; } to { offset-distance: 100%; } }
+.fvn-aleteo { transform-box: fill-box; transform-origin: center; animation: fvn-aleteo 0.5s ease-in-out infinite alternate; }
+@keyframes fvn-aleteo { from { transform: scaleX(1); } to { transform: scaleX(0.42); } }
+
+/* humo del fogón */
+.fvn-humo { animation: fvn-humo 4.6s linear infinite; }
+.fvn-humo.fvn-hu2 { animation-delay: -2.3s; }
+@keyframes fvn-humo {
+  0% { transform: translate(0, 0); opacity: 0; }
+  14% { opacity: 0.8; }
+  70% { transform: translate(3px, -16px); opacity: 0.4; }
+  100% { transform: translate(-2px, -28px); opacity: 0; }
+}
+
+/* matas de milpa con la brisa */
+.fvn-mata { transform-box: fill-box; transform-origin: 50% 100%; animation: fvn-mata var(--fvn-brisa) ease-in-out infinite; }
+.fvn-mata.fvn-m2 { animation-delay: -3s; }
+.fvn-mata.fvn-m3 { animation-delay: -6s; }
+@keyframes fvn-mata { 0%, 100% { transform: rotate(-1.6deg); } 50% { transform: rotate(1.8deg); } }
+
+/* cerezas de café que maduran */
+.fvn-cereza { transform-box: fill-box; transform-origin: center; animation: fvn-cereza 4.6s ease-in-out infinite; }
+.fvn-cereza.fvn-c2 { animation-delay: -1.5s; }
+.fvn-cereza.fvn-c3 { animation-delay: -3s; }
+@keyframes fvn-cereza { 0%, 100% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.25); } }
+
+/* polen dorado que flota en el rayo de luz */
+.fvn-mota { animation: fvn-mota 9s linear infinite; }
+.fvn-mota.fvn-mo2 { animation-duration: 11s; animation-delay: -4s; }
+.fvn-mota.fvn-mo3 { animation-duration: 8s; animation-delay: -6s; }
+.fvn-mota.fvn-mo4 { animation-duration: 12s; animation-delay: -2s; }
+@keyframes fvn-mota {
+  0% { transform: translate(0, 0); opacity: 0; }
+  16% { opacity: 0.9; }
+  84% { opacity: 0.7; }
+  100% { transform: translate(14px, -44px); opacity: 0; }
+}
+
+/* raíces: la savia baja (pulso lento, en familia con el latido biopunk) */
+.fvn-raiz { animation: fvn-raiz 6.4s ease-in-out infinite; }
+.fvn-raiz.fvn-r2 { animation-delay: -3.2s; }
+@keyframes fvn-raiz { 0%, 100% { opacity: 0.62; } 50% { opacity: 1; } }
+
+/* semillas germinando (el brote se estira apenas) */
+.fvn-semilla { transform-box: fill-box; transform-origin: 50% 100%; animation: fvn-semilla 7s ease-in-out infinite; }
+.fvn-semilla.fvn-s2 { animation-delay: -3.5s; }
+@keyframes fvn-semilla { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+
+/* lombriz que se estira */
+.fvn-lombriz { animation: fvn-lombriz 5s ease-in-out infinite; }
+@keyframes fvn-lombriz { 0%, 100% { transform: translateX(0) scaleX(1); } 50% { transform: translateX(3px) scaleX(1.12); } }
+
+/* ── reduced motion: mañana quieta DIGNA ────────────────────────────────────
+   (el apagado global lo hace finca-viva-hero.css; aquí la foto fija: bandada
+   a mitad de cielo, sin hojas cayendo, polen posado, raíces encendidas.) */
+@media (prefers-reduced-motion: reduce) {
+  .fvn-svg * { animation: none !important; }
+  .fvn-bandada { transform: translate(-260px, 8px); }
+  .fvn-hoja-cae { opacity: 0; }
+  .fvn-mota { opacity: 0.55; }
+  .fvn-raiz { opacity: 0.9; }
+  .fvn-mariposa { offset-distance: 30%; }
+  .fvn-mariposa.fvn-mp2 { offset-distance: 65%; }
+}

@@ -1,0 +1,74 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   SCENE "UN SOLO TRAZO" (tema minimalista) — el dibujo de línea que SE TRAZA
+   SOLO al entrar y luego respira apenas. Todo CSS/SVG declarativo (cero JS
+   por frame). Prefijo `fvm-`. Cada elemento lleva pathLength="1" para que el
+   draw-in sea independiente de la longitud real del trazo. Las etapas
+   fvm-t1…fvm-t9 orquestan el orden del dibujo (loma → casa → árbol → vida).
+   prefers-reduced-motion = el dibujo COMPLETO y quieto desde el primer frame.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* trazo que se dibuja (base: oculto hasta que su etapa lo llama) */
+.fvm-draw {
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  animation: fvm-draw 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes fvm-draw { to { stroke-dashoffset: 0; } }
+
+/* elementos que aparecen en fundido (sol, puntos, leyenda, humo) */
+.fvm-fade {
+  opacity: 0;
+  animation: fvm-fade 1.1s ease forwards;
+}
+@keyframes fvm-fade { to { opacity: 1; } }
+
+/* etapas del dibujo (delay heredado por los trazos y fundidos del grupo) */
+.fvm-t1 .fvm-draw, .fvm-t1.fvm-fade { animation-delay: 0.15s; }
+.fvm-t2 .fvm-draw, .fvm-t2.fvm-fade { animation-delay: 0.4s; }
+.fvm-t3 .fvm-draw, .fvm-t3.fvm-fade { animation-delay: 0.7s; }
+.fvm-t4 .fvm-draw, .fvm-t4.fvm-fade { animation-delay: 0.95s; }
+.fvm-t5 .fvm-draw, .fvm-t5.fvm-fade { animation-delay: 1.2s; }
+.fvm-t6 .fvm-draw, .fvm-t6.fvm-fade { animation-delay: 1.5s; }
+.fvm-t7 .fvm-draw, .fvm-t7 .fvm-fade, .fvm-t7.fvm-fade { animation-delay: 1.8s; }
+.fvm-t8 .fvm-draw, .fvm-t8 .fvm-fade, .fvm-t8.fvm-fade { animation-delay: 2.1s; }
+.fvm-t9 .fvm-draw, .fvm-t9.fvm-fade { animation-delay: 2.5s; }
+/* el punto dorado del colibrí llega de último dentro de su etapa */
+.fvm-t7 .fvm-fade.fvm-t8 { animation-delay: 2.2s; }
+
+/* ── la vida mínima después del trazo ─────────────────────────────────────── */
+
+/* halo del sol: late apenas */
+.fvm-halo { transform-box: fill-box; transform-origin: center; animation: fvm-halo 8s ease-in-out infinite; }
+@keyframes fvm-halo { 0%, 100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(1.1); opacity: 0.5; } }
+
+/* el ave planea despacio por el cielo de papel */
+.fvm-ave { animation: fvm-ave 30s ease-in-out infinite alternate; }
+@keyframes fvm-ave { from { transform: translate(0, 0); } to { transform: translate(150px, -20px); } }
+
+/* el humo fluye (línea punteada que corre) */
+.fvm-humo {
+  stroke-dasharray: 3 7;
+  animation: fvm-humo-flujo 3.2s linear infinite;
+  opacity: 0.75;
+}
+@keyframes fvm-humo-flujo { to { stroke-dashoffset: -40; } }
+
+/* la flor respira con la brisa */
+.fvm-flor { transform-box: view-box; transform-origin: 216px 300px; animation: fvm-flor 7s ease-in-out infinite; }
+@keyframes fvm-flor { 0%, 100% { transform: rotate(-1.4deg); } 50% { transform: rotate(1.6deg); } }
+
+/* el colibrí de línea: vuelo estacionario + su ala */
+.fvm-colibri { animation: fvm-colibri 3s ease-in-out infinite; }
+@keyframes fvm-colibri { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-2px, -3px); } }
+.fvm-alaline { transform-box: fill-box; transform-origin: 20% 100%; animation: fvm-alaline 0.16s ease-in-out infinite alternate; }
+@keyframes fvm-alaline { from { transform: rotate(-14deg); } to { transform: rotate(18deg); } }
+
+/* ── reduced motion: el dibujo COMPLETO, quieto y digno ─────────────────────
+   (el apagado global de animaciones lo hace finca-viva-hero.css; aquí se
+   garantiza que el trazo esté terminado y todo visible sin animar.) */
+@media (prefers-reduced-motion: reduce) {
+  .fvm-svg * { animation: none !important; }
+  .fvm-draw { stroke-dashoffset: 0; }
+  .fvm-fade { opacity: 1; }
+  .fvm-humo { stroke-dasharray: 3 7; opacity: 0.6; }
+}

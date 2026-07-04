@@ -1,0 +1,120 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   SCENE "HUERTO EXUBERANTE" (tema verde-vivo) — animaciones de la huerta en su
+   mejor mañana. Todo CSS/SVG declarativo (cero JS por frame). Prefijo `fvv-`.
+   prefers-reduced-motion = huerto quieto digno (gota posada en la hoja, sin
+   goteo ni onda, mariposas suspendidas, sol quieto).
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.fvv-svg {
+  /* ciclo del rocío: gota que se hincha → cae → onda (todo sincronizado) */
+  --fvv-rocio: 4.6s;
+}
+
+/* sol: halo que respira + rayos que giran muy despacio */
+.fvv-halo { transform-box: fill-box; transform-origin: center; animation: fvv-halo 6s ease-in-out infinite; }
+@keyframes fvv-halo { 0%, 100% { transform: scale(1); opacity: 0.28; } 50% { transform: scale(1.16); opacity: 0.45; } }
+.fvv-rayos { transform-box: view-box; transform-origin: 318px 62px; animation: fvv-rayos 46s linear infinite; }
+@keyframes fvv-rayos { to { transform: rotate(360deg); } }
+
+/* destellos de mañana */
+.fvv-brillo { transform-box: fill-box; transform-origin: center; animation: fvv-brillo 3.6s ease-in-out infinite; }
+.fvv-brillo.fvv-b2 { animation-delay: -1.2s; }
+.fvv-brillo.fvv-b3 { animation-delay: -2.4s; }
+@keyframes fvv-brillo { 0%, 100% { opacity: 0.15; transform: scale(0.7); } 50% { opacity: 1; transform: scale(1.15); } }
+
+/* plantas que bailan con la brisa (tomateras, acelga, zanahorias) */
+.fvv-planta { transform-box: fill-box; transform-origin: 50% 100%; animation: fvv-planta 5.6s ease-in-out infinite; }
+.fvv-planta.fvv-p2 { animation-delay: -1.9s; }
+.fvv-planta.fvv-p3 { animation-delay: -3.8s; }
+@keyframes fvv-planta { 0%, 100% { transform: rotate(-1.8deg); } 50% { transform: rotate(2deg); } }
+
+/* lechugas que crecen a ojo (pulso de vida) */
+.fvv-crece { transform-box: fill-box; transform-origin: 50% 90%; animation: fvv-crece 4.4s ease-in-out infinite; }
+.fvv-crece.fvv-p2 { animation-delay: -1.5s; }
+.fvv-crece.fvv-p3 { animation-delay: -3s; }
+@keyframes fvv-crece { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+/* auyama satisfecha (respira apenas) + flor que saluda */
+.fvv-auyama { transform-box: fill-box; transform-origin: 50% 100%; animation: fvv-auyama 7s ease-in-out infinite; }
+@keyframes fvv-auyama { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.025, 1.04); } }
+.fvv-flor { transform-box: fill-box; transform-origin: 0% 100%; animation: fvv-flor 4.8s ease-in-out infinite; }
+@keyframes fvv-flor { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(4deg); } }
+
+/* girasol que se mece (protagonista del fondo) */
+.fvv-girasol { transform-box: fill-box; transform-origin: 50% 100%; animation: fvv-girasol 8s ease-in-out infinite; }
+@keyframes fvv-girasol { 0%, 100% { transform: rotate(-1.6deg); } 50% { transform: rotate(1.8deg); } }
+
+/* abeja: órbita de trabajo alrededor del girasol */
+.fvv-abeja {
+  offset-path: path('M296,212 C272,196 258,216 276,228 C292,238 308,224 296,212');
+  offset-rotate: 0deg;
+  animation: fvv-abeja 7s linear infinite;
+}
+@keyframes fvv-abeja { from { offset-distance: 0%; } to { offset-distance: 100%; } }
+.fvv-ala-abeja { transform-box: fill-box; transform-origin: 50% 100%; animation: fvv-ala-abeja 0.1s linear infinite alternate; }
+@keyframes fvv-ala-abeja { from { transform: scaleY(1); } to { transform: scaleY(0.4); } }
+
+/* mariposas: paseo por las eras (motion path) */
+.fvv-mariposa {
+  offset-path: path('M40,244 C120,186 240,192 342,242 C244,272 122,280 40,244');
+  offset-rotate: 0deg;
+  animation: fvv-vuelo-mp 17s ease-in-out infinite;
+}
+.fvv-mariposa.fvv-mp2 {
+  offset-path: path('M350,160 C260,120 140,126 52,164 C140,190 262,188 350,160');
+  animation-duration: 23s;
+  animation-direction: reverse;
+}
+@keyframes fvv-vuelo-mp { from { offset-distance: 0%; } to { offset-distance: 100%; } }
+.fvv-aleteo { transform-box: fill-box; transform-origin: center; animation: fvv-aleteo 0.45s ease-in-out infinite alternate; }
+@keyframes fvv-aleteo { from { transform: scaleX(1); } to { transform: scaleX(0.4); } }
+
+/* hojas de bore del primer plano: vaivén lento */
+.fvv-hoja { transform-box: view-box; transform-origin: 0px 486px; animation: fvv-hoja 9s ease-in-out infinite; }
+.fvv-hoja.fvv-h2 { transform-origin: 390px 486px; animation-delay: -4.5s; }
+@keyframes fvv-hoja { 0%, 100% { transform: rotate(-0.7deg); } 50% { transform: rotate(0.8deg); } }
+
+/* LA GOTA: se hincha en el borde de la hoja… */
+.fvv-gota { transform-box: fill-box; transform-origin: 50% 0%; animation: fvv-gota var(--fvv-rocio) ease-in infinite; }
+@keyframes fvv-gota {
+  0% { transform: scale(0.55); opacity: 0.9; }
+  55% { transform: scale(1); opacity: 1; }
+  72% { transform: scale(1.12, 1.22); }
+  78% { transform: scale(0.5, 0.6); opacity: 0; }
+  100% { transform: scale(0.5); opacity: 0; }
+}
+/* …cae… */
+.fvv-goteo { animation: fvv-goteo var(--fvv-rocio) ease-in infinite; }
+@keyframes fvv-goteo {
+  0%, 74% { transform: translateY(0); opacity: 0; }
+  78% { opacity: 1; }
+  92% { transform: translateY(50px); opacity: 0.9; }
+  96%, 100% { transform: translateY(52px); opacity: 0; }
+}
+/* …y hace onda en la tierra */
+.fvv-onda { transform-box: fill-box; transform-origin: center; animation: fvv-onda var(--fvv-rocio) ease-out infinite; }
+@keyframes fvv-onda {
+  0%, 90% { transform: scale(0.3); opacity: 0; }
+  93% { opacity: 0.9; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+/* perlas de rocío que brillan */
+.fvv-perla { animation: fvv-perla 3.8s ease-in-out infinite; }
+.fvv-perla.fvv-pe2 { animation-delay: -1.3s; }
+.fvv-perla.fvv-pe3 { animation-delay: -2.6s; }
+@keyframes fvv-perla { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+
+/* ── reduced motion: huerto quieto DIGNO ────────────────────────────────────
+   La gota queda posada y brillante en la hoja; sin goteo ni onda; mariposas
+   suspendidas a mitad de paseo; abeja junto al girasol. */
+@media (prefers-reduced-motion: reduce) {
+  .fvv-svg * { animation: none !important; }
+  .fvv-gota { transform: scale(1); opacity: 1; }
+  .fvv-goteo, .fvv-onda { opacity: 0; }
+  .fvv-perla { opacity: 0.9; }
+  .fvv-mariposa { offset-distance: 25%; }
+  .fvv-mariposa.fvv-mp2 { offset-distance: 60%; }
+  .fvv-abeja { offset-distance: 10%; }
+  .fvv-brillo { opacity: 0.7; transform: scale(1); }
+}

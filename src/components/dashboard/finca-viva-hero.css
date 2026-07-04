@@ -1226,15 +1226,15 @@ html[data-theme="biopunk"] .fvh {
 .fvh .fvh-portales-tit span { background: var(--fvh-on-cielo-div); }
 
 /* ════════════════════════════════════════════════════════════════════════════
-   ESCENA "FINCA ORGANISMO" (solo tema biopunk) — ajustes del contenedor.
-   La escena aprobada (SceneFincaOrganismo, mockup escena-home-biopunk-v2)
-   incluye el CORTE DE SUELO con el corazón-semilla: es más ALTA (390×486)
-   que las escenas isométricas (390×360). El modificador del wrap le da su
-   proporción para que el corazón bajo tierra SIEMPRE se vea, y apaga las
-   capas de "grade"/velo genéricas: la escena trae su PROPIA atmósfera neón
-   calibrada (aurora, niebla, halos). Solo aplica en biopunk; los otros
-   temas nunca montan este modificador. */
-.fvh .fvh-escena-wrap--organismo .fvh-escena {
+   ESCENAS VIVAS POR TEMA (`--viva`) — ajustes del contenedor compartidos por
+   las 4 escenas de autor (biopunk "Finca Organismo" · nature "El Árbol de la
+   Vida" · verde-vivo "Huerto Exuberante" · minimalista "Un solo trazo").
+   Todas usan el formato ALTO 390×486 (la biopunk además incluye el corte de
+   suelo con el corazón-semilla; nature, su corte de raíces). El modificador
+   del wrap les da su proporción y apaga las capas de "grade"/velo genéricas:
+   cada escena YA ES el arte final calibrado de su tema. El alias histórico
+   `--organismo` sigue emitiéndose en biopunk para specs externos. */
+.fvh .fvh-escena-wrap--viva .fvh-escena {
   height: auto;
   aspect-ratio: 390 / 486;
   max-width: 460px;
@@ -1242,6 +1242,7 @@ html[data-theme="biopunk"] .fvh {
   margin: 6px auto 0;
 }
 /* La escena ya ES el arte final del tema: sin grade de color encima. */
-.fvh .fvh-escena-wrap--organismo .fvh-escena > svg { filter: none; }
-/* Sin velo neón genérico (::after) — duplicaba brillos sobre la aurora. */
-.fvh .fvh-escena-wrap--organismo::after { opacity: 0; }
+.fvh .fvh-escena-wrap--viva .fvh-escena > svg { filter: none; }
+/* Sin velo/veladura genérica (::after) — duplicaba brillos/tramas sobre la
+   atmósfera propia de cada escena (aurora neón, rayo dorado, rocío, papel). */
+.fvh .fvh-escena-wrap--viva::after { opacity: 0; }
