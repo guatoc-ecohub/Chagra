@@ -26,7 +26,7 @@ import {
     rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays, Sprout, HelpCircle, Store, FileText, Mic, CloudRain, Leaf } from 'lucide-react';
+import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays, Sprout, HelpCircle, Store, FileText, Mic, CloudRain, Leaf, Gauge } from 'lucide-react';
 import AgentHero from './AgentHero';
 import OnboardingHero from '../OnboardingHero';
 import {
@@ -187,6 +187,11 @@ const APRENDER_TILES = [
     // Módulo "Agua de la finca" (cosecha de lluvia + riego con medida +
     // cuidar el nacimiento). Ruta real: App.jsx case 'agua' / #agua.
     { view: 'agua', label: 'Agua', labelF2: 'El agua de su finca', icon: CloudRain, desc: 'Cosechar lluvia, regar con medida y cuidar el nacimiento', descF2: 'Coseche la lluvia, riegue con medida y cuide su nacimiento', accent: 'text-cyan-400 border-l-cyan-500' },
+    // Cuaderno del Suelo (módulo Salud del Suelo): leer el análisis de laboratorio
+    // (pH, MO, N-P-K, aluminio), calculadora de encalado determinista y mejora del
+    // suelo. Complementa la ruta 'suelo' (diagnóstico folk sin laboratorio) y
+    // enlaza a la cromatografía + micorrizas del grafo, sin reimplementarlas.
+    { view: 'salud_suelo', label: 'Cuaderno del Suelo', icon: Gauge, desc: 'Leer el análisis, encalar y mejorar la tierra', descF2: 'Cómo está su tierra, corregir la acidez y mejorarla', accent: 'text-emerald-400 border-l-emerald-500' },
     { view: 'toxicologia', label: 'Seguridad', icon: ShieldAlert, desc: 'Toxicidad de insumos y riesgo', descF2: 'Qué es peligroso y cómo cuidarse', accent: 'text-rose-400 border-l-rose-500' },
     { view: 'faq', label: 'Preguntas frecuentes', icon: HelpCircle, desc: 'Cómo funciona Chagra', accent: 'text-violet-400 border-l-violet-500' },
 ];
