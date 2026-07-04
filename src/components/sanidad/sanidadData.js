@@ -519,18 +519,22 @@ export const CULTIVOS = {
 export const SINTOMAS = [
     {
         id: 'gota',
-        label: 'Gota / lancha / rancha',
+        label: 'Gota / gotera / lancha / rancha',
         emoji: '💧',
         vineta: 'manchaHumeda',
         terminos: ['gota', 'gotera', 'lancha', 'rancha', 'chispeado', 'tizon tardio', 'gotiando', 'se esta gotiando'],
         pista: 'Manchas húmedas pardo-oscuras que se extienden rápido; en clima fresco y húmedo salen con un vellito blanco en el envés.',
-        nota: 'En tomate, si viene con SEQUÍA y calor, ya no es la gota sino el tizón temprano (Alternaria): manchitas cafés con anillos.',
+        // "gotera" es POLISÉMICA (DR sanidad §2.1/§2.2): en papa/tomate es la
+        // gota (Phytophthora); en CAFÉ, "gotera" es el ojo de gallo (Mycena
+        // citricolor), otra enfermedad. Por eso el síntoma pregunta el cultivo.
+        nota: 'Ojo con "gotera": en papa y tomate es la gota (Phytophthora). En CAFÉ, "gotera" es el ojo de gallo (Mycena citricolor), otra enfermedad. Y en tomate con SEQUÍA y calor ya no es la gota sino el tizón temprano (Alternaria): manchitas cafés con anillos.',
         pregunta: {
             texto: '¿En qué mata la vio?',
             tipo: 'cultivo',
             opciones: [
                 { cultivo: 'papa', causa: 'phytophthora_infestans' },
                 { cultivo: 'tomate', causa: 'phytophthora_infestans' },
+                { cultivo: 'cafe', causa: 'mycena_citricolor' },
             ],
         },
     },

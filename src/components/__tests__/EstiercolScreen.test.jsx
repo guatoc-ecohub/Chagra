@@ -33,9 +33,10 @@ describe('EstiercolScreen — "Del corral al abono"', () => {
     fireEvent.click(within(screen.getByTestId('estiercol-pilares')).getByText('Biodigestor'));
     const input = screen.getByLabelText(/Cuántos cerdos/i);
     expect(input.value).toBe('300');
-    // Resultados coherentes con la fórmula (72 m³/día de biogás para 300 cerdos).
+    // Groundeado (CIPAV/LRRD): 300 cerdos → 17 m³/día de biogás en clima
+    // cálido/templado (default). 810 kg estiércol × 0.021 m³/kg.
     const res = screen.getByTestId('biodigestor-resultados');
-    expect(within(res).getByText('72')).toBeTruthy();
+    expect(within(res).getByText('17')).toBeTruthy();
   });
 
   it('la calculadora recalcula al cambiar el número de animales', () => {
@@ -43,9 +44,22 @@ describe('EstiercolScreen — "Del corral al abono"', () => {
     fireEvent.click(within(screen.getByTestId('estiercol-pilares')).getByText('Biodigestor'));
     const input = screen.getByLabelText(/Cuántos cerdos/i);
     fireEvent.change(input, { target: { value: '100' } });
-    // 100 cerdos → 24 m³/día de biogás.
+    // 100 cerdos → 270 kg × 0.021 = 5,7 m³/día de biogás (locale es-CO).
     const res = screen.getByTestId('biodigestor-resultados');
-    expect(within(res).getByText('24')).toBeTruthy();
+    expect(within(res).getByText('5,7')).toBeTruthy();
+  });
+
+  it('el TRH depende del piso térmico: el páramo agranda el digestor', () => {
+    render(<EstiercolScreen onBack={() => {}} onHome={() => {}} />);
+    fireEvent.click(within(screen.getByTestId('estiercol-pilares')).getByText('Biodigestor'));
+    const res = screen.getByTestId('biodigestor-resultados');
+    // Volumen en clima cálido (default) para 300 cerdos ≈ 55,9 m³.
+    expect(within(res).getByText('55,9')).toBeTruthy();
+    // Al cambiar a páramo (TRH 104 días) el digestor crece muy por encima.
+    fireEvent.click(screen.getByTestId('biodigestor-piso-paramo'));
+    expect(within(res).queryByText('55,9')).toBeNull();
+    // 1.62 m³/día × 104 × 1.15 ≈ 193,8 m³.
+    expect(within(res).getByText('193,8')).toBeTruthy();
   });
 
   it('Abonos lista los siete abonos y marca el slot grounded-pendiente al abrir', () => {

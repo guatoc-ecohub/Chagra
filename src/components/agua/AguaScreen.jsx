@@ -17,6 +17,7 @@ import {
 import {
   PILARES_AGUA,
   PASOS_COSECHA,
+  ETO_POR_PISO_TERMICO,
   KC_CULTIVOS,
   SISTEMAS_RIEGO,
   PRACTICAS_AHORRO,
@@ -255,10 +256,30 @@ function PilarRiego() {
           onChange={setArea}
           placeholder="100"
         />
+        {/* ETo de referencia por piso térmico (IDEAM): toque para llenar */}
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wide text-slate-300 mb-1.5">
+            ETo por piso térmico <span className="font-normal normal-case text-slate-500">(toque para usar)</span>
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {ETO_POR_PISO_TERMICO.map((e) => (
+              <button
+                key={e.piso}
+                type="button"
+                data-testid={`agua-eto-piso-${e.piso}`}
+                onClick={() => setEto(String(e.etoMmDia))}
+                className="inline-flex items-center gap-1.5 rounded-full border border-teal-700/50 bg-teal-950/40 px-2.5 py-1 text-xs font-bold text-slate-200 active:bg-teal-900/60"
+              >
+                {e.piso}
+                <span className="text-teal-300">{e.etoMmDia} mm/día</span>
+              </button>
+            ))}
+          </div>
+        </div>
         <p className="text-[11px] leading-snug text-slate-400">
-          La ETo por piso térmico y el Kc de cada cultivo del directorio llegarán
-          con fuente citada <SlotPendiente>ETo y Kc en camino (FAO-56 / IDEAM)</SlotPendiente>.
-          Si ya los conoce, la cuenta le sirve desde hoy.
+          ETo de referencia por piso térmico (fórmula altitud del IDEAM) y Kc por cultivo
+          (FAO-56 Cuadro 12): son valores <strong className="text-slate-300">orientadores</strong> —
+          ajústelos al clima y la variedad de su finca. Si tiene el dato de su estación, use ese.
         </p>
 
         {litrosDia != null ? (
@@ -277,15 +298,24 @@ function PilarRiego() {
           </p>
         )}
 
-        {/* Kc por cultivo: slots honestos, se llenan por grounding */}
+        {/* Kc por cultivo (FAO-56, etapa media): toque para llenar */}
         <div>
-          <p className="text-xs font-bold uppercase tracking-wide text-slate-300 mb-1.5">Kc por cultivo</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-slate-300 mb-1.5">
+            Kc por cultivo <span className="font-normal normal-case text-slate-500">(pico, toque para usar)</span>
+          </p>
           <div className="flex flex-wrap gap-1.5">
             {KC_CULTIVOS.map((c) => (
-              <span key={c.slug} className="inline-flex items-center gap-1.5 rounded-full border border-slate-700 bg-slate-950/50 px-2.5 py-1 text-xs font-bold text-slate-200">
+              <button
+                key={c.slug}
+                type="button"
+                data-testid={`agua-kc-${c.slug}`}
+                onClick={() => c.kc != null && setKc(String(c.kc))}
+                disabled={c.kc == null}
+                className="inline-flex items-center gap-1.5 rounded-full border border-slate-700 bg-slate-950/50 px-2.5 py-1 text-xs font-bold text-slate-200 active:bg-slate-800/60 disabled:opacity-60"
+              >
                 {c.nombre}
                 {c.kc == null ? <SlotPendiente /> : <span className="text-teal-300">{c.kc}</span>}
-              </span>
+              </button>
             ))}
           </div>
         </div>
@@ -299,14 +329,19 @@ function PilarRiego() {
             <p className="flex flex-wrap items-center gap-2 text-sm font-bold text-slate-100 leading-tight">
               {s.nombre}
               <span className="rounded-full bg-slate-700/50 px-2 py-0.5 text-[11px] font-bold text-slate-300">{s.pierde}</span>
+              {Array.isArray(s.coefRango) && (
+                <span className="rounded-full bg-teal-500/15 border border-teal-600/40 px-2 py-0.5 text-[11px] font-bold text-teal-300">
+                  {Math.round(s.coefRango[0] * 100)}–{Math.round(s.coefRango[1] * 100)}% llega a la raíz
+                </span>
+              )}
             </p>
             <p className="text-xs leading-snug text-slate-300 mt-1">{s.detalle}</p>
           </div>
         ))}
         <p className="text-[11px] leading-snug text-slate-400">
-          El porcentaje exacto de eficiencia de cada sistema{' '}
-          <SlotPendiente>eficiencias en camino (FAO)</SlotPendiente> — el orden, eso sí,
-          no cambia: goteo rinde más que aspersión, y aspersión más que el surco.
+          Eficiencia de aplicación por sistema (goteo 90–95 %, aspersión 80–85 %, surco 70–80 %;
+          el surco es el único valor primario verificado, los otros dos son rango de literatura).
+          El orden no cambia: goteo rinde más que aspersión, y aspersión más que el surco.
         </p>
       </div>
 
@@ -360,26 +395,45 @@ function PilarCuidar() {
         ))}
       </div>
 
-      {/* Potabilidad — cualitativo seguro + dosis pendientes */}
+      {/* Potabilidad — dosis groundeadas (EPA / OMS / EAWAG) */}
       <div className="rounded-2xl border border-sky-700/40 bg-slate-900/60 p-4 space-y-2">
         <p className="flex items-center gap-2 text-sm font-black text-sky-300 uppercase tracking-wide">
           <Milk size={16} aria-hidden="true" /> Para tomar: trátela siempre
         </p>
         <p className="text-xs leading-snug text-slate-200">
-          Deje asentar el agua turbia y pásela por tela limpia. Para consumo, lo más
-          seguro de la finca es <strong className="text-sky-200">hervirla hasta que suelte borbotones</strong> y
-          guardarla tapada. También sirve desinfectar con cloro de uso doméstico —
-          pero la dosis exacta por litro solo se la vamos a dar con fuente sanitaria:
+          Deje asentar el agua turbia y pásela por tela limpia (el cloro y el sol pierden
+          fuerza en agua turbia). Luego, elija una:
         </p>
-        <p>
-          <SlotPendiente>dosis de cloro y tiempos en camino (OMS / MinSalud)</SlotPendiente>
+        <ul className="space-y-1.5" data-testid="agua-dosis-potabilizacion">
+          <li className="text-xs leading-snug text-slate-200 flex gap-2">
+            <span aria-hidden="true" className="text-sky-400 font-bold">•</span>
+            <span>
+              <strong className="text-sky-200">Hervir:</strong> {DOSIS_POTABILIZACION.hervorMinutos} minuto
+              a nivel del mar, {DOSIS_POTABILIZACION.hervorMinutosSobre1000m} minutos por encima de los
+              1.000 metros (en alto el agua hierve más frío).
+            </span>
+          </li>
+          <li className="text-xs leading-snug text-slate-200 flex gap-2">
+            <span aria-hidden="true" className="text-sky-400 font-bold">•</span>
+            <span>
+              <strong className="text-sky-200">Cloro:</strong> {DOSIS_POTABILIZACION.cloroGotasPorLitro} gotas
+              de cloro doméstico (al {DOSIS_POTABILIZACION.cloroConcentracionPct} %) por litro, revuelva y
+              espere {DOSIS_POTABILIZACION.cloroEsperaMin} minutos. Doble la dosis si está turbia, con color o muy fría.
+            </span>
+          </li>
+          <li className="text-xs leading-snug text-slate-200 flex gap-2">
+            <span aria-hidden="true" className="text-sky-400 font-bold">•</span>
+            <span>
+              <strong className="text-sky-200">Sol (SODIS):</strong> botella plástica transparente de máximo 2 litros,
+              {' '}{DOSIS_POTABILIZACION.sodisHorasSol} horas al sol despejado ({DOSIS_POTABILIZACION.sodisDiasSiNublado} días
+              si está muy nublado). Solo si el agua está clara (turbiedad baja).
+            </span>
+          </li>
+        </ul>
+        <p className="text-[10px] leading-snug text-slate-500">
+          Fuentes: EPA (cloro), OMS/EPA (hervido), EAWAG-Banco Mundial (SODIS).
+          Si huele a químico o viene de potrero fumigado, ni hervida — consígala de otra fuente.
         </p>
-        {DOSIS_POTABILIZACION.cloroGotasPorLitro == null && (
-          <p className="text-[11px] leading-snug text-slate-400">
-            Mientras el dato llega, no adivine gotas: hierva. Y si el agua huele a
-            químico o viene de potrero fumigado, ni hervida — consígala de otra fuente.
-          </p>
-        )}
         <div className="rounded-xl border border-rose-700/40 bg-rose-950/30 p-3">
           <p className="flex items-center gap-2 text-xs font-black text-rose-300 uppercase tracking-wide mb-1.5">
             <TriangleAlert size={14} aria-hidden="true" /> No la use si ve esto
@@ -447,18 +501,20 @@ function PilarCuidar() {
           <p className="text-xs leading-snug text-slate-200">{consejoEnso}</p>
         </div>
 
-        {/* Franja legal: slot honesto */}
-        <div className="rounded-xl border border-slate-700/50 bg-slate-950/40 p-3">
+        {/* Franja legal: metros groundeados (Decreto 1449/1977) */}
+        <div className="rounded-xl border border-slate-700/50 bg-slate-950/40 p-3" data-testid="agua-ronda-legal">
           <p className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-slate-200 mb-1">
             <ShieldCheck size={14} aria-hidden="true" /> La ley también lo protege
           </p>
           <p className="text-xs leading-snug text-slate-300">
-            La norma colombiana ordena conservar una franja de monte alrededor de los
-            nacimientos y a la orilla de los cauces. Los metros exactos se los daremos
-            con la norma citada{' '}
-            {RONDA_PROTECCION.metrosNacimiento == null && (
-              <SlotPendiente>metros de ronda en camino (norma verificada)</SlotPendiente>
-            )}
+            La norma colombiana ordena conservar una franja de monte, como mínimo, de{' '}
+            <strong className="text-emerald-300">{RONDA_PROTECCION.metrosNacimiento} metros a la redonda</strong> de
+            cada nacimiento y de{' '}
+            <strong className="text-emerald-300">{RONDA_PROTECCION.metrosCauce} metros a cada lado</strong> de ríos y
+            quebradas. Es obligación del dueño del predio, con o sin trámite.
+          </p>
+          <p className="text-[10px] leading-snug text-slate-500 mt-1">
+            Decreto 1449 de 1977, Art. 3 (hoy en el Decreto 1076 de 2015).
           </p>
         </div>
       </div>
