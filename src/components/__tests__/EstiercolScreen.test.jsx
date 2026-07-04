@@ -31,7 +31,7 @@ describe('EstiercolScreen — "Del corral al abono"', () => {
   it('la calculadora del biodigestor arranca en el caso insignia (300 cerdos)', () => {
     render(<EstiercolScreen onBack={() => {}} onHome={() => {}} />);
     fireEvent.click(within(screen.getByTestId('estiercol-pilares')).getByText('Biodigestor'));
-    const input = screen.getByLabelText(/Cuántos cerdos/i);
+    const input = /** @type {HTMLInputElement} */ (screen.getByLabelText(/Cuántos cerdos/i));
     expect(input.value).toBe('300');
     // Groundeado (CIPAV/LRRD): 300 cerdos → 17 m³/día de biogás en clima
     // cálido/templado (default). 810 kg estiércol × 0.021 m³/kg.

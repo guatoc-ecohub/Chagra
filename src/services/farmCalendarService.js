@@ -322,6 +322,9 @@ function buildPerennialEntries({ speciesId, plantingDate, now }) {
  * @property {boolean} hasSowingDate
  * @property {CalendarEntry[]} entries
  * @property {Object|null} perennial — resolución perenne (si aplica)
+ * @property {number} [count] - cuántas matas equivalentes representa esta fila
+ *   (agrupación de entradas repetidas; badge "×N"). Se asigna después de construir
+ *   el calendario, no es parte del cálculo fenológico.
  */
 
 /**

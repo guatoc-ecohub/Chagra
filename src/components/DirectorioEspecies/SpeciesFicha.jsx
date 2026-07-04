@@ -534,7 +534,7 @@ function SourceChip({ fuente }) {
   );
 }
 
-function Section({ icon, title, accent, count, children }) {
+function Section({ icon, title, accent, count = null, children }) {
   const Icon = icon;
   const ACC = {
     amber: 'from-amber-400 to-orange-400',

@@ -11,8 +11,16 @@
  *      fallback sin id muestra el índice, nunca una pantalla rota.
  */
 import React from 'react';
+// @types/node no está instalado en el repo (gap conocido, ya tolerado en
+// App.glaciar-prefetch.test.jsx / FincaVivaResto.noSolapa.test.jsx /
+// dataJsonValidity.test.js): tsc no resuelve los specifiers "node:*". Runtime
+// (vitest/node) los resuelve sin problema; irreducible sin sumar la
+// dependencia @types/node al repo entero (fuera de alcance de este fix).
+// @ts-expect-error TS2591 — ver comentario arriba.
 import fs from 'node:fs';
+// @ts-expect-error TS2591 — ver comentario arriba.
 import path from 'node:path';
+// @ts-expect-error TS2591 — ver comentario arriba.
 import { fileURLToPath } from 'node:url';
 import { render, screen, fireEvent, cleanup, within } from '@testing-library/react';
 import '@testing-library/jest-dom';

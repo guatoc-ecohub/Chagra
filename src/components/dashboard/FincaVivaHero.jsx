@@ -99,7 +99,7 @@ const COLIBRI_REAL = colibriRealActivo();
  * (tú/usted), sin voseo.
  *
  * @param {Object} props
- * @param {Function} [props.onNavigate]   navegación de la app.
+ * @param {(screen: string, options?: Object) => void} [props.onNavigate]   navegación de la app.
  * @param {Function} [props.onOpenAgent]  abre el agente (globo + composer + portal).
  * @param {Function} [props.onGestionar]  abre la GESTIÓN de la finca (registros y
  *   acciones). En el home F2 la gestión vive como una sección (GESTION_TILES) en
@@ -1962,7 +1962,7 @@ function factorEstructura(escalaFinca, tamano) {
  * @param {string|null} props.forma       una de INVERNADERO_FORMAS (o null).
  * @param {string|null} props.tamano      texto libre del onboarding.
  * @param {string} [props.escalaFinca]    una de SCENE_ESCALAS (variant.escala).
- * @param {boolean} [props.noche]         ¿la escena está en su paleta nocturna?
+ * @param {boolean} [props.noche] - ¿la escena está en su paleta nocturna?
  */
 function EstructuraCubierta({ forma, tamano, escalaFinca, noche }) {
   const f = factorEstructura(escalaFinca, tamano);

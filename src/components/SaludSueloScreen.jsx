@@ -418,7 +418,9 @@ function PilarAnalisis({ onNavigate, onIr }) {
 /* ────────────────────── Pilar 2 — Corregir la acidez ──────────────────────── */
 function PilarAcidez() {
   const [bases, setBases] = useState({ al: '', ca: '', mg: '', k: '' });
-  const [fuente, setFuente] = useState('cal_dolomita');
+  const [fuente, setFuente] = useState(
+    /** @type {'cal_dolomita'|'cal_agricola'|'cal_viva'} */ ('cal_dolomita')
+  );
   const [objetivo, setObjetivo] = useState(String(SATURACION_AL_OBJETIVO_DEFAULT));
   const [hectareas, setHectareas] = useState('1');
 
@@ -490,7 +492,8 @@ function PilarAcidez() {
         <div>
           <p className="text-xs uppercase tracking-wide font-bold text-slate-400 mb-1.5">¿Qué cal va a usar?</p>
           <div className="flex flex-wrap gap-2">
-            {Object.entries(FUENTES_CAL).map(([key, info]) => {
+            {Object.entries(FUENTES_CAL).map(([rawKey, info]) => {
+              const key = /** @type {keyof typeof FUENTES_CAL} */ (rawKey);
               const activo = fuente === key;
               return (
                 <button

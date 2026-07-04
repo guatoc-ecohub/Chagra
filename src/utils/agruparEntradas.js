@@ -18,7 +18,8 @@
  * Quita el sufijo de instancia " #NN" que AssetsDashboard agrega a cada mata
  * cuando se siembran varias en modo individual.
  *   "Fresa #01" → "Fresa"      "Tomate #007" → "Tomate"      "Fresa" → "Fresa"
- * @param {string} [name]
+ * @param {unknown} [name] - dato externo (farmOS) sin garantía de tipo; la
+ *   función es defensiva y normaliza cualquier valor no-string a ''.
  * @returns {string}
  */
 export function stripInstanceSuffix(name) {

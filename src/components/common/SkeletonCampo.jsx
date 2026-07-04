@@ -11,13 +11,16 @@ import './campo-states.css';
  *
  * Componente PURAMENTE presentacional.
  *
- * @param {object} props
- * @param {'lista'|'ficha'|'timeline'} [props.variant]
- * @param {number} [props.count]   - filas a dibujar (lista/timeline).
- * @param {React.ReactNode} [props.label] - texto visible junto al punto vivo.
- * @param {string} [props.className]
+ * @typedef {object} SkeletonCampoProps
+ * @property {'lista'|'ficha'|'timeline'} [variant]
+ * @property {number} [count]   - filas a dibujar (lista/timeline).
+ * @property {React.ReactNode} [label] - texto visible junto al punto vivo.
+ * @property {string} [className]
  */
 
+/**
+ * @param {{ className?: string, style?: React.CSSProperties }} props
+ */
 const Bone = ({ className = '', style = undefined }) => (
   <div className={`esc-bone ${className}`} style={style} aria-hidden="true" />
 );
@@ -75,6 +78,9 @@ const RowsTimeline = ({ count }) => (
   </div>
 );
 
+/**
+ * @param {SkeletonCampoProps} props
+ */
 export default function SkeletonCampo({
   variant = 'lista',
   count = 3,

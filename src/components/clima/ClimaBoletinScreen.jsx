@@ -145,7 +145,7 @@ function PilarQueViene({ family, faseLabel, source, regionLine }) {
 }
 
 /* ── PILAR 2 · Qué hacer ───────────────────────────────────────────────── */
-function PilarQueHacer({ family, regionLine, onNavigate }) {
+function PilarQueHacer({ family, regionLine, onNavigate = undefined }) {
   const acciones = ACCIONES_ENSO[family] || ACCIONES_ENSO.neutral;
   const acento = FASE_ACENTO[family] || FASE_ACENTO.neutral;
 
@@ -283,7 +283,7 @@ function PilarDondeMirar({ mtaRegional }) {
 }
 
 /* ── Pantalla principal ───────────────────────────────────────────────── */
-export default function ClimaBoletinScreen({ onBack, onNavigate }) {
+export default function ClimaBoletinScreen({ onBack, onNavigate = undefined }) {
   const [pilar, setPilar] = useState('que_viene');
 
   // Fase ENSO EN VIVO (ensoService) — fuente única para toda la app. No se

@@ -32,9 +32,9 @@ import {
 export default function CalculadoraGradosDia({ className = '' }) {
     const [cultivoId, setCultivoId] = useState('maiz');
     const [pisoId, setPisoId] = useState('frio');
-    const [tmin, setTmin] = useState(7);
-    const [tmax, setTmax] = useState(19);
-    const [tbManual, setTbManual] = useState(10);
+    const [tmin, setTmin] = useState(/** @type {number|string} */ (7));
+    const [tmax, setTmax] = useState(/** @type {number|string} */ (19));
+    const [tbManual, setTbManual] = useState(/** @type {number|string} */ (10));
     const [fecha, setFecha] = useState('');
 
     const cultivo = CULTIVO_GDD_BY_ID[cultivoId] || CULTIVOS_GDD[0];

@@ -22,7 +22,9 @@ import { setEnsoPhase, clearEnsoPhase } from '../../services/ensoService.js';
 // neutral con el coarse 'el_nino'. Conservamos el resto del módulo real
 // (climaService y otros dependen de sus otras exportaciones).
 vi.mock('../../services/userProfileService', async (importActual) => {
-  const actual = await importActual();
+  const actual = /** @type {typeof import('../../services/userProfileService')} */ (
+    await importActual()
+  );
   return { ...actual, getProfile: () => ({ departamento: 'boyacá' }) };
 });
 

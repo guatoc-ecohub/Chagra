@@ -48,7 +48,7 @@ import './agua.css';
 const fmt = (n) => Number(n).toLocaleString('es-CO');
 
 /** Chip honesto para cifras aún sin grounding: promete el dato, no lo inventa. */
-function SlotPendiente({ children }) {
+function SlotPendiente({ children = null }) {
   return (
     <span
       data-testid="slot-grounded-pendiente"
@@ -61,7 +61,7 @@ function SlotPendiente({ children }) {
 }
 
 /** Campo numérico grande, legible al sol, con etiqueta arriba y unidad al lado. */
-function CampoNumero({ id, label, unidad, value, onChange, placeholder, hint }) {
+function CampoNumero({ id, label, unidad, value, onChange, placeholder, hint = '' }) {
   return (
     <label htmlFor={id} className="block">
       <span className="block text-xs font-bold uppercase tracking-wide text-slate-300 mb-1">{label}</span>
@@ -523,7 +523,7 @@ function PilarCuidar() {
 }
 
 /* ── Pantalla principal ───────────────────────────────────────────────── */
-export default function AguaScreen({ onBack, onNavigate }) {
+export default function AguaScreen({ onBack, onNavigate = undefined }) {
   const [pilar, setPilar] = useState('lluvia');
 
   return (
