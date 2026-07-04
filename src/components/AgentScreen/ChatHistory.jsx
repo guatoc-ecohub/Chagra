@@ -26,6 +26,7 @@ const FLOATING_BACK_THRESHOLD_PX = 160;
  * @param {Function} props.onConsentNeeded - Callback cuando se requiere consentimiento del usuario.
  * @param {Function} props.onRetryOrphan - Callback para reintentar un mensaje huérfano (sin respuesta).
  * @param {Function} props.onCancelDeepResearch - Callback para cancelar una investigación profunda en curso.
+ * @param {Function} [props.onAyudaAction] - Callback del deep-link «Abrir …» de la ayuda groundeada (AYUDA_FUNCIONES).
  * @param {Object|null} [props.proactiveGreeting=null] - Datos del saludo proactivo dinámico.
  * @param {Function} props.onBack - Callback para volver a la pantalla anterior.
  */

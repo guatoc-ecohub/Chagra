@@ -193,10 +193,6 @@ function pasosGenericos(nombre, accion) {
 }
 
 /**
- * AYUDA_FUNCIONES — el manifiesto de ayuda, derivado de CAPABILITY_MANIFEST.
- * Solo capacidades `status:'live'` (las que el campesino puede usar de verdad).
- * Cada entrada es la forma canónica que consume el agente y la tarjeta de ayuda.
- *
  * @typedef {Object} AyudaFuncion
  * @property {string} id
  * @property {string} nombre
@@ -206,6 +202,12 @@ function pasosGenericos(nombre, accion) {
  * @property {{tipo:string, view?:string, prompt?:string, intent?:string}} accion
  * @property {string[]} keywords
  * @property {string} grupo
+ */
+
+/**
+ * AYUDA_FUNCIONES — el manifiesto de ayuda, derivado de CAPABILITY_MANIFEST.
+ * Solo capacidades `status:'live'` (las que el campesino puede usar de verdad).
+ * Cada entrada es la forma canónica que consume el agente y la tarjeta de ayuda.
  *
  * @type {ReadonlyArray<AyudaFuncion>}
  */

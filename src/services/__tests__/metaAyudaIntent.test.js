@@ -20,6 +20,9 @@ describe('detectMetaAyudaIntent — SÍ es meta (sobre la app)', () => {
     '¿Dónde está el mapa de la finca?',
     '¿Cómo abro el cuaderno de campo?',
     'no sé cómo usar esto',
+    '¿Cómo uso la cámara?',
+    'qué hace el mundo de suelo',
+    'qué hace la sección de plagas',
   ];
   for (const q of metaQueries) {
     it(`meta: "${q}"`, () => {
@@ -47,6 +50,10 @@ describe('detectMetaAyudaIntent — NO es meta (agronómico)', () => {
     '¿Cómo va mi chagra este año?',
     'para qué sirve el neem',
     '¿qué plaga tiene mi tomate?',
+    'qué hace la broca del café',
+    'qué hace el pulgón en mi tomate',
+    'cómo uso la cámara fría para guardar la cosecha',
+    'cómo uso la cámara frigorífica',
   ];
   for (const q of agroQueries) {
     it(`NO meta: "${q}"`, () => {

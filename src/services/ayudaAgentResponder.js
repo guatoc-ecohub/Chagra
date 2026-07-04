@@ -111,16 +111,20 @@ export function buildAyudaResponse(meta) {
   }
 
   // how-to: resolver la función concreta.
-  const m = matchAyudaFuncion(consulta);
-  if (m.found) {
+  const matchHowto = matchAyudaFuncion(consulta);
+  if (matchHowto.found) {
     return {
-      content: formatFuncion(m.funcion, m.alternativas),
-      ayudaAction: buildAction(m.funcion),
+      content: formatFuncion(matchHowto.funcion, matchHowto.alternativas),
+      ayudaAction: buildAction(matchHowto.funcion),
     };
   }
 
   // HONESTO — no hay función que matchee: NO inventamos. Ofrecemos las reales.
-  const sugeridas = (m.sugerencias || []).map((s) => s.nombre).join(', ');
+  // tsc corre con strict:false (jsconfig.json): el narrowing de CFA no reduce
+  // el branch `found:false` de la unión tras el `if` de arriba (limitación
+  // conocida sin strictNullChecks). Cast explícito, ya validado por el `if`.
+  const { sugerencias } = /** @type {{ found: false, sugerencias: import('../data/ayudaFunciones.js').AyudaFuncion[] }} */ (matchHowto);
+  const sugeridas = (sugerencias || []).map((s) => s.nombre).join(', ');
   const content =
     'Todavía no tengo esa función en Chagra. ' +
     (sugeridas

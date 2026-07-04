@@ -36,13 +36,13 @@ describe('AYUDA_FUNCIONES — manifiesto derivado de CAPABILITY_MANIFEST', () =>
 describe('matchAyudaFuncion — match grounded', () => {
   it('«¿cómo registro una siembra?» → Registrar hablando (función real)', () => {
     const r = matchAyudaFuncion('como registro una siembra');
-    expect(r.found).toBe(true);
+    if (!r.found) throw new Error('se esperaba found:true');
     expect(r.funcion.id).toBe('procesos');
   });
 
   it('«dónde veo mis plantas» → Mis plantas, con vista de navegación', () => {
     const r = matchAyudaFuncion('donde veo mis plantas');
-    expect(r.found).toBe(true);
+    if (!r.found) throw new Error('se esperaba found:true');
     expect(r.funcion.id).toBe('plantas');
     expect(r.funcion.accion.tipo).toBe('nav');
     expect(r.funcion.accion.view).toBe('activos');
@@ -50,17 +50,22 @@ describe('matchAyudaFuncion — match grounded', () => {
 
   it('«el mapa de la finca» → mapa', () => {
     const r = matchAyudaFuncion('el mapa de la finca');
-    expect(r.found).toBe(true);
+    if (!r.found) throw new Error('se esperaba found:true');
     expect(r.funcion.id).toBe('mapa');
   });
 
   it('ANTI-ALUCINACIÓN: función inexistente → found:false + sugerencias reales', () => {
     const r = matchAyudaFuncion('como pido un dron con inteligencia artificial cuantica');
-    expect(r.found).toBe(false);
-    expect(Array.isArray(r.sugerencias)).toBe(true);
-    expect(r.sugerencias.length).toBeGreaterThan(0);
+    if (r.found) throw new Error('se esperaba found:false');
+    // tsc corre con strict:false (jsconfig.json): el narrowing de CFA no reduce
+    // el branch `found:false` de una unión discriminada por booleano tras un
+    // `throw` (limitación conocida sin strictNullChecks). Cast explícito,
+    // documentado, ya validado arriba por el `if`.
+    const { sugerencias } = /** @type {{ found: false, sugerencias: import('../ayudaFunciones.js').AyudaFuncion[] }} */ (r);
+    expect(Array.isArray(sugerencias)).toBe(true);
+    expect(sugerencias.length).toBeGreaterThan(0);
     // Todas las sugerencias son funciones REALES del manifiesto.
-    for (const s of r.sugerencias) {
+    for (const s of sugerencias) {
       expect(getAyudaFuncion(s.id)).not.toBeNull();
     }
   });

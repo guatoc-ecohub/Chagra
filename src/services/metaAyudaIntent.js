@@ -67,6 +67,18 @@ const RE_WHERE_BLOCK = /\bdonde (consigo|compro|vendo|siembro|planto|cultivo|enc
 // Frases sueltas de "no sé usar esto / ayúdame con la app".
 const RE_HELP_APP = /\b(no se como (usar|manejar|funciona)|como se (usa|maneja) (esto|la app|chagra)|ayuda con la app|como manejo la app|como funciona esto)\b/;
 
+// Cámara del chat (tomar foto de la mata): pregunta insignia «¿cómo uso la
+// cámara?» que NO siempre trae una referencia explícita a la app (RE_APP_REF).
+// Excluye "cámara fría/frigorífica" (cadena de frío poscosecha — agronómico,
+// NO la cámara de fotos del chat).
+const RE_CAMARA_APP = /\bcomo (uso|utilizo|activo|manejo|abro) (la |mi )?camara\b(?! (fria|frigorifica))/;
+
+// «Qué hace el mundo/la sección/el módulo de X» (pregunta por lo que ofrece
+// una PARTE de la app, no el catálogo completo). El marcador de navegación
+// (mundo/parte/sección/módulo de) es lo que la distingue de una pregunta
+// agronómica tipo «qué hace la broca del café» (sin ese marcador, NO dispara).
+const RE_QUE_HACE_SECCION = /\bque hace\b.*\b(el |la )?(mundo|parte|seccion|modulo|area) de\b/;
+
 /**
  * Detecta si el texto es una pregunta META (sobre cómo usar Chagra) y de qué
  * clase. Devuelve `{ isMeta:false }` cuando NO lo es (deja el flujo agronómico).
@@ -87,11 +99,21 @@ export function detectMetaAyudaIntent(text) {
     return { isMeta: true, kind: 'capabilities', consulta: text.trim() };
   }
 
+  // 1b) «Qué hace el mundo/sección/módulo de X» → howto de esa parte (resuelve
+  // por keyword, no por catálogo completo).
+  if (RE_QUE_HACE_SECCION.test(n)) {
+    return { isMeta: true, kind: 'howto', consulta: text.trim() };
+  }
+
   // 2) Cómo operar la app (verbo fuerte, o débil + referencia a la app).
   if (RE_APP_VERB_STRONG.test(n)) {
     return { isMeta: true, kind: 'howto', consulta: text.trim() };
   }
   if (RE_APP_VERB_WEAK.test(n) && hasAppRef) {
+    return { isMeta: true, kind: 'howto', consulta: text.trim() };
+  }
+  // 2b) Cámara del chat: insignia sin referencia explícita a la app.
+  if (RE_CAMARA_APP.test(n)) {
     return { isMeta: true, kind: 'howto', consulta: text.trim() };
   }
 
