@@ -9,6 +9,8 @@ import HelpDictionary from './HelpDictionary.jsx';
 import HelpVoiceRegionalDemo from './HelpVoiceRegionalDemo.jsx';
 import HelpAgentSection from './HelpAgentSection.jsx';
 import HelpDatosScreen from './HelpDatosScreen.jsx';
+import HelpFuncionesScreen from './help/HelpFuncionesScreen.jsx';
+import { CosturaDivider } from './help/HelpIllustrations.jsx';
 
 /**
  * HelpManual — Manual de usuario integrado en la PWA.
@@ -45,7 +47,7 @@ import HelpDatosScreen from './HelpDatosScreen.jsx';
  *   - "Novedades mayo 2026"        → Chagra/CHANGELOG.md (root)
  */
 export default function HelpManual({ onBack, onNavigate }) {
-  // 'home' | 'voz' | 'uso' | 'ciclo' | 'diccionario' | 'agente' | 'datos' | 'voz-regional-demo'
+  // 'home' | 'funciones' | 'voz' | 'uso' | 'ciclo' | 'diccionario' | 'agente' | 'datos' | 'voz-regional-demo'
   const [section, setSection] = useState('home');
 
   // CTAs híbridas (P5): cierran el manual y navegan al flow real.
@@ -74,12 +76,20 @@ export default function HelpManual({ onBack, onNavigate }) {
         </div>
       </header>
 
+      {/* Dobladillo cosido bajo el header: LA COSTURA de la marca (misma
+          puntada del dobladillo de la mochila del agente) — el Manual es
+          contenido curado, cosido al cuaderno de campo. */}
+      <CosturaDivider className="mx-4 mt-2" />
+
       {/* Tip del día siempre visible bajo el header */}
       <HelpTipCard />
 
       {/* Sub-vistas */}
       {section === 'home' && (
         <HelpHomeScreen onSelect={setSection} onNavigate={closeAndNavigate} />
+      )}
+      {section === 'funciones' && (
+        <HelpFuncionesScreen onBackToHome={goHome} onNavigate={closeAndNavigate} />
       )}
       {section === 'voz' && (
         <HelpVozScreen onBackToHome={goHome} onNavigate={closeAndNavigate} />
