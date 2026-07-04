@@ -29,6 +29,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays, Sprout, HelpCircle, Store, FileText, Mic } from 'lucide-react';
 import AgentHero from './AgentHero';
 import OnboardingHero from '../OnboardingHero';
+import BienvenidaFinca, { bienvenidaYaVista } from '../BienvenidaFinca';
 import {
     getProfile,
     getModuleVisibility,
@@ -365,6 +366,15 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
         const hasAltitud = p.finca_altitud !== '' && p.finca_altitud != null && Number.isFinite(alt);
         return !hasAltitud || p.piso_confirmado !== '1';
     });
+    // Bienvenida de PRIMERA VEZ (BienvenidaFinca): secuencia de 3 momentos
+    // (colibrí + capacidades estrella + ubicación mágica) que se muestra UNA
+    // sola vez, con la MISMA señal de primer uso del banner compacto (sin
+    // plantas y sin piso) + flag persistente "ya la vi". Capa 100% visual:
+    // "Ubicar mi finca" delega en la ruta existente 'ubicacion-detectada';
+    // al saltar queda el flujo de siempre (banner del piso térmico).
+    const [showBienvenida, setShowBienvenida] = useState(
+        () => plantsCount === 0 && needsPisoCapture && !bienvenidaYaVista(),
+    );
 
     // HOME "Finca Viva" por perfil (flag VITE_FINCA_VIVA_HOME_PERFIL). Se evalúa
     // una vez al montar. Con la flag ON: (1) la escena de la finca se muestra
@@ -585,6 +595,19 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
             className="relative flex flex-col w-full h-full overflow-y-auto pb-6"
             data-scroll-key="dashboard-live"
         >
+            {/* BIENVENIDA de primera vez — overlay a pantalla completa SOBRE
+                cualquiera de las dos portadas (AgentHero / Finca Viva). Solo
+                se monta en el verdadero primer uso y una sola vez (flag en
+                localStorage dentro del componente). */}
+            {showBienvenida && (
+                <BienvenidaFinca
+                    onUbicar={() => {
+                        setShowBienvenida(false);
+                        onNavigate('ubicacion-detectada');
+                    }}
+                    onClose={() => setShowBienvenida(false)}
+                />
+            )}
             {/* PORTADA del home — depende de la flag VITE_FINCA_VIVA_HOME_PERFIL:
                 ─────────────────────────────────────────────────────────────────
                 · Flag ON  → la ESCENA ISOMÉTRICA "Finca Viva" (mockup F2) es el
