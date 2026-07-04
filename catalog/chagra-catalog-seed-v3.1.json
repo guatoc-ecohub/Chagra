@@ -607,7 +607,7 @@
       },
       "plagas_criticas": [
         "Hypothenemus hampei (broca del café — plaga #1, perfora el grano; su estadio larval se llama chapola)",
-        "Leucoptera coffeella (minador de la hoja)",
+        "Leucoptera coffeella (minador de la hoja del café)",
         "Planococcus spp. (cochinilla harinosa de la raíz y el fruto)",
         "Monalonion velezangeli (chinche de la chamusquina, también afecta café en algunas zonas)"
       ],
@@ -1756,9 +1756,11 @@
         ]
       },
       "plagas_criticas": [
-        "Frankliniella spp. / Thrips spp. (trips, vectores de virus del bronceado TSWV)",
+        "Frankliniella spp. (trips, vector principal del bronceado TSWV)",
+        "Thrips spp. (trips, vector ocasional del bronceado TSWV)",
         "Tuta absoluta (polilla/cogollero del tomate, minador devastador)",
-        "Bemisia tabaci / Trialeurodes vaporariorum (mosca blanca, vector de geminivirus)",
+        "Bemisia tabaci (mosca blanca de la hoja plateada, vector principal de geminivirus)",
+        "Trialeurodes vaporariorum (mosca blanca de los invernaderos, vector de virosis)",
         "Helicoverpa zea / Heliothis (gusano del fruto)",
         "Tetranychus urticae / Aculops lycopersici (ácaro del tomate)",
         "Agrotis ipsilon (trozador, corta plántulas a ras de suelo)"
@@ -3002,7 +3004,7 @@
         "Premnotrypes vorax (gusano blanco / chiza de la papa)",
         "Phyllophaga spp. y Ancognatha spp. (chiza, larva rizófaga)",
         "Globodera pallida / Globodera rostochiensis (nematodo del quiste de la papa)",
-        "Liriomyza huidobrensis (minador de la hoja)",
+        "Liriomyza huidobrensis (minador de la hoja de la papa)",
         "Epitrix spp. (pulguilla de la papa)"
       ],
       "enfermedades_criticas": [
@@ -3379,9 +3381,10 @@
       "plagas_criticas": [
         "Phenacoccus manihoti (cochinilla harinosa de la yuca, controlada biológicamente con Anagyrus lopezi)",
         "Mononychellus tanajoa (ácaro verde de la yuca)",
-        "Bemisia tuberculata / Aleurotrachelus socialis (mosca blanca, vector de virus)",
+        "Bemisia tuberculata (mosca blanca de la yuca, vector de virosis — género Bemisia)",
+        "Aleurotrachelus socialis (mosca blanca de la yuca, vector de virosis — género Aleurotrachelus)",
         "Erinnyis ello (gusano cachón / cornudo de la yuca, defoliador)",
-        "Chilomima clarkei (barrenador del tallo)"
+        "Chilomima clarkei (barrenador del tallo de la yuca)"
       ],
       "enfermedades_criticas": [
         "Xanthomonas axonopodis pv. manihotis (bacteriosis / añublo bacterial de la yuca)",
@@ -4984,7 +4987,7 @@
         "Spodoptera frugiperda (cogollero/gusano ejército)",
         "Hydrellia spp. (mosca minadora de la hoja)",
         "Oebalus spp. (chinche del grano, causa vaneamiento y manchado)",
-        "Diatraea saccharalis (barrenador del tallo)"
+        "Diatraea saccharalis (barrenador del tallo del arroz)"
       ],
       "enfermedades_criticas": [
         "Pyricularia oryzae (añublo / quema del arroz / blast) — enfermedad fúngica #1",
