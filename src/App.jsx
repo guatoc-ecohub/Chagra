@@ -119,6 +119,11 @@ const SaludSueloScreen = lazy(() => import('./components/SaludSueloScreen'));
 // (rag-doll + ajuste de densidad). Calculadoras deterministas en
 // src/services/semillaCalculator.js.
 const SemillaScreen = lazy(() => import('./components/semilla/SemillaScreen'));
+// Módulo "Poscosecha y Despensa" (mundo Mercado y despensa): cosechar en punto
+// (índices de madurez), guardar bien (curado + calculadora determinista de
+// secado de grano a humedad segura) y transformar el excedente con su punto
+// crítico de inocuidad. Cifras grounded al DR nacional/internacional.
+const PoscosechaScreen = lazy(() => import('./components/PoscosechaScreen'));
 // LOS MUNDOS DE MI FINCA (reestructuración 2.0 del home): un mundo por dentro —
 // las funciones existentes agrupadas por lugar. Re-rutea, no reimplementa.
 const MundoScreen = lazy(() => import('./components/MundoScreen'));
@@ -238,6 +243,9 @@ const HASH_VIEW_ROUTES = {
   mercado: 'mercado',
   mercados: 'mercado',
   vender: 'mercado',
+  poscosecha: 'poscosecha',
+  despensa: 'poscosecha',
+  'poscosecha-despensa': 'poscosecha',
 };
 
 // Vistas que cuentan como "módulo" para telemetría de piloto.
@@ -247,7 +255,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'toxicologia', 'aprende', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'toxicologia', 'aprende', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
   'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
@@ -1317,6 +1325,18 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Semilla">
               <SemillaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'poscosecha':
+        // Módulo "Poscosecha y Despensa" (mundo Mercado y despensa): 3 pilares
+        // (cosechar en punto / guardar bien / transformar) + calculadora
+        // determinista de secado de grano. Cifras grounded al DR; slots no
+        // cerrados marcados grounded-pendiente en poscosechaCalculator.js.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Poscosecha y Despensa">
+              <PoscosechaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
