@@ -283,7 +283,7 @@ function PilarDondeMirar({ mtaRegional }) {
 }
 
 /* ── Pantalla principal ───────────────────────────────────────────────── */
-export default function ClimaBoletinScreen({ onBack, onNavigate }) {
+export default function ClimaBoletinScreen({ onBack, onNavigate = undefined }) {
   const [pilar, setPilar] = useState('que_viene');
 
   // Fase ENSO EN VIVO (ensoService) — fuente única para toda la app. No se

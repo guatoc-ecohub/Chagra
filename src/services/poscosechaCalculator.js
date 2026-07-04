@@ -80,9 +80,9 @@ export const GRANOS = {
  * arrobas, bultos — el resultado sale en la misma unidad de entrada).
  *
  * @param {Object} p
- * @param {number} p.pesoInicial      Peso mojado del lote (misma unidad de salida).
- * @param {number} p.humedadInicial   Humedad actual del grano (% base húmeda).
- * @param {number} p.humedadObjetivo  Humedad segura de guardado (% base húmeda).
+ * @param {number|string} p.pesoInicial      Peso mojado del lote (misma unidad de salida). Acepta coma decimal.
+ * @param {number|string} p.humedadInicial   Humedad actual del grano (% base húmeda). Acepta coma decimal.
+ * @param {number|string} p.humedadObjetivo  Humedad segura de guardado (% base húmeda). Acepta coma decimal.
  * @returns {null | {
  *   pesoInicial: number,
  *   pesoFinal: number,
@@ -129,7 +129,7 @@ export const AGUACATE_MS_MINIMO_COLOMBIA = 23; // propuesto Colombia (23–24 %)
 
 /**
  * Evalúa si un aguacate Hass está en punto de cosecha por su materia seca.
- * @param {number|null} materiaSecaPorc  % de materia seca medido.
+ * @param {number|string|null} materiaSecaPorc  % de materia seca medido. Acepta coma decimal.
  * @returns {{ nivel: string, label: string, color: string } | null}
  */
 export function evaluarMateriaSecaAguacate(materiaSecaPorc) {

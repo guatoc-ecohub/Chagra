@@ -405,7 +405,7 @@ function PilarAnalisis({ onNavigate, onIr }) {
 /* ────────────────────── Pilar 2 — Corregir la acidez ──────────────────────── */
 function PilarAcidez() {
   const [bases, setBases] = useState({ al: '', ca: '', mg: '', k: '' });
-  const [fuente, setFuente] = useState('cal_dolomita');
+  const [fuente, setFuente] = useState(/** @type {keyof typeof FUENTES_CAL} */ ('cal_dolomita'));
   const [objetivo, setObjetivo] = useState(String(SATURACION_AL_OBJETIVO_DEFAULT));
   const [hectareas, setHectareas] = useState('1');
 
@@ -483,7 +483,7 @@ function PilarAcidez() {
                 <button
                   key={key}
                   type="button"
-                  onClick={() => setFuente(key)}
+                  onClick={() => setFuente(/** @type {keyof typeof FUENTES_CAL} */ (key))}
                   aria-pressed={activo}
                   className={`min-h-[40px] px-3 rounded-full border text-sm font-semibold transition-colors ${
                     activo ? 'border-transparent text-white' : 'bg-slate-800 border-slate-700 text-slate-200 hover:border-slate-500'

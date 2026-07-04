@@ -31,7 +31,7 @@ describe('EstiercolScreen — "Del corral al abono"', () => {
   it('la calculadora del biodigestor arranca en el caso insignia (300 cerdos)', () => {
     render(<EstiercolScreen onBack={() => {}} onHome={() => {}} />);
     fireEvent.click(within(screen.getByTestId('estiercol-pilares')).getByText('Biodigestor'));
-    const input = screen.getByLabelText(/Cuántos cerdos/i);
+    const input = /** @type {HTMLInputElement} */ (screen.getByLabelText(/Cuántos cerdos/i));
     expect(input.value).toBe('300');
     // Resultados coherentes con la fórmula (72 m³/día de biogás para 300 cerdos).
     const res = screen.getByTestId('biodigestor-resultados');

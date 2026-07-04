@@ -60,7 +60,7 @@ export function litrosLluviaCaptables({ areaTechoM2, lluviaMm, coefEscorrentia =
 /**
  * Cuántas canecas de 55 galones equivalen a unos litros. Para que el número
  * grande se pueda "ver" en objetos de finca.
- * @param {number} litros
+ * @param {number|string} litros
  * @returns {number|null} canecas (1 decimal)
  */
 export function canecasEquivalentes(litros) {

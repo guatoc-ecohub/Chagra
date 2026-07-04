@@ -10,12 +10,6 @@ import './campo-states.css';
  * cálido y entrada escalonada para que la espera se sienta viva, no técnica.
  *
  * Componente PURAMENTE presentacional.
- *
- * @param {object} props
- * @param {'lista'|'ficha'|'timeline'} [props.variant]
- * @param {number} [props.count]   - filas a dibujar (lista/timeline).
- * @param {React.ReactNode} [props.label] - texto visible junto al punto vivo.
- * @param {string} [props.className]
  */
 
 const Bone = ({ className = '', style = undefined }) => (
@@ -75,6 +69,13 @@ const RowsTimeline = ({ count }) => (
   </div>
 );
 
+/**
+ * @param {object} props
+ * @param {'lista'|'ficha'|'timeline'} [props.variant]
+ * @param {number} [props.count]   - filas a dibujar (lista/timeline).
+ * @param {React.ReactNode} [props.label] - texto visible junto al punto vivo.
+ * @param {string} [props.className]
+ */
 export default function SkeletonCampo({
   variant = 'lista',
   count = 3,

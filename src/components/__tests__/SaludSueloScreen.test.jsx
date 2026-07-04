@@ -62,7 +62,7 @@ describe('SaludSueloScreen — pilar 1: ¿cómo está mi suelo?', () => {
   it('acepta coma decimal en las entradas', () => {
     render(<SaludSueloScreen onBack={() => {}} />);
     irA(/¿Cómo está mi suelo\?/i);
-    const moInput = screen.getByLabelText(/Materia orgánica/i);
+    const moInput = /** @type {HTMLInputElement} */ (screen.getByLabelText(/Materia orgánica/i));
     fireEvent.change(moInput, { target: { value: '1,2' } });
     expect(moInput.value).toBe('1.2');
     expect(screen.getByText(/Baja/i)).toBeTruthy();
