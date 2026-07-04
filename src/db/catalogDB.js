@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import sqlite3InitModule from '@sqlite.org/sqlite-wasm';
 import { loadCatalogBuffer, assertCatalogShape, isAbortLikeFetchError } from '../services/corpusLoader';
 
@@ -5,7 +6,7 @@ let dbInstance = null;
 let initPromise = null;
 
 async function doInit() {
-    const sqlite3 = await sqlite3InitModule({
+    const sqlite3 = await (/** @type {*} */(sqlite3InitModule))({
         print: console.info,
         printErr: console.error,
     });
@@ -19,13 +20,13 @@ async function doInit() {
     console.info(`[SQLite WASM] Catalog loaded from ${source.url} (tier=${source.tier}${source.fallback ? ', fallback' : ''})`);
 
     let db = null;
-    if (sqlite3.opfs && typeof navigator !== 'undefined' && navigator.storage && navigator.storage.getDirectory) {
+    if (/** @type {*} */(sqlite3).opfs && typeof navigator !== 'undefined' && navigator.storage && navigator.storage.getDirectory) {
         try {
             const root = await navigator.storage.getDirectory();
             // Write to OPFS root directory
             const fileHandle = await root.getFileHandle('catalog.sqlite', { create: true });
             const writable = await fileHandle.createWritable();
-            await writable.write(uint8Array);
+            await (/** @type {*} */(writable)).write(uint8Array);
             await writable.close();
 
             db = new sqlite3.oo1.OpfsDb('/catalog.sqlite');
@@ -241,7 +242,7 @@ export async function getCatalogStats() {
 
 /**
  * Lista todos los biopreparados del catálogo.
- * @returns {Promise<Array<biopreparado>>}
+ * @returns {Promise<Array<Object>>}
  */
 export async function getAllBiopreparados() {
     if (!dbInstance) await initCatalog();
@@ -254,7 +255,7 @@ export async function getAllBiopreparados() {
 
 /**
  * Lista todos los fermentos del catálogo (alimentarios + vetos de seguridad).
- * @returns {Promise<Array<fermento>>}
+ * @returns {Promise<Array<Object>>}
  */
 export async function getAllFermentos() {
     if (!dbInstance) await initCatalog();
@@ -274,7 +275,7 @@ export async function getAllFermentos() {
  * ↔ suero de leche).
  *
  * @param {string} ingredientName — nombre del material como lo añadió user
- * @returns {Promise<Array<biopreparado>>}
+ * @returns {Promise<Array<Object>>}
  */
 export async function findBiopreparadosByIngredient(ingredientName) {
     if (!ingredientName || typeof ingredientName !== 'string') return [];
@@ -299,7 +300,7 @@ export async function findBiopreparadosByIngredient(ingredientName) {
 
 if (import.meta.env.DEV) {
     if (typeof window !== 'undefined') {
-        window.__chagraCatalog = {
+        /** @type {*} */(window).__chagraCatalog = {
             initCatalog,
             getAllSpecies,
             getAllBiopreparados,

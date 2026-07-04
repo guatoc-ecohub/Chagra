@@ -110,6 +110,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
   // Catálogo dinámico (v3.1 ≈480 species) con fallback legacy (~77).
   // Se carga async desde catalogDB al mount; si tarda >2s o falla, queda
   // el legacy para no romper offline-first ni la UX del form.
+  /** @type {import('react').Dispatch<import('react').SetStateAction<Array<{id:string; name:string; groupId:string; groupLabel:string; [key:string]:any}>>>} */
   const [allSpecies, setAllSpecies] = useState(LEGACY_SPECIES);
   useEffect(() => {
     let cancelled = false;
@@ -199,14 +200,14 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
       const compressed = await compressImage(file);
       if (!compressed.ok) {
         setAiState('idle');
-        if (compressed.reason === 'too_large') {
+        if ('reason' in compressed && compressed.reason === 'too_large') {
           window.dispatchEvent(new CustomEvent('chagraToast', {
             detail: { message: IMAGE_TOO_LARGE_MESSAGE },
           }));
         }
         return;
       }
-      const { blob } = await captureAndCompress(compressed.blob);
+      const { blob } = await captureAndCompress(/** @type {File} */ (compressed.blob));
       // Bug fix #2 (2026-05-18): la foto sirve tanto para identificar como
       // para persistirse como foto de la planta. Si el parent pasó onPhoto,
       // le delegamos el blob ya comprimido (mismo blob que enviamos a Ollama)
@@ -487,9 +488,10 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
       {selectedSpeciesId && (
         <div className="mt-2 flex items-center gap-2 p-2 rounded-lg bg-slate-900 border border-slate-800">
           <SpeciesImage
-            scientificName={selectedSpecies?.nombre_cientifico}
-            commonName={selectedSpecies?.nombre_comun || value}
-            category={selectedSpecies?.groupId}
+            scientificName={/** @type {*} */(selectedSpecies)?.nombre_cientifico}
+            commonName={/** @type {*} */(selectedSpecies)?.nombre_comun || value}
+            category={/** @type {*} */(selectedSpecies)?.groupId}
+            catalogImage={null}
             compact
             className="w-20 shrink-0"
           />
@@ -730,7 +732,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
               {/* UX-1 (#284): badge "beta" debajo del nombre sugerido por
                   el modelo de visión. Recordatorio sutil de que la
                   identificación es generativa, aun cuando esté grounded. */}
-              <AIBetaBadge className="mt-1" title="Identificación generada por IA — verifica antes de actuar." />
+              <AIBetaBadge className="mt-1" title="Identificación generada por IA — verifica antes de actuar." confidence={undefined} />
             </div>
             {/* Si el primario fue rechazado por el catálogo pero el sidecar
                 encontró candidates alternativos válidos, ofrecerlos como

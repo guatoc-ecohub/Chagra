@@ -110,6 +110,7 @@ export function isDeepResearchIntent(intent) {
  *   stubMessage: string | null, // mensaje honesto "aún no disponible" para el usuario
  *   prompt: string,             // texto del usuario trimmeado (lo que se manda al LLM/burbuja)
  *   skipNlu: true,              // SIEMPRE true: el chip salta el NLU planner
+ *   localGrounding: any,        // módulo client-side a inyectar (ej. 'incendio'), sin tool del sidecar
  * }}
  */
 export function planForcedIntent(intent, text, opts = {}) {
@@ -414,7 +415,9 @@ const ANIMAL_PATTERNS = [
  */
 function detectAnimalSilvo(text) {
   const t = String(text);
-  for (const [re, animal] of ANIMAL_PATTERNS) {
+  for (const entry of ANIMAL_PATTERNS) {
+    const re = /** @type {RegExp} */ (entry[0]);
+    const animal = /** @type {'bovino'|'ovino'|'caprino'} */ (entry[1]);
     if (re.test(t)) return animal;
   }
   return null;

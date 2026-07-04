@@ -37,6 +37,7 @@ export function FieldError({ children }) {
  * @param {string} [props.hint]
  * @param {import('react').ComponentType<{size?: number}>} [props.Icon]
  * @param {string} [props.error]
+ * @param {string} [props.name]
  */
 export function TextField({ label, hint, Icon, error, ...rest }) {
   return (
@@ -58,6 +59,9 @@ export function TextField({ label, hint, Icon, error, ...rest }) {
  * @param {string} [props.hint]
  * @param {import('react').ComponentType<{size?: number}>} [props.Icon]
  * @param {string} [props.error]
+ * @param {string} [props.name]
+ * @param {string} [props.step]
+ * @param {string} [props.min]
  */
 export function NumberField({ label, hint, Icon, error, ...rest }) {
   return (
@@ -81,8 +85,9 @@ export function NumberField({ label, hint, Icon, error, ...rest }) {
  * @param {string} [props.hint]
  * @param {import('react').ComponentType<{size?: number}>} [props.Icon]
  * @param {string} [props.error]
- * @param {Array<{value: string, label: string}>} props.options
+ * @param {{value:string, label:string}[]} props.options
  * @param {string} [props.placeholder]
+ * @param {string} [props.name]
  */
 export function SelectField({ label, hint, Icon, error, options, placeholder, ...rest }) {
   return (
@@ -109,13 +114,15 @@ export function SelectField({ label, hint, Icon, error, options, placeholder, ..
  * @param {string} [props.hint]
  * @param {import('react').ComponentType<{size?: number}>} [props.Icon]
  * @param {string} [props.error]
+ * @param {string} [props.name]
+ * @param {number} [props.rows]
  */
 export function TextAreaField({ label, hint, Icon, error, ...rest }) {
   return (
     <label className="registro-field">
       <FieldLabel hint={hint} Icon={Icon}>{label}</FieldLabel>
       <textarea
-        className={`registro-textarea ${error ? 'registro-input--invalid' : ''}`}
+        className={`registro-input ${error ? 'registro-input--invalid' : ''}`}
         aria-invalid={!!error}
         {...rest}
       />
