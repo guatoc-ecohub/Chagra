@@ -118,9 +118,9 @@ describe('datos groundeados — integridad del set', () => {
     test('maíz y papa traen Tb y fuente citada', () => {
         expect(CULTIVO_GDD_BY_ID.maiz.tb).toBe(10);
         expect(CULTIVO_GDD_BY_ID.maiz.to).toBe(30);
-        expect(CULTIVO_GDD_BY_ID.maiz.fuente).toMatch(/R30/);
+        expect(CULTIVO_GDD_BY_ID.maiz.fuente).toMatch(/Chapingo/);
         expect(CULTIVO_GDD_BY_ID.papa.tb).toBe(5);
-        expect(CULTIVO_GDD_BY_ID.papa.fuente).toMatch(/R31/);
+        expect(CULTIVO_GDD_BY_ID.papa.fuente).toMatch(/SciELO/);
     });
     test('todo cultivo tiene id, nombre y Tb numérica', () => {
         for (const c of CULTIVOS_GDD) {
