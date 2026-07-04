@@ -1104,7 +1104,7 @@ export function makeContaminationJudgeCall({ spawnImpl, timeoutMs = 300_000 } = 
       contaminated: null,
       category: null,
       explanation: null,
-      source: 'unjudged',
+      source: /** @type {'unjudged'} */ ('unjudged'),
     }));
 
     if (arr.length === 0) return [];
@@ -1124,14 +1124,14 @@ export function makeContaminationJudgeCall({ spawnImpl, timeoutMs = 300_000 } = 
     return arr.map((item) => {
       const v = byId.get(item.id);
       if (!v) {
-        return { id: item.id, contaminated: null, category: null, explanation: null, source: 'unjudged' };
+        return { id: item.id, contaminated: null, category: null, explanation: null, source: /** @type {'unjudged'} */ ('unjudged') };
       }
       return {
         id: item.id,
         contaminated: v.contaminated,
         category: v.category,
         explanation: v.explanation,
-        source: 'judge',
+        source: /** @type {'judge'} */ ('judge'),
       };
     });
   };
