@@ -203,6 +203,51 @@
 [data-theme="nature"] .fvh,
 [data-theme="minimalista"] .fvh { --fvh-neon-velo: 0; }
 
+/* ── PROFUNDIZAR EL TEMA EN LA ESCENA (V4) ──────────────────────────────────
+   Antes los temas retiñían el shell pero la BANDA CENTRAL isométrica quedaba
+   casi igual (mismos verdes/tierras del SVG). Dos capas nuevas, sin tocar los
+   SVG ni la disposición:
+
+   1) GRADE de color por tema sobre el SVG de la escena (.fvh-escena > svg —
+      SOLO la escena; el globo del agente y la fauna quedan fuera): biopunk
+      enfría y apaga hacia su clave nocturna; nature calienta a tierra; el
+      minimalista desatura a papel; verde-vivo sube la savia. Es la misma
+      escena con otra LUZ, como los bocetos por tema aprobados.
+
+   2) VELADURA/TEXTURA por tema (reusa el ::after del velo, que biopunk ya
+      ocupaba con su neón): sol de mañana en verde-vivo, veladura dorada +
+      grano de papel kraft en nature, trama fina de papel en minimalista. */
+.fvh-escena > svg {
+  filter: saturate(0.86) hue-rotate(-8deg) brightness(0.93); /* biopunk base */
+  transition: filter 0.6s ease;
+}
+[data-theme="verde-vivo"] .fvh-escena > svg { filter: saturate(1.14) brightness(1.02); }
+[data-theme="nature"] .fvh-escena > svg { filter: sepia(0.22) saturate(0.95) brightness(1.02); }
+[data-theme="minimalista"] .fvh-escena > svg { filter: saturate(0.62) contrast(0.97) brightness(1.05); }
+
+/* verde-vivo: sol de mañana que entra por la esquina alta izquierda. */
+[data-theme="verde-vivo"] .fvh-escena-wrap::after {
+  opacity: 1;
+  background: radial-gradient(110% 80% at 22% 8%, rgba(255, 240, 180, 0.20), transparent 52%);
+}
+/* nature: veladura dorada de tierra + grano horizontal de papel kraft. */
+[data-theme="nature"] .fvh-escena-wrap::after {
+  opacity: 1;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 214, 150, 0.16), transparent 55%),
+    repeating-linear-gradient(0deg, rgba(122, 82, 48, 0.05) 0 2px, transparent 2px 6px);
+}
+/* minimalista: luz pareja de estudio + trama vertical finísima de papel. */
+[data-theme="minimalista"] .fvh-escena-wrap::after {
+  opacity: 1;
+  background:
+    linear-gradient(180deg, rgba(246, 243, 236, 0.20) 0%, transparent 40%),
+    repeating-linear-gradient(90deg, rgba(60, 70, 60, 0.035) 0 1px, transparent 1px 8px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .fvh-escena > svg { transition: none; }
+}
+
 /* VIÑETA DE PROFUNDIDAD de la escena (todos los temas): un brillo apenas
    perceptible arriba (aire) + una caída suave abajo que asienta la escena
    contra el compositor. z5: sobre la escena (z2), bajo el velo neón (z6). */

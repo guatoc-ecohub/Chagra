@@ -26,7 +26,7 @@ import {
     rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays, Sprout, HelpCircle, Store, FileText, Mic, CloudRain, Leaf, Gauge } from 'lucide-react';
+import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays, Sprout, HelpCircle, Store, Mic, CloudRain, Leaf, Gauge } from 'lucide-react';
 import AgentHero from './AgentHero';
 import OnboardingHero from '../OnboardingHero';
 import {
@@ -58,6 +58,10 @@ import './dashboard-resto-redistribucion.css';
 // CAPABILITIES_STATUS.md §2.
 import CaseStudyTopWidget from '../CaseStudyTopWidget';
 import CicloVivoWidget from '../CicloVivo/CicloVivoWidget';
+// LOS MUNDOS DE MI FINCA (reestructuración 2.0, V4): el contenedor que agrupa
+// las funciones dispersas del home F2 en 9 mundos coherentes (mundosFinca.js).
+// Solo se monta con la flag F2 ON; el legacy conserva sus tiles.
+import MundosDeMiFinca from './MundosDeMiFinca';
 import ClimaStrip from './ClimaStrip';
 import HoyEnFincaStrip from './HoyEnFincaStrip';
 import AIStatusFooter from './AIStatusFooter';
@@ -196,11 +200,9 @@ const APRENDER_TILES = [
     { view: 'faq', label: 'Preguntas frecuentes', icon: HelpCircle, desc: 'Cómo funciona Chagra', accent: 'text-violet-400 border-l-violet-500' },
 ];
 
-// Reportes para imprimir/llevar a la cooperativa. Antes vivía solo como tarjeta
-// "Informes/CSV" en el grid del vistazo (audit: jerga); en F2 se trae al bloque
-// "Consultar y aprender" con copy campesino ("Sacar reportes"). `informes` es la
-// ruta real (App.jsx). Solo se ofrece como tile en la home F2.
-const REPORTES_TILE_F2 = { view: 'informes', label: 'Sacar reportes', icon: FileText, desc: 'Para imprimir o llevar al banco o la cooperativa', accent: 'text-slate-300 border-l-slate-500' };
+// Reportes ("Sacar reportes", ruta 'informes'): con la reestructuración 2.0
+// vive DENTRO del mundo "Mercado y despensa" (mundosFinca.js) — ya no es un
+// tile suelto del home F2. El legacy (flag OFF) lo conserva vía InformesCard.
 
 // 3) GESTIÓN — "Mi finca": registros y acciones de manejo, sin launcher directo
 //    antes (huérfanas o solo por la mano). Semilleros entra aquí (es gestión de
@@ -697,10 +699,14 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
 
             {fincaVivaFlag ? (
             /* ════════════════════════════════════════════════════════════════
-               HOME F2 EN 5 BLOQUES (audit botones/distribución 2026-06-26).
-               Orden = flujo mental del campesino: estado → tengo → hago →
-               consulto → vendo. Copy campesino. Bloque condicional de proyectos
-               BAJADO. Solo activo con la flag ON; el legacy (else) queda intacto.
+               HOME F2 — REESTRUCTURACIÓN 2.0 "LOS MUNDOS DE MI FINCA" (V4).
+               Flujo: cómo va la finca (estado) → registrar (la acción diaria,
+               voz-primero, ancla del portal "Mi finca") → LOS MUNDOS (todas las
+               herramientas agrupadas en 9 lugares coherentes, mundosFinca.js)
+               → ciclo vivo + casos → pie (FAQ/Ayuda). Reemplaza los 5 bloques
+               del audit 2026-06-26 (las tiles de consultar/aprender, mercado,
+               inventario suelto y seguimiento viven ahora DENTRO de sus
+               mundos). Solo activo con la flag ON; el legacy (else) intacto.
                ════════════════════════════════════════════════════════════════ */
             <>
                 {/* ── BLOQUE 1 · "Cómo va su finca hoy" ───────────────────────
@@ -721,42 +727,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                     </div>
                 </div>
 
-                {/* El Ciclo Vivo: portal a la rueda de las 7 fases. Estado real
-                    por función desde chagra-stats.json (se enciende solo). */}
-                <div className="px-4 pt-3 fvh-resto-block">
-                    {blockLabel('El ciclo de su cultivo', 'from-amber-400 to-lime-400')}
-                    <CicloVivoWidget onNavigate={onNavigate} />
-                </div>
-
-                {/* Top problemas activos (casos de estudio, DR-044). Se auto-oculta
-                    si no hay casos → zero footprint. Va tras el estado del día. */}
-                <div className="px-4 pt-3 fvh-resto-block">
-                    <CaseStudyTopWidget onNavigate={onNavigate} maxItems={3} />
-                </div>
-
-                {/* ── BLOQUE 2 · "Sus plantas y animales" ─────────────────────
-                    Agrupa las cinco superficies de plantas que antes estaban
-                    revueltas entre el grid del vistazo y el bloque destacado
-                    (audit §3.4): mis matas (plantas), zonas, plagas, asociaciones
-                    y flora/fauna — más los animales. Así se entiende cuál abrir
-                    para "ver mis matas". */}
-                <div className="px-4 pt-3 fvh-resto-block" data-testid="bloque-plantas-animales">
-                    {blockLabel('Sus plantas y animales', 'from-lime-400 to-emerald-400')}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        <PlantasCard onNavigate={onNavigate} variant="grid" />
-                        <ZonasCard onNavigate={onNavigate} variant="grid" />
-                        <PlagasCard onNavigate={onNavigate} variant="grid" />
-                        <AsociacionesCard onNavigate={onNavigate} variant="grid" />
-                        <BiodiversidadCard onNavigate={onNavigate} variant="grid" />
-                    </div>
-                    {mostrarAnimales && (
-                        <div className="mt-3">
-                            <AnimalesCard onNavigate={onNavigate} variant="list" />
-                        </div>
-                    )}
-                </div>
-
-                {/* ── BLOQUE 3 · "Registrar en la finca" ──────────────────────
+                {/* ── BLOQUE 2 · "Registrar en la finca" ──────────────────────
                     El bloque de ACCIÓN: semilleros, cosechar, abonos e insumos
                     (UNIFICA los dos insumos que se solapaban, audit §3.1), labores
                     y la bitácora. Conserva el ancla #finca-gestion: el portal "Mi
@@ -810,43 +781,57 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                     </div>
                 </div>
 
-                {/* ── BLOQUE 4 · "Consultar y aprender" ───────────────────────
-                    Lo de consulta ocasional, no del primer scroll (audit §4):
-                    catálogo de plantas + calendario (lo fuerte y grounded, en
-                    tiles grandes), las superficies de contenido (casos,
-                    biopreparados, suelo, seguridad, faq) y "Sacar reportes". El
-                    portal "Aprender" del hero ya entra al hub `aprende`, así que
-                    aquí se filtra ese tile para no duplicar el nombre (audit
-                    §3.5). Colapsable: <details> abierto por defecto. */}
-                <div className="px-4 pt-3 fvh-resto-block" data-testid="bloque-consultar">
-                    <details open className="fvh-consultar">
-                        <summary className="list-none cursor-pointer">
-                            {blockLabel('Consultar y aprender', 'from-violet-400 to-emerald-400')}
-                        </summary>
-                        <div className="grid grid-cols-2 gap-3" data-testid="destacado-tiles">
-                            {DESTACADO_TILES.map((tile) => renderTile(tile, { large: true }))}
-                        </div>
-                        <div className="grid grid-cols-3 gap-3 mt-3" data-testid="aprender-tiles">
-                            {APRENDER_TILES
-                                .filter((tile) => tile.view !== 'aprende')
-                                .map((tile) => renderTile(tile))}
-                            {renderTile(REPORTES_TILE_F2)}
-                        </div>
-                    </details>
+                {/* ── BLOQUE 3 · LOS MUNDOS DE SU FINCA (reestructuración 2.0) ─
+                    EL contenedor: reemplaza la caja de herramientas regada de
+                    antes (tiles de consultar/aprender + inventario suelto +
+                    mercado + seguimiento) por 9 mundos coherentes. Cada función
+                    vieja vive DENTRO de su mundo (mundosFinca.js es la fuente
+                    única; el test de reachability congela el contrato). El gate
+                    de Animales por perfil se conserva (mostrarAnimales). */}
+                <div className="px-4 pt-4 fvh-resto-block" data-testid="bloque-mundos">
+                    <MundosDeMiFinca
+                        onNavigate={onNavigate}
+                        mostrarAnimales={mostrarAnimales}
+                        plantsCount={plantsCount}
+                    />
                 </div>
 
-                {/* ── BLOQUE 5 · "Vender y comprar" ───────────────────────────
-                    Mercado, ya está bien; va al fondo de lo cotidiano. */}
-                {renderMercado()}
+                {/* El Ciclo Vivo: portal a la rueda de las 7 fases. Estado real
+                    por función desde chagra-stats.json (se enciende solo). */}
+                <div className="px-4 pt-3 fvh-resto-block">
+                    {blockLabel('El ciclo de su cultivo', 'from-amber-400 to-lime-400')}
+                    <CicloVivoWidget onNavigate={onNavigate} />
+                </div>
 
-                {/* ── CONDICIONAL · "Sus proyectos de finca" (BAJADO) ─────────
-                    Reforestación · Silvopastoreo · Páramo · Cerdos. Es de nicho
-                    (audit §4): gateado por perfil y BAJADO bajo lo cotidiano para
-                    no robarle el primer scroll a "mis plantas/hoy". */}
-                {renderSeguimiento({ f2: true })}
+                {/* Top problemas activos (casos de estudio, DR-044). Se auto-oculta
+                    si no hay casos → zero footprint. */}
+                <div className="px-4 pt-3 fvh-resto-block">
+                    <CaseStudyTopWidget onNavigate={onNavigate} maxItems={3} />
+                </div>
 
                 {/* "Campo, Javier" (gateado al operador), al fondo. */}
                 {renderJavier()}
+
+                {/* Pie del cuaderno: ayuda y preguntas frecuentes, discretas
+                    pero siempre alcanzables (antes "Preguntas frecuentes" era
+                    un tile de Consultar; el mundo no las necesita). */}
+                <div className="px-4 pt-4 pb-2 flex items-center justify-center gap-2 fvh-resto-block" data-testid="footer-ayuda">
+                    <button
+                        type="button"
+                        onClick={() => onNavigate('faq')}
+                        className="text-xs font-bold underline underline-offset-2 fvh-block-label"
+                    >
+                        Preguntas frecuentes
+                    </button>
+                    <span aria-hidden="true" className="fvh-block-label">·</span>
+                    <button
+                        type="button"
+                        onClick={() => onNavigate('ayuda')}
+                        className="text-xs font-bold underline underline-offset-2 fvh-block-label"
+                    >
+                        Ayuda
+                    </button>
+                </div>
             </>
             ) : (
             /* ════════════════════════════════════════════════════════════════

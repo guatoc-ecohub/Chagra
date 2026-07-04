@@ -83,18 +83,16 @@ const labelOf = (el) => el.getAttribute('aria-label')?.split(':')[0];
 const indexInDom = (node) =>
   Array.prototype.indexOf.call(document.querySelectorAll('[data-testid]'), node);
 
-describe('Home F2 — reorganización en 5 bloques (audit 2026-06-26)', () => {
-  test('los 5 bloques existen en el orden del flujo del campesino', async () => {
+describe('Home F2 — reestructuración 2.0 "Los mundos de mi finca" (V4)', () => {
+  test('el flujo: estado → registrar → LOS MUNDOS → pie de ayuda, en orden', async () => {
     render(<DashboardLive onNavigate={vi.fn()} />);
     await waitFor(() => expect(screen.getByTestId('bloque-finca-hoy')).toBeInTheDocument());
 
-    // estado → tengo → hago → consulto → vendo.
     const blocks = [
-      'bloque-finca-hoy',        // 1. Cómo va su finca hoy
-      'bloque-plantas-animales', // 2. Sus plantas y animales
-      'bloque-registrar',        // 3. Registrar en la finca
-      'bloque-consultar',        // 4. Consultar y aprender
-      'mercado-tiles',           // 5. Vender y comprar
+      'bloque-finca-hoy',  // 1. Cómo va su finca hoy
+      'bloque-registrar',  // 2. Registrar en la finca (voz-primero, ancla)
+      'bloque-mundos',     // 3. LOS MUNDOS DE SU FINCA
+      'footer-ayuda',      // pie: FAQ · Ayuda
     ];
     for (const b of blocks) expect(screen.getByTestId(b)).toBeInTheDocument();
 
@@ -119,17 +117,7 @@ describe('Home F2 — reorganización en 5 bloques (audit 2026-06-26)', () => {
     expect(screen.getAllByTestId('hoy-strip')).toHaveLength(1);
   });
 
-  test('BLOQUE 2 agrupa plantas, zonas, plagas, asociaciones y flora/fauna', async () => {
-    render(<DashboardLive onNavigate={vi.fn()} />);
-    const block = await screen.findByTestId('bloque-plantas-animales');
-    const txt = block.textContent;
-    expect(block).toHaveTextContent('Sus plantas y animales');
-    for (const t of ['Mis plantas', 'Mis zonas', 'Plagas', 'Asociaciones', 'Plantas y animales del monte']) {
-      expect(txt).toContain(t);
-    }
-  });
-
-  test('BLOQUE 3 "Registrar" unifica abonos e insumos y usa copy campesino', async () => {
+  test('"Registrar" unifica abonos e insumos y usa copy campesino', async () => {
     render(<DashboardLive onNavigate={vi.fn()} />);
     const block = await screen.findByTestId('bloque-registrar');
     const gestion = within(block).getByTestId('gestion-tiles');
@@ -139,7 +127,7 @@ describe('Home F2 — reorganización en 5 bloques (audit 2026-06-26)', () => {
     expect(block).toHaveTextContent('Bitácora');
   });
 
-  test('BLOQUE 3 conserva el ancla #finca-gestion (destino del portal Mi finca)', async () => {
+  test('"Registrar" conserva el ancla #finca-gestion (destino del portal Mi finca)', async () => {
     render(<DashboardLive onNavigate={vi.fn()} />);
     const block = await screen.findByTestId('bloque-registrar');
     const ancla = document.getElementById('finca-gestion');
@@ -147,61 +135,58 @@ describe('Home F2 — reorganización en 5 bloques (audit 2026-06-26)', () => {
     expect(ancla).toBe(block);
   });
 
-  test('BLOQUE 4 "Consultar y aprender" con catálogo, calendario, contenido y reportes', async () => {
+  test('LOS MUNDOS: la grilla monta los 9 mundos con su copy', async () => {
     render(<DashboardLive onNavigate={vi.fn()} />);
-    const block = await screen.findByTestId('bloque-consultar');
-
-    // Lo fuerte y grounded, con copy campesino.
-    const destacado = within(block).getByTestId('destacado-tiles');
-    expect(within(destacado).getAllByRole('button').map(labelOf))
-      .toEqual(['Qué puedo sembrar', 'Calendario de la finca']);
-
-    // El contenido consolidado + "Sacar reportes"; NO duplica el hub "Aprender"
-    // (ese es el portal del hero en F2).
-    const aprender = within(block).getByTestId('aprender-tiles');
-    const labels = within(aprender).getAllByRole('button').map(labelOf);
-    expect(labels).not.toContain('Aprender');
-    expect(labels).toEqual([
-      'Casos reales', 'Ciclo de nutrientes', 'Del corral al abono', 'Biopreparados', 'Suelo', 'El agua de su finca', 'Cuaderno del Suelo', 'Seguridad', 'Preguntas frecuentes', 'Sacar reportes',
-    ]);
+    const block = await screen.findByTestId('bloque-mundos');
+    expect(within(block).getByTestId('mundos-finca')).toBeInTheDocument();
+    for (const id of ['cultivos', 'suelo', 'agua', 'abono', 'sanidad', 'clima', 'animales', 'mercado', 'disenio']) {
+      expect(within(block).getByTestId(`mundo-${id}`)).toBeInTheDocument();
+    }
+    expect(block).toHaveTextContent('Los mundos de su finca');
+    expect(block).toHaveTextContent('Cultivos y semillas');
+    expect(block).toHaveTextContent('Sanidad de la mata');
   });
 
-  test('BLOQUE 5 Mercado al fondo y navega a la ruta mercado', async () => {
+  test('mundos con pantalla propia navegan a la ruta mundo; los directos a su vista', async () => {
     const onNavigate = vi.fn();
     render(<DashboardLive onNavigate={onNavigate} />);
-    const block = await screen.findByTestId('mercado-tiles');
-    fireEvent.click(within(block).getByRole('button', { name: /Mercado/ }));
-    expect(onNavigate).toHaveBeenCalledWith('mercado', undefined);
+    await screen.findByTestId('bloque-mundos');
+
+    // Mundo con entradas → pantalla de mundo.
+    fireEvent.click(screen.getByTestId('mundo-cultivos'));
+    expect(onNavigate).toHaveBeenCalledWith('mundo', { mundo: 'cultivos' });
+    fireEvent.click(screen.getByTestId('mundo-mercado'));
+    expect(onNavigate).toHaveBeenCalledWith('mundo', { mundo: 'mercado' });
+
+    // Mundos de UNA pantalla → directo, sin intermedia vacía.
+    fireEvent.click(screen.getByTestId('mundo-agua'));
+    expect(onNavigate).toHaveBeenCalledWith('agua', undefined);
+    fireEvent.click(screen.getByTestId('mundo-abono'));
+    expect(onNavigate).toHaveBeenCalledWith('estiercol', undefined);
+    fireEvent.click(screen.getByTestId('mundo-clima'));
+    expect(onNavigate).toHaveBeenCalledWith('hoy_finca', undefined);
   });
 
-  test('"Sus proyectos de finca" va MÁS ABAJO que lo cotidiano (estado/registrar)', async () => {
+  test('las tiles sueltas viejas ya NO existen en F2 (viven dentro de sus mundos)', async () => {
     render(<DashboardLive onNavigate={vi.fn()} />);
-    await screen.findByTestId('seguimiento-cards');
-    const seguimiento = screen.getByTestId('seguimiento-cards');
-    const registrar = screen.getByTestId('bloque-registrar');
-    const hoy = screen.getByTestId('bloque-finca-hoy');
-    // El bloque condicional de proyectos queda debajo de lo cotidiano.
-    expect(indexInDom(seguimiento)).toBeGreaterThan(indexInDom(registrar));
-    expect(indexInDom(seguimiento)).toBeGreaterThan(indexInDom(hoy));
-    // Y lleva su rótulo campesino renombrado.
-    expect(seguimiento.closest('[class*="px-4"]')).toHaveTextContent('Sus proyectos de finca');
+    await screen.findByTestId('bloque-mundos');
+    // Los bloques desmontados por la reestructuración.
+    expect(screen.queryByTestId('bloque-plantas-animales')).toBeNull();
+    expect(screen.queryByTestId('bloque-consultar')).toBeNull();
+    expect(screen.queryByTestId('destacado-tiles')).toBeNull();
+    expect(screen.queryByTestId('aprender-tiles')).toBeNull();
+    expect(screen.queryByTestId('mercado-tiles')).toBeNull();
+    expect(screen.queryByTestId('seguimiento-cards')).toBeNull();
   });
 
-  test('los tiles navegan a sus rutas reales (directorio, calendario, casos, biopreparados con back, reportes)', async () => {
+  test('el pie mantiene FAQ y Ayuda alcanzables', async () => {
     const onNavigate = vi.fn();
     render(<DashboardLive onNavigate={onNavigate} />);
-    await screen.findByTestId('bloque-consultar');
-
-    fireEvent.click(screen.getByRole('button', { name: /^Qué puedo sembrar/ }));
-    expect(onNavigate).toHaveBeenCalledWith('directorio', undefined);
-    fireEvent.click(screen.getByRole('button', { name: /^Calendario de la finca/ }));
-    expect(onNavigate).toHaveBeenCalledWith('calendario_finca', undefined);
-    fireEvent.click(screen.getByRole('button', { name: /^Casos reales/ }));
-    expect(onNavigate).toHaveBeenCalledWith('casos', undefined);
-    fireEvent.click(screen.getByRole('button', { name: /^Biopreparados/ }));
-    expect(onNavigate).toHaveBeenCalledWith('biopreparados', { back: 'dashboard' });
-    fireEvent.click(screen.getByRole('button', { name: /^Sacar reportes/ }));
-    expect(onNavigate).toHaveBeenCalledWith('informes', undefined);
+    const pie = await screen.findByTestId('footer-ayuda');
+    fireEvent.click(within(pie).getByRole('button', { name: /Preguntas frecuentes/ }));
+    expect(onNavigate).toHaveBeenCalledWith('faq');
+    fireEvent.click(within(pie).getByRole('button', { name: /^Ayuda$/ }));
+    expect(onNavigate).toHaveBeenCalledWith('ayuda');
   });
 
   test('el hero recibe onGestionar y, al invocarlo, hace scroll al ancla de gestión (no navega al juego)', async () => {

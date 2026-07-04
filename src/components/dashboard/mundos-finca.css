@@ -1,0 +1,395 @@
+/* ============================================================================
+   mundos-finca.css — LOS MUNDOS DE MI FINCA (reestructuración 2.0 del home).
+
+   Identidad: CUADERNO DE CAMPO. Cada mundo es una lámina de papel pegada al
+   cuaderno crema del home: viñeta ilustrada arriba, nombre en Baloo 2, lema en
+   Nunito y las herramientas "adentro" como chips de tinta. La paleta de cada
+   mundo entra por dos custom properties que fija el JSX:
+     --mf-a  acento fuerte (tierra/verde/agua del mundo)
+     --mf-b  acento suave (el papel tintado del mundo)
+
+   Los mundos viven en dos superficies:
+     · La GRILLA del home (.mf, dentro de la hoja crema .fvh-resto).
+     · La PANTALLA de mundo (.mf-mundo, dentro de ScreenShell — ahí las láminas
+       de papel funcionan sobre cualquier tema, claro u oscuro: son papel).
+
+   Legible al sol: tinta oscura #26331f sobre papel, labels en negrita, sin
+   depender del color para la jerarquía. prefers-reduced-motion: sin entradas
+   animadas ni lifts. rsvg-safe: nada de filtros en las viñetas.
+   ========================================================================== */
+
+.mf {
+  --mf-papel: #fffdf6;
+  --mf-tinta: #26331f;
+  --mf-tinta-suave: #4e5c42;
+  --mf-display: 'Baloo 2', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mf-body: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family: var(--mf-body);
+  color: var(--mf-tinta);
+}
+
+/* ── Cabecera de la sección ────────────────────────────────────────────────── */
+.mf-head { margin: 2px 2px 12px; }
+.mf-tit {
+  font-family: var(--mf-display);
+  font-weight: 800;
+  font-size: 21px;
+  line-height: 1.15;
+  color: var(--mf-tinta);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+/* La puntada del cuaderno: hilo corto cosido antes del título. */
+.mf-tit::before {
+  content: '';
+  width: 26px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background:
+    repeating-linear-gradient(90deg,
+      #3f8f4e 0 6px, transparent 6px 10px);
+}
+.mf-sub {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--mf-tinta-suave);
+  margin: 4px 0 0;
+  max-width: 42ch;
+}
+
+/* ── Grilla de mundos ──────────────────────────────────────────────────────── */
+.mf-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (min-width: 720px) {
+  .mf-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* ── Tarjeta de mundo: la lámina de papel ──────────────────────────────────── */
+.mf-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  border: 1px solid rgba(38, 51, 31, 0.14);
+  border-radius: 18px;
+  background: var(--mf-papel, #fffdf6);
+  box-shadow: 0 2px 10px rgba(38, 51, 31, 0.08);
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+  /* entrada escalonada de la grilla (--mf-i la fija el JSX) */
+  animation: mf-brota 420ms cubic-bezier(0.22, 0.9, 0.3, 1) both;
+  animation-delay: calc(var(--mf-i, 0) * 45ms);
+}
+.mf-card:active { transform: scale(0.985); }
+@media (hover: hover) {
+  .mf-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(38, 51, 31, 0.14);
+  }
+}
+.mf-card:focus-visible {
+  outline: 3px solid var(--mf-a, #3f8f4e);
+  outline-offset: 2px;
+}
+@keyframes mf-brota {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* El mundo destacado (Cultivos) ocupa la fila completa. */
+.mf-card--featured { grid-column: 1 / -1; }
+
+/* Banda de viñeta ilustrada. */
+.mf-vineta {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 84px;
+  background: var(--mf-b, #eef3e2);
+  /* línea de tierra del mundo: separa la ilustración del papel */
+  border-bottom: 3px solid var(--mf-a, #3f8f4e);
+}
+.mf-card--featured .mf-vineta { height: 116px; }
+.mf-vineta-svg { display: block; width: 100%; height: 100%; }
+
+/* Sello vivo sobre la viñeta (dato real: "N matas sembradas"). */
+.mf-sello {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 253, 246, 0.92);
+  border: 1px solid var(--mf-a, #3f8f4e);
+  color: var(--mf-tinta);
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+/* Cuerpo de la lámina. */
+.mf-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px 12px;
+  flex: 1;
+}
+.mf-nombre {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--mf-display);
+  font-weight: 800;
+  font-size: 15.5px;
+  line-height: 1.15;
+  color: var(--mf-tinta);
+}
+.mf-card--featured .mf-nombre { font-size: 18px; }
+.mf-emoji { font-size: 18px; line-height: 1; }
+.mf-lema {
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: var(--mf-tinta-suave);
+}
+.mf-card--featured .mf-lema { font-size: 12.5px; }
+
+/* "Adentro": chips de las herramientas del mundo. */
+.mf-adentro {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+.mf-chip {
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: var(--mf-b, #eef3e2);
+  border: 1px solid color-mix(in srgb, var(--mf-a, #3f8f4e) 35%, transparent);
+  color: var(--mf-tinta);
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mf-chip--mas,
+.mf-chip--entrar {
+  background: transparent;
+  border-style: dashed;
+  color: var(--mf-tinta-suave);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PANTALLA DE MUNDO (MundoScreen) — el mundo por dentro.
+   ══════════════════════════════════════════════════════════════════════════ */
+.mf-mundo {
+  --mf-papel: #fffdf6;
+  --mf-tinta: #26331f;
+  --mf-tinta-suave: #4e5c42;
+  font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* Portada: la viñeta en grande con el emoji del mundo sellado encima. */
+.mf-mundo-hero {
+  position: relative;
+  height: 132px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(38, 51, 31, 0.14);
+  border-bottom: 4px solid var(--mf-a, #3f8f4e);
+  background: var(--mf-b, #eef3e2);
+  box-shadow: 0 3px 12px rgba(38, 51, 31, 0.10);
+}
+.mf-mundo-hero .mf-vineta-svg { width: 100%; height: 100%; display: block; }
+.mf-mundo-emoji {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  border-radius: 14px;
+  background: rgba(255, 253, 246, 0.92);
+  border: 1.5px solid var(--mf-a, #3f8f4e);
+  box-shadow: 0 2px 8px rgba(38, 51, 31, 0.14);
+}
+.mf-mundo-lema {
+  margin: 10px 4px 14px;
+  font-size: 13.5px;
+  line-height: 1.4;
+  font-weight: 700;
+  color: var(--mf-tinta);
+  background: var(--mf-papel);
+  border-left: 4px solid var(--mf-a, #3f8f4e);
+  border-radius: 10px;
+  padding: 9px 12px;
+  box-shadow: 0 1px 6px rgba(38, 51, 31, 0.08);
+}
+
+/* Las herramientas del mundo: filas de papel generosas (área táctil ≥56px). */
+.mf-entradas {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.mf-entrada {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 60px;
+  padding: 10px 12px;
+  border-radius: 15px;
+  border: 1px solid rgba(38, 51, 31, 0.14);
+  background: var(--mf-papel);
+  color: var(--mf-tinta);
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 1px 6px rgba(38, 51, 31, 0.07);
+  transition: transform 140ms ease, box-shadow 140ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.mf-entrada:active { transform: scale(0.988); }
+@media (hover: hover) {
+  .mf-entrada:hover { box-shadow: 0 4px 14px rgba(38, 51, 31, 0.13); }
+}
+.mf-entrada:focus-visible {
+  outline: 3px solid var(--mf-a, #3f8f4e);
+  outline-offset: 2px;
+}
+.mf-entrada-icono {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  font-size: 21px;
+  border-radius: 12px;
+  background: var(--mf-b, #eef3e2);
+  border: 1px solid color-mix(in srgb, var(--mf-a, #3f8f4e) 40%, transparent);
+}
+.mf-entrada-txt {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.mf-entrada-txt b {
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 14.5px;
+  line-height: 1.2;
+}
+.mf-entrada-txt small {
+  font-size: 11.5px;
+  line-height: 1.3;
+  color: var(--mf-tinta-suave);
+}
+.mf-entrada-ir {
+  flex: 0 0 auto;
+  font-weight: 800;
+  color: var(--mf-a, #3f8f4e);
+  opacity: 0.85;
+}
+
+/* El agente, siempre a la mano al pie del mundo. */
+.mf-agente {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 14px;
+  min-height: 58px;
+  padding: 10px 14px;
+  border-radius: 15px;
+  border: 1.5px dashed var(--mf-a, #3f8f4e);
+  background: color-mix(in srgb, var(--mf-b, #eef3e2) 55%, var(--mf-papel));
+  color: var(--mf-tinta);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.mf-agente > span:first-child { font-size: 22px; }
+.mf-agente b {
+  display: block;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 14.5px;
+}
+.mf-agente small {
+  display: block;
+  font-size: 11.5px;
+  color: var(--mf-tinta-suave);
+}
+.mf-agente:focus-visible {
+  outline: 3px solid var(--mf-a, #3f8f4e);
+  outline-offset: 2px;
+}
+
+/* Índice de mundos (fallback sin id): lista sencilla de láminas. */
+.mf-indice-intro {
+  font-size: 13px;
+  color: #4e5c42;
+  margin: 0 2px 10px;
+}
+.mf-indice { display: flex; flex-direction: column; gap: 9px; }
+.mf-indice-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 9px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(38, 51, 31, 0.14);
+  border-left: 5px solid var(--mf-a, #3f8f4e);
+  background: #fffdf6;
+  color: #26331f;
+  text-align: left;
+  cursor: pointer;
+}
+.mf-indice-emoji { font-size: 22px; }
+.mf-indice-txt b {
+  display: block;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 14.5px;
+}
+.mf-indice-txt small {
+  display: block;
+  font-size: 11.5px;
+  color: #4e5c42;
+}
+.mf-indice-item:focus-visible {
+  outline: 3px solid var(--mf-a, #3f8f4e);
+  outline-offset: 2px;
+}
+
+/* ── Accesibilidad de movimiento ──────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .mf-card {
+    animation: none;
+    transition: none;
+  }
+  .mf-card:active,
+  .mf-entrada:active { transform: none; }
+  .mf-entrada { transition: none; }
+  @media (hover: hover) {
+    .mf-card:hover { transform: none; }
+  }
+}

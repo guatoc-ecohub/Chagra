@@ -110,6 +110,9 @@ const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScree
 // (calidad + nacimiento, caso "se me seca el nacimiento en verano").
 const AguaScreen = lazy(() => import('./components/agua/AguaScreen'));
 const SaludSueloScreen = lazy(() => import('./components/SaludSueloScreen'));
+// LOS MUNDOS DE MI FINCA (reestructuración 2.0 del home): un mundo por dentro —
+// las funciones existentes agrupadas por lugar. Re-rutea, no reimplementa.
+const MundoScreen = lazy(() => import('./components/MundoScreen'));
 const CromatografiaScreen = lazy(() => import('./components/CromatografiaScreen'));
 const CicloVivoFullView = lazy(() => import('./components/CicloVivo/CicloVivoFullView'));
 const ToxicologiaScreen = lazy(() => import('./components/ToxicologiaScreen'));
@@ -227,7 +230,7 @@ const MODULE_VIEWS = new Set([
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'salud_suelo', 'toxicologia', 'aprende', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
-  'usage_stats', 'mercado', 'auditoria_inventario',
+  'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
 ]);
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
@@ -1287,6 +1290,22 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Agua de la finca">
               <AguaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mundo':
+        // LOS MUNDOS DE MI FINCA (reestructuración 2.0 del home, V4): la
+        // pantalla de un mundo agrupa sus funciones y RE-RUTEA a las vistas
+        // reales existentes. data = { mundo: id } (mundosFinca.js); sin data o
+        // con id desconocido muestra el índice de mundos (fallback honesto).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mundos de la finca">
+              <MundoScreen
+                mundoId={currentViewData?.mundo}
+                onBack={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
             </ErrorFallback>
           </ErrorBoundary>
         );

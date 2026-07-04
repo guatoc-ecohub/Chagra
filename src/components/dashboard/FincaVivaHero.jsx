@@ -162,6 +162,13 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
 
   // ── Cielo real: hora + clima (REUSA atmosphereService, no inventa motor) ──
   const atmosfera = useAtmosferaEscena();
+  // La atmósfera + el TEMA activo: las escenas pintan su cielo interno con la
+  // piel del tema (CIELOS_TEMA) además de la hora/clima reales. Un solo objeto
+  // para no cambiar la firma de las 3 escenas.
+  const atmosferaTema = useMemo(
+    () => ({ ...atmosfera, tema: theme }),
+    [atmosfera, theme],
+  );
 
   // Variante de escena por PERFIL (override duro urbano, invernadero, finca…).
   const variant = useMemo(() => {
@@ -354,12 +361,12 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
 
               {tieneFincaPropia ? (
                 <>
-                  {escala === 'balcon' && <SceneBalcon poblada={poblada} cielo={atmosfera} />}
-                  {escala === 'invernadero' && <SceneInvernadero poblada={poblada} cielo={atmosfera} />}
+                  {escala === 'balcon' && <SceneBalcon poblada={poblada} cielo={atmosferaTema} />}
+                  {escala === 'invernadero' && <SceneInvernadero poblada={poblada} cielo={atmosferaTema} />}
                   {escala === 'finca' && (
                     <SceneFinca
                       poblada={poblada}
-                      cielo={atmosfera}
+                      cielo={atmosferaTema}
                       estructura={estructuraFinca}
                       escalaFinca={variant?.escala}
                     />
@@ -656,9 +663,53 @@ const CIELOS_ESCENA = {
     noche: ['#1d2b4a', '#465a64'],
   },
 };
+/**
+ * CIELOS POR TEMA — la piel del tema DENTRO de la escena (V4, req. "profundizar
+ * el tema en la escena"). Antes los 4 temas casi solo cambiaban la barra y el
+ * degradado del shell: la banda central isométrica seguía con el mismo cielo.
+ * Ahora cada tema fija el cielo INTERNO de la escena por tono de luz:
+ *   · biopunk (base) — navy/teal nocturno-neón incluso de día (coherente con el
+ *     velo neón y el boceto aprobado; adiós al "mediodía suelto").
+ *   · verde-vivo — turquesa fresco + crema frondosa (el look vivo original).
+ *   · nature — cielos de tierra: crema dorada de día, ocres al sol bajo.
+ *   · minimalista — papel: salvia pálida, tonos apagados, noche gris-azul.
+ * Se aplica ANTES que la tabla por escena (que queda como fallback sin tema).
+ * El grade/textura por tema del CSS (.fvh-escena > svg) completa la piel.
+ */
+const CIELOS_TEMA = {
+  biopunk: {
+    dia: ['#16324f', '#2b5a63'],
+    amanecer: ['#3b2f5e', '#b06a55'],
+    atardecer: ['#3a2440', '#c25c4a'],
+    noche: ['#0c1830', '#26404d'],
+  },
+  'verde-vivo': {
+    dia: ['#79c9b7', '#e2f0cf'],
+    amanecer: ['#ecb27a', '#f6ecc4'],
+    atardecer: ['#dd8455', '#f3d99b'],
+    noche: ['#183253', '#3e5a63'],
+  },
+  nature: {
+    dia: ['#d9c493', '#f2e8cd'],
+    amanecer: ['#e0a066', '#f7e6c0'],
+    atardecer: ['#c97a45', '#efd6a0'],
+    noche: ['#26243d', '#5a4a58'],
+  },
+  minimalista: {
+    dia: ['#cfdcd2', '#f3f1e8'],
+    amanecer: ['#e3c3a3', '#f5eddd'],
+    atardecer: ['#d8a887', '#f0e2c8'],
+    noche: ['#31394a', '#5d6672'],
+  },
+};
+
 function cieloEscena(cielo, escena) {
+  const tono = tonoLuz(cielo);
+  // Piel por tema primero (cielo.tema lo inyecta el hero desde useTheme).
+  const porTema = CIELOS_TEMA[cielo?.tema]?.[tono];
+  if (porTema) return porTema;
   const mapa = CIELOS_ESCENA[escena] || CIELOS_ESCENA.finca;
-  return mapa[tonoLuz(cielo)] || mapa.dia;
+  return mapa[tono] || mapa.dia;
 }
 
 /**
