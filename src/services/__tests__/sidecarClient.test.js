@@ -762,6 +762,125 @@ describe('sidecarClient — feature flag on', () => {
       expect(res).toBeNull();
     });
   });
+
+  describe('pisoTermicoGuard — GUARDA desajuste piso térmico (chagra-pro #288)', () => {
+    const MISMATCH_HIT = {
+      has_mismatch: true,
+      user_piso_termico: 'calido',
+      user_piso_origen: 'texto_mensaje',
+      species_id: 'arracacia_xanthorrhiza_amarilla',
+      species_nombre_comun: 'Arracacha amarilla',
+      species_altitud_min: 1800,
+      species_altitud_max: 2500,
+      viabilidad: 'inviable',
+      alternativas: ['Yuca', 'Plátano'],
+      system_prompt_block:
+        '[GUARD PISO TÉRMICO — DESAJUSTE DETECTADO · innegociable]\n' +
+        '"Arracacha amarilla" NO es viable en tierra caliente.',
+      reason: 'desajuste_piso_termico_inviable',
+    };
+
+    const NO_MISMATCH = {
+      has_mismatch: false,
+      user_piso_termico: null,
+      user_piso_origen: null,
+      species_id: null,
+      species_nombre_comun: null,
+      species_altitud_min: null,
+      species_altitud_max: null,
+      viabilidad: null,
+      alternativas: [],
+      system_prompt_block: '',
+      reason: 'sin_piso_termico_usuario',
+    };
+
+    it('query con DESAJUSTE de piso térmico → inyecta el system_prompt_block del sidecar', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, MISMATCH_HIT));
+      const { pisoTermicoGuard } = await importFresh();
+      const res = await pisoTermicoGuard('Tengo finca en piso térmico calido. ¿Puedo sembrar arracacha ahí?');
+      expect(res).not.toBeNull();
+      expect(res.has_mismatch).toBe(true);
+      expect(res.system_prompt_block).toContain('DESAJUSTE DETECTADO');
+      expect(res.viabilidad).toBe('inviable');
+      expect(res.alternativas).toEqual(['Yuca', 'Plátano']);
+      // POST con user_message a /piso-termico-guard (mismo contrato que /fermento-prefilter).
+      const [url, opts] = fetchMock.mock.calls[0];
+      expect(url).toBe('/api/mcp/agro/piso-termico-guard');
+      expect(opts.method).toBe('POST');
+      expect(opts.headers['X-Chagra-Token']).toBe('test-token-123');
+      expect(JSON.parse(opts.body)).toEqual({ user_message: 'Tengo finca en piso térmico calido. ¿Puedo sembrar arracacha ahí?' });
+    });
+
+    it('reenvía finca_altitud y piso_termico cuando se pasan por opts (prioridad finca > perfil)', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, NO_MISMATCH));
+      const { pisoTermicoGuard } = await importFresh();
+      await pisoTermicoGuard('¿puedo sembrar café?', { fincaAltitud: 2600, pisoTermico: 'frio' });
+      const [, opts] = fetchMock.mock.calls[0];
+      expect(JSON.parse(opts.body)).toEqual({
+        user_message: '¿puedo sembrar café?',
+        finca_altitud: 2600,
+        piso_termico: 'frio',
+      });
+    });
+
+    it('query SIN desajuste → has_mismatch false + bloque vacío (no se inyecta nada)', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, NO_MISMATCH));
+      const { pisoTermicoGuard } = await importFresh();
+      const res = await pisoTermicoGuard('¿a cómo está la papa?');
+      expect(res).not.toBeNull();
+      expect(res.has_mismatch).toBe(false);
+      expect(res.system_prompt_block).toBe('');
+    });
+
+    it('normaliza un body parcial del sidecar a la forma contractual (defensivo)', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, { has_mismatch: true, system_prompt_block: 'X' }));
+      const { pisoTermicoGuard } = await importFresh();
+      const res = await pisoTermicoGuard('cómo siembro arracacha');
+      expect(res.has_mismatch).toBe(true);
+      expect(res.system_prompt_block).toBe('X');
+      expect(res.species_id).toBeNull();
+      expect(res.alternativas).toEqual([]);
+      expect(res.reason).toBe('');
+    });
+
+    it('devuelve null sin fetch cuando flag off (degradación graceful)', async () => {
+      disableFlag();
+      const { pisoTermicoGuard } = await importFresh();
+      const res = await pisoTermicoGuard('cómo siembro arracacha');
+      expect(res).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('devuelve null sin fetch cuando offline', async () => {
+      Object.defineProperty(navigator, 'onLine', { configurable: true, value: false });
+      const { pisoTermicoGuard } = await importFresh();
+      const res = await pisoTermicoGuard('cómo siembro arracacha');
+      expect(res).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('devuelve null sin fetch cuando userMessage vacío/no-string', async () => {
+      const { pisoTermicoGuard } = await importFresh();
+      expect(await pisoTermicoGuard('')).toBeNull();
+      expect(await pisoTermicoGuard(null)).toBeNull();
+      expect(await pisoTermicoGuard(undefined)).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('5xx → null sin throw (sidecar caído, FAIL-SAFE: no rompe el turno ni fabrica datos)', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(503, { error: 'age down' }));
+      const { pisoTermicoGuard } = await importFresh();
+      const res = await pisoTermicoGuard('cómo siembro arracacha');
+      expect(res).toBeNull();
+    });
+
+    it('fetch throws → null sin throw', async () => {
+      fetchMock.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+      const { pisoTermicoGuard } = await importFresh();
+      const res = await pisoTermicoGuard('cómo siembro arracacha');
+      expect(res).toBeNull();
+    });
+  });
 });
 
 describe('sidecarClient — getClimaSnapshot elevation (gradiente térmico)', () => {

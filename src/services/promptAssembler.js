@@ -96,6 +96,7 @@ export const BLOCK_ORDER = [
   'priceDecline', // GUARDA precio sin dato (protegido)
   'fermento', // GUARDA DR-FOOD-3 (protegido, máxima recency)
   'biopreparado', // GROUNDING biopreparados chagra-pro #248 (protegido, máxima recency — anti-negación)
+  'pisoTermico', // GUARDA desajuste de piso térmico chagra-pro #288 (protegido, ÚLTIMA — cross_thermal, SUPRESIÓN-Y-REEMPLAZO)
 ];
 
 /**

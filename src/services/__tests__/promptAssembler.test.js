@@ -75,6 +75,19 @@ describe('assembleSystemContent — orden por prioridad', () => {
     const { content } = assembleSystemContent({ base: 'BASE', evidence: '', clima: '' });
     expect(content).toBe('BASE');
   });
+
+  it('GUARDA piso térmico (chagra-pro #288) queda AL FINAL, después de fermento/biopreparado (máxima recency)', () => {
+    const { content } = assembleSystemContent({
+      base: 'BASE',
+      evidence: 'EVIDENCIA',
+      fermento: 'GUARDA_FERMENTO',
+      biopreparado: 'GUARDA_BIOPREPARADO',
+      pisoTermico: 'GUARDA_PISO_TERMICO',
+    });
+    expect(content.indexOf('GUARDA_PISO_TERMICO')).toBeGreaterThan(content.indexOf('GUARDA_FERMENTO'));
+    expect(content.indexOf('GUARDA_PISO_TERMICO')).toBeGreaterThan(content.indexOf('GUARDA_BIOPREPARADO'));
+    expect(content.endsWith('GUARDA_PISO_TERMICO')).toBe(true);
+  });
 });
 
 describe('assembleSystemContent — presupuesto y degradación', () => {
@@ -120,14 +133,15 @@ describe('assembleSystemContent — presupuesto y degradación', () => {
         fermento: big,
         suggested: big,
         viabilidad: big,
+        pisoTermico: big,
         corpus: { variants: ['recortable', ''] },
       },
       { budget: 100 },
     );
     expect(r.overBudget).toBe(true);
     expect(warn).toHaveBeenCalled();
-    for (const name of ['base', 'evidence', 'seguridad', 'priceDecline', 'fermento', 'suggested', 'viabilidad']) {
-      expect(r.content.split(big).length - 1).toBeGreaterThanOrEqual(7);
+    for (const name of ['base', 'evidence', 'seguridad', 'priceDecline', 'fermento', 'suggested', 'viabilidad', 'pisoTermico']) {
+      expect(r.content.split(big).length - 1).toBeGreaterThanOrEqual(8);
       expect(r.breakdown.find((b) => b.name === name).degraded).toBe(false);
     }
   });

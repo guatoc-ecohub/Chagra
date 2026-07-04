@@ -531,6 +531,68 @@ export async function biopreparadoGrounding(userMessage) {
 }
 
 /**
+ * GUARDA de desajuste de PISO TÉRMICO (chagra-pro #288, determinista,
+ * PRE-LLM — cierra el driver #1 de contaminación cross-domain, sonda
+ * `cross_thermal` de `bench-contaminacion.mjs`, ~86.7% de contaminación
+ * medida 2026-07). Llama `POST ${BASE}/piso-termico-guard` con
+ * `{ user_message, finca_altitud?, piso_termico? }` para que el sidecar
+ * detecte el piso térmico del usuario (finca georreferenciada > piso
+ * explícito del perfil > frase en texto libre, ej. "tengo finca en piso
+ * térmico cálido") y, si la especie mencionada resulta marginal/inviable a
+ * esa altitud (motor de viabilidad de `/resolve-entities`, mismo grafo AGE),
+ * devuelva un `system_prompt_block` de SUPRESIÓN-Y-REEMPLAZO: el LLM debe
+ * advertir el desajuste PRIMERO y ofrecer solo alternativas reales del
+ * catálogo, nunca inventadas.
+ *
+ * Espejo exacto de `fermentoPrefilter`/`biopreparadoGrounding`: FAIL-SAFE,
+ * no-throw. Devuelve null si: flag off, offline, timeout, non-2xx, body
+ * inválido → el caller degrada con gracia (no inyecta bloque, no rompe el
+ * turno). Cuando `has_mismatch` es false, NO hay que inyectar nada.
+ *
+ * @param {string} userMessage — texto del operador.
+ * @param {object} [opts]
+ * @param {number|string|null} [opts.fincaAltitud] - msnm de la finca activa (prioridad 1).
+ * @param {string|null} [opts.pisoTermico] - piso térmico explícito del perfil (prioridad 2).
+ * @returns {Promise<null | {
+ *   has_mismatch: boolean,
+ *   user_piso_termico: string | null,
+ *   user_piso_origen: string | null,
+ *   species_id: string | null,
+ *   species_nombre_comun: string | null,
+ *   species_altitud_min: number | null,
+ *   species_altitud_max: number | null,
+ *   viabilidad: string | null,
+ *   alternativas: string[],
+ *   system_prompt_block: string,
+ *   reason: string,
+ * }>}
+ */
+export async function pisoTermicoGuard(userMessage, opts = {}) {
+  if (!userMessage || typeof userMessage !== 'string') return null;
+  const body = { user_message: userMessage };
+  const alt = opts && opts.fincaAltitud != null ? Number(opts.fincaAltitud) : NaN;
+  if (Number.isFinite(alt)) body.finca_altitud = alt;
+  if (opts && typeof opts.pisoTermico === 'string' && opts.pisoTermico.trim()) {
+    body.piso_termico = opts.pisoTermico.trim();
+  }
+  const raw = await postJson('/piso-termico-guard', body, NLU_TIMEOUT_MS);
+  if (!raw || typeof raw !== 'object') return null;
+  return {
+    has_mismatch: raw.has_mismatch === true,
+    user_piso_termico: typeof raw.user_piso_termico === 'string' ? raw.user_piso_termico : null,
+    user_piso_origen: typeof raw.user_piso_origen === 'string' ? raw.user_piso_origen : null,
+    species_id: typeof raw.species_id === 'string' ? raw.species_id : null,
+    species_nombre_comun: typeof raw.species_nombre_comun === 'string' ? raw.species_nombre_comun : null,
+    species_altitud_min: typeof raw.species_altitud_min === 'number' ? raw.species_altitud_min : null,
+    species_altitud_max: typeof raw.species_altitud_max === 'number' ? raw.species_altitud_max : null,
+    viabilidad: typeof raw.viabilidad === 'string' ? raw.viabilidad : null,
+    alternativas: Array.isArray(raw.alternativas) ? raw.alternativas.filter((a) => typeof a === 'string') : [],
+    system_prompt_block: typeof raw.system_prompt_block === 'string' ? raw.system_prompt_block : '',
+    reason: typeof raw.reason === 'string' ? raw.reason : '',
+  };
+}
+
+/**
  * Capa 2 anti-alucinación (cross-check de contexto). Llama
  * `POST ${BASE}/post-validate` con el TEXTO que el LLM ya generó y, opcional,
  * los `nombre_cientifico` de las entidades que la capa 1 resolvió para el turno
