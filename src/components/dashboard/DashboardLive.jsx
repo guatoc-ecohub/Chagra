@@ -26,7 +26,7 @@ import {
     rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays, Sprout, HelpCircle, Store, FileText, Mic } from 'lucide-react';
+import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays, Sprout, HelpCircle, Store, FileText, Mic, CloudRain } from 'lucide-react';
 import AgentHero from './AgentHero';
 import OnboardingHero from '../OnboardingHero';
 import {
@@ -180,6 +180,9 @@ const APRENDER_TILES = [
     { view: 'ciclo_nutrientes', label: 'Ciclo de nutrientes', icon: Recycle, desc: 'Del animal al suelo y la planta', accent: 'text-emerald-400 border-l-emerald-500' },
     { view: 'biopreparados', label: 'Biopreparados', icon: FlaskConical, desc: 'Recetas caseras paso a paso', accent: 'text-lime-400 border-l-lime-500', data: { back: 'dashboard' } },
     { view: 'suelo', label: 'Suelo', icon: Layers, desc: 'Salud del suelo y micorrizas', descF2: 'Cómo está su tierra y cómo cuidarla', accent: 'text-amber-400 border-l-amber-500' },
+    // Módulo "Agua de la finca" (cosecha de lluvia + riego con medida +
+    // cuidar el nacimiento). Ruta real: App.jsx case 'agua' / #agua.
+    { view: 'agua', label: 'Agua', labelF2: 'El agua de su finca', icon: CloudRain, desc: 'Cosechar lluvia, regar con medida y cuidar el nacimiento', descF2: 'Coseche la lluvia, riegue con medida y cuide su nacimiento', accent: 'text-cyan-400 border-l-cyan-500' },
     { view: 'toxicologia', label: 'Seguridad', icon: ShieldAlert, desc: 'Toxicidad de insumos y riesgo', descF2: 'Qué es peligroso y cómo cuidarse', accent: 'text-rose-400 border-l-rose-500' },
     { view: 'faq', label: 'Preguntas frecuentes', icon: HelpCircle, desc: 'Cómo funciona Chagra', accent: 'text-violet-400 border-l-violet-500' },
 ];
