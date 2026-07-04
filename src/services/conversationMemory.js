@@ -133,10 +133,25 @@ export async function getContextString(operatorId, maxTurns = 20) {
 }
 
 /**
- * Limpiar entradas antiguas (más de 30 días o más de 100 turnos).
- * Se ejecuta automáticamente después de cada addTurn.
+ * Limpiar entradas antiguas. Aplica DOS políticas INDEPENDIENTES:
+ *
+ *   1. Purga por EDAD (TTL de MAX_DAYS = 30 días) — corre SIEMPRE, sin importar
+ *      cuántos turnos haya. Antes esta purga vivía dentro del guard
+ *      `if (allTurns.length > MAX_TURNS) return;`, así que un operador con menos
+ *      de MAX_TURNS turnos NUNCA limpiaba memoria vieja: un historial de hace
+ *      meses se quedaba indefinidamente y se incumplía el TTL declarado de 30
+ *      días (audit P1-1). Ahora la edad se evalúa aparte del volumen.
+ *   2. Purga por VOLUMEN (MAX_TURNS) — solo cuando se supera el tope; conserva
+ *      los MAX_TURNS turnos más recientes y elimina el excedente más antiguo.
+ *
+ * Se ejecuta automáticamente (fire-and-forget) tras cada addTurn. Exportada
+ * para poder testear la purga por edad de forma determinista. Nunca rechaza:
+ * el cleanup es no-crítico y falla en silencio.
+ *
+ * @param {string} operatorId
+ * @returns {Promise<void>} resuelve cuando la limpieza terminó (o falló silente).
  */
-async function cleanOldEntries(operatorId) {
+export async function cleanOldEntries(operatorId) {
   try {
     const db = await openDB();
     const tx = db.transaction(STORES.CONVERSATION_MEMORY, 'readwrite');
@@ -146,21 +161,35 @@ async function cleanOldEntries(operatorId) {
     const range = IDBKeyRange.only(operatorId);
     const request = index.getAll(range);
 
-    request.onsuccess = () => {
-      const allTurns = request.result || [];
-      if (allTurns.length <= MAX_TURNS) return;
+    return await new Promise((resolve) => {
+      request.onsuccess = () => {
+        const allTurns = request.result || [];
+        const sorted = [...allTurns].sort((a, b) => a.timestamp - b.timestamp);
+        const cutoffTime = Date.now() - THIRTY_DAYS_MS;
 
-      const sorted = allTurns.sort((a, b) => a.timestamp - b.timestamp);
-      const cutoffTime = Date.now() - THIRTY_DAYS_MS;
+        // (1) EDAD — SIEMPRE: elimina cualquier turno con más de MAX_DAYS días.
+        const toDelete = new Set(
+          sorted.filter((t) => t.timestamp < cutoffTime).map((t) => t.id),
+        );
 
-      const toDelete = sorted
-        .filter((t) => t.timestamp < cutoffTime || allTurns.indexOf(t) < allTurns.length - MAX_TURNS)
-        .map((t) => t.id);
+        // (2) VOLUMEN — solo si se excede MAX_TURNS: elimina el excedente más
+        // antiguo, conservando los MAX_TURNS turnos más recientes.
+        if (sorted.length > MAX_TURNS) {
+          const overflow = sorted.slice(0, sorted.length - MAX_TURNS);
+          for (const t of overflow) toDelete.add(t.id);
+        }
 
-      for (const id of toDelete) {
-        store.delete(id);
-      }
-    };
+        for (const id of toDelete) {
+          store.delete(id);
+        }
+      };
+      // Cleanup no-crítico: cualquier terminal (éxito o error) resuelve en
+      // silencio para no generar unhandled-rejections en el fire-and-forget.
+      request.onerror = () => resolve();
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+      tx.onabort = () => resolve();
+    });
   } catch {
     // Silent fail - cleanup is non-critical
   }
@@ -677,6 +706,7 @@ export default {
   getContextString,
   getFullHistory,
   clearMemory,
+  cleanOldEntries,
   computeSourceMetadata,
   mergePostValidateMetadata,
   extractGroundingBadges,
