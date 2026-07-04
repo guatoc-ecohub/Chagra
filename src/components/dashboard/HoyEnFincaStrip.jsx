@@ -20,6 +20,11 @@ import { buildClimaHoy, buildTareasSemana, buildAgenda, agendaPorDia } from '../
  * Misma dieta offline-first de ClimaStrip: pinta caches al instante y
  * refresca en background (los fetch nunca lanzan). Sin datos → texto
  * honesto, sin sol inventado.
+ *
+ * `embedded` (consolidación home F2 2026-07-04): cuando el strip vive DENTRO
+ * de EstadoDelDiaCard (el card único "Cómo va su finca hoy"), pierde su
+ * cáscara de tarjeta (fondo/borde/redondeo) — el contenedor la pone UNA vez
+ * para los tres paneles fundidos. Solo cambia la capa visual; datos idénticos.
  */
 
 const CONDITION_ICONS = {
@@ -30,7 +35,7 @@ const CONDITION_ICONS = {
     lluvia: { Icon: CloudRain, cls: 'text-sky-400' },
 };
 
-export default function HoyEnFincaStrip({ onNavigate }) {
+export default function HoyEnFincaStrip({ onNavigate, embedded = false }) {
     const activeAlerts = useAlertStore((s) => s.activeAlerts);
     const geo = useMemo(() => resolveClimaLocation(), []);
 
@@ -91,7 +96,9 @@ export default function HoyEnFincaStrip({ onNavigate }) {
             data-testid="hoy-en-finca-strip"
             onClick={() => onNavigate?.('hoy_finca')}
             aria-label="Hoy en finca: ver el día completo, alertas, tareas y agenda"
-            className="group w-full text-left rounded-2xl bg-gradient-to-br from-emerald-950/60 to-slate-900/60 backdrop-blur-xl border border-emerald-800/30 p-4 ring-2 ring-emerald-500/0 hover:ring-emerald-500/30 active:scale-[0.99] transition-all"
+            className={embedded
+                ? 'group w-full text-left p-4 hover:bg-white/[0.03] active:bg-white/[0.05] transition-colors motion-reduce:transition-none'
+                : 'group w-full text-left rounded-2xl bg-gradient-to-br from-emerald-950/60 to-slate-900/60 backdrop-blur-xl border border-emerald-800/30 p-4 ring-2 ring-emerald-500/0 hover:ring-emerald-500/30 active:scale-[0.99] transition-all'}
         >
             <div className="flex items-center justify-between gap-2 mb-2">
                 <h3 className="text-base font-bold text-white flex items-center gap-2 min-w-0">

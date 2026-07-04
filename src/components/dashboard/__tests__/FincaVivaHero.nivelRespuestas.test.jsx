@@ -24,6 +24,11 @@ vi.mock('../../../config/glaciarAccess', () => ({
   tieneAccesoGlaciarActual: () => false,
   esOperadorActual: () => false,
 }));
+// La campana real del header (regresión 2026-07-04) arrastra stores +
+// climaService; aquí se prueba el toggle de nivel, así que va un stub.
+vi.mock('../../NotificationsBell', () => ({
+  default: () => <button type="button" aria-label="Notificaciones" />,
+}));
 
 import FincaVivaHero from '../FincaVivaHero';
 

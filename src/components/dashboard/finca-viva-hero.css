@@ -319,6 +319,14 @@ html[data-theme="biopunk"] .fvh {
   background: radial-gradient(circle at 32% 26%, #2a2024, #140d10);
   box-shadow: 0 6px 16px rgba(120, 20, 20, 0.32),
               0 0 0 1.5px rgba(231, 76, 60, 0.55) inset;
+  /* Regresión header 2026-07-04: la A pasó de <span> decorativo a BOTÓN del
+     agente (en biopunk la A invoca al agente) — reset del cromo nativo. */
+  border: 0;
+  cursor: pointer;
+}
+.fvh-brand-a:active { transform: scale(0.96); }
+@media (prefers-reduced-motion: reduce) {
+  .fvh-brand-a:active { transform: none; }
 }
 /* Temas de piel clara → plinto claro del tema (superficie + borde --c-*). */
 [data-theme="verde-vivo"] .fvh-brand-a,
@@ -355,6 +363,12 @@ html[data-theme="biopunk"] .fvh {
   gap: 9px;
   margin: 0 auto 0 8px;          /* empuja levemente desde la marca */
   max-width: min(48%, 360px);
+  /* Regresión header 2026-07-04 ("se perdió el perfil"): el chip de ubicación
+     no cedía ancho — en pantallas angostas la fila desbordaba y las píldoras
+     de la derecha (campana/?/PERFIL) se salían del viewport. El chip es el
+     único elástico de la fila: cede primero (su texto ya elipsa). */
+  flex: 0 1 auto;
+  min-width: 0;
   cursor: pointer;
   /* Superficie del tema (no #fff fijo): en biopunk es navy con borde neón →
      el texto del tema contrasta; en los claros es papel con borde tierra. Era
@@ -428,6 +442,21 @@ html[data-theme="biopunk"] .fvh {
 .fvh-pill.fvh-pill-perfil {
   box-shadow: 0 4px 11px rgba(60, 40, 10, 0.18),
               0 0 0 2px rgb(var(--c-emerald-500, 47 107 58) / 0.55);
+}
+
+/* MÓVIL ANGOSTO (regresión 2026-07-04): con 4 accesos en el header (A del
+   agente + campana + "?" + perfil) más el chip de ubicación, en ≤430px la fila
+   no cabía y el PERFIL quedaba fuera de pantalla. Se recupera aire ocultando
+   el wordmark "Chagra / Su finca viva" (la A de marca queda como sello, y ES
+   el botón del agente) y compactando gaps/píldoras. Los 4 botones quedan
+   SIEMPRE visibles y tocables (≥40px). */
+@media (max-width: 430px) {
+  .fvh-topbar { gap: 8px; padding-left: 12px; padding-right: 12px; }
+  .fvh-brand { gap: 0; }
+  .fvh-brand-txt { display: none; }
+  .fvh-ubic { margin-left: 0; max-width: none; }
+  .fvh-top-pills { gap: 6px; }
+  .fvh-pill { width: 40px; height: 40px; }
 }
 
 /* ── QA del operador (override de escala, oculto al usuario — feedback #6) ──── */

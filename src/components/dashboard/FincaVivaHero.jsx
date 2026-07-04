@@ -18,6 +18,11 @@ import { useTheme } from '../../hooks/useTheme';
 import { iconForTheme } from './themeIcon';
 import { colibriRealActivo } from '../../config/colibriFlag';
 import { BarbuditoIlustrado, BarbuditoRealLoop } from '../colibri/Barbudito';
+// Campana de notificaciones en el header F2 (regresión 2026-07-04): con la flag
+// F2 ON el TopBar legacy (que la montaba) NO se renderiza, así que el home se
+// quedó sin campana. `variant="f2"` es la misma píldora redonda que ya usa
+// ScreenShell en las pantallas F2.
+import NotificationsBell from '../NotificationsBell';
 import './finca-viva-hero.css';
 
 // ¿Modo A/B del colibrí del páramo? Gateado por VITE_COLIBRI (colibriFlag.js),
@@ -235,8 +240,21 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
           <div className="fvh-brand">
             {/* Ícono de marca del agente del TEMA ACTIVO (feedback #4): la A roja
                 en biopunk, la sol-mano frondosa en verde-vivo, etc. — la escena
-                toma la piel del tema. */}
-            <span className="fvh-brand-a" data-theme-icon={theme} aria-hidden="true">{iconForTheme(theme)}</span>
+                toma la piel del tema. Regresión header 2026-07-04: la A es el
+                BOTÓN DEL AGENTE (en biopunk la A de la mano de Chagra invoca al
+                agente), NO decoración ni perfil — ahora es interactiva y abre el
+                agente, coexistiendo con "?"/campana/perfil a la derecha. */}
+            <button
+              type="button"
+              className="fvh-brand-a"
+              data-theme-icon={theme}
+              data-testid="fvh-brand-agente"
+              aria-label="Abrir el agente Chagra"
+              title="Hablar con el agente"
+              onClick={abrirAgente}
+            >
+              {iconForTheme(theme)}
+            </button>
             <div className="fvh-brand-txt">
               <b>Chagra</b>
               <span>Su finca viva</span>
@@ -280,6 +298,11 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
           )}
 
           <div className="fvh-top-pills">
+            {/* CAMPANA (regresión 2026-07-04): el home F2 no monta el TopBar
+                legacy, que era quien traía NotificationsBell — el usuario se
+                quedaba sin notificaciones en el home. Misma píldora `f2` que
+                ScreenShell usa en el resto de pantallas F2. */}
+            <NotificationsBell onNavigate={onNavigate} variant="f2" />
             <button
               type="button"
               className="fvh-pill"

@@ -103,13 +103,23 @@ describe('Home F2 — reestructuración 2.0 "Los mundos de mi finca" (V4)', () =
     expect(order).toEqual(blocks);
   });
 
-  test('BLOQUE 1 funde el día + clima + aviso de Chagra y NO duplica IA ni "hoy"', async () => {
+  test('BLOQUE 1 = UN solo card "estado del día" (consolidación 2026-07-04)', async () => {
     render(<DashboardLive onNavigate={vi.fn()} />);
     const block = await screen.findByTestId('bloque-finca-hoy');
-    // El estado del día: UNA sola tira "hoy", el clima y el aviso de Chagra.
-    expect(within(block).getByTestId('hoy-strip')).toBeInTheDocument();
-    expect(within(block).getByTestId('clima-strip')).toBeInTheDocument();
-    expect(within(block).getByTestId('analisis-ia')).toBeInTheDocument();
+    // Los tres paneles ya NO son tres tarjetas apiladas: viven DENTRO de un
+    // único card compacto (EstadoDelDiaCard) — el clima de HOY sale una sola
+    // vez (cabecera) y "Registrar" sube sobre el fold.
+    const card = within(block).getByTestId('estado-del-dia');
+    expect(within(card).getByTestId('hoy-strip')).toBeInTheDocument();
+    expect(within(card).getByTestId('analisis-ia')).toBeInTheDocument();
+    // El pronóstico de 7 días es COLAPSABLE y arranca cerrado (el clima de hoy
+    // ya está en la cabecera — así se corta la doble aparición del clima).
+    const toggle = within(card).getByTestId('estado-clima-toggle');
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(within(card).queryByTestId('clima-strip')).toBeNull();
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(within(card).getByTestId('clima-strip')).toBeInTheDocument();
     // No hay un SEGUNDO panel de IA al pie (AIStatusFooter "Status proactivo IA"
     // NO se monta en F2: su idea ES este bloque).
     expect(screen.queryByTestId('ai-status-footer')).toBeNull();

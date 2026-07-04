@@ -23,6 +23,11 @@ vi.mock('../../../config/glaciarAccess', () => ({
   tieneAccesoGlaciarActual: () => false,
   esOperadorActual: () => false,
 }));
+// La campana real del header (regresión 2026-07-04) arrastra stores +
+// climaService; aquí se prueba la piel del tema, así que va un stub.
+vi.mock('../../NotificationsBell', () => ({
+  default: () => <button type="button" aria-label="Notificaciones" />,
+}));
 
 // Tema activo controlable: el hero debe pedirle al tema su ícono de marca.
 let activeTheme = 'biopunk';

@@ -67,6 +67,10 @@ import ClimaStrip from './ClimaStrip';
 import HoyEnFincaStrip from './HoyEnFincaStrip';
 import AIStatusFooter from './AIStatusFooter';
 import AnalisisProactivoIA from './AnalisisProactivoIA';
+// Consolidación BLOQUE 1 (bug UX operador 2026-07-04): las TRES tarjetas del
+// estado del día (Hoy en finca + Clima 7d + Análisis IA) se funden en UN card
+// compacto — el clima salía DOS veces y "Registrar" quedaba bajo el fold.
+import EstadoDelDiaCard from './EstadoDelDiaCard';
 import useAssetStore from '../../store/useAssetStore';
 import {
     PlantasCard,
@@ -737,21 +741,19 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                ════════════════════════════════════════════════════════════════ */
             <>
                 {/* ── BLOQUE 1 · "Cómo va su finca hoy" ───────────────────────
-                    FUNDE lo que antes eran cuatro superficies solapadas (audit
-                    §3.7/§3.8): el día (HoyEnFincaStrip — UNA sola vez; el tile
-                    duplicado `hoy` ya no se renderiza aquí), el clima
-                    (ClimaStrip) y el aviso/recomendación de Chagra
-                    (AnalisisProactivoIA). El antiguo footer "Status proactivo IA"
-                    (AIStatusFooter) NO se monta en F2: su idea ES este bloque, y
-                    duplicarla era el solape ALTO reportado. Sube ARRIBA: es lo
-                    primero que el campesino quiere ver. */}
+                    UN solo card compacto (EstadoDelDiaCard, bug UX 2026-07-04):
+                    antes eran TRES tarjetas apiladas (HoyEnFincaStrip +
+                    ClimaStrip + AnalisisProactivoIA) que repetían el clima DOS
+                    veces y empujaban "Registrar en la finca" bajo el fold.
+                    Ahora: cabecera del día (clima HOY una sola vez) + tira de
+                    7 días colapsable + el aviso de Chagra con CTA al agente,
+                    todo dentro de una sola cáscara. El AIStatusFooter sigue
+                    SIN montarse en F2 (su idea ES este bloque). Los tres
+                    componentes viven intactos en modo `embedded` — misma
+                    lógica de datos, solo cambió la capa visual. */}
                 <div className="px-4 pt-3 fvh-resto-block" data-testid="bloque-finca-hoy">
                     {blockLabel('Cómo va su finca hoy', 'from-cyan-400 to-emerald-400')}
-                    <div className="space-y-3">
-                        <HoyEnFincaStrip onNavigate={onNavigate} />
-                        <ClimaStrip onNavigate={onNavigate} />
-                        <AnalisisProactivoIA onNavigate={onNavigate} sensors={iotAlerts} />
-                    </div>
+                    <EstadoDelDiaCard onNavigate={onNavigate} sensors={iotAlerts} />
                 </div>
 
                 {/* ── BLOQUE 2 · "Registrar en la finca" ──────────────────────
