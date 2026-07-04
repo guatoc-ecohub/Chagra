@@ -105,7 +105,10 @@ export default function HoyEnFincaStrip({ onNavigate, embedded = false }) {
                     <Sunrise size={20} style={{ color: 'rgb(var(--t-accent-rgb))' }} aria-hidden="true" />
                     Hoy en finca
                 </h3>
-                <span className="text-[10px] text-slate-400 capitalize truncate shrink">{fecha}</span>
+                {/* Sin `capitalize` (Tailwind): esa clase mayúscula CADA palabra
+                    ("Sábado, 4 De Julio" — bug UX audit 2026-07-04 P2-4). El
+                    es-CO de Intl ya devuelve la fecha en minúscula correcta. */}
+                <span className="text-[10px] text-slate-400 truncate shrink">{fecha}</span>
                 <ChevronRight size={16} className="text-slate-500 group-hover:text-slate-300 shrink-0" aria-hidden="true" />
             </div>
 

@@ -41,7 +41,7 @@ import { getEnsoOutlook, regionFromProfile } from '../../services/ensoContext';
  *   - 3 mini-chips destacados (clickables): tareas / plantas / alertas.
  *   - CTA: "Habla con el agente" → onNavigate('agente').
  *
- * Español colombiano (tú/usted, SIN voseo argentino).
+ * Español colombiano, trato de usted (SIN voseo argentino).
  */
 
 const HORAS = {
@@ -91,15 +91,15 @@ function buildNarrative({ hora, plantasCount, pendingTasks, sensorSummary, alert
     // Frase 1: estado general
     if (plantasCount === 0) {
         lines.push(
-            `${saludo}. Tu chagra está vacía por ahora — agrega tu primera planta para que empiece a aprender de tu finca.`,
+            `${saludo}. Su chagra está vacía por ahora — agregue su primera planta para que empiece a aprender de su finca.`,
         );
     } else if (plantasCount === 1) {
         lines.push(
-            `${saludo}. Tienes 1 cultivo registrado en la finca. Vamos paso a paso.`,
+            `${saludo}. Tiene 1 cultivo registrado en la finca. Vamos paso a paso.`,
         );
     } else {
         lines.push(
-            `${saludo}. Hoy llevo seguimiento a ${plantasCount} cultivos en tu finca.`,
+            `${saludo}. Hoy llevo seguimiento a ${plantasCount} cultivos en su finca.`,
         );
     }
 
@@ -108,10 +108,10 @@ function buildNarrative({ hora, plantasCount, pendingTasks, sensorSummary, alert
         if (pendingTasks === 1) {
             lines.push('Hay 1 tarea pendiente que vale la pena resolver hoy.');
         } else if (pendingTasks <= 5) {
-            lines.push(`Tienes ${pendingTasks} tareas pendientes — varias son rápidas.`);
+            lines.push(`Tiene ${pendingTasks} tareas pendientes — varias son rápidas.`);
         } else {
             lines.push(
-                `Llevas ${pendingTasks} tareas en cola, conviene priorizar las del día y reprogramar el resto.`,
+                `Lleva ${pendingTasks} tareas en cola, conviene priorizar las del día y reprogramar el resto.`,
             );
         }
     } else if (plantasCount > 0) {

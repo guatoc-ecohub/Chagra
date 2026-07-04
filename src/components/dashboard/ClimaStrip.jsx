@@ -256,10 +256,10 @@ export default function ClimaStrip({ onNavigate, embedded = false }) {
             <div className={embedded ? 'p-4 pt-2' : 'bg-gradient-to-br from-sky-950/70 to-indigo-950/60 backdrop-blur-xl border border-sky-800/40 rounded-2xl p-5'}>
                 <div className="flex items-center gap-2 mb-2">
                     <Cloud size={20} className="text-sky-300" />
-                    <h3 className="text-base font-bold text-white">Clima en tu zona</h3>
+                    <h3 className="text-base font-bold text-white">Clima en su zona</h3>
                 </div>
                 <p className="text-sm text-slate-300 leading-relaxed">
-                    Cuéntame en qué municipio queda tu finca y te traigo el pronóstico real de los próximos 7 días.
+                    Cuéntame en qué municipio queda su finca y le traigo el pronóstico real de los próximos 7 días.
                 </p>
                 {/* Bug fix 2026-05-28 (Brave laptop): el botón no tenía
                     onClick — operador clickeaba y nada pasaba.
@@ -322,7 +322,7 @@ export default function ClimaStrip({ onNavigate, embedded = false }) {
     });
 
     const hasReal = filled.some((d) => d.tempMaxC != null);
-    const headerLabel = (municipio || '').split(',')[0] || 'tu finca';
+    const headerLabel = (municipio || '').split(',')[0] || 'su finca';
 
     return (
         <div className={embedded ? 'px-4 pb-4 pt-1' : 'bg-gradient-to-br from-sky-950/70 to-indigo-950/60 backdrop-blur-xl border border-sky-800/40 rounded-2xl p-5'}>
@@ -330,7 +330,7 @@ export default function ClimaStrip({ onNavigate, embedded = false }) {
                 <div className="flex items-center gap-2 min-w-0">
                     {!embedded && <Cloud size={20} className="text-sky-300 shrink-0" />}
                     <h3 className={`${embedded ? 'text-xs' : 'text-base'} font-bold text-white truncate`}>
-                        {coarse ? 'Clima en tu zona' : `Clima en ${headerLabel}`}
+                        {coarse ? 'Clima en su zona' : `Clima en ${headerLabel}`}
                     </h3>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
@@ -369,9 +369,9 @@ export default function ClimaStrip({ onNavigate, embedded = false }) {
                     <AlertCircle size={14} className="shrink-0 mt-0.5" aria-hidden="true" />
                     <div className="flex-1 min-w-0">
                         <p className="leading-relaxed">
-                            Confirma tu ubicación para un clima exacto. La que tenemos
+                            Confirme su ubicación para un clima exacto. La que tenemos
                             guardada es aproximada (puede ser la cabecera del municipio,
-                            no tu finca).
+                            no su finca).
                         </p>
                         <button
                             type="button"
@@ -388,7 +388,7 @@ export default function ClimaStrip({ onNavigate, embedded = false }) {
 
             {!hasReal && (
                 <p className="text-xs text-slate-400 mb-3 italic">
-                    El pronóstico fino aún se está cargando. Mientras tanto, ten precaución en la noche con cultivos sensibles.
+                    El pronóstico fino aún se está cargando. Mientras tanto, tenga precaución en la noche con cultivos sensibles.
                 </p>
             )}
 
