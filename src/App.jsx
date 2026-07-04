@@ -90,6 +90,7 @@ const AnimalesScreen = lazy(() => import('./components/AnimalesScreen'));
 const GallinasScreen = lazy(() => import('./components/GallinasScreen'));
 const AbejasScreen = lazy(() => import('./components/AbejasScreen'));
 const VacasScreen = lazy(() => import('./components/VacasScreen'));
+const EstiercolScreen = lazy(() => import('./components/EstiercolScreen'));
 const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
 const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
 const LocationDetectedScreen = lazy(() => import('./components/LocationDetectedScreen'));
@@ -191,6 +192,10 @@ const HASH_VIEW_ROUTES = {
   'animales-gallinas': 'animales_gallinas',
   'animales-abejas': 'animales_abejas',
   'animales-vacas': 'animales_vacas',
+  estiercol: 'estiercol',
+  'del-corral-al-abono': 'estiercol',
+  abono: 'estiercol',
+  biodigestor: 'estiercol',
   'doom-finca': 'doom_finca',
   subsuelo: 'subsuelo',
   'mundo-subsuelo': 'subsuelo',
@@ -212,7 +217,7 @@ const HASH_VIEW_ROUTES = {
 const MODULE_VIEWS = new Set([
   'activos', 'mapa', 'javier', 'bodega', 'task_log', 'historial', 'bitacora',
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
-  'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas',
+  'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'toxicologia', 'aprende', 'directorio', 'mercados',
@@ -1116,6 +1121,20 @@ export default function App() {
               {/* onNavigate: VacasScreen enlaza al proceso de seguimiento de
                   silvopastoreo existente ('seguimiento_silvopastoreo'). */}
               <VacasScreen onBack={() => navigate('animales')} onHome={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'estiercol':
+        // Módulo "Del corral al abono": aprovechamiento del estiércol
+        // (olores/gallinaza, biodigestor con calculadora de dimensionamiento y
+        // abonos: gallinaza/porquinaza/bovinaza/biol/biosol/compost/
+        // lombricompost). Calculadora determinista (biodigestorCalculator.js);
+        // dosis/rendimientos exactos quedan en slots grounded-pendiente hasta la
+        // investigación (nacional + internacional). Ruta #estiercol / #biodigestor.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Del corral al abono">
+              <EstiercolScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );

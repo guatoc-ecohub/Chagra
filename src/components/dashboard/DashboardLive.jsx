@@ -26,7 +26,7 @@ import {
     rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays, Sprout, HelpCircle, Store, FileText, Mic, CloudRain } from 'lucide-react';
+import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays, Sprout, HelpCircle, Store, FileText, Mic, CloudRain, Leaf } from 'lucide-react';
 import AgentHero from './AgentHero';
 import OnboardingHero from '../OnboardingHero';
 import {
@@ -178,6 +178,10 @@ const APRENDER_TILES = [
     { view: 'aprende', label: 'Aprender', icon: BookOpen, desc: 'Lecciones agroecológicas con fuente', accent: 'text-emerald-400 border-l-emerald-500' },
     { view: 'casos', label: 'Casos de estudio', labelF2: 'Casos reales', icon: ClipboardList, desc: 'Problemas reales y su tratamiento', descF2: 'Problemas de otras fincas y cómo los resolvieron', accent: 'text-amber-400 border-l-amber-500' },
     { view: 'ciclo_nutrientes', label: 'Ciclo de nutrientes', icon: Recycle, desc: 'Del animal al suelo y la planta', accent: 'text-emerald-400 border-l-emerald-500' },
+    // "Del corral al abono" — mini-app de aprovechamiento del estiércol
+    // (olores/gallinaza · biodigestor con calculadora · abonos). Ruta App.jsx
+    // 'estiercol'. Vecino natural del ciclo de nutrientes: lo hace accionable.
+    { view: 'estiercol', label: 'Del corral al abono', labelF2: 'Del corral al abono', icon: Leaf, desc: 'Aproveche el estiércol: sin olores, biogás y abono', descF2: 'Quítele el olor al estiércol y sáquele abono y gas', accent: 'text-lime-400 border-l-lime-500' },
     { view: 'biopreparados', label: 'Biopreparados', icon: FlaskConical, desc: 'Recetas caseras paso a paso', accent: 'text-lime-400 border-l-lime-500', data: { back: 'dashboard' } },
     { view: 'suelo', label: 'Suelo', icon: Layers, desc: 'Salud del suelo y micorrizas', descF2: 'Cómo está su tierra y cómo cuidarla', accent: 'text-amber-400 border-l-amber-500' },
     // Módulo "Agua de la finca" (cosecha de lluvia + riego con medida +
