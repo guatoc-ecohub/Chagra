@@ -2,7 +2,6 @@ import React from 'react';
 import {
   ArrowLeft,
   ChevronRight,
-  Notebook,
   Wifi,
   CloudUpload,
   Smartphone,
@@ -11,6 +10,7 @@ import {
   ShieldCheck,
   Bot,
 } from 'lucide-react';
+import { IlusDatos, IlusRegistro } from './help/HelpIllustrations.jsx';
 
 /**
  * HelpDatosScreen — Sub-vista del Manual: "¿Dónde se guardan mis datos?".
@@ -80,8 +80,8 @@ export default function HelpDatosScreen({ onBackToHome, onNavigate }) {
       <main className="flex-1 p-4 max-w-2xl mx-auto w-full pb-12 flex flex-col gap-6">
         {/* Hero */}
         <div className="flex items-start gap-3">
-          <span className="shrink-0 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-teal-700/40 border border-teal-500/50">
-            <Notebook size={26} className="text-teal-300" />
+          <span className="shrink-0 inline-flex items-center justify-center w-14 h-14 rounded-[16px_16px_16px_6px] bg-teal-700/40 border border-teal-500/50">
+            <IlusDatos size={36} className="text-teal-200" />
           </span>
           <div className="min-w-0 flex-1">
             <h2 className="text-2xl font-black text-teal-100 leading-tight">
@@ -118,7 +118,7 @@ export default function HelpDatosScreen({ onBackToHome, onNavigate }) {
         {/* La metáfora del cuaderno de campo */}
         <section className="rounded-xl border border-teal-900/60 bg-teal-950/30 p-4">
           <div className="flex items-start gap-3">
-            <Notebook size={20} className="text-teal-300 shrink-0 mt-0.5" aria-hidden="true" />
+            <IlusRegistro size={34} className="text-teal-300 shrink-0 mt-0.5" />
             <div className="text-sm text-slate-200 leading-relaxed space-y-2">
               <p>
                 Piensa en Chagra como un{' '}

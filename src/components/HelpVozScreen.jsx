@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowLeft, Mic, Ear, BrainCircuit, CheckCircle2, ChevronRight } from 'lucide-react';
+import { IlusVoz } from './help/HelpIllustrations.jsx';
 
 /**
  * Sub-vista del Manual: cómo usar la voz. Híbrido tutorial + CTA "Probar
@@ -13,10 +14,14 @@ export default function HelpVozScreen({ onBackToHome, onNavigate }) {
 
   const steps = [
     {
+      // Corrección 2026-07: el copy viejo decía "abajo a la izquierda,
+      // siempre visible" — desactualizado. Las entradas REALES de la voz
+      // hoy: la mano Ⓐ → "Registrar hablando" (flujo unificado) y el botón
+      // de micrófono de la barra de arriba (agregar planta por voz).
       n: 1,
       icon: Mic,
-      title: 'Toca el botón micrófono',
-      body: 'Está abajo a la izquierda, siempre visible. Lo encuentras en cualquier pantalla menos cuando ya estás dentro del módulo de voz.',
+      title: 'Abre la voz desde la mano de Chagra',
+      body: 'Toca el botón Ⓐ (la mano de Chagra) y elige "Registrar hablando". También sirve el botón de micrófono con la plantica, arriba en la barra.',
     },
     {
       n: 2,
@@ -57,8 +62,8 @@ export default function HelpVozScreen({ onBackToHome, onNavigate }) {
 
       <main className="flex-1 p-4 max-w-2xl mx-auto w-full pb-12 flex flex-col gap-4">
         <div className="flex items-start gap-3">
-          <span className="shrink-0 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-700/40 border border-emerald-500/50">
-            <Mic size={26} className="text-emerald-300" />
+          <span className="shrink-0 inline-flex items-center justify-center w-14 h-14 rounded-[16px_16px_16px_6px] bg-emerald-700/40 border border-emerald-500/50">
+            <IlusVoz size={36} className="text-emerald-200" />
           </span>
           <div className="min-w-0 flex-1">
             <h2 className="text-2xl font-black text-emerald-100 leading-tight">Habla y registra</h2>

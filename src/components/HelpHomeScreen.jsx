@@ -1,9 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import {
-  Mic, BookOpen, Sprout, ChevronRight, Library, Bot, Database, Search, X,
+  BookOpen, Sprout, ChevronRight, Library, Search, X,
   Leaf, CalendarDays, Store, HelpCircle, Gamepad2, MessageSquare,
 } from 'lucide-react';
 import HelpRegionSelector from './HelpRegionSelector.jsx';
+import ManoChagraGlyph from './dashboard/ManoChagraGlyph.jsx';
+import {
+  IlusVoz, IlusMundos, IlusCiclo, IlusDatos, IlusVerificado,
+} from './help/HelpIllustrations.jsx';
 
 /**
  * Home del Manual: botones grandes para entrar a las sub-vistas del help,
@@ -37,10 +41,29 @@ export default function HelpHomeScreen({ onSelect, onNavigate }) {
     if (typeof onNavigate === 'function') onNavigate(route);
   };
 
+  // Tarjetas de tema. `icon` acepta lucide O una ilustración propia de
+  // help/HelpIllustrations.jsx (misma interfaz size/className): las
+  // ilustraciones traen LA COSTURA del acento del tema — marca cosida.
   const cards = [
     {
+      // Overhaul 2026-07: LA pregunta número uno del campesino nuevo ("¿esto
+      // pa' qué sirve?") ahora es la PRIMERA tarjeta. Abre el mapa completo
+      // de funciones derivado del manifiesto de la mano, con deep-links.
+      key: 'funciones',
+      icon: ManoChagraGlyph,
+      title: '¿Qué puede hacer Chagra?',
+      sub: 'Todas las funciones en tarjetas que abren directo: registrar, cuidar, planear, aprender, vender.',
+      keywords: 'funciones capacidades que puede hacer todo lista mano boton abrir atajos empezar primera vez',
+      accent: 'from-emerald-900/60 to-slate-950/80',
+      border: 'border-emerald-500/50 hover:border-emerald-300/70',
+      iconBg: 'bg-emerald-700/40 border-emerald-400/60',
+      iconColor: 'text-emerald-200',
+      titleColor: 'text-emerald-50',
+      subColor: 'text-emerald-100/70',
+    },
+    {
       key: 'voz',
-      icon: Mic,
+      icon: IlusVoz,
       title: 'Cómo usar la voz',
       sub: 'Habla y deja que Chagra registre tu siembra, cosecha o lo que veas en campo.',
       keywords: 'voz hablar microfono micrófono dictar grabar audio transcribir registrar sin manos',
@@ -53,7 +76,7 @@ export default function HelpHomeScreen({ onSelect, onNavigate }) {
     },
     {
       key: 'uso',
-      icon: BookOpen,
+      icon: IlusMundos,
       title: 'Cómo usar Chagra',
       sub: 'Inicio rápido, foto, zonas, plagas, cosecha, reportes y problemas comunes.',
       keywords: 'usar inicio rapido foto camara cámara zona ubicacion gps plaga cosecha reportar problema bug ayuda offline sin internet',
@@ -66,7 +89,7 @@ export default function HelpHomeScreen({ onSelect, onNavigate }) {
     },
     {
       key: 'ciclo',
-      icon: Sprout,
+      icon: IlusCiclo,
       title: 'Aprende sembrando',
       sub: 'El ciclo de un cultivo paso a paso: germinar, crecer, florecer, cosechar. Con su fuente.',
       keywords: 'aprender sembrar cultivar ciclo lechuga fresa tomate germinar cosechar floracion fenologia biopreparado bocashi compañeros perenne',
@@ -81,7 +104,7 @@ export default function HelpHomeScreen({ onSelect, onNavigate }) {
       key: 'diccionario',
       icon: Library,
       title: 'Diccionario',
-      sub: 'Bocashi, micorriza, milpa… palabras del campo explicadas como si tu hije de 11 años te preguntara.',
+      sub: 'Bocashi, micorriza, milpa… palabras del campo explicadas como si tu hijo de 11 años te preguntara.',
       keywords: 'diccionario palabras significado bocashi micorriza milpa terminos términos definicion qué es',
       accent: 'from-violet-900/40 to-purple-950/80',
       border: 'border-violet-600/40 hover:border-violet-400/70',
@@ -94,7 +117,7 @@ export default function HelpHomeScreen({ onSelect, onNavigate }) {
       // Task #123: sección Ayuda > "Sobre el agente Chagra".
       // Cero hype, lo que SÍ y lo que NO puede el agente, auditable.
       key: 'agente',
-      icon: Bot,
+      icon: IlusVerificado,
       title: 'Sobre el agente Chagra',
       sub: 'Qué SÍ puede y qué NO puede. Sin promesas mágicas. Con fuentes.',
       keywords: 'agente ia inteligencia artificial chat puede no puede limitaciones confiar auditar fuente',
@@ -110,7 +133,7 @@ export default function HelpHomeScreen({ onSelect, onNavigate }) {
       // iniciar sesión). Responde la pregunta más confusa del piloto
       // ("¿por qué veo cosas distintas en mis aparatos?").
       key: 'datos',
-      icon: Database,
+      icon: IlusDatos,
       title: '¿Dónde se guardan mis datos?',
       sub: 'Tu cuaderno de campo en el bolsillo: todo se guarda en tu aparato, sin internet. Por qué a veces ves cosas distintas en el celular y el computador.',
       keywords: 'datos guardar guardan donde dónde almacenar privacidad sincronizar sincronización servidor nube internet sin conexion offline cuaderno celular computador aparato dispositivo perder respaldo iniciar sesion sesión usuario',
@@ -130,9 +153,12 @@ export default function HelpHomeScreen({ onSelect, onNavigate }) {
     {
       key: 'gestionar',
       icon: Sprout,
-      title: 'Gestionar',
+      // Paridad con FincaVivaHero (bug viejo replicado aquí: el portal
+      // "Gestionar" mandaba a 'juego', el mismo destino que "Jugar"). El
+      // portal del home hoy se llama "Mi finca" y abre la gestión real.
+      title: 'Mi finca (Gestionar)',
       sub: 'Registre y cuide sus siembras, zonas, animales y bitácora.',
-      route: 'juego',
+      route: 'activos',
       iconColor: 'text-emerald-300',
       ring: 'border-emerald-600/40 hover:border-emerald-400/70',
     },
@@ -351,8 +377,8 @@ export default function HelpHomeScreen({ onSelect, onNavigate }) {
               onClick={() => onSelect(c.key)}
               className={`rounded-2xl bg-gradient-to-br ${c.accent} border ${c.border} active:scale-[0.99] transition-all p-5 text-left flex items-start gap-4 min-h-[112px] shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60`}
             >
-              <span className={`shrink-0 inline-flex items-center justify-center w-14 h-14 rounded-xl border ${c.iconBg}`}>
-                <Icon size={28} className={c.iconColor} />
+              <span className={`shrink-0 inline-flex items-center justify-center w-14 h-14 rounded-[16px_16px_16px_6px] border ${c.iconBg}`}>
+                <Icon size={34} className={c.iconColor} />
               </span>
               <div className="min-w-0 flex-1">
                 <p className={`text-lg font-black leading-tight ${c.titleColor}`}>{c.title}</p>

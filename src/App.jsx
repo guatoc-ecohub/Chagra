@@ -1037,6 +1037,7 @@ export default function App() {
             </ScreenShell>
           </ErrorBoundary>
         );
+      case 'gestionar': // alias usado por el FAQ ("Gestionar mi finca") — sin este label caía en default "Vista no disponible"
       case 'activos':
         return (
           <ErrorBoundary>
@@ -1282,6 +1283,7 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'calendario': // alias usado por Manual/FAQ (HASH_VIEW_ROUTES ya lo mapea para hash, pero navigate() no normaliza — sin este label caía en default "Vista no disponible")
       case 'calendario_finca':
         // Módulo CALENDARIO DE FINCA: UN SOLO calendario que UNIFICA por planta
         // (ciclos de la finca, o especies del catálogo si no hay finca) las
@@ -1457,6 +1459,7 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'especies': // alias usado por Manual/FAQ (mismo caso que 'calendario': navigate() no pasa por HASH_VIEW_ROUTES)
       case 'directorio':
         // Directorio de especies: explorador visual del catálogo. Buscador con
         // resolución de nombre (matcher canónico del proyecto) + ficha grounded
