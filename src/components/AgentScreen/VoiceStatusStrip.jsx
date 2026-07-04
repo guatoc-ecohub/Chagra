@@ -129,9 +129,12 @@ export default function VoiceStatusStrip({
             {isSpeaking && <Equalizer />}
           </span>
           <p
-            className="flex-1 text-base font-bold leading-tight"
+            className="flex-1 text-base leading-tight"
             data-testid="voice-state-label"
             aria-live="polite"
+            /* V3: la voz de estado habla en Baloo 2 — la misma letra redonda y
+               amable del resto del agente (byline, mochila), no la sans dura. */
+            style={{ fontFamily: "'Baloo 2', 'Nunito', system-ui, sans-serif", fontWeight: 700, letterSpacing: '0.1px' }}
           >
             {isListening && 'Chagra te escucha'}
             {isThinking && 'Chagra está pensando'}

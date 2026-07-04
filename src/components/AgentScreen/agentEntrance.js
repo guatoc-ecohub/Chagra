@@ -179,6 +179,307 @@ export const AGENT_COMPOSITOR_CSS = `
   }
 `;
 
+/**
+ * V3 (fable) — "CUADERNO DE CAMPO COSIDO". CSS de la capa visual nueva del chat
+ * del agente:
+ *
+ *   1. LA MOCHILA (.v3-mochila*): la bandeja de ~11-13 chips de modo que vivía
+ *      SIEMPRE sobre el input (y se comía media pantalla en el celular — el
+ *      operador la rechazó 3 veces) se colapsa en UN disparador del compositor
+ *      (.v3-modo) que abre un bottom-sheet con scroll. Cerrada, el chat tiene
+ *      el ALTO COMPLETO.
+ *   2. TARJETAS-SEMILLA (.v3-chipcard): dentro de la mochila los modos son
+ *      tarjetas grandes en grilla (emoji 22px + etiqueta Nunito) — legibles al
+ *      sol y tocables con guantes, no píldoras miniatura.
+ *   3. EL CUADERNO (.v3-turn/.v3-card): los turnos del agente son ENTRADAS de
+ *      cuaderno de campo — byline "Chagra" en Baloo 2 + tarjeta papel del tema.
+ *      La firma de la marca es LA COSTURA: una puntada de hilo esmeralda en el
+ *      borde izquierdo de las respuestas respaldadas por el catálogo
+ *      ([data-grounded="true"]) — "cosida al catálogo", como la costura de un
+ *      costal de fique. Las respuestas solo-generativas NO llevan costura.
+ *
+ * Todo por TOKENS de tema (--c-* espacio-separado, --t-accent-rgb coma-
+ * separado) → coherente en los 4 temas y legible al sol (superficies opacas).
+ * Tipografía: Baloo 2 (display) + Nunito (cuerpo), ya self-host en /fonts —
+ * los @font-face duplican los de finca-viva-hero.css a propósito (el navegador
+ * los dedupe) para que el agente no dependa de que el home los haya cargado.
+ * Respeta prefers-reduced-motion (bloque final).
+ */
+export const AGENT_V3_CSS = `
+  @font-face {
+    font-family: 'Baloo 2'; font-style: normal; font-weight: 400 800;
+    font-display: swap; src: url('/fonts/baloo2-latin.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Nunito'; font-style: normal; font-weight: 400 800;
+    font-display: swap; src: url('/fonts/nunito-latin.woff2') format('woff2');
+  }
+
+  /* ── Disparador de modos en el compositor (colapsa la bandeja) ─────────── */
+  .v3-modo {
+    flex: 0 1 auto; min-width: 0; max-width: 160px; height: 44px;
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 0 13px;
+    /* Forma de SEMILLA: radio asimétrico — sello de la V3, no píldora genérica. */
+    border-radius: 22px 22px 22px 8px;
+    background: rgb(var(--c-surface-raised, 30 41 59) / 0.92);
+    border: 1px solid rgb(var(--c-surface-border, 100 116 139) / 0.6);
+    color: rgb(var(--c-slate-300, 203 213 225)); cursor: pointer;
+    font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease,
+                transform 0.16s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  .v3-modo:hover { border-color: rgba(var(--t-accent-rgb, 25, 201, 154), 0.55); }
+  .v3-modo:active { transform: scale(0.95); }
+  .v3-modo:disabled { opacity: 0.4; cursor: not-allowed; }
+  .v3-modo.is-active {
+    background: rgba(var(--t-accent-rgb, 25, 201, 154), 0.16);
+    border-color: rgba(var(--t-accent-rgb, 25, 201, 154), 0.65);
+    color: rgb(var(--t-accent-rgb, 25, 201, 154));
+  }
+  .v3-modo-txt {
+    min-width: 0; font-size: 13.5px; font-weight: 700; letter-spacing: 0.1px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  /* Etiqueta del MODO ACTIVO sobre el input (fila propia dentro del pill —
+     ancho completo, nunca se trunca como en la fila de íconos). */
+  .v3-modo-tagrow {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 8px 0;
+  }
+  .v3-modo-tag {
+    min-width: 0; max-width: 100%; height: 30px;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 0 11px; border-radius: 15px 15px 15px 6px;
+    background: rgba(var(--t-accent-rgb, 25, 201, 154), 0.15);
+    border: 1px solid rgba(var(--t-accent-rgb, 25, 201, 154), 0.55);
+    color: rgb(var(--t-accent-rgb, 25, 201, 154)); cursor: pointer;
+    font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+    animation: v3-pop 0.22s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+  .v3-modo-tag-txt {
+    min-width: 0; font-size: 12.5px; font-weight: 700; letter-spacing: 0.1px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  /* Salida rápida del modo activo (un toque, sin reabrir la mochila). */
+  .v3-modo-clear {
+    flex: none; width: 30px; height: 30px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgb(var(--c-surface-raised, 30 41 59) / 0.9);
+    border: 1px solid rgb(var(--c-surface-border, 100 116 139) / 0.55);
+    color: rgb(var(--c-slate-400, 148 163 184)); cursor: pointer;
+    transition: color 0.18s ease, border-color 0.18s ease, transform 0.16s ease;
+  }
+  .v3-modo-clear:hover { color: rgb(var(--c-slate-100, 241 245 249)); }
+  .v3-modo-clear:active { transform: scale(0.9); }
+
+  /* ── LA MOCHILA — bottom-sheet de modos con scroll ─────────────────────── */
+  .v3-mochila {
+    position: fixed; inset: 0; z-index: 70;
+    display: flex; flex-direction: column; justify-content: flex-end;
+  }
+  .v3-mochila-scrim {
+    position: absolute; inset: 0; border: 0; padding: 0; margin: 0; cursor: pointer;
+    background: rgba(5, 12, 9, 0.58);
+    -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+    animation: v3-fade 0.2s ease both;
+  }
+  .v3-mochila-panel {
+    position: relative; z-index: 1; width: 100%; max-width: 680px; margin: 0 auto;
+    max-height: min(72dvh, 560px);
+    display: flex; flex-direction: column;
+    background: rgb(var(--c-surface-card, 15 23 42));
+    border: 1px solid rgb(var(--c-surface-border, 51 65 85));
+    border-bottom: 0; border-radius: 24px 24px 0 0;
+    box-shadow: 0 -22px 56px -18px rgba(0, 0, 0, 0.65);
+    padding: 0 14px calc(env(safe-area-inset-bottom, 0px) + 14px);
+    animation: v3-rise 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+  /* Dobladillo COSIDO: agarradera + puntada de hilo del acento — misma costura
+     que firma las respuestas respaldadas. */
+  .v3-mochila-hem { padding: 9px 0 8px; flex: none; }
+  .v3-mochila-grab {
+    display: block; width: 44px; height: 4px; border-radius: 999px;
+    background: rgb(var(--c-slate-400, 148 163 184) / 0.55);
+    margin: 0 auto 9px;
+  }
+  .v3-mochila-stitch {
+    display: block; height: 2px; border-radius: 2px; margin: 0 6px;
+    background-image: repeating-linear-gradient(
+      90deg,
+      rgba(var(--t-accent-rgb, 25, 201, 154), 0.75) 0 8px,
+      transparent 8px 15px
+    );
+  }
+  .v3-mochila-head {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 4px 4px 10px; flex: none;
+  }
+  .v3-mochila-titwrap { flex: 1; min-width: 0; }
+  .v3-mochila-titwrap h2 {
+    font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+    font-weight: 800; font-size: 19px; letter-spacing: -0.3px; line-height: 1.15;
+    color: rgb(var(--c-slate-100, 241 245 249));
+  }
+  .v3-mochila-titwrap p {
+    font-family: 'Nunito', system-ui, sans-serif;
+    font-size: 12.5px; line-height: 1.35; margin-top: 2px;
+    color: rgb(var(--c-slate-400, 148 163 184));
+  }
+  .v3-mochila-close {
+    flex: none; width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: rgb(var(--c-surface-raised, 30 41 59));
+    border: 1px solid rgb(var(--c-surface-border, 51 65 85));
+    color: rgb(var(--c-slate-300, 203 213 225)); cursor: pointer;
+    transition: color 0.18s ease, border-color 0.18s ease;
+  }
+  .v3-mochila-close:hover {
+    color: rgb(var(--c-slate-100, 241 245 249));
+    border-color: rgba(var(--t-accent-rgb, 25, 201, 154), 0.55);
+  }
+  .v3-mochila-body {
+    overflow-y: auto; overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch; padding: 2px 2px 6px;
+  }
+
+  /* ── Tarjetas-semilla de modo (grilla dentro de la mochila) ────────────── */
+  .v3-chipgrid {
+    display: grid; gap: 9px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+  .v3-chipcard {
+    display: flex; align-items: center; gap: 10px; text-align: left;
+    min-height: 58px; padding: 9px 11px;
+    border-radius: 16px 16px 16px 6px;
+    background: rgb(var(--c-surface-raised, 30 41 59) / 0.85);
+    border: 1px solid rgb(var(--c-surface-border, 51 65 85) / 0.9);
+    color: rgb(var(--c-slate-100, 241 245 249)); cursor: pointer;
+    animation: v3-pop 0.26s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+    animation-delay: calc(var(--i, 0) * 22ms);
+    transition: border-color 0.18s ease, background 0.18s ease,
+                transform 0.14s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  .v3-chipcard:hover { border-color: rgba(var(--t-accent-rgb, 25, 201, 154), 0.55); }
+  .v3-chipcard:active { transform: scale(0.96); }
+  .v3-chipcard:disabled { opacity: 0.45; cursor: not-allowed; }
+  .v3-chipcard[aria-pressed="true"] {
+    background: rgba(var(--t-accent-rgb, 25, 201, 154), 0.16);
+    border-color: rgba(var(--t-accent-rgb, 25, 201, 154), 0.7);
+  }
+  .v3-chipcard.is-locked {
+    opacity: 0.55; cursor: not-allowed;
+    background: rgb(var(--c-surface-raised, 30 41 59) / 0.5);
+  }
+  .v3-chipcard-emoji {
+    flex: none; width: 36px; height: 36px; border-radius: 12px 12px 12px 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 21px; line-height: 1;
+    background: rgb(var(--c-surface-card, 15 23 42));
+    border: 1px solid rgb(var(--c-surface-border, 51 65 85) / 0.7);
+  }
+  .v3-chipcard-label {
+    min-width: 0; font-family: 'Nunito', system-ui, sans-serif;
+    font-size: 13.5px; font-weight: 700; line-height: 1.25;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  /* Fila "Más consultas" — ocupa todo el ancho de la grilla, borde punteado
+     (misma familia visual que la costura). */
+  .v3-more-row {
+    grid-column: 1 / -1; min-height: 46px; margin-top: 2px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    border-radius: 14px; border: 1.5px dashed rgb(var(--c-surface-border, 51 65 85));
+    background: transparent; color: rgb(var(--c-slate-400, 148 163 184));
+    font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+    font-size: 13.5px; font-weight: 700; cursor: pointer;
+    transition: color 0.18s ease, border-color 0.18s ease;
+  }
+  .v3-more-row:hover {
+    color: rgb(var(--c-slate-100, 241 245 249));
+    border-color: rgba(var(--t-accent-rgb, 25, 201, 154), 0.5);
+  }
+  .v3-more-row[aria-expanded="true"] {
+    color: rgb(var(--t-accent-rgb, 25, 201, 154));
+    border-color: rgba(var(--t-accent-rgb, 25, 201, 154), 0.55);
+  }
+  .v3-chipgrid-more { margin-top: 9px; }
+
+  /* ── EL CUADERNO — turnos del chat como entradas de campo ──────────────── */
+  .v3-turn {
+    margin-bottom: 15px;
+    animation: v3-entry 0.26s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+  .v3-turn-user { display: flex; justify-content: flex-end; }
+  .v3-byline {
+    display: flex; align-items: center; gap: 6px; margin: 0 0 4px 2px;
+    font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+    font-size: 12.5px; font-weight: 700; letter-spacing: 0.2px;
+    color: rgb(var(--c-slate-400, 148 163 184));
+  }
+  .v3-byline-avatar {
+    flex: none; width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+    background: rgb(var(--c-surface-card, 15 23 42));
+    border: 1px solid rgb(var(--c-surface-border, 51 65 85));
+  }
+  .v3-byline-avatar.is-streaming {
+    border-color: rgba(var(--t-accent-rgb, 25, 201, 154), 0.7);
+    box-shadow: 0 0 10px rgba(var(--t-accent-rgb, 25, 201, 154), 0.35);
+  }
+  /* Tarjeta-papel del agente. Lomo plano arriba-izquierda (bajo el byline),
+     tipografía Nunito de cuaderno, superficie del TEMA (papel en claros,
+     panel nocturno en biopunk). */
+  .v3-card {
+    position: relative; max-width: 88%;
+    padding: 11px 14px; border-radius: 5px 18px 18px 18px;
+    background: rgb(var(--c-surface-card, 15 23 42) / 0.97);
+    border: 1px solid rgb(var(--c-surface-border, 51 65 85) / 0.9);
+    box-shadow: 0 8px 22px -14px rgba(0, 0, 0, 0.55);
+    color: rgb(var(--c-slate-100, 241 245 249));
+    font-family: 'Nunito', system-ui, sans-serif;
+  }
+  /* LA COSTURA (firma V3): respuesta respaldada por el catálogo = puntada de
+     hilo esmeralda en el borde izquierdo, como la costura de un costal. Las
+     respuestas solo-generativas no llevan hilo. */
+  .v3-card[data-grounded="true"] { padding-left: 22px; }
+  .v3-card[data-grounded="true"]::before {
+    content: ''; position: absolute; left: 9px; top: 12px; bottom: 12px;
+    width: 2.5px; border-radius: 2px;
+    background-image: repeating-linear-gradient(
+      180deg,
+      rgb(var(--c-emerald-500, 16 185 129)) 0 7px,
+      transparent 7px 13px
+    );
+  }
+  .v3-bubble-user {
+    max-width: 82%; padding: 10px 14px;
+    border-radius: 18px 18px 5px 18px;
+    background: rgb(var(--c-emerald-700, 4 120 87));
+    border: 1px solid rgb(var(--c-emerald-500, 16 185 129) / 0.35);
+    box-shadow: 0 8px 22px -14px rgb(var(--c-emerald-700, 4 120 87) / 0.8);
+    color: #fff; font-family: 'Nunito', system-ui, sans-serif;
+  }
+
+  @keyframes v3-rise { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  @keyframes v3-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes v3-pop {
+    from { opacity: 0; transform: translateY(8px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes v3-entry {
+    from { opacity: 0; transform: translateY(7px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .v3-mochila-panel, .v3-mochila-scrim, .v3-chipcard, .v3-turn,
+    .v3-modo-tag {
+      animation: none !important;
+    }
+    .v3-modo, .v3-modo-clear, .v3-chipcard { transition: none; }
+  }
+`;
+
 
 /**
  * ¿El usuario pidió reducir el movimiento? Tolerante a entornos sin matchMedia

@@ -99,7 +99,14 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
             <ProactiveGreeting greeting={proactiveGreeting} />
           ) : (
             <>
-              <p className="text-slate-200 text-base mb-2 font-medium">¡Hola! Soy tu asistente agroecológico.</p>
+              {/* V3: saludo en Baloo 2 (display de la casa) — el mismo trazo
+                  redondo del home Finca Viva, no la sans genérica. */}
+              <p
+                className="text-slate-200 text-xl mb-2"
+                style={{ fontFamily: "'Baloo 2', 'Nunito', system-ui, sans-serif", fontWeight: 700, letterSpacing: '-0.3px' }}
+              >
+                ¡Hola! Soy tu asistente agroecológico.
+              </p>
               <p className="text-slate-500 text-xs">Puedes hablarme o escribirme sobre tus plantas.</p>
             </>
           )}
@@ -216,14 +223,21 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
           desapercibido porque el ojo del operador está en la ventana de
           diálogo. Acá el colibrí late en thinking + texto "Pensando…". */}
       {showThinkingAvatar && (
-        <div className="flex items-end gap-3 mb-4 animate-fadeIn">
-          <ChagraAgentAvatar
-            state="thinking"
-            size={96}
-            className="shrink-0 mb-1"
-            ariaLabel={MSG.agente.pensandoAria}
-          />
-          <div className="rounded-2xl rounded-bl-sm bg-slate-800/80 border border-slate-700/60 px-4 py-3 text-slate-300 text-sm italic shadow-lg">
+        // V3: la espera del primer token es una ENTRADA más del cuaderno —
+        // byline "Chagra" + tarjeta-papel, coherente con las respuestas. El
+        // colibrí late en thinking (alas en blur + sip rápido) en el byline.
+        <div className="v3-turn animate-fadeIn">
+          <div className="v3-byline">
+            <span className="v3-byline-avatar is-streaming">
+              <ChagraAgentAvatar
+                state="thinking"
+                size={22}
+                ariaLabel={MSG.agente.pensandoAria}
+              />
+            </span>
+            <span>Chagra</span>
+          </div>
+          <div className="v3-card text-sm italic text-slate-300">
             {MSG.agente.pensandoTexto}
             <span className="inline-block ml-1 animate-thinkingDot">·</span>
             <span className="inline-block ml-0.5 animate-thinkingDot [animation-delay:200ms]">·</span>
@@ -278,7 +292,11 @@ function ProactiveGreeting({ greeting }) {
   const isPending = state === 'pending';
   return (
     <div data-testid="proactive-greeting" data-greeting-state={state}>
-      <p className="text-slate-200 text-base mb-1.5 font-medium">
+      {/* V3: saludo en Baloo 2 — misma voz tipográfica que el resto del agente. */}
+      <p
+        className="text-slate-200 text-xl mb-1.5"
+        style={{ fontFamily: "'Baloo 2', 'Nunito', system-ui, sans-serif", fontWeight: 700, letterSpacing: '-0.3px' }}
+      >
         {hi}. Soy <span className="text-emerald-300">Chagra</span>.
       </p>
       <p

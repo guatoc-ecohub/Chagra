@@ -3,20 +3,29 @@ import { CHIP_DEFS, CHIP_INTENTS } from '../services/chipIntentRouter';
 import { isDeepResearchEnabled } from '../services/deepResearchClient';
 
 /**
- * ChipsToolbar — "caja de herramientas" del agente como CHIPS DE MODO
- * (estilo Gemini). Fila horizontal scrollable que vive JUSTO sobre el input
- * del chat (A4/B4). Al tocar un chip, la intención queda forzada y rutea
- * DIRECTO a la capacidad determinística, SALTANDO el NLU (A3) — el routing
- * vive en `chipIntentRouter.planForcedIntent` y lo ejecuta AgentScreen.
+ * ChipsToolbar — "caja de herramientas" del agente como MODOS de consulta.
+ * Al tocar un modo, la intención queda forzada y rutea DIRECTO a la capacidad
+ * determinística, SALTANDO el NLU (A3) — el routing vive en
+ * `chipIntentRouter.planForcedIntent` y lo ejecuta AgentScreen.
+ *
+ * V3 (fable, "cuaderno de campo cosido"): este componente YA NO vive inline
+ * sobre el input del chat — la bandeja de ~11-13 píldoras en flex-wrap se comía
+ * media pantalla en el celular y ahorcaba el chat (el operador la rechazó 3
+ * veces). Ahora vive DENTRO de la "mochila" (bottom-sheet del AgentScreen) y
+ * cada modo se pinta como TARJETA-SEMILLA grande en grilla (emoji 21px +
+ * etiqueta Nunito, ≥58px de alto): legible al sol, tocable con guantes, apto
+ * para baja alfabetización. CSS en AGENT_V3_CSS (agentEntrance.js), 100% por
+ * tokens de tema.
+ *
+ * SOLO cambió la capa visual: misma data (CHIP_DEFS / chipDefs por perfil),
+ * mismo mecanismo (onSelectIntent(intent)), mismos testids/roles/aria
+ * (mode-chip, mode-chip-foto, mode-chip-more, chips-toolbar,
+ * chips-toolbar-more, aria-pressed/expanded/controls) — cero cambios de
+ * lógica ni de contrato de tests.
  *
  * Diferencia frente a `QuickChipsBar`: aquél es un atajo de pantalla-nueva
- * que inyecta texto y pasa por el NLU normal. ChipsToolbar es una barra
- * PERSISTENTE de modos que se queda visible durante toda la conversación y
- * fuerza la intención sin inferencia.
- *
- * Diseño: píldoras táctiles, alto contraste (legible al sol, campesino), área
- * de toque cómoda (min 44px alto efectivo), scroll horizontal sin barra
- * visible. Cada chip es un <button> con aria-pressed para el estado activo.
+ * que inyecta texto y pasa por el NLU normal. ChipsToolbar fuerza la
+ * intención sin inferencia.
  *
  * El chip 📷 foto solo se muestra cuando hay una imagen adjunta lista
  * (`hasAttachment`). Coordina con el flujo de adjuntos del compositor.
@@ -49,15 +58,14 @@ import { isDeepResearchEnabled } from '../services/deepResearchClient';
  *                     omite (null/undefined), se muestran TODOS los chips
  *                     (CHIP_DEFS) — comportamiento histórico, sin breaking
  *                     change. Este componente NO decide la selección: solo
- *                     pinta lo que recibe con su CSS actual (la legibilidad/
- *                     estilo la lleva otro stream).
+ *                     pinta lo que recibe. La legibilidad/estilo va por CSS.
  *
  * Grupo "Más" (grounding oscuro, 2026-07-01): algunos chips del manifiesto
  * (toxicidad, saberes tradicionales, alerta normativa páramo, variedades,
  * polinización, fenología — `moreGroup:true` en CHIP_DEFS, derivado de
  * `chipMore` en agentCapabilities.js) son consultas puntuales del grafo, NO el
- * núcleo diario. Para no saturar la barra principal se agrupan detrás de un
- * chip toggle "Más" (`data-testid="mode-chip-more"`): al tocarlo se despliega
+ * núcleo diario. Para no saturar la grilla principal se agrupan detrás de una
+ * fila toggle "Más" (`data-testid="mode-chip-more"`): al tocarla se despliega
  * un SEGUNDO `role="toolbar"` con esos chips, pintados con el MISMO patrón
  * (mismo `onSelectIntent`, mismo `data-testid="mode-chip"`, mismo
  * aria-pressed/disabled) — cero mecanismo nuevo, solo una repisa aparte.
@@ -93,31 +101,17 @@ const ChipsToolbar = React.memo(function ChipsToolbar({
 
   // Grupo "Más": chips de grounding puntual (toxicidad, saberes tradicionales,
   // alerta páramo, variedades, polinización, fenología) que NO se pintan en la
-  // fila principal — se agrupan detrás del toggle para no saturar la barra
-  // con el núcleo diario. `coreChipDefs` conserva EXACTAMENTE el comportamiento
+  // grilla principal — se agrupan detrás del toggle para no saturar con el
+  // núcleo diario. `coreChipDefs` conserva EXACTAMENTE el comportamiento
   // histórico (mismo orden, mismo contenido) para no romper nada existente.
   const coreChipDefs = visibleChipDefs.filter((def) => !def.moreGroup);
   const moreChipDefs = visibleChipDefs.filter((def) => def.moreGroup);
 
-  const baseChip =
-    'shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border ' +
-    'text-sm font-semibold whitespace-nowrap transition-all active:scale-95 ' +
-    'focus:outline-none focus:ring-2 focus:ring-emerald-400/60 ' +
-    'disabled:opacity-40 disabled:cursor-not-allowed';
-  // Alto contraste: activo = verde sólido sobre texto blanco; inactivo =
-  // superficie OPACA por token (.agent-chip — paridad con el home, legible sobre
-  // la foto de fondo). Toque ≥44px efectivo por padding.
-  const inactiveChip = 'agent-chip';
-  const activeChip =
-    'bg-emerald-600 border-emerald-300 text-white shadow-md';
-  // Chip Pro bloqueado: apariencia visualmente diferenciada para free users.
-  const proLockedChip =
-    'bg-slate-800 border-slate-700 text-slate-500 cursor-not-allowed';
-
-  // Render de UN chip de modo — compartido entre la fila principal y el
-  // grupo "Más" (mismo mecanismo: onSelectIntent(def.intent), mismo testid,
-  // mismo aria-pressed/disabled). Evita duplicar el markup entre las dos filas.
-  const renderChip = (def) => {
+  // Render de UN modo como tarjeta-semilla — compartido entre la grilla
+  // principal y el grupo "Más" (mismo mecanismo: onSelectIntent(def.intent),
+  // mismo testid, mismo aria-pressed/disabled). `index` alimenta --i para la
+  // entrada escalonada (solo presentación; reduced-motion la apaga por CSS).
+  const renderChip = (def, index) => {
     const isActive = activeIntent === def.intent;
     // El chip 🔬 Deep Research es Pro-only. Para usuarios free: deshabilitado
     // con copy claro "función Pro" y title explicativo. NO se oculta — el
@@ -125,11 +119,6 @@ const ChipsToolbar = React.memo(function ChipsToolbar({
     const isDeepChip = def.intent === CHIP_INTENTS.deep;
     const isProLocked = isDeepChip && !isPro;
     const chipDisabled = disabled || isProLocked;
-    const chipClass = isProLocked
-      ? proLockedChip
-      : isActive
-        ? activeChip
-        : inactiveChip;
     const chipTitle = isProLocked
       ? 'Función Pro — disponible para usuarios con acceso avanzado'
       : def.placeholder;
@@ -146,23 +135,21 @@ const ChipsToolbar = React.memo(function ChipsToolbar({
         aria-pressed={isActive}
         aria-label={isProLocked ? `${def.label} — función Pro` : def.label}
         title={chipTitle}
-        className={`${baseChip} ${chipClass}`}
+        className={`v3-chipcard${isProLocked ? ' is-locked' : ''}`}
+        style={{ '--i': index }}
       >
-        <span aria-hidden="true">{def.emoji}</span>
-        <span>{isProLocked ? `${def.label} (Pro)` : def.label}</span>
+        <span className="v3-chipcard-emoji" aria-hidden="true">{def.emoji}</span>
+        <span className="v3-chipcard-label">{isProLocked ? `${def.label} (Pro)` : def.label}</span>
       </button>
     );
   };
 
   return (
-    <div
-      data-testid="chips-toolbar"
-      className="agent-chip-tray px-3 py-2"
-    >
+    <div data-testid="chips-toolbar">
       <div
         role="toolbar"
         aria-label="Modos del asistente"
-        className="flex flex-wrap gap-2 pb-1 -mb-1"
+        className="v3-chipgrid"
       >
         {/* Chip 📷 foto: primero y SOLO si hay imagen adjunta. */}
         {hasAttachment && (
@@ -172,10 +159,11 @@ const ChipsToolbar = React.memo(function ChipsToolbar({
             onClick={() => onSelectIntent('foto')}
             disabled={disabled}
             aria-pressed={activeIntent === 'foto'}
-            className={`${baseChip} ${activeIntent === 'foto' ? activeChip : inactiveChip}`}
+            className="v3-chipcard"
+            style={{ '--i': 0 }}
           >
-            <span aria-hidden="true">📷</span>
-            <span>Foto</span>
+            <span className="v3-chipcard-emoji" aria-hidden="true">📷</span>
+            <span className="v3-chipcard-label">Foto</span>
           </button>
         )}
 
@@ -193,10 +181,10 @@ const ChipsToolbar = React.memo(function ChipsToolbar({
             aria-controls="chips-toolbar-more"
             aria-label={showMore ? 'Ocultar más consultas del agente' : 'Más consultas del agente'}
             title="Más consultas: toxicidad, saberes tradicionales, variedades, polinización, fenología y normativa de páramo"
-            className={`${baseChip} ${showMore ? activeChip : inactiveChip}`}
+            className="v3-more-row"
           >
             <span aria-hidden="true">{showMore ? '➖' : '➕'}</span>
-            <span>Más</span>
+            <span>{showMore ? 'Menos consultas' : 'Más consultas del catálogo'}</span>
           </button>
         )}
       </div>
@@ -206,7 +194,7 @@ const ChipsToolbar = React.memo(function ChipsToolbar({
           id="chips-toolbar-more"
           role="toolbar"
           aria-label="Más consultas del agente"
-          className="flex flex-wrap gap-2 pt-2 mt-2 border-t border-white/10"
+          className="v3-chipgrid v3-chipgrid-more"
         >
           {moreChipDefs.map(renderChip)}
         </div>
