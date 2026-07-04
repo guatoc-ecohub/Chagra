@@ -95,9 +95,23 @@ function setupFetchMock() {
   });
 }
 
+// Catálogo OSS que cubre los slugs sintéticos del manifest de estos describes.
+// Tras el fix FAIL-CLOSED (P0-1), el tier-gate ya NO carga el manifest completo
+// cuando el catálogo no está disponible; hay que proveer un catálogo que
+// contenga los slugs de prueba para ejercitar la mecánica del corpus por el
+// camino sano (catálogo presente), no por el agujero fail-open que se cerró.
+const EXTENDED_CATALOG = [
+  { id: 'fragaria_test' },
+  { id: 'coffea_test' },
+  { id: 'lechuga_test' },
+];
+
 describe('ragRetriever — corpus extendido v2', () => {
   beforeEach(() => {
     vi.resetModules();
+    vi.doMock('../../db/catalogDB', () => ({
+      getAllSpecies: vi.fn().mockResolvedValue(EXTENDED_CATALOG),
+    }));
     setupFetchMock();
   });
 
@@ -191,6 +205,9 @@ describe('ragRetriever — corpus extendido v2', () => {
 describe('ragRetriever — pre-tokenize perf fix', () => {
   beforeEach(() => {
     vi.resetModules();
+    vi.doMock('../../db/catalogDB', () => ({
+      getAllSpecies: vi.fn().mockResolvedValue(EXTENDED_CATALOG),
+    }));
     setupFetchMock();
   });
 
@@ -327,6 +344,14 @@ describe('ragRetriever — loadCorpus paralelo-acotado (hotfix prod-down 2026-06
 
   beforeEach(() => {
     vi.resetModules();
+    // FAIL-CLOSED (P0-1): estos tests usan slugs sp_N; sin catálogo el tier-gate
+    // ya no los carga. Proveemos un catálogo amplio que los cubra para probar la
+    // mecánica de concurrencia por el camino sano.
+    vi.doMock('../../db/catalogDB', () => ({
+      getAllSpecies: vi.fn().mockResolvedValue(
+        Array.from({ length: 120 }, (_, i) => ({ id: `sp_${i}` })),
+      ),
+    }));
   });
 
   afterEach(() => {
@@ -402,7 +427,7 @@ describe('ragRetriever — tier-gate del catalogo (SEC-002 / UXC-004)', () => {
     // pro_only_1 y pro_only_2 NO estan en el catalogo OSS
   ];
 
-  function setupGatedFetchMock() {
+  function setupGatedFetchMock(manifest = MANIFEST_GATED) {
     const tracker = { docFetches: new Set() };
     globalThis.fetch = vi.fn((url) => {
       const u = String(url);
@@ -410,7 +435,7 @@ describe('ragRetriever — tier-gate del catalogo (SEC-002 / UXC-004)', () => {
         return Promise.resolve({
           ok: true, status: 200,
           headers: { get: (h) => (h.toLowerCase() === 'content-type' ? 'application/json' : '') },
-          json: () => Promise.resolve(MANIFEST_GATED),
+          json: () => Promise.resolve(manifest),
         });
       }
       const match = u.match(/\/cycle-content\/([^.]+)\.json/);
@@ -478,33 +503,66 @@ describe('ragRetriever — tier-gate del catalogo (SEC-002 / UXC-004)', () => {
     expect(stats.totalDocs).toBe(3);
   });
 
-  it('SEC-002 — si el catalogo falla, carga todos los slugs (degradacion segura)', async () => {
+  it('P0-1 FAIL-CLOSED — si el catalogo falla, NO carga slugs fuera del subconjunto seguro', async () => {
     vi.doMock('../../db/catalogDB', () => ({
       getAllSpecies: vi.fn().mockRejectedValue(new Error('SQLite no disponible')),
     }));
 
     const tracker = setupGatedFetchMock();
-    const { retrieve, getCorpusStats } = await import('../ragRetriever.js');
+    const { retrieve, getCorpusStats, getTierGateBlockCount } = await import('../ragRetriever.js');
 
     await retrieve('ficha pedagógica', 5);
 
     const stats = await getCorpusStats();
-    // Degradacion: sin catalogo, carga los 5 slugs completos
-    expect(stats.totalDocs).toBe(5);
-    expect(tracker.docFetches.size).toBe(5);
+    // FAIL-CLOSED: los slugs del MANIFEST_GATED (*_test / pro_only) NO están en
+    // CROP_TAXONOMY, así que el subconjunto seguro es vacío. No se sirve corpus
+    // amplio: NADA se fetchea, 0 docs. Antes (fail-open) cargaba los 5.
+    expect(stats.totalDocs).toBe(0);
+    expect(tracker.docFetches.size).toBe(0);
+    // La degradación se contabiliza como métrica de bloqueo observable.
+    expect(getTierGateBlockCount()).toBe(1);
   });
 
-  it('SEC-002 — catalogo vacio (sin especies) carga todos los slugs', async () => {
+  it('P0-1 FAIL-CLOSED — catalogo vacio (sin especies) tampoco carga corpus amplio', async () => {
     vi.doMock('../../db/catalogDB', () => ({
       getAllSpecies: vi.fn().mockResolvedValue([]),
     }));
 
     const tracker = setupGatedFetchMock();
-    const { retrieve } = await import('../ragRetriever.js');
+    const { retrieve, getTierGateBlockCount } = await import('../ragRetriever.js');
 
     await retrieve('ficha pedagógica', 5);
 
-    expect(tracker.docFetches.size).toBe(5);
+    // Catálogo vacío = tier indeterminado → fail-closed al subconjunto seguro
+    // (vacío para estos slugs de prueba). No se filtra corpus Pro por defecto.
+    expect(tracker.docFetches.size).toBe(0);
+    expect(getTierGateBlockCount()).toBe(1);
+  });
+
+  it('P0-1 FAIL-CLOSED — sin catalogo sirve SOLO el subconjunto seguro (CROP_TAXONOMY), nunca Pro', async () => {
+    // Manifest mixto: 3 slugs OSS reales (presentes en CROP_TAXONOMY) + 2 Pro.
+    // Reutilizamos setupGatedFetchMock (parametrizado) para no introducir otro
+    // sitio de asignación a globalThis.fetch.
+    const MANIFEST_MIX = {
+      generated_at: '2026-07-03T00:00:00Z',
+      slugs: ['coffea_arabica', 'lactuca_sativa', 'solanum_tuberosum', 'pro_secret_1', 'pro_secret_2'],
+    };
+    vi.doMock('../../db/catalogDB', () => ({
+      getAllSpecies: vi.fn().mockRejectedValue(new Error('catálogo caído')),
+    }));
+
+    const tracker = setupGatedFetchMock(MANIFEST_MIX);
+    const { retrieve, getCorpusStats } = await import('../ragRetriever.js');
+    await retrieve('ficha pedagógica', 5);
+
+    // Los 3 OSS de CROP_TAXONOMY SÍ entran; los Pro NUNCA se fetchean.
+    expect(tracker.docFetches.has('coffea_arabica')).toBe(true);
+    expect(tracker.docFetches.has('lactuca_sativa')).toBe(true);
+    expect(tracker.docFetches.has('solanum_tuberosum')).toBe(true);
+    expect(tracker.docFetches.has('pro_secret_1')).toBe(false);
+    expect(tracker.docFetches.has('pro_secret_2')).toBe(false);
+    const stats = await getCorpusStats();
+    expect(stats.totalDocs).toBe(3);
   });
 
   it('SEC-002 — retrieve solo devuelve docs dentro del tier', async () => {
