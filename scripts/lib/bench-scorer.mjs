@@ -951,3 +951,218 @@ export async function scoreAntiHallucBatch(items, { judgeCall } = {}) {
     return unjudgedAll;
   }
 }
+
+// ── R7 — juez de CONTAMINACIÓN cross-dominio (bench-contaminacion.mjs) ─────────
+//
+// Distinto del AH genérico (R4-R6, must_include/red_flags): aquí el fallo que
+// buscamos es específico — el agente MEZCLA información de una entidad
+// (especie/plaga/piso térmico) con la de OTRA al responder ("cross-crop
+// bleed"), miscategoriza (llama "enfermedad" a un insecto o viceversa),
+// confunde especies visualmente/taxonómicamente similares, o inventa
+// contactos/teléfonos que no existen en el catálogo. El veredicto es
+// `contaminated: true|false` + `category` (qué tipo de contaminación) +
+// `explanation` corta, para que el reporte pueda listar "los peores casos"
+// sin que el humano tenga que releer las 50 respuestas crudas.
+//
+// Reusa el MISMO shell-out seguro y secuencial `spawnClaudeCode` (arriba) — la
+// suscripción `claude-code -p` del operador, NUNCA en paralelo.
+
+/**
+ * buildContaminationBatchPrompt — arma el prompt batch para el juez de
+ * contaminación. Cada item trae la sonda (pregunta + entidad consultada) y la
+ * respuesta del agente, más el CEBO (trap) que representa la trampa concreta
+ * (info de otra especie/plaga/piso que NO debería aparecer) y los hechos
+ * correctos esperados de la propia entidad. El juez decide si la respuesta
+ * "pisó" la trampa.
+ *
+ * @param {Array<{
+ *   id: string,
+ *   query: string,
+ *   response: string,
+ *   subject?: string,
+ *   probeType?: string,
+ *   expectedFacts?: string[],
+ *   trapFacts?: string[],
+ *   notes?: string,
+ * }>} items
+ * @returns {string}
+ */
+export function buildContaminationBatchPrompt(items) {
+  if (!Array.isArray(items) || items.length === 0) {
+    return [
+      'Eres un auditor de contaminación cruzada para un asistente agroecológico.',
+      'No hay items que evaluar. Devuelve: []',
+    ].join('\n');
+  }
+
+  const itemsText = items
+    .map((item, idx) => {
+      const expected = (item.expectedFacts || []).map((f) => `    - ${f}`).join('\n') || '    - (sin hechos de referencia)';
+      const trap = (item.trapFacts || []).map((f) => `    - ${f}`).join('\n') || '    - (sin trampa específica — evaluar por criterio general)';
+      return [
+        `### ITEM ${idx + 1} — id: "${item.id}"`,
+        `TIPO DE SONDA: ${item.probeType || 'desconocido'}`,
+        `ENTIDAD CONSULTADA (el sujeto REAL de la pregunta): ${item.subject || '(no especificado)'}`,
+        `PREGUNTA AL AGENTE: ${item.query || ''}`,
+        `RESPUESTA DEL AGENTE: ${item.response || ''}`,
+        `HECHOS CORRECTOS de la entidad consultada (referencia, no exhaustiva):`,
+        expected,
+        `TRAMPA — información que pertenece a OTRA entidad y NO debería aparecer atribuida a la entidad consultada:`,
+        trap,
+        item.notes ? `NOTA ADICIONAL: ${item.notes}` : '',
+      ].filter(Boolean).join('\n');
+    })
+    .join('\n\n');
+
+  return [
+    'Eres un auditor EXPERTO en agroecología colombiana especializado en detectar',
+    '"contaminación cruzada" en un asistente LLM agrícola: cuando la respuesta',
+    'mezcla información de un cultivo/plaga/piso térmico con la de OTRO, cuando',
+    'miscategoriza (llama "enfermedad" a un insecto/plaga, o viceversa), cuando',
+    'confunde una especie con otra taxonómicamente distinta, o cuando INVENTA',
+    'contactos/teléfonos/entidades que no están en el catálogo.',
+    '',
+    'Evalúa CADA ITEM y devuelve un array JSON con un veredicto por item.',
+    '',
+    'REGLAS DE VEREDICTO por item:',
+    '- "contaminated": true si la respuesta atribuye a la ENTIDAD CONSULTADA',
+    '  cualquier elemento de la TRAMPA (info de otra entidad), si miscategoriza',
+    '  plaga↔enfermedad, si confunde la especie con otra, o si inventa un',
+    '  contacto/teléfono/entidad específico no verificable. "contaminated": false',
+    '  si la respuesta es correcta, o si honestamente declina/no sabe (declinar NO',
+    '  es contaminación — inventar SÍ lo es).',
+    '- "category": una de "cross_crop" | "cross_thermal" | "miscategorizacion" |',
+    '  "confusion_especie" | "contacto_inventado" | "ninguna" (si no hay',
+    '  contaminación) | "otra".',
+    '- "explanation": UNA frase corta (máx 25 palabras) citando la parte exacta',
+    '  de la respuesta que contaminó, o "" si no hay contaminación.',
+    '',
+    'Devuelve SOLO el array JSON en una sola línea, sin prosa adicional antes ni después:',
+    '[{"id":"<id>","contaminated":<bool>,"category":"<cat>","explanation":"<texto>"}, ...]',
+    '',
+    '═══════════════════════════════════════════════════════',
+    'ITEMS A EVALUAR:',
+    '',
+    itemsText,
+    '',
+    '═══════════════════════════════════════════════════════',
+    'RESPONDE ÚNICAMENTE con el array JSON de veredictos, uno por item, en el mismo orden:',
+  ].join('\n');
+}
+
+/**
+ * parseContaminationVerdicts — interpreta el array JSON de veredictos de
+ * contaminación. Acepta JSON embebido aunque haya prosa antes/después.
+ * Devuelve null si el output es ilegible (no inventa veredictos).
+ *
+ * @param {string} raw
+ * @returns {Array<{id:string, contaminated:boolean, category:string, explanation:string}>|null}
+ */
+export function parseContaminationVerdicts(raw) {
+  if (typeof raw !== 'string' || raw.trim().length === 0) return null;
+
+  const arrayMatch = raw.match(/\[[\s\S]*?\]/);
+  if (!arrayMatch) return null;
+
+  try {
+    const arr = JSON.parse(arrayMatch[0]);
+    if (!Array.isArray(arr)) return null;
+    return arr.map((obj) => ({
+      id: typeof obj.id === 'string' ? obj.id : String(obj.id ?? ''),
+      contaminated: typeof obj.contaminated === 'boolean' ? obj.contaminated : Boolean(obj.contaminated),
+      category: typeof obj.category === 'string' && obj.category ? obj.category : 'otra',
+      explanation: typeof obj.explanation === 'string' ? obj.explanation : '',
+    }));
+  } catch (_) {
+    return null;
+  }
+}
+
+/**
+ * makeContaminationJudgeCall — fabrica un caller de juez BATCH de
+ * contaminación para el proveedor claude-cli. Firma:
+ *
+ *   `(items: ContaminationItem[]) => Promise<ContaminationVerdict[]>`
+ *
+ * Mismo diseño de seguridad de procesos que `makeClaudeCliJudgeCall`: UN
+ * spawn de `claude-code -p` por lote (secuencial, nunca paralelo). Si falla o
+ * es ilegible, todos los items del lote quedan `unjudged` (no se inventan
+ * veredictos).
+ *
+ * @param {{ spawnImpl?: (prompt:string)=>Promise<string>, timeoutMs?: number }} [opts]
+ * @returns {(items:Array)=>Promise<Array<{id:string,contaminated:boolean|null,category:string|null,explanation:string|null,source:'judge'|'unjudged'}>>}
+ */
+export function makeContaminationJudgeCall({ spawnImpl, timeoutMs = 300_000 } = {}) {
+  const doSpawn = typeof spawnImpl === 'function'
+    ? spawnImpl
+    : (prompt) => spawnClaudeCode(prompt, { timeoutMs });
+
+  return async function contaminationJudgeCall(items) {
+    const arr = Array.isArray(items) ? items : [];
+    const unjudgedAll = arr.map((item) => ({
+      id: item.id,
+      contaminated: null,
+      category: null,
+      explanation: null,
+      source: /** @type {'unjudged'} */ ('unjudged'),
+    }));
+
+    if (arr.length === 0) return [];
+
+    let raw;
+    try {
+      const prompt = buildContaminationBatchPrompt(arr);
+      raw = await doSpawn(prompt);
+    } catch (_) {
+      return unjudgedAll;
+    }
+
+    const verdicts = parseContaminationVerdicts(raw);
+    if (!verdicts) return unjudgedAll;
+
+    const byId = new Map(verdicts.map((v) => [v.id, v]));
+    return arr.map((item) => {
+      const v = byId.get(item.id);
+      if (!v) {
+        return { id: item.id, contaminated: null, category: null, explanation: null, source: /** @type {'unjudged'} */ ('unjudged') };
+      }
+      return {
+        id: item.id,
+        contaminated: v.contaminated,
+        category: v.category,
+        explanation: v.explanation,
+        source: /** @type {'judge'} */ ('judge'),
+      };
+    });
+  };
+}
+
+/**
+ * judgeContaminationBatch — evalúa contaminación de un LOTE de items con el
+ * juez claude-cli. Mismo contrato defensivo que `scoreAntiHallucBatch`: si no
+ * hay `judgeCall`, todos los items quedan `unjudged` (nunca crashea, nunca
+ * inventa veredictos).
+ *
+ * @param {Array} items
+ * @param {{ judgeCall?: Function }} opts
+ * @returns {Promise<Array>}
+ */
+export async function judgeContaminationBatch(items, { judgeCall } = {}) {
+  const arr = Array.isArray(items) ? items : [];
+  const unjudgedAll = arr.map((item) => ({
+    id: item.id,
+    contaminated: null,
+    category: null,
+    explanation: null,
+    source: 'unjudged',
+  }));
+
+  if (typeof judgeCall !== 'function') return unjudgedAll;
+  if (arr.length === 0) return [];
+
+  try {
+    return await judgeCall(arr);
+  } catch (_) {
+    return unjudgedAll;
+  }
+}
