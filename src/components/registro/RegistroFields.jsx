@@ -116,7 +116,6 @@ export function SelectField({ label, hint, Icon, error, options, placeholder, ..
  * @param {import('react').ComponentType<{size?: number}>} [props.Icon]
  * @param {string} [props.error]
  * @param {string} [props.name]
- * @param {string|number} [props.rows]
  */
 export function TextAreaField({ label, hint, Icon, error, ...rest }) {
   return (

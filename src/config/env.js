@@ -1,5 +1,3 @@
-/// <reference types="vite/client" />
-
 // Validación de env vars al startup.
 // VITE_FARMOS_URL puede ser vacío (proxy relativo via Nginx), así que
 // solo validamos que la variable EXISTA (haya sido definida en build-time).

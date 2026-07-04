@@ -1,5 +1,3 @@
-/// <reference types="vite/client" />
-
 import sqlite3InitModule from '@sqlite.org/sqlite-wasm';
 import { loadCatalogBuffer, assertCatalogShape, isAbortLikeFetchError } from '../services/corpusLoader';
 
