@@ -1,0 +1,496 @@
+/* ============================================================================
+   mundo-cultivos-hub.css — PORTADA del mundo 🌱 CULTIVOS Y SEMILLAS.
+
+   Identidad: CUADERNO DE CAMPO. Todo son láminas de papel crema con tinta verde
+   (Baloo 2 en títulos, Nunito en cuerpo). Al ser "papel", el hub se lee bien
+   sobre los 4 temas (biopunk oscuro, nature, minimalista, verde-vivo) sin
+   depender de las variables --c-* del tema: es una hoja pegada encima.
+
+   Namespace propio `.mch-` para no colisionar con las portadas hermanas de los
+   otros mundos (cada agente trae su prefijo). Legible al sol: tinta oscura,
+   labels en negrita, jerarquía sin depender del color. rsvg-safe en los SVG.
+   prefers-reduced-motion: sin animaciones ni lifts.
+   ========================================================================== */
+
+.mch {
+  --mch-papel: #fffdf6;
+  --mch-papel-2: #f4f6ea;
+  --mch-tinta: #26331f;
+  --mch-tinta-suave: #4e5c42;
+  --mch-verde: #3f8f4e;
+  --mch-verde-hondo: #2f6b3a;
+  --mch-ocre: #b98a2f;
+  --mch-display: 'Baloo 2', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mch-body: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 12px 14px 28px;
+  font-family: var(--mch-body);
+  color: var(--mch-tinta);
+}
+
+/* ── Portada ilustrada ─────────────────────────────────────────────────────── */
+.mch-hero {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(38, 51, 31, 0.14);
+  border-bottom: 4px solid var(--mch-verde);
+  box-shadow: 0 3px 14px rgba(38, 51, 31, 0.12);
+  background: #eaf3da;
+}
+.mch-hero-svg {
+  display: block;
+  width: 100%;
+  height: 128px;
+}
+.mch-hero-txt {
+  padding: 12px 14px 14px;
+  background: var(--mch-papel);
+  border-top: 1px solid rgba(38, 51, 31, 0.1);
+}
+.mch-hero-tit {
+  margin: 0;
+  font-family: var(--mch-display);
+  font-weight: 800;
+  font-size: 22px;
+  line-height: 1.15;
+  color: var(--mch-tinta);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.mch-hero-lema {
+  margin: 5px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: 600;
+  color: var(--mch-tinta-suave);
+}
+
+/* ── Secciones y encabezados ───────────────────────────────────────────────── */
+.mch-orienta,
+.mch-grupo {
+  margin-top: 20px;
+}
+.mch-h2 {
+  margin: 0;
+  font-family: var(--mch-display);
+  font-weight: 800;
+  font-size: 17px;
+  line-height: 1.2;
+  color: var(--mch-tinta);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* hilo cosido del cuaderno bajo cada título de sección */
+.mch-h2::after {
+  content: '';
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: repeating-linear-gradient(90deg,
+    color-mix(in srgb, var(--mch-verde) 55%, transparent) 0 5px,
+    transparent 5px 9px);
+  opacity: 0.6;
+}
+.mch-sub {
+  margin: 4px 0 10px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--mch-tinta-suave);
+  max-width: 52ch;
+}
+
+/* ── Orientación por régimen de lluvia ─────────────────────────────────────── */
+.mch-seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.mch-seg-btn {
+  flex: 1 1 auto;
+  min-height: 46px;
+  padding: 8px 12px;
+  border-radius: 13px;
+  border: 1.5px solid rgba(38, 51, 31, 0.16);
+  background: var(--mch-papel);
+  color: var(--mch-tinta);
+  font-family: var(--mch-body);
+  font-weight: 700;
+  font-size: 12.5px;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 140ms ease, background 140ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.mch-seg-btn.is-on {
+  border-color: var(--mch-verde);
+  background: color-mix(in srgb, var(--mch-verde) 12%, var(--mch-papel));
+  box-shadow: inset 0 0 0 1px var(--mch-verde);
+}
+.mch-seg-btn:focus-visible {
+  outline: 3px solid var(--mch-verde);
+  outline-offset: 2px;
+}
+
+.mch-ventanas {
+  border: 1px solid rgba(38, 51, 31, 0.14);
+  border-left: 4px solid var(--mch-ocre);
+  border-radius: 12px;
+  background: var(--mch-papel);
+  padding: 11px 13px;
+  box-shadow: 0 1px 6px rgba(38, 51, 31, 0.07);
+}
+.mch-ventanas-desc {
+  margin: 0 0 9px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--mch-tinta);
+}
+.mch-ventanas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 9px;
+}
+.mch-ventana {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  background: var(--mch-papel-2);
+  border: 1px solid rgba(38, 51, 31, 0.1);
+}
+.mch-ventana b {
+  font-family: var(--mch-display);
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--mch-verde-hondo);
+}
+.mch-ventana span {
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: var(--mch-tinta);
+}
+.mch-ventana i {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--mch-tinta-suave);
+}
+.mch-nota {
+  margin: 9px 0 0;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--mch-tinta-suave);
+}
+.mch-fuente {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--mch-ocre);
+  white-space: nowrap;
+}
+
+/* ── Láminas de función (re-rutean a pantallas existentes) ─────────────────── */
+.mch-laminas {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.mch-lamina,
+.mch-calc-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 60px;
+  padding: 10px 12px;
+  border-radius: 15px;
+  border: 1px solid rgba(38, 51, 31, 0.14);
+  background: var(--mch-papel);
+  color: var(--mch-tinta);
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 1px 6px rgba(38, 51, 31, 0.07);
+  transition: transform 140ms ease, box-shadow 140ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.mch-lamina:active,
+.mch-calc-toggle:active { transform: scale(0.988); }
+@media (hover: hover) {
+  .mch-lamina:hover,
+  .mch-calc-toggle:hover { box-shadow: 0 4px 14px rgba(38, 51, 31, 0.13); }
+}
+.mch-lamina:focus-visible,
+.mch-calc-toggle:focus-visible {
+  outline: 3px solid var(--mch-verde);
+  outline-offset: 2px;
+}
+.mch-lamina-ic {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  border-radius: 12px;
+  background: var(--mch-papel-2);
+  border: 1px solid color-mix(in srgb, var(--mch-verde) 40%, transparent);
+}
+.mch-lamina-txt {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.mch-lamina-txt b {
+  font-family: var(--mch-display);
+  font-weight: 800;
+  font-size: 14.5px;
+  line-height: 1.2;
+}
+.mch-lamina-txt small {
+  font-size: 11.5px;
+  line-height: 1.3;
+  color: var(--mch-tinta-suave);
+}
+.mch-lamina-ir {
+  flex: 0 0 auto;
+  font-weight: 800;
+  color: var(--mch-verde);
+  opacity: 0.85;
+}
+.mch-calc-toggle.is-open { border-color: var(--mch-verde); }
+
+/* ── Calculadora de grados-día ─────────────────────────────────────────────── */
+.mch-calc {
+  margin-top: 10px;
+  border: 1px solid rgba(38, 51, 31, 0.14);
+  border-radius: 16px;
+  background: var(--mch-papel);
+  padding: 13px 14px 14px;
+  box-shadow: 0 1px 6px rgba(38, 51, 31, 0.07);
+}
+.mch-calc-intro {
+  margin: 0 0 12px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--mch-tinta);
+}
+.mch-calc-grupo {
+  border: 0;
+  border-top: 1px dashed rgba(38, 51, 31, 0.18);
+  margin: 0;
+  padding: 12px 0 4px;
+}
+.mch-calc-grupo:first-of-type { border-top: 0; padding-top: 0; }
+.mch-calc-grupo legend {
+  font-family: var(--mch-display);
+  font-weight: 800;
+  font-size: 13.5px;
+  color: var(--mch-verde-hondo);
+  padding: 0;
+  margin-bottom: 8px;
+}
+.mch-calc-grupo legend small {
+  font-weight: 600;
+  color: var(--mch-tinta-suave);
+}
+.mch-calc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 9px;
+}
+.mch-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-height: 40px;
+  padding: 6px 11px;
+  border-radius: 11px;
+  border: 1.5px solid rgba(38, 51, 31, 0.16);
+  background: var(--mch-papel-2);
+  color: var(--mch-tinta);
+  font-family: var(--mch-body);
+  font-weight: 700;
+  font-size: 12.5px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 140ms ease, background 140ms ease;
+}
+.mch-chip small {
+  font-weight: 600;
+  font-size: 10px;
+  color: var(--mch-tinta-suave);
+}
+.mch-chip.is-on {
+  border-color: var(--mch-verde);
+  background: color-mix(in srgb, var(--mch-verde) 14%, var(--mch-papel));
+  box-shadow: inset 0 0 0 1px var(--mch-verde);
+}
+.mch-chip:focus-visible {
+  outline: 3px solid var(--mch-verde);
+  outline-offset: 2px;
+}
+.mch-calc-temps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+.mch-calc-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--mch-tinta-suave);
+}
+.mch-calc-campo input {
+  min-height: 44px;
+  padding: 8px 11px;
+  border-radius: 11px;
+  border: 1.5px solid rgba(38, 51, 31, 0.2);
+  background: #fff;
+  color: var(--mch-tinta);
+  font-family: var(--mch-body);
+  font-size: 15px;
+  font-weight: 700;
+}
+.mch-calc-campo input:focus-visible {
+  outline: 3px solid var(--mch-verde);
+  outline-offset: 1px;
+  border-color: var(--mch-verde);
+}
+.mch-calc-nota {
+  margin: 8px 0 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--mch-tinta-suave);
+}
+.mch-calc-aviso {
+  margin: 12px 0;
+  padding: 10px 12px;
+  border-radius: 11px;
+  background: #fbeecf;
+  border: 1px solid var(--mch-ocre);
+  color: #6b4e12;
+  font-size: 12px;
+  font-weight: 700;
+}
+.mch-calc-resultado {
+  margin: 12px 0;
+  padding: 12px 14px;
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--mch-verde) 10%, var(--mch-papel));
+  border: 1px solid color-mix(in srgb, var(--mch-verde) 35%, transparent);
+}
+.mch-calc-big {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+}
+.mch-calc-big b {
+  font-family: var(--mch-display);
+  font-weight: 800;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--mch-verde-hondo);
+}
+.mch-calc-big span {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--mch-tinta-suave);
+}
+.mch-calc-porque {
+  margin: 9px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--mch-tinta);
+}
+.mch-calc-etapa {
+  margin-top: 10px;
+  padding: 11px 13px;
+  border-radius: 12px;
+  background: var(--mch-papel-2);
+  border: 1px solid rgba(38, 51, 31, 0.12);
+}
+.mch-calc-etapa p { margin: 0 0 6px; font-size: 12.5px; line-height: 1.4; }
+.mch-calc-etapa p:last-child { margin-bottom: 0; }
+.mch-calc-etapa-actual b { color: var(--mch-verde-hondo); }
+.mch-calc-etapa-prox { color: var(--mch-tinta-suave); }
+.mch-calc-pie {
+  margin: 12px 0 0;
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: var(--mch-tinta-suave);
+  font-style: italic;
+}
+
+/* ── Saber cultural: calendario lunar ──────────────────────────────────────── */
+.mch-luna {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin-top: 20px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: color-mix(in srgb, #3a4a7a 8%, var(--mch-papel));
+  border: 1px solid rgba(38, 51, 31, 0.14);
+  border-left: 4px solid #5b6ea8;
+}
+.mch-luna-ic { font-size: 22px; line-height: 1.2; flex: 0 0 auto; }
+.mch-luna p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--mch-tinta);
+}
+
+/* ── El agente al pie ──────────────────────────────────────────────────────── */
+.mch-agente {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 20px;
+  min-height: 58px;
+  padding: 10px 14px;
+  border-radius: 15px;
+  border: 1.5px dashed var(--mch-verde);
+  background: color-mix(in srgb, var(--mch-papel-2) 60%, var(--mch-papel));
+  color: var(--mch-tinta);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.mch-agente > span:first-child { font-size: 22px; }
+.mch-agente b {
+  display: block;
+  font-family: var(--mch-display);
+  font-weight: 800;
+  font-size: 14.5px;
+}
+.mch-agente small {
+  display: block;
+  font-size: 11.5px;
+  color: var(--mch-tinta-suave);
+}
+.mch-agente:focus-visible {
+  outline: 3px solid var(--mch-verde);
+  outline-offset: 2px;
+}
+
+/* ── Accesibilidad de movimiento ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .mch-lamina,
+  .mch-calc-toggle,
+  .mch-seg-btn,
+  .mch-chip { transition: none; }
+  .mch-lamina:active,
+  .mch-calc-toggle:active { transform: none; }
+}

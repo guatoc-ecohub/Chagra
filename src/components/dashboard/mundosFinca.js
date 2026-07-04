@@ -29,6 +29,10 @@
  *   featured — true = tarjeta grande (ancho completo) en la grilla.
  *   directo  — {view, data}: el mundo ES una sola pantalla → la tarjeta navega
  *              directo (sin pantalla intermedia de mundo).
+ *   portada  — view de una PORTADA de mundo a medida (hub ilustrado) que
+ *              reemplaza a la MundoScreen genérica: la tarjeta y el índice
+ *              navegan ahí. Convive con `entradas` (que siguen congelando la
+ *              reachability y sirven de fallback genérico si hiciera falta).
  *   entradas — funciones del mundo: {view, label, desc, emoji, data?}.
  *              `view` SIEMPRE es un case real de App.jsx.
  */
@@ -41,6 +45,9 @@ export const MUNDOS_FINCA = [
         lema: 'Qué sembrar, cuándo, y cómo van sus matas',
         tinte: ['#3f8f4e', '#dcedc9'],
         featured: true,
+        // Portada a medida (hub del mundo cultivos): orienta por región/clima,
+        // agrupa las funciones existentes y suma la calculadora de grados-día.
+        portada: 'mundo_cultivos',
         entradas: [
             { view: 'directorio', label: 'Qué puedo sembrar', desc: 'Especies para su clima, con qué se llevan y sus plagas', emoji: '🌱' },
             { view: 'calendario_finca', label: 'Calendario de la finca', desc: 'Cuándo sembrar, abonar y cosechar, todo junto', emoji: '🗓️' },

@@ -46,9 +46,11 @@ export default function MundoScreen({ mundoId, onBack, onNavigate }) {
                                 type="button"
                                 className="mf-indice-item"
                                 style={{ '--mf-a': m.tinte[0], '--mf-b': m.tinte[1] }}
-                                onClick={() => (m.directo
-                                    ? onNavigate?.(m.directo.view, m.directo.data)
-                                    : onNavigate?.('mundo', { mundo: m.id }))}
+                                onClick={() => {
+                                    if (m.portada) onNavigate?.(m.portada);
+                                    else if (m.directo) onNavigate?.(m.directo.view, m.directo.data);
+                                    else onNavigate?.('mundo', { mundo: m.id });
+                                }}
                                 aria-label={`${m.titulo}: ${m.lema}`}
                             >
                                 <span aria-hidden="true" className="mf-indice-emoji">{m.emoji}</span>
