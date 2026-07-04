@@ -128,7 +128,7 @@ export default function PoscosechaScreen({ onBack, onNavigate }) {
       <div className="px-4 pb-10">
         {pilar === 'hub' && <Hub onIr={setPilar} onNavigate={onNavigate} />}
         {pilar === 'cosecha' && <PilarCosecha />}
-        {pilar === 'guardar' && <PilarGuardar />}
+        {pilar === 'guardar' && <PilarGuardar onNavigate={onNavigate} />}
         {pilar === 'transformar' && <PilarTransformar onNavigate={onNavigate} />}
       </div>
     </div>
@@ -324,7 +324,7 @@ function RegistroCosecha({ titulo, texto, fuente }) {
 }
 
 /* ─────────────────── Pilar 2 — Guardar bien ─────────────────── */
-function PilarGuardar() {
+function PilarGuardar({ onNavigate }) {
   return (
     <div className="flex flex-col gap-5">
       {/* 2a. Calculadora de secado de grano (determinista) */}
@@ -377,6 +377,16 @@ function PilarGuardar() {
         </p>
         <p className="mt-1.5 text-[11px] text-slate-500">Fuente: FAO / SciELO · confianza media-alta.</p>
       </section>
+
+      {/* 2e. Puente al módulo profundo de almacenamiento (extiende esta sección) */}
+      {onNavigate ? (
+        <PuenteBoton
+          icon={Warehouse}
+          titulo="Almacenamiento y conservación a fondo"
+          sub="Troja y silo con calculadoras, plagas de almacén, micotoxinas y el guard de botulismo."
+          onClick={() => onNavigate('almacenamiento')}
+        />
+      ) : null}
     </div>
   );
 }

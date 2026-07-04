@@ -638,6 +638,19 @@
 }
 
 /* ===========================================================================
+ * ALMACENAMIENTO Y CONSERVACIÓN — el sol respira sobre el silo hermético
+ * (AlmacenamientoScreen). Sutil e infinito muy lento; se apaga con
+ * prefers-reduced-motion.
+ * =========================================================================== */
+.al-sun {
+  transform-origin: 206px 26px;
+  animation: pc-breathe 4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .al-sun { animation: none; }
+}
+
+/* ===========================================================================
  * LOADING SKELETON DARK — fondo oscuro unificado para estados de carga.
  *
  * Tarea 81: .loading-skeleton-dark evita flash blanco en dark theme

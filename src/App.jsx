@@ -124,6 +124,13 @@ const SemillaScreen = lazy(() => import('./components/semilla/SemillaScreen'));
 // secado de grano a humedad segura) y transformar el excedente con su punto
 // crítico de inocuidad. Cifras grounded al DR nacional/internacional.
 const PoscosechaScreen = lazy(() => import('./components/PoscosechaScreen'));
+// Módulo "Almacenamiento y Conservación de Alimentos" (mundo Mercado y despensa):
+// EXTIENDE/absorbe la poscosecha. 4 pilares — almacenar (troja/silo hermético +
+// calculadora determinista de pérdida evitada y capacidad), conservar (con el
+// GUARD DE BOTULISMO pH 4,6 / olla a presión, autoridad institucional), plagas
+// de almacén (Sitophilus/Prostephanus) y micotoxinas. Cifras grounded al DR
+// TRIPLE; slots no cerrados (Res. 4506/2013, salado, dosis 10:1) grounded-pendiente.
+const AlmacenamientoScreen = lazy(() => import('./components/AlmacenamientoScreen'));
 // LOS MUNDOS DE MI FINCA (reestructuración 2.0 del home): un mundo por dentro —
 // las funciones existentes agrupadas por lugar. Re-rutea, no reimplementa.
 const MundoScreen = lazy(() => import('./components/MundoScreen'));
@@ -246,6 +253,11 @@ const HASH_VIEW_ROUTES = {
   poscosecha: 'poscosecha',
   despensa: 'poscosecha',
   'poscosecha-despensa': 'poscosecha',
+  almacenamiento: 'almacenamiento',
+  'almacenamiento-conservacion': 'almacenamiento',
+  conservacion: 'almacenamiento',
+  almacenar: 'almacenamiento',
+  silo: 'almacenamiento',
 };
 
 // Vistas que cuentan como "módulo" para telemetría de piloto.
@@ -255,7 +267,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'toxicologia', 'aprende', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'toxicologia', 'aprende', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
   'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
@@ -1339,6 +1351,19 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Poscosecha y Despensa">
               <PoscosechaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'almacenamiento':
+        // Módulo "Almacenamiento y Conservación de Alimentos" (mundo Mercado y
+        // despensa): EXTIENDE/absorbe la poscosecha. 4 pilares (almacenar /
+        // conservar con guard de botulismo / plagas de almacén / micotoxinas) +
+        // calculadoras deterministas de pérdida evitada y capacidad. Cifras
+        // grounded al DR TRIPLE; slots no cerrados grounded-pendiente.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Almacenamiento y Conservación">
+              <AlmacenamientoScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
