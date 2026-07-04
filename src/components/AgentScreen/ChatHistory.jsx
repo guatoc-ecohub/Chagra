@@ -29,7 +29,7 @@ const FLOATING_BACK_THRESHOLD_PX = 160;
  * @param {Object|null} [props.proactiveGreeting=null] - Datos del saludo proactivo dinámico.
  * @param {Function} props.onBack - Callback para volver a la pantalla anterior.
  */
-export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, onConsentNeeded, onRetryOrphan, onCancelDeepResearch, onDismissInsight, proactiveGreeting = null, onBack }) {
+export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, onConsentNeeded, onRetryOrphan, onCancelDeepResearch, onDismissInsight, onAyudaAction, proactiveGreeting = null, onBack }) {
   const bottomRef = useRef(null);
   const scrollRef = useRef(null);
   // (B) Botón "Volver" flotante: visible solo cuando el operador se alejó del
@@ -212,6 +212,22 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
                     : undefined
                 }
               />
+            )}
+            {/* AYUDA GROUNDED («Chagra enseña a usar Chagra»): deep-link a la
+                función que el agente acaba de explicar. Navega con el mismo
+                mecanismo de la mano (onNavigate) o siembra la pregunta insignia. */}
+            {msg._ayudaAction && typeof onAyudaAction === 'function' && (
+              <div className="mb-4 ml-12 -mt-2">
+                <button
+                  type="button"
+                  onClick={() => onAyudaAction(msg._ayudaAction)}
+                  data-testid="ayuda-deeplink"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-emerald-600/90 hover:bg-emerald-500 text-white text-sm font-semibold shadow-lg active:scale-95 transition"
+                >
+                  <span aria-hidden>↗</span>
+                  <span>{msg._ayudaAction.label}</span>
+                </button>
+              </div>
             )}
           </React.Fragment>
         );

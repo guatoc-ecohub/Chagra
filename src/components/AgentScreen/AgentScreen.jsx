@@ -52,6 +52,12 @@ import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities,
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
 // el chip cuyo backend aún no existe (deep).
 import { planForcedIntent, isStubIntent, isDeepResearchIntent, CHIP_DEFS } from '../../services/chipIntentRouter';
+// «Chagra enseña a usar Chagra» (ayuda groundeada): detecta preguntas META
+// («¿cómo uso X?», «¿qué puede hacer Chagra?», «¿dónde veo los precios?») y
+// responde DESDE el manifiesto (ayudaFunciones) — sin LLM, nunca inventa una
+// función que no existe, y evita el misroute meta→get_species.
+import { detectMetaAyudaIntent } from '../../services/metaAyudaIntent';
+import { buildAyudaResponse } from '../../services/ayudaAgentResponder';
 // #349 — router heurístico de GROUNDING para el path de FALLO del NLU. Cuando
 // `planNlu` devuelve null (timeout/fail del sidecar bajo contención de GPU), el
 // turno NO debe saltarse el grounding: este router PURO deriva el tool obvio
@@ -2586,6 +2592,37 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     // chip activo → rutean por el NLU normal.
     let firstForcedIntent = forcedIntent;
 
+    // «CHAGRA ENSEÑA A USAR CHAGRA» (ayuda groundeada) — solo texto libre (sin
+    // chip, sin foto). Si el usuario pregunta CÓMO usar una función, QUÉ puede
+    // hacer Chagra o DÓNDE ve algo, respondemos DESDE el manifiesto de ayuda
+    // (determinístico, sin LLM): nunca inventa una función que no existe y de
+    // paso evita el misroute meta→get_species → «el catálogo no tiene esa
+    // especie». Adjuntamos la acción de deep-link para el botón «Abrir …».
+    if (!forcedIntent && !visionContext && !suppressUserBubble) {
+      const meta = detectMetaAyudaIntent(trimmed);
+      if (meta.isMeta) {
+        const resp = buildAyudaResponse(meta);
+        if (resp && resp.content) {
+          const userMessage = { role: 'user', content: trimmed, timestamp: Date.now() };
+          const assistantMessage = {
+            role: 'assistant',
+            content: resp.content,
+            timestamp: Date.now(),
+            ...(resp.ayudaAction ? { _ayudaAction: resp.ayudaAction } : {}),
+          };
+          setMessages((prev) => [...prev, userMessage, assistantMessage]);
+          try {
+            await addTurn(operatorId, { role: 'user', content: trimmed });
+            await addTurn(operatorId, { role: 'assistant', content: resp.content });
+          } catch (e) {
+            console.warn('[Agent] ayuda addTurn failed (continuo):', e?.message);
+          }
+          setActiveIntent(null);
+          return;
+        }
+      }
+    }
+
     const route = selectChatRoute(trimmed);
     const result = useAgentQueueStore.getState().enqueue(trimmed, route);
 
@@ -2757,6 +2794,19 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     });
     // Tras cualquier acción (o no-op de capacidad por lanzar) cerramos la mano.
     if (acted) setSheetOpen(false);
+  };
+
+  // Deep-link de una tarjeta de AYUDA («Abrir …» / «Preguntar: …»): navega a la
+  // vista con el MISMO mecanismo de la mano (onNavigate → HASH_VIEW_ROUTES) o,
+  // para capacidades tipo `ask`, siembra la pregunta insignia en el chat.
+  const handleAyudaAction = (action) => {
+    if (!action) return;
+    if (action.tipo === 'nav' && action.view) {
+      try { agentSounds.start(); } catch { /* sonido opcional */ }
+      if (onNavigate) onNavigate(action.view);
+    } else if (action.tipo === 'ask' && action.prompt) {
+      handleSubmit(action.prompt);
+    }
   };
 
   // ── Foto inline desde el compositor del AgentScreen ───────────────────────
@@ -3214,6 +3264,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         onRetryOrphan={handleRetryOrphan}
         onCancelDeepResearch={handleCancelDeepResearch}
         onDismissInsight={handleDismissInsight}
+        onAyudaAction={handleAyudaAction}
         proactiveGreeting={proactiveGreeting}
         onBack={onBack}
       />
