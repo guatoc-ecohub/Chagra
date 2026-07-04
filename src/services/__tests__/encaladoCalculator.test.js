@@ -54,13 +54,13 @@ describe('calcularDosisCal — fórmula de Cochrane (1980)', () => {
     const bases = { al: 1.8, ca: 2.5, mg: 0.8, k: 0.3 }; // CICE 5.4, satAl 33.3%
     const r = calcularDosisCal(bases, { saturacionObjetivo: 25, fuente: 'cal_dolomita' });
     // exceso = 1.8 - 0.25*5.4 = 1.8 - 1.35 = 0.45
-    // req = 1.5 * 0.45 = 0.675 cmol/kg
-    expect(r.requerimientoCmol).toBeCloseTo(0.68, 1);
-    expect(COEF_COCHRANE_DEFAULT).toBe(1.5);
-    // CaCO3 puro = 0.675 * 1.2 = 0.81 t/ha
-    expect(r.dosisCaCO3Tha).toBeCloseTo(0.81, 1);
-    // ajuste PRNT 95% → 0.81 / 0.95 ≈ 0.85 t/ha
-    expect(r.dosisRealTha).toBeCloseTo(0.85, 1);
+    // req = 1.8 * 0.45 = 0.81 cmol/kg (coef 1.8 groundeado AGROSAVIA, DR suelo §3.3)
+    expect(r.requerimientoCmol).toBeCloseTo(0.81, 1);
+    expect(COEF_COCHRANE_DEFAULT).toBe(1.8);
+    // CaCO3 puro = 0.81 * 1.2 = 0.972 t/ha
+    expect(r.dosisCaCO3Tha).toBeCloseTo(0.97, 1);
+    // ajuste PRNT 95% → 0.972 / 0.95 ≈ 1.02 t/ha
+    expect(r.dosisRealTha).toBeCloseTo(1.02, 1);
     expect(r.necesitaCal).toBe(true);
     expect(FACTOR_THA_POR_CMOL_20CM_DEFAULT).toBe(1.2);
   });

@@ -3,29 +3,45 @@ import {
   estimarBiodigestor,
   ANIMALES_BIODIGESTOR,
   PARAMS_PROCESO,
+  TRH_DIAS_POR_PISO,
 } from '../biodigestorCalculator';
 
 describe('biodigestorCalculator — estimarBiodigestor', () => {
-  it('el caso insignia (300 cerdos) da un orden de magnitud coherente', () => {
+  it('el caso insignia (300 cerdos) da un orden de magnitud coherente (groundeado)', () => {
     const r = estimarBiodigestor({ tipoAnimal: 'cerdo', numAnimales: 300 });
-    // 300 × 4 kg = 1200 kg/día de estiércol fresco.
-    expect(r.estiercolKgDia).toBe(1200);
-    // Mezcla 1:3 → 1200 L estiércol + 3600 L agua = 4800 L/día.
-    expect(r.mezclaLitrosDia).toBe(4800);
-    // Volumen = 4.8 m³ × 30 días × 1.15 = 165.6 m³.
-    expect(r.volumenDigestorM3).toBeCloseTo(165.6, 1);
-    // Biogás = 1200 × 0.06 = 72 m³/día.
-    expect(r.biogasM3Dia).toBe(72);
-    // Biol = 4800 × 0.9 = 4320 L/día.
-    expect(r.biolLitrosDia).toBe(4320);
+    // 300 × 2.7 kg = 810 kg/día de estiércol fresco (2,25 kg/50 kg peso vivo,
+    // escalado a cerdo de 60 kg — Rev. Cubana de Ingeniería).
+    expect(r.estiercolKgDia).toBe(810);
+    // Mezcla 1:1 (CIPAV/LRRD; Engormix) → 810 L estiércol + 810 L agua = 1620 L/día.
+    expect(r.mezclaLitrosDia).toBe(1620);
+    // Volumen = 1.62 m³ × 30 días (TRH default cálido/templado, LRRD 11(1)) × 1.15 ≈ 55.9 m³.
+    expect(r.volumenDigestorM3).toBeCloseTo(55.9, 1);
+    // Biogás = 810 × 0.021 (CIPAV/LRRD, biogás/kg cerdo) ≈ 17 m³/día.
+    expect(r.biogasM3Dia).toBeCloseTo(17, 0);
+    // Biol = 1620 × 0.9 = 1458 L/día.
+    expect(r.biolLitrosDia).toBe(1458);
     expect(r.groundedPendiente).toBe(true);
+  });
+
+  it('el TRH depende del PISO TÉRMICO, no es fijo (páramo ≈104 días)', () => {
+    const sinPiso = estimarBiodigestor({ tipoAnimal: 'bovino', numAnimales: 5 });
+    const paramo = estimarBiodigestor({ tipoAnimal: 'bovino', numAnimales: 5, pisoTermico: 'paramo' });
+    const calido = estimarBiodigestor({ tipoAnimal: 'bovino', numAnimales: 5, pisoTermico: 'calido' });
+    expect(sinPiso.trhDias).toBe(TRH_DIAS_POR_PISO.calido.dias); // default = cálido/templado
+    expect(calido.trhDias).toBe(30);
+    expect(paramo.trhDias).toBe(104);
+    // Mismo hato, pero el digestor en páramo debe ser mucho más grande (más
+    // días de retención con la misma carga diaria).
+    expect(paramo.volumenDigestorM3).toBeGreaterThan(calido.volumenDigestorM3 * 3);
   });
 
   it('escala linealmente con el número de animales', () => {
     const a = estimarBiodigestor({ tipoAnimal: 'cerdo', numAnimales: 100 });
     const b = estimarBiodigestor({ tipoAnimal: 'cerdo', numAnimales: 200 });
-    expect(b.biogasM3Dia).toBeCloseTo(a.biogasM3Dia * 2, 5);
-    expect(b.volumenDigestorM3).toBeCloseTo(a.volumenDigestorM3 * 2, 5);
+    // Tolerancia amplia (±0.5): cada valor se redondea a 1 decimal por
+    // separado, así que doblar la entrada no dobla el redondeado EXACTO.
+    expect(b.biogasM3Dia).toBeCloseTo(a.biogasM3Dia * 2, 0);
+    expect(b.volumenDigestorM3).toBeCloseTo(a.volumenDigestorM3 * 2, 0);
   });
 
   it('con 0 animales todo es 0 (sin NaN ni negativos)', () => {
@@ -42,6 +58,13 @@ describe('biodigestorCalculator — estimarBiodigestor', () => {
     expect(cerdo.estiercolKgDia).toBe(10 * ANIMALES_BIODIGESTOR.cerdo.estiercolKgDia);
     expect(gallina.estiercolKgDia).toBeCloseTo(10 * ANIMALES_BIODIGESTOR.gallina.estiercolKgDia, 5);
     expect(cerdo.estiercolKgDia).toBeGreaterThan(gallina.estiercolKgDia);
+  });
+
+  it('cerdo y bovino usan su propio rendimiento de biogás/kg groundeado', () => {
+    expect(ANIMALES_BIODIGESTOR.cerdo.biogasM3PorKg).toBeCloseTo(0.021, 3);
+    expect(ANIMALES_BIODIGESTOR.bovino.biogasM3PorKg).toBeCloseTo(0.0415, 3);
+    // La gallina no tiene cifra colombiana citable: usa el default global.
+    expect(ANIMALES_BIODIGESTOR.gallina.biogasM3PorKg).toBeUndefined();
   });
 
   it('es determinista: misma entrada → misma salida', () => {
@@ -62,8 +85,15 @@ describe('biodigestorCalculator — estimarBiodigestor', () => {
     expect(r.numAnimales).toBe(2);
   });
 
+  it('un piso térmico desconocido cae al TRH default (no revienta)', () => {
+    const r = estimarBiodigestor({ tipoAnimal: 'cerdo', numAnimales: 10, pisoTermico: 'marciano' });
+    expect(r.trhDias).toBe(PARAMS_PROCESO.TRH_DIAS);
+    expect(r.pisoTermico).toBeNull();
+  });
+
   it('los parámetros de proceso quedan expuestos para el grounding posterior', () => {
     expect(PARAMS_PROCESO.TRH_DIAS).toBeGreaterThan(0);
     expect(PARAMS_PROCESO.BIOGAS_M3_POR_KG).toBeGreaterThan(0);
+    expect(PARAMS_PROCESO.DILUCION_AGUA).toBeGreaterThan(0);
   });
 });
