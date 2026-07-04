@@ -1,0 +1,1964 @@
+{
+  "beta_vulgaris_cicla_blanca": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "brassica_oleracea_acephala_curly": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "brassica_oleracea_capitata_alba": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "brassica_oleracea_italica": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "eugenia_stipitata": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "foeniculum_vulgare": {
+    "nombres": [
+      "hinojo"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "lactuca_sativa_capitata": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "lactuca_sativa_crispa_verde": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "lactuca_sativa_longifolia_verde": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "melissa_officinalis": {
+    "nombres": [
+      "Limoncillo",
+      "balsamita mayor",
+      "citraria",
+      "erva-cidreira",
+      "toronjil"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "passiflora_edulis_morada": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "solanum_lycopersicum_cerasiforme": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "solanum_lycopersicum_sungold": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "beta_vulgaris_var_cicla": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "borojoa_patinoi": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "mangifera_indica": {
+    "nombres": [
+      "manga",
+      "mango"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "citrus_latifolia": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "citrus_sinensis": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "acca_sellowiana": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "physalis_angulata": {
+    "nombres": [
+      "Ba pist chi",
+      "Chandia tton’tto",
+      "Chapuca",
+      "Kasena",
+      "Kowane monkamo",
+      "Papicha finu puka chi",
+      "Pchfux-las-dan",
+      "Saka pukuna",
+      "Siri pia",
+      "Tomate",
+      "Tomate de Cáscara",
+      "Tomate de Hoja",
+      "Tomate de Milpa",
+      "Tomatillo",
+      "Tomatillo Chino",
+      "Tomatito",
+      "Tsakaya pukuna",
+      "Uvilla",
+      "Xpak' ch'um"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "solanum_melongena": {
+    "nombres": [
+      "berenjena"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "myrciaria_dubia": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "myrciaria_cauliflora": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "spondias_mombin": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "bunchosia_armeniaca": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "raphanus_sativus_niger": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "brassica_oleracea_sabellica": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "beta_vulgaris_cicla_morada": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "brassica_oleracea_gemmifera": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "brassica_oleracea_botrytis": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "brassica_rapa": {
+    "nombres": [
+      "Alpiste",
+      "Hoja de nabo eurasiático",
+      "Mostaza"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "brassica_napus": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "leucaena_leucocephala": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "pueraria_phaseoloides": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "mucuna_pruriens": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "flemingia_congesta": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "cratylia_argentea": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "desmodium_intortum": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "centrosema_macrocarpum": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "stylosanthes_guianensis": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "calopogonium_mucunoides": {
+    "nombres": [
+      "frisolilla",
+      "rabo de iguana"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "eucalyptus_globulus": {
+    "nombres": [
+      "Eucalipto blanco",
+      "calitro",
+      "eucalipto",
+      "eucalipto azul",
+      "eucalipto blanco",
+      "eucalipto rojo"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "bidens_alba": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "pennisetum_clandestinum": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "kyllinga_brevifolia": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "genista_monspessulana": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "uva_bifera": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "hedychium_coronarium": {
+    "nombres": [
+      "Caña de ámbar",
+      "Heliotropo",
+      "Jazmín"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "lantana_camara": {
+    "nombres": [
+      "Añono",
+      "Añunu",
+      "Bandera española",
+      "Camará",
+      "Cinco negritos",
+      "Jelen te’pun",
+      "Menta",
+      "Menta panka",
+      "Muras",
+      "Supirrosa",
+      "Tupirrosa",
+      "Venturosa",
+      "Wake najamar nupa",
+      "Yaantria",
+      "bandera española",
+      "banderas",
+      "camarà",
+      "confiturilla",
+      "espuela de galán",
+      "flor de duende",
+      "lantana",
+      "siete colores",
+      "supirosa",
+      "verbena"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "artemisia_absinthium": {
+    "nombres": [
+      "absintio",
+      "ajenjo"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "borago_officinalis": {
+    "nombres": [
+      "Boraja",
+      "borraja"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "melilotus_officinalis": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "hypericum_perforatum": {
+    "nombres": [
+      "Hierba de San Juan"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "achillea_millefolium": {
+    "nombres": [
+      "Abrofia",
+      "Ciprés de Judea",
+      "Ciprés de invierno",
+      "Ciprés de perla",
+      "Milenrama",
+      "Milenrama eurasiática",
+      "Sereno de invierno",
+      "milefólio",
+      "milenrama"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "cymbopogon_martinii": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "aloe_arborescens": {
+    "nombres": [
+      "Aloe candelabro",
+      "Sábila candelabro africano",
+      "acíbar",
+      "aloe",
+      "aloé arborescente",
+      "atzavara",
+      "balsemera",
+      "pulpos",
+      "sávila",
+      "zabila",
+      "zabira"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "sambucus_nigra": {
+    "nombres": [
+      "sabugo"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "piper_nigrum": {
+    "nombres": [
+      "pimienta"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "myristica_fragrans": {
+    "nombres": [
+      "Mirística",
+      "Nuez De Banda",
+      "Nuez De Especias",
+      "Nuez Moscada",
+      "nogal moscado",
+      "nuez moscada",
+      "nuez-moscada"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "cinnamomum_verum": {
+    "nombres": [
+      "canela",
+      "canelero de Ceilán"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "elettaria_cardamomum": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "syzygium_aromaticum": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "pimpinella_anisum": {
+    "nombres": [
+      "anís"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "foeniculum_vulgare_var_dulce": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "thymus_serpyllum": {
+    "nombres": [
+      "serpol",
+      "tomillo"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "majorana_hortensis": {
+    "nombres": [
+      "amaraco",
+      "mejorana"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "lavandula_angustifolia": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "prunus_persica": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "prunus_domestica": {
+    "nombres": [
+      "cirolero",
+      "ciruelo"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "prunus_armeniaca": {
+    "nombres": [
+      "albaricoque",
+      "chabacano",
+      "damasco",
+      "damasqueiro",
+      "damasquino"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "cydonia_oblonga": {
+    "nombres": [
+      "Membrillero",
+      "Membrillo",
+      "marmeleiro",
+      "membrillero",
+      "membrillo"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "ficus_carica": {
+    "nombres": [
+      "Brevo",
+      "Higuera",
+      "figueira",
+      "higo",
+      "higuera",
+      "higuera común"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "punica_granatum": {
+    "nombres": [
+      "Granada",
+      "granada cordelina",
+      "granado",
+      "mangrano",
+      "romazeira",
+      "romeira"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "pyrus_communis": {
+    "nombres": [
+      "Pera",
+      "Peral",
+      "pera",
+      "peral"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "malus_domestica": {
+    "nombres": [
+      "manzana",
+      "manzana agria",
+      "manzano",
+      "pomera"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "eriobotrya_japonica": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "morus_alba": {
+    "nombres": [
+      "Morera asiática",
+      "mora",
+      "moral blanco",
+      "morera blanca",
+      "morera-blanca"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "acacia_mangium": {
+    "nombres": [
+      "Acacia de hojas grandes"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "calliandra_calothyrsus": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "albizia_guachapele": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "cecropia_peltata": {
+    "nombres": [
+      "guarumo",
+      "yagrumo"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "mimosa_sensitiva": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "jacaranda_mimosifolia": {
+    "nombres": [
+      "Cacha Cacha",
+      "Chepereque",
+      "Jacaranda",
+      "Jacaranda sudamericana",
+      "Tarco",
+      "jacaranda"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "tabebuia_rosea": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "croton_lechleri": {
+    "nombres": [
+      "Ao yëhui",
+      "Hoja de sangre",
+      "Koyibe",
+      "Koñiwe",
+      "Masujin",
+      "Resina de sangre",
+      "Sacha tucufais",
+      "Sangre de drago",
+      "Sulsul",
+      "Tulan wiki",
+      "Tulan yura",
+      "Tupic",
+      "Uruch numi",
+      "Urúchmas",
+      "Yawar kaspi",
+      "Yawar wiki",
+      "Yawar wiki panka",
+      "sangre de drago",
+      "sangre de dragón",
+      "sangre de grado"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "canavalia_ensiformis": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "vigna_unguiculata": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "lablab_purpureus": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "crotalaria_juncea": {
+    "nombres": [
+      "cáñamo san"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "vicia_villosa": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "avena_sativa": {
+    "nombres": [
+      "avena",
+      "avena común",
+      "avena roja"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "hordeum_vulgare": {
+    "nombres": [
+      "Cebada",
+      "cebada"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "secale_cereale": {
+    "nombres": [
+      "centeno"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "triticum_aestivum": {
+    "nombres": [
+      "Tritiko"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "vaccinium_floribundum": {
+    "nombres": [
+      "Joyapa chiquito",
+      "Manzana",
+      "Manzanilla",
+      "Manzanilla de cerro",
+      "Mortiño",
+      "Mortiño de comer",
+      "Mortiño de quito",
+      "mortiño"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "agrostis_foliata": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "acacia_melanoxylon": {
+    "nombres": [
+      "acacia",
+      "acacia de leño negro",
+      "acacia de los filodios",
+      "acacia de madera negra",
+      "acacia negra"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "actinidia_deliciosa": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "agave_americana": {
+    "nombres": [
+      "Maguey Americano",
+      "Maguey americano",
+      "acibara",
+      "agabe",
+      "atzavara",
+      "atzavara de tanques",
+      "azabara",
+      "cabuya",
+      "cardal",
+      "maguey",
+      "pita",
+      "pitaco",
+      "pitera"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "agave_cocui": {
+    "nombres": [
+      "Cocuy",
+      "Maguey",
+      "Motua",
+      "Penca"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "agave_tequilana": {
+    "nombres": [
+      "Agave Chato",
+      "Agave azul",
+      "Mezcal azul tequilero",
+      "Tequila",
+      "maguey de tequila",
+      "maguey mezcal",
+      "maguey tequilero",
+      "mescal azul"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "aiphanes_aculeata": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "aloysia_citrodora": {
+    "nombres": [
+      "cedrón"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "amaranthus_caudatus_kiwicha": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "anacardium_excelsum": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "andropogon_gayanus": {
+    "nombres": [
+      "Pasto gamba",
+      "pasto llanero"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "anethum_graveolens": {
+    "nombres": [
+      "Abesón",
+      "Hinojo",
+      "aneto",
+      "anís alemán",
+      "eneldo"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "aniba_perutilis": {
+    "nombres": [
+      "Chachajo",
+      "Comino",
+      "Comino crespo",
+      "Laurel Comino"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "annona_mucosa": {
+    "nombres": [
+      "anona",
+      "anón amazónico",
+      "cachimán",
+      "candón",
+      "cherimoya"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "annona_squamosa": {
+    "nombres": [
+      "anon",
+      "anona blanca",
+      "anón",
+      "chirimoyo",
+      "fruta de condesa",
+      "fruta del conde",
+      "saramuyo"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "arrabidaea_chica": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "aspidosperma_polyneuron": {
+    "nombres": [
+      "Amargoroso",
+      "Carreto",
+      "Carretto",
+      "Costillo Acanalado",
+      "Cumulá",
+      "Ib",
+      "Palo Rosa",
+      "Peroba Amarela",
+      "Peroba Mirim",
+      "Peroba Rajada",
+      "Peroba Rosa",
+      "Sobro"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "attalea_butyracea": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "attalea_speciosa": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "axinaea_macrophylla": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "axonopus_compressus": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "azolla_filiculoides": {
+    "nombres": [
+      "azolla",
+      "helecho lentejita"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "beta_vulgaris_altissima": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "beta_vulgaris_cicla_amarilla": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "beta_vulgaris_cicla_roja": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "bocconia_frutescens": {
+    "nombres": [
+      "Enguambo (Región del Bajío)",
+      "Gordolobo",
+      "Guacamaya",
+      "Guacamayo",
+      "Llora sangre",
+      "Papagayo",
+      "Trompeto",
+      "calderón",
+      "cojojehuite",
+      "contsitslats (totonaco)",
+      "cuatlatlaya",
+      "cuauchichili",
+      "gualichi, guachile",
+      "inguande"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "bombacopsis_quinata": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "borojoa_sorbilis": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "brachiaria_brizantha": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "brachiaria_decumbens": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "brassica_oleracea_acephala_lacinato": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "brassica_oleracea_acephala_red_russian": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "brassica_oleracea_capitata_rubra": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "brassica_oleracea_sabauda": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "brassica_oleracea_var_acephala": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "brassica_oleracea_var_capitata": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "brassica_rapa_rapifera": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "brassica_rapa_var_rapa": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "buddleja_americana": {
+    "nombres": [
+      "Kishwar",
+      "Salvia",
+      "Salvia real"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "bursera_graveolens": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "byrsonima_crassifolia": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "caesalpinia_sappan": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "cajanus_cajan": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "canna_edulis": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "capsicum_pubescens_rocoto": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "cariniana_estrellensis": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "cariniana_pyriformis": {
+    "nombres": [
+      "Abarco"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "cassia_grandis": {
+    "nombres": [
+      "Carao",
+      "Caña fístula",
+      "Cañafístula",
+      "Sandal",
+      "sándalo",
+      "árbol de fuego"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "cattleya_trianae": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "cecropia_telealba": {
+    "nombres": [
+      "Yarumo Blanco"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "cestrum_nocturnum": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "chamaemelum_nobile": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "chrysophyllum_cainito": {
+    "nombres": [
+      "caimito",
+      "caimito blanco",
+      "caimito morado"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "cinchona_officinalis": {
+    "nombres": [
+      "cascarilla",
+      "árbol de quina"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "clethra_fagifolia": {
+    "nombres": [
+      "Ahuyamo"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "clusia_grandiflora": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "clusia_multiflora": {
+    "nombres": [
+      "Cucharo",
+      "Gaque"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "cnidoscolus_aconitifolius": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "colocasia_antiquorum": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "cosmos_sulphureus": {
+    "nombres": [
+      "Cosmos azufrado",
+      "Mirasol amarillo",
+      "cinco llagas"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "costus_spicatus": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "crassula_ovata": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "cuminum_cyminum": {
+    "nombres": [
+      "comino"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "cymbopogon_flexuosus": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "cymbopogon_nardus": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "cynara_cardunculus_scolymus": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "cynodon_nlemfuensis": {
+    "nombres": [
+      "pasto Alicia"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "cyperus_articulatus": {
+    "nombres": [
+      "Jureshtai pirípri",
+      "Napi pirípri",
+      "Piri piri",
+      "Piripiri",
+      "Ñumi"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "dahlia_imperialis": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "dicksonia_sellowiana": {
+    "nombres": [
+      "Helecho de tronco",
+      "helecho lanudo"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "dioscorea_japonica": {
+    "nombres": [
+      "yamaimo",
+      "Ñame de Japón"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "dodonaea_viscosa": {
+    "nombres": [
+      "Chamana",
+      "Chanchillo",
+      "Chirca",
+      "Chirca de Monte",
+      "Crestona",
+      "Cucaracha",
+      "Hayuelo",
+      "Santa María",
+      "chapulixtle",
+      "granadillo"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "drimys_granadensis": {
+    "nombres": [
+      "Ajicillo",
+      "Ají",
+      "Ají de monte",
+      "Canelo de Páramo",
+      "Chilemuelo",
+      "Chilillo",
+      "Cucharo hojiblanco"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "dysphania_ambrosioides": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "epiphyllum_phyllanthus": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "erythrina_rubrinervia": {
+    "nombres": [
+      "Balú",
+      "Chochito",
+      "Chochitos",
+      "Chocho",
+      "Chocho de árbol",
+      "Chochos",
+      "Palo Sabre",
+      "Pernilla de Casa",
+      "Siringay",
+      "amasisa",
+      "chochos de árbol",
+      "haymura",
+      "peronio",
+      "porotillo",
+      "poroto",
+      "sirigual",
+      "siriguay",
+      "wayruru"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "escallonia_pendula": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "festuca_arundinacea": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "foeniculum_vulgare_azoricum": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "freziera_canescens": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "furcraea_andina": {
+    "nombres": [
+      "Cabuya",
+      "Cabuya blanca",
+      "Cabuyo blanco",
+      "Penco",
+      "Penco blanco",
+      "penco blanco"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "gaiadendron_punctatum": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "genipa_americana": {
+    "nombres": [
+      "Airo toa",
+      "Bi",
+      "Bi-nané",
+      "Caporán",
+      "Genipa",
+      "Genipap",
+      "Guaitil",
+      "Huëe",
+      "Jagua",
+      "Jagua de comar",
+      "Jagua dulce",
+      "Jenipapo",
+      "Mali",
+      "Shiño",
+      "Sua",
+      "Teta de vieja",
+      "Wituk",
+      "caruto",
+      "genipa",
+      "huito",
+      "irayol",
+      "yagua"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "gossypium_barbadense_criollo": {
+    "nombres": [
+      "Algodón",
+      "Algodón de monte",
+      "Dayonwe",
+      "Jo’ya yui",
+      "Kewa chi",
+      "Kuwa",
+      "Oya yëi",
+      "Runa algodón",
+      "Shicha ta’va",
+      "Ta’va",
+      "Tree cotton",
+      "Urúch",
+      "Yakabewe",
+      "algodonero de las Barbados",
+      "algodón"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "hibiscus_sabdariffa": {
+    "nombres": [
+      "acedera de Guinea",
+      "rosa de Jamaica",
+      "serení"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "huberodendron_patinoi": {
+    "nombres": [
+      "Carra",
+      "Carrá",
+      "Coco Volador"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "hylocereus_undatus": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "ilex_kunthiana": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "illicium_verum": {
+    "nombres": [
+      "Anís Estrella",
+      "Badiana",
+      "anís de China",
+      "anís estrellado",
+      "badián"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "inga_alba": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "inga_densiflora": {
+    "nombres": [
+      "A’cho fiño",
+      "Eweban",
+      "Guaba",
+      "Guaba machetona",
+      "Guaba machetona silvestre",
+      "Guaba salada",
+      "Guabo panaco",
+      "Kusillu pakay",
+      "Machetona",
+      "Machetona pakay",
+      "Nomonebe",
+      "Otensa fiño",
+      "Pakay machetona",
+      "Pilingas pakay",
+      "Tona pené",
+      "Ttofi fiño",
+      "Yana kara"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "inga_vera": {
+    "nombres": [
+      "Guaba",
+      "Guabilla",
+      "Illta",
+      "Suru pakay",
+      "guamo"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "ipomoea_aquatica": {
+    "nombres": [
+      "espinaca acuática"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "juglans_neotropica": {
+    "nombres": [
+      "Cedro Grande",
+      "Cedro Negro",
+      "Nogal",
+      "Tocte",
+      "Tukti",
+      "cedro nogal",
+      "nogal",
+      "tocte"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "juncus_effusus": {
+    "nombres": [
+      "Junca",
+      "Junco de esteras",
+      "junquera"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "kalanchoe_blossfeldiana": {
+    "nombres": [
+      "Kalanchoe de Madagascar",
+      "oreja de ratón"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "kalanchoe_pinnata": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "lactuca_sativa_longifolia_morada": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "lavandula_dentata": {
+    "nombres": [
+      "alhucema rizada",
+      "cantueso dentado",
+      "cantueso rizado",
+      "espliego dentado",
+      "rosmaninho"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "lecythis_minor": {
+    "nombres": [
+      "Olla de Mono",
+      "coco de mono"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "lemna_minor": {
+    "nombres": [
+      "Lenteja de agua"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "levisticum_officinale": {
+    "nombres": [
+      "Apio de monte",
+      "apio de montaña",
+      "levístico"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "lippia_alba": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "lolium_perenne": {
+    "nombres": [
+      "ballico perenne",
+      "césped inglés",
+      "raygras",
+      "raygrás inglés"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "lonchocarpus_velutinus": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "magnolia_caricifragrans": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "magnolia_yarumalensis": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "malus_domestica_sabanera": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "mammea_americana": {
+    "nombres": [
+      "Mamón",
+      "abricó",
+      "albricoque",
+      "mamey"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "manihot_glaziovii": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "masdevallia_coccinea": {
+    "nombres": [
+      "Bandera colorada"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "mauritia_minor": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "medicago_sativa": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "melicoccus_bijugatus": {
+    "nombres": [
+      "Limoncillo",
+      "Mamon",
+      "mamoncillo",
+      "mamón"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "miconia_squamulosa": {
+    "nombres": [
+      "Esmeraldo",
+      "Nigüito",
+      "Tuno",
+      "Tuno Esmeralda",
+      "Tuno Esmeraldo"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "mikania_micrantha": {
+    "nombres": [
+      "Matico silvestre",
+      "Pulaya kiwa",
+      "Rabo de ardilla",
+      "Suwanbe chuwa",
+      "Wakitu",
+      "Wanbe tape"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "mirabilis_expansa": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "monarda_didyma": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "morella_pubescens": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "morus_nigra_mora_de_arbol": {
+    "nombres": [
+      "Moral",
+      "moral negro",
+      "morera negra",
+      "morera negra asiática",
+      "morera-negra"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "myrcia_popayanensis": {
+    "nombres": [
+      "Arrayancito"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "myrcianthes_ferreyrae": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "myrcianthes_rhopaloides": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "myristica_fragrans_americana": {
+    "nombres": [
+      "Mirística",
+      "Nuez De Banda",
+      "Nuez De Especias",
+      "Nuez Moscada",
+      "nogal moscado",
+      "nuez moscada",
+      "nuez-moscada"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "myroxylon_pereirae": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "myrsine_coriacea": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "nasturtium_officinale": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "nectandra_acutifolia": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "nigella_sativa": {
+    "nombres": [
+      "Neguilla",
+      "ajenuz",
+      "arañuel"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "nymphaea_alba_andina": {
+    "nombres": [
+      "Nenúfar blanco europeo",
+      "Nenúfar europeo blanco"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "ochroma_pyramidale": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "ocotea_calophylla": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "odontoglossum_crispum": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "oreopanax_floribundum": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "oreopanax_incisus": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "pachyrhizus_erosus": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "pachyrhizus_tuberosus": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "panicum_maximum_mombasa": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "parkia_pendula": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "paspalum_notatum": {
+    "nombres": [
+      "Pasto estrella",
+      "alpargata",
+      "cambute",
+      "cañamazo",
+      "grama dulce",
+      "pasto horqueta",
+      "sacasebo"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "passiflora_edulis_amarilla_colombia": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "passiflora_incarnata": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "pastinaca_sativa": {
+    "nombres": [
+      "chirivía"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "petiveria_alliacea": {
+    "nombres": [
+      "Carricillo silvestre",
+      "Condición",
+      "Condición panka",
+      "Co’arahuëëco",
+      "Monte zorillo",
+      "Rama de zorrillo",
+      "Zorrillo",
+      "anamú",
+      "apacina",
+      "hierba de las gallinitas",
+      "hierba del zorrillo",
+      "hoja de zorrillo",
+      "zorrillo"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "petroselinum_crispum_neapolitanum": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "phacelia_tanacetifolia": {
+    "nombres": [
+      "Facelia azul",
+      "facelia"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "phaseolus_vulgaris_nuna": {
+    "nombres": [
+      "Common bean",
+      "Frijol",
+      "Fréjol",
+      "Habichuelas",
+      "Mulu fintsumu buli",
+      "Poroto",
+      "Purutu",
+      "Verdura",
+      "Wamolo",
+      "alubia",
+      "caraota",
+      "frijol",
+      "fréjol",
+      "fríjol",
+      "habichuela",
+      "judía",
+      "judía común",
+      "poroto"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "phytelephas_macrocarpa": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "phytelephas_seemannii": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "pithecellobium_dulce": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "polygonum_punctatum": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "polypodium_decumanum": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "pouteria_torta": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "prosopis_juliflora": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "prunus_avium_ducezno": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "prunus_domestica_ciruela_imperial": {
+    "nombres": [
+      "cirolero",
+      "ciruelo"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "prunus_persica_amarilla": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "prunus_serotina_capuli": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "pseudobombax_septenatum": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "pseudosamanea_guachapele": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "psidium_friedrichsthalianum": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "psophocarpus_tetragonolobus": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "pyrus_communis_anjou": {
+    "nombres": [
+      "Pera",
+      "Peral",
+      "pera",
+      "peral"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "raphanus_sativus_longipinnatus": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "raphanus_sativus_oleifer": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "raphanus_sativus_sativus": {
+    "nombres": [
+      "rabanillo",
+      "rabanito",
+      "rábano",
+      "rábano blanco"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "renealmia_alpinia": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "rubus_glaucus_sin_espinas": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "rubus_idaeus_golden": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "rubus_idaeus_heritage": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "salvia_officinalis": {
+    "nombres": [
+      "Mermasangre",
+      "Salvia",
+      "Salvia Real",
+      "Salvia dulce",
+      "Salvia fina",
+      "salvia real"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "sambucus_nigra_peruviana": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "sambucus_peruviana": {
+    "nombres": [
+      "Sauco",
+      "Sauco grande",
+      "Tilo",
+      "saúco"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "sansevieria_trifasciata": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "selaginella_lepidophylla": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "selenicereus_megalanthus": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "setaria_sphacelata": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "simarouba_amara": {
+    "nombres": [
+      "Aceituno negrito",
+      "Algarrobo",
+      "Amargo",
+      "Cedro blanco",
+      "Juan Primero",
+      "Linsu kaspi",
+      "Simaruba",
+      "aceituno",
+      "maruba",
+      "marupa"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "solanum_americanum": {
+    "nombres": [
+      "Ají Montesino",
+      "Chimblas",
+      "Ekelite",
+      "Hierba mora",
+      "Jachafili",
+      "Killi panka",
+      "Martillo",
+      "Mortiño",
+      "Paban chinpalo",
+      "Pili muyu",
+      "Quelite",
+      "Shimpiship",
+      "Shinpishi",
+      "Wampishkúr",
+      "chichiquelite",
+      "hierba mora",
+      "hierba mora negra"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "solanum_lycopersicum_cerasiforme_uvalina": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "solanum_muricatum": {
+    "nombres": [
+      "Cachum",
+      "Pepino",
+      "mataserrano",
+      "pepino",
+      "pepino dulce"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "solanum_quitoense_amazonico": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "solanum_tuberosum_argentina": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "spondias_dulcis": {
+    "nombres": [
+      "ambarella",
+      "jobo de la India",
+      "taperiba"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "stenocereus_griseus": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "tabebuia_chrysantha": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "talisia_olivaeformis": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "taraxacum_officinale": {
+    "nombres": [
+      "Diente de león o taraxaco",
+      "achicoria amarga",
+      "amargón",
+      "diente de león"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "terminalia_amazonia": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "theobroma_bicolor": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "tigridia_pavonia": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "tillandsia_complanata": {
+    "nombres": [
+      "Ficundo",
+      "Lechuga",
+      "Waykuntu",
+      "hiucundo"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "tithonia_diversifolia": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "typha_dominguensis": {
+    "nombres": [
+      "Enea",
+      "Espadaña",
+      "Tule",
+      "junco",
+      "masa de agua",
+      "piripepe",
+      "pirivevýi",
+      "totora"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "vaccinium_corymbosum_emerald": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "vallea_stipularis": {
+    "nombres": [
+      "Caléndula",
+      "Chulchul",
+      "Hacha rosa",
+      "Hoja de rosa",
+      "Monte pela",
+      "Morte pila",
+      "Palo de rosa",
+      "Pawkar",
+      "Peralillo",
+      "Pitill",
+      "Raque",
+      "Rosa",
+      "Sacha capulí",
+      "Urku capulí",
+      "Whisho",
+      "pichul"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "vanilla_planifolia": {
+    "nombres": [
+      "Vainilla",
+      "Vainilla Colibrí",
+      "Vainilla Mansa",
+      "Vainilla tlilxóchil",
+      "vainilla"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "verbena_officinalis": {
+    "nombres": [
+      "verbena común"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "viburnum_triphyllum": {
+    "nombres": [
+      "Bodoquero",
+      "Chucua",
+      "Chuque",
+      "Garrocho",
+      "Juan blanco",
+      "Juco",
+      "Morochillo",
+      "Palo juan",
+      "Pelotillo",
+      "Pita",
+      "Ruque",
+      "Sauco de monte",
+      "Yugoda"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "vicia_sativa": {
+    "nombres": [
+      "Algarrobilla",
+      "Lenteja rústica"
+    ],
+    "fuente": "gbif-vernacular"
+  },
+  "victoria_amazonica": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "vigna_subterranea": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "viola_odorata": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "vismia_baccifera": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "weinmannia_microphylla": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "weinmannia_pubescens": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "xanthosoma_violaceum": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  },
+  "zea_mays_capio": {
+    "nombres": [],
+    "fuente": "gbif-vernacular"
+  }
+}
