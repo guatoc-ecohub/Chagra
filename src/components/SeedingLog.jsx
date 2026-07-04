@@ -36,7 +36,7 @@ const MIN_CROP_LEN = 2;
  * @param {Function} [props.onSave] - Callback invocado tras guardado exitoso.
  * @param {Object|null} [props.initialData] - Datos iniciales para pre-llenar el formulario
  *   (crop, plant_type, variety, quantity, coordinates, notes).
- * @returns {JSX.Element}
+ * @returns {React.JSX.Element}
  */
 export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw }) {
   // Bug B4 piloto 2026-05-28: QuickActionsPanel "Agregar planta" navega a
@@ -45,7 +45,7 @@ export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw
   // intentaba leer `null.crop` y crasheaba el ErrorBoundary del componente.
   // Coalesce explícito null/undefined → {}.
   const initialData = initialDataRaw || {};
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(/** @type {{date: string, crop: string, crop_species_id: (string|null), plant_type?: ({type: string, id: string}|null), variety: string, quantity: string}} */({
     date: new Date().toISOString().split('T')[0],
     crop: initialData.crop || '', // Nombre común limpio de la especie (ej. "Fresa")
     // Bug operador 2026-06-25: id canónico del catálogo elegido en el selector.
@@ -54,7 +54,7 @@ export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw
     plant_type: initialData.plant_type || null, // ADR-019: { type: 'taxonomy_term--plant_type', id: '...' }
     variety: initialData.variety || '',
     quantity: initialData.quantity || ''
-  });
+  }));
   // Etiqueta de ubicación SEPARADA del nombre de la especie (bug operador
   // 2026-06-25): antes el campesino escribía "Fresa - Invernadero #1" todo
   // junto y la especie no resolvía. Ahora la especie se elige limpia del
@@ -250,7 +250,7 @@ export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw
         notes ? notes.trim() : '',
         locationLabel.trim() ? `Ubicación: ${locationLabel.trim()}` : '',
       ].filter(Boolean).join('\n');
-      if (composedNotes) payload.data.attributes.notes = { value: composedNotes, format: 'plain_text' };
+      if (composedNotes) /** @type {Record<string, any>} */ (payload.data.attributes).notes = { value: composedNotes, format: 'plain_text' };
 
       const result = await savePayload('seeding', payload);
 
@@ -265,6 +265,7 @@ export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw
         if (draft) {
           const now = Date.now();
           const processId = newUlid();
+          /** @type {import('../types/farmProcess').FarmProcess} */
           const process = {
             process_id: processId,
             type: 'farm_process',
@@ -349,7 +350,7 @@ export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw
   return (
     <div className="h-[100dvh] w-full bg-slate-950 text-slate-100 flex flex-col overflow-y-auto">
       <header className="p-4 sticky top-0 bg-slate-950 border-b border-slate-800 flex items-center gap-4 z-10 shrink-0 shadow-md">
-        <button onClick={onBack} aria-label="Volver" className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[56px] min-w-[56px] flex justify-center items-center shrink-0">
+        <button onClick={/** @type {React.MouseEventHandler<HTMLButtonElement>} */ (onBack)} aria-label="Volver" className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[56px] min-w-[56px] flex justify-center items-center shrink-0">
           <ArrowLeft size={32} aria-hidden="true" />
         </button>
         <h2 className="text-3xl font-bold truncate">Sembrar</h2>

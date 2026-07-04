@@ -37,7 +37,7 @@ const CATALOG_PHOTOS_BASE = '/catalog-photos';
  * redimensiona, comprime, y retorna un Blob JPEG.
  *
  * @param {File} file - input file de <input type="file" accept="image/*"> (cámara o galería)
- * @returns {Promise<{blob: Blob, width: number, height: number, originalSize: number, compressedSize: number, mime: string}>}
+ * @returns {Promise<{blob: Blob, width: number, height: number, originalSize: number, compressedSize: number, mime: string, quality: number}>}
  */
 export async function captureAndCompress(file) {
   if (!file || !file.type.startsWith('image/')) {
@@ -96,10 +96,10 @@ export async function captureAndCompress(file) {
  *
  * @param {Object} args
  * @param {Blob}   args.blob
- * @param {string} [args.assetId] — id del asset al que pertenece
- * @param {string} [args.logId]   — id del log entry (e.g. inventory_event)
- * @param {string} [args.speciesSlug] — slug del catálogo (para 2-tier resolution)
- * @param {Object} [args.meta]    — metadata extra (capturedAt, gps, notes)
+ * @param {string} [args.assetId] - id del asset al que pertenece
+ * @param {string} [args.logId]   - id del log entry (e.g. inventory_event)
+ * @param {string} [args.speciesSlug] - slug del catalogo (para 2-tier resolution)
+ * @param {Object} [args.meta]    - metadata extra (capturedAt, gps, notes)
  * @returns {Promise<number>} id de la foto persistida
  */
 export async function savePhoto({ blob, assetId, logId, speciesSlug, meta = {} }) {
@@ -328,6 +328,9 @@ function canvasToBlob(canvas, type, quality) {
   });
 }
 
+/**
+ * @param {{ assetId?: string, speciesSlug?: string, logId?: string }} params
+ */
 async function findLatestUserPhoto({ assetId, speciesSlug, logId }) {
   const db = await openDB();
   const tx = db.transaction(STORES.MEDIA_CACHE, 'readonly');

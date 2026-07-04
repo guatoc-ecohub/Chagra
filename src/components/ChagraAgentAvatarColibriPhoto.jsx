@@ -54,7 +54,7 @@ export default function ChagraAgentAvatarColibriPhoto({
   state = 'idle',
   size = 56,
   withLabel = false,
-  onClick,
+  onClick = undefined,
   onDoubleClick,
   glow = false,
   className = '',

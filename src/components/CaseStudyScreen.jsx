@@ -134,12 +134,14 @@ const NewCaseForm = ({ onCreate, onCancel, defaultFincaSlug }) => {
   const [extracting, setExtracting] = useState(false);
   const [extractError, setExtractError] = useState(null);
   const [transcribing, setTranscribing] = useState(false);
+  /** @type {{title?: boolean, problem_name?: boolean, count_total?: boolean, count_affected?: boolean}} */
   const [touched, setTouched] = useState({});
   const recorder = useVoiceRecorder();
 
   // Bug 069.10 — validación inline: títulos/problemas mínimos para no crear
   // casos de estudio basura; counts coherentes (afectados ≤ total).
   const errors = useMemo(() => {
+    /** @type {{title?: string, problem_name?: string, count_total?: string, count_affected?: string}} */
     const e = {};
     if (!form.title.trim()) e.title = 'Indica un título';
     else if (form.title.trim().length < 3) e.title = 'Mínimo 3 caracteres';

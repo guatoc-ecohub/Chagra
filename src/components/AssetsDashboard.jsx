@@ -303,7 +303,7 @@ const TAB_LABELS = {
  * @param {Function} [props.onBack] - Callback para navegar hacia atrás o cerrar el dashboard.
  * @param {string} [props.initialTab] - Pestaña activa al montar (plant, land, structure, equipment, material).
  * @param {boolean} [props.initialShowForm=false] - Si true, abre el formulario de creación automáticamente al montar.
- * @returns {JSX.Element}
+ * @returns {React.JSX.Element}
  */
 export default function AssetsDashboard({ onBack, initialTab, initialShowForm = false }) {
   const {
@@ -324,6 +324,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
 
   const { request: requestGeo } = useGeolocation();
 
+  /** @type {[string|boolean, import('react').Dispatch<import('react').SetStateAction<string|boolean>>]} */
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [showFincaModal, setShowFincaModal] = useState(false);
   // Sugerencias post-create. Miguel UX 2026-05-03: cuando user agrega
@@ -362,7 +363,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     setRagLoading(true);
     (async () => {
       try {
-        const insights = await enrichEntity({ crop: formData.name });
+        const insights = await enrichEntity(/** @type {{crop: string, quantity?: number, location?: string}} */ ({ crop: formData.name }));
         if (cancelled) return;
         setRagInsights(insights || null);
       } catch (err) {
@@ -610,6 +611,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
 
     // Construcción del template de attributes (compartido por todos los assets
     // en individual mode; en aggregate solo hay 1)
+    /** @type {{status: string, notes?: string|{value: string}, intrinsic_geometry?: {value: string}, land_type?: string, _speciesSlug?: string, _chagra_plant_meta?: object}} */
     const baseAttributes = {
       status: formData.status || 'active',
       ...(notesValue ? { notes: notesValue } : {}),
@@ -658,6 +660,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     }
 
     // Relaciones compartidas (location + parent + plant_type)
+    /** @type {Record<string, any> | null} */
     let baseRels = null;
     if (activeTab !== 'material') {
       const parentLandId = formData.parentLandId || DEFAULT_LOCATION_ID;
@@ -801,11 +804,11 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
         const plantingDateIso = formData.fechaGerminacion
           ? new Date(formData.fechaGerminacion).toISOString()
           : new Date().toISOString();
-        generatePlanForPlant({
+        generatePlanForPlant(/** @type {{assetId: string, speciesSlug: string|null, plantingDate: string}} */ ({
           assetId: assetUUIDs[0],
           speciesSlug: formData.speciesId,
           plantingDate: plantingDateIso,
-        }).then((plan) => {
+        })).then((plan) => {
           if (plan?.steps?.length > 0) {
             window.dispatchEvent(new CustomEvent('chagraToast', {
               detail: {
@@ -1246,7 +1249,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
         value={formData.notes}
         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
         placeholder="Notas de campo (opcional)"
-        rows="2"
+        rows={/** @type {number} */ ("2")}
         className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm min-h-[56px]"
       />
 
@@ -1394,7 +1397,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
         value={formData.notes}
         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
         placeholder="Notas (opcional)"
-        rows="2"
+        rows={/** @type {number} */ ("2")}
         className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm min-h-[56px]"
       />
 
@@ -1418,7 +1421,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     <div className="h-[100dvh] w-full bg-slate-950 text-slate-100 flex flex-col overflow-hidden">
       {/* Header */}
       <header className="p-4 bg-slate-950 border-b border-slate-800 flex items-center gap-4 shrink-0 shadow-md">
-        <button onClick={onBack} aria-label="Volver al panel principal" className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[48px] min-w-[48px] flex justify-center items-center shrink-0">
+        <button onClick={/** @type {React.MouseEventHandler<HTMLButtonElement>} */ (onBack)} aria-label="Volver al panel principal" className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[48px] min-w-[48px] flex justify-center items-center shrink-0">
           <ArrowLeft size={24} aria-hidden="true" />
         </button>
         <h2 className="text-2xl font-black flex-1">Activos</h2>
@@ -1891,7 +1894,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
       {/* Map picker modal (Fase 17.3) */}
       {showMapPicker && (
         <MapPicker
-          mode={showMapPicker}
+          mode={/** @type {string} */ (showMapPicker)}
           initial={formData.geometry}
           onSave={(geometry) => {
             setFormData((prev) => ({ ...prev, geometry }));

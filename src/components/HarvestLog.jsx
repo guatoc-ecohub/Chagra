@@ -87,10 +87,10 @@ const MOCK_SUB_AREAS = {
  * @param {Object} props
  * @param {Function} [props.onBack] - Callback invocado al cancelar o navegar hacia atrás.
  * @param {Function} [props.onSave] - Callback invocado tras guardado exitoso del log de cosecha.
- * @returns {JSX.Element}
+ * @returns {React.JSX.Element}
  */
 export default function HarvestLog({ onBack, onSave }) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(/** @type {{date: string, mainArea: string, subArea: string, product: string, quantity: string, unit: string, notes: string}} */({
     date: new Date().toISOString().split('T')[0],
     mainArea: '',
     subArea: '',
@@ -98,7 +98,7 @@ export default function HarvestLog({ onBack, onSave }) {
     quantity: '',
     unit: 'Kilogramos',
     notes: ''
-  });
+  }));
   const [isSaving, setIsSaving] = useState(false);
   const [medianHint, setMedianHint] = useState(null); // { median, count } | null
   const [syncedOffline, setSyncedOffline] = useState(false);
@@ -377,7 +377,7 @@ export default function HarvestLog({ onBack, onSave }) {
   return (
     <div className="h-[100dvh] w-full bg-slate-950 text-slate-100 flex flex-col overflow-y-auto">
       <header className="p-4 sticky top-0 bg-slate-950 border-b border-slate-800 flex items-center gap-4 z-10 shrink-0 shadow-md">
-        <button onClick={onBack} aria-label="Volver" className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[56px] min-w-[56px] flex justify-center items-center shrink-0">
+        <button onClick={/** @type {React.MouseEventHandler<HTMLButtonElement>} */ (onBack)} aria-label="Volver" className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[56px] min-w-[56px] flex justify-center items-center shrink-0">
           <ArrowLeft size={32} aria-hidden="true" />
         </button>
         <h2 className="text-3xl font-bold truncate">Cosechar</h2>
@@ -491,7 +491,7 @@ export default function HarvestLog({ onBack, onSave }) {
 
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Observaciones (Opcional)</span>
-          <textarea name="notes" rows="3" value={formData.notes} onChange={handleInput} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-xl text-white min-h-[80px] placeholder-slate-500" placeholder="Ej: Fruta de tamaño pequeño o picada..." />
+          <textarea name="notes" rows={Number("3")} value={formData.notes} onChange={handleInput} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-xl text-white min-h-[80px] placeholder-slate-500" placeholder="Ej: Fruta de tamaño pequeño o picada..." />
         </label>
 
         <button

@@ -108,6 +108,7 @@ export function isDeepResearchIntent(intent) {
  *   stub: boolean,              // true → no hay tool real
  *   stubResult: object | null,  // evidence sintética inyectable (ej. clima no_municipio)
  *   stubMessage: string | null, // mensaje honesto "aún no disponible" para el usuario
+ *   localGrounding: any,        // módulo client-side a inyectar (ej. 'incendio'), sin tool del sidecar
  *   prompt: string,             // texto del usuario trimmeado (lo que se manda al LLM/burbuja)
  *   skipNlu: true,              // SIEMPRE true: el chip salta el NLU planner
  * }}
@@ -415,7 +416,7 @@ const ANIMAL_PATTERNS = [
 function detectAnimalSilvo(text) {
   const t = String(text);
   for (const [re, animal] of ANIMAL_PATTERNS) {
-    if (re.test(t)) return animal;
+    if (/** @type {RegExp} */ (re).test(t)) return animal;
   }
   return null;
 }
