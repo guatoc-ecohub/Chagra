@@ -39,7 +39,12 @@ import {
   runOnAlpha,
   sidecarReachableLocally,
   generateMarkdownReport,
+  buildEnrichedSystemPrompt,
 } from '../bench-contaminacion.mjs';
+
+/** Stub por defecto del guard piso térmico: sin desajuste, no-op — evita que
+ * los tests que no lo ejercitan explícitamente peguen a la red real. */
+const noMismatchPisoTermicoFn = async () => ({ has_mismatch: false, system_prompt_block: '' });
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..', '..');
@@ -335,6 +340,26 @@ describe('loadCatalog', () => {
   });
 });
 
+describe('buildEnrichedSystemPrompt (guard piso térmico chagra-pro #288)', () => {
+  it('sin pisoTermicoBlock: prompt idéntico al comportamiento previo (retrocompatible)', () => {
+    const prompt = buildEnrichedSystemPrompt([{ kind: 'species', mentioned: 'x', nombre_cientifico: 'Y', nombre_comun: 'y' }]);
+    expect(prompt).not.toContain('GUARD PISO TÉRMICO');
+    expect(prompt).toContain('ENTIDADES DEL CATÁLOGO');
+  });
+
+  it('pisoTermicoBlock no vacío se agrega AL FINAL (recency máxima, mismo criterio que AgentScreen.jsx)', () => {
+    const prompt = buildEnrichedSystemPrompt([], '[GUARD PISO TÉRMICO — DESAJUSTE DETECTADO · innegociable]\nNo siembres esto acá.');
+    expect(prompt.endsWith('No siembres esto acá.')).toBe(true);
+    expect(prompt.indexOf('GUARD PISO TÉRMICO')).toBeGreaterThan(-1);
+  });
+
+  it('pisoTermicoBlock vacío/no-string es no-op', () => {
+    const base = buildEnrichedSystemPrompt([]);
+    expect(buildEnrichedSystemPrompt([], '')).toBe(base);
+    expect(buildEnrichedSystemPrompt([], undefined)).toBe(base);
+  });
+});
+
 // ── orquestación: resolveFn/callFn/validateFn INYECTADOS (sin red real) ────
 
 describe('runProbeAgainstAgent (dependencias inyectadas, sin red)', () => {
@@ -344,11 +369,12 @@ describe('runProbeAgainstAgent (dependencias inyectadas, sin red)', () => {
     const resolveFn = async () => ({ entities: [{ kind: 'species', mentioned: 'x' }] });
     const callFn = async () => ({ response: 'respuesta de prueba', error: null });
     const validateFn = async () => ({ hallucinated: [], detected_count: 0 });
-    const out = await runProbeAgainstAgent(probe, { resolveFn, callFn, validateFn });
+    const out = await runProbeAgainstAgent(probe, { resolveFn, callFn, validateFn, pisoTermicoFn: noMismatchPisoTermicoFn });
     expect(out.id).toBe('p1');
     expect(out.response).toBe('respuesta de prueba');
     expect(out.entities_grounded).toBe(1);
     expect(out.error).toBeNull();
+    expect(out.piso_termico_guard_fired).toBe(false);
   });
 
   it('si callFn devuelve error, no llama a validateFn (evita gastar red en vano)', async () => {
@@ -356,9 +382,55 @@ describe('runProbeAgainstAgent (dependencias inyectadas, sin red)', () => {
     const resolveFn = async () => ({ entities: [] });
     const callFn = async () => ({ response: '', error: 'timeout' });
     const validateFn = async () => { validateCalled = true; return { hallucinated: [], detected_count: 0 }; };
-    const out = await runProbeAgainstAgent(probe, { resolveFn, callFn, validateFn });
+    const out = await runProbeAgainstAgent(probe, { resolveFn, callFn, validateFn, pisoTermicoFn: noMismatchPisoTermicoFn });
     expect(out.error).toBe('timeout');
     expect(validateCalled).toBe(false);
+  });
+
+  // ── GUARD piso térmico (chagra-pro #288) — el bench debe reflejar el MISMO
+  // pipeline que producción (AgentScreen.jsx): inyecta el system_prompt_block
+  // del guard cuando hay desajuste, degrada limpio cuando no.
+  describe('wiring /piso-termico-guard (bench honesto, mismo pipeline que prod)', () => {
+    it('has_mismatch:true → el system_prompt_block del guard llega al systemPrompt que ve callFn', async () => {
+      const resolveFn = async () => ({ entities: [] });
+      let seenSystemPrompt = null;
+      const callFn = async (_model, systemPrompt) => {
+        seenSystemPrompt = systemPrompt;
+        return { response: 'r', error: null };
+      };
+      const validateFn = async () => ({ hallucinated: [], detected_count: 0 });
+      const pisoTermicoFn = async () => ({
+        has_mismatch: true,
+        system_prompt_block: '[GUARD PISO TÉRMICO — DESAJUSTE DETECTADO · innegociable]',
+      });
+      const out = await runProbeAgainstAgent(probe, { resolveFn, callFn, validateFn, pisoTermicoFn });
+      expect(seenSystemPrompt).toContain('GUARD PISO TÉRMICO');
+      expect(out.piso_termico_guard_fired).toBe(true);
+    });
+
+    it('has_mismatch:false → NO inyecta nada (no-op, prompt idéntico al de antes del guard)', async () => {
+      const resolveFn = async () => ({ entities: [] });
+      let seenSystemPrompt = null;
+      const callFn = async (_model, systemPrompt) => {
+        seenSystemPrompt = systemPrompt;
+        return { response: 'r', error: null };
+      };
+      const validateFn = async () => ({ hallucinated: [], detected_count: 0 });
+      const pisoTermicoFn = async () => ({ has_mismatch: false, system_prompt_block: '' });
+      const out = await runProbeAgainstAgent(probe, { resolveFn, callFn, validateFn, pisoTermicoFn });
+      expect(seenSystemPrompt).not.toContain('GUARD PISO TÉRMICO');
+      expect(out.piso_termico_guard_fired).toBe(false);
+    });
+
+    it('pisoTermicoFn caído/lanza error de red → degrada limpio, no rompe la sonda', async () => {
+      const resolveFn = async () => ({ entities: [] });
+      const callFn = async () => ({ response: 'r', error: null });
+      const validateFn = async () => ({ hallucinated: [], detected_count: 0 });
+      const pisoTermicoFn = async () => ({ has_mismatch: false, system_prompt_block: '', error: 'ECONNREFUSED' });
+      const out = await runProbeAgainstAgent(probe, { resolveFn, callFn, validateFn, pisoTermicoFn });
+      expect(out.error).toBeNull();
+      expect(out.piso_termico_guard_fired).toBe(false);
+    });
   });
 });
 
@@ -372,7 +444,7 @@ describe('runAllProbes (secuencial, dependencias inyectadas)', () => {
       return { response: `resp-${userPrompt}`, error: null };
     };
     const validateFn = async () => ({ hallucinated: [], detected_count: 0 });
-    const out = await runAllProbes(probes, { resolveFn, callFn, validateFn, sleepMs: 0 });
+    const out = await runAllProbes(probes, { resolveFn, callFn, validateFn, pisoTermicoFn: noMismatchPisoTermicoFn, sleepMs: 0 });
     expect(order).toEqual(['a', 'b', 'c']);
     expect(out).toHaveLength(3);
   });
@@ -384,7 +456,7 @@ describe('runAllProbes (secuencial, dependencias inyectadas)', () => {
     const callFn = async () => ({ response: 'r', error: null });
     const validateFn = async () => ({ hallucinated: [], detected_count: 0 });
     await runAllProbes(probes, {
-      resolveFn, callFn, validateFn, sleepMs: 0,
+      resolveFn, callFn, validateFn, pisoTermicoFn: noMismatchPisoTermicoFn, sleepMs: 0,
       onProgress: (result, i, total) => calls.push([result.id, i, total]),
     });
     expect(calls).toEqual([['a', 0, 1]]);
