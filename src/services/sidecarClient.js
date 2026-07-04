@@ -356,6 +356,12 @@ const ALLOWED_TOOLS = new Set([
   'get_alerta_carbono', //        alerta defensiva bonos de carbono + PSA estatal
   'get_alerta_normativa_paramo', // alerta regulatoria de páramo (Ley 1930/2018)
   'get_alerta_clima_consejo', //  alerta de decisión por cambio climático
+  // «Chagra enseña a usar Chagra» (ayuda groundeada): cómo usar una función de
+  // la app, qué puede hacer Chagra y dónde se ve algo, con deep-link. Standalone
+  // (manifiesto de funciones), grounded — found:false si la función no existe
+  // (nunca inventa). El cliente además intercepta la mayoría de estas preguntas
+  // localmente (metaAyudaIntent), pero se expone para el ruteo del NLU en chat.
+  'get_ayuda_funcion',
 ]);
 
 /**
