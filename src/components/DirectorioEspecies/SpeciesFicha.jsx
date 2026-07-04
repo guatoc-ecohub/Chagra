@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import PisoTermicoBand from './PisoTermicoBand.jsx';
 import { PHASES } from '../CicloVivo/cicloVivoData.js';
+import PedagogicalText from '../common/PedagogicalText.jsx';
 
 /**
  * SpeciesFicha — ficha visual de REFERENCIA de una especie del Directorio.
@@ -196,14 +197,10 @@ export default function SpeciesFicha({ ficha, onSelectSpecies }) {
         )}
       </Section>
 
-      {/* SABERES / MANEJO */}
+      {/* SABERES / MANEJO — el bloque crudo se estructura en párrafos/secciones */}
       {fenologia?.valorPedagogico && (
         <Section icon={BookOpen} title="Manejo y saberes" accent="indigo">
-          <div className="rounded-xl border border-indigo-800/30 bg-indigo-950/20 p-3.5">
-            <p className="text-sm text-slate-200 leading-relaxed whitespace-pre-line">
-              {fenologia.valorPedagogico}
-            </p>
-          </div>
+          <ManejoSaberes texto={fenologia.valorPedagogico} />
         </Section>
       )}
 
@@ -214,6 +211,23 @@ export default function SpeciesFicha({ ficha, onSelectSpecies }) {
 }
 
 /* ---------------------------------------------------------------- subcomp. */
+
+/**
+ * ManejoSaberes — vuelve LEGIBLE el `valor_pedagogico`, que en el catálogo es un
+ * único bloque densísimo (hasta ~6.000 caracteres) sin saltos de línea y con
+ * "encabezados" embebidos en la frase ("Manejo agroecológico: …", "Fuentes Tier
+ * A: …"). Delega el parseo/estructura en `PedagogicalText` (compartido con la
+ * receta de biopreparado) y solo aporta el envoltorio índigo de la ficha.
+ *
+ * @param {{ texto: string }} props
+ */
+function ManejoSaberes({ texto }) {
+  return (
+    <div className="rounded-xl border border-indigo-800/30 bg-indigo-950/20 p-3.5">
+      <PedagogicalText texto={texto} tone="indigo" testId="ficha-manejo-saberes" />
+    </div>
+  );
+}
 
 /**
  * Retrato de la especie. Foto CC con crédito honesto, o ilustración botánica

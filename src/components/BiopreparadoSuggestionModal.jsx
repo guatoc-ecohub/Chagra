@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Beaker, Clock, ChevronDown, ChevronRight, BookOpen } from 'lucide-react';
 import BiopreparadoDiagrama from './BiopreparadoDiagrama';
+import PedagogicalText from './common/PedagogicalText.jsx';
 import { tieneDiagrama } from '../data/biopreparado-diagramas';
 
 /**
@@ -114,7 +115,8 @@ export default function BiopreparadoSuggestionModal({ ingredientName, bioprepara
                             <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1 flex items-center gap-1">
                               <BookOpen size={10} /> Proceso
                             </p>
-                            <p className="text-xs text-slate-300 leading-relaxed">{bp.proceso_resumen}</p>
+                            {/* Estructurado en párrafos legibles (evita el muro de texto). */}
+                            <PedagogicalText texto={bp.proceso_resumen} tone="slate" />
                           </div>
                         )}
                       </>

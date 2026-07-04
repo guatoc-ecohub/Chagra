@@ -96,4 +96,22 @@ describe('SpeciesFicha', () => {
     const { container } = render(<SpeciesFicha ficha={null} />);
     expect(container.firstChild).toBeNull();
   });
+
+  it('estructura "Manejo y saberes" densa en párrafos, subtítulos y fuentes', () => {
+    const denso = 'La pitaya blanca (Hylocereus undatus (Haw.) Britton & Rose) es un cactus '
+      + 'epífito trepador perenne. Es lección viva de bioeconomía agroexportadora. '
+      + 'Manejo agroecológico: propagación por esqueje de cladodio maduro, tutorado obligatorio, '
+      + 'cosecha a los 30-40 días. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA.';
+    const ficha = { ...FICHA_COMPLETA, fenologia: { valorPedagogico: denso } };
+    render(<SpeciesFicha ficha={ficha} />);
+
+    const bloque = screen.getByTestId('ficha-manejo-saberes');
+    expect(bloque).toBeInTheDocument();
+    // subtítulo de sección extraído del texto
+    expect(screen.getByRole('heading', { name: 'Manejo agroecológico' })).toBeInTheDocument();
+    // pie de fuentes citadas en el texto
+    expect(screen.getByText('POWO Kew')).toBeInTheDocument();
+    // el muro original NO se pinta como un único nodo de texto gigante
+    expect(bloque.querySelectorAll('p').length).toBeGreaterThan(1);
+  });
 });
