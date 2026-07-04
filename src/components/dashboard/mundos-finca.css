@@ -380,6 +380,120 @@
   outline-offset: 2px;
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   BIOPUNK (tema base, sin data-theme) — LÁMINA DE NOCHE (V4).
+   El "cuaderno de campo" de papel es la piel de los temas CLAROS. En biopunk
+   la lámina vira a la clave navy+neón que el tema ya tiene en el resto de la
+   app (tokens --c-surface-… y --c-slate-… de index.css y el teal --t-accent-rgb
+   de themes.css — nada inventado): tarjeta navy, tinta clara, y el ACENTO DEL
+   MUNDO (--mf-a) como neón de borde. La VIÑETA ilustrada conserva su pastel:
+   es la "ventana iluminada" de cada mundo sobre la tarjeta oscura (el mismo
+   recurso de los 4 portales del hero, arte a color sobre cuerpo oscuro).
+   Scope biopunk = html sin data-theme (applyTheme quita el atributo) + el
+   atributo explícito por robustez. Los temas claros no cambian ni un pelo.
+   ══════════════════════════════════════════════════════════════════════════ */
+html:not([data-theme]) .mf,
+html:not([data-theme]) .mf-mundo,
+html[data-theme="biopunk"] .mf,
+html[data-theme="biopunk"] .mf-mundo {
+  --mf-papel: rgb(var(--c-surface-card));
+  --mf-tinta: rgb(var(--c-slate-100));
+  --mf-tinta-suave: rgb(var(--c-slate-300));
+}
+/* La puntada del cuaderno, en el teal neón del tema. */
+html:not([data-theme]) .mf .mf-tit::before,
+html[data-theme="biopunk"] .mf .mf-tit::before {
+  background: repeating-linear-gradient(90deg, #3be8a6 0 6px, transparent 6px 10px);
+}
+/* Tarjeta de mundo: navy + borde-neón sutil del acento del mundo. */
+html:not([data-theme]) .mf-card,
+html[data-theme="biopunk"] .mf-card {
+  border-color: color-mix(in srgb, var(--mf-a, #19c79a) 36%, rgb(var(--c-surface-border)));
+  box-shadow: 0 4px 16px rgba(2, 6, 23, 0.45),
+              0 0 12px color-mix(in srgb, var(--mf-a, #19c79a) 14%, transparent);
+}
+@media (hover: hover) {
+  html:not([data-theme]) .mf-card:hover,
+  html[data-theme="biopunk"] .mf-card:hover {
+    box-shadow: 0 8px 22px rgba(2, 6, 23, 0.55),
+                0 0 18px color-mix(in srgb, var(--mf-a, #19c79a) 30%, transparent);
+  }
+}
+/* Chips "adentro": tinta clara sobre tinte oscuro del acento (no el pastel). */
+html:not([data-theme]) .mf-chip,
+html[data-theme="biopunk"] .mf-chip {
+  background: color-mix(in srgb, var(--mf-a, #19c79a) 18%, rgb(var(--c-surface-card)));
+  border-color: color-mix(in srgb, var(--mf-a, #19c79a) 45%, transparent);
+  color: rgb(var(--c-slate-100));
+}
+html:not([data-theme]) .mf-chip--mas,
+html:not([data-theme]) .mf-chip--entrar,
+html[data-theme="biopunk"] .mf-chip--mas,
+html[data-theme="biopunk"] .mf-chip--entrar {
+  background: transparent;
+  color: rgb(var(--c-slate-300));
+}
+/* Sello vivo: pastilla navy con el acento del mundo (era papel translúcido). */
+html:not([data-theme]) .mf-sello,
+html[data-theme="biopunk"] .mf-sello {
+  background: rgb(var(--c-surface-card) / 0.88);
+  color: rgb(var(--c-slate-100));
+}
+/* Pantalla de mundo: portada, lema, filas y pie del agente en la misma clave. */
+html:not([data-theme]) .mf-mundo-hero,
+html[data-theme="biopunk"] .mf-mundo-hero {
+  border-color: color-mix(in srgb, var(--mf-a, #19c79a) 36%, rgb(var(--c-surface-border)));
+  box-shadow: 0 4px 16px rgba(2, 6, 23, 0.45);
+}
+html:not([data-theme]) .mf-mundo-emoji,
+html[data-theme="biopunk"] .mf-mundo-emoji {
+  background: rgb(var(--c-surface-card) / 0.92);
+}
+html:not([data-theme]) .mf-mundo-lema,
+html[data-theme="biopunk"] .mf-mundo-lema {
+  box-shadow: 0 1px 8px rgba(2, 6, 23, 0.4);
+}
+html:not([data-theme]) .mf-entrada,
+html[data-theme="biopunk"] .mf-entrada {
+  border-color: rgb(var(--c-surface-border) / 0.75);
+  box-shadow: 0 1px 8px rgba(2, 6, 23, 0.35);
+}
+@media (hover: hover) {
+  html:not([data-theme]) .mf-entrada:hover,
+  html[data-theme="biopunk"] .mf-entrada:hover {
+    box-shadow: 0 4px 14px rgba(2, 6, 23, 0.55);
+  }
+}
+html:not([data-theme]) .mf-entrada-icono,
+html[data-theme="biopunk"] .mf-entrada-icono {
+  background: color-mix(in srgb, var(--mf-a, #19c79a) 16%, rgb(var(--c-surface-card)));
+}
+html:not([data-theme]) .mf-agente,
+html[data-theme="biopunk"] .mf-agente {
+  background: color-mix(in srgb, var(--mf-a, #19c79a) 10%, rgb(var(--c-surface-card)));
+}
+/* El acento del mundo como TEXTO ("Entrar →" de la fila) sobre navy: algunos
+   tintes de tierra (--mf-a café/verde oscuro) no leen sobre oscuro; se les
+   sube la luz mezclando con blanco (sigue siendo el color del mundo). */
+html:not([data-theme]) .mf-entrada-ir,
+html[data-theme="biopunk"] .mf-entrada-ir {
+  color: color-mix(in srgb, var(--mf-a, #19c79a) 55%, #e8f5ee);
+}
+/* Índice de mundos (fallback): mismas láminas de noche. */
+html:not([data-theme]) .mf-indice-intro,
+html[data-theme="biopunk"] .mf-indice-intro { color: rgb(var(--c-slate-300)); }
+html:not([data-theme]) .mf-indice-item,
+html[data-theme="biopunk"] .mf-indice-item {
+  background: rgb(var(--c-surface-card));
+  color: rgb(var(--c-slate-100));
+  border-color: rgb(var(--c-surface-border) / 0.75);
+  /* el lomo izquierdo conserva el ACENTO del mundo (border-color de arriba es
+     shorthand de los 4 lados y lo pisaría) */
+  border-left-color: var(--mf-a, #19c79a);
+}
+html:not([data-theme]) .mf-indice-txt small,
+html[data-theme="biopunk"] .mf-indice-txt small { color: rgb(var(--c-slate-300)); }
+
 /* ── Accesibilidad de movimiento ──────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .mf-card {
