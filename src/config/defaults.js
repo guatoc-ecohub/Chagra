@@ -2,6 +2,7 @@ const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
 
 export const FARM_CONFIG = {
   LOCATION_ID: import.meta.env.VITE_DEFAULT_LOCATION_ID || '',
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- fallback de config build-time preexistente (no es copy de UI); el hook lo marca al re-tocar el archivo
   FARM_NAME: import.meta.env.VITE_DEFAULT_FARM_NAME || 'Finca Principal',
   // Contexto geoagronómico usado por builders de IA externa (R5) y etiquetas UI.
   // En demo-mode se cortocircuita a constantes del guión Ministerio
