@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw, X, Home, Camera, Square } from 'lucide-react';
+import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw, X, Home, Camera, Square, Sprout } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { transcribe, queueForRetry } from '../../services/voiceService';
 import VoiceStatusStrip from './VoiceStatusStrip';
@@ -15,7 +15,7 @@ import { analyzeFoliage } from '../../services/aiService';
 import { captureAndCompress } from '../../services/photoService';
 import { processPhotoItem, buildPhotoUserMessage } from '../../services/agentOutboxPhoto';
 import { isAnalyzableImageAttachment, buildAttachmentRejection } from '../../services/agentOutboxAttachment';
-import { AGENT_ENTRANCE_CSS, AGENT_COMPOSITOR_CSS, agentEntranceClass } from './agentEntrance';
+import { AGENT_ENTRANCE_CSS, AGENT_COMPOSITOR_CSS, AGENT_V3_CSS, agentEntranceClass } from './agentEntrance';
 import {
   addTurn,
   getFullHistory,
@@ -296,6 +296,13 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // La MANO de Chagra (AgentRedMenu) — MISMA red que el home, no menús de texto.
   // sheetOpen monta/desmonta el overlay de la mano (AgentManoOverlay).
   const [sheetOpen, setSheetOpen] = useState(false);
+  // V3 (fable) — LA MOCHILA de modos. La bandeja de ~11-13 chips (ChipsToolbar)
+  // ya NO vive inline sobre el input (se comía media pantalla en móvil y
+  // ahorcaba el chat — el operador la rechazó 3 veces): se colapsa en UN
+  // disparador del compositor que abre un bottom-sheet con scroll. Solo estado
+  // de presentación; el ruteo sigue intacto (ChipsToolbar → onSelectIntent →
+  // setActiveIntent).
+  const [mochilaOpen, setMochilaOpen] = useState(false);
   // Fase del compositor para la animación shimmer/lift al enviar.
   const [composerPhase, setComposerPhase] = useState('idle'); // 'idle' | 'sending'
   // Deep Research (A6/A7): refs para los AbortControllers de los jobs en vuelo.
@@ -3046,9 +3053,12 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
 
   // CHIPS DE MODO (A4): placeholder guía según el modo activo. Sin modo →
   // placeholder genérico. Español colombiano (tú/usted), nunca voseo.
-  const activePlaceholder = activeIntent
-    ? (CHIP_DEFS.find((c) => c.intent === activeIntent)?.placeholder || 'Escribe tu pregunta...')
-    : 'Escribe tu pregunta...';
+  // V3: la def completa alimenta también el disparador de la mochila (que
+  // muestra emoji + etiqueta del modo activo).
+  const activeChipDef = activeIntent
+    ? (CHIP_DEFS.find((c) => c.intent === activeIntent) || null)
+    : null;
+  const activePlaceholder = activeChipDef?.placeholder || 'Escribe tu pregunta...';
 
   // PIEL POR TEMA del botón enviar (Fase 2 de temas). Con la flag ON y el botón
   // habilitado (hay texto/adjunto y no se está grabando ni hay cola), aplicamos
@@ -3068,7 +3078,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           (fix legibilidad 2026-06-15). */}
       <div className="absolute inset-0 agent-scrim backdrop-blur-[2px] pointer-events-none" aria-hidden="true" />
       {/* B1: animación de entrada (fade+rise). Respeta prefers-reduced-motion. */}
-      <style>{AGENT_ENTRANCE_CSS}{AGENT_COMPOSITOR_CSS}</style>
+      <style>{AGENT_ENTRANCE_CSS}{AGENT_COMPOSITOR_CSS}{AGENT_V3_CSS}</style>
 
       {/* ── Header estilo ScreenShell (2026-06-08): superficie OPACA por token
           (.agent-bar-surface) + acciones globales. Antes bg-slate-900/50 dejaba
@@ -3358,16 +3368,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           onDismissNotice={() => setVoiceNotice('')}
         />
 
-        <ChipsToolbar
-          activeIntent={activeIntent}
-          hasAttachment={Boolean(agentAttachment)}
-          disabled={state === STATE_RECORDING || queuePending.length >= 1}
-          isPro={isPro}
-          chipDefs={profileChipDefs}
-          onSelectIntent={(intent) => {
-            setActiveIntent((current) => (current === intent ? null : intent));
-          }}
-        />
+        {/* V3: la bandeja de ~11-13 chips (ChipsToolbar) ya NO se pinta inline
+            aquí — ahogaba el chat en móvil. Vive dentro de LA MOCHILA
+            (bottom-sheet de más abajo) y se abre desde el disparador "Temas"
+            del compositor. Con la mochila cerrada el chat tiene el alto
+            completo. Misma data y ruteo — cero cambios de lógica. */}
 
         {/* Pill — unified with AgentHero (as-bar CSS tokens) */}
         <div
@@ -3377,6 +3382,34 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             composerPhase === 'sending' ? 'as-shimmer as-sending' : '',
           ].join(' ')}
         >
+          {/* V3 — Etiqueta del MODO ACTIVO sobre el input (ancho completo, no
+              se trunca): dice de qué tema va a responder Chagra. Tocarla
+              reabre la mochila; la "x" limpia el modo con un toque (mismo
+              setActiveIntent — cero mecanismo nuevo). */}
+          {activeChipDef && state !== STATE_RECORDING && (
+            <div className="v3-modo-tagrow">
+              <button
+                type="button"
+                onClick={() => setMochilaOpen(true)}
+                aria-label={`Modo activo: ${activeChipDef.label}. Cambiar tema`}
+                data-testid="agent-modo-tag"
+                className="v3-modo-tag"
+              >
+                <span aria-hidden="true">{activeChipDef.emoji}</span>
+                <span className="v3-modo-tag-txt">{activeChipDef.label}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveIntent(null)}
+                aria-label={`Quitar el modo ${activeChipDef.label}`}
+                data-testid="agent-modo-clear"
+                className="v3-modo-clear"
+              >
+                <X size={14} aria-hidden="true" />
+              </button>
+            </div>
+          )}
+
           {/* Fila 1: textarea o waveform de grabación */}
           {state === STATE_RECORDING ? (
             <div className="flex items-center gap-3 px-3 py-3 min-h-[52px]">
@@ -3461,6 +3494,27 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               <Camera size={19} strokeWidth={2} aria-hidden="true" />
             </button>
 
+            {/* V3 — Disparador de LA MOCHILA de temas. Colapsa la bandeja de
+                ~11-13 chips en un solo control (mandato del operador tras
+                rechazarla 3 veces). Etiqueta constante "Temas" (el modo activo
+                se muestra COMPLETO en la etiqueta sobre el input — aquí solo
+                se tiñe con el acento para no truncarse en la fila angosta). */}
+            <button
+              type="button"
+              onClick={() => setMochilaOpen(true)}
+              disabled={state === STATE_RECORDING}
+              aria-label={activeChipDef
+                ? `Modo activo: ${activeChipDef.label}. Abrir los temas del agente`
+                : 'Temas del agente'}
+              aria-haspopup="dialog"
+              aria-expanded={mochilaOpen}
+              data-testid="agent-modos-trigger"
+              className={['v3-modo', activeChipDef ? 'is-active' : ''].join(' ')}
+            >
+              <Sprout size={17} strokeWidth={2.2} aria-hidden="true" />
+              <span className="v3-modo-txt">Temas</span>
+            </button>
+
             <div className="flex-1" />
 
             {/* Micrófono (toggle) — GRANDE (TIER 2 #5): el camino principal
@@ -3527,6 +3581,66 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             quitar los chips/líneas de sugerencia que ensucian la pantalla del
             agente. El acceso a capacidades queda por la mano de Chagra (botón
             Ⓐ del compositor + botón de la pantalla vacía). */}
+
+        {/* ── V3 · LA MOCHILA DE TEMAS ────────────────────────────────────────
+            Colapsa la bandeja de ~11-13 chips de modo (ChipsToolbar) que
+            ahogaba el chat. Misma data y ruteo; solo cambia el contenedor: un
+            bottom-sheet con scroll que se cierra al elegir un modo, al tocar
+            afuera o con Escape. El dobladillo lleva LA COSTURA — la misma
+            puntada que firma las respuestas respaldadas por el catálogo. */}
+        {mochilaOpen && (
+          <div
+            className="v3-mochila"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Temas del agente"
+            data-testid="agent-modos-sheet"
+            onKeyDown={(e) => { if (e.key === 'Escape') setMochilaOpen(false); }}
+          >
+            <button
+              type="button"
+              className="v3-mochila-scrim"
+              aria-label="Cerrar los temas del agente"
+              onClick={() => setMochilaOpen(false)}
+            />
+            <div className="v3-mochila-panel">
+              <div className="v3-mochila-hem" aria-hidden="true">
+                <span className="v3-mochila-grab" />
+                <span className="v3-mochila-stitch" />
+              </div>
+              <div className="v3-mochila-head">
+                <div className="v3-mochila-titwrap">
+                  <h2>¿Sobre qué hablamos?</h2>
+                  <p>Toca un tema y Chagra va directo al grano, sin rodeos.</p>
+                </div>
+                <button
+                  type="button"
+                  className="v3-mochila-close"
+                  onClick={() => setMochilaOpen(false)}
+                  aria-label="Cerrar"
+                  /* Al abrir, el foco entra al diálogo (cerrar) → Escape y
+                     lectores de pantalla operan DENTRO de la mochila. */
+                  autoFocus
+                >
+                  <X size={18} aria-hidden="true" />
+                </button>
+              </div>
+              <div className="v3-mochila-body">
+                <ChipsToolbar
+                  activeIntent={activeIntent}
+                  hasAttachment={Boolean(agentAttachment)}
+                  disabled={state === STATE_RECORDING || queuePending.length >= 1}
+                  isPro={isPro}
+                  chipDefs={profileChipDefs}
+                  onSelectIntent={(intent) => {
+                    setActiveIntent((current) => (current === intent ? null : intent));
+                    setMochilaOpen(false);
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Input oculto de foto */}
         <input

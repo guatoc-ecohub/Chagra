@@ -77,7 +77,9 @@ describe('flujo usuario nuevo — estado activo del modo claro', () => {
     render(<ChipsToolbar onSelectIntent={() => {}} activeIntent="clima" />);
     const climaChip = screen.getByRole('button', { name: /clima/i });
     expect(climaChip).toHaveAttribute('aria-pressed', 'true');
-    expect(climaChip).toHaveClass(/emerald/); // verde = activo
+    // V3: el estado activo ya no va por clase Tailwind emerald — lo pinta el
+    // CSS por atributo (.v3-chipcard[aria-pressed="true"] → acento del tema).
+    expect(climaChip).toHaveClass('v3-chipcard');
   });
 
   it('chip inactivo no tiene aria-pressed=true', () => {

@@ -396,25 +396,44 @@ describe('AgentScreen - chips toolbar', () => {
     vi.clearAllMocks();
   });
 
-  it('monta la barra de chips junto al input y cambia la intencion al tocar un chip', async () => {
+  it('V3: colapsa la bandeja en la mochila; el disparador la abre y elegir un modo lo fuerza, la cierra y lo muestra', async () => {
     render(<AgentScreen onBack={() => {}} />);
 
-    await waitFor(() => {
-      expect(screen.getByTestId('chips-toolbar')).toBeInTheDocument();
-    });
+    // El disparador vive en el compositor; la mochila arranca CERRADA (el
+    // chat recupera el alto completo). ChipsToolbar NO está montada aún y no
+    // hay etiqueta de modo activo.
+    const trigger = await screen.findByTestId('agent-modos-trigger');
+    expect(trigger).toHaveTextContent('Temas');
+    expect(screen.queryByTestId('chips-toolbar')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('agent-modo-tag')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('agent-modo-clear')).not.toBeInTheDocument();
 
-    const toolbar = screen.getByTestId('chips-toolbar');
-    const input = screen.getByTestId('agent-input');
-    expect(toolbar.compareDocumentPosition(input) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
-
+    // Abrir la mochila → la bandeja aparece con sus modos.
+    fireEvent.click(trigger);
+    const toolbar = await screen.findByTestId('chips-toolbar');
+    expect(screen.getByTestId('agent-modos-sheet')).toBeInTheDocument();
     expect(toolbar).toHaveTextContent('Biopreparado');
-    const biopreparadoChip = screen.getByRole('button', { name: /biopreparado/i });
-    fireEvent.click(biopreparadoChip);
 
-    expect(biopreparadoChip).toHaveAttribute('aria-pressed', 'true');
+    // Elegir un modo lo fuerza: cambia el placeholder del input, cierra la
+    // mochila, tiñe el disparador y muestra la ETIQUETA del modo activo sobre
+    // el input (el chip queda desmontado al cerrar, por eso verificamos el
+    // efecto persistente, no aria-pressed).
+    fireEvent.click(screen.getByRole('button', { name: /biopreparado/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('chips-toolbar')).not.toBeInTheDocument();
+    });
     expect(screen.getByTestId('agent-input')).toHaveAttribute(
       'placeholder',
       'Escribe para que plaga o planta quieres el biopreparado',
     );
+    expect(screen.getByTestId('agent-modo-tag')).toHaveTextContent('Biopreparado');
+    expect(screen.getByTestId('agent-modos-trigger').className).toMatch(/is-active/);
+
+    // Salida rápida del modo: la "x" junto a la etiqueta lo limpia sin
+    // reabrir la mochila.
+    fireEvent.click(screen.getByTestId('agent-modo-clear'));
+    expect(screen.queryByTestId('agent-modo-tag')).not.toBeInTheDocument();
+    expect(screen.getByTestId('agent-input')).toHaveAttribute('placeholder', 'Escribe tu pregunta...');
   });
 });

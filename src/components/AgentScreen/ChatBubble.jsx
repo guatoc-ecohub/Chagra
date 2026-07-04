@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, BadgeCheck, Info, Sparkles, AlertTriangle, ExternalLink, ShieldCheck } from 'lucide-react';
+import { BadgeCheck, Info, Sparkles, AlertTriangle, ExternalLink, ShieldCheck } from 'lucide-react';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import { speak, speakKokoro, stop, isSpeaking, isKokoroAvailable } from '../../services/ttsService';
 import { agentSounds } from '../../services/agentSoundService';
@@ -332,35 +332,32 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
     }
   };
 
+  // V3 "cuaderno de campo cosido": los turnos ya no son la pareja genérica
+  // avatar-circulito + burbuja slate de chatbot. El turno del AGENTE es una
+  // ENTRADA de cuaderno: byline chiquito (colibrí 22px + "Chagra" en Baloo 2)
+  // y debajo la tarjeta-papel del tema (.v3-card), con LA COSTURA de hilo
+  // esmeralda en el borde izquierdo cuando la respuesta viene respaldada por
+  // el catálogo (data-grounded — el CSS pinta la puntada). El turno del
+  // USUARIO es una nota compacta con el verde del tema (.v3-bubble-user), sin
+  // ícono de personita: la alineación derecha ya dice quién habla y el chat
+  // recupera ese ancho en el celular. CSS en AGENT_V3_CSS (agentEntrance.js).
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3.5`}>
-      <div className={`flex gap-2 max-w-[85%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
-        {isUser ? (
-          <div className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-emerald-600 ring-1 ring-emerald-400/40 shadow-sm shadow-emerald-950/30">
-            <User size={16} className="text-white" />
-          </div>
-        ) : (
-          <div
-            className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center bg-slate-900 border overflow-hidden ${
-              isStreaming ? 'border-amber-400/60 shadow-[0_0_10px_rgba(245,158,11,.4)]' : 'border-emerald-700/40'
-            }`}
-          >
-            <ChagraAgentAvatar state={agentState} size={32} ariaLabel="Chagra IA" />
-          </div>
-        )}
+    <div className={`v3-turn ${isUser ? 'v3-turn-user' : 'v3-turn-agent'}`}>
+      {!isUser && (
+        <div className="v3-byline" aria-hidden="true">
+          <span className={`v3-byline-avatar${isStreaming ? ' is-streaming' : ''}`}>
+            <ChagraAgentAvatar state={agentState} size={22} ariaLabel="Chagra IA" />
+          </span>
+          <span>Chagra</span>
+        </div>
+      )}
 
-        <div
-          className={`rounded-2xl px-4 py-3 shadow-md ${
-            isUser
-              ? 'bg-emerald-700/70 text-white rounded-tr-md border border-emerald-500/25 shadow-emerald-950/25'
-              : `bg-slate-800/90 text-slate-100 rounded-tl-md border border-slate-700/60 shadow-slate-950/30 cursor-pointer${
-                  isGrounded ? ' border-l-2 border-l-emerald-400/70' : ''
-                }`
-          }`}
-          data-grounded={isGrounded ? 'true' : undefined}
-          onDoubleClick={handleBubbleDoubleClick}
-          title={!isUser && !isStreaming ? 'Doble click reproduce o silencia esta respuesta' : undefined}
-        >
+      <div
+        className={isUser ? 'v3-bubble-user' : 'v3-card cursor-pointer'}
+        data-grounded={isGrounded ? 'true' : undefined}
+        onDoubleClick={handleBubbleDoubleClick}
+        title={!isUser && !isStreaming ? 'Doble click reproduce o silencia esta respuesta' : undefined}
+      >
           {/* Bug 2026-05-31: la foto del compositor del home NO llegaba al chat,
               solo el texto. Si el mensaje trae `imageUrl` (foto adjuntada en
               AgentHero → outbox → AgentScreen), la pintamos como miniatura
@@ -476,7 +473,6 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
               </p>
             </div>
           )}
-        </div>
       </div>
     </div>
   );
