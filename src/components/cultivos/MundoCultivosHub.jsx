@@ -172,8 +172,7 @@ export default function MundoCultivosHub({ onBack, onNavigate }) {
                     <p>
                         <b>El calendario lunar</b> es saber campesino que vale para organizar las
                         labores (creciente para lo de porte alto; menguante para raíces como la
-                        papa). No promete más cosecha: es cultura, no receta.{' '}
-                        <span className="mch-fuente">(R43, R44)</span>
+                        papa). No promete más cosecha: es cultura, no receta.
                     </p>
                 </section>
 

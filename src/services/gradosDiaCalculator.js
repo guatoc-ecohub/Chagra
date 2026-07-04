@@ -52,7 +52,7 @@ export const CULTIVOS_GDD = /** @type {CultivoGDD[]} */ ([
         tb: 10,
         to: 30,
         tbNota: 'Tb 10 °C, tope 30 °C (método modificado). Confianza alta.',
-        fuente: 'R30 — Rev. Chapingo / SciELO',
+        fuente: 'Rev. Chapingo / SciELO',
         fenologia: [
             { id: 'siembra', label: 'Siembra', desc: 'Semilla en el surco', dds: 0 },
             { id: 'emergencia', label: 'Emergencia', desc: 'Asoma la matica', dds: 8 },
@@ -61,7 +61,7 @@ export const CULTIVOS_GDD = /** @type {CultivoGDD[]} */ ([
             { id: 'choclo', label: 'Choclo', desc: 'Mazorca tierna (V-305)', dds: 100 },
             { id: 'grano_seco', label: 'Grano seco', desc: 'Madurez de cosecha (V-305)', dds: 170 },
         ],
-        fenologiaFuente: 'R18 — ICA V-305 (V-109: choclo 70–80 d / grano 120 d)',
+        fenologiaFuente: 'ICA V-305 (V-109: choclo 70–80 d / grano 120 d)',
     },
     {
         id: 'papa',
@@ -70,7 +70,7 @@ export const CULTIVOS_GDD = /** @type {CultivoGDD[]} */ ([
         tb: 5,
         to: null,
         tbNota: 'Tb 4–7 °C según modelo; usamos 5 °C. Valor AGROSAVIA exacto: pendiente.',
-        fuente: 'R31 — SciELO (tiempo térmico papa)',
+        fuente: 'SciELO (tiempo térmico papa)',
         fenologia: [
             { id: 'siembra', label: 'Siembra', desc: 'Tubérculo-semilla enterrado', dds: 0 },
             { id: 'emergencia', label: 'Emergencia', desc: 'Brota la planta', dds: 32 },
@@ -78,7 +78,7 @@ export const CULTIVOS_GDD = /** @type {CultivoGDD[]} */ ([
             { id: 'tuberizacion', label: 'Tuberización', desc: 'Cuaja el tubérculo', dds: 85 },
             { id: 'madurez', label: 'Madurez', desc: 'Lista para arrancar', dds: 167 },
         ],
-        fenologiaFuente: 'R10 — AGROSAVIA, altiplano cundiboyacense',
+        fenologiaFuente: 'AGROSAVIA, altiplano cundiboyacense',
     },
     {
         id: 'manual',
@@ -121,7 +121,7 @@ export const REGIMENES_LLUVIA = [
             { label: 'Semestre B', siembra: 'septiembre–noviembre', cosecha: 'diciembre–enero' },
         ],
         nota: 'Siembre apenas se estabilicen las primeras lluvias. "Mitaca" = la segunda cosecha del año.',
-        fuente: 'R16, R17',
+        fuente: 'IDEAM',
     },
     {
         id: 'unimodal',
@@ -131,7 +131,7 @@ export const REGIMENES_LLUVIA = [
             { label: 'Única', siembra: 'al arrancar las lluvias (mitad de año)', cosecha: 'según el ciclo del cultivo' },
         ],
         nota: 'La seca va aproximadamente de diciembre a marzo.',
-        fuente: 'R16',
+        fuente: 'IDEAM',
     },
 ];
 
