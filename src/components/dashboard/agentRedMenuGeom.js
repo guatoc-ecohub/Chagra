@@ -190,6 +190,62 @@ export function shelfPack(boxes, band, opts = {}) {
 }
 
 /**
+ * ABANICO RADIAL desde la raíz Ⓐ (red viva de 2 niveles, 2026-07-04): coloca
+ * las RAMAS-GRUPO del nivel 1 sobre arcos a radios ESCALONADOS desde rootPt —
+ * anillos entrelazados cerca/lejos/medio + vaivén sembrado — para que el
+ * despliegue se LEA como organismo que crece desde el botón del agente, no
+ * como filas de estante. El mandato CERO-choque (2026-06-10) se conserva:
+ * relaxRects con las cajas reales orbe+etiqueta + verificación (rectsOverlap)
+ * con reintentos a mayor dispersión; si el abanico es INFACTIBLE en el lienzo
+ * (celular angosto / hero bajito), FALLBACK a shelfPack — cero choque por
+ * construcción SIEMPRE gana sobre la poesía del abanico.
+ * `band` = región de los RECTS (bordes reales del lienzo), como shelfPack.
+ */
+export function fanPlace(rootPt, boxes, band, opts = {}) {
+  const n = boxes.length;
+  if (!n) return [];
+  const { a0 = -1.5, a1 = -0.12, pad = 8 } = opts;
+  const rnd = opts.rand || (() => 0.5);
+  const fixed = opts.fixed || [];
+  /* bounds de CENTROS: la caja completa (orbe+etiqueta) cabe en band. Si el
+     inset conservador (cajas máximas) deja banda degenerada → estantes. */
+  const bdC = {
+    x0: band.x0 + Math.max(...boxes.map((b) => b.hw)),
+    x1: band.x1 - Math.max(...boxes.map((b) => b.hw)),
+    y0: band.y0 + Math.max(...boxes.map((b) => b.hh - b.oy)),
+    y1: band.y1 - Math.max(...boxes.map((b) => b.hh + b.oy)),
+  };
+  if (bdC.x1 - bdC.x0 < 40 || bdC.y1 - bdC.y0 < 40) {
+    return shelfPack(boxes, band, { pad, jitter: 8, rand: rnd });
+  }
+  /* radio útil: hasta la esquina de la banda más lejana de la raíz */
+  const maxR = Math.max(
+    Math.hypot(bdC.x0 - rootPt.x, bdC.y0 - rootPt.y),
+    Math.hypot(bdC.x1 - rootPt.x, bdC.y0 - rootPt.y),
+    Math.hypot(bdC.x0 - rootPt.x, bdC.y1 - rootPt.y),
+    Math.hypot(bdC.x1 - rootPt.x, bdC.y1 - rootPt.y),
+  );
+  for (let t = 0; t < 3; t++) {
+    const spread = 1 + t * 0.16;
+    const pts = boxes.map((b, i) => {
+      const f = n > 1 ? i / (n - 1) : 0.5;
+      const a = a0 + (a1 - a0) * f;
+      /* tres anillos entrelazados: vecinos angulares a radios distintos —
+         la diagonal viva sin fila ni grilla */
+      const tier = [0.44, 0.78, 0.6][i % 3];
+      const r = maxR * tier * spread + (rnd(i + 23) - 0.5) * 28;
+      return {
+        x: clampN(rootPt.x + Math.cos(a) * r, bdC.x0, bdC.x1),
+        y: clampN(rootPt.y + Math.sin(a) * r * 0.92, bdC.y0, bdC.y1),
+      };
+    });
+    relaxRects(pts, boxes, bdC, { pad, fixed });
+    if (!rectsOverlap(pts, boxes, fixed, 2)) return pts;
+  }
+  return shelfPack(boxes, band, { pad, jitter: 8, rand: rnd });
+}
+
+/**
  * Escalera del ÁRBOL (nature): filas copa→base alternando columna izquierda/
  * derecha del tronco. Las columnas opuestas nunca chocan en X (los orbes
  * flanquean el tronco); dentro de la MISMA columna (vecino = fila r-2) el
