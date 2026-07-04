@@ -46,6 +46,39 @@ let corpusLoadPromise = null;
 // (flattenDoc + pre-tokenize) se conserva idéntica; solo cambia serial→batch.
 const CORPUS_FETCH_CONCURRENCY = 12;
 
+// Métrica de bloqueo del tier-gate (audit P0-1, 2026-07-03). Cuenta cuántas
+// veces buildCorpus tuvo que degradar FAIL-CLOSED por no poder confiar en el
+// catálogo activo (throw o vacío). Un valor creciente es la señal observable de
+// que el RAG está sirviendo solo el subconjunto seguro, no el corpus completo.
+let tierGateBlockCount = 0;
+
+/**
+ * @returns {number} nº de veces que el tier-gate degradó FAIL-CLOSED por
+ *   catálogo no disponible. Para health-checks / telemetría.
+ */
+export function getTierGateBlockCount() {
+  return tierGateBlockCount;
+}
+
+// Sentinel numérico para el `tier` cuando degradamos FAIL-CLOSED. -1 nunca es
+// un tamaño real de catálogo (que es > 0), así el índice persistido de un build
+// seguro NO se sirve a una sesión con catálogo sano ni viceversa
+// (corpusIndexCache invalida cuando `tier` cambia). Se mantiene numérico para
+// no cambiar el tipo de `tier` (number | null) en las llamadas al cache.
+const FAIL_CLOSED_TIER = -1;
+
+/**
+ * Universo de slugs OSS-seguro hardcodeado: los ids de CROP_TAXONOMY, que
+ * viajan en el repo público y NO contienen contenido Pro/privado. Es el
+ * fallback FAIL-CLOSED del tier-gate cuando el catálogo activo no está
+ * disponible: nunca deja groundear un slug fuera de esta taxonomía baked-in.
+ */
+function safeSubsetIds() {
+  return new Set(
+    Object.values(CROP_TAXONOMY).flatMap((group) => group.species.map((sp) => sp.id)),
+  );
+}
+
 function tokenize(text) {
   if (!text || typeof text !== 'string') return [];
   return text
@@ -232,12 +265,20 @@ async function buildCorpus() {
   // Tier gate (SEC-002 / UXC-004): filtrar slugs contra el catalogo activo.
   // En OSS el catalogo tiene ~263 especies; el manifest ~491. Los ~296 slugs
   // sin entrada en el catalogo NO deben groundearse para evitar leak de
-  // contenido Pro a usuarios OSS. Degradacion: si el catalogo falla, se
-  // cargan todos los slugs (mejor grounding completo que ninguno).
+  // contenido Pro a usuarios OSS.
+  //
+  // FAIL-CLOSED (audit P0-1, 2026-07-03): si el catálogo NO está disponible
+  // (getAllSpecies lanza) o viene vacío, NO cargamos el manifest completo —
+  // eso serviría corpus fuera de tier (contenido Pro/privado) justo cuando el
+  // gate debía impedirlo. En su lugar degradamos a un SUBCONJUNTO SEGURO
+  // hardcodeado (CROP_TAXONOMY ∩ manifest, ver safeSubsetIds), contamos el
+  // bloqueo y NUNCA servimos RAG "amplio" por defecto.
   let tier = null;
+  let catalogTrusted = false;
   try {
     const catalogSpecies = await getAllSpecies();
     if (catalogSpecies && catalogSpecies.length > 0) {
+      catalogTrusted = true;
       tier = catalogSpecies.length;
       const allowedIds = new Set(catalogSpecies.map((s) => s.id));
       const before = species.length;
@@ -245,9 +286,24 @@ async function buildCorpus() {
       if (before !== species.length) {
         console.info(`[RAG] Tier gate: ${before} slugs en manifest, ${species.length} dentro del catalogo (${before - species.length} excluidos).`);
       }
+    } else {
+      console.warn('[RAG] Tier gate: catálogo vacío — degradando FAIL-CLOSED al subconjunto seguro.');
     }
   } catch (err) {
-    console.warn('[RAG] No se pudo cargar el catalogo para tier-gate — cargando todos los slugs:', err?.message);
+    console.warn('[RAG] No se pudo cargar el catálogo para tier-gate — degradando FAIL-CLOSED al subconjunto seguro:', err?.message);
+  }
+
+  if (!catalogTrusted) {
+    // FAIL-CLOSED: sin un catálogo confiable no podemos determinar el tier, así
+    // que restringimos al subconjunto seguro OSS en vez de servir el manifest
+    // completo. Nunca contenido fuera de CROP_TAXONOMY. Si el manifest era null,
+    // `species` ya era CROP_TAXONOMY (este filtro es un no-op y es correcto).
+    const safeIds = safeSubsetIds();
+    const before = species.length;
+    species = species.filter((slug) => safeIds.has(slug));
+    tier = FAIL_CLOSED_TIER;
+    tierGateBlockCount += 1;
+    console.warn(`[RAG] Tier gate FAIL-CLOSED (#${tierGateBlockCount}): ${before} slugs → ${species.length} del subconjunto seguro (CROP_TAXONOMY). Sin catálogo confiable no se sirve RAG amplio.`);
   }
 
   // OFFLINE-FIRST: intentar hidratar el índice YA construido desde IndexedDB
@@ -691,4 +747,5 @@ export const RAG_SERVICE = {
   retrieve,
   getCorpusStats,
   prewarmCorpus,
+  getTierGateBlockCount,
 };
