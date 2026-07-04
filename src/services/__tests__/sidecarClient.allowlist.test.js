@@ -23,7 +23,13 @@
 /* eslint-disable no-undef */
 
 import { describe, it, expect } from 'vitest';
+// Los builtins de Node no tienen @types/node en este proyecto — por eso los
+// ~13 tests que importan `node:*` acumulan errores de tipo baselineados. Este
+// archivo es nuevo y no puede baselinear, así que se suprimen los TS2307/TS2591
+// puntuales (irreducibles sin agregar la dependencia de tipos).
+// @ts-ignore
 import { readFileSync } from 'node:fs';
+// @ts-ignore
 import { resolve } from 'node:path';
 import { isToolAllowed, __TEST__ } from '../sidecarClient.js';
 
@@ -64,6 +70,7 @@ const WRAPPER_LITERALS_OTHER_MODULES = [
 function extractSourceLiterals() {
   // En jsdom import.meta.url no es file: — resolvemos desde la raíz del repo
   // (vitest siempre corre con cwd = raíz del proyecto).
+  // @ts-ignore -- `process` global sin @types/node (ver nota en los imports).
   const sourcePath = resolve(process.cwd(), 'src/services/sidecarClient.js');
   const source = readFileSync(sourcePath, 'utf8');
   const start = source.indexOf('const ALLOWED_TOOLS = new Set([');
@@ -94,7 +101,7 @@ describe('allow-list MCP — forma y exports', () => {
     expect(isToolAllowed('')).toBe(false);
     expect(isToolAllowed(null)).toBe(false);
     expect(isToolAllowed(undefined)).toBe(false);
-    expect(isToolAllowed(42)).toBe(false);
+    expect(isToolAllowed(/** @type {any} */ (42))).toBe(false);
   });
 });
 
