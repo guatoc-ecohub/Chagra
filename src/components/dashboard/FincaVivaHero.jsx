@@ -23,6 +23,12 @@ import { BarbuditoIlustrado, BarbuditoRealLoop } from '../colibri/Barbudito';
 // quedó sin campana. `variant="f2"` es la misma píldora redonda que ya usa
 // ScreenShell en las pantallas F2.
 import NotificationsBell from '../NotificationsBell';
+// Escena "FINCA ORGANISMO" — el arte aprobado del tema BIOPUNK (mockup
+// escena-home-biopunk-v2): corazón-semilla que late + red micorrízica +
+// invernadero-célula. SOLO se monta con el tema biopunk; los demás temas
+// conservan sus escenas isométricas intactas.
+import SceneFincaOrganismo from './SceneFincaOrganismo';
+import './scene-finca-organismo.css';
 import './finca-viva-hero.css';
 
 // ¿Modo A/B del colibrí del páramo? Gateado por VITE_COLIBRI (colibriFlag.js),
@@ -226,6 +232,21 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
 
   const tieneFincaPropia = !children; // children = red institucional del extensionista.
 
+  // ── Escena "FINCA ORGANISMO" (SOLO tema biopunk) ─────────────────────────
+  // Con el tema biopunk activo, la escena de FINCA es el arte aprobado
+  // "Finca Organismo" (mockup escena-home-biopunk-v2): la finca de noche como
+  // organismo bioluminiscente — corazón-semilla latiendo bajo tierra, red
+  // micorrízica, invernadero-célula, milpa de savia neón, campesino + perro
+  // criollo + colibrí de luz. Los otros temas (nature/minimalista/verde-vivo)
+  // conservan SceneFinca/SceneBalcon/SceneInvernadero INTACTAS, y las escalas
+  // balcon/invernadero del perfil también (su arte biopunk es trabajo aparte).
+  // `theme==='auto'` se resuelve mirando el data-theme efectivo que applyTheme
+  // ya dejó en <html> (biopunk = tema base SIN atributo).
+  const temaEfectivo = theme === 'auto'
+    ? ((typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme')) || 'biopunk')
+    : theme;
+  const organismoActivo = temaEfectivo === 'biopunk' && escala === 'finca' && tieneFincaPropia;
+
   return (
     <section
       data-testid="finca-viva-hero"
@@ -365,7 +386,7 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
 
         <main className="fvh-main">
           {/* ── ESCENA ISOMÉTRICA (o slot institucional) ────────────────────── */}
-          <div className="fvh-escena-wrap">
+          <div className={`fvh-escena-wrap${organismoActivo ? ' fvh-escena-wrap--organismo' : ''}`}>
             <div className="fvh-escena">
               {/* globo del agente colibrí */}
               <button
@@ -387,19 +408,30 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
                   {escala === 'balcon' && <SceneBalcon poblada={poblada} cielo={atmosferaTema} />}
                   {escala === 'invernadero' && <SceneInvernadero poblada={poblada} cielo={atmosferaTema} />}
                   {escala === 'finca' && (
-                    <SceneFinca
-                      poblada={poblada}
-                      cielo={atmosferaTema}
-                      estructura={estructuraFinca}
-                      escalaFinca={variant?.escala}
-                    />
+                    organismoActivo ? (
+                      /* BIOPUNK → la "Finca Organismo" aprobada. Lleva la
+                         estructura declarada (#34): el invernadero-célula de
+                         la escena porta el marcador fvh-estructura. */
+                      <SceneFincaOrganismo estructura={estructuraFinca} />
+                    ) : (
+                      <SceneFinca
+                        poblada={poblada}
+                        cielo={atmosferaTema}
+                        estructura={estructuraFinca}
+                        escalaFinca={variant?.escala}
+                      />
+                    )
                   )}
 
                   {/* fauna sobre la escena. El COLIBRÍ (criatura insignia del
                       agente) vuela SIEMPRE — es el guía, no ganado; acompaña
                       también la finca recién empezada. La mariposa y la abeja
                       (fauna que prospera) sólo aparecen cuando la finca está
-                      poblada. */}
+                      poblada. Con la "Finca Organismo" (biopunk) NO se
+                      superpone fauna: la escena trae su PROPIO colibrí de luz
+                      y sus cocuyos (el emoji 🦋/🐝 y el colibrí 2D duplicados
+                      rompían la clave nocturna del arte aprobado). */}
+                  {!organismoActivo && (
                   <div className="fvh-bichos" aria-hidden="true">
                     {/* COLIBRÍ insignia. Con la flag VITE_COLIBRI ON (dev) =
                         modo A/B TEMPORAL: dos barbuditos de páramo, uno a cada
@@ -431,6 +463,7 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
                       </>
                     )}
                   </div>
+                  )}
                 </>
               ) : (
                 <div className="fvh-institucional">{children}</div>

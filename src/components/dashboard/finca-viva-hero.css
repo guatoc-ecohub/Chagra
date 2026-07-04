@@ -1224,3 +1224,24 @@ html[data-theme="biopunk"] .fvh {
   text-shadow: var(--fvh-on-cielo-sombra);
 }
 .fvh .fvh-portales-tit span { background: var(--fvh-on-cielo-div); }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   ESCENA "FINCA ORGANISMO" (solo tema biopunk) — ajustes del contenedor.
+   La escena aprobada (SceneFincaOrganismo, mockup escena-home-biopunk-v2)
+   incluye el CORTE DE SUELO con el corazón-semilla: es más ALTA (390×486)
+   que las escenas isométricas (390×360). El modificador del wrap le da su
+   proporción para que el corazón bajo tierra SIEMPRE se vea, y apaga las
+   capas de "grade"/velo genéricas: la escena trae su PROPIA atmósfera neón
+   calibrada (aurora, niebla, halos). Solo aplica en biopunk; los otros
+   temas nunca montan este modificador. */
+.fvh .fvh-escena-wrap--organismo .fvh-escena {
+  height: auto;
+  aspect-ratio: 390 / 486;
+  max-width: 460px;
+  max-height: 580px;
+  margin: 6px auto 0;
+}
+/* La escena ya ES el arte final del tema: sin grade de color encima. */
+.fvh .fvh-escena-wrap--organismo .fvh-escena > svg { filter: none; }
+/* Sin velo neón genérico (::after) — duplicaba brillos sobre la aurora. */
+.fvh .fvh-escena-wrap--organismo::after { opacity: 0; }
