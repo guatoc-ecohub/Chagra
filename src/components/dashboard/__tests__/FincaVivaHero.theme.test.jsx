@@ -30,9 +30,13 @@ vi.mock('../../NotificationsBell', () => ({
 }));
 
 // Tema activo controlable: el hero debe pedirle al tema su ícono de marca.
+// `resolveAutoTheme` acompaña a useTheme en el mock porque el hero lo usa para
+// resolver 'auto' (misma regla que applyTheme); aquí es identidad (no probamos
+// 'auto').
 let activeTheme = 'biopunk';
 vi.mock('../../../hooks/useTheme', () => ({
   useTheme: () => ({ theme: activeTheme, setTheme: vi.fn() }),
+  resolveAutoTheme: (t) => t,
 }));
 
 // themeIcon stub identificable por tema para aseverar el ícono efectivo.
@@ -48,8 +52,8 @@ beforeEach(() => {
 });
 afterEach(() => cleanup());
 
-describe('FincaVivaHero — piel del tema activo (los 4 temas)', () => {
-  for (const theme of ['biopunk', 'nature', 'minimalista', 'verde-vivo']) {
+describe('FincaVivaHero — piel del tema activo (los 5 temas)', () => {
+  for (const theme of ['biopunk', 'biopunk2', 'nature', 'minimalista', 'verde-vivo']) {
     test(`con tema "${theme}" la escena usa el ícono de marca de ese tema`, () => {
       activeTheme = theme;
       render(<FincaVivaHero onNavigate={vi.fn()} onOpenAgent={vi.fn()} onGestionar={vi.fn()} />);
@@ -59,4 +63,27 @@ describe('FincaVivaHero — piel del tema activo (los 4 temas)', () => {
       expect(screen.getByTestId(`brand-icon-${theme}`)).toBeInTheDocument();
     });
   }
+});
+
+describe('FincaVivaHero — split biopunk/biopunk2 (GO-LIVE 2026-07-04)', () => {
+  test('biopunk2 (default) monta la "Finca Organismo" con el wrap organismo', () => {
+    activeTheme = 'biopunk2';
+    const { container } = render(
+      <FincaVivaHero onNavigate={vi.fn()} onOpenAgent={vi.fn()} onGestionar={vi.fn()} />,
+    );
+    expect(screen.getByTestId('fvo-escena')).toBeInTheDocument();
+    expect(container.querySelector('.fvh-escena-wrap--organismo')).not.toBeNull();
+    // La isométrica clásica NO se monta a la vez.
+    expect(screen.queryByTestId('fvh-escena-finca')).toBeNull();
+  });
+
+  test('biopunk (respaldo) restaura la escena isométrica ORIGINAL (sin organismo)', () => {
+    activeTheme = 'biopunk';
+    const { container } = render(
+      <FincaVivaHero onNavigate={vi.fn()} onOpenAgent={vi.fn()} onGestionar={vi.fn()} />,
+    );
+    expect(screen.getByTestId('fvh-escena-finca')).toBeInTheDocument();
+    expect(screen.queryByTestId('fvo-escena')).toBeNull();
+    expect(container.querySelector('.fvh-escena-wrap--organismo')).toBeNull();
+  });
 });

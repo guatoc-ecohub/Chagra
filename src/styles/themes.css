@@ -2,11 +2,23 @@
  * ============================================================================
  * SISTEMA DE TEMAS (skin global de la app) — capa de OVERRIDES NO-COLOR.
  *
- * Tres temas curados (operador 2026-06-03/04, demo Bogotá), aplicados app-wide
- * desde el LOGIN vía `data-theme` en <html> (lo escribe useTheme.js):
+ * Temas curados (operador 2026-06-03/04, demo Bogotá; split biopunk/biopunk2
+ * GO-LIVE 2026-07-04), aplicados app-wide desde el LOGIN vía `data-theme` en
+ * <html> (lo escribe useTheme.js):
  *
- *   - bio-punk (DEFAULT)  → estilo BASE. NO lleva data-theme. Lienzo "cosecha
- *                           mística" (§4). Tokens de color en :root de index.css.
+ *   - biopunk2 (DEFAULT)  → estilo BASE. NO lleva data-theme (useTheme lo
+ *                           quita, igual que biopunk): TODA la piel biopunk
+ *                           (este archivo, index.css :root, y cada regla
+ *                           `html:not([data-theme])` del repo) le aplica tal
+ *                           cual. Su ÚNICA diferencia con biopunk es la escena
+ *                           del home finca viva ("Finca Organismo"), decidida
+ *                           en JS (FincaVivaHero → ESCENA_VIVA_POR_TEMA), no
+ *                           en CSS. Por eso NO existe (ni debe existir) un
+ *                           bloque [data-theme="biopunk2"] acá.
+ *   - bio-punk            → estilo BASE original (respaldo). NO lleva
+ *                           data-theme. Lienzo "cosecha mística" (§4). Tokens
+ *                           de color en :root de index.css. Escena isométrica
+ *                           clásica en el home finca viva.
  *   - minimalista         → papel claro + tinta + salvia (demo
  *                           demo-agente-minimalista.html).
  *   - nature              → crema cálida + café + salvia + ocre (demo

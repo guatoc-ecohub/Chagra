@@ -145,11 +145,15 @@ export const THEME_ICON = {
     ),
 };
 
+// biopunk2 (split GO-LIVE 2026-07-04) comparte la MARCA biopunk (la misma Ⓐ
+// de herramientas de campo): solo difieren en la escena del home finca viva.
+THEME_ICON.biopunk2 = THEME_ICON.biopunk;
+
 /**
  * Resuelve el ícono efectivo del tema (con fallback para `auto`/desconocidos).
  * `auto` cae al ícono biopunk (su estética base / default de la app).
  *
- * @param {string} theme - 'nature' | 'biopunk' | 'minimalista' | 'auto'
+ * @param {string} theme - 'nature' | 'biopunk' | 'biopunk2' | 'minimalista' | 'auto'
  * @returns {React.ReactNode}
  */
 export function iconForTheme(theme) {

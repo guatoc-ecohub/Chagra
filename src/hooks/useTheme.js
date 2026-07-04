@@ -3,29 +3,49 @@ import { useEffect, useState, useCallback } from 'react';
 /**
  * useTheme — sistema de temas visuales de la app (skin global).
  * ================================================================
- * Tres temas curados (operador 2026-06-03, demo Bogotá). El tema se aplica
- * desde el LOGIN y en toda la app vía el atributo `data-theme` en <html>;
- * las variables y overrides viven en `src/styles/themes.css`:
+ * Temas curados (operador 2026-06-03, demo Bogotá; split biopunk/biopunk2
+ * 2026-07-04, decisión GO-LIVE). El tema se aplica desde el LOGIN y en toda la
+ * app vía el atributo `data-theme` en <html>; las variables y overrides viven
+ * en `src/styles/themes.css`:
  *
- *   - bio-punk (DEFAULT)  → oscuro #0a0e14, neón teal #19c79a "cosecha mística".
- *                           Es el estilo BASE de la app → NO escribe data-theme.
+ *   - biopunk2 (DEFAULT)  → oscuro #0a0e14, neón teal #19c79a, con la escena
+ *                           de autor "Finca Organismo" como portada del home
+ *                           finca viva. COMPARTE la piel base biopunk (misma
+ *                           paleta/tokens) → NO escribe data-theme: todo el
+ *                           CSS `html:not([data-theme])` (= piel biopunk base)
+ *                           le aplica tal cual. La DIFERENCIA con biopunk es
+ *                           SOLO la escena del home (se resuelve en JS,
+ *                           ESCENA_VIVA_POR_TEMA de FincaVivaHero).
+ *   - biopunk             → el bio-punk ORIGINAL (respaldo): misma piel base,
+ *                           escena isométrica clásica con tokens biopunk (la
+ *                           que había ANTES de la "Finca Organismo").
+ *                           Tampoco escribe data-theme (es el estilo BASE).
  *   - nature              → cálido botánico (terracota/salvia/ocre).
  *   - minimalista         → limpio, crema, monoline verde #2f6e5a.
  *   - verde-vivo          → la PIEL propia de la finca viva: verde frondoso +
  *                           sol cálido + tierra/ocre (identidad Chagra). SOLO
  *                           visible en el selector con la flag de finca viva ON
  *                           (VITE_FINCA_VIVA_HOME_PERFIL); con la flag OFF el
- *                           selector muestra EXACTO los 3 temas de hoy.
+ *                           selector muestra EXACTO los temas base.
  *
- * Más un modo `auto` que alterna entre minimalista (día) y bio-punk (noche).
+ * Más un modo `auto` que alterna entre nature (día) y biopunk2 (noche).
  *
- * Persistencia híbrida: default bio-punk + override del usuario en
+ * Persistencia híbrida: default biopunk2 + override del usuario en
  * localStorage (`chagra:theme`). Un id legado/desconocido cae al default.
+ * Un usuario con 'biopunk' ya persistido lo CONSERVA (id válido): el split
+ * no le cambia el tema por debajo.
  * ================================================================
  */
 
 export const STORAGE_KEY = 'chagra:theme';
-export const DEFAULT_THEME = 'biopunk';
+export const DEFAULT_THEME = 'biopunk2';
+
+/**
+ * Temas que comparten la PIEL BASE de la app (sin data-theme en <html>).
+ * biopunk y biopunk2 son la MISMA piel (paleta neón teal sobre #0a0e14);
+ * solo difieren en la escena del home finca viva (decidida en JS).
+ */
+export const BASE_SKIN_THEMES = Object.freeze(['biopunk', 'biopunk2']);
 
 /**
  * Catálogo visible en el switcher (ThemeSelector). El orden define el orden
@@ -35,12 +55,23 @@ export const THEMES = Object.freeze([
   Object.freeze({
     id: 'auto',
     label: 'Automático',
-    desc: 'Nature de día, Bio-Punk de noche.',
+    desc: 'Nature de día, Bio-Punk 2 de noche.',
+  }),
+  // El DEFAULT: la piel biopunk con la escena de autor "Finca Organismo"
+  // (decisión operador GO-LIVE 2026-07-04: biopunk2 default, biopunk respaldo).
+  Object.freeze({
+    id: 'biopunk2',
+    label: 'Bio-Punk 2',
+    // "Finca Organismo" es el NOMBRE PROPIO de la escena (dispara el patrón
+    // \bFinca\b del linter); las demás descs de este catálogo tampoco viven en
+    // messages.js aún (TAREA i18n ADR-050, transversal).
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- nombre propio de la escena
+    desc: 'Oscuro, neón teal — Finca Organismo, corazón vivo.',
   }),
   Object.freeze({
     id: 'biopunk',
     label: 'Bio-Punk',
-    desc: 'Oscuro, neón teal — cosecha mística.',
+    desc: 'Oscuro, neón teal — cosecha mística (el clásico).',
   }),
   Object.freeze({
     id: 'nature',
@@ -101,19 +132,28 @@ export function normalizeTheme(id) {
 }
 
 /**
- * Aplica un tema al <html>. bio-punk es el estilo BASE → se quita data-theme;
+ * Resuelve el modo `auto` a un tema concreto según la hora local: nature de
+ * día, biopunk2 (el default) de noche. Cualquier otro id se devuelve tal cual.
+ * Fuente ÚNICA de esa regla (la usan applyTheme y FincaVivaHero — antes cada
+ * uno resolvía por su lado y el split biopunk/biopunk2 los habría desalineado).
+ */
+export function resolveAutoTheme(theme) {
+  if (theme !== 'auto') return theme;
+  const hour = new Date().getHours();
+  return hour >= 18 || hour < 6 ? 'biopunk2' : 'nature';
+}
+
+/**
+ * Aplica un tema al <html>. biopunk y biopunk2 comparten el estilo BASE → se
+ * quita data-theme (todo el CSS `html:not([data-theme])` les aplica igual);
  * el resto escribe `data-theme="<id>"` que activa las variables/overrides de
- * themes.css. Para `auto` resuelve según la hora local (día→minimalista,
- * noche→biopunk). Devuelve el tema EFECTIVO ya resuelto (útil en tests).
+ * themes.css. Para `auto` resuelve según la hora local (día→nature,
+ * noche→biopunk2). Devuelve el tema EFECTIVO ya resuelto (útil en tests).
  */
 export function applyTheme(theme) {
-  let resolved = theme;
-  if (theme === 'auto') {
-    const hour = new Date().getHours();
-    resolved = hour >= 18 || hour < 6 ? 'biopunk' : 'nature';
-  }
+  const resolved = resolveAutoTheme(theme);
 
-  if (resolved === 'biopunk') {
+  if (BASE_SKIN_THEMES.includes(resolved)) {
     document.documentElement.removeAttribute('data-theme');
   } else {
     document.documentElement.setAttribute('data-theme', resolved);

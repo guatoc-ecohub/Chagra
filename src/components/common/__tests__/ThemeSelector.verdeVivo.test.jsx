@@ -34,11 +34,14 @@ describe('ThemeSelector — 4º tema Verde Vivo gateado por flag', () => {
 
   const verdeBtn = () => screen.queryByRole('button', { name: /^Verde Vivo/i });
 
-  it('flag OFF (prod): NO muestra el 4º tema, y siguen los 3 + auto', () => {
+  it('flag OFF (prod): NO muestra el tema verde-vivo, y sigue el catálogo base', () => {
     flagOn = false;
     render(<ThemeSelector />);
     expect(verdeBtn()).toBeNull();
-    expect(screen.getByRole('button', { name: /^Bio-Punk/i })).toBeTruthy();
+    // "Bio-Punk 2" y "Bio-Punk" coexisten desde el split GO-LIVE 2026-07-04:
+    // el clásico se distingue por el arranque de su descripción.
+    expect(screen.getByRole('button', { name: /^Bio-Punk 2/i })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /^Bio-Punk Oscuro/i })).toBeTruthy();
     expect(screen.getByRole('button', { name: /^Nature/i })).toBeTruthy();
     expect(screen.getByRole('button', { name: /^Minimalista/i })).toBeTruthy();
     expect(screen.getByRole('button', { name: /^Autom/i })).toBeTruthy();

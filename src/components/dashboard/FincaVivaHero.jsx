@@ -14,7 +14,7 @@ import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciar
 import { deriveAtmosphere } from '../../services/atmosphereService';
 import { resolveClimaLocation, getCachedClimaSnapshot, CLIMA_UPDATED_EVENT } from '../../services/climaService';
 import { clasificarPisoTermico } from '../../services/pisoTermicoClassifier';
-import { useTheme } from '../../hooks/useTheme';
+import { useTheme, resolveAutoTheme } from '../../hooks/useTheme';
 import { iconForTheme } from './themeIcon';
 import { colibriRealActivo } from '../../config/colibriFlag';
 import { BarbuditoIlustrado, BarbuditoRealLoop } from '../colibri/Barbudito';
@@ -26,8 +26,13 @@ import NotificationsBell from '../NotificationsBell';
 // ESCENAS VIVAS POR TEMA — cada tema tiene su escena de autor para la escala
 // FINCA (la portada del home). Biopunk estrenó el patrón con la "Finca
 // Organismo" aprobada; nature/verde-vivo/minimalista suben al MISMO nivel con
-// estética PROPIA (2026-07-04):
-//   · biopunk     → "Finca Organismo" (noche bioluminiscente, corazón-semilla).
+// estética PROPIA (2026-07-04). SPLIT GO-LIVE (decisión operador 2026-07-04):
+// la "Finca Organismo" pasa a ser el tema NUEVO `biopunk2` (el DEFAULT) y
+// `biopunk` RESTAURA su escena original — la isométrica base (SceneFinca) con
+// los tokens biopunk de CIELOS_TEMA, la que había ANTES de la Finca Organismo:
+//   · biopunk2    → "Finca Organismo" (noche bioluminiscente, corazón-semilla).
+//   · biopunk     → escena isométrica clásica con piel biopunk (respaldo;
+//                    NO va en ESCENA_VIVA_POR_TEMA: cae a SceneFinca).
 //   · nature      → "El Árbol de la Vida" (mañana dorada, raíces que crían).
 //   · verde-vivo  → "Huerto Exuberante" (verdes saturados, rocío que cae).
 //   · minimalista → "Un solo trazo" (line-art que se dibuja sobre papel).
@@ -243,21 +248,23 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
 
   const tieneFincaPropia = !children; // children = red institucional del extensionista.
 
-  // ── ESCENA VIVA DEL TEMA (los 4 temas, escala finca) ─────────────────────
+  // ── ESCENA VIVA DEL TEMA (escala finca) ──────────────────────────────────
   // Cada tema monta SU escena de autor para la portada (ver mapa en el import):
-  // la "Finca Organismo" en biopunk, "El Árbol de la Vida" en nature, el
-  // "Huerto Exuberante" en verde-vivo y "Un solo trazo" en minimalista. Las
-  // escalas balcon/invernadero del perfil conservan sus escenas isométricas
-  // (su arte por tema es trabajo aparte), igual que un tema desconocido cae a
-  // SceneFinca. `theme==='auto'` se resuelve mirando el data-theme efectivo
-  // que applyTheme ya dejó en <html> (biopunk = tema base SIN atributo).
-  const temaEfectivo = theme === 'auto'
-    ? ((typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme')) || 'biopunk')
-    : theme;
+  // la "Finca Organismo" en biopunk2 (default), "El Árbol de la Vida" en
+  // nature, el "Huerto Exuberante" en verde-vivo y "Un solo trazo" en
+  // minimalista. `biopunk` (respaldo) NO está en el mapa: cae a la SceneFinca
+  // isométrica original con su piel de CIELOS_TEMA. Las escalas balcon/
+  // invernadero del perfil conservan sus escenas isométricas (su arte por tema
+  // es trabajo aparte), igual que un tema desconocido cae a SceneFinca.
+  // `theme==='auto'` se resuelve con resolveAutoTheme (la MISMA regla que
+  // applyTheme): biopunk y biopunk2 comparten piel base SIN data-theme en
+  // <html>, así que el atributo ya no distingue cuál escena toca.
+  const temaEfectivo = resolveAutoTheme(theme);
   const EscenaViva = ESCENA_VIVA_POR_TEMA[temaEfectivo] || null;
   const escenaVivaActiva = !!EscenaViva && escala === 'finca' && tieneFincaPropia;
-  // Compat: el modificador histórico del wrap biopunk (specs externos lo usan).
-  const organismoActivo = escenaVivaActiva && temaEfectivo === 'biopunk';
+  // Compat: el modificador histórico del wrap organismo (specs externos lo
+  // usan). Tras el split vive en biopunk2 (donde quedó la Finca Organismo).
+  const organismoActivo = escenaVivaActiva && temaEfectivo === 'biopunk2';
 
   return (
     <section
@@ -752,6 +759,15 @@ const CIELOS_TEMA = {
     atardecer: ['#3a2440', '#c25c4a'],
     noche: ['#0c1830', '#26404d'],
   },
+  // biopunk2 comparte la piel biopunk (mismo cielo interno): la diferencia
+  // entre ambos es SOLO la escena de la escala finca (Finca Organismo vs.
+  // isométrica clásica). Este cielo aplica a balcon/invernadero y fallbacks.
+  biopunk2: {
+    dia: ['#16324f', '#2b5a63'],
+    amanecer: ['#3b2f5e', '#b06a55'],
+    atardecer: ['#3a2440', '#c25c4a'],
+    noche: ['#0c1830', '#26404d'],
+  },
   'verde-vivo': {
     dia: ['#79c9b7', '#e2f0cf'],
     amanecer: ['#ecb27a', '#f6ecc4'],
@@ -1025,9 +1041,12 @@ function ColibriAvatar() {
 /**
  * ESCENA VIVA de autor por tema (escala finca). Un tema fuera de este mapa
  * (futuro/desconocido) cae a la SceneFinca isométrica con su grade de color.
+ * SPLIT GO-LIVE 2026-07-04: la "Finca Organismo" vive en `biopunk2` (default);
+ * `biopunk` queda FUERA del mapa a propósito — restaura su escena original
+ * (SceneFinca isométrica con los tokens biopunk de CIELOS_TEMA).
  */
 const ESCENA_VIVA_POR_TEMA = Object.freeze({
-  biopunk: SceneFincaOrganismo,
+  biopunk2: SceneFincaOrganismo,
   nature: SceneFincaNature,
   'verde-vivo': SceneHuertoVivo,
   minimalista: SceneTrazoMinimal,
@@ -1586,6 +1605,7 @@ function SceneFinca({ poblada, cielo, estructura, escalaFinca }) {
     : '';
   return (
     <svg viewBox="0 0 390 360" preserveAspectRatio="xMidYMid slice"
+      data-testid="fvh-escena-finca"
       aria-label={`Su finca vista en isométrico: milpa, hortaliza, estanque con pato, corral con cerdo, gallina, vaca y abejas, y un guamo de sombra al centro.${ariaEstructura}`}>
       <defs>
         <SolGrad />

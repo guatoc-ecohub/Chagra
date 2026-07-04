@@ -1,17 +1,23 @@
 /**
  * useTheme — sistema de temas visuales de la app.
  *
- * Tres temas curados (operador 2026-06-03, demo Bogotá):
- *   - bio-punk (DEFAULT)  → oscuro neón teal "cosecha mística"
+ * Temas curados (operador 2026-06-03, demo Bogotá; split biopunk/biopunk2
+ * GO-LIVE 2026-07-04):
+ *   - biopunk2 (DEFAULT)  → piel biopunk + escena "Finca Organismo"
+ *   - bio-punk            → oscuro neón teal "cosecha mística" (el clásico,
+ *                           respaldo; escena isométrica original)
  *   - nature              → cálido botánico (terracota/salvia/ocre)
  *   - minimalista         → limpio, crema, monoline verde
- * Más un modo `auto` (alterna minimalista/biopunk según la hora).
+ * Más un modo `auto` (alterna nature/biopunk2 según la hora).
  *
  * Cubre:
- *   - default = bio-punk (sin localStorage previo, desde PR #1501)
- *   - applyTheme escribe / limpia data-theme en <html> (biopunk = sin attr)
+ *   - default = biopunk2 (decisión operador GO-LIVE 2026-07-04)
+ *   - applyTheme escribe / limpia data-theme en <html> (biopunk y biopunk2 =
+ *     piel BASE, sin attr — comparten todo el CSS `html:not([data-theme])`)
  *   - setTheme persiste en localStorage (chagra:theme) y rechaza ids inválidos
- *   - THEME_IDS expone exactamente los 3 temas + auto
+ *   - THEME_IDS expone exactamente los temas curados + auto
+ *   - un 'biopunk' ya persistido se CONSERVA (el split no cambia el tema por
+ *     debajo a quien eligió el clásico)
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
@@ -35,20 +41,22 @@ describe('useTheme — sistema de temas', () => {
     document.documentElement.removeAttribute('data-theme');
   });
 
-  it('default es biopunk cuando no hay nada en localStorage', () => {
+  it('default es biopunk2 cuando no hay nada en localStorage', () => {
     const { result } = renderHook(() => useTheme());
-    expect(result.current.theme).toBe('biopunk');
-    expect(DEFAULT_THEME).toBe('biopunk');
+    expect(result.current.theme).toBe('biopunk2');
+    expect(DEFAULT_THEME).toBe('biopunk2');
   });
 
-  it('THEME_IDS expone los 3 temas curados + auto', () => {
+  it('THEME_IDS expone los temas curados + auto (biopunk2 incluido)', () => {
+    expect(THEME_IDS).toContain('biopunk2');
     expect(THEME_IDS).toContain('biopunk');
     expect(THEME_IDS).toContain('nature');
     expect(THEME_IDS).toContain('minimalista');
     expect(THEME_IDS).toContain('auto');
-    // El catálogo visible al usuario contiene los 3 temas explícitos + auto.
+    // El catálogo visible al usuario: auto + biopunk2 (default) + los 3 curados.
     expect(THEMES.map((t) => t.id)).toEqual([
       'auto',
+      'biopunk2',
       'biopunk',
       'nature',
       'minimalista',
@@ -59,6 +67,13 @@ describe('useTheme — sistema de temas', () => {
     document.documentElement.setAttribute('data-theme', 'nature');
     const resolved = applyTheme('biopunk');
     expect(resolved).toBe('biopunk');
+    expect(document.documentElement.hasAttribute('data-theme')).toBe(false);
+  });
+
+  it('applyTheme(biopunk2) NO pone data-theme (comparte la piel base biopunk)', () => {
+    document.documentElement.setAttribute('data-theme', 'nature');
+    const resolved = applyTheme('biopunk2');
+    expect(resolved).toBe('biopunk2');
     expect(document.documentElement.hasAttribute('data-theme')).toBe(false);
   });
 
@@ -84,11 +99,11 @@ describe('useTheme — sistema de temas', () => {
     expect(document.documentElement.getAttribute('data-theme')).toBe('nature');
   });
 
-  it('applyTheme(auto) de noche resuelve a biopunk (sin data-theme)', () => {
+  it('applyTheme(auto) de noche resuelve a biopunk2 (el default, sin data-theme)', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-06-03T22:00:00'));
     const resolved = applyTheme('auto');
-    expect(resolved).toBe('biopunk');
+    expect(resolved).toBe('biopunk2');
     expect(document.documentElement.hasAttribute('data-theme')).toBe(false);
   });
 
@@ -117,9 +132,15 @@ describe('useTheme — sistema de temas', () => {
     );
   });
 
-  it('migra ids legados (dark-sober/light) al default biopunk en el getter', () => {
-    // dark-sober y light fueron reemplazados por los 3 temas curados + auto.
+  it('migra ids legados (dark-sober/light) al default biopunk2 en el getter', () => {
+    // dark-sober y light fueron reemplazados por los temas curados + auto.
     localStorage.setItem(STORAGE_KEY, 'dark-sober');
+    const { result } = renderHook(() => useTheme());
+    expect(result.current.theme).toBe('biopunk2');
+  });
+
+  it("un 'biopunk' ya persistido se CONSERVA (el split no cambia el tema al usuario)", () => {
+    localStorage.setItem(STORAGE_KEY, 'biopunk');
     const { result } = renderHook(() => useTheme());
     expect(result.current.theme).toBe('biopunk');
   });
