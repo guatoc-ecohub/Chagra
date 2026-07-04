@@ -30,7 +30,8 @@ export default function MundosDeMiFinca({ onNavigate, mostrarAnimales = true, pl
     const mundos = MUNDOS_FINCA.filter((m) => m.gate !== 'animales' || mostrarAnimales);
 
     const abrir = (m) => {
-        if (m.directo) onNavigate?.(m.directo.view, m.directo.data);
+        if (m.portada) onNavigate?.(m.portada);
+        else if (m.directo) onNavigate?.(m.directo.view, m.directo.data);
         else onNavigate?.('mundo', { mundo: m.id });
     };
 

@@ -125,6 +125,11 @@ const MundoScreen = lazy(() => import('./components/MundoScreen'));
 // Mini-app insignia del mundo Sanidad: síntoma folk → plaga/enfermedad →
 // manejo agroecológico (grounded DR AGROSAVIA/Cenicafé/SciELO + FAO/IPM).
 const SanidadSintomaScreen = lazy(() => import('./components/sanidad/SanidadSintomaScreen'));
+// Portada a medida del mundo 🌱 CULTIVOS Y SEMILLAS: hub que orienta por
+// región/clima, agrupa las funciones existentes (directorio, ciclo, germinación,
+// calendario, siembra, cosecha) y suma una calculadora de grados-día. Re-rutea,
+// no reimplementa.
+const MundoCultivosHub = lazy(() => import('./components/cultivos/MundoCultivosHub'));
 const CromatografiaScreen = lazy(() => import('./components/CromatografiaScreen'));
 const CicloVivoFullView = lazy(() => import('./components/CicloVivo/CicloVivoFullView'));
 const ToxicologiaScreen = lazy(() => import('./components/ToxicologiaScreen'));
@@ -1356,6 +1361,20 @@ export default function App() {
             <ErrorFallback moduleName="Mundos de la finca">
               <MundoScreen
                 mundoId={currentViewData?.mundo}
+                onBack={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mundo_cultivos':
+        // Portada a medida del mundo CULTIVOS Y SEMILLAS (hub): orienta por
+        // región/clima, agrupa las funciones existentes y suma la calculadora
+        // de grados-día. Cada lámina RE-RUTEA a su pantalla real vía navigate.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Cultivos y semillas">
+              <MundoCultivosHub
                 onBack={() => navigate('dashboard')}
                 onNavigate={navigate}
               />
