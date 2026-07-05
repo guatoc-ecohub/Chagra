@@ -65,6 +65,11 @@ import { buildAyudaResponse } from '../../services/ayudaAgentResponder';
 // para intentar AL MENOS una consulta al grafo en vez de caer a generativo puro.
 import { planNluFallback } from '../../services/agentNluFallback';
 import { planKnowledgeIntent, hasSoilDiagnosticIntent } from '../../services/knowledgeIntentRouter';
+// Fix misroute "papa precio" (2026-07-05): router PURO que detecta intención
+// de PRECIO/MERCADO ANTES de planKnowledgeIntent/planNlu — garantiza que
+// "a cómo está la papa" SIEMPRE llame get_precio_sipsa (dato vivo), nunca
+// termine en ficha/viabilidad/variedades. Ver cabecera de marketIntentRouter.js.
+import { planMarketIntent } from '../../services/marketIntentRouter';
 // Grounding OFFLINE del grafo (#49): cuando NO hay red, el bloque de relaciones
 // (plaga→controlador / compatibles / antagonistas / biopreparados / vernáculos)
 // se arma desde el export precacheado del grafo AGE (grafo-relations.json), en
@@ -1634,7 +1639,47 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           // y el agente responde neutral en vez de fabricar. No corre bajo chip
           // forzado (el chip ya decidió el tool determinístico).
           if (!forcedIntent) {
+            // PASO 2-pre0 — routing determinístico de PRECIO/MERCADO (fix
+            // misroute "papa precio", 2026-07-05). MÁXIMA PRIORIDAD: corre
+            // ANTES de planKnowledgeIntent (que podría atrapar "variedad"/
+            // "cultivar" en el mismo mensaje) y antes del planner NLU del
+            // sidecar (LLM chico, misroutea a ficha/viabilidad — bug
+            // histórico documentado en chipIntentRouter.js). Garantiza que
+            // TODA consulta de precio ejecute get_precio_sipsa (dato vivo de
+            // la tabla chagra.sipsa_precios, NUNCA la tabla estática
+            // precioReferencia.js). Se inyecta available:false SINTÉTICO si
+            // el tool no respondió (sidecar caído): el turno sigue siendo de
+            // precio, nunca cae a viabilidad/variedades por accidente.
+            // Aguas abajo, buildPriceAnswer (available:true) o
+            // buildPriceDeclineContext (available:false) deciden la
+            // respuesta — ambos ya groundeados y anti-alucinación.
             try {
+              const mPlan = planMarketIntent(textForLLM, resolvedEntities);
+              if (mPlan && mPlan.tool) {
+                const tM0 = performance.now();
+                const mResult = await callTool(mPlan.tool, mPlan.args);
+                const tM1 = performance.now();
+                toolEvidence = {
+                  tool: mPlan.tool,
+                  args: mPlan.args,
+                  result: mResult || {
+                    available: false,
+                    reason: 'sin_respuesta',
+                    hint: 'la herramienta de precios no respondió — declinar honesto (SIPSA/DANE/Corabastos), NO inventar un precio',
+                  },
+                };
+                nluRoute = `precio:${mPlan.source}`;
+                console.debug('[sidecar] precio/mercado (NLU saltado)', {
+                  tool: mPlan.tool,
+                  producto: mPlan.args.producto,
+                  source: mPlan.source,
+                  available: mResult ? mResult.available : false,
+                  latencyTool: Math.round(tM1 - tM0),
+                });
+              }
+            } catch (_) { /* graceful: sigue el flujo de conocimiento/NLU normal */ }
+
+            if (!toolEvidence) try {
               const kPlan = planKnowledgeIntent(textForLLM, resolvedEntities);
               if (kPlan && kPlan.tool) {
                 const tK0 = performance.now();
