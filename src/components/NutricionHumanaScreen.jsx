@@ -235,6 +235,13 @@ function PlatoIlustracion() {
   );
 }
 
+/**
+ * @param {Object} props
+ * @param {() => void} props.onBack
+ * @param {(view: string, data?: any) => void} [props.onNavigate] - aceptado por
+ *   consistencia con el resto de mini-apps (App.jsx siempre lo pasa); esta
+ *   pantalla todavía no lo usa (no hay CTA de navegación cruzada aún).
+ */
 export default function NutricionHumanaScreen({ onBack }) {
   const [data, setData] = useState(null);
   const [estado, setEstado] = useState('cargando'); // cargando | listo | error
