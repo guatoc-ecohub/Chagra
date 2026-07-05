@@ -152,9 +152,10 @@ describe('Home F2 — reestructuración 2.0 "Los mundos de mi finca" (V4)', () =
     render(<DashboardLive onNavigate={onNavigate} />);
     await screen.findByTestId('bloque-mundos');
 
-    // Mundo con entradas → pantalla de mundo.
+    // Cultivos tiene PORTADA a medida (hub) → navega a su vista propia.
     fireEvent.click(screen.getByTestId('mundo-cultivos'));
-    expect(onNavigate).toHaveBeenCalledWith('mundo', { mundo: 'cultivos' });
+    expect(onNavigate).toHaveBeenCalledWith('mundo_cultivos');
+    // Mundo con entradas y sin portada → pantalla de mundo genérica.
     fireEvent.click(screen.getByTestId('mundo-mercado'));
     expect(onNavigate).toHaveBeenCalledWith('mundo', { mundo: 'mercado' });
 
