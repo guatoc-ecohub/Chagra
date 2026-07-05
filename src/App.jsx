@@ -1338,9 +1338,10 @@ export default function App() {
           </ErrorBoundary>
         );
       case 'poscosecha':
-        // Módulo "Poscosecha y Despensa" (mundo Mercado y despensa): 3 pilares
-        // (cosechar en punto / guardar bien / transformar) + calculadora
-        // determinista de secado de grano. Cifras grounded al DR; slots no
+        // Módulo "Poscosecha y Despensa" (mundo Mercado y despensa): 4 pilares
+        // con fotos reales CC (cosechar en punto / enfriar y curar / secar y
+        // guardar el grano / transformar) + calculadora determinista de secado,
+        // plagas de bodega y micotoxinas. Cifras grounded al DR; slots no
         // cerrados marcados grounded-pendiente en poscosechaCalculator.js.
         return (
           <ErrorBoundary>

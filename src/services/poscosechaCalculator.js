@@ -251,6 +251,168 @@ export const TRANSFORMACIONES = [
   },
 ];
 
+/* ═══════════════════ 4b. ÍNDICES DE MADUREZ — cuándo cosechar ═══════════════
+ * El índice de cosecha dice CUÁNDO recolectar para máxima vida útil y calidad.
+ * Se lee con los ojos (color), la mano (firmeza) y el calendario (días desde la
+ * flor); con equipo, con Brix o materia seca. Verde de más = sin sabor; maduro
+ * de más = poca vida y golpe en el transporte. Grounded al DR nacional §2.
+ * `foto` = slug en /public/poscosecha (ver creditos.json).
+ * ────────────────────────────────────────────────────────────────────────── */
+export const INDICES_MADUREZ = [
+  {
+    id: 'aguacate',
+    cultivo: 'Aguacate Hass',
+    foto: 'cosecha-aguacate',
+    sena: 'Materia seca, no color',
+    texto: 'No madura en la planta: se cosecha fisiológicamente maduro (firme) y ablanda después. La seña es el contenido de materia seca.',
+    dato: 'Norma internacional ≥ 21 %; para Colombia se propone 23–24 % como punto de cosecha.',
+    fuente: 'AGROSAVIA; norma de exportación',
+    confianza: 'alta',
+  },
+  {
+    id: 'uchuva',
+    cultivo: 'Uchuva',
+    foto: 'cosecha-uchuva',
+    sena: 'Color del capacho y del fruto',
+    texto: 'El punto se lee por el color del capacho (cáliz) y del fruto. La variedad andina llega a ~14,5 °Brix, buenos para consumo y guardado.',
+    dato: 'Cáliz que vira de verde a dorado = fruto en su punto.',
+    fuente: 'AGROSAVIA',
+    confianza: 'media-alta',
+  },
+  {
+    id: 'climatericos',
+    cultivo: 'Banano, plátano, mango, tomate, papaya',
+    foto: 'cosecha-platano',
+    sena: 'Firmes; maduran después',
+    texto: 'Se cosechan fisiológicamente maduros pero FIRMES y maduran en poscosecha. Para consumo local puede esperar más color; para transporte largo, coséchelos más verdes.',
+    dato: 'Cosechar más verde = más días de viaje sin golpearse.',
+    fuente: 'FAO',
+    confianza: 'alta',
+  },
+];
+
+/* ═══════════════════ 4c. PLAGAS DE ALMACÉN — control físico sin veneno ═══════
+ * Gorgojos, polillas y escarabajos (más roedores y aves) atacan el grano
+ * guardado. En bodega abierta la pérdida puede pasar del 5 % anual; con buen
+ * manejo físico se reduce casi a cero, SIN químico de síntesis. DR nacional §4,
+ * DR internacional §4.2.
+ * ────────────────────────────────────────────────────────────────────────── */
+export const PLAGAS_ALMACEN = [
+  {
+    id: 'limpieza',
+    titulo: 'Limpie la bodega antes de llenarla',
+    texto: 'Saque los residuos y el grano viejo de la cosecha pasada: ahí se esconde el foco de gorgojo. Recipiente y bodega limpios y secos.',
+    tag: 'gratis',
+  },
+  {
+    id: 'hermetico',
+    titulo: 'Hermético: mata el gorgojo sin veneno',
+    texto: 'Grano seco en silo metálico o bolsa hermética bien cerrada: el aire se acaba, sube el CO₂ y las plagas mueren solas. La bolsa hermética aguanta grano algo húmedo (~21 % por unos 21 días) mientras seca, pero para guardar largo hay que secar a 13–14 % primero.',
+    tag: 'sin químico',
+  },
+  {
+    id: 'diatomeas',
+    titulo: 'Tierra de diatomeas: polvo que reseca al insecto',
+    foto: 'diatomeas',
+    texto: 'Es un polvo mineral (conchas fósiles molidas). Al espolvorearlo con el grano raspa y deseca al gorgojo hasta matarlo; es barrera física, no veneno de síntesis. Mézclelo seco y use tapabocas al aplicarlo.',
+    tag: 'físico',
+  },
+  {
+    id: 'frio-calor',
+    titulo: 'Frío y calor como arma',
+    texto: 'El frío frena a los insectos; el sol y el calor del secado matan huevos y larvas. Vigile los "focos calientes" en el montón: calor donde no debe = insecto activo comiendo.',
+    tag: 'físico',
+  },
+];
+
+/* ═══════════════════ 4d. MICOTOXINAS — el peligro invisible (SALUD) ══════════
+ * Venenos que producen ciertos hongos en el grano/fruto mal secado o guardado
+ * húmedo. NO se ven a simple vista, NO se quitan lavando y RESISTEN la cocción.
+ * Riesgo real de salud (hígado, riñón). La defensa #1 es SECAR y guardar seco;
+ * el grano con moho se DESCARTA, no se lava ni se cocina. DR internacional §4.1
+ * (aflatoxina/Aspergillus flavus), DR nacional §4/§5.6 (ocratoxina/café).
+ * ────────────────────────────────────────────────────────────────────────── */
+
+/** Mensaje transversal de salud — el mismo para todas las micotoxinas. */
+export const MICOTOXINAS_ADVERTENCIA =
+  'Las micotoxinas no se ven, no se sienten en el sabor, no se quitan lavando y resisten la cocción. El grano o la mazorca con moho se descartan; no se lavan ni se dan a los animales.';
+
+export const MICOTOXINAS = [
+  {
+    id: 'aflatoxina',
+    nombre: 'Aflatoxina',
+    foto: 'moho-maiz',
+    hongo: 'Aspergillus flavus',
+    donde: 'Maíz, maní y granos guardados húmedos o mohosos.',
+    peligro: 'Es de las más tóxicas: daña el hígado y es cancerígena. Peligrosa para la familia y para los animales de la finca.',
+    prevencion: 'Secar a menos de 13 % ANTES de guardar y mantener seco y hermético. Por debajo de 13 % el moho casi no crece.',
+    fuente: 'FAO; DR internacional §4.1',
+    confianza: 'alta',
+  },
+  {
+    id: 'ocratoxina',
+    nombre: 'Ocratoxina A',
+    hongo: 'Aspergillus / Penicillium',
+    donde: 'Café mal secado y granos guardados húmedos.',
+    peligro: 'Daña el riñón. En el café castiga la calidad y la salud.',
+    prevencion: 'Secar el café a 10–12 %, voltearlo al sol para que seque parejo, y guardar por debajo de 20 °C, con humedad ambiente baja (< 75 %) y sin luz.',
+    fuente: 'Cenicafé; DR nacional §5.6',
+    confianza: 'media-alta',
+  },
+  {
+    id: 'fumonisina',
+    nombre: 'Fumonisina',
+    hongo: 'Fusarium verticillioides',
+    donde: 'Maíz con pudrición de la mazorca (grano rosado/rojizo).',
+    peligro: 'Se asocia a daños en salud humana y animal; es otro riesgo del maíz mal manejado.',
+    prevencion: 'Cosechar sano, secar rápido, descartar mazorcas podridas y guardar seco. No mezclar mazorca dañada con la sana.',
+    fuente: 'FAO; DR internacional §4.1',
+    confianza: 'media',
+  },
+];
+
+/* ═══════════════════ 4e. CADENA DE FRÍO CASERA — enfriar sin nevera ══════════
+ * Enfriar rápido tras la cosecha y mantenerlo frío alarga mucho la vida de
+ * frutas y hortalizas. Sin cuarto frío hay opciones de bajo costo. DR nacional
+ * §3.4, DR internacional §4.3 (cámara evaporativa / ZECC).
+ * ────────────────────────────────────────────────────────────────────────── */
+export const CADENA_FRIO = [
+  {
+    id: 'preenfriado',
+    titulo: 'Coseche fresco y quite el calor de campo',
+    texto: 'Recolecte en las horas frescas (mañana), saque del sol de inmediato y acopie en sombra ventilada. El calor del campo es el primer enemigo: cada hora al sol le quita días de vida.',
+    tag: 'gratis',
+  },
+  {
+    id: 'aire',
+    titulo: 'Aire forzado con ventilador',
+    texto: 'Un ventilador moviendo aire en la bodega baja la temperatura del producto de forma barata. Para hortalizas de hoja, humedezca un poco el ambiente para que no se marchiten.',
+    tag: 'barato',
+  },
+  {
+    id: 'evaporativa',
+    titulo: 'Cámara evaporativa (olla de barro / muro de arena húmeda)',
+    foto: 'frio-olla',
+    texto: 'Sin electricidad, solo con agua y barro o arena húmeda, se logran ~15–18 °C y 90–95 % de humedad por evaporación. Una olla de barro con arena mojada alrededor, o un doble muro de ladrillo con arena húmeda en medio, funcionan como nevera de pobre.',
+    tag: 'sin luz',
+  },
+];
+
+/**
+ * Extensión de vida útil en cámara evaporativa vs. ambiente (estudio único,
+ * depende de clima y variedad). Sirve en clima seco-caliente y es para guardar
+ * POCOS días, no meses. DR internacional §4.3 (ZECC).
+ */
+export const CAMARA_EVAPORATIVA_VIDA = [
+  { producto: 'Tomate', conCamara: 21, ambiente: 6 },
+  { producto: 'Zanahoria', conCamara: 28, ambiente: 8 },
+  { producto: 'Banano', conCamara: 17, ambiente: 5 },
+  { producto: 'Mango', conCamara: 14, ambiente: 5 },
+];
+export const CAMARA_EVAPORATIVA_NOTA =
+  'Rinde mejor en clima seco y caliente (en aire húmedo enfría poco) y es para guardar unos días, no para almacenar meses.';
+export const CAMARA_EVAPORATIVA_FUENTE = 'DR internacional §4.3 (Zero-Energy Cool Chamber) · confianza media';
+
 /* ═══════════════════ 5. MAGNITUD DEL PROBLEMA (gancho) ══════════════════════ */
 
 /** Cifras de pérdida país (DNP, año base 2016). Confianza ALTA por triangulación. */
