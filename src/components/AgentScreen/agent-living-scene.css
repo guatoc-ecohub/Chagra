@@ -1,0 +1,191 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   AGENT LIVING SCENE — "El organismo que conversa".
+   ============================================================================
+   El fondo del chat del agente DEJA de ser un rectángulo plano con velo: es un
+   MUNDO VIVO que respira y REACCIONA al estado del agente (idle / escuchando /
+   pensando / hablando), distinto por tema — la misma alma del home "Finca
+   Organismo" que el operador amó, ahora en la conversación.
+
+   Cada tema es un organismo:
+     · biopunk / biopunk2 → corazón-micelio nocturno (teal neón), esporas que
+       suben, hifas con savia que fluye.
+     · nature             → amanecer que respira, sol-corazón cálido, polen ocre.
+     · verde-vivo         → dosel vivo, sol entre hojas, hojitas que caen.
+     · minimalista        → UN solo pulso de tinta salvia sobre papel (cero motas,
+       cero glow — el ADN minimalista: una línea que escucha).
+
+   REACTIVIDAD (el "alma"): la clase raíz lleva data-state y el CSS cambia el
+   ritmo/el gesto del organismo:
+     · idle       → respira lento.
+     · listening  → anillos que CONTRAEN hacia el corazón (te está oyendo).
+     · thinking   → doble latido rápido + savia acelerada (está pensando).
+     · speaking   → ondas que EMANAN del corazón hacia afuera (te está hablando).
+
+   Todo es CSS/SVG declarativo (cero JS por frame). prefers-reduced-motion =
+   estado estático digno (organismo encendido, sin movimiento).
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.als-root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /* ritmo cardíaco base compartido por todo el organismo */
+  --als-beat: 5s;
+  --als-flow: 3s;
+  --als-drift: 13s;
+}
+.als-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── El CORAZÓN / presencia (respira; se acelera al pensar) ─────────────────── */
+.als-heart {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: als-breathe var(--als-beat) ease-in-out infinite;
+}
+@keyframes als-breathe {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50%      { transform: scale(1.045); filter: brightness(1.18); }
+}
+/* doble latido cardíaco (se activa al pensar) */
+@keyframes als-beat {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  8%  { transform: scale(1.24); filter: brightness(2); }
+  16% { transform: scale(1); }
+  24% { transform: scale(1.14); filter: brightness(1.5); }
+  32% { transform: scale(1); filter: brightness(1); }
+}
+
+/* halo del corazón (respira desfasado) */
+.als-halo {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: als-halo calc(var(--als-beat) * 1.4) ease-in-out infinite;
+}
+@keyframes als-halo {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50%      { transform: scale(1.16); opacity: 0.85; }
+}
+
+/* ── ONDAS que emanan (al hablar) / anillos que contraen (al escuchar) ───────── */
+.als-wave {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+}
+.als-listenring {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+}
+
+/* ── HIFAS / ramas con savia que fluye ───────────────────────────────────────── */
+.als-thread {
+  stroke-dasharray: 5 10;
+  animation: als-flow var(--als-flow) linear infinite;
+}
+.als-thread.als-rev { animation-direction: reverse; }
+.als-thread.als-slow { animation-duration: calc(var(--als-flow) * 1.7); stroke-dasharray: 3 12; }
+@keyframes als-flow { to { stroke-dashoffset: -60; } }
+
+/* la red entera se enciende con cada latido */
+.als-net { animation: als-netglow var(--als-beat) ease-in-out infinite; }
+@keyframes als-netglow {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 0.9; }
+}
+
+/* ── MOTAS de vida (esporas / polen / hojitas) que suben o caen y se mecen ────── */
+.als-mote {
+  transform-box: fill-box;
+  animation: als-rise var(--als-drift) linear infinite;
+}
+.als-mote.als-fall { animation-name: als-fall; }
+@keyframes als-rise {
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  12%  { opacity: 0.9; }
+  88%  { opacity: 0.9; }
+  100% { transform: translateY(-120px) translateX(10px); opacity: 0; }
+}
+@keyframes als-fall {
+  0%   { transform: translateY(-10px) rotate(-12deg); opacity: 0; }
+  14%  { opacity: 0.95; }
+  86%  { opacity: 0.95; }
+  100% { transform: translateY(150px) translateX(-16px) rotate(16deg); opacity: 0; }
+}
+
+/* estrellas/cocuyos que titilan */
+.als-tw { animation: als-tw 3.6s ease-in-out infinite; }
+@keyframes als-tw { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+
+/* niebla que deriva */
+.als-fog { animation: als-fog 18s ease-in-out infinite alternate; }
+@keyframes als-fog { from { transform: translateX(-14px); opacity: 0.5; } to { transform: translateX(14px); opacity: 0.9; } }
+
+/* rayo de sol / haz que respira (nature / verde-vivo) */
+.als-beam { transform-box: fill-box; transform-origin: top center; animation: als-beam 9s ease-in-out infinite; }
+@keyframes als-beam { 0%, 100% { opacity: 0.25; transform: scaleY(0.98); } 50% { opacity: 0.55; transform: scaleY(1.03); } }
+
+/* ── minimalista: el ÚNICO pulso (una línea que escucha) ─────────────────────── */
+.als-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: als-pulse 6s ease-out infinite;
+  opacity: 0;
+}
+@keyframes als-pulse {
+  0%   { transform: scale(0.4); opacity: 0; }
+  20%  { opacity: 0.55; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* ══════════════════ REACTIVIDAD POR ESTADO ══════════════════════════════════ */
+
+/* PENSANDO — el corazón late doble y rápido; la savia corre; la red pulsa fuerte. */
+.als-root[data-state="thinking"] { --als-beat: 2.3s; --als-flow: 1.5s; }
+.als-root[data-state="thinking"] .als-heart { animation: als-beat var(--als-beat) ease-in-out infinite; }
+.als-root[data-state="thinking"] .als-pulse { animation-duration: 2.4s; }
+
+/* HABLANDO — ondas que EMANAN del corazón hacia afuera (con cada frase). */
+.als-root[data-state="speaking"] { --als-beat: 3.4s; --als-flow: 2s; }
+.als-root[data-state="speaking"] .als-wave {
+  animation: als-emanate 3.4s ease-out infinite;
+}
+.als-root[data-state="speaking"] .als-wave.als-w2 { animation-delay: 1.13s; }
+.als-root[data-state="speaking"] .als-wave.als-w3 { animation-delay: 2.26s; }
+.als-root[data-state="speaking"] .als-pulse { animation-duration: 3s; }
+@keyframes als-emanate {
+  0%   { transform: scale(0.3); opacity: 0.75; }
+  80%  { opacity: 0; }
+  100% { transform: scale(2.7); opacity: 0; }
+}
+
+/* ESCUCHANDO — anillos que CONTRAEN hacia el corazón (te está atendiendo). */
+.als-root[data-state="listening"] { --als-beat: 3.8s; }
+.als-root[data-state="listening"] .als-listenring {
+  animation: als-contract 2.4s ease-in infinite;
+}
+.als-root[data-state="listening"] .als-listenring.als-l2 { animation-delay: 0.8s; }
+.als-root[data-state="listening"] .als-listenring.als-l3 { animation-delay: 1.6s; }
+.als-root[data-state="listening"] .als-pulse { animation-duration: 3.4s; }
+@keyframes als-contract {
+  0%   { transform: scale(2.4); opacity: 0; }
+  25%  { opacity: 0.7; }
+  100% { transform: scale(0.35); opacity: 0; }
+}
+
+/* ── reduced-motion: organismo encendido, quieto y digno ─────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .als-heart, .als-halo, .als-net, .als-thread, .als-mote, .als-tw,
+  .als-fog, .als-beam, .als-pulse, .als-wave, .als-listenring {
+    animation: none !important;
+  }
+  .als-wave, .als-listenring, .als-pulse { opacity: 0.28 !important; }
+  .als-net { opacity: 0.7 !important; }
+}
