@@ -46,6 +46,12 @@ import {
  * los tests que no lo ejercitan explícitamente peguen a la red real. */
 const noMismatchPisoTermicoFn = async () => ({ has_mismatch: false, system_prompt_block: '' });
 
+/** Stubs por defecto de los guards confusión-especie (#292) y
+ * pest-vs-disease (#293): sin disparo, no-op — mismo criterio que
+ * `noMismatchPisoTermicoFn`, evita red real en tests que no los ejercitan. */
+const noConfusionEspecieFn = async () => ({ has_confusion: false, system_prompt_block: '' });
+const noPestVsDiseaseFn = async () => ({ has_classification: false, system_prompt_block: '' });
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..', '..');
 
@@ -358,6 +364,24 @@ describe('buildEnrichedSystemPrompt (guard piso térmico chagra-pro #288)', () =
     expect(buildEnrichedSystemPrompt([], '')).toBe(base);
     expect(buildEnrichedSystemPrompt([], undefined)).toBe(base);
   });
+
+  it('confusionEspecieBlock y pestVsDiseaseBlock se agregan AL FINAL, después de pisoTermico', () => {
+    const prompt = buildEnrichedSystemPrompt(
+      [],
+      '[GUARD PISO TÉRMICO — DESAJUSTE DETECTADO · innegociable]',
+      '[GUARD CONFUSIÓN DE ESPECIE — RIESGO DE FAMILIA/TAXONOMÍA EQUIVOCADA · innegociable]',
+      '[GUARD PLAGA VS ENFERMEDAD — CLASIFICACIÓN VERIFICADA · innegociable]',
+    );
+    expect(prompt.indexOf('CONFUSIÓN DE ESPECIE')).toBeGreaterThan(prompt.indexOf('PISO TÉRMICO'));
+    expect(prompt.indexOf('PLAGA VS ENFERMEDAD')).toBeGreaterThan(prompt.indexOf('CONFUSIÓN DE ESPECIE'));
+    expect(prompt.endsWith('[GUARD PLAGA VS ENFERMEDAD — CLASIFICACIÓN VERIFICADA · innegociable]')).toBe(true);
+  });
+
+  it('confusionEspecieBlock/pestVsDiseaseBlock vacíos/no-string son no-op', () => {
+    const base = buildEnrichedSystemPrompt([]);
+    expect(buildEnrichedSystemPrompt([], '', '', '')).toBe(base);
+    expect(buildEnrichedSystemPrompt([], undefined, undefined, undefined)).toBe(base);
+  });
 });
 
 // ── orquestación: resolveFn/callFn/validateFn INYECTADOS (sin red real) ────
@@ -369,7 +393,7 @@ describe('runProbeAgainstAgent (dependencias inyectadas, sin red)', () => {
     const resolveFn = async () => ({ entities: [{ kind: 'species', mentioned: 'x' }] });
     const callFn = async () => ({ response: 'respuesta de prueba', error: null });
     const validateFn = async () => ({ hallucinated: [], detected_count: 0 });
-    const out = await runProbeAgainstAgent(probe, { resolveFn, callFn, validateFn, pisoTermicoFn: noMismatchPisoTermicoFn });
+    const out = await runProbeAgainstAgent(probe, { resolveFn, callFn, validateFn, pisoTermicoFn: noMismatchPisoTermicoFn, confusionEspecieFn: noConfusionEspecieFn, pestVsDiseaseFn: noPestVsDiseaseFn });
     expect(out.id).toBe('p1');
     expect(out.response).toBe('respuesta de prueba');
     expect(out.entities_grounded).toBe(1);
@@ -382,7 +406,7 @@ describe('runProbeAgainstAgent (dependencias inyectadas, sin red)', () => {
     const resolveFn = async () => ({ entities: [] });
     const callFn = async () => ({ response: '', error: 'timeout' });
     const validateFn = async () => { validateCalled = true; return { hallucinated: [], detected_count: 0 }; };
-    const out = await runProbeAgainstAgent(probe, { resolveFn, callFn, validateFn, pisoTermicoFn: noMismatchPisoTermicoFn });
+    const out = await runProbeAgainstAgent(probe, { resolveFn, callFn, validateFn, pisoTermicoFn: noMismatchPisoTermicoFn, confusionEspecieFn: noConfusionEspecieFn, pestVsDiseaseFn: noPestVsDiseaseFn });
     expect(out.error).toBe('timeout');
     expect(validateCalled).toBe(false);
   });
@@ -403,7 +427,7 @@ describe('runProbeAgainstAgent (dependencias inyectadas, sin red)', () => {
         has_mismatch: true,
         system_prompt_block: '[GUARD PISO TÉRMICO — DESAJUSTE DETECTADO · innegociable]',
       });
-      const out = await runProbeAgainstAgent(probe, { resolveFn, callFn, validateFn, pisoTermicoFn });
+      const out = await runProbeAgainstAgent(probe, { resolveFn, callFn, validateFn, pisoTermicoFn, confusionEspecieFn: noConfusionEspecieFn, pestVsDiseaseFn: noPestVsDiseaseFn });
       expect(seenSystemPrompt).toContain('GUARD PISO TÉRMICO');
       expect(out.piso_termico_guard_fired).toBe(true);
     });
@@ -417,7 +441,7 @@ describe('runProbeAgainstAgent (dependencias inyectadas, sin red)', () => {
       };
       const validateFn = async () => ({ hallucinated: [], detected_count: 0 });
       const pisoTermicoFn = async () => ({ has_mismatch: false, system_prompt_block: '' });
-      const out = await runProbeAgainstAgent(probe, { resolveFn, callFn, validateFn, pisoTermicoFn });
+      const out = await runProbeAgainstAgent(probe, { resolveFn, callFn, validateFn, pisoTermicoFn, confusionEspecieFn: noConfusionEspecieFn, pestVsDiseaseFn: noPestVsDiseaseFn });
       expect(seenSystemPrompt).not.toContain('GUARD PISO TÉRMICO');
       expect(out.piso_termico_guard_fired).toBe(false);
     });
@@ -427,9 +451,110 @@ describe('runProbeAgainstAgent (dependencias inyectadas, sin red)', () => {
       const callFn = async () => ({ response: 'r', error: null });
       const validateFn = async () => ({ hallucinated: [], detected_count: 0 });
       const pisoTermicoFn = async () => ({ has_mismatch: false, system_prompt_block: '', error: 'ECONNREFUSED' });
-      const out = await runProbeAgainstAgent(probe, { resolveFn, callFn, validateFn, pisoTermicoFn });
+      const out = await runProbeAgainstAgent(probe, { resolveFn, callFn, validateFn, pisoTermicoFn, confusionEspecieFn: noConfusionEspecieFn, pestVsDiseaseFn: noPestVsDiseaseFn });
       expect(out.error).toBeNull();
       expect(out.piso_termico_guard_fired).toBe(false);
+    });
+  });
+
+  // ── GUARD confusión de especie (chagra-pro #292) — mismo criterio honesto
+  // que piso térmico: el bench debe medir el pipeline REAL de prod.
+  describe('wiring /confusion-especie-guard (bench honesto, mismo pipeline que prod)', () => {
+    it('has_confusion:true → el system_prompt_block del guard llega al systemPrompt que ve callFn', async () => {
+      const resolveFn = async () => ({ entities: [] });
+      let seenSystemPrompt = null;
+      const callFn = async (_model, systemPrompt) => {
+        seenSystemPrompt = systemPrompt;
+        return { response: 'r', error: null };
+      };
+      const validateFn = async () => ({ hallucinated: [], detected_count: 0 });
+      const confusionEspecieFn = async () => ({
+        has_confusion: true,
+        system_prompt_block: '[GUARD CONFUSIÓN DE ESPECIE — RIESGO DE FAMILIA/TAXONOMÍA EQUIVOCADA · innegociable]',
+      });
+      const out = await runProbeAgainstAgent(probe, {
+        resolveFn, callFn, validateFn, pisoTermicoFn: noMismatchPisoTermicoFn, confusionEspecieFn, pestVsDiseaseFn: noPestVsDiseaseFn,
+      });
+      expect(seenSystemPrompt).toContain('CONFUSIÓN DE ESPECIE');
+      expect(out.confusion_especie_guard_fired).toBe(true);
+    });
+
+    it('has_confusion:false → NO inyecta nada (no-op, prompt idéntico al de antes del guard)', async () => {
+      const resolveFn = async () => ({ entities: [] });
+      let seenSystemPrompt = null;
+      const callFn = async (_model, systemPrompt) => {
+        seenSystemPrompt = systemPrompt;
+        return { response: 'r', error: null };
+      };
+      const validateFn = async () => ({ hallucinated: [], detected_count: 0 });
+      const confusionEspecieFn = async () => ({ has_confusion: false, system_prompt_block: '' });
+      const out = await runProbeAgainstAgent(probe, {
+        resolveFn, callFn, validateFn, pisoTermicoFn: noMismatchPisoTermicoFn, confusionEspecieFn, pestVsDiseaseFn: noPestVsDiseaseFn,
+      });
+      expect(seenSystemPrompt).not.toContain('CONFUSIÓN DE ESPECIE');
+      expect(out.confusion_especie_guard_fired).toBe(false);
+    });
+
+    it('confusionEspecieFn caído/lanza error de red → degrada limpio, no rompe la sonda', async () => {
+      const resolveFn = async () => ({ entities: [] });
+      const callFn = async () => ({ response: 'r', error: null });
+      const validateFn = async () => ({ hallucinated: [], detected_count: 0 });
+      const confusionEspecieFn = async () => ({ has_confusion: false, system_prompt_block: '', error: 'ECONNREFUSED' });
+      const out = await runProbeAgainstAgent(probe, {
+        resolveFn, callFn, validateFn, pisoTermicoFn: noMismatchPisoTermicoFn, confusionEspecieFn, pestVsDiseaseFn: noPestVsDiseaseFn,
+      });
+      expect(out.error).toBeNull();
+      expect(out.confusion_especie_guard_fired).toBe(false);
+    });
+  });
+
+  // ── GUARD plaga vs enfermedad (chagra-pro #293) — mismo criterio honesto.
+  describe('wiring /pest-vs-disease-guard (bench honesto, mismo pipeline que prod)', () => {
+    it('has_classification:true → el system_prompt_block del guard llega al systemPrompt que ve callFn', async () => {
+      const resolveFn = async () => ({ entities: [] });
+      let seenSystemPrompt = null;
+      const callFn = async (_model, systemPrompt) => {
+        seenSystemPrompt = systemPrompt;
+        return { response: 'r', error: null };
+      };
+      const validateFn = async () => ({ hallucinated: [], detected_count: 0 });
+      const pestVsDiseaseFn = async () => ({
+        has_classification: true,
+        system_prompt_block: '[GUARD PLAGA VS ENFERMEDAD — CLASIFICACIÓN VERIFICADA · innegociable]',
+      });
+      const out = await runProbeAgainstAgent(probe, {
+        resolveFn, callFn, validateFn, pisoTermicoFn: noMismatchPisoTermicoFn, confusionEspecieFn: noConfusionEspecieFn, pestVsDiseaseFn,
+      });
+      expect(seenSystemPrompt).toContain('PLAGA VS ENFERMEDAD');
+      expect(out.pest_vs_disease_guard_fired).toBe(true);
+    });
+
+    it('has_classification:false (incluye desacuerdo catálogo↔heurística) → NO inyecta nada', async () => {
+      const resolveFn = async () => ({ entities: [] });
+      let seenSystemPrompt = null;
+      const callFn = async (_model, systemPrompt) => {
+        seenSystemPrompt = systemPrompt;
+        return { response: 'r', error: null };
+      };
+      const validateFn = async () => ({ hallucinated: [], detected_count: 0 });
+      const pestVsDiseaseFn = async () => ({ has_classification: false, system_prompt_block: '' });
+      const out = await runProbeAgainstAgent(probe, {
+        resolveFn, callFn, validateFn, pisoTermicoFn: noMismatchPisoTermicoFn, confusionEspecieFn: noConfusionEspecieFn, pestVsDiseaseFn,
+      });
+      expect(seenSystemPrompt).not.toContain('PLAGA VS ENFERMEDAD');
+      expect(out.pest_vs_disease_guard_fired).toBe(false);
+    });
+
+    it('pestVsDiseaseFn caído/lanza error de red → degrada limpio, no rompe la sonda', async () => {
+      const resolveFn = async () => ({ entities: [] });
+      const callFn = async () => ({ response: 'r', error: null });
+      const validateFn = async () => ({ hallucinated: [], detected_count: 0 });
+      const pestVsDiseaseFn = async () => ({ has_classification: false, system_prompt_block: '', error: 'ECONNREFUSED' });
+      const out = await runProbeAgainstAgent(probe, {
+        resolveFn, callFn, validateFn, pisoTermicoFn: noMismatchPisoTermicoFn, confusionEspecieFn: noConfusionEspecieFn, pestVsDiseaseFn,
+      });
+      expect(out.error).toBeNull();
+      expect(out.pest_vs_disease_guard_fired).toBe(false);
     });
   });
 });
@@ -444,7 +569,7 @@ describe('runAllProbes (secuencial, dependencias inyectadas)', () => {
       return { response: `resp-${userPrompt}`, error: null };
     };
     const validateFn = async () => ({ hallucinated: [], detected_count: 0 });
-    const out = await runAllProbes(probes, { resolveFn, callFn, validateFn, pisoTermicoFn: noMismatchPisoTermicoFn, sleepMs: 0 });
+    const out = await runAllProbes(probes, { resolveFn, callFn, validateFn, pisoTermicoFn: noMismatchPisoTermicoFn, confusionEspecieFn: noConfusionEspecieFn, pestVsDiseaseFn: noPestVsDiseaseFn, sleepMs: 0 });
     expect(order).toEqual(['a', 'b', 'c']);
     expect(out).toHaveLength(3);
   });
@@ -456,7 +581,8 @@ describe('runAllProbes (secuencial, dependencias inyectadas)', () => {
     const callFn = async () => ({ response: 'r', error: null });
     const validateFn = async () => ({ hallucinated: [], detected_count: 0 });
     await runAllProbes(probes, {
-      resolveFn, callFn, validateFn, pisoTermicoFn: noMismatchPisoTermicoFn, sleepMs: 0,
+      resolveFn, callFn, validateFn, pisoTermicoFn: noMismatchPisoTermicoFn,
+      confusionEspecieFn: noConfusionEspecieFn, pestVsDiseaseFn: noPestVsDiseaseFn, sleepMs: 0,
       onProgress: (result, i, total) => calls.push([result.id, i, total]),
     });
     expect(calls).toEqual([['a', 0, 1]]);

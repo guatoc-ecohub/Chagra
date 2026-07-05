@@ -107,6 +107,40 @@ describe('assembleSystemContent — orden por prioridad', () => {
       content.indexOf('BLOQUE_GROUNDING_POLICY'),
     );
   });
+
+  it('GUARDAS confusión de especie (#292) y plaga vs enfermedad (#293) quedan AL FINAL, después de pisoTermico (máxima recency)', () => {
+    const { content } = assembleSystemContent({
+      base: 'BASE',
+      evidence: 'EVIDENCIA',
+      fermento: 'GUARDA_FERMENTO',
+      biopreparado: 'GUARDA_BIOPREPARADO',
+      pisoTermico: 'GUARDA_PISO_TERMICO',
+      confusionEspecie: 'GUARDA_CONFUSION_ESPECIE',
+      pestVsDisease: 'GUARDA_PEST_VS_DISEASE',
+    });
+    expect(content.indexOf('GUARDA_CONFUSION_ESPECIE')).toBeGreaterThan(content.indexOf('GUARDA_PISO_TERMICO'));
+    expect(content.indexOf('GUARDA_PEST_VS_DISEASE')).toBeGreaterThan(content.indexOf('GUARDA_CONFUSION_ESPECIE'));
+    expect(content.endsWith('GUARDA_PEST_VS_DISEASE')).toBe(true);
+  });
+
+  it('GUARDAS confusión de especie / pest_vs_disease NUNCA se recortan (no están en SACRIFICE_ORDER)', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const big = 'w'.repeat(6400); // ~2000 tokens
+    const r = assembleSystemContent(
+      {
+        base: big,
+        confusionEspecie: big,
+        pestVsDisease: big,
+        corpus: { variants: ['recortable', ''] },
+      },
+      { budget: 100 },
+    );
+    expect(r.overBudget).toBe(true);
+    expect(warn).toHaveBeenCalled();
+    expect(r.breakdown.find((b) => b.name === 'confusionEspecie').degraded).toBe(false);
+    expect(r.breakdown.find((b) => b.name === 'pestVsDisease').degraded).toBe(false);
+    expect(r.content).toContain(big);
+  });
 });
 
 describe('assembleSystemContent — presupuesto y degradación', () => {

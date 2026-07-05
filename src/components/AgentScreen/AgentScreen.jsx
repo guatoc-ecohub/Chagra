@@ -46,7 +46,7 @@ import { createStreamDeadline } from '../../services/streamDeadline';
 // Sidecar agro-mcp (ADR-045 Fase 2 Step B/C). Detrás de feature flag
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
-import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, biopreparadoGrounding, pisoTermicoGuard, postValidate, getClimaIdeam, isToolAllowed } from '../../services/sidecarClient';
+import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, biopreparadoGrounding, pisoTermicoGuard, confusionEspecieGuard, pestVsDiseaseGuard, postValidate, getClimaIdeam, isToolAllowed } from '../../services/sidecarClient';
 // CHIPS DE MODO (A3/A4, decisión operador 2026-06-02): el router PURO mapea
 // la intención forzada del chip → tool determinístico, SALTANDO el NLU
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
@@ -818,7 +818,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // formatToolEvidence y analyzeQuery viven en agentPromptBase (funciones
   // puras, testeables y medibles fuera de React).
 
-  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null, fermentoBlock = '', subgrafoBloque = '', biopreparadoBlock = '', pisoTermicoBlock = '', groundingPolicyBlock = '') => {
+  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null, fermentoBlock = '', subgrafoBloque = '', biopreparadoBlock = '', pisoTermicoBlock = '', confusionEspecieBlock = '', pestVsDiseaseBlock = '', groundingPolicyBlock = '') => {
     const analysis = analyzeQuery(query);
     // El base recibe query/historial/isEnum para inyectar SOLO los glosarios
     // y reglas condicionales que la conversación toca (re-arquitectura GR-10).
@@ -1030,6 +1030,31 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       ? `\n\n${pisoTermicoBlock}`
       : '';
 
+    // GUARDA CONFUSIÓN DE ESPECIE (chagra-pro #292, segundo driver de
+    // contaminación cross-domain tras cross_thermal, sonda `confusion_especie`
+    // de bench-contaminacion.mjs, ~20% medida 2026-07). El sidecar
+    // /confusion-especie-guard ya detectó si la especie mencionada trae
+    // advertencia `_anti_confusion` curada o un look-alike de familia botánica
+    // distinta, y armó el bloque de SUPRESIÓN-Y-REEMPLAZO. Va de máxima
+    // recency (mismo criterio que fermento/biopreparado/pisoTermico). ''
+    // (no-op) cuando no hay riesgo detectado o el sidecar no respondió
+    // (degradación graceful — no rompe el turno, nunca inventa un look-alike).
+    const confusionEspecieSafetyBlock = (typeof confusionEspecieBlock === 'string' && confusionEspecieBlock.trim())
+      ? `\n\n${confusionEspecieBlock}`
+      : '';
+
+    // GUARDA PLAGA VS ENFERMEDAD (chagra-pro #293, tercer driver de
+    // contaminación cross-domain, sonda `pest_vs_disease` de
+    // bench-contaminacion.mjs). El sidecar /pest-vs-disease-guard ya cruzó el
+    // término mencionado (plaga/enfermedad) contra el catálogo Y la heurística
+    // léxica/taxonómica, y armó el bloque de SUPRESIÓN-Y-REEMPLAZO cuando
+    // ambas coinciden. '' (no-op) cuando no hubo término mencionado, hay
+    // desacuerdo catálogo↔heurística (fail-safe a propósito), o el sidecar no
+    // respondió (degradación graceful).
+    const pestVsDiseaseSafetyBlock = (typeof pestVsDiseaseBlock === 'string' && pestVsDiseaseBlock.trim())
+      ? `\n\n${pestVsDiseaseBlock}`
+      : '';
+
     // MODO CIENTÍFICO (#17) — bloque answer/hedge/abstain ya formateado por
     // el sidecar (WIRING real de grounding-policy.ts/grounding-prompt-
     // formatter.ts). Va DENTRO del cluster de grounding (después de la cadena
@@ -1072,6 +1097,8 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       fermento: fermentoSafetyBlock,
       biopreparado: biopreparadoSafetyBlock,
       pisoTermico: pisoTermicoSafetyBlock,
+      confusionEspecie: confusionEspecieSafetyBlock,
+      pestVsDisease: pestVsDiseaseSafetyBlock,
     });
 
     const messages = [
@@ -1376,6 +1403,23 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // no-op en el system prompt si el piso coincide, no hubo señal de piso
       // del usuario, o el sidecar no respondió (degradación graceful).
       let pisoTermicoBlock = '';
+      // GUARDA CONFUSIÓN DE ESPECIE (chagra-pro #292, segundo driver de
+      // contaminación cross-domain — sonda `confusion_especie` de
+      // bench-contaminacion.mjs, ~20% medida 2026-07). Bloque de
+      // SUPRESIÓN-Y-REEMPLAZO ya formateado por el sidecar
+      // (/confusion-especie-guard) cuando la especie mencionada trae
+      // advertencia curada o un look-alike de familia botánica distinta. ''
+      // por default → no-op si no hay riesgo detectado o el sidecar no
+      // respondió (degradación graceful).
+      let confusionEspecieBlock = '';
+      // GUARDA PLAGA VS ENFERMEDAD (chagra-pro #293, tercer driver de
+      // contaminación cross-domain — sonda `pest_vs_disease` de
+      // bench-contaminacion.mjs). Bloque de SUPRESIÓN-Y-REEMPLAZO ya
+      // formateado por el sidecar (/pest-vs-disease-guard) cuando el término
+      // mencionado tiene categoría confirmada (catálogo + heurística
+      // coinciden). '' por default → no-op (degradación graceful, incluye el
+      // caso de desacuerdo catálogo↔heurística — fail-safe a propósito).
+      let pestVsDiseaseBlock = '';
       // MODO CIENTÍFICO (#17) — WIRING real de grounding-policy.ts/grounding-
       // prompt-formatter.ts (audit 2026-07-04-optimizacion-grounding-
       // velocidad-inteligencia.md win #4). El sidecar decide answer/hedge/
@@ -1409,15 +1453,18 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           })();
           const tRE0 = performance.now();
           // SAFETY-CRITICAL en PARALELO: /fermento-prefilter,
-          // /biopreparado-grounding y /piso-termico-guard corren junto a
+          // /biopreparado-grounding, /piso-termico-guard,
+          // /confusion-especie-guard y /pest-vs-disease-guard corren junto a
           // /resolve-entities (mismo turno, antes del LLM) — CERO latencia
-          // serial añadida. Los cuatro wrappers son no-throw (devuelven null
-          // en error/timeout), así que Promise.all no puede rechazar por ellos.
-          const [resolved, fermento, biopreparado, pisoTermico] = await Promise.all([
+          // serial añadida. Los seis wrappers son no-throw (devuelven null en
+          // error/timeout), así que Promise.all no puede rechazar por ellos.
+          const [resolved, fermento, biopreparado, pisoTermico, confusionEspecie, pestVsDisease] = await Promise.all([
             resolveEntities(textForLLM, { fincaAltitud: reAltitud, context: contextMemory }),
             fermentoPrefilter(textForLLM),
             biopreparadoGrounding(textForLLM),
             pisoTermicoGuard(textForLLM, { fincaAltitud: reAltitud, pisoTermico: rePisoTermico }),
+            confusionEspecieGuard(textForLLM),
+            pestVsDiseaseGuard(textForLLM),
           ]);
           const tRE1 = performance.now();
           // FERMENTOS: si el sidecar marcó intención-fermento, inyectamos su
@@ -1461,6 +1508,39 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               userPisoOrigen: pisoTermico.user_piso_origen,
               viabilidad: pisoTermico.viabilidad,
               reason: pisoTermico.reason,
+            });
+          }
+          // CONFUSIÓN DE ESPECIE: si el sidecar detectó riesgo real (curado o
+          // algorítmico) de confundir la familia botánica de la especie
+          // mencionada, inyectamos su bloque de SUPRESIÓN-Y-REEMPLAZO al
+          // final del system prompt (recency máxima). Si el sidecar no
+          // respondió (null) o no hay riesgo, confusionEspecieBlock queda ''
+          // → no-op, el turno sigue sin romperse (degradación graceful).
+          if (confusionEspecie && confusionEspecie.has_confusion && typeof confusionEspecie.system_prompt_block === 'string' && confusionEspecie.system_prompt_block.trim()) {
+            confusionEspecieBlock = confusionEspecie.system_prompt_block;
+            console.debug('[sidecar] confusion-especie-guard', {
+              speciesId: confusionEspecie.species_id,
+              speciesMentioned: confusionEspecie.species_mentioned,
+              confusionSource: confusionEspecie.confusion_source,
+              lookalike: confusionEspecie.lookalike_nombre_comun,
+              reason: confusionEspecie.reason,
+            });
+          }
+          // PLAGA VS ENFERMEDAD: si el sidecar confirmó la categoría real
+          // (catálogo + heurística coinciden) del término mencionado,
+          // inyectamos su bloque de SUPRESIÓN-Y-REEMPLAZO al final del
+          // system prompt (recency máxima). Si el sidecar no respondió
+          // (null), no hubo término mencionado, o hay desacuerdo
+          // catálogo↔heurística (fail-safe a propósito), pestVsDiseaseBlock
+          // queda '' → no-op, el turno sigue sin romperse.
+          if (pestVsDisease && pestVsDisease.has_classification && typeof pestVsDisease.system_prompt_block === 'string' && pestVsDisease.system_prompt_block.trim()) {
+            pestVsDiseaseBlock = pestVsDisease.system_prompt_block;
+            console.debug('[sidecar] pest-vs-disease-guard', {
+              speciesId: pestVsDisease.species_id,
+              termMentioned: pestVsDisease.term_mentioned,
+              termCategoria: pestVsDisease.term_categoria,
+              manejoEquivocadoDetectado: pestVsDisease.manejo_equivocado_detectado,
+              reason: pestVsDisease.reason,
             });
           }
           if (resolved && Array.isArray(resolved.entities) && resolved.entities.length > 0) {
@@ -2006,7 +2086,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       const deterministicPrice = buildPriceAnswer({ userMessage: text, toolEvidence });
       const rawResponse = deterministicPrice != null
         ? deterministicPrice
-        : await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, edgesTruncated, biopreparadoBlock, pisoTermicoBlock, groundingPolicyBlock);
+        : await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, edgesTruncated, biopreparadoBlock, pisoTermicoBlock, confusionEspecieBlock, pestVsDiseaseBlock, groundingPolicyBlock);
       if (deterministicPrice != null) {
         console.debug('[precio] respuesta determinista SIPSA (sin LLM)', { route: nluRoute });
       }

@@ -615,6 +615,108 @@ export async function pisoTermicoGuard(userMessage, opts = {}) {
 }
 
 /**
+ * GUARDA de CONFUSIÓN DE ESPECIE / familia botánica equivocada (chagra-pro
+ * #292, determinista, PRE-LLM — segundo driver de contaminación
+ * cross-domain, sonda `confusion_especie` de `bench-contaminacion.mjs`,
+ * ~20% medida 2026-07, el driver siguiente tras `cross_thermal` que
+ * `/piso-termico-guard` bajó de 86.7% a 6.7%). Llama `POST
+ * ${BASE}/confusion-especie-guard` con `{ user_message }` para que el
+ * sidecar detecte si el mensaje menciona una especie del catálogo con (a)
+ * advertencia `_anti_confusion` curada, o (b) otra especie de nombre
+ * parecido pero familia botánica DISTINTA (riesgo algorítmico) y, si aplica,
+ * devuelva un `system_prompt_block` de SUPRESIÓN-Y-REEMPLAZO: el LLM debe
+ * citar la familia REAL primero y no mezclar datos de la especie parecida.
+ *
+ * Espejo exacto de `pisoTermicoGuard`/`biopreparadoGrounding`: FAIL-SAFE,
+ * no-throw. Devuelve null si: flag off, offline, timeout, non-2xx, body
+ * inválido → el caller degrada con gracia (no inyecta bloque, no rompe el
+ * turno). Cuando `has_confusion` es false, NO hay que inyectar nada.
+ *
+ * @param {string} userMessage — texto del operador.
+ * @returns {Promise<null | {
+ *   has_confusion: boolean,
+ *   species_mentioned: string | null,
+ *   species_id: string | null,
+ *   species_nombre_cientifico: string | null,
+ *   species_familia_botanica: string | null,
+ *   confusion_source: string | null,
+ *   lookalike_nombre_comun: string | null,
+ *   lookalike_nombre_cientifico: string | null,
+ *   lookalike_familia_botanica: string | null,
+ *   system_prompt_block: string,
+ *   reason: string,
+ * }>}
+ */
+export async function confusionEspecieGuard(userMessage) {
+  if (!userMessage || typeof userMessage !== 'string') return null;
+  const raw = await postJson('/confusion-especie-guard', { user_message: userMessage }, NLU_TIMEOUT_MS);
+  if (!raw || typeof raw !== 'object') return null;
+  return {
+    has_confusion: raw.has_confusion === true,
+    species_mentioned: typeof raw.species_mentioned === 'string' ? raw.species_mentioned : null,
+    species_id: typeof raw.species_id === 'string' ? raw.species_id : null,
+    species_nombre_cientifico: typeof raw.species_nombre_cientifico === 'string' ? raw.species_nombre_cientifico : null,
+    species_familia_botanica: typeof raw.species_familia_botanica === 'string' ? raw.species_familia_botanica : null,
+    confusion_source: typeof raw.confusion_source === 'string' ? raw.confusion_source : null,
+    lookalike_nombre_comun: typeof raw.lookalike_nombre_comun === 'string' ? raw.lookalike_nombre_comun : null,
+    lookalike_nombre_cientifico: typeof raw.lookalike_nombre_cientifico === 'string' ? raw.lookalike_nombre_cientifico : null,
+    lookalike_familia_botanica: typeof raw.lookalike_familia_botanica === 'string' ? raw.lookalike_familia_botanica : null,
+    system_prompt_block: typeof raw.system_prompt_block === 'string' ? raw.system_prompt_block : '',
+    reason: typeof raw.reason === 'string' ? raw.reason : '',
+  };
+}
+
+/**
+ * GUARDA de confusión PLAGA VS ENFERMEDAD (chagra-pro #293, determinista,
+ * PRE-LLM — tercer driver de contaminación cross-domain, sonda
+ * `pest_vs_disease` de `bench-contaminacion.mjs`). Llama `POST
+ * ${BASE}/pest-vs-disease-guard` con `{ user_message }` para que el sidecar
+ * detecte si el mensaje menciona un término de `plagas_criticas`/
+ * `enfermedades_criticas` del catálogo Y la categoría del catálogo NO es
+ * contradicha por la heurística léxica/taxonómica; si `has_classification`,
+ * devuelve un `system_prompt_block` de SUPRESIÓN-Y-REEMPLAZO: el LLM debe
+ * afirmar la categoría REAL primero y recomendar el TIPO de manejo correcto
+ * (nunca fungicida para un insecto ni insecticida para un hongo/bacteria).
+ *
+ * Espejo exacto de `confusionEspecieGuard`/`pisoTermicoGuard`: FAIL-SAFE,
+ * no-throw. Devuelve null si: flag off, offline, timeout, non-2xx, body
+ * inválido → el caller degrada con gracia. Cuando `has_classification` es
+ * false (incluye el caso de desacuerdo catálogo↔heurística, fail-safe a
+ * propósito), NO hay que inyectar nada.
+ *
+ * @param {string} userMessage — texto del operador.
+ * @returns {Promise<null | {
+ *   has_classification: boolean,
+ *   term_mentioned: string | null,
+ *   term_categoria: string | null,
+ *   species_id: string | null,
+ *   species_nombre_comun: string | null,
+ *   heuristica_categoria: string | null,
+ *   source: string | null,
+ *   manejo_equivocado_detectado: boolean,
+ *   system_prompt_block: string,
+ *   reason: string,
+ * }>}
+ */
+export async function pestVsDiseaseGuard(userMessage) {
+  if (!userMessage || typeof userMessage !== 'string') return null;
+  const raw = await postJson('/pest-vs-disease-guard', { user_message: userMessage }, NLU_TIMEOUT_MS);
+  if (!raw || typeof raw !== 'object') return null;
+  return {
+    has_classification: raw.has_classification === true,
+    term_mentioned: typeof raw.term_mentioned === 'string' ? raw.term_mentioned : null,
+    term_categoria: typeof raw.term_categoria === 'string' ? raw.term_categoria : null,
+    species_id: typeof raw.species_id === 'string' ? raw.species_id : null,
+    species_nombre_comun: typeof raw.species_nombre_comun === 'string' ? raw.species_nombre_comun : null,
+    heuristica_categoria: typeof raw.heuristica_categoria === 'string' ? raw.heuristica_categoria : null,
+    source: typeof raw.source === 'string' ? raw.source : null,
+    manejo_equivocado_detectado: raw.manejo_equivocado_detectado === true,
+    system_prompt_block: typeof raw.system_prompt_block === 'string' ? raw.system_prompt_block : '',
+    reason: typeof raw.reason === 'string' ? raw.reason : '',
+  };
+}
+
+/**
  * Capa 2 anti-alucinación (cross-check de contexto). Llama
  * `POST ${BASE}/post-validate` con el TEXTO que el LLM ya generó y, opcional,
  * los `nombre_cientifico` de las entidades que la capa 1 resolvió para el turno
