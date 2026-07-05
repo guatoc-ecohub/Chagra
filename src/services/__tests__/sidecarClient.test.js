@@ -881,6 +881,217 @@ describe('sidecarClient — feature flag on', () => {
       expect(res).toBeNull();
     });
   });
+
+  describe('confusionEspecieGuard — GUARDA confusión de especie/familia botánica (chagra-pro #292)', () => {
+    const CONFUSION_HIT = {
+      has_confusion: true,
+      species_mentioned: 'limoncillo',
+      species_id: 'cymbopogon_citratus',
+      species_nombre_cientifico: 'Cymbopogon citratus',
+      species_familia_botanica: 'Poaceae',
+      confusion_source: 'anti_confusion_curado',
+      lookalike_nombre_comun: null,
+      lookalike_nombre_cientifico: null,
+      lookalike_familia_botanica: null,
+      system_prompt_block:
+        '[GUARD CONFUSIÓN DE ESPECIE — RIESGO DE FAMILIA/TAXONOMÍA EQUIVOCADA · innegociable]\n' +
+        '"limoncillo" (Cymbopogon citratus) pertenece REALMENTE a la familia Poaceae.',
+      reason: 'confusion_curada_catalogo',
+    };
+
+    const NO_CONFUSION = {
+      has_confusion: false,
+      species_mentioned: null,
+      species_id: null,
+      species_nombre_cientifico: null,
+      species_familia_botanica: null,
+      confusion_source: null,
+      lookalike_nombre_comun: null,
+      lookalike_nombre_cientifico: null,
+      lookalike_familia_botanica: null,
+      system_prompt_block: '',
+      reason: 'sin_especie_mencionada',
+    };
+
+    it('mensaje con especie de riesgo de confusión curado → inyecta el system_prompt_block del sidecar', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, CONFUSION_HIT));
+      const { confusionEspecieGuard } = await importFresh();
+      const res = await confusionEspecieGuard('¿el limoncillo es lo mismo que la citronela?');
+      expect(res).not.toBeNull();
+      expect(res.has_confusion).toBe(true);
+      expect(res.system_prompt_block).toContain('RIESGO DE FAMILIA/TAXONOMÍA EQUIVOCADA');
+      expect(res.species_familia_botanica).toBe('Poaceae');
+      // POST con user_message a /confusion-especie-guard (mismo contrato que /piso-termico-guard).
+      const [url, opts] = fetchMock.mock.calls[0];
+      expect(url).toBe('/api/mcp/agro/confusion-especie-guard');
+      expect(opts.method).toBe('POST');
+      expect(opts.headers['X-Chagra-Token']).toBe('test-token-123');
+      expect(JSON.parse(opts.body)).toEqual({ user_message: '¿el limoncillo es lo mismo que la citronela?' });
+    });
+
+    it('mensaje SIN riesgo de confusión → has_confusion false + bloque vacío (no se inyecta nada)', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, NO_CONFUSION));
+      const { confusionEspecieGuard } = await importFresh();
+      const res = await confusionEspecieGuard('¿a cómo está la papa?');
+      expect(res).not.toBeNull();
+      expect(res.has_confusion).toBe(false);
+      expect(res.system_prompt_block).toBe('');
+    });
+
+    it('normaliza un body parcial del sidecar a la forma contractual (defensivo)', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, { has_confusion: true, system_prompt_block: 'X' }));
+      const { confusionEspecieGuard } = await importFresh();
+      const res = await confusionEspecieGuard('cómo siembro limoncillo');
+      expect(res.has_confusion).toBe(true);
+      expect(res.system_prompt_block).toBe('X');
+      expect(res.species_id).toBeNull();
+      expect(res.lookalike_nombre_comun).toBeNull();
+      expect(res.reason).toBe('');
+    });
+
+    it('devuelve null sin fetch cuando flag off (degradación graceful)', async () => {
+      disableFlag();
+      const { confusionEspecieGuard } = await importFresh();
+      const res = await confusionEspecieGuard('cómo siembro limoncillo');
+      expect(res).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('devuelve null sin fetch cuando offline', async () => {
+      Object.defineProperty(navigator, 'onLine', { configurable: true, value: false });
+      const { confusionEspecieGuard } = await importFresh();
+      const res = await confusionEspecieGuard('cómo siembro limoncillo');
+      expect(res).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('devuelve null sin fetch cuando userMessage vacío/no-string', async () => {
+      const { confusionEspecieGuard } = await importFresh();
+      expect(await confusionEspecieGuard('')).toBeNull();
+      expect(await confusionEspecieGuard(null)).toBeNull();
+      expect(await confusionEspecieGuard(undefined)).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('5xx → null sin throw (sidecar caído, FAIL-SAFE: no rompe el turno ni fabrica datos)', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(503, { error: 'age down' }));
+      const { confusionEspecieGuard } = await importFresh();
+      const res = await confusionEspecieGuard('cómo siembro limoncillo');
+      expect(res).toBeNull();
+    });
+
+    it('fetch throws → null sin throw', async () => {
+      fetchMock.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+      const { confusionEspecieGuard } = await importFresh();
+      const res = await confusionEspecieGuard('cómo siembro limoncillo');
+      expect(res).toBeNull();
+    });
+  });
+
+  describe('pestVsDiseaseGuard — GUARDA confusión plaga vs enfermedad (chagra-pro #293)', () => {
+    const CLASSIFICATION_HIT = {
+      has_classification: true,
+      term_mentioned: 'Hypothenemus hampei (broca)',
+      term_categoria: 'plaga',
+      species_id: 'coffea_arabica',
+      species_nombre_comun: 'Café caturra',
+      heuristica_categoria: 'plaga',
+      source: 'catalogo_confirmado_por_heuristica',
+      manejo_equivocado_detectado: true,
+      system_prompt_block:
+        '[GUARD PLAGA VS ENFERMEDAD — CLASIFICACIÓN VERIFICADA · innegociable]\n' +
+        '"Hypothenemus hampei (broca)" (en el cultivo de Café caturra) ES PLAGA.',
+      reason: 'clasificacion_confirmada_manejo_equivocado_detectado',
+    };
+
+    const NO_CLASSIFICATION = {
+      has_classification: false,
+      term_mentioned: null,
+      term_categoria: null,
+      species_id: null,
+      species_nombre_comun: null,
+      heuristica_categoria: null,
+      source: null,
+      manejo_equivocado_detectado: false,
+      system_prompt_block: '',
+      reason: 'sin_termino_mencionado',
+    };
+
+    it('mensaje con término clasificado (catálogo+heurística coinciden) → inyecta el system_prompt_block del sidecar', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, CLASSIFICATION_HIT));
+      const { pestVsDiseaseGuard } = await importFresh();
+      const res = await pestVsDiseaseGuard('¿qué fungicida uso para la broca del café?');
+      expect(res).not.toBeNull();
+      expect(res.has_classification).toBe(true);
+      expect(res.system_prompt_block).toContain('CLASIFICACIÓN VERIFICADA');
+      expect(res.term_categoria).toBe('plaga');
+      expect(res.manejo_equivocado_detectado).toBe(true);
+      // POST con user_message a /pest-vs-disease-guard (mismo contrato que /confusion-especie-guard).
+      const [url, opts] = fetchMock.mock.calls[0];
+      expect(url).toBe('/api/mcp/agro/pest-vs-disease-guard');
+      expect(opts.method).toBe('POST');
+      expect(opts.headers['X-Chagra-Token']).toBe('test-token-123');
+      expect(JSON.parse(opts.body)).toEqual({ user_message: '¿qué fungicida uso para la broca del café?' });
+    });
+
+    it('mensaje SIN término clasificado (o desacuerdo catálogo↔heurística) → has_classification false + bloque vacío', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, NO_CLASSIFICATION));
+      const { pestVsDiseaseGuard } = await importFresh();
+      const res = await pestVsDiseaseGuard('¿a cómo está la papa?');
+      expect(res).not.toBeNull();
+      expect(res.has_classification).toBe(false);
+      expect(res.system_prompt_block).toBe('');
+    });
+
+    it('normaliza un body parcial del sidecar a la forma contractual (defensivo)', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, { has_classification: true, system_prompt_block: 'X' }));
+      const { pestVsDiseaseGuard } = await importFresh();
+      const res = await pestVsDiseaseGuard('el trozador es plaga o enfermedad');
+      expect(res.has_classification).toBe(true);
+      expect(res.system_prompt_block).toBe('X');
+      expect(res.species_id).toBeNull();
+      expect(res.manejo_equivocado_detectado).toBe(false);
+      expect(res.reason).toBe('');
+    });
+
+    it('devuelve null sin fetch cuando flag off (degradación graceful)', async () => {
+      disableFlag();
+      const { pestVsDiseaseGuard } = await importFresh();
+      const res = await pestVsDiseaseGuard('el trozador es plaga o enfermedad');
+      expect(res).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('devuelve null sin fetch cuando offline', async () => {
+      Object.defineProperty(navigator, 'onLine', { configurable: true, value: false });
+      const { pestVsDiseaseGuard } = await importFresh();
+      const res = await pestVsDiseaseGuard('el trozador es plaga o enfermedad');
+      expect(res).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('devuelve null sin fetch cuando userMessage vacío/no-string', async () => {
+      const { pestVsDiseaseGuard } = await importFresh();
+      expect(await pestVsDiseaseGuard('')).toBeNull();
+      expect(await pestVsDiseaseGuard(null)).toBeNull();
+      expect(await pestVsDiseaseGuard(undefined)).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('5xx → null sin throw (sidecar caído, FAIL-SAFE: no rompe el turno ni fabrica datos)', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(503, { error: 'age down' }));
+      const { pestVsDiseaseGuard } = await importFresh();
+      const res = await pestVsDiseaseGuard('el trozador es plaga o enfermedad');
+      expect(res).toBeNull();
+    });
+
+    it('fetch throws → null sin throw', async () => {
+      fetchMock.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+      const { pestVsDiseaseGuard } = await importFresh();
+      const res = await pestVsDiseaseGuard('el trozador es plaga o enfermedad');
+      expect(res).toBeNull();
+    });
+  });
 });
 
 describe('sidecarClient — getClimaSnapshot elevation (gradiente térmico)', () => {

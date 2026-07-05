@@ -594,17 +594,86 @@ async function pisoTermicoGuard(userMessage, { sidecarUrl = SIDECAR_URL } = {}) 
 }
 
 /**
+ * confusionEspecieGuard — llama al MISMO endpoint determinista
+ * `/confusion-especie-guard` (chagra-pro #292) que consume producción
+ * (`src/services/sidecarClient.js`, cableado en `AgentScreen.jsx`). Mismo
+ * criterio que `pisoTermicoGuard`: el bench mide el pipeline REAL, no uno
+ * idealizado. FAIL-SAFE: cualquier error/timeout/non-2xx degrada a
+ * `has_confusion:false` (no-op).
+ * @param {string} userMessage
+ * @param {{ sidecarUrl?: string }} [opts]
+ * @returns {Promise<{ has_confusion: boolean, system_prompt_block: string }>}
+ */
+async function confusionEspecieGuard(userMessage, { sidecarUrl = SIDECAR_URL } = {}) {
+  const token = getSidecarToken();
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['X-Chagra-Token'] = token;
+  try {
+    const res = await fetch(`${sidecarUrl}/confusion-especie-guard`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ user_message: userMessage }),
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!res.ok) return { has_confusion: false, system_prompt_block: '' };
+    const data = await res.json();
+    return {
+      has_confusion: data.has_confusion === true,
+      system_prompt_block: typeof data.system_prompt_block === 'string' ? data.system_prompt_block : '',
+    };
+  } catch (err) {
+    return { has_confusion: false, system_prompt_block: '', error: err.message };
+  }
+}
+
+/**
+ * pestVsDiseaseGuard — llama al MISMO endpoint determinista
+ * `/pest-vs-disease-guard` (chagra-pro #293) que consume producción
+ * (`src/services/sidecarClient.js`, cableado en `AgentScreen.jsx`). Mismo
+ * criterio que `pisoTermicoGuard`/`confusionEspecieGuard`. FAIL-SAFE:
+ * cualquier error/timeout/non-2xx degrada a `has_classification:false`
+ * (no-op).
+ * @param {string} userMessage
+ * @param {{ sidecarUrl?: string }} [opts]
+ * @returns {Promise<{ has_classification: boolean, system_prompt_block: string }>}
+ */
+async function pestVsDiseaseGuard(userMessage, { sidecarUrl = SIDECAR_URL } = {}) {
+  const token = getSidecarToken();
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['X-Chagra-Token'] = token;
+  try {
+    const res = await fetch(`${sidecarUrl}/pest-vs-disease-guard`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ user_message: userMessage }),
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!res.ok) return { has_classification: false, system_prompt_block: '' };
+    const data = await res.json();
+    return {
+      has_classification: data.has_classification === true,
+      system_prompt_block: typeof data.system_prompt_block === 'string' ? data.system_prompt_block : '',
+    };
+  } catch (err) {
+    return { has_classification: false, system_prompt_block: '', error: err.message };
+  }
+}
+
+/**
  * buildEnrichedSystemPrompt — arma el system prompt que ve el modelo en la
- * fase remote-run. `pisoTermicoBlock` (opcional) es el `system_prompt_block`
- * YA formateado que devuelve `/piso-termico-guard` cuando detectó un
- * desajuste (marginal/inviable) — se inyecta al FINAL (recency máxima),
- * espejo exacto de cómo lo inyecta `AgentScreen.jsx` en producción (guarda
- * de SUPRESIÓN-Y-REEMPLAZO, debe dominar sobre el consejo genérico). ''/
- * ausente = no-op, el prompt queda idéntico al de antes de este guard.
+ * fase remote-run. `pisoTermicoBlock`/`confusionEspecieBlock`/
+ * `pestVsDiseaseBlock` (opcionales) son los `system_prompt_block` YA
+ * formateados que devuelven sus respectivos guards cuando detectaron un
+ * problema — se inyectan al FINAL (recency máxima), espejo exacto de cómo
+ * los inyecta `AgentScreen.jsx` en producción (guardas de
+ * SUPRESIÓN-Y-REEMPLAZO, deben dominar sobre el consejo genérico). ''/
+ * ausente = no-op, el prompt queda idéntico al de antes de estos guards.
  * @param {object[]} entities
  * @param {string} [pisoTermicoBlock]
+ * @param {string} [confusionEspecieBlock]
+ * @param {string} [pestVsDiseaseBlock]
  */
-export function buildEnrichedSystemPrompt(entities, pisoTermicoBlock = '') {
+export function buildEnrichedSystemPrompt(entities, pisoTermicoBlock = '', confusionEspecieBlock = '', pestVsDiseaseBlock = '') {
   const basePrompt = `Eres un asistente agroecológico experto para Colombia. Responde en español claro, práctico para agricultores.
 
 Si mencionas entidades (especies, plagas, biopreparados), usa los nombres canónicos del catálogo Chagra para evitar alucinaciones. Si no tiene un dato verificado (por ejemplo, un contacto o teléfono), dígalo honestamente en vez de inventarlo.`;
@@ -627,6 +696,12 @@ Si mencionas entidades (especies, plagas, biopreparados), usa los nombres canón
 
   if (typeof pisoTermicoBlock === 'string' && pisoTermicoBlock.trim()) {
     prompt = `${prompt}\n\n${pisoTermicoBlock}`;
+  }
+  if (typeof confusionEspecieBlock === 'string' && confusionEspecieBlock.trim()) {
+    prompt = `${prompt}\n\n${confusionEspecieBlock}`;
+  }
+  if (typeof pestVsDiseaseBlock === 'string' && pestVsDiseaseBlock.trim()) {
+    prompt = `${prompt}\n\n${pestVsDiseaseBlock}`;
   }
 
   return prompt;
@@ -686,15 +761,17 @@ async function postValidate(userMessage, modelResponse, { sidecarUrl = SIDECAR_U
 /**
  * runProbeAgainstAgent — corre UNA sonda por el pipeline real. Impura (red),
  * pero cada dependencia (resolveEntities/callOllama/postValidate/
- * pisoTermicoGuard) es inyectable para test sin red.
+ * pisoTermicoGuard/confusionEspecieGuard/pestVsDiseaseGuard) es inyectable
+ * para test sin red.
  *
- * `pisoTermicoFn` corre EN PARALELO con `resolveFn` (mismo turno, cero
- * latencia serial añadida — espejo del `Promise.all` que hace
- * `AgentScreen.jsx` en producción) y, si devuelve `has_mismatch:true`, su
- * `system_prompt_block` se inyecta en `buildEnrichedSystemPrompt` — así el
- * bench mide el MISMO pipeline que ve el usuario real, no uno sin el guard.
+ * `pisoTermicoFn`/`confusionEspecieFn`/`pestVsDiseaseFn` corren EN PARALELO
+ * con `resolveFn` (mismo turno, cero latencia serial añadida — espejo del
+ * `Promise.all` que hace `AgentScreen.jsx` en producción) y, si alguno
+ * dispara, su `system_prompt_block` se inyecta en `buildEnrichedSystemPrompt`
+ * — así el bench mide el MISMO pipeline que ve el usuario real, no uno sin
+ * los guards.
  * @param {object} probe
- * @param {{ model?: string, resolveFn?: Function, callFn?: Function, validateFn?: Function, pisoTermicoFn?: Function }} [opts]
+ * @param {{ model?: string, resolveFn?: Function, callFn?: Function, validateFn?: Function, pisoTermicoFn?: Function, confusionEspecieFn?: Function, pestVsDiseaseFn?: Function }} [opts]
  * @returns {Promise<object>}
  */
 export async function runProbeAgainstAgent(probe, opts = {}) {
@@ -704,16 +781,26 @@ export async function runProbeAgainstAgent(probe, opts = {}) {
     callFn = callOllama,
     validateFn = postValidate,
     pisoTermicoFn = pisoTermicoGuard,
+    confusionEspecieFn = confusionEspecieGuard,
+    pestVsDiseaseFn = pestVsDiseaseGuard,
   } = opts;
   const t0 = performance.now();
-  const [{ entities }, pisoTermico] = await Promise.all([
+  const [{ entities }, pisoTermico, confusionEspecie, pestVsDisease] = await Promise.all([
     resolveFn(probe.query),
     pisoTermicoFn(probe.query),
+    confusionEspecieFn(probe.query),
+    pestVsDiseaseFn(probe.query),
   ]);
   const pisoTermicoBlock = (pisoTermico && pisoTermico.has_mismatch && pisoTermico.system_prompt_block)
     ? pisoTermico.system_prompt_block
     : '';
-  const systemPrompt = buildEnrichedSystemPrompt(entities, pisoTermicoBlock);
+  const confusionEspecieBlock = (confusionEspecie && confusionEspecie.has_confusion && confusionEspecie.system_prompt_block)
+    ? confusionEspecie.system_prompt_block
+    : '';
+  const pestVsDiseaseBlock = (pestVsDisease && pestVsDisease.has_classification && pestVsDisease.system_prompt_block)
+    ? pestVsDisease.system_prompt_block
+    : '';
+  const systemPrompt = buildEnrichedSystemPrompt(entities, pisoTermicoBlock, confusionEspecieBlock, pestVsDiseaseBlock);
   const { response, error } = await callFn(model, systemPrompt, probe.query);
   const validation = error ? { hallucinated: [], detected_count: 0 } : await validateFn(probe.query, response);
   return {
@@ -726,6 +813,8 @@ export async function runProbeAgainstAgent(probe, opts = {}) {
     error: error || null,
     entities_grounded: entities.length,
     piso_termico_guard_fired: Boolean(pisoTermicoBlock),
+    confusion_especie_guard_fired: Boolean(confusionEspecieBlock),
+    pest_vs_disease_guard_fired: Boolean(pestVsDiseaseBlock),
     halluc_detected_count: validation.detected_count,
     latency_ms: Math.round(performance.now() - t0),
   };
