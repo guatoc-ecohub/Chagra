@@ -1708,8 +1708,11 @@ export default function App() {
           pregunta al agente punta a punta por voz). El FAB (abajo-izquierda)
           es el trigger de HOY; el wake-word "hola Chagra" de MAÑANA llama el
           mismo activarEscucha() sin tocar nada de esto. Oculto donde ya hay
-          micrófono propio (agente, voz) y en login/onboarding. */}
-      {!['loading', 'login', 'oauth-callback', 'onboarding-perfil', 'ubicacion-detectada', 'agente', 'voz', 'voz_planta', 'registro_voz'].includes(currentView) && <EscuchaFab />}
+          micrófono propio (agente, voz, y el home: el compositor del hero
+          trae mic y el FAB taparía el botón Ⓐ de la mano — misma política
+          que AgentFab) y en login/onboarding. El overlay SÍ vive en el home:
+          el wake-word podrá abrirlo allí. */}
+      {!['loading', 'login', 'oauth-callback', 'onboarding-perfil', 'ubicacion-detectada', 'dashboard', 'agente', 'voz', 'voz_planta', 'registro_voz'].includes(currentView) && <EscuchaFab />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <EscuchaOverlay />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <SyncProgressIndicator />}

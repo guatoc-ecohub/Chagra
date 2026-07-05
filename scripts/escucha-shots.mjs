@@ -113,16 +113,32 @@ async function main() {
       locale: 'es-CO',
       permissions: ['microphone'],
     });
-    // Whisper stub (context.route — el SW sombrea page.route).
+    const page = await context.newPage();
+    page.setDefaultTimeout(60_000);
+    await installDeterminism(context, page, { profileKey: 'operador' });
+
+    // GOTCHA: installDeterminism hardcodea el origen del app como :5173 —
+    // en cualquier otro puerto su catch-all intercepta hasta los MÓDULOS JS
+    // y responde {data:[]} → el app jamás monta. Este wrapper se registra
+    // DESPUÉS (Playwright evalúa rutas LIFO): deja PASAR los recursos del
+    // app en nuestro puerto y delega el resto (APIs) con fallback().
+    await context.route('**/*', async (route) => {
+      const url = new URL(route.request().url());
+      const esRecursoApp = url.origin === BASE_URL
+        && !url.pathname.includes('/api/')
+        && !url.pathname.includes('/jsonapi/')
+        && !url.pathname.includes('/oauth/');
+      if (esRecursoApp) return route.continue();
+      return route.fallback();
+    });
+
+    // Whisper stub (después del wrapper → precedencia; y context.route, NO
+    // page.route: el SW lo sombrea).
     await context.route('**/api/whisper/asr*', (route) => route.fulfill({
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify({ text: 'Lléveme al mercado' }),
     }));
-
-    const page = await context.newPage();
-    page.setDefaultTimeout(60_000);
-    await installDeterminism(context, page, { profileKey: 'operador' });
     if (tema.dataTheme) {
       await page.addInitScript((t) => {
         localStorage.setItem('chagra:theme', t);
@@ -188,9 +204,14 @@ async function main() {
     if (!seeded) throw new Error('No se pudo seedear tras 3 intentos');
     await page.waitForTimeout(1500);
 
-    // 1) FAB visible en el home
+    // 1) FAB visible en una pantalla real (suelo). En el home NO hay FAB
+    // (política AgentFab: el compositor del hero ya trae mic + botón Ⓐ).
+    await page.evaluate(() => {
+      window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view: 'suelo' } }));
+    });
     const fabShot = `${OUTDIR}/escucha-01-fab-${tema.id}.png`;
     await page.waitForSelector('[data-testid="escucha-fab"]', { timeout: 20_000 });
+    await page.waitForTimeout(4500); // deja cargar el chunk lazy de la vista
     await page.screenshot({ path: fabShot });
     hechas.push(fabShot);
 

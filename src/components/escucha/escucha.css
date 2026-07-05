@@ -277,6 +277,13 @@
   outline: 3px solid rgba(var(--esc-linea-rgb), 0.9);
   outline-offset: 2px;
 }
+/* La carta recibe foco PROGRAMÁTICO al abrir (anuncio para lectores de
+ * pantalla); el focus-ring global del app le pintaba un aro ámbar alrededor
+ * de todo el modal. El foco visible se reserva para los botones. */
+.escucha-carta:focus,
+.escucha-carta:focus-visible {
+  outline: none;
+}
 
 /* ============================================================================
  * EscuchaFab — botón flotante persistente (el tap de HOY).

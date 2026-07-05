@@ -155,14 +155,11 @@ export default function EscuchaOverlay() {
     setFase(FASE_CERRADO);
   }, [reset]);
 
-  const faseRef = useRef(fase);
-  faseRef.current = fase;
-
   const abrir = useCallback(async (detalle) => {
     // Guard re-disparo: un wake-word puede gatillar varias veces seguidas
     // (o el operador toca el FAB mientras ya está abierto). Si ya estamos
     // oyendo/pensando/en rumbo, ignorar — no duplicar streams del mic.
-    if (faseRef.current !== FASE_CERRADO && faseRef.current !== FASE_ERROR) return;
+    if (fase !== FASE_CERRADO && fase !== FASE_ERROR) return;
     setFuente(detalle?.fuente || 'tap');
     setDestino(null);
     setMensajeError('');
@@ -182,7 +179,7 @@ export default function EscuchaOverlay() {
       );
       setFase(FASE_ERROR);
     }
-  }, [start]);
+  }, [start, fase]);
 
   /** Cierra la grabación y corre el pipeline Whisper → router → destino. */
   const finalizar = useCallback(async () => {
