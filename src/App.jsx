@@ -128,6 +128,12 @@ const PoscosechaScreen = lazy(() => import('./components/PoscosechaScreen'));
 // nutricional (ICBF TCAC 2015) por cultivo, exportado del grafo chagra_kg a
 // public/nutricion-humana.json (la PWA no consulta el grafo en vivo).
 const NutricionHumanaScreen = lazy(() => import('./components/NutricionHumanaScreen'));
+// Módulo "Mercado y despensa" (mundo del mismo nombre): los 6 canales de
+// comercialización + los 4 productos con valor agregado (marco INVIMA) + precio
+// del día EN VIVO por cultivo (get_precio_sipsa). Estructura de mercado
+// exportada del grafo chagra_kg a public/mercado-despensa.json; los precios
+// SIEMPRE se traen en vivo (nunca hardcodeados).
+const MercadoDespensaScreen = lazy(() => import('./components/MercadoDespensaScreen'));
 // LOS MUNDOS DE MI FINCA (reestructuración 2.0 del home): un mundo por dentro —
 // las funciones existentes agrupadas por lugar. Re-rutea, no reimplementa.
 const MundoScreen = lazy(() => import('./components/MundoScreen'));
@@ -254,6 +260,9 @@ const HASH_VIEW_ROUTES = {
   nutricion: 'nutricion',
   'nutricion-humana': 'nutricion',
   'comida-que-alimenta': 'nutricion',
+  'mercado-despensa': 'mercado_despensa',
+  mercado_despensa: 'mercado_despensa',
+  'por-donde-vendo': 'mercado_despensa',
   // Curso guiado + deep-links profundos usados por la landing (chagra.bio):
   // permiten que chagra.app/#curso, /#sembrar, /#voz, /#milpa, /#biopreparados,
   // /#sanidad y /#cosechar caigan en su vista real (antes caían a dashboard).
@@ -280,7 +289,7 @@ const MODULE_VIEWS = new Set([
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
-  'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
+  'usage_stats', 'mercado', 'mercado_despensa', 'auditoria_inventario', 'mundo',
 ]);
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
@@ -1373,6 +1382,20 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="La comida que alimenta">
               <NutricionHumanaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mercado_despensa':
+        // Módulo "Mercado y despensa" (mundo del mismo nombre): ¿por dónde
+        // vendo? (6 canales, ACFC Ley 2046 como oportunidad) · ¿cómo le agrego
+        // valor? (4 valor agregado + marco INVIMA) · ¿a cómo está? (precio del
+        // día EN VIVO por cultivo vía get_precio_sipsa — SIPSA/DANE, nunca
+        // hardcodeado). Estructura exportada del grafo chagra_kg a
+        // public/mercado-despensa.json.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mercado y despensa">
+              <MercadoDespensaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );

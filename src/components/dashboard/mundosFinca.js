@@ -139,6 +139,7 @@ export const MUNDOS_FINCA = [
         lema: 'Venda directo, saque cuentas y transforme su cosecha',
         tinte: ['#b98a2f', '#f7ecd2'],
         entradas: [
+            { view: 'mercado_despensa', label: '¿Por dónde vendo?', desc: 'Los 6 canales de venta, la compra pública (Ley 2046), valor agregado y el precio del día', emoji: '🏪' },
             { view: 'mercado', label: 'Vender y comprar', desc: 'Directo entre fincas, sin intermediarios', emoji: '🤝' },
             { view: 'poscosecha', label: 'Poscosecha y despensa', desc: 'Cosechar en punto, guardar sin que se dañe y transformar', emoji: '🥕' },
             { view: 'nutricion', label: 'La comida que alimenta', desc: 'Qué te da comer cada cultivo: fuerza, cuerpo, sangre y defensas (ICBF)', emoji: '🍽️' },

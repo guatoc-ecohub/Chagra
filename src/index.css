@@ -685,6 +685,28 @@
 }
 
 /* ===========================================================================
+ * MERCADO Y DESPENSA — micro-animaciones (MercadoDespensaScreen).
+ * El sol respira y la moneda del puesto tintinea (rota apenas). Sutil; TODO se
+ * apaga con prefers-reduced-motion.
+ * =========================================================================== */
+.md-sun {
+  transform-origin: 34px 30px;
+  animation: pc-breathe 4s ease-in-out infinite;
+}
+.md-coin {
+  transform-origin: 120px 62px;
+  animation: md-coin-tilt 3.6s ease-in-out infinite;
+}
+@keyframes md-coin-tilt {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .md-sun { animation: none; }
+  .md-coin { animation: none; transform: none; }
+}
+
+/* ===========================================================================
  * LOADING SKELETON DARK — fondo oscuro unificado para estados de carga.
  *
  * Tarea 81: .loading-skeleton-dark evita flash blanco en dark theme

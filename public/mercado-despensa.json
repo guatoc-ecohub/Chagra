@@ -1,0 +1,620 @@
+{
+  "meta": {
+    "titulo": "Mercado y despensa",
+    "subtitulo": "¿Por dónde vendo, cómo le agrego valor y a cómo está?",
+    "origen_datos": "Grafo de conocimiento chagra_kg (nodos CanalComercializacion + ValorAgregado y aristas SE_COMERCIALIZA_EN / SE_TRANSFORMA_EN), exportado a estático porque la PWA no consulta el grafo en vivo.",
+    "batch": "mercado-estructural-dr-2026-07-05",
+    "generado": "2026-07-05",
+    "total_canales": 6,
+    "total_valor_agregado": 4,
+    "total_despensa": 26,
+    "despensa_con_producto_sipsa": 23,
+    "nota_precios": "Este archivo NO contiene precios. Los precios del día los trae el agente en vivo con get_precio_sipsa (SIPSA/DANE). Donde no hay dato en vivo, se dice claro y se remite a la fuente oficial. Nunca se inventa un número.",
+    "fuente_precio_url": "https://www.dane.gov.co/index.php/estadisticas-por-tema/agropecuario/sistema-de-informacion-de-precios-sipsa"
+  },
+  "canales": [
+    {
+      "id": "canal_venta_directa_finca",
+      "nombre": "Venta directa al consumidor (sin intermediacion)",
+      "tipo": "circuito_corto",
+      "descripcion": "Comercializacion directa finca-consumidor; mayor porcentaje del precio final para el productor, relacion directa de confianza, flexibilidad en precio.",
+      "fuente": "FAO Colombia - Agricultura familiar y circuitos cortos de comercializacion",
+      "confianza": "media-alta",
+      "orden": 1,
+      "emoji": "🤝",
+      "titulo_corto": "Venta directa desde la finca",
+      "gancho": "El que más plata le deja: usted le vende directo a quien se lo come.",
+      "tono": "emerald"
+    },
+    {
+      "id": "canal_mercado_campesino",
+      "nombre": "Mercados Campesinos (circuito corto)",
+      "tipo": "circuito_corto",
+      "descripcion": "Venta directa en mercados campesinos/agroferias; modalidades sitio fijo, movil y en linea (canastas a domicilio, pedido a la carta). Dirigido a agricultura familiar campesina y comunitaria (ACFC). Requisitos: cedula + reconocimiento UMATA/ULATA (+ INVIMA si transforma).",
+      "fuente": "Ley 160 de 1994; Resolucion 464 de 2017 (MADR); mercadoscampesinos.gov.co",
+      "confianza": "alta",
+      "orden": 2,
+      "emoji": "🧺",
+      "titulo_corto": "Mercados campesinos",
+      "gancho": "La plaza campesina: sitio fijo, móvil o canastas a domicilio.",
+      "tono": "lime"
+    },
+    {
+      "id": "canal_agroferia_institucional",
+      "nombre": "Agroferia / gran mercado campesino institucional",
+      "tipo": "circuito_corto",
+      "descripcion": "Eventos periodicos de gran escala organizados por entidades territoriales (ej. Bogota, Manizales, Ibague, Putumayo) que conectan decenas/cientos de productores directamente con consumidores urbanos; evidencia de traccion: un Gran Mercado Campesino de Bogota supero $400 millones en ventas y conecto mas de 200 productores (2024-2026 acumulado distrital ~$24.900 millones).",
+      "fuente": "Bogota.gov.co / Secretaria Distrital de Desarrollo Economico",
+      "confianza": "media",
+      "orden": 3,
+      "emoji": "🎪",
+      "titulo_corto": "Agroferias y grandes mercados",
+      "gancho": "Los eventos grandes que arma la alcaldía o la gobernación.",
+      "tono": "amber"
+    },
+    {
+      "id": "canal_compra_publica_acfc",
+      "nombre": "Compras publicas locales a agricultura campesina, familiar y comunitaria",
+      "tipo": "compra_publica",
+      "descripcion": "Ley 2046 de 2020: todo programa/entidad publica o privada que compre alimentos con recursos publicos debe comprar minimo 30% a pequenos productores locales y ACFC (u organizaciones legalmente constituidas). Pago contra entrega (no espera terminos usuales de 30 dias habiles). Aplica a PAE, ICBF, Fuerzas Militares, sistema penitenciario, hospitales, universidades. Demanda PAE+ICBF > 2.6 billones COP/ano.",
+      "fuente": "Ley 2046 de 2020; colombiacompra.gov.co; fao.org/colombia",
+      "confianza": "alta",
+      "orden": 4,
+      "emoji": "🏫",
+      "titulo_corto": "Compra pública (Ley 2046)",
+      "oportunidad": true,
+      "gancho": "La ley obliga a comprarle mínimo 30% a la agricultura campesina. Y le pagan contra entrega.",
+      "tono": "violet"
+    },
+    {
+      "id": "canal_agroindustria_cliente_formal",
+      "nombre": "Venta a cliente formal (restaurante/tienda/agroindustria) via documento soporte DIAN",
+      "tipo": "b2b_formal",
+      "descripcion": "El pequeno productor no obligado a facturar puede venderle a un cliente formal: el comprador genera el 'Documento Soporte en Adquisiciones a No Obligados a Facturar' (Resolucion 000167 de 2021, modificada por Resolucion 000488 de 2022) para registrar costo/deduccion. Requiere nombre/NIT o cedula del productor.",
+      "fuente": "DIAN - Resolucion 000167 de 2021",
+      "confianza": "alta",
+      "orden": 5,
+      "emoji": "🧾",
+      "titulo_corto": "Venderle a un cliente formal",
+      "gancho": "Restaurante, tienda o agroindustria: el comprador hace el papeleo con la DIAN, usted no factura.",
+      "tono": "sky"
+    },
+    {
+      "id": "canal_central_mayorista_sipsa",
+      "nombre": "Central mayorista / SIPSA-DANE",
+      "tipo": "mayorista",
+      "descripcion": "Precios mayoristas de central de abasto publicados por el Sistema de Informacion de Precios y Abastecimiento del Sector Agropecuario (SIPSA-DANE), boletin semanal/diario, cobertura 32 mercados. El precio SIPSA es de central, no de finca: el productor recibe menos por flete e intermediacion.",
+      "fuente": "DANE - SIPSA (dane.gov.co)",
+      "confianza": "alta",
+      "orden": 6,
+      "emoji": "🚛",
+      "titulo_corto": "Central mayorista",
+      "gancho": "El precio de referencia del país (SIPSA/DANE). Ojo: es precio de central, no de finca.",
+      "tono": "slate"
+    }
+  ],
+  "valor_agregado": [
+    {
+      "id": "valor_agregado_panela",
+      "nombre": "Panela",
+      "tipo": "transformacion_artesanal",
+      "descripcion": "Alimento natural que NO requiere Registro Sanitario INVIMA mientras no se le agreguen saborizantes ni transformacion industrial adicional. Si se transforma mas, cambia el regimen sanitario.",
+      "fuente": "Affirma Legal - Productos que requieren Registro Sanitario INVIMA",
+      "confianza": "media-alta",
+      "orden": 1,
+      "emoji": "🟫",
+      "nivel_riesgo": "bajo",
+      "regimen": "No requiere Registro Sanitario INVIMA (mientras sea natural, sin saborizantes).",
+      "gancho": "La panela natural puede arrancar sin registro INVIMA."
+    },
+    {
+      "id": "valor_agregado_cafe_tostado",
+      "nombre": "Cafe tostado y molido",
+      "tipo": "transformacion_agroindustrial",
+      "descripcion": "Transformar cafe pergamino/verde a tostado multiplica el margen: indice ingresos/costos I/C=1,09 (estudio UTP 2018). No requiere el mismo tramite que lacteos pero si buenas practicas de manufactura.",
+      "fuente": "UTP - Simulador costo de produccion de cafe (repositorio institucional)",
+      "confianza": "media",
+      "orden": 2,
+      "emoji": "☕",
+      "nivel_riesgo": "bajo-medio",
+      "regimen": "No pide el mismo trámite que un lácteo, pero sí Buenas Prácticas de Manufactura (BPM).",
+      "gancho": "Tostar y moler el café multiplica el margen frente al pergamino."
+    },
+    {
+      "id": "valor_agregado_mermelada",
+      "nombre": "Mermelada",
+      "tipo": "transformacion_artesanal",
+      "descripcion": "Producto transformado que entra a categorizacion de riesgo INVIMA (Registro/Permiso/Notificacion Sanitaria segun riesgo). Microempresas, cooperativas y asociaciones agropecuarias estan exentas del pago de tarifas de registro sanitario la primera vez (Ley 2069 de 2020).",
+      "fuente": "INVIMA; Ley 2069 de 2020",
+      "confianza": "media",
+      "orden": 3,
+      "emoji": "🍓",
+      "nivel_riesgo": "medio",
+      "regimen": "Entra a categorización de riesgo INVIMA (Registro/Permiso/Notificación según riesgo).",
+      "gancho": "Microempresas y asociaciones NO pagan la tarifa del registro la primera vez (Ley 2069/2020)."
+    },
+    {
+      "id": "valor_agregado_queso",
+      "nombre": "Queso (lacteo transformado)",
+      "tipo": "transformacion_agroindustrial",
+      "descripcion": "Lacteo transformado, categoria de ALTO RIESGO ante INVIMA: requiere Registro Sanitario (RSA) con vigencia de 5 anos, evaluacion documental y tecnica completa, segun Resolucion 719 de 2015 y Resolucion 2674 de 2013.",
+      "fuente": "INVIMA - pasos para registro/permiso/notificacion sanitaria; Res. 719/2015, Res. 2674/2013",
+      "confianza": "media-alta",
+      "orden": 4,
+      "emoji": "🧀",
+      "nivel_riesgo": "alto",
+      "regimen": "Lácteo = ALTO RIESGO: exige Registro Sanitario (RSA), vigencia 5 años (Res. 719/2015, 2674/2013).",
+      "gancho": "El queso vende bien, pero es el trámite sanitario más exigente. Planéelo con tiempo."
+    }
+  ],
+  "despensa": [
+    {
+      "species_id": "persea_americana",
+      "nombre_comun": "Aguacate",
+      "nombre_cientifico": "Persea americana Mill.",
+      "canales": [
+        "canal_compra_publica_acfc",
+        "canal_central_mayorista_sipsa",
+        "canal_mercado_campesino",
+        "canal_venta_directa_finca"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "aguacate",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/608148225/original.jpg",
+        "licencia": "http://creativecommons.org/publicdomain/zero/1.0/",
+        "autor": "Hugo Saulino"
+      }
+    },
+    {
+      "species_id": "arracacia_xanthorrhiza_amarilla",
+      "nombre_comun": "Arracacha amarilla",
+      "nombre_cientifico": "Arracacia xanthorrhiza Bancr. cv. 'Amarilla'",
+      "canales": [
+        "canal_compra_publica_acfc",
+        "canal_venta_directa_finca",
+        "canal_mercado_campesino",
+        "canal_central_mayorista_sipsa"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "arracacha",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/182461836/original.jpg",
+        "licencia": "http://creativecommons.org/licenses/by/4.0/",
+        "autor": "Nicolás Baresch Uribe"
+      }
+    },
+    {
+      "species_id": "oryza_sativa",
+      "nombre_comun": "Arroz Clearfield",
+      "nombre_cientifico": "Oryza sativa L. (tecnología Clearfield, tolerante a imidazolinonas)",
+      "canales": [
+        "canal_venta_directa_finca",
+        "canal_central_mayorista_sipsa",
+        "canal_mercado_campesino",
+        "canal_compra_publica_acfc"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": null,
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/492154473/original.jpg",
+        "licencia": "http://creativecommons.org/licenses/by/4.0/",
+        "autor": "Aditya Rao"
+      }
+    },
+    {
+      "species_id": "pisum_sativum",
+      "nombre_comun": "Arveja",
+      "nombre_cientifico": "Pisum sativum",
+      "canales": [
+        "canal_venta_directa_finca",
+        "canal_central_mayorista_sipsa",
+        "canal_mercado_campesino",
+        "canal_compra_publica_acfc"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "arveja",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/57714057/medium.jpg",
+        "licencia": "cc-by-nc",
+        "autor": "(c) Luca Boscain, some rights reserved (CC BY-NC), uploaded by Luca Boscain"
+      }
+    },
+    {
+      "species_id": "theobroma_cacao",
+      "nombre_comun": "Cacao",
+      "nombre_cientifico": "Theobroma cacao L.",
+      "canales": [
+        "canal_compra_publica_acfc",
+        "canal_venta_directa_finca",
+        "canal_central_mayorista_sipsa",
+        "canal_mercado_campesino"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": null,
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/608761215/original.jpg",
+        "licencia": "http://creativecommons.org/licenses/by/4.0/",
+        "autor": "Derek Duplessis"
+      }
+    },
+    {
+      "species_id": "coffea_arabica",
+      "nombre_comun": "Café caturra / Castillo / Cenicafé 1",
+      "nombre_cientifico": "Coffea arabica L.",
+      "canales": [
+        "canal_mercado_campesino",
+        "canal_compra_publica_acfc",
+        "canal_venta_directa_finca",
+        "canal_central_mayorista_sipsa"
+      ],
+      "transforma_en": "valor_agregado_cafe_tostado",
+      "producto_sipsa": null,
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/605811844/original.jpg",
+        "licencia": "http://creativecommons.org/licenses/by/4.0/",
+        "autor": "Richard Jacob"
+      }
+    },
+    {
+      "species_id": "cucurbita_maxima",
+      "nombre_comun": "Calabaza / Auyama",
+      "nombre_cientifico": "Cucurbita maxima Duchesne",
+      "canales": [
+        "canal_compra_publica_acfc",
+        "canal_venta_directa_finca",
+        "canal_central_mayorista_sipsa",
+        "canal_mercado_campesino"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "calabaza",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/607534145/original.jpg",
+        "licencia": "http://creativecommons.org/licenses/by/4.0/",
+        "autor": "Joe Dillon"
+      }
+    },
+    {
+      "species_id": "allium_cepa",
+      "nombre_comun": "Cebolla cabezona",
+      "nombre_cientifico": "Allium cepa L.",
+      "canales": [
+        "canal_compra_publica_acfc",
+        "canal_venta_directa_finca",
+        "canal_central_mayorista_sipsa",
+        "canal_mercado_campesino"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "cebolla cabezona",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/640133931/original.jpg",
+        "licencia": "http://creativecommons.org/licenses/by/4.0/",
+        "autor": "Fyodor Pudovikov"
+      }
+    },
+    {
+      "species_id": "coriandrum_sativum",
+      "nombre_comun": "Cilantro",
+      "nombre_cientifico": "Coriandrum sativum L.",
+      "canales": [
+        "canal_compra_publica_acfc",
+        "canal_venta_directa_finca",
+        "canal_central_mayorista_sipsa",
+        "canal_mercado_campesino"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "cilantro",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/644275211/original.jpg",
+        "licencia": "http://creativecommons.org/publicdomain/zero/1.0/",
+        "autor": "lanechaffin"
+      }
+    },
+    {
+      "species_id": "fragaria_ananassa_monterrey",
+      "nombre_comun": "Fresa Monterrey",
+      "nombre_cientifico": "Fragaria × ananassa 'Monterrey'",
+      "canales": [
+        "canal_venta_directa_finca",
+        "canal_central_mayorista_sipsa",
+        "canal_mercado_campesino",
+        "canal_compra_publica_acfc"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "fresa",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/611897519/original.jpg",
+        "licencia": "http://creativecommons.org/publicdomain/zero/1.0/",
+        "autor": "NENP_StBartsNewbury"
+      }
+    },
+    {
+      "species_id": "phaseolus_vulgaris",
+      "nombre_comun": "Frijol arbustivo / voluble",
+      "nombre_cientifico": "Phaseolus vulgaris L.",
+      "canales": [
+        "canal_compra_publica_acfc",
+        "canal_central_mayorista_sipsa",
+        "canal_venta_directa_finca",
+        "canal_mercado_campesino"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "frijol",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/500118303/original.jpeg",
+        "licencia": "http://creativecommons.org/licenses/by/4.0/",
+        "autor": "Raúl A. Ruiz M."
+      }
+    },
+    {
+      "species_id": "vicia_faba",
+      "nombre_comun": "Haba",
+      "nombre_cientifico": "Vicia faba L.",
+      "canales": [
+        "canal_compra_publica_acfc",
+        "canal_venta_directa_finca",
+        "canal_mercado_campesino",
+        "canal_central_mayorista_sipsa"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "haba",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/604467340/original.jpg",
+        "licencia": "http://creativecommons.org/licenses/by/4.0/",
+        "autor": "Tracy PW"
+      }
+    },
+    {
+      "species_id": "lactuca_sativa",
+      "nombre_comun": "Lechuga",
+      "nombre_cientifico": "Lactuca sativa L.",
+      "canales": [
+        "canal_compra_publica_acfc",
+        "canal_venta_directa_finca",
+        "canal_mercado_campesino",
+        "canal_central_mayorista_sipsa"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "lechuga",
+      "imagen": {
+        "url": "https://observation.org/photos/146115174.jpg",
+        "licencia": "http://creativecommons.org/publicdomain/zero/1.0/legalcode",
+        "autor": "Bram vd Bergh"
+      }
+    },
+    {
+      "species_id": "solanum_quitoense",
+      "nombre_comun": "Lulo / Naranjilla / Chuva",
+      "nombre_cientifico": "Solanum quitoense Lam.",
+      "canales": [
+        "canal_compra_publica_acfc",
+        "canal_central_mayorista_sipsa",
+        "canal_mercado_campesino",
+        "canal_venta_directa_finca"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "lulo",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/610859797/original.jpg",
+        "licencia": "http://creativecommons.org/licenses/by/4.0/",
+        "autor": "Alina Martin"
+      }
+    },
+    {
+      "species_id": "zea_mays",
+      "nombre_comun": "Maíz criollo",
+      "nombre_cientifico": "Zea mays L.",
+      "canales": [
+        "canal_compra_publica_acfc",
+        "canal_venta_directa_finca",
+        "canal_central_mayorista_sipsa",
+        "canal_mercado_campesino"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "maiz",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/618509763/original.jpg",
+        "licencia": "http://creativecommons.org/licenses/by/4.0/",
+        "autor": "Hannah Stitt"
+      }
+    },
+    {
+      "species_id": "rubus_glaucus",
+      "nombre_comun": "Mora andina / Mora de Castilla",
+      "nombre_cientifico": "Rubus glaucus Benth.",
+      "canales": [
+        "canal_compra_publica_acfc",
+        "canal_central_mayorista_sipsa",
+        "canal_mercado_campesino",
+        "canal_venta_directa_finca"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "mora",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/462588725/original.jpg",
+        "licencia": "http://creativecommons.org/publicdomain/zero/1.0/",
+        "autor": "Zoltán Stekkelpak"
+      }
+    },
+    {
+      "species_id": "solanum_tuberosum",
+      "nombre_comun": "Papa parda pastusa",
+      "nombre_cientifico": "Solanum tuberosum L. subsp. andigenum var. parda pastusa",
+      "canales": [
+        "canal_compra_publica_acfc",
+        "canal_venta_directa_finca",
+        "canal_central_mayorista_sipsa",
+        "canal_mercado_campesino"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "papa",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/607744677/original.jpg",
+        "licencia": "http://creativecommons.org/licenses/by/4.0/",
+        "autor": "Elliot Greiner"
+      }
+    },
+    {
+      "species_id": "musa_paradisiaca",
+      "nombre_comun": "Plátano",
+      "nombre_cientifico": "Musa × paradisiaca L.",
+      "canales": [
+        "canal_compra_publica_acfc",
+        "canal_central_mayorista_sipsa",
+        "canal_mercado_campesino",
+        "canal_venta_directa_finca"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "banano",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/608043778/original.jpg",
+        "licencia": "http://creativecommons.org/publicdomain/zero/1.0/",
+        "autor": "Sinaloa Silvestre"
+      }
+    },
+    {
+      "species_id": "chenopodium_quinoa",
+      "nombre_comun": "Quinua",
+      "nombre_cientifico": "Chenopodium quinoa Willd.",
+      "canales": [
+        "canal_venta_directa_finca",
+        "canal_central_mayorista_sipsa",
+        "canal_mercado_campesino",
+        "canal_compra_publica_acfc"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "quinua",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/463521370/original.jpeg",
+        "licencia": "http://creativecommons.org/licenses/by/4.0/",
+        "autor": "Humber Alberto"
+      }
+    },
+    {
+      "species_id": "beta_vulgaris_conditiva",
+      "nombre_comun": "Remolacha",
+      "nombre_cientifico": "Beta vulgaris L. subsp. vulgaris Conditiva Group",
+      "canales": [
+        "canal_compra_publica_acfc",
+        "canal_venta_directa_finca",
+        "canal_mercado_campesino",
+        "canal_central_mayorista_sipsa"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "remolacha",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/605386667/original.jpg",
+        "licencia": "http://creativecommons.org/licenses/by/4.0/",
+        "autor": "Shane Austin"
+      }
+    },
+    {
+      "species_id": "brassica_oleracea_var_capitata",
+      "nombre_comun": "Repollo",
+      "nombre_cientifico": "Brassica oleracea var. capitata L.",
+      "canales": [
+        "canal_compra_publica_acfc",
+        "canal_venta_directa_finca",
+        "canal_central_mayorista_sipsa",
+        "canal_mercado_campesino"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "repollo",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/615794433/original.jpg",
+        "licencia": "http://creativecommons.org/publicdomain/zero/1.0/",
+        "autor": "Peter de Lange"
+      }
+    },
+    {
+      "species_id": "solanum_lycopersicum",
+      "nombre_comun": "Tomate chonto",
+      "nombre_cientifico": "Solanum lycopersicum L.",
+      "canales": [
+        "canal_compra_publica_acfc",
+        "canal_venta_directa_finca",
+        "canal_central_mayorista_sipsa",
+        "canal_mercado_campesino"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "tomate",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/608629968/original.jpg",
+        "licencia": "http://creativecommons.org/licenses/by/4.0/",
+        "autor": "Dave Richardson"
+      }
+    },
+    {
+      "species_id": "solanum_betaceum",
+      "nombre_comun": "Tomate de árbol / Tamarillo",
+      "nombre_cientifico": "Solanum betaceum Cav.",
+      "canales": [
+        "canal_venta_directa_finca",
+        "canal_central_mayorista_sipsa",
+        "canal_mercado_campesino",
+        "canal_compra_publica_acfc"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "tomate arbol",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/605808233/original.jpg",
+        "licencia": "http://creativecommons.org/publicdomain/zero/1.0/",
+        "autor": "Steven Smethurst"
+      }
+    },
+    {
+      "species_id": "physalis_peruviana",
+      "nombre_comun": "Uchuva",
+      "nombre_cientifico": "Physalis peruviana L.",
+      "canales": [
+        "canal_venta_directa_finca",
+        "canal_central_mayorista_sipsa",
+        "canal_mercado_campesino",
+        "canal_compra_publica_acfc"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "uchuva",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/606541557/original.jpg",
+        "licencia": "http://creativecommons.org/licenses/by/4.0/",
+        "autor": "desertnaturalist"
+      }
+    },
+    {
+      "species_id": "manihot_esculenta",
+      "nombre_comun": "Yuca brava amazónica",
+      "nombre_cientifico": "Manihot esculenta Crantz",
+      "canales": [
+        "canal_compra_publica_acfc",
+        "canal_central_mayorista_sipsa",
+        "canal_mercado_campesino",
+        "canal_venta_directa_finca"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "yuca",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/608599553/original.jpg",
+        "licencia": "http://creativecommons.org/licenses/by/4.0/",
+        "autor": "Mark"
+      }
+    },
+    {
+      "species_id": "daucus_carota_subsp_sativus",
+      "nombre_comun": "Zanahoria",
+      "nombre_cientifico": "Daucus carota L. subsp. sativus (Hoffm.) Arcang.",
+      "canales": [
+        "canal_compra_publica_acfc",
+        "canal_venta_directa_finca",
+        "canal_central_mayorista_sipsa",
+        "canal_mercado_campesino"
+      ],
+      "transforma_en": null,
+      "producto_sipsa": "zanahoria",
+      "imagen": {
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/605366692/original.jpg",
+        "licencia": "http://creativecommons.org/licenses/by/4.0/",
+        "autor": "Karen Fry"
+      }
+    }
+  ]
+}
