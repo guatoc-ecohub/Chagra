@@ -40,6 +40,7 @@ import {
   sidecarReachableLocally,
   generateMarkdownReport,
   buildEnrichedSystemPrompt,
+  companionSpeciesGuard,
 } from '../bench-contaminacion.mjs';
 
 /** Stub por defecto del guard piso térmico: sin desajuste, no-op — evita que
@@ -384,6 +385,34 @@ describe('buildEnrichedSystemPrompt (guard piso térmico chagra-pro #288)', () =
   });
 });
 
+describe('companionSpeciesGuard (post-LLM cross_thermal)', () => {
+  it('devuelve bloque y flag cuando el sidecar corrige una respuesta', async () => {
+    const fetchImpl = async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        has_companion_species: true,
+        system_prompt_block: '[GUARD COMPANION SPECIES] Corrige la compania.',
+      }),
+    });
+    const res = await companionSpeciesGuard('respuesta del agente', { sidecarUrl: 'http://sidecar', fetchImpl });
+    expect(res).toEqual({
+      has_companion_species: true,
+      system_prompt_block: '[GUARD COMPANION SPECIES] Corrige la compania.',
+    });
+  });
+
+  it('degrada a bloque vacio si el sidecar cae', async () => {
+    const fetchImpl = async () => { throw new Error('down'); };
+    const res = await companionSpeciesGuard('respuesta del agente', { sidecarUrl: 'http://sidecar', fetchImpl });
+    expect(res).toEqual({
+      has_companion_species: false,
+      system_prompt_block: '',
+      error: 'down',
+    });
+  });
+});
+
 // ── orquestación: resolveFn/callFn/validateFn INYECTADOS (sin red real) ────
 
 describe('runProbeAgainstAgent (dependencias inyectadas, sin red)', () => {
@@ -555,6 +584,53 @@ describe('runProbeAgainstAgent (dependencias inyectadas, sin red)', () => {
       });
       expect(out.error).toBeNull();
       expect(out.pest_vs_disease_guard_fired).toBe(false);
+    });
+  });
+
+  describe('wiring /companion-species-guard (bench honesto, post-LLM cross_thermal)', () => {
+    const crossThermalProbe = { id: 'ct1', type: 'cross_thermal', query: 'respuesta cruzada', subject: 'S' };
+
+    it('has bloque → antepone la correccion y marca companion_species_guard_fired', async () => {
+      const resolveFn = async () => ({ entities: [] });
+      let seenResponse = null;
+      const callFn = async () => ({ response: 'respuesta base', error: null });
+      const validateFn = async (_query, response) => {
+        seenResponse = response;
+        return { hallucinated: [], detected_count: 0 };
+      };
+      const companionSpeciesFn = async () => ({
+        has_companion_species: true,
+        system_prompt_block: '[GUARD COMPANION SPECIES] Corrige la compania.',
+      });
+      const out = await runProbeAgainstAgent(crossThermalProbe, {
+        resolveFn,
+        callFn,
+        validateFn,
+        pisoTermicoFn: noMismatchPisoTermicoFn,
+        confusionEspecieFn: noConfusionEspecieFn,
+        pestVsDiseaseFn: noPestVsDiseaseFn,
+        companionSpeciesFn,
+      });
+      expect(seenResponse.startsWith('[GUARD COMPANION SPECIES] Corrige la compania.')).toBe(true);
+      expect(out.companion_species_guard_fired).toBe(true);
+    });
+
+    it('companionSpeciesFn caido → degrada limpio y no marca firing', async () => {
+      const resolveFn = async () => ({ entities: [] });
+      const callFn = async () => ({ response: 'respuesta base', error: null });
+      const validateFn = async () => ({ hallucinated: [], detected_count: 0 });
+      const companionSpeciesFn = async () => ({ has_companion_species: false, system_prompt_block: '', error: 'ECONNREFUSED' });
+      const out = await runProbeAgainstAgent(crossThermalProbe, {
+        resolveFn,
+        callFn,
+        validateFn,
+        pisoTermicoFn: noMismatchPisoTermicoFn,
+        confusionEspecieFn: noConfusionEspecieFn,
+        pestVsDiseaseFn: noPestVsDiseaseFn,
+        companionSpeciesFn,
+      });
+      expect(out.companion_species_guard_fired).toBe(false);
+      expect(out.error).toBeNull();
     });
   });
 });

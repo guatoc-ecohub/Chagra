@@ -47,7 +47,7 @@ import { createStreamDeadline } from '../../services/streamDeadline';
 // Sidecar agro-mcp (ADR-045 Fase 2 Step B/C). Detrás de feature flag
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
-import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, biopreparadoGrounding, pisoTermicoGuard, confusionEspecieGuard, pestVsDiseaseGuard, postValidate, getClimaIdeam, isToolAllowed } from '../../services/sidecarClient';
+import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, biopreparadoGrounding, pisoTermicoGuard, confusionEspecieGuard, pestVsDiseaseGuard, companionSpeciesGuard, postValidate, getClimaIdeam, isToolAllowed } from '../../services/sidecarClient';
 // CHIPS DE MODO (A3/A4, decisión operador 2026-06-02): el router PURO mapea
 // la intención forzada del chip → tool determinístico, SALTANDO el NLU
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
@@ -113,6 +113,7 @@ import { selectChipDefs } from '../../services/profileChipSelector';
 import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciarAccess';
 import { captureExchange } from '../../services/conversationCaptureService';
 import { regionFromProfile, getEnsoOutlook } from '../../services/ensoContext';
+import { prependCorrectionBlock } from './responseGuards';
 // SALUDO PROACTIVO (#162 alertas + #298 tareas + #331 análisis): el agente, de
 // entrada, lidera con lo MÁS importante (1-2 pendientes) si los hay, o da una
 // idea contextual (cultivo/clima/temporada) sin inventar alarmas. Lógica pura
@@ -2284,7 +2285,26 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // `valid`—. La cobertura taxonómica la dan los guards síncronos de
       // applyOutputGuards (#1332 binomio benéfico + 5/5b sustitución/companion)
       // y el grounding de resolve-entities. Ver outputGuards.js.
-      const responseBody = guarded.text;
+      let responseBody = guarded.text;
+      let responseAutoCorrected = guarded.modified === true;
+      // GUARDA POST-LLM de companion species: valida la respuesta ya generada
+      // contra el catalogo. Si dispara, anteponemos el bloque de correccion al
+      // turno final sin romper el flujo si el sidecar falla.
+      if (isOnline && isSidecarEnabled()) {
+        try {
+          const companionSpecies = await companionSpeciesGuard(responseBody);
+          if (companionSpecies && typeof companionSpecies.system_prompt_block === 'string' && companionSpecies.system_prompt_block.trim()) {
+            responseBody = prependCorrectionBlock(responseBody, companionSpecies.system_prompt_block);
+            responseAutoCorrected = true;
+            console.debug('[sidecar] companion-species-guard', {
+              hasCompanionSpecies: companionSpecies.has_companion_species,
+              reason: companionSpecies.reason,
+            });
+          }
+        } catch (companionErr) {
+          console.debug('[sidecar] companion-species-guard fail (sigo sin bloque):', companionErr?.message);
+        }
+      }
       agentSounds.chime();
 
       const { intent } = parseIntent(text);
@@ -2345,7 +2365,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         ...evidenceSourceLink,
         ...groundingBadges,
         ...groundingSemaphoreMeta,
-        auto_corrected: guarded.modified === true,
+        auto_corrected: responseAutoCorrected,
       };
       const profileMode = (() => {
         try {

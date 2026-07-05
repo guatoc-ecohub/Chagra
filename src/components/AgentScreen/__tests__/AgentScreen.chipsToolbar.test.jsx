@@ -155,6 +155,7 @@ vi.mock('../../../services/sidecarClient', () => ({
   pisoTermicoGuard: vi.fn(),
   confusionEspecieGuard: vi.fn(),
   pestVsDiseaseGuard: vi.fn(),
+  companionSpeciesGuard: vi.fn(),
   postValidate: vi.fn(),
   getClimaIdeam: vi.fn(),
   isToolAllowed: vi.fn(() => false),
