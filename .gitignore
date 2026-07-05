@@ -67,3 +67,11 @@ chagra-anthropic-judge-key
 # Salida del dashboard de benches (scripts/bench-dashboard.mjs): HTML + SVG + PNG
 # son artefactos EFÍMEROS regenerables. El script SÍ se versiona; su salida no.
 /out/
+
+# Dataset de entrenamiento del wake-word "hola chagra" (#2088): WAV generados
+# con Kokoro TTS + ffmpeg (scripts/wake-word/generate-samples.mjs). Es un
+# artefacto REGENERABLE (no fuente) — ~5 MB de audio sintético que no aporta
+# nada versionado en git. Los scripts SÍ se versionan; los .wav no. El
+# RESULTADO del entrenamiento (public/models/hola-chagra/{examples.bin,
+# metadata.json}) SÍ se commitea — es lo que se shippea.
+/scripts/wake-word/samples/

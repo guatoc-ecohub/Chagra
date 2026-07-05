@@ -1,0 +1,103 @@
+{
+  "ts": "2026-07-05T21:26:24.999Z",
+  "dataset": {
+    "total": 47,
+    "train": 38,
+    "holdout": 9
+  },
+  "caveat": "Dataset 100% SINTÉTICO (Kokoro TTS + variaciones ffmpeg de velocidad/tono + ruido sintético). Valida el PIPELINE end-to-end y da una cota honesta de precisión sobre voces de máquina; NO reemplaza la validación con voz real de campo — ver \"Enséñale tu voz\" (enrollment) como fallback/ajuste fino cuando el modelo base sintético no calza con el acento/tono real del operador.",
+  "load_ms": 1346,
+  "collect_ms": 41695,
+  "counts": {
+    "hola chagra": 13,
+    "otro": 19,
+    "_background_noise_": 6
+  },
+  "train_ms": 18201,
+  "epochs": 40,
+  "wordLabels": [
+    "_background_noise_",
+    "hola chagra",
+    "otro"
+  ],
+  "finalLoss": 0.034154389053583145,
+  "finalAcc": 1,
+  "heldOutEval": {
+    "threshold": 0.9,
+    "tp": 3,
+    "fn": 0,
+    "fp": 0,
+    "tn": 6,
+    "accuracy": 1,
+    "precision": 1,
+    "recall": 1,
+    "rows": [
+      {
+        "file": "pos/ef_aoede-v90.wav",
+        "trueLabel": "hola chagra",
+        "maxWakeScore": 0.9984903335571289,
+        "predictedWake": true,
+        "correct": true
+      },
+      {
+        "file": "pos/ef_kore-v112.wav",
+        "trueLabel": "hola chagra",
+        "maxWakeScore": 0.9972169399261475,
+        "predictedWake": true,
+        "correct": true
+      },
+      {
+        "file": "pos/em_alex-pitchUp.wav",
+        "trueLabel": "hola chagra",
+        "maxWakeScore": 0.9199883341789246,
+        "predictedWake": true,
+        "correct": true
+      },
+      {
+        "file": "neg-otro/chagra-em_alex.wav",
+        "trueLabel": "otro",
+        "maxWakeScore": 0.8606233596801758,
+        "predictedWake": false,
+        "correct": true
+      },
+      {
+        "file": "neg-otro/c-mo-est-la-finca-ef_dora.wav",
+        "trueLabel": "otro",
+        "maxWakeScore": 0.8334939479827881,
+        "predictedWake": false,
+        "correct": true
+      },
+      {
+        "file": "neg-otro/hasta-luego-em_alex.wav",
+        "trueLabel": "otro",
+        "maxWakeScore": 0.28493160009384155,
+        "predictedWake": false,
+        "correct": true
+      },
+      {
+        "file": "neg-otro/espere-un-momentico-ef_dora.wav",
+        "trueLabel": "otro",
+        "maxWakeScore": 0.30535054206848145,
+        "predictedWake": false,
+        "correct": true
+      },
+      {
+        "file": "neg-otro/buenas-chagra-em_alex.wav",
+        "trueLabel": "otro",
+        "maxWakeScore": 0.6427485942840576,
+        "predictedWake": false,
+        "correct": true
+      },
+      {
+        "file": "neg-noise/silence-1.wav",
+        "trueLabel": "_background_noise_",
+        "maxWakeScore": 0.18212687969207764,
+        "predictedWake": false,
+        "correct": true
+      }
+    ]
+  },
+  "examplesBytesTotal": 1519204,
+  "examplesBytesTrainOnly": 1519204,
+  "ok": true
+}

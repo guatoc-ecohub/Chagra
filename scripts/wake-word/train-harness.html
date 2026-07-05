@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>train-harness — wake-word "hola chagra"</title>
+<link rel="icon" href="data:,">  <!-- evita el 404 de /favicon.ico en el log del harness -->
+
+<!--
+  train-harness.html — arnés de ENTRENAMIENTO del wake-word "hola chagra"
+  (MODO CAMPO, #2088). NO es parte del build de Chagra (vive en scripts/,
+  fuera de Vite) y NO se shippea. Lo conduce scripts/wake-word/train-model.mjs
+  vía Playwright (headed sobre Xvfb — headless throttlea audio/rAF, ver
+  spikes/wake-word/verify-headless.mjs).
+
+  Carga los MISMOS archivos self-hosted que se shippean a producción
+  (/vendor/tfjs, /vendor/speech-commands, /models/speech-commands) — el
+  entrenamiento corre contra el pipeline REAL, no un mock. La diferencia
+  con producción es la fuente del audio: aquí viene de WAV generados con
+  Kokoro TTS + ffmpeg (scripts/wake-word/generate-samples.mjs), inyectados
+  como micrófono falso (mismo truco que el spike: getUserMedia devuelve un
+  MediaStreamDestination fresco por llamada).
+-->
+<!-- core+layers+data+backend-wasm (NO el paquete `@tensorflow/tfjs` completo:
+     ese hace eval() al registrar cpu/webgl y viola la CSP real de la app —
+     ver el comentario largo en src/services/wakeWordService.js). Entrenamos
+     con el MISMO backend ('wasm') que corre en producción para que la
+     precisión held-out reportada sea la real, no la de un backend distinto. -->
+<script src="/vendor/tfjs/tf-core.min.js"></script>
+<script src="/vendor/tfjs/tf-layers.min.js"></script>
+<script src="/vendor/tfjs/tf-data.min.js"></script>
+<script src="/vendor/tfjs/tf-backend-wasm.min.js"></script>
+<!-- tf-core.min.js no registra la API encadenada (tensor.argMax(), etc.) por
+     defecto — speech-commands SÍ la usa. Ver public/vendor/tfjs/chained-ops-shim.js. -->
+<script src="/vendor/tfjs/chained-ops-shim.js"></script>
+<script src="/vendor/speech-commands/speech-commands.min.js"></script>
+</head>
+<body>
+<pre id="log"></pre>
+<script>
+const logEl = document.getElementById('log');
+function log(msg) { logEl.textContent += msg + '\n'; console.log(msg); }
+
+/* ---- getUserMedia falso: mismo truco que spikes/wake-word/verify-headless.mjs ----
+ * Un solo AudioContext + gain "mix" persistente; cada llamada a getUserMedia
+ * devuelve un MediaStreamDestination FRESCO (speech-commands hace track.stop()
+ * tras cada collectExample/listen, así que reusar el stream viejo no sirve). */
+const Ctx = window.AudioContext || window.webkitAudioContext;
+const ctx = new Ctx();
+const mix = ctx.createGain();
+mix.gain.value = 1.0;
+{
+  // Sin esto, `mix` acumula una conexión de salida por CADA getUserMedia()
+  // (nunca se desconectan las viejas) — con decenas de muestras el fan-out
+  // crece sin límite y cada callback de audio se vuelve más costoso
+  // (degradación notada al entrenar con >30 ejemplos reales).
+  let lastDest = null;
+  const md = navigator.mediaDevices || (navigator.mediaDevices = {});
+  md.getUserMedia = async () => {
+    await ctx.resume();
+    if (lastDest) { try { mix.disconnect(lastDest); } catch (_) {} }
+    const dest = ctx.createMediaStreamDestination();
+    mix.connect(dest);
+    lastDest = dest;
+    return dest.stream;
+  };
+}
+
+function base64ToArrayBuffer(b64) {
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes.buffer;
+}
+
+function arrayBufferToBase64(buf) {
+  const bytes = new Uint8Array(buf);
+  let binary = '';
+  const CHUNK = 0x8000;
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+  }
+  return btoa(binary);
+}
+
+/** Decodifica el WAV (base64) y lo conecta LOOPEADO al mix. El caller debe
+ * pararlo (src.stop()/disconnect()) cuando termine de usarlo. */
+async function connectLoopedClip(base64) {
+  const arrBuf = base64ToArrayBuffer(base64);
+  const audioBuf = await ctx.decodeAudioData(arrBuf.slice(0));
+  const src = ctx.createBufferSource();
+  src.buffer = audioBuf;
+  src.loop = true;
+  src.connect(mix);
+  src.start();
+  return src;
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+let base = null;
+let transfer = null;
+
+window.trainAPI = {
+  async loadBase() {
+    tf.wasm.setWasmPaths('/vendor/tfjs/');
+    await tf.setBackend('wasm');
+    await tf.ready();
+    log('backend: ' + tf.getBackend());
+    // speech-commands exige URL absoluta (http/https) para metadataURL —
+    // una ruta relativa lanza "Unsupported URL scheme". Mismo requisito
+    // aplica en producción (ver wakeWordService.js).
+    base = speechCommands.create(
+      'BROWSER_FFT', undefined,
+      location.origin + '/models/speech-commands/model.json',
+      location.origin + '/models/speech-commands/metadata.json',
+    );
+    await base.ensureModelLoaded();
+    transfer = base.createTransfer('hola-chagra');
+    log('base cargado. vocabulario base: ' + base.wordLabels().length + ' palabras');
+    return true;
+  },
+
+  /** Recolecta UN ejemplo del label a partir de un WAV en base64 (loopeado
+   * mientras dura collectExample). */
+  async collectFromBase64(label, base64) {
+    const src = await connectLoopedClip(base64);
+    try {
+      await transfer.collectExample(label);
+    } finally {
+      try { src.stop(); } catch (_) {}
+      try { src.disconnect(); } catch (_) {}
+    }
+    return transfer.countExamples();
+  },
+
+  counts() {
+    return transfer.countExamples();
+  },
+
+  async train(epochs) {
+    const history = { loss: [], acc: [] };
+    await transfer.train({
+      epochs: epochs || 30,
+      callback: {
+        onEpochEnd: (ep, logs) => {
+          history.loss.push(logs.loss ?? null);
+          history.acc.push(logs.acc ?? logs.accuracy ?? null);
+        },
+      },
+    });
+    return { history, words: transfer.wordLabels() };
+  },
+
+  /** Corre listen() en vivo sobre UN clip loopeado unos segundos y devuelve
+   * el score MÁXIMO visto para `label`. Ejercita el pipeline de streaming
+   * REAL (no solo collectExample) — es la métrica honesta de held-out. */
+  async evalClip(base64, label, windowMs) {
+    const words = transfer.wordLabels();
+    const idx = words.indexOf(label);
+    if (idx < 0) throw new Error('label no encontrado en wordLabels: ' + label);
+    const src = await connectLoopedClip(base64);
+    let maxScore = 0;
+    let frames = 0;
+    await transfer.listen(
+      (result) => {
+        frames++;
+        const s = result.scores[idx];
+        if (s > maxScore) maxScore = s;
+      },
+      {
+        probabilityThreshold: 0,
+        overlapFactor: 0.5,
+        includeSpectrogram: false,
+        invokeCallbackOnNoiseAndUnknown: true,
+        suppressionTimeMillis: 0,
+      },
+    );
+    await sleep(windowMs || 2200);
+    await transfer.stopListening();
+    try { src.stop(); } catch (_) {}
+    try { src.disconnect(); } catch (_) {}
+    return { maxScore, frames, words };
+  },
+
+  /** Serializa TODOS los ejemplos recolectados (todas las labels) a un
+   * ArrayBuffer (documentado: TransferSpeechCommandRecognizer.serializeExamples).
+   * Esto es lo que se shippea — NO el modelo entrenado completo (que
+   * duplicaría los pesos del modelo base congelado dentro de sí). El cliente
+   * hace loadExamples() + train() UNA vez (warm-up local, ver
+   * wakeWordService.js) y persiste el resultado en IndexedDB. */
+  serializeExamplesBase64() {
+    const buf = transfer.serializeExamples();
+    return arrayBufferToBase64(buf);
+  },
+};
+</script>
+</body>
+</html>
