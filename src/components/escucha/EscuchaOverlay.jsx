@@ -155,7 +155,14 @@ export default function EscuchaOverlay() {
     setFase(FASE_CERRADO);
   }, [reset]);
 
+  const faseRef = useRef(fase);
+  faseRef.current = fase;
+
   const abrir = useCallback(async (detalle) => {
+    // Guard re-disparo: un wake-word puede gatillar varias veces seguidas
+    // (o el operador toca el FAB mientras ya está abierto). Si ya estamos
+    // oyendo/pensando/en rumbo, ignorar — no duplicar streams del mic.
+    if (faseRef.current !== FASE_CERRADO && faseRef.current !== FASE_ERROR) return;
     setFuente(detalle?.fuente || 'tap');
     setDestino(null);
     setMensajeError('');

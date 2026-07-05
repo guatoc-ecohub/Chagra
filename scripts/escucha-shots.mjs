@@ -138,9 +138,39 @@ async function main() {
       () => document.querySelector('#root')?.children.length > 0,
       { timeout: 180_000 },
     );
+    // La app solo crea ChagraDB tras autenticar → sembrar el token (DB
+    // 'Chagra'/syncQueue, mismo contrato de seedAuthToken) y recargar para
+    // que el boot AUTENTICADO cree los object stores antes del seed.
+    await page.evaluate(async () => {
+      const db = await new Promise((resolve, reject) => {
+        const req = indexedDB.open('Chagra');
+        req.onupgradeneeded = () => {
+          if (!req.result.objectStoreNames.contains('syncQueue')) {
+            req.result.createObjectStore('syncQueue');
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction('syncQueue', 'readwrite');
+        const store = tx.objectStore('syncQueue');
+        store.put('visual-token', 'farmos_access_token');
+        store.put('visual-refresh', 'farmos_refresh_token');
+        store.put(Date.now() + 3600_000, 'farmos_token_expiry');
+        tx.oncomplete = resolve;
+        tx.onerror = () => reject(tx.error);
+      });
+      db.close();
+    });
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(
+      () => document.querySelector('#root')?.children.length > 0,
+      { timeout: 180_000 },
+    );
     await page.waitForFunction(
       async () => (await indexedDB.databases()).some((d) => d.name === 'ChagraDB'),
-      { timeout: 60_000 },
+      { timeout: 90_000 },
     );
     let seeded = false;
     for (let intento = 1; intento <= 3 && !seeded; intento++) {
