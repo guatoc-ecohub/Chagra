@@ -124,8 +124,12 @@ import ManoChagraGlyph from '../dashboard/ManoChagraGlyph';
 // Ícono del TEMA para el botón Ⓐ del compositor (paridad con home/TopBar y
 // AgentHero): el acceso a capacidades entra por el ícono del tema, no por la
 // mano (operador 2026-06-18). Misma fuente que TopBar.jsx / AgentHero.jsx.
-import { useTheme } from '../../hooks/useTheme';
+import { useTheme, resolveAutoTheme } from '../../hooks/useTheme';
 import { iconForTheme } from '../dashboard/themeIcon';
+// PIEL POR TEMA del agente (rediseño 2026-07): tokens --ag-* + escena
+// ambiental por concepto de tema — el equivalente del chat a las escenas de
+// autor del home finca viva. Ver cabecera de agent-skin.css (4 pasadas).
+import './agent-skin.css';
 import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 // Agente guiado: selección PURA de un insight verificado proactivo a partir del
 // texto del turno (cultivo detectado → dato con fuente que el usuario no vio).
@@ -3168,35 +3172,54 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     !((!inputText.trim() && !agentAttachment) || state === STATE_RECORDING || queuePending.length >= 1);
   const agentSendAccent = fincaVivaHomePerfilActivo() && enviarHabilitado;
 
+  // PIEL POR TEMA (rediseño 2026-07): biopunk y biopunk2 comparten piel base
+  // SIN data-theme en <html> — la diferencia (escena "Organismo" vs "Cosecha
+  // mística") se resuelve acá en JS, igual que ESCENA_VIVA_POR_TEMA del home.
+  // El atributo data-agent-tema del root activa el bloque de vars --ag-* del
+  // tema en agent-skin.css (indirección CSS-var, cero parches clase-por-clase).
+  const temaEfectivo = resolveAutoTheme(theme);
+
   return (
-    <div className={`h-[100dvh] flex flex-col overflow-hidden relative text-white ${entranceClassRef.current}`}>
+    <div
+      className={`ag-root h-[100dvh] flex flex-col overflow-hidden relative text-white ${entranceClassRef.current}`}
+      data-agent-tema={temaEfectivo}
+    >
       {/* Velo de legibilidad: deja ver --app-bg-image del body PERO garantiza
           contraste. Token-aware (.agent-scrim → navy denso en bio-punk, crema
           sutil en claros). Antes era bg-slate-950/82 fijo y, accediendo al
           agente directo (#agente), la foto lavaba chips/sugerencias/Volver
           (fix legibilidad 2026-06-15). */}
       <div className="absolute inset-0 agent-scrim backdrop-blur-[2px] pointer-events-none" aria-hidden="true" />
+      {/* ESCENA AMBIENTAL del tema (sobre el velo, bajo el contenido z-10):
+          micelio+esporas (biopunk2) · brasas rojas (biopunk) · amanecer+polen
+          (nature) · dosel+hojitas (verde-vivo) · un solo trazo (minimalista).
+          Puro CSS (agent-skin.css); las <i> son las motas de vida animadas. */}
+      <div className="ag-scene" aria-hidden="true">
+        <i className="ag-mote" /><i className="ag-mote" /><i className="ag-mote" />
+        <i className="ag-mote" /><i className="ag-mote" /><i className="ag-mote" />
+      </div>
       {/* B1: animación de entrada (fade+rise). Respeta prefers-reduced-motion. */}
       <style>{AGENT_ENTRANCE_CSS}{AGENT_COMPOSITOR_CSS}{AGENT_V3_CSS}</style>
 
-      {/* ── Header estilo ScreenShell (2026-06-08): superficie OPACA por token
-          (.agent-bar-surface) + acciones globales. Antes bg-slate-900/50 dejaba
-          pasar la foto detrás del título y los íconos (fix legibilidad 2026-06-15). ── */}
-      <header className="px-4 py-3 flex items-center gap-2 border-b border-slate-800 agent-bar-surface shrink-0">
+      {/* ── Header (rediseño 2026-07): superficie del tema + HILO del acento
+          como firma (.ag-header::after), botones fantasma del tema (.ag-hbtn)
+          y título en la display de la casa. Mismos controles y aria-labels —
+          solo cambió la piel. ── */}
+      <header className="ag-header">
         {/* Back */}
         <button
           type="button"
           onClick={onBack}
-          className="p-3 rounded-full bg-slate-800 hover:bg-slate-700 active:scale-95 transition-all min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
+          className="ag-hbtn"
           aria-label="Volver"
         >
-          <ArrowLeft size={20} className="text-slate-300" />
+          <ArrowLeft size={20} />
         </button>
         {/* Home */}
         <button
           type="button"
           onClick={() => window.dispatchEvent(new CustomEvent('chagra:nav', { detail: 'dashboard' }))}
-          className="p-3 rounded-full bg-slate-800 hover:bg-emerald-700/40 hover:text-emerald-200 active:bg-emerald-700/60 transition-all text-emerald-400 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
+          className="ag-hbtn ag-hbtn--accent"
           aria-label="Volver al inicio"
           title="Inicio"
         >
@@ -3217,15 +3240,18 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           ariaLabel="Chagra IA — doble click silencia/reactiva voz"
         />
         <div className="flex-1 min-w-0">
-          <h1 className="text-sm font-bold text-white leading-tight truncate">Chagra IA</h1>
-          {/* Theme-aware (2026-06-10): clases Tailwind (van por --c-*) en vez
-              de hex inline que ignoraba los temas. + estado "hablando". */}
-          <p className={`text-[10px] font-semibold uppercase tracking-wider leading-tight ${
-            state === STATE_THINKING ? 'text-amber-500'
-              : state === STATE_RECORDING ? 'text-violet-400'
-              : isVoicePlaying ? 'text-emerald-400'
-              : 'text-emerald-300'
-          }`}>
+          <h1 className="ag-title truncate">Chagra IA</h1>
+          {/* Estado con el ACENTO del tema (agent-skin.css por data-state):
+              pensando=ámbar · escuchando=rosa · hablando/idle=acento. */}
+          <p
+            className="ag-status"
+            data-state={
+              state === STATE_THINKING ? 'thinking'
+                : state === STATE_RECORDING ? 'listening'
+                : isVoicePlaying ? 'speaking'
+                : 'idle'
+            }
+          >
             {state === STATE_THINKING && 'pensando…'}
             {state === STATE_RECORDING && 'escuchando…'}
             {state === STATE_IDLE && (isVoicePlaying ? 'hablando…' : 'agente agroecológico')}
@@ -3236,11 +3262,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           type="button"
           onClick={handleNewConversation}
           disabled={state !== STATE_IDLE || messages.length === 0}
-          className={`p-2.5 rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center transition-all ${
-            state !== STATE_IDLE || messages.length === 0
-              ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
-              : 'bg-slate-800 text-slate-300 hover:bg-slate-700 active:scale-95'
-          }`}
+          className="ag-hbtn"
           title="Nueva conversación"
           aria-label="Iniciar nueva conversación"
           data-testid="new-conversation-btn"
@@ -3251,11 +3273,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           type="button"
           disabled={!ttsSupported}
           onClick={() => { if (ttsEnabled) stop(); setTtsEnabled(!ttsEnabled); }}
-          className={`p-2.5 rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center transition-all ${
-            !ttsSupported ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
-              : ttsEnabled ? 'bg-violet-900/40 text-violet-400'
-              : 'bg-slate-800 text-slate-500'
-          }`}
+          className={`ag-hbtn ${ttsEnabled ? 'ag-hbtn--on' : ''}`}
           title={ttsEnabled ? 'Silenciar voz' : 'Activar voz'}
         >
           {ttsEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
@@ -3267,16 +3285,14 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         <button
           type="button"
           onClick={() => window.dispatchEvent(new CustomEvent('chagra:nav', { detail: 'ayuda' }))}
-          className="p-2.5 rounded-full bg-amber-500/15 hover:bg-amber-500/25 active:bg-amber-500/35 text-amber-300 min-h-[44px] min-w-[44px] flex items-center justify-center transition-all"
+          className="ag-hbtn ag-hbtn--warm"
           title="Manual de uso"
           aria-label="Abrir el manual de uso"
           data-testid="agent-help-btn"
         >
           <HelpCircle size={16} strokeWidth={2.5} />
         </button>
-        <div className={`hidden sm:flex items-center gap-1 px-2 py-1 rounded-full text-[10px] ${
-          isOnline ? 'bg-emerald-900/40 text-emerald-400' : 'bg-red-900/40 text-red-400'
-        }`}>
+        <div className={`ag-net ${isOnline ? 'ag-net--on' : 'ag-net--off'}`}>
           {isOnline ? <Wifi size={11} /> : <WifiOff size={11} />}
           {isOnline ? 'Online' : 'Offline'}
         </div>
@@ -3286,9 +3302,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           o por botón explícito. Sin esto el operador no entendería por qué su
           history desapareció. Ephemeral — se borra al primer submit. */}
       {showFreshSessionBadge && (
-        <div className="px-4 py-2 mx-4 mt-2 rounded-lg bg-slate-800/60 border border-slate-700/60 flex items-center gap-2">
-          <Sparkles size={14} className="text-violet-400 shrink-0" />
-          <p className="text-xs text-slate-300" data-testid="fresh-session-badge">
+        <div className="ag-banner items-center">
+          <Sparkles size={14} className="shrink-0" style={{ color: `rgb(var(--ag-accent))` }} />
+          <p data-testid="fresh-session-badge">
             Empezamos fresco. Tu historial sigue guardado en tu finca; este
             chat arranca limpio para que el agente se concentre en lo nuevo.
           </p>
@@ -3303,18 +3319,16 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           en GPU M6000). Spinner CSS con animación spin de Tailwind. */}
       {(ollamaWarmStatus === 'warming' || ollamaWarmStatus === 'unknown') && (
         <div
-          className="px-4 py-2 mx-4 mt-2 rounded-lg bg-amber-900/30 border border-amber-800/50 flex items-center gap-2"
+          className="ag-banner ag-banner--warn items-center"
           data-testid="ollama-warming-banner"
           role="status"
           aria-live="polite"
         >
           <span
-            className="w-3 h-3 rounded-full border-2 border-amber-400 border-t-transparent animate-spin shrink-0"
+            className="w-3 h-3 rounded-full border-2 border-current border-t-transparent animate-spin shrink-0"
             aria-hidden="true"
           />
-          <p className="text-xs text-amber-300">
-            Preparando agente IA (~20s)…
-          </p>
+          <p>Preparando agente IA (~20s)…</p>
         </div>
       )}
 
@@ -3334,8 +3348,8 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
 
       {/* Error */}
       {error && (
-        <div className="px-4 py-2 mx-4 mb-2 rounded-lg bg-red-900/30 border border-red-800/50">
-          <p className="text-xs text-red-300">{error}</p>
+        <div className="ag-banner ag-banner--error ag-banner--above">
+          <p>{error}</p>
         </div>
       )}
 
@@ -3346,36 +3360,36 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           fuente del aviso antes de mandar la pregunta. Dismissable. */}
       {alertContextBanner && (
         <div
-          className="mx-4 mb-2 p-3 rounded-lg bg-sky-950/40 border border-sky-800/50 flex items-start gap-3"
+          className="ag-banner ag-banner--info ag-banner--above"
           data-testid="agent-alert-context-banner"
           role="status"
         >
           <div className="flex-1 min-w-0">
             {alertContextBanner.alertContext?.title && (
-              <p className="text-xs font-bold text-sky-200 leading-tight">
+              <p className="font-bold leading-tight">
                 {alertContextBanner.alertContext.title}
               </p>
             )}
             {alertContextBanner.alertContext?.body && (
-              <p className="text-[11px] text-sky-300/85 mt-0.5 leading-snug">
+              <p className="text-[11px] opacity-90 mt-0.5 leading-snug">
                 {alertContextBanner.alertContext.body}
               </p>
             )}
             {(alertContextBanner.sourceLabel || alertContextBanner.sourceUrl) && (
-              <p className="text-[10px] text-slate-400 mt-1.5 leading-tight">
+              <p className="text-[10px] opacity-80 mt-1.5 leading-tight">
                 Fuente:{' '}
                 {alertContextBanner.sourceUrl ? (
                   <a
                     href={alertContextBanner.sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sky-300 hover:text-sky-200 underline"
+                    className="underline hover:opacity-100"
                     data-testid="agent-alert-source-link"
                   >
                     {alertContextBanner.sourceLabel || 'Ver informe oficial'}
                   </a>
                 ) : (
-                  <span className="text-slate-300">{alertContextBanner.sourceLabel}</span>
+                  <span>{alertContextBanner.sourceLabel}</span>
                 )}
               </p>
             )}
@@ -3383,7 +3397,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           <button
             type="button"
             onClick={() => setAlertContextBanner(null)}
-            className="tap-target shrink-0 p-1.5 rounded-md hover:bg-white/10 text-slate-400"
+            className="tap-target shrink-0 p-1.5 rounded-md hover:bg-white/10"
             aria-label="Cerrar contexto de alerta"
           >
             <X size={16} />
@@ -3396,26 +3410,35 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           el acceso a capacidades es SOLO por este botón o el ícono del tema en
           el compositor, nunca por chips de texto. */}
       {messages.length === 0 && (
-        <div className="px-4 pb-1 pt-1 shrink-0">
+        <div className="relative z-10 px-4 pb-1 pt-1 shrink-0">
+          {/* Rediseño 2026-07: la MANO deja de ser una barrita genérica y pasa
+              a TARJETA VIVA del tema — medallón con el glifo respirando con el
+              acento (teal/rojo/ocre/verde según tema) + jerarquía de texto.
+              Mismo onClick/aria/testid: solo cambió la piel. */}
           <button
             type="button"
             onClick={() => setSheetOpen(true)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border border-emerald-400/60 bg-emerald-700/45 text-emerald-50 text-sm font-semibold shadow-lg shadow-emerald-950/40 active:scale-[.98] transition-transform"
+            className="ag-mano-cta"
             aria-label="Abrir la mano de Chagra"
             data-testid="agent-mano-trigger"
           >
-            <span className="w-[20px] h-[20px] shrink-0 flex items-center justify-center" aria-hidden="true">
-              <ManoChagraGlyph size={20} />
+            <span className="ag-mano-cta-glyph" aria-hidden="true">
+              <ManoChagraGlyph size={26} />
             </span>
-            Toca la mano de Chagra para ver todo lo que puede hacer
+            <span className="flex-1 min-w-0">
+              <span className="ag-mano-cta-title">La mano de Chagra</span>
+              <span className="ag-mano-cta-sub">
+                Tócala y mira todo lo que puedo hacer por tu finca.
+              </span>
+            </span>
           </button>
         </div>
       )}
 
-      {/* ── Compositor pill — paridad completa AgentHero (2026-06-08).
-          Superficie OPACA por token (.agent-bar-surface) para legibilidad sobre
-          la foto de fondo (fix 2026-06-15). ── */}
-      <div className="relative z-10 px-3 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] pt-2 border-t border-slate-800/60 agent-bar-surface shrink-0">
+      {/* ── Compositor (rediseño 2026-07): superficie del tema con LA COSTURA
+          del acento como borde superior (.ag-composer::before) — la misma
+          puntada que firma las respuestas respaldadas y la mochila. ── */}
+      <div className="ag-composer">
 
         {/* Preview de foto adjunta (outbox) */}
         {agentAttachment && (
@@ -3569,7 +3592,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               }
               disabled={queuePending.length >= 1}
               data-testid="agent-input"
-              className="w-full bg-transparent resize-none px-3 py-3 text-sm text-white placeholder-slate-500 focus:outline-none leading-snug"
+              /* Tinta por tema: el color del texto/placeholder lo ponen
+                 .as-bar textarea (--ag-input-ink) y agent-skin.css — antes
+                 text-white fijo era invisible sobre el papel de los claros. */
+              className="w-full bg-transparent resize-none px-3 py-3 text-sm focus:outline-none leading-snug"
               style={{ minHeight: '44px', maxHeight: '140px' }}
             />
           )}
@@ -3662,25 +3688,14 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               aria-label="Enviar al agente"
               className={[
                 'as-send',
-                // PIEL POR TEMA del botón enviar (Fase 2). Con la flag ON y el
-                // botón activo, toma `.agent-send-accent` → themes.css lo pinta
-                // con el acento del tema (teal/ocre/verde), igual que AgentHero,
-                // en vez del gradiente teal→cian fijo. Con OFF queda como hoy.
+                // PIEL POR TEMA del botón enviar (rediseño 2026-07): el fondo/
+                // glow salen de --ag-send-* (agent-skin.css) vía el CSS de
+                // .as-send — teal-cian en biopunk, ocre en nature, verde en
+                // verde-vivo/minimalista. El estado deshabilitado lo apaga
+                // :disabled. `.agent-send-accent` (flag finca viva) sigue
+                // pudiendo forzar el acento sólido del tema (themes.css).
                 agentSendAccent ? 'agent-send-accent' : '',
               ].filter(Boolean).join(' ')}
-              style={{
-                background:
-                  (!inputText.trim() && !agentAttachment) || state === STATE_RECORDING || queuePending.length >= 1
-                    ? 'rgba(51,65,85,0.8)'
-                    // Con `agent-send-accent` activo, el color lo pone themes.css
-                    // (background-color !important del acento del tema); aquí no
-                    // forzamos el gradiente para no taparlo.
-                    : agentSendAccent ? undefined : 'linear-gradient(135deg,#10b981 0%,#0891b2 100%)',
-                boxShadow:
-                  (!inputText.trim() && !agentAttachment) || state === STATE_RECORDING || queuePending.length >= 1
-                    ? 'none'
-                    : '0 0 18px rgba(16,185,129,0.5)',
-              }}
             >
               <ChagraAgentAvatar
                 size={38}
@@ -3771,7 +3786,8 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         {state === STATE_THINKING && (
           <div className="flex flex-col items-center gap-2 mt-2">
             <p
-              className={`text-center text-xs ${showSlowWarning ? 'text-amber-400' : 'text-violet-400'}`}
+              className="ag-thinking-eta text-center text-xs"
+              data-slow={showSlowWarning ? 'true' : undefined}
               data-testid="eta-label"
             >
               {(() => {
@@ -3807,7 +3823,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             </p>
             {queuePending.length >= 1 && (
               <p
-                className="text-center text-[10px] text-violet-300"
+                className="ag-thinking-sub text-center text-[10px]"
                 data-testid="queue-pending-badge"
               >
                 Tienes 1 pregunta en cola — te respondo después de la actual.
@@ -3815,15 +3831,15 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             )}
             {rotatingTip && !hintDismissed && (
               <div
-                className="mt-1 px-3 py-2 rounded-lg bg-slate-800/60 border border-slate-700/60 flex items-start gap-2 max-w-sm transition-opacity duration-300"
+                className="ag-tipcard"
                 data-testid="rotating-tip"
                 key={rotatingTip.id}
               >
                 <span className="text-base shrink-0 leading-none mt-0.5" aria-hidden="true">
                   {rotatingTip.icon}
                 </span>
-                <p className="text-[11px] text-slate-300 leading-snug flex-1">
-                  <span className="text-violet-400 font-medium block mb-0.5">
+                <p className="text-[11px] leading-snug flex-1">
+                  <span className="ag-tipcard-title block mb-0.5">
                     💡 Tip mientras espero
                   </span>
                   {rotatingTip.text}
@@ -3835,7 +3851,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
                     setHintDismissed(true);
                   }}
                   aria-label="Cerrar sugerencia"
-                  className="text-[10px] text-slate-500 hover:text-slate-300 shrink-0 leading-none px-1"
+                  className="ag-tipcard-close shrink-0 leading-none px-1"
                   data-testid="dismiss-tip"
                 >
                   ×
@@ -3845,7 +3861,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             <button
               type="button"
               onClick={handleCancelLLM}
-              className="text-[10px] px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 active:scale-95 transition-all"
+              className="ag-cancelbtn"
             >
               Cancelar
             </button>
@@ -3854,17 +3870,17 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
 
         {queueRejectedToast && (
           <div
-            className="mt-2 px-3 py-2 rounded-lg bg-amber-900/40 border border-amber-700/60 flex items-center gap-2"
+            className="ag-banner ag-banner--warn ag-banner--inset items-center"
             data-testid="queue-rejected-toast"
             role="status"
             aria-live="polite"
           >
-            <p className="text-xs text-amber-300 flex-1">{queueRejectedToast}</p>
+            <p className="flex-1">{queueRejectedToast}</p>
             <button
               type="button"
               onClick={() => setQueueRejectedToast('')}
               aria-label="Cerrar aviso"
-              className="text-amber-400 hover:text-amber-200 text-sm leading-none"
+              className="text-sm leading-none opacity-80 hover:opacity-100"
             >
               ×
             </button>

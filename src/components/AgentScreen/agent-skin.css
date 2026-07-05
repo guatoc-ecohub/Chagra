@@ -1,0 +1,639 @@
+/* ============================================================================
+   agent-skin.css — LA PIEL DEL AGENTE POR CONCEPTO DE TEMA (rediseño 2026-07).
+
+   El operador: "el agente actual es una pieza NO digna del trabajo que se le ha
+   metido" — el home finca-viva tiene escena de autor por tema y el chat se
+   quedó en slate genérico. Este archivo eleva la pantalla del agente a la
+   ALTURA del home: cada tema imprime su alma en el chat vía INDIRECCIÓN de
+   CSS-vars (--ag-*), nunca parches clase-por-clase (política themes-cssvar).
+
+   ARQUITECTURA (4 pasadas):
+     P1 CONCEPTO+LAYOUT  → capa de tokens --ag-* + clases estructurales
+                           (.ag-header, .ag-mano-cta, .ag-composer, .ag-banner)
+                           que el JSX usa SIN colores hardcodeados.
+     P2 PIEL POR TEMA    → un bloque por tema que SOLO redefine vars + su
+                           ESCENA ambiental (.ag-scene) — el equivalente del
+                           chat a las escenas de autor del home:
+             biopunk2    → "Organismo nocturno": micelio + esporas
+                           bioluminiscentes teal sobre la noche #0a0e14.
+             biopunk     → "Cosecha mística": la piel base con el REBELDE rojo
+                           de la Ⓐ anarco-agro (hilo rojo + brasas).
+             nature      → "Árbol de la Vida": amanecer ocre, ramas de café,
+                           polen dorado.
+             verde-vivo  → "Huerto exuberante": dosel de hojas, sol cálido,
+                           hojitas que caen.
+             minimalista → "Un solo trazo": papel, UNA línea, cero ruido.
+     P3 MOTION+PULIDO    → microinteracciones (esporas/hojas/polen, respiración
+                           de la mano, pop del tick grounded) con apagado TOTAL
+                           bajo prefers-reduced-motion.
+     P4 REFINAMIENTO     → jerarquía del header, densidad, focus-visible con el
+                           acento del tema, contraste AA en claros.
+
+   El selector de tema vive en el ROOT del AgentScreen como
+   [data-agent-tema="…"] (lo escribe el JSX con resolveAutoTheme) porque
+   biopunk y biopunk2 comparten piel base SIN data-theme en <html> — igual que
+   ESCENA_VIVA_POR_TEMA del home resuelve la escena en JS.
+
+   Los tokens base salen de los del tema global (--c-* espacio-separado,
+   --t-accent-rgb coma-separado, index.css/themes.css) → un tema futuro hereda
+   una piel coherente sin tocar este archivo. Español Colombia, sin voseo.
+   ========================================================================== */
+
+/* ── P1 · TOKENS BASE (= piel biopunk; los claros los re-tiñen abajo) ─────── */
+.ag-root {
+  /* acento del tema (coma-separado, formato rgba(var(--ag-accent), a)) */
+  --ag-accent: var(--t-accent-rgb, 25, 201, 154);
+  /* acento SECUNDARIO: solo biopunk (rojo Ⓐ) lo separa; default = acento */
+  --ag-accent-2: var(--t-accent-rgb, 25, 201, 154);
+  /* forma: radio "orgánico" de tarjetas/pill — cada tema lo esculpe */
+  --ag-radius: 22px;
+  /* tipografía display de la casa (la misma del home finca viva) */
+  --ag-display: 'Baloo 2', 'Nunito', system-ui, -apple-system, sans-serif;
+  --ag-body: 'Nunito', system-ui, -apple-system, sans-serif;
+
+  /* header */
+  --ag-header-bg: rgb(var(--c-surface-card, 15 23 42) / 0.93);
+  --ag-hairline: linear-gradient(
+    90deg,
+    transparent 4%,
+    rgba(var(--ag-accent), 0.65) 30%,
+    rgba(var(--ag-accent-2), 0.65) 70%,
+    transparent 96%
+  );
+  --ag-hbtn-bg: rgb(var(--c-surface-raised, 30 41 59) / 0.85);
+  --ag-hbtn-ink: rgb(var(--c-slate-300, 203 213 225));
+  --ag-hbtn-border: rgb(var(--c-surface-border, 51 65 85) / 0.85);
+
+  /* compositor (pill .as-bar — consumidos por AGENT_COMPOSITOR_CSS) */
+  --ag-bar-bg: rgb(var(--c-surface-raised, 30 41 59) / 0.9);
+  --ag-bar-border: rgb(var(--c-surface-border, 100 116 139) / 0.55);
+  --ag-bar-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.5);
+  --ag-input-ink: rgb(var(--c-slate-100, 241 245 249));
+  --ag-iconbtn-bg: rgb(var(--c-surface-raised, 30 41 59) / 0.92);
+  --ag-iconbtn-ink: rgb(var(--c-slate-400, 148 163 184));
+  --ag-iconbtn-ink-hover: rgb(var(--c-slate-100, 255 255 255));
+  --ag-iconbtn-border: rgb(var(--c-surface-border, 100 116 139) / 0.5);
+
+  /* enviar: el punto focal de acción — cada tema pinta el suyo */
+  --ag-send-bg: linear-gradient(135deg, #10b981 0%, #0891b2 100%);
+  --ag-send-glow: 0 0 18px rgba(var(--ag-accent), 0.5);
+
+  /* escena ambiental (grosor de presencia de la escena tras el velo) */
+  --ag-scene-opacity: 1;
+
+  font-family: var(--ag-body);
+}
+
+/* ── P1 · ESCENA AMBIENTAL — el "lienzo de autor" del chat ─────────────────
+   Capa fija detrás del contenido (encima del velo .agent-scrim, debajo del
+   chat z-10). Dos capas de pintura (::before glows / ::after trazos SVG) +
+   6 motas de vida (.ag-mote) que cada tema re-significa: esporas (biopunk2),
+   brasas (biopunk), polen (nature), hojitas (verde-vivo), nada (minimalista). */
+.ag-scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: var(--ag-scene-opacity);
+  z-index: 0;
+}
+.ag-scene::before,
+.ag-scene::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+/* Default (piel base biopunk/biopunk2): resplandores teal de noche viva. */
+.ag-scene::before {
+  background:
+    radial-gradient(620px 420px at 88% -12%, rgba(var(--ag-accent), 0.16), transparent 62%),
+    radial-gradient(520px 400px at -12% 106%, rgba(8, 145, 178, 0.13), transparent 60%);
+}
+.ag-scene::after {
+  background-image: none;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: cover;
+}
+
+/* Mota base: un punto de vida. Posiciones/tempos por nth-child; el color y la
+   forma los decide el tema. Motion en P3 (abajo). */
+.ag-mote {
+  position: absolute;
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(var(--ag-accent), 0.55);
+  box-shadow: 0 0 8px 1px rgba(var(--ag-accent), 0.35);
+  opacity: 0;
+}
+.ag-mote:nth-child(1) { left: 12%; bottom: 22%; animation-delay: 0s; }
+.ag-mote:nth-child(2) { left: 78%; bottom: 30%; width: 3px; height: 3px; animation-delay: 2.4s; }
+.ag-mote:nth-child(3) { left: 32%; bottom: 12%; width: 5px; height: 5px; animation-delay: 4.8s; }
+.ag-mote:nth-child(4) { left: 88%; bottom: 14%; animation-delay: 7.1s; }
+.ag-mote:nth-child(5) { left: 55%; bottom: 26%; width: 3px; height: 3px; animation-delay: 9.6s; }
+.ag-mote:nth-child(6) { left: 20%; bottom: 34%; animation-delay: 12s; }
+
+/* ── P1 · HEADER — jerarquía y aire ────────────────────────────────────────
+   Superficie del tema + HILO del acento como firma (la costura de la marca).
+   `relative z-10` para pintar sobre velo+escena (igual que chat/compositor). */
+.ag-header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--ag-header-bg);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  flex-shrink: 0;
+}
+.ag-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--ag-hairline);
+  pointer-events: none;
+}
+
+/* Botón de header: fantasma del tema (no más pastillas slate genéricas). */
+.ag-hbtn {
+  flex: none;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(var(--ag-radius) * 0.6);
+  background: var(--ag-hbtn-bg);
+  border: 1px solid var(--ag-hbtn-border);
+  color: var(--ag-hbtn-ink);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease,
+              transform 0.16s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.ag-hbtn:hover {
+  color: rgb(var(--c-slate-100, 241 245 249));
+  border-color: rgba(var(--ag-accent), 0.55);
+}
+.ag-hbtn:active { transform: scale(0.92); }
+.ag-hbtn:disabled,
+.ag-hbtn[aria-disabled='true'] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+/* Variante acento (Inicio 🏠 y estados "vivos"). */
+.ag-hbtn--accent { color: rgb(var(--ag-accent)); }
+.ag-hbtn--accent:hover { color: rgb(var(--ag-accent)); background: rgba(var(--ag-accent), 0.14); }
+/* Variante cálida (ayuda "?") — puerta amable al manual. La tinta cálida
+   (--ag-warn-ink) la oscurecen los temas claros para pasar AA sobre papel. */
+.ag-hbtn--warm {
+  color: var(--ag-warn-ink, rgb(var(--c-amber-300, 252 211 77)));
+  background: rgb(var(--c-amber-500, 245 158 11) / 0.12);
+  border-color: rgb(var(--c-amber-500, 245 158 11) / 0.35);
+}
+.ag-hbtn--warm:hover { background: rgb(var(--c-amber-500, 245 158 11) / 0.22); }
+/* Variante TTS activo. */
+.ag-hbtn--on {
+  color: rgb(var(--c-violet-400, 167 139 250));
+  background: rgb(var(--c-violet-500, 139 92 246) / 0.14);
+  border-color: rgb(var(--c-violet-500, 139 92 246) / 0.4);
+}
+
+/* Identidad: título en la display de la casa + subtítulo de estado. */
+.ag-title {
+  font-family: var(--ag-display);
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: -0.2px;
+  line-height: 1.1;
+  color: rgb(var(--c-slate-100, 241 245 249));
+}
+.ag-status {
+  font-family: var(--ag-body);
+  /* 9px + tracking corto: "AGENTE AGROECOLÓGICO" puede partir en 2 líneas en
+     móviles angostos (como siempre lo hizo) en vez de truncarse en "AGR…". */
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  line-height: 1.25;
+  color: rgba(var(--ag-accent), 0.95);
+}
+.ag-status[data-state='thinking'] { color: var(--ag-warn-ink, rgb(var(--c-amber-400, 251 191 36))); }
+.ag-status[data-state='listening'] { color: rgb(var(--c-rose-400, 251 113 133)); }
+.ag-status[data-state='speaking'] { color: rgb(var(--ag-accent)); }
+
+/* Badge online/offline del header. */
+.ag-net {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: var(--ag-body);
+}
+@media (min-width: 640px) { .ag-net { display: inline-flex; } }
+.ag-net--on {
+  color: rgb(var(--ag-accent));
+  background: rgba(var(--ag-accent), 0.12);
+  border: 1px solid rgba(var(--ag-accent), 0.3);
+}
+.ag-net--off {
+  color: rgb(var(--c-red-400, 248 113 113));
+  background: rgb(var(--c-red-500, 239 68 68) / 0.12);
+  border: 1px solid rgb(var(--c-red-500, 239 68 68) / 0.35);
+}
+
+/* ── P1 · LA MANO COMO PROTAGONISTA (pantalla de llegada) ──────────────────
+   Ya no una barrita verde genérica: una TARJETA VIVA del tema — medallón con
+   el glifo de la mano que respira con el acento + jerarquía de texto. */
+.ag-mano-cta {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  text-align: left;
+  padding: 13px 16px;
+  border-radius: var(--ag-radius) var(--ag-radius) var(--ag-radius) calc(var(--ag-radius) * 0.32);
+  background:
+    linear-gradient(135deg, rgba(var(--ag-accent), 0.16), rgb(var(--c-surface-card, 15 23 42) / 0.94) 55%),
+    rgb(var(--c-surface-card, 15 23 42));
+  border: 1.5px solid rgba(var(--ag-accent), 0.5);
+  box-shadow: 0 14px 34px -20px rgba(var(--ag-accent), 0.55);
+  color: rgb(var(--c-slate-100, 241 245 249));
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.25s ease,
+              transform 0.16s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.ag-mano-cta:hover { border-color: rgba(var(--ag-accent-2), 0.8); }
+.ag-mano-cta:active { transform: scale(0.98); }
+.ag-mano-cta-glyph {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: rgb(var(--ag-accent-2));
+  background: rgba(var(--ag-accent), 0.13);
+  border: 1px solid rgba(var(--ag-accent), 0.45);
+}
+.ag-mano-cta-title {
+  display: block;
+  font-family: var(--ag-display);
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: -0.2px;
+  line-height: 1.15;
+}
+.ag-mano-cta-sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.3;
+  color: rgb(var(--c-slate-400, 148 163 184));
+}
+
+/* ── P1 · COMPOSITOR — la orilla del cuaderno ──────────────────────────────
+   Superficie del tema con la COSTURA (puntada del acento) como borde superior:
+   la misma puntada que firma las respuestas respaldadas y la mochila. */
+.ag-composer {
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
+  padding: 9px 12px calc(env(safe-area-inset-bottom, 0px) + 8px);
+  background: var(--ag-header-bg);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.ag-composer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10px;
+  right: 10px;
+  height: 2px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(var(--ag-accent), 0.55) 0 8px,
+    transparent 8px 15px
+  );
+  pointer-events: none;
+}
+
+/* ── P1 · BANNERS del flujo (sesión nueva / calentando / error / alerta) ───
+   Familia única de avisos del tema, no cuatro estilos slate distintos. */
+.ag-banner {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin: 8px 16px 0;
+  padding: 9px 12px;
+  border-radius: calc(var(--ag-radius) * 0.65);
+  background: rgb(var(--c-surface-raised, 30 41 59) / 0.92);
+  border: 1px solid rgb(var(--c-surface-border, 51 65 85) / 0.9);
+  color: rgb(var(--c-slate-300, 203 213 225));
+  font-size: 12px;
+  line-height: 1.4;
+}
+.ag-banner--warn {
+  background: rgb(var(--c-amber-500, 245 158 11) / 0.12);
+  border-color: rgb(var(--c-amber-500, 245 158 11) / 0.38);
+  color: var(--ag-warn-ink, rgb(var(--c-amber-300, 252 211 77)));
+}
+.ag-banner--error {
+  background: rgb(var(--c-red-500, 239 68 68) / 0.12);
+  border-color: rgb(var(--c-red-500, 239 68 68) / 0.4);
+  color: rgb(var(--c-red-300, 252 165 165));
+}
+.ag-banner--info {
+  background: rgb(var(--c-sky-500, 14 165 233) / 0.1);
+  border-color: rgb(var(--c-sky-500, 14 165 233) / 0.35);
+  color: rgb(var(--c-sky-300, 125 211 252));
+}
+/* Posición: sobre el compositor (margen abajo) / dentro del compositor. */
+.ag-banner--above { margin: 0 16px 8px; }
+.ag-banner--inset { margin: 8px 4px 0; }
+
+/* ── P1 · ZONA "PENSANDO" bajo el compositor ─────────────────────────────── */
+.ag-thinking-eta {
+  font-family: var(--ag-body);
+  color: rgba(var(--ag-accent), 0.95);
+}
+.ag-thinking-eta[data-slow='true'] { color: rgb(var(--c-amber-400, 251 191 36)); }
+.ag-thinking-sub { color: rgba(var(--ag-accent), 0.75); }
+.ag-tipcard {
+  margin-top: 4px;
+  padding: 8px 12px;
+  max-width: 24rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  border-radius: calc(var(--ag-radius) * 0.6);
+  background: rgb(var(--c-surface-raised, 30 41 59) / 0.85);
+  border: 1px solid rgb(var(--c-surface-border, 51 65 85) / 0.8);
+  color: rgb(var(--c-slate-300, 203 213 225));
+  transition: opacity 0.3s ease;
+}
+.ag-tipcard-title {
+  color: rgb(var(--ag-accent));
+  font-weight: 700;
+  font-family: var(--ag-display);
+}
+.ag-tipcard-close { color: rgb(var(--c-slate-400, 148 163 184)); font-size: 10px; }
+.ag-tipcard-close:hover { color: rgb(var(--c-slate-100, 241 245 249)); }
+.ag-cancelbtn {
+  font-size: 10px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: rgb(var(--c-surface-raised, 30 41 59) / 0.9);
+  border: 1px solid rgb(var(--c-surface-border, 51 65 85));
+  color: rgb(var(--c-slate-300, 203 213 225));
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.15s ease;
+}
+.ag-cancelbtn:hover { border-color: rgba(var(--ag-accent), 0.5); }
+.ag-cancelbtn:active { transform: scale(0.95); }
+
+/* Botón "Volver" flotante del chat (antes slate-900 fijo — ilegible en claros). */
+.ag-floatback {
+  background: rgb(var(--c-surface-card, 15 23 42) / 0.94) !important;
+  border-color: rgba(var(--ag-accent), 0.4) !important;
+  color: rgb(var(--c-slate-100, 241 245 249)) !important;
+}
+
+/* ── P2 · PIEL POR TEMA ═══════════════════════════════════════════════════ */
+
+/* Común a los TEMAS CLAROS: la tinta "cálida" (ayuda/avisos/pensando) debe ser
+   ámbar OSCURO para pasar AA sobre papel/crema (el amarillo claro del dark se
+   lava). Un solo token — no parches por clase. */
+.ag-root[data-agent-tema='nature'],
+.ag-root[data-agent-tema='verde-vivo'],
+.ag-root[data-agent-tema='minimalista'] {
+  --ag-warn-ink: rgb(var(--c-amber-700, 120 72 32));
+}
+
+/* ── biopunk2 · "ORGANISMO NOCTURNO" (default GO-LIVE) ─────────────────────
+   La Finca Organismo respira de noche: micelio que trepa desde el borde
+   inferior + esporas teal que suben lento. El pill y las tarjetas llevan el
+   radio orgánico grande. (Los tokens base YA son esta piel; aquí va la escena
+   y los matices propios.) */
+.ag-root[data-agent-tema='biopunk2'] .ag-scene::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 412 300' preserveAspectRatio='xMidYMax slice'%3E%3Cg fill='none' stroke='%2319c79a' stroke-width='1.1'%3E%3Cpath stroke-opacity='0.20' d='M-10 300 C 60 240 40 190 110 160 M110 160 C 150 145 170 180 210 150'/%3E%3Cpath stroke-opacity='0.14' d='M120 300 C 160 250 240 260 280 210 C 310 175 380 190 422 150'/%3E%3Cpath stroke-opacity='0.10' d='M300 300 C 320 260 280 230 330 195 M330 195 C 360 175 400 185 422 160'/%3E%3C/g%3E%3Cg fill='%2319c79a'%3E%3Ccircle cx='110' cy='160' r='2.6' fill-opacity='0.35'/%3E%3Ccircle cx='280' cy='210' r='2.2' fill-opacity='0.28'/%3E%3Ccircle cx='330' cy='195' r='1.8' fill-opacity='0.25'/%3E%3Ccircle cx='210' cy='150' r='1.6' fill-opacity='0.3'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 100% auto;
+  background-position: center bottom;
+}
+
+/* ── biopunk · "COSECHA MÍSTICA" (el clásico, la Ⓐ roja) ───────────────────
+   Misma noche teal PERO con el hilo ROJO anarco-agro de la Ⓐ original: el
+   acento secundario tiñe hairline, medallón de la mano y la mitad de las
+   brasas. Radio más recto — más punk, menos organismo. */
+.ag-root[data-agent-tema='biopunk'] {
+  --ag-accent-2: 192, 57, 43; /* rojo forja de la Ⓐ (themeIcon ANIM-2) */
+  --ag-radius: 15px;
+  --ag-hairline: linear-gradient(
+    90deg,
+    transparent 2%,
+    rgba(192, 57, 43, 0.75) 26%,
+    rgba(var(--ag-accent), 0.7) 74%,
+    transparent 98%
+  );
+}
+.ag-root[data-agent-tema='biopunk'] .ag-scene::before {
+  background:
+    radial-gradient(560px 400px at 88% -12%, rgba(var(--ag-accent), 0.15), transparent 62%),
+    radial-gradient(480px 380px at -10% 108%, rgba(192, 57, 43, 0.13), transparent 58%);
+}
+.ag-root[data-agent-tema='biopunk'] .ag-scene::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 412 300' preserveAspectRatio='xMidYMax slice'%3E%3Cg fill='none' stroke-width='1.2'%3E%3Cpath stroke='%23c0392b' stroke-opacity='0.16' d='M-10 260 L 80 200 L 90 210 L 170 150'/%3E%3Cpath stroke='%2319c79a' stroke-opacity='0.13' d='M412 280 L 330 220 L 320 232 L 240 175'/%3E%3Cpath stroke='%23c0392b' stroke-opacity='0.09' d='M200 300 L 206 240 L 199 236 L 205 180'/%3E%3C/g%3E%3C/svg%3E");
+}
+/* Brasas: alternar rojo/teal. */
+.ag-root[data-agent-tema='biopunk'] .ag-mote:nth-child(odd) {
+  background: rgba(192, 57, 43, 0.6);
+  box-shadow: 0 0 8px 1px rgba(192, 57, 43, 0.4);
+}
+
+/* ── nature · "ÁRBOL DE LA VIDA" ───────────────────────────────────────────
+   Amanecer sobre papel crema: sol ocre arriba, ramas de café que entran por
+   las esquinas, polen dorado que flota. Superficies = papel del tema (los
+   --c-* de nature ya viran todos los tokens base); aquí la luz y la escena. */
+.ag-root[data-agent-tema='nature'] {
+  --ag-radius: 18px;
+  --ag-send-bg: linear-gradient(135deg, #d98a4f 0%, #b86a32 100%);
+  --ag-send-glow: 0 6px 18px -6px rgba(184, 106, 50, 0.55);
+  --ag-bar-shadow: 0 10px 30px -14px rgba(96, 66, 32, 0.28);
+  /* La nota del productor va en TERRACOTA (no el esmeralda genérico): la voz
+     humana lleva el barro; el catálogo lleva la salvia. */
+  --ag-user-bg: linear-gradient(160deg, #c07845 0%, #a8612f 100%);
+  --ag-user-border: rgba(168, 97, 47, 0.55);
+}
+.ag-root[data-agent-tema='nature'] .ag-scene::before {
+  background:
+    radial-gradient(520px 340px at 50% -10%, rgba(255, 214, 150, 0.5), transparent 68%),
+    radial-gradient(420px 320px at 108% 108%, rgba(217, 138, 79, 0.14), transparent 60%);
+}
+.ag-root[data-agent-tema='nature'] .ag-scene::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 412 300' preserveAspectRatio='xMidYMin slice'%3E%3Cg fill='none' stroke='%23a8612f' stroke-width='1.4'%3E%3Cpath stroke-opacity='0.16' d='M-10 30 C 70 55 120 20 190 45 C 240 62 300 35 422 70'/%3E%3Cpath stroke-opacity='0.10' d='M-10 70 C 60 90 130 60 200 85'/%3E%3C/g%3E%3Cg fill='%23a8612f'%3E%3Cellipse cx='120' cy='28' rx='7' ry='3' transform='rotate(-24 120 28)' fill-opacity='0.14'/%3E%3Cellipse cx='250' cy='50' rx='6' ry='2.6' transform='rotate(18 250 50)' fill-opacity='0.12'/%3E%3Cellipse cx='340' cy='52' rx='7' ry='3' transform='rotate(-14 340 52)' fill-opacity='0.11'/%3E%3C/g%3E%3C/svg%3E");
+  background-position: center top;
+  background-size: 100% auto;
+}
+/* Polen dorado: cálido, sin glow neón. */
+.ag-root[data-agent-tema='nature'] .ag-mote {
+  background: rgba(216, 160, 76, 0.55);
+  box-shadow: 0 0 6px 1px rgba(216, 160, 76, 0.3);
+}
+
+/* ── verde-vivo · "HUERTO EXUBERANTE" ──────────────────────────────────────
+   El dosel entra por arriba (hojas verdes), el sol pega en la esquina y
+   caen hojitas. Verde de hoja en el acento (ya viene de --t-accent-rgb). */
+.ag-root[data-agent-tema='verde-vivo'] {
+  --ag-radius: 20px;
+  --ag-send-bg: linear-gradient(135deg, #2e8b3d 0%, #226628 100%);
+  --ag-send-glow: 0 6px 18px -6px rgba(34, 102, 40, 0.55);
+  --ag-bar-shadow: 0 10px 30px -14px rgba(43, 74, 34, 0.3);
+}
+.ag-root[data-agent-tema='verde-vivo'] .ag-scene::before {
+  background:
+    linear-gradient(180deg, rgba(46, 139, 61, 0.16), transparent 22%),
+    radial-gradient(440px 320px at 92% -8%, rgba(255, 224, 130, 0.4), transparent 62%);
+}
+.ag-root[data-agent-tema='verde-vivo'] .ag-scene::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 412 300' preserveAspectRatio='xMidYMin slice'%3E%3Cg fill='%232e8b3d'%3E%3Cpath fill-opacity='0.14' d='M20 0 q 18 26 0 44 q -18 -18 0 -44'/%3E%3Cpath fill-opacity='0.11' d='M70 -8 q 22 30 0 52 q -22 -22 0 -52'/%3E%3Cpath fill-opacity='0.12' d='M360 -4 q 20 28 0 48 q -20 -20 0 -48'/%3E%3Cpath fill-opacity='0.09' d='M320 6 q 15 22 0 38 q -15 -16 0 -38'/%3E%3Cpath fill-opacity='0.08' d='M150 -10 q 16 24 0 42 q -16 -18 0 -42'/%3E%3C/g%3E%3C/svg%3E");
+  background-position: center top;
+  background-size: 100% auto;
+}
+/* Hojitas: forma de hoja (radio asimétrico), verde vivo, giran al caer (P3). */
+.ag-root[data-agent-tema='verde-vivo'] .ag-mote {
+  width: 7px;
+  height: 7px;
+  border-radius: 0 70% 0 70%;
+  background: rgba(46, 139, 61, 0.4);
+  box-shadow: none;
+}
+
+/* ── minimalista · "UN SOLO TRAZO" ─────────────────────────────────────────
+   Papel, tinta y UNA línea que cruza. Nada respira, nada brilla: la elegancia
+   es la ausencia. Radios rectos, sombras casi nulas, motas apagadas. */
+.ag-root[data-agent-tema='minimalista'] {
+  --ag-radius: 11px;
+  --ag-hairline: linear-gradient(90deg, rgba(var(--ag-accent), 0.4), rgba(var(--ag-accent), 0.4));
+  --ag-send-bg: linear-gradient(135deg, #2f6e5a 0%, #2f6e5a 100%);
+  --ag-send-glow: 0 4px 12px -6px rgba(29, 70, 57, 0.4);
+  --ag-bar-shadow: 0 6px 18px -12px rgba(31, 36, 33, 0.22);
+  /* Nota del productor = el MISMO verde del trazo, plano, sin degradé. */
+  --ag-user-bg: #2f6e5a;
+  --ag-user-border: rgba(29, 70, 57, 0.45);
+}
+.ag-root[data-agent-tema='minimalista'] .ag-scene::before { background: none; }
+.ag-root[data-agent-tema='minimalista'] .ag-scene::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 412 300' preserveAspectRatio='xMidYMin slice'%3E%3Cpath fill='none' stroke='%232f6e5a' stroke-opacity='0.14' stroke-width='1.5' d='M-10 84 C 90 44 220 116 300 72 C 340 50 390 62 422 54'/%3E%3C/svg%3E");
+  background-position: center top;
+  background-size: 100% auto;
+}
+.ag-root[data-agent-tema='minimalista'] .ag-mote { display: none; }
+/* La costura del compositor se vuelve UNA línea continua fina. */
+.ag-root[data-agent-tema='minimalista'] .ag-composer::before {
+  background-image: none;
+  background-color: rgba(var(--ag-accent), 0.3);
+  height: 1.5px;
+}
+/* El CTA de la mano pierde el degradé: tarjeta blanca con borde de trazo. */
+.ag-root[data-agent-tema='minimalista'] .ag-mano-cta {
+  background: rgb(var(--c-surface-card, 255 255 255));
+  box-shadow: 0 8px 22px -16px rgba(31, 36, 33, 0.35);
+}
+
+/* ── P3 · MOTION — la vida de la escena y de los controles ─────────────────
+   Todo se APAGA bajo prefers-reduced-motion (bloque final). */
+
+/* Esporas/brasas/polen: suben lento y se desvanecen. */
+@keyframes ag-mote-rise {
+  0%   { opacity: 0; transform: translateY(0) scale(0.8); }
+  12%  { opacity: 1; }
+  78%  { opacity: 0.7; }
+  100% { opacity: 0; transform: translateY(-46vh) scale(1.15); }
+}
+/* Hojitas verde-vivo: caen meciéndose. */
+@keyframes ag-mote-fall {
+  0%   { opacity: 0; transform: translateY(-8vh) rotate(0deg); }
+  14%  { opacity: 0.8; }
+  80%  { opacity: 0.5; }
+  100% { opacity: 0; transform: translateY(38vh) rotate(300deg); }
+}
+.ag-mote { animation: ag-mote-rise 16s linear infinite; }
+.ag-mote:nth-child(2) { animation-duration: 19s; }
+.ag-mote:nth-child(3) { animation-duration: 14s; }
+.ag-mote:nth-child(5) { animation-duration: 21s; }
+.ag-root[data-agent-tema='verde-vivo'] .ag-mote {
+  top: -4vh;
+  bottom: auto;
+  animation-name: ag-mote-fall;
+  animation-timing-function: ease-in-out;
+}
+/* Nature: el polen se mece más corto y suave. */
+.ag-root[data-agent-tema='nature'] .ag-mote {
+  animation-duration: 24s;
+}
+
+/* El glifo de la mano respira con el acento (invita al toque, como el mic). */
+@keyframes ag-mano-breathe {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(var(--ag-accent), 0.35); }
+  50%      { box-shadow: 0 0 0 9px rgba(var(--ag-accent), 0); }
+}
+.ag-mano-cta-glyph { animation: ag-mano-breathe 3.4s ease-in-out infinite; }
+.ag-root[data-agent-tema='minimalista'] .ag-mano-cta-glyph { animation: none; }
+
+/* Tick de grounding: pop sutil al estabilizarse la respuesta. */
+@keyframes ag-tick-pop {
+  0%   { opacity: 0; transform: scale(0.4); }
+  70%  { transform: scale(1.18); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.v3-card [data-testid='grounded-tick'] {
+  animation: ag-tick-pop 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+/* Suavizar el cambio de tema en las superficies grandes. */
+.ag-header,
+.ag-composer,
+.ag-mano-cta {
+  transition-property: background, background-color, border-color, box-shadow, color;
+  transition-duration: 0.35s;
+  transition-timing-function: ease;
+}
+
+/* ── P4 · REFINAMIENTO — foco visible del tema + densidad ────────────────── */
+.ag-root button:focus-visible,
+.ag-root textarea:focus-visible,
+.ag-root a:focus-visible {
+  outline: 2.5px solid rgba(var(--ag-accent), 0.75);
+  outline-offset: 2px;
+}
+
+/* En claros, el placeholder del textarea hereda tinta suave del tema. */
+.ag-root .as-bar textarea::placeholder {
+  color: rgb(var(--c-slate-400, 100 116 139) / 0.9);
+}
+
+/* ── APAGADO TOTAL DE MOVIMIENTO ──────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ag-mote { animation: none !important; opacity: 0.35; }
+  .ag-mano-cta-glyph { animation: none !important; }
+  .v3-card [data-testid='grounded-tick'] { animation: none !important; }
+  .ag-header,
+  .ag-composer,
+  .ag-mano-cta,
+  .ag-hbtn { transition: none !important; }
+}

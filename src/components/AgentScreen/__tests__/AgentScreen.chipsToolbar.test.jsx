@@ -59,6 +59,9 @@ vi.mock('../../../services/tierService', () => ({
 
 vi.mock('../../../hooks/useTheme', () => ({
   useTheme: () => ({ theme: 'nature' }),
+  // Rediseño 2026-07: AgentScreen resuelve el tema efectivo (data-agent-tema)
+  // con resolveAutoTheme — el mock lo expone como identidad (tema ya concreto).
+  resolveAutoTheme: (t) => t,
 }));
 
 vi.mock('../../../hooks/useVoiceRecorder', () => ({

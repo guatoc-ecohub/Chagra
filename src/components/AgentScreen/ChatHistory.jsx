@@ -149,9 +149,11 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
           onClick={onBack}
           data-testid="chat-floating-back"
           aria-label="Volver"
-          className="chagra-floating-back absolute top-3 left-3 z-20 flex items-center gap-1.5 pl-2 pr-3 py-2 rounded-full bg-slate-900/90 backdrop-blur-sm border border-slate-700 text-amber-300 shadow-lg active:scale-95 hover:bg-slate-800"
+          /* Rediseño 2026-07: superficie/borde por tema (.ag-floatback,
+             agent-skin.css) — el slate-900 fijo era ilegible en claros. */
+          className="chagra-floating-back ag-floatback absolute top-3 left-3 z-20 flex items-center gap-1.5 pl-2 pr-3 py-2 rounded-full backdrop-blur-sm border shadow-lg active:scale-95"
         >
-          <ArrowLeft size={18} className="text-amber-400" />
+          <ArrowLeft size={18} />
           <span className="text-xs font-semibold">Volver</span>
         </button>
       )}

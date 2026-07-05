@@ -49,43 +49,58 @@ export const AGENT_ENTRANCE_CSS = `
 `;
 
 /**
- * CSS del compositor multimodal del AgentScreen. Idéntico a los tokens de
- * AgentHero para garantizar paridad visual completa (2026-06-08).
+ * CSS del compositor multimodal del AgentScreen.
+ *
+ * REDISEÑO POR TEMA (2026-07): las superficies/acentos ya NO van hardcodeados
+ * en slate/emerald — salen de los tokens --ag-* que define agent-skin.css por
+ * tema (indirección CSS-var, política feedback-themes-cssvar-indirection).
+ * Cada var lleva FALLBACK = el valor histórico exacto, así el pill se ve
+ * idéntico al de siempre si algún contexto no define la piel (p.ej. tests
+ * unitarios que montan el compositor sin el root .ag-root).
  */
 export const AGENT_COMPOSITOR_CSS = `
   .as-bar {
     display: flex; align-items: center; gap: 8px;
-    background: rgba(30,41,59,0.85); border: 1px solid rgba(100,116,139,0.4);
-    border-radius: 20px; padding: 7px 8px;
-    box-shadow: 0 10px 30px -12px rgba(0,0,0,0.5);
-    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    background: var(--ag-bar-bg, rgba(30,41,59,0.85));
+    border: 1px solid var(--ag-bar-border, rgba(100,116,139,0.4));
+    border-radius: var(--ag-radius, 20px); padding: 7px 8px;
+    box-shadow: var(--ag-bar-shadow, 0 10px 30px -12px rgba(0,0,0,0.5));
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.35s ease;
     position: relative; overflow: hidden;
     flex-direction: column; align-items: stretch;
   }
   .as-bar.is-recording { border-color: rgba(244,63,94,0.6); }
   .as-bar:focus-within {
-    border-color: rgba(16,185,129,0.55);
-    box-shadow: 0 10px 30px -12px rgba(0,0,0,0.5), 0 0 0 3px rgba(16,185,129,0.12);
+    border-color: rgba(var(--t-accent-rgb, 16,185,129), 0.55);
+    box-shadow: var(--ag-bar-shadow, 0 10px 30px -12px rgba(0,0,0,0.5)),
+                0 0 0 3px rgba(var(--t-accent-rgb, 16,185,129), 0.12);
   }
+  .as-bar textarea { color: var(--ag-input-ink, #fff); }
   .as-iconbtn {
     width: 44px; height: 44px; flex: none; border-radius: 50%;
-    background: rgba(30,41,59,0.9); border: 1px solid rgba(100,116,139,0.4);
+    background: var(--ag-iconbtn-bg, rgba(30,41,59,0.9));
+    border: 1px solid var(--ag-iconbtn-border, rgba(100,116,139,0.4));
     display: flex; align-items: center; justify-content: center;
-    color: rgb(148,163,184); cursor: pointer; position: relative;
+    color: var(--ag-iconbtn-ink, rgb(148,163,184)); cursor: pointer; position: relative;
     transition: transform 0.16s cubic-bezier(0.22,0.61,0.36,1),
                 background 0.25s ease, border-color 0.25s ease, color 0.2s ease;
   }
-  .as-iconbtn:hover { color: #fff; border-color: rgba(16,185,129,0.5); }
+  .as-iconbtn:hover {
+    color: var(--ag-iconbtn-ink-hover, #fff);
+    border-color: rgba(var(--t-accent-rgb, 16,185,129), 0.5);
+  }
   .as-iconbtn:active { transform: scale(0.9); }
   .as-iconbtn:disabled { opacity: 0.4; cursor: not-allowed; }
   .as-tool { animation: as-pulse-ring 3.6s cubic-bezier(.22,.61,.36,1) infinite; }
   .as-tool.is-open {
-    background: rgb(16,185,129); border-color: rgb(16,185,129); animation: none;
+    background: rgb(var(--t-accent-rgb, 16,185,129));
+    border-color: rgb(var(--t-accent-rgb, 16,185,129)); animation: none;
+    color: #fff;
   }
   @keyframes as-pulse-ring {
-    0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0.45); }
-    70%  { box-shadow: 0 0 0 12px rgba(16,185,129,0); }
-    100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    0%   { box-shadow: 0 0 0 0 rgba(var(--t-accent-rgb, 16,185,129),0.45); }
+    70%  { box-shadow: 0 0 0 12px rgba(var(--t-accent-rgb, 16,185,129),0); }
+    100% { box-shadow: 0 0 0 0 rgba(var(--t-accent-rgb, 16,185,129),0); }
   }
   .as-mic-on {
     background: rgb(244,63,94) !important; border-color: rgb(244,63,94) !important;
@@ -140,9 +155,19 @@ export const AGENT_COMPOSITOR_CSS = `
     width: 46px; height: 46px; flex: none; border: none; border-radius: 50%;
     display: flex; align-items: center; justify-content: center; cursor: pointer;
     overflow: hidden; padding: 0;
-    transition: opacity 0.25s ease, box-shadow 0.25s ease;
+    /* PIEL POR TEMA (rediseño 2026-07): el fondo/glow salen de --ag-send-* de
+       agent-skin.css (teal-cian en biopunk, ocre en nature, verde en
+       verde-vivo/minimalista). Antes iban inline en el JSX con el gradiente
+       teal fijo. El estado deshabilitado apaga color y sombra acá mismo. */
+    background: var(--ag-send-bg, linear-gradient(135deg,#10b981 0%,#0891b2 100%));
+    box-shadow: var(--ag-send-glow, 0 0 18px rgba(16,185,129,0.5));
+    transition: opacity 0.25s ease, box-shadow 0.25s ease, background 0.35s ease;
   }
-  .as-send:disabled { opacity: 0.35; cursor: not-allowed; }
+  .as-send:disabled {
+    opacity: 0.35; cursor: not-allowed;
+    background: var(--ag-iconbtn-bg, rgba(51,65,85,0.8));
+    box-shadow: none;
+  }
   @keyframes as-send-shimmer {
     0%   { transform: translateX(-130%); opacity: 0; }
     25%  { opacity: 1; }
@@ -156,7 +181,7 @@ export const AGENT_COMPOSITOR_CSS = `
   }
   .as-shimmer::after {
     content: ''; position: absolute; inset: 0; border-radius: inherit;
-    background: linear-gradient(100deg, transparent 12%, rgba(16,185,129,0.55) 50%, transparent 88%);
+    background: linear-gradient(100deg, transparent 12%, rgba(var(--t-accent-rgb, 16,185,129),0.55) 50%, transparent 88%);
     animation: as-send-shimmer 0.52s cubic-bezier(0.22,0.61,0.36,1) forwards;
     pointer-events: none;
   }
@@ -440,25 +465,27 @@ export const AGENT_V3_CSS = `
     font-family: 'Nunito', system-ui, sans-serif;
   }
   /* LA COSTURA (firma V3): respuesta respaldada por el catálogo = puntada de
-     hilo esmeralda en el borde izquierdo, como la costura de un costal. Las
-     respuestas solo-generativas no llevan hilo. */
+     HILO DEL ACENTO DEL TEMA en el borde izquierdo, como la costura de un
+     costal (rediseño 2026-07: antes esmeralda fija; ahora teal en biopunk,
+     ocre en nature, verde en verde-vivo/minimalista — la misma puntada del
+     compositor y la mochila). Las solo-generativas no llevan hilo. */
   .v3-card[data-grounded="true"] { padding-left: 22px; }
   .v3-card[data-grounded="true"]::before {
     content: ''; position: absolute; left: 9px; top: 12px; bottom: 12px;
     width: 2.5px; border-radius: 2px;
     background-image: repeating-linear-gradient(
       180deg,
-      rgb(var(--c-emerald-500, 16 185 129)) 0 7px,
+      rgba(var(--t-accent-rgb, 16, 185, 129), 0.95) 0 7px,
       transparent 7px 13px
     );
   }
   .v3-bubble-user {
     max-width: 82%; padding: 10px 14px;
     border-radius: 18px 18px 5px 18px;
-    background: rgb(var(--c-emerald-700, 4 120 87));
-    border: 1px solid rgb(var(--c-emerald-500, 16 185 129) / 0.35);
+    background: var(--ag-user-bg, rgb(var(--c-emerald-700, 4 120 87)));
+    border: 1px solid var(--ag-user-border, rgb(var(--c-emerald-500, 16 185 129) / 0.35));
     box-shadow: 0 8px 22px -14px rgb(var(--c-emerald-700, 4 120 87) / 0.8);
-    color: #fff; font-family: 'Nunito', system-ui, sans-serif;
+    color: var(--ag-user-ink, #fff); font-family: 'Nunito', system-ui, sans-serif;
   }
 
   @keyframes v3-rise { from { transform: translateY(100%); } to { transform: translateY(0); } }
