@@ -6,7 +6,8 @@ import { useMemo, useState } from 'react';
 import {
   ChevronLeft, ChevronRight, Sprout, Layers, Recycle, Calculator,
   FlaskConical, AlertTriangle, CheckCircle2, Info, Leaf, Worm, Gauge,
-  Beaker, ArrowRight, Wheat,
+  Beaker, ArrowRight, Wheat, Bug, Flame, Ban, Umbrella, Salad,
+  ExternalLink, Camera,
 } from 'lucide-react';
 import {
   calcularCICE,
@@ -17,6 +18,9 @@ import {
   FUENTES_CAL,
   SATURACION_AL_OBJETIVO_DEFAULT,
 } from '../services/encaladoCalculator';
+import {
+  HORIZONTES, HABITANTES, CICLO_ETAPAS, CUIDADOS_VIDA, CREDITOS_FOTOS, FOTO_BASE,
+} from '../data/vidaSuelo';
 
 /**
  * SaludSueloScreen — mini-app "Cuaderno del Suelo" (módulo Salud del Suelo).
@@ -204,6 +208,7 @@ export default function SaludSueloScreen({ onBack, onNavigate }) {
           {pilar === 'hub' ? 'La salud de su tierra, paso a paso.'
             : pilar === 'analisis' ? '¿Cómo está mi suelo?'
             : pilar === 'acidez' ? 'Corregir la acidez'
+            : pilar === 'vida' ? 'La vida del suelo'
             : 'Mejorar el suelo'}
         </p>
       </div>
@@ -217,6 +222,7 @@ export default function SaludSueloScreen({ onBack, onNavigate }) {
         {pilar === 'hub' && <Hub onIr={setPilar} onNavigate={onNavigate} />}
         {pilar === 'analisis' && <PilarAnalisis onNavigate={onNavigate} onIr={setPilar} />}
         {pilar === 'acidez' && <PilarAcidez />}
+        {pilar === 'vida' && <PilarVida onNavigate={onNavigate} />}
         {pilar === 'mejorar' && <PilarMejora onNavigate={onNavigate} />}
       </div>
     </div>
@@ -228,7 +234,8 @@ function Hub({ onIr, onNavigate }) {
   const pilares = [
     { key: 'analisis', icon: Gauge, titulo: '¿Cómo está mi suelo?', desc: 'Lea su análisis: pH, materia orgánica, N-P-K y aluminio, en palabras claras.', accent: 'emerald' },
     { key: 'acidez', icon: Calculator, titulo: 'Corregir la acidez', desc: 'Calculadora de cal: de la saturación de aluminio a los bultos por hectárea.', accent: 'amber' },
-    { key: 'mejorar', icon: Leaf, titulo: 'Mejorar el suelo', desc: 'Materia orgánica, coberturas, abonos verdes y micorrizas para una tierra viva.', accent: 'lime' },
+    { key: 'vida', icon: Worm, titulo: 'La vida del suelo', desc: 'Lombrices, hongos, micorrizas y microbios: la tierra viva, con fotos reales.', accent: 'lime' },
+    { key: 'mejorar', icon: Leaf, titulo: 'Mejorar el suelo', desc: 'Materia orgánica, coberturas, abonos verdes y micorrizas para una tierra viva.', accent: 'emerald' },
   ];
   return (
     <div className="flex flex-col gap-4">
@@ -614,6 +621,268 @@ function PilarAcidez() {
           </p>
         </div>
       </details>
+    </div>
+  );
+}
+
+/* ═══════════════════ Pilar — La vida del suelo (foto real) ═══════════════════ */
+
+const ICONO_ETAPA = { hojarasca: Leaf, descomponen: Worm, humus: Layers, nutrientes: Beaker, planta: Sprout };
+const ICONO_CUIDADO = { fuego: Flame, veneno: Ban, cobertura: Umbrella, alimento: Salad };
+
+/** Anillo del ciclo — motivo "reciclar" que gira muy lento (se apaga con
+ *  prefers-reduced-motion vía la clase .vs-ring en index.css). */
+function CicloAnillo() {
+  return (
+    <svg viewBox="0 0 96 96" role="img" aria-label="El ciclo de la vida del suelo gira sin parar" className="w-20 h-20 shrink-0">
+      <g className="vs-ring" style={{ transformOrigin: '48px 48px' }}>
+        <path d="M48 12 A36 36 0 0 1 82 62" fill="none" stroke="rgb(var(--t-accent-rgb))" strokeWidth="6" strokeLinecap="round" opacity="0.9" />
+        <path d="M82 62 l-2 -13 l13 4 z" fill="rgb(var(--t-accent-rgb))" />
+        <path d="M48 84 A36 36 0 0 1 14 34" fill="none" stroke="rgb(var(--t-accent-rgb))" strokeWidth="6" strokeLinecap="round" opacity="0.55" />
+        <path d="M14 34 l2 13 l-13 -4 z" fill="rgb(var(--t-accent-rgb))" />
+      </g>
+      <circle cx="48" cy="48" r="7" fill="rgb(var(--t-accent-rgb) / 0.35)" />
+    </svg>
+  );
+}
+
+/** Tarjeta de un habitante del suelo, con foto real (licencia abierta). */
+function HabitanteCard({ h }) {
+  const [imgOk, setImgOk] = useState(true);
+  return (
+    <article className="rounded-2xl border border-slate-800 bg-slate-900 overflow-hidden flex flex-col">
+      <div className="relative aspect-[4/3] bg-slate-950">
+        {imgOk ? (
+          <img
+            src={`${FOTO_BASE}/${h.slug}.jpg`}
+            alt={`Foto de ${h.nombre} (${h.tecnico})`}
+            loading="lazy"
+            decoding="async"
+            onError={() => setImgOk(false)}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-4xl" aria-hidden="true">{h.emoji}</div>
+        )}
+        {/* Chip del nombre folk sobre la FOTO: scrim oscuro FIJO + texto blanco
+         *  literal (text-[#fff] no lo vira el remapeo de temas claros de .text-white),
+         *  para que quede legible sobre la imagen en cualquier tema y al sol. */}
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-2.5 pt-8">
+          <p className="text-[15px] font-black text-[#ffffff] leading-tight drop-shadow">
+            <span aria-hidden="true" className="mr-1">{h.emoji}</span>{h.nombre}
+          </p>
+          <p className="text-[11px] text-[#e2e8f0] leading-tight italic">{h.tecnico}</p>
+        </div>
+      </div>
+      <div className="p-3 flex flex-col gap-2 flex-1">
+        <p className="text-[13px] font-bold leading-snug" style={{ color: 'rgb(var(--t-accent-deep-rgb))' }}>
+          «{h.lema}»
+        </p>
+        <p className="text-sm text-slate-200 leading-snug">{h.papel}</p>
+        <div className="mt-auto rounded-lg bg-slate-800/80 border border-slate-700/60 p-2.5">
+          <p className="text-[10px] uppercase tracking-wider font-bold mb-0.5" style={{ color: 'rgb(var(--t-accent-deep-rgb))' }}>En su finca lo ve así</p>
+          <p className="text-[13px] text-slate-100 leading-snug">{h.senal}</p>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+/**
+ * @param {Object} props
+ * @param {(view: string, data?: any) => void} [props.onNavigate]
+ */
+function PilarVida({ onNavigate }) {
+  const [perfilOk, setPerfilOk] = useState(true);
+  const [creditos, setCreditos] = useState(false);
+
+  return (
+    <div className="flex flex-col gap-5">
+      {/* Frase que engancha */}
+      <section className="rounded-2xl border border-lime-800/50 bg-gradient-to-br from-lime-950/50 to-slate-900 p-4">
+        <div className="flex items-start gap-3">
+          <span className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 vs-pulse"
+            style={{ backgroundColor: 'rgb(var(--t-accent-rgb) / 0.22)' }}>
+            <Bug size={24} style={{ color: 'rgb(var(--t-accent-rgb))' }} />
+          </span>
+          <div>
+            <p className="text-[17px] font-black text-white leading-tight">
+              En un puñado de tierra sana viven más seres que personas hay en el mundo.
+            </p>
+            <p className="text-sm text-slate-300 mt-1.5 leading-relaxed">
+              No se ven, pero son los que hacen el trabajo: sueltan el abono, guardan el agua y
+              defienden a la mata. Cuidar el suelo es cuidar a esos trabajadores.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Perfil del suelo — foto real + horizontes */}
+      <section aria-label="El perfil del suelo por capas">
+        <h2 className="text-[15px] font-black text-white mb-2 flex items-center gap-2">
+          <Layers size={18} style={{ color: 'rgb(var(--t-accent-rgb))' }} /> El suelo por capas
+        </h2>
+        <div className="rounded-2xl border border-slate-800 bg-slate-900 overflow-hidden flex flex-col sm:flex-row">
+          <div className="relative sm:w-2/5 aspect-[3/4] sm:aspect-auto bg-slate-950 shrink-0">
+            {perfilOk ? (
+              <img
+                src={`${FOTO_BASE}/perfil.jpg`}
+                alt="Foto de un perfil de suelo real mostrando sus capas u horizontes, de la hojarasca a la roca madre"
+                loading="lazy"
+                decoding="async"
+                onError={() => setPerfilOk(false)}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            ) : (
+              <div className="absolute inset-0 p-3 flex items-center justify-center"><PerfilSueloIlustracion /></div>
+            )}
+          </div>
+          <ol className="flex-1 divide-y divide-slate-800">
+            {HORIZONTES.map((hz) => (
+              <li key={hz.sigla} className="flex items-start gap-3 p-3">
+                <span
+                  className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-sm font-black text-[#ffffff] border border-white/15"
+                  style={{ backgroundColor: hz.color }}
+                >
+                  {hz.sigla}
+                </span>
+                <div>
+                  <p className="text-sm font-bold text-white leading-tight">
+                    {hz.nombre} <span className="text-[11px] font-normal text-slate-400">· {hz.tecnico}</span>
+                  </p>
+                  <p className="text-[13px] text-slate-300 leading-snug mt-0.5">{hz.desc}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+        <p className="text-[11px] text-slate-500 mt-1.5 leading-snug">
+          <Info size={12} className="inline mr-1 -mt-0.5" />
+          Cada finca tiene su propio perfil; el grosor y el color de las capas cambian con el terreno.
+        </p>
+      </section>
+
+      {/* Los habitantes — galería con fotos reales */}
+      <section aria-label="Los habitantes del suelo">
+        <h2 className="text-[15px] font-black text-white mb-1 flex items-center gap-2">
+          <Worm size={18} style={{ color: 'rgb(var(--t-accent-rgb))' }} /> Quién vive ahí abajo
+        </h2>
+        <p className="text-[13px] text-slate-400 mb-3 leading-snug">
+          Del más grande al invisible. Todos trabajan gratis, día y noche.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {HABITANTES.map((h) => <HabitanteCard key={h.slug} h={h} />)}
+        </div>
+      </section>
+
+      {/* El ciclo — de la hojarasca al alimento y otra vez */}
+      <section aria-label="El ciclo de la vida del suelo" className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+        <div className="flex items-center gap-3 mb-3">
+          <CicloAnillo />
+          <div>
+            <h2 className="text-[15px] font-black text-white leading-tight">La rueda que no para</h2>
+            <p className="text-[13px] text-slate-300 leading-snug mt-0.5">
+              Así la vida convierte el resto en fertilidad y vuelve a empezar.
+            </p>
+          </div>
+        </div>
+        <ol className="relative flex flex-col">
+          {CICLO_ETAPAS.map((e, i) => {
+            const Icono = ICONO_ETAPA[e.icono] || Leaf;
+            const last = i === CICLO_ETAPAS.length - 1;
+            return (
+              <li key={e.n} className="flex gap-3">
+                <div className="flex flex-col items-center shrink-0">
+                  <span className="w-9 h-9 rounded-full flex items-center justify-center border-2"
+                    style={{ borderColor: 'rgb(var(--t-accent-rgb))', backgroundColor: 'rgb(var(--t-accent-rgb) / 0.15)' }}>
+                    <Icono size={17} style={{ color: 'rgb(var(--t-accent-rgb))' }} />
+                  </span>
+                  {!last && <span className="w-0.5 flex-1 min-h-[14px]" style={{ backgroundColor: 'rgb(var(--t-accent-rgb) / 0.35)' }} />}
+                </div>
+                <div className={last ? 'pb-0' : 'pb-4'}>
+                  <p className="text-sm font-bold text-white leading-tight">{e.n}. {e.titulo}</p>
+                  <p className="text-[13px] text-slate-300 leading-snug mt-0.5">{e.texto}</p>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+        <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+          Ese nitrógeno, fósforo y potasio son los mismos números N-P-K de su análisis, en la pestaña «¿Cómo está mi suelo?».
+        </p>
+      </section>
+
+      {/* Cómo proteger esta vida */}
+      <section aria-label="Cómo cuidar la vida del suelo">
+        <h2 className="text-[15px] font-black text-white mb-3 flex items-center gap-2">
+          <Leaf size={18} style={{ color: 'rgb(var(--t-accent-rgb))' }} /> Cómo cuidar esta vida
+        </h2>
+        <div className="grid grid-cols-2 gap-3">
+          {CUIDADOS_VIDA.map((c) => {
+            const Icono = ICONO_CUIDADO[c.icono] || Leaf;
+            return (
+              <div key={c.titulo} className="rounded-xl border border-slate-800 bg-slate-900 p-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <Icono size={18} style={{ color: 'rgb(var(--t-accent-rgb))' }} />
+                  <h3 className="text-sm font-bold text-white leading-tight">{c.titulo}</h3>
+                </div>
+                <p className="text-[13px] text-slate-300 leading-snug">{c.texto}</p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Puentes a lo que ya existe */}
+      {onNavigate ? (
+        <div className="flex flex-col gap-2">
+          <PuenteBoton
+            icon={Worm}
+            titulo="Mundo Subsuelo"
+            sub="Decida y vea cómo revive el suelo con compost, hongos y lombrices."
+            onClick={() => onNavigate('subsuelo')}
+          />
+          <PuenteBoton
+            icon={FlaskConical}
+            titulo="Cromatografía de suelo"
+            sub="El retrato en colores de esta vida que las fotos no alcanzan a mostrar."
+            onClick={() => onNavigate('cromatografia')}
+          />
+          <PuenteBoton
+            icon={Sprout}
+            titulo="Pregúntele al agente"
+            sub="Qué sembrar o inocular para despertar la vida de su tierra."
+            onClick={() => onNavigate('agente', { prompt: '¿Cómo despierto la vida de mi suelo (lombrices y micorrizas)?' })}
+          />
+        </div>
+      ) : null}
+
+      {/* Créditos de fotos — cumplimiento de licencia abierta */}
+      <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+        <button
+          type="button"
+          onClick={() => setCreditos((v) => !v)}
+          aria-expanded={creditos}
+          className="w-full flex items-center gap-2 text-left"
+        >
+          <Camera size={15} className="text-slate-400 shrink-0" />
+          <span className="text-xs font-bold text-slate-300 flex-1">Créditos de las fotos (licencia abierta)</span>
+          <ChevronRight size={16} className={`text-slate-500 transition-transform ${creditos ? 'rotate-90' : ''}`} />
+        </button>
+        {creditos && (
+          <ul className="mt-2.5 pt-2.5 border-t border-slate-800 flex flex-col gap-1.5">
+            {CREDITOS_FOTOS.map((cr) => (
+              <li key={cr.slug} className="text-[11px] text-slate-400 leading-snug">
+                <a href={cr.url} target="_blank" rel="noopener noreferrer"
+                  className="font-semibold text-slate-200 hover:text-white underline decoration-slate-600 underline-offset-2 inline-flex items-center gap-0.5">
+                  {cr.slug}<ExternalLink size={10} className="inline shrink-0" />
+                </a>
+                <span className="text-slate-500"> — {cr.autor} · {cr.lic} · Wikimedia Commons</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
