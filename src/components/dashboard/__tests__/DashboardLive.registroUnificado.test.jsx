@@ -25,6 +25,7 @@ vi.mock('../../../config/registroUnificadoFlag', () => ({
 }));
 vi.mock('../../../config/extensionistaAccess', () => ({
   esExtensionistaActual: () => false,
+  esExtensionistaRealActual: () => false,
 }));
 vi.mock('../AgentHero', () => ({ default: () => <div data-testid="agent-hero" /> }));
 vi.mock('../FincaVivaHero', () => ({

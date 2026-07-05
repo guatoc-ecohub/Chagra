@@ -27,9 +27,12 @@ vi.mock('../../../config/fincaVivaHomeFlag', () => ({
   fincaVivaHomePerfilActivo: () => true, // home F2 ON
 }));
 
-// El operador/extensionista: modo supervisor multi-finca activo.
+// Extensionista REAL (flag + whitelist): modo supervisor multi-finca activo.
+// (Hotfix P0 2026-07-04: la portada del home la decide esExtensionistaRealActual
+// — el bypass del operador ya NO cambia la portada, solo el acceso al panel.)
 vi.mock('../../../config/extensionistaAccess', () => ({
   esExtensionistaActual: () => true,
+  esExtensionistaRealActual: () => true,
 }));
 
 // El hero real es pesado: lo stubeamos pero RENDERIZAMOS sus children para que

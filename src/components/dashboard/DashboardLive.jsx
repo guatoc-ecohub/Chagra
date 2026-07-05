@@ -44,7 +44,7 @@ import {
     esPerfilUrbano,
 } from '../../services/homeModuleSelector';
 import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciarAccess';
-import { esExtensionistaActual } from '../../config/extensionistaAccess';
+import { esExtensionistaRealActual } from '../../config/extensionistaAccess';
 import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 import { registroUnificadoActivo } from '../../config/registroUnificadoFlag';
 import SelectedBackgroundReveal from './SelectedBackgroundReveal';
@@ -398,15 +398,23 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
     // una vez al montar. Con la flag ON: (1) la escena de la finca se muestra
     // SIEMPRE — incluso con 0 plantas, que la propia escena cubre con su estado
     // "por sembrar" (fix UX: la escena por perfil orienta desde el primer uso);
-    // (2) si el usuario es extensionista (rol supervisor, con bypass de operador),
-    // se monta la RED institucional de fincas en vez de la escena de finca única.
-    // Con la flag OFF (default), el home conserva su comportamiento actual.
+    // (2) si el usuario es extensionista REAL (flag + whitelist, SIN bypass de
+    // operador), se monta la RED institucional de fincas en vez de la escena de
+    // finca única. Con la flag OFF (default), el home conserva su comportamiento
+    // actual.
     const [fincaVivaFlag] = useState(() => fincaVivaHomePerfilActivo());
     // Registro unificado (#23): con la flag ON, el bloque "Registrar en la finca"
     // muestra UNA sola puerta (→ registro_unificado) en vez de los tiles sueltos.
     const [registroUnifFlag] = useState(() => registroUnificadoActivo());
+    // HOTFIX P0 2026-07-04 (escena del home VACÍA en prod): aquí va el rol REAL
+    // (esExtensionistaRealActual), NO esExtensionistaActual. El bypass del
+    // operador de esExtensionista() convertía al operador en "extensionista" en
+    // el build de prod (VITE_OPERATOR_USERNAME baked) y su home montaba la red
+    // institucional (vacía para él) en vez de la escena de SU finca → área de
+    // escena en blanco en TODOS los temas. El bypass sigue vigente donde
+    // corresponde: la ruta #extensionista (App.jsx) y su entrada en Perfil.
     const [esExtensionista] = useState(() => {
-        try { return esExtensionistaActual(); } catch (_) { return false; }
+        try { return esExtensionistaRealActual(); } catch (_) { return false; }
     });
 
     // Escuchar cambios en visibilidad de módulos desde ProfileScreen (#7003)

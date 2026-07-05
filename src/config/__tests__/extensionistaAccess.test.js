@@ -156,3 +156,64 @@ describe('extensionistaAccess — esExtensionistaActual (lee tenant activo, offl
     expect(mod.esExtensionistaActual()).toBe(false);
   });
 });
+
+describe('extensionistaAccess — esExtensionistaReal (SIN bypass de operador; hotfix P0 2026-07-04)', () => {
+  // REGRESIÓN DE PRODUCCIÓN que motiva esta función: el home F2 (DashboardLive)
+  // decidía la portada con esExtensionista(), cuyo bypass de operador convertía
+  // al operador (VITE_OPERATOR_USERNAME baked en prod) en "extensionista" → su
+  // home montaba la RED institucional (vacía) en vez de la escena de SU finca →
+  // área de escena en blanco en TODOS los temas. La portada institucional debe
+  // gatearse por el rol REAL (flag + whitelist), nunca por el bypass.
+  beforeEach(() => {
+    localStorage.clear();
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    localStorage.clear();
+  });
+
+  it('el OPERADOR (override local) NO es extensionista real — conserva su escena de finca', async () => {
+    vi.stubEnv('VITE_FEATURE_EXTENSIONISTA', 'true');
+    localStorage.setItem('chagra:operator_override', '1');
+    const mod = await importFresh();
+    // El bypass sí aplica al panel (esExtensionista)…
+    expect(mod.esExtensionista('admin')).toBe(true);
+    // …pero NUNCA al rol real que decide la portada del home.
+    expect(mod.esExtensionistaReal('admin')).toBe(false);
+  });
+
+  it('un username de la whitelist con la flag ON SÍ es extensionista real', async () => {
+    vi.stubEnv('VITE_FEATURE_EXTENSIONISTA', 'true');
+    const mod = await importFresh();
+    expect(mod.esExtensionistaReal('demo-extensionista')).toBe(true);
+    expect(mod.esExtensionistaReal('  DEMO-EXTENSIONISTA  ')).toBe(true);
+  });
+
+  it('con la flag OFF nadie es extensionista real, ni la whitelist ni el operador', async () => {
+    vi.stubEnv('VITE_FEATURE_EXTENSIONISTA', 'false');
+    localStorage.setItem('chagra:operator_override', '1');
+    const mod = await importFresh();
+    expect(mod.esExtensionistaReal('demo-extensionista')).toBe(false);
+    expect(mod.esExtensionistaReal('admin')).toBe(false);
+  });
+
+  it('defensivo: null/undefined/vacío/no-string → false', async () => {
+    vi.stubEnv('VITE_FEATURE_EXTENSIONISTA', 'true');
+    const mod = await importFresh();
+    expect(mod.esExtensionistaReal(null)).toBe(false);
+    expect(mod.esExtensionistaReal(undefined)).toBe(false);
+    expect(mod.esExtensionistaReal('   ')).toBe(false);
+    expect(mod.esExtensionistaReal(123)).toBe(false);
+  });
+
+  it('esExtensionistaRealActual lee el tenant activo y respeta el mismo gate', async () => {
+    vi.stubEnv('VITE_FEATURE_EXTENSIONISTA', 'true');
+    const mod = await importFresh();
+    localStorage.setItem('chagra:active_tenant_id', 'demo-extensionista');
+    expect(mod.esExtensionistaRealActual()).toBe(true);
+    // El operador logueado con su propio username NO entra por acá.
+    localStorage.setItem('chagra:active_tenant_id', 'miguel-operador');
+    localStorage.setItem('chagra:operator_override', '1');
+    expect(mod.esExtensionistaRealActual()).toBe(false);
+  });
+});

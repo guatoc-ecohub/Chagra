@@ -121,11 +121,7 @@ export function esExtensionista(username) {
   // El operador (visión total) ve el panel extensionista aunque la flag esté
   // apagada o no esté en la whitelist — mismo criterio que glaciarAccess.
   if (esOperador(username)) return true;
-  if (!featureExtensionistaActivo()) return false;
-  if (!username || typeof username !== 'string') return false;
-  const normalized = username.trim().toLowerCase();
-  if (normalized.length === 0) return false;
-  return EXTENSIONISTA_WHITELIST.has(normalized);
+  return esExtensionistaReal(username);
 }
 
 /**
@@ -138,4 +134,46 @@ export function esExtensionista(username) {
  */
 export function esExtensionistaActual() {
   return esExtensionista(getActiveTenantId());
+}
+
+/**
+ * ¿Este username tiene el rol extensionista REAL (flag + whitelist), SIN el
+ * bypass del operador?
+ *
+ * POR QUÉ EXISTE (hotfix P0 2026-07-04, escena del home vacía en PROD):
+ *   `esExtensionista()` incluye el bypass del operador (visión total) para que
+ *   el operador pueda ENTRAR al panel #extensionista sin flag ni whitelist.
+ *   Pero DashboardLive usaba ESA misma función para decidir la PORTADA del
+ *   home F2: con `VITE_OPERATOR_USERNAME` baked en el build de prod (secret),
+ *   el operador quedaba "extensionista" y su home reemplazaba la escena de SU
+ *   finca por la RED institucional (vacía para él) → área de escena en blanco
+ *   (solo el degradado) en TODOS los temas. En dev no se reproducía porque
+ *   dev-deploy.yml NO define VITE_OPERATOR_USERNAME.
+ *
+ *   El bypass es para ACCEDER al panel (ruta #extensionista, App.jsx), no para
+ *   cambiarle la identidad de la portada: el operador tiene finca propia y su
+ *   home debe mostrar SU escena. La portada institucional es solo para el rol
+ *   REAL (featureExtensionistaActivo() + whitelist).
+ *
+ * @param {string|null|undefined} username — username farmOS del usuario.
+ * @returns {boolean} true SOLO si la flag global está encendida Y el username
+ *   está en la whitelist. El operador NO pasa por aquí (sin bypass).
+ */
+export function esExtensionistaReal(username) {
+  if (!featureExtensionistaActivo()) return false;
+  if (!username || typeof username !== 'string') return false;
+  const normalized = username.trim().toLowerCase();
+  if (normalized.length === 0) return false;
+  return EXTENSIONISTA_WHITELIST.has(normalized);
+}
+
+/**
+ * ¿El usuario actualmente logueado es extensionista REAL (sin bypass de
+ * operador)? Decide la PORTADA del home F2 (red institucional vs escena de
+ * finca propia). Offline-first, igual que `esExtensionistaActual`.
+ *
+ * @returns {boolean}
+ */
+export function esExtensionistaRealActual() {
+  return esExtensionistaReal(getActiveTenantId());
 }
