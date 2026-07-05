@@ -15,7 +15,7 @@ import { parsePedagogicalText } from '../../utils/pedagogicalText.js';
  *
  * @param {object} props
  * @param {string} props.texto — bloque crudo (`valor_pedagogico`, `proceso_resumen`…).
- * @param {'indigo'|'slate'} [props.tone='indigo'] — color de acento de subtítulos/viñetas.
+ * @param {'indigo'|'slate'} [props.tone='indigo'] - color de acento de subtítulos/viñetas.
  * @param {string} [props.testId]
  */
 export default function PedagogicalText({ texto, tone = 'indigo', testId }) {
