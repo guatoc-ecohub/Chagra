@@ -147,11 +147,21 @@ const messages = {
     capFotoCopy: 'Una foto y le dice qué tiene.',
     capVerifTitulo: 'Respuestas verificadas',
     capVerifCopy: 'Cada consejo va cosido a su fuente.',
+    // Herramientas / "juguetes" del campo (voz, cámara, gafas). Mención opcional
+    // para el usuario que trae equipo: Chagra lo entiende por voz o por foto.
+    capHerramTitulo: 'Sus herramientas del campo',
+    capHerramCopy: 'Si tiene micrófono, cámara o gafas, Chagra lo escucha y lo mira igual.',
     titulo3: '¿Dónde está su tierra?',
     copy3: 'Con un toque sabemos su vereda y su altura. Así el consejo llega acertado para su clima.',
     siguiente: 'Siguiente',
     ubicarFinca: 'Ubicar mi finca',
     ahoraNo: 'Ahora no, quiero mirar primero',
+    // Explorar con la finca de ejemplo (SKIP rico): puebla Chagra con una finca
+    // demostrativa (multi-piso, con historial y problemas) para mirar sin llenar
+    // nada. Es el camino del demo público.
+    explorarEjemplo: 'Explorar con finca de ejemplo',
+    explorarEjemploAria: 'Saltar el registro y explorar con una finca de ejemplo ya poblada',
+    explorarEjemploHint: 'Mire una finca completa de una vez — cafetera, papera y de tierra caliente — con sus siembras y problemas reales.',
     saltar: 'Saltar',
     saltarAria: 'Saltar la bienvenida',
     escuchar: 'Escuchar en voz alta',

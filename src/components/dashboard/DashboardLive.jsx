@@ -639,6 +639,20 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                         onNavigate('ubicacion-detectada');
                     }}
                     onClose={() => setShowBienvenida(false)}
+                    onExplorarEjemplo={async () => {
+                        // SKIP rico: sembrar la finca de ejemplo (multi-piso,
+                        // grounded al catálogo) y quedarse en el home, que la
+                        // renderiza POBLADA sin recargar (seedExampleFinca
+                        // re-hidrata el asset store). Import perezoso: no pesa en
+                        // el bundle del dashboard salvo que se use.
+                        try {
+                            const { seedExampleFinca } = await import('../../services/demoFincaEjemplo');
+                            await seedExampleFinca();
+                        } catch (err) {
+                            console.error('[DashboardLive] No se pudo sembrar la finca de ejemplo:', err);
+                        }
+                        setShowBienvenida(false);
+                    }}
                 />
             )}
             {/* PORTADA del home — depende de la flag VITE_FINCA_VIVA_HOME_PERFIL:

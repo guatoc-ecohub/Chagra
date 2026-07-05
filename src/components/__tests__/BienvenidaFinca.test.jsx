@@ -121,4 +121,30 @@ describe('BienvenidaFinca — secuencia de 3 momentos', () => {
     marcarBienvenidaVista();
     expect(bienvenidaYaVista()).toBe(true);
   });
+
+  it('sin onExplorarEjemplo NO muestra el botón de finca de ejemplo', () => {
+    render(<BienvenidaFinca onUbicar={vi.fn()} onClose={vi.fn()} />);
+    avanzarHastaUbicacion();
+    expect(screen.queryByTestId('bienvenida-explorar-ejemplo')).toBeNull();
+  });
+
+  it('"Explorar con finca de ejemplo" marca la flag y delega en onExplorarEjemplo', async () => {
+    const onExplorarEjemplo = vi.fn(() => Promise.resolve());
+    const onClose = vi.fn();
+    render(
+      <BienvenidaFinca onUbicar={vi.fn()} onClose={onClose} onExplorarEjemplo={onExplorarEjemplo} />,
+    );
+
+    avanzarHastaUbicacion();
+    fireEvent.click(screen.getByTestId('bienvenida-explorar-ejemplo'));
+
+    expect(onExplorarEjemplo).toHaveBeenCalledTimes(1);
+    expect(bienvenidaYaVista()).toBe(true);
+  });
+
+  it('el momento 2 muestra la capacidad de herramientas ("juguetes")', () => {
+    render(<BienvenidaFinca onUbicar={vi.fn()} onClose={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('bienvenida-siguiente'));
+    expect(screen.getByText(MSG.bienvenida.capHerramTitulo)).toBeTruthy();
+  });
 });

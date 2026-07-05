@@ -839,6 +839,17 @@ export default function App() {
             <OnboardingProfile
               onComplete={() => navigate('ubicacion-detectada', { next: 'dashboard' })}
               onClose={() => navigate(currentViewData?.back || 'dashboard')}
+              onExplorarEjemplo={async () => {
+                // SKIP rico: sembrar la finca de ejemplo (multi-piso, grounded al
+                // catálogo) y entrar directo al home ya poblado. Import perezoso.
+                try {
+                  const { seedExampleFinca } = await import('./services/demoFincaEjemplo');
+                  await seedExampleFinca();
+                } catch (err) {
+                  console.error('[App] No se pudo sembrar la finca de ejemplo:', err);
+                }
+                navigate('dashboard');
+              }}
             />
           </ErrorBoundary>
         );
