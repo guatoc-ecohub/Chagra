@@ -53,7 +53,7 @@ describe('extensionistaAccess — esExtensionista (función pura)', () => {
     expect(mod.esExtensionista(undefined)).toBe(false);
     expect(mod.esExtensionista('')).toBe(false);
     expect(mod.esExtensionista('   ')).toBe(false);
-    expect(mod.esExtensionista(123)).toBe(false);
+    expect(mod.esExtensionista(/** @type {any} */ (123))).toBe(false);
   });
 
   it('hace match case-insensitive y tolerante a espacios (trim)', () => {
@@ -203,7 +203,7 @@ describe('extensionistaAccess — esExtensionistaReal (SIN bypass de operador; h
     expect(mod.esExtensionistaReal(null)).toBe(false);
     expect(mod.esExtensionistaReal(undefined)).toBe(false);
     expect(mod.esExtensionistaReal('   ')).toBe(false);
-    expect(mod.esExtensionistaReal(123)).toBe(false);
+    expect(mod.esExtensionistaReal(/** @type {any} */ (123))).toBe(false);
   });
 
   it('esExtensionistaRealActual lee el tenant activo y respeta el mismo gate', async () => {
