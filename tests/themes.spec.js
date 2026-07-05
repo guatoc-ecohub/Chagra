@@ -22,7 +22,9 @@ test.describe('Themes - Perfil de usuario y persistencia', () => {
     async function openAppearance(page) {
         await page.getByTestId('topbar-user-menu').click();
         await page.getByTestId('topbar-user-settings').click();
-        await page.getByRole('tab', { name: /apariencia/i }).click();
+        // Hub "El Morral" (2026-07-05): Apariencia es una tarjeta de sección,
+        // ya no una pestaña.
+        await page.getByTestId('profile-section-apariencia').click();
     }
 
     test('cambia tema a Nature y persiste tras recarga', async ({ page }) => {
