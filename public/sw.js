@@ -46,7 +46,21 @@ const ASSETS_TO_CACHE = [
   // Catálogo de especies (sqlite-wasm). Precacheado para que el catálogo sea
   // consultable OFFLINE aunque el usuario nunca haya abierto una vista que lo
   // cargue estando online. ~1.2 MB; aceptable para garantizar offline-first.
-  '/catalog.sqlite'
+  '/catalog.sqlite',
+  // Video-manuales del curso "Aprende a usar Chagra" (#2079): HTML animado
+  // autocontenido (~150 KB c/u, fuentes embebidas en base64). ANTES no
+  // estaban en ningún precache: el iframe de VideoManual.jsx solo los
+  // cacheaba en background la PRIMERA vez que alguien tocaba "reproducir"
+  // (rama Network-First genérica del handler de fetch, más abajo). Si esa
+  // primera vez ocurría SIN señal (el caso típico rural que este curso está
+  // pensado para resolver), el fetch fallaba, el cache-miss no tenía nada
+  // que servir, y el iframe quedaba en blanco — bug reportado 2026-07-05.
+  // Precachearlos en install (igual que catalog.sqlite) garantiza que el
+  // video se vea la primera vez que se abre el curso, con o sin red.
+  '/manual/mv-siembra.html',
+  '/manual/mv-voz-registro.html',
+  '/manual/mv-milpa.html',
+  '/manual/mv-sipsa.html'
 ];
 
 // Grounding del agente precacheado en install (archivos únicos, no las 491

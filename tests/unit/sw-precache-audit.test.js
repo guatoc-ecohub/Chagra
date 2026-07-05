@@ -101,6 +101,19 @@ describe('SW precache contract', () => {
     expect(assets).toContain('/catalog.sqlite');
   });
 
+  it('ASSETS_TO_CACHE precachea los 4 video-manuales del curso (#2079) — regresión bug 2026-07-05', () => {
+    // Antes: los HTML animados de /manual/mv-*.html NO estaban en ningún
+    // precache. Se cacheaban recién al abrir el curso (Network-First
+    // genérico), así que la PRIMERA apertura sin señal (caso rural típico)
+    // dejaba el iframe de VideoManual.jsx en blanco. Ver cursoChagra.js para
+    // la lista canónica de videos por módulo.
+    const assets = extractArray('ASSETS_TO_CACHE');
+    expect(assets).toContain('/manual/mv-siembra.html');
+    expect(assets).toContain('/manual/mv-voz-registro.html');
+    expect(assets).toContain('/manual/mv-milpa.html');
+    expect(assets).toContain('/manual/mv-sipsa.html');
+  });
+
   it('RAG_GROUNDING_PRECACHE contiene rag-embeddings.json y cycle-content/manifest.json', () => {
     const precache = extractArray('RAG_GROUNDING_PRECACHE');
     expect(precache).toContain('/rag-embeddings.json');
