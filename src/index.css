@@ -582,6 +582,20 @@
 }
 
 /* ===========================================================================
+ * VIDA DEL SUELO — micro-animaciones del 4º pilar "La vida del suelo"
+ * (SaludSueloScreen → PilarVida). El anillo del ciclo gira muy lento y la
+ * frase-gancho respira. Sutil e infinito; se apaga con prefers-reduced-motion.
+ * =========================================================================== */
+.vs-ring { animation: vs-spin 22s linear infinite; }
+.vs-pulse { animation: vs-breathe 4.4s ease-in-out infinite; }
+@keyframes vs-spin { to { transform: rotate(360deg); } }
+@keyframes vs-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+@media (prefers-reduced-motion: reduce) {
+  .vs-ring { animation: none; }
+  .vs-pulse { animation: none; }
+}
+
+/* ===========================================================================
  * SEMILLA — micro-animaciones de la ilustración "de la semilla a la mata"
  * (SemillaScreen). El brote "crece", las semillas guardadas titilan y el sol
  * respira. Sutil e infinito muy lento; se apaga con prefers-reduced-motion.

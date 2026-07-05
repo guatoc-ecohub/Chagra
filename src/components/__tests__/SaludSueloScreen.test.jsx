@@ -115,3 +115,37 @@ describe('SaludSueloScreen — pilar 3: mejorar el suelo / micorrizas', () => {
     expect(onBack).not.toHaveBeenCalled();
   });
 });
+
+describe('SaludSueloScreen — pilar: la vida del suelo (fotos reales)', () => {
+  it('el hub ofrece el pilar "La vida del suelo"', () => {
+    render(<SaludSueloScreen onBack={() => {}} onNavigate={() => {}} />);
+    expect(screen.getByRole('button', { name: /La vida del suelo/i })).toBeTruthy();
+  });
+
+  it('muestra habitantes con fotos reales (alt) y las capas del suelo', () => {
+    render(<SaludSueloScreen onBack={() => {}} onNavigate={() => {}} />);
+    irA(/La vida del suelo/i);
+    // fotos reales con texto alternativo (accesibilidad + evidencia)
+    expect(screen.getByAltText(/lombriz de tierra/i)).toBeTruthy();
+    expect(screen.getByAltText(/perfil de suelo real/i)).toBeTruthy();
+    // los horizontes / capas
+    expect(screen.getByText(/La capa negra viva/i)).toBeTruthy();
+    // el ciclo enlaza con el N-P-K del análisis, sin inventar cifras
+    expect(screen.getByText(/mismos números N-P-K/i)).toBeTruthy();
+  });
+
+  it('enlaza al Mundo Subsuelo (grafo) desde la vida del suelo', () => {
+    const onNavigate = vi.fn();
+    render(<SaludSueloScreen onBack={() => {}} onNavigate={onNavigate} />);
+    irA(/La vida del suelo/i);
+    fireEvent.click(screen.getByRole('button', { name: /Mundo Subsuelo/i }));
+    expect(onNavigate).toHaveBeenCalledWith('subsuelo');
+  });
+
+  it('muestra los créditos de foto con licencia abierta al expandir', () => {
+    render(<SaludSueloScreen onBack={() => {}} onNavigate={() => {}} />);
+    irA(/La vida del suelo/i);
+    fireEvent.click(screen.getByRole('button', { name: /Créditos de las fotos/i }));
+    expect(screen.getAllByText(/Wikimedia Commons/i).length).toBeGreaterThan(0);
+  });
+});
