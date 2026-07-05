@@ -54,6 +54,7 @@ import GpsFincaBanner from './components/GpsFincaBanner';
 import DataLossBanner from './components/DataLossBanner';
 import DemoModeBanner from './components/DemoModeBanner';
 import CriticalAlertBanner from './components/CriticalAlertBanner';
+import ConoceChagraInvite from './components/conoce/ConoceChagraInvite';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ErrorFallback } from './components/common/ErrorFallback';
 
@@ -154,6 +155,10 @@ const TopBar = lazy(() => import('./components/TopBar'));
 const DashboardLive = lazy(() => import('./components/dashboard/DashboardLive'));
 const AprenderConAgente = lazy(() => import('./components/Aprende/AprenderConAgente'));
 const CursoChagra = lazy(() => import('./components/curso/CursoChagra'));
+// Recorrido guiado "Conoce Chagra" (tour opt-in de 7 escenas): qué es Chagra
+// y qué puede hacer, para primera vez / pilotos / donantes. NO es el
+// onboarding de perfil (#2078): no pide datos, solo cuenta el alma.
+const ConoceChagra = lazy(() => import('./components/conoce/ConoceChagra'));
 const DirectorioEspeciesScreen = lazy(() => import('./components/DirectorioEspecies/DirectorioEspeciesScreen'));
 const HoyEnFincaScreen = lazy(() => import('./components/hoy/HoyEnFincaScreen'));
 const MiFincaEvolucionScreen = lazy(() => import('./components/hoy/MiFincaEvolucionScreen'));
@@ -192,6 +197,8 @@ const LoadingFallback = () => (
 
 const HASH_VIEW_ROUTES = {
   agente: 'agente',
+  conoce: 'conoce',
+  'conoce-chagra': 'conoce',
   'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
   inventario: 'activos',
@@ -1495,6 +1502,22 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'conoce':
+        // Recorrido guiado "Conoce Chagra": 7 escenas que muestran qué es
+        // Chagra (agente groundeado, semáforo de confianza, mundos, voz,
+        // off-grid solar). Opt-in desde Manual/Perfil + auto-oferta de primera
+        // vez (ConoceChagraInvite) + deep-link #conoce para compartir con
+        // pilotos y donantes. Skippeable siempre; al cerrar vuelve al home.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Conoce Chagra">
+              <ConoceChagra
+                onClose={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mercados':
         // Rama "Vender" de la mano de Chagra (auditoría UX §7.4 P3): superficie
         // HONESTA "en preparación" — alcanzable, no un dead-end. Explica el
@@ -1752,9 +1775,16 @@ export default function App() {
           MENOS el home/dashboard (operador 2026-06-06): en el home el colibrí
           ya es el botón de ENVIAR del compositor, así que el FAB flotante ahí
           duplicaría el ave. Sigue en el resto para anunciar "respuesta lista". */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && <AgentFab onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'conoce' && <AgentFab onNavigate={navigate} />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <SyncProgressIndicator />}
+      {/* Auto-oferta de PRIMERA VEZ del recorrido "Conoce Chagra": tarjeta
+          descartable solo en el home, una sola vez (huella en localStorage).
+          NO toca el onboarding de perfil (#2078): cero estado compartido. */}
+      {currentView === 'dashboard' && <ConoceChagraInvite onStart={() => navigate('conoce')} />}
+      {/* 'conoce' excluido: el toast de sync tapaba el botón primario del
+          recorrido (medido en captura headless) — durante el tour no hay
+          nada que sincronizar que no pueda esperar un minuto. */}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'conoce' && <SyncProgressIndicator />}
       {toast && (
         <div
           role={toast.isError ? 'alert' : 'status'}

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench,
   Sprout, ChevronRight, ChevronLeft, Bell, Users, Camera, Trash2, Shield,
-  Archive, LifeBuoy, LayoutGrid, GraduationCap,
+  Archive, LifeBuoy, LayoutGrid, GraduationCap, Compass,
 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { esExtensionistaActual } from '../config/extensionistaAccess';
@@ -107,6 +107,7 @@ const SECTIONS = [
   { id: 'privacidad', label: 'Privacidad', icon: Shield, tint: 'text-violet-300', tintBg: 'bg-violet-900/30 border-violet-700/40', desc: 'Telemetría y permisos' },
   { id: 'respaldo', label: 'Respaldo', icon: Archive, tint: 'text-orange-300', tintBg: 'bg-orange-900/30 border-orange-700/40', desc: 'Copia de datos y PDF' },
   { id: 'ayuda', label: 'Ayuda', icon: LifeBuoy, tint: 'text-amber-300', tintBg: 'bg-amber-900/30 border-amber-700/40', desc: 'Manual de uso', action: true },
+  { id: 'conoce', label: 'Conoce Chagra', icon: Compass, tint: 'text-emerald-300', tintBg: 'bg-emerald-900/30 border-emerald-700/40', desc: 'El recorrido guiado', action: true },
   { id: 'avanzado', label: 'Avanzado', icon: Wrench, tint: 'text-slate-400', tintBg: 'bg-slate-800/60 border-slate-700', desc: 'Modo técnico y más' },
 ];
 
@@ -310,6 +311,7 @@ export default function ProfileScreen({ onBack, onHome }) {
     privacidad: telemetryConsent ? 'Métricas anónimas activas' : 'Solo en tu dispositivo',
     respaldo: 'Copia local + PDF',
     ayuda: 'Manual de uso',
+    conoce: 'Qué es y qué puede hacer',
     avanzado: modoTecnico || verTodo ? 'Modo técnico activo' : 'Todo normal',
   };
 
@@ -324,10 +326,11 @@ export default function ProfileScreen({ onBack, onHome }) {
   };
 
   const openSection = (id) => {
-    if (id === 'ayuda') {
-      // Acción directa: el manual vive en su propia pantalla.
+    if (id === 'ayuda' || id === 'conoce') {
+      // Acción directa: el manual y el recorrido "Conoce Chagra" viven en su
+      // propia pantalla (mismo mecanismo de navegación que usa ScreenShell).
       try {
-        window.dispatchEvent(new CustomEvent('chagra:nav', { detail: { view: 'ayuda' } }));
+        window.dispatchEvent(new CustomEvent('chagra:nav', { detail: { view: id } }));
       } catch (_) { /* noop */ }
       return;
     }

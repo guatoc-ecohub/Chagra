@@ -274,6 +274,44 @@ export default function HelpHomeScreen({ onSelect, onNavigate }) {
         Una mano rápida para entrar a Chagra. Toca lo que necesites o busca tu pregunta.
       </p>
 
+      {/* Recorrido guiado "Conoce Chagra" (tour opt-in de 7 escenas): la
+          entrada para primera vez o para MOSTRARLE Chagra a alguien sin que
+          tenga que explorar. Solo sin búsqueda activa (es invitación, no
+          resultado). El acento sale del tema (--t-accent-rgb). */}
+      {!query && (
+        <button
+          type="button"
+          onClick={() => go('conoce')}
+          data-testid="help-conoce-chagra"
+          className="rounded-2xl border p-4 text-left flex items-center gap-3 active:scale-[0.99] motion-reduce:active:scale-100 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60"
+          style={{
+            backgroundColor: 'rgb(var(--c-surface-card))',
+            borderColor: 'rgba(var(--t-accent-rgb), 0.5)',
+          }}
+        >
+          <span
+            className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 border"
+            style={{
+              color: 'rgb(var(--t-accent-rgb))',
+              borderColor: 'rgba(var(--t-accent-rgb), 0.5)',
+              backgroundColor: 'rgba(var(--t-accent-rgb), 0.1)',
+            }}
+            aria-hidden="true"
+          >
+            <ManoChagraGlyph size={26} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-base font-black leading-tight" style={{ color: 'rgb(var(--c-slate-100))' }}>
+              Conoce Chagra
+            </span>
+            <span className="block text-xs mt-0.5 leading-snug" style={{ color: 'rgb(var(--c-slate-400))' }}>
+              El recorrido de un minuto: qué es Chagra y qué puede hacer por su finca.
+            </span>
+          </span>
+          <ChevronRight size={18} className="shrink-0" style={{ color: 'rgb(var(--t-accent-rgb))' }} aria-hidden="true" />
+        </button>
+      )}
+
       {/* Mapa mental: los cuatro lugares de Chagra (home F2). Solo cuando no
           hay búsqueda activa — es orientación, no un resultado buscable. */}
       {!query && (
