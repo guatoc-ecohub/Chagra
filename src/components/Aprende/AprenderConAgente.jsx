@@ -402,6 +402,8 @@ export function AprenderEntryCard({ onNavigate }) {
  * @param {string} [props.initialSlug] - abre directamente esta lección (deep-link
  *   desde el Curso guiado, ej. navigate('aprende', { leccion: 'suelo' })). Si el
  *   slug no existe, cae al listado normal.
+ * @param {(view: string, data?: any) => void} [props.onNavigate] - navegación real
+ *   de la app; se usa para el CTA "Ir al curso guiado" (navigate('curso')).
  */
 export default function AprenderConAgente({ onBack, onAskAgent, initialSlug, onNavigate }) {
   const [leccionActual, setLeccionActual] = useState(
