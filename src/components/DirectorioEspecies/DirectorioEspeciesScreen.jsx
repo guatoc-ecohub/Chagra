@@ -23,8 +23,12 @@ import { fvhSkinClass } from '../../config/fvhSkin.js';
  * @param {object} props
  * @param {() => void} [props.onBack]
  * @param {string} [props.initialQuery] - consulta inicial (ej. deep-link).
+ * @param {(id: string) => void} [props.onOpenEspecie] - abre la Ficha de Especie
+ *   referenciada (#especie/<id>): la ficha canónica, enriquecida en vivo por el
+ *   sidecar. Cuando se provee, tocar un resultado navega a ella; si no (p. ej. en
+ *   tests), cae al render inline de la ficha del catálogo (offline).
  */
-export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) {
+export default function DirectorioEspeciesScreen({ onBack, initialQuery = '', onOpenEspecie }) {
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState([]);
   const [searching, setSearching] = useState(false);
@@ -59,6 +63,9 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
   }, [query, runSearch, selected]);
 
   const selectSpecies = useCallback(async (id) => {
+    // Ruta canónica: abrir la Ficha de Especie referenciada (sidecar-live).
+    if (typeof onOpenEspecie === 'function') { onOpenEspecie(id); return; }
+    // Fallback (sin router inyectado): ficha del catálogo inline (offline).
     setLoadingFicha(true);
     try {
       const ficha = await buildSpeciesFicha(id);
@@ -69,7 +76,7 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
     } finally {
       setLoadingFicha(false);
     }
-  }, []);
+  }, [onOpenEspecie]);
 
   // Si un solo candidato exacto, abrir directo al presionar Enter.
   const onSubmit = useCallback(

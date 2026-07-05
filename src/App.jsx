@@ -154,6 +154,7 @@ const TopBar = lazy(() => import('./components/TopBar'));
 const DashboardLive = lazy(() => import('./components/dashboard/DashboardLive'));
 const AprenderConAgente = lazy(() => import('./components/Aprende/AprenderConAgente'));
 const DirectorioEspeciesScreen = lazy(() => import('./components/DirectorioEspecies/DirectorioEspeciesScreen'));
+const EspecieFichaScreen = lazy(() => import('./components/DirectorioEspecies/EspecieFichaScreen'));
 const HoyEnFincaScreen = lazy(() => import('./components/hoy/HoyEnFincaScreen'));
 const MiFincaEvolucionScreen = lazy(() => import('./components/hoy/MiFincaEvolucionScreen'));
 const MiFincaVivaScreen = lazy(() => import('./components/juego/MiFincaVivaScreen'));
@@ -265,8 +266,25 @@ const MODULE_VIEWS = new Set([
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'nutricion', 'toxicologia', 'aprende', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
-  'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
+  'usage_stats', 'mercado', 'auditoria_inventario', 'mundo', 'especie',
 ]);
+
+/**
+ * Ruta paramétrica de la Ficha de Especie: `#especie/<id>` (también `#especie-<id>`).
+ * Devuelve el id snake_case del catálogo o null. El hash ya viene minusculado y
+ * sin el prefijo `#/`; los ids del catálogo son lowercase snake_case, así que no
+ * se pierde información. Es la superficie de deep-link a la que apuntan el agente,
+ * el navegador del grafo y los cultivos (`window.location.hash = '#especie/<id>'`).
+ *
+ * @param {string} hash
+ * @returns {string | null}
+ */
+function parseEspecieHash(hash) {
+  const m = /^especie[/-](.+)$/.exec(hash || '');
+  if (!m) return null;
+  const id = m[1].replace(/^\/+/, '').trim();
+  return id || null;
+}
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
 // useAssetStore() (hook) dispara re-render cuando hydrate()/syncFromServer() actualizan
@@ -539,6 +557,13 @@ export default function App() {
         navigate('login');
         return;
       }
+      // Deep-link a la Ficha de Especie (#especie/<id>): ruta paramétrica que no
+      // vive en HASH_VIEW_ROUTES. Va ANTES del fallback a dashboard.
+      const bootEspecieId = parseEspecieHash(hash);
+      if (bootEspecieId) {
+        navigate('especie', { speciesId: bootEspecieId });
+        return;
+      }
       const targetView = HASH_VIEW_ROUTES[hash] || 'dashboard';
       // Gate de acceso: el módulo glaciar es solo para los beta testers de "La
       // Cordada". Si un usuario fuera de la whitelist aterriza en #glaciar,
@@ -560,6 +585,14 @@ export default function App() {
   useEffect(() => {
     const handleHashRoute = () => {
       const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
+      // Deep-link paramétrico a la Ficha de Especie (#especie/<id>).
+      const especieId = parseEspecieHash(hash);
+      if (especieId) {
+        isAuthenticated().then((isAuth) => {
+          if (isAuth) navigate('especie', { speciesId: especieId });
+        });
+        return;
+      }
       const routeView = HASH_VIEW_ROUTES[hash];
       if (!routeView) return;
       // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
@@ -1491,6 +1524,24 @@ export default function App() {
               <DirectorioEspeciesScreen
                 onBack={() => navigate('dashboard')}
                 initialQuery={currentViewData?.query || ''}
+                onOpenEspecie={(id) => navigate('especie', { speciesId: id })}
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'especie':
+        // Ficha de Especie REFERENCIADA (#2049): pantalla de detalle photo-forward
+        // de cualquier especie del catálogo, con la base offline enriquecida en
+        // vivo por el sidecar (toxicidad, saberes, variedades, suelo, cadenas).
+        // Se llega por #especie/<id> (deep-link del agente / navegador del grafo /
+        // cultivos) o desde el Directorio. Vuelve al Directorio.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Ficha de especie">
+              <EspecieFichaScreen
+                speciesId={currentViewData?.speciesId || ''}
+                onBack={() => navigate('directorio')}
+                onSelectSpecies={(id) => navigate('especie', { speciesId: id })}
               />
             </ErrorFallback>
           </ErrorBoundary>
