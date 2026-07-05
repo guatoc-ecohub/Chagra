@@ -136,6 +136,7 @@ async function main() {
     await page.goto('/', { waitUntil: 'domcontentloaded', timeout: 120_000 });
     await page.waitForFunction(
       () => document.querySelector('#root')?.children.length > 0,
+      undefined,
       { timeout: 180_000 },
     );
     // La app solo crea ChagraDB tras autenticar → sembrar el token (DB
@@ -166,10 +167,12 @@ async function main() {
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(
       () => document.querySelector('#root')?.children.length > 0,
+      undefined,
       { timeout: 180_000 },
     );
     await page.waitForFunction(
       async () => (await indexedDB.databases()).some((d) => d.name === 'ChagraDB'),
+      undefined,
       { timeout: 90_000 },
     );
     let seeded = false;
