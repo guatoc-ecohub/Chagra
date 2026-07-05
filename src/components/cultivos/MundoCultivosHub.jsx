@@ -41,6 +41,7 @@ export default function MundoCultivosHub({ onBack, onNavigate }) {
             titulo: 'Saber qué y cuándo sembrar',
             desc: 'El conocimiento antes de meter la semilla',
             items: [
+                { view: 'cultivos_insignia', emoji: '🌽', label: 'Los cultivos insignia', desc: 'Con fotos: dónde va, qué le pide al suelo, con qué se lleva y qué lo ataca' },
                 { view: 'directorio', emoji: '🌱', label: 'Qué puedo sembrar', desc: 'Especies para su clima, con qué se llevan y sus plagas' },
                 { view: 'calendario_finca', emoji: '🗓️', label: 'Calendario de la finca', desc: 'Cuándo sembrar, abonar y cosechar, todo junto' },
                 { view: 'ciclo', emoji: '🔄', label: 'Ciclo de cultivo', desc: 'La vida de la mata etapa por etapa (fenología)' },

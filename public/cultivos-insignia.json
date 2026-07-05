@@ -1,0 +1,1660 @@
+{
+  "_meta": {
+    "fuente": "Grafo de conocimiento chagra_kg (Apache AGE) — export determinista",
+    "generado": "2026-07-05",
+    "script": "scripts/export-cultivos-insignia.mjs",
+    "nota": "Datos GROUNDED en el grafo. Piso térmico: IDEAM/IGAC. N/P/K: Agrosavia/Fedearroz/FAO. Asocios y plagas: catálogo agroecológico Chagra. Cero invención de cifras.",
+    "cultivos": 12
+  },
+  "cultivos": [
+    {
+      "id": "zea_mays",
+      "nombre": "Maíz criollo",
+      "cientifico": "Zea mays L.",
+      "categoria": "cereales",
+      "familia": "Poaceae",
+      "habito": "alto",
+      "pisos": [
+        {
+          "id": "templado",
+          "altMin": 1000,
+          "altMax": 2000,
+          "temp": "18-24"
+        },
+        {
+          "id": "frio",
+          "altMin": 2000,
+          "altMax": 3000,
+          "temp": "12-18"
+        }
+      ],
+      "npk": {
+        "N": {
+          "nivel": "alta",
+          "nota": "cultivo de referencia de alta demanda de N, con extraccion creciente hasta floracion",
+          "fuente": "Agrosavia (guia tecnica maiz)"
+        },
+        "P": {
+          "nivel": "media",
+          "nota": "critico en el establecimiento inicial de raiz (primeras semanas); suelos frios/acidos limitan su disponibilidad",
+          "fuente": "Agrosavia"
+        },
+        "K": {
+          "nivel": "alta",
+          "nota": "K critico en el llenado de grano; la deficiencia se ve como necrosis marginal en hojas viejas",
+          "fuente": "Agrosavia (guia tecnica maiz)"
+        }
+      },
+      "asocia": [
+        {
+          "id": "amaranthus_caudatus",
+          "nombre": "Amaranto"
+        },
+        {
+          "id": "arracacia_xanthorrhiza",
+          "nombre": "Arracacha / Zanahoria blanca"
+        },
+        {
+          "id": "beta_vulgaris_cicla_blanca",
+          "nombre": "Acelga blanca"
+        },
+        {
+          "id": "borojoa_sorbilis",
+          "nombre": "Borojó del Chocó"
+        },
+        {
+          "id": "cajanus_cajan",
+          "nombre": "Gandul"
+        },
+        {
+          "id": "canavalia_ensiformis",
+          "nombre": "Canavalia"
+        },
+        {
+          "id": "chenopodium_quinoa",
+          "nombre": "Quinua"
+        },
+        {
+          "id": "citrullus_lanatus",
+          "nombre": "Patilla / Sandía"
+        },
+        {
+          "id": "crotalaria_juncea",
+          "nombre": "Sunn hemp"
+        },
+        {
+          "id": "cucumis_sativus",
+          "nombre": "Pepino cohombro"
+        },
+        {
+          "id": "cucurbita_maxima",
+          "nombre": "Calabaza / Auyama"
+        },
+        {
+          "id": "cucurbita_moschata",
+          "nombre": "Ahuyama Amarilla"
+        }
+      ],
+      "incompat": [
+        {
+          "id": "foeniculum_vulgare",
+          "nombre": "Hinojo"
+        }
+      ],
+      "plagas": [
+        {
+          "id": "fusarium_verticillioides",
+          "nombre": "Pudrición de la mazorca del maíz por Fusarium",
+          "tipo": "hongo",
+          "controles": [
+            {
+              "nombre": "Hongo antagonista (trichoderma)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Bacillus thuringiensis (BT) — bioinsecticida lepidópteros",
+              "tipo": "Biopreparado"
+            },
+            {
+              "nombre": "Trichoderma harzianum (aplicación al suelo)",
+              "tipo": "Biopreparado"
+            },
+            {
+              "nombre": "Trichogramma spp. — parasitoide de huevos de lepidópteros",
+              "tipo": "Biopreparado"
+            }
+          ]
+        },
+        {
+          "id": "spodoptera_frugiperda",
+          "nombre": "Gusano cogollero del maíz (y otras hortalizas)",
+          "tipo": "insecto_lepidoptero",
+          "controles": [
+            {
+              "nombre": "Avispita parasitoide de huevos",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Bt (bacteria bioinsecticida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Chinche depredador (podisus)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Crisopa neotropical",
+              "tipo": "BeneficialOrganism"
+            }
+          ]
+        }
+      ],
+      "emoji": "🌽",
+      "fotoSlug": "maiz",
+      "asocia_total": 35
+    },
+    {
+      "id": "phaseolus_vulgaris",
+      "nombre": "Frijol arbustivo / voluble",
+      "cientifico": "Phaseolus vulgaris L.",
+      "categoria": "granos_legumbres",
+      "familia": "Fabaceae",
+      "habito": "medio",
+      "pisos": [
+        {
+          "id": "templado",
+          "altMin": 1000,
+          "altMax": 2000,
+          "temp": "18-24"
+        },
+        {
+          "id": "frio",
+          "altMin": 2000,
+          "altMax": 3000,
+          "temp": "12-18"
+        }
+      ],
+      "npk": {
+        "N": {
+          "nivel": "baja",
+          "nota": "fijacion simbiotica via Rhizobium; no requiere aporte externo alto de N, riesgo de exceso vegetativo si se abona con N",
+          "fuente": "FAO (Fertilizer and Plant Nutrition); grafo propio FIXES_NITROGEN"
+        },
+        "P": {
+          "nivel": "media",
+          "nota": "P critico para nodulacion y fijacion simbiotica de N",
+          "fuente": "Agrosavia"
+        },
+        "K": {
+          "nivel": "media",
+          "nota": "apoya llenado de vaina",
+          "fuente": "Agrosavia"
+        }
+      },
+      "asocia": [
+        {
+          "id": "amaranthus_caudatus",
+          "nombre": "Amaranto"
+        },
+        {
+          "id": "beta_vulgaris_cicla_blanca",
+          "nombre": "Acelga blanca"
+        },
+        {
+          "id": "canna_edulis",
+          "nombre": "Achira / SagU"
+        },
+        {
+          "id": "capsicum_annuum",
+          "nombre": "Pimentón"
+        },
+        {
+          "id": "cucumis_sativus",
+          "nombre": "Pepino cohombro"
+        },
+        {
+          "id": "cucurbita_maxima",
+          "nombre": "Calabaza / Auyama"
+        },
+        {
+          "id": "cucurbita_moschata",
+          "nombre": "Ahuyama Amarilla"
+        },
+        {
+          "id": "cucurbita_pepo",
+          "nombre": "Calabacín / Zucchini"
+        },
+        {
+          "id": "helianthus_annuus",
+          "nombre": "Girasol"
+        },
+        {
+          "id": "ipomoea_batatas",
+          "nombre": "Batata / Camote"
+        },
+        {
+          "id": "ipomoea_batatas_blanca",
+          "nombre": "Batata blanca"
+        },
+        {
+          "id": "ipomoea_batatas_morada",
+          "nombre": "Batata morada"
+        }
+      ],
+      "incompat": [
+        {
+          "id": "allium_ampeloprasum",
+          "nombre": "Cebolla puerro"
+        },
+        {
+          "id": "allium_cepa",
+          "nombre": "Cebolla cabezona"
+        },
+        {
+          "id": "allium_fistulosum",
+          "nombre": "Cebollín / Cebolla larga"
+        },
+        {
+          "id": "allium_sativum",
+          "nombre": "Ajo"
+        },
+        {
+          "id": "allium_schoenoprasum",
+          "nombre": "Cebollino"
+        },
+        {
+          "id": "foeniculum_vulgare",
+          "nombre": "Hinojo"
+        }
+      ],
+      "plagas": [
+        {
+          "id": "bean_common_mosaic_virus_bcmv",
+          "nombre": "Mosaico común del fríjol",
+          "tipo": "virus",
+          "controles": [
+            {
+              "nombre": "caldo M5 de Restrepo (bioinsecticida-bioestimulante)",
+              "tipo": "Biopreparado"
+            },
+            {
+              "nombre": "Extracto de neem (Azadirachta indica)",
+              "tipo": "Biopreparado"
+            }
+          ]
+        },
+        {
+          "id": "bemisia_tabaci_canonical",
+          "nombre": "Mosca blanca (complejo)",
+          "tipo": "insecto_hemiptero",
+          "controles": [
+            {
+              "nombre": "Encarsia formosa (avispa parasitoide mosca blanca)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Ácaro depredador (amblyseius)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Crisopa / león de áfidos",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Crisopa neotropical",
+              "tipo": "BeneficialOrganism"
+            }
+          ]
+        },
+        {
+          "id": "colletotrichum_lindemuthianum",
+          "nombre": "Antracnosis del fríjol",
+          "tipo": "hongo",
+          "controles": [
+            {
+              "nombre": "Bacteria antagonista (biofungicida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo antagonista del suelo",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo antagonista (trichoderma)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Bacillus subtilis (aplicación foliar)",
+              "tipo": "Biopreparado"
+            }
+          ]
+        },
+        {
+          "id": "pseudocercospora_griseola",
+          "nombre": "Mancha angular del fríjol",
+          "tipo": "hongo",
+          "controles": [
+            {
+              "nombre": "Bacteria antagonista (biofungicida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo antagonista del suelo",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Bacillus subtilis (aplicación foliar)",
+              "tipo": "Biopreparado"
+            },
+            {
+              "nombre": "Caldo bordelés",
+              "tipo": "Biopreparado"
+            }
+          ]
+        }
+      ],
+      "emoji": "🫘",
+      "fotoSlug": "frijol",
+      "asocia_total": 18
+    },
+    {
+      "id": "cucurbita_moschata",
+      "nombre": "Ahuyama Amarilla",
+      "cientifico": "Cucurbita moschata Duchesne",
+      "categoria": "granos_legumbres",
+      "familia": "Cucurbitaceae",
+      "habito": null,
+      "pisos": [
+        {
+          "id": "templado",
+          "altMin": 1000,
+          "altMax": 2000,
+          "temp": "18-24"
+        },
+        {
+          "id": "calido",
+          "altMin": 0,
+          "altMax": 1000,
+          "temp": ">24"
+        }
+      ],
+      "npk": {},
+      "asocia": [
+        {
+          "id": "manihot_esculenta",
+          "nombre": "Yuca brava amazónica"
+        },
+        {
+          "id": "phaseolus_vulgaris",
+          "nombre": "Frijol arbustivo / voluble"
+        },
+        {
+          "id": "solanum_tuberosum_sabanera",
+          "nombre": "Papa Sabanera"
+        },
+        {
+          "id": "zea_mays",
+          "nombre": "Maíz criollo"
+        }
+      ],
+      "incompat": [],
+      "plagas": [
+        {
+          "id": "bemisia_tabaci_canonical",
+          "nombre": "Mosca blanca (complejo)",
+          "tipo": "insecto_hemiptero",
+          "controles": [
+            {
+              "nombre": "Encarsia formosa (avispa parasitoide mosca blanca)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Ácaro depredador (amblyseius)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Crisopa / león de áfidos",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Crisopa neotropical",
+              "tipo": "BeneficialOrganism"
+            }
+          ]
+        },
+        {
+          "id": "diaphania_spp",
+          "nombre": "Gusano perforador de cucurbitaceas",
+          "tipo": null,
+          "controles": [
+            {
+              "nombre": "Avispita parasitoide de huevos",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Bt (bacteria bioinsecticida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Beauveria bassiana (hongo entomopatógeno)",
+              "tipo": "Biopreparado"
+            }
+          ]
+        },
+        {
+          "id": "podosphaera_xanthii",
+          "nombre": "Mildeo polvoso de las cucurbitáceas",
+          "tipo": "hongo",
+          "controles": [
+            {
+              "nombre": "Ampelomyces quisqualis (hiperparásito de oídio)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Bacteria antagonista (biofungicida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Azufre mojable foliar (anti-ácaros y oídio)",
+              "tipo": "Biopreparado"
+            },
+            {
+              "nombre": "Bacillus subtilis (aplicación foliar)",
+              "tipo": "Biopreparado"
+            }
+          ]
+        }
+      ],
+      "emoji": "🎃",
+      "fotoSlug": "ahuyama",
+      "asocia_total": 4
+    },
+    {
+      "id": "solanum_tuberosum",
+      "nombre": "Papa parda pastusa",
+      "cientifico": "Solanum tuberosum L. subsp. andigenum var. parda pastusa",
+      "categoria": null,
+      "familia": "Solanaceae",
+      "habito": null,
+      "pisos": [
+        {
+          "id": "frio",
+          "altMin": 2000,
+          "altMax": 3000,
+          "temp": "12-18"
+        },
+        {
+          "id": "paramo",
+          "altMin": 3000,
+          "altMax": 9999,
+          "temp": "<12"
+        }
+      ],
+      "npk": {
+        "N": {
+          "nivel": "media",
+          "nota": "demanda moderada-alta en fase vegetativa y tuberizacion inicial; exceso de N retrasa la tuberizacion y favorece follaje sobre tuberculo",
+          "fuente": "Agrosavia (guias de fertilizacion de papa)"
+        },
+        "P": {
+          "nivel": "media",
+          "nota": "importante en el establecimiento de raiz y estolones; suelos andinos acidos suelen fijar P, se requiere buen arranque temprano",
+          "fuente": "Agrosavia"
+        },
+        "K": {
+          "nivel": "alta",
+          "nota": "K es el nutriente mas extraido en la formacion de tuberculos; cultivo de referencia de alta demanda de potasio en Colombia",
+          "fuente": "Agrosavia (guias de fertilizacion de papa)"
+        }
+      },
+      "asocia": [
+        {
+          "id": "lupinus_mutabilis",
+          "nombre": "Chocho / Tarwi"
+        },
+        {
+          "id": "pisum_sativum_andina",
+          "nombre": "Arveja andina"
+        },
+        {
+          "id": "tropaeolum_tuberosum",
+          "nombre": "Mashua / Cubio"
+        },
+        {
+          "id": "tropaeolum_tuberosum_mashua",
+          "nombre": "Mashua (subsp. silvestre)"
+        }
+      ],
+      "incompat": [],
+      "plagas": [
+        {
+          "id": "phytophthora_infestans",
+          "nombre": "Tizon tardio / gota (papa y tomate)",
+          "tipo": "oomiceto",
+          "controles": [
+            {
+              "nombre": "Bacteria antagonista (biofungicida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo antagonista del suelo",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo antagonista (trichoderma)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Caldo bordelés",
+              "tipo": "Biopreparado"
+            }
+          ]
+        },
+        {
+          "id": "ralstonia_solanacearum",
+          "nombre": "Marchitez bacteriana o dormidera de la papa",
+          "tipo": "bacteria",
+          "controles": [
+            {
+              "nombre": "Microorganismo de control biológico (DR-MIP-1)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Bacillus subtilis (aplicación foliar)",
+              "tipo": "Biopreparado"
+            },
+            {
+              "nombre": "Pimentón",
+              "tipo": "Species"
+            },
+            {
+              "nombre": "Plátano",
+              "tipo": "Species"
+            }
+          ]
+        },
+        {
+          "id": "rhizoctonia_solani",
+          "nombre": "Tizón de la vaina del arroz",
+          "tipo": "hongo",
+          "controles": [
+            {
+              "nombre": "Trichoderma koningiopsis (cepa Th003 Agrosavia)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Bacteria antagonista (biofungicida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo antagonista del suelo",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo antagonista (trichoderma)",
+              "tipo": "BeneficialOrganism"
+            }
+          ]
+        },
+        {
+          "id": "tecia_solanivora",
+          "nombre": "Polilla guatemalteca de la papa",
+          "tipo": "insecto",
+          "controles": [
+            {
+              "nombre": "Bt (bacteria bioinsecticida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Microorganismo de control biológico (DR-MIP-1)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Parasitoide de control biológico",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Bacillus thuringiensis (BT) — bioinsecticida lepidópteros",
+              "tipo": "Biopreparado"
+            }
+          ]
+        }
+      ],
+      "emoji": "🥔",
+      "fotoSlug": "papa",
+      "asocia_total": 4
+    },
+    {
+      "id": "coffea_arabica",
+      "nombre": "Café caturra / Castillo / Cenicafé 1",
+      "cientifico": "Coffea arabica L.",
+      "categoria": "medicinales_alelopaticas",
+      "familia": "Rubiaceae",
+      "habito": "medio",
+      "pisos": [
+        {
+          "id": "templado",
+          "altMin": 1000,
+          "altMax": 2000,
+          "temp": "18-24"
+        }
+      ],
+      "npk": {
+        "N": {
+          "nivel": "alta",
+          "nota": "alta demanda de N para crecimiento vegetativo y sostenimiento de la produccion; se fracciona en varias aplicaciones al año",
+          "fuente": "Cenicafe"
+        },
+        "K": {
+          "nivel": "alta",
+          "nota": "K es el nutriente mas extraido en la formacion y llenado del grano de cafe",
+          "fuente": "Cenicafe (guias de fertilizacion cafetera)"
+        },
+        "Mg": {
+          "nivel": "media",
+          "nota": "deficiencia de magnesio frecuente en cafetales de suelos acidos con desbalance K/Mg; clorosis intervenal caracteristica",
+          "fuente": "Cenicafe"
+        }
+      },
+      "asocia": [
+        {
+          "id": "albizia_guachapele",
+          "nombre": "Iguá hoja menuda"
+        },
+        {
+          "id": "alnus_acuminata",
+          "nombre": "Aliso andino"
+        },
+        {
+          "id": "aniba_perutilis",
+          "nombre": "Aniba comino"
+        },
+        {
+          "id": "arachis_pintoi",
+          "nombre": "Maní forrajero"
+        },
+        {
+          "id": "byrsonima_crassifolia",
+          "nombre": "Peralejo"
+        },
+        {
+          "id": "cajanus_cajan",
+          "nombre": "Gandul"
+        },
+        {
+          "id": "cassia_grandis",
+          "nombre": "Cañafístula"
+        },
+        {
+          "id": "cedrela_montana",
+          "nombre": "Cedro de montaña"
+        },
+        {
+          "id": "cedrela_odorata",
+          "nombre": "Cedro real"
+        },
+        {
+          "id": "ceiba_pentandra",
+          "nombre": "Ceiba algodón"
+        },
+        {
+          "id": "cinchona_officinalis",
+          "nombre": "Quina amarilla"
+        },
+        {
+          "id": "cinchona_pubescens",
+          "nombre": "Quina roja"
+        }
+      ],
+      "incompat": [
+        {
+          "id": "foeniculum_vulgare",
+          "nombre": "Hinojo"
+        }
+      ],
+      "plagas": [
+        {
+          "id": "hemileia_vastatrix",
+          "nombre": "Roya del café",
+          "tipo": "hongo_basidiomiceto",
+          "controles": [
+            {
+              "nombre": "Bacteria antagonista (biofungicida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo antagonista del suelo",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo entomopatógeno (verticillium)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Caldo bordelés",
+              "tipo": "Biopreparado"
+            }
+          ]
+        },
+        {
+          "id": "hypothenemus_hampei",
+          "nombre": "Broca del café",
+          "tipo": "insecto_coleoptero",
+          "controles": [
+            {
+              "nombre": "Avispa parasitoide de la broca",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo entomopatógeno (beauveria)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo verde entomopatógeno",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Parasitoide de control biológico",
+              "tipo": "BeneficialOrganism"
+            }
+          ]
+        },
+        {
+          "id": "mycena_citricolor",
+          "nombre": "Ojo de gallo del café",
+          "tipo": "hongo",
+          "controles": [
+            {
+              "nombre": "Bacteria antagonista (biofungicida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo antagonista del suelo",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Café caturra / Castillo / Cenicafé 1",
+              "tipo": "Species"
+            }
+          ]
+        }
+      ],
+      "emoji": "☕",
+      "fotoSlug": "cafe",
+      "asocia_total": 38
+    },
+    {
+      "id": "persea_americana",
+      "nombre": "Aguacate",
+      "cientifico": "Persea americana Mill.",
+      "categoria": "frutales_perennes",
+      "familia": "Lauraceae",
+      "habito": null,
+      "pisos": [
+        {
+          "id": "templado",
+          "altMin": 1000,
+          "altMax": 2000,
+          "temp": "18-24"
+        },
+        {
+          "id": "calido",
+          "altMin": 0,
+          "altMax": 1000,
+          "temp": ">24"
+        }
+      ],
+      "npk": {
+        "N": {
+          "nivel": "media",
+          "nota": "moderar el N vegetativo excesivo, que compite con la fructificacion",
+          "fuente": "Agrosavia"
+        },
+        "K": {
+          "nivel": "alta",
+          "nota": "K critico para el desarrollo y llenado de fruto",
+          "fuente": "Agrosavia"
+        },
+        "Ca": {
+          "nivel": "media",
+          "nota": "deficiencia asociada a desordenes fisiologicos del fruto y debilidad radicular",
+          "fuente": "Agrosavia"
+        }
+      },
+      "asocia": [
+        {
+          "id": "arachis_pintoi",
+          "nombre": "Maní forrajero"
+        },
+        {
+          "id": "melicoccus_bijugatus",
+          "nombre": "Mamón"
+        },
+        {
+          "id": "spondias_dulcis",
+          "nombre": "Jobo cajá"
+        }
+      ],
+      "incompat": [
+        {
+          "id": "eucalyptus_globulus",
+          "nombre": "Eucalipto blanco"
+        }
+      ],
+      "plagas": [
+        {
+          "id": "colletotrichum_gloeosporioides",
+          "nombre": "Antracnosis de frutales",
+          "tipo": null,
+          "controles": [
+            {
+              "nombre": "Trichoderma koningiopsis (cepa Th003 Agrosavia)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Bacteria antagonista (biofungicida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo antagonista del suelo",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Microorganismo de control biológico (DR-MIP-1)",
+              "tipo": "BeneficialOrganism"
+            }
+          ]
+        },
+        {
+          "id": "heilipus_lauri",
+          "nombre": "Mosca del aguacate",
+          "tipo": "insecto_coleoptero",
+          "controles": [
+            {
+              "nombre": "Hongo entomopatógeno (beauveria)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Beauveria bassiana (hongo entomopatógeno)",
+              "tipo": "Biopreparado"
+            },
+            {
+              "nombre": "Metarhizium anisopliae (hongo entomopatógeno verde)",
+              "tipo": "Biopreparado"
+            },
+            {
+              "nombre": "Aguacate",
+              "tipo": "Species"
+            }
+          ]
+        },
+        {
+          "id": "phytophthora_cinnamomi",
+          "nombre": "Pudrición radicular del aguacate",
+          "tipo": null,
+          "controles": [
+            {
+              "nombre": "Bacillus amyloliquefaciens",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Bacteria antagonista (biofungicida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo antagonista del suelo",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo antagonista (trichoderma)",
+              "tipo": "BeneficialOrganism"
+            }
+          ]
+        },
+        {
+          "id": "stenoma_catenifer",
+          "nombre": "Barrenador del fruto del aguacate",
+          "tipo": null,
+          "controles": [
+            {
+              "nombre": "Avispita parasitoide de huevos",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Bt (bacteria bioinsecticida)",
+              "tipo": "BeneficialOrganism"
+            }
+          ]
+        }
+      ],
+      "emoji": "🥑",
+      "fotoSlug": "aguacate",
+      "asocia_total": 3
+    },
+    {
+      "id": "solanum_lycopersicum",
+      "nombre": "Tomate chonto",
+      "cientifico": "Solanum lycopersicum L.",
+      "categoria": null,
+      "familia": "Solanaceae",
+      "habito": null,
+      "pisos": [
+        {
+          "id": "templado",
+          "altMin": 1000,
+          "altMax": 2000,
+          "temp": "18-24"
+        },
+        {
+          "id": "calido",
+          "altMin": 0,
+          "altMax": 1000,
+          "temp": ">24"
+        }
+      ],
+      "npk": {
+        "N": {
+          "nivel": "media",
+          "nota": "exceso de N retrasa la fructificacion y favorece follaje excesivo sobre fruto",
+          "fuente": "Agrosavia"
+        },
+        "K": {
+          "nivel": "alta",
+          "nota": "K es el nutriente mas extraido en cuajado y llenado de fruto",
+          "fuente": "Agrosavia (guias de fertilizacion de tomate)"
+        },
+        "Ca": {
+          "nivel": "alta",
+          "nota": "deficiencia de calcio causa pudricion apical (culo negro); riego irregular agrava el problema aunque el suelo tenga Ca suficiente",
+          "fuente": "Agrosavia"
+        }
+      },
+      "asocia": [
+        {
+          "id": "petroselinum_crispum",
+          "nombre": "Perejil crespo"
+        }
+      ],
+      "incompat": [
+        {
+          "id": "annona_cherimola",
+          "nombre": "Chirimoya"
+        },
+        {
+          "id": "capsicum_annuum",
+          "nombre": "Pimentón"
+        },
+        {
+          "id": "cucumis_melo",
+          "nombre": "Melón"
+        },
+        {
+          "id": "fragaria_ananassa_monterrey",
+          "nombre": "Fresa Monterrey"
+        }
+      ],
+      "plagas": [
+        {
+          "id": "bemisia_tabaci_canonical",
+          "nombre": "Mosca blanca (complejo)",
+          "tipo": "insecto_hemiptero",
+          "controles": [
+            {
+              "nombre": "Encarsia formosa (avispa parasitoide mosca blanca)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Ácaro depredador (amblyseius)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Crisopa / león de áfidos",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Crisopa neotropical",
+              "tipo": "BeneficialOrganism"
+            }
+          ]
+        },
+        {
+          "id": "fusarium_oxysporum_fsp_lycopersici",
+          "nombre": "Marchitez vascular del tomate (Fusarium f.sp. lycopersici)",
+          "tipo": null,
+          "controles": [
+            {
+              "nombre": "Bacteria antagonista (biofungicida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo antagonista del suelo",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Tomate chonto",
+              "tipo": "Species"
+            }
+          ]
+        },
+        {
+          "id": "phytophthora_infestans",
+          "nombre": "Tizon tardio / gota (papa y tomate)",
+          "tipo": "oomiceto",
+          "controles": [
+            {
+              "nombre": "Bacteria antagonista (biofungicida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo antagonista del suelo",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo antagonista (trichoderma)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Caldo bordelés",
+              "tipo": "Biopreparado"
+            }
+          ]
+        },
+        {
+          "id": "tuta_absoluta",
+          "nombre": "Polilla del tomate",
+          "tipo": "insecto_lepidoptero",
+          "controles": [
+            {
+              "nombre": "Avispita parasitoide de huevos",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Bt (bacteria bioinsecticida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Chinche depredador (podisus)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Depredador de control biológico",
+              "tipo": "BeneficialOrganism"
+            }
+          ]
+        }
+      ],
+      "emoji": "🍅",
+      "fotoSlug": "tomate",
+      "asocia_total": 1
+    },
+    {
+      "id": "musa_paradisiaca",
+      "nombre": "Plátano",
+      "cientifico": "Musa × paradisiaca L.",
+      "categoria": "frutales_perennes",
+      "familia": "Musaceae",
+      "habito": null,
+      "pisos": [
+        {
+          "id": "templado",
+          "altMin": 1000,
+          "altMax": 2000,
+          "temp": "18-24"
+        },
+        {
+          "id": "calido",
+          "altMin": 0,
+          "altMax": 1000,
+          "temp": ">24"
+        }
+      ],
+      "npk": {
+        "N": {
+          "nivel": "alta",
+          "nota": "alta demanda de N para sostenimiento de la produccion continua (varios ciclos de cosecha al año)",
+          "fuente": "Agrosavia"
+        },
+        "K": {
+          "nivel": "alta",
+          "nota": "el platano/banano esta entre los cultivos de mayor extraccion de potasio por tonelada de fruta cosechada",
+          "fuente": "Agrosavia"
+        }
+      },
+      "asocia": [
+        {
+          "id": "alocasia_macrorrhizos",
+          "nombre": "Bore"
+        },
+        {
+          "id": "borojoa_sorbilis",
+          "nombre": "Borojó del Chocó"
+        },
+        {
+          "id": "cajanus_cajan",
+          "nombre": "Gandul"
+        },
+        {
+          "id": "canna_edulis",
+          "nombre": "Achira / SagU"
+        },
+        {
+          "id": "coffea_arabica",
+          "nombre": "Café caturra / Castillo / Cenicafé 1"
+        },
+        {
+          "id": "costus_spicatus",
+          "nombre": "Cana agria"
+        },
+        {
+          "id": "curcuma_longa",
+          "nombre": "Curcuma"
+        },
+        {
+          "id": "eryngium_foetidum",
+          "nombre": "Cilantro cimarron"
+        },
+        {
+          "id": "mammea_americana",
+          "nombre": "Mamey amarillo"
+        },
+        {
+          "id": "manihot_esculenta",
+          "nombre": "Yuca brava amazónica"
+        },
+        {
+          "id": "melicoccus_bijugatus",
+          "nombre": "Mamón"
+        },
+        {
+          "id": "myrciaria_dubia",
+          "nombre": "Camu camu"
+        }
+      ],
+      "incompat": [],
+      "plagas": [
+        {
+          "id": "cosmopolites_sordidus",
+          "nombre": "Picudo negro del plátano y banano",
+          "tipo": "insecto_coleoptero",
+          "controles": [
+            {
+              "nombre": "Hongo entomopatógeno (beauveria)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo verde entomopatógeno",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Microorganismo de control biológico (DR-MIP-1)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Beauveria bassiana (hongo entomopatógeno)",
+              "tipo": "Biopreparado"
+            }
+          ]
+        },
+        {
+          "id": "fusarium_oxysporum_fsp_cubense",
+          "nombre": "Mal de Panamá (Fusarium f.sp. cubense)",
+          "tipo": null,
+          "controles": [
+            {
+              "nombre": "Bacteria antagonista (biofungicida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo antagonista del suelo",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Banano Cavendish",
+              "tipo": "Species"
+            }
+          ]
+        },
+        {
+          "id": "mycosphaerella_fijiensis",
+          "nombre": "Sigatoka negra",
+          "tipo": "hongo_ascomiceto",
+          "controles": [
+            {
+              "nombre": "Bacteria antagonista (biofungicida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo antagonista del suelo",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Caldo sulfocálcico",
+              "tipo": "Biopreparado"
+            },
+            {
+              "nombre": "Trichoderma harzianum (aplicación al suelo)",
+              "tipo": "Biopreparado"
+            }
+          ]
+        },
+        {
+          "id": "ralstonia_solanacearum_raza_2",
+          "nombre": "Moko del plátano y banano",
+          "tipo": null,
+          "controles": [
+            {
+              "nombre": "Microorganismo de control biológico (DR-MIP-1)",
+              "tipo": "BeneficialOrganism"
+            }
+          ]
+        }
+      ],
+      "emoji": "🍌",
+      "fotoSlug": "platano",
+      "asocia_total": 24
+    },
+    {
+      "id": "theobroma_cacao",
+      "nombre": "Cacao",
+      "cientifico": "Theobroma cacao L.",
+      "categoria": "frutales_perennes",
+      "familia": "Malvaceae",
+      "habito": "alto",
+      "pisos": [
+        {
+          "id": "calido",
+          "altMin": 0,
+          "altMax": 1000,
+          "temp": ">24"
+        }
+      ],
+      "npk": {
+        "K": {
+          "nivel": "alta",
+          "nota": "alta demanda de potasio en el desarrollo de la mazorca",
+          "fuente": "Fedecacao/Agrosavia"
+        },
+        "Mg": {
+          "nivel": "media",
+          "nota": "requerimiento notable de magnesio, comun en suelos acidos de ladera cacaotera",
+          "fuente": "Fedecacao"
+        }
+      },
+      "asocia": [
+        {
+          "id": "borojoa_sorbilis",
+          "nombre": "Borojó del Chocó"
+        },
+        {
+          "id": "erythrina_poeppigiana",
+          "nombre": "cámbulo"
+        },
+        {
+          "id": "eugenia_stipitata",
+          "nombre": "Arazá"
+        },
+        {
+          "id": "gliricidia_sepium",
+          "nombre": "Matarratón"
+        },
+        {
+          "id": "musa_paradisiaca",
+          "nombre": "Plátano"
+        },
+        {
+          "id": "vanilla_planifolia",
+          "nombre": "Vainilla"
+        }
+      ],
+      "incompat": [],
+      "plagas": [
+        {
+          "id": "moniliophthora_perniciosa",
+          "nombre": "escoba de bruja cacao",
+          "tipo": null,
+          "controles": [
+            {
+              "nombre": "Bacteria antagonista (biofungicida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Microorganismo de control biológico (DR-MIP-1)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Poda fitosanitaria en época seca (cacao)",
+              "tipo": "Tecnica"
+            },
+            {
+              "nombre": "SAF de cacao (sistema agroforestal)",
+              "tipo": "Tecnica"
+            }
+          ]
+        },
+        {
+          "id": "moniliophthora_roreri",
+          "nombre": "moniliasis del cacao",
+          "tipo": "hongo_basidiomiceto",
+          "controles": [
+            {
+              "nombre": "Bacillus amyloliquefaciens",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Bacteria antagonista (biofungicida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo antagonista del suelo",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo antagonista (trichoderma)",
+              "tipo": "BeneficialOrganism"
+            }
+          ]
+        },
+        {
+          "id": "phytophthora_palmivora",
+          "nombre": "Pudrición del cogollo de la palma de aceite",
+          "tipo": null,
+          "controles": [
+            {
+              "nombre": "Bacteria antagonista (biofungicida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo antagonista del suelo",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Drenaje + poda de aireación (cacao)",
+              "tipo": "Tecnica"
+            }
+          ]
+        }
+      ],
+      "emoji": "🍫",
+      "fotoSlug": "cacao",
+      "asocia_total": 6
+    },
+    {
+      "id": "saccharum_officinarum",
+      "nombre": "Caña panelera",
+      "cientifico": "Saccharum officinarum L.",
+      "categoria": null,
+      "familia": "Poaceae",
+      "habito": null,
+      "pisos": [
+        {
+          "id": "templado",
+          "altMin": 1000,
+          "altMax": 2000,
+          "temp": "18-24"
+        },
+        {
+          "id": "calido",
+          "altMin": 0,
+          "altMax": 1000,
+          "temp": ">24"
+        }
+      ],
+      "npk": {
+        "N": {
+          "nivel": "alta",
+          "nota": "alta demanda de N para crecimiento vegetativo del tallo, fraccionada durante el macollamiento",
+          "fuente": "Agrosavia"
+        },
+        "K": {
+          "nivel": "alta",
+          "nota": "alta demanda de potasio, asociada a la acumulacion de sacarosa en el tallo",
+          "fuente": "Agrosavia"
+        }
+      },
+      "asocia": [],
+      "incompat": [],
+      "plagas": [
+        {
+          "id": "barrenador_de_la_cana_diatraea_saccharalis",
+          "nombre": "Barrenador del tallo de la caña (y otras gramíneas)",
+          "tipo": "insecto",
+          "controles": [
+            {
+              "nombre": "Avispa parasitoide del barrenador",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Avispita parasitoide de huevos",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Bt (bacteria bioinsecticida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo entomopatógeno (beauveria)",
+              "tipo": "BeneficialOrganism"
+            }
+          ]
+        },
+        {
+          "id": "diatraea_indigenella",
+          "nombre": "Barrenador del tallo de la cana",
+          "tipo": null,
+          "controles": [
+            {
+              "nombre": "Avispa parasitoide del barrenador",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Avispita parasitoide de huevos",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Parasitoide de control biológico",
+              "tipo": "BeneficialOrganism"
+            }
+          ]
+        },
+        {
+          "id": "puccinia_melanocephala",
+          "nombre": "Roya de la caña de azúcar",
+          "tipo": null,
+          "controles": [
+            {
+              "nombre": "Bacteria antagonista (biofungicida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo entomopatógeno (verticillium)",
+              "tipo": "BeneficialOrganism"
+            }
+          ]
+        },
+        {
+          "id": "ustilago_scitaminea",
+          "nombre": "Carbón de la caña (sin. Sporisorium scitamineum)",
+          "tipo": null,
+          "controles": []
+        }
+      ],
+      "emoji": "🎋",
+      "fotoSlug": "cana",
+      "asocia_total": 0
+    },
+    {
+      "id": "allium_cepa",
+      "nombre": "Cebolla cabezona",
+      "cientifico": "Allium cepa L.",
+      "categoria": "tuberculos_raices",
+      "familia": "Amaryllidaceae",
+      "habito": null,
+      "pisos": [
+        {
+          "id": "templado",
+          "altMin": 1000,
+          "altMax": 2000,
+          "temp": "18-24"
+        },
+        {
+          "id": "frio",
+          "altMin": 2000,
+          "altMax": 3000,
+          "temp": "12-18"
+        }
+      ],
+      "npk": {
+        "N": {
+          "nivel": "media",
+          "nota": "demanda moderada, mayor en la fase de crecimiento foliar antes de la bulbificacion",
+          "fuente": "Agrosavia"
+        },
+        "K": {
+          "nivel": "media",
+          "nota": "apoya la formacion y calidad del bulbo",
+          "fuente": "Agrosavia"
+        },
+        "S": {
+          "nivel": "alta",
+          "nota": "el azufre es clave en la sintesis de compuestos organosulfurados responsables del sabor/aroma picante de la cebolla",
+          "fuente": "Agrosavia"
+        }
+      },
+      "asocia": [
+        {
+          "id": "beta_vulgaris_cicla_blanca",
+          "nombre": "Acelga blanca"
+        },
+        {
+          "id": "daucus_carota_subsp_sativus",
+          "nombre": "Zanahoria"
+        },
+        {
+          "id": "matricaria_chamomilla",
+          "nombre": "Manzanilla"
+        },
+        {
+          "id": "petroselinum_crispum",
+          "nombre": "Perejil crespo"
+        },
+        {
+          "id": "solanum_tuberosum_sabanera",
+          "nombre": "Papa Sabanera"
+        }
+      ],
+      "incompat": [
+        {
+          "id": "phaseolus_vulgaris",
+          "nombre": "Frijol arbustivo / voluble"
+        }
+      ],
+      "plagas": [
+        {
+          "id": "liriomyza_huidobrensis",
+          "nombre": "Minador de la hoja (mosca minadora)",
+          "tipo": null,
+          "controles": [
+            {
+              "nombre": "Parasitoide de control biológico",
+              "tipo": "BeneficialOrganism"
+            }
+          ]
+        },
+        {
+          "id": "peronospora_destructor",
+          "nombre": "Mildiu velloso de la cebolla",
+          "tipo": "oomiceto",
+          "controles": [
+            {
+              "nombre": "Bacteria antagonista (biofungicida)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Cebolla cabezona",
+              "tipo": "Species"
+            }
+          ]
+        },
+        {
+          "id": "thrips_tabaci",
+          "nombre": "Trips de la cebolla",
+          "tipo": null,
+          "controles": [
+            {
+              "nombre": "Chinche pirata (orius)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Depredador de control biológico",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo entomopatógeno (beauveria)",
+              "tipo": "BeneficialOrganism"
+            },
+            {
+              "nombre": "Hongo verde entomopatógeno",
+              "tipo": "BeneficialOrganism"
+            }
+          ]
+        }
+      ],
+      "emoji": "🧅",
+      "fotoSlug": "cebolla",
+      "asocia_total": 5
+    },
+    {
+      "id": "daucus_carota_subsp_sativus",
+      "nombre": "Zanahoria",
+      "cientifico": "Daucus carota L. subsp. sativus (Hoffm.) Arcang.",
+      "categoria": "tuberculos_raices",
+      "familia": "Apiaceae",
+      "habito": null,
+      "pisos": [
+        {
+          "id": "templado",
+          "altMin": 1000,
+          "altMax": 2000,
+          "temp": "18-24"
+        },
+        {
+          "id": "frio",
+          "altMin": 2000,
+          "altMax": 3000,
+          "temp": "12-18"
+        }
+      ],
+      "npk": {
+        "N": {
+          "nivel": "baja",
+          "nota": "exceso de N favorece follaje sobre desarrollo de raiz; moderar dosis",
+          "fuente": "AGROSAVIA / FAO"
+        },
+        "K": {
+          "nivel": "alta",
+          "nota": "desarrollo de raiz de reserva requiere buen aporte de K",
+          "fuente": "AGROSAVIA"
+        }
+      },
+      "asocia": [
+        {
+          "id": "allium_cepa",
+          "nombre": "Cebolla cabezona"
+        },
+        {
+          "id": "allium_sativum",
+          "nombre": "Ajo"
+        },
+        {
+          "id": "raphanus_sativus_niger",
+          "nombre": "Rábano blanco / Rábano picante"
+        }
+      ],
+      "incompat": [],
+      "plagas": [],
+      "emoji": "🥕",
+      "fotoSlug": "zanahoria",
+      "asocia_total": 3
+    }
+  ]
+}

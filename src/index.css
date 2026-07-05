@@ -685,6 +685,25 @@
 }
 
 /* ===========================================================================
+ * CULTIVOS INSIGNIA — micro-animaciones (CultivosInsigniaScreen).
+ * Las barras de demanda N-P-K crecen desde 0 al montar; el roster de fotos se
+ * desliza sin barra visible. Todo sutil; se apaga con prefers-reduced-motion
+ * (las barras quedan a su ancho final, legibles al sol).
+ * =========================================================================== */
+.ci-bar {
+  transform-origin: left center;
+  animation: nutri-grow 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.ci-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.ci-scroll::-webkit-scrollbar { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .ci-bar { animation: none; transform: none; }
+}
+
+/* ===========================================================================
  * LOADING SKELETON DARK — fondo oscuro unificado para estados de carga.
  *
  * Tarea 81: .loading-skeleton-dark evita flash blanco en dark theme

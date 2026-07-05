@@ -139,6 +139,10 @@ const SanidadSintomaScreen = lazy(() => import('./components/sanidad/SanidadSint
 // calendario, siembra, cosecha) y suma una calculadora de grados-día. Re-rutea,
 // no reimplementa.
 const MundoCultivosHub = lazy(() => import('./components/cultivos/MundoCultivosHub'));
+// Los cultivos insignia: ficha photo-forward por cultivo emblema con su piso
+// térmico, demanda N-P-K, asocios (milpa) y plagas+manejo, exportado del grafo
+// chagra_kg a public/cultivos-insignia.json (la PWA no consulta AGE en vivo).
+const CultivosInsigniaScreen = lazy(() => import('./components/cultivos/CultivosInsigniaScreen'));
 const CromatografiaScreen = lazy(() => import('./components/CromatografiaScreen'));
 const CicloVivoFullView = lazy(() => import('./components/CicloVivo/CicloVivoFullView'));
 const ToxicologiaScreen = lazy(() => import('./components/ToxicologiaScreen'));
@@ -253,6 +257,9 @@ const HASH_VIEW_ROUTES = {
   nutricion: 'nutricion',
   'nutricion-humana': 'nutricion',
   'comida-que-alimenta': 'nutricion',
+  'cultivos-insignia': 'cultivos_insignia',
+  'cultivos_insignia': 'cultivos_insignia',
+  insignia: 'cultivos_insignia',
 };
 
 // Vistas que cuentan como "módulo" para telemetría de piloto.
@@ -262,7 +269,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'nutricion', 'toxicologia', 'aprende', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'nutricion', 'cultivos_insignia', 'toxicologia', 'aprende', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
   'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
@@ -1358,6 +1365,19 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="La comida que alimenta">
               <NutricionHumanaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'cultivos_insignia':
+        // "Los cultivos insignia" (mundo Cultivos y semillas): ficha
+        // photo-forward por cultivo emblema — piso térmico, demanda N-P-K,
+        // asocios (milpa/Tres Hermanas) y plagas+manejo. Datos exportados del
+        // grafo chagra_kg a public/cultivos-insignia.json; fotos CC en
+        // public/crop-photos/. Cero invención: sin dato, sin sección.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Los cultivos insignia">
+              <CultivosInsigniaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );

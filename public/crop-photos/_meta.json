@@ -1,0 +1,87 @@
+{
+  "_note": "Fotos de cultivos insignia — Wikimedia Commons, licencia abierta (CC0 / dominio público / CC BY / CC BY-SA). Thumbnails a 640 px. Atribución embebida en la UI (CultivosInsigniaScreen → créditos) y aquí para auditoría de licencias.",
+  "maiz": {
+    "file": "File:Cornfield in South Africa2.jpg",
+    "license": "CC BY-SA 3.0",
+    "license_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "artist": "Lotus Head from Johannesburg, Gauteng, South Africa",
+    "source": "https://commons.wikimedia.org/wiki/File:Cornfield_in_South_Africa2.jpg"
+  },
+  "frijol": {
+    "file": "File:Hopi Black Beans (Phaseolus vulgaris) (b2453f34-155d-451f-6722-3fb18b788d3c).JPG",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "NPS",
+    "source": "https://commons.wikimedia.org/wiki/File:Hopi_Black_Beans_(Phaseolus_vulgaris)_(b2453f34-155d-451f-6722-3fb18b788d3c).JPG"
+  },
+  "ahuyama": {
+    "file": "File:Cucurbita moschata Butternut 2012 G1.jpg",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "George Chernilevsky",
+    "source": "https://commons.wikimedia.org/wiki/File:Cucurbita_moschata_Butternut_2012_G1.jpg"
+  },
+  "papa": {
+    "file": "File:Patates.jpg",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "Scott Bauer, USDA ARS",
+    "source": "https://commons.wikimedia.org/wiki/File:Patates.jpg"
+  },
+  "cafe": {
+    "file": "File:Coffea arabica - Köhler–s Medizinal-Pflanzen-189.jpg",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "Franz Eugen Köhler",
+    "source": "https://commons.wikimedia.org/wiki/File:Coffea_arabica_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-189.jpg"
+  },
+  "aguacate": {
+    "file": "File:Persea americana fruit 2.JPG",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "B.navez",
+    "source": "https://commons.wikimedia.org/wiki/File:Persea_americana_fruit_2.JPG"
+  },
+  "tomate": {
+    "file": "File:Tomato je.jpg",
+    "license": "CC BY-SA 3.0",
+    "license_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "artist": "Softeis",
+    "source": "https://commons.wikimedia.org/wiki/File:Tomato_je.jpg"
+  },
+  "platano": {
+    "file": "File:Bananas white background DS.jpg",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Augustus Binu : flickr",
+    "source": "https://commons.wikimedia.org/wiki/File:Bananas_white_background_DS.jpg"
+  },
+  "cacao": {
+    "file": "File:Cacao-pod-k4636-14.jpg",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "Keith Weller, USDA ARS",
+    "source": "https://commons.wikimedia.org/wiki/File:Cacao-pod-k4636-14.jpg"
+  },
+  "cana": {
+    "file": "File:Sugar cane.jpg",
+    "license": "CC BY-SA 3.0",
+    "license_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "artist": "Yann",
+    "source": "https://commons.wikimedia.org/wiki/File:Sugar_cane.jpg"
+  },
+  "cebolla": {
+    "file": "File:Red Onion on White.JPG",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Colin",
+    "source": "https://commons.wikimedia.org/wiki/File:Red_Onion_on_White.JPG"
+  },
+  "zanahoria": {
+    "file": "File:Carrots of many colors.jpg",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "Stephen Ausmus",
+    "source": "https://commons.wikimedia.org/wiki/File:Carrots_of_many_colors.jpg"
+  }
+}
