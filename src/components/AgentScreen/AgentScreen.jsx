@@ -818,7 +818,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // formatToolEvidence y analyzeQuery viven en agentPromptBase (funciones
   // puras, testeables y medibles fuera de React).
 
-  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null, fermentoBlock = '', subgrafoBloque = '', biopreparadoBlock = '', pisoTermicoBlock = '') => {
+  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null, fermentoBlock = '', subgrafoBloque = '', biopreparadoBlock = '', pisoTermicoBlock = '', groundingPolicyBlock = '') => {
     const analysis = analyzeQuery(query);
     // El base recibe query/historial/isEnum para inyectar SOLO los glosarios
     // y reglas condicionales que la conversación toca (re-arquitectura GR-10).
@@ -1030,6 +1030,17 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       ? `\n\n${pisoTermicoBlock}`
       : '';
 
+    // MODO CIENTÍFICO (#17) — bloque answer/hedge/abstain ya formateado por
+    // el sidecar (WIRING real de grounding-policy.ts/grounding-prompt-
+    // formatter.ts). Va DENTRO del cluster de grounding (después de la cadena
+    // relacional): cuando la política es "abstain" el LLM recibe la
+    // instrucción explícita de NO inventar; "hedge" pide matizar; "answer" no
+    // agrega instrucción (el grounding ya alcanza). '' (no-op) si el sidecar
+    // no respondió — degradación graceful.
+    const groundingPolicyContext = (typeof groundingPolicyBlock === 'string' && groundingPolicyBlock.trim())
+      ? `\n\n${groundingPolicyBlock}`
+      : '';
+
     // Re-arquitectura GR-10: ensamblado con PRESUPUESTO de tokens y prioridad
     // por relevancia (promptAssembler). El grounding (evidencia / entidades /
     // hechos curados / cadena) va al FINAL del system — donde la truncación de
@@ -1054,6 +1065,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       resolvedEntities: resolvedEntitiesBlock,
       curatedFacts: curatedFactsContext,
       relacional: relacionalContext,
+      groundingPolicy: groundingPolicyContext,
       queryAnalysis: queryAnalysisBlock,
       suggested: suggestedBlock,
       priceDecline: priceDeclineBlock,
@@ -1364,6 +1376,15 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // no-op en el system prompt si el piso coincide, no hubo señal de piso
       // del usuario, o el sidecar no respondió (degradación graceful).
       let pisoTermicoBlock = '';
+      // MODO CIENTÍFICO (#17) — WIRING real de grounding-policy.ts/grounding-
+      // prompt-formatter.ts (audit 2026-07-04-optimizacion-grounding-
+      // velocidad-inteligencia.md win #4). El sidecar decide answer/hedge/
+      // abstain sobre las entidades del turno (incluye CERO entidades →
+      // abstain) y devuelve un bloque ya formateado + el semáforo verde/
+      // ámbar/rojo. '' / null por default → no-op (degradación graceful, el
+      // turno sigue sin este gate si el sidecar no respondió).
+      let groundingPolicyBlock = '';
+      let groundingDecisionMeta = null;
       // GraphRAG multi-hop (#1 intelligence-first): bloque "CADENA DE RELACIONES"
       // del grafo AGE para queries relacionales (plaga+cultivo). '' = no-op.
       let subgrafoBloque = '';
@@ -1463,6 +1484,24 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               latencyMs: Math.round(tRE1 - tRE0),
               entities: canonical.map((e) => `${e.mentioned}→${e.canonical_id}`),
               suggestedEntities: suggested.map((e) => `${e.mentioned}→${e.canonical_id}@${e.confidence}`),
+            });
+          }
+
+          // MODO CIENTÍFICO (#17) — semáforo de confianza + política real
+          // answer/hedge/abstain. Gate INDEPENDIENTE del bloque de arriba (no
+          // anidado en `resolved.entities.length > 0`): el caso de CERO
+          // entidades es exactamente el que debe producir `abstain`/rojo. El
+          // sidecar ya corrió `decideGroundingPolicy`/`formatGroundingBlock`
+          // de verdad (grounding-wire.ts) — aquí solo consumimos el bloque
+          // pre-formateado, igual que fermento/biopreparado.
+          if (resolved && resolved.grounding && typeof resolved.grounding.block === 'string' && resolved.grounding.block.trim()) {
+            groundingPolicyBlock = resolved.grounding.block;
+            groundingDecisionMeta = resolved.grounding;
+            console.debug('[sidecar] grounding-policy', {
+              policy: resolved.grounding.policy,
+              semaphore: resolved.grounding.semaphore,
+              resolvedEntities: resolved.grounding.resolved_entities,
+              minConfidence: resolved.grounding.min_confidence,
             });
           }
 
@@ -1967,7 +2006,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       const deterministicPrice = buildPriceAnswer({ userMessage: text, toolEvidence });
       const rawResponse = deterministicPrice != null
         ? deterministicPrice
-        : await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, edgesTruncated, biopreparadoBlock, pisoTermicoBlock);
+        : await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, edgesTruncated, biopreparadoBlock, pisoTermicoBlock, groundingPolicyBlock);
       if (deterministicPrice != null) {
         console.debug('[precio] respuesta determinista SIPSA (sin LLM)', { route: nluRoute });
       }
@@ -2085,10 +2124,24 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       const evidenceSourceLink = groundingBadges.fuente_url
         ? {}
         : deriveEvidenceSourceLink(toolEvidence);
+      // MODO CIENTÍFICO (#17) — semáforo verde/ámbar/rojo + política real del
+      // turno (WIRING de grounding-policy.ts vía el sidecar), expuesto en la
+      // metadata del mensaje para que una futura UI (badge de confianza) lo
+      // pinte SIN volver a calcularlo — el semáforo es 1:1 con lo que el
+      // agente ya decidió. Graceful: sin decisión del sidecar → no añade nada
+      // (no contamina sourceMetadata con null).
+      const groundingSemaphoreMeta = groundingDecisionMeta
+        ? {
+            grounding_semaphore: groundingDecisionMeta.semaphore,
+            grounding_policy: groundingDecisionMeta.policy,
+            grounding_reason: groundingDecisionMeta.reason,
+          }
+        : {};
       sourceMetadata = {
         ...sourceMetadata,
         ...evidenceSourceLink,
         ...groundingBadges,
+        ...groundingSemaphoreMeta,
         auto_corrected: guarded.modified === true,
       };
 
