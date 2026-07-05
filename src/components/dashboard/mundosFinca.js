@@ -128,6 +128,7 @@ export const MUNDOS_FINCA = [
         tinte: ['#b98a2f', '#f7ecd2'],
         entradas: [
             { view: 'mercado', label: 'Vender y comprar', desc: 'Directo entre fincas, sin intermediarios', emoji: '🤝' },
+            { view: 'poscosecha', label: 'Poscosecha y despensa', desc: 'Cosechar en punto, guardar sin que se dañe y transformar', emoji: '🥕' },
             { view: 'bodega', label: 'Bodega de insumos', desc: 'Lo que tiene guardado y lo que se acaba', emoji: '🏚️' },
             { view: 'informes', label: 'Sacar reportes', desc: 'Para imprimir o llevar al banco o la cooperativa', emoji: '🖨️' },
             { view: 'fermentos', label: 'Fermentos de la cocina', desc: 'Masato, chicha y kéfir con sus vetos de seguridad', emoji: '🫙' },
