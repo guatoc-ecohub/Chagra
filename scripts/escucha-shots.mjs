@@ -60,7 +60,8 @@ async function ensureServer() {
     const r = await fetch(BASE_URL, { signal: AbortSignal.timeout(1500) });
     if (r.ok || r.status >= 400) return null;
   } catch { /* arrancar */ }
-  const child = spawn('npm', ['run', 'dev', '--', '--host', '127.0.0.1', '--port', PORT, '--strictPort'], {
+  const mode = process.env.ESCUCHA_SHOT_SERVER || 'dev';
+  const child = spawn('npm', ['run', mode, '--', '--host', '127.0.0.1', '--port', PORT, '--strictPort'], {
     stdio: 'ignore',
     env: { ...process.env, VITE_FARMOS_URL: '', VITE_FARMOS_CLIENT_ID: 'farm', VITE_OPERATOR_USERNAME: 'op-test' },
   });
@@ -128,7 +129,30 @@ async function main() {
         document.documentElement?.setAttribute('data-theme', t);
       }, tema.dataTheme);
     }
-    await loginAndSeed(page, 'with-data');
+    // GOTCHA (dev server frío / caja cargada): loginAndSeed seedea el IDB con
+    // networkidle-catch, y si el app aún NO montó, ChagraDB no existe → el
+    // open del seed la crea VACÍA en v26 y poisonea el contexto ("object
+    // stores was not found"). Esperar boot real + creación de la DB primero.
+    await page.goto('/', { waitUntil: 'domcontentloaded', timeout: 120_000 });
+    await page.waitForFunction(
+      () => document.querySelector('#root')?.children.length > 0,
+      { timeout: 180_000 },
+    );
+    await page.waitForFunction(
+      async () => (await indexedDB.databases()).some((d) => d.name === 'ChagraDB'),
+      { timeout: 60_000 },
+    );
+    let seeded = false;
+    for (let intento = 1; intento <= 3 && !seeded; intento++) {
+      try {
+        await loginAndSeed(page, 'with-data');
+        seeded = true;
+      } catch (err) {
+        console.warn(`[escucha-shots] seed intento ${intento} falló: ${String(err.message).slice(0, 120)}`);
+        await page.waitForTimeout(4000);
+      }
+    }
+    if (!seeded) throw new Error('No se pudo seedear tras 3 intentos');
     await page.waitForTimeout(1500);
 
     // 1) FAB visible en el home

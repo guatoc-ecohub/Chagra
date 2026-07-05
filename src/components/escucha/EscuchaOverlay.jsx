@@ -247,14 +247,23 @@ export default function EscuchaOverlay() {
   // === Trigger desacoplado: tap HOY, wake-word MAÑANA (mismo evento). ===
   useEffect(() => onEscucha((detalle) => { abrir(detalle); }), [abrir]);
 
-  // Manos libres: vigilar el RMS. Si ya habló y lleva SILENCIO_MS callado,
-  // cerramos solos. El progreso alimenta el arco de cierre del iris.
+  // Manos libres (1/2): marcar actividad de voz en refs. audioLevel cambia a
+  // ~60fps (setState por frame del recorder) — este efecto SOLO toca refs.
   useEffect(() => {
-    if (fase !== FASE_OYENDO) return undefined;
+    if (fase !== FASE_OYENDO) return;
     if (audioLevel > UMBRAL_VOZ) {
       yaHabloRef.current = true;
       ultimaVozRef.current = Date.now();
     }
+  }, [fase, audioLevel]);
+
+  // Manos libres (2/2): el vigía. UN solo interval por fase — NO depende de
+  // audioLevel: si dependiera, el re-render de cada frame lo recrearía antes
+  // de cumplirse los 120ms y el conteo de silencio jamás dispararía. Si ya
+  // habló y lleva SILENCIO_MS callado, cerramos solos; el progreso alimenta
+  // el arco de cierre del iris.
+  useEffect(() => {
+    if (fase !== FASE_OYENDO) return undefined;
     const timer = setInterval(() => {
       const ahora = Date.now();
       const desdeApertura = ahora - abiertoTsRef.current;
@@ -265,7 +274,7 @@ export default function EscuchaOverlay() {
       setCierre(Math.max(0, Math.min(1, callado / SILENCIO_MS)));
     }, 120);
     return () => clearInterval(timer);
-  }, [fase, audioLevel, finalizar]);
+  }, [fase, finalizar]);
 
   // Escape cancela; foco inicial a la carta (lectores de pantalla anuncian).
   useEffect(() => {
