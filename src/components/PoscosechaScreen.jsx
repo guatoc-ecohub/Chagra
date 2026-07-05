@@ -63,7 +63,6 @@ const FOTOS = {
   'cosecha-platano': { autor: 'Henry Doe', licencia: 'CC0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Green_Plantains_(Unsplash).jpg', alt: 'Racimo de plátanos verdes, firmes.' },
   'secado-maiz': { autor: 'Cut angles', licencia: 'CC BY-SA 4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Maize_drying.jpg', alt: 'Grano de maíz secándose al sol.' },
   'secado-cafe': { autor: 'JPDAFT', licencia: 'CC0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:%22Helda%22_for_drying_coffee_in_Colombia.jpg', alt: 'Café en pergamino secándose al sol en un patio de una finca colombiana.' },
-  'almacen-maiz': { autor: 'Ms Kabintie', licencia: 'CC BY-SA 4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Maize_post_harvest.jpg', alt: 'Maíz cosechado listo para almacenar.' },
   'plaga-gorgojo': { autor: 'Natasha Wright, Bugwood.org', licencia: 'CC BY 3.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Maize_Weevil_-_Sitophilus_zeamais.jpg', alt: 'Gorgojo del maíz (Sitophilus zeamais) visto de cerca.' },
   'moho-maiz': { autor: 'UIUC', licencia: 'CC BY-SA 3.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Corn_mold.jpg', alt: 'Mazorca de maíz con moho: donde crece el hongo de la aflatoxina.' },
   'diatomeas': { autor: 'SprocketRocket', licencia: 'CC0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Diatomaceous_Earth.jpg', alt: 'Tierra de diatomeas: polvo mineral blanco para control físico de plagas.' },
