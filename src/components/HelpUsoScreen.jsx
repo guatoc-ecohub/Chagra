@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import FieldFeedback from './FieldFeedback';
 import { IlusFoto, IlusMundos } from './help/HelpIllustrations.jsx';
+import { CursoEntryCard } from './curso/CursoChagra.jsx';
 
 /**
  * Sub-vista del Manual: cómo usar Chagra (FAQs reorganizadas).
@@ -97,6 +98,13 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
         <p className="text-sm text-slate-300 leading-relaxed">
           Toca cada tema para abrir o cerrar. Si algo no está aquí, usa el tema &ldquo;Reportar problema&rdquo; al final.
         </p>
+
+        {/* ¿Primera vez? El curso guiado (video + lección + probar) lleva de la
+            mano del primer registro a la venta. Va arriba de todo: es el mejor
+            punto de partida para volverse autónomo con la app. */}
+        {typeof onNavigate === 'function' && (
+          <CursoEntryCard onNavigate={onNavigate} />
+        )}
 
         {/* 0. Orientación — los cuatro lugares de Chagra (home F2). Esto va
             primero porque es el mapa mental que el campesino nuevo necesita
