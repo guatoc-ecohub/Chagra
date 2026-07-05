@@ -44,6 +44,115 @@ const GROUND_Y = 340;
 const PLAYER_W = 38;
 const PLAYER_H = 54;
 
+// ── Utilidades de dibujo (capa visual pura; nada de lógica de juego) ──
+
+/** '#rrggbb' → rgba(r,g,b,a): velos, halos y sombras derivadas de la escena. */
+function hexA(hex, a) {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
+}
+
+/** Aclara (f>0) u oscurece (f<0) un color hex; deriva tonos de la paleta del nivel. */
+function shade(hex, f) {
+  const n = parseInt(hex.slice(1), 16);
+  const ch = (c) => Math.max(0, Math.min(255, Math.round(f > 0 ? c + (255 - c) * f : c + c * f)));
+  return `rgb(${ch((n >> 16) & 255)}, ${ch((n >> 8) & 255)}, ${ch(n & 255)})`;
+}
+
+/** Pseudo-azar determinista: el mismo paisaje en cada frame y cada partida. */
+function hashN(i, salt) {
+  const v = Math.sin(i * 127.1 + salt * 311.7) * 43758.5453;
+  return v - Math.floor(v);
+}
+
+/**
+ * Vegetación procedural por piso térmico: posiciones deterministas de las
+ * matas que visten cada nivel (huerta, ladera, cafetal, maizal). Solo visual;
+ * evita los huecos para que nada "flote" sobre una zanja.
+ */
+function construirDecor(nivel) {
+  const enHueco = (x) => nivel.huecos.some((h) => x > h.x - 24 && x < h.x + h.w + 24);
+  const items = [];
+  let x = 26;
+  for (let i = 0; x < nivel.mundoAncho - 30; i += 1) {
+    if (!enHueco(x)) items.push({ x, v: hashN(i, 2) });
+    x += 74 + hashN(i, 1) * 70;
+  }
+  return items;
+}
+
+/**
+ * Dibuja una mata según la escena del nivel: flores de huerta, arbusto de
+ * ladera, mata de café con granos maduros o maíz con espiga. Capa visual.
+ */
+function dibujarMata(ctx, esc, x, v) {
+  const g = GROUND_Y;
+  if (esc.id === 'maizal-atardecer') {
+    const alto = 44 + v * 26;
+    ctx.strokeStyle = shade(esc.pasto, -0.15);
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x, g);
+    ctx.lineTo(x, g - alto);
+    ctx.stroke();
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x, g - alto * 0.45);
+    ctx.quadraticCurveTo(x - 14, g - alto * 0.55, x - 18, g - alto * 0.35);
+    ctx.moveTo(x, g - alto * 0.65);
+    ctx.quadraticCurveTo(x + 14, g - alto * 0.75, x + 18, g - alto * 0.55);
+    ctx.stroke();
+    ctx.fillStyle = '#eab308';
+    ctx.fillRect(x - 2, g - alto - 8, 4, 9);
+  } else if (esc.id === 'cafetal-amanecer') {
+    const alto = 26 + v * 14;
+    ctx.fillStyle = shade(esc.montana, -0.2);
+    ctx.fillRect(x - 1.5, g - alto * 0.5, 3, alto * 0.5);
+    ctx.fillStyle = shade(esc.pasto, -0.25);
+    ctx.beginPath();
+    ctx.ellipse(x, g - alto * 0.62, 13 + v * 5, alto * 0.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#dc2626';
+    ctx.fillRect(x - 6, g - alto * 0.6, 2.5, 2.5);
+    ctx.fillRect(x + 4, g - alto * 0.75, 2.5, 2.5);
+    ctx.fillRect(x - 1, g - alto * 0.45, 2.5, 2.5);
+  } else if (esc.id === 'atardecer') {
+    ctx.fillStyle = shade(esc.pasto, -0.2);
+    ctx.beginPath();
+    ctx.arc(x - 6, g - 8, 8 + v * 3, 0, Math.PI * 2);
+    ctx.arc(x + 6, g - 10, 9 + v * 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = shade(esc.pasto, 0.15);
+    ctx.beginPath();
+    ctx.arc(x + 2, g - 14, 5 + v * 2, 0, Math.PI * 2);
+    ctx.fill();
+  } else {
+    ctx.fillStyle = shade(esc.pasto, -0.1);
+    ctx.beginPath();
+    ctx.moveTo(x - 8, g);
+    ctx.quadraticCurveTo(x - 6, g - 16 - v * 6, x, g - 4);
+    ctx.quadraticCurveTo(x + 6, g - 18 - v * 6, x + 8, g);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = v > 0.5 ? '#f59e0b' : '#f43f5e';
+    ctx.beginPath();
+    ctx.arc(x, g - 18 - v * 6, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+/** Partículas de confirmación (recoger, controlar, golpear jefe). Solo visual. */
+function spawnFx(w, x, y, color, n) {
+  if (!w) return;
+  w.fx = w.fx || [];
+  if (w.fx.length > 90) return;
+  for (let i = 0; i < n; i += 1) {
+    const a = (Math.PI * 2 * i) / n + hashN(i, 7);
+    const v = 1 + (i % 3) * 0.7;
+    w.fx.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 1.4, vida: 24 + (i % 4) * 5, color });
+  }
+}
+
 /** Lee del localStorage los niveles ya superados (offline-safe, tolera fallos). */
 function leerSuperados() {
   try {
@@ -130,6 +239,21 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
   // Refs del mundo (mutables, leídos por el loop a 60fps sin re-render).
   const world = useRef(null);
   const input = useRef({ left: false, right: false, jumpQueued: false });
+
+  // prefers-reduced-motion vivo (apaga deriva de nubes/niebla, bamboleos y
+  // reduce partículas; el juego en sí sigue igual). Capa visual pura.
+  const reduceMotionRef = useRef(false);
+  useEffect(() => {
+    const mq = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    reduceMotionRef.current = !!mq?.matches;
+    if (!mq?.addEventListener) return undefined;
+    const onChange = () => { reduceMotionRef.current = mq.matches; };
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
+  // Vegetación procedural del nivel (determinista, solo visual).
+  const decor = useMemo(() => construirDecor(nivel), [nivel]);
   const beneficoSelRef = useRef(beneficoSel);
   useEffect(() => {
     beneficoSelRef.current = beneficoSel;
@@ -221,6 +345,7 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
       puntaje: 0,
       energia: nivel.energiaInicial,
       t: 0,
+      fx: [], // partículas de feedback (capa visual pura)
     };
   }, [nivel, pares]);
 
@@ -269,15 +394,31 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
     if (!w || estado !== 'jugando') return;
     const id = beneficoSelRef.current;
     if (!id) return;
+    // Posiciones de las plagas vivas ANTES de aplicar, para las partículas
+    // de confirmación (visual; la eliminación la decide el motor).
+    const vivasAntes = w.plagas
+      .filter((p) => p.alive)
+      .map((p) => ({ id: p.id, x: p.x + p.w / 2, y: p.y + p.h / 2 }));
     const { plagas, eliminadas } = aplicarBenefico(w.plagas, id);
     w.plagas = plagas;
+    if (eliminadas > 0) {
+      const vivasDespues = new Set(w.plagas.filter((p) => p.alive).map((p) => p.id));
+      for (const v of vivasAntes) {
+        if (!vivasDespues.has(v.id)) {
+          spawnFx(w, v.x, v.y, '#6ee7b7', reduceMotionRef.current ? 4 : 12);
+        }
+      }
+    }
 
     let golpeoJefe = false;
     if (w.jefe && w.jefe.vivo) {
       const res = golpearJefe(w.jefe, id);
       w.jefe = res.jefe;
       golpeoJefe = res.golpeo;
-      if (res.golpeo) setJefeVida(w.jefe.vida);
+      if (res.golpeo) {
+        setJefeVida(w.jefe.vida);
+        spawnFx(w, w.jefe.x + w.jefe.w / 2, w.jefe.y + 20, '#fbbf24', reduceMotionRef.current ? 4 : 12);
+      }
     }
 
     if (eliminadas > 0 || golpeoJefe) {
@@ -311,6 +452,34 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
       ctx.font = `${size}px serif`;
       ctx.textBaseline = 'top';
       ctx.fillText(emoji, x, y);
+    };
+
+    // Cordillera estilizada con parallax: se desplaza a una fracción `f` de la
+    // cámara (más lejos = más lento). Picos alternos para variar la silueta.
+    const dibujarCordillera = (camX, color, f, peakY, periodo) => {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      const off = (camX * f) % periodo;
+      const x0 = camX - off - periodo;
+      ctx.moveTo(x0, GROUND_Y);
+      for (let mx = x0; mx <= camX + VIEW_W + periodo; mx += periodo) {
+        const varPico = (Math.floor(mx / periodo) % 2) * 22;
+        ctx.lineTo(mx + periodo * 0.5, peakY + varPico);
+        ctx.lineTo(mx + periodo, GROUND_Y);
+      }
+      ctx.lineTo(camX + VIEW_W + periodo, GROUND_Y);
+      ctx.closePath();
+      ctx.fill();
+    };
+
+    // Nube de tres lóbulos (el fillStyle lo fija quien llama).
+    const dibujarNube = (x, y, s) => {
+      ctx.beginPath();
+      ctx.arc(x, y, 12 * s, 0, Math.PI * 2);
+      ctx.arc(x + 14 * s, y - 5 * s, 10 * s, 0, Math.PI * 2);
+      ctx.arc(x + 28 * s, y, 11 * s, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.fill();
     };
 
     const step = () => {
@@ -374,8 +543,14 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
       }
 
       // Recolección de cultivos.
+      const cultivosAntes = w.cultivos;
       const rec = recolectarCultivos(w.player, w.cultivos);
       if (rec.recogidos.length > 0) {
+        // Chispas doradas donde estaba cada cultivo recogido (solo visual).
+        for (const idRec of rec.recogidos) {
+          const c = cultivosAntes.find((cc) => cc.id === idRec);
+          if (c) spawnFx(w, c.x + 15, c.y + 15, '#fde68a', reduceMotionRef.current ? 3 : 8);
+        }
         w.cultivos = rec.cultivos;
         w.cultivosRecogidos += rec.recogidos.length;
         w.puntaje = sumarPuntaje(w.puntaje, { cultivos: rec.recogidos.length });
@@ -438,6 +613,8 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
       ctx.translate(-w.camX, 0); // la cámara desplaza el mundo.
       const M = w.mundoAncho;
 
+      const reduce = reduceMotionRef.current;
+
       // Cielo (paleta del nivel).
       const sky = ctx.createLinearGradient(0, 0, 0, VIEW_H);
       sky.addColorStop(0, esc.cieloTop);
@@ -445,101 +622,276 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
       ctx.fillStyle = sky;
       ctx.fillRect(0, 0, M, VIEW_H);
 
-      // Estrellas tenues (atardecer).
+      // Estrellas tenues (atardecer), con titileo suave.
       if (esc.estrellas) {
-        ctx.fillStyle = 'rgba(255,255,255,0.55)';
         for (let i = 0; i < 40; i += 1) {
+          const alfa = reduce ? 0.55 : 0.3 + 0.35 * Math.abs(Math.sin(w.t * 0.03 + i));
+          ctx.fillStyle = `rgba(255,255,255,${alfa.toFixed(2)})`;
           ctx.fillRect((i * 137) % M, (i * 53) % 120, 2, 2);
         }
       }
 
-      // Astro (sol/luna), anclado a la vista.
+      // Astro (sol/luna) con halo cálido, anclado a la vista.
+      const ax = w.camX + VIEW_W - 70;
+      const ay = 70;
+      const halo = ctx.createRadialGradient(ax, ay, 12, ax, ay, 92);
+      halo.addColorStop(0, hexA(esc.astro, 0.8));
+      halo.addColorStop(1, hexA(esc.astro, 0));
+      ctx.fillStyle = halo;
+      ctx.fillRect(ax - 92, ay - 92, 184, 184);
       ctx.fillStyle = esc.astro;
       ctx.beginPath();
-      ctx.arc(w.camX + VIEW_W - 70, 70, 34, 0, Math.PI * 2);
+      ctx.arc(ax, ay, 30, 0, Math.PI * 2);
       ctx.fill();
 
-      // Montañas de fondo (repetidas a lo largo del mundo).
-      ctx.fillStyle = esc.montana;
-      ctx.beginPath();
-      ctx.moveTo(0, GROUND_Y);
-      for (let mx = 0; mx <= M; mx += 360) {
-        ctx.lineTo(mx + 160, 180);
-        ctx.lineTo(mx + 330, GROUND_Y);
+      // Nubes con deriva lenta y leve parallax (quietas con reduced-motion).
+      const deriva = reduce ? 0 : w.t * 0.12;
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      const spanNube = VIEW_W + 260;
+      for (let i = 0; i < 5; i += 1) {
+        const nx = w.camX + ((((i * 173 + deriva + w.camX * 0.3) % spanNube) + spanNube) % spanNube) - 130;
+        const ny = 34 + ((i * 37) % 70);
+        dibujarNube(nx, ny, 1 + (i % 3) * 0.35);
       }
-      ctx.lineTo(M, GROUND_Y);
-      ctx.closePath();
-      ctx.fill();
 
-      // Suelo por tramos (deja vacíos en los huecos).
+      // Cordillera doble con parallax: lejana (clara, lenta) y cercana.
+      dibujarCordillera(w.camX, shade(esc.montana, 0.35), 0.55, 150, 300);
+      dibujarCordillera(w.camX, esc.montana, 0.3, 185, 430);
+
+      // Bruma al pie de la cordillera (funde montaña y suelo).
+      const bruma = ctx.createLinearGradient(0, GROUND_Y - 110, 0, GROUND_Y);
+      bruma.addColorStop(0, hexA(esc.cieloBottom, 0));
+      bruma.addColorStop(1, hexA(esc.cieloBottom, 0.5));
+      ctx.fillStyle = bruma;
+      ctx.fillRect(w.camX, GROUND_Y - 110, VIEW_W, 110);
+
+      // Suelo por tramos (deja vacíos en los huecos), con textura de tierra,
+      // borde de pasto en dos tonos y matitas.
       const soil = ctx.createLinearGradient(0, GROUND_Y, 0, VIEW_H);
       soil.addColorStop(0, esc.sueloTop);
       soil.addColorStop(1, esc.sueloBottom);
+      const pintarTramo = (x0, ancho) => {
+        ctx.fillStyle = soil;
+        ctx.fillRect(x0, GROUND_Y, ancho, VIEW_H - GROUND_Y);
+        // Motas de tierra (deterministas, dan textura sin ruido).
+        ctx.fillStyle = 'rgba(255,255,255,0.06)';
+        for (let sx = Math.ceil(x0 / 46) * 46; sx < x0 + ancho - 5; sx += 46) {
+          ctx.fillRect(sx, GROUND_Y + 14 + (sx % 3) * 9, 5, 3);
+        }
+        ctx.fillStyle = 'rgba(0,0,0,0.14)';
+        for (let sx = Math.ceil(x0 / 61) * 61; sx < x0 + ancho - 6; sx += 61) {
+          ctx.fillRect(sx, GROUND_Y + 26 + (sx % 5) * 6, 6, 3);
+        }
+        // Franja de pasto con luz arriba y sombra bajo el borde.
+        ctx.fillStyle = esc.pasto;
+        ctx.fillRect(x0, GROUND_Y - 6, ancho, 10);
+        ctx.fillStyle = shade(esc.pasto, 0.25);
+        ctx.fillRect(x0, GROUND_Y - 6, ancho, 2);
+        ctx.fillStyle = shade(esc.pasto, -0.35);
+        ctx.fillRect(x0, GROUND_Y + 3, ancho, 2);
+        // Matitas de pasto sobre el borde.
+        ctx.fillStyle = shade(esc.pasto, 0.2);
+        for (let sx = Math.ceil(x0 / 34) * 34; sx < x0 + ancho - 6; sx += 34) {
+          ctx.fillRect(sx, GROUND_Y - 11, 2, 6);
+          ctx.fillRect(sx + 4, GROUND_Y - 9, 2, 4);
+        }
+      };
       const huecos = [...w.huecos].sort((a, b) => a.x - b.x);
       let cursor = 0;
       for (const h of huecos) {
-        if (h.x > cursor) {
-          ctx.fillStyle = soil;
-          ctx.fillRect(cursor, GROUND_Y, h.x - cursor, VIEW_H - GROUND_Y);
-          ctx.fillStyle = esc.pasto;
-          ctx.fillRect(cursor, GROUND_Y - 6, h.x - cursor, 10);
-        }
+        if (h.x > cursor) pintarTramo(cursor, h.x - cursor);
         cursor = h.x + h.w;
       }
-      if (cursor < M) {
-        ctx.fillStyle = soil;
-        ctx.fillRect(cursor, GROUND_Y, M - cursor, VIEW_H - GROUND_Y);
-        ctx.fillStyle = esc.pasto;
-        ctx.fillRect(cursor, GROUND_Y - 6, M - cursor, 10);
+      if (cursor < M) pintarTramo(cursor, M - cursor);
+
+      // Zanjas: fondo oscuro con borde quebrado (se leen como peligro).
+      for (const h of huecos) {
+        const pozo = ctx.createLinearGradient(0, GROUND_Y, 0, VIEW_H);
+        pozo.addColorStop(0, 'rgba(20,12,6,0.75)');
+        pozo.addColorStop(1, 'rgba(5,3,2,0.95)');
+        ctx.fillStyle = pozo;
+        ctx.fillRect(h.x, GROUND_Y, h.w, VIEW_H - GROUND_Y);
+        ctx.fillStyle = shade(esc.sueloTop, -0.4);
+        ctx.fillRect(h.x - 3, GROUND_Y - 2, 3, 9);
+        ctx.fillRect(h.x + h.w, GROUND_Y - 2, 3, 9);
       }
 
-      // Plataformas.
+      // Vegetación del piso térmico (solo lo visible; determinista).
+      for (const d of decor) {
+        if (d.x < w.camX - 60 || d.x > w.camX + VIEW_W + 60) continue;
+        dibujarMata(ctx, esc, d.x, d.v);
+      }
+
+      // Niebla del cafetal: jirones que derivan despacio (quietos con
+      // reduced-motion). Detrás de los personajes para no tapar el juego.
+      if (esc.id === 'cafetal-amanecer') {
+        ctx.fillStyle = 'rgba(243,239,224,0.28)';
+        const spanNiebla = VIEW_W + 300;
+        for (let i = 0; i < 3; i += 1) {
+          const nx = w.camX
+            + ((((i * 210 + (reduce ? 0 : w.t * (0.25 + i * 0.1))) % spanNiebla) + spanNiebla) % spanNiebla)
+            - 150;
+          const ny = GROUND_Y - 60 - i * 46;
+          ctx.beginPath();
+          ctx.ellipse(nx, ny, 130, 16, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // Plataformas como terrazas: sombra, cuerpo de tierra, borde oscuro,
+      // raíces colgantes y ceja de pasto con luz.
       for (const p of w.plataformas) {
+        ctx.fillStyle = 'rgba(0,0,0,0.18)';
+        ctx.fillRect(p.x + 4, p.y + p.h, p.w - 8, 4);
         ctx.fillStyle = esc.sueloTop;
         ctx.fillRect(p.x, p.y, p.w, p.h);
+        ctx.fillStyle = shade(esc.sueloTop, -0.35);
+        ctx.fillRect(p.x, p.y + p.h - 3, p.w, 3);
+        ctx.fillStyle = shade(esc.sueloTop, -0.2);
+        ctx.fillRect(p.x + 10, p.y + p.h, 2, 5);
+        ctx.fillRect(p.x + p.w - 14, p.y + p.h, 2, 4);
         ctx.fillStyle = esc.pasto;
-        ctx.fillRect(p.x, p.y - 4, p.w, 6);
+        ctx.fillRect(p.x - 2, p.y - 4, p.w + 4, 7);
+        ctx.fillStyle = shade(esc.pasto, 0.3);
+        ctx.fillRect(p.x - 2, p.y - 4, p.w + 4, 2);
       }
 
-      // Cultivos (puntos).
-      for (const c of w.cultivos) {
-        if (!c.recogido) drawEmoji(c.emoji, c.x, c.y, 30);
-      }
-      // Plagas vivas.
+      // Cultivos: halo cálido, sombra en el piso y flote suave (la colisión
+      // usa c.y del motor; el bamboleo es solo del dibujo).
+      w.cultivos.forEach((c, i) => {
+        if (c.recogido) return;
+        const flote = reduce ? 0 : Math.sin(w.t * 0.07 + i * 1.7) * 3;
+        ctx.fillStyle = 'rgba(0,0,0,0.16)';
+        ctx.beginPath();
+        ctx.ellipse(c.x + 15, c.y + 32, 11, 3.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(255,241,178,0.16)';
+        ctx.beginPath();
+        ctx.arc(c.x + 15, c.y + 15 + flote, 21, 0, Math.PI * 2);
+        ctx.fill();
+        drawEmoji(c.emoji, c.x, c.y + flote, 30);
+      });
+      // Plagas vivas: sombra, brinquito y volteo según hacia dónde patrullan.
       for (const p of w.plagas) {
-        if (p.alive) drawEmoji(p.emoji, p.x, p.y, 32);
+        if (!p.alive) continue;
+        const brinco = reduce ? 0 : Math.abs(Math.sin(w.t * 0.12 + p.baseX * 0.05)) * 2.5;
+        ctx.fillStyle = 'rgba(0,0,0,0.18)';
+        ctx.beginPath();
+        ctx.ellipse(p.x + p.w / 2, p.y + p.h - 2, p.w * 0.4, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.save();
+        ctx.translate(p.x + p.w / 2, p.y - brinco);
+        ctx.scale(p.dir < 0 ? -1 : 1, 1);
+        drawEmoji(p.emoji, -p.w / 2 + 1, 0, 32);
+        ctx.restore();
       }
-      // Mini-jefe + barra de vida.
+      // Mini-jefe: sombra grande, respiración amenazante y barra de vida con
+      // brillo y muescas por punto.
       if (w.jefe && w.jefe.vivo) {
-        drawEmoji(w.jefe.emoji, w.jefe.x, w.jefe.y, 60);
-        const bw = w.jefe.w;
-        ctx.fillStyle = 'rgba(0,0,0,0.4)';
-        ctx.fillRect(w.jefe.x, w.jefe.y - 12, bw, 7);
+        const j = w.jefe;
+        const pulso = reduce ? 0 : Math.sin(w.t * 0.09) * 2;
+        ctx.fillStyle = 'rgba(0,0,0,0.22)';
+        ctx.beginPath();
+        ctx.ellipse(j.x + j.w / 2, j.y + j.h - 2, j.w * 0.45, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.save();
+        ctx.translate(j.x + j.w / 2, j.y + pulso);
+        ctx.scale(j.dir < 0 ? -1 : 1, 1);
+        drawEmoji(j.emoji, -j.w / 2 + 2, 0, 60);
+        ctx.restore();
+        const bw = j.w;
+        ctx.fillStyle = 'rgba(10,10,10,0.55)';
+        ctx.fillRect(j.x - 1, j.y - 14, bw + 2, 9);
         ctx.fillStyle = '#ef4444';
-        ctx.fillRect(w.jefe.x, w.jefe.y - 12, (bw * w.jefe.vida) / w.jefe.vidaMax, 7);
+        ctx.fillRect(j.x, j.y - 13, (bw * j.vida) / j.vidaMax, 7);
+        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        ctx.fillRect(j.x, j.y - 13, (bw * j.vida) / j.vidaMax, 2);
+        ctx.fillStyle = 'rgba(0,0,0,0.35)';
+        for (let s = 1; s < j.vidaMax; s += 1) {
+          ctx.fillRect(j.x + (bw * s) / j.vidaMax, j.y - 13, 1, 7);
+        }
       }
 
-      // Jugador (campesino neutro dibujado a mano — sin nombre propio).
+      // Jugador (campesino neutro dibujado a mano — sin nombre propio):
+      // sombrero aguadeño con cinta, ruana terracota con franja y paso animado.
       const px = w.player.x;
       const py = w.player.y;
+      const pw = w.player.w;
       const blink = w.t < w.player.invulnUntil && Math.floor(w.t / 6) % 2 === 0;
       if (!blink) {
-        ctx.fillStyle = '#a16207';
-        ctx.fillRect(px - 4, py, w.player.w + 8, 8);
-        ctx.fillRect(px + 6, py - 8, w.player.w - 12, 10);
-        ctx.fillStyle = '#e8b98a';
-        ctx.fillRect(px + 8, py + 8, w.player.w - 16, 16);
-        ctx.fillStyle = '#15803d';
-        ctx.fillRect(px + 6, py + 24, w.player.w - 12, 20);
+        const camina = (input.current.left || input.current.right) && w.player.onGround;
+        const paso = camina && !reduce ? Math.sin(w.t * 0.35) * 4 : 0;
+        // Sombra a los pies (solo apoyado; en el aire se lee el salto).
+        if (w.player.onGround) {
+          ctx.fillStyle = 'rgba(0,0,0,0.25)';
+          ctx.beginPath();
+          ctx.ellipse(px + pw / 2, py + w.player.h, pw * 0.55, 5, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        // Piernas con paso alterno + botas.
         ctx.fillStyle = '#1e3a5f';
-        ctx.fillRect(px + 8, py + 42, w.player.w - 16, 12);
+        ctx.fillRect(px + 9 + paso, py + 40, 8, 12);
+        ctx.fillRect(px + 21 - paso, py + 40, 8, 12);
+        ctx.fillStyle = '#292524';
+        ctx.fillRect(px + 8 + paso, py + 50, 10, 4);
+        ctx.fillRect(px + 20 - paso, py + 50, 10, 4);
+        // Ruana terracota con franja clara.
+        ctx.fillStyle = '#a34d1f';
+        ctx.beginPath();
+        ctx.moveTo(px + 6, py + 22);
+        ctx.lineTo(px + pw - 6, py + 22);
+        ctx.lineTo(px + pw - 2, py + 41);
+        ctx.lineTo(px + 2, py + 41);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#f2e8d5';
+        ctx.fillRect(px + 3, py + 34, pw - 6, 3);
+        // Cara con mirada hacia donde corre y sonrisa breve.
+        ctx.fillStyle = '#e8b98a';
+        ctx.fillRect(px + 9, py + 8, pw - 18, 15);
         ctx.fillStyle = '#1c1917';
-        const ex = w.player.face === 1 ? px + 16 : px + 12;
-        ctx.fillRect(ex, py + 14, 3, 3);
-        ctx.fillRect(ex + 8, py + 14, 3, 3);
+        const ex = w.player.face === 1 ? px + 17 : px + 12;
+        ctx.fillRect(ex, py + 13, 3, 3);
+        ctx.fillRect(ex + 7, py + 13, 3, 3);
+        ctx.fillRect(ex + 2, py + 19, 6, 2);
+        // Sombrero aguadeño: ala ancha, copa clara y cinta oscura.
+        ctx.fillStyle = '#f5efe0';
+        ctx.fillRect(px - 5, py + 4, pw + 10, 5);
+        ctx.fillRect(px + 8, py - 6, pw - 16, 11);
+        ctx.fillStyle = '#292524';
+        ctx.fillRect(px + 8, py + 1, pw - 16, 3);
+        ctx.fillStyle = 'rgba(0,0,0,0.12)';
+        ctx.fillRect(px - 5, py + 7, pw + 10, 2);
+      }
+
+      // Partículas de feedback (chispas al recoger/controlar/golpear jefe).
+      if (w.fx && w.fx.length > 0) {
+        const vivos = [];
+        for (const f of w.fx) {
+          f.x += f.vx;
+          f.y += f.vy;
+          f.vy += 0.06;
+          f.vida -= 1;
+          if (f.vida > 0) {
+            ctx.globalAlpha = Math.min(1, f.vida / 18);
+            ctx.fillStyle = f.color;
+            ctx.fillRect(f.x, f.y, 4, 4);
+            vivos.push(f);
+          }
+        }
+        ctx.globalAlpha = 1;
+        w.fx = vivos;
       }
 
       ctx.restore();
+
+      // Velo rojo que se desvanece tras recibir daño (feedback inmediato).
+      if (estado === 'jugando' && w.t < w.player.invulnUntil) {
+        const k = (w.player.invulnUntil - w.t) / 60;
+        ctx.fillStyle = `rgba(220,38,38,${(0.24 * k).toFixed(3)})`;
+        ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+      }
+
       raf = requestAnimationFrame(step);
     };
 
@@ -548,7 +900,7 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
       running = false;
       cancelAnimationFrame(raf);
     };
-  }, [estado, beep, nivel, onGanar]);
+  }, [estado, beep, nivel, onGanar, decor]);
 
   // Reinicia el nivel actual (event handler → setState seguro).
   const reiniciar = useCallback(() => {
@@ -585,7 +937,10 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
 
       {/* HUD */}
       <div className="df-hud" data-testid="defensores-hud">
-        <div className="df-hearts" aria-label={`Energía: ${energia} de ${energiaMax}`}>
+        <div
+          className={`df-hearts${energia <= 1 ? ' df-hearts-low' : ''}`}
+          aria-label={`Energía: ${energia} de ${energiaMax}`}
+        >
           {Array.from({ length: energiaMax }).map((_, i) => (
             <span key={i} className={i < energia ? '' : 'df-heart-empty'} aria-hidden="true">
               💚
@@ -649,7 +1004,10 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
           aria-label="Finca con un campesino que corre, cultivos para recoger y plagas para controlar"
         />
         {estado !== 'jugando' && (
-          <div className="df-overlay" data-testid={`defensores-fin-${estado}`}>
+          <div
+            className={`df-overlay ${estado === 'gano' ? 'df-overlay-gano' : 'df-overlay-perdio'}`}
+            data-testid={`defensores-fin-${estado}`}
+          >
             <span className="df-overlay-emoji" aria-hidden="true">
               {estado === 'gano' ? '🌽🎉' : '🐛'}
             </span>
