@@ -1,5 +1,5 @@
-import React from 'react';
-import { BadgeCheck, Info, Sparkles, AlertTriangle, ExternalLink, ShieldCheck } from 'lucide-react';
+import React, { useState } from 'react';
+import { BadgeCheck, Info, Sparkles, AlertTriangle, ExternalLink, ShieldCheck, ChevronDown } from 'lucide-react';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import { speak, speakKokoro, stop, isSpeaking, isKokoroAvailable } from '../../services/ttsService';
 import { agentSounds } from '../../services/agentSoundService';
@@ -261,6 +261,199 @@ function ConfianzaBadge({ metadata }) {
 }
 
 /**
+ * #2074 — Semáforo de confianza científica POR-RESPUESTA. Traduce la política de
+ * grounding que el sidecar emite en `metadata.grounding_semaphore` a un chip
+ * verde/ámbar/rojo que funciona como "sello institucional": el usuario técnico
+ * lo lee de un vistazo y el campesino lo ignora sin fricción.
+ *
+ *   - 🟢 verde  → grounded ≥ umbral de confianza      → "Verificado"
+ *   - 🟡 ámbar  → una sola fuente / confianza media    → "Una fuente"
+ *   - 🔴 rojo   → disputed / sin fuente / abstain      → "Sin verificar"
+ *
+ * Al tocar el chip se despliega el `grounding_reason` (por qué el sidecar asignó
+ * ese color) + la procedencia (institución/source + DOI o enlace, si viajan en
+ * el metadata). Interacción CSP-safe: onClick de React (evento sintético, NO
+ * handler inline → no requiere 'unsafe-inline').
+ *
+ * Degradación suave: si el sidecar aún NO emite el semáforo (p.ej. antes de que
+ * #2074 llegue a producción), se DERIVA un color conservador desde las señales
+ * de grounding ya presentes en el turno (grounded / confianza / disputed). Si no
+ * hay ninguna señal reconocible (turno legacy o puramente generativo), no
+ * renderiza nada — el SourceBadge existente ya cubre ese caso.
+ */
+const _SEMAPHORE = {
+  verde: {
+    label: 'Verificado',
+    classes: 'bg-emerald-600/15 text-emerald-200 border-emerald-600/50 hover:bg-emerald-600/25',
+    dot: 'bg-emerald-400',
+    title: 'Semáforo de confianza: verde. Respuesta respaldada por el catálogo con confianza suficiente. Toca para ver por qué y la fuente.',
+    Icon: ShieldCheck,
+    fallbackReason: 'Dato respaldado por el catálogo Chagra con confianza suficiente.',
+  },
+  ambar: {
+    label: 'Una fuente',
+    classes: 'bg-amber-600/15 text-amber-200 border-amber-600/50 hover:bg-amber-600/25',
+    dot: 'bg-amber-400',
+    title: 'Semáforo de confianza: ámbar. Respaldo parcial (una sola fuente o confianza media). Toca para ver por qué y la fuente.',
+    Icon: Info,
+    fallbackReason: 'Respaldo parcial: una sola fuente o confianza media. Contrástalo antes de aplicar.',
+  },
+  rojo: {
+    label: 'Sin verificar',
+    classes: 'bg-red-700/20 text-red-200 border-red-700/60 hover:bg-red-700/30',
+    dot: 'bg-red-400',
+    title: 'Semáforo de confianza: rojo. Sin fuente verificable o dato en disputa. Toca para ver el detalle.',
+    Icon: AlertTriangle,
+    fallbackReason: 'Sin fuente verificable o dato en disputa. No lo apliques sin confirmarlo con un técnico.',
+  },
+};
+
+/**
+ * Normaliza el valor de `grounding_semaphore` (o sinónimos que pueda emitir el
+ * sidecar) a una de las claves canónicas 'verde' | 'ambar' | 'rojo'. Devuelve
+ * null si el valor no es reconocible (→ el caller intenta derivar).
+ */
+function _normSemaphore(raw) {
+  if (typeof raw !== 'string') return null;
+  const v = raw.trim().toLowerCase();
+  if (['verde', 'green', 'ok', 'grounded'].includes(v)) return 'verde';
+  if (['ambar', 'ámbar', 'amber', 'amarillo', 'yellow', 'warn', 'single', 'single_source', 'una_fuente'].includes(v)) return 'ambar';
+  if (['rojo', 'red', 'abstain', 'disputed', 'danger', 'sin_fuente'].includes(v)) return 'rojo';
+  return null;
+}
+
+/** ¿El turno trae alguna fuente citable (enlace http(s), texto o institución)? */
+function _hasVerifiableSource(md) {
+  const url = typeof md.fuente_url === 'string' ? md.fuente_url.trim() : '';
+  if (/^https?:\/\//i.test(url)) return true;
+  if (md.fuente_texto === true) return true;
+  return typeof md.fuente === 'string' && md.fuente.trim().length > 0;
+}
+
+/**
+ * Deriva un color conservador cuando el sidecar todavía no emite el semáforo.
+ * Solo se pronuncia si hay una señal firme (evita falsos alarmas en saludos):
+ *   - disputed === true                         → rojo
+ *   - grounded && (confianza alta || fuente)     → verde
+ *   - grounded (confianza media/desconocida)     → ámbar
+ *   - en cualquier otro caso                     → null (el SourceBadge ya avisa)
+ */
+function _deriveSemaphore(md) {
+  if (md.disputed === true) return 'rojo';
+  if (md.grounded === true) {
+    if (md.confianza === 'alta' || _hasVerifiableSource(md)) return 'verde';
+    return 'ambar';
+  }
+  return null;
+}
+
+/** Extrae la procedencia mostrable (institución + enlace/DOI) del metadata. */
+function _semaphoreProvenance(md) {
+  const rawUrl = typeof md.fuente_url === 'string' ? md.fuente_url.trim() : '';
+  const url = /^https?:\/\//i.test(rawUrl) ? rawUrl : '';
+  const rawDoi = typeof md.doi === 'string' ? md.doi.trim() : '';
+  // DOI puede venir como "10.xxxx/…" (bare) o ya como URL doi.org.
+  let doiLabel = '';
+  let doiUrl = '';
+  if (rawDoi) {
+    doiLabel = rawDoi.replace(/^https?:\/\/(dx\.)?doi\.org\//i, '');
+    doiUrl = /^https?:\/\//i.test(rawDoi) ? rawDoi : `https://doi.org/${rawDoi}`;
+  }
+  const inst =
+    (typeof md.institucion === 'string' && md.institucion.trim()) ||
+    (typeof md.fuente === 'string' && md.fuente.trim()) ||
+    '';
+  return { url, doiLabel, doiUrl, inst };
+}
+
+function SemaphoreBadge({ metadata }) {
+  const md = metadata || {};
+  const [expanded, setExpanded] = useState(false);
+
+  const color = _normSemaphore(md.grounding_semaphore) || _deriveSemaphore(md);
+  if (!color) return null;
+  const cfg = _SEMAPHORE[color];
+  const { Icon } = cfg;
+
+  // Origen del color: explícito del sidecar vs derivado en el cliente (útil
+  // para telemetría/QA; no cambia lo que ve el usuario).
+  const derived = !_normSemaphore(md.grounding_semaphore);
+  const reason =
+    (typeof md.grounding_reason === 'string' && md.grounding_reason.trim()) || cfg.fallbackReason;
+  const { url, doiLabel, doiUrl, inst } = _semaphoreProvenance(md);
+  const hasProvenance = Boolean(inst || url || doiLabel);
+  const detailId = 'semaphore-detail';
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        aria-expanded={expanded}
+        aria-controls={detailId}
+        aria-label={`${cfg.title}`}
+        data-testid="semaphore-badge"
+        data-semaphore={color}
+        data-derived={derived ? 'true' : undefined}
+        title={cfg.title}
+        className={`tap-target text-xs px-2 py-1 rounded-md inline-flex items-center gap-1.5 border transition-colors ${cfg.classes}`}
+      >
+        <span className={`inline-block w-2 h-2 rounded-full ${cfg.dot}`} aria-hidden="true" />
+        <Icon size={12} aria-hidden="true" />
+        <span>{cfg.label}</span>
+        <ChevronDown
+          size={12}
+          aria-hidden="true"
+          className={`transition-transform ${expanded ? 'rotate-180' : ''}`}
+        />
+      </button>
+
+      {expanded && (
+        <div
+          id={detailId}
+          data-testid="semaphore-detail"
+          className="basis-full mt-1 px-2.5 py-2 rounded-md text-xs leading-relaxed bg-slate-800/60 border border-slate-700 text-slate-200"
+        >
+          <p className="mb-1" data-testid="semaphore-reason">{reason}</p>
+          {hasProvenance && (
+            <div className="flex flex-col gap-0.5 text-slate-300" data-testid="semaphore-provenance">
+              {inst && (
+                <span className="inline-flex items-center gap-1">
+                  <ShieldCheck size={11} aria-hidden="true" />
+                  <span>Fuente: {inst}</span>
+                </span>
+              )}
+              {url && (
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-sky-300 hover:underline underline-offset-2 w-fit"
+                >
+                  <ExternalLink size={11} aria-hidden="true" />
+                  <span>Abrir recurso citado</span>
+                </a>
+              )}
+              {doiLabel && (
+                <a
+                  href={doiUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-sky-300 hover:underline underline-offset-2 w-fit"
+                >
+                  <ExternalLink size={11} aria-hidden="true" />
+                  <span>DOI: {doiLabel}</span>
+                </a>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </>
+  );
+}
+
+/**
  * Burbuja individual de chat para un mensaje del usuario o del agente.
  * Soporta renderizado de imágenes, badges de fuente verificable, confianza,
  * auto-corrección, nombres científicos sospechosos/alucinados, feedback,
@@ -268,7 +461,8 @@ function ConfianzaBadge({ metadata }) {
  *
  * @param {Object} props - Propiedades del componente.
  * @param {Object} props.message - Objeto mensaje con `role` ('user'|'assistant'), `content`, `timestamp`,
- *   `metadata` (fuente, confianza, tool_used, grounded), `imageUrl`, `photo`, `_orphan_recovery`,
+ *   `metadata` (fuente, confianza, tool_used, grounded, grounding_semaphore, grounding_reason, doi),
+ *   `imageUrl`, `photo`, `_orphan_recovery`,
  *   `_orphan_prompt`, `_deepResearch`, `_edges`.
  * @param {boolean} [props.isStreaming=false] - Indica si este mensaje está en streaming.
  * @param {string} [props.promptText] - Texto del prompt del usuario asociado a esta respuesta (para feedback).
@@ -406,6 +600,10 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
           )}
           {shouldShowBadge && (
             <div className="mt-1 flex flex-wrap items-center gap-1.5">
+              {/* #2074: semáforo de confianza científica por-respuesta (verde/
+                  ámbar/rojo). Chip interactivo: al tocarlo despliega el motivo
+                  del grounding + la procedencia (sello institucional). */}
+              <SemaphoreBadge metadata={message.metadata} />
               <SourceBadge metadata={message.metadata} />
               {/* #20: confianza del dato curado (alta/media/baja → verde/ámbar/gris). */}
               <ConfianzaBadge metadata={message.metadata} />

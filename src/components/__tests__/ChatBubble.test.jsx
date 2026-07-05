@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import ChatBubbleRaw from '../AgentScreen/ChatBubble';
 /** @type {any} */
@@ -526,5 +526,143 @@ describe('ChatBubble — badges anti-alucinación (#18 fuente · #19 auto-correg
     expect(screen.queryByTestId('fuente-badge')).not.toBeInTheDocument();
     expect(screen.queryByTestId('confianza-badge')).not.toBeInTheDocument();
     expect(screen.queryByTestId('auto-corrected-badge')).not.toBeInTheDocument();
+  });
+});
+
+
+// #2074 — Semáforo de confianza científica por-respuesta.
+describe('ChatBubble — #2074 semáforo de confianza (verde/ámbar/rojo)', () => {
+  let storeState;
+
+  beforeEach(() => {
+    storeState = { showSourceBadges: true };
+    usePrefsStore.mockImplementation((selector) => selector(storeState));
+  });
+
+  const base = (metadata) => ({
+    role: 'assistant',
+    content: 'La gulupa se siembra sobre los 1700 msnm.',
+    timestamp: Date.now(),
+    metadata,
+  });
+
+  test('grounding_semaphore="verde" → chip verde "Verificado"', () => {
+    render(<ChatBubble message={base({ grounding_semaphore: 'verde', grounded: true })} />);
+    const badge = screen.getByTestId('semaphore-badge');
+    expect(badge).toBeInTheDocument();
+    expect(badge).toHaveAttribute('data-semaphore', 'verde');
+    expect(badge).toHaveTextContent(/Verificado/i);
+    // Origen explícito del sidecar (no derivado en cliente).
+    expect(badge).not.toHaveAttribute('data-derived');
+    expect(badge.className).toMatch(/emerald/);
+  });
+
+  test('grounding_semaphore="ambar" → chip ámbar "Una fuente"', () => {
+    render(<ChatBubble message={base({ grounding_semaphore: 'ambar', grounded: true })} />);
+    const badge = screen.getByTestId('semaphore-badge');
+    expect(badge).toHaveAttribute('data-semaphore', 'ambar');
+    expect(badge).toHaveTextContent(/Una fuente/i);
+    expect(badge.className).toMatch(/amber/);
+  });
+
+  test('grounding_semaphore="rojo" → chip rojo "Sin verificar"', () => {
+    render(<ChatBubble message={base({ grounding_semaphore: 'rojo', grounded: false })} />);
+    const badge = screen.getByTestId('semaphore-badge');
+    expect(badge).toHaveAttribute('data-semaphore', 'rojo');
+    expect(badge).toHaveTextContent(/Sin verificar/i);
+    expect(badge.className).toMatch(/red/);
+  });
+
+  test('normaliza sinónimos del sidecar (green/amber/red) al color canónico', () => {
+    const { rerender } = render(<ChatBubble message={base({ grounding_semaphore: 'green' })} />);
+    expect(screen.getByTestId('semaphore-badge')).toHaveAttribute('data-semaphore', 'verde');
+    rerender(<ChatBubble message={base({ grounding_semaphore: 'amber' })} />);
+    expect(screen.getByTestId('semaphore-badge')).toHaveAttribute('data-semaphore', 'ambar');
+    rerender(<ChatBubble message={base({ grounding_semaphore: 'abstain' })} />);
+    expect(screen.getByTestId('semaphore-badge')).toHaveAttribute('data-semaphore', 'rojo');
+  });
+
+  test('al tocar el chip despliega grounding_reason + procedencia (source/DOI)', () => {
+    render(
+      <ChatBubble
+        message={base({
+          grounding_semaphore: 'verde',
+          grounded: true,
+          grounding_reason: 'Dos fuentes concordantes en el catálogo curado.',
+          fuente: 'Agrosavia',
+          fuente_url: 'https://repository.agrosavia.co/doc/123',
+          doi: '10.1234/abcd',
+        })}
+      />,
+    );
+    // Colapsado: el detalle no está visible.
+    expect(screen.queryByTestId('semaphore-detail')).not.toBeInTheDocument();
+    const badge = screen.getByTestId('semaphore-badge');
+    expect(badge).toHaveAttribute('aria-expanded', 'false');
+
+    fireEvent.click(badge);
+
+    expect(badge).toHaveAttribute('aria-expanded', 'true');
+    const detail = screen.getByTestId('semaphore-detail');
+    expect(detail).toBeInTheDocument();
+    expect(screen.getByTestId('semaphore-reason')).toHaveTextContent(
+      /Dos fuentes concordantes en el catálogo curado\./i,
+    );
+    const prov = screen.getByTestId('semaphore-provenance');
+    expect(prov).toHaveTextContent(/Fuente:\s*Agrosavia/i);
+    // DOI: enlace a doi.org construido desde el binomio bare.
+    const doiLink = screen.getByText(/DOI:\s*10\.1234\/abcd/i).closest('a');
+    expect(doiLink).toHaveAttribute('href', 'https://doi.org/10.1234/abcd');
+    expect(doiLink).toHaveAttribute('rel', expect.stringContaining('noopener'));
+  });
+
+  test('degradación suave: sin grounding_reason usa el motivo por defecto del color', () => {
+    render(<ChatBubble message={base({ grounding_semaphore: 'rojo', grounded: false })} />);
+    fireEvent.click(screen.getByTestId('semaphore-badge'));
+    expect(screen.getByTestId('semaphore-reason')).toHaveTextContent(/Sin fuente verificable|disputa/i);
+  });
+
+  test('deriva VERDE cuando no hay semáforo explícito pero grounded + confianza alta', () => {
+    render(<ChatBubble message={base({ grounded: true, confianza: 'alta' })} />);
+    const badge = screen.getByTestId('semaphore-badge');
+    expect(badge).toHaveAttribute('data-semaphore', 'verde');
+    // Marca de derivado-en-cliente para QA/telemetría.
+    expect(badge).toHaveAttribute('data-derived', 'true');
+  });
+
+  test('deriva ROJO cuando el dato está en disputa (disputed=true)', () => {
+    render(<ChatBubble message={base({ grounded: true, disputed: true })} />);
+    expect(screen.getByTestId('semaphore-badge')).toHaveAttribute('data-semaphore', 'rojo');
+  });
+
+  test('NO renderiza semáforo en turno generativo puro sin señal (evita falsa alarma)', () => {
+    render(<ChatBubble message={base({ tool_used: null, grounded: false })} />);
+    expect(screen.queryByTestId('semaphore-badge')).not.toBeInTheDocument();
+    // El badge de fuente normal SÍ sigue apareciendo.
+    expect(screen.getByTestId('source-badge')).toBeInTheDocument();
+  });
+
+  test('respeta showSourceBadges OFF (no aparece el semáforo)', () => {
+    storeState = { showSourceBadges: false };
+    usePrefsStore.mockImplementation((selector) => selector(storeState));
+    render(<ChatBubble message={base({ grounding_semaphore: 'verde', grounded: true })} />);
+    expect(screen.queryByTestId('semaphore-badge')).not.toBeInTheDocument();
+  });
+
+  test('backward compat: metadata=null no rompe el render ni muestra semáforo', () => {
+    render(<ChatBubble message={{ role: 'assistant', content: 'Legacy.', timestamp: Date.now(), metadata: null }} />);
+    expect(screen.queryByTestId('semaphore-badge')).not.toBeInTheDocument();
+  });
+
+  test('wording sin voseo argentino ni hype', () => {
+    render(
+      <ChatBubble
+        message={base({ grounding_semaphore: 'rojo', grounded: false, grounding_reason: 'Verifica con un técnico.' })}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('semaphore-badge'));
+    const detail = screen.getByTestId('semaphore-detail');
+    expect(detail.textContent).not.toMatch(/verificá|aplicá|tenés/i);
+    expect(detail.textContent).not.toMatch(/garantizado|perfecto|100%/i);
   });
 });

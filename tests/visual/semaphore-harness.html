@@ -1,0 +1,20 @@
+<!doctype html>
+<!--
+  semaphore-harness.html — Harness AISLADO para el test VISUAL del #2074
+  Semáforo de confianza científica del ChatBubble. Monta el ChatBubble REAL
+  con metadata sintética en los 3 estados (verde/ámbar/rojo), SIN pasar por
+  el router/auth de la app.
+
+  Uso: navegar a /tests/visual/semaphore-harness.html en el dev server.
+-->
+<html lang="es-CO">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Semáforo de confianza — harness visual</title>
+  </head>
+  <body class="bg-slate-950 text-white">
+    <div id="harness-root"></div>
+    <script type="module" src="./semaphore-harness.jsx"></script>
+  </body>
+</html>
