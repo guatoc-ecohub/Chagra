@@ -153,6 +153,7 @@ const HelpManual = lazy(() => import('./components/HelpManual'));
 const TopBar = lazy(() => import('./components/TopBar'));
 const DashboardLive = lazy(() => import('./components/dashboard/DashboardLive'));
 const AprenderConAgente = lazy(() => import('./components/Aprende/AprenderConAgente'));
+const CursoChagra = lazy(() => import('./components/curso/CursoChagra'));
 const DirectorioEspeciesScreen = lazy(() => import('./components/DirectorioEspecies/DirectorioEspeciesScreen'));
 const HoyEnFincaScreen = lazy(() => import('./components/hoy/HoyEnFincaScreen'));
 const MiFincaEvolucionScreen = lazy(() => import('./components/hoy/MiFincaEvolucionScreen'));
@@ -253,6 +254,20 @@ const HASH_VIEW_ROUTES = {
   nutricion: 'nutricion',
   'nutricion-humana': 'nutricion',
   'comida-que-alimenta': 'nutricion',
+  // Curso guiado + deep-links profundos usados por la landing (chagra.bio):
+  // permiten que chagra.app/#curso, /#sembrar, /#voz, /#milpa, /#biopreparados,
+  // /#sanidad y /#cosechar caigan en su vista real (antes caían a dashboard).
+  curso: 'curso',
+  'curso-chagra': 'curso',
+  manual: 'curso',
+  sembrar: 'sembrar',
+  siembra: 'sembrar',
+  voz: 'voz',
+  milpa: 'milpa',
+  biopreparados: 'biopreparados',
+  sanidad: 'sanidad_sintoma',
+  'sanidad-sintoma': 'sanidad_sintoma',
+  cosechar: 'cosechar',
 };
 
 // Vistas que cuentan como "módulo" para telemetría de piloto.
@@ -262,7 +277,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'nutricion', 'toxicologia', 'aprende', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
   'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
@@ -1454,9 +1469,28 @@ export default function App() {
             <ErrorFallback moduleName="Aprende con el agente">
               <AprenderConAgente
                 onBack={() => navigate('dashboard')}
+                initialSlug={currentViewData?.leccion}
+                onNavigate={navigate}
                 onAskAgent={(pregunta) =>
                   navigate('agente', { prefilledPrompt: pregunta })
                 }
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'curso':
+        // Curso auto-guiado "Aprende a usar Chagra" (#curso): un solo camino
+        // de 5 pasos (registrar → suelo → cuidar → asociar → vender) que junta
+        // los 4 video-manuales + las 5 lecciones del mundo Aprender + un
+        // "Pruébalo en tu finca" (deep-link a la función real) por módulo, con
+        // progreso guardado. Para volverse autónomo con la app sin ayuda.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Curso: usar Chagra">
+              <CursoChagra
+                onBack={() => navigate('dashboard')}
+                onNavigate={navigate}
+                initialModulo={currentViewData?.modulo}
               />
             </ErrorFallback>
           </ErrorBoundary>

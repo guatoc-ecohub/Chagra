@@ -25,6 +25,7 @@ import {
   Bug,
   CalendarDays,
   MessageCircle,
+  GraduationCap,
 } from 'lucide-react';
 
 import lecciones from '../../data/agro-lecciones.json';
@@ -398,9 +399,14 @@ export function AprenderEntryCard({ onNavigate }) {
  * @param {() => void} [props.onBack] - volver al dashboard.
  * @param {(pregunta: string) => void} [props.onAskAgent] - abre el chat del
  *   agente con la pregunta de la lección pre-cargada (conecta Aprender → Agente).
+ * @param {string} [props.initialSlug] - abre directamente esta lección (deep-link
+ *   desde el Curso guiado, ej. navigate('aprende', { leccion: 'suelo' })). Si el
+ *   slug no existe, cae al listado normal.
  */
-export default function AprenderConAgente({ onBack, onAskAgent }) {
-  const [leccionActual, setLeccionActual] = useState(null);
+export default function AprenderConAgente({ onBack, onAskAgent, initialSlug, onNavigate }) {
+  const [leccionActual, setLeccionActual] = useState(
+    () => (initialSlug ? lecciones.find((l) => l.slug === initialSlug) || null : null)
+  );
 
   if (leccionActual) {
     return (
@@ -434,8 +440,33 @@ export default function AprenderConAgente({ onBack, onAskAgent }) {
       </div>
 
       <main className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+        {/* ¿Nuevo en Chagra? El curso guiado enseña a USAR la app (video +
+            lección + probar), del primer registro a la venta. Va arriba de las
+            lecciones sueltas: es el camino para volverse autónomo. */}
+        {typeof onNavigate === 'function' && (
+          <button
+            type="button"
+            data-testid="aprende-curso-cta"
+            onClick={() => onNavigate('curso')}
+            className="w-full rounded-2xl bg-gradient-to-br from-cyan-900/60 to-emerald-950/80 border border-cyan-600/50 hover:border-cyan-400/70 active:scale-[0.99] transition-all p-4 text-left flex items-center gap-3 min-h-[84px] shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/60"
+          >
+            <span className="shrink-0 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-cyan-700/40 border border-cyan-500/50">
+              <GraduationCap size={26} className="text-cyan-200" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-base font-black leading-tight text-cyan-50">
+                Curso: aprende a usar Chagra
+              </span>
+              <span className="block text-xs mt-1 leading-snug text-cyan-100/70">
+                5 pasos con video, del primer registro a la venta.
+              </span>
+            </span>
+            <ChevronRight size={20} className="shrink-0 text-slate-400 self-center" />
+          </button>
+        )}
+
         <p className="text-xs text-slate-400 leading-relaxed">
-          Elige un tema. Cada lección tiene datos verificados con fuente real: nada inventado.
+          O elige un tema suelto. Cada lección tiene datos verificados con fuente real: nada inventado.
         </p>
 
         {lecciones.map((leccion) => {
