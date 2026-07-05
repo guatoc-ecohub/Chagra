@@ -442,6 +442,18 @@ html[data-theme="biopunk"] .fvh {
 .fvh-pill.fvh-pill-perfil {
   box-shadow: 0 4px 11px rgba(60, 40, 10, 0.18),
               0 0 0 2px rgb(var(--c-emerald-500, 47 107 58) / 0.55);
+  /* La foto de perfil (fvh-pill-foto) llena la píldora redonda sin desbordarla. */
+  overflow: hidden;
+}
+/* Foto de perfil fijada por el usuario dentro de la píldora (hotfix P0
+   2026-07-04: el home F2 mostraba SIEMPRE el ícono genérico aunque hubiera
+   foto — el TopBar legacy que la pintaba no se monta con la flag F2 ON). */
+.fvh-pill-perfil .fvh-pill-foto {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
 }
 
 /* MÓVIL ANGOSTO (regresión 2026-07-04): con 4 accesos en el header (A del

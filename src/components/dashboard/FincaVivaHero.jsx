@@ -10,6 +10,7 @@ import useAssetStore from '../../store/useAssetStore';
 import { buildFincaScene } from '../../services/fincaSceneService';
 import { selectSceneVariant, SCENE_KINDS } from '../../services/fincaSceneProfileSelector';
 import { getProfile, saveProfile, getInvernaderoEstructura } from '../../services/userProfileService';
+import { getOperatorPhoto } from '../../services/operatorPhotoService';
 import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciarAccess';
 import { deriveAtmosphere } from '../../services/atmosphereService';
 import { resolveClimaLocation, getCachedClimaSnapshot, CLIMA_UPDATED_EVENT } from '../../services/climaService';
@@ -186,6 +187,27 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
     try { if (typeof saveProfile === 'function') saveProfile({ nivel_respuestas: next }); }
     catch (_) { /* perfil opcional: el toggle igual refleja la elección en sesión */ }
   };
+
+  // ── Foto de perfil en la píldora del topbar (hotfix P0 2026-07-04) ────────
+  // El TopBar legacy mostraba la foto fijada por el usuario (getOperatorPhoto,
+  // feature 2026-06-15); con la flag F2 ON ese TopBar NO se monta y el home se
+  // quedó con el ícono genérico de persona aunque hubiera foto. Misma mecánica
+  // de re-lectura en vivo que TopBar: 'chagra:operator-update' (same-tab, la
+  // emite operatorPhotoService al subir/cambiar/quitar) + 'storage' (cross-tab).
+  const [fotoPerfil, setFotoPerfil] = useState(() => {
+    try { return getOperatorPhoto(); } catch (_) { return ''; }
+  });
+  useEffect(() => {
+    const refresh = () => {
+      try { setFotoPerfil(getOperatorPhoto()); } catch (_) { /* storage no disponible */ }
+    };
+    window.addEventListener('chagra:operator-update', refresh);
+    window.addEventListener('storage', refresh);
+    return () => {
+      window.removeEventListener('chagra:operator-update', refresh);
+      window.removeEventListener('storage', refresh);
+    };
+  }, []);
 
   // ── Cielo real: hora + clima (REUSA atmosphereService, no inventa motor) ──
   const atmosfera = useAtmosferaEscena();
@@ -368,10 +390,21 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
               data-testid="finca-viva-perfil"
               onClick={() => onNavigate?.('perfil')}
             >
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
-                <circle cx="12" cy="8.4" r="4" fill="currentColor" />
-                <path d="M4.6 19.5c.7-3.7 3.8-5.8 7.4-5.8s6.7 2.1 7.4 5.8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
-              </svg>
+              {/* Foto de perfil fijada por el usuario; cae al ícono genérico de
+                  persona si no hay foto (misma regla que el TopBar legacy). */}
+              {fotoPerfil ? (
+                <img
+                  src={fotoPerfil}
+                  alt=""
+                  className="fvh-pill-foto"
+                  data-testid="fvh-perfil-foto"
+                />
+              ) : (
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+                  <circle cx="12" cy="8.4" r="4" fill="currentColor" />
+                  <path d="M4.6 19.5c.7-3.7 3.8-5.8 7.4-5.8s6.7 2.1 7.4 5.8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
+                </svg>
+              )}
             </button>
           </div>
         </header>

@@ -63,6 +63,7 @@ vi.mock('../../../config/fincaVivaHomeFlag', () => ({
 }));
 vi.mock('../../../config/extensionistaAccess', () => ({
   esExtensionistaActual: () => false,
+  esExtensionistaRealActual: () => false,
 }));
 vi.mock('../../../config/glaciarAccess', () => ({
   tieneAccesoGlaciarActual: () => false,
