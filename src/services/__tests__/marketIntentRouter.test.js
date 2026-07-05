@@ -24,7 +24,13 @@ const sp = (mentioned, canonical_id = null, nombre_comun = null) => ({
 
 describe('planMarketIntent — guardas', () => {
   it('mensaje vacío / no-string → null', () => {
-    for (const bad of [null, undefined, '', '   ', 42, {}]) {
+    // `any[]`: se testea deliberadamente el guard de tipo con valores que
+    // NO son string (null/undefined/number/object) — es la firma real de
+    // "entrada malformada" que `planMarketIntent` debe rechazar en runtime,
+    // no tiene sentido ensanchar el tipo público `userMessage: string` solo
+    // para este test (mismo patrón ya aceptado en knowledgeIntentRouter.test.js
+    // y agentNluFallback.test.js).
+    for (const bad of /** @type {any[]} */ ([null, undefined, '', '   ', 42, {}])) {
       expect(planMarketIntent(bad, [sp('papa')])).toBeNull();
     }
   });
