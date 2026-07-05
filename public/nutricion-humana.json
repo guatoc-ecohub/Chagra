@@ -1,0 +1,869 @@
+{
+  "meta": {
+    "titulo": "La comida que alimenta",
+    "descripcion": "Qué te da comer cada cultivo de la finca — aporte nutricional por 100 gramos de porción comestible.",
+    "fuente": "ICBF — Tabla de Composición de Alimentos Colombianos (TCAC), 2015",
+    "fuente_url": "https://www.minsalud.gov.co/sites/rid/Lists/BibliotecaDigital/RIDE/INEC/IETS/tabla-de-composicion-alimentos-colombianos-2015.pdf",
+    "anio_fuente": 2015,
+    "unidad": "por 100 g de porción comestible",
+    "origen_datos": "Grafo de conocimiento chagra_kg (nodos AporteNutricional → Species vía TIENE_APORTE_NUTRICIONAL), exportado a estático porque la PWA no consulta el grafo en vivo.",
+    "batch": "nutricion-mercado-icbf-dr-2026-07-05",
+    "total_cultivos": 27,
+    "maximos": {
+      "energia_kcal": 468,
+      "proteina_g": 23.1,
+      "hierro_mg": 8.4,
+      "vitamina_a_er": 700
+    },
+    "nutrientes_ref": {
+      "energia_kcal": {
+        "etiqueta": "Energía",
+        "unidad": "kcal",
+        "folk": "Fuerza para el trabajo"
+      },
+      "proteina_g": {
+        "etiqueta": "Proteína",
+        "unidad": "g",
+        "folk": "Para formar el cuerpo"
+      },
+      "hierro_mg": {
+        "etiqueta": "Hierro",
+        "unidad": "mg",
+        "folk": "Para la sangre y la fuerza"
+      },
+      "vitamina_a_er": {
+        "etiqueta": "Vitamina A",
+        "unidad": "ER",
+        "folk": "Para los ojos y las defensas"
+      }
+    },
+    "nota_datos_faltantes": "Donde el ICBF (TCAC 2015) no reporta un valor, el campo va en null y aparece en datos_faltantes. No se inventan cifras."
+  },
+  "grupos": [
+    {
+      "id": "energeticos",
+      "titulo": "Energéticos",
+      "emoji": "🔥",
+      "folk": "Los que dan fuerza para el trabajo",
+      "cientifico": "Ricos en carbohidratos y grasas — el combustible del cuerpo.",
+      "color": "amber"
+    },
+    {
+      "id": "proteicos",
+      "titulo": "Proteicos",
+      "emoji": "💪",
+      "folk": "Los que forman el cuerpo: músculo y sangre",
+      "cientifico": "Ricos en proteína — construyen y reparan los tejidos.",
+      "color": "emerald"
+    },
+    {
+      "id": "protectores",
+      "titulo": "Protectores",
+      "emoji": "🛡️",
+      "folk": "Los que cuidan y defienden: ojos, sangre y defensas",
+      "cientifico": "Ricos en vitaminas y minerales — regulan y protegen.",
+      "color": "sky"
+    }
+  ],
+  "items": [
+    {
+      "id": "aporte_nutricional_coriandrum_sativum",
+      "species_id": "coriandrum_sativum",
+      "crop_key": "cilantro",
+      "nombre_comun": "Cilantro",
+      "nombre_cientifico": "Coriandrum sativum L.",
+      "nombres_comunes": [
+        "culantro"
+      ],
+      "categoria_botanica": "hortalizas_hoja",
+      "grupo": "protectores",
+      "nutriente_estrella": "vitamina_a_er",
+      "forma": "hojas",
+      "alimento_icbf": "Cilantro, hojas",
+      "codigo_icbf": 159,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 52,
+        "proteina_g": 4.2,
+        "hierro_mg": 7.4,
+        "vitamina_a_er": 390
+      },
+      "datos_faltantes": []
+    },
+    {
+      "id": "aporte_nutricional_cucurbita_maxima",
+      "species_id": "cucurbita_maxima",
+      "crop_key": "ahuyama",
+      "nombre_comun": "Calabaza / Auyama",
+      "nombre_cientifico": "Cucurbita maxima Duchesne",
+      "nombres_comunes": [
+        "ahuyama",
+        "calabacita banana",
+        "calabaza de castilla",
+        "zapallo criollo",
+        "zapallo plomo",
+        "zapallo"
+      ],
+      "categoria_botanica": "hortalizas_fruto_flor",
+      "grupo": "protectores",
+      "nutriente_estrella": "vitamina_a_er",
+      "forma": "sin cascara, cruda",
+      "alimento_icbf": "Ahuyama C. maxima, sin cascara, cruda",
+      "codigo_icbf": 124,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 40,
+        "proteina_g": 0.9,
+        "hierro_mg": null,
+        "vitamina_a_er": 340
+      },
+      "datos_faltantes": [
+        "hierro_mg"
+      ]
+    },
+    {
+      "id": "aporte_nutricional_solanum_lycopersicum",
+      "species_id": "solanum_lycopersicum",
+      "crop_key": "tomate",
+      "nombre_comun": "Tomate chonto",
+      "nombre_cientifico": "Solanum lycopersicum L.",
+      "nombres_comunes": [
+        "frutilla"
+      ],
+      "categoria_botanica": null,
+      "grupo": "protectores",
+      "nutriente_estrella": "vitamina_a_er",
+      "forma": "pulpa",
+      "alimento_icbf": "Tomate, pulpa",
+      "codigo_icbf": 244,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 18,
+        "proteina_g": 0.9,
+        "hierro_mg": 1.5,
+        "vitamina_a_er": 110
+      },
+      "datos_faltantes": []
+    },
+    {
+      "id": "aporte_nutricional_arracacia_xanthorrhiza_amarilla",
+      "species_id": "arracacia_xanthorrhiza_amarilla",
+      "crop_key": "arracacha",
+      "nombre_comun": "Arracacha amarilla",
+      "nombre_cientifico": "Arracacia xanthorrhiza Bancr. cv. 'Amarilla'",
+      "nombres_comunes": [
+        "apio",
+        "arracacha",
+        "arracache",
+        "maya",
+        "sacha zanahoria",
+        "yurak zanahoria",
+        "zanahoria",
+        "zanahoria blanca"
+      ],
+      "categoria_botanica": "tuberculos_raices",
+      "grupo": "energeticos",
+      "nutriente_estrella": "energia_kcal",
+      "forma": "amarilla, cruda",
+      "alimento_icbf": "Arracacha amarilla, sin cascara, cruda",
+      "codigo_icbf": 135,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 99,
+        "proteina_g": 0.9,
+        "hierro_mg": 0.9,
+        "vitamina_a_er": 24
+      },
+      "datos_faltantes": []
+    },
+    {
+      "id": "aporte_nutricional_daucus_carota_subsp_sativus",
+      "species_id": "daucus_carota_subsp_sativus",
+      "crop_key": "zanahoria",
+      "nombre_comun": "Zanahoria",
+      "nombre_cientifico": "Daucus carota L. subsp. sativus (Hoffm.) Arcang.",
+      "nombres_comunes": [],
+      "categoria_botanica": "tuberculos_raices",
+      "grupo": "protectores",
+      "nutriente_estrella": "vitamina_a_er",
+      "forma": "cruda",
+      "alimento_icbf": "Zanahoria, cruda",
+      "codigo_icbf": 251,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 37,
+        "proteina_g": 0.7,
+        "hierro_mg": 0.4,
+        "vitamina_a_er": 700
+      },
+      "datos_faltantes": []
+    },
+    {
+      "id": "aporte_nutricional_solanum_quitoense",
+      "species_id": "solanum_quitoense",
+      "crop_key": "lulo",
+      "nombre_comun": "Lulo / Naranjilla / Chuva",
+      "nombre_cientifico": "Solanum quitoense Lam.",
+      "nombres_comunes": [
+        "daboka",
+        "huevo de perro",
+        "kukuch",
+        "naranjilla",
+        "naranjilla silvestre",
+        "lulo"
+      ],
+      "categoria_botanica": "frutales_perennes",
+      "grupo": "protectores",
+      "nutriente_estrella": null,
+      "forma": "maduro, pulpa",
+      "alimento_icbf": "Lulo, maduro, pulpa",
+      "codigo_icbf": 321,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 37,
+        "proteina_g": 0.9,
+        "hierro_mg": 0.6,
+        "vitamina_a_er": 37
+      },
+      "datos_faltantes": []
+    },
+    {
+      "id": "aporte_nutricional_solanum_betaceum",
+      "species_id": "solanum_betaceum",
+      "crop_key": "tomate_arbol",
+      "nombre_comun": "Tomate de árbol / Tamarillo",
+      "nombre_cientifico": "Solanum betaceum Cav.",
+      "nombres_comunes": [
+        "lima tomate",
+        "tomate",
+        "tomate extranjero",
+        "tomate de palo",
+        "tomate de árbol",
+        "tomato de arbol",
+        "tamarillo",
+        "tomate serrano"
+      ],
+      "categoria_botanica": "frutales_perennes",
+      "grupo": "protectores",
+      "nutriente_estrella": null,
+      "forma": "rojo, maduro, pulpa",
+      "alimento_icbf": "Tomate de arbol rojo, maduro, pulpa",
+      "codigo_icbf": 358,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 42,
+        "proteina_g": 2,
+        "hierro_mg": 0.9,
+        "vitamina_a_er": 36
+      },
+      "datos_faltantes": []
+    },
+    {
+      "id": "aporte_nutricional_brassica_oleracea_var_capitata",
+      "species_id": "brassica_oleracea_var_capitata",
+      "crop_key": "repollo",
+      "nombre_comun": "Repollo",
+      "nombre_cientifico": "Brassica oleracea var. capitata L.",
+      "nombres_comunes": [
+        "col",
+        "col repollo",
+        "lombarda",
+        "repollo"
+      ],
+      "categoria_botanica": "hortalizas_hoja",
+      "grupo": "protectores",
+      "nutriente_estrella": null,
+      "forma": "hojas frescas",
+      "alimento_icbf": "Repollo, hojas frescas",
+      "codigo_icbf": 238,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 35,
+        "proteina_g": 1.8,
+        "hierro_mg": 0.8,
+        "vitamina_a_er": 24
+      },
+      "datos_faltantes": []
+    },
+    {
+      "id": "aporte_nutricional_lactuca_sativa",
+      "species_id": "lactuca_sativa",
+      "crop_key": "lechuga",
+      "nombre_comun": "Lechuga",
+      "nombre_cientifico": "Lactuca sativa L.",
+      "nombres_comunes": [
+        "cogollo",
+        "ensalada",
+        "farfalá",
+        "lechuga",
+        "lechuga arrepollada",
+        "lechugón",
+        "lechuga romana"
+      ],
+      "categoria_botanica": null,
+      "grupo": "protectores",
+      "nutriente_estrella": null,
+      "forma": "comun",
+      "alimento_icbf": "Lechuga comun",
+      "codigo_icbf": 179,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 8,
+        "proteina_g": 0.8,
+        "hierro_mg": 0.9,
+        "vitamina_a_er": 10
+      },
+      "datos_faltantes": []
+    },
+    {
+      "id": "aporte_nutricional_fragaria_ananassa_monterrey",
+      "species_id": "fragaria_ananassa_monterrey",
+      "crop_key": "fresa",
+      "nombre_comun": "Fresa Monterrey",
+      "nombre_cientifico": "Fragaria × ananassa 'Monterrey'",
+      "nombres_comunes": [
+        "fresa",
+        "fresa ananás"
+      ],
+      "categoria_botanica": "frutales_perennes",
+      "grupo": "protectores",
+      "nutriente_estrella": null,
+      "forma": "maduro, fruto entero",
+      "alimento_icbf": "Fresa, maduro, fruto entero",
+      "codigo_icbf": 302,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 35,
+        "proteina_g": 0.8,
+        "hierro_mg": 1.4,
+        "vitamina_a_er": 4
+      },
+      "datos_faltantes": []
+    },
+    {
+      "id": "aporte_nutricional_rubus_glaucus",
+      "species_id": "rubus_glaucus",
+      "crop_key": "mora",
+      "nombre_comun": "Mora andina / Mora de Castilla",
+      "nombre_cientifico": "Rubus glaucus Benth.",
+      "nombres_comunes": [
+        "ashpa mora",
+        "mora",
+        "mora de castilla",
+        "mora de monte",
+        "mora grande",
+        "mora blanca",
+        "zarzamora azul"
+      ],
+      "categoria_botanica": "frutales_perennes",
+      "grupo": "protectores",
+      "nutriente_estrella": null,
+      "forma": "pulpa",
+      "alimento_icbf": "Mora de castilla, pulpa",
+      "codigo_icbf": 339,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 63,
+        "proteina_g": 1,
+        "hierro_mg": 1.7,
+        "vitamina_a_er": 0
+      },
+      "datos_faltantes": []
+    },
+    {
+      "id": "aporte_nutricional_theobroma_cacao",
+      "species_id": "theobroma_cacao",
+      "crop_key": "cacao",
+      "nombre_comun": "Cacao",
+      "nombre_cientifico": "Theobroma cacao L.",
+      "nombres_comunes": [
+        "bikinka",
+        "cacao",
+        "cacao de monte",
+        "cacavo",
+        "chocolate",
+        "kakau",
+        "kope moenka",
+        "kopemowenka"
+      ],
+      "categoria_botanica": "frutales_perennes",
+      "grupo": "energeticos",
+      "nutriente_estrella": "hierro_mg",
+      "forma": "tostado, molido",
+      "alimento_icbf": "Cacao, tostado, molido",
+      "codigo_icbf": 275,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 468,
+        "proteina_g": 14.4,
+        "hierro_mg": 5.8,
+        "vitamina_a_er": 4
+      },
+      "datos_faltantes": []
+    },
+    {
+      "id": "aporte_nutricional_coffea_arabica",
+      "species_id": "coffea_arabica",
+      "crop_key": "cafe",
+      "nombre_comun": "Café caturra / Castillo / Cenicafé 1",
+      "nombre_cientifico": "Coffea arabica L.",
+      "nombres_comunes": [
+        "cafeto",
+        "cafeto arábigo",
+        "cafeto arábico",
+        "cafeto de arabia"
+      ],
+      "categoria_botanica": "medicinales_alelopaticas",
+      "grupo": "energeticos",
+      "nutriente_estrella": "hierro_mg",
+      "forma": "molido",
+      "alimento_icbf": "Cafe, molido",
+      "codigo_icbf": 727,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 441,
+        "proteina_g": 14.2,
+        "hierro_mg": 5.8,
+        "vitamina_a_er": null
+      },
+      "datos_faltantes": [
+        "vitamina_a_er"
+      ]
+    },
+    {
+      "id": "aporte_nutricional_persea_americana",
+      "species_id": "persea_americana",
+      "crop_key": "aguacate",
+      "nombre_comun": "Aguacate",
+      "nombre_cientifico": "Persea americana Mill.",
+      "nombres_comunes": [
+        "aguacate",
+        "palta",
+        "palto"
+      ],
+      "categoria_botanica": "frutales_perennes",
+      "grupo": "energeticos",
+      "nutriente_estrella": "energia_kcal",
+      "forma": "hass, maduro, pulpa",
+      "alimento_icbf": "Aguacate hass, maduro, pulpa",
+      "codigo_icbf": 252,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 170,
+        "proteina_g": 1.3,
+        "hierro_mg": null,
+        "vitamina_a_er": null
+      },
+      "datos_faltantes": [
+        "hierro_mg",
+        "vitamina_a_er"
+      ]
+    },
+    {
+      "id": "aporte_nutricional_manihot_esculenta",
+      "species_id": "manihot_esculenta",
+      "crop_key": "yuca",
+      "nombre_comun": "Yuca brava amazónica",
+      "nombre_cientifico": "Manihot esculenta Crantz",
+      "nombres_comunes": [
+        "airo bai a’so",
+        "apach mama",
+        "api lumu",
+        "arajuno lumu",
+        "auka lumu",
+        "awa llakta lumu",
+        "aypi",
+        "a’so"
+      ],
+      "categoria_botanica": "tuberculos_raices",
+      "grupo": "energeticos",
+      "nutriente_estrella": "energia_kcal",
+      "forma": "cruda",
+      "alimento_icbf": "Yuca, cruda",
+      "codigo_icbf": 249,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 153,
+        "proteina_g": 0.9,
+        "hierro_mg": 0.7,
+        "vitamina_a_er": 1
+      },
+      "datos_faltantes": []
+    },
+    {
+      "id": "aporte_nutricional_phaseolus_vulgaris_habichuela",
+      "species_id": "phaseolus_vulgaris",
+      "crop_key": "habichuela",
+      "nombre_comun": "Frijol arbustivo / voluble",
+      "nombre_cientifico": "Phaseolus vulgaris L.",
+      "nombres_comunes": [
+        "common bean",
+        "frijol",
+        "fréjol",
+        "habichuelas",
+        "mulu fintsumu buli",
+        "poroto",
+        "purutu",
+        "verdura"
+      ],
+      "categoria_botanica": "granos_legumbres",
+      "grupo": "protectores",
+      "nutriente_estrella": null,
+      "forma": "vaina verde, cruda",
+      "alimento_icbf": "Habichuela, cruda",
+      "codigo_icbf": 175,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 31,
+        "proteina_g": 2.1,
+        "hierro_mg": 1,
+        "vitamina_a_er": 17
+      },
+      "datos_faltantes": []
+    },
+    {
+      "id": "aporte_nutricional_beta_vulgaris_conditiva",
+      "species_id": "beta_vulgaris_conditiva",
+      "crop_key": "remolacha",
+      "nombre_comun": "Remolacha",
+      "nombre_cientifico": "Beta vulgaris L. subsp. vulgaris Conditiva Group",
+      "nombres_comunes": [
+        "acelga",
+        "acelga cardo",
+        "betarraga azucarera",
+        "betarraga forrajera",
+        "remolacha amarilla",
+        "remolacha azucarera",
+        "remolacha colorada",
+        "remolacha de mesa"
+      ],
+      "categoria_botanica": "tuberculos_raices",
+      "grupo": "protectores",
+      "nutriente_estrella": null,
+      "forma": "sin cascara, cruda",
+      "alimento_icbf": "Remolacha, sin cascara, cruda",
+      "codigo_icbf": 234,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 44,
+        "proteina_g": 1.4,
+        "hierro_mg": 0.8,
+        "vitamina_a_er": null
+      },
+      "datos_faltantes": [
+        "vitamina_a_er"
+      ]
+    },
+    {
+      "id": "aporte_nutricional_allium_cepa",
+      "species_id": "allium_cepa",
+      "crop_key": "cebolla",
+      "nombre_comun": "Cebolla cabezona",
+      "nombre_cientifico": "Allium cepa L.",
+      "nombres_comunes": [
+        "cebolla",
+        "cebolla cabezona"
+      ],
+      "categoria_botanica": "tuberculos_raices",
+      "grupo": "protectores",
+      "nutriente_estrella": null,
+      "forma": "cabezona",
+      "alimento_icbf": "Cebolla cabezona",
+      "codigo_icbf": 150,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 33,
+        "proteina_g": 1.4,
+        "hierro_mg": 0.7,
+        "vitamina_a_er": null
+      },
+      "datos_faltantes": [
+        "vitamina_a_er"
+      ]
+    },
+    {
+      "id": "aporte_nutricional_zea_mays",
+      "species_id": "zea_mays",
+      "crop_key": "maiz",
+      "nombre_comun": "Maíz criollo",
+      "nombre_cientifico": "Zea mays L.",
+      "nombres_comunes": [
+        "coronta o panocha",
+        "elote o choclo",
+        "maiz",
+        "mazorca",
+        "olote",
+        "choclo",
+        "maíz"
+      ],
+      "categoria_botanica": "cereales",
+      "grupo": "energeticos",
+      "nutriente_estrella": "energia_kcal",
+      "forma": "desgranado",
+      "alimento_icbf": "Maiz comun, desgranado",
+      "codigo_icbf": 60,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 363,
+        "proteina_g": 8.7,
+        "hierro_mg": null,
+        "vitamina_a_er": null
+      },
+      "datos_faltantes": [
+        "hierro_mg",
+        "vitamina_a_er"
+      ]
+    },
+    {
+      "id": "aporte_nutricional_oryza_sativa",
+      "species_id": "oryza_sativa",
+      "crop_key": "arroz",
+      "nombre_comun": "Arroz Clearfield",
+      "nombre_cientifico": "Oryza sativa L. (tecnología Clearfield)",
+      "nombres_comunes": [
+        "arroz"
+      ],
+      "categoria_botanica": null,
+      "grupo": "energeticos",
+      "nutriente_estrella": "energia_kcal",
+      "forma": "blanco, crudo",
+      "alimento_icbf": "Arroz blanco, crudo",
+      "codigo_icbf": 11,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 349,
+        "proteina_g": 6.7,
+        "hierro_mg": 0.8,
+        "vitamina_a_er": null
+      },
+      "datos_faltantes": [
+        "vitamina_a_er"
+      ]
+    },
+    {
+      "id": "aporte_nutricional_solanum_tuberosum",
+      "species_id": "solanum_tuberosum",
+      "crop_key": "papa",
+      "nombre_comun": "Papa parda pastusa",
+      "nombre_cientifico": "Solanum tuberosum L. subsp. andigenum var. parda pastusa",
+      "nombres_comunes": [
+        "chinpalu",
+        "papa",
+        "papa leona",
+        "papa pulos",
+        "papa uvilla",
+        "patata",
+        "potato",
+        "sacha papa"
+      ],
+      "categoria_botanica": null,
+      "grupo": "energeticos",
+      "nutriente_estrella": "energia_kcal",
+      "forma": "cruda, sin cascara",
+      "alimento_icbf": "Papa comun, sin cascara, cruda",
+      "codigo_icbf": 192,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 93,
+        "proteina_g": 1.9,
+        "hierro_mg": 1.1,
+        "vitamina_a_er": null
+      },
+      "datos_faltantes": [
+        "vitamina_a_er"
+      ]
+    },
+    {
+      "id": "aporte_nutricional_vicia_faba",
+      "species_id": "vicia_faba",
+      "crop_key": "haba",
+      "nombre_comun": "Haba",
+      "nombre_cientifico": "Vicia faba L.",
+      "nombres_comunes": [
+        "haba"
+      ],
+      "categoria_botanica": "granos_legumbres",
+      "grupo": "proteicos",
+      "nutriente_estrella": "proteina_g",
+      "forma": "seca",
+      "alimento_icbf": "Haba seca",
+      "codigo_icbf": 954,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 308,
+        "proteina_g": 23.1,
+        "hierro_mg": 4.9,
+        "vitamina_a_er": null
+      },
+      "datos_faltantes": [
+        "vitamina_a_er"
+      ]
+    },
+    {
+      "id": "aporte_nutricional_phaseolus_vulgaris",
+      "species_id": "phaseolus_vulgaris",
+      "crop_key": "frijol",
+      "nombre_comun": "Frijol arbustivo / voluble",
+      "nombre_cientifico": "Phaseolus vulgaris L.",
+      "nombres_comunes": [
+        "common bean",
+        "frijol",
+        "fréjol",
+        "habichuelas",
+        "mulu fintsumu buli",
+        "poroto",
+        "purutu",
+        "verdura"
+      ],
+      "categoria_botanica": "granos_legumbres",
+      "grupo": "proteicos",
+      "nutriente_estrella": "hierro_mg",
+      "forma": "grano seco",
+      "alimento_icbf": "Frijol rojo",
+      "codigo_icbf": 948,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 336,
+        "proteina_g": 20.4,
+        "hierro_mg": 7.1,
+        "vitamina_a_er": null
+      },
+      "datos_faltantes": [
+        "vitamina_a_er"
+      ]
+    },
+    {
+      "id": "aporte_nutricional_chenopodium_quinoa",
+      "species_id": "chenopodium_quinoa",
+      "crop_key": "quinua",
+      "nombre_comun": "Quinua",
+      "nombre_cientifico": "Chenopodium quinoa Willd.",
+      "nombres_comunes": [
+        "quinua",
+        "quinua de castilla",
+        "quínoa",
+        "quínua"
+      ],
+      "categoria_botanica": "cereales",
+      "grupo": "proteicos",
+      "nutriente_estrella": "hierro_mg",
+      "forma": "grano",
+      "alimento_icbf": "Quinua",
+      "codigo_icbf": 104,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 356,
+        "proteina_g": 14.6,
+        "hierro_mg": 8.4,
+        "vitamina_a_er": null
+      },
+      "datos_faltantes": [
+        "vitamina_a_er"
+      ]
+    },
+    {
+      "id": "aporte_nutricional_pisum_sativum",
+      "species_id": "pisum_sativum",
+      "crop_key": "arveja",
+      "nombre_comun": "Arveja",
+      "nombre_cientifico": "Pisum sativum L.",
+      "nombres_comunes": [],
+      "categoria_botanica": null,
+      "grupo": "proteicos",
+      "nutriente_estrella": "hierro_mg",
+      "forma": "verde, cruda",
+      "alimento_icbf": "Arveja verde, cruda",
+      "codigo_icbf": 139,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 120,
+        "proteina_g": 8.2,
+        "hierro_mg": 2.4,
+        "vitamina_a_er": 22
+      },
+      "datos_faltantes": []
+    },
+    {
+      "id": "aporte_nutricional_physalis_peruviana",
+      "species_id": "physalis_peruviana",
+      "crop_key": "uchuva",
+      "nombre_comun": "Uchuva",
+      "nombre_cientifico": "Physalis peruviana L.",
+      "nombres_comunes": [
+        "aguaymanto",
+        "alquequenje",
+        "capuchos",
+        "capulí",
+        "uchuva",
+        "uvilla"
+      ],
+      "categoria_botanica": "frutales_perennes",
+      "grupo": "protectores",
+      "nutriente_estrella": "vitamina_a_er",
+      "forma": "maduro",
+      "alimento_icbf": "Uchuva, maduro",
+      "codigo_icbf": 361,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 54,
+        "proteina_g": 1.5,
+        "hierro_mg": null,
+        "vitamina_a_er": 202
+      },
+      "datos_faltantes": [
+        "hierro_mg"
+      ]
+    },
+    {
+      "id": "aporte_nutricional_musa_paradisiaca",
+      "species_id": "musa_paradisiaca",
+      "crop_key": "platano",
+      "nombre_comun": "Plátano",
+      "nombre_cientifico": "Musa × paradisiaca L.",
+      "nombres_comunes": [
+        "banano"
+      ],
+      "categoria_botanica": "frutales_perennes",
+      "grupo": "energeticos",
+      "nutriente_estrella": "energia_kcal",
+      "forma": "harton, verde, crudo",
+      "alimento_icbf": "Platano harton, verde, crudo",
+      "codigo_icbf": 228,
+      "confianza": "alta",
+      "unidad": "por 100g porcion comestible",
+      "nutrientes": {
+        "energia_kcal": 158,
+        "proteina_g": 1.2,
+        "hierro_mg": 0.5,
+        "vitamina_a_er": 106
+      },
+      "datos_faltantes": []
+    }
+  ]
+}
