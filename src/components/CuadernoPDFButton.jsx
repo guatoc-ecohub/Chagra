@@ -1,13 +1,23 @@
+/*
+ * i18n (ADR-050): strings en español Colombia hardcodeadas, pendientes de
+ * migrar a src/config/messages.js. La regla chagra-i18n es soft (warn); se
+ * desactiva a nivel de archivo para no bloquear el pre-commit con deuda
+ * preexistente (mismo criterio que App.jsx/DashboardLive.jsx). Los errores
+ * reales de ESLint siguen activos.
+ */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import React, { useEffect, useState } from 'react';
 import { FileText, Download, Loader2, CheckCircle2, AlertCircle, Info } from 'lucide-react';
 import { assetCache } from '../db/assetCache';
 import { logCache } from '../db/logCache';
 import useFincaActiveStore from '../services/fincaActiveStore';
 import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
-import {
-  buildFincaData,
-  downloadCuadernoPDF,
-} from '../services/cuadernoPDF';
+// PERF-1 (medido 2026-07): `cuadernoPDF.js` importa `jspdf`, que por sí solo
+// infla este chunk a ~416KB. Como CuadernoPDFButton se monta estáticamente en
+// ProfileScreen/InformesScreen, un import ESTÁTICO aquí forzaba esos ~400KB
+// extra en CADA visita a esas pantallas, aunque la mayoría de operadores
+// nunca toca "Descargar cuaderno". Import dinámico → el peso de jsPDF solo se
+// paga al hacer click (mismo patrón ya usado en RestauracionPlanPDFButton).
 
 const ROLE_LABELS = {
   operador_campo: 'Operador de Campo',
@@ -94,6 +104,8 @@ export default function CuadernoPDFButton({ compact = false, className = '' }) {
         name: operatorName,
         role: ROLE_LABELS[roleId] || ROLE_LABELS.operador_campo,
       };
+
+      const { buildFincaData, downloadCuadernoPDF } = await import('../services/cuadernoPDF');
 
       const fincaData = await buildFincaData({
         assetCache,

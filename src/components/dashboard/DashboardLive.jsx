@@ -7,7 +7,7 @@
  * mismo criterio que App.jsx. Los errores reales de ESLint siguen activos.
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { useScrollRestoration } from '../../hooks/useScrollRestoration';
 import {
     DndContext,
@@ -50,7 +50,6 @@ import { registroUnificadoActivo } from '../../config/registroUnificadoFlag';
 import SelectedBackgroundReveal from './SelectedBackgroundReveal';
 import MiFincaVivaHomeCard from './MiFincaVivaHomeCard';
 import FincaRedInstitucional from './FincaRedInstitucional';
-import FincaVivaHero from './FincaVivaHero';
 import './finca-viva-resto.css';
 import './dashboard-resto-redistribucion.css';
 // Rescate huérfano 2026-06-24 (descubribilidad): CaseStudyTopWidget vivía solo
@@ -86,6 +85,14 @@ import {
     AnimalesCard,
     SeguimientoCards,
 } from './FincaCards';
+
+// PERF-1 (medido 2026-07): FincaVivaHero es dev-only (flag
+// VITE_FINCA_VIVA_HOME_PERFIL, ver fincaVivaHomeFlag.js) pero un import
+// estático la mete siempre en el chunk de DashboardLive — el home de TODO
+// operador en prod, la primera pantalla tras login. Lazy-load: en prod
+// (flag OFF, caso normal) su peso nunca se descarga; en dev, se paga una
+// sola vez al montar con la flag ON.
+const FincaVivaHero = lazy(() => import('./FincaVivaHero'));
 
 /**
  * DashboardLive — el dashboard rediseñado 2026-05-28 cervezas-test.
@@ -648,18 +655,20 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                   el banner de onboarding flota sobre él.
                 ───────────────────────────────────────────────────────────────── */}
             {fincaVivaFlag ? (
-                <FincaVivaHero
-                    onNavigate={onNavigate}
-                    onOpenAgent={() => onNavigate('agente')}
-                    onGestionar={revelarGestion}
-                    titulo={esExtensionista ? 'Red de fincas que acompaño' : 'Mi finca viva'}
-                >
-                    {esExtensionista ? (
-                        <div className="absolute inset-0 overflow-y-auto px-3 pt-[calc(env(safe-area-inset-top)+108px)] pb-4">
-                            <FincaRedInstitucional onNavigate={onNavigate} />
-                        </div>
-                    ) : null}
-                </FincaVivaHero>
+                <Suspense fallback={<div className="h-[100dvh]" />}>
+                    <FincaVivaHero
+                        onNavigate={onNavigate}
+                        onOpenAgent={() => onNavigate('agente')}
+                        onGestionar={revelarGestion}
+                        titulo={esExtensionista ? 'Red de fincas que acompaño' : 'Mi finca viva'}
+                    >
+                        {esExtensionista ? (
+                            <div className="absolute inset-0 overflow-y-auto px-3 pt-[calc(env(safe-area-inset-top)+108px)] pb-4">
+                                <FincaRedInstitucional onNavigate={onNavigate} />
+                            </div>
+                        ) : null}
+                    </FincaVivaHero>
+                </Suspense>
             ) : (
                 <>
                     {/* Primer uso sin piso confirmado: BANNER compacto del Paso 1

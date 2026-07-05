@@ -22,7 +22,6 @@ import { PRIMARY_WORKER_NAME } from './config/workerConfig';
 import { tieneAccesoGlaciarActual, esOperadorActual } from './config/glaciarAccess';
 import { getProfile } from './services/userProfileService';
 import { parseSeguimientoView } from './config/seguimientoProcesos';
-import { initCatalog } from './db/catalogDB';
 import NetworkStatusBar from './components/NetworkStatusBar';
 import PendingTasksWidget from './components/PendingTasksWidget';
 import SyncProgressIndicator from './components/common/SyncProgressIndicator';
@@ -34,7 +33,11 @@ import { recordScreenView } from './services/usageTelemetryService';
 import useThemeBackgroundStore, { getBackgroundSrc } from './store/useThemeBackgroundStore';
 import useAlertStore from './store/useAlertStore';
 import { alertEngine } from './services/alertEngine';
-import { cropAlertEngine } from './services/cropAlertEngine';
+// PERF-1 (medido 2026-07): `cropAlertEngine.js` → `farmProcessCache.js` →
+// `catalogDB.js` (~217KB + WASM sqlite). Un import ESTÁTICO aquí lo metía en
+// el grafo crítico de arranque (App.jsx es el entry-point) aunque
+// cropAlertEngine.start() solo corre en background. Import dinámico en el
+// call site, ver useEffect de "motor de alertas" más abajo.
 // FieldFeedback ya no se monta globalmente en App; vive embebido en
 // HelpUsoScreen como sección de Ayuda (decisión 2026-05-21, ver
 // comentario abajo donde se removió el render).
@@ -175,7 +178,10 @@ localforage.config({
 });
 
 const LoadingFallback = () => (
-  <div className="h-[100dvh] bg-slate-950 flex items-center justify-center text-muzo-glow">
+  <div
+    className="h-[100dvh] bg-slate-950 flex items-center justify-center text-muzo-glow"
+    data-testid="app-suspense-fallback"
+  >
     <ChagraGrowLoader size={80} showLabel labelText="Chagra..." />
   </div>
 );
@@ -604,9 +610,22 @@ export default function App() {
   // etc.) no espere el download del .sqlite (~135KB) ni la inicialización
   // del WASM. Si falla, el catalogDB log lo registra y los componentes
   // muestran su propio empty/error state.
+  //
+  // PERF-1 (medido 2026-07): `catalogDB.js` (~217KB) + el WASM de
+  // @sqlite.org/sqlite-wasm eran un import ESTÁTICO aquí. Como App.jsx es el
+  // entry-point (no-lazy), eso metía ~217KB en el grafo de módulos CRÍTICO
+  // que el navegador debe bajar+parsear antes de pintar CUALQUIER pantalla
+  // (login incluida). Import dinámico + `requestIdleCallback`: el catálogo
+  // se sigue precargando en background (mismo comportamiento observable),
+  // pero deja de competir con el primer paint.
   useEffect(() => {
-    initCatalog().catch((err) => {
-      console.warn('[App] Catálogo no se pudo preload (los componentes lo reintentarán al usarlos):', err);
+    const schedule = typeof requestIdleCallback === 'function'
+      ? (fn) => requestIdleCallback(fn, { timeout: 4000 })
+      : (fn) => setTimeout(fn, 0);
+    schedule(() => {
+      import('./db/catalogDB').then(({ initCatalog }) => initCatalog()).catch((err) => {
+        console.warn('[App] Catálogo no se pudo preload (los componentes lo reintentarán al usarlos):', err);
+      });
     });
   }, []);
 
@@ -625,7 +644,7 @@ export default function App() {
       });
       // Alertas del cultivo (plaga/etapa) desde los ciclos activos (FarmProcess)
       // hacia el mismo chip de alertas. Degrada limpio si no hay ciclos.
-      cropAlertEngine.start().catch((err) => {
+      import('./services/cropAlertEngine').then(({ cropAlertEngine }) => cropAlertEngine.start()).catch((err) => {
         console.warn('[App] cropAlertEngine no pudo arrancar:', err?.message);
       });
     } catch (err) {
@@ -677,6 +696,24 @@ export default function App() {
         // arranque online. No rompemos el dashboard por un prefetch fallido.
       });
     }
+
+    // PERF-1 (medido 2026-07): 'agente' es el destino MÁS común desde el
+    // home (portada = AgentHero/FincaVivaHero, botón "Preguntale a Chagra").
+    // Prefetch en idle para que, al tocarlo, el chunk (~220KB) ya esté en el
+    // cache de módulos del navegador y la transición se sienta instantánea
+    // en vez de esperar la descarga en el momento del tap. `requestIdleCallback`
+    // (con timeout de red de seguridad) evita competir con el primer paint del
+    // dashboard y con el prewarm del corpus RAG que arranca en el mismo idle
+    // window (ver ragRetriever.scheduleIdlePrewarm) — encolamos DESPUÉS con un
+    // timeout mayor para no sumar contención justo en esos primeros segundos.
+    const scheduleAgentPrefetch = typeof requestIdleCallback === 'function'
+      ? (fn) => requestIdleCallback(fn, { timeout: 6000 })
+      : (fn) => setTimeout(fn, 1500);
+    scheduleAgentPrefetch(() => {
+      import('./components/AgentScreen/AgentScreen').catch(() => {
+        // Sin señal: se reintentará solo cuando el usuario realmente navegue.
+      });
+    });
   }, [currentView]);
 
   // El fondo agroecológico de la app (catálogo biopunk, default "Páramo
