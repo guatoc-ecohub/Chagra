@@ -2,7 +2,6 @@
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { recordRagEvent } from './ragTelemetry';
 import { TOOL_TIMEOUT_MS } from './sidecarClient.js';
-import { getAllSpecies } from '../db/catalogDB';
 import { expandQueryTokens } from './ragSynonyms';
 import { saveCorpusIndex, loadCorpusIndex } from '../db/corpusIndexCache';
 import { fetchWithAuthRetry } from './apiService';
@@ -195,7 +194,14 @@ export function flattenDoc(doc, prefix = '', speciesSlug = null) {
  */
 async function loadManifest() {
   try {
-    const res = await fetch(`${CORPUS_PATH}manifest.json`);
+    // `priority: 'low'` (Fetch Priority API, Chromium): este fetch es
+    // background prewarm, no debe competir por ancho de banda con los
+    // chunks lazy que el usuario está esperando activamente al navegar
+    // (medido: en Slow 3G, el corpus completo satura la conexión y una
+    // navegación a un chunk de 220KB queda encolada detrás → PERF-1
+    // "transiciones se quedan pensando"). Browsers sin soporte ignoran
+    // la opción sin error (progressive enhancement).
+    const res = await fetch(`${CORPUS_PATH}manifest.json`, { priority: 'low' });
     if (!res.ok) return null;
     const ct = res.headers.get('content-type') || '';
     if (!ct.includes('json')) return null;
@@ -223,7 +229,9 @@ async function loadManifest() {
  */
 async function loadSlugDocs(slug) {
   try {
-    const res = await fetch(`${CORPUS_PATH}${slug}.json`);
+    // priority:'low' — ver nota en loadManifest(). Aquí importa más aún:
+    // son ~460 requests en batches de 12 (CORPUS_FETCH_CONCURRENCY).
+    const res = await fetch(`${CORPUS_PATH}${slug}.json`, { priority: 'low' });
     if (!res.ok) return [];
     const ct = res.headers.get('content-type') || '';
     if (!ct.includes('json')) return [];
@@ -276,6 +284,14 @@ async function buildCorpus() {
   let tier = null;
   let catalogTrusted = false;
   try {
+    // PERF-1 (medido 2026-07): import dinámico — `catalogDB.js` (~217KB +
+    // WASM sqlite) era un import ESTÁTICO de este archivo, y ragRetriever.js
+    // a su vez es import ESTÁTICO de App.jsx (entry-point no-lazy). Eso
+    // metía el catálogo completo en el grafo crítico de arranque aunque
+    // buildCorpus() solo corre en background (ver scheduleIdlePrewarm). Un
+    // fallo del import (red/chunk) cae en el mismo catch de abajo → mismo
+    // comportamiento FAIL-CLOSED (audit P0-1) que un getAllSpecies() que lanza.
+    const { getAllSpecies } = await import('../db/catalogDB');
     const catalogSpecies = await getAllSpecies();
     if (catalogSpecies && catalogSpecies.length > 0) {
       catalogTrusted = true;
@@ -372,6 +388,27 @@ async function loadCorpus() {
   return corpusLoadPromise;
 }
 
+// PERF-1 (medido Playwright + CPU 4x/Slow 3G, 2026-07): el prewarm dispara
+// ~460 fetches (batches de CORPUS_FETCH_CONCURRENCY) apenas arranca. Si eso
+// coincide con los primeros segundos post-login — justo cuando el usuario
+// suele empezar a tocar la app —, esos fetches saturan la conexión lenta y
+// las navegaciones normales (chunks lazy de 100-400KB) quedan encoladas
+// detrás: una transición dashboard→agente que debería tardar ~1s midió >19s
+// con el corpus todavía descargando. `requestIdleCallback` (con `timeout` de
+// red de seguridad) le da prioridad al primer paint/tap del usuario; si el
+// hilo nunca queda ocioso, igual arranca a los 4s. Sin `requestIdleCallback`
+// (Safari, jsdom en tests) cae a `setTimeout(0)` — no cambia el comportamiento
+// observable, solo evita bloquear el primer render en el mismo tick.
+function scheduleIdlePrewarm(run) {
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(() => run(), { timeout: 4000 });
+  } else if (typeof setTimeout === 'function') {
+    setTimeout(run, 0);
+  } else {
+    run();
+  }
+}
+
 /**
  * Pre-carga el corpus en background (fire-and-forget). Pensado para llamarse
  * al login / post-OAuth, junto al pre-warm de Ollama, de modo que el corpus
@@ -381,16 +418,24 @@ async function loadCorpus() {
  * reintentará (loadCorpus limpia la promesa fallida). Idempotente: si el
  * corpus ya está cacheado o cargándose, no dispara trabajo extra.
  *
+ * El arranque real se difiere a idle (ver `scheduleIdlePrewarm`) para no
+ * competir por ancho de banda con la primera interacción del usuario.
+ *
  * @returns {Promise<void>} resuelve cuando el pre-warm termina (callers la
  *   ignoran; existe para tests).
  */
 export function prewarmCorpus() {
-  return loadCorpus().then(
-    () => undefined,
-    (err) => {
-      console.warn('[RAG] prewarmCorpus falló (se reintentará en la primera query):', err?.message);
-    },
-  );
+  return new Promise((resolve) => {
+    scheduleIdlePrewarm(() => {
+      loadCorpus().then(
+        () => resolve(undefined),
+        (err) => {
+          console.warn('[RAG] prewarmCorpus falló (se reintentará en la primera query):', err?.message);
+          resolve(undefined);
+        },
+      );
+    });
+  });
 }
 
 /**
@@ -476,7 +521,7 @@ async function loadEmbeddings() {
 
   embeddingsLoadPromise = (async () => {
     try {
-      const res = await fetch(EMBEDDINGS_PATH);
+      const res = await fetch(EMBEDDINGS_PATH, { priority: 'low' });
       if (!res.ok) {
         embeddingsLoadPromise = null; // permitir reintento en próxima consulta
         return null;

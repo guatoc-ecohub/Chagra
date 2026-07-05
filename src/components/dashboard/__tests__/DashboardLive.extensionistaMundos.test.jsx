@@ -94,7 +94,10 @@ describe('DashboardLive — operador/extensionista ve los mundos (aditivo, no re
     render(<DashboardLive onNavigate={vi.fn()} />);
 
     // La red institucional ocupa el hero (portada del supervisor).
-    await waitFor(() => expect(screen.getByTestId('red-institucional')).toBeInTheDocument());
+    // timeout explícito: FincaVivaHero es lazy() (PERF-1, 2026-07) — el
+    // import() dinámico tarda más que el default de waitFor (1000ms) en el
+    // pipeline de transform de vitest.
+    await waitFor(() => expect(screen.getByTestId('red-institucional')).toBeInTheDocument(), { timeout: 5000 });
     expect(screen.getByTestId('finca-viva-hero').getAttribute('data-titulo'))
       .toBe('Red de fincas que acompaño');
 

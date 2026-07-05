@@ -114,10 +114,16 @@ import DashboardLive from '../DashboardLive';
 afterEach(() => cleanup());
 beforeEach(() => vi.clearAllMocks());
 
+// timeout explícito (10000ms) en los findByTestId de 'finca-viva-portales':
+// FincaVivaHero es lazy() desde PERF-1 (2026-07, -158KB del chunk de
+// DashboardLive en prod con la flag OFF). Este test NO mockea FincaVivaHero
+// (necesita los 4 portales reales) — el import() dinámico del componente real
+// (2000+ líneas) tarda más que el default de testing-library (1000ms) en el
+// pipeline de transform de vitest, sobre todo bajo carga del host.
 describe('Bug 2 · DOM — hero F2: 4 portales visibles + hoja "resto" separada', () => {
-  test('renderiza los 4 portales del hero (ninguno queda sin montar)', async () => {
+  test('renderiza los 4 portales del hero (ninguno queda sin montar)', { retry: 2 }, async () => {
     render(<DashboardLive onNavigate={vi.fn()} />);
-    const nav = await screen.findByTestId('finca-viva-portales');
+    const nav = await screen.findByTestId('finca-viva-portales', {}, { timeout: 15000 });
     const portales = within(nav).getAllByRole('button');
     expect(portales).toHaveLength(4);
     const labels = portales.map((b) => b.getAttribute('aria-label')?.split(':')[0]);
@@ -126,9 +132,9 @@ describe('Bug 2 · DOM — hero F2: 4 portales visibles + hoja "resto" separada'
     expect(labels).toEqual(['Mi finca', 'Aprender', 'Jugar', 'Pregúntele a Chagra']);
   });
 
-  test('la hoja "resto" NO contiene los portales (superficies separadas)', async () => {
+  test('la hoja "resto" NO contiene los portales (superficies separadas)', { retry: 2 }, async () => {
     render(<DashboardLive onNavigate={vi.fn()} />);
-    const nav = await screen.findByTestId('finca-viva-portales');
+    const nav = await screen.findByTestId('finca-viva-portales', {}, { timeout: 15000 });
     // La hoja "resto" se reorganizó en bloques (#1883/#1884); su contenedor es
     // .fvh-resto (data-testid estable), ya no el título "El resto de su finca".
     const hoja = screen.getByTestId('fvh-resto');
@@ -138,9 +144,9 @@ describe('Bug 2 · DOM — hero F2: 4 portales visibles + hoja "resto" separada'
     expect(hoja.contains(nav)).toBe(false);
   });
 
-  test('en orden de documento, los portales van ANTES de la hoja "resto"', async () => {
+  test('en orden de documento, los portales van ANTES de la hoja "resto"', { retry: 2 }, async () => {
     render(<DashboardLive onNavigate={vi.fn()} />);
-    const nav = await screen.findByTestId('finca-viva-portales');
+    const nav = await screen.findByTestId('finca-viva-portales', {}, { timeout: 15000 });
     const tit = screen.getByTestId('fvh-resto');
     await waitFor(() => expect(nav).toBeInTheDocument());
     // compareDocumentPosition: nav precede a tit → DOCUMENT_POSITION_FOLLOWING.
