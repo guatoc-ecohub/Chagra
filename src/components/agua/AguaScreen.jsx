@@ -2,9 +2,13 @@ import React, { useMemo, useState } from 'react';
 import {
   CloudRain, Droplets, Sprout, Calculator, TriangleAlert, Sun,
   ShieldCheck, Users, Hourglass, Milk, ChevronRight,
+  Skull, PiggyBank, Biohazard, FlaskConical, Fuel, Beef, Trash2,
+  Baby, Activity, ShieldAlert, Ruler, Landmark, HeartPulse,
 } from 'lucide-react';
 import { ScreenShell } from '../common/ScreenShell';
+import PedagogicalBlock from '../common/PedagogicalBlock';
 import CaminoDelAgua from './CaminoDelAgua';
+import DistanciasFinca from './DistanciasFinca';
 import {
   litrosLluviaCaptables,
   canecasEquivalentes,
@@ -26,6 +30,9 @@ import {
   DOSIS_POTABILIZACION,
   RONDA_PROTECCION,
   CASO_NACIMIENTO,
+  RIESGOS_CONTAMINACION,
+  ENFERMEDADES_AGUA,
+  DISTANCIAS_SEGURIDAD,
 } from '../../data/aguaFinca';
 import { getEnsoPhase, getEnsoLabel } from '../../services/ensoService';
 import './agua.css';
@@ -364,6 +371,214 @@ function PilarRiego() {
   );
 }
 
+/* ── PILAR 3b · Riesgos de contaminación + salud ──────────────────────── */
+
+/** Íconos de riesgo por clave de fuente contaminante (data-driven). */
+const ICONO_RIESGO = {
+  veneno: Skull,
+  cochera: PiggyBank,
+  letrina: Biohazard,
+  agroquimico: FlaskConical,
+  combustible: Fuel,
+  matadero: Beef,
+  basura: Trash2,
+};
+
+/** Íconos por enfermedad. */
+const ICONO_ENFERMEDAD = {
+  diarrea: Activity,
+  bebe: Baby,
+  intoxicacion: HeartPulse,
+};
+
+/** Semáforo de peligro: punto de color + etiqueta (alto = rojo, medio = ámbar). */
+function SemaforoPeligro({ nivel }) {
+  const alto = nivel === 'alto';
+  return (
+    <span
+      data-testid={`semaforo-${nivel}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-black uppercase tracking-wide ${
+        alto
+          ? 'border-rose-500/50 bg-rose-500/15 text-rose-200'
+          : 'border-amber-500/50 bg-amber-500/15 text-amber-200'
+      }`}
+    >
+      <span
+        aria-hidden="true"
+        className={`inline-block w-2 h-2 rounded-full ${alto ? 'bg-rose-400 agua-peligro-late' : 'bg-amber-400'}`}
+      />
+      Peligro {alto ? 'alto' : 'medio'}
+    </span>
+  );
+}
+
+/**
+ * RiesgosSalud — la sección nueva del pilar "Cuidar el agua":
+ *   A. Qué le echa veneno al agua (fuentes de contaminación + semáforo).
+ *   B. Y esto es lo que enferma (enfermedades, con autoridad institucional).
+ *   C. La regla de las distancias (ilustración de la finca + metros grounded).
+ * Mantiene el lenguaje visual del módulo (cuaderno de campo, acentos cyan) y
+ * NUNCA cita a una persona en lo safety-critical: solo instituciones.
+ */
+function RiesgosSalud() {
+  return (
+    <div className="space-y-4" data-testid="agua-riesgos-salud">
+      <PedagogicalBlock
+        icon={ShieldAlert}
+        tone="alerta"
+        lead="El agua no se ensucia sola: alguien, aguas arriba, le echó algo."
+        clave="Casi todo se previene con dos cosas: distancia al agua y manejo de lo que gotea (venenos, estiércol, aguas negras)."
+      >
+        <p>
+          La contaminación llega por dos caminos: la <strong className="text-rose-200">escorrentía</strong>{' '}
+          (lo que corre por encima con el aguacero) y la{' '}
+          <strong className="text-rose-200">lixiviación</strong> (lo que se filtra hacia abajo hasta el
+          agua del subsuelo). Por eso lo que pase loma arriba termina en el nacimiento y en el pozo.
+        </p>
+      </PedagogicalBlock>
+
+      {/* ── A · Qué contamina ── */}
+      <section className="rounded-2xl border border-slate-700/60 bg-slate-900/50 p-4 space-y-3" data-testid="agua-que-contamina">
+        <p className="flex items-center gap-2 text-sm font-black text-slate-100 uppercase tracking-wide">
+          <TriangleAlert size={16} aria-hidden="true" className="text-rose-300" /> Qué le echa veneno al agua
+        </p>
+        <ul className="space-y-2.5">
+          {RIESGOS_CONTAMINACION.map((r) => {
+            const Icono = ICONO_RIESGO[r.icono] || TriangleAlert;
+            return (
+              <li key={r.id} className="rounded-xl border border-slate-700/50 bg-slate-950/40 p-3" data-testid={`riesgo-${r.id}`}>
+                <div className="flex items-start gap-3">
+                  <span
+                    aria-hidden="true"
+                    className={`shrink-0 w-9 h-9 rounded-xl grid place-items-center ${
+                      r.nivel === 'alto' ? 'bg-rose-500/15 text-rose-300' : 'bg-amber-500/15 text-amber-300'
+                    }`}
+                  >
+                    <Icono size={18} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="flex flex-wrap items-center gap-2 text-sm font-bold text-slate-100 leading-tight">
+                      {r.fuente}
+                      <SemaforoPeligro nivel={r.nivel} />
+                    </p>
+                    <p className="mt-1 text-xs leading-snug text-slate-300">{r.aporta}</p>
+                    <p className="mt-1.5 text-[11px] leading-snug text-slate-400">
+                      <span className="inline-flex items-center gap-1 rounded bg-slate-800/70 px-1.5 py-0.5 font-bold text-slate-300">
+                        <Droplets size={10} aria-hidden="true" /> {r.via}
+                      </span>{' '}
+                      <span className="text-emerald-300 font-bold">Prevenir:</span> {r.prevenir}
+                    </p>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
+      {/* ── B · Qué enferma (autoridad institucional, nunca una persona) ── */}
+      <section className="rounded-2xl border border-slate-700/60 bg-slate-900/50 p-4 space-y-3" data-testid="agua-enfermedades">
+        <p className="flex items-center gap-2 text-sm font-black text-slate-100 uppercase tracking-wide">
+          <HeartPulse size={16} aria-hidden="true" className="text-rose-300" /> Y esto es lo que enferma
+        </p>
+        {ENFERMEDADES_AGUA.map((e) => {
+          const Icono = ICONO_ENFERMEDAD[e.icono] || Activity;
+          return (
+            <article
+              key={e.id}
+              data-testid={`enfermedad-${e.id}`}
+              className={`rounded-xl border p-3 ${
+                e.critico
+                  ? 'border-rose-600/50 bg-rose-950/30'
+                  : 'border-slate-700/50 bg-slate-950/40'
+              }`}
+            >
+              <p className="flex items-start gap-2.5 text-sm font-black leading-tight text-slate-100">
+                <Icono size={18} aria-hidden="true" className={`shrink-0 mt-0.5 ${e.critico ? 'text-rose-300' : 'text-slate-300'}`} />
+                <span>
+                  {e.nombre}
+                  {e.critico && (
+                    <span className="ml-2 rounded-full bg-rose-500/20 border border-rose-500/50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-rose-200 align-middle">
+                      Grave
+                    </span>
+                  )}
+                </span>
+              </p>
+              <dl className="mt-2 space-y-1 text-xs leading-snug">
+                <div className="flex gap-1.5">
+                  <dt className="shrink-0 font-bold text-slate-400">De dónde:</dt>
+                  <dd className="text-slate-300">{e.causa}</dd>
+                </div>
+                <div className="flex gap-1.5">
+                  <dt className="shrink-0 font-bold text-slate-400">Cómo se ve:</dt>
+                  <dd className="text-slate-200">{e.senal}</dd>
+                </div>
+                <div className="flex gap-1.5">
+                  <dt className="shrink-0 font-bold text-slate-400">Más riesgo:</dt>
+                  <dd className="text-slate-300">{e.masRiesgo}</dd>
+                </div>
+              </dl>
+              {/* Autoridad institucional citada — el "guard": nunca una persona */}
+              <div className="mt-2 rounded-lg border border-sky-700/40 bg-sky-950/30 p-2.5">
+                <p className="flex items-start gap-1.5 text-[11px] leading-snug text-sky-100">
+                  <ShieldCheck size={13} aria-hidden="true" className="shrink-0 mt-0.5 text-sky-300" />
+                  <span>{e.autoridad}</span>
+                </p>
+                <p className="mt-1 text-[10px] leading-snug text-slate-500">Fuente: {e.fuente}</p>
+              </div>
+            </article>
+          );
+        })}
+      </section>
+
+      {/* ── C · La regla de las distancias (ilustración + metros grounded) ── */}
+      <section className="rounded-2xl border border-emerald-700/40 bg-slate-900/60 p-4 space-y-3" data-testid="agua-distancias">
+        <p className="flex items-center gap-2 text-sm font-black text-emerald-200 uppercase tracking-wide">
+          <Ruler size={16} aria-hidden="true" /> La regla de las distancias
+        </p>
+        <p className="text-xs leading-snug text-slate-300">
+          La misma finca, en corte: el agua en el centro, y cada cosa que la puede dañar a su
+          distancia mínima. Lo verde protege; lo rojo se aleja.
+        </p>
+
+        <DistanciasFinca items={DISTANCIAS_SEGURIDAD} />
+
+        <ul className="space-y-2">
+          {DISTANCIAS_SEGURIDAD.map((d) => (
+            <li key={d.id} className="flex items-start gap-2.5" data-testid={`distancia-${d.id}`}>
+              <span
+                aria-hidden="true"
+                className={`shrink-0 mt-0.5 inline-flex items-center justify-center min-w-[52px] rounded-lg px-1.5 py-0.5 text-xs font-black ${
+                  d.tipo === 'proteger'
+                    ? 'bg-emerald-500/15 text-emerald-200 border border-emerald-500/40'
+                    : 'bg-rose-500/15 text-rose-200 border border-rose-500/40'
+                }`}
+              >
+                {d.metros} m
+              </span>
+              <span className="min-w-0">
+                <span className="block text-sm font-bold text-slate-100 leading-tight">{d.que}</span>
+                <span className="block text-xs text-slate-300 leading-snug mt-0.5">{d.detalle}</span>
+                <span className="block text-[10px] text-slate-500 leading-snug mt-0.5">
+                  {d.norma}{d.confianza === 'media' ? ' · referencia (confianza media)' : ''}
+                </span>
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p className="flex items-start gap-1.5 text-[11px] leading-snug text-slate-400">
+          <Landmark size={13} aria-hidden="true" className="shrink-0 mt-0.5 text-slate-500" />
+          <span>
+            La distancia exacta de un corral o porqueriza al agua todavía no tiene una cifra única en
+            norma nacional{' '}<SlotPendiente>retiro de corrales en camino (ICA)</SlotPendiente>; mientras
+            tanto, la regla es sencilla: lejos y aguas abajo del pozo.
+          </span>
+        </p>
+      </section>
+    </div>
+  );
+}
+
 /* ── PILAR 3 · Cuidar el agua ─────────────────────────────────────────── */
 function PilarCuidar() {
   // Fase ENSO viva desde el servicio que Chagra ya tiene (no se re-implementa
@@ -447,6 +662,9 @@ function PilarCuidar() {
           </ul>
         </div>
       </div>
+
+      {/* RIESGOS DE CONTAMINACIÓN + SALUD (qué contamina, qué enferma, distancias) */}
+      <RiesgosSalud />
 
       {/* CASO INSIGNIA */}
       <div className="rounded-2xl border border-emerald-700/50 bg-emerald-950/30 p-4 space-y-3" data-testid="caso-nacimiento">

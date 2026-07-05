@@ -106,6 +106,67 @@ describe('AguaScreen — pilar cuidar (caso nacimiento + ENSO)', () => {
   });
 });
 
+describe('AguaScreen — riesgos de contaminación + salud', () => {
+  it('muestra qué contamina el agua con el semáforo de peligro', () => {
+    render(<AguaScreen onBack={() => {}} />);
+    fireEvent.click(screen.getByTestId('pilar-tab-cuidar'));
+
+    const bloque = screen.getByTestId('agua-que-contamina');
+    // Focos clave del pedido del operador presentes.
+    expect(bloque).toHaveTextContent(/venenos y plaguicidas/i);
+    expect(bloque).toHaveTextContent(/cocheras y corrales/i);
+    expect(bloque).toHaveTextContent(/letrinas/i);
+    // Vías de contaminación explicadas (didáctico).
+    expect(bloque).toHaveTextContent(/escorrent/i);
+    expect(bloque).toHaveTextContent(/lixiviaci/i);
+    // Semáforo: los venenos son peligro ALTO.
+    const riesgoVeneno = screen.getByTestId('riesgo-plaguicidas');
+    expect(riesgoVeneno).toHaveTextContent(/peligro alto/i);
+  });
+
+  it('la metahemoglobinemia (bebé azul) cita autoridad institucional, nunca una persona', () => {
+    render(<AguaScreen onBack={() => {}} />);
+    fireEvent.click(screen.getByTestId('pilar-tab-cuidar'));
+
+    const meta = screen.getByTestId('enfermedad-metahemoglobinemia');
+    expect(meta).toHaveTextContent(/bebé azul/i);
+    // Safety-critical: respaldado por OMS y Resolución 2115/2007 (MinSalud).
+    expect(meta).toHaveTextContent(/OMS/);
+    expect(meta).toHaveTextContent(/Resolución 2115\/2007/);
+    // Nitratos como causa y su límite grounded.
+    expect(meta).toHaveTextContent(/nitrato/i);
+    expect(meta).toHaveTextContent(/50 mg\/L/);
+    // Marcada como grave.
+    expect(meta).toHaveTextContent(/grave/i);
+  });
+
+  it('muestra la intoxicación por plaguicidas con el ICA como autoridad', () => {
+    render(<AguaScreen onBack={() => {}} />);
+    fireEvent.click(screen.getByTestId('pilar-tab-cuidar'));
+    const intox = screen.getByTestId('enfermedad-intoxicacion');
+    expect(intox).toHaveTextContent(/intoxicaci/i);
+    expect(intox).toHaveTextContent(/ICA/);
+  });
+
+  it('muestra la regla de las distancias groundeadas + la ilustración de la finca', () => {
+    render(<AguaScreen onBack={() => {}} />);
+    fireEvent.click(screen.getByTestId('pilar-tab-cuidar'));
+
+    // Ilustración presente (decorativa) y lista de distancias.
+    expect(screen.getByTestId('distancias-finca')).toBeInTheDocument();
+    const distancias = screen.getByTestId('agua-distancias');
+    // Cifras grounded: 10 m fumigación terrestre, 100 m nacimiento, 30 m letrina.
+    expect(screen.getByTestId('distancia-fumigacion-terrestre')).toHaveTextContent('10 m');
+    expect(screen.getByTestId('distancia-nacimiento')).toHaveTextContent('100 m');
+    expect(screen.getByTestId('distancia-septico')).toHaveTextContent('30 m');
+    // Normas citadas.
+    expect(distancias).toHaveTextContent(/Decreto 1843\/1991/);
+    expect(distancias).toHaveTextContent(/RAS/);
+    // Honestidad: el retiro exacto de corrales aún es "dato en camino".
+    expect(screen.getByTestId('agua-distancias')).toHaveTextContent(/en camino/i);
+  });
+});
+
 describe('AguaScreen — puente al agente', () => {
   it('navega al agente con la pregunta prellenada', () => {
     const onNavigate = vi.fn();
