@@ -161,6 +161,16 @@ export function applyTheme(theme) {
   return resolved;
 }
 
+/**
+ * Evento same-tab para sincronizar TODAS las instancias de useTheme.
+ * Bug cazado en el rediseño del perfil (2026-07-05): cada useState del hook
+ * era una isla — al aplicar un tema en la galería (ThemeSelector), el estado
+ * de OTRO componente montado (hub del perfil, ícono del ScreenShell) quedaba
+ * stale mostrando el tema anterior. setTheme ahora emite este evento y cada
+ * instancia montada re-lee el tema.
+ */
+export const THEME_CHANGED_EVENT = 'chagra:theme-changed';
+
 export function useTheme() {
   const [theme, setThemeState] = useState(() =>
     normalizeTheme(localStorage.getItem(STORAGE_KEY))
@@ -175,10 +185,25 @@ export function useTheme() {
     }
   }, [theme]);
 
+  // Sincronía entre instancias del hook (same-tab): otra pantalla/selector
+  // cambió el tema → esta instancia re-lee. Sin dispatch acá (solo setTheme
+  // emite) — no hay riesgo de loop.
+  useEffect(() => {
+    const onThemeChanged = (e) => {
+      const next = normalizeTheme(e?.detail?.theme ?? localStorage.getItem(STORAGE_KEY));
+      setThemeState(next);
+    };
+    window.addEventListener(THEME_CHANGED_EVENT, onThemeChanged);
+    return () => window.removeEventListener(THEME_CHANGED_EVENT, onThemeChanged);
+  }, []);
+
   const setTheme = useCallback((next) => {
     if (!THEME_IDS.includes(next)) return;
     localStorage.setItem(STORAGE_KEY, next);
     setThemeState(next);
+    try {
+      window.dispatchEvent(new CustomEvent(THEME_CHANGED_EVENT, { detail: { theme: next } }));
+    } catch (_) { /* noop */ }
   }, []);
 
   return { theme, setTheme };

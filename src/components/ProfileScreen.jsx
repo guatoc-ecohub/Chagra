@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench, Sprout, ChevronRight, Bell, Users, Camera, Trash2 } from 'lucide-react';
+import {
+  User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench,
+  Sprout, ChevronRight, ChevronLeft, Bell, Users, Camera, Trash2, Shield,
+  Archive, LifeBuoy, LayoutGrid, GraduationCap,
+} from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { esExtensionistaActual } from '../config/extensionistaAccess';
-import ThemeSelector from './common/ThemeSelector';
+import ThemeSelector, { ThemeScene } from './common/ThemeSelector';
+import { PREVIEWS } from './common/themePreviewPalettes';
 import AgentAvatarSelector from './Settings/AgentAvatarSelector';
 import BackgroundSelector from './Settings/BackgroundSelector';
 import BackupExportButton from './BackupExportButton';
@@ -13,11 +18,17 @@ import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 import useFincaActiveStore from '../services/fincaActiveStore';
 import usePrefsStore from '../store/usePrefsStore';
 import { stop as stopTTS } from '../services/ttsService';
-import { getNotificationStyle, setNotificationStyle, getTelemetryConsent, setTelemetryConsent, HOME_MODULES, getModuleVisibility, setModuleVisibility, hasManualModuleVisibility, getProfile } from '../services/userProfileService';
+import {
+  getNotificationStyle, setNotificationStyle, getTelemetryConsent,
+  setTelemetryConsent, HOME_MODULES, getModuleVisibility, setModuleVisibility,
+  hasManualModuleVisibility, getProfile, saveProfile, getProfileMunicipio,
+} from '../services/userProfileService';
 import { selectHomeModuleVisibilityMap } from '../services/homeModuleSelector';
 import { tieneAccesoGlaciarActual, esOperadorActual, operatorOverrideActivo, setOperatorOverride } from '../config/glaciarAccess';
 import { getOperatorPhoto, setOperatorPhotoFromFile, removeOperatorPhotoLocal } from '../services/operatorPhotoService';
 import ProfileSwitcher from './Settings/ProfileSwitcher';
+import { useTheme, getSelectableThemes } from '../hooks/useTheme';
+import { fincaVivaHomePerfilActivo } from '../config/fincaVivaHomeFlag';
 import { MSG } from '../config/messages';
 
 const TTL_OPTIONS = [
@@ -28,25 +39,39 @@ const TTL_OPTIONS = [
 ];
 
 /**
- * ProfileScreen, perfil del operador.
+ * ProfileScreen — "Mi Chagra", el morral del usuario.
  *
- * Feedback piloto #120: "debería poderse registrar los datos del 'Trabajador -
- * Operador de Campo'". Antes era display-only con nombre hardcoded.
- * Ahora editable con persistencia localStorage:
- *   - chagra:operator:name (string, ya leído por TopBar)
- *   - chagra:operator:role (enum)
+ * REDISEÑO HUB-AND-SPOKE BENTO (2026-07-05, "reinventar el panel de perfil"):
+ * el operador pidió mejorar la navegabilidad por TODAS las opciones y añadir
+ * previsualización de temas. Se exploraron 4 conceptos (cédula-lista, morral
+ * bento vivo, tabs 2.0, sendero-acordeón); ganó "El Morral":
  *
- * TopBar muestra el rol además del nombre cuando está disponible.
+ *   HUB (portada) → cédula de identidad (foto/nombre/rol/ubicación) + rejilla
+ *   bento donde CADA tarjeta resume su sección con ESTADO VIVO (tema actual
+ *   con mini-previews, voz on/off + nivel de respuestas, finca activa, N de M
+ *   módulos, privacidad on/off). Tocar una tarjeta enfoca su SECCIÓN, con
+ *   volver-al-morral. Ventaja sobre las 5 pestañas anteriores: el mapa
+ *   completo de opciones se ve de un vistazo (las tabs se truncaban en móvil
+ *   y escondían el estado).
  *
- * Reorganización en PESTAÑAS (2026-05-28): el operador reportó "está difícil
- * de navegar, muchas opciones" — todo vivía en una sola columna scrolleable
- * larga. Ahora se agrupa en 4 pestañas con una tab bar sticky arriba (sin
- * librería nueva: estado local `activeTab` + render condicional):
- *   - 👤 Perfil:     nombre, rol, CTAs onboarding + ubicación.
- *   - 🎨 Apariencia: tema, fondo, avatar del agente.
- *   - 🔊 Voz y finca: voz del agente + selector de voz + multifinca/GPS.
- *   - ⚙️ Avanzado:   modo técnico (HYTA), telemetría, copia de seguridad, PDF.
- * Ningún breaking change funcional: todas las opciones siguen accesibles.
+ * Secciones (todo lo que estaba regado, unificado):
+ *   - datos       → nombre, rol, cambio de perfil activo (ProfileSwitcher).
+ *   - apariencia  → GALERÍA DE TEMAS con preview (nuevo), fondo, avatar,
+ *                   estilo de avisos.
+ *   - agente      → nivel de respuestas simple/detallado/maestro (antes solo
+ *                   en onboarding), personalizar agente, voz TTS + selector.
+ *   - finca       → ubicación, multifinca, GPS indoor, histórico GPS.
+ *   - inicio      → visibilidad de módulos del home.
+ *   - privacidad  → telemetría de voz local + consentimiento de envío.
+ *   - respaldo    → copia de seguridad JSON + cuaderno de campo PDF.
+ *   - avanzado    → modo técnico (HYTA), visión total, extensionista.
+ *   - ayuda       → acción directa al manual de uso (chagra:nav).
+ *
+ * Historia previa que se conserva (sin breaking change funcional):
+ *   - Feedback piloto #120: nombre/rol editables (chagra:operator:name/role).
+ *   - Pestañas 2026-05-28 ("difícil de navegar") → superadas por este hub.
+ *   - Foto de perfil 2026-06-15 (operatorPhotoService, testids intactos).
+ *   - Todos los toggles/keys de localStorage y eventos CustomEvent idénticos.
  */
 
 const ROLES = [
@@ -59,20 +84,37 @@ const ROLES = [
 ];
 
 /**
- * Definición de las pestañas. El emoji acompaña al label corto para que se
- * reconozcan de un vistazo en la tab bar (especialmente en móvil donde el
- * espacio es escaso). El icono lucide se usa en el encabezado de la sección.
+ * Nivel de respuestas del agente (3 modos, memoria
+ * reference-agente-modos-experto-campesino-maestro). Antes SOLO se podía
+ * elegir en el onboarding (OnboardingProfile) o con el switch parcial
+ * simple/detallado del hero finca viva — aquí queda el control COMPLETO,
+ * persistido en el perfil (`nivel_respuestas`, mismo campo que arma el
+ * system-prompt del LLM en agentPromptBase).
  */
-const TABS = [
-  { id: 'perfil', emoji: '👤', label: MSG.nav.perfil },
-  { id: 'apariencia', emoji: '🎨', label: 'Apariencia' },
-  { id: 'voz', emoji: '🔊', label: 'Voz y finca' },
-  { id: 'modulos', emoji: '📦', label: 'Módulos' },
-  { id: 'avanzado', emoji: '⚙️', label: 'Avanzado' },
+const NIVELES_RESPUESTA = [
+  { value: 'simple', label: 'Simple y al grano', desc: 'Respuestas cortas y claras, sin enredos.' },
+  { value: 'detallado', label: 'Detallado', desc: 'Con explicación técnica y sus datos.' },
+  { value: 'maestro', label: 'Maestro', desc: 'Le enseña el porqué de cada cosa.' },
 ];
 
+/** Catálogo de secciones del morral. El orden define la rejilla del hub. */
+const SECTIONS = [
+  { id: 'apariencia', label: 'Apariencia', icon: Palette, tint: 'text-amber-400', tintBg: 'bg-amber-900/30 border-amber-700/40', desc: 'Tema, fondo y avatar' },
+  { id: 'agente', label: 'Mi agente', icon: Sprout, tint: 'text-emerald-400', tintBg: 'bg-emerald-900/30 border-emerald-700/40', desc: 'Respuestas y voz' },
+  { id: 'datos', label: 'Mis datos', icon: User, tint: 'text-teal-300', tintBg: 'bg-teal-900/30 border-teal-700/40', desc: 'Nombre, rol y perfil' },
+  { id: 'finca', label: 'Finca y ubicación', icon: MapPin, tint: 'text-sky-400', tintBg: 'bg-sky-900/30 border-sky-700/40', desc: 'Mapa, GPS y multifinca' },
+  { id: 'inicio', label: 'Pantalla de inicio', icon: LayoutGrid, tint: 'text-cyan-300', tintBg: 'bg-cyan-900/30 border-cyan-700/40', desc: 'Módulos visibles' },
+  { id: 'privacidad', label: 'Privacidad', icon: Shield, tint: 'text-violet-300', tintBg: 'bg-violet-900/30 border-violet-700/40', desc: 'Telemetría y permisos' },
+  { id: 'respaldo', label: 'Respaldo', icon: Archive, tint: 'text-orange-300', tintBg: 'bg-orange-900/30 border-orange-700/40', desc: 'Copia de datos y PDF' },
+  { id: 'ayuda', label: 'Ayuda', icon: LifeBuoy, tint: 'text-amber-300', tintBg: 'bg-amber-900/30 border-amber-700/40', desc: 'Manual de uso', action: true },
+  { id: 'avanzado', label: 'Avanzado', icon: Wrench, tint: 'text-slate-400', tintBg: 'bg-slate-800/60 border-slate-700', desc: 'Modo técnico y más' },
+];
+
+const SECTION_LABELS = Object.fromEntries(SECTIONS.map((s) => [s.id, s.label]));
+
 export default function ProfileScreen({ onBack, onHome }) {
-  const [activeTab, setActiveTab] = useState('perfil');
+  // null = hub (el morral). string = sección enfocada.
+  const [section, setSection] = useState(null);
 
   const [name, setName] = useState(() =>
     typeof window !== 'undefined'
@@ -141,12 +183,8 @@ export default function ProfileScreen({ onBack, onHome }) {
   );
 
   // Visibilidad de módulos del Home (#7003 + gating por perfil 2026-06-15).
-  // Permite activar/desactivar cada módulo individualmente. Estado inicial =
-  // visibilidad EFECTIVA del home: si el usuario ya guardó una preferencia
-  // MANUAL, esa gana (#1560); si no, partimos del DEFAULT derivado del perfil
-  // (homeModuleSelector) para que los toggles coincidan con lo que el home
-  // realmente muestra. Así un urbano ve aquí 'zonas/insumos' ya en OFF (no un
-  // todo-ON que contradiga su home).
+  // Estado inicial = visibilidad EFECTIVA del home: preferencia MANUAL gana
+  // (#1560); si no, el DEFAULT derivado del perfil (homeModuleSelector).
   const [moduleVisibility, setModuleVisibilityState] = useState(() => {
     try {
       if (hasManualModuleVisibility()) return getModuleVisibility();
@@ -159,9 +197,7 @@ export default function ProfileScreen({ onBack, onHome }) {
   });
 
   // Free 7→10 fix-pack: HYTA (info GPU/Ollama) detrás de un toggle "Modo
-  // técnico". Default OFF para que el campesino-target no vea jerga técnica
-  // que le haga sentir que la app no es para él (hipótesis #4 del análisis
-  // project-free-7-10-analysis-2026-05-28). Persiste en localStorage.
+  // técnico". Default OFF (hipótesis #4 project-free-7-10-analysis).
   const [modoTecnico, setModoTecnico] = useState(() =>
     typeof window !== 'undefined'
       ? localStorage.getItem('chagra:profile:modo-tecnico:v1') === '1'
@@ -172,12 +208,8 @@ export default function ProfileScreen({ onBack, onHome }) {
     localStorage.setItem('chagra:profile:modo-tecnico:v1', modoTecnico ? '1' : '0');
   }, [modoTecnico]);
 
-  // Visión total del operador (bug demo 2026-06-19: "faltan varios botones en mi
-  // usuario"). La whitelist de operador se inyecta SOLO por VITE_OPERATOR_USERNAME
-  // en el build de prod (anti-leak); en un build de demo sin esa env, el bypass
-  // de gating nunca se activa y al operador le faltan módulos/botones. Este toggle
-  // enciende el override LOCAL (localStorage, sin leakear username) para que el
-  // operador vea TODO. Cambiar el flag re-deriva el home (chagra:profile-changed).
+  // Visión total del operador (bug demo 2026-06-19): override LOCAL del
+  // gating del home sin leakear username (glaciarAccess.setOperatorOverride).
   const [verTodo, setVerTodo] = useState(() => {
     try { return operatorOverrideActivo() || esOperadorActual(); } catch (_) { return false; }
   });
@@ -191,13 +223,27 @@ export default function ProfileScreen({ onBack, onHome }) {
     } catch (_) { /* noop */ }
   };
 
-  // Estilo de notificación de alertas (operador 2026-06-06): 'demo' (chip
-  // llamativo estilo demo en la portada del agente, POR DEFECTO) o 'actual'
-  // (campanita del TopBar). Persiste en el perfil (userProfileService).
+  // Estilo de notificación de alertas (operador 2026-06-06): 'demo' o 'actual'.
   const [notifStyle, setNotifStyle] = useState(() => getNotificationStyle());
   const handleNotifStyle = (style) => {
     setNotifStyle(style);
     setNotificationStyle(style);
+  };
+
+  // Nivel de respuestas del agente (NUEVO en perfil 2026-07-05; mismo campo
+  // `nivel_respuestas` del onboarding y del hero finca viva).
+  const [nivelRespuestas, setNivelRespuestas] = useState(() => {
+    try {
+      const v = getProfile()?.nivel_respuestas;
+      return NIVELES_RESPUESTA.some((n) => n.value === v) ? v : 'simple';
+    } catch (_) { return 'simple'; }
+  });
+  const handleNivel = (value) => {
+    setNivelRespuestas(value);
+    try { saveProfile({ nivel_respuestas: value }); } catch (_) { /* noop */ }
+    try {
+      window.dispatchEvent(new CustomEvent('chagra:profile-changed', { detail: { nivel_respuestas: value } }));
+    } catch (_) { /* noop */ }
   };
 
   useEffect(() => {
@@ -209,9 +255,8 @@ export default function ProfileScreen({ onBack, onHome }) {
   }, [telemetryTtl]);
 
   // Persistir cambios al storage en cada modificación + emitir custom event
-  // (CodeQL flag #36/#37 contra StorageEvent ctor, migrado a CustomEvent
-  // que es el patrón canónico para same-tab pub/sub. TopBar escucha ambos
-  // 'storage' (cross-tab nativo) y 'chagra:operator-update' (same-tab).
+  // (CodeQL #36/#37: CustomEvent same-tab; TopBar escucha 'storage' +
+  // 'chagra:operator-update').
   useEffect(() => {
     localStorage.setItem('chagra:operator:name', name);
     window.dispatchEvent(new CustomEvent('chagra:operator-update', {
@@ -226,8 +271,7 @@ export default function ProfileScreen({ onBack, onHome }) {
     }));
   }, [role]);
 
-  // Sincronizar visibilidad de módulos con el perfil y notificar al Home
-  // para actualización en tiempo real.
+  // Sincronizar visibilidad de módulos con el perfil y notificar al Home.
   useEffect(() => {
     setModuleVisibility(moduleVisibility);
     try {
@@ -244,58 +288,77 @@ export default function ProfileScreen({ onBack, onHome }) {
 
   const currentRoleLabel = ROLES.find(r => r.id === role)?.label || MSG.perfilScreen.rolOperadorCampo;
 
-  return (
-    <ScreenShell title={MSG.perfilScreen.tituloPantalla} icon={User} onBack={onBack} onHome={onHome}>
-      {/* Tab bar sticky arriba. Scroll horizontal en móvil si no caben los 4
-          (overflow-x-auto + whitespace-nowrap). La pestaña activa lleva ring +
-          texto emerald como indicador visual. role=tablist para a11y. */}
-      <div
-        role="tablist"
-        aria-label="Secciones del perfil"
-        className="sticky top-0 z-20 flex gap-2 overflow-x-auto bg-slate-950/80 backdrop-blur-md border-b border-slate-800 px-3 py-2 -mx-0"
-      >
-        {TABS.map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              role="tab"
-              aria-selected={isActive}
-              aria-controls={`profile-panel-${tab.id}`}
-              id={`profile-tab-${tab.id}`}
-              onClick={() => setActiveTab(tab.id)}
-              className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center gap-1.5 ${
-                isActive
-                  ? 'bg-emerald-900/30 text-emerald-300 ring-2 ring-emerald-500/50'
-                  : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-              }`}
-            >
-              <span aria-hidden="true">{tab.emoji}</span>
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
+  // ── Estado vivo para las tarjetas del morral ────────────────────────────
+  const { theme } = useTheme();
+  const selectableThemes = getSelectableThemes(fincaVivaHomePerfilActivo());
+  const themeLabel = selectableThemes.find((t) => t.id === theme)?.label || theme;
+  const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);
+  const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
+  const municipio = (() => {
+    try { return getProfileMunicipio(); } catch (_) { return null; }
+  })();
+  const modulosVisibles = HOME_MODULES.filter((m) => moduleVisibility[m.id] !== false).length;
+  const nivelLabel = NIVELES_RESPUESTA.find((n) => n.value === nivelRespuestas)?.label || 'Simple';
 
-      <div className="flex flex-col gap-6 px-4 pt-4 pb-8">
-        {/* ── PESTAÑA: PERFIL ───────────────────────────────────────── */}
-        {activeTab === 'perfil' && (
-          <div
-            role="tabpanel"
-            id="profile-panel-perfil"
-            aria-labelledby="profile-tab-perfil"
-            className="flex flex-col gap-6"
-          >
-            {/* ID Card / User Info, header con datos sintetizados.
-                Avatar editable: el operador sube su foto (cámara/galería). La
-                imagen se guarda local (offline) y se sincroniza a FarmOS para
-                verla en otros dispositivos (operatorPhotoService). */}
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col items-center">
-              <div className="relative mb-4">
-                <div
-                  className="w-24 h-24 bg-slate-800 rounded-full overflow-hidden flex items-center justify-center border-2 border-emerald-500/30"
-                >
+  /** Línea de estado vivo por sección (el "resumen sin entrar"). */
+  const SECTION_STATUS = {
+    datos: currentRoleLabel,
+    apariencia: `Tema: ${themeLabel}`,
+    agente: `${ttsEnabled ? 'Voz activa' : 'Voz apagada'} · ${nivelLabel}`,
+    finca: municipio ? String(municipio).split(',')[0] : activeFincaSlug,
+    inicio: `${modulosVisibles} de ${HOME_MODULES.length} módulos`,
+    privacidad: telemetryConsent ? 'Métricas anónimas activas' : 'Solo en tu dispositivo',
+    respaldo: 'Copia local + PDF',
+    ayuda: 'Manual de uso',
+    avanzado: modoTecnico || verTodo ? 'Modo técnico activo' : 'Todo normal',
+  };
+
+  /** Secciones con "señal encendida" (punto de acento vivo en la tarjeta). */
+  const SECTION_LIT = {
+    apariencia: true,
+    agente: ttsEnabled,
+    finca: true,
+    inicio: modulosVisibles > 0,
+    privacidad: telemetryConsent,
+    avanzado: modoTecnico || verTodo,
+  };
+
+  const openSection = (id) => {
+    if (id === 'ayuda') {
+      // Acción directa: el manual vive en su propia pantalla.
+      try {
+        window.dispatchEvent(new CustomEvent('chagra:nav', { detail: { view: 'ayuda' } }));
+      } catch (_) { /* noop */ }
+      return;
+    }
+    setSection(id);
+  };
+
+  // Al enfocar una sección, volver el scroll arriba (el shell scrollea el main).
+  const panelTopRef = useRef(null);
+  useEffect(() => {
+    if (section && panelTopRef.current) {
+      try { panelTopRef.current.scrollIntoView({ block: 'start' }); } catch (_) { /* noop */ }
+    }
+  }, [section]);
+
+  return (
+    <ScreenShell
+      title={section ? SECTION_LABELS[section] : MSG.perfilScreen.tituloPantalla}
+      icon={User}
+      onBack={section ? () => setSection(null) : onBack}
+      onHome={onHome}
+    >
+      <div ref={panelTopRef} className="flex flex-col gap-5 px-4 pt-4 pb-8" data-testid="profile-hub-root">
+
+        {/* ════════ EL MORRAL (hub) ════════ */}
+        {!section && (
+          <>
+            {/* Cédula de identidad — foto editable (testids intactos), nombre,
+                rol y ubicación de la finca. */}
+            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex items-center gap-4" data-testid="profile-identity-card">
+              <div className="relative shrink-0">
+                <div className="w-20 h-20 bg-slate-800 rounded-full overflow-hidden flex items-center justify-center border-2 border-emerald-500/30">
                   {photoData ? (
                     <img
                       src={photoData}
@@ -304,7 +367,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                       data-testid="profile-photo-img"
                     />
                   ) : (
-                    <User size={44} className="text-emerald-400" aria-hidden="true" />
+                    <User size={38} className="text-emerald-400" aria-hidden="true" />
                   )}
                 </div>
                 <button
@@ -318,10 +381,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                 >
                   <Camera size={16} aria-hidden="true" />
                 </button>
-                {/* SIN `capture` (operador 2026-06-15): el atributo `capture`
-                    forzaba la cámara y ocultaba la galería en móvil. Quitándolo,
-                    el SO ofrece AMBOS — cámara y galería/archivos — que es lo que
-                    el operador espera para elegir una foto ya existente. */}
+                {/* SIN `capture` (operador 2026-06-15): el SO ofrece cámara Y galería. */}
                 <input
                   ref={photoInputRef}
                   type="file"
@@ -332,73 +392,115 @@ export default function ProfileScreen({ onBack, onHome }) {
                   data-testid="profile-photo-input"
                 />
               </div>
-              {photoError && (
-                <p className="text-xs text-amber-400 mb-2" role="alert">{photoError}</p>
-              )}
-              {photoData && (
-                <button
-                  type="button"
-                  onClick={handlePhotoRemove}
-                  className="text-[10px] text-slate-500 hover:text-slate-300 inline-flex items-center gap-1 mb-2"
-                >
-                  <Trash2 size={11} aria-hidden="true" /> Quitar foto
-                </button>
-              )}
-              <h2 className="text-2xl font-black text-white">{name}</h2>
-              <p className="text-xs text-slate-500 uppercase tracking-widest font-bold mt-1">{currentRoleLabel}</p>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-xl font-black text-white leading-tight break-words">{name}</h2>
+                <p className="text-[10px] text-emerald-400 uppercase tracking-widest font-bold mt-0.5">{currentRoleLabel}</p>
+                {(municipio || activeFincaSlug) && (
+                  <p className="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+                    <MapPin size={11} aria-hidden="true" className="shrink-0" />
+                    <span className="truncate">
+                      {[activeFincaSlug, municipio ? String(municipio).split(',')[0] : null].filter(Boolean).join(' · ')}
+                    </span>
+                  </p>
+                )}
+                {photoError && (
+                  <p className="text-xs text-amber-400 mt-1" role="alert">{photoError}</p>
+                )}
+                {photoData && (
+                  <button
+                    type="button"
+                    onClick={handlePhotoRemove}
+                    className="text-[10px] text-slate-500 hover:text-slate-300 inline-flex items-center gap-1 mt-1"
+                  >
+                    <Trash2 size={11} aria-hidden="true" /> Quitar foto
+                  </button>
+                )}
+              </div>
             </div>
 
-            {/* Selector de PERFIL activo (tarea #33). Cambia el rol activo —
-                campesino / cafetero / cacaotero / corporativo — afectando chips,
-                módulos del home y asociaciones por rol. Operador 2026-06-19:
-                "nunca he visto cómo switchear a los perfiles corporativos". */}
+            {/* Rejilla bento — la tarjeta de Apariencia va ancha con la tira de
+                mini-temas (el avance de la galería); el resto en 2 columnas con
+                su estado vivo. nav con aria-label para lectores. */}
+            <nav aria-label="Secciones del perfil" className="grid grid-cols-2 gap-3">
+              {SECTIONS.map((s) => {
+                const Icon = s.icon;
+                const wide = s.id === 'apariencia';
+                const lit = Boolean(SECTION_LIT[s.id]);
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => openSection(s.id)}
+                    data-testid={`profile-section-${s.id}`}
+                    aria-label={`${s.label}. ${SECTION_STATUS[s.id]}`}
+                    className={`text-left rounded-2xl border bg-slate-900/50 border-slate-800 hover:border-slate-600 hover:bg-slate-900/70 active:scale-[0.98] motion-reduce:active:scale-100 transition-all p-4 min-h-[92px] flex flex-col ${wide ? 'col-span-2' : ''}`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${s.tintBg}`}>
+                        <Icon size={18} className={s.tint} aria-hidden="true" />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-bold text-white leading-tight">{s.label}</span>
+                        <span className="block text-[10px] text-slate-500 leading-snug mt-0.5">{s.desc}</span>
+                      </span>
+                      <ChevronRight size={16} className="text-slate-600 shrink-0 mt-1" aria-hidden="true" />
+                    </div>
+
+                    {/* Tira de mini-temas SOLO en la tarjeta ancha de Apariencia:
+                        el usuario ve las pieles disponibles desde la portada. */}
+                    {wide && (
+                      <span className="flex gap-2 mt-3" aria-hidden="true">
+                        {selectableThemes.filter((t) => t.id !== 'auto').map((t) => {
+                          const p = PREVIEWS[t.id] || PREVIEWS.biopunk;
+                          const isActive = theme === t.id;
+                          return (
+                            <span
+                              key={t.id}
+                              className={`block w-12 h-16 rounded-lg overflow-hidden border-2 ${
+                                isActive ? 'border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.45)]' : 'border-slate-700/70'
+                              }`}
+                            >
+                              <ThemeScene p={p} />
+                            </span>
+                          );
+                        })}
+                      </span>
+                    )}
+
+                    <span className={`mt-auto pt-2 flex items-center gap-1.5 text-[10px] font-semibold ${lit ? 'text-emerald-400' : 'text-slate-500'}`}>
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full shrink-0 ${lit ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]' : 'bg-slate-600'}`}
+                        aria-hidden="true"
+                      />
+                      <span className="truncate">{SECTION_STATUS[s.id]}</span>
+                    </span>
+                  </button>
+                );
+              })}
+            </nav>
+          </>
+        )}
+
+        {/* ════════ SECCIONES ENFOCADAS ════════ */}
+        {section && (
+          <button
+            type="button"
+            onClick={() => setSection(null)}
+            data-testid="profile-back-to-hub"
+            className="self-start inline-flex items-center gap-1.5 text-sm font-bold text-emerald-400 hover:text-emerald-300 rounded-lg px-2 py-1.5 -ml-2 min-h-[44px]"
+          >
+            <ChevronLeft size={18} aria-hidden="true" /> Mi perfil
+          </button>
+        )}
+
+        {/* ── MIS DATOS ─────────────────────────────────────────────── */}
+        {section === 'datos' && (
+          <div className="flex flex-col gap-6" data-testid="profile-panel-datos">
+            {/* Selector de PERFIL activo (tarea #33): campesino / cafetero /
+                cacaotero / corporativo — afecta chips, módulos y asociaciones. */}
             <ProfileSwitcher />
 
-            {/* #200/#201: CTAs para personalizar el agente y configurar ubicación.
-                Navegan vía 'chagra:nav' (patrón CSP-safe, sin onClick inline-string).
-                ProfileScreen no recibe onNavigate, así que despacha el evento global
-                que App.jsx escucha. */}
-            <div className="grid sm:grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  try {
-                    window.dispatchEvent(new CustomEvent('chagra:nav', { detail: { view: 'onboarding-perfil', data: { back: 'perfil' } } }));
-                  } catch (_) { /* noop */ }
-                }}
-                className="text-left rounded-2xl bg-emerald-900/20 border border-emerald-800/40 p-4 hover:bg-emerald-900/30 transition-colors flex items-center gap-3"
-              >
-                <div className="p-2 rounded-xl bg-emerald-900/40 border border-emerald-700/40">
-                  <Sprout size={20} className="text-emerald-400" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-bold text-white">Personalizar mi agente</p>
-                  <p className="text-xs text-slate-400">Cuéntale de tu cultivo para respuestas a tu medida</p>
-                </div>
-                <ChevronRight size={18} className="text-slate-500" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  try {
-                    window.dispatchEvent(new CustomEvent('chagra:nav', { detail: { view: 'ubicacion-detectada', data: { back: 'perfil' } } }));
-                  } catch (_) { /* noop */ }
-                }}
-                className="text-left rounded-2xl bg-sky-900/20 border border-sky-800/40 p-4 hover:bg-sky-900/30 transition-colors flex items-center gap-3"
-              >
-                <div className="p-2 rounded-xl bg-sky-900/40 border border-sky-700/40">
-                  <MapPin size={20} className="text-sky-400" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-bold text-white">Configurar ubicación</p>
-                  <p className="text-xs text-slate-400">{MSG.perfilScreen.ubicacionDesc}</p>
-                </div>
-                <ChevronRight size={18} className="text-slate-500" />
-              </button>
-            </div>
-
-            {/* Edit Form */}
+            {/* Edit Form (feedback piloto #120: editable con persistencia) */}
             <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
               <div className="flex items-center gap-2 px-1">
                 <Briefcase size={18} className="text-emerald-400" />
@@ -446,27 +548,29 @@ export default function ProfileScreen({ onBack, onHome }) {
           </div>
         )}
 
-        {/* ── PESTAÑA: APARIENCIA ───────────────────────────────────── */}
-        {activeTab === 'apariencia' && (
-          <div
-            role="tabpanel"
-            id="profile-panel-apariencia"
-            aria-labelledby="profile-tab-apariencia"
-            className="space-y-4"
-          >
-            <div className="flex items-center gap-2 px-1">
-              <Palette size={18} className="text-emerald-400" />
-              <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Personalización</h3>
+        {/* ── APARIENCIA ────────────────────────────────────────────── */}
+        {section === 'apariencia' && (
+          <div className="space-y-5" data-testid="profile-panel-apariencia">
+            {/* GALERÍA DE TEMAS con previsualización (pedido explícito del
+                operador 2026-07-05): mini-teléfonos que muestran cada tema
+                antes de aplicarlo. */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 px-1">
+                <Palette size={18} className="text-emerald-400" />
+                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Tema de la app</h3>
+              </div>
+              <p className="text-[11px] text-slate-500 leading-snug px-1">
+                Cada tarjeta muestra cómo se verá Chagra con ese tema. Toca una
+                para aplicarla al instante — puedes devolverte cuando quieras.
+              </p>
+              <ThemeSelector />
             </div>
-            <ThemeSelector />
+
             <BackgroundSelector />
             <AgentAvatarSelector />
 
-            {/* Estilo de notificación (operador 2026-06-06 + 2026-06-11).
-                Decide CUÁL campana única se muestra (bug "dos campanas"):
-                'demo' = campana de la portada del agente + aviso destacado
-                (por defecto). 'actual' = campanita clásica del encabezado.
-                Persiste en el perfil. */}
+            {/* Estilo de notificación (operador 2026-06-06 + 2026-06-11):
+                decide CUÁL campana única se muestra. */}
             <div className="space-y-3 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
               <div className="flex items-center gap-2 px-1">
                 <Bell size={18} className="text-emerald-400" />
@@ -501,42 +605,108 @@ export default function ProfileScreen({ onBack, onHome }) {
           </div>
         )}
 
-        {/* ── PESTAÑA: VOZ Y FINCA ──────────────────────────────────── */}
-        {activeTab === 'voz' && (
-          <div
-            role="tabpanel"
-            id="profile-panel-voz"
-            aria-labelledby="profile-tab-voz"
-            className="flex flex-col gap-6"
-          >
-            {/* Task #122 (2026-05-23): toggle global TTS del agente Chagra.
-                Persiste en usePrefsStore (localStorage `chagra:prefs:tts-enabled`).
-                Default ON. Operador puede silenciar también con doble-click en
-                el avatar colibrí (header AgentScreen o FAB global). */}
+        {/* ── MI AGENTE ─────────────────────────────────────────────── */}
+        {section === 'agente' && (
+          <div className="flex flex-col gap-6" data-testid="profile-panel-agente">
+            {/* Nivel de respuestas — el control COMPLETO de los 3 modos (antes
+                regado entre onboarding y el switch parcial del hero). */}
+            <div className="space-y-3 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+              <div className="flex items-center gap-2 px-1">
+                <GraduationCap size={18} className="text-emerald-400" />
+                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Cómo le responde el agente</h3>
+              </div>
+              <div className="flex flex-col gap-2" role="radiogroup" aria-label="Nivel de respuestas del agente">
+                {NIVELES_RESPUESTA.map((n) => {
+                  const active = nivelRespuestas === n.value;
+                  return (
+                    <button
+                      key={n.value}
+                      type="button"
+                      role="radio"
+                      aria-checked={active}
+                      data-testid={`nivel-respuestas-${n.value}`}
+                      onClick={() => handleNivel(n.value)}
+                      className={`text-left rounded-2xl p-4 border transition-colors min-h-[56px] flex items-center gap-3 ${
+                        active
+                          ? 'bg-emerald-900/30 border-emerald-600/60'
+                          : 'bg-slate-800/40 border-slate-700 hover:bg-slate-800/70'
+                      }`}
+                    >
+                      <span className="flex-1">
+                        <span className="block text-sm font-bold text-white">{n.label}</span>
+                        <span className="block text-[11px] text-slate-400 mt-0.5 leading-snug">{n.desc}</span>
+                      </span>
+                      {active && <Check size={18} className="text-emerald-400 shrink-0" aria-hidden="true" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* #200: CTA para personalizar el agente (onboarding-perfil).
+                Navega vía 'chagra:nav' (patrón CSP-safe). */}
+            <button
+              type="button"
+              onClick={() => {
+                try {
+                  window.dispatchEvent(new CustomEvent('chagra:nav', { detail: { view: 'onboarding-perfil', data: { back: 'perfil' } } }));
+                } catch (_) { /* noop */ }
+              }}
+              className="text-left rounded-2xl bg-emerald-900/20 border border-emerald-800/40 p-4 hover:bg-emerald-900/30 transition-colors flex items-center gap-3"
+            >
+              <div className="p-2 rounded-xl bg-emerald-900/40 border border-emerald-700/40">
+                <Sprout size={20} className="text-emerald-400" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-white">Personalizar mi agente</p>
+                <p className="text-xs text-slate-400">Cuéntale de tu cultivo para respuestas a tu medida</p>
+              </div>
+              <ChevronRight size={18} className="text-slate-500" />
+            </button>
+
+            {/* Task #122: toggle global TTS del agente. */}
             <AgentVoiceSection />
 
-            {/* Task #124 (2026-05-24): selector de voz Kokoro + velocidad. Solo
-                tiene sentido si TTS está activo, pero lo renderizamos siempre
-                (no oculto) para que el operador pueda elegir voz antes de
-                activar TTS — UX más predictible que esconder/mostrar. */}
+            {/* Task #124: selector de voz Kokoro + velocidad. Siempre visible
+                (UX predictible aunque TTS esté apagado). */}
             <VoiceSelector />
+          </div>
+        )}
 
-            {/* Multifinca + GPS Section (062.7 indoor override + 062.8 privacy) */}
+        {/* ── FINCA Y UBICACIÓN ─────────────────────────────────────── */}
+        {section === 'finca' && (
+          <div className="flex flex-col gap-6" data-testid="profile-panel-finca">
+            {/* #201: CTA configurar ubicación (mapa / piso térmico). */}
+            <button
+              type="button"
+              onClick={() => {
+                try {
+                  window.dispatchEvent(new CustomEvent('chagra:nav', { detail: { view: 'ubicacion-detectada', data: { back: 'perfil' } } }));
+                } catch (_) { /* noop */ }
+              }}
+              className="text-left rounded-2xl bg-sky-900/20 border border-sky-800/40 p-4 hover:bg-sky-900/30 transition-colors flex items-center gap-3"
+            >
+              <div className="p-2 rounded-xl bg-sky-900/40 border border-sky-700/40">
+                <MapPin size={20} className="text-sky-400" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-white">Configurar ubicación</p>
+                <p className="text-xs text-slate-400">{MSG.perfilScreen.ubicacionDesc}</p>
+              </div>
+              <ChevronRight size={18} className="text-slate-500" />
+            </button>
+
+            {/* Multifinca + GPS (062.7 indoor override + 062.8 privacy) */}
             <MultifincaGpsSection />
           </div>
         )}
 
-        {/* ── PESTAÑA: MÓDULOS (#7003) ───────────────────────────────── */}
-        {activeTab === 'modulos' && (
-          <div
-            role="tabpanel"
-            id="profile-panel-modulos"
-            aria-labelledby="profile-tab-modulos"
-            className="flex flex-col gap-6"
-          >
+        {/* ── PANTALLA DE INICIO (módulos #7003) ────────────────────── */}
+        {section === 'inicio' && (
+          <div className="flex flex-col gap-6" data-testid="profile-panel-inicio">
             <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
               <div className="flex items-center gap-2 px-1">
-                <Sprout size={18} className="text-emerald-400" />
+                <LayoutGrid size={18} className="text-emerald-400" />
                 <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Módulos del Home</h3>
               </div>
 
@@ -546,7 +716,6 @@ export default function ProfileScreen({ onBack, onHome }) {
                 activados por defecto.
               </p>
 
-              {/* Agrupar módulos por categoría */}
               {(() => {
                 const grouped = {};
                 for (const module of HOME_MODULES) {
@@ -612,128 +781,10 @@ export default function ProfileScreen({ onBack, onHome }) {
           </div>
         )}
 
-        {/* ── PESTAÑA: AVANZADO ─────────────────────────────────────── */}
-        {activeTab === 'avanzado' && (
-          <div
-            role="tabpanel"
-            id="profile-panel-avanzado"
-            aria-labelledby="profile-tab-avanzado"
-            className="flex flex-col gap-6"
-          >
-            {/* Modo técnico toggle — Free 7→10 fix-pack (hipótesis #4).
-                HYTA (GPU/Ollama) es jerga ingenieril que asusta al campesino
-                target. Lo ocultamos detrás de un switch off-by-default para
-                usuarios curiosos sin imponerlo a la mayoría. */}
-            <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
-              <div className="flex items-center gap-2 px-1">
-                <Wrench size={18} className="text-slate-400" />
-                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Modo técnico</h3>
-              </div>
-
-              <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
-                <div className="flex flex-col gap-0.5 flex-1">
-                  <span className="text-sm font-bold text-slate-200">Mostrar información GPU</span>
-                  <span className="text-[10px] text-slate-500 leading-snug">
-                    Para curiosos: muestra qué modelos de IA están cargados en GPU
-                    y cuánta memoria usan. No es necesario para usar Chagra.
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={modoTecnico}
-                  aria-label="Activar o desactivar modo técnico"
-                  onClick={() => setModoTecnico((v) => !v)}
-                  className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
-                    modoTecnico ? 'bg-slate-500' : 'bg-slate-700'
-                  }`}
-                >
-                  <span
-                    className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
-                      modoTecnico ? 'translate-x-5' : 'translate-x-0'
-                    }`}
-                  />
-                </button>
-              </label>
-
-              {modoTecnico && (
-                <div className="mt-2">
-                  <HytaPanel />
-                </div>
-              )}
-            </div>
-
-            {/* Visión total del operador (tarea bug demo 2026-06-19). Bypass del
-                gating del home: enciende TODOS los módulos, las 4 tarjetas de
-                seguimiento y el catálogo completo de chips. Pensado para el
-                operador/admin del producto y para demos. NO leakea identidad: es
-                una bandera booleana local (ver glaciarAccess.setOperatorOverride). */}
-            <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
-              <div className="flex items-center gap-2 px-1">
-                <Wrench size={18} className="text-amber-400" />
-                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Visión total (operador)</h3>
-              </div>
-
-              <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
-                <div className="flex flex-col gap-0.5 flex-1">
-                  <span className="text-sm font-bold text-slate-200">Mostrar todas las capacidades</span>
-                  <span className="text-[10px] text-slate-500 leading-snug">
-                    Activa todos los módulos, tarjetas de seguimiento y opciones del
-                    home, saltándose el filtrado por perfil. Útil para demos y para
-                    el administrador del producto.
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={verTodo}
-                  aria-label="Activar o desactivar la visión total del operador"
-                  data-testid="operator-override-toggle"
-                  onClick={handleVerTodo}
-                  className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
-                    verTodo ? 'bg-amber-600' : 'bg-slate-700'
-                  }`}
-                >
-                  <span
-                    className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
-                      verTodo ? 'translate-x-5' : 'translate-x-0'
-                    }`}
-                  />
-                </button>
-              </label>
-            </div>
-
-            {/* Modo extensionista (ADR-048 MVP): entrada al panel supervisor
-                multi-finca. Solo se RENDERIZA si el usuario tiene el rol
-                (feature flag VITE_FEATURE_EXTENSIONISTA + whitelist). Para el
-                resto de usuarios esta sección no existe. Navega vía 'chagra:nav'
-                (patrón CSP-safe, sin onClick inline-string). */}
-            {esExtensionistaActual() && (
-              <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
-                <div className="flex items-center gap-2 px-1">
-                  <Users size={18} className="text-emerald-400" />
-                  <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Acompañamiento</h3>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    window.dispatchEvent(new CustomEvent('chagra:nav', { detail: { view: 'extensionista' } }));
-                  }}
-                  className="w-full flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 hover:bg-slate-700/60 transition-colors min-h-[48px] text-left cursor-pointer"
-                >
-                  <div className="flex flex-col gap-0.5 flex-1">
-                    <span className="text-sm font-bold text-slate-200">Fincas que acompaño</span>
-                    <span className="text-[10px] text-slate-500 leading-snug">
-                      Panel del extensionista: revisa el estado de las fincas que
-                      supervisas. Vista previa con datos de ejemplo.
-                    </span>
-                  </div>
-                  <ChevronRight size={18} className="text-slate-400 shrink-0" aria-hidden="true" />
-                </button>
-              </div>
-            )}
-
-            {/* Telemetry Section */}
+        {/* ── PRIVACIDAD ────────────────────────────────────────────── */}
+        {section === 'privacidad' && (
+          <div className="flex flex-col gap-6" data-testid="profile-panel-privacidad">
+            {/* Telemetría de voz LOCAL (solo en el dispositivo). */}
             <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
               <div className="flex items-center gap-2 px-1">
                 <Mic size={18} className="text-morpho" />
@@ -782,12 +833,10 @@ export default function ProfileScreen({ onBack, onHome }) {
             </div>
 
             {/* Tarea #8 — Consentimiento de envío de telemetría al servidor.
-                Default OFF (privacidad). Autoriza enviar SOLO metadatos
-                anónimos (modelo, ruta, latencias, tokens) — NUNCA el prompt ni
-                la respuesta ni datos de ubicación. */}
+                Default OFF (privacidad). SOLO metadatos anónimos. */}
             <div className="space-y-3 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
               <div className="flex items-center gap-2 px-1">
-                <Wrench size={18} className="text-morpho" />
+                <Shield size={18} className="text-morpho" />
                 <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Compartir telemetría del agente</h3>
               </div>
 
@@ -825,21 +874,133 @@ export default function ProfileScreen({ onBack, onHome }) {
                 las respuestas, ni tu ubicación. Puedes desactivarlo cuando quieras.
               </p>
             </div>
+          </div>
+        )}
 
-            {/* Copia de seguridad (2026-05-19): operador perdió plantas + 100
-                species + túnel por un "Clear cache" en Chrome Android. Botón
-                visible y prominente para que descargue snapshot JSON cuando
-                quiera. */}
+        {/* ── COPIA Y CUADERNO ──────────────────────────────────────── */}
+        {section === 'respaldo' && (
+          <div className="flex flex-col gap-6" data-testid="profile-panel-respaldo">
+            {/* Copia de seguridad (2026-05-19: operador perdió datos por un
+                "Clear cache"). Botón prominente de snapshot JSON. */}
             <BackupExportButton />
 
-            {/* Cuaderno de campo PDF (FEAT-D #295, 2026-05-28): diferenciador
-                agronómico para SNIA / EPSEA / certificación orgánica. PDF
-                imprimible con inventario + bitácora + cosechas + insumos. */}
+            {/* Cuaderno de campo PDF (FEAT-D #295): diferenciador agronómico
+                para SNIA / EPSEA / certificación orgánica. */}
             <CuadernoPDFButton />
           </div>
         )}
 
-        {/* App Info Footer — común a todas las pestañas */}
+        {/* ── AVANZADO ──────────────────────────────────────────────── */}
+        {section === 'avanzado' && (
+          <div className="flex flex-col gap-6" data-testid="profile-panel-avanzado">
+            {/* Modo técnico (Free 7→10 fix-pack, hipótesis #4): HYTA detrás
+                de un switch off-by-default. */}
+            <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+              <div className="flex items-center gap-2 px-1">
+                <Wrench size={18} className="text-slate-400" />
+                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Modo técnico</h3>
+              </div>
+
+              <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
+                <div className="flex flex-col gap-0.5 flex-1">
+                  <span className="text-sm font-bold text-slate-200">Mostrar información GPU</span>
+                  <span className="text-[10px] text-slate-500 leading-snug">
+                    Para curiosos: muestra qué modelos de IA están cargados en GPU
+                    y cuánta memoria usan. No es necesario para usar Chagra.
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={modoTecnico}
+                  aria-label="Activar o desactivar modo técnico"
+                  onClick={() => setModoTecnico((v) => !v)}
+                  className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+                    modoTecnico ? 'bg-slate-500' : 'bg-slate-700'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                      modoTecnico ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </label>
+
+              {modoTecnico && (
+                <div className="mt-2">
+                  <HytaPanel />
+                </div>
+              )}
+            </div>
+
+            {/* Visión total del operador (bug demo 2026-06-19): bypass del
+                gating del home. Bandera booleana local, NO leakea identidad. */}
+            <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+              <div className="flex items-center gap-2 px-1">
+                <Wrench size={18} className="text-amber-400" />
+                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Visión total (operador)</h3>
+              </div>
+
+              <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
+                <div className="flex flex-col gap-0.5 flex-1">
+                  <span className="text-sm font-bold text-slate-200">Mostrar todas las capacidades</span>
+                  <span className="text-[10px] text-slate-500 leading-snug">
+                    Activa todos los módulos, tarjetas de seguimiento y opciones del
+                    home, saltándose el filtrado por perfil. Útil para demos y para
+                    el administrador del producto.
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={verTodo}
+                  aria-label="Activar o desactivar la visión total del operador"
+                  data-testid="operator-override-toggle"
+                  onClick={handleVerTodo}
+                  className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+                    verTodo ? 'bg-amber-600' : 'bg-slate-700'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                      verTodo ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </label>
+            </div>
+
+            {/* Modo extensionista (ADR-048 MVP): SOLO se renderiza si el
+                usuario tiene el rol (flag + whitelist). */}
+            {esExtensionistaActual() && (
+              <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+                <div className="flex items-center gap-2 px-1">
+                  <Users size={18} className="text-emerald-400" />
+                  <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Acompañamiento</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('chagra:nav', { detail: { view: 'extensionista' } }));
+                  }}
+                  className="w-full flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 hover:bg-slate-700/60 transition-colors min-h-[48px] text-left cursor-pointer"
+                >
+                  <div className="flex flex-col gap-0.5 flex-1">
+                    <span className="text-sm font-bold text-slate-200">Fincas que acompaño</span>
+                    <span className="text-[10px] text-slate-500 leading-snug">
+                      Panel del extensionista: revisa el estado de las fincas que
+                      supervisas. Vista previa con datos de ejemplo.
+                    </span>
+                  </div>
+                  <ChevronRight size={18} className="text-slate-400 shrink-0" aria-hidden="true" />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* App Info Footer — común a hub y secciones */}
         <div className="mt-8 pt-6 border-t border-slate-800/50 text-center">
           <p className="text-[10px] text-slate-600 font-mono tracking-tighter uppercase">
             Chagra • v1.0.0
@@ -857,11 +1018,8 @@ export default function ProfileScreen({ onBack, onHome }) {
  * AgentVoiceSection — Task #122 (2026-05-23).
  *
  * Toggle "Voz del agente activa" persistido en usePrefsStore (key
- * `chagra:prefs:tts-enabled`). Cuando se desactiva, se llama stop()
- * inmediato del ttsService para silenciar cualquier playback en curso.
- *
- * Equivalente al doble-click del avatar colibrí, pero accesible desde
- * Perfil para operadores que prefieran control explícito UI.
+ * `chagra:prefs:tts-enabled`). Al desactivar, stop() inmediato del
+ * ttsService. Equivalente al doble-click del avatar colibrí.
  */
 function AgentVoiceSection() {
   const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);

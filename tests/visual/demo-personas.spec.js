@@ -19,6 +19,8 @@ test.describe('Demo Personas — Perfiles Visiblemente Distintos', () => {
   test('CAMPESINO: finca diversa pequeña', async ({ page }) => {
     // Navegar al perfil
     await page.click('[data-testid="nav-perfil"]');
+    // Hub "El Morral" (2026-07-05): los presets viven en la sección Mis datos.
+    await page.click('[data-testid="profile-section-datos"]');
     await page.waitForSelector('[data-testid="profile-preset-campesino"]');
     
     // Capturar antes del cambio
@@ -47,6 +49,8 @@ test.describe('Demo Personas — Perfiles Visiblemente Distintos', () => {
 
   test('CAFETERO: SAF café + sombra + plátano', async ({ page }) => {
     await page.click('[data-testid="nav-perfil"]');
+    // Hub "El Morral" (2026-07-05): los presets viven en la sección Mis datos.
+    await page.click('[data-testid="profile-section-datos"]');
     await page.waitForSelector('[data-testid="profile-preset-cafetero"]');
     
     await page.screenshot({ path: 'screenshots/demo-personas/before-cafetero.png' });
@@ -65,6 +69,8 @@ test.describe('Demo Personas — Perfiles Visiblemente Distintos', () => {
 
   test('CACAOTERO: cacao + matarratón + plátano', async ({ page }) => {
     await page.click('[data-testid="nav-perfil"]');
+    // Hub "El Morral" (2026-07-05): los presets viven en la sección Mis datos.
+    await page.click('[data-testid="profile-section-datos"]');
     await page.waitForSelector('[data-testid="profile-preset-cacaotero"]');
     
     await page.screenshot({ path: 'screenshots/demo-personas/before-cacaotero.png' });
@@ -83,6 +89,8 @@ test.describe('Demo Personas — Perfiles Visiblemente Distintos', () => {
 
   test('CORPORATIVO: multi-finca con indicadores', async ({ page }) => {
     await page.click('[data-testid="nav-perfil"]');
+    // Hub "El Morral" (2026-07-05): los presets viven en la sección Mis datos.
+    await page.click('[data-testid="profile-section-datos"]');
     await page.waitForSelector('[data-testid="profile-preset-corporativo"]');
     
     await page.screenshot({ path: 'screenshots/demo-personas/before-corporativo.png' });
@@ -102,7 +110,8 @@ test.describe('Demo Personas — Perfiles Visiblemente Distintos', () => {
   test('Verificar que Visión total se desactiva al cambiar perfil', async ({ page }) => {
     // Primero activar "Visión total" manualmente
     await page.click('[data-testid="nav-perfil"]');
-    await page.click('text=Avanzado');
+    // Hub "El Morral" (2026-07-05): Visión total vive en la sección Avanzado.
+    await page.click('[data-testid="profile-section-avanzado"]');
     
     // Buscar el toggle de "Visión total" y activarlo
     const visionTotalToggle = page.locator('[data-testid="operator-override-toggle"]');
@@ -113,13 +122,16 @@ test.describe('Demo Personas — Perfiles Visiblemente Distintos', () => {
       await expect(visionTotalToggle).toHaveAttribute('aria-checked', 'true');
     }
     
-    // Ahora cambiar a un perfil demo
+    // Ahora cambiar a un perfil demo (presets en la sección Mis datos)
+    await page.click('[data-testid="profile-back-to-hub"]');
+    await page.click('[data-testid="profile-section-datos"]');
     await page.click('[data-testid="profile-preset-campesino"]');
     await page.waitForSelector('button[aria-busy="true"]', { state: 'visible' });
     await page.waitForSelector('button[aria-busy="true"]', { state: 'hidden', timeout: 10000 });
     
     // Verificar que el toggle de "Visión total" está desactivado
-    await page.click('text=Avanzado');
+    await page.click('[data-testid="profile-back-to-hub"]');
+    await page.click('[data-testid="profile-section-avanzado"]');
     await expect(visionTotalToggle).toHaveAttribute('aria-checked', 'false');
     
     await page.screenshot({ path: 'screenshots/demo-personas/vision-total-desactivada.png' });
