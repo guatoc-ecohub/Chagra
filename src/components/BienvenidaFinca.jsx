@@ -2,7 +2,7 @@
    marcarBienvenidaVista son los helpers de gating "una sola vez" y deben
    exportarse junto al componente (mismo patrón que NotifPermissionPrompt). */
 import React, { useEffect, useRef, useState } from 'react';
-import { Mic, Camera, BadgeCheck, MapPin, ArrowRight, Volume2 } from 'lucide-react';
+import { Mic, Camera, BadgeCheck, MapPin, ArrowRight, Volume2, Sparkles, Glasses } from 'lucide-react';
 import ChagraAgentAvatarColibri from './ChagraAgentAvatarColibri';
 import { MSG } from '../config/messages.js';
 
@@ -42,6 +42,8 @@ import { MSG } from '../config/messages.js';
  * Props:
  *   - onUbicar: ir a 'ubicacion-detectada' (flujo existente de ubicación).
  *   - onClose:  descartar la bienvenida (saltar / "ahora no").
+ *   - onExplorarEjemplo: SKIP rico → sembrar la finca de ejemplo y entrar al
+ *     home ya POBLADO (demo público). Si no se pasa, el botón no se muestra.
  */
 
 const BIENVENIDA_KEY = 'chagra:bienvenida-vista:v1';
@@ -73,8 +75,9 @@ function escucharTexto(texto) {
     .catch(() => {});
 }
 
-export default function BienvenidaFinca({ onUbicar, onClose }) {
+export default function BienvenidaFinca({ onUbicar, onClose, onExplorarEjemplo = undefined }) {
   const [paso, setPaso] = useState(0);
+  const [sembrando, setSembrando] = useState(false);
   const dialogRef = useRef(null);
   const B = MSG.bienvenida;
 
@@ -89,6 +92,20 @@ export default function BienvenidaFinca({ onUbicar, onClose }) {
     else onClose?.();
   };
 
+  // SKIP rico: sembrar la finca de ejemplo y entrar al home ya poblado. Marca la
+  // bienvenida como vista (no reaparece) y delega en el contenedor la siembra +
+  // navegación. Guard anti-doble-toque mientras siembra.
+  const explorarEjemplo = async () => {
+    if (sembrando) return;
+    setSembrando(true);
+    marcarBienvenidaVista();
+    try {
+      await onExplorarEjemplo?.();
+    } finally {
+      setSembrando(false);
+    }
+  };
+
   const onKeyDown = (e) => {
     if (e.key === 'Escape') terminar('cerrar');
   };
@@ -98,7 +115,7 @@ export default function BienvenidaFinca({ onUbicar, onClose }) {
     { titulo: B.titulo1, copy: B.copy1 },
     {
       titulo: B.titulo2,
-      copy: `${B.capVozTitulo}: ${B.capVozCopy} ${B.capFotoTitulo}: ${B.capFotoCopy} ${B.capVerifTitulo}: ${B.capVerifCopy}`,
+      copy: `${B.capVozTitulo}: ${B.capVozCopy} ${B.capFotoTitulo}: ${B.capFotoCopy} ${B.capHerramTitulo}: ${B.capHerramCopy} ${B.capVerifTitulo}: ${B.capVerifCopy}`,
     },
     { titulo: B.titulo3, copy: B.copy3 },
   ];
@@ -106,6 +123,7 @@ export default function BienvenidaFinca({ onUbicar, onClose }) {
   const capacidades = [
     { id: 'voz', Icon: Mic, titulo: B.capVozTitulo, copy: B.capVozCopy, costura: false },
     { id: 'foto', Icon: Camera, titulo: B.capFotoTitulo, copy: B.capFotoCopy, costura: false },
+    { id: 'herramientas', Icon: Glasses, titulo: B.capHerramTitulo, copy: B.capHerramCopy, costura: false },
     { id: 'verificado', Icon: BadgeCheck, titulo: B.capVerifTitulo, copy: B.capVerifCopy, costura: true },
   ];
 
@@ -262,6 +280,20 @@ export default function BienvenidaFinca({ onUbicar, onClose }) {
             >
               <MapPin size={22} aria-hidden="true" /> {B.ubicarFinca}
             </button>
+            {/* SKIP rico: explorar con la finca de ejemplo ya poblada (demo). */}
+            {typeof onExplorarEjemplo === 'function' && (
+              <button
+                type="button"
+                onClick={explorarEjemplo}
+                disabled={sembrando}
+                aria-label={B.explorarEjemploAria}
+                className="onboarding-piso-secondary inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                data-testid="bienvenida-explorar-ejemplo"
+              >
+                <Sparkles size={18} aria-hidden="true" />
+                {sembrando ? 'Preparando su finca…' : B.explorarEjemplo}
+              </button>
+            )}
             <button
               type="button"
               onClick={() => terminar('cerrar')}

@@ -6,6 +6,7 @@ import {
   SkipForward,
   Check,
   Clock,
+  Sparkles,
 } from 'lucide-react';
 import {
   getApplicableQuestions,
@@ -39,10 +40,14 @@ import { PISO_TERMICO_INFO } from '../services/locationService';
  * Props:
  *   - onComplete(profile): llamado al terminar o saltar todo.
  *   - onClose():           opcional, cierre/atrás global.
+ *   - onExplorarEjemplo(): opcional, SKIP rico → sembrar la finca de ejemplo y
+ *                          entrar al home ya poblado (demo público). Si no se
+ *                          pasa, el botón no se muestra.
  */
-export default function OnboardingProfile({ onComplete, onClose }) {
+export default function OnboardingProfile({ onComplete, onClose = undefined, onExplorarEjemplo = undefined }) {
   const [answers, setAnswers] = useState(() => getProfile());
   const [index, setIndex] = useState(0);
+  const [sembrando, setSembrando] = useState(false);
 
   // Lista de preguntas aplicables según respuestas acumuladas. Se
   // recalcula en cada render para soportar condicionales.
@@ -90,6 +95,19 @@ export default function OnboardingProfile({ onComplete, onClose }) {
     markProfileSkipped();
     const profile = getProfile();
     if (onComplete) onComplete(profile);
+  };
+
+  // SKIP rico: marcar el perfil como saltado, sembrar la finca de ejemplo y
+  // entrar al home ya poblado. Guard anti-doble-toque mientras siembra.
+  const explorarEjemplo = async () => {
+    if (sembrando) return;
+    setSembrando(true);
+    markProfileSkipped();
+    try {
+      await onExplorarEjemplo?.();
+    } finally {
+      setSembrando(false);
+    }
   };
 
   if (!current) {
@@ -152,6 +170,23 @@ export default function OnboardingProfile({ onComplete, onClose }) {
 
       {/* Footer nav */}
       <div className="sticky bottom-0 bg-slate-950/95 backdrop-blur border-t border-slate-800 px-4 py-3">
+        {/* SKIP rico: explorar con la finca de ejemplo ya poblada (demo público).
+            No pide llenar nada — entra a una finca completa (multi-piso, con
+            historial y problemas reales). */}
+        {typeof onExplorarEjemplo === 'function' && (
+          <div className="max-w-xl mx-auto mb-2.5">
+            <button
+              type="button"
+              onClick={explorarEjemplo}
+              disabled={sembrando}
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-emerald-700/60 bg-emerald-900/20 text-emerald-200 hover:bg-emerald-900/40 font-medium transition-colors disabled:opacity-60"
+              data-testid="onboarding-explorar-ejemplo"
+            >
+              <Sparkles size={17} />
+              {sembrando ? 'Preparando su finca…' : 'Explorar con finca de ejemplo'}
+            </button>
+          </div>
+        )}
         <div className="max-w-xl mx-auto flex items-center gap-3">
           <button
             type="button"
