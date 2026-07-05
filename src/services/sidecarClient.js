@@ -425,6 +425,13 @@ const PRECIO_SIPSA_ACTIONS = new Set([
  * @param {object} [opts]
  * @param {number|string|null} [opts.fincaAltitud] - msnm de la finca activa.
  * @param {string} [opts.context] - historial de conversación (últimos N turnos).
+ * MODO CIENTÍFICO (#17): el sidecar corre `grounding-policy.ts`/`grounding-
+ * prompt-formatter.ts` (WIRING real, audit 2026-07-04-optimizacion-
+ * grounding-velocidad-inteligencia.md win #4) sobre las entidades ya
+ * resueltas y devuelve un campo `grounding` con la decisión answer/hedge/
+ * abstain + el semáforo verde/ámbar/rojo — se pasa tal cual (puede ser
+ * `null` si el sidecar no lo computó, degradación graceful).
+ *
  * @returns {Promise<null | { entities: Array<{
  *   mentioned: string,
  *   kind: 'species' | 'pest' | 'biopreparado',
@@ -438,7 +445,15 @@ const PRECIO_SIPSA_ACTIONS = new Set([
  *   viabilidad?: 'viable' | 'marginal' | 'inviable', delta_altitud?: number,
  *   companions?: Array<string|object>, antagonists?: Array<string|object>,
  *   alternativas_viables?: Array<string|object>, alternativas_cercanas?: Array<string|object>,
- * }> }>}
+ * }>, grounding: null | {
+ *   semaphore: 'verde' | 'ambar' | 'rojo',
+ *   policy: 'answer' | 'hedge' | 'abstain',
+ *   reason: string,
+ *   resolved_entities: number,
+ *   min_confidence: number,
+ *   provenance: Array<{ entity_id: string, confidence: number, source: string|null, validation_level: string|null }>,
+ *   block: string,
+ * } }>}
  */
 export async function resolveEntities(userMessage, opts = {}) {
   if (!userMessage || typeof userMessage !== 'string') return null;
@@ -458,8 +473,9 @@ export async function resolveEntities(userMessage, opts = {}) {
   if (Number.isFinite(alt)) body.finca_altitud = alt;
   const raw = await postJson('/resolve-entities', body, NLU_TIMEOUT_MS);
   if (!raw || typeof raw !== 'object') return null;
-  if (!Array.isArray(raw.entities)) return { entities: [] };
-  return { entities: raw.entities };
+  const grounding = raw.grounding && typeof raw.grounding === 'object' ? raw.grounding : null;
+  if (!Array.isArray(raw.entities)) return { entities: [], grounding };
+  return { entities: raw.entities, grounding };
 }
 
 /**

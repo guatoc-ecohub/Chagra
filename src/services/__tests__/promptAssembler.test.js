@@ -88,6 +88,25 @@ describe('assembleSystemContent — orden por prioridad', () => {
     expect(content.indexOf('GUARDA_PISO_TERMICO')).toBeGreaterThan(content.indexOf('GUARDA_BIOPREPARADO'));
     expect(content.endsWith('GUARDA_PISO_TERMICO')).toBe(true);
   });
+
+  // MODO CIENTÍFICO (#17): el bloque answer/hedge/abstain (grounding-policy.ts
+  // WIRING real vía el sidecar) queda DENTRO del cluster de grounding —
+  // después de la cadena relacional, antes del análisis de la query — para
+  // que domine por recency sin pisar las guardas de seguridad finales.
+  it('groundingPolicy queda DESPUÉS de relacional y ANTES de queryAnalysis', () => {
+    const { content } = assembleSystemContent({
+      base: 'BASE_PROMPT',
+      relacional: 'BLOQUE_CADENA',
+      groundingPolicy: 'BLOQUE_GROUNDING_POLICY',
+      queryAnalysis: 'BLOQUE_ANALISIS',
+    });
+    expect(content.indexOf('BLOQUE_GROUNDING_POLICY')).toBeGreaterThan(
+      content.indexOf('BLOQUE_CADENA'),
+    );
+    expect(content.indexOf('BLOQUE_ANALISIS')).toBeGreaterThan(
+      content.indexOf('BLOQUE_GROUNDING_POLICY'),
+    );
+  });
 });
 
 describe('assembleSystemContent — presupuesto y degradación', () => {
@@ -144,6 +163,23 @@ describe('assembleSystemContent — presupuesto y degradación', () => {
       expect(r.content.split(big).length - 1).toBeGreaterThanOrEqual(8);
       expect(r.breakdown.find((b) => b.name === name).degraded).toBe(false);
     }
+  });
+
+  it('groundingPolicy (MODO CIENTÍFICO #17) NUNCA se recorta bajo presión de presupuesto', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const big = 'w'.repeat(6400); // ~2000 tokens
+    const r = assembleSystemContent(
+      {
+        base: big,
+        groundingPolicy: big,
+        corpus: { variants: ['recortable', ''] },
+      },
+      { budget: 100 },
+    );
+    expect(r.overBudget).toBe(true);
+    expect(warn).toHaveBeenCalled();
+    expect(r.breakdown.find((b) => b.name === 'groundingPolicy').degraded).toBe(false);
+    expect(r.content).toContain(big);
   });
 
   it('MEMORIA EPISÓDICA (TIER 2 #6): va ANTES del grounding y se sacrifica tras el corpus, sin tocar la evidencia', () => {

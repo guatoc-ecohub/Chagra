@@ -91,6 +91,7 @@ export const BLOCK_ORDER = [
   'resolvedEntities', // GROUNDING entidades canónicas (protegido)
   'curatedFacts', // GROUNDING hechos curados AGE (protegido)
   'relacional', // GROUNDING cadena de relaciones GraphRAG (protegido)
+  'groundingPolicy', // MODO CIENTÍFICO #17: answer/hedge/abstain por confianza (protegido)
   'queryAnalysis', // análisis NN2/NN3 de ESTA query (protegido)
   'suggested', // GUARDA CASO B baja confianza (protegido)
   'priceDecline', // GUARDA precio sin dato (protegido)
