@@ -638,6 +638,39 @@
 }
 
 /* ===========================================================================
+ * LA COMIDA QUE ALIMENTA — micro-animaciones (NutricionHumanaScreen).
+ * El sol respira, el vapor sube y las barras comparativas crecen desde 0 al
+ * montar. Todo sutil; TODO se apaga con prefers-reduced-motion (las barras
+ * quedan directamente a su ancho final, legibles).
+ * =========================================================================== */
+.nh-sun {
+  transform-origin: 202px 28px;
+  animation: pc-breathe 4s ease-in-out infinite;
+}
+.nh-steam path {
+  animation: nh-steam-rise 3.2s ease-in-out infinite;
+}
+.nh-steam path:nth-child(2) { animation-delay: 0.9s; }
+.nutri-bar {
+  transform-origin: left center;
+  animation: nutri-grow 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes nh-steam-rise {
+  0% { opacity: 0.15; transform: translateY(4px); }
+  50% { opacity: 0.75; }
+  100% { opacity: 0; transform: translateY(-6px); }
+}
+@keyframes nutri-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nh-sun { animation: none; }
+  .nh-steam path { animation: none; opacity: 0.5; }
+  .nutri-bar { animation: none; transform: none; }
+}
+
+/* ===========================================================================
  * LOADING SKELETON DARK — fondo oscuro unificado para estados de carga.
  *
  * Tarea 81: .loading-skeleton-dark evita flash blanco en dark theme
