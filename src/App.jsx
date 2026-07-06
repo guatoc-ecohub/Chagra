@@ -188,8 +188,43 @@ const CaseStudyScreen = lazy(() => import('./components/CaseStudyScreen'));
 const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
 const FaqScreen = lazy(() => import('./components/FaqScreen'));
 const HelpManual = lazy(() => import('./components/HelpManual'));
-const TopBar = lazy(() => import('./components/TopBar'));
-const DashboardLive = lazy(() => import('./components/dashboard/DashboardLive'));
+// Chunks del HOME (TopBar + DashboardLive): son la PRIMERA pantalla tras el
+// login y se cargan como lazy para no pesar sobre el paint del login. Pero eso
+// abre una carrera: si la red se cae (ej. el gate offline-first hace
+// context.setOffline apenas ve la barra global "Cola de tareas" —que vive fuera
+// del Suspense, así que aparece antes de que el chunk del dashboard termine—)
+// el import dinámico en vuelo se ABORTA y React.lazy tira "Failed to fetch
+// dynamically imported module", cayendo al ErrorBoundary. En dev/CI el grafo de
+// módulos es grande y la ventana de la carrera se ensancha. Fix: memoizamos el
+// import y lo PREcargamos mientras el usuario está en el login (ver useEffect de
+// prefetch del home), de modo que al navegar al dashboard el módulo ya está en
+// caché del navegador y no depende de la red. `lazy` reusa la MISMA promesa
+// memoizada (prefetchHomeChunks) → sin doble fetch.
+// Memoiza el import dinámico pero SIN cachear un rechazo: si el fetch se aborta
+// (ej. la red se cae con el import en vuelo), limpia la promesa para que el
+// siguiente intento (render de React.lazy o un nuevo preload al reconectar)
+// vuelva a importar en vez de quedar envenenado con la promesa rechazada.
+const makeLazyLoader = (factory) => {
+  let promise = null;
+  return () => {
+    if (!promise) {
+      promise = factory().catch((err) => {
+        promise = null;
+        throw err;
+      });
+    }
+    return promise;
+  };
+};
+const prefetchTopBar = makeLazyLoader(() => import('./components/TopBar'));
+const prefetchDashboardLive = makeLazyLoader(() => import('./components/dashboard/DashboardLive'));
+// Precarga los chunks del home fuera del render (se dispara desde el login).
+const prefetchHomeChunks = () => {
+  prefetchTopBar().catch(() => {});
+  prefetchDashboardLive().catch(() => {});
+};
+const TopBar = lazy(() => prefetchTopBar());
+const DashboardLive = lazy(() => prefetchDashboardLive());
 const AprenderConAgente = lazy(() => import('./components/Aprende/AprenderConAgente'));
 const CursoChagra = lazy(() => import('./components/curso/CursoChagra'));
 const DirectorioEspeciesScreen = lazy(() => import('./components/DirectorioEspecies/DirectorioEspeciesScreen'));
@@ -756,6 +791,22 @@ export default function App() {
       });
     });
   }, []);
+
+  // Prefetch del HOME mientras el usuario está en el login: baja los chunks de
+  // TopBar + DashboardLive ANTES de navegar al dashboard, para que la
+  // transición no dependa de la red en ese instante. Cierra la carrera del gate
+  // offline-first (context.setOffline apenas ve "Cola de tareas" —barra global,
+  // fuera del Suspense— abortaba el import en vuelo del dashboard → ErrorBoundary
+  // "Failed to fetch dynamically imported module"). Fire-and-forget y no-throw:
+  // si falla o no alcanza a terminar, el flujo lazy normal sigue vigente.
+  useEffect(() => {
+    if (currentView !== 'login') return;
+    try {
+      prefetchHomeChunks();
+    } catch (err) {
+      console.warn('[App] Prefetch del home no se pudo disparar:', err?.message);
+    }
+  }, [currentView]);
 
   // alertas-reales (2026-05-30): arranca el motor de alertas con CLIMA REAL.
   // Inicializa los listeners del store (escucha alertTriggered/alertCleared) y
