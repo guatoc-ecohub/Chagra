@@ -555,9 +555,22 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // normal NO debe re-disparar el prompt.
   useEffect(() => {
     if (!initialContext) return;
-    const { prefilledPrompt, sourceLabel, sourceUrl, alertContext } = initialContext;
+    const { prefilledPrompt, sourceLabel, sourceUrl, alertContext, autoSend, fromVoice } = initialContext;
+    let autoSendTimer = null;
     if (typeof prefilledPrompt === 'string' && prefilledPrompt.trim().length > 0) {
-      setInputText(prefilledPrompt);
+      if (autoSend) {
+        // 2026-07-05: widget "Chagra está escuchando" (escucha manos libres,
+        // caso guantes/manos embarradas). La pregunta llega YA transcrita por
+        // Whisper → se envía sola sin que el operador toque la pantalla, y si
+        // vino por voz activamos TTS para que la respuesta se HABLE por
+        // Kokoro (Whisper → agente → Kokoro, punta a punta).
+        if (fromVoice && !ttsEnabled) setTtsEnabled(true);
+        autoSendTimer = setTimeout(() => {
+          handleSubmit(prefilledPrompt, { fromVoice: Boolean(fromVoice) });
+        }, 250);
+      } else {
+        setInputText(prefilledPrompt);
+      }
     }
     if (sourceUrl || sourceLabel || alertContext) {
       setAlertContextBanner({
@@ -566,6 +579,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         alertContext: alertContext || null,
       });
     }
+    return () => { if (autoSendTimer) clearTimeout(autoSendTimer); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

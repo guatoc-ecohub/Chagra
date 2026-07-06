@@ -21,7 +21,11 @@
     "validate:ngsi": "node scripts/export-ngsi-ld.mjs",
     "hooks:install": "lefthook install",
     "tsc:check": "tsc --noEmit -p jsconfig.json",
-    "perf-budget": "node scripts/check-perf-budget.mjs"
+    "perf-budget": "node scripts/check-perf-budget.mjs",
+    "wake-word:vendor-libs": "node scripts/wake-word/vendor-libs.mjs",
+    "wake-word:generate-samples": "node scripts/wake-word/generate-samples.mjs",
+    "wake-word:train": "node scripts/wake-word/train-model.mjs",
+    "wake-word:smoke": "node tests/e2e-real/modo-campo-wakeword.smoke.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -30,6 +34,9 @@
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
     "@sqlite.org/sqlite-wasm": "^3.53.0-build1",
+    "@tensorflow-models/speech-commands": "^0.5.4",
+    "@tensorflow/tfjs": "^4.22.0",
+    "@tensorflow/tfjs-backend-wasm": "^4.22.0",
     "jspdf": "^4.2.1",
     "leaflet": "^1.9.4",
     "localforage": "^1.10.0",

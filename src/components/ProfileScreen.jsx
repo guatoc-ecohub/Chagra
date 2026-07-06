@@ -13,6 +13,8 @@ import BackgroundSelector from './Settings/BackgroundSelector';
 import BackupExportButton from './BackupExportButton';
 import CuadernoPDFButton from './CuadernoPDFButton';
 import VoiceSelector from './Settings/VoiceSelector';
+import ModoCampoPanel from './modoCampo/ModoCampoPanel';
+import { modoCampoDisponible } from '../config/modoCampoFlag';
 import HytaPanel from './HytaPanel';
 import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 import useFincaActiveStore from '../services/fincaActiveStore';
@@ -695,6 +697,12 @@ export default function ProfileScreen({ onBack, onHome }) {
               </div>
               <ChevronRight size={18} className="text-slate-500" />
             </button>
+
+            {/* Modo campo / manos libres (#2088): wake-word "hola chagra" vía
+                TF.js speech-commands, on-device. Shippeado "dark" — solo
+                aparece con VITE_MODO_CAMPO=true (dev/piloto), ver
+                src/config/modoCampoFlag.js. */}
+            {modoCampoDisponible() && <ModoCampoPanel />}
 
             {/* Multifinca + GPS (062.7 indoor override + 062.8 privacy) */}
             <MultifincaGpsSection />
