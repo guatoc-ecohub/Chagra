@@ -159,6 +159,13 @@ const NutricionHumanaScreen = lazy(() => import('./components/NutricionHumanaScr
 // Datos grounded al catálogo/grafo (cycle-content musa, grafo-relations,
 // sanidadData). Fotos CC con crédito visible.
 const PlatanoBananoScreen = lazy(() => import('./components/PlatanoBananoScreen'));
+// Mundo "El cacao" (dentro de Cultivos y semillas): cultivo bandera de la paz y
+// la sustitución. 5 estaciones photo-forward — el árbol/clones, la sombra (SAF),
+// siembra e injerto + poda, monilia y escoba de bruja (manejo cultural, sin dosis
+// inventadas) y cosecha + beneficio (fermentación/secado + cáscara→abono).
+// Groundeado al catálogo/grafo (theobroma_cacao, moniliophthora_*) + FEDECACAO/
+// AGROSAVIA/ICA. Fotos CC reales con crédito visible (public/cacao/creditos.json).
+const CacaoScreen = lazy(() => import('./components/cacao/CacaoScreen'));
 // LOS MUNDOS DE MI FINCA (reestructuración 2.0 del home): un mundo por dentro —
 // las funciones existentes agrupadas por lugar. Re-rutea, no reimplementa.
 const MundoScreen = lazy(() => import('./components/MundoScreen'));
@@ -318,6 +325,9 @@ const HASH_VIEW_ROUTES = {
   'platano-banano': 'platano',
   banano: 'platano',
   platanera: 'platano',
+  cacao: 'cacao',
+  'el-cacao': 'cacao',
+  theobroma: 'cacao',
   // Curso guiado + deep-links profundos usados por la landing (chagra.bio):
   // permiten que chagra.app/#curso, /#sembrar, /#voz, /#milpa, /#biopreparados,
   // /#sanidad y /#cosechar caigan en su vista real (antes caían a dashboard).
@@ -345,6 +355,7 @@ const MODULE_VIEWS = new Set([
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'aromaticas', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'platano', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'cacao', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
   'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
@@ -1534,6 +1545,20 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="La comida que alimenta">
               <NutricionHumanaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'cacao':
+        // Mundo "El cacao" (dentro de Cultivos y semillas): cultivo bandera de la
+        // paz. 5 estaciones photo-forward — árbol/clones, sombra (SAF), siembra/
+        // injerto + poda, monilia y escoba de bruja (manejo cultural, sin dosis
+        // inventadas), cosecha + beneficio (fermentación/secado) y cáscara→abono
+        // (enlaza al mundo del compost). Groundeado a catálogo/grafo + FEDECACAO/
+        // AGROSAVIA/ICA. Fotos CC reales con crédito visible.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El cacao">
+              <CacaoScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
