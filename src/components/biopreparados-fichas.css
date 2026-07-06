@@ -1,0 +1,53 @@
+/* biopreparados-fichas.css — animación sutil de las ilustraciones de las
+ * fichas de biopreparados (burbujas de fermentación, gotas de extracto).
+ *
+ * REGLAS DURAS:
+ *   - Todo el movimiento está APAGADO bajo `prefers-reduced-motion: reduce`.
+ *   - Sin colores fijos: los tonos salen de las clases Tailwind theme-aware
+ *     (slate/emerald/amber → CSS-vars por [data-theme]) y del acento de marca
+ *     `--t-accent-rgb`. Este archivo SOLO define movimiento y geometría.
+ *   - Legibilidad al sol: la animación vive en la ilustración (banda superior),
+ *     NUNCA detrás del texto de dosis/seguridad.
+ */
+
+/* Burbujas que suben en los fermentos/caldos (movimiento muy lento, decorativo). */
+@keyframes bpf-bubble-rise {
+  0%   { transform: translateY(2px) scale(0.85); opacity: 0; }
+  20%  { opacity: 0.9; }
+  80%  { opacity: 0.7; }
+  100% { transform: translateY(-14px) scale(1.05); opacity: 0; }
+}
+
+/* Vaivén tenue del contenido (microbios flotando, algas). */
+@keyframes bpf-drift {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-1.5px); }
+}
+
+.bpf-bubble {
+  transform-origin: center;
+  animation: bpf-bubble-rise 4.2s ease-in-out infinite;
+}
+.bpf-bubble--b { animation-delay: 1.1s; animation-duration: 5.1s; }
+.bpf-bubble--c { animation-delay: 2.3s; animation-duration: 4.7s; }
+
+.bpf-drift {
+  animation: bpf-drift 5.5s ease-in-out infinite;
+}
+
+/* Al expandir la preparación, un fundido corto y suave. */
+.bpf-reveal {
+  animation: bpf-fade-in 0.28s ease-out;
+}
+@keyframes bpf-fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bpf-bubble,
+  .bpf-drift,
+  .bpf-reveal {
+    animation: none !important;
+  }
+}

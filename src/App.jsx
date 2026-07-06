@@ -7,7 +7,7 @@
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import React, { lazy, Suspense, useState, useEffect, useCallback, useRef } from 'react';
-import { MapPin, Eye, Package, CheckCircle, WifiOff, Mic, AlertCircle, Network, Beaker, Scale } from 'lucide-react';
+import { MapPin, Eye, Package, CheckCircle, WifiOff, Mic, Network, Beaker, Scale } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
 import { useClimaAtmosphere } from './hooks/useClimaAtmosphere';
@@ -82,7 +82,7 @@ const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').
 // 2026-06-30. Se alcanza desde 'bodega' vía el botón "Auditoría y
 // reconciliación", o directo por hash (#auditoria-inventario).
 const InventoryPage = lazy(() => import('./pages/InventoryPage'));
-const BiopreparadoRecetasGallery = lazy(() => import('./components/BiopreparadoRecetasGallery'));
+const BiopreparadosView = lazy(() => import('./components/BiopreparadosView'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
 const UsageStatsDashboard = lazy(() => import('./components/UsageStatsDashboard'));
@@ -986,21 +986,11 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ScreenShell title="Biopreparados" onBack={() => navigate(currentViewData?.back || 'juego')} onHome={() => navigate('dashboard')}>
-              <div className="px-4 pt-3 pb-10 max-w-2xl mx-auto flex flex-col gap-4">
-                {/* Acceso a la toxicología de insumos (EPI, dosis seguras,
-                    restricción ICA). Caso crítico: caldo bordelés / sulfocálcico. */}
-                <button
-                  type="button"
-                  onClick={() => navigate('toxicologia', { tab: 'insumos' })}
-                  className="rounded-xl border border-amber-700/50 bg-amber-950/30 p-3 flex items-center gap-2.5 text-left hover:border-amber-600 transition-colors"
-                >
-                  <AlertCircle size={20} className="shrink-0 text-amber-400" />
-                  <span className="text-sm text-amber-100 flex-1">
-                    <span className="font-bold">Toxicología y seguridad.</span> Antes de preparar,
-                    revisa la protección (EPI), las dosis seguras y las restricciones legales.
-                  </span>
-                </button>
-                <BiopreparadoRecetasGallery />
+              {/* Fichas ILUSTRADAS de biopreparados (qué es · dosis · cada-cuánto ·
+                  preparación paso a paso · seguridad · fuente). La toxicología/EPI
+                  vive dentro de la vista como CTA a 'toxicologia'. */}
+              <div className="pb-10">
+                <BiopreparadosView onNavigate={navigate} />
               </div>
             </ScreenShell>
           </ErrorBoundary>
