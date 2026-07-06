@@ -166,6 +166,12 @@ const PlatanoBananoScreen = lazy(() => import('./components/PlatanoBananoScreen'
 // Groundeado al catálogo/grafo (theobroma_cacao, moniliophthora_*) + FEDECACAO/
 // AGROSAVIA/ICA. Fotos CC reales con crédito visible (public/cacao/creditos.json).
 const CacaoScreen = lazy(() => import('./components/cacao/CacaoScreen'));
+// Módulo "Hortalizas de la huerta" (mundo Cultivos y semillas): la comida diaria
+// de la casa campesina. Ficha de cultivo por hortaliza (siembra, luz/agua/piso
+// térmico, vecinas, plagas con manejo agroecológico, cosecha y conservación).
+// Vecinas + plagas del grafo chagra_kg (public/grafo-relations.json); cero dosis
+// químicas; "dato en camino" donde el grafo aún no respalda. Fotos CC con crédito.
+const HortalizasScreen = lazy(() => import('./components/HortalizasScreen'));
 // LOS MUNDOS DE MI FINCA (reestructuración 2.0 del home): un mundo por dentro —
 // las funciones existentes agrupadas por lugar. Re-rutea, no reimplementa.
 const MundoScreen = lazy(() => import('./components/MundoScreen'));
@@ -384,6 +390,9 @@ const HASH_VIEW_ROUTES = {
   cacao: 'cacao',
   'el-cacao': 'cacao',
   theobroma: 'cacao',
+  hortalizas: 'hortalizas',
+  huerta: 'hortalizas',
+  verduras: 'hortalizas',
   // Curso guiado + deep-links profundos usados por la landing (chagra.bio):
   // permiten que chagra.app/#curso, /#sembrar, /#voz, /#milpa, /#biopreparados,
   // /#sanidad y /#cosechar caigan en su vista real (antes caían a dashboard).
@@ -412,6 +421,7 @@ const MODULE_VIEWS = new Set([
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'platano', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'cacao', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'hortalizas', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
   'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
@@ -1615,6 +1625,18 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El cacao">
               <CacaoScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+      case 'hortalizas':
+        // Módulo "Hortalizas de la huerta" (mundo Cultivos y semillas): la comida
+        // diaria de la casa. Ficha de cultivo por hortaliza (siembra, luz/agua/piso
+        // térmico, vecinas, plagas con manejo agroecológico, cosecha y
+        // conservación). Vecinas + plagas grounded al grafo chagra_kg
+        // (public/grafo-relations.json); días a cosecha de las plantillas de
+        // fenología; cero dosis químicas; "dato en camino" donde el grafo aún no
+        // respalda. Fotos CC con crédito visible.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Hortalizas de la huerta">
+              <HortalizasScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );

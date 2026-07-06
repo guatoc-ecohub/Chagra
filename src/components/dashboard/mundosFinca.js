@@ -52,6 +52,7 @@ export const MUNDOS_FINCA = [
             { view: 'directorio', label: 'Qué puedo sembrar', desc: 'Especies para su clima, con qué se llevan y sus plagas', emoji: '🌱' },
             { view: 'platano', label: 'Plátano y banano', desc: 'El pancoger de la casa: variedades, siembra, la mata madre-hijo-nieto, sigatoka y picudo, y aprovechar el pseudotallo', emoji: '🍌' },
             { view: 'cacao', label: 'El cacao', desc: 'Cultivo bandera de la paz: clones, sombra, monilia y escoba, y el beneficio que hace el precio', emoji: '🍫' },
+            { view: 'hortalizas', label: 'Hortalizas de la huerta', desc: 'La comida diaria de la casa: siembra, agua, vecinas, plagas y cosecha de tomate, cebolla, zanahoria y más', emoji: '🥕' },
             { view: 'calendario_finca', label: 'Calendario de la finca', desc: 'Cuándo sembrar, abonar y cosechar, todo junto', emoji: '🗓️' },
             { view: 'activos', label: 'Mis matas', desc: 'Las plantas que tiene sembradas y cómo van', emoji: '🪴' },
             { view: 'mapa', label: 'Zonas de la finca', desc: 'Sus lotes, eras y potreros en el mapa', emoji: '🗺️' },
