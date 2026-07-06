@@ -5,6 +5,7 @@ import {
   Skull, PiggyBank, Biohazard, FlaskConical, Fuel, Beef, Trash2,
   Baby, Activity, ShieldAlert, Ruler, Landmark, HeartPulse,
   Flame, Filter, Camera, ExternalLink, HelpCircle,
+  Worm, Eye, ScanEye, MapPin, ListChecks,
 } from 'lucide-react';
 import { ScreenShell } from '../common/ScreenShell';
 import PedagogicalBlock from '../common/PedagogicalBlock';
@@ -35,6 +36,7 @@ import {
   DISTANCIAS_SEGURIDAD,
   IRCA_RURAL,
   METODOS_POTABILIZACION,
+  CHEQUEO_AGUA_SEGURA,
   FOTO_BASE_AGUA,
   CREDITOS_FOTOS_AGUA,
 } from '../../data/aguaFinca';
@@ -473,6 +475,8 @@ const ICONO_RIESGO = {
 /** Íconos por enfermedad. */
 const ICONO_ENFERMEDAD = {
   diarrea: Activity,
+  parasito: Worm,
+  hepatitis: Eye,
   bebe: Baby,
   intoxicacion: HeartPulse,
 };
@@ -717,6 +721,132 @@ function MiAguaSegura() {
   );
 }
 
+/* ── SALUD · Chequeo casero «¿mi agua es segura?» (lámina + auto-revisión) ── */
+
+/** Lámina propia: una lupa sobre una gota de agua = «revísela antes de tomar».
+ *  Decorativa (aria-hidden): el chequeo con letras va debajo. */
+function LaminaChequeo() {
+  return (
+    <svg viewBox="0 0 120 72" role="img" aria-hidden="true" className="w-full h-auto select-none">
+      {/* gota de agua examinada */}
+      <g className="text-cyan-300">
+        <path d="M52 22 C52 14 60 9 60 9 C60 9 68 14 68 22 C68 28 64 32 60 32 C56 32 52 28 52 22 Z" fill="currentColor" opacity="0.85" />
+      </g>
+      {/* lupa que la revisa */}
+      <g className="text-slate-200">
+        <circle cx="60" cy="30" r="20" fill="none" stroke="currentColor" strokeWidth="3.2" opacity="0.9" />
+        <line x1="74" y1="44" x2="90" y2="60" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round" />
+      </g>
+      {/* señales que se buscan: color, olor, entorno */}
+      <g fontSize="7.5" fontWeight="700">
+        <circle cx="18" cy="18" r="3" className="fill-current text-rose-400" />
+        <text x="24" y="21" className="fill-current text-rose-300">turbia</text>
+        <circle cx="18" cy="36" r="3" className="fill-current text-amber-400" />
+        <text x="24" y="39" className="fill-current text-amber-300">olor</text>
+        <circle cx="18" cy="54" r="3" className="fill-current text-emerald-400" />
+        <text x="24" y="57" className="fill-current text-emerald-300">de dónde viene</text>
+      </g>
+    </svg>
+  );
+}
+
+/** Un grupo del chequeo (sentidos o entorno): cada punto se toca y se marca. */
+function GrupoChequeo({ grupo, icono, marcados, onToggle }) {
+  const Icono = icono; // patrón del módulo: el ícono va a un const capitalizado
+  return (
+    <div className="rounded-xl border border-slate-700/50 bg-slate-950/40 p-3">
+      <p className="flex items-center gap-2 text-xs font-black uppercase tracking-wide text-slate-200 mb-2">
+        <Icono size={15} aria-hidden="true" className="text-cyan-300" /> {grupo.titulo}
+      </p>
+      <ul className="space-y-1.5">
+        {grupo.items.map((it) => {
+          const on = marcados.has(it.id);
+          return (
+            <li key={it.id}>
+              <button
+                type="button"
+                onClick={() => onToggle(it.id)}
+                aria-pressed={on}
+                data-testid={`chequeo-item-${it.id}`}
+                className={`w-full flex items-start gap-2.5 rounded-lg border px-2.5 py-2 text-left transition-colors ${
+                  on
+                    ? 'border-rose-500/60 bg-rose-500/15'
+                    : 'border-slate-700/60 bg-slate-900/40 active:bg-slate-800/60'
+                }`}
+              >
+                {/* casilla: vacía por defecto, roja marcada (sí = riesgo) */}
+                <span
+                  aria-hidden="true"
+                  className={`shrink-0 mt-0.5 w-4 h-4 rounded border grid place-items-center text-[10px] font-black ${
+                    on ? 'border-rose-400 bg-rose-500/30 text-rose-100' : 'border-slate-600 text-transparent'
+                  }`}
+                >
+                  ✓
+                </span>
+                <span className={`text-xs leading-snug ${on ? 'text-rose-100' : 'text-slate-200'}`}>{it.texto}</span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+/**
+ * ChequeoAguaSegura — auto-revisión de la familia: ¿esta agua está para tomar?
+ * Dos miradas (sentidos + entorno) donde marcar SIEMPRE significa riesgo, con un
+ * veredicto vivo. El remate no da falsa tranquilidad: lo peor no se ve, así que
+ * el agua "clarita" también se trata. No inventa cifras (cualitativo, OMS/OPS).
+ */
+function ChequeoAguaSegura() {
+  const [marcados, setMarcados] = useState(() => new Set());
+  const toggle = (id) => setMarcados((prev) => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
+  const total = marcados.size;
+
+  return (
+    <section className="rounded-2xl border border-cyan-700/40 bg-slate-900/60 p-4 space-y-3" data-testid="agua-chequeo-seguro">
+      <div className="flex items-center gap-3">
+        <div className="shrink-0 w-24" aria-hidden="true"><LaminaChequeo /></div>
+        <div className="min-w-0">
+          <p className="flex items-center gap-2 text-sm font-black text-cyan-200 uppercase tracking-wide">
+            <ListChecks size={16} aria-hidden="true" /> ¿Cómo sé si mi agua es segura?
+          </p>
+          <p className="text-xs leading-snug text-slate-300 mt-1">
+            Revísela antes de tomar. Toque cada señal que note en su agua: si marca aunque sea una, no es de fiar sin tratar.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid gap-2.5">
+        <GrupoChequeo grupo={CHEQUEO_AGUA_SEGURA.sentidos} icono={ScanEye} marcados={marcados} onToggle={toggle} />
+        <GrupoChequeo grupo={CHEQUEO_AGUA_SEGURA.entorno} icono={MapPin} marcados={marcados} onToggle={toggle} />
+      </div>
+
+      {/* Veredicto vivo: cambia según lo que la persona marcó */}
+      {total > 0 && (
+        <div className="flex items-start gap-2.5 rounded-xl border border-rose-600/50 bg-rose-950/30 p-3" data-testid="chequeo-veredicto">
+          <TriangleAlert size={16} aria-hidden="true" className="shrink-0 mt-0.5 text-rose-300" />
+          <p className="text-xs leading-snug text-rose-100">
+            Marcó <strong className="text-white">{total}</strong> {total === 1 ? 'señal' : 'señales'} de riesgo:
+            {' '}<strong className="text-white">no la tome sin tratar</strong>. Hiérvala o desinféctela antes.
+          </p>
+        </div>
+      )}
+
+      <div className="flex items-start gap-2.5 rounded-xl border border-slate-700/50 bg-slate-950/50 p-3" data-testid="chequeo-invisible">
+        <Eye size={16} aria-hidden="true" className="shrink-0 mt-0.5 text-slate-400" />
+        <p className="text-xs leading-snug text-slate-200">{CHEQUEO_AGUA_SEGURA.invisible}</p>
+      </div>
+      <p className="text-[10px] leading-snug text-slate-500">Fuente: {CHEQUEO_AGUA_SEGURA.fuente}</p>
+    </section>
+  );
+}
+
 /* ── SALUD · Cómo potabilizar en casa (4 métodos, paso a paso con foto) ── */
 const ICONO_METODO = { hervir: Flame, cloro: Droplets, sodis: Sun, bioarena: Filter };
 const TONO_METODO = {
@@ -848,6 +978,9 @@ function PilarCuidar() {
     <section className="agua-seccion space-y-4" data-testid="pilar-cuidar">
       {/* SALUD · el gancho: ¿mi agua es segura? (foto real + IRCA + señales) */}
       <MiAguaSegura />
+
+      {/* SALUD · chequeo casero para saber si el agua está para tomar */}
+      <ChequeoAguaSegura />
 
       <p className="text-sm leading-relaxed text-slate-200">
         El agua de la finca son dos cuidados en uno: que la que entra a la casa no

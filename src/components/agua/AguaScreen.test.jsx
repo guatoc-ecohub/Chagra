@@ -148,6 +148,30 @@ describe('AguaScreen — riesgos de contaminación + salud', () => {
     expect(intox).toHaveTextContent(/ICA/);
   });
 
+  it('2da pasada: parásitos (giardia) manda a hervir/filtrar porque resisten al cloro', () => {
+    render(<AguaScreen onBack={() => {}} />);
+    fireEvent.click(screen.getByTestId('pilar-tab-cuidar'));
+    const paras = screen.getByTestId('enfermedad-parasitos');
+    expect(paras).toHaveTextContent(/giardia/i);
+    // Dato safety-critical: resisten el cloro → hervir o filtrar.
+    expect(paras).toHaveTextContent(/resisten al cloro/i);
+    expect(paras).toHaveTextContent(/hervir/i);
+    // Autoridad institucional (nunca una persona).
+    expect(paras).toHaveTextContent(/OMS/);
+    // Los niños como más vulnerables (crecimiento).
+    expect(paras).toHaveTextContent(/niños/i);
+  });
+
+  it('2da pasada: hepatitis A cita la vacuna y a la OMS como autoridad', () => {
+    render(<AguaScreen onBack={() => {}} />);
+    fireEvent.click(screen.getByTestId('pilar-tab-cuidar'));
+    const hep = screen.getByTestId('enfermedad-hepatitis');
+    expect(hep).toHaveTextContent(/hepatitis a/i);
+    expect(hep).toHaveTextContent(/amarill/i); // ictericia
+    expect(hep).toHaveTextContent(/vacuna/i);
+    expect(hep).toHaveTextContent(/OMS/);
+  });
+
   it('muestra la regla de las distancias groundeadas + la ilustración de la finca', () => {
     render(<AguaScreen onBack={() => {}} />);
     fireEvent.click(screen.getByTestId('pilar-tab-cuidar'));
@@ -164,6 +188,34 @@ describe('AguaScreen — riesgos de contaminación + salud', () => {
     expect(distancias).toHaveTextContent(/RAS/);
     // Honestidad: el retiro exacto de corrales aún es "dato en camino".
     expect(screen.getByTestId('agua-distancias')).toHaveTextContent(/en camino/i);
+  });
+});
+
+describe('AguaScreen — chequeo casero «¿mi agua es segura?»', () => {
+  it('lista las señales por sentidos y por entorno (corral, letrina, fumigado)', () => {
+    render(<AguaScreen onBack={() => {}} />);
+    fireEvent.click(screen.getByTestId('pilar-tab-cuidar'));
+
+    const chequeo = screen.getByTestId('agua-chequeo-seguro');
+    expect(chequeo).toHaveTextContent(/turbia/i);
+    expect(chequeo).toHaveTextContent(/huele/i);
+    // Entorno: cercanía a corral, letrina y cultivo fumigado (pedido del operador).
+    expect(screen.getByTestId('chequeo-item-corral')).toHaveTextContent(/corral/i);
+    expect(screen.getByTestId('chequeo-item-letrina')).toHaveTextContent(/letrina/i);
+    expect(screen.getByTestId('chequeo-item-fumigado')).toHaveTextContent(/fumigado/i);
+    // Remate safety-critical: lo peor no se ve → trátela siempre.
+    expect(screen.getByTestId('chequeo-invisible')).toHaveTextContent(/no se ve|trátela siempre/i);
+  });
+
+  it('el veredicto aparece al marcar una señal de riesgo', () => {
+    render(<AguaScreen onBack={() => {}} />);
+    fireEvent.click(screen.getByTestId('pilar-tab-cuidar'));
+    // Sin marcar, no hay veredicto de riesgo.
+    expect(screen.queryByTestId('chequeo-veredicto')).toBeNull();
+    // Al marcar «huele feo», el chequeo manda a tratar el agua.
+    fireEvent.click(screen.getByTestId('chequeo-item-olor'));
+    const veredicto = screen.getByTestId('chequeo-veredicto');
+    expect(veredicto).toHaveTextContent(/no la tome sin tratar/i);
   });
 });
 

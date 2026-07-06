@@ -346,6 +346,48 @@ export const SENALES_ALERTA_AGUA = [
 ];
 
 /**
+ * CHEQUEO CASERO · ¿mi agua es segura para tomar?
+ *
+ * Lista de auto-revisión para la familia campesina, en dos miradas:
+ *   · SENTIDOS — lo que se ve, huele y prueba (turbidez, color, olor, sabor).
+ *   · ENTORNO  — de dónde viene y qué hay aguas arriba (corral, letrina,
+ *     cultivo fumigado, si el agua pasa por potreros/casas antes de llegar).
+ * Cada punto está redactado para que "sí" SIEMPRE signifique riesgo, de modo
+ * que marcar aunque sea uno mande a tratar el agua.
+ *
+ * Cualitativo (educación sanitaria, OMS/OPS — inspección sanitaria de la
+ * fuente). El remate `invisible` es el mensaje safety-critical: lo peor
+ * (microbios, nitratos, venenos) NO se ve ni se huele, por eso el agua "clarita"
+ * también se trata. Enlaza con IRCA_RURAL (el 37,4 % del agua rural en riesgo).
+ */
+export const CHEQUEO_AGUA_SEGURA = {
+  sentidos: {
+    id: 'sentidos',
+    titulo: 'Lo que ve, huele y prueba',
+    items: [
+      { id: 'turbia', texto: '¿Está turbia, con barro o color, sobre todo después de un aguacero?' },
+      { id: 'olor', texto: '¿Huele feo (a podrido, a huevo dañado) o a químico?' },
+      { id: 'sabor', texto: '¿Deja sabor raro: metálico, a tierra o a jabón?' },
+      { id: 'nata', texto: '¿Tiene nata aceitosa o espuma que no se deshace?' },
+    ],
+  },
+  entorno: {
+    id: 'entorno',
+    titulo: 'De dónde viene y qué hay aguas arriba',
+    items: [
+      { id: 'corral', texto: '¿Hay cochera, corral o establo cerca o loma arriba de la fuente?' },
+      { id: 'letrina', texto: '¿Hay letrina o pozo séptico cerca, o más arriba que el pozo de agua?' },
+      { id: 'fumigado', texto: '¿Hay cultivo fumigado o potrero aguas arriba del nacimiento?' },
+      { id: 'paso', texto: '¿El agua pasa por potreros o casas antes de llegar a la suya?' },
+      { id: 'techo', texto: 'Si es de lluvia: ¿el tanque queda destapado o no desvía la primera lavada sucia del techo?' },
+    ],
+  },
+  // Mensaje safety-critical: cierra el chequeo sin dar falsa tranquilidad.
+  invisible: 'Lo más peligroso no se ve ni se huele: los microbios, los nitratos y los venenos pueden estar en un agua clarita. Marque aunque sea UNA y trátela sí o sí; y aunque no marque ninguna, para tomar trátela SIEMPRE.',
+  fuente: 'OMS/OPS — inspección sanitaria de fuentes de agua; ver también IRCA rural (37,4 % en riesgo alto).',
+};
+
+/**
  * Franja legal de protección alrededor de nacimientos y cauces (metros).
  *
  * GROUNDED (DR agua nacional §4.1, verificado contra norma): son MÍNIMOS
@@ -486,6 +528,30 @@ export const ENFERMEDADES_AGUA = [
     masRiesgo: 'Niños pequeños y adultos mayores.',
     autoridad: 'El agua para tomar no admite NINGUNA E. coli (0 UFC/100 mL). En Colombia, el 37,4 % del agua rural está en riesgo ALTO.',
     fuente: 'Resolución 2115/2007 (MinSalud/MinVivienda); INCA 2023 (MinVivienda/INS)',
+  },
+  {
+    id: 'parasitos',
+    icono: 'parasito',
+    nombre: 'Parásitos: giardia, amebas y lombrices',
+    critico: false,
+    causa: 'Quistes de giardia y amebas, y huevos de lombriz, que llegan al agua desde las heces de personas o animales (letrinas, cocheras, potreros aguas arriba).',
+    senal: 'Diarrea que va y vuelve, retortijón, mucho gas e inflamación; en los niños, bajan de peso y dejan de crecer bien aunque coman.',
+    masRiesgo: 'Niños: la parasitosis repetida les roba el alimento y les frena el crecimiento.',
+    // Dato safety-critical: la giardia y el criptosporidio son resistentes al
+    // cloro; el mensaje correcto es hervir/filtrar, NO clorar y confiarse.
+    autoridad: 'Ojo clave: la giardia y el criptosporidio RESISTEN al cloro. Contra parásitos lo seguro es HERVIR o pasar el agua por un filtro de bioarena — no basta con clorar. El agua de tomar no admite E. coli ni parásitos.',
+    fuente: 'OMS — Guías para la calidad del agua de consumo humano; Resolución 2115/2007 (MinSalud)',
+  },
+  {
+    id: 'hepatitis',
+    icono: 'hepatitis',
+    nombre: 'Hepatitis A — el «mal amarillo»',
+    critico: false,
+    causa: 'Un virus que sale en las heces y entra por agua o alimentos contaminados (la misma ruta fecal-oral de la diarrea).',
+    senal: 'Primero cansancio, falta de apetito, náuseas y fiebre; luego los ojos y la piel se ponen amarillos (ictericia) y la orina oscura.',
+    masRiesgo: 'Niños (muchas veces sin síntomas, pero contagian) y adultos sin vacuna, en quienes suele ser más grave.',
+    autoridad: 'La OMS previene la hepatitis A con agua segura, saneamiento y VACUNA (ya está en el esquema nacional de vacunación infantil). El hervido y el cloro inactivan el virus. Si ve a alguien amarillo, llévelo al médico.',
+    fuente: 'OMS — Hepatitis A; INS/MinSalud — vigilancia y esquema PAI de vacunación',
   },
   {
     id: 'metahemoglobinemia',
