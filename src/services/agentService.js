@@ -764,8 +764,18 @@ export function buildViabilityContext({
 } = {}) {
   if (!Array.isArray(resolvedEntities) || resolvedEntities.length === 0) return '';
 
+  // FUGA DE UBICACIÓN DEFAULT (0 msnm) — incidente audit de conversación (cacao):
+  // cuando el perfil NO tiene altitud capturada, el caller (AgentScreen) pasa
+  // `fincaAltitud = null`. `Number(null) === 0` (¡NO NaN!), así que la altitud
+  // FANTASMA 0 msnm se colaba como si fuera real: nivel del mar → piso cálido →
+  // cacao (200–900 m) caía "MARGINAL" (0 está 200 m bajo el mínimo, dentro del
+  // margen de 300) y el prompt afirmaba "tu finca a 0 msnm… al límite de su rango",
+  // con consejos de heladas/microclima ABRIGADO que en tierra baja tropical son
+  // agronómicamente al REVÉS. Un 0 default NO es un hecho: exigimos altitud
+  // POSITIVA y finita. Sin altitud confirmada NO se emite veredicto de viabilidad
+  // (degrada a neutral) — alineado con clima/saludo, que usan la ubicación GUARDADA.
   const alt = Number(fincaAltitud);
-  const haveAlt = Number.isFinite(alt);
+  const haveAlt = Number.isFinite(alt) && alt > 0;
   const fincaPiso = haveAlt ? pisoTermicoFromAltitud(alt) : null;
 
   const marginales = [];
