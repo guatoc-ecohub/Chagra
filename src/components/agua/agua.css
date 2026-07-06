@@ -59,11 +59,22 @@
   animation: agua-seccion-entra 0.3s ease-out;
 }
 
+/* Punto del semáforo de peligro ALTO: late suave para llamar la atención
+   sin gritar (solo opacity, bajo costo). El "medio" queda estático. */
+@keyframes agua-peligro-late {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+.agua-peligro-late {
+  animation: agua-peligro-late 1.6s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .agua-gota,
   .agua-hilo,
   .agua-estacion-activa,
-  .agua-seccion {
+  .agua-seccion,
+  .agua-peligro-late {
     animation: none;
   }
   .agua-gota { opacity: 0.9; }

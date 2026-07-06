@@ -233,6 +233,216 @@ export const RONDA_PROTECCION = {
   confianza: 'alta',
 };
 
+/* ────────────────────────────────────────────────────────────────────────
+ * PILAR 3b · RIESGOS DE CONTAMINACIÓN + SALUD
+ * (qué le echa veneno al agua, qué enferma, y a qué distancia se previene)
+ *
+ * REGLA REFORZADA (mismo patrón que el veto de botulismo del módulo de
+ * fermentos): todo lo SAFETY-CRITICAL —nitratos que enferman a los bebés,
+ * intoxicación por plaguicidas, diarrea— se respalda con AUTORIDAD
+ * INSTITUCIONAL citada (OMS, MinSalud/INS vía Res. 2115/2007, ICA), NUNCA con
+ * la opinión de una persona. Las CIFRAS de distancia y de límite salen del DR
+ * agua nacional (2026-07-03, verificadas contra la norma). Lo que no tenga
+ * fuente firme se deja como "dato en camino" (SlotPendiente), no se inventa.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/** Nivel de peligro para el semáforo (alto = rojo, medio = ámbar). */
+export const NIVEL_PELIGRO = Object.freeze({ ALTO: 'alto', MEDIO: 'medio' });
+
+/**
+ * Qué contamina el agua de la finca (fuentes) y por dónde llega:
+ *   · escorrentía  = corre por encima del suelo con el aguacero,
+ *   · lixiviación  = se filtra hacia abajo hasta el agua del subsuelo.
+ * Cualitativo (agroecología + saneamiento básico). Las cifras de distancia
+ * para prevenir viven aparte, groundeadas, en DISTANCIAS_SEGURIDAD.
+ * `icono` es una clave que el componente mapea a un ícono de riesgo.
+ */
+export const RIESGOS_CONTAMINACION = [
+  {
+    id: 'plaguicidas',
+    icono: 'veneno',
+    fuente: 'Venenos y plaguicidas',
+    via: 'Escorrentía y lixiviación',
+    aporta: 'Residuos de agroquímicos que corren con el aguacero o se filtran al subsuelo hasta el nacimiento y el pozo.',
+    nivel: 'alto',
+    prevenir: 'No fumigue ni lave la bomba cerca del agua; respete la franja de seguridad (ver distancias). Los envases NO se enjuagan en la quebrada.',
+  },
+  {
+    id: 'cochera',
+    icono: 'cochera',
+    fuente: 'Cocheras y corrales mal manejados',
+    via: 'Escorrentía y lixiviación',
+    aporta: 'El estiércol sin manejo suelta coliformes y E. coli (microbios de la caca) y nitratos que bajan al agua.',
+    nivel: 'alto',
+    prevenir: 'Cochera con piso, techo y cuneta que NO drene al cauce; el estiércol va a compost o biodigestor. Siempre lejos y aguas abajo del pozo.',
+  },
+  {
+    id: 'letrina',
+    icono: 'letrina',
+    fuente: 'Letrinas y pozos sépticos mal ubicados',
+    via: 'Lixiviación',
+    aporta: 'Coliformes/E. coli y nitratos que se filtran cuando la letrina queda cerca o loma arriba del pozo de agua.',
+    nivel: 'alto',
+    prevenir: 'Letrina o pozo séptico siempre aguas abajo y a la distancia mínima del pozo de agua (ver distancias).',
+  },
+  {
+    id: 'agroquimicos',
+    icono: 'agroquimico',
+    fuente: 'Fertilizantes en exceso',
+    via: 'Lixiviación',
+    aporta: 'El sobrante de urea y abonos nitrogenados se filtra como nitratos: el mismo veneno silencioso que enferma a los bebés.',
+    nivel: 'alto',
+    prevenir: 'Abone lo que la mata necesita, no de más; un suelo tapado y con materia orgánica retiene el nitrógeno en vez de soltarlo al agua.',
+  },
+  {
+    id: 'combustibles',
+    icono: 'combustible',
+    fuente: 'Combustibles y aceites',
+    via: 'Escorrentía',
+    aporta: 'Gasolina, ACPM y aceite quemado dejan una nata de hidrocarburos que el agua no bota ni hirviendo.',
+    nivel: 'medio',
+    prevenir: 'Guarde y cambie aceites lejos del agua, sobre piso firme; el aceite usado se recoge, no se riega ni se quema al lado del cauce.',
+  },
+  {
+    id: 'matadero',
+    icono: 'matadero',
+    fuente: 'Sacrificio casero (mataderos)',
+    via: 'Escorrentía directa',
+    aporta: 'Sangre, vísceras y lavazas cargan materia orgánica y microbios directo a la quebrada si se botan ahí.',
+    nivel: 'medio',
+    prevenir: 'Sacrifique lejos del agua; los desechos van a compost o fosa, nunca al cauce.',
+  },
+  {
+    id: 'basura',
+    icono: 'basura',
+    fuente: 'Basura y botaderos',
+    via: 'Lixiviación',
+    aporta: 'La basura amontonada suelta lixiviados (el jugo negro) que bajan al suelo y al agua.',
+    nivel: 'medio',
+    prevenir: 'Nada de botaderos al lado del cauce; separe, composte lo orgánico y saque el resto de la ronda del agua.',
+  },
+];
+
+/**
+ * Distancia específica de un corral/porqueriza a la fuente de agua: no hay una
+ * cifra única citable en norma nacional (las Buenas Prácticas Porcícolas del
+ * ICA dan criterios de ubicación, no un metraje universal). Se deja honesta
+ * como "dato en camino" y en la práctica se manda "lejos y aguas abajo".
+ */
+export const DISTANCIA_CORRAL_AGUA = {
+  estado: ESTADO_GROUNDED_PENDIENTE,
+  valor: null,
+  fuentePrevista: 'ICA — Buenas Prácticas Porcícolas/Ganaderas (retiro de corrales a fuentes de agua)',
+};
+
+/**
+ * Qué ENFERMA cuando esa contaminación llega al agua que se toma.
+ *
+ * SAFETY-CRITICAL: cada enfermedad se respalda con la AUTORIDAD que fija el
+ * límite o el diagnóstico (OMS, MinSalud/INS vía Res. 2115/2007, ICA), NUNCA
+ * con una persona. La metahemoglobinemia (bebés) es la más grave y silenciosa:
+ * va marcada `critico: true`. `icono` = clave que el componente mapea.
+ */
+export const ENFERMEDADES_AGUA = [
+  {
+    id: 'diarrea',
+    icono: 'diarrea',
+    nombre: 'Diarrea e infecciones del estómago',
+    critico: false,
+    causa: 'Coliformes y E. coli de cocheras, letrinas y heces que llegan al agua.',
+    senal: 'Diarrea, vómito, cólico y deshidratación — más peligrosa en niños y ancianos.',
+    masRiesgo: 'Niños pequeños y adultos mayores.',
+    autoridad: 'El agua para tomar no admite NINGUNA E. coli (0 UFC/100 mL). En Colombia, el 37,4 % del agua rural está en riesgo ALTO.',
+    fuente: 'Resolución 2115/2007 (MinSalud/MinVivienda); INCA 2023 (MinVivienda/INS)',
+  },
+  {
+    id: 'metahemoglobinemia',
+    icono: 'bebe',
+    nombre: 'Metahemoglobinemia — el «bebé azul»',
+    critico: true,
+    causa: 'Nitratos en el agua (de estiércol, letrinas y abonos) usada para preparar el tetero.',
+    senal: 'El nitrato se vuelve nitrito en la barriga del bebé y le quita el oxígeno a la sangre: la piel se pone azulada alrededor de la boca y los ojos. Puede ser mortal.',
+    masRiesgo: 'Bebés menores de 6 meses, sobre todo con leche de fórmula preparada con esa agua.',
+    autoridad: 'La OMS fija el nitrato en máximo 50 mg/L justamente para evitar esta enfermedad en lactantes; Colombia exige máximo 10 mg/L de nitratos y 0,1 mg/L de nitritos en el agua de tomar. Si un bebé se pone azulado: al médico YA.',
+    fuente: 'OMS — Guías para la calidad del agua de consumo humano (valor guía nitrato 50 mg/L); Resolución 2115/2007 (MinSalud): nitratos 10 mg/L, nitritos 0,1 mg/L',
+  },
+  {
+    id: 'intoxicacion',
+    icono: 'intoxicacion',
+    nombre: 'Intoxicación por plaguicidas',
+    critico: true,
+    causa: 'Residuos de venenos agrícolas que la lluvia arrastra al agua, o envases lavados en el cauce.',
+    senal: 'Dolor de cabeza, náuseas, mareo, visión borrosa; en casos fuertes, urgencia médica.',
+    masRiesgo: 'Toda la familia; el veneno no se ve ni se quita hirviendo el agua.',
+    autoridad: 'El agua de tomar admite como máximo 0,1 mg/L de plaguicidas en total. El registro y control de plaguicidas es del ICA, que mantiene la lista de los prohibidos. Si el agua huele a químico o viene de potrero fumigado, NO se toma — ni hervida.',
+    fuente: 'Resolución 2115/2007 (MinSalud): plaguicidas ≤ 0,1 mg/L; ICA (registro y control de plaguicidas)',
+  },
+];
+
+/**
+ * La REGLA DE LAS DISTANCIAS: a qué retiro del agua debe quedar cada foco de
+ * contaminación y qué franja de monte hay que dejar. Cifras GROUNDED contra
+ * norma (DR agua nacional §4.1). `tipo`: 'proteger' (dejar monte) vs 'alejar'
+ * (retirar la fuente de riesgo). El componente ilustra estos metros.
+ */
+export const DISTANCIAS_SEGURIDAD = [
+  {
+    id: 'nacimiento',
+    icono: 'nacimiento',
+    que: 'Monte alrededor del nacimiento',
+    metros: 100,
+    detalle: 'Franja de bosque a la redonda del ojo de agua. Es obligación del dueño del predio.',
+    norma: 'Decreto 1449/1977 Art. 3 (hoy Decreto 1076/2015)',
+    tipo: 'proteger',
+    estado: 'grounded',
+    confianza: 'alta',
+  },
+  {
+    id: 'cauce',
+    icono: 'cauce',
+    que: 'Monte a lado y lado de ríos y quebradas',
+    metros: 30,
+    detalle: 'Franja de bosque a cada orilla del cauce, sea permanente o no.',
+    norma: 'Decreto 1449/1977 Art. 3 (hoy Decreto 1076/2015)',
+    tipo: 'proteger',
+    estado: 'grounded',
+    confianza: 'alta',
+  },
+  {
+    id: 'septico',
+    icono: 'letrina',
+    que: 'Letrina o pozo séptico, lejos y aguas abajo del pozo de agua',
+    metros: 30,
+    detalle: 'Retiro mínimo de la letrina o pozo séptico al pozo/aljibe de agua para tomar, y SIEMPRE ladera abajo de él.',
+    norma: 'RAS — Reglamento de Agua Potable y Saneamiento Básico, Título E (MinVivienda)',
+    tipo: 'alejar',
+    estado: 'grounded',
+    confianza: 'media',
+  },
+  {
+    id: 'fumigacion-terrestre',
+    icono: 'fumigar',
+    que: 'No fumigar con bomba de espalda junto al agua',
+    metros: 10,
+    detalle: 'Franja de seguridad mínima entre la fumigación terrestre y cualquier cuerpo de agua.',
+    norma: 'Decreto 1843/1991 Art. 87',
+    tipo: 'alejar',
+    estado: 'grounded',
+    confianza: 'alta',
+  },
+  {
+    id: 'fumigacion-aerea',
+    icono: 'fumigar',
+    que: 'No fumigar con avioneta sobre el agua',
+    metros: 100,
+    detalle: 'Franja de seguridad mínima para aspersión aérea sobre cuerpos de agua.',
+    norma: 'Decreto 1843/1991 Art. 87',
+    tipo: 'alejar',
+    estado: 'grounded',
+    confianza: 'alta',
+  },
+];
+
 /**
  * CASO INSIGNIA · "Se me seca el nacimiento en verano".
  * Plan cualitativo por tiempos: qué hacer YA en verano, qué sembrar/cercar en
