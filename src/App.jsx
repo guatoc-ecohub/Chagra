@@ -1646,6 +1646,9 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Aromáticas y condimentarias">
               <AromaticasScreen onBack={() => navigate('mundo_cultivos')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'cafe':
         // Mundo "El café" (5 estaciones: variedad+siembra / sombra+suelo /
         // broca+roya / flor+cosecha / beneficio). Photo-forward con fotos CC y
@@ -1998,19 +2001,16 @@ export default function App() {
       {/* #315 — banner crítico global: surfacea alertas graves (helada, sensor
           crítico) sin abrir la campana. Imposible de ignorar. */}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <CriticalAlertBanner onNavigate={navigate} />}
-      <Suspense fallback={<LoadingFallback />}>
-        {/* Entrada de pantalla: el swap de vista era SECO (desmonta/monta sin
-            transición). El wrapper con key remonta en cada cambio de vista y
-            dispara un fade corto (motion.css .anim-screen-enter — solo
-            opacidad, sin transform, para no des-anclar los position:fixed
-            internos). Respeta prefers-reduced-motion. */}
+      {/* Entrada de pantalla: el swap de vista era SECO (desmonta/monta sin
+          transición). El wrapper con key remonta en cada cambio de vista y
+          dispara un fade corto (motion.css .anim-screen-enter — solo opacidad,
+          sin transform, para no des-anclar los position:fixed internos). Y el
+          fallback conoce la vista destino: mientras baja el chunk lazy muestra
+          "Abriendo el catálogo…" etc. Respeta prefers-reduced-motion. */}
+      <Suspense fallback={<LoadingFallback view={currentView} />}>
         <div key={currentView} className="anim-screen-enter">
           {renderView()}
         </div>
-      {/* El fallback conoce la vista destino: mientras baja el chunk lazy
-          muestra "Abriendo el catálogo…" etc. en vez del genérico. */}
-      <Suspense fallback={<LoadingFallback view={currentView} />}>
-        {renderView()}
       </Suspense>
       {/* FAB feedback flotante REMOVIDO 2026-05-21: el reporte de errores
           ahora vive embebido dentro de HelpUsoScreen (sección "Reportar
