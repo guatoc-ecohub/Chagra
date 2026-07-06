@@ -26,7 +26,7 @@ import {
     rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays, Sprout, HelpCircle, Store, Mic, CloudRain, Leaf, Gauge } from 'lucide-react';
+import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays, Sprout, HelpCircle, Store, Mic, CloudRain, Leaf, Gauge, Stethoscope } from 'lucide-react';
 import AgentHero from './AgentHero';
 import OnboardingHero from '../OnboardingHero';
 import BienvenidaFinca, { bienvenidaYaVista } from '../BienvenidaFinca';
@@ -168,6 +168,14 @@ const SECTION_COMPONENTS = {
 // dashboard legacy queda intacto, audit "flag OFF = home actual"). Así el copy de
 // la auditoría no rompe el layout de prod ni sus tests.
 const DESTACADO_TILES = [
+    // "Mi mata está enferma" — fix de huérfana (auditoría 2026-07: la pantalla
+    // SanidadSintomaScreen existía con case 'sanidad_sintoma' + hash #sanidad
+    // pero SIN entrada visible en el layout de prod; solo la home F2 flag-ON la
+    // listaba en mundosFinca.js). Es la necesidad #1 del campesino y una
+    // superficie 100% groundeada (AGROSAVIA/Cenicafé), así que va PRIMERA y a
+    // fila completa (span: 2) en el bloque destacado. En F2 NO se duplica: ese
+    // layout ya la trae dentro del mundo "Sanidad de la mata".
+    { view: 'sanidad_sintoma', span: 2, label: 'Mi mata está enferma', icon: Stethoscope, desc: 'Diga qué le ve — "gota", "polvillo", "amarilla" — y sepa qué es y cómo manejarla sin veneno', accent: 'text-orange-400 border-l-orange-500' },
     { view: 'directorio', label: 'Especies', labelF2: 'Qué puedo sembrar', icon: Sprout, desc: 'Directorio: clima, asociaciones, plagas y biopreparados por especie', descF2: 'Qué crece en su clima, con qué se lleva y sus plagas', accent: 'text-lime-400 border-l-lime-500' },
     // Calendario de finca: UN solo calendario que unifica por planta fenología,
     // nutrición, siembra, cosecha, sanidad y ciclo perenne (App.jsx case
@@ -557,7 +565,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
             type="button"
             onClick={() => onNavigate(tile.view, tile.data)}
             aria-label={`${tileLabel(tile)}: ${tileDesc(tile)}`}
-            className={`dash-tile ${large ? 'dash-tile--destacado ' : ''}${fincaVivaFlag ? 'fvh-tile-claro' : 'bg-slate-900/60'} border border-slate-800 border-l-4 ${tile.accent} ${large ? 'rounded-2xl p-4 min-h-[112px]' : 'rounded-xl p-3 min-h-[88px]'} text-left active:bg-slate-800/70 transition-colors flex flex-col`}
+            className={`dash-tile ${large ? 'dash-tile--destacado ' : ''}${tile.span === 2 ? 'col-span-2 ' : ''}${fincaVivaFlag ? 'fvh-tile-claro' : 'bg-slate-900/60'} border border-slate-800 border-l-4 ${tile.accent} ${large ? 'rounded-2xl p-4 min-h-[112px]' : 'rounded-xl p-3 min-h-[88px]'} text-left active:bg-slate-800/70 transition-colors flex flex-col`}
         >
             <tile.icon size={large ? 30 : 24} strokeWidth={2} className={`${large ? 'mb-2' : 'mb-1.5'} ${tile.accent.split(' ')[0]}`} aria-hidden="true" />
             <span className={`${large ? 'text-base' : 'text-sm'} font-black block leading-tight fvh-tile-label ${tile.accent.split(' ')[0]}`}>{tileLabel(tile)}</span>

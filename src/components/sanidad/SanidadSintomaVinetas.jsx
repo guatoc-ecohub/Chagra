@@ -272,6 +272,98 @@ function VHojaAmarilla() {
     );
 }
 
+/** 🌅 LÁMINA DE ESPERANZA — la portada: hoja enferma → camino del manejo →
+ *  hoja sana bajo el sol. El arco punteado ES la tesis de la mini-app: esto
+ *  tiene remedio. Lámina ancha (220×100), mismo lenguaje de mano alzada. */
+function VPortadaEsperanza() {
+    return (
+        <svg className="san-vineta-svg san-vineta-svg--ancha" viewBox="0 0 220 100" aria-hidden="true">
+            <rect width="220" height="100" fill="#f6ded1" />
+            {/* suelo que une las dos matas — la misma tierra, otro cuidado */}
+            <path d="M0 88 H220 V92 H0 Z" fill="#8a5a38" opacity=".9" />
+
+            {/* sol — el que acompaña la recuperación (rayos animables en CSS) */}
+            <g className="san-sol">
+                <circle cx="194" cy="20" r="10" fill="#f4b64d" stroke="#c98a2f" strokeWidth="2" />
+                <g className="san-sol-rayos" stroke="#e8a63c" strokeWidth="2.2" strokeLinecap="round">
+                    <path d="M194 4 v-2" /><path d="M194 36 v2" />
+                    <path d="M178 20 h-2" /><path d="M210 20 h2" />
+                    <path d="M183 9 l-1.6 -1.6" /><path d="M205 31 l1.6 1.6" />
+                    <path d="M205 9 l1.6 -1.6" /><path d="M183 31 l-1.6 1.6" />
+                </g>
+            </g>
+
+            {/* hoja ENFERMA (izquierda): caída, amarillosa, con manchas */}
+            <g transform="translate(10 26) scale(0.64) rotate(9 50 50)">
+                <path d="M50 88 C20 78 14 40 30 20 C50 6 74 16 82 34 C90 58 74 82 50 88 Z" fill="#b3ac52" stroke="#77702c" strokeWidth="3" />
+                <path d="M50 86 C48 60 50 36 56 20" stroke="#77702c" strokeWidth="2.6" fill="none" strokeLinecap="round" />
+                <g fill="#6b4626" opacity=".8">
+                    <ellipse cx="44" cy="50" rx="9" ry="7" />
+                    <ellipse cx="64" cy="64" rx="6" ry="5" />
+                    <ellipse cx="36" cy="66" rx="4.5" ry="3.6" />
+                </g>
+            </g>
+
+            {/* el CAMINO del manejo: arco punteado con la gota de remedio */}
+            <path
+                d="M74 40 C90 14 128 12 144 34"
+                fill="none"
+                stroke="#b0532f"
+                strokeWidth="2.6"
+                strokeLinecap="round"
+                strokeDasharray="1 7"
+            />
+            {/* punta de flecha del arco */}
+            <path d="M144 34 l-7 -4.5 M144 34 l-8 1.5" stroke="#b0532f" strokeWidth="2.4" strokeLinecap="round" fill="none" />
+            {/* la gota de biopreparado en el punto más alto del camino */}
+            <path d="M109 8 q6 8 0 13 q-6 -5 0 -13 Z" fill="#3f8f4e" stroke="#2f6b3a" strokeWidth="1.6" />
+            <path d="M107 15 q1.4 2 3 1" stroke="#bfe3c2" strokeWidth="1.4" fill="none" strokeLinecap="round" />
+
+            {/* hoja SANA (derecha): erguida, verde vivo, con chispas */}
+            <g transform="translate(140 20) scale(0.7)">
+                <path d="M50 88 C20 78 14 40 30 20 C50 6 74 16 82 34 C90 58 74 82 50 88 Z" fill="#5a9e4b" stroke="#2f6b3a" strokeWidth="3" />
+                <path d="M50 86 C48 60 50 36 56 20" stroke="#2f6b3a" strokeWidth="2.6" fill="none" strokeLinecap="round" />
+                <path d="M50 70 L34 58 M51 58 L36 44 M53 46 L40 34" stroke="#2f6b3a" strokeWidth="1.6" fill="none" opacity=".55" strokeLinecap="round" />
+                <path d="M50 70 L70 60 M51 58 L72 48 M53 46 L70 38" stroke="#2f6b3a" strokeWidth="1.6" fill="none" opacity=".55" strokeLinecap="round" />
+            </g>
+            <g fill="#f4b64d">
+                <path d="M136 14 l1.8 4.6 4.6 1.8 -4.6 1.8 -1.8 4.6 -1.8 -4.6 -4.6 -1.8 4.6 -1.8 Z" />
+                <path d="M206 52 l1.4 3.6 3.6 1.4 -3.6 1.4 -1.4 3.6 -1.4 -3.6 -3.6 -1.4 3.6 -1.4 Z" />
+            </g>
+        </svg>
+    );
+}
+
+/** 🌱 Mata sana — el cierre esperanzador del resultado: mata erguida con un
+ *  BROTE NUEVO (la señal de que va ganando, la misma del copy) bajo el sol. */
+function VMataSana() {
+    return (
+        <svg {...P}>
+            <rect width="100" height="100" fill="#f6ded1" />
+            <path d="M0 82 H100 V86 H0 Z" fill="#8a5a38" />
+            {/* tallo erguido */}
+            <path d="M50 82 V40" stroke="#3f7d3a" strokeWidth="3.5" strokeLinecap="round" />
+            {/* hojas paradas, con ganas */}
+            <path d="M50 66 q-16 -2 -22 -14 q14 -4 22 6 Z" fill="#5a9e4b" stroke="#2f6b3a" strokeWidth="2" />
+            <path d="M50 58 q16 -2 22 -14 q-14 -4 -22 6 Z" fill="#5a9e4b" stroke="#2f6b3a" strokeWidth="2" />
+            <path d="M50 46 q-12 -4 -14 -14 q12 -2 16 8 Z" fill="#6fae54" stroke="#2f6b3a" strokeWidth="2" />
+            {/* el brote nuevo — la señal de recuperación */}
+            <path d="M50 40 q0 -8 6 -12" stroke="#7fc25e" strokeWidth="2.6" fill="none" strokeLinecap="round" />
+            <circle cx="57" cy="27" r="3.6" fill="#a4d67f" stroke="#5a9e4b" strokeWidth="1.4" />
+            {/* sol pequeño que acompaña */}
+            <g className="san-sol">
+                <circle cx="19" cy="17" r="7.5" fill="#f4b64d" stroke="#c98a2f" strokeWidth="1.6" />
+                <g className="san-sol-rayos" stroke="#e8a63c" strokeWidth="1.8" strokeLinecap="round">
+                    <path d="M19 5.5 v-2" /><path d="M19 28.5 v2" />
+                    <path d="M7.5 17 h-2" /><path d="M30.5 17 h2" />
+                </g>
+            </g>
+            {/* chispa de ánimo */}
+            <path d="M74 34 l1.6 4 4 1.6 -4 1.6 -1.6 4 -1.6 -4 -4 -1.6 4 -1.6 Z" fill="#f4b64d" />
+        </svg>
+    );
+}
+
 const VINETAS = {
     manchaHumeda: VManchaHumeda,
     manchaOjo: VManchaOjo,
@@ -285,6 +377,8 @@ const VINETAS = {
     hojaRaya: VHojaRaya,
     hojaNegra: VHojaNegra,
     hojaAmarilla: VHojaAmarilla,
+    portadaEsperanza: VPortadaEsperanza,
+    mataSana: VMataSana,
 };
 
 /**
