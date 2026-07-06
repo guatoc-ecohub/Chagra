@@ -61,6 +61,16 @@ export const MUNDOS_FINCA = [
         ],
     },
     {
+        id: 'cafe',
+        titulo: 'El café',
+        emoji: '☕',
+        lema: 'El cultivo bandera: variedad y roya, sombra, broca, cosecha y beneficio',
+        tinte: ['#7a4a24', '#efe0cf'],
+        // Mundo de una sola pantalla (photo-forward, 5 estaciones del ciclo
+        // cafetero). La tarjeta navega directo, sin pantalla intermedia.
+        directo: { view: 'cafe' },
+    },
+    {
         id: 'suelo',
         titulo: 'El suelo vivo',
         emoji: '🌱',

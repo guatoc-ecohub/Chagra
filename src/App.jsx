@@ -112,6 +112,11 @@ const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScree
 // riego con medida (ETc; Kc/ETo = slots grounded-pendiente) y cuidar el agua
 // (calidad + nacimiento, caso "se me seca el nacimiento en verano").
 const AguaScreen = lazy(() => import('./components/agua/AguaScreen'));
+// Mundo "El café": el cultivo bandera del campesino colombiano, contado por su
+// ciclo (variedad/roya, almácigo, sombra, broca+roya, cosecha selectiva y
+// beneficio). Photo-forward (patrón Agua) y groundeado en el grafo
+// (species.coffea_arabica) + Cenicafé; la pulpa cierra ciclo hacia el compost.
+const CafeScreen = lazy(() => import('./components/cafe/CafeScreen'));
 // "El clima que viene": traductor campesino de los boletines IDEAM/ENSO. Lee la
 // fase ENSO en vivo (ensoService) y remite a la Mesa Técnica Agroclimática — no
 // reimplementa el motor de clima ni pronostica.
@@ -247,6 +252,11 @@ const HASH_VIEW_ROUTES = {
   suelo: 'suelo',
   agua: 'agua',
   'manejo-agua': 'agua',
+  cafe: 'cafe',
+  café: 'cafe',
+  'el-cafe': 'cafe',
+  cafetal: 'cafe',
+  cafeto: 'cafe',
   'salud-suelo': 'salud_suelo',
   'cuaderno-suelo': 'salud_suelo',
   encalado: 'salud_suelo',
@@ -295,7 +305,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
   'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
@@ -1466,6 +1476,18 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Agua de la finca">
               <AguaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'cafe':
+        // Mundo "El café" (5 estaciones: variedad+siembra / sombra+suelo /
+        // broca+roya / flor+cosecha / beneficio). Photo-forward con fotos CC y
+        // groundeado en el grafo (coffea_arabica) + Cenicafé; sin dosis
+        // químicas inventadas (cifras de sitio = "dato en camino").
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El café">
+              <CafeScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
