@@ -113,6 +113,12 @@ const FincaVivaHero = lazy(() => import('./FincaVivaHero'));
 // se mantiene acá como alias para el fail-open de la visibilidad por perfil.
 const DEFAULT_ORDER = HOME_MODULE_DEFAULT_ORDER;
 
+// Secciones que ya viven FUNDIDAS en la cabecera del día (EstadoDelDiaCard,
+// BLOQUE 1). Se excluyen de la grilla de secciones arrastrables para no
+// pintarlas dos veces — incluso en perfiles existentes cuyo `modulos_orden`
+// guardado aún las lista (redundancia clima+análisis "encimados", #2054).
+const FUSED_EN_ESTADO_DEL_DIA = new Set(['hoyfinca', 'clima', 'analisis']);
+
 const SECTION_COMPONENTS = {
     hoyfinca: { Component: HoyEnFincaStrip, full: true },
     clima: { Component: ClimaStrip, full: true },
@@ -1000,6 +1006,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                     <SortableContext items={order} strategy={rectSortingStrategy}>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             {order
+                                .filter((id) => !FUSED_EN_ESTADO_DEL_DIA.has(id))
                                 .filter((id) => moduleVisibility[id] !== false)
                                 .map((id) => (
                                     <SortableSection key={id} id={id} onNavigate={onNavigate} sensors={iotAlerts} />
