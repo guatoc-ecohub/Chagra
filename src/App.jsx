@@ -112,6 +112,7 @@ const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScree
 // riego con medida (ETc; Kc/ETo = slots grounded-pendiente) y cuidar el agua
 // (calidad + nacimiento, caso "se me seca el nacimiento en verano").
 const AguaScreen = lazy(() => import('./components/agua/AguaScreen'));
+const MilpaScreen = lazy(() => import('./components/milpa/MilpaScreen'));
 // "El clima que viene": traductor campesino de los boletines IDEAM/ENSO. Lee la
 // fase ENSO en vivo (ensoService) y remite a la Mesa Técnica Agroclimática — no
 // reimplementa el motor de clima ni pronostica.
@@ -247,6 +248,8 @@ const HASH_VIEW_ROUTES = {
   suelo: 'suelo',
   agua: 'agua',
   'manejo-agua': 'agua',
+  'milpa-cultivo': 'milpa_cultivo',
+  'tres-hermanas': 'milpa_cultivo',
   'salud-suelo': 'salud_suelo',
   'cuaderno-suelo': 'salud_suelo',
   encalado: 'salud_suelo',
@@ -295,7 +298,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'milpa_cultivo', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
   'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
@@ -1466,6 +1469,20 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Agua de la finca">
               <AguaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'milpa_cultivo':
+        // Módulo "La milpa: maíz, fríjol y calabaza" (las tres hermanas): la
+        // asociación ancestral groundeada en el grafo (COMPATIBLE_WITH /
+        // CONTROLS) y en las fichas de ciclo (src/data/milpaFinca.js). Sin dosis
+        // químicas; cifras sin fuente van como "dato en camino". Vive dentro del
+        // mundo Cultivos. NB: la vista 'milpa' (sin sufijo) es el juego
+        // MilpaSimulator — por eso esta usa 'milpa_cultivo'.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La milpa: maíz, fríjol y calabaza">
+              <MilpaScreen onBack={() => navigate('mundo_cultivos')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );

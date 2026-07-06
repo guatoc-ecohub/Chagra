@@ -38,6 +38,13 @@ export default function MundoCultivosHub({ onBack, onNavigate }) {
     // mundosFinca.js, que congela la reachability).
     const grupos = [
         {
+            titulo: 'La milpa ancestral',
+            desc: 'Las tres hermanas, sembradas juntas',
+            items: [
+                { view: 'milpa_cultivo', emoji: '🌽', label: 'La milpa: maíz, fríjol y calabaza', desc: 'Por qué se ayudan, cómo sembrarlas y su valor nutricional' },
+            ],
+        },
+        {
             titulo: 'Saber qué y cuándo sembrar',
             desc: 'El conocimiento antes de meter la semilla',
             items: [

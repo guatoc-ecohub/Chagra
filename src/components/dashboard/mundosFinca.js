@@ -49,6 +49,7 @@ export const MUNDOS_FINCA = [
         // agrupa las funciones existentes y suma la calculadora de grados-día.
         portada: 'mundo_cultivos',
         entradas: [
+            { view: 'milpa_cultivo', label: 'La milpa', desc: 'Maíz, fríjol y calabaza sembrados juntos (las tres hermanas)', emoji: '🌽' },
             { view: 'directorio', label: 'Qué puedo sembrar', desc: 'Especies para su clima, con qué se llevan y sus plagas', emoji: '🌱' },
             { view: 'calendario_finca', label: 'Calendario de la finca', desc: 'Cuándo sembrar, abonar y cosechar, todo junto', emoji: '🗓️' },
             { view: 'activos', label: 'Mis matas', desc: 'Las plantas que tiene sembradas y cómo van', emoji: '🪴' },
