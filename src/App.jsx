@@ -184,14 +184,70 @@ localforage.config({
   storeName: 'syncQueue'
 });
 
-const LoadingFallback = () => (
-  <div
-    className="h-[100dvh] bg-slate-950 flex items-center justify-center text-muzo-glow"
-    data-testid="app-suspense-fallback"
-  >
-    <ChagraGrowLoader size={80} showLabel labelText="Chagra..." />
-  </div>
-);
+// Etiquetas contextuales del fallback de Suspense (perceived performance):
+// mientras baja el chunk lazy de la vista destino, el loader dice A DÓNDE
+// vas en lugar del "Chagra..." genérico — la espera se siente intencional.
+// Vistas sin entrada caen al label genérico (abajo).
+const VIEW_LOADING_LABELS = {
+  loading: 'Preparando tu chagra…',
+  dashboard: 'Preparando tu chagra…',
+  hoy_finca: 'Preparando tu chagra…',
+  agente: 'Despertando al agente…',
+  voz: 'Preparando el modo voz…',
+  voz_planta: 'Preparando el modo voz…',
+  directorio: 'Abriendo el catálogo de especies…',
+  especies: 'Abriendo el catálogo de especies…',
+  toxicologia: 'Abriendo el catálogo de especies…',
+  mundo: 'Abriendo el mundo…',
+  mundo_cultivos: 'Abriendo tus cultivos…',
+  agua: 'Abriendo el mundo del agua…',
+  suelo: 'Abriendo el mundo del suelo…',
+  salud_suelo: 'Abriendo el mundo del suelo…',
+  semilla: 'Abriendo el mundo de la semilla…',
+  poscosecha: 'Abriendo la poscosecha…',
+  almacenamiento: 'Abriendo el almacenamiento…',
+  nutricion: 'Abriendo la comida que alimenta…',
+  animales: 'Abriendo tus animales…',
+  ciclo_vivo: 'Abriendo el ciclo vivo…',
+  calendario: 'Abriendo el calendario…',
+  calendario_finca: 'Abriendo el calendario…',
+  mapa: 'Abriendo el mapa…',
+  mercado: 'Abriendo el mercado…',
+  mercados: 'Abriendo el mercado…',
+  aprende: 'Abriendo los cursos…',
+  bitacora: 'Abriendo la bitácora…',
+  historial: 'Abriendo la bitácora…',
+  informes: 'Preparando los informes…',
+};
+
+// Si el chunk tarda más que esto, mostramos una línea de calma (UX paciente:
+// típico en campo con señal débil o en la primera visita sin caché).
+const SLOW_LOAD_HINT_MS = 4000;
+
+const LoadingFallback = ({ view = null }) => {
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setSlow(true), SLOW_LOAD_HINT_MS);
+    return () => clearTimeout(t);
+  }, []);
+  return (
+    <div
+      className="h-[100dvh] bg-slate-950 flex flex-col items-center justify-center gap-3 text-muzo-glow"
+      data-testid="app-suspense-fallback"
+    >
+      <ChagraGrowLoader size={80} showLabel labelText={VIEW_LOADING_LABELS[view] || 'Cargando…'} />
+      {slow && (
+        <p
+          className="text-xs text-slate-400 text-center px-8 max-w-xs"
+          data-testid="app-suspense-slow-hint"
+          aria-live="polite"
+        >
+          Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.
+        </p>
+      )}
+    </div>
+  );
+};
 
 // CÓDIGO MUERTO REMOVIDO 2026-06-24 (descubribilidad): `NAV_TILES` +
 // `ACCENT_CLASSES` solo los consumía `DashboardView` (la grilla de 16 tiles del
@@ -821,7 +877,7 @@ export default function App() {
 
     switch (currentView) {
       case 'loading':
-        return <LoadingFallback />;
+        return <LoadingFallback view="loading" />;
       case 'login':
         return (
           <ErrorBoundary>
@@ -1809,7 +1865,9 @@ export default function App() {
       {/* #315 — banner crítico global: surfacea alertas graves (helada, sensor
           crítico) sin abrir la campana. Imposible de ignorar. */}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <CriticalAlertBanner onNavigate={navigate} />}
-      <Suspense fallback={<LoadingFallback />}>
+      {/* El fallback conoce la vista destino: mientras baja el chunk lazy
+          muestra "Abriendo el catálogo…" etc. en vez del genérico. */}
+      <Suspense fallback={<LoadingFallback view={currentView} />}>
         {renderView()}
       </Suspense>
       {/* FAB feedback flotante REMOVIDO 2026-05-21: el reporte de errores
