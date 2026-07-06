@@ -21,7 +21,10 @@
  *    (0.20 glow / 0.26 tinte / 0.25 noche) que ni la calibración ni el ENSO
  *    pueden superar. Peor caso CALCULADO (niebla nature al tope 0.26): tinta
  *    café sobre crema velada ≈ 4.9:1 → sigue AA. A 0.32 caía a 4.1 → por eso
- *    el tope es 0.26.
+ *    el tope es 0.26. El tope del TINTE es var por CONTEXTO
+ *    (--w-tint-cap-top/-bot): 0.26/0.20 en claros; biopunk DE NOCHE lo baja a
+ *    0.10/0.08 porque sobre oscuro la misma alpha comprime el doble (ver
+ *    bloque noche).
  *  - Sin atributos → sin velo (ni siquiera se genera el ::after).
  *  - `prefers-contrast: more` apaga TODA la capa (campo, sol directo).
  *  - Calibración sensores: `--w-cal` (atmosphereService, 0..1.5) escala todo.
@@ -52,6 +55,16 @@
   /* Capa 3: veladura nocturna (solo temas claros). */
   --w-night-rgb: 24 32 48;
   --w-night-a: 0;
+  /* TOPES del tinte por CONTEXTO (legibilidad 2026-07-06). El 0.26/0.20 del
+   * diseño original se CALCULÓ para temas claros (tinta café sobre crema
+   * ≈ 4.9:1 AA al tope). Sobre el tema OSCURO la misma alpha comprime el
+   * DOBLE: el texto claro pierde luminancia y el fondo casi no gana (medido:
+   * slate-400 sobre raised 5.7:1 → 3.4:1 y blanco sobre botón emerald-700
+   * 5.5:1 → 3.5:1 con niebla/lluvia nocturna al tope). El contexto
+   * biopunk-de-noche baja estos topes (ver bloque noche); el velo sigue
+   * respirando, pero nunca por debajo de AA en los pares del chrome. */
+  --w-tint-cap-top: 0.26;
+  --w-tint-cap-bot: 0.20;
   /* Lienzo biopunk (themes.css §4): alpha del glow ambiental teal. El clima lo
    * "respira": sol pleno lo aviva, lluvia/niebla lo amortiguan. */
   --bp-glow-a: 0.10;
@@ -76,9 +89,20 @@ html[data-luz="noche"] {
 }
 /* Biopunk es el tema NOCTURNO por diseño ("cosecha mística"): de noche no se
  * vela nada — se respeta su modo oscuro tal cual (patrón del modo auto:
- * noche→biopunk). */
+ * noche→biopunk). Legibilidad 2026-07-06: además del velo navy, se apaga el
+ * TINTE azul residual de `html[data-luz="noche"]` (0.10) que sí caía sobre
+ * biopunk en noche despejada, contradiciendo este mismo comentario (los velos
+ * de CLIMA — nublado/lluvia/niebla — se re-declaran después con la misma
+ * especificidad y GANAN, así que la lluvia de noche se sigue sintiendo). Y se
+ * bajan los topes del tinte a 0.10/0.08: calibrado con sonda WCAG para que el
+ * peor caso nocturno (niebla ×niña ×cal 1.5) conserve AA en los pares
+ * apretados del chrome oscuro (slate-400/raised 4.6:1, blanco/emerald-700
+ * 4.7:1). La estética biopunk NO se toca: esto solo LIMITA el velo externo. */
 html:not([data-theme])[data-luz="noche"] {
   --w-night-a: 0;
+  --w-tint-a: 0;
+  --w-tint-cap-top: 0.10;
+  --w-tint-cap-bot: 0.08;
 }
 /* TEMAS CLAROS SIEMPRE CLAROS (operador 2026-06-20: "siempre claro como los
  * demos"). nature, minimalista y verde-vivo NO adoptan la veladura navy ni el
@@ -226,8 +250,8 @@ html[data-clima] body::after {
     ),
     linear-gradient(
       180deg,
-      rgb(var(--w-tint-rgb) / min(0.26, calc(var(--w-tint-a) * var(--w-enso-tint) * var(--w-cal)))) 0%,
-      rgb(var(--w-tint-rgb) / min(0.20, calc(var(--w-tint-a) * 0.55 * var(--w-enso-tint) * var(--w-cal)))) 100%
+      rgb(var(--w-tint-rgb) / min(var(--w-tint-cap-top, 0.26), calc(var(--w-tint-a) * var(--w-enso-tint) * var(--w-cal)))) 0%,
+      rgb(var(--w-tint-rgb) / min(var(--w-tint-cap-bot, 0.20), calc(var(--w-tint-a) * 0.55 * var(--w-enso-tint) * var(--w-cal)))) 100%
     ),
     rgb(var(--w-night-rgb) / min(0.25, calc(var(--w-night-a) * var(--w-cal))));
 }
