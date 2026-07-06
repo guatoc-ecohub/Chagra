@@ -382,15 +382,15 @@ export default function CompostScreen({ onBack, onHome, onNavigate }) {
           <ul className="mt-2 flex flex-col gap-2 text-sm text-slate-300 leading-relaxed">
             <li className="flex items-start gap-2">
               <span className="mt-2 h-1 w-1 rounded-full bg-emerald-400 shrink-0" aria-hidden="true" />
-              El calor de la pila (bien volteada) mata los patógenos. Por eso <span className="font-semibold text-slate-100">no se aplica estiércol crudo</span> a lo que se come en hoja cruda.
+              <span className="min-w-0">El calor de la pila (bien volteada) mata los patógenos. Por eso <span className="font-semibold text-slate-100">no se aplica estiércol crudo</span> a lo que se come en hoja cruda.</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="mt-2 h-1 w-1 rounded-full bg-emerald-400 shrink-0" aria-hidden="true" />
-              Arme la pila lejos y aguas abajo del pozo o la quebrada, para que el escurrido no llegue al agua.
+              <span className="min-w-0">Arme la pila lejos y aguas abajo del pozo o la quebrada, para que el escurrido no llegue al agua.</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="mt-2 h-1 w-1 rounded-full bg-emerald-400 shrink-0" aria-hidden="true" />
-              Lávese bien las manos después de manejar estiércol fresco.
+              <span className="min-w-0">Lávese bien las manos después de manejar estiércol fresco.</span>
             </li>
           </ul>
         </section>
