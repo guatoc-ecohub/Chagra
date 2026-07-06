@@ -232,9 +232,9 @@ export default function HarvestLog({ onBack, onSave }) {
           <h3 className="text-2xl font-bold">Cosecha registrada</h3>
           <p className="text-sm text-slate-400 mt-2">
             {syncedOffline ? (
-              <>Se sincronizará con FarmOS cuando haya conexión. Mientras tanto, la encuentras en <strong className="text-slate-200">Bitácora → Recientes</strong>.</>
+              <>Quedó guardada en tu finca. Apenas vuelva la señal, se guarda sola. Mientras tanto, la encuentras en <strong className="text-slate-200">Bitácora → Recientes</strong>.</>
             ) : (
-              <>Sincronizado con FarmOS.</>
+              <>Quedó guardada. Todo al día.</>
             )}
           </p>
         </div>
