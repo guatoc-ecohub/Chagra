@@ -94,6 +94,7 @@ const GallinasScreen = lazy(() => import('./components/GallinasScreen'));
 const AbejasScreen = lazy(() => import('./components/AbejasScreen'));
 const VacasScreen = lazy(() => import('./components/VacasScreen'));
 const EstiercolScreen = lazy(() => import('./components/EstiercolScreen'));
+const CompostScreen = lazy(() => import('./components/CompostScreen'));
 const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
 const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
 const LocationDetectedScreen = lazy(() => import('./components/LocationDetectedScreen'));
@@ -240,6 +241,9 @@ const HASH_VIEW_ROUTES = {
   'del-corral-al-abono': 'estiercol',
   abono: 'estiercol',
   biodigestor: 'estiercol',
+  compost: 'compost',
+  'estiercol-compost': 'compost',
+  'compost-paso-a-paso': 'compost',
   'doom-finca': 'doom_finca',
   subsuelo: 'subsuelo',
   'mundo-subsuelo': 'subsuelo',
@@ -292,7 +296,7 @@ const HASH_VIEW_ROUTES = {
 const MODULE_VIEWS = new Set([
   'activos', 'mapa', 'javier', 'bodega', 'task_log', 'historial', 'bitacora',
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
-  'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol',
+  'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol', 'compost',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
@@ -1268,6 +1272,23 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Del corral al abono">
               <EstiercolScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'compost':
+        // "El compost, paso a paso" — hermana photo-forward de AguaScreen dentro
+        // del mundo Estiércol y compost. Lleva por la receta (recolección →
+        // mezcla C:N → volteo → madurez → aplicación) con fotos CC reales.
+        // El back regresa al hub del mundo (abono), no al dashboard, porque se
+        // llega desde ahí. Ruta #compost.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El compost, paso a paso">
+              <CompostScreen
+                onBack={() => navigate('mundo', { mundo: 'abono' })}
+                onHome={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
             </ErrorFallback>
           </ErrorBoundary>
         );

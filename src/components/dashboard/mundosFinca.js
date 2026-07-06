@@ -83,11 +83,17 @@ export const MUNDOS_FINCA = [
     },
     {
         id: 'abono',
-        titulo: 'Del corral al abono',
+        titulo: 'Estiércol y compost',
         emoji: '🐄',
-        lema: 'Quítele el olor al estiércol y sáquele abono y gas',
+        lema: 'Quítele el olor al estiércol, sáquele gas y hágalo tierra negra',
         tinte: ['#6d7a2e', '#e9ecc9'],
-        directo: { view: 'estiercol' },
+        // El mundo ganó su segunda sala (compost paso a paso, photo-forward):
+        // pasó de `directo` a hub con entradas, igual que el clima cuando ganó
+        // su mini-app. La sala vieja ('estiercol') sigue alcanzable como antes.
+        entradas: [
+            { view: 'compost', label: 'El compost, paso a paso', desc: 'De la recolección a la tierra negra: mezcla café/verde, volteo, madurez y aplicación', emoji: '🍂' },
+            { view: 'estiercol', label: 'Del corral al abono', desc: 'Quítele el olor a la gallinaza, sáquele gas con el biodigestor y saque cuentas', emoji: '🐄' },
+        ],
     },
     {
         id: 'sanidad',
