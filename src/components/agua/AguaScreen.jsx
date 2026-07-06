@@ -4,6 +4,7 @@ import {
   ShieldCheck, Users, Hourglass, Milk, ChevronRight,
   Skull, PiggyBank, Biohazard, FlaskConical, Fuel, Beef, Trash2,
   Baby, Activity, ShieldAlert, Ruler, Landmark, HeartPulse,
+  Flame, Filter, Camera, ExternalLink, HelpCircle,
 } from 'lucide-react';
 import { ScreenShell } from '../common/ScreenShell';
 import PedagogicalBlock from '../common/PedagogicalBlock';
@@ -27,12 +28,15 @@ import {
   PRACTICAS_AHORRO,
   USOS_DEL_AGUA,
   SENALES_ALERTA_AGUA,
-  DOSIS_POTABILIZACION,
   RONDA_PROTECCION,
   CASO_NACIMIENTO,
   RIESGOS_CONTAMINACION,
   ENFERMEDADES_AGUA,
   DISTANCIAS_SEGURIDAD,
+  IRCA_RURAL,
+  METODOS_POTABILIZACION,
+  FOTO_BASE_AGUA,
+  CREDITOS_FOTOS_AGUA,
 } from '../../data/aguaFinca';
 import { getEnsoPhase, getEnsoLabel } from '../../services/ensoService';
 import './agua.css';
@@ -91,6 +95,77 @@ function CampoNumero({ id, label, unidad, value, onChange, placeholder, hint = '
   );
 }
 
+/* ── Fotos reales (licencia abierta) — patrón "photo-forward" ─────────────
+ * Igual que el módulo Suelo: foto real de Wikimedia Commons + crédito visible +
+ * fallback a ícono si no carga. El scrim oscuro es FIJO (no lo vira el remapeo
+ * de temas claros) para que el texto encima quede legible al sol. */
+const creditoDe = (slug) => CREDITOS_FOTOS_AGUA.find((c) => c.slug === slug)?.autor || '';
+
+/**
+ * FotoAgua — imagen a sangre con scrim inferior fijo, crédito de autor en la
+ * esquina y fallback a un ícono. `children` va SOBRE la foto (títulos, stats).
+ */
+function FotoAgua({ slug, alt, ratio = 'aspect-[16/10]', rounded = '', Fallback = Droplets, children = null }) {
+  const [ok, setOk] = useState(true);
+  const credito = creditoDe(slug);
+  const IconoFallback = Fallback;
+  return (
+    <div className={`relative overflow-hidden bg-slate-950 ${ratio} ${rounded}`}>
+      {ok ? (
+        <img
+          src={`${FOTO_BASE_AGUA}/${slug}.jpg`}
+          alt={alt}
+          loading="lazy"
+          decoding="async"
+          onError={() => setOk(false)}
+          className="agua-foto absolute inset-0 w-full h-full object-cover"
+        />
+      ) : (
+        <div className="absolute inset-0 grid place-items-center" aria-hidden="true">
+          <IconoFallback size={38} className="text-slate-700" />
+        </div>
+      )}
+      {/* scrim fijo para legibilidad del texto/crédito sobre cualquier foto */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/5" aria-hidden="true" />
+      {children}
+      {credito && (
+        <span className="absolute bottom-1 right-1.5 rounded bg-black/55 px-1 py-0.5 text-[9px] leading-none text-white/75">
+          Foto: {credito}
+        </span>
+      )}
+    </div>
+  );
+}
+
+/** Ilustración SVG propia para la cloración (evita foto de marca de lejía).
+ *  Un gotero echa 2 gotas a un vaso de agua — el gesto exacto del método. */
+function CloroIlustracion() {
+  return (
+    <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-cyan-950/70 to-slate-950" aria-hidden="true">
+      <svg viewBox="0 0 160 100" className="w-4/5 h-4/5">
+        {/* gotero inclinado */}
+        <g className="text-slate-200">
+          <rect x="30" y="14" width="14" height="30" rx="4" transform="rotate(28 37 29)" fill="currentColor" opacity="0.9" />
+          <rect x="33" y="8" width="8" height="9" rx="2" transform="rotate(28 37 12)" fill="currentColor" />
+        </g>
+        {/* 2 gotas cayendo */}
+        <g className="text-cyan-300">
+          <path d="M62 40 q -4 6 0 9 q 4 -3 0 -9 z" fill="currentColor" />
+          <path d="M70 52 q -4 6 0 9 q 4 -3 0 -9 z" fill="currentColor" opacity="0.85" />
+        </g>
+        {/* etiqueta de la dosis */}
+        <text x="86" y="38" className="fill-cyan-200" fontSize="15" fontWeight="900">×2</text>
+        {/* vaso con agua */}
+        <g>
+          <path d="M96 58 L140 58 L134 94 L102 94 Z" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-slate-300" strokeLinejoin="round" />
+          <path d="M99 74 L137 74 L134 94 L102 94 Z" fill="currentColor" className="text-cyan-400/80" />
+        </g>
+      </svg>
+      <span className="absolute bottom-1 right-1.5 rounded bg-black/45 px-1 py-0.5 text-[9px] leading-none text-white/60">Ilustración</span>
+    </div>
+  );
+}
+
 /* ── PILAR 1 · Cosechar la lluvia ─────────────────────────────────────── */
 function PilarLluvia() {
   const [areaTecho, setAreaTecho] = useState('');
@@ -106,6 +181,17 @@ function PilarLluvia() {
 
   return (
     <section className="agua-seccion space-y-4" data-testid="pilar-lluvia">
+      {/* Hero con foto real del sistema techo→canal→tanque */}
+      <div className="rounded-2xl border border-cyan-700/40 overflow-hidden bg-slate-900/60">
+        <FotoAgua slug="lluvia" alt="Sistema de cosecha de lluvia: canal en el alero que baja a un tanque junto a la casa" ratio="aspect-[16/9]" Fallback={CloudRain}>
+          <div className="absolute inset-0 flex flex-col justify-end p-4">
+            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-cyan-200">
+              <CloudRain size={14} aria-hidden="true" /> Del cielo al tanque
+            </p>
+            <h3 className="text-xl font-black text-[#ffffff] leading-tight drop-shadow">El techo también es una fuente de agua</h3>
+          </div>
+        </FotoAgua>
+      </div>
       <p className="text-sm leading-relaxed text-slate-200">
         Cada aguacero que cae sobre su techo es agua que ya pagó el cielo. Con un
         canal y un tanque, ese techo se vuelve la primera fuente de agua de la
@@ -579,6 +665,173 @@ function RiesgosSalud() {
   );
 }
 
+/* ── SALUD · ¿Mi agua es segura? (IRCA + señales, sobre foto real) ─────── */
+function MiAguaSegura() {
+  return (
+    <section className="rounded-2xl border border-slate-700/60 bg-slate-900/60 overflow-hidden" data-testid="agua-es-segura">
+      <FotoAgua
+        slug="turbia"
+        alt="Agua de quebrada turbia, revuelta y con espuma: señal de que no está para tomar sin tratar"
+        ratio="aspect-[16/9]"
+        Fallback={HelpCircle}
+      >
+        <div className="absolute inset-0 flex flex-col justify-end p-4">
+          <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-cyan-200">
+            <HeartPulse size={14} aria-hidden="true" /> Su salud
+          </p>
+          <h3 className="text-2xl font-black text-[#ffffff] leading-tight drop-shadow">¿Mi agua es segura?</h3>
+        </div>
+      </FotoAgua>
+
+      <div className="p-4 space-y-3">
+        {/* El dato que convierte "puede estar mala" en "a uno de cada tres le sale mala" */}
+        <div className="flex items-center gap-3.5 rounded-xl border border-rose-600/40 bg-rose-950/30 p-3" data-testid="agua-irca">
+          <p className="shrink-0 text-4xl font-black leading-none text-rose-300">{fmt(IRCA_RURAL.porcentajeRiesgo)}%</p>
+          <p className="text-xs leading-snug text-slate-200">
+            del agua para tomar en el <strong className="text-rose-200">campo colombiano</strong> está en riesgo alto:
+            a más de uno de cada tres vecinos le sale mala. No se ve ni se huele — por eso, para tomar,{' '}
+            <strong className="text-white">trátela siempre</strong>.
+          </p>
+        </div>
+
+        {/* Señales de agua contaminada (antes vivían dentro del bloque de dosis) */}
+        <div>
+          <p className="flex items-center gap-2 text-xs font-black uppercase tracking-wide text-rose-300 mb-1.5">
+            <TriangleAlert size={14} aria-hidden="true" /> Ni la toque si ve esto
+          </p>
+          <ul className="grid gap-1.5" data-testid="agua-senales-alerta">
+            {SENALES_ALERTA_AGUA.map((s) => (
+              <li key={s} className="flex gap-1.5 text-xs leading-snug text-slate-200">
+                <span aria-hidden="true" className="text-rose-400">•</span>{s}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <p className="text-[10px] leading-snug text-slate-500">
+          El riesgo se mide con el IRCA (Índice de Riesgo de la Calidad del Agua para consumo humano).
+          Fuente: {IRCA_RURAL.fuente}.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+/* ── SALUD · Cómo potabilizar en casa (4 métodos, paso a paso con foto) ── */
+const ICONO_METODO = { hervir: Flame, cloro: Droplets, sodis: Sun, bioarena: Filter };
+const TONO_METODO = {
+  sky: { icon: 'text-sky-300', num: 'border-sky-500/40 bg-sky-500/15 text-sky-200' },
+  cyan: { icon: 'text-cyan-300', num: 'border-cyan-500/40 bg-cyan-500/15 text-cyan-200' },
+  amber: { icon: 'text-amber-300', num: 'border-amber-500/40 bg-amber-500/15 text-amber-200' },
+  lime: { icon: 'text-lime-300', num: 'border-lime-500/40 bg-lime-500/15 text-lime-200' },
+};
+
+/** Tarjeta de un método de potabilización: foto/ilustración + pasos + alcance. */
+function MetodoCard({ m }) {
+  const Icono = ICONO_METODO[m.icono] || Droplets;
+  const t = TONO_METODO[m.tono] || TONO_METODO.sky;
+  return (
+    <article className="rounded-2xl border border-slate-700/60 bg-slate-900/60 overflow-hidden flex flex-col" data-testid={`metodo-${m.id}`}>
+      <div className="relative aspect-[16/10] bg-slate-950">
+        {m.foto ? (
+          <FotoAgua slug={m.foto} alt={`Potabilizar el agua en casa: ${m.titulo}`} ratio="aspect-[16/10]" Fallback={Icono} />
+        ) : (
+          <CloroIlustracion />
+        )}
+        <span className="absolute top-2 left-2 z-10 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1">
+          <Icono size={15} className={t.icon} aria-hidden="true" />
+          <span className="text-[13px] font-black text-[#ffffff]">{m.titulo}</span>
+        </span>
+      </div>
+
+      <div className="p-3.5 flex flex-col gap-3 flex-1">
+        <p className="text-sm font-bold leading-snug text-slate-100">{m.gancho}</p>
+        <ol className="space-y-2">
+          {m.pasos.map((p, i) => (
+            <li key={i} className="flex gap-2.5">
+              <span aria-hidden="true" className={`shrink-0 w-5 h-5 rounded-full border grid place-items-center text-[11px] font-black ${t.num}`}>{i + 1}</span>
+              <p className="text-xs leading-snug text-slate-200">{p}</p>
+            </li>
+          ))}
+        </ol>
+        <div className="mt-auto grid gap-1.5 rounded-lg bg-slate-950/50 border border-slate-700/50 p-2.5">
+          <p className="flex items-start gap-1.5 text-[11px] leading-snug text-emerald-200">
+            <ShieldCheck size={13} aria-hidden="true" className="shrink-0 mt-0.5 text-emerald-400" />{m.quita}
+          </p>
+          <p className="flex items-start gap-1.5 text-[11px] leading-snug text-amber-200/90">
+            <TriangleAlert size={13} aria-hidden="true" className="shrink-0 mt-0.5 text-amber-400" />{m.noQuita}
+          </p>
+        </div>
+        <p className="text-[10px] leading-snug text-slate-500">Fuente: {m.fuente}</p>
+      </div>
+    </article>
+  );
+}
+
+/**
+ * MetodosPotabilizacion — la galería photo-forward del "para tomar, trátela".
+ * Conserva el data-testid `agua-dosis-potabilizacion` y las cifras que las
+ * pruebas verifican (las dosis viven en cada MetodoCard, groundeadas).
+ */
+function MetodosPotabilizacion() {
+  return (
+    <section className="rounded-2xl border border-sky-700/40 bg-slate-900/60 p-4 space-y-3" data-testid="agua-dosis-potabilizacion">
+      <p className="flex items-center gap-2 text-sm font-black text-sky-300 uppercase tracking-wide">
+        <Milk size={16} aria-hidden="true" /> Para tomar: trátela siempre
+      </p>
+      <p className="text-xs leading-snug text-slate-200">
+        Cuatro maneras caseras, de la más segura a la más sencilla. Antes de cualquiera,
+        deje asentar el agua turbia y pásela por una tela limpia: el cloro y el sol pierden
+        fuerza en agua revuelta.
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {METODOS_POTABILIZACION.map((m) => <MetodoCard key={m.id} m={m} />)}
+      </div>
+      <p className="text-[10px] leading-snug text-slate-500">
+        Dosis groundeadas: EPA (cloro), OMS/EPA (hervido), EAWAG-SANDEC/Banco Mundial (SODIS),
+        CAWST/OMS (bioarena). Si huele a químico o viene de potrero fumigado, ni hervida —
+        consígala de otra fuente.
+      </p>
+    </section>
+  );
+}
+
+/** Créditos de las fotos — cumplimiento de licencia abierta (patrón Suelo). */
+function CreditosFotos() {
+  const [abierto, setAbierto] = useState(false);
+  return (
+    <div className="rounded-xl border border-slate-700/60 bg-slate-900/50 p-3" data-testid="agua-creditos-fotos">
+      <button
+        type="button"
+        onClick={() => setAbierto((v) => !v)}
+        aria-expanded={abierto}
+        className="w-full flex items-center gap-2 text-left"
+      >
+        <Camera size={15} className="text-slate-400 shrink-0" aria-hidden="true" />
+        <span className="flex-1 text-xs font-bold text-slate-300">Créditos de las fotos (licencia abierta)</span>
+        <ChevronRight size={16} className={`text-slate-500 transition-transform ${abierto ? 'rotate-90' : ''}`} aria-hidden="true" />
+      </button>
+      {abierto && (
+        <ul className="mt-2.5 pt-2.5 border-t border-slate-700/60 flex flex-col gap-1.5">
+          {CREDITOS_FOTOS_AGUA.map((cr) => (
+            <li key={cr.slug} className="text-[11px] leading-snug text-slate-400">
+              <a
+                href={cr.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-slate-200 hover:text-white underline decoration-slate-600 underline-offset-2 inline-flex items-center gap-0.5"
+              >
+                {cr.slug}<ExternalLink size={10} className="inline shrink-0" aria-hidden="true" />
+              </a>
+              <span className="text-slate-500"> — {cr.autor} · {cr.lic} · Wikimedia Commons</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 /* ── PILAR 3 · Cuidar el agua ─────────────────────────────────────────── */
 function PilarCuidar() {
   // Fase ENSO viva desde el servicio que Chagra ya tiene (no se re-implementa
@@ -593,6 +846,9 @@ function PilarCuidar() {
 
   return (
     <section className="agua-seccion space-y-4" data-testid="pilar-cuidar">
+      {/* SALUD · el gancho: ¿mi agua es segura? (foto real + IRCA + señales) */}
+      <MiAguaSegura />
+
       <p className="text-sm leading-relaxed text-slate-200">
         El agua de la finca son dos cuidados en uno: que la que entra a la casa no
         enferme a nadie, y que el nacimiento que la da no se quede solo.
@@ -610,64 +866,24 @@ function PilarCuidar() {
         ))}
       </div>
 
-      {/* Potabilidad — dosis groundeadas (EPA / OMS / EAWAG) */}
-      <div className="rounded-2xl border border-sky-700/40 bg-slate-900/60 p-4 space-y-2">
-        <p className="flex items-center gap-2 text-sm font-black text-sky-300 uppercase tracking-wide">
-          <Milk size={16} aria-hidden="true" /> Para tomar: trátela siempre
-        </p>
-        <p className="text-xs leading-snug text-slate-200">
-          Deje asentar el agua turbia y pásela por tela limpia (el cloro y el sol pierden
-          fuerza en agua turbia). Luego, elija una:
-        </p>
-        <ul className="space-y-1.5" data-testid="agua-dosis-potabilizacion">
-          <li className="text-xs leading-snug text-slate-200 flex gap-2">
-            <span aria-hidden="true" className="text-sky-400 font-bold">•</span>
-            <span>
-              <strong className="text-sky-200">Hervir:</strong> {DOSIS_POTABILIZACION.hervorMinutos} minuto
-              a nivel del mar, {DOSIS_POTABILIZACION.hervorMinutosSobre1000m} minutos por encima de los
-              1.000 metros (en alto el agua hierve más frío).
-            </span>
-          </li>
-          <li className="text-xs leading-snug text-slate-200 flex gap-2">
-            <span aria-hidden="true" className="text-sky-400 font-bold">•</span>
-            <span>
-              <strong className="text-sky-200">Cloro:</strong> {DOSIS_POTABILIZACION.cloroGotasPorLitro} gotas
-              de cloro doméstico (al {DOSIS_POTABILIZACION.cloroConcentracionPct} %) por litro, revuelva y
-              espere {DOSIS_POTABILIZACION.cloroEsperaMin} minutos. Doble la dosis si está turbia, con color o muy fría.
-            </span>
-          </li>
-          <li className="text-xs leading-snug text-slate-200 flex gap-2">
-            <span aria-hidden="true" className="text-sky-400 font-bold">•</span>
-            <span>
-              <strong className="text-sky-200">Sol (SODIS):</strong> botella plástica transparente de máximo 2 litros,
-              {' '}{DOSIS_POTABILIZACION.sodisHorasSol} horas al sol despejado ({DOSIS_POTABILIZACION.sodisDiasSiNublado} días
-              si está muy nublado). Solo si el agua está clara (turbiedad baja).
-            </span>
-          </li>
-        </ul>
-        <p className="text-[10px] leading-snug text-slate-500">
-          Fuentes: EPA (cloro), OMS/EPA (hervido), EAWAG-Banco Mundial (SODIS).
-          Si huele a químico o viene de potrero fumigado, ni hervida — consígala de otra fuente.
-        </p>
-        <div className="rounded-xl border border-rose-700/40 bg-rose-950/30 p-3">
-          <p className="flex items-center gap-2 text-xs font-black text-rose-300 uppercase tracking-wide mb-1.5">
-            <TriangleAlert size={14} aria-hidden="true" /> No la use si ve esto
-          </p>
-          <ul className="space-y-1">
-            {SENALES_ALERTA_AGUA.map((s) => (
-              <li key={s} className="text-xs leading-snug text-slate-200 flex gap-1.5">
-                <span aria-hidden="true" className="text-rose-400">•</span>{s}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+      {/* SALUD · Cómo potabilizar en casa — galería photo-forward, 4 métodos */}
+      <MetodosPotabilizacion />
 
       {/* RIESGOS DE CONTAMINACIÓN + SALUD (qué contamina, qué enferma, distancias) */}
       <RiesgosSalud />
 
-      {/* CASO INSIGNIA */}
-      <div className="rounded-2xl border border-emerald-700/50 bg-emerald-950/30 p-4 space-y-3" data-testid="caso-nacimiento">
+      {/* CASO INSIGNIA · proteger la fuente (foto real de la franja de monte) */}
+      <div className="rounded-2xl border border-emerald-700/50 bg-emerald-950/30 overflow-hidden" data-testid="caso-nacimiento">
+        <FotoAgua slug="nacimiento" alt="Franja de monte a lado y lado de una quebrada que la protege: la ronda hídrica que cuida la fuente" ratio="aspect-[16/9]" Fallback={Sprout}>
+          <div className="absolute inset-0 flex flex-col justify-end p-4">
+            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-emerald-200">
+              <Sprout size={14} aria-hidden="true" /> Proteger la fuente
+            </p>
+            <h3 className="text-xl font-black text-[#ffffff] leading-tight drop-shadow">El monte de la orilla es lo que guarda el agua</h3>
+          </div>
+        </FotoAgua>
+
+        <div className="p-4 space-y-3">
         <p className="flex items-center gap-2 text-base font-black text-emerald-200 leading-tight">
           <Droplets size={18} aria-hidden="true" className="shrink-0 text-cyan-300" />
           «{CASO_NACIMIENTO.titulo}»
@@ -735,6 +951,7 @@ function PilarCuidar() {
             Decreto 1449 de 1977, Art. 3 (hoy en el Decreto 1076 de 2015).
           </p>
         </div>
+        </div>
       </div>
     </section>
   );
@@ -786,6 +1003,9 @@ export default function AguaScreen({ onBack, onNavigate = undefined }) {
         {pilar === 'lluvia' && <PilarLluvia />}
         {pilar === 'riego' && <PilarRiego />}
         {pilar === 'cuidar' && <PilarCuidar />}
+
+        {/* Créditos de todas las fotos del módulo (cumplimiento licencia abierta) */}
+        <CreditosFotos />
 
         {/* Puente al agente para lo que el módulo no alcanza */}
         {typeof onNavigate === 'function' && (

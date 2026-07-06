@@ -1,0 +1,55 @@
+{
+  "_note": "Fotos del modulo AGUA (salud) — Wikimedia Commons, licencia abierta (CC0/PD/CC BY/CC BY-SA). Redimensionadas ~640px por Special:FilePath. Atribucion embebida en AguaScreen (Creditos de las fotos) y aqui para auditoria de licencias. El metodo de cloracion usa una ilustracion SVG propia (no foto de marca).",
+  "lluvia": {
+    "file": "File:Rainwater harvesting system (3441562258).jpg",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0",
+    "artist": "SuSanA Secretariat",
+    "source": "https://commons.wikimedia.org/wiki/File:Rainwater_harvesting_system_(3441562258).jpg",
+    "bytes": 274238,
+    "term": "rainwater harvesting tank gutter"
+  },
+  "turbia": {
+    "file": "File:Muddy water, Belfast - geograph.org.uk - 953830.jpg",
+    "license": "CC BY-SA 2.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "artist": "Albert Bridge",
+    "source": "https://commons.wikimedia.org/wiki/File:Muddy_water,_Belfast_-_geograph.org.uk_-_953830.jpg",
+    "bytes": 50502
+  },
+  "hervir": {
+    "file": "File:Community Health Education - Boiling water so it is safe to use.jpg",
+    "license": "CC0",
+    "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "artist": "Debske",
+    "source": "https://commons.wikimedia.org/wiki/File:Community_Health_Education_-_Boiling_water_so_it_is_safe_to_use.jpg",
+    "bytes": 189958,
+    "term": "boiling water pot fire"
+  },
+  "sodis": {
+    "file": "File:Indonesia-sodis-gross.jpg",
+    "license": "CC BY 3.0",
+    "license_url": "https://creativecommons.org/licenses/by/3.0",
+    "artist": "SODIS Eawag",
+    "source": "https://commons.wikimedia.org/wiki/File:Indonesia-sodis-gross.jpg",
+    "bytes": 251223,
+    "term": "SODIS solar water disinfection bottles"
+  },
+  "bioarena": {
+    "file": "File:Biosand Filters in Guatemala.JPG",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Nora.jeanine530",
+    "source": "https://commons.wikimedia.org/wiki/File:Biosand_Filters_in_Guatemala.JPG",
+    "bytes": 101986
+  },
+  "nacimiento": {
+    "file": "File:Riparian buffer augusta county va.jpg",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "USDA",
+    "source": "https://commons.wikimedia.org/wiki/File:Riparian_buffer_augusta_county_va.jpg",
+    "bytes": 240306,
+    "term": "riparian forest stream"
+  }
+}
