@@ -11,6 +11,7 @@
  * mecánica exacta del velo: si alguien sube los topes nocturnos o re-vela
  * biopunk de noche, falla con el par y el ratio medidos.
  */
+// @ts-nocheck -- test de Node (vitest) que parsea el CSS real con built-ins node:* (fs/url/path); el jsconfig apunta al navegador y no tipa Node, irreducible aquí.
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
