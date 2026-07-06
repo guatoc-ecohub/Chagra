@@ -93,6 +93,8 @@ const AnimalesScreen = lazy(() => import('./components/AnimalesScreen'));
 const GallinasScreen = lazy(() => import('./components/GallinasScreen'));
 const AbejasScreen = lazy(() => import('./components/AbejasScreen'));
 const VacasScreen = lazy(() => import('./components/VacasScreen'));
+const ConejosScreen = lazy(() => import('./components/ConejosScreen'));
+const CaprinosScreen = lazy(() => import('./components/CaprinosScreen'));
 const EstiercolScreen = lazy(() => import('./components/EstiercolScreen'));
 const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
 const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
@@ -236,6 +238,11 @@ const HASH_VIEW_ROUTES = {
   'animales-gallinas': 'animales_gallinas',
   'animales-abejas': 'animales_abejas',
   'animales-vacas': 'animales_vacas',
+  'animales-conejos': 'animales_conejos',
+  conejos: 'animales_conejos',
+  'animales-caprinos': 'animales_caprinos',
+  'cabras-ovejas': 'animales_caprinos',
+  cabras: 'animales_caprinos',
   estiercol: 'estiercol',
   'del-corral-al-abono': 'estiercol',
   abono: 'estiercol',
@@ -292,7 +299,7 @@ const HASH_VIEW_ROUTES = {
 const MODULE_VIEWS = new Set([
   'activos', 'mapa', 'javier', 'bodega', 'task_log', 'historial', 'bitacora',
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
-  'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol',
+  'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'animales_conejos', 'animales_caprinos', 'estiercol',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
@@ -1254,6 +1261,26 @@ export default function App() {
               {/* onNavigate: VacasScreen enlaza al proceso de seguimiento de
                   silvopastoreo existente ('seguimiento_silvopastoreo'). */}
               <VacasScreen onBack={() => navigate('animales')} onHome={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'animales_conejos':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Conejos">
+              {/* onNavigate: ConejosScreen salta al mundo del abono ('estiercol')
+                  para cerrar el ciclo con la conejaza. */}
+              <ConejosScreen onBack={() => navigate('animales')} onHome={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'animales_caprinos':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Cabras y ovejas">
+              {/* onNavigate: CaprinosScreen salta al mundo del abono ('estiercol')
+                  para cerrar el ciclo con la majada. */}
+              <CaprinosScreen onBack={() => navigate('animales')} onHome={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
