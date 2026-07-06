@@ -1,9 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import DirectorioEspeciesScreen from './DirectorioEspeciesScreen.jsx';
 
-// El servicio de datos se mockea: estos tests verifican SUPERFICIE/CONTRASTE de
-// la pantalla (fondo oscuro opaco en ambas vistas), no la orquestación de datos.
+// El servicio de ESPECIES se mockea: estos tests verifican SUPERFICIE/CONTRASTE
+// de la pantalla (fondo oscuro opaco en ambas vistas), no la orquestación de
+// datos de especies. El servicio de PLAGAS (directorioPlagas) NO se mockea: se
+// alimenta del catálogo de sanidad real (sanidadData) — así probamos que la
+// pestaña de plagas queda cableada de verdad, no huérfana.
 vi.mock('../../services/directorioEspecies.js', () => ({
   searchSpecies: vi.fn(),
   buildSpeciesFicha: vi.fn(),
@@ -61,5 +64,40 @@ describe('DirectorioEspeciesScreen — superficie / contraste', () => {
     render(<DirectorioEspeciesScreen />);
     expect(screen.getByText('Directorio de especies')).toBeInTheDocument();
     expect(screen.getByLabelText('Buscar especie por nombre')).toBeInTheDocument();
+  });
+});
+
+describe('DirectorioEspeciesScreen — pestaña de plagas (cableado real)', () => {
+  it('la pestaña Plagas muestra la cuadrícula del catálogo de sanidad', () => {
+    render(<DirectorioEspeciesScreen initialMode="plagas" />);
+    expect(screen.getByText('Directorio de plagas')).toBeInTheDocument();
+    // La cuadrícula se puebla con datos REALES de sanidadData (no mockeados).
+    expect(screen.getByTestId('directorio-plagas-results')).toBeInTheDocument();
+    expect(screen.getByTestId('directorio-plaga-hypothenemus_hampei')).toBeInTheDocument();
+  });
+
+  it('se puede alternar de Especies a Plagas con la pestaña', () => {
+    render(<DirectorioEspeciesScreen />);
+    // Arranca en especies.
+    expect(screen.getByLabelText('Buscar especie por nombre')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('directorio-tab-plagas'));
+    expect(screen.getByLabelText('Buscar plaga o enfermedad por nombre')).toBeInTheDocument();
+  });
+
+  it('al tocar una plaga abre su ficha grounded (no queda huérfana)', async () => {
+    render(<DirectorioEspeciesScreen initialMode="plagas" />);
+    fireEvent.click(screen.getByTestId('directorio-plaga-hypothenemus_hampei'));
+    // La ficha se construye desde el catálogo de sanidad (offline degrada solo).
+    await waitFor(() => expect(screen.getByTestId('plaga-ficha')).toBeInTheDocument());
+    // El binomio aparece en el header y en el cuerpo de la ficha.
+    expect(screen.getAllByText('Hypothenemus hampei').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('la búsqueda de plagas filtra por término folk', () => {
+    render(<DirectorioEspeciesScreen initialMode="plagas" />);
+    fireEvent.change(screen.getByLabelText('Buscar plaga o enfermedad por nombre'), { target: { value: 'roya' } });
+    expect(screen.getByTestId('directorio-plaga-hemileia_vastatrix')).toBeInTheDocument();
+    // Las que no casan desaparecen de la cuadrícula.
+    expect(screen.queryByTestId('directorio-plaga-mosca_blanca')).not.toBeInTheDocument();
   });
 });

@@ -257,6 +257,10 @@ const HASH_VIEW_ROUTES = {
   directorio: 'directorio',
   'directorio-especies': 'directorio',
   especies: 'directorio',
+  plagas: 'plagas',
+  'directorio-plagas': 'plagas',
+  plaga: 'plagas',
+  enfermedades: 'plagas',
   'usage-stats': 'usage_stats',
   mercado: 'mercado',
   mercados: 'mercado',
@@ -295,7 +299,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'plagas', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
   'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
@@ -1599,6 +1603,23 @@ export default function App() {
               <DirectorioEspeciesScreen
                 onBack={() => navigate('dashboard')}
                 initialQuery={currentViewData?.query || ''}
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'plagas':
+        // Directorio de plagas: el ESPEJO del de especies. Cuadrícula de
+        // plagas/enfermedades + ficha grounded por plaga (foto del daño, a qué
+        // le pega, cómo reconocerla, umbral, manejo agroecológico sin veneno),
+        // offline-first desde el catálogo de sanidad + grafo-relations.json.
+        // initialPlagaId vía currentViewData.plagaId (deep-link desde Sanidad).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Directorio de plagas">
+              <DirectorioEspeciesScreen
+                onBack={() => navigate('dashboard')}
+                initialMode="plagas"
+                initialPlagaId={currentViewData?.plagaId || ''}
               />
             </ErrorFallback>
           </ErrorBoundary>

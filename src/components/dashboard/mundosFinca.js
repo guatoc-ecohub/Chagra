@@ -97,6 +97,7 @@ export const MUNDOS_FINCA = [
         tinte: ['#b0532f', '#f6ded1'],
         entradas: [
             { view: 'sanidad_sintoma', label: 'Mi mata está enferma', desc: 'Diga qué le ve ("gota", "polvillo", "amarilla") y sepa qué es y cómo manejarla sin veneno', emoji: '🩺' },
+            { view: 'plagas', label: 'Directorio de plagas', desc: 'Reconozca el bicho o la enfermedad por foto: a qué le pega, cómo se ve y su manejo sin veneno', emoji: '🐛' },
             { view: 'biopreparados', label: 'Biopreparados', desc: 'Recetas caseras paso a paso para proteger la mata', emoji: '🧪', data: { back: 'dashboard' } },
             { view: 'reportar_invasora', label: 'Reportar una plaga', desc: 'Vio algo raro en una mata: repórtelo con foto', emoji: '🔍' },
             { view: 'casos', label: 'Casos reales', desc: 'Problemas de otras fincas y cómo los resolvieron', emoji: '📋' },

@@ -116,11 +116,13 @@ export default function SanidadSintomaScreen({ onBack, onHome, onNavigate }) {
                     <SanidadResultado
                         sintoma={sintoma}
                         causa={causa}
+                        causaId={nodo.causa}
                         camino={camino}
                         onReiniciar={reiniciar}
                         onAgente={() => onNavigate?.('agente')}
                         onBiopreparados={() => onNavigate?.('biopreparados', { back: 'dashboard' })}
                         onDefensores={() => onNavigate?.('defensores')}
+                        onFicha={() => onNavigate?.('plagas', { plagaId: nodo.causa })}
                     />
                 )}
             </div>
@@ -285,7 +287,7 @@ function SanidadPregunta({ sintoma, pregunta, camino, onElegir, onReiniciar }) {
 }
 
 /* ── Pantalla 3: resultado (causa + 3 pilares de manejo) ───────────────────── */
-function SanidadResultado({ sintoma, causa, camino, onReiniciar, onAgente, onBiopreparados, onDefensores }) {
+function SanidadResultado({ sintoma, causa, causaId, camino, onReiniciar, onAgente, onBiopreparados, onDefensores, onFicha }) {
     const conf = CONFIANZA_META[causa.confianza] || CONFIANZA_META.media;
     const tipo = TIPO_META[causa.tipo] || { label: causa.tipo, emoji: '•' };
     const hayBio = !!causa.manejo.biologico;
@@ -381,6 +383,11 @@ function SanidadResultado({ sintoma, causa, camino, onReiniciar, onAgente, onBio
 
             {/* Puentes a las herramientas hermanas del mundo */}
             <div className="san-acciones">
+                {onFicha && causaId && causa.tipo !== 'deficiencia' && (
+                    <button type="button" className="san-accion" onClick={onFicha} data-testid="san-ver-ficha">
+                        {TIPO_META[causa.tipo]?.emoji || '🐛'} Ver la ficha completa
+                    </button>
+                )}
                 {causa.manejo.biopreparado && (
                     <button type="button" className="san-accion" onClick={onBiopreparados}>
                         🧪 Ver el biopreparado paso a paso
