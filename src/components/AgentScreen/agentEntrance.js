@@ -258,17 +258,25 @@ export const AGENT_V3_CSS = `
     animation: v3-pop 0.22s cubic-bezier(0.22, 0.61, 0.36, 1) both;
   }
   .v3-modo-tag-txt {
-    min-width: 0; font-size: 12.5px; font-weight: 700; letter-spacing: 0.1px;
+    min-width: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.1px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  /* Salida rápida del modo activo (un toque, sin reabrir la mochila). */
+  /* Salida rápida del modo activo (un toque, sin reabrir la mochila).
+     30px visuales pero hit-area de 44px vía ::after (patrón .tap-target de
+     index.css) — dedos de campo. */
   .v3-modo-clear {
+    position: relative;
     flex: none; width: 30px; height: 30px; border-radius: 50%;
     display: inline-flex; align-items: center; justify-content: center;
     background: rgb(var(--c-surface-raised, 30 41 59) / 0.9);
     border: 1px solid rgb(var(--c-surface-border, 100 116 139) / 0.55);
     color: rgb(var(--c-slate-400, 148 163 184)); cursor: pointer;
     transition: color 0.18s ease, border-color 0.18s ease, transform 0.16s ease;
+  }
+  .v3-modo-clear::after {
+    content: ''; position: absolute; left: 50%; top: 50%;
+    width: max(100%, 44px); height: max(100%, 44px);
+    transform: translate(-50%, -50%);
   }
   .v3-modo-clear:hover { color: rgb(var(--c-slate-100, 241 245 249)); }
   .v3-modo-clear:active { transform: scale(0.9); }
@@ -323,7 +331,7 @@ export const AGENT_V3_CSS = `
   }
   .v3-mochila-titwrap p {
     font-family: 'Nunito', system-ui, sans-serif;
-    font-size: 12.5px; line-height: 1.35; margin-top: 2px;
+    font-size: 13.5px; line-height: 1.35; margin-top: 2px;
     color: rgb(var(--c-slate-400, 148 163 184));
   }
   .v3-mochila-close {

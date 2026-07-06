@@ -365,13 +365,16 @@
     box-shadow: none !important;
   }
 
+  /* Focus teclado GLOBAL (a11y): anillo verde + offset que respira con el TEMA
+   * (antes ring-offset-slate-950 fijo → halo navy pesado en los temas claros;
+   * con la superficie del tema el anillo se lee como anillo en claro y oscuro). */
   button,
   [role="button"],
   a,
   input,
   select,
   textarea {
-    @apply focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 outline-none;
+    @apply focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--c-surface))] outline-none;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -379,6 +382,7 @@
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
     }
   }
 }

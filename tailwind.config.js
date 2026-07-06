@@ -6,7 +6,10 @@ export default {
     theme: {
         extend: {
             fontSize: {
-                '2xs': ['0.6875rem', { lineHeight: '1rem' }],
+                // A11y legibilidad al sol (2026-07): 11px → 12px. El token se usa
+                // ~200 veces (badges/metadatos); 12px es el piso legible para el
+                // usuario campesino mayor sin romper layouts (1px de delta).
+                '2xs': ['0.75rem', { lineHeight: '1.05rem' }],
             },
             colors: {
                 // -------------------------------------------------------------
