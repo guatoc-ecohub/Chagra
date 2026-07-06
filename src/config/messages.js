@@ -222,7 +222,7 @@ const messages = {
     estadoCargando: 'Cargando…',
     estadoCargandoModelo: 'Cargando modelo…',
     estadoCargandoVoz: 'Cargando tu voz…',
-    estadoPreparando: 'Preparando el oído de Chagra (solo la primera vez)…',
+    estadoPreparando: 'Preparando el oído de Chagra por primera vez… (unos segundos; después queda listo al instante)',
     estadoEscuchando: 'Escuchando «hola chagra»',
     estadoError: 'Hubo un problema',
     grabandoHableAhora: 'Grabando… hable ahora',

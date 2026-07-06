@@ -253,7 +253,12 @@ export async function prepareRecognizer({ onProgress } = {}) {
       fetchJson(PRETRAINED_METADATA_URL).catch(() => null),
     ]);
     transfer.loadExamples(examplesBuf);
-    await transfer.train({ epochs: metadata?.epochs || 40 });
+    // Épocas: 20 (antes 40). El modelo base sintético (Kokoro TTS) satura la
+    // accuracy held-out en ~20 épocas; 40 duplicaba el tiempo de entreno
+    // on-device en WASM (~24s → ~12s) sin ganar precisión — y ese tiempo es
+    // el "Cargando…" que el operador veía como colgado en la 1ra activación
+    // (ver diag 2026-07-06: el flujo completo NO cuelga, solo era lento).
+    await transfer.train({ epochs: metadata?.epochs || 20 });
     // Persiste para que la próxima activación sea instantánea (sin red).
     await transfer.save().catch(() => { /* IndexedDB llena/no disponible: degradar a re-entrenar cada vez */ });
     source = 'ready-fresh';
