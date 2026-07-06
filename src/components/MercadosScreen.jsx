@@ -6,9 +6,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Store, Plus, Search, MapPin, Phone, Trash2, ArrowLeft, Tag, Info,
-  PackageOpen, Sprout, AlertCircle, CheckCircle2,
+  Sprout, AlertCircle, CheckCircle2,
 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
+import EmptyStateCampo from './common/EmptyStateCampo.jsx';
+import ErrorStateCampo from './common/ErrorStateCampo.jsx';
+import SkeletonCampo from './common/SkeletonCampo.jsx';
 import PhotoCaptureField from './PhotoCaptureField';
 import { blobToDataUrl } from '../utils/imageProcessor';
 import { marketplaceOfertas } from '../db/marketplaceOfertas';
@@ -55,6 +58,7 @@ export default function MercadosScreen({ onBack, onNavigate: _onNavigate }) {
   const [tab, setTab] = useState('explorar'); // 'explorar' | 'publicar'
   const [publicadas, setPublicadas] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [errorCarga, setErrorCarga] = useState(false);
   const [mostrarEjemplos, setMostrarEjemplos] = useState(true);
   const [filtroCat, setFiltroCat] = useState('');
   const [filtroTexto, setFiltroTexto] = useState('');
@@ -65,9 +69,13 @@ export default function MercadosScreen({ onBack, onNavigate: _onNavigate }) {
     try {
       const lista = await marketplaceOfertas.getAll();
       setPublicadas(lista);
+      setErrorCarga(false);
     } catch (e) {
+      // Un fallo de lectura NO debe verse igual que un mercado vacío: se
+      // marca para que ExplorarPanel muestre el estado de error con reintento.
       console.warn('[Mercados] no se pudieron leer las ofertas:', e?.message);
       setPublicadas([]);
+      setErrorCarga(true);
     } finally {
       setCargando(false);
     }
@@ -151,6 +159,8 @@ export default function MercadosScreen({ onBack, onNavigate: _onNavigate }) {
         {tab === 'explorar' && (
           <ExplorarPanel
             cargando={cargando}
+            errorCarga={errorCarga}
+            onReintentar={recargar}
             ofertas={visibles}
             filtroCat={filtroCat}
             setFiltroCat={setFiltroCat}
@@ -182,7 +192,7 @@ export default function MercadosScreen({ onBack, onNavigate: _onNavigate }) {
 /* ════════════════════════ EXPLORAR ════════════════════════ */
 
 function ExplorarPanel({
-  cargando, ofertas, filtroCat, setFiltroCat, filtroTexto, setFiltroTexto,
+  cargando, errorCarga, onReintentar, ofertas, filtroCat, setFiltroCat, filtroTexto, setFiltroTexto,
   mostrarEjemplos, setMostrarEjemplos, onContactar, onPublicarCta,
 }) {
   return (
@@ -226,29 +236,59 @@ function ExplorarPanel({
       </label>
 
       {cargando ? (
-        <p className="text-center text-slate-500 py-10 text-sm">Cargando ofertas…</p>
-      ) : ofertas.length === 0 ? (
-        <div className="text-center py-10">
-          <PackageOpen className="mx-auto text-slate-600 mb-3" size={40} />
-          <p className="text-slate-400 text-sm mb-4">
-            No hay ofertas que coincidan. Sé el primero en publicar lo que vende tu finca.
-          </p>
-          <button
-            type="button"
-            onClick={onPublicarCta}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm"
-          >
-            <Plus size={16} /> Publicar mi producto
-          </button>
+        <SkeletonCampo variant="lista" count={3} label="Cargando ofertas…" />
+      ) : errorCarga && ofertas.length === 0 ? (
+        <div className="py-10" data-testid="mercado-error">
+          <ErrorStateCampo
+            title="No pudimos abrir el mercado."
+            hint="Sus ofertas guardadas están a salvo en este dispositivo. Espere un momento y vuelva a intentar."
+            onRetry={onReintentar}
+          />
         </div>
       ) : (
-        <ul className="space-y-3">
-          {ofertas.map((o) => (
-            <li key={o.id}>
-              <OfertaCard oferta={o} onContactar={onContactar} />
-            </li>
-          ))}
-        </ul>
+        <>
+          {/* Si falló la lectura de las ofertas propias pero los ejemplos sí se
+              ven, se avisa sin tapar la lista. */}
+          {errorCarga && (
+            <div className="flex items-center justify-between gap-3 mb-3 px-3 py-2 rounded-lg bg-amber-900/20 border border-amber-800/40">
+              <p className="text-xs text-amber-200">
+                No pudimos leer sus ofertas guardadas. Las de ejemplo sí se ven.
+              </p>
+              <button
+                type="button"
+                onClick={onReintentar}
+                className="text-xs font-bold text-amber-300 underline shrink-0"
+              >
+                Reintentar
+              </button>
+            </div>
+          )}
+          {ofertas.length === 0 ? (
+            <div className="py-10" data-testid="mercado-empty">
+              <EmptyStateCampo
+                variant="busqueda"
+                title="No hay ofertas que coincidan todavía."
+                hint="Sea el primero: publique lo que vende su finca y aparecerá aquí para los vecinos."
+              >
+                <button
+                  type="button"
+                  onClick={onPublicarCta}
+                  className="mt-4 inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm"
+                >
+                  <Plus size={16} /> Publicar mi producto
+                </button>
+              </EmptyStateCampo>
+            </div>
+          ) : (
+            <ul className="space-y-3">
+              {ofertas.map((o) => (
+                <li key={o.id}>
+                  <OfertaCard oferta={o} onContactar={onContactar} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
       )}
     </div>
   );

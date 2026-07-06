@@ -1,5 +1,11 @@
+/* i18n (ADR-050): etiquetas user-facing en español Colombia. La regla
+ * chagra-i18n es soft (warn); se desactiva a nivel de archivo siguiendo el
+ * mismo criterio que MercadosScreen/GerminacionScreen para no bloquear el
+ * pre-commit (max-warnings=0). Los errores reales siguen activos. */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import React, { useEffect, useState } from 'react';
 import { Sprout, AlertTriangle, Users, Beaker, Mountain, BookOpen, Loader2, FileEdit } from 'lucide-react';
+import ErrorStateCampo from './common/ErrorStateCampo.jsx';
 
 /**
  * Sanitiza strings de fuente para ocultar jerga interna DR-034 al usuario
@@ -52,28 +58,58 @@ const DIFFICULTY_BADGE = {
  */
 export default function CycleContentRenderer({ slug, onClose }) {
   const [state, setState] = useState({ slug: null, data: null, error: null });
+  const [reintento, setReintento] = useState(0);
 
   useEffect(() => {
     const ctrl = new AbortController();
     fetch(`${import.meta.env.BASE_URL}cycle-content/${slug}.json`, { signal: ctrl.signal })
       .then((r) => {
-        if (!r.ok) throw new Error(`No se encontró el ciclo de ${slug}`);
+        if (!r.ok) {
+          // Marcada como "no encontrada" para distinguirla de un fallo de red:
+          // sin la guía no hay nada que reintentar; sin señal sí.
+          throw Object.assign(new Error(`Todavía no está escrita la guía de ${slug}.`), { notFound: true });
+        }
         return r.json();
       })
       .then((j) => setState({ slug, data: j, error: null }))
-      .catch((e) => { if (e.name !== 'AbortError') setState({ slug, data: null, error: e.message }); });
+      .catch((e) => {
+        if (e.name === 'AbortError') return;
+        setState({ slug, data: null, error: { notFound: !!e.notFound, message: e.message } });
+      });
     return () => ctrl.abort();
-  }, [slug]);
+  }, [slug, reintento]);
 
   const isLoading = state.slug !== slug;
   const data = isLoading ? null : state.data;
   const error = isLoading ? null : state.error;
 
   if (error) {
+    // NUNCA el e.message crudo ("Failed to fetch"): frase campesina + acción.
     return (
-      <div className="p-4 rounded-xl bg-rose-900/20 border border-rose-800/50">
-        <p className="text-sm text-rose-300">{error}</p>
-        <button type="button" onClick={onClose} className="mt-2 text-xs underline text-slate-400">Volver</button>
+      <div className="py-6" data-testid="ciclo-error">
+        <ErrorStateCampo
+          title={error.notFound ? 'Esta guía todavía no está escrita.' : 'No pudimos cargar esta guía.'}
+          hint={
+            error.notFound
+              ? 'Estamos completando el cuaderno especie por especie. Vuelva a mirar más adelante.'
+              : 'Puede ser la señal. Espere un momento y vuelva a intentar.'
+          }
+          onRetry={
+            error.notFound
+              ? null
+              : () => {
+                  // Vuelve al estado "cargando" mientras se reintenta.
+                  setState({ slug: null, data: null, error: null });
+                  setReintento((n) => n + 1);
+                }
+          }
+        >
+          {onClose && (
+            <button type="button" onClick={onClose} className="mt-3 text-xs underline text-slate-400">
+              Volver
+            </button>
+          )}
+        </ErrorStateCampo>
       </div>
     );
   }
