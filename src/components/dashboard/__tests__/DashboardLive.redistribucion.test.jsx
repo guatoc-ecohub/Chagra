@@ -243,12 +243,26 @@ describe('Home — flag OFF conserva el layout legacy (prod intacto)', () => {
     const labels = within(aprender).getAllByRole('button').map(labelOf);
     expect(labels[0]).toBe('Aprender');
     expect(labels).toContain('Casos de estudio'); // copy legacy, NO "Casos reales"
-    // DESTACADO con labels legacy.
+    // DESTACADO con labels legacy + "Mi mata está enferma" (fix de huérfana
+    // 2026-07: SanidadSintomaScreen existía sin entrada visible en prod).
     const destacado = screen.getByTestId('destacado-tiles');
-    expect(within(destacado).getAllByRole('button').map(labelOf)).toEqual(['Especies', 'Calendario']);
+    expect(within(destacado).getAllByRole('button').map(labelOf))
+      .toEqual(['Mi mata está enferma', 'Especies', 'Calendario']);
     // GESTIÓN con label legacy "Insumos aplicados" (no "Abonos e insumos").
     const gestion = screen.getByTestId('gestion-tiles');
     expect(within(gestion).getAllByRole('button').map(labelOf))
       .toEqual(['Semilleros', 'Cosechar', 'Insumos aplicados', 'Mantenimiento']);
+  });
+
+  test('"Mi mata está enferma" es alcanzable desde el home de prod (ya NO huérfana)', async () => {
+    const onNavigate = vi.fn();
+    render(<DashboardLive onNavigate={onNavigate} />);
+    const destacado = await screen.findByTestId('destacado-tiles');
+    const tile = within(destacado)
+      .getAllByRole('button')
+      .find((b) => labelOf(b) === 'Mi mata está enferma');
+    expect(tile).toBeTruthy();
+    fireEvent.click(tile);
+    expect(onNavigate).toHaveBeenCalledWith('sanidad_sintoma', undefined);
   });
 });

@@ -24,10 +24,28 @@
   --san-display: 'Baloo 2', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --san-body: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
   max-width: 640px;
-  margin: 0 auto;
-  padding: 14px 14px 40px;
+  margin: 10px auto 30px;
+  padding: 16px 14px 30px 22px;
   font-family: var(--san-body);
   color: var(--san-tinta);
+  /* LA PÁGINA del cuaderno: papel de verdad bajo TODA la tinta. Sin esto la
+     tinta oscura caía directo sobre el fondo (oscuro) de la app y los títulos
+     eran ilegibles (WCAG). El papel es fijo — no depende del tema — igual que
+     las láminas: el cuaderno se lee al sol sobre cualquier tema. El margen
+     rojo del canto izquierdo es la seña de identidad de la libreta de campo
+     (la tinta empieza DESPUÉS del margen: padding-left 22px > línea en 12px). */
+  background-color: var(--san-papel);
+  background-image: linear-gradient(
+    90deg,
+    transparent 0,
+    transparent 12px,
+    color-mix(in srgb, var(--san-a) 34%, transparent) 12px,
+    color-mix(in srgb, var(--san-a) 34%, transparent) 13.5px,
+    transparent 13.5px
+  );
+  border: 1px solid rgba(38, 51, 31, 0.16);
+  border-radius: 18px;
+  box-shadow: 0 3px 16px rgba(0, 0, 0, 0.2);
 }
 
 .san-wrap b { color: var(--san-tinta); }
@@ -45,6 +63,57 @@
   place-items: center;
 }
 .san-portada .san-vineta-svg { width: 128px; height: 100%; }
+/* La lámina de esperanza es ANCHA (220×100): llena la portada de lado a lado. */
+.san-portada .san-vineta-svg--ancha { width: 100%; }
+
+/* Único movimiento de la lámina: los rayos del sol respiran, muy despacio.
+   Ambiente, no protagonismo — y apagado con reduced-motion. */
+@keyframes san-sol-respira {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.san-sol-rayos { animation: san-sol-respira 4.5s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .san-sol-rayos { animation: none; }
+}
+
+/* ── Los 3 pasos del flujo (mire → cuénteme → remedio) ────────────────────── */
+.san-pasos {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0 0 4px;
+  padding: 0;
+}
+.san-paso {
+  flex: 1 1 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--san-papel);
+  border: 1px solid rgba(38, 51, 31, 0.14);
+  border-radius: 999px;
+  padding: 6px 12px 6px 6px;
+  font-size: 12.5px;
+  line-height: 1.25;
+  color: var(--san-tinta);
+  box-shadow: 0 1px 5px rgba(38, 51, 31, 0.06);
+}
+.san-paso b { font-family: var(--san-display); font-weight: 800; }
+.san-paso-n {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--san-a);
+  color: #fff;
+  font-family: var(--san-display);
+  font-weight: 800;
+  font-size: 12.5px;
+}
 
 .san-h2 {
   font-family: var(--san-display);
@@ -456,6 +525,42 @@
 }
 .san-prevencion b { font-family: var(--san-display); font-size: 13.5px; }
 .san-prevencion p { margin: 3px 0 0; font-size: 12.8px; line-height: 1.45; }
+/* ── El cierre esperanzador ("esto tiene manejo") ─────────────────────────── */
+.san-esperanza {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  background: #eef6ee;
+  border: 1px solid #b5d8b8;
+  border-left: 4px solid #3f8f4e;
+  border-radius: 13px;
+  padding: 11px 13px;
+}
+.san-esperanza-vineta {
+  flex: 0 0 auto;
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--san-b);
+  border: 1px solid #b5d8b8;
+}
+.san-esperanza-vineta .san-vineta-svg { width: 100%; height: 100%; display: block; }
+.san-esperanza b {
+  font-family: var(--san-display);
+  font-weight: 800;
+  font-size: 14px;
+  color: #256b2c;
+  display: block;
+}
+.san-esperanza p {
+  margin: 3px 0 0;
+  font-size: 12.8px;
+  line-height: 1.45;
+  color: #2c4a2e;
+}
+
 .san-pendiente {
   margin: 12px 0 0;
   font-size: 12px;

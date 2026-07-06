@@ -69,6 +69,22 @@ describe('SanidadSintomaScreen — flujo síntoma → causa → manejo', () => {
         expect(screen.getByTestId('san-pregunta')).toHaveTextContent(/Dónde está el polvo/i);
     });
 
+    test('la portada orienta: 3 pasos reales del flujo (mire → cuénteme → remedio)', () => {
+        render(<SanidadSintomaScreen />);
+        const pasos = screen.getByRole('list', { name: /tres pasos/i });
+        expect(pasos).toHaveTextContent(/Mire/);
+        expect(pasos).toHaveTextContent(/Cuénteme/);
+        expect(pasos).toHaveTextContent(/Remedio/);
+    });
+
+    test('el resultado cierra con esperanza: "esto tiene manejo" + señal de recuperación', () => {
+        render(<SanidadSintomaScreen />);
+        fireEvent.click(screen.getByTestId('san-sintoma-broca'));
+        const esp = screen.getByTestId('san-esperanza');
+        expect(esp).toHaveTextContent(/Esto tiene manejo/i);
+        expect(esp).toHaveTextContent(/hojas nuevas/i);
+    });
+
     test('el agente queda siempre a la mano en el resultado', () => {
         const onNavigate = vi.fn();
         render(<SanidadSintomaScreen onNavigate={onNavigate} />);

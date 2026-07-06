@@ -132,8 +132,10 @@ export default function SanidadSintomaScreen({ onBack, onHome, onNavigate }) {
 function SanidadInicio({ texto, setTexto, onBuscar, sugeridos, noEncontrado, onElegir, onAgente }) {
     return (
         <div className="san-inicio">
+            {/* La lámina de esperanza: hoja enferma → camino del manejo → hoja
+                sana. La tesis de la mini-app dibujada antes de leer nada. */}
             <div className="san-portada" aria-hidden="true">
-                <SanidadSintomaVineta nombre="hojaMordida" />
+                <SanidadSintomaVineta nombre="portadaEsperanza" />
             </div>
             <h2 className="san-h2">¿Qué le pasa a su mata?</h2>
             <p className="san-lead">
@@ -141,6 +143,22 @@ function SanidadInicio({ texto, setTexto, onBuscar, sugeridos, noEncontrado, onE
                 "le salió polvillo", "se seca de la punta". Yo le ayudo a saber qué es
                 y cómo manejarlo sin veneno.
             </p>
+
+            {/* Los 3 pasos reales del flujo — para que sepa qué viene. */}
+            <ol className="san-pasos" aria-label="Cómo funciona, en tres pasos">
+                <li className="san-paso">
+                    <span className="san-paso-n" aria-hidden="true">1</span>
+                    <span><b>Mire</b> la mata con calma</span>
+                </li>
+                <li className="san-paso">
+                    <span className="san-paso-n" aria-hidden="true">2</span>
+                    <span><b>Cuénteme</b> lo que le ve</span>
+                </li>
+                <li className="san-paso">
+                    <span className="san-paso-n" aria-hidden="true">3</span>
+                    <span><b>Remedio</b> sin veneno, con fuente</span>
+                </li>
+            </ol>
 
             <form
                 className="san-buscar"
@@ -333,6 +351,21 @@ function SanidadResultado({ sintoma, causa, camino, onReiniciar, onAgente, onBio
                     <p>{causa.prevencion}</p>
                 </div>
             )}
+
+            {/* El cierre esperanzador: esto tiene manejo, la mata puede volver */}
+            <div className="san-esperanza" data-testid="san-esperanza">
+                <span className="san-esperanza-vineta" aria-hidden="true">
+                    <SanidadSintomaVineta nombre="mataSana" />
+                </span>
+                <div>
+                    <b>Esto tiene manejo</b>
+                    <p>
+                        Con estos cuidados su mata puede recuperarse. Revísela cada dos
+                        o tres días y fíjese si le salen hojas nuevas: esa es la señal
+                        de que va ganando.
+                    </p>
+                </div>
+            </div>
 
             {/* Grounded-pendiente honesto para dosis exactas */}
             {causa.dosisPendiente && (
