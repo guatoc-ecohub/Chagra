@@ -1810,7 +1810,14 @@ export default function App() {
           crítico) sin abrir la campana. Imposible de ignorar. */}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <CriticalAlertBanner onNavigate={navigate} />}
       <Suspense fallback={<LoadingFallback />}>
-        {renderView()}
+        {/* Entrada de pantalla: el swap de vista era SECO (desmonta/monta sin
+            transición). El wrapper con key remonta en cada cambio de vista y
+            dispara un fade corto (motion.css .anim-screen-enter — solo
+            opacidad, sin transform, para no des-anclar los position:fixed
+            internos). Respeta prefers-reduced-motion. */}
+        <div key={currentView} className="anim-screen-enter">
+          {renderView()}
+        </div>
       </Suspense>
       {/* FAB feedback flotante REMOVIDO 2026-05-21: el reporte de errores
           ahora vive embebido dentro de HelpUsoScreen (sección "Reportar

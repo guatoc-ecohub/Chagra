@@ -84,10 +84,14 @@
   text-align: left;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 160ms ease, box-shadow 160ms ease;
-  /* entrada escalonada de la grilla (--mf-i la fija el JSX) */
-  animation: mf-brota 420ms cubic-bezier(0.22, 0.9, 0.3, 1) both;
-  animation-delay: calc(var(--mf-i, 0) * 45ms);
+  transition:
+    transform var(--motion-dur-press, 160ms) var(--motion-ease, ease),
+    box-shadow 160ms ease;
+  /* entrada escalonada de la grilla (--mf-i la fija el JSX). Los tokens
+     vienen de motion.css (lenguaje compartido); el fallback conserva los
+     valores originales de este archivo. */
+  animation: mf-brota var(--motion-dur-enter, 420ms) var(--motion-ease-brota, cubic-bezier(0.22, 0.9, 0.3, 1)) both;
+  animation-delay: calc(var(--mf-i, 0) * var(--motion-stagger, 45ms));
 }
 .mf-card:active { transform: scale(0.985); }
 @media (hover: hover) {
