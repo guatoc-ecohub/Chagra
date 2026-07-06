@@ -193,6 +193,7 @@ const messages = {
     ingresoBitacora: 'Registrar en Bitácora',
     errorReporteCsv: 'No se pudo generar el reporte CSV.',
     errorAbastecer: 'No se pudo abastecer el insumo. Verifique el almacenamiento.',
+    errorMarcarPaso: 'No se pudo marcar el paso como hecho. Intente de nuevo en un momento.',
     errorGps: 'No se pudo iniciar la captura GPS.',
     errorPermisoNegado: 'Permiso de ubicación denegado. En iPhone: Ajustes > Safari > Ubicación.',
     errorPermisoNegadoAndroid: 'Permiso de ubicación denegado. En iPhone: Ajustes > Safari > Ubicación. En Android: toca el candado de la barra de URL.',

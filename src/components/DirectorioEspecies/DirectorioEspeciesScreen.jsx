@@ -3,6 +3,7 @@ import { ChevronLeft, Search, Sprout, Leaf, X } from 'lucide-react';
 import { searchSpecies, buildSpeciesFicha } from '../../services/directorioEspecies.js';
 import SpeciesFicha from './SpeciesFicha.jsx';
 import EmptyStateCampo from '../common/EmptyStateCampo.jsx';
+import ErrorStateCampo from '../common/ErrorStateCampo.jsx';
 import SkeletonCampo from '../common/SkeletonCampo.jsx';
 import ChagraGrowLoader from '../ChagraGrowLoader.jsx';
 import { fvhSkinClass } from '../../config/fvhSkin.js';
@@ -28,8 +29,10 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState([]);
   const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState(false); // el catálogo no cargó (≠ sin resultados)
   const [selected, setSelected] = useState(null); // ficha construida
   const [loadingFicha, setLoadingFicha] = useState(false);
+  const [fichaErrorId, setFichaErrorId] = useState(null); // id cuya ficha falló al abrir
   const [touched, setTouched] = useState(false);
   const debounceRef = useRef(null);
 
@@ -37,14 +40,19 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
     if (!q || q.trim().length < 2) {
       setResults([]);
       setSearching(false);
+      setSearchError(false);
       return;
     }
     setSearching(true);
+    setSearchError(false);
     try {
       const found = await searchSpecies(q);
       setResults(found);
     } catch (_) {
+      // Un catálogo que no cargó NO es lo mismo que "no encontramos esa mata":
+      // se marca el error para ofrecer reintento en vez del empty engañoso.
       setResults([]);
+      setSearchError(true);
     } finally {
       setSearching(false);
     }
@@ -60,12 +68,15 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
 
   const selectSpecies = useCallback(async (id) => {
     setLoadingFicha(true);
+    setFichaErrorId(null);
     try {
       const ficha = await buildSpeciesFicha(id);
       setSelected(ficha);
       if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'auto' });
     } catch (_) {
+      // Antes esto dejaba la lista muda, como si nada hubiera pasado.
       setSelected(null);
+      setFichaErrorId(id);
     } finally {
       setLoadingFicha(false);
     }
@@ -76,9 +87,16 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
     async (e) => {
       e.preventDefault();
       setTouched(true);
-      const found = await searchSpecies(query);
-      setResults(found);
-      if (found.length === 1) selectSpecies(found[0].id);
+      try {
+        const found = await searchSpecies(query);
+        setResults(found);
+        setSearchError(false);
+        if (found.length === 1) selectSpecies(found[0].id);
+      } catch (_) {
+        // Sin este catch, un fallo aquí era un rechazo sin manejar (blanco).
+        setResults([]);
+        setSearchError(true);
+      }
     },
     [query, selectSpecies],
   );
@@ -183,7 +201,32 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
           />
         )}
 
-        {!loadingFicha && !searching && touched && query.trim().length >= 2 && results.length === 0 && (
+        {/* El catálogo no cargó: reintento honesto en vez de "sin resultados". */}
+        {!loadingFicha && !searching && searchError && (
+          <div className="py-8" data-testid="directorio-error">
+            <ErrorStateCampo
+              title={<span className="jp-tinta">No pudimos abrir el catálogo.</span>}
+              hint={<span className="jp-tinta-suave">Sus datos están a salvo. Espere un momento y vuelva a intentar.</span>}
+              onRetry={() => runSearch(query)}
+            />
+          </div>
+        )}
+
+        {/* La ficha de una especie no abrió: avisar y dejar reintentar. */}
+        {!loadingFicha && !searchError && fichaErrorId && (
+          <div className="flex items-center justify-between gap-3 mb-3 px-3 py-2 rounded-lg bg-amber-900/20 border border-amber-800/40" data-testid="directorio-ficha-error">
+            <p className="jp-tinta-suave text-xs text-amber-200">No pudimos abrir esa ficha.</p>
+            <button
+              type="button"
+              onClick={() => selectSpecies(fichaErrorId)}
+              className="text-xs font-bold text-amber-300 underline shrink-0"
+            >
+              Reintentar
+            </button>
+          </div>
+        )}
+
+        {!loadingFicha && !searching && !searchError && touched && query.trim().length >= 2 && results.length === 0 && (
           <div className="py-8" data-testid="directorio-empty">
             <EmptyStateCampo
               variant="busqueda"

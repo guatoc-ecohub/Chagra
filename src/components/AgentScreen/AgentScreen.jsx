@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw, X, Home, Camera, Square, Sprout, HelpCircle } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
+import { mensajeErrorCampesino } from '../../utils/mensajeErrorCampesino';
 import { transcribe, queueForRetry } from '../../services/voiceService';
 import VoiceStatusStrip from './VoiceStatusStrip';
 import ChipsToolbar from '../ChipsToolbar';
@@ -2530,7 +2531,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         // (timeout/abort: dejamos durableRequestIdRef.current intacto en IDB como
         // 'queued'; solo soltamos la ref local en el finally.)
       } else {
-        setError(e.message || 'No pude conectarme al asistente. Intenta de nuevo.');
+        // NUNCA e.message crudo al banner ("Failed to fetch", stacktraces):
+        // mensajeErrorCampesino respeta frases ya curadas y traduce lo técnico.
+        setError(mensajeErrorCampesino(e, 'No pude con esa pregunta. Intente de nuevo, o pregunte de otra forma.'));
         // Error NO-interrupción (HTTP 5xx, sesión, etc.): marcar failed. El
         // prompt queda intacto en IDB; la cola durable NO lo reintenta (no es
         // recuperable solo con reintentar), pero NO se pierde el dato.
