@@ -42,6 +42,7 @@ export default function MundoCultivosHub({ onBack, onNavigate }) {
             desc: 'El conocimiento antes de meter la semilla',
             items: [
                 { view: 'directorio', emoji: '🌱', label: 'Qué puedo sembrar', desc: 'Especies para su clima, con qué se llevan y sus plagas' },
+                { view: 'aromaticas', emoji: '🌿', label: 'Huerta de aromáticas', desc: 'La huerta de la cocina: cilantro, cebolla larga, orégano y más — cocina y cultivo' },
                 { view: 'calendario_finca', emoji: '🗓️', label: 'Calendario de la finca', desc: 'Cuándo sembrar, abonar y cosechar, todo junto' },
                 { view: 'ciclo', emoji: '🔄', label: 'Ciclo de cultivo', desc: 'La vida de la mata etapa por etapa (fenología)' },
             ],
