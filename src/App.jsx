@@ -112,6 +112,10 @@ const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScree
 // riego con medida (ETc; Kc/ETo = slots grounded-pendiente) y cuidar el agua
 // (calidad + nacimiento, caso "se me seca el nacimiento en verano").
 const AguaScreen = lazy(() => import('./components/agua/AguaScreen'));
+// "Aromáticas y condimentarias": la huerta de la cocina campesina (8 hierbas,
+// photo-forward). Cultivo groundeado en el catálogo Chagra; cocina sin claims
+// medicinales. Vive dentro del mundo Cultivos y semillas.
+const AromaticasScreen = lazy(() => import('./components/aromaticas/AromaticasScreen'));
 // "El clima que viene": traductor campesino de los boletines IDEAM/ENSO. Lee la
 // fase ENSO en vivo (ensoService) y remite a la Mesa Técnica Agroclimática — no
 // reimplementa el motor de clima ni pronostica.
@@ -247,6 +251,10 @@ const HASH_VIEW_ROUTES = {
   suelo: 'suelo',
   agua: 'agua',
   'manejo-agua': 'agua',
+  aromaticas: 'aromaticas',
+  'aromaticas-condimentarias': 'aromaticas',
+  condimentarias: 'aromaticas',
+  'huerta-aromaticas': 'aromaticas',
   'salud-suelo': 'salud_suelo',
   'cuaderno-suelo': 'salud_suelo',
   encalado: 'salud_suelo',
@@ -295,7 +303,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'aromaticas', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
   'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
@@ -1466,6 +1474,18 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Agua de la finca">
               <AguaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'aromaticas':
+        // Mundo "Aromáticas y condimentarias" (dentro de Cultivos y semillas):
+        // la huerta de la cocina campesina, 8 hierbas photo-forward. El cultivo
+        // va groundeado en el catálogo (altitud, piso térmico, sol/agua,
+        // propagación); la cocina es campesina, sin claims medicinales.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Aromáticas y condimentarias">
+              <AromaticasScreen onBack={() => navigate('mundo_cultivos')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
