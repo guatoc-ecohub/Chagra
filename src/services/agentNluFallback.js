@@ -29,9 +29,15 @@
  * devolvió null. Si `callTool` falla, el turno sigue (igual que hoy) — pero al
  * menos lo INTENTAMOS en vez de saltarnos el grounding.
  *
- * Conservador por diseño: para una consulta agro real SIEMPRE devuelve un plan
- * (peor caso: get_species genérico). Devuelve null solo si el mensaje no es un
- * string útil (no hay nada que groundear).
+ * Conservador por diseño: para una consulta agro real con SUJETO (especie/plaga)
+ * SIEMPRE devuelve un plan (peor caso: get_species genérico). Devuelve null si el
+ * mensaje no es un string útil, O si es una pregunta GENÉRICA/conversacional sin
+ * especie/plaga clara (saludo, meta-ayuda, consejo general de suelo/huerta): en
+ * ese caso forzar `get_species` con la frase cruda misrutea a una ficha de
+ * especie que el sidecar resuelve como `found:false` y el agente deflecta con un
+ * "el catálogo no tiene esa especie" irrelevante (bug audit conversación + memoria
+ * feedback-agente-pregunta-general-misruteo-tool-especie). Sin tool → el LLM
+ * responde conversacional con el grounding ligero de resolveEntities.
  */
 
 /**
@@ -49,6 +55,32 @@ const PEST_KEYWORDS_RE =
  */
 const BIOPREP_KEYWORDS_RE =
   /\b(biopreparado[s]?|bioinsumo[s]?|caldo\s+(bordeles|sulfocalcico|de\s+ceniza)|purin(es)?|biol\b|extracto[s]?\s+vegetal|receta\s+(organica|casera)|preparado\s+casero|abono\s+organico|microorganismo[s]?\s+eficientes|jabon\s+potasico)\b/;
+
+/**
+ * SALUDO / smalltalk PURO ("hola", "buenos días", "gracias", "hey"). Solo se
+ * trata como deflección cuando el saludo ES el mensaje (mensaje corto): así
+ * "buenas, ¿cómo cuido el aguacate?" NO se deflecta por el prefijo de saludo —
+ * la longitud lo distingue de un saludo suelto. Sobre el texto normalizado.
+ */
+const GREETING_RE =
+  /^\s*(hola|holas|buenas|buenos\s+dias|buenas\s+(tardes|noches)|que\s+mas|qu?iubo|hey|hello|gracias|muchas\s+gracias|chao|listo|oki?|dale|saludos)\b/i;
+
+/**
+ * META-AYUDA / capacidades de la app y pedido de consejo SIN sujeto ("qué puedes
+ * hacer", "para qué sirves", "cómo funcionas", "qué me recomiendas"). Patrones
+ * AUTO-CONTENIDOS y específicos → seguros aun en mensajes largos (no dependen de
+ * la longitud). Sobre el texto normalizado.
+ */
+const META_QUERY_RE =
+  /\b(que|para\s+que)\s+(puedes|sabes|podes|haces|sirves|ofreces|me\s+ofreces)\b|\bpara\s+que\s+sirves\b|\bcomo\s+funciona[s]?\b|\bquien\s+eres\b|\bque\s+eres\b|\bque\s+es\s+chagra\b|\bayuda(me|rme)?\b|\bhelp\b|\bque\s+me\s+recomiend/i;
+
+/**
+ * Rama de CONSEJO GENERAL de finca/suelo sin cultivo nombrado. Necesita un verbo
+ * de manejo + un objeto GENÉRICO de finca (no un cultivo). Sobre el texto
+ * normalizado.
+ */
+const GENERIC_MANEJO_RE =
+  /\b(como|que)\s+(?:\w+\s+){0,2}(mejor\w*|cuid\w*|enriquec\w*|prepar\w*|nutr\w*|recuper\w*|arregl\w*|trabaj\w*|manej\w*|abon\w*|fertiliz\w*|empie\w*|empez\w*|arranc\w*|inici\w*|comien\w*|comenz\w*)\s+(?:mi\s+|el\s+|la\s+|un\s+|una\s+)?(suelo|tierra|finca|huerta|parcela|chagra)\b|\bque\s+le\s+(echo|pongo|hecho)\s+a\s+(la\s+tierra|mi\s+suelo|mi\s+tierra)\b|\bcomo\s+(?:se\s+)?(hago|hacer|preparo|preparar)\s+(?:un\s+|el\s+)?(?:buen\s+)?(compost|abono\s+organico|humus|lombricompost|bocashi|bocachi)\b/i;
 
 /**
  * Normaliza a minúsculas SIN tildes para el matching de keywords (replica el
@@ -115,10 +147,27 @@ export function planNluFallback(userMessage, resolvedEntities = null) {
     return { tool: 'get_biopreparados', args: { query }, source: 'fallback_keyword_biopreparado' };
   }
 
-  // (c) DEFAULT — ficha de especie con el query crudo. Grounding genérico, pero
+  // (c) DEFLECCIÓN — pregunta GENÉRICA/conversacional SIN especie/plaga clara.
+  // Corre DESPUÉS de las señales de entidad/keyword (una plaga o cultivo nombrado
+  // ya se habría capturado arriba): lo que queda aquí y matchea es smalltalk,
+  // meta-ayuda o consejo general de finca/suelo. Forzar get_species con la frase
+  // cruda misrutea a una ficha inexistente → found:false → deflección irrelevante.
+  // Devolvemos null: el caller (AgentScreen) NO invoca tool y el LLM responde
+  // conversacional con el grounding ligero de resolveEntities.
+  //
+  // El saludo PURO solo deflecta si ES el mensaje (≤4 palabras): un saludo que
+  // prefija una pregunta real ("buenas, cómo cuido el aguacate") NO se deflecta.
+  // Meta-ayuda y consejo general son auto-contenidos → deflectan sin importar largo.
+  const wordCount = norm.split(/\s+/).filter(Boolean).length;
+  const isPureGreeting = GREETING_RE.test(norm) && wordCount <= 4;
+  if (isPureGreeting || META_QUERY_RE.test(norm) || GENERIC_MANEJO_RE.test(norm)) {
+    return null;
+  }
+
+  // (d) DEFAULT — ficha de especie con el query crudo. Grounding genérico, pero
   // preferible a generativo puro: el sidecar resuelve el cultivo por nombre.
   return { tool: 'get_species', args: { query }, source: 'fallback_default_species' };
 }
 
 // Export interno para testabilidad de los regex sin reflectar la closure.
-export const __TEST__ = { PEST_KEYWORDS_RE, BIOPREP_KEYWORDS_RE, _norm };
+export const __TEST__ = { PEST_KEYWORDS_RE, BIOPREP_KEYWORDS_RE, GREETING_RE, META_QUERY_RE, GENERIC_MANEJO_RE, _norm };
