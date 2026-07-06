@@ -69,12 +69,22 @@
   animation: agua-peligro-late 1.6s ease-in-out infinite;
 }
 
+/* Fotos reales: aparición suave (solo opacity, sin reflow) al montarse. */
+@keyframes agua-foto-entra {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.agua-foto {
+  animation: agua-foto-entra 0.5s ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .agua-gota,
   .agua-hilo,
   .agua-estacion-activa,
   .agua-seccion,
-  .agua-peligro-late {
+  .agua-peligro-late,
+  .agua-foto {
     animation: none;
   }
   .agua-gota { opacity: 0.9; }

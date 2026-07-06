@@ -198,6 +198,138 @@ export const DOSIS_POTABILIZACION = {
   confianza: 'media (cloro); alta (hervido, SODIS)',
 };
 
+/**
+ * IRCA rural — Índice de Riesgo de la Calidad del Agua para consumo humano.
+ *
+ * GROUNDED (DR agua nacional §3.1; grafo chagra_kg agua↔riesgo↔salud): el
+ * 37,4 % del agua para tomar en la zona RURAL de Colombia está en riesgo ALTO
+ * o inviable sanitariamente. Es el dato que convierte "el agua puede estar
+ * mala" en "a uno de cada tres vecinos le sale mala": por eso el módulo empuja
+ * a tratar SIEMPRE el agua de tomar. Fuente: INCA (Informe Nacional de la
+ * Calidad del Agua). Confianza: media (dato oficial agregado, varía por año).
+ */
+export const IRCA_RURAL = {
+  estado: 'grounded',
+  porcentajeRiesgo: 37.4,
+  ambito: 'rural',
+  fuente: 'INCA — Informe Nacional de la Calidad del Agua (MinVivienda / INS)',
+  confianza: 'media',
+};
+
+/**
+ * Filtro de BIOARENA (biosand filter) — cuarto método casero de potabilización.
+ *
+ * GROUNDED (grafo chagra_kg agua↔salud; CAWST / OMS): tanque con capas de arena
+ * y grava por donde el agua pasa despacio; en la superficie de la arena se forma
+ * una "biocapa" viva (schmutzdecke) que atrapa y se come los microbios. Madura
+ * en 1–3 semanas de uso diario. LÍMITE SAFETY-CRITICAL: quita la mayoría de
+ * bacterias, parásitos y turbiedad, pero NO quita virus ni químicos disueltos
+ * (venenos, nitratos) — por eso el agua filtrada se TERMINA de asegurar con
+ * cloro o sol antes de tomarla. Fuente: CAWST (manual del filtro de bioarena);
+ * OMS (evaluación de tratamiento de agua en el hogar). Confianza: media.
+ */
+export const BIOARENA = {
+  estado: 'grounded',
+  biocapaSemanasMin: 1,
+  biocapaSemanasMax: 3,
+  segundaBarrera: true,
+  quita: 'la mayoría de bacterias, parásitos y la turbiedad',
+  noQuita: 'virus ni químicos disueltos (venenos, nitratos)',
+  fuente: 'CAWST (filtro de bioarena); OMS (tratamiento de agua en el hogar)',
+  confianza: 'media',
+};
+
+/**
+ * Los cuatro métodos caseros para potabilizar, en formato paso-a-paso con foto.
+ *
+ * Regla del módulo: los NÚMEROS salen de las constantes ya groundeadas
+ * (DOSIS_POTABILIZACION, BIOARENA) — aquí NO se inventa ninguna cifra, solo se
+ * teje el copy campesino alrededor. `foto` = slug del archivo en
+ * public/agua-salud/<foto>.jpg (null = ilustración SVG propia, sin foto de
+ * marca). `quita` / `noQuita` comunican honestamente el alcance y el límite de
+ * cada método (parte del guard de salud: no vender un método como si lo hiciera
+ * todo). `tono` mapea al acento visual del componente.
+ */
+export const METODOS_POTABILIZACION = [
+  {
+    id: 'hervir',
+    foto: 'hervir',
+    icono: 'hervir',
+    tono: 'sky',
+    titulo: 'Hervir',
+    gancho: 'El más completo: no le queda bicho vivo.',
+    pasos: [
+      'Si está turbia, deje asentar y pásela por una tela limpia.',
+      `Póngala a hervir a borbotón fuerte: ${DOSIS_POTABILIZACION.hervorMinutos} minuto a nivel del mar, ${DOSIS_POTABILIZACION.hervorMinutosSobre1000m} minutos por encima de los 1.000 metros (en tierra fría el agua hierve más frío).`,
+      'Tápela y déjela enfriar en el mismo recipiente limpio. Sírvala con un cucharón, sin meter la mano.',
+    ],
+    quita: 'Mata bacterias, virus y parásitos.',
+    noQuita: 'No quita venenos ni nitratos, y gasta leña.',
+    fuente: 'OMS / EPA',
+  },
+  {
+    id: 'cloro',
+    foto: null,
+    icono: 'cloro',
+    tono: 'cyan',
+    titulo: 'Cloro (lejía)',
+    gancho: 'Rápido, barato y deja el agua protegida un rato.',
+    pasos: [
+      'Deje asentar y cuele: el cloro pierde fuerza en agua turbia.',
+      `Eche ${DOSIS_POTABILIZACION.cloroGotasPorLitro} gotas de cloro doméstico —lejía SIN aroma, al ${DOSIS_POTABILIZACION.cloroConcentracionPct} %— por cada litro de agua.`,
+      `Revuelva y espere ${DOSIS_POTABILIZACION.cloroEsperaMin} minutos antes de tomar. Doble la dosis si está turbia, con color o muy fría.`,
+    ],
+    quita: 'Mata bacterias y virus, y protege el agua guardada.',
+    noQuita: 'Flojo contra el parásito Cryptosporidium; no quita químicos.',
+    fuente: 'EPA',
+  },
+  {
+    id: 'sodis',
+    foto: 'sodis',
+    icono: 'sodis',
+    tono: 'amber',
+    titulo: 'Sol (SODIS)',
+    gancho: 'Gratis: solo pide sol y botellas.',
+    pasos: [
+      'Llene botellas plásticas transparentes de máximo 2 litros con agua CLARA (si está turbia, cuélela y déjela asentar primero).',
+      'Tápelas y acuéstelas sobre el techo de zinc o una lámina, bien expuestas.',
+      `Déjelas al sol despejado ${DOSIS_POTABILIZACION.sodisHorasSol} horas seguidas (${DOSIS_POTABILIZACION.sodisDiasSiNublado} días si está muy nublado).`,
+    ],
+    quita: 'El sol (rayos UV) mata bacterias, virus y parásitos.',
+    noQuita: 'Solo sirve con agua clara; no quita químicos ni turbiedad.',
+    fuente: 'EAWAG-SANDEC / Banco Mundial',
+  },
+  {
+    id: 'bioarena',
+    foto: 'bioarena',
+    icono: 'bioarena',
+    tono: 'lime',
+    titulo: 'Filtro de bioarena',
+    gancho: 'Un filtro casero de arena que trabaja solo.',
+    pasos: [
+      'Arme el filtro: capas de grava y arena fina dentro de un tanque; el agua entra por arriba y sale limpia por un tubo.',
+      `Úselo a diario: sobre la arena se forma una nata viva (biocapa) que se come los microbios. Tarda de ${BIOARENA.biocapaSemanasMin} a ${BIOARENA.biocapaSemanasMax} semanas en madurar.`,
+      'Para tomar, termine el agua filtrada con cloro o sol: el filtro no quita virus ni químicos.',
+    ],
+    quita: `Quita ${BIOARENA.quita}.`,
+    noQuita: `No quita ${BIOARENA.noQuita}.`,
+    fuente: 'CAWST / OMS',
+  },
+];
+
+/* Fotos del módulo (salud) — reales, licencia abierta. slug = archivo en
+ * public/agua-salud/<slug>.jpg. Provenance completa en public/agua-salud/_meta.json.
+ * La atribución se muestra en la UI (Créditos de las fotos) por cumplimiento CC. */
+export const FOTO_BASE_AGUA = '/agua-salud';
+export const CREDITOS_FOTOS_AGUA = [
+  { slug: 'lluvia', autor: 'SuSanA Secretariat', lic: 'CC BY 2.0', url: 'https://commons.wikimedia.org/wiki/File:Rainwater_harvesting_system_(3441562258).jpg' },
+  { slug: 'turbia', autor: 'Albert Bridge', lic: 'CC BY-SA 2.0', url: 'https://commons.wikimedia.org/wiki/File:Muddy_water,_Belfast_-_geograph.org.uk_-_953830.jpg' },
+  { slug: 'hervir', autor: 'Debske', lic: 'CC0', url: 'https://commons.wikimedia.org/wiki/File:Community_Health_Education_-_Boiling_water_so_it_is_safe_to_use.jpg' },
+  { slug: 'sodis', autor: 'SODIS Eawag', lic: 'CC BY 3.0', url: 'https://commons.wikimedia.org/wiki/File:Indonesia-sodis-gross.jpg' },
+  { slug: 'bioarena', autor: 'Nora.jeanine530', lic: 'CC BY-SA 3.0', url: 'https://commons.wikimedia.org/wiki/File:Biosand_Filters_in_Guatemala.JPG' },
+  { slug: 'nacimiento', autor: 'USDA', lic: 'Dominio público', url: 'https://commons.wikimedia.org/wiki/File:Riparian_buffer_augusta_county_va.jpg' },
+];
+
 /** Escalera de calidad: para qué sirve cada agua de la finca. Cualitativo. */
 export const USOS_DEL_AGUA = [
   { id: 'lluvia-directa', agua: 'Lluvia recién cosechada (tanque tapado)', sirve: 'Riego, animales, lavar, aseo de la casa', ojo: 'Para tomar o cocinar, trátela primero (hierva o desinfecte).' },
