@@ -35,7 +35,7 @@ describe('PlatanoBananoScreen — hub', () => {
 
   it('botón volver llama onBack desde el hub', () => {
     const onBack = vi.fn();
-    render(<PlatanoBananoScreen onBack={onBack} />);
+    render(<PlatanoBananoScreen onBack={onBack} onNavigate={() => {}} />);
     fireEvent.click(screen.getByRole('button', { name: /Volver/i }));
     expect(onBack).toHaveBeenCalled();
   });
@@ -57,7 +57,7 @@ describe('PlatanoBananoScreen — hub', () => {
 
 describe('PlatanoBananoScreen — pilar Variedades y la mata', () => {
   it('muestra variedades campesinas y la sucesión madre-hijo-nieto', () => {
-    render(<PlatanoBananoScreen onBack={() => {}} />);
+    render(<PlatanoBananoScreen onBack={() => {}} onNavigate={() => {}} />);
     irA(/^Variedades y la mata/i);
     expect(screen.getAllByText(/Hartón/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/Dominico hartón/i)).toBeTruthy();
@@ -73,7 +73,7 @@ describe('PlatanoBananoScreen — pilar Variedades y la mata', () => {
 
 describe('PlatanoBananoScreen — pilar Siembra (calculadora determinista)', () => {
   it('la calculadora de densidad calcula matas por hectárea (geometría exacta)', () => {
-    render(<PlatanoBananoScreen onBack={() => {}} />);
+    render(<PlatanoBananoScreen onBack={() => {}} onNavigate={() => {}} />);
     irA(/^Siembra y compañía/i);
     // 3 × 3 m por defecto → 10.000 ÷ 9 = 1.111 matas/ha
     expect(screen.getByText(/matas \/ ha/i)).toBeTruthy();
@@ -85,7 +85,7 @@ describe('PlatanoBananoScreen — pilar Siembra (calculadora determinista)', () 
   });
 
   it('muestra el asocio con café/cacao y el hambre de potasio', () => {
-    render(<PlatanoBananoScreen onBack={() => {}} />);
+    render(<PlatanoBananoScreen onBack={() => {}} onNavigate={() => {}} />);
     irA(/^Siembra y compañía/i);
     expect(screen.getByText(/hambre de potasio/i)).toBeTruthy();
     expect(screen.getByText(/^Café$/i)).toBeTruthy();
@@ -95,14 +95,14 @@ describe('PlatanoBananoScreen — pilar Siembra (calculadora determinista)', () 
 
 describe('PlatanoBananoScreen — pilar Sigatoka y picudo', () => {
   it('presenta las dos amenazas con su nombre científico', () => {
-    render(<PlatanoBananoScreen onBack={() => {}} />);
+    render(<PlatanoBananoScreen onBack={() => {}} onNavigate={() => {}} />);
     irA(/^Sigatoka y picudo/i);
     expect(screen.getByText(/Mycosphaerella fijiensis/i)).toBeTruthy();
     expect(screen.getByText(/Cosmopolites sordidus/i)).toBeTruthy();
   });
 
   it('el biocontrol del picudo (Beauveria) sin dosis va como dato en camino', () => {
-    render(<PlatanoBananoScreen onBack={() => {}} />);
+    render(<PlatanoBananoScreen onBack={() => {}} onNavigate={() => {}} />);
     irA(/^Sigatoka y picudo/i);
     expect(screen.getAllByText(/Beauveria bassiana/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Dato en camino/i).length).toBeGreaterThan(0);
@@ -111,7 +111,7 @@ describe('PlatanoBananoScreen — pilar Sigatoka y picudo', () => {
 
 describe('PlatanoBananoScreen — pilar Cosecha y aprovechamiento', () => {
   it('muestra el punto de corte y el aprovechamiento del pseudotallo', () => {
-    render(<PlatanoBananoScreen onBack={() => {}} />);
+    render(<PlatanoBananoScreen onBack={() => {}} onNavigate={() => {}} />);
     irA(/^Cosecha y aprovechamiento/i);
     expect(screen.getByText(/El punto de corte/i)).toBeTruthy();
     expect(screen.getByText(/Pseudotallo picado = abono/i)).toBeTruthy();
@@ -121,7 +121,7 @@ describe('PlatanoBananoScreen — pilar Cosecha y aprovechamiento', () => {
 describe('PlatanoBananoScreen — navegación', () => {
   it('vuelve al hub con el botón volver desde un pilar (sin llamar onBack)', () => {
     const onBack = vi.fn();
-    render(<PlatanoBananoScreen onBack={onBack} />);
+    render(<PlatanoBananoScreen onBack={onBack} onNavigate={() => {}} />);
     irA(/^Sigatoka y picudo/i);
     fireEvent.click(screen.getByRole('button', { name: /Volver/i }));
     expect(within(document.body).getByText(/La mata que nunca se acaba/i)).toBeTruthy();
