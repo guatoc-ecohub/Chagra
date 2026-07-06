@@ -95,7 +95,7 @@ export default function FaqScreen({ onBack, onNavigate }) {
           );
         })}
         {items.length === 0 && (
-          <p className="text-sm text-slate-500 text-center py-8">No encontramos preguntas con ese termino.</p>
+          <p className="text-sm text-slate-500 text-center py-8">No encontramos nada con esa palabra. Pruebe con otra.</p>
         )}
       </main>
     </div>

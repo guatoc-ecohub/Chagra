@@ -30,20 +30,20 @@ export default function AgentOfflineGuard({ onBack }) {
           </div>
           <div className="flex-1">
             <h2 className="text-lg font-bold text-white">Sin conexión a internet</h2>
-            <p className="text-sm text-slate-400 mt-1">El asistente IA necesita internet</p>
+            <p className="text-sm text-slate-400 mt-1">Chagra necesita internet para conversar</p>
           </div>
         </div>
 
         <div className="p-4 bg-slate-800 rounded-xl border border-slate-700">
           <p className="text-sm text-slate-300 leading-relaxed">
-            El asistente conversacional necesita conexión a internet para responder.
-            Conéctate y vuelve a intentarlo.
+            Para conversar, Chagra necesita internet. Apenas te vuelva la señal,
+            inténtalo de nuevo.
           </p>
           <p className="text-sm text-emerald-300 leading-relaxed mt-3">
             Tus datos de la finca (siembras, zonas, tareas, bitácora y el catálogo
             de especies) <span className="font-bold">sí funcionan sin conexión</span>.
-            Lo que registres ahora se guarda en tu teléfono y se sincroniza cuando
-            vuelvas a tener internet.
+            Lo que registres ahora se guarda en tu teléfono y se pasa solo cuando
+            vuelva la señal.
           </p>
         </div>
 

@@ -1303,14 +1303,14 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       if (match) {
         const status = parseInt(match[1], 10);
         if (status === 401 || status === 403) {
-          throw new Error('Sesion expirada, recarga la app');
+          throw new Error('La sesión se venció. Recarga la app para seguir.');
         }
         if (status >= 500 && status <= 503) {
-          throw new Error('IA no disponible, intenta de nuevo en un momento');
+          throw new Error('Chagra no puede responder ahora mismo. Intenta de nuevo en un momento.');
         }
-        throw new Error(`Error al consultar IA (codigo: ${status})`);
+        throw new Error(`Chagra no pudo responder (código ${status}). Intenta de nuevo.`);
       }
-      throw new Error('IA no disponible, intenta de nuevo en un momento');
+      throw new Error('Chagra no puede responder ahora mismo. Intenta de nuevo en un momento.');
     } finally {
       // Detiene idle + techo del deadline stream-aware (limpia ambos timers).
       if (stallTimerRef.current && typeof stallTimerRef.current.stop === 'function') {
@@ -2955,7 +2955,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       const result = await stopRecord();
       if (!result || !result.blob) {
         setState(STATE_IDLE);
-        setError('No se capturó audio. Intenta de nuevo.');
+        setError('No alcancé a escucharte. Intenta grabar de nuevo.');
         return;
       }
       const { blob } = result;
@@ -3481,7 +3481,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           isOnline ? 'bg-emerald-900/40 text-emerald-400' : 'bg-red-900/40 text-red-400'
         }`}>
           {isOnline ? <Wifi size={11} /> : <WifiOff size={11} />}
-          {isOnline ? 'Online' : 'Offline'}
+          {isOnline ? 'Con señal' : 'Sin señal'}
         </div>
       </header>
 

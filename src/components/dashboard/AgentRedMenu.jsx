@@ -1103,7 +1103,7 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
                 {isCap && isDown && (
                   <>
                     <br />
-                    <span className="arm-badge arm-badge-down">sin servidor</span>
+                    <span className="arm-badge arm-badge-down">no disponible</span>
                   </>
                 )}
               </div>
@@ -1152,7 +1152,7 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
                   {isDown && (
                     <>
                       <br />
-                      <span className="arm-badge arm-badge-down">sin servidor</span>
+                      <span className="arm-badge arm-badge-down">no disponible</span>
                     </>
                   )}
                 </div>

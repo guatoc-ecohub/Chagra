@@ -700,7 +700,7 @@ export default function AgentHero({ onNavigate }) {
             requestAnimationFrame(() => textareaRef.current?.focus());
         } catch (err) {
             console.error('[AgentHero] no se pudo procesar la foto:', err);
-            setPickError('No pude procesar esa foto. Inténtalo de nuevo con otra imagen.');
+            setPickError('No pude ver bien esa foto. Prueba con otra, con buena luz.');
         } finally {
             setBusy(false);
         }
@@ -1871,14 +1871,14 @@ export default function AgentHero({ onNavigate }) {
                             campanita clásica vive aquí (operador 2026-06-11). */}
                         {failedTxCount > 0 && (
                             <>
-                                <div className="nsec">Sincronización</div>
+                                <div className="nsec">Cambios por subir</div>
                                 <div className="nitem is-danger">
                                     <span className="nico" aria-hidden="true">📡</span>
                                     <span className="ntxt">
                                         <span className="ntit">
                                             {failedTxCount === 1
-                                                ? '1 cambio no se pudo sincronizar'
-                                                : `${failedTxCount} cambios no se pudieron sincronizar`}
+                                                ? '1 cambio no se pudo subir todavía'
+                                                : `${failedTxCount} cambios no se pudieron subir todavía`}
                                         </span>
                                         <span className="nmeta">Tus datos siguen guardados en el teléfono. Revisa la conexión e intenta de nuevo.</span>
                                     </span>

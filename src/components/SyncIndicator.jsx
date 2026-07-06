@@ -27,12 +27,12 @@ export default function SyncIndicator() {
       {isOnline ? (
         <div className="flex items-center gap-1 text-green-400">
           <Wifi size={14} />
-          <span>Online</span>
+          <span>Con señal</span>
         </div>
       ) : (
         <div className="flex items-center gap-1 text-red-400">
           <WifiOff size={14} />
-          <span>Offline</span>
+          <span>Sin señal</span>
         </div>
       )}
 
