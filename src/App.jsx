@@ -7,7 +7,7 @@
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import React, { lazy, Suspense, useState, useEffect, useCallback, useRef } from 'react';
-import { MapPin, Eye, Package, CheckCircle, WifiOff, Mic, AlertCircle, Network, Beaker, Scale } from 'lucide-react';
+import { MapPin, Eye, Package, CheckCircle, WifiOff, Mic, Network, Beaker, Scale } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
 import { useClimaAtmosphere } from './hooks/useClimaAtmosphere';
@@ -82,7 +82,7 @@ const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').
 // 2026-06-30. Se alcanza desde 'bodega' vía el botón "Auditoría y
 // reconciliación", o directo por hash (#auditoria-inventario).
 const InventoryPage = lazy(() => import('./pages/InventoryPage'));
-const BiopreparadoRecetasGallery = lazy(() => import('./components/BiopreparadoRecetasGallery'));
+const BiopreparadosScreen = lazy(() => import('./components/biopreparados/BiopreparadosScreen'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
 const UsageStatsDashboard = lazy(() => import('./components/UsageStatsDashboard'));
@@ -987,34 +987,22 @@ export default function App() {
           </ErrorBoundary>
         );
       case 'biopreparados':
-        // Galería de recetas de biopreparados PASO A PASO (no la pantalla de
-        // insumos/inventario). Dos entradas: (1) la misión "Prepárale comida
-        // natural" del juego (sin `back` → vuelve al juego, default) y (2) la
-        // home viva (Herramientas de finca → Biopreparados, rescatada
-        // 2026-06-24, pasa back:'dashboard'). El botón Volver respeta de dónde
-        // se vino: por defecto al juego (back-compat de la misión); desde la
-        // home, al dashboard. Antes onBack iba SIEMPRE a 'juego', así que desde
-        // la home el usuario caía en el juego (huérfano).
+        // Fichas photo-forward de biopreparados (caldos, purines, biofermentos,
+        // extractos): para qué sirve, ingredientes con medidas caseras, paso a
+        // paso, tiempo de fermentación, dosis y precauciones (EPP, vetos,
+        // reingreso). Todo grounded en catalog/biopreparados-seed.json — cero
+        // dosis inventada. Reemplaza la galería de solo-diagramas que vivía aquí
+        // (la galería sigue accesible desde la Bodega/InventoryDashboard).
+        // El botón Volver respeta de dónde se vino: por defecto al juego
+        // (back-compat de la misión "Prepárale comida natural"); desde la home
+        // viva de Sanidad, al dashboard (currentViewData.back).
         return (
           <ErrorBoundary>
-            <ScreenShell title="Biopreparados" onBack={() => navigate(currentViewData?.back || 'juego')} onHome={() => navigate('dashboard')}>
-              <div className="px-4 pt-3 pb-10 max-w-2xl mx-auto flex flex-col gap-4">
-                {/* Acceso a la toxicología de insumos (EPI, dosis seguras,
-                    restricción ICA). Caso crítico: caldo bordelés / sulfocálcico. */}
-                <button
-                  type="button"
-                  onClick={() => navigate('toxicologia', { tab: 'insumos' })}
-                  className="rounded-xl border border-amber-700/50 bg-amber-950/30 p-3 flex items-center gap-2.5 text-left hover:border-amber-600 transition-colors"
-                >
-                  <AlertCircle size={20} className="shrink-0 text-amber-400" />
-                  <span className="text-sm text-amber-100 flex-1">
-                    <span className="font-bold">Toxicología y seguridad.</span> Antes de preparar,
-                    revisa la protección (EPI), las dosis seguras y las restricciones legales.
-                  </span>
-                </button>
-                <BiopreparadoRecetasGallery />
-              </div>
-            </ScreenShell>
+            <BiopreparadosScreen
+              onBack={() => navigate(currentViewData?.back || 'juego')}
+              onHome={() => navigate('dashboard')}
+              onNavigate={navigate}
+            />
           </ErrorBoundary>
         );
       case 'plant_asset':
