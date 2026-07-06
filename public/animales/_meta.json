@@ -1,0 +1,91 @@
+{
+  "_note": "Fotos del modulo ANIMALES (cria campesina) — Wikimedia Commons, licencia abierta (CC0/PD/CC BY/CC BY-SA). Thumbs ~960px via API. Atribucion embebida en la UI (FotoAnimal + creditos) y aqui para auditoria de licencias.",
+  "gallinas": {
+    "file": "File:Chicken in the Pleasure Grounds at Parham Park, West Sussex, England 1.jpg",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "Acabashi",
+    "source": "https://commons.wikimedia.org/wiki/File:Chicken_in_the_Pleasure_Grounds_at_Parham_Park,_West_Sussex,_England_1.jpg",
+    "bytes": 241355
+  },
+  "pollos": {
+    "file": "File:Cornish Rock broiler chicks.JPG",
+    "license": "CC BY 3.0",
+    "license_url": "https://creativecommons.org/licenses/by/3.0",
+    "artist": "Earthdirt",
+    "source": "https://commons.wikimedia.org/wiki/File:Cornish_Rock_broiler_chicks.JPG",
+    "bytes": 212110
+  },
+  "cerdos": {
+    "file": "File:Pig pen alongside footpath on Bower Farm - geograph.org.uk - 2591969.jpg",
+    "license": "CC BY-SA 2.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "artist": "Dave Spicer",
+    "source": "https://commons.wikimedia.org/wiki/File:Pig_pen_alongside_footpath_on_Bower_Farm_-_geograph.org.uk_-_2591969.jpg",
+    "bytes": 293866
+  },
+  "conejos": {
+    "file": "File:Large Rabbit Hutch.jpg",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Louisejw",
+    "source": "https://commons.wikimedia.org/wiki/File:Large_Rabbit_Hutch.jpg",
+    "bytes": 218371
+  },
+  "conejo-forraje": {
+    "file": "File:European Rabbit, Lake District, UK - August 2011.jpg",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Diliff",
+    "source": "https://commons.wikimedia.org/wiki/File:European_Rabbit,_Lake_District,_UK_-_August_2011.jpg",
+    "bytes": 193531
+  },
+  "gazapos": {
+    "file": "File:Chilled and Warm Himalayan rabbit kits.JPG",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "SableSteel",
+    "source": "https://commons.wikimedia.org/wiki/File:Chilled_and_Warm_Himalayan_rabbit_kits.JPG",
+    "bytes": 106827
+  },
+  "cabra": {
+    "file": "File:Capra aegagrus hircus in isla Margarita.jpg",
+    "license": "CC0",
+    "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "artist": "Wilfredor",
+    "source": "https://commons.wikimedia.org/wiki/File:Capra_aegagrus_hircus_in_isla_Margarita.jpg",
+    "bytes": 209710
+  },
+  "cabras": {
+    "file": "File:Goats graze in a pasture in Lovelock, Nevada on 13 September 2023 - 20230913-FPAC-KLS-0031 EDIT.jpg",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "USDAgov",
+    "source": "https://commons.wikimedia.org/wiki/File:Goats_graze_in_a_pasture_in_Lovelock,_Nevada_on_13_September_2023_-_20230913-FPAC-KLS-0031_EDIT.jpg",
+    "bytes": 247103
+  },
+  "ovejas": {
+    "file": "File:Grazing pasture with sheep - geograph.org.uk - 3805265.jpg",
+    "license": "CC BY-SA 2.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "artist": "Dr Duncan Pepper",
+    "source": "https://commons.wikimedia.org/wiki/File:Grazing_pasture_with_sheep_-_geograph.org.uk_-_3805265.jpg",
+    "bytes": 206008
+  },
+  "vacas": {
+    "file": "File:Grazing cows - Gillué, Aragon.JPG",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "DonCamillo",
+    "source": "https://commons.wikimedia.org/wiki/File:Grazing_cows_-_Gillu%C3%A9,_Aragon.JPG",
+    "bytes": 170603
+  },
+  "abejas": {
+    "file": "File:SAREC Apiary - 53077967569.jpg",
+    "license": "CC BY-SA 2.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "artist": "Ark. Agricultural Experiment Station",
+    "source": "https://commons.wikimedia.org/wiki/File:SAREC_Apiary_-_53077967569.jpg",
+    "bytes": 170047
+  }
+}

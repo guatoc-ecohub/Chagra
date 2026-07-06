@@ -125,17 +125,19 @@ export const MUNDOS_FINCA = [
         id: 'animales',
         titulo: 'Los animales',
         emoji: '🐔',
-        lema: 'Gallinas, vacas, abejas y cerdos: sanidad y manejo',
+        lema: 'Cría campesina: gallinas, cerdos, conejos, cabras y más',
         tinte: ['#a86a3a', '#f3e3cf'],
         // Gate por perfil: un urbano de balcón no ve este mundo (mismo criterio
         // `mostrarAnimales` del home). El filtro lo aplica MundosDeMiFinca.
         gate: 'animales',
         entradas: [
             { view: 'animales', label: 'Todos los animales', desc: 'Su corral completo y el ciclo cerrado', emoji: '🐮' },
-            { view: 'animales_gallinas', label: 'Gallinas', desc: 'Postura, sanidad y gallinaza', emoji: '🐔' },
+            { view: 'animales_gallinas', label: 'Gallinas', desc: 'Ponedoras, engorde, sanidad y gallinaza', emoji: '🐔' },
+            { view: 'seguimiento_cerdos', label: 'Cerdos', desc: 'Ciclo de manejo porcino y cama profunda', emoji: '🐖' },
+            { view: 'animales_conejos', label: 'Conejos', desc: 'Cría en poco espacio, forraje y conejaza', emoji: '🐇' },
+            { view: 'animales_caprinos', label: 'Cabras y ovejas', desc: 'Leche, carne, lana y majada para el abono', emoji: '🐐' },
             { view: 'animales_vacas', label: 'Vacas', desc: 'Manejo, pastoreo y ordeño', emoji: '🐄' },
             { view: 'animales_abejas', label: 'Abejas', desc: 'Colmenas y polinización de sus cultivos', emoji: '🐝' },
-            { view: 'seguimiento_cerdos', label: 'Cerdos', desc: 'Ciclo de manejo porcino y cama profunda', emoji: '🐖' },
         ],
     },
     {
