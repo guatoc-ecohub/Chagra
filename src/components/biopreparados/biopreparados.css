@@ -1,0 +1,32 @@
+/*
+ * biopreparados.css — micro-animaciones del mundo "Biopreparados".
+ * Mismos principios que agua.css: solo transform/opacity (sin reflow),
+ * prefers-reduced-motion las apaga, y NINGÚN color de tema se fija aquí (los
+ * colores salen de las clases Tailwind del componente, que reaccionan a los
+ * temas vía data-theme).
+ */
+
+/* Fotos reales: aparición suave al montarse (solo opacity). */
+@keyframes bio-foto-entra {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.bio-foto {
+  animation: bio-foto-entra 0.5s ease-out;
+}
+
+/* Cuerpo de la ficha al desplegarse: entra desde arriba, suave. */
+@keyframes bio-ficha-entra {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.bio-ficha-cuerpo {
+  animation: bio-ficha-entra 0.25s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bio-foto,
+  .bio-ficha-cuerpo {
+    animation: none;
+  }
+}
