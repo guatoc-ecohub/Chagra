@@ -1634,6 +1634,9 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El cacao">
               <CacaoScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'hortalizas':
         // Módulo "Hortalizas de la huerta" (mundo Cultivos y semillas): la comida
         // diaria de la casa. Ficha de cultivo por hortaliza (siembra, luz/agua/piso
@@ -1689,6 +1692,9 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El café">
               <CafeScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'milpa_cultivo':
         // Módulo "La milpa: maíz, fríjol y calabaza" (las tres hermanas): la
         // asociación ancestral groundeada en el grafo (COMPATIBLE_WITH /
