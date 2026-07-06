@@ -1169,10 +1169,13 @@ export function isModuleVisible(moduleId) {
  *
  * v3 (2026-06-11): 'hoyfinca' (HoyEnFincaStrip) como primera sección.
  */
+// hoyfinca/clima/analisis NO van aquí: desde el rediseño del BLOQUE 1
+// (EstadoDelDiaCard, 2026-07-04) esos tres se muestran FUNDIDOS en la cabecera
+// del día — incluirlos como secciones arrastrables los pintaba DOS veces
+// (redundancia clima+análisis "encimados", #2054). Se filtran también en el
+// render (FUSED_EN_ESTADO_DEL_DIA en DashboardLive) para no duplicarlos ni en
+// los perfiles existentes que ya los tenían guardados en su orden.
 export const HOME_MODULE_DEFAULT_ORDER = Object.freeze([
-  'hoyfinca',
-  'clima',
-  'analisis',
   'asociaciones',
   'plantas',
   'hoy',
