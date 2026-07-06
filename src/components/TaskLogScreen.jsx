@@ -87,18 +87,18 @@ function TaskLogScreen({ onBack, onNewTask }) {
           <button onClick={onBack} aria-label="Volver" className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[56px] min-w-[56px] flex justify-center items-center shrink-0">
             <ArrowLeft size={32} />
           </button>
-          <h2 className="text-3xl font-bold">Log de Tareas</h2>
+          <h2 className="text-3xl font-bold">Tareas de la finca</h2>
         </div>
         <div className="flex items-center gap-2">
           {isOnline ? (
             <div className="flex items-center gap-1 text-green-400">
               <Wifi size={14} />
-              <span className="text-sm">Online</span>
+              <span className="text-sm">Con señal</span>
             </div>
           ) : (
             <div className="flex items-center gap-1 text-red-400">
               <WifiOff size={14} />
-              <span className="text-sm">Offline</span>
+              <span className="text-sm">Sin señal</span>
             </div>
           )}
           <button

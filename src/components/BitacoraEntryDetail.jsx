@@ -522,8 +522,8 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
                   <div className="p-3 rounded-xl bg-red-900/20 border border-red-800/50 flex items-start gap-2">
                     <AlertTriangle size={14} className="text-red-400 shrink-0 mt-0.5" />
                     <div className="flex-1 text-xs text-red-300">
-                      <p className="font-bold">No se pudo analizar</p>
-                      <p className="text-[11px] text-red-400/80 mt-0.5">El modelo Ollama puede no estar disponible o la imagen no pudo procesarse.</p>
+                      <p className="font-bold">No pude mirar la foto</p>
+                      <p className="text-[11px] text-red-400/80 mt-0.5">Chagra no pudo revisar la imagen en este momento. Inténtelo otra vez en un rato.</p>
                       <button
                         onClick={handleAnalyze}
                         className="mt-2 text-[11px] underline text-red-300"

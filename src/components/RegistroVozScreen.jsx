@@ -284,7 +284,7 @@ export default function RegistroVozScreen({ onBack, onSave, onManual = null }) {
         {view === ST.ERROR && (
           <div className="flex flex-col items-center gap-4 py-10 px-4">
             <AlertTriangle size={48} className="text-amber-400" />
-            <p className="text-sm text-amber-200 text-center max-w-sm">{errorMsg || recorderError || 'Error desconocido'}</p>
+            <p className="text-sm text-amber-200 text-center max-w-sm">{errorMsg || recorderError || 'Algo no salió bien. Inténtelo otra vez.'}</p>
             <button onClick={resetAll} className="px-6 py-3 min-h-[44px] bg-slate-800 hover:bg-slate-700 rounded-xl font-bold flex items-center gap-2">
               <RotateCcw size={18} /> Reintentar
             </button>
@@ -298,8 +298,8 @@ export default function RegistroVozScreen({ onBack, onSave, onManual = null }) {
               <p className="text-base font-bold text-green-300">{savedKind} guardado ✓</p>
               <p className="text-xs text-slate-400 mt-1">
                 {savedOffline
-                  ? <>Se sincronizará con FarmOS cuando haya conexión. Mientras tanto queda en <strong className="text-slate-200">Cuaderno de campo</strong>.</>
-                  : <>Sincronizado con FarmOS.</>}
+                  ? <>Quedó guardado en su finca. Apenas vuelva la señal, se guarda solo. Mientras tanto queda en <strong className="text-slate-200">Cuaderno de campo</strong>.</>
+                  : <>Quedó guardado. Todo al día.</>}
               </p>
             </div>
             <div className="flex flex-wrap gap-2 justify-center">

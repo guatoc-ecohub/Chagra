@@ -640,7 +640,7 @@ export default function VoiceCapture({ onSave, onPlantsSaved, hideDoneScreen = f
       {view === STATE_ERROR && (
         <div className="flex flex-col items-center gap-4 py-8">
           <AlertTriangle size={48} className="text-amber-400" />
-          <p className="text-sm text-amber-200 text-center max-w-sm">{errorMsg || recorderErr || 'Error desconocido'}</p>
+          <p className="text-sm text-amber-200 text-center max-w-sm">{errorMsg || recorderErr || 'Algo no salió bien. Inténtelo otra vez.'}</p>
           <button
             onClick={resetAll}
             className="px-6 py-3 min-h-[44px] bg-slate-800 hover:bg-slate-700 rounded-xl font-bold flex items-center gap-2"
@@ -657,9 +657,9 @@ export default function VoiceCapture({ onSave, onPlantsSaved, hideDoneScreen = f
             <p className="text-base font-bold text-green-300">Registro guardado ✓</p>
             <p className="text-xs text-slate-400 mt-1">
               {syncedOffline ? (
-                <>Se sincronizará con FarmOS cuando haya conexión. Mientras tanto, lo encuentra en <strong className="text-slate-200">Bitácora → Recientes</strong>.</>
+                <>Quedó guardado en su finca. Apenas vuelva la señal, se guarda solo. Mientras tanto, lo encuentra en <strong className="text-slate-200">Bitácora → Recientes</strong>.</>
               ) : (
-                <>Sincronizado con FarmOS.</>
+                <>Quedó guardado. Todo al día.</>
               )}
             </p>
           </div>

@@ -183,7 +183,7 @@ export default function NetworkStatusBar() {
       {config.icon}
       <span className="flex-1 truncate">{config.text}</span>
       {status === STATUS.OFFLINE && (
-        <span className="text-xs text-amber-300/70 shrink-0">Offline-First activo</span>
+        <span className="text-xs text-amber-300/70 shrink-0">Chagra sigue trabajando sin señal</span>
       )}
       {isClickable && (
         <span className="text-[10px] text-white/60 shrink-0 hidden sm:inline">Toque para detalle</span>
