@@ -1,6 +1,4 @@
-# Git merge strategies para evitar conflicts en archivos auto-bumpeados
-# package.json y sw.js son bumpeados por lefthook en cada commit.
-# Usar estrategia "ours" evita que los bumps paralelos causen conflicts.
-
-package.json merge=ours
-public/sw.js merge=ours
+src/components/dashboard/mundosFinca.js merge=union
+src/App.jsx merge=union
+src/config/messages.js merge=union
+src/index.css merge=union
