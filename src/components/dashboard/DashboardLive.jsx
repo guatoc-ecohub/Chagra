@@ -560,13 +560,17 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
     // Tile estándar (chico) — reusa el ESTILO único de los tiles del resto
     // (mismo fix de contraste F2: .fvh-tile-label/.fvh-tile-desc fuerzan tinta
     // oscura sobre el pastel claro). `size` cambia ícono y altura.
-    const renderTile = (tile, { large = false } = {}) => (
+    // `i` = índice dentro de su grid: escalona la entrada (anim-brota, mismo
+    // lenguaje "brota" de las tarjetas de Mundos) y anim-press da el
+    // hundimiento sutil al tocar. Ambos se apagan con prefers-reduced-motion.
+    const renderTile = (tile, { large = false, i = 0 } = {}) => (
         <button
             key={tile.view}
             type="button"
             onClick={() => onNavigate(tile.view, tile.data)}
             aria-label={`${tileLabel(tile)}: ${tileDesc(tile)}`}
-            className={`dash-tile ${large ? 'dash-tile--destacado ' : ''}${tile.span === 2 ? 'col-span-2 ' : ''}${fincaVivaFlag ? 'fvh-tile-claro' : 'bg-slate-900/60'} border border-slate-800 border-l-4 ${tile.accent} ${large ? 'rounded-2xl p-4 min-h-[112px]' : 'rounded-xl p-3 min-h-[88px]'} text-left active:bg-slate-800/70 transition-colors flex flex-col`}
+            style={{ '--i': i }}
+            className={`dash-tile anim-brota anim-press ${large ? 'dash-tile--destacado ' : ''}${tile.span === 2 ? 'col-span-2 ' : ''}${fincaVivaFlag ? 'fvh-tile-claro' : 'bg-slate-900/60'} border border-slate-800 border-l-4 ${tile.accent} ${large ? 'rounded-2xl p-4 min-h-[112px]' : 'rounded-xl p-3 min-h-[88px]'} text-left active:bg-slate-800/70 transition-colors flex flex-col`}
         >
             <tile.icon size={large ? 30 : 24} strokeWidth={2} className={`${large ? 'mb-2' : 'mb-1.5'} ${tile.accent.split(' ')[0]}`} aria-hidden="true" />
             <span className={`${large ? 'text-base' : 'text-sm'} font-black block leading-tight fvh-tile-label ${tile.accent.split(' ')[0]}`}>{tileLabel(tile)}</span>
@@ -583,7 +587,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                     type="button"
                     onClick={() => onNavigate(MERCADO_TILE.view, MERCADO_TILE.data)}
                     aria-label={`${MERCADO_TILE.label}: ${MERCADO_TILE.desc}`}
-                    className={`dash-tile ${fincaVivaFlag ? 'fvh-tile-claro' : 'bg-slate-900/60'} border border-slate-800 border-l-4 ${MERCADO_TILE.accent} rounded-xl p-3.5 text-left active:bg-slate-800/70 transition-colors flex items-center gap-3`}
+                    className={`dash-tile anim-brota anim-press ${fincaVivaFlag ? 'fvh-tile-claro' : 'bg-slate-900/60'} border border-slate-800 border-l-4 ${MERCADO_TILE.accent} rounded-xl p-3.5 text-left active:bg-slate-800/70 transition-colors flex items-center gap-3`}
                 >
                     <MERCADO_TILE.icon size={26} strokeWidth={2} className={`${MERCADO_TILE.accent.split(' ')[0]} shrink-0`} aria-hidden="true" />
                     <span className="flex-1 min-w-0">
@@ -837,12 +841,12 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                                 <ChevronRight size={22} className="shrink-0 text-slate-500" aria-hidden="true" />
                             </button>
                             <div className="grid grid-cols-3 gap-3 mt-3" data-testid="gestion-tiles">
-                                {GESTION_TILES.filter((t) => t.view === 'germinacion').map((tile) => renderTile(tile))}
+                                {GESTION_TILES.filter((t) => t.view === 'germinacion').map((tile, i) => renderTile(tile, { i }))}
                             </div>
                         </>
                     ) : (
                         <div className="grid grid-cols-3 gap-3" data-testid="gestion-tiles">
-                            {GESTION_TILES.map((tile) => renderTile(tile))}
+                            {GESTION_TILES.map((tile, i) => renderTile(tile, { i }))}
                         </div>
                     )}
                     <div className="mt-3">
@@ -937,7 +941,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
             <div className="px-4 pt-3">
                 {blockLabel('Lo más sólido de Chagra', 'from-lime-400 to-emerald-400')}
                 <div className="grid grid-cols-2 gap-3" data-testid="destacado-tiles">
-                    {DESTACADO_TILES.map((tile) => renderTile(tile, { large: true }))}
+                    {DESTACADO_TILES.map((tile, i) => renderTile(tile, { large: true, i }))}
                 </div>
             </div>
 
@@ -945,7 +949,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
             <div className="px-4 pt-3">
                 {blockLabel('Aprender', 'from-emerald-400 to-teal-400')}
                 <div className="grid grid-cols-3 gap-3" data-testid="aprender-tiles">
-                    {APRENDER_TILES.map((tile) => renderTile(tile))}
+                    {APRENDER_TILES.map((tile, i) => renderTile(tile, { i }))}
                 </div>
             </div>
 
@@ -958,7 +962,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
             >
                 {blockLabel('Mi finca · gestión', 'from-sky-400 to-emerald-400')}
                 <div className="grid grid-cols-3 gap-3" data-testid="gestion-tiles">
-                    {GESTION_TILES.map((tile) => renderTile(tile))}
+                    {GESTION_TILES.map((tile, i) => renderTile(tile, { i }))}
                 </div>
             </div>
 
