@@ -94,6 +94,9 @@ test.describe('IDB schema v9 — índice compuesto asset_id+timestamp', () => {
 
   test('logs store tiene índice compuesto asset_id_timestamp y retorna logs ordenados', async ({ page }) => {
     await page.goto('/');
+  // El arranque en dev (vite cold-compile) puede tardar con el grafo de módulos completo;
+  // esperamos explícitamente al formulario de login antes de escribir (robustez del gate).
+  await expect(page.getByLabel(/usuario/i)).toBeVisible({ timeout: 90_000 });
   await page.getByLabel(/usuario/i).fill('e2e-operator');
     await page.getByRole('textbox', { name: /contraseña/i }).fill('e2e-pass');
     await page.getByRole('button', { name: /ingresar/i }).click();
@@ -226,6 +229,9 @@ test.describe('Offline-first — siembra pendiente y reconexión', () => {
     await page.goto('/');
 
     // Login vía UI contra endpoint mockeado.
+    // El arranque en dev (vite cold-compile) puede tardar con el grafo de módulos
+    // completo; esperamos explícitamente al formulario antes de escribir.
+    await expect(page.getByLabel(/usuario/i)).toBeVisible({ timeout: 90_000 });
     await page.getByLabel(/usuario/i).fill('e2e-operator');
     await page.getByRole('textbox', { name: /contraseña/i }).fill('e2e-pass');
     await page.getByRole('button', { name: /ingresar/i }).click();
