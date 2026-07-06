@@ -173,7 +173,9 @@
   padding: 8px 0;
 }
 .san-input:focus { outline: none; }
-.san-input::placeholder { color: #9aa08e; }
+/* Placeholder legible al sol: la tinta suave del mundo (#9aa08e no llegaba a AA
+   sobre el papel). */
+.san-input::placeholder { color: var(--san-tinta-suave); }
 .san-buscar-btn {
   flex: 0 0 auto;
   border: 0;

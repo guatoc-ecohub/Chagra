@@ -394,9 +394,9 @@ export default function ProfileScreen({ onBack, onHome }) {
               </div>
               <div className="min-w-0 flex-1">
                 <h2 className="text-xl font-black text-white leading-tight break-words">{name}</h2>
-                <p className="text-[10px] text-emerald-400 uppercase tracking-widest font-bold mt-0.5">{currentRoleLabel}</p>
+                <p className="text-[11px] text-emerald-400 uppercase tracking-widest font-bold mt-0.5">{currentRoleLabel}</p>
                 {(municipio || activeFincaSlug) && (
-                  <p className="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+                  <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
                     <MapPin size={11} aria-hidden="true" className="shrink-0" />
                     <span className="truncate">
                       {[activeFincaSlug, municipio ? String(municipio).split(',')[0] : null].filter(Boolean).join(' · ')}
@@ -410,7 +410,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                   <button
                     type="button"
                     onClick={handlePhotoRemove}
-                    className="text-[10px] text-slate-500 hover:text-slate-300 inline-flex items-center gap-1 mt-1"
+                    className="tap-target text-xs text-slate-400 hover:text-slate-300 inline-flex items-center gap-1 mt-1"
                   >
                     <Trash2 size={11} aria-hidden="true" /> Quitar foto
                   </button>
@@ -441,7 +441,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="block text-sm font-bold text-white leading-tight">{s.label}</span>
-                        <span className="block text-[10px] text-slate-500 leading-snug mt-0.5">{s.desc}</span>
+                        <span className="block text-xs text-slate-400 leading-snug mt-0.5">{s.desc}</span>
                       </span>
                       <ChevronRight size={16} className="text-slate-600 shrink-0 mt-1" aria-hidden="true" />
                     </div>
@@ -467,7 +467,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                       </span>
                     )}
 
-                    <span className={`mt-auto pt-2 flex items-center gap-1.5 text-[10px] font-semibold ${lit ? 'text-emerald-400' : 'text-slate-500'}`}>
+                    <span className={`mt-auto pt-2 flex items-center gap-1.5 text-[11px] font-semibold ${lit ? 'text-emerald-400' : 'text-slate-400'}`}>
                       <span
                         className={`w-1.5 h-1.5 rounded-full shrink-0 ${lit ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]' : 'bg-slate-600'}`}
                         aria-hidden="true"
@@ -540,7 +540,7 @@ export default function ProfileScreen({ onBack, onHome }) {
               >
                 {savedFlash ? <><Check size={18} /> Guardado</> : <><Save size={18} /> {MSG.perfilScreen.guardarCambios}</>}
               </button>
-              <p className="text-[10px] text-slate-500 text-center leading-relaxed">
+              <p className="text-xs text-slate-400 text-center leading-relaxed">
                 El nombre y el rol se guardan en tu dispositivo. Tu foto de perfil
                 se sincroniza con el servidor para verla en otros dispositivos.
               </p>
@@ -559,7 +559,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                 <Palette size={18} className="text-emerald-400" />
                 <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Tema de la app</h3>
               </div>
-              <p className="text-[11px] text-slate-500 leading-snug px-1">
+              <p className="text-xs text-slate-400 leading-snug px-1">
                 Cada tarjeta muestra cómo se verá Chagra con ese tema. Toca una
                 para aplicarla al instante — puedes devolverte cuando quieras.
               </p>
@@ -576,7 +576,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                 <Bell size={18} className="text-emerald-400" />
                 <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Botón de avisos</h3>
               </div>
-              <p className="text-[11px] text-slate-500 leading-snug px-1">
+              <p className="text-xs text-slate-400 leading-snug px-1">
                 Elige cuál campana te muestra los avisos (alertas, tareas y sincronización). Solo se muestra una.
               </p>
               <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label="Estilo de avisos">
@@ -597,7 +597,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                     }`}
                   >
                     <p className="text-sm font-bold text-white">{opt.label}</p>
-                    <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">{opt.desc}</p>
+                    <p className="text-xs text-slate-400 mt-0.5 leading-snug">{opt.desc}</p>
                   </button>
                 ))}
               </div>
@@ -634,7 +634,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                     >
                       <span className="flex-1">
                         <span className="block text-sm font-bold text-white">{n.label}</span>
-                        <span className="block text-[11px] text-slate-400 mt-0.5 leading-snug">{n.desc}</span>
+                        <span className="block text-xs text-slate-400 mt-0.5 leading-snug">{n.desc}</span>
                       </span>
                       {active && <Check size={18} className="text-emerald-400 shrink-0" aria-hidden="true" />}
                     </button>
@@ -710,7 +710,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                 <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Módulos del Home</h3>
               </div>
 
-              <p className="text-[11px] text-slate-500 leading-snug px-1">
+              <p className="text-xs text-slate-400 leading-snug px-1">
                 Elige qué módulos quieres ver en tu pantalla de inicio. Puedes ocultar
                 los que no usas para tener una vista más limpia. Todos los módulos están
                 activados por defecto.
@@ -737,7 +737,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                         >
                           <div className="flex flex-col gap-0.5 flex-1">
                             <span className="text-sm font-bold text-slate-200">{module.label}</span>
-                            <span className="text-[10px] text-slate-500 leading-snug">{module.description}</span>
+                            <span className="text-xs text-slate-400 leading-snug">{module.description}</span>
                           </div>
                           <button
                             type="button"
@@ -748,7 +748,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                               ...prev,
                               [module.id]: prev[module.id] === false ? true : false,
                             }))}
-                            className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+                            className={`tap-target relative w-12 h-7 rounded-full transition-colors shrink-0 ${
                               moduleVisibility[module.id] !== false ? 'bg-emerald-600' : 'bg-slate-700'
                             }`}
                           >
@@ -794,14 +794,14 @@ export default function ProfileScreen({ onBack, onHome }) {
               <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
                 <div className="flex flex-col gap-0.5">
                   <span className="text-sm font-bold text-slate-200">Habilitar telemetría</span>
-                  <span className="text-[10px] text-slate-500">{MSG.perfilScreen.telemetriaVozDesc}</span>
+                  <span className="text-xs text-slate-400">{MSG.perfilScreen.telemetriaVozDesc}</span>
                 </div>
                 <button
                   type="button"
                   role="switch"
                   aria-checked={telemetryEnabled}
                   onClick={() => setTelemetryEnabled((v) => !v)}
-                  className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+                  className={`tap-target relative w-12 h-7 rounded-full transition-colors shrink-0 ${
                     telemetryEnabled ? 'bg-emerald-600' : 'bg-slate-700'
                   }`}
                 >
@@ -826,7 +826,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                 </select>
               </label>
 
-              <p className="text-[10px] text-slate-500 px-1 leading-relaxed">
+              <p className="text-xs text-slate-400 px-1 leading-relaxed">
                 La telemetría sigue grabándose en el dispositivo (privacy-safe, NUNCA prompt ni respuesta).
                 El dashboard de visualización se migró al panel privado del operador (ADR-020 anti-leak / ADR-029 Capa C).
               </p>
@@ -843,7 +843,7 @@ export default function ProfileScreen({ onBack, onHome }) {
               <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
                 <div className="flex flex-col gap-0.5">
                   <span className="text-sm font-bold text-slate-200">Enviar métricas anónimas</span>
-                  <span className="text-[10px] text-slate-500">{MSG.perfilScreen.telemetriaAgenteDesc}</span>
+                  <span className="text-xs text-slate-400">{MSG.perfilScreen.telemetriaAgenteDesc}</span>
                 </div>
                 <button
                   type="button"
@@ -856,7 +856,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                     setTelemetryConsent(next);
                     setTelemetryConsentState(next);
                   }}
-                  className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+                  className={`tap-target relative w-12 h-7 rounded-full transition-colors shrink-0 ${
                     telemetryConsent ? 'bg-emerald-600' : 'bg-slate-700'
                   }`}
                 >
@@ -868,7 +868,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                 </button>
               </label>
 
-              <p className="text-[10px] text-slate-500 px-1 leading-relaxed">
+              <p className="text-xs text-slate-400 px-1 leading-relaxed">
                 Si lo activas, se envían al servidor métricas agregadas de tus consultas (modelo usado, tipo de
                 consulta, tiempos de respuesta y conteo de tokens). Nunca se envían el texto de tus preguntas ni
                 las respuestas, ni tu ubicación. Puedes desactivarlo cuando quieras.
@@ -904,7 +904,7 @@ export default function ProfileScreen({ onBack, onHome }) {
               <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
                 <div className="flex flex-col gap-0.5 flex-1">
                   <span className="text-sm font-bold text-slate-200">Mostrar información GPU</span>
-                  <span className="text-[10px] text-slate-500 leading-snug">
+                  <span className="text-xs text-slate-400 leading-snug">
                     Para curiosos: muestra qué modelos de IA están cargados en GPU
                     y cuánta memoria usan. No es necesario para usar Chagra.
                   </span>
@@ -915,7 +915,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                   aria-checked={modoTecnico}
                   aria-label="Activar o desactivar modo técnico"
                   onClick={() => setModoTecnico((v) => !v)}
-                  className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+                  className={`tap-target relative w-12 h-7 rounded-full transition-colors shrink-0 ${
                     modoTecnico ? 'bg-slate-500' : 'bg-slate-700'
                   }`}
                 >
@@ -945,7 +945,7 @@ export default function ProfileScreen({ onBack, onHome }) {
               <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
                 <div className="flex flex-col gap-0.5 flex-1">
                   <span className="text-sm font-bold text-slate-200">Mostrar todas las capacidades</span>
-                  <span className="text-[10px] text-slate-500 leading-snug">
+                  <span className="text-xs text-slate-400 leading-snug">
                     Activa todos los módulos, tarjetas de seguimiento y opciones del
                     home, saltándose el filtrado por perfil. Útil para demos y para
                     el administrador del producto.
@@ -958,7 +958,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                   aria-label="Activar o desactivar la visión total del operador"
                   data-testid="operator-override-toggle"
                   onClick={handleVerTodo}
-                  className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+                  className={`tap-target relative w-12 h-7 rounded-full transition-colors shrink-0 ${
                     verTodo ? 'bg-amber-600' : 'bg-slate-700'
                   }`}
                 >
@@ -988,7 +988,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                 >
                   <div className="flex flex-col gap-0.5 flex-1">
                     <span className="text-sm font-bold text-slate-200">Fincas que acompaño</span>
-                    <span className="text-[10px] text-slate-500 leading-snug">
+                    <span className="text-xs text-slate-400 leading-snug">
                       Panel del extensionista: revisa el estado de las fincas que
                       supervisas. Vista previa con datos de ejemplo.
                     </span>
@@ -1002,10 +1002,10 @@ export default function ProfileScreen({ onBack, onHome }) {
 
         {/* App Info Footer — común a hub y secciones */}
         <div className="mt-8 pt-6 border-t border-slate-800/50 text-center">
-          <p className="text-[10px] text-slate-600 font-mono tracking-tighter uppercase">
+          <p className="text-[11px] text-slate-500 font-mono tracking-tighter uppercase">
             Chagra • v1.0.0
           </p>
-          <p className="text-[9px] text-slate-700 mt-1 max-w-[200px] mx-auto leading-tight">
+          <p className="text-[11px] text-slate-500 mt-1 max-w-[220px] mx-auto leading-tight">
             Diseñado para la soberanía alimentaria y la regeneración ecosistémica.
           </p>
         </div>
@@ -1044,7 +1044,7 @@ function AgentVoiceSection() {
       <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
         <div className="flex flex-col gap-0.5 flex-1">
           <span className="text-sm font-bold text-slate-200">Voz del agente activa</span>
-          <span className="text-[10px] text-slate-500 leading-snug">
+          <span className="text-xs text-slate-400 leading-snug">
             Cuando está activa, Chagra IA lee en voz alta sus respuestas (Kokoro TTS,
             con respaldo al sintetizador del navegador). Doble click en el avatar
             colibrí silencia o reactiva sin abrir esta pantalla.
@@ -1056,7 +1056,7 @@ function AgentVoiceSection() {
           aria-checked={ttsEnabled}
           aria-label="Activar o silenciar la voz del agente"
           onClick={handleToggle}
-          className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+          className={`tap-target relative w-12 h-7 rounded-full transition-colors shrink-0 ${
             ttsEnabled ? 'bg-violet-600' : 'bg-slate-700'
           }`}
         >
@@ -1117,7 +1117,7 @@ function MultifincaGpsSection() {
         <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-amber-900/20 border border-amber-700/40">
           <div className="flex flex-col gap-0.5 flex-1">
             <span className="text-sm font-bold text-amber-200">Modo manual activo</span>
-            <span className="text-[10px] text-amber-300/70">
+            <span className="text-xs text-amber-200/90">
               El banner GPS no consultará tu ubicación hasta que vuelvas a modo auto.
             </span>
           </div>
@@ -1136,7 +1136,7 @@ function MultifincaGpsSection() {
         <span className="text-xs font-bold text-slate-400 uppercase tracking-wide flex items-center gap-1.5">
           <Home size={12} /> Zona indoor (invernadero)
         </span>
-        <span className="text-[10px] text-slate-500 leading-relaxed">
+        <span className="text-xs text-slate-400 leading-relaxed">
           Cuando estás bajo techo y el GPS pierde fix, Chagra recuerda esta zona
           para no volver a "out of range". Vacío = sin zona indoor activa.
         </span>
@@ -1157,7 +1157,7 @@ function MultifincaGpsSection() {
           </button>
         </div>
         {indoorZone && (
-          <p className="text-[10px] text-emerald-400/80">
+          <p className="text-xs text-emerald-400">
             Activo: <strong>{indoorZone}</strong>
           </p>
         )}
@@ -1167,7 +1167,7 @@ function MultifincaGpsSection() {
       <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
         <div className="flex flex-col gap-0.5 flex-1">
           <span className="text-sm font-bold text-slate-200">Sincronizar histórico GPS</span>
-          <span className="text-[10px] text-slate-500 leading-snug">
+          <span className="text-xs text-slate-400 leading-snug">
             Off por default. Cuando activo, Chagra envía tu ubicación al server
             para análisis multifinca. Off = solo lookup local sin persistencia.
           </span>
@@ -1177,7 +1177,7 @@ function MultifincaGpsSection() {
           role="switch"
           aria-checked={gpsHistoryEnabled}
           onClick={() => setGpsHistoryEnabled(!gpsHistoryEnabled)}
-          className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+          className={`tap-target relative w-12 h-7 rounded-full transition-colors shrink-0 ${
             gpsHistoryEnabled ? 'bg-emerald-600' : 'bg-slate-700'
           }`}
         >

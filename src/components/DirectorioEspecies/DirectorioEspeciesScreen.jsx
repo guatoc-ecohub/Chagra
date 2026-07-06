@@ -215,7 +215,7 @@ export default function DirectorioEspeciesScreen({ onBack, initialQuery = '' }) 
                         <span className="jp-tinta-suave block text-xs italic text-slate-400 leading-tight truncate">{r.cientifico}</span>
                       )}
                       {r.familia && (
-                        <span className="jp-tinta-suave block text-[11px] text-slate-400 leading-tight">{r.familia}</span>
+                        <span className="jp-tinta-suave block text-xs text-slate-400 leading-tight">{r.familia}</span>
                       )}
                     </span>
                   </button>

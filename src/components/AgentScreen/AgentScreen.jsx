@@ -3435,6 +3435,8 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               : 'bg-slate-800 text-slate-500'
           }`}
           title={ttsEnabled ? 'Silenciar voz' : 'Activar voz'}
+          aria-label={ttsEnabled ? 'Silenciar voz' : 'Activar voz'}
+          aria-pressed={ttsEnabled}
         >
           {ttsEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
         </button>
@@ -4000,7 +4002,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
                 <span className="text-base shrink-0 leading-none mt-0.5" aria-hidden="true">
                   {rotatingTip.icon}
                 </span>
-                <p className="text-[11px] text-slate-300 leading-snug flex-1">
+                <p className="text-xs text-slate-300 leading-snug flex-1">
                   <span className="text-violet-400 font-medium block mb-0.5">
                     💡 Tip mientras espero
                   </span>
@@ -4013,7 +4015,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
                     setHintDismissed(true);
                   }}
                   aria-label="Cerrar sugerencia"
-                  className="text-[10px] text-slate-500 hover:text-slate-300 shrink-0 leading-none px-1"
+                  className="tap-target text-sm text-slate-400 hover:text-slate-200 shrink-0 leading-none px-1"
                   data-testid="dismiss-tip"
                 >
                   ×
@@ -4023,7 +4025,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             <button
               type="button"
               onClick={handleCancelLLM}
-              className="text-[10px] px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 active:scale-95 transition-all"
+              className="tap-target text-xs px-4 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 active:scale-95 motion-reduce:transition-none motion-reduce:active:scale-100 transition-all"
             >
               Cancelar
             </button>
@@ -4042,7 +4044,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               type="button"
               onClick={() => setQueueRejectedToast('')}
               aria-label="Cerrar aviso"
-              className="text-amber-400 hover:text-amber-200 text-sm leading-none"
+              className="tap-target text-amber-400 hover:text-amber-200 text-sm leading-none"
             >
               ×
             </button>

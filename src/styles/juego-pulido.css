@@ -166,7 +166,7 @@
   box-shadow: inset 0 0 0 1px var(--jp-vida-clara), 0 0 12px var(--jp-vida-suave);
 }
 .fvh-skin .df-beneficio-nombre {
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   color: var(--jp-tinta-2);
   letter-spacing: 0.005em;
 }
