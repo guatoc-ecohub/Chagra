@@ -15,7 +15,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Radio, Mic, BatteryWarning, GraduationCap } from 'lucide-react';
-import useModoCampo from '../../hooks/useModoCampo';
+import { useModoCampoContext } from '../../hooks/ModoCampoContext';
 import { hasPersonalVoiceMarker, forgetPersonalVoice } from '../../services/wakeWordService';
 import EnrollmentModoCampo from './EnrollmentModoCampo';
 import { MSG } from '../../config/messages';
@@ -37,7 +37,7 @@ export default function ModoCampoPanel() {
   const {
     active, setActive, status, errorMsg, source,
     lowBatteryNotice, dismissLowBattery,
-  } = useModoCampo();
+  } = useModoCampoContext();
   const [showConsent, setShowConsent] = useState(false);
   const [showEnrollment, setShowEnrollment] = useState(false);
   // Marcador liviano (localStorage, sin cargar TF.js) — ver

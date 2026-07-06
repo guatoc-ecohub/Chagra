@@ -75,7 +75,10 @@ export async function createEnrollmentSession({ onProgress } = {}) {
      * modelo base). Rechaza si el usuario negó el permiso de micrófono.
      */
     async collect(label) {
-      return transfer.collectExample(label);
+      // durationMultiplier 1.5: +50% de tiempo para decir "hola chagra" completo
+      // (el default ~1s cortaba la frase). speech-commands extrae la ventana de
+      // mayor energía, así que el modelo sigue recibiendo su frame nativo.
+      return transfer.collectExample(label, { durationMultiplier: 1.5 });
     },
 
     /** Conteo actual por clase — útil para deshabilitar "Entrenar" hasta tener suficiente. */

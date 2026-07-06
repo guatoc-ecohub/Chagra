@@ -29,6 +29,12 @@ import { activarEscucha } from '../services/escuchaService';
 
 const INACTIVITY_MS = 10 * 60 * 1000; // 10 min sin disparos → apagar solo
 const LOW_BATTERY_LEVEL = 0.15; // ~15%
+const ACTIVE_KEY = 'chagra:modoCampo:active';
+
+/** Lee el toggle persistido (sobrevive navegación entre pantallas y reload). */
+function readPersistedActive() {
+  try { return localStorage.getItem(ACTIVE_KEY) === '1'; } catch (_) { return false; }
+}
 
 /**
  * @typedef {'idle'|'loading-libs'|'loading-base'|'loading-personal'|'loading-ready'|'training'|'ready'|'listening'|'error'} ModoCampoStatus
@@ -44,7 +50,7 @@ const LOW_BATTERY_LEVEL = 0.15; // ~15%
  * }}
  */
 export function useModoCampo() {
-  const [active, setActive] = useState(false);
+  const [active, setActive] = useState(readPersistedActive);
   /** @type {[ModoCampoStatus, (s: ModoCampoStatus) => void]} */
   const [status, setStatus] = useState(/** @type {ModoCampoStatus} */ ('idle'));
   const [lastScore, setLastScore] = useState(0);
@@ -56,6 +62,16 @@ export function useModoCampo() {
   const detectorRef = useRef(null);
   const inactivityRef = useRef(null);
   const cancelledRef = useRef(false);
+
+  // Persiste el toggle: el modo campo sobrevive al navegar entre pantallas y al
+  // reload (antes el estado vivía en ModoCampoPanel/Perfil y moría al salir →
+  // el wake-word no escuchaba en ningún otro lado).
+  useEffect(() => {
+    try {
+      if (active) localStorage.setItem(ACTIVE_KEY, '1');
+      else localStorage.removeItem(ACTIVE_KEY);
+    } catch (_) { /* localStorage no disponible: degradar sin romper */ }
+  }, [active]);
 
   const resetInactivityTimer = useCallback(() => {
     if (inactivityRef.current) clearTimeout(inactivityRef.current);
