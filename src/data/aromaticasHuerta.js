@@ -190,17 +190,17 @@ export const AROMATICAS = [
   {
     slug: 'hierbabuena',
     nombre: 'Hierbabuena',
-    cientifico: 'Mentha × villosa',
+    cientifico: 'Mentha spicata',
     familia: 'Lamiaceae',
     emoji: '🍃',
     hook: 'La del agua de panela y las aromáticas de la casa',
     grounded: {
-      altitud: { optMin: 800, optMax: 2500, absMin: 300, absMax: 3000 },
+      altitud: { optMin: 500, optMax: 2600, absMin: 0, absMax: 3000 },
       pisos: ['calido', 'templado', 'frio'],
       sol: 'sombra_parcial',
       agua: 'alto',
       drenaje: 'medio',
-      propagacion: { metodo: 'estolon', nota: 'Es un híbrido estéril: solo se propaga por sus guías rastreras (estolones), muy usada en huertas caseras colombianas.' },
+      propagacion: { metodo: 'estolon', nota: 'Solo se propaga por sus guías rastreras (estolones). La hierbabuena de las huertas caseras colombianas, la del agua de panela y las aromáticas.' },
       roles: ['crop', 'pest_repellent', 'ground_cover'],
     },
     cocina:
