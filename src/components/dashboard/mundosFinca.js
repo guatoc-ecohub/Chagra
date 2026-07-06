@@ -128,7 +128,7 @@ export const MUNDOS_FINCA = [
             { view: 'animales', label: 'Todos los animales', desc: 'Su corral completo y el ciclo cerrado', emoji: '🐮' },
             { view: 'animales_gallinas', label: 'Gallinas', desc: 'Postura, sanidad y gallinaza', emoji: '🐔' },
             { view: 'animales_vacas', label: 'Vacas', desc: 'Manejo, pastoreo y ordeño', emoji: '🐄' },
-            { view: 'animales_abejas', label: 'Abejas', desc: 'Colmenas y polinización de sus cultivos', emoji: '🐝' },
+            { view: 'animales_abejas', label: 'Abejas y polinización', desc: 'Nativas sin aguijón, colmenas y una finca amiga de polinizadores', emoji: '🐝' },
             { view: 'seguimiento_cerdos', label: 'Cerdos', desc: 'Ciclo de manejo porcino y cama profunda', emoji: '🐖' },
         ],
     },

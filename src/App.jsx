@@ -235,6 +235,10 @@ const HASH_VIEW_ROUTES = {
   animales: 'animales',
   'animales-gallinas': 'animales_gallinas',
   'animales-abejas': 'animales_abejas',
+  abejas: 'animales_abejas',
+  polinizacion: 'animales_abejas',
+  polinizadores: 'animales_abejas',
+  meliponicultura: 'animales_abejas',
   'animales-vacas': 'animales_vacas',
   estiercol: 'estiercol',
   'del-corral-al-abono': 'estiercol',
@@ -1243,7 +1247,7 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Abejas">
-              <AbejasScreen onBack={() => navigate('animales')} onHome={() => navigate('dashboard')} />
+              <AbejasScreen onBack={() => navigate('animales')} onHome={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
