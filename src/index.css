@@ -665,6 +665,19 @@
 }
 
 /* ===========================================================================
+ * PLÁTANO Y BANANO — el sol respira sobre la mata madre-hijo-nieto
+ * (PlatanoBananoScreen). Mismo latido sutil que el silo; se apaga con
+ * prefers-reduced-motion.
+ * =========================================================================== */
+.pb-sun {
+  transform-origin: 210px 26px;
+  animation: pc-breathe 4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pb-sun { animation: none; }
+}
+
+/* ===========================================================================
  * LA COMIDA QUE ALIMENTA — micro-animaciones (NutricionHumanaScreen).
  * El sol respira, el vapor sube y las barras comparativas crecen desde 0 al
  * montar. Todo sutil; TODO se apaga con prefers-reduced-motion (las barras

@@ -138,6 +138,15 @@ const AlmacenamientoScreen = lazy(() => import('./components/AlmacenamientoScree
 // nutricional (ICBF TCAC 2015) por cultivo, exportado del grafo chagra_kg a
 // public/nutricion-humana.json (la PWA no consulta el grafo en vivo).
 const NutricionHumanaScreen = lazy(() => import('./components/NutricionHumanaScreen'));
+// Módulo "Plátano y banano" (mundo Cultivos y semillas): el pancoger clave del
+// campesino colombiano, foto-forward. 4 pilares — variedades y la mata como
+// sistema (madre-hijo-nieto + deshije), siembra y compañía (colino/cormo,
+// distancias con calculadora de densidad, sombra café/cacao, hambre de potasio),
+// sigatoka y picudo (reconocer + manejo agroecológico, sin dosis inventadas) y
+// cosecha + aprovechamiento del pseudotallo/hoja (enlaza al mundo del abono).
+// Datos grounded al catálogo/grafo (cycle-content musa, grafo-relations,
+// sanidadData). Fotos CC con crédito visible.
+const PlatanoBananoScreen = lazy(() => import('./components/PlatanoBananoScreen'));
 // LOS MUNDOS DE MI FINCA (reestructuración 2.0 del home): un mundo por dentro —
 // las funciones existentes agrupadas por lugar. Re-rutea, no reimplementa.
 const MundoScreen = lazy(() => import('./components/MundoScreen'));
@@ -272,6 +281,10 @@ const HASH_VIEW_ROUTES = {
   nutricion: 'nutricion',
   'nutricion-humana': 'nutricion',
   'comida-que-alimenta': 'nutricion',
+  platano: 'platano',
+  'platano-banano': 'platano',
+  banano: 'platano',
+  platanera: 'platano',
   // Curso guiado + deep-links profundos usados por la landing (chagra.bio):
   // permiten que chagra.app/#curso, /#sembrar, /#voz, /#milpa, /#biopreparados,
   // /#sanidad y /#cosechar caigan en su vista real (antes caían a dashboard).
@@ -295,7 +308,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'platano', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
   'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
@@ -1435,6 +1448,19 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Almacenamiento y Conservación">
               <AlmacenamientoScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'platano':
+        // Módulo "Plátano y banano" (mundo Cultivos y semillas): el pancoger
+        // clave del campesino, foto-forward. 4 pilares (variedades y la mata
+        // madre-hijo-nieto / siembra y compañía con calculadora de densidad /
+        // sigatoka y picudo con manejo agroecológico / cosecha y aprovechamiento
+        // del pseudotallo). Grounded al catálogo/grafo; fotos CC con crédito.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Plátano y banano">
+              <PlatanoBananoScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
