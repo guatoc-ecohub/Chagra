@@ -665,6 +665,20 @@
 }
 
 /* ===========================================================================
+ * FICHA DE ESPECIE — el brote de la ilustración de portada respira cuando la
+ * especie aún no tiene foto en el catálogo (SpeciesFicha/SpeciesHero). Sutil e
+ * infinito muy lento; se apaga con prefers-reduced-motion. transform-origin en
+ * unidades de usuario del SVG (viewBox 120×120), centrado en la semilla.
+ * =========================================================================== */
+.sf-brote {
+  transform-origin: 60px 50px;
+  animation: pc-breathe 4.5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sf-brote { animation: none; }
+}
+
+/* ===========================================================================
  * LA COMIDA QUE ALIMENTA — micro-animaciones (NutricionHumanaScreen).
  * El sol respira, el vapor sube y las barras comparativas crecen desde 0 al
  * montar. Todo sutil; TODO se apaga con prefers-reduced-motion (las barras
