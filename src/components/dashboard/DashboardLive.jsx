@@ -399,8 +399,9 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
         const hasAltitud = p.finca_altitud !== '' && p.finca_altitud != null && Number.isFinite(alt);
         return !hasAltitud || p.piso_confirmado !== '1';
     });
-    // Bienvenida de PRIMERA VEZ (BienvenidaFinca): secuencia de 3 momentos
-    // (colibrí + capacidades estrella + ubicación mágica) que se muestra UNA
+    // Bienvenida de PRIMERA VEZ (BienvenidaFinca): recorrido de 5 momentos
+    // (colibrí + capacidades estrella + "hola Chagra" manos-libres +
+    // instalar la app + ubicación mágica) que se muestra UNA
     // sola vez, con la MISMA señal de primer uso del banner compacto (sin
     // plantas y sin piso) + flag persistente "ya la vi". Capa 100% visual:
     // "Ubicar mi finca" delega en la ruta existente 'ubicacion-detectada';

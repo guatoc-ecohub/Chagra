@@ -133,7 +133,18 @@ const messages = {
     elegirRegistro: 'Elija cómo registrarla. Las tres rutas guardan lo mismo.',
     tipZonas: 'Tip: tras la primera, puede crear zonas (parcelas, camas) para organizarlas.',
   },
-  // Bienvenida de PRIMERA VEZ (BienvenidaFinca) — secuencia de 3 momentos.
+  // Instalación de la PWA — strings COMPARTIDOS entre IosInstallBanner,
+  // AndroidInstallBanner y el momento "instalar" del recorrido de bienvenida
+  // (BienvenidaFinca), para no duplicar el copy de los pasos.
+  instalarApp: {
+    titulo: 'Instale Chagra',
+    subtituloAndroid: 'Téngala en su pantalla de inicio, como una aplicación.',
+    cta: 'Instalar Chagra',
+    cerrarAria: 'Cerrar',
+    iosPaso1: 'Toque el botón Compartir en Safari.',
+    iosPaso2: 'Elija “Añadir a pantalla de inicio”.',
+  },
+  // Bienvenida de PRIMERA VEZ (BienvenidaFinca) — secuencia de 5 momentos.
   // Tono "usted" cordial colombiano, frases cortas (muchos usuarios leen poco).
   bienvenida: {
     eyebrow: 'Bienvenido a Chagra',
@@ -151,6 +162,28 @@ const messages = {
     // para el usuario que trae equipo: Chagra lo entiende por voz o por foto.
     capHerramTitulo: 'Sus herramientas del campo',
     capHerramCopy: 'Si tiene micrófono, cámara o gafas, Chagra lo escucha y lo mira igual.',
+    // Momento 3 — "Hola Chagra": hablarle con las manos ocupadas (modo campo).
+    // HONESTO con el MVP de voz (push-to-talk, D9 de la arquitectura
+    // voice-first): se toca el micrófono UNA vez y se habla; la escucha
+    // continua siempre-atenta es fase 2 y este copy NO la promete.
+    vozTitulo: '¿Manos en la tierra? Háblele',
+    vozCopy: 'En el surco, con guantes o con las manos sucias, no tiene que escribir: abra el agente, toque el micrófono y salude.',
+    vozEjemplo: '“Hola Chagra, ¿cuándo abono el café?”',
+    vozChip1: 'Con guantes puestos',
+    vozChip2: 'En pleno surco',
+    vozChip3: 'Sin escribir nada',
+    vozNota: 'Y Chagra le puede responder con voz, para que no suelte la herramienta.',
+    vozFotoAlt: 'Manos campesinas sembrando una plántula en la tierra.',
+    // Momento 4 — instalar la app (PWA): el porqué es el campo sin señal.
+    instalarTitulo: 'Llévela en el bolsillo',
+    instalarCopy: 'Instale Chagra como una app y le sirve hasta donde no llega la señal.',
+    instalarPorque1: 'Funciona sin internet, allá arriba en el lote.',
+    instalarPorque2: 'Lo que registre queda guardado en su celular, sin gastar datos.',
+    instalarPorque3: 'Abre con un toque desde su pantalla, como cualquier app.',
+    instalarCta: 'Instalar Chagra ahora',
+    instalarListo: 'Listo: Chagra ya está instalada en este equipo.',
+    instalarMenuHint: 'En el menú de su navegador (⋮) busque “Instalar aplicación” o “Añadir a pantalla de inicio”.',
+    instalarFotoAlt: 'Caficultor cogiendo café en una ladera de Rioblanco, Tolima.',
     titulo3: '¿Dónde está su tierra?',
     copy3: 'Con un toque sabemos su vereda y su altura. Así el consejo llega acertado para su clima.',
     siguiente: 'Siguiente',
