@@ -52,6 +52,9 @@ import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities,
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
 // el chip cuyo backend aún no existe (deep).
 import { planForcedIntent, isStubIntent, isDeepResearchIntent, CHIP_DEFS } from '../../services/chipIntentRouter';
+// Fases visibles del "pensando" (MSG.agente.fases) — perceived performance:
+// la espera larga muestra en qué va el pipeline, no un "Pensando" opaco.
+import { MSG } from '../../config/messages';
 // «Chagra enseña a usar Chagra» (ayuda groundeada): detecta preguntas META
 // («¿cómo uso X?», «¿qué puede hacer Chagra?», «¿dónde veo los precios?») y
 // responde DESDE el manifiesto (ayudaFunciones) — sin LLM, nunca inventa una
@@ -223,6 +226,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   const [agentAttachment, setAgentAttachment] = useState(null); // {blob,mime,previewUrl,fileName}
   const [agentPickError, setAgentPickError] = useState('');
   const [streamingContent, setStreamingContent] = useState('');
+  // Fase visible del pipeline mientras state === STATE_THINKING (perceived
+  // performance): 'transcribiendo' | 'entendiendo' | 'consultando' |
+  // 'escribiendo' | null. Cada entrada al pipeline la setea fresca, así que
+  // no hace falta limpiarla al salir de THINKING (solo se renderiza ahí).
+  const [thinkingPhase, setThinkingPhase] = useState(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [error, setError] = useState('');
   const [actionModal, setActionModal] = useState({ isOpen: false, intent: null, llmResponse: '' });
@@ -824,6 +832,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // puras, testeables y medibles fuera de React).
 
   const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null, fermentoBlock = '', subgrafoBloque = '', biopreparadoBlock = '', pisoTermicoBlock = '', confusionEspecieBlock = '', pestVsDiseaseBlock = '', groundingPolicyBlock = '') => {
+    // Fase 3 del "pensando" visible: generación en el LLM. Cuando llega el
+    // primer token, la UI pasa sola al parcial streaming (streamingContent).
+    setThinkingPhase('escribiendo');
     const analysis = analyzeQuery(query);
     // El base recibe query/historial/isEnum para inyectar SOLO los glosarios
     // y reglas condicionales que la conversación toca (re-arquitectura GR-10).
@@ -1331,6 +1342,8 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     }
     setStreamingContent('');
     setState(STATE_THINKING);
+    // Fase 1 del "pensando" visible: contexto + RAG + resolución de entidades.
+    setThinkingPhase('entendiendo');
     setError('');
     agentSounds.start();
 
@@ -1438,6 +1451,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // del grafo AGE para queries relacionales (plaga+cultivo). '' = no-op.
       let subgrafoBloque = '';
       if (isOnline && isSidecarEnabled()) {
+        // Fase 2 del "pensando" visible: grounding real contra el sidecar
+        // (entidades, guards, grafo, tools). Es el tramo más largo antes de
+        // generar — mostrarlo evita la sensación de "se colgó".
+        setThinkingPhase('consultando');
         try {
           // PASO 1 — pre-validation AGE (DR taxonómico Tier 1 B, PR #59).
           // Resuelve entidades vegetales/plagas a binomio canónico autoritativo
@@ -2940,6 +2957,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       }
       const { blob } = result;
       setState(STATE_THINKING);
+      // Fase de voz: transcripción Whisper antes de entrar al pipeline de
+      // texto (que setea sus propias fases al arrancar).
+      setThinkingPhase('transcribiendo');
 
       try {
         const text = await transcribe(blob);
@@ -3503,6 +3523,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         messages={messages}
         streamingContent={streamingContent}
         isStreaming={state === STATE_THINKING}
+        thinkingLabel={MSG.agente.fases[thinkingPhase] || null}
         onConsentNeeded={handleFeedbackConsentNeeded}
         onRetryOrphan={handleRetryOrphan}
         onCancelDeepResearch={handleCancelDeepResearch}
@@ -3959,6 +3980,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
                 // pedimos "toca de nuevo" — la pregunta está guardada y, si se
                 // corta, se reintenta sola. Aun el caso lento ofrece SOLO
                 // Cancelar (acción voluntaria), nunca insinúa que se perdió.
+                // La fase visible (thinkingPhase) reemplaza el "Pensando"
+                // genérico para que la espera muestre avance real.
+                const faseLabel = MSG.agente.fases[thinkingPhase] || null;
                 if (showSlowWarning) {
                   return 'Sigo pensando — esto puede tardar en el campo. Tu pregunta está guardada.';
                 }
@@ -3980,9 +4004,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
                   if (stretching) {
                     return `Casi listo… (${Math.floor(elapsed / 1000)}s)`;
                   }
-                  return `Pensando tu respuesta… ~${secsLeft}s`;
+                  return `${faseLabel || 'Pensando tu respuesta'}… ~${secsLeft}s`;
                 }
-                return 'Pensando… (puede tardar en el campo)';
+                return `${faseLabel || 'Pensando'}… (puede tardar en el campo)`;
               })()}
             </p>
             {queuePending.length >= 1 && (

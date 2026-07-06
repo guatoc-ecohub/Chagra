@@ -92,6 +92,16 @@ const messages = {
     // estado completo para lectores de pantalla.
     pensandoTexto: 'Pensando',
     pensandoAria: 'Chagra IA está pensando',
+    // Fases visibles del "pensando" (perceived performance): el pipeline
+    // interno (transcripción → entendimiento → grounding/tools → generación)
+    // se asoma a la UI para que la espera larga se sienta viva y con avance,
+    // no colgada. Las claves las setea AgentScreen (thinkingPhase).
+    fases: {
+      transcribiendo: 'Entendiendo tu voz',
+      entendiendo: 'Entendiendo tu pregunta',
+      consultando: 'Consultando el catálogo y tu chagra',
+      escribiendo: 'Escribiendo tu respuesta',
+    },
     confianzaAlta: 'Confianza alta',
     confianzaMedia: 'Confianza media',
     confianzaBaja: 'Confianza baja',
