@@ -267,11 +267,24 @@ export async function resolvePestSynonym(term) {
 
 /**
  * Índice plaga canónica → ids de especies que afecta (según el grafo offline).
+ * Es la arista AFFECTS (plaga→cultivo) materializada offline.
  * @returns {Promise<Record<string, string[]>>}
  */
 export async function getPestIndex() {
   await loadGrafoRelations();
   return (rootCache && rootCache._pest_index) || {};
+}
+
+/**
+ * Mapa de sinónimos de plaga (término coloquial/regional/científico → etiqueta
+ * canónica del grafo). Espeja `_pest_synonyms` del export offline. Permite
+ * resolver una plaga MENCIONADA (por el usuario o citada en la respuesta) a su
+ * etiqueta canónica y, de ahí, a su arista AFFECTS vía `getPestIndex`.
+ * @returns {Promise<Record<string, string>>}
+ */
+export async function getPestSynonyms() {
+  await loadGrafoRelations();
+  return (rootCache && rootCache._pest_synonyms) || {};
 }
 
 /**

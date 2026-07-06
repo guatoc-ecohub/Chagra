@@ -79,7 +79,17 @@ import { planMarketIntent } from '../../services/marketIntentRouter';
 // se arma desde el export precacheado del grafo AGE (grafo-relations.json), en
 // vez de quedarse sin grounding relacional. resolveSpecies mapea el query a un
 // id del catálogo SIN red (catalogDB + BM25 local).
-import { buildOfflineGroundingBlock } from '../../services/grafoRelations';
+import { buildOfflineGroundingBlock, getPestIndex, getPestSynonyms } from '../../services/grafoRelations';
+// AFFECTS-GATE (anti-contaminación cruzada de cultivo): el sello "Catálogo
+// verificado" NO debe pintarse cuando la evidencia surfacea un organismo que no
+// afecta al cultivo en foco (arista AFFECTS ausente). Ver affectsGate.js.
+import {
+  extractAffectsFromEvidence,
+  resolvePestAffects,
+  scanTextForPestAffects,
+  detectCrossCropContamination,
+  gateSourceMetadataByAffects,
+} from '../../services/affectsGate';
 import { resolveSpecies } from '../../services/speciesResolver';
 // Deep Research (A6/A7): cliente HTTP del endpoint async de investigación
 // profunda del sidecar. Feature flag VITE_DEEP_RESEARCH_ENABLED (default false).
@@ -2287,6 +2297,52 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         ...groundingSemaphoreMeta,
         auto_corrected: guarded.modified === true,
       };
+
+      // AFFECTS-GATE (auditoría anti-contaminación cruzada de cultivo, 2026-07):
+      // el sello "Catálogo verificado" NO debe pintarse cuando la evidencia
+      // surfacea un organismo (plaga) que NO afecta al cultivo EN FOCO. Caso
+      // confirmado: BROCA (plaga de CAFÉ, Hypothenemus hampei) mostrada como
+      // "Dato verificado" en una conversación de CACAO — verificado ≠ relevante.
+      // La arista AFFECTS ya viaja en la evidencia (get_pest_controllers →
+      // target_species) y en el índice offline del grafo (_pest_index); esto es
+      // SOLO la comprobación (wiring), no grounding nuevo. Suppress-and-replace
+      // del SELLO: grounded→false + marca explícita cross_crop (el ChatBubble
+      // pinta "Dato de otro cultivo · verifica"). Solo corre sobre turnos que
+      // IBAN a salir verificados. Graceful: cualquier fallo deja el sello
+      // intacto (jamás degrada por error).
+      if (sourceMetadata && sourceMetadata.grounded === true) {
+        try {
+          const cropInFocusIds = Array.from(new Set(
+            (resolvedEntities || [])
+              .filter((e) => e && ['cultivo', 'especie', 'species', 'planta'].includes(e.kind))
+              .map((e) => e.canonical_id)
+              .filter((id) => typeof id === 'string' && id.trim().length > 0)
+          ));
+          if (cropInFocusIds.length > 0) {
+            const [pestIndex, pestSynonyms] = await Promise.all([getPestIndex(), getPestSynonyms()]);
+            const maps = { pestIndex, pestSynonyms };
+            const pestAffectsList = [
+              ...extractAffectsFromEvidence(toolEvidence),
+              ...(resolvedEntities || [])
+                .filter((e) => e && (e.kind === 'pest' || e.kind === 'plaga'))
+                .map((e) => resolvePestAffects(e.canonical_id || e.mentioned, maps))
+                .filter(Boolean),
+              ...scanTextForPestAffects(response, maps),
+            ];
+            const gateResult = detectCrossCropContamination({ cropInFocusIds, pestAffectsList });
+            if (gateResult.crossCrop) {
+              sourceMetadata = gateSourceMetadataByAffects(sourceMetadata, gateResult, { cropInFocusIds });
+              console.debug('[affects-gate] cross-crop → sello degradado', {
+                cropInFocusIds,
+                organismos: gateResult.offending.map((o) => o.pest),
+              });
+            }
+          }
+        } catch (gErr) {
+          // El gate jamás bloquea el chat: si algo falla, el sello queda como estaba.
+          console.debug('[affects-gate] no aplicado (sigo con el sello original):', gErr?.message);
+        }
+      }
 
       // Capa 2 anti-alucinación — cross-check de contexto (operador 2026-05-30).
       // Tras generar la respuesta, le pedimos al sidecar que correlacione cada
