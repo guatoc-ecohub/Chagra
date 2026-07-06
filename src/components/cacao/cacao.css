@@ -1,0 +1,43 @@
+/*
+ * cacao.css — piel del mundo "El cacao". Acentos de tierra/chocolate.
+ * El scrim de las fotos es FIJO (no lo vira el remapeo de temas claros) para que
+ * el texto encima quede legible al sol, igual que en el módulo Agua.
+ */
+
+/* Entrada suave de cada sección al cambiar de estación. */
+@keyframes cacao-seccion-entra {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.cacao-seccion {
+  animation: cacao-seccion-entra 0.28s ease-out both;
+}
+
+/* Latido del punto rojo en las alertas de enfermedad (respeta reduce-motion). */
+@keyframes cacao-alerta-late {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+.cacao-alerta-late {
+  animation: cacao-alerta-late 1.6s ease-in-out infinite;
+}
+
+/* Pulso sutil de la pestaña activa. */
+.cacao-estacion-activa {
+  box-shadow: 0 0 0 1px rgba(217, 119, 6, 0.35) inset;
+}
+
+/* La foto entra con un leve zoom-out para dar vida sin distraer. */
+@keyframes cacao-foto-entra {
+  from { transform: scale(1.04); }
+  to   { transform: scale(1); }
+}
+.cacao-foto {
+  animation: cacao-foto-entra 0.6s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cacao-seccion,
+  .cacao-foto { animation: none; }
+  .cacao-alerta-late { animation: none; }
+}

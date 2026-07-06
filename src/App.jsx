@@ -138,6 +138,13 @@ const AlmacenamientoScreen = lazy(() => import('./components/AlmacenamientoScree
 // nutricional (ICBF TCAC 2015) por cultivo, exportado del grafo chagra_kg a
 // public/nutricion-humana.json (la PWA no consulta el grafo en vivo).
 const NutricionHumanaScreen = lazy(() => import('./components/NutricionHumanaScreen'));
+// Mundo "El cacao" (dentro de Cultivos y semillas): cultivo bandera de la paz y
+// la sustitución. 5 estaciones photo-forward — el árbol/clones, la sombra (SAF),
+// siembra e injerto + poda, monilia y escoba de bruja (manejo cultural, sin dosis
+// inventadas) y cosecha + beneficio (fermentación/secado + cáscara→abono).
+// Groundeado al catálogo/grafo (theobroma_cacao, moniliophthora_*) + FEDECACAO/
+// AGROSAVIA/ICA. Fotos CC reales con crédito visible (public/cacao/creditos.json).
+const CacaoScreen = lazy(() => import('./components/cacao/CacaoScreen'));
 // LOS MUNDOS DE MI FINCA (reestructuración 2.0 del home): un mundo por dentro —
 // las funciones existentes agrupadas por lugar. Re-rutea, no reimplementa.
 const MundoScreen = lazy(() => import('./components/MundoScreen'));
@@ -272,6 +279,9 @@ const HASH_VIEW_ROUTES = {
   nutricion: 'nutricion',
   'nutricion-humana': 'nutricion',
   'comida-que-alimenta': 'nutricion',
+  cacao: 'cacao',
+  'el-cacao': 'cacao',
+  theobroma: 'cacao',
   // Curso guiado + deep-links profundos usados por la landing (chagra.bio):
   // permiten que chagra.app/#curso, /#sembrar, /#voz, /#milpa, /#biopreparados,
   // /#sanidad y /#cosechar caigan en su vista real (antes caían a dashboard).
@@ -295,7 +305,7 @@ const MODULE_VIEWS = new Set([
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'cacao', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
   'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
@@ -1447,6 +1457,20 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="La comida que alimenta">
               <NutricionHumanaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'cacao':
+        // Mundo "El cacao" (dentro de Cultivos y semillas): cultivo bandera de la
+        // paz. 5 estaciones photo-forward — árbol/clones, sombra (SAF), siembra/
+        // injerto + poda, monilia y escoba de bruja (manejo cultural, sin dosis
+        // inventadas), cosecha + beneficio (fermentación/secado) y cáscara→abono
+        // (enlaza al mundo del compost). Groundeado a catálogo/grafo + FEDECACAO/
+        // AGROSAVIA/ICA. Fotos CC reales con crédito visible.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El cacao">
+              <CacaoScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
