@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
 import { Share, X } from 'lucide-react';
+import { isIosDevice, isStandaloneDisplay } from '../hooks/usePwaInstall';
+import { MSG } from '../config/messages.js';
 
+/**
+ * IosInstallBanner — instrucciones de instalación manual para iOS Safari.
+ *
+ * iOS jamás emite `beforeinstallprompt`: la única vía es el flujo manual
+ * "Compartir → Añadir a pantalla de inicio". La detección de plataforma y
+ * el copy de los pasos se comparten con el recorrido de bienvenida
+ * (usePwaInstall.isIosDevice + MSG.instalarApp) para no duplicarlos.
+ */
 const IosInstallBanner = () => {
-    // Use lazy initializer to avoid setState in useEffect and satisfy project linting
+    // Lazy initializer: evita setState en useEffect y respeta el linting.
     const [showBanner, setShowBanner] = useState(() => {
         if (typeof window === 'undefined') return false;
-
-        const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
         const isDismissed = localStorage.getItem('chagra-ios-install-dismissed');
-
-        return !!(isIos && !isStandalone && !isDismissed);
+        return !!(isIosDevice() && !isStandaloneDisplay() && !isDismissed);
     });
 
     const handleDismiss = () => {
@@ -21,7 +27,7 @@ const IosInstallBanner = () => {
     if (!showBanner) return null;
 
     return (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-md animate-in fade-in slide-in-from-bottom-5 duration-500">
+        <div className="pwa-install-banner fixed bottom-24 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-md animate-in fade-in slide-in-from-bottom-5 duration-500">
             <div className="bg-slate-900 border border-slate-700 shadow-2xl rounded-2xl p-4 flex items-center gap-4 relative overflow-hidden">
                 {/* Bio-punk accent */}
                 <div className="absolute top-0 left-0 w-1 h-full bg-muzo-glow"></div>
@@ -31,16 +37,17 @@ const IosInstallBanner = () => {
                 </div>
 
                 <div className="flex-1">
-                    <h3 className="text-white font-bold text-sm">Instala Chagra</h3>
+                    <h3 className="text-white font-bold text-sm">{MSG.instalarApp.titulo}</h3>
                     <p className="text-slate-400 text-xs">
-                        Toca <span className="text-slate-200">Compartir</span> en Safari y luego <span className="text-slate-200">"Añadir a inicio"</span>.
+                        <span className="text-slate-200">{MSG.instalarApp.iosPaso1}</span>{' '}
+                        {MSG.instalarApp.iosPaso2}
                     </p>
                 </div>
 
                 <button
                     onClick={handleDismiss}
                     className="p-2 text-slate-500 hover:text-white transition-colors"
-                    aria-label="Cerrar"
+                    aria-label={MSG.instalarApp.cerrarAria}
                 >
                     <X size={20} />
                 </button>
