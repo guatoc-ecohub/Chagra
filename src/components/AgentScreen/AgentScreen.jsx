@@ -1624,7 +1624,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           // Tambien invocamos get_multihop_companions (AIA-008): cadenas de N
           // saltos de asociacion ecologica (companeras que controlan plagas).
           // Ambas tools son sub-segundo y no-throw; si no hay dato, no-op.
-          const pestEnt = (resolvedEntities || []).find((e) => e.kind === 'pest' || e.kind === 'plaga');
+          const pestEnt = (resolvedEntities || []).find((e) => ['pest', 'plaga'].includes(e.kind));
           const cropEnt = (resolvedEntities || []).find((e) => ['cultivo', 'especie', 'species', 'planta'].includes(e.kind));
           const relArgs = {};
           if (pestEnt) relArgs.pest = pestEnt.canonical_id || pestEnt.mentioned;
@@ -2324,7 +2324,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             const pestAffectsList = [
               ...extractAffectsFromEvidence(toolEvidence),
               ...(resolvedEntities || [])
-                .filter((e) => e && (e.kind === 'pest' || e.kind === 'plaga'))
+                .filter((e) => e && (['pest', 'plaga'].includes(e.kind)))
                 .map((e) => resolvePestAffects(e.canonical_id || e.mentioned, maps))
                 .filter(Boolean),
               ...scanTextForPestAffects(response, maps),
