@@ -3076,6 +3076,373 @@ export function guardCompanionBinomial(responseText, resolvedEntities = null, _f
   return { text, modified: true, reason: `binomio_compañía: ${disparadas.join('; ')}` };
 }
 
+// ── GUARD 5c: FAMILIA BOTÁNICA FABRICADA en prosa (confusion_especie, #2132) ──
+//
+// Contexto (bench-contaminacion.mjs, sonda `confusion_especie`, 2026-07): tras
+// cerrar el hueco cross_thermal (guardWarmLowlandColdCrop/pisoTermico) el residuo
+// de contaminación migró a confusion_especie (0% → 9.5% del passrate): granite
+// AFIRMA en TEXTO LIBRE pertenencias de familia botánica INVENTADAS que ningún
+// guard cortaba. Casos reales cazados por el juez del bench:
+//   - "la guayaba pertenece a Passifloraceae"  (es Myrtaceae)
+//   - "el plátano es de la familia Passifloraceae"  (es Musaceae)
+//   - "la morera es Rosaceae"  (es Moraceae)
+// El PRE-prompt confusion-especie-guard (sidecar, chagra-pro #292/#2077) STEERING
+// solo INYECTA un aviso al system prompt ANTES de responder; no valida la salida.
+// Este guard es su COMPLEMENTO de RUNTIME sobre la RESPUESTA: cuando el texto le
+// atribuye una familia botánica a una especie EN FOCO que CONTRADICE la familia
+// REAL del catálogo/grafo (HAS_FAMILY), SUPRIME-Y-REEMPLAZA el cuerpo (NO antepone
+// un aviso: un cuerpo que clasifica mal la familia suele arrastrar rasgos de la
+// familia equivocada en toda la respuesta) por la corrección grounded.
+//
+// Patrón determinista groundeado en el catálogo, como el resto del trío: la tabla
+// `FAMILIA_CANON_SPECIES` es la proyección de `familia_botanica` (HAS_FAMILY) del
+// catálogo Chagra para las especies comestibles/cultivos comúnmente confundidas,
+// VERIFICADA contra catalog/*.json (test de anti-drift). Solo dispara ante una
+// atribución EXPLÍCITA ("pertenece a / es de la familia / es <Familia>aceae") que
+// contradice la familia real; reconoce tanto la forma latina (-aceae) como la
+// vernácula española (-áceas/-ácea) y los sinónimos clásicos (leguminosas,
+// gramíneas, compuestas, crucíferas, palmae).
+//
+// NUNCA inventa una familia: solo corrige una contradicción con el catálogo.
+
+/**
+ * Marcador idempotente de nuestro reemplazo (evita re-suprimir la corrección, que
+ * ya cita la familia CORRECTA y por tanto no re-dispara, pero lo cortamos barato).
+ */
+const BOTANICAL_FAMILY_MARKER = 'la clasificación botánica correcta';
+
+/**
+ * Familia botánica canónica (normalizada, latín en minúscula) por especie/género
+ * comúnmente confundido. `tokens` = nombres comunes normalizados (sin tildes, sin
+ * ñ→n) que el modelo usa en prosa; `family` = familia real del catálogo; `sci` =
+ * binomio representativo para la corrección; `excludeNext`/`excludePrev` = palabras
+ * de compuestos folk que denotan OTRA planta (p.ej. "papa china" = Araceae) y NO
+ * deben disparar. Solo se incluyen nombres INEQUÍVOCOS en prosa colombiana
+ * (verificado contra catalog/*.json: cero familias contradictorias).
+ */
+const FAMILIA_CANON_SPECIES = [
+  // Passifloraceae
+  { tokens: ['maracuya'], family: 'passifloraceae', display: 'el maracuyá', sci: 'Passiflora edulis' },
+  { tokens: ['gulupa'], family: 'passifloraceae', display: 'la gulupa', sci: 'Passiflora edulis f. edulis' },
+  { tokens: ['granadilla'], family: 'passifloraceae', display: 'la granadilla', sci: 'Passiflora ligularis' },
+  { tokens: ['curuba'], family: 'passifloraceae', display: 'la curuba', sci: 'Passiflora tripartita' },
+  { tokens: ['badea'], family: 'passifloraceae', display: 'la badea', sci: 'Passiflora quadrangularis' },
+  // Myrtaceae
+  { tokens: ['guayaba', 'guayabo'], family: 'myrtaceae', display: 'la guayaba', sci: 'Psidium guajava' },
+  { tokens: ['feijoa'], family: 'myrtaceae', display: 'la feijoa', sci: 'Acca sellowiana' },
+  { tokens: ['pomarrosa'], family: 'myrtaceae', display: 'la pomarrosa', sci: 'Syzygium jambos' },
+  { tokens: ['arrayan'], family: 'myrtaceae', display: 'el arrayán', sci: 'Myrcianthes' },
+  { tokens: ['eucalipto'], family: 'myrtaceae', display: 'el eucalipto', sci: 'Eucalyptus' },
+  // Musaceae
+  { tokens: ['platano'], family: 'musaceae', display: 'el plátano', sci: 'Musa × paradisiaca' },
+  { tokens: ['banano', 'guineo'], family: 'musaceae', display: 'el banano', sci: 'Musa acuminata' },
+  // Moraceae
+  { tokens: ['morera'], family: 'moraceae', display: 'la morera', sci: 'Morus alba' },
+  // Rosaceae
+  { tokens: ['fresa', 'frutilla'], family: 'rosaceae', display: 'la fresa', sci: 'Fragaria × ananassa' },
+  { tokens: ['durazno'], family: 'rosaceae', display: 'el durazno', sci: 'Prunus persica' },
+  // Solanaceae
+  { tokens: ['tomate'], family: 'solanaceae', display: 'el tomate', sci: 'Solanum lycopersicum' },
+  { tokens: ['papa'], family: 'solanaceae', display: 'la papa', sci: 'Solanum tuberosum', excludeNext: ['china'], excludePrev: ['cidra'] },
+  { tokens: ['lulo'], family: 'solanaceae', display: 'el lulo', sci: 'Solanum quitoense' },
+  { tokens: ['uchuva'], family: 'solanaceae', display: 'la uchuva', sci: 'Physalis peruviana' },
+  { tokens: ['berenjena'], family: 'solanaceae', display: 'la berenjena', sci: 'Solanum melongena' },
+  { tokens: ['aji'], family: 'solanaceae', display: 'el ají', sci: 'Capsicum' },
+  { tokens: ['tabaco'], family: 'solanaceae', display: 'el tabaco', sci: 'Nicotiana tabacum' },
+  // Rutaceae
+  { tokens: ['naranja'], family: 'rutaceae', display: 'la naranja', sci: 'Citrus × sinensis', excludePrev: ['arbol'] },
+  { tokens: ['mandarina'], family: 'rutaceae', display: 'la mandarina', sci: 'Citrus reticulata' },
+  { tokens: ['limon'], family: 'rutaceae', display: 'el limón', sci: 'Citrus × limon' },
+  { tokens: ['toronja'], family: 'rutaceae', display: 'la toronja', sci: 'Citrus × paradisi' },
+  // Lauraceae
+  { tokens: ['aguacate'], family: 'lauraceae', display: 'el aguacate', sci: 'Persea americana' },
+  // Anacardiaceae
+  { tokens: ['mango'], family: 'anacardiaceae', display: 'el mango', sci: 'Mangifera indica' },
+  { tokens: ['maranon'], family: 'anacardiaceae', display: 'el marañón', sci: 'Anacardium occidentale' },
+  { tokens: ['hobo', 'jobo'], family: 'anacardiaceae', display: 'el hobo', sci: 'Spondias' },
+  // Malvaceae
+  { tokens: ['cacao'], family: 'malvaceae', display: 'el cacao', sci: 'Theobroma cacao' },
+  { tokens: ['copoazu'], family: 'malvaceae', display: 'el copoazú', sci: 'Theobroma grandiflorum' },
+  // Rubiaceae
+  { tokens: ['cafe', 'cafeto'], family: 'rubiaceae', display: 'el café', sci: 'Coffea arabica' },
+  // Euphorbiaceae
+  { tokens: ['yuca'], family: 'euphorbiaceae', display: 'la yuca', sci: 'Manihot esculenta' },
+  // Arecaceae
+  { tokens: ['chontaduro'], family: 'arecaceae', display: 'el chontaduro', sci: 'Bactris gasipaes' },
+  // Fabaceae
+  { tokens: ['frijol', 'frijol'], family: 'fabaceae', display: 'el fríjol', sci: 'Phaseolus vulgaris' },
+  { tokens: ['arveja'], family: 'fabaceae', display: 'la arveja', sci: 'Pisum sativum' },
+  { tokens: ['haba'], family: 'fabaceae', display: 'el haba', sci: 'Vicia faba' },
+  { tokens: ['guamo', 'guama'], family: 'fabaceae', display: 'el guamo', sci: 'Inga' },
+  { tokens: ['guandul'], family: 'fabaceae', display: 'el guandul', sci: 'Cajanus cajan' },
+  { tokens: ['soya'], family: 'fabaceae', display: 'la soya', sci: 'Glycine max' },
+  // Brassicaceae
+  { tokens: ['repollo'], family: 'brassicaceae', display: 'el repollo', sci: 'Brassica oleracea' },
+  { tokens: ['brocoli'], family: 'brassicaceae', display: 'el brócoli', sci: 'Brassica oleracea var. italica' },
+  { tokens: ['coliflor'], family: 'brassicaceae', display: 'la coliflor', sci: 'Brassica oleracea var. botrytis' },
+  { tokens: ['rabano'], family: 'brassicaceae', display: 'el rábano', sci: 'Raphanus sativus' },
+  // Cucurbitaceae
+  { tokens: ['ahuyama', 'zapallo', 'calabaza'], family: 'cucurbitaceae', display: 'la ahuyama', sci: 'Cucurbita' },
+  { tokens: ['chayote'], family: 'cucurbitaceae', display: 'el chayote', sci: 'Sechium edule' },
+  // Poaceae
+  { tokens: ['maiz'], family: 'poaceae', display: 'el maíz', sci: 'Zea mays' },
+  { tokens: ['arroz'], family: 'poaceae', display: 'el arroz', sci: 'Oryza sativa' },
+  { tokens: ['bambu'], family: 'poaceae', display: 'el bambú', sci: 'Guadua angustifolia' },
+  { tokens: ['limonaria'], family: 'poaceae', display: 'la limonaria', sci: 'Cymbopogon citratus' },
+  // Asteraceae
+  { tokens: ['lechuga'], family: 'asteraceae', display: 'la lechuga', sci: 'Lactuca sativa' },
+  { tokens: ['girasol'], family: 'asteraceae', display: 'el girasol', sci: 'Helianthus annuus' },
+  { tokens: ['manzanilla'], family: 'asteraceae', display: 'la manzanilla', sci: 'Matricaria chamomilla' },
+  { tokens: ['calendula'], family: 'asteraceae', display: 'la caléndula', sci: 'Calendula officinalis' },
+  // Caricaceae
+  { tokens: ['papaya'], family: 'caricaceae', display: 'la papaya', sci: 'Carica papaya' },
+  { tokens: ['papayuela'], family: 'caricaceae', display: 'la papayuela', sci: 'Vasconcellea pubescens' },
+  // Amaranthaceae
+  { tokens: ['quinua'], family: 'amaranthaceae', display: 'la quinua', sci: 'Chenopodium quinoa' },
+  { tokens: ['acelga'], family: 'amaranthaceae', display: 'la acelga', sci: 'Beta vulgaris var. cicla' },
+  { tokens: ['remolacha'], family: 'amaranthaceae', display: 'la remolacha', sci: 'Beta vulgaris' },
+  // Convolvulaceae
+  { tokens: ['batata'], family: 'convolvulaceae', display: 'la batata', sci: 'Ipomoea batatas' },
+  // Annonaceae
+  { tokens: ['guanabana'], family: 'annonaceae', display: 'la guanábana', sci: 'Annona muricata' },
+  { tokens: ['chirimoya'], family: 'annonaceae', display: 'la chirimoya', sci: 'Annona cherimola' },
+  { tokens: ['anon'], family: 'annonaceae', display: 'el anón', sci: 'Annona squamosa' },
+  // Amaryllidaceae
+  { tokens: ['cebolla'], family: 'amaryllidaceae', display: 'la cebolla', sci: 'Allium' },
+  { tokens: ['ajo'], family: 'amaryllidaceae', display: 'el ajo', sci: 'Allium sativum' },
+];
+
+/** Índice token(normalizado) → entrada de FAMILIA_CANON_SPECIES. */
+const FAMILIA_CANON_INDEX = (() => {
+  const idx = new Map();
+  for (const e of FAMILIA_CANON_SPECIES) for (const t of e.tokens) idx.set(t, e);
+  return idx;
+})();
+
+/**
+ * Alias de nombre de familia (vernáculo español + sinónimos clásicos) →
+ * familia canónica latina normalizada. Las formas latinas puras (-aceae) NO
+ * necesitan alias: se canonicalizan por sufijo. Cubre las familias de la tabla
+ * (bridge f↔ph, t↔th: euforbiáceas→euphorbiaceae, amarantáceas→amaranthaceae).
+ */
+const FAMILY_NAME_ALIASES = (() => {
+  const stems = {
+    pasiflor: 'passifloraceae', mirt: 'myrtaceae', mus: 'musaceae', mor: 'moraceae',
+    ros: 'rosaceae', solan: 'solanaceae', rut: 'rutaceae', laur: 'lauraceae',
+    anacardi: 'anacardiaceae', malv: 'malvaceae', rubi: 'rubiaceae', euforbi: 'euphorbiaceae',
+    arec: 'arecaceae', fab: 'fabaceae', brasic: 'brassicaceae', cucurbit: 'cucurbitaceae',
+    po: 'poaceae', aster: 'asteraceae', caric: 'caricaceae', amarant: 'amaranthaceae',
+    convolvul: 'convolvulaceae', anon: 'annonaceae', amarilid: 'amaryllidaceae',
+  };
+  const m = new Map();
+  for (const [stem, fam] of Object.entries(stems)) {
+    m.set(`${stem}aceas`, fam);
+    m.set(`${stem}acea`, fam);
+  }
+  // Sinónimos clásicos (nomina conservanda) latín + vernáculo.
+  m.set('leguminosas', 'fabaceae'); m.set('leguminosae', 'fabaceae');
+  m.set('gramineas', 'poaceae'); m.set('gramineae', 'poaceae');
+  m.set('compuestas', 'asteraceae'); m.set('compositae', 'asteraceae');
+  m.set('cruciferas', 'brassicaceae'); m.set('cruciferae', 'brassicaceae');
+  m.set('palmae', 'arecaceae'); m.set('palmaceae', 'arecaceae'); m.set('palmaceas', 'arecaceae');
+  m.set('umbeliferas', 'apiaceae'); m.set('umbeliferae', 'apiaceae');
+  return m;
+})();
+
+/**
+ * Candidato a NOMBRE DE FAMILIA en texto normalizado: latín (-aceae), vernáculo
+ * español (-áceas/-ácea → -aceas/-acea normalizado) o sinónimo clásico.
+ */
+const FAMILY_CANDIDATE_RE =
+  /\b([a-z]+ace(?:ae|as|a)|leguminosas?|leguminosae|gramineas?|gramineae|compuestas?|compositae|cruciferas?|cruciferae|palmae|palmaceas?|umbeliferas?|umbeliferae)\b/g;
+
+/** Cue FUERTE de atribución taxonómica (sobre texto normalizado). */
+const FAMILY_ATTR_STRONG_RE =
+  /\b(pertenece|pertenecen|familia|proviene|clasific|corresponde|taxonom|del?\s+genero|es\s+miembro|es\s+parte|dentro\s+de)\b/;
+
+/** Cópula/artículo/preposición justo antes de la familia ("… es Rosaceae"). */
+const FAMILY_ATTR_COPULA_TAIL_RE = /(?:^|\s)(es|son|a|de|del|una?|el|las?|los)\s*$/;
+
+/**
+ * Cue de ENUMERACIÓN de miembros tras un nombre de familia ("familia X, como las
+ * guayabas…", "familia Y incluye el tomate…", "familia Z, tales como…"). El "como"
+ * desnudo SOLO cuenta precedido de coma (enumeración "familia X, como Y"), para no
+ * confundirlo con un "como" COMPARATIVO ("crece como la papa"). El grupo 1 (si
+ * existe) marca dónde termina el cue; usamos el final del match para escanear los
+ * miembros enumerados.
+ */
+const FAMILY_ENUM_CUE_RE =
+  /,\s*como\b|\b(?:tales\s+como|como\s+por\s+ejemplo|como\s+en\s+el\s+caso\s+de|entre\s+ell[ao]s|incluyen?|incluyendo|por\s+ejemplo|tal\s+como)\b/g;
+
+/** Canonicaliza un nombre de familia (normalizado) a latín-normalizado o null. */
+function _canonFamilyName(tok) {
+  if (FAMILY_NAME_ALIASES.has(tok)) return FAMILY_NAME_ALIASES.get(tok);
+  if (tok.endsWith('aceae')) return tok; // familia latina pura
+  return null;
+}
+
+/** Título de una familia latina-normalizada para mostrar ("myrtaceae" → "Myrtaceae"). */
+const _titleFamily = (fam) => (fam ? fam.charAt(0).toUpperCase() + fam.slice(1) : fam);
+
+/**
+ * guardFabricatedBotanicalFamily — SUPRIME-Y-REEMPLAZA una respuesta que le
+ * atribuye a una especie EN FOCO una familia botánica que CONTRADICE la del
+ * catálogo (confusion_especie, #2132). Determinista, PURA y SÍNCRONA.
+ *
+ * Algoritmo (todo en espacio normalizado — sin tildes/case):
+ *   1. Localiza menciones de especies conocidas (tokens de FAMILIA_CANON_SPECIES,
+ *      con plural español -s/-es), respetando exclusiones de compuestos folk
+ *      (papa china, cidra papa, tomate de árbol naranja).
+ *   2. Localiza nombres de familia (latín/vernáculo/sinónimo) canonicalizables.
+ *   3. PATRÓN A (especie-primero): empareja cada especie con la PRIMERA familia que
+ *      la sigue dentro de una ventana corta (≤ 64 chars), en la MISMA oración (sin
+ *      . ; ! ? entre medias), con un cue de atribución (fuerte o cópula), y SIN otra
+ *      especie conocida entre medias. Ej.: "la guayaba pertenece a Passifloraceae".
+ *   4. PATRÓN B (familia-primero, enumeración de miembros): para cada cue de
+ *      enumeración ("familia X, como las guayabas…", "…incluye el tomate…") busca la
+ *      familia X inmediatamente antes (con puente anafórico "…familia X. Esta
+ *      familia … como …") y marca como contradicción cada especie enumerada cuya
+ *      familia real ≠ X. Ej. real del bench: "de la familia Passifloraceae, como las
+ *      guayabas (Psidium) o los plátanos (Musa)".
+ *   5. Si la familia atribuida ≠ la real de la especie → contradicción.
+ *   6. Con ≥1 contradicción, REEMPLAZA todo el cuerpo por la corrección grounded.
+ *
+ * @param {string} responseText  texto del LLM (pos-voseo / pos-roleLeak).
+ * @param {Array<object>|null} [_resolvedEntities]  (reservado; el grounding vive
+ *   en la tabla curada, proyección verificada del catálogo HAS_FAMILY).
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardFabricatedBotanicalFamily(responseText, _resolvedEntities = null) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Idempotencia: nuestra corrección ya está.
+  if (responseText.includes(BOTANICAL_FAMILY_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  const norm = _stripDiacritics(responseText);
+  if (!norm.includes('acea') && !/\b(leguminos|gramine|compuest|composit|crucifer|palmae|umbelifer)/.test(norm)) {
+    return { text: responseText, modified: false, reason: null }; // ninguna familia mencionada → barato
+  }
+
+  // (1) menciones de especies conocidas, con exclusiones de compuestos folk.
+  const wordAt = (from) => {
+    const m = /^\s*([a-z]+)/.exec(norm.slice(from));
+    return m ? m[1] : '';
+  };
+  const prevWord = (upto) => {
+    const m = /([a-z]+)\s*$/.exec(norm.slice(0, upto));
+    return m ? m[1] : '';
+  };
+  const speciesHits = [];
+  for (const [tok, entry] of FAMILIA_CANON_INDEX) {
+    // plural español (-s/-es): "guayabas", "platanos", "moreras", "limones".
+    const re = new RegExp(`\\b${tok}(?:es|s)?\\b`, 'g');
+    let mm;
+    while ((mm = re.exec(norm)) !== null) {
+      const start = mm.index;
+      const end = mm.index + mm[0].length; // incluye el plural, si lo hay.
+      if (Array.isArray(entry.excludeNext) && entry.excludeNext.includes(wordAt(end))) continue;
+      if (Array.isArray(entry.excludePrev) && entry.excludePrev.includes(prevWord(start))) continue;
+      speciesHits.push({ start, end, entry, tok });
+    }
+  }
+  if (speciesHits.length === 0) return { text: responseText, modified: false, reason: null };
+
+  // (2) menciones de familia canonicalizables.
+  const familyHits = [];
+  FAMILY_CANDIDATE_RE.lastIndex = 0;
+  let fm;
+  while ((fm = FAMILY_CANDIDATE_RE.exec(norm)) !== null) {
+    const canon = _canonFamilyName(fm[1]);
+    if (!canon) continue;
+    familyHits.push({ start: fm.index, canon });
+  }
+  if (familyHits.length === 0) return { text: responseText, modified: false, reason: null };
+
+  const MAX_GAP = 64; // ventana especie→familia (patrón A)
+  const ENUM_WINDOW = 90; // ventana cue→miembros (patrón B)
+  const ANAPHORA_WINDOW = 200; // familia→cue (patrón B, con puente "esta familia")
+  const otherSpeciesStarts = speciesHits.map((s) => s.start);
+  const seen = new Set();
+  const contradictions = [];
+  const disparadas = [];
+
+  const addContradiction = (entry, tok, wrongCanon) => {
+    if (wrongCanon === entry.family) return;
+    if (seen.has(entry.display)) return;
+    seen.add(entry.display);
+    const sci = entry.sci ? ` (${entry.sci})` : '';
+    contradictions.push(
+      `${entry.display}${sci} pertenece a la familia ${_titleFamily(entry.family)}, ` +
+        `no a ${_titleFamily(wrongCanon)}`,
+    );
+    disparadas.push(`${tok}: ${_titleFamily(wrongCanon)}→${_titleFamily(entry.family)}`);
+  };
+
+  // PATRÓN A — especie primero: "la guayaba pertenece a Passifloraceae".
+  for (const sp of speciesHits) {
+    let fam = null;
+    for (const f of familyHits) {
+      if (f.start <= sp.end) continue;
+      if (f.start - sp.end > MAX_GAP) break;
+      fam = f;
+      break;
+    }
+    if (!fam) continue;
+    const gap = norm.slice(sp.end, fam.start);
+    if (/[.;!?]/.test(gap)) continue; // cruzó de oración/cláusula
+    // otra especie conocida entre medias → no atribuimos (enumeración).
+    if (otherSpeciesStarts.some((p) => p > sp.start && p < fam.start)) continue;
+    if (!FAMILY_ATTR_STRONG_RE.test(gap) && !FAMILY_ATTR_COPULA_TAIL_RE.test(gap)) continue;
+    addContradiction(sp.entry, sp.tok, fam.canon);
+  }
+
+  // PATRÓN B — familia primero, enumeración de miembros: "de la familia
+  // Passifloraceae, como las guayabas (Psidium) o los plátanos (Musa)". Para cada
+  // cue de enumeración, la familia responsable es la más cercana ANTES del cue
+  // (permitiendo un puente anafórico "…familia X. Esta familia … como …"); cada
+  // especie enumerada tras el cue cuya familia real ≠ X es una contradicción.
+  FAMILY_ENUM_CUE_RE.lastIndex = 0;
+  let cm;
+  while ((cm = FAMILY_ENUM_CUE_RE.exec(norm)) !== null) {
+    const cueStart = cm.index;
+    const cueEnd = cm.index + cm[0].length;
+    // familia más cercana antes del cue (dentro de la ventana anafórica).
+    let fam = null;
+    for (const f of familyHits) {
+      if (f.start >= cueStart) break;
+      if (cueStart - f.start <= ANAPHORA_WINDOW) fam = f; // la última (más cercana) gana
+    }
+    if (!fam) continue;
+    const bridge = norm.slice(fam.start, cueStart);
+    // cruzar de oración solo se permite con puente anafórico ("… esta familia …").
+    if (/[.;!?]/.test(bridge) && !/\bfamilia\b/.test(bridge)) continue;
+    // otra familia entre la familia-fuente y el cue → esa sería la referente.
+    if (familyHits.some((f) => f.start > fam.start && f.start < cueStart)) continue;
+    // miembros enumerados tras el cue, hasta el fin de oración o la ventana.
+    let regionEnd = cueEnd + ENUM_WINDOW;
+    const brk = norm.slice(cueEnd, regionEnd).search(/[.;!?]/);
+    if (brk >= 0) regionEnd = cueEnd + brk;
+    for (const sp of speciesHits) {
+      if (sp.start < cueEnd || sp.start >= regionEnd) continue;
+      addContradiction(sp.entry, sp.tok, fam.canon);
+    }
+  }
+
+  if (contradictions.length === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('fabricated_botanical_family');
+  // SUPPRESS-AND-REPLACE: el cuerpo clasificó mal la familia (y suele arrastrar
+  // rasgos de la familia equivocada); lo reemplazamos por la corrección grounded.
+  const text =
+    `Una precisión sobre ${BOTANICAL_FAMILY_MARKER}: ${contradictions.join('; ')}. ` +
+    'Si quieres, seguimos con la siembra, los cuidados, las plagas o la cosecha de ese cultivo.';
+  return { text, modified: true, reason: `familia_botanica_fabricada: ${disparadas.join('; ')}` };
+}
+
 // ── GUARD 6: diagnóstico visual fabricado SIN foto real ─────────────────────
 
 /**
@@ -8959,6 +9326,22 @@ export function applyOutputGuards(
       text: paramo.text,
       modified: true,
       reasons: paramo.reason ? [paramo.reason] : [],
+    };
+  }
+
+  // GUARD FAMILIA BOTÁNICA FABRICADA (confusion_especie, #2132): si la respuesta le
+  // atribuye a una especie EN FOCO una familia botánica que CONTRADICE la real del
+  // catálogo ("la guayaba pertenece a Passifloraceae"), SUPRIME el cuerpo y lo
+  // REEMPLAZA por la corrección grounded. Es un error de IDENTIDAD que aparece en
+  // cualquier tipo de consulta (no solo siembra) → corre SIEMPRE. Como REEMPLAZA
+  // todo el cuerpo (una clasificación mal atribuida suele arrastrar rasgos de la
+  // familia equivocada), early-return, igual que premisa-falsa / off-domain.
+  const famBotanica = guardFabricatedBotanicalFamily(text, entities);
+  if (famBotanica && famBotanica.modified) {
+    return {
+      text: famBotanica.text,
+      modified: true,
+      reasons: famBotanica.reason ? [famBotanica.reason] : [],
     };
   }
 
