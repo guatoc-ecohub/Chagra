@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw, X, Home, Camera, Square, Sprout, HelpCircle } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
+import { mensajeErrorCampesino } from '../../utils/mensajeErrorCampesino';
 import { transcribe, queueForRetry } from '../../services/voiceService';
 import VoiceStatusStrip from './VoiceStatusStrip';
 import ChipsToolbar from '../ChipsToolbar';
@@ -52,6 +53,9 @@ import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities,
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
 // el chip cuyo backend aún no existe (deep).
 import { planForcedIntent, isStubIntent, isDeepResearchIntent, CHIP_DEFS } from '../../services/chipIntentRouter';
+// Fases visibles del "pensando" (MSG.agente.fases) — perceived performance:
+// la espera larga muestra en qué va el pipeline, no un "Pensando" opaco.
+import { MSG } from '../../config/messages';
 // «Chagra enseña a usar Chagra» (ayuda groundeada): detecta preguntas META
 // («¿cómo uso X?», «¿qué puede hacer Chagra?», «¿dónde veo los precios?») y
 // responde DESDE el manifiesto (ayudaFunciones) — sin LLM, nunca inventa una
@@ -75,7 +79,17 @@ import { planMarketIntent } from '../../services/marketIntentRouter';
 // se arma desde el export precacheado del grafo AGE (grafo-relations.json), en
 // vez de quedarse sin grounding relacional. resolveSpecies mapea el query a un
 // id del catálogo SIN red (catalogDB + BM25 local).
-import { buildOfflineGroundingBlock } from '../../services/grafoRelations';
+import { buildOfflineGroundingBlock, getPestIndex, getPestSynonyms } from '../../services/grafoRelations';
+// AFFECTS-GATE (anti-contaminación cruzada de cultivo): el sello "Catálogo
+// verificado" NO debe pintarse cuando la evidencia surfacea un organismo que no
+// afecta al cultivo en foco (arista AFFECTS ausente). Ver affectsGate.js.
+import {
+  extractAffectsFromEvidence,
+  resolvePestAffects,
+  scanTextForPestAffects,
+  detectCrossCropContamination,
+  gateSourceMetadataByAffects,
+} from '../../services/affectsGate';
 import { resolveSpecies } from '../../services/speciesResolver';
 // Deep Research (A6/A7): cliente HTTP del endpoint async de investigación
 // profunda del sidecar. Feature flag VITE_DEEP_RESEARCH_ENABLED (default false).
@@ -223,6 +237,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   const [agentAttachment, setAgentAttachment] = useState(null); // {blob,mime,previewUrl,fileName}
   const [agentPickError, setAgentPickError] = useState('');
   const [streamingContent, setStreamingContent] = useState('');
+  // Fase visible del pipeline mientras state === STATE_THINKING (perceived
+  // performance): 'transcribiendo' | 'entendiendo' | 'consultando' |
+  // 'escribiendo' | null. Cada entrada al pipeline la setea fresca, así que
+  // no hace falta limpiarla al salir de THINKING (solo se renderiza ahí).
+  const [thinkingPhase, setThinkingPhase] = useState(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [error, setError] = useState('');
   const [actionModal, setActionModal] = useState({ isOpen: false, intent: null, llmResponse: '' });
@@ -824,6 +843,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // puras, testeables y medibles fuera de React).
 
   const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null, fermentoBlock = '', subgrafoBloque = '', biopreparadoBlock = '', pisoTermicoBlock = '', confusionEspecieBlock = '', pestVsDiseaseBlock = '', groundingPolicyBlock = '') => {
+    // Fase 3 del "pensando" visible: generación en el LLM. Cuando llega el
+    // primer token, la UI pasa sola al parcial streaming (streamingContent).
+    setThinkingPhase('escribiendo');
     const analysis = analyzeQuery(query);
     // El base recibe query/historial/isEnum para inyectar SOLO los glosarios
     // y reglas condicionales que la conversación toca (re-arquitectura GR-10).
@@ -1291,14 +1313,14 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       if (match) {
         const status = parseInt(match[1], 10);
         if (status === 401 || status === 403) {
-          throw new Error('Sesion expirada, recarga la app');
+          throw new Error('La sesión se venció. Recarga la app para seguir.');
         }
         if (status >= 500 && status <= 503) {
-          throw new Error('IA no disponible, intenta de nuevo en un momento');
+          throw new Error('Chagra no puede responder ahora mismo. Intenta de nuevo en un momento.');
         }
-        throw new Error(`Error al consultar IA (codigo: ${status})`);
+        throw new Error(`Chagra no pudo responder (código ${status}). Intenta de nuevo.`);
       }
-      throw new Error('IA no disponible, intenta de nuevo en un momento');
+      throw new Error('Chagra no puede responder ahora mismo. Intenta de nuevo en un momento.');
     } finally {
       // Detiene idle + techo del deadline stream-aware (limpia ambos timers).
       if (stallTimerRef.current && typeof stallTimerRef.current.stop === 'function') {
@@ -1331,6 +1353,8 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     }
     setStreamingContent('');
     setState(STATE_THINKING);
+    // Fase 1 del "pensando" visible: contexto + RAG + resolución de entidades.
+    setThinkingPhase('entendiendo');
     setError('');
     agentSounds.start();
 
@@ -1438,6 +1462,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // del grafo AGE para queries relacionales (plaga+cultivo). '' = no-op.
       let subgrafoBloque = '';
       if (isOnline && isSidecarEnabled()) {
+        // Fase 2 del "pensando" visible: grounding real contra el sidecar
+        // (entidades, guards, grafo, tools). Es el tramo más largo antes de
+        // generar — mostrarlo evita la sensación de "se colgó".
+        setThinkingPhase('consultando');
         try {
           // PASO 1 — pre-validation AGE (DR taxonómico Tier 1 B, PR #59).
           // Resuelve entidades vegetales/plagas a binomio canónico autoritativo
@@ -1596,7 +1624,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           // Tambien invocamos get_multihop_companions (AIA-008): cadenas de N
           // saltos de asociacion ecologica (companeras que controlan plagas).
           // Ambas tools son sub-segundo y no-throw; si no hay dato, no-op.
-          const pestEnt = (resolvedEntities || []).find((e) => e.kind === 'pest' || e.kind === 'plaga');
+          const pestEnt = (resolvedEntities || []).find((e) => ['pest', 'plaga'].includes(e.kind));
           const cropEnt = (resolvedEntities || []).find((e) => ['cultivo', 'especie', 'species', 'planta'].includes(e.kind));
           const relArgs = {};
           if (pestEnt) relArgs.pest = pestEnt.canonical_id || pestEnt.mentioned;
@@ -2270,6 +2298,52 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         auto_corrected: guarded.modified === true,
       };
 
+      // AFFECTS-GATE (auditoría anti-contaminación cruzada de cultivo, 2026-07):
+      // el sello "Catálogo verificado" NO debe pintarse cuando la evidencia
+      // surfacea un organismo (plaga) que NO afecta al cultivo EN FOCO. Caso
+      // confirmado: BROCA (plaga de CAFÉ, Hypothenemus hampei) mostrada como
+      // "Dato verificado" en una conversación de CACAO — verificado ≠ relevante.
+      // La arista AFFECTS ya viaja en la evidencia (get_pest_controllers →
+      // target_species) y en el índice offline del grafo (_pest_index); esto es
+      // SOLO la comprobación (wiring), no grounding nuevo. Suppress-and-replace
+      // del SELLO: grounded→false + marca explícita cross_crop (el ChatBubble
+      // pinta "Dato de otro cultivo · verifica"). Solo corre sobre turnos que
+      // IBAN a salir verificados. Graceful: cualquier fallo deja el sello
+      // intacto (jamás degrada por error).
+      if (sourceMetadata && sourceMetadata.grounded === true) {
+        try {
+          const cropInFocusIds = Array.from(new Set(
+            (resolvedEntities || [])
+              .filter((e) => e && ['cultivo', 'especie', 'species', 'planta'].includes(e.kind))
+              .map((e) => e.canonical_id)
+              .filter((id) => typeof id === 'string' && id.trim().length > 0)
+          ));
+          if (cropInFocusIds.length > 0) {
+            const [pestIndex, pestSynonyms] = await Promise.all([getPestIndex(), getPestSynonyms()]);
+            const maps = { pestIndex, pestSynonyms };
+            const pestAffectsList = [
+              ...extractAffectsFromEvidence(toolEvidence),
+              ...(resolvedEntities || [])
+                .filter((e) => e && (['pest', 'plaga'].includes(e.kind)))
+                .map((e) => resolvePestAffects(e.canonical_id || e.mentioned, maps))
+                .filter(Boolean),
+              ...scanTextForPestAffects(response, maps),
+            ];
+            const gateResult = detectCrossCropContamination({ cropInFocusIds, pestAffectsList });
+            if (gateResult.crossCrop) {
+              sourceMetadata = gateSourceMetadataByAffects(sourceMetadata, gateResult, { cropInFocusIds });
+              console.debug('[affects-gate] cross-crop → sello degradado', {
+                cropInFocusIds,
+                organismos: gateResult.offending.map((o) => o.pest),
+              });
+            }
+          }
+        } catch (gErr) {
+          // El gate jamás bloquea el chat: si algo falla, el sello queda como estaba.
+          console.debug('[affects-gate] no aplicado (sigo con el sello original):', gErr?.message);
+        }
+      }
+
       // Capa 2 anti-alucinación — cross-check de contexto (operador 2026-05-30).
       // Tras generar la respuesta, le pedimos al sidecar que correlacione cada
       // binomio Linneano CITADO en el texto con las entidades que la capa 1 ya
@@ -2530,7 +2604,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         // (timeout/abort: dejamos durableRequestIdRef.current intacto en IDB como
         // 'queued'; solo soltamos la ref local en el finally.)
       } else {
-        setError(e.message || 'No pude conectarme al asistente. Intenta de nuevo.');
+        // NUNCA e.message crudo al banner ("Failed to fetch", stacktraces):
+        // mensajeErrorCampesino respeta frases ya curadas y traduce lo técnico.
+        setError(mensajeErrorCampesino(e, 'No pude con esa pregunta. Intente de nuevo, o pregunte de otra forma.'));
         // Error NO-interrupción (HTTP 5xx, sesión, etc.): marcar failed. El
         // prompt queda intacto en IDB; la cola durable NO lo reintenta (no es
         // recuperable solo con reintentar), pero NO se pierde el dato.
@@ -2935,11 +3011,14 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       const result = await stopRecord();
       if (!result || !result.blob) {
         setState(STATE_IDLE);
-        setError('No se capturó audio. Intenta de nuevo.');
+        setError('No alcancé a escucharte. Intenta grabar de nuevo.');
         return;
       }
       const { blob } = result;
       setState(STATE_THINKING);
+      // Fase de voz: transcripción Whisper antes de entrar al pipeline de
+      // texto (que setea sus propias fases al arrancar).
+      setThinkingPhase('transcribiendo');
 
       try {
         const text = await transcribe(blob);
@@ -3435,6 +3514,8 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               : 'bg-slate-800 text-slate-500'
           }`}
           title={ttsEnabled ? 'Silenciar voz' : 'Activar voz'}
+          aria-label={ttsEnabled ? 'Silenciar voz' : 'Activar voz'}
+          aria-pressed={ttsEnabled}
         >
           {ttsEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
         </button>
@@ -3456,7 +3537,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           isOnline ? 'bg-emerald-900/40 text-emerald-400' : 'bg-red-900/40 text-red-400'
         }`}>
           {isOnline ? <Wifi size={11} /> : <WifiOff size={11} />}
-          {isOnline ? 'Online' : 'Offline'}
+          {isOnline ? 'Con señal' : 'Sin señal'}
         </div>
       </header>
 
@@ -3501,6 +3582,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         messages={messages}
         streamingContent={streamingContent}
         isStreaming={state === STATE_THINKING}
+        thinkingLabel={MSG.agente.fases[thinkingPhase] || null}
         onConsentNeeded={handleFeedbackConsentNeeded}
         onRetryOrphan={handleRetryOrphan}
         onCancelDeepResearch={handleCancelDeepResearch}
@@ -3957,6 +4039,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
                 // pedimos "toca de nuevo" — la pregunta está guardada y, si se
                 // corta, se reintenta sola. Aun el caso lento ofrece SOLO
                 // Cancelar (acción voluntaria), nunca insinúa que se perdió.
+                // La fase visible (thinkingPhase) reemplaza el "Pensando"
+                // genérico para que la espera muestre avance real.
+                const faseLabel = MSG.agente.fases[thinkingPhase] || null;
                 if (showSlowWarning) {
                   return 'Sigo pensando — esto puede tardar en el campo. Tu pregunta está guardada.';
                 }
@@ -3978,9 +4063,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
                   if (stretching) {
                     return `Casi listo… (${Math.floor(elapsed / 1000)}s)`;
                   }
-                  return `Pensando tu respuesta… ~${secsLeft}s`;
+                  return `${faseLabel || 'Pensando tu respuesta'}… ~${secsLeft}s`;
                 }
-                return 'Pensando… (puede tardar en el campo)';
+                return `${faseLabel || 'Pensando'}… (puede tardar en el campo)`;
               })()}
             </p>
             {queuePending.length >= 1 && (
@@ -4000,7 +4085,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
                 <span className="text-base shrink-0 leading-none mt-0.5" aria-hidden="true">
                   {rotatingTip.icon}
                 </span>
-                <p className="text-[11px] text-slate-300 leading-snug flex-1">
+                <p className="text-xs text-slate-300 leading-snug flex-1">
                   <span className="text-violet-400 font-medium block mb-0.5">
                     💡 Tip mientras espero
                   </span>
@@ -4013,7 +4098,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
                     setHintDismissed(true);
                   }}
                   aria-label="Cerrar sugerencia"
-                  className="text-[10px] text-slate-500 hover:text-slate-300 shrink-0 leading-none px-1"
+                  className="tap-target text-sm text-slate-400 hover:text-slate-200 shrink-0 leading-none px-1"
                   data-testid="dismiss-tip"
                 >
                   ×
@@ -4023,7 +4108,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             <button
               type="button"
               onClick={handleCancelLLM}
-              className="text-[10px] px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 active:scale-95 transition-all"
+              className="tap-target text-xs px-4 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 active:scale-95 motion-reduce:transition-none motion-reduce:active:scale-100 transition-all"
             >
               Cancelar
             </button>
@@ -4042,7 +4127,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               type="button"
               onClick={() => setQueueRejectedToast('')}
               aria-label="Cerrar aviso"
-              className="text-amber-400 hover:text-amber-200 text-sm leading-none"
+              className="tap-target text-amber-400 hover:text-amber-200 text-sm leading-none"
             >
               ×
             </button>

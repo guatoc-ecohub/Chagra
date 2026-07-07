@@ -1,11 +1,15 @@
 import React from 'react';
-import { Loader2, AlertTriangle, PackageOpen } from 'lucide-react';
+import { AlertTriangle, PackageOpen } from 'lucide-react';
+import ChagraGrowLoader from '../ChagraGrowLoader';
 
 /**
  * ScreenLoadingStatus — estado de carga / vacio / error reutilizable.
  *
  * Props:
- *  - isLoading (boolean) — muestra spinner centrado
+ *  - isLoading (boolean) — muestra el loader de la casa (ChagraGrowLoader)
+ *  - loadingMessage (string) — mensaje contextual de carga ("Cargando el
+ *    catálogo…"); pásalo SIEMPRE que sepas qué se está cargando — el
+ *    "Cargando..." genérico es solo el último recurso (perceived performance)
  *  - isEmpty (boolean) — muestra estado vacio
  *  - hasError (boolean) — muestra estado de error
  *  - emptyTitle (string) — titulo del estado vacio
@@ -15,6 +19,7 @@ import { Loader2, AlertTriangle, PackageOpen } from 'lucide-react';
  */
 export default function ScreenLoadingStatus({
   isLoading = false,
+  loadingMessage = 'Cargando...',
   isEmpty = false,
   hasError = false,
   emptyTitle = '',
@@ -26,8 +31,11 @@ export default function ScreenLoadingStatus({
     return (
       <div className="h-[100dvh] w-full flex items-center justify-center bg-slate-950">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 size={40} className="text-emerald-400 animate-spin" aria-hidden="true" />
-          <p className="text-slate-400 text-sm font-medium">Cargando...</p>
+          {/* Loader de la casa (planta que crece; respeta reduced-motion) en
+              lugar del spinner genérico — misma gramática visual que el
+              fallback de Suspense y el directorio. */}
+          <ChagraGrowLoader size={56} ariaLabel={loadingMessage} />
+          <p className="text-slate-400 text-sm font-medium" aria-hidden="true">{loadingMessage}</p>
         </div>
       </div>
     );

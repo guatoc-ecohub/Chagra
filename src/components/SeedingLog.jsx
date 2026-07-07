@@ -321,9 +321,9 @@ export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw
           <h3 className="text-2xl font-bold">Registro guardado</h3>
           <p className="text-sm text-slate-400 mt-2">
             {syncedOffline ? (
-              <>Se sincronizará con FarmOS cuando haya conexión. Mientras tanto, lo encuentra en <strong className="text-slate-200">Bitácora → Recientes</strong>.</>
+              <>Quedó guardado en su finca. Apenas vuelva la señal, se guarda solo. Mientras tanto, lo encuentra en <strong className="text-slate-200">Bitácora → Recientes</strong>.</>
             ) : (
-              <>Sincronizado con FarmOS.</>
+              <>Quedó guardado. Todo al día.</>
             )}
           </p>
         </div>

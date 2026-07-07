@@ -62,5 +62,33 @@
     "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
     "artist": "Suiseisekiryu",
     "source": "https://commons.wikimedia.org/wiki/File:Germination_and_humus.jpg"
+  },
+  "palada": {
+    "file": "File:Soil Survey01 (24211387577).jpg",
+    "license": "Public domain (PD-USGov-USDA)",
+    "license_url": "https://commons.wikimedia.org/wiki/Template:PD-USGov-USDA",
+    "artist": "USDA-NRCS Montana",
+    "source": "https://commons.wikimedia.org/wiki/File:Soil_Survey01_(24211387577).jpg"
+  },
+  "compactacion": {
+    "file": "File:Soil compaction.JPG",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "artist": "Blonder1984",
+    "source": "https://commons.wikimedia.org/wiki/File:Soil_compaction.JPG"
+  },
+  "erosion": {
+    "file": "File:Erosion gulleys on unterraced farmland in Yunnan.jpg",
+    "license": "CC BY-SA 3.0 US",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0/us/deed.en",
+    "artist": "Desmanthus4food",
+    "source": "https://commons.wikimedia.org/wiki/File:Erosion_gulleys_on_unterraced_farmland_in_Yunnan.jpg"
+  },
+  "costra": {
+    "file": "File:Dry cracked soil ground.jpg",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "artist": "Ibrahim Achiri",
+    "source": "https://commons.wikimedia.org/wiki/File:Dry_cracked_soil_ground.jpg"
   }
 }

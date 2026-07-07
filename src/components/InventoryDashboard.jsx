@@ -10,6 +10,7 @@ import { exportTraceabilityCsv } from '../services/exportService';
 import { getAllPlans, markStepExecuted } from '../services/planGeneratorService';
 import { getCurrentOperatorHash } from '../services/operatorIdentityService';
 import { MSG } from '../config/messages.js';
+import { mensajeErrorCampesino } from '../utils/mensajeErrorCampesino';
 
 // Autopilot #10 (2026-05-03): banner top + sort low-stock primero. Reduce
 // chance que el operador no se entere de stock bajo hasta que use el material.
@@ -183,7 +184,8 @@ export const InventoryDashboard = () => {
       await markStepExecuted(planId, stepId, hash);
       loadUpcomingSteps();
     } catch (e) {
-      alert("Error: " + e.message);
+      // Sin "Error: TypeError…" al campesino: frase clara y reintentable.
+      alert(mensajeErrorCampesino(e, MSG.ui.errorMarcarPaso));
     }
   };
 

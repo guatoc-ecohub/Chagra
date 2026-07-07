@@ -84,11 +84,12 @@ export default function MundoScreen({ mundoId, onBack, onNavigate }) {
 
                 {/* Las funciones del mundo — cada una re-rutea a su pantalla real. */}
                 <nav className="mf-entradas" aria-label={`Herramientas de ${mundo.titulo}`}>
-                    {entradas.map((e) => (
+                    {entradas.map((e, i) => (
                         <button
                             key={e.view}
                             type="button"
-                            className="mf-entrada"
+                            className="mf-entrada anim-brota"
+                            style={{ '--i': i }}
                             data-testid={`entrada-${e.view}`}
                             onClick={() => onNavigate?.(e.view, e.data)}
                             aria-label={`${e.label}: ${e.desc}`}

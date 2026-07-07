@@ -7,7 +7,8 @@ import {
   ChevronLeft, ChevronRight, Sprout, Layers, Recycle, Calculator,
   FlaskConical, AlertTriangle, CheckCircle2, Info, Leaf, Worm, Gauge,
   Beaker, ArrowRight, Wheat, Bug, Flame, Ban, Umbrella, Salad,
-  ExternalLink, Camera,
+  ExternalLink, Camera, Shovel, Palette, Wind, Droplets, Eye,
+  Stethoscope, HeartPulse,
 } from 'lucide-react';
 import {
   calcularCICE,
@@ -21,11 +22,19 @@ import {
 import {
   HORIZONTES, HABITANTES, CICLO_ETAPAS, CUIDADOS_VIDA, CREDITOS_FOTOS, FOTO_BASE,
 } from '../data/vidaSuelo';
+import {
+  LECTURAS_CAMPO, SENALES_ENFERMO, CREDITOS_LECTURA,
+} from '../data/lecturaSuelo';
 
 /**
  * SaludSueloScreen — mini-app "Cuaderno del Suelo" (módulo Salud del Suelo).
  *
  * Identidad: cuaderno de campo / Ciclo Vivo. Cálida, campesina, legible al sol.
+ *
+ * PASO 0 (léala en campo): antes del laboratorio, leer la tierra con las manos
+ *   (pala, color, olor, infiltración) y reconocer cuándo está enferma
+ *   (compactación, erosión, costra). Photo-forward; ENLAZA al diagnóstico
+ *   interactivo (ruta 'suelo') para el paso a paso, sin reimplementarlo.
  *
  * Tres pilares + caso insignia ("mi tierra está cansada / ácida"):
  *   1. ¿Cómo está mi suelo?  — leer/interpretar un análisis (pH, MO, N-P-K, Al)
@@ -206,6 +215,7 @@ export default function SaludSueloScreen({ onBack, onNavigate }) {
         <h1 className="text-lg font-bold leading-tight text-white">Cuaderno del Suelo</h1>
         <p className="text-xs text-slate-400 leading-tight">
           {pilar === 'hub' ? 'La salud de su tierra, paso a paso.'
+            : pilar === 'lectura' ? 'Léala en campo'
             : pilar === 'analisis' ? '¿Cómo está mi suelo?'
             : pilar === 'acidez' ? 'Corregir la acidez'
             : pilar === 'vida' ? 'La vida del suelo'
@@ -220,6 +230,7 @@ export default function SaludSueloScreen({ onBack, onNavigate }) {
       {Header}
       <div className="px-4 pb-10">
         {pilar === 'hub' && <Hub onIr={setPilar} onNavigate={onNavigate} />}
+        {pilar === 'lectura' && <PilarLectura onNavigate={onNavigate} onIr={setPilar} />}
         {pilar === 'analisis' && <PilarAnalisis onNavigate={onNavigate} onIr={setPilar} />}
         {pilar === 'acidez' && <PilarAcidez />}
         {pilar === 'vida' && <PilarVida onNavigate={onNavigate} />}
@@ -232,6 +243,7 @@ export default function SaludSueloScreen({ onBack, onNavigate }) {
 /* ─────────────────────────────────── Hub ─────────────────────────────────── */
 function Hub({ onIr, onNavigate }) {
   const pilares = [
+    { key: 'lectura', icon: Shovel, titulo: 'Léala en campo', desc: 'La prueba de la pala, el color, el olor y el agua. Y las señales de que la tierra está enferma.', accent: 'amber' },
     { key: 'analisis', icon: Gauge, titulo: '¿Cómo está mi suelo?', desc: 'Lea su análisis: pH, materia orgánica, N-P-K y aluminio, en palabras claras.', accent: 'emerald' },
     { key: 'acidez', icon: Calculator, titulo: 'Corregir la acidez', desc: 'Calculadora de cal: de la saturación de aluminio a los bultos por hectárea.', accent: 'amber' },
     { key: 'vida', icon: Worm, titulo: 'La vida del suelo', desc: 'Lombrices, hongos, micorrizas y microbios: la tierra viva, con fotos reales.', accent: 'lime' },
@@ -327,6 +339,251 @@ function PuenteBoton({ icon, titulo, sub, onClick }) {
       </span>
       <ChevronRight size={18} className="text-slate-500 shrink-0" />
     </button>
+  );
+}
+
+/* ═══════════════ Pilar — Léala en campo (PASO 0, sin laboratorio) ═══════════ */
+
+const ICONO_LECTURA = { pala: Shovel, color: Palette, olor: Wind, agua: Droplets };
+
+/** Ilustración de la franja de colores del suelo — apoya la lectura del color
+ *  sin depender de una foto (cada finca tiene su tono). */
+function FranjaColorSuelo() {
+  const tramos = [
+    { c: '#3a2a1c', t: 'negra' },
+    { c: '#5b4326', t: 'café' },
+    { c: '#b98a3c', t: 'amarilla' },
+    { c: '#9aa0a6', t: 'gris' },
+  ];
+  return (
+    <svg viewBox="0 0 200 44" role="img" aria-label="Franja de colores del suelo, de la tierra negra viva a la gris encharcada" className="w-full h-auto">
+      {tramos.map((tr, i) => (
+        <g key={tr.t}>
+          <rect x={i * 50} y="0" width="50" height="30" fill={tr.c} />
+          <text x={i * 50 + 25} y="41" textAnchor="middle" fontSize="8" fill="currentColor" opacity="0.75">{tr.t}</text>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+/** Tarjeta de una lectura con las manos. Photo-forward cuando hay foto real;
+ *  si no, un mosaico ilustrado (nunca una foto que engañe). */
+function LecturaCard({ l }) {
+  const [imgOk, setImgOk] = useState(true);
+  const Icono = ICONO_LECTURA[l.icono] || Eye;
+  return (
+    <article className="rounded-2xl border border-slate-800 bg-slate-900 overflow-hidden flex flex-col">
+      {/* Encabezado visual: foto real si existe; si no, ilustración/mosaico */}
+      <div className="relative aspect-[16/9] bg-slate-950">
+        {l.slug && imgOk ? (
+          <img
+            src={`${FOTO_BASE}/${l.slug}.jpg`}
+            alt={`Foto de ${l.titulo.toLowerCase()} (${l.tecnico})`}
+            loading="lazy"
+            decoding="async"
+            onError={() => setImgOk(false)}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : l.icono === 'color' ? (
+          <div className="absolute inset-0 flex items-center justify-center p-4 text-slate-300">
+            <FranjaColorSuelo />
+          </div>
+        ) : (
+          <div
+            className="absolute inset-0 flex items-center justify-center gap-2"
+            style={{ background: 'linear-gradient(135deg, rgb(var(--t-accent-rgb) / 0.18), rgb(var(--t-accent-deep-rgb) / 0.10))' }}
+          >
+            <span className="text-5xl" aria-hidden="true">{l.emoji}</span>
+            <Icono size={30} style={{ color: 'rgb(var(--t-accent-rgb))' }} aria-hidden="true" />
+          </div>
+        )}
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-2.5 pt-8">
+          <p className="text-[15px] font-black text-[#ffffff] leading-tight drop-shadow">
+            <span aria-hidden="true" className="mr-1">{l.emoji}</span>{l.titulo}
+          </p>
+          <p className="text-[11px] text-[#e2e8f0] leading-tight italic">{l.tecnico}</p>
+        </div>
+      </div>
+      <div className="p-3 flex flex-col gap-2.5 flex-1">
+        <p className="text-sm text-slate-200 leading-snug">{l.como}</p>
+        <div className="grid grid-cols-1 gap-2 mt-auto">
+          <div className="rounded-lg border border-emerald-800/40 bg-emerald-950/25 p-2.5 flex items-start gap-2">
+            <CheckCircle2 size={16} className="text-emerald-300 shrink-0 mt-0.5" />
+            <p className="text-[13px] text-emerald-100/90 leading-snug"><span className="font-bold text-emerald-200">Buena señal:</span> {l.buena}</p>
+          </div>
+          <div className="rounded-lg border border-amber-800/40 bg-amber-950/20 p-2.5 flex items-start gap-2">
+            <AlertTriangle size={16} className="text-amber-400 shrink-0 mt-0.5" />
+            <p className="text-[13px] text-amber-100/90 leading-snug"><span className="font-bold text-amber-200">Ojo:</span> {l.alerta}</p>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+/** Tarjeta de una señal de suelo enfermo, con foto real (licencia abierta). */
+function SenalEnfermaCard({ s }) {
+  const [imgOk, setImgOk] = useState(true);
+  return (
+    <article className="rounded-2xl border border-rose-900/50 bg-slate-900 overflow-hidden flex flex-col">
+      <div className="relative aspect-[4/3] bg-slate-950">
+        {imgOk ? (
+          <img
+            src={`${FOTO_BASE}/${s.slug}.jpg`}
+            alt={`Foto de suelo con ${s.titulo.toLowerCase()} (${s.tecnico})`}
+            loading="lazy"
+            decoding="async"
+            onError={() => setImgOk(false)}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-5xl" aria-hidden="true">{s.emoji}</div>
+        )}
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-2.5 pt-8">
+          <p className="text-[15px] font-black text-[#ffffff] leading-tight drop-shadow">
+            <span aria-hidden="true" className="mr-1">{s.emoji}</span>{s.titulo}
+          </p>
+          <p className="text-[11px] text-[#e2e8f0] leading-tight italic">{s.tecnico}</p>
+        </div>
+      </div>
+      <div className="p-3 flex flex-col gap-2 flex-1">
+        <div>
+          <p className="text-[10px] uppercase tracking-wider font-bold text-rose-300/90 mb-0.5">La señal que se ve</p>
+          <p className="text-[13px] text-slate-100 leading-snug">{s.senal}</p>
+        </div>
+        <div>
+          <p className="text-[10px] uppercase tracking-wider font-bold text-slate-400 mb-0.5">Por qué pasa</p>
+          <p className="text-[13px] text-slate-300 leading-snug">{s.causa}</p>
+        </div>
+        <div className="mt-auto rounded-lg border border-emerald-800/40 bg-emerald-950/25 p-2.5">
+          <p className="text-[10px] uppercase tracking-wider font-bold text-emerald-300 mb-0.5 flex items-center gap-1">
+            <HeartPulse size={12} /> Primer auxilio
+          </p>
+          <p className="text-[13px] text-emerald-100/90 leading-snug">{s.auxilio}</p>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+/**
+ * PilarLectura — leer la tierra con las manos (PASO 0) y reconocer cuándo está
+ * enferma. Photo-forward y didáctico; NO reimplementa el diagnóstico
+ * interactivo (ruta 'suelo'), lo ENLAZA para el paso a paso guiado.
+ * @param {Object} props
+ * @param {(view: string, data?: any) => void} [props.onNavigate]
+ * @param {(pilar: string) => void} [props.onIr]
+ */
+function PilarLectura({ onNavigate, onIr }) {
+  const [creditos, setCreditos] = useState(false);
+  return (
+    <div className="flex flex-col gap-5">
+      {/* Gancho — el PASO 0 del rediseño agroecológico */}
+      <section className="rounded-2xl border border-amber-800/50 bg-gradient-to-br from-amber-950/40 to-slate-900 p-4">
+        <div className="flex items-start gap-3">
+          <span className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+            style={{ backgroundColor: 'rgb(var(--t-accent-rgb) / 0.22)' }}>
+            <Shovel size={24} style={{ color: 'rgb(var(--t-accent-rgb))' }} />
+          </span>
+          <div>
+            <p className="text-[17px] font-black text-white leading-tight">
+              Antes del laboratorio, la tierra ya le habla.
+            </p>
+            <p className="text-sm text-slate-300 mt-1.5 leading-relaxed">
+              Con la pala, el color, el olor y cómo se traga el agua, usted lee su suelo sin gastar un peso.
+              Es el <span className="font-semibold text-slate-100">paso cero</span>: antes de sembrar o abonar, sepa qué tierra tiene.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Las cuatro lecturas con las manos */}
+      <section aria-label="Cuatro lecturas del suelo con las manos">
+        <h2 className="text-[15px] font-black text-white mb-1 flex items-center gap-2">
+          <Eye size={18} style={{ color: 'rgb(var(--t-accent-rgb))' }} /> Cuatro lecturas con las manos
+        </h2>
+        <p className="text-[13px] text-slate-400 mb-3 leading-snug">
+          Sin laboratorio, en cualquier lote. Solo una pala, un hueco y sus sentidos.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {LECTURAS_CAMPO.map((l) => <LecturaCard key={l.id} l={l} />)}
+        </div>
+      </section>
+
+      {/* Señales de suelo enfermo — fotos reales */}
+      <section aria-label="Señales de que la tierra está enferma">
+        <h2 className="text-[15px] font-black text-white mb-1 flex items-center gap-2">
+          <Stethoscope size={18} style={{ color: 'rgb(var(--t-accent-rgb))' }} /> Cuando la tierra está enferma
+        </h2>
+        <p className="text-[13px] text-slate-400 mb-3 leading-snug">
+          Tres males que se ven a simple vista. Reconocerlos a tiempo es media cura.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {SENALES_ENFERMO.map((s) => <SenalEnfermaCard key={s.slug} s={s} />)}
+        </div>
+      </section>
+
+      {/* Puentes: al diagnóstico guiado, a la cromatografía y a cómo sanarla */}
+      {onNavigate ? (
+        <div className="flex flex-col gap-2">
+          <PuenteBoton
+            icon={Sprout}
+            titulo="Diagnostíquela paso a paso"
+            sub="La guía interactiva sin laboratorio: responda lo que ve y le dice qué tiene su tierra."
+            onClick={() => onNavigate('suelo')}
+          />
+          <PuenteBoton
+            icon={FlaskConical}
+            titulo="Contrástelo con una cromatografía"
+            sub="El retrato en colores confirma la vida y los minerales que la pala insinúa."
+            onClick={() => onNavigate('cromatografia')}
+          />
+        </div>
+      ) : null}
+
+      {/* Cierre del bucle: si salió enferma, así se sana */}
+      <button
+        type="button"
+        onClick={() => onIr?.('mejorar')}
+        className="rounded-xl border border-emerald-700/50 bg-emerald-950/30 p-3 flex items-center gap-2.5 text-left hover:border-emerald-600 transition-colors motion-reduce:transition-none"
+      >
+        <HeartPulse size={20} className="shrink-0 text-emerald-300" />
+        <span className="text-sm text-emerald-100 flex-1">
+          <span className="font-bold">¿Salió enferma o cansada?</span> Así se sana: coberturas, no arar de más y abono.
+        </span>
+        <ArrowRight size={18} className="shrink-0 text-emerald-300" />
+      </button>
+
+      {/* Créditos de fotos nuevas — cumplimiento de licencia abierta */}
+      {CREDITOS_LECTURA.length > 0 ? (
+        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+          <button
+            type="button"
+            onClick={() => setCreditos((v) => !v)}
+            aria-expanded={creditos}
+            className="w-full flex items-center gap-2 text-left"
+          >
+            <Camera size={15} className="text-slate-400 shrink-0" />
+            <span className="text-xs font-bold text-slate-300 flex-1">Créditos de las fotos (licencia abierta)</span>
+            <ChevronRight size={16} className={`text-slate-500 transition-transform ${creditos ? 'rotate-90' : ''}`} />
+          </button>
+          {creditos && (
+            <ul className="mt-2.5 pt-2.5 border-t border-slate-800 flex flex-col gap-1.5">
+              {CREDITOS_LECTURA.map((cr) => (
+                <li key={cr.slug} className="text-[11px] text-slate-400 leading-snug">
+                  <a href={cr.url} target="_blank" rel="noopener noreferrer"
+                    className="font-semibold text-slate-200 hover:text-white underline decoration-slate-600 underline-offset-2 inline-flex items-center gap-0.5">
+                    {cr.slug}<ExternalLink size={10} className="inline shrink-0" />
+                  </a>
+                  <span className="text-slate-500"> — {cr.autor} · {cr.lic} · Wikimedia Commons</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -916,6 +1173,16 @@ function PilarMejora({ onNavigate }) {
           );
         })}
       </div>
+
+      {/* Puente al mundo del estiércol — el abono que sana la tierra cansada */}
+      {onNavigate ? (
+        <PuenteBoton
+          icon={Recycle}
+          titulo="Del corral al abono"
+          sub="Convierta el estiércol en compost y humus: la comida que le devuelve la vida al suelo."
+          onClick={() => onNavigate('estiercol')}
+        />
+      ) : null}
 
       {/* Bloque micorrizas — enlaza al grafo (Mundo Subsuelo / agente), NO reimplementa */}
       <section className="rounded-2xl border border-lime-800/40 bg-lime-950/20 p-4">

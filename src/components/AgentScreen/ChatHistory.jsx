@@ -28,9 +28,12 @@ const FLOATING_BACK_THRESHOLD_PX = 160;
  * @param {Function} props.onCancelDeepResearch - Callback para cancelar una investigación profunda en curso.
  * @param {Function} [props.onAyudaAction] - Callback del deep-link «Abrir …» de la ayuda groundeada (AYUDA_FUNCIONES).
  * @param {Object|null} [props.proactiveGreeting=null] - Datos del saludo proactivo dinámico.
+ * @param {string|null} [props.thinkingLabel=null] - Fase visible del pipeline mientras
+ *   se espera el primer token ("Entendiendo tu pregunta", "Consultando el catálogo…").
+ *   Si es null cae al "Pensando" genérico — perceived performance, la espera avanza.
  * @param {Function} props.onBack - Callback para volver a la pantalla anterior.
  */
-export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, onConsentNeeded, onRetryOrphan, onCancelDeepResearch, onDismissInsight, onAyudaAction, proactiveGreeting = null, onBack }) {
+export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, thinkingLabel = null, onConsentNeeded, onRetryOrphan, onCancelDeepResearch, onDismissInsight, onAyudaAction, proactiveGreeting = null, onBack }) {
   const bottomRef = useRef(null);
   const scrollRef = useRef(null);
   // (B) Botón "Volver" flotante: visible solo cuando el operador se alejó del
@@ -254,8 +257,8 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
             </span>
             <span>Chagra</span>
           </div>
-          <div className="v3-card text-sm italic text-slate-300">
-            {MSG.agente.pensandoTexto}
+          <div className="v3-card text-sm italic text-slate-300" aria-live="polite">
+            {thinkingLabel || MSG.agente.pensandoTexto}
             <span className="inline-block ml-1 animate-thinkingDot">·</span>
             <span className="inline-block ml-0.5 animate-thinkingDot [animation-delay:200ms]">·</span>
             <span className="inline-block ml-0.5 animate-thinkingDot [animation-delay:400ms]">·</span>

@@ -149,3 +149,46 @@ describe('SaludSueloScreen — pilar: la vida del suelo (fotos reales)', () => {
     expect(screen.getAllByText(/Wikimedia Commons/i).length).toBeGreaterThan(0);
   });
 });
+
+describe('SaludSueloScreen — pilar: léala en campo (PASO 0)', () => {
+  it('el hub ofrece el pilar "Léala en campo"', () => {
+    render(<SaludSueloScreen onBack={() => {}} onNavigate={() => {}} />);
+    expect(screen.getByRole('button', { name: /Léala en campo/i })).toBeTruthy();
+  });
+
+  it('muestra las cuatro lecturas con las manos y las señales de suelo enfermo', () => {
+    render(<SaludSueloScreen onBack={() => {}} onNavigate={() => {}} />);
+    irA(/Léala en campo/i);
+    // las lecturas sin laboratorio
+    expect(screen.getByText(/La prueba de la pala/i)).toBeTruthy();
+    expect(screen.getByText(/Cómo entra el agua/i)).toBeTruthy();
+    // señales de suelo enfermo con fotos reales (alt de accesibilidad)
+    expect(screen.getByAltText(/erosión/i)).toBeTruthy();
+    expect(screen.getByText(/Costra dura/i)).toBeTruthy();
+  });
+
+  it('enlaza al diagnóstico interactivo (ruta suelo) sin reimplementarlo', () => {
+    const onNavigate = vi.fn();
+    render(<SaludSueloScreen onBack={() => {}} onNavigate={onNavigate} />);
+    irA(/Léala en campo/i);
+    fireEvent.click(screen.getByRole('button', { name: /Diagnostíquela paso a paso/i }));
+    expect(onNavigate).toHaveBeenCalledWith('suelo');
+  });
+
+  it('muestra los créditos de las fotos nuevas con licencia abierta', () => {
+    render(<SaludSueloScreen onBack={() => {}} onNavigate={() => {}} />);
+    irA(/Léala en campo/i);
+    fireEvent.click(screen.getByRole('button', { name: /Créditos de las fotos/i }));
+    expect(screen.getAllByText(/Wikimedia Commons/i).length).toBeGreaterThan(0);
+  });
+});
+
+describe('SaludSueloScreen — pilar 3: enlace al mundo del estiércol', () => {
+  it('enlaza a "Del corral al abono" (ruta estiercol) desde mejorar el suelo', () => {
+    const onNavigate = vi.fn();
+    render(<SaludSueloScreen onBack={() => {}} onNavigate={onNavigate} />);
+    irA(/Mejorar el suelo/i);
+    fireEvent.click(screen.getByRole('button', { name: /Del corral al abono/i }));
+    expect(onNavigate).toHaveBeenCalledWith('estiercol');
+  });
+});

@@ -1,0 +1,156 @@
+/* ============================================================================
+   motion.css — LENGUAJE DE MOVIMIENTO compartido de Chagra (tokens + utilidades).
+
+   Hasta hoy cada componente copiaba su propio easing/duración a mano (el
+   cubic-bezier(.22,.61,.36,1) del agente aparece literal en ~10 archivos, y el
+   "brota" de las tarjetas de Mundos vive solo en mundos-finca.css). Este archivo
+   FORMALIZA ese lenguaje ya existente en un set pequeño de tokens y clases
+   reutilizables — no inventa un motor nuevo ni cambia el carácter del
+   movimiento: lo unifica.
+
+   Principios (innegociables):
+   1. SUTIL: nada distrae ni compite con el contenido. Duraciones cortas,
+      desplazamientos pequeños (≤10px), escalas mínimas.
+   2. ORGÁNICO: las entradas "brotan" (suben mientras aparecen), los elementos
+      vivos "respiran" al ritmo del corazón de la finca (--fvo-beat = 5.2s,
+      scene-finca-organismo.css).
+   3. prefers-reduced-motion APAGA TODO limpio: el contenido queda visible y en
+      su sitio, sin transformación residual (bloque al final). Además existe la
+      red de seguridad global de index.css (@layer base).
+   4. Solo CSS puro — offline-first, cero JS.
+
+   Español de Colombia (tú/usted), sin voseo.
+   ========================================================================== */
+
+:root {
+  /* Easing "de la casa": el del press/entradas del agente y los botones. */
+  --motion-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  /* Easing del "brota" de Mundos (llegada con un pelo más de carácter). */
+  --motion-ease-brota: cubic-bezier(0.22, 0.9, 0.3, 1);
+  /* Duraciones canónicas. */
+  --motion-dur-press: 0.16s;   /* feedback táctil */
+  --motion-dur-screen: 0.28s;  /* entrada de pantalla */
+  --motion-dur-enter: 0.42s;   /* entrada de tarjeta/lista */
+  /* Paso del escalonado entre tarjetas hermanas (el de mf-brota). */
+  --motion-stagger: 45ms;
+  /* Ritmo del latido/respiración biopunk (= --fvo-beat de la finca-organismo). */
+  --motion-beat: 5.2s;
+}
+
+/* ── Entrada de tarjeta/lista: "brota" ──────────────────────────────────────
+   Fade + subida corta. Escalonable poniendo el índice en --i (inline style):
+     <div className="anim-brota" style={{ '--i': idx }}>
+   El delay se capa a 360ms para que las listas largas no queden "en espera". */
+@keyframes motion-brota {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.anim-brota {
+  animation: motion-brota var(--motion-dur-enter) var(--motion-ease-brota) both;
+  animation-delay: min(calc(var(--i, 0) * var(--motion-stagger)), 360ms);
+}
+
+/* ── Entrada de pantalla ────────────────────────────────────────────────────
+   SOLO opacidad, a propósito: un transform en el contenedor raíz de la vista
+   convertiría a sus position:fixed internos (FABs, banners, modales) en
+   fixed-relativo-al-contenedor mientras dura la animación. El fade corto ya
+   quita lo "seco" del swap sin ese riesgo. */
+@keyframes motion-screen-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.anim-screen-enter {
+  animation: motion-screen-in var(--motion-dur-screen) ease-out both;
+}
+
+/* ── Feedback de press (tacto) ──────────────────────────────────────────────
+   El patrón de themes.css:197 hecho clase: hundimiento sutil al presionar. */
+.anim-press {
+  transition: transform var(--motion-dur-press) var(--motion-ease);
+}
+.anim-press:active {
+  transform: scale(0.985);
+}
+
+/* ── Lift en hover (solo dispositivos con puntero real) ─────────────────────
+   El hover de las tarjetas de Mundos (translateY(-2px) + sombra) hecho clase.
+   En táctil no aplica: el hover pegajoso de móvil se ve roto. */
+@media (hover: hover) and (pointer: fine) {
+  .anim-lift {
+    transition:
+      transform var(--motion-dur-press) var(--motion-ease),
+      box-shadow 0.2s ease;
+  }
+  .anim-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -12px rgb(0 0 0 / 0.45);
+  }
+  /* Si el elemento también es .anim-press, el press gana sobre el lift. */
+  .anim-lift:active {
+    transform: scale(0.985);
+  }
+}
+
+/* ── Respiración biopunk (el latido de la finca) ────────────────────────────
+   Escala mínima (1.5%) al ritmo del corazón de la finca-organismo. Para
+   acentos pequeños (íconos, glifos) — nunca para bloques de texto. */
+@keyframes motion-respira {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.015); }
+}
+.anim-respira {
+  animation: motion-respira var(--motion-beat) ease-in-out infinite;
+}
+
+/* Los íconos de los tiles DESTACADOS del home respiran con la finca (vida
+   sutil en el núcleo del dashboard, mismo ritmo que el corazón del hero). */
+.dash-tile--destacado > svg[aria-hidden='true'] {
+  animation: motion-respira var(--motion-beat) ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* ── Latido de aviso del FAB del agente ("respuesta lista") ─────────────────
+   El FAB pinta su chrome con estilos inline (transform de press/hover
+   incluido); por eso el aviso late por GLOW (box-shadow) y no por transform:
+   la animación gana al inline mientras corre, sin pisar el press. */
+@keyframes motion-aviso-glow {
+  0%, 100% {
+    box-shadow:
+      0 4px 16px rgb(0 0 0 / 0.4),
+      0 0 12px rgb(251 191 36 / 0.35);
+  }
+  50% {
+    box-shadow:
+      0 4px 16px rgb(0 0 0 / 0.4),
+      0 0 22px rgb(251 191 36 / 0.65);
+  }
+}
+.chagra-fab.is-ready {
+  animation: motion-aviso-glow 2.6s ease-in-out infinite;
+}
+
+/* ── prefers-reduced-motion: apagado LIMPIO ─────────────────────────────────
+   Contenido visible, en su sitio, sin latidos. (index.css además acorta toda
+   animación global a 0.01ms como red de seguridad.) */
+@media (prefers-reduced-motion: reduce) {
+  .anim-brota,
+  .anim-screen-enter {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .anim-press,
+  .anim-lift {
+    transition: none;
+  }
+  .anim-press:active,
+  .anim-lift:hover,
+  .anim-lift:active {
+    transform: none;
+  }
+  .anim-respira,
+  .dash-tile--destacado > svg[aria-hidden='true'],
+  .chagra-fab.is-ready {
+    animation: none;
+  }
+}

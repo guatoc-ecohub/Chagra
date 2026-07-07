@@ -926,6 +926,54 @@ describe('agentService — Task #202 Profile Context', () => {
       expect(ctx).toContain('200');
     });
 
+    // ── BUG 1 (audit conversación cacao): FUGA DE UBICACIÓN DEFAULT (0 msnm) ──
+    // Con el perfil SIN altitud capturada, el caller pasa `fincaAltitud = null`.
+    // `Number(null) === 0`, así que un 0 FANTASMA se colaba como nivel del mar:
+    // cacao (200–900 m) caía "MARGINAL/al límite" y el prompt afirmaba "tu finca a
+    // 0 msnm", derivando consejos de heladas/microclima ABRIGADO — al revés para
+    // tierra baja tropical. Sin altitud confirmada NO debe emitir veredicto.
+    it('BUG-1: fincaAltitud null NO produce veredicto para cacao (no inventa 0 msnm)', () => {
+      const cacao = [
+        {
+          mentioned: 'cacao', kind: 'species', nombre_comun: 'Cacao',
+          nombre_cientifico: 'Theobroma cacao', altitud_min: 200, altitud_max: 900,
+        },
+      ];
+      const ctx = buildViabilityContext({ fincaAltitud: null, resolvedEntities: cacao });
+      expect(ctx).toBe('');
+      // No debe filtrar el 0 fantasma ni marcar "al límite/marginal".
+      expect(ctx).not.toContain('0 msnm');
+      expect(ctx).not.toMatch(/MARGINAL|MUY BAJA|LÍMITE/i);
+    });
+
+    it('BUG-1: fincaAltitud undefined / "" / 0 se tratan como SIN altitud (no fantasma cálido)', () => {
+      const cacao = [
+        {
+          mentioned: 'cacao', kind: 'species', nombre_comun: 'Cacao',
+          nombre_cientifico: 'Theobroma cacao', altitud_min: 200, altitud_max: 900,
+        },
+      ];
+      for (const alt of [undefined, '', 0, '0', null]) {
+        const ctx = buildViabilityContext({ fincaAltitud: alt, resolvedEntities: cacao });
+        expect(ctx).toBe('');
+      }
+    });
+
+    it('BUG-1: con altitud REAL de tierra baja (350 m) SÍ evalúa cacao como viable', () => {
+      // Sanidad: el fix no rompe la altitud legítima — a 350 m cacao es viable
+      // (dentro de 200–900) y no se emite línea de advertencia.
+      const ctx = buildViabilityContext({
+        fincaAltitud: 350,
+        resolvedEntities: [
+          {
+            mentioned: 'cacao', kind: 'species', nombre_comun: 'Cacao',
+            nombre_cientifico: 'Theobroma cacao', altitud_min: 200, altitud_max: 900,
+          },
+        ],
+      });
+      expect(ctx).toBe('');
+    });
+
     it('ignora plagas/biopreparados (solo evalúa especies sembrables)', () => {
       const ctx = buildViabilityContext({
         fincaAltitud: 2580,

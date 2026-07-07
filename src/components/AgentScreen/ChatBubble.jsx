@@ -89,6 +89,31 @@ function SourceBadge({ metadata }) {
     );
   }
 
+  // AFFECTS-GATE (anti-contaminación cruzada de cultivo): la evidencia surfaceó
+  // un organismo (plaga) que NO afecta al cultivo en foco — la arista AFFECTS no
+  // existe (ej. la BROCA, plaga de café, en una conversación de cacao). El sello
+  // "Catálogo verificado" YA se degradó aguas arriba (grounded=false); acá lo
+  // decimos explícito y honesto: el dato es de OTRO cultivo. Ámbar, no verde.
+  // Wording sobrio, cero hype. Ver services/affectsGate.js.
+  const crossCrop = md.cross_crop === true;
+  if (crossCrop) {
+    const organismos = Array.isArray(md.cross_crop_organisms)
+      ? md.cross_crop_organisms.filter((s) => typeof s === 'string' && s.trim().length > 0)
+      : [];
+    const detalle = organismos.length > 0 ? ` (${organismos.join(', ')})` : '';
+    return (
+      <span
+        className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-amber-600/20 text-amber-300 border border-amber-700"
+        data-testid="cross-crop-badge"
+        data-source="cross-crop"
+        title={`Este dato${detalle} existe en el catálogo pero corresponde a OTRO cultivo, no al que tienes en foco. No es un "dato verificado" para tu cultivo: verifícalo antes de aplicarlo.`}
+      >
+        <AlertTriangle size={12} aria-hidden="true" />
+        <span>Dato de otro cultivo · verifica</span>
+      </span>
+    );
+  }
+
   if (toolUsed && grounded) {
     return (
       <span

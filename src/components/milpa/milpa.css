@@ -1,0 +1,59 @@
+/*
+ * milpa.css — micro-animaciones del módulo "La milpa: maíz, fríjol y calabaza".
+ *
+ * Principios (mismos que agua.css):
+ *   · Sutiles y de bajo costo (solo transform/opacity, nada de layout).
+ *   · prefers-reduced-motion las apaga TODAS.
+ *   · Los colores salen de las clases Tailwind del componente (paleta slate +
+ *     acentos ámbar/rosa/naranja), que ya reaccionan a los temas vía data-theme
+ *     (themes.css) — aquí no se fija ningún color de tema, solo movimiento.
+ */
+
+/* Entrada suave del contenido de la sección al cambiar de pestaña. */
+@keyframes milpa-seccion-entra {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.milpa-seccion {
+  animation: milpa-seccion-entra 0.3s ease-out;
+}
+
+/* Fotos reales: aparición suave (solo opacity, sin reflow) al montarse. */
+@keyframes milpa-foto-entra {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.milpa-foto {
+  animation: milpa-foto-entra 0.5s ease-out;
+}
+
+/* Pestaña activa: aro que pulsa una sola vez al seleccionar. */
+@keyframes milpa-tab-pulso {
+  0% { transform: scale(0.94); opacity: 0.5; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.milpa-tab-activa {
+  animation: milpa-tab-pulso 0.42s ease-out;
+}
+
+/* El fríjol que "trepa" por la caña del maíz en el diagrama de la asociación:
+   la guía crece de abajo hacia arriba (scaleY con origen abajo). */
+.milpa-guia {
+  transform-origin: center bottom;
+  animation: milpa-guia-sube 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes milpa-guia-sube {
+  from { transform: scaleY(0); opacity: 0.2; }
+  to { transform: scaleY(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .milpa-seccion,
+  .milpa-foto,
+  .milpa-tab-activa,
+  .milpa-guia {
+    animation: none;
+  }
+  .milpa-guia { transform: none; }
+}

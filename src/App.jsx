@@ -7,7 +7,7 @@
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import React, { lazy, Suspense, useState, useEffect, useCallback, useRef } from 'react';
-import { MapPin, Eye, Package, CheckCircle, WifiOff, Mic, AlertCircle, Network, Beaker, Scale } from 'lucide-react';
+import { MapPin, Eye, Package, CheckCircle, WifiOff, Mic, Network, Beaker, Scale } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
 import { useClimaAtmosphere } from './hooks/useClimaAtmosphere';
@@ -82,7 +82,7 @@ const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').
 // 2026-06-30. Se alcanza desde 'bodega' vía el botón "Auditoría y
 // reconciliación", o directo por hash (#auditoria-inventario).
 const InventoryPage = lazy(() => import('./pages/InventoryPage'));
-const BiopreparadoRecetasGallery = lazy(() => import('./components/BiopreparadoRecetasGallery'));
+const BiopreparadosScreen = lazy(() => import('./components/biopreparados/BiopreparadosScreen'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
 const UsageStatsDashboard = lazy(() => import('./components/UsageStatsDashboard'));
@@ -93,7 +93,10 @@ const AnimalesScreen = lazy(() => import('./components/AnimalesScreen'));
 const GallinasScreen = lazy(() => import('./components/GallinasScreen'));
 const AbejasScreen = lazy(() => import('./components/AbejasScreen'));
 const VacasScreen = lazy(() => import('./components/VacasScreen'));
+const ConejosScreen = lazy(() => import('./components/ConejosScreen'));
+const CaprinosScreen = lazy(() => import('./components/CaprinosScreen'));
 const EstiercolScreen = lazy(() => import('./components/EstiercolScreen'));
+const CompostScreen = lazy(() => import('./components/CompostScreen'));
 const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
 const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
 const LocationDetectedScreen = lazy(() => import('./components/LocationDetectedScreen'));
@@ -112,6 +115,16 @@ const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScree
 // riego con medida (ETc; Kc/ETo = slots grounded-pendiente) y cuidar el agua
 // (calidad + nacimiento, caso "se me seca el nacimiento en verano").
 const AguaScreen = lazy(() => import('./components/agua/AguaScreen'));
+// "Aromáticas y condimentarias": la huerta de la cocina campesina (8 hierbas,
+// photo-forward). Cultivo groundeado en el catálogo Chagra; cocina sin claims
+// medicinales. Vive dentro del mundo Cultivos y semillas.
+const AromaticasScreen = lazy(() => import('./components/aromaticas/AromaticasScreen'));
+// Mundo "El café": el cultivo bandera del campesino colombiano, contado por su
+// ciclo (variedad/roya, almácigo, sombra, broca+roya, cosecha selectiva y
+// beneficio). Photo-forward (patrón Agua) y groundeado en el grafo
+// (species.coffea_arabica) + Cenicafé; la pulpa cierra ciclo hacia el compost.
+const CafeScreen = lazy(() => import('./components/cafe/CafeScreen'));
+const MilpaScreen = lazy(() => import('./components/milpa/MilpaScreen'));
 // "El clima que viene": traductor campesino de los boletines IDEAM/ENSO. Lee la
 // fase ENSO en vivo (ensoService) y remite a la Mesa Técnica Agroclimática — no
 // reimplementa el motor de clima ni pronostica.
@@ -138,6 +151,28 @@ const AlmacenamientoScreen = lazy(() => import('./components/AlmacenamientoScree
 // nutricional (ICBF TCAC 2015) por cultivo, exportado del grafo chagra_kg a
 // public/nutricion-humana.json (la PWA no consulta el grafo en vivo).
 const NutricionHumanaScreen = lazy(() => import('./components/NutricionHumanaScreen'));
+// Módulo "Plátano y banano" (mundo Cultivos y semillas): el pancoger clave del
+// campesino colombiano, foto-forward. 4 pilares — variedades y la mata como
+// sistema (madre-hijo-nieto + deshije), siembra y compañía (colino/cormo,
+// distancias con calculadora de densidad, sombra café/cacao, hambre de potasio),
+// sigatoka y picudo (reconocer + manejo agroecológico, sin dosis inventadas) y
+// cosecha + aprovechamiento del pseudotallo/hoja (enlaza al mundo del abono).
+// Datos grounded al catálogo/grafo (cycle-content musa, grafo-relations,
+// sanidadData). Fotos CC con crédito visible.
+const PlatanoBananoScreen = lazy(() => import('./components/PlatanoBananoScreen'));
+// Mundo "El cacao" (dentro de Cultivos y semillas): cultivo bandera de la paz y
+// la sustitución. 5 estaciones photo-forward — el árbol/clones, la sombra (SAF),
+// siembra e injerto + poda, monilia y escoba de bruja (manejo cultural, sin dosis
+// inventadas) y cosecha + beneficio (fermentación/secado + cáscara→abono).
+// Groundeado al catálogo/grafo (theobroma_cacao, moniliophthora_*) + FEDECACAO/
+// AGROSAVIA/ICA. Fotos CC reales con crédito visible (public/cacao/creditos.json).
+const CacaoScreen = lazy(() => import('./components/cacao/CacaoScreen'));
+// Módulo "Hortalizas de la huerta" (mundo Cultivos y semillas): la comida diaria
+// de la casa campesina. Ficha de cultivo por hortaliza (siembra, luz/agua/piso
+// térmico, vecinas, plagas con manejo agroecológico, cosecha y conservación).
+// Vecinas + plagas del grafo chagra_kg (public/grafo-relations.json); cero dosis
+// químicas; "dato en camino" donde el grafo aún no respalda. Fotos CC con crédito.
+const HortalizasScreen = lazy(() => import('./components/HortalizasScreen'));
 // LOS MUNDOS DE MI FINCA (reestructuración 2.0 del home): un mundo por dentro —
 // las funciones existentes agrupadas por lugar. Re-rutea, no reimplementa.
 const MundoScreen = lazy(() => import('./components/MundoScreen'));
@@ -160,8 +195,43 @@ const CaseStudyScreen = lazy(() => import('./components/CaseStudyScreen'));
 const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
 const FaqScreen = lazy(() => import('./components/FaqScreen'));
 const HelpManual = lazy(() => import('./components/HelpManual'));
-const TopBar = lazy(() => import('./components/TopBar'));
-const DashboardLive = lazy(() => import('./components/dashboard/DashboardLive'));
+// Chunks del HOME (TopBar + DashboardLive): son la PRIMERA pantalla tras el
+// login y se cargan como lazy para no pesar sobre el paint del login. Pero eso
+// abre una carrera: si la red se cae (ej. el gate offline-first hace
+// context.setOffline apenas ve la barra global "Cola de tareas" —que vive fuera
+// del Suspense, así que aparece antes de que el chunk del dashboard termine—)
+// el import dinámico en vuelo se ABORTA y React.lazy tira "Failed to fetch
+// dynamically imported module", cayendo al ErrorBoundary. En dev/CI el grafo de
+// módulos es grande y la ventana de la carrera se ensancha. Fix: memoizamos el
+// import y lo PREcargamos mientras el usuario está en el login (ver useEffect de
+// prefetch del home), de modo que al navegar al dashboard el módulo ya está en
+// caché del navegador y no depende de la red. `lazy` reusa la MISMA promesa
+// memoizada (prefetchHomeChunks) → sin doble fetch.
+// Memoiza el import dinámico pero SIN cachear un rechazo: si el fetch se aborta
+// (ej. la red se cae con el import en vuelo), limpia la promesa para que el
+// siguiente intento (render de React.lazy o un nuevo preload al reconectar)
+// vuelva a importar en vez de quedar envenenado con la promesa rechazada.
+const makeLazyLoader = (factory) => {
+  let promise = null;
+  return () => {
+    if (!promise) {
+      promise = factory().catch((err) => {
+        promise = null;
+        throw err;
+      });
+    }
+    return promise;
+  };
+};
+const prefetchTopBar = makeLazyLoader(() => import('./components/TopBar'));
+const prefetchDashboardLive = makeLazyLoader(() => import('./components/dashboard/DashboardLive'));
+// Precarga los chunks del home fuera del render (se dispara desde el login).
+const prefetchHomeChunks = () => {
+  prefetchTopBar().catch(() => {});
+  prefetchDashboardLive().catch(() => {});
+};
+const TopBar = lazy(() => prefetchTopBar());
+const DashboardLive = lazy(() => prefetchDashboardLive());
 const AprenderConAgente = lazy(() => import('./components/Aprende/AprenderConAgente'));
 const CursoChagra = lazy(() => import('./components/curso/CursoChagra'));
 const DirectorioEspeciesScreen = lazy(() => import('./components/DirectorioEspecies/DirectorioEspeciesScreen'));
@@ -184,14 +254,70 @@ localforage.config({
   storeName: 'syncQueue'
 });
 
-const LoadingFallback = () => (
-  <div
-    className="h-[100dvh] bg-slate-950 flex items-center justify-center text-muzo-glow"
-    data-testid="app-suspense-fallback"
-  >
-    <ChagraGrowLoader size={80} showLabel labelText="Chagra..." />
-  </div>
-);
+// Etiquetas contextuales del fallback de Suspense (perceived performance):
+// mientras baja el chunk lazy de la vista destino, el loader dice A DÓNDE
+// vas en lugar del "Chagra..." genérico — la espera se siente intencional.
+// Vistas sin entrada caen al label genérico (abajo).
+const VIEW_LOADING_LABELS = {
+  loading: 'Preparando tu chagra…',
+  dashboard: 'Preparando tu chagra…',
+  hoy_finca: 'Preparando tu chagra…',
+  agente: 'Despertando al agente…',
+  voz: 'Preparando el modo voz…',
+  voz_planta: 'Preparando el modo voz…',
+  directorio: 'Abriendo el catálogo de especies…',
+  especies: 'Abriendo el catálogo de especies…',
+  toxicologia: 'Abriendo el catálogo de especies…',
+  mundo: 'Abriendo el mundo…',
+  mundo_cultivos: 'Abriendo tus cultivos…',
+  agua: 'Abriendo el mundo del agua…',
+  suelo: 'Abriendo el mundo del suelo…',
+  salud_suelo: 'Abriendo el mundo del suelo…',
+  semilla: 'Abriendo el mundo de la semilla…',
+  poscosecha: 'Abriendo la poscosecha…',
+  almacenamiento: 'Abriendo el almacenamiento…',
+  nutricion: 'Abriendo la comida que alimenta…',
+  animales: 'Abriendo tus animales…',
+  ciclo_vivo: 'Abriendo el ciclo vivo…',
+  calendario: 'Abriendo el calendario…',
+  calendario_finca: 'Abriendo el calendario…',
+  mapa: 'Abriendo el mapa…',
+  mercado: 'Abriendo el mercado…',
+  mercados: 'Abriendo el mercado…',
+  aprende: 'Abriendo los cursos…',
+  bitacora: 'Abriendo la bitácora…',
+  historial: 'Abriendo la bitácora…',
+  informes: 'Preparando los informes…',
+};
+
+// Si el chunk tarda más que esto, mostramos una línea de calma (UX paciente:
+// típico en campo con señal débil o en la primera visita sin caché).
+const SLOW_LOAD_HINT_MS = 4000;
+
+const LoadingFallback = ({ view = null }) => {
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setSlow(true), SLOW_LOAD_HINT_MS);
+    return () => clearTimeout(t);
+  }, []);
+  return (
+    <div
+      className="h-[100dvh] bg-slate-950 flex flex-col items-center justify-center gap-3 text-muzo-glow"
+      data-testid="app-suspense-fallback"
+    >
+      <ChagraGrowLoader size={80} showLabel labelText={VIEW_LOADING_LABELS[view] || 'Cargando…'} />
+      {slow && (
+        <p
+          className="text-xs text-slate-400 text-center px-8 max-w-xs"
+          data-testid="app-suspense-slow-hint"
+          aria-live="polite"
+        >
+          Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.
+        </p>
+      )}
+    </div>
+  );
+};
 
 // CÓDIGO MUERTO REMOVIDO 2026-06-24 (descubribilidad): `NAV_TILES` +
 // `ACCENT_CLASSES` solo los consumía `DashboardView` (la grilla de 16 tiles del
@@ -235,11 +361,23 @@ const HASH_VIEW_ROUTES = {
   animales: 'animales',
   'animales-gallinas': 'animales_gallinas',
   'animales-abejas': 'animales_abejas',
+  abejas: 'animales_abejas',
+  polinizacion: 'animales_abejas',
+  polinizadores: 'animales_abejas',
+  meliponicultura: 'animales_abejas',
   'animales-vacas': 'animales_vacas',
+  'animales-conejos': 'animales_conejos',
+  conejos: 'animales_conejos',
+  'animales-caprinos': 'animales_caprinos',
+  'cabras-ovejas': 'animales_caprinos',
+  cabras: 'animales_caprinos',
   estiercol: 'estiercol',
   'del-corral-al-abono': 'estiercol',
   abono: 'estiercol',
   biodigestor: 'estiercol',
+  compost: 'compost',
+  'estiercol-compost': 'compost',
+  'compost-paso-a-paso': 'compost',
   'doom-finca': 'doom_finca',
   subsuelo: 'subsuelo',
   'mundo-subsuelo': 'subsuelo',
@@ -247,6 +385,17 @@ const HASH_VIEW_ROUTES = {
   suelo: 'suelo',
   agua: 'agua',
   'manejo-agua': 'agua',
+  aromaticas: 'aromaticas',
+  'aromaticas-condimentarias': 'aromaticas',
+  condimentarias: 'aromaticas',
+  'huerta-aromaticas': 'aromaticas',
+  cafe: 'cafe',
+  café: 'cafe',
+  'el-cafe': 'cafe',
+  cafetal: 'cafe',
+  cafeto: 'cafe',
+  'milpa-cultivo': 'milpa_cultivo',
+  'tres-hermanas': 'milpa_cultivo',
   'salud-suelo': 'salud_suelo',
   'cuaderno-suelo': 'salud_suelo',
   encalado: 'salud_suelo',
@@ -257,6 +406,10 @@ const HASH_VIEW_ROUTES = {
   directorio: 'directorio',
   'directorio-especies': 'directorio',
   especies: 'directorio',
+  plagas: 'plagas',
+  'directorio-plagas': 'plagas',
+  plaga: 'plagas',
+  enfermedades: 'plagas',
   'usage-stats': 'usage_stats',
   mercado: 'mercado',
   mercados: 'mercado',
@@ -272,6 +425,16 @@ const HASH_VIEW_ROUTES = {
   nutricion: 'nutricion',
   'nutricion-humana': 'nutricion',
   'comida-que-alimenta': 'nutricion',
+  platano: 'platano',
+  'platano-banano': 'platano',
+  banano: 'platano',
+  platanera: 'platano',
+  cacao: 'cacao',
+  'el-cacao': 'cacao',
+  theobroma: 'cacao',
+  hortalizas: 'hortalizas',
+  huerta: 'hortalizas',
+  verduras: 'hortalizas',
   // Curso guiado + deep-links profundos usados por la landing (chagra.bio):
   // permiten que chagra.app/#curso, /#sembrar, /#voz, /#milpa, /#biopreparados,
   // /#sanidad y /#cosechar caigan en su vista real (antes caían a dashboard).
@@ -292,10 +455,17 @@ const HASH_VIEW_ROUTES = {
 const MODULE_VIEWS = new Set([
   'activos', 'mapa', 'javier', 'bodega', 'task_log', 'historial', 'bitacora',
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
-  'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol',
+  'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol', 'compost',
+  'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'animales_conejos', 'animales_caprinos', 'estiercol',
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'aromaticas', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'platano', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'cacao', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'hortalizas', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'milpa_cultivo', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'plagas', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
   'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
@@ -641,6 +811,22 @@ export default function App() {
     });
   }, []);
 
+  // Prefetch del HOME mientras el usuario está en el login: baja los chunks de
+  // TopBar + DashboardLive ANTES de navegar al dashboard, para que la
+  // transición no dependa de la red en ese instante. Cierra la carrera del gate
+  // offline-first (context.setOffline apenas ve "Cola de tareas" —barra global,
+  // fuera del Suspense— abortaba el import en vuelo del dashboard → ErrorBoundary
+  // "Failed to fetch dynamically imported module"). Fire-and-forget y no-throw:
+  // si falla o no alcanza a terminar, el flujo lazy normal sigue vigente.
+  useEffect(() => {
+    if (currentView !== 'login') return;
+    try {
+      prefetchHomeChunks();
+    } catch (err) {
+      console.warn('[App] Prefetch del home no se pudo disparar:', err?.message);
+    }
+  }, [currentView]);
+
   // alertas-reales (2026-05-30): arranca el motor de alertas con CLIMA REAL.
   // Inicializa los listeners del store (escucha alertTriggered/alertCleared) y
   // arranca el alertEngine, que consulta el pronóstico Open-Meteo de la finca
@@ -821,7 +1007,7 @@ export default function App() {
 
     switch (currentView) {
       case 'loading':
-        return <LoadingFallback />;
+        return <LoadingFallback view="loading" />;
       case 'login':
         return (
           <ErrorBoundary>
@@ -987,34 +1173,22 @@ export default function App() {
           </ErrorBoundary>
         );
       case 'biopreparados':
-        // Galería de recetas de biopreparados PASO A PASO (no la pantalla de
-        // insumos/inventario). Dos entradas: (1) la misión "Prepárale comida
-        // natural" del juego (sin `back` → vuelve al juego, default) y (2) la
-        // home viva (Herramientas de finca → Biopreparados, rescatada
-        // 2026-06-24, pasa back:'dashboard'). El botón Volver respeta de dónde
-        // se vino: por defecto al juego (back-compat de la misión); desde la
-        // home, al dashboard. Antes onBack iba SIEMPRE a 'juego', así que desde
-        // la home el usuario caía en el juego (huérfano).
+        // Fichas photo-forward de biopreparados (caldos, purines, biofermentos,
+        // extractos): para qué sirve, ingredientes con medidas caseras, paso a
+        // paso, tiempo de fermentación, dosis y precauciones (EPP, vetos,
+        // reingreso). Todo grounded en catalog/biopreparados-seed.json — cero
+        // dosis inventada. Reemplaza la galería de solo-diagramas que vivía aquí
+        // (la galería sigue accesible desde la Bodega/InventoryDashboard).
+        // El botón Volver respeta de dónde se vino: por defecto al juego
+        // (back-compat de la misión "Prepárale comida natural"); desde la home
+        // viva de Sanidad, al dashboard (currentViewData.back).
         return (
           <ErrorBoundary>
-            <ScreenShell title="Biopreparados" onBack={() => navigate(currentViewData?.back || 'juego')} onHome={() => navigate('dashboard')}>
-              <div className="px-4 pt-3 pb-10 max-w-2xl mx-auto flex flex-col gap-4">
-                {/* Acceso a la toxicología de insumos (EPI, dosis seguras,
-                    restricción ICA). Caso crítico: caldo bordelés / sulfocálcico. */}
-                <button
-                  type="button"
-                  onClick={() => navigate('toxicologia', { tab: 'insumos' })}
-                  className="rounded-xl border border-amber-700/50 bg-amber-950/30 p-3 flex items-center gap-2.5 text-left hover:border-amber-600 transition-colors"
-                >
-                  <AlertCircle size={20} className="shrink-0 text-amber-400" />
-                  <span className="text-sm text-amber-100 flex-1">
-                    <span className="font-bold">Toxicología y seguridad.</span> Antes de preparar,
-                    revisa la protección (EPI), las dosis seguras y las restricciones legales.
-                  </span>
-                </button>
-                <BiopreparadoRecetasGallery />
-              </div>
-            </ScreenShell>
+            <BiopreparadosScreen
+              onBack={() => navigate(currentViewData?.back || 'juego')}
+              onHome={() => navigate('dashboard')}
+              onNavigate={navigate}
+            />
           </ErrorBoundary>
         );
       case 'plant_asset':
@@ -1243,7 +1417,7 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Abejas">
-              <AbejasScreen onBack={() => navigate('animales')} onHome={() => navigate('dashboard')} />
+              <AbejasScreen onBack={() => navigate('animales')} onHome={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -1254,6 +1428,26 @@ export default function App() {
               {/* onNavigate: VacasScreen enlaza al proceso de seguimiento de
                   silvopastoreo existente ('seguimiento_silvopastoreo'). */}
               <VacasScreen onBack={() => navigate('animales')} onHome={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'animales_conejos':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Conejos">
+              {/* onNavigate: ConejosScreen salta al mundo del abono ('estiercol')
+                  para cerrar el ciclo con la conejaza. */}
+              <ConejosScreen onBack={() => navigate('animales')} onHome={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'animales_caprinos':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Cabras y ovejas">
+              {/* onNavigate: CaprinosScreen salta al mundo del abono ('estiercol')
+                  para cerrar el ciclo con la majada. */}
+              <CaprinosScreen onBack={() => navigate('animales')} onHome={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -1268,6 +1462,23 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Del corral al abono">
               <EstiercolScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'compost':
+        // "El compost, paso a paso" — hermana photo-forward de AguaScreen dentro
+        // del mundo Estiércol y compost. Lleva por la receta (recolección →
+        // mezcla C:N → volteo → madurez → aplicación) con fotos CC reales.
+        // El back regresa al hub del mundo (abono), no al dashboard, porque se
+        // llega desde ahí. Ruta #compost.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El compost, paso a paso">
+              <CompostScreen
+                onBack={() => navigate('mundo', { mundo: 'abono' })}
+                onHome={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -1438,6 +1649,19 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'platano':
+        // Módulo "Plátano y banano" (mundo Cultivos y semillas): el pancoger
+        // clave del campesino, foto-forward. 4 pilares (variedades y la mata
+        // madre-hijo-nieto / siembra y compañía con calculadora de densidad /
+        // sigatoka y picudo con manejo agroecológico / cosecha y aprovechamiento
+        // del pseudotallo). Grounded al catálogo/grafo; fotos CC con crédito.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Plátano y banano">
+              <PlatanoBananoScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'nutricion':
         // Módulo "La comida que alimenta" (mundo Mercado y despensa): aporte
         // nutricional por cultivo (energía/proteína/hierro/vitamina A por 100 g)
@@ -1447,6 +1671,35 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="La comida que alimenta">
               <NutricionHumanaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'cacao':
+        // Mundo "El cacao" (dentro de Cultivos y semillas): cultivo bandera de la
+        // paz. 5 estaciones photo-forward — árbol/clones, sombra (SAF), siembra/
+        // injerto + poda, monilia y escoba de bruja (manejo cultural, sin dosis
+        // inventadas), cosecha + beneficio (fermentación/secado) y cáscara→abono
+        // (enlaza al mundo del compost). Groundeado a catálogo/grafo + FEDECACAO/
+        // AGROSAVIA/ICA. Fotos CC reales con crédito visible.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El cacao">
+              <CacaoScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'hortalizas':
+        // Módulo "Hortalizas de la huerta" (mundo Cultivos y semillas): la comida
+        // diaria de la casa. Ficha de cultivo por hortaliza (siembra, luz/agua/piso
+        // térmico, vecinas, plagas con manejo agroecológico, cosecha y
+        // conservación). Vecinas + plagas grounded al grafo chagra_kg
+        // (public/grafo-relations.json); días a cosecha de las plantillas de
+        // fenología; cero dosis químicas; "dato en camino" donde el grafo aún no
+        // respalda. Fotos CC con crédito visible.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Hortalizas de la huerta">
+              <HortalizasScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -1466,6 +1719,44 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Agua de la finca">
               <AguaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'aromaticas':
+        // Mundo "Aromáticas y condimentarias" (dentro de Cultivos y semillas):
+        // la huerta de la cocina campesina, 8 hierbas photo-forward. El cultivo
+        // va groundeado en el catálogo (altitud, piso térmico, sol/agua,
+        // propagación); la cocina es campesina, sin claims medicinales.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Aromáticas y condimentarias">
+              <AromaticasScreen onBack={() => navigate('mundo_cultivos')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'cafe':
+        // Mundo "El café" (5 estaciones: variedad+siembra / sombra+suelo /
+        // broca+roya / flor+cosecha / beneficio). Photo-forward con fotos CC y
+        // groundeado en el grafo (coffea_arabica) + Cenicafé; sin dosis
+        // químicas inventadas (cifras de sitio = "dato en camino").
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El café">
+              <CafeScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'milpa_cultivo':
+        // Módulo "La milpa: maíz, fríjol y calabaza" (las tres hermanas): la
+        // asociación ancestral groundeada en el grafo (COMPATIBLE_WITH /
+        // CONTROLS) y en las fichas de ciclo (src/data/milpaFinca.js). Sin dosis
+        // químicas; cifras sin fuente van como "dato en camino". Vive dentro del
+        // mundo Cultivos. NB: la vista 'milpa' (sin sufijo) es el juego
+        // MilpaSimulator — por eso esta usa 'milpa_cultivo'.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La milpa: maíz, fríjol y calabaza">
+              <MilpaScreen onBack={() => navigate('mundo_cultivos')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -1599,6 +1890,23 @@ export default function App() {
               <DirectorioEspeciesScreen
                 onBack={() => navigate('dashboard')}
                 initialQuery={currentViewData?.query || ''}
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'plagas':
+        // Directorio de plagas: el ESPEJO del de especies. Cuadrícula de
+        // plagas/enfermedades + ficha grounded por plaga (foto del daño, a qué
+        // le pega, cómo reconocerla, umbral, manejo agroecológico sin veneno),
+        // offline-first desde el catálogo de sanidad + grafo-relations.json.
+        // initialPlagaId vía currentViewData.plagaId (deep-link desde Sanidad).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Directorio de plagas">
+              <DirectorioEspeciesScreen
+                onBack={() => navigate('dashboard')}
+                initialMode="plagas"
+                initialPlagaId={currentViewData?.plagaId || ''}
               />
             </ErrorFallback>
           </ErrorBoundary>
@@ -1809,8 +2117,16 @@ export default function App() {
       {/* #315 — banner crítico global: surfacea alertas graves (helada, sensor
           crítico) sin abrir la campana. Imposible de ignorar. */}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <CriticalAlertBanner onNavigate={navigate} />}
-      <Suspense fallback={<LoadingFallback />}>
-        {renderView()}
+      {/* Entrada de pantalla: el swap de vista era SECO (desmonta/monta sin
+          transición). El wrapper con key remonta en cada cambio de vista y
+          dispara un fade corto (motion.css .anim-screen-enter — solo opacidad,
+          sin transform, para no des-anclar los position:fixed internos). Y el
+          fallback conoce la vista destino: mientras baja el chunk lazy muestra
+          "Abriendo el catálogo…" etc. Respeta prefers-reduced-motion. */}
+      <Suspense fallback={<LoadingFallback view={currentView} />}>
+        <div key={currentView} className="anim-screen-enter">
+          {renderView()}
+        </div>
       </Suspense>
       {/* FAB feedback flotante REMOVIDO 2026-05-21: el reporte de errores
           ahora vive embebido dentro de HelpUsoScreen (sección "Reportar

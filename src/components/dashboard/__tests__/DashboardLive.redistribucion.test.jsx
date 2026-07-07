@@ -172,8 +172,12 @@ describe('Home F2 — reestructuración 2.0 "Los mundos de mi finca" (V4)', () =
     // Mundos de UNA pantalla → directo, sin intermedia vacía.
     fireEvent.click(screen.getByTestId('mundo-agua'));
     expect(onNavigate).toHaveBeenCalledWith('agua', undefined);
+
+    // Estiércol y compost ganó su segunda sala ("El compost, paso a paso"):
+    // pasó de directo a hub con DOS entradas (compost + del corral al abono),
+    // así que ahora abre la pantalla de mundo genérica (mismo caso que clima).
     fireEvent.click(screen.getByTestId('mundo-abono'));
-    expect(onNavigate).toHaveBeenCalledWith('estiercol', undefined);
+    expect(onNavigate).toHaveBeenCalledWith('mundo', { mundo: 'abono' });
 
     // Clima ganó su propia mini-app (#2045): ahora tiene DOS entradas
     // (su día en la finca + el boletín del clima que viene), así que ya no

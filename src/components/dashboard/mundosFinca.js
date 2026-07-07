@@ -49,16 +49,31 @@ export const MUNDOS_FINCA = [
         // agrupa las funciones existentes y suma la calculadora de grados-día.
         portada: 'mundo_cultivos',
         entradas: [
+            { view: 'milpa_cultivo', label: 'La milpa', desc: 'Maíz, fríjol y calabaza sembrados juntos (las tres hermanas)', emoji: '🌽' },
             { view: 'directorio', label: 'Qué puedo sembrar', desc: 'Especies para su clima, con qué se llevan y sus plagas', emoji: '🌱' },
+            { view: 'platano', label: 'Plátano y banano', desc: 'El pancoger de la casa: variedades, siembra, la mata madre-hijo-nieto, sigatoka y picudo, y aprovechar el pseudotallo', emoji: '🍌' },
+            { view: 'cacao', label: 'El cacao', desc: 'Cultivo bandera de la paz: clones, sombra, monilia y escoba, y el beneficio que hace el precio', emoji: '🍫' },
+            { view: 'hortalizas', label: 'Hortalizas de la huerta', desc: 'La comida diaria de la casa: siembra, agua, vecinas, plagas y cosecha de tomate, cebolla, zanahoria y más', emoji: '🥕' },
             { view: 'calendario_finca', label: 'Calendario de la finca', desc: 'Cuándo sembrar, abonar y cosechar, todo junto', emoji: '🗓️' },
             { view: 'activos', label: 'Mis matas', desc: 'Las plantas que tiene sembradas y cómo van', emoji: '🪴' },
             { view: 'mapa', label: 'Zonas de la finca', desc: 'Sus lotes, eras y potreros en el mapa', emoji: '🗺️' },
             { view: 'semilla', label: 'Semilla propia', desc: 'Seleccione, guarde y pruebe su semilla criolla', emoji: '🌾' },
             { view: 'germinacion', label: 'Semilleros', desc: 'Pruebe sus semillas y vea cuáles nacen', emoji: '🫘' },
+            { view: 'aromaticas', label: 'Huerta de aromáticas', desc: 'Cilantro, cebolla larga, orégano y más: para qué sirven en la cocina y cómo sembrarlas', emoji: '🌿' },
             { view: 'sembrar', label: 'Registrar una siembra', desc: 'Anote lo que sembró y arranca su ciclo', emoji: '🌽' },
             { view: 'cosechar', label: 'Cosechar', desc: 'Anote lo que recogió', emoji: '🧺' },
             { view: 'ciclo', label: 'Ciclo de cultivo', desc: 'La vida de la mata etapa por etapa', emoji: '🔄' },
         ],
+    },
+    {
+        id: 'cafe',
+        titulo: 'El café',
+        emoji: '☕',
+        lema: 'El cultivo bandera: variedad y roya, sombra, broca, cosecha y beneficio',
+        tinte: ['#7a4a24', '#efe0cf'],
+        // Mundo de una sola pantalla (photo-forward, 5 estaciones del ciclo
+        // cafetero). La tarjeta navega directo, sin pantalla intermedia.
+        directo: { view: 'cafe' },
     },
     {
         id: 'suelo',
@@ -83,11 +98,17 @@ export const MUNDOS_FINCA = [
     },
     {
         id: 'abono',
-        titulo: 'Del corral al abono',
+        titulo: 'Estiércol y compost',
         emoji: '🐄',
-        lema: 'Quítele el olor al estiércol y sáquele abono y gas',
+        lema: 'Quítele el olor al estiércol, sáquele gas y hágalo tierra negra',
         tinte: ['#6d7a2e', '#e9ecc9'],
-        directo: { view: 'estiercol' },
+        // El mundo ganó su segunda sala (compost paso a paso, photo-forward):
+        // pasó de `directo` a hub con entradas, igual que el clima cuando ganó
+        // su mini-app. La sala vieja ('estiercol') sigue alcanzable como antes.
+        entradas: [
+            { view: 'compost', label: 'El compost, paso a paso', desc: 'De la recolección a la tierra negra: mezcla café/verde, volteo, madurez y aplicación', emoji: '🍂' },
+            { view: 'estiercol', label: 'Del corral al abono', desc: 'Quítele el olor a la gallinaza, sáquele gas con el biodigestor y saque cuentas', emoji: '🐄' },
+        ],
     },
     {
         id: 'sanidad',
@@ -97,6 +118,7 @@ export const MUNDOS_FINCA = [
         tinte: ['#b0532f', '#f6ded1'],
         entradas: [
             { view: 'sanidad_sintoma', label: 'Mi mata está enferma', desc: 'Diga qué le ve ("gota", "polvillo", "amarilla") y sepa qué es y cómo manejarla sin veneno', emoji: '🩺' },
+            { view: 'plagas', label: 'Directorio de plagas', desc: 'Reconozca el bicho o la enfermedad por foto: a qué le pega, cómo se ve y su manejo sin veneno', emoji: '🐛' },
             { view: 'biopreparados', label: 'Biopreparados', desc: 'Recetas caseras paso a paso para proteger la mata', emoji: '🧪', data: { back: 'dashboard' } },
             { view: 'reportar_invasora', label: 'Reportar una plaga', desc: 'Vio algo raro en una mata: repórtelo con foto', emoji: '🔍' },
             { view: 'casos', label: 'Casos reales', desc: 'Problemas de otras fincas y cómo los resolvieron', emoji: '📋' },
@@ -119,17 +141,19 @@ export const MUNDOS_FINCA = [
         id: 'animales',
         titulo: 'Los animales',
         emoji: '🐔',
-        lema: 'Gallinas, vacas, abejas y cerdos: sanidad y manejo',
+        lema: 'Cría campesina: gallinas, cerdos, conejos, cabras y más',
         tinte: ['#a86a3a', '#f3e3cf'],
         // Gate por perfil: un urbano de balcón no ve este mundo (mismo criterio
         // `mostrarAnimales` del home). El filtro lo aplica MundosDeMiFinca.
         gate: 'animales',
         entradas: [
             { view: 'animales', label: 'Todos los animales', desc: 'Su corral completo y el ciclo cerrado', emoji: '🐮' },
-            { view: 'animales_gallinas', label: 'Gallinas', desc: 'Postura, sanidad y gallinaza', emoji: '🐔' },
-            { view: 'animales_vacas', label: 'Vacas', desc: 'Manejo, pastoreo y ordeño', emoji: '🐄' },
-            { view: 'animales_abejas', label: 'Abejas', desc: 'Colmenas y polinización de sus cultivos', emoji: '🐝' },
+            { view: 'animales_gallinas', label: 'Gallinas', desc: 'Ponedoras, engorde, sanidad y gallinaza', emoji: '🐔' },
             { view: 'seguimiento_cerdos', label: 'Cerdos', desc: 'Ciclo de manejo porcino y cama profunda', emoji: '🐖' },
+            { view: 'animales_conejos', label: 'Conejos', desc: 'Cría en poco espacio, forraje y conejaza', emoji: '🐇' },
+            { view: 'animales_caprinos', label: 'Cabras y ovejas', desc: 'Leche, carne, lana y majada para el abono', emoji: '🐐' },
+            { view: 'animales_vacas', label: 'Vacas', desc: 'Manejo, pastoreo y ordeño', emoji: '🐄' },
+            { view: 'animales_abejas', label: 'Abejas y polinización', desc: 'Nativas sin aguijón, colmenas y una finca amiga de polinizadores', emoji: '🐝' },
         ],
     },
     {

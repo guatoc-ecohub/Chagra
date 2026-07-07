@@ -580,8 +580,8 @@ function ClimaPanel({ snapshot, loading, onRefresh, climaInfo, onAlertAction, on
                     <p className="font-medium">Consultando IDEAM, NOAA y Open-Meteo…</p>
                 ) : (
                     <>
-                        <p className="font-medium">Clima no disponible.</p>
-                        <p className="text-xs mt-1">El sidecar de Chagra no contestó. Inténtalo más tarde.</p>
+                        <p className="font-medium">No pudimos traer el clima.</p>
+                        <p className="text-xs mt-1">El pronóstico no llegó esta vez. Inténtalo más tarde.</p>
                         <button
                             type="button"
                             onClick={onRefresh}

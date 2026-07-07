@@ -1,0 +1,219 @@
+/*
+ * biopreparadosFichas.js — Capa de PRESENTACIÓN de las fichas photo-forward de
+ * biopreparados (mundo Sanidad → "Biopreparados").
+ *
+ * REGLA DURA — CERO FABRICACIÓN:
+ * Igual que src/data/biopreparado-diagramas.js, este archivo NO inventa dosis
+ * ni plagas. Solo RE-EXPRESA en lenguaje campesino lo que ya vive, textual, en
+ * catalog/biopreparados-seed.json (campos `proposito`, `uso`, `dosis`,
+ * `precaucion_seguridad`, `metodo`, `frecuencia`, `safety_class`,
+ * `ppe_required`, `do_not_use_when`, `reentry_interval_dias`, `fuente`).
+ *   · Las cifras y las plagas concretas salen del catálogo en tiempo de
+ *     ejecución (getAllBiopreparados) — este archivo NO las duplica.
+ *   · `paraQueSirve` es una glosa breve; los objetivos concretos que menciona
+ *     (pulgón, hongos, ácaros, Botrytis…) aparecen LITERALMENTE en el `uso`/
+ *     `dosis` del mismo catálogo. Donde el catálogo no nombra un objetivo, la
+ *     glosa NO lo inventa (p. ej. el bordelés se describe como preventivo).
+ *
+ * Las fotos son reales, de Wikimedia Commons, con licencia abierta y crédito
+ * verificado por la API de Commons (no fabricado). El componente cae con
+ * elegancia a un ícono cuando un biopreparado no tiene foto (patrón FotoAgua).
+ */
+
+/** Prefijo público donde viven los .jpg (public/biopreparados/<slug>.jpg). */
+export const FOTO_BASE_BIOPREPARADOS = '/biopreparados';
+
+/**
+ * Categorías pedagógicas — se derivan del campo `tipo` del catálogo (no de una
+ * lista de ids), así el mundo absorbe solas las adiciones futuras al catálogo.
+ * @type {Array<{tipo:string,label:string,desc:string,emoji:string}>}
+ */
+export const CATEGORIAS_BIOPREPARADO = [
+  { tipo: 'caldo', label: 'Caldos minerales', desc: 'Cobre y azufre contra hongos', emoji: '⚗️' },
+  { tipo: 'fermentado', label: 'Purines y biofermentos', desc: 'Abonos vivos que fermentan', emoji: '🫧' },
+  { tipo: 'extracto', label: 'Extractos y tés', desc: 'Se cuelan y se asperjan', emoji: '🧉' },
+  { tipo: 'mineral', label: 'Minerales y enmiendas', desc: 'Corrigen y nutren el suelo', emoji: '🪨' },
+  { tipo: 'microbiano', label: 'Microbianos', desc: 'Hongos y bacterias amigas', emoji: '🦠' },
+];
+
+const TIPO_A_CATEGORIA = Object.fromEntries(
+  CATEGORIAS_BIOPREPARADO.map((c) => [c.tipo, c]),
+);
+
+/** Resuelve la categoría pedagógica de un biopreparado por su `tipo`. */
+export function categoriaDeBiopreparado(bp) {
+  return TIPO_A_CATEGORIA[bp?.tipo] || null;
+}
+
+/**
+ * Glosa de cada código de `proposito` del catálogo → pastilla legible.
+ * `k` agrupa el tono/ícono (nutre / vida / repele / previene / cura / enmienda).
+ * @type {Record<string,{label:string,k:string}>}
+ */
+export const PROPOSITO_LABEL = {
+  fertilizacion: { label: 'Nutre y abona', k: 'nutre' },
+  estimulante_microbiano: { label: 'Despierta la vida del suelo', k: 'vida' },
+  repelente_insectos: { label: 'Repele insectos', k: 'repele' },
+  fitosanitario_preventivo: { label: 'Previene enfermedades', k: 'previene' },
+  fitosanitario_curativo: { label: 'Ataca la enfermedad', k: 'cura' },
+  enmienda_ph: { label: 'Corrige la acidez', k: 'enmienda' },
+  enmienda_ca: { label: 'Aporta calcio', k: 'enmienda' },
+  enmienda_p: { label: 'Aporta fósforo', k: 'enmienda' },
+};
+
+/** Equipo de protección (EPP) del campo `ppe_required` → etiqueta campesina. */
+export const PPE_LABEL = {
+  guantes: 'Guantes',
+  careta: 'Careta para vapores',
+  gafas: 'Gafas',
+  tapabocas: 'Tapabocas',
+};
+
+/** Vetos del campo `do_not_use_when` → explicación campesina del porqué. */
+export const DO_NOT_USE_LABEL = {
+  floracion: 'No aplicar en floración: daña la cuaja y espanta a los polinizadores.',
+  proximo_a_cosecha: 'No aplicar cerca de la cosecha (respete el tiempo de reingreso).',
+  suelo_ph_mayor_6_5: 'No usar en suelos poco ácidos (pH mayor a 6,5) ni en arándano o té.',
+};
+
+/**
+ * Clasificación de seguridad (`safety_class` del catálogo) → color + etiqueta.
+ * `revisar` se pinta honesto como "sin clasificar" (dato en camino), no verde.
+ * @type {Record<string,{label:string,tone:'bajo'|'medio'|'alto'|'revisar'}>}
+ */
+export const SAFETY_LABEL = {
+  bajo: { label: 'Riesgo bajo', tone: 'bajo' },
+  medio: { label: 'Riesgo medio', tone: 'medio' },
+  alto: { label: 'Riesgo alto', tone: 'alto' },
+  revisar: { label: 'Sin clasificar', tone: 'revisar' },
+};
+
+/**
+ * Metadatos de PRESENTACIÓN por id de biopreparado. Solo dos campos:
+ *   · foto: slug del .jpg real en public/biopreparados/ (omitido = ícono).
+ *   · paraQueSirve: glosa breve. Los objetivos concretos que nombra están,
+ *     TEXTUALES, en el `uso`/`dosis` del catálogo (ver comentario de cada uno).
+ * Todo lo demás (ingredientes, dosis, tiempo, precauciones, fuente) sale del
+ * catálogo en runtime — no se copia aquí.
+ * @type {Record<string,{foto?:string,paraQueSirve:string}>}
+ */
+export const FICHA_META = {
+  // proposito: fertilizacion + estimulante_microbiano
+  bocashi: {
+    foto: 'bocashi',
+    paraQueSirve: 'Abono sólido fermentado que se mezcla con la tierra: nutre la mata y despierta la vida del suelo.',
+  },
+  // proposito: fertilizacion + estimulante_microbiano
+  biol: {
+    foto: 'biol',
+    paraQueSirve: 'Abono líquido foliar de estiércol fermentado sin aire: nutre la hoja y empuja el crecimiento.',
+  },
+  // dosis (catálogo): «curativo contra pulgón»; proposito: repelente_insectos
+  purin_ortiga: {
+    foto: 'purin_ortiga',
+    paraQueSirve: 'Nutre y, sobre todo, repele plagas chupadoras: en curativo se usa contra el pulgón.',
+  },
+  // uso (catálogo): «activo contra hongos y ácaros»; dosis: «escamas, chancros»
+  caldo_sulfocalcico: {
+    foto: 'caldo_sulfocalcico',
+    paraQueSirve: 'Fungicida y acaricida foliar: previene y ataca hongos y ácaros; en invierno trata escamas y chancros del tronco.',
+  },
+  // proposito: fitosanitario_preventivo; uso: aplicar ANTES, en alta humedad
+  caldo_bordeles: {
+    foto: 'caldo_bordeles',
+    paraQueSirve: 'Fungicida de cobre de uso preventivo: se asperja antes de que llegue la enfermedad, en épocas de mucha humedad.',
+  },
+  // proposito: fertilizacion + estimulante_microbiano + fitosanitario_preventivo
+  te_compost: {
+    foto: 'te_compost',
+    paraQueSirve: 'Extracto microbiano vivo: nutre la hoja, despierta microbios buenos y ayuda a prevenir enfermedades.',
+  },
+  // proposito: fertilizacion + estimulante_microbiano
+  humus_liquido: {
+    foto: 'humus_liquido',
+    paraQueSirve: 'Abono líquido de lombriz: nutre la planta y ayuda a que agarre raíz.',
+  },
+  // uso (catálogo): «aporte de potasio y micronutrientes» en fase reproductiva
+  lixiviado_frutas: {
+    foto: 'lixiviado_frutas',
+    paraQueSirve: 'Abono líquido rico en potasio para la floración y el llenado del fruto.',
+  },
+  // uso (catálogo): corrige deficiencias — «clorosis intervenal, brotes deformes»
+  supermagro: {
+    foto: 'supermagro',
+    paraQueSirve: 'Biofertilizante foliar de micronutrientes: corrige deficiencias (hojas amarillas entre las venas, brotes deformes).',
+  },
+  // uso (catálogo): «contra Rhizoctonia, Fusarium y Sclerotinia»
+  trichoderma_harzianum_suelo: {
+    paraQueSirve: 'Hongo benéfico que se echa al suelo: controla hongos de la raíz (Rhizoctonia, Fusarium, Sclerotinia).',
+  },
+  // uso (catálogo): «contra Botrytis, Alternaria y Monilia»
+  bacillus_subtilis_foliar: {
+    paraQueSirve: 'Bacteria benéfica foliar: controla Botrytis, Alternaria y Monilia.',
+  },
+  // proposito: enmienda_ph + enmienda_ca
+  cal_dolomita: {
+    paraQueSirve: 'Enmienda que sube el pH (suelo menos ácido) y aporta calcio y magnesio.',
+  },
+  // proposito: enmienda_p + fertilizacion; uso: suelos ácidos
+  roca_fosforica: {
+    foto: 'roca_fosforica',
+    paraQueSirve: 'Fósforo de liberación lenta para suelos ácidos.',
+  },
+  // uso (catálogo): potasio + calcio, corrige acidez, «repelente físico de babosas»
+  ceniza_madera: {
+    paraQueSirve: 'Aporta potasio y calcio, corrige la acidez suave y, en cordón, repele babosas.',
+  },
+  // proposito: fertilizacion + estimulante_microbiano
+  compost_maduro: {
+    foto: 'compost_maduro',
+    paraQueSirve: 'Abono sólido maduro: enmienda orgánica que nutre el suelo y despierta su vida.',
+  },
+  // proceso (catálogo): estimulante de enraizamiento (citoquininas, auxinas)
+  biofertilizante_algas: {
+    paraQueSirve: 'Extracto de algas: estimulante de enraizamiento (citoquininas, auxinas, oligoelementos).',
+  },
+};
+
+/**
+ * Créditos de las fotos — cada campo (autor, licencia, url del archivo) fue
+ * leído de la API de Wikimedia Commons (extmetadata), NO inventado. Solo
+ * aparecen aquí los slugs que tienen .jpg real descargado en public/.
+ * @type {Array<{slug:string,autor:string,lic:string,url:string}>}
+ */
+export const CREDITOS_FOTOS_BIOPREPARADOS = [
+  { slug: 'biol', autor: 'David Medcalf', lic: 'CC BY-SA 2.0', url: 'https://commons.wikimedia.org/wiki/File:A_massive_biodigester_at_Pengelly_Barton_Farm_-_geograph.org.uk_-_8234071.jpg' },
+  { slug: 'bocashi', autor: 'Acabashi', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Compost_heap_Heyrons_High_Easter_Essex_01.jpg' },
+  { slug: 'caldo_bordeles', autor: 'Crystal Titan', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Copper_Sulfate_Crystal.jpg' },
+  { slug: 'caldo_sulfocalcico', autor: 'Robert M. Lavinsky', lic: 'CC BY-SA 3.0', url: 'https://commons.wikimedia.org/wiki/File:Celestine-Sulfur-j08-12a.jpg' },
+  { slug: 'compost_maduro', autor: 'Richard Webb', lic: 'CC BY-SA 2.0', url: 'https://commons.wikimedia.org/wiki/File:A_steaming_pile_-_geograph.org.uk_-_297127.jpg' },
+  { slug: 'humus_liquido', autor: 'SuSanA Secretariat', lic: 'CC BY 2.0', url: 'https://commons.wikimedia.org/wiki/File:Composting_Unit_Ecodomeo_-_Local_de_compostage_Ecodomeo_(6126690435).jpg' },
+  { slug: 'lixiviado_frutas', autor: 'PattayaPatrol', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:DFC_3928_A_vibrant_pile_of_fresh_oranges_with_mottled_green-and-orange_skins_ready_to_be_picked_or_enjoyed.jpg' },
+  { slug: 'purin_ortiga', autor: 'دانية دروبي', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Gooseberry_and_Nettle_plant_in_botanical_garden.jpg' },
+  { slug: 'roca_fosforica', autor: 'James St. John', lic: 'CC BY 2.0', url: 'https://commons.wikimedia.org/wiki/File:Black_concretionary_phosphorite_(Morris_Member,_Phosphoria_Formation,_mid-Permian;_Waterloo_Mine,_Bear_Lake_County,_Idaho,_USA)_(34327234316).jpg' },
+  { slug: 'supermagro', autor: 'Nadinviki', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:COW_DUNG_MANURE.jpg' },
+  { slug: 'te_compost', autor: 'Pratiti Dutta', lic: 'CC0', url: 'https://commons.wikimedia.org/wiki/File:WORM_TEA_BREWER.jpg' },
+];
+
+const CREDITO_BY_SLUG = Object.fromEntries(
+  CREDITOS_FOTOS_BIOPREPARADOS.map((c) => [c.slug, c]),
+);
+
+/** Devuelve el autor de la foto de un slug (o '' si no tiene foto). */
+export const creditoFotoBiopreparado = (slug) => CREDITO_BY_SLUG[slug]?.autor || '';
+
+/** ¿Ese slug tiene foto real descargada? */
+export const tieneFotoBiopreparado = (slug) => Boolean(slug && CREDITO_BY_SLUG[slug]);
+
+/** Fallback tipado para ids sin metadata (evita inferencia `{}` en tsc). */
+const FICHA_VACIA = /** @type {{foto?:string, paraQueSirve?:string}} */ ({});
+
+/**
+ * Devuelve la metadata de presentación de un biopreparado (o un objeto vacío
+ * seguro): { foto?, paraQueSirve? }.
+ * @param {string} id
+ * @returns {{foto?:string, paraQueSirve?:string}}
+ */
+export function fichaMeta(id) {
+  return FICHA_META[id] || FICHA_VACIA;
+}

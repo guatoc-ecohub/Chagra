@@ -16,6 +16,7 @@ import {
   Layers,
   ExternalLink,
   ImageOff,
+  Camera,
 } from 'lucide-react';
 import PisoTermicoBand from './PisoTermicoBand.jsx';
 import { PHASES } from '../CicloVivo/cicloVivoData.js';
@@ -59,20 +60,18 @@ export default function SpeciesFicha({ ficha, onSelectSpecies }) {
 
   return (
     <article className="max-w-2xl mx-auto pb-12" data-testid="species-ficha">
-      {/* IDENTIDAD — retrato + nombre, como la portada de una guía de campo */}
-      <SpeciesHero imagen={imagen} comun={comun} fuentesCount={fuentes.length} />
+      {/* IDENTIDAD — portada de guía de campo: el retrato manda y el nombre vive
+          SOBRE la foto (o sobre la ilustración cuando no hay foto). */}
+      <SpeciesHero
+        imagen={imagen}
+        comun={comun}
+        cientifico={cientifico}
+        fuentesCount={fuentes.length}
+      />
 
-      <header className="px-4 pt-4">
-        <p className="jp-tinta-suave text-[11px] font-black uppercase tracking-[0.18em] text-emerald-400/80">
-          Ficha de especie
-        </p>
-        <h2 className="jp-tinta text-[26px] leading-[1.08] font-black text-emerald-50 mt-0.5">{comun}</h2>
-        {cientifico && (
-          <p className="font-serif italic text-[15px] text-emerald-300/85 leading-tight mt-0.5">{cientifico}</p>
-        )}
-
-        {/* Taxonomía de un vistazo */}
-        <div className="flex flex-wrap gap-1.5 mt-2.5">
+      {/* Bajo la portada: taxonomía escaneable y los otros nombres del campo. */}
+      <div className="px-4 pt-3.5">
+        <div className="flex flex-wrap items-center gap-1.5">
           {familia && <Pill icon={Leaf} tone="emerald">{familia}</Pill>}
           {categoria && <Pill icon={Tag} tone="teal">{cap(categoria)}</Pill>}
           {estrato && <Pill icon={Layers} tone="slate">Estrato {estrato}</Pill>}
@@ -89,13 +88,7 @@ export default function SpeciesFicha({ ficha, onSelectSpecies }) {
             ))}
           </p>
         )}
-
-        {/* Costura de confianza — este dato viene del catálogo grounded */}
-        <p className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-700/40 bg-emerald-950/40 px-2.5 py-1 text-[11px] font-bold text-emerald-300">
-          <ShieldCheck size={12} aria-hidden="true" />
-          Ficha del catálogo Chagra
-        </p>
-      </header>
+      </div>
 
       {/* CLAVE DE UN VISTAZO — clima y ciclo escaneables al sol */}
       <GlanceStrip pisoTermico={pisoTermico} fenologia={fenologia} />
@@ -230,49 +223,86 @@ function ManejoSaberes({ texto }) {
 }
 
 /**
- * Retrato de la especie. Foto CC con crédito honesto, o ilustración botánica
- * propia (nunca imagen rota). Lleva un scrim inferior para que el crédito no
- * compita con la foto, y un sello de piso de confianza arriba a la izquierda.
+ * SpeciesHero — portada de la ficha, estilo tapa de guía de campo: el retrato
+ * de la especie llena el ancho y el NOMBRE vive SOBRE él (común + científico).
+ * Si el catálogo tiene foto CC, se muestra con su crédito (la licencia exige
+ * atribución visible); si no, cae a una ilustración botánica propia que respira
+ * — nunca una imagen rota ni un hueco. El texto va sobre un velo oscuro inferior
+ * para ser legible al sol (contraste WCAG en los 4 temas).
+ *
+ * @param {object} props
+ * @param {object|null} props.imagen — { url, thumbUrl, source, license, rightsHolder } | null
+ * @param {string} props.comun
+ * @param {string} [props.cientifico]
+ * @param {number} props.fuentesCount
  */
-function SpeciesHero({ imagen, comun, fuentesCount }) {
+function SpeciesHero({ imagen, comun, cientifico, fuentesCount }) {
+  const tienePhoto = Boolean(imagen?.url);
+
+  // Sello de origen: la costura de confianza vive desde la portada misma.
   const seal = (
-    <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-black/45 backdrop-blur px-2 py-1 text-[10px] font-bold text-emerald-100 ring-1 ring-white/15">
+    <span className="absolute top-3 left-3 z-10 inline-flex items-center gap-1 rounded-full bg-black/50 backdrop-blur px-2 py-1 text-[10px] font-bold text-emerald-100 ring-1 ring-white/15">
       <ShieldCheck size={11} aria-hidden="true" />
       Catálogo Chagra{fuentesCount > 0 ? ` · ${fuentesCount} ${fuentesCount === 1 ? 'fuente' : 'fuentes'}` : ''}
     </span>
   );
 
-  if (imagen?.url) {
+  // El nombre montado sobre el retrato. Se comparte entre foto e ilustración
+  // para que la portada se sienta igual haya o no foto (misma jerarquía).
+  const identidad = (
+    <div className="absolute inset-x-0 bottom-0 z-10 px-4 pb-5 pt-14 bg-gradient-to-t from-black/95 via-black/65 to-transparent">
+      <p className="text-[11px] font-black uppercase tracking-[0.18em] text-emerald-300 drop-shadow-[0_1px_5px_rgba(0,0,0,0.95)]">
+        Ficha de especie
+      </p>
+      <h2 className="jp-tinta text-[27px] leading-[1.05] font-black text-white mt-0.5 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+        {comun}
+      </h2>
+      {cientifico && (
+        <p className="font-serif italic text-[15px] text-emerald-50 leading-tight mt-0.5 drop-shadow-[0_1px_6px_rgba(0,0,0,0.95)]">
+          {cientifico}
+        </p>
+      )}
+    </div>
+  );
+
+  if (tienePhoto) {
     return (
-      <figure className="relative w-full aspect-[16/10] sm:aspect-[2/1] bg-slate-900 overflow-hidden">
+      <figure className="relative w-full aspect-[4/3] sm:aspect-[16/9] max-h-[440px] bg-slate-900 overflow-hidden">
         <img
           src={imagen.thumbUrl || imagen.url}
           alt={`Foto de ${comun}`}
           className="w-full h-full object-cover"
           loading="lazy"
         />
-        {/* Scrim inferior para legibilidad del crédito, y superior para el sello */}
-        <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/55 to-transparent" aria-hidden="true" />
-        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/70 to-transparent" aria-hidden="true" />
         {seal}
-        <figcaption className="absolute bottom-0 inset-x-0 px-3 py-1.5 text-[10px] text-white/85 flex items-center gap-1">
-          <span className="opacity-70">Foto:</span> {[imagen.source, imagen.license, imagen.rightsHolder].filter(Boolean).join(' · ')}
+        {identidad}
+        {/* Crédito CC — atribución obligatoria, discreta arriba a la derecha
+            sobre franja opaca para que sea legible sin robarle la foto. */}
+        <figcaption className="absolute top-3 right-3 z-10 max-w-[62%]">
+          <span className="flex items-center gap-1 rounded-full bg-black/50 backdrop-blur px-2 py-1 text-[10px] text-white/85 ring-1 ring-white/10">
+            <Camera size={10} className="shrink-0 opacity-80" aria-hidden="true" />
+            <span className="truncate">
+              {[imagen.source, imagen.license, imagen.rightsHolder].filter(Boolean).join(' · ')}
+            </span>
+          </span>
         </figcaption>
       </figure>
     );
   }
 
-  // Fallback ilustrado — mismo lenguaje del Ciclo Vivo (dos hojas + brote).
+  // Fallback ilustrado — mismo lenguaje del Ciclo Vivo (dos hojas + brote), con
+  // el brote que RESPIRA (se apaga con prefers-reduced-motion). Misma altura y
+  // overlay que la foto para que la portada no cambie de forma sin dato.
   return (
     <div
-      className="relative w-full aspect-[16/10] sm:aspect-[2/1] flex flex-col items-center justify-center overflow-hidden"
-      style={{ background: 'radial-gradient(120% 90% at 50% 18%, #0b3b32 0%, #062a26 45%, #041b1c 100%)' }}
+      className="relative w-full aspect-[4/3] sm:aspect-[16/9] max-h-[440px] flex items-center justify-center overflow-hidden"
+      style={{ background: 'radial-gradient(120% 95% at 50% 32%, #0b3b32 0%, #062a26 48%, #041b1c 100%)' }}
       data-testid="species-photo-fallback"
       role="img"
       aria-label={`Sin foto de ${comun}; ilustración`}
     >
       {seal}
-      <svg viewBox="0 0 120 120" className="w-28 h-28" aria-hidden="true">
+      <svg viewBox="0 0 120 120" className="w-32 h-32 -mt-8 opacity-95" aria-hidden="true">
         <defs>
           <linearGradient id="fichaLeafA" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="#5b8a52" />
@@ -291,12 +321,13 @@ function SpeciesHero({ imagen, comun, fuentesCount }) {
         <path d="M60 78 C44 74 34 60 32 44 C50 46 62 58 60 78 Z" fill="url(#fichaLeafA)" />
         {/* hoja derecha */}
         <path d="M60 68 C76 62 86 46 90 28 C70 30 56 46 60 68 Z" fill="url(#fichaLeafB)" />
-        {/* brote/semilla en la punta */}
-        <circle cx="60" cy="50" r="6" fill="#c9a227" />
+        {/* brote/semilla en la punta — el que respira */}
+        <circle cx="60" cy="50" r="6" fill="#c9a227" className="sf-brote" />
       </svg>
-      <p className="mt-1 flex items-center gap-1.5 text-xs text-emerald-200/70">
-        <ImageOff size={12} aria-hidden="true" /> Sin foto en el catálogo todavía
-      </p>
+      <span className="absolute top-3 right-3 z-10 inline-flex items-center gap-1 rounded-full bg-black/35 backdrop-blur px-2 py-1 text-[10px] text-emerald-100/80 ring-1 ring-white/10">
+        <ImageOff size={11} aria-hidden="true" /> Sin foto todavía
+      </span>
+      {identidad}
     </div>
   );
 }

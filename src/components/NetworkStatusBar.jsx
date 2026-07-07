@@ -182,8 +182,14 @@ export default function NetworkStatusBar() {
     >
       {config.icon}
       <span className="flex-1 truncate">{config.text}</span>
+      {/* Badge de MODO (secundario): el texto cálido principal ya vive en
+          config.text ("Sin señal. Sus datos quedaron guardados…"). Este tag
+          técnico rotula el modo activo — es también el indicador que verifica
+          el contrato offline-first (gate E2E tests/offline.spec.js): debe
+          contener "Offline-First" para señalar, de forma legible y estable,
+          que la app está operando sin red. */}
       {status === STATUS.OFFLINE && (
-        <span className="text-xs text-amber-300/70 shrink-0">Offline-First activo</span>
+        <span className="text-xs text-amber-300/70 shrink-0">Offline-First activo · sin señal</span>
       )}
       {isClickable && (
         <span className="text-[10px] text-white/60 shrink-0 hidden sm:inline">Toque para detalle</span>

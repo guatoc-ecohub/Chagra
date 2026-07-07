@@ -113,6 +113,12 @@ const FincaVivaHero = lazy(() => import('./FincaVivaHero'));
 // se mantiene acá como alias para el fail-open de la visibilidad por perfil.
 const DEFAULT_ORDER = HOME_MODULE_DEFAULT_ORDER;
 
+// Secciones que ya viven FUNDIDAS en la cabecera del día (EstadoDelDiaCard,
+// BLOQUE 1). Se excluyen de la grilla de secciones arrastrables para no
+// pintarlas dos veces — incluso en perfiles existentes cuyo `modulos_orden`
+// guardado aún las lista (redundancia clima+análisis "encimados", #2054).
+const FUSED_EN_ESTADO_DEL_DIA = new Set(['hoyfinca', 'clima', 'analisis']);
+
 const SECTION_COMPONENTS = {
     hoyfinca: { Component: HoyEnFincaStrip, full: true },
     clima: { Component: ClimaStrip, full: true },
@@ -399,8 +405,9 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
         const hasAltitud = p.finca_altitud !== '' && p.finca_altitud != null && Number.isFinite(alt);
         return !hasAltitud || p.piso_confirmado !== '1';
     });
-    // Bienvenida de PRIMERA VEZ (BienvenidaFinca): secuencia de 3 momentos
-    // (colibrí + capacidades estrella + ubicación mágica) que se muestra UNA
+    // Bienvenida de PRIMERA VEZ (BienvenidaFinca): recorrido de 5 momentos
+    // (colibrí + capacidades estrella + "hola Chagra" manos-libres +
+    // instalar la app + ubicación mágica) que se muestra UNA
     // sola vez, con la MISMA señal de primer uso del banner compacto (sin
     // plantas y sin piso) + flag persistente "ya la vi". Capa 100% visual:
     // "Ubicar mi finca" delega en la ruta existente 'ubicacion-detectada';
@@ -559,13 +566,17 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
     // Tile estándar (chico) — reusa el ESTILO único de los tiles del resto
     // (mismo fix de contraste F2: .fvh-tile-label/.fvh-tile-desc fuerzan tinta
     // oscura sobre el pastel claro). `size` cambia ícono y altura.
-    const renderTile = (tile, { large = false } = {}) => (
+    // `i` = índice dentro de su grid: escalona la entrada (anim-brota, mismo
+    // lenguaje "brota" de las tarjetas de Mundos) y anim-press da el
+    // hundimiento sutil al tocar. Ambos se apagan con prefers-reduced-motion.
+    const renderTile = (tile, { large = false, i = 0 } = {}) => (
         <button
             key={tile.view}
             type="button"
             onClick={() => onNavigate(tile.view, tile.data)}
             aria-label={`${tileLabel(tile)}: ${tileDesc(tile)}`}
-            className={`dash-tile ${large ? 'dash-tile--destacado ' : ''}${tile.span === 2 ? 'col-span-2 ' : ''}${fincaVivaFlag ? 'fvh-tile-claro' : 'bg-slate-900/60'} border border-slate-800 border-l-4 ${tile.accent} ${large ? 'rounded-2xl p-4 min-h-[112px]' : 'rounded-xl p-3 min-h-[88px]'} text-left active:bg-slate-800/70 transition-colors flex flex-col`}
+            style={{ '--i': i }}
+            className={`dash-tile anim-brota anim-press ${large ? 'dash-tile--destacado ' : ''}${tile.span === 2 ? 'col-span-2 ' : ''}${fincaVivaFlag ? 'fvh-tile-claro' : 'bg-slate-900/60'} border border-slate-800 border-l-4 ${tile.accent} ${large ? 'rounded-2xl p-4 min-h-[112px]' : 'rounded-xl p-3 min-h-[88px]'} text-left active:bg-slate-800/70 transition-colors flex flex-col`}
         >
             <tile.icon size={large ? 30 : 24} strokeWidth={2} className={`${large ? 'mb-2' : 'mb-1.5'} ${tile.accent.split(' ')[0]}`} aria-hidden="true" />
             <span className={`${large ? 'text-base' : 'text-sm'} font-black block leading-tight fvh-tile-label ${tile.accent.split(' ')[0]}`}>{tileLabel(tile)}</span>
@@ -582,7 +593,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                     type="button"
                     onClick={() => onNavigate(MERCADO_TILE.view, MERCADO_TILE.data)}
                     aria-label={`${MERCADO_TILE.label}: ${MERCADO_TILE.desc}`}
-                    className={`dash-tile ${fincaVivaFlag ? 'fvh-tile-claro' : 'bg-slate-900/60'} border border-slate-800 border-l-4 ${MERCADO_TILE.accent} rounded-xl p-3.5 text-left active:bg-slate-800/70 transition-colors flex items-center gap-3`}
+                    className={`dash-tile anim-brota anim-press ${fincaVivaFlag ? 'fvh-tile-claro' : 'bg-slate-900/60'} border border-slate-800 border-l-4 ${MERCADO_TILE.accent} rounded-xl p-3.5 text-left active:bg-slate-800/70 transition-colors flex items-center gap-3`}
                 >
                     <MERCADO_TILE.icon size={26} strokeWidth={2} className={`${MERCADO_TILE.accent.split(' ')[0]} shrink-0`} aria-hidden="true" />
                     <span className="flex-1 min-w-0">
@@ -836,12 +847,12 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                                 <ChevronRight size={22} className="shrink-0 text-slate-500" aria-hidden="true" />
                             </button>
                             <div className="grid grid-cols-3 gap-3 mt-3" data-testid="gestion-tiles">
-                                {GESTION_TILES.filter((t) => t.view === 'germinacion').map((tile) => renderTile(tile))}
+                                {GESTION_TILES.filter((t) => t.view === 'germinacion').map((tile, i) => renderTile(tile, { i }))}
                             </div>
                         </>
                     ) : (
                         <div className="grid grid-cols-3 gap-3" data-testid="gestion-tiles">
-                            {GESTION_TILES.map((tile) => renderTile(tile))}
+                            {GESTION_TILES.map((tile, i) => renderTile(tile, { i }))}
                         </div>
                     )}
                     <div className="mt-3">
@@ -936,7 +947,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
             <div className="px-4 pt-3">
                 {blockLabel('Lo más sólido de Chagra', 'from-lime-400 to-emerald-400')}
                 <div className="grid grid-cols-2 gap-3" data-testid="destacado-tiles">
-                    {DESTACADO_TILES.map((tile) => renderTile(tile, { large: true }))}
+                    {DESTACADO_TILES.map((tile, i) => renderTile(tile, { large: true, i }))}
                 </div>
             </div>
 
@@ -944,7 +955,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
             <div className="px-4 pt-3">
                 {blockLabel('Aprender', 'from-emerald-400 to-teal-400')}
                 <div className="grid grid-cols-3 gap-3" data-testid="aprender-tiles">
-                    {APRENDER_TILES.map((tile) => renderTile(tile))}
+                    {APRENDER_TILES.map((tile, i) => renderTile(tile, { i }))}
                 </div>
             </div>
 
@@ -957,7 +968,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
             >
                 {blockLabel('Mi finca · gestión', 'from-sky-400 to-emerald-400')}
                 <div className="grid grid-cols-3 gap-3" data-testid="gestion-tiles">
-                    {GESTION_TILES.map((tile) => renderTile(tile))}
+                    {GESTION_TILES.map((tile, i) => renderTile(tile, { i }))}
                 </div>
             </div>
 
@@ -995,6 +1006,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                     <SortableContext items={order} strategy={rectSortingStrategy}>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             {order
+                                .filter((id) => !FUSED_EN_ESTADO_DEL_DIA.has(id))
                                 .filter((id) => moduleVisibility[id] !== false)
                                 .map((id) => (
                                     <SortableSection key={id} id={id} onNavigate={onNavigate} sensors={iotAlerts} />

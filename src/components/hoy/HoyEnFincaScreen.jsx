@@ -65,7 +65,7 @@ const QUICK_ACTIONS = [
     { id: 'cosechar', label: 'Cosechar', Icon: Sprout, desc: 'Anotar una cosecha' },
     { id: 'reportar_invasora', label: 'Plagas', Icon: Bug, desc: 'Reportar plaga o maleza' },
     { id: 'bodega', label: 'Insumos', Icon: Package, desc: 'Ver bodega de insumos' },
-    { id: 'task_log', label: 'Tareas', Icon: ClipboardList, desc: 'Cola de pendientes' },
+    { id: 'task_log', label: 'Tareas', Icon: ClipboardList, desc: 'Lo que hay por hacer' },
     { id: 'agente', label: 'Preguntar', Icon: MessageCircle, desc: 'Hablar con Chagra' },
 ];
 
@@ -225,7 +225,7 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
                         data-testid="clima-hoy-card"
                         aria-label={clima.hasData
                             ? `Clima de hoy: ${clima.label}. Tocar para preguntarle al agente`
-                            : 'Clima de hoy sin datos'}
+                            : 'Clima de hoy: todavía no tenemos datos'}
                         className="w-full text-left bg-gradient-to-br from-sky-950/70 to-indigo-950/60 backdrop-blur-xl border border-sky-800/40 rounded-2xl p-4 active:scale-[0.99] transition-transform"
                     >
                         <div className="flex items-center justify-between mb-1">

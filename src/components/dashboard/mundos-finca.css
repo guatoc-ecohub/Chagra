@@ -53,7 +53,7 @@
       #3f8f4e 0 6px, transparent 6px 10px);
 }
 .mf-sub {
-  font-size: 12.5px;
+  font-size: 14px;
   line-height: 1.4;
   color: var(--mf-tinta-suave);
   margin: 4px 0 0;
@@ -84,10 +84,14 @@
   text-align: left;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 160ms ease, box-shadow 160ms ease;
-  /* entrada escalonada de la grilla (--mf-i la fija el JSX) */
-  animation: mf-brota 420ms cubic-bezier(0.22, 0.9, 0.3, 1) both;
-  animation-delay: calc(var(--mf-i, 0) * 45ms);
+  transition:
+    transform var(--motion-dur-press, 160ms) var(--motion-ease, ease),
+    box-shadow 160ms ease;
+  /* entrada escalonada de la grilla (--mf-i la fija el JSX). Los tokens
+     vienen de motion.css (lenguaje compartido); el fallback conserva los
+     valores originales de este archivo. */
+  animation: mf-brota var(--motion-dur-enter, 420ms) var(--motion-ease-brota, cubic-bezier(0.22, 0.9, 0.3, 1)) both;
+  animation-delay: calc(var(--mf-i, 0) * var(--motion-stagger, 45ms));
 }
 .mf-card:active { transform: scale(0.985); }
 @media (hover: hover) {
@@ -131,7 +135,7 @@
   background: rgba(255, 253, 246, 0.92);
   border: 1px solid var(--mf-a, #3f8f4e);
   color: var(--mf-tinta);
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 800;
   letter-spacing: 0.02em;
 }
@@ -157,11 +161,11 @@
 .mf-card--featured .mf-nombre { font-size: 18px; }
 .mf-emoji { font-size: 18px; line-height: 1; }
 .mf-lema {
-  font-size: 11.5px;
+  font-size: 13px;
   line-height: 1.35;
   color: var(--mf-tinta-suave);
 }
-.mf-card--featured .mf-lema { font-size: 12.5px; }
+.mf-card--featured .mf-lema { font-size: 14px; }
 
 /* "Adentro": chips de las herramientas del mundo. */
 .mf-adentro {
@@ -171,7 +175,7 @@
   margin-top: 6px;
 }
 .mf-chip {
-  font-size: 10px;
+  font-size: 11.5px;
   font-weight: 700;
   line-height: 1;
   padding: 4px 7px;
@@ -296,7 +300,7 @@
   line-height: 1.2;
 }
 .mf-entrada-txt small {
-  font-size: 11.5px;
+  font-size: 12.5px;
   line-height: 1.3;
   color: var(--mf-tinta-suave);
 }
@@ -333,7 +337,7 @@
 }
 .mf-agente small {
   display: block;
-  font-size: 11.5px;
+  font-size: 12.5px;
   color: var(--mf-tinta-suave);
 }
 .mf-agente:focus-visible {
@@ -343,7 +347,7 @@
 
 /* Índice de mundos (fallback sin id): lista sencilla de láminas. */
 .mf-indice-intro {
-  font-size: 13px;
+  font-size: 14px;
   color: #4e5c42;
   margin: 0 2px 10px;
 }
@@ -372,7 +376,7 @@
 }
 .mf-indice-txt small {
   display: block;
-  font-size: 11.5px;
+  font-size: 12.5px;
   color: #4e5c42;
 }
 .mf-indice-item:focus-visible {

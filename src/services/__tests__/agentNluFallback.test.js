@@ -95,6 +95,70 @@ describe('planNluFallback — (b) keywords cuando no hay entidad resuelta', () =
   });
 });
 
+// ── BUG 2 (audit conversación): DEFLECCIÓN de pregunta GENÉRICA mal ruteada ──
+// Una pregunta genérica/conversacional SIN especie/plaga clara NO debe forzar
+// get_species con la frase cruda (el sidecar la resuelve como found:false y el
+// agente deflecta "el catálogo no tiene esa especie"). Debe devolver null →
+// respuesta conversacional. Ver feedback-agente-pregunta-general-misruteo-tool-especie.
+describe('planNluFallback — (c) pregunta genérica sin sujeto → null (deflección conversacional)', () => {
+  it('saludos / smalltalk → null', () => {
+    for (const q of ['hola', 'buenos días', 'buenas tardes', 'qué más', 'gracias', 'hey']) {
+      expect(planNluFallback(q, null)).toBeNull();
+    }
+  });
+
+  it('meta-ayuda / capacidades de la app → null', () => {
+    for (const q of [
+      'qué puedes hacer',
+      'para qué sirves',
+      'cómo funcionas',
+      'quién eres',
+      'qué es chagra',
+      'ayúdame',
+    ]) {
+      expect(planNluFallback(q, null)).toBeNull();
+    }
+  });
+
+  it('consejo general de suelo/finca SIN cultivo nombrado → null', () => {
+    for (const q of [
+      'cómo mejoro mi suelo',
+      'cómo puedo mejorar mi tierra',
+      'qué le echo a la tierra',
+      'cómo hago un buen compost',
+      'cómo empiezo mi huerta',
+      'qué me recomiendas hoy',
+    ]) {
+      expect(planNluFallback(q, null)).toBeNull();
+    }
+  });
+
+  it('NO roba queries con cultivo nombrado: siguen ruteando a get_species', () => {
+    // La rama de consejo general exige un sustantivo genérico de finca como
+    // objeto (suelo/tierra/...), NUNCA un cultivo → estas mantienen get_species.
+    for (const q of [
+      'cómo cuido el aguacate',
+      'cómo mejoro el rendimiento del café',
+      'a qué altitud se da la quinua',
+      'cómo abono el tomate',
+    ]) {
+      const plan = planNluFallback(q, null);
+      expect(plan).not.toBeNull();
+      expect(plan.tool).toBe('get_species');
+    }
+  });
+
+  it('una entidad de especie/plaga resuelta GANA a la deflección genérica', () => {
+    // Aunque el texto luzca general, si el grafo resolvió una entidad canónica
+    // la señal fuerte manda (no se deflecta).
+    const entities = [{ mentioned: 'café', kind: 'species', canonical_id: 'coffea_arabica' }];
+    const plan = planNluFallback('cómo mejoro mi suelo para el café', entities);
+    expect(plan).not.toBeNull();
+    expect(plan.tool).toBe('get_species');
+    expect(plan.args).toEqual({ id_or_name: 'coffea_arabica' });
+  });
+});
+
 describe('planNluFallback — entidades de baja calidad no rompen', () => {
   it('entidad sin canonical_id → cae al heurístico por keywords', () => {
     const entities = [{ mentioned: 'algo', kind: 'species' }]; // sin canonical_id

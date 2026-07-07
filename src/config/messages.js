@@ -74,24 +74,34 @@ const messages = {
   },
   status: {
     cargando: 'Cargando...',
-    sinConexion: 'Sin conexion',
-    enLinea: 'En linea',
-    sincronizando: 'Sincronizando...',
+    sinConexion: 'Sin señal',
+    enLinea: 'Con señal',
+    sincronizando: 'Poniendo todo al día...',
     pendientes: 'Pendientes',
-    errorGeneral: 'Ocurrio un error',
-    errorSincronizar: 'Error al sincronizar.',
+    errorGeneral: 'Algo no salió bien. Inténtelo otra vez.',
+    errorSincronizar: 'No se pudieron subir los cambios. Chagra vuelve a intentar solo.',
     sinConexionPendientes: (count) =>
-      `Sin conexion. ${count} registro${count !== 1 ? 's' : ''} guardado${count !== 1 ? 's' : ''} localmente.`,
-    sinConexionSinPendientes: 'Sin conexion. Datos guardados localmente.',
+      `Sin señal. ${count} registro${count !== 1 ? 's' : ''} guardado${count !== 1 ? 's' : ''} en su teléfono.`,
+    sinConexionSinPendientes: 'Sin señal. Sus datos quedaron guardados en el teléfono.',
   },
   agente: {
-    placeholder: 'Escribe tu consulta...',
-    pensando: 'Chagra esta pensando...',
+    placeholder: 'Cuéntele a Chagra qué pasa en su finca...',
+    pensando: 'Chagra está pensando...',
     // Estado "pensando" del chat: el texto visible es solo la palabra (los
     // puntos suspensivos animados van en spans aparte) y el aria describe el
     // estado completo para lectores de pantalla.
     pensandoTexto: 'Pensando',
     pensandoAria: 'Chagra IA está pensando',
+    // Fases visibles del "pensando" (perceived performance): el pipeline
+    // interno (transcripción → entendimiento → grounding/tools → generación)
+    // se asoma a la UI para que la espera larga se sienta viva y con avance,
+    // no colgada. Las claves las setea AgentScreen (thinkingPhase).
+    fases: {
+      transcribiendo: 'Entendiendo tu voz',
+      entendiendo: 'Entendiendo tu pregunta',
+      consultando: 'Consultando el catálogo y tu chagra',
+      escribiendo: 'Escribiendo tu respuesta',
+    },
     confianzaAlta: 'Confianza alta',
     confianzaMedia: 'Confianza media',
     confianzaBaja: 'Confianza baja',
@@ -105,13 +115,13 @@ const messages = {
     perfilActivo: 'Perfil activo',
   },
   confirm: {
-    eliminarItem: 'Esta seguro de eliminar este elemento?',
-    descartarCambios: 'Descartar cambios sin guardar?',
+    eliminarItem: '¿Seguro que quiere borrar esto? No se puede deshacer.',
+    descartarCambios: '¿Salir sin guardar? Se pierde lo que escribió.',
   },
   voz: {
     grabando: 'Grabando...',
-    procesando: 'Procesando...',
-    errorMicrofono: 'No se pudo acceder al microfono',
+    procesando: 'Un momento, estoy escuchando...',
+    errorMicrofono: 'No pudimos usar el micrófono. Revise el permiso en su teléfono.',
     transcripcion: 'Transcripción',
     ayudaVariaciones: 'Revisa la transcripción arriba. Si Chagra escuchó bien pero el cultivo es una variedad nueva o regional (ej. una cepa específica, una variedad local), todavía no la tengo en mi catálogo.',
     opciones: 'Tienes 3 opciones:',
@@ -133,7 +143,18 @@ const messages = {
     elegirRegistro: 'Elija cómo registrarla. Las tres rutas guardan lo mismo.',
     tipZonas: 'Tip: tras la primera, puede crear zonas (parcelas, camas) para organizarlas.',
   },
-  // Bienvenida de PRIMERA VEZ (BienvenidaFinca) — secuencia de 3 momentos.
+  // Instalación de la PWA — strings COMPARTIDOS entre IosInstallBanner,
+  // AndroidInstallBanner y el momento "instalar" del recorrido de bienvenida
+  // (BienvenidaFinca), para no duplicar el copy de los pasos.
+  instalarApp: {
+    titulo: 'Instale Chagra',
+    subtituloAndroid: 'Téngala en su pantalla de inicio, como una aplicación.',
+    cta: 'Instalar Chagra',
+    cerrarAria: 'Cerrar',
+    iosPaso1: 'Toque el botón Compartir en Safari.',
+    iosPaso2: 'Elija “Añadir a pantalla de inicio”.',
+  },
+  // Bienvenida de PRIMERA VEZ (BienvenidaFinca) — secuencia de 5 momentos.
   // Tono "usted" cordial colombiano, frases cortas (muchos usuarios leen poco).
   bienvenida: {
     eyebrow: 'Bienvenido a Chagra',
@@ -151,6 +172,28 @@ const messages = {
     // para el usuario que trae equipo: Chagra lo entiende por voz o por foto.
     capHerramTitulo: 'Sus herramientas del campo',
     capHerramCopy: 'Si tiene micrófono, cámara o gafas, Chagra lo escucha y lo mira igual.',
+    // Momento 3 — "Hola Chagra": hablarle con las manos ocupadas (modo campo).
+    // HONESTO con el MVP de voz (push-to-talk, D9 de la arquitectura
+    // voice-first): se toca el micrófono UNA vez y se habla; la escucha
+    // continua siempre-atenta es fase 2 y este copy NO la promete.
+    vozTitulo: '¿Manos en la tierra? Háblele',
+    vozCopy: 'En el surco, con guantes o con las manos sucias, no tiene que escribir: abra el agente, toque el micrófono y salude.',
+    vozEjemplo: '“Hola Chagra, ¿cuándo abono el café?”',
+    vozChip1: 'Con guantes puestos',
+    vozChip2: 'En pleno surco',
+    vozChip3: 'Sin escribir nada',
+    vozNota: 'Y Chagra le puede responder con voz, para que no suelte la herramienta.',
+    vozFotoAlt: 'Manos campesinas sembrando una plántula en la tierra.',
+    // Momento 4 — instalar la app (PWA): el porqué es el campo sin señal.
+    instalarTitulo: 'Llévela en el bolsillo',
+    instalarCopy: 'Instale Chagra como una app y le sirve hasta donde no llega la señal.',
+    instalarPorque1: 'Funciona sin internet, allá arriba en el lote.',
+    instalarPorque2: 'Lo que registre queda guardado en su celular, sin gastar datos.',
+    instalarPorque3: 'Abre con un toque desde su pantalla, como cualquier app.',
+    instalarCta: 'Instalar Chagra ahora',
+    instalarListo: 'Listo: Chagra ya está instalada en este equipo.',
+    instalarMenuHint: 'En el menú de su navegador (⋮) busque “Instalar aplicación” o “Añadir a pantalla de inicio”.',
+    instalarFotoAlt: 'Caficultor cogiendo café en una ladera de Rioblanco, Tolima.',
     titulo3: '¿Dónde está su tierra?',
     copy3: 'Con un toque sabemos su vereda y su altura. Así el consejo llega acertado para su clima.',
     siguiente: 'Siguiente',
@@ -175,11 +218,11 @@ const messages = {
     cargandoFotos: 'Cargando fotos...',
     cargandoTareas: 'Cargando tareas...',
     cargandoCatalogo: 'Cargando catálogo...',
-    sincronizandoSensores: 'Sincronizando sensores...',
+    sincronizandoSensores: 'Poniendo los sensores al día...',
     sincronizandoRegistros: (count) =>
-      `Sincronizando ${count} registro${count !== 1 ? 's' : ''}...`,
-    sincronizarSensoresBtn: 'Sincronizar Sensores',
-    sincronizarOffline: 'Sincronizar Offline...',
+      `Subiendo ${count} registro${count !== 1 ? 's' : ''}...`,
+    sincronizarSensoresBtn: 'Poner sensores al día',
+    sincronizarOffline: 'Guardando...',
     registrarProduccion: 'Registrar Producción',
     guardarGeometria: 'Guardar geometría',
     tareasPendientes: 'Tareas Pendientes',
@@ -191,15 +234,16 @@ const messages = {
       `Guardar (${count} ${count === 1 ? 'planta' : 'plantas'})`,
     guardando: 'Guardando…',
     ingresoBitacora: 'Registrar en Bitácora',
-    errorReporteCsv: 'No se pudo generar el reporte CSV.',
-    errorAbastecer: 'No se pudo abastecer el insumo. Verifique el almacenamiento.',
-    errorGps: 'No se pudo iniciar la captura GPS.',
+    errorMarcarPaso: 'No se pudo marcar el paso como hecho. Intente de nuevo en un momento.',
+    errorReporteCsv: 'No se pudo crear el archivo del informe. Inténtelo otra vez.',
+    errorAbastecer: 'No se pudo abastecer el insumo. Inténtelo otra vez en un momento.',
+    errorGps: 'No pudimos empezar a marcar la ubicación. Inténtelo de nuevo.',
     errorPermisoNegado: 'Permiso de ubicación denegado. En iPhone: Ajustes > Safari > Ubicación.',
     errorPermisoNegadoAndroid: 'Permiso de ubicación denegado. En iPhone: Ajustes > Safari > Ubicación. En Android: toca el candado de la barra de URL.',
     errorGpsNoDisponible: 'GPS no disponible. Sal al exterior y verifica que el GPS esté activo.',
     errorGpsNoDisponibleDetalle: 'GPS no disponible. Verifica que el GPS esté activo y que estés al exterior (no en sótano / lejos de ventana).',
-    errorUbicacion: 'No se pudo obtener tu ubicación.',
-    errorTimeout: 'Tiempo agotado esperando al GPS (30s). En iPhone, el GPS puede tardar más al aire libre — espera unos segundos y vuelve a tocar "Mi ubicación".',
+    errorUbicacion: 'No pudimos encontrar tu ubicación. Inténtalo de nuevo.',
+    errorTimeout: 'El GPS se demoró más de la cuenta. Al aire libre puede tardar un poco — espera unos segundos y vuelve a tocar "Mi ubicación".',
     // Bug #57 — trazar caminando: warm-up del GPS antes de empezar el trazo.
     gpsAfinando: 'Afinando GPS… espera a que la señal mejore.',
     confirmarAbastecer: 'Confirmar',
@@ -215,7 +259,7 @@ const messages = {
     agregarFoto: 'Agregar foto',
     ubicacionDesc: 'Mapa, piso térmico y cultivos de tu zona',
     guardarCambios: 'Guardar cambios',
-    telemetriaVozDesc: 'Registrar eventos del pipeline de voz',
+    telemetriaVozDesc: 'Ayuda a mejorar cómo Chagra escucha su voz',
     telemetriaAgenteDesc: 'Ayuda a mejorar el agente. Desactivado por defecto.',
     fincaActivaLabel: 'Finca activa:',
     guardar: 'Guardar',
