@@ -55,7 +55,7 @@ describe('AbejasScreen — fotos CC con atribución', () => {
     const licencias = screen.getAllByRole('link', { name: /CC BY/i });
     expect(licencias.length).toBeGreaterThan(0);
     licencias.forEach((a) => {
-      expect(a.getAttribute('href')).toMatch(/creativecommons\.org/);
+      expect(a.getAttribute('href')).toMatch(/^https?:\/\/([a-z0-9-]+\.)*creativecommons\.org\//);
       expect(a).toHaveAttribute('rel', 'noopener noreferrer');
     });
     // Autor concreto de una de las fotos (angelita)

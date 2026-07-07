@@ -145,7 +145,7 @@ describe('CafeScreen — puente al agente y créditos de fotos', () => {
     for (const cr of CREDITOS_FOTOS_CAFE) {
       expect(cr.autor).toBeTruthy();
       expect(cr.licencia).toBeTruthy();
-      expect(cr.fuenteUrl).toMatch(/wikimedia\.org/);
+      expect(cr.fuenteUrl).toMatch(/^https?:\/\/([a-z0-9-]+\.)*wikimedia\.org\//);
     }
   });
 });
