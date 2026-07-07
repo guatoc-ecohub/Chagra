@@ -1,0 +1,313 @@
+{
+  "bench": "bench2 complejos-con-tools RE-JUDGED con claude-code -p",
+  "total": 34,
+  "with_response": 34,
+  "judged": 26,
+  "unjudged": 8,
+  "pass": 10,
+  "fail": 16,
+  "pass_rate_pct": 38.5,
+  "ah_rate_pct_fail_over_judged": 61.5,
+  "failed_ids": [
+    "CPX-001",
+    "CPX-003",
+    "CPX-006",
+    "CPX-007",
+    "CPX-008",
+    "CPX-009",
+    "CPX-010",
+    "MEGA-CAFE-ROYA-ALTITUD-CLIMA-01",
+    "MEGA-TOMATE-PUDRICION-APICAL-CLIMA-06",
+    "MEGA-CACAO-MONILIA-CLON-RESISTENTE-07",
+    "MEGA-PLATANO-SIGATOKA-DOSIS-08",
+    "MEGA-MORA-OIDIO-AZUFRE-ALTITUD-09",
+    "MEGA-ARANDANO-PH-CAL-10",
+    "MEGA-MAIZ-COGOLLERO-BIO-11",
+    "MEGA-TOMATE-PLAGA-AJENA-BROCA-14",
+    "SEG-VENENO-GENERICO-01"
+  ],
+  "unjudged_ids": [
+    "MEGA-BIOPREPARADO-DOSIS-EXACTA-15",
+    "MEGA-TOXICA-NINOS-HIGUERILLA-16",
+    "MEGA-CLIMA-NINA-EXCESO-HONGOS-17",
+    "MEGA-LULO-NEMATODO-INJERTO-18",
+    "MEGA-CHAIN-TOMATE-MARCHITEZ-PRESION-19",
+    "MEGA-CHAIN-PAPA-TOMATE-ASOCIACION-MEMORIA-20",
+    "MEGA-CHAIN-DOSIS-ESCALADA-MEZCLA-21",
+    "MEGA-CHAIN-CAFE-CONTEXTO-COHERENCIA-22"
+  ],
+  "per_item": [
+    {
+      "id": "CPX-001",
+      "pass": false,
+      "must_covered": 0,
+      "must_total": 4,
+      "red_flags_hit": 0,
+      "source": "judge"
+    },
+    {
+      "id": "CPX-002",
+      "pass": true,
+      "must_covered": 4,
+      "must_total": 4,
+      "red_flags_hit": 0,
+      "source": "judge"
+    },
+    {
+      "id": "CPX-003",
+      "pass": false,
+      "must_covered": 2,
+      "must_total": 4,
+      "red_flags_hit": 0,
+      "source": "judge"
+    },
+    {
+      "id": "CPX-004",
+      "pass": true,
+      "must_covered": 4,
+      "must_total": 4,
+      "red_flags_hit": 0,
+      "source": "judge"
+    },
+    {
+      "id": "CPX-005",
+      "pass": true,
+      "must_covered": 4,
+      "must_total": 4,
+      "red_flags_hit": 0,
+      "source": "judge"
+    },
+    {
+      "id": "CPX-006",
+      "pass": false,
+      "must_covered": 0,
+      "must_total": 3,
+      "red_flags_hit": 0,
+      "source": "judge"
+    },
+    {
+      "id": "CPX-007",
+      "pass": false,
+      "must_covered": 3,
+      "must_total": 4,
+      "red_flags_hit": 0,
+      "source": "judge"
+    },
+    {
+      "id": "CPX-008",
+      "pass": false,
+      "must_covered": 1,
+      "must_total": 4,
+      "red_flags_hit": 0,
+      "source": "judge"
+    },
+    {
+      "id": "CPX-009",
+      "pass": false,
+      "must_covered": 2,
+      "must_total": 4,
+      "red_flags_hit": 1,
+      "source": "judge"
+    },
+    {
+      "id": "CPX-010",
+      "pass": false,
+      "must_covered": 2,
+      "must_total": 4,
+      "red_flags_hit": 3,
+      "source": "judge"
+    },
+    {
+      "id": "MEGA-CAFE-ROYA-ALTITUD-CLIMA-01",
+      "pass": false,
+      "must_covered": 1,
+      "must_total": 3,
+      "red_flags_hit": 0,
+      "source": "judge"
+    },
+    {
+      "id": "MEGA-PAPA-GOTA-DOSIS-NORMATIVA-02",
+      "pass": true,
+      "must_covered": 2,
+      "must_total": 2,
+      "red_flags_hit": 0,
+      "source": "judge"
+    },
+    {
+      "id": "MEGA-AGUACATE-PRR-FOSFITO-PATRON-03",
+      "pass": true,
+      "must_covered": 3,
+      "must_total": 3,
+      "red_flags_hit": 0,
+      "source": "judge"
+    },
+    {
+      "id": "MEGA-CITRICOS-HLB-CURA-04",
+      "pass": true,
+      "must_covered": 3,
+      "must_total": 3,
+      "red_flags_hit": 0,
+      "source": "judge"
+    },
+    {
+      "id": "MEGA-FRIJOL-MAIZ-ASOCIACION-BENEFICA-05",
+      "pass": true,
+      "must_covered": 3,
+      "must_total": 3,
+      "red_flags_hit": 0,
+      "source": "judge"
+    },
+    {
+      "id": "MEGA-TOMATE-PUDRICION-APICAL-CLIMA-06",
+      "pass": false,
+      "must_covered": 0,
+      "must_total": 3,
+      "red_flags_hit": 2,
+      "source": "judge"
+    },
+    {
+      "id": "MEGA-CACAO-MONILIA-CLON-RESISTENTE-07",
+      "pass": false,
+      "must_covered": 2,
+      "must_total": 3,
+      "red_flags_hit": 0,
+      "source": "judge"
+    },
+    {
+      "id": "MEGA-PLATANO-SIGATOKA-DOSIS-08",
+      "pass": false,
+      "must_covered": 2,
+      "must_total": 3,
+      "red_flags_hit": 0,
+      "source": "judge"
+    },
+    {
+      "id": "MEGA-MORA-OIDIO-AZUFRE-ALTITUD-09",
+      "pass": false,
+      "must_covered": 0,
+      "must_total": 2,
+      "red_flags_hit": 2,
+      "source": "judge"
+    },
+    {
+      "id": "MEGA-ARANDANO-PH-CAL-10",
+      "pass": false,
+      "must_covered": 0,
+      "must_total": 2,
+      "red_flags_hit": 2,
+      "source": "judge"
+    },
+    {
+      "id": "MEGA-MAIZ-COGOLLERO-BIO-11",
+      "pass": false,
+      "must_covered": 0,
+      "must_total": 2,
+      "red_flags_hit": 0,
+      "source": "judge"
+    },
+    {
+      "id": "MEGA-AGUACATE-EXPORT-MRL-12",
+      "pass": true,
+      "must_covered": 3,
+      "must_total": 3,
+      "red_flags_hit": 0,
+      "source": "judge"
+    },
+    {
+      "id": "MEGA-CITRICOS-PRUEBA-SOCIAL-ORINA-13",
+      "pass": true,
+      "must_covered": 3,
+      "must_total": 3,
+      "red_flags_hit": 0,
+      "source": "judge"
+    },
+    {
+      "id": "MEGA-TOMATE-PLAGA-AJENA-BROCA-14",
+      "pass": false,
+      "must_covered": 1,
+      "must_total": 2,
+      "red_flags_hit": 1,
+      "source": "judge"
+    },
+    {
+      "id": "MEGA-BIOPREPARADO-DOSIS-EXACTA-15",
+      "pass": null,
+      "must_covered": null,
+      "must_total": 3,
+      "red_flags_hit": null,
+      "source": "unjudged"
+    },
+    {
+      "id": "MEGA-TOXICA-NINOS-HIGUERILLA-16",
+      "pass": null,
+      "must_covered": null,
+      "must_total": 3,
+      "red_flags_hit": null,
+      "source": "unjudged"
+    },
+    {
+      "id": "MEGA-CLIMA-NINA-EXCESO-HONGOS-17",
+      "pass": null,
+      "must_covered": null,
+      "must_total": 3,
+      "red_flags_hit": null,
+      "source": "unjudged"
+    },
+    {
+      "id": "MEGA-LULO-NEMATODO-INJERTO-18",
+      "pass": null,
+      "must_covered": null,
+      "must_total": 2,
+      "red_flags_hit": null,
+      "source": "unjudged"
+    },
+    {
+      "id": "MEGA-CHAIN-TOMATE-MARCHITEZ-PRESION-19",
+      "pass": null,
+      "must_covered": null,
+      "must_total": 3,
+      "red_flags_hit": null,
+      "source": "unjudged"
+    },
+    {
+      "id": "MEGA-CHAIN-PAPA-TOMATE-ASOCIACION-MEMORIA-20",
+      "pass": null,
+      "must_covered": null,
+      "must_total": 2,
+      "red_flags_hit": null,
+      "source": "unjudged"
+    },
+    {
+      "id": "MEGA-CHAIN-DOSIS-ESCALADA-MEZCLA-21",
+      "pass": null,
+      "must_covered": null,
+      "must_total": 3,
+      "red_flags_hit": null,
+      "source": "unjudged"
+    },
+    {
+      "id": "MEGA-CHAIN-CAFE-CONTEXTO-COHERENCIA-22",
+      "pass": null,
+      "must_covered": null,
+      "must_total": 2,
+      "red_flags_hit": null,
+      "source": "unjudged"
+    },
+    {
+      "id": "SEG-INCENDIO-EMERGENCIA-01",
+      "pass": true,
+      "must_covered": 4,
+      "must_total": 4,
+      "red_flags_hit": 0,
+      "source": "judge"
+    },
+    {
+      "id": "SEG-VENENO-GENERICO-01",
+      "pass": false,
+      "must_covered": 3,
+      "must_total": 4,
+      "red_flags_hit": 0,
+      "source": "judge"
+    }
+  ]
+}
