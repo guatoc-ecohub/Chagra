@@ -43,7 +43,12 @@ import { alertEngine } from './services/alertEngine';
 // comentario abajo donde se removió el render).
 // import FieldFeedback from './components/FieldFeedback';
 import AgentFab from './components/AgentFab';
-import EscuchaFab from './components/escucha/EscuchaFab';
+// EscuchaFab (el FAB de tap "barbudito de páramo") DESHABILITADO por decisión
+// del operador 2026-07-07: modo campo = WAKE-WORD SOLO ("hola chagra"). El
+// único FAB visible es el colibrí (AgentFab). El overlay SÍ se importa: lo abre
+// el wake-word vía activarEscucha() (useModoCampo/onWake). Para re-habilitar el
+// tap, descomentar el import y el render de <EscuchaFab /> más abajo.
+// import EscuchaFab from './components/escucha/EscuchaFab';
 import EscuchaOverlay from './components/escucha/EscuchaOverlay';
 import AgentOfflineGuard from './components/AgentScreen/AgentOfflineGuard';
 // Transición home→conversación: el colibrí en video (~2s). Eager (debe
@@ -2146,16 +2151,18 @@ export default function App() {
           duplicaría el ave. Sigue en el resto para anunciar "respuesta lista". */}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && <AgentFab onNavigate={navigate} />}
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
-          embarradas — distinto del MicFab removido 2026-05-30: aquel era solo
-          "grabar"; este abre el widget "Chagra está escuchando" que navega o
-          pregunta al agente punta a punta por voz). El FAB (abajo-izquierda)
-          es el trigger de HOY; el wake-word "hola Chagra" de MAÑANA llama el
-          mismo activarEscucha() sin tocar nada de esto. Oculto donde ya hay
-          micrófono propio (agente, voz, y el home: el compositor del hero
-          trae mic y el FAB taparía el botón Ⓐ de la mano — misma política
-          que AgentFab) y en login/onboarding. El overlay SÍ vive en el home:
-          el wake-word podrá abrirlo allí. */}
-      {!['loading', 'login', 'oauth-callback', 'onboarding-perfil', 'ubicacion-detectada', 'dashboard', 'agente', 'voz', 'voz_planta', 'registro_voz'].includes(currentView) && <EscuchaFab />}
+          embarradas). Abre el widget "Chagra está escuchando" que navega o
+          pregunta al agente punta a punta por voz.
+
+          DECISIÓN OPERADOR 2026-07-07 — MODO CAMPO = WAKE-WORD SOLO: el FAB de
+          tap ("barbudito de páramo", EscuchaFab) NO se muestra a los usuarios.
+          El único FAB visible sigue siendo el colibrí (AgentFab, "respuesta
+          lista"). El overlay se abre EXCLUSIVAMENTE por el wake-word "hola
+          chagra" (useModoCampo.onWake → activarEscucha({fuente:'wakeword'})),
+          que solo corre con VITE_MODO_CAMPO=true y modo campo activado (opt-in).
+          Para re-habilitar el tap: descomentar el import de EscuchaFab (arriba)
+          y la línea del render de abajo. */}
+      {/* {!['loading', 'login', 'oauth-callback', 'onboarding-perfil', 'ubicacion-detectada', 'dashboard', 'agente', 'voz', 'voz_planta', 'registro_voz'].includes(currentView) && <EscuchaFab />} */}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <EscuchaOverlay />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <SyncProgressIndicator />}
