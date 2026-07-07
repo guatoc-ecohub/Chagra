@@ -852,6 +852,73 @@ export function validateAmb31_crossContaminationInsectoPatogeno(catalog) {
   return errors;
 }
 
+// AMB-32: consistencia género → familia botánica para taxones de confusión
+// conocida (regresión-guard). Introducido 2026-07-05 tras que los benches de
+// contaminación reportaran confusiones de FAMILIA que AMB-28 NO cubre:
+//   - guayaba (Psidium) y plátano (Musa) metidos en Passifloraceae
+//   - morera (Morus) colada en Rosaceae (confusión con mora andina Rubus)
+// AMB-28 chequea nombre_comun/id (patrón gulupa→guayaba), pero NO valida que
+// familia_botanica sea coherente con el género del nombre_cientifico. Si alguien
+// re-introduce `familia_botanica: "Passifloraceae"` en psidium_guajava o
+// "Rosaceae" en Morus, AMB-28 no lo caza porque el id/nombre no dispara el
+// patrón. Este validador cierra ese hueco con un mapa CURADO género→familia
+// canónica de alta confianza, verificado contra el GBIF Backbone Taxonomy (con
+// POWO/Kew como autoridad taxonómica de respaldo). Solo cubre los géneros
+// confusables reportados por los benches + sus parejas de confusión — NO es un
+// checker taxonómico exhaustivo (eso daría falsos positivos por reclasificaciones
+// APG). Error duro: solo dispara ante contradicción definitiva.
+//
+// Fuentes (familia aceptada por género — GBIF Backbone Taxonomy · POWO):
+//   Psidium    → Myrtaceae      (GBIF 5420380 · Psidium guajava; guayaba)
+//   Acca       → Myrtaceae      (GBIF 5418629 · Acca sellowiana / syn. Feijoa; feijoa)
+//   Musa       → Musaceae       (GBIF 2760990; plátano/banano)
+//   Morus      → Moraceae       (GBIF 5361889 · Morus alba; morera)
+//   Passiflora → Passifloraceae (GBIF 2874172; gulupa/maracuyá/granadilla/curuba/badea)
+//   Rubus      → Rosaceae       (GBIF 2988638; mora andina/frambuesa)
+//   Fragaria   → Rosaceae       (GBIF 3029779; fresa)
+//   Persea     → Lauraceae      (GBIF 3034041; aguacate)
+export const GENUS_FAMILY_CANONICAL = new Map([
+  ['psidium', 'Myrtaceae'],
+  ['acca', 'Myrtaceae'],
+  ['musa', 'Musaceae'],
+  ['morus', 'Moraceae'],
+  ['passiflora', 'Passifloraceae'],
+  ['rubus', 'Rosaceae'],
+  ['fragaria', 'Rosaceae'],
+  ['persea', 'Lauraceae'],
+]);
+
+// Extrae el género (primer token alfabético) de un nombre científico, tolerando
+// un marcador de híbrido inicial ("× " o "x "). Devuelve lowercase. El match
+// es de PALABRA COMPLETA (no prefijo) para no colisionar géneros distintos que
+// comparten prefijo (p.ej. Mora Fabaceae vs Morus Moraceae, Moringa, Muscari).
+export function extractGenus(nombreCientifico) {
+  if (typeof nombreCientifico !== 'string') return '';
+  const cleaned = nombreCientifico.trim().replace(/^[×xX]\s+/, '');
+  const m = cleaned.match(/^[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ-]+/);
+  return m ? m[0].toLowerCase() : '';
+}
+
+export function validateAmb32_genusFamilyConsistency(catalog) {
+  const errors = [];
+  for (const sp of catalog.species || []) {
+    const sci = sp.nombre_cientifico;
+    const fam = sp.familia_botanica;
+    if (typeof sci !== 'string' || typeof fam !== 'string' || !fam) continue;
+    const genus = extractGenus(sci);
+    const expected = GENUS_FAMILY_CANONICAL.get(genus);
+    if (expected && fam !== expected) {
+      errors.push(
+        `AMB-32 [${sp.id}]: género "${genus}" (de nombre_cientifico "${sci}") ` +
+        `pertenece a ${expected} pero familia_botanica="${fam}". ` +
+        `Fuente: GBIF Backbone / POWO. Confusión histórica cazada por benches ` +
+        `(guayaba/plátano→Passifloraceae, morera→Rosaceae).`,
+      );
+    }
+  }
+  return errors;
+}
+
 // ----------------------------------------------------------------
 // Main (CLI). Gated por `import.meta.url === file://${process.argv[1]}` para
 // permitir importar las funciones validador desde tests (scripts/__tests__/
@@ -998,6 +1065,15 @@ function runCli() {
     // y viceversa.
     ['AMB-31 contaminación cruzada insecto ↔ patógeno', (c) => ({
       errors: validateAmb31_crossContaminationInsectoPatogeno(c),
+      warnings: [],
+    })],
+    // AMB-32 introducido 2026-07-05 (fix/catalog-genus-family-guard-amb32) como
+    // regresión-guard de las confusiones de FAMILIA cazadas por los benches de
+    // contaminación (guayaba/plátano→Passifloraceae, morera→Rosaceae). Error
+    // duro: verifica coherencia género→familia canónica (GBIF/POWO) para los
+    // taxones confusables. Complementa AMB-28 (que solo mira nombre_comun/id).
+    ['AMB-32 consistencia género → familia (confusables)', (c) => ({
+      errors: validateAmb32_genusFamilyConsistency(c),
       warnings: [],
     })],
   ];

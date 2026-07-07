@@ -362,6 +362,40 @@ const ALLOWED_TOOLS = new Set([
   // (nunca inventa). El cliente además intercepta la mayoría de estas preguntas
   // localmente (metaAyudaIntent), pero se expone para el ruteo del NLU en chat.
   'get_ayuda_funcion',
+  // ── Reconciliación allow-list cliente ↔ 41 tools del NLU · Fase 1 (fix
+  //    grounding P0, CAPABILITIES_STATUS.md §7.3). El sidecar NLU (nlu.ts) ya
+  //    define y rutea estas 3, pero el cliente las rechazaba con
+  //    {_error, reason:'not_allowed'} → el turno degradaba a RAG SIN grounding
+  //    en silencio. Las 3 son read-only del grafo AGE, con args que el NLU SÍ
+  //    puede rellenar desde una frase de chat (mismo patrón que tools ya
+  //    expuestas), así que son seguras y valiosas de exponer:
+  //  - get_cultivos_viables: cultivos VIABLES a una altitud (grafo AGE). Arg
+  //    `altitud` (msnm) — idéntico patrón a get_diseno_silvopastoril/restauracion
+  //    ya expuestas. Alternativas honestas cuando el usuario propone un cultivo
+  //    inviable para su piso térmico. Degrada a {available:false} si AGE cae.
+  //  - get_diseno_finca: policultivo agroecológico estilo Restrepo por rol
+  //    funcional (polinizadores/abonos_verdes/sombra/cercas_vivas/alelopaticas)
+  //    y VIABLE a la altitud. Mismo arg `altitud`. Degrada si AGE cae.
+  //  - get_dosis_biopreparado: dosis, periodo de carencia, incompatibilidades y
+  //    registro ICA de biopreparados (grafo AGE). SEGURIDAD: responde
+  //    "¿cuánto le pongo? ¿cada cuánto? ¿tiene carencia?". Args
+  //    `biopreparado_id`|`pest_id` (snake_case) — mismo patrón que get_biopreparados
+  //    ya expuesta. Degrada a found:false si el grafo no tiene el dato.
+  'get_cultivos_viables',
+  'get_diseno_finca',
+  'get_dosis_biopreparado',
+  // FASE 2 (deferidas, NO exponer aún):
+  //  - get_grado_dia: requiere `fecha_siembra` (ISO YYYY-MM-DD, sin default) que
+  //    el NLU no puede sintetizar con fiabilidad desde una frase libre de chat.
+  //    Se cablea mejor desde un contexto estructurado (asset plant con fecha de
+  //    siembra conocida) o un chip dedicado, no desde el ruteo NLU. Mientras
+  //    tanto queda en deflección honesta (guard `not_allowed` en AgentScreen).
+  //
+  // NO se exponen (siguen en deflección honesta) las que exigen credenciales
+  // farmOS, coords de dispositivo o NIT DIAN — el NLU no puede rellenar esos
+  // args desde una frase de chat: add_planta_finca (write), get_finca_overview,
+  // get_sensor_finca, get_weather_data, get_clima_finca, get_ubicacion_actual,
+  // get_documento_soporte_dian.
 ]);
 
 /**
