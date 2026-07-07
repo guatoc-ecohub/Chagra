@@ -574,9 +574,15 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // normal NO debe re-disparar el prompt.
   useEffect(() => {
     if (!initialContext) return;
-    const { prefilledPrompt, sourceLabel, sourceUrl, alertContext } = initialContext;
-    if (typeof prefilledPrompt === 'string' && prefilledPrompt.trim().length > 0) {
-      setInputText(prefilledPrompt);
+    const { prefilledPrompt, prompt, sourceLabel, sourceUrl, alertContext } = initialContext;
+    // Alias defensivo: varias pantallas de mundo pasaban la clave `prompt`
+    // (SemillaScreen, PlatanoBanano, Poscosecha, Almacenamiento, Compost,
+    // SaludSuelo…) creyendo que prellenaban el input, pero solo se leía
+    // `prefilledPrompt` → el prompt se descartaba y el agente abría vacío.
+    // Aceptar ambas claves repara ese hueco sin tocar cada call site.
+    const seed = prefilledPrompt ?? prompt;
+    if (typeof seed === 'string' && seed.trim().length > 0) {
+      setInputText(seed);
     }
     if (sourceUrl || sourceLabel || alertContext) {
       setAlertContextBanner({

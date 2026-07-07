@@ -203,6 +203,9 @@ export function mundosViews() {
     const out = new Set();
     for (const m of MUNDOS_FINCA) {
         if (m.directo) out.add(m.directo.view);
+        // La portada a medida del mundo también es una vista real de App.jsx:
+        // incluirla congela su reachability (antes se colaba sin validar).
+        if (m.portada) out.add(m.portada);
         for (const e of m.entradas || []) out.add(e.view);
     }
     return [...out];

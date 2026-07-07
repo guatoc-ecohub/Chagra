@@ -48,6 +48,47 @@ function VinetaCultivos() {
     );
 }
 
+/** ☕ El café — ladera de cafetal, rama con cerezas maduras y sol de montaña. */
+function VinetaCafe() {
+    return (
+        <svg {...SVG_PROPS}>
+            <rect width="180" height="90" fill="#efe0cf" />
+            {/* montañas del eje cafetero al fondo */}
+            <path d="M-4 46 L38 20 L82 46 Z" fill="#c3a888" opacity=".7" />
+            <path d="M64 48 L116 16 L170 48 Z" fill="#b0916e" opacity=".75" />
+            {/* sol suave de mañana */}
+            <circle cx="150" cy="20" r="10" fill="#ffe6b0" />
+            {/* laderas del cafetal */}
+            <path d="M-4 46 Q60 34 120 46 T184 42 V90 H-4 Z" fill="#6f9a52" />
+            <path d="M-4 62 Q70 50 184 60 V90 H-4 Z" fill="#547e3c" />
+            {/* hileras de cafetos en curva de nivel (matas redondas en fila) */}
+            <g fill="#3f7a3a">
+                <circle cx="22" cy="58" r="6" /><circle cx="46" cy="55" r="6" /><circle cx="70" cy="57" r="6" />
+                <circle cx="130" cy="54" r="6" /><circle cx="154" cy="57" r="6" />
+            </g>
+            <g fill="#4c8a44" opacity=".85">
+                <circle cx="22" cy="56" r="3" /><circle cx="46" cy="53" r="3" /><circle cx="70" cy="55" r="3" />
+                <circle cx="130" cy="52" r="3" /><circle cx="154" cy="55" r="3" />
+            </g>
+            {/* rama de café protagonista en primer plano, con cerezas maduras */}
+            <g transform="translate(96 58)">
+                <path d="M-42 28 Q-8 10 34 3" stroke="#7a5230" strokeWidth="3.4" strokeLinecap="round" fill="none" />
+                {/* hojas lanceoladas */}
+                <path d="M-20 17 Q-28 9 -24 -2 Q-13 4 -16 15 Z" fill="#2f6b3a" />
+                <path d="M0 9 Q-6 -1 0 -10 Q9 -2 5 9 Z" fill="#2f6b3a" />
+                <path d="M20 5 Q16 -5 25 -10 Q31 -1 25 6 Z" fill="#3f8f4e" />
+                {/* cerezas de café (rojas) agrupadas en el nudo, como en la mata real */}
+                <g>
+                    <circle cx="-26" cy="19" r="3.4" fill="#c8321f" /><circle cx="-19" cy="21" r="3.4" fill="#d94f30" />
+                    <circle cx="-5" cy="11" r="3.4" fill="#d94f30" /><circle cx="2" cy="13" r="3.4" fill="#c8321f" />
+                    <circle cx="16" cy="6" r="3.2" fill="#d94f30" /><circle cx="23" cy="8" r="3.2" fill="#c8321f" />
+                    <circle cx="31" cy="4" r="3" fill="#e06a48" />
+                </g>
+            </g>
+        </svg>
+    );
+}
+
 /** 🌱 El suelo vivo — corte de tierra en capas con raíces y lombriz. */
 function VinetaSuelo() {
     return (
@@ -311,6 +352,7 @@ function VinetaDisenio() {
 /** Viñeta por id de mundo (fuente única para tarjeta + pantalla de mundo). */
 const VINETAS = {
     cultivos: VinetaCultivos,
+    cafe: VinetaCafe,
     suelo: VinetaSuelo,
     agua: VinetaAgua,
     abono: VinetaAbono,

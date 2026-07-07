@@ -184,12 +184,15 @@ export default function MundoCultivosHub({ onBack, onNavigate }) {
                     </p>
                 </section>
 
-                {/* El agente, siempre a la mano, con el contexto del mundo. */}
+                {/* El agente, siempre a la mano, con el contexto del mundo: el
+                    prompt arranca sembrado con el tema (editable en el input). */}
                 <button
                     type="button"
                     className="mch-agente"
                     data-testid="mch-agente"
-                    onClick={() => onNavigate?.('agente')}
+                    onClick={() => onNavigate?.('agente', {
+                        prefilledPrompt: 'Tengo una duda sobre cultivos y semillas: ',
+                    })}
                     aria-label="Pregúntele a Chagra sobre cultivos y semillas"
                 >
                     <span aria-hidden="true">💬</span>

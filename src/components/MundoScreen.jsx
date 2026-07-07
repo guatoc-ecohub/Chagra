@@ -104,12 +104,16 @@ export default function MundoScreen({ mundoId, onBack, onNavigate }) {
                     ))}
                 </nav>
 
-                {/* El agente siempre presente, con el contexto del mundo. */}
+                {/* El agente siempre presente, con el contexto del mundo: el
+                    prompt arranca sembrado con el tema del mundo (AgentScreen lo
+                    pone en el input, editable — no lo envía solo). */}
                 <button
                     type="button"
                     className="mf-agente"
                     data-testid="mundo-agente"
-                    onClick={() => onNavigate?.('agente')}
+                    onClick={() => onNavigate?.('agente', {
+                        prefilledPrompt: `Tengo una duda sobre ${mundo.titulo.toLowerCase()}: `,
+                    })}
                     aria-label={`Pregúntele a Chagra sobre ${mundo.titulo.toLowerCase()}`}
                 >
                     <span aria-hidden="true">💬</span>

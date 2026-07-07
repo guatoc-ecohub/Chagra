@@ -29,6 +29,7 @@ import { describe, test, expect, vi, afterEach } from 'vitest';
 import { MUNDOS_FINCA, mundosViews, getMundo } from '../mundosFinca';
 import MundosDeMiFinca from '../MundosDeMiFinca';
 import MundoScreen from '../../MundoScreen';
+import MundoVineta from '../MundoVinetas';
 
 afterEach(() => cleanup());
 
@@ -79,6 +80,17 @@ describe('Mundos — el mapa cubre todo lo que el home F2 exponía (sin huérfan
       expect(tieneDirecto !== tieneEntradas, `${m.id} debe ser directo O tener entradas`).toBe(true);
     }
   });
+
+  // Regresión: TODO mundo debe tener su ilustración (viñeta). El mundo 'café'
+  // se había quedado sin registrar en MundoVinetas → su tarjeta salía con el
+  // hueco vacío. Este test congela que ningún mundo quede sin dibujo.
+  test('cada mundo tiene su viñeta ilustrada (ninguna tarjeta queda vacía)', () => {
+    for (const m of MUNDOS_FINCA) {
+      const { container } = render(<MundoVineta mundoId={m.id} />);
+      expect(container.querySelector('svg'), `el mundo '${m.id}' no tiene viñeta`).not.toBeNull();
+      cleanup();
+    }
+  });
 });
 
 describe('MundosDeMiFinca — grilla del home', () => {
@@ -108,11 +120,15 @@ describe('MundoScreen — el mundo por dentro re-rutea a las vistas reales', () 
     expect(onNavigate).toHaveBeenCalledWith('biopreparados', { back: 'dashboard' });
   });
 
-  test('el agente queda siempre presente en el pie del mundo', () => {
+  test('el agente queda siempre presente en el pie del mundo, con contexto', () => {
     const onNavigate = vi.fn();
     render(<MundoScreen mundoId="suelo" onBack={vi.fn()} onNavigate={onNavigate} />);
     fireEvent.click(screen.getByTestId('mundo-agente'));
-    expect(onNavigate).toHaveBeenCalledWith('agente');
+    // Ahora arranca el prompt sembrado con el tema del mundo (editable en el input).
+    expect(onNavigate).toHaveBeenCalledWith(
+      'agente',
+      expect.objectContaining({ prefilledPrompt: expect.stringContaining('suelo vivo') }),
+    );
   });
 
   test('sin id (recarga/enlace viejo) muestra el índice de mundos, no un error', () => {

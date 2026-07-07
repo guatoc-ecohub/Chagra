@@ -8,10 +8,29 @@
  * en su propio módulo para no romper esa garantía.
  *
  * ── Persistencia local (siempre, offline-first) ──────────────────────────
- *   - Data-URL JPEG redimensionado a 256×256 (calidad 0.82 ≈ 15-40 KB) en
- *     `localStorage[chagra:operator:photo:v1]`. Holgado dentro de la cuota
- *     de ~5 MB por origen.
- *   - La portada (TopBar) lee de aquí: render inmediato sin red.
+ *   - Data-URL JPEG redimensionado a 256×256 (calidad 0.82 ≈ 15-40 KB).
+ *   - Store DURABLE = IndexedDB vía localforage, clave `chagra:operator:photo:v1`
+ *     (mismo motor offline que el resto de la app: authService, dataBackup,
+ *     conversationMemory). Cuota holgada (cientos de MB), NUNCA compite con el
+ *     presupuesto síncrono de ~5 MB de localStorage.
+ *
+ *   BUG HISTÓRICO (2026-07-05, "la foto no persiste al recargar"): antes la foto
+ *   se guardaba SOLO como base64 en `localStorage`. Ese cubo tiene ~5 MB por
+ *   origen, es síncrono y ya lo llenan 50+ claves `chagra:*` + el fondo elegido;
+ *   base64 infla el blob ~33%. Cuando el `setItem` reventaba con
+ *   `QuotaExceededError`, se tragaba en silencio (console.warn) → la foto NO se
+ *   guardaba y al recargar `getOperatorPhoto()` devolvía '' (la foto "desaparecía").
+ *   Rompía además la regla del propio repo ("Blobs grandes → IndexedDB, NO
+ *   localStorage", dbCore v16/v17, ADR-030 Regla 8). Fix: la fuente de verdad
+ *   pasó a localforage/IndexedDB; localStorage queda como ESPEJO best-effort
+ *   opcional (solo pinta sin flash en la recarga; si revienta la cuota, no pasa
+ *   nada porque la durabilidad la garantiza IndexedDB).
+ *
+ *   - Render inmediato (offline-first, sin flash): `getOperatorPhoto()` es
+ *     SÍNCRONO — devuelve un cache en memoria (o el espejo de localStorage la
+ *     primera vez) y dispara la hidratación desde IndexedDB en segundo plano.
+ *     Al resolver, emite `chagra:operator-update` y los consumidores (TopBar,
+ *     ProfileScreen) re-leen. La portada (TopBar) lee de aquí sin red.
  *
  * ── Sincronización a FarmOS (cuando hay sesión) ──────────────────────────
  *   Reutiliza el patrón YA existente en el repo (`useBackgroundImage` +
@@ -39,11 +58,12 @@
  * @module operatorPhotoService
  */
 
+import localforage from 'localforage';
 import { getActiveTenantId } from './tenantContext';
 
 export const PHOTO_STORAGE_KEY = 'chagra:operator:photo:v1';
 // Metadatos de la última sync (UUID del file en FarmOS) — evita re-subir/
-// re-descargar la misma foto. Plano en localStorage, separado del data-URL.
+// re-descargar la misma foto. Plano en localStorage (es pequeño, sin blob).
 export const PHOTO_SYNC_META_KEY = 'chagra:operator:photo:sync:v1';
 export const PHOTO_MAX_DIMENSION = 256;
 export const PHOTO_JPEG_QUALITY = 0.82;
@@ -52,6 +72,93 @@ export const PHOTO_JPEG_QUALITY = 0.82;
 const FARMOS_PHOTO_PREFIX = 'chagra-operator-photo';
 
 const hasStorage = () => typeof window !== 'undefined' && !!window.localStorage;
+
+// ── Cache en memoria = fuente SÍNCRONA para render inmediato ─────────────
+// null = aún no hidratado desde IndexedDB; '' = hidratado sin foto; string = foto.
+let _memoryPhoto = null;
+// Promesa de hidratación (idempotente): la primera lectura la dispara.
+let _hydratePromise = null;
+
+/**
+ * Lee el ESPEJO de localStorage (síncrono). Sirve para (a) pintar sin flash la
+ * primera vez antes de que responda IndexedDB y (b) migrar fotos de usuarios
+ * que ya la tenían en localStorage antes de esta versión. NO es la fuente de
+ * verdad (lo es IndexedDB).
+ */
+function readMirror() {
+  if (!hasStorage()) return '';
+  try {
+    return window.localStorage.getItem(PHOTO_STORAGE_KEY) || '';
+  } catch (e) {
+    console.warn('[operatorPhoto] readMirror:', e);
+    return '';
+  }
+}
+
+/**
+ * Escribe el espejo síncrono best-effort. Si la cuota de localStorage está
+ * llena (el bug histórico), se ignora SIN romper: la durabilidad ya la
+ * garantiza localforage/IndexedDB; el espejo es solo un acelerador de pintado.
+ */
+function writeMirror(dataUrl) {
+  if (!hasStorage()) return;
+  try {
+    if (dataUrl) window.localStorage.setItem(PHOTO_STORAGE_KEY, dataUrl);
+    else window.localStorage.removeItem(PHOTO_STORAGE_KEY);
+  } catch (e) {
+    // QuotaExceededError — precisamente lo que motivó mover el store a IndexedDB.
+    console.warn('[operatorPhoto] espejo localStorage lleno (no fatal):', e?.name || e);
+  }
+}
+
+/** Dispara la hidratación desde IndexedDB una sola vez (idempotente). */
+function ensureHydrated() {
+  if (!_hydratePromise) _hydratePromise = hydrateOperatorPhoto();
+  return _hydratePromise;
+}
+
+/**
+ * Hidrata `_memoryPhoto` desde el store DURABLE (localforage/IndexedDB) y, si
+ * hiciera falta, MIGRA una foto legada que viviera solo en localStorage. Emite
+ * `chagra:operator-update` si el valor cambió, para que TopBar/ProfileScreen
+ * re-lean en vivo. No-throw. Llamar al bootstrap y/o perezosamente desde
+ * `getOperatorPhoto`. Segura de correr varias veces.
+ *
+ * @returns {Promise<string>} el data-URL efectivo tras hidratar ('' si no hay).
+ */
+export async function hydrateOperatorPhoto() {
+  let durable = '';
+  try {
+    const raw = await localforage.getItem(PHOTO_STORAGE_KEY);
+    if (typeof raw === 'string') durable = raw;
+  } catch (e) {
+    console.warn('[operatorPhoto] hydrate localforage falló:', e?.message || e);
+  }
+
+  if (durable) {
+    const changed = _memoryPhoto !== durable;
+    _memoryPhoto = durable;
+    writeMirror(durable); // mantener el espejo síncrono al día
+    if (changed) emitOperatorUpdate(durable);
+    return durable;
+  }
+
+  // IndexedDB vacío: ¿hay una foto legada en localStorage (versiones previas)?
+  // Migrarla al store durable de una vez.
+  const legacy = readMirror();
+  if (legacy) {
+    try {
+      await localforage.setItem(PHOTO_STORAGE_KEY, legacy);
+    } catch (e) {
+      console.warn('[operatorPhoto] migración a localforage falló:', e?.message || e);
+    }
+    _memoryPhoto = legacy;
+    return legacy;
+  }
+
+  _memoryPhoto = '';
+  return '';
+}
 
 /**
  * Redimensiona un File de imagen a un data-URL JPEG ≤256px lado mayor.
@@ -90,16 +197,16 @@ export async function resizePhotoToDataUrl(file) {
 }
 
 /**
- * @returns {string} data-URL de la foto local, o '' si no hay.
+ * @returns {string} data-URL de la foto local, o '' si no hay. SÍNCRONO
+ * (offline-first, render inmediato): devuelve el cache en memoria si ya se
+ * hidrató; si no, dispara la hidratación desde IndexedDB en segundo plano y
+ * devuelve el espejo síncrono de localStorage para pintar sin flash. Cuando la
+ * hidratación resuelve, emite `chagra:operator-update` y los consumidores re-leen.
  */
 export function getOperatorPhoto() {
-  if (!hasStorage()) return '';
-  try {
-    return window.localStorage.getItem(PHOTO_STORAGE_KEY) || '';
-  } catch (e) {
-    console.warn('[operatorPhoto] getOperatorPhoto:', e);
-    return '';
-  }
+  if (_memoryPhoto !== null) return _memoryPhoto;
+  ensureHydrated();
+  return readMirror();
 }
 
 /**
@@ -117,21 +224,24 @@ function emitOperatorUpdate(value) {
 
 /**
  * Persiste la foto local (sin tocar red) y notifica a los consumidores.
+ * Fuente de verdad = localforage/IndexedDB (durable, cuota holgada). El cache
+ * en memoria se actualiza SÍNCRONO para render inmediato; el espejo de
+ * localStorage es best-effort (no fatal si la cuota está llena).
  * @param {string} dataUrl
  */
 export function setOperatorPhotoLocal(dataUrl) {
-  if (!hasStorage()) return;
-  try {
-    if (dataUrl) {
-      window.localStorage.setItem(PHOTO_STORAGE_KEY, dataUrl);
-    } else {
-      window.localStorage.removeItem(PHOTO_STORAGE_KEY);
-    }
-  } catch (e) {
-    // QuotaExceeded u otro — no romper la UI; la foto simplemente no persiste.
-    console.warn('[operatorPhoto] setOperatorPhotoLocal:', e);
-  }
-  emitOperatorUpdate(dataUrl || '');
+  const value = dataUrl || '';
+  _memoryPhoto = value;
+  _hydratePromise = Promise.resolve(value); // ya está hidratado con este valor
+  // Durable primero (IndexedDB) — fire-and-forget, no-throw.
+  const durableWrite = value
+    ? localforage.setItem(PHOTO_STORAGE_KEY, value)
+    : localforage.removeItem(PHOTO_STORAGE_KEY);
+  Promise.resolve(durableWrite)
+    .catch((e) => console.warn('[operatorPhoto] persist localforage falló:', e?.message || e));
+  // Espejo síncrono best-effort (pinta sin flash en la próxima recarga).
+  writeMirror(value);
+  emitOperatorUpdate(value);
 }
 
 /**
@@ -297,10 +407,21 @@ export async function setOperatorPhotoFromFile(file) {
   return dataUrl;
 }
 
+/**
+ * Resetea el estado en memoria del módulo (cache + hidratación). Solo para
+ * tests: en prod el módulo vive lo que dure la pestaña.
+ */
+export function _resetForTests() {
+  _memoryPhoto = null;
+  _hydratePromise = null;
+}
+
 export const __test = {
   FARMOS_PHOTO_PREFIX,
   latestPhotoEndpoint,
   dataUrlToBlob,
   readSyncMeta,
   writeSyncMeta,
+  readMirror,
+  writeMirror,
 };

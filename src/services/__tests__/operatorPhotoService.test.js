@@ -7,6 +7,7 @@
  * cross-device) con apiService/authService mockeados.
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import localforage from 'localforage';
 
 // Mocks de red: apiService (POST/GET FarmOS + descarga con auth-retry).
 const sendToFarmOS = vi.fn();
@@ -28,6 +29,8 @@ import {
   uploadToFarmOS,
   loadFromFarmOS,
   setOperatorPhotoFromFile,
+  hydrateOperatorPhoto,
+  _resetForTests as _resetPhotoForTests,
   __test,
 } from '../operatorPhotoService.js';
 import { setActiveTenantId, _resetForTests } from '../tenantContext.js';
@@ -71,9 +74,11 @@ function installCanvasMocks({ width = 1024, height = 768 } = {}) {
 }
 
 describe('operatorPhotoService', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     localStorage.clear();
+    await localforage.clear(); // el store DURABLE (IndexedDB) también persiste entre tests
     _resetForTests();
+    _resetPhotoForTests(); // limpia el cache en memoria del módulo de foto
     sendToFarmOS.mockReset();
     fetchFromFarmOS.mockReset();
     fetchWithAuthRetry.mockReset();
@@ -120,6 +125,91 @@ describe('operatorPhotoService', () => {
       expect(localStorage.getItem(PHOTO_SYNC_META_KEY)).toBeNull();
       expect(handler.mock.calls.at(-1)[0].detail).toEqual({ key: PHOTO_STORAGE_KEY, value: '' });
       window.removeEventListener('chagra:operator-update', handler);
+    });
+  });
+
+  // ── BUG FIX 2026-07-05: durabilidad en IndexedDB (localforage) ────────────
+  // La foto YA NO depende del cubo frágil de localStorage (~5 MB, síncrono, se
+  // llena y revienta en silencio con QuotaExceededError → la foto "desaparecía"
+  // al recargar). La fuente de verdad pasó a localforage/IndexedDB; el espejo de
+  // localStorage es best-effort. Estos tests prueban que la foto SOBREVIVE una
+  // recarga aunque el espejo síncrono se pierda, y que migra fotos legadas.
+  describe('durabilidad en IndexedDB (localforage)', () => {
+    it('setOperatorPhotoLocal persiste en el store durable (localforage)', async () => {
+      setOperatorPhotoLocal(SAMPLE_DATA_URL);
+      // La escritura durable es fire-and-forget: esperamos a que asiente.
+      await vi.waitFor(async () =>
+        expect(await localforage.getItem(PHOTO_STORAGE_KEY)).toBe(SAMPLE_DATA_URL),
+      );
+    });
+
+    it('la foto sobrevive una "recarga" aunque el espejo de localStorage se pierda', async () => {
+      setOperatorPhotoLocal(SAMPLE_DATA_URL);
+      await vi.waitFor(async () =>
+        expect(await localforage.getItem(PHOTO_STORAGE_KEY)).toBe(SAMPLE_DATA_URL),
+      );
+
+      // Simula recarga con el espejo síncrono VACÍO (cuota llena la sesión
+      // pasada, o el usuario limpió localStorage): SOLO IndexedDB tiene la foto.
+      _resetPhotoForTests();
+      localStorage.removeItem(PHOTO_STORAGE_KEY);
+
+      // El primer render pinta '' (espejo vacío) pero dispara la hidratación…
+      expect(getOperatorPhoto()).toBe('');
+      // …y al hidratar desde IndexedDB, la foto vuelve (antes se perdía).
+      expect(await hydrateOperatorPhoto()).toBe(SAMPLE_DATA_URL);
+      expect(getOperatorPhoto()).toBe(SAMPLE_DATA_URL);
+    });
+
+    it('hidratar emite chagra:operator-update para que TopBar/ProfileScreen re-lean', async () => {
+      await localforage.setItem(PHOTO_STORAGE_KEY, SAMPLE_DATA_URL);
+      _resetPhotoForTests();
+      const handler = vi.fn();
+      window.addEventListener('chagra:operator-update', handler);
+
+      await hydrateOperatorPhoto();
+
+      expect(handler).toHaveBeenCalled();
+      expect(handler.mock.calls.at(-1)[0].detail).toEqual({
+        key: PHOTO_STORAGE_KEY, value: SAMPLE_DATA_URL,
+      });
+      window.removeEventListener('chagra:operator-update', handler);
+    });
+
+    it('MIGRA una foto legada que vivía SOLO en localStorage al store durable', async () => {
+      // Usuario de una versión previa: la foto está solo en localStorage.
+      localStorage.setItem(PHOTO_STORAGE_KEY, SAMPLE_DATA_URL);
+      _resetPhotoForTests();
+      expect(await localforage.getItem(PHOTO_STORAGE_KEY)).toBeNull();
+
+      const hydrated = await hydrateOperatorPhoto();
+
+      expect(hydrated).toBe(SAMPLE_DATA_URL);
+      // Quedó copiada a IndexedDB (durable de ahí en más).
+      expect(await localforage.getItem(PHOTO_STORAGE_KEY)).toBe(SAMPLE_DATA_URL);
+    });
+
+    it('si el espejo localStorage revienta por cuota, la foto igual persiste en IndexedDB', async () => {
+      const spy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+        const e = new Error('QuotaExceededError');
+        e.name = 'QuotaExceededError';
+        throw e;
+      });
+
+      // NO revienta la UI (el bug original se tragaba el error y perdía la foto)…
+      expect(() => setOperatorPhotoLocal(SAMPLE_DATA_URL)).not.toThrow();
+      // …y el cache en memoria refleja la foto de inmediato (render sin flash).
+      expect(getOperatorPhoto()).toBe(SAMPLE_DATA_URL);
+
+      spy.mockRestore();
+
+      // Durabilidad: aunque el espejo falló, IndexedDB SÍ guardó la foto.
+      await vi.waitFor(async () =>
+        expect(await localforage.getItem(PHOTO_STORAGE_KEY)).toBe(SAMPLE_DATA_URL),
+      );
+      // Y tras "recargar", se restaura desde IndexedDB.
+      _resetPhotoForTests();
+      expect(await hydrateOperatorPhoto()).toBe(SAMPLE_DATA_URL);
     });
   });
 
