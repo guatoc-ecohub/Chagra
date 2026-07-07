@@ -25,7 +25,7 @@ describe('Catalog Count - Task #189', () => {
     // 2026-07-04: +50 especies comestibles (frutales/hortalizas/tubérculos/
     // aromáticas relevantes para Colombia, incluido el lichi/Litchi chinensis
     // notado como faltante) → 530 → 580. Ver scripts/add-50-comestibles.mjs.
-    expect(catalog.species.length).toBe(580);
+    expect(catalog.species.length).toBe(581);
   });
 
   it('should include Carludovica palmata (palma de iraca) - Task #iraca-seed', () => {
@@ -63,7 +63,7 @@ describe('Catalog Count - Task #189', () => {
     // El conteo declarado DEBE coincidir con el array real.
     // 2026-06-25: 263 → 530 tras ampliación grounded grafo→catálogo.
     // 2026-07-04: 530 → 580 tras +50 especies comestibles.
-    expect(catalog._subset_meta.species_count).toBe(580);
+    expect(catalog._subset_meta.species_count).toBe(581);
     expect(catalog._subset_meta.species_count).toBe(catalog.species.length);
   });
   
