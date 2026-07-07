@@ -20,6 +20,51 @@ const BM25_PARAMS = {
 const BM25_WEIGHT = 1.0;
 const SEMANTIC_WEIGHT = 1.5;
 
+// ── Kill-switch REVERSIBLE de la capa SEMÁNTICA (arctic-embed2) ────────────
+// La semántica (similitud coseno sobre embeddings snowflake-arctic-embed2) va
+// ACTIVADA por defecto en producción — es el comportamiento aprobado: mejora
+// la resolución folk (papa criolla↔Solanum phureja, broca↔Hypothenemus,
+// roya↔Hemileia) frente al puro BM25 / scorer literal.
+//
+// `VITE_RAG_SEMANTIC` es el corte de emergencia: cualquier valor "apagado"
+// explícito ('0'|'false'|'off'|'no') degrada a BM25-only sin tocar código
+// (rebuild con la env var, sin deploy de lógica). Ausente/vacío/cualquier otro
+// valor ⇒ ON (default seguro para prod). Ver .env.example y docs/RAG.md.
+//
+// Por qué existe el flag y no es "siempre on": la mitad SEMÁNTICA embebe la
+// query EN VIVO vía Ollama (embedQuery). Si el embedder arctic-embed2 (4.6 GB)
+// co-reside con granite3.3:8b (~7.2 GB) en la M6000 (12 GiB) puede disparar un
+// cudaMalloc OOM que tumba al agente. La mitigación de runtime es
+// keep_alive:'0s' (ver embedQuery); este flag es el kill-switch si aún así hay
+// presión de VRAM en prod.
+const SEMANTIC_DISABLED_VALUES = new Set(['0', 'false', 'off', 'no']);
+
+/**
+ * ¿Está activa la capa semántica del RAG híbrido? Default ON (producción).
+ * Solo un valor de apagado explícito en `VITE_RAG_SEMANTIC` la desactiva.
+ * Exportada para que un caller/telemetría pueda short-circuitear sin correr
+ * el retrieve (mismo patrón que `isSidecarEnabled` en sidecarClient.js).
+ * @returns {boolean}
+ */
+export function isSemanticEnabled() {
+  try {
+    // `import.meta.env` lo inyecta Vite en build/runtime, pero jsconfig no
+    // incluye los tipos de `vite/client`, así que `ImportMeta` no declara
+    // `.env` (mismo caso que las ~93 lecturas VITE_* del repo). Cast local a
+    // any: irreducible sin cambiar la config global de tipos; el
+    // optional-chaining ya degrada a undefined en node (benches/tests).
+    const meta = /** @type {any} */ (import.meta);
+    const raw = meta?.env?.VITE_RAG_SEMANTIC;
+    if (raw === false) return false;
+    if (typeof raw === 'string' && SEMANTIC_DISABLED_VALUES.has(raw.trim().toLowerCase())) {
+      return false;
+    }
+    return true;
+  } catch (_) {
+    return true;
+  }
+}
+
 let corpusCache = null;
 let avgDocLen = 0;
 
@@ -468,6 +513,13 @@ async function retrieveInternal(query, topK) {
       score,
     }));
 
+  // Kill-switch reversible: con la semántica apagada (VITE_RAG_SEMANTIC =
+  // 0/false/off/no) NO cargamos embeddings ni embebemos la query en vivo →
+  // BM25-only. Corte de emergencia anti-OOM sin tocar código.
+  if (!isSemanticEnabled()) {
+    return bm25Top.slice(0, topK);
+  }
+
   const embeddings = await loadEmbeddings();
   if (!embeddings) {
     return bm25Top.slice(0, topK);
@@ -565,17 +617,26 @@ async function loadEmbeddings() {
  * Embebe una query via Ollama (POST /api/ollama/api/embeddings).
  * Si falla (sin red, modelo caído), retorna null → fallback a BM25 solo.
  *
- * `options.num_gpu: 0` fuerza el embed a CPU (P0 warm, audit 2026-06-28): evita
- * que el embedder co-resida en la GPU del chat y dispare OOM.
+ * MITIGACIÓN OOM (verificada EN VIVO 2026-07-06 — memoria
+ * reference-num-gpu-0-no-fuerza-cpu-ollama-024): `keep_alive: '0s'` hace que
+ * Ollama DESCARGUE arctic-embed2 (4.6 GB) apenas termina cada embed, y así lo
+ * serializa contra la generación de granite3.3:8b (~7.2 GB) en la M6000
+ * (12 GiB) — evita la co-residencia sostenida que dispara cudaMalloc OOM y
+ * tumba al agente. `options.num_gpu:0` se conserva pero en Ollama 0.24 NO
+ * fuerza CPU (arctic carga igual en GPU aunque `ollama ps` reporte "100% CPU");
+ * por eso la mitigación REAL es keep_alive:'0s', no num_gpu:0.
  */
 async function embedQuery(queryText) {
   try {
     const res = await fetchWithAuthRetry('/api/ollama/api/embeddings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      // num_gpu:0 → el embedder corre en CPU, NO en la M6000 (12 GiB). La
-      // co-residencia embedder + granite3.3:8b puede disparar un cudaMalloc
-      // OOM y tumbar el runner compartido.
+      // keep_alive:'0s' → Ollama descarga arctic-embed2 (4.6 GB) apenas
+      // termina el embed, serializándolo contra granite3.3:8b (~7.2 GB) para
+      // que NO co-residan sostenidamente en la M6000 (12 GiB) y disparen un
+      // cudaMalloc OOM que tumbe al runner compartido del agente. num_gpu:0 se
+      // conserva pero en Ollama 0.24 NO fuerza CPU (verificado en vivo) — la
+      // mitigación que sí funciona es keep_alive:'0s'.
       //
       // FIX P0 (auditoría RAG 2026-07-02): el commit anterior de esta rama
       // había puesto `model: 'nomic-embed-text'` aquí, con el comentario (falso)
@@ -597,6 +658,8 @@ async function embedQuery(queryText) {
       body: JSON.stringify({
         model: 'snowflake-arctic-embed2',
         prompt: queryText,
+        // Descarga arctic tras el embed (anti-OOM por co-residencia con granite).
+        keep_alive: '0s',
         options: { num_gpu: 0 },
       }),
       signal: AbortSignal.timeout(TOOL_TIMEOUT_MS),
