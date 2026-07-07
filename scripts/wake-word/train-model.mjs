@@ -52,22 +52,53 @@ function startStaticServer(repoRoot) {
   const publicRoot = join(repoRoot, 'public');
   return new Promise((resolve) => {
     const server = http.createServer((req, res) => {
-      const urlPath = decodeURIComponent(req.url.split('?')[0]);
-      const roots = urlPath.startsWith('/scripts/') ? [repoRoot] : [publicRoot, repoRoot];
-      for (const root of roots) {
-        try {
-          const filePath = join(root, urlPath);
-          if (!filePath.startsWith(root)) continue;
-          const data = readFileSync(filePath);
-          const ct = MIME[extname(filePath)] || 'application/octet-stream';
-          res.writeHead(200, { 'Content-Type': ct, 'Access-Control-Allow-Origin': '*' });
-          res.end(data);
+      try {
+        // Sanitizar URL: prevenir path traversal y log injection
+        const rawUrl = req.url.split('?')[0];
+        const sanitizedUrl = rawUrl.replace(/[^\w\-./~]/g, ''); // Solo caracteres seguros
+        const urlPath = decodeURIComponent(sanitizedUrl);
+
+        // Validar que no contenga path traversal
+        if (urlPath.includes('..')) {
+          console.error('[static 403] Potencial path traversal:', urlPath.replace(/[^\w\-./]/g, '_'));
+          res.writeHead(403);
+          res.end('forbidden');
           return;
-        } catch { /* probar el siguiente root */ }
+        }
+
+        const roots = urlPath.startsWith('/scripts/') ? [repoRoot] : [publicRoot, repoRoot];
+        for (const root of roots) {
+          try {
+            const filePath = join(root, urlPath);
+            // Validación adicional: asegurar que el archivo está dentro del root
+            const resolvedPath = filePath;
+            if (!resolvedPath.startsWith(root)) continue;
+
+            // Validar extensión del archivo (solo servir tipos seguros)
+            const ext = extname(filePath);
+            if (!MIME[ext]) {
+              console.error('[static 403] Extensión no permitida:', ext);
+              res.writeHead(403);
+              res.end('forbidden');
+              return;
+            }
+
+            const data = readFileSync(filePath);
+            const ct = MIME[ext] || 'application/octet-stream';
+            res.writeHead(200, { 'Content-Type': ct, 'Access-Control-Allow-Origin': '*' });
+            res.end(data);
+            return;
+          } catch { /* probar el siguiente root */ }
+        }
+        // Log seguro - sanitizar la URL antes de logear
+        console.error('[static 404]', urlPath.replace(/[^\w\-./]/g, '_'));
+        res.writeHead(404);
+        res.end('not found');
+      } catch (error) {
+        console.error('[static server error]', error.message);
+        res.writeHead(500);
+        res.end('server error');
       }
-      console.error('[static 404]', req.url);
-      res.writeHead(404);
-      res.end('not found: ' + req.url);
     });
     server.listen(0, '127.0.0.1', () => resolve(server));
   });
@@ -144,10 +175,17 @@ async function main() {
       i++;
       const tSample0 = Date.now();
       const b64 = wavToBase64(m.file);
+
+      // Sanitizar label para prevenir XSS - solo permitir caracteres alfanuméricos básicos
+      const sanitizedLabel = String(m.label).replace(/[^\w\s-áéíóúñü]/g, '').slice(0, 50);
+
       await withTimeout(
-        page.evaluate(({ label, b64 }) => window.trainAPI.collectFromBase64(label, b64), { label: m.label, b64 }),
+        page.evaluate(({ label, b64 }) => window.trainAPI.collectFromBase64(label, b64), {
+          label: sanitizedLabel,
+          b64
+        }),
         20000,
-        `collectFromBase64(${m.label} / ${m.file})`,
+        `collectFromBase64(${sanitizedLabel} / ${m.file})`,
       );
       console.log(`  [${i}/${training.length}] ${m.label.padEnd(16)} ${m.file} — ${Date.now() - tSample0}ms`);
     }
