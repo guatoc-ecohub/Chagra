@@ -1,0 +1,3 @@
+## Fuerza cache clean tras re-run de workflows
+
+GitHub Actions cacheó los checks antiguos. Commit dummy para invalidar.
