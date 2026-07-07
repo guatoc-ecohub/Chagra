@@ -290,6 +290,27 @@ declare global {
     confidence: number;
     alternatives?: Array<string | { name?: string; common_name_es?: string }>;
   }
+
+  // ───────────────────────────────────────────────
+  // Modo campo / wake-word (#2088) — TF.js self-hosted vía <script> globals
+  // (ver src/services/wakeWordService.js). `any` a propósito: son namespaces
+  // de terceros cargados dinámicamente, no vale la pena tipar su API completa.
+  // ───────────────────────────────────────────────
+
+  interface Window {
+    tf?: any;
+    speechCommands?: any;
+  }
+
+  interface Navigator {
+    /** API experimental (Battery Status), sin tipos en lib.dom.d.ts. */
+    getBattery?: () => Promise<{
+      level: number;
+      charging: boolean;
+      addEventListener: (type: string, cb: () => void) => void;
+      removeEventListener: (type: string, cb: () => void) => void;
+    }>;
+  }
 }
 
 // ───────────────────────────────────────────────

@@ -9,6 +9,7 @@ import './styles/juego-pulido.css'
 import './styles/clima-atmosfera.css'
 import App from './App.jsx'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { ModoCampoProvider } from './hooks/ModoCampoContext'
 import { syncManager } from './services/syncManager'
 import { useLogStore } from './store/useLogStore'
 import { fetchFromFarmOS } from './services/apiService'
@@ -109,7 +110,9 @@ if (typeof window !== 'undefined') {
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ErrorBoundary>
-      <App />
+      <ModoCampoProvider>
+        <App />
+      </ModoCampoProvider>
     </ErrorBoundary>
   </StrictMode>,
 )
