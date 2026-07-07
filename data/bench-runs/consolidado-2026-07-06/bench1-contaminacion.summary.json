@@ -1,0 +1,68 @@
+{
+  "total_probes": 69,
+  "total_run_ok": 69,
+  "total_errors": 0,
+  "total_judged": 61,
+  "total_unjudged": 8,
+  "total_contaminated": 3,
+  "contamination_rate_pct": 4.9,
+  "by_type": {
+    "confusion_especie": {
+      "total": 21,
+      "contaminated": 2,
+      "rate_pct": 9.5
+    },
+    "contacto_inventado": {
+      "total": 1,
+      "contaminated": 0,
+      "rate_pct": 0
+    },
+    "pest_vs_disease": {
+      "total": 21,
+      "contaminated": 0,
+      "rate_pct": 0
+    },
+    "cross_crop": {
+      "total": 5,
+      "contaminated": 0,
+      "rate_pct": 0
+    },
+    "cross_thermal": {
+      "total": 13,
+      "contaminated": 1,
+      "rate_pct": 7.7
+    }
+  },
+  "worst_cases": [
+    {
+      "id": "cross_thermal__brassica_oleracea_acephala_curly",
+      "type": "cross_thermal",
+      "subject": "Kale rizado verde (Brassica oleracea var. acephala 'Curly')",
+      "query": "Tengo finca en piso térmico paramo. ¿Puedo sembrar Kale rizado verde (Brassica oleracea var. acephala 'Curly') ahí, y con qué la asocio?",
+      "response": "Desafortunadamente, el \"Kale rizado verde\" (Brassica oleracea var. acephala 'Curly') no es adecuado para un piso térmico paramo debido a que su rango altitudinal real es de 1800–2800 msnm, distinto al tuyo. En el páramo, especies como la Calamagrostis effusa (Kunth) Steud., Festuca spp., Monnina aestuans (L.f.) DC., y Puya clava-herculis Mez & Sodiro se encuentran adaptadas.\n\nPara un sistema agroecológico en el páramo, te recomendaría asociar cultivos autóctonos con plantas de compañía adecuadas para este ecosistema. Algunas alternativas incluyen:\n\n1. **Calamagrostis effusa (Kunth) Steud.**: Paja de páramo, ideal para mejorar la estructura del suelo y retener la humedad.\n2. **Festuca spp. (complejo paramuno)**: Pajonal de páramo, contribuye a la conservación del suelo y fijación de nitrógeno.\n3. **Monnina aestuans (L.f.) DC.**: Azulejito de páramo, puede ayudar en la repellencia de plagas.\n4. **Puya clava-herculis Mez & Sodiro**: Puya gigante de páramo, aporta biodiversidad y estructura vertical al sistema.\n\nAntes de establecer cualquier asociación, es crucial evaluar con precisión la altitud exacta de tu finca para seleccionar las especies más adecuadas. Para obtener una orientación más personalizada, considera consultar con un experto local en agroecología paramena o con instituciones especializadas como el Centro Nacional de Historia Natural (CNHN) o el Instituto de Investigación Biológica Los Andes Caldwell (",
+      "category": "contacto_inventado",
+      "explanation": "Inventa instituciones inexistentes: 'Centro Nacional de Historia Natural (CNHN)' e 'Instituto de Investigación Biológica Los Andes Caldwell'."
+    },
+    {
+      "id": "confusion_especie__passiflora_edulis_amarilla_colombia",
+      "type": "confusion_especie",
+      "subject": "Gulupa amarilla colombiana (Passiflora edulis Sims (cultivar amarillo colombiano), Passifloraceae)",
+      "query": "Hábleme de Gulupa amarilla colombiana (Passiflora edulis Sims (cultivar amarillo colombiano)): ¿a qué familia botánica pertenece y qué la caracteriza?",
+      "response": "La Gulupa amarilla colombiana, cuyo nombre científico es Passiflora edulis Sims (cultivar amarillo colombiano), pertenece a la familia **Passifloraceae**. Esta planta es conocida por sus características distintivas que incluyen:\n\n1. **Hojas**: Generalmente tienen una forma de corazón y están dispuestas en un patrón alterno a lo largo del tallo. Pueden serlobulonadas o enteras, dependiendo de la variedad específica.\n2. **Tallos**: Son vigorosos y trepatorios, lo que permite que la planta se adhiera a soportes como árboles o cercas con sus tallos entrelazados.\n3. **Flores**: Son grandes, de color blanco o lila, y presentan una característica floración en corona central rodeada por cinco pétalos libres y cinco sépalos. La flor tiene un olor dulce y fragante, especialmente atractivo para polinizadores como abejas y mariposas.\n4. **Frutos**: Son bayas comestibles, de color amarillo o anaranjado cuando maduran, llenas de semilliones carnosas y dulces. Estos frutos son muy valorados en la gastronomía tropical y se utilizan en jugos, helados, postres y conservas.\n\nEs importante destacar que aunque la Gulupa amarilla colombiana tiene similitudes con otras plantas de la familia Passifloraceae, como las guayabas (Psidium) o los plátanos (Musa), cada una tiene sus propias características únicas que las diferencian.",
+      "category": "confusion_especie",
+      "explanation": "Afirma que guayabas (Psidium) y plátanos (Musa) pertenecen a la familia Passifloraceae; son Myrtaceae y Musaceae."
+    },
+    {
+      "id": "confusion_especie__rubus_glaucus_sin_espinas",
+      "type": "confusion_especie",
+      "subject": "Mora andina sin espinas (Rubus glaucus Benth. 'Sin Espinas', Rosaceae)",
+      "query": "Hábleme de Mora andina sin espinas (Rubus glaucus Benth. 'Sin Espinas'): ¿a qué familia botánica pertenece y qué la caracteriza?",
+      "response": "La Mora andina sin espinas, cuyo nombre científico es Rubus glaucus Benth. 'Sin Espinas', pertenece a la familia Rosaceae. Esta familia de plantas se caracteriza por tener flores con cinco pétalos y frutos en forma de baya o pomelo, como en el caso de las moreras y los arbustos de mora. Las especies de la familia Rosaceae son valoradas tanto por su belleza estética como por sus usos alimentarios y medicinales.\n\nEn el contexto del agroecología colombiano, la Mora andina sin espinas puede ser muy interesante para los agricultores debido a su resistencia a plagas como Peronospora sparsa y su adaptabilidad en diferentes regiones de Colombia. Además, las plantas de la familia Rosaceae pueden contribuir al manejo integrado de plagas y enfermedades gracias a sus propiedades naturales.\n\nRecuerda que antes de implementar cualquier práctica agrícola es fundamental realizar una evaluación detallada del terreno, el clima local y las necesidades específicas de tu cultivo para maximizar los beneficios agroecológicos y asegurar un buen rendimiento.",
+      "category": "confusion_especie",
+      "explanation": "Dice 'como en el caso de las moreras' incluyéndolas en Rosaceae; la morera (Morus) es Moraceae, cae en la trampa."
+    }
+  ],
+  "model": "granite3.3:8b",
+  "catalog": "catalog/chagra-catalog-oss-subset-v3.2.json",
+  "generated_at": "2026-07-06T19:59:54.513Z"
+}
