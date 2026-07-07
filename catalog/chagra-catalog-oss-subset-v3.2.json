@@ -28,7 +28,7 @@
     "subset_name": "oss-subset-263",
     "subset_version": "v3.2",
     "source_file": "chagra-catalog-oss-subset-v3.2.json (canonical, self-contained shipping seed)",
-    "species_count": 580,
+    "species_count": 581,
     "sources_count": 71,
     "biopreparados_count": 36,
     "license": "CC-BY-NC-SA 4.0",
@@ -30546,6 +30546,53 @@
       "tracking_mode": "individual",
       "cultivar": false,
       "validation_level": "claude_draft"
+    },
+    {
+      "id": "psidium_guajava",
+      "nombre_comun": "Guayaba",
+      "nombre_comunes_regionales": [
+        "guayaba común",
+        "guayaba manzana",
+        "guayaba pera",
+        "guayabo"
+      ],
+      "nombre_cientifico": "Psidium guajava L.",
+      "familia_botanica": "Myrtaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1500,
+        "max_absoluto": 1800
+      },
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "radiacion": "sol_pleno",
+      "tracking_mode": "individual",
+      "plagas_criticas": [
+        "Conotrachelus psidii",
+        "Ceratitis capitata",
+        "Anastrepha fraterculus"
+      ],
+      "valor_pedagogico": "La guayaba (Psidium guajava L., Myrtaceae) es un frutal nativo del trópico americano, ampliamente cultivado y naturalizado en Colombia; la provincia de Vélez (Santander) y la hoya del río Suárez son la región guayabera emblemática y base del bocadillo veleño. Crece en piso cálido a templado (0-1800 msnm), a sol pleno y en suelos bien drenados. Su plaga insignia en Colombia es el picudo de la guayaba (Conotrachelus psidii Marshall), cuyas larvas barrenan el fruto; se maneja con nematodos entomopatógenos (Heterorhabditis bacteriophora / Steinernema; Delgado 2012, UNAL) y prácticas culturales (recolección y destrucción de frutos caídos). También la atacan las moscas de la fruta (Anastrepha spp. y Ceratitis capitata).",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-manual-frutales-tropicales",
+        "agrosavia-mip-picudo-guayaba-santander"
+      ],
+      "cultivar": false,
+      "validation_level": "claude_draft"
     }
   ],
   "sources": [
@@ -31318,6 +31365,15 @@
       "titulo": "Valor nutricional del kikuyo (Cenchrus clandestinus) y respuestas productivas en ganadería lechera andina",
       "año": 2008,
       "tier": "A"
+    },
+    {
+      "id": "agrosavia-mip-picudo-guayaba-santander",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA (Corporación Colombiana de Investigación Agropecuaria, antes Corpoica)",
+      "titulo": "Manejo integrado del picudo de la guayaba (Conotrachelus psidii Marshall) en Santander",
+      "institucion": "AGROSAVIA — Corporación Colombiana de Investigación Agropecuaria",
+      "tier": "A",
+      "url": "https://redcol.minciencias.gov.co/Record/Agrosavia2_c70ed384746b15638fd7c1d1b174b515"
     }
   ],
   "biopreparados": [

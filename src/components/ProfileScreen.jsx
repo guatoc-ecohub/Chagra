@@ -137,6 +137,22 @@ export default function ProfileScreen({ onBack, onHome }) {
   const [photoBusy, setPhotoBusy] = useState(false);
   const photoInputRef = useRef(null);
 
+  // La foto vive en IndexedDB (localforage) y se hidrata async. El primer
+  // render puede pintar el placeholder antes de que responda IndexedDB (o si el
+  // espejo síncrono de localStorage quedó vacío por cuota llena). Al resolver la
+  // hidratación —o al subir/quitar la foto en otra pestaña— se emite
+  // `chagra:operator-update`; re-leemos para reflejarla sin recargar. Mismo
+  // patrón que TopBar (misma foto, misma fuente).
+  useEffect(() => {
+    const refresh = () => setPhotoData(getOperatorPhoto());
+    window.addEventListener('chagra:operator-update', refresh);
+    window.addEventListener('storage', refresh);
+    return () => {
+      window.removeEventListener('chagra:operator-update', refresh);
+      window.removeEventListener('storage', refresh);
+    };
+  }, []);
+
   const handlePhotoSelected = async (e) => {
     setPhotoError(null);
     const file = e.target.files?.[0];

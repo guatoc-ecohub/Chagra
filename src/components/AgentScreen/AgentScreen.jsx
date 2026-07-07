@@ -574,21 +574,25 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // normal NO debe re-disparar el prompt.
   useEffect(() => {
     if (!initialContext) return;
-    const { prefilledPrompt, sourceLabel, sourceUrl, alertContext, autoSend, fromVoice } = initialContext;
+    const { prefilledPrompt, prompt, sourceLabel, sourceUrl, alertContext, autoSend, fromVoice } = initialContext;
     let autoSendTimer = null;
-    if (typeof prefilledPrompt === 'string' && prefilledPrompt.trim().length > 0) {
+    // Alias defensivo: varias pantallas de mundo pasaban la clave `prompt`
+    // (SemillaScreen, PlatanoBanano, Poscosecha, Almacenamiento, Compost,
+    // SaludSuelo…) creyendo que prellenaban el input, pero solo se leía
+    // `prefilledPrompt` → el prompt se descartaba. Aceptar ambas repara el hueco.
+    const seed = prefilledPrompt ?? prompt;
+    if (typeof seed === 'string' && seed.trim().length > 0) {
       if (autoSend) {
         // 2026-07-05: widget "Chagra está escuchando" (escucha manos libres,
         // caso guantes/manos embarradas). La pregunta llega YA transcrita por
-        // Whisper → se envía sola sin que el operador toque la pantalla, y si
-        // vino por voz activamos TTS para que la respuesta se HABLE por
-        // Kokoro (Whisper → agente → Kokoro, punta a punta).
+        // Whisper → se envía sola sin tocar la pantalla, y si vino por voz
+        // activamos TTS para que la respuesta se HABLE por Kokoro.
         if (fromVoice && !ttsEnabled) setTtsEnabled(true);
         autoSendTimer = setTimeout(() => {
-          handleSubmit(prefilledPrompt, { fromVoice: Boolean(fromVoice) });
+          handleSubmit(seed, { fromVoice: Boolean(fromVoice) });
         }, 250);
       } else {
-        setInputText(prefilledPrompt);
+        setInputText(seed);
       }
     }
     if (sourceUrl || sourceLabel || alertContext) {
