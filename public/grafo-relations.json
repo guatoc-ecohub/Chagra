@@ -15,12 +15,13 @@
       "threat_status",
       "conservation_status"
     ],
-    "species_count": 103,
-    "relation_count": 947,
+    "species_count": 108,
+    "relation_count": 1297,
     "note": "Datos derivados del grafo AGE. NO contiene infraestructura ni secretos.",
     "pest_synonyms_count": 162,
     "pest_labels_count": 78,
-    "pest_synonyms_added": "2026-06-25"
+    "pest_synonyms_added": "2026-06-25",
+    "frutales_tuberculos_fable_enriched": "2026-07-06"
   },
   "_pest_synonyms": {
     "gota": "Tizon tardio / gota (papa y tomate)",
@@ -721,11 +722,24 @@
       "nombre_cientifico": "Ipomoea batatas (L.) Lam.",
       "nombres_comunes": [
         "apichu",
-        "camote"
+        "camote",
+        "batata"
       ],
       "establishment_means": "introducido",
       "threat_status": "DATA_DEFICIENT",
-      "conservation_status": "cultivo_comun"
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "phaseolus_vulgaris",
+        "zea_mays"
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Picudo de la batata (gorgojo del camote)",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        }
+      ]
     },
     "passiflora_edulis_morada": {
       "nombre_comun": "Gulupa",
@@ -1078,6 +1092,9 @@
       "establishment_means": "introducido",
       "threat_status": "NOT_EVALUATED",
       "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "eugenia_stipitata"
+      ],
       "biopreparados": [
         {
           "id": "trampa_melaza_atrayente",
@@ -1121,6 +1138,195 @@
           "controladores": [
             "Mariquita roja"
           ]
+        },
+        {
+          "plaga": "Mosca del Mediterráneo",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Picudo de los cítricos / barrenador",
+          "controladores": [
+            "Nematodos entomopatógenos (Steinernema carpocapsae)",
+            "Nematodos entomopatógenos (Steinernema feltiae)",
+            "Nematodos entomopatógenos (Heterorhabditis bacteriophora)"
+          ]
+        },
+        {
+          "plaga": "Antracnosis de frutales",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Trichoderma spp",
+            "Bacteria antagonista (biofungicida)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Minador de la hoja de cítricos",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Piojo blanco o coma de los cítricos",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Ácaro tostador de los cítricos",
+          "controladores": [
+            "Depredador de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Mosca de la fruta (Anastrepha spp.)",
+          "controladores": [
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Ácaro rojo de los cítricos",
+          "controladores": [
+            "Depredador de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "mosca sudamericana de la fruta",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Cochinilla harinosa de los cítricos",
+          "controladores": [
+            "Mariquita destructora de cochinillas",
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Nematodo espiral del café y frutales",
+          "controladores": [
+            "Hongo nematófago (paecilomyces)",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Mosca blanca algodonosa de los cítricos",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Leprosis de los cítricos (ácaro vector)",
+          "controladores": [
+            "Depredador de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Escama roja de los cítricos y frutales",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Cochinilla rosada del hibisco",
+          "controladores": [
+            "Mariquita destructora de cochinillas",
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Cochinilla acanalada de los cítricos",
+          "controladores": [
+            "Depredador de control biológico",
+            "Mariquita destructora de cochinillas"
+          ]
+        },
+        {
+          "plaga": "Áfido pardo de los cítricos (vector de la tristeza)",
+          "controladores": [
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)",
+            "Mariquita roja"
+          ]
+        },
+        {
+          "plaga": "Escama blanca del aguacate",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Escama verde de los cítricos",
+          "controladores": [
+            "Hongo entomopatógeno (verticillium)"
+          ]
+        },
+        {
+          "plaga": "Mancha negra de los cítricos",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Alternaria del fruto del cítrico",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Pudrición peduncular del mango y aguacate",
+          "controladores": [
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Bicho de cesto o canasta (plaga de ornamentales y frutales)",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)"
+          ]
+        },
+        {
+          "plaga": "Comején de los árboles frutales",
+          "controladores": [
+            "Hongo verde entomopatógeno",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Ácaro blanco tropical",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Ácaro depredador (neoseiulus)"
+          ]
+        },
+        {
+          "plaga": "Nemátodo de los cítricos (decaimiento lento)",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Hongo nematófago (paecilomyces)"
+          ]
+        },
+        {
+          "plaga": "Hormiga arriera (zompopa)",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno"
+          ]
+        },
+        {
+          "plaga": "Picudo de los cítricos",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
         }
       ]
     },
@@ -1163,7 +1369,10 @@
       "nombre_cientifico": "Rubus glaucus Benth.",
       "nombres_comunes": [
         "mora castellana",
-        "mora de castilla"
+        "mora de castilla",
+        "mora andina",
+        "mora de Castilla",
+        "zarzamora"
       ],
       "establishment_means": "introducido",
       "threat_status": "NOT_EVALUATED",
@@ -1199,7 +1408,8 @@
           "controladores": [
             "Microorganismo de control biológico (DR-MIP-1)",
             "Bacteria antagonista (biofungicida)",
-            "Hongo antagonista del suelo"
+            "Hongo antagonista del suelo",
+            "Hongo antagonista (trichoderma)"
           ]
         },
         {
@@ -1284,6 +1494,22 @@
           "controladores": [
             "Hongo antagonista del suelo",
             "Hongo nematófago (paecilomyces)",
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Trichoderma spp",
+            "Pochonia chlamydosporia"
+          ]
+        },
+        {
+          "plaga": "sclerotinia_sclerotiorum",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Hongo antagonista del suelo",
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Marchitez del lulo y solanáceas por Fusarium",
+          "controladores": [
             "Microorganismo de control biológico (DR-MIP-1)"
           ]
         }
@@ -1389,16 +1615,21 @@
       "nombres_comunes": [
         "guacamota",
         "casabe (planta)",
-        "mandioca"
+        "mandioca",
+        "casabe",
+        "yuca brava"
       ],
       "establishment_means": "introducido",
       "threat_status": "NOT_EVALUATED",
       "conservation_status": "cultivo_comun",
       "compatible_with": [
+        "borojoa_sorbilis",
+        "cajanus_cajan",
         "cucurbita_maxima",
         "cucurbita_moschata",
         "musa_paradisiaca",
         "phaseolus_vulgaris",
+        "plukenetia_volubilis",
         "zea_mays"
       ],
       "biopreparados": [
@@ -1498,6 +1729,86 @@
           "plaga": "Bacteriosis de la yuca (añublo bacteriano)",
           "controladores": [
             "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Mosca blanca (complejo)",
+          "controladores": [
+            "Hongo entomopatogeno (Isaria/Cordyceps)",
+            "Encarsia spp",
+            "Parasitoide de control biológico",
+            "Depredador de control biológico",
+            "Avispita parasitoide de mosca blanca",
+            "Hongo entomopatógeno (beauveria)",
+            "Parasitoide de mosca blanca (eretmocerus)",
+            "Crisopa neotropical",
+            "Crisopa / león de áfidos",
+            "Hongo entomopatógeno (verticillium)",
+            "Hongo entomopatógeno (paecilomyces)",
+            "Ácaro depredador (amblyseius)"
+          ]
+        },
+        {
+          "plaga": "Arana roja / acaro de dos manchas (polifago: tomate, frijol, etc.)",
+          "controladores": [
+            "Ácaro depredador (amblyseius)",
+            "Depredador de control biológico",
+            "Chinche pirata (orius)",
+            "Crisopa / león de áfidos",
+            "Ácaro depredador de araña roja",
+            "Hongo entomopatógeno (beauveria)",
+            "Ácaro depredador (neoseiulus)"
+          ]
+        },
+        {
+          "plaga": "Lorito verde (chicharrita) del fríjol y yuca",
+          "controladores": [
+            "Hongo verde entomopatógeno",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Nematodo agallador",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Hongo antagonista del suelo",
+            "Hongo nematófago (paecilomyces)",
+            "Trichoderma spp",
+            "Pochonia chlamydosporia"
+          ]
+        },
+        {
+          "plaga": "Piojo harinoso de la yuca",
+          "controladores": [
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Pudrición basal por Fusarium en yuca",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Virus del mosaico de la yuca (transmitido por mosca blanca)",
+          "controladores": [
+            "Depredador de control biológico"
+          ]
+        },
+        {
+          "plaga": "Nematodo lesionador",
+          "controladores": [
+            "Hongo nematófago (paecilomyces)",
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Hormiga arriera (zompopa)",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno"
           ]
         }
       ]
@@ -1666,11 +1977,13 @@
       "nombre_comun": "Papa criolla",
       "nombre_cientifico": "Solanum phureja Juz. & Bukasov",
       "nombres_comunes": [
-        "chaucha"
+        "chaucha",
+        "papa criolla"
       ],
       "conservation_status": "cultivo_comun",
       "compatible_with": [
         "alnus_acuminata",
+        "mirabilis_expansa",
         "urtica_dioica",
         "zea_mays"
       ],
@@ -1692,7 +2005,9 @@
           "controladores": [
             "Hongo entomopatógeno (beauveria)",
             "Hongo verde entomopatógeno",
-            "Microorganismo de control biológico (DR-MIP-1)"
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Nematodos entomopatógenos (Steinernema carpocapsae)",
+            "Nematodos entomopatógenos (Steinernema feltiae)"
           ]
         },
         {
@@ -1930,7 +2245,8 @@
       "nombre_cientifico": "Solanum betaceum Cav.",
       "nombres_comunes": [
         "tomate de palo",
-        "tamarillo"
+        "tamarillo",
+        "chupitá"
       ],
       "establishment_means": "introducido",
       "threat_status": "DATA_DEFICIENT",
@@ -1968,6 +2284,12 @@
             "Bacteria antagonista (biofungicida)",
             "Trichoderma spp",
             "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Marchitez del lulo y solanáceas por Fusarium",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
           ]
         }
       ]
@@ -2021,7 +2343,10 @@
       "establishment_means": "introducido",
       "threat_status": "NOT_EVALUATED",
       "compatible_with": [
-        "pisum_sativum_andina"
+        "lupinus_mutabilis",
+        "pisum_sativum_andina",
+        "tropaeolum_tuberosum",
+        "tropaeolum_tuberosum_mashua"
       ],
       "biopreparados": [
         {
@@ -2273,7 +2598,9 @@
           "controladores": [
             "Hongo entomopatógeno (beauveria)",
             "Hongo verde entomopatógeno",
-            "Microorganismo de control biológico (DR-MIP-1)"
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Nematodos entomopatógenos (Steinernema carpocapsae)",
+            "Nematodos entomopatógenos (Steinernema feltiae)"
           ]
         },
         {
@@ -2326,7 +2653,9 @@
           "controladores": [
             "Hongo antagonista del suelo",
             "Hongo nematófago (paecilomyces)",
-            "Microorganismo de control biológico (DR-MIP-1)"
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Trichoderma spp",
+            "Pochonia chlamydosporia"
           ]
         },
         {
@@ -2341,7 +2670,99 @@
             "Hongo entomopatógeno (beauveria)",
             "Hongo verde entomopatógeno",
             "Hongo entomopatógeno de chizas",
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Nematodos entomopatógenos (Steinernema carpocapsae)",
+            "Nematodos entomopatógenos (Steinernema feltiae)",
+            "Nematodos entomopatógenos (Heterorhabditis bacteriophora)"
+          ]
+        },
+        {
+          "plaga": "Nematodo quiste de la papa",
+          "controladores": [
+            "Hongo nematófago (paecilomyces)",
             "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Psílido de la papa",
+          "controladores": [
+            "Crisopa / león de áfidos",
+            "Hongo entomopatógeno (beauveria)",
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Minador de la hoja en papa y hortalizas",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "pulgón verde durazno",
+          "controladores": [
+            "Coccinella septempunctata",
+            "Avispa parasitoide de pulgones",
+            "Crisopa neotropical",
+            "Hongo entomopatógeno (beauveria)",
+            "Crisopa / león de áfidos"
+          ]
+        },
+        {
+          "plaga": "nematodo dorado papa",
+          "controladores": [
+            "Hongo nematófago (paecilomyces)",
+            "Pochonia chlamydosporia"
+          ]
+        },
+        {
+          "plaga": "brevicoryne_brassicae",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Avispa parasitoide de pulgones",
+            "Avispa parasitoide de áfidos"
+          ]
+        },
+        {
+          "plaga": "trozador",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Bt (bacteria bioinsecticida)"
+          ]
+        },
+        {
+          "plaga": "chisa",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Nematodos entomopatógenos (Steinernema carpocapsae)",
+            "Nematodos entomopatógenos (Steinernema feltiae)",
+            "Nematodos entomopatógenos (Heterorhabditis bacteriophora)"
+          ]
+        },
+        {
+          "plaga": "globodera_pallida",
+          "controladores": [
+            "Hongo nematófago (paecilomyces)",
+            "Pochonia chlamydosporia"
+          ]
+        },
+        {
+          "plaga": "Tizón temprano de la papa",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Pudrición basal por Sclerotium",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Bacteria antagonista (biofungicida)"
+          ]
+        },
+        {
+          "plaga": "Ácaro blanco tropical",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Ácaro depredador (neoseiulus)"
           ]
         }
       ]
@@ -2947,6 +3368,182 @@
           "controladores": [
             "Mariquita roja"
           ]
+        },
+        {
+          "plaga": "Mosca del Mediterráneo",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Picudo de los cítricos / barrenador",
+          "controladores": [
+            "Nematodos entomopatógenos (Steinernema carpocapsae)",
+            "Nematodos entomopatógenos (Steinernema feltiae)",
+            "Nematodos entomopatógenos (Heterorhabditis bacteriophora)"
+          ]
+        },
+        {
+          "plaga": "Antracnosis de frutales",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Trichoderma spp",
+            "Bacteria antagonista (biofungicida)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Minador de la hoja de cítricos",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Piojo blanco o coma de los cítricos",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Ácaro tostador de los cítricos",
+          "controladores": [
+            "Depredador de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Ácaro rojo de los cítricos",
+          "controladores": [
+            "Depredador de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "mosca sudamericana de la fruta",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Cochinilla harinosa de los cítricos",
+          "controladores": [
+            "Mariquita destructora de cochinillas",
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Nematodo espiral del café y frutales",
+          "controladores": [
+            "Hongo nematófago (paecilomyces)",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Mosca blanca algodonosa de los cítricos",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Leprosis de los cítricos (ácaro vector)",
+          "controladores": [
+            "Depredador de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Escama roja de los cítricos y frutales",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Cochinilla rosada del hibisco",
+          "controladores": [
+            "Mariquita destructora de cochinillas",
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Cochinilla acanalada de los cítricos",
+          "controladores": [
+            "Depredador de control biológico",
+            "Mariquita destructora de cochinillas"
+          ]
+        },
+        {
+          "plaga": "Áfido pardo de los cítricos (vector de la tristeza)",
+          "controladores": [
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)",
+            "Mariquita roja"
+          ]
+        },
+        {
+          "plaga": "Escama blanca del aguacate",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Escama verde de los cítricos",
+          "controladores": [
+            "Hongo entomopatógeno (verticillium)"
+          ]
+        },
+        {
+          "plaga": "Mancha negra de los cítricos",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Alternaria del fruto del cítrico",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Pudrición peduncular del mango y aguacate",
+          "controladores": [
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Bicho de cesto o canasta (plaga de ornamentales y frutales)",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)"
+          ]
+        },
+        {
+          "plaga": "Comején de los árboles frutales",
+          "controladores": [
+            "Hongo verde entomopatógeno",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Ácaro blanco tropical",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Ácaro depredador (neoseiulus)"
+          ]
+        },
+        {
+          "plaga": "Nemátodo de los cítricos (decaimiento lento)",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Hongo nematófago (paecilomyces)"
+          ]
+        },
+        {
+          "plaga": "Hormiga arriera (zompopa)",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno"
+          ]
         }
       ]
     },
@@ -3050,7 +3647,9 @@
           "controladores": [
             "Hongo antagonista del suelo",
             "Hongo nematófago (paecilomyces)",
-            "Microorganismo de control biológico (DR-MIP-1)"
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Trichoderma spp",
+            "Pochonia chlamydosporia"
           ]
         }
       ]
@@ -3070,15 +3669,101 @@
       "nombre_cientifico": "Mangifera indica L.",
       "nombres_comunes": [
         "mango de azucar",
-        "manga"
+        "manga",
+        "mango",
+        "mancera"
       ],
       "establishment_means": "introducido",
       "threat_status": "DATA_DEFICIENT",
       "conservation_status": "naturalizada",
+      "compatible_with": [
+        "chrysophyllum_cainito",
+        "mammea_americana",
+        "melicoccus_bijugatus",
+        "spondias_dulcis",
+        "stylosanthes_guianensis"
+      ],
       "biopreparados": [
         {
           "id": "lechada_cal_troncos",
           "nombre": "Lechada de cal (encalado de troncos)"
+        }
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Mosca del Mediterráneo",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Antracnosis de frutales",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Trichoderma spp",
+            "Bacteria antagonista (biofungicida)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Mosca de la fruta (Anastrepha spp.)",
+          "controladores": [
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "mosca sudamericana de la fruta",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Cochinilla rosada del hibisco",
+          "controladores": [
+            "Mariquita destructora de cochinillas",
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Ácaro de las yemas del mango",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Ácaro depredador (amblyseius)"
+          ]
+        },
+        {
+          "plaga": "Oidio o mildeo polvoso",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Trips del cacao",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Chinche pirata (orius)"
+          ]
+        },
+        {
+          "plaga": "Mancha bacteriana del mango",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)"
+          ]
+        },
+        {
+          "plaga": "Pudrición peduncular del mango y aguacate",
+          "controladores": [
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Comején de los árboles frutales",
+          "controladores": [
+            "Hongo verde entomopatógeno",
+            "Hongo entomopatógeno (beauveria)"
+          ]
         }
       ]
     },
@@ -3663,11 +4348,20 @@
       "nombre_cientifico": "Persea americana Mill.",
       "nombres_comunes": [
         "cura",
-        "palta"
+        "palta",
+        "aguacatillo"
       ],
       "establishment_means": "introducido",
       "threat_status": "LEAST_CONCERN",
       "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "arachis_pintoi",
+        "melicoccus_bijugatus",
+        "spondias_dulcis"
+      ],
+      "antagonist_of": [
+        "eucalyptus_globulus"
+      ],
       "biopreparados": [
         {
           "id": "bacillus_subtilis_foliar",
@@ -3700,6 +4394,10 @@
         {
           "id": "trichoderma_harzianum_suelo",
           "nombre": "Trichoderma harzianum (aplicación al suelo)"
+        },
+        {
+          "id": "micorrizas_arbusculares",
+          "nombre": "Micorrizas arbusculares (inoculante de HMA)"
         }
       ],
       "pest_controllers": [
@@ -3708,7 +4406,8 @@
           "controladores": [
             "Bacteria antagonista (biofungicida)",
             "Hongo antagonista del suelo",
-            "Hongo antagonista (trichoderma)"
+            "Hongo antagonista (trichoderma)",
+            "Microorganismo de control biológico (DR-MIP-1)"
           ]
         },
         {
@@ -3731,6 +4430,82 @@
           "controladores": [
             "Bt (bacteria bioinsecticida)",
             "Avispita parasitoide de huevos"
+          ]
+        },
+        {
+          "plaga": "Antracnosis del tomate de árbol",
+          "controladores": [
+            "Trichoderma spp",
+            "Bacteria antagonista (biofungicida)",
+            "Hongo antagonista del suelo",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "ácaro del café",
+          "controladores": [
+            "Ácaro depredador (neoseiulus)",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Escama roja de los cítricos y frutales",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Escama blanca del aguacate",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Trips del cacao",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Chinche pirata (orius)"
+          ]
+        },
+        {
+          "plaga": "Barrenador del aguacate",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno"
+          ]
+        },
+        {
+          "plaga": "chinche de la chamusquina",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno",
+            "Depredador de control biológico"
+          ]
+        },
+        {
+          "plaga": "Pudrición peduncular del mango y aguacate",
+          "controladores": [
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Ácaro del aguacate",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Depredador de control biológico"
+          ]
+        },
+        {
+          "plaga": "Bicho de cesto o canasta (plaga de ornamentales y frutales)",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)"
+          ]
+        },
+        {
+          "plaga": "Comején de los árboles frutales",
+          "controladores": [
+            "Hongo verde entomopatógeno",
+            "Hongo entomopatógeno (beauveria)"
           ]
         }
       ]
@@ -3848,6 +4623,367 @@
       "compatible_with": [
         "daucus_carota_subsp_sativus",
         "lactuca_sativa_capitata"
+      ]
+    },
+    "psidium_guajava": {
+      "nombre_comun": "Guayaba",
+      "nombre_cientifico": "Psidium guajava L.",
+      "establishment_means": "introducido",
+      "threat_status": "LEAST_CONCERN",
+      "compatible_with": [
+        "eugenia_uniflora"
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Mosca del Mediterráneo",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Mosca de la fruta (Anastrepha spp.)",
+          "controladores": [
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "mosca sudamericana de la fruta",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Picudo de la guayaba",
+          "controladores": [
+            "Nematodos entomopatógenos (Steinernema carpocapsae)",
+            "Nematodos entomopatógenos (Heterorhabditis bacteriophora)"
+          ]
+        },
+        {
+          "plaga": "Cochinilla rosada del hibisco",
+          "controladores": [
+            "Mariquita destructora de cochinillas",
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        }
+      ]
+    },
+    "citrus_reticulata": {
+      "nombre_comun": "Mandarina",
+      "nombre_cientifico": "Citrus reticulata Blanco",
+      "nombres_comunes": [
+        "mandarino"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "biopreparados": [
+        {
+          "id": "trampa_melaza_atrayente",
+          "nombre": "Trampa de melaza (cebo atrayente líquido)"
+        },
+        {
+          "id": "sal_epsom_foliar",
+          "nombre": "Sal de Epsom foliar (sulfato de magnesio)"
+        },
+        {
+          "id": "emulsion_nim",
+          "nombre": "Aceite/emulsión de nim (neem)"
+        },
+        {
+          "id": "aceite_jabon_anticochinilla",
+          "nombre": "Aceite mineral/vegetal + jabón (anti-cochinilla y escamas)"
+        },
+        {
+          "id": "lechada_cal_troncos",
+          "nombre": "Lechada de cal (encalado de troncos)"
+        },
+        {
+          "id": "caldo_ceniza_jabon_concentrado",
+          "nombre": "Caldo ceniza-jabón concentrado (anti-minador/cochinilla)"
+        }
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Psílido asiático de los cítricos",
+          "controladores": [
+            "Hongo entomopatógeno (paecilomyces)",
+            "Mariquita roja",
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo entomopatogeno (Isaria/Cordyceps)",
+            "Hongo verde entomopatógeno"
+          ]
+        },
+        {
+          "plaga": "Huanglongbing (HLB) / dragón amarillo de los cítricos",
+          "controladores": [
+            "Mariquita roja"
+          ]
+        },
+        {
+          "plaga": "Mosca del Mediterráneo",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Picudo de los cítricos / barrenador",
+          "controladores": [
+            "Nematodos entomopatógenos (Steinernema carpocapsae)",
+            "Nematodos entomopatógenos (Steinernema feltiae)",
+            "Nematodos entomopatógenos (Heterorhabditis bacteriophora)"
+          ]
+        },
+        {
+          "plaga": "Antracnosis de frutales",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Trichoderma spp",
+            "Bacteria antagonista (biofungicida)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Minador de la hoja de cítricos",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Piojo blanco o coma de los cítricos",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Ácaro tostador de los cítricos",
+          "controladores": [
+            "Depredador de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Ácaro rojo de los cítricos",
+          "controladores": [
+            "Depredador de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "mosca sudamericana de la fruta",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Cochinilla harinosa de los cítricos",
+          "controladores": [
+            "Mariquita destructora de cochinillas",
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Nematodo espiral del café y frutales",
+          "controladores": [
+            "Hongo nematófago (paecilomyces)",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Mosca blanca algodonosa de los cítricos",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Leprosis de los cítricos (ácaro vector)",
+          "controladores": [
+            "Depredador de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Escama roja de los cítricos y frutales",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Cochinilla rosada del hibisco",
+          "controladores": [
+            "Mariquita destructora de cochinillas",
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Cochinilla acanalada de los cítricos",
+          "controladores": [
+            "Depredador de control biológico",
+            "Mariquita destructora de cochinillas"
+          ]
+        },
+        {
+          "plaga": "Áfido pardo de los cítricos (vector de la tristeza)",
+          "controladores": [
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)",
+            "Mariquita roja"
+          ]
+        },
+        {
+          "plaga": "Escama blanca del aguacate",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Escama verde de los cítricos",
+          "controladores": [
+            "Hongo entomopatógeno (verticillium)"
+          ]
+        },
+        {
+          "plaga": "Mancha negra de los cítricos",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Alternaria del fruto del cítrico",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Pudrición peduncular del mango y aguacate",
+          "controladores": [
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Bicho de cesto o canasta (plaga de ornamentales y frutales)",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)"
+          ]
+        },
+        {
+          "plaga": "Comején de los árboles frutales",
+          "controladores": [
+            "Hongo verde entomopatógeno",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Ácaro blanco tropical",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Ácaro depredador (neoseiulus)"
+          ]
+        },
+        {
+          "plaga": "Nemátodo de los cítricos (decaimiento lento)",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Hongo nematófago (paecilomyces)"
+          ]
+        },
+        {
+          "plaga": "Hormiga arriera (zompopa)",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno"
+          ]
+        }
+      ]
+    },
+    "dioscorea_rotundata": {
+      "nombre_comun": "Ñame blanco africano",
+      "nombre_cientifico": "Dioscorea rotundata Poir.",
+      "nombres_comunes": [
+        "name espino",
+        "ñame blanco"
+      ],
+      "conservation_status": "naturalizada",
+      "pest_controllers": [
+        {
+          "plaga": "Antracnosis de frutales",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Trichoderma spp",
+            "Bacteria antagonista (biofungicida)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        }
+      ]
+    },
+    "dioscorea_alata": {
+      "nombre_comun": "Ñame blanco",
+      "nombre_cientifico": "Dioscorea alata L.",
+      "nombres_comunes": [
+        "name criollo",
+        "name diamante"
+      ],
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "pest_controllers": [
+        {
+          "plaga": "Antracnosis de frutales",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Trichoderma spp",
+            "Bacteria antagonista (biofungicida)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        }
+      ]
+    },
+    "carica_papaya": {
+      "nombre_comun": "Papaya",
+      "nombre_cientifico": "Carica papaya L.",
+      "nombres_comunes": [
+        "papayo",
+        "mamon (papaya)"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "DATA_DEFICIENT",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "borojoa_sorbilis",
+        "mammea_americana",
+        "melicoccus_bijugatus",
+        "spondias_dulcis"
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Nematodo agallador",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Hongo antagonista del suelo",
+            "Hongo nematófago (paecilomyces)",
+            "Trichoderma spp",
+            "Pochonia chlamydosporia"
+          ]
+        },
+        {
+          "plaga": "Mosca de la fruta de la papaya",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Antracnosis de frutales",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Trichoderma spp",
+            "Bacteria antagonista (biofungicida)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        }
       ]
     }
   }
