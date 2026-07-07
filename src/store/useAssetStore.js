@@ -14,6 +14,29 @@ import { MSG } from '../config/messages';
 /** @typedef {import('../types').ChagraSpecies} ChagraSpecies */
 /** @typedef {import('../types').ChagraBiopreparado} ChagraBiopreparado */
 
+// Mapa canónico assetType → clave del estado en memoria. Incluir `land`
+// (Fase 17 / croquis de lotes): antes el fallback mandaba `land` al bucket
+// `materials`, así que un lote creado de forma optimista NO aparecía en
+// `lands` (ni en el mapa) hasta un re-hydrate desde IndexedDB. Ese re-hydrate
+// SÍ lo colocaba bien porque `commitOptimisticUpdate` persiste con el
+// `asset_type` correcto — el bug era solo en el reflejo en memoria. Ver
+// services/loteService.js, que apoya el CRUD de lotes en estas acciones.
+const ASSET_BUCKET = {
+  plant: 'plants',
+  structure: 'structures',
+  equipment: 'equipment',
+  material: 'materials',
+  land: 'lands',
+};
+
+/**
+ * Resuelve la clave del store para un assetType. Fallback conservador a
+ * `materials` para tipos desconocidos (comportamiento histórico).
+ * @param {string} assetType
+ * @returns {'plants'|'structures'|'equipment'|'materials'|'lands'}
+ */
+const bucketKey = (assetType) => ASSET_BUCKET[assetType] || 'materials';
+
 /**
  * Store global de Activos (Zustand)
  * Patrón Offline-First: memoria (Zustand) ← IndexedDB ← FarmOS API
@@ -248,10 +271,7 @@ const useAssetStore = create((set, get) => ({
     try {
       await assetCache.commitOptimisticUpdate([{ assetType, asset }], pendingTxs);
       set((state) => {
-        const key = assetType === 'plant' ? 'plants'
-          : assetType === 'structure' ? 'structures'
-            : assetType === 'equipment' ? 'equipment'
-              : 'materials';
+        const key = bucketKey(assetType);
         return { [key]: [...state[key], asset] };
       });
       // emptyDbDetector: huella para post-clear-cache detection.
@@ -287,10 +307,7 @@ const useAssetStore = create((set, get) => ({
       const updates = assets.map((asset) => ({ assetType, asset }));
       await assetCache.commitOptimisticUpdate(updates, pendingTxs);
       set((state) => {
-        const key = assetType === 'plant' ? 'plants'
-          : assetType === 'structure' ? 'structures'
-            : assetType === 'equipment' ? 'equipment'
-              : 'materials';
+        const key = bucketKey(assetType);
         return { [key]: [...state[key], ...assets] };
       });
       navigator.serviceWorker?.controller?.postMessage({ type: 'SYNC_REQUESTED' });
@@ -305,10 +322,7 @@ const useAssetStore = create((set, get) => ({
     try {
       await assetCache.commitOptimisticUpdate([{ assetType, asset }], pendingTxs);
       set((state) => {
-        const key = assetType === 'plant' ? 'plants'
-          : assetType === 'structure' ? 'structures'
-            : assetType === 'equipment' ? 'equipment'
-              : 'materials';
+        const key = bucketKey(assetType);
         return { [key]: state[key].map((a) => a.id === asset.id ? asset : a) };
       });
       navigator.serviceWorker?.controller?.postMessage({ type: 'SYNC_REQUESTED' });
@@ -347,10 +361,7 @@ const useAssetStore = create((set, get) => ({
       });
 
       set((state) => {
-        const key = assetType === 'plant' ? 'plants'
-          : assetType === 'structure' ? 'structures'
-            : assetType === 'equipment' ? 'equipment'
-              : 'materials';
+        const key = bucketKey(assetType);
         return { [key]: state[key].filter((a) => a.id !== assetId) };
       });
       navigator.serviceWorker?.controller?.postMessage({ type: 'SYNC_REQUESTED' });
