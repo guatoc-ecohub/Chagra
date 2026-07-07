@@ -27,6 +27,9 @@ import {
   validateAmb28_taxonomicConfusion,
   validateAmb29_speciesInBiopreparados,
   validateAmb31_crossContaminationInsectoPatogeno,
+  GENUS_FAMILY_CANONICAL,
+  extractGenus,
+  validateAmb32_genusFamilyConsistency,
 } from '../validate-catalog.mjs';
 
 describe('AMB-25 — autoridad canónica estricta', () => {
@@ -694,5 +697,111 @@ describe('AMB-31 — contaminación cruzada insecto ↔ patógeno', () => {
     const errors = validateAmb31_crossContaminationInsectoPatogeno(catalog);
     expect(errors).toHaveLength(2);
     expect(errors.every(e => e.includes('roya'))).toBe(true);
+  });
+});
+
+describe('AMB-32 — consistencia género → familia (confusables)', () => {
+  it('mapa canónico cubre los géneros confusables de los benches', () => {
+    for (const [genus, fam] of [
+      ['psidium', 'Myrtaceae'],       // guayaba
+      ['acca', 'Myrtaceae'],          // feijoa
+      ['musa', 'Musaceae'],           // plátano/banano
+      ['morus', 'Moraceae'],          // morera
+      ['passiflora', 'Passifloraceae'], // gulupa/maracuyá/granadilla/curuba
+      ['rubus', 'Rosaceae'],          // mora andina/frambuesa
+      ['fragaria', 'Rosaceae'],       // fresa
+      ['persea', 'Lauraceae'],        // aguacate
+    ]) {
+      expect(GENUS_FAMILY_CANONICAL.get(genus)).toBe(fam);
+    }
+  });
+
+  it('extractGenus obtiene el género tolerando híbridos y autoridad', () => {
+    expect(extractGenus('Psidium guajava L.')).toBe('psidium');
+    expect(extractGenus('Musa × paradisiaca L.')).toBe('musa');
+    expect(extractGenus("Fragaria × ananassa 'Monterrey'")).toBe('fragaria');
+    expect(extractGenus('Passiflora edulis f. edulis Sims')).toBe('passiflora');
+    expect(extractGenus('Rubus glaucus Benth.')).toBe('rubus');
+    expect(extractGenus('')).toBe('');
+    expect(extractGenus(null)).toBe('');
+  });
+
+  it('acepta las asignaciones correctas sin error', () => {
+    const catalog = {
+      species: [
+        { id: 'psidium_guajava', nombre_cientifico: 'Psidium guajava L.', familia_botanica: 'Myrtaceae' },
+        { id: 'musa_paradisiaca', nombre_cientifico: 'Musa × paradisiaca L.', familia_botanica: 'Musaceae' },
+        { id: 'morus_alba', nombre_cientifico: 'Morus alba L.', familia_botanica: 'Moraceae' },
+        { id: 'passiflora_ligularis', nombre_cientifico: 'Passiflora ligularis Juss.', familia_botanica: 'Passifloraceae' },
+        { id: 'rubus_glaucus', nombre_cientifico: 'Rubus glaucus Benth.', familia_botanica: 'Rosaceae' },
+      ],
+    };
+    expect(validateAmb32_genusFamilyConsistency(catalog)).toEqual([]);
+  });
+
+  it('caza guayaba (Psidium) metida en Passifloraceae', () => {
+    const catalog = {
+      species: [
+        { id: 'psidium_guajava', nombre_cientifico: 'Psidium guajava L.', familia_botanica: 'Passifloraceae' },
+      ],
+    };
+    const errors = validateAmb32_genusFamilyConsistency(catalog);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('psidium_guajava');
+    expect(errors[0]).toContain('Myrtaceae');
+    expect(errors[0]).toContain('Passifloraceae');
+  });
+
+  it('caza plátano (Musa) metido en Passifloraceae', () => {
+    const catalog = {
+      species: [
+        { id: 'musa_paradisiaca', nombre_cientifico: 'Musa × paradisiaca L.', familia_botanica: 'Passifloraceae' },
+      ],
+    };
+    const errors = validateAmb32_genusFamilyConsistency(catalog);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('Musaceae');
+  });
+
+  it('caza morera (Morus) colada en Rosaceae', () => {
+    const catalog = {
+      species: [
+        { id: 'morus_alba', nombre_cientifico: 'Morus alba L.', familia_botanica: 'Rosaceae' },
+      ],
+    };
+    const errors = validateAmb32_genusFamilyConsistency(catalog);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('Moraceae');
+  });
+
+  it('NO confunde mora andina (Rubus, Rosaceae) con morera (Morus, Moraceae)', () => {
+    const catalog = {
+      species: [
+        { id: 'rubus_glaucus', nombre_cientifico: 'Rubus glaucus Benth.', familia_botanica: 'Rosaceae' },
+        { id: 'morus_nigra', nombre_cientifico: 'Morus nigra L.', familia_botanica: 'Moraceae' },
+      ],
+    };
+    expect(validateAmb32_genusFamilyConsistency(catalog)).toEqual([]);
+  });
+
+  it('ignora géneros no confusables fuera del mapa (p.ej. Mora Fabaceae, nato)', () => {
+    const catalog = {
+      species: [
+        // "Mora" (Fabaceae, nato) NO es "Morus" — no debe dispararse
+        { id: 'mora_megistosperma', nombre_cientifico: 'Mora megistosperma (Pittier) Britton & Rose', familia_botanica: 'Fabaceae' },
+        { id: 'solanum_betaceum', nombre_cientifico: 'Solanum betaceum Cav.', familia_botanica: 'Solanaceae' },
+      ],
+    };
+    expect(validateAmb32_genusFamilyConsistency(catalog)).toEqual([]);
+  });
+
+  it('ignora species sin nombre_cientifico o sin familia_botanica', () => {
+    const catalog = {
+      species: [
+        { id: 'sin_sci', familia_botanica: 'Myrtaceae' },
+        { id: 'sin_fam', nombre_cientifico: 'Psidium guajava L.' },
+      ],
+    };
+    expect(validateAmb32_genusFamilyConsistency(catalog)).toEqual([]);
   });
 });
