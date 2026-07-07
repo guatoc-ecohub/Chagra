@@ -1,0 +1,3 @@
+## Force re-run de workflows tras checks zombies
+
+Los checks zombies no se actualizaron con re-runs. Commit dummy para forzar workflows completamente nuevos y limpiar el estado del PR #2145.
