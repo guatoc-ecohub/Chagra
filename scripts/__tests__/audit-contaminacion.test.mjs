@@ -36,6 +36,7 @@ import {
   runAudit,
   buildReport,
   fingerprintOf,
+  loadGraphSnapshot,
   loadBaseline,
   diffAgainstBaseline,
   formatReportText,
@@ -482,5 +483,45 @@ describe('runAudit — gate de regresion sobre catalogo/grafo real', () => {
       );
     }
     expect(nuevos).toHaveLength(0);
+  });
+});
+
+// =============================================================================
+// Guard de integridad del snapshot de grafo — regresión del export CSV roto
+// que empacaba id|nombre_comun|nombre_cientifico|familia_botanica|category
+// dentro del string `id` de cada nodo Species (delimitador `"|"`, resto null).
+// Con el bug, ningún id de Species resolvía contra los targets de las aristas
+// AFFECTS y la clase de auditoría `cruce_cultivo/grafo` quedaba muda.
+// =============================================================================
+describe('integridad de nodos Species del snapshot de grafo', () => {
+  const snap = loadGraphSnapshot();
+  const species = (snap.nodes || []).filter((n) => (n.labels || []).includes('Species'));
+
+  it('hay Species y ninguno arrastra el delimitador "|" del export roto', () => {
+    expect(species.length).toBeGreaterThan(0);
+    for (const n of species) {
+      expect(n.id).not.toMatch(/"\|"/);
+    }
+  });
+
+  it('cada Species tiene id en forma de slug y propiedades separadas coherentes', () => {
+    for (const n of species) {
+      expect(n.id).toMatch(/^[a-z0-9_]+$/);
+      const p = n.properties || {};
+      expect(p.id).toBe(n.id);
+      for (const campo of ['nombre_comun', 'nombre_cientifico', 'familia_botanica', 'category']) {
+        expect(campo in p).toBe(true);
+        expect(p[campo] === null || typeof p[campo] === 'string').toBe(true);
+      }
+    }
+  });
+
+  it('los ids de Species resuelven contra los targets de las aristas AFFECTS', () => {
+    const ids = new Set(species.map((n) => n.id));
+    const affectsTargets = (snap.edges || [])
+      .filter((e) => e.label === 'AFFECTS')
+      .map((e) => e.target);
+    const resueltos = affectsTargets.filter((t) => ids.has(t));
+    expect(resueltos.length).toBeGreaterThan(0);
   });
 });
