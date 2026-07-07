@@ -182,6 +182,7 @@ const GLOSARIO_PLAGAS = [
   [['mosca'], '- mosca del aguacate = Heilipus lauri'],
   [['mosca'], '- mosca de la fruta = Anastrepha spp. / Ceratitis capitata'],
   [['picudo'], '- picudo del plátano = Cosmopolites sordidus'],
+  [['picudo del algodón', 'picudo del algodon', 'picudo algodonero', 'anthonomus grandis', 'gorgojo del algodon'], '- picudo del algodón (gorgojo del algodonero) = Anthonomus grandis — plaga cuarentenaria reglamentada por el ICA en Colombia; ataca SOLO algodón (Gossypium spp.)'],
   [['roya'], '- roya del café = Hemileia vastatrix'],
   [['sigatoka'], '- sigatoka negra del plátano = Mycosphaerella fijiensis'],
   [['antracnosis'], '- antracnosis = Colletotrichum spp.'],
@@ -609,6 +610,16 @@ REGLA CONTINUIDAD DE HILO: conversación en curso → PROHIBIDO re-presentarte o
     sections.push(`REGLA ESPECIAL ANTI-CONFUSIÓN TOMATES: "tomate" sin más contexto = Solanum lycopersicum (hortaliza). "Tomate de árbol"/"tomate de palo" = Solanum betaceum (frutal perenne, ESPECIE DISTINTA). NO los mezcles.`);
   }
 
+  if (_mentionsAny(mention, ['picudo', 'anthonomus', 'diaprepes', 'cosmopolites', 'rhynchophorus', 'gorgojo'])) {
+    sections.push(`REGLA ESPECIAL ANTI-CONFUSIÓN PICUDOS (Curculionidae): "picudo" NO es una sola especie. Existen varios picudos/gorgojos en cultivos diferentes, y confundirlos es alucinación grave:
+- picudo del plátano/banano = Cosmopolites sordidus (ataca Musa)
+- picudo del algodón (gorgojo del algodonero) = Anthonomus grandis — plaga cuarentenaria reglamentada por el ICA en Colombia; ataca SOLO algodón (Gossypium spp.)
+- picudo de los cítricos = Diaprepes abbreviatus (ataca cítricos, larvas en raíces)
+- picudo de las palmas (transmisor del anillo rojo) = Rhynchophorus palmarum (ataca coco, palma de aceite, chontaduro)
+- picudo del aguacate (mosca del aguacate) = Heilipus lauri (Curculionidae aunque se llame "mosca")
+REGLA: si el usuario dice solo "picudo" sin especificar cultivo, pide cuál cultivo antes de asignar el binomio. Si el cultivo está claro, usa el binomio EXACTO de arriba para ese cultivo. NUNCA digas que Anthonomus grandis "no es cuarentenaria" — SÍ lo es en Colombia (ICA). NUNCA sustituyas un picudo por otro aunque suenen parecidos.`);
+  }
+
   const regional = GLOSARIO_REGIONAL.filter(([keys]) => _mentionsAny(mention, keys)).map(([, l]) => l);
   if (regional.length > 0) {
     sections.push(`Glosario regionalismos campesinos (Boyacá / Caldas / Choachí):\n${regional.join('\n')}`);
@@ -705,6 +716,9 @@ export const analyzeQuery = (q) => {
     'mosca del aguacate': 'Heilipus lauri',
     'mosca de la fruta': 'Anastrepha spp. / Ceratitis capitata',
     'picudo del plátano': 'Cosmopolites sordidus',
+    'picudo del algodón': 'Anthonomus grandis (plaga cuarentenaria reglamentada ICA, ataca SOLO algodón Gossypium spp.)',
+    'picudo del algodon': 'Anthonomus grandis (plaga cuarentenaria reglamentada ICA, ataca SOLO algodón Gossypium spp.)',
+    'picudo algodonero': 'Anthonomus grandis (plaga cuarentenaria reglamentada ICA, ataca SOLO algodón Gossypium spp.)',
     'roya del café': 'Hemileia vastatrix (hongo, royas)',
     roya: 'Hemileia vastatrix',
     'sigatoka negra': 'Mycosphaerella fijiensis (hongo, plátano/banano)',
