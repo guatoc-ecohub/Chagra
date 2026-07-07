@@ -54,11 +54,15 @@ describe('MundoCultivosHub — portada del mundo cultivos', () => {
         expect(screen.getByTestId('calc-por-dia')).toHaveTextContent('4.5');
     });
 
-    test('el agente queda a la mano al pie', () => {
+    test('el agente queda a la mano al pie, con contexto del mundo', () => {
         const onNavigate = vi.fn();
         render(<MundoCultivosHub onBack={vi.fn()} onNavigate={onNavigate} />);
         fireEvent.click(screen.getByTestId('mch-agente'));
-        expect(onNavigate).toHaveBeenCalledWith('agente');
+        // Arranca el prompt sembrado con el tema (editable en el input, no se envía solo).
+        expect(onNavigate).toHaveBeenCalledWith(
+            'agente',
+            expect.objectContaining({ prefilledPrompt: expect.stringContaining('cultivos') }),
+        );
     });
 });
 
