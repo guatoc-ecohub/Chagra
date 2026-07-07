@@ -10,16 +10,46 @@ const THRESHOLDS = {
   totalMax:      25 * 1024 * 1024,
 };
 
+// MODO CAMPO / wake-word "hola chagra" (#2088): los libs de TF.js vendoreados
+// + el modelo speech-commands (~9 MB) se cargan PEREZOSAMENTE — inyectados con
+// injectScript SOLO al activar el modo campo, y cacheados cache-on-use por el
+// SW (WAKE_WORD_PATH_PREFIXES en public/sw.js), NUNCA precacheados en install.
+// No pesan en la carga inicial ni en el bundle crítico, así que se excluyen del
+// techo de 25 MB (que mide el peso de arranque, no el disco total del dist).
+// Espeja EXACTAMENTE los prefijos del SW: si cambian allá, cambian acá.
+const LAZY_EXCLUDED_PREFIXES = [
+  join(DIST, 'vendor', 'tfjs'),
+  join(DIST, 'vendor', 'speech-commands'),
+  join(DIST, 'models', 'speech-commands'),
+  join(DIST, 'models', 'hola-chagra'),
+];
+
 function formatSize(bytes) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function isLazyExcluded(fullPath) {
+  return LAZY_EXCLUDED_PREFIXES.some((p) => fullPath === p || fullPath.startsWith(p + '/'));
+}
+
+function getDirSizeRaw(dir) {
+  let total = 0;
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    if (entry.isFile()) total += statSync(full).size;
+    else if (entry.isDirectory()) total += getDirSizeRaw(full);
+  }
+  return total;
+}
+
 function getDirSize(dir) {
   let total = 0;
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
+    // Assets lazy del modo campo (#2088): no cuentan al techo de arranque.
+    if (isLazyExcluded(full)) continue;
     if (entry.isFile()) total += statSync(full).size;
     else if (entry.isDirectory()) total += getDirSize(full);
   }
@@ -37,6 +67,13 @@ function checkBudget() {
   const totalSize = getDirSize(DIST);
   if (totalSize > THRESHOLDS.totalMax) {
     errors.push('TOTAL dist exceeds budget: ' + formatSize(totalSize));
+  }
+
+  // Peso lazy excluido (modo campo #2088): reportado para trazabilidad — así el
+  // gate deja constancia de cuánto se dejó fuera del techo y por qué.
+  let lazyExcluded = 0;
+  for (const p of LAZY_EXCLUDED_PREFIXES) {
+    if (existsSync(p)) lazyExcluded += getDirSizeRaw(p);
   }
 
   let mainBundleSize = 0;
@@ -59,7 +96,10 @@ function checkBudget() {
     }
   }
 
-  console.log('Total dist: ' + formatSize(totalSize));
+  console.log('Total dist (arranque, budget): ' + formatSize(totalSize) + ' / ' + formatSize(THRESHOLDS.totalMax));
+  if (lazyExcluded > 0) {
+    console.log('Excluido lazy (modo campo #2088): ' + formatSize(lazyExcluded) + ' (cache-on-use, no en arranque)');
+  }
   console.log('Main bundle: ' + formatSize(mainBundleSize));
   console.log('Chunk count: ' + chunkSizes.length);
 

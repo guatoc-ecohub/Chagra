@@ -70,7 +70,15 @@ const vitestGlobals = {
 }
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores([
+    'dist',
+    // Modo campo (#2088): librerías de terceros vendoreadas TAL CUAL (UMD
+    // minificado de @tensorflow/tfjs-core|layers|data|backend-wasm y
+    // @tensorflow-models/speech-commands, ver scripts/wake-word/vendor-libs.mjs).
+    // NO son código propio — lintearlas tira cientos de falsos + (exports/
+    // require UMD, vars de una letra minificadas, etc.).
+    'public/vendor/**',
+  ]),
   {
     // Configs Node (playwright/vite/etc.) — requieren globals.node.
     files: ['*.config.{js,mjs,ts}', 'playwright.config.js', 'vite.config.js'],

@@ -126,7 +126,12 @@ pre-commit:
 
     eslint:
       glob: "*.{js,jsx,ts,tsx}"
-      exclude: '\.d\.ts$'
+      # public/vendor/** (#2088, modo campo): librerías de terceros vendoreadas
+      # TAL CUAL (UMD minificado TF.js/speech-commands). Ya están en
+      # eslint.config.js globalIgnores, pero --max-warnings=0 cuenta el propio
+      # warning de "ignorado por patrón" — hay que excluirlas del glob acá
+      # también para no romper el commit de un vendor legítimo.
+      exclude: '\.d\.ts$|^public/vendor/'
       run: npx eslint {staged_files} --max-warnings=0
 
     # auto-bump-version REMOVIDO 2026-06-02: el bump de versión se movió a

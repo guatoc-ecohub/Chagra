@@ -270,6 +270,18 @@ const messages = {
     plantaTuya: 'Planta tuya',
     plantasTuyas: 'Plantas tuyas',
   },
+  // Modo campo / wake-word "hola chagra" (#2088) — ver ModoCampoPanel.jsx,
+  // EnrollmentModoCampo.jsx, wakeWordService.js.
+  modoCampo: {
+    estadoCargando: 'Cargando…',
+    estadoCargandoModelo: 'Cargando modelo…',
+    estadoCargandoVoz: 'Cargando tu voz…',
+    estadoPreparando: 'Preparando el oído de Chagra por primera vez… (unos segundos; después queda listo al instante)',
+    estadoEscuchando: 'Escuchando «hola chagra»',
+    estadoError: 'Hubo un problema',
+    grabandoHableAhora: 'Grabando… hable ahora',
+    errorCargaLibs: 'No se pudo cargar {src}',
+  },
   format,
 };
 

@@ -129,6 +129,14 @@ jobs:
           # publico - defense-in-depth, NO auth real (auth real = nginx CORS
           # lockdown). Sincronizado con SOPS de alpha; rotacion coordinada.
           VITE_CHAGRA_MCP_TOKEN: ${{ secrets.VITE_CHAGRA_MCP_TOKEN }}
+          # MODO CAMPO / manos libres (#2088): wake-word "hola chagra" (TF.js
+          # speech-commands, on-device, offline — el audio NUNCA sale del
+          # dispositivo). Antes shippeado "dark" (flag ausente ⇒ off); el
+          # operador lo validó en dev y autorizó verlo en prod (2026-07-05).
+          # Con true, aparece el panel "Modo campo" en Perfil → pestaña de voz.
+          # Los assets vendoreados (TF.js/modelo, ~9 MB) NO se precachean:
+          # cache-on-use del SW (WAKE_WORD_PATH_PREFIXES) al activarlo online.
+          VITE_MODO_CAMPO: "true"
 
       - if: env.SKIP_DEPLOY != '1'
         name: Deploy to production

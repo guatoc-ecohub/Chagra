@@ -34,6 +34,19 @@ const MAP_TILE_HOSTS = ['tile.openstreetmap.org', 'tile.osm.org', 'tile.opentopo
 // la ficha siga mostrando la foto ya vista cuando la finca queda sin señal.
 const SPECIES_IMAGE_CACHE = 'chagra-species-images-v1';
 
+// Modo campo / wake-word "hola chagra" (#2088): TF.js self-hosted +
+// modelo base speech-commands + ejemplos "hola chagra" (~6 MB en total).
+// CACHE-ON-USE (NO precache en install): la feature se shippa "dark"
+// (VITE_MODO_CAMPO=false en prod) y este archivo SW es el MISMO para todos
+// los builds — un precache incondicional le cobraría ~6 MB de descarga en
+// el install a CADA usuaria, incluso las que nunca activan modo campo. En
+// vez de eso, la primera vez que el operador activa el modo campo (online)
+// estos archivos se cachean cache-first (mismo patrón que MAP_TILES_CACHE/
+// SPECIES_IMAGE_CACHE); de ahí en adelante — incluida offline — cargan del
+// cache. Bump el sufijo de versión si el modelo/lib cambia de contenido.
+const WAKE_WORD_CACHE = 'chagra-wake-word-v1';
+const WAKE_WORD_PATH_PREFIXES = ['/vendor/tfjs/', '/vendor/speech-commands/', '/models/speech-commands/', '/models/hola-chagra/'];
+
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -157,6 +170,7 @@ self.addEventListener('activate', (event) => {
           if (cacheName === RAG_GROUNDING_CACHE) return undefined;
           if (cacheName === MAP_TILES_CACHE) return undefined;
           if (cacheName === SPECIES_IMAGE_CACHE) return undefined;
+          if (cacheName === WAKE_WORD_CACHE) return undefined;
           // Versiones viejas de los buckets de grounding/tiles → borrar.
           // El resto (CACHE_NAME viejo, caches huérfanos) → borrar.
           return caches.delete(cacheName);
@@ -355,6 +369,27 @@ self.addEventListener('fetch', (event) => {
         cache.match(event.request).then((cached) => {
           if (cached) return cached;
           return fetch(event.request).catch(() => Response.error());
+        })
+      )
+    );
+    return;
+  }
+
+  // Modo campo / wake-word (#2088): CACHE-FIRST cache-on-use, ver comentario
+  // de WAKE_WORD_CACHE arriba. La PRIMERA activación (online) llena el
+  // cache; después — incluida offline — sirve de ahí. Sin precache en
+  // install: los usuarios que nunca activan el modo campo no pagan este peso.
+  if (event.request.method === 'GET' && WAKE_WORD_PATH_PREFIXES.some((p) => url.pathname.startsWith(p))) {
+    event.respondWith(
+      caches.open(WAKE_WORD_CACHE).then((cache) =>
+        cache.match(event.request).then((cached) => {
+          if (cached) return cached;
+          return fetch(event.request)
+            .then((response) => {
+              if (response && response.ok) cache.put(event.request, response.clone());
+              return response;
+            })
+            .catch(() => new Response('', { status: 504, statusText: 'Offline: modo campo no cacheado aún' }));
         })
       )
     );
