@@ -40,7 +40,7 @@ describe('ChatBubble — sello ante cross-crop (AFFECTS-GATE)', () => {
         cross_crop_focus: ['theobroma_cacao'],
       },
     };
-    render(<ChatBubble message={message} />);
+    render(<ChatBubble message={message} onConsentNeeded={() => {}} onRetryOrphan={() => {}} />);
 
     // El sello verde NO aparece.
     expect(screen.queryByText(/Catálogo verificado/i)).toBeNull();
@@ -59,7 +59,7 @@ describe('ChatBubble — sello ante cross-crop (AFFECTS-GATE)', () => {
       timestamp: Date.now(),
       metadata: { tool_used: 'get_pest_controllers', grounded: true },
     };
-    render(<ChatBubble message={message} />);
+    render(<ChatBubble message={message} onConsentNeeded={() => {}} onRetryOrphan={() => {}} />);
 
     expect(screen.getByTestId('source-badge')).toHaveTextContent(/Catálogo verificado/i);
     expect(screen.queryByTestId('cross-crop-badge')).toBeNull();

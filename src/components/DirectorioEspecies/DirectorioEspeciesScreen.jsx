@@ -269,6 +269,9 @@ export default function DirectorioEspeciesScreen({
           loadingFicha={loadingFicha}
           onSelect={selectSpecies}
           onClear={() => { setQuery(''); setResults([]); }}
+          searchError={searchError}
+          fichaErrorId={fichaErrorId}
+          onRetrySearch={() => runSearch(query)}
         />
       ) : (
         <PlagasBrowser
@@ -285,6 +288,7 @@ export default function DirectorioEspeciesScreen({
 /* ── Pestaña ESPECIES: buscador + resultados ─────────────────────────────── */
 function EspeciesSearch({
   query, setQuery, setTouched, touched, onSubmit, results, searching, loadingFicha, onSelect, onClear,
+  searchError, fichaErrorId, onRetrySearch,
 }) {
   return (
     <>
@@ -339,7 +343,7 @@ function EspeciesSearch({
             <ErrorStateCampo
               title={<span className="jp-tinta">No pudimos abrir el catálogo.</span>}
               hint={<span className="jp-tinta-suave">Sus datos están a salvo. Espere un momento y vuelva a intentar.</span>}
-              onRetry={() => runSearch(query)}
+              onRetry={onRetrySearch}
             />
           </div>
         )}
@@ -350,7 +354,7 @@ function EspeciesSearch({
             <p className="jp-tinta-suave text-xs text-amber-200">No pudimos abrir esa ficha.</p>
             <button
               type="button"
-              onClick={() => selectSpecies(fichaErrorId)}
+              onClick={() => onSelect(fichaErrorId)}
               className="text-xs font-bold text-amber-300 underline shrink-0"
             >
               Reintentar
