@@ -20,6 +20,29 @@ Query del campesino
 | Offline | ollama caído / sin red | Solo BM25 + sinónimos campesinos |
 | Sin asset | embeddings.json no existe | Solo BM25 + sinónimos |
 
+## Kill-switch semántico — `VITE_RAG_SEMANTIC`
+
+La capa semántica va **ACTIVADA por defecto** (default seguro de producción):
+mejora la resolución folk (papa criolla↔*Solanum phureja*, broca, roya) frente
+al puro BM25 / scorer literal — ver la tabla de recall más abajo. Modo extra en
+la tabla de arriba: con `VITE_RAG_SEMANTIC=false` (o `0`/`off`/`no`) el retrieve
+degrada a solo-BM25.
+
+- **Activar (default):** no hacer nada. Ausente/vacío/cualquier valor distinto
+  de los de apagado ⇒ ON. Ver `isSemanticEnabled()` en `ragRetriever.js`.
+- **REVERTIR a BM25-only:** ponga `VITE_RAG_SEMANTIC=false` (también valen `0`,
+  `off`, `no`) en el `.env` de build y reconstruya (`npm run build`). No requiere
+  cambio de código ni deploy de lógica. Con OFF, `retrieveInternal` corta antes
+  de `loadEmbeddings()` / `embedQuery()` → cero llamadas a Ollama.
+- **Por qué es un kill-switch y no "siempre on":** la semántica embebe la query
+  **EN VIVO** vía Ollama. El embed usa `keep_alive: '0s'` para que
+  `snowflake-arctic-embed2` (4.6 GB) se descargue tras cada embed y NO co-resida
+  sostenidamente con `granite3.3:8b` (~7.2 GB) en la M6000 (12 GiB) — evita el
+  `cudaMalloc` OOM que tumba al agente (memoria
+  `reference-num-gpu-0-no-fuerza-cpu-ollama-024`; `options.num_gpu:0` NO fuerza
+  CPU en Ollama 0.24). El flag es el corte de emergencia si aún así hay presión
+  de VRAM en prod.
+
 ## Asset de embeddings
 
 - Archivo: `public/rag-embeddings.json` (501 vectores × 1024d, verificado 2026-07-02)
