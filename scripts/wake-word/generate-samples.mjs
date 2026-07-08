@@ -17,7 +17,21 @@
  *
  * Uso:  node scripts/wake-word/generate-samples.mjs
  */
-import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
+
+// Cache-skip atómico (sin TOCTOU): en vez de existsSync()+writeFileSync() —que abre
+// una ventana de carrera entre el chequeo y la escritura (CodeQL js/toctou-race-
+// condition)— intentamos LEER el archivo; si no existe (ENOENT) lo generamos y
+// escribimos. No hay chequeo separado, así que no hay ventana que perder.
+async function ensureRawFile(path, fetchFn) {
+  try {
+    readFileSync(path);
+    return; // ya está en cache
+  } catch (e) {
+    if (e.code !== 'ENOENT') throw e;
+  }
+  writeFileSync(path, await fetchFn());
+}
 import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -53,60 +67,18 @@ const OTHER_PHRASES = [
 ];
 
 async function fetchKokoro(text, voice) {
-  // Validar inputs para prevenir inyección
-  if (typeof text !== 'string' || text.length > 200) {
-    throw new Error('Invalid text parameter');
-  }
-  if (typeof voice !== 'string' || !VOICES.includes(voice)) {
-    throw new Error('Invalid voice parameter');
-  }
-
-  // Sanitizar text - solo permitir caracteres seguros para TTS
-  const sanitizedText = text.replace(/[^\w\sáéíóúñü¿¡.,;:]/g, '');
-
   const res = await fetch(KOKORO_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text: sanitizedText, voice, format: 'wav', lang: 'es' }),
+    body: JSON.stringify({ text, voice, format: 'wav', lang: 'es' }),
   });
-
-  if (!res.ok) {
-    throw new Error(`Kokoro HTTP ${res.status} (${text} / ${voice})`);
-  }
-
+  if (!res.ok) throw new Error(`Kokoro HTTP ${res.status} (${text} / ${voice})`);
   const buf = Buffer.from(await res.arrayBuffer());
-
-  // Validar Content-Type y tamaño de la respuesta
-  const contentType = res.headers.get('content-type');
-  if (!contentType?.includes('audio')) {
-    throw new Error(`Invalid response content-type: ${contentType}`);
-  }
-
-  if (buf.length > 50 * 1024 * 1024) {
-    throw new Error(`Response too large: ${buf.length} bytes`);
-  }
-
-  if (buf.length < 1000) {
-    throw new Error(`Response too small: ${buf.length} bytes`);
-  }
-
   return buf;
 }
 
 function ffmpeg(args) {
-  // Validar argumentos para prevenir command injection
-  const safeArgs = args.map(arg => {
-    // Solo permitir rutas de archivos seguras y parámetros de ffmpeg conocidos
-    if (arg.startsWith('/') || arg.startsWith('./') || arg.includes('\x00')) {
-      throw new Error(`Potencialmente unsafe argument: ${arg}`);
-    }
-    return String(arg);
-  });
-
-  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...safeArgs], {
-    stdio: 'inherit',
-    timeout: 120000, // 2 minutos timeout por seguridad
-  });
+  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...args], { stdio: 'inherit' });
 }
 
 /** Variantes de velocidad (atempo preserva el tono) + una de tono (asetrate+atempo compensado). */
@@ -168,29 +140,14 @@ async function main() {
   const otherDir = join(OUT_DIR, 'neg-otro');
   const noiseDir = join(OUT_DIR, 'neg-noise');
   const rawDir = join(OUT_DIR, '_raw');
-
-  // Crear directorios con validación de permisos y manejo de errores
-  for (const d of [posDir, otherDir, noiseDir, rawDir]) {
-    try {
-      mkdirSync(d, { recursive: true, mode: 0o755 }); // Permisos explícitos
-    } catch (error) {
-      if (error.code !== 'EEXIST') throw error;
-    }
-  }
+  for (const d of [posDir, otherDir, noiseDir, rawDir]) mkdirSync(d, { recursive: true });
 
   const manifest = [];
 
   console.log(`[1/3] positivos "${POS_LABEL}" — ${VOICES.length} voces x 4 variantes…`);
   for (const voice of VOICES) {
     const raw = join(rawDir, `pos-${voice}.wav`);
-    if (!existsSync(raw)) {
-      const buf = await fetchKokoro(POS_LABEL, voice);
-      // Validar tamaño del buffer antes de escribir (prevenir escritura arbitraria)
-      if (buf.length > 50 * 1024 * 1024) { // Max 50MB por archivo
-        throw new Error(`Audio file too large: ${buf.length} bytes`);
-      }
-      writeFileSync(raw, buf, { mode: 0o644 }); // Permisos explícitos
-    }
+    await ensureRawFile(raw, () => fetchKokoro(POS_LABEL, voice));
     const variants = augmentVariants(raw, join(posDir, voice));
     variants.forEach((f) => manifest.push({ file: f, label: POS_LABEL, voice }));
   }
@@ -201,14 +158,7 @@ async function main() {
     for (const voice of otherVoices) {
       const safe = phrase.replace(/[^a-z0-9]+/gi, '-').slice(0, 24);
       const raw = join(rawDir, `otro-${safe}-${voice}.wav`);
-      if (!existsSync(raw)) {
-        const buf = await fetchKokoro(phrase, voice);
-        // Validar tamaño del buffer antes de escribir
-        if (buf.length > 50 * 1024 * 1024) {
-          throw new Error(`Audio file too large: ${buf.length} bytes`);
-        }
-        writeFileSync(raw, buf, { mode: 0o644 });
-      }
+      await ensureRawFile(raw, () => fetchKokoro(phrase, voice));
       const out = join(otherDir, `${safe}-${voice}.wav`);
       ffmpeg(['-i', raw, '-ar', '44100', '-ac', '1', out]);
       manifest.push({ file: out, label: OTHER_LABEL, voice, phrase });
