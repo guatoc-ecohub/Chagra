@@ -63,12 +63,12 @@ const creditoDe = (slug) => CREDITOS_FOTOS_CACAO.find((c) => c.slug === slug) ||
  * FotoCacao — imagen a sangre con scrim inferior fijo, crédito de autor en la
  * esquina y fallback a un ícono si no carga. `children` va SOBRE la foto.
  */
-function FotoCacao({ slug, alt, ratio = 'aspect-[16/10]', rounded = '', Fallback = Sprout, children = null }) {
+function FotoCacao({ slug, alt, ratio = 'aspect-[16/10]', rounded = '', Fallback = Sprout, hero = false, children = null }) {
   const [ok, setOk] = useState(true);
   const credito = creditoDe(slug);
   const IconoFallback = Fallback;
   return (
-    <div className={`relative overflow-hidden bg-stone-950 ${ratio} ${rounded}`}>
+    <div className={`relative overflow-hidden bg-stone-950 ${ratio} ${rounded} ${hero ? 'cacao-hero' : ''}`}>
       {ok ? (
         <img
           src={`${FOTO_BASE_CACAO}/${slug}.jpg`}
@@ -113,13 +113,14 @@ function EstacionArbol() {
   return (
     <section className="cacao-seccion space-y-4" data-testid="estacion-arbol">
       {/* Hero con la mazorca real sobre el tronco (cauliflor) */}
-      <div className="rounded-2xl border border-amber-800/40 overflow-hidden bg-stone-900/60">
-        <FotoCacao slug="mazorca" alt="Mazorcas de cacao rojas brotando directamente del tronco del árbol" ratio="aspect-[16/10]" Fallback={Sprout}>
-          <div className="absolute inset-0 flex flex-col justify-end p-4">
-            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-amber-200">
+      <div className="cacao-card rounded-2xl border border-amber-800/40 overflow-hidden bg-stone-900/60">
+        <FotoCacao slug="mazorca" alt="Mazorcas de cacao rojas brotando directamente del tronco del árbol" ratio="aspect-[16/10]" Fallback={Sprout} hero>
+          <div className="absolute inset-0 flex flex-col justify-end p-5">
+            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-amber-200">
               <Sparkles size={14} aria-hidden="true" /> Cultivo de la paz
             </p>
-            <h3 className="text-2xl font-black text-[#ffffff] leading-tight drop-shadow">El árbol que da el chocolate</h3>
+            <span aria-hidden="true" className="cacao-eyebrow-linea text-amber-300" />
+            <h3 className="cacao-hero-titulo mt-1.5 text-[1.7rem] font-black text-[#ffffff] leading-[1.1] tracking-tight">El árbol que da el chocolate</h3>
           </div>
         </FotoCacao>
       </div>
@@ -131,7 +132,7 @@ function EstacionArbol() {
       </p>
 
       {/* Ficha groundeada */}
-      <div className="rounded-2xl border border-stone-700/60 bg-stone-900/50 p-4">
+      <div className="cacao-card rounded-2xl border border-stone-700/60 bg-stone-900/50 p-4">
         <p className="text-sm font-black text-stone-100 uppercase tracking-wide mb-1">
           {FICHA_CACAO.nombreCientifico} <span className="font-normal normal-case text-stone-400">· {FICHA_CACAO.familia}</span>
         </p>
@@ -148,10 +149,10 @@ function EstacionArbol() {
 
       {/* Flor cauliflora — foto real */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div className="rounded-2xl border border-stone-700/60 overflow-hidden bg-stone-900/50">
+        <div className="cacao-card rounded-2xl border border-stone-700/60 overflow-hidden bg-stone-900/50">
           <FotoCacao slug="flor" alt="Flores de cacao brotando directamente de la corteza del tronco" ratio="aspect-[4/3]" Fallback={Flower2}>
             <div className="absolute inset-0 flex flex-col justify-end p-3">
-              <p className="text-sm font-black text-[#ffffff] leading-tight drop-shadow">Flores en el tronco</p>
+              <p className="cacao-hero-titulo text-sm font-black text-[#ffffff] leading-tight">Flores en el tronco</p>
             </div>
           </FotoCacao>
           <p className="p-3 text-xs leading-snug text-stone-300">
@@ -159,7 +160,7 @@ function EstacionArbol() {
             tronco y de las ramas gruesas, no de las puntas.
           </p>
         </div>
-        <div className="rounded-2xl border border-emerald-800/40 bg-emerald-950/20 p-3.5 flex flex-col justify-center">
+        <div className="cacao-card rounded-2xl border border-emerald-800/40 bg-emerald-950/20 p-3.5 flex flex-col justify-center">
           <p className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-emerald-300 mb-1.5">
             <MapPin size={14} aria-hidden="true" /> Colombia cacaotera
           </p>
@@ -174,7 +175,7 @@ function EstacionArbol() {
         <p className="text-sm font-black text-stone-100 uppercase tracking-wide">De qué familia es su cacao</p>
         <div className="grid gap-2.5">
           {GRUPOS_GENETICOS.map((g) => (
-            <div key={g.id} className="rounded-xl border border-stone-700/50 bg-stone-950/40 p-3" data-testid={`grupo-${g.id}`}>
+            <div key={g.id} className="cacao-card rounded-xl border border-stone-700/50 bg-stone-950/40 p-3" data-testid={`grupo-${g.id}`}>
               <p className="flex flex-wrap items-center gap-2 text-sm font-bold text-stone-100 leading-tight">
                 {g.nombre}
                 <span className="rounded-full bg-amber-500/15 border border-amber-600/40 px-2 py-0.5 text-[11px] font-bold text-amber-300">{g.etiqueta}</span>
@@ -190,7 +191,7 @@ function EstacionArbol() {
         <p className="text-sm font-black text-stone-100 uppercase tracking-wide">Clones para sembrar</p>
         <div className="grid gap-2.5">
           {CLONES_CACAO.map((c) => (
-            <div key={c.id} className="rounded-xl border border-stone-700/50 bg-stone-950/40 p-3" data-testid={`clon-${c.id}`}>
+            <div key={c.id} className="cacao-card rounded-xl border border-stone-700/50 bg-stone-950/40 p-3" data-testid={`clon-${c.id}`}>
               <p className="flex flex-wrap items-center gap-2 text-sm font-bold text-stone-100 leading-tight">
                 {c.nombre}
                 <span className="rounded-full bg-stone-700/50 px-2 py-0.5 text-[11px] font-bold text-stone-300">{c.tipo}</span>
@@ -211,13 +212,14 @@ function EstacionArbol() {
 function EstacionSombra({ onNavigate }) {
   return (
     <section className="cacao-seccion space-y-4" data-testid="estacion-sombra">
-      <div className="rounded-2xl border border-emerald-800/40 overflow-hidden bg-stone-900/60">
-        <FotoCacao slug="agroforestal" alt="Cacaotal bajo sombra integrado en un sistema con palmas y monte" ratio="aspect-[16/9]" Fallback={Trees}>
-          <div className="absolute inset-0 flex flex-col justify-end p-4">
-            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-emerald-200">
+      <div className="cacao-card rounded-2xl border border-emerald-800/40 overflow-hidden bg-stone-900/60">
+        <FotoCacao slug="agroforestal" alt="Cacaotal bajo sombra integrado en un sistema con palmas y monte" ratio="aspect-[16/9]" Fallback={Trees} hero>
+          <div className="absolute inset-0 flex flex-col justify-end p-5">
+            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-emerald-200">
               <Trees size={14} aria-hidden="true" /> Cacao bajo monte
             </p>
-            <h3 className="text-xl font-black text-[#ffffff] leading-tight drop-shadow">El cacao no vive solo: vive en un sistema</h3>
+            <span aria-hidden="true" className="cacao-eyebrow-linea text-emerald-300" />
+            <h3 className="cacao-hero-titulo mt-1.5 text-xl font-black text-[#ffffff] leading-tight tracking-tight">El cacao no vive solo: vive en un sistema</h3>
           </div>
         </FotoCacao>
       </div>
@@ -237,7 +239,7 @@ function EstacionSombra({ onNavigate }) {
             <div
               key={e.id}
               data-testid={`estrato-${e.id}`}
-              className={`rounded-xl border p-3 ${esCacao ? 'border-amber-600/50 bg-amber-950/25' : 'border-stone-700/50 bg-stone-950/40'}`}
+              className={`cacao-card rounded-xl border p-3 ${esCacao ? 'border-amber-600/50 bg-amber-950/25 shadow-[0_0_0_1px_rgba(217,119,6,0.25)]' : 'border-stone-700/50 bg-stone-950/40'}`}
               style={{ marginLeft: `${i * 8}px` }}
             >
               <p className="flex flex-wrap items-center gap-2 text-sm font-bold text-stone-100 leading-tight">
@@ -275,27 +277,27 @@ function EstacionSombra({ onNavigate }) {
             type="button"
             data-testid="cacao-link-asociaciones"
             onClick={() => onNavigate('asociaciones')}
-            className="flex items-center gap-3 rounded-2xl border border-emerald-700/50 bg-emerald-950/20 p-3.5 text-left active:bg-emerald-900/30 transition-colors"
+            className="cacao-enlace cacao-focus flex items-center gap-3 rounded-2xl border border-emerald-700/50 bg-emerald-950/20 p-3.5 text-left hover:border-emerald-500/70 hover:bg-emerald-900/25 active:bg-emerald-900/30"
           >
             <HeartHandshake size={20} className="shrink-0 text-emerald-300" aria-hidden="true" />
             <span className="flex-1 min-w-0">
               <span className="block text-sm font-bold text-stone-100 leading-tight">Buenas vecinas</span>
               <span className="block text-xs text-stone-400 leading-tight mt-0.5">Con qué se lleva bien el cacao</span>
             </span>
-            <ChevronRight size={18} className="shrink-0 text-stone-500" aria-hidden="true" />
+            <ChevronRight size={18} className="cacao-enlace-chevron shrink-0 text-emerald-400/80" aria-hidden="true" />
           </button>
           <button
             type="button"
             data-testid="cacao-link-biodiversidad"
             onClick={() => onNavigate('biodiversidad')}
-            className="flex items-center gap-3 rounded-2xl border border-emerald-700/50 bg-emerald-950/20 p-3.5 text-left active:bg-emerald-900/30 transition-colors"
+            className="cacao-enlace cacao-focus flex items-center gap-3 rounded-2xl border border-emerald-700/50 bg-emerald-950/20 p-3.5 text-left hover:border-emerald-500/70 hover:bg-emerald-900/25 active:bg-emerald-900/30"
           >
             <Trees size={20} className="shrink-0 text-emerald-300" aria-hidden="true" />
             <span className="flex-1 min-w-0">
               <span className="block text-sm font-bold text-stone-100 leading-tight">El monte de la finca</span>
               <span className="block text-xs text-stone-400 leading-tight mt-0.5">Los árboles de sombra y su vida</span>
             </span>
-            <ChevronRight size={18} className="shrink-0 text-stone-500" aria-hidden="true" />
+            <ChevronRight size={18} className="cacao-enlace-chevron shrink-0 text-emerald-400/80" aria-hidden="true" />
           </button>
         </div>
       )}
@@ -307,13 +309,14 @@ function EstacionSombra({ onNavigate }) {
 function EstacionManejo() {
   return (
     <section className="cacao-seccion space-y-4" data-testid="estacion-manejo">
-      <div className="rounded-2xl border border-stone-700/60 overflow-hidden bg-stone-900/60">
-        <FotoCacao slug="injerto" alt="Campesina injertando una plántula de cacao en el vivero" ratio="aspect-[16/9]" Fallback={Scissors}>
-          <div className="absolute inset-0 flex flex-col justify-end p-4">
-            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-amber-200">
+      <div className="cacao-card rounded-2xl border border-stone-700/60 overflow-hidden bg-stone-900/60">
+        <FotoCacao slug="injerto" alt="Campesina injertando una plántula de cacao en el vivero" ratio="aspect-[16/9]" Fallback={Scissors} hero>
+          <div className="absolute inset-0 flex flex-col justify-end p-5">
+            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-amber-200">
               <Scissors size={14} aria-hidden="true" /> De la semilla al clon
             </p>
-            <h3 className="text-xl font-black text-[#ffffff] leading-tight drop-shadow">Cómo se arranca un buen cacaotal</h3>
+            <span aria-hidden="true" className="cacao-eyebrow-linea text-amber-300" />
+            <h3 className="cacao-hero-titulo mt-1.5 text-xl font-black text-[#ffffff] leading-tight tracking-tight">Cómo se arranca un buen cacaotal</h3>
           </div>
         </FotoCacao>
       </div>
@@ -321,7 +324,7 @@ function EstacionManejo() {
       {/* Propagación: semilla vs injerto */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {PROPAGACION_CACAO.map((p) => (
-          <div key={p.id} className="rounded-2xl border border-stone-700/60 bg-stone-900/50 p-4" data-testid={`propagacion-${p.id}`}>
+          <div key={p.id} className="cacao-card rounded-2xl border border-stone-700/60 bg-stone-900/50 p-4" data-testid={`propagacion-${p.id}`}>
             <p className="flex items-center gap-2 text-sm font-black text-stone-100 leading-tight">
               {p.id === 'injerto' ? <Scissors size={16} className="text-amber-400" aria-hidden="true" /> : <Sprout size={16} className="text-lime-400" aria-hidden="true" />}
               {p.titulo}
@@ -364,13 +367,14 @@ function EstacionManejo() {
 /* ── ESTACIÓN 4 · Monilia y escoba de bruja ────────────────────────────────── */
 function TarjetaEnfermedad({ e }) {
   return (
-    <article className="rounded-2xl border border-rose-800/40 bg-stone-900/60 overflow-hidden" data-testid={`enfermedad-${e.id}`}>
-      <FotoCacao slug={e.foto} alt={`Síntomas de ${e.nombre} en cacao`} ratio="aspect-[16/10]" Fallback={Bug}>
-        <div className="absolute inset-0 flex flex-col justify-end p-4">
-          <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-rose-200">
+    <article className="cacao-card rounded-2xl border border-rose-800/40 bg-stone-900/60 overflow-hidden" data-testid={`enfermedad-${e.id}`}>
+      <FotoCacao slug={e.foto} alt={`Síntomas de ${e.nombre} en cacao`} ratio="aspect-[16/10]" Fallback={Bug} hero>
+        <div className="absolute inset-0 flex flex-col justify-end p-5">
+          <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.14em] italic text-rose-200">
             <Bug size={14} aria-hidden="true" /> {e.cientifico}
           </p>
-          <h3 className="text-xl font-black text-[#ffffff] leading-tight drop-shadow">{e.nombre}</h3>
+          <span aria-hidden="true" className="cacao-eyebrow-linea text-rose-300" />
+          <h3 className="cacao-hero-titulo mt-1.5 text-xl font-black text-[#ffffff] leading-tight tracking-tight">{e.nombre}</h3>
         </div>
       </FotoCacao>
 
@@ -382,10 +386,11 @@ function TarjetaEnfermedad({ e }) {
           <p className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-stone-200 mb-2">
             <Camera size={13} aria-hidden="true" className="text-rose-300" /> Cómo se ve
           </p>
-          <ul className="space-y-1.5">
+          <ul className="space-y-2">
             {e.comoSeVe.map((s, i) => (
-              <li key={i} className="flex gap-1.5 text-xs leading-snug text-stone-200">
-                <span aria-hidden="true" className="text-rose-400 font-black">{i + 1}.</span>{s}
+              <li key={i} className="flex items-start gap-2 text-xs leading-snug text-stone-200">
+                <span aria-hidden="true" className="cacao-num">{i + 1}</span>
+                <span className="flex-1 min-w-0 pt-px">{s}</span>
               </li>
             ))}
           </ul>
@@ -394,7 +399,7 @@ function TarjetaEnfermedad({ e }) {
         {/* Umbral + impacto */}
         <div className="flex flex-wrap gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-lg border border-amber-600/40 bg-amber-500/15 px-2.5 py-1 text-[11px] font-bold text-amber-200">
-            <TriangleAlert size={12} aria-hidden="true" /> {e.umbral}
+            <TriangleAlert size={12} aria-hidden="true" className="cacao-alerta-late shrink-0" /> {e.umbral}
           </span>
         </div>
         <p className="text-xs leading-snug text-stone-300">{e.impacto}</p>
@@ -439,7 +444,7 @@ function EstacionSanidad() {
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           {CACAO_NO_CONFUNDIR.map((c) => (
-            <div key={c.id} className="rounded-xl border border-stone-700/50 bg-stone-950/40 overflow-hidden" data-testid={`confundir-${c.id}`}>
+            <div key={c.id} className="cacao-card rounded-xl border border-stone-700/50 bg-stone-950/40 overflow-hidden" data-testid={`confundir-${c.id}`}>
               <FotoCacao slug={c.foto} alt={`Síntoma de ${c.que}`} ratio="aspect-[4/3]" Fallback={Bug} />
               <div className="p-2.5">
                 <p className="text-xs font-bold text-stone-100 leading-tight">{c.que}</p>
@@ -458,19 +463,20 @@ function EstacionSanidad() {
 function EstacionBeneficio({ onNavigate }) {
   return (
     <section className="cacao-seccion space-y-4" data-testid="estacion-beneficio">
-      <div className="rounded-2xl border border-amber-800/40 overflow-hidden bg-stone-900/60">
-        <FotoCacao slug="cosecha" alt="Mazorcas de cacao de colores junto a un canasto de granos" ratio="aspect-[16/9]" Fallback={Package}>
-          <div className="absolute inset-0 flex flex-col justify-end p-4">
-            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-amber-200">
+      <div className="cacao-card rounded-2xl border border-amber-800/40 overflow-hidden bg-stone-900/60">
+        <FotoCacao slug="cosecha" alt="Mazorcas de cacao de colores junto a un canasto de granos" ratio="aspect-[16/9]" Fallback={Package} hero>
+          <div className="absolute inset-0 flex flex-col justify-end p-5">
+            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-amber-200">
               <Package size={14} aria-hidden="true" /> De la mazorca al grano
             </p>
-            <h3 className="text-xl font-black text-[#ffffff] leading-tight drop-shadow">Aquí se hace el precio</h3>
+            <span aria-hidden="true" className="cacao-eyebrow-linea text-amber-300" />
+            <h3 className="cacao-hero-titulo mt-1.5 text-xl font-black text-[#ffffff] leading-tight tracking-tight">Aquí se hace el precio</h3>
           </div>
         </FotoCacao>
       </div>
 
       {/* Cosecha */}
-      <div className="rounded-2xl border border-stone-700/60 bg-stone-900/50 p-4 space-y-2">
+      <div className="cacao-card rounded-2xl border border-stone-700/60 bg-stone-900/50 p-4 space-y-2">
         <p className="flex items-center gap-2 text-sm font-black text-stone-100 uppercase tracking-wide">
           <Sprout size={16} aria-hidden="true" className="text-lime-400" /> La cosecha
         </p>
@@ -482,11 +488,12 @@ function EstacionBeneficio({ onNavigate }) {
       {/* Beneficio: fermentación + secado */}
       <div className="grid grid-cols-1 gap-3">
         {BENEFICIO_CACAO.map((b) => (
-          <article key={b.id} className="rounded-2xl border border-amber-800/40 bg-stone-900/60 overflow-hidden" data-testid={`beneficio-${b.id}`}>
-            <FotoCacao slug={b.foto} alt={b.titulo} ratio="aspect-[16/9]" Fallback={Package}>
-              <div className="absolute inset-0 flex flex-col justify-end p-3">
-                <p className="text-[11px] font-black uppercase tracking-wider text-amber-200">{b.clave}</p>
-                <h4 className="text-lg font-black text-[#ffffff] leading-tight drop-shadow">{b.titulo}</h4>
+          <article key={b.id} className="cacao-card rounded-2xl border border-amber-800/40 bg-stone-900/60 overflow-hidden" data-testid={`beneficio-${b.id}`}>
+            <FotoCacao slug={b.foto} alt={b.titulo} ratio="aspect-[16/9]" Fallback={Package} hero>
+              <div className="absolute inset-0 flex flex-col justify-end p-4">
+                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-amber-200">{b.clave}</p>
+                <span aria-hidden="true" className="cacao-eyebrow-linea text-amber-300" />
+                <h4 className="cacao-hero-titulo mt-1 text-lg font-black text-[#ffffff] leading-tight tracking-tight">{b.titulo}</h4>
               </div>
             </FotoCacao>
             <p className="p-3.5 text-xs leading-snug text-stone-200">{b.detalle}</p>
@@ -499,7 +506,7 @@ function EstacionBeneficio({ onNavigate }) {
       </PedagogicalBlock>
 
       {/* Cáscara / baba como abono → enlace al mundo del compost */}
-      <div className="rounded-2xl border border-lime-800/40 bg-lime-950/15 p-4 space-y-2.5" data-testid="cacao-cascara-abono">
+      <div className="cacao-card rounded-2xl border border-lime-800/40 bg-lime-950/15 p-4 space-y-2.5" data-testid="cacao-cascara-abono">
         <p className="flex items-center gap-2 text-sm font-black text-lime-200 uppercase tracking-wide">
           <Recycle size={16} aria-hidden="true" /> La cáscara vuelve al suelo
         </p>
@@ -523,14 +530,14 @@ function EstacionBeneficio({ onNavigate }) {
             type="button"
             data-testid="cacao-link-estiercol"
             onClick={() => onNavigate('estiercol')}
-            className="w-full flex items-center gap-3 rounded-xl border border-lime-700/50 bg-lime-950/25 p-3 text-left active:bg-lime-900/30 transition-colors"
+            className="cacao-enlace cacao-focus w-full flex items-center gap-3 rounded-xl border border-lime-700/50 bg-lime-950/25 p-3 text-left hover:border-lime-500/70 hover:bg-lime-900/30 active:bg-lime-900/30"
           >
             <Recycle size={18} className="shrink-0 text-lime-300" aria-hidden="true" />
             <span className="flex-1 min-w-0">
               <span className="block text-sm font-bold text-stone-100 leading-tight">Del corral al abono</span>
               <span className="block text-xs text-stone-400 leading-tight mt-0.5">Compostar la cáscara junto al estiércol y la ceniza</span>
             </span>
-            <ChevronRight size={18} className="shrink-0 text-stone-500" aria-hidden="true" />
+            <ChevronRight size={18} className="cacao-enlace-chevron shrink-0 text-lime-400/80" aria-hidden="true" />
           </button>
         )}
       </div>
@@ -547,7 +554,7 @@ function CreditosFotos() {
         type="button"
         onClick={() => setAbierto((v) => !v)}
         aria-expanded={abierto}
-        className="w-full flex items-center gap-2 text-left"
+        className="cacao-focus w-full flex items-center gap-2 text-left rounded-md"
       >
         <Camera size={15} className="text-stone-400 shrink-0" aria-hidden="true" />
         <span className="flex-1 text-xs font-bold text-stone-300">Créditos de las fotos (licencia abierta)</span>
@@ -602,10 +609,10 @@ export default function CacaoScreen({ onBack, onNavigate = undefined }) {
                 aria-selected={activo}
                 data-testid={`estacion-tab-${e.id}`}
                 onClick={() => setEstacion(e.id)}
-                className={`rounded-xl border px-1.5 py-2 text-center transition-colors min-h-[56px] ${
+                className={`cacao-tab cacao-focus rounded-xl border px-1.5 py-2 text-center min-h-[56px] ${
                   activo
                     ? 'cacao-estacion-activa border-amber-500/70 bg-amber-500/15 text-amber-200'
-                    : 'border-stone-700 bg-stone-900/50 text-stone-300 active:bg-stone-800/70'
+                    : 'border-stone-700 bg-stone-900/50 text-stone-300 hover:border-stone-600 hover:bg-stone-800/60 active:bg-stone-800/70'
                 }`}
               >
                 <span className="block text-[13px] font-black leading-tight">{e.titulo}</span>
@@ -632,7 +639,7 @@ export default function CacaoScreen({ onBack, onNavigate = undefined }) {
             type="button"
             data-testid="cacao-preguntar-agente"
             onClick={() => onNavigate('agente', { prefilledPrompt: '¿Cómo manejo la monilia en mi cultivo de cacao sin veneno?' })}
-            className="w-full flex items-center gap-3 rounded-2xl border border-stone-700/60 bg-stone-900/40 p-3.5 text-left active:bg-stone-800/60 transition-colors"
+            className="cacao-enlace cacao-focus w-full flex items-center gap-3 rounded-2xl border border-stone-700/60 bg-stone-900/40 p-3.5 text-left hover:border-amber-600/50 hover:bg-stone-800/60 active:bg-stone-800/60"
           >
             <span aria-hidden="true" className="shrink-0 w-10 h-10 rounded-xl bg-amber-500/15 grid place-items-center">
               <Sprout size={20} className="text-amber-300" />
@@ -641,7 +648,7 @@ export default function CacaoScreen({ onBack, onNavigate = undefined }) {
               <span className="block text-sm font-bold text-stone-100 leading-tight">¿Su caso es distinto?</span>
               <span className="block text-xs text-stone-400 leading-tight mt-0.5">Cuénteselo al agente: él conoce su finca, su clima y su clon.</span>
             </span>
-            <ChevronRight size={18} className="shrink-0 text-stone-500" aria-hidden="true" />
+            <ChevronRight size={18} className="cacao-enlace-chevron shrink-0 text-amber-400/70" aria-hidden="true" />
           </button>
         )}
       </div>

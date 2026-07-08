@@ -1,0 +1,56 @@
+/* ============================================================================
+ * ejemplosVoz.css — tarjeta de ejemplos del modo campo («hola chagra»).
+ *
+ * Solo lo que Tailwind no da: la onda de voz que late y la transición de
+ * entrada del ejemplo que rota. Acento vía --t-accent-rgb (themes.css) con
+ * fallback al esmeralda del panel — indirección CSS-var, nunca color duro
+ * por tema.
+ * ========================================================================== */
+
+/* --- Onda de voz: 9 barras que laten desfasadas (decorativa) -------------- */
+.ejemplos-voz-onda {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 22px;
+  flex-shrink: 0;
+}
+.ejemplos-voz-barra {
+  width: 3px;
+  border-radius: 2px;
+  background: rgba(var(--t-accent-rgb, 52, 211, 153), 0.85);
+  /* Altura base variada (perfil de onda) + latido escalado por barra. */
+  height: calc(6px + (var(--i) - 4) * (var(--i) - 4) * -0.8px + 14px);
+  transform-origin: center;
+  animation: ejemplos-voz-late 1.5s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.13s);
+}
+@keyframes ejemplos-voz-late {
+  0%, 100% { transform: scaleY(0.45); opacity: 0.55; }
+  50%      { transform: scaleY(1);    opacity: 1; }
+}
+
+/* --- Escena del ejemplo que rota ------------------------------------------ */
+/* min-height reserva el espacio de la frase más larga en dos líneas:
+ * sin brincos de layout cuando cambia el ejemplo. */
+.ejemplos-voz-escena {
+  min-height: 86px;
+  display: flex;
+  align-items: flex-start;
+}
+.ejemplos-voz-paso {
+  width: 100%;
+  animation: ejemplos-voz-entra 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes ejemplos-voz-entra {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Movimiento reducido ---------------------------------------------------
+ * El JSX ya cambia a lista estática (matchMedia); esto cubre además el caso
+ * de que la preferencia cambie con el panel ya montado: todo quieto. */
+@media (prefers-reduced-motion: reduce) {
+  .ejemplos-voz-barra { animation: none; opacity: 0.8; }
+  .ejemplos-voz-paso { animation: none; }
+}

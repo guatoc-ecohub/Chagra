@@ -18,6 +18,7 @@ import { Radio, Mic, BatteryWarning, GraduationCap } from 'lucide-react';
 import { useModoCampoContext } from '../../hooks/ModoCampoContext';
 import { hasPersonalVoiceMarker, forgetPersonalVoice } from '../../services/wakeWordService';
 import EnrollmentModoCampo from './EnrollmentModoCampo';
+import EjemplosVoz from './EjemplosVoz';
 import { MSG } from '../../config/messages';
 
 const CONSENT_KEY = 'chagra:modoCampo:consentimiento';
@@ -89,6 +90,8 @@ export default function ModoCampoPanel() {
         EN su celular — nunca sale audio a internet. La pantalla se queda encendida mientras esté
         activo.
       </p>
+
+      <EjemplosVoz />
 
       <button
         type="button"

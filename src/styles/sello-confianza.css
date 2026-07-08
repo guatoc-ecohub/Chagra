@@ -1,0 +1,202 @@
+/* ============================================================================
+ * SELLO DE CONFIANZA — el semáforo de confianza del agente Chagra.
+ *
+ * Unifica los badges que aparecen bajo cada respuesta del agente (beta,
+ * catálogo verificado, respuesta generativa, nombre científico sospechoso,
+ * auto-corregida, fuente verificable, confianza del dato) en UNA anatomía
+ * visual coherente que el campesino lee de un vistazo:
+ *
+ *   verde  → dato sembrado en el catálogo/grafo Chagra (verificado).
+ *   ámbar  → salió del modelo o no calzó con el catálogo: verifica.
+ *   rojo   → señal fuerte de posible invento del modelo: no confíe.
+ *   gris   → neutro/informativo (beta, cita sin enlace, dato tentativo).
+ *
+ * Accesibilidad daltónicos: el color NUNCA va solo — cada nivel lleva un
+ * ícono de FORMA distinta (check / triángulo / octágono / chispa) dentro de
+ * la "lámpara" (punto sólido), más la etiqueta en texto.
+ *
+ * Móvil: el tooltip nativo (title) no existe en pantalla táctil, así que
+ * cada sello es un botón que al toque abre una "nota al margen" (.sello-nota)
+ * con la explicación en español llano. GPU-friendly: solo transform/opacity;
+ * todo respeta prefers-reduced-motion.
+ *
+ * Theming: los niveles se resuelven contra las vars --c-* de index.css (la
+ * indirección por tema ya remapea emerald/amber/slate a tintas AA en los
+ * temas claros). El rojo no tiene token --c-*, así que se define acá con
+ * override explícito para los temas de papel.
+ * ========================================================================== */
+
+.sello-fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.sello {
+  /* Nivel por defecto = gris neutro. Cada data-nivel redefine las 2 vars. */
+  --sello-rgb: var(--c-slate-400, 148 163 184);
+  --sello-texto-rgb: var(--c-slate-300, 203 213 225);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px 3px 4px;
+  border-radius: 999px;
+  border: 1px solid rgb(var(--sello-rgb) / 0.38);
+  background: rgb(var(--sello-rgb) / 0.12);
+  color: rgb(var(--sello-texto-rgb));
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-size: 11.5px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Sellos interactivos (botón expandible o enlace a la fuente). */
+button.sello,
+a.sello {
+  cursor: pointer;
+  transition: border-color 0.16s ease, background-color 0.16s ease;
+}
+button.sello:hover,
+a.sello:hover {
+  border-color: rgb(var(--sello-rgb) / 0.65);
+  background: rgb(var(--sello-rgb) / 0.18);
+}
+button.sello:focus-visible,
+a.sello:focus-visible {
+  outline: 2px solid rgb(var(--sello-rgb) / 0.85);
+  outline-offset: 2px;
+}
+button.sello[aria-expanded="true"] {
+  border-color: rgb(var(--sello-rgb) / 0.7);
+  background: rgb(var(--sello-rgb) / 0.2);
+}
+
+/* ── Niveles del semáforo ─────────────────────────────────────────────────── */
+.sello[data-nivel="verde"] {
+  --sello-rgb: var(--c-emerald-500, 16 185 129);
+  --sello-texto-rgb: var(--c-emerald-300, 110 231 183);
+}
+.sello[data-nivel="ambar"] {
+  --sello-rgb: var(--c-amber-500, 245 158 11);
+  --sello-texto-rgb: var(--c-amber-300, 252 211 77);
+}
+.sello[data-nivel="rojo"] {
+  --sello-rgb: 244 63 94;        /* rose-500 */
+  --sello-texto-rgb: 253 164 175; /* rose-300 */
+}
+/* gris = el default de .sello (slate). */
+
+/* Temas de papel (claros): las vars emerald/amber-300 de nature quedan claras
+ * sobre crema; el texto del sello baja a los matices profundos AA del tema.
+ * El rojo (sin token --c-*) también se oscurece a mano. */
+[data-theme="minimalista"] .sello[data-nivel="verde"],
+[data-theme="nature"] .sello[data-nivel="verde"],
+[data-theme="verde-vivo"] .sello[data-nivel="verde"] {
+  --sello-texto-rgb: var(--c-emerald-600, 5 150 105);
+}
+[data-theme="minimalista"] .sello[data-nivel="ambar"],
+[data-theme="nature"] .sello[data-nivel="ambar"],
+[data-theme="verde-vivo"] .sello[data-nivel="ambar"] {
+  --sello-texto-rgb: var(--c-amber-700, 180 83 9);
+}
+[data-theme="minimalista"] .sello[data-nivel="rojo"],
+[data-theme="nature"] .sello[data-nivel="rojo"],
+[data-theme="verde-vivo"] .sello[data-nivel="rojo"] {
+  --sello-rgb: 225 29 72;        /* rose-600 */
+  --sello-texto-rgb: 159 18 57;  /* rose-800 (AA sobre papel) */
+}
+
+/* ── La lámpara: el punto del semáforo con el ícono en negativo ───────────── */
+.sello-lampara {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(var(--sello-rgb));
+  color: rgb(var(--c-surface-card, 15 23 42));
+  /* Se "prende" una sola vez al aparecer — transform/opacity, GPU-friendly. */
+  animation: sello-prende 0.34s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+/* Firma: el sello verde lleva un anillo de puntada, ecoando la costura
+ * esmeralda del cuaderno (v3-card[data-grounded]). Solo el verde: es la
+ * marca de "cosido al catálogo". */
+.sello[data-nivel="verde"] .sello-lampara {
+  box-shadow: 0 0 0 1.5px rgb(var(--c-surface-card, 15 23 42)),
+              0 0 0 2.5px rgb(var(--sello-rgb) / 0.55);
+}
+
+.sello-texto {
+  white-space: nowrap;
+  padding-top: 1px; /* óptico: centra el x-height de Nunito contra la lámpara */
+}
+.sello-texto .sello-sub {
+  font-weight: 700;
+  opacity: 0.78;
+}
+
+/* Variante "beta" (AIBetaBadge): etiqueta de versión en caps chiquitas.
+ * Misma anatomía y semáforo, carácter tipográfico propio. */
+.sello.sello-beta {
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.07em;
+}
+
+/* Caret de los sellos expandibles — gira al abrir (solo transform). */
+.sello-caret {
+  flex: none;
+  opacity: 0.65;
+  transition: transform 0.18s ease;
+}
+button.sello[aria-expanded="true"] .sello-caret {
+  transform: rotate(180deg);
+}
+
+/* ── La nota al margen: explicación en español llano al tocar el sello ────── */
+.sello-nota {
+  --sello-rgb: var(--c-slate-400, 148 163 184);
+  display: block;
+  flex-basis: 100%;
+  padding: 7px 10px;
+  border-left: 2.5px solid rgb(var(--sello-rgb) / 0.75);
+  border-radius: 4px 10px 10px 4px;
+  background: rgb(var(--sello-rgb) / 0.08);
+  color: rgb(var(--c-slate-300, 203 213 225));
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.45;
+  animation: sello-nota-abre 0.18s ease both;
+}
+.sello-nota[data-nivel="verde"] { --sello-rgb: var(--c-emerald-500, 16 185 129); }
+.sello-nota[data-nivel="ambar"] { --sello-rgb: var(--c-amber-500, 245 158 11); }
+.sello-nota[data-nivel="rojo"]  { --sello-rgb: 244 63 94; }
+
+@keyframes sello-prende {
+  from { transform: scale(0.55); opacity: 0.3; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+@keyframes sello-nota-abre {
+  from { transform: translateY(-3px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sello-lampara,
+  .sello-nota {
+    animation: none !important;
+  }
+  .sello,
+  .sello-caret {
+    transition: none !important;
+  }
+}

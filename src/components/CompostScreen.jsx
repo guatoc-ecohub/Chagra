@@ -8,6 +8,7 @@ import {
   ChevronRight, ArrowRight, Info, Worm,
 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
+import './compost/compost.css';
 
 /**
  * CompostScreen — "El compost, paso a paso" (entrada del mundo Estiércol y
@@ -23,6 +24,13 @@ import { ScreenShell } from './common/ScreenShell';
  *   3. Voltear   → darle aire y agua para que caliente.
  *   4. Madurar   → esperar a que huela a tierra de monte.
  *   5. Aplicar   → repartirlo en la era o al pie de la mata.
+ *
+ * 2ª PASADA VISUAL (compost/compost.css): hero con Ken Burns lento, entrada
+ * escalonada (anim-brota de motion.css), conector punteado que fluye entre los
+ * pasos, "PilaViva" (SVG firma: el sánduche C:N dibujado con la regla real,
+ * respirando con vapor y termómetro), llama que parpadea en el diagnóstico,
+ * lombriz que ondula y foco accesible. Solo transform/opacity; TODO se apaga
+ * con prefers-reduced-motion. Cero imágenes nuevas (bundle al tope).
  *
  * Grounding honesto: las cantidades van como REGLA DEL OJO (rangos de práctica
  * estándar de compostaje), no como cifra citada de una fuente puntual. Las
@@ -45,6 +53,70 @@ const CREDITOS_FOTOS_COMPOST = [
   { slug: 'lombriz', autor: 'Gordon Joly', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Compost_with_worms.jpg' },
 ];
 const creditoDe = (slug) => CREDITOS_FOTOS_COMPOST.find((c) => c.slug === slug)?.autor || '';
+
+/**
+ * PilaViva — SVG decorativo firma de la 2ª pasada: el sánduche de la pila
+ * DIBUJADO con la regla real (capas café anchas, capas verde delgadas),
+ * respirando al ritmo de la finca, con vapor y termómetro vivos (compost.css).
+ * Cero bytes de imagen: puro SVG inline. Decorativo → aria-hidden; el texto
+ * de la sección lleva el contenido.
+ */
+function PilaViva() {
+  return (
+    <figure className="my-3">
+      <svg
+        viewBox="0 0 260 150"
+        className="w-full max-w-sm mx-auto block"
+        aria-hidden="true"
+        focusable="false"
+      >
+        {/* suelo */}
+        <line x1="18" y1="133" x2="242" y2="133" stroke="#475569" strokeWidth="2" strokeLinecap="round" />
+        {/* la pila respira (origen abajo, solo transform) */}
+        <g className="compost-pila">
+          {/* capa café ancha (base) */}
+          <path d="M40 132 L220 132 L208 114 L52 114 Z" fill="#92400e" opacity="0.75" />
+          {/* capa verde delgada */}
+          <path d="M52 114 L208 114 L200 106 L60 106 Z" fill="#059669" opacity="0.85" />
+          {/* capa café ancha */}
+          <path d="M60 106 L200 106 L188 88 L72 88 Z" fill="#b45309" opacity="0.7" />
+          {/* capa verde delgada */}
+          <path d="M72 88 L188 88 L180 80 L80 80 Z" fill="#10b981" opacity="0.85" />
+          {/* copete café (tapa) */}
+          <path d="M80 80 L180 80 Q130 52 80 80 Z" fill="#a16207" opacity="0.8" />
+          {/* pajitas sueltas: textura de tamo */}
+          <g stroke="#fbbf24" strokeWidth="1.2" strokeLinecap="round" opacity="0.4">
+            <line x1="70" y1="124" x2="80" y2="120" />
+            <line x1="150" y1="126" x2="162" y2="123" />
+            <line x1="100" y1="97" x2="112" y2="94" />
+            <line x1="165" y1="99" x2="175" y2="95" />
+            <line x1="115" y1="70" x2="127" y2="66" />
+          </g>
+        </g>
+        {/* vapor: la pila está caliente por dentro */}
+        <g stroke="#e2e8f0" strokeWidth="2" fill="none" strokeLinecap="round">
+          <path className="compost-vapor" d="M112 56 q-3 -6 0 -11 q3 -5 0 -10" />
+          <path className="compost-vapor compost-vapor--b" d="M131 50 q-3 -6 0 -11 q3 -5 0 -10" />
+          <path className="compost-vapor compost-vapor--c" d="M150 56 q-3 -6 0 -11 q3 -5 0 -10" />
+        </g>
+        {/* termómetro de finca: el mercurio late con la pila */}
+        <g>
+          <rect x="231" y="56" width="10" height="58" rx="5" fill="#0f172a" stroke="#64748b" strokeWidth="1.5" />
+          <rect className="compost-mercurio" x="234" y="60" width="4" height="50" rx="2" fill="#fb7185" />
+          <circle cx="236" cy="121" r="8" fill="#fb7185" stroke="#64748b" strokeWidth="1.5" />
+          <g stroke="#64748b" strokeWidth="1.2" strokeLinecap="round">
+            <line x1="243" y1="66" x2="247" y2="66" />
+            <line x1="243" y1="82" x2="247" y2="82" />
+            <line x1="243" y1="98" x2="247" y2="98" />
+          </g>
+        </g>
+      </svg>
+      <figcaption className="text-center text-xs text-slate-400 leading-snug">
+        La pila por dentro: capas anchas de café, capas delgadas de verde — y calientica.
+      </figcaption>
+    </figure>
+  );
+}
 
 /**
  * FotoCompost — imagen a sangre con scrim inferior fijo, crédito de autor en la
@@ -165,6 +237,7 @@ const SENALES = [
   },
   {
     Icon: Flame,
+    anim: 'compost-llama',
     sintoma: 'No calienta ni con volteo',
     causa: 'Está seca, muy pequeña o le falta verde.',
     arreglo: 'Riéguela hasta esponja escurrida, agrándela y súmele estiércol o monte verde.',
@@ -203,21 +276,24 @@ const TONOS = {
 export default function CompostScreen({ onBack, onHome, onNavigate }) {
   return (
     <ScreenShell title="El compost, paso a paso" icon={Recycle} onBack={onBack} onHome={onHome}>
-      <div className="max-w-2xl mx-auto px-4 pt-4 pb-10 flex flex-col gap-5">
+      <div className="compost-screen max-w-2xl mx-auto px-4 pt-4 pb-10 flex flex-col gap-5">
 
-        {/* Hero photo-forward */}
-        <section className="rounded-2xl border border-lime-800/40 overflow-hidden bg-slate-900/60">
+        {/* Hero photo-forward — Ken Burns lento sobre la MISMA foto (compost.css) */}
+        <section
+          className="compost-hero anim-brota rounded-2xl border border-lime-800/40 overflow-hidden bg-slate-900/60"
+          style={{ '--i': 0 }}
+        >
           <FotoCompost
             slug="hero"
             alt="Pila de compost en una finca, con capas de estiércol y monte sobre el pasto"
             ratio="aspect-[16/9]"
             Fallback={Recycle}
           >
-            <div className="absolute inset-0 flex flex-col justify-end p-4">
-              <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-lime-200">
+            <div className="absolute inset-0 flex flex-col justify-end p-4 pb-5">
+              <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-lime-200">
                 <Recycle size={14} aria-hidden="true" /> Nada se pierde en la finca
               </p>
-              <h2 className="text-xl font-black text-white leading-tight drop-shadow">
+              <h2 className="mt-0.5 text-2xl sm:text-3xl font-black text-white leading-none drop-shadow-lg">
                 Del corral a la tierra negra
               </h2>
             </div>
@@ -225,7 +301,7 @@ export default function CompostScreen({ onBack, onHome, onNavigate }) {
         </section>
 
         {/* Gancho corto — por qué compostar */}
-        <p className="text-[15px] leading-relaxed text-slate-200">
+        <p className="anim-brota text-[15px] leading-relaxed text-slate-200" style={{ '--i': 1 }}>
           El estiércol crudo <span className="font-semibold text-white">quema la mata y apesta</span>. Pero dejándolo
           madurar con un poco de maña se vuelve el <span className="font-semibold text-lime-300">mejor abono de la finca</span> —
           y no cuesta un peso. Aquí va la receta, con la seña para saber cuándo pasar al siguiente paso.
@@ -236,31 +312,44 @@ export default function CompostScreen({ onBack, onHome, onNavigate }) {
           <h2 id="compost-receta" className="flex items-center gap-2 text-base font-black text-slate-100 mb-3">
             <Sprout size={18} className="text-lime-300" aria-hidden="true" /> La receta en 5 pasos
           </h2>
-          <ol className="flex flex-col gap-4">
-            {PASOS.map((p) => (
-              <li key={p.n} className="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
-                <FotoCompost slug={p.slug} alt={`Paso ${p.n}: ${p.titulo}`} ratio="aspect-[16/9]" Fallback={p.Fallback}>
-                  <div className="absolute inset-0 flex items-end p-3">
-                    <span className="flex items-center gap-2">
-                      <span className="grid place-items-center w-9 h-9 rounded-full bg-lime-500 text-slate-950 text-lg font-black shrink-0 shadow">
-                        {p.n}
-                      </span>
-                      <span className="flex items-center gap-1.5 rounded-full bg-black/50 px-2.5 py-1 text-[11px] font-black uppercase tracking-wide text-lime-200">
-                        <p.Icon size={13} aria-hidden="true" /> {p.kicker}
-                      </span>
-                    </span>
+          <ol className="flex flex-col">
+            {PASOS.map((p, idx) => (
+              <li key={p.n} className="flex flex-col">
+                {/* Conector punteado que "escurre" hacia el paso siguiente (compost.css) */}
+                {p.n > 1 && (
+                  <div className="flex justify-center py-0.5" aria-hidden="true">
+                    <svg width="10" height="26" viewBox="0 0 10 26" className="text-lime-500/60" focusable="false">
+                      <line x1="5" y1="1" x2="5" y2="25" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="compost-flujo" />
+                    </svg>
                   </div>
-                </FotoCompost>
-                <div className="p-4">
-                  <h3 className="text-[15px] font-black text-white leading-tight">{p.titulo}</h3>
-                  <p className="mt-1.5 text-sm text-slate-300 leading-relaxed">{p.texto}</p>
-                  <div className="mt-3 flex items-start gap-2 rounded-xl border border-lime-800/40 bg-lime-950/25 p-2.5">
-                    <CheckCircle2 size={16} className="text-lime-300 shrink-0 mt-0.5" aria-hidden="true" />
-                    <p className="text-[13px] leading-snug text-lime-100/90">
-                      <span className="font-bold text-lime-200">La seña: </span>{p.sena}
-                    </p>
+                )}
+                <article
+                  className="compost-paso anim-brota rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden"
+                  style={{ '--i': idx + 2 }}
+                >
+                  <FotoCompost slug={p.slug} alt={`Paso ${p.n}: ${p.titulo}`} ratio="aspect-[16/9]" Fallback={p.Fallback}>
+                    <div className="absolute inset-0 flex items-end p-3">
+                      <span className="flex items-center gap-2">
+                        <span className="grid place-items-center w-9 h-9 rounded-full bg-lime-500 text-slate-950 text-lg font-black shrink-0 shadow-lg shadow-lime-500/25 ring-2 ring-lime-200/40">
+                          {p.n}
+                        </span>
+                        <span className="flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-black uppercase tracking-wide text-lime-200">
+                          <p.Icon size={13} aria-hidden="true" /> {p.kicker}
+                        </span>
+                      </span>
+                    </div>
+                  </FotoCompost>
+                  <div className="p-4">
+                    <h3 className="text-base font-black text-white leading-tight">{p.titulo}</h3>
+                    <p className="mt-1.5 text-sm text-slate-300 leading-relaxed">{p.texto}</p>
+                    <div className="mt-3 flex items-start gap-2 rounded-xl border border-lime-800/40 border-l-2 border-l-lime-400/80 bg-lime-950/25 p-2.5">
+                      <CheckCircle2 size={16} className="text-lime-300 shrink-0 mt-0.5" aria-hidden="true" />
+                      <p className="text-[13px] leading-snug text-lime-100/90">
+                        <span className="font-bold text-lime-200">La seña: </span>{p.sena}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                </article>
               </li>
             ))}
           </ol>
@@ -277,6 +366,7 @@ export default function CompostScreen({ onBack, onHome, onNavigate }) {
             <span className="font-semibold text-emerald-200">verde y húmedo</span>. Ese equilibrio es el que hace
             que caliente sin apestar.
           </p>
+          <PilaViva />
           <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[MATERIALES.cafe, MATERIALES.verde].map((m, i) => {
               const Icono = m.Icon;
@@ -320,8 +410,11 @@ export default function CompostScreen({ onBack, onHome, onNavigate }) {
               const Icono = s.Icon;
               return (
                 <div key={s.sintoma} className={`rounded-2xl border ${t.border} ${t.bg} p-4`}>
-                  <h3 className={`flex items-center gap-2 text-sm font-black ${t.text}`}>
-                    <Icono size={16} aria-hidden="true" /> {s.sintoma}
+                  <h3 className={`flex items-center gap-2.5 text-sm font-black ${t.text}`}>
+                    <span className={`grid place-items-center w-8 h-8 rounded-lg shrink-0 ${t.chip}`}>
+                      <Icono size={16} className={s.anim || ''} aria-hidden="true" />
+                    </span>
+                    {s.sintoma}
                   </h3>
                   <p className="mt-1 text-[13px] text-slate-400 leading-snug">
                     <span className="font-semibold text-slate-300">Por qué: </span>{s.causa}
@@ -340,9 +433,9 @@ export default function CompostScreen({ onBack, onHome, onNavigate }) {
           <h2 className="flex items-center gap-2 text-base font-black text-slate-100">
             <Recycle size={18} className="text-lime-300" aria-hidden="true" /> Cada estiércol es distinto
           </h2>
-          <ul className="mt-3 flex flex-col gap-2.5">
+          <ul className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             {ESTIERCOLES.map((e) => (
-              <li key={e.animal} className="rounded-xl border border-slate-700/50 bg-slate-800/30 p-3">
+              <li key={e.animal} className="rounded-xl border border-slate-700/50 border-l-2 border-l-lime-600/50 bg-slate-800/30 p-3">
                 <p className="text-sm font-bold text-slate-100">{e.animal}</p>
                 <p className="text-[13px] text-slate-300 leading-snug mt-0.5">{e.nota}</p>
               </li>
@@ -360,7 +453,7 @@ export default function CompostScreen({ onBack, onHome, onNavigate }) {
           >
             <div className="absolute inset-0 flex flex-col justify-end p-4">
               <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-fuchsia-200">
-                <Worm size={14} aria-hidden="true" /> Con ayudantes
+                <Worm size={14} className="compost-lombriz" aria-hidden="true" /> Con ayudantes
               </p>
               <h2 className="text-lg font-black text-white leading-tight drop-shadow">El lombricompost, el más fino</h2>
             </div>
@@ -403,26 +496,26 @@ export default function CompostScreen({ onBack, onHome, onNavigate }) {
               <button
                 type="button"
                 onClick={() => onNavigate('estiercol')}
-                className="w-full text-left rounded-xl border border-slate-700/60 bg-slate-800/40 p-3 flex items-center gap-3 hover:border-slate-600 transition-colors motion-reduce:transition-none"
+                className="compost-puente anim-press w-full text-left rounded-xl border border-slate-700/60 bg-slate-800/40 p-3 flex items-center gap-3 hover:border-lime-700/60 hover:bg-slate-800/70 transition-colors motion-reduce:transition-none"
               >
                 <Flame size={20} className="shrink-0 text-lime-300" aria-hidden="true" />
                 <span className="flex-1 min-w-0">
                   <span className="block text-sm font-bold text-slate-100 leading-tight">Del corral al abono</span>
                   <span className="block text-xs text-slate-400 leading-snug">Quítele el olor a la gallinaza, sáquele gas con el biodigestor y saque cuentas.</span>
                 </span>
-                <ChevronRight size={18} className="text-slate-500 shrink-0" aria-hidden="true" />
+                <ChevronRight size={18} className="compost-puente-flecha text-slate-500 shrink-0" aria-hidden="true" />
               </button>
               <button
                 type="button"
                 onClick={() => onNavigate('agente', { prompt: '¿Cómo hago compost con el estiércol de mis animales y cuánto le echo a cada mata?' })}
-                className="w-full text-left rounded-xl border border-slate-700/60 bg-slate-800/40 p-3 flex items-center gap-3 hover:border-slate-600 transition-colors motion-reduce:transition-none"
+                className="compost-puente anim-press w-full text-left rounded-xl border border-slate-700/60 bg-slate-800/40 p-3 flex items-center gap-3 hover:border-lime-700/60 hover:bg-slate-800/70 transition-colors motion-reduce:transition-none"
               >
                 <Sprout size={20} className="shrink-0 text-lime-300" aria-hidden="true" />
                 <span className="flex-1 min-w-0">
                   <span className="block text-sm font-bold text-slate-100 leading-tight">Pregúntele a Chagra</span>
                   <span className="block text-xs text-slate-400 leading-snug">La dosis fina de compost para su cultivo y su clima.</span>
                 </span>
-                <ArrowRight size={18} className="text-slate-500 shrink-0" aria-hidden="true" />
+                <ArrowRight size={18} className="compost-puente-flecha text-slate-500 shrink-0" aria-hidden="true" />
               </button>
             </div>
           </div>

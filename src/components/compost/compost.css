@@ -1,0 +1,144 @@
+/* ───────────────────────────────────────────────────────────────────────────
+   compost.css — 2ª pasada visual de "El compost, paso a paso".
+
+   Micro-animaciones del mundo Estiércol y compost, hermanas de las de
+   estiercol.css y montadas sobre los tokens de motion.css (--motion-beat,
+   --motion-ease). Todas son SOLO transform/opacity (GPU-friendly, nada de
+   filter/blur animado) y se apagan limpio con prefers-reduced-motion.
+   Cero imágenes nuevas: la vida sale de CSS + SVG inline.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── Hero: Ken Burns lentísimo sobre la foto existente ──────────────────────
+   Zoom apenas perceptible (6% en ~24s, ida y vuelta) que le da aire de
+   documental a la foto de la pila sin pedir un byte nuevo. */
+@keyframes compost-ken {
+  from { transform: scale(1); }
+  to   { transform: scale(1.06); }
+}
+.compost-hero img {
+  animation: compost-ken 24s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* ── Fotos de los pasos: zoom sutil al pasar el mouse (solo puntero fino) ── */
+.compost-paso img {
+  transition: transform 0.7s var(--motion-ease, cubic-bezier(0.22, 0.61, 0.36, 1));
+}
+@media (hover: hover) and (pointer: fine) {
+  .compost-paso:hover img {
+    transform: scale(1.035);
+  }
+}
+
+/* ── Conector entre pasos: el flujo de la receta ────────────────────────────
+   Línea punteada vertical que "escurre" hacia abajo entre tarjeta y tarjeta
+   (mismo lenguaje que la flecha del ciclo en estiércol). Encode la secuencia:
+   la receta ES un orden. */
+@keyframes compost-flujo {
+  to { stroke-dashoffset: -20; }
+}
+.compost-flujo {
+  stroke-dasharray: 4 6;
+  animation: compost-flujo 1.4s linear infinite;
+}
+
+/* ── La pila que respira (SVG firma de la sección C:N) ──────────────────────
+   El montón sube y baja el pecho al ritmo del corazón de la finca
+   (--motion-beat = 5.2s, el mismo latido biopunk de motion.css). */
+@keyframes compost-respira {
+  0%, 100% { transform: scaleY(1); }
+  50%      { transform: scaleY(1.025); }
+}
+.compost-pila {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: compost-respira var(--motion-beat, 5.2s) ease-in-out infinite;
+}
+
+/* Vapor que sube del lomo de la pila: caliente por dentro. */
+@keyframes compost-vapor {
+  0%   { transform: translateY(0); opacity: 0; }
+  20%  { opacity: 0.55; }
+  80%  { opacity: 0.45; }
+  100% { transform: translateY(-16px); opacity: 0; }
+}
+.compost-vapor {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: compost-vapor 4.2s ease-in-out infinite;
+}
+.compost-vapor--b { animation-delay: 1.4s; animation-duration: 4.8s; }
+.compost-vapor--c { animation-delay: 2.6s; animation-duration: 3.8s; }
+
+/* Mercurio del termómetro: sube y baja con la respiración de la pila. */
+@keyframes compost-mercurio {
+  0%, 100% { transform: scaleY(0.62); }
+  50%      { transform: scaleY(0.95); }
+}
+.compost-mercurio {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: compost-mercurio var(--motion-beat, 5.2s) ease-in-out infinite;
+}
+
+/* ── Diagnóstico: la llama de "no calienta" parpadea (un solo acento) ────── */
+@keyframes compost-llama {
+  0%, 100% { transform: scaleY(1) translateY(0); opacity: 0.92; }
+  50%      { transform: scaleY(1.16) translateY(-0.5px); opacity: 1; }
+}
+.compost-llama {
+  animation: compost-llama 1.1s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+/* ── La lombriz ondula despacito en el kicker del lombricompost ──────────── */
+@keyframes compost-lombriz {
+  0%, 100% { transform: rotate(-5deg); }
+  50%      { transform: rotate(5deg); }
+}
+.compost-lombriz {
+  animation: compost-lombriz 3.4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* ── Puentes al mundo: la flecha se asoma al pasar el mouse ─────────────── */
+.compost-puente-flecha {
+  transition: transform var(--motion-dur-press, 0.16s) var(--motion-ease, ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .compost-puente:hover .compost-puente-flecha {
+    transform: translateX(3px);
+  }
+}
+
+/* ── Foco accesible vivo en toda la pantalla ────────────────────────────────
+   Anillo lima consistente para teclado en botones y enlaces (los estilos
+   Tailwind por-elemento no lo cubrían). */
+.compost-screen :is(button, a):focus-visible {
+  outline: 2px solid rgb(163 230 53 / 0.85);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+/* ── prefers-reduced-motion: TODO quieto, contenido intacto ──────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .compost-hero img,
+  .compost-flujo,
+  .compost-pila,
+  .compost-vapor,
+  .compost-mercurio,
+  .compost-llama,
+  .compost-lombriz {
+    animation: none;
+  }
+  .compost-vapor { opacity: 0.4; }
+  .compost-mercurio { transform: scaleY(0.8); }
+  .compost-paso img,
+  .compost-puente-flecha {
+    transition: none;
+  }
+  .compost-paso:hover img,
+  .compost-puente:hover .compost-puente-flecha {
+    transform: none;
+  }
+}

@@ -7,6 +7,7 @@ import './styles/motion.css'
 import './styles/temas-fase2.css'
 import './styles/juego-pulido.css'
 import './styles/clima-atmosfera.css'
+import './styles/sello-confianza.css'
 import App from './App.jsx'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ModoCampoProvider } from './hooks/ModoCampoContext'
@@ -17,7 +18,7 @@ import { PRIMARY_WORKER_NAME } from './config/workerConfig'
 import { renameWorker } from './services/assetService'
 import { getAccessToken } from './services/authService'
 import { registerServiceWorker } from './services/swRegistration'
-import { runSelfHealCheck, RUNNING_BUILD_SHA } from './services/versionCheck'
+import { runSelfHealCheck, installBundleRecoveryGuards, RUNNING_BUILD_SHA } from './services/versionCheck'
 import { runCanonicalHostRedirectGuard } from './services/canonicalHostRedirect'
 
 // Exponer el SHA del bundle CORRIENDO para diagnóstico + el smoke post-deploy
@@ -49,6 +50,7 @@ if (!canonicalRedirect.redirected) {
     }
 
     syncManager.startNetworkMonitoring();
+    installBundleRecoveryGuards();
 
     // Migración de identidad: ejecución única, solo si hay sesión activa.
     if (navigator.onLine && !localStorage.getItem('chagra:v1:rename_done')) {

@@ -1,33 +1,46 @@
 /*
  * milpa.css — micro-animaciones del módulo "La milpa: maíz, fríjol y calabaza".
+ * (2ª pasada visual: orquestación del diagrama + stagger + estados vivos.)
  *
  * Principios (mismos que agua.css):
- *   · Sutiles y de bajo costo (solo transform/opacity, nada de layout).
- *   · prefers-reduced-motion las apaga TODAS.
+ *   · Sutiles y de bajo costo: SOLO transform/opacity (GPU-friendly), nada de
+ *     layout ni filter/blur animado.
+ *   · prefers-reduced-motion las apaga TODAS (el módulo queda 100% legible
+ *     estático: las animaciones "both" pierden su fill y todo queda crecido).
  *   · Los colores salen de las clases Tailwind del componente (paleta slate +
  *     acentos ámbar/rosa/naranja), que ya reaccionan a los temas vía data-theme
  *     (themes.css) — aquí no se fija ningún color de tema, solo movimiento.
  */
 
-/* Entrada suave del contenido de la sección al cambiar de pestaña. */
-@keyframes milpa-seccion-entra {
-  from { opacity: 0; transform: translateY(6px); }
+/* ── Entrada de sección: los bloques suben en cascada (stagger) ─────────── */
+@keyframes milpa-sube {
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.milpa-seccion {
-  animation: milpa-seccion-entra 0.3s ease-out;
+.milpa-seccion > * {
+  animation: milpa-sube 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+.milpa-seccion > *:nth-child(2) { animation-delay: 0.06s; }
+.milpa-seccion > *:nth-child(3) { animation-delay: 0.12s; }
+.milpa-seccion > *:nth-child(4) { animation-delay: 0.18s; }
+.milpa-seccion > *:nth-child(5) { animation-delay: 0.24s; }
+.milpa-seccion > *:nth-child(n + 6) { animation-delay: 0.3s; }
 
-/* Fotos reales: aparición suave (solo opacity, sin reflow) al montarse. */
-@keyframes milpa-foto-entra {
-  from { opacity: 0; }
-  to { opacity: 1; }
+/* ── Fotos reales: se "asientan" (opacity + zoom leve que cede) ─────────── */
+@keyframes milpa-foto-asienta {
+  from { opacity: 0; transform: scale(1.045); }
+  to { opacity: 1; transform: scale(1); }
 }
 .milpa-foto {
-  animation: milpa-foto-entra 0.5s ease-out;
+  animation: milpa-foto-asienta 0.9s ease-out both;
 }
 
-/* Pestaña activa: aro que pulsa una sola vez al seleccionar. */
+/* ── Pestañas: transición suave + pulso al activar + indicador ──────────── */
+.milpa-tab {
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+.milpa-tab:active { transform: scale(0.97); }
+
 @keyframes milpa-tab-pulso {
   0% { transform: scale(0.94); opacity: 0.5; }
   60% { transform: scale(1.05); opacity: 1; }
@@ -37,23 +50,100 @@
   animation: milpa-tab-pulso 0.42s ease-out;
 }
 
-/* El fríjol que "trepa" por la caña del maíz en el diagrama de la asociación:
-   la guía crece de abajo hacia arriba (scaleY con origen abajo). */
-.milpa-guia {
-  transform-origin: center bottom;
-  animation: milpa-guia-sube 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+/* Rayita indicadora bajo la pestaña activa: se abre desde el centro. */
+@keyframes milpa-indicador-abre {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }
-@keyframes milpa-guia-sube {
-  from { transform: scaleY(0); opacity: 0.2; }
-  to { transform: scaleY(1); opacity: 1; }
+.milpa-tab-indicador {
+  transform-origin: center;
+  animation: milpa-indicador-abre 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* ── Tarjetas vivas: leve levantada al pasar el mouse (solo con puntero) ── */
+.milpa-card-viva {
+  transition: transform 0.22s ease, border-color 0.22s ease, background-color 0.22s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .milpa-card-viva:hover { transform: translateY(-2px); }
+}
+
+/* ── El diagrama: la milpa CRECE en orden real de siembra ────────────────
+ * 1º el maíz sube (el tutor) → 2º el fríjol trepa por la caña → 3º la
+ * calabaza se riega por el suelo → brotan hojas/etiquetas → brisa perpetua.
+ * Los <g> usan transform-box: fill-box para que el origen sea de cada grupo. */
+@keyframes milpa-crece {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+@keyframes milpa-riega {
+  from { transform: scale(0.12, 0.5); opacity: 0; }
+  to { transform: scale(1, 1); opacity: 1; }
+}
+@keyframes milpa-aparece {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+/* Brisa: mece la mata desde la base; arranca y termina en 0° (loop sin salto). */
+@keyframes milpa-brisa-mece {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(1.3deg); }
+  75% { transform: rotate(-1.3deg); }
+}
+@keyframes milpa-sol-late {
+  from { opacity: 0.55; }
+  to { opacity: 1; }
+}
+
+.milpa-anim-maiz {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: milpa-crece 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+.milpa-brisa {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: milpa-brisa-mece 6s ease-in-out 2.6s infinite;
+}
+.milpa-anim-frijol {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: milpa-crece 1.2s cubic-bezier(0.22, 1, 0.36, 1) 1.05s both;
+}
+.milpa-anim-calabaza {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: milpa-riega 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1.7s both;
+}
+.milpa-anim-brote { animation: milpa-aparece 0.6s ease-out 2.1s both; }
+.milpa-sol { animation: milpa-sol-late 7s ease-in-out infinite alternate; }
+.milpa-etiquetas { animation: milpa-aparece 0.6s ease-out 2.3s both; }
+
+/* ── Relojito de "dato en camino": se voltea de vez en cuando ───────────── */
+@keyframes milpa-reloj-vuelta {
+  0%, 55% { transform: rotate(0deg); }
+  70%, 90% { transform: rotate(180deg); }
+  100% { transform: rotate(360deg); }
+}
+.milpa-reloj { animation: milpa-reloj-vuelta 5s ease-in-out infinite; }
+
+/* ── prefers-reduced-motion: TODO quieto (y el diagrama, crecido) ───────── */
 @media (prefers-reduced-motion: reduce) {
-  .milpa-seccion,
+  .milpa-seccion > *,
   .milpa-foto,
+  .milpa-tab,
   .milpa-tab-activa,
-  .milpa-guia {
-    animation: none;
+  .milpa-tab-indicador,
+  .milpa-card-viva,
+  .milpa-anim-maiz,
+  .milpa-brisa,
+  .milpa-anim-frijol,
+  .milpa-anim-calabaza,
+  .milpa-anim-brote,
+  .milpa-sol,
+  .milpa-etiquetas,
+  .milpa-reloj {
+    animation: none !important;
+    transition: none !important;
   }
-  .milpa-guia { transform: none; }
 }

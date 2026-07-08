@@ -3,6 +3,10 @@
    Sutiles, cálidas, tipo cuaderno de campo. Todas se apagan con
    prefers-reduced-motion. No hardcodean color de tema (usan currentColor /
    opacidad) para vivir bien en los 4 temas y ser legibles al sol.
+
+   2ª pasada visual (jerarquía + vida): hero photo-forward, entrada escalonada,
+   hover/focus vivos, pop de resultados. SOLO transform/opacity (GPU-friendly);
+   nada de filter/blur animado.
    ─────────────────────────────────────────────────────────────────────────── */
 
 /* Entrada suave de cada sección al cambiar de pilar. */
@@ -12,6 +16,31 @@
 }
 .estiercol-enter {
   animation: estiercol-fade-up 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Entrada escalonada de los hijos directos (listas de cards): cada tarjeta
+   llega un pelito después de la anterior — la pantalla "se arma" sola. */
+.estiercol-stagger > * {
+  animation: estiercol-fade-up 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.estiercol-stagger > *:nth-child(1) { animation-delay: 0.03s; }
+.estiercol-stagger > *:nth-child(2) { animation-delay: 0.09s; }
+.estiercol-stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.estiercol-stagger > *:nth-child(4) { animation-delay: 0.21s; }
+.estiercol-stagger > *:nth-child(5) { animation-delay: 0.27s; }
+.estiercol-stagger > *:nth-child(6) { animation-delay: 0.33s; }
+.estiercol-stagger > *:nth-child(7) { animation-delay: 0.39s; }
+.estiercol-stagger > *:nth-child(n+8) { animation-delay: 0.45s; }
+
+/* Hero photo-forward: la foto respira un Ken Burns MUY leve al entrar
+   (solo transform, una vez) y el contenido sube por encima del scrim. */
+@keyframes estiercol-hero-kb {
+  from { transform: scale(1.07); }
+  to   { transform: scale(1); }
+}
+.estiercol-hero-img {
+  animation: estiercol-hero-kb 1.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform;
 }
 
 /* Burbujas de gas subiendo dentro del biodigestor (SVG). */
@@ -62,17 +91,82 @@
   animation: estiercol-flujo 1.1s linear infinite;
 }
 
-/* Chip/pastilla del pilar activo — sutil elevación. */
+/* Chip/pastilla del pilar activo — elevación sutil + foco accesible visible.
+   Se comparte con botones de la calculadora y accesos del inicio. */
 .estiercol-pilar-btn {
-  transition: transform 0.16s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  transition: transform 0.16s ease, box-shadow 0.2s ease, background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+@media (hover: hover) {
+  .estiercol-pilar-btn:hover { transform: translateY(-1px); }
 }
 .estiercol-pilar-btn:active { transform: scale(0.97); }
+.estiercol-pilar-btn:focus-visible,
+.estiercol-card-btn:focus-visible {
+  outline: 2px solid rgba(52, 211, 153, 0.9); /* emerald-400 */
+  outline-offset: 2px;
+}
+
+/* Tarjeta-acceso (inicio) y tarjeta de abono: levantan al pasar el dedo/mouse
+   y el chevrón se corre — invitan a tocar. Solo transform/opacity. */
+.estiercol-card-btn {
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease,
+    border-color 0.2s ease, background-color 0.2s ease;
+}
+@media (hover: hover) {
+  .estiercol-card-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px -8px rgba(0, 0, 0, 0.55);
+  }
+  .estiercol-card-btn:hover .estiercol-chevron { transform: translateX(3px); }
+}
+.estiercol-card-btn:active { transform: scale(0.985); }
+.estiercol-chevron { transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1); }
+.estiercol-chevron--abierto { transform: rotate(90deg); }
+@media (hover: hover) {
+  .estiercol-card-btn:hover .estiercol-chevron--abierto {
+    transform: rotate(90deg) translateY(-3px); /* eje rotado: sigue "saliendo" */
+  }
+}
+
+/* Glifo del abono: al abrir la tarjeta crece un pelo, como asintiendo. */
+.estiercol-glifo-tile { transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1); }
+.estiercol-glifo-tile--abierto { transform: scale(1.08); }
+
+/* Resultado de la calculadora: cuando la cifra cambia, "asienta" con un pop.
+   Se re-dispara montando el span con key={texto}. */
+@keyframes estiercol-pop {
+  0%   { opacity: 0;   transform: translateY(4px) scale(0.94); }
+  60%  { opacity: 1;   transform: translateY(0)   scale(1.03); }
+  100% { opacity: 1;   transform: translateY(0)   scale(1); }
+}
+.estiercol-pop {
+  display: inline-block;
+  animation: estiercol-pop 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Flecha "de esto → a esto" (olores): empuja suave hacia la solución. */
+@keyframes estiercol-nudge {
+  0%, 100% { transform: translateX(0);   opacity: 0.85; }
+  50%      { transform: translateX(4px); opacity: 1; }
+}
+.estiercol-nudge { animation: estiercol-nudge 1.6s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   .estiercol-enter,
+  .estiercol-stagger > *,
+  .estiercol-hero-img,
   .estiercol-burbuja,
   .estiercol-cupula,
   .estiercol-llama,
-  .estiercol-flujo { animation: none; }
-  .estiercol-cupula { transition: none; }
+  .estiercol-flujo,
+  .estiercol-pop,
+  .estiercol-nudge { animation: none; }
+  .estiercol-cupula,
+  .estiercol-pilar-btn,
+  .estiercol-card-btn,
+  .estiercol-chevron,
+  .estiercol-glifo-tile { transition: none; }
+  .estiercol-card-btn:hover,
+  .estiercol-pilar-btn:hover { transform: none; }
 }

@@ -6,6 +6,7 @@ import {
   Baby, Activity, ShieldAlert, Ruler, Landmark, HeartPulse,
   Flame, Filter, Camera, ExternalLink, HelpCircle,
   Worm, Eye, ScanEye, MapPin, ListChecks,
+  Coffee, Layers, Pickaxe, GlassWater, Salad, PawPrint,
 } from 'lucide-react';
 import { ScreenShell } from '../common/ScreenShell';
 import PedagogicalBlock from '../common/PedagogicalBlock';
@@ -39,6 +40,9 @@ import {
   CHEQUEO_AGUA_SEGURA,
   FOTO_BASE_AGUA,
   CREDITOS_FOTOS_AGUA,
+  CAFE_AGUAS_MIELES,
+  METALES_AGUA,
+  PARA_QUE_SIRVE,
 } from '../../data/aguaFinca';
 import { getEnsoPhase, getEnsoLabel } from '../../services/ensoService';
 import './agua.css';
@@ -470,6 +474,17 @@ const ICONO_RIESGO = {
   combustible: Fuel,
   matadero: Beef,
   basura: Trash2,
+  cafe: Coffee,
+  sedimento: Layers,
+  metal: Pickaxe,
+};
+
+/** Íconos por uso del agua (¿esta agua sirve para...?). */
+const ICONO_USO = {
+  tomar: GlassWater,
+  hortaliza: Salad,
+  animales: PawPrint,
+  riego: Sprout,
 };
 
 /** Íconos por enfermedad. */
@@ -499,6 +514,101 @@ function SemaforoPeligro({ nivel }) {
       />
       Peligro {alto ? 'alto' : 'medio'}
     </span>
+  );
+}
+
+/** Lámina propia del beneficiadero: la cereza de café y los DOS destinos del
+ *  agua miel — a la fosa/pozo (bien) o a la quebrada (mal). Decorativa
+ *  (aria-hidden): el paso a paso con letras va debajo. Solo SVG, cero fotos. */
+function LaminaAguasMieles() {
+  return (
+    <svg viewBox="0 0 180 100" aria-hidden="true" className="w-full h-auto select-none">
+      {/* rama de café con cerezas maduras */}
+      <g>
+        <path d="M14 30 q 18 -14 38 -8" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-emerald-700" strokeLinecap="round" />
+        <ellipse cx="30" cy="18" rx="9" ry="4.5" transform="rotate(-24 30 18)" className="fill-current text-emerald-600" />
+        <circle cx="22" cy="32" r="6" className="fill-current text-rose-500" />
+        <circle cx="34" cy="36" r="6" className="fill-current text-rose-600" />
+        <circle cx="45" cy="31" r="6" className="fill-current text-rose-500" />
+      </g>
+      {/* tolva del beneficiadero */}
+      <g className="text-slate-300">
+        <path d="M62 22 L94 22 L86 44 L70 44 Z" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round" />
+        <rect x="73" y="44" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2.5" />
+      </g>
+      {/* gotas de agua miel saliendo del beneficio */}
+      <g className="text-amber-400">
+        <path d="M78 60 q -3.5 5 0 8 q 3.5 -3 0 -8 z" fill="currentColor" />
+      </g>
+      {/* camino BUENO: al pozo/fosa techada (check) */}
+      <g>
+        <path d="M86 68 q 20 10 34 10" fill="none" stroke="currentColor" strokeWidth="2" className="text-emerald-400" strokeDasharray="4 3" strokeLinecap="round" />
+        <path d="M126 70 L150 70 L148 88 L128 88 Z" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-emerald-400" strokeLinejoin="round" />
+        <path d="M123 70 L138 61 L153 70" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-emerald-300" strokeLinejoin="round" />
+        <path d="M133 79 l 4 4 l 7 -8" fill="none" stroke="currentColor" strokeWidth="3" className="text-emerald-300" strokeLinecap="round" strokeLinejoin="round" />
+        <text x="126" y="98" fontSize="8" fontWeight="700" className="fill-current text-emerald-300">a su pozo</text>
+      </g>
+      {/* camino MALO: a la quebrada (equis roja sobre el agua) */}
+      <g>
+        <path d="M70 68 q -20 10 -34 12" fill="none" stroke="currentColor" strokeWidth="2" className="text-rose-400" strokeDasharray="4 3" strokeLinecap="round" />
+        <path d="M8 88 q 6 -4 12 0 t 12 0 t 12 0" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-cyan-400 agua-hilo" strokeLinecap="round" />
+        <g className="text-rose-400" strokeLinecap="round">
+          <line x1="18" y1="72" x2="30" y2="84" stroke="currentColor" strokeWidth="3.5" />
+          <line x1="30" y1="72" x2="18" y2="84" stroke="currentColor" strokeWidth="3.5" />
+        </g>
+        <text x="8" y="70" fontSize="8" fontWeight="700" className="fill-current text-rose-300">quebrada NO</text>
+      </g>
+    </svg>
+  );
+}
+
+/**
+ * AguasMielesCafe — el caso icónico de la finca cafetera: el beneficiadero.
+ * Qué son las aguas mieles, por qué matan la quebrada (le roban el oxígeno) y
+ * el paso a paso del beneficio ecológico (Cenicafé, cualitativo). La cifra de
+ * carga contaminante (DBO) es slot grounded-pendiente: se promete, no se
+ * inventa.
+ */
+function AguasMielesCafe() {
+  return (
+    <section className="rounded-2xl border border-amber-700/40 bg-slate-900/60 p-4 space-y-3" data-testid="agua-aguas-mieles">
+      <div className="flex items-start gap-3">
+        <span aria-hidden="true" className="shrink-0 w-9 h-9 rounded-xl bg-amber-500/15 grid place-items-center text-amber-300">
+          <Coffee size={18} />
+        </span>
+        <div className="min-w-0">
+          <p className="text-sm font-black text-amber-200 uppercase tracking-wide leading-tight">{CAFE_AGUAS_MIELES.titulo}</p>
+          <p className="text-[11px] text-slate-400 leading-snug mt-0.5">El caso del beneficiadero, para finca cafetera</p>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-slate-700/50 bg-slate-950/50 p-2">
+        <LaminaAguasMieles />
+      </div>
+
+      <p className="text-xs leading-snug text-slate-200">{CAFE_AGUAS_MIELES.resumen}</p>
+
+      <ol className="space-y-2.5">
+        {CAFE_AGUAS_MIELES.queHacer.map((paso, i) => (
+          <li key={paso.id} className="flex gap-3" data-testid={`mieles-paso-${paso.id}`}>
+            <span aria-hidden="true" className="shrink-0 w-6 h-6 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-black grid place-items-center">
+              {i + 1}
+            </span>
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-slate-100 leading-tight">{paso.titulo}</p>
+              <p className="text-xs leading-snug text-slate-300 mt-0.5">{paso.detalle}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      <p className="text-[11px] leading-snug text-slate-400">
+        ¿Qué tanto contamina un beneficio sin manejo? La cifra medida viene en camino{' '}
+        <SlotPendiente>carga orgánica (DBO) en camino (Cenicafé)</SlotPendiente>. Lo que ya es
+        seguro: agua miel a la quebrada = quebrada sin oxígeno.
+      </p>
+      <p className="text-[10px] leading-snug text-slate-500">Fuente: {CAFE_AGUAS_MIELES.fuente}.</p>
+    </section>
   );
 }
 
@@ -564,7 +674,21 @@ function RiesgosSalud() {
             );
           })}
         </ul>
+        {/* Metales: el único foco SIN tratamiento casero — el límite legal es casi cero */}
+        <p className="flex items-start gap-1.5 text-[11px] leading-snug text-slate-400" data-testid="agua-metales-limite">
+          <Pickaxe size={13} aria-hidden="true" className="shrink-0 mt-0.5 text-slate-500" />
+          <span>
+            Con los metales no hay remedio casero: hervir <strong className="text-slate-300">no</strong> los
+            quita. Por eso la ley los deja casi en cero en el agua de tomar — mercurio máximo{' '}
+            <strong className="text-slate-300">{fmt(METALES_AGUA.limitesMgL.mercurio)} mg/L</strong>, plomo y arsénico{' '}
+            <strong className="text-slate-300">{fmt(METALES_AGUA.limitesMgL.plomo)} mg/L</strong> (Resolución 2115/2007).
+            La única defensa es cambiar de fuente.
+          </span>
+        </p>
       </section>
+
+      {/* ── A2 · Caso cafetero: las aguas mieles del beneficiadero ── */}
+      <AguasMielesCafe />
 
       {/* ── B · Qué enferma (autoridad institucional, nunca una persona) ── */}
       <section className="rounded-2xl border border-slate-700/60 bg-slate-900/50 p-4 space-y-3" data-testid="agua-enfermedades">
@@ -666,6 +790,41 @@ function RiesgosSalud() {
         </p>
       </section>
     </div>
+  );
+}
+
+/**
+ * ParaQueSirve — «¿esta agua sirve para...?»: la regla por USO, del más
+ * exigente (tomar/tetero) al menos (riego). Complementa la escalera por
+ * fuente ("Cada agua para lo suyo") en la dirección en que pregunta la gente.
+ */
+function ParaQueSirve() {
+  return (
+    <section className="rounded-2xl border border-slate-700/60 bg-slate-900/50 p-4 space-y-3" data-testid="agua-para-que-sirve">
+      <p className="flex items-center gap-2 text-sm font-black text-slate-100 uppercase tracking-wide">
+        <HelpCircle size={16} aria-hidden="true" className="text-cyan-300" /> ¿Esta agua sirve para...?
+      </p>
+      <p className="text-xs leading-snug text-slate-300">
+        De lo más delicado a lo menos: entre más arriba en la lista, más limpia tiene que llegar el agua.
+      </p>
+      <ol className="space-y-2.5">
+        {PARA_QUE_SIRVE.map((u) => {
+          const Icono = ICONO_USO[u.icono] || Droplets;
+          return (
+            <li key={u.id} className="rounded-xl border border-slate-700/50 bg-slate-950/40 p-3" data-testid={`uso-${u.id}`}>
+              <p className="flex flex-wrap items-center gap-2 text-sm font-bold text-slate-100 leading-tight">
+                <Icono size={16} aria-hidden="true" className="shrink-0 text-cyan-300" />
+                {u.uso}
+                <span className="rounded-full bg-slate-700/50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-slate-300">
+                  {u.exige}
+                </span>
+              </p>
+              <p className="mt-1 text-xs leading-snug text-slate-300">{u.regla}</p>
+            </li>
+          );
+        })}
+      </ol>
+    </section>
   );
 }
 
@@ -998,6 +1157,9 @@ function PilarCuidar() {
           </div>
         ))}
       </div>
+
+      {/* ¿Esta agua sirve para...? — la misma pregunta, mirada desde el USO */}
+      <ParaQueSirve />
 
       {/* SALUD · Cómo potabilizar en casa — galería photo-forward, 4 métodos */}
       <MetodosPotabilizacion />

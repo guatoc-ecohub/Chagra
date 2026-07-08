@@ -22,6 +22,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   registerServiceWorker,
   AUTO_UPDATE_DELAY_MS,
+  unregisterRegisteredServiceWorker,
 } from '../swRegistration';
 import { ACK_STORAGE_KEY } from '../swUpdateAck';
 import { reloadPage } from '../pageReload';
@@ -258,5 +259,18 @@ describe('swRegistration — AUTO-UPDATE seguro', () => {
     // Asegurar que no existe.
     delete navigator.serviceWorker;
     expect(() => registerServiceWorker()).not.toThrow();
+  });
+
+  it('unregisterRegisteredServiceWorker desregistra sin tocar IndexedDB', async () => {
+    const unregister = vi.fn(async () => true);
+    Object.defineProperty(navigator, 'serviceWorker', {
+      configurable: true,
+      value: {
+        getRegistration: vi.fn(async () => ({ unregister })),
+      },
+    });
+
+    await expect(unregisterRegisteredServiceWorker()).resolves.toBe(true);
+    expect(unregister).toHaveBeenCalledTimes(1);
   });
 });

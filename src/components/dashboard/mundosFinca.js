@@ -53,8 +53,14 @@ export const MUNDOS_FINCA = [
             { view: 'directorio', label: 'Qué puedo sembrar', desc: 'Especies para su clima, con qué se llevan y sus plagas', emoji: '🌱' },
             { view: 'platano', label: 'Plátano y banano', desc: 'El pancoger de la casa: variedades, siembra, la mata madre-hijo-nieto, sigatoka y picudo, y aprovechar el pseudotallo', emoji: '🍌' },
             { view: 'cacao', label: 'El cacao', desc: 'Cultivo bandera de la paz: clones, sombra, monilia y escoba, y el beneficio que hace el precio', emoji: '🍫' },
+            { view: 'frutales', label: 'Frutales de la finca', desc: 'Cítricos, aguacate, mango, guayaba, mora, lulo, tomate de árbol y papaya: cómo se propagan e injertan, siembra y distancias, piso térmico, plagas sin veneno, poda y cosecha', emoji: '🍊' },
             { view: 'hortalizas', label: 'Hortalizas de la huerta', desc: 'La comida diaria de la casa: siembra, agua, vecinas, plagas y cosecha de tomate, cebolla, zanahoria y más', emoji: '🥕' },
+            { view: 'tuberculos', label: 'Tubérculos y raíces', desc: 'El pancoger de raíz: papa y criolla, yuca, arracacha, ñame, batata, oca, cubio y ulluco — siembra, aporque, plagas y curado', emoji: '🥔' },
+            { view: 'quinua', label: 'Quinua y granos andinos', desc: 'Granos ancestrales del frío alto-andino: quinua, amaranto, cañihua, chía y tarwi; siembra, el desaponificado (lavar el amargo), mildiú sin veneno, cosecha y su valor nutricional (proteína completa, sin gluten)', emoji: '🌾' },
+            { view: 'fique', label: 'El fique y las fibras', desc: 'El cultivo de ladera que cuida el suelo: la cabuya, cómo se cría, el desfibrado de la penca, empaques y artesanía, y aprovechar el bagazo y el jugo sin contaminar el agua', emoji: '🪢' },
             { view: 'calendario_finca', label: 'Calendario de la finca', desc: 'Cuándo sembrar, abonar y cosechar, todo junto', emoji: '🗓️' },
+            { view: 'almanaque', label: 'Almanaque campesino', desc: 'El año a lo grande: aguas y secas, qué da su piso térmico y el saber lunar', emoji: '🌙' },
+            { view: 'ano_finca', label: 'El año de la finca', desc: 'La línea de tiempo de SU año: qué sembró, cosechó y trabajó, y lo que viene en camino', emoji: '🛤️' },
             { view: 'activos', label: 'Mis matas', desc: 'Las plantas que tiene sembradas y cómo van', emoji: '🪴' },
             { view: 'mapa', label: 'Zonas de la finca', desc: 'Sus lotes, eras y potreros en el mapa', emoji: '🗺️' },
             { view: 'semilla', label: 'Semilla propia', desc: 'Seleccione, guarde y pruebe su semilla criolla', emoji: '🌾' },
@@ -62,6 +68,7 @@ export const MUNDOS_FINCA = [
             { view: 'aromaticas', label: 'Huerta de aromáticas', desc: 'Cilantro, cebolla larga, orégano y más: para qué sirven en la cocina y cómo sembrarlas', emoji: '🌿' },
             { view: 'sembrar', label: 'Registrar una siembra', desc: 'Anote lo que sembró y arranca su ciclo', emoji: '🌽' },
             { view: 'cosechar', label: 'Cosechar', desc: 'Anote lo que recogió', emoji: '🧺' },
+            { view: 'mi_cosecha', label: 'Mi cosecha', desc: 'Cuánto ha producido su finca: por cultivo, mes a mes y por lote', emoji: '📊' },
             { view: 'ciclo', label: 'Ciclo de cultivo', desc: 'La vida de la mata etapa por etapa', emoji: '🔄' },
         ],
     },
@@ -74,6 +81,17 @@ export const MUNDOS_FINCA = [
         // Mundo de una sola pantalla (photo-forward, 5 estaciones del ciclo
         // cafetero). La tarjeta navega directo, sin pantalla intermedia.
         directo: { view: 'cafe' },
+    },
+    {
+        id: 'cana',
+        titulo: 'La caña y la panela',
+        emoji: '🥮',
+        lema: 'De la caña al bloque: variedad, siembra, barrenador, corte y la panela en el trapiche',
+        tinte: ['#8a5a1f', '#f3e3c2'],
+        // Mundo de una sola pantalla (photo-forward, 5 estaciones: la caña /
+        // siembra y manejo / plagas / corte / la panela). Cultura panelera
+        // colombiana. La tarjeta navega directo, sin pantalla intermedia.
+        directo: { view: 'cana' },
     },
     {
         id: 'suelo',
@@ -180,6 +198,7 @@ export const MUNDOS_FINCA = [
         tinte: ['#2f6b3a', '#d8e9d2'],
         entradas: [
             { view: 'asociaciones', label: 'Buenas vecinas', desc: 'Qué cultivos se ayudan sembrados juntos', emoji: '🌻' },
+            { view: 'restauracion', label: 'Restauración y bosque de alimentos', desc: 'Los 7 estratos del bosque comestible, la sucesión ecológica y cómo restaurar un suelo herido — con especies nativas y multipropósito del catálogo', emoji: '🌳' },
             { view: 'biodiversidad', label: 'El monte de la finca', desc: 'Plantas y animales silvestres que la acompañan', emoji: '🦜' },
             { view: 'seguimiento_reforestacion', label: 'Reforestación', desc: 'Restauración con árboles nativos', emoji: '🌳' },
             { view: 'seguimiento_silvopastoreo', label: 'Silvopastoreo', desc: 'Árboles + pasto + ganado en el mismo lote', emoji: '🐂' },

@@ -392,13 +392,64 @@ export const temporalTrend = (norm = []) => {
   return { series, slope, direction };
 };
 
+/**
+ * Totales de la TEMPORADA (año calendario en curso) + comparación simple del
+ * último mes con datos contra el mes anterior con datos. Derivado 100% de la
+ * serie mensual de temporalTrend — no toca los logs.
+ *
+ * @param {Array<{period:string,totalKg:number,totalCount:number,harvestCount:number}>} series
+ *   serie mensual ORDENADA ascendente (salida de temporalTrend).
+ * @param {Date} [now] - inyectable para tests; default hoy.
+ * @returns {{
+ *   year:string, seasonKg:number, seasonCount:number, seasonHarvests:number,
+ *   monthsWithData:number, usesKg:boolean,
+ *   lastMonth:object|null, prevMonth:object|null,
+ *   deltaKg:number|null, deltaPct:number|null
+ * }}
+ */
+export const seasonStats = (series = [], now = new Date()) => {
+  const year = String(now.getUTCFullYear());
+  const inYear = series.filter((s) => s.period.startsWith(`${year}-`));
+  const sum = (arr, key) => arr.reduce((acc, s) => acc + (s[key] || 0), 0);
+
+  // Comparación: último mes con datos vs el anterior CON datos (la vista
+  // muestra ambos periodos para que la comparación sea honesta aunque haya
+  // meses vacíos en medio).
+  const lastMonth = series.length ? series[series.length - 1] : null;
+  const prevMonth = series.length > 1 ? series[series.length - 2] : null;
+  const usesKg = series.some((s) => s.totalKg > 0);
+  const valueOf = (s) => (usesKg ? s.totalKg : s.totalCount);
+
+  let deltaKg = null;
+  let deltaPct = null;
+  if (lastMonth && prevMonth) {
+    deltaKg = valueOf(lastMonth) - valueOf(prevMonth);
+    const base = valueOf(prevMonth);
+    deltaPct = base > 0 ? (deltaKg / base) * 100 : null;
+  }
+
+  return {
+    year,
+    seasonKg: sum(inYear, 'totalKg'),
+    seasonCount: sum(inYear, 'totalCount'),
+    seasonHarvests: sum(inYear, 'harvestCount'),
+    monthsWithData: inYear.length,
+    usesKg,
+    lastMonth,
+    prevMonth,
+    deltaKg,
+    deltaPct,
+  };
+};
+
 // ── Resumen compuesto (lo que la vista pinta) ───────────────────────────────
 
 /**
  * Resumen completo de "Mi cosecha" a partir de los log--harvest.
  * @param {object[]} logs - log--harvest crudos (de logCache.getByType).
- * @param {{plants?:object[], lands?:object[], areaOf?:(lote:object)=>number}} ctx
- * @returns {object} { totalKg, totalHarvests, cropCount, byCrop, byLote, yieldPerPlant, trend, topCrop, dateRange }
+ * @param {{plants?:object[], lands?:object[], areaOf?:(lote:object)=>number, now?:Date}} ctx
+ *   - now: inyectable para tests de temporada; default hoy.
+ * @returns {object} { totalKg, totalHarvests, cropCount, byCrop, byLote, yieldPerPlant, trend, season, topCrop, dateRange }
  */
 export const harvestSummary = (logs = [], ctx = {}) => {
   const norm = normalizeHarvests(logs);
@@ -406,6 +457,7 @@ export const harvestSummary = (logs = [], ctx = {}) => {
   const byLote = aggregateByLote(norm, ctx);
   const yieldPerPlant = yieldPerPlantByCrop(norm, ctx.plants || []);
   const trend = temporalTrend(norm);
+  const season = seasonStats(trend.series, ctx.now);
 
   const totalKg = norm.reduce((acc, h) => acc + (h.kg || 0), 0);
   const allMs = norm.map((h) => h.timestampMs).filter((m) => m != null);
@@ -418,6 +470,7 @@ export const harvestSummary = (logs = [], ctx = {}) => {
     byLote,
     yieldPerPlant,
     trend,
+    season,
     topCrop: byCrop[0] || null,
     dateRange: allMs.length
       ? { firstMs: Math.min(...allMs), lastMs: Math.max(...allMs) }
@@ -438,5 +491,6 @@ export default {
   aggregateByLote,
   yieldPerPlantByCrop,
   temporalTrend,
+  seasonStats,
   harvestSummary,
 };

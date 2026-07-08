@@ -354,4 +354,6 @@ export interface ChagraBiopreparado {
   expiration: string;
 }
 
+declare const __BUILD_SHA__: string;
+
 export {};

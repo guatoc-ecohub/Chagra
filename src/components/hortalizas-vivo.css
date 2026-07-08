@@ -1,0 +1,64 @@
+/* ===========================================================================
+ * HORTALIZAS DE LA HUERTA — 2ª pasada visual (HortalizasScreen).
+ *
+ * "La era viva": las tarjetas brotan escalonadas como una era recién sembrada,
+ * levantan al tacto y la foto respira con un acercamiento lento. Todo es
+ * transform/opacity (GPU-friendly, sin filter/blur animado) y TODO se apaga
+ * con prefers-reduced-motion. Cero bytes de assets nuevos.
+ * =========================================================================== */
+
+/* Brote escalonado: cada tarjeta/bloque entra con su índice (--hz-i). */
+@keyframes hz-brotar {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.hz-in {
+  animation: hz-brotar 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--hz-i, 0) * 55ms);
+}
+
+/* Tarjeta-era: levanta al pasar y asienta al presionar. */
+.hz-card {
+  transition: transform 0.22s ease, border-color 0.22s ease;
+}
+.hz-card:hover { transform: translateY(-3px); }
+.hz-card:active { transform: translateY(-1px) scale(0.985); }
+
+/* La foto de la era respira: zoom sutil solo-transform dentro de su marco. */
+.hz-card img { transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1); }
+.hz-card:hover img { transform: scale(1.045); }
+
+/* Hero: la foto llega con un acercamiento lentísimo, una sola vez. */
+.hz-hero img {
+  animation: hz-acercar 14s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-origin: center 62%;
+}
+@keyframes hz-acercar {
+  from { transform: scale(1.06); }
+  to { transform: scale(1); }
+}
+
+/* Enlaces internos de la ficha (biopreparados, almacenamiento): empujón leve. */
+.hz-link { transition: transform 0.2s ease; }
+.hz-link:hover { transform: translateX(2px); }
+
+/* Foco accesible y vivo, con el acento del tema (fallback esmeralda). */
+.hz-focus:focus-visible,
+.hz-card:focus-visible,
+.hz-link:focus-visible {
+  outline: 3px solid rgb(var(--t-accent-rgb, 52 211 153) / 0.9);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.hz-card:focus-visible { border-radius: 16px; }
+
+/* Reduced motion: quieto todo — entradas, zooms, levantes y el sol (.al-sun
+ * ya se apaga en index.css). */
+@media (prefers-reduced-motion: reduce) {
+  .hz-in { animation: none; }
+  .hz-hero img { animation: none; }
+  .hz-card, .hz-card img, .hz-link { transition: none; }
+  .hz-card:hover, .hz-card:active { transform: none; }
+  .hz-card:hover img { transform: none; }
+  .hz-link:hover { transform: none; }
+}

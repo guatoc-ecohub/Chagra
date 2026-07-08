@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-07-06T07:54:02.422Z",
+  "generated_at": "2026-07-08T15:05:21.013Z",
   "schema_version": "1.1.0",
   "catalogo": {
-    "especies": 580,
+    "especies": 581,
     "biopreparados": 36,
     "biopreparados_con_seguridad": 36,
     "mip_plagas": {
@@ -10,9 +10,9 @@
       "total": 391,
       "pct": 41.7
     },
-    "fuentes": 71,
+    "fuentes": 72,
     "fuentes_doi": 2,
-    "fuentes_tier_a": 57
+    "fuentes_tier_a": 58
   },
   "grafo": {
     "nodos": 3159,

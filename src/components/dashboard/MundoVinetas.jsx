@@ -89,6 +89,48 @@ function VinetaCafe() {
     );
 }
 
+/** 🥮 La caña y la panela — cañaveral, trapiche y bloque de panela al sol. */
+function VinetaCana() {
+    return (
+        <svg {...SVG_PROPS}>
+            <rect width="180" height="90" fill="#f3e3c2" />
+            {/* sol de tierra caliente */}
+            <circle cx="150" cy="20" r="10" fill="#ffd98a" />
+            {/* loma del cañaveral */}
+            <path d="M-4 50 Q60 38 120 48 T184 44 V90 H-4 Z" fill="#8fae4e" />
+            <path d="M-4 64 Q70 52 184 60 V90 H-4 Z" fill="#6f9138" />
+            {/* cañaveral: tallos altos con penachos (a la izquierda) */}
+            <g stroke="#c9a24a" strokeWidth="2.6" strokeLinecap="round" fill="none">
+                <path d="M20 66 V26" /><path d="M30 66 V22" /><path d="M40 66 V28" /><path d="M50 66 V24" />
+            </g>
+            {/* nudos de la caña */}
+            <g stroke="#a7802f" strokeWidth="2.6" strokeLinecap="round">
+                <path d="M19 40 h2.6" /><path d="M19 52 h2.6" /><path d="M29 38 h2.6" /><path d="M29 50 h2.6" />
+                <path d="M39 42 h2.6" /><path d="M49 40 h2.6" />
+            </g>
+            {/* penachos (flecha de la caña) */}
+            <g stroke="#e6d29a" strokeWidth="2" strokeLinecap="round" fill="none">
+                <path d="M20 26 q-4 -6 -8 -8" /><path d="M20 26 q4 -6 9 -7" />
+                <path d="M30 22 q-4 -6 -8 -8" /><path d="M30 22 q4 -6 9 -7" />
+                <path d="M40 28 q-4 -6 -8 -8" /><path d="M50 24 q4 -6 9 -7" />
+            </g>
+            {/* la panela: bloque redondo (dos tapas) en primer plano derecha */}
+            <g transform="translate(120 58)">
+                <ellipse cx="0" cy="8" rx="20" ry="5" fill="#6b3f16" opacity=".5" />
+                {/* bloque de panela en bloque */}
+                <path d="M-18 6 L18 6 L14 -8 L-14 -8 Z" fill="#a9691f" />
+                <path d="M-14 -8 L14 -8 L12 -14 L-12 -14 Z" fill="#c07d2a" />
+                <path d="M-18 6 L-14 -8 L-12 -14" stroke="#8a5316" strokeWidth="1.4" fill="none" />
+                {/* panela redonda encima */}
+                <ellipse cx="6" cy="-15" rx="9" ry="3.4" fill="#b5772a" />
+                <ellipse cx="6" cy="-16.5" rx="9" ry="3.4" fill="#c98b3a" />
+            </g>
+            {/* humito de la hornilla */}
+            <path d="M92 40 q-3 -6 1 -9 q4 -3 1 -8" stroke="#efe6cf" strokeWidth="2.2" strokeLinecap="round" fill="none" opacity=".8" />
+        </svg>
+    );
+}
+
 /** 🌱 El suelo vivo — corte de tierra en capas con raíces y lombriz. */
 function VinetaSuelo() {
     return (
@@ -353,6 +395,7 @@ function VinetaDisenio() {
 const VINETAS = {
     cultivos: VinetaCultivos,
     cafe: VinetaCafe,
+    cana: VinetaCana,
     suelo: VinetaSuelo,
     agua: VinetaAgua,
     abono: VinetaAbono,

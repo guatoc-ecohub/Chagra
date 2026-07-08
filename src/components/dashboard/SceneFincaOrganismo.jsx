@@ -35,7 +35,7 @@ export default function SceneFincaOrganismo({ estructura }) {
       viewBox="0 0 390 486"
       preserveAspectRatio="xMidYMid slice"
       role="img"
-      aria-label="Su finca de noche convertida en organismo bioluminiscente: un corazón-semilla late bajo la tierra y su red de micorrizas alimenta cada planta; cultivos con savia de neón, invernadero-célula que respira, campesino con su perro y colibrí de luz."
+      aria-label="Su finca convertida en organismo bioluminiscente, con el sol o la luna según la hora y el cielo real de su vereda: un corazón-semilla late bajo la tierra y su red de micorrizas conecta las raíces de cada planta, con lombrices y bichitos trabajando el suelo; cultivos con savia de neón, invernadero-célula que respira, campesino con su perro y colibrí de luz."
       data-testid="fvo-escena"
     >
       <defs>
@@ -53,6 +53,23 @@ export default function SceneFincaOrganismo({ estructura }) {
           <stop offset=".7" stopColor="#a8e8d4" />
           <stop offset="1" stopColor="#6fc4b0" />
         </radialGradient>
+        {/* sol bioluminiscente + velos de cielo diurno/crepuscular (la escena
+            sigue la atmósfera REAL: data-luz/data-clima en .fvh, ver CSS) */}
+        <radialGradient id="fvo-sol" cx=".42" cy=".4" r="1">
+          <stop offset="0" stopColor="#fff9e0" />
+          <stop offset=".55" stopColor="#ffd76a" />
+          <stop offset="1" stopColor="#ff9d3f" />
+        </radialGradient>
+        <linearGradient id="fvo-cielo-dia-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#11506b" />
+          <stop offset=".55" stopColor="#177082" />
+          <stop offset="1" stopColor="#1a7a6a" />
+        </linearGradient>
+        <linearGradient id="fvo-cielo-crep-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#241338" />
+          <stop offset=".6" stopColor="#4a1e4e" />
+          <stop offset="1" stopColor="#8a4a2c" />
+        </linearGradient>
         <radialGradient id="fvo-bulbo" cx=".5" cy=".5" r=".5">
           <stop offset="0" stopColor="#2dffc4" stopOpacity=".9" />
           <stop offset=".55" stopColor="#2dffc4" stopOpacity=".25" />
@@ -82,6 +99,10 @@ export default function SceneFincaOrganismo({ estructura }) {
 
       {/* ============ CIELO ============ */}
       <rect width="390" height="486" fill="url(#fvo-cielo)" />
+      {/* velos atmosféricos: se encienden por data-luz (día / amanecer-atardecer).
+          Van bajo montañas y terrazas — solo aclaran el cielo, no la finca. */}
+      <rect className="fvo-cielo-dia" width="390" height="486" fill="url(#fvo-cielo-dia-grad)" />
+      <rect className="fvo-cielo-crep" width="390" height="486" fill="url(#fvo-cielo-crep-grad)" />
 
       {/* aurora de páramo */}
       <path
@@ -112,8 +133,8 @@ export default function SceneFincaOrganismo({ estructura }) {
         <circle className="fvo-tw" style={{ animationDelay: '-2s' }} cx="288" cy="40" r=".8" fill="#9dff3f" />
       </g>
 
-      {/* luna bioluminiscente */}
-      <g>
+      {/* luna bioluminiscente (solo de noche — data-luz la gobierna en CSS) */}
+      <g className="fvo-astro fvo-luna-g">
         <circle cx="318" cy="64" r="54" fill="#2dffc4" opacity=".045" filter="url(#fvo-blur8)" />
         <circle cx="318" cy="64" r="40" fill="#a8e8d4" opacity=".08" filter="url(#fvo-blur8)" />
         <circle className="fvo-halo" cx="318" cy="64" r="34" fill="none" stroke="#2dffc4" strokeWidth="1" opacity=".45" />
@@ -123,6 +144,36 @@ export default function SceneFincaOrganismo({ estructura }) {
         <circle cx="309" cy="71" r="2.3" fill="#5fb89e" opacity=".4" />
         <circle cx="305" cy="63" r="1.4" fill="#5fb89e" opacity=".35" />
         <circle cx="312.5" cy="76" r="1" fill="#5fb89e" opacity=".3" />
+      </g>
+
+      {/* sol bioluminiscente (día / amanecer / atardecer — mismo lugar del
+          cielo que la luna; el CSS muestra UNO según la atmósfera real) */}
+      <g className="fvo-astro fvo-sol-g">
+        <circle cx="318" cy="64" r="54" fill="#ffb54f" opacity=".07" filter="url(#fvo-blur8)" />
+        <circle cx="318" cy="64" r="40" fill="#ffd76a" opacity=".1" filter="url(#fvo-blur8)" />
+        <circle className="fvo-halo" cx="318" cy="64" r="34" fill="none" stroke="#ffb54f" strokeWidth="1" opacity=".5" />
+        <circle cx="318" cy="64" r="21" fill="url(#fvo-sol)" />
+        <circle cx="318" cy="64" r="21" fill="none" stroke="#fff3c9" strokeWidth=".7" opacity=".6" />
+        {/* corona de rayos que respira */}
+        <g className="fvo-corona" stroke="#ffd76a" strokeWidth="1.4" strokeLinecap="round" fill="none">
+          <path d="M318,34 L318,26" /><path d="M318,94 L318,102" />
+          <path d="M288,64 L280,64" /><path d="M348,64 L356,64" />
+          <path d="M297,43 L291,37" /><path d="M339,85 L345,91" />
+          <path d="M339,43 L345,37" /><path d="M297,85 L291,91" />
+        </g>
+      </g>
+
+      {/* nubes de clima: aparecen con nublado/lluvia/niebla (data-clima) y
+          velan el astro — el cielo de la escena cuenta el clima REAL */}
+      <g className="fvo-nubes">
+        <g className="fvo-fog">
+          <ellipse cx="310" cy="58" rx="46" ry="12" fill="#8fa8bd" opacity=".38" filter="url(#fvo-blur8)" />
+          <ellipse cx="286" cy="72" rx="34" ry="10" fill="#7d95ab" opacity=".3" filter="url(#fvo-blur8)" />
+        </g>
+        <g className="fvo-fog fvo-g2">
+          <ellipse cx="120" cy="66" rx="52" ry="12" fill="#8fa8bd" opacity=".3" filter="url(#fvo-blur8)" />
+          <ellipse cx="152" cy="78" rx="36" ry="9" fill="#7d95ab" opacity=".24" filter="url(#fvo-blur8)" />
+        </g>
       </g>
 
       {/* estrella fugaz + aves lejanas */}
@@ -495,6 +546,24 @@ export default function SceneFincaOrganismo({ estructura }) {
           <path className="fvo-hypha fvo-slow fvo-rev" d="M195,440 C235,450 270,452 300,446" />
         </g>
 
+        {/* micelio FINO: la trama dendrítica de verdad — hifas delgadas que se
+            ramifican en Y desde las troncales y tejen el suelo entero (así se
+            ve una red micorrízica real, no solo cables gruesos) */}
+        <g className="fvo-micelio" fill="none" stroke="#2dffc4" strokeWidth=".6" opacity=".38" strokeLinecap="round">
+          <path d="M160,392 C150,388 142,382 138,374 M138,374 C134,368 128,364 120,362 M138,374 C142,366 140,358 136,352" />
+          <path d="M230,390 C242,384 250,376 254,366 M254,366 C258,358 266,354 274,352 M254,366 C250,356 252,348 258,342" />
+          <path d="M195,428 C186,434 176,438 164,440 M164,440 C154,442 146,448 142,456 M164,440 C160,448 162,456 168,462" />
+          <path d="M195,428 C206,434 216,438 228,440 M228,440 C240,442 248,448 252,456 M228,440 C234,448 232,456 226,462" />
+          <path d="M120,404 C108,400 98,400 88,404 M88,404 C78,408 70,406 62,400 M88,404 C84,412 78,416 70,418" />
+          <path d="M270,406 C282,402 292,402 302,406 M302,406 C312,410 320,408 328,402 M302,406 C306,414 312,418 320,420" />
+          <path d="M78,352 C74,362 68,370 60,376 M60,376 C54,380 50,386 48,394" />
+          <path d="M300,350 C304,360 310,368 318,374 M318,374 C324,378 328,384 330,392" />
+          <path d="M156,350 C152,358 146,364 138,368 M138,368 C132,371 128,376 126,382" />
+          <path d="M240,348 C244,356 250,362 258,366 M258,366 C264,369 268,374 270,380" />
+          <path d="M40,348 C38,358 34,366 28,372" />
+          <path d="M118,349 C120,358 124,366 130,372" />
+        </g>
+
         {/* bulbos de raíz (bajo cada planta) */}
         <g>
           <circle cx="40" cy="348" r="9" fill="url(#fvo-bulbo)" /><circle cx="40" cy="348" r="2.2" fill="#bfffe9" />
@@ -510,6 +579,63 @@ export default function SceneFincaOrganismo({ estructura }) {
           <path d="M156,338 L156,348" /><path d="M210,336 C214,340 222,344 240,347" />
           <path d="M298,332 C298,338 299,344 300,348" />
         </g>
+        {/* raíces LATERALES de cada planta: el bulbo no flota — la raíz se
+            ramifica y la hifa la encuentra en la punta (micorriza real) */}
+        <g stroke="#9dff3f" strokeWidth=".8" opacity=".5" fill="none" strokeLinecap="round">
+          <path d="M40,346 C36,352 32,356 26,358 M40,346 C44,352 48,355 54,356" />
+          <path d="M78,350 C72,356 66,360 58,362 M78,350 C84,356 90,359 98,360" />
+          <path d="M118,347 C112,353 106,357 98,359 M118,347 C124,353 130,356 138,357" />
+          <path d="M156,348 C151,354 146,357 140,359 M156,348 C161,354 166,357 172,358" />
+          <path d="M240,347 C235,353 230,356 224,358 M240,347 C245,353 250,356 256,357" />
+          <path d="M300,348 C294,355 287,359 278,361 M300,348 C306,355 313,359 322,361" />
+        </g>
+        {/* nodos micorrízicos: el punto donde la hifa abraza la punta de la
+            raíz e intercambia azúcar por nutrientes (titilan suave) */}
+        <g fill="#bfffe9">
+          <circle className="fvo-nodo" cx="26" cy="358" r="1" />
+          <circle className="fvo-nodo fvo-n2" cx="58" cy="362" r="1.1" />
+          <circle className="fvo-nodo fvo-n3" cx="98" cy="359.5" r="1" />
+          <circle className="fvo-nodo" cx="140" cy="359" r="1" />
+          <circle className="fvo-nodo fvo-n2" cx="224" cy="358" r="1" />
+          <circle className="fvo-nodo fvo-n3" cx="278" cy="361" r="1.1" />
+          <circle className="fvo-nodo fvo-n2" cx="322" cy="361" r="1.1" />
+        </g>
+      </g>
+
+      {/* ============ LA VIDA DEL SUELO: lombrices y bichitos ============ */}
+      {/* lombriz de tierra (rosada, segmentada, con clitelo) que avanza */}
+      <g className="fvo-lombriz">
+        <path d="M96,432 C104,428 112,432 118,428 C124,424 130,427 134,432" fill="none" stroke="#ff8fb0" strokeWidth="3.4" strokeLinecap="round" opacity=".85" />
+        <path d="M96,432 C104,428 112,432 118,428 C124,424 130,427 134,432" fill="none" stroke="#ffd0dc" strokeWidth="1" strokeLinecap="round" opacity=".5" />
+        {/* segmentos */}
+        <g stroke="#e06a8e" strokeWidth=".7" opacity=".6">
+          <path d="M102,428.6 L102.6,431.6" /><path d="M108,429 L108,432" /><path d="M122,426.4 L122.6,429.2" /><path d="M128,426.6 L128,429.6" />
+        </g>
+        {/* clitelo (el anillo grueso) */}
+        <path d="M112,430.4 L116,429" stroke="#ff6f8a" strokeWidth="3.8" strokeLinecap="round" />
+      </g>
+      <g className="fvo-lombriz fvo-l2">
+        <path d="M330,472 C324,468 318,471 312,468 C306,465 300,468 296,472" fill="none" stroke="#ff8fb0" strokeWidth="3" strokeLinecap="round" opacity=".8" />
+        <path d="M314,469.4 L310,468.4" stroke="#ff6f8a" strokeWidth="3.4" strokeLinecap="round" />
+        <g stroke="#e06a8e" strokeWidth=".6" opacity=".55">
+          <path d="M324,469 L324,471.6" /><path d="M304,467 L304,469.6" />
+        </g>
+      </g>
+
+      {/* escarabajo del suelo (camina despacio entre las piedras) */}
+      <g className="fvo-bicho">
+        <ellipse cx="66" cy="416" rx="3.4" ry="2.3" fill="#4fd8ff" opacity=".75" />
+        <circle cx="70" cy="415.4" r="1.3" fill="#2f9fc4" />
+        <path d="M63,414.6 Q66,413.2 69,414.4" stroke="#bfeaff" strokeWidth=".5" fill="none" opacity=".7" />
+        <g stroke="#4fd8ff" strokeWidth=".6" opacity=".7" fill="none">
+          <path d="M64,418 L62,420" /><path d="M66,418.4 L65,421" /><path d="M68,418 L69,420.6" />
+        </g>
+      </g>
+      {/* colémbolo (bichito saltarín, descompone la hojarasca) */}
+      <g className="fvo-bicho fvo-bi2">
+        <ellipse cx="330" cy="446" rx="2.6" ry="1.7" fill="#d8ff6a" opacity=".8" />
+        <circle cx="332.6" cy="445.4" r=".9" fill="#9dff3f" />
+        <path d="M327.6,445.4 Q326,444 325.2,442.6" stroke="#d8ff6a" strokeWidth=".7" fill="none" opacity=".8" />
       </g>
 
       {/* ============ CORAZÓN-SEMILLA MICORRÍZICO (la vida bajo la tierra) ============ */}

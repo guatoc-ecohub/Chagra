@@ -4,10 +4,11 @@
  * Es el trigger de HOY (tap). El de MAÑANA es el wake-word "hola Chagra":
  * ambos llaman `activarEscucha()` (escuchaService) — el widget no distingue.
  *
- * Diseño: espejo del AgentFab (colibrí, abajo-derecha): este vive ABAJO A LA
- * IZQUIERDA, 62px (tamaño guante), micrófono grande + la ramita de la mano de
- * Chagra como firma, acento del tema por --t-accent-rgb, con un ping perezoso
- * cada 4s que anuncia "aquí se habla" (apagado con prefers-reduced-motion).
+ * Diseño: "EL UMBRAL en miniatura" — espejo del AgentFab (colibrí, derecha):
+ * este vive ABAJO A LA IZQUIERDA, 62px (tamaño guante). Un disco de vacío
+ * índigo con un núcleo de luz latiendo detrás del micrófono, un anillo
+ * holográfico girando lentísimo y dos motas en órbita: la presencia dormida,
+ * esperando que le hablen (todo se detiene con prefers-reduced-motion).
  *
  * IMPORTANTE — español colombiano (tú/usted), NUNCA voseo argentino.
  */
@@ -26,25 +27,13 @@ export default function EscuchaFab() {
       title="Manos libres: toque y hable — «lléveme al mercado» o pregunte lo que necesite"
       onClick={() => activarEscucha({ fuente: 'tap' })}
     >
-      <span className="escucha-fab-ping" aria-hidden="true" />
+      <span className="escucha-fab-nucleo" aria-hidden="true" />
+      <span className="escucha-fab-anillo" aria-hidden="true" />
+      <span className="escucha-fab-orbita" aria-hidden="true">
+        <span className="escucha-fab-mota" />
+        <span className="escucha-fab-mota m2" />
+      </span>
       <Mic size={27} strokeWidth={2.4} aria-hidden="true" />
-      {/* La firma de la marca: la ramita con nodos que brota (mano de Chagra) */}
-      <svg
-        className="escucha-fab-brotecito"
-        width="16"
-        height="16"
-        viewBox="0 0 16 16"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.4"
-        strokeLinecap="round"
-        aria-hidden="true"
-      >
-        <path d="M8 13V7" />
-        <path d="M8 7L5.6 4.8M8 7l2.3-2.4" />
-        <circle cx="4.9" cy="4" r="0.8" fill="currentColor" stroke="none" />
-        <circle cx="11" cy="3.8" r="0.8" fill="currentColor" stroke="none" />
-      </svg>
     </button>
   );
 }
