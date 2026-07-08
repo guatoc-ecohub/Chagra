@@ -133,6 +133,15 @@ const AromaticasScreen = lazy(() => import('./components/aromaticas/AromaticasSc
 // beneficio). Photo-forward (patrón Agua) y groundeado en el grafo
 // (species.coffea_arabica) + Cenicafé; la pulpa cierra ciclo hacia el compost.
 const CafeScreen = lazy(() => import('./components/cafe/CafeScreen'));
+// Mundo "La uchuva" (dentro de Cultivos y semillas): la fruta andina de
+// exportación, de CLIMA FRÍO de altura (óptimo 1.800–2.800 msnm) — contraste
+// didáctico con mango/cítricos (tierra caliente). 6 estaciones photo-forward:
+// clima+altura / semilla+siembra / tutorado+poda / plagas (pulgón, polilla,
+// minador, marchitez por Fusarium — sin dosis) / cosecha por el color del
+// capacho (NTC 4580) / poscosecha de exportación. Groundeado al grafo
+// (species.physalis_peruviana, pest edges → AFFECTS) + cycle-content Tier A
+// (AGROSAVIA/ICA/POWO/GBIF). Fotos CC reales con crédito visible.
+const UchuvaScreen = lazy(() => import('./components/uchuva/UchuvaScreen'));
 // Mundo "Frutales de la finca con vida": los frutales del solar campesino
 // (cítricos, aguacate, mango, guayaba, mora, lulo, tomate de árbol, papaya),
 // cada uno con su ficha de cultivo. Photo-forward (patrón Café/Agua) y
@@ -445,6 +454,12 @@ const HASH_VIEW_ROUTES = {
   'el-cafe': 'cafe',
   cafetal: 'cafe',
   cafeto: 'cafe',
+  uchuva: 'uchuva',
+  'la-uchuva': 'uchuva',
+  aguaymanto: 'uchuva',
+  uvilla: 'uchuva',
+  guchuva: 'uchuva',
+  physalis: 'uchuva',
   frutales: 'frutales',
   frutal: 'frutales',
   'arboles-frutales': 'frutales',
@@ -541,7 +556,7 @@ const MODULE_VIEWS = new Set([
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'mi_cosecha', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'aromaticas', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'frutales', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'uchuva', 'frutales', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'almanaque', 'suelo', 'agua', 'cafe', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'cana', 'restauracion', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'fique', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
@@ -1887,6 +1902,20 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El café">
               <CafeScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'uchuva':
+        // Mundo "La uchuva" (Physalis peruviana, dentro de Cultivos y semillas):
+        // la fruta andina de exportación, de clima FRÍO de altura. 6 estaciones
+        // photo-forward (clima+altura / siembra / tutorado+poda / plagas sin
+        // veneno / cosecha por el color del capacho / poscosecha de exportación).
+        // Groundeado al grafo (physalis_peruviana) + cycle-content Tier A
+        // (AGROSAVIA/ICA/POWO/GBIF); cifras de sitio = "dato en camino".
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La uchuva">
+              <UchuvaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
