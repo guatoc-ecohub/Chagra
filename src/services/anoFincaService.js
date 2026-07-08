@@ -263,12 +263,11 @@ export function hitosDeEventos(eventsByProcess = {}, cyclesById = {}, year) {
  * mes siguiente, no en 12 puntos.
  *
  * @param {Array} calendars — PlantCalendar[] con status 'ok'
- * @param {Object} cfg
- * @param {number} cfg.year
- * @param {number} cfg.currentMonth — 1-12 (los hitos van de currentMonth+1 a 12)
+ * @param {{currentMonth?: number}} [cfg] - mes actual 1-12 (los hitos van de
+ *   currentMonth+1 a 12)
  * @returns {Array} hitos con pasado: false
  */
-export function hitosFuturos(calendars = [], { year, currentMonth } = {}) {
+export function hitosFuturos(calendars = [], { currentMonth } = {}) {
   const hitos = [];
   for (const plant of calendars) {
     if (!plant || plant.status !== 'ok') continue;
@@ -326,14 +325,14 @@ export function hitosFuturos(calendars = [], { year, currentMonth } = {}) {
  * Arma la línea de tiempo completa del año en curso.
  *
  * @param {Object} cfg
- * @param {Array} [cfg.cycles] — FarmProcess[] de la finca
- * @param {Array} [cfg.harvestLogs] — log--harvest crudos (logCache)
- * @param {Object<string, Array>} [cfg.eventsByProcess] — process_id → eventos
- * @param {Array} [cfg.calendars] — PlantCalendar[] (farmCalendarService)
- * @param {number} [cfg.now] — epoch ms (inyectable en tests)
+ * @param {Array} [cfg.cycles] - FarmProcess[] de la finca
+ * @param {Array} [cfg.harvestLogs] - log--harvest crudos (logCache)
+ * @param {Object<string, Array>} [cfg.eventsByProcess] - process_id a eventos
+ * @param {Array} [cfg.calendars] - PlantCalendar[] (farmCalendarService)
+ * @param {number} [cfg.now] - epoch ms (inyectable en tests)
  * @returns {{
  *   year: number, currentMonth: number, hitos: Array,
- *   porMes: Array<{mes:number, estado:'pasado'|'hoy'|'proximo', tono:string,
+ *   porMes: Array<{mes:number, estado:string, tono:string, temporadaId:(string|null),
  *                  hitos:Array, counts:Object, total:number}>,
  *   totalPasado: number, totalFuturo: number, vacio: boolean
  * }}
@@ -354,7 +353,7 @@ export function buildAnoFinca({ cycles = [], harvestLogs = [], eventsByProcess =
     ...hitosDeCosechas(harvestLogs, year),
     ...hitosDeEventos(eventsByProcess, cyclesById, year),
   ];
-  const futuros = hitosFuturos(calendars, { year, currentMonth });
+  const futuros = hitosFuturos(calendars, { currentMonth });
   const hitos = [...pasados, ...futuros];
 
   const porMes = TEMPORADA_POR_MES.map(({ mes, tono, temporadaId }) => {

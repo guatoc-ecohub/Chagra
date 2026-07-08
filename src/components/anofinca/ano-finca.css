@@ -1,0 +1,51 @@
+/**
+ * ano-finca.css — El año de la finca (línea de tiempo anual).
+ *
+ * Solo lo que Tailwind no expresa bien: el dibujado del camino (una vez, al
+ * cargar), el pulso del marcador "hoy" y el scroll-snap del carril. Todas las
+ * animaciones son de stroke/opacity (baratas, sin relayout) y se APAGAN con
+ * prefers-reduced-motion.
+ */
+
+.anofinca-scroll {
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+
+.anofinca-mes {
+  scroll-snap-align: center;
+}
+
+/* El camino recorrido se "camina" al entrar: un solo trazo, una sola vez.
+   El dasharray (2000) supera con holgura el largo real del path (<1000),
+   así el trazo termina SÓLIDO — el punteado del futuro es otro path. */
+.anofinca-camino-pasado {
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  animation: anofinca-dibujar 1.2s ease-out 0.15s forwards;
+}
+
+@keyframes anofinca-dibujar {
+  to { stroke-dashoffset: 0; }
+}
+
+/* El marcador de "hoy" respira suave (solo opacity, GPU-friendly). */
+.anofinca-hoy-pulso {
+  animation: anofinca-pulso 2.6s ease-in-out infinite;
+}
+
+@keyframes anofinca-pulso {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 0.35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anofinca-camino-pasado {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .anofinca-hoy-pulso {
+    animation: none;
+    opacity: 0.85;
+  }
+}

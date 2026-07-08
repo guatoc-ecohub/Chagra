@@ -137,7 +137,7 @@ describe('hitosFuturos', () => {
       { layer: 'nutricion', anchored: false, title: 'Abonado sin anclar', months: [11] }, // sin siembra real → fuera
       { layer: 'sanidad', months: [8], title: 'Caldo bordelés' }, // capa sin agenda → fuera
     ]);
-    const hitos = hitosFuturos([cal], { year: YEAR, currentMonth: 6 });
+    const hitos = hitosFuturos([cal], { currentMonth: 6 });
     expect(hitos.map((h) => `${h.tipo}:${h.month}`).sort()).toEqual([
       'cosecha:8', 'cosecha:9', 'floracion:7', 'nutricion:10',
     ]);
@@ -149,7 +149,7 @@ describe('hitosFuturos', () => {
     const cal = calendar('c2', 'Plátano', [
       { layer: 'cosecha', continuous: true, months: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], title: 'Cosecha casi todo el año' },
     ]);
-    const hitos = hitosFuturos([cal], { year: YEAR, currentMonth: 6 });
+    const hitos = hitosFuturos([cal], { currentMonth: 6 });
     expect(hitos).toHaveLength(1);
     expect(hitos[0].month).toBe(7);
     expect(hitos[0].label).toBe('Plátano: cosecha casi todo el año');
