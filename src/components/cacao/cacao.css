@@ -1,19 +1,168 @@
 /*
  * cacao.css — piel del mundo "El cacao". Acentos de tierra/chocolate.
+ *
+ * 2ª pasada visual: jerarquía, transiciones suaves, hover/focus vivos y
+ * tarjetas con más vida — SIN tocar el contenido ni el grounding y SIN fotos
+ * nuevas (byte-neutral). Todo el movimiento es GPU-friendly (solo transform/
+ * opacity; nada de filter/blur animado) y `prefers-reduced-motion` lo apaga.
+ *
  * El scrim de las fotos es FIJO (no lo vira el remapeo de temas claros) para que
- * el texto encima quede legible al sol, igual que en el módulo Agua.
+ * el texto encima quede legible al sol, igual que en el módulo Agua. Los colores
+ * salen de las clases Tailwind del componente; aquí solo se define movimiento,
+ * profundidad (sombras neutras) y espaciado.
  */
 
-/* Entrada suave de cada sección al cambiar de estación. */
+/* ── Entrada de sección al cambiar de estación ──────────────────────────────── */
 @keyframes cacao-seccion-entra {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 .cacao-seccion {
-  animation: cacao-seccion-entra 0.28s ease-out both;
+  animation: cacao-seccion-entra 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Latido del punto rojo en las alertas de enfermedad (respeta reduce-motion). */
+/* ── Fotos: entrada con leve zoom-out para dar vida sin distraer ─────────────── */
+@keyframes cacao-foto-entra {
+  from { opacity: 0; transform: scale(1.05); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.cacao-foto {
+  animation: cacao-foto-entra 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+/* Al pasar el cursor/tocar la tarjeta contenedora, la foto respira un pelín. */
+.cacao-card:hover .cacao-foto,
+.cacao-card:focus-within .cacao-foto {
+  transform: scale(1.03);
+}
+
+/* ── Hero: barrido de luz sutil que recorre la foto una vez al montar ────────── */
+.cacao-hero {
+  position: relative;
+}
+.cacao-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.10) 46%,
+    rgba(255, 255, 255, 0.16) 50%,
+    rgba(255, 255, 255, 0.10) 54%,
+    transparent 70%
+  );
+  transform: translateX(-120%);
+  animation: cacao-hero-brillo 1.6s ease-out 0.35s both;
+  z-index: 2;
+}
+@keyframes cacao-hero-brillo {
+  to { transform: translateX(120%); }
+}
+/* Título del hero: sombra propia para legibilidad garantizada sobre la foto. */
+.cacao-hero-titulo {
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7), 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+/* Filete de acento bajo el ojal (eyebrow) del hero. */
+.cacao-eyebrow-linea {
+  display: block;
+  height: 2px;
+  width: 2.25rem;
+  margin-top: 0.35rem;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, currentColor, transparent);
+  opacity: 0.8;
+  transform-origin: left center;
+  animation: cacao-linea-crece 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+@keyframes cacao-linea-crece {
+  from { transform: scaleX(0); opacity: 0; }
+  to   { transform: scaleX(1); opacity: 0.8; }
+}
+
+/* ── Tarjetas: profundidad + realce al hover/focus (elevación GPU) ──────────── */
+.cacao-card {
+  transition:
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+}
+.cacao-card:hover,
+.cacao-card:focus-within {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.7);
+}
+
+/* ── Botones-puente y tarjetas clicables ────────────────────────────────────── */
+.cacao-enlace {
+  transition:
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+.cacao-enlace:hover {
+  transform: translateY(-1px);
+}
+/* La flechita se corre un pelín al hover para invitar al toque. */
+.cacao-enlace-chevron {
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cacao-enlace:hover .cacao-enlace-chevron {
+  transform: translateX(3px);
+}
+
+/* Anillo de foco accesible y uniforme para todo lo interactivo del mundo. */
+.cacao-focus:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(23, 23, 23, 0.9), 0 0 0 4px rgba(245, 158, 11, 0.75);
+  border-radius: 0.9rem;
+}
+
+/* ── Pestañas de estación ───────────────────────────────────────────────────── */
+.cacao-tab {
+  transition:
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+.cacao-tab:hover {
+  transform: translateY(-1px);
+}
+.cacao-tab:active {
+  transform: translateY(0);
+}
+/* Pestaña activa: aro interior + pulso único al seleccionar. */
+.cacao-estacion-activa {
+  box-shadow: 0 0 0 1px rgba(217, 119, 6, 0.45) inset;
+  animation: cacao-tab-pulso 0.4s ease-out;
+}
+@keyframes cacao-tab-pulso {
+  0%   { transform: scale(0.96); }
+  60%  { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+/* ── Fichas/plagas: número de paso como insignia legible ────────────────────── */
+.cacao-num {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-top: 0.05rem;
+  border-radius: 9999px;
+  background: rgba(244, 63, 94, 0.16);
+  border: 1px solid rgba(244, 63, 94, 0.45);
+  color: rgb(253, 164, 175);
+  font-size: 0.66rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+/* Latido del punto rojo en alertas de enfermedad (respeta reduce-motion). */
 @keyframes cacao-alerta-late {
   0%, 100% { opacity: 1; }
   50%      { opacity: 0.35; }
@@ -22,22 +171,24 @@
   animation: cacao-alerta-late 1.6s ease-in-out infinite;
 }
 
-/* Pulso sutil de la pestaña activa. */
-.cacao-estacion-activa {
-  box-shadow: 0 0 0 1px rgba(217, 119, 6, 0.35) inset;
-}
-
-/* La foto entra con un leve zoom-out para dar vida sin distraer. */
-@keyframes cacao-foto-entra {
-  from { transform: scale(1.04); }
-  to   { transform: scale(1); }
-}
-.cacao-foto {
-  animation: cacao-foto-entra 0.6s ease-out both;
-}
-
+/* ── Preferencia de movimiento reducido: todo quieto ────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .cacao-seccion,
-  .cacao-foto { animation: none; }
+  .cacao-foto,
+  .cacao-eyebrow-linea { animation: none; }
+  .cacao-hero::after { animation: none; display: none; }
   .cacao-alerta-late { animation: none; }
+  .cacao-estacion-activa { animation: none; }
+  .cacao-foto,
+  .cacao-card,
+  .cacao-enlace,
+  .cacao-enlace-chevron,
+  .cacao-tab { transition: none; }
+  .cacao-card:hover,
+  .cacao-card:focus-within,
+  .cacao-enlace:hover,
+  .cacao-tab:hover { transform: none; }
+  .cacao-card:hover .cacao-foto,
+  .cacao-card:focus-within .cacao-foto,
+  .cacao-enlace:hover .cacao-enlace-chevron { transform: none; }
 }
