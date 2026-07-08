@@ -69,6 +69,9 @@ import { ErrorFallback } from './components/common/ErrorFallback';
 
 // Lazy-loaded route components
 const LoginScreen = lazy(() => import('./components/LoginScreen'));
+// Mockup dev (sin gate, datos de muestra): dirección visual del "juego final"
+// — el avatar/espíritu de la finca en tema biopunk. Ruta #/mockups/avatar-biopunk.
+const AvatarGameBiopunk = lazy(() => import('./mockups/AvatarGameBiopunk'));
 const OAuthCallback = lazy(() => import('./components/OAuthCallback'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
@@ -530,6 +533,9 @@ const HASH_VIEW_ROUTES = {
   cosechar: 'cosechar',
   'mi-cosecha': 'mi_cosecha',
   micosecha: 'mi_cosecha',
+  // Mockup dev del juego final (avatar biopunk): vista aislada con datos de
+  // muestra, sin gate — no toca datos reales ni requiere sesión.
+  'mockups/avatar-biopunk': 'mockup_avatar_biopunk',
 };
 
 // Vistas que cuentan como "módulo" para telemetría de piloto.
@@ -821,6 +827,13 @@ export default function App() {
       return;
     }
 
+    // Mockup dev (#/mockups/avatar-biopunk): vista aislada con datos de
+    // muestra — se monta sin sesión (no lee ni escribe datos reales).
+    if (hash === 'mockups/avatar-biopunk') {
+      Promise.resolve().then(() => navigate('mockup_avatar_biopunk'));
+      return;
+    }
+
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
         navigate('login');
@@ -849,6 +862,11 @@ export default function App() {
       const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
       const routeView = HASH_VIEW_ROUTES[hash];
       if (!routeView) return;
+      // Mockup dev: sin gate ni sesión (datos de muestra).
+      if (routeView === 'mockup_avatar_biopunk') {
+        navigate(routeView);
+        return;
+      }
       // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
       if (routeView === 'extensionista' && !esExtensionistaActual()) {
         navigate('dashboard');
@@ -1210,6 +1228,16 @@ export default function App() {
                 onBack={() => navigate('juego')}
                 onHome={() => navigate('dashboard')}
               />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_avatar_biopunk':
+        // Mockup dev del juego final (El Espíritu de tu Finca, biopunk).
+        // Full-screen, datos de muestra, sin gate — solo para decidir dirección.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Avatar Biopunk">
+              <AvatarGameBiopunk onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
