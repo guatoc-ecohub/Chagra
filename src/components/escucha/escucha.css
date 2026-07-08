@@ -1,14 +1,20 @@
 /* ============================================================================
  * escucha.css — Widget "Chagra está escuchando" (escucha manos libres).
  *
- * Estética: "la mano que escucha" — la mano de Chagra al centro de un iris
- * de micelio que respira con el nivel REAL del micrófono. Biopunk por
- * defecto; en temas claros (minimalista/nature/verde-vivo) el velo pasa a
- * papel del tema con tinta oscura (AA al sol).
+ * Estética: "LA PRESENCIA" — el widget es un portal circular a otra
+ * dimensión. El MARCO es de Chagra (acento del tema, --t-accent-rgb); lo que
+ * hay ADENTRO no es de aquí: espacio profundo, un núcleo de luz suspendido
+ * (un OJO de energía), geometría sagrada que respira, y un campo de partículas
+ * que se ordena con la voz (RMS real). La carta alrededor sigue las reglas del
+ * app: papel del tema en temas claros (AA al sol), tinta legible, botones
+ * tamaño guante.
  *
- * Tokens: TODO el acento sale de --t-accent-rgb (themes.css). Este archivo
- * solo define superficie/tinta del overlay por tema (indirección CSS-var,
- * NUNCA parche clase-por-clase).
+ * Luz espectral de la Presencia (cian/violeta/blanco lunar): es SUYA, no del
+ * tema — la entidad trae su propia luz. El portal siempre es oscuro por
+ * dentro, así el contraste de la luz está garantizado en cualquier tema.
+ *
+ * GPU-friendly: solo transform/opacity animados; nada de filter/blur en
+ * animación. prefers-reduced-motion → composición estática y legible.
  * ========================================================================== */
 
 .escucha-overlay {
@@ -17,9 +23,13 @@
   --esc-carta-rgb: 8, 22, 19;       /* superficie de la carta */
   --esc-ink-rgb: 236, 253, 245;     /* tinta principal */
   --esc-dim-rgb: 148, 187, 173;     /* tinta secundaria */
-  --esc-linea-rgb: 25, 201, 154;    /* trazos del iris (= acento biopunk) */
-  --esc-linea-rgb: var(--t-accent-rgb);
+  --esc-linea-rgb: var(--t-accent-rgb); /* acento del tema (marco/CTA) */
   --esc-cta-ink: #04231b;           /* tinta sobre el botón de acento */
+
+  /* La luz de la Presencia (propia, no del tema) */
+  --pre-a-rgb: 120, 235, 255;       /* cian etéreo */
+  --pre-b-rgb: 178, 140, 255;       /* violeta */
+  --pre-w-rgb: 240, 250, 255;       /* blanco lunar */
 
   position: fixed;
   inset: 0;
@@ -31,7 +41,15 @@
   padding-bottom: max(16px, env(safe-area-inset-bottom));
 }
 
-/* Temas claros: papel del tema + tinta oscura (legible a pleno sol). */
+/* Error: la luz de la Presencia vira a ámbar (aviso sin gritar). */
+.escucha-overlay[data-fase="error"] {
+  --pre-a-rgb: 255, 200, 120;
+  --pre-b-rgb: 255, 145, 95;
+  --pre-w-rgb: 255, 244, 228;
+}
+
+/* Temas claros: papel del tema + tinta oscura (legible a pleno sol).
+ * El portal NO cambia: adentro siempre es el otro lado (oscuro). */
 [data-theme="minimalista"] .escucha-overlay {
   --esc-bg-rgb: 246, 243, 236;
   --esc-carta-rgb: 252, 250, 245;
@@ -59,7 +77,7 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 120% 80% at 50% 30%, rgba(var(--esc-linea-rgb), 0.10), transparent 60%),
+    radial-gradient(ellipse 120% 80% at 50% 30%, rgba(var(--pre-b-rgb), 0.08), transparent 60%),
     rgba(var(--esc-bg-rgb), 0.96);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
@@ -80,7 +98,7 @@
   border: 1px solid rgba(var(--esc-linea-rgb), 0.35);
   box-shadow:
     0 24px 80px rgba(0, 0, 0, 0.45),
-    0 0 60px rgba(var(--esc-linea-rgb), 0.18);
+    0 0 60px rgba(var(--pre-b-rgb), 0.14);
   color: rgb(var(--esc-ink-rgb));
   animation: escucha-entra 0.28s cubic-bezier(0.34, 1.4, 0.64, 1) both;
 }
@@ -115,56 +133,176 @@
   100% { box-shadow: 0 0 0 0 rgba(var(--esc-linea-rgb), 0); }
 }
 
-/* --- El iris (la mano que escucha) --------------------------------------- */
-.escucha-iris {
+/* ============================================================================
+ * EL PORTAL — la ventana circular al otro lado.
+ * Capas (atrás→adelante): espacio con estrellas · geometría sagrada · campo
+ * de partículas (caos⇄orden, deriva lenta) · espectro-mandala + sello ·
+ * núcleo de luz (ojo de energía) con la mano de Chagra en la pupila.
+ * ========================================================================== */
+.escucha-portal {
   position: relative;
-  width: 232px;
-  height: 232px;
+  width: 250px;
+  height: 250px;
   display: grid;
   place-items: center;
   margin: 2px 0;
 }
-.escucha-iris svg { position: absolute; inset: 0; overflow: visible; }
+.escucha-portal > svg,
+.escucha-espacio > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
 
-/* Anillos de micelio: el scale lo pone el JSX con el RMS real; acá solo
- * la transición corta para que el movimiento se sienta orgánico. */
-.escucha-anillo {
+/* El espacio profundo: siempre oscuro — la luz de adentro no es del tema.
+ * Doble marco: hilo del acento (Chagra) afuera, aliento cian en el borde. */
+.escucha-espacio {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 38%,
+    #141838 0%, #0b0d24 45%, #060713 76%, #030309 100%);
+  border: 1px solid rgba(var(--pre-a-rgb), 0.35);
+  box-shadow:
+    inset 0 0 34px rgba(var(--pre-b-rgb), 0.20),
+    inset 0 -20px 44px rgba(var(--pre-a-rgb), 0.07),
+    0 0 44px rgba(var(--pre-b-rgb), 0.28),
+    0 0 0 4px rgba(var(--esc-carta-rgb), 0.9),
+    0 0 0 5px rgba(var(--esc-linea-rgb), 0.45);
+}
+.escucha-estrella { fill: rgb(var(--pre-w-rgb)); }
+.escucha-estrella-titila { animation: escucha-titila 3.8s ease-in-out infinite; }
+@keyframes escucha-titila {
+  0%, 100% { opacity: 0.15; }
+  50%      { opacity: 0.75; }
+}
+
+/* Geometría sagrada: rotación lentísima en reposo; PENSANDO la acelera y
+ * contra-rota — la energía procesa. Fantasmas cian/violeta = dispersión
+ * cromática (luz que no enfoca del todo en este plano). */
+.escucha-geo {
+  fill: none;
   transform-origin: center;
-  transition: transform 0.09s ease-out, opacity 0.2s ease;
+  overflow: visible;
 }
-.escucha-brote {
-  transition: opacity 0.15s ease;
-  stroke: rgb(var(--esc-linea-rgb));
+.escucha-geo-a { animation: escucha-gira 80s linear infinite; }
+.escucha-geo-b { animation: escucha-gira-rev 55s linear infinite; }
+.escucha-overlay[data-fase="pensando"] .escucha-geo-a { animation: escucha-gira 7s linear infinite; }
+.escucha-overlay[data-fase="pensando"] .escucha-geo-b { animation: escucha-gira-rev 4.5s linear infinite; }
+@keyframes escucha-gira     { from { transform: rotate(0deg); }   to { transform: rotate(360deg); } }
+@keyframes escucha-gira-rev { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+.escucha-geo-linea      { stroke: rgba(var(--pre-w-rgb), 0.34); stroke-width: 1; }
+.escucha-geo-fantasma-a { stroke: rgba(var(--pre-a-rgb), 0.26); stroke-width: 1; }
+.escucha-geo-fantasma-b { stroke: rgba(var(--pre-b-rgb), 0.26); stroke-width: 1; }
+.escucha-geo-aro  { fill: none; stroke: rgba(var(--pre-a-rgb), 0.20); stroke-width: 1; }
+.escucha-geo-nodo { fill: rgba(var(--pre-a-rgb), 0.65); }
+
+/* Campo de partículas: la posición caos⇄orden la pone el JSX con el RMS
+ * real; acá solo la deriva ambiental (rotación lenta del plano entero) y el
+ * remolino de PENSANDO (espiral hacia el centro). */
+.escucha-campo {
+  transform-origin: center;
+  animation: escucha-gira 90s linear infinite;
+}
+.escucha-overlay[data-fase="pensando"] .escucha-campo {
+  animation: escucha-remolino 5s linear infinite;
+}
+@keyframes escucha-remolino {
+  0%   { transform: rotate(0deg) scale(1); }
+  50%  { transform: rotate(180deg) scale(0.86); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+.escucha-particula { transition: opacity 0.2s ease; }
+
+/* Tonos espectrales (partículas y rayos): la dispersión de la Presencia. */
+.escucha-tono-0 { fill: rgb(var(--pre-w-rgb)); stroke: rgb(var(--pre-w-rgb)); }
+.escucha-tono-1 { fill: rgb(var(--pre-a-rgb)); stroke: rgb(var(--pre-a-rgb)); }
+.escucha-tono-2 { fill: rgb(var(--pre-b-rgb)); stroke: rgb(var(--pre-b-rgb)); }
+
+/* Espectro-mandala: doble trazo (aliento ancho + filo fino) por rayo. */
+.escucha-mandala { overflow: visible; }
+.escucha-rayo,
+.escucha-rayo-glow {
+  fill: none;
   stroke-linecap: round;
+  transition: opacity 0.15s ease;
 }
-.escucha-arco-cierre {
-  stroke: rgb(var(--esc-ink-rgb));
-  opacity: 0.85;
+
+/* Sello de silencio: aro de luz blanca que se cierra (conteo honesto). */
+.escucha-sello {
+  stroke: rgb(var(--pre-w-rgb));
+  opacity: 0.9;
+  transition: stroke-dashoffset 0.15s linear;
+}
+.escucha-sello-glow {
+  stroke: rgba(var(--pre-a-rgb), 0.35);
   transition: stroke-dashoffset 0.15s linear;
 }
 
-/* La mano al centro: disco propio + glifo con el acento del tema. */
-.escucha-mano {
+/* El núcleo: un OJO de energía. Halo volumétrico (violeta) + cuerpo de luz
+ * (iris cian-blanco) + anillo de apertura brillante + la mano de Chagra como
+ * pupila oscura: alguien está ahí, mirando. El scale lo pone el JSX (RMS). */
+.escucha-nucleo {
   position: relative;
   z-index: 2;
-  width: 96px;
-  height: 96px;
-  border-radius: 50%;
+  width: 92px;
+  height: 92px;
   display: grid;
   place-items: center;
-  color: rgb(var(--esc-linea-rgb));
-  background:
-    radial-gradient(circle at 32% 28%, rgba(var(--esc-linea-rgb), 0.22), transparent 62%),
-    rgba(var(--esc-carta-rgb), 0.95);
-  border: 2px solid rgba(var(--esc-linea-rgb), 0.55);
-  box-shadow: 0 0 34px rgba(var(--esc-linea-rgb), 0.35);
+  transition: transform 0.09s ease-out;
 }
-.escucha-overlay[data-fase="pensando"] .escucha-mano {
-  animation: escucha-piensa 1.4s ease-in-out infinite;
+.escucha-nucleo-halo {
+  position: absolute;
+  inset: -30px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(var(--pre-b-rgb), 0.30) 0%,
+    rgba(var(--pre-b-rgb), 0.10) 42%,
+    transparent 70%);
+  animation: escucha-respira 5s ease-in-out infinite;
 }
-@keyframes escucha-piensa {
-  0%, 100% { box-shadow: 0 0 22px rgba(var(--esc-linea-rgb), 0.25); }
-  50%      { box-shadow: 0 0 48px rgba(var(--esc-linea-rgb), 0.55); }
+@keyframes escucha-respira {
+  0%, 100% { transform: scale(1);    opacity: 0.85; }
+  50%      { transform: scale(1.12); opacity: 1; }
+}
+.escucha-nucleo-luz {
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 46%,
+    rgba(var(--pre-w-rgb), 0.55) 0%,
+    rgba(255, 255, 255, 0.94) 30%,
+    rgba(var(--pre-a-rgb), 0.60) 56%,
+    rgba(var(--pre-b-rgb), 0.20) 78%,
+    transparent 90%);
+  box-shadow:
+    0 0 34px rgba(var(--pre-a-rgb), 0.45),
+    0 0 80px rgba(var(--pre-b-rgb), 0.30);
+}
+.escucha-nucleo-apertura {
+  position: absolute;
+  inset: 11px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 0 14px rgba(var(--pre-a-rgb), 0.7),
+    inset 0 0 10px rgba(var(--pre-a-rgb), 0.5);
+  pointer-events: none;
+}
+.escucha-nucleo-mano {
+  position: relative;
+  z-index: 1;
+  color: #0a0d24; /* pupila: silueta oscura en la luz */
+  opacity: 0.95;
+}
+.escucha-overlay[data-fase="pensando"] .escucha-nucleo {
+  animation: escucha-nucleo-procesa 1.6s ease-in-out infinite;
+}
+@keyframes escucha-nucleo-procesa {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.09); }
 }
 
 /* --- Título de estado (legible al sol: enorme y extrabold) ---------------- */
@@ -287,11 +425,17 @@
 
 /* ============================================================================
  * EscuchaFab — botón flotante persistente (el tap de HOY).
- * Espejo del AgentFab (colibrí, derecha): este vive a la IZQUIERDA, tamaño
- * guante (62px), acento del tema, con un ping suave que anuncia "aquí se
- * habla". El wake-word de mañana NO lo necesita — llama activarEscucha().
+ * "La Presencia" en miniatura: marco del tema (Chagra) + espacio profundo
+ * adentro + núcleo de luz que LEVITA con dos motas en órbita. Tamaño guante
+ * (62px), abajo a la IZQUIERDA (espejo del AgentFab). El wake-word de mañana
+ * NO lo necesita — llama activarEscucha().
  * ========================================================================== */
 .escucha-fab {
+  /* La luz de la Presencia (misma del overlay) */
+  --pre-a-rgb: 120, 235, 255;
+  --pre-b-rgb: 178, 140, 255;
+  --pre-w-rgb: 240, 250, 255;
+
   position: fixed;
   bottom: max(90px, calc(env(safe-area-inset-bottom) + 90px));
   left: 16px;
@@ -299,16 +443,15 @@
   height: 62px;
   border-radius: 50%;
   z-index: 40;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
+  padding: 0;
   cursor: pointer;
-  color: rgb(var(--t-accent-rgb));
-  background: radial-gradient(circle at 30% 25%, rgba(var(--t-accent-rgb), 0.16), transparent 65%), rgba(6, 16, 13, 0.92);
-  border: 2px solid rgba(var(--t-accent-rgb), 0.65);
+  background: transparent;
+  border: 2px solid rgba(var(--t-accent-rgb), 0.55); /* el marco es de Chagra */
   box-shadow:
     0 4px 18px rgba(0, 0, 0, 0.45),
-    0 0 18px rgba(var(--t-accent-rgb), 0.35);
+    0 0 20px rgba(var(--pre-b-rgb), 0.30);
   transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
 }
 .escucha-fab:hover, .escucha-fab:focus-visible { transform: scale(1.06); }
@@ -318,49 +461,128 @@
   outline-offset: 2px;
 }
 
-/* Temas claros: el FAB pasa a disco del acento con tinta clara (contraste). */
-[data-theme="minimalista"] .escucha-fab,
-[data-theme="nature"] .escucha-fab,
-[data-theme="verde-vivo"] .escucha-fab {
-  color: #fff;
-  background: rgb(var(--t-accent-rgb));
-  border-color: rgba(255, 255, 255, 0.65);
+/* El otro lado en miniatura (siempre oscuro — contraste en cualquier tema). */
+.escucha-fab-espacio {
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 50% 36%,
+    #151a3c 0%, #0b0d24 48%, #050610 82%);
+  box-shadow:
+    inset 0 0 12px rgba(var(--pre-b-rgb), 0.25),
+    inset 0 -6px 14px rgba(var(--pre-a-rgb), 0.10);
 }
-[data-theme="nature"] .escucha-fab { color: #2b1c10; }
 
-/* Ping perezoso: un aro que brota cada 4s — anuncia sin fastidiar. */
-.escucha-fab-ping {
+/* Órbita: dos motas de luz girando alrededor del núcleo. */
+.escucha-fab-orbita {
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  animation: escucha-gira 8s linear infinite;
+}
+.escucha-fab-mota {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+}
+.escucha-fab-mota-a {
+  top: 0;
+  left: 50%;
+  margin-left: -2px;
+  background: rgb(var(--pre-a-rgb));
+  box-shadow: 0 0 6px rgba(var(--pre-a-rgb), 0.9);
+}
+.escucha-fab-mota-b {
+  bottom: 3px;
+  right: 8px;
+  width: 3px;
+  height: 3px;
+  background: rgb(var(--pre-b-rgb));
+  box-shadow: 0 0 5px rgba(var(--pre-b-rgb), 0.9);
+}
+
+/* Núcleo suspendido: levita (translateY suave, GPU) bajo el micrófono. */
+.escucha-fab-nucleo {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 42%,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(var(--pre-a-rgb), 0.55) 45%,
+    rgba(var(--pre-b-rgb), 0.18) 72%,
+    transparent 86%);
+  box-shadow:
+    0 0 14px rgba(var(--pre-a-rgb), 0.55),
+    0 0 30px rgba(var(--pre-b-rgb), 0.35);
+  animation: escucha-levita 4s ease-in-out infinite;
+}
+@keyframes escucha-levita {
+  0%, 100% { transform: translateY(1.5px); }
+  50%      { transform: translateY(-1.5px); }
+}
+
+/* El micrófono flota sobre la luz: silueta oscura, legible. */
+.escucha-fab-mic {
+  position: relative;
+  z-index: 2;
+  color: #0a0d24;
+}
+
+/* Pulso de presencia: un aro que se dilata cada 4s — anuncia sin fastidiar. */
+.escucha-fab-pulso {
   position: absolute;
   inset: -2px;
   border-radius: 50%;
-  border: 2px solid rgba(var(--t-accent-rgb), 0.55);
-  animation: escucha-fab-brota 4s ease-out infinite;
+  border: 2px solid rgba(var(--pre-a-rgb), 0.55);
+  animation: escucha-fab-pulsa 4s ease-out infinite;
   pointer-events: none;
 }
-@keyframes escucha-fab-brota {
+@keyframes escucha-fab-pulsa {
   0%   { transform: scale(1); opacity: 0.7; }
   30%  { transform: scale(1.45); opacity: 0; }
   100% { transform: scale(1.45); opacity: 0; }
 }
 
-/* La ramita del glifo sobre el mic: la firma "mano de Chagra" en miniatura. */
-.escucha-fab-brotecito {
+/* La firma: destello de 4 puntas titilando suave arriba a la derecha. */
+.escucha-fab-destello {
   position: absolute;
-  top: 7px;
-  right: 9px;
-  opacity: 0.9;
+  top: 6px;
+  right: 8px;
+  z-index: 2;
+  color: rgba(var(--pre-w-rgb), 0.95);
+  animation: escucha-destella 4s ease-in-out infinite;
   pointer-events: none;
+}
+@keyframes escucha-destella {
+  0%, 100% { transform: scale(0.8); opacity: 0.5; }
+  50%      { transform: scale(1);   opacity: 1; }
 }
 
 /* ============================================================================
- * Movimiento reducido: el organismo queda quieto pero el ESTADO sigue claro
- * (el arco de cierre y los textos son informativos, no decorativos).
+ * Movimiento reducido: la Presencia queda QUIETA pero hermosa — campo
+ * ordenado, geometría fija, núcleo estable. El ESTADO sigue claro (el sello
+ * de cierre y los textos son informativos, no decorativos).
  * ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
   .escucha-carta { animation: none; }
   .escucha-punto { animation: none; }
-  .escucha-anillo { transition: none; }
-  .escucha-overlay[data-fase="pensando"] .escucha-mano { animation: none; }
-  .escucha-fab-ping { animation: none; opacity: 0; }
+  .escucha-estrella-titila { animation: none; }
+  .escucha-geo-a, .escucha-geo-b,
+  .escucha-overlay[data-fase="pensando"] .escucha-geo-a,
+  .escucha-overlay[data-fase="pensando"] .escucha-geo-b { animation: none; }
+  .escucha-campo,
+  .escucha-overlay[data-fase="pensando"] .escucha-campo { animation: none; }
+  .escucha-nucleo-halo { animation: none; }
+  .escucha-overlay[data-fase="pensando"] .escucha-nucleo { animation: none; }
+  .escucha-nucleo { transition: none; }
+  .escucha-particula, .escucha-rayo, .escucha-rayo-glow { transition: none; }
+  .escucha-fab-orbita { animation: none; }
+  .escucha-fab-nucleo { animation: none; }
+  .escucha-fab-pulso { animation: none; opacity: 0; }
+  .escucha-fab-destello { animation: none; }
   .escucha-fab, .escucha-btn-listo { transition: none; }
 }

@@ -5,7 +5,7 @@
  * Reusa la infra de chagra-shot (visualTestUtils: determinismo + login + seed)
  * y el patrón NixOS (chromium del nix-store). El micrófono es el FAKE de
  * Chromium (--use-fake-device-for-media-capture): produce un tono real, así
- * que los anillos/brotes del iris se mueven con amplitud DE VERDAD.
+ * que los rayos/partículas del portal se mueven con amplitud DE VERDAD.
  *
  * Whisper se stubbea con context.route (NO page.route: el SW lo sombrea,
  * gotcha documentado) para poder capturar la fase "rumbo" sin backend.
@@ -79,7 +79,7 @@ async function abrirEscucha(page, fuente) {
     window.dispatchEvent(new CustomEvent('chagra:escucha', { detail: { fuente: f, ts: Date.now() } }));
   }, fuente);
   await page.waitForSelector('[data-testid="escucha-overlay"][data-fase="oyendo"]', { timeout: 15_000 });
-  // Deja correr el tono fake ~1.2s para que los brotes tengan historia real.
+  // Deja correr el tono fake ~1.2s para que los rayos tengan historia real.
   await page.waitForTimeout(1200);
 }
 
@@ -206,14 +206,21 @@ async function main() {
 
     // 1) FAB visible en una pantalla real (suelo). En el home NO hay FAB
     // (política AgentFab: el compositor del hero ya trae mic + botón Ⓐ).
+    // GOTCHA: el tap del FAB está DESHABILITADO en App.jsx (el trigger de
+    // usuarios es el wake-word) — si no está montado, se omite esa captura
+    // en vez de reventar (para capturarlo: descomentar <EscuchaFab /> local).
     await page.evaluate(() => {
       window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view: 'suelo' } }));
     });
-    const fabShot = `${OUTDIR}/escucha-01-fab-${tema.id}.png`;
-    await page.waitForSelector('[data-testid="escucha-fab"]', { timeout: 20_000 });
     await page.waitForTimeout(4500); // deja cargar el chunk lazy de la vista
-    await page.screenshot({ path: fabShot });
-    hechas.push(fabShot);
+    const hayFab = await page.locator('[data-testid="escucha-fab"]').count() > 0;
+    if (hayFab) {
+      const fabShot = `${OUTDIR}/escucha-01-fab-${tema.id}.png`;
+      await page.screenshot({ path: fabShot });
+      hechas.push(fabShot);
+    } else {
+      console.warn(`[escucha-shots] FAB no montado (deshabilitado en App.jsx) — captura 01 omitida (${tema.id})`);
+    }
 
     // 2) Widget escuchando (tap)
     await abrirEscucha(page, 'tap');
@@ -228,6 +235,19 @@ async function main() {
       const wwShot = `${OUTDIR}/escucha-03-wakeword-biopunk.png`;
       await page.screenshot({ path: wwShot });
       hechas.push(wwShot);
+
+      // 3b) Fase "pensando" (solo VISUAL): se fuerza data-fase en el DOM para
+      // ver la animación de proceso sin depender del timing real de Whisper.
+      await page.evaluate(() => {
+        document.querySelector('[data-testid="escucha-overlay"]')?.setAttribute('data-fase', 'pensando');
+      });
+      await page.waitForTimeout(700);
+      const pensShot = `${OUTDIR}/escucha-03b-pensando-biopunk.png`;
+      await page.screenshot({ path: pensShot });
+      hechas.push(pensShot);
+      await page.evaluate(() => {
+        document.querySelector('[data-testid="escucha-overlay"]')?.setAttribute('data-fase', 'oyendo');
+      });
 
       // 4) Fase rumbo: "Lléveme al mercado" → "Abriendo Mercado…"
       await page.click('[data-testid="escucha-listo"]');
