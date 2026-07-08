@@ -1902,6 +1902,9 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Quinua y granos andinos">
               <QuinuaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'fique':
         // Mundo "El fique y las fibras" (5 estaciones: la planta y la ladera /
         // cría y manejo / el desfibrado / usos y cultura / bagazo y jugo).
