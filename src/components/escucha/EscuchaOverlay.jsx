@@ -19,9 +19,10 @@
  * es ese conteo, feedback honesto). "Listo" y "Cancelar" quedan como respaldo
  * táctil tamaño guante.
  *
- * Visual: "la mano que escucha" — ManoChagraGlyph al centro de un iris de
- * micelio cuyos anillos y brotes respiran con el RMS REAL del micrófono
- * (audioLevel/amplitudeHistory del recorder — nada de animación fingida).
+ * Visual: "EL UMBRAL" — una presencia de luz se asoma a escuchar: un campo
+ * de motas que se ORDENA con el RMS REAL del micrófono, un aro-oscilo que
+ * dibuja la historia de amplitud real y un núcleo suspendido con la mano de
+ * Chagra como holograma (nada de animación fingida — el dato manda).
  *
  * IMPORTANTE — español colombiano (tú/usted), NUNCA voseo argentino.
  */
@@ -49,80 +50,223 @@ const MIN_ESCUCHA_MS = 1500;
 const TOPE_ESCUCHA_MS = 25000; // por debajo del hard-limit (30s) del recorder
 const PAUSA_RUMBO_MS = 1000;   // deja LEER "Abriendo Mercado…" antes de saltar
 
-const NUM_BROTES = 28;
-
 const formatoSegundos = (ms) => `${(ms / 1000).toFixed(0)}s`;
 
 const navegar = (view, initialData = null) => {
   window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view, initialData } }));
 };
 
-/**
- * Iris de micelio: 3 anillos que respiran con el RMS + brotes radiales con la
- * historia de amplitud + arco de cierre (conteo de silencio). Todo dato real.
- */
-function IrisEscucha({ nivel, historia, fase, cierre }) {
-  const C = 116; // centro del viewBox 232x232
-  const brotes = [];
-  const muestras = historia.slice(-NUM_BROTES);
-  for (let i = 0; i < NUM_BROTES; i++) {
-    const m = muestras[i] ?? 0;
-    const ang = (i / NUM_BROTES) * Math.PI * 2 - Math.PI / 2;
-    const r0 = 78;
-    const largo = fase === FASE_OYENDO ? 5 + m * 26 : 5;
-    const x1 = C + Math.cos(ang) * r0;
-    const y1 = C + Math.sin(ang) * r0;
-    const x2 = C + Math.cos(ang) * (r0 + largo);
-    const y2 = C + Math.sin(ang) * (r0 + largo);
-    brotes.push(
-      <line
-        key={i}
-        className="escucha-brote"
-        x1={x1} y1={y1} x2={x2} y2={y2}
-        strokeWidth={i % 4 === 0 ? 3 : 2}
-        opacity={0.35 + m * 0.65}
-      />,
-    );
+/* ========================== EL UMBRAL (visual) =============================
+ * Presencia etérea: un umbral de energía se abre cuando Chagra escucha.
+ * TODO el movimiento significativo es DATO REAL del micrófono:
+ *   - las motas de luz viven en caos calmo y se ORDENAN en anillos con la
+ *     voz (RMS suavizado): hablar = ordenar el campo,
+ *   - el aro-oscilo dibuja la historia de amplitud (la voz, visible),
+ *   - el sello de silencio es el conteo real que cierra la escucha.
+ * GPU-friendly: transform/opacity + atributos SVG. Sin blur animado.
+ * ========================================================================== */
+
+const VB = 260;       // lado del viewBox del portal
+const CV = VB / 2;    // centro
+const N_MOTAS = 56;   // motas de luz del campo
+const N_OSC = 72;     // puntos del aro-oscilo
+
+/* PRNG determinista: mismas motas en cada montaje (nada de Math.random). */
+const azar = (i, sal) => {
+  const x = Math.sin(i * 127.1 + sal * 311.7) * 43758.5453;
+  return x - Math.floor(x);
+};
+
+/* Campo precomputado UNA vez: cada mota tiene una posición de CAOS (deriva
+ * calma, distribución de ángulo áureo) y una de ORDEN (tres anillos
+ * concéntricos). La voz interpola entre las dos. */
+const MOTAS = Array.from({ length: N_MOTAS }, (_, i) => {
+  const anillo = i % 3;
+  const porAnillo = Math.ceil(N_MOTAS / 3);
+  return {
+    caosAng: i * 2.399963 + azar(i, 1) * 0.9,
+    caosR: 54 + azar(i, 2) * 58,
+    ordenAng: (Math.floor(i / 3) / porAnillo) * Math.PI * 2 + anillo * 0.35,
+    ordenR: [70, 86, 102][anillo],
+    tam: 1 + azar(i, 3) * 1.6,
+    base: 0.2 + azar(i, 4) * 0.3,
+  };
+});
+
+/* Diferencia angular por el camino corto (la mota no da la vuelta larga). */
+const deltaAng = (a, b) => {
+  let d = (b - a) % (Math.PI * 2);
+  if (d > Math.PI) d -= Math.PI * 2;
+  if (d < -Math.PI) d += Math.PI * 2;
+  return d;
+};
+
+/* Polígono regular inscrito en r, como string de puntos SVG. */
+const poligono = (lados, r, giro = 0) =>
+  Array.from({ length: lados }, (_, k) => {
+    const a = (k / lados) * Math.PI * 2 + giro;
+    return `${(CV + Math.cos(a) * r).toFixed(1)},${(CV + Math.sin(a) * r).toFixed(1)}`;
+  }).join(' ');
+
+const HEXAGONO = poligono(6, 118, -Math.PI / 2);
+const TRIANGULO_A = poligono(3, 118, -Math.PI / 2);
+const TRIANGULO_B = poligono(3, 118, Math.PI / 2);
+
+/* Ticks del astrolabio: 12 marcas fijas cada 30°. */
+const TICKS = Array.from({ length: 12 }, (_, k) => {
+  const a = (k / 12) * Math.PI * 2;
+  const r1 = 108;
+  const r2 = k % 3 === 0 ? 116 : 112;
+  return {
+    x1: CV + Math.cos(a) * r1, y1: CV + Math.sin(a) * r1,
+    x2: CV + Math.cos(a) * r2, y2: CV + Math.sin(a) * r2,
+  };
+});
+
+/* Aro-oscilo: path cerrado cuyo radio module la historia REAL de amplitud. */
+function pathOscilo(historia) {
+  const m = historia.slice(-N_OSC);
+  const falta = N_OSC - m.length;
+  let d = '';
+  for (let k = 0; k < N_OSC; k++) {
+    const v = k < falta ? 0 : (m[k - falta] || 0);
+    const a = (k / N_OSC) * Math.PI * 2 - Math.PI / 2;
+    const r = 52 + v * 20;
+    const x = (CV + Math.cos(a) * r).toFixed(1);
+    const y = (CV + Math.sin(a) * r).toFixed(1);
+    d += (k === 0 ? 'M' : 'L') + x + ' ' + y;
   }
+  return d + 'Z';
+}
 
-  // Arco de cierre: circunferencia r=110; se va DIBUJANDO con el silencio.
-  const rArco = 110;
-  const circArco = 2 * Math.PI * rArco;
+/**
+ * El Umbral: astrolabio holográfico + campo de motas (orden = RMS real) +
+ * aro-oscilo (historia real) + núcleo suspendido con la mano de Chagra como
+ * holograma + sello de silencio (conteo real). El estado de fase colorea y
+ * anima por CSS (data-fase en el overlay); aquí solo se pintan los DATOS.
+ */
+function PortalUmbral({ nivel, historia, fase, cierre }) {
+  const oyendo = fase === FASE_OYENDO;
 
-  const vivo = fase === FASE_OYENDO;
+  // Orden del campo: 0 = caos calmo, 1 = anillos perfectos. Un loop rAF lo
+  // suaviza leyendo el último RMS/fase desde refs (actualizadas en un efecto,
+  // nunca en render). Suavizado asimétrico: sube rápido con la voz, cae lento
+  // (la presencia "retiene" un instante lo que oyó). setState va DENTRO del
+  // rAF (diferido), no síncrono en el efecto.
+  const nivelRef = useRef(0);
+  const faseRef = useRef(fase);
+  useEffect(() => { nivelRef.current = nivel; faseRef.current = fase; }, [nivel, fase]);
+
+  const [orden, setOrden] = useState(0);
+  useEffect(() => {
+    let raf = 0;
+    const tick = () => {
+      setOrden((prev) => {
+        const f = faseRef.current;
+        if (f === FASE_PENSANDO || f === FASE_RUMBO) return prev + (1 - prev) * 0.12;
+        if (f !== FASE_OYENDO) return prev * 0.85;
+        const objetivo = Math.min(1, nivelRef.current * 2.8);
+        return prev + (objetivo - prev) * (objetivo > prev ? 0.3 : 0.05);
+      });
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  const t = orden;
+
+  const motas = MOTAS.map((m, i) => {
+    const ang = m.caosAng + deltaAng(m.caosAng, m.ordenAng) * t;
+    const r = m.caosR + (m.ordenR - m.caosR) * t;
+    return (
+      <circle
+        key={i}
+        className="portal-mota"
+        cx={(CV + Math.cos(ang) * r).toFixed(1)}
+        cy={(CV + Math.sin(ang) * r).toFixed(1)}
+        r={m.tam}
+        opacity={Math.min(1, m.base + t * 0.6)}
+      />
+    );
+  });
+
+  // Sello de silencio: r=122; se dibuja con el conteo real de cierre.
+  const rSello = 122;
+  const circSello = 2 * Math.PI * rSello;
+  const dOscilo = oyendo ? pathOscilo(historia) : '';
+
+  // Luz volumétrica: respira con la voz; cada fase tiene su intensidad.
+  const rayosOpacidad = oyendo ? 0.3 + t * 0.55
+    : fase === FASE_PENSANDO ? 0.55
+      : fase === FASE_RUMBO ? 0.85 : 0.12;
+
   return (
-    <div className="escucha-iris" aria-hidden="true">
-      <svg viewBox="0 0 232 232">
-        {/* Anillos de micelio: respiración = RMS real, cada uno a su ritmo */}
-        {[{ r: 58, k: 26, o: 0.5 }, { r: 68, k: 16, o: 0.35 }, { r: 78, k: 8, o: 0.25 }].map(({ r, k, o }, i) => (
-          <circle
-            key={i}
-            className="escucha-anillo"
-            cx={C} cy={C} r={r}
-            fill="none"
-            stroke={`rgba(var(--esc-linea-rgb), ${o + (vivo ? nivel * 0.4 : 0)})`}
-            strokeWidth={i === 0 ? 2.5 : 1.5}
-            strokeDasharray={i === 2 ? '3 7' : i === 1 ? '10 6' : 'none'}
-            style={{ transform: vivo ? `scale(${1 + nivel * (k / 100)})` : 'scale(1)' }}
-          />
-        ))}
-        {brotes}
-        {/* Conteo de silencio: el aro exterior se cierra → "ya casi termino de oír" */}
-        {vivo && cierre > 0 && (
-          <circle
-            className="escucha-arco-cierre"
-            cx={C} cy={C} r={rArco}
-            fill="none"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeDasharray={circArco}
-            strokeDashoffset={circArco * (1 - cierre)}
-            transform={`rotate(-90 ${C} ${C})`}
-          />
+    <div className="escucha-portal" aria-hidden="true">
+      <div className="portal-rayos" style={{ opacity: rayosOpacidad }} />
+      <div className="portal-glow" />
+      <svg viewBox={`0 0 ${VB} ${VB}`}>
+        {/* Astrolabio holográfico: geometría que gira lentísimo en calma y
+            se recompone contra-rotando cuando la presencia piensa. */}
+        <g className="portal-geo portal-geo-a">
+          <circle cx={CV} cy={CV} r={112} fill="none" strokeDasharray="1 7" />
+          <polygon points={HEXAGONO} fill="none" />
+        </g>
+        <g className="portal-geo portal-geo-b">
+          <circle cx={CV} cy={CV} r={104} fill="none" strokeDasharray="26 12" />
+          <polygon points={TRIANGULO_A} fill="none" />
+          <polygon points={TRIANGULO_B} fill="none" />
+        </g>
+        <g className="portal-ticks">
+          {TICKS.map((tk, k) => (
+            <line key={k} x1={tk.x1} y1={tk.y1} x2={tk.x2} y2={tk.y2} />
+          ))}
+        </g>
+
+        {/* El campo: caos calmo → anillos concéntricos, con la voz real. */}
+        <g className="portal-motas">{motas}</g>
+
+        {/* La voz visible: aro-oscilo con la historia real + eco espectral. */}
+        {oyendo && (
+          <>
+            <path className="portal-oscilo-eco" d={dOscilo} />
+            <path className="portal-oscilo" d={dOscilo} />
+          </>
+        )}
+
+        {/* Pensando: anillo de proceso orbitando el núcleo. */}
+        {fase === FASE_PENSANDO && (
+          <circle className="portal-proceso" cx={CV} cy={CV} r={58} fill="none" strokeDasharray="36 328" />
+        )}
+
+        {/* Sello de silencio: el umbral se va cerrando con el conteo real. */}
+        {oyendo && cierre > 0 && (
+          <>
+            <circle
+              className="portal-sello-halo"
+              cx={CV} cy={CV} r={rSello}
+              fill="none"
+              strokeDasharray={circSello}
+              strokeDashoffset={circSello * (1 - cierre)}
+              transform={`rotate(-90 ${CV} ${CV})`}
+            />
+            <circle
+              className="portal-sello"
+              cx={CV} cy={CV} r={rSello}
+              fill="none"
+              strokeLinecap="round"
+              strokeDasharray={circSello}
+              strokeDashoffset={circSello * (1 - cierre)}
+              transform={`rotate(-90 ${CV} ${CV})`}
+            />
+          </>
         )}
       </svg>
-      <div className="escucha-mano">
-        <ManoChagraGlyph size={54} />
+
+      {/* Núcleo de energía suspendido: se hincha con la voz real; adentro
+          flota la firma de Chagra como holograma. */}
+      <div className="portal-nucleo" style={{ transform: `scale(${(1 + t * 0.14).toFixed(3)})` }}>
+        <span className="portal-corazon" />
+        <ManoChagraGlyph size={40} className="portal-glifo" />
       </div>
     </div>
   );
@@ -320,7 +464,7 @@ export default function EscuchaOverlay() {
           {fuente === 'wakeword' ? 'Escuché «hola Chagra»' : 'Escucha manos libres'}
         </div>
 
-        <IrisEscucha nivel={audioLevel} historia={amplitudeHistory} fase={fase} cierre={cierre} />
+        <PortalUmbral nivel={audioLevel} historia={amplitudeHistory} fase={fase} cierre={cierre} />
 
         <h2 className="escucha-titulo" data-testid="escucha-estado" aria-live="polite">
           {fase === FASE_ERROR && <AlertTriangle size={22} style={{ display: 'inline', verticalAlign: '-3px', marginRight: 6 }} />}
