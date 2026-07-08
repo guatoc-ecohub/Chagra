@@ -11,6 +11,14 @@ import React from 'react';
  * (que indica si la respuesta fue grounded contra el catálogo); convive con
  * él porque cubre una dimensión distinta — "esto es IA, no oráculo".
  *
+ * Pulido 2026-07 (semáforo de confianza): comparte la anatomía visual .sello
+ * de src/styles/sello-confianza.css con los demás badges del agente — lámpara
+ * de color con ícono en negativo + etiqueta. El nivel del semáforo
+ * (verde/ámbar/rojo/gris) sale del mismo mapeo de confianza de siempre; la
+ * lógica NO cambió, solo la presentación. Los íconos siguen siendo SVG inline
+ * (sin lucide) para que el badge no arrastre dependencias en pantallas
+ * livianas (SpeciesSelect, demos).
+ *
  * Confidence-weighted (#245 E2, 2026-05-28): si recibe `confidence` prop
  * (típicamente `message._grounded?.confidence` del LLM output), cambia
  * el color y el texto para que el usuario sepa qué tan confiable es la
@@ -19,12 +27,6 @@ import React from 'react';
  *   - 0.4-0.8 (media): ámbar + "probable" + icono info.
  *   - < 0.4 (baja): rojo + "verifica" + icono warning.
  *   - undefined: gris "beta" (default original — backwards compat).
- *
- * Operator 2026-05-28 03:50 COT: "no hiciste preguntas grandes supongo no
- * tienes asi que dame señal cuando puedas confirmar que vas a tener de sobra
- * para 10 horas de autopiloto extremo ya sabes q mejorar asi que adelante" —
- * confidence badges son la mejora más visible para que Free distinga
- * respuestas grounded vs generativas sin tener que abrir tooltip.
  *
  * Props:
  *   - className: clases extra para ajustar margenes desde el call-site.
@@ -42,13 +44,18 @@ function getLevel(confidence) {
 const LEVEL_CONFIG = {
     default: {
         text: 'beta',
-        classes: 'bg-slate-500/20 text-slate-400 border-slate-600/40',
+        nivel: 'gris',
         defaultTooltip: 'Respuesta generada por IA — verifica antes de actuar.',
-        icon: null,
+        // Chispa IA: forma propia del nivel gris/beta (accesible sin color).
+        icon: (
+            <svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                <path d="M8 2.5 L9.4 6.6 L13.5 8 L9.4 9.4 L8 13.5 L6.6 9.4 L2.5 8 L6.6 6.6 Z" strokeLinejoin="round" />
+            </svg>
+        ),
     },
     high: {
         text: 'verificado',
-        classes: 'bg-emerald-500/20 text-emerald-300 border-emerald-600/40',
+        nivel: 'verde',
         defaultTooltip: 'Alta confianza — respaldado por el catálogo Chagra.',
         // SVG inline check (sin lucide para no inflar bundle del badge)
         icon: (
@@ -59,7 +66,7 @@ const LEVEL_CONFIG = {
     },
     mid: {
         text: 'probable',
-        classes: 'bg-amber-500/20 text-amber-300 border-amber-600/40',
+        nivel: 'ambar',
         defaultTooltip: 'Confianza media — útil de referencia, contrasta con un técnico.',
         icon: (
             <svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -71,7 +78,7 @@ const LEVEL_CONFIG = {
     },
     low: {
         text: 'verifica',
-        classes: 'bg-rose-500/20 text-rose-300 border-rose-600/40',
+        nivel: 'rojo',
         defaultTooltip: 'Baja confianza — respuesta generativa sin fuente clara. No actues sin verificar.',
         icon: (
             <svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -92,13 +99,14 @@ export default function AIBetaBadge({ className = '', title, confidence }) {
         <span
             data-testid="ai-beta-badge"
             data-confidence-level={level}
+            data-nivel={cfg.nivel}
             role="note"
             aria-label={tooltip}
             title={tooltip}
-            className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border text-[10px] font-medium uppercase tracking-wide opacity-90 ${cfg.classes} ${className}`}
+            className={`sello sello-beta rounded-full ${className}`}
         >
-            {cfg.icon}
-            {cfg.text}
+            <span className="sello-lampara" aria-hidden="true">{cfg.icon}</span>
+            <span className="sello-texto">{cfg.text}</span>
         </span>
     );
 }

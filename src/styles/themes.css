@@ -461,29 +461,28 @@
  *    ClimaStrip, PestMonitoringWindow, etc. mantienen su estilo).
  * =========================================================================== */
 
-/* Superficie + borde del badge → tarjeta/línea suave del tema. */
+/* Superficie + borde del badge → tarjeta/línea suave del tema.
+ * NOTA semáforo 2026-07: los overrides de [data-testid="ai-beta-badge"]
+ * [data-confidence-level="low"] que vivían acá se retiraron — colapsaban el
+ * nivel "low" (rojo) a tinta verde neutra en los claros, contradiciendo el
+ * semáforo de confianza. El sello nuevo (src/styles/sello-confianza.css) ya
+ * trae su propio override AA por tema claro para el nivel rojo. */
 [data-theme="minimalista"] [data-testid="altitude-badge"],
 [data-theme="nature"] [data-testid="altitude-badge"],
-[data-theme="minimalista"] [data-testid="ai-beta-badge"][data-confidence-level="low"],
-[data-theme="nature"] [data-testid="ai-beta-badge"][data-confidence-level="low"],
-[data-theme="verde-vivo"] [data-testid="altitude-badge"],
-[data-theme="verde-vivo"] [data-testid="ai-beta-badge"][data-confidence-level="low"]{
+[data-theme="verde-vivo"] [data-testid="altitude-badge"]{
   background-color: rgb(var(--c-surface-raised)) !important;
   border-color: rgb(var(--c-surface-border)) !important;
 }
 
 /* Tinta del badge → tinta profunda del tema (AA sobre papel/crema). Cubre los 4
- * pisos térmicos (orange/amber/green/indigo) y el nivel low (rose) de un golpe,
- * sin enumerar familias, porque está anclado al badge. */
-[data-theme="minimalista"] [data-testid="altitude-badge"],
-[data-theme="minimalista"] [data-testid="ai-beta-badge"][data-confidence-level="low"] {
+ * pisos térmicos (orange/amber/green/indigo) de un golpe, sin enumerar
+ * familias, porque está anclado al badge. */
+[data-theme="minimalista"] [data-testid="altitude-badge"] {
   color: rgb(var(--c-emerald-400)) !important;  /* salvia oscura minimalista (AA) */
   text-shadow: none !important;
 }
 [data-theme="nature"] [data-testid="altitude-badge"],
-[data-theme="nature"] [data-testid="ai-beta-badge"][data-confidence-level="low"],
-[data-theme="verde-vivo"] [data-testid="altitude-badge"],
-[data-theme="verde-vivo"] [data-testid="ai-beta-badge"][data-confidence-level="low"]{
+[data-theme="verde-vivo"] [data-testid="altitude-badge"]{
   color: rgb(var(--c-emerald-700)) !important;  /* verde profundo cálido (AA) */
   text-shadow: none !important;
 }
