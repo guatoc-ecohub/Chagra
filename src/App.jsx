@@ -185,6 +185,14 @@ const CacaoScreen = lazy(() => import('./components/cacao/CacaoScreen'));
 // Vecinas + plagas del grafo chagra_kg (public/grafo-relations.json); cero dosis
 // químicas; "dato en camino" donde el grafo aún no respalda. Fotos CC con crédito.
 const HortalizasScreen = lazy(() => import('./components/HortalizasScreen'));
+// Módulo "Tubérculos y raíces" (mundo Cultivos y semillas): el pancoger de raíz.
+// Ficha de cultivo por tubérculo (siembra tubérculo-semilla/esqueje/colino,
+// luz/agua/piso térmico, aporque, vecinas, plagas con manejo agroecológico,
+// cosecha y conservación/curado) para papa, papa criolla, yuca, arracacha, ñame,
+// batata, oca, cubio y ulluco. Vecinas + plagas del grafo chagra_kg
+// (public/grafo-relations.json); cero dosis químicas; "dato en camino" donde el
+// grafo aún no respalda. Fotos CC con crédito visible.
+const TuberculosScreen = lazy(() => import('./components/TuberculosScreen'));
 // LOS MUNDOS DE MI FINCA (reestructuración 2.0 del home): un mundo por dentro —
 // las funciones existentes agrupadas por lugar. Re-rutea, no reimplementa.
 const MundoScreen = lazy(() => import('./components/MundoScreen'));
@@ -451,6 +459,11 @@ const HASH_VIEW_ROUTES = {
   hortalizas: 'hortalizas',
   huerta: 'hortalizas',
   verduras: 'hortalizas',
+  tuberculos: 'tuberculos',
+  'tuberculos-raices': 'tuberculos',
+  raices: 'tuberculos',
+  papa: 'tuberculos',
+  yuca: 'tuberculos',
   // Curso guiado + deep-links profundos usados por la landing (chagra.bio):
   // permiten que chagra.app/#curso, /#sembrar, /#voz, /#milpa, /#biopreparados,
   // /#sanidad y /#cosechar caigan en su vista real (antes caían a dashboard).
@@ -479,7 +492,7 @@ const MODULE_VIEWS = new Set([
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'frutales', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'platano', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'cacao', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'hortalizas', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'hortalizas', 'tuberculos', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'milpa_cultivo', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'plagas', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
@@ -1716,6 +1729,20 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Hortalizas de la huerta">
               <HortalizasScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'tuberculos':
+        // Módulo "Tubérculos y raíces" (mundo Cultivos y semillas): el pancoger de
+        // raíz. Ficha de cultivo por tubérculo (siembra tubérculo-semilla/esqueje/
+        // colino, luz/agua/piso térmico, aporque, vecinas, plagas con manejo
+        // agroecológico, cosecha y conservación/curado). Vecinas + plagas grounded
+        // al grafo chagra_kg (public/grafo-relations.json); cero dosis químicas;
+        // "dato en camino" donde el grafo aún no respalda. Fotos CC con crédito.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Tubérculos y raíces">
+              <TuberculosScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
