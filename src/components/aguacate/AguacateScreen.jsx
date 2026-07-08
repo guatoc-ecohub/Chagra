@@ -141,7 +141,7 @@ function EstacionSiembra() {
         clave="La primera decisión es la variedad correcta para SU altura — sembrar Hass en tierra caliente, o un antillano en el frío, es perder el árbol."
       >
         <p>
-          En Colombia se cultiva entre {CICLO_AGUACATE.altitud.toLowerCase()}. Da su
+          En Colombia se cultiva entre {CICLO_AGUACATE.altitud}. Da su
           primera cosecha a los {CICLO_AGUACATE.primeraCosechaAnios[0]}–{CICLO_AGUACATE.primeraCosechaAnios[1]} años
           (injertado) y vive productivo cerca de {CICLO_AGUACATE.vidaProductivaAnios} años:
           es una renta larga, así que vale la pena arrancar bien.
