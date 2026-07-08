@@ -161,6 +161,15 @@ export async function fetchDeployedSha({
   }
 }
 
+/**
+ * @param {{
+ *   unregisterServiceWorker?: () => Promise<unknown>,
+ *   markReloaded?: () => void,
+ *   reload?: () => void,
+ *   alreadyReloaded?: () => boolean,
+ * }} [deps]
+ * @returns {Promise<{ recovered: boolean, reason: string }>}
+ */
 async function reloadAfterUnregister({
   unregisterServiceWorker = unregisterRegisteredServiceWorker,
   markReloaded = () => markSelfHealReloaded(),
