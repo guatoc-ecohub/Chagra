@@ -17,8 +17,8 @@
  * por Vite `define`). Al arrancar CON conexión, el cliente hace fetch `no-store`
  * a `/version.json` (lo emite el deploy con el SHA desplegado). Si el SHA que
  * está CORRIENDO ≠ el SHA DESPLEGADO → hay un bundle nuevo en el servidor que
- * este cliente no tomó: mandamos SKIP_WAITING al SW en waiting y recargamos UNA
- * sola vez. Tras la recarga, el navegador pide el index.html fresco
+ * este cliente no tomó: desregistramos el SW viejo y recargamos UNA sola vez.
+ * Tras la recarga, el navegador pide el index.html fresco
  * (Network-First en el SW) → bundle nuevo → SHA coincide → no recarga otra vez.
  *
  * Es belt-and-suspenders del auto-update: si éste ya recargó, el SHA coincide y
@@ -41,6 +41,7 @@
  * Funciones puras + helpers para que versionCheck.test.js cubra los casos sin
  * mockear navigator entero.
  */
+import { unregisterRegisteredServiceWorker } from './swRegistration';
 
 /**
  * SHA del build embebido en el bundle. Lo inyecta Vite `define` desde
@@ -57,6 +58,8 @@ export const PENDING_UPDATE_SHA_KEY = 'chagra:self-heal-pending-sha';
 export const VERSION_ENDPOINT = '/version.json';
 // Timeout corto: el self-heal NO debe bloquear el boot ni colgarse en red rural.
 export const VERSION_FETCH_TIMEOUT_MS = 4000;
+const BUNDLE_FETCH_FAILURE_RE =
+  /(?:failed to fetch dynamically imported module|error loading dynamically imported module|loading chunk [^ ]+ failed|chunkloaderror|importing a module script failed|failed to load module script|failed to fetch.*(?:chunk|module))/i;
 
 /**
  * Normaliza un SHA para comparar (trim, lowercase). Acepta short o full SHA y
@@ -100,6 +103,29 @@ export function shouldSelfHeal({ runningSha, deployedSha, alreadyReloaded, onlin
 }
 
 /**
+ * Detecta fallos de carga de bundles o chunks lazy, no fetches de API.
+ *
+ * @param {unknown} input
+ * @returns {boolean}
+ */
+export function isBundleFetchFailure(input) {
+  const obj = /** @type {{ filename?: unknown, message?: unknown, reason?: any }} */ (
+    input && typeof input === 'object' ? input : {}
+  );
+  if (typeof obj.filename === 'string' && obj.filename.includes('/assets/')) {
+    return true;
+  }
+  const msg = (() => {
+    if (typeof input === 'string') return input;
+    if (typeof obj.message === 'string') return obj.message;
+    if (typeof obj.reason === 'string') return obj.reason;
+    if (obj.reason && typeof obj.reason.message === 'string') return obj.reason.message;
+    return '';
+  })().toLowerCase();
+  return BUNDLE_FETCH_FAILURE_RE.test(msg) || (/\/assets\//.test(msg) && /(error|failed|load|chunk|module)/i.test(msg));
+}
+
+/**
  * Lee /version.json con timeout y cache-busting (no-store). Devuelve el SHA
  * desplegado o null si no se pudo obtener (offline/timeout/JSON inválido).
  * NUNCA lanza.
@@ -134,6 +160,32 @@ export async function fetchDeployedSha({
   } finally {
     if (timer) clearTimeout(timer);
   }
+}
+
+/**
+ * @param {{
+ *   unregisterServiceWorker?: () => Promise<unknown>,
+ *   markReloaded?: () => void,
+ *   reload?: () => void,
+ *   alreadyReloaded?: () => boolean,
+ * }} [deps]
+ * @returns {Promise<{ recovered: boolean, reason: string }>}
+ */
+async function reloadAfterUnregister({
+  unregisterServiceWorker = unregisterRegisteredServiceWorker,
+  markReloaded = () => markSelfHealReloaded(),
+  reload = defaultReload,
+  alreadyReloaded = () => hasSelfHealReloaded(),
+} = {}) {
+  if (alreadyReloaded()) return { recovered: false, reason: 'already-reloaded' };
+  markReloaded();
+  try {
+    await unregisterServiceWorker();
+  } catch (_) {
+    /* unregister falló, pero el reload sigue para salir del bundle roto */
+  }
+  reload();
+  return { recovered: true, reason: 'reloaded-after-unregister' };
 }
 
 function safeSessionStorage() {
@@ -201,19 +253,9 @@ export function clearPendingUpdateSha(storage = safeLocalStorage()) {
   }
 }
 
-function defaultNotifyUpdateAvailable(version) {
-  try {
-    window.dispatchEvent(
-      new CustomEvent('chagra:update-available', { detail: { version } }),
-    );
-  } catch (_) {
-    /* entorno sin window/CustomEvent: no-op */
-  }
-}
-
 /**
- * Orquesta el self-heal: lee /version.json, decide, y si procede manda
- * SKIP_WAITING al SW en waiting + recarga UNA sola vez (marcando el guard).
+ * Orquesta el self-heal: lee /version.json, decide, y si procede unregister
+ * del SW + recarga UNA sola vez (marcando el guard).
  *
  * Dependencias inyectables para test (sin tocar navigator/location reales).
  *
@@ -223,11 +265,7 @@ function defaultNotifyUpdateAvailable(version) {
  * @param {() => boolean} [deps.isOnline]
  * @param {() => boolean} [deps.alreadyReloaded]
  * @param {() => void} [deps.markReloaded]
- * @param {() => string|null} [deps.readPending]
- * @param {(sha:string) => void} [deps.writePending]
- * @param {() => void} [deps.clearPending]
- * @param {(version:string) => void} [deps.notifyUpdateAvailable]
- * @param {() => Promise<void>} [deps.skipWaiting] - manda SKIP_WAITING al SW.
+ * @param {() => Promise<boolean>} [deps.unregisterServiceWorker]
  * @param {() => void} [deps.reload] - recarga la página.
  * @returns {Promise<{healed: boolean, reason: string}>}
  */
@@ -239,11 +277,7 @@ export async function runSelfHealCheck(deps = {}) {
       typeof navigator === 'undefined' ? true : navigator.onLine !== false,
     alreadyReloaded = () => hasSelfHealReloaded(),
     markReloaded = () => markSelfHealReloaded(),
-    readPending = () => readPendingUpdateSha(),
-    writePending = (sha) => writePendingUpdateSha(sha),
-    clearPending = () => clearPendingUpdateSha(),
-    notifyUpdateAvailable = defaultNotifyUpdateAvailable,
-    skipWaiting = defaultSkipWaiting,
+    unregisterServiceWorker = unregisterRegisteredServiceWorker,
     reload = defaultReload,
   } = deps;
 
@@ -251,53 +285,23 @@ export async function runSelfHealCheck(deps = {}) {
   if (alreadyReloaded()) return { healed: false, reason: 'already-reloaded' };
 
   const deployedSha = await getDeployedSha();
-  if (deployedSha && shasMatch(runningSha, deployedSha)) {
-    clearPending();
-  }
   const decision = shouldSelfHeal({
     runningSha,
     deployedSha,
     alreadyReloaded: alreadyReloaded(),
     online: isOnline(),
   });
-  if (!decision) return { healed: false, reason: 'in-sync-or-unknown' };
-
-  const pendingSha = readPending();
-  const wasPendingFromPreviousStart = shasMatch(pendingSha, deployedSha);
-  writePending(deployedSha);
-  notifyUpdateAvailable(deployedSha);
-  try {
-    await skipWaiting();
-  } catch (_) {
-    /* SW no disponible: el próximo arranque sigue protegido por pendingSha. */
+  if (!decision) {
+    return { healed: false, reason: deployedSha ? 'in-sync' : 'inconclusive' };
   }
 
-  if (!wasPendingFromPreviousStart) {
-    return { healed: false, reason: 'update-pending' };
-  }
-
-  // Marcar ANTES de recargar: si la recarga es instantánea, el guard ya quedó
-  // escrito para que el próximo arranque no re-dispare en bucle.
-  markReloaded();
-  reload();
-  return { healed: true, reason: 'sha-mismatch' };
-}
-
-/**
- * Manda SKIP_WAITING al SW en `waiting` (si lo hay). Reusa el mismo flujo que
- * el botón del banner: dispara `chagra:sw-update-requested` para que el guard
- * de controllerchange de swRegistration recargue, por si el reload directo de
- * abajo no alcanzara. No-op si no hay SW / waiting.
- */
-async function defaultSkipWaiting() {
-  if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
-  try {
-    window.dispatchEvent(new CustomEvent('chagra:sw-update-requested'));
-  } catch (_) { /* CustomEvent existe en todos los browsers soportados */ }
-  const reg = await navigator.serviceWorker.getRegistration();
-  if (reg && reg.waiting) {
-    reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-  }
+  const result = await reloadAfterUnregister({
+    unregisterServiceWorker,
+    markReloaded,
+    reload,
+    alreadyReloaded,
+  });
+  return { healed: result.recovered, reason: 'sha-mismatch' };
 }
 
 function defaultReload() {
@@ -306,4 +310,69 @@ function defaultReload() {
   try {
     window.location.reload();
   } catch (_) { /* entorno sin window (SSR/test) — no-op */ }
+}
+
+/**
+ * Instala guards de runtime para recuperar bundles/chunks que fallan al cargar.
+ * Debe montarse una sola vez al inicio de la app.
+ *
+ * @param {{
+ *   alreadyReloaded?: () => boolean,
+ *   markReloaded?: () => void,
+ *   unregisterServiceWorker?: () => Promise<unknown>,
+ *   reload?: () => void,
+ *   recover?: () => Promise<boolean|{recovered?: boolean}>,
+ * }} [deps]
+ * @returns {() => void} cleanup
+ */
+export function installBundleRecoveryGuards(deps = {}) {
+  if (typeof window === 'undefined') return () => {};
+  const {
+    alreadyReloaded = () => hasSelfHealReloaded(),
+    markReloaded = () => markSelfHealReloaded(),
+    unregisterServiceWorker = unregisterRegisteredServiceWorker,
+    reload = defaultReload,
+  } = deps;
+
+  const maybeRecover = async (input) => {
+    if (!isBundleFetchFailure(input)) return;
+    await reloadAfterUnregister({
+      alreadyReloaded,
+      markReloaded,
+      unregisterServiceWorker,
+      reload,
+    });
+  };
+
+  const onError = (event) => {
+    const filename = typeof event?.filename === 'string' ? event.filename : '';
+    const targetSrc = typeof event?.target?.src === 'string' ? event.target.src : '';
+    const targetHref = typeof event?.target?.href === 'string' ? event.target.href : '';
+    const message = [
+      event?.message,
+      event?.error?.message,
+      event?.error?.toString?.(),
+      filename,
+      targetSrc,
+      targetHref,
+    ].filter(Boolean).join(' ');
+    if (!filename.includes('/assets/') && !targetSrc.includes('/assets/') && !targetHref.includes('/assets/') && !isBundleFetchFailure(message)) {
+      return;
+    }
+    void maybeRecover(message || event);
+  };
+
+  const onRejection = (event) => {
+    const reason = event?.reason;
+    if (!isBundleFetchFailure(reason)) return;
+    void maybeRecover(reason);
+  };
+
+  window.addEventListener('error', onError, true);
+  window.addEventListener('unhandledrejection', onRejection);
+
+  return () => {
+    window.removeEventListener('error', onError, true);
+    window.removeEventListener('unhandledrejection', onRejection);
+  };
 }

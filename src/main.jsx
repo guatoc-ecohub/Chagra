@@ -17,7 +17,7 @@ import { PRIMARY_WORKER_NAME } from './config/workerConfig'
 import { renameWorker } from './services/assetService'
 import { getAccessToken } from './services/authService'
 import { registerServiceWorker } from './services/swRegistration'
-import { runSelfHealCheck, RUNNING_BUILD_SHA } from './services/versionCheck'
+import { runSelfHealCheck, installBundleRecoveryGuards, RUNNING_BUILD_SHA } from './services/versionCheck'
 
 // Exponer el SHA del bundle CORRIENDO para diagnóstico + el smoke post-deploy
 // (tests/e2e-real/sw-self-heal.smoke.mjs compara window.__CHAGRA_BUILD_SHA__
@@ -84,6 +84,8 @@ if ('serviceWorker' in navigator) {
 
   registerServiceWorker();
 }
+
+installBundleRecoveryGuards();
 
 // Auto-recuperación por versión (self-heal) — NO depende del ciclo de vida del
 // SW. Compara el SHA del bundle corriendo (__BUILD_SHA__) contra /version.json

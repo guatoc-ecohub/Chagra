@@ -80,6 +80,9 @@ const messages = {
     pendientes: 'Pendientes',
     errorGeneral: 'Algo no salió bien. Inténtelo otra vez.',
     errorSincronizar: 'No se pudieron subir los cambios. Chagra vuelve a intentar solo.',
+    dataLossCheckFailed: 'No se pudo verificar el estado de pérdida de datos.',
+    dataRecoveryFailed: 'No se pudieron recuperar los datos desde FarmOS.',
+    backupReadFailed: 'No se pudo leer el archivo.',
     sinConexionPendientes: (count) =>
       `Sin señal. ${count} registro${count !== 1 ? 's' : ''} guardado${count !== 1 ? 's' : ''} en su teléfono.`,
     sinConexionSinPendientes: 'Sin señal. Sus datos quedaron guardados en el teléfono.',
