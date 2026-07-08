@@ -142,6 +142,7 @@ const FrutalesScreen = lazy(() => import('./components/frutales/FrutalesScreen')
 // grafo (Diatraea AFFECTS caña; Cotesia/Trichogramma CONTROLS Diatraea) +
 // Cenicaña/AGROSAVIA/FEDEPANELA/INVIMA; el bagazo cierra ciclo hacia el compost.
 const CanaScreen = lazy(() => import('./components/cana/CanaScreen'));
+const RestauracionScreen = lazy(() => import('./components/restauracion/RestauracionScreen'));
 // Mundo "Quinua y granos andinos": recuperación de los granos ancestrales de la
 // montaña (quinua, amaranto/bledo, chía, cañihua y tarwi). Photo-forward (patrón
 // Café) y groundeado en las fichas de ciclo (cycle-content) + nutrición ICBF; el
@@ -439,6 +440,12 @@ const HASH_VIEW_ROUTES = {
   trapiche: 'cana',
   canaveral: 'cana',
   cañaveral: 'cana',
+  restauracion: 'restauracion',
+  'restauracion-bosque': 'restauracion',
+  'bosque-de-alimentos': 'restauracion',
+  'bosque-comestible': 'restauracion',
+  agroforesteria: 'restauracion',
+  'food-forest': 'restauracion',
   'milpa-cultivo': 'milpa_cultivo',
   'tres-hermanas': 'milpa_cultivo',
   'salud-suelo': 'salud_suelo',
@@ -512,7 +519,7 @@ const MODULE_VIEWS = new Set([
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'aromaticas', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'frutales', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'almanaque', 'suelo', 'agua', 'cafe', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'cana', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'cana', 'restauracion', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'platano', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'cacao', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'hortalizas', 'tuberculos', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
@@ -1849,6 +1856,21 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="La caña y la panela">
               <CanaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'restauracion':
+        // Mundo "Restauración y bosque de alimentos" (dentro de "Diseño de la
+        // finca"): COMPLEMENTA reforestación/silvopastoreo/páramo con el enfoque
+        // food-forest — los 7 estratos, la sucesión ecológica y la restauración
+        // del suelo, como MÉTODO. 5 estaciones photo-forward (fotos CC reusadas de
+        // otros mundos, 0 KB de aporte). GROUNDING RESPONSABLE: toda especie es un
+        // id real de public/grafo-relations.json (el test de grounding lo verifica);
+        // nada de especies inventadas; cifras de sitio = "dato en camino".
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Restauración y bosque de alimentos">
+              <RestauracionScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
