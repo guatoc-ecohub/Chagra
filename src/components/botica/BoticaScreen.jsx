@@ -222,7 +222,12 @@ function PlantaCard({ planta }) {
 }
 
 /* ── Estación por grupo (renderiza las plantas del grupo) ───────────────── */
-function EstacionGrupo({ grupo, icon: Icono, tituloHero, lead, clave, tone }) {
+/**
+ * @param {{ grupo: string, icon: import('lucide-react').LucideIcon,
+ *   tituloHero: React.ReactNode, lead: React.ReactNode, clave: React.ReactNode,
+ *   tone?: 'neutral' | 'alerta' }} props
+ */
+function EstacionGrupo({ grupo, icon: Icono, tituloHero, lead, clave, tone = 'neutral' }) {
   const plantas = plantasDeGrupo(grupo);
   return (
     <section className="botica-seccion space-y-4" data-testid={`estacion-${grupo}`}>
