@@ -30,6 +30,10 @@
   display: block;
 }
 
+/* El espíritu reemplaza al colibrí: mientras el mockup está montado, el FAB
+   del agente no debe flotar encima de la escena. */
+body.avv-mockup-abierto .chagra-fab { display: none !important; }
+
 /* ============================== CABEZOTE ============================== */
 
 .avv-cabezote {
@@ -114,7 +118,7 @@
 /* ============================== ESCENA: VIDA ============================== */
 
 .avv-sol-rayos {
-  transform-origin: 652px 128px;
+  transform-origin: 615px 128px;
   animation: avv-gira 70s linear infinite;
 }
 @keyframes avv-gira { to { transform: rotate(360deg); } }
@@ -137,13 +141,92 @@
 @keyframes avv-humea { from { opacity: 0.45; } to { opacity: 0.85; } }
 
 .avv-agua-brillo { animation: avv-corre 2.6s linear infinite; }
+.avv-agua-brillo-2 { animation-duration: 3.6s; }
 @keyframes avv-corre { to { stroke-dashoffset: -52; } }
 
-.avv-hoja-t0 { fill: #4aa84f; }
-.avv-hoja-t1 { fill: #57b45f; }
-.avv-hoja-t2 { fill: #7cc95d; }
-.avv-hoja-t3 { fill: #a9e070; }
+/* Follaje con volumen: gradientes con la luz del sol (arriba-derecha). */
+.avv-hoja-t0 { fill: url(#avv-hoja-g0); }
+.avv-hoja-t1 { fill: url(#avv-hoja-g1); }
+.avv-hoja-t2 { fill: url(#avv-hoja-g2); }
+.avv-hoja-t3 { fill: url(#avv-hoja-g3); }
 .avv-hoja { transition: rx 0.4s ease, ry 0.4s ease; }
+
+/* --- LA FINCA LATE: todo comparte el pulso de 2,4s del corazón-semilla --- */
+.avv-sol-nucleo {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: avv-sol-late 2.4s ease-in-out infinite;
+}
+@keyframes avv-sol-late {
+  0%, 48%, 100% { transform: scale(1); }
+  12% { transform: scale(1.03); }
+  24% { transform: scale(1); }
+  36% { transform: scale(1.015); }
+}
+.avv-copa-latido {
+  opacity: 0;
+  animation: avv-copa-late 2.4s ease-in-out infinite;
+}
+@keyframes avv-copa-late {
+  0%, 48%, 100% { opacity: 0; }
+  12% { opacity: 0.18; }
+  36% { opacity: 0.07; }
+}
+.avv-rayo-a { animation: avv-rayo-respira 4.8s ease-in-out infinite; }
+.avv-rayo-b { animation: avv-rayo-respira 4.8s ease-in-out infinite; animation-delay: -2.4s; }
+@keyframes avv-rayo-respira {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.95; }
+}
+
+/* Enredaderas que cuelgan de la copa */
+.avv-cuelga {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: avv-cuelga-mece 5.2s ease-in-out infinite alternate;
+}
+.avv-cuelga-b { animation-duration: 6.4s; animation-direction: alternate-reverse; }
+@keyframes avv-cuelga-mece {
+  from { transform: rotate(-4deg); }
+  to { transform: rotate(4deg); }
+}
+
+/* Chispas que orbitan el corazón-semilla */
+.avv-orbita { transform-origin: 0 0; animation: avv-gira-aura 16s linear infinite; }
+.avv-orbita-inv { animation-duration: 11s; animation-direction: reverse; }
+
+/* Mariposas: aleteo (scaleX hacia el cuerpo) + deriva por la escena */
+.avv-ala-mari { transform-box: fill-box; }
+.avv-ala-mari-a { transform-origin: 100% 50%; animation: avv-aletea-mari 0.22s ease-in-out infinite alternate; }
+.avv-ala-mari-b { transform-origin: 0% 50%; animation: avv-aletea-mari 0.22s ease-in-out infinite alternate-reverse; }
+@keyframes avv-aletea-mari {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0.35); }
+}
+.avv-mariposa-1 { animation: avv-vaga-1 26s ease-in-out infinite; }
+.avv-mariposa-2 { animation: avv-vaga-2 21s ease-in-out infinite; }
+@keyframes avv-vaga-1 {
+  0%, 100% { transform: translate(238px, 520px) rotate(0deg); }
+  25% { transform: translate(316px, 464px) rotate(9deg); }
+  50% { transform: translate(438px, 516px) rotate(-7deg); }
+  75% { transform: translate(322px, 604px) rotate(6deg); }
+}
+@keyframes avv-vaga-2 {
+  0%, 100% { transform: translate(562px, 500px) rotate(0deg); }
+  25% { transform: translate(624px, 556px) rotate(-8deg); }
+  50% { transform: translate(524px, 612px) rotate(7deg); }
+  75% { transform: translate(478px, 536px) rotate(-5deg); }
+}
+
+/* Velo dorado del futuro (opacidad la pone React según la proyección) */
+.avv-velo-futuro {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(180deg, rgba(255, 214, 110, 0.7), rgba(255, 240, 190, 0.3) 45%, rgba(255, 214, 110, 0) 78%);
+  transition: opacity 0.2s linear;
+}
 
 .avv-mece-a { animation: avv-mece 6s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
 .avv-mece-b { animation: avv-mece 7.4s ease-in-out infinite alternate-reverse; transform-box: fill-box; transform-origin: center; }
@@ -152,7 +235,7 @@
   to { transform: rotate(1.4deg) translateX(3px); }
 }
 
-.avv-savia { animation: avv-sube 1.9s linear infinite; }
+.avv-savia { animation: avv-sube 2.4s linear infinite; }
 @keyframes avv-sube { to { stroke-dashoffset: -44; } }
 
 .avv-flor { animation: avv-brota 0.6s ease-out backwards; }
@@ -194,7 +277,16 @@
 
 /* ============================== NODOS DE MUNDO ============================== */
 
-.avv-nodo { cursor: pointer; outline: none; }
+.avv-nodo { cursor: pointer; outline: none; transition: opacity 0.25s ease; }
+/* Con un mundo seleccionado, los demás se atenúan para enfocar */
+.avv-escena-consel .avv-nodo:not(.avv-nodo-sel) { opacity: 0.55; }
+.avv-nodo-nucleo {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.18s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.avv-nodo:hover .avv-nodo-nucleo,
+.avv-nodo:focus-visible .avv-nodo-nucleo { transform: scale(1.09); }
 .avv-nodo-halo {
   fill: rgba(211, 242, 150, 0.5);
   animation: avv-halo 3s ease-in-out infinite;
@@ -234,7 +326,20 @@
 
 /* ============================== AVATAR ============================== */
 
-.avv-avatar { transition: transform 0.5s ease; }
+.avv-avatar { transition: transform 0.5s ease; cursor: pointer; }
+/* La criatura nace con un pop (también al cambiar de especie: key remonta) */
+.avv-criatura {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.25s ease;
+  animation: avv-nace 0.6s cubic-bezier(0.2, 1.5, 0.4, 1) backwards;
+}
+.avv-avatar:hover .avv-criatura,
+.avv-avatar:focus-visible .avv-criatura { transform: scale(1.07); }
+@keyframes avv-nace {
+  from { opacity: 0; transform: scale(0.25); }
+  to { opacity: 1; transform: scale(1); }
+}
 .avv-flota { animation: avv-flotar 3.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
 @keyframes avv-flotar {
   0%, 100% { transform: translateY(0); }
@@ -351,14 +456,56 @@
   background: linear-gradient(120deg, #e9f8d4, #d0efb2);
   border: 1.5px solid #b5dc8c;
 }
+.avv-salud-gauge {
+  position: relative;
+  flex: 0 0 62px;
+  width: 62px;
+  height: 62px;
+}
+.avv-salud-gauge svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transform: rotate(-90deg);
+}
+.avv-gauge-pista { fill: none; stroke: #dcead8; stroke-width: 6; }
+.avv-gauge-arco {
+  fill: none;
+  stroke: #57b45f;
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.35s ease;
+}
 .avv-salud-num {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
   font-family: 'Baloo 2', 'Nunito', sans-serif;
-  font-size: 34px;
+  font-size: 21px;
   line-height: 1;
   color: var(--avv-verde);
 }
 .avv-salud-estado { margin: 0; font-weight: 800; font-size: 14.5px; color: var(--avv-verde-hondo); }
 .avv-salud-nota { margin: 1px 0 0; font-size: 11.5px; color: #4a6a3c; line-height: 1.25; }
+
+/* El susurro del espíritu: lo que la finca más pide, con voz propia */
+.avv-susurro {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  padding: 9px 11px;
+  margin-bottom: 12px;
+  border-radius: 14px;
+  background: linear-gradient(120deg, #fdf8e4, #f7f0cc);
+  border: 1.5px solid #ecdca0;
+  font-size: 12px;
+  color: #5a5030;
+  line-height: 1.35;
+}
+.avv-susurro p { margin: 0; }
+.avv-susurro strong { color: #8a5a10; }
+.avv-susurro-icono { font-size: 15px; line-height: 1.2; }
 
 .avv-panel-sub {
   margin: 0 0 7px;
@@ -410,11 +557,23 @@
 
 .avv-etapas { list-style: none; margin: 0 0 13px; padding: 0; display: grid; gap: 6px; }
 .avv-etapa {
+  position: relative;
   display: flex;
   gap: 9px;
   align-items: flex-start;
   font-size: 12.5px;
   color: #5a7050;
+}
+/* hilo de vid que une las etapas */
+.avv-etapa:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 22px;
+  bottom: -7px;
+  width: 2px;
+  border-radius: 2px;
+  background: #cadba4;
 }
 .avv-etapa-punto {
   flex: 0 0 20px;
@@ -457,7 +616,7 @@
   line-height: 1.3;
 }
 .avv-anillos-sec p { margin: 0; }
-.avv-anillos { flex: 0 0 62px; width: 62px; height: 62px; }
+.avv-anillos { flex: 0 0 62px; width: 62px; height: 62px; animation: avv-gira 90s linear infinite; }
 
 /* ============================== BOTONES ============================== */
 
@@ -722,6 +881,7 @@
   font-weight: 800;
   color: #3f7a52;
 }
+.avv-especie-habitat { font-size: 11px; color: #7a8a6a; }
 .avv-especie-check {
   position: absolute;
   top: 8px;

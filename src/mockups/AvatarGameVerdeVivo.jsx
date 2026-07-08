@@ -10,8 +10,14 @@
  * cosechas, raíces = suelo, sol = clima) y un AVATAR de especie nativa
  * colombiana que evoluciona (semilla→adulto) reflejando la salud REAL de la
  * finca. Datos de muestra. Ruta dev: #/mockups/avatar-verde-vivo (sin gate).
+ *
+ * 2ª PASADA (refinamiento de dirección): la firma es "la finca late" — el
+ * corazón-semilla, la savia, el resplandor de la copa y el sol comparten el
+ * mismo pulso de 2,4s. El espíritu ahora SUSURRA lo que la finca más pide
+ * (indicador vivo, no mascota), el avatar es tocable, y la proyección llega
+ * a 10 años como manda AVATAR_GAME.md.
  */
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import './avatar-game-verde-vivo.css';
 
 const AÑO_HOY = 2026;
@@ -26,14 +32,14 @@ const MUNDOS = [
   { id: 'cana', emoji: '🥮', titulo: 'La caña y la panela', lema: 'De la caña al bloque: corte y trapiche', zona: 'rama', nodo: [613, 438], vinculo: 'Rama dulce · corte en 2 meses', chips: ['Siembra', 'El corte', 'El trapiche'] },
   { id: 'animales', emoji: '🐔', titulo: 'Los animales', lema: 'Cría campesina: gallinas, abejas, cabras y más', zona: 'rama', nodo: [247, 552], vinculo: 'Corral vivo · 18 gallinas, 2 colmenas', chips: ['Gallinas', 'Abejas', 'Cabras', '+4'] },
   { id: 'mercado', emoji: '🧺', titulo: 'Mercado y despensa', lema: 'Venda directo, saque cuentas y transforme', zona: 'rama', nodo: [553, 552], vinculo: 'Frutos que salen · 3 ventas este mes', chips: ['Vender directo', 'Poscosecha', '+5'] },
-  { id: 'clima', emoji: '⛅', titulo: 'El clima', lema: 'Lo que viene y qué hacer, del IDEAM en campesino', zona: 'sol', nodo: [652, 128], vinculo: 'Sol y lluvia · La Niña suave', chips: ['Su día en la finca', 'El clima que viene'] },
+  { id: 'clima', emoji: '⛅', titulo: 'El clima', lema: 'Lo que viene y qué hacer, del IDEAM en campesino', zona: 'sol', nodo: [615, 128], vinculo: 'Sol y lluvia · La Niña suave', chips: ['Su día en la finca', 'El clima que viene'] },
   { id: 'agua', emoji: '💧', titulo: 'El agua', lema: 'Coseche la lluvia, riegue con medida, cuide el nacimiento', zona: 'agua', nodo: [143, 690], vinculo: 'Savia de la finca · nacimiento protegido', chips: ['Cosecha de lluvia', 'Riego', 'Nacimiento'] },
   { id: 'suelo', emoji: '🌱', titulo: 'El suelo vivo', lema: 'Conozca su tierra, corríjala y aliméntela', zona: 'raiz', nodo: [280, 902], vinculo: 'Raíces · pH 5,8 y subiendo', chips: ['Cuaderno del suelo', 'Cromatografía', '+2'] },
   { id: 'abono', emoji: '🐄', titulo: 'Estiércol y compost', lema: 'Del corral a la tierra negra', zona: 'raiz', nodo: [520, 902], vinculo: 'Humus · pila № 3 madurando', chips: ['Compost paso a paso', 'Biodigestor'] },
 ];
 
 const ESPECIES = [
-  { id: 'chivito', emoji: '🐦', nombre: 'Chivito de páramo', cientifico: 'Oxypogon guerinii', eje: 'Páramo sano y flores nativas', habitat: 'Vive entre las flores de la copa', anclaje: [297, 312], escala: 0.95 },
+  { id: 'chivito', emoji: '🐦', nombre: 'Chivito de páramo', cientifico: 'Oxypogon guerinii', eje: 'Páramo sano y flores nativas', habitat: 'Vive entre las flores de la copa', anclaje: [308, 342], escala: 0.95 },
   { id: 'rana', emoji: '🐸', nombre: 'Rana dorada', cientifico: 'Andinobates dorisswansonae', eje: 'Agua limpia y quebradas vivas', habitat: 'Vive junto a la quebrada', anclaje: [178, 724], escala: 0.72 },
   { id: 'abeja', emoji: '🐝', nombre: 'Abeja angelita', cientifico: 'Tetragonisca angustula', eje: 'Floración y biodiversidad', habitat: 'Vive entre las flores de la copa', anclaje: [513, 340], escala: 0.62 },
   { id: 'oso', emoji: '🐻', nombre: 'Oso de anteojos', cientifico: 'Tremarctos ornatus', eje: 'Bosque y agroforestería', habitat: 'Vive al pie del tronco', anclaje: [472, 652], escala: 1.25 },
@@ -52,10 +58,20 @@ const ETAPAS = [
   { id: 'semilla', nombre: 'Semilla', hito: 'Sembró su primera mata', cuando: '2024' },
   { id: 'brote', nombre: 'Brote', hito: '5 matas y su primer compost', cuando: '2025' },
   { id: 'joven', nombre: 'Joven', hito: '3 cosechas y el agua cuidada', cuando: 'hoy' },
-  { id: 'adulto', nombre: 'Adulto', hito: 'Un año entero de constancia', cuando: 'en camino' },
+  { id: 'adulto', nombre: 'Adulto', hito: 'Cuatro años de constancia', cuando: 'en camino' },
 ];
 
-/* Frutos y flores de la copa: [x, y, umbral-de-años/5, tipo] */
+/* Susurros del espíritu: qué pide la finca según su métrica más floja.
+ * Es la voz del INDICADOR VIVO — consejo concreto, no decoración. */
+const SUSURROS = {
+  agua: 'El agua baja clara, pero el tanque quiere su cosecha de lluvia antes del verano.',
+  suelo: 'Las raíces piden comida: la pila № 3 ya casi está lista para la huerta.',
+  bio: 'Siembra más flores nativas y verás llegar abejas nuevas a la copa.',
+  cosechas: 'Hay matas cargadas esperando canasto — salga a cosechar esta semana.',
+  constancia: 'Volvió un día más. La finca lo siente, aunque no lo diga.',
+};
+
+/* Frutos y flores de la copa: [x, y, umbral-de-años/10, tipo] */
 const FRUTOS = [
   [318, 352, 0, 'nar'], [468, 402, 0, 'cer'], [385, 300, 0.08, 'nar'], [508, 318, 0.14, 'cer'],
   [268, 408, 0.2, 'nar'], [432, 250, 0.26, 'cer'], [540, 422, 0.34, 'nar'], [352, 448, 0.4, 'cer'],
@@ -248,9 +264,12 @@ function NodoMundo({ mundo, seleccionado, onSelect, r = 26 }) {
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(mundo.id); } }}
     >
       <circle className="avv-nodo-halo" r={r + 9} />
-      <circle className="avv-nodo-cuerpo" r={r} />
-      <circle className="avv-nodo-borde" r={r} />
-      <text className="avv-nodo-emoji" y={r * 0.28} fontSize={r * 1.05} textAnchor="middle">{mundo.emoji}</text>
+      {/* núcleo separado del halo: el hover lo escala con resorte sin mover el halo */}
+      <g className="avv-nodo-nucleo">
+        <circle className="avv-nodo-cuerpo" r={r} />
+        <circle className="avv-nodo-borde" r={r} />
+        <text className="avv-nodo-emoji" y={r * 0.28} fontSize={r * 1.05} textAnchor="middle">{mundo.emoji}</text>
+      </g>
       <g className="avv-nodo-tag" transform={`translate(0,${r + 17})`}>
         <text textAnchor="middle" className="avv-nodo-label">{mundo.titulo}</text>
       </g>
@@ -258,9 +277,22 @@ function NodoMundo({ mundo, seleccionado, onSelect, r = 26 }) {
   );
 }
 
+/* Mariposa sencilla: dos alas que baten (scaleX) y un cuerpo. La deriva por
+ * la escena la pone el CSS; el transform del <g> exterior es el reposo para
+ * prefers-reduced-motion. */
+function Mariposa({ clase, reposo, tonoA, tonoB }) {
+  return (
+    <g className={`avv-mariposa ${clase}`} transform={reposo} aria-hidden="true">
+      <ellipse className="avv-ala-mari avv-ala-mari-a" cx="-5" cy="-1.5" rx="5.6" ry="3.8" fill={tonoA} />
+      <ellipse className="avv-ala-mari avv-ala-mari-b" cx="5" cy="-1.5" rx="5.6" ry="3.8" fill={tonoB} />
+      <ellipse cx="0" cy="0" rx="1.3" ry="4.4" fill="#4a3320" />
+    </g>
+  );
+}
+
 /* ============================== ESCENA ============================== */
 
-function EscenaOrganismo({ tn, años, especie, etapaIdx, mundoSel, onMundo }) {
+function EscenaOrganismo({ tn, especie, etapaIdx, mundoSel, onMundo, onAvatar }) {
   const s = 0.84 + 0.34 * tn; // crecimiento del organismo aéreo
   const Criatura = CRIATURAS[especie.id];
   const [ax, ay] = especie.anclaje;
@@ -272,11 +304,23 @@ function EscenaOrganismo({ tn, años, especie, etapaIdx, mundoSel, onMundo }) {
   const mundosRaiz = MUNDOS.filter((m) => m.zona === 'raiz');
   const avatarAereo = especie.id === 'chivito' || especie.id === 'abeja';
 
+  // En pantallas anchas (tablet/desktop) el anclaje YMax dejaba ver casi solo
+  // subsuelo; centramos el encuadre para que el organismo completo respire.
+  const [apaisada, setApaisada] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(min-aspect-ratio: 9/10)').matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia('(min-aspect-ratio: 9/10)');
+    const onChange = (e) => setApaisada(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
   return (
     <svg
-      className="avv-escena"
+      className={`avv-escena ${mundoSel ? 'avv-escena-consel' : ''}`}
       viewBox="0 0 800 1160"
-      preserveAspectRatio="xMidYMax slice"
+      preserveAspectRatio={apaisada ? 'xMidYMid slice' : 'xMidYMax slice'}
       aria-label={`Su finca convertida en organismo vivo a plena luz del día: un árbol frondoso cuyas ramas son los mundos, con frutos por cada cosecha, raíces doradas y un corazón-semilla latiendo bajo la tierra. Su espíritu guardián, ${especie.nombre.toLowerCase()}, vive en él.`}
     >
       <defs>
@@ -316,6 +360,23 @@ function EscenaOrganismo({ tn, años, especie, etapaIdx, mundoSel, onMundo }) {
           <stop offset="0" stopColor="#9adfe4" />
           <stop offset="1" stopColor="#5db9cb" />
         </linearGradient>
+        <linearGradient id="avv-rayo" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#fff3c0" stopOpacity=".5" />
+          <stop offset="1" stopColor="#fff3c0" stopOpacity="0" />
+        </linearGradient>
+        {/* follaje con volumen: luz desde el sol (arriba-derecha) */}
+        <radialGradient id="avv-hoja-g0" cx=".62" cy=".28" r="1">
+          <stop offset="0" stopColor="#5fbd60" /><stop offset="1" stopColor="#3b9146" />
+        </radialGradient>
+        <radialGradient id="avv-hoja-g1" cx=".62" cy=".28" r="1">
+          <stop offset="0" stopColor="#70c76c" /><stop offset="1" stopColor="#489f4e" />
+        </radialGradient>
+        <radialGradient id="avv-hoja-g2" cx=".62" cy=".28" r="1">
+          <stop offset="0" stopColor="#93d76a" /><stop offset="1" stopColor="#63b556" />
+        </radialGradient>
+        <radialGradient id="avv-hoja-g3" cx=".62" cy=".28" r="1">
+          <stop offset="0" stopColor="#c0e981" /><stop offset="1" stopColor="#8ecd62" />
+        </radialGradient>
         <filter id="avv-blur6"><feGaussianBlur stdDeviation="6" /></filter>
         <DefsCriaturas />
       </defs>
@@ -325,21 +386,27 @@ function EscenaOrganismo({ tn, años, especie, etapaIdx, mundoSel, onMundo }) {
 
       {/* SOL = mundo clima */}
       <g className="avv-sol-grupo">
-        <circle cx="652" cy="128" r="118" fill="url(#avv-sol-halo)" />
+        <circle cx="615" cy="128" r="118" fill="url(#avv-sol-halo)" />
         <g className="avv-sol-rayos">
           {Array.from({ length: 12 }, (_, i) => {
             const a = (i * 30 * Math.PI) / 180;
             return (
               <line
                 key={i}
-                x1={652 + Math.cos(a) * 62} y1={128 + Math.sin(a) * 62}
-                x2={652 + Math.cos(a) * (i % 2 ? 78 : 88)} y2={128 + Math.sin(a) * (i % 2 ? 78 : 88)}
+                x1={615 + Math.cos(a) * 62} y1={128 + Math.sin(a) * 62}
+                x2={615 + Math.cos(a) * (i % 2 ? 78 : 88)} y2={128 + Math.sin(a) * (i % 2 ? 78 : 88)}
                 stroke="#ffdf7e" strokeWidth="5" strokeLinecap="round" opacity=".8"
               />
             );
           })}
         </g>
-        <circle cx="652" cy="128" r="48" fill="url(#avv-sol-g)" />
+        <circle cx="615" cy="128" r="48" fill="url(#avv-sol-g)" className="avv-sol-nucleo" />
+      </g>
+
+      {/* HACES DE LUZ de la tarde: respiran al mismo pulso de la finca */}
+      <g aria-hidden="true">
+        <path d="M615,128 L282,700 L468,700 Z" fill="url(#avv-rayo)" className="avv-rayo-a" />
+        <path d="M615,128 L500,720 L648,720 Z" fill="url(#avv-rayo)" className="avv-rayo-b" />
       </g>
 
       {/* NUBES */}
@@ -365,6 +432,8 @@ function EscenaOrganismo({ tn, años, especie, etapaIdx, mundoSel, onMundo }) {
 
       {/* CORDILLERA */}
       <path d="M0,505 Q130,432 258,472 Q360,502 470,458 Q600,408 800,488 L800,760 L0,760 Z" fill="#a8d8b4" opacity=".85" />
+      {/* bruma cálida de media tarde entre cordilleras */}
+      <rect x="-20" y="452" width="840" height="120" fill="#f2f8d9" opacity=".3" filter="url(#avv-blur6)" />
       <path d="M0,568 Q160,498 320,538 Q470,572 620,522 Q710,494 800,540 L800,760 L0,760 Z" fill="#7cbd7f" opacity=".95" />
       {/* frailejones del páramo lejano */}
       <g fill="#5a9a5e" opacity=".9">
@@ -399,10 +468,22 @@ function EscenaOrganismo({ tn, años, especie, etapaIdx, mundoSel, onMundo }) {
       <g>
         <path d="M96,636 C110,668 118,690 128,712 C140,738 152,752 168,764 L120,776 C104,748 92,716 84,684 C80,666 82,650 96,636 Z" fill="url(#avv-agua-g)" opacity=".92" />
         <path className="avv-agua-brillo" d="M100,650 C112,684 124,716 146,752" stroke="#eafcff" strokeWidth="3.2" fill="none" strokeLinecap="round" strokeDasharray="10 16" />
+        <path className="avv-agua-brillo avv-agua-brillo-2" d="M112,662 C122,692 134,722 156,754" stroke="#eafcff" strokeWidth="2" fill="none" strokeLinecap="round" strokeDasharray="6 18" opacity=".7" />
       </g>
+      {/* juncos a la orilla de la quebrada */}
+      <g transform="translate(70,700)" aria-hidden="true">
+        <g className="avv-mece-a">
+          <path d="M2,0 Q0,-16 4,-30 M9,2 Q9,-14 6,-26 M15,0 Q18,-12 16,-24" stroke="#3f8f46" strokeWidth="2.6" fill="none" strokeLinecap="round" />
+          <ellipse cx="4.6" cy="-31" rx="2.6" ry="6" fill="#7a5230" />
+          <ellipse cx="16" cy="-25" rx="2.2" ry="5" fill="#8a5a38" />
+        </g>
+      </g>
+
 
       {/* ============ EL ORGANISMO (crece con el tiempo) ============ */}
       <g transform={`translate(400,712) scale(${s}) translate(-400,-712)`}>
+        {/* sombra fresca bajo la copa (crece con el árbol) */}
+        <ellipse cx="400" cy="708" rx="164" ry="22" fill="#1d5c2a" opacity=".14" />
         {/* ramas */}
         <g stroke="#6b4526" fill="none" strokeLinecap="round">
           <path d="M400,540 C400,470 400,330 400,262" strokeWidth="20" />
@@ -415,8 +496,11 @@ function EscenaOrganismo({ tn, años, especie, etapaIdx, mundoSel, onMundo }) {
         </g>
         {/* tronco */}
         <path d="M378,716 C380,640 372,560 366,470 C388,486 412,486 434,470 C428,560 420,640 422,716 Q400,726 378,716 Z" fill="url(#avv-tronco)" />
-        <path d="M400,700 C396,600 394,540 398,478" className="avv-savia" stroke="#d3f296" strokeWidth="3.4" fill="none" strokeLinecap="round" strokeDasharray="7 15" opacity=".85" />
+        <path d="M398,700 C390,646 408,592 393,540 C387,516 399,494 396,478" className="avv-savia" stroke="#d3f296" strokeWidth="2.4" fill="none" strokeLinecap="round" strokeDasharray="5 13" opacity=".55" />
         <path d="M366,470 C388,486 412,486 434,470" fill="none" stroke="#4a2f1a" strokeWidth="2" opacity=".4" />
+        {/* vetas y musgo del tronco */}
+        <path d="M386,690 C384,630 383,570 386,510 M414,688 C416,634 417,576 414,516" stroke="#4a2f1a" strokeWidth="1.6" fill="none" opacity=".35" />
+        <ellipse cx="382" cy="664" rx="9" ry="16" fill="#57a453" opacity=".5" />
 
         {/* copa */}
         <g className="avv-copa">
@@ -428,11 +512,37 @@ function EscenaOrganismo({ tn, años, especie, etapaIdx, mundoSel, onMundo }) {
               rx={rx * (0.86 + 0.2 * tn)} ry={ry * (0.86 + 0.2 * tn)}
             />
           ))}
-          {/* brillos de luz sobre el follaje */}
+          {/* penumbra bajo la copa: volumen */}
+          <g fill="#2e7a3c" opacity=".24">
+            <ellipse cx="330" cy="472" rx="92" ry="34" className="avv-mece-a" />
+            <ellipse cx="472" cy="468" rx="88" ry="32" className="avv-mece-b" />
+          </g>
+          {/* brillos de luz sobre el follaje (lado del sol) */}
           <g fill="#d3f296" opacity=".55">
-            {[[330, 300], [470, 280], [280, 390], [520, 400], [400, 220], [360, 430]].map(([bx, by], i) => (
+            {[[338, 296], [478, 274], [292, 386], [528, 394], [412, 214], [368, 426]].map(([bx, by], i) => (
               <ellipse key={i} cx={bx} cy={by} rx="26" ry="10" className={i % 2 ? 'avv-mece-a' : 'avv-mece-b'} />
             ))}
+          </g>
+          {/* resplandor que late al pulso del corazón-semilla */}
+          <ellipse cx="400" cy="368" rx="158" ry="112" fill="#d3f296" className="avv-copa-latido" />
+        </g>
+
+        {/* enredaderas colgando de la copa */}
+        <g stroke="#57a453" strokeWidth="2" fill="none" aria-hidden="true">
+          <g transform="translate(238,468)">
+            <g className="avv-cuelga">
+              <path d="M0,0 Q4,16 0,30 Q-3,42 2,54" />
+              <ellipse cx="3" cy="14" rx="4.6" ry="2.6" fill="#7cc95d" stroke="none" transform="rotate(28 3 14)" />
+              <ellipse cx="-2" cy="34" rx="4.2" ry="2.4" fill="#57b45f" stroke="none" transform="rotate(-24 -2 34)" />
+              <ellipse cx="3" cy="52" rx="3.8" ry="2.2" fill="#7cc95d" stroke="none" transform="rotate(20 3 52)" />
+            </g>
+          </g>
+          <g transform="translate(566,462)">
+            <g className="avv-cuelga avv-cuelga-b">
+              <path d="M0,0 Q-4,14 0,28 Q3,40 -2,50" />
+              <ellipse cx="-3" cy="12" rx="4.4" ry="2.5" fill="#a9e070" stroke="none" transform="rotate(-26 -3 12)" />
+              <ellipse cx="2" cy="32" rx="4" ry="2.3" fill="#57b45f" stroke="none" transform="rotate(22 2 32)" />
+            </g>
           </g>
         </g>
 
@@ -446,12 +556,25 @@ function EscenaOrganismo({ tn, años, especie, etapaIdx, mundoSel, onMundo }) {
           </g>
         ))}
 
-        {/* frutos = cosechas */}
+        {/* frutos = cosechas: naranjas y pepas de café maduras */}
         {FRUTOS.filter((f) => tn >= f[2]).map(([fx, fy, , tipo], i) => (
-          <g key={i} transform={`translate(${fx},${fy})`} className="avv-fruto">
-            <circle r={tipo === 'nar' ? 9 : 6.5} fill={tipo === 'nar' ? '#f09c2e' : '#d9482e'} />
-            <circle r={tipo === 'nar' ? 9 : 6.5} fill="#fff" opacity=".22" cx="-2.6" cy="-2.8" />
-            <path d="M0,-8 Q3,-13 7,-13" stroke="#3f7a3f" strokeWidth="2" fill="none" />
+          <g key={i} transform={`translate(${fx},${fy})`} className="avv-fruto" style={{ animationDelay: `${(i % 5) * 0.07}s` }}>
+            {tipo === 'nar' ? (
+              <>
+                <circle r="9" fill="#f09c2e" />
+                <circle r="9" fill="#fff" opacity=".22" cx="-2.6" cy="-2.8" />
+                <path d="M0,-8 Q3,-13 7,-13" stroke="#3f7a3f" strokeWidth="2" fill="none" />
+                <ellipse cx="5" cy="-11" rx="3.4" ry="1.8" fill="#57a453" transform="rotate(26 5 -11)" />
+              </>
+            ) : (
+              <>
+                <path d="M-3,-7 Q0,-12 4,-9" stroke="#3f7a3f" strokeWidth="1.8" fill="none" />
+                <circle cx="-3.2" cy="0.4" r="5.4" fill="#d9482e" />
+                <circle cx="3.8" cy="1.8" r="4.9" fill="#c22f22" />
+                <circle cx="-4.6" cy="-1.4" r="1.7" fill="#fff" opacity=".45" />
+                <circle cx="2.6" cy="0.2" r="1.3" fill="#fff" opacity=".35" />
+              </>
+            )}
           </g>
         ))}
 
@@ -461,17 +584,38 @@ function EscenaOrganismo({ tn, años, especie, etapaIdx, mundoSel, onMundo }) {
         ))}
       </g>
 
-      {/* polen / motas de luz */}
+      {/* polen / motas de luz (tamaños variados) */}
       <g fill="#fdf6c8">
-        {[[240, 560, 0], [340, 500, 1], [470, 530, 2], [560, 590, 3], [300, 620, 4], [520, 480, 5], [420, 640, 6]].map(([px, py, d]) => (
-          <circle key={d} cx={px} cy={py} r="3" className="avv-mota" style={{ animationDelay: `${Number(d) * -1.7}s` }} />
+        {[[240, 560, 0, 3], [340, 500, 1, 2.2], [470, 530, 2, 3.4], [560, 590, 3, 2.4], [300, 620, 4, 3], [520, 480, 5, 2], [420, 640, 6, 2.8], [200, 500, 7, 2.2], [610, 540, 8, 2.6]].map(([px, py, d, rr]) => (
+          <circle key={d} cx={px} cy={py} r={rr} className="avv-mota" style={{ animationDelay: `${Number(d) * -1.7}s` }} />
         ))}
       </g>
+
+      {/* MARIPOSAS rondando la copa y el pasto */}
+      <Mariposa clase="avv-mariposa-1" reposo="translate(238,520)" tonoA="#f2a33c" tonoB="#f6bd58" />
+      <Mariposa clase="avv-mariposa-2" reposo="translate(562,500)" tonoA="#fdf1f7" tonoB="#f7dceb" />
 
       {/* ============ EL SUBSUELO ============ */}
       <path d="M0,790 C140,752 260,712 400,712 C540,712 660,752 800,790 L800,1160 L0,1160 Z" fill="url(#avv-tierra)" />
       <path d="M0,790 C140,752 260,712 400,712 C540,712 660,752 800,790" fill="none" stroke="#2e6b34" strokeWidth="9" />
       <path d="M0,790 C140,752 260,712 400,712 C540,712 660,752 800,790" fill="none" stroke="#8fd05a" strokeWidth="3" opacity=".8" />
+
+      {/* pasto y flores silvestres sobre el filo de la tierra */}
+      <g aria-hidden="true">
+        {[[58, 776], [148, 753], [236, 726], [318, 711], [482, 712], [566, 728], [654, 750], [744, 774]].map(([gx, gy], i) => (
+          <g key={i} transform={`translate(${gx},${gy})`}>
+            <g className={i % 2 ? 'avv-mece-b' : 'avv-mece-a'}>
+              <path d="M0,0 Q-6,-9 -9,-17 M0,0 Q-1,-11 2,-19 M0,0 Q5,-8 9,-15" stroke={i % 3 ? '#3f8f46' : '#57a453'} strokeWidth="2.4" fill="none" strokeLinecap="round" />
+              {i % 3 === 0 && (
+                <g transform="translate(6,-17)">
+                  <circle r="3" fill="#fdf1f7" />
+                  <circle r="1.3" fill="#f2b93c" />
+                </g>
+              )}
+            </g>
+          </g>
+        ))}
+      </g>
 
       {/* raíces doradas */}
       <g stroke="#c9a35e" fill="none" strokeLinecap="round" opacity=".95">
@@ -507,6 +651,14 @@ function EscenaOrganismo({ tn, años, especie, etapaIdx, mundoSel, onMundo }) {
           <path d="M0,-18 C0,-4 0,10 0,20" stroke="#c98f1e" strokeWidth="2" opacity=".7" />
           <path d="M0,-26 C-4,-38 -14,-44 -24,-44 M0,-26 C4,-38 14,-44 24,-44" stroke="#8fd05a" strokeWidth="3.4" fill="none" strokeLinecap="round" />
         </g>
+        {/* chispas orbitando el corazón */}
+        <g className="avv-orbita" aria-hidden="true">
+          <circle cx="0" cy="-48" r="2.6" fill="#fff3c0" />
+          <circle cx="34" cy="30" r="1.8" fill="#ffe98a" />
+        </g>
+        <g className="avv-orbita avv-orbita-inv" aria-hidden="true">
+          <circle cx="0" cy="42" r="2" fill="#fff3c0" />
+        </g>
       </g>
 
       {/* bichitos del suelo */}
@@ -531,9 +683,18 @@ function EscenaOrganismo({ tn, años, especie, etapaIdx, mundoSel, onMundo }) {
 
       {/* ============ EL ESPÍRITU (avatar) ============ */}
       <g
+        key={especie.id}
         className={`avv-avatar ${avatarAereo ? 'avv-avatar-aereo' : ''}`}
         transform={`translate(${ax - 50 * kAvatar},${ay - 50 * kAvatar}) scale(${kAvatar})`}
+        role="button"
+        tabIndex={0}
+        aria-label={`Tu espíritu, ${especie.nombre}. Tócalo para ver su salud.`}
+        onClick={onAvatar}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onAvatar(); } }}
       >
+        {!avatarAereo && especie.id !== 'lombriz' && (
+          <ellipse cx="50" cy="94" rx="27" ry="6" fill="#1d5c2a" opacity=".2" />
+        )}
         <Criatura aura={aura} />
       </g>
 
@@ -545,7 +706,8 @@ function EscenaOrganismo({ tn, años, especie, etapaIdx, mundoSel, onMundo }) {
 
 /* ============================== PANEL DEL ESPÍRITU ============================== */
 
-function PanelEspiritu({ especie, etapaIdx, salud, saludGlobal, estado, anillos, años, onCambiar, onCerrar }) {
+function PanelEspiritu({ especie, etapaIdx, salud, saludGlobal, estado, anillos, años, susurro, onCambiar, onCerrar }) {
+  const circunferencia = 2 * Math.PI * 27;
   return (
     <aside className="avv-panel" aria-label="Panel del espíritu de la finca">
       <button type="button" className="avv-panel-cerrar" onClick={onCerrar} aria-label="Cerrar panel del espíritu">✕</button>
@@ -564,11 +726,26 @@ function PanelEspiritu({ especie, etapaIdx, salud, saludGlobal, estado, anillos,
       </header>
 
       <div className="avv-salud-global">
-        <div className="avv-salud-num" data-estado={estado.toLowerCase()}>{saludGlobal}</div>
+        <div className="avv-salud-gauge" data-estado={estado.toLowerCase()}>
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <circle cx="32" cy="32" r="27" className="avv-gauge-pista" />
+            <circle
+              cx="32" cy="32" r="27"
+              className="avv-gauge-arco"
+              strokeDasharray={`${(saludGlobal / 100) * circunferencia} ${circunferencia}`}
+            />
+          </svg>
+          <span className="avv-salud-num">{saludGlobal}</span>
+        </div>
         <div>
           <p className="avv-salud-estado">🌿 {estado}</p>
           <p className="avv-salud-nota">La salud del espíritu es la salud real de tu finca</p>
         </div>
+      </div>
+
+      <div className="avv-susurro">
+        <span className="avv-susurro-icono" aria-hidden="true">🌬️</span>
+        <p><strong>El espíritu susurra: </strong>{susurro}</p>
       </div>
 
       <section aria-label="Salud de la finca">
@@ -611,7 +788,7 @@ function PanelEspiritu({ especie, etapaIdx, salud, saludGlobal, estado, anillos,
       <section className="avv-anillos-sec" aria-label="Anillos del frailejón">
         <svg viewBox="0 0 84 84" className="avv-anillos" aria-hidden="true">
           {Array.from({ length: anillos }, (_, i) => (
-            <circle key={i} cx="42" cy="42" r={6 + i * 4.2} fill="none" stroke={i % 2 ? '#8fd05a' : '#57a453'} strokeWidth="2.4" opacity={0.9 - i * 0.06} />
+            <circle key={i} cx="42" cy="42" r={6 + i * (32 / Math.max(anillos, 8))} fill="none" stroke={i % 2 ? '#8fd05a' : '#57a453'} strokeWidth="2.2" opacity={Math.max(0.25, 0.9 - i * 0.045)} />
           ))}
           <circle cx="42" cy="42" r="3.4" fill="#e8b93c" />
         </svg>
@@ -651,6 +828,7 @@ function SelectorEspecie({ actual, onElegir, onCerrar }) {
                   <strong>{e.nombre}</strong>
                   <i>{e.cientifico}</i>
                   <span className="avv-especie-eje">{e.emoji} {e.eje}</span>
+                  <span className="avv-especie-habitat">{e.habitat}</span>
                 </span>
                 {actual === e.id && <span className="avv-especie-check" aria-hidden="true">✓</span>}
               </button>
@@ -697,16 +875,26 @@ export default function AvatarGameVerdeVivo({ onBack }) {
   const [selectorAbierto, setSelectorAbierto] = useState(false);
   const [panelAbierto, setPanelAbierto] = useState(true);
 
-  const tn = clamp01(años / 5);
+  // Mientras el mockup vive, el espíritu REEMPLAZA al colibrí: ocultamos el
+  // FAB del agente para que no flote encima de la escena.
+  useEffect(() => {
+    document.body.classList.add('avv-mockup-abierto');
+    return () => document.body.classList.remove('avv-mockup-abierto');
+  }, []);
+
+  const tn = clamp01(años / 10);
   const especie = ESPECIES.find((e) => e.id === especieId) || ESPECIES[0];
-  const etapaIdx = años >= 3 ? 3 : 2;
-  const anillos = 4 + Math.round(años * 2);
+  const etapaIdx = años >= 4 ? 3 : 2;
+  const anillos = 4 + Math.round(años * 1.2);
   const salud = useMemo(
-    () => SALUD_BASE.map((m) => ({ ...m, proyectado: Math.min(97, Math.round(lerp(m.valor, 95, 0.55 * tn))) })),
+    () => SALUD_BASE.map((m) => ({ ...m, proyectado: Math.min(97, Math.round(lerp(m.valor, 96, 0.62 * tn))) })),
     [tn],
   );
   const saludGlobal = Math.round(salud.reduce((acc, m) => acc + m.proyectado, 0) / salud.length);
   const estado = saludGlobal >= 85 ? 'Exuberante' : saludGlobal >= 70 ? 'Floreciendo' : saludGlobal >= 50 ? 'Despertando' : 'Marchito';
+  // El susurro del espíritu: lo que la finca más pide (su métrica más floja).
+  const metricaFloja = salud.reduce((min, m) => (m.proyectado < min.proyectado ? m : min), salud[0]);
+  const susurro = SUSURROS[metricaFloja.id];
   const mundo = MUNDOS.find((m) => m.id === mundoSel) || null;
   const volver = onBack || (() => { window.location.hash = ''; });
 
@@ -714,18 +902,21 @@ export default function AvatarGameVerdeVivo({ onBack }) {
     <div className="avv-root" data-mockup="avatar-verde-vivo">
       <EscenaOrganismo
         tn={tn}
-        años={años}
         especie={especie}
         etapaIdx={etapaIdx}
         mundoSel={mundoSel}
         onMundo={(id) => setMundoSel((prev) => (prev === id ? null : id))}
+        onAvatar={() => setPanelAbierto(true)}
       />
+
+      {/* Velo dorado del futuro: crece con la proyección (solo opacity, GPU) */}
+      <div className="avv-velo-futuro" style={{ opacity: tn * 0.26 }} aria-hidden="true" />
 
       {/* CABEZOTE */}
       <header className="avv-cabezote">
         <button type="button" className="avv-volver" onClick={volver} aria-label="Volver al inicio">←</button>
         <div>
-          <p className="avv-eyebrow">Mockup · Tema verde vivo</p>
+          <p className="avv-eyebrow">Mockup · Verde vivo · 2ª pasada</p>
           <h1 className="avv-titulo">El espíritu de tu finca</h1>
           <p className="avv-subtitulo">Finca La Esperanza · Choachí, 2.650 msnm</p>
         </div>
@@ -748,6 +939,7 @@ export default function AvatarGameVerdeVivo({ onBack }) {
           estado={estado}
           anillos={anillos}
           años={años}
+          susurro={susurro}
           onCambiar={() => setSelectorAbierto(true)}
           onCerrar={() => setPanelAbierto(false)}
         />
@@ -755,7 +947,7 @@ export default function AvatarGameVerdeVivo({ onBack }) {
 
       {/* MUELLE INFERIOR: el tiempo de la finca */}
       <footer className="avv-muelle">
-        {!panelAbierto && (
+        {!panelAbierto && !mundo && (
           <button type="button" className="avv-btn avv-btn-suave avv-btn-panel" onClick={() => setPanelAbierto(true)}>
             {especie.emoji} Mi espíritu
           </button>
@@ -769,15 +961,15 @@ export default function AvatarGameVerdeVivo({ onBack }) {
           </div>
           <input
             type="range"
-            min="0" max="5" step="0.1"
+            min="0" max="10" step="0.1"
             value={años}
             onChange={(e) => setAños(Number(e.target.value))}
             className="avv-tiempo-slider"
-            aria-label="Ver la finca crecer hasta 5 años en el futuro"
+            aria-label="Ver la finca crecer hasta 10 años en el futuro"
             style={{ '--avv-t': `${tn * 100}%` }}
           />
           <div className="avv-tiempo-marcas" aria-hidden="true">
-            <span>Hoy</span><span>+1 año</span><span>+3 años</span><span>+5 años</span>
+            <span>Hoy</span><span>+5 años</span><span>+10 años</span>
           </div>
         </div>
       </footer>
