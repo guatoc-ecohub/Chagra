@@ -51,6 +51,20 @@ const PAUSA_RUMBO_MS = 1000;   // deja LEER "Abriendo Mercado…" antes de salta
 
 const NUM_BROTES = 28;
 
+/* Micro-partículas (esporas) que orbitan el iris: posiciones DETERMINISTAS
+ * por ángulo áureo (137.5°) — se ven orgánicas sin aleatoriedad por render.
+ * Dos órbitas contrarrotantes (CSS); la opacidad la sube el RMS real. */
+const ESPORAS = Array.from({ length: 14 }, (_, i) => {
+  const ang = ((i * 137.5) % 360) * (Math.PI / 180);
+  const r = 86 + (i % 5) * 5.5;
+  return {
+    x: 116 + Math.cos(ang) * r,
+    y: 116 + Math.sin(ang) * r,
+    tam: 1.1 + (i % 3) * 0.55,
+    orbita: i % 2 === 0 ? 'a' : 'b',
+  };
+});
+
 const formatoSegundos = (ms) => `${(ms / 1000).toFixed(0)}s`;
 
 const navegar = (view, initialData = null) => {
@@ -60,6 +74,12 @@ const navegar = (view, initialData = null) => {
 /**
  * Iris de micelio: 3 anillos que respiran con el RMS + brotes radiales con la
  * historia de amplitud + arco de cierre (conteo de silencio). Todo dato real.
+ *
+ * Capa "viva" (solo visual, cero lógica): aurora de gradiente que gira lenta
+ * detrás, halo cónico que orbita el borde, esporas contrarrotantes y un glow
+ * central — TODOS escalados por --nivel (el RMS real vía CSS var). En
+ * "pensando", dos arcos contrarrotantes + shimmer sobre la mano (el loop de
+ * "estoy trabajando"). Ver escucha.css para el detalle de cada capa.
  */
 function IrisEscucha({ nivel, historia, fase, cierre }) {
   const C = 116; // centro del viewBox 232x232
@@ -90,9 +110,39 @@ function IrisEscucha({ nivel, historia, fase, cierre }) {
   const circArco = 2 * Math.PI * rArco;
 
   const vivo = fase === FASE_OYENDO;
+  const pensando = fase === FASE_PENSANDO;
+  // Arcos de "pensando": dos aros parciales contrarrotantes (CSS los gira).
+  const rPensarA = 100;
+  const rPensarB = 91;
+
   return (
-    <div className="escucha-iris" aria-hidden="true">
+    <div
+      className="escucha-iris"
+      aria-hidden="true"
+      style={{ '--nivel': vivo ? Number(nivel.toFixed(3)) : 0 }}
+    >
+      {/* Aurora: gradiente bicolor que gira lento detrás de todo — el
+          "organismo" respira solo y se enciende con la voz (var --nivel). */}
+      <div className="escucha-aurora">
+        <span className="escucha-aurora-giro" />
+      </div>
+      {/* Halo cónico: una luz que ORBITA el borde del iris (en pensando
+          acelera — el loop de trabajo). */}
+      <div className="escucha-halo-giro" />
+      {/* Glow central reactivo: late detrás de la mano con el RMS real. */}
+      <div className="escucha-glow" />
       <svg viewBox="0 0 232 232">
+        {/* Esporas: micro-partículas en dos órbitas contrarrotantes. */}
+        <g className="escucha-orbita escucha-orbita-a">
+          {ESPORAS.filter((e) => e.orbita === 'a').map((e, i) => (
+            <circle key={i} className="escucha-espora" cx={e.x} cy={e.y} r={e.tam} />
+          ))}
+        </g>
+        <g className="escucha-orbita escucha-orbita-b">
+          {ESPORAS.filter((e) => e.orbita === 'b').map((e, i) => (
+            <circle key={i} className="escucha-espora escucha-espora-alt" cx={e.x} cy={e.y} r={e.tam} />
+          ))}
+        </g>
         {/* Anillos de micelio: respiración = RMS real, cada uno a su ritmo */}
         {[{ r: 58, k: 26, o: 0.5 }, { r: 68, k: 16, o: 0.35 }, { r: 78, k: 8, o: 0.25 }].map(({ r, k, o }, i) => (
           <circle
@@ -107,6 +157,28 @@ function IrisEscucha({ nivel, historia, fase, cierre }) {
           />
         ))}
         {brotes}
+        {/* Pensando: dos arcos contrarrotantes alrededor del iris — el
+            shimmer/loop de "estoy trabajando con lo que dijo". */}
+        {pensando && (
+          <>
+            <circle
+              className="escucha-arco-pensar escucha-arco-pensar-a"
+              cx={C} cy={C} r={rPensarA}
+              fill="none"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeDasharray={`${2 * Math.PI * rPensarA * 0.22} ${2 * Math.PI * rPensarA * 0.78}`}
+            />
+            <circle
+              className="escucha-arco-pensar escucha-arco-pensar-b"
+              cx={C} cy={C} r={rPensarB}
+              fill="none"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeDasharray={`${2 * Math.PI * rPensarB * 0.14} ${2 * Math.PI * rPensarB * 0.86}`}
+            />
+          </>
+        )}
         {/* Conteo de silencio: el aro exterior se cierra → "ya casi termino de oír" */}
         {vivo && cierre > 0 && (
           <circle

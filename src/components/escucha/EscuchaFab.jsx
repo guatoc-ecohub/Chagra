@@ -6,8 +6,12 @@
  *
  * Diseño: espejo del AgentFab (colibrí, abajo-derecha): este vive ABAJO A LA
  * IZQUIERDA, 62px (tamaño guante), micrófono grande + la ramita de la mano de
- * Chagra como firma, acento del tema por --t-accent-rgb, con un ping perezoso
- * cada 4s que anuncia "aquí se habla" (apagado con prefers-reduced-motion).
+ * Chagra como firma, acento del tema por --t-accent-rgb.
+ *
+ * Estado REPOSO ("respira suave"): aurora de gradiente que respira detrás,
+ * un filo de luz cónico que orbita el borde y dos pings desfasados que
+ * brotan — el botón se siente VIVO sin gritar. Todo CSS (transform/opacity,
+ * GPU) y apagado con prefers-reduced-motion (queda un aro estático claro).
  *
  * IMPORTANTE — español colombiano (tú/usted), NUNCA voseo argentino.
  */
@@ -26,7 +30,11 @@ export default function EscuchaFab() {
       title="Manos libres: toque y hable — «lléveme al mercado» o pregunte lo que necesite"
       onClick={() => activarEscucha({ fuente: 'tap' })}
     >
+      {/* Capa viva del reposo: aurora que respira + filo de luz que orbita. */}
+      <span className="escucha-fab-aurora" aria-hidden="true" />
+      <span className="escucha-fab-giro" aria-hidden="true" />
       <span className="escucha-fab-ping" aria-hidden="true" />
+      <span className="escucha-fab-ping escucha-fab-ping-b" aria-hidden="true" />
       <Mic size={27} strokeWidth={2.4} aria-hidden="true" />
       {/* La firma de la marca: la ramita con nodos que brota (mano de Chagra) */}
       <svg

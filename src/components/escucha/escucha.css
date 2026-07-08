@@ -19,6 +19,7 @@
   --esc-dim-rgb: 148, 187, 173;     /* tinta secundaria */
   --esc-linea-rgb: 25, 201, 154;    /* trazos del iris (= acento biopunk) */
   --esc-linea-rgb: var(--t-accent-rgb);
+  --esc-linea2-rgb: 125, 211, 252;  /* segundo tono del gradiente vivo (cian) */
   --esc-cta-ink: #04231b;           /* tinta sobre el botón de acento */
 
   position: fixed;
@@ -37,6 +38,7 @@
   --esc-carta-rgb: 252, 250, 245;
   --esc-ink-rgb: 24, 34, 29;
   --esc-dim-rgb: 90, 106, 98;
+  --esc-linea2-rgb: 59, 130, 246;   /* azul: legible sobre papel */
   --esc-cta-ink: #ffffff;
 }
 [data-theme="nature"] .escucha-overlay {
@@ -44,6 +46,7 @@
   --esc-carta-rgb: 254, 250, 242;
   --esc-ink-rgb: 43, 33, 24;
   --esc-dim-rgb: 122, 103, 82;
+  --esc-linea2-rgb: 217, 119, 6;    /* ámbar: cálido sobre papel crema */
   --esc-cta-ink: #2b1c10;
 }
 [data-theme="verde-vivo"] .escucha-overlay {
@@ -51,6 +54,7 @@
   --esc-carta-rgb: 248, 251, 240;
   --esc-ink-rgb: 26, 38, 28;
   --esc-dim-rgb: 84, 104, 88;
+  --esc-linea2-rgb: 101, 163, 13;   /* lima: pariente del acento */
   --esc-cta-ink: #ffffff;
 }
 
@@ -115,8 +119,12 @@
   100% { box-shadow: 0 0 0 0 rgba(var(--esc-linea-rgb), 0); }
 }
 
-/* --- El iris (la mano que escucha) --------------------------------------- */
+/* --- El iris (la mano que escucha) -----------------------------------------
+ * Capa VIVA: todo lo que se mueve acá es transform/opacity (composita en
+ * GPU) y todo lo reactivo lee --nivel = RMS REAL del micrófono (la pone el
+ * JSX en .escucha-iris). Nada de animación fingida de audio. */
 .escucha-iris {
+  --nivel: 0;
   position: relative;
   width: 232px;
   height: 232px;
@@ -124,7 +132,116 @@
   place-items: center;
   margin: 2px 0;
 }
-.escucha-iris svg { position: absolute; inset: 0; overflow: visible; }
+.escucha-iris svg { position: absolute; inset: 0; overflow: visible; z-index: 1; }
+
+/* Aurora: gradiente bicolor que gira lento detrás de todo el iris. Los
+ * radial-gradients con caída larga dan el look "desenfocado" SIN filter:
+ * blur (que forzaría re-rasterizado por frame). La voz la enciende. */
+.escucha-aurora {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  z-index: 0;
+  transform: scale(calc(1 + var(--nivel) * 0.16));
+  opacity: calc(0.65 + var(--nivel) * 0.35);
+  transition: transform 0.12s ease-out, opacity 0.15s ease-out;
+  pointer-events: none;
+}
+.escucha-aurora-giro {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(var(--esc-linea-rgb), 0.30), transparent 52%),
+    radial-gradient(circle at 70% 68%, rgba(var(--esc-linea2-rgb), 0.22), transparent 55%),
+    radial-gradient(circle at 55% 45%, rgba(var(--esc-linea-rgb), 0.10), transparent 70%);
+  animation: escucha-aurora-vive 13s linear infinite;
+}
+@keyframes escucha-aurora-vive {
+  0%   { transform: rotate(0deg) scale(1); }
+  50%  { transform: rotate(180deg) scale(1.07); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+/* Halo cónico: un filo de luz que ORBITA el borde del iris (máscara en
+ * anillo). En "pensando" acelera y se vuelve el loop de trabajo; en error
+ * se apaga casi del todo. */
+.escucha-halo-giro {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(var(--esc-linea-rgb), 0.85) 70deg,
+    rgba(var(--esc-linea2-rgb), 0.55) 110deg,
+    transparent 170deg,
+    rgba(var(--esc-linea-rgb), 0.30) 260deg,
+    transparent 320deg
+  );
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+  opacity: calc(0.55 + var(--nivel) * 0.45);
+  animation: escucha-gira 5.5s linear infinite;
+}
+.escucha-overlay[data-fase="pensando"] .escucha-halo-giro { animation-duration: 1.5s; }
+.escucha-overlay[data-fase="error"] .escucha-halo-giro {
+  animation-play-state: paused;
+  opacity: 0.18;
+}
+@keyframes escucha-gira {
+  to { transform: rotate(360deg); }
+}
+
+/* Glow central: late detrás de la mano con la voz (RMS real vía --nivel). */
+.escucha-glow {
+  position: absolute;
+  width: 156px;
+  height: 156px;
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(var(--esc-linea-rgb), 0.42), rgba(var(--esc-linea-rgb), 0.10) 48%, transparent 72%);
+  transform: scale(calc(0.9 + var(--nivel) * 0.55));
+  opacity: calc(0.4 + var(--nivel) * 0.6);
+  transition: transform 0.1s ease-out, opacity 0.15s ease-out;
+}
+
+/* Esporas: micro-partículas en dos órbitas contrarrotantes. La voz las
+ * enciende (opacidad por --nivel); en pensando se recogen hacia el centro
+ * (scale del grupo) como "concentrándose". */
+.escucha-orbita {
+  transform-origin: 116px 116px;
+  opacity: calc(0.30 + var(--nivel) * 0.70);
+  transition: opacity 0.2s ease;
+}
+.escucha-orbita-a { animation: escucha-gira 26s linear infinite; }
+.escucha-orbita-b { animation: escucha-gira-inversa 18s linear infinite; }
+@keyframes escucha-gira-inversa {
+  to { transform: rotate(-360deg); }
+}
+.escucha-overlay[data-fase="pensando"] .escucha-orbita-a { animation-duration: 7s; }
+.escucha-overlay[data-fase="pensando"] .escucha-orbita-b { animation-duration: 5s; }
+.escucha-espora { fill: rgb(var(--esc-linea-rgb)); }
+.escucha-espora-alt { fill: rgb(var(--esc-linea2-rgb)); }
+
+/* Pensando: dos arcos contrarrotantes (dasharray parcial, round cap) — el
+ * "shimmer loop" de estoy-trabajando, honesto y hermoso. */
+.escucha-arco-pensar {
+  transform-origin: 116px 116px;
+}
+.escucha-arco-pensar-a {
+  stroke: rgb(var(--esc-linea-rgb));
+  animation: escucha-gira 1.4s cubic-bezier(0.45, 0.1, 0.55, 0.9) infinite;
+}
+.escucha-arco-pensar-b {
+  stroke: rgb(var(--esc-linea2-rgb));
+  opacity: 0.75;
+  animation: escucha-gira-inversa 2.1s cubic-bezier(0.45, 0.1, 0.55, 0.9) infinite;
+}
 
 /* Anillos de micelio: el scale lo pone el JSX con el RMS real; acá solo
  * la transición corta para que el movimiento se sienta orgánico. */
@@ -160,11 +277,32 @@
   box-shadow: 0 0 34px rgba(var(--esc-linea-rgb), 0.35);
 }
 .escucha-overlay[data-fase="pensando"] .escucha-mano {
+  overflow: hidden; /* contiene el barrido de luz al disco */
   animation: escucha-piensa 1.4s ease-in-out infinite;
 }
 @keyframes escucha-piensa {
   0%, 100% { box-shadow: 0 0 22px rgba(var(--esc-linea-rgb), 0.25); }
   50%      { box-shadow: 0 0 48px rgba(var(--esc-linea-rgb), 0.55); }
+}
+/* Shimmer: un barrido de luz cruza la mano mientras piensa (transform puro). */
+.escucha-overlay[data-fase="pensando"] .escucha-mano::after {
+  content: '';
+  position: absolute;
+  inset: -30%;
+  background: linear-gradient(
+    115deg,
+    transparent 40%,
+    rgba(var(--esc-linea2-rgb), 0.16) 47%,
+    rgba(255, 255, 255, 0.28) 51%,
+    rgba(var(--esc-linea-rgb), 0.14) 55%,
+    transparent 62%
+  );
+  animation: escucha-shimmer 1.6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes escucha-shimmer {
+  from { transform: translateX(-65%); }
+  to   { transform: translateX(65%); }
 }
 
 /* --- Título de estado (legible al sol: enorme y extrabold) ---------------- */
@@ -328,7 +466,59 @@
 }
 [data-theme="nature"] .escucha-fab { color: #2b1c10; }
 
-/* Ping perezoso: un aro que brota cada 4s — anuncia sin fastidiar. */
+/* Aurora del reposo: un aliento de luz detrás del FAB que respira lento —
+ * "aquí vive algo". Solo transform/opacity (GPU). */
+.escucha-fab-aurora {
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(var(--t-accent-rgb), 0.40), transparent 58%),
+    radial-gradient(circle at 68% 72%, rgba(var(--t-accent-rgb), 0.22), transparent 62%);
+  animation: escucha-fab-respira 4.2s ease-in-out infinite;
+}
+@keyframes escucha-fab-respira {
+  0%, 100% { transform: scale(0.96); opacity: 0.5; }
+  50%      { transform: scale(1.1);  opacity: 0.95; }
+}
+
+/* Filo de luz que orbita el borde del FAB (gradiente cónico + máscara en
+ * anillo, girado con transform — compositor puro). */
+.escucha-fab-giro {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: conic-gradient(
+    from 0deg,
+    transparent 8%,
+    rgba(var(--t-accent-rgb), 0.95) 22%,
+    transparent 42%,
+    rgba(var(--t-accent-rgb), 0.35) 68%,
+    transparent 90%
+  );
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  animation: escucha-gira 7s linear infinite;
+}
+
+/* Sobre el disco sólido de los temas claros el filo del acento no se ve:
+ * pasa a luz blanca. */
+[data-theme="minimalista"] .escucha-fab-giro,
+[data-theme="nature"] .escucha-fab-giro,
+[data-theme="verde-vivo"] .escucha-fab-giro {
+  background: conic-gradient(
+    from 0deg,
+    transparent 8%,
+    rgba(255, 255, 255, 0.95) 22%,
+    transparent 42%,
+    rgba(255, 255, 255, 0.35) 68%,
+    transparent 90%
+  );
+}
+
+/* Pings perezosos: dos aros desfasados que brotan — anuncian sin fastidiar. */
 .escucha-fab-ping {
   position: absolute;
   inset: -2px;
@@ -337,6 +527,7 @@
   animation: escucha-fab-brota 4s ease-out infinite;
   pointer-events: none;
 }
+.escucha-fab-ping-b { animation-delay: 2s; }
 @keyframes escucha-fab-brota {
   0%   { transform: scale(1); opacity: 0.7; }
   30%  { transform: scale(1.45); opacity: 0; }
@@ -363,4 +554,19 @@
   .escucha-overlay[data-fase="pensando"] .escucha-mano { animation: none; }
   .escucha-fab-ping { animation: none; opacity: 0; }
   .escucha-fab, .escucha-btn-listo { transition: none; }
+
+  /* Capa viva quieta pero LEGIBLE: la aurora y el halo quedan como aro/luz
+   * estáticos (el estado sigue claro), las esporas tenues y sin órbita, el
+   * shimmer apagado. Los arcos de "pensando" quedan fijos: junto al texto
+   * "Entendiendo lo que dijo…" siguen comunicando el estado. */
+  .escucha-aurora,
+  .escucha-aurora-giro,
+  .escucha-halo-giro,
+  .escucha-orbita,
+  .escucha-arco-pensar { animation: none; transition: none; }
+  .escucha-glow { transition: none; }
+  .escucha-orbita { opacity: 0.25; }
+  .escucha-overlay[data-fase="pensando"] .escucha-mano::after { animation: none; content: none; }
+  .escucha-fab-aurora { animation: none; opacity: 0.45; }
+  .escucha-fab-giro { animation: none; opacity: 0.5; }
 }

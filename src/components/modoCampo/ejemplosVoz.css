@@ -1,10 +1,15 @@
 /* ============================================================================
  * ejemplosVoz.css — tarjeta de ejemplos del modo campo («hola chagra»).
  *
- * Solo lo que Tailwind no da: la onda de voz que late y la transición de
- * entrada del ejemplo que rota. Acento vía --t-accent-rgb (themes.css) con
- * fallback al esmeralda del panel — indirección CSS-var, nunca color duro
- * por tema.
+ * Solo lo que Tailwind no da: la coreografía de entrada (los 3 ejemplos
+ * irrumpen en cascada al abrir el panel), la onda de voz que late y la
+ * transición del ejemplo que rota. Acento vía --t-accent-rgb (themes.css)
+ * con fallback al esmeralda del panel — indirección CSS-var, nunca color
+ * duro por tema.
+ *
+ * Presupuesto de movimiento: transform + opacity en todo lo que se repite
+ * (GPU, cero layout thrash). La única animación de alto (el colapso de la
+ * cascada al carrusel) corre UNA vez al abrir, sobre ~200px, y listo.
  * ========================================================================== */
 
 /* --- Onda de voz: 9 barras que laten desfasadas (decorativa) -------------- */
@@ -30,7 +35,49 @@
   50%      { transform: scaleY(1);    opacity: 1; }
 }
 
-/* --- Escena del ejemplo que rota ------------------------------------------ */
+/* --- Acto 1: la cascada de entrada -----------------------------------------
+ * Al montar, cada ejemplo IRRUMPE desde la derecha con un pequeño rebote
+ * (overshoot del cubic-bezier), uno tras otro (--i escala el delay). La
+ * tarjeta se siente viva desde el primer instante, no esperando su turno. */
+.ejemplos-voz-entrada {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: hidden;
+  max-height: 320px;
+}
+.ejemplos-voz-entrada-item {
+  animation: ejemplos-voz-irrumpe 0.6s cubic-bezier(0.34, 1.45, 0.64, 1) both;
+  animation-delay: calc(0.12s + var(--i) * 0.22s);
+}
+@keyframes ejemplos-voz-irrumpe {
+  from { opacity: 0; transform: translateX(32px) scale(0.94); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* Despedida: los ejemplos 2 y 3 se van (abajo→arriba en orden inverso) y el
+ * alto colapsa hacia la escena del carrusel. El primero se queda quieto: es
+ * el mismo que el carrusel muestra al arrancar — continuidad sin brincos.
+ * El colapso anima max-height (layout) pero corre UNA sola vez al abrir. */
+.ejemplos-voz-entrada-saliendo {
+  animation: ejemplos-voz-colapsa 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.ejemplos-voz-entrada-saliendo .ejemplos-voz-entrada-item {
+  animation: ejemplos-voz-sale 0.32s ease-in both;
+  animation-delay: calc((2 - var(--i)) * 0.07s);
+}
+.ejemplos-voz-entrada-saliendo .ejemplos-voz-entrada-item:first-child {
+  animation: none;
+}
+@keyframes ejemplos-voz-sale {
+  to { opacity: 0; transform: translateY(-12px) scale(0.97); }
+}
+@keyframes ejemplos-voz-colapsa {
+  from { max-height: 320px; }
+  to   { max-height: 86px; }
+}
+
+/* --- Acto 2: escena del ejemplo que rota ----------------------------------- */
 /* min-height reserva el espacio de la frase más larga en dos líneas:
  * sin brincos de layout cuando cambia el ejemplo. */
 .ejemplos-voz-escena {
@@ -40,6 +87,8 @@
 }
 .ejemplos-voz-paso {
   width: 100%;
+}
+.ejemplos-voz-paso-anima {
   animation: ejemplos-voz-entra 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 @keyframes ejemplos-voz-entra {
@@ -52,5 +101,8 @@
  * de que la preferencia cambie con el panel ya montado: todo quieto. */
 @media (prefers-reduced-motion: reduce) {
   .ejemplos-voz-barra { animation: none; opacity: 0.8; }
-  .ejemplos-voz-paso { animation: none; }
+  .ejemplos-voz-paso-anima { animation: none; }
+  .ejemplos-voz-entrada,
+  .ejemplos-voz-entrada-item,
+  .ejemplos-voz-entrada-saliendo .ejemplos-voz-entrada-item { animation: none; }
 }
