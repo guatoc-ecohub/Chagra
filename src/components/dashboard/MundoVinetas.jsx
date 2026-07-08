@@ -131,6 +131,51 @@ function VinetaCana() {
     );
 }
 
+/** 🍊 Los cítricos — arbolito cargado de naranjas al sol de tierra caliente. */
+function VinetaCitricos() {
+    return (
+        <svg {...SVG_PROPS}>
+            <rect width="180" height="90" fill="#f7e6c8" />
+            {/* sol fuerte de tierra caliente */}
+            <circle cx="150" cy="20" r="11" fill="#ffd98a" />
+            <circle cx="150" cy="20" r="6.5" fill="#fff0c4" />
+            {/* loma del huerto cítrico */}
+            <path d="M-4 52 Q60 40 120 50 T184 46 V90 H-4 Z" fill="#8fae4e" />
+            <path d="M-4 66 Q70 54 184 62 V90 H-4 Z" fill="#6f9138" />
+            {/* hileras de arbolitos cítricos al fondo (copas redondas con fruta) */}
+            <g>
+                <g><circle cx="24" cy="52" r="7" fill="#3f7a3a" /><circle cx="22" cy="50" r="1.6" fill="#f6a11f" /><circle cx="27" cy="54" r="1.6" fill="#f6a11f" /></g>
+                <g><circle cx="128" cy="50" r="7" fill="#3f7a3a" /><circle cx="126" cy="48" r="1.6" fill="#f6a11f" /><circle cx="131" cy="52" r="1.6" fill="#f6a11f" /></g>
+                <g><circle cx="152" cy="53" r="6" fill="#4c8a44" /><circle cx="151" cy="51" r="1.5" fill="#f6a11f" /></g>
+            </g>
+            {/* árbol cítrico protagonista, cargado de naranjas */}
+            <g transform="translate(78 40)">
+                {/* tronco */}
+                <path d="M0 40 V22" stroke="#7a5230" strokeWidth="4.4" strokeLinecap="round" />
+                <path d="M0 30 q-8 -2 -12 -8 M0 26 q8 -2 12 -8" stroke="#7a5230" strokeWidth="2.8" strokeLinecap="round" fill="none" />
+                {/* copa densa */}
+                <circle cx="0" cy="6" r="22" fill="#2f6b3a" />
+                <circle cx="-13" cy="2" r="12" fill="#3f8f4e" />
+                <circle cx="13" cy="4" r="12" fill="#3f8f4e" />
+                <circle cx="0" cy="-8" r="12" fill="#4c8a44" />
+                {/* naranjas repartidas en la copa */}
+                <g>
+                    <circle cx="-12" cy="4" r="3.6" fill="#f6931f" /><circle cx="-13.5" cy="2.5" r="1" fill="#ffc65c" />
+                    <circle cx="2" cy="10" r="3.8" fill="#ef8317" /><circle cx="0.5" cy="8.5" r="1" fill="#ffc65c" />
+                    <circle cx="12" cy="6" r="3.6" fill="#f6931f" /><circle cx="10.5" cy="4.5" r="1" fill="#ffc65c" />
+                    <circle cx="-4" cy="-6" r="3.4" fill="#ef8317" /><circle cx="-5.2" cy="-7.2" r=".9" fill="#ffc65c" />
+                    <circle cx="8" cy="-4" r="3.2" fill="#f6931f" />
+                    <circle cx="-16" cy="-4" r="3" fill="#ef8317" />
+                </g>
+                {/* azahar (florecita blanca del cítrico) */}
+                <g fill="#fbfaf3">
+                    <circle cx="16" cy="-8" r="1.5" /><circle cx="-9" cy="-12" r="1.5" />
+                </g>
+            </g>
+        </svg>
+    );
+}
+
 /** 🌱 El suelo vivo — corte de tierra en capas con raíces y lombriz. */
 function VinetaSuelo() {
     return (
@@ -396,6 +441,7 @@ const VINETAS = {
     cultivos: VinetaCultivos,
     cafe: VinetaCafe,
     cana: VinetaCana,
+    citricos: VinetaCitricos,
     suelo: VinetaSuelo,
     agua: VinetaAgua,
     abono: VinetaAbono,
