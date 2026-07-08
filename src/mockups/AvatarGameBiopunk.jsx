@@ -21,10 +21,18 @@ const MAX_ANIO = 5;
 const ETAPAS = [
   'Semilla de espíritu',
   'Cría de luz',
-  'Joven espíritu',
+  'Brote andante',
   'Joven espíritu',
   'Guardián de la finca',
   'Espíritu radiante',
+];
+
+/* lo que dice el espíritu al tocarlo, según la vitalidad real de la finca */
+const FRASES_ESPIRITU = [
+  { tope: 45, frase: 'Su espíritu apenas despierta — anote agua y suelo para darle fuerza.' },
+  { tope: 70, frase: 'Su espíritu va tomando cuerpo: la finca se siente cuidada.' },
+  { tope: 90, frase: 'Su espíritu brilla — la biodiversidad de su finca lo alimenta.' },
+  { tope: 101, frase: 'Espíritu radiante: su finca es un organismo pleno.' },
 ];
 
 /* salud simulada por año (0..5): la trayectoria de una finca bien cuidada */
@@ -44,6 +52,7 @@ const EJES_PANEL = [
   { id: 'constancia', emoji: '🔥', c1: '#9dff3f', c2: '#2dffc4' },
 ];
 
+/* cada guardián trae su propio acento de luz: el HUD entero se re-tiñe con él */
 const ESPECIES = [
   {
     id: 'chivito',
@@ -52,6 +61,7 @@ const ESPECIES = [
     cientifico: 'Oxypogon guerinii',
     eje: 'Páramo sano y flores nativas',
     glifo: '🐦',
+    acc: '#2dffc4', accRgb: '45, 255, 196', acc2: '#ff4fd8',
   },
   {
     id: 'rana',
@@ -60,6 +70,7 @@ const ESPECIES = [
     cientifico: 'Phyllobates terribilis',
     eje: 'Agua limpia',
     glifo: '🐸',
+    acc: '#ffd76a', accRgb: '255, 215, 106', acc2: '#ff9d3f',
   },
   {
     id: 'abeja',
@@ -68,6 +79,7 @@ const ESPECIES = [
     cientifico: 'Tetragonisca angustula',
     eje: 'Floración y biodiversidad',
     glifo: '🐝',
+    acc: '#ffb54f', accRgb: '255, 181, 79', acc2: '#4fd8ff',
   },
   {
     id: 'oso',
@@ -76,6 +88,7 @@ const ESPECIES = [
     cientifico: 'Tremarctos ornatus',
     eje: 'Bosque y agroforestería',
     glifo: '🐻',
+    acc: '#b28dff', accRgb: '178, 141, 255', acc2: '#2dffc4',
   },
   {
     id: 'lombriz',
@@ -84,8 +97,36 @@ const ESPECIES = [
     cientifico: 'La red que teje el suelo',
     eje: 'Suelo vivo',
     glifo: '🪱',
+    acc: '#ff8fb0', accRgb: '255, 143, 176', acc2: '#9dff3f',
   },
 ];
+
+/* el guardián también está escrito en el cielo: una constelación por especie */
+const CONSTELACIONES = {
+  chivito: {
+    lineas: [[[18, 149], [40, 140], [66, 122], [90, 130], [112, 104], [136, 118], [122, 146], [90, 140]]],
+    label: [58, 206],
+  },
+  rana: {
+    lineas: [[[52, 132], [70, 110], [96, 106], [118, 120], [110, 144], [78, 150], [52, 132]]],
+    label: [58, 206],
+  },
+  abeja: {
+    lineas: [
+      [[60, 134], [80, 124], [102, 128], [118, 140], [96, 148], [74, 146], [60, 134]],
+      [[84, 122], [76, 100], [96, 104]],
+    ],
+    label: [58, 206],
+  },
+  oso: {
+    lineas: [[[46, 148], [58, 120], [86, 108], [114, 114], [128, 136], [108, 152], [72, 156], [46, 148]]],
+    label: [58, 206],
+  },
+  lombriz: {
+    lineas: [[[30, 148], [54, 132], [78, 146], [102, 128], [126, 142], [150, 126], [172, 138]]],
+    label: [58, 206],
+  },
+};
 
 /* ramas del organismo = mundos (de mundosFinca.js, muestra) */
 const MUNDOS = [
@@ -169,6 +210,47 @@ const clamp01 = (v) => Math.max(0, Math.min(100, v));
 /* ------------------------------------------------------------------------- */
 /* piezas SVG                                                                  */
 /* ------------------------------------------------------------------------- */
+
+/* la constelación del guardián: se dibuja sola al escoger especie */
+function Constelacion({ especie }) {
+  const c = CONSTELACIONES[especie.id];
+  return (
+    <g key={especie.id} className="agb-constel" aria-hidden="true">
+      {c.lineas.map((linea, i) => (
+        <polyline
+          key={i}
+          className="agb-constel-linea"
+          points={linea.map((p) => p.join(',')).join(' ')}
+          pathLength="1"
+          fill="none"
+          stroke="#eafff6"
+          strokeWidth="0.6"
+          opacity="0.35"
+          style={{ animationDelay: `${0.25 + i * 0.5}s` }}
+        />
+      ))}
+      {c.lineas.flat().map(([x, y], i) => (
+        <circle
+          key={`${x}-${y}-${i}`}
+          className="agb-constel-estrella"
+          cx={x}
+          cy={y}
+          r={i === 0 ? 1.5 : 1.05}
+          fill={especie.acc}
+          style={{ animationDelay: `${0.15 + i * 0.09}s`, filter: `drop-shadow(0 0 3px ${especie.acc})` }}
+        />
+      ))}
+      <text
+        className="agb-constel-label"
+        x={c.label[0]} y={c.label[1]} textAnchor="middle"
+        fontFamily="ui-monospace,monospace" fontSize="6" letterSpacing="1.6"
+        fill="#bfffe9" opacity="0.55"
+      >
+        {`CONSTELACIÓN · ${especie.corto.toUpperCase()}`}
+      </text>
+    </g>
+  );
+}
 
 function Hoja({ x, y, r, rot, delayClass }) {
   return (
@@ -327,20 +409,44 @@ function AvatarLombriz() {
 }
 
 const AVATAR_RENDER = {
-  chivito: { pos: [148, 208], Cuerpo: AvatarChivito },
+  chivito: { pos: [152, 218], Cuerpo: AvatarChivito },
   rana: { pos: [80, 282], Cuerpo: AvatarRana },
   abeja: { pos: [108, 340], Cuerpo: AvatarAbeja },
   oso: { pos: [248, 438], Cuerpo: AvatarOso },
   lombriz: { pos: [140, 590], Cuerpo: AvatarLombriz },
 };
 
-function Avatar({ especie, etapa, vitalidad }) {
+/* el filamento de savia que une el corazón de la finca con su espíritu */
+function VinculoEspiritu({ especie }) {
+  const [ax, ay] = AVATAR_RENDER[especie.id].pos;
+  const mx = (195 + ax) / 2 + (ax < 195 ? -26 : 26);
+  const my = (556 + ay) / 2 + 10;
+  const d = `M195,556 Q${mx},${my} ${ax},${ay + 16}`;
+  return (
+    <g key={especie.id} aria-hidden="true">
+      <path className="agb-vinculo" d={d} fill="none" stroke={especie.acc} strokeWidth="1" strokeLinecap="round" opacity="0.3" />
+      <circle className="agb-vinculo-spark" r="1.7" fill="#eafff6" style={{ offsetPath: `path('${d}')`, filter: `drop-shadow(0 0 3px ${especie.acc})` }} />
+    </g>
+  );
+}
+
+function Avatar({ especie, etapa, vitalidad, evo, onTocar }) {
   const { pos, Cuerpo } = AVATAR_RENDER[especie.id];
   const [ax, ay] = pos;
   const escala = 0.62 + etapa * 0.1;
   const aura = 0.14 + (vitalidad / 100) * 0.4;
   return (
-    <g className="agb-avatar agb-av-pop" key={`${especie.id}-${etapa === 0 ? 'huevo' : 'ser'}`}>
+    <g
+      className="agb-avatar agb-av-pop"
+      key={`${especie.id}-${etapa === 0 ? 'huevo' : 'ser'}`}
+      role="button"
+      tabIndex={0}
+      aria-label={`Tocar a su espíritu: ${especie.nombre}`}
+      onClick={onTocar}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onTocar(); }
+      }}
+    >
       <circle
         className="agb-av-aura" cx={ax} cy={ay} r={20 + etapa * 4}
         fill="url(#agb-aura-grad)" style={{ '--agb-aura': aura }}
@@ -373,10 +479,36 @@ function Avatar({ especie, etapa, vitalidad }) {
       )}
       <text
         x={ax} y={ay + 34 + etapa * 2} textAnchor="middle" fontFamily="ui-monospace,monospace"
-        fontSize="6.5" letterSpacing="1.2" fill="#2dffc4" opacity="0.9"
+        fontSize="6.5" letterSpacing="1.2" fill={especie.acc} opacity="0.9"
       >
         {(etapa === 0 ? 'SEMILLA DE ' : '') + especie.nombre.toUpperCase()}
       </text>
+      {/* el momento de evolución: ondas + rayos + anuncio, una sola vez por etapa */}
+      {evo && (
+        <g key={`evo-${etapa}`} className="agb-evo" aria-hidden="true">
+          <circle className="agb-evo-onda" cx={ax} cy={ay} r="16" fill="none" stroke="#eafff6" strokeWidth="1.4" />
+          <circle className="agb-evo-onda agb-eo2" cx={ax} cy={ay} r="16" fill="none" stroke={especie.acc} strokeWidth="1" />
+          <g className="agb-evo-rayos" stroke="#eafff6" strokeWidth="1" strokeLinecap="round" style={{ transformOrigin: `${ax}px ${ay}px` }}>
+            {[0, 60, 120, 180, 240, 300].map((ang) => {
+              const rad = (ang * Math.PI) / 180;
+              return (
+                <line
+                  key={ang}
+                  x1={ax + Math.cos(rad) * 24} y1={ay + Math.sin(rad) * 24}
+                  x2={ax + Math.cos(rad) * 33} y2={ay + Math.sin(rad) * 33}
+                />
+              );
+            })}
+          </g>
+          <text
+            className="agb-evo-texto" x={ax} y={ay - 46} textAnchor="middle"
+            fontFamily="ui-monospace,monospace" fontSize="8" letterSpacing="2" fontWeight="700"
+            fill="#eafff6" style={{ filter: `drop-shadow(0 0 6px ${especie.acc})` }}
+          >
+            ✦ EVOLUCIONÓ ✦
+          </text>
+        </g>
+      )}
     </g>
   );
 }
@@ -385,7 +517,10 @@ function Avatar({ especie, etapa, vitalidad }) {
 /* la escena completa                                                          */
 /* ------------------------------------------------------------------------- */
 
-function EscenaOrganismo({ year, especie, etapa, vitalidad, mundoAbierto, onOpenMundo }) {
+function EscenaOrganismo({
+  year, especie, etapa, vitalidad, mundoAbierto, evo, pulso,
+  onOpenMundo, onPulso, onTocarEspiritu,
+}) {
   const on = (minYear) => year >= minYear;
   const delayLeaf = ['', 'agb-l2', 'agb-l3'];
   return (
@@ -464,6 +599,9 @@ function EscenaOrganismo({ year, especie, etapa, vitalidad, mundoAbierto, onOpen
         <circle className="agb-tw" style={{ animationDelay: '-1.9s' }} cx="102" cy="92" r="0.9" fill="#ff4fd8" />
         <circle className="agb-tw" style={{ animationDelay: '-3.1s' }} cx="290" cy="66" r="0.8" fill="#9dff3f" />
       </g>
+
+      {/* la constelación del guardián se dibuja al escogerlo */}
+      <Constelacion especie={especie} />
 
       {/* luna = mundo Clima (tocable) */}
       <g
@@ -598,17 +736,37 @@ function EscenaOrganismo({ year, especie, etapa, vitalidad, mundoAbierto, onOpen
       {/* raíz-mundo: el suelo vivo */}
       <NodoMundo mundo={MUNDOS.find((m) => m.id === 'suelo')} visible={on(0)} activo={mundoAbierto === 'suelo'} onOpen={onOpenMundo} />
 
-      {/* corazón-semilla que late */}
-      <ellipse cx="195" cy="556" rx="40" ry="34" fill="#02040c" opacity="0.55" />
-      <ellipse cx="195" cy="556" rx="40" ry="34" fill="none" stroke="#0f3a30" strokeWidth="1" opacity="0.55" />
-      <circle className="agb-heart-wave" cx="195" cy="556" r="22" fill="none" stroke="#2dffc4" strokeWidth="1.6" />
-      <circle className="agb-heart-wave" style={{ animationDelay: '0.6s' }} cx="195" cy="556" r="22" fill="none" stroke="#ff4fd8" strokeWidth="1" />
-      <circle className="agb-heart" cx="195" cy="556" r="14" fill="url(#agb-corazon)" />
-      <g className="agb-heart">
-        <path d="M195,541 C205,547 205,565 195,572 C185,565 185,547 195,541 Z" fill="#0e5a44" stroke="#2dffc4" strokeWidth="1.4" style={{ filter: 'drop-shadow(0 0 6px rgba(45,255,196,0.55))' }} />
-        <circle cx="195" cy="556" r="4.6" fill="#eafff6" />
-        <circle cx="195" cy="556" r="2" fill="#ff8fe4" />
+      {/* corazón-semilla que late — TOCABLE: manda un pulso de savia al organismo */}
+      <g
+        className="agb-nodo agb-heart-hit"
+        role="button"
+        tabIndex={0}
+        aria-label="Tocar el corazón de la finca para enviar un pulso de vida"
+        onClick={onPulso}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPulso(); }
+        }}
+      >
+        <ellipse cx="195" cy="556" rx="40" ry="34" fill="#02040c" opacity="0.55" />
+        <ellipse cx="195" cy="556" rx="40" ry="34" fill="none" stroke="#0f3a30" strokeWidth="1" opacity="0.55" />
+        <circle className="agb-heart-wave" cx="195" cy="556" r="22" fill="none" stroke="#2dffc4" strokeWidth="1.6" />
+        <circle className="agb-heart-wave" style={{ animationDelay: '0.6s' }} cx="195" cy="556" r="22" fill="none" stroke="#ff4fd8" strokeWidth="1" />
+        <circle className="agb-heart" cx="195" cy="556" r="14" fill="url(#agb-corazon)" />
+        <g className="agb-heart">
+          <path d="M195,541 C205,547 205,565 195,572 C185,565 185,547 195,541 Z" fill="#0e5a44" stroke="#2dffc4" strokeWidth="1.4" style={{ filter: 'drop-shadow(0 0 6px rgba(45,255,196,0.55))' }} />
+          <circle cx="195" cy="556" r="4.6" fill="#eafff6" />
+          <circle cx="195" cy="556" r="2" fill="#ff8fe4" />
+        </g>
       </g>
+
+      {/* onda expansiva del pulso de vida (se re-monta por toque) */}
+      {pulso > 0 && (
+        <g key={pulso} aria-hidden="true">
+          <circle className="agb-pulso-onda" cx="195" cy="556" r="18" fill="none" stroke="#eafff6" strokeWidth="1.6" />
+          <circle className="agb-pulso-onda agb-po2" cx="195" cy="556" r="18" fill="none" stroke={especie.acc} strokeWidth="1.1" />
+          <circle className="agb-pulso-onda agb-po3" cx="195" cy="556" r="18" fill="none" stroke="#9dff3f" strokeWidth="0.8" />
+        </g>
+      )}
 
       {/* nutrientes viajando (paths en CSS) */}
       <circle className="agb-spark agb-p1" r="2" fill="#bfffe9" />
@@ -624,7 +782,9 @@ function EscenaOrganismo({ year, especie, etapa, vitalidad, mundoAbierto, onOpen
       </g>
 
       {/* ============ EL AVATAR: el espíritu vive en el organismo ============ */}
-      <Avatar especie={especie} etapa={etapa} vitalidad={vitalidad} />
+      {/* filamento de savia corazón→espíritu: el vínculo que lo alimenta */}
+      <VinculoEspiritu especie={especie} />
+      <Avatar especie={especie} etapa={etapa} vitalidad={vitalidad} evo={evo} onTocar={onTocarEspiritu} />
     </svg>
   );
 }
@@ -638,8 +798,14 @@ export default function AvatarGameBiopunk({ onBack }) {
   const [especieId, setEspecieId] = useState('chivito');
   const [mundo, setMundo] = useState(null);
   const [nota, setNota] = useState('');
+  const [playing, setPlaying] = useState(false);
+  const [pulso, setPulso] = useState(0); /* contador: cada toque re-monta la onda */
+  const [evo, setEvo] = useState(false);
   const autoplayRef = useRef(null);
   const notaRef = useRef(null);
+  const pulsoRef = useRef(null);
+  const evoRef = useRef(null);
+  const etapaPrevRef = useRef(0);
 
   const especie = ESPECIES.find((e) => e.id === especieId);
   const etapa = Math.min(year, 5);
@@ -652,11 +818,13 @@ export default function AvatarGameBiopunk({ onBack }) {
       clearInterval(autoplayRef.current);
       autoplayRef.current = null;
     }
+    setPlaying(false);
   }, []);
 
   const reproducir = useCallback(() => {
     pararAutoplay();
     setYear(0);
+    setPlaying(true);
     let y = 0;
     autoplayRef.current = setInterval(() => {
       y += 1;
@@ -665,21 +833,35 @@ export default function AvatarGameBiopunk({ onBack }) {
     }, 1050);
   }, [pararAutoplay]);
 
+  /* el momento de evolución: cuando la etapa sube, el espíritu lo celebra */
+  useEffect(() => {
+    if (etapa > etapaPrevRef.current) {
+      setEvo(true);
+      clearTimeout(evoRef.current);
+      evoRef.current = setTimeout(() => setEvo(false), 2000);
+    }
+    etapaPrevRef.current = etapa;
+  }, [etapa]);
+
   /* cinematográfica de entrada: la finca crece sola hasta 2031 */
   useEffect(() => {
     const quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (quieto) {
-      setYear(MAX_ANIO);
-      return undefined;
-    }
-    const arranque = setTimeout(reproducir, 2300);
+    /* con reduced-motion no hay cinematográfica: se salta directo al año 5
+       (diferido para no encadenar renders dentro del efecto) */
+    const arranque = quieto
+      ? setTimeout(() => setYear(MAX_ANIO), 0)
+      : setTimeout(reproducir, 2300);
     return () => {
       clearTimeout(arranque);
       pararAutoplay();
     };
   }, [reproducir, pararAutoplay]);
 
-  useEffect(() => () => clearTimeout(notaRef.current), []);
+  useEffect(() => () => {
+    clearTimeout(notaRef.current);
+    clearTimeout(pulsoRef.current);
+    clearTimeout(evoRef.current);
+  }, []);
 
   const avisar = (texto) => {
     setNota(texto);
@@ -704,10 +886,35 @@ export default function AvatarGameBiopunk({ onBack }) {
     avisar(`${e.nombre} — guardián de: ${e.eje.toLowerCase()}`);
   };
 
+  /* tocar el corazón: un pulso de savia recorre el organismo entero */
+  const enviarPulso = () => {
+    setPulso((n) => n + 1);
+    clearTimeout(pulsoRef.current);
+    pulsoRef.current = setTimeout(() => setPulso(0), 1700);
+    avisar('El corazón late fuerte — la savia corre a su espíritu ✦');
+  };
+
+  /* tocar al espíritu: dice cómo se siente según la vitalidad real */
+  const tocarEspiritu = () => {
+    const nivel = FRASES_ESPIRITU.find((f) => vitalidad < f.tope);
+    if (nivel) avisar(nivel.frase);
+  };
+
+  const alternarReproduccion = () => {
+    if (playing) pararAutoplay();
+    else reproducir();
+  };
+
   const circ = 2 * Math.PI * 26;
 
   return (
-    <div className="agb" data-year={year} data-testid="agb-mockup">
+    <div
+      className={`agb${pulso > 0 ? ' agb-pulsando' : ''}`}
+      data-year={year}
+      data-especie={especieId}
+      data-testid="agb-mockup"
+      style={{ '--agb-acc': especie.acc, '--agb-acc-rgb': especie.accRgb, '--agb-acc2': especie.acc2 }}
+    >
       <div className="agb-wings" aria-hidden="true" />
       <div className="agb-scene agb-enter">
         <EscenaOrganismo
@@ -716,9 +923,15 @@ export default function AvatarGameBiopunk({ onBack }) {
           etapa={etapa}
           vitalidad={vitalidad}
           mundoAbierto={mundo?.id}
+          evo={evo}
+          pulso={pulso}
           onOpenMundo={abrirMundo}
+          onPulso={enviarPulso}
+          onTocarEspiritu={tocarEspiritu}
         />
       </div>
+      {/* velo de foco: al abrir un mundo, el resto de la finca se apaga un poco */}
+      <div className={`agb-velo${mundo ? ' on' : ''}`} aria-hidden="true" />
 
       {onBack && (
         <button type="button" className="agb-volver agb-enter agb-d4" onClick={onBack}>
@@ -818,7 +1031,7 @@ export default function AvatarGameBiopunk({ onBack }) {
         <div className="agb-dock agb-rise agb-d5">
           <div className="agb-dock-cab">
             <span>SU GUARDIÁN — ESCOJA UNA ESPECIE NATIVA</span>
-            <span>{especie.cientifico}</span>
+            <span className="agb-dock-cientifico">{especie.cientifico}</span>
           </div>
           <div className="agb-chips" role="radiogroup" aria-label="Especie del guardián">
             {ESPECIES.map((e) => (
@@ -838,8 +1051,13 @@ export default function AvatarGameBiopunk({ onBack }) {
 
           <div className="agb-reloj">
             <div className="agb-reloj-fila">
-              <button type="button" className="agb-play" onClick={reproducir} aria-label="Ver crecer la finca 5 años">
-                ▶
+              <button
+                type="button"
+                className={`agb-play${playing ? ' agb-play-on' : ''}`}
+                onClick={alternarReproduccion}
+                aria-label={playing ? 'Pausar el crecimiento' : 'Ver crecer la finca 5 años'}
+              >
+                {playing ? '❚❚' : '▶'}
               </button>
               <div className="agb-anillos">
                 <div className="agb-tics" aria-hidden="true">
@@ -863,7 +1081,7 @@ export default function AvatarGameBiopunk({ onBack }) {
                   onChange={(e) => { pararAutoplay(); setYear(Number(e.target.value)); }}
                 />
               </div>
-              <span className="agb-reloj-anio">{ANIO_BASE + year}</span>
+              <span key={year} className="agb-reloj-anio agb-anio-pop">{ANIO_BASE + year}</span>
             </div>
             <div className="agb-reloj-pie">
               <span>EL RELOJ DEL FRAILEJÓN · UN ANILLO POR AÑO</span>

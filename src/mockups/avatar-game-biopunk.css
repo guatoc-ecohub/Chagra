@@ -31,10 +31,17 @@
   --agb-borde: rgba(45, 255, 196, 0.28);
   --agb-display: 'Baloo 2', 'Nunito', system-ui, sans-serif;
   --agb-mono: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  /* acento vivo del guardián escogido (lo inyecta React por especie):
+     el HUD entero respira del mismo color que el espíritu */
+  --agb-acc: var(--agb-savia);
+  --agb-acc-rgb: 45, 255, 196;
+  --agb-acc2: var(--agb-magenta);
 
   position: fixed;
   inset: 0;
-  z-index: 60;
+  /* por encima de los FAB del app shell (colibrí/agente): el mockup es
+     full-screen y nada de la app debe flotarle encima */
+  z-index: 1200;
   overflow: hidden;
   background:
     radial-gradient(120% 60% at 50% -10%, #0d1e44 0%, transparent 60%),
@@ -61,6 +68,9 @@
     width: auto;
     max-width: none;
     filter: drop-shadow(0 0 60px rgba(45, 255, 196, 0.08));
+    /* funde los bordes del escenario con la noche: sin filo duro */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
   }
 }
 
@@ -106,6 +116,27 @@
 @keyframes agb-fog { from { transform: translateX(-24px); } to { transform: translateX(26px); } }
 .agb-fog { animation: agb-fog 16s ease-in-out infinite alternate; }
 .agb-fog.agb-g2 { animation-delay: -6s; animation-duration: 20s; }
+
+/* --------- constelación del guardián: se dibuja al escoger especie -------- */
+@keyframes agb-constel-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.agb-constel-linea {
+  stroke-dasharray: 1;
+  animation: agb-constel-draw 1.5s cubic-bezier(0.3, 0.6, 0.3, 1) backwards;
+}
+@keyframes agb-constel-pop {
+  from { opacity: 0; transform: scale(0); }
+  60% { opacity: 1; transform: scale(1.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+.agb-constel-estrella {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation:
+    agb-constel-pop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.4) backwards,
+    agb-tw 4.6s ease-in-out 1.4s infinite;
+}
+@keyframes agb-constel-label { from { opacity: 0; } to { opacity: 0.55; } }
+.agb-constel-label { animation: agb-constel-label 1s ease 1.2s backwards; }
 
 @keyframes agb-fly {
   0%, 100% { transform: translate(0, 0); opacity: 0.4; }
@@ -176,6 +207,38 @@
 }
 .agb-heart { transform-box: fill-box; transform-origin: center; animation: agb-heart 2.4s ease-in-out infinite; }
 
+/* el corazón es tocable: invita con un latido más presente al pasar el dedo */
+.agb-heart-hit { cursor: pointer; }
+.agb-heart-hit:hover .agb-heart,
+.agb-heart-hit:focus-visible .agb-heart { animation-duration: 1.2s; }
+.agb-heart-hit:focus-visible { outline: none; }
+
+/* pulso de vida: onda triple que recorre la finca desde el corazón */
+@keyframes agb-pulso-onda {
+  0% { transform: scale(0.3); opacity: 0.95; }
+  100% { transform: scale(9); opacity: 0; }
+}
+.agb-pulso-onda {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: agb-pulso-onda 1.5s cubic-bezier(0.15, 0.6, 0.4, 1) forwards;
+}
+.agb-pulso-onda.agb-po2 { animation-delay: 0.14s; }
+.agb-pulso-onda.agb-po3 { animation-delay: 0.3s; }
+
+/* mientras el pulso viaja, TODO el organismo se acelera: la savia corre,
+   las chispas vuelan y el espíritu brinca (van después de sus reglas base
+   para ganar la cascada) */
+.agb-pulsando .agb-sap { animation-duration: 0.9s; }
+.agb-pulsando .agb-spark { animation-duration: 1.6s; }
+.agb-pulsando .agb-vinculo-spark { animation-duration: 1.1s; }
+@keyframes agb-salto {
+  0%, 100% { transform: translateY(0); }
+  35% { transform: translateY(-11px); }
+  65% { transform: translateY(2px); }
+}
+.agb-pulsando .agb-avatar { animation: agb-salto 0.85s cubic-bezier(0.3, 1.4, 0.4, 1) 0.35s; }
+
 @keyframes agb-hwave {
   0% { transform: scale(0.35); opacity: 0.85; }
   100% { transform: scale(2.1); opacity: 0; }
@@ -204,8 +267,21 @@
 .agb-spark.agb-p4 { offset-path: path('M195,556 C150,586 104,606 60,610'); animation-delay: 0.8s; animation-duration: 6s; }
 .agb-spark.agb-p5 { offset-path: path('M195,556 C244,584 292,600 336,602'); animation-delay: 3.4s; animation-duration: 6s; }
 
+/* --- vínculo corazón→espíritu: el filamento de savia que lo alimenta ------ */
+.agb-vinculo {
+  stroke-dasharray: 2.5 9;
+  animation: agb-sap 3s linear infinite;
+}
+.agb-vinculo-spark {
+  offset-rotate: 0deg;
+  animation: agb-travel 3.4s linear infinite;
+}
+
 /* ============================== EL AVATAR ================================= */
-.agb-avatar { transform-box: view-box; }
+.agb-avatar { transform-box: view-box; cursor: pointer; }
+.agb-avatar:focus-visible { outline: none; }
+.agb-avatar:hover .agb-av-aura,
+.agb-avatar:focus-visible .agb-av-aura { animation-duration: 1.6s; }
 @keyframes agb-hover {
   0%, 100% { transform: translate(0, 0); }
   30% { transform: translate(4px, -6px); }
@@ -263,6 +339,31 @@
   100% { opacity: 1; transform: scale(1); }
 }
 
+/* --- el momento de evolución: ondas, rayos que giran y anuncio ------------ */
+@keyframes agb-evo-onda {
+  0% { transform: scale(0.4); opacity: 1; }
+  100% { transform: scale(4.4); opacity: 0; }
+}
+.agb-evo-onda {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: agb-evo-onda 1.4s cubic-bezier(0.15, 0.6, 0.4, 1) forwards;
+}
+.agb-evo-onda.agb-eo2 { animation-delay: 0.18s; }
+@keyframes agb-evo-rayos {
+  0% { opacity: 0; transform: rotate(0deg) scale(0.5); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(80deg) scale(1.5); }
+}
+.agb-evo-rayos { animation: agb-evo-rayos 1.9s ease-out forwards; }
+@keyframes agb-evo-texto {
+  0% { opacity: 0; transform: translateY(8px); }
+  18% { opacity: 1; transform: translateY(0); }
+  78% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-6px); }
+}
+.agb-evo-texto { animation: agb-evo-texto 2s ease forwards; }
+
 /* ================================ UI: HUD ================================= */
 .agb-hud {
   position: absolute;
@@ -283,6 +384,9 @@
 
 .agb-titulo { max-width: 200px; }
 .agb-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-family: var(--agb-mono);
   font-size: 9px;
   letter-spacing: 2.4px;
@@ -290,14 +394,28 @@
   opacity: 0.85;
   margin: 0 0 4px;
 }
+/* punto de vida antes del eyebrow: late con el acento del guardián */
+@keyframes agb-latido-dot { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.35); } }
+.agb-eyebrow::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--agb-acc);
+  box-shadow: 0 0 7px var(--agb-acc);
+  animation: agb-latido-dot 2.4s ease-in-out infinite;
+}
 .agb-h1 {
   font-family: var(--agb-display);
   font-weight: 800;
   font-size: 24px;
   line-height: 1.04;
   margin: 0;
-  color: var(--agb-crema);
-  text-shadow: 0 0 18px rgba(45, 255, 196, 0.35);
+  background: linear-gradient(115deg, var(--agb-crema) 40%, var(--agb-acc) 85%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 16px rgba(var(--agb-acc-rgb), 0.35));
 }
 .agb-sub {
   margin: 6px 0 0;
@@ -309,6 +427,10 @@
 
 /* -------- panel del Espíritu (vitalidad + evolución) -------- */
 .agb-panel {
+  position: relative;
+  overflow: hidden;
+  /* deja aire para el botón SALIR que flota arriba a la derecha */
+  margin-top: 30px;
   width: 156px;
   border-radius: 16px;
   border: 1px solid var(--agb-borde);
@@ -317,6 +439,19 @@
   -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 6px 30px rgba(2, 4, 18, 0.6), inset 0 0 24px rgba(45, 255, 196, 0.05);
   padding: 10px 12px 12px;
+}
+/* filo superior con el acento del guardián: el panel es SU lectura de vida */
+.agb-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 12px;
+  right: 12px;
+  height: 1.5px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, transparent, var(--agb-acc), transparent);
+  opacity: 0.8;
+  transition: background 0.5s ease;
 }
 .agb-panel-cab {
   font-family: var(--agb-mono);
@@ -336,7 +471,8 @@
   font-size: 25px;
   line-height: 1;
   color: var(--agb-crema);
-  text-shadow: 0 0 14px rgba(45, 255, 196, 0.6);
+  text-shadow: 0 0 14px rgba(var(--agb-acc-rgb), 0.6);
+  transition: text-shadow 0.5s ease;
 }
 .agb-vital-num small { font-size: 12px; opacity: 0.7; font-weight: 600; }
 .agb-vital-cap {
@@ -347,11 +483,11 @@
   color: var(--agb-tinta);
   margin-top: 3px;
 }
-.agb-ring-track { stroke: rgba(45, 255, 196, 0.14); }
+.agb-ring-track { stroke: rgba(var(--agb-acc-rgb), 0.14); }
 .agb-ring-val {
-  stroke: var(--agb-savia);
-  filter: drop-shadow(0 0 4px rgba(45, 255, 196, 0.8));
-  transition: stroke-dashoffset 1.1s cubic-bezier(0.2, 0.8, 0.3, 1);
+  stroke: var(--agb-acc);
+  filter: drop-shadow(0 0 4px rgba(var(--agb-acc-rgb), 0.8));
+  transition: stroke-dashoffset 1.1s cubic-bezier(0.2, 0.8, 0.3, 1), stroke 0.5s ease;
 }
 
 .agb-ejes { margin: 10px 0 0; display: grid; gap: 6px; }
@@ -519,24 +655,40 @@
 .agb-carta-entrar:hover { transform: translateY(-1px); box-shadow: 0 0 26px rgba(45, 255, 196, 0.4); }
 .agb-carta-entrar:active { transform: translateY(0); }
 
-/* nota flotante (mockup honesto) */
+/* velo de foco: al abrir un mundo el resto de la finca se apaga un poco */
+.agb-velo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(90% 70% at 50% 46%, transparent 30%, rgba(2, 4, 18, 0.55) 100%);
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+.agb-velo.on { opacity: 1; }
+
+/* nota flotante: la voz del organismo (habla con el acento del guardián) */
 .agb-nota {
   position: absolute;
   left: 50%;
   bottom: 190px;
   transform: translateX(-50%);
+  max-width: min(92vw, 480px);
   background: var(--agb-vidrio);
-  border: 1px solid var(--agb-borde);
+  border: 1px solid rgba(var(--agb-acc-rgb), 0.45);
   border-radius: 999px;
   padding: 7px 14px;
   font-family: var(--agb-mono);
   font-size: 9.5px;
   letter-spacing: 0.6px;
-  color: var(--agb-savia);
+  color: var(--agb-acc);
+  box-shadow: 0 0 20px rgba(var(--agb-acc-rgb), 0.18);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   animation: agb-carta 0.35s ease;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ------------------------------- dock inferior --------------------------- */
@@ -561,6 +713,7 @@
   margin-bottom: 7px;
 }
 .agb-dock-cab span:last-child { color: var(--agb-tinta); letter-spacing: 0.6px; }
+.agb-dock-cientifico { font-style: italic; transition: color 0.4s ease; }
 
 .agb-chips {
   display: flex;
@@ -595,11 +748,15 @@
   font-size: 12px;
   background: radial-gradient(circle at 40% 35%, rgba(45, 255, 196, 0.22), rgba(45, 255, 196, 0.02));
 }
+.agb-chip:hover { border-color: rgba(45, 255, 196, 0.45); color: var(--agb-crema); }
 .agb-chip.on {
-  border-color: var(--agb-savia);
+  border-color: var(--agb-acc);
   color: var(--agb-crema);
-  background: linear-gradient(180deg, rgba(45, 255, 196, 0.2), rgba(45, 255, 196, 0.05));
-  box-shadow: 0 0 16px rgba(45, 255, 196, 0.35);
+  background: linear-gradient(180deg, rgba(var(--agb-acc-rgb), 0.22), rgba(var(--agb-acc-rgb), 0.05));
+  box-shadow: 0 0 16px rgba(var(--agb-acc-rgb), 0.35);
+}
+.agb-chip.on .agb-chip-glifo {
+  background: radial-gradient(circle at 40% 35%, rgba(var(--agb-acc-rgb), 0.35), rgba(var(--agb-acc-rgb), 0.04));
 }
 .agb-chip:focus-visible { outline: 2px solid var(--agb-crema); outline-offset: 2px; }
 
@@ -615,17 +772,20 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  border: 1px solid var(--agb-savia);
-  background: radial-gradient(circle at 38% 32%, rgba(45, 255, 196, 0.3), rgba(45, 255, 196, 0.06));
+  border: 1px solid var(--agb-acc);
+  background: radial-gradient(circle at 38% 32%, rgba(var(--agb-acc-rgb), 0.3), rgba(var(--agb-acc-rgb), 0.06));
   color: var(--agb-crema);
   font-size: 13px;
   cursor: pointer;
   display: grid;
   place-items: center;
-  box-shadow: 0 0 14px rgba(45, 255, 196, 0.3);
-  transition: transform 0.15s ease;
+  box-shadow: 0 0 14px rgba(var(--agb-acc-rgb), 0.3);
+  transition: transform 0.15s ease, box-shadow 0.3s ease;
 }
 .agb-play:hover { transform: scale(1.08); }
+/* reproduciendo: el botón respira al ritmo del crecimiento */
+@keyframes agb-play-latido { 0%, 100% { box-shadow: 0 0 10px rgba(var(--agb-acc-rgb), 0.25); } 50% { box-shadow: 0 0 22px rgba(var(--agb-acc-rgb), 0.6); } }
+.agb-play-on { font-size: 10px; animation: agb-play-latido 1.05s ease-in-out infinite; }
 .agb-play:focus-visible { outline: 2px solid var(--agb-crema); outline-offset: 2px; }
 
 .agb-anillos {
@@ -668,16 +828,16 @@
   background:
     radial-gradient(circle at 50% 50%, var(--agb-crema) 0 22%, transparent 24%),
     radial-gradient(circle at 50% 50%, transparent 0 38%, rgba(234, 255, 246, 0.85) 40% 46%, transparent 48%),
-    radial-gradient(circle, var(--agb-savia), #0a9f74);
-  box-shadow: 0 0 14px var(--agb-savia);
+    radial-gradient(circle, var(--agb-acc), #0a9f74);
+  box-shadow: 0 0 14px var(--agb-acc);
 }
 .agb-range::-moz-range-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
   border: 2px solid var(--agb-crema);
-  background: radial-gradient(circle, var(--agb-savia), #0a9f74);
-  box-shadow: 0 0 14px var(--agb-savia);
+  background: radial-gradient(circle, var(--agb-acc), #0a9f74);
+  box-shadow: 0 0 14px var(--agb-acc);
 }
 .agb-range:focus-visible { outline: 2px solid var(--agb-crema); outline-offset: 4px; border-radius: 8px; }
 
@@ -721,8 +881,16 @@
   font-weight: 800;
   font-size: 13px;
   letter-spacing: 0.4px;
-  text-shadow: 0 0 12px rgba(45, 255, 196, 0.5);
+  text-shadow: 0 0 12px rgba(var(--agb-acc-rgb), 0.5);
+  min-width: 34px;
+  text-align: right;
 }
+/* el año hace "tic" al cambiar (se re-monta por key) */
+@keyframes agb-anio-pop {
+  0% { transform: scale(1.35); color: var(--agb-acc); }
+  100% { transform: scale(1); color: var(--agb-crema); }
+}
+.agb-anio-pop { display: inline-block; animation: agb-anio-pop 0.5s cubic-bezier(0.2, 0.8, 0.3, 1); }
 .agb-reloj-cap { transition: color 0.4s ease; }
 .agb-reloj-cap.futuro { color: var(--agb-magenta); text-shadow: 0 0 10px rgba(255, 79, 216, 0.4); }
 
@@ -782,5 +950,12 @@
   .agb-rise { opacity: 1; transform: none; }
   .agb-g { opacity: 0; }
   .agb-g.on { opacity: 1; transform: scale(1); }
-  .agb-spark { display: none; }
+  .agb-spark,
+  .agb-vinculo-spark,
+  .agb-pulso-onda,
+  .agb-evo-onda,
+  .agb-evo-rayos { display: none; }
+  /* la constelación queda dibujada y quieta (sus keyframes van de oculto a
+     visible: sin animación, el estado base ya es el final) */
+  .agb-constel-linea { stroke-dashoffset: 0; }
 }
