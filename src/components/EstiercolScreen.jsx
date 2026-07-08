@@ -562,10 +562,10 @@ function PilarInicio({ onIr }) {
         slug="recoleccion"
         alt="Pila de estiércol en una finca, lista para volverse abono"
         className="rounded-2xl border border-emerald-700/40 min-h-[196px] flex"
-        imgClassName="estiercol-hero-img"
+        imgClassName="estiercol-hero-img object-[68%_62%]"
       >
         <div className="relative z-[1] mt-auto p-4 pb-5 w-full">
-          <p className="text-2xs font-black uppercase tracking-[0.14em] text-emerald-300">
+          <p className="text-2xs font-black uppercase tracking-[0.14em] text-emerald-300 [text-shadow:0_1px_6px_rgba(0,0,0,0.85)]">
             Ciclo vivo · Estiércoles y abonos
           </p>
           <p className="mt-1 text-2xl font-black text-white leading-tight [text-shadow:0_1px_8px_rgba(0,0,0,0.6)]">
