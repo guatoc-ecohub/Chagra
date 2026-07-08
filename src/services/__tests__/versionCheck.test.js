@@ -8,19 +8,26 @@
  *  2. shouldSelfHeal: solo true cuando online + no recargado + SHAs difieren +
  *     runningSha real (no 'dev'). Offline / ya-recargado / sin deployedSha /
  *     dev → false (offline-first + anti-loop).
- *  3. fetchDeployedSha: parsea {sha}/{commit}/{build}; null en !ok / no-JSON /
+ *  3. isBundleFetchFailure: detecta fallos de chunks/bundles lazy sin confundir
+ *     fetches de API.
+ *  4. fetchDeployedSha: parsea {sha}/{commit}/{build}; null en !ok / no-JSON /
  *     fetch lanzando (offline). Pide cache:'no-store'.
- *  4. runSelfHealCheck: primera detección avisa + marca pending; el siguiente
- *     arranque con el mismo SHA pendiente recarga UNA vez.
+ *  5. runSelfHealCheck: mismatch de versión desregistra el SW + recarga UNA
+ *     vez, con guard de sesión.
+ *  6. installBundleRecoveryGuards: un unhandledrejection de bundle/chunk
+ *     dispara el mismo recovery y no entra en loop.
  */
 import { describe, it, expect, vi } from 'vitest';
 import {
   shasMatch,
   shouldSelfHeal,
+  isBundleFetchFailure,
   fetchDeployedSha,
   runSelfHealCheck,
+  installBundleRecoveryGuards,
   VERSION_ENDPOINT,
-  PENDING_UPDATE_SHA_KEY,
+  SELF_HEAL_GUARD_KEY,
+  hasSelfHealReloaded,
 } from '../versionCheck';
 
 describe('shasMatch', () => {
@@ -69,6 +76,22 @@ describe('shouldSelfHeal', () => {
   });
 });
 
+describe('isBundleFetchFailure', () => {
+  it('detecta failed fetch de chunk o module lazy', () => {
+    expect(
+      isBundleFetchFailure(new TypeError('Failed to fetch dynamically imported module: https://x/assets/App-abc.js')),
+    ).toBe(true);
+    expect(
+      isBundleFetchFailure('Loading chunk DashboardLive failed.'),
+    ).toBe(true);
+  });
+
+  it('no confunde fetch de API o errores genéricos', () => {
+    expect(isBundleFetchFailure(new Error('NetworkError when attempting to fetch resource'))).toBe(false);
+    expect(isBundleFetchFailure('Error al consultar FarmOS')).toBe(false);
+  });
+});
+
 describe('fetchDeployedSha', () => {
   const okResponse = (body) => ({ ok: true, json: async () => body });
 
@@ -108,11 +131,8 @@ describe('fetchDeployedSha', () => {
 describe('runSelfHealCheck', () => {
   function makeDeps(overrides = {}) {
     const reload = vi.fn();
-    const skipWaiting = vi.fn(async () => {});
+    const unregisterServiceWorker = vi.fn(async () => true);
     const markReloaded = vi.fn();
-    const writePending = vi.fn();
-    const clearPending = vi.fn();
-    const notifyUpdateAvailable = vi.fn();
     return {
       deps: {
         runningSha: 'a1b2c3d',
@@ -120,94 +140,99 @@ describe('runSelfHealCheck', () => {
         isOnline: () => true,
         alreadyReloaded: () => false,
         markReloaded,
-        readPending: () => null,
-        writePending,
-        clearPending,
-        notifyUpdateAvailable,
-        skipWaiting,
+        unregisterServiceWorker,
         reload,
         ...overrides,
       },
       reload,
-      skipWaiting,
+      unregisterServiceWorker,
       markReloaded,
-      writePending,
-      clearPending,
-      notifyUpdateAvailable,
     };
   }
 
-  it('primer mismatch → muestra banner, marca pending y manda skipWaiting sin recarga directa', async () => {
-    const { deps, reload, skipWaiting, markReloaded, writePending, notifyUpdateAvailable } = makeDeps();
-    const res = await runSelfHealCheck(deps);
-    expect(res.healed).toBe(false);
-    expect(res.reason).toBe('update-pending');
-    expect(writePending).toHaveBeenCalledWith('f9e8d7c');
-    expect(notifyUpdateAvailable).toHaveBeenCalledWith('f9e8d7c');
-    expect(skipWaiting).toHaveBeenCalledTimes(1);
-    expect(markReloaded).not.toHaveBeenCalled();
-    expect(reload).not.toHaveBeenCalled();
-  });
-
-  it('mismatch ya pendiente de un arranque anterior → recarga UNA vez', async () => {
-    const { deps, reload, skipWaiting, markReloaded } = makeDeps({
-      readPending: () => 'f9e8d7c',
-    });
+  it('mismatch de versión → desregistra el SW y recarga una sola vez', async () => {
+    const { deps, reload, unregisterServiceWorker, markReloaded } = makeDeps();
     const res = await runSelfHealCheck(deps);
     expect(res.healed).toBe(true);
     expect(res.reason).toBe('sha-mismatch');
-    expect(skipWaiting).toHaveBeenCalledTimes(1);
     expect(markReloaded).toHaveBeenCalledTimes(1);
+    expect(unregisterServiceWorker).toHaveBeenCalledTimes(1);
     expect(reload).toHaveBeenCalledTimes(1);
   });
 
   it('SHAs en sync → no-op (no recarga)', async () => {
-    const { deps, reload, clearPending } = makeDeps({ getDeployedSha: async () => 'a1b2c3d' });
+    const { deps, reload, unregisterServiceWorker, markReloaded } = makeDeps({ getDeployedSha: async () => 'a1b2c3d' });
     const res = await runSelfHealCheck(deps);
     expect(res.healed).toBe(false);
-    expect(clearPending).toHaveBeenCalledTimes(1);
+    expect(markReloaded).not.toHaveBeenCalled();
+    expect(unregisterServiceWorker).not.toHaveBeenCalled();
     expect(reload).not.toHaveBeenCalled();
   });
 
   it('offline → no-op (offline-first)', async () => {
-    const { deps, reload, skipWaiting } = makeDeps({ isOnline: () => false });
+    const { deps, reload, unregisterServiceWorker } = makeDeps({ isOnline: () => false });
     const res = await runSelfHealCheck(deps);
     expect(res.healed).toBe(false);
     expect(res.reason).toBe('offline');
     expect(reload).not.toHaveBeenCalled();
-    expect(skipWaiting).not.toHaveBeenCalled();
+    expect(unregisterServiceWorker).not.toHaveBeenCalled();
   });
 
   it('ya recargado → no-op (anti-loop)', async () => {
-    const { deps, reload } = makeDeps({ alreadyReloaded: () => true });
+    const { deps, reload, unregisterServiceWorker } = makeDeps({ alreadyReloaded: () => true });
     const res = await runSelfHealCheck(deps);
     expect(res.healed).toBe(false);
     expect(res.reason).toBe('already-reloaded');
     expect(reload).not.toHaveBeenCalled();
+    expect(unregisterServiceWorker).not.toHaveBeenCalled();
   });
 
   it('/version.json no disponible → no-op (no rompe boot)', async () => {
-    const { deps, reload } = makeDeps({ getDeployedSha: async () => null });
+    const { deps, reload, unregisterServiceWorker } = makeDeps({ getDeployedSha: async () => null });
     const res = await runSelfHealCheck(deps);
     expect(res.healed).toBe(false);
     expect(reload).not.toHaveBeenCalled();
+    expect(unregisterServiceWorker).not.toHaveBeenCalled();
   });
 
-  it('skipWaiting lanza en primera detección → queda pending y no bloquea el boot', async () => {
-    const { deps, reload } = makeDeps({ skipWaiting: async () => { throw new Error('no SW'); } });
-    const res = await runSelfHealCheck(deps);
-    expect(res.healed).toBe(false);
-    expect(res.reason).toBe('update-pending');
-    expect(reload).not.toHaveBeenCalled();
+  it('marca la sesión al recuperar, para no reentrar en loop', async () => {
+    sessionStorage.removeItem(SELF_HEAL_GUARD_KEY);
+    const { deps } = makeDeps({ markReloaded: undefined });
+    await runSelfHealCheck(deps);
+    expect(hasSelfHealReloaded()).toBe(true);
   });
+});
 
-  it('helpers de pending usan localStorage', async () => {
-    localStorage.clear();
-    const { writePendingUpdateSha, readPendingUpdateSha, clearPendingUpdateSha } = await import('../versionCheck');
-    writePendingUpdateSha('abc1234');
-    expect(localStorage.getItem(PENDING_UPDATE_SHA_KEY)).toBe('abc1234');
-    expect(readPendingUpdateSha()).toBe('abc1234');
-    clearPendingUpdateSha();
-    expect(readPendingUpdateSha()).toBeNull();
+describe('installBundleRecoveryGuards', () => {
+  it('un unhandledrejection de chunk dispara unregister + reload una sola vez', async () => {
+    sessionStorage.removeItem(SELF_HEAL_GUARD_KEY);
+    const unregisterServiceWorker = vi.fn(async () => true);
+    const reload = vi.fn();
+    const cleanup = installBundleRecoveryGuards({
+      unregisterServiceWorker,
+      reload,
+    });
+
+    const makeEvt = () => {
+      const evt = new Event('unhandledrejection');
+      Object.defineProperty(evt, 'reason', {
+        configurable: true,
+        value: new TypeError('Failed to fetch dynamically imported module: https://example.com/assets/App-123.js'),
+      });
+      return evt;
+    };
+
+    window.dispatchEvent(makeEvt());
+    await Promise.resolve();
+
+    expect(unregisterServiceWorker).toHaveBeenCalledTimes(1);
+    expect(reload).toHaveBeenCalledTimes(1);
+
+    window.dispatchEvent(makeEvt());
+    await Promise.resolve();
+
+    expect(unregisterServiceWorker).toHaveBeenCalledTimes(1);
+    expect(reload).toHaveBeenCalledTimes(1);
+    cleanup();
   });
 });
