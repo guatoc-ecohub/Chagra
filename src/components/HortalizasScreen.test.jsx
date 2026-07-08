@@ -108,6 +108,26 @@ describe('hortalizasData — invariantes de grounding', () => {
     }
   });
 
+  it('cada hortaliza declara familia botánica y tipo de siembra (rotación de eras)', () => {
+    const familias = new Set();
+    for (const h of HORTALIZAS) {
+      expect(h.familia).toBeTruthy();
+      expect(h.siembraTipo).toBeTruthy();
+      familias.add(h.familia);
+    }
+    // La rotación necesita al menos dos familias distintas para relevar la era.
+    expect(familias.size).toBeGreaterThanOrEqual(2);
+  });
+
+  it('la ficha muestra la rotación por familia (2ª pasada)', () => {
+    render(<HortalizasScreen onBack={vi.fn()} onNavigate={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('hortaliza-tomate'));
+    expect(screen.getByText(/Rotación/i)).toBeInTheDocument();
+    // El consejo de rotación nombra la familia y pide relevar la era.
+    expect(screen.getByText(/familia de las solanáceas/i)).toBeInTheDocument();
+    expect(screen.getByText(/otra familia/i)).toBeInTheDocument();
+  });
+
   it('tieneDato distingue vacío de con-dato', () => {
     expect(tieneDato(getHortaliza('tomate').vecinasBuenas)).toBe(true);
     expect(tieneDato(getHortaliza('cilantro').plagas)).toBe(false);

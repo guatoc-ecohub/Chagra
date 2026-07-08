@@ -117,6 +117,7 @@ const GerminacionScreen = lazy(() => import('./components/GerminacionScreen'));
 const CicloNutrientesScreen = lazy(() => import('./components/CicloNutrientesScreen'));
 const CalendarioFincaScreen = lazy(() => import('./components/CalendarioFincaScreen'));
 const AlmanaqueScreen = lazy(() => import('./components/almanaque/AlmanaqueScreen'));
+const AnoFincaScreen = lazy(() => import('./components/anofinca/AnoFincaScreen'));
 const SeguimientoProcesoScreen = lazy(() => import('./components/SeguimientoProcesoScreen'));
 const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
 // Módulo "Agua de la finca": cosecha de lluvia (calculadora determinista),
@@ -326,6 +327,7 @@ const VIEW_LOADING_LABELS = {
   calendario: 'Abriendo el calendario…',
   calendario_finca: 'Abriendo el calendario…',
   almanaque: 'Abriendo el almanaque…',
+  ano_finca: 'Recorriendo su año…',
   mapa: 'Abriendo el mapa…',
   mercado: 'Abriendo el mercado…',
   mercados: 'Abriendo el mercado…',
@@ -405,6 +407,8 @@ const HASH_VIEW_ROUTES = {
   'calendario-finca': 'calendario_finca',
   almanaque: 'almanaque',
   'almanaque-campesino': 'almanaque',
+  'ano-finca': 'ano_finca',
+  'ano-de-la-finca': 'ano_finca',
   animales: 'animales',
   'animales-gallinas': 'animales_gallinas',
   'animales-abejas': 'animales_abejas',
@@ -1683,6 +1687,25 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Calendario de Finca">
               <CalendarioFincaScreen
+                onBack={() => navigate('dashboard')}
+                onHome={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'ano_finca':
+        // Módulo EL AÑO DE LA FINCA: la línea de tiempo del año del usuario —
+        // qué sembró, cosechó, trabajó y floreció (registros reales: ciclos,
+        // log--harvest, eventos) y lo que viene (calendario groundeado por su
+        // altitud). Complementa al calendario_finca (agenda por planta/capa) y
+        // al almanaque (el año a lo grande): esta es la vista TEMPORAL de SU
+        // finca. cosechaService es SOLO LECTURA aquí ("Mi cosecha" es dueña
+        // del tablero de cantidades).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El año de la finca">
+              <AnoFincaScreen
                 onBack={() => navigate('dashboard')}
                 onHome={() => navigate('dashboard')}
                 onNavigate={navigate}

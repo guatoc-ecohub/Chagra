@@ -19,6 +19,10 @@ const C = {
   agua: '#3f9fd4',
   trazo: '#2c1c0f',
   cielo: '#cfe8d6',
+  /* 2ª pasada: rótulos/flechas del emblema del ciclo. Vive SIEMPRE sobre la
+     card oscura del inicio (esta pantalla usa cards slate fijas en los 4
+     temas), así que el rótulo va claro — el trazo oscuro se perdía. */
+  crema: '#f1e9da',
 };
 
 /**
@@ -166,8 +170,8 @@ export function CicloCorralAbono({ animated = true, className = '' }) {
     <circle cx={x} cy={y} r="30" fill={fill} opacity="0.16" stroke={fill} strokeWidth="2" />
   );
   const flecha = (d) => (
-    <path d={d} fill="none" stroke={C.trazo} strokeWidth="2.4" strokeLinecap="round"
-      opacity="0.75" className={animated ? 'estiercol-flujo' : undefined} />
+    <path d={d} fill="none" stroke={C.crema} strokeWidth="2.4" strokeLinecap="round"
+      opacity="0.7" className={animated ? 'estiercol-flujo' : undefined} />
   );
   return (
     <svg
@@ -180,19 +184,19 @@ export function CicloCorralAbono({ animated = true, className = '' }) {
       {/* Nodos */}
       {nodo(150, 52, C.tierra)}
       <text x="150" y="49" textAnchor="middle" fontSize="26">🐖</text>
-      <text x="150" y="92" textAnchor="middle" fontSize="12" fontWeight="800" fill={C.trazo}>Corral</text>
+      <text x="150" y="92" textAnchor="middle" fontSize="12" fontWeight="800" fill={C.crema}>Corral</text>
 
       {nodo(248, 150, C.gas)}
       <text x="248" y="147" textAnchor="middle" fontSize="24">🛢️</text>
-      <text x="248" y="190" textAnchor="middle" fontSize="12" fontWeight="800" fill={C.trazo}>Procesa</text>
+      <text x="248" y="190" textAnchor="middle" fontSize="12" fontWeight="800" fill={C.crema}>Procesa</text>
 
       {nodo(150, 248, C.biol)}
       <text x="150" y="245" textAnchor="middle" fontSize="24">💧</text>
-      <text x="150" y="220" textAnchor="middle" fontSize="12" fontWeight="800" fill={C.trazo}>Biol y biogás</text>
+      <text x="150" y="220" textAnchor="middle" fontSize="12" fontWeight="800" fill={C.crema}>Biol y biogás</text>
 
       {nodo(52, 150, C.biolClaro)}
       <text x="52" y="147" textAnchor="middle" fontSize="24">🌱</text>
-      <text x="52" y="190" textAnchor="middle" fontSize="12" fontWeight="800" fill={C.trazo}>Suelo</text>
+      <text x="52" y="190" textAnchor="middle" fontSize="12" fontWeight="800" fill={C.crema}>Suelo</text>
 
       {/* Flechas del ciclo (sentido horario) */}
       {flecha('M182 66 Q222 84 236 122')}
