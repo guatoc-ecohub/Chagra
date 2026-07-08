@@ -53,8 +53,12 @@ export const MUNDOS_FINCA = [
             { view: 'directorio', label: 'Qué puedo sembrar', desc: 'Especies para su clima, con qué se llevan y sus plagas', emoji: '🌱' },
             { view: 'platano', label: 'Plátano y banano', desc: 'El pancoger de la casa: variedades, siembra, la mata madre-hijo-nieto, sigatoka y picudo, y aprovechar el pseudotallo', emoji: '🍌' },
             { view: 'cacao', label: 'El cacao', desc: 'Cultivo bandera de la paz: clones, sombra, monilia y escoba, y el beneficio que hace el precio', emoji: '🍫' },
+            { view: 'frutales', label: 'Frutales de la finca', desc: 'Cítricos, aguacate, mango, guayaba, mora, lulo, tomate de árbol y papaya: cómo se propagan e injertan, siembra y distancias, piso térmico, plagas sin veneno, poda y cosecha', emoji: '🍊' },
             { view: 'hortalizas', label: 'Hortalizas de la huerta', desc: 'La comida diaria de la casa: siembra, agua, vecinas, plagas y cosecha de tomate, cebolla, zanahoria y más', emoji: '🥕' },
+            { view: 'tuberculos', label: 'Tubérculos y raíces', desc: 'El pancoger de raíz: papa y criolla, yuca, arracacha, ñame, batata, oca, cubio y ulluco — siembra, aporque, plagas y curado', emoji: '🥔' },
+            { view: 'quinua', label: 'Quinua y granos andinos', desc: 'Granos ancestrales del frío alto-andino: quinua, amaranto, cañihua, chía y tarwi; siembra, el desaponificado (lavar el amargo), mildiú sin veneno, cosecha y su valor nutricional (proteína completa, sin gluten)', emoji: '🌾' },
             { view: 'calendario_finca', label: 'Calendario de la finca', desc: 'Cuándo sembrar, abonar y cosechar, todo junto', emoji: '🗓️' },
+            { view: 'almanaque', label: 'Almanaque campesino', desc: 'El año a lo grande: aguas y secas, qué da su piso térmico y el saber lunar', emoji: '🌙' },
             { view: 'activos', label: 'Mis matas', desc: 'Las plantas que tiene sembradas y cómo van', emoji: '🪴' },
             { view: 'mapa', label: 'Zonas de la finca', desc: 'Sus lotes, eras y potreros en el mapa', emoji: '🗺️' },
             { view: 'semilla', label: 'Semilla propia', desc: 'Seleccione, guarde y pruebe su semilla criolla', emoji: '🌾' },
@@ -74,6 +78,17 @@ export const MUNDOS_FINCA = [
         // Mundo de una sola pantalla (photo-forward, 5 estaciones del ciclo
         // cafetero). La tarjeta navega directo, sin pantalla intermedia.
         directo: { view: 'cafe' },
+    },
+    {
+        id: 'cana',
+        titulo: 'La caña y la panela',
+        emoji: '🥮',
+        lema: 'De la caña al bloque: variedad, siembra, barrenador, corte y la panela en el trapiche',
+        tinte: ['#8a5a1f', '#f3e3c2'],
+        // Mundo de una sola pantalla (photo-forward, 5 estaciones: la caña /
+        // siembra y manejo / plagas / corte / la panela). Cultura panelera
+        // colombiana. La tarjeta navega directo, sin pantalla intermedia.
+        directo: { view: 'cana' },
     },
     {
         id: 'suelo',
