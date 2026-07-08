@@ -60,6 +60,7 @@ export const MUNDOS_FINCA = [
             { view: 'fique', label: 'El fique y las fibras', desc: 'El cultivo de ladera que cuida el suelo: la cabuya, cómo se cría, el desfibrado de la penca, empaques y artesanía, y aprovechar el bagazo y el jugo sin contaminar el agua', emoji: '🪢' },
             { view: 'calendario_finca', label: 'Calendario de la finca', desc: 'Cuándo sembrar, abonar y cosechar, todo junto', emoji: '🗓️' },
             { view: 'almanaque', label: 'Almanaque campesino', desc: 'El año a lo grande: aguas y secas, qué da su piso térmico y el saber lunar', emoji: '🌙' },
+            { view: 'ano_finca', label: 'El año de la finca', desc: 'La línea de tiempo de SU año: qué sembró, cosechó y trabajó, y lo que viene en camino', emoji: '🛤️' },
             { view: 'activos', label: 'Mis matas', desc: 'Las plantas que tiene sembradas y cómo van', emoji: '🪴' },
             { view: 'mapa', label: 'Zonas de la finca', desc: 'Sus lotes, eras y potreros en el mapa', emoji: '🗺️' },
             { view: 'semilla', label: 'Semilla propia', desc: 'Seleccione, guarde y pruebe su semilla criolla', emoji: '🌾' },
