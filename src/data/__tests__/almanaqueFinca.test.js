@@ -80,7 +80,7 @@ describe('almanaqueFinca — grounding y honestidad', () => {
     for (const cr of CREDITOS_FOTOS_ALMANAQUE) {
       expect(cr.autor).toBeTruthy();
       expect(cr.licencia).toMatch(/CC/);
-      expect(cr.fuenteUrl).toMatch(/commons\.wikimedia\.org/);
+      expect(cr.fuenteUrl).toMatch(/^https:\/\/commons\.wikimedia\.org\//);
     }
   });
 });

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Wheat, Sprout, Bug, Leaf, Droplets, Recycle, ChevronRight, Camera,
+  Wheat, Sprout, Bug, Leaf, Recycle, ChevronRight, Camera,
   ExternalLink, TriangleAlert, ShieldCheck, Mountain, Scissors, FlaskConical,
   Info, Hourglass, Factory, Flame, CookingPot, Candy,
 } from 'lucide-react';

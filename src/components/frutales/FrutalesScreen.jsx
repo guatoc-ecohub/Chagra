@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Citrus, Apple, Sprout, Scissors, Bug, Leaf, Droplets, Sun, Mountain,
+  Citrus, Apple, Sprout, Scissors, Bug, Leaf, Sun, Mountain,
   Ruler, ChevronRight, Camera, ExternalLink, TriangleAlert, ShieldCheck,
   FlaskConical, CalendarDays, Info, Hourglass, Trees,
 } from 'lucide-react';
