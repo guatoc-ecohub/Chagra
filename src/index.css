@@ -585,6 +585,64 @@
   .ss-sun { animation: none; }
 }
 
+/* ── Salud del Suelo · 2ª pasada visual ──────────────────────────────────────
+ * Utilidades de microinteracción del Cuaderno del Suelo. Solo transform y
+ * opacity (GPU-friendly, sin filter/blur animado); todo se apaga con
+ * prefers-reduced-motion. */
+
+/* Entrada de cada pilar al navegar (el wrapper lleva key={pilar}). */
+.ss-enter { animation: ss-enter-in 0.35s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+@keyframes ss-enter-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Aparición escalonada de tarjetas (delay por --d inline). */
+.ss-rise { animation: ss-rise-in 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) var(--d, 0s) both; }
+@keyframes ss-rise-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Superficie táctil viva: leve lift en hover, asiento en active y foco
+ * accesible visible con el acento del tema. */
+.ss-tap { transition: transform 0.18s ease, border-color 0.18s ease; }
+@media (hover: hover) {
+  .ss-tap:hover { transform: translateY(-2px); }
+}
+.ss-tap:active { transform: translateY(0) scale(0.99); }
+.ss-tap:focus-visible,
+.ss-focus:focus-visible {
+  outline: 2px solid rgb(var(--t-accent-rgb));
+  outline-offset: 2px;
+}
+/* El chevrón de una superficie ss-tap se asoma hacia la acción. */
+.ss-chev { transition: transform 0.2s ease; }
+@media (hover: hover) {
+  .ss-tap:hover .ss-chev { transform: translateX(3px); }
+}
+
+/* Fotos de tarjeta: zoom lentísimo al pasar el mouse (solo dispositivos
+ * con hover; en táctil no hace nada). */
+.ss-photo { transition: transform 0.7s cubic-bezier(0.2, 0.6, 0.2, 1); }
+@media (hover: hover) {
+  .ss-card:hover .ss-photo { transform: scale(1.05); }
+}
+
+/* Entradas del cuaderno: foco con el acento del tema en vez del gris. */
+.ss-input:focus {
+  outline: none;
+  border-color: rgb(var(--t-accent-rgb) / 0.7);
+  box-shadow: 0 0 0 3px rgb(var(--t-accent-rgb) / 0.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ss-enter, .ss-rise { animation: none; opacity: 1; transform: none; }
+  .ss-tap, .ss-chev, .ss-photo { transition: none; }
+  .ss-tap:hover, .ss-tap:active { transform: none; }
+  .ss-card:hover .ss-photo { transform: none; }
+}
+
 /* ===========================================================================
  * VIDA DEL SUELO — micro-animaciones del 4º pilar "La vida del suelo"
  * (SaludSueloScreen → PilarVida). El anillo del ciclo gira muy lento y la
