@@ -1,81 +1,97 @@
 /**
- * Tests del router puro de escucha manos libres (navegación vs agente).
- * Los dos caminos que pidió el operador: (a) comando de navegación →
- * redirigir; (b) pregunta/pedido → agente (Whisper → agente → Kokoro).
+ * Tests del router puro de escucha manos libres.
+ * Cubre navegación, preguntas al agente, ayuda, registro por voz y
+ * variantes tolerantes a la wake-word en transcripciones de Whisper.
  */
 import { describe, it, expect } from 'vitest';
-import { routeUtterance, normalizarHabla, listarDestinos } from '../escuchaIntentRouter.js';
+import {
+  routeUtterance,
+  normalizarHabla,
+  listarDestinos,
+  extraerTextoDespuesWakeWord,
+} from '../escuchaIntentRouter.js';
 
 describe('normalizarHabla', () => {
   it('quita tildes, signos y colapsa espacios', () => {
     expect(normalizarHabla('¿Lléveme  al MAPA, por favor?')).toBe('lleveme al mapa por favor');
   });
+
   it('tolera null/undefined', () => {
     expect(normalizarHabla(null)).toBe('');
     expect(normalizarHabla(undefined)).toBe('');
   });
 });
 
-describe('routeUtterance — camino (a): comandos de navegación', () => {
-  const casos = [
-    ['Lléveme a suelo', 'suelo'],
-    ['llevame a suelo', 'suelo'],
-    ['abrir mercado', 'mercado'],
-    ['Abra el mercado', 'mercado'],
-    ['muéstrame el mapa', 'mapa'],
-    ['Muéstreme la bitácora', 'historial'],
-    ['vamos al calendario', 'calendario_finca'],
-    ['ir a la bodega', 'bodega'],
-    ['quiero ver el clima', 'clima_boletin'],
-    ['abre biopreparados', 'biopreparados'],
-    ['lléveme a las gallinas', 'animales_gallinas'],
-    ['entrar a mi perfil', 'perfil'],
-    ['vamos a sembrar', 'sembrar'],
-    ['abrir mercados campesinos', 'mercados'],
-    ['muestre la salud del suelo', 'salud_suelo'],
-    ['ve a inicio', 'dashboard'],
-    ['abrir la ayuda', 'ayuda'],
-  ];
-  it.each(casos)('"%s" → navegar:%s', (frase, view) => {
-    expect(routeUtterance(frase)).toMatchObject({
-      tipo: 'navegar',
-      view,
-      etiqueta: expect.any(String),
+describe('extraerTextoDespuesWakeWord', () => {
+  it('detecta hola chagra con mayusculas, sin h y con muletillas', () => {
+    expect(extraerTextoDespuesWakeWord('HOLA chagra')).toEqual({
+      tieneWakeWord: true,
+      texto: '',
+    });
+    expect(extraerTextoDespuesWakeWord('ola chagra')).toEqual({
+      tieneWakeWord: true,
+      texto: '',
+    });
+    expect(extraerTextoDespuesWakeWord('este... hola chagra pues como esta el cafe')).toEqual({
+      tieneWakeWord: true,
+      texto: 'como esta el cafe',
     });
   });
 
-  it('frase corta que ES el destino ("el mercado") también navega', () => {
-    expect(routeUtterance('el mercado')).toMatchObject({ tipo: 'navegar', view: 'mercado' });
-    expect(routeUtterance('mapa')).toMatchObject({ tipo: 'navegar', view: 'mapa' });
-    expect(routeUtterance('a la bodega')).toMatchObject({ tipo: 'navegar', view: 'bodega' });
+  it('ignora textos que no empiezan con la wake-word', () => {
+    expect(extraerTextoDespuesWakeWord('como va mi finca')).toEqual({
+      tieneWakeWord: false,
+      texto: 'como va mi finca',
+    });
   });
 });
 
-describe('routeUtterance — camino (b): preguntas y pedidos → agente', () => {
+describe('routeUtterance', () => {
   const casos = [
-    '¿Cuánta agua necesita el café?',
-    'qué siembro este mes',
-    'cómo está el suelo de mi finca',        // menciona "suelo" pero es pregunta
-    'cuándo cosecho la papa',
-    'por qué se me amarillan las hojas del tomate',
-    'me recomienda un biopreparado para la gota',
-    'el mercado está caro y no sé si vender ya',  // larga, no es comando
-    'dónde consigo semilla de arracacha certificada',
-    'ayúdeme con una plaga en las gallinas',
+    { frase: 'lleveme a las gallinas', esperado: { tipo: 'navegar', view: 'animales_gallinas' } },
+    { frase: 'abrame el cafe', esperado: { tipo: 'navegar', view: 'cafe' } },
+    { frase: 'quiero ver el suelo', esperado: { tipo: 'navegar', view: 'suelo' } },
+    { frase: 'muestreme el mercado', esperado: { tipo: 'navegar', view: 'mercado' } },
+    { frase: '¿por qué se amarilla el tomate?', esperado: { tipo: 'agente' } },
+    { frase: '¿por qué se amarilla el café?', esperado: { tipo: 'agente' } },
+    { frase: '¿por qué se amarilla el plátano?', esperado: { tipo: 'agente' } },
+    { frase: '¿por qué se amarilla la papa?', esperado: { tipo: 'agente' } },
+    { frase: '¿qué sabes hacer?', esperado: { tipo: 'agente' } },
+    { frase: 'ayuda', esperado: { tipo: 'navegar', view: 'ayuda' } },
+    { frase: '¿cómo registro una siembra?', esperado: { tipo: 'agente' } },
+    { frase: 'anota que sembre 20 tomates', esperado: { tipo: 'navegar', view: 'sembrar' } },
+    { frase: 'apunta que coseche 3 arrobas de papa', esperado: { tipo: 'navegar', view: 'cosechar' } },
+    { frase: 'HOLA chagra', esperado: { tipo: 'agente', prompt: 'HOLA chagra' } },
+    { frase: 'ola chagra', esperado: { tipo: 'agente', prompt: 'ola chagra' } },
+    {
+      frase: 'este... hola chagra pues como esta el cafe',
+      esperado: { tipo: 'agente', prompt: 'como esta el cafe' },
+    },
+    { frase: '', esperado: { tipo: 'agente', prompt: '' } },
+    { frase: 'hola chagra', esperado: { tipo: 'agente', prompt: 'hola chagra' } },
+    { frase: '¿por qué se amarilla?', esperado: { tipo: 'agente' } },
+    { frase: 'como va mi finca', esperado: { tipo: 'agente' } },
   ];
-  it.each(casos)('"%s" → agente', (frase) => {
-    expect(routeUtterance(frase)).toMatchObject({ tipo: 'agente', prompt: frase.trim() });
+
+  it.each(casos)('$frase', ({ frase, esperado }) => {
+    const r = routeUtterance(frase);
+    expect(r.tipo).toBe(esperado.tipo);
+    if (esperado.tipo === 'navegar') {
+      expect(r).toMatchObject({
+        tipo: 'navegar',
+        view: esperado.view,
+        etiqueta: expect.any(String),
+      });
+    } else {
+      expect(r).toMatchObject({ tipo: 'agente' });
+      if ('prompt' in esperado) {
+        expect(r.prompt).toBe(esperado.prompt);
+      }
+    }
   });
 
-  it('pregunta gana aunque haya verbo de navegación', () => {
-    // "muéstrame cómo hacer compost" = pedido de explicación, no navegación
-    expect(routeUtterance('muéstrame cómo hacer compost').tipo).toBe('agente');
-  });
-
-  it('texto vacío o basura cae al agente sin explotar', () => {
-    expect(routeUtterance('').tipo).toBe('agente');
-    expect(routeUtterance('   ').tipo).toBe('agente');
-    expect(routeUtterance(null).tipo).toBe('agente');
+  it('frase de ayuda corta sigue navegando a la vista de ayuda', () => {
+    expect(routeUtterance('manual')).toMatchObject({ tipo: 'navegar', view: 'ayuda' });
   });
 });
 

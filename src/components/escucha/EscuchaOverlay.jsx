@@ -25,12 +25,14 @@
  *
  * IMPORTANTE — español colombiano (tú/usted), NUNCA voseo argentino.
  */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- copy de UI pendiente de migrar a messages.js */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { X, Mic, Keyboard, CornerUpRight, AlertTriangle } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { transcribe, queueForRetry } from '../../services/voiceService';
 import { routeUtterance } from '../../services/escuchaIntentRouter';
 import { onEscucha } from '../../services/escuchaService';
+import { mensajeErrorMicrofono } from './escuchaOverlayUtils';
 import ManoChagraGlyph from '../dashboard/ManoChagraGlyph';
 import './escucha.css';
 
@@ -172,11 +174,7 @@ export default function EscuchaOverlay() {
     try {
       await start();
     } catch (err) {
-      setMensajeError(
-        err?.message?.includes('MediaDevices') || err?.message?.includes('Permission')
-          ? 'No pude usar el micrófono. Revise el permiso del navegador.'
-          : (err?.message || 'No pude empezar a escuchar.'),
-      );
+      setMensajeError(mensajeErrorMicrofono(err));
       setFase(FASE_ERROR);
     }
   }, [start, fase]);
