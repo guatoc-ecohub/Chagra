@@ -1,6 +1,8 @@
 /* ==========================================================================
-   AvatarGameVerdeVivo — mockup "El Espíritu de tu Finca", tema VERDE VIVO.
+   AvatarGameVerdeVivo — mockup "El Espíritu de tu Finca", tema VERDE VIVO v3.
    Prefijo avv-. Luz de día, verdes vibrantes, campo andino rebosante de vida.
+   v3: escena en capas con profundidad real — parallax por puntero, tilt 3D
+   sutil del lienzo, bruma atmosférica al fondo y primer plano desenfocado.
    ========================================================================== */
 
 .avv-root {
@@ -19,16 +21,126 @@
   overflow: hidden;
   font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
   color: var(--avv-ink);
-  background: linear-gradient(#8fd4c0, #f2f8d9);
+  /* Fondo de respaldo: replica las bandas de la escena (cielo → pastos →
+     tierra) para que los costados en pantallas anchas sigan siendo campo. */
+  background:
+    radial-gradient(46% 26% at 6% 62%, rgba(87, 164, 83, 0.5), transparent 72%),
+    radial-gradient(46% 26% at 94% 62%, rgba(87, 164, 83, 0.45), transparent 72%),
+    linear-gradient(#8fd4c0, #c5e9cd 42%, #f2f8d9 56%, #8fd05a 62%, #57a453 67%, #54371f 70%, #33210f 100%);
+  perspective: 1200px;
 }
 
-.avv-escena {
+/* ============================== LIENZO PROFUNDO ============================== */
+
+/* Columna de proporción fija anclada abajo: todas las capas comparten el
+   mismo viewBox y quedan alineadas pixel a pixel. En celular sobresale por
+   los lados (recorte natural); en pantallas anchas el fondo de .avv-root
+   completa el paisaje. El tilt 3D responde al puntero. */
+.avv-lienzo {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  height: 100%;
+  aspect-ratio: 800 / 1160;
+  transform: translateX(-50%) rotateX(var(--avv-rx, 0deg)) rotateY(var(--avv-ry, 0deg));
+  will-change: transform;
+}
+
+/* Cada capa se traslada según su factor de profundidad --f (0 = infinito,
+   1.3 = pegada al vidrio) y se escala un pelo más cuanto más cerca está,
+   lo que además evita bordes pelados al moverse. */
+.avv-capa {
   position: absolute;
   inset: 0;
+  pointer-events: none;
+  transform:
+    translate3d(calc(var(--avv-px, 0px) * var(--f, 0)), calc(var(--avv-py, 0px) * var(--f, 0)), 0)
+    scale(calc(1 + 0.05 * var(--f, 0)));
+  transform-origin: 50% 62%;
+  will-change: transform;
+}
+
+/* Deriva lenta en reposo (también en táctil, donde no hay puntero). */
+.avv-capa-deriva {
+  position: absolute;
+  inset: 0;
+  animation: avv-deriva-capa 36s ease-in-out infinite alternate;
+}
+.avv-capa-deriva svg {
   width: 100%;
   height: 100%;
   display: block;
 }
+@keyframes avv-deriva-capa {
+  from { transform: translate3d(calc(-7px * var(--f, 0)), calc(2px * var(--f, 0)), 0); }
+  to { transform: translate3d(calc(9px * var(--f, 0)), calc(-3px * var(--f, 0)), 0); }
+}
+
+/* Perspectiva atmosférica: lo lejano se desenfoca y pierde saturación;
+   el primer plano queda fuera de foco como bokeh de cámara. */
+.avv-capa-lejos { filter: blur(1.1px) saturate(0.9) brightness(1.04); }
+.avv-capa-frente { filter: blur(2.2px) saturate(1.12); }
+.avv-capa-luz { mix-blend-mode: soft-light; }
+
+/* Los nodos de mundo siguen siendo tocables aunque su capa no lo sea. */
+.avv-nodo { pointer-events: auto; }
+
+/* Viñeta suave: concentra la mirada en el organismo. Va detrás de la UI. */
+.avv-vineta {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 92% at 50% 42%, transparent 56%, rgba(18, 38, 16, 0.17) 100%);
+}
+
+/* Primer plano: mecidas amplias y elementos vivos */
+.avv-frente-mece {
+  animation: avv-mece-frente 9s ease-in-out infinite alternate;
+  transform-box: fill-box;
+  transform-origin: 20% 0%;
+}
+.avv-frente-mece-b {
+  animation: avv-mece-frente 11s ease-in-out infinite alternate-reverse;
+  transform-box: fill-box;
+  transform-origin: 80% 0%;
+}
+@keyframes avv-mece-frente {
+  from { transform: rotate(-2.2deg); }
+  to { transform: rotate(2.2deg); }
+}
+
+.avv-bokeh {
+  opacity: 0.28;
+  animation: avv-bokeh-flota 13s ease-in-out infinite;
+}
+@keyframes avv-bokeh-flota {
+  0%, 100% { transform: translate(0, 0); opacity: 0.14; }
+  35% { opacity: 0.34; }
+  50% { transform: translate(18px, -44px); opacity: 0.26; }
+  85% { opacity: 0.12; }
+}
+
+.avv-abeja-paseo { animation: avv-paseo 46s linear infinite; }
+@keyframes avv-paseo {
+  0% { transform: translate(-90px, 500px) rotate(4deg); }
+  30% { transform: translate(300px, 396px) rotate(-3deg); }
+  55% { transform: translate(470px, 470px) rotate(5deg); }
+  100% { transform: translate(910px, 330px) rotate(-2deg); }
+}
+
+.avv-rayos-luz { animation: avv-rayo-pulsa 9s ease-in-out infinite; }
+@keyframes avv-rayo-pulsa {
+  0%, 100% { opacity: 0.65; }
+  50% { opacity: 1; }
+}
+
+.avv-estela {
+  stroke-dasharray: 2 9;
+  opacity: 0.85;
+  animation: avv-corre 3.2s linear infinite reverse;
+}
+
+.avv-pajaros-lejos { animation: avv-vuelo 52s linear infinite; }
 
 /* ============================== CABEZOTE ============================== */
 
@@ -721,6 +833,11 @@
   font-size: 11.5px;
   font-weight: 800;
   color: #3f7a52;
+}
+.avv-especie-nota {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #b06e10;
 }
 .avv-especie-check {
   position: absolute;

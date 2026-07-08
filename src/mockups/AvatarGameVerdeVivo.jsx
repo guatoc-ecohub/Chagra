@@ -3,15 +3,26 @@
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
 /**
- * AvatarGameVerdeVivo — MOCKUP del "juego final de Chagra" en tema VERDE VIVO.
+ * AvatarGameVerdeVivo — MOCKUP del "juego final de Chagra" en tema VERDE VIVO (v3).
  *
  * "El Espíritu de tu Finca" (Chagra-strategy/ops/AVATAR_GAME.md): la finca es
  * un ORGANISMO VIVO NAVEGABLE (ramas = mundos, hojas = especies, frutos =
  * cosechas, raíces = suelo, sol = clima) y un AVATAR de especie nativa
  * colombiana que evoluciona (semilla→adulto) reflejando la salud REAL de la
  * finca. Datos de muestra. Ruta dev: #/mockups/avatar-verde-vivo (sin gate).
+ *
+ * v3 = la v1 original (la estética que gustó) + PROFUNDIDAD REAL:
+ *   - Escena en 6 capas parallax (cielo → cordillera → plano medio →
+ *     organismo → luz → primer plano) que se mueven a distinta velocidad
+ *     con el puntero y una deriva lenta en reposo.
+ *   - Perspectiva sutil (tilt 3D del lienzo) + perspectiva atmosférica
+ *     (bruma y desenfoque en lo lejano, desenfoque tipo bokeh en lo cercano).
+ *   - Primer plano vegetal que enmarca la escena y abeja paseandera
+ *     desenfocada — la escena se siente honda, no plana.
+ *   - La abeja angelita es ahora la protagonista (espíritu por defecto);
+ *     el chivito pasa de últimas en el selector.
  */
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import './avatar-game-verde-vivo.css';
 
 const AÑO_HOY = 2026;
@@ -32,12 +43,13 @@ const MUNDOS = [
   { id: 'abono', emoji: '🐄', titulo: 'Estiércol y compost', lema: 'Del corral a la tierra negra', zona: 'raiz', nodo: [520, 902], vinculo: 'Humus · pila № 3 madurando', chips: ['Compost paso a paso', 'Biodigestor'] },
 ];
 
+/* La abeja angelita encabeza la lista (protagonista); el chivito va de últimas. */
 const ESPECIES = [
-  { id: 'chivito', emoji: '🐦', nombre: 'Chivito de páramo', cientifico: 'Oxypogon guerinii', eje: 'Páramo sano y flores nativas', habitat: 'Vive entre las flores de la copa', anclaje: [297, 312], escala: 0.95 },
+  { id: 'abeja', emoji: '🐝', nombre: 'Abeja angelita', cientifico: 'Tetragonisca angustula', eje: 'Floración y biodiversidad', habitat: 'Vive entre las flores de la copa', anclaje: [505, 334], escala: 0.85, nota: 'La consentida de la finca' },
   { id: 'rana', emoji: '🐸', nombre: 'Rana dorada', cientifico: 'Andinobates dorisswansonae', eje: 'Agua limpia y quebradas vivas', habitat: 'Vive junto a la quebrada', anclaje: [178, 724], escala: 0.72 },
-  { id: 'abeja', emoji: '🐝', nombre: 'Abeja angelita', cientifico: 'Tetragonisca angustula', eje: 'Floración y biodiversidad', habitat: 'Vive entre las flores de la copa', anclaje: [513, 340], escala: 0.62 },
   { id: 'oso', emoji: '🐻', nombre: 'Oso de anteojos', cientifico: 'Tremarctos ornatus', eje: 'Bosque y agroforestería', habitat: 'Vive al pie del tronco', anclaje: [472, 652], escala: 1.25 },
   { id: 'lombriz', emoji: '🪱', nombre: 'Lombriz y micelio', cientifico: 'La red viva del subsuelo', eje: 'Suelo vivo y compost', habitat: 'Vive junto al corazón-semilla', anclaje: [335, 928], escala: 1.0 },
+  { id: 'chivito', emoji: '🐦', nombre: 'Chivito de páramo', cientifico: 'Oxypogon guerinii', eje: 'Páramo sano y flores nativas', habitat: 'Vive entre las flores de la copa', anclaje: [297, 312], escala: 0.95 },
 ];
 
 const SALUD_BASE = [
@@ -199,7 +211,7 @@ const CRIATURAS = {
 
 /** Retrato de criatura para paneles y selector. */
 function RetratoEspiritu({ especieId, aura = false, className = '' }) {
-  const Criatura = CRIATURAS[especieId] || CriaturaChivito;
+  const Criatura = CRIATURAS[especieId] || CriaturaAbeja;
   return (
     <svg viewBox="0 0 100 100" className={`avv-retrato ${className}`} aria-hidden="true">
       <Criatura aura={aura} />
@@ -207,7 +219,8 @@ function RetratoEspiritu({ especieId, aura = false, className = '' }) {
   );
 }
 
-/* Gradientes compartidos de las criaturas (se declaran una vez por <svg>). */
+/* Gradientes compartidos de las criaturas (se declaran una vez, en la capa cielo;
+   los url(#...) resuelven a nivel de documento entre SVGs inline). */
 function DefsCriaturas() {
   return (
     <defs>
@@ -258,9 +271,31 @@ function NodoMundo({ mundo, seleccionado, onSelect, r = 26 }) {
   );
 }
 
-/* ============================== ESCENA ============================== */
+/* ============================== ESCENA EN CAPAS (v3: profundidad) ============================== */
 
-function EscenaOrganismo({ tn, años, especie, etapaIdx, mundoSel, onMundo }) {
+/**
+ * Una capa del lienzo profundo. `f` es el factor de parallax (0 = infinito,
+ * 1.3 = pegado al vidrio): gobierna cuánto se mueve con el puntero, la deriva
+ * en reposo y la micro-escala (lo cercano se ve un pelo más grande).
+ */
+function Capa({ f, nombre, interactiva = false, children }) {
+  return (
+    <div className={`avv-capa avv-capa-${nombre}`} style={{ '--f': f }}>
+      <div className="avv-capa-deriva">
+        <svg
+          viewBox="0 0 800 1160"
+          preserveAspectRatio="xMidYMax meet"
+          focusable="false"
+          {...(interactiva ? {} : { 'aria-hidden': true })}
+        >
+          {children}
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+function EscenaOrganismo({ tn, especie, etapaIdx, mundoSel, onMundo }) {
   const s = 0.84 + 0.34 * tn; // crecimiento del organismo aéreo
   const Criatura = CRIATURAS[especie.id];
   const [ax, ay] = especie.anclaje;
@@ -273,273 +308,377 @@ function EscenaOrganismo({ tn, años, especie, etapaIdx, mundoSel, onMundo }) {
   const avatarAereo = especie.id === 'chivito' || especie.id === 'abeja';
 
   return (
-    <svg
-      className="avv-escena"
-      viewBox="0 0 800 1160"
-      preserveAspectRatio="xMidYMax slice"
-      aria-label={`Su finca convertida en organismo vivo a plena luz del día: un árbol frondoso cuyas ramas son los mundos, con frutos por cada cosecha, raíces doradas y un corazón-semilla latiendo bajo la tierra. Su espíritu guardián, ${especie.nombre.toLowerCase()}, vive en él.`}
+    <div
+      className="avv-lienzo"
+      role="group"
+      aria-label={`Su finca convertida en organismo vivo con profundidad de campo: cielo y sol al fondo, cordillera con bruma, la loma con su casa en el plano medio, el árbol frondoso de los mundos en primer término y hojas que enmarcan la escena. Su espíritu guardián, ${especie.nombre.toLowerCase()}, vive en él.`}
     >
-      <defs>
-        <linearGradient id="avv-cielo" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#8fd4c0" />
-          <stop offset=".5" stopColor="#c5e9cd" />
-          <stop offset="1" stopColor="#f2f8d9" />
-        </linearGradient>
-        <radialGradient id="avv-sol-g" cx=".42" cy=".4" r="1">
-          <stop offset="0" stopColor="#fffbe6" />
-          <stop offset=".55" stopColor="#ffe98a" />
-          <stop offset="1" stopColor="#ffc84d" />
-        </radialGradient>
-        <radialGradient id="avv-sol-halo" cx=".5" cy=".5" r=".5">
-          <stop offset="0" stopColor="#fff3c0" stopOpacity=".9" />
-          <stop offset="1" stopColor="#fff3c0" stopOpacity="0" />
-        </radialGradient>
-        <linearGradient id="avv-lomas" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#8fd05a" />
-          <stop offset="1" stopColor="#57a453" />
-        </linearGradient>
-        <linearGradient id="avv-tierra" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#6e4a2c" />
-          <stop offset=".4" stopColor="#54371f" />
-          <stop offset="1" stopColor="#33210f" />
-        </linearGradient>
-        <linearGradient id="avv-tronco" x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0" stopColor="#5c3d24" />
-          <stop offset="1" stopColor="#7a5230" />
-        </linearGradient>
-        <radialGradient id="avv-corazon" cx=".5" cy=".5" r=".5">
-          <stop offset="0" stopColor="#fff8d8" />
-          <stop offset=".4" stopColor="#ffe07a" stopOpacity=".85" />
-          <stop offset="1" stopColor="#e8c87a" stopOpacity="0" />
-        </radialGradient>
-        <linearGradient id="avv-agua-g" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#9adfe4" />
-          <stop offset="1" stopColor="#5db9cb" />
-        </linearGradient>
-        <filter id="avv-blur6"><feGaussianBlur stdDeviation="6" /></filter>
+      {/* ---- CAPA 1 · CIELO (lo más lejano: sol = mundo clima, nubes altas) ---- */}
+      <Capa f={0.12} nombre="cielo" interactiva>
+        <defs>
+          <linearGradient id="avv-cielo" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#8fd4c0" />
+            <stop offset=".5" stopColor="#c5e9cd" />
+            <stop offset="1" stopColor="#f2f8d9" />
+          </linearGradient>
+          <radialGradient id="avv-sol-g" cx=".42" cy=".4" r="1">
+            <stop offset="0" stopColor="#fffbe6" />
+            <stop offset=".55" stopColor="#ffe98a" />
+            <stop offset="1" stopColor="#ffc84d" />
+          </radialGradient>
+          <radialGradient id="avv-sol-halo" cx=".5" cy=".5" r=".5">
+            <stop offset="0" stopColor="#fff3c0" stopOpacity=".9" />
+            <stop offset="1" stopColor="#fff3c0" stopOpacity="0" />
+          </radialGradient>
+          <linearGradient id="avv-lomas" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#8fd05a" />
+            <stop offset="1" stopColor="#57a453" />
+          </linearGradient>
+          <linearGradient id="avv-tierra" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#6e4a2c" />
+            <stop offset=".4" stopColor="#54371f" />
+            <stop offset="1" stopColor="#33210f" />
+          </linearGradient>
+          <linearGradient id="avv-tronco" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0" stopColor="#5c3d24" />
+            <stop offset="1" stopColor="#7a5230" />
+          </linearGradient>
+          <radialGradient id="avv-corazon" cx=".5" cy=".5" r=".5">
+            <stop offset="0" stopColor="#fff8d8" />
+            <stop offset=".4" stopColor="#ffe07a" stopOpacity=".85" />
+            <stop offset="1" stopColor="#e8c87a" stopOpacity="0" />
+          </radialGradient>
+          <linearGradient id="avv-agua-g" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#9adfe4" />
+            <stop offset="1" stopColor="#5db9cb" />
+          </linearGradient>
+          <linearGradient id="avv-bruma" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#eaf6e2" stopOpacity="0" />
+            <stop offset=".55" stopColor="#eaf6e2" stopOpacity=".55" />
+            <stop offset="1" stopColor="#eaf6e2" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="avv-hoja-frente" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#2e8b3d" />
+            <stop offset="1" stopColor="#153f1e" />
+          </linearGradient>
+          <filter id="avv-blur6"><feGaussianBlur stdDeviation="6" /></filter>
+        </defs>
         <DefsCriaturas />
-      </defs>
 
-      {/* CIELO */}
-      <rect width="800" height="760" fill="url(#avv-cielo)" />
+        <rect width="800" height="1160" fill="url(#avv-cielo)" />
 
-      {/* SOL = mundo clima */}
-      <g className="avv-sol-grupo">
-        <circle cx="652" cy="128" r="118" fill="url(#avv-sol-halo)" />
-        <g className="avv-sol-rayos">
-          {Array.from({ length: 12 }, (_, i) => {
-            const a = (i * 30 * Math.PI) / 180;
-            return (
-              <line
-                key={i}
-                x1={652 + Math.cos(a) * 62} y1={128 + Math.sin(a) * 62}
-                x2={652 + Math.cos(a) * (i % 2 ? 78 : 88)} y2={128 + Math.sin(a) * (i % 2 ? 78 : 88)}
-                stroke="#ffdf7e" strokeWidth="5" strokeLinecap="round" opacity=".8"
-              />
-            );
-          })}
-        </g>
-        <circle cx="652" cy="128" r="48" fill="url(#avv-sol-g)" />
-      </g>
-
-      {/* NUBES */}
-      <g className="avv-nube avv-nube-1" fill="#ffffff" opacity=".9">
-        <ellipse cx="150" cy="108" rx="58" ry="20" />
-        <ellipse cx="192" cy="94" rx="40" ry="16" />
-        <ellipse cx="112" cy="96" rx="32" ry="13" />
-      </g>
-      <g className="avv-nube avv-nube-2" fill="#ffffff" opacity=".75">
-        <ellipse cx="430" cy="70" rx="46" ry="15" />
-        <ellipse cx="464" cy="59" rx="30" ry="12" />
-      </g>
-      <g className="avv-nube avv-nube-3" fill="#ffffff" opacity=".6">
-        <ellipse cx="300" cy="170" rx="36" ry="11" />
-        <ellipse cx="326" cy="162" rx="24" ry="9" />
-      </g>
-
-      {/* PÁJAROS */}
-      <g className="avv-pajaros" stroke="#3f7a52" strokeWidth="2.4" fill="none" strokeLinecap="round">
-        <path d="M210 210 q6 -7 12 0 q6 -7 12 0" />
-        <path d="M252 190 q5 -6 10 0 q5 -6 10 0" opacity=".7" />
-      </g>
-
-      {/* CORDILLERA */}
-      <path d="M0,505 Q130,432 258,472 Q360,502 470,458 Q600,408 800,488 L800,760 L0,760 Z" fill="#a8d8b4" opacity=".85" />
-      <path d="M0,568 Q160,498 320,538 Q470,572 620,522 Q710,494 800,540 L800,760 L0,760 Z" fill="#7cbd7f" opacity=".95" />
-      {/* frailejones del páramo lejano */}
-      <g fill="#5a9a5e" opacity=".9">
-        {[[92, 546], [130, 536], [560, 528], [610, 520], [672, 528]].map(([fx, fy], i) => (
-          <g key={i} transform={`translate(${fx},${fy})`}>
-            <rect x="-2.4" y="0" width="4.8" height="15" rx="2" fill="#7a6a3a" />
-            <path d="M0,-3 L-9,3 L-3,4 L-11,10 L0,7 L11,10 L3,4 L9,3 Z" fill="#8fb96a" />
+        {/* SOL = mundo clima */}
+        <g className="avv-sol-grupo">
+          <circle cx="652" cy="128" r="118" fill="url(#avv-sol-halo)" />
+          <g className="avv-sol-rayos">
+            {Array.from({ length: 12 }, (_, i) => {
+              const a = (i * 30 * Math.PI) / 180;
+              return (
+                <line
+                  key={i}
+                  x1={652 + Math.cos(a) * 62} y1={128 + Math.sin(a) * 62}
+                  x2={652 + Math.cos(a) * (i % 2 ? 78 : 88)} y2={128 + Math.sin(a) * (i % 2 ? 78 : 88)}
+                  stroke="#ffdf7e" strokeWidth="5" strokeLinecap="round" opacity=".8"
+                />
+              );
+            })}
           </g>
-        ))}
-      </g>
-
-      {/* LOMA CERCANA con retazos de cultivos */}
-      <path d="M0,648 C130,600 260,580 400,580 C540,580 670,600 800,650 L800,790 L0,790 Z" fill="url(#avv-lomas)" />
-      <g opacity=".55">
-        <path d="M588,614 L648,606 L662,632 L600,642 Z" fill="#b9e678" />
-        <path d="M652,606 L706,600 L724,626 L666,632 Z" fill="#e0c46a" />
-        <path d="M604,644 L666,634 L678,660 L614,670 Z" fill="#79c26a" />
-        <path d="M120,630 L180,622 L190,648 L128,657 Z" fill="#a5d95f" />
-        <path d="M184,621 L238,615 L250,640 L194,647 Z" fill="#8fce8a" />
-      </g>
-
-      {/* CASA CAMPESINA */}
-      <g transform="translate(636,560)">
-        <rect x="0" y="18" width="58" height="36" rx="2" fill="#fbf6e8" stroke="#d8c9a8" strokeWidth="1.4" />
-        <path d="M-7,20 L29,-4 L65,20 Z" fill="#c25b38" />
-        <rect x="10" y="30" width="12" height="24" rx="1.4" fill="#8a5a38" />
-        <rect x="34" y="30" width="13" height="12" rx="1.4" fill="#bfe3ee" stroke="#8a5a38" strokeWidth="1.2" />
-        <path className="avv-humo" d="M48 -6 q-5 -8 1 -14 q5 -6 0 -13" stroke="#eef4e0" strokeWidth="4" fill="none" strokeLinecap="round" opacity=".8" />
-      </g>
-
-      {/* QUEBRADA (mundo agua) */}
-      <g>
-        <path d="M96,636 C110,668 118,690 128,712 C140,738 152,752 168,764 L120,776 C104,748 92,716 84,684 C80,666 82,650 96,636 Z" fill="url(#avv-agua-g)" opacity=".92" />
-        <path className="avv-agua-brillo" d="M100,650 C112,684 124,716 146,752" stroke="#eafcff" strokeWidth="3.2" fill="none" strokeLinecap="round" strokeDasharray="10 16" />
-      </g>
-
-      {/* ============ EL ORGANISMO (crece con el tiempo) ============ */}
-      <g transform={`translate(400,712) scale(${s}) translate(-400,-712)`}>
-        {/* ramas */}
-        <g stroke="#6b4526" fill="none" strokeLinecap="round">
-          <path d="M400,540 C400,470 400,330 400,262" strokeWidth="20" />
-          <path d="M398,470 C340,430 286,368 248,314" strokeWidth="15" />
-          <path d="M402,470 C460,430 514,368 552,314" strokeWidth="15" />
-          <path d="M396,540 C320,516 246,480 202,450" strokeWidth="13" />
-          <path d="M404,540 C480,516 554,480 598,450" strokeWidth="13" />
-          <path d="M394,590 C330,586 280,572 254,562" strokeWidth="11" />
-          <path d="M406,590 C470,586 520,572 546,562" strokeWidth="11" />
+          <circle cx="652" cy="128" r="48" fill="url(#avv-sol-g)" />
         </g>
-        {/* tronco */}
-        <path d="M378,716 C380,640 372,560 366,470 C388,486 412,486 434,470 C428,560 420,640 422,716 Q400,726 378,716 Z" fill="url(#avv-tronco)" />
-        <path d="M400,700 C396,600 394,540 398,478" className="avv-savia" stroke="#d3f296" strokeWidth="3.4" fill="none" strokeLinecap="round" strokeDasharray="7 15" opacity=".85" />
-        <path d="M366,470 C388,486 412,486 434,470" fill="none" stroke="#4a2f1a" strokeWidth="2" opacity=".4" />
 
-        {/* copa */}
-        <g className="avv-copa">
-          {FOLLAJE.filter((f) => tn >= f[5]).map(([cx, cy, rx, ry, tono], i) => (
-            <ellipse
-              key={i}
-              className={`avv-hoja avv-hoja-t${tono} ${i % 2 ? 'avv-mece-b' : 'avv-mece-a'}`}
-              cx={cx} cy={cy}
-              rx={rx * (0.86 + 0.2 * tn)} ry={ry * (0.86 + 0.2 * tn)}
-            />
+        {/* nubes altas, lentas: las más lejanas */}
+        <g className="avv-nube avv-nube-2" fill="#ffffff" opacity=".72">
+          <ellipse cx="430" cy="70" rx="46" ry="15" />
+          <ellipse cx="464" cy="59" rx="30" ry="12" />
+        </g>
+        <g className="avv-nube avv-nube-3" fill="#ffffff" opacity=".58">
+          <ellipse cx="300" cy="170" rx="36" ry="11" />
+          <ellipse cx="326" cy="162" rx="24" ry="9" />
+        </g>
+
+        {/* bandada lejanísima, apenas un trazo */}
+        <g className="avv-pajaros-lejos" stroke="#5a8a68" strokeWidth="1.6" fill="none" strokeLinecap="round" opacity=".6">
+          <path d="M150 150 q4 -5 8 0 q4 -5 8 0" />
+          <path d="M178 140 q3 -4 7 0 q3 -4 7 0" />
+        </g>
+
+        {/* velo de luz alto */}
+        <path d="M560,0 L800,0 L800,240 Z" fill="#fff8d0" opacity=".18" filter="url(#avv-blur6)" />
+
+        {/* nodo del mundo clima, vive en el sol (plano lejano → más pequeño) */}
+        {mundoClima && <NodoMundo mundo={mundoClima} seleccionado={mundoSel === mundoClima.id} onSelect={onMundo} r={22} />}
+      </Capa>
+
+      {/* ---- CAPA 2 · CORDILLERA (lejos: bruma + desenfoque atmosférico) ---- */}
+      <Capa f={0.28} nombre="lejos">
+        <path d="M0,505 Q130,432 258,472 Q360,502 470,458 Q600,408 800,488 L800,760 L0,760 Z" fill="#a8d8b4" opacity=".85" />
+        <path d="M0,568 Q160,498 320,538 Q470,572 620,522 Q710,494 800,540 L800,760 L0,760 Z" fill="#7cbd7f" opacity=".95" />
+        {/* frailejones del páramo lejano */}
+        <g fill="#5a9a5e" opacity=".9">
+          {[[92, 546], [130, 536], [560, 528], [610, 520], [672, 528]].map(([fx, fy], i) => (
+            <g key={i} transform={`translate(${fx},${fy})`}>
+              <rect x="-2.4" y="0" width="4.8" height="15" rx="2" fill="#7a6a3a" />
+              <path d="M0,-3 L-9,3 L-3,4 L-11,10 L0,7 L11,10 L3,4 L9,3 Z" fill="#8fb96a" />
+            </g>
           ))}
-          {/* brillos de luz sobre el follaje */}
-          <g fill="#d3f296" opacity=".55">
-            {[[330, 300], [470, 280], [280, 390], [520, 400], [400, 220], [360, 430]].map(([bx, by], i) => (
-              <ellipse key={i} cx={bx} cy={by} rx="26" ry="10" className={i % 2 ? 'avv-mece-a' : 'avv-mece-b'} />
+        </g>
+        {/* nube baja, más cercana que las del cielo */}
+        <g className="avv-nube avv-nube-1" fill="#ffffff" opacity=".9">
+          <ellipse cx="150" cy="108" rx="58" ry="20" />
+          <ellipse cx="192" cy="94" rx="40" ry="16" />
+          <ellipse cx="112" cy="96" rx="32" ry="13" />
+        </g>
+        {/* pájaros cruzando el valle */}
+        <g className="avv-pajaros" stroke="#3f7a52" strokeWidth="2.4" fill="none" strokeLinecap="round">
+          <path d="M210 210 q6 -7 12 0 q6 -7 12 0" />
+          <path d="M252 190 q5 -6 10 0 q5 -6 10 0" opacity=".7" />
+        </g>
+        {/* bruma del valle: perspectiva atmosférica entre cordillera y loma */}
+        <rect x="0" y="470" width="800" height="150" fill="url(#avv-bruma)" />
+      </Capa>
+
+      {/* ---- CAPA 3 · PLANO MEDIO (loma, casa, vecinas, quebrada = mundo agua) ---- */}
+      <Capa f={0.5} nombre="medio" interactiva>
+        <path d="M0,648 C130,600 260,580 400,580 C540,580 670,600 800,650 L800,790 L0,790 Z" fill="url(#avv-lomas)" />
+        <g opacity=".55">
+          <path d="M588,614 L648,606 L662,632 L600,642 Z" fill="#b9e678" />
+          <path d="M652,606 L706,600 L724,626 L666,632 Z" fill="#e0c46a" />
+          <path d="M604,644 L666,634 L678,660 L614,670 Z" fill="#79c26a" />
+          <path d="M120,630 L180,622 L190,648 L128,657 Z" fill="#a5d95f" />
+          <path d="M184,621 L238,615 L250,640 L194,647 Z" fill="#8fce8a" />
+        </g>
+
+        {/* arbolitos vecinos: dan escala y hondura al plano medio */}
+        <g className="avv-arbolitos">
+          {[[108, 596, 1], [188, 585, 0.72], [712, 604, 0.85]].map(([tx, ty, tk], i) => (
+            <g key={i} transform={`translate(${tx},${ty}) scale(${tk})`} opacity=".92">
+              <rect x="-3" y="-6" width="6" height="26" rx="2.6" fill="#6b4526" />
+              <ellipse cx="0" cy="-22" rx="24" ry="19" fill="#6fb46a" />
+              <ellipse cx="-13" cy="-14" rx="14" ry="11" fill="#7fc272" />
+              <ellipse cx="13" cy="-13" rx="13" ry="10" fill="#5fa75e" />
+            </g>
+          ))}
+        </g>
+
+        {/* CASA CAMPESINA */}
+        <g transform="translate(636,560)">
+          <rect x="0" y="18" width="58" height="36" rx="2" fill="#fbf6e8" stroke="#d8c9a8" strokeWidth="1.4" />
+          <path d="M-7,20 L29,-4 L65,20 Z" fill="#c25b38" />
+          <rect x="10" y="30" width="12" height="24" rx="1.4" fill="#8a5a38" />
+          <rect x="34" y="30" width="13" height="12" rx="1.4" fill="#bfe3ee" stroke="#8a5a38" strokeWidth="1.2" />
+          <path className="avv-humo" d="M48 -6 q-5 -8 1 -14 q5 -6 0 -13" stroke="#eef4e0" strokeWidth="4" fill="none" strokeLinecap="round" opacity=".8" />
+        </g>
+
+        {/* QUEBRADA (mundo agua) */}
+        <g>
+          <path d="M96,636 C110,668 118,690 128,712 C140,738 152,752 168,764 L120,776 C104,748 92,716 84,684 C80,666 82,650 96,636 Z" fill="url(#avv-agua-g)" opacity=".92" />
+          <path className="avv-agua-brillo" d="M100,650 C112,684 124,716 146,752" stroke="#eafcff" strokeWidth="3.2" fill="none" strokeLinecap="round" strokeDasharray="10 16" />
+        </g>
+        {mundoAgua && <NodoMundo mundo={mundoAgua} seleccionado={mundoSel === mundoAgua.id} onSelect={onMundo} r={24} />}
+      </Capa>
+
+      {/* ---- CAPA 4 · EL ORGANISMO (primer término: árbol, suelo y subsuelo) ---- */}
+      <Capa f={0.85} nombre="organismo" interactiva>
+        {/* ============ EL ORGANISMO (crece con el tiempo) ============ */}
+        <g transform={`translate(400,712) scale(${s}) translate(-400,-712)`}>
+          {/* ramas */}
+          <g stroke="#6b4526" fill="none" strokeLinecap="round">
+            <path d="M400,540 C400,470 400,330 400,262" strokeWidth="20" />
+            <path d="M398,470 C340,430 286,368 248,314" strokeWidth="15" />
+            <path d="M402,470 C460,430 514,368 552,314" strokeWidth="15" />
+            <path d="M396,540 C320,516 246,480 202,450" strokeWidth="13" />
+            <path d="M404,540 C480,516 554,480 598,450" strokeWidth="13" />
+            <path d="M394,590 C330,586 280,572 254,562" strokeWidth="11" />
+            <path d="M406,590 C470,586 520,572 546,562" strokeWidth="11" />
+          </g>
+          {/* tronco */}
+          <path d="M378,716 C380,640 372,560 366,470 C388,486 412,486 434,470 C428,560 420,640 422,716 Q400,726 378,716 Z" fill="url(#avv-tronco)" />
+          <path d="M400,700 C396,600 394,540 398,478" className="avv-savia" stroke="#d3f296" strokeWidth="3.4" fill="none" strokeLinecap="round" strokeDasharray="7 15" opacity=".85" />
+          <path d="M366,470 C388,486 412,486 434,470" fill="none" stroke="#4a2f1a" strokeWidth="2" opacity=".4" />
+
+          {/* copa */}
+          <g className="avv-copa">
+            {FOLLAJE.filter((f) => tn >= f[5]).map(([cx, cy, rx, ry, tono], i) => (
+              <ellipse
+                key={i}
+                className={`avv-hoja avv-hoja-t${tono} ${i % 2 ? 'avv-mece-b' : 'avv-mece-a'}`}
+                cx={cx} cy={cy}
+                rx={rx * (0.86 + 0.2 * tn)} ry={ry * (0.86 + 0.2 * tn)}
+              />
             ))}
+            {/* brillos de luz sobre el follaje */}
+            <g fill="#d3f296" opacity=".55">
+              {[[330, 300], [470, 280], [280, 390], [520, 400], [400, 220], [360, 430]].map(([bx, by], i) => (
+                <ellipse key={i} cx={bx} cy={by} rx="26" ry="10" className={i % 2 ? 'avv-mece-a' : 'avv-mece-b'} />
+              ))}
+            </g>
+          </g>
+
+          {/* flores */}
+          {FLORES.filter((f) => tn >= f[2]).map(([fx, fy], i) => (
+            <g key={i} transform={`translate(${fx},${fy})`} className="avv-flor">
+              {[0, 72, 144, 216, 288].map((rot) => (
+                <ellipse key={rot} cx="0" cy="-6.5" rx="3.4" ry="6" fill="#fdf1f7" transform={`rotate(${rot})`} />
+              ))}
+              <circle r="3.4" fill="#f2b93c" />
+            </g>
+          ))}
+
+          {/* frutos = cosechas */}
+          {FRUTOS.filter((f) => tn >= f[2]).map(([fx, fy, , tipo], i) => (
+            <g key={i} transform={`translate(${fx},${fy})`} className="avv-fruto">
+              <circle r={tipo === 'nar' ? 9 : 6.5} fill={tipo === 'nar' ? '#f09c2e' : '#d9482e'} />
+              <circle r={tipo === 'nar' ? 9 : 6.5} fill="#fff" opacity=".22" cx="-2.6" cy="-2.8" />
+              <path d="M0,-8 Q3,-13 7,-13" stroke="#3f7a3f" strokeWidth="2" fill="none" />
+            </g>
+          ))}
+
+          {/* nodos de mundos en las ramas */}
+          {mundosRama.map((m) => (
+            <NodoMundo key={m.id} mundo={m} seleccionado={mundoSel === m.id} onSelect={onMundo} r={m.id === 'cultivos' ? 30 : 25} />
+          ))}
+        </g>
+
+        {/* polen / motas de luz */}
+        <g fill="#fdf6c8">
+          {[[240, 560, 0], [340, 500, 1], [470, 530, 2], [560, 590, 3], [300, 620, 4], [520, 480, 5], [420, 640, 6]].map(([px, py, d]) => (
+            <circle key={d} cx={px} cy={py} r="3" className="avv-mota" style={{ animationDelay: `${Number(d) * -1.7}s` }} />
+          ))}
+        </g>
+
+        {/* ============ EL SUBSUELO ============ */}
+        <path d="M0,790 C140,752 260,712 400,712 C540,712 660,752 800,790 L800,1160 L0,1160 Z" fill="url(#avv-tierra)" />
+        <path d="M0,790 C140,752 260,712 400,712 C540,712 660,752 800,790" fill="none" stroke="#2e6b34" strokeWidth="9" />
+        <path d="M0,790 C140,752 260,712 400,712 C540,712 660,752 800,790" fill="none" stroke="#8fd05a" strokeWidth="3" opacity=".8" />
+
+        {/* raíces doradas */}
+        <g stroke="#c9a35e" fill="none" strokeLinecap="round" opacity=".95">
+          <path d="M388,724 C360,790 344,850 358,912" strokeWidth="9" />
+          <path d="M412,724 C440,790 458,844 448,908" strokeWidth="9" />
+          <path d="M400,730 C400,800 398,860 400,916" strokeWidth="7" />
+          <path d="M378,760 C320,800 284,842 272,884" strokeWidth="6" />
+          <path d="M422,760 C480,800 518,842 530,884" strokeWidth="6" />
+          <path d="M360,850 C320,872 296,896 288,920" strokeWidth="4" />
+          <path d="M446,856 C490,878 512,900 518,922" strokeWidth="4" />
+        </g>
+
+        {/* red de micelio */}
+        <g className="avv-micelio" stroke="#f0e0b0" strokeWidth="1.6" fill="none" opacity=".8">
+          <path d="M356,914 C300,940 220,952 140,944" strokeDasharray="5 9" />
+          <path d="M448,910 C520,942 600,954 680,942" strokeDasharray="5 9" />
+          <path d="M400,918 C380,980 330,1020 250,1036" strokeDasharray="5 9" />
+          <path d="M402,920 C430,986 490,1024 570,1038" strokeDasharray="5 9" />
+          <path d="M288,922 C260,970 220,1000 160,1012" strokeDasharray="4 10" opacity=".7" />
+          <path d="M518,924 C548,972 590,1002 648,1014" strokeDasharray="4 10" opacity=".7" />
+        </g>
+        <g fill="#f6ecc8">
+          {[[140, 944], [680, 942], [250, 1036], [570, 1038], [160, 1012], [648, 1014]].map(([mx, my], i) => (
+            <circle key={i} cx={mx} cy={my} r="3" className="avv-brilla" style={{ animationDelay: `${i * -1.3}s` }} />
+          ))}
+        </g>
+
+        {/* corazón-semilla */}
+        <g transform="translate(400,930)">
+          <circle r="64" fill="url(#avv-corazon)" className="avv-late-halo" />
+          <g className="avv-late">
+            <path d="M0,-26 C16,-14 18,8 6,22 Q0,28 -6,22 C-18,8 -16,-14 0,-26 Z" fill="#ffe07a" stroke="#e8b93c" strokeWidth="2.4" />
+            <path d="M0,-18 C0,-4 0,10 0,20" stroke="#c98f1e" strokeWidth="2" opacity=".7" />
+            <path d="M0,-26 C-4,-38 -14,-44 -24,-44 M0,-26 C4,-38 14,-44 24,-44" stroke="#8fd05a" strokeWidth="3.4" fill="none" strokeLinecap="round" />
           </g>
         </g>
 
-        {/* flores */}
-        {FLORES.filter((f) => tn >= f[2]).map(([fx, fy], i) => (
-          <g key={i} transform={`translate(${fx},${fy})`} className="avv-flor">
-            {[0, 72, 144, 216, 288].map((rot) => (
-              <ellipse key={rot} cx="0" cy="-6.5" rx="3.4" ry="6" fill="#fdf1f7" transform={`rotate(${rot})`} />
-            ))}
-            <circle r="3.4" fill="#f2b93c" />
-          </g>
-        ))}
-
-        {/* frutos = cosechas */}
-        {FRUTOS.filter((f) => tn >= f[2]).map(([fx, fy, , tipo], i) => (
-          <g key={i} transform={`translate(${fx},${fy})`} className="avv-fruto">
-            <circle r={tipo === 'nar' ? 9 : 6.5} fill={tipo === 'nar' ? '#f09c2e' : '#d9482e'} />
-            <circle r={tipo === 'nar' ? 9 : 6.5} fill="#fff" opacity=".22" cx="-2.6" cy="-2.8" />
-            <path d="M0,-8 Q3,-13 7,-13" stroke="#3f7a3f" strokeWidth="2" fill="none" />
-          </g>
-        ))}
-
-        {/* nodos de mundos en las ramas */}
-        {mundosRama.map((m) => (
-          <NodoMundo key={m.id} mundo={m} seleccionado={mundoSel === m.id} onSelect={onMundo} r={m.id === 'cultivos' ? 30 : 25} />
-        ))}
-      </g>
-
-      {/* polen / motas de luz */}
-      <g fill="#fdf6c8">
-        {[[240, 560, 0], [340, 500, 1], [470, 530, 2], [560, 590, 3], [300, 620, 4], [520, 480, 5], [420, 640, 6]].map(([px, py, d]) => (
-          <circle key={d} cx={px} cy={py} r="3" className="avv-mota" style={{ animationDelay: `${Number(d) * -1.7}s` }} />
-        ))}
-      </g>
-
-      {/* ============ EL SUBSUELO ============ */}
-      <path d="M0,790 C140,752 260,712 400,712 C540,712 660,752 800,790 L800,1160 L0,1160 Z" fill="url(#avv-tierra)" />
-      <path d="M0,790 C140,752 260,712 400,712 C540,712 660,752 800,790" fill="none" stroke="#2e6b34" strokeWidth="9" />
-      <path d="M0,790 C140,752 260,712 400,712 C540,712 660,752 800,790" fill="none" stroke="#8fd05a" strokeWidth="3" opacity=".8" />
-
-      {/* raíces doradas */}
-      <g stroke="#c9a35e" fill="none" strokeLinecap="round" opacity=".95">
-        <path d="M388,724 C360,790 344,850 358,912" strokeWidth="9" />
-        <path d="M412,724 C440,790 458,844 448,908" strokeWidth="9" />
-        <path d="M400,730 C400,800 398,860 400,916" strokeWidth="7" />
-        <path d="M378,760 C320,800 284,842 272,884" strokeWidth="6" />
-        <path d="M422,760 C480,800 518,842 530,884" strokeWidth="6" />
-        <path d="M360,850 C320,872 296,896 288,920" strokeWidth="4" />
-        <path d="M446,856 C490,878 512,900 518,922" strokeWidth="4" />
-      </g>
-
-      {/* red de micelio */}
-      <g className="avv-micelio" stroke="#f0e0b0" strokeWidth="1.6" fill="none" opacity=".8">
-        <path d="M356,914 C300,940 220,952 140,944" strokeDasharray="5 9" />
-        <path d="M448,910 C520,942 600,954 680,942" strokeDasharray="5 9" />
-        <path d="M400,918 C380,980 330,1020 250,1036" strokeDasharray="5 9" />
-        <path d="M402,920 C430,986 490,1024 570,1038" strokeDasharray="5 9" />
-        <path d="M288,922 C260,970 220,1000 160,1012" strokeDasharray="4 10" opacity=".7" />
-        <path d="M518,924 C548,972 590,1002 648,1014" strokeDasharray="4 10" opacity=".7" />
-      </g>
-      <g fill="#f6ecc8">
-        {[[140, 944], [680, 942], [250, 1036], [570, 1038], [160, 1012], [648, 1014]].map(([mx, my], i) => (
-          <circle key={i} cx={mx} cy={my} r="3" className="avv-brilla" style={{ animationDelay: `${i * -1.3}s` }} />
-        ))}
-      </g>
-
-      {/* corazón-semilla */}
-      <g transform="translate(400,930)">
-        <circle r="64" fill="url(#avv-corazon)" className="avv-late-halo" />
-        <g className="avv-late">
-          <path d="M0,-26 C16,-14 18,8 6,22 Q0,28 -6,22 C-18,8 -16,-14 0,-26 Z" fill="#ffe07a" stroke="#e8b93c" strokeWidth="2.4" />
-          <path d="M0,-18 C0,-4 0,10 0,20" stroke="#c98f1e" strokeWidth="2" opacity=".7" />
-          <path d="M0,-26 C-4,-38 -14,-44 -24,-44 M0,-26 C4,-38 14,-44 24,-44" stroke="#8fd05a" strokeWidth="3.4" fill="none" strokeLinecap="round" />
+        {/* bichitos del suelo */}
+        <g opacity=".9">
+          <circle cx="212" cy="860" r="3.4" fill="#caa15e" />
+          <circle cx="222" cy="864" r="3" fill="#caa15e" />
+          <circle cx="596" cy="984" r="3.2" fill="#caa15e" />
+          <path d="M640,868 q10,-6 20,0 q-10,6 -20,0" fill="#b56a52" />
         </g>
-      </g>
+        <g fill="#4a3320" opacity=".8">
+          {[[160, 850], [330, 1000], [470, 1060], [620, 920], [90, 1000], [710, 1060], [260, 1090]].map(([rx, ry], i) => (
+            <ellipse key={i} cx={rx} cy={ry} rx="9" ry="5" />
+          ))}
+        </g>
 
-      {/* bichitos del suelo */}
-      <g opacity=".9">
-        <circle cx="212" cy="860" r="3.4" fill="#caa15e" />
-        <circle cx="222" cy="864" r="3" fill="#caa15e" />
-        <circle cx="596" cy="984" r="3.2" fill="#caa15e" />
-        <path d="M640,868 q10,-6 20,0 q-10,6 -20,0" fill="#b56a52" />
-      </g>
-      <g fill="#4a3320" opacity=".8">
-        {[[160, 850], [330, 1000], [470, 1060], [620, 920], [90, 1000], [710, 1060], [260, 1090]].map(([rx, ry], i) => (
-          <ellipse key={i} cx={rx} cy={ry} rx="9" ry="5" />
+        {/* nodos de mundos: raíces */}
+        {mundosRaiz.map((m) => (
+          <NodoMundo key={m.id} mundo={m} seleccionado={mundoSel === m.id} onSelect={onMundo} r={24} />
         ))}
-      </g>
 
-      {/* nodos de mundos: sol, agua y raíces */}
-      {mundoClima && <NodoMundo mundo={mundoClima} seleccionado={mundoSel === mundoClima.id} onSelect={onMundo} r={24} />}
-      {mundoAgua && <NodoMundo mundo={mundoAgua} seleccionado={mundoSel === mundoAgua.id} onSelect={onMundo} r={24} />}
-      {mundosRaiz.map((m) => (
-        <NodoMundo key={m.id} mundo={m} seleccionado={mundoSel === m.id} onSelect={onMundo} r={24} />
-      ))}
+        {/* estela de polen de la protagonista */}
+        {especie.id === 'abeja' && (
+          <path
+            className="avv-estela"
+            d={`M${ax - 128},${ay + 52} Q${ax - 70},${ay - 36} ${ax - 14},${ay + 4}`}
+            fill="none" stroke="#f2c23a" strokeWidth="2.6" strokeLinecap="round"
+          />
+        )}
 
-      {/* ============ EL ESPÍRITU (avatar) ============ */}
-      <g
-        className={`avv-avatar ${avatarAereo ? 'avv-avatar-aereo' : ''}`}
-        transform={`translate(${ax - 50 * kAvatar},${ay - 50 * kAvatar}) scale(${kAvatar})`}
-      >
-        <Criatura aura={aura} />
-      </g>
+        {/* ============ EL ESPÍRITU (avatar) ============ */}
+        <g
+          className={`avv-avatar ${avatarAereo ? 'avv-avatar-aereo' : ''}`}
+          transform={`translate(${ax - 50 * kAvatar},${ay - 50 * kAvatar}) scale(${kAvatar})`}
+        >
+          <Criatura aura={aura} />
+        </g>
+      </Capa>
 
-      {/* velo de luz frontal */}
-      <path d="M560,0 L800,0 L800,240 Z" fill="#fff8d0" opacity=".18" filter="url(#avv-blur6)" />
-    </svg>
+      {/* ---- CAPA 5 · LUZ (rayos de sol que cruzan por delante del organismo) ---- */}
+      <Capa f={0.18} nombre="luz">
+        <g className="avv-rayos-luz" fill="#fff8d0" filter="url(#avv-blur6)">
+          <polygon points="596,0 668,0 258,700 208,652" opacity=".12" />
+          <polygon points="678,0 726,0 420,660 372,620" opacity=".09" />
+          <polygon points="520,0 552,0 150,600 118,560" opacity=".07" />
+        </g>
+      </Capa>
+
+      {/* ---- CAPA 6 · PRIMER PLANO (marco vegetal desenfocado + bokeh) ---- */}
+      <Capa f={1.3} nombre="frente">
+        {/* hojas soleadas que enmarcan la esquina superior izquierda: claras y
+            translúcidas para no pisar el cabezote con una mancha oscura */}
+        <g className="avv-frente-mece" transform="translate(96,-64) rotate(24)" opacity=".6">
+          <ellipse cx="0" cy="60" rx="24" ry="70" fill="#4aa84f" transform="rotate(-28)" />
+          <ellipse cx="42" cy="28" rx="19" ry="56" fill="#57b45f" transform="rotate(4)" opacity=".9" />
+          <ellipse cx="-36" cy="18" rx="16" ry="46" fill="#2e8b3d" transform="rotate(-50)" opacity=".85" />
+        </g>
+        {/* hojas altas a la derecha, sin tapar el sol */}
+        <g className="avv-frente-mece-b" transform="translate(682,-6) rotate(-14)">
+          <ellipse cx="0" cy="52" rx="26" ry="70" fill="url(#avv-hoja-frente)" transform="rotate(28)" opacity=".95" />
+          <ellipse cx="34" cy="26" rx="20" ry="56" fill="#1d5c2a" transform="rotate(48)" opacity=".88" />
+        </g>
+        {/* fronda lateral izquierda a media altura */}
+        <g className="avv-frente-mece-b" stroke="#1d5c2a" fill="none" strokeLinecap="round" opacity=".92">
+          <path d="M118,600 Q104,500 132,418" strokeWidth="13" />
+          <path d="M132,612 Q130,516 158,452" strokeWidth="9" />
+          <path d="M108,588 Q88,520 96,462" strokeWidth="7" />
+        </g>
+        {/* pasto en las esquinas de abajo, sobre el filo del suelo */}
+        <g className="avv-frente-mece" stroke="#163a1c" fill="none" strokeLinecap="round" opacity=".9">
+          <path d="M146,788 Q140,742 152,712" strokeWidth="6" />
+          <path d="M162,792 Q164,748 178,724" strokeWidth="5" />
+          <path d="M132,786 Q122,752 126,728" strokeWidth="4.4" />
+          <path d="M642,792 Q636,748 648,716" strokeWidth="6" />
+          <path d="M658,796 Q662,752 676,730" strokeWidth="5" />
+          <path d="M628,790 Q618,756 622,732" strokeWidth="4.4" />
+        </g>
+        {/* bokeh: polen fuera de foco flotando pegado al vidrio */}
+        <g fill="#fdf6c8">
+          {[[210, 240, 26, 0], [560, 210, 18, 1], [120, 640, 22, 2], [690, 560, 16, 3], [360, 120, 14, 4]].map(([bx, by, br, d]) => (
+            <circle key={d} cx={bx} cy={by} r={br} className="avv-bokeh" style={{ animationDelay: `${Number(d) * -2.6}s` }} />
+          ))}
+        </g>
+        {/* abeja paseandera desenfocada: cruza el primer plano de vez en cuando */}
+        <g className="avv-abeja-paseo" opacity=".42">
+          <g className="avv-flota">
+            <ellipse cx="6" cy="-20" rx="18" ry="9" fill="#eef9fb" opacity=".8" className="avv-ala avv-ala-a" />
+            <ellipse cx="-8" cy="-22" rx="16" ry="8" fill="#dff3f7" opacity=".75" className="avv-ala avv-ala-b" />
+            <ellipse cx="0" cy="0" rx="26" ry="18" fill="url(#avv-miel)" />
+            <path d="M-10,-16 Q-8,0 -10,16 M4,-17 Q6,0 4,17" stroke="#5a3a10" strokeWidth="6" fill="none" strokeLinecap="round" />
+            <circle cx="-30" cy="2" r="13" fill="#3a2a14" />
+          </g>
+        </g>
+      </Capa>
+    </div>
   );
 }
 
@@ -651,6 +790,7 @@ function SelectorEspecie({ actual, onElegir, onCerrar }) {
                   <strong>{e.nombre}</strong>
                   <i>{e.cientifico}</i>
                   <span className="avv-especie-eje">{e.emoji} {e.eje}</span>
+                  {e.nota && <span className="avv-especie-nota">⭐ {e.nota}</span>}
                 </span>
                 {actual === e.id && <span className="avv-especie-check" aria-hidden="true">✓</span>}
               </button>
@@ -692,10 +832,47 @@ function TarjetaMundo({ mundo, onCerrar }) {
  */
 export default function AvatarGameVerdeVivo({ onBack }) {
   const [años, setAños] = useState(0);
-  const [especieId, setEspecieId] = useState('chivito');
+  const [especieId, setEspecieId] = useState('abeja');
   const [mundoSel, setMundoSel] = useState(/** @type {string|null} */(null));
   const [selectorAbierto, setSelectorAbierto] = useState(false);
   const [panelAbierto, setPanelAbierto] = useState(true);
+  const rootRef = useRef(/** @type {HTMLDivElement|null} */(null));
+
+  /* Parallax por puntero: mueve las variables --avv-px/--avv-py (traslación por
+     capa según su --f) y --avv-rx/--avv-ry (tilt 3D del lienzo). Con
+     prefers-reduced-motion no se instala nada y la escena queda quieta. */
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || typeof window.matchMedia !== 'function') return undefined;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    let raf = 0;
+    let nx = 0;
+    let ny = 0;
+    const aplicar = () => {
+      raf = 0;
+      el.style.setProperty('--avv-px', `${(nx * -18).toFixed(2)}px`);
+      el.style.setProperty('--avv-py', `${(ny * -10).toFixed(2)}px`);
+      el.style.setProperty('--avv-rx', `${(ny * 1.1).toFixed(2)}deg`);
+      el.style.setProperty('--avv-ry', `${(nx * -1.4).toFixed(2)}deg`);
+    };
+    const alMover = (e) => {
+      nx = (e.clientX / window.innerWidth) * 2 - 1;
+      ny = (e.clientY / window.innerHeight) * 2 - 1;
+      if (!raf) raf = window.requestAnimationFrame(aplicar);
+    };
+    const alSalir = () => {
+      nx = 0;
+      ny = 0;
+      if (!raf) raf = window.requestAnimationFrame(aplicar);
+    };
+    window.addEventListener('pointermove', alMover, { passive: true });
+    window.addEventListener('pointerleave', alSalir);
+    return () => {
+      window.removeEventListener('pointermove', alMover);
+      window.removeEventListener('pointerleave', alSalir);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
+  }, []);
 
   const tn = clamp01(años / 5);
   const especie = ESPECIES.find((e) => e.id === especieId) || ESPECIES[0];
@@ -711,15 +888,15 @@ export default function AvatarGameVerdeVivo({ onBack }) {
   const volver = onBack || (() => { window.location.hash = ''; });
 
   return (
-    <div className="avv-root" data-mockup="avatar-verde-vivo">
+    <div className="avv-root" data-mockup="avatar-verde-vivo" ref={rootRef}>
       <EscenaOrganismo
         tn={tn}
-        años={años}
         especie={especie}
         etapaIdx={etapaIdx}
         mundoSel={mundoSel}
         onMundo={(id) => setMundoSel((prev) => (prev === id ? null : id))}
       />
+      <div className="avv-vineta" aria-hidden="true" />
 
       {/* CABEZOTE */}
       <header className="avv-cabezote">

@@ -2384,8 +2384,9 @@ export default function App() {
       {/* AgentFab (colibrí flotante "respuesta lista") en TODAS las pantallas
           MENOS el home/dashboard (operador 2026-06-06): en el home el colibrí
           ya es el botón de ENVIAR del compositor, así que el FAB flotante ahí
-          duplicaría el ave. Sigue en el resto para anunciar "respuesta lista". */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && <AgentFab onNavigate={navigate} />}
+          duplicaría el ave. Sigue en el resto para anunciar "respuesta lista".
+          Tampoco en el mockup del avatar (pantalla completa de demo visual). */}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'mockup_avatar_verde_vivo' && <AgentFab onNavigate={navigate} />}
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
           pregunta al agente punta a punta por voz.
