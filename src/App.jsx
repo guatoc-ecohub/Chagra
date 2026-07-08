@@ -116,6 +116,7 @@ const CicloCultivoScreen = lazy(() => import('./components/CicloCultivoScreen'))
 const GerminacionScreen = lazy(() => import('./components/GerminacionScreen'));
 const CicloNutrientesScreen = lazy(() => import('./components/CicloNutrientesScreen'));
 const CalendarioFincaScreen = lazy(() => import('./components/CalendarioFincaScreen'));
+const AlmanaqueScreen = lazy(() => import('./components/almanaque/AlmanaqueScreen'));
 const SeguimientoProcesoScreen = lazy(() => import('./components/SeguimientoProcesoScreen'));
 const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
 // Módulo "Agua de la finca": cosecha de lluvia (calculadora determinista),
@@ -301,6 +302,7 @@ const VIEW_LOADING_LABELS = {
   ciclo_vivo: 'Abriendo el ciclo vivo…',
   calendario: 'Abriendo el calendario…',
   calendario_finca: 'Abriendo el calendario…',
+  almanaque: 'Abriendo el almanaque…',
   mapa: 'Abriendo el mapa…',
   mercado: 'Abriendo el mercado…',
   mercados: 'Abriendo el mercado…',
@@ -378,6 +380,8 @@ const HASH_VIEW_ROUTES = {
   'ciclo-nutrientes': 'ciclo_nutrientes',
   calendario: 'calendario_finca',
   'calendario-finca': 'calendario_finca',
+  almanaque: 'almanaque',
+  'almanaque-campesino': 'almanaque',
   animales: 'animales',
   'animales-gallinas': 'animales_gallinas',
   'animales-abejas': 'animales_abejas',
@@ -490,6 +494,7 @@ const MODULE_VIEWS = new Set([
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'aromaticas', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'frutales', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'almanaque', 'suelo', 'agua', 'cafe', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'platano', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'cacao', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'hortalizas', 'tuberculos', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
@@ -1774,6 +1779,19 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Aromáticas y condimentarias">
               <AromaticasScreen onBack={() => navigate('mundo_cultivos')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'almanaque':
+        // Vista HERMANA de calendario_finca (no la duplica): el "Almanaque de la
+        // finca" enseña el año campesino a lo grande — aguas y secas, qué da cada
+        // piso térmico (ventanas de cosecha grounded en perennialCycles) y el
+        // saber lunar tradicional (cultura, no receta). Photo-forward reusando
+        // fotos CC ya en /public; enlaza al calendario grounded de detalle.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Almanaque de la finca">
+              <AlmanaqueScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
