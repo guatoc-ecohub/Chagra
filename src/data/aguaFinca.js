@@ -495,6 +495,120 @@ export const RIESGOS_CONTAMINACION = [
     nivel: 'medio',
     prevenir: 'Nada de botaderos al lado del cauce; separe, composte lo orgánico y saque el resto de la ronda del agua.',
   },
+  /* ── 2ª pasada (pedido del operador): aguas mieles, sedimentos, metales ── */
+  {
+    id: 'aguas-mieles',
+    icono: 'cafe',
+    fuente: 'Aguas mieles del café',
+    via: 'Escorrentía directa',
+    aporta: 'El agua del despulpado y del lavado baja cargada de miel (mucílago) y pulpa. Esa dulzura alimenta tantos microbios que le acaban el oxígeno a la quebrada: aguas abajo se mueren peces y camarones.',
+    nivel: 'alto',
+    prevenir: 'Ni la pulpa ni el agua del lavado van al cauce: pulpa a fosa techada y aguas mieles a su propio pozo o tanque (ver el caso del beneficiadero, abajo).',
+  },
+  {
+    id: 'sedimentos',
+    icono: 'sedimento',
+    fuente: 'Sedimentos: tierra suelta y erosión',
+    via: 'Escorrentía',
+    aporta: 'El barro de potreros pelados, quemas, caminos y del ganado metido al cauce enturbia el agua y entierra bocatomas y acequias — y los venenos y microbios viajan pegados a ese barro.',
+    nivel: 'medio',
+    prevenir: 'Suelo tapado y sin quemas ladera arriba, zanjas a nivel, y el ganado bebe en bebedero, no dentro de la quebrada. Ojo: el agua turbia además le quita fuerza al cloro y al sol (SODIS).',
+  },
+  {
+    id: 'mineria',
+    icono: 'metal',
+    fuente: 'Metales pesados (minería aguas arriba)',
+    via: 'Escorrentía y sedimentos',
+    aporta: 'Donde hay minería aguas arriba —sobre todo de oro— el mercurio y otros metales bajan con el agua y el barro, se van acumulando en el cuerpo y en los peces, y NO salen hirviendo el agua.',
+    nivel: 'alto',
+    prevenir: 'Si hay mina o entable aguas arriba, esa agua no es para tomar ni cocinar — ni hervida. Consígala de otra fuente y avise a la autoridad de salud de su municipio.',
+  },
+];
+
+/**
+ * Metales pesados en el agua de tomar — límites legales.
+ *
+ * GROUNDED (DR agua nacional §3.1 — Resolución 2115/2007, MinSalud): el agua
+ * para consumo humano admite como máximo mercurio 0,001 mg/L, plomo 0,01 mg/L
+ * y arsénico 0,01 mg/L — prácticamente CERO. Y el hervido NO remueve químicos
+ * ni metales (DR §3.3, OMS/EPA): contra metales no hay tratamiento casero, la
+ * única defensa es cambiar de fuente. Confianza: alta (norma citada a texto).
+ */
+export const METALES_AGUA = {
+  estado: 'grounded',
+  limitesMgL: { mercurio: 0.001, plomo: 0.01, arsenico: 0.01 },
+  hervirNoLosQuita: true,
+  fuente: 'Resolución 2115/2007 (MinSalud); OMS/EPA — el hervido no remueve químicos ni metales (DR agua §3.1 y §3.3)',
+  confianza: 'alta',
+};
+
+/**
+ * CASO CAFETERO · Las aguas mieles del beneficiadero.
+ *
+ * Es EL riesgo icónico de la finca cafetera colombiana: el agua dulce del
+ * despulpado y lavado ("aguas mieles") es de las cargas orgánicas más
+ * concentradas que produce una finca. El plan es CUALITATIVO (prácticas del
+ * beneficio ecológico difundidas por Cenicafé: despulpado en seco, fosa
+ * techada para la pulpa, lavar con poca agua, aguas mieles a pozo/tanque).
+ * La CIFRA de carga contaminante (DBO / equivalencia) queda como slot
+ * grounded-pendiente: NO se inventa.
+ */
+export const CAFE_AGUAS_MIELES = {
+  id: 'cafe-aguas-mieles',
+  titulo: 'Las aguas mieles del café',
+  resumen: 'En una finca cafetera, el punto que más contamina no es el cafetal: es el beneficiadero. La miel (mucílago) que suelta el grano es puro alimento para microbios — al caer a la quebrada se lo comen tan rápido que le acaban el oxígeno al agua.',
+  queHacer: [
+    { id: 'despulpe-seco', titulo: 'Despulpe sin agua', detalle: 'El despulpado en seco (sin chorro) es el primer ahorro: menos agua sucia que manejar y la miel queda concentrada donde usted la controla.' },
+    { id: 'fosa-pulpa', titulo: 'La pulpa a fosa techada', detalle: 'La pulpa va a una fosa con techo — nunca al cauce ni amontonada en la orilla, porque el aguacero la lava derecho a la quebrada. Bien manejada se vuelve abono para el mismo cafetal.' },
+    { id: 'lavar-poca-agua', titulo: 'Lave con poca agua', detalle: 'Lavar en tanque (tina) reutilizando el agua gasta muchísimo menos que lavar bajo el chorro. Menos agua usada = menos agua miel que tratar.' },
+    { id: 'pozo-mieles', titulo: 'Las aguas mieles, a su propio pozo', detalle: 'El agua del lavado va a un pozo o tanque aparte para que se asiente y se descomponga — de ahí sale para compost o biofertilizante, no para la quebrada.' },
+  ],
+  cifraCarga: {
+    estado: ESTADO_GROUNDED_PENDIENTE,
+    valor: null,
+    fuentePrevista: 'Cenicafé — carga orgánica (DBO) del beneficio tradicional vs beneficio ecológico',
+  },
+  fuente: 'Cenicafé — prácticas del beneficio ecológico del café (cualitativo)',
+};
+
+/**
+ * ¿ESTA AGUA SIRVE PARA...? — la regla por USO (del más exigente al menos).
+ *
+ * Complementa la escalera USOS_DEL_AGUA (que va por FUENTE): aquí la persona
+ * parte del uso que necesita y recibe la regla para decidir. Cualitativo
+ * (saneamiento básico OMS/OPS + inspección sanitaria); el punto de riego con
+ * agua reusada tiene norma colombiana (Resolución 1256/2021, DR agua §5.2).
+ * `icono` = clave que el componente mapea a un ícono.
+ */
+export const PARA_QUE_SIRVE = [
+  {
+    id: 'tomar',
+    icono: 'tomar',
+    uso: 'Tomar, cocinar y preparar tetero',
+    exige: 'La más exigente',
+    regla: 'SIEMPRE tratada (hervida, clorada, al sol o filtrada y rematada con cloro), venga de donde venga — el agua clarita también. Para el tetero del bebé, la mejor agua de la casa.',
+  },
+  {
+    id: 'hortaliza',
+    icono: 'hortaliza',
+    uso: 'Regar hortaliza que se come cruda',
+    exige: 'Exigente',
+    regla: 'Nada de agua que venga de corrales, letrinas o casas aguas arriba: lo que toca la lechuga o el tomate se lo come la familia tal cual. En la duda, riegue al pie de la mata y no sobre la hoja.',
+  },
+  {
+    id: 'animales',
+    icono: 'animales',
+    uso: 'Dar de beber a los animales',
+    exige: 'Media',
+    regla: 'Los animales también se enferman con agua podrida: deles la más limpia que tenga, en bebedero y no directo del cauce (así cuidan al animal Y a la quebrada). Ternero o lechón con diarrea es plata que se va en agua sucia.',
+  },
+  {
+    id: 'riego',
+    icono: 'riego',
+    uso: 'Riego general y lavar equipos',
+    exige: 'La menos exigente',
+    regla: 'Quebrada, acequia o lluvia sirven — pero si huele a químico, tiene nata o mató peces, tampoco: ese veneno se le pega al cultivo. Y la bomba de fumigar NO se lava en el cauce. El reúso de aguas tratadas para riego tiene norma propia (Resolución 1256/2021).',
+  },
 ];
 
 /**

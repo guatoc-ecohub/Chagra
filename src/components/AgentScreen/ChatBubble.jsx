@@ -1,5 +1,8 @@
-import React from 'react';
-import { BadgeCheck, Info, Sparkles, AlertTriangle, ExternalLink, ShieldCheck } from 'lucide-react';
+import React, { useState } from 'react';
+import {
+  BadgeCheck, Info, Sparkles, AlertTriangle, ExternalLink, ShieldCheck,
+  OctagonAlert, SearchX, Wrench, ChevronDown,
+} from 'lucide-react';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import { speak, speakKokoro, stop, isSpeaking, isKokoroAvailable } from '../../services/ttsService';
 import { agentSounds } from '../../services/agentSoundService';
@@ -34,10 +37,89 @@ function toolLabel(toolName) {
 }
 
 /**
+ * Sello — la pieza base del SEMÁFORO DE CONFIANZA (pulido visual 2026-07).
+ * TODOS los badges bajo una respuesta del agente comparten esta anatomía:
+ * lámpara (punto sólido del color del nivel con el ícono en negativo) +
+ * etiqueta + caret si es expandible. El nivel es el semáforo que el
+ * campesino lee de un vistazo:
+ *
+ *   verde → verificado en el catálogo/grafo · ámbar → generativo/parcial,
+ *   verifica · rojo → posible invento del modelo · gris → neutro (beta).
+ *
+ * Accesible sin depender del color: cada nivel usa un ícono de FORMA
+ * distinta (check/triángulo/octágono/chispa) + texto. En celular no hay
+ * tooltip nativo, así que si el sello trae `explica`, se vuelve botón y al
+ * toque abre una "nota al margen" (.sello-nota) con la explicación en
+ * español llano. CSS en src/styles/sello-confianza.css (theme-aware,
+ * GPU-friendly, prefers-reduced-motion). Este componente es SOLO
+ * presentación — qué sello sale lo decide el pipeline aguas arriba.
+ *
+ * @param {Object} props
+ * @param {'verde'|'ambar'|'rojo'|'gris'} props.nivel - Nivel del semáforo.
+ * @param {React.ComponentType<any>} props.Icon - Ícono lucide de la lámpara.
+ * @param {string} props.label - Etiqueta corta del sello.
+ * @param {string} [props.sub] - Sufijo secundario (" · <sub>", más tenue).
+ * @param {string} [props.explica] - Explicación llana; si viene, el sello es
+ *   un botón expandible que la muestra como nota al margen.
+ * @param {string} props.testId - data-testid estable (contrato de tests).
+ * @param {string} [props.title] - Tooltip nativo (desktop).
+ * @param {Object} [props.dataAttrs] - Atributos data-* extra (data-source…).
+ */
+function Sello({ nivel, Icon, label, sub, explica, testId, title, dataAttrs = {} }) {
+  const [abierto, setAbierto] = useState(false);
+  const cuerpo = (
+    <>
+      <span className="sello-lampara" aria-hidden="true">
+        <Icon size={10} strokeWidth={2.75} />
+      </span>
+      <span className="sello-texto">
+        {label}
+        {sub ? <span className="sello-sub"> · {sub}</span> : null}
+      </span>
+      {explica ? <ChevronDown size={10} className="sello-caret" aria-hidden="true" /> : null}
+    </>
+  );
+
+  if (!explica) {
+    return (
+      <span className="sello" data-nivel={nivel} data-testid={testId} title={title} {...dataAttrs}>
+        {cuerpo}
+      </span>
+    );
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        className="sello"
+        data-nivel={nivel}
+        data-testid={testId}
+        title={title || explica}
+        aria-expanded={abierto}
+        onClick={(e) => {
+          e.stopPropagation();
+          setAbierto((v) => !v);
+        }}
+        onDoubleClick={(e) => e.stopPropagation()}
+        {...dataAttrs}
+      >
+        {cuerpo}
+      </button>
+      {abierto && (
+        <span className="sello-nota" role="note" data-nivel={nivel}>
+          {explica}
+        </span>
+      )}
+    </>
+  );
+}
+
+/**
  * Renderiza el badge de "fuente" según el metadata del turno del assistant:
  *   - grounded === true             → verde "Catálogo verificado · <tool>"
- *   - tool_used && !grounded        → amber "Tool sin match · <tool>"
- *   - !tool_used (LLM only)         → gris "Respuesta generativa"
+ *   - tool_used && !grounded        → ámbar "No está en el catálogo · <tool>"
+ *   - !tool_used (LLM only)         → ámbar "Respuesta generativa · verifica"
  *
  * Wording deliberadamente sobrio (cero hype). Sin "garantizado", "100%",
  * "perfecto" — el catálogo Chagra está en construcción, el badge solo dice
@@ -63,29 +145,29 @@ function SourceBadge({ metadata }) {
 
   if (hasHallucinated) {
     return (
-      <span
-        className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-red-700/25 text-red-200 border border-red-700"
-        data-testid="hallucinated-name-badge"
-        data-source="hallucinated-scientific-name"
+      <Sello
+        nivel="rojo"
+        Icon={OctagonAlert}
+        label="Nombre científico sin verificar"
+        testId="hallucinated-name-badge"
+        dataAttrs={{ 'data-source': 'hallucinated-scientific-name' }}
         title={`La respuesta menciona un nombre científico que NO está verificado en el catálogo y podría estar inventado por el modelo: ${hallucinatedNames.join(', ')}. No lo uses sin confirmarlo.`}
-      >
-        <AlertTriangle size={12} aria-hidden="true" />
-        <span>Nombre científico sin verificar</span>
-      </span>
+        explica={`La respuesta menciona un nombre científico que NO está en el catálogo y podría ser un invento del modelo: ${hallucinatedNames.join(', ')}. No lo use sin confirmarlo con un técnico.`}
+      />
     );
   }
 
   if (hasSuspect) {
     return (
-      <span
-        className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-amber-600/20 text-amber-300 border border-amber-700"
-        data-testid="suspect-name-badge"
-        data-source="suspect-scientific-name"
+      <Sello
+        nivel="ambar"
+        Icon={AlertTriangle}
+        label="Verifica el nombre científico"
+        testId="suspect-name-badge"
+        dataAttrs={{ 'data-source': 'suspect-scientific-name' }}
         title={`El nombre científico citado existe en el catálogo pero podría no corresponder a lo que preguntaste: ${suspectNames.join(', ')}. Verifícalo antes de aplicarlo.`}
-      >
-        <AlertTriangle size={12} aria-hidden="true" />
-        <span>Verifica el nombre científico</span>
-      </span>
+        explica={`El nombre científico citado existe en el catálogo, pero podría no ser el de la planta que usted preguntó: ${suspectNames.join(', ')}. Verifíquelo antes de aplicarlo.`}
+      />
     );
   }
 
@@ -102,55 +184,58 @@ function SourceBadge({ metadata }) {
       : [];
     const detalle = organismos.length > 0 ? ` (${organismos.join(', ')})` : '';
     return (
-      <span
-        className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-amber-600/20 text-amber-300 border border-amber-700"
-        data-testid="cross-crop-badge"
-        data-source="cross-crop"
+      <Sello
+        nivel="ambar"
+        Icon={AlertTriangle}
+        label="Dato de otro cultivo"
+        sub="verifica"
+        testId="cross-crop-badge"
+        dataAttrs={{ 'data-source': 'cross-crop' }}
         title={`Este dato${detalle} existe en el catálogo pero corresponde a OTRO cultivo, no al que tienes en foco. No es un "dato verificado" para tu cultivo: verifícalo antes de aplicarlo.`}
-      >
-        <AlertTriangle size={12} aria-hidden="true" />
-        <span>Dato de otro cultivo · verifica</span>
-      </span>
+        explica={`Este dato${detalle} sí está en el catálogo, pero es de OTRO cultivo, no del que usted tiene en foco. No lo tome como verificado para su cultivo: verifíquelo antes de aplicarlo.`}
+      />
     );
   }
 
   if (toolUsed && grounded) {
     return (
-      <span
-        className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-green-600/20 text-green-300 border border-green-700"
-        data-testid="source-badge"
-        data-source="catalog"
-      >
-        <BadgeCheck size={12} aria-hidden="true" />
-        <span>Catálogo verificado · {toolLabel(toolUsed)}</span>
-      </span>
+      <Sello
+        nivel="verde"
+        Icon={BadgeCheck}
+        label="Catálogo verificado"
+        sub={toolLabel(toolUsed)}
+        testId="source-badge"
+        dataAttrs={{ 'data-source': 'catalog' }}
+        explica="Este dato viene del catálogo Chagra, armado con fuentes revisadas. No es solo palabra del modelo: tiene respaldo. Ante la duda, consulte a su técnico."
+      />
     );
   }
 
   if (toolUsed && !grounded) {
     return (
-      <span
-        className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-amber-600/20 text-amber-300 border border-amber-700"
-        data-testid="source-badge"
-        data-source="tool-no-match"
-      >
-        <Info size={12} aria-hidden="true" />
-        <span>Tool sin match · {toolLabel(toolUsed)}</span>
-      </span>
+      <Sello
+        nivel="ambar"
+        Icon={SearchX}
+        label="No está en el catálogo"
+        sub={toolLabel(toolUsed)}
+        testId="source-badge"
+        dataAttrs={{ 'data-source': 'tool-no-match' }}
+        explica="Chagra buscó en su catálogo y no encontró este dato. Lo que lee salió del modelo de IA, sin respaldo del catálogo: verifíquelo antes de aplicarlo."
+      />
     );
   }
 
   return (
-    <span
-      className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-amber-900/30 text-amber-300 border border-amber-700/50"
-      data-testid="source-badge"
-      data-source="generative"
+    <Sello
+      nivel="ambar"
+      Icon={Sparkles}
+      label="Respuesta generativa"
+      sub="verifica"
+      testId="source-badge"
+      dataAttrs={{ 'data-source': 'generative' }}
       title="Respuesta del modelo de IA SIN consulta al catálogo Chagra. Puede contener errores; verifica antes de aplicar al cultivo."
-    >
-      <AlertTriangle size={12} aria-hidden="true" />
-      <Sparkles size={12} aria-hidden="true" />
-      <span>Respuesta generativa · verifica</span>
-    </span>
+      explica="Esta respuesta salió del modelo de IA sin consultar el catálogo Chagra. Puede traer errores: verifíquela antes de aplicarla en su cultivo."
+    />
   );
 }
 
@@ -175,7 +260,9 @@ function FuenteBadge({ metadata }) {
   const url = typeof md.fuente_url === 'string' ? md.fuente_url.trim() : '';
   const label = (typeof md.fuente === 'string' && md.fuente.trim()) || 'fuente externa';
 
-  // Forma 1: recurso citado → link clickeable.
+  // Forma 1: recurso citado → link clickeable. Sello VERDE del semáforo (la
+  // fuente es verificable), pero sigue siendo <a> nativo CSP-safe — el toque
+  // navega al recurso, no expande nota.
   if (/^https?:\/\//i.test(url)) {
     return (
       <a
@@ -184,12 +271,15 @@ function FuenteBadge({ metadata }) {
         rel="noopener noreferrer"
         data-testid="fuente-badge"
         data-source="verifiable-source"
+        data-nivel="verde"
         title={`Esta respuesta cita una fuente verificable (${label}). Abre el recurso citado en una pestaña nueva.`}
-        className="tap-target text-xs px-2.5 py-1.5 rounded-md inline-flex items-center gap-1 mt-1 bg-sky-600/20 text-sky-300 border border-sky-700 hover:bg-sky-600/30 underline-offset-2 hover:underline"
+        className="sello tap-target"
       >
-        <ShieldCheck size={12} aria-hidden="true" />
-        <span>Fuente verificable: {label}</span>
-        <ExternalLink size={11} aria-hidden="true" />
+        <span className="sello-lampara" aria-hidden="true">
+          <ShieldCheck size={10} strokeWidth={2.75} />
+        </span>
+        <span className="sello-texto">Fuente verificable: {label}</span>
+        <ExternalLink size={10} className="sello-caret" aria-hidden="true" />
       </a>
     );
   }
@@ -198,15 +288,15 @@ function FuenteBadge({ metadata }) {
   // NO emitimos <a> (no linkeamos a la homepage): solo citamos honestamente.
   if (md.fuente_texto === true) {
     return (
-      <span
-        data-testid="fuente-badge-text"
-        data-source="cited-source-text"
+      <Sello
+        nivel="gris"
+        Icon={ShieldCheck}
+        label={`Fuente: ${label}`}
+        testId="fuente-badge-text"
+        dataAttrs={{ 'data-source': 'cited-source-text' }}
         title={`Esta respuesta cita a ${label}. La institución no expone un enlace directo al dato citado, por eso se muestra como referencia (sin enlace).`}
-        className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-slate-600/20 text-slate-300 border border-slate-700"
-      >
-        <ShieldCheck size={12} aria-hidden="true" />
-        <span>Fuente: {label}</span>
-      </span>
+        explica={`Esta respuesta cita a ${label}. Esa institución no tiene un enlace directo al dato citado, por eso se muestra solo como referencia, sin enlace.`}
+      />
     );
   }
 
@@ -224,15 +314,15 @@ function AutoCorrectedBadge({ metadata }) {
   const md = metadata || {};
   if (md.auto_corrected !== true) return null;
   return (
-    <span
-      className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-violet-600/20 text-violet-300 border border-violet-700"
-      data-testid="auto-corrected-badge"
-      data-source="auto-corrected"
+    <Sello
+      nivel="ambar"
+      Icon={Wrench}
+      label="Respuesta auto-corregida"
+      testId="auto-corrected-badge"
+      dataAttrs={{ 'data-source': 'auto-corrected' }}
       title="El sistema ajustó automáticamente esta respuesta para corregir un posible error del modelo (viabilidad, agroquímico sintético, especie invasora, dosis sin fuente). El contenido mostrado ya está corregido."
-    >
-      <AlertTriangle size={12} aria-hidden="true" />
-      <span>Respuesta auto-corregida</span>
-    </span>
+      explica="El sistema corrigió automáticamente un posible error del modelo en esta respuesta (viabilidad, agroquímico sintético, especie invasora o dosis sin fuente). Lo que usted lee ya está corregido."
+    />
   );
 }
 
@@ -249,20 +339,23 @@ function AutoCorrectedBadge({ metadata }) {
 const _CONFIANZA_BADGE = {
   alta: {
     label: 'Confianza alta',
-    classes: 'bg-emerald-600/20 text-emerald-300 border-emerald-700',
+    nivel: 'verde',
     title: 'Dato del catálogo con alta confianza (curado / respaldado por fuente).',
+    explica: 'Este dato del catálogo tiene alta confianza: fue curado y tiene fuente que lo respalda.',
     Icon: BadgeCheck,
   },
   media: {
     label: 'Confianza media',
-    classes: 'bg-amber-600/20 text-amber-300 border-amber-700',
+    nivel: 'ambar',
     title: 'Dato del catálogo con confianza media — útil de referencia, contrástalo antes de aplicar.',
+    explica: 'Este dato del catálogo tiene confianza media: sirve de referencia, pero contrástelo con su técnico antes de aplicarlo.',
     Icon: Info,
   },
   baja: {
     label: 'Confianza baja',
-    classes: 'bg-slate-600/20 text-slate-300 border-slate-600',
+    nivel: 'gris',
     title: 'Dato del catálogo con confianza baja — tentativo, no actúes sin verificar con un técnico.',
+    explica: 'Este dato del catálogo tiene confianza baja: es tentativo. No actúe sin verificarlo con un técnico.',
     Icon: AlertTriangle,
   },
 };
@@ -271,17 +364,16 @@ function ConfianzaBadge({ metadata }) {
   const md = metadata || {};
   const cfg = _CONFIANZA_BADGE[md.confianza];
   if (!cfg) return null;
-  const { Icon } = cfg;
   return (
-    <span
-      className={`text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 border ${cfg.classes}`}
-      data-testid="confianza-badge"
-      data-confianza={md.confianza}
+    <Sello
+      nivel={cfg.nivel}
+      Icon={cfg.Icon}
+      label={cfg.label}
+      testId="confianza-badge"
+      dataAttrs={{ 'data-confianza': md.confianza }}
       title={cfg.title}
-    >
-      <Icon size={12} aria-hidden="true" />
-      <span>{cfg.label}</span>
-    </span>
+      explica={cfg.explica}
+    />
   );
 }
 
@@ -423,21 +515,26 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
               IA del agente. NO reemplaza a SourceBadge (que es la fuente
               grounded vs generativa) — convive. Suprimido para mensajes de
               recuperación huérfana porque no son respuesta real del modelo. */}
+          {/* SEMÁFORO DE CONFIANZA: una sola fila coherente de sellos. El pill
+              beta (siempre visible) y los sellos de fuente/confianza (pref
+              showSourceBadges) comparten fila y anatomía — antes eran
+              etiquetas sueltas apiladas con estilos distintos. */}
           {!isUser && !isStreaming && !message._orphan_recovery && (
-            <AIBetaBadge
-              className="mt-1"
-              confidence={message._grounded?.confidence ?? message.metadata?.confidence}
-            />
-          )}
-          {shouldShowBadge && (
-            <div className="mt-1 flex flex-wrap items-center gap-1.5">
-              <SourceBadge metadata={message.metadata} />
-              {/* #20: confianza del dato curado (alta/media/baja → verde/ámbar/gris). */}
-              <ConfianzaBadge metadata={message.metadata} />
-              {/* #18: fuente verificable clickeable (Agrosavia/FAO), CSP-safe. */}
-              <FuenteBadge metadata={message.metadata} />
-              {/* #19: aviso de que los guards deterministas corrigieron la respuesta. */}
-              <AutoCorrectedBadge metadata={message.metadata} />
+            <div className="mt-1.5 sello-fila" data-testid="sello-fila">
+              <AIBetaBadge
+                confidence={message._grounded?.confidence ?? message.metadata?.confidence}
+              />
+              {shouldShowBadge && (
+                <>
+                  <SourceBadge metadata={message.metadata} />
+                  {/* #20: confianza del dato curado (alta/media/baja → verde/ámbar/gris). */}
+                  <ConfianzaBadge metadata={message.metadata} />
+                  {/* #18: fuente verificable clickeable (Agrosavia/FAO), CSP-safe. */}
+                  <FuenteBadge metadata={message.metadata} />
+                  {/* #19: aviso de que los guards deterministas corrigieron la respuesta. */}
+                  <AutoCorrectedBadge metadata={message.metadata} />
+                </>
+              )}
             </div>
           )}
           {message.timestamp && (

@@ -100,6 +100,26 @@ function PerfilSueloIlustracion() {
   );
 }
 
+/* ── Divisor decorativo: raicilla con hifas de micorriza. Marca el paso de una
+ *    sección a otra del cuaderno, como una raíz que sigue bajando. ── */
+function RaicillasDivider() {
+  return (
+    <svg viewBox="0 0 240 14" className="w-full h-3.5 text-slate-600" aria-hidden="true" focusable="false">
+      <g stroke="currentColor" fill="none" strokeWidth="1.1" strokeLinecap="round">
+        <path d="M6 7 H234" opacity="0.3" />
+        <path d="M62 7 q3 4 9 5" opacity="0.55" />
+        <path d="M120 7 q-3 -4 -9 -5" opacity="0.55" />
+        <path d="M178 7 q3 4 9 5" opacity="0.55" />
+      </g>
+      <g fill="rgb(var(--t-accent-rgb) / 0.75)">
+        <circle cx="62" cy="7" r="1.7" />
+        <circle cx="120" cy="7" r="1.7" />
+        <circle cx="178" cy="7" r="1.7" />
+      </g>
+    </svg>
+  );
+}
+
 /* ── Indicadores del análisis (pilar 1). Umbrales GROUNDED a valores GENERALES
  *    del DR de suelo (deepresearch/2026-07-03-suelo-salud-nacional-CO.md §1):
  *      - pH: óptimo general 5,5–7,0; neutro 6,6–7,3; alcalino >7,5 (USDA/IGAC,
@@ -207,7 +227,7 @@ export default function SaludSueloScreen({ onBack, onNavigate }) {
         type="button"
         onClick={volver}
         aria-label="Volver"
-        className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center shrink-0"
+        className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center shrink-0 ss-focus"
       >
         <ChevronLeft size={20} />
       </button>
@@ -229,12 +249,15 @@ export default function SaludSueloScreen({ onBack, onNavigate }) {
     <div className="min-h-[100dvh] text-white">
       {Header}
       <div className="px-4 pb-10">
-        {pilar === 'hub' && <Hub onIr={setPilar} onNavigate={onNavigate} />}
-        {pilar === 'lectura' && <PilarLectura onNavigate={onNavigate} onIr={setPilar} />}
-        {pilar === 'analisis' && <PilarAnalisis onNavigate={onNavigate} onIr={setPilar} />}
-        {pilar === 'acidez' && <PilarAcidez />}
-        {pilar === 'vida' && <PilarVida onNavigate={onNavigate} />}
-        {pilar === 'mejorar' && <PilarMejora onNavigate={onNavigate} />}
+        {/* key={pilar} remonta el contenido al navegar → entrada suave ss-enter */}
+        <div key={pilar} className="ss-enter">
+          {pilar === 'hub' && <Hub onIr={setPilar} onNavigate={onNavigate} />}
+          {pilar === 'lectura' && <PilarLectura onNavigate={onNavigate} onIr={setPilar} />}
+          {pilar === 'analisis' && <PilarAnalisis onNavigate={onNavigate} onIr={setPilar} />}
+          {pilar === 'acidez' && <PilarAcidez />}
+          {pilar === 'vida' && <PilarVida onNavigate={onNavigate} />}
+          {pilar === 'mejorar' && <PilarMejora onNavigate={onNavigate} />}
+        </div>
       </div>
     </div>
   );
@@ -242,6 +265,7 @@ export default function SaludSueloScreen({ onBack, onNavigate }) {
 
 /* ─────────────────────────────────── Hub ─────────────────────────────────── */
 function Hub({ onIr, onNavigate }) {
+  const [heroOk, setHeroOk] = useState(true);
   const pilares = [
     { key: 'lectura', icon: Shovel, titulo: 'Léala en campo', desc: 'La prueba de la pala, el color, el olor y el agua. Y las señales de que la tierra está enferma.', accent: 'amber' },
     { key: 'analisis', icon: Gauge, titulo: '¿Cómo está mi suelo?', desc: 'Lea su análisis: pH, materia orgánica, N-P-K y aluminio, en palabras claras.', accent: 'emerald' },
@@ -251,58 +275,93 @@ function Hub({ onIr, onNavigate }) {
   ];
   return (
     <div className="flex flex-col gap-4">
-      {/* Caso insignia — el léxico campesino como entrada */}
-      <section className="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
-        <div className="p-4 pb-3">
-          <PerfilSueloIlustracion />
+      {/* Caso insignia — hero con foto real (palada.jpg, ya embarcada en
+       *  public/soil-life: USDA-NRCS, dominio público) + el léxico campesino */}
+      <section className="ss-rise rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+        <div className="relative aspect-[16/9] bg-slate-950">
+          {heroOk ? (
+            <img
+              src={`${FOTO_BASE}/palada.jpg`}
+              alt="Manos de un campesino leyendo un puñado de su tierra recién sacado con la pala"
+              decoding="async"
+              onError={() => setHeroOk(false)}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ) : (
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(160deg, #4b3a2a 0%, #33271b 55%, #241a11 100%)' }}
+            />
+          )}
+          {/* Scrim de tierra: legible al sol, en cualquier tema */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/5" aria-hidden="true" />
+          <div className="absolute inset-x-0 bottom-0 p-4 pb-3.5">
+            <p className="text-[11px] uppercase tracking-[0.18em] font-bold text-[#fbbf24]">Caso frecuente</p>
+            <p className="mt-1 text-[19px] font-black text-[#ffffff] leading-tight drop-shadow-md">
+              "Mi tierra está cansada y ácida, ya no da como antes."
+            </p>
+          </div>
         </div>
-        <div className="px-4 pb-4">
-          <p className="text-[13px] uppercase tracking-wide font-bold text-slate-400">Caso frecuente</p>
-          <p className="mt-1 text-[15px] text-slate-100 leading-snug">
-            <span className="font-bold">"Mi tierra está cansada y ácida, ya no da como antes."</span>
-          </p>
-          <p className="mt-2 text-sm text-slate-300 leading-relaxed">
+        <div className="px-4 pt-3 pb-2">
+          <p className="text-sm text-slate-300 leading-relaxed">
             Vamos por partes: primero <span className="font-semibold text-slate-100">leemos cómo está</span>,
             luego <span className="font-semibold text-slate-100">corregimos la acidez</span> si hace falta,
             y por último <span className="font-semibold text-slate-100">la volvemos a llenar de vida</span>.
           </p>
         </div>
+        <div className="px-4 pb-3.5">
+          <PerfilSueloIlustracion />
+        </div>
       </section>
 
-      {/* Tres pilares */}
-      <div className="flex flex-col gap-3">
+      <RaicillasDivider />
+
+      {/* La ruta del cuaderno: cinco pasos unidos por un hilo de raíz */}
+      <ol className="flex flex-col" aria-label="Los cinco pasos del Cuaderno del Suelo">
         {pilares.map((p, i) => {
           const c = COLOR_MAP[p.accent];
           const Icono = p.icon;
+          const last = i === pilares.length - 1;
           return (
-            <button
-              key={p.key}
-              type="button"
-              onClick={() => onIr(p.key)}
-              className={`text-left rounded-2xl border ${c.border} ${c.bg} p-4 flex items-start gap-3 hover:border-opacity-100 transition-colors motion-reduce:transition-none active:scale-[0.99]`}
-            >
-              <span
-                className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
-                style={{ backgroundColor: 'rgb(var(--t-accent-rgb) / 0.20)' }}
-              >
-                <Icono size={22} className={c.text} />
-              </span>
-              <span className="flex-1 min-w-0">
-                <span className="flex items-center gap-2">
-                  <span className="text-[11px] font-bold text-slate-500">Paso {i + 1}</span>
+            <li key={p.key} className="flex gap-3 ss-rise" style={{ '--d': `${80 + i * 70}ms` }}>
+              {/* Riel: chip del paso + hilo de raíz que baja al siguiente */}
+              <div className="flex flex-col items-center shrink-0" aria-hidden="true">
+                <span
+                  className="w-10 h-10 rounded-full flex items-center justify-center border-2 mt-1"
+                  style={{
+                    borderColor: 'rgb(var(--t-accent-rgb) / 0.65)',
+                    backgroundColor: 'rgb(var(--t-accent-rgb) / 0.15)',
+                  }}
+                >
+                  <Icono size={19} className={c.text} />
                 </span>
-                <span className="block text-[15px] font-bold text-white leading-tight">{p.titulo}</span>
-                <span className="block text-sm text-slate-300 mt-0.5 leading-snug">{p.desc}</span>
-              </span>
-              <ChevronRight size={20} className="text-slate-500 shrink-0 mt-2" />
-            </button>
+                {!last && (
+                  <span
+                    className="w-0.5 flex-1 min-h-[16px] rounded-full"
+                    style={{ backgroundColor: 'rgb(var(--t-accent-rgb) / 0.30)' }}
+                  />
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => onIr(p.key)}
+                className={`ss-tap flex-1 min-w-0 text-left rounded-2xl border ${c.border} ${c.bg} p-3.5 flex items-start gap-3 ${last ? '' : 'mb-3'}`}
+              >
+                <span className="flex-1 min-w-0">
+                  <span className="block text-[11px] font-bold uppercase tracking-wider text-slate-500">Paso {i + 1}</span>
+                  <span className="block text-[15px] font-bold text-white leading-tight mt-0.5">{p.titulo}</span>
+                  <span className="block text-sm text-slate-300 mt-0.5 leading-snug">{p.desc}</span>
+                </span>
+                <ChevronRight size={20} className="ss-chev text-slate-500 shrink-0 mt-2" />
+              </button>
+            </li>
           );
         })}
-      </div>
+      </ol>
 
       {/* Puente honesto a herramientas existentes (NO duplicar) */}
       {onNavigate ? (
-        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-3">
+        <div className="ss-rise rounded-xl border border-slate-800 bg-slate-900/50 p-3" style={{ '--d': '480ms' }}>
           <p className="text-xs uppercase tracking-wide font-bold text-slate-400 mb-2">También en Chagra</p>
           <div className="flex flex-col gap-2">
             <PuenteBoton
@@ -330,14 +389,14 @@ function PuenteBoton({ icon, titulo, sub, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="w-full text-left rounded-xl border border-slate-700/60 bg-slate-800/40 p-3 flex items-center gap-3 hover:border-slate-600 transition-colors motion-reduce:transition-none"
+      className="ss-tap w-full text-left rounded-xl border border-slate-700/60 bg-slate-800/40 p-3 flex items-center gap-3 hover:border-slate-600"
     >
       <Icon size={20} className="shrink-0" style={{ color: 'rgb(var(--t-accent-rgb))' }} />
       <span className="flex-1 min-w-0">
         <span className="block text-sm font-bold text-slate-100 leading-tight">{titulo}</span>
         <span className="block text-xs text-slate-400 leading-snug">{sub}</span>
       </span>
-      <ChevronRight size={18} className="text-slate-500 shrink-0" />
+      <ChevronRight size={18} className="ss-chev text-slate-500 shrink-0" />
     </button>
   );
 }
@@ -369,13 +428,13 @@ function FranjaColorSuelo() {
 
 /** Tarjeta de una lectura con las manos. Photo-forward cuando hay foto real;
  *  si no, un mosaico ilustrado (nunca una foto que engañe). */
-function LecturaCard({ l }) {
+function LecturaCard({ l, delay = 0 }) {
   const [imgOk, setImgOk] = useState(true);
   const Icono = ICONO_LECTURA[l.icono] || Eye;
   return (
-    <article className="rounded-2xl border border-slate-800 bg-slate-900 overflow-hidden flex flex-col">
+    <article className="ss-card ss-rise rounded-2xl border border-slate-800 bg-slate-900 overflow-hidden flex flex-col" style={{ '--d': `${delay}ms` }}>
       {/* Encabezado visual: foto real si existe; si no, ilustración/mosaico */}
-      <div className="relative aspect-[16/9] bg-slate-950">
+      <div className="relative aspect-[16/9] bg-slate-950 overflow-hidden">
         {l.slug && imgOk ? (
           <img
             src={`${FOTO_BASE}/${l.slug}.jpg`}
@@ -383,7 +442,7 @@ function LecturaCard({ l }) {
             loading="lazy"
             decoding="async"
             onError={() => setImgOk(false)}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="ss-photo absolute inset-0 w-full h-full object-cover"
           />
         ) : l.icono === 'color' ? (
           <div className="absolute inset-0 flex items-center justify-center p-4 text-slate-300">
@@ -423,11 +482,11 @@ function LecturaCard({ l }) {
 }
 
 /** Tarjeta de una señal de suelo enfermo, con foto real (licencia abierta). */
-function SenalEnfermaCard({ s }) {
+function SenalEnfermaCard({ s, delay = 0 }) {
   const [imgOk, setImgOk] = useState(true);
   return (
-    <article className="rounded-2xl border border-rose-900/50 bg-slate-900 overflow-hidden flex flex-col">
-      <div className="relative aspect-[4/3] bg-slate-950">
+    <article className="ss-card ss-rise rounded-2xl border border-rose-900/50 bg-slate-900 overflow-hidden flex flex-col" style={{ '--d': `${delay}ms` }}>
+      <div className="relative aspect-[4/3] bg-slate-950 overflow-hidden">
         {imgOk ? (
           <img
             src={`${FOTO_BASE}/${s.slug}.jpg`}
@@ -435,7 +494,7 @@ function SenalEnfermaCard({ s }) {
             loading="lazy"
             decoding="async"
             onError={() => setImgOk(false)}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="ss-photo absolute inset-0 w-full h-full object-cover"
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-5xl" aria-hidden="true">{s.emoji}</div>
@@ -507,9 +566,11 @@ function PilarLectura({ onNavigate, onIr }) {
           Sin laboratorio, en cualquier lote. Solo una pala, un hueco y sus sentidos.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {LECTURAS_CAMPO.map((l) => <LecturaCard key={l.id} l={l} />)}
+          {LECTURAS_CAMPO.map((l, i) => <LecturaCard key={l.id} l={l} delay={i * 70} />)}
         </div>
       </section>
+
+      <RaicillasDivider />
 
       {/* Señales de suelo enfermo — fotos reales */}
       <section aria-label="Señales de que la tierra está enferma">
@@ -520,7 +581,7 @@ function PilarLectura({ onNavigate, onIr }) {
           Tres males que se ven a simple vista. Reconocerlos a tiempo es media cura.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {SENALES_ENFERMO.map((s) => <SenalEnfermaCard key={s.slug} s={s} />)}
+          {SENALES_ENFERMO.map((s, i) => <SenalEnfermaCard key={s.slug} s={s} delay={i * 70} />)}
         </div>
       </section>
 
@@ -546,13 +607,13 @@ function PilarLectura({ onNavigate, onIr }) {
       <button
         type="button"
         onClick={() => onIr?.('mejorar')}
-        className="rounded-xl border border-emerald-700/50 bg-emerald-950/30 p-3 flex items-center gap-2.5 text-left hover:border-emerald-600 transition-colors motion-reduce:transition-none"
+        className="ss-tap rounded-xl border border-emerald-700/50 bg-emerald-950/30 p-3 flex items-center gap-2.5 text-left hover:border-emerald-600"
       >
         <HeartPulse size={20} className="shrink-0 text-emerald-300" />
         <span className="text-sm text-emerald-100 flex-1">
           <span className="font-bold">¿Salió enferma o cansada?</span> Así se sana: coberturas, no arar de más y abono.
         </span>
-        <ArrowRight size={18} className="shrink-0 text-emerald-300" />
+        <ArrowRight size={18} className="ss-chev shrink-0 text-emerald-300" />
       </button>
 
       {/* Créditos de fotos nuevas — cumplimiento de licencia abierta */}
@@ -562,7 +623,7 @@ function PilarLectura({ onNavigate, onIr }) {
             type="button"
             onClick={() => setCreditos((v) => !v)}
             aria-expanded={creditos}
-            className="w-full flex items-center gap-2 text-left"
+            className="ss-focus w-full flex items-center gap-2 text-left"
           >
             <Camera size={15} className="text-slate-400 shrink-0" />
             <span className="text-xs font-bold text-slate-300 flex-1">Créditos de las fotos (licencia abierta)</span>
@@ -628,7 +689,7 @@ function PilarAnalisis({ onNavigate, onIr }) {
                   disabled={bloqueado}
                   placeholder={bloqueado ? 'Se calcula en "Corregir la acidez"' : `ej. ${ind.ejemplo}`}
                   aria-label={ind.label}
-                  className="flex-1 min-w-0 rounded-lg bg-slate-800 border border-slate-700 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-slate-500 disabled:opacity-50"
+                  className="ss-input flex-1 min-w-0 rounded-lg bg-slate-800 border border-slate-700 px-3 py-2 text-sm text-white placeholder:text-slate-500 disabled:opacity-50"
                 />
                 {ind.unidad ? <span className="text-xs text-slate-400 shrink-0">{ind.unidad}</span> : null}
               </div>
@@ -650,13 +711,13 @@ function PilarAnalisis({ onNavigate, onIr }) {
         <button
           type="button"
           onClick={() => onIr('acidez')}
-          className="rounded-xl border border-amber-700/50 bg-amber-950/30 p-3 flex items-center gap-2.5 text-left hover:border-amber-600 transition-colors"
+          className="ss-tap ss-enter rounded-xl border border-amber-700/50 bg-amber-950/30 p-3 flex items-center gap-2.5 text-left hover:border-amber-600"
         >
           <Calculator size={20} className="shrink-0 text-amber-400" />
           <span className="text-sm text-amber-100 flex-1">
             <span className="font-bold">Su tierra salió ácida.</span> Calcule cuánta cal necesita.
           </span>
-          <ArrowRight size={18} className="shrink-0 text-amber-400" />
+          <ArrowRight size={18} className="ss-chev shrink-0 text-amber-400" />
         </button>
       ) : null}
 
@@ -743,7 +804,7 @@ function PilarAcidez() {
                 onChange={(e) => setB(f.key, e.target.value)}
                 placeholder={`ej. ${f.ej}`}
                 aria-label={f.label}
-                className="w-full min-w-0 rounded-lg bg-slate-800 border border-slate-700 px-2.5 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-slate-500"
+                className="ss-input w-full min-w-0 rounded-lg bg-slate-800 border border-slate-700 px-2.5 py-2 text-sm text-white placeholder:text-slate-500"
               />
             </div>
             <p className="mt-1 text-[10px] text-slate-500">cmol(+)/kg</p>
@@ -765,7 +826,7 @@ function PilarAcidez() {
                   type="button"
                   onClick={() => setFuente(key)}
                   aria-pressed={activo}
-                  className={`min-h-[40px] px-3 rounded-full border text-sm font-semibold transition-colors ${
+                  className={`ss-focus min-h-[40px] px-3 rounded-full border text-sm font-semibold transition-colors ${
                     activo ? 'border-transparent text-white' : 'bg-slate-800 border-slate-700 text-slate-200 hover:border-slate-500'
                   }`}
                   style={activo ? { backgroundColor: 'rgb(var(--t-accent-rgb) / 0.25)', boxShadow: 'inset 0 0 0 2px rgb(var(--t-accent-rgb))' } : undefined}
@@ -784,7 +845,7 @@ function PilarAcidez() {
               type="text" inputMode="decimal" value={objetivo}
               onChange={(e) => setObjetivo(e.target.value.replace(',', '.').replace(/[^0-9.]/g, ''))}
               aria-label="Saturación de aluminio objetivo"
-              className="w-full rounded-lg bg-slate-800 border border-slate-700 px-2.5 py-2 text-sm text-white focus:outline-none focus:border-slate-500"
+              className="ss-input w-full rounded-lg bg-slate-800 border border-slate-700 px-2.5 py-2 text-sm text-white"
             />
           </div>
           <div>
@@ -793,7 +854,7 @@ function PilarAcidez() {
               type="text" inputMode="decimal" value={hectareas}
               onChange={(e) => setHectareas(e.target.value.replace(',', '.').replace(/[^0-9.]/g, ''))}
               aria-label="Número de hectáreas"
-              className="w-full rounded-lg bg-slate-800 border border-slate-700 px-2.5 py-2 text-sm text-white focus:outline-none focus:border-slate-500"
+              className="ss-input w-full rounded-lg bg-slate-800 border border-slate-700 px-2.5 py-2 text-sm text-white"
             />
           </div>
         </div>
@@ -805,7 +866,7 @@ function PilarAcidez() {
           Escriba al menos el aluminio y el calcio (o magnesio) para calcular.
         </p>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="ss-enter flex flex-col gap-3">
           {/* Saturación de Al */}
           <div className={`rounded-xl border ${satColor.border} ${satColor.bg} p-3`}>
             <p className="text-xs uppercase tracking-wide font-bold text-slate-400">Saturación de aluminio</p>
@@ -866,7 +927,7 @@ function PilarAcidez() {
 
       {/* Transparencia de supuestos — honestidad grounded-pendiente */}
       <details className="rounded-xl border border-slate-800 bg-slate-900/50 p-3">
-        <summary className="text-sm font-bold text-slate-200 cursor-pointer">Cómo se calcula (supuestos)</summary>
+        <summary className="ss-focus text-sm font-bold text-slate-200 cursor-pointer rounded">Cómo se calcula (supuestos)</summary>
         <div className="mt-2 text-xs text-slate-400 leading-relaxed flex flex-col gap-1.5">
           <p>Saturación de Al = Al ÷ (Al + Ca + Mg + K) × 100. Es matemática exacta.</p>
           <p>Requerimiento (cmol/kg) = 1.5 × [Al − (objetivo/100) × CICE], método de Cochrane, Salinas &amp; Sánchez (1980).</p>
@@ -904,11 +965,11 @@ function CicloAnillo() {
 }
 
 /** Tarjeta de un habitante del suelo, con foto real (licencia abierta). */
-function HabitanteCard({ h }) {
+function HabitanteCard({ h, delay = 0 }) {
   const [imgOk, setImgOk] = useState(true);
   return (
-    <article className="rounded-2xl border border-slate-800 bg-slate-900 overflow-hidden flex flex-col">
-      <div className="relative aspect-[4/3] bg-slate-950">
+    <article className="ss-card ss-rise rounded-2xl border border-slate-800 bg-slate-900 overflow-hidden flex flex-col" style={{ '--d': `${delay}ms` }}>
+      <div className="relative aspect-[4/3] bg-slate-950 overflow-hidden">
         {imgOk ? (
           <img
             src={`${FOTO_BASE}/${h.slug}.jpg`}
@@ -916,7 +977,7 @@ function HabitanteCard({ h }) {
             loading="lazy"
             decoding="async"
             onError={() => setImgOk(false)}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="ss-photo absolute inset-0 w-full h-full object-cover"
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-4xl" aria-hidden="true">{h.emoji}</div>
@@ -1028,9 +1089,11 @@ function PilarVida({ onNavigate }) {
           Del más grande al invisible. Todos trabajan gratis, día y noche.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {HABITANTES.map((h) => <HabitanteCard key={h.slug} h={h} />)}
+          {HABITANTES.map((h, i) => <HabitanteCard key={h.slug} h={h} delay={i * 60} />)}
         </div>
       </section>
+
+      <RaicillasDivider />
 
       {/* El ciclo — de la hojarasca al alimento y otra vez */}
       <section aria-label="El ciclo de la vida del suelo" className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
@@ -1155,10 +1218,10 @@ function PilarMejora({ onNavigate }) {
       </p>
 
       <div className="flex flex-col gap-3">
-        {PRACTICAS_MEJORA.map((p) => {
+        {PRACTICAS_MEJORA.map((p, i) => {
           const Icono = p.icon;
           return (
-            <div key={p.titulo} className="rounded-xl border border-slate-800 bg-slate-900/60 p-3 flex items-start gap-3">
+            <div key={p.titulo} className="ss-rise rounded-xl border border-slate-800 bg-slate-900/60 p-3 flex items-start gap-3" style={{ '--d': `${i * 70}ms` }}>
               <span
                 className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                 style={{ backgroundColor: 'rgb(var(--t-accent-rgb) / 0.18)' }}
