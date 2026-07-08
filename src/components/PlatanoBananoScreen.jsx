@@ -129,11 +129,13 @@ function MataIlustracion() {
       <g>
         <rect x="60" y="52" width="16" height="80" rx="7" fill="#7fae55" />
         <rect x="60" y="52" width="16" height="80" rx="7" fill="none" stroke="#5f8a3e" strokeWidth="1.5" />
-        {/* hojas */}
-        <path d="M68 56 Q40 40 24 52 Q46 54 68 66 Z" fill="#6fa049" />
-        <path d="M68 56 Q96 40 112 52 Q90 54 68 66 Z" fill="#7fae55" />
-        <path d="M68 60 Q42 66 30 84 Q56 72 68 74 Z" fill="#6fa049" />
-        <path d="M68 60 Q94 66 106 84 Q80 72 68 74 Z" fill="#7fae55" />
+        {/* hojas (se mecen con el viento; se apagan con reduced-motion) */}
+        <g className="pb-hojas">
+          <path d="M68 56 Q40 40 24 52 Q46 54 68 66 Z" fill="#6fa049" />
+          <path d="M68 56 Q96 40 112 52 Q90 54 68 66 Z" fill="#7fae55" />
+          <path d="M68 60 Q42 66 30 84 Q56 72 68 74 Z" fill="#6fa049" />
+          <path d="M68 60 Q94 66 106 84 Q80 72 68 74 Z" fill="#7fae55" />
+        </g>
         {/* racimo */}
         <g fill="#cf9a2f">
           <path d="M74 96 q10 2 9 12 q-9 -1 -10 -8 Z" />
@@ -144,14 +146,18 @@ function MataIlustracion() {
       {/* Hijo (mediano) */}
       <g>
         <rect x="96" y="80" width="11" height="52" rx="5" fill="#8fbb60" />
-        <path d="M101 84 Q84 74 74 84 Q90 86 101 92 Z" fill="#7fae55" />
-        <path d="M101 84 Q118 74 128 84 Q112 86 101 92 Z" fill="#8fbb60" />
+        <g className="pb-hojas pb-hojas-2">
+          <path d="M101 84 Q84 74 74 84 Q90 86 101 92 Z" fill="#7fae55" />
+          <path d="M101 84 Q118 74 128 84 Q112 86 101 92 Z" fill="#8fbb60" />
+        </g>
       </g>
       {/* Nieto (pequeño) */}
       <g>
         <rect x="118" y="104" width="8" height="28" rx="4" fill="#9ac96b" />
-        <path d="M122 106 Q110 100 104 106 Q116 108 122 112 Z" fill="#9ac96b" />
-        <path d="M122 106 Q134 100 140 106 Q128 108 122 112 Z" fill="#a7d178" />
+        <g className="pb-hojas pb-hojas-3">
+          <path d="M122 106 Q110 100 104 106 Q116 108 122 112 Z" fill="#9ac96b" />
+          <path d="M122 106 Q134 100 140 106 Q128 108 122 112 Z" fill="#a7d178" />
+        </g>
       </g>
       {/* Escudo agroecológico (sin veneno) */}
       <g transform="translate(30 58)">
@@ -162,14 +168,16 @@ function MataIlustracion() {
   );
 }
 
-/* Clases LITERALES por acento (Tailwind JIT no ve strings construidos). */
+/* Clases LITERALES por acento (Tailwind JIT no ve strings construidos).
+ * rail = barra de acento de las tarjetas; chip = medallón del ícono;
+ * hover = borde vivo al pasar el dedo/mouse; borderL = acento lateral. */
 const COLOR_MAP = {
-  emerald: { text: 'text-emerald-300', border: 'border-emerald-700/50', bg: 'bg-emerald-950/30' },
-  lime: { text: 'text-lime-300', border: 'border-lime-700/50', bg: 'bg-lime-950/30' },
-  amber: { text: 'text-amber-300', border: 'border-amber-700/50', bg: 'bg-amber-950/30' },
-  sky: { text: 'text-sky-300', border: 'border-sky-700/50', bg: 'bg-sky-950/30' },
-  rose: { text: 'text-rose-300', border: 'border-rose-700/50', bg: 'bg-rose-950/30' },
-  slate: { text: 'text-slate-300', border: 'border-slate-700/50', bg: 'bg-slate-900/50' },
+  emerald: { text: 'text-emerald-300', border: 'border-emerald-700/50', bg: 'bg-emerald-950/30', rail: 'bg-emerald-400/80', chip: 'bg-emerald-400/15 border-emerald-500/40', hover: 'hover:border-emerald-500/80', borderL: 'border-l-emerald-400/60' },
+  lime: { text: 'text-lime-300', border: 'border-lime-700/50', bg: 'bg-lime-950/30', rail: 'bg-lime-400/80', chip: 'bg-lime-400/15 border-lime-500/40', hover: 'hover:border-lime-500/80', borderL: 'border-l-lime-400/60' },
+  amber: { text: 'text-amber-300', border: 'border-amber-700/50', bg: 'bg-amber-950/30', rail: 'bg-amber-400/80', chip: 'bg-amber-400/15 border-amber-500/40', hover: 'hover:border-amber-500/80', borderL: 'border-l-amber-400/60' },
+  sky: { text: 'text-sky-300', border: 'border-sky-700/50', bg: 'bg-sky-950/30', rail: 'bg-sky-400/80', chip: 'bg-sky-400/15 border-sky-500/40', hover: 'hover:border-sky-500/80', borderL: 'border-l-sky-400/60' },
+  rose: { text: 'text-rose-300', border: 'border-rose-700/50', bg: 'bg-rose-950/30', rail: 'bg-rose-400/80', chip: 'bg-rose-400/15 border-rose-500/40', hover: 'hover:border-rose-500/80', borderL: 'border-l-rose-400/60' },
+  slate: { text: 'text-slate-300', border: 'border-slate-700/50', bg: 'bg-slate-900/50', rail: 'bg-slate-400/80', chip: 'bg-slate-400/15 border-slate-500/40', hover: 'hover:border-slate-500/80', borderL: 'border-l-slate-400/60' },
 };
 
 const cleanNum = (raw) => raw.replace(',', '.').replace(/[^0-9.]/g, '');
@@ -193,22 +201,23 @@ export default function PlatanoBananoScreen({ onBack, onNavigate }) {
 
   return (
     <div className="min-h-[100dvh] text-white">
-      <header className="flex items-center gap-2 px-4 pt-[calc(14px+env(safe-area-inset-top))] pb-2">
+      <header className="flex items-center gap-2.5 px-4 pt-[calc(14px+env(safe-area-inset-top))] pb-2">
         <button
           type="button"
           onClick={volver}
           aria-label="Volver"
-          className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center shrink-0"
+          className="pb-focus w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center shrink-0 transition-colors motion-reduce:transition-none"
         >
           <ChevronLeft size={20} />
         </button>
-        <div>
-          <h1 className="text-lg font-bold leading-tight text-white">Plátano y banano</h1>
-          <p className="text-xs text-slate-400 leading-tight">{subtitulo}</p>
+        <div className="min-w-0">
+          <h1 className="pb-display text-xl font-bold leading-tight text-white">Plátano y banano</h1>
+          <p className="text-xs text-slate-400 leading-tight truncate">{subtitulo}</p>
         </div>
       </header>
 
-      <div className="px-4 pb-10">
+      {/* key={pilar}: re-monta el contenedor y dispara la transición pb-view */}
+      <div key={pilar} className="pb-view px-4 pb-10">
         {pilar === 'hub' && <Hub onIr={setPilar} onNavigate={onNavigate} />}
         {pilar === 'variedades' && <PilarVariedades />}
         {pilar === 'siembra' && <PilarSiembra />}
@@ -227,36 +236,63 @@ function Hub({ onIr, onNavigate }) {
     { key: 'amenazas', icon: Bug, foto: 'sigatoka-hoja', titulo: 'Sigatoka y picudo', desc: 'Las dos amenazas clave: cómo reconocerlas y manejarlas sin veneno.', accent: 'rose' },
     { key: 'cosecha', icon: Recycle, foto: 'pseudotallo-hoja', titulo: 'Cosecha y aprovechamiento', desc: 'El punto de corte, y cómo el pseudotallo y la hoja vuelven a la tierra como abono.', accent: 'amber' },
   ];
+  const heroCred = FOTOS['cafe-sombra'];
   return (
     <div className="flex flex-col gap-4">
-      {/* Gancho — foto real de la mata + la verdad que nadie cuenta */}
-      <section className="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
-        <Foto slug="platanera-mata" ratio="aspect-[16/9]" className="rounded-none border-0 border-b border-slate-800" objectPos="object-center" FallbackIcon={Leaf} />
+      {/* Gancho — la postal del platanal: el platanal verde y frondoso de hero
+          (cafe-sombra es la foto más viva del set), título sobre la foto y
+          crédito CC siempre visible (píldora arriba) */}
+      <section className="pb-rise rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden" style={{ '--pb-d': '0ms' }}>
+        <div className="relative overflow-hidden border-b border-slate-800">
+          <img
+            src="/platano-banano/cafe-sombra.jpg"
+            alt={heroCred.alt}
+            className="pb-hero-img w-full aspect-[4/3] sm:aspect-[16/9] object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/35 to-slate-950/10" aria-hidden="true" />
+          <a
+            href={heroCred.fuenteUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="pb-focus absolute top-2 right-2 flex items-center gap-1 rounded-full bg-slate-950/70 px-2 py-1 text-[9px] text-slate-300 backdrop-blur-sm"
+            title={`${heroCred.autor} · ${heroCred.licencia} · Wikimedia Commons`}
+          >
+            <Camera size={9} className="shrink-0" aria-hidden="true" />
+            <span>Foto: {heroCred.autor} · {heroCred.licencia}</span>
+          </a>
+          <div className="absolute inset-x-0 bottom-0 px-4 pb-3.5">
+            <p className="text-[11px] uppercase tracking-[0.14em] font-bold text-lime-300/90">El pancoger de la finca</p>
+            <p className="pb-display mt-0.5 text-2xl font-bold text-white leading-tight [text-shadow:0_1px_10px_rgb(2_6_23/0.7)]">
+              {GANCHO_PLATANO.titulo}
+            </p>
+          </div>
+        </div>
         <div className="px-4 pt-3 pb-4">
-          <p className="text-[13px] uppercase tracking-wide font-bold text-slate-400">{GANCHO_PLATANO.titulo}</p>
-          <p className="mt-1.5 text-sm text-slate-200 leading-relaxed">{GANCHO_PLATANO.cuerpo}</p>
+          <p className="text-sm text-slate-200 leading-relaxed">{GANCHO_PLATANO.cuerpo}</p>
           <p className="mt-2 text-[11px] text-slate-500">Fuente: {GANCHO_PLATANO.fuente} · confianza {GANCHO_PLATANO.confianza}.</p>
         </div>
       </section>
 
       {/* Las tres verdades de la mata — legibles de un vistazo */}
       <div className="grid grid-cols-3 gap-2">
-        {TRES_VERDADES.map((v) => {
+        {TRES_VERDADES.map((v, i) => {
           const c = COLOR_MAP[v.accent];
           const Icon = VERDAD_ICON[v.icon] || Sprout;
           return (
-            <div key={v.titulo} className={`rounded-xl border ${c.border} ${c.bg} p-2.5 text-center`}>
-              <Icon size={22} className={`mx-auto ${c.text}`} aria-hidden="true" />
-              <p className="mt-1.5 text-sm font-bold text-white leading-tight">{v.titulo}</p>
+            <div key={v.titulo} className={`pb-rise rounded-xl border ${c.border} ${c.bg} p-2.5 text-center`} style={{ '--pb-d': `${90 + i * 70}ms` }}>
+              <span className={`mx-auto w-9 h-9 rounded-full border ${c.chip} flex items-center justify-center`}>
+                <Icon size={18} className={c.text} aria-hidden="true" />
+              </span>
+              <p className="pb-display mt-1.5 text-sm font-bold text-white leading-tight">{v.titulo}</p>
               <p className="mt-0.5 text-[11px] text-slate-300 leading-snug">{v.sub}</p>
             </div>
           );
         })}
       </div>
 
-      {/* Cuatro pilares, cada uno con su foto real */}
+      {/* Cuatro pilares, cada uno con su foto real y su riel de acento */}
       <div className="flex flex-col gap-3">
-        {pilares.map((p) => {
+        {pilares.map((p, i) => {
           const c = COLOR_MAP[p.accent];
           const Icono = p.icon;
           return (
@@ -264,19 +300,21 @@ function Hub({ onIr, onNavigate }) {
               key={p.key}
               type="button"
               onClick={() => onIr(p.key)}
-              className={`text-left rounded-2xl border ${c.border} ${c.bg} p-3 flex items-center gap-3 hover:border-opacity-100 transition-colors motion-reduce:transition-none active:scale-[0.99]`}
+              className={`pb-rise pb-card pb-focus relative text-left rounded-2xl border ${c.border} ${c.hover} ${c.bg} p-3 pl-4 flex items-center gap-3`}
+              style={{ '--pb-d': `${320 + i * 80}ms` }}
             >
-              <span className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-slate-800">
+              <span className={`absolute left-0 top-3 bottom-3 w-1 rounded-r-full ${c.rail}`} aria-hidden="true" />
+              <span className="pb-thumb relative w-[72px] h-[72px] rounded-xl overflow-hidden shrink-0 border border-slate-800">
                 <img src={`/platano-banano/${p.foto}.jpg`} alt="" aria-hidden="true" loading="lazy" className="w-full h-full object-cover" />
                 <span className="absolute inset-0 flex items-center justify-center bg-slate-950/40">
                   <Icono size={20} className="text-white drop-shadow" />
                 </span>
               </span>
               <span className="flex-1 min-w-0">
-                <span className="block text-[15px] font-bold text-white leading-tight">{p.titulo}</span>
-                <span className="block text-sm text-slate-300 mt-0.5 leading-snug">{p.desc}</span>
+                <span className="pb-display block text-base font-bold text-white leading-tight">{p.titulo}</span>
+                <span className="block text-[13px] text-slate-300 mt-0.5 leading-snug">{p.desc}</span>
               </span>
-              <ChevronRight size={20} className="text-slate-500 shrink-0" />
+              <ChevronRight size={20} className={`pb-chev shrink-0 ${c.text}`} />
             </button>
           );
         })}
@@ -284,8 +322,8 @@ function Hub({ onIr, onNavigate }) {
 
       {/* Puentes honestos: enlaza a lo que ya existe en Chagra */}
       {onNavigate ? (
-        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-3">
-          <p className="text-xs uppercase tracking-wide font-bold text-slate-400 mb-2">También en Chagra</p>
+        <div className="pb-rise rounded-xl border border-slate-800 bg-slate-900/50 p-3" style={{ '--pb-d': '640ms' }}>
+          <p className="text-xs uppercase tracking-[0.14em] font-bold text-slate-400 mb-2">También en Chagra</p>
           <div className="flex flex-col gap-2">
             <PuenteBoton
               icon={Bug}
@@ -320,14 +358,19 @@ function PuenteBoton({ icon, titulo, sub, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="w-full text-left rounded-xl border border-slate-700/60 bg-slate-800/40 p-3 flex items-center gap-3 hover:border-slate-600 transition-colors motion-reduce:transition-none"
+      className="pb-card pb-focus w-full text-left rounded-xl border border-slate-700/60 bg-slate-800/40 p-3 flex items-center gap-3 hover:border-slate-500"
     >
-      <Icon size={20} className="shrink-0" style={{ color: 'rgb(var(--t-accent-rgb))' }} />
+      <span
+        className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center border"
+        style={{ color: 'rgb(var(--t-accent-rgb))', backgroundColor: 'rgb(var(--t-accent-rgb) / 0.12)', borderColor: 'rgb(var(--t-accent-rgb) / 0.35)' }}
+      >
+        <Icon size={18} aria-hidden="true" />
+      </span>
       <span className="flex-1 min-w-0">
         <span className="block text-sm font-bold text-slate-100 leading-tight">{titulo}</span>
         <span className="block text-xs text-slate-400 leading-snug">{sub}</span>
       </span>
-      <ChevronRight size={18} className="text-slate-500 shrink-0" />
+      <ChevronRight size={18} className="pb-chev text-slate-400 shrink-0" />
     </button>
   );
 }
@@ -335,8 +378,8 @@ function PuenteBoton({ icon, titulo, sub, onClick }) {
 /* Créditos de las fotos (todas licencia abierta), colapsable al pie. */
 function CreditosFotos() {
   return (
-    <details className="rounded-xl border border-slate-800 bg-slate-900/40 p-3">
-      <summary className="text-xs font-bold text-slate-300 cursor-pointer flex items-center gap-1.5">
+    <details className="pb-rise rounded-xl border border-slate-800 bg-slate-900/40 p-3" style={{ '--pb-d': '720ms' }}>
+      <summary className="pb-focus text-xs font-bold text-slate-300 cursor-pointer flex items-center gap-1.5 rounded">
         <Camera size={13} aria-hidden="true" /> Créditos de las fotos (licencia abierta)
       </summary>
       <ul className="mt-2 flex flex-col gap-1.5">
@@ -368,7 +411,7 @@ function PilarVariedades() {
 
       {/* Variedades */}
       <section>
-        <h2 className="text-sm uppercase tracking-wide font-bold text-slate-400 mb-2 flex items-center gap-2">
+        <h2 className="text-xs uppercase tracking-[0.14em] font-bold text-slate-400 mb-2 flex items-center gap-2">
           <Sprout size={15} /> Las variedades de la finca
         </h2>
         <div className="flex flex-col gap-3">
@@ -377,8 +420,8 @@ function PilarVariedades() {
               <Foto slug={v.foto} ratio="aspect-[16/9]" className="rounded-none border-0 border-b border-slate-800" />
               <div className="p-4">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="text-[15px] font-bold text-slate-100">{v.nombre}</h3>
-                  <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">{v.grupo}</span>
+                  <h3 className="pb-display text-base font-bold text-slate-100">{v.nombre}</h3>
+                  <span className="text-[10px] uppercase tracking-wide font-bold px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">{v.grupo}</span>
                 </div>
                 <p className="text-sm text-slate-300 mt-1.5 leading-snug"><span className="font-semibold text-slate-100">Dónde:</span> {v.donde}</p>
                 <p className="text-sm text-slate-300 mt-1 leading-snug">{v.como}</p>
@@ -390,16 +433,20 @@ function PilarVariedades() {
 
       {/* La sucesión madre-hijo-nieto */}
       <section>
-        <h2 className="text-sm uppercase tracking-wide font-bold text-slate-400 mb-2 flex items-center gap-2">
+        <h2 className="text-xs uppercase tracking-[0.14em] font-bold text-slate-400 mb-2 flex items-center gap-2">
           <RefreshCw size={15} /> La mata como sistema: madre, hijo, nieto
         </h2>
         <Foto slug="mata-sistema-hijos" ratio="aspect-[16/10]" className="mb-3" objectPos="object-center" />
         <div className="grid grid-cols-3 gap-2">
-          {SUCESION.map((s) => (
-            <div key={s.rol} className="rounded-xl border border-emerald-800/40 bg-emerald-950/20 p-2.5 text-center">
-              <div className="text-2xl" aria-hidden="true">{s.emoji}</div>
-              <p className="mt-1 text-sm font-bold text-emerald-200">{s.rol}</p>
+          {SUCESION.map((s, i) => (
+            <div key={s.rol} className="relative rounded-xl border border-emerald-800/40 bg-emerald-950/20 p-2.5 text-center">
+              {/* la generación decrece: la madre grande, el nieto pequeño */}
+              <div className={i === 0 ? 'text-3xl' : i === 1 ? 'text-2xl' : 'text-xl'} aria-hidden="true">{s.emoji}</div>
+              <p className="pb-display mt-1 text-sm font-bold text-emerald-200">{s.rol}</p>
               <p className="mt-0.5 text-[11px] text-emerald-100/80 leading-snug">{s.desc}</p>
+              {i < SUCESION.length - 1 ? (
+                <ChevronRight size={14} className="absolute top-1/2 -right-[11px] -translate-y-1/2 text-emerald-500/70 z-10" aria-hidden="true" />
+              ) : null}
             </div>
           ))}
         </div>
@@ -409,7 +456,7 @@ function PilarVariedades() {
       <section className="rounded-2xl border border-lime-800/40 bg-lime-950/20 p-4">
         <div className="flex items-center gap-2">
           <Scissors size={18} className="text-lime-300 shrink-0" />
-          <h3 className="text-[15px] font-bold text-lime-200">El deshije: {DESHIJE.regla.toLowerCase()}</h3>
+          <h3 className="pb-display text-base font-bold text-lime-200">El deshije: {DESHIJE.regla.toLowerCase()}</h3>
         </div>
         <p className="text-sm text-lime-100/90 mt-2 leading-relaxed">{DESHIJE.cuerpo}</p>
         <ul className="mt-3 flex flex-col gap-1.5 text-sm text-lime-100/90">
@@ -431,7 +478,7 @@ function PilarSiembra() {
       <section className="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
         <Foto slug="colino-siembra" ratio="aspect-[16/9]" className="rounded-none border-0 border-b border-slate-800" />
         <div className="p-4">
-          <h2 className="text-[15px] font-bold text-slate-100 flex items-center gap-2"><Sprout size={16} /> Con qué se siembra</h2>
+          <h2 className="pb-display text-base font-bold text-slate-100 flex items-center gap-2"><Sprout size={16} /> Con qué se siembra</h2>
           <div className="mt-2 flex flex-col gap-2.5">
             {SIEMBRA.material.map((m) => (
               <div key={m.id} className="rounded-lg bg-slate-800/40 border border-slate-700/50 p-2.5">
@@ -458,7 +505,7 @@ function PilarSiembra() {
       <section className="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
         <Foto slug="cafe-sombra" ratio="aspect-[16/9]" className="rounded-none border-0 border-b border-slate-800" FallbackIcon={Trees} />
         <div className="p-4">
-          <h2 className="text-[15px] font-bold text-slate-100 flex items-center gap-2"><Trees size={16} /> El paraguas de la finca</h2>
+          <h2 className="pb-display text-base font-bold text-slate-100 flex items-center gap-2"><Trees size={16} /> El paraguas de la finca</h2>
           <p className="text-sm text-slate-300 mt-2 leading-relaxed">{ASOCIACION.intro}</p>
           <div className="mt-3 grid grid-cols-2 gap-2">
             {ASOCIACION.companeras.map((co) => (
@@ -476,7 +523,7 @@ function PilarSiembra() {
       <section className="rounded-2xl border border-amber-800/40 bg-amber-950/20 p-4">
         <div className="flex items-center gap-2">
           <Droplets size={18} className="text-amber-300 shrink-0" />
-          <h3 className="text-[15px] font-bold text-amber-200">{NUTRICION_K.titulo}</h3>
+          <h3 className="pb-display text-base font-bold text-amber-200">{NUTRICION_K.titulo}</h3>
         </div>
         <p className="text-sm text-amber-100/90 mt-2 leading-relaxed">{NUTRICION_K.cuerpo}</p>
         <div className="mt-3 flex flex-col gap-2">
@@ -506,7 +553,7 @@ function CalculadoraDensidad() {
     <section className="rounded-2xl border border-emerald-800/40 bg-emerald-950/20 p-4">
       <div className="flex items-center gap-2">
         <Ruler size={20} className="text-emerald-300 shrink-0" />
-        <h3 className="text-[15px] font-bold text-emerald-200">¿Cuántas matas caben en una hectárea?</h3>
+        <h3 className="pb-display text-base font-bold text-emerald-200">¿Cuántas matas caben en una hectárea?</h3>
       </div>
       <p className="text-sm text-emerald-100/90 mt-2 leading-relaxed">
         Escriba la distancia entre matas y entre surcos. Le decimos cuántas matas le caben en una hectárea (10.000 m²).
@@ -523,7 +570,7 @@ function CalculadoraDensidad() {
             onChange={(e) => setDp(cleanNum(e.target.value))}
             placeholder="ej. 3"
             aria-label="Distancia entre matas en metros"
-            className="w-full rounded-lg bg-slate-800 border border-slate-700 px-2.5 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-slate-500"
+            className="w-full rounded-lg bg-slate-800 border border-slate-700 px-2.5 py-2 text-sm text-white placeholder:text-slate-500 transition-colors motion-reduce:transition-none focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/30"
           />
         </div>
         <div>
@@ -536,7 +583,7 @@ function CalculadoraDensidad() {
             onChange={(e) => setDs(cleanNum(e.target.value))}
             placeholder="ej. 3"
             aria-label="Distancia entre surcos en metros"
-            className="w-full rounded-lg bg-slate-800 border border-slate-700 px-2.5 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-slate-500"
+            className="w-full rounded-lg bg-slate-800 border border-slate-700 px-2.5 py-2 text-sm text-white placeholder:text-slate-500 transition-colors motion-reduce:transition-none focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/30"
           />
         </div>
       </div>
@@ -547,8 +594,9 @@ function CalculadoraDensidad() {
             <CheckCircle2 size={18} className="text-emerald-300 shrink-0" />
             <p className="text-sm font-bold text-emerald-200">Le caben aproximadamente</p>
           </div>
-          <p className="text-4xl font-black text-white mt-2 leading-none">
-            {res.matasPorHa.toLocaleString('es-CO')}
+          {/* key={matasPorHa}: el número "aterriza" cada vez que cambia */}
+          <p className="pb-display text-4xl font-black text-white mt-2 leading-none tabular-nums">
+            <span key={res.matasPorHa} className="pb-pop">{res.matasPorHa.toLocaleString('es-CO')}</span>
             <span className="text-lg font-bold text-slate-300"> matas / ha</span>
           </p>
           <p className="text-xs text-emerald-100/80 mt-2">Cada mata ocupa {res.area} m². Cálculo exacto: 10.000 ÷ ({dp} × {ds}).</p>
@@ -557,20 +605,27 @@ function CalculadoraDensidad() {
         <p className="mt-3 text-sm text-emerald-100/70 text-center py-2">Escriba las dos distancias para calcular.</p>
       )}
 
-      {/* Distancias de referencia grounded */}
+      {/* Distancias de referencia grounded; la activa se marca con el acento */}
       <div className="mt-3 flex flex-col gap-2">
-        <p className="text-xs uppercase tracking-wide font-bold text-emerald-200/70">Distancias de referencia</p>
-        {DISTANCIAS_REFERENCIA.map((d) => (
-          <button
-            key={d.etiqueta}
-            type="button"
-            onClick={() => { setDp(String(d.entrePlantas)); setDs(String(d.entreSurcos)); }}
-            className="w-full text-left rounded-lg border border-emerald-800/30 bg-emerald-950/10 p-2.5 hover:border-emerald-700/60 transition-colors motion-reduce:transition-none"
-          >
-            <p className="text-sm font-bold text-emerald-100">{d.etiqueta}</p>
-            <p className="text-[11px] text-emerald-100/70 mt-0.5 leading-snug">{d.nota}</p>
-          </button>
-        ))}
+        <p className="text-xs uppercase tracking-[0.14em] font-bold text-emerald-200/70">Distancias de referencia</p>
+        {DISTANCIAS_REFERENCIA.map((d) => {
+          const activa = Number(dp) === d.entrePlantas && Number(ds) === d.entreSurcos;
+          return (
+            <button
+              key={d.etiqueta}
+              type="button"
+              aria-pressed={activa}
+              onClick={() => { setDp(String(d.entrePlantas)); setDs(String(d.entreSurcos)); }}
+              className={`pb-card pb-focus w-full text-left rounded-lg border p-2.5 flex items-center gap-2.5 ${activa ? 'border-emerald-500/70 bg-emerald-900/40' : 'border-emerald-800/30 bg-emerald-950/10 hover:border-emerald-700/60'}`}
+            >
+              <span className="flex-1 min-w-0">
+                <span className="block text-sm font-bold text-emerald-100">{d.etiqueta}</span>
+                <span className="block text-[11px] text-emerald-100/70 mt-0.5 leading-snug">{d.nota}</span>
+              </span>
+              {activa ? <CheckCircle2 size={16} className="text-emerald-300 shrink-0" aria-hidden="true" /> : null}
+            </button>
+          );
+        })}
       </div>
       <p className="mt-2 text-[11px] text-emerald-200/70">Distancias grounded a Agrosavia (3×3 a 4×4 m según variedad). La geometría es exacta.</p>
     </section>
@@ -607,26 +662,31 @@ function PilarAmenazas({ onNavigate }) {
 function AmenazaCard({ data, accent }) {
   const c = COLOR_MAP[accent] || COLOR_MAP.rose;
   return (
-    <section className={`rounded-2xl border ${c.border} bg-slate-900/60 overflow-hidden`}>
+    <section className={`relative rounded-2xl border ${c.border} bg-slate-900/60 overflow-hidden`}>
+      {/* riel de acento: el color de la amenaza acompaña toda la tarjeta */}
+      <span className={`absolute left-0 top-0 bottom-0 w-1 ${c.rail} z-10`} aria-hidden="true" />
       <Foto slug={data.foto} ratio="aspect-[16/9]" className="rounded-none border-0 border-b border-slate-800" FallbackIcon={Bug} />
-      <div className="p-4">
+      <div className="p-4 pl-5">
         <div className="flex items-center gap-2 flex-wrap">
-          <h3 className="text-[15px] font-bold text-white">{data.nombre}</h3>
-          <span className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-slate-800 ${c.text} border border-slate-700`}>{data.tipo}</span>
+          <span className={`w-8 h-8 rounded-full border ${c.chip} flex items-center justify-center shrink-0`}>
+            <Bug size={15} className={c.text} aria-hidden="true" />
+          </span>
+          <h3 className="pb-display text-base font-bold text-white">{data.nombre}</h3>
+          <span className={`text-[10px] uppercase tracking-wide font-bold px-1.5 py-0.5 rounded-full bg-slate-800 ${c.text} border border-slate-700`}>{data.tipo}</span>
         </div>
-        <p className="text-xs italic text-slate-400 mt-0.5">{data.cientifico}</p>
+        <p className="text-xs italic text-slate-400 mt-1">{data.cientifico}</p>
 
-        <p className="mt-3 text-xs uppercase tracking-wide font-bold text-slate-400">Cómo reconocerla</p>
+        <p className="mt-3 text-xs uppercase tracking-[0.14em] font-bold text-slate-400">Cómo reconocerla</p>
         <ul className="mt-1.5 flex flex-col gap-1.5">
           {data.reconocer.map((r) => (
-            <li key={r} className="flex items-start gap-2 text-sm text-slate-300"><span className={`${c.text} mt-0.5`} aria-hidden="true">•</span><span className="leading-snug">{r}</span></li>
+            <li key={r} className="flex items-start gap-2 text-sm text-slate-300"><span className={`${c.text} mt-0.5 font-bold`} aria-hidden="true">✓</span><span className="leading-snug">{r}</span></li>
           ))}
         </ul>
 
-        <p className="mt-3 text-xs uppercase tracking-wide font-bold text-slate-400">Manejo agroecológico</p>
+        <p className="mt-3 text-xs uppercase tracking-[0.14em] font-bold text-slate-400">Manejo agroecológico</p>
         <div className="mt-1.5 flex flex-col gap-2">
           {data.manejo.map((m) => (
-            <div key={m.titulo} className="rounded-lg border border-slate-700/50 bg-slate-800/40 p-2.5">
+            <div key={m.titulo} className={`rounded-lg border border-slate-700/50 border-l-2 ${c.borderL} bg-slate-800/40 p-2.5`}>
               <p className="text-sm font-bold text-slate-100">{m.titulo}</p>
               <p className="text-[13px] text-slate-300 mt-0.5 leading-snug">{m.desc}</p>
             </div>
@@ -659,7 +719,7 @@ function PilarCosecha({ onNavigate }) {
       <section className="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
         <Foto slug="racimo-verde" ratio="aspect-[16/9]" className="rounded-none border-0 border-b border-slate-800" FallbackIcon={Wheat} />
         <div className="p-4">
-          <h2 className="text-[15px] font-bold text-slate-100 flex items-center gap-2"><Wheat size={16} /> {COSECHA.titulo}</h2>
+          <h2 className="pb-display text-base font-bold text-slate-100 flex items-center gap-2"><Wheat size={16} /> {COSECHA.titulo}</h2>
           <ul className="mt-2 flex flex-col gap-1.5">
             {COSECHA.senales.map((s) => (
               <li key={s} className="flex items-start gap-2 text-sm text-slate-300"><span className="text-emerald-400 mt-0.5" aria-hidden="true">•</span><span className="leading-snug">{s}</span></li>
@@ -674,7 +734,7 @@ function PilarCosecha({ onNavigate }) {
 
       {/* Aprovechamiento del pseudotallo y la hoja */}
       <section>
-        <h2 className="text-sm uppercase tracking-wide font-bold text-slate-400 mb-2 flex items-center gap-2">
+        <h2 className="text-xs uppercase tracking-[0.14em] font-bold text-slate-400 mb-2 flex items-center gap-2">
           <Recycle size={15} /> Nada se bota: el pseudotallo y la hoja
         </h2>
         <Foto slug="pseudotallo-hoja" ratio="aspect-[16/10]" className="mb-3" FallbackIcon={Leaf} />
