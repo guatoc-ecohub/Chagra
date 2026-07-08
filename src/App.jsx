@@ -148,6 +148,13 @@ const RestauracionScreen = lazy(() => import('./components/restauracion/Restaura
 // Café) y groundeado en las fichas de ciclo (cycle-content) + nutrición ICBF; el
 // desaponificado de la quinua es el paso clave; mildiú sin dosis químicas.
 const QuinuaScreen = lazy(() => import('./components/quinua/QuinuaScreen'));
+// Mundo "El fique y las fibras": el cultivo de ladera (Furcraea andina/cabuya)
+// contado por su ciclo — planta+ladera (control de erosión), cría/manejo,
+// desfibrado (penca→fibra), usos/cultura (cabuya, empaques, artesanía) y el
+// aprovechamiento del bagazo/jugo sin contaminar el agua. Photo-forward (patrón
+// Café) y groundeado en el catálogo (furcraea_andina.json) + Agrosavia; sin
+// plagas ni dosis inventadas (lo que el grafo no tiene = "dato en camino").
+const FiqueScreen = lazy(() => import('./components/fique/FiqueScreen'));
 const MilpaScreen = lazy(() => import('./components/milpa/MilpaScreen'));
 // "El clima que viene": traductor campesino de los boletines IDEAM/ENSO. Lee la
 // fase ENSO en vivo (ensoService) y remite a la Mesa Técnica Agroclimática — no
@@ -446,6 +453,12 @@ const HASH_VIEW_ROUTES = {
   'bosque-comestible': 'restauracion',
   agroforesteria: 'restauracion',
   'food-forest': 'restauracion',
+  fique: 'fique',
+  'el-fique': 'fique',
+  cabuya: 'fique',
+  penca: 'fique',
+  furcraea: 'fique',
+  fibras: 'fique',
   'milpa-cultivo': 'milpa_cultivo',
   'tres-hermanas': 'milpa_cultivo',
   'salud-suelo': 'salud_suelo',
@@ -520,6 +533,7 @@ const MODULE_VIEWS = new Set([
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'frutales', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'almanaque', 'suelo', 'agua', 'cafe', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'cana', 'restauracion', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'fique', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'platano', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'cacao', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'hortalizas', 'tuberculos', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
@@ -1888,6 +1902,17 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Quinua y granos andinos">
               <QuinuaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+      case 'fique':
+        // Mundo "El fique y las fibras" (5 estaciones: la planta y la ladera /
+        // cría y manejo / el desfibrado / usos y cultura / bagazo y jugo).
+        // Photo-forward con fotos CC y groundeado en el catálogo Chagra
+        // (furcraea_andina.json) + Agrosavia; sin dosis ni plagas inventadas
+        // (lo que el grafo aún no tiene = "dato en camino"). Vive dentro del
+        // mundo Cultivos; su back vuelve al hub de cultivos.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El fique y las fibras">
+              <FiqueScreen onBack={() => navigate('mundo_cultivos')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
