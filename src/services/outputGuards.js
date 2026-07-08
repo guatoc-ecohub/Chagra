@@ -9337,7 +9337,7 @@ export function applyOutputGuards(
   // todo el cuerpo (una clasificación mal atribuida suele arrastrar rasgos de la
   // familia equivocada), early-return, igual que premisa-falsa / off-domain.
   const famBotanica = guardFabricatedBotanicalFamily(text, entities);
-  if (famBotanica && famBotanica.modified) {
+  if (famBotanica?.modified) {
     return {
       text: famBotanica.text,
       modified: true,

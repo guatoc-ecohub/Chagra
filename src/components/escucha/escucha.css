@@ -1,0 +1,366 @@
+/* ============================================================================
+ * escucha.css — Widget "Chagra está escuchando" (escucha manos libres).
+ *
+ * Estética: "la mano que escucha" — la mano de Chagra al centro de un iris
+ * de micelio que respira con el nivel REAL del micrófono. Biopunk por
+ * defecto; en temas claros (minimalista/nature/verde-vivo) el velo pasa a
+ * papel del tema con tinta oscura (AA al sol).
+ *
+ * Tokens: TODO el acento sale de --t-accent-rgb (themes.css). Este archivo
+ * solo define superficie/tinta del overlay por tema (indirección CSS-var,
+ * NUNCA parche clase-por-clase).
+ * ========================================================================== */
+
+.escucha-overlay {
+  /* Tokens del overlay (default = biopunk noche-bosque) */
+  --esc-bg-rgb: 4, 13, 11;          /* fondo del velo */
+  --esc-carta-rgb: 8, 22, 19;       /* superficie de la carta */
+  --esc-ink-rgb: 236, 253, 245;     /* tinta principal */
+  --esc-dim-rgb: 148, 187, 173;     /* tinta secundaria */
+  --esc-linea-rgb: 25, 201, 154;    /* trazos del iris (= acento biopunk) */
+  --esc-linea-rgb: var(--t-accent-rgb);
+  --esc-cta-ink: #04231b;           /* tinta sobre el botón de acento */
+
+  position: fixed;
+  inset: 0;
+  z-index: 90; /* sobre FABs (40) y chrome; bajo nada — es modal */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+
+/* Temas claros: papel del tema + tinta oscura (legible a pleno sol). */
+[data-theme="minimalista"] .escucha-overlay {
+  --esc-bg-rgb: 246, 243, 236;
+  --esc-carta-rgb: 252, 250, 245;
+  --esc-ink-rgb: 24, 34, 29;
+  --esc-dim-rgb: 90, 106, 98;
+  --esc-cta-ink: #ffffff;
+}
+[data-theme="nature"] .escucha-overlay {
+  --esc-bg-rgb: 251, 245, 234;
+  --esc-carta-rgb: 254, 250, 242;
+  --esc-ink-rgb: 43, 33, 24;
+  --esc-dim-rgb: 122, 103, 82;
+  --esc-cta-ink: #2b1c10;
+}
+[data-theme="verde-vivo"] .escucha-overlay {
+  --esc-bg-rgb: 238, 243, 226;
+  --esc-carta-rgb: 248, 251, 240;
+  --esc-ink-rgb: 26, 38, 28;
+  --esc-dim-rgb: 84, 104, 88;
+  --esc-cta-ink: #ffffff;
+}
+
+/* Velo: casi opaco a propósito — al sol un velo translúcido no se lee. */
+.escucha-velo {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 120% 80% at 50% 30%, rgba(var(--esc-linea-rgb), 0.10), transparent 60%),
+    rgba(var(--esc-bg-rgb), 0.96);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.escucha-carta {
+  position: relative;
+  width: min(100%, 420px);
+  max-height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 20px calc(18px + env(safe-area-inset-bottom));
+  border-radius: 28px;
+  background: rgba(var(--esc-carta-rgb), 0.92);
+  border: 1px solid rgba(var(--esc-linea-rgb), 0.35);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.45),
+    0 0 60px rgba(var(--esc-linea-rgb), 0.18);
+  color: rgb(var(--esc-ink-rgb));
+  animation: escucha-entra 0.28s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+
+@keyframes escucha-entra {
+  from { transform: translateY(24px) scale(0.96); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* --- Eyebrow: "escucha activa" ------------------------------------------ */
+.escucha-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(var(--esc-dim-rgb));
+}
+.escucha-punto {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgb(var(--esc-linea-rgb));
+  box-shadow: 0 0 0 0 rgba(var(--esc-linea-rgb), 0.55);
+  animation: escucha-latido 1.6s ease-out infinite;
+}
+@keyframes escucha-latido {
+  0%   { box-shadow: 0 0 0 0 rgba(var(--esc-linea-rgb), 0.55); }
+  70%  { box-shadow: 0 0 0 10px rgba(var(--esc-linea-rgb), 0); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--esc-linea-rgb), 0); }
+}
+
+/* --- El iris (la mano que escucha) --------------------------------------- */
+.escucha-iris {
+  position: relative;
+  width: 232px;
+  height: 232px;
+  display: grid;
+  place-items: center;
+  margin: 2px 0;
+}
+.escucha-iris svg { position: absolute; inset: 0; overflow: visible; }
+
+/* Anillos de micelio: el scale lo pone el JSX con el RMS real; acá solo
+ * la transición corta para que el movimiento se sienta orgánico. */
+.escucha-anillo {
+  transform-origin: center;
+  transition: transform 0.09s ease-out, opacity 0.2s ease;
+}
+.escucha-brote {
+  transition: opacity 0.15s ease;
+  stroke: rgb(var(--esc-linea-rgb));
+  stroke-linecap: round;
+}
+.escucha-arco-cierre {
+  stroke: rgb(var(--esc-ink-rgb));
+  opacity: 0.85;
+  transition: stroke-dashoffset 0.15s linear;
+}
+
+/* La mano al centro: disco propio + glifo con el acento del tema. */
+.escucha-mano {
+  position: relative;
+  z-index: 2;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: rgb(var(--esc-linea-rgb));
+  background:
+    radial-gradient(circle at 32% 28%, rgba(var(--esc-linea-rgb), 0.22), transparent 62%),
+    rgba(var(--esc-carta-rgb), 0.95);
+  border: 2px solid rgba(var(--esc-linea-rgb), 0.55);
+  box-shadow: 0 0 34px rgba(var(--esc-linea-rgb), 0.35);
+}
+.escucha-overlay[data-fase="pensando"] .escucha-mano {
+  animation: escucha-piensa 1.4s ease-in-out infinite;
+}
+@keyframes escucha-piensa {
+  0%, 100% { box-shadow: 0 0 22px rgba(var(--esc-linea-rgb), 0.25); }
+  50%      { box-shadow: 0 0 48px rgba(var(--esc-linea-rgb), 0.55); }
+}
+
+/* --- Título de estado (legible al sol: enorme y extrabold) ---------------- */
+.escucha-titulo {
+  margin: 0;
+  font-size: clamp(1.55rem, 6.4vw, 1.95rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  text-align: center;
+  color: rgb(var(--esc-ink-rgb));
+}
+.escucha-titulo b { color: rgb(var(--esc-linea-rgb)); font-weight: 800; }
+
+.escucha-sub {
+  margin: 0;
+  max-width: 32ch;
+  text-align: center;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: rgb(var(--esc-dim-rgb));
+}
+.escucha-sub b { color: rgb(var(--esc-ink-rgb)); font-weight: 700; }
+
+/* --- Medidor: duración + rumbo ------------------------------------------- */
+.escucha-medidor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: rgb(var(--esc-dim-rgb));
+}
+.escucha-rumbo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgb(var(--esc-ink-rgb));
+  background: rgba(var(--esc-linea-rgb), 0.14);
+  border: 1px solid rgba(var(--esc-linea-rgb), 0.45);
+}
+.escucha-rumbo b { color: rgb(var(--esc-linea-rgb)); }
+
+/* --- Acciones tamaño GUANTE ------------------------------------------------
+ * El caso de uso es manos con guantes/barro: el botón primario ocupa todo el
+ * ancho y mide ≥72px de alto. Nada de targets de 40px acá. */
+.escucha-acciones {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
+}
+.escucha-btn-listo {
+  width: 100%;
+  min-height: 72px;
+  border: none;
+  border-radius: 20px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--esc-cta-ink);
+  background: rgb(var(--esc-linea-rgb));
+  box-shadow: 0 10px 30px rgba(var(--esc-linea-rgb), 0.35);
+  transition: transform 0.12s ease, box-shadow 0.2s ease;
+}
+.escucha-btn-listo:active { transform: scale(0.97); }
+.escucha-btn-sec {
+  width: 100%;
+  min-height: 56px;
+  border-radius: 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: rgb(var(--esc-ink-rgb));
+  background: rgba(var(--esc-ink-rgb), 0.08);
+  border: 1px solid rgba(var(--esc-ink-rgb), 0.22);
+}
+.escucha-btn-cancelar {
+  width: 100%;
+  min-height: 52px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: rgb(var(--esc-dim-rgb));
+}
+.escucha-btn-cancelar:hover { color: rgb(var(--esc-ink-rgb)); }
+
+.escucha-overlay button:focus-visible {
+  outline: 3px solid rgba(var(--esc-linea-rgb), 0.9);
+  outline-offset: 2px;
+}
+/* La carta recibe foco PROGRAMÁTICO al abrir (anuncio para lectores de
+ * pantalla); el focus-ring global del app le pintaba un aro ámbar alrededor
+ * de todo el modal. El foco visible se reserva para los botones. */
+.escucha-carta:focus,
+.escucha-carta:focus-visible {
+  outline: none;
+}
+
+/* ============================================================================
+ * EscuchaFab — botón flotante persistente (el tap de HOY).
+ * Espejo del AgentFab (colibrí, derecha): este vive a la IZQUIERDA, tamaño
+ * guante (62px), acento del tema, con un ping suave que anuncia "aquí se
+ * habla". El wake-word de mañana NO lo necesita — llama activarEscucha().
+ * ========================================================================== */
+.escucha-fab {
+  position: fixed;
+  bottom: max(90px, calc(env(safe-area-inset-bottom) + 90px));
+  left: 16px;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: rgb(var(--t-accent-rgb));
+  background: radial-gradient(circle at 30% 25%, rgba(var(--t-accent-rgb), 0.16), transparent 65%), rgba(6, 16, 13, 0.92);
+  border: 2px solid rgba(var(--t-accent-rgb), 0.65);
+  box-shadow:
+    0 4px 18px rgba(0, 0, 0, 0.45),
+    0 0 18px rgba(var(--t-accent-rgb), 0.35);
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+}
+.escucha-fab:hover, .escucha-fab:focus-visible { transform: scale(1.06); }
+.escucha-fab:active { transform: scale(0.94); }
+.escucha-fab:focus-visible {
+  outline: 3px solid rgba(var(--t-accent-rgb), 0.9);
+  outline-offset: 2px;
+}
+
+/* Temas claros: el FAB pasa a disco del acento con tinta clara (contraste). */
+[data-theme="minimalista"] .escucha-fab,
+[data-theme="nature"] .escucha-fab,
+[data-theme="verde-vivo"] .escucha-fab {
+  color: #fff;
+  background: rgb(var(--t-accent-rgb));
+  border-color: rgba(255, 255, 255, 0.65);
+}
+[data-theme="nature"] .escucha-fab { color: #2b1c10; }
+
+/* Ping perezoso: un aro que brota cada 4s — anuncia sin fastidiar. */
+.escucha-fab-ping {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid rgba(var(--t-accent-rgb), 0.55);
+  animation: escucha-fab-brota 4s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes escucha-fab-brota {
+  0%   { transform: scale(1); opacity: 0.7; }
+  30%  { transform: scale(1.45); opacity: 0; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+
+/* La ramita del glifo sobre el mic: la firma "mano de Chagra" en miniatura. */
+.escucha-fab-brotecito {
+  position: absolute;
+  top: 7px;
+  right: 9px;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+/* ============================================================================
+ * Movimiento reducido: el organismo queda quieto pero el ESTADO sigue claro
+ * (el arco de cierre y los textos son informativos, no decorativos).
+ * ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .escucha-carta { animation: none; }
+  .escucha-punto { animation: none; }
+  .escucha-anillo { transition: none; }
+  .escucha-overlay[data-fase="pensando"] .escucha-mano { animation: none; }
+  .escucha-fab-ping { animation: none; opacity: 0; }
+  .escucha-fab, .escucha-btn-listo { transition: none; }
+}

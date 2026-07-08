@@ -83,7 +83,7 @@ jobs:
               echo "⚠️  author null, saltando"
               continue
             fi
-            if echo "$ALLOWLIST" | tr ',' '\n' | grep -qx "$author"; then
+            if echo "$ALLOWLIST" | tr ',' '\n' | grep -Fqx "$author"; then
               echo "✅ $author en allowlist"
               continue
             fi
