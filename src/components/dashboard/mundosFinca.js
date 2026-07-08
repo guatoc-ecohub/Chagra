@@ -67,6 +67,7 @@ export const MUNDOS_FINCA = [
             { view: 'aromaticas', label: 'Huerta de aromáticas', desc: 'Cilantro, cebolla larga, orégano y más: para qué sirven en la cocina y cómo sembrarlas', emoji: '🌿' },
             { view: 'sembrar', label: 'Registrar una siembra', desc: 'Anote lo que sembró y arranca su ciclo', emoji: '🌽' },
             { view: 'cosechar', label: 'Cosechar', desc: 'Anote lo que recogió', emoji: '🧺' },
+            { view: 'mi_cosecha', label: 'Mi cosecha', desc: 'Cuánto ha producido su finca: por cultivo, mes a mes y por lote', emoji: '📊' },
             { view: 'ciclo', label: 'Ciclo de cultivo', desc: 'La vida de la mata etapa por etapa', emoji: '🔄' },
         ],
     },
