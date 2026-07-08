@@ -1,7 +1,8 @@
 /**
  * Tests de EjemplosVoz — la tarjeta de ejemplos del modo campo:
  *  - encabezado honesto + micro-guía siempre visibles
- *  - con movimiento normal: muestra UN ejemplo y ROTA cada ~4s
+ *  - con movimiento normal: al ABRIR los 3 ejemplos entran en cascada
+ *    (acto de entrada), luego colapsa a UN ejemplo que ROTA cada ~4s
  *  - con prefers-reduced-motion: lista estática con los 3 ejemplos, sin timer
  *
  * Español colombiano (tú/usted), NUNCA voseo argentino.
@@ -48,10 +49,30 @@ describe('EjemplosVoz', () => {
     expect(screen.getByTestId('ejemplos-voz-guia').textContent).toContain('enséñele su voz');
   });
 
-  it('con movimiento normal muestra un ejemplo a la vez y rota cada ~4s', () => {
+  it('al abrir, los 3 ejemplos entran en cascada (acto de entrada)', () => {
     mockMatchMedia(false);
     render(<EjemplosVoz />);
-    // Arranca en el primero.
+    // Acto 1: cascada con los 3 ejemplos visibles a la vez.
+    expect(screen.getByTestId('ejemplos-voz-entrada')).toBeInTheDocument();
+    EJEMPLOS_VOZ.forEach((e) => {
+      expect(screen.getByText(e.frase)).toBeInTheDocument();
+    });
+    // El stagger va por CSS (animation-delay con --i): cada item lo declara.
+    const items = screen.getByTestId('ejemplos-voz-entrada').querySelectorAll('.ejemplos-voz-entrada-item');
+    expect(items).toHaveLength(3);
+    // Todavía no hay carrusel montado.
+    expect(screen.queryByTestId('ejemplos-voz-activo')).not.toBeInTheDocument();
+  });
+
+  it('tras la entrada colapsa a un ejemplo a la vez y rota cada ~4s', () => {
+    mockMatchMedia(false);
+    render(<EjemplosVoz />);
+    // Deja pasar la coreografía de entrada en dos pasos — hold (~4.6s) y
+    // salida (~0.45s) — porque el segundo timer se agenda en el re-render.
+    act(() => { vi.advanceTimersByTime(4700); });
+    act(() => { vi.advanceTimersByTime(500); });
+    expect(screen.queryByTestId('ejemplos-voz-entrada')).not.toBeInTheDocument();
+    // El carrusel arranca en el primero (el que dejó la cascada).
     expect(screen.getByTestId('ejemplos-voz-activo').textContent).toContain(EJEMPLOS_VOZ[0].frase);
     expect(screen.queryByText(EJEMPLOS_VOZ[1].frase)).not.toBeInTheDocument();
     // Tras ~4s pasa al segundo.
