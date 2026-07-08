@@ -26,6 +26,8 @@ import {
   FOTO_BASE_MANGO,
   FOTO_FRUTALES_MANGO,
   FOTO_FRUTALES_INJERTO,
+  CREDITO_ARBOL_LADERA,
+  CREDITO_INJERTO,
   CREDITOS_FOTOS_MANGO,
 } from '../../data/mangoFinca';
 import './mango.css';
@@ -75,7 +77,7 @@ function SlotPendiente({ children = null }) {
  * oscuro es FIJO (no lo vira el remapeo de temas claros) para legibilidad. */
 const creditoDe = (slug) => CREDITOS_FOTOS_MANGO.find((c) => c.slug === slug)?.autor || '';
 
-function FotoMango({ slug, src = null, credito = null, alt, ratio = 'aspect-[16/10]', rounded = '', Fallback = Apple, kenburns = false, children = null }) {
+function FotoMango({ slug = null, src = null, credito = null, alt, ratio = 'aspect-[16/10]', rounded = '', Fallback = Apple, kenburns = false, children = null }) {
   const [ok, setOk] = useState(true);
   const autor = credito !== null ? credito : creditoDe(slug);
   const url = src || `${FOTO_BASE_MANGO}/${slug}.jpg`;
@@ -220,7 +222,7 @@ function EstacionSiembra() {
 
       {/* Del patrón al árbol (foto del injerto + pasos en orden) */}
       <div className="rounded-2xl border border-emerald-800/40 overflow-hidden bg-[#241a0c]/50">
-        <FotoMango src={FOTO_FRUTALES_INJERTO} credito="" alt="Injerto de yema en un frutal" ratio="aspect-[16/8]" Fallback={Scissors}>
+        <FotoMango src={FOTO_FRUTALES_INJERTO} credito={CREDITO_INJERTO} alt="Injerto de yema en un frutal" ratio="aspect-[16/8]" Fallback={Scissors}>
           <div className="absolute inset-0 flex flex-col justify-end p-4">
             <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.16em] text-emerald-200">
               <Sprout size={14} aria-hidden="true" /> Del patrón al árbol
@@ -269,7 +271,7 @@ function EstacionClima({ onNavigate }) {
   return (
     <section className="mango-seccion space-y-4" data-testid="estacion-clima">
       <div className="rounded-2xl border border-amber-800/40 overflow-hidden bg-[#241a0c]/60">
-        <FotoMango src={FOTO_FRUTALES_MANGO} credito="" alt="Árbol de mango solitario en una ladera de tierra cálida" ratio="aspect-[16/9]" kenburns Fallback={Mountain}>
+        <FotoMango src={FOTO_FRUTALES_MANGO} credito={CREDITO_ARBOL_LADERA} alt="Árbol de mango solitario en una ladera de tierra cálida" ratio="aspect-[16/9]" kenburns Fallback={Mountain}>
           <div className="absolute inset-0 flex flex-col justify-end p-4">
             <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.16em] text-amber-200">
               <Thermometer size={14} aria-hidden="true" /> ¿A mi finca le va?

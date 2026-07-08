@@ -420,4 +420,12 @@ export const CREDITOS_FOTOS_MANGO = [
   { slug: 'fruto', autor: 'Ivar Leidus', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Mango_fruit_Nam_Dok_Mai.jpg' },
   { slug: 'antracnosis', autor: 'Knowledge Center', licencia: 'CC BY-SA 3.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/3.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Mango-anthracnose.jpg' },
   { slug: 'mosca', autor: 'Jeffrey W. Lotz (FDACS)', licencia: 'CC BY 3.0 us', licenciaUrl: 'https://creativecommons.org/licenses/by/3.0/us/deed.en', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Anastrepha_ludens_5179020.jpg' },
+  // Fotos REUTILIZADAS del mundo "Frutales" (ya en el bundle): igual llevan
+  // atribución visible aquí, por ser CC BY-SA.
+  { slug: 'arbol-ladera', autor: 'CEphoto, Uwe Aranas', licencia: 'CC BY-SA 3.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/3.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Paitan_Sabah_Common-mango-Mangifera-indica-01.jpg' },
+  { slug: 'injerto', autor: 'Sorruno', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Injerto_de_yema.JPG' },
 ];
+
+/** Autores de las fotos reutilizadas (para la atribución visible en el badge). */
+export const CREDITO_ARBOL_LADERA = 'CEphoto, Uwe Aranas';
+export const CREDITO_INJERTO = 'Sorruno';
