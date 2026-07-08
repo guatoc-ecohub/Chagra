@@ -80,6 +80,19 @@ export const MUNDOS_FINCA = [
         directo: { view: 'cafe' },
     },
     {
+        id: 'aguacate',
+        titulo: 'El aguacate',
+        emoji: '🥑',
+        lema: 'El cultivo bandera de alto valor: piso térmico e injerto, drenaje contra la pudrición, flor tipo A/B y cosecha',
+        tinte: ['#5b7f2a', '#e4efd0'],
+        // Mundo de una sola pantalla (photo-forward, 5 estaciones: variedad y
+        // siembra / suelo y agua / plagas / flor y polinización A/B / cosecha).
+        // Profundización dedicada del Hass y los criollos de montaña; el
+        // aguacate conserva su ficha rápida dentro del mundo Frutales (no la
+        // duplica). La tarjeta navega directo, sin pantalla intermedia.
+        directo: { view: 'aguacate' },
+    },
+    {
         id: 'cana',
         titulo: 'La caña y la panela',
         emoji: '🥮',

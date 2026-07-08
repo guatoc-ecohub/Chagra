@@ -137,6 +137,13 @@ const CafeScreen = lazy(() => import('./components/cafe/CafeScreen'));
 // cada uno con su ficha de cultivo. Photo-forward (patrón Café/Agua) y
 // groundeado en el grafo (pest_controllers) + perennialCycles (AGROSAVIA).
 const FrutalesScreen = lazy(() => import('./components/frutales/FrutalesScreen'));
+// Mundo "El aguacate": la profundización dedicada del cultivo bandera de alto
+// valor (Hass y criollos de montaña). Photo-forward (patrón Café) y groundeado
+// en el grafo (species.persea_americana: pest_controllers, compatible_with,
+// antagonist_of, biopreparados) + perennialCycles (AGROSAVIA). NO es duplicado:
+// el aguacate sigue teniendo su ficha rápida dentro del mundo Frutales; aquí se
+// profundiza (injerto/patrón, drenaje contra Phytophthora, floración tipo A/B).
+const AguacateScreen = lazy(() => import('./components/aguacate/AguacateScreen'));
 // Mundo "La caña y la panela" (5 estaciones: la caña / siembra y manejo /
 // plagas / corte / la panela). Photo-forward (patrón Café) y groundeado en el
 // grafo (Diatraea AFFECTS caña; Cotesia/Trichogramma CONTROLS Diatraea) +
@@ -432,6 +439,12 @@ const HASH_VIEW_ROUTES = {
   frutal: 'frutales',
   'arboles-frutales': 'frutales',
   'frutales-finca': 'frutales',
+  aguacate: 'aguacate',
+  'el-aguacate': 'aguacate',
+  palta: 'aguacate',
+  cura: 'aguacate',
+  hass: 'aguacate',
+  persea: 'aguacate',
   cana: 'cana',
   caña: 'cana',
   'la-cana': 'cana',
@@ -510,7 +523,7 @@ const MODULE_VIEWS = new Set([
   'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'aromaticas', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'frutales', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'frutales', 'aguacate', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'almanaque', 'suelo', 'agua', 'cafe', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'cana', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'platano', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
@@ -1836,6 +1849,21 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Frutales de la finca">
               <FrutalesScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'aguacate':
+        // Mundo "El aguacate": profundización dedicada del cultivo bandera de
+        // alto valor (Hass y criollos de montaña). 5 estaciones photo-forward
+        // (variedad+siembra / suelo+agua / plagas / flor+polinización A/B /
+        // cosecha). Groundeado en el grafo (persea_americana: pest_controllers,
+        // compatible_with, antagonist_of, biopreparados) + perennialCycles
+        // (AGROSAVIA); sin dosis químicas (cifras de sitio = "dato en camino").
+        // Convive con la ficha de aguacate del mundo Frutales (no la duplica).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El aguacate">
+              <AguacateScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
