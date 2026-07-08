@@ -1,20 +1,27 @@
 /**
- * EscuchaFab — botón flotante persistente que activa la escucha manos libres.
+ * EscuchaFab — la SEMILLA EN REPOSO: botón flotante que activa la escucha
+ * manos libres. (Hoy deshabilitado en App — el trigger vivo es el wake-word
+ * "hola Chagra"; ambos llaman `activarEscucha()` y el widget no distingue.)
  *
- * Es el trigger de HOY (tap). El de MAÑANA es el wake-word "hola Chagra":
- * ambos llaman `activarEscucha()` (escuchaService) — el widget no distingue.
+ * Visual: mismo organismo que el overlay ("la semilla que despierta") pero
+ * dormido — una semilla bioluminiscente con membranas que mutan despacio,
+ * un corazón que late lub-dub como luciérnaga lejana, y raicillas que ya
+ * agarraron tierra donde vive. Al tocarla, germina (abre el overlay).
  *
- * Diseño: espejo del AgentFab (colibrí, abajo-derecha): este vive ABAJO A LA
- * IZQUIERDA, 62px (tamaño guante), micrófono grande + la ramita de la mano de
- * Chagra como firma, acento del tema por --t-accent-rgb, con un ping perezoso
- * cada 4s que anuncia "aquí se habla" (apagado con prefers-reduced-motion).
+ * Tamaño guante (62px), abajo-izquierda (espejo del AgentFab colibrí).
+ * Acento por --t-accent-rgb (indirección de temas).
  *
  * IMPORTANTE — español colombiano (tú/usted), NUNCA voseo argentino.
  */
 import React from 'react';
 import { Mic } from 'lucide-react';
 import { activarEscucha } from '../../services/escuchaService';
+import { blobPath } from './organico';
 import './escucha.css';
+
+/* Membranas de la semilla: deterministas (siempre la misma criatura). */
+const MEMBRANA_1 = blobPath(36, 36, 26, 2.2, 0.13);
+const MEMBRANA_2 = blobPath(36, 36, 30, 5.9, 0.11);
 
 export default function EscuchaFab() {
   return (
@@ -26,25 +33,20 @@ export default function EscuchaFab() {
       title="Manos libres: toque y hable — «lléveme al mercado» o pregunte lo que necesite"
       onClick={() => activarEscucha({ fuente: 'tap' })}
     >
-      <span className="escucha-fab-ping" aria-hidden="true" />
-      <Mic size={27} strokeWidth={2.4} aria-hidden="true" />
-      {/* La firma de la marca: la ramita con nodos que brota (mano de Chagra) */}
-      <svg
-        className="escucha-fab-brotecito"
-        width="16"
-        height="16"
-        viewBox="0 0 16 16"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.4"
-        strokeLinecap="round"
-        aria-hidden="true"
-      >
-        <path d="M8 13V7" />
-        <path d="M8 7L5.6 4.8M8 7l2.3-2.4" />
-        <circle cx="4.9" cy="4" r="0.8" fill="currentColor" stroke="none" />
-        <circle cx="11" cy="3.8" r="0.8" fill="currentColor" stroke="none" />
+      <svg className="escucha-fab-vida" viewBox="0 0 72 72" aria-hidden="true">
+        <path className="escucha-fab-membrana esc-fm1" d={MEMBRANA_1} />
+        <path className="escucha-fab-membrana esc-fm2" d={MEMBRANA_2} />
+        {/* Raicillas: la semilla ya agarró tierra donde vive. */}
+        <g className="escucha-fab-raicillas">
+          <path d="M28 60 C 26 65, 21 66, 17 70" />
+          <path d="M36 62 C 36 66, 38 69, 37 72" />
+          <path d="M44 60 C 47 64, 52 65, 55 69" />
+        </g>
       </svg>
+      <span className="escucha-fab-corazon" aria-hidden="true" />
+      <Mic size={26} strokeWidth={2.4} aria-hidden="true" />
+      {/* Una luciérnaga pasa de visita cada tanto. */}
+      <span className="escucha-fab-luci" aria-hidden="true" />
     </button>
   );
 }
