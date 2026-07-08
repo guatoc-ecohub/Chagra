@@ -1,0 +1,122 @@
+/* mi-cosecha.css — tablero "Mi cosecha".
+ *
+ * Marcas de gráfica en un solo tono validado sobre superficie #0f172a
+ * (slate-900): kg = #059669 (esmeralda), conteos = #d97706 (ámbar).
+ * Contraste ≥3:1 y ΔE CVD 39.3 entre ambos (validate_palette.js, modo dark).
+ *
+ * Animaciones SOLO transform/opacity (GPU-friendly, sin filter/blur) y
+ * apagadas bajo prefers-reduced-motion. */
+
+.mc-tablero {
+  --mc-series-kg: #059669;
+  --mc-series-count: #d97706;
+  --mc-track: rgba(148, 163, 184, 0.14);
+  --mc-hairline: rgba(148, 163, 184, 0.25);
+}
+
+/* ── Columnas por mes ── */
+.mc-bar-v {
+  background: var(--mc-series-kg);
+  border-radius: 4px 4px 0 0; /* punta de dato redondeada, base cuadrada */
+  transform-origin: bottom;
+  animation: mc-grow-v 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.mc-baseline {
+  height: 1px;
+  background: var(--mc-hairline);
+}
+
+/* ── Barras horizontales por cultivo ── */
+.mc-track {
+  height: 12px;
+  border-radius: 0 4px 4px 0;
+  background: var(--mc-track);
+}
+
+.mc-bar-h {
+  height: 100%;
+  background: var(--mc-series-kg);
+  border-radius: 0 4px 4px 0; /* punta de dato redondeada, base cuadrada */
+  transform-origin: left;
+  animation: mc-grow-h 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+/* Marcador de cultivos medidos por unidades (escala aparte) */
+.mc-dot-count {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--mc-series-count);
+  box-shadow: 0 0 0 2px #0f172a; /* anillo de superficie */
+}
+
+/* ── Entrada suave de tarjetas y skeleton de carga ── */
+.mc-card {
+  animation: mc-fade-in 0.35s ease-out backwards;
+}
+
+.mc-skeleton {
+  background: rgba(148, 163, 184, 0.1);
+  animation: mc-pulse 1.4s ease-in-out infinite;
+}
+
+.mc-cta {
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+/* ── Estado vacío: sol y matica respiran suave ── */
+.mc-sun {
+  animation: mc-breathe 3.5s ease-in-out infinite;
+  transform-origin: 184px 30px;
+}
+
+.mc-sprout {
+  animation: mc-sway 4s ease-in-out infinite;
+  transform-origin: 44px 104px;
+}
+
+@keyframes mc-grow-v {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+@keyframes mc-grow-h {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes mc-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes mc-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+@keyframes mc-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+@keyframes mc-sway {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-3deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mc-bar-v,
+  .mc-bar-h,
+  .mc-card,
+  .mc-skeleton,
+  .mc-sun,
+  .mc-sprout {
+    animation: none;
+  }
+
+  .mc-cta {
+    transition: none;
+  }
+}
