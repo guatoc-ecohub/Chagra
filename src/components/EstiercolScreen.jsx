@@ -48,6 +48,50 @@ const PILARES = [
   { id: 'abonos', label: 'Abonos', Icon: Sprout },
 ];
 
+/* ── Fotos reales (licencia abierta) — REUSO de /estiercol-compost ──────────
+ * 2ª pasada visual: mismas fotos que ya embarca CompostScreen (0 bytes nuevos
+ * en dist), mismo patrón "photo-forward" foto + scrim FIJO + crédito visible.
+ * Solo se usan donde la foto es temáticamente exacta. Licencias auditadas en
+ * public/estiercol-compost/_meta.json. */
+const FOTO_BASE_ESTIERCOL = '/estiercol-compost';
+const CREDITOS_FOTOS_ESTIERCOL = {
+  recoleccion: { autor: 'DS Pugh', lic: 'CC BY-SA 2.0' },
+  volteo: { autor: 'SB Johnny', lic: 'CC BY-SA 3.0' },
+  lombriz: { autor: 'Gordon Joly', lic: 'CC BY-SA 4.0' },
+};
+
+/**
+ * FotoEstiercol — foto a sangre con scrim inferior fijo (legible al sol en los
+ * 4 temas), crédito de autor y fallback silencioso (si la foto no carga queda
+ * el fondo de la card, sin hueco). `children` va SOBRE la foto.
+ */
+function FotoEstiercol({ slug, alt, className = '', imgClassName = '', children = null }) {
+  const [ok, setOk] = useState(true);
+  const credito = CREDITOS_FOTOS_ESTIERCOL[slug];
+  return (
+    <div className={`relative overflow-hidden bg-slate-950 ${className}`}>
+      {ok && (
+        <img
+          src={`${FOTO_BASE_ESTIERCOL}/${slug}.jpg`}
+          alt={alt}
+          loading="lazy"
+          decoding="async"
+          onError={() => setOk(false)}
+          className={`absolute inset-0 w-full h-full object-cover ${imgClassName}`}
+        />
+      )}
+      {/* Scrim fijo (no lo vira el remapeo de temas claros) */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10" aria-hidden="true" />
+      {children}
+      {ok && credito && (
+        <span className="absolute bottom-1 right-1.5 rounded bg-black/55 px-1 py-0.5 text-[9px] leading-none text-white/75">
+          Foto: {credito.autor} · {credito.lic}
+        </span>
+      )}
+    </div>
+  );
+}
+
 /* ── Piezas de UI reutilizables ─────────────────────────────────────────── */
 
 /** Card de sección con encabezado a color (patrón de las pantallas de Chagra). */
@@ -55,7 +99,7 @@ function SeccionCard({ Icon, tono, titulo, children, className = '' }) {
   return (
     <section className={`rounded-2xl border ${tono.border} ${tono.bg} p-4 ${className}`}>
       {titulo && (
-        <h2 className={`flex items-center gap-2 text-base font-black ${tono.text}`}>
+        <h2 className={`flex items-center gap-2 text-base font-black tracking-tight ${tono.text}`}>
           {Icon && <Icon size={18} aria-hidden="true" />}
           {titulo}
         </h2>
@@ -138,7 +182,7 @@ function PilarOlores() {
       </div>
 
       <SeccionCard Icon={Info} tono={{ border: 'border-amber-600/40', bg: 'bg-amber-900/20', text: 'text-amber-200' }} titulo="Por qué huele">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-1 estiercol-stagger">
           {OLOR_CAUSAS.map((c) => (
             <div key={c.t} className="rounded-xl bg-black/20 border border-slate-700/50 p-3">
               <p className="flex items-center gap-2 font-bold text-slate-100">
@@ -153,13 +197,13 @@ function PilarOlores() {
 
       {/* De esto → a esto (antes/después) */}
       <div className="rounded-2xl border border-slate-700/50 bg-slate-900/30 p-3.5 flex items-center gap-3">
-        <div className="flex-1 text-center">
+        <div className="flex-1 text-center rounded-xl border border-rose-700/30 bg-rose-950/30 py-2.5 px-2">
           <p className="text-2xl" aria-hidden="true">💩</p>
           <p className="text-xs font-bold text-rose-300 mt-1">Pila húmeda y tapada</p>
           <p className="text-2xs text-slate-400">huele a amoníaco</p>
         </div>
-        <ArrowRight size={22} className="text-emerald-400 shrink-0" aria-hidden="true" />
-        <div className="flex-1 text-center">
+        <ArrowRight size={22} className="estiercol-nudge text-emerald-400 shrink-0" aria-hidden="true" />
+        <div className="flex-1 text-center rounded-xl border border-emerald-700/30 bg-emerald-950/30 py-2.5 px-2">
           <p className="text-2xl" aria-hidden="true">🌱</p>
           <p className="text-xs font-bold text-emerald-300 mt-1">Compost aireado</p>
           <p className="text-2xs text-slate-400">huele a tierra</p>
@@ -225,7 +269,7 @@ function PilarBiodigestor() {
       </div>
 
       <SeccionCard Icon={CheckCircle2} tono={tono} titulo="Para qué sirve">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-1 estiercol-stagger">
           {BIODIGESTOR_BENEFICIOS.map((b) => (
             <div key={b.t} className="rounded-xl bg-black/20 border border-slate-700/50 p-3">
               <p className="flex items-center gap-2 font-bold text-slate-100">
@@ -377,7 +421,8 @@ function ResultCard({ Icon, valor, unidad, etiqueta, tono }) {
     <div className="rounded-xl bg-black/25 border border-slate-700/50 p-3">
       {Icon && <Icon size={18} className={`${tono} mb-1`} aria-hidden="true" />}
       <p className="leading-none">
-        <span className={`text-2xl font-black ${tono}`}>{texto}</span>{' '}
+        {/* key={texto}: al cambiar la cifra el span se re-monta y "asienta" con pop */}
+        <span key={texto} className={`estiercol-pop text-2xl font-black tabular-nums ${tono}`}>{texto}</span>{' '}
         <span className="text-xs text-slate-400 font-bold">{unidad}</span>
       </p>
       <p className="text-2xs text-slate-400 mt-1 leading-tight">{etiqueta}</p>
@@ -420,12 +465,14 @@ const ABONOS = [
   },
   {
     tipo: 'compost', nombre: 'Compost', de: 'Pila aireada',
+    foto: { slug: 'volteo', alt: 'Volteo de una pila de compost caliente con horqueta' },
     que: 'Estiércol + material seco, volteado con aire hasta que huele a tierra. El abono más versátil.',
     pasos: ['Mezcle estiércol con material seco (2–3 : 1).', 'Voltee cada pocos días y mantenga húmedo como esponja escurrida.', 'Listo cuando huele a tierra y no se reconoce el material.'],
     tono: { border: 'border-emerald-600/40', bg: 'bg-emerald-900/20', text: 'text-emerald-200' },
   },
   {
     tipo: 'lombricompost', nombre: 'Lombricompost', de: 'Con lombriz roja',
+    foto: { slug: 'lombriz', alt: 'Lombrices rojas trabajando el compost' },
     que: 'Estiércol digerido por lombriz roja californiana. El humus más fino y de mejor calidad.',
     pasos: ['Prepare camas con estiércol ya pre-compostado (frío).', 'Siembre la lombriz y manténgala húmeda y a la sombra.', 'Cose­che el humus del lecho cada pocos meses.'],
     tono: { border: 'border-teal-600/40', bg: 'bg-teal-900/20', text: 'text-teal-200' },
@@ -440,19 +487,30 @@ function AbonoCard({ abono }) {
         type="button"
         onClick={() => setAbierto((v) => !v)}
         aria-expanded={abierto}
-        className="w-full flex items-center gap-3 p-3.5 text-left"
+        className="estiercol-card-btn w-full flex items-center gap-3 p-3.5 text-left rounded-2xl"
       >
-        <span className="shrink-0 w-11 h-11 rounded-xl bg-black/25 border border-slate-700/50 grid place-items-center">
+        <span className={`estiercol-glifo-tile ${abierto ? 'estiercol-glifo-tile--abierto' : ''} shrink-0 w-11 h-11 rounded-xl bg-black/25 border border-slate-700/50 grid place-items-center`}>
           <AbonoGlifo tipo={abono.tipo} size={34} />
         </span>
         <span className="flex-1 min-w-0">
-          <span className={`block font-black leading-tight ${abono.tono.text}`}>{abono.nombre}</span>
+          <span className={`block font-black leading-tight tracking-tight ${abono.tono.text}`}>{abono.nombre}</span>
           <span className="block text-2xs text-slate-400">{abono.de}</span>
         </span>
-        <ChevronRight size={18} className={`shrink-0 text-slate-500 transition-transform ${abierto ? 'rotate-90' : ''}`} aria-hidden="true" />
+        <ChevronRight
+          size={18}
+          className={`estiercol-chevron ${abierto ? 'estiercol-chevron--abierto' : ''} shrink-0 text-slate-500`}
+          aria-hidden="true"
+        />
       </button>
       {abierto && (
         <div className="px-3.5 pb-3.5 -mt-1 space-y-2 estiercol-enter">
+          {abono.foto && (
+            <FotoEstiercol
+              slug={abono.foto.slug}
+              alt={abono.foto.alt}
+              className="rounded-xl border border-slate-700/50 aspect-[16/7]"
+            />
+          )}
           <p className="text-sm text-slate-300/90 leading-snug">{abono.que}</p>
           <div>
             <p className="text-xs font-bold text-slate-300 mb-1">Cómo se hace</p>
@@ -481,7 +539,7 @@ function PilarAbonos() {
           hace y —cuando la investigación lo confirme— cuánto aplicar.
         </p>
       </SeccionCard>
-      <div className="space-y-2.5">
+      <div className="space-y-2.5 estiercol-stagger">
         {ABONOS.map((a) => <AbonoCard key={a.tipo} abono={a} />)}
       </div>
     </div>
@@ -498,32 +556,55 @@ function PilarInicio({ onIr }) {
   ];
   return (
     <div className="space-y-4 estiercol-enter">
-      <div className="rounded-2xl border border-emerald-700/40 bg-gradient-to-b from-emerald-900/20 to-transparent p-4">
-        <p className="text-sm text-slate-200/95 leading-relaxed">
-          En la finca <b>nada sobra</b>. El estiércol del corral, bien manejado, se
-          vuelve <b className="text-lime-200">abono</b>, <b className="text-amber-200">gas para cocinar</b> y
-          suelo vivo. Aquí aprende a aprovecharlo sin malos olores.
-        </p>
-        <div className="mt-2 max-w-[240px] mx-auto">
-          <CicloCorralAbono />
+      {/* Hero photo-forward: pila de estiércol real (reuso CC, 0 bytes nuevos).
+          El copy es el MISMO de la 1ª pasada, ahora sobre la foto. */}
+      <FotoEstiercol
+        slug="recoleccion"
+        alt="Pila de estiércol en una finca, lista para volverse abono"
+        className="rounded-2xl border border-emerald-700/40 min-h-[196px] flex"
+        imgClassName="estiercol-hero-img"
+      >
+        <div className="relative z-[1] mt-auto p-4 pb-5 w-full">
+          <p className="text-2xs font-black uppercase tracking-[0.14em] text-emerald-300">
+            Ciclo vivo · Estiércoles y abonos
+          </p>
+          <p className="mt-1 text-2xl font-black text-white leading-tight [text-shadow:0_1px_8px_rgba(0,0,0,0.6)]">
+            En la finca nada sobra
+          </p>
+          <p className="mt-1.5 max-w-md text-sm text-slate-100/95 leading-relaxed [text-shadow:0_1px_6px_rgba(0,0,0,0.7)]">
+            El estiércol del corral, bien manejado, se
+            vuelve <b className="text-lime-300">abono</b>, <b className="text-amber-300">gas para cocinar</b> y
+            suelo vivo. Aquí aprende a aprovecharlo sin malos olores.
+          </p>
         </div>
-      </div>
-      <div className="space-y-2.5">
+      </FotoEstiercol>
+
+      <div className="space-y-2.5 estiercol-stagger">
         {cards.map((c) => (
           <button
             key={c.id}
             type="button"
             onClick={() => onIr(c.id)}
-            className={`estiercol-pilar-btn w-full flex items-center gap-3 rounded-2xl border border-slate-800 border-l-4 ${c.tono.split(' ')[0]} bg-slate-900/40 p-4 text-left`}
+            className={`estiercol-card-btn w-full flex items-center gap-3 rounded-2xl border border-slate-800 border-l-4 ${c.tono.split(' ')[0]} bg-slate-900/40 p-4 text-left`}
           >
             <c.Icon size={26} className={`shrink-0 ${c.tono.split(' ')[1]}`} aria-hidden="true" />
             <span className="flex-1 min-w-0">
-              <span className={`block font-black ${c.tono.split(' ')[1]}`}>{c.t}</span>
+              <span className={`block font-black tracking-tight ${c.tono.split(' ')[1]}`}>{c.t}</span>
               <span className="block text-xs text-slate-400 mt-0.5">{c.d}</span>
             </span>
-            <ChevronRight size={20} className="shrink-0 text-slate-500" aria-hidden="true" />
+            <ChevronRight size={20} className="estiercol-chevron shrink-0 text-slate-500" aria-hidden="true" />
           </button>
         ))}
+      </div>
+
+      {/* El emblema del módulo: el ciclo cerrado corral → abono. */}
+      <div className="rounded-2xl border border-emerald-700/40 bg-gradient-to-b from-emerald-900/20 to-transparent p-4">
+        <p className="text-2xs font-black uppercase tracking-[0.14em] text-emerald-300/90 text-center">
+          El ciclo cerrado
+        </p>
+        <div className="mt-1 max-w-[240px] mx-auto">
+          <CicloCorralAbono />
+        </div>
       </div>
     </div>
   );
