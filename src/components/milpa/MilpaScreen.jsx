@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
-  Wheat, Bean, Carrot, Sprout, Leaf, Bug, Utensils, Flame, Sun, CloudRain,
-  Camera, ExternalLink, ChevronRight, HelpCircle, Hourglass, Handshake,
+  Wheat, Bean, Carrot, Sprout, Leaf, Bug, Utensils, Flame, CloudRain,
+  Camera, ExternalLink, ChevronRight, Hourglass, Handshake,
   ShieldCheck, Ruler, Sparkles, ArrowUp, Package,
 } from 'lucide-react';
 import { ScreenShell } from '../common/ScreenShell';
@@ -48,6 +48,7 @@ const TONO = {
   orange: { text: 'text-orange-300', border: 'border-orange-600/40', chipBg: 'bg-orange-500/15', chipTx: 'text-orange-200', ring: 'border-orange-500/70 bg-orange-500/15 text-orange-100' },
 };
 const ICONO_HERMANA = { maiz: Wheat, frijol: Bean, calabaza: Carrot };
+const ICONO_SECCION = { juntas: Handshake, sembrar: Sprout, cuidar: ShieldCheck };
 
 const creditoDe = (slug) => CREDITOS_FOTOS_MILPA.find((c) => c.slug === slug)?.autor || '';
 
@@ -58,7 +59,7 @@ function SlotPendiente({ children = null }) {
       data-testid="slot-grounded-pendiente"
       className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[11px] font-bold text-amber-300"
     >
-      <Hourglass size={11} aria-hidden="true" />
+      <Hourglass size={11} aria-hidden="true" className="milpa-reloj" />
       {children || 'Dato en camino'}
     </span>
   );
@@ -104,61 +105,79 @@ function FotoMilpa({ slug, alt, ratio = 'aspect-[16/10]', rounded = '', Fallback
 /**
  * DiagramaMilpa — ilustración propia (SVG, rsvg-safe) de las tres hermanas
  * juntas: la caña de maíz al centro, el fríjol trepando por ella y la calabaza
- * tapando el suelo. Es el gesto exacto de la asociación. Sin foreignObject,
- * sin filtros; el movimiento lo pone milpa.css y respeta reduced-motion.
+ * tapando el suelo. Es el gesto exacto de la asociación, ANIMADO en el orden
+ * real de siembra: primero crece el maíz (el tutor), después trepa el fríjol,
+ * de último la calabaza se riega por el piso; al final una brisa perpetua mece
+ * la mata. Sin foreignObject, sin filtros; el movimiento lo pone milpa.css
+ * (solo transform/opacity) y prefers-reduced-motion lo deja todo crecido.
  */
 function DiagramaMilpa() {
   return (
-    <div className="relative rounded-2xl border border-slate-700/60 bg-gradient-to-b from-sky-950/30 to-emerald-950/30 p-3" data-testid="milpa-diagrama">
-      <svg viewBox="0 0 200 150" className="w-full h-auto" role="img" aria-label="Las tres hermanas: la caña de maíz al centro, el fríjol trepando por ella y la calabaza cubriendo el suelo">
+    <div className="relative rounded-2xl border border-slate-700/60 bg-gradient-to-b from-sky-950/40 to-emerald-950/30 p-3" data-testid="milpa-diagrama">
+      <svg viewBox="0 0 200 150" className="w-full h-auto" role="img" aria-label="Las tres hermanas creciendo en orden: la caña de maíz al centro, el fríjol trepando por ella y la calabaza cubriendo el suelo">
+        {/* sol que late, suave */}
+        <g className="milpa-sol">
+          <circle cx="28" cy="26" r="14" fill="#f2c94c" opacity="0.18" />
+          <circle cx="28" cy="26" r="8" fill="#f2c94c" opacity="0.85" />
+        </g>
         {/* suelo */}
         <path d="M0 128 h200 v22 h-200 z" fill="#5b3a20" />
         <path d="M0 128 q50 -6 100 0 t100 0 v6 h-200 z" fill="#6b4626" />
-        {/* CALABAZA — guías rastreras que tapan el piso */}
-        <g stroke="#3f8f4e" strokeWidth="2.4" fill="none" strokeLinecap="round" className="milpa-guia">
-          <path d="M100 130 q-34 -2 -58 6" />
-          <path d="M100 130 q34 -2 58 6" />
-          <path d="M70 132 q-8 -6 -18 -4" />
-          <path d="M130 132 q8 -6 18 -4" />
+        {/* MAÍZ — crece primero; la brisa lo mece desde la base */}
+        <g className="milpa-anim-maiz">
+          <g className="milpa-brisa">
+            {/* caña alta y recta al centro (el tutor) */}
+            <path d="M100 130 C 98 96, 102 70, 100 34" stroke="#caa23e" strokeWidth="4" fill="none" strokeLinecap="round" />
+            {/* hojas del maíz */}
+            <g stroke="#8fae3a" strokeWidth="3" fill="none" strokeLinecap="round">
+              <path d="M100 104 q-20 -8 -30 -22" />
+              <path d="M100 88 q20 -8 30 -22" />
+              <path d="M100 66 q-18 -8 -26 -22" />
+            </g>
+            {/* penacho del maíz */}
+            <g stroke="#e6cf7a" strokeWidth="2" strokeLinecap="round">
+              <path d="M100 34 v-12" />
+              <path d="M100 30 l-7 -10" />
+              <path d="M100 30 l7 -10" />
+            </g>
+            {/* FRÍJOL — trepa en espiral por la caña, después del maíz */}
+            <path
+              d="M100 128 q-9 -8 0 -16 q9 -8 0 -16 q-9 -8 0 -16 q9 -8 0 -16 q-9 -8 0 -16 q9 -7 0 -14"
+              stroke="#e46a7a" strokeWidth="2.6" fill="none" strokeLinecap="round" className="milpa-anim-frijol"
+            />
+            {/* hojas y vaina de fríjol: brotan al final */}
+            <g className="milpa-anim-brote">
+              <g fill="#e46a7a">
+                <ellipse cx="90" cy="112" rx="5" ry="3" transform="rotate(-30 90 112)" />
+                <ellipse cx="110" cy="88" rx="5" ry="3" transform="rotate(30 110 88)" />
+              </g>
+              <path d="M108 64 q7 4 6 13" stroke="#c94f60" strokeWidth="3" fill="none" strokeLinecap="round" />
+            </g>
+          </g>
         </g>
-        {/* hojas anchas de calabaza */}
-        <g fill="#4fae5f">
-          <ellipse cx="40" cy="134" rx="13" ry="8" transform="rotate(-14 40 134)" />
-          <ellipse cx="160" cy="134" rx="13" ry="8" transform="rotate(14 160 134)" />
-          <ellipse cx="66" cy="138" rx="9" ry="6" transform="rotate(-6 66 138)" />
+        {/* CALABAZA — de última, se riega desde el centro y tapa el piso */}
+        <g className="milpa-anim-calabaza">
+          <g stroke="#3f8f4e" strokeWidth="2.4" fill="none" strokeLinecap="round">
+            <path d="M100 130 q-34 -2 -58 6" />
+            <path d="M100 130 q34 -2 58 6" />
+            <path d="M70 132 q-8 -6 -18 -4" />
+            <path d="M130 132 q8 -6 18 -4" />
+          </g>
+          {/* hojas anchas de calabaza */}
+          <g fill="#4fae5f">
+            <ellipse cx="40" cy="134" rx="13" ry="8" transform="rotate(-14 40 134)" />
+            <ellipse cx="160" cy="134" rx="13" ry="8" transform="rotate(14 160 134)" />
+            <ellipse cx="66" cy="138" rx="9" ry="6" transform="rotate(-6 66 138)" />
+          </g>
+          {/* flor/fruto de calabaza */}
+          <circle cx="36" cy="132" r="5" fill="#f0a92b" />
         </g>
-        {/* flor/fruto de calabaza */}
-        <circle cx="36" cy="132" r="5" fill="#f0a92b" />
-        {/* MAÍZ — caña alta y recta al centro (el tutor) */}
-        <path d="M100 130 C 98 96, 102 70, 100 34" stroke="#caa23e" strokeWidth="4" fill="none" strokeLinecap="round" />
-        {/* hojas del maíz */}
-        <g stroke="#8fae3a" strokeWidth="3" fill="none" strokeLinecap="round">
-          <path d="M100 104 q-20 -8 -30 -22" />
-          <path d="M100 88 q20 -8 30 -22" />
-          <path d="M100 66 q-18 -8 -26 -22" />
-        </g>
-        {/* penacho del maíz */}
-        <g stroke="#e6cf7a" strokeWidth="2" strokeLinecap="round">
-          <path d="M100 34 v-12" />
-          <path d="M100 30 l-7 -10" />
-          <path d="M100 30 l7 -10" />
-        </g>
-        {/* FRÍJOL — guía que trepa en espiral por la caña */}
-        <path
-          d="M100 128 q-9 -8 0 -16 q9 -8 0 -16 q-9 -8 0 -16 q9 -8 0 -16 q-9 -8 0 -16 q9 -7 0 -14"
-          stroke="#e46a7a" strokeWidth="2.6" fill="none" strokeLinecap="round" className="milpa-guia"
-        />
-        {/* hojas y vaina de fríjol */}
-        <g fill="#e46a7a">
-          <ellipse cx="90" cy="112" rx="5" ry="3" transform="rotate(-30 90 112)" />
-          <ellipse cx="110" cy="88" rx="5" ry="3" transform="rotate(30 110 88)" />
-        </g>
-        <path d="M108 64 q7 4 6 13" stroke="#c94f60" strokeWidth="3" fill="none" strokeLinecap="round" />
       </svg>
-      {/* etiquetas de rol */}
-      <div className="mt-1 grid grid-cols-3 gap-1 text-center">
+      {/* etiquetas de rol, con su punto de color (aparecen al final) */}
+      <div className="milpa-etiquetas mt-1 grid grid-cols-3 gap-1 text-center">
         {HERMANAS.map((h) => (
-          <span key={h.id} className={`text-[10px] font-black uppercase tracking-wide ${TONO[h.color].text}`}>
+          <span key={h.id} className={`inline-flex items-center justify-center gap-1 text-[10px] font-black uppercase tracking-wide ${TONO[h.color].text}`}>
+            <span aria-hidden="true" className={`inline-block h-1.5 w-1.5 rounded-full ${TONO[h.color].chipBg} border ${TONO[h.color].border}`} />
             {h.nombre}
           </span>
         ))}
@@ -170,6 +189,13 @@ function DiagramaMilpa() {
 
 /* ── SECCIÓN 1 · Las tres juntas ────────────────────────────────────────── */
 const ICONO_ROL = { soporte: ArrowUp, nitrogeno: Sparkles, cobertura: Leaf };
+/* Cada rol ES una hermana: la tarjeta hereda su color (misma paleta de TONO).
+   Clases literales completas para que el JIT de Tailwind las recoja. */
+const TONO_ROL = {
+  soporte: { barra: 'bg-amber-500/70', chip: 'bg-amber-500/15', icono: 'text-amber-300' },
+  nitrogeno: { barra: 'bg-rose-500/70', chip: 'bg-rose-500/15', icono: 'text-rose-300' },
+  cobertura: { barra: 'bg-orange-500/70', chip: 'bg-orange-500/15', icono: 'text-orange-300' },
+};
 
 function SeccionJuntas() {
   return (
@@ -181,7 +207,7 @@ function SeccionJuntas() {
             <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-amber-200">
               <Handshake size={14} aria-hidden="true" /> Las tres hermanas
             </p>
-            <h3 className="text-xl font-black text-[#ffffff] leading-tight drop-shadow">Tres matas que se cuidan entre ellas</h3>
+            <h3 className="text-xl font-black tracking-tight text-[#ffffff] leading-tight drop-shadow">Tres matas que se cuidan entre ellas</h3>
           </div>
         </FotoMilpa>
       </div>
@@ -199,10 +225,11 @@ function SeccionJuntas() {
           const Icono = ICONO_HERMANA[h.id] || Sprout;
           const t = TONO[h.color];
           return (
-            <div key={h.id} className={`rounded-2xl border ${t.border} bg-slate-900/60 p-2.5 text-center`} data-testid={`hermana-${h.id}`}>
+            <div key={h.id} className={`milpa-card-viva rounded-2xl border ${t.border} bg-slate-900/60 p-2.5 text-center`} data-testid={`hermana-${h.id}`}>
               <span aria-hidden="true" className={`mx-auto mb-1.5 grid h-10 w-10 place-items-center rounded-xl ${t.chipBg}`}>
                 <Icono size={20} className={t.text} />
               </span>
+              <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500 leading-tight">{h.apodo}</p>
               <p className="text-sm font-black text-slate-100 leading-tight">{h.nombre}</p>
               <p className={`text-[10px] font-bold uppercase tracking-wide ${t.text}`}>{h.papel}</p>
               <p className="mt-1 text-[11px] leading-snug text-slate-300">{h.resumen}</p>
@@ -218,11 +245,14 @@ function SeccionJuntas() {
       <div className="space-y-2.5" data-testid="milpa-por-que">
         {POR_QUE_JUNTAS.map((r) => {
           const Icono = ICONO_ROL[r.icono] || Sprout;
+          const tr = TONO_ROL[r.icono] || TONO_ROL.soporte;
           return (
-            <div key={r.id} className="rounded-2xl border border-slate-700/60 bg-slate-900/50 p-3.5" data-testid={`rol-${r.id}`}>
+            <div key={r.id} className="milpa-card-viva relative rounded-2xl border border-slate-700/60 bg-slate-900/50 p-3.5 pl-5" data-testid={`rol-${r.id}`}>
+              {/* barra de acento: el color de la hermana que hace este trabajo */}
+              <span aria-hidden="true" className={`absolute left-0 top-3 bottom-3 w-1 rounded-full ${tr.barra}`} />
               <p className="flex items-start gap-2.5 text-sm font-black text-slate-100 leading-tight">
-                <span aria-hidden="true" className="shrink-0 grid h-8 w-8 place-items-center rounded-lg bg-emerald-500/15">
-                  <Icono size={17} className="text-emerald-300" />
+                <span aria-hidden="true" className={`shrink-0 grid h-8 w-8 place-items-center rounded-lg ${tr.chip}`}>
+                  <Icono size={17} className={tr.icono} />
                 </span>
                 {r.titulo}
               </p>
@@ -257,7 +287,7 @@ function VariedadesGrupo({ crop }) {
       </p>
       <ul className="mt-2.5 space-y-2">
         {g.items.map((v) => (
-          <li key={v.slug} className="rounded-xl border border-slate-700/50 bg-slate-950/40 p-2.5" data-testid={`variedad-${v.slug}`}>
+          <li key={v.slug} className="milpa-card-viva rounded-xl border border-slate-700/50 bg-slate-950/40 p-2.5 hover:border-slate-600" data-testid={`variedad-${v.slug}`}>
             <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
               <span className="text-sm font-bold text-slate-100 leading-tight">{v.nombre}</span>
               <span className="text-[11px] italic text-slate-400">{v.cientifico}</span>
@@ -281,7 +311,7 @@ function SeccionSembrar() {
             <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-emerald-200">
               <Sprout size={14} aria-hidden="true" /> El arreglo
             </p>
-            <h3 className="text-xl font-black text-[#ffffff] leading-tight drop-shadow">Cada hermana entra a su tiempo</h3>
+            <h3 className="text-xl font-black tracking-tight text-[#ffffff] leading-tight drop-shadow">Cada hermana entra a su tiempo</h3>
           </div>
         </FotoMilpa>
       </div>
@@ -307,7 +337,11 @@ function SeccionSembrar() {
           {SIEMBRA_PASOS.map((paso, i) => {
             const Icono = ICONO_PASO[paso.icono] || Sprout;
             return (
-              <li key={paso.id} className="flex gap-3" data-testid={`paso-${paso.id}`}>
+              <li key={paso.id} className="relative flex gap-3" data-testid={`paso-${paso.id}`}>
+                {/* hilo que une los pasos: la siembra es una secuencia real */}
+                {i < SIEMBRA_PASOS.length - 1 && (
+                  <span aria-hidden="true" className="absolute left-3.5 top-8 -bottom-3 w-px bg-emerald-500/25" />
+                )}
                 <span aria-hidden="true" className="shrink-0 w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-black grid place-items-center">
                   {i + 1}
                 </span>
@@ -387,7 +421,7 @@ function GrupoPlagas({ grupo }) {
       </p>
       <div className="mt-2.5 space-y-2.5">
         {grupo.items.map((p) => (
-          <div key={p.id} className="rounded-xl border border-slate-700/50 bg-slate-950/40 p-3" data-testid={`plaga-${p.id}`}>
+          <div key={p.id} className="milpa-card-viva rounded-xl border border-slate-700/50 bg-slate-950/40 p-3 hover:border-slate-600" data-testid={`plaga-${p.id}`}>
             <p className="flex flex-wrap items-baseline gap-x-2">
               <span className="flex items-center gap-1.5 text-sm font-bold text-slate-100 leading-tight">
                 <Bug size={14} aria-hidden="true" className="text-rose-300/80" /> {p.plaga}
@@ -401,7 +435,7 @@ function GrupoPlagas({ grupo }) {
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {p.control.map((c) => (
-                  <span key={c} className="rounded-full border border-emerald-600/40 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-200">
+                  <span key={c} className="rounded-full border border-emerald-600/40 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-200 transition-colors hover:bg-emerald-500/20">
                     {c}
                   </span>
                 ))}
@@ -462,7 +496,7 @@ function SeccionCuidar({ onNavigate }) {
             <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-amber-200">
               <Package size={14} aria-hidden="true" /> La cosecha
             </p>
-            <h3 className="text-xl font-black text-[#ffffff] leading-tight drop-shadow">Cada hermana se recoge a su punto</h3>
+            <h3 className="text-xl font-black tracking-tight text-[#ffffff] leading-tight drop-shadow">Cada hermana se recoge a su punto</h3>
           </div>
         </FotoMilpa>
         <div className="p-4 space-y-2.5">
@@ -498,13 +532,13 @@ function SeccionCuidar({ onNavigate }) {
               {NUTRICION_MILPA.items.map((n) => {
                 const tn = TONO_NUTRI[n.grupo];
                 return (
-                  <tr key={n.crop} className="border-b border-slate-800/60" data-testid={`nutri-${n.crop}`}>
+                  <tr key={n.crop} className="border-b border-slate-800/60 transition-colors hover:bg-slate-800/40" data-testid={`nutri-${n.crop}`}>
                     <td className="py-2 pr-2">
                       <span className="block font-bold text-slate-100 leading-tight">{n.alimento}</span>
                       <span className={`mt-0.5 inline-block rounded-full border px-1.5 py-0.5 text-[9px] font-bold ${tn.chip}`}>{tn.label}</span>
                     </td>
-                    <td className="py-2 px-1.5 text-right font-black text-slate-100 whitespace-nowrap">{n.energia}<span className="text-[10px] font-bold text-slate-400"> kcal</span></td>
-                    <td className="py-2 px-1.5 text-right font-black text-slate-100 whitespace-nowrap">{n.proteina}<span className="text-[10px] font-bold text-slate-400"> g</span></td>
+                    <td className="py-2 px-1.5 text-right font-black tabular-nums text-slate-100 whitespace-nowrap">{n.energia}<span className="text-[10px] font-bold text-slate-400"> kcal</span></td>
+                    <td className="py-2 px-1.5 text-right font-black tabular-nums text-slate-100 whitespace-nowrap">{n.proteina}<span className="text-[10px] font-bold text-slate-400"> g</span></td>
                     <td className="py-2 pl-1.5 text-right whitespace-nowrap">
                       {n.hierro != null && <span className="font-bold text-rose-200">{n.hierro} mg Fe</span>}
                       {n.vitA != null && <span className="font-bold text-sky-200">{n.vitA} ER</span>}
@@ -527,7 +561,7 @@ function SeccionCuidar({ onNavigate }) {
           type="button"
           data-testid="milpa-preguntar-agente"
           onClick={() => onNavigate('agente', { prefilledPrompt: '¿Cómo siembro la milpa (maíz, fríjol y calabaza juntos) en mi finca?' })}
-          className="w-full flex items-center gap-3 rounded-2xl border border-slate-700/60 bg-slate-900/40 p-3.5 text-left active:bg-slate-800/60 transition-colors"
+          className="group w-full flex items-center gap-3 rounded-2xl border border-slate-700/60 bg-slate-900/40 p-3.5 text-left transition-colors hover:border-amber-500/50 hover:bg-slate-800/50 active:bg-slate-800/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
         >
           <span aria-hidden="true" className="shrink-0 w-10 h-10 rounded-xl bg-amber-500/15 grid place-items-center">
             <Wheat size={20} className="text-amber-300" />
@@ -536,7 +570,7 @@ function SeccionCuidar({ onNavigate }) {
             <span className="block text-sm font-bold text-slate-100 leading-tight">¿Su caso es distinto?</span>
             <span className="block text-xs text-slate-400 leading-tight mt-0.5">Cuénteselo al agente: él conoce su clima y su tierra.</span>
           </span>
-          <ChevronRight size={18} className="shrink-0 text-slate-500" aria-hidden="true" />
+          <ChevronRight size={18} className="shrink-0 text-slate-500 transition-transform group-hover:translate-x-0.5 group-hover:text-amber-300" aria-hidden="true" />
         </button>
       )}
     </section>
@@ -552,7 +586,7 @@ function CreditosFotos() {
         type="button"
         onClick={() => setAbierto((v) => !v)}
         aria-expanded={abierto}
-        className="w-full flex items-center gap-2 text-left"
+        className="w-full flex items-center gap-2 text-left rounded-lg transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
       >
         <Camera size={15} className="text-slate-400 shrink-0" aria-hidden="true" />
         <span className="flex-1 text-xs font-bold text-slate-300">Créditos de las fotos (licencia abierta)</span>
@@ -593,7 +627,18 @@ export default function MilpaScreen({ onBack, onNavigate = undefined }) {
               <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-lime-200">
                 <Flame size={13} aria-hidden="true" /> El cultivo de las tres hermanas
               </p>
-              <h2 className="text-2xl font-black text-[#ffffff] leading-tight drop-shadow">Una tierra, tres cosechas que se ayudan</h2>
+              <h2 className="text-2xl font-black tracking-tight text-[#ffffff] leading-tight drop-shadow">Una tierra, tres cosechas que se ayudan</h2>
+              {/* las tres hermanas, presentes desde la portada */}
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {HERMANAS.map((h) => {
+                  const IconoChip = ICONO_HERMANA[h.id] || Sprout;
+                  return (
+                    <span key={h.id} className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold ${TONO[h.color].ring}`}>
+                      <IconoChip size={11} aria-hidden="true" /> {h.nombre}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
           </FotoMilpa>
         </div>
@@ -602,6 +647,7 @@ export default function MilpaScreen({ onBack, onNavigate = undefined }) {
         <div className="grid grid-cols-3 gap-2" role="tablist" aria-label="Secciones de la milpa">
           {SECCIONES_MILPA.map((s) => {
             const activo = seccion === s.id;
+            const IconoTab = ICONO_SECCION[s.id] || Sprout;
             return (
               <button
                 key={s.id}
@@ -610,16 +656,18 @@ export default function MilpaScreen({ onBack, onNavigate = undefined }) {
                 aria-selected={activo}
                 data-testid={`milpa-tab-${s.id}`}
                 onClick={() => setSeccion(s.id)}
-                className={`rounded-xl border px-2 py-2.5 text-center transition-colors min-h-[56px] ${
+                className={`milpa-tab rounded-xl border px-2 py-2.5 text-center min-h-[56px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400 ${
                   activo
                     ? 'milpa-tab-activa border-amber-500/70 bg-amber-500/15 text-amber-200'
-                    : 'border-slate-700 bg-slate-900/50 text-slate-300 active:bg-slate-800/70'
+                    : 'border-slate-700 bg-slate-900/50 text-slate-300 hover:border-slate-500 hover:bg-slate-800/60 active:bg-slate-800/70'
                 }`}
               >
+                <IconoTab size={15} aria-hidden="true" className={`mx-auto mb-1 ${activo ? 'text-amber-300' : 'text-slate-500'}`} />
                 <span className="block text-sm font-black leading-tight">{s.titulo}</span>
                 <span className={`block text-[10px] leading-tight mt-0.5 ${activo ? 'text-amber-300/90' : 'text-slate-500'}`}>
                   {s.descripcion}
                 </span>
+                {activo && <span aria-hidden="true" className="milpa-tab-indicador mx-auto mt-1.5 block h-0.5 w-8 rounded-full bg-amber-400/80" />}
               </button>
             );
           })}
