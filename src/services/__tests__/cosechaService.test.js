@@ -20,6 +20,7 @@ import {
   aggregateByLote,
   yieldPerPlantByCrop,
   temporalTrend,
+  seasonStats,
   harvestSummary,
 } from '../cosechaService';
 
@@ -203,6 +204,61 @@ describe('temporalTrend', () => {
   it('marca estable con un solo mes', () => {
     const norm = normalizeHarvests([harvest({ id: '1', name: 'Cosecha de Fresa', value: 5, unit: 'kg', ts: 1 })]);
     expect(temporalTrend(norm).direction).toBe('estable');
+  });
+});
+
+describe('seasonStats — temporada (año en curso) y comparación de meses', () => {
+  const NOW = new Date('2026-07-07T12:00:00Z');
+  const bucket = (period, totalKg, harvestCount = 1, totalCount = 0) =>
+    ({ period, totalKg, totalCount, harvestCount });
+
+  it('suma solo los meses del año en curso y compara los dos últimos meses con datos', () => {
+    const series = [
+      bucket('2025-11', 20), // año pasado: fuera de la temporada
+      bucket('2026-04', 10),
+      bucket('2026-06', 15), // mayo sin datos: la comparación es abr vs jun, honesta
+    ];
+    const s = seasonStats(series, NOW);
+    expect(s.year).toBe('2026');
+    expect(s.seasonKg).toBe(25); // 10 + 15 (el 2025 no cuenta)
+    expect(s.seasonHarvests).toBe(2);
+    expect(s.monthsWithData).toBe(2);
+    expect(s.lastMonth.period).toBe('2026-06');
+    expect(s.prevMonth.period).toBe('2026-04');
+    expect(s.deltaKg).toBe(5);
+    expect(s.deltaPct).toBe(50);
+    expect(s.usesKg).toBe(true);
+  });
+
+  it('con un solo mes no inventa comparación', () => {
+    const s = seasonStats([bucket('2026-06', 15)], NOW);
+    expect(s.seasonKg).toBe(15);
+    expect(s.prevMonth).toBeNull();
+    expect(s.deltaKg).toBeNull();
+    expect(s.deltaPct).toBeNull();
+  });
+
+  it('serie vacía → temporada en ceros, sin deltas fabricados', () => {
+    const s = seasonStats([], NOW);
+    expect(s).toMatchObject({
+      seasonKg: 0, seasonCount: 0, seasonHarvests: 0, monthsWithData: 0,
+      lastMonth: null, prevMonth: null, deltaKg: null, deltaPct: null,
+    });
+  });
+
+  it('cosechas solo por conteo (sin peso) comparan en unidades', () => {
+    const series = [bucket('2026-05', 0, 1, 10), bucket('2026-06', 0, 1, 30)];
+    const s = seasonStats(series, NOW);
+    expect(s.usesKg).toBe(false);
+    expect(s.deltaKg).toBe(20); // delta en la unidad activa (conteo)
+    expect(s.deltaPct).toBe(200);
+  });
+
+  it('mes anterior en 0 → deltaPct null (no división por cero)', () => {
+    const series = [bucket('2026-05', 0, 1, 0), bucket('2026-06', 8)];
+    const s = seasonStats(series, NOW);
+    expect(s.deltaKg).toBe(8);
+    expect(s.deltaPct).toBeNull();
   });
 });
 

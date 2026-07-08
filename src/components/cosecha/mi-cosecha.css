@@ -1,0 +1,484 @@
+/*
+ * mi-cosecha.css — tablero "Mi cosecha" (producción y rendimiento del piloto).
+ *
+ * Lenguaje visual: cards slate semi-transparentes (dejan ver la foto de fondo
+ * del body a través del scrim de ScreenShell, igual que el resto de la app) +
+ * UN solo tono de dato (esmeralda): las gráficas son de magnitud, no de
+ * identidad, así que el color es secuencial — nada de arcoíris.
+ *
+ * Byte-neutral: CERO imágenes; todo CSS/SVG. Animaciones SOLO transform y
+ * opacity (GPU-friendly), apagadas bajo prefers-reduced-motion.
+ */
+
+.mi-cosecha {
+    /* Tokens locales del tablero (texto ≠ color de dato: el texto usa tinta,
+       la marca lleva el color). */
+    --mc-card: rgba(15, 23, 42, 0.72);
+    --mc-card-solid: #0f1a2e;      /* para el anillo de superficie de los puntos */
+    --mc-border: rgba(51, 65, 85, 0.6);
+    --mc-ink: #f1f5f9;
+    --mc-ink-2: #94a3b8;
+    --mc-ink-3: #64748b;
+    --mc-grid: rgba(148, 163, 184, 0.22);
+    --mc-dato: #10b981;            /* esmeralda: la ÚNICA voz de dato */
+    --mc-dato-claro: #34d399;
+    --mc-sube: #34d399;
+    --mc-baja: #fbbf24;            /* ámbar honesto, no rojo alarmista */
+
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 16px 16px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    color: var(--mc-ink);
+}
+
+/* ── Entrada suave de las secciones (transform+opacity, escalonada) ───────── */
+.mc-card {
+    background: var(--mc-card);
+    border: 1px solid var(--mc-border);
+    border-radius: 16px;
+    padding: 16px;
+    animation: mc-rise 0.45s ease both;
+}
+
+.mc-card:nth-child(2) { animation-delay: 0.06s; }
+.mc-card:nth-child(3) { animation-delay: 0.12s; }
+.mc-card:nth-child(4) { animation-delay: 0.18s; }
+.mc-card:nth-child(5) { animation-delay: 0.24s; }
+.mc-card:nth-child(6) { animation-delay: 0.3s; }
+
+@keyframes mc-rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.mc-section-title {
+    margin: 0 0 4px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--mc-ink);
+}
+
+.mc-section-sub {
+    margin: 0 0 12px;
+    font-size: 0.78rem;
+    color: var(--mc-ink-2);
+}
+
+/* ── Héroe: lo cosechado en la temporada ─────────────────────────────────── */
+.mc-hero-label {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--mc-ink-2);
+}
+
+.mc-hero-value {
+    margin: 2px 0 0;
+    font-size: 3rem;
+    line-height: 1.05;
+    font-weight: 600;
+    color: var(--mc-ink);
+}
+
+.mc-hero-unit {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--mc-ink-2);
+    margin-left: 4px;
+}
+
+.mc-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 10px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    background: rgba(52, 211, 153, 0.12);
+    color: var(--mc-sube);
+}
+
+.mc-delta.is-baja {
+    background: rgba(251, 191, 36, 0.12);
+    color: var(--mc-baja);
+}
+
+.mc-delta.is-estable {
+    background: rgba(148, 163, 184, 0.12);
+    color: var(--mc-ink-2);
+}
+
+/* ── Fila de tiles (KPI) ─────────────────────────────────────────────────── */
+.mc-kpis {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.mc-kpi {
+    background: var(--mc-card);
+    border: 1px solid var(--mc-border);
+    border-radius: 14px;
+    padding: 12px;
+    animation: mc-rise 0.45s ease both;
+    animation-delay: 0.08s;
+    min-width: 0;
+}
+
+.mc-kpi-label {
+    display: block;
+    font-size: 0.68rem;
+    color: var(--mc-ink-2);
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mc-kpi-value {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--mc-ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mc-kpi-value small {
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: var(--mc-ink-2);
+}
+
+/* ── Barras por cultivo (magnitud → un solo tono) ────────────────────────── */
+.mc-bars {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mc-bar-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.mc-bar-name {
+    font-size: 0.85rem;
+    color: var(--mc-ink);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mc-bar-value {
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--mc-ink-2);
+    flex-shrink: 0;
+}
+
+.mc-bar-track {
+    height: 12px;
+    border-radius: 0 4px 4px 0;
+    background: rgba(148, 163, 184, 0.1);
+    overflow: hidden;
+}
+
+/* La barra crece con scaleX desde la base (GPU); el radio va en el track para
+   que el fill no deforme la punta durante la animación. */
+.mc-bar-fill {
+    height: 100%;
+    background: var(--mc-dato);
+    border-radius: 0 4px 4px 0;
+    transform-origin: left center;
+    animation: mc-grow 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: 0.15s;
+}
+
+@keyframes mc-grow {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+}
+
+.mc-bar-fill.is-otros {
+    background: rgba(148, 163, 184, 0.45);
+}
+
+/* Cultivos que se cuentan (no se pesan): lista aparte, sin mezclar escalas. */
+.mc-conteos {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 10px 0 0;
+    border-top: 1px solid var(--mc-border);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.mc-conteos li {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--mc-ink);
+}
+
+.mc-conteos .mc-bar-value { font-variant-numeric: tabular-nums; }
+
+/* ── Gráfica de tendencia (SVG) ──────────────────────────────────────────── */
+.mc-trend-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin-top: 4px;
+}
+
+.mc-trend-line {
+    fill: none;
+    stroke: var(--mc-dato-claro);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.mc-trend-area { fill: var(--mc-dato); opacity: 0.1; }
+.mc-trend-grid { stroke: var(--mc-grid); stroke-width: 1; }
+
+.mc-trend-dot {
+    fill: var(--mc-dato-claro);
+    stroke: var(--mc-card-solid); /* anillo de superficie: legible sobre la línea */
+    stroke-width: 2;
+}
+
+.mc-trend-tick {
+    font-size: 10px;
+    fill: var(--mc-ink-3);
+}
+
+.mc-trend-endlabel {
+    font-size: 11px;
+    font-weight: 600;
+    fill: var(--mc-ink);
+}
+
+/* El trazo y el velo aparecen con opacity (sin animar el path: GPU-friendly). */
+.mc-trend-svg .mc-trend-line,
+.mc-trend-svg .mc-trend-area,
+.mc-trend-svg .mc-trend-dot {
+    animation: mc-fade 0.7s ease both;
+    animation-delay: 0.2s;
+}
+
+/* Con solo `from`, el `to` es la opacidad computada de cada marca (1 para la
+   línea/puntos, 0.1 para el velo del área) — un solo keyframe sirve a todos. */
+@keyframes mc-fade {
+    from { opacity: 0; }
+}
+
+.mc-compara {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: var(--mc-ink-2);
+}
+
+/* ── Rendimiento por lote ────────────────────────────────────────────────── */
+.mc-lotes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mc-lote {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--mc-border);
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.5);
+}
+
+.mc-lote-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--mc-ink);
+}
+
+.mc-lote-datos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    font-size: 0.75rem;
+    color: var(--mc-ink-2);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Tabla alterna (accesibilidad: los números de la gráfica, en texto) ──── */
+.mc-table {
+    margin-top: 12px;
+    font-size: 0.8rem;
+}
+
+.mc-table summary {
+    cursor: pointer;
+    color: var(--mc-ink-2);
+    font-size: 0.78rem;
+    padding: 6px 0;
+    min-height: 32px;
+}
+
+.mc-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 6px;
+}
+
+.mc-table th,
+.mc-table td {
+    text-align: left;
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--mc-border);
+    color: var(--mc-ink);
+}
+
+.mc-table td:last-child,
+.mc-table th:last-child {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.mc-table th {
+    color: var(--mc-ink-2);
+    font-weight: 600;
+    font-size: 0.72rem;
+}
+
+/* ── Estado vacío acogedor ───────────────────────────────────────────────── */
+.mc-vacio {
+    text-align: center;
+    padding: 36px 20px;
+    animation: mc-rise 0.45s ease both;
+}
+
+.mc-vacio-dibujo {
+    width: 150px;
+    height: auto;
+    margin: 0 auto 8px;
+    display: block;
+}
+
+/* La fruta flota suave sobre la canasta (transform puro). */
+.mc-vacio-fruta {
+    animation: mc-flota 3.2s ease-in-out infinite;
+    transform-origin: center;
+}
+
+.mc-vacio-fruta.is-2 { animation-delay: -1.6s; }
+
+@keyframes mc-flota {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.mc-vacio h2 {
+    margin: 8px 0 6px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--mc-ink);
+}
+
+.mc-vacio p {
+    margin: 0 auto 20px;
+    max-width: 320px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--mc-ink-2);
+}
+
+/* ── CTAs (vacío y pie del tablero) ──────────────────────────────────────── */
+.mc-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 12px 22px;
+    border: none;
+    border-radius: 999px;
+    background: var(--mc-dato);
+    color: #052e22;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.mc-cta:hover { opacity: 0.92; }
+.mc-cta:active { transform: scale(0.97); }
+
+.mc-cta.is-secundario {
+    background: transparent;
+    border: 1px solid var(--mc-border);
+    color: var(--mc-ink);
+    font-weight: 600;
+}
+
+.mc-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.mc-nota {
+    font-size: 0.78rem;
+    color: var(--mc-ink-2);
+    margin: 8px 0 0;
+}
+
+.mc-cargando {
+    padding: 32px 16px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--mc-ink-2);
+}
+
+/* ── Reduced motion: el tablero llega quieto, completo y legible ─────────── */
+@media (prefers-reduced-motion: reduce) {
+    .mc-card,
+    .mc-kpi,
+    .mc-vacio,
+    .mc-bar-fill,
+    .mc-vacio-fruta,
+    .mc-trend-svg .mc-trend-line,
+    .mc-trend-svg .mc-trend-area,
+    .mc-trend-svg .mc-trend-dot {
+        animation: none;
+    }
+
+    .mc-cta { transition: none; }
+}

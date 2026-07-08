@@ -4,12 +4,11 @@
  * Es el trigger de HOY (tap). El de MAÑANA es el wake-word "hola Chagra":
  * ambos llaman `activarEscucha()` (escuchaService) — el widget no distingue.
  *
- * Diseño: "LA PRESENCIA" en miniatura — un mini-portal de espacio profundo
- * (mismo lenguaje del overlay): el marco lleva el acento del tema (Chagra),
- * adentro un núcleo de luz suspendido LEVITA con dos motas en órbita, y el
- * micrófono flota sobre la luz. Un pulso de presencia se dilata cada 4s
- * ("aquí se habla" sin fastidiar; apagado con prefers-reduced-motion).
- * Vive ABAJO A LA IZQUIERDA (espejo del AgentFab), 62px tamaño guante.
+ * Diseño: "EL UMBRAL en miniatura" — espejo del AgentFab (colibrí, derecha):
+ * este vive ABAJO A LA IZQUIERDA, 62px (tamaño guante). Un disco de vacío
+ * índigo con un núcleo de luz latiendo detrás del micrófono, un anillo
+ * holográfico girando lentísimo y dos motas en órbita: la presencia dormida,
+ * esperando que le hablen (todo se detiene con prefers-reduced-motion).
  *
  * IMPORTANTE — español colombiano (tú/usted), NUNCA voseo argentino.
  */
@@ -28,27 +27,13 @@ export default function EscuchaFab() {
       title="Manos libres: toque y hable — «lléveme al mercado» o pregunte lo que necesite"
       onClick={() => activarEscucha({ fuente: 'tap' })}
     >
-      <span className="escucha-fab-pulso" aria-hidden="true" />
-      {/* El otro lado en miniatura: espacio + órbita + núcleo suspendido */}
-      <span className="escucha-fab-espacio" aria-hidden="true">
-        <span className="escucha-fab-orbita">
-          <span className="escucha-fab-mota escucha-fab-mota-a" />
-          <span className="escucha-fab-mota escucha-fab-mota-b" />
-        </span>
-        <span className="escucha-fab-nucleo" />
+      <span className="escucha-fab-nucleo" aria-hidden="true" />
+      <span className="escucha-fab-anillo" aria-hidden="true" />
+      <span className="escucha-fab-orbita" aria-hidden="true">
+        <span className="escucha-fab-mota" />
+        <span className="escucha-fab-mota m2" />
       </span>
-      <Mic className="escucha-fab-mic" size={26} strokeWidth={2.4} aria-hidden="true" />
-      {/* La firma: un destello de 4 puntas — la Presencia deja su chispa */}
-      <svg
-        className="escucha-fab-destello"
-        width="14"
-        height="14"
-        viewBox="0 0 14 14"
-        fill="currentColor"
-        aria-hidden="true"
-      >
-        <path d="M7 0.5 L8.3 5.7 L13.5 7 L8.3 8.3 L7 13.5 L5.7 8.3 L0.5 7 L5.7 5.7 Z" />
-      </svg>
+      <Mic size={27} strokeWidth={2.4} aria-hidden="true" />
     </button>
   );
 }

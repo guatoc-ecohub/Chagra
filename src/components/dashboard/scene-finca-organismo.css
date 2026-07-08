@@ -223,6 +223,110 @@
 .fvo-flap { transform-box: fill-box; transform-origin: center; animation: fvo-flap 1.6s ease-in-out infinite; }
 @keyframes fvo-flap { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.55); } }
 
+/* ── SOL Y LUNA según la atmósfera real ────────────────────────────────────
+   FincaVivaHero estampa data-luz (amanecer|dia|atardecer|noche) y data-clima
+   (despejado|nublado|lluvia|niebla) en .fvh (atmosphereService, offline-first
+   por efemérides). La escena ya no es "siempre de noche": de día sale el sol
+   biopunk, al amanecer/atardecer el cielo se enciende cálido y de noche vuelve
+   la luna. Sin data-luz (sin señal) la escena conserva su identidad nocturna. */
+.fvo-cielo-dia,
+.fvo-cielo-crep { opacity: 0; transition: opacity 1.2s ease; }
+.fvo-sol-g { display: none; }
+
+.fvh[data-luz='dia'] .fvo-sol-g,
+.fvh[data-luz='amanecer'] .fvo-sol-g,
+.fvh[data-luz='atardecer'] .fvo-sol-g { display: inline; }
+
+.fvh[data-luz='dia'] .fvo-luna-g,
+.fvh[data-luz='amanecer'] .fvo-luna-g,
+.fvh[data-luz='atardecer'] .fvo-luna-g { display: none; }
+
+.fvh[data-luz='dia'] .fvo-cielo-dia { opacity: 0.68; }
+
+.fvh[data-luz='amanecer'] .fvo-cielo-crep,
+.fvh[data-luz='atardecer'] .fvo-cielo-crep { opacity: 0.5; }
+
+/* al amanecer/atardecer el sol anda BAJO, cerca del filo de la montaña */
+.fvh[data-luz='amanecer'] .fvo-sol-g,
+.fvh[data-luz='atardecer'] .fvo-sol-g { transform: translateY(26px); }
+
+/* de día las estrellas descansan; en el crepúsculo apenas se insinúan */
+.fvh[data-luz='dia'] .fvo-tw,
+.fvh[data-luz='dia'] .fvo-shoot { display: none; }
+
+.fvh[data-luz='amanecer'] .fvo-tw,
+.fvh[data-luz='atardecer'] .fvo-tw { animation: none; opacity: 0.3; }
+
+/* clima: nublado/lluvia/niebla traen nubes y velan el astro (honesto: el
+   cielo de la escena cuenta el clima que el piloto ve por la ventana) */
+.fvo-nubes { display: none; }
+
+.fvh[data-clima='nublado'] .fvo-nubes,
+.fvh[data-clima='lluvia'] .fvo-nubes,
+.fvh[data-clima='niebla'] .fvo-nubes { display: inline; }
+
+.fvh[data-clima='nublado'] .fvo-astro { opacity: 0.45; }
+.fvh[data-clima='lluvia'] .fvo-astro { opacity: 0.3; }
+.fvh[data-clima='niebla'] .fvo-astro { opacity: 0.55; }
+
+/* corona del sol: respira (transform+opacity, GPU) */
+.fvo-corona {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fvo-corona 5s ease-in-out infinite;
+}
+
+@keyframes fvo-corona {
+  0%, 100% { transform: scale(1); opacity: 0.55; }
+  50% { transform: scale(1.06); opacity: 0.9; }
+}
+
+/* ── LA VIDA DEL SUELO: micelio fino, nodos, lombrices y bichitos ──────────
+   El micelio fino respira con el mismo latido de la red; los nodos
+   micorrízicos titilan (intercambio azúcar↔nutrientes); las lombrices se
+   estiran y encogen al avanzar; el colémbolo pega brinquitos. Todo
+   transform/opacity — cero blur/filtro animado. */
+.fvo-micelio {
+  animation: fvo-netglow var(--fvo-beat) ease-in-out infinite;
+  animation-delay: -0.4s;
+}
+
+.fvo-nodo { animation: fvo-tw 3.8s ease-in-out infinite; }
+.fvo-nodo.fvo-n2 { animation-delay: -1.3s; }
+.fvo-nodo.fvo-n3 { animation-delay: -2.4s; }
+
+.fvo-lombriz {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fvo-lombriz 7s ease-in-out infinite;
+}
+
+.fvo-lombriz.fvo-l2 { animation-delay: -3.2s; animation-duration: 8.5s; }
+
+@keyframes fvo-lombriz {
+  0%, 100% { transform: translateX(0) scaleX(1); }
+  50% { transform: translateX(3px) scaleX(0.94); }
+}
+
+.fvo-bicho {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fvo-bicho 9s ease-in-out infinite;
+}
+
+@keyframes fvo-bicho {
+  0%, 100% { transform: translateX(0); }
+  45%, 55% { transform: translateX(-6px); }
+}
+
+.fvo-bicho.fvo-bi2 { animation: fvo-brinco 4.6s ease-in-out infinite; }
+
+@keyframes fvo-brinco {
+  0%, 86%, 100% { transform: translate(0, 0); }
+  90% { transform: translate(-3px, -6px); }
+  94% { transform: translate(-5px, 0); }
+}
+
 /* ── reduced motion: estado estático DIGNO (como el mockup) ────────────────
    El apagado global de animaciones ya lo hace finca-viva-hero.css
    (`.fvh * { animation: none !important }`); aquí se compone la foto fija:
@@ -241,4 +345,7 @@
   .fvo-panel { opacity: 0.7; }
   .fvo-lamplight { opacity: 0.3; }
   .fvo-lantpool { opacity: 0.5; }
+  /* la vida del suelo queda quieta pero visible (foto fija digna) */
+  .fvo-micelio { opacity: 0.38; }
+  .fvo-nodo { opacity: 0.85; }
 }

@@ -15,22 +15,18 @@
  * reusa exactamente ese trigger sin tocar este archivo.
  *
  * MANOS LIBRES DE VERDAD: detección de silencio — cuando ya habló y calla
- * ~1.8s, la escucha se cierra sola (el sello de luz que se cierra alrededor
- * del portal es ese conteo, feedback honesto). "Listo" y "Cancelar" quedan
- * como respaldo táctil tamaño guante.
+ * ~1.8s, la escucha se cierra sola (el arco que se cierra alrededor del iris
+ * es ese conteo, feedback honesto). "Listo" y "Cancelar" quedan como respaldo
+ * táctil tamaño guante.
  *
- * Visual: "LA PRESENCIA" — un portal circular a otra dimensión. El marco es
- * de Chagra (acento del tema); adentro hay espacio profundo, un núcleo de luz
- * suspendido (un OJO de energía con la mano de Chagra en la pupila), geometría
- * sagrada que respira, y un campo de partículas que vive en CAOS y se ORDENA
- * en anillos cuando usted habla: el parámetro de orden es el RMS REAL del
- * micrófono (audioLevel/amplitudeHistory del recorder — nada de animación
- * fingida). El espectro radial se espeja izquierda/derecha: la voz dibuja un
- * mandala de luz, no ruido.
+ * Visual: "EL UMBRAL" — una presencia de luz se asoma a escuchar: un campo
+ * de motas que se ORDENA con el RMS REAL del micrófono, un aro-oscilo que
+ * dibuja la historia de amplitud real y un núcleo suspendido con la mano de
+ * Chagra como holograma (nada de animación fingida — el dato manda).
  *
  * IMPORTANTE — español colombiano (tú/usted), NUNCA voseo argentino.
  */
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { X, Mic, Keyboard, CornerUpRight, AlertTriangle } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { transcribe, queueForRetry } from '../../services/voiceService';
@@ -60,223 +56,217 @@ const navegar = (view, initialData = null) => {
   window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view, initialData } }));
 };
 
-/* ============================================================================
- * LA PRESENCIA — geometría del portal (módulo: se calcula UNA vez).
+/* ========================== EL UMBRAL (visual) =============================
+ * Presencia etérea: un umbral de energía se abre cuando Chagra escucha.
+ * TODO el movimiento significativo es DATO REAL del micrófono:
+ *   - las motas de luz viven en caos calmo y se ORDENAN en anillos con la
+ *     voz (RMS suavizado): hablar = ordenar el campo,
+ *   - el aro-oscilo dibuja la historia de amplitud (la voz, visible),
+ *   - el sello de silencio es el conteo real que cierra la escucha.
+ * GPU-friendly: transform/opacity + atributos SVG. Sin blur animado.
  * ========================================================================== */
-const VB = 260;   // lado del viewBox cuadrado
-const CTR = 130;  // centro
-const NUM_RAYOS = 44;      // espectro radial (espejado → mandala)
-const NUM_PARTICULAS = 36; // campo caos→orden
 
-/** Pseudo-azar determinista (sin Math.random: capturas y tests reproducibles). */
+const VB = 260;       // lado del viewBox del portal
+const CV = VB / 2;    // centro
+const N_MOTAS = 56;   // motas de luz del campo
+const N_OSC = 72;     // puntos del aro-oscilo
+
+/* PRNG determinista: mismas motas en cada montaje (nada de Math.random). */
 const azar = (i, sal) => {
-  const s = Math.sin(i * 127.1 + sal * 311.7) * 43758.5453;
-  return s - Math.floor(s);
+  const x = Math.sin(i * 127.1 + sal * 311.7) * 43758.5453;
+  return x - Math.floor(x);
 };
 
-/**
- * Campo de partículas: cada una tiene una posición CAÓTICA (reposo, deriva) y
- * una posición ORDENADA (anillos concéntricos). El RMS real interpola entre
- * ambas: hablar = el caos se ordena. Esa es la firma del diseño.
- */
-const PARTICULAS = Array.from({ length: NUM_PARTICULAS }, (_, i) => {
-  const aCaos = azar(i, 1) * Math.PI * 2;
-  const rCaos = 40 + azar(i, 2) * 66;
+/* Campo precomputado UNA vez: cada mota tiene una posición de CAOS (deriva
+ * calma, distribución de ángulo áureo) y una de ORDEN (tres anillos
+ * concéntricos). La voz interpola entre las dos. */
+const MOTAS = Array.from({ length: N_MOTAS }, (_, i) => {
   const anillo = i % 3;
-  const porAnillo = NUM_PARTICULAS / 3;
-  const aOrden = (Math.floor(i / 3) / porAnillo) * Math.PI * 2 + anillo * (Math.PI / porAnillo);
-  const rOrden = 66 + anillo * 12;
+  const porAnillo = Math.ceil(N_MOTAS / 3);
   return {
-    cx: CTR + Math.cos(aCaos) * rCaos,
-    cy: CTR + Math.sin(aCaos) * rCaos,
-    ox: CTR + Math.cos(aOrden) * rOrden,
-    oy: CTR + Math.sin(aOrden) * rOrden,
-    r: 1.1 + azar(i, 3) * 1.5,
-    tono: i % 3, // 0 blanco lunar, 1 cian, 2 violeta
+    caosAng: i * 2.399963 + azar(i, 1) * 0.9,
+    caosR: 54 + azar(i, 2) * 58,
+    ordenAng: (Math.floor(i / 3) / porAnillo) * Math.PI * 2 + anillo * 0.35,
+    ordenR: [70, 86, 102][anillo],
+    tam: 1 + azar(i, 3) * 1.6,
+    base: 0.2 + azar(i, 4) * 0.3,
   };
 });
 
-/** Estrellas fijas del espacio profundo (fondo del portal). */
-const ESTRELLAS = Array.from({ length: 18 }, (_, i) => {
-  const a = azar(i, 5) * Math.PI * 2;
-  const r = 20 + azar(i, 6) * 86;
-  return {
-    x: +(CTR + Math.cos(a) * r).toFixed(1),
-    y: +(CTR + Math.sin(a) * r).toFixed(1),
-    rad: +(0.5 + azar(i, 7) * 0.9).toFixed(2),
-    o: +(0.15 + azar(i, 8) * 0.5).toFixed(2),
-    titila: i % 5 === 0,
-  };
-});
+/* Diferencia angular por el camino corto (la mota no da la vuelta larga). */
+const deltaAng = (a, b) => {
+  let d = (b - a) % (Math.PI * 2);
+  if (d > Math.PI) d -= Math.PI * 2;
+  if (d < -Math.PI) d += Math.PI * 2;
+  return d;
+};
 
-const poligono = (lados, radio, rot = 0) =>
-  Array.from({ length: lados }, (_, i) => {
-    const a = (i / lados) * Math.PI * 2 + rot;
-    return `${(CTR + Math.cos(a) * radio).toFixed(1)},${(CTR + Math.sin(a) * radio).toFixed(1)}`;
+/* Polígono regular inscrito en r, como string de puntos SVG. */
+const poligono = (lados, r, giro = 0) =>
+  Array.from({ length: lados }, (_, k) => {
+    const a = (k / lados) * Math.PI * 2 + giro;
+    return `${(CV + Math.cos(a) * r).toFixed(1)},${(CV + Math.sin(a) * r).toFixed(1)}`;
   }).join(' ');
 
-/* Geometría SAGRADA (no HUD): un hexagrama — dos triángulos entrelazados —
- * más un anillo de nodos (semilla-de-vida) y un aro limpio. La compuerta de
- * la Presencia respira y contra-rota; los nodos son la retícula del portal. */
-const GEO_TRI_A = poligono(3, 94, -Math.PI / 2);
-const GEO_TRI_B = poligono(3, 94, Math.PI / 2);
-const NODOS = Array.from({ length: 12 }, (_, i) => {
-  const a = (i / 12) * Math.PI * 2 - Math.PI / 2;
-  return { x: +(CTR + Math.cos(a) * 96).toFixed(1), y: +(CTR + Math.sin(a) * 96).toFixed(1) };
+const HEXAGONO = poligono(6, 118, -Math.PI / 2);
+const TRIANGULO_A = poligono(3, 118, -Math.PI / 2);
+const TRIANGULO_B = poligono(3, 118, Math.PI / 2);
+
+/* Ticks del astrolabio: 12 marcas fijas cada 30°. */
+const TICKS = Array.from({ length: 12 }, (_, k) => {
+  const a = (k / 12) * Math.PI * 2;
+  const r1 = 108;
+  const r2 = k % 3 === 0 ? 116 : 112;
+  return {
+    x1: CV + Math.cos(a) * r1, y1: CV + Math.sin(a) * r1,
+    x2: CV + Math.cos(a) * r2, y2: CV + Math.sin(a) * r2,
+  };
 });
 
+/* Aro-oscilo: path cerrado cuyo radio module la historia REAL de amplitud. */
+function pathOscilo(historia) {
+  const m = historia.slice(-N_OSC);
+  const falta = N_OSC - m.length;
+  let d = '';
+  for (let k = 0; k < N_OSC; k++) {
+    const v = k < falta ? 0 : (m[k - falta] || 0);
+    const a = (k / N_OSC) * Math.PI * 2 - Math.PI / 2;
+    const r = 50 + v * 26;
+    const x = (CV + Math.cos(a) * r).toFixed(1);
+    const y = (CV + Math.sin(a) * r).toFixed(1);
+    d += (k === 0 ? 'M' : 'L') + x + ' ' + y;
+  }
+  return d + 'Z';
+}
+
 /**
- * El portal de la Presencia: espacio profundo + geometría sagrada + campo de
- * partículas caos→orden + espectro-mandala + núcleo de luz (ojo de energía)
- * con la mano de Chagra en la pupila. TODO el movimiento reactivo es dato real
- * (RMS/amplitud del micrófono); el resto es respiración ambiental CSS.
+ * El Umbral: astrolabio holográfico + campo de motas (orden = RMS real) +
+ * aro-oscilo (historia real) + núcleo suspendido con la mano de Chagra como
+ * holograma + sello de silencio (conteo real). El estado de fase colorea y
+ * anima por CSS (data-fase en el overlay); aquí solo se pintan los DATOS.
  */
-function PortalPresencia({ nivel, historia, fase, cierre }) {
+function PortalUmbral({ nivel, historia, fase, cierre }) {
   const oyendo = fase === FASE_OYENDO;
 
-  // Movimiento reducido → composición estática y legible: campo ordenado,
-  // espectro en patrón fijo, sin deriva. El sello de cierre (informativo) queda.
-  const reducida = useMemo(
-    () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches,
-    [],
-  );
+  // Orden del campo: 0 = caos calmo, 1 = anillos perfectos. Un loop rAF lo
+  // suaviza leyendo el último RMS/fase desde refs (actualizadas en un efecto,
+  // nunca en render). Suavizado asimétrico: sube rápido con la voz, cae lento
+  // (la presencia "retiene" un instante lo que oyó). setState va DENTRO del
+  // rAF (diferido), no síncrono en el efecto.
+  const nivelRef = useRef(0);
+  const faseRef = useRef(fase);
+  useEffect(() => { nivelRef.current = nivel; faseRef.current = fase; }, [nivel, fase]);
 
-  // Orden del campo (0 = caos, 1 = anillos): promedio corto del RMS real —
-  // sube rápido al hablar, cae suave al callar. Pensando/rumbo = orden pleno
-  // (la energía "procesa" ya recompuesta).
-  let orden;
-  if (reducida || fase === FASE_PENSANDO || fase === FASE_RUMBO) {
-    orden = 1;
-  } else if (!oyendo) {
-    orden = 0.1;
-  } else {
-    const cola = historia.slice(-9);
-    const prom = cola.length ? cola.reduce((s, v) => s + v, 0) / cola.length : 0;
-    orden = Math.max(0.08, Math.min(1, prom * 2.6 + nivel * 0.5));
-  }
+  const [orden, setOrden] = useState(0);
+  useEffect(() => {
+    let raf = 0;
+    const tick = () => {
+      setOrden((prev) => {
+        const f = faseRef.current;
+        if (f === FASE_PENSANDO || f === FASE_RUMBO) return prev + (1 - prev) * 0.12;
+        if (f !== FASE_OYENDO) return prev * 0.85;
+        const objetivo = Math.min(1, nivelRef.current * 2.8);
+        return prev + (objetivo - prev) * (objetivo > prev ? 0.3 : 0.05);
+      });
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  const t = orden;
 
-  // Espectro radial ESPEJADO (mandala): las muestras reales de amplitud se
-  // reflejan izquierda/derecha — la voz dibuja simetría, no ruido.
-  const mitad = NUM_RAYOS / 2;
-  const muestras = historia.slice(-mitad);
-  const rayos = [];
-  for (let i = 0; i < NUM_RAYOS; i++) {
-    const j = i < mitad ? i : NUM_RAYOS - 1 - i;
-    const m = oyendo && !reducida ? (muestras[j] ?? 0) : 0;
-    const ang = (i / NUM_RAYOS) * Math.PI * 2 - Math.PI / 2;
-    const r0 = 60;
-    const largo = reducida && oyendo ? 10 + (j % 4) * 4 : (oyendo ? 5 + m * 40 : 3);
-    const x1 = CTR + Math.cos(ang) * r0;
-    const y1 = CTR + Math.sin(ang) * r0;
-    const x2 = CTR + Math.cos(ang) * (r0 + largo);
-    const y2 = CTR + Math.sin(ang) * (r0 + largo);
-    const tono = i % 3;
-    rayos.push(
-      <line
-        key={`g${i}`}
-        className={`escucha-rayo-glow escucha-tono-${tono}`}
-        x1={x1} y1={y1} x2={x2} y2={y2}
-        strokeWidth={6}
-        opacity={0.1 + m * 0.4}
-      />,
-      <line
-        key={`r${i}`}
-        className={`escucha-rayo escucha-tono-${tono}`}
-        x1={x1} y1={y1} x2={x2} y2={y2}
-        strokeWidth={i % 4 === 0 ? 2.2 : 1.3}
-        opacity={0.42 + m * 0.58}
-      />,
+  const motas = MOTAS.map((m, i) => {
+    const ang = m.caosAng + deltaAng(m.caosAng, m.ordenAng) * t;
+    const r = m.caosR + (m.ordenR - m.caosR) * t;
+    return (
+      <circle
+        key={i}
+        className="portal-mota"
+        cx={(CV + Math.cos(ang) * r).toFixed(1)}
+        cy={(CV + Math.sin(ang) * r).toFixed(1)}
+        r={m.tam}
+        opacity={Math.min(1, m.base + t * 0.6)}
+      />
     );
-  }
+  });
 
-  // Sello de silencio: el aro de luz que se cierra alrededor del portal
-  // (conteo honesto de "ya lo oí, cierro si se queda callado").
-  const rSello = 108;
+  // Sello de silencio: r=122; se dibuja con el conteo real de cierre.
+  const rSello = 122;
   const circSello = 2 * Math.PI * rSello;
-  const escala = 1 + (oyendo ? nivel * 0.35 : 0);
+  const dOscilo = oyendo ? pathOscilo(historia) : '';
+
+  // Luz volumétrica: respira con la voz; cada fase tiene su intensidad.
+  const rayosOpacidad = oyendo ? 0.3 + t * 0.55
+    : fase === FASE_PENSANDO ? 0.55
+      : fase === FASE_RUMBO ? 0.85 : 0.12;
 
   return (
     <div className="escucha-portal" aria-hidden="true">
-      {/* La ventana al otro lado: espacio profundo con estrellas fijas */}
-      <div className="escucha-espacio">
-        <svg viewBox={`0 0 ${VB} ${VB}`}>
-          {ESTRELLAS.map((e, i) => (
-            <circle
-              key={i}
-              className={e.titila ? 'escucha-estrella escucha-estrella-titila' : 'escucha-estrella'}
-              cx={e.x} cy={e.y} r={e.rad} opacity={e.o}
-            />
+      <div className="portal-rayos" style={{ opacity: rayosOpacidad }} />
+      <div className="portal-glow" />
+      <svg viewBox={`0 0 ${VB} ${VB}`}>
+        {/* Astrolabio holográfico: geometría que gira lentísimo en calma y
+            se recompone contra-rotando cuando la presencia piensa. */}
+        <g className="portal-geo portal-geo-a">
+          <circle cx={CV} cy={CV} r={112} fill="none" strokeDasharray="1 7" />
+          <polygon points={HEXAGONO} fill="none" />
+        </g>
+        <g className="portal-geo portal-geo-b">
+          <circle cx={CV} cy={CV} r={104} fill="none" strokeDasharray="26 12" />
+          <polygon points={TRIANGULO_A} fill="none" />
+          <polygon points={TRIANGULO_B} fill="none" />
+        </g>
+        <g className="portal-ticks">
+          {TICKS.map((tk, k) => (
+            <line key={k} x1={tk.x1} y1={tk.y1} x2={tk.x2} y2={tk.y2} />
           ))}
-        </svg>
-      </div>
+        </g>
 
-      {/* Compuerta de geometría SAGRADA: hexagrama (dos triángulos entrelazados)
-          con dispersión cromática + anillo de nodos semilla-de-vida contra-
-          rotando. Pensando acelera ambos: la energía procesa. */}
-      <svg className="escucha-geo escucha-geo-a" viewBox={`0 0 ${VB} ${VB}`}>
-        <polygon points={GEO_TRI_A} className="escucha-geo-fantasma-a" transform={`rotate(2 ${CTR} ${CTR})`} />
-        <polygon points={GEO_TRI_B} className="escucha-geo-fantasma-b" transform={`rotate(-2 ${CTR} ${CTR})`} />
-        <polygon points={GEO_TRI_A} className="escucha-geo-linea" />
-        <polygon points={GEO_TRI_B} className="escucha-geo-linea" />
-      </svg>
-      <svg className="escucha-geo escucha-geo-b" viewBox={`0 0 ${VB} ${VB}`}>
-        <circle cx={CTR} cy={CTR} r="96" className="escucha-geo-aro" />
-        {NODOS.map((n, i) => (
-          <circle key={i} cx={n.x} cy={n.y} r={i % 3 === 0 ? 2.4 : 1.5} className="escucha-geo-nodo" />
-        ))}
-      </svg>
+        {/* El campo: caos calmo → anillos concéntricos, con la voz real. */}
+        <g className="portal-motas">{motas}</g>
 
-      {/* Campo de partículas: caos ⇄ orden con el RMS real (deriva lenta CSS) */}
-      <svg className="escucha-campo" viewBox={`0 0 ${VB} ${VB}`}>
-        {PARTICULAS.map((p, i) => (
-          <circle
-            key={i}
-            className={`escucha-particula escucha-tono-${p.tono}`}
-            cx={p.cx + (p.ox - p.cx) * orden}
-            cy={p.cy + (p.oy - p.cy) * orden}
-            r={p.r}
-            opacity={0.25 + orden * 0.55}
-          />
-        ))}
-      </svg>
+        {/* La voz visible: aro-oscilo con la historia real + eco espectral. */}
+        {oyendo && (
+          <>
+            <path className="portal-oscilo-eco" d={dOscilo} />
+            <path className="portal-oscilo" d={dOscilo} />
+          </>
+        )}
 
-      {/* Espectro-mandala + sello de silencio (capa que NO rota) */}
-      <svg className="escucha-mandala" viewBox={`0 0 ${VB} ${VB}`}>
-        {rayos}
+        {/* Pensando: anillo de proceso orbitando el núcleo. */}
+        {fase === FASE_PENSANDO && (
+          <circle className="portal-proceso" cx={CV} cy={CV} r={58} fill="none" strokeDasharray="36 328" />
+        )}
+
+        {/* Sello de silencio: el umbral se va cerrando con el conteo real. */}
         {oyendo && cierre > 0 && (
           <>
             <circle
-              className="escucha-sello-glow"
-              cx={CTR} cy={CTR} r={rSello}
+              className="portal-sello-halo"
+              cx={CV} cy={CV} r={rSello}
               fill="none"
-              strokeWidth="7"
-              strokeLinecap="round"
               strokeDasharray={circSello}
               strokeDashoffset={circSello * (1 - cierre)}
-              transform={`rotate(-90 ${CTR} ${CTR})`}
+              transform={`rotate(-90 ${CV} ${CV})`}
             />
             <circle
-              className="escucha-sello"
-              cx={CTR} cy={CTR} r={rSello}
+              className="portal-sello"
+              cx={CV} cy={CV} r={rSello}
               fill="none"
-              strokeWidth="2.5"
               strokeLinecap="round"
               strokeDasharray={circSello}
               strokeDashoffset={circSello * (1 - cierre)}
-              transform={`rotate(-90 ${CTR} ${CTR})`}
+              transform={`rotate(-90 ${CV} ${CV})`}
             />
           </>
         )}
       </svg>
 
-      {/* El núcleo: un OJO de energía. Halo volumétrico + iris de luz con su
-          anillo de apertura + la mano de Chagra en la pupila — alguien está
-          ahí, mirando. Escala = RMS real. */}
-      <div className="escucha-nucleo" style={{ transform: `scale(${escala.toFixed(3)})` }}>
-        <span className="escucha-nucleo-halo" />
-        <span className="escucha-nucleo-luz" />
-        <span className="escucha-nucleo-apertura" />
-        <ManoChagraGlyph size={46} className="escucha-nucleo-mano" />
+      {/* Núcleo de energía suspendido: se hincha con la voz real; adentro
+          flota la firma de Chagra como holograma. */}
+      <div className="portal-nucleo" style={{ transform: `scale(${(1 + t * 0.14).toFixed(3)})` }}>
+        <span className="portal-corazon" />
+        <ManoChagraGlyph size={40} className="portal-glifo" />
       </div>
     </div>
   );
@@ -419,7 +409,7 @@ export default function EscuchaOverlay() {
   // audioLevel: si dependiera, el re-render de cada frame lo recrearía antes
   // de cumplirse los 120ms y el conteo de silencio jamás dispararía. Si ya
   // habló y lleva SILENCIO_MS callado, cerramos solos; el progreso alimenta
-  // el sello de cierre del portal.
+  // el arco de cierre del iris.
   useEffect(() => {
     if (fase !== FASE_OYENDO) return undefined;
     const timer = setInterval(() => {
@@ -474,7 +464,7 @@ export default function EscuchaOverlay() {
           {fuente === 'wakeword' ? 'Escuché «hola Chagra»' : 'Escucha manos libres'}
         </div>
 
-        <PortalPresencia nivel={audioLevel} historia={amplitudeHistory} fase={fase} cierre={cierre} />
+        <PortalUmbral nivel={audioLevel} historia={amplitudeHistory} fase={fase} cierre={cierre} />
 
         <h2 className="escucha-titulo" data-testid="escucha-estado" aria-live="polite">
           {fase === FASE_ERROR && <AlertTriangle size={22} style={{ display: 'inline', verticalAlign: '-3px', marginRight: 6 }} />}

@@ -171,6 +171,11 @@ const SemillaScreen = lazy(() => import('./components/semilla/SemillaScreen'));
 // secado de grano a humedad segura) y transformar el excedente con su punto
 // crítico de inocuidad. Cifras grounded al DR nacional/internacional.
 const PoscosechaScreen = lazy(() => import('./components/PoscosechaScreen'));
+// Tablero "Mi cosecha": producción y rendimiento del piloto con SU dato propio
+// (por cultivo, mes a mes y por lote), agregado por cosechaService sobre los
+// log--harvest que HarvestLog ya registra (offline-first). Solo VISTA: el
+// registro sigue viviendo en 'cosechar'.
+const MiCosechaScreen = lazy(() => import('./components/cosecha/MiCosechaScreen'));
 // Módulo "Almacenamiento y Conservación de Alimentos" (mundo Mercado y despensa):
 // EXTIENDE/absorbe la poscosecha, enfocado en guardar a mediano/largo plazo. 4
 // pilares — almacenar (troja/silo hermético + calculadora de pérdida evitada y
@@ -519,6 +524,8 @@ const HASH_VIEW_ROUTES = {
   sanidad: 'sanidad_sintoma',
   'sanidad-sintoma': 'sanidad_sintoma',
   cosechar: 'cosechar',
+  'mi-cosecha': 'mi_cosecha',
+  micosecha: 'mi_cosecha',
 };
 
 // Vistas que cuentan como "módulo" para telemetría de piloto.
@@ -527,7 +534,7 @@ const MODULE_VIEWS = new Set([
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol', 'compost',
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'animales_conejos', 'animales_caprinos', 'estiercol',
-  'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
+  'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'mi_cosecha', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'aromaticas', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'frutales', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
@@ -1237,6 +1244,20 @@ export default function App() {
         return (
           <ErrorBoundary>
             <HarvestLog onBack={() => navigate('dashboard')} onSave={showToast} />
+          </ErrorBoundary>
+        );
+      case 'mi_cosecha':
+        // Tablero de producción/rendimiento (ver lazy import arriba). Entra
+        // desde el mundo Cultivos y semillas (junto a 'cosechar').
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mi cosecha">
+              <MiCosechaScreen
+                onBack={() => navigate('dashboard')}
+                onHome={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'insumos':
