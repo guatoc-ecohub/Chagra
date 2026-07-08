@@ -27,10 +27,7 @@
 import { join, dirname } from 'node:path';
 import { mkdirSync, appendFileSync, existsSync } from 'node:fs';
 import { execSync } from 'node:child_process';
-import {
-  judgeContaminationBatch,
-  makeContaminationJudgeCall,
-} from './bench-scorer.mjs';
+import { spawnClaudeCode } from './bench-scorer.mjs';
 import { buildEnrichedSystemPrompt } from './bench-sidecar.mjs';
 
 // ── helpers compartidos ───────────────────────────────────────────────────────
@@ -210,33 +207,145 @@ async function runConversacion(ctx) {
   return { status, valor: `${turnOk}/${conversation.length} respuestas`, detalle: `Conversación compleja sobre ${topic.id} (${turnOk}/${conversation.length} turnos con respuesta).`, data: { topic: topic.id } };
 }
 
-/** B0g — grounding: juez claude-code -p (contaminación/alucinación). Llena ctx.verdicts. */
+/**
+ * gatherGraphEvidence — junta EVIDENCIA GROUNDED del grafo/catálogo para el tema
+ * (hechos canónicos + entidades resueltas + facts de tools del sidecar). Esta
+ * evidencia es la que usa el juez para escribir la `respuesta_corregida` sin
+ * inventar. Todo degrada graceful (si una tool cae, se omite).
+ */
+async function gatherGraphEvidence(ctx) {
+  const { base, sidecarToken, topic, responses = [] } = ctx;
+  const parts = [];
+  parts.push(`HECHOS CANÓNICOS DEL TEMA: ${topic.problema} = ${topic.tipo}; agente causal = ${topic.patogeno}; cultivo hospedante = ${topic.cultivo} (${topic.cientifico}); piso térmico típico = ${topic.piso}; fuente autoritativa = ${topic.fuente}.`);
+
+  const resolved = [...new Set(responses.flatMap((r) => r.entities_grounded || []))].slice(0, 25);
+  if (resolved.length) parts.push(`ENTIDADES RESUELTAS EN EL GRAFO (canónicas): ${resolved.join(' · ')}`);
+
+  // Facts de tools del sidecar (grafo AGE) — best-effort, se recorta cada payload.
+  const probes = [
+    ['get_species', { id_or_name: topic.cientifico }],
+    ['get_pest_controllers', { id_or_name: topic.patogeno }],
+    ['get_biopreparados', { id_or_name: topic.patogeno }],
+  ];
+  for (const [name, args] of probes) {
+    try {
+      const r = await callTool(base, sidecarToken, name, args, 20000);
+      if (r.ok && r.json && JSON.stringify(r.json) !== '{}' && r.json.available !== false && !r.json.error) {
+        parts.push(`GRAFO ${name}: ${clip(JSON.stringify(r.json), 700)}`);
+      }
+    } catch (_) { /* omitir */ }
+  }
+  return parts.join('\n');
+}
+
+/** buildCorrectionBatchPrompt — prompt del juez que evalúa Y CORRIGE (grounded). */
+export function buildCorrectionBatchPrompt(items, evidence) {
+  const itemsText = items.map((it, i) => [
+    `### ITEM ${i + 1} — id: "${it.id}"`,
+    `TIPO DE PREGUNTA: ${it.probeType}`,
+    `PREGUNTA DEL USUARIO: ${it.query}`,
+    `RESPUESTA DE GRANITE (a evaluar): ${it.response}`,
+    it.entidades ? `ENTIDADES QUE RESOLVIÓ ESTE TURNO: ${it.entidades}` : '',
+  ].filter(Boolean).join('\n')).join('\n\n');
+
+  return [
+    'Eres un AUDITOR EXPERTO en agroecología colombiana y, a la vez, un MAESTRO que',
+    'corrige. Para CADA item: (1) evalúa si la respuesta de granite está contaminada',
+    '(mezcla info de otra plaga/enfermedad, miscategoriza plaga↔enfermedad, confunde',
+    'la especie, recomienda plantas/insumos de otro piso térmico, o inventa',
+    'fuentes/instituciones/familias); y (2) ESCRIBE la respuesta CORRECTA y grounded.',
+    '',
+    'REGLA DE ORO PARA LA CORRECCIÓN: básate ESTRICTAMENTE en la EVIDENCIA DEL GRAFO/',
+    'CATÁLOGO de abajo + conocimiento agronómico establecido para Colombia. NO inventes',
+    'entidades, familias, dosis peligrosas ni fuentes. Si la EVIDENCIA NO ALCANZA para',
+    'responder con seguridad, pon "is_gap": true y deja `respuesta_corregida` con lo',
+    'que sí se pueda afirmar (o vacío) — ese gap alimenta la cola de enriquecimiento.',
+    '',
+    '═══════ EVIDENCIA DEL GRAFO/CATÁLOGO (canónica, NO inventar más allá de esto) ═══════',
+    evidence || '(sin evidencia adicional; usa solo los hechos canónicos del tema)',
+    '',
+    '═══════ ITEMS A EVALUAR Y CORREGIR ═══════',
+    itemsText,
+    '',
+    'Devuelve ÚNICAMENTE un array JSON (sin prosa antes ni después), un objeto por item,',
+    'en el MISMO orden. Cada `respuesta_corregida` debe ser una SOLA línea (sin saltos',
+    'de línea internos), en español campesino claro, práctica, citando la entidad/fuente',
+    'de la evidencia cuando exista, y máximo ~900 caracteres. Escapa las comillas dobles.',
+    'Formato EXACTO:',
+    '[{"id":"<id>","contaminated":<bool>,"category":"<cross_thermal|confusion_especie|pest_vs_disease|institucion_inventada|familia_fabricada|otra|ninguna>","explanation":"<por qué, breve>","respuesta_corregida":"<respuesta correcta grounded>","is_gap":<bool>}]',
+  ].join('\n');
+}
+
+/** parseCorrectionVerdicts — extrae el array JSON de veredictos+correcciones. */
+export function parseCorrectionVerdicts(raw) {
+  if (typeof raw !== 'string' || !raw.trim()) return null;
+  const start = raw.indexOf('[');
+  const end = raw.lastIndexOf(']');
+  if (start < 0 || end <= start) return null;
+  let arr;
+  try { arr = JSON.parse(raw.slice(start, end + 1)); }
+  catch (_) { return null; }
+  if (!Array.isArray(arr)) return null;
+  return arr.map((o) => ({
+    id: typeof o.id === 'string' ? o.id : String(o.id ?? ''),
+    contaminated: typeof o.contaminated === 'boolean' ? o.contaminated : Boolean(o.contaminated),
+    category: typeof o.category === 'string' && o.category ? o.category : 'otra',
+    explanation: typeof o.explanation === 'string' ? o.explanation : '',
+    respuesta_corregida: typeof o.respuesta_corregida === 'string' ? o.respuesta_corregida.trim() : '',
+    is_gap: typeof o.is_gap === 'boolean' ? o.is_gap : Boolean(o.is_gap),
+    source: 'judge',
+  }));
+}
+
+/**
+ * B0g — grounding: juez `claude-code -p` que evalúa CADA respuesta (contaminación/
+ * alucinación) Y ADEMÁS genera la `respuesta_corregida` GROUNDED con el grafo (o
+ * marca `is_gap` si el grafo no tiene el dato → alimenta A2). Llena ctx.verdictsById
+ * para que A1 (destilado) escriba tuplas útiles para LoRA y A2 encole los gaps.
+ */
 async function runGrounding(ctx) {
   const { topic, responses = [] } = ctx;
   const items = responses
     .filter((r) => r.agent_text && r.agent_text.length > 20)
     .map((r) => ({
-      id: `${topic.id}-t${r.turn}`, probeType: r.kind,
-      subject: `${topic.problema} en ${topic.cultivo} (${topic.cientifico})`,
-      query: r.user_text, response: r.agent_text,
-      expectedFacts: [`${topic.problema} es ${topic.tipo}`, `agente causal / entidad: ${topic.patogeno}`],
-      trapFacts: [`información atribuida a otra plaga/enfermedad distinta de ${topic.patogeno}`],
-      notes: 'Marcar contaminación si inventa familias/instituciones o confunde con otra especie/plaga.',
+      id: `${topic.id}-t${r.turn}`, probeType: r.kind, query: r.user_text, response: r.agent_text,
+      entidades: (r.entities_grounded || []).join(', '),
     }));
   if (items.length === 0) return { status: 'fail', valor: '0 evaluables', detalle: 'No hubo respuestas evaluables (agente vacío).' };
-  const judgeCall = makeContaminationJudgeCall({ timeoutMs: 300000 });
-  const verdicts = await judgeContaminationBatch(items, { judgeCall });
+
+  // Evidencia grounded del grafo para que el juez corrija sin inventar.
+  const evidence = await gatherGraphEvidence(ctx);
+
+  // Un solo spawn de claude-code -p (secuencial, nunca paralelo) con evaluación + corrección.
+  const unjudged = items.map((it) => ({ id: it.id, contaminated: null, category: null, explanation: null, respuesta_corregida: '', is_gap: false, source: 'unjudged' }));
+  let verdicts = unjudged;
+  try {
+    const raw = await spawnClaudeCode(buildCorrectionBatchPrompt(items, evidence), { timeoutMs: 300000 });
+    const parsed = parseCorrectionVerdicts(raw);
+    if (parsed) {
+      const byId = new Map(parsed.map((v) => [v.id, v]));
+      verdicts = items.map((it) => byId.get(it.id) || { id: it.id, contaminated: null, category: null, explanation: null, respuesta_corregida: '', is_gap: false, source: 'unjudged' });
+    }
+  } catch (_) { /* degrada a unjudged */ }
+
   ctx.verdicts = verdicts;
   ctx.verdictsById = new Map(verdicts.map((v) => [v.id, v]));
+  ctx.judgeGaps = verdicts.filter((v) => v.is_gap === true);
+
   const judged = verdicts.filter((v) => v.source === 'judge');
   const contaminated = judged.filter((v) => v.contaminated === true);
+  const corrected = judged.filter((v) => v.respuesta_corregida && v.respuesta_corregida.length > 20);
+  const gaps = judged.filter((v) => v.is_gap === true);
   const pvHits = responses.reduce((a, r) => a + (r.post_validate_hallucinated || 0), 0);
   const status = judged.length === 0 ? 'skip' : contaminated.length === 0 && pvHits === 0 ? 'pass' : 'fail';
   return {
     status,
-    valor: `${contaminated.length} contaminados / ${judged.length} juzgados; ${pvHits} entidades alucinadas`,
-    detalle: `juez claude-code -p: ${judged.length}/${items.length} evaluados, ${contaminated.length} contaminados; post-validate: ${pvHits} alucinadas.`,
-    data: { verdicts: verdicts.map((v) => ({ id: v.id, contaminated: v.contaminated, category: v.category, explanation: clip(v.explanation, 400) })), post_validate_hits: pvHits },
+    valor: `${contaminated.length} contaminados / ${judged.length}; ${corrected.length} con corrección; ${gaps.length} gaps; ${pvHits} alucinadas`,
+    detalle: `juez claude-code -p: ${judged.length}/${items.length} evaluados, ${contaminated.length} contaminados, ${corrected.length} con respuesta_corregida grounded, ${gaps.length} gaps; post-validate: ${pvHits} alucinadas.`,
+    data: {
+      verdicts: verdicts.map((v) => ({ id: v.id, contaminated: v.contaminated, category: v.category, explanation: clip(v.explanation, 300), respuesta_corregida: clip(v.respuesta_corregida, 500), is_gap: v.is_gap })),
+      post_validate_hits: pvHits, corrected: corrected.length, gaps: gaps.length,
+    },
   };
 }
 
@@ -550,38 +659,66 @@ async function runDistill(ctx) {
   if (!responses.length) return { status: 'skip', valor: '0', detalle: 'Sin respuestas para destilar.' };
   const file = join(outDir, 'distill-dataset', `distill-${dateStr}.jsonl`);
   let n = 0;
+  let conCorreccion = 0;
   for (const r of responses) {
     if (!r.agent_text) continue;
     const v = verdictsById?.get(`${topic.id}-t${r.turn}`);
     const grounded = Boolean(v && v.contaminated === false && (r.post_validate_hallucinated || 0) === 0);
+    // El juez (B0g) ya produjo la respuesta grounded corregida. Sin ella la tupla
+    // no sirve para LoRA → la poblamos aquí. Si el juez marcó gap, queda vacía y
+    // se registra el gap (lo escribe A2).
+    const correccion = v && typeof v.respuesta_corregida === 'string' && v.respuesta_corregida.length > 20 ? v.respuesta_corregida : null;
+    if (correccion) conCorreccion += 1;
     appendJsonl(file, {
       ts: nowIso(), target, tema: topic.id, tema_problema: topic.problema, turno: r.turn, tipo_pregunta: r.kind,
       pregunta: r.user_text, respuesta_granite: r.agent_text, modelo: r.model,
       veredicto_juez: v ? { contaminated: v.contaminated, category: v.category, explanation: v.explanation, source: v.source } : { source: 'unjudged' },
-      respuesta_corregida: null, grounded,
+      respuesta_corregida: correccion,
+      es_gap: Boolean(v && v.is_gap),
+      grounded,
       tipo_error: v && v.contaminated ? (v.category || 'contaminacion') : ((r.post_validate_hallucinated || 0) > 0 ? 'entidad_alucinada' : null),
     });
     n += 1;
   }
-  return { status: 'pass', valor: `${n} tuplas`, detalle: `${n} tuplas acumuladas en ${file} (insumo LoRA; sintético, sin PII).`, data: { file, n } };
+  return { status: 'pass', valor: `${n} tuplas, ${conCorreccion} con corrección`, detalle: `${n} tuplas acumuladas en ${file} (${conCorreccion} con respuesta_corregida grounded; insumo LoRA; sintético, sin PII).`, data: { file, n, con_correccion: conCorreccion } };
 }
 
-/** A2 — gaps de grounding → cola DR (el sujeto del tema no resolvió en el grafo). */
+/** A2 — gaps de grounding → cola DR. Dos fuentes: (1) el sujeto no resolvió en el
+ *  grafo (heurística resolve-entities); (2) el juez de B0g marcó `is_gap` en algún
+ *  turno (el grafo no tenía lo necesario para corregir). Ambos alimentan DR. */
 async function runGaps(ctx) {
-  const { responses = [], topic, target, outDir, dateStr } = ctx;
+  const { responses = [], topic, target, outDir, dateStr, judgeGaps = [] } = ctx;
   const file = join(outDir, `grounding-gaps-${dateStr}.jsonl`);
+  let anotados = 0;
+
+  // (1) Heurística: el sujeto del tema no resolvió en el grafo.
   const resolvedAll = norm(responses.flatMap((r) => r.entities_grounded || []).join(' | '));
   const subjectResolved =
     resolvedAll.includes(norm(topic.patogeno).split(' ')[0]) ||
     resolvedAll.includes(norm(topic.cientifico).split(' ')[0]) ||
     resolvedAll.includes(norm(topic.cultivo));
-  if (subjectResolved) return { status: 'pass', valor: 'sujeto resuelto', detalle: `El sujeto del tema (${topic.patogeno}/${topic.cientifico}) resolvió en el grafo; sin gap.` };
-  appendJsonl(file, {
-    ts: nowIso(), target, tema: topic.id, entidad_faltante: `${topic.patogeno} / ${topic.cientifico}`, cultivo: topic.cultivo,
-    que_se_necesita: `Especie/plaga "${topic.patogeno}" (${topic.tipo}) en ${topic.cultivo} (${topic.cientifico}) y sus aristas (AFFECTS/SUSCEPTIBLE_TO, control cultural, biopreparados, fuente ${topic.fuente}) no resolvieron. Encolar DR/ingest.`,
-    detectado_por: 'resolve-entities vacío para el sujeto del tema',
-  });
-  return { status: 'pass', valor: 'GAP anotado', detalle: `GAP de grafo anotado en ${file} (${topic.patogeno}/${topic.cientifico}) → alimenta cola DR.`, data: { file } };
+  if (!subjectResolved) {
+    appendJsonl(file, {
+      ts: nowIso(), target, tema: topic.id, entidad_faltante: `${topic.patogeno} / ${topic.cientifico}`, cultivo: topic.cultivo,
+      que_se_necesita: `Especie/plaga "${topic.patogeno}" (${topic.tipo}) en ${topic.cultivo} (${topic.cientifico}) y sus aristas (AFFECTS/SUSCEPTIBLE_TO, control cultural, biopreparados, fuente ${topic.fuente}) no resolvieron. Encolar DR/ingest.`,
+      detectado_por: 'resolve-entities vacío para el sujeto del tema',
+    });
+    anotados += 1;
+  }
+
+  // (2) Gaps que marcó el juez de B0g (no pudo corregir con el grafo).
+  for (const g of judgeGaps) {
+    const turno = String(g.id || '').split('-t')[1] || '?';
+    appendJsonl(file, {
+      ts: nowIso(), target, tema: topic.id, entidad_faltante: `${topic.patogeno} / ${topic.cientifico}`, cultivo: topic.cultivo,
+      que_se_necesita: `El juez no pudo dar respuesta_corregida grounded para el turno ${turno} (${g.category || 'gap'}): ${clip(g.explanation, 300)}. Enriquecer el grafo/catálogo (fuente ${topic.fuente}) y encolar DR.`,
+      detectado_por: 'juez B0g marcó is_gap (evidencia del grafo insuficiente)',
+    });
+    anotados += 1;
+  }
+
+  if (anotados === 0) return { status: 'pass', valor: 'sin gaps', detalle: `El sujeto del tema (${topic.patogeno}/${topic.cientifico}) resolvió y el juez corrigió con el grafo; sin gap.` };
+  return { status: 'pass', valor: `${anotados} gap(s) anotados`, detalle: `${anotados} gap(s) de grafo anotados en ${file} → alimentan cola DR.`, data: { file, anotados, judge_gaps: judgeGaps.length } };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
