@@ -109,16 +109,17 @@ export function shouldSelfHeal({ runningSha, deployedSha, alreadyReloaded, onlin
  * @returns {boolean}
  */
 export function isBundleFetchFailure(input) {
-  if (input && typeof input === 'object' && typeof input.filename === 'string' && input.filename.includes('/assets/')) {
+  const obj = /** @type {{ filename?: unknown, message?: unknown, reason?: any }} */ (
+    input && typeof input === 'object' ? input : {}
+  );
+  if (typeof obj.filename === 'string' && obj.filename.includes('/assets/')) {
     return true;
   }
   const msg = (() => {
     if (typeof input === 'string') return input;
-    if (input && typeof input === 'object') {
-      if (typeof input.message === 'string') return input.message;
-      if (typeof input.reason === 'string') return input.reason;
-      if (input.reason && typeof input.reason.message === 'string') return input.reason.message;
-    }
+    if (typeof obj.message === 'string') return obj.message;
+    if (typeof obj.reason === 'string') return obj.reason;
+    if (obj.reason && typeof obj.reason.message === 'string') return obj.reason.message;
     return '';
   })().toLowerCase();
   return BUNDLE_FETCH_FAILURE_RE.test(msg) || (/\/assets\//.test(msg) && /(error|failed|load|chunk|module)/i.test(msg));
@@ -315,8 +316,13 @@ function defaultReload() {
  * Instala guards de runtime para recuperar bundles/chunks que fallan al cargar.
  * Debe montarse una sola vez al inicio de la app.
  *
- * @param {object} [deps]
- * @param {() => Promise<boolean|{recovered?: boolean}>} [deps.recover]
+ * @param {{
+ *   alreadyReloaded?: () => boolean,
+ *   markReloaded?: () => void,
+ *   unregisterServiceWorker?: () => Promise<unknown>,
+ *   reload?: () => void,
+ *   recover?: () => Promise<boolean|{recovered?: boolean}>,
+ * }} [deps]
  * @returns {() => void} cleanup
  */
 export function installBundleRecoveryGuards(deps = {}) {
