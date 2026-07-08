@@ -195,6 +195,7 @@ export const MUNDOS_FINCA = [
         tinte: ['#2f6b3a', '#d8e9d2'],
         entradas: [
             { view: 'asociaciones', label: 'Buenas vecinas', desc: 'Qué cultivos se ayudan sembrados juntos', emoji: '🌻' },
+            { view: 'restauracion', label: 'Restauración y bosque de alimentos', desc: 'Los 7 estratos del bosque comestible, la sucesión ecológica y cómo restaurar un suelo herido — con especies nativas y multipropósito del catálogo', emoji: '🌳' },
             { view: 'biodiversidad', label: 'El monte de la finca', desc: 'Plantas y animales silvestres que la acompañan', emoji: '🦜' },
             { view: 'seguimiento_reforestacion', label: 'Reforestación', desc: 'Restauración con árboles nativos', emoji: '🌳' },
             { view: 'seguimiento_silvopastoreo', label: 'Silvopastoreo', desc: 'Árboles + pasto + ganado en el mismo lote', emoji: '🐂' },
