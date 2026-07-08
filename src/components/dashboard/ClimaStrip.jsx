@@ -1,12 +1,14 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Cloud, CloudRain, CloudFog, Sun, CloudSun, Droplets, Wind, Thermometer, MapPin, AlertCircle, Pencil } from 'lucide-react';
-import { fetchClimaSnapshot, getCachedClimaSnapshot } from '../../services/climaService';
-import { fetchSkyConditions, getCachedSkyConditions, skyForDay } from '../../services/skyConditionService';
+import { Cloud, Droplets, Snowflake, Thermometer, MapPin, AlertCircle, Pencil } from 'lucide-react';
+import { fetchClimaSnapshot, getCachedClimaSnapshot, describePhase } from '../../services/climaService';
+import { fetchSkyConditions, getCachedSkyConditions, skyForDay, pisoFromMsnm } from '../../services/skyConditionService';
 import { findMunicipio } from '../../utils/colombiaLocations';
-import { isSavedLocationCoarse } from '../../services/locationService';
+import { isSavedLocationCoarse, getPisoTermicoInfo } from '../../services/locationService';
+import { FORECAST_THRESHOLDS } from '../../constants/alertThresholds';
 import { FARM_CONFIG } from '../../config/defaults';
 import useFincaActiveStore from '../../services/fincaActiveStore';
 import { getProfile, getProfileMunicipio } from '../../services/userProfileService';
+import ClimaIconoVivo from './ClimaIconoVivo';
 
 /**
  * ClimaStrip — pronóstico real de 7 días debajo del agente.
@@ -44,7 +46,7 @@ import { getProfile, getProfileMunicipio } from '../../services/userProfileServi
 const DAY_LABELS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
 /**
- * Ícono + color por CONDICIÓN REAL del cielo (fix Choachí 2026-06).
+ * Color por CONDICIÓN REAL del cielo (fix Choachí 2026-06).
  *
  * Antes: <2 mm de precipitación → "solecito" ámbar. En los pueblos altoandinos
  * (nubosidad orográfica + niebla SIN lluvia medible) eso prometía ~4 días de
@@ -52,13 +54,16 @@ const DAY_LABELS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
  * nubosidad real de Open-Meteo + corrección por piso térmico + ENSO; sin dato
  * de nube cae a un prior conservador (piso frío → variable, no sol).
  * El ámbar de "sol" queda RESERVADO para despejado de verdad.
+ *
+ * El dibujo ahora lo pone ClimaIconoVivo (SVG animado sutil, GPU-friendly);
+ * este mapa solo aporta el color por condición.
  */
-const CONDITION_ICONS = {
-    despejado: { Icon: Sun, cls: 'text-amber-300' },
-    parcial: { Icon: CloudSun, cls: 'text-slate-200' },
-    nublado: { Icon: Cloud, cls: 'text-slate-400' },
-    niebla: { Icon: CloudFog, cls: 'text-slate-300' },
-    lluvia: { Icon: CloudRain, cls: 'text-sky-400' },
+const CONDITION_COLORS = {
+    despejado: 'text-amber-300',
+    parcial: 'text-slate-200',
+    nublado: 'text-slate-400',
+    niebla: 'text-slate-300',
+    lluvia: 'text-sky-400',
 };
 
 function dayLabel(isoDate, i) {
@@ -324,6 +329,36 @@ export default function ClimaStrip({ onNavigate, embedded = false }) {
     const hasReal = filled.some((d) => d.tempMaxC != null);
     const headerLabel = (municipio || '').split(',')[0] || 'su finca';
 
+    // ── Piso térmico (grounding térmico por ALTITUD GUARDADA del perfil) ──
+    // Refuerza visualmente el dato que el agente más confunde: a qué piso
+    // pertenece la finca y que el pronóstico YA viene corregido a esa altitud.
+    // Sin altitud → "dato en camino", jamás un piso inventado.
+    const pisoInfo = geo?.elevation != null ? getPisoTermicoInfo(geo.elevation) : null;
+    const pisoSlug = geo?.elevation != null ? pisoFromMsnm(geo.elevation) : null;
+
+    // ── Helada BIEN CALIBRADA ──────────────────────────────────────────────
+    // Helada REAL = mínima pronosticada ≤ 0 °C. Punto. Por encima de 0 °C y
+    // hasta el umbral de VIGILANCIA del piso térmico (los mismos
+    // FORECAST_THRESHOLDS.HELADA_MIN_C que usa alertEngine: páramo 6°, frío 4°,
+    // templado 2°, cálido 1°) es "noche fría / riesgo", nunca "helada". Esto es
+    // coherente con el guard del agente en curso (helada ≤ 0 °C, no 14 °C).
+    const umbralVigilancia = FORECAST_THRESHOLDS.HELADA_MIN_C[pisoSlug]
+        ?? FORECAST_THRESHOLDS.HELADA_MIN_C.default;
+    const heladaDia = filled.find((d) => d.tempMinC != null && d.tempMinC <= 0) || null;
+    const nocheFriaDia = heladaDia
+        ? null
+        : filled.find((d) => d.tempMinC != null && d.tempMinC <= umbralVigilancia) || null;
+
+    // ── ENSO/temporada — SOLO si el dato existe en el snapshot ────────────
+    // Sin fase del sidecar no se muestra nada (cero fabricación). El guard
+    // `typeof describePhase === 'function'` cubre los tests que mockean
+    // climaService parcialmente (solo fetch/getCached).
+    const ensoPhaseRaw = snapshot?.enso_status?.phase || null;
+    const ensoTexto = ensoPhaseRaw && typeof describePhase === 'function'
+        ? describePhase(ensoPhaseRaw)
+        : null;
+    const ensoVisible = ensoTexto && !/desconocido/i.test(ensoTexto) ? ensoTexto : null;
+
     return (
         <div className={embedded ? 'px-4 pb-4 pt-1' : 'bg-gradient-to-br from-sky-950/70 to-indigo-950/60 backdrop-blur-xl border border-sky-800/40 rounded-2xl p-5'}>
             <div className={`flex items-center justify-between ${embedded ? 'mb-2' : 'mb-3'}`}>
@@ -353,6 +388,39 @@ export default function ClimaStrip({ onNavigate, embedded = false }) {
                         <Pencil size={13} aria-hidden="true" />
                     </button>
                 </div>
+            </div>
+
+            {/* Contexto de grounding: piso térmico por ALTITUD GUARDADA + ENSO.
+                El chip de piso refuerza el dato térmico correcto (el que el
+                agente más confunde) y explicita que el pronóstico ya viene
+                corregido a la altitud de la finca. Sin altitud → "dato en
+                camino" (cero invención). ENSO solo si el snapshot lo trae. */}
+            <div className={`flex flex-wrap items-center gap-1.5 ${embedded ? 'mb-2' : 'mb-3'}`} data-testid="clima-contexto">
+                {pisoInfo ? (
+                    <span
+                        data-testid="clima-piso-termico"
+                        title={`Piso térmico ${pisoInfo.label} (${pisoInfo.rango}). El pronóstico ya está corregido a la altitud de su finca.`}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-[10px] font-bold text-emerald-200"
+                    >
+                        <span aria-hidden="true">{pisoInfo.emoji}</span>
+                        Piso {pisoInfo.label.toLowerCase()} · {Math.round(geo.elevation)} msnm
+                    </span>
+                ) : (
+                    <span
+                        data-testid="clima-piso-pendiente"
+                        className="inline-flex items-center px-2 py-0.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-[10px] text-slate-400"
+                    >
+                        Altitud de la finca: dato en camino
+                    </span>
+                )}
+                {ensoVisible && (
+                    <span
+                        data-testid="clima-enso"
+                        className="inline-flex items-center px-2 py-0.5 rounded-lg bg-sky-500/10 border border-sky-500/25 text-[10px] text-sky-200"
+                    >
+                        {ensoVisible}
+                    </span>
+                )}
             </div>
 
             {/* mitad geo de #364: aviso de confianza cuando la ubicación GUARDADA
@@ -392,23 +460,69 @@ export default function ClimaStrip({ onNavigate, embedded = false }) {
                 </p>
             )}
 
+            {/* Aviso de helada CALIBRADO: banner solo con helada REAL (mínima
+                ≤ 0 °C) en el pronóstico. Noches frías por encima de 0 °C pero
+                bajo el umbral de vigilancia del piso térmico → nota suave que
+                además ENSEÑA la calibración (no grita "helada" a 14 °C). */}
+            {heladaDia && (
+                <div
+                    data-testid="clima-helada-aviso"
+                    className="mb-3 rounded-xl bg-cyan-950/40 border border-cyan-700/50 p-3 text-xs text-cyan-100 flex gap-2"
+                >
+                    <Snowflake size={14} className="shrink-0 mt-0.5 text-cyan-300" aria-hidden="true" />
+                    <p className="leading-relaxed">
+                        <span className="font-bold">Helada en el pronóstico:</span>{' '}
+                        {heladaDia.label} con mínima de {Math.round(heladaDia.tempMinC)} °C
+                        (helada real = 0 °C o menos). Proteja los cultivos sensibles
+                        antes del anochecer.
+                    </p>
+                </div>
+            )}
+            {nocheFriaDia && pisoInfo && (
+                <p data-testid="clima-noche-fria" className="text-[11px] text-sky-200/80 mb-3 leading-relaxed">
+                    Noches frías en el pronóstico (mínima {Math.round(nocheFriaDia.tempMinC)} °C,
+                    vigilancia desde {umbralVigilancia} °C en piso {pisoInfo.label.toLowerCase()}).
+                    Helada real solo si baja a 0 °C o menos.
+                </p>
+            )}
+
             <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
                 {filled.map((d, i) => {
-                    const { Icon, cls } = CONDITION_ICONS[d.condition] || CONDITION_ICONS.parcial;
+                    const cls = CONDITION_COLORS[d.condition] || CONDITION_COLORS.parcial;
+                    // Copo/realce SOLO con helada real (≤ 0 °C), coherente con el banner.
+                    const esHelada = d.tempMinC != null && d.tempMinC <= 0;
                     return (
                         <div
                             key={i}
                             data-condition={d.condition}
-                            title={d.conditionLabel}
-                            className={`flex flex-col items-center gap-1 ${embedded ? 'py-1.5' : 'py-2.5'} rounded-xl bg-white/[0.04] border border-white/[0.06]`}
+                            title={esHelada
+                                ? `${d.conditionLabel} · Helada: mínima de ${Math.round(d.tempMinC)} °C`
+                                : d.conditionLabel}
+                            style={{ '--cv-i': i }}
+                            className={`clima-dia-card flex flex-col items-center gap-1 ${embedded ? 'py-1.5' : 'py-2.5'} rounded-xl border ${esHelada
+                                ? 'bg-cyan-500/10 border-cyan-400/40'
+                                : i === 0
+                                    ? 'bg-white/[0.07] border-white/[0.16]'
+                                    : 'bg-white/[0.04] border-white/[0.06]'}`}
                         >
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{d.label}</span>
-                            <Icon size={embedded ? 18 : 22} className={cls} />
+                            <span className={`text-[10px] font-bold uppercase tracking-wide ${i === 0 ? 'text-slate-200' : 'text-slate-400'}`}>{d.label}</span>
+                            <ClimaIconoVivo
+                                condition={d.condition}
+                                frost={esHelada}
+                                size={embedded ? 18 : 22}
+                                className={cls}
+                            />
                             {d.tempMaxC != null && (
                                 <span className={`${embedded ? 'text-xs' : 'text-sm'} font-bold text-white tabular-nums`}>{Math.round(d.tempMaxC)}°</span>
                             )}
                             {d.tempMinC != null && (
-                                <span className="text-[10px] text-slate-400 tabular-nums">{Math.round(d.tempMinC)}°</span>
+                                <span className={`text-[10px] tabular-nums ${esHelada ? 'text-cyan-300 font-bold' : 'text-slate-400'}`}>{Math.round(d.tempMinC)}°</span>
+                            )}
+                            {/* Lluvia esperada del día: solo con dato real ≥ 1 mm. */}
+                            {d.precipMm != null && d.precipMm >= 1 && (
+                                <span className="text-[9px] text-sky-300/80 tabular-nums leading-none">
+                                    {Math.round(d.precipMm)} mm
+                                </span>
                             )}
                         </div>
                     );
@@ -428,9 +542,12 @@ export default function ClimaStrip({ onNavigate, embedded = false }) {
                         <Droplets size={14} className="text-sky-400" />
                         <span className="truncate">Lluvia</span>
                     </div>
+                    {/* Antes decía "Viento", pero el strip nunca pinta viento —
+                        leyenda huérfana. En su lugar, la calibración de helada
+                        (≤ 0 °C real) que sí se usa en celdas y banner. */}
                     <div className="flex items-center gap-1.5 text-slate-300">
-                        <Wind size={14} className="text-emerald-400" />
-                        <span className="truncate">Viento</span>
+                        <Snowflake size={14} className="text-cyan-300" />
+                        <span className="truncate">Helada ≤ 0 °C</span>
                     </div>
                 </div>
             )}

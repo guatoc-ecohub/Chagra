@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-    Sun, CloudSun, Cloud, CloudFog, CloudRain, Sunrise,
+    Cloud, Sunrise,
     Bell, BellOff, MapPin, Droplets, Sprout, Mic, Bug,
     Package, ClipboardList, MessageCircle, Map as MapIcon, ChevronRight, WifiOff,
 } from 'lucide-react';
+import ClimaIconoVivo from '../dashboard/ClimaIconoVivo';
 import { ScreenShell } from '../common/ScreenShell';
 import AgendaCampesina from './AgendaCampesina';
 import JourneyGuideCard from './JourneyGuideCard';
@@ -18,6 +19,7 @@ import {
     describePhase,
 } from '../../services/climaService';
 import { getCachedSkyConditions, fetchSkyConditions } from '../../services/skyConditionService';
+import { getPisoTermicoInfo } from '../../services/locationService';
 import { buildClimaHoy, buildTareasSemana, buildAgenda } from '../../services/hoyEnFincaService';
 
 /**
@@ -45,12 +47,13 @@ import { buildClimaHoy, buildTareasSemana, buildAgenda } from '../../services/ho
  * y sin cache → estados vacíos honestos, jamás datos inventados.
  */
 
-const CONDITION_ICONS = {
-    despejado: { Icon: Sun, cls: 'text-amber-300' },
-    parcial: { Icon: CloudSun, cls: 'text-slate-200' },
-    nublado: { Icon: Cloud, cls: 'text-slate-400' },
-    niebla: { Icon: CloudFog, cls: 'text-slate-300' },
-    lluvia: { Icon: CloudRain, cls: 'text-sky-400' },
+/* El dibujo lo pone ClimaIconoVivo (SVG animado sutil); aquí solo el color. */
+const CONDITION_COLORS = {
+    despejado: 'text-amber-300',
+    parcial: 'text-slate-200',
+    nublado: 'text-slate-400',
+    niebla: 'text-slate-300',
+    lluvia: 'text-sky-400',
 };
 
 const SEVERITY_STYLES = {
@@ -159,7 +162,10 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
         );
     }, [goAgente]);
 
-    const { Icon: CondIcon, cls: condCls } = CONDITION_ICONS[clima.condition] || CONDITION_ICONS.parcial;
+    const condCls = CONDITION_COLORS[clima.condition] || CONDITION_COLORS.parcial;
+    // Piso térmico desde la ALTITUD GUARDADA del perfil (grounding térmico):
+    // sin altitud no se muestra nada — jamás un piso inventado.
+    const pisoInfo = elevationM != null ? getPisoTermicoInfo(elevationM) : null;
 
     return (
         <ScreenShell title="Hoy en finca" icon={Sunrise} onBack={onBack} onHome={onHome}>
@@ -238,7 +244,12 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
                         </div>
                         {clima.hasData ? (
                             <div className="flex items-center gap-4">
-                                <CondIcon size={52} className={`${condCls} shrink-0`} aria-hidden="true" />
+                                <ClimaIconoVivo
+                                    condition={clima.condition}
+                                    frost={clima.tempMinC != null && clima.tempMinC <= 0}
+                                    size={52}
+                                    className={`${condCls} shrink-0`}
+                                />
                                 <div className="flex-1 min-w-0">
                                     <p className="text-xl font-black text-white leading-tight" data-testid="clima-hoy-label">
                                         {clima.label}
@@ -263,6 +274,15 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
                                     <p className="text-xs text-slate-400 mt-1.5" data-testid="enso-llano">
                                         {describePhase(ensoPhase)}
                                     </p>
+                                    {/* Piso térmico por altitud GUARDADA — refuerza el
+                                        grounding térmico correcto (el pronóstico ya viene
+                                        corregido a la altitud de la finca). */}
+                                    {pisoInfo && (
+                                        <p className="text-[10px] text-emerald-300/80 mt-1" data-testid="clima-piso-termico-hoy">
+                                            <span aria-hidden="true">{pisoInfo.emoji} </span>
+                                            Piso {pisoInfo.label.toLowerCase()} · {Math.round(elevationM)} msnm — pronóstico ajustado a su altitud
+                                        </p>
+                                    )}
                                 </div>
                                 <ChevronRight size={18} className="text-slate-500 shrink-0" aria-hidden="true" />
                             </div>

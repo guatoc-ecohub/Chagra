@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Sun, CloudSun, Cloud, CloudFog, CloudRain, Sunrise, Bell, ClipboardList, ChevronRight } from 'lucide-react';
+import { Sunrise, Bell, ClipboardList, ChevronRight } from 'lucide-react';
+import ClimaIconoVivo from './ClimaIconoVivo';
 import useAlertStore from '../../store/useAlertStore';
 import { listFarmProcesses } from '../../db/farmProcessCache';
 import {
@@ -27,12 +28,13 @@ import { buildClimaHoy, buildTareasSemana, buildAgenda, agendaPorDia } from '../
  * para los tres paneles fundidos. Solo cambia la capa visual; datos idénticos.
  */
 
-const CONDITION_ICONS = {
-    despejado: { Icon: Sun, cls: 'text-amber-300' },
-    parcial: { Icon: CloudSun, cls: 'text-slate-200' },
-    nublado: { Icon: Cloud, cls: 'text-slate-400' },
-    niebla: { Icon: CloudFog, cls: 'text-slate-300' },
-    lluvia: { Icon: CloudRain, cls: 'text-sky-400' },
+/* El dibujo lo pone ClimaIconoVivo (SVG animado sutil); aquí solo el color. */
+const CONDITION_COLORS = {
+    despejado: 'text-amber-300',
+    parcial: 'text-slate-200',
+    nublado: 'text-slate-400',
+    niebla: 'text-slate-300',
+    lluvia: 'text-sky-400',
 };
 
 export default function HoyEnFincaStrip({ onNavigate, embedded = false }) {
@@ -88,7 +90,7 @@ export default function HoyEnFincaStrip({ onNavigate, embedded = false }) {
         [],
     );
 
-    const { Icon: CondIcon, cls: condCls } = CONDITION_ICONS[clima.condition] || CONDITION_ICONS.parcial;
+    const condCls = CONDITION_COLORS[clima.condition] || CONDITION_COLORS.parcial;
 
     return (
         <button
@@ -117,7 +119,12 @@ export default function HoyEnFincaStrip({ onNavigate, embedded = false }) {
                 <div className="flex items-center gap-2 min-w-0 flex-1">
                     {clima.hasData ? (
                         <>
-                            <CondIcon size={32} className={`${condCls} shrink-0`} aria-hidden="true" />
+                            <ClimaIconoVivo
+                                condition={clima.condition}
+                                frost={clima.tempMinC != null && clima.tempMinC <= 0}
+                                size={32}
+                                className={`${condCls} shrink-0`}
+                            />
                             <div className="min-w-0">
                                 <p className="text-sm font-bold text-white truncate">{clima.label}</p>
                                 {clima.tempMaxC != null && (
