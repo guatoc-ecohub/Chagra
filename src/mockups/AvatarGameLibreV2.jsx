@@ -45,6 +45,7 @@ const ESPECIES = [
     unidad: 'pote de miel',
     unidadPlural: 'potes de miel',
     simbolo: 'pote',
+    cuentaPaso2: 'Se llena un pote de miel',
     acento: '#B97A10',
     etapas: ['Cría', 'Obrera', 'Guardiana', 'Reina'],
     animoPalabra: ['TRISTE', 'MÁS O MENOS', 'CONTENTA'],
@@ -67,6 +68,7 @@ const ESPECIES = [
     unidad: 'gota de agua limpia',
     unidadPlural: 'gotas de agua limpia',
     simbolo: 'gota',
+    cuentaPaso2: 'Cae una gota de agua limpia',
     acento: '#1F7A8C',
     etapas: ['Huevo', 'Renacuajo', 'Ranita', 'Rana dorada'],
     animoPalabra: ['TRISTE', 'MÁS O MENOS', 'CONTENTA'],
@@ -89,6 +91,7 @@ const ESPECIES = [
     unidad: 'árbol',
     unidadPlural: 'árboles',
     simbolo: 'arbol',
+    cuentaPaso2: 'Crece un árbol del bosque',
     acento: '#4A6B2E',
     etapas: ['Osezno', 'Joven', 'Andarín', 'Guardián del monte'],
     animoPalabra: ['TRISTE', 'MÁS O MENOS', 'CONTENTO'],
@@ -111,6 +114,7 @@ const ESPECIES = [
     unidad: 'montón de abono',
     unidadPlural: 'montones de abono',
     simbolo: 'abono',
+    cuentaPaso2: 'Se hace un montón de abono',
     acento: '#6B4A2E',
     etapas: ['Chiquita', 'Trabajadora', 'Abonadora', 'Madre de la tierra'],
     animoPalabra: ['TRISTE', 'MÁS O MENOS', 'CONTENTA'],
@@ -133,6 +137,7 @@ const ESPECIES = [
     unidad: 'frailejón',
     unidadPlural: 'frailejones',
     simbolo: 'frailejon',
+    cuentaPaso2: 'Florece un frailejón',
     acento: '#5E7350',
     etapas: ['Polluelo', 'Volantón', 'Barbudito', 'Señor del páramo'],
     animoPalabra: ['TRISTE', 'MÁS O MENOS', 'CONTENTO'],
@@ -155,6 +160,7 @@ const ESPECIES = [
     unidad: 'flor',
     unidadPlural: 'flores',
     simbolo: 'flor',
+    cuentaPaso2: 'Abre una flor del jardín',
     acento: '#7A7A72',
     esViejo: true,
     etapas: ['Polluelo', 'Volantón', 'Volador', 'Veterano'],
@@ -624,7 +630,7 @@ export default function AvatarGameLibreV2() {
         <span className="cav2-flecha" aria-hidden="true">→</span>
         <div className="cav2-cuenta-paso">
           <SimboloPuesto tipo={especie.simbolo} lleno />
-          <span>Se llena un {especie.unidad}</span>
+          <span>{especie.cuentaPaso2}</span>
         </div>
         <span className="cav2-flecha" aria-hidden="true">→</span>
         <div className="cav2-cuenta-paso">
