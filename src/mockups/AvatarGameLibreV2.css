@@ -1,10 +1,647 @@
-/* Mockup dev — "La Casa de tu Animalito" (avatar libre v2). Scaffold. */
-.casita-root {
+/* Mockup dev — "La Casa de tu Animalito" (avatar libre v2).
+ *
+ * Dirección: claridad campesina. Tipografía grande y redonda, semáforo de
+ * color, tarjetas de borde grueso tipo cartilla rural, un solo acento por
+ * especie. Todo SVG/CSS, GPU-friendly (transform/opacity), y con respeto de
+ * prefers-reduced-motion. Prefijo cav2- para no chocar con la app.
+ */
+
+.cav2-root {
+  --cav2-acento: #b97a10;
+  --cav2-papel: #f6f4e8;
+  --cav2-carta: #fffdf4;
+  --cav2-tinta: #2b2018;
+  --cav2-tinta-suave: #6b5d4a;
+  --cav2-borde: #d8cfb4;
+  --cav2-verde: #3e8e4c;
+  --cav2-amarillo: #e4ae1f;
+  --cav2-rojo: #c0492b;
+  --cav2-miel: #f0b428;
+
   min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--cav2-papel);
+  color: var(--cav2-tinta);
+  font-family: 'Trebuchet MS', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 0 28px;
+  overflow-x: hidden;
+}
+
+.cav2-root > * {
+  width: min(560px, calc(100% - 24px));
+}
+
+/* ============ Barra superior ============ */
+.cav2-topbar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 14px 2px 8px;
+}
+
+.cav2-titulo {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.cav2-chip-mockup {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--cav2-tinta-suave);
+  border: 1.5px dashed var(--cav2-borde);
+  border-radius: 999px;
+  padding: 3px 10px;
+  background: var(--cav2-carta);
+}
+
+/* ============ 1. Escena del animalito ============ */
+.cav2-escena {
+  position: relative;
+  border: 3px solid var(--cav2-tinta);
+  border-radius: 22px;
+  overflow: hidden;
+  background: linear-gradient(#cde8f5 0%, #e6f2e2 62%, #bcd9a8 62%);
+}
+
+.cav2-cielo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cav2-sol {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #f5d34a;
+  box-shadow: 0 0 0 10px rgba(245, 211, 74, 0.28);
+}
+
+.cav2-loma {
+  position: absolute;
+  bottom: -30%;
+  border-radius: 50%;
+}
+
+.cav2-loma-lejos {
+  left: -20%;
+  width: 90%;
+  height: 62%;
+  background: #a8cd8f;
+}
+
+.cav2-loma-cerca {
+  right: -25%;
+  width: 100%;
+  height: 55%;
+  background: #8fbe74;
+}
+
+.cav2-animal-marco {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: 18px 0 0;
+}
+
+.cav2-animal {
+  width: min(210px, 52vw);
+  height: auto;
+  filter: saturate(1);
+}
+
+/* El ánimo también se nota en el cuerpo: apagado cuando está triste. */
+.cav2-animo-0 { filter: saturate(0.55) brightness(0.94); }
+.cav2-animo-1 { filter: saturate(0.85); }
+
+/* Flotación suave permanente + brinco de celebración. */
+.cav2-cuerpo-flotante {
+  animation: cav2-flotar 3.2s ease-in-out infinite;
+  transform-origin: 50% 60%;
+}
+
+@keyframes cav2-flotar {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.cav2-ala {
+  animation: cav2-aletear 0.5s ease-in-out infinite alternate;
+}
+
+.cav2-ala-izq { transform-origin: 62px 60px; }
+.cav2-ala-der { transform-origin: 98px 60px; }
+
+@keyframes cav2-aletear {
+  from { transform: rotate(-6deg); }
+  to { transform: rotate(10deg); }
+}
+
+/* Triste: alas caídas, quieto. */
+.cav2-animo-0 .cav2-ala { animation: none; }
+.cav2-animo-0 .cav2-cuerpo-flotante { animation: none; }
+
+.cav2-brinca .cav2-animal {
+  animation: cav2-brincar 0.9s ease-in-out 1;
+}
+
+@keyframes cav2-brincar {
+  0%, 100% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-16px) scale(1.05); }
+  55% { transform: translateY(0) scale(0.98); }
+  72% { transform: translateY(-8px) scale(1.02); }
+}
+
+/* Placa de estado: semáforo + palabra grande. */
+.cav2-placa-estado {
+  position: relative;
+  margin: 10px 14px 14px;
+  background: var(--cav2-carta);
+  border: 3px solid var(--cav2-tinta);
+  border-radius: 16px;
+  padding: 10px 14px 12px;
+  text-align: center;
+  box-shadow: 0 3px 0 rgba(43, 32, 24, 0.35);
+}
+
+.cav2-placa-fila {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.cav2-semaforo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #3a352e;
+  border-radius: 10px;
+  padding: 6px 5px;
+}
+
+.cav2-luz {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #57514a;
+  transition: background 0.3s ease;
+}
+
+.cav2-palabra-animo {
+  margin: 0;
+  font-size: clamp(1.9rem, 8vw, 2.6rem);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+}
+
+.cav2-root[data-nivel='0'] .cav2-palabra-animo { color: var(--cav2-rojo); }
+.cav2-root[data-nivel='1'] .cav2-palabra-animo { color: #a87c07; }
+.cav2-root[data-nivel='2'] .cav2-palabra-animo { color: var(--cav2-verde); }
+
+.cav2-frase-animo {
+  margin: 6px 0 0;
+  font-size: 0.98rem;
+  color: var(--cav2-tinta-suave);
+  line-height: 1.35;
+}
+
+/* ============ 2. La cuenta en tres dibujos ============ */
+.cav2-cuenta {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 14px;
+  background: var(--cav2-carta);
+  border: 2px solid var(--cav2-borde);
+  border-radius: 16px;
+  padding: 12px 8px;
+}
+
+.cav2-cuenta-paso {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--cav2-tinta);
+  line-height: 1.2;
+}
+
+.cav2-cuenta-paso .cav2-icono-trabajo,
+.cav2-cuenta-paso .cav2-puesto,
+.cav2-carita svg {
+  width: 44px;
+  height: 44px;
+}
+
+.cav2-flecha {
+  align-self: center;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--cav2-acento);
+}
+
+/* ============ Tarjetas (cartilla rural) ============ */
+.cav2-carta {
+  margin-top: 14px;
+  background: var(--cav2-carta);
+  border: 3px solid var(--cav2-tinta);
+  border-radius: 20px;
+  padding: 14px 14px 16px;
+  box-shadow: 0 3px 0 rgba(43, 32, 24, 0.25);
+}
+
+.cav2-carta-cabeza {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.cav2-carta-cabeza h2 {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 800;
+}
+
+.cav2-contador {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--cav2-tinta-suave);
+}
+
+.cav2-contador strong {
+  color: var(--cav2-acento);
+  font-size: 1.15rem;
+}
+
+/* ============ 3. La casa (los puestos) ============ */
+.cav2-puestos {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  background: rgba(184, 158, 100, 0.14);
+  border-radius: 14px;
+  padding: 10px;
+}
+
+.cav2-puesto {
+  width: 100%;
+  height: auto;
+}
+
+.cav2-puesto .cav2-forma { fill: #efe6cc; stroke: #8a7a54; stroke-width: 1.6; }
+.cav2-puesto .cav2-tronco { fill: #b89264; }
+.cav2-puesto-vacio .cav2-forma { fill: transparent; stroke: #b5a67e; stroke-dasharray: 4 3; }
+.cav2-puesto-vacio .cav2-tronco { fill: transparent; stroke: #b5a67e; stroke-width: 1.4; stroke-dasharray: 4 3; }
+
+.cav2-puesto-lleno .cav2-forma { fill: #f3e3b8; stroke: var(--cav2-acento); stroke-width: 2; }
+.cav2-puesto .cav2-miel { fill: var(--cav2-miel); }
+.cav2-puesto .cav2-agua { fill: #6faecf; }
+.cav2-puesto .cav2-copa { fill: #3e8e4c; }
+.cav2-puesto .cav2-tierra { fill: #54402e; }
+.cav2-puesto .cav2-lombricita { fill: none; stroke: #d98a7e; stroke-width: 2.4; stroke-linecap: round; }
+.cav2-puesto .cav2-florcita { fill: #e8b520; stroke: #b97a10; stroke-width: 1.4; }
+
+.cav2-puesto-pop {
+  animation: cav2-pop 0.6s cubic-bezier(0.2, 1.6, 0.4, 1) 1;
+}
+
+@keyframes cav2-pop {
+  0% { transform: scale(0.2); }
+  70% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+.cav2-casa-nota {
+  margin: 10px 2px 0;
+  font-size: 0.92rem;
+  color: var(--cav2-tinta-suave);
+  line-height: 1.35;
+}
+
+/* ============ 4. El camino de crecimiento ============ */
+.cav2-camino {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 4px;
+}
+
+.cav2-paso {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  text-align: center;
+  position: relative;
+  padding-top: 2px;
+}
+
+/* Caminito entre pasos */
+.cav2-paso + .cav2-paso::before {
+  content: '';
+  position: absolute;
+  top: 18px;
+  left: calc(-50% + 18px);
+  width: calc(100% - 36px);
+  height: 4px;
+  border-radius: 2px;
+  background: var(--cav2-borde);
+}
+
+.cav2-paso-hecha + .cav2-paso::before,
+.cav2-paso-hecha + .cav2-paso-actual::before {
+  background: var(--cav2-verde);
+}
+
+.cav2-paso-punto {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 1rem;
+  border: 3px solid var(--cav2-borde);
+  background: var(--cav2-carta);
+  color: var(--cav2-tinta-suave);
+  position: relative;
+  z-index: 1;
+}
+
+.cav2-paso-hecha .cav2-paso-punto {
+  background: var(--cav2-verde);
+  border-color: var(--cav2-verde);
+  color: #fff;
+}
+
+.cav2-paso-actual .cav2-paso-punto {
+  border-color: var(--cav2-acento);
+  color: var(--cav2-acento);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--cav2-acento) 22%, transparent);
+}
+
+.cav2-paso-nombre {
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--cav2-tinta-suave);
+}
+
+.cav2-paso-actual .cav2-paso-nombre {
+  color: var(--cav2-tinta);
+}
+
+.cav2-paso-aqui {
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: #fff;
+  background: var(--cav2-acento);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+/* ============ 5. Trabajos de hoy ============ */
+.cav2-tareas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cav2-tarea {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 2px solid var(--cav2-borde);
+  border-radius: 16px;
+  padding: 10px;
+  background: #fffef9;
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+.cav2-tarea-hecha {
+  border-color: var(--cav2-verde);
+  background: #eef6ea;
+}
+
+.cav2-icono-trabajo {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+}
+
+.cav2-tarea-texto {
+  flex: 1;
+  min-width: 0;
+}
+
+.cav2-tarea-verbo {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.cav2-tarea-detalle {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: var(--cav2-tinta-suave);
+  line-height: 1.25;
+}
+
+.cav2-tarea-lado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.cav2-premio {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.9rem;
+  font-weight: 900;
+  color: var(--cav2-acento);
+}
+
+.cav2-premio .cav2-puesto {
+  width: 26px;
+  height: 26px;
+}
+
+.cav2-boton-hice {
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #fff;
+  background: var(--cav2-verde);
+  border: none;
+  border-radius: 12px;
+  padding: 9px 14px;
+  min-width: 104px;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #2c6737;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.2s ease;
+}
+
+.cav2-boton-hice:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #2c6737;
+}
+
+.cav2-boton-hice:disabled {
+  background: #9ab894;
+  box-shadow: none;
+  cursor: default;
+}
+
+.cav2-tarea-hecha .cav2-boton-hice {
+  background: #6faa63;
+}
+
+.cav2-nota-real {
+  margin: 12px 2px 0;
+  font-size: 0.82rem;
+  color: var(--cav2-tinta-suave);
+  line-height: 1.35;
+  border-top: 1.5px dashed var(--cav2-borde);
+  padding-top: 10px;
+}
+
+/* ============ 6. Escoja su animalito ============ */
+.cav2-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.cav2-ficha {
+  font: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  border: 2.5px solid var(--cav2-borde);
+  border-radius: 16px;
+  background: #fffef9;
+  padding: 10px 6px;
+  cursor: pointer;
+  text-align: center;
+  color: var(--cav2-tinta);
+  transition: border-color 0.2s ease, transform 0.15s ease;
+}
+
+.cav2-ficha:active { transform: scale(0.97); }
+
+.cav2-ficha-activa {
+  border-color: var(--cav2-verde);
+  background: #f1f8ec;
+  box-shadow: 0 0 0 3px rgba(62, 142, 76, 0.2);
+}
+
+.cav2-ficha-vieja {
+  opacity: 0.75;
+  background: #f4f3ee;
+}
+
+.cav2-ficha-animal {
+  width: 64px;
+  height: 60px;
   display: grid;
   place-items: center;
 }
 
-.casita-scaffold {
-  font-size: 1.1rem;
+.cav2-ficha-animal .cav2-animal {
+  width: 64px;
+  height: 60px;
+}
+
+/* En las fichas chicas los animalitos no se mueven (ruido visual). */
+.cav2-ficha .cav2-cuerpo-flotante,
+.cav2-ficha .cav2-ala {
+  animation: none;
+}
+
+.cav2-ficha-nombre {
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.cav2-ficha-rol {
+  font-size: 0.68rem;
+  color: var(--cav2-tinta-suave);
+  line-height: 1.2;
+}
+
+.cav2-ficha-marca {
+  font-size: 0.66rem;
+  font-weight: 900;
+  color: #fff;
+  background: var(--cav2-verde);
+  border-radius: 999px;
+  padding: 2px 8px;
+  margin-top: 2px;
+}
+
+/* ============ Pie ============ */
+.cav2-pie {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.cav2-pie p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--cav2-tinta-suave);
+  line-height: 1.4;
+}
+
+/* ============ Accesibilidad y pantallas ============ */
+.cav2-boton-hice:focus-visible,
+.cav2-ficha:focus-visible {
+  outline: 3px solid var(--cav2-acento);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cav2-cuerpo-flotante,
+  .cav2-ala,
+  .cav2-brinca .cav2-animal,
+  .cav2-puesto-pop {
+    animation: none !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .cav2-selector { grid-template-columns: repeat(2, 1fr); }
+  .cav2-puestos { grid-template-columns: repeat(4, 1fr); }
+  .cav2-tarea-lado { min-width: 96px; }
 }
