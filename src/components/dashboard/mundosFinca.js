@@ -79,6 +79,17 @@ export const MUNDOS_FINCA = [
         directo: { view: 'cafe' },
     },
     {
+        id: 'cana',
+        titulo: 'La caña y la panela',
+        emoji: '🥮',
+        lema: 'De la caña al bloque: variedad, siembra, barrenador, corte y la panela en el trapiche',
+        tinte: ['#8a5a1f', '#f3e3c2'],
+        // Mundo de una sola pantalla (photo-forward, 5 estaciones: la caña /
+        // siembra y manejo / plagas / corte / la panela). Cultura panelera
+        // colombiana. La tarjeta navega directo, sin pantalla intermedia.
+        directo: { view: 'cana' },
+    },
+    {
         id: 'suelo',
         titulo: 'El suelo vivo',
         emoji: '🌱',
