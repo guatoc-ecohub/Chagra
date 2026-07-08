@@ -173,7 +173,7 @@ const FOTOS = {
 
 /* ════════════════════════════════════════════════════════════════════ */
 
-function Card({ children, className = '', style }) {
+function Card({ children, className = '', style = {} }) {
   return (
     <section
       style={style}
