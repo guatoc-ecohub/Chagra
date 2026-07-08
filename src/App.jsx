@@ -290,6 +290,9 @@ const MundoSubsuelo = lazy(() => import('./components/juego/MundoSubsuelo'));
 // Modo extensionista (panel supervisor multi-finca, ADR-048 MVP). Gateado por
 // feature flag VITE_FEATURE_EXTENSIONISTA + rol (ver config/extensionistaAccess).
 const ExtensionistaScreen = lazy(() => import('./components/ExtensionistaScreen'));
+// MOCKUP dev (sin gate): "El Espíritu de tu Finca" en tema verde vivo
+// (AVATAR_GAME.md) — dirección visual del juego final. Ruta #/mockups/avatar-verde-vivo.
+const AvatarGameVerdeVivo = lazy(() => import('./mockups/AvatarGameVerdeVivo'));
 import HomeRegionalGreeting from './components/HomeRegionalGreeting';
 import { fincaVivaHomePerfilActivo } from './config/fincaVivaHomeFlag';
 import { esExtensionistaActual } from './config/extensionistaAccess';
@@ -530,6 +533,8 @@ const HASH_VIEW_ROUTES = {
   cosechar: 'cosechar',
   'mi-cosecha': 'mi_cosecha',
   micosecha: 'mi_cosecha',
+  // Mockup dev de dirección visual (AVATAR_GAME.md), sin gate.
+  'mockups/avatar-verde-vivo': 'mockup_avatar_verde_vivo',
 };
 
 // Vistas que cuentan como "módulo" para telemetría de piloto.
@@ -821,6 +826,13 @@ export default function App() {
       return;
     }
 
+    // Mockup dev de dirección visual (#/mockups/avatar-verde-vivo): pública y
+    // sin gate — solo datos de muestra, cero datos del usuario.
+    if (hash === 'mockups/avatar-verde-vivo') {
+      Promise.resolve().then(() => navigate('mockup_avatar_verde_vivo'));
+      return;
+    }
+
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
         navigate('login');
@@ -849,6 +861,11 @@ export default function App() {
       const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
       const routeView = HASH_VIEW_ROUTES[hash];
       if (!routeView) return;
+      // Mockup dev (sin gate ni auth): solo datos de muestra.
+      if (routeView === 'mockup_avatar_verde_vivo') {
+        navigate(routeView);
+        return;
+      }
       // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
       if (routeView === 'extensionista' && !esExtensionistaActual()) {
         navigate('dashboard');
@@ -1210,6 +1227,15 @@ export default function App() {
                 onBack={() => navigate('juego')}
                 onHome={() => navigate('dashboard')}
               />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_avatar_verde_vivo':
+        // Mockup dev "El Espíritu de tu Finca" (verde vivo), sin gate.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup avatar verde vivo">
+              <AvatarGameVerdeVivo onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
