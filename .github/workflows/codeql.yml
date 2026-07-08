@@ -40,6 +40,14 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           queries: security-extended,security-and-quality
+          # Tooling dev-only del wake-word (genera/entrena el modelo offline a mano,
+          # NUNCA corre en prod ni va al bundle) + smoke e2e: excluidos del análisis
+          # de seguridad — sus "alertas" (log/path-injection sobre args de un script
+          # local, unused-var en un smoke) son ruido de dev, no superficie de prod.
+          config: |
+            paths-ignore:
+              - 'scripts/wake-word/**'
+              - 'tests/e2e-real/**'
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@v3
