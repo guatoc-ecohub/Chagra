@@ -187,6 +187,13 @@
   stroke-width: 0.8;
 }
 .portal-geo polygon { stroke: rgba(var(--esc-alt-rgb), 0.22); stroke-width: 0.6; }
+/* Cada estado tiene su HÉROE: al oír, la voz manda y el astrolabio se retira
+ * al fondo; al pensar, la geometría es la protagonista y sube a plena luz. */
+.portal-geo, .portal-ticks { opacity: 0.5; transition: opacity 0.45s ease; }
+.escucha-overlay[data-fase="pensando"] .portal-geo,
+.escucha-overlay[data-fase="pensando"] .portal-ticks,
+.escucha-overlay[data-fase="rumbo"] .portal-geo,
+.escucha-overlay[data-fase="rumbo"] .portal-ticks { opacity: 1; }
 .portal-geo-a { animation: portal-gira 80s linear infinite; }
 .portal-geo-b { animation: portal-gira-rev 110s linear infinite; }
 .escucha-overlay[data-fase="pensando"] .portal-geo-a { animation: portal-recompone-a 5s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
@@ -221,23 +228,23 @@
 .escucha-overlay[data-fase="error"] .portal-motas { animation-play-state: paused; }
 
 /* El aro-oscilo: la voz hecha anillo (historia real de amplitud) + su eco
- * espectral apenas girado — la firma "de otra dimensión". */
+ * espectral apenas girado — la firma "de otra dimensión". Un relleno tenue
+ * lo vuelve una MEMBRANA de luz viva, no una simple línea. */
 .portal-oscilo {
   stroke: rgb(var(--esc-energia-rgb));
-  stroke-width: 2;
+  stroke-width: 2.2;
   stroke-linejoin: round;
-  fill: none;
-  opacity: 0.95;
+  fill: rgba(var(--esc-energia-rgb), 0.06);
 }
 .portal-oscilo-eco {
   stroke: rgb(var(--esc-alt-rgb));
-  stroke-width: 1.2;
+  stroke-width: 1.4;
   stroke-linejoin: round;
   fill: none;
-  opacity: 0.4;
+  opacity: 0.45;
   transform-box: view-box;
   transform-origin: center;
-  transform: rotate(4deg);
+  transform: rotate(5deg);
 }
 
 /* Pensando: anillo de proceso orbitando el núcleo (un cometa de luz). */
@@ -250,16 +257,18 @@
   animation: portal-gira 1.5s linear infinite;
 }
 
-/* Sello de silencio: el umbral cerrándose (dato real del conteo). */
+/* Sello de silencio: el umbral cerrándose (dato real del conteo). Es la LUZ
+ * de la presencia recogiéndose — línea fina del acento (no un aro de sistema
+ * grueso) con un halo suave; se lee "ya casi termino de oír", no "cargando". */
 .portal-sello {
-  stroke: rgb(var(--esc-ink-rgb));
-  stroke-width: 2.5;
-  opacity: 0.95;
+  stroke: rgb(var(--esc-energia-rgb));
+  stroke-width: 1.8;
+  opacity: 0.92;
   transition: stroke-dashoffset 0.15s linear;
 }
 .portal-sello-halo {
-  stroke: rgba(var(--esc-energia-rgb), 0.4);
-  stroke-width: 7;
+  stroke: rgba(var(--esc-energia-rgb), 0.22);
+  stroke-width: 5;
   transition: stroke-dashoffset 0.15s linear;
 }
 
@@ -282,6 +291,18 @@
     0 0 26px rgba(var(--esc-energia-rgb), 0.35),
     inset 0 0 20px rgba(var(--esc-energia-rgb), 0.16);
   transition: transform 0.1s ease-out;
+}
+/* Franja cromática: un aro violeta apenas desplazado sobre el borde de
+ * energía — aberración de otra dimensión, la señal "no es de este plano". */
+.portal-nucleo::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--esc-alt-rgb), 0.5);
+  transform: translateX(1.5px);
+  pointer-events: none;
+  mix-blend-mode: screen;
 }
 .portal-corazon {
   position: absolute;

@@ -131,7 +131,7 @@ function pathOscilo(historia) {
   for (let k = 0; k < N_OSC; k++) {
     const v = k < falta ? 0 : (m[k - falta] || 0);
     const a = (k / N_OSC) * Math.PI * 2 - Math.PI / 2;
-    const r = 52 + v * 20;
+    const r = 50 + v * 26;
     const x = (CV + Math.cos(a) * r).toFixed(1);
     const y = (CV + Math.sin(a) * r).toFixed(1);
     d += (k === 0 ? 'M' : 'L') + x + ' ' + y;
