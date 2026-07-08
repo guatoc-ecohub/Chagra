@@ -6,8 +6,10 @@ import { useState } from 'react';
 import {
   ChevronLeft, Sprout, Sun, Droplets, Mountain, Bug, ShieldCheck,
   Leaf, Ban, Scissors, Package, Camera, Info, FlaskConical, ArrowRight, Users,
+  Recycle,
 } from 'lucide-react';
 import { HORTALIZAS, getHortaliza, tieneDato, DATO_EN_CAMINO } from '../services/hortalizasData';
+import './hortalizas-vivo.css';
 
 /**
  * HortalizasScreen — mini-app "Hortalizas de la huerta" (mundo Cultivos y semillas).
@@ -156,7 +158,7 @@ export default function HortalizasScreen({ onBack, onNavigate }) {
           type="button"
           onClick={volver}
           aria-label="Volver"
-          className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center shrink-0"
+          className="hz-focus w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center shrink-0"
         >
           <ChevronLeft size={20} />
         </button>
@@ -179,14 +181,44 @@ export default function HortalizasScreen({ onBack, onNavigate }) {
 
 /* ─────────────────────────────────── Hub ─────────────────────────────────── */
 function Hub({ onSel }) {
+  /* Familias presentes en la huerta — la vuelta completa de la rotación. */
+  const familias = [...new Set(HORTALIZAS.map((h) => h.familia))];
+  const heroCredito = FOTOS['lechuga'];
   return (
     <div className="flex flex-col gap-4">
-      {/* Gancho: la huerta como despensa de la casa */}
-      <section className="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
-        <Foto slug="lechuga" ratio="aspect-[16/9]" className="rounded-none border-0 border-b border-slate-800" />
+      {/* Hero: la huerta como despensa de la casa, con el título sobre la foto */}
+      <section className="hz-in rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden" style={{ '--hz-i': 0 }}>
+        <figure className="hz-hero relative overflow-hidden border-b border-slate-800 bg-slate-800">
+          <img
+            src="/hortalizas/lechuga.jpg"
+            alt={heroCredito.alt}
+            className="w-full aspect-[16/10] object-cover"
+          />
+          {/* Velo de tierra: legible al sol sin tapar la foto */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/30 to-transparent" aria-hidden="true" />
+          <div className="absolute inset-x-0 bottom-6 px-4 pb-1.5">
+            <p className="text-[11px] uppercase tracking-[0.2em] font-bold text-emerald-300">
+              Cultivos y semillas
+            </p>
+            <p className="mt-0.5 text-[22px] font-extrabold text-white leading-tight drop-shadow">
+              La huerta de la casa
+            </p>
+          </div>
+          <figcaption className="absolute inset-x-0 bottom-0 bg-slate-950/82 px-2 py-1 backdrop-blur-sm">
+            <a
+              href={heroCredito.fuenteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 truncate text-[9px] text-slate-300 underline decoration-slate-600 underline-offset-2"
+              title={`${heroCredito.autor} · ${heroCredito.licencia} · Wikimedia Commons`}
+            >
+              <Camera size={9} className="shrink-0" aria-hidden="true" />
+              <span className="truncate">Foto: {heroCredito.autor} · {heroCredito.licencia} · Wikimedia</span>
+            </a>
+          </figcaption>
+        </figure>
         <div className="px-4 pt-3 pb-4">
-          <p className="text-[13px] uppercase tracking-wide font-bold text-slate-400">La huerta de la casa</p>
-          <p className="mt-1 text-[15px] text-slate-100 leading-snug">
+          <p className="text-[15px] text-slate-100 leading-snug">
             Ocho hortalizas de la olla campesina, cada una con su ficha de cultivo:
             <span className="font-bold text-emerald-300"> siembra, agua, vecinas, plagas y cosecha</span>.
           </p>
@@ -194,34 +226,89 @@ function Hub({ onSel }) {
             Las buenas y malas vecinas, y las plagas con su manejo agroecológico, salen del
             grafo de la finca. Donde todavía no hay dato, se lo decimos claro — sin inventar.
           </p>
+          {/* Cómo leer las eras: la estaca de cada tarjeta dice cómo se siembra */}
+          <div className="mt-3 flex flex-wrap gap-1.5" aria-label="Guía de las tarjetas">
+            <span className="inline-flex items-center gap-1 text-[11px] rounded-full border border-slate-700 bg-slate-950/60 px-2 py-0.5 text-slate-300">
+              <Sprout size={11} className="text-emerald-400" aria-hidden="true" /> Directa: a la era
+            </span>
+            <span className="inline-flex items-center gap-1 text-[11px] rounded-full border border-slate-700 bg-slate-950/60 px-2 py-0.5 text-slate-300">
+              <Leaf size={11} className="text-lime-400" aria-hidden="true" /> Semillero: y trasplante
+            </span>
+            <span className="inline-flex items-center gap-1 text-[11px] rounded-full border border-slate-700 bg-slate-950/60 px-2 py-0.5 text-slate-300">
+              <Recycle size={11} className="text-amber-400" aria-hidden="true" /> Rotación: por familia
+            </span>
+          </div>
         </div>
       </section>
 
-      {/* Grilla de hortalizas — photo-forward */}
+      {/* Grilla de eras — photo-forward, cada tarjeta con su estaca de siembra */}
       <div className="grid grid-cols-2 gap-3">
-        {HORTALIZAS.map((h) => {
+        {HORTALIZAS.map((h, i) => {
           const c = COLOR_MAP[h.accent] || COLOR_MAP.slate;
+          const nVecinas = (h.vecinasBuenas?.length || 0) + (h.vecinasMalas?.length || 0);
+          const nPlagas = h.plagas?.length || 0;
           return (
             <button
               key={h.id}
               type="button"
               data-testid={`hortaliza-${h.id}`}
               onClick={() => onSel(h.id)}
-              className={`group text-left rounded-2xl border ${c.border} bg-slate-900/60 overflow-hidden hover:bg-slate-900 transition-colors`}
+              style={{ '--hz-i': i + 1 }}
+              className={`hz-card hz-in group text-left rounded-2xl border ${c.border} bg-slate-900/60 overflow-hidden hover:bg-slate-900`}
             >
-              <Foto slug={h.foto} ratio="aspect-[4/3]" className="rounded-none border-0" />
+              <div className="relative">
+                <Foto slug={h.foto} ratio="aspect-[4/3]" className="rounded-none border-0" />
+                {/* Estaca de la era: cómo se siembra, de un vistazo */}
+                <span className={`absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-slate-950/85 px-2 py-0.5 text-[10px] font-bold ${c.text}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${c.dot}`} aria-hidden="true" />
+                  {h.siembraTipo}
+                </span>
+              </div>
               <div className="px-3 pt-2 pb-3">
                 <p className="text-[15px] font-bold text-white leading-tight">
                   <span aria-hidden="true">{h.emoji}</span> {h.nombre}
                 </p>
                 <p className="mt-0.5 text-[11px] text-slate-400 leading-snug line-clamp-2">{h.resumen}</p>
+                {/* Pie de era: familia (rotación) + qué trae del grafo */}
+                <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <span className="text-[10px] rounded-full border border-slate-800 px-1.5 py-px text-slate-500">{h.familia}</span>
+                  {nVecinas > 0 && (
+                    <span className="inline-flex items-center gap-0.5 text-[10px] text-emerald-400/90">
+                      <Users size={10} aria-hidden="true" /> {nVecinas} vecinas
+                    </span>
+                  )}
+                  {nPlagas > 0 && (
+                    <span className="inline-flex items-center gap-0.5 text-[10px] text-rose-400/90">
+                      <Bug size={10} aria-hidden="true" /> {nPlagas} {nPlagas === 1 ? 'plaga' : 'plagas'}
+                    </span>
+                  )}
+                </div>
               </div>
             </button>
           );
         })}
       </div>
 
-      <p className="text-[11px] text-slate-500 leading-relaxed">
+      {/* Rotación de eras: la vuelta que descansa el suelo y despista plagas */}
+      <section
+        className="hz-in rounded-2xl border border-amber-700/40 bg-amber-950/20 overflow-hidden"
+        style={{ '--hz-i': HORTALIZAS.length + 1 }}
+      >
+        <div className="px-4 pt-3 pb-4">
+          <h2 className="text-[13px] uppercase tracking-wide font-bold flex items-center gap-1.5 text-amber-300">
+            <Recycle size={15} aria-hidden="true" /> Rote la era cada cosecha
+          </h2>
+          <p className="mt-2 text-sm text-slate-200 leading-relaxed">
+            No repita familia en la misma era el ciclo siguiente: cambie de puesto entre{' '}
+            <span className="font-semibold text-amber-200">{familias.join(' · ')}</span>.
+            Así el suelo descansa y las plagas de cada familia pierden la pista.
+          </p>
+          <p className="mt-1.5 text-[10px] text-slate-500">Práctica de huerta casera — SENA / Agrosavia / ICA.</p>
+        </div>
+        <HuertaIlustracion />
+      </section>
+
+      <p className="hz-in text-[11px] text-slate-500 leading-relaxed" style={{ '--hz-i': HORTALIZAS.length + 2 }}>
         Fotos con licencia Creative Commons (autor + licencia visibles). Datos de cultivo:
         huerta casera SENA / Agrosavia / ICA. Vecinas y plagas: grafo Chagra.
       </p>
@@ -232,10 +319,12 @@ function Hub({ onSel }) {
 /* ─────────────────────────── Ficha de una hortaliza ─────────────────────────── */
 function Ficha({ h, onNavigate }) {
   const c = COLOR_MAP[h.accent] || COLOR_MAP.slate;
+  /* Rotación: las demás familias de la huerta, para relevar esta era. */
+  const otrasFamilias = [...new Set(HORTALIZAS.filter((x) => x.familia !== h.familia).map((x) => x.familia))];
   return (
     <div className="flex flex-col gap-4">
       {/* Portada */}
-      <section className="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+      <section className="hz-in rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden" style={{ '--hz-i': 0 }}>
         <Foto slug={h.foto} ratio="aspect-[16/9]" className="rounded-none border-0 border-b border-slate-800" />
         <div className="px-4 pt-3 pb-4">
           <p className="text-xl font-bold text-white leading-tight">
@@ -244,32 +333,45 @@ function Ficha({ h, onNavigate }) {
           <p className={`mt-0.5 text-xs italic ${c.text}`}>{h.cientifico}</p>
           {h.variedades && <p className="mt-1 text-[12px] text-slate-400">Variedades: {h.variedades}</p>}
           <p className="mt-2 text-sm text-slate-200 leading-relaxed">{h.resumen}</p>
+          {/* La estaca y la familia, de un vistazo */}
+          <div className="mt-2.5 flex flex-wrap gap-1.5">
+            <span className={`inline-flex items-center gap-1 text-[11px] font-bold rounded-full border ${c.border} ${c.bg} px-2 py-0.5 ${c.text}`}>
+              <Sprout size={11} aria-hidden="true" /> {h.siembraTipo}
+            </span>
+            <span className="inline-flex items-center gap-1 text-[11px] rounded-full border border-slate-700 bg-slate-950/60 px-2 py-0.5 text-slate-300">
+              <Recycle size={11} aria-hidden="true" /> Familia: {h.familia}
+            </span>
+          </div>
         </div>
       </section>
 
       {/* Siembra */}
-      <Bloque icon={Sprout} accent={c} titulo="Siembra">
+      <Bloque icon={Sprout} accent={c} titulo="Siembra" orden={1}>
         <Dato etiqueta="Cómo" valor={h.siembra.metodo} />
         <Dato etiqueta="Distancia" valor={h.siembra.distancia} />
         <Dato etiqueta="Profundidad" valor={h.siembra.profundidad} />
+        <Dato
+          etiqueta="Rotación"
+          valor={`Es de la familia de las ${h.familia.toLowerCase()}: el próximo ciclo siembre en esta era otra familia (${otrasFamilias.join(', ').toLowerCase()}).`}
+        />
       </Bloque>
 
       {/* Clima: luz / agua / piso térmico */}
-      <Bloque icon={Sun} accent={c} titulo="Luz, agua y piso térmico">
+      <Bloque icon={Sun} accent={c} titulo="Luz, agua y piso térmico" orden={2}>
         <FilaIcono icon={Sun} texto={h.clima.luz} />
         <FilaIcono icon={Droplets} texto={h.clima.agua} />
         <FilaIcono icon={Mountain} texto={h.clima.piso} />
       </Bloque>
 
       {/* Vecinas (grafo) */}
-      <Bloque icon={Users} accent={c} titulo="Con quién se lleva">
+      <Bloque icon={Users} accent={c} titulo="Con quién se lleva" orden={3}>
         <Vecinas titulo="Buenas vecinas" icon={Leaf} tono="emerald" lista={h.vecinasBuenas} />
         <Vecinas titulo="Malas vecinas" icon={Ban} tono="rose" lista={h.vecinasMalas} />
         <p className="mt-1 text-[10px] text-slate-500">Fuente: {h.fuentes.relaciones}</p>
       </Bloque>
 
       {/* Plagas y manejo agroecológico (grafo) */}
-      <Bloque icon={Bug} accent={c} titulo="Plagas y manejo sin veneno">
+      <Bloque icon={Bug} accent={c} titulo="Plagas y manejo sin veneno" orden={4}>
         {tieneDato(h.plagas) ? (
           <div className="flex flex-col gap-2">
             {h.plagas.map((p) => (
@@ -304,7 +406,7 @@ function Ficha({ h, onNavigate }) {
             <button
               type="button"
               onClick={() => onNavigate?.('biopreparados', { back: 'dashboard' })}
-              className="mt-2 inline-flex items-center gap-1 text-[13px] text-emerald-300 underline underline-offset-2"
+              className="hz-link mt-2 inline-flex items-center gap-1 text-[13px] text-emerald-300 underline underline-offset-2"
             >
               <FlaskConical size={13} aria-hidden="true" /> Ver las recetas paso a paso
               <ArrowRight size={12} aria-hidden="true" />
@@ -318,25 +420,25 @@ function Ficha({ h, onNavigate }) {
       </Bloque>
 
       {/* Cosecha */}
-      <Bloque icon={Scissors} accent={c} titulo="Cosecha">
+      <Bloque icon={Scissors} accent={c} titulo="Cosecha" orden={5}>
         <p className="text-sm text-slate-200 leading-relaxed">{h.cosecha}</p>
         <p className="mt-1 text-[10px] text-slate-500">Fuente: {h.fuentes.cosecha}</p>
       </Bloque>
 
       {/* Conservación */}
-      <Bloque icon={Package} accent={c} titulo="Conservación">
+      <Bloque icon={Package} accent={c} titulo="Conservación" orden={6}>
         <p className="text-sm text-slate-200 leading-relaxed">{h.conservacion}</p>
         <button
           type="button"
           onClick={() => onNavigate?.('almacenamiento')}
-          className="mt-2 inline-flex items-center gap-1 text-[13px] text-sky-300 underline underline-offset-2"
+          className="hz-link mt-2 inline-flex items-center gap-1 text-[13px] text-sky-300 underline underline-offset-2"
         >
           <Package size={13} aria-hidden="true" /> Guardar y conservar sin que se dañe
           <ArrowRight size={12} aria-hidden="true" />
         </button>
       </Bloque>
 
-      <p className="text-[11px] text-slate-500 leading-relaxed">
+      <p className="hz-in text-[11px] text-slate-500 leading-relaxed" style={{ '--hz-i': 7 }}>
         Ficha de cultivo: {h.fuentes.cultivo} · Los datos que aún no están en el grafo
         se muestran como "dato en camino".
       </p>
@@ -345,9 +447,9 @@ function Ficha({ h, onNavigate }) {
 }
 
 /* ─────────────────────────────── Piezas de UI ─────────────────────────────── */
-function Bloque({ icon: Icono, accent, titulo, children }) {
+function Bloque({ icon: Icono, accent, titulo, orden = 0, children }) {
   return (
-    <section className={`rounded-2xl border ${accent.border} ${accent.bg} px-4 pt-3 pb-4`}>
+    <section className={`hz-in rounded-2xl border ${accent.border} ${accent.bg} px-4 pt-3 pb-4`} style={{ '--hz-i': orden }}>
       <h2 className={`text-[13px] uppercase tracking-wide font-bold flex items-center gap-1.5 ${accent.text}`}>
         <Icono size={15} aria-hidden="true" /> {titulo}
       </h2>
