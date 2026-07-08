@@ -713,6 +713,57 @@
   .pc-drops path { animation: none; opacity: 0.6; }
 }
 
+/* ── Poscosecha · 2ª pasada visual ───────────────────────────────────────────
+ * Microinteracciones del cuaderno de la despensa. Solo transform y opacity
+ * (GPU-friendly, sin filter/blur animado); reusa los keyframes ss-enter-in /
+ * ss-rise-in de Salud del Suelo. Todo se apaga con prefers-reduced-motion. */
+
+/* Entrada de cada pilar al navegar (el wrapper lleva key={pilar}). */
+.pc-enter { animation: ss-enter-in 0.35s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+
+/* Aparición escalonada de tarjetas (delay por --d inline). */
+.pc-rise { animation: ss-rise-in 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) var(--d, 0s) both; }
+
+/* Resultado de calculadora que "aterriza" al aparecer. */
+.pc-pop { animation: pc-pop-in 0.32s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+@keyframes pc-pop-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Superficie táctil viva: leve lift en hover, asiento en active y foco
+ * accesible visible con el acento del tema. */
+.pc-tap { transition: transform 0.18s ease, border-color 0.18s ease; }
+@media (hover: hover) {
+  .pc-tap:hover { transform: translateY(-2px); }
+  .pc-tap:hover .pc-chev { transform: translateX(3px); }
+  .pc-card:hover .pc-photo { transform: scale(1.05); }
+}
+.pc-tap:active { transform: translateY(0) scale(0.99); }
+.pc-tap:focus-visible,
+.pc-focus:focus-visible {
+  outline: 2px solid rgb(var(--t-accent-rgb));
+  outline-offset: 2px;
+}
+.pc-chev { transition: transform 0.2s ease; }
+
+/* Fotos de tarjeta: zoom lentísimo al pasar el mouse (solo con hover). */
+.pc-photo { transition: transform 0.7s cubic-bezier(0.2, 0.6, 0.2, 1); }
+
+/* Entradas del cuaderno: foco con el acento del tema en vez del gris. */
+.pc-input:focus {
+  outline: none;
+  border-color: rgb(var(--t-accent-rgb) / 0.7);
+  box-shadow: 0 0 0 3px rgb(var(--t-accent-rgb) / 0.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pc-enter, .pc-rise, .pc-pop { animation: none; opacity: 1; transform: none; }
+  .pc-tap, .pc-chev, .pc-photo { transition: none; }
+  .pc-tap:hover, .pc-tap:active { transform: none; }
+  .pc-card:hover .pc-photo { transform: none; }
+}
+
 /* ===========================================================================
  * ALMACENAMIENTO Y CONSERVACIÓN — el sol respira sobre el silo hermético
  * (AlmacenamientoScreen). Sutil e infinito muy lento; se apaga con
