@@ -1836,6 +1836,9 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Frutales de la finca">
               <FrutalesScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'cana':
         // Mundo "La caña y la panela" (5 estaciones: la caña / siembra y manejo /
         // plagas / corte / la panela). Photo-forward con fotos CC y groundeado en
@@ -1846,6 +1849,9 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="La caña y la panela">
               <CanaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'quinua':
         // Mundo "Quinua y granos andinos" (dentro de Cultivos y semillas):
         // recuperación de granos ancestrales alto-andinos. 5 estaciones photo-
