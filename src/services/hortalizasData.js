@@ -37,12 +37,22 @@ export const FUENTES = {
 /** Texto único para cualquier campo que el grafo todavía no respalda. */
 export const DATO_EN_CAMINO = 'Dato en camino: el grafo aún no tiene este dato para esta hortaliza.';
 
+/* Cada hortaliza declara además:
+ *  - familia: familia botánica en su nombre hortelano común (taxonomía estándar,
+ *    verificable por el nombre científico). Es la base de la ROTACIÓN de eras:
+ *    no repetir familia en la misma era el ciclo siguiente (práctica estándar
+ *    de huerta casera — SENA / Agrosavia / ICA).
+ *  - siembraTipo: etiqueta corta del método de siembra, restatement literal de
+ *    siembra.metodo ('Semillero' | 'Siembra directa' | 'Colino' | mixto). */
+
 /**
  * Las hortalizas de la huerta. Cada una es una ficha didáctica de CULTIVO.
  */
 export const HORTALIZAS = [
   {
     id: 'tomate',
+    familia: 'Solanáceas',
+    siembraTipo: 'Semillero',
     nombre: 'Tomate',
     variedades: 'Chonto, aliño, milano, cherry',
     cientifico: 'Solanum lycopersicum',
@@ -75,6 +85,8 @@ export const HORTALIZAS = [
   },
   {
     id: 'cebolla-larga',
+    familia: 'Aliáceas',
+    siembraTipo: 'Colino',
     nombre: 'Cebolla larga',
     variedades: 'Cebolla de rama, cebollín (Allium fistulosum)',
     cientifico: 'Allium fistulosum',
@@ -107,6 +119,8 @@ export const HORTALIZAS = [
   },
   {
     id: 'cebolla-bulbo',
+    familia: 'Aliáceas',
+    siembraTipo: 'Semillero o directa',
     nombre: 'Cebolla de bulbo',
     variedades: 'Cebolla cabezona, ocañera, roja',
     cientifico: 'Allium cepa',
@@ -144,6 +158,8 @@ export const HORTALIZAS = [
   },
   {
     id: 'zanahoria',
+    familia: 'Apiáceas',
+    siembraTipo: 'Siembra directa',
     nombre: 'Zanahoria',
     variedades: 'Chantenay, Nantes',
     cientifico: 'Daucus carota subsp. sativus',
@@ -172,6 +188,8 @@ export const HORTALIZAS = [
   },
   {
     id: 'repollo',
+    familia: 'Crucíferas',
+    siembraTipo: 'Semillero',
     nombre: 'Repollo',
     variedades: 'Blanco, morado, corazón de buey',
     cientifico: 'Brassica oleracea var. capitata',
@@ -200,6 +218,8 @@ export const HORTALIZAS = [
   },
   {
     id: 'lechuga',
+    familia: 'Asteráceas',
+    siembraTipo: 'Semillero',
     nombre: 'Lechuga',
     variedades: 'Crespa, batavia, romana, cogollo',
     cientifico: 'Lactuca sativa',
@@ -228,6 +248,8 @@ export const HORTALIZAS = [
   },
   {
     id: 'cilantro',
+    familia: 'Apiáceas',
+    siembraTipo: 'Siembra directa',
     nombre: 'Cilantro',
     variedades: 'Cilantro común (la semilla seca es el coriandro)',
     cientifico: 'Coriandrum sativum',
@@ -255,6 +277,8 @@ export const HORTALIZAS = [
   },
   {
     id: 'remolacha',
+    familia: 'Amarantáceas',
+    siembraTipo: 'Siembra directa',
     nombre: 'Remolacha',
     variedades: 'Remolacha de mesa, roja',
     cientifico: 'Beta vulgaris',
@@ -282,6 +306,8 @@ export const HORTALIZAS = [
   },
   {
     id: 'acelga',
+    familia: 'Amarantáceas',
+    siembraTipo: 'Directa o semillero',
     nombre: 'Acelga',
     variedades: 'Acelga verde, de penca blanca y de colores',
     cientifico: 'Beta vulgaris var. cicla',
