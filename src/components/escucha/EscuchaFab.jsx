@@ -1,27 +1,22 @@
 /**
- * EscuchaFab — la SEMILLA EN REPOSO: botón flotante que activa la escucha
- * manos libres. (Hoy deshabilitado en App — el trigger vivo es el wake-word
- * "hola Chagra"; ambos llaman `activarEscucha()` y el widget no distingue.)
+ * EscuchaFab — botón flotante persistente que activa la escucha manos libres.
  *
- * Visual: mismo organismo que el overlay ("la semilla que despierta") pero
- * dormido — una semilla bioluminiscente con membranas que mutan despacio,
- * un corazón que late lub-dub como luciérnaga lejana, y raicillas que ya
- * agarraron tierra donde vive. Al tocarla, germina (abre el overlay).
+ * Es el trigger de HOY (tap). El de MAÑANA es el wake-word "hola Chagra":
+ * ambos llaman `activarEscucha()` (escuchaService) — el widget no distingue.
  *
- * Tamaño guante (62px), abajo-izquierda (espejo del AgentFab colibrí).
- * Acento por --t-accent-rgb (indirección de temas).
+ * Diseño: "LA PRESENCIA" en miniatura — un mini-portal de espacio profundo
+ * (mismo lenguaje del overlay): el marco lleva el acento del tema (Chagra),
+ * adentro un núcleo de luz suspendido LEVITA con dos motas en órbita, y el
+ * micrófono flota sobre la luz. Un pulso de presencia se dilata cada 4s
+ * ("aquí se habla" sin fastidiar; apagado con prefers-reduced-motion).
+ * Vive ABAJO A LA IZQUIERDA (espejo del AgentFab), 62px tamaño guante.
  *
  * IMPORTANTE — español colombiano (tú/usted), NUNCA voseo argentino.
  */
 import React from 'react';
 import { Mic } from 'lucide-react';
 import { activarEscucha } from '../../services/escuchaService';
-import { blobPath } from './organico';
 import './escucha.css';
-
-/* Membranas de la semilla: deterministas (siempre la misma criatura). */
-const MEMBRANA_1 = blobPath(36, 36, 26, 2.2, 0.13);
-const MEMBRANA_2 = blobPath(36, 36, 30, 5.9, 0.11);
 
 export default function EscuchaFab() {
   return (
@@ -33,20 +28,27 @@ export default function EscuchaFab() {
       title="Manos libres: toque y hable — «lléveme al mercado» o pregunte lo que necesite"
       onClick={() => activarEscucha({ fuente: 'tap' })}
     >
-      <svg className="escucha-fab-vida" viewBox="0 0 72 72" aria-hidden="true">
-        <path className="escucha-fab-membrana esc-fm1" d={MEMBRANA_1} />
-        <path className="escucha-fab-membrana esc-fm2" d={MEMBRANA_2} />
-        {/* Raicillas: la semilla ya agarró tierra donde vive. */}
-        <g className="escucha-fab-raicillas">
-          <path d="M28 60 C 26 65, 21 66, 17 70" />
-          <path d="M36 62 C 36 66, 38 69, 37 72" />
-          <path d="M44 60 C 47 64, 52 65, 55 69" />
-        </g>
+      <span className="escucha-fab-pulso" aria-hidden="true" />
+      {/* El otro lado en miniatura: espacio + órbita + núcleo suspendido */}
+      <span className="escucha-fab-espacio" aria-hidden="true">
+        <span className="escucha-fab-orbita">
+          <span className="escucha-fab-mota escucha-fab-mota-a" />
+          <span className="escucha-fab-mota escucha-fab-mota-b" />
+        </span>
+        <span className="escucha-fab-nucleo" />
+      </span>
+      <Mic className="escucha-fab-mic" size={26} strokeWidth={2.4} aria-hidden="true" />
+      {/* La firma: un destello de 4 puntas — la Presencia deja su chispa */}
+      <svg
+        className="escucha-fab-destello"
+        width="14"
+        height="14"
+        viewBox="0 0 14 14"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path d="M7 0.5 L8.3 5.7 L13.5 7 L8.3 8.3 L7 13.5 L5.7 8.3 L0.5 7 L5.7 5.7 Z" />
       </svg>
-      <span className="escucha-fab-corazon" aria-hidden="true" />
-      <Mic size={26} strokeWidth={2.4} aria-hidden="true" />
-      {/* Una luciérnaga pasa de visita cada tanto. */}
-      <span className="escucha-fab-luci" aria-hidden="true" />
     </button>
   );
 }

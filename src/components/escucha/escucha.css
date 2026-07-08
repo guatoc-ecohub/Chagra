@@ -1,30 +1,35 @@
 /* ============================================================================
- * escucha.css — "LA SEMILLA QUE DESPIERTA" (escucha manos libres).
+ * escucha.css — Widget "Chagra está escuchando" (escucha manos libres).
  *
- * El widget NO es un botón: es una criatura bioluminiscente de bosque
- * nocturno. Membranas orgánicas que mutan a ritmos primos, un corazón que
- * late (lub-dub) con la mano de Chagra adentro, raíces de luz que crecen con
- * la voz REAL, luciérnagas ámbar, savia que fluye al pensar.
+ * Estética: "LA PRESENCIA" — el widget es un portal circular a otra
+ * dimensión. El MARCO es de Chagra (acento del tema, --t-accent-rgb); lo que
+ * hay ADENTRO no es de aquí: espacio profundo, un núcleo de luz suspendido
+ * (un OJO de energía), geometría sagrada que respira, y un campo de partículas
+ * que se ordena con la voz (RMS real). La carta alrededor sigue las reglas del
+ * app: papel del tema en temas claros (AA al sol), tinta legible, botones
+ * tamaño guante.
  *
- * DECISIÓN DE DISEÑO — la criatura trae su propia noche: la bioluminiscencia
- * solo existe en la oscuridad, así que el overlay es NOCHE DE MONTE en TODOS
- * los temas (tinta casi blanca sobre casi negro = contraste máximo, legible
- * a pleno sol). El acento bio sale de --t-accent-rgb con variante LUMINOSA
- * por tema (indirección CSS-var, nunca parche clase-por-clase); la luciérnaga
- * es ámbar cálido en todos los temas — el contrapunto de fuego frío/calor.
+ * Luz espectral de la Presencia (cian/violeta/blanco lunar): es SUYA, no del
+ * tema — la entidad trae su propia luz. El portal siempre es oscuro por
+ * dentro, así el contraste de la luz está garantizado en cualquier tema.
  *
- * PRESUPUESTO GPU: loops solo con transform/opacity; stroke-dashoffset va por
- * dato real (transición corta, no animación); CERO filter animado, cero deps.
+ * GPU-friendly: solo transform/opacity animados; nada de filter/blur en
+ * animación. prefers-reduced-motion → composición estática y legible.
  * ========================================================================== */
 
 .escucha-overlay {
-  /* --- Tokens de la noche ------------------------------------------------ */
-  --esc-noche-rgb: 3, 12, 10;        /* el negro-verde del monte a medianoche */
-  --esc-ink-rgb: 240, 253, 248;      /* tinta principal (casi blanca) */
-  --esc-dim-rgb: 152, 192, 177;      /* tinta secundaria */
-  --esc-bio-rgb: var(--t-accent-rgb);/* luz de la criatura (acento del tema) */
-  --esc-luci-rgb: 255, 209, 102;     /* luciérnagas: ámbar cálido, siempre */
-  --esc-cta-ink: #04231b;            /* tinta sobre el botón de acento */
+  /* Tokens del overlay (default = biopunk noche-bosque) */
+  --esc-bg-rgb: 4, 13, 11;          /* fondo del velo */
+  --esc-carta-rgb: 8, 22, 19;       /* superficie de la carta */
+  --esc-ink-rgb: 236, 253, 245;     /* tinta principal */
+  --esc-dim-rgb: 148, 187, 173;     /* tinta secundaria */
+  --esc-linea-rgb: var(--t-accent-rgb); /* acento del tema (marco/CTA) */
+  --esc-cta-ink: #04231b;           /* tinta sobre el botón de acento */
+
+  /* La luz de la Presencia (propia, no del tema) */
+  --pre-a-rgb: 120, 235, 255;       /* cian etéreo */
+  --pre-b-rgb: 178, 140, 255;       /* violeta */
+  --pre-w-rgb: 240, 250, 255;       /* blanco lunar */
 
   position: fixed;
   inset: 0;
@@ -36,30 +41,48 @@
   padding-bottom: max(16px, env(safe-area-inset-bottom));
 }
 
-/* Temas claros: la MISMA noche, pero la luz de la criatura sube a una
- * variante luminosa del acento del tema (el acento crudo es muy oscuro
- * para brillar sobre negro). Identidad del tema intacta, física correcta. */
-[data-theme="minimalista"] .escucha-overlay { --esc-bio-rgb: 96, 216, 172; }
-[data-theme="nature"] .escucha-overlay { --esc-bio-rgb: 255, 178, 106; --esc-cta-ink: #2b1a0a; }
-[data-theme="verde-vivo"] .escucha-overlay { --esc-bio-rgb: 110, 224, 122; }
+/* Error: la luz de la Presencia vira a ámbar (aviso sin gritar). */
+.escucha-overlay[data-fase="error"] {
+  --pre-a-rgb: 255, 200, 120;
+  --pre-b-rgb: 255, 145, 95;
+  --pre-w-rgb: 255, 244, 228;
+}
 
-/* --- El velo: noche de monte con esporas lejanas (estático, barato) ------ */
+/* Temas claros: papel del tema + tinta oscura (legible a pleno sol).
+ * El portal NO cambia: adentro siempre es el otro lado (oscuro). */
+[data-theme="minimalista"] .escucha-overlay {
+  --esc-bg-rgb: 246, 243, 236;
+  --esc-carta-rgb: 252, 250, 245;
+  --esc-ink-rgb: 24, 34, 29;
+  --esc-dim-rgb: 90, 106, 98;
+  --esc-cta-ink: #ffffff;
+}
+[data-theme="nature"] .escucha-overlay {
+  --esc-bg-rgb: 251, 245, 234;
+  --esc-carta-rgb: 254, 250, 242;
+  --esc-ink-rgb: 43, 33, 24;
+  --esc-dim-rgb: 122, 103, 82;
+  --esc-cta-ink: #2b1c10;
+}
+[data-theme="verde-vivo"] .escucha-overlay {
+  --esc-bg-rgb: 238, 243, 226;
+  --esc-carta-rgb: 248, 251, 240;
+  --esc-ink-rgb: 26, 38, 28;
+  --esc-dim-rgb: 84, 104, 88;
+  --esc-cta-ink: #ffffff;
+}
+
+/* Velo: casi opaco a propósito — al sol un velo translúcido no se lee. */
 .escucha-velo {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(1.5px 1.5px at 18% 22%, rgba(var(--esc-luci-rgb), 0.5), transparent 100%),
-    radial-gradient(1px 1px at 74% 14%, rgba(var(--esc-bio-rgb), 0.55), transparent 100%),
-    radial-gradient(1.5px 1.5px at 88% 46%, rgba(var(--esc-luci-rgb), 0.3), transparent 100%),
-    radial-gradient(1px 1px at 8% 64%, rgba(var(--esc-bio-rgb), 0.4), transparent 100%),
-    radial-gradient(1.5px 1.5px at 62% 84%, rgba(var(--esc-luci-rgb), 0.35), transparent 100%),
-    radial-gradient(1px 1px at 34% 92%, rgba(var(--esc-bio-rgb), 0.45), transparent 100%),
-    radial-gradient(ellipse 130% 90% at 50% 34%, rgba(var(--esc-bio-rgb), 0.09), transparent 62%),
-    radial-gradient(ellipse 160% 120% at 50% 118%, rgba(0, 0, 0, 0.55), transparent 55%),
-    rgb(var(--esc-noche-rgb));
+    radial-gradient(ellipse 120% 80% at 50% 30%, rgba(var(--pre-b-rgb), 0.08), transparent 60%),
+    rgba(var(--esc-bg-rgb), 0.96);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
-/* --- La carta: columna transparente — la criatura flota en la noche ------- */
 .escucha-carta {
   position: relative;
   width: min(100%, 420px);
@@ -69,328 +92,249 @@
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  padding: 18px 16px calc(14px + env(safe-area-inset-bottom));
+  padding: 22px 20px calc(18px + env(safe-area-inset-bottom));
+  border-radius: 28px;
+  background: rgba(var(--esc-carta-rgb), 0.92);
+  border: 1px solid rgba(var(--esc-linea-rgb), 0.35);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.45),
+    0 0 60px rgba(var(--pre-b-rgb), 0.14);
   color: rgb(var(--esc-ink-rgb));
-  animation: escucha-germina 0.5s cubic-bezier(0.22, 1.2, 0.36, 1) both;
+  animation: escucha-entra 0.28s cubic-bezier(0.34, 1.4, 0.64, 1) both;
 }
 
-@keyframes escucha-germina {
-  from { transform: translateY(18px) scale(0.94); opacity: 0; }
+@keyframes escucha-entra {
+  from { transform: translateY(24px) scale(0.96); opacity: 0; }
   to   { transform: translateY(0) scale(1); opacity: 1; }
 }
 
-/* --- Eyebrow: una luciérnaga anuncia ------------------------------------- */
+/* --- Eyebrow: "escucha activa" ------------------------------------------ */
 .escucha-eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: rgb(var(--esc-dim-rgb));
 }
 .escucha-punto {
-  width: 7px;
-  height: 7px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  background: rgb(var(--esc-luci-rgb));
-  box-shadow: 0 0 10px 2px rgba(var(--esc-luci-rgb), 0.55);
-  animation: escucha-parpadeo-luci 2.8s ease-out infinite;
+  background: rgb(var(--esc-linea-rgb));
+  box-shadow: 0 0 0 0 rgba(var(--esc-linea-rgb), 0.55);
+  animation: escucha-latido 1.6s ease-out infinite;
 }
-
-/* Parpadeo de luciérnaga real: encendido rápido, apagado lento. */
-@keyframes escucha-parpadeo-luci {
-  0%, 100% { opacity: 0.15; }
-  6%       { opacity: 1; }
-  40%      { opacity: 0.35; }
-  55%      { opacity: 0.9; }
-  90%      { opacity: 0.15; }
+@keyframes escucha-latido {
+  0%   { box-shadow: 0 0 0 0 rgba(var(--esc-linea-rgb), 0.55); }
+  70%  { box-shadow: 0 0 0 10px rgba(var(--esc-linea-rgb), 0); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--esc-linea-rgb), 0); }
 }
 
 /* ============================================================================
- * LA CRIATURA
- * Wrapper de 280px EXACTOS = unidades del viewBox (la savia usa offset-path
- * con coordenadas del path — deben coincidir 1:1 con los píxeles).
+ * EL PORTAL — la ventana circular al otro lado.
+ * Capas (atrás→adelante): espacio con estrellas · geometría sagrada · campo
+ * de partículas (caos⇄orden, deriva lenta) · espectro-mandala + sello ·
+ * núcleo de luz (ojo de energía) con la mano de Chagra en la pupila.
  * ========================================================================== */
-.escucha-criatura {
+.escucha-portal {
   position: relative;
-  width: 280px;
-  height: 280px;
+  width: 250px;
+  height: 250px;
   display: grid;
   place-items: center;
-  margin: -4px 0;
-  flex-shrink: 0;
+  margin: 2px 0;
 }
-.escucha-criatura svg {
+.escucha-portal > svg,
+.escucha-espacio > svg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+}
+
+/* El espacio profundo: siempre oscuro — la luz de adentro no es del tema.
+ * Doble marco: hilo del acento (Chagra) afuera, aliento cian en el borde. */
+.escucha-espacio {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 38%,
+    #141838 0%, #0b0d24 45%, #060713 76%, #030309 100%);
+  border: 1px solid rgba(var(--pre-a-rgb), 0.35);
+  box-shadow:
+    inset 0 0 34px rgba(var(--pre-b-rgb), 0.20),
+    inset 0 -20px 44px rgba(var(--pre-a-rgb), 0.07),
+    0 0 44px rgba(var(--pre-b-rgb), 0.28),
+    0 0 0 4px rgba(var(--esc-carta-rgb), 0.9),
+    0 0 0 5px rgba(var(--esc-linea-rgb), 0.45);
+}
+.escucha-estrella { fill: rgb(var(--pre-w-rgb)); }
+.escucha-estrella-titila { animation: escucha-titila 3.8s ease-in-out infinite; }
+@keyframes escucha-titila {
+  0%, 100% { opacity: 0.15; }
+  50%      { opacity: 0.75; }
+}
+
+/* Geometría sagrada: rotación lentísima en reposo; PENSANDO la acelera y
+ * contra-rota — la energía procesa. Fantasmas cian/violeta = dispersión
+ * cromática (luz que no enfoca del todo en este plano). */
+.escucha-geo {
+  fill: none;
+  transform-origin: center;
   overflow: visible;
 }
+.escucha-geo-a { animation: escucha-gira 80s linear infinite; }
+.escucha-geo-b { animation: escucha-gira-rev 55s linear infinite; }
+.escucha-overlay[data-fase="pensando"] .escucha-geo-a { animation: escucha-gira 7s linear infinite; }
+.escucha-overlay[data-fase="pensando"] .escucha-geo-b { animation: escucha-gira-rev 4.5s linear infinite; }
+@keyframes escucha-gira     { from { transform: rotate(0deg); }   to { transform: rotate(360deg); } }
+@keyframes escucha-gira-rev { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+.escucha-geo-linea      { stroke: rgba(var(--pre-w-rgb), 0.34); stroke-width: 1; }
+.escucha-geo-fantasma-a { stroke: rgba(var(--pre-a-rgb), 0.26); stroke-width: 1; }
+.escucha-geo-fantasma-b { stroke: rgba(var(--pre-b-rgb), 0.26); stroke-width: 1; }
+.escucha-geo-aro  { fill: none; stroke: rgba(var(--pre-a-rgb), 0.20); stroke-width: 1; }
+.escucha-geo-nodo { fill: rgba(var(--pre-a-rgb), 0.65); }
 
-/* --- Halo del corazón: respiración de luz (escala = RMS real via JSX) ---- */
-.escucha-halo {
-  transform-box: fill-box;
+/* Campo de partículas: la posición caos⇄orden la pone el JSX con el RMS
+ * real; acá solo la deriva ambiental (rotación lenta del plano entero) y el
+ * remolino de PENSANDO (espiral hacia el centro). */
+.escucha-campo {
   transform-origin: center;
-  transition: transform 0.1s ease-out;
-  animation: escucha-halo-respira 5.2s ease-in-out infinite;
+  animation: escucha-gira 90s linear infinite;
 }
-@keyframes escucha-halo-respira {
-  0%, 100% { opacity: 0.75; }
-  50%      { opacity: 1; }
+.escucha-overlay[data-fase="pensando"] .escucha-campo {
+  animation: escucha-remolino 5s linear infinite;
 }
-
-/* --- Membranas: el cuerpo que muta (rotación+respiración a ritmos primos) - */
-.escucha-cuerpo {
-  transform-box: fill-box;
-  transform-origin: center;
-  transition: transform 0.09s ease-out;
-}
-.escucha-membrana {
-  transform-box: fill-box;
-  transform-origin: center;
-  fill: none;
-  stroke: rgba(var(--esc-bio-rgb), 0.3);
-  stroke-width: 1.2;
-}
-/* Jerarquía de capas: carne (relleno), piel (trazo firme), aura (punteada). */
-.esc-m1 { animation: escucha-muta-a 17s linear infinite; fill: rgba(var(--esc-bio-rgb), 0.10); stroke: none; }
-.esc-m2 { animation: escucha-muta-b 23s linear infinite; fill: rgba(var(--esc-bio-rgb), 0.04); stroke-width: 1.4; stroke: rgba(var(--esc-bio-rgb), 0.42); }
-.esc-m3 { animation: escucha-muta-a 31s linear infinite reverse; stroke-dasharray: 4 8; stroke-width: 0.9; stroke: rgba(var(--esc-bio-rgb), 0.34); }
-
-@keyframes escucha-muta-a {
+@keyframes escucha-remolino {
   0%   { transform: rotate(0deg) scale(1); }
-  50%  { transform: rotate(180deg) scale(1.05); }
+  50%  { transform: rotate(180deg) scale(0.86); }
   100% { transform: rotate(360deg) scale(1); }
 }
-@keyframes escucha-muta-b {
-  0%   { transform: rotate(360deg) scale(1.04); }
-  50%  { transform: rotate(180deg) scale(0.98); }
-  100% { transform: rotate(0deg) scale(1.04); }
-}
+.escucha-particula { transition: opacity 0.2s ease; }
 
-/* Oyendo: la criatura despierta — membranas más encendidas. */
-.escucha-overlay[data-fase="oyendo"] .escucha-membrana {
-  stroke: rgba(var(--esc-bio-rgb), 0.5);
-}
-/* Error: la criatura se apaga (se recoge, pierde luz). */
-.escucha-overlay[data-fase="error"] .escucha-membrana {
-  stroke: rgba(var(--esc-bio-rgb), 0.18);
-  fill: rgba(var(--esc-bio-rgb), 0.03);
-}
+/* Tonos espectrales (partículas y rayos): la dispersión de la Presencia. */
+.escucha-tono-0 { fill: rgb(var(--pre-w-rgb)); stroke: rgb(var(--pre-w-rgb)); }
+.escucha-tono-1 { fill: rgb(var(--pre-a-rgb)); stroke: rgb(var(--pre-a-rgb)); }
+.escucha-tono-2 { fill: rgb(var(--pre-b-rgb)); stroke: rgb(var(--pre-b-rgb)); }
 
-/* --- Raíces de luz: crecen con la voz (dashoffset = dato real del JSX) ---- */
-.escucha-raiz {
+/* Espectro-mandala: doble trazo (aliento ancho + filo fino) por rayo. */
+.escucha-mandala { overflow: visible; }
+.escucha-rayo,
+.escucha-rayo-glow {
   fill: none;
-  stroke: rgba(var(--esc-bio-rgb), 0.8);
   stroke-linecap: round;
-  transition: stroke-dashoffset 0.14s ease-out;
-}
-.escucha-ramita {
-  fill: none;
-  stroke: rgba(var(--esc-bio-rgb), 0.55);
-  stroke-width: 1;
-  stroke-linecap: round;
-  transition: stroke-dashoffset 0.18s ease-out;
-}
-.escucha-nodo {
-  fill: rgb(var(--esc-bio-rgb));
-  transition: opacity 0.2s ease;
-}
-.escucha-overlay[data-fase="rumbo"] .escucha-raiz,
-.escucha-overlay[data-fase="rumbo"] .escucha-ramita {
-  transition: stroke-dashoffset 0.45s cubic-bezier(0.22, 1.2, 0.36, 1);
+  transition: opacity 0.15s ease;
 }
 
-/* La membrana propia del corazón: anillo orgánico que abraza la mano. */
-.escucha-anillo-corazon {
-  fill: none;
-  stroke: rgba(var(--esc-bio-rgb), 0.5);
-  stroke-width: 1.6;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: escucha-muta-b 21s linear infinite;
-}
-
-/* --- La luciérnaga contadora (conteo de silencio, dato real) -------------- */
-.escucha-estela {
-  stroke: rgba(var(--esc-luci-rgb), 0.55);
+/* Sello de silencio: aro de luz blanca que se cierra (conteo honesto). */
+.escucha-sello {
+  stroke: rgb(var(--pre-w-rgb));
+  opacity: 0.9;
   transition: stroke-dashoffset 0.15s linear;
 }
-.escucha-luci-halo { fill: rgba(var(--esc-luci-rgb), 0.22); }
-.escucha-luci-cuerpo { fill: rgb(var(--esc-luci-rgb)); }
+.escucha-sello-glow {
+  stroke: rgba(var(--pre-a-rgb), 0.35);
+  transition: stroke-dashoffset 0.15s linear;
+}
 
-/* --- El corazón: núcleo luminoso con la mano de Chagra -------------------- */
-.escucha-mano {
+/* El núcleo: un OJO de energía. Halo volumétrico (violeta) + cuerpo de luz
+ * (iris cian-blanco) + anillo de apertura brillante + la mano de Chagra como
+ * pupila oscura: alguien está ahí, mirando. El scale lo pone el JSX (RMS). */
+.escucha-nucleo {
   position: relative;
   z-index: 2;
   width: 92px;
   height: 92px;
-  /* Silueta de semilla, no de botón: radios orgánicos asimétricos. */
-  border-radius: 46% 54% 52% 48% / 55% 47% 53% 45%;
   display: grid;
   place-items: center;
-  color: rgb(var(--esc-bio-rgb));
-  background:
-    radial-gradient(circle at 50% 44%, rgba(var(--esc-bio-rgb), 0.55), rgba(var(--esc-bio-rgb), 0.14) 52%, transparent 74%),
-    radial-gradient(circle at 34% 26%, rgba(236, 255, 248, 0.14), transparent 45%),
-    rgba(var(--esc-noche-rgb), 0.5);
-  box-shadow:
-    0 0 44px rgba(var(--esc-bio-rgb), 0.4),
-    0 0 90px rgba(var(--esc-bio-rgb), 0.16),
-    inset 0 0 26px rgba(var(--esc-bio-rgb), 0.3);
   transition: transform 0.09s ease-out;
 }
-/* La mano se recorta contra el núcleo encendido: tinta noche, no acento. */
-.escucha-mano svg { color: #eafff6; filter: drop-shadow(0 0 6px rgba(var(--esc-bio-rgb), 0.8)); }
-/* Lub-dub: el latido vive en un velo de luz superpuesto (solo opacity). */
-.escucha-mano::after {
-  content: '';
+.escucha-nucleo-halo {
   position: absolute;
-  inset: -6px;
-  border-radius: inherit;
-  background: radial-gradient(circle, rgba(var(--esc-bio-rgb), 0.30), transparent 70%);
-  animation: escucha-lubdub 2.6s ease-out infinite;
-  pointer-events: none;
-}
-@keyframes escucha-lubdub {
-  0%, 100% { opacity: 0.1; }
-  7%       { opacity: 0.85; }  /* lub */
-  15%      { opacity: 0.25; }
-  22%      { opacity: 0.6; }   /* dub */
-  45%      { opacity: 0.1; }
-}
-/* Pensando: el corazón digiere — late más rápido. */
-.escucha-overlay[data-fase="pensando"] .escucha-mano::after {
-  animation-duration: 1.1s;
-}
-.escucha-overlay[data-fase="error"] .escucha-mano {
-  box-shadow: 0 0 18px rgba(var(--esc-bio-rgb), 0.15);
-}
-.escucha-overlay[data-fase="error"] .escucha-mano::after { animation: none; opacity: 0.06; }
-
-/* --- Luciérnagas ambientales (deriva = transform; brillo = voz) ----------- */
-.escucha-luci {
-  position: absolute;
-  width: 5px;
-  height: 5px;
-  pointer-events: none;
-  opacity: calc(0.3 + var(--nivel, 0) * 0.7);
-}
-.escucha-luci i {
-  display: block;
-  width: 100%;
-  height: 100%;
+  inset: -30px;
   border-radius: 50%;
-  background: rgb(var(--esc-luci-rgb));
-  box-shadow: 0 0 8px 2px rgba(var(--esc-luci-rgb), 0.45);
-  animation: escucha-parpadeo-luci 3.4s ease-out infinite;
+  background: radial-gradient(circle,
+    rgba(var(--pre-b-rgb), 0.30) 0%,
+    rgba(var(--pre-b-rgb), 0.10) 42%,
+    transparent 70%);
+  animation: escucha-respira 5s ease-in-out infinite;
 }
-.esc-l1 { top: 12%; left: 18%; animation: escucha-deriva-a 11s ease-in-out infinite; }
-.esc-l2 { top: 8%;  left: 72%; animation: escucha-deriva-b 13s ease-in-out infinite; }
-.esc-l3 { top: 38%; left: 92%; animation: escucha-deriva-a 9s ease-in-out infinite reverse; }
-.esc-l4 { top: 80%; left: 84%; animation: escucha-deriva-b 12s ease-in-out infinite reverse; }
-.esc-l5 { top: 88%; left: 24%; animation: escucha-deriva-a 14s ease-in-out infinite; }
-.esc-l6 { top: 52%; left: 2%;  animation: escucha-deriva-b 10s ease-in-out infinite; }
-.esc-l2 i { animation-delay: 0.9s; }
-.esc-l3 i { animation-delay: 1.7s; }
-.esc-l4 i { animation-delay: 0.4s; }
-.esc-l5 i { animation-delay: 2.3s; }
-.esc-l6 i { animation-delay: 1.2s; }
-
-@keyframes escucha-deriva-a {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  30%      { transform: translate3d(9px, -14px, 0); }
-  65%      { transform: translate3d(-7px, -5px, 0); }
+@keyframes escucha-respira {
+  0%, 100% { transform: scale(1);    opacity: 0.85; }
+  50%      { transform: scale(1.12); opacity: 1; }
 }
-@keyframes escucha-deriva-b {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  40%      { transform: translate3d(-11px, 10px, 0); }
-  70%      { transform: translate3d(6px, -9px, 0); }
-}
-
-/* --- La savia (pensando): luz que viaja por las raíces hacia el corazón.
- * Arranca en 82% (donde la raíz está crecida) para no flotar en el vacío. */
-.escucha-savia {
+.escucha-nucleo-luz {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 8px;
-  height: 8px;
-  margin: -4px 0 0 -4px;
+  inset: 8px;
   border-radius: 50%;
-  background: rgb(var(--esc-bio-rgb));
-  box-shadow: 0 0 12px 4px rgba(var(--esc-bio-rgb), 0.55);
-  pointer-events: none;
-  offset-rotate: 0deg;
-  animation: escucha-savia-fluye 1.7s ease-in infinite;
+  background: radial-gradient(circle at 50% 46%,
+    rgba(var(--pre-w-rgb), 0.55) 0%,
+    rgba(255, 255, 255, 0.94) 30%,
+    rgba(var(--pre-a-rgb), 0.60) 56%,
+    rgba(var(--pre-b-rgb), 0.20) 78%,
+    transparent 90%);
+  box-shadow:
+    0 0 34px rgba(var(--pre-a-rgb), 0.45),
+    0 0 80px rgba(var(--pre-b-rgb), 0.30);
 }
-@keyframes escucha-savia-fluye {
-  0%   { offset-distance: 82%; opacity: 0; transform: scale(0.5); }
-  16%  { opacity: 1; transform: scale(1); }
-  85%  { opacity: 0.9; }
-  100% { offset-distance: 0%; opacity: 0; transform: scale(0.55); }
-}
-
-/* --- Esporas: mientras oye, la criatura exhala chispas que suben ---------- */
-.escucha-espora {
+.escucha-nucleo-apertura {
   position: absolute;
-  top: 34%;
-  left: 50%;
-  width: 4px;
-  height: 4px;
+  inset: 11px;
   border-radius: 50%;
-  background: rgb(var(--esc-bio-rgb));
-  box-shadow: 0 0 6px 1px rgba(var(--esc-bio-rgb), 0.4);
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 0 14px rgba(var(--pre-a-rgb), 0.7),
+    inset 0 0 10px rgba(var(--pre-a-rgb), 0.5);
   pointer-events: none;
-  opacity: 0;
-  animation: escucha-espora-sube 4.6s ease-out infinite;
 }
-.esc-e1 { animation-delay: 0s;   margin-left: -26px; }
-.esc-e2 { animation-delay: 1.2s; margin-left: 14px; }
-.esc-e3 { animation-delay: 2.3s; margin-left: -4px; }
-.esc-e4 { animation-delay: 3.4s; margin-left: 30px; }
-@keyframes escucha-espora-sube {
-  0%   { opacity: 0; transform: translate3d(0, 0, 0) scale(0.6); }
-  12%  { opacity: 0.85; }
-  60%  { opacity: 0.4; }
-  100% { opacity: 0; transform: translate3d(8px, -86px, 0) scale(1); }
+.escucha-nucleo-mano {
+  position: relative;
+  z-index: 1;
+  color: #0a0d24; /* pupila: silueta oscura en la luz */
+  opacity: 0.95;
+}
+.escucha-overlay[data-fase="pensando"] .escucha-nucleo {
+  animation: escucha-nucleo-procesa 1.6s ease-in-out infinite;
+}
+@keyframes escucha-nucleo-procesa {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.09); }
 }
 
 /* --- Título de estado (legible al sol: enorme y extrabold) ---------------- */
 .escucha-titulo {
   margin: 0;
-  font-size: clamp(1.55rem, 6.4vw, 2rem);
+  font-size: clamp(1.55rem, 6.4vw, 1.95rem);
   font-weight: 800;
   letter-spacing: -0.01em;
   line-height: 1.15;
   text-align: center;
   color: rgb(var(--esc-ink-rgb));
-  text-shadow: 0 2px 24px rgba(var(--esc-noche-rgb), 0.9);
 }
-.escucha-titulo b { color: rgb(var(--esc-bio-rgb)); font-weight: 800; }
+.escucha-titulo b { color: rgb(var(--esc-linea-rgb)); font-weight: 800; }
 
 .escucha-sub {
   margin: 0;
-  max-width: 34ch;
+  max-width: 32ch;
   text-align: center;
-  font-size: 0.95rem;
-  line-height: 1.5;
+  font-size: 0.92rem;
+  line-height: 1.45;
   color: rgb(var(--esc-dim-rgb));
 }
 .escucha-sub b { color: rgb(var(--esc-ink-rgb)); font-weight: 700; }
 
-/* --- Medidor: duración + estado del conteo -------------------------------- */
+/* --- Medidor: duración + rumbo ------------------------------------------- */
 .escucha-medidor {
   display: flex;
   align-items: center;
   gap: 10px;
-  white-space: nowrap;
   font-variant-numeric: tabular-nums;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.88rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: rgb(var(--esc-dim-rgb));
 }
@@ -398,30 +342,31 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 18px;
+  padding: 10px 16px;
   border-radius: 999px;
   font-size: 1rem;
   font-weight: 700;
   color: rgb(var(--esc-ink-rgb));
-  background: rgba(var(--esc-bio-rgb), 0.14);
-  border: 1px solid rgba(var(--esc-bio-rgb), 0.45);
+  background: rgba(var(--esc-linea-rgb), 0.14);
+  border: 1px solid rgba(var(--esc-linea-rgb), 0.45);
 }
-.escucha-rumbo b { color: rgb(var(--esc-bio-rgb)); }
+.escucha-rumbo b { color: rgb(var(--esc-linea-rgb)); }
 
 /* --- Acciones tamaño GUANTE ------------------------------------------------
- * Caso de uso: manos con guantes/barro. CTA de ancho completo, ≥72px alto. */
+ * El caso de uso es manos con guantes/barro: el botón primario ocupa todo el
+ * ancho y mide ≥72px de alto. Nada de targets de 40px acá. */
 .escucha-acciones {
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 .escucha-btn-listo {
   width: 100%;
   min-height: 72px;
   border: none;
-  border-radius: 999px;
+  border-radius: 20px;
   font-size: 1.15rem;
   font-weight: 800;
   cursor: pointer;
@@ -430,15 +375,15 @@
   justify-content: center;
   gap: 10px;
   color: var(--esc-cta-ink);
-  background: rgb(var(--esc-bio-rgb));
-  box-shadow: 0 0 34px rgba(var(--esc-bio-rgb), 0.35), 0 10px 30px rgba(0, 0, 0, 0.4);
+  background: rgb(var(--esc-linea-rgb));
+  box-shadow: 0 10px 30px rgba(var(--esc-linea-rgb), 0.35);
   transition: transform 0.12s ease, box-shadow 0.2s ease;
 }
 .escucha-btn-listo:active { transform: scale(0.97); }
 .escucha-btn-sec {
   width: 100%;
   min-height: 56px;
-  border-radius: 999px;
+  border-radius: 16px;
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
@@ -448,7 +393,7 @@
   gap: 8px;
   color: rgb(var(--esc-ink-rgb));
   background: rgba(var(--esc-ink-rgb), 0.08);
-  border: 1px solid rgba(var(--esc-ink-rgb), 0.25);
+  border: 1px solid rgba(var(--esc-ink-rgb), 0.22);
 }
 .escucha-btn-cancelar {
   width: 100%;
@@ -467,42 +412,46 @@
 .escucha-btn-cancelar:hover { color: rgb(var(--esc-ink-rgb)); }
 
 .escucha-overlay button:focus-visible {
-  outline: 3px solid rgba(var(--esc-bio-rgb), 0.9);
+  outline: 3px solid rgba(var(--esc-linea-rgb), 0.9);
   outline-offset: 2px;
 }
 /* La carta recibe foco PROGRAMÁTICO al abrir (anuncio para lectores de
- * pantalla); el foco visible se reserva para los botones. */
+ * pantalla); el focus-ring global del app le pintaba un aro ámbar alrededor
+ * de todo el modal. El foco visible se reserva para los botones. */
 .escucha-carta:focus,
 .escucha-carta:focus-visible {
   outline: none;
 }
 
 /* ============================================================================
- * EscuchaFab — LA SEMILLA EN REPOSO (hoy deshabilitado en App; el wake-word
- * es el trigger vivo). Misma criatura, dormida: silueta de semilla (radios
- * orgánicos), membranas mutando despacio, latido lub-dub, raicillas que ya
- * agarraron tierra, y una luciérnaga que pasa de visita.
+ * EscuchaFab — botón flotante persistente (el tap de HOY).
+ * "La Presencia" en miniatura: marco del tema (Chagra) + espacio profundo
+ * adentro + núcleo de luz que LEVITA con dos motas en órbita. Tamaño guante
+ * (62px), abajo a la IZQUIERDA (espejo del AgentFab). El wake-word de mañana
+ * NO lo necesita — llama activarEscucha().
  * ========================================================================== */
 .escucha-fab {
+  /* La luz de la Presencia (misma del overlay) */
+  --pre-a-rgb: 120, 235, 255;
+  --pre-b-rgb: 178, 140, 255;
+  --pre-w-rgb: 240, 250, 255;
+
   position: fixed;
   bottom: max(90px, calc(env(safe-area-inset-bottom) + 90px));
   left: 16px;
   width: 62px;
   height: 62px;
-  border-radius: 46% 54% 50% 50% / 52% 48% 56% 44%;
+  border-radius: 50%;
   z-index: 40;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
+  padding: 0;
   cursor: pointer;
-  border: none;
-  color: rgb(var(--t-accent-rgb));
-  background:
-    radial-gradient(circle at 34% 28%, rgba(var(--t-accent-rgb), 0.30), rgba(var(--t-accent-rgb), 0.06) 60%, transparent 78%),
-    rgba(4, 13, 11, 0.94);
+  background: transparent;
+  border: 2px solid rgba(var(--t-accent-rgb), 0.55); /* el marco es de Chagra */
   box-shadow:
     0 4px 18px rgba(0, 0, 0, 0.45),
-    0 0 20px rgba(var(--t-accent-rgb), 0.30);
+    0 0 20px rgba(var(--pre-b-rgb), 0.30);
   transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
 }
 .escucha-fab:hover, .escucha-fab:focus-visible { transform: scale(1.06); }
@@ -512,85 +461,128 @@
   outline-offset: 2px;
 }
 
-/* Membranas de la semilla: mutan despacio (transform-only). */
-.escucha-fab-vida {
+/* El otro lado en miniatura (siempre oscuro — contraste en cualquier tema). */
+.escucha-fab-espacio {
   position: absolute;
-  inset: -5px;
-  width: 72px;
-  height: 72px;
-  overflow: visible;
-  pointer-events: none;
-}
-.escucha-fab-membrana {
-  transform-box: fill-box;
-  transform-origin: center;
-  fill: none;
-  stroke: rgba(var(--t-accent-rgb), 0.55);
-  stroke-width: 1.2;
-}
-.esc-fm1 { animation: escucha-muta-a 19s linear infinite; fill: rgba(var(--t-accent-rgb), 0.05); }
-.esc-fm2 { animation: escucha-muta-b 29s linear infinite; stroke-dasharray: 4 7; stroke-width: 0.9; stroke: rgba(var(--t-accent-rgb), 0.4); }
-
-/* Raicillas: la semilla agarró tierra donde vive. */
-.escucha-fab-raicillas path {
-  fill: none;
-  stroke: rgba(var(--t-accent-rgb), 0.6);
-  stroke-width: 1.6;
-  stroke-linecap: round;
-}
-
-/* El corazón dormido: lub-dub lento detrás del micrófono. */
-.escucha-fab-corazon {
-  position: absolute;
-  inset: 8px;
+  inset: 2px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(var(--t-accent-rgb), 0.5), transparent 72%);
-  animation: escucha-lubdub 3.4s ease-out infinite;
-  pointer-events: none;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 50% 36%,
+    #151a3c 0%, #0b0d24 48%, #050610 82%);
+  box-shadow:
+    inset 0 0 12px rgba(var(--pre-b-rgb), 0.25),
+    inset 0 -6px 14px rgba(var(--pre-a-rgb), 0.10);
 }
 
-/* Una luciérnaga pasa de visita cada tanto (sube y se apaga). */
-.escucha-fab-luci {
+/* Órbita: dos motas de luz girando alrededor del núcleo. */
+.escucha-fab-orbita {
   position: absolute;
-  top: 4px;
-  right: 2px;
+  inset: 5px;
+  border-radius: 50%;
+  animation: escucha-gira 8s linear infinite;
+}
+.escucha-fab-mota {
+  position: absolute;
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: rgb(255, 209, 102);
-  box-shadow: 0 0 7px 2px rgba(255, 209, 102, 0.5);
-  animation: escucha-luci-visita 7s ease-in-out infinite;
+}
+.escucha-fab-mota-a {
+  top: 0;
+  left: 50%;
+  margin-left: -2px;
+  background: rgb(var(--pre-a-rgb));
+  box-shadow: 0 0 6px rgba(var(--pre-a-rgb), 0.9);
+}
+.escucha-fab-mota-b {
+  bottom: 3px;
+  right: 8px;
+  width: 3px;
+  height: 3px;
+  background: rgb(var(--pre-b-rgb));
+  box-shadow: 0 0 5px rgba(var(--pre-b-rgb), 0.9);
+}
+
+/* Núcleo suspendido: levita (translateY suave, GPU) bajo el micrófono. */
+.escucha-fab-nucleo {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 42%,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(var(--pre-a-rgb), 0.55) 45%,
+    rgba(var(--pre-b-rgb), 0.18) 72%,
+    transparent 86%);
+  box-shadow:
+    0 0 14px rgba(var(--pre-a-rgb), 0.55),
+    0 0 30px rgba(var(--pre-b-rgb), 0.35);
+  animation: escucha-levita 4s ease-in-out infinite;
+}
+@keyframes escucha-levita {
+  0%, 100% { transform: translateY(1.5px); }
+  50%      { transform: translateY(-1.5px); }
+}
+
+/* El micrófono flota sobre la luz: silueta oscura, legible. */
+.escucha-fab-mic {
+  position: relative;
+  z-index: 2;
+  color: #0a0d24;
+}
+
+/* Pulso de presencia: un aro que se dilata cada 4s — anuncia sin fastidiar. */
+.escucha-fab-pulso {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid rgba(var(--pre-a-rgb), 0.55);
+  animation: escucha-fab-pulsa 4s ease-out infinite;
   pointer-events: none;
 }
-@keyframes escucha-luci-visita {
-  0%, 55%, 100% { opacity: 0; transform: translate3d(0, 0, 0); }
-  60%  { opacity: 1; transform: translate3d(-3px, -6px, 0); }
-  72%  { opacity: 0.25; transform: translate3d(2px, -14px, 0); }
-  82%  { opacity: 0.7; transform: translate3d(-2px, -20px, 0); }
-  95%  { opacity: 0; transform: translate3d(0, -26px, 0); }
+@keyframes escucha-fab-pulsa {
+  0%   { transform: scale(1); opacity: 0.7; }
+  30%  { transform: scale(1.45); opacity: 0; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+
+/* La firma: destello de 4 puntas titilando suave arriba a la derecha. */
+.escucha-fab-destello {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  z-index: 2;
+  color: rgba(var(--pre-w-rgb), 0.95);
+  animation: escucha-destella 4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes escucha-destella {
+  0%, 100% { transform: scale(0.8); opacity: 0.5; }
+  50%      { transform: scale(1);   opacity: 1; }
 }
 
 /* ============================================================================
- * Movimiento reducido: la criatura queda QUIETA pero hermosa y el ESTADO
- * sigue claro — raíces a media extensión, corazón con brillo fijo, y la
- * luciérnaga contadora SÍ avanza (es informativa, no decorativa).
+ * Movimiento reducido: la Presencia queda QUIETA pero hermosa — campo
+ * ordenado, geometría fija, núcleo estable. El ESTADO sigue claro (el sello
+ * de cierre y los textos son informativos, no decorativos).
  * ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
-  .escucha-carta,
-  .escucha-punto,
-  .escucha-halo,
-  .esc-m1, .esc-m2, .esc-m3,
-  .escucha-anillo-corazon,
-  .escucha-mano::after,
-  .escucha-luci i,
-  .escucha-fab-corazon,
-  .esc-fm1, .esc-fm2,
-  .escucha-fab-luci { animation: none; }
-  .escucha-mano::after { opacity: 0.4; }
-  .escucha-luci, .escucha-savia, .escucha-espora { display: none; }
-  .escucha-raiz { transition: none; stroke-dashoffset: 40; }
-  .escucha-ramita { transition: none; stroke-dashoffset: 65; }
-  .escucha-nodo { transition: none; opacity: 0.5; }
-  .escucha-cuerpo, .escucha-halo, .escucha-mano { transition: none; transform: none !important; }
+  .escucha-carta { animation: none; }
+  .escucha-punto { animation: none; }
+  .escucha-estrella-titila { animation: none; }
+  .escucha-geo-a, .escucha-geo-b,
+  .escucha-overlay[data-fase="pensando"] .escucha-geo-a,
+  .escucha-overlay[data-fase="pensando"] .escucha-geo-b { animation: none; }
+  .escucha-campo,
+  .escucha-overlay[data-fase="pensando"] .escucha-campo { animation: none; }
+  .escucha-nucleo-halo { animation: none; }
+  .escucha-overlay[data-fase="pensando"] .escucha-nucleo { animation: none; }
+  .escucha-nucleo { transition: none; }
+  .escucha-particula, .escucha-rayo, .escucha-rayo-glow { transition: none; }
+  .escucha-fab-orbita { animation: none; }
+  .escucha-fab-nucleo { animation: none; }
+  .escucha-fab-pulso { animation: none; opacity: 0; }
+  .escucha-fab-destello { animation: none; }
   .escucha-fab, .escucha-btn-listo { transition: none; }
 }
