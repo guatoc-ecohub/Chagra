@@ -2152,21 +2152,80 @@ export function guardInvertedViability(responseText, resolvedEntities = null, fi
 /** Margen °C de seguridad para el cruce pronóstico × tolerancia de la especie. */
 const THERMAL_MARGIN_C = 2;
 
+/**
+ * Helada AMBIENTAL real (formación de hielo sobre el cultivo): convención IDEAM
+ * ≤ 0°C. Llamar "helada" a temperaturas por encima de 0°C es un error que confunde
+ * al campesino (piloto Choachí 2.513 msnm, #gl-guardhelada2: el guard decía
+ * "riesgo de helada: fresa sufre por debajo de ~14°C" cuando una mínima de 14°C
+ * NO es helada —es solo salir del óptimo del cultivo— y se autocontradecía con
+ * el body del modelo que dijo "fresa resistente hasta -5°C").
+ */
+const HELADA_REAL_C = 0;
+
 /** Idempotencia: marca textual que deja este guard al anexar su advertencia. */
-const THERMAL_NOTE_MARK = /ojo[^.]*riesgo de (helada|golpe de calor)/i;
+const THERMAL_NOTE_MARK = /ojo[^.]*riesgo de (helada|fr[ií]o|golpe de calor)/i;
 
 /**
- * Guard 3b — viabilidad TÉRMICA (audit #23). Análogo a `guardInvertedViability`
- * pero para TEMPERATURA: cruza la tolerancia térmica de la especie
- * (`temp_min`/`temp_max` que ya vienen en el grounding / resolvedEntities) contra
- * la temperatura esperada del PRONÓSTICO (forecastTempMin / forecastTempMax,
- * derivadas de `climaSnapshot.openmeteo.forecast_7d` en la pantalla y pasadas por
- * ctx — el grounding NO trae la temp del pronóstico, solo la tolerancia de la
- * especie; ver gap documentado abajo).
+ * Anti-autocontradicción (#gl-guardhelada2): detecta si el body ya citó un
+ * umbral térmico de frío para una especie — p.ej. "fresa resistente hasta -5°C",
+ * "aguanta 0°C", "no tolera bajo 2°C", "sufre bajo -3°C". Si el body ya dio el
+ * umbral, el guard NO antepone otro distinto (evita el caso piloto donde el body
+ * dijo -5°C y el guard antepuso ~14°C en la misma burbuja).
+ *
+ * @param {string} textNorm texto del body sin diacríticas.
+ * @param {string} nombreNorm nombre de la especie sin diacríticas.
+ * @returns {boolean} true si el body YA citó un umbral de frío para esa especie.
+ */
+const COLD_THRESHOLD_NEAR_RE =
+  /(?:resist\w*|aguanta\w*|toler\w*|soport\w*|sobreviv\w*|sufre?\w*|muere\w*|no\s+toler\w*|no\s+aguanta\w*)[^.\n]{0,50}?(?<temp>-?\d+(?:[.,]\d+)?)\s*°?\s*c/i;
+
+function _bodyAlreadyGaveColdThreshold(textNorm, nombreNorm) {
+  if (!textNorm || !nombreNorm || nombreNorm.length < 3) return false;
+  // Busca en oraciones que mencionen la especie Y contengan un umbral
+  // ("resiste hasta -5°C"). Para manejar ANÁFORAS ("Fresa es buena. Es
+  // resistente hasta -5°C."), la ventana incluye la oración actual + la
+  // SIGUIENTE (el pronombre "Es" de la segunda oración refiere a la especie de
+  // la primera). No incluye la anterior para no contaminar con umbrales de
+  // otras especias citadas antes (p.ej. "Tomate tolera 4°C. La fresa...").
+  const first = nombreNorm.split(/\s+/)[0];
+  const oraciones = String(textNorm)
+    .split(/[.\n!?]+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  for (let i = 0; i < oraciones.length; i++) {
+    const o = oraciones[i];
+    const menciona = o.includes(nombreNorm) || (first.length >= 3 && o.includes(first));
+    if (!menciona) continue;
+    const ventana = [o, oraciones[i + 1]].filter(Boolean).join(' ');
+    if (COLD_THRESHOLD_NEAR_RE.test(ventana)) return true;
+  }
+  return false;
+}
+
+/**
+ * Guard 3b — viabilidad TÉRMICA (audit #23 + fix #gl-guardhelada2). Análogo a
+ * `guardInvertedViability` pero para TEMPERATURA: cruza la tolerancia térmica de
+ * la especie contra la temperatura esperada del PRONÓSTICO.
+ *
+ * PRIORIDAD DE UMBRAL DE DAÑO POR FRÍO (fix #gl-guardhelada2):
+ *   1. `helada_letal` del grafo (punto de muerte por helada específico del
+ *      cultivo, p.ej. fresa = -3°C, aguacate = -2°C). Es el UMBRAL REAL de daño.
+ *   2. `temp_min` del grounding (que típicamente es el óptimo mínimo, NO un
+ *      umbral de daño). Se usa como fallback conservador cuando no hay
+ *      `helada_letal`, PERO el label se ajusta para no llamar "helada" a 14°C.
+ *
+ * ETIQUETA CORRECTA (fix #gl-guardhelada2, "no llamar helada a 14°C"):
+ *   - "riesgo de HELADA" si el pronóstico toca ≤0°C (formación de hielo) o si
+ *     cruza `helada_letal` (punto de daño por helada del cultivo).
+ *   - "riesgo de FRÍO" si solo dispara por `temp_min` (óptimo) y el pronóstico
+ *     no baja a 0°C — es estrés térmico, NO helada.
+ *
+ * ANTI-AUTOCONTRADICCIÓN (fix #gl-guardhelada2): si el body ya dio un umbral de
+ * frío para la especie ("resiste hasta -5°C"), el guard NO antepone otro
+ * distinto.
  *
  * Lógica (solo para especies que el texto FOMENTA sembrar):
- *   - Si la mínima pronosticada ≤ (temp_min + margen) → riesgo de HELADA/frío que
- *     puede matar el cultivo.
+ *   - Si la mínima pronosticada ≤ (umbralDaño + margen) → riesgo de helada/frío.
  *   - Si la máxima pronosticada ≥ (temp_max - margen) → riesgo de GOLPE DE CALOR.
  *
  * Doctrina zona-gris (intelligence-first, tono HUMILDE): ADVIERTE, no bloquea ni
@@ -2183,7 +2242,8 @@ const THERMAL_NOTE_MARK = /ojo[^.]*riesgo de (helada|golpe de calor)/i;
  * GUARD_CHAIN.
  *
  * @param {string} responseText
- * @param {Array<object>|null} resolvedEntities  cada una puede traer temp_min/temp_max.
+ * @param {Array<object>|null} resolvedEntities  cada una puede traer temp_min/temp_max
+ *   y opcionalmente helada_letal (umbral de daño por helada del grafo).
  * @param {number|string|null} _fincaAltitud      (no usado: la temp viene del pronóstico)
  * @param {object} [ctx]
  * @param {number|null} [ctx.forecastTempMin]  mínima esperada del pronóstico (°C).
@@ -2226,7 +2286,14 @@ export function guardThermalViability(
     if (!_isSpecies(e)) continue;
     const tMin = e.temp_min != null && e.temp_min !== '' ? Number(e.temp_min) : NaN;
     const tMax = e.temp_max != null && e.temp_max !== '' ? Number(e.temp_max) : NaN;
-    if (!Number.isFinite(tMin) && !Number.isFinite(tMax)) continue; // grounding sin temp.
+    // helada_letal: punto de MUERTE por helada específico del cultivo (p.ej.
+    // fresa = -3°C). Es el umbral REAL de daño, distinto de temp_min que suele
+    // ser el óptimo (fresa temp_min ≈ 12°C). Ver fix #gl-guardhelada2.
+    const heladaLetal =
+      e.helada_letal != null && e.helada_letal !== '' ? Number(e.helada_letal) : NaN;
+    if (!Number.isFinite(tMin) && !Number.isFinite(tMax) && !Number.isFinite(heladaLetal)) {
+      continue; // grounding sin ningún umbral térmico
+    }
 
     const nombre = _entityName(e);
     const nombreNorm = _stripDiacritics(nombre);
@@ -2234,10 +2301,27 @@ export function guardThermalViability(
     // lo menciona). Reusa el detector directo de fomento.
     if (!_fomentaSiembra(norm, nombreNorm)) continue;
 
+    // ANTI-AUTOCONTRADICCIÓN (#gl-guardhelada2): si el body ya citó un umbral de
+    // frío para esta especie ("resistente hasta -5°C"), el guard NO antepone
+    // otro distinto — evitaría duplicar/conflictuar el dato del modelo.
+    if (_bodyAlreadyGaveColdThreshold(norm, nombreNorm)) continue;
+
+    // Umbral de DAÑO por frío: prefiere helada_letal (real, específico) sobre
+    // temp_min (que suele ser óptimo mínimo). Así un cultivo de frío como fresa
+    // (helada_letal=-3, temp_min=12) NO dispara a 10°C como si fuera "helada".
+    const tieneHeladaLetal = Number.isFinite(heladaLetal);
+    const umbralDano = tieneHeladaLetal ? heladaLetal : tMin;
+    // ¿Es una HELADA real (≤0°C ambiental) o cruzando el punto de daño letal del
+    // cultivo? Si no, es solo FRÍO (estrés térmico), no helada.
+    const heladaAmbiental = haveMin && fMin <= HELADA_REAL_C + marginC;
+    const heladaPorCultivo = tieneHeladaLetal && haveMin && fMin <= heladaLetal + marginC;
+
     const partes = [];
-    if (Number.isFinite(tMin) && haveMin && fMin <= tMin + marginC) {
+    if (Number.isFinite(umbralDano) && haveMin && fMin <= umbralDano + marginC) {
+      const esHelada = heladaAmbiental || heladaPorCultivo;
+      const etiqueta = esHelada ? 'helada' : 'frío';
       partes.push(
-        `riesgo de helada: ${nombre} sufre por debajo de ~${tMin}°C y el pronóstico baja a ` +
+        `riesgo de ${etiqueta}: ${nombre} sufre por debajo de ~${umbralDano}°C y el pronóstico baja a ` +
           `${Math.round(fMin)}°C`,
       );
     }

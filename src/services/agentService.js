@@ -855,19 +855,24 @@ REGLA (intelligence-first, tono HUMILDE):
 /**
  * buildFrostHeatContext — alerta DETERMINÍSTICA de heladas/calor extremo POR
  * CULTIVO mencionado este turno. Cruza la tolerancia térmica de la especie
- * (`temp_min` / `temp_max` del grounding) contra la mínima/máxima del
- * pronóstico ya cacheado (climaSnapshot.openmeteo.forecast_7d, el mismo que
- * usa buildFincaContext — NO se re-pide). CERO latencia, PURA y SÍNCRONA.
+ * (`helada_letal` preferido, fallback `temp_min` / `temp_max` del grounding)
+ * contra la mínima/máxima del pronóstico ya cacheado
+ * (climaSnapshot.openmeteo.forecast_7d, el mismo que usa buildFincaContext — NO
+ * se re-pide). CERO latencia, PURA y SÍNCRONA.
  *
- * Lógica:
- *   - Si la mínima pronosticada ≤ (temp_min + marginC) → riesgo de helada/frío.
+ * Lógica (fix #gl-guardhelada2 — no llamar "helada" a 14°C, no aplicar umbral
+ * de cálido a cultivos de frío):
+ *   - Umbral de daño por frío = `helada_letal` si existe (p.ej. fresa=-3°C,
+ *     aguacate=-2°C); si no, cae a `temp_min` (óptimo mínimo).
+ *   - Etiqueta "helada" solo si el pronóstico toca ≤0°C o cruza `helada_letal`;
+ *     si no, etiqueta "frío" (estrés térmico, no helada ambiental).
  *   - Si la máxima pronosticada ≥ (temp_max - marginC) → riesgo de calor.
  * Solo emite si HAY datos en ambos lados. Degrada con gracia (sin temp_min ni
  * temp_max, o sin forecast → '').
  *
  * @param {object} args
  * @param {Array<object>|null} [args.resolvedEntities] - entidades AGE del turno.
- *   Cada una puede traer { kind, nombre_comun, temp_min, temp_max }.
+ *   Cada una puede traer { kind, nombre_comun, temp_min, temp_max, helada_letal }.
  * @param {object|null} [args.climaSnapshot] - getCachedClimaSnapshot().
  * @param {number} [args.marginC=2] - margen °C de seguridad.
  * @returns {string} bloque compacto, o '' si no hay nada accionable.
@@ -905,11 +910,21 @@ export function buildFrostHeatContext({
     const nombre = e.nombre_comun || e.mentioned || 'tu cultivo';
     const tMin = e.temp_min != null && e.temp_min !== '' ? Number(e.temp_min) : NaN;
     const tMax = e.temp_max != null && e.temp_max !== '' ? Number(e.temp_max) : NaN;
+    // helada_letal: punto de muerte por helada específico del cultivo (p.ej.
+    // fresa=-3°C). Prefiere este umbral sobre temp_min (óptimo) para no llamar
+    // "helada" a 14°C ni aplicar umbral de cálido a cultivos de frío (#gl-guardhelada2).
+    const heladaLetal =
+      e.helada_letal != null && e.helada_letal !== '' ? Number(e.helada_letal) : NaN;
+    const umbralDano = Number.isFinite(heladaLetal) ? heladaLetal : tMin;
 
-    if (Number.isFinite(tMin) && minDay && minDay.t <= tMin + marginC) {
+    if (Number.isFinite(umbralDano) && minDay && minDay.t <= umbralDano + marginC) {
       const cuando = minDay.fecha ? ` el ${minDay.fecha}` : ' esta semana';
+      // Etiqueta honesta: "helada" solo si el pronóstico toca ≤0°C o cruza el
+      // helada_letal; si no, es "frío" (estrés térmico). NO "sufre bajo 14°C".
+      const esHelada = minDay.t <= 0 + marginC || Number.isFinite(heladaLetal);
+      const etiqueta = esHelada ? 'helada' : 'frío';
       alertas.push(
-        `- ❄️ ${nombre}: sufre bajo ${tMin}°C; el pronóstico baja a ${Math.round(minDay.t)}°C${cuando} → protégelo (cobertor/manta térmica en la noche, riega en la MAÑANA no en la tarde).`,
+        `- ❄️ ${nombre}: riesgo de ${etiqueta} (daño bajo ${umbralDano}°C); el pronóstico baja a ${Math.round(minDay.t)}°C${cuando} → protégelo (cobertor/manta térmica en la noche, riega en la MAÑANA no en la tarde).`,
       );
     }
     if (Number.isFinite(tMax) && maxDay && maxDay.t >= tMax - marginC) {
