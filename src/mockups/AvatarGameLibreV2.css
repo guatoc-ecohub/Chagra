@@ -1,0 +1,10 @@
+/* Mockup dev — "La Casa de tu Animalito" (avatar libre v2). Scaffold. */
+.casita-root {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+}
+
+.casita-scaffold {
+  font-size: 1.1rem;
+}

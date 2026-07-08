@@ -124,6 +124,10 @@ const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScree
 // riego con medida (ETc; Kc/ETo = slots grounded-pendiente) y cuidar el agua
 // (calidad + nacimiento, caso "se me seca el nacimiento en verano").
 const AguaScreen = lazy(() => import('./components/agua/AguaScreen'));
+// Mockup dev "La Casa de tu Animalito" (2ª exploración libre del avatar
+// evolutivo, #/mockups/avatar-libre-v2): self-contained, datos de muestra,
+// sin gate. Prioriza claridad para campesino de baja alfabetización.
+const AvatarGameLibreV2 = lazy(() => import('./mockups/AvatarGameLibreV2'));
 // "Aromáticas y condimentarias": la huerta de la cocina campesina (8 hierbas,
 // photo-forward). Cultivo groundeado en el catálogo Chagra; cocina sin claims
 // medicinales. Vive dentro del mundo Cultivos y semillas.
@@ -530,6 +534,10 @@ const HASH_VIEW_ROUTES = {
   cosechar: 'cosechar',
   'mi-cosecha': 'mi_cosecha',
   micosecha: 'mi_cosecha',
+  // Mockup dev (2ª exploración visual del avatar, dirección "claridad
+  // campesina"): ruta sin gate de auth (ver bypass en el ruteo inicial y en
+  // handleHashRoute). NO enlazada desde ninguna vista de producción.
+  'mockups/avatar-libre-v2': 'mockup_avatar_libre_v2',
 };
 
 // Vistas que cuentan como "módulo" para telemetría de piloto.
@@ -821,6 +829,14 @@ export default function App() {
       return;
     }
 
+    // Mockup dev "La Casa de tu Animalito" (#/mockups/avatar-libre-v2):
+    // pública, sin auth — exploración visual con datos de muestra, no toca
+    // servicios reales.
+    if (hash === 'mockups/avatar-libre-v2') {
+      Promise.resolve().then(() => navigate('mockup_avatar_libre_v2'));
+      return;
+    }
+
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
         navigate('login');
@@ -849,6 +865,12 @@ export default function App() {
       const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
       const routeView = HASH_VIEW_ROUTES[hash];
       if (!routeView) return;
+      // Mockup dev "La Casa de tu Animalito": sin gate de auth (exploración
+      // visual, datos de muestra).
+      if (routeView === 'mockup_avatar_libre_v2') {
+        navigate(routeView);
+        return;
+      }
       // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
       if (routeView === 'extensionista' && !esExtensionistaActual()) {
         navigate('dashboard');
@@ -1235,6 +1257,14 @@ export default function App() {
               <ScreenShell title="Mundo Subsuelo" onBack={() => navigate('juego')} onHome={() => navigate('dashboard')}>
                 <MundoSubsuelo />
               </ScreenShell>
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_avatar_libre_v2':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup La Casa de tu Animalito">
+              <AvatarGameLibreV2 />
             </ErrorFallback>
           </ErrorBoundary>
         );
