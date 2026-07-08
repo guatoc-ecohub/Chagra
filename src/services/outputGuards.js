@@ -2485,6 +2485,261 @@ export function guardInventedContact(responseText, _resolvedEntities = null, _fi
   return { text: responseText, modified: false, reason: null };
 }
 
+// ── GUARD: INSTITUCIÓN / FUENTE DE APOYO FABRICADA (#2133) ───────────────────
+
+/**
+ * Siglas de instituciones/fuentes REALES colombianas y de agro (allowlist curada,
+ * normalizada en minúscula). El agente puede citarlas como autoridad; cualquier
+ * OTRA "institución especializada" o "entidad de apoyo" nombrada como fuente que
+ * NO matchee esta allowlist (ni la de nombres) se trata como FABRICACIÓN DE
+ * AUTORIDAD (#2133: "Centro Nacional de Historia Natural (CNHN)", "Instituto de
+ * Investigación Biológica Los Andes Caldwell", "SERAGRO", "CATI").
+ *
+ * Es el análogo institucional de `guardInventedContact` (#1949, teléfono/URL/
+ * resolución) y de `guardInventedBrand` (#1305, marca comercial): mismo eje
+ * (afirmar una fuente que no existe), otro vector (el nombre de la entidad).
+ */
+const REAL_INSTITUTION_ACRONYMS = new Set([
+  // Agro / fitosanitario nacional
+  'ica', 'agrosavia', 'corpoica', 'cenicafe', 'cenicana', 'cenipalma', 'fedearroz',
+  'fedepapa', 'fedecacao', 'fedegan', 'fedepalma', 'fenalce', 'asohofrucol', 'augura',
+  'fnc', 'fedecafe', 'porkcolombia', 'asocana', 'analac', 'ceniuva', 'agronet',
+  // Ambiental / científico
+  'ideam', 'sinchi', 'iiap', 'invemar', 'humboldt', 'igac', 'anla', 'pnn', 'minambiente',
+  // Estado / rural / educación técnica / precios / sanidad
+  'sena', 'upra', 'icbf', 'dane', 'dian', 'adr', 'ant', 'upme', 'minagricultura',
+  'minciencias', 'colciencias', 'umata', 'epsagro', 'ins', 'sipsa', 'sic', 'finagro',
+  'aunap', 'invima', 'anvisa', 'snia', 'incoder', 'inderena',
+  // Universidades públicas más citadas (toda "Universidad …" se allowlistea por
+  // categoría en REAL_INSTITUTION_NAME_RE; estas siglas cubren la mención suelta)
+  'unal', 'uniandes', 'udea', 'univalle', 'unicauca', 'unillanos', 'uptc', 'uis',
+  'unimagdalena', 'unicordoba',
+  // Corporaciones autónomas regionales (CARs) comunes
+  'car', 'cvc', 'cvs', 'crq', 'cas', 'csb', 'cra', 'cdmb', 'carder', 'crc',
+  'corantioquia', 'corpoboyaca', 'cornare', 'cormacarena', 'corpocaldas', 'corpamag',
+  'cortolima', 'corpoguavio', 'codechoco', 'corpouraba', 'cardique', 'corponarino',
+  'corpochivor', 'corpocesar', 'corpomojana', 'corpoamazonia', 'corpoorinoquia',
+  // Internacionales agro/salud reconocidas
+  'ciat', 'iica', 'fao', 'cgiar', 'bioversity', 'embrapa', 'oms', 'who', 'fda',
+  'efsa', 'usda', 'inta',
+]);
+
+/**
+ * Firmas de NOMBRE (substrings normalizados) que identifican una institución REAL
+ * cuando aparece deletreada. Con que UNA matchee el nombre extraído, la institución
+ * es real y NO se suprime. Incluye `universidad` como categoría entera: Colombia
+ * tiene decenas de universidades públicas/privadas reales, así que #2133 las
+ * allowlistea en bloque (el vector fabricado del bench es Instituto/Centro, no una
+ * universidad). NO listamos "los andes" a secas (existe "Universidad de los Andes"
+ * real, pero "Instituto … Los Andes Caldwell" es fabricado) — solo la forma
+ * completa "universidad de los andes".
+ */
+const REAL_INSTITUTION_NAME_RE =
+  /\b(agrosavia|corpoica|colombian[oa]\s+(de\s+investigacion\s+)?agropecuari|corporacion\s+autonoma|autonoma\s+regional|universidad|nacional\s+de\s+aprendizaje|bienestar\s+familiar|planificacion\s+rural\s+agropecuaria|investigaciones?\s+de\s+cafe|cenicafe|investigacion(es)?\s+de\s+la\s+cana|cenicana|palma\s+de\s+aceite|cenipalma|federacion\s+nacional\s+de\s+cafeteros|nacional\s+de\s+cafeteros|nacional\s+de\s+cerealistas|cultivadores\s+de\s+cereales|fedearroz|arroceros|fedepapa|paperos|fedecacao|cacaoteros|hidrologia|meteorologia|ideam|von\s+humboldt|humboldt|alexander|recursos\s+biologicos|amazonic[oa]\s+de\s+investigaciones|sinchi|invemar|marinas\s+y\s+costeras|investigaciones?\s+ambientales?\s+del\s+pacifico|agricultura\s+tropical|geografic[oa]|codazzi|jardin\s+botanico|ministerio\s+de\s+(agricultura|ambiente|ciencia)|asistencia\s+tecnica\s+agropecuaria|umata)\b/;
+
+/**
+ * Instalación GENÉRICA (no una "autoridad" de conocimiento): un "Centro de Acopio",
+ * "Centro de Salud", "Centro Comercial" no es una fuente científica fabricada aunque
+ * no esté en la allowlist. Excluir evita sobre-supresión.
+ */
+const GENERIC_FACILITY_NAME_RE =
+  /\b(acopio|salud|hospital|comercial|comercio|recreativ|deportiv|cultural|penitenciari|carcelari|poblad|convenciones|eventos|logistic|distribucion|zoologic|acuatic)\b/;
+
+/**
+ * Sustantivo-cabeza de una institución NOMBRADA (Título-Caso) + su nombre propio +
+ * su sigla opcional entre paréntesis. Case-sensitive: los nombres propios van
+ * capitalizados, así que "centro de acopio" (minúscula) no dispara. `Universidad`
+ * NO va en la cabeza (toda universidad se allowlistea por categoría → evita FP con
+ * las decenas de universidades reales).
+ */
+const INSTITUTION_HEAD_RE =
+  /\b(Instituto|Centro|Corporaci[oó]n|Fundaci[oó]n|Federaci[oó]n|Laboratorio|Observatorio|Comisi[oó]n)((?:\s+(?:de|del|la|los|las|y|e|para|en|el|von|san|santa)\b|\s+[A-ZÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚÑáéíóúñ.]+){1,9})(?:\s*\(([A-Za-zÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚÑáéíóúñ.-]{1,14})\))?/g;
+
+/**
+ * Sigla en mayúsculas suelta (3–8 letras) candidata a nombre de entidad. Usa
+ * lookaround ACENTO-AWARE en vez de `\b` porque el word-boundary ASCII de JS corta
+ * en las tildes ("CENICAFÉ" → "CENICAF", que no matchearía la allowlist "cenicafe").
+ */
+const BARE_ACRONYM_RE = /(?<![A-Za-zÁÉÍÓÚÑáéíóúñ0-9])([A-ZÁÉÍÓÚÑ]{3,8})(?![A-Za-zÁÉÍÓÚÑáéíóúñ0-9])/g;
+
+/**
+ * Siglas en mayúsculas que NO son instituciones (unidades, químicos, formatos,
+ * jerga). Se saltan para no confundir "NPK"/"MIP"/"pH" con una entidad fabricada.
+ */
+const ALLCAPS_NON_INSTITUTION = new Set([
+  'npk', 'mip', 'adn', 'arn', 'ndvi', 'pvc', 'co2', 'gps', 'pdf', 'onu', 'iva',
+  'rut', 'nit', 'url', 'faq', 'ong', 'led', 'usb', 'pib', 'pyme', 'pymes', 'msnm',
+  'otan', 'eeuu', 'usa', 'iot', 'api', 'ppm', 'usd', 'cop', 'eur', 'gmo', 'ogm',
+  'abc', 'xyz', 'sos', 'html', 'http', 'https', 'ceo', 'vip', 'atp', 'cic', 'pcr',
+  'vih', 'sida', 'epoc', 'iso', 'sst', 'epp', 'bpa', 'poa',
+  // Insumos / fertilizantes / combustibles (no son entidades)
+  'acpm', 'dap', 'map', 'tsp', 'kcl', 'sku', 'cafe',
+]);
+
+/**
+ * Sustantivos de INSTITUCIÓN en el contexto previo a una sigla. El PATRÓN 2 exige
+ * uno (o el cierre "en tu/su región") para no confundir una sigla de químico/
+ * fertilizante ("de DAP") o un sistema de precios ("consulta SIPSA") con una entidad
+ * fabricada: la fabricación real del bench viene enmarcada ("entidades de apoyo como
+ * SERAGRO", "instituciones especializadas como …"). Normalizado.
+ */
+const INSTITUTION_NOUN_CTX_RE =
+  /\b(institucion\w*|entidad\w*|organismo\w*|organizacion\w*|centro\w*|instituto\w*|agencia\w*|corporacion\w*|cooperativa\w*|asociacion\w*|federacion\w*|gremio\w*|autoridad\w*|laboratorio\w*|fundacion\w*|universidad\w*|observatorio\w*|comision\w*|dependencia\w*)\b/;
+
+/**
+ * Cue de que una entidad se está presentando como AUTORIDAD / FUENTE / contacto a
+ * consultar. Sin cue no hay "fabricación de autoridad" que cazar (gate barato).
+ * Normalizado.
+ */
+const INSTITUTION_AUTHORITY_CUE_RE =
+  /\b(consult\w*|segun\b|de\s+acuerdo\s+con|acorde\s+con|reportad\w*|public\w*|estudi\w*|investigac\w*|fuente[s]?\b|instituci\w*|entidad\w*|avalad\w*|certificad\w*|respald\w*|recomiend\w*|recomend\w*|acerc\w*|comunic\w*|contact\w*|acude\w*|dirig\w*|escrib\w*|asesor\w*|especializ\w*|apoyo\b)\b/;
+
+/** Marca idempotente del reemplazo de institución fabricada. */
+const FABRICATED_INSTITUTION_MARKER = 'no te puedo confirmar esa institución como fuente verificada';
+
+/**
+ * Redirección honesta que REEMPLAZA la oración que cita una institución fabricada.
+ * No nombra la entidad inventada: degrada a "sin fuente verificada" y manda a las
+ * fuentes reales. Estable para idempotencia (contiene `FABRICATED_INSTITUTION_MARKER`).
+ */
+const FABRICATED_INSTITUTION_REPLACEMENT =
+  `Sobre esa recomendación, ${FABRICATED_INSTITUTION_MARKER}. Para orientación con respaldo, ` +
+  'acude a una fuente real: la autoridad fitosanitaria (el ICA), Agrosavia, tu UMATA local o la ' +
+  'corporación autónoma regional de tu zona.';
+
+/**
+ * Detecta menciones de instituciones FABRICADAS (fuera de la allowlist) en UNA
+ * oración. Devuelve la lista de nombres/siglas fabricados hallados.
+ *   PATRÓN 1 — institución nombrada: sustantivo-cabeza + Título-Caso (+ sigla opc.).
+ *   PATRÓN 2 — sigla suelta presentada como entidad ("como SERAGRO", "SERAGRO en
+ *              tu región").
+ *
+ * @param {string} sentence  oración cruda (con mayúsculas).
+ * @param {string} _sNorm    misma oración normalizada (reservado).
+ * @returns {string[]}
+ */
+function _fabricatedInstitutionsInSentence(sentence, _sNorm) {
+  const found = [];
+
+  // PATRÓN 1 — institución NOMBRADA (Título-Caso).
+  INSTITUTION_HEAD_RE.lastIndex = 0;
+  let m;
+  while ((m = INSTITUTION_HEAD_RE.exec(sentence)) !== null) {
+    const tail = m[2] || '';
+    // Exige ≥1 palabra propia (Título-Caso) en el nombre — descarta "Centro de"
+    // suelto o cabezas seguidas solo de conectores en minúscula.
+    if (!/[A-ZÁÉÍÓÚÑ][a-záéíóúñ]/.test(tail)) continue;
+    const fullName = `${m[1]}${tail}`.replace(/\s+/g, ' ').replace(/[.,;:]+$/, '').trim();
+    const acronym = m[3] ? _stripDiacritics(m[3]) : null;
+    const nameNorm = _stripDiacritics(fullName);
+    // Real por sigla o por firma de nombre → no es fabricada.
+    if (acronym && REAL_INSTITUTION_ACRONYMS.has(acronym)) continue;
+    if (REAL_INSTITUTION_NAME_RE.test(nameNorm)) continue;
+    // Instalación genérica (acopio/salud/comercial…) → no es autoridad fabricada.
+    if (GENERIC_FACILITY_NAME_RE.test(nameNorm)) continue;
+    found.push(m[3] ? `${fullName} (${m[3]})` : fullName);
+  }
+
+  // PATRÓN 2 — SIGLA suelta presentada como ENTIDAD/INSTITUCIÓN.
+  BARE_ACRONYM_RE.lastIndex = 0;
+  while ((m = BARE_ACRONYM_RE.exec(sentence)) !== null) {
+    const raw = m[1];
+    const acr = _stripDiacritics(raw);
+    if (REAL_INSTITUTION_ACRONYMS.has(acr)) continue;
+    if (ALLCAPS_NON_INSTITUTION.has(acr)) continue;
+    const before = _stripDiacritics(sentence.slice(Math.max(0, m.index - 48), m.index));
+    const after = _stripDiacritics(sentence.slice(m.index + raw.length, m.index + raw.length + 28));
+    // Debe (a) ir tras un conector de mención Y (b) tener un sustantivo de
+    // INSTITUCIÓN en la ventana previa (o cerrarse con "en tu/su región"). Así una
+    // sigla de químico/fertilizante ("de DAP") o de un sistema de precios ("consulta
+    // SIPSA") SIN marco institucional NO se confunde con una entidad fabricada; la
+    // fabricación real viene enmarcada ("entidades de apoyo como SERAGRO").
+    const introduced = /\b(como|con|segun|por|ante|de|del)\s*$/.test(before);
+    if (!introduced) continue;
+    const institutionalCtx = INSTITUTION_NOUN_CTX_RE.test(before);
+    const asRegionalEntity = /^\s*(en|de)\s+(tu|su|la|mi)\s+region/.test(after);
+    if (!institutionalCtx && !asRegionalEntity) continue;
+    if (!found.includes(raw)) found.push(raw);
+  }
+
+  return found;
+}
+
+/**
+ * guardFabricatedInstitution — #2133. SUPPRESS-AND-REPLACE quirúrgico por oración:
+ * cuando la respuesta cita una institución/entidad/fuente de apoyo que NO existe en
+ * la allowlist curada de instituciones REALES colombianas/agro (Agrosavia, ICA,
+ * Cenicafé, IDEAM, UNAL, Fenalce, Corpoica, FNC, SENA, UPRA, MinAgricultura, CARs,
+ * CIAT, IICA, FAO…) como AUTORIDAD a consultar/fuente, sustituye ESA oración por la
+ * redirección honesta ("no te puedo confirmar esa institución como fuente
+ * verificada; acude al ICA/Agrosavia/UMATA/CAR"). Análogo institucional de
+ * `guardInventedContact` (#1949) y `guardInventedBrand` (#1305).
+ *
+ * Determinista, PURO y SÍNCRONO. Quirúrgico (no nuke): el resto de la respuesta —el
+ * agronómico correcto, p.ej. "el kale no va en páramo"— se conserva; solo se
+ * reemplaza la oración con la fabricación. Va tras la marca inventada en
+ * `applyOutputGuards`. Idempotente por marcador.
+ *
+ * GATING (anti-sobre-supresión): la oración debe (1) tener un cue de autoridad/
+ * fuente (`INSTITUTION_AUTHORITY_CUE_RE`) Y (2) nombrar ≥1 institución fabricada
+ * (fuera de allowlist de siglas y de nombres, y que no sea instalación genérica).
+ *
+ * @param {string} responseText
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardFabricatedInstitution(responseText) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Idempotencia: nuestra redirección ya está.
+  if (responseText.includes(FABRICATED_INSTITUTION_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  // Gate barato: sin cue de autoridad en todo el texto no hay nada que cazar.
+  if (!INSTITUTION_AUTHORITY_CUE_RE.test(_stripDiacritics(responseText))) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const sentences = _splitSentences(responseText);
+  const fabricated = [];
+  let changed = false;
+  let lastWasReplacement = false;
+
+  const out = sentences
+    .map((sentence) => {
+      const sNorm = _stripDiacritics(sentence);
+      // La oración debe presentar una entidad como autoridad/fuente.
+      if (!INSTITUTION_AUTHORITY_CUE_RE.test(sNorm)) {
+        lastWasReplacement = false;
+        return sentence;
+      }
+      const hits = _fabricatedInstitutionsInSentence(sentence, sNorm);
+      if (hits.length === 0) {
+        lastWasReplacement = false;
+        return sentence;
+      }
+      for (const h of hits) if (!fabricated.includes(h)) fabricated.push(h);
+      changed = true;
+      // Colapsa reemplazos en oraciones consecutivas (una sola redirección).
+      if (lastWasReplacement) return '';
+      lastWasReplacement = true;
+      const trailing = sentence.match(/\s*$/)?.[0] || ' ';
+      return `${FABRICATED_INSTITUTION_REPLACEMENT}${trailing}`;
+    })
+    .join('');
+
+  if (!changed) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('fabricated_institution');
+  return {
+    text: out.trim(),
+    modified: true,
+    reason: `institucion_fabricada_suprimida: ${[...new Set(fabricated)].slice(0, 5).join(', ')}`,
+  };
+}
+
 // ── GUARD: receta EXACTA de caldo clásico pedida en dosis (BORDE-003 / 004) ──
 
 /**
@@ -9638,6 +9893,20 @@ export function applyOutputGuards(
     text = contactRes.text;
     modified = true;
     if (contactRes.reason) reasons.push(contactRes.reason);
+  }
+  // Guard SAFETY de INSTITUCIÓN / FUENTE FABRICADA (#2133): firma propia (solo el
+  // texto). Corre SIEMPRE (no es de siembra). SUPPRESS-AND-REPLACE quirúrgico por
+  // oración: si el cuerpo cita una institución/entidad de apoyo que NO está en la
+  // allowlist curada de instituciones reales colombianas/agro ("Centro Nacional de
+  // Historia Natural (CNHN)", "…Los Andes Caldwell", "SERAGRO") como autoridad a
+  // consultar, sustituye esa oración por la redirección honesta (sin fuente
+  // verificada → ICA/Agrosavia/UMATA/CAR). Análogo institucional de la marca y el
+  // contacto inventados: va justo tras ellos. Idempotente.
+  const institutionRes = guardFabricatedInstitution(text);
+  if (institutionRes && institutionRes.modified) {
+    text = institutionRes.text;
+    modified = true;
+    if (institutionRes.reason) reasons.push(institutionRes.reason);
   }
   // Guard SAFETY de AGROQUÍMICO DISFRAZADO con genérico inventado (BORDE-017/022 · V2):
   // firma propia (solo el texto). Corre SIEMPRE (no es de siembra). SUPPRESS-AND-REPLACE:
