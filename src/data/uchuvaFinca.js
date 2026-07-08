@@ -411,6 +411,6 @@ export const CREDITOS_FOTOS_UCHUVA = [
   { slug: 'siembra', autor: 'Frank Vincentz', licencia: 'CC BY-SA 3.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/3.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Kluse_-_Physalis_peruviana_-_Kapstachelbeere_07_ies.jpg' },
   { slug: 'capacho', autor: 'Frank Vincentz', licencia: 'CC BY-SA 3.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/3.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Kluse_-_Physalis_peruviana_-_Kapstachelbeere_01_ies.jpg' },
   { slug: 'flor', autor: 'AnRo0002', licencia: 'CC0', licenciaUrl: 'https://creativecommons.org/publicdomain/zero/1.0/deed.en', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:20241102Physalis_peruviana3.jpg' },
-  { slug: 'cosecha', autor: 'AnRo0002', licencia: 'CC0', licenciaUrl: 'https://creativecommons.org/publicdomain/zero/1.0/deed.en', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:20241102Physalis_peruviana1.jpg' },
+  { slug: 'cosecha', autor: 'Frank Vincentz', licencia: 'CC BY-SA 3.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/3.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Kluse_-_Physalis_peruviana_-_Kapstachelbeere_03_ies.jpg' },
   { slug: 'poscosecha', autor: 'Fumikas Sagisavas', licencia: 'CC0', licenciaUrl: 'https://creativecommons.org/publicdomain/zero/1.0/deed.en', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Cape_gooseberry_pods.jpg' },
 ];
