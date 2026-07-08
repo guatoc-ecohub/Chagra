@@ -72,6 +72,8 @@ const LoginScreen = lazy(() => import('./components/LoginScreen'));
 // Mockup dev (sin gate, datos de muestra): dirección visual del "juego final"
 // — el avatar/espíritu de la finca en tema biopunk. Ruta #/mockups/avatar-biopunk.
 const AvatarGameBiopunk = lazy(() => import('./mockups/AvatarGameBiopunk'));
+const AvatarGameVerdeVivo = lazy(() => import('./mockups/AvatarGameVerdeVivo'));
+const AvatarGameLibre = lazy(() => import('./mockups/AvatarGameLibre'));
 const OAuthCallback = lazy(() => import('./components/OAuthCallback'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
@@ -536,6 +538,8 @@ const HASH_VIEW_ROUTES = {
   // Mockup dev del juego final (avatar biopunk): vista aislada con datos de
   // muestra, sin gate — no toca datos reales ni requiere sesión.
   'mockups/avatar-biopunk': 'mockup_avatar_biopunk',
+  'mockups/avatar-verde-vivo': 'mockup_avatar_verde_vivo',
+  'mockups/avatar-libre': 'mockup_avatar_libre',
 };
 
 // Vistas que cuentan como "módulo" para telemetría de piloto.
@@ -833,6 +837,14 @@ export default function App() {
       Promise.resolve().then(() => navigate('mockup_avatar_biopunk'));
       return;
     }
+    if (hash === 'mockups/avatar-verde-vivo') {
+      Promise.resolve().then(() => navigate('mockup_avatar_verde_vivo'));
+      return;
+    }
+    if (hash === 'mockups/avatar-libre') {
+      Promise.resolve().then(() => navigate('mockup_avatar_libre'));
+      return;
+    }
 
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
@@ -864,6 +876,10 @@ export default function App() {
       if (!routeView) return;
       // Mockup dev: sin gate ni sesión (datos de muestra).
       if (routeView === 'mockup_avatar_biopunk') {
+        navigate(routeView);
+        return;
+      }
+      if (routeView === 'mockup_avatar_verde_vivo' || routeView === 'mockup_avatar_libre') {
         navigate(routeView);
         return;
       }
@@ -1238,6 +1254,22 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Mockup Avatar Biopunk">
               <AvatarGameBiopunk onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_avatar_verde_vivo':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Avatar Verde Vivo">
+              <AvatarGameVerdeVivo onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_avatar_libre':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Avatar Libre">
+              <AvatarGameLibre onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
