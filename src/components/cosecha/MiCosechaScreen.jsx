@@ -140,7 +140,7 @@ function Hero({ summary }) {
 function KpiRow({ summary }) {
   const kpis = [
     { label: 'Total histórico', value: fmtCant(summary.totalKg), sufijo: 'kg' },
-    { label: 'Cosechas anotadas', value: nf0.format(summary.totalHarvests) },
+    { label: 'Cosechas', value: nf0.format(summary.totalHarvests) },
     { label: 'Cultivo estrella', value: summary.topCrop?.crop || '—' },
   ];
   return (
@@ -365,6 +365,9 @@ function PorLote({ byLote }) {
 
 // ── Pantalla ─────────────────────────────────────────────────────────────────
 
+/**
+ * @param {{ onBack: Function, onHome?: Function, onNavigate: Function }} props
+ */
 export default function MiCosechaScreen({ onBack, onHome, onNavigate }) {
   const summary = useCosechaStore((s) => s.summary);
   const isLoading = useCosechaStore((s) => s.isLoading);

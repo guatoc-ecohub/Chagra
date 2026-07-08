@@ -95,7 +95,7 @@ describe('MiCosechaScreen — tablero con datos', () => {
     // 4 + 8 + 12.5 (arroba) = 24.5 kg, todo del año en curso.
     expect(screen.getByText(new RegExp(`Cosechado en lo que va de ${Y}`))).toBeInTheDocument();
     expect(screen.getAllByText('24,5').length).toBeGreaterThan(0); // es-CO usa coma
-    expect(screen.getByText('Cosechas anotadas')).toBeInTheDocument();
+    expect(screen.getAllByText('Cosechas').length).toBeGreaterThan(0); // KPI (y th de tablas)
     expect(screen.getByText('Cultivo estrella')).toBeInTheDocument();
     expect(screen.getAllByText(/Fresa/).length).toBeGreaterThan(0);
   });
