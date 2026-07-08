@@ -57,6 +57,7 @@ export const MUNDOS_FINCA = [
             { view: 'hortalizas', label: 'Hortalizas de la huerta', desc: 'La comida diaria de la casa: siembra, agua, vecinas, plagas y cosecha de tomate, cebolla, zanahoria y más', emoji: '🥕' },
             { view: 'tuberculos', label: 'Tubérculos y raíces', desc: 'El pancoger de raíz: papa y criolla, yuca, arracacha, ñame, batata, oca, cubio y ulluco — siembra, aporque, plagas y curado', emoji: '🥔' },
             { view: 'quinua', label: 'Quinua y granos andinos', desc: 'Granos ancestrales del frío alto-andino: quinua, amaranto, cañihua, chía y tarwi; siembra, el desaponificado (lavar el amargo), mildiú sin veneno, cosecha y su valor nutricional (proteína completa, sin gluten)', emoji: '🌾' },
+            { view: 'fique', label: 'El fique y las fibras', desc: 'El cultivo de ladera que cuida el suelo: la cabuya, cómo se cría, el desfibrado de la penca, empaques y artesanía, y aprovechar el bagazo y el jugo sin contaminar el agua', emoji: '🪢' },
             { view: 'calendario_finca', label: 'Calendario de la finca', desc: 'Cuándo sembrar, abonar y cosechar, todo junto', emoji: '🗓️' },
             { view: 'almanaque', label: 'Almanaque campesino', desc: 'El año a lo grande: aguas y secas, qué da su piso térmico y el saber lunar', emoji: '🌙' },
             { view: 'activos', label: 'Mis matas', desc: 'Las plantas que tiene sembradas y cómo van', emoji: '🪴' },
@@ -195,6 +196,7 @@ export const MUNDOS_FINCA = [
         tinte: ['#2f6b3a', '#d8e9d2'],
         entradas: [
             { view: 'asociaciones', label: 'Buenas vecinas', desc: 'Qué cultivos se ayudan sembrados juntos', emoji: '🌻' },
+            { view: 'restauracion', label: 'Restauración y bosque de alimentos', desc: 'Los 7 estratos del bosque comestible, la sucesión ecológica y cómo restaurar un suelo herido — con especies nativas y multipropósito del catálogo', emoji: '🌳' },
             { view: 'biodiversidad', label: 'El monte de la finca', desc: 'Plantas y animales silvestres que la acompañan', emoji: '🦜' },
             { view: 'seguimiento_reforestacion', label: 'Reforestación', desc: 'Restauración con árboles nativos', emoji: '🌳' },
             { view: 'seguimiento_silvopastoreo', label: 'Silvopastoreo', desc: 'Árboles + pasto + ganado en el mismo lote', emoji: '🐂' },
