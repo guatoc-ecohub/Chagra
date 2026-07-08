@@ -1,0 +1,78 @@
+/* ===========================================================================
+ * GERMINACIÓN — 2ª pasada visual (GerminacionScreen).
+ *
+ * "La semilla despierta": los bloques brotan escalonados desde la tierra
+ * (translateY + opacity), el hero llega con un acercamiento lentísimo, las
+ * tarjetas levantan al tacto y el % de la vista previa germina con un pop.
+ * Todo es transform/opacity (GPU-friendly, sin filter/blur animado) y TODO
+ * se apaga con prefers-reduced-motion. Cero bytes de assets nuevos: las
+ * fotos son las que ya embarca dist (/bienvenida, /milpa).
+ * =========================================================================== */
+
+/* Brote escalonado: cada bloque entra con su índice (--gm-i). */
+@keyframes gm-brotar {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.gm-in {
+  animation: gm-brotar 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--gm-i, 0) * 60ms);
+}
+
+/* Hero: la foto llega con un acercamiento lentísimo, una sola vez. */
+.gm-hero img {
+  animation: gm-acercar 14s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-origin: center 42%;
+}
+@keyframes gm-acercar {
+  from { transform: scale(1.07); }
+  to { transform: scale(1); }
+}
+
+/* Tarjeta viva: levanta al pasar y asienta al presionar. */
+.gm-card {
+  transition: transform 0.22s ease, border-color 0.22s ease;
+}
+.gm-card:hover { transform: translateY(-2px); }
+.gm-card:active { transform: translateY(0) scale(0.99); }
+
+/* Filas de la tabla de referencia: empujón leve hacia la acción. */
+.gm-row { transition: transform 0.2s ease; }
+.gm-row:hover { transform: translateX(3px); }
+
+/* Botones de acción (registrar, guardar, sembrar): levante breve. */
+.gm-btn { transition: transform 0.18s ease; }
+.gm-btn:hover { transform: translateY(-1px); }
+.gm-btn:active { transform: translateY(0) scale(0.985); }
+
+/* La vista previa del % germina: pop de escala al aparecer. */
+@keyframes gm-pop {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+.gm-pop { animation: gm-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+/* El CTA del final respira con la foto: zoom sutil solo-transform al hover. */
+.gm-foto-cta img { transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1); }
+.gm-foto-cta:hover img { transform: scale(1.04); }
+
+/* Foco accesible y vivo, con el acento del tema (fallback lima). */
+.gm-focus:focus-visible,
+.gm-row:focus-visible,
+.gm-btn:focus-visible {
+  outline: 3px solid rgb(var(--t-accent-rgb, 163 230 53) / 0.9);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Reduced motion: quieto todo — entradas, zoom del hero, pops y levantes. */
+@media (prefers-reduced-motion: reduce) {
+  .gm-in { animation: none; }
+  .gm-hero img { animation: none; }
+  .gm-pop { animation: none; }
+  .gm-card, .gm-row, .gm-btn, .gm-foto-cta img { transition: none; }
+  .gm-card:hover, .gm-card:active,
+  .gm-row:hover,
+  .gm-btn:hover, .gm-btn:active,
+  .gm-foto-cta:hover img { transform: none; }
+}
