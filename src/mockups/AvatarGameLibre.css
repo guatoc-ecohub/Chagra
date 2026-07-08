@@ -1,0 +1,12 @@
+/* Mockup dev — El Telar de la Finca. Self-contained (prefijo .telar-). */
+.telar-root {
+  min-height: 100vh;
+  background: #131226;
+  color: #f4ebda;
+  display: grid;
+  place-items: center;
+}
+.telar-cargando {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+}
