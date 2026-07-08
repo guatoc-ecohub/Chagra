@@ -236,15 +236,16 @@ function Hub({ onIr, onNavigate }) {
     { key: 'amenazas', icon: Bug, foto: 'sigatoka-hoja', titulo: 'Sigatoka y picudo', desc: 'Las dos amenazas clave: cómo reconocerlas y manejarlas sin veneno.', accent: 'rose' },
     { key: 'cosecha', icon: Recycle, foto: 'pseudotallo-hoja', titulo: 'Cosecha y aprovechamiento', desc: 'El punto de corte, y cómo el pseudotallo y la hoja vuelven a la tierra como abono.', accent: 'amber' },
   ];
-  const heroCred = FOTOS['platanera-mata'];
+  const heroCred = FOTOS['cafe-sombra'];
   return (
     <div className="flex flex-col gap-4">
-      {/* Gancho — la postal del platanal: título sobre la foto real, crédito CC
-          siempre visible (píldora arriba) y la verdad que nadie cuenta debajo */}
+      {/* Gancho — la postal del platanal: el platanal verde y frondoso de hero
+          (cafe-sombra es la foto más viva del set), título sobre la foto y
+          crédito CC siempre visible (píldora arriba) */}
       <section className="pb-rise rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden" style={{ '--pb-d': '0ms' }}>
         <div className="relative overflow-hidden border-b border-slate-800">
           <img
-            src="/platano-banano/platanera-mata.jpg"
+            src="/platano-banano/cafe-sombra.jpg"
             alt={heroCred.alt}
             className="pb-hero-img w-full aspect-[4/3] sm:aspect-[16/9] object-cover"
           />
