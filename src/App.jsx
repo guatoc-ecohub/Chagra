@@ -132,6 +132,13 @@ const AromaticasScreen = lazy(() => import('./components/aromaticas/AromaticasSc
 // beneficio). Photo-forward (patrón Agua) y groundeado en el grafo
 // (species.coffea_arabica) + Cenicafé; la pulpa cierra ciclo hacia el compost.
 const CafeScreen = lazy(() => import('./components/cafe/CafeScreen'));
+// Mundo "La botica campesina": la huerta MEDICINAL de la finca andina
+// (caléndula, manzanilla, toronjil, cidrón, saúco, ortiga, llantén; la ruda
+// como planta de respeto). Photo-forward (patrón Café/Agua) con fotos CC.
+// Dominio de salud: todo enmarcado como USO TRADICIONAL (saber popular), nunca
+// medicina/cura/dosis; cultivo groundeado en el catálogo Chagra. Complementa
+// —no duplica— la huerta de aromáticas de la cocina.
+const BoticaScreen = lazy(() => import('./components/botica/BoticaScreen'));
 // Mundo "Frutales de la finca con vida": los frutales del solar campesino
 // (cítricos, aguacate, mango, guayaba, mora, lulo, tomate de árbol, papaya),
 // cada uno con su ficha de cultivo. Photo-forward (patrón Café/Agua) y
@@ -428,6 +435,11 @@ const HASH_VIEW_ROUTES = {
   'el-cafe': 'cafe',
   cafetal: 'cafe',
   cafeto: 'cafe',
+  botica: 'botica',
+  'botica-campesina': 'botica',
+  medicinales: 'botica',
+  'plantas-medicinales': 'botica',
+  'huerta-medicinal': 'botica',
   frutales: 'frutales',
   frutal: 'frutales',
   'arboles-frutales': 'frutales',
@@ -1822,6 +1834,20 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El café">
               <CafeScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'botica':
+        // Mundo "La botica campesina" (5 estaciones: barriga y nervios / piel y
+        // heridas / gripa y tónico / cultivar la botica / con cuidado). La huerta
+        // MEDICINAL de la finca andina, photo-forward con fotos CC. Dominio de
+        // salud: todo enmarcado como USO TRADICIONAL (saber popular), sin claims
+        // de cura ni dosis; cultivo groundeado en el catálogo Chagra. Vetos
+        // honestos (ruda abortiva/fototóxica) + disclaimer "consulte al médico".
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La botica campesina">
+              <BoticaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );

@@ -91,6 +91,22 @@ export const MUNDOS_FINCA = [
         directo: { view: 'cana' },
     },
     {
+        id: 'botica',
+        titulo: 'La botica campesina',
+        emoji: '🌿',
+        lema: 'Las matas que curan de la casa: para qué se usan (uso tradicional) y cómo se cultivan',
+        tinte: ['#3f7d4e', '#dcecd0'],
+        // Mundo de una sola pantalla (photo-forward, 5 estaciones: barriga y
+        // nervios / piel y heridas / gripa y tónico / cultivar la botica / con
+        // cuidado). La huerta MEDICINAL de la finca andina (caléndula, manzanilla,
+        // toronjil, cidrón, saúco, ortiga, llantén, y la ruda como planta de
+        // respeto). Complementa —no duplica— la huerta de aromáticas de la cocina.
+        // Dominio de salud: todo enmarcado como USO TRADICIONAL (saber popular),
+        // nunca medicina/cura; cultivo groundeado en el catálogo Chagra. La
+        // tarjeta navega directo, sin pantalla intermedia.
+        directo: { view: 'botica' },
+    },
+    {
         id: 'suelo',
         titulo: 'El suelo vivo',
         emoji: '🌱',
