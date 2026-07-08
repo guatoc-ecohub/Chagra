@@ -301,6 +301,9 @@ const messages = {
     estadoError: 'Hubo un problema',
     grabandoHableAhora: 'Grabando… hable ahora',
     errorCargaLibs: 'No se pudo cargar {src}',
+  // Recorrido de finca por voz (useRecorridoStore / recorridoService).
+  recorrido: {
+    errorRegistro: 'No se pudo registrar la observación',
   },
   format,
 };
