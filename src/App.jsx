@@ -143,6 +143,13 @@ const FrutalesScreen = lazy(() => import('./components/frutales/FrutalesScreen')
 // grafo (Diatraea AFFECTS caña; Cotesia/Trichogramma CONTROLS Diatraea) +
 // Cenicaña/AGROSAVIA/FEDEPANELA/INVIMA; el bagazo cierra ciclo hacia el compost.
 const CanaScreen = lazy(() => import('./components/cana/CanaScreen'));
+// Mundo "El mango" (5 estaciones: variedad+siembra / piso térmico+agua /
+// floración+cuaje / plagas / cosecha+despensa). Profundización dedicada del
+// mango (como el café o la caña), más allá de la ficha en Frutales.
+// Photo-forward (patrón Café) y groundeado en el grafo (mangifera_indica:
+// pest_controllers → antracnosis/Anastrepha; compatible_with) + perennialCycles
+// (AGROSAVIA); honestidad térmica (tierra cálida <1200 msnm; >1800 NO va).
+const MangoScreen = lazy(() => import('./components/mango/MangoScreen'));
 const RestauracionScreen = lazy(() => import('./components/restauracion/RestauracionScreen'));
 // Mundo "Quinua y granos andinos": recuperación de los granos ancestrales de la
 // montaña (quinua, amaranto/bledo, chía, cañihua y tarwi). Photo-forward (patrón
@@ -456,6 +463,11 @@ const HASH_VIEW_ROUTES = {
   trapiche: 'cana',
   canaveral: 'cana',
   cañaveral: 'cana',
+  mango: 'mango',
+  'el-mango': 'mango',
+  mangifera: 'mango',
+  manga: 'mango',
+  mancera: 'mango',
   restauracion: 'restauracion',
   'restauracion-bosque': 'restauracion',
   'bosque-de-alimentos': 'restauracion',
@@ -543,7 +555,7 @@ const MODULE_VIEWS = new Set([
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'aromaticas', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'frutales', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'almanaque', 'suelo', 'agua', 'cafe', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'cana', 'restauracion', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'cana', 'mango', 'restauracion', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'fique', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'platano', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'cacao', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
@@ -1914,6 +1926,21 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="La caña y la panela">
               <CanaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mango':
+        // Mundo "El mango" (5 estaciones: variedad+siembra / piso térmico+agua /
+        // floración+cuaje / plagas / cosecha+despensa). Profundización dedicada
+        // del mango, photo-forward con fotos CC y groundeado en el grafo
+        // (mangifera_indica: antracnosis/Anastrepha vía pest_controllers,
+        // compatible_with) + perennialCycles (AGROSAVIA). Honestidad térmica:
+        // tierra cálida (<1200 msnm) sí, por encima de ~1800 NO va. Sin dosis
+        // químicas inventadas (cifras de sitio = "dato en camino").
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mango">
+              <MangoScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );

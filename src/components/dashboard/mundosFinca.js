@@ -94,6 +94,18 @@ export const MUNDOS_FINCA = [
         directo: { view: 'cana' },
     },
     {
+        id: 'mango',
+        titulo: 'El mango',
+        emoji: '🥭',
+        lema: 'El rey de la tierra cálida: variedad e injerto, piso térmico, floración, antracnosis y mosca, cosecha y despensa',
+        tinte: ['#c9791f', '#f7e6c9'],
+        // Mundo de una sola pantalla (photo-forward, 5 estaciones del ciclo del
+        // mango). Profundización dedicada (como el café o la caña), más allá de
+        // la ficha corta que vive en "Frutales de la finca". La tarjeta navega
+        // directo, sin pantalla intermedia.
+        directo: { view: 'mango' },
+    },
+    {
         id: 'suelo',
         titulo: 'El suelo vivo',
         emoji: '🌱',

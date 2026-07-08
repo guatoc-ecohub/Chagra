@@ -391,11 +391,56 @@ function VinetaDisenio() {
     );
 }
 
+/** 🥭 El mango — árbol grande de tierra caliente, cargado de mangos, sol fuerte. */
+function VinetaMango() {
+    return (
+        <svg {...SVG_PROPS}>
+            <rect width="180" height="90" fill="#f7e6c9" />
+            {/* sol fuerte de tierra caliente */}
+            <circle cx="150" cy="20" r="12" fill="#ffcf6b" />
+            <circle cx="150" cy="20" r="7" fill="#ffe3a0" />
+            {/* loma cálida */}
+            <path d="M-4 54 Q60 44 120 52 T184 48 V90 H-4 Z" fill="#a9b95a" />
+            <path d="M-4 66 Q70 56 184 62 V90 H-4 Z" fill="#7f9a3e" />
+            {/* tronco del árbol de mango */}
+            <path d="M56 78 L56 46 M56 60 q-8 -3 -13 -10 M56 54 q9 -3 14 -11" stroke="#7a5230" strokeWidth="4.6" strokeLinecap="round" fill="none" />
+            {/* copa densa y redonda del mango (varios lóbulos de fronda) */}
+            <g fill="#2f6b3a">
+                <circle cx="40" cy="34" r="18" />
+                <circle cx="64" cy="28" r="20" />
+                <circle cx="82" cy="40" r="16" />
+                <circle cx="52" cy="46" r="16" />
+            </g>
+            <g fill="#3f8f4e" opacity=".9">
+                <circle cx="46" cy="30" r="10" />
+                <circle cx="70" cy="34" r="10" />
+                <circle cx="60" cy="24" r="8" />
+            </g>
+            {/* mangos colgando en la copa (amarillo-naranja con cachete rojizo) */}
+            <g>
+                <ellipse cx="38" cy="44" rx="4" ry="5.4" fill="#f0a52e" transform="rotate(12 38 44)" />
+                <ellipse cx="56" cy="48" rx="4" ry="5.4" fill="#ec9a26" transform="rotate(-8 56 48)" />
+                <ellipse cx="72" cy="46" rx="4" ry="5.4" fill="#f0a52e" transform="rotate(10 72 46)" />
+                <ellipse cx="48" cy="38" rx="3.6" ry="4.8" fill="#ef8f24" transform="rotate(-6 48 38)" />
+                <ellipse cx="66" cy="38" rx="3.6" ry="4.8" fill="#f2ab34" transform="rotate(8 66 38)" />
+            </g>
+            {/* cachete rojizo del mango protagonista en primer plano */}
+            <g transform="translate(126 60)">
+                <ellipse cx="0" cy="10" rx="16" ry="4" fill="#6b3f16" opacity=".4" />
+                <ellipse cx="0" cy="0" rx="12" ry="9" fill="#f0a52e" />
+                <path d="M-11 -2 Q-4 -10 8 -8 Q2 -2 -2 2 Z" fill="#e2582a" opacity=".85" />
+                <path d="M0 -9 q2 -4 -1 -6" stroke="#6b8a2f" strokeWidth="2" strokeLinecap="round" fill="none" />
+            </g>
+        </svg>
+    );
+}
+
 /** Viñeta por id de mundo (fuente única para tarjeta + pantalla de mundo). */
 const VINETAS = {
     cultivos: VinetaCultivos,
     cafe: VinetaCafe,
     cana: VinetaCana,
+    mango: VinetaMango,
     suelo: VinetaSuelo,
     agua: VinetaAgua,
     abono: VinetaAbono,
