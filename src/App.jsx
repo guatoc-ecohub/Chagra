@@ -131,6 +131,11 @@ const AromaticasScreen = lazy(() => import('./components/aromaticas/AromaticasSc
 // beneficio). Photo-forward (patrón Agua) y groundeado en el grafo
 // (species.coffea_arabica) + Cenicafé; la pulpa cierra ciclo hacia el compost.
 const CafeScreen = lazy(() => import('./components/cafe/CafeScreen'));
+// Mundo "Quinua y granos andinos": recuperación de los granos ancestrales de la
+// montaña (quinua, amaranto/bledo, chía, cañihua y tarwi). Photo-forward (patrón
+// Café) y groundeado en las fichas de ciclo (cycle-content) + nutrición ICBF; el
+// desaponificado de la quinua es el paso clave; mildiú sin dosis químicas.
+const QuinuaScreen = lazy(() => import('./components/quinua/QuinuaScreen'));
 const MilpaScreen = lazy(() => import('./components/milpa/MilpaScreen'));
 // "El clima que viene": traductor campesino de los boletines IDEAM/ENSO. Lee la
 // fase ENSO en vivo (ensoService) y remite a la Mesa Técnica Agroclimática — no
@@ -1750,6 +1755,23 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El café">
               <CafeScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'quinua':
+        // Mundo "Quinua y granos andinos" (dentro de Cultivos y semillas):
+        // recuperación de granos ancestrales alto-andinos. 5 estaciones photo-
+        // forward — los granos (quinua/amaranto/chía/cañihua/tarwi) y su valor /
+        // siembra y piso térmico / el desaponificado de la quinua (lavar el
+        // amargo, paso clave) + desamargado del tarwi / mildiú (Peronospora
+        // variabilis) con manejo agroecológico sin dosis químicas / cosecha,
+        // trilla y valor nutricional (proteína completa, sin gluten, hierro).
+        // Groundeado en cycle-content + nutricion-humana ICBF; cifras de sitio =
+        // "dato en camino". Fotos CC reales con crédito visible.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Quinua y granos andinos">
+              <QuinuaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
