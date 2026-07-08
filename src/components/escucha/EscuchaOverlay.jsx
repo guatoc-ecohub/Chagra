@@ -19,19 +19,25 @@
  * es ese conteo, feedback honesto). "Listo" y "Cancelar" quedan como respaldo
  * táctil tamaño guante.
  *
- * Visual: "la mano que escucha" — ManoChagraGlyph al centro de un iris de
- * micelio cuyos anillos y brotes respiran con el RMS REAL del micrófono
- * (audioLevel/amplitudeHistory del recorder — nada de animación fingida).
+ * Visual: "LA SEMILLA QUE DESPIERTA" — el widget no es un botón, es una
+ * criatura bioluminiscente de bosque nocturno. Membranas orgánicas que mutan,
+ * un corazón que late con la mano de Chagra adentro, raíces de luz que CRECEN
+ * con el RMS REAL del micrófono (audioLevel/amplitudeHistory del recorder —
+ * nada de animación fingida), luciérnagas ámbar, y savia que fluye por las
+ * raíces hacia el corazón cuando piensa. El conteo de silencio es una
+ * luciérnaga que le da la vuelta a la criatura: si completa el círculo,
+ * terminamos de oír (feedback honesto, dato real).
  *
  * IMPORTANTE — español colombiano (tú/usted), NUNCA voseo argentino.
  */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { X, Mic, Keyboard, CornerUpRight, AlertTriangle } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { transcribe, queueForRetry } from '../../services/voiceService';
 import { routeUtterance } from '../../services/escuchaIntentRouter';
 import { onEscucha } from '../../services/escuchaService';
 import ManoChagraGlyph from '../dashboard/ManoChagraGlyph';
+import { blobPath, generarRaices } from './organico';
 import './escucha.css';
 
 /* Fases del widget. 'cerrado' = desmontado visualmente (retorna null). */
@@ -49,7 +55,9 @@ const MIN_ESCUCHA_MS = 1500;
 const TOPE_ESCUCHA_MS = 25000; // por debajo del hard-limit (30s) del recorder
 const PAUSA_RUMBO_MS = 1000;   // deja LEER "Abriendo Mercado…" antes de saltar
 
-const NUM_BROTES = 28;
+/* La criatura: número de raíces de luz y centro del viewBox 280×280. */
+const NUM_RAICES = 12;
+const CENTRO = 140;
 
 const formatoSegundos = (ms) => `${(ms / 1000).toFixed(0)}s`;
 
@@ -58,72 +66,185 @@ const navegar = (view, initialData = null) => {
 };
 
 /**
- * Iris de micelio: 3 anillos que respiran con el RMS + brotes radiales con la
- * historia de amplitud + arco de cierre (conteo de silencio). Todo dato real.
+ * La Semilla que Despierta — la criatura bioluminiscente del overlay.
+ *
+ * Anatomía (de adentro hacia afuera):
+ *  - CORAZÓN: halo + disco luminoso con la mano de Chagra; se hincha con el
+ *    RMS real y late (lub-dub) cuando piensa.
+ *  - MEMBRANAS: 3 blobs orgánicos superpuestos que rotan/respiran a ritmos
+ *    primos — la silueta muta todo el tiempo (transform-only, GPU).
+ *  - RAÍCES: 12 tendrilos curvos asimétricos con pathLength=100; su
+ *    crecimiento (stroke-dashoffset) responde a la historia de amplitud REAL.
+ *    En "pensando" quedan a media extensión y la SAVIA (pulsos de luz por
+ *    offset-path) viaja por ellas hacia el corazón — se está comiendo sus
+ *    palabras. En "rumbo" se extienden plenas (¡señala!).
+ *  - LUCIÉRNAGA CONTADORA: el conteo de silencio es una luciérnaga ámbar que
+ *    rodea la criatura dejando estela; si completa la vuelta, cerramos.
+ *  - LUCIÉRNAGAS ambientales: 6 chispas ámbar que derivan; la voz las aviva.
+ *
+ * Todo dato visible es real (RMS, historia, conteo) — nada fingido.
  */
-function IrisEscucha({ nivel, historia, fase, cierre }) {
-  const C = 116; // centro del viewBox 232x232
-  const brotes = [];
-  const muestras = historia.slice(-NUM_BROTES);
-  for (let i = 0; i < NUM_BROTES; i++) {
-    const m = muestras[i] ?? 0;
-    const ang = (i / NUM_BROTES) * Math.PI * 2 - Math.PI / 2;
-    const r0 = 78;
-    const largo = fase === FASE_OYENDO ? 5 + m * 26 : 5;
-    const x1 = C + Math.cos(ang) * r0;
-    const y1 = C + Math.sin(ang) * r0;
-    const x2 = C + Math.cos(ang) * (r0 + largo);
-    const y2 = C + Math.sin(ang) * (r0 + largo);
-    brotes.push(
-      <line
-        key={i}
-        className="escucha-brote"
-        x1={x1} y1={y1} x2={x2} y2={y2}
-        strokeWidth={i % 4 === 0 ? 3 : 2}
-        opacity={0.35 + m * 0.65}
-      />,
-    );
-  }
-
-  // Arco de cierre: circunferencia r=110; se va DIBUJANDO con el silencio.
-  const rArco = 110;
-  const circArco = 2 * Math.PI * rArco;
-
+function SemillaViva({ nivel, historia, fase, cierre }) {
+  const C = CENTRO;
   const vivo = fase === FASE_OYENDO;
+
+  // Geometría determinista: la criatura es siempre LA MISMA criatura.
+  const raices = useMemo(() => generarRaices(C, C, NUM_RAICES), []);
+  const membranas = useMemo(() => ([
+    { d: blobPath(C, C, 60, 1.3, 0.16), cls: 'escucha-membrana esc-m1' },
+    { d: blobPath(C, C, 71, 4.1, 0.13), cls: 'escucha-membrana esc-m2' },
+    { d: blobPath(C, C, 82, 7.7, 0.11), cls: 'escucha-membrana esc-m3' },
+  ]), []);
+  // Anillo interior: la membrana propia del corazón (abraza la mano).
+  const anilloCorazon = useMemo(() => blobPath(C, C, 49, 3.4, 0.07), []);
+
+  // Crecimiento de cada raíz según la fase (0..100 sobre pathLength=100).
+  const muestras = historia.slice(-NUM_RAICES);
+  const crecimiento = (i) => {
+    if (vivo) {
+      const m = muestras[i] ?? 0;
+      return 30 + Math.min(1, m * 1.15 + nivel * 0.25) * 70;
+    }
+    if (fase === FASE_PENSANDO) return 85;
+    if (fase === FASE_RUMBO) return 100;
+    return 16;
+  };
+
+  // La luciérnaga contadora recorre el perímetro con el silencio (dato real).
+  const rArco = 124;
+  const circArco = 2 * Math.PI * rArco;
+  const angTip = -Math.PI / 2 + cierre * Math.PI * 2;
+  const tipX = C + Math.cos(angTip) * rArco;
+  const tipY = C + Math.sin(angTip) * rArco;
+
   return (
-    <div className="escucha-iris" aria-hidden="true">
-      <svg viewBox="0 0 232 232">
-        {/* Anillos de micelio: respiración = RMS real, cada uno a su ritmo */}
-        {[{ r: 58, k: 26, o: 0.5 }, { r: 68, k: 16, o: 0.35 }, { r: 78, k: 8, o: 0.25 }].map(({ r, k, o }, i) => (
-          <circle
-            key={i}
-            className="escucha-anillo"
-            cx={C} cy={C} r={r}
-            fill="none"
-            stroke={`rgba(var(--esc-linea-rgb), ${o + (vivo ? nivel * 0.4 : 0)})`}
-            strokeWidth={i === 0 ? 2.5 : 1.5}
-            strokeDasharray={i === 2 ? '3 7' : i === 1 ? '10 6' : 'none'}
-            style={{ transform: vivo ? `scale(${1 + nivel * (k / 100)})` : 'scale(1)' }}
-          />
-        ))}
-        {brotes}
-        {/* Conteo de silencio: el aro exterior se cierra → "ya casi termino de oír" */}
+    <div
+      className="escucha-criatura"
+      aria-hidden="true"
+      style={{ '--nivel': nivel }}
+    >
+      <svg viewBox="0 0 280 280">
+        <defs>
+          <radialGradient id="esc-halo-grad">
+            <stop offset="0%" stopColor="rgba(var(--esc-bio-rgb), 0.30)" />
+            <stop offset="55%" stopColor="rgba(var(--esc-bio-rgb), 0.10)" />
+            <stop offset="100%" stopColor="rgba(var(--esc-bio-rgb), 0)" />
+          </radialGradient>
+        </defs>
+
+        {/* Halo del corazón: respiración de luz detrás de todo. */}
+        <circle
+          className="escucha-halo"
+          cx={C} cy={C} r={92}
+          fill="url(#esc-halo-grad)"
+          style={{ transform: `scale(${vivo ? 1 + nivel * 0.22 : 1})` }}
+        />
+
+        {/* Membranas: el cuerpo que muta. El grupo se hincha con la voz. */}
+        <g
+          className="escucha-cuerpo"
+          style={{ transform: `scale(${vivo ? 1 + nivel * 0.07 : 1})` }}
+        >
+          {membranas.map((m) => (
+            <path key={m.cls} className={m.cls} d={m.d} />
+          ))}
+        </g>
+
+        {/* Raíces de luz en S + ramificaciones + nodos (encienden al crecer). */}
+        <g className="escucha-raices">
+          {raices.map((r, i) => {
+            const g = crecimiento(i);
+            return (
+              <path
+                key={`r${i}`}
+                className="escucha-raiz"
+                d={r.d}
+                pathLength={100}
+                strokeWidth={r.w}
+                strokeDasharray="100"
+                strokeDashoffset={100 - g}
+              />
+            );
+          })}
+          {raices.map((r, i) => r.rama && (
+            <path
+              key={`rr${i}`}
+              className="escucha-ramita"
+              d={r.rama.d}
+              pathLength={100}
+              strokeDasharray="100"
+              strokeDashoffset={100 - Math.max(0, (crecimiento(i) - 45) / 55) * 100}
+            />
+          ))}
+          {raices.map((r, i) => (
+            <circle
+              key={`n${i}`}
+              className="escucha-nodo"
+              cx={r.tip.x} cy={r.tip.y} r={2.4}
+              opacity={Math.max(0, (crecimiento(i) - 45) / 55) * 0.9}
+            />
+          ))}
+          {raices.map((r, i) => r.rama && (
+            <circle
+              key={`nr${i}`}
+              className="escucha-nodo"
+              cx={r.rama.tip.x} cy={r.rama.tip.y} r={1.7}
+              opacity={Math.max(0, (crecimiento(i) - 70) / 30) * 0.75}
+            />
+          ))}
+        </g>
+
+        {/* La membrana propia del corazón: abraza la mano. */}
+        <path className="escucha-anillo-corazon" d={anilloCorazon} />
+
+        {/* Conteo de silencio: la luciérnaga que rodea la criatura. */}
         {vivo && cierre > 0 && (
-          <circle
-            className="escucha-arco-cierre"
-            cx={C} cy={C} r={rArco}
-            fill="none"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeDasharray={circArco}
-            strokeDashoffset={circArco * (1 - cierre)}
-            transform={`rotate(-90 ${C} ${C})`}
-          />
+          <g className="escucha-vigilia">
+            <circle
+              className="escucha-estela"
+              cx={C} cy={C} r={rArco}
+              fill="none"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeDasharray={circArco}
+              strokeDashoffset={circArco * (1 - cierre)}
+              transform={`rotate(-90 ${C} ${C})`}
+            />
+            <circle className="escucha-luci-halo" cx={tipX} cy={tipY} r={8} />
+            <circle className="escucha-luci-cuerpo" cx={tipX} cy={tipY} r={2.8} />
+          </g>
         )}
       </svg>
-      <div className="escucha-mano">
+
+      {/* El corazón: la mano de Chagra dentro del núcleo luminoso. */}
+      <div
+        className="escucha-mano"
+        style={{ transform: `scale(${vivo ? 1 + nivel * 0.12 : 1})` }}
+      >
         <ManoChagraGlyph size={54} />
       </div>
+
+      {/* Luciérnagas ambientales (6 chispas ámbar; la voz las aviva). */}
+      {[1, 2, 3, 4, 5, 6].map((k) => (
+        <span key={k} className={`escucha-luci esc-l${k}`}><i /></span>
+      ))}
+
+      {/* Esporas: mientras oye, la criatura exhala chispas que suben. */}
+      {vivo && [1, 2, 3, 4].map((k) => (
+        <span key={`e${k}`} className={`escucha-espora esc-e${k}`} />
+      ))}
+
+      {/* Savia: pulsos de luz que viajan por las raíces hacia el corazón. */}
+      {fase === FASE_PENSANDO && [1, 4, 7, 10].map((ri, k) => (
+        <span
+          key={`s${ri}`}
+          className="escucha-savia"
+          style={{
+            offsetPath: `path("${raices[ri].d}")`,
+            animationDelay: `${k * 0.45}s`,
+          }}
+        />
+      ))}
     </div>
   );
 }
@@ -320,7 +441,7 @@ export default function EscuchaOverlay() {
           {fuente === 'wakeword' ? 'Escuché «hola Chagra»' : 'Escucha manos libres'}
         </div>
 
-        <IrisEscucha nivel={audioLevel} historia={amplitudeHistory} fase={fase} cierre={cierre} />
+        <SemillaViva nivel={audioLevel} historia={amplitudeHistory} fase={fase} cierre={cierre} />
 
         <h2 className="escucha-titulo" data-testid="escucha-estado" aria-live="polite">
           {fase === FASE_ERROR && <AlertTriangle size={22} style={{ display: 'inline', verticalAlign: '-3px', marginRight: 6 }} />}
@@ -332,7 +453,7 @@ export default function EscuchaOverlay() {
           <div className="escucha-medidor" aria-hidden="true">
             <span>{formatoSegundos(durationMs)}</span>
             <span>·</span>
-            <span>{cierre > 0 ? 'lo oí — cierro si se queda callado' : 'grabando'}</span>
+            <span>{cierre > 0 ? 'lo oí — si calla, cierro' : 'grabando'}</span>
           </div>
         )}
 
