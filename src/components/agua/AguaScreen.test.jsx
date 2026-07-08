@@ -191,6 +191,67 @@ describe('AguaScreen — riesgos de contaminación + salud', () => {
   });
 });
 
+describe('AguaScreen — 2ª pasada: aguas mieles, sedimentos, metales y usos', () => {
+  it('lista las aguas mieles del café como riesgo alto (roban el oxígeno)', () => {
+    render(<AguaScreen onBack={() => {}} />);
+    fireEvent.click(screen.getByTestId('pilar-tab-cuidar'));
+    const mieles = screen.getByTestId('riesgo-aguas-mieles');
+    expect(mieles).toHaveTextContent(/aguas mieles del café/i);
+    expect(mieles).toHaveTextContent(/oxígeno/i);
+    expect(mieles).toHaveTextContent(/peligro alto/i);
+  });
+
+  it('el caso del beneficiadero da el paso a paso y deja la DBO como dato en camino (Cenicafé)', () => {
+    render(<AguaScreen onBack={() => {}} />);
+    fireEvent.click(screen.getByTestId('pilar-tab-cuidar'));
+    const caso = screen.getByTestId('agua-aguas-mieles');
+    expect(caso).toHaveTextContent(/beneficiadero/i);
+    // Prácticas del beneficio ecológico: fosa techada + pozo propio para mieles.
+    expect(screen.getByTestId('mieles-paso-fosa-pulpa')).toHaveTextContent(/fosa/i);
+    expect(screen.getByTestId('mieles-paso-pozo-mieles')).toHaveTextContent(/pozo o tanque/i);
+    // Honestidad grounded: la cifra de carga (DBO) NO se inventa.
+    expect(caso).toHaveTextContent(/en camino/i);
+    expect(caso).toHaveTextContent(/Cenicafé/);
+  });
+
+  it('los sedimentos avisan que el agua turbia le quita fuerza al cloro y al sol', () => {
+    render(<AguaScreen onBack={() => {}} />);
+    fireEvent.click(screen.getByTestId('pilar-tab-cuidar'));
+    const sed = screen.getByTestId('riesgo-sedimentos');
+    expect(sed).toHaveTextContent(/erosión/i);
+    expect(sed).toHaveTextContent(/le quita fuerza al cloro/i);
+    // El ganado bebe en bebedero, no dentro del cauce.
+    expect(sed).toHaveTextContent(/bebedero/i);
+  });
+
+  it('metales/minería: NO salen hirviendo y el límite legal es casi cero (Res. 2115/2007)', () => {
+    render(<AguaScreen onBack={() => {}} />);
+    fireEvent.click(screen.getByTestId('pilar-tab-cuidar'));
+    const min = screen.getByTestId('riesgo-mineria');
+    expect(min).toHaveTextContent(/mercurio/i);
+    expect(min).toHaveTextContent(/ni hervida/i);
+    // Límite grounded, formateado es-CO (0,001 mg/L de mercurio).
+    const limite = screen.getByTestId('agua-metales-limite');
+    expect(limite).toHaveTextContent('0,001 mg/L');
+    expect(limite).toHaveTextContent(/Resolución 2115\/2007/);
+  });
+
+  it('«¿esta agua sirve para...?» da la regla por uso: tomar, hortaliza cruda, animales y riego', () => {
+    render(<AguaScreen onBack={() => {}} />);
+    fireEvent.click(screen.getByTestId('pilar-tab-cuidar'));
+    expect(screen.getByTestId('agua-para-que-sirve')).toBeInTheDocument();
+    // Tomar: siempre tratada, y el tetero con la mejor agua.
+    expect(screen.getByTestId('uso-tomar')).toHaveTextContent(/siempre tratada/i);
+    expect(screen.getByTestId('uso-tomar')).toHaveTextContent(/tetero/i);
+    // Hortaliza que se come cruda: nada de agua de corrales/letrinas.
+    expect(screen.getByTestId('uso-hortaliza')).toHaveTextContent(/cruda/i);
+    // Animales: la más limpia que tenga, en bebedero.
+    expect(screen.getByTestId('uso-animales')).toHaveTextContent(/bebedero/i);
+    // Riego: la bomba de fumigar no se lava en el cauce + norma de reúso.
+    expect(screen.getByTestId('uso-riego')).toHaveTextContent(/Resolución 1256\/2021/);
+  });
+});
+
 describe('AguaScreen — chequeo casero «¿mi agua es segura?»', () => {
   it('lista las señales por sentidos y por entorno (corral, letrina, fumigado)', () => {
     render(<AguaScreen onBack={() => {}} />);
