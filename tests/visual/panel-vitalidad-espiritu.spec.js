@@ -83,13 +83,18 @@ async function sembrarFincaReal(page) {
         updated_at: now,
       },
     });
-    // Cosecha real anotada (log--harvest, shape de producción).
+    // Cosecha real anotada (log--harvest, shape de producción). `_pending: true`
+    // = registrada localmente y aún sin sincronizar (lo que ES una cosecha
+    // recién anotada por el campesino). Sin esa marca, el GC de logCache.bulkPut
+    // la borra cuando el home sincroniza contra el backend mock (data: []),
+    // dejando el contador en 0 — el mismo camino de producción de un log local.
     await logCache.put({
       id: 'e2e-pve-cosecha-1',
       type: 'log--harvest',
       name: 'Cosecha: Maíz',
       timestamp: Math.floor(now / 1000),
       status: 'done',
+      _pending: true,
       quantity: [{ measure: 'weight', value: { decimal: '12' }, units: 'kg' }],
     });
   });
