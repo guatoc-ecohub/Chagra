@@ -61,6 +61,8 @@
   --mm-platano-tallo: #8aa14f;
   --mm-cana: #a9bd68;
   --mm-piedra: #b7ab8d;
+  --mm-luz-a: rgba(255, 240, 200, 0.22);
+  --mm-luz-b: rgba(46, 32, 10, 0.16);
   --mm-halo-mundo: rgba(255, 205, 110, 0.9);
   --mm-etiqueta-bg: rgba(255, 248, 232, 0.94);
   --mm-etiqueta-ink: #4a3a20;
@@ -132,6 +134,8 @@
   --mm-platano-tallo: #24684a;
   --mm-cana: #2f7a52;
   --mm-piedra: #23405c;
+  --mm-luz-a: rgba(103, 232, 249, 0.10);
+  --mm-luz-b: rgba(2, 6, 16, 0.30);
   --mm-halo-mundo: rgba(34, 211, 238, 0.85);
   --mm-etiqueta-bg: rgba(8, 18, 34, 0.88);
   --mm-etiqueta-ink: #d9fbf3;
@@ -195,6 +199,8 @@
   --mm-platano-tallo: #94b757;
   --mm-cana: #b7d377;
   --mm-piedra: #c9c2a4;
+  --mm-luz-a: rgba(255, 255, 255, 0.26);
+  --mm-luz-b: rgba(28, 64, 30, 0.12);
   --mm-halo-mundo: rgba(120, 200, 90, 0.9);
   --mm-etiqueta-bg: rgba(255, 255, 255, 0.94);
   --mm-etiqueta-ink: #24532b;
@@ -302,7 +308,7 @@
   margin: 0 auto;
   overflow: hidden;
   touch-action: none;
-  background: var(--mm-cielo-a);
+  background: linear-gradient(180deg, var(--mm-cielo-a), var(--mm-cielo-b));
   transition: background 0.5s ease;
 }
 
@@ -345,7 +351,7 @@
   position: absolute;
   transform: translate(-50%, -100%);
   z-index: 4;
-  font: 800 9px 'Nunito', sans-serif;
+  font: 800 10.5px 'Nunito', sans-serif;
   color: var(--mm-etiqueta-ink);
   background: var(--mm-etiqueta-bg);
   border: 1px solid var(--mm-etiqueta-borde);
@@ -359,8 +365,8 @@
 .mm-mundo {
   position: absolute;
   transform: translate(-50%, -50%);
-  width: 30px;
-  height: 30px;
+  width: 38px;
+  height: 38px;
   padding: 0;
   border: none;
   background: transparent;
@@ -372,10 +378,10 @@
 }
 
 .mm-mundo-halo {
-  width: 20px;
-  height: 20px;
+  width: 23px;
+  height: 23px;
   border-radius: 50%;
-  border: 1.6px solid var(--mm-halo-mundo);
+  border: 2px solid var(--mm-halo-mundo);
   box-shadow: 0 0 10px var(--mm-halo-mundo), inset 0 0 6px var(--mm-halo-mundo);
   animation: mm-pulso 2.6s ease-in-out infinite;
 }
@@ -386,7 +392,7 @@
   left: 50%;
   transform: translateX(-50%);
   margin-top: 1px;
-  font: 800 7.5px 'Nunito', sans-serif;
+  font: 800 10px 'Nunito', sans-serif;
   color: var(--mm-etiqueta-ink);
   background: var(--mm-etiqueta-bg);
   border: 1px solid var(--mm-etiqueta-borde);
@@ -560,9 +566,11 @@
 .mm-stop-halo-b { stop-color: var(--mm-halo-b); }
 .mm-stop-rio-a { stop-color: var(--mm-rio-a); }
 .mm-stop-rio-b { stop-color: var(--mm-rio-b); }
+.mm-stop-luz-a { stop-color: var(--mm-luz-a); }
+.mm-stop-luz-b { stop-color: var(--mm-luz-b); }
 
-.mm-ridge-a { fill: var(--mm-ridge-a); opacity: 0.75; }
-.mm-ridge-b { fill: var(--mm-ridge-b); opacity: 0.65; }
+.mm-ridge-a { fill: var(--mm-ridge-a); opacity: 0.5; }
+.mm-ridge-b { fill: var(--mm-ridge-b); opacity: 0.42; }
 
 .mm-piso-paramo { fill: var(--mm-paramo); }
 .mm-piso-frio { fill: var(--mm-frio); }
@@ -579,7 +587,9 @@
 }
 
 .mm[data-dir='biopunk'] .mm-borde-piso {
-  filter: drop-shadow(0 0 3px rgba(34, 211, 238, 0.7));
+  stroke-width: 2.4;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0.8));
 }
 
 .mm-niebla { fill: var(--mm-niebla); }
@@ -663,6 +673,10 @@
 .mm-mercado-fruta-a { fill: var(--mm-fruta-a); }
 .mm-mercado-fruta-b { fill: var(--mm-fruta-b); }
 
+/* Sombríos del cafetal */
+.mm-sombrio path { fill: none; stroke: var(--mm-tronco); stroke-width: 4; stroke-linecap: round; }
+.mm-sombrio-copa { fill: var(--mm-mango-copa); opacity: 0.88; }
+
 /* Cálido */
 .mm-mango-tronco { fill: none; stroke: var(--mm-tronco); stroke-width: 7; stroke-linecap: round; }
 .mm-mango-copa { fill: var(--mm-mango-copa); }
@@ -702,6 +716,10 @@
   stroke: none;
   animation: mm-titila 2.8s ease-in-out infinite alternate;
 }
+
+/* Follaje botánico en primer plano (solo verde vivo) */
+.mm-botanica { display: none; }
+.mm[data-dir='verde'] .mm-botanica { display: block; fill: #4c9a4f; }
 
 /* Mariposas (solo verde vivo) */
 .mm-mariposas { display: none; }

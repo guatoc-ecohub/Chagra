@@ -58,7 +58,7 @@ const MUNDOS = [
   { id: 'restauracion', x: 132, y: 434, piso: 1, etiqueta: 'Restaurar', abre: 'la restauración del páramo y el bosque' },
   { id: 'papa', x: 118, y: 662, piso: 2, etiqueta: 'La papa', abre: 'la papa y los tubérculos' },
   { id: 'animales', x: 272, y: 700, piso: 2, etiqueta: 'Mis animales', abre: 'sus animales: gallinas, vacas, cabras' },
-  { id: 'agente', x: 195, y: 892, piso: 3, etiqueta: 'Hablar con Chagra', abre: 'el agente: pregunte con su voz' },
+  { id: 'agente', x: 207, y: 896, piso: 3, etiqueta: 'Hablar con Chagra', abre: 'el agente: pregunte con su voz' },
   { id: 'cosecha', x: 296, y: 848, piso: 3, etiqueta: 'Mi cosecha', abre: 'su cosecha guardada en el troje' },
   { id: 'cafe', x: 96, y: 942, piso: 3, etiqueta: 'El café', abre: 'el mundo del café' },
   { id: 'vender', x: 300, y: 986, piso: 3, etiqueta: 'Vender', abre: 'el mercado: precios y ventas' },
@@ -78,12 +78,16 @@ const DIRECCIONES = [
 function calcularTransform(vp, modo, piso) {
   const escenaH = vp.w * (VB_H / VB_W);
   if (modo === 'montana') {
-    const s = Math.min(vp.h / escenaH, 1);
-    return { s, tx: (vp.w - vp.w * s) / 2, ty: Math.max((vp.h - escenaH * s) / 2, 0) };
+    // Deja aire para la brújula (arriba) y el botón de zoom (abajo), que
+    // tapaban el rótulo de "El río" cuando la montaña llenaba todo el alto.
+    const s = Math.min((vp.h - 150) / escenaH, 1);
+    return { s, tx: (vp.w - vp.w * s) / 2, ty: 84 };
   }
   const p = PISOS[piso];
   const bandaH = ((p.y1 - p.y0) / VB_H) * escenaH;
-  const s = Math.max(1, Math.min((vp.h * 0.94) / bandaH, 2.4));
+  // Tope 1.35: con más acercamiento el piso pierde su ancho (el cafetal y
+  // el troje quedaban por fuera de la pantalla) y las etiquetas gigantes.
+  const s = Math.max(1, Math.min((vp.h * 0.94) / bandaH, 1.35));
   const cy = (((p.y0 + p.y1) / 2) / VB_H) * escenaH;
   let ty = vp.h / 2 - cy * s;
   ty = Math.max(vp.h - escenaH * s, Math.min(0, ty));
@@ -372,6 +376,13 @@ function MontanaSvg() {
           <stop offset="0" className="mm-stop-rio-a" />
           <stop offset="1" className="mm-stop-rio-b" />
         </linearGradient>
+        {/* Luz de montaña: baña la ladera de arriba (cálida/neón/blanca según
+            dirección) y hunde el valle — profundidad pictórica sin más capas. */}
+        <linearGradient id="mm-g-luz" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" className="mm-stop-luz-a" />
+          <stop offset="0.45" stopColor="rgba(0,0,0,0)" />
+          <stop offset="1" className="mm-stop-luz-b" />
+        </linearGradient>
         {/* La montaña recorta sus pisos: nada se pinta fuera de su silueta. */}
         <clipPath id="mm-clip-montana">
           <path d="M-2 1442 L-2 760 Q56 706 96 596 Q136 486 160 366 Q178 268 195 176 Q212 268 230 366 Q254 486 294 596 Q334 706 392 760 L392 1442 Z" />
@@ -411,9 +422,9 @@ function MontanaSvg() {
         </g>
       </g>
 
-      {/* Cordilleras de atrás: profundidad de sierra */}
-      <path className="mm-ridge mm-ridge-a" d="M-2 1442 L-2 700 Q40 660 72 560 Q104 452 128 392 Q150 452 176 540 L200 640 L200 1442 Z" />
-      <path className="mm-ridge mm-ridge-b" d="M392 1442 L392 680 Q350 640 322 556 Q296 470 276 408 Q258 470 236 560 L214 660 L214 1442 Z" />
+      {/* Cordilleras de atrás: lomas redondas y brumosas, más bajas que el pico */}
+      <path className="mm-ridge mm-ridge-a" d="M-2 1442 L-2 720 Q50 600 96 486 Q120 430 150 470 Q180 540 196 640 L196 1442 Z" />
+      <path className="mm-ridge mm-ridge-b" d="M392 1442 L392 700 Q346 590 306 500 Q284 452 258 496 Q230 560 214 660 L214 1442 Z" />
 
       {/* ── Cuerpo de la montaña: pisos térmicos apilados ── */}
       <g clipPath="url(#mm-clip-montana)">
@@ -424,10 +435,9 @@ function MontanaSvg() {
         <path className="mm-piso-calido" d="M-2 1076 Q54 1058 110 1068 Q166 1080 222 1066 Q276 1052 330 1066 Q364 1074 392 1062 L392 1442 L-2 1442 Z" />
         <path className="mm-piso-valle" d="M-2 1316 Q60 1300 130 1310 Q210 1322 280 1308 Q340 1298 392 1308 L392 1442 L-2 1442 Z" />
 
-        {/* Nieve: cae sobre el páramo con lengua de glaciar */}
-        <path className="mm-nieve" d="M195 168 Q210 240 228 292 Q216 306 204 296 Q198 330 188 356 Q178 322 172 300 Q160 312 150 298 Q170 246 195 168 Z" />
-        <path className="mm-nieve" d="M195 168 Q170 250 148 302 Q136 296 130 306 Q148 322 142 338 Q120 330 108 342 Q132 250 160 214 Z" opacity="0.92" />
-        <path className="mm-nieve" d="M195 168 Q220 250 242 302 Q254 296 260 306 Q244 322 250 336 Q272 330 284 340 Q258 248 230 214 Z" opacity="0.92" />
+        {/* Nieve: casquete ancho con ruana dentada y lengua de glaciar */}
+        <path className="mm-nieve" d="M195 140 Q168 220 138 320 L154 306 L166 324 L182 306 L196 330 L212 306 L226 322 L240 304 L254 318 Q222 220 195 140 Z" />
+        <path className="mm-nieve" d="M196 330 Q192 358 184 382 Q178 360 182 336 Z" opacity="0.9" />
 
         {/* Bordes de piso: rima de luz (neón en biopunk) */}
         <path className="mm-borde-piso" d="M-2 574 Q46 556 94 566 Q152 578 200 564 Q258 550 306 564 Q350 576 392 562" />
@@ -494,6 +504,13 @@ function MontanaSvg() {
           <circle cx="298" cy="849" r="3" className="mm-troje-grano" />
           <circle cx="304" cy="846" r="3" className="mm-troje-grano" />
         </g>
+        {/* Sombríos del café (guamos): el cafetal colombiano crece a la sombra */}
+        <g className="mm-sombrio">
+          <path d="M52 940 Q50 924 54 912" />
+          <path d="M146 936 Q144 920 148 908" />
+        </g>
+        <ellipse className="mm-sombrio-copa" cx="54" cy="906" rx="17" ry="9" />
+        <ellipse className="mm-sombrio-copa" cx="148" cy="902" rx="19" ry="10" />
         <g className="mm-cafetal">
           <MataCafe x={72} y={938} s={1.1} />
           <MataCafe x={98} y={930} s={1} />
@@ -557,6 +574,9 @@ function MontanaSvg() {
         </g>
         <ellipse className="mm-piedra" cx="182" cy="1368" rx="8" ry="5" />
         <ellipse className="mm-piedra" cx="222" cy="1322" rx="6" ry="4" />
+
+        {/* Luz de montaña sobre toda la ladera (dentro del recorte) */}
+        <rect x="-2" y="120" width="394" height="1322" fill="url(#mm-g-luz)" pointerEvents="none" />
       </g>
 
       {/* Red viva (solo biopunk): el micelio conecta los pisos */}
@@ -590,6 +610,14 @@ function MontanaSvg() {
       <g className="mm-aves">
         <path d="M96 236 q6 -6 12 0 q6 -6 12 0" />
         <path d="M130 258 q5 -5 10 0 q5 -5 10 0" />
+      </g>
+
+      {/* Follaje botánico en primer plano (solo verde vivo) */}
+      <g className="mm-botanica">
+        <path d="M-4 1442 Q10 1380 44 1352 Q26 1394 22 1442 Z" />
+        <path d="M-4 1442 Q28 1402 74 1392 Q40 1420 34 1442 Z" opacity="0.75" />
+        <path d="M394 1442 Q380 1376 344 1348 Q364 1392 368 1442 Z" />
+        <path d="M394 1442 Q360 1400 316 1390 Q352 1418 358 1442 Z" opacity="0.75" />
       </g>
     </svg>
   );
