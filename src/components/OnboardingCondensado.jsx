@@ -324,6 +324,9 @@ export default function OnboardingCondensado({
 
   /** GPS → resolveUbicacion (municipio+altitud+piso+vereda PIP, §2.2). */
   const ubicarMiFinca = () => {
+    // Una corrección manual de altitud previa pertenece a la ubicación
+    // ANTERIOR — no debe envenenar la nueva detección.
+    setManualAltitud('');
     setGeoState('detecting');
     requestGeo({
       maximumAge: 0,
@@ -353,6 +356,7 @@ export default function OnboardingCondensado({
 
   /** Alternativa sin GPS: municipio del cascade DANE → centroide + veredas. */
   const escogerMunicipioManual = async (m, departamento) => {
+    setManualAltitud('');
     const base = {
       lat: m.lat,
       lng: m.lng,
