@@ -120,21 +120,21 @@ beforeEach(() => vi.clearAllMocks());
 // (necesita los 4 portales reales) — el import() dinámico del componente real
 // (2000+ líneas) tarda más que el default de testing-library (1000ms) en el
 // pipeline de transform de vitest, sobre todo bajo carga del host.
-describe('Bug 2 · DOM — hero F2: 4 portales visibles + hoja "resto" separada', () => {
-  test('renderiza los 4 portales del hero (ninguno queda sin montar)', { retry: 2 }, async () => {
+describe('Bug 2 · DOM — hero F2: 6 puertas visibles + hoja "resto" separada', () => {
+  test('renderiza las 6 puertas del hero (ninguna queda sin montar)', { retry: 2 }, async () => {
     render(<DashboardLive onNavigate={vi.fn()} />);
-    const nav = await screen.findByTestId('finca-viva-portales', {}, { timeout: 15000 });
-    const portales = within(nav).getAllByRole('button');
-    expect(portales).toHaveLength(4);
-    const labels = portales.map((b) => b.getAttribute('aria-label')?.split(':')[0]);
-    // Copy campesino vigente (#1883/#1884): "Mi finca" (gestión), "Aprender",
-    // "Jugar", "Pregúntele a Chagra" (agente). Antes eran Gestionar/Agente.
-    expect(labels).toEqual(['Mi finca', 'Aprender', 'Jugar', 'Pregúntele a Chagra']);
+    const nav = await screen.findByTestId('finca-viva-puertas', {}, { timeout: 15000 });
+    const puertas = within(nav).getAllByRole('button');
+    expect(puertas).toHaveLength(6);
+    const labels = puertas.map((b) => b.getAttribute('aria-label')?.split(':')[0]);
+    // Usabilidad campesina #5 (2026-07): SEIS puertas de 1-2 palabras
+    // reemplazan los 4 portales con descripción.
+    expect(labels).toEqual(['Mis matas', 'Mis animales', 'El tiempo', 'Vender', 'Aprender', 'Toda mi finca']);
   });
 
-  test('la hoja "resto" NO contiene los portales (superficies separadas)', { retry: 2 }, async () => {
+  test('la hoja "resto" NO contiene las puertas (superficies separadas)', { retry: 2 }, async () => {
     render(<DashboardLive onNavigate={vi.fn()} />);
-    const nav = await screen.findByTestId('finca-viva-portales', {}, { timeout: 15000 });
+    const nav = await screen.findByTestId('finca-viva-puertas', {}, { timeout: 15000 });
     // La hoja "resto" se reorganizó en bloques (#1883/#1884); su contenedor es
     // .fvh-resto (data-testid estable), ya no el título "El resto de su finca".
     const hoja = screen.getByTestId('fvh-resto');
@@ -144,9 +144,9 @@ describe('Bug 2 · DOM — hero F2: 4 portales visibles + hoja "resto" separada'
     expect(hoja.contains(nav)).toBe(false);
   });
 
-  test('en orden de documento, los portales van ANTES de la hoja "resto"', { retry: 2 }, async () => {
+  test('en orden de documento, las puertas van ANTES de la hoja "resto"', { retry: 2 }, async () => {
     render(<DashboardLive onNavigate={vi.fn()} />);
-    const nav = await screen.findByTestId('finca-viva-portales', {}, { timeout: 15000 });
+    const nav = await screen.findByTestId('finca-viva-puertas', {}, { timeout: 15000 });
     const tit = screen.getByTestId('fvh-resto');
     await waitFor(() => expect(nav).toBeInTheDocument());
     // compareDocumentPosition: nav precede a tit → DOCUMENT_POSITION_FOLLOWING.

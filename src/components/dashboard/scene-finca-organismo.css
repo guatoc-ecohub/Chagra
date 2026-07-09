@@ -349,3 +349,30 @@
   .fvo-micelio { opacity: 0.38; }
   .fvo-nodo { opacity: 0.85; }
 }
+
+/* ── CORAZÓN TAPPABLE = "PREGUNTE" (usabilidad campesina #4) ───────────────
+   Cuando FincaVivaHero pasa onPregunte, el corazón-semilla es un botón que
+   abre el agente. Cursor, foco visible para teclado y un halo-invitación que
+   respira (se apaga con prefers-reduced-motion, quedando el halo fijo). */
+.fvo-corazon-tap {
+  cursor: pointer;
+  outline: none;
+}
+.fvo-corazon-tap:focus-visible ellipse:first-of-type {
+  stroke: #eafff6;
+  stroke-width: 2;
+  opacity: 0.9;
+}
+.fvo-corazon-tap:active .fvo-heart { opacity: 0.85; }
+.fvo-corazon-halo {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fvo-corazon-invita 2.4s ease-out infinite;
+}
+@keyframes fvo-corazon-invita {
+  0% { transform: scale(0.8); opacity: 0.55; }
+  70%, 100% { transform: scale(1.35); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fvo-corazon-halo { animation: none !important; opacity: 0.4; }
+}
