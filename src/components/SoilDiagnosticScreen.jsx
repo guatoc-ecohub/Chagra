@@ -10,7 +10,7 @@ import {
   Clock3, Lock, RotateCcw, MessageCircle, Beaker, Skull,
 } from 'lucide-react';
 import SOIL_DATA from '../data/soil-diagnostics.json';
-import { diagnosticarSuelo } from '../services/soilDiagnostic';
+import { diagnosticarSuelo, guardarDiagnosticoSuelo } from '../services/soilDiagnostic';
 import useVoiceRecorder from '../hooks/useVoiceRecorder';
 import { transcribe } from '../services/voiceService';
 import ContextTip from './ContextTip';
@@ -183,6 +183,9 @@ export default function SoilDiagnosticScreen({ onBack, onNavigate }) {
     }
     setSinMatch(false);
     setDiag(d);
+    // Persistir el diagnóstico REAL: el home (panel de vitalidad, eje 🪱)
+    // lo lee con getDiagnosticoSueloGuardado — deja de decir "dato en camino".
+    guardarDiagnosticoSuelo(d);
     setPaso('diagnostico');
   }, [descripcion]);
 
