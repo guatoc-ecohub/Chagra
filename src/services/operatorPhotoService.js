@@ -33,11 +33,14 @@
  *     ProfileScreen) re-leen. La portada (TopBar) lee de aquí sin red.
  *
  * ── Sincronización a FarmOS (cuando hay sesión) ──────────────────────────
- *   Reutiliza el patrón YA existente en el repo (`useBackgroundImage` +
- *   `syncManager`): NO inventa endpoints.
- *     - Subida:  POST /api/file/upload (FormData) → crea un `file--file` con
- *       filename `chagra-operator-photo-<tenantId>-<ts>.jpg`. El prefijo por
- *       usuario evita colisiones entre operadores que comparten backend.
+ *   Usa el flujo NATIVO de Drupal 10 JSON:API (`uploadBinaryToFarmOS`):
+ *     - Subida:  POST /api/log/observation/file (octet-stream +
+ *       Content-Disposition) → crea un `file--file` con filename
+ *       `chagra-operator-photo-<tenantId>-<ts>.jpg` (el prefijo por usuario
+ *       evita colisiones entre operadores que comparten backend) y se adjunta
+ *       a un log--observation estable por usuario para que Drupal lo marque
+ *       PERMANENTE (bug 2026-07-08: la ruta vieja /api/file/upload no existe
+ *       → 404 silencioso, la foto nunca subía).
  *     - Carga:   GET /api/file/file?filter[filename][operator]=CONTAINS
  *       &filter[filename][value]=chagra-operator-photo-<tenantId>-&sort=-created
  *       &page[limit]=1 → descarga el blob más reciente con Bearer token y lo
@@ -303,15 +306,25 @@ export async function uploadToFarmOS(dataUrl) {
     return { ok: false, reason: 'offline' };
   }
   try {
-    const { sendToFarmOS } = await import('./apiService.js');
+    const { sendToFarmOS, uploadBinaryToFarmOS } = await import('./apiService.js');
     const blob = dataUrlToBlob(dataUrl);
     const filename = `${FARMOS_PHOTO_PREFIX}-${tenantId}-${Date.now()}.jpg`;
-    const formData = new FormData();
-    formData.append('file', blob, filename);
-    const result = await sendToFarmOS('/api/file/upload', formData, 'POST');
+    // BUG FIX 2026-07-08 ("no sube a farmOS"): la ruta vieja POST
+    // /api/file/upload NO EXISTE en farmOS 4.x / Drupal 10 (404 verificado en
+    // vivo) — la subida fallaba en silencio desde siempre. La vía real de
+    // Drupal es el upload POR CAMPO: POST /api/log/observation/file con
+    // octet-stream + Content-Disposition (403 sin auth = la ruta sí existe).
+    const result = await uploadBinaryToFarmOS(blob, filename, {
+      entity: 'log', bundle: 'observation', field: 'file',
+    });
     const fileUuid = result?.data?.id;
     if (fileUuid) {
-      writeSyncMeta({ fileUuid, filename, syncedAt: Date.now(), tenantId });
+      // Durabilidad: un file--file SIN referencia queda "temporal" y el cron
+      // de Drupal lo borra (~6 h) → la foto "desaparecía" del server. Se
+      // adjunta a UN log--observation por usuario (reusado entre cambios de
+      // foto vía logUuid en el sync meta) para marcarlo permanente.
+      const logUuid = await attachPhotoToLog(sendToFarmOS, fileUuid, tenantId);
+      writeSyncMeta({ fileUuid, filename, logUuid, syncedAt: Date.now(), tenantId });
       return { ok: true, fileUuid };
     }
     return { ok: false, reason: 'no-uuid' };
@@ -319,6 +332,53 @@ export async function uploadToFarmOS(dataUrl) {
     // Falla de red/permiso no es fatal: el local sigue funcionando.
     console.warn('[operatorPhoto] uploadToFarmOS falló (no bloqueante):', err?.message || err);
     return { ok: false, reason: 'error' };
+  }
+}
+
+/**
+ * Adjunta el file subido a un `log--observation` estable por usuario
+ * (`chagra-operator-photo-<tenantId>`) para que Drupal marque el archivo como
+ * PERMANENTE (sin referencia lo garbage-collectea en horas). Reusa el mismo
+ * log entre cambios de foto (PATCH); si el log guardado ya no existe (o nunca
+ * se creó), crea uno nuevo. No-throw: devuelve el logUuid efectivo o null.
+ *
+ * @param {Function} sendToFarmOS - inyectado por el caller (ya importado)
+ * @param {string} fileUuid
+ * @param {string} tenantId
+ * @returns {Promise<string|null>}
+ */
+async function attachPhotoToLog(sendToFarmOS, fileUuid, tenantId) {
+  const relationships = {
+    file: { data: [{ type: 'file--file', id: fileUuid }] },
+  };
+  const prevLogUuid = readSyncMeta().logUuid || null;
+  if (prevLogUuid) {
+    try {
+      await sendToFarmOS(`/api/log/observation/${prevLogUuid}`, {
+        data: { type: 'log--observation', id: prevLogUuid, relationships },
+      }, 'PATCH');
+      return prevLogUuid;
+    } catch (e) {
+      // Log borrado remotamente / permiso — caer a crear uno nuevo.
+      console.warn('[operatorPhoto] PATCH log foto falló, creando nuevo:', e?.message || e);
+    }
+  }
+  try {
+    const res = await sendToFarmOS('/api/log/observation', {
+      data: {
+        type: 'log--observation',
+        attributes: {
+          name: `${FARMOS_PHOTO_PREFIX}-${tenantId}`,
+          status: 'done',
+        },
+        relationships,
+      },
+    }, 'POST');
+    return res?.data?.id || null;
+  } catch (e) {
+    // No fatal: el file quedó subido; el próximo cambio de foto reintenta.
+    console.warn('[operatorPhoto] attach log foto falló (no bloqueante):', e?.message || e);
+    return null;
   }
 }
 

@@ -137,6 +137,15 @@ jobs:
           # Los assets vendoreados (TF.js/modelo, ~9 MB) NO se precachean:
           # cache-on-use del SW (WAKE_WORD_PATH_PREFIXES) al activarlo online.
           VITE_MODO_CAMPO: "true"
+          # AVATAR-ESPIRITU / módulos Pro (chagra #2210 + chagra-pro #304):
+          # ruta del bundle Pro pre-construido servido desde el MISMO origen
+          # (mismo-origin ⇒ CSP script-src 'self' lo cubre). loadProModules.js
+          # hace import() dinámico de `${VITE_PRO_MODULES_PATH}/<mod>/index.js`.
+          # Los bundles viven en /mnt/fast/appdata/farmos-pwa/pro-modules/ (montados
+          # manualmente en alpha, FUERA del repo público — anti-leak OSS/Pro). Si
+          # el path no resuelve, el import falla en silencio (try/catch) y la UI
+          # degrada: build puro OSS sin Pro. Preservado del rsync --delete abajo.
+          VITE_PRO_MODULES_PATH: "/pro-modules"
 
       - if: env.SKIP_DEPLOY != '1'
         name: Deploy to production
@@ -180,9 +189,16 @@ jobs:
         #     3) GC de chunks viejos para no crecer infinito: borra archivos en
         #        TARGET/assets/ con mtime > 30 dias. 30 dias cubre de sobra el
         #        tiempo para que un cliente instalado se actualice.
+        #
+        # /pro-modules/ es montado manualmente en el docroot (bundles Pro pre-
+        # construidos de chagra-pro, NO viven en el repo público → no están en
+        # dist/). Sin excluirlo, `rsync --delete` lo consideraría "sobrante" y lo
+        # borraría en cada deploy (mismo patrón que los manuales de escotillas que
+        # ya se perdieron). `--exclude='/pro-modules/'` lo preserva (ADR-002 +
+        # VITE_PRO_MODULES_PATH arriba).
         run: |
           umask 022
-          rsync -avzO --no-perms --delete --no-group --chmod=F644 --exclude='/assets/' dist/ /mnt/fast/appdata/farmos-pwa/
+          rsync -avzO --no-perms --delete --no-group --chmod=F644 --exclude='/assets/' --exclude='/pro-modules/' dist/ /mnt/fast/appdata/farmos-pwa/
           rsync -avzO --no-perms --no-group --chmod=F644 dist/assets/ /mnt/fast/appdata/farmos-pwa/assets/
           find /mnt/fast/appdata/farmos-pwa/assets/ -type f -mtime +30 -delete || true
           find /mnt/fast/appdata/farmos-pwa -type f -user runner ! -perm 644 -exec chmod 644 {} + || true

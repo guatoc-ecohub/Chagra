@@ -354,3 +354,49 @@ export const sendToFarmOS = async (endpoint, payload, method = 'POST') => {
 
   return await fetchFromFarmOS(endpoint, options);
 };
+
+/**
+ * Sube un binario (foto/evidencia) a FarmOS por el flujo NATIVO de
+ * Drupal 10 JSON:API — "file upload por campo":
+ *
+ *   POST /api/{entity}/{bundle}/{field}
+ *   Content-Type: application/octet-stream
+ *   Content-Disposition: file; filename="nombre.jpg"
+ *
+ * Crea un `file--file` NUEVO (sin adjuntar) y devuelve la respuesta JSON:API
+ * con su UUID en `data.id`.
+ *
+ * BUG HISTÓRICO (2026-07-08, "la foto de perfil no sube a farmOS"): el código
+ * usaba `POST /api/file/upload` con FormData — una ruta que NO EXISTE en
+ * farmOS 4.x / Drupal 10 (verificado en vivo: 404). Drupal solo expone la
+ * subida de archivos por campo de entidad (`/api/log/observation/file` → 403
+ * sin auth = la ruta sí existe). Como el caller tragaba el error con un
+ * `console.warn` "no bloqueante", la subida fallaba en silencio desde siempre.
+ *
+ * ⚠️ IMPORTANTE (durabilidad): el file creado queda TEMPORAL (status 0) hasta
+ * que alguna entidad lo referencie; el cron de Drupal borra los temporales
+ * (~6 h). El caller DEBE adjuntarlo (POST/PATCH con relationships) para que
+ * sobreviva — ver uploadToFarmOS (operatorPhotoService) y la evidencia de
+ * syncManager (Paso B ya lo hacía).
+ *
+ * @param {Blob} blob - binario a subir
+ * @param {string} filename - nombre del archivo (se sanea para el header)
+ * @param {{entity?: string, bundle?: string, field?: string}} [target]
+ *   Entidad/bundle/campo destino. Default: log observation, campo `file`.
+ * @returns {Promise<Object>} respuesta JSON:API (`data.id` = UUID del file--file)
+ * @throws {Error} si el servidor responde no-2xx / red caída (mismo contrato
+ *   que fetchFromFarmOS; el caller decide si es fatal)
+ */
+export const uploadBinaryToFarmOS = async (blob, filename, target = {}) => {
+  const { entity = 'log', bundle = 'observation', field = 'file' } = target;
+  // Sanear el filename para el header (sin comillas ni saltos de línea).
+  const safeName = String(filename || 'archivo.jpg').replace(/["\r\n]/g, '');
+  return await fetchFromFarmOS(`/api/${entity}/${bundle}/${field}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/octet-stream',
+      'Content-Disposition': `file; filename="${safeName}"`,
+    },
+    body: blob,
+  });
+};

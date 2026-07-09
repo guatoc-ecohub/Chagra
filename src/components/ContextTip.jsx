@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Guatoc Eco Hub
 
 import React, { useState } from 'react';
+import { X } from 'lucide-react';
 import { hasSeenTip, markTipSeen } from '../services/contextTips';
 
 /**
@@ -28,8 +29,12 @@ import { hasSeenTip, markTipSeen } from '../services/contextTips';
  *   - children:  texto del tip (1-2 frases).
  *   - moreLabel / onMore: acción secundaria opcional (ej. abrir el Manual).
  *   - className: clases extra del contenedor.
+ *   - variant:   'card' (default, tarjeta con botón Entendido) o 'subtle'
+ *                (una sola línea discreta con "x" — para lugares donde una
+ *                tarjeta grita, ej. encima del compositor del agente;
+ *                operador 2026-07-08). Misma mecánica contextTips.
  */
-export default function ContextTip({ id, emoji, title, children, moreLabel, onMore, className = '' }) {
+export default function ContextTip({ id, emoji, title, children, moreLabel = null, onMore = null, className = '', variant = 'card' }) {
   const [visible, setVisible] = useState(() => !hasSeenTip(id));
 
   if (!visible) return null;
@@ -38,6 +43,28 @@ export default function ContextTip({ id, emoji, title, children, moreLabel, onMo
     markTipSeen(id);
     setVisible(false);
   };
+
+  if (variant === 'subtle') {
+    return (
+      <div
+        role="note"
+        aria-label={title}
+        data-testid={`context-tip-${id}`}
+        className={`flex items-center gap-1.5 px-1 ${className}`}
+      >
+        <span className="text-sm shrink-0 leading-none" aria-hidden="true">{emoji}</span>
+        <p className="flex-1 min-w-0 text-xs text-slate-400 leading-snug">{children}</p>
+        <button
+          type="button"
+          onClick={dismiss}
+          aria-label={`Entendido, ocultar: ${title}`}
+          className="tap-target shrink-0 p-1 rounded-md text-slate-500 hover:text-slate-300 hover:bg-white/10 transition-colors"
+        >
+          <X size={13} aria-hidden="true" />
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div

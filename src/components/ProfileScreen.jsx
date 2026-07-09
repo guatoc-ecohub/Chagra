@@ -6,8 +6,8 @@ import {
 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { esExtensionistaActual } from '../config/extensionistaAccess';
-import ThemeSelector, { ThemeScene } from './common/ThemeSelector';
-import { PREVIEWS } from './common/themePreviewPalettes';
+import ThemeSelector from './common/ThemeSelector';
+import ThemeLivePreview from './common/ThemeLivePreview';
 import AgentAvatarSelector from './Settings/AgentAvatarSelector';
 import BackgroundSelector from './Settings/BackgroundSelector';
 import BackupExportButton from './BackupExportButton';
@@ -465,11 +465,12 @@ export default function ProfileScreen({ onBack, onHome }) {
                     </div>
 
                     {/* Tira de mini-temas SOLO en la tarjeta ancha de Apariencia:
-                        el usuario ve las pieles disponibles desde la portada. */}
+                        el usuario ve las pieles disponibles desde la portada.
+                        Cada swatch es un render VIVO del tema (ThemeLivePreview,
+                        tokens reales) — no un dibujo con paleta hard-codeada. */}
                     {wide && (
                       <span className="flex gap-2 mt-3" aria-hidden="true">
                         {selectableThemes.filter((t) => t.id !== 'auto').map((t) => {
-                          const p = PREVIEWS[t.id] || PREVIEWS.biopunk;
                           const isActive = theme === t.id;
                           return (
                             <span
@@ -478,7 +479,7 @@ export default function ProfileScreen({ onBack, onHome }) {
                                 isActive ? 'border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.45)]' : 'border-slate-700/70'
                               }`}
                             >
-                              <ThemeScene p={p} />
+                              <ThemeLivePreview themeId={t.id} />
                             </span>
                           );
                         })}

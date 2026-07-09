@@ -1,0 +1,166 @@
+/*
+ * mango.css — micro-animaciones del mundo "El mango" (photo-forward).
+ *
+ * Mismos principios que cafe.css / agua.css:
+ *   · Sutiles y baratas (SOLO transform/opacity — nada de layout, filter ni
+ *     blur animado; GPU-friendly).
+ *   · prefers-reduced-motion las apaga TODAS.
+ *   · Los colores salen de las clases Tailwind del componente (paleta slate +
+ *     acentos ámbar/mango), que reaccionan a los temas vía data-theme; aquí solo
+ *     hay movimiento y acentos rgb() puntuales de la misma paleta cálida.
+ */
+
+/* ── Entrada escalonada del contenido al cambiar de estación ───────────── */
+@keyframes mango-entra {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.mango-seccion > * {
+  animation: mango-entra 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.mango-seccion > *:nth-child(2) { animation-delay: 60ms; }
+.mango-seccion > *:nth-child(3) { animation-delay: 120ms; }
+.mango-seccion > *:nth-child(4) { animation-delay: 180ms; }
+.mango-seccion > *:nth-child(5) { animation-delay: 240ms; }
+.mango-seccion > *:nth-child(n+6) { animation-delay: 300ms; }
+
+/* ── Estación activa: aro que pulsa una sola vez al seleccionar ────────── */
+@keyframes mango-estacion-pulso {
+  0% { transform: scale(0.94); opacity: 0.5; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.mango-estacion-activa {
+  animation: mango-estacion-pulso 0.45s ease-out;
+}
+
+/* Pestañas de estación: respuesta táctil y de puntero con vida. */
+.mango-tab {
+  transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+@media (hover: hover) {
+  .mango-tab:hover { transform: translateY(-2px); }
+}
+.mango-tab:active { transform: scale(0.97); }
+
+/* Indicador de la estación activa: se despliega desde el centro. */
+@keyframes mango-indicador-entra {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+.mango-tab-indicador {
+  transform-origin: center;
+  animation: mango-indicador-entra 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Fotos reales ─────────────────────────────────────────────────────── */
+@keyframes mango-foto-entra {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.mango-foto {
+  animation: mango-foto-entra 0.5s ease-out;
+}
+@keyframes mango-kenburns {
+  from { transform: scale(1.06); }
+  to { transform: scale(1); }
+}
+.mango-foto--kenburns {
+  animation:
+    mango-foto-entra 0.6s ease-out both,
+    mango-kenburns 8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Texto del hero de portada: entra por líneas, escalonado. */
+.mango-hero-linea { animation: mango-entra 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.mango-hero-linea--2 { animation-delay: 0.14s; }
+.mango-hero-linea--3 { animation-delay: 0.28s; }
+
+/* ── Sol de tierra caliente (firma del mundo) ───────────────────────────
+ * Un sol SVG que "respira" sobre el hero de portada: rayos que laten suave.
+ * Solo transform/opacity. */
+@keyframes mango-sol-late {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 0.95; transform: scale(1.08); }
+}
+.mango-sol { transform-origin: center; animation: mango-sol-late 4.2s ease-in-out infinite; }
+
+/* ── Tarjetas vivas (variedades, vecinas, manejo) ───────────────────────
+ * Lift sutil + acento ámbar al pasar el puntero. */
+.mango-card {
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+@media (hover: hover) {
+  .mango-card:hover {
+    transform: translateY(-2px);
+    border-color: rgb(251 191 36 / 0.4);
+  }
+}
+
+/* CTAs (puentes a otros mundos): la flecha "invita" al pasar el puntero. */
+.mango-cta {
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+.mango-cta-flecha { transition: transform 0.2s ease; }
+@media (hover: hover) {
+  .mango-cta:hover { border-color: rgb(251 191 36 / 0.45); }
+  .mango-cta:hover .mango-cta-flecha { transform: translateX(3px); }
+}
+
+/* ── Timeline de pasos ordenados (siembra, flor→fruto) ──────────────────
+ * Hilo que conecta los círculos numerados: la secuencia se LEE como camino. */
+.mango-paso { position: relative; }
+.mango-paso:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 28px;
+  bottom: -10px;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, rgb(251 191 36 / 0.4), rgb(251 191 36 / 0.05));
+}
+.mango-paso--verde:not(:last-child)::before {
+  background: linear-gradient(to bottom, rgb(52 211 153 / 0.4), rgb(52 211 153 / 0.05));
+}
+
+/* ── Escala de piso térmico: la franja viable "se asienta" al aparecer ── */
+@keyframes mango-banda-entra {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.mango-banda { animation: mango-banda-entra 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.mango-banda:nth-child(2) { animation-delay: 80ms; }
+.mango-banda:nth-child(3) { animation-delay: 160ms; }
+
+/* ── Accesibilidad: foco visible en todo el mundo mango ─────────────────── */
+.mango-mundo :is(button, a):focus-visible {
+  outline: 2px solid rgb(251 191 36 / 0.85);
+  outline-offset: 2px;
+}
+
+/* ── prefers-reduced-motion: TODO quieto ───────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .mango-seccion > *,
+  .mango-estacion-activa,
+  .mango-tab-indicador,
+  .mango-foto,
+  .mango-foto--kenburns,
+  .mango-hero-linea,
+  .mango-sol,
+  .mango-banda {
+    animation: none;
+  }
+  .mango-sol { opacity: 0.7; }
+  .mango-tab,
+  .mango-card,
+  .mango-cta,
+  .mango-cta-flecha {
+    transition: none;
+  }
+  @media (hover: hover) {
+    .mango-tab:hover,
+    .mango-card:hover { transform: none; }
+    .mango-cta:hover .mango-cta-flecha { transform: none; }
+  }
+}

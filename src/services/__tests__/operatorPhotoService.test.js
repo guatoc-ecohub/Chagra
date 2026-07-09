@@ -13,10 +13,12 @@ import localforage from 'localforage';
 const sendToFarmOS = vi.fn();
 const fetchFromFarmOS = vi.fn();
 const fetchWithAuthRetry = vi.fn();
+const uploadBinaryToFarmOS = vi.fn();
 vi.mock('../apiService.js', () => ({
   sendToFarmOS: (...a) => sendToFarmOS(...a),
   fetchFromFarmOS: (...a) => fetchFromFarmOS(...a),
   fetchWithAuthRetry: (...a) => fetchWithAuthRetry(...a),
+  uploadBinaryToFarmOS: (...a) => uploadBinaryToFarmOS(...a),
 }));
 
 import {
@@ -82,6 +84,7 @@ describe('operatorPhotoService', () => {
     sendToFarmOS.mockReset();
     fetchFromFarmOS.mockReset();
     fetchWithAuthRetry.mockReset();
+    uploadBinaryToFarmOS.mockReset();
     // onLine = true por defecto (jsdom navigator es read-only → defineProperty).
     Object.defineProperty(navigator, 'onLine', { value: true, configurable: true });
   });
@@ -232,7 +235,7 @@ describe('operatorPhotoService', () => {
       const r = await uploadToFarmOS(SAMPLE_DATA_URL);
       expect(r.ok).toBe(false);
       expect(r.reason).toBe('no-session');
-      expect(sendToFarmOS).not.toHaveBeenCalled();
+      expect(uploadBinaryToFarmOS).not.toHaveBeenCalled();
     });
 
     it('no sube en offline', async () => {
@@ -240,32 +243,84 @@ describe('operatorPhotoService', () => {
       Object.defineProperty(navigator, 'onLine', { value: false, configurable: true });
       const r = await uploadToFarmOS(SAMPLE_DATA_URL);
       expect(r.reason).toBe('offline');
-      expect(sendToFarmOS).not.toHaveBeenCalled();
+      expect(uploadBinaryToFarmOS).not.toHaveBeenCalled();
     });
 
-    it('POST /api/file/upload con filename scopeado por usuario y guarda meta', async () => {
+    it('sube por el flujo Drupal (upload por campo), adjunta a un log y guarda meta', async () => {
       setActiveTenantId('alice');
-      sendToFarmOS.mockResolvedValue({ data: { id: 'uuid-123', type: 'file--file' } });
+      uploadBinaryToFarmOS.mockResolvedValue({ data: { id: 'uuid-123', type: 'file--file' } });
+      sendToFarmOS.mockResolvedValue({ data: { id: 'log-uuid-1', type: 'log--observation' } });
 
       const r = await uploadToFarmOS(SAMPLE_DATA_URL);
 
       expect(r.ok).toBe(true);
       expect(r.fileUuid).toBe('uuid-123');
+      // Paso A: binario por upload-por-campo (la ruta /api/file/upload NO
+      // existe en farmOS 4.x — bug 2026-07-08).
+      expect(uploadBinaryToFarmOS).toHaveBeenCalledTimes(1);
+      const [blob, filename, target] = uploadBinaryToFarmOS.mock.calls[0];
+      expect(blob).toBeInstanceOf(Blob);
+      expect(filename).toMatch(/^chagra-operator-photo-alice-\d+\.jpg$/);
+      expect(target).toEqual({ entity: 'log', bundle: 'observation', field: 'file' });
+      // Paso B: se adjunta a un log--observation para volver el file permanente.
       expect(sendToFarmOS).toHaveBeenCalledTimes(1);
-      const [endpoint, formData, method] = sendToFarmOS.mock.calls[0];
-      expect(endpoint).toBe('/api/file/upload');
-      expect(method).toBe('POST');
-      expect(formData).toBeInstanceOf(FormData);
-      const uploaded = formData.get('file');
-      expect(uploaded).toBeInstanceOf(Blob);
-      expect(uploaded.name).toMatch(/^chagra-operator-photo-alice-\d+\.jpg$/);
-      // meta persistida para evitar re-descargas redundantes.
+      const [logEndpoint, logPayload, logMethod] = sendToFarmOS.mock.calls[0];
+      expect(logEndpoint).toBe('/api/log/observation');
+      expect(logMethod).toBe('POST');
+      expect(logPayload.data.attributes.name).toBe('chagra-operator-photo-alice');
+      expect(logPayload.data.relationships.file.data).toEqual([
+        { type: 'file--file', id: 'uuid-123' },
+      ]);
+      // meta persistida para evitar re-descargas redundantes + reusar el log.
       expect(__test.readSyncMeta().fileUuid).toBe('uuid-123');
+      expect(__test.readSyncMeta().logUuid).toBe('log-uuid-1');
+    });
+
+    it('reusa el log existente (PATCH) al cambiar la foto', async () => {
+      setActiveTenantId('alice');
+      __test.writeSyncMeta({ fileUuid: 'old', logUuid: 'log-uuid-1', tenantId: 'alice' });
+      uploadBinaryToFarmOS.mockResolvedValue({ data: { id: 'uuid-456' } });
+      sendToFarmOS.mockResolvedValue({ data: { id: 'log-uuid-1' } });
+
+      const r = await uploadToFarmOS(SAMPLE_DATA_URL);
+
+      expect(r.ok).toBe(true);
+      const [logEndpoint, logPayload, logMethod] = sendToFarmOS.mock.calls[0];
+      expect(logEndpoint).toBe('/api/log/observation/log-uuid-1');
+      expect(logMethod).toBe('PATCH');
+      expect(logPayload.data.id).toBe('log-uuid-1');
+      expect(__test.readSyncMeta().logUuid).toBe('log-uuid-1');
+    });
+
+    it('si el PATCH al log guardado falla (borrado remoto), crea uno nuevo', async () => {
+      setActiveTenantId('alice');
+      __test.writeSyncMeta({ fileUuid: 'old', logUuid: 'log-muerto', tenantId: 'alice' });
+      uploadBinaryToFarmOS.mockResolvedValue({ data: { id: 'uuid-789' } });
+      sendToFarmOS
+        .mockRejectedValueOnce(new Error('404')) // PATCH al log muerto
+        .mockResolvedValueOnce({ data: { id: 'log-nuevo' } }); // POST nuevo
+
+      const r = await uploadToFarmOS(SAMPLE_DATA_URL);
+
+      expect(r.ok).toBe(true);
+      expect(__test.readSyncMeta().logUuid).toBe('log-nuevo');
+    });
+
+    it('sigue ok aunque el attach al log falle (el file quedó subido)', async () => {
+      setActiveTenantId('alice');
+      uploadBinaryToFarmOS.mockResolvedValue({ data: { id: 'uuid-999' } });
+      sendToFarmOS.mockRejectedValue(new Error('403'));
+
+      const r = await uploadToFarmOS(SAMPLE_DATA_URL);
+
+      expect(r.ok).toBe(true);
+      expect(r.fileUuid).toBe('uuid-999');
+      expect(__test.readSyncMeta().logUuid).toBe(null);
     });
 
     it('no-throw si la red falla', async () => {
       setActiveTenantId('alice');
-      sendToFarmOS.mockRejectedValue(new Error('500'));
+      uploadBinaryToFarmOS.mockRejectedValue(new Error('500'));
       const r = await uploadToFarmOS(SAMPLE_DATA_URL);
       expect(r.ok).toBe(false);
       expect(r.reason).toBe('error');
@@ -339,7 +394,8 @@ describe('operatorPhotoService', () => {
     it('redimensiona, persiste local y devuelve el data-URL (sync dispara en background)', async () => {
       installCanvasMocks();
       setActiveTenantId('alice');
-      sendToFarmOS.mockResolvedValue({ data: { id: 'bg-uuid' } });
+      uploadBinaryToFarmOS.mockResolvedValue({ data: { id: 'bg-uuid' } });
+      sendToFarmOS.mockResolvedValue({ data: { id: 'bg-log' } });
       const file = new File([new Uint8Array(10)], 'foto.jpg', { type: 'image/jpeg' });
 
       const out = await setOperatorPhotoFromFile(file);
@@ -348,7 +404,11 @@ describe('operatorPhotoService', () => {
       expect(getOperatorPhoto()).toBe(SAMPLE_DATA_URL);
       // El upload corre en background (fire-and-forget); esperamos a que llegue.
       await vi.waitFor(() =>
-        expect(sendToFarmOS).toHaveBeenCalledWith('/api/file/upload', expect.any(FormData), 'POST'),
+        expect(uploadBinaryToFarmOS).toHaveBeenCalledWith(
+          expect.any(Blob),
+          expect.stringMatching(/^chagra-operator-photo-alice-\d+\.jpg$/),
+          { entity: 'log', bundle: 'observation', field: 'file' },
+        ),
       );
     });
   });
