@@ -83,6 +83,9 @@ const WorkerHistory = lazy(() => import('./components/WorkerHistory'));
 const BitacoraEntryDetail = lazy(() => import('./components/BitacoraEntryDetail'));
 const InformesScreen = lazy(() => import('./components/InformesScreen'));
 const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').then(m => ({ default: m.InventoryDashboard })));
+// Mockup dev del nuevo FAB del agente (Ⓐ de herramientas que se ensamblan).
+// Ruta #/mockups/boton-anarquia — sin gate ni sesión (no toca datos reales).
+const BotonAnarquiaMockup = lazy(() => import('./mockups/BotonAnarquia'));
 // InventoryPage orquesta la capa de auditoría/reconciliación de inventario
 // (InventoryAuditTrail + InventoryAuditDashboard + InventoryEventTimeline),
 // completa pero huérfana (0 rutas) antes de este wiring — descubribilidad
@@ -417,6 +420,7 @@ const LoadingFallback = ({ view = null }) => {
 // Ref: CAPABILITIES_STATUS.md §4 (deuda de navegación) + §2 (huérfanos).
 
 const HASH_VIEW_ROUTES = {
+  'mockups/boton-anarquia': 'mockup_boton_anarquia',
   agente: 'agente',
   'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
@@ -896,6 +900,13 @@ export default function App() {
       return;
     }
 
+    // Mockup dev (#/mockups/boton-anarquia): vista aislada de decisión visual
+    // — se monta sin sesión (no lee ni escribe datos reales).
+    if (hash === 'mockups/boton-anarquia') {
+      Promise.resolve().then(() => navigate('mockup_boton_anarquia'));
+      return;
+    }
+
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
         navigate('login');
@@ -924,6 +935,11 @@ export default function App() {
       const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
       const routeView = HASH_VIEW_ROUTES[hash];
       if (!routeView) return;
+      // Mockup dev: sin gate ni sesión (datos de muestra).
+      if (routeView === 'mockup_boton_anarquia') {
+        navigate(routeView);
+        return;
+      }
       // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
       if (routeView === 'extensionista' && !esExtensionistaActual()) {
         navigate('dashboard');
@@ -1228,6 +1244,16 @@ export default function App() {
         return (
           <ErrorBoundary>
             <DashboardLiveView onNavigate={navigate} onLogout={handleLogout} lastLogMessage={lastLogMessage} />
+          </ErrorBoundary>
+        );
+      case 'mockup_boton_anarquia':
+        // Mockup dev del nuevo FAB del agente (3 variantes animadas de la Ⓐ
+        // de herramientas). Full-screen, sin gate — solo para decidir dirección.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Botón Anarquía">
+              <BotonAnarquiaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'hoy_finca':
