@@ -35,33 +35,35 @@ import React, { useState } from 'react';
 // lados — la Ⓐ pintada de un solo gesto.
 // ─────────────────────────────────────────────────────────────────────────────
 
-// PALA (diagonal izquierda). Local: empuñadura D en (0,~2), mango a (0,78),
-// hoja puntuda hasta (0,112). Colocada: vértice (70,15), 17.2° → punta ~(37,122).
-const PALA_POS = 'translate(70 15) rotate(17.2)';
-const PALA_GRIP = 'M -7 9 A 7 7 0 1 1 7 9 L -7 9';
-const PALA_SHAFT = 'M 0 9 L 0 78';
-const PALA_BLADE = 'M -10 74 C -11.5 88 -6 100 0 112 C 6 100 11.5 88 10 74 C 4 78.5 -4 78.5 -10 74 Z';
+// PALA (diagonal izquierda). Local: empuñadura D (estribo abierto) arriba,
+// mango a (0,78), hoja puntuda hasta (0,111). Colocada: vértice (68.5,13),
+// 18° → punta ~(34,118). La empuñadura asoma por fuera del aro (vértice Ⓐ).
+const PALA_POS = 'translate(68.5 13) rotate(18)';
+const PALA_GRIP = 'M -7 13 L -7 6 A 7 7 0 0 1 7 6 L 7 13';
+const PALA_SHAFT = 'M 0 11 L 0 78';
+const PALA_BLADE = 'M -8.5 74 C -10 87 -5.5 99 0 111 C 5.5 99 10 87 8.5 74 C 3.5 78 -3.5 78 -8.5 74 Z';
 
 // MACHETE (diagonal derecha). Local: pomo/mango (0,2)-(0,26), guarda, hoja
-// que se ensancha con lomo recto y filo curvo hasta la punta (12,100).
-// Colocado: nace junto al vértice (72,22), −18.8° → punta ~(116,113).
-const MACHETE_POS = 'translate(72 22) rotate(-18.8)';
+// que se ensancha con lomo recto y filo curvo hasta la punta (13.5,~96).
+// Colocado: nace junto al vértice (73.5,20), −19.5° → punta ~(114,104).
+const MACHETE_POS = 'translate(73.5 20) rotate(-19.5)';
 const MACHETE_HANDLE = 'M 0 2 L 0 26';
 const MACHETE_GUARD = 'M -6 27 L 7 27';
-const MACHETE_BLADE = 'M -4 29 L -4 80 Q -4 94 9 104 L 15 97 Q 7 90 6.5 76 L 6.5 29 Z';
+const MACHETE_BLADE = 'M -3.5 29 L -3.5 78 Q -3.5 90 8 99 L 13.5 92.5 Q 6.5 86 6 73 L 6 29 Z';
+const MACHETE_FILO = 'M 8 99 L 13.5 92.5';
 
-// AZADÓN (travesaño). Local horizontal: mango (6,0)-(100,0); en el extremo
-// izquierdo el cuello dobla hacia abajo y remata en la hoja perpendicular.
-// Colocado en (22,88): el mango sobresale del aro por ambos lados y la cabeza
-// cuelga afuera abajo-izquierda (contrapeso de la punta del machete).
+// AZADÓN (travesaño). Local horizontal: mango (8,0)-(100,0); en el extremo
+// izquierdo el cuello dobla hacia abajo y remata en la hoja perpendicular,
+// pequeña y pegada al mango. Colocado en (22,88): el mango sobresale del aro
+// por ambos lados y la cabeza queda abajo-izquierda (contrapeso del machete).
 const AZADON_POS = 'translate(22 88)';
 const AZADON_HANDLE = 'M 8 0 L 100 0';
-const AZADON_NECK = 'M 10 -1 C 2 0 -2 4 -3 10';
-const AZADON_BLADE = 'M -8 8 L 3 9 L 5 26 L -13 23 Z';
+const AZADON_NECK = 'M 12 -1 C 4 0 0 3 -1 9';
+const AZADON_BLADE = 'M -6 7 L 4 8.5 L 5.5 22 L -10 19 Z';
 
 // Ejes simplificados de la A (para capas de glow / savia): las tres barras.
-const EJE_PALA = 'M 70 15 L 37 122';
-const EJE_MACHETE = 'M 72 22 L 116 113';
+const EJE_PALA = 'M 68 16 L 35 118';
+const EJE_MACHETE = 'M 74 22 L 113 103';
 const EJE_AZADON = 'M 24 88 L 120 88';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -112,7 +114,7 @@ function Machete({ skin }) {
       <path d={MACHETE_GUARD} fill="none" stroke={c.line} strokeWidth="4.5" strokeLinecap="round" />
       <path d={MACHETE_BLADE} fill={c.fill} stroke={c.hi} strokeWidth="2.6" strokeLinejoin="round" />
       {/* filo — la línea de vida del machete */}
-      <path d="M 9 104 L 15 97" fill="none" stroke={c.filo} strokeWidth="3" strokeLinecap="round" />
+      <path d={MACHETE_FILO} fill="none" stroke={c.filo} strokeWidth="3" strokeLinecap="round" />
     </g>
   );
 }
@@ -142,10 +144,10 @@ function Azadon({ skin }) {
 /** Chispas de impacto: rayitas que salen despedidas desde (x,y). */
 function Chispas({ x, y, kf, color = '#ffb03a' }) {
   const dirs = [
-    { sx: '-13px', sy: '-9px', r: -40 },
-    { sx: '12px', sy: '-12px', r: 35 },
-    { sx: '-10px', sy: '7px', r: -105 },
-    { sx: '14px', sy: '5px', r: 110 },
+    { sx: '-20px', sy: '-15px', r: -50 },
+    { sx: '18px', sy: '-19px', r: 40 },
+    { sx: '-16px', sy: '9px', r: -100 },
+    { sx: '22px', sy: '7px', r: 95 },
   ];
   return (
     <g>
@@ -153,8 +155,8 @@ function Chispas({ x, y, kf, color = '#ffb03a' }) {
         <line
           key={i}
           className={`ba-spark ${kf}`}
-          x1={x} y1={y} x2={x} y2={y - 6}
-          stroke={color} strokeWidth="2.6" strokeLinecap="round"
+          x1={x} y1={y} x2={x} y2={y - 10}
+          stroke={color} strokeWidth="2.8" strokeLinecap="round"
           style={{ '--sx': d.sx, '--sy': d.sy, '--sr': `${d.r}deg` }}
         />
       ))}
@@ -192,11 +194,11 @@ function FabForja() {
       <g className="b1-azadon"><Azadon skin="neon" /></g>
 
       {/* ondas + chispas de cada aterrizaje */}
-      <circle className="b1-onda b1-onda-a" cx="42" cy="112" r="9" fill="none" stroke="#ffb03a" strokeWidth="2.4" opacity="0" />
-      <circle className="b1-onda b1-onda-b" cx="108" cy="106" r="9" fill="none" stroke="#ffb03a" strokeWidth="2.4" opacity="0" />
+      <circle className="b1-onda b1-onda-a" cx="36" cy="114" r="9" fill="none" stroke="#ffb03a" strokeWidth="2.4" opacity="0" />
+      <circle className="b1-onda b1-onda-b" cx="112" cy="103" r="9" fill="none" stroke="#ffb03a" strokeWidth="2.4" opacity="0" />
       <circle className="b1-onda b1-onda-c" cx="70" cy="88" r="9" fill="none" stroke="#ffb03a" strokeWidth="2.4" opacity="0" />
-      <Chispas x={42} y={112} kf="b1-sp-a" />
-      <Chispas x={108} y={106} kf="b1-sp-b" />
+      <Chispas x={36} y={114} kf="b1-sp-a" />
+      <Chispas x={112} y={103} kf="b1-sp-b" />
       <Chispas x={26} y={88} kf="b1-sp-c" />
       <Chispas x={118} y={88} kf="b1-sp-c" />
     </svg>
@@ -290,7 +292,7 @@ function FabMachetazo() {
         </g>
 
         {/* estelas de velocidad de cada golpe */}
-        <polygon className="b3-streak b3-streak-pala" points="66,-14 74,-14 71,52 69,52" fill="#ece3cf" opacity="0" />
+        <polygon className="b3-streak b3-streak-pala" points="60,-28 69,-30 72,48 66,49" fill="#ece3cf" opacity="0" />
         <g className="b3-streak b3-streak-azadon" stroke="#ece3cf" strokeWidth="3" strokeLinecap="round" opacity="0">
           <line x1="78" y1="82" x2="130" y2="80" />
           <line x1="86" y1="94" x2="132" y2="93" />
@@ -499,6 +501,7 @@ const BA_CSS = `
 .ba-stage {
   display: flex; align-items: center; justify-content: center; position: relative;
   padding: 26px 0 34px; cursor: pointer; border: 0; border-radius: 14px;
+  overflow: hidden; /* las herramientas "entran" a escena, no vuelan sobre el texto */
   background:
     radial-gradient(340px 200px at 50% 42%, rgba(255, 255, 255, 0.035), transparent 70%),
     rgba(0, 0, 0, 0.32);
@@ -515,6 +518,7 @@ const BA_CSS = `
 .ba-real {
   display: flex; align-items: center; gap: 14px;
   border-top: 1px dashed rgba(217, 229, 220, 0.14); padding-top: 12px;
+  overflow: hidden;
 }
 .ba-real-label, .ba-real-px, .ba-specs {
   font-family: ui-monospace, 'Cascadia Mono', 'JetBrains Mono', monospace;
@@ -535,6 +539,14 @@ const BA_CSS = `
 .ba-svg g, .ba-svg circle, .ba-svg line, .ba-svg polygon, .ba-svg path {
   transform-box: fill-box;
   transform-origin: center;
+}
+/* las capas que giran alrededor del CENTRO del botón (órbitas de la
+   Simbiosis, estampado y poros) pivotan sobre el viewBox, no sobre su bbox.
+   Especificidad .ba-svg + clase para ganarle a la regla blanket de arriba. */
+.ba-svg .b2-orb, .ba-svg .b2-membrana, .ba-svg .b2-poros,
+.ba-svg .b3-aro, .ba-svg .b3-grunge {
+  transform-box: view-box;
+  transform-origin: 70px 74px;
 }
 
 /* ══ 01 · LA FORJA ═══════════════════════════════════════════════════════ */
