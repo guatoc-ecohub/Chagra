@@ -104,7 +104,9 @@ async function login(page) {
 
 test.describe('Selector del guardián (espíritu de la finca)', () => {
   test('elegir un guardián nativo lo resalta, muestra el nombre científico y PERSISTE', async ({ page }) => {
-    test.setTimeout(90000);
+    // Dos cargas completas del home (inicial + reload de persistencia): con el
+    // dev server compilando en frío o CI bajo carga, 90s se quedaba corto.
+    test.setTimeout(240000);
     await seedOperador(page);
     await mockBackend(page);
 

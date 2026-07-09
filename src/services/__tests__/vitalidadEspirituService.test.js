@@ -160,16 +160,17 @@ describe('ejeEnergia — registros REALES del mes en curso', () => {
   });
 });
 
-describe('contarAnillosFrailejon — una temporada (~3 meses) por anillo', () => {
+describe('contarAnillosFrailejon — un anillo por AÑO (mismo contrato que el reloj)', () => {
   it('desde el primer registro real (la cosecha más antigua manda aquí)', () => {
-    // primer registro: 2025-10-05 (cosecha) → 9 meses hasta 2026-07 → 3 temporadas + 1
+    // primer registro: 2025-10-05 (cosecha) → años 2025 y 2026 → 2 anillos,
+    // exactamente los MISMOS que contaría fincaClockService (el reloj).
     const anillos = contarAnillosFrailejon({
       processes: procesos(),
       harvestSummary: resumenCosecha(),
       now: NOW,
     });
     expect(anillos.estado).toBe('ok');
-    expect(anillos.valor).toBe(4);
+    expect(anillos.valor).toBe(2);
   });
 
   it('sin ningún registro → pendiente (no se inventa historia)', () => {
@@ -197,7 +198,7 @@ describe('buildVitalidadEspiritu — modelo completo', () => {
     expect(m.ejes.map((e) => e.id)).toEqual(['clima', 'suelo', 'biodiversidad', 'energia']);
     expect(m.conteos.especies.valor).toBe(5);
     expect(m.conteos.cosechas.valor).toBe(5);
-    expect(m.conteos.anillos.valor).toBe(4);
+    expect(m.conteos.anillos.valor).toBe(2);
     // suelo sin diagnóstico persistido → pendiente (dato en camino)
     expect(m.ejes.find((e) => e.id === 'suelo').estado).toBe('pendiente');
     expect(m.algunPendiente).toBe(true);

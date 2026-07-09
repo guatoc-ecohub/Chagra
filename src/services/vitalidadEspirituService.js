@@ -43,12 +43,12 @@
  *     (log--harvest reales de logCache, agregados por cosechaService).
  *     summary null (aún sin cargar / error IDB) → pendiente. 0 con el store
  *     cargado es un CERO REAL y se muestra.
- *   · ◎ Anillos del frailejón → un anillo por TEMPORADA del almanaque
- *     campesino (~3 meses; la zona andina bimodal tiene 4 temporadas/año,
- *     ver anoFincaService.TEMPORADA_POR_MES) transcurrida desde el PRIMER
- *     registro real de la finca (la siembra más antigua o la primera
- *     cosecha anotada, lo que ocurra primero). Sin ningún registro →
- *     pendiente.
+ *   · ◎ Anillos del frailejón → un anillo por AÑO calendario desde el
+ *     PRIMER registro real de la finca (la siembra más antigua o la primera
+ *     cosecha anotada, lo que ocurra primero) — el MISMO contrato que el
+ *     Reloj del Frailejón (fincaClockService): el frailejón crece un anillo
+ *     al año, y los dos "anillos" del home deben contar lo mismo. Sin
+ *     ningún registro → pendiente.
  *
  * Todo puro y client-side (sin fetch, sin IDB, sin DOM): la vista
  * (FincaVivaHero → PanelVitalidadEspiritu) inyecta los datos ya cargados.
@@ -67,8 +67,6 @@ export const BIODIVERSIDAD_SATURACION = 6;
 export const ENERGIA_META_MES = 6;
 /** Penalización por problema de suelo detectado (0..100, documentada). */
 export const SUELO_PENALIZACION_POR_PROBLEMA = 18;
-/** Meses por temporada del almanaque andino bimodal (4 temporadas/año). */
-export const MESES_POR_TEMPORADA = 3;
 
 /** Copys de las fuentes (aria/title de cada slot — trazabilidad visible). */
 export const FUENTES = Object.freeze({
@@ -79,7 +77,7 @@ export const FUENTES = Object.freeze({
   biodiversidad: 'Especies distintas vivas en su finca (saturación a 6, como la vitalidad)',
   energia: 'Registros de este mes: cosechas anotadas + siembras abiertas',
   cosechas: 'Cosechas anotadas en «Mi cosecha» (registros reales de su finca)',
-  anillos: 'Una temporada del almanaque (~3 meses) por anillo, desde su primer registro',
+  anillos: 'Un anillo por año de su finca en Chagra, desde su primer registro real',
 });
 
 const CONDICION_LABEL = Object.freeze({
@@ -285,8 +283,10 @@ export function ejeEnergia({ processes = [], harvestSummary = null, now = new Da
 }
 
 /**
- * ◎ Anillos del frailejón: temporadas del almanaque (~3 meses) desde el
- * primer registro real (siembra más antigua o primera cosecha anotada).
+ * ◎ Anillos del frailejón: un anillo por AÑO calendario desde el primer
+ * registro real (siembra más antigua o primera cosecha anotada) — mismo
+ * contrato que fincaClockService.getAniosFinca (el reloj del home): los dos
+ * "anillos del frailejón" cuentan LO MISMO y nunca se contradicen.
  *
  * @param {{processes?: Array, harvestSummary?: object|null, now?: Date}} [input]
  * @returns {SlotVitalidad}
@@ -307,8 +307,7 @@ export function contarAnillosFrailejon({ processes = [], harvestSummary = null, 
     return pendiente({ fuente: FUENTES.anillos });
   }
   const inicio = new Date(primero);
-  const meses = (now.getFullYear() - inicio.getFullYear()) * 12 + (now.getMonth() - inicio.getMonth());
-  const anillos = Math.floor(Math.max(0, meses) / MESES_POR_TEMPORADA) + 1;
+  const anillos = Math.max(0, now.getFullYear() - inicio.getFullYear()) + 1;
   return ok(anillos, { fuente: FUENTES.anillos });
 }
 

@@ -73,13 +73,13 @@ test.describe('Árbol de mundos + reloj del frailejón (home biopunk2)', () => {
     await sembrarCicloViejo(page);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('networkidle').catch(() => {});
-    await expect(page.getByTestId('finca-viva-hero')).toBeVisible({ timeout: 20000 });
+    await expect(page.getByTestId('finca-viva-hero')).toBeVisible({ timeout: 60000 });
 
     // 1) EL ÁRBOL vive dentro del bloque de mundos (no huérfano).
     const bloque = page.getByTestId('bloque-mundos');
     const arbol = bloque.getByTestId('arbol-mundos');
     await arbol.scrollIntoViewIfNeeded();
-    await expect(arbol).toBeVisible({ timeout: 20000 });
+    await expect(arbol).toBeVisible({ timeout: 60000 });
     await expect(arbol).toContainText('El árbol de su finca');
 
     // Una rama-vaina por mundo del manifiesto (perfil con animales → todas).
@@ -91,7 +91,7 @@ test.describe('Árbol de mundos + reloj del frailejón (home biopunk2)', () => {
     //    (p. ej. 2024·2025·2026), un anillo por año REAL.
     const reloj = arbol.getByTestId('reloj-frailejon');
     await reloj.scrollIntoViewIfNeeded();
-    await expect(reloj).toBeVisible({ timeout: 20000 });
+    await expect(reloj).toBeVisible({ timeout: 60000 });
     await expect(reloj.getByTestId('reloj-frailejon-anios')).toContainText('3 anillos');
     const anioActual = new Date().getFullYear();
     await expect(reloj).toContainText(`desde ${anioActual - 2}`);

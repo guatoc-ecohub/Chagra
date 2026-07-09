@@ -49,7 +49,11 @@ export default function RelojFrailejon({ onNavigate }) {
   const n = anios.length;
   const paso = n > MAX_ANILLOS_COMODOS ? (R_PASO * MAX_ANILLOS_COMODOS) / n : R_PASO;
   const rMax = R_BASE + (n - 1) * paso;
-  const etiquetarCada = n <= 6 ? 1 : n <= 12 ? 2 : Math.ceil(n / 5);
+  // Yemas (marcadores) en varios anillos, pero AÑO escrito solo en el primero
+  // (a la izquierda) y el actual (a la derecha): con 3+ anillos separados
+  // ~6.5px, escribir cada año en la misma línea los encaballaba (QA visual
+  // 2026-07-09). El resumen de texto ya cuenta la historia completa.
+  const marcarCada = n <= 6 ? 1 : n <= 12 ? 2 : Math.ceil(n / 5);
 
   const abrir = () => onNavigate?.('ano_finca');
 
@@ -100,21 +104,24 @@ export default function RelojFrailejon({ onNavigate }) {
                 style={{ animationDelay: `${i * 0.18}s` }}
               />
               {/* marcador del año: una yema en lo alto del anillo */}
-              {(i % etiquetarCada === 0 || esActual) && (
+              {(i % marcarCada === 0 || esActual) && (
                 <g style={{ animationDelay: `${i * 0.18}s` }} className="adm-reloj-marca">
                   <circle cx="60" cy={60 - r} r={esActual ? 2 : 1.4} fill={esActual ? '#eafff6' : '#d8ff6a'} />
-                  <text
-                    x={i % 2 ? 60 + r + 3 : 60 - r - 3}
-                    y="62.2"
-                    textAnchor={i % 2 ? 'start' : 'end'}
-                    fontFamily="ui-monospace,monospace"
-                    fontSize="6"
-                    letterSpacing="0.5"
-                    fill={esActual ? '#eafff6' : '#bfffe9'}
-                    opacity={esActual ? 1 : 0.75}
-                  >
-                    {anio}
-                  </text>
+                  {/* el AÑO escrito: solo primer anillo (izq.) y actual (der.) */}
+                  {(i === 0 || esActual) && (
+                    <text
+                      x={esActual && i !== 0 ? 60 + r + 3 : 60 - r - 3}
+                      y="62.2"
+                      textAnchor={esActual && i !== 0 ? 'start' : 'end'}
+                      fontFamily="ui-monospace,monospace"
+                      fontSize="6"
+                      letterSpacing="0.5"
+                      fill={esActual ? '#eafff6' : '#bfffe9'}
+                      opacity={esActual ? 1 : 0.75}
+                    >
+                      {anio}
+                    </text>
+                  )}
                 </g>
               )}
             </g>

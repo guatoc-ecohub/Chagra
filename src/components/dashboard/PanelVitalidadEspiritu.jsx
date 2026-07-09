@@ -35,6 +35,11 @@ export default function PanelVitalidadEspiritu({ modelo }) {
   const offset = vitalidadOk ? CIRC * (1 - vitalidad.valor / 100) : CIRC;
 
   const num = (slot) => (slot.estado === 'ok' ? slot.valor : '—');
+  // Plural honesto: "1 cosecha anotada" / "3 cosechas anotadas". Con el slot
+  // pendiente ("—") se usa el plural (lectura de categoría, no de cantidad).
+  const plural = (slot, singular, pluralTxt) => (
+    slot.estado === 'ok' && slot.valor === 1 ? singular : pluralTxt
+  );
 
   return (
     <aside
@@ -119,15 +124,15 @@ export default function PanelVitalidadEspiritu({ modelo }) {
         {/* ── 3 contadores ── */}
         <div className="pve-conteos">
           <span title={conteos.especies.fuente} data-estado={conteos.especies.estado} data-testid="pve-conteo-especies">
-            <i aria-hidden="true">🍃</i> <b>{num(conteos.especies)}</b> especies registradas
+            <i aria-hidden="true">🍃</i> <b>{num(conteos.especies)}</b> {plural(conteos.especies, 'especie registrada', 'especies registradas')}
           </span>
           <span title={conteos.cosechas.fuente} data-estado={conteos.cosechas.estado} data-testid="pve-conteo-cosechas">
-            <i aria-hidden="true">✦</i> <b>{num(conteos.cosechas)}</b> cosechas anotadas
+            <i aria-hidden="true">✦</i> <b>{num(conteos.cosechas)}</b> {plural(conteos.cosechas, 'cosecha anotada', 'cosechas anotadas')}
           </span>
           <span title={conteos.anillos.fuente} data-estado={conteos.anillos.estado} data-testid="pve-conteo-anillos">
             <AnillosFrailejon anillos={conteos.anillos.estado === 'ok' ? conteos.anillos.valor : 0} />
             {' '}
-            <b>{num(conteos.anillos)}</b> anillos del frailejón
+            <b>{num(conteos.anillos)}</b> {plural(conteos.anillos, 'anillo del frailejón', 'anillos del frailejón')}
           </span>
         </div>
       </div>

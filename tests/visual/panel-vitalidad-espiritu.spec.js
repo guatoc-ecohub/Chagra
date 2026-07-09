@@ -31,7 +31,11 @@ async function sembrarFincaReal(page) {
     const { putFarmProcess } = await import('/src/db/farmProcessCache.js');
     const { logCache } = await import('/src/db/logCache.js');
     const now = Date.now();
-    const hace8Meses = now - 8 * 30 * 24 * 60 * 60 * 1000;
+    // Café sembrado hace 2 años calendario (determinista): el primer registro
+    // fija los anillos del frailejón en 3 (p. ej. 2024·2025·2026) sin importar
+    // el mes en que corra el test.
+    const nowD = new Date(now);
+    const hace2Anios = new Date(nowD.getFullYear() - 2, nowD.getMonth(), 15).getTime();
 
     await putFarmProcess({
       process_id: 'e2e-pve-cafe',
@@ -45,7 +49,7 @@ async function sembrarFincaReal(page) {
         unit: 'plantas',
         status: 'active',
         current_stage: 'flowering',
-        created_at: hace8Meses,
+        created_at: hace2Anios,
         updated_at: now,
       },
     });
@@ -65,13 +69,17 @@ async function sembrarFincaReal(page) {
         updated_at: now,
       },
     });
-    // Cosecha real anotada (log--harvest, shape de producción).
+    // Cosecha real anotada (log--harvest, shape de producción). `_pending`
+    // = capturada offline aún sin sync (el camino real del registro en campo);
+    // sin la marca, el sync post-reload contra el farmOS mockeado (data: [])
+    // la purgaría por GC (logCache.bulkPut) antes de que el panel la cuente.
     await logCache.put({
       id: 'e2e-pve-cosecha-1',
       type: 'log--harvest',
       name: 'Cosecha: Maíz',
       timestamp: Math.floor(now / 1000),
       status: 'done',
+      _pending: true,
       quantity: [{ measure: 'weight', value: { decimal: '12' }, units: 'kg' }],
     });
   });
@@ -94,9 +102,9 @@ test.describe('Panel de vitalidad del espíritu (home menú vivo)', () => {
 
     // El hero F2 y, DENTRO de él, el panel (no huérfano).
     const hero = page.getByTestId('finca-viva-hero');
-    await expect(hero).toBeVisible({ timeout: 20000 });
+    await expect(hero).toBeVisible({ timeout: 60000 });
     const panel = hero.getByTestId('panel-vitalidad-espiritu');
-    await expect(panel).toBeVisible({ timeout: 20000 });
+    await expect(panel).toBeVisible({ timeout: 60000 });
     await expect(panel).toContainText('VITALIDAD DEL ESPÍRITU');
 
     // Medidor circular con vitalidad REAL (café floreciendo + maíz en
@@ -131,8 +139,10 @@ test.describe('Panel de vitalidad del espíritu (home menú vivo)', () => {
     await expect(panel.getByTestId('pve-conteo-especies')).toContainText('2');
     await expect(panel.getByTestId('pve-conteo-especies')).toContainText('especies registradas');
     await expect(panel.getByTestId('pve-conteo-cosechas')).toContainText('1');
-    await expect(panel.getByTestId('pve-conteo-cosechas')).toContainText('cosechas anotadas');
-    // Anillos: primer registro hace ~8 meses → 2 temporadas cumplidas + 1.
+    // 1 cosecha → singular honesto ("1 cosecha anotada", no "1 cosechas").
+    await expect(panel.getByTestId('pve-conteo-cosechas')).toContainText('cosecha anotada');
+    // Anillos: primer registro hace 2 años → 3 años calendario = 3 anillos
+    // (un anillo por año, el MISMO contrato del Reloj del Frailejón).
     const anillos = panel.getByTestId('pve-conteo-anillos');
     await expect(anillos).toHaveAttribute('data-estado', 'ok');
     await expect(anillos).toContainText('anillos del frailejón');
@@ -159,7 +169,7 @@ test.describe('Panel de vitalidad del espíritu (home menú vivo)', () => {
 
     await login(page, { user: 'e2e-pve-vacia' });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByTestId('finca-viva-hero')).toBeVisible({ timeout: 20000 });
+    await expect(page.getByTestId('finca-viva-hero')).toBeVisible({ timeout: 60000 });
 
     const panel = page.getByTestId('panel-vitalidad-espiritu');
     if (await panel.count()) {
