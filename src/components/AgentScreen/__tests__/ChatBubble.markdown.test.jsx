@@ -17,6 +17,11 @@ vi.mock('../../../services/agentSoundService', () => ({
 vi.mock('../../FeedbackButtons', () => ({ default: () => <div data-testid="feedback-mock" /> }));
 vi.mock('../../AIBetaBadge', () => ({ default: () => <div data-testid="beta-mock" /> }));
 
+// ChatBubble tipa onConsentNeeded/onRetryOrphan como requeridos (feedback y
+// recuperación de huérfanos, ninguno relevante para el render de markdown) —
+// no-ops que solo satisfacen el contrato de props.
+const noop = () => {};
+
 /**
  * Task #58: la burbuja del AGENTE debe renderizar markdown limpio (negritas,
  * viñetas), NO mostrar `**`/`###` crudos al campesino/niña. El texto del USUARIO
@@ -28,6 +33,8 @@ describe('ChatBubble — render de markdown del agente (#58)', () => {
       <ChatBubble
         message={{ role: 'assistant', content: 'Aplica **caldo bordelés** por la mañana.' }}
         isStreaming={false}
+        onConsentNeeded={noop}
+        onRetryOrphan={noop}
       />,
     );
     const strong = screen.getByText('caldo bordelés');
@@ -41,6 +48,8 @@ describe('ChatBubble — render de markdown del agente (#58)', () => {
       <ChatBubble
         message={{ role: 'assistant', content: 'Compañeras:\n* Caléndula\n* Albahaca' }}
         isStreaming={false}
+        onConsentNeeded={noop}
+        onRetryOrphan={noop}
       />,
     );
     expect(screen.getByText('Caléndula').tagName).toBe('LI');
@@ -53,6 +62,8 @@ describe('ChatBubble — render de markdown del agente (#58)', () => {
       <ChatBubble
         message={{ role: 'user', content: 'tengo **plaga** en el tomate' }}
         isStreaming={false}
+        onConsentNeeded={noop}
+        onRetryOrphan={noop}
       />,
     );
     // El texto del usuario conserva sus asteriscos literales (no es markdown).
@@ -64,6 +75,8 @@ describe('ChatBubble — render de markdown del agente (#58)', () => {
       <ChatBubble
         message={{ role: 'assistant', content: 'Voy a explicarte **cómo' }}
         isStreaming={true}
+        onConsentNeeded={noop}
+        onRetryOrphan={noop}
       />,
     );
     // Durante streaming no rompemos el render con markdown a medias.
@@ -72,7 +85,12 @@ describe('ChatBubble — render de markdown del agente (#58)', () => {
 
   it('respuesta vacía del agente: muestra fallback, no burbuja en blanco', () => {
     render(
-      <ChatBubble message={{ role: 'assistant', content: '' }} isStreaming={false} />,
+      <ChatBubble
+        message={{ role: 'assistant', content: '' }}
+        isStreaming={false}
+        onConsentNeeded={noop}
+        onRetryOrphan={noop}
+      />,
     );
     expect(screen.getByText(/No recibí respuesta/)).toBeInTheDocument();
   });

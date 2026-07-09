@@ -533,6 +533,8 @@
     width: max(100%, 44px);
     height: max(100%, 44px);
     transform: translate(-50%, -50%);
+  }
+
   /* Markdown renderizado de las respuestas del agente (task #58). Tipografía
    * limpia para campesino/niña: negritas marcadas, viñetas reales con punto,
    * títulos legibles — CERO asteriscos a la vista. El HTML viene sanitizado por

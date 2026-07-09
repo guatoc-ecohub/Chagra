@@ -71,7 +71,10 @@ function inlineMarkdown(line) {
 /**
  * Convierte markdown del agente a una cadena HTML segura y sanitizada.
  *
- * @param {string} text - Texto del agente (posiblemente con markdown).
+ * @param {*} text - Texto del agente (posiblemente con markdown). Tipado laxo
+ *   a propósito: degrada limpio (cadena vacía) ante `null`/`undefined`/no-string
+ *   en vez de lanzar — el guard `typeof text !== 'string'` de abajo es el
+ *   contrato real, no una excepción del tipo.
  * @returns {string} HTML seguro (allow-list estrecha) listo para inyectar.
  */
 export function renderAgentMarkdown(text) {
