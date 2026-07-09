@@ -221,6 +221,66 @@ function VinetaCitricos() {
     );
 }
 
+/** 🌿 La botica campesina — repisa con frascos de hierbas, mortero y mata en flor. */
+function VinetaBotica() {
+    return (
+        <svg {...SVG_PROPS}>
+            <rect width="180" height="90" fill="#dcecd0" />
+            {/* pared cálida de la cocina/despensa */}
+            <path d="M0 0 H180 V58 H0 Z" fill="#e7efd8" />
+            {/* repisa de madera con los frascos de la botica */}
+            <rect x="86" y="30" width="94" height="6" rx="1.5" fill="#a0764a" />
+            <rect x="86" y="36" width="94" height="2.4" fill="#7a5230" opacity=".6" />
+            {/* frascos de hierbas secas sobre la repisa */}
+            <g>
+                {/* frasco 1 — flores anaranjadas (caléndula) */}
+                <rect x="96" y="14" width="14" height="16" rx="2.5" fill="#cfe2f0" opacity=".85" />
+                <rect x="98" y="10" width="10" height="5" rx="1.5" fill="#8a5a38" />
+                <g fill="#e8912f"><circle cx="100" cy="24" r="2.2" /><circle cx="105" cy="21" r="2.2" /><circle cx="104" cy="26" r="2" /></g>
+                {/* frasco 2 — hoja verde (toronjil/cidrón) */}
+                <rect x="118" y="12" width="14" height="18" rx="2.5" fill="#d6ecd0" opacity=".85" />
+                <rect x="120" y="8" width="10" height="5" rx="1.5" fill="#4c7a3d" />
+                <g stroke="#3f8f4e" strokeWidth="1.8" strokeLinecap="round" fill="none"><path d="M122 26 q2 -8 4 -11" /><path d="M127 26 q0 -7 2 -10" /></g>
+                {/* frasco 3 — flor blanca (saúco/manzanilla) */}
+                <rect x="140" y="15" width="14" height="15" rx="2.5" fill="#eef3ea" opacity=".85" />
+                <rect x="142" y="11" width="10" height="5" rx="1.5" fill="#8a5a38" />
+                <g fill="#f6f2e4"><circle cx="145" cy="24" r="2" /><circle cx="149" cy="22" r="2" /><circle cx="150" cy="26" r="1.8" /></g>
+                <circle cx="147.5" cy="23.5" r="1.2" fill="#e8c04a" />
+            </g>
+            {/* mortero y mano de moler (machacar la hierba) */}
+            <g transform="translate(120 44)">
+                <path d="M-12 0 Q0 16 12 0 Z" fill="#9a8a72" />
+                <path d="M-12 0 Q0 6 12 0" stroke="#6b5c48" strokeWidth="1.6" fill="none" />
+                <ellipse cx="0" cy="0" rx="12" ry="3.2" fill="#b7a992" />
+                <path d="M6 -2 L14 -14" stroke="#7a5230" strokeWidth="3.4" strokeLinecap="round" />
+            </g>
+            {/* mata medicinal en flor en primer plano (caléndula) a la izquierda */}
+            <path d="M-4 52 Q30 44 62 52 V90 H-4 Z" fill="#8fae5f" />
+            <g transform="translate(34 40)">
+                <path d="M0 34 V6" stroke="#3f7d3f" strokeWidth="3" strokeLinecap="round" fill="none" />
+                {/* hojas */}
+                <path d="M0 22 Q-12 20 -16 9 Q-4 9 0 18 Z" fill="#4c8a44" />
+                <path d="M0 16 Q12 14 16 3 Q4 3 0 12 Z" fill="#3f8f4e" />
+                {/* flor anaranjada radiada */}
+                <g transform="translate(0 4)">
+                    <g fill="#e8912f">
+                        <ellipse cx="0" cy="-9" rx="2" ry="4.5" />
+                        <ellipse cx="9" cy="0" rx="4.5" ry="2" />
+                        <ellipse cx="-9" cy="0" rx="4.5" ry="2" />
+                        <ellipse cx="0" cy="9" rx="2" ry="4.5" />
+                        <ellipse cx="6.4" cy="-6.4" rx="4" ry="2" transform="rotate(45 6.4 -6.4)" />
+                        <ellipse cx="-6.4" cy="-6.4" rx="4" ry="2" transform="rotate(-45 -6.4 -6.4)" />
+                        <ellipse cx="6.4" cy="6.4" rx="4" ry="2" transform="rotate(-45 6.4 6.4)" />
+                        <ellipse cx="-6.4" cy="6.4" rx="4" ry="2" transform="rotate(45 -6.4 6.4)" />
+                    </g>
+                    <circle cx="0" cy="0" r="4" fill="#a85b1f" />
+                </g>
+            </g>
+        </svg>
+    );
+}
+
+
 /** 🌱 El suelo vivo — corte de tierra en capas con raíces y lombriz. */
 function VinetaSuelo() {
     return (
@@ -533,6 +593,7 @@ const VINETAS = {
     cana: VinetaCana,
     mango: VinetaMango,
     citricos: VinetaCitricos,
+    botica: VinetaBotica,
     suelo: VinetaSuelo,
     agua: VinetaAgua,
     abono: VinetaAbono,
