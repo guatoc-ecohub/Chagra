@@ -68,6 +68,10 @@ chagra-anthropic-judge-key
 # son artefactos EFÍMEROS regenerables. El script SÍ se versiona; su salida no.
 /out/
 
+# Salida de stress/*.mjs (reportes JSON con OUT_JSON/SAVE_OUTCOMES): efímera,
+# regenerable en cada corrida. Los scripts SÍ se versionan; sus resultados no.
+/stress/results/
+
 # Dataset de entrenamiento del wake-word "hola chagra" (#2088): WAV generados
 # con Kokoro TTS + ffmpeg (scripts/wake-word/generate-samples.mjs). Es un
 # artefacto REGENERABLE (no fuente) — ~5 MB de audio sintético que no aporta
