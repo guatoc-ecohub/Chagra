@@ -154,6 +154,12 @@ const FrutalesScreen = lazy(() => import('./components/frutales/FrutalesScreen')
 // el aguacate sigue teniendo su ficha rápida dentro del mundo Frutales; aquí se
 // profundiza (injerto/patrón, drenaje contra Phytophthora, floración tipo A/B).
 const AguacateScreen = lazy(() => import('./components/aguacate/AguacateScreen'));
+// Mundo "Los cítricos": profundización DEDICADA del frutal cítrico (naranja,
+// mandarina, limón y lima) en 5 estaciones photo-forward (patrón Café). Refuerza
+// el grounding térmico: el cítrico es de clima cálido-templado (0–1800 msnm; el
+// limón Tahití hasta ~2100), NO de frío alto. Groundeado en el grafo
+// (citrus_sinensis/reticulata/latifolia + pest_controllers) + AGROSAVIA/ICA.
+const CitricosScreen = lazy(() => import('./components/citricos/CitricosScreen'));
 // Mundo "La caña y la panela" (5 estaciones: la caña / siembra y manejo /
 // plagas / corte / la panela). Photo-forward (patrón Café) y groundeado en el
 // grafo (Diatraea AFFECTS caña; Cotesia/Trichogramma CONTROLS Diatraea) +
@@ -484,6 +490,15 @@ const HASH_VIEW_ROUTES = {
   cura: 'aguacate',
   hass: 'aguacate',
   persea: 'aguacate',
+  citricos: 'citricos',
+  cítricos: 'citricos',
+  'los-citricos': 'citricos',
+  citrico: 'citricos',
+  naranja: 'citricos',
+  mandarina: 'citricos',
+  limon: 'citricos',
+  limón: 'citricos',
+  lima: 'citricos',
   cana: 'cana',
   caña: 'cana',
   'la-cana': 'cana',
@@ -1971,6 +1986,22 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El aguacate">
               <AguacateScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'citricos':
+        // Mundo "Los cítricos": profundización DEDICADA del frutal cítrico
+        // (naranja, mandarina, limón y lima) en 5 estaciones photo-forward
+        // (variedades+injerto / piso térmico / siembra+poda / plagas+HLB /
+        // abono+cosecha). Refuerza el grounding térmico correcto: cítrico de
+        // clima cálido-templado (0–1800 msnm; Tahití ~2100), NO de frío alto.
+        // Groundeado en el grafo (citrus_* + pest_controllers → AFFECTS/CONTROLS)
+        // + AGROSAVIA/ICA; sin dosis inventadas (cifras de sitio = "dato en
+        // camino"); la gomosis (ausente del grafo) se declara faltante, no se inventa.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Los cítricos">
+              <CitricosScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );

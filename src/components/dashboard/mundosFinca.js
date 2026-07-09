@@ -118,6 +118,16 @@ export const MUNDOS_FINCA = [
         // la ficha corta que vive en "Frutales de la finca". La tarjeta navega
         // directo, sin pantalla intermedia.
         directo: { view: 'mango' },
+        id: 'citricos',
+        titulo: 'Los cítricos',
+        emoji: '🍊',
+        lema: 'Naranja, mandarina, limón y lima: variedad e injerto, piso térmico, plagas y HLB, y cosecha',
+        tinte: ['#c9791f', '#f7e6c8'],
+        // Mundo de una sola pantalla (photo-forward, 5 estaciones del ciclo
+        // cítrico). Profundización dedicada del frutal cítrico que refuerza el
+        // grounding térmico (cálido-templado, NO frío alto). La tarjeta navega
+        // directo, sin pantalla intermedia.
+        directo: { view: 'citricos' },
     },
     {
         id: 'suelo',
