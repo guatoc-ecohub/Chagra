@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 
 // Test de REGRESIÓN VISUAL (bug prod 2026-06-25): el prompt de instalación PWA
-// (IosInstallBanner / AndroidInstallBanner) es un overlay `fixed bottom-24
+// (IosInstallBanner / AndroidInstallBanner) es un overlay `fixed bottom-20
 // left-1/2 z-50` y se renderizaba en TODAS las vistas, incluida la de login.
 // Sobre el formulario de login (campos Usuario/Contraseña/Ingresar) se encimaba:
 // en desktop tapaba e interceptaba el clic del campo "Usuario"; en móvil empujaba

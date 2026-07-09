@@ -103,9 +103,16 @@ export const ScreenShell = ({ title, onBack, onHome, icon: Icon, children, actio
                     >
                         <Home size={20} />
                     </button>
-                    <h1 className="text-xl font-bold text-white flex items-center gap-2 truncate">
+                    {/* FIX truncado (QA-VISUAL-MUNDOS 2026-07-08): el `truncate`
+                        iba sobre el <h1> que es `display:flex`, así que el título
+                        (nodo de texto = flex-item anónimo) se recortaba en seco SIN
+                        elipsis a 390px ("La botica car", "El fique y las", "Quinua y
+                        gra"). El text-overflow:ellipsis solo aplica a un hijo
+                        propio con overflow:hidden; por eso el título va ahora en su
+                        propio <span className="truncate"> (el h1 conserva flex). */}
+                    <h1 className="text-xl font-bold text-white flex items-center gap-2 min-w-0">
                         {Icon && <Icon className="text-morpho shrink-0" size={20} />}
-                        {title}
+                        <span className="truncate min-w-0">{title}</span>
                     </h1>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
@@ -189,7 +196,10 @@ function ScreenShellF2({ title, onBack, handleHome, Icon, actions, children }) {
                                 <Icon size={20} />
                             </span>
                         )}
-                        {title}
+                        {/* Mismo fix que el shell legacy: el título va en su propio
+                            span truncable (el h1 es flex → la elipsis no aplica al
+                            nodo de texto suelto). */}
+                        <span className="screen-shell-f2-title-text">{title}</span>
                     </h1>
                 </div>
                 <div className="screen-shell-f2-right">

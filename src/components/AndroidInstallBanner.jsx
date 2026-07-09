@@ -68,13 +68,17 @@ const AndroidInstallBanner = () => {
   if (installed || dismissed || !canInstall) return null;
 
   return (
-    <div className="pwa-install-banner fixed bottom-24 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-md animate-in fade-in slide-in-from-bottom-5 duration-500">
-      <div className="bg-slate-900 border border-slate-700 shadow-2xl rounded-2xl p-4 flex items-center gap-3 relative overflow-hidden">
+    <div className="pwa-install-banner fixed bottom-20 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-md animate-in fade-in slide-in-from-bottom-5 duration-500">
+      {/* Footprint compacto (QA-VISUAL-MUNDOS 2026-07-08): el banner tapaba
+          ~150px del contenido inferior en móvil. Se bajó (bottom-24→bottom-20) y
+          se compactó (p-4→p-2.5, ícono 24→20) para que quepa dentro del pb del
+          contenido y deje de tapar los CTAs del final de página. */}
+      <div className="bg-slate-900 border border-slate-700 shadow-2xl rounded-2xl p-2.5 flex items-center gap-2.5 relative overflow-hidden">
         {/* Acento bio-punk, igual que IosInstallBanner */}
         <div className="absolute top-0 left-0 w-1 h-full bg-muzo-glow" />
 
-        <div className="bg-muzo-glow/20 p-2 rounded-xl flex-shrink-0">
-          <Download className="text-muzo-glow" size={24} />
+        <div className="bg-muzo-glow/20 p-1.5 rounded-xl flex-shrink-0">
+          <Download className="text-muzo-glow" size={20} />
         </div>
 
         <div className="flex-1 min-w-0">

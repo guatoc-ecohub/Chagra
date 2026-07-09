@@ -27,13 +27,16 @@ const IosInstallBanner = () => {
     if (!showBanner) return null;
 
     return (
-        <div className="pwa-install-banner fixed bottom-24 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-md animate-in fade-in slide-in-from-bottom-5 duration-500">
-            <div className="bg-slate-900 border border-slate-700 shadow-2xl rounded-2xl p-4 flex items-center gap-4 relative overflow-hidden">
+        <div className="pwa-install-banner fixed bottom-20 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-md animate-in fade-in slide-in-from-bottom-5 duration-500">
+            {/* Footprint compacto (QA-VISUAL-MUNDOS 2026-07-08): mismo ajuste que
+                el banner de Android — bajado y compactado para no tapar los CTAs
+                del final de página en móvil. */}
+            <div className="bg-slate-900 border border-slate-700 shadow-2xl rounded-2xl p-2.5 flex items-center gap-2.5 relative overflow-hidden">
                 {/* Bio-punk accent */}
                 <div className="absolute top-0 left-0 w-1 h-full bg-muzo-glow"></div>
 
-                <div className="bg-muzo-glow/20 p-2 rounded-xl flex-shrink-0">
-                    <Share className="text-muzo-glow" size={24} />
+                <div className="bg-muzo-glow/20 p-1.5 rounded-xl flex-shrink-0">
+                    <Share className="text-muzo-glow" size={20} />
                 </div>
 
                 <div className="flex-1">
