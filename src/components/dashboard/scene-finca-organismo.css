@@ -327,6 +327,170 @@
   94% { transform: translate(-5px, 0); }
 }
 
+/* ── QUEBRADA: el agua corre, cae en cascaditas y ondea en el pocito ───────
+   La corriente es el mismo truco de las hifas (dash que corre); los destellos
+   de cascada titilan; el remanso emite ondas concéntricas. Todo dash/opacity/
+   transform — nada de filtros animados. */
+.fvo-agua { stroke-dasharray: 8 5; animation: fvo-aguaflow 1.9s linear infinite; }
+.fvo-agua.fvo-a2 { stroke-dasharray: 4 8; animation-duration: 2.7s; animation-delay: -0.8s; }
+@keyframes fvo-aguaflow { to { stroke-dashoffset: -52; } }
+
+.fvo-destello { animation: fvo-tw 2.6s ease-in-out infinite; }
+
+.fvo-onda {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fvo-onda 4.2s ease-out infinite;
+}
+
+.fvo-onda.fvo-on2 { animation-delay: -2.1s; }
+
+@keyframes fvo-onda {
+  0% { transform: scale(0.3); opacity: 0.8; }
+  70%, 100% { transform: scale(1.7); opacity: 0; }
+}
+
+.fvo-reflejo { animation: fvo-reflejo 5s ease-in-out infinite; }
+@keyframes fvo-reflejo { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.6; } }
+
+/* ── RAYO DEL ASTRO: la luz cae en diagonal y respira ── */
+.fvo-rayo { animation: fvo-rayo 9s ease-in-out infinite; }
+@keyframes fvo-rayo { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+/* ── POTRERO: LA VACA ──────────────────────────────────────────────────────
+   Respira con la panza (scaleY desde el vientre), pasta de a ratos (la
+   cabeza baja y vuelve), espanta con la cola y las manchas bioluminiscentes
+   laten con el MISMO pulso var(--fvo-beat) de la red — la vaca es parte del
+   organismo, no un sticker encima. */
+.fvo-vaca-cuerpo {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: fvo-vacabreathe 3.8s ease-in-out infinite;
+}
+
+@keyframes fvo-vacabreathe {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.04); }
+}
+
+.fvo-vaca-cabeza {
+  transform-box: fill-box;
+  transform-origin: 92% 42%;
+  animation: fvo-vacapasta 11s ease-in-out infinite;
+}
+
+@keyframes fvo-vacapasta {
+  0%, 36%, 100% { transform: rotate(0deg); }
+  44%, 66% { transform: rotate(13deg); }
+  52% { transform: rotate(11deg); }
+  76% { transform: rotate(-2deg); }
+  84% { transform: rotate(0deg); }
+}
+
+.fvo-vaca-cola {
+  transform-box: fill-box;
+  transform-origin: 20% 6%;
+  animation: fvo-vacacola 6.5s ease-in-out infinite;
+}
+
+@keyframes fvo-vacacola {
+  0%, 52%, 100% { transform: rotate(0deg); }
+  60% { transform: rotate(18deg); }
+  70% { transform: rotate(-12deg); }
+  80% { transform: rotate(9deg); }
+  88% { transform: rotate(0deg); }
+}
+
+.fvo-vaca-oreja {
+  transform-box: fill-box;
+  transform-origin: 10% 90%;
+  animation: fvo-vacaoreja 7s ease-in-out infinite;
+}
+
+@keyframes fvo-vacaoreja {
+  0%, 78%, 100% { transform: rotate(0deg); }
+  84% { transform: rotate(-16deg); }
+  90% { transform: rotate(4deg); }
+}
+
+/* manchas de la vaca: laten con el corazón de la finca */
+.fvo-mancha { animation: fvo-mancha var(--fvo-beat) ease-in-out infinite; }
+.fvo-mancha.fvo-m2 { animation-delay: 0.3s; }
+.fvo-mancha.fvo-m3 { animation-delay: 0.6s; }
+@keyframes fvo-mancha { 0%, 100% { opacity: 0.45; } 8% { opacity: 1; } 16% { opacity: 0.6; } 24% { opacity: 0.85; } 36% { opacity: 0.45; } }
+
+/* ── POTRERO: LAS GALLINAS pican el pasto (doble picoteo con pausa; cada
+   una a su ritmo). La espejada (mira a la izquierda) picotea al revés. */
+.fvo-gallina {
+  transform-box: fill-box;
+  transform-origin: 64% 100%;
+  animation: fvo-picoteo 3.6s ease-in-out infinite;
+}
+
+.fvo-gallina.fvo-ga2 { animation-duration: 4.4s; animation-delay: -1.3s; }
+.fvo-gallina.fvo-ga3 { animation-duration: 3.1s; animation-delay: -2.2s; }
+
+@keyframes fvo-picoteo {
+  0%, 34%, 100% { transform: rotate(0deg); }
+  40% { transform: rotate(24deg); }
+  46% { transform: rotate(5deg); }
+  52% { transform: rotate(26deg); }
+  58% { transform: rotate(0deg); }
+}
+
+.fvo-gallina.fvo-ga-esp {
+  transform-origin: 36% 100%;
+  animation-name: fvo-picoteo-esp;
+}
+
+@keyframes fvo-picoteo-esp {
+  0%, 34%, 100% { transform: rotate(0deg); }
+  40% { transform: rotate(-24deg); }
+  46% { transform: rotate(-5deg); }
+  52% { transform: rotate(-26deg); }
+  58% { transform: rotate(0deg); }
+}
+
+/* ── POTRERO como PUERTA al mundo de los animales ──────────────────────────
+   Con data-tap el grupo es un botón: cursor, halo-invitación que emana cada
+   6s, etiqueta que respira y anillo de foco accesible (:focus-visible). */
+.fvo-animales[data-tap='1'] { cursor: pointer; outline: none; }
+
+.fvo-cta-halo {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fvo-ctahalo 6s ease-out infinite;
+  opacity: 0;
+}
+
+@keyframes fvo-ctahalo {
+  0%, 55% { transform: scale(0.55); opacity: 0; }
+  62% { opacity: 0.7; }
+  100% { transform: scale(1.12); opacity: 0; }
+}
+
+.fvo-cta-tag { animation: fvo-ctatag 6s ease-in-out infinite; }
+@keyframes fvo-ctatag { 0%, 100% { opacity: 0.55; } 60% { opacity: 1; } }
+
+.fvo-animales[data-tap='1']:focus-visible .fvo-cta-anillo { opacity: 1; }
+.fvo-animales[data-tap='1']:hover .fvo-cta-tag { opacity: 1; animation: none; }
+
+/* ── polillas del farol (revolotean cortico y titilan) ── */
+.fvo-polilla {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fvo-polilla 3.4s ease-in-out infinite alternate, fvo-blink 1.7s ease-in-out infinite;
+}
+
+.fvo-polilla.fvo-po2 { animation-duration: 2.6s, 2.3s; animation-delay: -1.3s, -0.6s; }
+
+@keyframes fvo-polilla {
+  from { transform: translate(0, 0); }
+  33% { transform: translate(-4px, -5px); }
+  66% { transform: translate(3px, -2px); }
+  to { transform: translate(-2px, 3px); }
+}
+
 /* ── reduced motion: estado estático DIGNO (como el mockup) ────────────────
    El apagado global de animaciones ya lo hace finca-viva-hero.css
    (`.fvh * { animation: none !important }`); aquí se compone la foto fija:
@@ -348,4 +512,43 @@
   /* la vida del suelo queda quieta pero visible (foto fija digna) */
   .fvo-micelio { opacity: 0.38; }
   .fvo-nodo { opacity: 0.85; }
+  /* la quebrada queda llena (sin dash), el remanso quieto y brillante */
+  .fvo-agua { stroke-dasharray: none; }
+  .fvo-onda { opacity: 0; }
+  .fvo-reflejo { opacity: 0.5; }
+  .fvo-destello { opacity: 0.7; }
+  .fvo-rayo { opacity: 0.7; }
+  /* el potrero posa: vaca erguida, manchas encendidas, gallinas de pie;
+     la invitación al mundo animales queda como etiqueta fija visible */
+  .fvo-mancha { opacity: 0.85; }
+  .fvo-cta-halo { opacity: 0; }
+  .fvo-cta-tag { opacity: 0.9; }
+  .fvo-polilla { opacity: 0.7; }
+}
+
+/* ── CORAZÓN TAPPABLE = "PREGUNTE" (usabilidad campesina #4) ───────────────
+   Cuando FincaVivaHero pasa onPregunte, el corazón-semilla es un botón que
+   abre el agente. Cursor, foco visible para teclado y un halo-invitación que
+   respira (se apaga con prefers-reduced-motion, quedando el halo fijo). */
+.fvo-corazon-tap {
+  cursor: pointer;
+  outline: none;
+}
+.fvo-corazon-tap:focus-visible ellipse:first-of-type {
+  stroke: #eafff6;
+  stroke-width: 2;
+  opacity: 0.9;
+}
+.fvo-corazon-tap:active .fvo-heart { opacity: 0.85; }
+.fvo-corazon-halo {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fvo-corazon-invita 2.4s ease-out infinite;
+}
+@keyframes fvo-corazon-invita {
+  0% { transform: scale(0.8); opacity: 0.55; }
+  70%, 100% { transform: scale(1.35); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fvo-corazon-halo { animation: none !important; opacity: 0.4; }
 }

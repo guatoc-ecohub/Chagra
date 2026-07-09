@@ -1276,3 +1276,186 @@ html[data-theme="biopunk"] .fvh {
 /* Sin velo/veladura genérica (::after) — duplicaba brillos/tramas sobre la
    atmósfera propia de cada escena (aurora neón, rayo dorado, rocío, papel). */
 .fvh .fvh-escena-wrap--viva::after { opacity: 0; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   USABILIDAD CAMPESINA (fold del mockup #/mockups/home-campesino, 2026-07)
+   ──────────────────────────────────────────────────────────────────────────
+   · "PREGUNTE" dominante: el compositor pasa de barra de texto a BOTÓN GRANDE
+     (≥96px) que late como el corazón de la escena.
+   · Pastillas "Escuchar" (🔊 TTS) y "Pleno sol" (alto contraste mediodía).
+   · LAS 6 PUERTAS: 1-2 palabras, dibujo grande, targets ≥96px.
+   · Variante [data-plenosol="1"]: claro de ALTO contraste para el rayo del
+     sol (el biopunk nocturno va bien de noche; a mediodía no se ve).
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── El botón dominante "Pregunte" ── */
+.fvh-composer.fvh-composer--pregunte {
+  min-height: 96px;
+  gap: 16px;
+  padding: 14px 18px;
+  border-radius: 26px;
+  background: linear-gradient(135deg, var(--fvh-lima), #8fd62e);
+  box-shadow: 0 16px 34px rgba(40, 60, 40, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.25) inset;
+}
+.fvh-corazon-btn {
+  position: relative;
+  flex: 0 0 auto;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.6), transparent 60%), var(--fvh-lima-claro);
+  border: 3px solid #12260a;
+}
+.fvh-corazon-pulso {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid #12260a;
+  opacity: 0;
+  animation: fvh-corazon-late 2.4s ease-out infinite;
+}
+.fvh-corazon-pulso2 { animation-delay: 1.2s; }
+@keyframes fvh-corazon-late {
+  0% { transform: scale(1); opacity: 0.5; }
+  70%, 100% { transform: scale(1.5); opacity: 0; }
+}
+.fvh-pregunte-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; color: #12260a; }
+.fvh-pregunte-txt b {
+  font-family: var(--fvh-display);
+  font-size: 25px;
+  line-height: 1.05;
+  letter-spacing: 0.2px;
+}
+.fvh-pregunte-txt small { font-size: 14.5px; font-weight: 800; opacity: 0.9; }
+
+/* ── Pastillas Escuchar + Pleno sol ── */
+.fvh-audio-sol {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 4px 0;
+}
+.fvh-escuchar,
+.fvh-sol-toggle {
+  min-height: 48px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 2px solid var(--fvh-pill-border);
+  background: var(--fvh-pill-bg);
+  color: var(--fvh-pill-ink);
+  font: 800 15px/1 var(--fvh-body);
+  cursor: pointer;
+}
+.fvh-escuchar[aria-pressed="true"] { border-color: var(--fvh-lima); }
+.fvh-escuchar:active,
+.fvh-sol-toggle:active { transform: scale(0.97); }
+
+/* ── LAS 6 PUERTAS ── */
+.fvh-puertas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 0 16px;
+}
+@media (min-width: 720px) { .fvh-puertas { grid-template-columns: repeat(3, 1fr); } }
+.fvh-puerta {
+  min-height: 112px;
+  border-radius: 22px;
+  border: 2px solid var(--fvh-p-borde, var(--fvh-card-border));
+  background: var(--fvh-card-bg);
+  color: var(--fvh-card-tinta);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 12px 8px;
+  box-shadow: 0 10px 24px rgba(20, 30, 20, 0.25);
+  animation: fvh-puerta-brota 0.5s ease-out both;
+}
+.fvh-puerta:active { transform: scale(0.97); }
+.fvh-puerta:focus-visible { outline: 3px solid var(--fvh-lima); outline-offset: 2px; }
+.fvh-puerta-emoji { font-size: 40px; line-height: 1; }
+.fvh-puerta-nombre {
+  font-family: var(--fvh-display);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+}
+@keyframes fvh-puerta-brota {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* tinte por puerta: solo el borde, para no volver arcoíris el home */
+.fvh-puerta.t-verde { --fvh-p-borde: rgba(132, 204, 22, 0.6); }
+.fvh-puerta.t-teja { --fvh-p-borde: rgba(234, 88, 12, 0.6); }
+.fvh-puerta.t-cielo { --fvh-p-borde: rgba(56, 189, 248, 0.6); }
+.fvh-puerta.t-ambar { --fvh-p-borde: rgba(245, 158, 11, 0.65); }
+.fvh-puerta.t-uva { --fvh-p-borde: rgba(167, 139, 250, 0.6); }
+.fvh-puerta.t-menta { --fvh-p-borde: rgba(45, 212, 191, 0.6); }
+
+/* ── VARIANTE "PLENO SOL" (alto contraste de mediodía) ─────────────────────
+   Redefine los tokens del hero a un papel claro con tinta oscura dura. Va al
+   FINAL del archivo y con especificidad doblada para ganarle a las pieles por
+   tema (html[data-theme] .fvh). La hoja .fvh-resto ya es clara de por sí. */
+html .fvh.fvh.fvh[data-plenosol="1"] {
+  --fvh-cielo-a: #eaf4fb;
+  --fvh-cielo-b: #f5f2e3;
+  --fvh-tinta: #1c2a1a;
+  --fvh-tinta-suave: #44543f;
+  /* la tinta "sobre el cielo" tambien pasa a oscura de contraste duro */
+  --fvh-on-cielo: #1c2a1a;
+  --fvh-on-cielo-suave: #33472a;
+  --fvh-on-cielo-acento: #3f6212;
+  --fvh-on-cielo-sombra: 0 1px 2px rgba(255, 255, 255, 0.55);
+  --fvh-on-cielo-div: linear-gradient(90deg, rgba(63, 98, 18, 0.5), transparent);
+  --fvh-verde-1: #3f6212;
+  --fvh-sello: #365314;
+  --fvh-lima: #4d7c0f;
+  --fvh-lima-claro: #d9f99d;
+  --fvh-card-bg: #fffdf4;
+  --fvh-card-border: rgba(28, 42, 26, 0.35);
+  --fvh-card-tinta: #1c2a1a;
+  --fvh-card-tinta-suave: #44543f;
+  --fvh-pill-bg: #fffdf4;
+  --fvh-pill-border: rgba(28, 42, 26, 0.35);
+  --fvh-pill-ink: #1c2a1a;
+}
+html .fvh.fvh.fvh[data-plenosol="1"] .fvh-composer--pregunte {
+  background: linear-gradient(135deg, #65a30d, #4d7c0f);
+  box-shadow: 0 10px 22px rgba(28, 42, 26, 0.25);
+}
+html .fvh.fvh.fvh[data-plenosol="1"] .fvh-pregunte-txt { color: #f7fee7; }
+html .fvh.fvh.fvh[data-plenosol="1"] .fvh-corazon-btn { background: #d9f99d; border-color: #1f3300; }
+html .fvh.fvh.fvh[data-plenosol="1"] .fvh-corazon-pulso { border-color: #1f3300; }
+html .fvh.fvh.fvh[data-plenosol="1"] .fvh-brand-txt b,
+html .fvh.fvh.fvh[data-plenosol="1"] .fvh-brand-txt span { color: #1c2a1a; }
+html .fvh.fvh.fvh[data-plenosol="1"] .fvh-hero-saludo h1,
+html .fvh.fvh.fvh[data-plenosol="1"] .fvh-hero-saludo p { color: #1c2a1a; }
+html .fvh.fvh.fvh[data-plenosol="1"] .fvh-hero-saludo h1 em { color: #3f6212; }
+html .fvh.fvh.fvh[data-plenosol="1"] .fvh-portales-tit { color: #1c2a1a; }
+/* la escena nocturna se enmarca como tarjeta (arte de noche sobre papel claro) */
+html .fvh.fvh.fvh[data-plenosol="1"] .fvh-escena-wrap--viva {
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(28, 42, 26, 0.18);
+}
+/* tintes de puerta con contraste duro a pleno sol */
+html .fvh.fvh.fvh[data-plenosol="1"] .fvh-puerta.t-verde { --fvh-p-borde: #4d7c0f; }
+html .fvh.fvh.fvh[data-plenosol="1"] .fvh-puerta.t-teja { --fvh-p-borde: #c2410c; }
+html .fvh.fvh.fvh[data-plenosol="1"] .fvh-puerta.t-cielo { --fvh-p-borde: #0369a1; }
+html .fvh.fvh.fvh[data-plenosol="1"] .fvh-puerta.t-ambar { --fvh-p-borde: #b45309; }
+html .fvh.fvh.fvh[data-plenosol="1"] .fvh-puerta.t-uva { --fvh-p-borde: #6d28d9; }
+html .fvh.fvh.fvh[data-plenosol="1"] .fvh-puerta.t-menta { --fvh-p-borde: #0f766e; }
+html .fvh.fvh.fvh[data-plenosol="1"] .fvh-puerta { box-shadow: 0 6px 16px rgba(28, 42, 26, 0.14); }
+
+@media (prefers-reduced-motion: reduce) {
+  .fvh-corazon-pulso { animation: none; opacity: 0; }
+  .fvh-puerta { animation: none; }
+  .fvh-puerta:active,
+  .fvh-escuchar:active,
+  .fvh-sol-toggle:active { transform: none; }
+}

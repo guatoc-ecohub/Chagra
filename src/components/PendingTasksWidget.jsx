@@ -127,7 +127,9 @@ export default function PendingTasksWidget({ onEdit }) {
       >
         <div className="flex items-center gap-3">
           <span className={`w-3 h-3 rounded-full ${pendingCount > 0 ? (criticalCount > 0 ? 'bg-red-500 animate-pulse' : 'bg-amber-500') : 'bg-green-500'}`}></span>
-          <h3 className="text-base font-bold text-slate-100">Cola de tareas</h3>
+          {/* Sin jerga de ingeniero (usabilidad campesina #1): antes "Cola de
+              tareas" — palabras del campo. */}
+          <h3 className="text-base font-bold text-slate-100">Tareas pendientes</h3>
           <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${pendingCount > 0 ? 'bg-amber-600/20 text-amber-400' : 'bg-green-600/20 text-green-400'}`}>
             {pendingCount}
           </span>
