@@ -134,8 +134,20 @@ function migrateLegacyProfile() {
  *   - when:      (answers) => boolean — condición de visibilidad. Si se
  *                omite, la pregunta siempre aplica.
  *
- * El array es la fuente de verdad del flujo. Son 18 preguntas; las
+ * El array es la fuente de verdad del flujo. Son 25 preguntas; las
  * condicionales reducen el número efectivo según el perfil.
+ *
+ * REESCRITURA DEL ONBOARDING (spec 2026-07-08): el flujo de arranque es
+ * OnboardingCondensado (3 pantallas). Las preguntas con `deferred: true` YA NO
+ * se hacen al inicio — se difieren a la voz / progressive profiling /
+ * ProfileScreen (ninguna bloquea una feature: 0-1 lecturas c/u, ver §1.5 del
+ * spec). En particular:
+ *   - `region` y `finca_altitud` las resuelve el botón "Ubicar mi finca"
+ *     (GPS → municipio DANE + altitud Open-Meteo + vereda point-in-polygon).
+ *   - vocacion/rol/finca_tipo se capturan FUSIONADAS en una tarjeta de
+ *     identidad (mismos valores del catálogo — sin migración).
+ * El flujo clásico (OnboardingProfile, ruta 'onboarding-perfil-clasico')
+ * sigue usando el array completo vía getApplicableQuestions.
  */
 export const PROFILE_QUESTIONS = [
   // ── Identidad ────────────────────────────────────────────────────────
@@ -149,6 +161,7 @@ export const PROFILE_QUESTIONS = [
   },
   {
     id: 'region',
+    deferred: true,
     category: 'identidad',
     title: '¿En qué municipio o región cultiva?',
     help: 'Ej: Choachí, Cauca, Antioquia. Ayuda a dar consejos según su clima y costumbres.',
@@ -203,6 +216,7 @@ export const PROFILE_QUESTIONS = [
   },
   {
     id: 'finca_hectareas',
+    deferred: true,
     category: 'finca',
     title: '¿Qué tamaño tiene su finca?',
     help: 'Aproximado, en hectáreas. Si no lo sabe, sáltelo.',
@@ -218,6 +232,7 @@ export const PROFILE_QUESTIONS = [
   },
   {
     id: 'finca_altitud',
+    deferred: true,
     category: 'finca',
     title: '¿A qué altura está su finca?',
     help: 'En metros sobre el nivel del mar (msnm). Define su piso térmico. Si no la sabe, la detectamos por ubicación.',
@@ -233,6 +248,7 @@ export const PROFILE_QUESTIONS = [
     // fenología ni inventario de plantas (eso lo llena la voz #23 después).
     // No aplica al cultivo urbano de balcón/terraza (sin espacio para invernadero).
     id: 'invernadero_tiene',
+    deferred: true,
     category: 'finca',
     title: '¿Tiene invernadero?',
     help: 'Para dibujar bien su finca. Si no tiene, dígalo y seguimos.',
@@ -248,6 +264,7 @@ export const PROFILE_QUESTIONS = [
     // vs. túnel pequeño. Solo si declaró que tiene uno (o si su finca ES un
     // invernadero). La forma define cómo se dibuja la estructura en la escena.
     id: 'invernadero_forma',
+    deferred: true,
     category: 'finca',
     title: '¿Cómo es su invernadero?',
     help: 'Escoja la forma que más se parezca al suyo.',
@@ -264,6 +281,7 @@ export const PROFILE_QUESTIONS = [
     // campesino describe a su manera ("como 6 por 10", "una nave grande"). La
     // escena F2 usa esto solo para escalar el dibujo, no para cálculos.
     id: 'invernadero_tamano',
+    deferred: true,
     category: 'finca',
     title: '¿De qué tamaño es, más o menos?',
     help: 'Como lo sienta: "6 por 10 metros", "pequeño", "media hectárea". Puede saltarlo.',
@@ -325,6 +343,7 @@ export const PROFILE_QUESTIONS = [
     // explícito del brief (carlos.rivera). Solo si marcó gallinas. Refina el
     // contexto del agente; no cambia la selección de chips por sí sola.
     id: 'gallinas_manejo',
+    deferred: true,
     category: 'finca',
     title: '¿Cómo tiene las gallinas?',
     help: 'Ayuda a dar mejor consejo de sanidad y postura.',
@@ -342,6 +361,7 @@ export const PROFILE_QUESTIONS = [
     // restauradores y guías de páramo/glaciar. Refina el contexto y refuerza
     // la selección de chips de restauración. Skippable.
     id: 'restauracion_objetivo',
+    deferred: true,
     category: 'finca',
     title: '¿Qué le gustaría recuperar?',
     help: 'Marque lo que quiere restaurar con nativas. Opcional.',
@@ -360,6 +380,7 @@ export const PROFILE_QUESTIONS = [
   // ── Experiencia ──────────────────────────────────────────────────────
   {
     id: 'anios_cultivando',
+    deferred: true,
     category: 'experiencia',
     title: '¿Hace cuánto cultiva?',
     type: 'single',
@@ -372,6 +393,7 @@ export const PROFILE_QUESTIONS = [
   },
   {
     id: 'manejo',
+    deferred: true,
     category: 'experiencia',
     title: '¿Cómo maneja sus cultivos?',
     type: 'single',
@@ -384,6 +406,7 @@ export const PROFILE_QUESTIONS = [
   },
   {
     id: 'problemas',
+    deferred: true,
     category: 'experiencia',
     title: '¿Qué problemas tiene con frecuencia?',
     help: 'Marque todos los que apliquen.',
@@ -401,6 +424,7 @@ export const PROFILE_QUESTIONS = [
   // ── Objetivos ────────────────────────────────────────────────────────
   {
     id: 'objetivo',
+    deferred: true,
     category: 'objetivos',
     title: '¿Qué quiere lograr con Chagra?',
     type: 'multi',
@@ -415,6 +439,7 @@ export const PROFILE_QUESTIONS = [
   },
   {
     id: 'cultivos_interes',
+    deferred: true,
     category: 'objetivos',
     title: '¿Qué cultivos le gustaría sembrar o mejorar?',
     help: 'Cultivos nuevos que le interesan. Opcional.',
@@ -425,6 +450,7 @@ export const PROFILE_QUESTIONS = [
   // ── Preferencias ─────────────────────────────────────────────────────
   {
     id: 'nivel_respuestas',
+    deferred: true,
     category: 'preferencias',
     title: '¿Cómo prefiere que el agente le responda?',
     type: 'single',
@@ -436,6 +462,7 @@ export const PROFILE_QUESTIONS = [
   },
   {
     id: 'notif_clima',
+    deferred: true,
     category: 'preferencias',
     title: '¿Quiere alertas de clima para su zona?',
     help: 'Avisos de lluvia, heladas o sequía relevantes para sus cultivos.',
@@ -447,6 +474,7 @@ export const PROFILE_QUESTIONS = [
   },
   {
     id: 'estrato',
+    deferred: true,
     category: 'finca',
     title: '¿En qué estrato vive?',
     help: 'Solo para cultivo urbano — ayuda a sugerir soluciones según su espacio. Opcional.',
@@ -461,6 +489,7 @@ export const PROFILE_QUESTIONS = [
   },
   {
     id: 'espacio_urbano',
+    deferred: true,
     category: 'finca',
     title: '¿Cuánto espacio tiene para cultivar?',
     help: 'Aproximado. Solo para cultivo urbano.',
@@ -474,6 +503,7 @@ export const PROFILE_QUESTIONS = [
   },
   {
     id: 'riego',
+    deferred: true,
     category: 'finca',
     title: '¿Cómo riega sus cultivos?',
     type: 'single',
@@ -497,6 +527,27 @@ export const PROFILE_QUESTIONS = [
  */
 export function getApplicableQuestions(answers = {}) {
   return PROFILE_QUESTIONS.filter((q) => (typeof q.when === 'function' ? q.when(answers) : true));
+}
+
+/**
+ * Preguntas DIFERIDAS que aplican al perfil y aún no tienen respuesta.
+ *
+ * Gancho para el progressive profiling (spec reescritura §3.2): el agente /
+ * ProfileScreen pueden pedir MÁXIMO una por sesión cuando sea relevante, en
+ * vez de preguntarlo todo en el arranque. Pura y sin efectos.
+ *
+ * @param {Object} [answers] - perfil actual; si se omite, se lee de localStorage
+ * @returns {Array} subconjunto de PROFILE_QUESTIONS deferred, aplicable y sin responder
+ */
+export function getDeferredQuestions(answers) {
+  const a = answers || getProfile();
+  return PROFILE_QUESTIONS.filter((q) => {
+    if (!q.deferred) return false;
+    if (typeof q.when === 'function' && !q.when(a)) return false;
+    const v = a[q.id];
+    if (v == null || v === '') return true;
+    return Array.isArray(v) && v.length === 0;
+  });
 }
 
 /**

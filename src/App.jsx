@@ -106,6 +106,7 @@ const EstiercolScreen = lazy(() => import('./components/EstiercolScreen'));
 const CompostScreen = lazy(() => import('./components/CompostScreen'));
 const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
 const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
+const OnboardingCondensado = lazy(() => import('./components/OnboardingCondensado'));
 const LocationDetectedScreen = lazy(() => import('./components/LocationDetectedScreen'));
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
 const PlantaPorVozScreen = lazy(() => import('./components/PlantaPorVozScreen'));
@@ -1206,17 +1207,41 @@ export default function App() {
           </ErrorBoundary>
         );
       case 'onboarding-perfil':
-        // #200: onboarding extendido de 18 preguntas condicionales → perfil.
-        // Al terminar/saltar va al detector de ubicación; tras confirmar,
-        // al dashboard. currentViewData.next permite override del destino.
+        // Reescritura del onboarding (spec 2026-07-08): 19 preguntas → 3
+        // pantallas (identidad · ubicación auto-mágica con vereda DANE ·
+        // la finca). La ubicación se captura DENTRO del flujo (botón "Ubicar
+        // mi finca" + corrección inline de vereda), así que al terminar va
+        // directo al dashboard — ya no hay salto a 'ubicacion-detectada'.
+        // El flujo viejo sigue cableado en 'onboarding-perfil-clasico'.
+        return (
+          <ErrorBoundary>
+            <OnboardingCondensado
+              onComplete={() => navigate(currentViewData?.next || 'dashboard')}
+              onClose={() => navigate(currentViewData?.back || 'dashboard')}
+              onExplorarEjemplo={async () => {
+                // SKIP rico: sembrar la finca de ejemplo (multi-piso, grounded al
+                // catálogo) y entrar directo al home ya poblado. Import perezoso.
+                try {
+                  const { seedExampleFinca } = await import('./services/demoFincaEjemplo');
+                  await seedExampleFinca();
+                } catch (err) {
+                  console.error('[App] No se pudo sembrar la finca de ejemplo:', err);
+                }
+                navigate('dashboard');
+              }}
+            />
+          </ErrorBoundary>
+        );
+      case 'onboarding-perfil-clasico':
+        // #200: el onboarding extendido ORIGINAL (hasta 25 preguntas
+        // condicionales). Se conserva cableado (features no huérfanas) como
+        // camino largo/diagnóstico mientras el operador valida el condensado.
         return (
           <ErrorBoundary>
             <OnboardingProfile
               onComplete={() => navigate('ubicacion-detectada', { next: 'dashboard' })}
               onClose={() => navigate(currentViewData?.back || 'dashboard')}
               onExplorarEjemplo={async () => {
-                // SKIP rico: sembrar la finca de ejemplo (multi-piso, grounded al
-                // catálogo) y entrar directo al home ya poblado. Import perezoso.
                 try {
                   const { seedExampleFinca } = await import('./services/demoFincaEjemplo');
                   await seedExampleFinca();
@@ -2535,7 +2560,7 @@ export default function App() {
           Tampoco en onboarding-perfil (tarea #16): el FAB se encimaba sobre el
           CTA "Explorar con finca de ejemplo" del footer y la usuaria nueva aún
           no conoce al agente — ruido en su primer flujo. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && <AgentFab onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
           pregunta al agente punta a punta por voz.
