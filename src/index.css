@@ -21,8 +21,18 @@
  *
  * Con esto las ~726 clases de color del PWA (incluidas las de opacidad) se
  * vuelven theme-aware DE UNA, sin overrides clase-por-clase en themes.css.
+ *
+ * PREVIEW VIVO DE TEMAS (galería del selector, 2026-07-08): los selectores
+ * [data-theme="biopunk"] / [data-theme="biopunk2"] acompañan a :root en ESTE
+ * MISMO bloque (cero duplicación de valores) para que un CONTENEDOR anidado
+ * con ese atributo re-ancle la piel base aunque el tema global de <html> sea
+ * uno claro (las custom properties heredan del ancestro MÁS CERCANO que las
+ * define). En la app real es un no-op: useTheme NUNCA escribe esos ids en
+ * <html> (les quita data-theme). Ver ThemeLivePreview.jsx.
  * =========================================================================== */
-:root {
+:root,
+[data-theme="biopunk"],
+[data-theme="biopunk2"] {
   /* slate — escala neutra (chrome oscuro biopunk). Tailwind default exacto. */
   --c-slate-50: 248 250 252;
   --c-slate-100: 241 245 249;
