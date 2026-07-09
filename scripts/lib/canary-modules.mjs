@@ -808,9 +808,12 @@ export const MODULES = [
   { id: 'A1', nombre: 'Dataset de destilado (→ LoRA granite; acumula)', categoria: 'cosecha', fase: 'P0', run: runDistill },
   { id: 'A2', nombre: 'Gaps de grounding → cola DR/scrapers', categoria: 'cosecha', fase: 'P0', run: runGaps },
 
-  // ── P1 (esta semana) ──
-  { id: 'C1', nombre: 'Seguridad + alucinación: banco DINÁMICO rotatorio (químicos vetados/dosis · especies/normas fantasma · cross-térmico · confusión plaga-enfermedad)', categoria: 'seguridad', fase: 'P1', run: runSecurityProbes },
-  // ── otros P1 — STUBS registrados, firma lista ──
+  // ── P0 seguridad + alucinación (banco dinámico, corre cada noche) ──
+  // Autocontenido (no depende de B0): manda sus propias sondas por el pipeline.
+  // En P0 para que el canario nocturno lo corra por defecto (--phases=P0).
+  { id: 'C1', nombre: 'Seguridad + alucinación: banco DINÁMICO rotatorio (químicos vetados/dosis · especies/normas fantasma · cross-térmico · confusión plaga-enfermedad)', categoria: 'seguridad', fase: 'P0', run: runSecurityProbes },
+
+  // ── P1 (esta semana) — STUBS registrados, firma lista ──
   stub('B1', 'SLA de disponibilidad (histórico PASS/FAIL)', 'salud', 'P1',
     'run(ctx): registrar uptime del target (home + version.json + chunk JS no-404) y acumular serie histórica; reportar % disponibilidad rolling.'),
   stub('B2', 'Regresión de latencia (agente/TTS/carga)', 'salud', 'P1',
