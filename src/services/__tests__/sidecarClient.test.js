@@ -1135,3 +1135,44 @@ describe('sidecarClient — getClimaSnapshot elevation (gradiente térmico)', ()
     expect(url).not.toContain('elevation');
   });
 });
+
+describe('sidecarClient — companionSpeciesGuard post-LLM', () => {
+  beforeEach(() => {
+    enableFlag();
+  });
+
+  it('200 con bloque de correccion → normaliza has_companion_species y system_prompt_block', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(200, {
+      has_companion_species: true,
+      system_prompt_block: '[CORRECCION] La especie companera correcta es X.',
+      reason: 'catalog_match',
+    }));
+    const { companionSpeciesGuard } = await importFresh();
+    const res = await companionSpeciesGuard('respuesta del agente ya generada');
+    expect(res).toEqual({
+      has_companion_species: true,
+      system_prompt_block: '[CORRECCION] La especie companera correcta es X.',
+      reason: 'catalog_match',
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [url, opts] = fetchMock.mock.calls[0];
+    expect(url).toBe('/api/mcp/agro/companion-species-guard');
+    expect(opts.method).toBe('POST');
+    const body = JSON.parse(opts.body);
+    expect(body).toEqual({ response: 'respuesta del agente ya generada' });
+  });
+
+  it('degrada a null si el endpoint cae o no responde 2xx', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(503, { error: 'down' }));
+    const { companionSpeciesGuard } = await importFresh();
+    expect(await companionSpeciesGuard('respuesta')).toBeNull();
+  });
+
+  it('devuelve null sin fetch cuando la respuesta viene vacia', async () => {
+    const { companionSpeciesGuard } = await importFresh();
+    expect(await companionSpeciesGuard('')).toBeNull();
+    expect(await companionSpeciesGuard('   ')).toBeNull();
+    expect(await companionSpeciesGuard(null)).toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+});

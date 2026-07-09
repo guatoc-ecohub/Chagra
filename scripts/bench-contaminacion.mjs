@@ -82,6 +82,7 @@ import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { performance } from 'node:perf_hooks';
+import { prependCorrectionBlock } from '../src/components/AgentScreen/responseGuards.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
@@ -660,6 +661,41 @@ async function pestVsDiseaseGuard(userMessage, { sidecarUrl = SIDECAR_URL } = {}
 }
 
 /**
+ * companionSpeciesGuard — llama al endpoint POST-LLM `/companion-species-guard`.
+ * El bench lo invoca solo para las sondas cross_thermal, sobre la respuesta ya
+ * generada, para medir si el guard hubiera corregido el turno real.
+ *
+ * FAIL-SAFE: cualquier error/timeout/non-2xx degrada a bloque vacio.
+ * @param {string} responseText
+ * @param {{ sidecarUrl?: string }} [opts]
+ * @returns {Promise<{ has_companion_species: boolean, system_prompt_block: string }>}
+ */
+export async function companionSpeciesGuard(
+  responseText,
+  { sidecarUrl = SIDECAR_URL, fetchImpl = fetch } = {},
+) {
+  const token = getSidecarToken();
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['X-Chagra-Token'] = token;
+  try {
+    const res = await fetchImpl(`${sidecarUrl}/companion-species-guard`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ response: responseText }),
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) return { has_companion_species: false, system_prompt_block: '' };
+    const data = await res.json();
+    return {
+      has_companion_species: data.has_companion_species === true || data.has_companion === true || data.needs_correction === true,
+      system_prompt_block: typeof data.system_prompt_block === 'string' ? data.system_prompt_block : '',
+    };
+  } catch (err) {
+    return { has_companion_species: false, system_prompt_block: '', error: err.message };
+  }
+}
+
+/**
  * buildEnrichedSystemPrompt — arma el system prompt que ve el modelo en la
  * fase remote-run. `pisoTermicoBlock`/`confusionEspecieBlock`/
  * `pestVsDiseaseBlock` (opcionales) son los `system_prompt_block` YA
@@ -783,6 +819,7 @@ export async function runProbeAgainstAgent(probe, opts = {}) {
     pisoTermicoFn = pisoTermicoGuard,
     confusionEspecieFn = confusionEspecieGuard,
     pestVsDiseaseFn = pestVsDiseaseGuard,
+    companionSpeciesFn = companionSpeciesGuard,
   } = opts;
   const t0 = performance.now();
   const [{ entities }, pisoTermico, confusionEspecie, pestVsDisease] = await Promise.all([
@@ -801,7 +838,16 @@ export async function runProbeAgainstAgent(probe, opts = {}) {
     ? pestVsDisease.system_prompt_block
     : '';
   const systemPrompt = buildEnrichedSystemPrompt(entities, pisoTermicoBlock, confusionEspecieBlock, pestVsDiseaseBlock);
-  const { response, error } = await callFn(model, systemPrompt, probe.query);
+  const { response: rawResponse, error } = await callFn(model, systemPrompt, probe.query);
+  let response = rawResponse;
+  let companionSpeciesBlock = '';
+  if (!error && probe.type === 'cross_thermal') {
+    const companionSpecies = await companionSpeciesFn(rawResponse);
+    if (companionSpecies && typeof companionSpecies.system_prompt_block === 'string' && companionSpecies.system_prompt_block.trim()) {
+      companionSpeciesBlock = companionSpecies.system_prompt_block;
+      response = prependCorrectionBlock(response, companionSpeciesBlock);
+    }
+  }
   const validation = error ? { hallucinated: [], detected_count: 0 } : await validateFn(probe.query, response);
   return {
     id: probe.id,
@@ -815,6 +861,7 @@ export async function runProbeAgainstAgent(probe, opts = {}) {
     piso_termico_guard_fired: Boolean(pisoTermicoBlock),
     confusion_especie_guard_fired: Boolean(confusionEspecieBlock),
     pest_vs_disease_guard_fired: Boolean(pestVsDiseaseBlock),
+    companion_species_guard_fired: Boolean(companionSpeciesBlock),
     halluc_detected_count: validation.detected_count,
     latency_ms: Math.round(performance.now() - t0),
   };
