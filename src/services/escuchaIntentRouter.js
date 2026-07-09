@@ -26,6 +26,7 @@
  *
  * IMPORTANTE — español colombiano (tú/usted), NUNCA voseo argentino.
  */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- etiquetas visibles de destino; deuda de i18n fuera de este cambio */
 
 /** Quita tildes/diéresis y baja a minúsculas para matching tolerante a Whisper. */
 export function normalizarHabla(texto) {
@@ -49,6 +50,7 @@ const DESTINOS = Object.freeze([
   { claves: ['registro por voz', 'registrar por voz'], view: 'voz', etiqueta: 'Registro por voz' },
   // una palabra
   { claves: ['suelo'], view: 'suelo', etiqueta: 'Suelo' },
+  { claves: ['cafe', 'cafeto', 'cafetal', 'el cafe'], view: 'cafe', etiqueta: 'El café' },
   { claves: ['mercado'], view: 'mercado', etiqueta: 'Mercado' },
   { claves: ['mercados'], view: 'mercados', etiqueta: 'Mercados campesinos' },
   { claves: ['mapa'], view: 'mapa', etiqueta: 'Mapa de la finca' },
@@ -65,8 +67,8 @@ const DESTINOS = Object.freeze([
   { claves: ['vacas'], view: 'animales_vacas', etiqueta: 'Vacas' },
   { claves: ['biopreparados', 'biopreparado'], view: 'biopreparados', etiqueta: 'Biopreparados' },
   { claves: ['fermentos'], view: 'fermentos', etiqueta: 'Fermentos' },
-  { claves: ['sembrar', 'siembra', 'siembras'], view: 'sembrar', etiqueta: 'Sembrar' },
-  { claves: ['cosechar', 'cosecha', 'cosechas'], view: 'cosechar', etiqueta: 'Cosechar' },
+  { claves: ['sembrar', 'siembra', 'siembras', 'siembre', 'sembre'], view: 'sembrar', etiqueta: 'Sembrar' },
+  { claves: ['cosechar', 'cosecha', 'cosechas', 'coseche'], view: 'cosechar', etiqueta: 'Cosechar' },
   { claves: ['perfil'], view: 'perfil', etiqueta: 'Perfil' },
   { claves: ['inicio', 'casa', 'portada', 'principal'], view: 'dashboard', etiqueta: 'Inicio' },
   { claves: ['especies', 'directorio'], view: 'directorio', etiqueta: 'Directorio de especies' },
@@ -88,6 +90,7 @@ const VERBOS_NAV = [
   'muestrame', 'muestreme', 'mostrar', 'muestra', 'muestre',
   'ir a', 'ir al', 'vamos a', 'vamos al', 'vamos para', 've a', 'vaya a',
   'entrar a', 'entra a', 'entre a', 'entremos a',
+  'anota', 'apunta', 'registra', 'registre',
   'quiero ver', 'quiero entrar', 'ver el', 'ver la', 'ver los', 'ver las', 'ver mi', 'ver mis',
 ];
 
@@ -103,6 +106,8 @@ const INTERROGATIVAS = [
 /* Palabras "relleno" tolerables en una frase corta que es solo un destino:
  * "a la bodega" → bodega. */
 const RELLENO = new Set(['a', 'al', 'el', 'la', 'los', 'las', 'de', 'del', 'mi', 'mis', 'un', 'una', 'chagra', 'por', 'favor']);
+const WAKE_FILLER_PREFIX = new Set(['este', 'eh', 'em', 'um', 'pues', 'bueno', 'aver', 'a', 'ver']);
+const WAKE_FILLER_SUFFIX = new Set(['pues', 'entonces', 'bueno', 'eh', 'em', 'um', 'este']);
 
 const contieneToken = (tokens, frase) => {
   const partes = frase.split(' ');
@@ -123,6 +128,27 @@ function buscarDestino(tokens) {
 }
 
 /**
+ * Recorta la wake-word cuando aparece al inicio de la transcripción, tolerando
+ * mayúsculas, muletillas y la variante sin h ("ola chagra").
+ *
+ * @param {string} texto
+ * @returns {{ tieneWakeWord: boolean, texto: string }}
+ */
+export function extraerTextoDespuesWakeWord(texto) {
+  const original = String(texto || '').trim();
+  const norma = normalizarHabla(original);
+  if (!norma) return { tieneWakeWord: false, texto: '' };
+  const tokens = norma.split(' ').filter(Boolean);
+  let i = 0;
+  while (i < tokens.length && WAKE_FILLER_PREFIX.has(tokens[i])) i += 1;
+  if (tokens[i] !== 'hola' && tokens[i] !== 'ola') return { tieneWakeWord: false, texto: original };
+  if (tokens[i + 1] !== 'chagra') return { tieneWakeWord: false, texto: original };
+  i += 2;
+  while (i < tokens.length && WAKE_FILLER_SUFFIX.has(tokens[i])) i += 1;
+  return { tieneWakeWord: true, texto: tokens.slice(i).join(' ') };
+}
+
+/**
  * Rutea una frase transcrita: ¿navegación o pregunta al agente?
  *
  * @param {string} texto - transcripción cruda de Whisper.
@@ -134,21 +160,31 @@ function buscarDestino(tokens) {
  * routeUtterance('¿cuánta agua pide el café?'); // → { tipo:'agente', prompt:'…' }
  */
 export function routeUtterance(texto) {
-  const prompt = String(texto || '').trim();
+  const promptOriginal = String(texto || '').trim();
+  const afterWakeWord = extraerTextoDespuesWakeWord(promptOriginal);
+  const prompt = afterWakeWord.tieneWakeWord ? (afterWakeWord.texto || promptOriginal) : promptOriginal;
   const norma = normalizarHabla(prompt);
   if (!norma) return { tipo: 'agente', prompt };
 
   const tokens = norma.split(' ');
+  const tieneVerboNav = VERBOS_NAV.some((v) => contieneToken(tokens, v));
 
   // Regla 1: pregunta explícita → agente, sin importar qué destinos mencione.
-  if (INTERROGATIVAS.some((q) => contieneToken(tokens, q))) {
+  const tieneInterrogativa = INTERROGATIVAS.some((q) => {
+    if (q === 'que') {
+      const idx = tokens.indexOf('que');
+      if (idx > 0 && tieneVerboNav) return false;
+    }
+    return contieneToken(tokens, q);
+  });
+  if (tieneInterrogativa) {
     return { tipo: 'agente', prompt };
   }
 
   const destino = buscarDestino(tokens);
   if (destino) {
     // Regla 2: verbo de navegación + destino conocido.
-    if (VERBOS_NAV.some((v) => contieneToken(tokens, v))) {
+    if (tieneVerboNav) {
       return { tipo: 'navegar', view: destino.view, etiqueta: destino.etiqueta };
     }
     // Regla 3: la frase corta ES el destino (con artículos de relleno).
